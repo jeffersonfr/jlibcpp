@@ -1,0 +1,21 @@
+<!-- <?echo "<?xml version=\"1.0\" ?>";?> -->
+
+<script type="text/javascript" language="javascript">
+
+	function update() {
+		var intervalo = window.setInterval(function() {
+			window.location.reload();
+			// window.parent.frames['info'].location.reload();
+		}, 1000);
+	}
+</script>
+
+<html>
+	<body onload="update();">
+
+		<iframe name='info' height=400px align=center width=100% frameborder=10 marginwidth=10 marginheight=10 scrolling=no src="http://127.0.0.1:3200/?type=info"></iframe>
+
+		<h2>Mlive Stream Server</h2>
+		<hr>
+	</body>
+</html>

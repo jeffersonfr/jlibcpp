@@ -1,0 +1,23 @@
+[Installing jlib]
+
+Type:
+
+"sudo make all install"
+
+[Compilling tests]
+
+For each module of jlib, change to tests directory and type
+
+"make"
+
+[Compiling applications]
+
+## Makefile -- begin ##
+
+export JLIB_HOME=<jlib-home>
+
+all:
+	g++ <app.cpp> -o <app> -I$(JLIB_HOME)/jcommon/include -I$(JLIB_HOME)/jsocket/include -I$(JLIB_HOME)/jthread/include -I$(JLIB_HOME)/jio/include -I$(JLIB_HOME)/jlogger/include -I$(JLIB_HOME)/jshare/include -I<directfb-include> -L$(JLIB_HOME)/lib -ljlib -lpthread -ldirectfb -lssl -D_GNU_SOURCE -DJDEBUG_ENABLED -DDIRECTFB_UI
+
+## Makefile -- end ##
+

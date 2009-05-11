@@ -1,0 +1,287 @@
+MODULE	= jlibcpp
+
+EXE			= lib$(MODULE).dll
+
+DEVCPP	= c:/Dev-Cpp
+
+CPP			= g++.exe
+CC			= gcc.exe
+WINDRES	= windres.exe
+RES			=
+LIBS		=  -L. -L$(DEVCPP)/lib -lwsock32 -lcoredll
+INCS		=  -Iinclude -I$(DEVCPP)/include -Iwin32/include -Ijcommon/include -Ijio/include -Ijlogger/include -Ijshared/include -Ijsocket/include -Ijthread/include -Ijmpeg/include -Ijgui/include 
+CXXINCS	=  -I$(DEVCPP)/include/c++ -I$(DEVCPP)/include/c++/mingw32 -I$(DEVCPP)/include/c++/backward -I$(DEVCPP)/include 
+CXXFLAGS	= $(CXXINCS) $(INCS)
+
+EXTRAOBJ	= 
+
+.PHONY: all all-before all-after clean clean-custom
+
+all: all-before $(EXE) all-after
+
+OK			= OK
+
+OBJS_jcommon = \
+	   jbitstream.o\
+	   jcalendar.o\
+	   jsystem.o\
+	   jdate.o\
+	   jdynamiclink.o\
+	   jexception.o\
+	   jobject.o\
+	   jobservable.o\
+	   jobserver.o\
+	   joutofboundsexception.o\
+	   jproperties.o\
+	   jruntimeexception.o\
+	   jnullpointerexception.o\
+	   jstringtokenizer.o\
+	   jtypes.o\
+	   jurl.o\
+	   jhttp.o\
+	   jstringutils.o\
+	   jcommonlib.o\
+	   jcompileexception.o\
+	   jxmlparser.o\
+	   joptions.o\
+	   jlistener.o\
+	   jeventobject.o\
+	   
+OBJS_jmpeg = \
+	   jadaptationfield.o\
+   	 jmpegexception.o\
+	   jmpeglib.o\
+	   jprogramassociationsection.o\
+	   jprogrammapsection.o\
+	   jprogramelementarystreamsection.o\
+	   jprogramsysteminformationsection.o\
+	   jtransportstreampacket.o\
+
+OBJS_jio = \
+	   jbitinputstream.o\
+	   jbitoutputstream.o\
+	   jfile.o\
+	   jfileexception.o\
+	   jfileinputstream.o\
+	   jfileoutputstream.o\
+	   jdatainputstream.o\
+	   jdataoutputstream.o\
+	   jinputstream.o\
+	   joutputstream.o\
+	   jioexception.o\
+	   jmemoryinputstream.o\
+	   jmemoryoutputstream.o\
+	   jpipeexception.o\
+	   jpipestream.o\
+	   jchannel.o\
+	   jbufferedreader.o\
+	   jprintstream.o\
+	   jiolib.o\
+
+OBJS_jio = \
+	   jbitinputstream.o\
+	   jbitoutputstream.o\
+	   jfile.o\
+	   jfileexception.o\
+	   jfileinputstream.o\
+	   jfileoutputstream.o\
+	   jinputstream.o\
+	   joutputstream.o\
+	   jioexception.o\
+	   jmemoryinputstream.o\
+	   jmemoryoutputstream.o\
+	   jpipeexception.o\
+	   jpipestream.o\
+	   jchannel.o\
+	   jbufferedreader.o\
+	   jprintstream.o\
+	   jiolib.o\
+
+OBJS_jlogger = \
+	   jhandler.o\
+	   jsockethandler.o\
+	   jstreamhandler.o\
+	   jconsolehandler.o\
+	   jmemoryhandler.o\
+	   jfilehandler.o\
+	   jformatter.o\
+	   jsimpleformatter.o\
+	   jxmlformatter.o\
+	   jlogger.o\
+	   jloggerexception.o\
+	   jloggermanager.o\
+	   jlogrecord.o\
+	   jloggerlib.o
+
+OBJS_jshared = \
+	   jpipe.o\
+	   jmemorymap.o\
+	   jsharedmemory.o\
+	   jsharedsemaphore.o\
+	   jmemoryexception.o\
+	   jprocessexception.o\
+	   jmessagequeue.o\
+	   jprivateprocess.o\
+	   jwrapperprocess.o\
+	   jsharedfifo.o\
+	   jsharedlib.o\
+	   jmessageexception.o\
+	   jfifoexception.o\
+	   jschedule.o\
+
+OBJS_jsocket = \
+	   jconnection.o\
+	   jconnectionpipe.o\
+	   jsocketexception.o\
+	   jsockettimeoutexception.o\
+	   junknownhostexception.o\
+	   jsocketoptionexception.o\
+	   jinetaddress.o\
+	   jsocket.o\
+	   jdatagramsocket.o\
+	   jmulticastsocket.o\
+	   jserversocket.o\
+	   jsocketoption.o\
+	   jsocketinputstream.o\
+	   jsocketoutputstream.o\
+	   jsocketstreamexception.o\
+	   jsocketlib.o\
+
+OBJS_jthread = \
+	   jbufferexception.o\
+	   jcondition.o\
+	   jmutex.o\
+	   jsemaphore.o\
+	   jthread.o\
+	   jthreadexception.o\
+	   jsemaphoreexception.o\
+	   jsemaphoretimeoutexception.o\
+	   jmutexexception.o\
+	   jautolock.o\
+	   jspinlock.o\
+	   jthreadlib.o\
+	   jmultidestinationbuffer.o\
+	   jthreadgroup.o\
+	   jrunnable.o\
+
+OBJS_jgui = \
+		janimation.o\
+		jadjustmentlistener.o\
+		jadjustmentevent.o\
+		jbutton.o\
+		jbuttonevent.o\
+		jbuttonlistener.o\
+		jcalendardialog.o\
+		jcalendarevent.o\
+		jcalendarlistener.o\
+		jcheckbutton.o\
+		jcheckbuttonevent.o\
+		jcomponent.o\
+		jcheckbuttongroup.o\
+		jcheckbuttonlistener.o\
+		jcombobox.o\
+		jcomponentlistener.o\
+		jcomponentevent.o\
+		jcontainer.o\
+		jfocusevent.o\
+		jfocuslistener.o\
+		jfont.o\
+		jframeinputlistener.o\
+		jgraphics.o\
+		jnullgraphics.o\
+		jimagebutton.o\
+		jframe.o\
+		jgfxhandler.o\
+		jkeyboard.o\
+		jkeyboardevent.o\
+		jkeyboardlistener.o\
+		jkeylistener.o\
+		jkeyevent.o\
+		jinputmanager.o\
+		jlabel.o\
+		jlayout.o\
+		jnulllayout.o\
+		jgridlayout.o\
+		jborderlayout.o\
+		jlistbox.o\
+		jmarquee.o\
+		jmenu.o\
+		jmenugroup.o\
+		jmenuexception.o\
+		jmenuevent.o\
+		jmenulistener.o\
+		jmessagedialog.o\
+		jinputdialogbox.o\
+		joffscreenimage.o\
+		jpanel.o\
+		jprogressbar.o\
+		jmouselistener.o\
+		jmouseevent.o\
+		jselectevent.o\
+		jselectlistener.o\
+		jstaticimage.o\
+		jslider.o\
+		jscrollbar.o\
+		jspin.o\
+		jtextarea.o\
+		jtextdialog.o\
+		jtextevent.o\
+		jtextfield.o\
+		jtextlistener.o\
+		jwatch.o\
+		jyesnodialog.o\
+		jwindow.o\
+		jtable.o\
+		jtooglebutton.o\
+		jwindowlistener.o\
+		jwindowmanager.o\
+		jwindowevent.o\
+		jcontainerlistener.o\
+		jcontainerevent.o\
+		jguilib.o\
+
+SRCS_jcommon	= $(addprefix jcommon/,$(OBJS_jcommon))
+SRCS_jmpeg	= $(addprefix jmpeg/,$(OBJS_jmpeg))
+SRCS_jio	= $(addprefix jio/,$(OBJS_jio))
+SRCS_jlogger	= $(addprefix jlogger/,$(OBJS_jlogger))
+SRCS_jshared	= $(addprefix jshared/,$(OBJS_jshared))
+SRCS_jsocket	= $(addprefix jsocket/,$(OBJS_jsocket))
+SRCS_jthread	= $(addprefix jthread/,$(OBJS_jthread))
+SRCS_jgui	= $(addprefix jgui/,$(OBJS_jgui))
+
+OBJS	= $(OBJS_jcommon) $(OBJS_jmpeg) $(OBJS_jio) $(OBJS_jlogger) $(OBJS_jshared) $(OBJS_jsocket) $(OBJS_jthread) $(OBJS_jgui)
+SRCS	= $(SRCS_jcommon) $(SRCS_jmpeg) $(SRCS_jio) $(SRCS_jlogger) $(SRCS_jshared) $(SRCS_jsocket) $(SRCS_jthread) $(SRCS_jgui)
+
+$(EXE): $(SRCS)
+	@rm -rf lib
+	@mkdir lib
+	@$(AR) -rc ./lib/$(EXE) $(SRCS) 
+	@echo Linking $(EXE) ...  $(OK)
+
+.cpp.o: $<
+	@$(CPP) $(CXXFLAGS) -c $< -o $@ && echo Compiling $< ...  $(OK)
+
+strip:
+	@echo -e "Strip $(EXE)...  $(OK)"
+	@$(STRIP) $(LIBDIR)/$(EXE)
+
+tests:
+	@cd $(TESTDIR) && make && cd .. &&  echo -e "Compiling $< ...  $(OK)" 
+
+doc:
+	@mkdir -p $(DOCDIR) 
+
+install:
+	@cp $(LIBDIR)/$(EXE) c:/windows/system32
+
+uninstall:
+	@rm c:/windows/system32/$(EXE)
+
+clean: clean-custom
+	@rm -rf *.o *~ lib/$(EXE) jcommon/*.o jio/*.o jlogger/*.o jmpeg/*.o jshared/*.o jsocket/*.o jthread/*.o jgui/*.o
+	@echo $(MODULE) clean $(OK)
+
+ultraclean: clean
+	@rm -rf lib/$(EXE) $(BINDIR) $(LIBDIR)
+	@echo $(MODULE) ultraclean $(OK)
+

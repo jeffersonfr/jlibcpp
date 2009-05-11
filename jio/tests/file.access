@@ -1,0 +1,10 @@
+# allow ips
+allow {
+	192.168.0.*
+	189.99.84.*
+}
+
+# deny ips
+deny {
+	all
+}

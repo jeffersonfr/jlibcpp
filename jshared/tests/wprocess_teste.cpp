@@ -1,0 +1,70 @@
+#include "jwrapperprocess.h"
+
+#include <iostream>
+#include <sstream>
+#include <assert.h>
+
+using namespace std;
+using namespace jshared;
+
+int ostream_test()
+{
+  WrapperProcess grep("/bin/ls -l");
+
+  grep.Write("This is the first line");
+  grep.Write("This is Seven: 7");
+  
+  stringbuf sb;
+  char buf[200];
+
+  grep.Read(buf, 200);
+  
+  cout << "ostream test OK!" << endl;
+  cout << buf << endl;
+
+  return 0;
+}
+
+int main() 
+{
+  ostream_test();
+  
+  char *params[] = {"-i", 
+	  "-v", 
+	  "test"
+  };
+  char *dum[] = {"-l"
+  };
+  char *s = "			\
+	  This is\n			\
+	  a small test\n	\
+	  very small\n		\
+	  but a test\n		\
+	  ";
+  
+  WrapperProcess grep("/bin/grep", params);
+  WrapperProcess wc("/usr/bin/wc", dum);    
+
+  grep.Write(s, strlen(s));
+  wc.Write(s, strlen(s));
+
+  grep.WaitAllData();
+ 
+  char buf[256];
+  int len = grep.Read(buf, 255);
+  
+  buf[len] = 0;
+  
+  cout << "read " << len << " bytes: " << buf << endl;
+  
+  wc.Write(buf,len);
+  wc.WaitAllData();
+  
+  len = wc.Read(buf, 255);
+  buf[len] = 0;
+ 
+  cout << "read " << len << " bytes: " << buf << endl;
+
+  return 0;
+}
+
