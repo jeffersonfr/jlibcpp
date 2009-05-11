@@ -31,10 +31,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			jgui::Button button("teste", 10, 10, 10, 10);
 			container.Add(&button);
 			button.RequestFocus();
-			printf("FOCUS:: %p\n", container.GetComponentInFocus());
-
-
-
 		}
 
 		virtual ~GraphicsTeste()
