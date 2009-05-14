@@ -155,7 +155,7 @@ void Frame::SetInputEnabled(bool b)
 
 void Frame::Pack()
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	Component *c;
 	int max_width = 0,

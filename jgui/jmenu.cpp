@@ -275,9 +275,11 @@ int Menu::GetCurrentIndex()
 
 void Menu::RemoveItem(int index)
 {
-	jthread::AutoLock lock(&_menu_mutex);
+	{
+		jthread::AutoLock lock(&_menu_mutex);
 
-	// TODO:: 
+		// TODO:: 
+	}
 	
 	Repaint();
 }
@@ -848,7 +850,11 @@ int MenuComponent::GetCurrentIndex()
 
 void MenuComponent::RemoveItem(int index)
 {
-	// remove
+	{
+		jthread::AutoLock lock(&_component_mutex);
+		
+		// remove
+	}
 
 	Repaint();
 }

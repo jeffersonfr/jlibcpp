@@ -165,7 +165,7 @@ Container * Container::GetParent()
 
 void Container::InvalidateAll()
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	std::vector<std::vector<jgui::Component *> *> containers;
 
@@ -192,7 +192,7 @@ void Container::InvalidateAll()
 
 void Container::RevalidateAll()
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	std::vector<std::vector<jgui::Component *> *> containers;
 
@@ -253,7 +253,7 @@ void Container::Paint(Graphics *g)
 	// CHANGE:: descarta componentes fora dos limites de desenho
 	bool paint_components_out_of_range = false;
 
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		c = (*i);
@@ -320,11 +320,11 @@ bool Container::Collide(Component *c1, int x, int y, int w, int h)
 
 void Container::Repaint(bool all)
 {
+	Invalidate();
+
 	if (_ignore_repaint == true) {
 		return;
 	}
-
-	Invalidate();
 
 	if (_parent != NULL) {
 		if (all == false && IsOpaque() == true) {
@@ -451,7 +451,7 @@ void Container::Add(jgui::Component *c, jborderlayout_align_t align)
 
 void Container::Remove(jgui::Component *c)
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	c->ReleaseFocus();
 
@@ -476,7 +476,7 @@ void Container::Remove(jgui::Component *c)
 
 void Container::RemoveAll()
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	_components.clear();
 
@@ -485,7 +485,7 @@ void Container::RemoveAll()
 
 int Container::GetComponentCount()
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	return _components.size();
 }
@@ -497,6 +497,8 @@ std::vector<Component *> & Container::GetComponents()
 
 void Container::RequestComponentFocus(jgui::Component *c)
 {
+	SetIgnoreRepaint(true);
+
 	if (_parent != NULL) {
 		_parent->RequestComponentFocus(c);
 	} else {
@@ -512,6 +514,10 @@ void Container::RequestComponentFocus(jgui::Component *c)
 			dynamic_cast<Component *>(_focus)->DispatchEvent(new FocusEvent(_focus, GAINED_FOCUS_EVENT));
 		}
 	}
+	
+	SetIgnoreRepaint(false);
+
+	c->Repaint();
 }
 
 void Container::ReleaseComponentFocus(jgui::Component *c)
@@ -542,7 +548,7 @@ jgui::Component * Container::GetComponentInFocus()
 
 void Container::RaiseComponentToTop(Component *c)
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	bool b = false;
 
@@ -563,7 +569,7 @@ void Container::RaiseComponentToTop(Component *c)
 
 void Container::LowerComponentToBottom(Component *c)
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	bool b = false;
 
@@ -584,7 +590,7 @@ void Container::LowerComponentToBottom(Component *c)
 
 void Container::PutComponentATop(Component *c, Component *c1)
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	std::vector<jgui::Component *>::iterator i;
 
@@ -599,7 +605,7 @@ void Container::PutComponentATop(Component *c, Component *c1)
 
 void Container::PutComponentBelow(Component *c, Component *c1)
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_container_mutex);
 
 	std::vector<jgui::Component *>::iterator i;
 

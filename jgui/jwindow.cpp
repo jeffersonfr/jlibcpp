@@ -531,8 +531,6 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 		return;
 	}
 
-	// graphics->Lock();
-
 	Component *c1 = NULL,
 			  *c2 = NULL;
 
@@ -541,7 +539,7 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 
 		collisions.push_back(c);
 
-		jthread::AutoLock lock(&_component_mutex);
+		jthread::AutoLock lock(&_container_mutex);
 
 		for (std::vector<jgui::Component *>::iterator i=std::find(_components.begin(), _components.end(), c); i!=_components.end(); i++) {
 			c1 = (*i);
@@ -601,19 +599,22 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 					y2 = y3+h3;
 				}
 
-				graphics->SetClip(x3, y3, w3, h3);
-				// graphics->SetClip(c1->GetX()-_scroll_x, c1->GetY()-_scroll_y, c1->GetWidth(), c1->GetHeight());
+				graphics->Lock();
 				graphics->Reset();
+				graphics->SetClip(x3, y3, w3, h3);
 
 				c1->Paint(graphics);
 				c1->Revalidate();
 
 				graphics->ReleaseClip();
+				graphics->Unlock();
 			}
 		}
 		
 		if (flag == true) {
+			graphics->Lock();
 			graphics->Flip(x1, y1, x2-x1, y2-y1);
+			graphics->Unlock();
 		}
 	} else {
 		c1 = c;
@@ -625,19 +626,19 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 						h1 = c1->GetHeight();
 
 			if ((x1 < GetWidth() && (x1+w1) > 0) && (y1 < GetHeight() && (y1+h1) > 0)) {
-				graphics->SetClip(x1, y1, w1, h1);
+				graphics->Lock();
 				graphics->Reset();
+				graphics->SetClip(x1, y1, w1, h1);
 
 				c1->Paint(graphics);
 				c1->Revalidate();
 
 				graphics->Flip(x1, y1, w1, h1);
 				graphics->ReleaseClip();
+				graphics->Unlock();
 			}
 		}
 	}
-	
-	// graphics->Unlock();
 }
 
 void Window::Paint(Graphics *g)

@@ -224,20 +224,22 @@ int ComboMenu::GetCurrentIndex()
 
 void ComboMenu::RemoveItem(int index)
 {
-	jthread::AutoLock lock(&_menu_mutex);
+	{
+		jthread::AutoLock lock(&_menu_mutex);
 
-	// TODO:: 
+		// TODO:: 
+	}
 	
 	Repaint();
 }
 
 void ComboMenu::RemoveAll()
 {
+	jthread::AutoLock lock(&_menu_mutex);
+
 	if (_list == NULL) {
 		return;
 	}
-
-	jthread::AutoLock lock(&_menu_mutex);
 
 	_list->RemoveAll();
 }
@@ -1146,9 +1148,13 @@ void ComboBox::ItemSelected(MenuEvent *event)
 
 void ComboBox::ItemChanged(MenuEvent *event)
 {
-	jthread::AutoLock lock(&_component_mutex);
+	MenuItem *item = NULL;
 
-	MenuItem *item = event->GetMenuItem();
+	{
+		jthread::AutoLock lock(&_component_mutex);
+
+		item = event->GetMenuItem();
+	}
 
 	if (item != NULL) {
 		Repaint();

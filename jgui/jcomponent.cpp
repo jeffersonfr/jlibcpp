@@ -365,11 +365,11 @@ void Component::SetIgnoreRepaint(bool b)
 
 void Component::Repaint(bool all)
 {
+	Invalidate();
+
 	if (_ignore_repaint == true) {
 		return;
 	}
-
-	Invalidate();
 
 	if (_parent != NULL) {
 		if (all == false && IsOpaque() == true) {
