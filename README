@@ -1,4 +1,4 @@
-[Installing jlib]
+[Installing jlibcpp]
 
 Type:
 
@@ -6,7 +6,7 @@ Type:
 
 [Compilling tests]
 
-For each module of jlib, change to tests directory and type
+For each module of jlibcpp, change to tests directory and type
 
 "make"
 
@@ -14,10 +14,10 @@ For each module of jlib, change to tests directory and type
 
 ## Makefile -- begin ##
 
-export JLIB_HOME=<jlib-home>
+export JLIB_HOME=<jlibcpp-home>
 
 all:
-	g++ <app.cpp> -o <app> -I$(JLIB_HOME)/jcommon/include -I$(JLIB_HOME)/jsocket/include -I$(JLIB_HOME)/jthread/include -I$(JLIB_HOME)/jio/include -I$(JLIB_HOME)/jlogger/include -I$(JLIB_HOME)/jshare/include -I<directfb-include> -L$(JLIB_HOME)/lib -ljlib -lpthread -ldirectfb -lssl -D_GNU_SOURCE -DJDEBUG_ENABLED -DDIRECTFB_UI
+	g++ <app.cpp> -o <app> -I$(JLIB_HOME)/jcommon/include -I$(JLIB_HOME)/jsocket/include -I$(JLIB_HOME)/jthread/include -I$(JLIB_HOME)/jio/include -I$(JLIB_HOME)/jlogger/include -I$(JLIB_HOME)/jshare/include -I<directfb-include> -L$(JLIB_HOME)/lib -ljlibcpp -lpthread -ldirectfb -lssl -D_GNU_SOURCE -DJDEBUG_ENABLED -DDIRECTFB_UI
 
 ## Makefile -- end ##
 
