@@ -241,28 +241,6 @@ void Frame::SetLastKeyCode(jkey_symbol_t key)
 	_last_key_code = key;
 }
 
-void Frame::RequestComponentFocus(jgui::Component *c)
-{
-	// WARN:: comentado por causa de dead-locks no processamento dos eventos de mouse
-	// jthread::AutoLock lock(&_input_mutex);
-
-	Container::RequestComponentFocus(c);
-}
-
-void Frame::ReleaseComponentFocus(jgui::Component *c)
-{
-	jthread::AutoLock lock(&_input_mutex);
-
-	Container::ReleaseComponentFocus(c);
-}
-
-jgui::Component * Frame::GetComponentInFocus()
-{
-	jthread::AutoLock lock(&_input_mutex);
-
-	return Container::GetComponentInFocus();
-}
-
 jinsets_t Frame::GetInsets()
 {
 	if (_subtitles.size() == 0) {

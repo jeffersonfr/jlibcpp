@@ -43,6 +43,8 @@ class Layout;
 
 class Container : public jgui::Component{
 
+	friend class Component;
+
 	protected:
 		jthread::Mutex _container_mutex;
 
@@ -56,6 +58,10 @@ class Container : public jgui::Component{
 		int _scale_width, 
 			_scale_height;
 		bool _optimized_paint;
+
+	protected:
+		virtual void RequestComponentFocus(jgui::Component *c);
+		virtual void ReleaseComponentFocus(jgui::Component *c);
 
 	public:
 		Container(int x = 0, int y = 0, int width = 0, int height = 0, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
@@ -101,8 +107,6 @@ class Container : public jgui::Component{
 
 		virtual Component * GetTargetComponent(Container *target, int x, int y);
 
-		virtual void RequestComponentFocus(jgui::Component *c);
-		virtual void ReleaseComponentFocus(jgui::Component *c);
 		virtual jgui::Component * GetComponentInFocus();
 
 		virtual void RaiseComponentToTop(Component *c);

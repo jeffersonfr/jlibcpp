@@ -258,7 +258,7 @@ void Container::Paint(Graphics *g)
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		c = (*i);
 
-		if (c->IsVisible() == true) {
+		if (c->IsVisible() == true && c->IsValid() == false) {
 			int x1 = c->GetX()-_scroll_x,
 					y1 = c->GetY()-_scroll_y,
 					w1 = c->GetWidth(),
@@ -276,10 +276,8 @@ void Container::Paint(Graphics *g)
 				g->Lock();
 				g->SetClip(x1, y1, w1, h1);
 				
-				if (c->IsValid() == false) {
-					c->Paint(g);
-					c->Revalidate();
-				}
+				c->Paint(g);
+				c->Revalidate();
 
 				g->ReleaseClip();
 				g->Unlock();
@@ -327,16 +325,10 @@ void Container::Repaint(bool all)
 	}
 
 	if (_parent != NULL) {
-		if (all == false && IsOpaque() == true) {
+		if (all == false && IsOpaque() == true && _parent->IsValid() == true) {
 			_parent->Repaint(this, _x-_scroll_x, _y-_scroll_y, _width, _height);
 		} else {
 			InvalidateAll();
-
-			/*
-			for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-				(*i)->Invalidate();
-			}
-			*/
 
 			_parent->Repaint(true);
 		}
@@ -347,11 +339,11 @@ void Container::Repaint(bool all)
 
 void Container::Repaint(int x, int y, int width, int height)
 {
+	Invalidate();
+
 	if (_ignore_repaint == true) {
 		return;
 	}
-
-	Invalidate();
 
 	if (_parent != NULL) {
 		_parent->Repaint(_x-_scroll_x, _y-_scroll_y, _width, _height);
@@ -360,15 +352,18 @@ void Container::Repaint(int x, int y, int width, int height)
 
 void Container::Repaint(Component *c, int x, int y, int width, int height)
 {
+	Invalidate();
+
 	if (_ignore_repaint == true) {
 		return;
 	}
 
-	Invalidate();
-
 	if (_parent != NULL) {
 		_parent->Repaint(this, _x-_scroll_x, _y-_scroll_y, _width, _height);
 	}
+
+	// CHANGE:: o container naum estava voltando ao estado valido
+	Revalidate();
 }
 
 void Container::Add(Component *c, GridBagConstraints *constraints)
@@ -497,43 +492,48 @@ std::vector<Component *> & Container::GetComponents()
 
 void Container::RequestComponentFocus(jgui::Component *c)
 {
-	SetIgnoreRepaint(true);
+	if (c == NULL) {
+		return;
+	}
 
 	if (_parent != NULL) {
+		// Invalidate();
 		_parent->RequestComponentFocus(c);
 	} else {
-		if (c != NULL) {
-			if (_focus != NULL && _focus != c) {
-				_focus->ReleaseFocus();
-			}
+		SetIgnoreRepaint(true);
 
-			_focus = c;
-
-			_focus->Repaint();
-
-			dynamic_cast<Component *>(_focus)->DispatchEvent(new FocusEvent(_focus, GAINED_FOCUS_EVENT));
+		if (_focus != NULL && _focus != c) {
+			_focus->ReleaseFocus();
 		}
-	}
-	
-	SetIgnoreRepaint(false);
 
-	c->Repaint();
+		_focus = c;
+
+		_focus->Invalidate();
+
+		dynamic_cast<Component *>(_focus)->DispatchEvent(new FocusEvent(_focus, GAINED_FOCUS_EVENT));
+	
+		SetIgnoreRepaint(false);
+
+		c->Repaint();
+	}
 }
 
 void Container::ReleaseComponentFocus(jgui::Component *c)
 {
+	if (c == NULL) {
+		return;
+	}
+
 	if (_parent != NULL) {
 		_parent->ReleaseComponentFocus(c);
 	} else {
-		if (c != NULL) {
-			if (_focus != NULL && _focus == c) {
-				_focus->Repaint();
+		if (_focus != NULL && _focus == c) {
+			_focus->Repaint();
 
-				dynamic_cast<Component *>(_focus)->DispatchEvent(new FocusEvent(_focus, LOST_FOCUS_EVENT));
-			}
-
-			_focus = NULL;
+			dynamic_cast<Component *>(_focus)->DispatchEvent(new FocusEvent(_focus, LOST_FOCUS_EVENT));
 		}
+
+		_focus = NULL;
 	}
 }
 

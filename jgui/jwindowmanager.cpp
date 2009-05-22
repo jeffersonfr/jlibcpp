@@ -100,11 +100,7 @@ void WindowManager::Release()
 		Window *w = (*i);
 
 		w->ReleaseWindow();
-
-		// CHANGE:: delete w;
 	}
-
-	// CHANGE:: windows.clear();
 #endif
 }
 

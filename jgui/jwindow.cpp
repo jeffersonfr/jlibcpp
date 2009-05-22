@@ -179,7 +179,7 @@ void Window::InnerCreateWindow()
 	}
 
 	if (window != NULL) {
-		window->SetOpacity(window, 0x00);
+		window->SetOpacity(window, _opacity);//0x00);
 		window->Release(window);
 		window = NULL;
 	}

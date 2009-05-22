@@ -751,6 +751,16 @@ std::string TextArea::GetText()
 	return _text;
 }
 
+void TextArea::ScrollUp()
+{
+	IncLine();
+}
+
+void TextArea::ScrollDown()
+{
+	DecLine();
+}
+
 void TextArea::RegisterTextListener(TextListener *listener)
 {
 	if (listener == NULL) {

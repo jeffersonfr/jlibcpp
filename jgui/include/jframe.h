@@ -131,10 +131,6 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		virtual void AddSubtitle(std::string image, std::string label);
 		virtual void RemoveAllSubtitles();
 
-		virtual void RequestComponentFocus(jgui::Component *c);
-		virtual void ReleaseComponentFocus(jgui::Component *c);
-		virtual jgui::Component * GetComponentInFocus();
-
 		virtual jkey_symbol_t GetLastKeyCode();
 		virtual void SetLastKeyCode(jkey_symbol_t key);
 

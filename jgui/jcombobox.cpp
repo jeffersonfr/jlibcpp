@@ -940,11 +940,12 @@ ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
 {
 	jcommon::Object::SetClassName("jgui::ComboBox");
 
+	_old_index = 0;
+
 	_menu = new ComboMenu(_x, _y+_height, _width, visible_items);
 
 	_menu->SetLoop(false);
 	_menu->SetCurrentIndex(0);
-
 	_menu->RegisterMenuListener(this);
 
 	SetFocusable(true);
@@ -1092,6 +1093,7 @@ void ComboBox::SetIndex(int i)
 {
 	jthread::AutoLock lock(&_component_mutex);
 
+	_old_index = _menu->GetCurrentIndex();
 	_menu->SetCurrentIndex(i);
 }
 
@@ -1144,6 +1146,11 @@ int ComboBox::GetIndex()
 
 void ComboBox::ItemSelected(MenuEvent *event)
 {
+	if (event == NULL) {
+		return;
+	}
+
+	DispatchEvent(new SelectEvent(this, GetValue(), GetIndex(), ACTION_ITEM));
 }
 
 void ComboBox::ItemChanged(MenuEvent *event)
@@ -1158,6 +1165,14 @@ void ComboBox::ItemChanged(MenuEvent *event)
 
 	if (item != NULL) {
 		Repaint();
+
+		if (GetIndex() > _old_index || (GetIndex() == 0 && _menu->GetItemsSize()-1)) {
+			DispatchEvent(new SelectEvent(this, GetValue(), GetIndex(), DOWN_ITEM));
+		} else {
+			DispatchEvent(new SelectEvent(this, GetValue(), GetIndex(), UP_ITEM));
+		}
+
+		_old_index = _menu->GetCurrentIndex();
 	}
 }
 

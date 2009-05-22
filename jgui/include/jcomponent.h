@@ -177,6 +177,10 @@ class Component : public virtual jcommon::Object{
 			_border_green,
 			_border_blue, 
 			_border_alpha,
+			_borderfocus_red,
+			_borderfocus_green,
+			_borderfocus_blue, 
+			_borderfocus_alpha,
 			_gradient_level,
 			_vertical_gap,
 			_horizontal_gap;
@@ -292,9 +296,10 @@ class Component : public virtual jcommon::Object{
 
 		virtual void SetBackgroundColor(int red, int green, int blue, int alpha);
 		virtual void SetForegroundColor(int red, int green, int blue, int alpha);
+		virtual void SetBorderColor(int red, int green, int blue, int alpha);
 		virtual void SetBackgroundFocusColor(int red, int green, int blue, int alpha);
 		virtual void SetForegroundFocusColor(int red, int green, int blue, int alpha);
-		virtual void SetBorderColor(int red, int green, int blue, int alpha);
+		virtual void SetBorderFocusColor(int red, int green, int blue, int alpha);
 
 		virtual unsigned int GetBackgroundColor();
 		virtual unsigned int GetForegroundColor();

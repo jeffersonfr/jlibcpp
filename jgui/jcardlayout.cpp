@@ -119,7 +119,8 @@ void CardLayout::First(Container *parent)
 
 		int ncomponents = parent->GetComponentCount();
 
-		for (int i = 0 ; i < ncomponents ; i++) {
+		// CHANGE:: for (int i = 0 ; i < ncomponents ; i++) {
+		for (int i = 1 ; i < ncomponents ; i++) {
 			Component *comp = parent->GetComponents()[i];
 
 			if (comp->IsVisible()) {
@@ -198,7 +199,8 @@ void CardLayout::Last(Container *parent)
 
 		int ncomponents = parent->GetComponentCount();
 		
-		for (int i = 0 ; i < ncomponents ; i++) {
+		// CHANGE:: for (int i = 0 ; i < ncomponents ; i++) {
+		for (int i = 0 ; i < ncomponents-1 ; i++) {
 			Component *comp = parent->GetComponents()[i];
 
 			if (comp->IsVisible()) {

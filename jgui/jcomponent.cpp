@@ -372,12 +372,10 @@ void Component::Repaint(bool all)
 	}
 
 	if (_parent != NULL) {
-		if (all == false && IsOpaque() == true) {
+		if (all == false && IsOpaque() == true && _parent->IsValid() == true) {
 			_parent->Repaint(this, _x, _y, _width, _height);
 		} else {
-			if (_parent != NULL) {
-				_parent->Repaint(true);
-			}
+			_parent->Repaint(true);
 		}
 	}
 
@@ -909,6 +907,18 @@ void Component::SetBorderColor(int red, int green, int blue, int alpha)
 	_border_green = green;
 	_border_blue = blue;
 	_border_alpha = alpha;
+
+	Repaint();
+}
+
+void Component::SetBorderFocusColor(int red, int green, int blue, int alpha)
+{
+	TRUNC_COLOR(red, green, blue, alpha);
+
+	_borderfocus_red = red;
+	_borderfocus_green = green;
+	_borderfocus_blue = blue;
+	_borderfocus_alpha = alpha;
 
 	Repaint();
 }

@@ -95,6 +95,8 @@ class TextArea : public Component{
 		std::string GetText();
 		bool SetSelectedText(int begin, int end);
 		std::string GetSelectedText();
+		void ScrollUp();
+		void ScrollDown();
 
 		virtual void SetWrap(bool b);
 		virtual void Paint(Graphics *g);

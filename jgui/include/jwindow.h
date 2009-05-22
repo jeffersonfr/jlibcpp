@@ -40,6 +40,7 @@ class InputManager;
 class Window : public Container{
 
 	friend class InputManager;
+	friend class WindowManager;
 
 	protected:
 #ifdef DIRECTFB_UI

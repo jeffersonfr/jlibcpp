@@ -159,7 +159,8 @@ class ComboBox : public Component, public MenuListener{//, public jthread::Threa
 	private:
 		std::vector<SelectListener *> _select_listeners;
 		ComboMenu *_menu;
-		int _arrow_size;
+		int _arrow_size,
+				_old_index;
 
 	public:
 		ComboBox(int x = 0, int y = 0, int width = 0, int height = 0, int visible_items = 3);
