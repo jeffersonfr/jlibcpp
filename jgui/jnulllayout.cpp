@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "jnulllayout.h"
 
+#include <limits.h>
+
 namespace jgui {
 
 NullLayout::NullLayout():

@@ -20,6 +20,8 @@
 #include "jborderlayout.h"
 #include "jcontainer.h"
 
+#include <limits.h>
+
 namespace jgui {
 
 BorderLayout::BorderLayout(int hgap, int vgap):

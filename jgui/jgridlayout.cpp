@@ -20,6 +20,8 @@
 #include "jgridlayout.h"
 #include "jcontainer.h"
 
+#include <limits.h>
+
 namespace jgui {
 
 GridLayout::GridLayout(int rows, int cols, int hgap, int vgap):

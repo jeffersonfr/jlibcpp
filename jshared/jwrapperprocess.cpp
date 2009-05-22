@@ -34,6 +34,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #define MAX_BUFFER_SIZE	4096
 

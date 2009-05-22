@@ -667,8 +667,8 @@ bool Window::Show(bool modal)
 
 bool Window::Hide()
 {
-	if (_is_visible = false) {
-		return true;;
+	if (_is_visible == false) {
+		return true;
 	}
 
 	_is_visible = false;

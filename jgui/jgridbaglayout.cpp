@@ -20,6 +20,8 @@
 #include "jgridbaglayout.h"
 #include "jcontainer.h"
 
+#include <limits.h>
+
 namespace jgui {
 
 GridBagLayout::GridBagLayout():

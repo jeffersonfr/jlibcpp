@@ -21,6 +21,8 @@
 #include "jcontainer.h"
 #include "jruntimeexception.h"
 
+#include <limits.h>
+
 namespace jgui {
 
 CardLayout::CardLayout(int hgap, int vgap):

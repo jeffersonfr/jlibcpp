@@ -264,7 +264,7 @@ void Container::Paint(Graphics *g)
 					w1 = c->GetWidth(),
 					h1 = c->GetHeight();
 
-			if (paint_components_out_of_range || (x1 < GetWidth() && (x1+w1) > 0) && (y1 < GetHeight() && (y1+h1) > 0)) {
+			if (paint_components_out_of_range || ((x1 < GetWidth() && (x1+w1) > 0) && (y1 < GetHeight() && (y1+h1) > 0))) {
 				if ((x1+w1) > GetWidth()) {
 					w1 = GetWidth()-x1;
 				}

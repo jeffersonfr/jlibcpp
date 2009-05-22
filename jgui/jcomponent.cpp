@@ -66,6 +66,10 @@ Component::Component(int x, int y, int width, int height):
 	_border_green = 0x00;
 	_border_blue = 0x00;
 	_border_alpha = 0x00;
+	_borderfocus_red = 0xf0;
+	_borderfocus_green = 0xf0;
+	_borderfocus_blue = 0xf0;
+	_borderfocus_alpha = 0xff;
 	_gradient_level = 0x40;
 	_vertical_gap = 10;
 	_horizontal_gap = 10;
@@ -209,13 +213,12 @@ void Component::PaintBorder(Graphics *g)
 	int step = 0x20;
 
 	if (HasFocus() == true) {
-		dr = 0xf0;
-		dg = 0xf0;
-		db = 0xf0;
+		dr = _borderfocus_red;
+		dg = _borderfocus_green;
+		db = _borderfocus_blue;
+		da = _borderfocus_alpha;
 	}
 	
-	da = 0xff;
-
 	if (_border == FLAT_BORDER) {
 		g->SetColor(dr, dg, db, da);
 		for (int i=0; i<size && i<wp && i<hp; i++) {

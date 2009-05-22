@@ -28,6 +28,7 @@
 #include <sys/shm.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 #endif
 
 namespace jshared {

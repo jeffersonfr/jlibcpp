@@ -38,6 +38,8 @@ TextField::TextField(int x, int y, int width, int height, int max_text):
 	_cursor = UNDERSCORE_CURSOR;
 	_begin_index = 0;
 	_end_index = 0;
+	_horizontal_gap = 2;
+	_vertical_gap = 2;
 	
 	SetFocusable(true);
 	SetAlign(LEFT_ALIGN);
@@ -324,7 +326,7 @@ void TextField::Paint(Graphics *g)
 		text_end = _position,
 		caret_size = 0,
 		current_text_size,
-		pos = _horizontal_gap;
+		pos = 0;
 
 	{
 		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
@@ -372,15 +374,22 @@ void TextField::Paint(Graphics *g)
 			current_text_size = _font->GetStringWidth(s);
 		} else {
 			if (_align == 0) {
-				pos = _horizontal_gap;
+				pos = 0;
 			} else if (_align == 1) {
-				pos = (_width-_font->GetStringWidth(s)-_horizontal_gap)/2;
+				pos = (_width-_font->GetStringWidth(s))/2;
 			} else {
-				pos = _width-_font->GetStringWidth(s)-_horizontal_gap;
+				pos = _width-_font->GetStringWidth(s);
 			}
 		}
 
-		g->DrawString(s, pos, (CENTER_VERTICAL_TEXT));
+		int dy = ((CENTER_VERTICAL_TEXT)-_vertical_gap);
+
+		if (dy < 0) {
+			dy = 0;
+		}
+
+		g->SetClip(_horizontal_gap, _vertical_gap, _width-2*_horizontal_gap, _height-2*_vertical_gap);
+		g->DrawString(s, pos, dy);
 
 		if (HasFocus() == true) {
 			if (_is_editable == true && _cursor_visible == true) {
@@ -390,6 +399,8 @@ void TextField::Paint(Graphics *g)
 			}
 		}
 	}
+
+	g->ReleaseClip();
 
 	PaintBorder(g);
 

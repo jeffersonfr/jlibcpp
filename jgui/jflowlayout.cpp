@@ -20,6 +20,8 @@
 #include "jflowlayout.h"
 #include "jcontainer.h"
 
+#include <limits.h>
+
 namespace jgui {
 
 FlowLayout::FlowLayout(jflowlayout_align_t align, int hgap, int vgap):
