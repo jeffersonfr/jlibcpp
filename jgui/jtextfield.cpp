@@ -322,9 +322,7 @@ void TextField::Paint(Graphics *g)
 		temp, 
 		previous,
 		s = paint_text;
-	int text_start = 0,
-		text_end = _position,
-		caret_size = 0,
+	int caret_size = 0,
 		current_text_size,
 		pos = 0;
 
@@ -350,36 +348,42 @@ void TextField::Paint(Graphics *g)
 		}
 
 		if (current_text_size > (_width-caret_size-_horizontal_gap)) {
-			text_start = _position;
-			text_end = _position;
-
-			text_start = 0;
+			int count = 0;
 
 			do {
-				text_start++;
+				count++;
 
-				int d = _position-text_start;
+				current_text_size = _font->GetStringWidth(s.substr(_position-count, count));
+			} while (current_text_size < (_width-caret_size-2*_horizontal_gap));
 
-				if (d < 0) {
-					d = 0;
-				}
+			count = count-1;
+			current_text_size = current_text_size-caret_size;
 
-				current_text_size = _font->GetStringWidth(s.substr(d, text_start));
-			} while (current_text_size < (_width-caret_size-_horizontal_gap));
-
-			text_start--;
-
-			s = s.substr(_position-text_start, text_start);
-
-			current_text_size = _font->GetStringWidth(s);
+			s = s.substr(_position-count, count);
 		} else {
+			int count = 1;
+
+			do {
+				current_text_size = _font->GetStringWidth(s.substr(0, count));
+				
+				if (count++ > (int)paint_text.size()) {
+					break;
+				}
+			} while (current_text_size < (_width-caret_size-2*_horizontal_gap));
+
+			count = count-1;
+
+			s = s.substr(0, count);
+
 			if (_align == 0) {
 				pos = 0;
 			} else if (_align == 1) {
-				pos = (_width-_font->GetStringWidth(s))/2;
+				pos = (_width-current_text_size)/2;
 			} else {
-				pos = _width-_font->GetStringWidth(s);
+				pos = _width-current_text_size;
 			}
+				
+			current_text_size = _font->GetStringWidth(s.substr(0, _position));
 		}
 
 		int dy = ((CENTER_VERTICAL_TEXT)-_vertical_gap);
