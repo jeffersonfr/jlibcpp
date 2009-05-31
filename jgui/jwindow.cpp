@@ -509,9 +509,10 @@ void Window::Repaint(bool all)
 
 	graphics->Reset();
 	Paint(graphics);
-	Revalidate();
 	graphics->Unlock();
 	graphics->Flip();
+
+	Revalidate();
 
 	Component::DispatchEvent(new ComponentEvent(this, COMPONENT_PAINT_EVENT));
 }
@@ -639,11 +640,6 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 			}
 		}
 	}
-}
-
-void Window::Paint(Graphics *g)
-{
-	Container::Paint(g);
 }
 
 bool Window::Show(bool modal)

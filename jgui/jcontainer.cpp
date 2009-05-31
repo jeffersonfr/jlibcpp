@@ -282,15 +282,30 @@ void Container::Paint(Graphics *g)
 				g->SetClip(x1, y1, w1, h1);
 				
 				c->Paint(g);
-				c->Revalidate();
 
 				g->ReleaseClip();
 				g->Unlock();
 			}
+				
+			c->Revalidate();
 		}
 	}
 				
 	PaintBorder(g);
+
+	// CHANGE:: estudar melhor o problema de validacao dos containers.
+	// Revalidar os container no metodo Paint() pode gerar problemas de
+	// sincronizacao com o Frame, por exemplo. Esse problema pode ocorrer
+	// na chamada do metodo 
+	// 		Frame::Paint() { 
+	// 			Container::Paint(); 
+	//
+	// 			... 
+	// 		}
+	// Apos chamar o metodo Container::Paint() o Frame jah estaria validado,
+	// quando na verdade deveria ser validado somente apos a chamada do
+	// metodo Repaint().
+	Revalidate();
 }
 
 bool Container::Collide(Component *c1, Component *c2)
@@ -366,9 +381,6 @@ void Container::Repaint(Component *c, int x, int y, int width, int height)
 	if (_parent != NULL) {
 		_parent->Repaint(this, _x-_scroll_x, _y-_scroll_y, _width, _height);
 	}
-
-	// CHANGE:: o container naum estava voltando ao estado valido
-	Revalidate();
 }
 
 void Container::Add(Component *c, GridBagConstraints *constraints)

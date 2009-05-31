@@ -363,7 +363,7 @@ void TextField::Paint(Graphics *g)
 			current_text_size = _font->GetStringWidth(s);
 			offset = (_width-current_text_size-caret_size)-caret_size;
 
-			if (_position < paint_text.size()) {
+			if (_position < (int)paint_text.size()) {
 				s = s + paint_text[_position];
 			}
 		} else {

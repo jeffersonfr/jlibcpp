@@ -89,7 +89,6 @@ class Window : public Container{
 		virtual bool Hide();
 		virtual bool Show(bool modal = true);
 
-		virtual void Paint(Graphics *g);
 		virtual void Repaint(bool all = false);
 		virtual void Repaint(int x, int y, int width, int height);
 		virtual void Repaint(Component *c, int x, int y, int width, int height);
