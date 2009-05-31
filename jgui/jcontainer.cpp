@@ -23,6 +23,7 @@
 #include "jcardlayout.h"
 #include "jfocusevent.h"
 #include "jcomponentevent.h"
+#include "jcommonlib.h"
 
 namespace jgui {
 
@@ -235,6 +236,8 @@ int Container::GetWorkingHeight()
 
 void Container::Paint(Graphics *g)
 {
+	JDEBUG(JINFO, "paint\n");
+
 	// Component::Paint(g);
 
 	//CHANGE:: permite alteracoes on-the-fly
@@ -246,6 +249,8 @@ void Container::Paint(Graphics *g)
 		g->SetColor(_bg_red, _bg_green, _bg_blue, _bg_alpha);
 
 		FillRectangle(g, 0, 0, _width, _height);
+
+		InvalidateAll();
 	}
 
 	Component *c = NULL;
