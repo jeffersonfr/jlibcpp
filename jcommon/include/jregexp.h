@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   Copyright (C) 2005 by <still unknown>                                 *
  *   root@sat                                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *

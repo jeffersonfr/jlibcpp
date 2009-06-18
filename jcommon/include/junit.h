@@ -45,9 +45,6 @@ class Visitor;
  * responsibilities for freeing them again.
  *
  * The function call overload mechanism is used for the executable part of the test
- *
- * \author <i will find>
- *
  */
 class Test {
 	std::string nam;

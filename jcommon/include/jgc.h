@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   Copyright (C) 2005 <still unknown>                                    *
  *   root@sat                                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -111,20 +111,6 @@ using namespace std;
 
 namespace jcommon {
 
-/**
- * \brief Smieciuch -- portable GC library for C
- * (c) 2003-2005  InForma-Sebastian Kaliszewski
- * published under NCSA License
- *
- * Code is based on a one associated with article 
- * by William E. Kempf published at The Code Project 
- * site in Jan 2001.
- *
- * http://www.codeproject.com/cpp/garbage_collect2.asp
- *
- * \author William E. Kempf
- *
- */
 template<typename T> class gc_ptr;
 template<typename T> class const_gc_ptr;
 template<typename T> class gc_arr;

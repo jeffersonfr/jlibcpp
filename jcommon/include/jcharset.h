@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   Copyright (C) 2005 by <still unknown> <modified version>              *
  *   root@sat                                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -27,10 +27,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-typedef uint32_t	UTF32;	// at least 32 bits 
-typedef uint16_t	UTF16;	// at least 16 bits 
+typedef uint32_t	UTF32;		// at least 32 bits 
+typedef uint16_t	UTF16;		// at least 16 bits 
 typedef uint8_t		UTF8;		// typically 8 bits 
-typedef uint32_t	Char; 	// 0 or 1 
+typedef uint32_t	Char; 		// 0 or 1 
 
 // Some fundamental constants 
 #define UNI_REPLACEMENT_CHAR (UTF32)0x0000FFFD

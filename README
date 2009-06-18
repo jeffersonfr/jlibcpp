@@ -6,7 +6,7 @@ Type:
 
 [Compilling tests]
 
-For each module of jlibcpp, change to tests directory and type
+For each module of jlibcpp, change to tests directory and type:
 
 "make"
 

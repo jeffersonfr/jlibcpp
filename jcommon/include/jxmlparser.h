@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   Copyright (C) 2005 by Lee Thomason <modified version>                 *
  *   root@sat                                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -17,27 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_XMLPARSER_H
-#define J_XMLPARSER_H
-
-#include "jobject.h"
-
-#include <map>
-#include <vector>
-#include <iostream>
-#include <sstream>
-#include <string>
-
-#include <assert.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-
 /**
- * \brief Original code (2.0 and earlier )copyright (c) 2000-2006 Lee Thomason (www.grinninglizard.com)
+ * \brief Original code (2.0 and earlier )copyright (c) 2000-2006 Lee Thomason 
+ * (www.grinninglizard.com)
+ *
  * www.sourceforge.net/projects/tinyxml
  *
  * This software is provided 'as-is', without any express or implied
@@ -58,9 +41,27 @@
  *
  * 3. This notice may not be removed or altered from any source
  * distribution.
- *
  */
  
+#ifndef J_XMLPARSER_H
+#define J_XMLPARSER_H
+
+#include "jobject.h"
+
+#include <map>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <string>
+
+#include <assert.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
+
 /**
  * \brief The support for explicit isn't that universal, and it isn't really
  * required - it is used to check that the XmlString class isn't incorrectly

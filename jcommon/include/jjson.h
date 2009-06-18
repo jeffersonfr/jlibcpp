@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   Copyright (C) 2005 by <still unknown> <modified version>              *
  *   root@sat                                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -32,11 +32,6 @@
 
 namespace jcommon {
 
-/**
- * \brief
- * 
- * \author <i will find>
- */
 class JSONNode;
 class JSONPullEvent;
 class JSONPullEventQueue;
