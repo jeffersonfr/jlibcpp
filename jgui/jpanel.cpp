@@ -23,7 +23,7 @@
 namespace jgui {
 
 Panel::Panel(int x, int y, int width, int height):
-	Component(x, y, width, height)
+	Container(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::Panel");
 }
@@ -36,7 +36,7 @@ void Panel::Paint(Graphics *g)
 {
 	JDEBUG(JINFO, "paint\n");
 
-	Component::Paint(g);
+	Container::Paint(g);
 }
 
 }

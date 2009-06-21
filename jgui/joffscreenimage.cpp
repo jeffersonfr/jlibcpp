@@ -116,4 +116,13 @@ int OffScreenImage::GetScaleHeight()
 	return _scale_height;
 }
 
+void OffScreenImage::Release()
+{
 }
+
+void OffScreenImage::Restore()
+{
+}
+
+}
+

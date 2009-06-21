@@ -721,19 +721,19 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 		//load some textures
 		unsigned long tw, th, error = 0;
 
-		error |= loadImage(texture[0], tw, th, "pics/eagle.png");
-		error |= loadImage(texture[1], tw, th, "pics/redbrick.png");
-		error |= loadImage(texture[2], tw, th, "pics/purplestone.png");
-		error |= loadImage(texture[3], tw, th, "pics/greystone.png");
-		error |= loadImage(texture[4], tw, th, "pics/bluestone.png");
-		error |= loadImage(texture[5], tw, th, "pics/mossy.png");
-		error |= loadImage(texture[6], tw, th, "pics/wood.png");
-		error |= loadImage(texture[7], tw, th, "pics/colorstone.png");
+		error |= loadImage(texture[0], tw, th, "icons/pics/eagle.png");
+		error |= loadImage(texture[1], tw, th, "icons/pics/redbrick.png");
+		error |= loadImage(texture[2], tw, th, "icons/pics/purplestone.png");
+		error |= loadImage(texture[3], tw, th, "icons/pics/greystone.png");
+		error |= loadImage(texture[4], tw, th, "icons/pics/bluestone.png");
+		error |= loadImage(texture[5], tw, th, "icons/pics/mossy.png");
+		error |= loadImage(texture[6], tw, th, "icons/pics/wood.png");
+		error |= loadImage(texture[7], tw, th, "icons/pics/colorstone.png");
 
 		//load some sprite textures
-		error |= loadImage(texture[8], tw, th, "pics/barrel.png");
-		error |= loadImage(texture[9], tw, th, "pics/pillar.png");
-		error |= loadImage(texture[10], tw, th, "pics/greenlight.png");
+		error |= loadImage(texture[8], tw, th, "icons/pics/barrel.png");
+		error |= loadImage(texture[9], tw, th, "icons/pics/pillar.png");
+		error |= loadImage(texture[10], tw, th, "icons/pics/greenlight.png");
 
 		if(error) { 
 			exit(1);
@@ -1046,8 +1046,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 
 int main( int argc, char *argv[] )
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/comic.ttf", 0, 20));
-
 	GraphicsTeste test;
 
 	test.Show();

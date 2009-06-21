@@ -20,7 +20,7 @@
 #ifndef PANEL_H
 #define PANEL_H
 
-#include "jcomponent.h"
+#include "jcontainer.h"
 
 #include <string>
 
@@ -30,7 +30,7 @@
 
 namespace jgui {
 
-class Panel : public Component{
+class Panel : public Container{
 
 	private:
 

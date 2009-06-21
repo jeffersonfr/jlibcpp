@@ -298,7 +298,10 @@ bool TextField::ProcessEvent(KeyEvent *event)
 
 		if (s != "") {
 			Insert(s);
+		
+			//_position++;
 		}
+
 	}
 
 	return catched;

@@ -156,7 +156,7 @@ class Plotter : public jgui::Frame, public jthread::Thread {
 
 int main()
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/comic.ttf", 0, 20));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
 
 	InitWindowsSocket();
 

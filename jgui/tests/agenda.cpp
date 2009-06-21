@@ -18,7 +18,7 @@ Agenda::Agenda(int x, int y):
 
 	db->Load();
 
-	_list = new jgui::ListBox(_insets.left, _insets.top, _width-_insets.left-_insets.right, 240);
+	_list = new jgui::ListBox(_insets.left, _insets.top, _width-_insets.left-_insets.right, 200);
 
 	_list->SetBackgroundVisible(false);
 	_list->AddItem("Verificar compromissos");
@@ -104,7 +104,7 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 
 int main()
 {
-	jgui::Font *font = new jgui::Font("./fonts/comic.ttf", 0, 28);
+	jgui::Font *font = new jgui::Font("./fonts/font.ttf", 0, 28);
 
 	font->SetEncoding("Latin1");
 

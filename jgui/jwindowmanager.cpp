@@ -88,7 +88,7 @@ void WindowManager::Restore()
 	for (std::vector<Window *>::const_iterator i=windows.begin(); i!=windows.end(); ++i) {
 		Window *w = (*i);
 
-		w->Repaint();
+		((Window *)w)->Show(false);
 	} 
 #endif
 }

@@ -28,6 +28,7 @@
 #include "jcontainerevent.h"
 #include "jborderlayout.h"
 #include "jgridbaglayout.h"
+#include "jscrollbar.h"
 
 #include <string>
 #include <vector>
@@ -53,10 +54,10 @@ class Container : public jgui::Component{
 		Component *_focus;
 		jgui::Layout *_layout;
 		jinsets_t _insets;
-		int _scroll_x,
-			_scroll_y;
 		int _scale_width, 
-			_scale_height;
+			_scale_height,
+			_scroll_x,
+			_scroll_y;
 		bool _optimized_paint;
 
 	protected:

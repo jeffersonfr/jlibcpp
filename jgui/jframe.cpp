@@ -616,7 +616,7 @@ void Frame::Release()
 	InputManager::GetInstance()->RemoveKeyListener(this);
 	InputManager::GetInstance()->RemoveMouseListener(this);
 
-	Frame::SetVisible(false);
+	SetVisible(false);
 	
 	_frame_sem.Notify();
 }

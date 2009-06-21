@@ -120,10 +120,6 @@ void * Window::GetWindowEngine()
 
 void Window::SetVisible(bool b)
 {
-	if (_is_visible == b) {
-		return;
-	}
-
 	Container::SetVisible(b);
 
 	if (b == false) {
@@ -186,32 +182,6 @@ void Window::InnerCreateWindow()
 
 	surface = s;
 	window = w;
-	
-	/*
-	if (graphics != NULL) {
-		delete graphics;
-		graphics = NULL;
-	}
-
-	if (surface != NULL) {
-		surface->SetDrawingFlags(surface, DSDRAW_NOFX);
-		surface->SetBlittingFlags(surface, DSBLIT_NOFX);
-		surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
-		surface->ReleaseSource(surface);
-	}
-
-	if (window != NULL) {
-		window->SetOpacity(window, 0x00);
-		window->Release(window);
-		window = NULL;
-	}
-
-	((GFXHandler *)GFXHandler::GetInstance())->CreateWindow(_x - bWidth, _y - bHeight, _width + 2*bWidth, _height + 2*bHeight, &window, &surface, _opacity);
-		
-	if (graphics == NULL) {
-		graphics = new Graphics(surface);
-	}
-	*/
 #endif
 }
 
@@ -663,10 +633,6 @@ bool Window::Show(bool modal)
 
 bool Window::Hide()
 {
-	if (_is_visible == false) {
-		return true;
-	}
-
 	_is_visible = false;
 
 #ifdef DIRECTFB_UI
@@ -693,15 +659,24 @@ void Window::ReleaseWindow()
 {
 #ifdef DIRECTFB_UI
 	if (graphics != NULL) {
+		graphics->Lock();
+		graphics->SetSurface(NULL);
+		graphics->Unlock();
+
 		delete graphics;
 		graphics = NULL;
 	}
 
-	if (window) {
+	if (window != NULL) {
 		window->Release(window);
 	}
 
+	if (surface != NULL) {
+		surface->Release(surface);
+	}
+
 	window = NULL;
+	surface = NULL;
 #endif
 }
 

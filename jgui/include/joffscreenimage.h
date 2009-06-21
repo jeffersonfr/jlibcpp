@@ -50,6 +50,9 @@ class OffScreenImage : public virtual jcommon::Object{
 		int GetScaleWidth();
 		int GetScaleHeight();
 
+		void Release();
+		void Restore();
+
 };
 
 }

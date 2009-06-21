@@ -631,10 +631,10 @@ class GraphicPanel : public jgui::Panel{
 		g->FillCircle(3*200+200+10, 3*(100+10)+10+50, 10);
 
 		// texts
-		jgui::Font *f1 = new jgui::Font("./fonts/comic.ttf", 0, 50),
-			*f2 = new jgui::Font("./fonts/comic.ttf", 0, 40),
-			*f3 = new jgui::Font("./fonts/comic.ttf", 0, 30),
-			*f4 = new jgui::Font("./fonts/comic.ttf", 0, 20);
+		jgui::Font *f1 = new jgui::Font("./fonts/font.ttf", 0, 50),
+			*f2 = new jgui::Font("./fonts/font.ttf", 0, 40),
+			*f3 = new jgui::Font("./fonts/font.ttf", 0, 30),
+			*f4 = new jgui::Font("./fonts/font.ttf", 0, 20);
 		int shadow = 4;
 
 		g->SetColor(0x00, 0x80, 0xe0, 0xff);
@@ -930,8 +930,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 
 int main( int argc, char *argv[] )
 {
-	// jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/comic.ttf", 0, 20));
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/Tiresias Normal.ttf", 0, 20));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
 
 	ModulesTeste test;
 

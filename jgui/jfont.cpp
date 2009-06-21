@@ -182,4 +182,12 @@ std::string Font::TruncateString(std::string text, std::string extension, int wi
 	return text;
 }
 
+void Font::Release()
+{
+}
+
+void Font::Restore()
+{
+}
+
 }

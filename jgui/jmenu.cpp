@@ -599,7 +599,7 @@ void MenuComponent::Paint(Graphics *g)
 	int i,
 		count = 0,
 		space = 15,
-		font_height = DEFAULT_COMPONENT_HEIGHT;
+		font_height = _item_size;
 
 	if (_font != NULL) {
 		font_height = _font->GetHeight();

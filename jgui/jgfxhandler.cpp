@@ -498,6 +498,7 @@ void GFXHandler::Restore()
 void GFXHandler::Release()
 {
 	// TODO:: identificar e liberar os recursos dos objetos OffScreenImage
+	// TODO:: identificar e liberar os recursos dos objetos Font
 
 #ifdef DIRECTFB_UI
 	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {

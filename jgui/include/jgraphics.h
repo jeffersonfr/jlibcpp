@@ -300,6 +300,7 @@ class Graphics : public virtual jcommon::Object{
 		virtual void DrawPolygon(int x, int y, jpoint_t *p, int num, bool close);
 		virtual void FillGradientRectangle(int x, int y, int w, int h, int sr, int sg, int sb, int sa, int dr, int dg, int db, int da = 0xFF, bool horizontal = true);
 		virtual void DrawGlyph(int symbol, int xp, int yp);
+		virtual bool GetImageSize(std::string img, int *real_width, int *real_height, int *scaled_width, int *scaled_height);
 		virtual bool DrawImage(std::string img, int x, int y, int alpha = 0xff);
 		virtual bool DrawImage(std::string img, int x, int y, int w, int h, int alpha = 0xff);
 		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha = 0xff);

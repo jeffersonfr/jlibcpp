@@ -239,7 +239,7 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 
 int main(int argc, char **argv)
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/comic.ttf", 0, 18));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 18));
 	
 	Main main("Layouts", 50, 50, 1820, 980);
 

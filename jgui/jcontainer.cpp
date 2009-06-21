@@ -280,17 +280,17 @@ void Container::Paint(Graphics *g)
 
 				g->Lock();
 				g->SetClip(x1, y1, w1, h1);
-				
+
 				c->Paint(g);
 
 				g->ReleaseClip();
 				g->Unlock();
 			}
-				
+
 			c->Revalidate();
 		}
 	}
-				
+
 	PaintBorder(g);
 
 	// CHANGE:: estudar melhor o problema de validacao dos containers.
@@ -517,7 +517,7 @@ void Container::RequestComponentFocus(jgui::Component *c)
 		// Invalidate();
 		_parent->RequestComponentFocus(c);
 	} else {
-		SetIgnoreRepaint(true);
+		// SetIgnoreRepaint(true);
 
 		if (_focus != NULL && _focus != c) {
 			_focus->ReleaseFocus();
@@ -529,7 +529,7 @@ void Container::RequestComponentFocus(jgui::Component *c)
 
 		dynamic_cast<Component *>(_focus)->DispatchEvent(new FocusEvent(_focus, GAINED_FOCUS_EVENT));
 	
-		SetIgnoreRepaint(false);
+		// SetIgnoreRepaint(false);
 
 		c->Repaint();
 	}

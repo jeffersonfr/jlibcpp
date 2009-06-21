@@ -526,7 +526,7 @@ void Mines::UpdateBoard(int flag)
 
 int main()
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/comic.ttf", 0, 28));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 28));
 	
 	mines::Mines app(100, 100);
 

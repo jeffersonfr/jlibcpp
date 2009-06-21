@@ -60,7 +60,7 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	jgui::Font *font = new jgui::Font("fonts/verdana.ttf", 0, 24, 1920, 1080);
+	jgui::Font *font = new jgui::Font("fonts/font.ttf", 0, 24, 1920, 1080);
 
 	jgui::Graphics::SetDefaultFont(font);
 

@@ -28,7 +28,7 @@
 #define ENABLE_GUI	1
 #define DRAW_ANTS	0
 
-#define FONT "./fonts/gothic.ttf"
+#define FONT "./fonts/font.ttf"
 
 struct path_t {
 	int x;

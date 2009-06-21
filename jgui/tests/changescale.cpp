@@ -78,13 +78,13 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/comic.ttf", 0, 20));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
 	
-	font = new jgui::Font("fonts/verdana.ttf", 0, 24, 720, 480);
+	font = new jgui::Font("fonts/font.ttf", 0, 24, 720, 480);
 	Main main1("Scale 720x480", 0, 0, 500, 400, 720, 480);
 	main1.SetFont(font);
 	
-	font = new jgui::Font("fonts/verdana.ttf", 0, 24, 1920, 1080);
+	font = new jgui::Font("fonts/font.ttf", 0, 24, 1920, 1080);
 	Main main2("Scale 1920x1080", 1100, 300, 500, 400, 1920, 1080);
 	main2.SetFont(font);
 

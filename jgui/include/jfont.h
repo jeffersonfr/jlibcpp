@@ -74,6 +74,9 @@ class Font : public virtual jcommon::Object{
 		int GetStringWidth(std::string text);
 		std::string TruncateString(std::string text, std::string extension, int width);
 
+		void Release();
+		void Restore();
+
 };
 
 }
