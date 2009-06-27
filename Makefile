@@ -324,13 +324,6 @@ ultraclean: clean uninstall
 	@cd jshared/tests && make clean && cd -
 	@cd jsocket/tests && make clean && cd -
 	@cd jthread/tests && make clean &&cd -
-	@rm -rf /usr/local/include/jlibcpp/jcommon
-	@rm -rf /usr/local/include/jlibcpp/jgui
-	@rm -rf /usr/local/include/jlibcpp/jio
-	@rm -rf /usr/local/include/jlibcpp/jlogger
-	@rm -rf /usr/local/include/jlibcpp/jmpeg
-	@rm -rf /usr/local/include/jlibcpp/jshared
-	@rm -rf /usr/local/include/jlibcpp/jsocket
-	@rm -rf /usr/local/include/jlibcpp/jthread
+	@rm -rf /usr/local/include/jlibcpp
 	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) 2> /dev/null && echo -e "$(MODULE) ultraclean $(OK)" 
 
