@@ -14,10 +14,29 @@ For each module of jlibcpp, change to tests directory and type:
 
 ## Makefile -- begin ##
 
-export JLIB_HOME=<jlibcpp-home>
+JLIBCPP_INCLUDE		=	/usr/local/include/jlibcpp
+DIRECTFB_INCLUDE	=	/usr/local/include/directfb
+
+INCLUDES					= -I$(JLIBCPP_INCLUDE)/jcommon/include \
+										-I$(JLIBCPP_INCLUDE)/jsocket/include \
+										-I$(JLIBCPP_INCLUDE)/jthread/include \
+										-I$(JLIBCPP_INCLUDE)/jio/include \
+										-I$(JLIBCPP_INCLUDE)/jlogger/include \
+										-I$(JLIBCPP_INCLUDE)/jshare/include \
+										-I$(DIRECTFB_INCLUDE) \
+
+LIBRARIES					= -L$(JLIBCPP_INCLUDE)/lib \
+										-ljlibcpp \
+										-lpthread \
+										-ldirectfb \
+										-lssl \
+
+DEFINITIONS				= -D_GNU_SOURCE \
+										-DJDEBUG_ENABLED \
+										-DDIRECTFB_UI \
 
 all:
-	g++ <app.cpp> -o <app> -I$(JLIB_HOME)/jcommon/include -I$(JLIB_HOME)/jsocket/include -I$(JLIB_HOME)/jthread/include -I$(JLIB_HOME)/jio/include -I$(JLIB_HOME)/jlogger/include -I$(JLIB_HOME)/jshare/include -I<directfb-include> -L$(JLIB_HOME)/lib -ljlibcpp -lpthread -ldirectfb -lssl -D_GNU_SOURCE -DJDEBUG_ENABLED -DDIRECTFB_UI
+	g++ <app.cpp> -o <app> $(INCLUDES) $(LIBRARIES) $(DEFINITIONS) 
 
 ## Makefile -- end ##
 

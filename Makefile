@@ -292,14 +292,14 @@ doc:
 
 install: uninstall
 	@install -o root -m 644 $(LIBDIR)/$(EXE) $(INSTALL_DIR) && echo -e "Instaling $(EXE) in $(INSTALL_DIR)/lib$(MODULE).so"
-	@install -d -o root -m 644 /usr/local/include/jlibcpp/jcommon && install -o root -m 644 jcommon/include/* /usr/local/include/jlibcpp/jcommon
-	@install -d -o root -m 644 /usr/local/include/jlibcpp/jgui && install -o root -m 644 jgui/include/* /usr/local/include/jlibcpp/jgui
-	@install -d -o root -m 644 /usr/local/include/jlibcpp/jio && install -o root -m 644 jio/include/* /usr/local/include/jlibcpp/jio
-	@install -d -o root -m 644 /usr/local/include/jlibcpp/jlogger && install -o root -m 644 jlogger/include/* /usr/local/include/jlibcpp/jlogger
-	@install -d -o root -m 644 /usr/local/include/jlibcpp/jmpeg && install -o root -m 644 jmpeg/include/* /usr/local/include/jlibcpp/jmpeg
-	@install -d -o root -m 644 /usr/local/include/jlibcpp/jshared && install -o root -m 644 jshared/include/* /usr/local/include/jlibcpp/jshared
-	@install -d -o root -m 644 /usr/local/include/jlibcpp/jsocket && install -o root -m 644 jsocket/include/* /usr/local/include/jlibcpp/jsocket
-	@install -d -o root -m 644 /usr/local/include/jlibcpp/jthread && install -o root -m 644 jthread/include/* /usr/local/include/jlibcpp/jthread
+	@install -d -o root -m 755 /usr/local/include/jlibcpp/jcommon && install -o root -m 644 jcommon/include/* /usr/local/include/jlibcpp/jcommon
+	@install -d -o root -m 755 /usr/local/include/jlibcpp/jgui && install -o root -m 644 jgui/include/* /usr/local/include/jlibcpp/jgui
+	@install -d -o root -m 755 /usr/local/include/jlibcpp/jio && install -o root -m 644 jio/include/* /usr/local/include/jlibcpp/jio
+	@install -d -o root -m 755 /usr/local/include/jlibcpp/jlogger && install -o root -m 644 jlogger/include/* /usr/local/include/jlibcpp/jlogger
+	@install -d -o root -m 755 /usr/local/include/jlibcpp/jmpeg && install -o root -m 644 jmpeg/include/* /usr/local/include/jlibcpp/jmpeg
+	@install -d -o root -m 755 /usr/local/include/jlibcpp/jshared && install -o root -m 644 jshared/include/* /usr/local/include/jlibcpp/jshared
+	@install -d -o root -m 755 /usr/local/include/jlibcpp/jsocket && install -o root -m 644 jsocket/include/* /usr/local/include/jlibcpp/jsocket
+	@install -d -o root -m 755 /usr/local/include/jlibcpp/jthread && install -o root -m 644 jthread/include/* /usr/local/include/jlibcpp/jthread
 	@ln -s $(INSTALL_DIR)/$(EXE) $(INSTALL_DIR)/lib$(MODULE).so && ldconfig
 	@echo -e "$(OK)"
 

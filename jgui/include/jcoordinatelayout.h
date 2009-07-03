@@ -17,64 +17,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsimpleformatter.h"
+#ifndef COORDINATELAYOUT_H
+#define COORDINATELAYOUT_H
+
+#include "jlayout.h"
+#include "jcontainer.h"
 
 #include <iostream>
-#include <sstream>
+#include <cstdlib>
+#include <map>
 
-#include <string.h>
-#include <stdlib.h>
+namespace jgui {
 
-namespace jlogger {
+enum jcoordinate_layout_t {
+	CL_HORIZONTAL	= 1,
+	CL_VERTICAL		= 2
+};
 
-SimpleFormatter::SimpleFormatter():
-	jlogger::Formatter()
-{
-	jcommon::Object::SetClassName("jlogger::SimpleFormatter");
-}
+class CoordinateLayout : public Layout{
 
-SimpleFormatter::~SimpleFormatter()
-{
-}
+	private:
+		jcoordinate_layout_t _type;
+		int _width,
+				_height;
 
-void SimpleFormatter::Transform(LogRecord *log)
-{
-	if (log == NULL) {
-		return;
-	}
-	
-	std::string type;
-	
-	time_t curtime = time(NULL);
-	char *loctime = asctime(localtime (&curtime));
-	
-	std::ostringstream date,
-						format;
-		
-	if (loctime != NULL) {
-		loctime[strlen(loctime)-1] = '\0';
-	
-		date << " [" << (loctime + 4) << "]  ";
-	}
-	
-	if (log->GetType() == INFO_LOGGER) {
-		format << "LOG_INFO" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == WARNNING_LOGGER) {
-		format << "LOG_WARNNING" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == ERROR_LOGGER) {
-		format << "LOG_ERROR" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == CRITICAL_LOGGER) {
-		format << "LOG_CRITICAL" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == UNKNOWN_LOGGER) {
-		format << "UNKNOWN" << date.str() << log->GetRecord() << std::flush << std::endl;
-	}
+	public:
+		CoordinateLayout(int hgap = 10, int vgap = 10, jcoordinate_layout_t type = (jcoordinate_layout_t)(CL_HORIZONTAL | CL_VERTICAL));
+		virtual ~CoordinateLayout();
 
-	log->SetRecord(format.str());
-}
+		void SetWidth(int width);
+		void SetHeight(int height);
+		void SetType(jcoordinate_layout_t type);
 
-LogRecord * SimpleFormatter::Release()
-{
-	return NULL;
-}
+		int GetWidth();
+		int GetHeight();
+		jcoordinate_layout_t GetType();
+
+		jsize_t GetPreferredSize(Container *target);
+
+		virtual void DoLayout(Container *parent);
+
+};
 
 }
+
+#endif
+
