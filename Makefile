@@ -1,5 +1,5 @@
 MODULE		= jlibcpp
-VERSION		= 0.1
+VERSION		= 0.3
 
 EXE			= lib$(MODULE)-$(VERSION).so
 
