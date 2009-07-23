@@ -150,14 +150,6 @@ void ImageButton::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int font_height = DEFAULT_COMPONENT_HEIGHT;
-	
-	if (_font != NULL) {
-		font_height = _font->GetHeight();
-	}
-
-	g->SetFont(_font);
-
 	{
 		/*
 		if (_has_focus == true) {
@@ -181,7 +173,11 @@ void ImageButton::Paint(Graphics *g)
 				g->DrawImage(prefetch1, 0, 0, _height, _height);
 				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
 
-				int gap = _horizontal_gap+_border_size+font_height;
+				int gap = _horizontal_gap+_border_size;
+
+				if (IsFontSet() == true) {
+					gap = gap + _font->GetHeight();
+				}
 
 				if (gap < 0) {
 					gap = 0;

@@ -26,10 +26,41 @@
 #include <signal.h>
 #include <math.h>
 
+class ImageTest : public jgui::Component{
+
+	private:
+		jgui::OffScreenImage *_image;
+
+	public:
+		ImageTest():
+			jgui::Component()
+		{
+			_image = new jgui::OffScreenImage(100, 100);
+
+			jgui::Graphics *g = _image->GetGraphics();
+
+			g->SetColor(0xf0, 0x00, 0x00, 0xff);
+			g->FillRectangle(0, 0, 100, 100);
+			g->SetColor(0x00, 0x00, 0xf0, 0xff);
+			g->FillRectangle(10, 10, 80, 80);
+		}
+
+		virtual ~ImageTest()
+		{
+		}
+
+		virtual void Paint(jgui::Graphics *g)
+		{
+			g->DrawImage(_image, 0, 0);
+		}
+
+};
+
 class Main : public jgui::Frame{
 
 	private:
-		jgui::Button *b[5];
+		jgui::Button *_buttons[5];
+		jgui::Component *_component;
 
 	public:
 		Main(std::string title, int x, int y, int w, int h):
@@ -43,17 +74,25 @@ class Main : public jgui::Frame{
 
 				sprintf(tmp, "Teste %d", i+1);
 
-				b[i] = new jgui::Button(tmp, 100+i*100, 100+i*100, 200, 200);
+				_buttons[i] = new jgui::Button(tmp, 100+i*100, 100+i*100, 200, 200);
 
-				Add(b[i]);
+				Add(_buttons[i]);
 			}
+
+			_component = new ImageTest();
+
+			_component->SetBounds(50, 400, 100, 100);
+
+			Add(_component);
 		}
 
 		virtual ~Main()
 		{
 			for (int i=0; i<4; i++) {
-				delete b[i];
+				delete _buttons[i];
 			}
+
+			delete _component;
 		}
 
 };
@@ -68,11 +107,11 @@ int main(int argc, char **argv)
 
 	main.Show(false);
 
-	sleep(2);
+	sleep(4);
 
 	jgui::GFXHandler::GetInstance()->Release();
 	
-	sleep(2);
+	sleep(1);
 	
 	jgui::GFXHandler::GetInstance()->Restore();
 

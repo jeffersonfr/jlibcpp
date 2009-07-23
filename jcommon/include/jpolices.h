@@ -50,7 +50,7 @@ class Polices : public virtual jcommon::Object{
 
 		void Load(std::string filename);
 		void Save();
-		int GetPolicesSize();
+		int GetSize();
 		std::vector<struct jpolice_t> & GetPolices();
 		std::string GetContent(std::string id);
 

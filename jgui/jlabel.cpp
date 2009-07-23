@@ -85,9 +85,7 @@ void Label::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	g->SetFont(_font);
-
-	if (_font != NULL) {
+	if (IsFontSet() == true) {
 		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
 
 		if (_wrap == false && _truncate_string == true) {

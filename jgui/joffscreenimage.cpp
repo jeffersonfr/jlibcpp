@@ -32,6 +32,8 @@ OffScreenImage::OffScreenImage(int width, int height, int scale_width, int scale
 	jcommon::Object::SetClassName("jgui::OffScreenImage");
 
 	graphics = NULL;
+
+	_buffer = NULL;
 	_width = width;
 	_height = height;
 	_scale_width = scale_width;
@@ -70,18 +72,22 @@ OffScreenImage::OffScreenImage(int width, int height, int scale_width, int scale
 
 	graphics = new Graphics(surface);
 
-	graphics->SetCurrentWorkingScreenSize(scale_width, scale_height);
+	graphics->SetCurrentWorkingScreenSize(_scale_width, _scale_height);
 #endif
+
+	GFXHandler::GetInstance()->Add(this);
 }
 
 OffScreenImage::~OffScreenImage()
 {
+	GFXHandler::GetInstance()->Remove(this);
+
 #ifdef DIRECTFB_UI
 	if (graphics != NULL) {
 		IDirectFBSurface *surface = (IDirectFBSurface *)graphics->GetSurface();
 
 		if (surface != NULL) {
-			// CHANGE:: ReleaseSource() -> Release()
+			// CHANGE:: ReleaseSource()->Release()
 			surface->Release(surface);
 		}
 		
@@ -118,10 +124,81 @@ int OffScreenImage::GetScaleHeight()
 
 void OffScreenImage::Release()
 {
+	// TODO:: gravar o array em um buffer interno
+#ifdef DIRECTFB_UI
+	if (graphics != NULL) {
+		IDirectFBSurface *surface = (IDirectFBSurface *)graphics->GetSurface();
+		
+		void *ptr;
+		int pitch,
+				width,
+				height;
+
+		surface->GetSize(surface, &width, &height);
+		surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
+
+		_buffer = new uint8_t[pitch*height];
+
+		memcpy(_buffer, ptr, pitch*height);
+
+		surface->Unlock(surface);
+
+		if (surface != NULL) {
+			// CHANGE:: ReleaseSource()->Release()
+			surface->Release(surface);
+		}
+		
+		delete graphics;
+		graphics = NULL;
+	}
+
+#endif
 }
 
 void OffScreenImage::Restore()
 {
+	// TODO:: restaurar o buffer gravado durante o release
+#ifdef DIRECTFB_UI
+	if (graphics == NULL) {
+		IDirectFBSurface *surface = NULL;
+		DFBSurfaceDescription desc;
+
+		desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
+		desc.caps = (DFBSurfaceCapabilities)(DSCAPS_SYSTEMONLY);
+		desc.width = SCALE_TO_SCREEN(_width, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width);
+		desc.height = SCALE_TO_SCREEN(_height, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
+		desc.pixelformat = DSPF_ARGB;
+
+		GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
+		IDirectFB *engine = ((IDirectFB *)dfb->GetGraphicEngine());
+
+		if (engine->CreateSurface(engine, &desc, &surface) != DFB_OK) {
+			return;
+		}
+
+		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+		surface->SetDrawingFlags(surface, DSDRAW_BLEND);
+		surface->SetPorterDuff(surface, DSPD_SRC_OVER);
+
+		surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
+
+		graphics = new Graphics(surface);
+
+		graphics->SetCurrentWorkingScreenSize(_scale_width, _scale_height);
+
+		void *ptr;
+		int pitch,
+				width,
+				height;
+
+		surface->GetSize(surface, &width, &height);
+		surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_WRITE), &ptr, &pitch);
+
+		memcpy(ptr, _buffer, pitch*height);
+
+		surface->Unlock(surface);
+	}
+#endif
 }
 
 }

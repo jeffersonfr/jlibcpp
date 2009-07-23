@@ -137,7 +137,7 @@ void Polices::Save()
 	}
 }
 
-int Polices::GetPolicesSize()
+int Polices::GetSize()
 {
 	return _polices.size();
 }

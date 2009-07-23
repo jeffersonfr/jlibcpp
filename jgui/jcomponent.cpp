@@ -290,6 +290,8 @@ void Component::PaintBorder(Graphics *g)
 
 void Component::Paint(Graphics *g)
 {
+	g->SetFont(_font);
+
 	if (_background_visible == true) {
 		g->SetColor(_bg_red, _bg_green, _bg_blue, _bg_alpha);
 		FillRectangle(g, 0, 0, _width, _height);
@@ -727,6 +729,11 @@ int Component::GetHeight()
 void Component::SetFont(Font *font)
 {
 	_font = font;
+}
+
+bool Component::IsFontSet()
+{
+	return ((void *)_font != NULL);
 }
 
 Font * Component::GetFont()

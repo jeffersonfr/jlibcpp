@@ -313,23 +313,20 @@ void TextField::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	g->SetFont(_font);
+	if (IsFontSet() == true) {
+		std::string paint_text = _text,
+			cursor,
+			temp, 
+			previous,
+			s = paint_text;
+		int caret_size = 0,
+				current_text_size,
+				pos = 0;
 
-	std::string paint_text = _text;
+		if (EchoCharIsSet() == true) {
+			paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
+		}
 
-	if (EchoCharIsSet() == true) {
-		paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
-	}
-
-	std::string cursor,
-		temp, 
-		previous,
-		s = paint_text;
-	int caret_size = 0,
-		current_text_size,
-		pos = 0;
-
-	{
 		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
 
 		current_text_size = 0;
@@ -411,9 +408,9 @@ void TextField::Paint(Graphics *g)
 				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
 			}
 		}
+	
+		g->ReleaseClip();
 	}
-
-	g->ReleaseClip();
 
 	PaintBorder(g);
 

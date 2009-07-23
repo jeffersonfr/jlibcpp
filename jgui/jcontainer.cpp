@@ -240,6 +240,8 @@ void Container::Paint(Graphics *g)
 
 	// Component::Paint(g);
 
+	g->SetFont(_font);
+
 	//CHANGE:: permite alteracoes on-the-fly
 	g->SetCurrentWorkingScreenSize(_scale_width, _scale_height);
 
@@ -308,7 +310,7 @@ void Container::Paint(Graphics *g)
 	Revalidate();
 }
 
-bool Container::Collide(Component *c1, Component *c2)
+bool Container::Intersect(Component *c1, Component *c2)
 {
 	int ax = c1->GetX(), 
 		ay = c1->GetY(),
@@ -322,7 +324,7 @@ bool Container::Collide(Component *c1, Component *c2)
 	return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
 }
 
-bool Container::Collide(Component *c1, int x, int y, int w, int h)
+bool Container::Intersect(Component *c1, int x, int y, int w, int h)
 {
 	int ax = c1->GetX(), 
 		ay = c1->GetY(),

@@ -502,8 +502,8 @@ MenuComponent::MenuComponent(int x, int y, int width, int visible_items):
 	by = y+20;
 	bwidth = 30;
 	bheight = 30;
-	_vertical_gap = 15;
-	_horizontal_gap = 15;
+	_vertical_gap = 16;
+	_horizontal_gap = 16;
 	delta = 1.0f;
 
 	_menu = NULL;
@@ -596,16 +596,16 @@ void MenuComponent::Paint(Graphics *g)
 	// INFO:: este metodo estah comentado para permitir a atualizacao dos themes
 	// Component::Paint(g);
 
+	g->SetFont(_font);
+
 	int i,
 		count = 0,
 		space = 15,
 		font_height = _item_size;
 
-	if (_font != NULL) {
+	if (IsFontSet() == true) {
 		font_height = _font->GetHeight();
 	}
-
-	g->SetFont(_font);
 
 	if (_paint_count == 0) {
 		_paint_count = 1;

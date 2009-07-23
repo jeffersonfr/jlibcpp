@@ -600,8 +600,6 @@ void ComboMenuComponent::Paint(Graphics *g)
 		font_height = _font->GetHeight();
 	}
 
-	g->SetFont(_font);
-
 	int position = _index-_visible_items/2;
 
 	if (position > (int)(_items.size()-_visible_items)) {

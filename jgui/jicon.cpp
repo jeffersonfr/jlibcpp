@@ -169,8 +169,6 @@ void Icon::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	g->SetFont(_font);
-
 	if (_image != NULL) {
 		g->DrawImage(_image, 0, 0, _width, _height);
 	} else {

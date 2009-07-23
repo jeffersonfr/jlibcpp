@@ -449,9 +449,7 @@ void TextArea::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	g->SetFont(_font);
-
-	if (_font != NULL) {
+	if (IsFontSet() == true) {
 		int font_height = _font->GetHeight();
 
 		std::vector<std::string> super_lines, 

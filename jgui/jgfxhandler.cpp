@@ -489,8 +489,20 @@ void GFXHandler::Restore()
 	// TODO:: identificar e restaurar os recursos dos objetos OffScreenImage
 	
 #ifdef DIRECTFB_UI
+	// INFO:: restoring engine
 	InitEngine();
 
+	// INFO:: restoring fonts
+	for (std::vector<Font *>::iterator i=_fonts.begin(); i!=_fonts.end(); i++) {
+		(*i)->Restore();
+	}
+	
+	// INFO:: restoring offscreenimages
+	for (std::vector<OffScreenImage *>::iterator i=_offscreenimages.begin(); i!=_offscreenimages.end(); i++) {
+		(*i)->Restore();
+	}
+	
+	// INFO:: restoring windows
 	WindowManager::GetInstance()->Restore();
 #endif
 }
@@ -507,18 +519,61 @@ void GFXHandler::Release()
 
 	_cursors.clear();
 
+	// INFO:: release windows
 	WindowManager::GetInstance()->Release();
 	
+	// INFO:: release offscreenimage
+	for (std::vector<OffScreenImage *>::iterator i=_offscreenimages.begin(); i!=_offscreenimages.end(); i++) {
+		(*i)->Release();
+	}
+	
+	// INFO:: release fonts
+	for (std::vector<Font *>::iterator i=_fonts.begin(); i!=_fonts.end(); i++) {
+		(*i)->Release();
+	}
+	
+	// INFO:: release layers
 	if (_layer != NULL) {
 		_layer->Release(_layer);
 		_layer = NULL;
 	}
 
+	// INFO:: release engine
 	if (_dfb != NULL) {
 		_dfb->Release(_dfb);
 		_dfb = NULL;
 	}
 #endif
+}
+
+void GFXHandler::Add(Font *font)
+{
+	_fonts.push_back(font);
+}
+
+void GFXHandler::Remove(Font *font)
+{
+	// WARNNING:: lembrar de sincronizar os iterators para evitar erros indesejados
+	for (std::vector<Font *>::iterator i=_fonts.begin(); i!=_fonts.end(); i++) {
+		if (font == (*i)) {
+			_fonts.erase(i);
+		}
+	}
+}
+
+void GFXHandler::Add(OffScreenImage *image)
+{
+	_offscreenimages.push_back(image);
+}
+
+void GFXHandler::Remove(OffScreenImage *image)
+{
+	// WARNNING:: lembrar de sincronizar os iterators para evitar erros indesejados
+	for (std::vector<OffScreenImage *>::iterator i=_offscreenimages.begin(); i!=_offscreenimages.end(); i++) {
+		if (image == (*i)) {
+			_offscreenimages.erase(i);
+		}
+	}
 }
 
 }

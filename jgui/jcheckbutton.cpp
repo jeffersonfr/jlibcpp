@@ -32,7 +32,6 @@ CheckButton::CheckButton(jcheckbox_type_t type, std::string label, int x, int y,
 	_type = type;
 	_label = label;
 	_checked = false;
-	_paint_count = 0;
 
 	SetFocusable(true);
 	SetSize(width, height);
@@ -154,17 +153,20 @@ void CheckButton::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int font_height = DEFAULT_COMPONENT_HEIGHT;
-	
-	if (_font != NULL) {
-		font_height = _font->GetHeight();
+	int size = DEFAULT_COMPONENT_HEIGHT-2*_border_size,
+			maxwh = std::min(_width, _height);
+
+	if (size > maxwh) {
+		size = maxwh;
 	}
 
-	g->SetFont(_font);
+	int raio = size/2 - 4;
 
-	{
-		_paint_count = 1;
+	if (raio < 0) {
+		raio = 0;
+	}
 
+	if (IsFontSet() == true) {
 		/*
 		if (_has_focus == true) {
 			g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
@@ -173,38 +175,32 @@ void CheckButton::Paint(Graphics *g)
 		*/
 
 		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-		g->DrawStringJustified(TruncateString(_label, _width-(font_height+15)), _height+10, (CENTER_VERTICAL_TEXT), _width, _height, LEFT_ALIGN);
+		g->DrawStringJustified(TruncateString(_label, _width-(size+15)), size+10, (CENTER_VERTICAL_TEXT), _width, _height, LEFT_ALIGN);
 	}
 
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
-	int size = _height;
-
-	if (_height > _width) {
-		size = _width;
-	}
-
-	int raio = size/2 - 4;
+	int center = (_height-size)/2;
 
 	if (_checked == true) {
 		if (_type == CHECK_TYPE) {
-			FillRectangle(g, 2, 2, size-4, size-4);
+			FillRectangle(g, 2, 2+center, size-4, size-4);
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			FillRectangle(g, 6, 6, size-12, size-12);
+			FillRectangle(g, 6, 6+center, size-12, size-12);
 			// g->DrawRectangle(2, 2, size-4, size-4);
 		} else {
-			g->FillCircle(_height/2, size/2, raio);
+			g->FillCircle(size/2, size/2+center, raio);
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->FillCircle(size/2, size/2, (int)(size*0.2));
+			g->FillCircle(size/2, size/2+center, (int)(size*0.2));
 			// g->DrawCircle(size/2, size/2, size/2);
 		}
 	} else {
 		if (_type == CHECK_TYPE) {
-			FillRectangle(g, 2, 2, size-4, size-4);
+			FillRectangle(g, 2, 2+center, size-4, size-4);
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
 			// g->DrawRectangle(2, 2, size-4, size-4);
 		} else {
-			g->FillCircle(size/2, size/2, raio);
+			g->FillCircle(size/2, size/2+center, raio);
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
 			// g->DrawCircle(size/2, size/2, size/2);
 		}

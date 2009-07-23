@@ -193,10 +193,7 @@ void Watch::Paint(Graphics *g)
 	}
 	*/
 
-	g->SetFont(_font);
-
-	if (_font != NULL) {
-
+	if (IsFontSet() == true) {
 		if (_type == ANALOGIC_WATCH) {
 			time_t raw;
 			char *t;

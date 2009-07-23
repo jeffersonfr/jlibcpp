@@ -54,12 +54,18 @@ Font::Font(std::string name, int attr, int height, int scale_width, int scale_he
 		_font->GetDescender(_font, &_descender);
 	}
 #endif
+
+	GFXHandler::GetInstance()->Add(this);
 }
 
 Font::~Font()
 {
+	GFXHandler::GetInstance()->Add(this);
+
 #ifdef DIRECTFB_UI
-	_font->Release(_font);
+	if (_font != NULL) {
+		_font->Release(_font);
+	}
 #endif
 }
 
@@ -96,9 +102,9 @@ bool Font::SetEncoding(std::string code)
 	}
 
 	return true;
-#else
-	return false;
 #endif
+
+	return false;
 }
 
 std::string Font::GetName()
@@ -155,7 +161,7 @@ int Font::GetStringWidth(std::string text)
 
 std::string Font::TruncateString(std::string text, std::string extension, int width)
 {
-	if (text.size() <= 1) {
+	if (text.size() <= 1 || width <= 0) {
 		return text;
 	}
 
@@ -184,10 +190,21 @@ std::string Font::TruncateString(std::string text, std::string extension, int wi
 
 void Font::Release()
 {
+#ifdef DIRECTFB_UI
+	if (_font != NULL) {
+		_font->Release(_font);
+		_font = NULL;
+	}
+#endif
 }
 
 void Font::Restore()
 {
+#ifdef DIRECTFB_UI
+	if (_font == NULL) {
+		((GFXHandler *)GFXHandler::GetInstance())->CreateFont(_name, _virtual_height, &_font, _scale_width, _scale_height);
+	}
+#endif
 }
 
 }

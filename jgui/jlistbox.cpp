@@ -179,8 +179,6 @@ void ListBox::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	g->SetFont(_font);
-
 	int position,
 			visible_items = GetVisibleItems();
 
@@ -291,10 +289,14 @@ void ListBox::Paint(Graphics *g)
 	for (; count<visible_items+1; count++) {
 		default_y = (_item_size+_vertical_gap)*count+_vertical_gap;
 		
-		if ((default_y+_item_size) < _height) {
-			g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-			FillRectangle(g, _horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
+		int gap = 0;
+
+		if ((default_y+_item_size) >= (_height-_vertical_gap)) {
+			gap = (default_y+_item_size)-(_height-_vertical_gap);
 		}
+
+		g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
+		FillRectangle(g, _horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size-gap);
 	}
 	
 	if (_scroll == SCROLL_BAR) {

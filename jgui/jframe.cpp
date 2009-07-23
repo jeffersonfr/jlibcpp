@@ -22,6 +22,7 @@
 #include "jcalendar.h"
 #include "jfocusevent.h"
 #include "jthememanager.h"
+#include "jwindowmanager.h"
 
 namespace jgui {
 
@@ -286,9 +287,7 @@ void Frame::Maximize()
 	_old_width = _width;
 	_old_height = _height;
 
-	SetIgnoreRepaint(true);
 	SetBounds(0, 0, _scale_width, _scale_height);
-	SetIgnoreRepaint(false);
 }
 
 void Frame::Restore()
@@ -308,13 +307,11 @@ void Frame::Paint(Graphics *g)
 
 	jthread::AutoLock lock(&_paint_mutex);
 
-	g->SetFont(_font);
-
 	if (_title != "") {
 		g->SetColor(0xf0, 0xf0, 0xf0, 0x80);
 		g->FillRectangle(_insets.left, _insets.top-10, _width-_insets.left-_insets.right, 5);
 
-		if (_font != NULL) {
+		if (IsFontSet() == true) {
 			int font_height = _font->GetHeight(),
 					dy = (_insets.top-font_height)-15;
 
@@ -340,7 +337,7 @@ void Frame::Paint(Graphics *g)
 		int count = 35;
 
 		for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
-			if (_font != NULL) {
+			if (IsFontSet() == true) {
 				count += _font->GetStringWidth((*i).subtitle.c_str());
 
 				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
@@ -611,6 +608,9 @@ void Frame::MouseWheel(MouseEvent *event)
 
 void Frame::Release()
 {
+	// WARNNING:: agora o frame estah sendo removido do WindowManager no metodo Release()
+	WindowManager::GetInstance()->Remove(this);
+
 	_input_locked = false;
 
 	InputManager::GetInstance()->RemoveKeyListener(this);

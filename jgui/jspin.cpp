@@ -286,8 +286,6 @@ void Spin::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	g->SetFont(_font);
-
 	{
 		/*
 		if (_has_focus == true) {

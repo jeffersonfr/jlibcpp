@@ -152,8 +152,6 @@ void ProgressBar::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	g->SetFont(_font);
-
 	{
 		if (_indeterminate == false) {
 			if (_type == LEFT_RIGHT_DIRECTION) {

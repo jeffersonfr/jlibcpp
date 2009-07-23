@@ -113,11 +113,7 @@ void Animation::Paint(Graphics *g)
 		
 		Component::Paint(g);
 
-		if (_images.size() == 0) {
-			return;
-		}
-
-		{
+		if (_images.size() != 0) {
 			OffScreenImage *image = _images[_index];
 
 			g->DrawImage(image, 0, 0, _width, _height);

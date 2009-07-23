@@ -32,13 +32,44 @@
 
 namespace jgui {
 
-Font *Graphics::_default_font = NULL; // TODO:: new Font("./fonts/font.ttf", 0, 16);
+static const float EPSILON = 0.0000000001f;
 
-class Vector2d;
-class Triangle;
+class Vector2d {
+
+	private:
+		float mX;
+		float mY;
+
+	public:
+		Vector2d(float x,float y);
+
+		float GetX(void) const;
+		float GetY(void) const;
+		void  Set(float x,float y);
+
+};
 
 // Vector of vertices which are used to represent a polygon/contour and a series of triangles
 typedef std::vector< Vector2d > Vector2dVector;
+
+class Triangulate {
+	private:
+		static bool Snip(const Vector2dVector &contour,int u,int v,int w,int n,int *V);
+
+	public:
+  		// triangulate a contour/polygon, places results in STL vector as series of triangles
+		static bool Process(const Vector2dVector &contour, Vector2dVector &result);
+		// compute area of a contour/polygon
+		static float Area(const Vector2dVector &contour);
+		// decide if point Px/Py is inside triangle defined by (Ax,Ay) (Bx,By) (Cx,Cy)
+		static bool InsideTriangle(float Ax, float Ay, float Bx, float By, float Cx, float Cy, float Px, float Py);
+
+};
+
+// Vector of vertices which are used to represent a polygon/contour and a series of triangles
+typedef std::vector< Vector2d > Vector2dVector;
+
+Font *Graphics::_default_font = NULL;
 
 Graphics::Graphics(void *s):
 	jcommon::Object()
@@ -1139,6 +1170,40 @@ void Graphics::FillCircle(int xp, int yp, int raio)
 
 	int x1, 
 			x2,
+			l = 0,
+			k = 0,
+			nlines = 2*raio;
+
+	DFBRegion lines[nlines];
+
+	for (int y1=yp-raio; y1<=yp+raio; y1++) {
+		double d = sqrt(raio*raio-(y1-yp)*(y1-yp));
+
+		x1 = (int)(xp - d);
+		x2 = (int)(xp + d);
+
+		int j = SCALE_TO_SCREEN((_clip.y+y1), _screen_height, _scale_height);
+
+		if (l != j) {
+			l = j;
+
+			int px1 = SCALE_TO_SCREEN((_clip.x+x1), _screen_width, _scale_width),
+					px2 = SCALE_TO_SCREEN((_clip.x+x2), _screen_width, _scale_width);
+
+			lines[k].x1 = px1;
+			lines[k].y1 = l;
+			lines[k].x2 = px2;
+			lines[k].y2 = l;
+
+			k++;
+		}
+	}
+	
+	surface->DrawLines(surface, lines, k-1);
+
+	/*
+	int x1, 
+			x2,
 			l = 0;
 
 	for (int y1=yp-raio; y1<=yp+raio; y1++) {
@@ -1158,6 +1223,7 @@ void Graphics::FillCircle(int xp, int yp, int raio)
 			surface->DrawLine(surface, px1, l, px2, l);
 		}
 	}
+	*/
 #endif
 }
 
@@ -2831,6 +2897,7 @@ surface->Unlock(surface);
 
 void Graphics::Reset()
 {
+	_font = NULL;
 	_red = 0x00;
 	_green = 0x00;
 	_blue = 0x00;
@@ -3130,7 +3197,9 @@ bool Triangulate::Snip(const Vector2dVector &contour,int u,int v,int w,int n,int
 	Cx = contour[V[w]].GetX();
 	Cy = contour[V[w]].GetY();
 
-	if ( EPSILON > (((Bx-Ax)*(Cy-Ay)) - ((By-Ay)*(Cx-Ax))) ) return false;
+	if (EPSILON > (((Bx-Ax)*(Cy-Ay))-((By-Ay)*(Cx-Ax)))) {
+		return false;
+	}
 
 	for (p=0;p<n;p++)
 	{

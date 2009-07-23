@@ -161,35 +161,31 @@ void Marquee::Paint(Graphics *g)
 	g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
 	*/
 
-	if (_font == NULL) {
-		PaintBorder(g);
+	if (IsFontSet() == true) {
+		int string_width = _font->GetStringWidth(full_text.c_str());
 
-		return;
-	}
+		g->SetFont(_font);
 
-	int string_width = _font->GetStringWidth(full_text.c_str());
+		if (_type == LOOP_TEXT) {
+			g->SetClip(0, 0, _width-2*_fixe_delta, _height);
+		}
 
-	g->SetFont(_font);
-
-	if (_type == LOOP_TEXT) {
-		g->SetClip(0, 0, _width-2*_fixe_delta, _height);
-	}
-
-	if (_type == BOUNCE_TEXT) {
-		if (_width < string_width) {
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawString((char *)(full_text.c_str()+_index), _fixe_delta, (CENTER_VERTICAL_TEXT));
+		if (_type == BOUNCE_TEXT) {
+			if (_width < string_width) {
+				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+				g->DrawString((char *)(full_text.c_str()+_index), _fixe_delta, (CENTER_VERTICAL_TEXT));
+			} else {
+				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+				g->DrawString((char *)(full_text.c_str()), _position, (CENTER_VERTICAL_TEXT));
+			}
 		} else {
 			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawString((char *)(full_text.c_str()), _position, (CENTER_VERTICAL_TEXT));
+			g->DrawString((char *)(full_text.c_str()+_index), _position, (CENTER_VERTICAL_TEXT));
 		}
-	} else {
-		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-		g->DrawString((char *)(full_text.c_str()+_index), _position, (CENTER_VERTICAL_TEXT));
-	}
 
-	if (_type == LOOP_TEXT) {
-		g->ReleaseClip();
+		if (_type == LOOP_TEXT) {
+			g->ReleaseClip();
+		}
 	}
 
 	PaintBorder(g);

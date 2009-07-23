@@ -525,7 +525,7 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 					for (std::vector<jgui::Component *>::iterator j=collisions.begin(); j!=collisions.end(); j++) {
 						c2 = (*j);
 
-						if (Collide(c1, c2) == true) {
+						if (Intersect(c1, c2) == true) {
 							c1->Invalidate();
 
 							collisions.push_back(c1);
