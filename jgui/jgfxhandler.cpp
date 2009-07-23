@@ -548,30 +548,40 @@ void GFXHandler::Release()
 
 void GFXHandler::Add(Font *font)
 {
+	jthread::AutoLock lock(&_mutex);
+
 	_fonts.push_back(font);
 }
 
 void GFXHandler::Remove(Font *font)
 {
-	// WARNNING:: lembrar de sincronizar os iterators para evitar erros indesejados
+	jthread::AutoLock lock(&_mutex);
+
 	for (std::vector<Font *>::iterator i=_fonts.begin(); i!=_fonts.end(); i++) {
 		if (font == (*i)) {
 			_fonts.erase(i);
+
+			break;
 		}
 	}
 }
 
 void GFXHandler::Add(OffScreenImage *image)
 {
+	jthread::AutoLock lock(&_mutex);
+
 	_offscreenimages.push_back(image);
 }
 
 void GFXHandler::Remove(OffScreenImage *image)
 {
-	// WARNNING:: lembrar de sincronizar os iterators para evitar erros indesejados
+	jthread::AutoLock lock(&_mutex);
+
 	for (std::vector<OffScreenImage *>::iterator i=_offscreenimages.begin(); i!=_offscreenimages.end(); i++) {
 		if (image == (*i)) {
 			_offscreenimages.erase(i);
+
+			break;
 		}
 	}
 }
