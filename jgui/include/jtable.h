@@ -33,6 +33,11 @@ namespace jgui {
 
 class Table;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Cell : public virtual jcommon::Object{
 
 	private:
@@ -66,6 +71,11 @@ class Cell : public virtual jcommon::Object{
 
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Table : public Component, public virtual jcommon::Object{
 
 	friend class Cell;

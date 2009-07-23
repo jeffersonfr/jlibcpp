@@ -30,6 +30,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Panel : public Container{
 
 	private:

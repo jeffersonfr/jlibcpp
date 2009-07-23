@@ -26,6 +26,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class FrameInputListener : public jcommon::Listener{
 
 	private:

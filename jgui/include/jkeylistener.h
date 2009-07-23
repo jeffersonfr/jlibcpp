@@ -25,6 +25,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class KeyListener : public jcommon::Listener{
 
 	private:

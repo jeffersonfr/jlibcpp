@@ -35,6 +35,11 @@ namespace jgui {
 class TreeItem;
 class TreeComponent;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Tree : public jgui::Component{
 
 	friend class TreeComponent;
@@ -76,6 +81,11 @@ class Tree : public jgui::Component{
 
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class TreeItem{
 
 	friend class TreeComponent;
@@ -212,6 +222,11 @@ class TreeItem{
 
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class TreeComponent : public Component{
 
 	friend class Tree;

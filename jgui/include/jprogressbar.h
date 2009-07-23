@@ -39,6 +39,11 @@ enum jprogress_type_t {
 class ButtonListener;
 class ButtonEvent;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ProgressBar : public jgui::Component, public jthread::Thread{
 
 	private:

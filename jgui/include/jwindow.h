@@ -37,6 +37,11 @@ namespace jgui{
 class Graphics;
 class InputManager;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Window : public Container{
 
 	friend class InputManager;

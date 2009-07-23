@@ -36,14 +36,31 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class AdjustmentListener : public jcommon::Listener{
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		AdjustmentListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~AdjustmentListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void AdjustmentValueChanged(AdjustmentEvent *event);
 
 };

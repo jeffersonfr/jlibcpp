@@ -49,6 +49,11 @@ enum jframe_buttons_t {
 	FB_RELEASE = 2
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Frame : public KeyListener, public MouseListener, public Window {
 
 	friend class Component;

@@ -42,6 +42,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Animation : public Component, public jthread::Thread{
 
 	private:
@@ -51,16 +56,58 @@ class Animation : public Component, public jthread::Thread{
 		bool _running;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Animation(int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Animation();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void AddImage(std::string file);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetInterval(int i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveAll();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Release();
 		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetVisible(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Run();
 
 };

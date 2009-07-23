@@ -36,6 +36,11 @@ enum jscroll_orientation_t {
 	BOTTOM_UP_SCROLL
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ScrollBar : public jgui::Component{
 
 	private:

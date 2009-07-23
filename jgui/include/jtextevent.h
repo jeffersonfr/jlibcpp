@@ -35,6 +35,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class TextEvent : public jcommon::EventObject{
 
 	private:

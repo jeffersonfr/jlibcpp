@@ -42,6 +42,11 @@ namespace jgui {
 
 class Layout;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Container : public jgui::Component{
 
 	friend class Component;
@@ -61,63 +66,251 @@ class Container : public jgui::Component{
 		bool _optimized_paint;
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void RequestComponentFocus(jgui::Component *c);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ReleaseComponentFocus(jgui::Component *c);
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Container(int x = 0, int y = 0, int width = 0, int height = 0, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Container();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Container * GetParent();
 		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetLayout(jgui::Layout *layout);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jgui::Layout * GetLayout();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DoLayout();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetOptimizedPaint(bool b);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWorkingScreenSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetWorkingWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetWorkingHeight();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jinsets_t GetInsets();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetSize(int w, int h);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetInsets(jinsets_t insets);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetInsets(int left, int top, int right, int bottom);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Add(Component *c, jborderlayout_align_t align = BL_CENTER);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Add(Component *c, GridBagConstraints *constraints);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Add(Component *c, std::string id);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Remove(Component *c);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void RemoveAll();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetComponentCount();
 
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<Component *> & GetComponents();
 
-		virtual bool Collide(Component *c1, Component *c2);
-		virtual bool Collide(Component *c1, int x, int y, int w, int h);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool Intersect(Component *c1, Component *c2);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool Intersect(Component *c1, int x, int y, int w, int h);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void InvalidateAll();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void RevalidateAll();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Repaint(bool all = true);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Repaint(int x, int y, int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Repaint(Component *c, int x, int y, int width, int height);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Component * GetTargetComponent(Container *target, int x, int y);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jgui::Component * GetComponentInFocus();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void RaiseComponentToTop(Component *c);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void LowerComponentToBottom(Component *c);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void PutComponentATop(Component *c, Component *c1);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void PutComponentBelow(Component *c, Component *c1);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterContainerListener(ContainerListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveContainerListener(ContainerListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(ContainerEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<ContainerListener *> & GetFrameListeners();
 
 };

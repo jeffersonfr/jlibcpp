@@ -36,15 +36,33 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ButtonEvent : public jcommon::EventObject{
 
 	private:
 		std::string _symbol;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		ButtonEvent(void *source, std::string symbol);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ButtonEvent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetSymbol();
 
 };

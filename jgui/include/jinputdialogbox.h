@@ -40,6 +40,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class InputDialogBox : public jgui::Frame, public jgui::ButtonListener{
 
 	private:

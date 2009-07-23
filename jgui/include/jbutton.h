@@ -33,6 +33,11 @@ namespace jgui {
 class ButtonListener;
 class ButtonEvent;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Button : public Component{
 
 	private:
@@ -44,26 +49,112 @@ class Button : public Component{
 		jalign_t _align;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Button(std::string label, int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Button();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetText(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AddName(std::string);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveName(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetCurrentNameIndex(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void NextName();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void PreviousName();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetAlign(jalign_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jalign_t GetAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetName();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(MouseEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterButtonListener(ButtonListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveButtonListener(ButtonListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(ButtonEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<ButtonListener *> & GetButtonListeners();
 
 };

@@ -52,6 +52,11 @@ enum jmouse_button_t {
 	JBUTTON_WHEEL = 0x08
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class MouseEvent : public jcommon::EventObject{
 
 	private:

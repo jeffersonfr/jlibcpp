@@ -36,6 +36,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class MenuListener : public jcommon::Listener{
 
 	protected:

@@ -28,6 +28,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class GridLayout : public Layout{
 
 	private:

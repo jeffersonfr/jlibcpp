@@ -38,33 +38,97 @@ enum jcheckbox_type_t {
 class CheckButtonListener;
 class CheckButtonEvent;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class CheckButton : public Component{
 
 	private:
 		std::vector<CheckButtonListener *> _check_listeners;
 		std::string _label;
 		jcheckbox_type_t _type;
-		int _paint_count;
 		bool _checked,
 			 _just_check;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		CheckButton(jcheckbox_type_t type, std::string label, int x = 0, int y = 0, int width = 0, int height = 0);
+	
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~CheckButton();
 
-
+		/**
+		 * \brief
+		 *
+		 */
 		void SetType(jcheckbox_type_t type);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jcheckbox_type_t GetType();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool IsSelected();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetSelected(bool b);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(MouseEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterCheckButtonListener(CheckButtonListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveCheckButtonListener(CheckButtonListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(CheckButtonEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<CheckButtonListener *> & GetCheckButtonListeners();
 
 };

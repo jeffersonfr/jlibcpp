@@ -28,6 +28,11 @@
 
 namespace jgui{
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Icon : public jgui::Component{
 
 	private:

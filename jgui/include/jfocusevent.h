@@ -40,6 +40,11 @@ enum jfocus_event_t {
 	LOST_FOCUS_EVENT
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class FocusEvent : public jcommon::EventObject{
 
 	private:

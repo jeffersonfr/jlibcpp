@@ -39,6 +39,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Font : public virtual jcommon::Object{
 
 	friend class Graphics;

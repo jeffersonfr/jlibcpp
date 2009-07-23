@@ -43,6 +43,11 @@ enum jselect_type_t {
 	ACTION_ITEM
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class SelectEvent : public jcommon::EventObject{
 
 	private:

@@ -187,6 +187,11 @@ enum jgridbaglayout_style_t {
 
 class Container;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class GridBagConstraints{
 
 	private:

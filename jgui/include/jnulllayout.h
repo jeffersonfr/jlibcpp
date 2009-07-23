@@ -28,6 +28,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class NullLayout : public Layout{
 
 	private:

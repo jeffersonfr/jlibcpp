@@ -37,6 +37,11 @@ enum jflowlayout_align_t {
 	FL_TRAILING
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class FlowLayout : public Layout{
 
 	private:

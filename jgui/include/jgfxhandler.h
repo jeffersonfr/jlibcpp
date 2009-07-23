@@ -48,6 +48,11 @@ enum jcursor_style_t {
 
 class OffScreenImage;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class GFXHandler : public virtual jcommon::Object{
 
 	protected:
@@ -80,6 +85,18 @@ class GFXHandler : public virtual jcommon::Object{
 			screenHeight,
 			scaleWidth, 
 			scaleHeight;
+
+	private:
+		friend class Font;
+		friend class OffScreenImage;
+
+		std::vector<Font *> _fonts;
+		std::vector<OffScreenImage *> _offscreenimages;
+
+		void Add(Font *);
+		void Remove(Font *);
+		void Add(OffScreenImage *);
+		void Remove(OffScreenImage *);
 
 	public:
 		virtual ~GFXHandler();

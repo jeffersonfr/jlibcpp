@@ -37,6 +37,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class KeyProcess : public jthread::Thread{
 
 	private:

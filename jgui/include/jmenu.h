@@ -53,6 +53,11 @@ class MenuItem;
 class MenuComponent;
 class ComboMenuComponent;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Menu : public jgui::Frame, public jgui::FrameInputListener{
 
 	friend class MenuComponent;

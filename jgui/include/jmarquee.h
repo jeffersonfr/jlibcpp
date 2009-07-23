@@ -46,6 +46,11 @@ enum jmarquee_type_t {
 	BOUNCE_TEXT
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Marquee : public Component, public jthread::Thread{
 
 	private:

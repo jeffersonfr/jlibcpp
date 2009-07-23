@@ -39,6 +39,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class YesNoDialog : public jgui::Frame, public jgui::ButtonListener{
 
 	private:

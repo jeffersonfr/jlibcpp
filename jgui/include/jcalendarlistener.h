@@ -36,14 +36,31 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class CalendarListener : public jcommon::Listener{
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		CalendarListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~CalendarListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DateChanged(CalendarEvent *event);
 
 };

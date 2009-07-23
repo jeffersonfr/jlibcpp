@@ -30,6 +30,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class MenuGroup : public MenuListener{
 
 	private:

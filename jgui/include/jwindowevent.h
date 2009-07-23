@@ -43,6 +43,11 @@ enum jwindow_event_t {
 	WINDOW_MOVED_EVENT
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class WindowEvent : public jcommon::EventObject{
 
 	private:

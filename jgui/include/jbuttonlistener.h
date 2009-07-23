@@ -36,14 +36,31 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ButtonListener : public jcommon::Listener{
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		ButtonListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ButtonListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ActionPerformed(ButtonEvent *event);
 
 };

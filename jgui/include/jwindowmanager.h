@@ -32,6 +32,11 @@
 
 namespace jgui{
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class WindowManager : public virtual jcommon::Object{
 
 	private:

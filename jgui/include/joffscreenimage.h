@@ -29,7 +29,15 @@ namespace jgui{
 
 class Graphics;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class OffScreenImage : public virtual jcommon::Object{
+
+	private:
+		uint8_t *_buffer;
 
 	protected:
 		Graphics *graphics;

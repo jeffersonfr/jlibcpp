@@ -36,6 +36,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class WindowListener : public jcommon::Listener{
 
 	protected:

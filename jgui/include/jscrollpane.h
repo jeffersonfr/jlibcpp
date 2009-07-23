@@ -42,6 +42,11 @@ enum jscrollpane_type_t {
 
 class Layout;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ScrollPane : public jgui::Container{
 
 	friend class Component;

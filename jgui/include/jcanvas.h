@@ -30,14 +30,32 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Canvas : public Component{
 
 	private:
 
 	public:
+		/**
+		 * \brief 
+		 *
+		 */
 		Canvas(int x = 0, int y = 0, int width = 0, int height = 0);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Canvas();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
 };

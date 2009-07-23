@@ -32,6 +32,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Slider : public jgui::Component{
 
 	private:

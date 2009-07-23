@@ -36,15 +36,37 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ContainerListener : public jcommon::Listener{
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		ContainerListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ContainerListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ComponentAdded(ContainerEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ComponentRemoved(ContainerEvent *event);
 
 };

@@ -35,6 +35,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jcomponent_event_t {
 	COMPONENT_HIDDEN_EVENT,
 	COMPONENT_SHOWN_EVENT,
@@ -42,15 +46,33 @@ enum jcomponent_event_t {
 	COMPONENT_PAINT_EVENT
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ComponentEvent : public jcommon::EventObject{
 
 	private:
 		jcomponent_event_t _type;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		ComponentEvent(void *source, jcomponent_event_t type);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ComponentEvent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		jcomponent_event_t GetType();
 
 };

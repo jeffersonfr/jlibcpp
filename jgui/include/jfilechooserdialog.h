@@ -49,6 +49,11 @@ enum jfilechooser_filter_t {
 	FILE_AND_DIRECTORY
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class FileChooserDialog : public jgui::Frame, public jgui::SelectListener, public jgui::FrameInputListener{
 
 	private:

@@ -41,6 +41,11 @@ enum jspin_type_t {
 	VERTICAL_SPIN
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Spin : public Component{
 
 	private:

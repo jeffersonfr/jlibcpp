@@ -29,6 +29,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jborderlayout_align_t {
 	BL_UNKNOWN,
 	BL_NORTH,
@@ -46,6 +50,11 @@ enum jborderlayout_align_t {
 	BL_LINE_END = BL_AFTER_LINE_ENDS
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class BorderLayout : public Layout{
 
 	private:
@@ -62,28 +71,106 @@ class BorderLayout : public Layout{
 				_vgap;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		BorderLayout(int hgap = 10, int vgap = 10);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~BorderLayout();
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetHGap();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetVGap();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetHGap(int hgap);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetVgap(int vgap);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void AddLayoutComponent(Component *c, jborderlayout_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveLayoutComponent(Component *c);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveLayoutComponents();
 
+		/**
+		 * \brief
+		 *
+		 */
 		jborderlayout_align_t GetConstraints(Component *c);
 
+		/**
+		 * \brief
+		 *
+		 */
 		Component * GetLayoutComponent(jborderlayout_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		Component * GetLayoutComponent(Container *target, jborderlayout_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		Component * GetChild(jborderlayout_align_t key, bool ltr);
 
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetPreferredLayoutSize(Container *parent);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DoLayout(Container *target);
 
 };

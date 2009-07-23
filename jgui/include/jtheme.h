@@ -34,6 +34,11 @@ namespace jgui {
 class Component;
 class Window;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Theme : public jcommon::Object{
 
 	friend class ThemeManager;

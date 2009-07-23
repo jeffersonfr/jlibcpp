@@ -39,6 +39,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class MessageDialog : public jgui::Frame, public jgui::ButtonListener{
 
 	private:

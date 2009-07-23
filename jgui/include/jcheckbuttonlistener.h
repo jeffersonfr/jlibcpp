@@ -36,14 +36,31 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class CheckButtonListener : public jcommon::Listener{
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		CheckButtonListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~CheckButtonListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ButtonSelected(CheckButtonEvent *event);
 
 };

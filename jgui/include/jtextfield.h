@@ -41,6 +41,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class TextField : public Component{
 
 	private:

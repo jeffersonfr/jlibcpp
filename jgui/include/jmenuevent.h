@@ -42,6 +42,11 @@ enum jmenu_event_t {
 
 class MenuItem;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class MenuEvent : public jcommon::EventObject{
 
 	private:

@@ -42,6 +42,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 struct jcalendar_warnning_t {
 	int day;
 	int month;
@@ -51,6 +55,11 @@ struct jcalendar_warnning_t {
 	int blue;
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class CalendarDialog : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public FrameInputListener{
 
 	private:
@@ -91,30 +100,118 @@ class CalendarDialog : public jgui::Frame, public jgui::ButtonListener, public j
 			 _response;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		CalendarDialog(int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~CalendarDialog();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void BuildCalendar();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetDay(int d);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetMonth(int m);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetYear(int y);
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetDay();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetMonth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetYear();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void AddWarnning(int day, int month, int year, int red = 0xf0, int green = 0x20, int blue = 0x20);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveWarnning(jcalendar_warnning_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveAll();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ActionPerformed(ButtonEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ItemChanged(SelectEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void InputChanged(jgui::KeyEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterCalendarListener(CalendarListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveCalendarListener(CalendarListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(CalendarEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<CalendarListener *> & GetCalendarListeners();
 
 };

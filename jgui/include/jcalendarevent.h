@@ -35,6 +35,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class CalendarEvent : public jcommon::EventObject{
 
 	private:
@@ -43,11 +48,34 @@ class CalendarEvent : public jcommon::EventObject{
 			_year;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		CalendarEvent(void *source, int day, int month, int year);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~CalendarEvent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetDay();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetMonth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetYear();
 
 };

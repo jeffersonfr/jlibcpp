@@ -48,6 +48,11 @@ enum jcursor_type_t {
 	BLOCK_CURSOR
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class TextArea : public Component{
 
 	private:

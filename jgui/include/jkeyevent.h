@@ -224,6 +224,11 @@ enum jkey_symbol_t {
 	JKEY_RECORD,
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class KeyEvent : public jcommon::EventObject{
 
 	private:

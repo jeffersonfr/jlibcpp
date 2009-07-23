@@ -34,6 +34,11 @@ namespace jgui {
 class ButtonListener;
 class ButtonEvent;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ImageButton : public Button{
 
 	protected:

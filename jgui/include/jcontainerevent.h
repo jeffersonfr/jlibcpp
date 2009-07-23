@@ -36,11 +36,20 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum frame_event_t {
 	COMPONENT_ADDED_EVENT,
 	COMPONENT_REMOVED_EVENT
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ContainerEvent : public jcommon::EventObject{
 
 	private:
@@ -48,10 +57,28 @@ class ContainerEvent : public jcommon::EventObject{
 		frame_event_t _type;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		ContainerEvent(void *source, Component *component, frame_event_t type);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ContainerEvent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		Component * GetComponent();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		frame_event_t GetType();
 
 };

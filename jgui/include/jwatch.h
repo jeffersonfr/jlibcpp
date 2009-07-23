@@ -43,6 +43,11 @@ enum jwatch_type_t {
 class ButtonListener;
 class ButtonEvent;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Watch : public jgui::Component, public jthread::Thread{
 
 	private:

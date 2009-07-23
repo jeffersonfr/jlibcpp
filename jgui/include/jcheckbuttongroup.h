@@ -30,6 +30,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class CheckButtonGroup : public CheckButtonListener{
 
 	private:
@@ -37,15 +42,41 @@ class CheckButtonGroup : public CheckButtonListener{
 		jthread::Mutex _mutex;
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ButtonSelected(CheckButtonEvent *event);
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		CheckButtonGroup();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~CheckButtonGroup();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void Add(CheckButton *button);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Remove(CheckButton *button);
 
+		/**
+		 * \brief
+		 *
+		 */
 		CheckButton * GetSelected();
 
 };

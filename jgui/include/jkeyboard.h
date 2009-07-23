@@ -48,6 +48,11 @@ enum jkeyboard_type_t {
 	FULL_WEB_KEYBOARD
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::FrameInputListener, public jgui::TextListener {
 
 	public:

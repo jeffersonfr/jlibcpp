@@ -29,11 +29,20 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jcoordinate_layout_t {
 	CL_HORIZONTAL	= 1,
 	CL_VERTICAL		= 2
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class CoordinateLayout : public Layout{
 
 	private:
@@ -42,19 +51,64 @@ class CoordinateLayout : public Layout{
 				_height;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		CoordinateLayout(int hgap = 10, int vgap = 10, jcoordinate_layout_t type = (jcoordinate_layout_t)(CL_HORIZONTAL | CL_VERTICAL));
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~CoordinateLayout();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetWidth(int width);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetHeight(int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetType(jcoordinate_layout_t type);
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jcoordinate_layout_t GetType();
 
+		/**
+		 * \brief
+		 *
+		 */
 		jsize_t GetPreferredSize(Container *target);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DoLayout(Container *parent);
 
 };

@@ -30,6 +30,11 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ThemeManager : public jcommon::Object{
 
 	private:

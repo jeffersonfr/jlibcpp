@@ -58,6 +58,11 @@ enum jlist_selection_type_t {
 	MULTI_SELECTION
 };
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class ListBox : public ButtonListener, public Component{
 
 	private:

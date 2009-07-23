@@ -30,6 +30,11 @@ namespace jgui {
 
 class Container;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Layout : public virtual jcommon::Object{
 
 	private:

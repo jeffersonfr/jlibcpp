@@ -129,6 +129,11 @@ class InteractionListener;
 class InteractionEvent;
 class Container;
 
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
 class Component : public virtual jcommon::Object{
 
 	friend class Container;
@@ -199,127 +204,588 @@ class Component : public virtual jcommon::Object{
 													 _alignment_y;
 		jcomponent_orientation_t _orientation;
 
+		/**
+		 * \brief
+		 *
+		 */
 		std::string TruncateString(std::string text, int width);
 
 	protected:
-		// INFO:: render surface using component_border_t parameter
+		/**
+		 * \brief render surface using component_border_t parameter
+		 *
+		 */
 		void FillRectangle(Graphics *g, int x, int y, int width, int height);
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Component(int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Component();
 
+		/**
+		 * \brief
+		 *
+		 */
 		static int CountLines(std::string text, int width, Font *font);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Container * GetParent();
 		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetBaseline(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jcomponent_behavior_t GetBaselineResizeBehavior();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jcomponent_alignment_t GetAlignmentX();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jcomponent_alignment_t GetAlignmentY();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetAlignmentX(jcomponent_alignment_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetAlignmentY(jcomponent_alignment_t align);
 		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetComponentOrientation(jcomponent_orientation_t orientation);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jcomponent_orientation_t GetComponentOrientation();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetThemeEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool IsThemeEnabled();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetIgnoreRepaint(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetOpaque(bool opaque);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool IsOpaque();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Invalidate();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Revalidate();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool IsValid();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetGap(int hgap, int vgap);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetParent(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBackgroundVisible(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetTruncated(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void AddNavigator(Component *left, Component *right, Component *up, Component *down);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Component * GetLeftComponent();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Component * GetRightComponent();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Component * GetUpComponent();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Component * GetDownComponent();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void RequestFocus();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ReleaseFocus();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetVisible(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool IsVisible();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool HasFocus();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetMinimumSize(int w, int h);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetMaximumSize(int w, int h);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetPreferredSize(int w, int h);
 		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetMinimumWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetMinimumHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetMaximumWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetMaximumHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetPreferredWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetPreferredHeight();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBorder(jcomponent_border_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBorderSize(int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Move(int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBounds(int x, int y, int w, int h);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetPosition(int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetX();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetY();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetHeight();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void PaintBorder(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Repaint(bool all = false);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetGradientLevel(int level);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetGradientLevel();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetFont(Font *font);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsFontSet();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Font * GetFont();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void RaiseToTop();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void LowerToBottom();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void PutAtop(Component *c);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void PutBelow(Component *c);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBackgroundColor(uint32_t color);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetForegroundColor(uint32_t color);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBackgroundFocusColor(uint32_t color);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetForegroundFocusColor(uint32_t color);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBorderColor(uint32_t color);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBackgroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetForegroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBorderColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBackgroundFocusColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetForegroundFocusColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBorderFocusColor(int red, int green, int blue, int alpha);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual unsigned int GetBackgroundColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual unsigned int GetForegroundColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual unsigned int GetBackgroundFocusColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual unsigned int GetForegroundFocusColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual unsigned int GetBorderColor();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetFocusable(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool IsFocusable();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool Intersect(int x, int y);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterFocusListener(FocusListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveFocusListener(FocusListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(FocusEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<FocusListener *> & GetFocusListeners();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterComponentListener(ComponentListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveComponentListener(ComponentListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(ComponentEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<ComponentListener *> & GetComponentListeners();
 
 };
