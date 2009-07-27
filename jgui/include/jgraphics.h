@@ -62,6 +62,10 @@
 
 namespace jgui{
 
+/**
+ * \brief
+ *
+ */
 enum jporter_duff_flags_t {
 	PD_NONE				= 0x0001,	// fs: sa fd: 1.0-sa (defaults)
 	PD_CLEAR			= 0x0002,	// fs: 0.0 fd: 0.0
@@ -78,12 +82,20 @@ enum jporter_duff_flags_t {
 	PD_XOR				= 0x1000	// fs: 1.0-da fd: 1.0-sa 
 };
 
+/**
+ * \brief
+ *
+ */
 enum jdrawing_flags_t {
 	NOFX_FLAG			= 0x01,
 	BLEND_FLAG		= 0x02,
 	XOR_FLAG			= 0x04
 };
 
+/**
+ * \brief
+ *
+ */
 enum jblitting_flags_t {
 	NOFX_BLIT					= 0x01,
 	ALPHACHANNEL_BLIT	= 0x02,
@@ -95,11 +107,19 @@ enum jblitting_flags_t {
 	XOR_BLIT					= 0x80
 };
 
+/**
+ * \brief
+ *
+ */
 enum jline_type_t {
 	RECT_LINE			= 0x01,
 	ROUND_LINE			= 0x02
 };
 
+/**
+ * \brief
+ *
+ */
 enum jline_style_t {
 	SOLID_LINE			= 0x01,
 	DASH_LINE			= 0x02,
@@ -107,6 +127,10 @@ enum jline_style_t {
 	DOT_LINE			= 0x08
 };
 
+/**
+ * \brief
+ *
+ */
 enum jalign_t {
 	LEFT_ALIGN,
 	CENTER_ALIGN,
@@ -114,16 +138,28 @@ enum jalign_t {
 	JUSTIFY_ALIGN
 };
 
+/**
+ * \brief
+ *
+ */
 struct jpoint_t {
 	int x;
 	int y;
 };
 
+/**
+ * \brief
+ *
+ */
 struct jsize_t {
 	int width;
 	int height;
 };
 
+/**
+ * \brief
+ *
+ */
 struct jregion_t {
 	int x;
 	int y;
@@ -131,6 +167,10 @@ struct jregion_t {
 	int height;
 };
 
+/**
+ * \brief
+ *
+ */
 struct jinsets_t {
 	int left;
 	int top;
@@ -209,85 +249,418 @@ class Graphics : public virtual jcommon::Object{
 		void RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle);
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Graphics();
 
+		/**
+		 * \brief
+		 *
+		 */
 		static void SetDefaultFont(Font *font);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		static Font * GetDefaultFont();
 		
+		/**
+		 * \brief
+		 *
+		 */
 		void * GetSurface();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetSurface(void *surface);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetCurrentWorkingScreenSize(int width, int height);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual OffScreenImage * Create();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Rotate(double radians);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Translate(int x, int y);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetClip(int x1, int y1, int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetClipX();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetClipY();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetClipWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetClipHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ReleaseClip();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Clear(int r = 0xff, int g = 0xff, int b = 0xff, int a = 0x00);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Idle();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Flip();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Flip(int x, int y, int w, int h);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual uint32_t GetColor(); 
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetColor(uint32_t c); 
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetColor(int r, int g, int b, int a = 0xff); 
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetFont(Font *font); 
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Font * GetFont(); 
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetPorterDuffFlags(jporter_duff_flags_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetDrawingFlags(jdrawing_flags_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBlittingFlags(jblitting_flags_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetPixel(int xp, int yp, uint32_t pixel);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual uint32_t GetPixel(int xp, int yp);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetLineType(jline_type_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetLineStyle(jline_style_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetLineWidth(int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jline_type_t GetLineType();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jline_style_t GetLineStyle();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetLineWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawLine(int xp, int yp, int xf, int yf);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawBezierCurve(jpoint_t *points, int n_points);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FillRectangle(int x, int y, int w, int h);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawRectangle(int x, int y, int w, int h);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FillBevelRectangle(int x, int y, int w, int h, int dx = 10, int dy = 10);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawBevelRectangle(int x, int y, int w, int h, int dx = 10, int dy = 10);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FillRoundRectangle(int x, int y, int w, int h, int raio = 10);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawRoundRectangle(int x, int y, int w, int h, int raio = 10);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FillCircle(int xp, int yp, int raio);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawCircle(int xp, int yp, int raio);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FillArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FillTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FillPolygon(int x, int y, jpoint_t *p, int num);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawPolygon(int x, int y, jpoint_t *p, int num, bool close);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FillGradientRectangle(int x, int y, int w, int h, int sr, int sg, int sb, int sa, int dr, int dg, int db, int da = 0xFF, bool horizontal = true);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawGlyph(int symbol, int xp, int yp);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool GetImageSize(std::string img, int *real_width, int *real_height, int *scaled_width, int *scaled_height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool DrawImage(std::string img, int x, int y, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool DrawImage(std::string img, int x, int y, int w, int h, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool DrawImage(OffScreenImage *img, int x, int y, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool DrawImage(OffScreenImage *img, int x, int y, int w, int h, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawString(std::string s, int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawStringJustified(std::string full_text, int x, int y, int width, int height, jalign_t align = JUSTIFY_ALIGN);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual uint32_t GetRGB(int xp, int yp, uint32_t pixel = 0xff000000);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void GetRGBArray(int startxp, int startyp, int widthp, int heightp, uint32_t **rgb, int offset, int scansize);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetRGB(int xp, int yp, uint32_t rgb);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline);
 	
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Reset();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void Lock();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Unlock();
 
 };

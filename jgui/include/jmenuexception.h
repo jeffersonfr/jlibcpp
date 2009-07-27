@@ -34,20 +34,20 @@ namespace jgui {
  */
 class MenuException : public jcommon::Exception, std::runtime_error{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        MenuException(std::string reason);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~MenuException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		MenuException(std::string reason);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~MenuException() throw();
 
 		/**
 		 * \brief

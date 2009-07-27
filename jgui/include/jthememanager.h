@@ -43,18 +43,47 @@ class ThemeManager : public jcommon::Object{
 		Theme *_theme,
 					*_default_theme;
 
+		/**
+		 * \brief
+		 *
+		 */
 		ThemeManager();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ThemeManager();
 
+		/**
+		 * \brief
+		 *
+		 */
 		static ThemeManager * GetInstance();
 
+		/**
+		 * \brief
+		 *
+		 */
 		Theme * GetDefaultTheme();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetTheme(Theme *theme);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		Theme * GetTheme();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void Update();
 
 };

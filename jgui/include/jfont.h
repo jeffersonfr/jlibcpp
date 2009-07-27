@@ -62,24 +62,100 @@ class Font : public virtual jcommon::Object{
 		std::string _name;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Font(std::string name, int attr, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Font();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void * GetFont();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetWorkingScreenSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool SetEncoding(std::string code);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetName();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetVirtualHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetAscender();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetDescender();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetMaxAdvanced();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetLeading();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetStringWidth(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::string TruncateString(std::string text, std::string extension, int width);
-
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Release();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Restore();
 
 };

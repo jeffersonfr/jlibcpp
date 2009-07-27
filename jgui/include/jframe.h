@@ -43,6 +43,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jframe_buttons_t {
 	FB_NONE = 0,
 	FB_MAXIMIZE = 1,
@@ -59,18 +63,50 @@ class Frame : public KeyListener, public MouseListener, public Window {
 	friend class Component;
 
 	private:
+		/**
+		 * \brief
+		 *
+		 */
 		struct frame_subtitle_t {
 			std::string image;
 			std::string subtitle;
 		};
 
 	private:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void KeyPressed(KeyEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MousePressed(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseReleased(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseClicked(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseMoved(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseWheel(MouseEvent *event);
 
 	protected:
@@ -105,44 +141,178 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		jcursor_style_t _default_cursor;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Frame(std::string title, int x, int y, int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Frame();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Pack();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Maximize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Restore();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool Hide();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool Show(bool modal = true);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Release();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jinsets_t GetInsets();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual std::string GetIcon();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetIcon(std::string icon);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetFrameButtons();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetFrameButtons(int buttons);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetMoveEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetResizeEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool IsMoveEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool IsResizeEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetDefaultExitEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetTitle(std::string title);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual std::string GetTitle();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetInputEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void AddSubtitle(std::string image, std::string label);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void RemoveAllSubtitles();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jkey_symbol_t GetLastKeyCode();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetLastKeyCode(jkey_symbol_t key);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterInputListener(FrameInputListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveInputListener(FrameInputListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<FrameInputListener *> & GetFrameInputListeners();
 
 };

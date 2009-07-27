@@ -40,6 +40,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jkeyboard_type_t {
 	FULL_ALPHA_NUMERIC_KEYBOARD,
 	SMALL_ALPHA_NUMERIC_KEYBOARD,
@@ -80,31 +84,124 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::F
 			 _is_password;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible = true, bool is_password = false);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Keyboard();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void BuildWebKeyboard();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void BuildFullAlphaNumericKeyboard();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void BuildSmallAlphaNumericKeyboard();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void BuildFullNumericKeyboard();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void BuildSmallNumericKeyboard();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetMaxTextSize(int max);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Clear();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWrap(bool b);
 		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetText(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual std::string GetText();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ProcessCaps(Button *button);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ActionPerformed(ButtonEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void InputChanged(jgui::KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void TextChanged(TextEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<KeyboardListener *> & GetKeyboardListeners();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterKeyboardListener(KeyboardListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveKeyboardListener(KeyboardListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(KeyboardEvent *event);
 
 };

@@ -45,15 +45,52 @@ class ToogleButton : public ImageButton{
 		bool _is_pressed;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		ToogleButton(std::string label, int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		ToogleButton(std::string image, std::string label, int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ToogleButton();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetButtonPressed(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool IsPressed();
 				
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(MouseEvent *event);
 
 };

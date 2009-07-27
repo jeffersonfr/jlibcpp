@@ -37,11 +37,19 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jmenu_align_t {
 	MENU_ALIGN,
 	SUBMENU_ALIGN
 };
 
+/**
+ * \brief
+ *
+ */
 enum jmenuitem_type_t {
 	TEXT_MENU_ITEM,
 	IMAGE_MENU_ITEM,

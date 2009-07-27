@@ -46,9 +46,22 @@ class TextEvent : public jcommon::EventObject{
 		std::string _text;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		TextEvent(void *source, std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~TextEvent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetText();
 
 };

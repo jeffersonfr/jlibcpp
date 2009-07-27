@@ -55,28 +55,124 @@ class Tree : public jgui::Component{
 		jmenu_align_t _menu_align;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Tree(int x = 0, int y = 0, int width = 0, int visible_items = 3);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Tree();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetTreeAlign(jmenu_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetItemsSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetVisibleItems();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetLoop(bool loop);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		uint32_t GetItemColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetItemColor(uint32_t color);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetItemColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetCurrentIndex(int i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AddTreeItem(TreeItem *item);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		TreeItem * GetCurrentItem();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetCurrentIndex();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveItem(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveAll();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterMenuListener(MenuListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveMenuListener(MenuListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(MenuEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<MenuListener *> & GetMenuListeners();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
 
 };
@@ -254,31 +350,137 @@ class TreeComponent : public Component{
 			 _arrows_visible,
 			 _loop;
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetTree(Tree *tree);
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		TreeComponent(int x, int y, int width, int visible_items);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~TreeComponent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetGap(int hgap, int vgap);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetLoop(bool loop);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		uint32_t GetItemColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetItemColor(uint32_t color);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetItemColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetCurrentIndex(int i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AddEmptyItem();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AddItem(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AddItem(std::string text, std::string image);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AddItem(std::string text, bool checked);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AddTreeItem(TreeItem *item);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		TreeItem * GetTreeItem(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		TreeItem * GetCurrentTreeItem();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetCurrentIndex();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetItemsSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveItem(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveAll();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
 };

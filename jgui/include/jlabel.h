@@ -46,15 +46,52 @@ class Label : public jgui::Component{
 		bool _wrap;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Label(std::string text, int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Label();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetWrap(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetText(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetText();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetAlign(jalign_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jalign_t GetAlign();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
 };

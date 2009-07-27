@@ -31,6 +31,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jprogress_type_t {
 	BOTTOM_UP_DIRECTION,
 	LEFT_RIGHT_DIRECTION
@@ -57,18 +61,70 @@ class ProgressBar : public jgui::Component, public jthread::Thread{
 			 _running;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		ProgressBar(int x = 0, int y = 0, int width = 0, int height = 0, jprogress_type_t type = LEFT_RIGHT_DIRECTION);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ProgressBar();
 
+		/**
+		 * \brief
+		 *
+		 */
 		double GetPosition();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetPosition(double i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetStringPainted(bool b);
+	
+		/**
+		 * \brief
+		 *
+		 */
 		void SetIndeterminate(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool IsStringPainted();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Release();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetVisible(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Run();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
 };

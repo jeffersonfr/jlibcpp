@@ -153,43 +153,157 @@ class InputManager : public jthread::Thread{
 			 _skip_key_events,
 			 _skip_mouse_events;
 
+		/**
+		 * \brief
+		 *
+		 */
 		InputManager();
 
 #ifdef DIRECTFB_UI
+		/**
+		 * \brief
+		 *
+		 */
 		int TranslateToDFBKeyCode(int code);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int TranslateToDFBKeyID(DFBInputDeviceKeyIdentifier id);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jkey_symbol_t TranslateToDFBKeySymbol(DFBInputDeviceKeySymbol symbol);
 #endif
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~InputManager();
 
+		/**
+		 * \brief
+		 *
+		 */
 		static InputManager * GetInstance();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetCurrentWorkingScreenSize(int width, int height);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SkipKeyEvents(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SkipMouseEvents(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetKeyEventsEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetMouseEventsEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool IsKeyEventsEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool IsMouseEventsEnabled();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void PostEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void PostEvent(MouseEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterKeyListener(KeyListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveKeyListener(KeyListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<KeyListener *> & GetKeyListeners();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterMouseListener(MouseListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveMouseListener(MouseListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<MouseListener *> & GetMouseListeners();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void WaitEvents();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Run();
 
 };

@@ -34,6 +34,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jscrollpane_type_t {
 	HORIZONTAL_SCROLL,
 	VERTICAL_SCROLL,
@@ -62,12 +66,34 @@ class ScrollPane : public jgui::Container{
 		bool _auto_scroll;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		ScrollPane(int x = 0, int y = 0, int width = 0, int height = 0, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ScrollPane();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetAutoScroll(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetScrollType(jscrollpane_type_t type);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
 };

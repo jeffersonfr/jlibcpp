@@ -40,9 +40,22 @@ class Panel : public Container{
 	private:
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Panel(int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Panel();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
 };

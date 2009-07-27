@@ -42,23 +42,88 @@ class GridLayout : public Layout{
 				_cols;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		GridLayout(int rows = 1, int cols = 1, int hgap = 10, int vgap = 10);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~GridLayout();
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetRows();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetColumns();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetHorizontalGap();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetVerticalGap();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetRows(int rows);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetColumns(int cols);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetHorizontalGap(int hgap);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetVerticalGap(int vgap);
 
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetPreferredLayoutSize(Container *parent);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DoLayout(Container *parent);
 
 };

@@ -35,9 +35,22 @@ class KeyListener : public jcommon::Listener{
 	private:
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		KeyListener();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~KeyListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void KeyPressed(KeyEvent *event);
 
 };

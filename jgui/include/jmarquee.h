@@ -41,6 +41,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jmarquee_type_t {
 	LOOP_TEXT,
 	BOUNCE_TEXT
@@ -64,15 +68,58 @@ class Marquee : public Component, public jthread::Thread{
 		bool _running;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Marquee(int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Marquee();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetVisible(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetType(jmarquee_type_t type);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetInterval(int i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetText(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Run();
+
+		/**
+		 * \brief
+		 *
+		 */
 		void Release();
 
 };

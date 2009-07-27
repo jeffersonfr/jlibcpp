@@ -35,6 +35,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jwindow_event_t {
 	WINDOW_CLOSING_EVENT,
 	WINDOW_CLOSED_EVENT,
@@ -54,9 +58,22 @@ class WindowEvent : public jcommon::EventObject{
 		jwindow_event_t _type;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		WindowEvent(void *source, jwindow_event_t type);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~WindowEvent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		jwindow_event_t GetType();
 			
 };

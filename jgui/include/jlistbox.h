@@ -40,18 +40,30 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jlist_item_type_t {
 	TEXT_ITEM,
 	IMAGE_ITEM,
 	EMPTY_ITEM
 };
 
+/**
+ * \brief
+ *
+ */
 enum jlist_scroll_type_t {
 	NONE_SCROLL,
 	SCROLL_ARROW,
 	SCROLL_BAR
 };
 
+/**
+ * \brief
+ *
+ */
 enum jlist_selection_type_t {
 	NONE_SELECTION,
 	SINGLE_SELECTION,

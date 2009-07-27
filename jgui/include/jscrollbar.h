@@ -31,6 +31,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jscroll_orientation_t {
 	LEFT_RIGHT_SCROLL,
 	BOTTOM_UP_SCROLL
@@ -59,29 +63,130 @@ class ScrollBar : public jgui::Component{
 		jscroll_orientation_t _type;
 		
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		ScrollBar(int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ScrollBar();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetOrientation(jscroll_orientation_t type);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jscroll_orientation_t GetOrientation();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetStoneSize(int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetArrowsSize(int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetStoneSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetArrowsSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		double GetPosition();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		double GetMinorTickSpacing();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		double GetMajorTickSpacing();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetPosition(double i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetMinorTickSpacing(double i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetMajorTickSpacing(double i);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(MouseEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterAdjustmentListener(AdjustmentListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveAdjustmentListener(AdjustmentListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(AdjustmentEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<AdjustmentListener *> & GetAdjustmentListeners();
 
 };

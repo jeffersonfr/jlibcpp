@@ -44,11 +44,23 @@ namespace jgui {
 class KeyboardListener : public jcommon::Listener{
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		KeyboardListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~KeyboardListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void KeyboardUpdated(KeyboardEvent *event);
 
 };

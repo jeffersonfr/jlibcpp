@@ -56,11 +56,28 @@ class InputDialogBox : public jgui::Frame, public jgui::ButtonListener{
 			   *_cancel;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		InputDialogBox(std::string title, std::string warn, int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~InputDialogBox();
 
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetText();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void ActionPerformed(jgui::ButtonEvent *event);
 
 };

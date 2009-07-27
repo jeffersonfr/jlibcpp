@@ -64,33 +64,119 @@ class Theme : public jcommon::Object{
 		jcomponent_border_t _component_border,
 									 _window_border;
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Update(Component *parent);
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Theme();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Theme();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWindowBackgroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWindowForegroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWindowBorderColor(int red, int green, int blue, int alpha);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetComponentBackgroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetComponentForegroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetComponentBorderColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetComponentBackgroungFocusColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetComponentForegroundFocusColor(int red, int green, int blue, int alpha);
 		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetComponentBorder(jcomponent_border_t border);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWindowBorder(jcomponent_border_t border);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWindowInsets(int left, int top, int right, int bottom);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWindowBorderSize(int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetComponentBorderSize(int size);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWindowFont(Font *font);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetComponentFont(Font *font);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetGradientLevel(int level);
 
 };

@@ -42,17 +42,53 @@ class MenuGroup : public MenuListener{
 		Menu *_menu;
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ItemSelected(MenuEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ItemChanged(MenuEvent *event);
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		MenuGroup(Menu *menu);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~MenuGroup();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void Add(MenuItem *item);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Remove(MenuItem *item);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void Select(MenuItem *item);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		MenuItem * GetSelected();
 
 };

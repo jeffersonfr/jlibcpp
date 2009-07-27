@@ -44,12 +44,29 @@ namespace jgui {
 class MenuListener : public jcommon::Listener{
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		MenuListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~MenuListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ItemSelected(MenuEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ItemChanged(MenuEvent *event);
 
 };

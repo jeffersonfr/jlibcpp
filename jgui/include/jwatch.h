@@ -34,6 +34,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jwatch_type_t {
 	ANALOGIC_WATCH,
 	CRONOMETERUP_WATCH,
@@ -59,20 +63,70 @@ class Watch : public jgui::Component, public jthread::Thread{
 		jwatch_type_t _type;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Watch(int x = 0, int y = 0, int width = 0, int height = 0, jwatch_type_t type = ANALOGIC_WATCH);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Watch();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetVisible(bool b);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetSeconds(int i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetMinutes(int i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetHours(int i);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void Pause();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Reset();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Run();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Release();
 
 };

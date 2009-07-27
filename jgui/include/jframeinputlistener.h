@@ -36,10 +36,28 @@ class FrameInputListener : public jcommon::Listener{
 	private:
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		FrameInputListener();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~FrameInputListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void InputChanged(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void InputChanged(MouseEvent *event);
 
 };

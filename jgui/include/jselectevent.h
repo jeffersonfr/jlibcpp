@@ -35,6 +35,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jselect_type_t {
 	LEFT_ITEM,
 	RIGHT_ITEM,
@@ -56,11 +60,34 @@ class SelectEvent : public jcommon::EventObject{
 		jselect_type_t _type;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		SelectEvent(void *source, std::string text, int index, jselect_type_t type);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~SelectEvent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetText();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetIndex();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jselect_type_t GetType();
 
 };

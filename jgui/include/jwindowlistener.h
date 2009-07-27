@@ -44,15 +44,47 @@ namespace jgui {
 class WindowListener : public jcommon::Listener{
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		WindowListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~WindowListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void WindowOpened(WindowEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void WindowClosing(WindowEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void WindowClosed(WindowEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void WindowResized(WindowEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void WindowMoved(WindowEvent *event);
 
 };

@@ -35,11 +35,19 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jkey_type_t {
 	JKEY_PRESSED,
 	JKEY_RELEASED
 };
 
+/**
+ * \brief
+ *
+ */
 enum jinput_modifiers_t {
 	JMOD_SHIFT,
 	JMOD_CONTROL,
@@ -50,6 +58,10 @@ enum jinput_modifiers_t {
 	JMOD_HYPER
 };
 
+/**
+ * \brief
+ *
+ */
 enum jkey_symbol_t {
   JKEY_UNKNOWN,
 	JKEY_EXIT,
@@ -238,12 +250,36 @@ class KeyEvent : public jcommon::EventObject{
 		jinput_modifiers_t _mod;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		KeyEvent(void *source, jkey_type_t type, jinput_modifiers_t mod, int code, jkey_symbol_t symbol);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~KeyEvent();
 
 		int GetCode();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jkey_symbol_t GetSymbol();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jkey_type_t GetType();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jinput_modifiers_t GetModifiers();
 
 };

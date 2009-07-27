@@ -36,6 +36,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jspin_type_t {
 	HORIZONTAL_SPIN,
 	VERTICAL_SPIN
@@ -57,28 +61,124 @@ class Spin : public Component{
 		jspin_type_t _type;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Spin(int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Spin();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetArrowsSize(int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetArrowsSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetType(jspin_type_t type);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jspin_type_t GetType();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetLoop(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetIndex(int i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Add(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Remove(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveAll();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetValue();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetIndex();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterSelectListener(SelectListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveSelectListener(SelectListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(SelectEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<SelectListener *> & GetSelectListeners();
 
 };

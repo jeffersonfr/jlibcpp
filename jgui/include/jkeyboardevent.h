@@ -49,10 +49,28 @@ class KeyboardEvent : public jcommon::EventObject{
 		std::string _full_text;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		KeyboardEvent(void *source, std::string symbol, std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~KeyboardEvent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetSymbol();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetText();
 
 };

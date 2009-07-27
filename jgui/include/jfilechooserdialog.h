@@ -38,11 +38,19 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jfilechooser_type_t {
 	OPEN_FILE_DIALOG,
 	SAVE_FILE_DIALOG
 };
 
+/**
+ * \brief
+ *
+ */
 enum jfilechooser_filter_t {
 	FILE_ONLY,
 	DIRECTORY_ONLY,
@@ -70,26 +78,103 @@ class FileChooserDialog : public jgui::Frame, public jgui::SelectListener, publi
 		bool _has_parent,
 			 _extension_ignorecase;
 
+		/**
+		 * \brief
+		 *
+		 */
 		void ShowFiles();
+
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<std::string> ListFiles(std::string dirPath);
+
+		/**
+		 * \brief
+		 *
+		 */
 		bool IsDirectory(std::string path);
+
+		/**
+		 * \brief
+		 *
+		 */
 		bool IsFile(std::string path);
 
 	public:
+
+		/**
+		 * \brief
+		 *
+		 */
 		FileChooserDialog(std::string title, std::string directory, int x, int y, jfilechooser_type_t type = OPEN_FILE_DIALOG);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~FileChooserDialog();
 
+
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetName();
+
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetFile();
+
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetCurrentDirectory();
+
+		/**
+		 * \brief
+		 *
+		 */
 		void SetCurrentDirectory(std::string directory);
+
+		/**
+		 * \brief
+		 *
+		 */
 		void AddExtension(std::string ext);
+
+		/**
+		 * \brief
+		 *
+		 */
 		void SetExtensionIgnoreCase(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
 		void SetFileFilter(jfilechooser_filter_t filter);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void ItemSelected(jgui::SelectEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
 		void InputChanged(jgui::KeyEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool Show(bool modal = true);
 
 };

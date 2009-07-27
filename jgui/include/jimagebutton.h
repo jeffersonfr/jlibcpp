@@ -48,13 +48,40 @@ class ImageButton : public Button{
 			_image_focus;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		ImageButton(std::string image, std::string label, int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~ImageButton();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetImage(std::string image);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetImageFocus(std::string image);
 		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
 };

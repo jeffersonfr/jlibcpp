@@ -40,13 +40,40 @@ class Layout : public virtual jcommon::Object{
 	private:
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Layout();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Layout();
 
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetPreferredLayoutSize(Container *parent);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DoLayout(Container *parent);
 
 };

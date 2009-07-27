@@ -35,6 +35,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jmenu_event_t {
 	CHANGE_MENU_ITEM_EVENT,
 	SELECT_MENU_ITEM_EVENT
@@ -54,10 +58,28 @@ class MenuEvent : public jcommon::EventObject{
 		jmenu_event_t _type;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		MenuEvent(void *source, jmenu_event_t type, MenuItem *item);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~MenuEvent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		jmenu_event_t GetType();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		MenuItem * GetMenuItem();
 
 };

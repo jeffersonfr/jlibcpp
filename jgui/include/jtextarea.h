@@ -41,6 +41,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jcursor_type_t {
 	NONE_CURSOR,
 	UNDERSCORE_CURSOR,
@@ -70,47 +74,227 @@ class TextArea : public Component{
 		char _echo_char;
 		jcursor_type_t _cursor_type;
 
+		/**
+		 * \brief
+		 *
+		 */
 		void IncLine();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DecLine();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void GetLines(std::vector<std::string> *texts);
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		TextArea(int x = 0, int y = 0, int width = 0, int height = 0, int max_text = -1);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~TextArea();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetEchoChar(char echo_char);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		char GetEchoChar();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool EchoCharIsSet();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetEditable(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool IsEditable();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetCaretPosition(int pos);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetCaretPosition();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetCaretVisible(bool visible);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetCaretType(jcursor_type_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jcursor_type_t GetCaretType();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Clear();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Backspace();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Delete();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetMaxTextSize(int max);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void IncCaretPosition(int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DecCaretPosition();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Insert(std::string text, int pos = -1);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Append(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetText(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetText();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool SetSelectedText(int begin, int end);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetSelectedText();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void ScrollUp();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void ScrollDown();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWrap(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(MouseEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RegisterTextListener(TextListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveTextListener(TextListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void DispatchEvent(TextEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<TextListener *> & GetTextListeners();
 
 };

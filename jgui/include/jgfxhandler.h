@@ -35,6 +35,10 @@
 
 namespace jgui{
 
+/**
+ * \brief
+ *
+ */
 enum jcursor_style_t {
 	ARROW_CURSOR,
 	SIZECORNER_CURSOR,
@@ -58,6 +62,10 @@ class GFXHandler : public virtual jcommon::Object{
 	protected:
 		GFXHandler();
 
+		/**
+		 * \brief
+		 *
+		 */
 		int InitEngine();
 
 	private:
@@ -94,39 +102,139 @@ class GFXHandler : public virtual jcommon::Object{
 		std::vector<Font *> _fonts;
 		std::vector<OffScreenImage *> _offscreenimages;
 
+		/**
+		 * \brief
+		 *
+		 */
 		void Add(Font *);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Remove(Font *);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Add(OffScreenImage *);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Remove(OffScreenImage *);
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~GFXHandler();
 
+		/**
+		 * \brief
+		 *
+		 */
 		static GFXHandler * GetInstance();
 
+		/**
+		 * \brief
+		 *
+		 */
 		static std::string GetID();
 		
+		/**
+		 * \brief
+		 *
+		 */
 		void * GetGraphicEngine();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetCurrentWorkingScreenSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetScreenWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetScreenHeight();
 		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jpoint_t GetMousePosition();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetMousePosition(int x, int y);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void InitCursors();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetCursorEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetCursor(jcursor_style_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetCursor(OffScreenImage *shape, int hotx, int hoty);
 
 #ifdef DIRECTFB_UI
+		/**
+		 * \brief
+		 *
+		 */
 		IDirectFBDisplayLayer * GetDisplayLayer();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 #endif
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Restore();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Release();
 
 };

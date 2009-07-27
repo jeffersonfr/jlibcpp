@@ -43,13 +43,40 @@ class Icon : public jgui::Component{
 			_scale_height;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Icon(std::string, int x = 0, int y = 0, int width = 0, int height = 0, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Icon();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetText(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetImage(std::string file);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
 };

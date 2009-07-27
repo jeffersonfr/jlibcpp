@@ -45,23 +45,83 @@ class WindowManager : public virtual jcommon::Object{
 		jthread::Mutex _mutex;
 		std::vector<Window *> windows;
 		
+		/**
+		 * \brief
+		 *
+		 */
 		WindowManager();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~WindowManager();
 
+		/**
+		 * \brief
+		 *
+		 */
 		static WindowManager * GetInstance();
 
+		/**
+		 * \brief
+		 *
+		 */
 		std::vector<Window *> & GetWindows();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		Window * GetWindowInFocus();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Add(Window *w);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Remove(Window *w);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Restore();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Release();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void RaiseToTop(Window *c);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void LowerToBottom(Window *c);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void PutWindowATop(Window *c, Window *c1);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void PutWindowBelow(Window *c, Window *c1);
 
 };

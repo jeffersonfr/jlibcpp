@@ -396,31 +396,142 @@ class GridBagLayout : public Layout{
 		bool rightToLeft;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		GridBagLayout();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~GridBagLayout();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetConstraints(Component *comp, GridBagConstraints *constraints);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		GridBagConstraints * GetConstraints(Component *comp);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		GridBagConstraints * LookupConstraints(Component *comp);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveConstraints(Component *comp);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jpoint_t GetLayoutOrigin();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AddLayoutComponent(Component *comp, GridBagConstraints *constraints);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveLayoutComponent(Component *comp);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		GridBagLayoutInfo * GetLayoutInfo(Container *parent, int sizeflag);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int64_t * PreInitMaximumArraySizes(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool CalculateBaseline(Component *c, GridBagConstraints *constraints, jsize_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AdjustForGravity(GridBagConstraints *constraints, jregion_t *r);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AlignOnBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AlignAboveBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void AlignBelowBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void CenterVertically(GridBagConstraints *cons, jregion_t *r, int cellHeight);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jsize_t GetMinSize(Container *parent, GridBagLayoutInfo *info);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void ArrangeGrid(Container *parent);
 
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetPreferredLayoutSize(Container *parent);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DoLayout(Container *parent);
 
 };

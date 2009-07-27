@@ -53,11 +53,28 @@ class MessageDialog : public jgui::Frame, public jgui::ButtonListener{
 		Button *_ok;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		MessageDialog(std::string title, std::string msg, int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~MessageDialog();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetAlign(jalign_t align);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void ActionPerformed(jgui::ButtonEvent *event);
 
 };

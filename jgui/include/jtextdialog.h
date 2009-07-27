@@ -45,7 +45,16 @@ class TextDialog : public jgui::Frame, public jgui::ButtonListener{
 		Label *_label;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		TextDialog(std::string msg, int x, int y, bool wrap = false);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~TextDialog();
 
 };

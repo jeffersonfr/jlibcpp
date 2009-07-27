@@ -35,6 +35,10 @@
 
 namespace jgui {
 
+/**
+ * \brief
+ *
+ */
 enum jmouse_event_t {
 	JMOUSE_UNKNOWN_EVENT,
 	JMOUSE_CLICKED_EVENT,
@@ -44,6 +48,10 @@ enum jmouse_event_t {
 	JMOUSE_WHEEL_EVENT
 };
 
+/**
+ * \brief
+ *
+ */
 enum jmouse_button_t {
 	JBUTTON_UNKNOWN = 0x0,
 	JBUTTON_BUTTON1 = 0x1,
@@ -67,15 +75,46 @@ class MouseEvent : public jcommon::EventObject{
 		jmouse_button_t _button;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		MouseEvent(void *source, jmouse_event_t type, jmouse_button_t button, int click_count, int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~MouseEvent();
 
+		/**
+		 * \brief
+		 *
+		 */
 		jmouse_event_t GetType();
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetClickCount();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		jmouse_button_t GetButton();
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetX();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetY();
 
 };

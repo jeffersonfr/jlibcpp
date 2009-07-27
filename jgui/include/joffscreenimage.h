@@ -47,18 +47,58 @@ class OffScreenImage : public virtual jcommon::Object{
 			_scale_height;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		OffScreenImage(int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~OffScreenImage();
 
+		/**
+		 * \brief
+		 *
+		 */
 		Graphics * GetGraphics();
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetHeight();
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetScaleWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetScaleHeight();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void Release();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Restore();
 
 };

@@ -35,13 +35,46 @@ class MouseListener : public jcommon::Listener{
 	private:
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		MouseListener();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~MouseListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MousePressed(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseReleased(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseClicked(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseMoved(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseWheel(MouseEvent *event);
 
 };

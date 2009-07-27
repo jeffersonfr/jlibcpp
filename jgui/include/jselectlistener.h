@@ -44,12 +44,29 @@ namespace jgui {
 class SelectListener : public jcommon::Listener{
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		SelectListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~SelectListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ItemChanged(SelectEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ItemSelected(SelectEvent *event);
 
 };

@@ -47,9 +47,22 @@ class FocusListener : public jcommon::Listener{
 		FocusListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~FocusListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FocusGained(FocusEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FocusLost(FocusEvent *event);
 
 };

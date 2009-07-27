@@ -97,48 +97,196 @@ class Table : public Component, public virtual jcommon::Object{
 			 _loop;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Table(int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Table();
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetLoop(bool loop);
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetNumberOfColumns();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetNumberOfRows();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetNumberOfColumns(int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetNumberOfRows(int size);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void InsertColumn(std::string text, int index = -1);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void InsertRow(std::string text, int index = -1);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveColumn(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void RemoveRow(int index);
 		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetHeaderValue(std::string text, int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetHeaderValue(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetHeaderVisible(bool visible);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		bool IsHeaderVisible();
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetCurrentColumn();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetCurrentRow();
 
+		/**
+		 * \brief
+		 *
+		 */
 		Cell * GetCurrentCell();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetCurrentCell(int row, int column);
 
+		/**
+		 * \brief
+		 *
+		 */
 		Cell * GetCell(int row, int column);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetCell(Cell *cell, int row, int column);
 
+		/**
+		 * \brief
+		 *
+		 */
 		uint32_t GetItemColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetItemColor(uint32_t color);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetItemColor(int red, int green, int blue, int alpha);
 		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetGridColor(uint32_t color);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetGridColor(int r, int g, int b, int a);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetColumnSize(int index, int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetColumnSize(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetRowSize(int index, int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetRowSize(int index);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
 };

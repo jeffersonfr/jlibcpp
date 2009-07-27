@@ -54,11 +54,28 @@ class YesNoDialog : public jgui::Frame, public jgui::ButtonListener{
 			   *_no;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		YesNoDialog(std::string title, std::string msg, int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~YesNoDialog();
 
+		/**
+		 * \brief
+		 *
+		 */
 		int GetResponse();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ActionPerformed(jgui::ButtonEvent *event);
 
 };

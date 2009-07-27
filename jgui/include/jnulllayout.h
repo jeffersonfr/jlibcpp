@@ -38,13 +38,40 @@ class NullLayout : public Layout{
 	private:
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		NullLayout();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~NullLayout();
 
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetMinimumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetMaximumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
     virtual jsize_t GetPreferredLayoutSize(Container *parent);
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DoLayout(Container *c);
 
 };

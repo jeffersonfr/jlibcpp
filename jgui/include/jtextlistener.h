@@ -44,11 +44,23 @@ namespace jgui {
 class TextListener : public jcommon::Listener{
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		TextListener();
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~TextListener();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void TextChanged(TextEvent *event);
 
 };
