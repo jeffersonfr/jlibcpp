@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_MONITOR_H
-#define J_MONITOR_H
+#ifndef J_MUTEX_H
+#define J_MUTEX_H
 
 #include "jobject.h"
 

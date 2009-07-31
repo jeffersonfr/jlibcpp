@@ -44,7 +44,7 @@ InetAddress * InetAddress::GetByName(std::string host_)
     
 	if (h == NULL) {
 		throw UnknownHostException("Host not found");
-    }
+  }
     
 	InetAddress *addr = new InetAddress(host_, *(in_addr *)h->h_addr_list[0]);
 

@@ -295,15 +295,17 @@ void Container::Paint(Graphics *g)
 
 	PaintBorder(g);
 
-	// CHANGE:: estudar melhor o problema de validacao dos containers.
-	// Revalidar os container no metodo Paint() pode gerar problemas de
+	// WARNNING:: estudar melhor o problema de validacao dos containers.
+	// Revalidar o container no metodo Paint() pode gerar problemas de
 	// sincronizacao com o Frame, por exemplo. Esse problema pode ocorrer
 	// na chamada do metodo 
+	//
 	// 		Frame::Paint() { 
 	// 			Container::Paint(); 
 	//
 	// 			... 
 	// 		}
+	//
 	// Apos chamar o metodo Container::Paint() o Frame jah estaria validado,
 	// quando na verdade deveria ser validado somente apos a chamada do
 	// metodo Repaint().
@@ -509,17 +511,19 @@ std::vector<Component *> & Container::GetComponents()
 	return _components;
 }
 
-void Container::RequestComponentFocus(jgui::Component *c)
+void Container::RequestComponentFocus(jgui::Component *c, bool has_parent)
 {
 	if (c == NULL) {
 		return;
 	}
 
 	if (_parent != NULL) {
-		// Invalidate();
-		_parent->RequestComponentFocus(c);
+		// WARNNING:: verificar se a logica estah correta
+		_parent->RequestComponentFocus(c, !IsOpaque());
 	} else {
-		// SetIgnoreRepaint(true);
+		if (has_parent == true) {
+			SetIgnoreRepaint(true);
+		}
 
 		if (_focus != NULL && _focus != c) {
 			_focus->ReleaseFocus();
@@ -531,9 +535,12 @@ void Container::RequestComponentFocus(jgui::Component *c)
 
 		dynamic_cast<Component *>(_focus)->DispatchEvent(new FocusEvent(_focus, GAINED_FOCUS_EVENT));
 	
-		// SetIgnoreRepaint(false);
-
 		c->Repaint();
+		
+		if (has_parent == true) {
+			SetIgnoreRepaint(false);
+			Repaint();
+		}
 	}
 }
 

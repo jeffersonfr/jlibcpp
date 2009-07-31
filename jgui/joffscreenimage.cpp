@@ -137,6 +137,11 @@ void OffScreenImage::Release()
 		surface->GetSize(surface, &width, &height);
 		surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
 
+		if (_buffer != NULL) {
+			delete [] _buffer;
+			_buffer = NULL;
+		}
+
 		_buffer = new uint8_t[pitch*height];
 
 		memcpy(_buffer, ptr, pitch*height);
@@ -197,6 +202,11 @@ void OffScreenImage::Restore()
 		memcpy(ptr, _buffer, pitch*height);
 
 		surface->Unlock(surface);
+		
+		if (_buffer != NULL) {
+			delete [] _buffer;
+			_buffer = NULL;
+		}
 	}
 #endif
 }

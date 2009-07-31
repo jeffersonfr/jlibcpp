@@ -68,8 +68,8 @@ FileChooserDialog::FileChooserDialog(std::string title, std::string directory, i
 		Add(label);
 		Add(file);
 
-		list->AddNavigator(file, file, NULL, NULL);
-		file->AddNavigator(NULL, NULL, list, list);
+		list->SetNavigation(file, file, NULL, NULL);
+		file->SetNavigation(NULL, NULL, list, list);
 	}
 
 	list->RequestFocus();

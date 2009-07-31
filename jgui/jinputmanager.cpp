@@ -669,15 +669,25 @@ void InputManager::WaitEvents()
 		return;
 	}
 
-	std::map<KeyListener *, KeyProcess *>::iterator i = _key_processors.find(*_key_listeners.rbegin());
+	{
+		std::map<KeyListener *, KeyProcess *>::iterator i = _key_processors.find(*_key_listeners.rbegin());
 
-	if (i != _key_processors.end()) {
-		while ((*i).second->IsRunning() == true) {
-			Thread::Sleep(100);
+		if (i != _key_processors.end()) {
+			while ((*i).second->IsRunning() == true) {
+				Thread::Sleep(100);
+			}
 		}
 	}
 
-	// TODO:: mouse process
+	{
+		std::map<MouseListener *, MouseProcess *>::iterator i = _mouse_processors.find(*_mouse_listeners.rbegin());
+
+		if (i != _mouse_processors.end()) {
+			while ((*i).second->IsRunning() == true) {
+				Thread::Sleep(100);
+			}
+		}
+	}
 }
 
 void InputManager::Run()

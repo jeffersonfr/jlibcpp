@@ -372,7 +372,7 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void AddNavigator(Component *left, Component *right, Component *up, Component *down);
+		virtual void SetNavigation(Component *left, Component *right, Component *up, Component *down);
 		
 		/**
 		 * \brief

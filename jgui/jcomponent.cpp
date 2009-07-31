@@ -958,7 +958,7 @@ unsigned int Component::GetBorderColor()
 	return (_border_alpha & 0xff) << 24 | (_border_red & 0xff) << 16 | (_border_green & 0xff) << 8 | (_border_blue & 0xff) << 0;
 }
 
-void Component::AddNavigator(Component *left, Component *right, Component *up, Component *down)
+void Component::SetNavigation(Component *left, Component *right, Component *up, Component *down)
 {
 	_left = left;
 	_right = right;
@@ -1041,7 +1041,7 @@ void Component::RequestFocus()
 		if (_parent != NULL) {
 			_has_focus = true;
 
-			_parent->RequestComponentFocus(this);
+			_parent->RequestComponentFocus(this, false);
 		}
 	}
 }

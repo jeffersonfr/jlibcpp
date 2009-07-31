@@ -21,6 +21,7 @@
 #include "jsocketstreamexception.h"
 #include "jsocket.h"
 #include "jsocketexception.h"
+#include "junknownhostexception.h"
 
 namespace jsocket {
 
@@ -29,13 +30,17 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
 {
 	jcommon::Object::SetClassName("jsocket::ServerSocket");
 	
-    _local = NULL;
+  _local = NULL;
 	_is_closed = false;
 
 	if (addr_ == NULL) {
-		InetAddress *a = InetAddress::GetLocalHost();
+		try {
+			InetAddress *a = InetAddress::GetLocalHost();
         
-		addr_ = a;
+			addr_ = a;
+		} catch (UnknownHostException &e) {
+			addr_ = NULL;
+		}
 	}
 
 	CreateSocket();

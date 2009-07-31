@@ -70,7 +70,7 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void RequestComponentFocus(jgui::Component *c);
+		virtual void RequestComponentFocus(jgui::Component *c, bool has_parent);
 		
 		/**
 		 * \brief

@@ -36,5 +36,9 @@ Observer::~Observer()
 {
 }
 
+void Observer::Update(void *)
+{
+}
+
 }
 

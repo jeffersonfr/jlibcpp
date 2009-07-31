@@ -71,11 +71,12 @@ class GFXHandler : public virtual jcommon::Object{
 	private:
 		static GFXHandler * instance;
 		
+		jthread::Mutex _mutex;
+		jcursor_style_t _cursor;
+
 #ifdef DIRECTFB_UI
 		IDirectFB *_dfb;
 		IDirectFBDisplayLayer *_layer;
-		jthread::Mutex _mutex;
-		jcursor_style_t _cursor;
 		
 		struct cursor_params_t {
 			OffScreenImage *cursor;

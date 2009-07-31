@@ -53,7 +53,7 @@ MemoryInputStream::~MemoryInputStream()
 
 bool MemoryInputStream::IsEmpty()
 {
-	return Available() == 0;
+	return Available() <= 0;
 }
 
 long long MemoryInputStream::Available()

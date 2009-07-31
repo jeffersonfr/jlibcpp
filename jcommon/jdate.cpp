@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jdate.h"
+#include "jcalendar.h"
 #include "jruntimeexception.h"
 
 #include <iostream>
@@ -73,10 +74,10 @@ Date::Date(time_t time_):
 		horas, 
 		minutos, 
 		segundos,
-		MJD,
+		MJD;
 
-	MJD = UTC >> 24;
-	hora = UTC & 0xFFFFFF;
+	MJD = time_ >> 24;
+	hora = time_ & 0xFFFFFF;
 
 	Y2 = (int) ((MJD - 15078.2) / 365.25);
 	M2 = (int) ((MJD - 14956.1 - (int) (Y2 * 365.25)) / 30.6001);
@@ -89,12 +90,12 @@ Date::Date(time_t time_):
 	minutos  = ((hora >> 12) & 0x0F) * 10 + ((hora >>  8) & 0x0F);
 	segundos = ((hora >>  4) & 0x0F) * 10 + ((hora >>  0) & 0x0F);
 
-	_zone.dia = D;
-	_zone.mes = M;
-	_zone.ano = Y + 1900;
-	_zone.horas = horas;
-	_zone.minutos = minutos;
-	_zone.segundos = segundos;
+	_zone.wDay = D; // 1-31
+	_zone.wMonth = M; // 1-12
+	_zone.wYear = Y + 1900; // 1601-30827
+	_zone.wHour = horas; // 0-23
+	_zone.wMinute = minutos; // 0-59
+	_zone.wSecond = segundos; // 0-59
 #else
 	_zone = localtime(&_time);
 	
@@ -267,7 +268,7 @@ int Date::GetDayOfYear()
 {
 #ifdef _WIN32
 	Calendar c1(1, 1, _zone.wYear),
-			 c2(_zone.wDay, _zone.wMonth, _wYear);
+		 c2(_zone.wDay, _zone.wMonth, _zone.wYear);
 
 	return c1.CountDays(&c2);
 #else

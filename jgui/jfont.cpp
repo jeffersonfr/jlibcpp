@@ -28,7 +28,11 @@ Font::Font(std::string name, int attr, int height, int scale_width, int scale_he
 {
 	jcommon::Object::SetClassName("jgui::Font");
 
+#ifdef _WIN32
+#else
 	_font = NULL;
+#endif
+
 	_name = name;
 	_height = 0;
 	_ascender = 0;

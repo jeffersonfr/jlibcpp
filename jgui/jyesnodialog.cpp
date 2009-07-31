@@ -43,8 +43,8 @@ YesNoDialog::YesNoDialog(std::string title, std::string msg, int x, int y):
 	_no = new Button("N\xe3o", _width-(1*200+60)+30, _label->GetY()+_label->GetHeight()+20, 200, 40);
 	_yes = new Button("Sim", _width-(2*200+60), _label->GetY()+_label->GetHeight()+20, 200, 40);
 	
-	_no->AddNavigator(_yes, NULL, _yes, NULL);
-	_yes->AddNavigator(NULL, _no, NULL, _no);
+	_no->SetNavigation(_yes, NULL, _yes, NULL);
+	_yes->SetNavigation(NULL, _no, NULL, _no);
 
 	_no->SetAlign(CENTER_ALIGN);
 	_yes->SetAlign(CENTER_ALIGN);

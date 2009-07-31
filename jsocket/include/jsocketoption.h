@@ -62,8 +62,12 @@ enum socket_shutdown_t {
  * \author Jeff Ferr
  */
 class SocketOption : public virtual jcommon::Object{
-    friend class Socket;
+#ifdef _WIN32
+#else
     friend class SSLSocket;
+#endif
+
+    friend class Socket;
     friend class DatagramSocket;
     friend class RawSocket;
     friend class MulticastSocket;

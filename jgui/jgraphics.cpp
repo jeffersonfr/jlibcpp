@@ -1804,6 +1804,9 @@ void Graphics::DrawGlyph(int symbol, int xp, int yp)
 
 bool Graphics::GetImageSize(std::string img, int *real_width, int *real_height, int *scaled_width, int *scaled_height)
 {
+#ifdef _WIN32
+	return false;
+#else
 	IDirectFBImageProvider *imgProvider = NULL;
 	DFBSurfaceDescription desc;
 
@@ -1855,6 +1858,7 @@ bool Graphics::GetImageSize(std::string img, int *real_width, int *real_height, 
 	}
 
 	return true;
+#endif
 }
 
 bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)

@@ -222,11 +222,7 @@ SOCKET ConnectionPipe::GetHandler()
 int ConnectionPipe::GetHandler()
 #endif
 {
-#ifdef _WIN32
-	return _pipe[0];
-#else
-	return _pipe[0];
-#endif
+	return _connection->GetHandler();
 }
         
 jio::InputStream * ConnectionPipe::GetInputStream()
@@ -325,7 +321,7 @@ void ConnectionPipe::main_pipe_sender()
 			ReadFile(pipe, (c + count), size_buffer - count, (DWORD *)&r, 0);
 
 			if (r <= 0) {
-				return 0;
+				return;
 			}
 		}
 #else

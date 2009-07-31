@@ -26,6 +26,13 @@ Panel::Panel(int x, int y, int width, int height):
 	Container(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::Panel");
+	
+	int d = 0x10;
+
+	SetBackgroundColor(0x15-d, 0x35-d, 0x55-d, 0xff);
+	SetBorderColor(0x60-d, 0x60-d, 0x80-d, 0xff);
+	SetBackgroundVisible(true);
+	SetBorder(LINE_BORDER);
 }
 
 Panel::~Panel()

@@ -266,7 +266,7 @@ bool Thread::Interrupt(int key)
 	t->alive = false;
 
 #ifdef _WIN32
-	if (TerminateThread(thread, 0) == FALSE) {
+	if (TerminateThread(_thread, 0) == FALSE) {
 		return false; // CHANGE:: throw ThreadException("Thread cancel exception !");
 	}
 

@@ -54,7 +54,7 @@ class Observer : public virtual jcommon::Object{
 		* \brief
 		*
 		*/
-		virtual void Update(void *) = 0;
+		virtual void Update(void *);
 		
 };
 

@@ -346,8 +346,8 @@ void CalendarDialog::BuildCalendar()
 		Add(b);
 	}
 
-	_buttons[0]->AddNavigator(NULL, _buttons[1], month, _buttons[0+7]);
-	_buttons[mes-1]->AddNavigator(_buttons[mes-2], NULL, _buttons[mes-1-7], NULL);
+	_buttons[0]->SetNavigation(NULL, _buttons[1], month, _buttons[0+7]);
+	_buttons[mes-1]->SetNavigation(_buttons[mes-2], NULL, _buttons[mes-1-7], NULL);
 
 	for (int i=1; i<mes-1; i++) {
 		up = NULL;
@@ -363,12 +363,12 @@ void CalendarDialog::BuildCalendar()
 			up = month;
 		}
 
-		_buttons[i]->AddNavigator(_buttons[i-1], _buttons[i+1], up, down);
+		_buttons[i]->SetNavigation(_buttons[i-1], _buttons[i+1], up, down);
 	}
 
 
-	year->AddNavigator(NULL, NULL, NULL, month);	
-	month->AddNavigator(NULL, NULL, year, _buttons[0]);	
+	year->SetNavigation(NULL, NULL, NULL, month);	
+	month->SetNavigation(NULL, NULL, year, _buttons[0]);	
 
 	if (GetComponentInFocus() == NULL) {
 		_buttons[_day]->RequestFocus();

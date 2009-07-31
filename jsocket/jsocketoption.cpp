@@ -23,6 +23,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #else
+#include "jsslsocket.h"
 #include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>

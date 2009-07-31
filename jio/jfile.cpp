@@ -77,7 +77,7 @@ File::File(std::string filename_, int flags_):
 	// CreateSymbolicLink
 	// CreateDirectory
 	
-	if ((flags_ & F_CREAT) == 0) {
+	if ((flags_ & F_CREATE) == 0) {
 		_fd = CreateFile (filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	} else {
 		_fd = CreateFile (filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
@@ -266,12 +266,12 @@ File::File(std::string prefix, std::string sufix, bool scramble):
 	std::ostringstream o;
 
 	if (sufix == "") {
-		o << filename_ << r << std::flush;
+		o << _filename << r << std::flush;
 	} else {
-		o << filename_ << r << "." << sufix << std::flush;
+		o << _filename << r << "." << sufix << std::flush;
 	}
 
-	_fd = CreateFile (filename_.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	_fd = CreateFile (_filename.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	
 	if (_fd == INVALID_HANDLE_VALUE) {
 		DWORD code = GetLastError();
@@ -381,16 +381,24 @@ std::string File::GetDirectoryDelimiter()
 
 bool File::IsFile()
 {
+#ifdef _WIN32
+	return true;
+#else
 	if (S_ISREG(_stat.st_mode) | S_ISFIFO(_stat.st_mode) | S_ISLNK(_stat.st_mode)) {
 		return true;
 	}
+#endif
 
 	return false;
 }
 
 bool File::IsDirectory()
 {
+#ifdef _WIN32
+	return false;
+#else
 	return (_dir != NULL);
+#endif
 }
 
 bool File::IsExecutable()
@@ -702,7 +710,7 @@ int File::Seek(int n)
 
 	distanceToMove.QuadPart = n;
 
-	return SetFilePointerEx(h, distanceToMove, 0, FILE_BEGIN);
+	return SetFilePointerEx(_fd, distanceToMove, 0, FILE_BEGIN);
 #else
 	return lseek(_fd, n, SEEK_SET);
 #endif

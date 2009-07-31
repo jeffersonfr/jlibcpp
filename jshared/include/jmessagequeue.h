@@ -54,7 +54,7 @@ struct msgbuf {
 
 union msg_t {
 #ifdef _WIN32
-	page_msg_t msg;
+	jpage_msg_t msg;
 #else
 	struct msgbuf buf;
 	jpage_msg_t msg;
