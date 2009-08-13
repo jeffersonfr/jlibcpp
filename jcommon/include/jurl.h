@@ -40,13 +40,15 @@ namespace jcommon {
 class URL : public virtual jcommon::Object{
 
 	protected:
-		std::string _url;
-		std::string _protocol;
-		std::string _host;
+		std::string _url,
+			_protocol,
+			_host,
+			_params,
+			_file,
+			_reference,
+			_query,
+			_path;
 		int _port;
-		std::string _params;
-		std::string _resource;
-		std::string _file;
 
 	public:
 		/**
@@ -107,13 +109,19 @@ class URL : public virtual jcommon::Object{
 		* \brief
 		*
 		*/
+		std::string GetReference();
+
+		/**
+		* \brief
+		*
+		*/
 		std::string GetFile();
 
 		/**
 		* \brief
 		*
 		*/
-		std::string GetResource();
+		std::string GetQuery();
 
 		/**
 		* \brief
@@ -155,7 +163,19 @@ class URL : public virtual jcommon::Object{
 		* \brief
 		*
 		*/
-		void SetResource(std::string s);
+		void SetPath(std::string s);
+
+		/**
+		* \brief
+		*
+		*/
+		void SetQuery(std::string s);
+
+		/**
+		* \brief
+		*
+		*/
+		void SetReference(std::string s);
 
 		/**
 		* \brief

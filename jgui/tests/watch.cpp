@@ -51,7 +51,7 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 			SetResizeEnabled(true);
 
 			_flag = true;
-			_filled = false; // true;
+			_filled = true;
 		}
 
 		virtual ~WatchTeste()

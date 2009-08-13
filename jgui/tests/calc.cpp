@@ -18,77 +18,80 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "calc.h"
+#include "jborderlayout.h"
+#include "jgridlayout.h"
 
 namespace mcalc {
 
 MCalc::MCalc(int x, int y):
-   	jgui::Frame("Calculadora", x, y, 1, 1)
+   	jgui::Frame("Calculadora", x, y, 500, 400)
 {
-	bx = _insets.left;
-	by = _insets.top;
-	bwidth = 90;
-	bheight = 80;
-	delta = 1.0f;
-
-	SetSize(7*bwidth-20, 7*bheight-20);
+	SetResizeEnabled(true);
+	SetMoveEnabled(true);
 
 	_number0 = "";
 	_number1 = "";
 	_operation = -1;
 	_state = 1;
 
-	_display = new Display((int)(bx+(bwidth*0*delta)), (int)(by+(bheight*0*delta)), 6*bwidth, bheight);
+	_display = new Display(0, 0, 0, 0);
 
 	_display->Clear();
 
 	jgui::Button *b[] = { 
-		   new jgui::Button("7", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		   new jgui::Button("8", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		   new jgui::Button("9", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		   new jgui::Button("/", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		   new jgui::Button("C", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*1*delta)), 2*bwidth, bheight),
-		   new jgui::Button("4", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		   new jgui::Button("5", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		   new jgui::Button("6", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		   new jgui::Button("x", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		   new jgui::Button("raiz", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*2*delta)), 2*bwidth, bheight),
-		   new jgui::Button("1", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		   new jgui::Button("2", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		   new jgui::Button("3", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		   new jgui::Button("-", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		   new jgui::Button("del", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*3*delta)), 2*bwidth, bheight),
-		   new jgui::Button("0", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*4*delta)), bwidth, bheight),
-		   new jgui::Button(".", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*4*delta)), bwidth, bheight),
-		   new jgui::Button("%", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*4*delta)), bwidth, bheight),
-		   new jgui::Button("+", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*4*delta)), bwidth, bheight),
-		   new jgui::Button("=", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*4*delta)), 2*bwidth, bheight)
+		   new jgui::Button("7"),
+		   new jgui::Button("8"),
+		   new jgui::Button("9"),
+		   new jgui::Button("/"),
+		   new jgui::Button("C"),
+		   new jgui::Button("4"),
+		   new jgui::Button("5"),
+		   new jgui::Button("6"),
+		   new jgui::Button("x"),
+		   new jgui::Button("raiz"),
+		   new jgui::Button("1"),
+		   new jgui::Button("2"),
+		   new jgui::Button("3"),
+		   new jgui::Button("-"),
+		   new jgui::Button("del"),
+		   new jgui::Button("0"),
+		   new jgui::Button("."),
+		   new jgui::Button("%"),
+		   new jgui::Button("+"),
+		   new jgui::Button("=")
 	};
 
-	b[0]->AddNavigator(NULL, b[1], NULL, b[5]);	
-	b[1]->AddNavigator(b[0], b[2], NULL, b[6]);	
-	b[2]->AddNavigator(b[1], b[3], NULL, b[7]);	
-	b[3]->AddNavigator(b[2], b[4], NULL, b[8]);	
-	b[4]->AddNavigator(b[3], NULL, NULL, b[9]);	
+	b[0]->SetNavigation(NULL, b[1], NULL, b[5]);	
+	b[1]->SetNavigation(b[0], b[2], NULL, b[6]);	
+	b[2]->SetNavigation(b[1], b[3], NULL, b[7]);	
+	b[3]->SetNavigation(b[2], b[4], NULL, b[8]);	
+	b[4]->SetNavigation(b[3], NULL, NULL, b[9]);	
 
-	b[5]->AddNavigator(NULL, b[6], b[0], b[10]);	
-	b[6]->AddNavigator(b[5], b[7], b[1], b[11]);	
-	b[7]->AddNavigator(b[6], b[8], b[2], b[12]);	
-	b[8]->AddNavigator(b[7], b[9], b[3], b[13]);	
-	b[9]->AddNavigator(b[8], NULL, b[4], b[14]);	
+	b[5]->SetNavigation(NULL, b[6], b[0], b[10]);	
+	b[6]->SetNavigation(b[5], b[7], b[1], b[11]);	
+	b[7]->SetNavigation(b[6], b[8], b[2], b[12]);	
+	b[8]->SetNavigation(b[7], b[9], b[3], b[13]);	
+	b[9]->SetNavigation(b[8], NULL, b[4], b[14]);	
 
-	b[10]->AddNavigator(NULL, b[11], b[5], b[15]);	
-	b[11]->AddNavigator(b[10], b[12], b[6], b[16]);	
-	b[12]->AddNavigator(b[11], b[13], b[7], b[17]);	
-	b[13]->AddNavigator(b[12], b[14], b[8], b[18]);	
-	b[14]->AddNavigator(b[13], NULL, b[9], b[19]);
+	b[10]->SetNavigation(NULL, b[11], b[5], b[15]);	
+	b[11]->SetNavigation(b[10], b[12], b[6], b[16]);	
+	b[12]->SetNavigation(b[11], b[13], b[7], b[17]);	
+	b[13]->SetNavigation(b[12], b[14], b[8], b[18]);	
+	b[14]->SetNavigation(b[13], NULL, b[9], b[19]);
 
-	b[15]->AddNavigator(NULL, b[16], b[10], NULL);	
-	b[16]->AddNavigator(b[15], b[17], b[11], NULL);	
-	b[17]->AddNavigator(b[16], b[18], b[12], NULL);	
-	b[18]->AddNavigator(b[17], b[19], b[13], NULL);	
-	b[19]->AddNavigator(b[18], NULL, b[14], NULL);	
+	b[15]->SetNavigation(NULL, b[16], b[10], NULL);	
+	b[16]->SetNavigation(b[15], b[17], b[11], NULL);	
+	b[17]->SetNavigation(b[16], b[18], b[12], NULL);	
+	b[18]->SetNavigation(b[17], b[19], b[13], NULL);	
+	b[19]->SetNavigation(b[18], NULL, b[14], NULL);	
 
-	Add(_display);
+	SetLayout(new jgui::BorderLayout());
+
+	Add(_display, jgui::BL_NORTH);
+
+	jgui::Container *container = new jgui::Container();
+
+	container->SetLayout(new jgui::GridLayout(4, 5, 2, 2));
 
 	for (int i=0; i<20; i++) {
 			b[i]->SetAlign(jgui::CENTER_ALIGN);
@@ -97,15 +100,12 @@ MCalc::MCalc(int x, int y):
 
 			b[i]->RegisterButtonListener(this);
 
-			Add(b[i]);
+			container->Add(b[i]);
 	}
 
+	Add(container, jgui::BL_CENTER);
+
 	b[10]->RequestFocus();
-
-	// INFO:: para evitar que uma tecla sobreponha outra
-	// SetStackRepaint(false);
-
-	Pack();
 
 	Frame::RegisterInputListener(this);
 }
@@ -272,6 +272,8 @@ void MCalc::Process(std::string type)
 						_number0 = zeros;
 				}
 		} else if (type == "=") {
+				_display->SetOperation("");
+
 				if (_state == 4) {
 						_state = 5;
 
@@ -618,7 +620,7 @@ void MCalc::ActionPerformed(jgui::ButtonEvent *event)
 
 int main()
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 28));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 18));
 
 	mcalc::MCalc app(100, 100);
 

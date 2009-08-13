@@ -33,16 +33,13 @@ URL::URL(std::string url_):
 	_url = url_;
 
 	jcommon::StringTokenizer proto(_url, "://", SPLIT_FLAG, false);
-	int index;
 
 	if (proto.GetSize() == 1) {
-		if (_url[0] == '.' || _url[0] == '/') {
 			_protocol = "file";
-		} else {
-		 	_protocol = "http";
-		}
+			_path = _url;
 	} else if (proto.GetSize() == 2) {
 		_protocol = proto.GetToken(0);
+		_path = proto.GetToken(1);
 	} else {
 		throw jcommon::RuntimeException("URL malformed exception");
 	}
@@ -56,8 +53,7 @@ URL::URL(std::string url_):
 		} else if (_protocol == "ftp") {
 			_port = 21;
 		} else {
-			// file, playlist, plist
-			_port = 0;
+			_port = -1;
 		}
 	} else if (port.GetSize() == 2) {
 		_port = atoi(port.GetToken(1).c_str());
@@ -68,30 +64,31 @@ URL::URL(std::string url_):
 	_host = port.GetToken(0);
 
 	if (host.GetSize() == 1) {
-		_params = "";
-		_resource = "/";
-		_file = "";
-	
-		return;
-	}
-	
-	index = proto.GetToken(proto.GetSize() - 1).find("/");
-	
-	if (_protocol == "file" || _protocol == "plist" || _protocol == "playlist") {
-		_resource = _host;
-	}
+		_file = _host;
+		_query = "/";
+	} else {
+		_query = "/" + host.GetToken(1);
 
-	_resource = _resource + proto.GetToken(proto.GetSize() - 1).substr(index);
-	
-	if (_protocol == "file" || _protocol == "plist" || _protocol == "playlist") {
-		uint32_t index = _resource.rfind("/");
+		uint32_t index = _query.rfind("/");
 
 		if (index != std::string::npos) {
-			_file = _resource.substr(index+1);
-			_resource = _resource.substr(0, index);
+			_file = _query.substr(index+1);
 		} else {
-			_file = _resource;
-			_resource = "";
+			_file = "";
+		}
+		
+		jcommon::StringTokenizer params(_file, "?", SPLIT_FLAG, false);
+
+		if (params.GetSize() == 2) {
+			_file = params.GetToken(0);
+			_params = params.GetToken(1);
+		}
+
+		jcommon::StringTokenizer reference(_file, "#", SPLIT_FLAG, false);
+
+		if (reference.GetSize() == 2) {
+			_file = reference.GetToken(0);
+			_reference = reference.GetToken(1);
 		}
 	}
 }
@@ -308,19 +305,24 @@ std::string URL::GetParameters()
 	return _params;
 }
 
+std::string URL::GetReference()
+{
+	return _reference;
+}
+
 std::string URL::GetFile()
 {
 	return _file;
 }
 
-std::string URL::GetResource()
+std::string URL::GetQuery()
 {
-	return _resource;
+	return _query;
 }
 
 std::string URL::GetPath()
 {
-	return	_resource + "/" + _file;
+	return _path;
 }
 
 void URL::SetHost(std::string s)
@@ -338,6 +340,11 @@ void URL::SetProtocol(std::string s)
 	_protocol = s;
 }
 
+void URL::SetReference(std::string s)
+{
+	_reference = s;
+}
+
 void URL::SetParameters(std::string s)
 {
 	_params = s;
@@ -348,9 +355,14 @@ void URL::SetFile(std::string s)
 	_file = s;
 }
 
-void URL::SetResource(std::string s)
+void URL::SetQuery(std::string s)
 {
-	_resource = s;
+	_query = s;
+}
+
+void URL::SetPath(std::string s)
+{
+	_path = s;
 }
 
 std::string URL::what()
@@ -358,9 +370,9 @@ std::string URL::what()
 	std::ostringstream o;
 
 	if (_protocol == "file" || _protocol == "plist" || _protocol == "playlist") {
-		o << _protocol << "://" << _resource << "/" << _file << std::flush;
+		o << _protocol << "://" << GetPath() << std::flush;
 	} else {
-		o << _protocol << "://" << _host << ":" << _port << _resource << std::flush;
+		o << _protocol << "://" << _host << ":" << _port << _query << std::flush;
 	}
 
 	return o.str();

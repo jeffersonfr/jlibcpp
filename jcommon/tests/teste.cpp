@@ -129,14 +129,15 @@ void testStringToken()
 
 void testURL()
 {
-	jcommon::URL url_01("www.google.com");
-	jcommon::URL url_02("http://charges.com/");
-	jcommon::URL url_03("ftp://www.lavid.ufpb.br/cvs");
-	jcommon::URL url_04("phrack.com:80");
+	jcommon::URL url_01("http://www.google.com");
+	jcommon::URL url_02("http://charges.com/a?a=1");
+	jcommon::URL url_03("ftp://www.lavid.ufpb.br/cvs#ref");
+	jcommon::URL url_04("http://phrack.com:80/?a=1&b=2");
 	jcommon::URL url_05("file:///test/file.mpg");
 	jcommon::URL url_06("./file.mpg");
 	jcommon::URL url_07("/file.mpg");
 	jcommon::URL url_08("file.mpg");
+	jcommon::URL url_09("file://file.mpg");
 
 	std::cout << "URL 01:: " << url_01.what() << std::endl;
 	std::cout << "URL 02:: " << url_02.what() << std::endl;
@@ -146,6 +147,7 @@ void testURL()
 	std::cout << "URL 06:: " << url_06.what() << std::endl;
 	std::cout << "URL 07:: " << url_07.what() << std::endl;
 	std::cout << "URL 08:: " << url_08.what() << std::endl;
+	std::cout << "URL 09:: " << url_09.what() << std::endl;
 }
 
 void testOptions(int argc, char **argv)
