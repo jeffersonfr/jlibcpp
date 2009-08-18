@@ -18,7 +18,7 @@ INCDIR		= ./include
 LIBDIR		= ./lib
 SRCDIR 		= ./src
 BINDIR 		= ./bin
-OBJDIR		= ./obj
+OBJDIR		= ./objs
 TESTDIR		= ./tests
 DOCDIR		= ./doc/
 
@@ -275,7 +275,7 @@ OBJS	= $(OBJS_jcommon) $(OBJS_jmpeg) $(OBJS_jio) $(OBJS_jlogger) $(OBJS_jshared)
 SRCS	= $(SRCS_jcommon) $(SRCS_jmpeg) $(SRCS_jio) $(SRCS_jlogger) $(SRCS_jshared) $(SRCS_jsocket) $(SRCS_jthread) $(SRCS_jgui)
 
 all: $(EXE)
-	
+
 $(EXE): $(SRCS)
 	@$(CC) $(CFLAGS) -o $(EXE) $(SRCS) $(LIBRARY)
 	@mkdir -p $(BINDIR) $(LIBDIR) && mv $(EXE) $(LIBDIR)
@@ -291,16 +291,16 @@ doc:
 	@mkdir -p $(DOCDIR) 
 
 install: uninstall
-	@install -o root -m 644 $(LIBDIR)/$(EXE) $(INSTALL_DIR) && echo -e "Instaling $(EXE) in $(INSTALL_DIR)/lib$(MODULE).so"
-	@install -d -o root -m 755 /usr/local/include/jlibcpp/jcommon && install -o root -m 644 jcommon/include/* /usr/local/include/jlibcpp/jcommon
-	@install -d -o root -m 755 /usr/local/include/jlibcpp/jgui && install -o root -m 644 jgui/include/* /usr/local/include/jlibcpp/jgui
-	@install -d -o root -m 755 /usr/local/include/jlibcpp/jio && install -o root -m 644 jio/include/* /usr/local/include/jlibcpp/jio
-	@install -d -o root -m 755 /usr/local/include/jlibcpp/jlogger && install -o root -m 644 jlogger/include/* /usr/local/include/jlibcpp/jlogger
-	@install -d -o root -m 755 /usr/local/include/jlibcpp/jmpeg && install -o root -m 644 jmpeg/include/* /usr/local/include/jlibcpp/jmpeg
-	@install -d -o root -m 755 /usr/local/include/jlibcpp/jshared && install -o root -m 644 jshared/include/* /usr/local/include/jlibcpp/jshared
-	@install -d -o root -m 755 /usr/local/include/jlibcpp/jsocket && install -o root -m 644 jsocket/include/* /usr/local/include/jlibcpp/jsocket
-	@install -d -o root -m 755 /usr/local/include/jlibcpp/jthread && install -o root -m 644 jthread/include/* /usr/local/include/jlibcpp/jthread
-	@ln -s $(INSTALL_DIR)/$(EXE) $(INSTALL_DIR)/lib$(MODULE).so && ldconfig
+	@install -o nobody -m 644 $(LIBDIR)/$(EXE) $(INSTALL_DIR) && echo -e "Instaling $(EXE) in $(INSTALL_DIR)/lib$(MODULE).so"
+	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jcommon && install -o nobody -m 644 jcommon/include/* /usr/local/include/jlibcpp/jcommon
+	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jgui && install -o nobody -m 644 jgui/include/* /usr/local/include/jlibcpp/jgui
+	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jio && install -o nobody -m 644 jio/include/* /usr/local/include/jlibcpp/jio
+	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jlogger && install -o nobody -m 644 jlogger/include/* /usr/local/include/jlibcpp/jlogger
+	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jmpeg && install -o nobody -m 644 jmpeg/include/* /usr/local/include/jlibcpp/jmpeg
+	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jshared && install -o nobody -m 644 jshared/include/* /usr/local/include/jlibcpp/jshared
+	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jsocket && install -o nobody -m 644 jsocket/include/* /usr/local/include/jlibcpp/jsocket
+	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jthread && install -o nobody -m 644 jthread/include/* /usr/local/include/jlibcpp/jthread
+	@ln -s $(INSTALL_DIR)/$(EXE) $(INSTALL_DIR)/lib$(MODULE).so
 	@echo -e "$(OK)"
 
 uninstall:

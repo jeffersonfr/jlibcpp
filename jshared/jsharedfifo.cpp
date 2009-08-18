@@ -87,7 +87,7 @@ SharedFifo::SharedFifo(key_t key_, int npages_, int struct_size_):
 	shmdt(p);
 	
 	// TODO:: verificar se jah existe e depois abrir
-	_shm->semid = semget(key_, 1, IPC_CREAT | IPC_EXCL + 0600);
+	_shm->semid = semget(key_, 1, (IPC_CREAT | IPC_EXCL) + 0600);
 	
 	if(_shm->semid < 0) {
 		throw FifoException("Failed to create a semaphore");
