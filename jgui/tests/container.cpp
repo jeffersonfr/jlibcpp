@@ -279,26 +279,26 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			combo->Add("opcao 0");
 		}
 
-		button1->AddNavigator(NULL, NULL, combo, button2);
-		button2->AddNavigator(NULL, NULL, button1, toogle);
-		toogle->AddNavigator(NULL, NULL, button2, button3);
-		button3->AddNavigator(NULL, NULL, toogle, image_button1);
-		image_button1->AddNavigator(NULL, NULL, button3, image_button2);
-		image_button2->AddNavigator(NULL, NULL, image_button1, image_button3);
-		image_button3->AddNavigator(NULL, NULL, image_button2, spin);
-		spin->AddNavigator(NULL, NULL, image_button3, slider);
-		slider->AddNavigator(NULL, NULL, spin, scroll);
-		scroll->AddNavigator(NULL, NULL, slider, text_field);
-		text_field->AddNavigator(NULL, NULL, scroll, text_area);
-		text_area->AddNavigator(NULL, NULL, text_field, check1);
-		check1->AddNavigator(NULL, NULL, text_area, check2);
-		check2->AddNavigator(NULL, NULL, check1, check3);
-		check3->AddNavigator(NULL, NULL, check2, radio1);
-		radio1->AddNavigator(NULL, NULL, check3, radio2);
-		radio2->AddNavigator(NULL, NULL, radio1, radio3);
-		radio3->AddNavigator(NULL, NULL, radio2, list);
-		list->AddNavigator(radio3, combo, NULL, NULL);
-		combo->AddNavigator(NULL, NULL, list, button1);
+		button1->SetNavigation(NULL, NULL, combo, button2);
+		button2->SetNavigation(NULL, NULL, button1, toogle);
+		toogle->SetNavigation(NULL, NULL, button2, button3);
+		button3->SetNavigation(NULL, NULL, toogle, image_button1);
+		image_button1->SetNavigation(NULL, NULL, button3, image_button2);
+		image_button2->SetNavigation(NULL, NULL, image_button1, image_button3);
+		image_button3->SetNavigation(NULL, NULL, image_button2, spin);
+		spin->SetNavigation(NULL, NULL, image_button3, slider);
+		slider->SetNavigation(NULL, NULL, spin, scroll);
+		scroll->SetNavigation(NULL, NULL, slider, text_field);
+		text_field->SetNavigation(NULL, NULL, scroll, text_area);
+		text_area->SetNavigation(NULL, NULL, text_field, check1);
+		check1->SetNavigation(NULL, NULL, text_area, check2);
+		check2->SetNavigation(NULL, NULL, check1, check3);
+		check3->SetNavigation(NULL, NULL, check2, radio1);
+		radio1->SetNavigation(NULL, NULL, check3, radio2);
+		radio2->SetNavigation(NULL, NULL, radio1, radio3);
+		radio3->SetNavigation(NULL, NULL, radio2, list);
+		list->SetNavigation(radio3, combo, NULL, NULL);
+		combo->SetNavigation(NULL, NULL, list, button1);
 
 		container->Add(text_field);
 		container->Add(text_area);

@@ -64,10 +64,10 @@ AddMessage::AddMessage(AgendaDB *base, int x, int y):
 	label4 = new jgui::Label("Mensagem", _insets.left, _insets.top+3*sheight, minute->GetX()+minute->GetWidth()-_insets.left, dheight);
 	message = new jgui::TextArea(_insets.left, _insets.top+4*sheight, minute->GetX()+minute->GetWidth()-_insets.left, 400);
 
-	hour->AddNavigator(NULL, minute, NULL, minute);
-	minute->AddNavigator(hour, date, hour, date);
-	date->AddNavigator(minute, message, minute, message);
-	message->AddNavigator(date, NULL, date, NULL);
+	hour->SetNavigation(NULL, minute, NULL, minute);
+	minute->SetNavigation(hour, date, hour, date);
+	date->SetNavigation(minute, message, minute, message);
+	message->SetNavigation(date, NULL, date, NULL);
 
 	Add(label1);
 	Add(label2);
@@ -146,10 +146,10 @@ AddMessage::AddMessage(AgendaDB *base, int index, int x, int y):
 
 	message->Insert(db->Get(_index)->event);
 
-	hour->AddNavigator(NULL, minute, NULL, minute);
-	minute->AddNavigator(hour, date, hour, date);
-	date->AddNavigator(minute, message, minute, message);
-	message->AddNavigator(date, NULL, date, NULL);
+	hour->SetNavigation(NULL, minute, NULL, minute);
+	minute->SetNavigation(hour, date, hour, date);
+	date->SetNavigation(minute, message, minute, message);
+	message->SetNavigation(date, NULL, date, NULL);
 
 	Add(label1);
 	Add(label2);

@@ -33,20 +33,13 @@ Display::~Display()
 void Display::SetText(std::string text)
 {
 		_text = text;
-		draw = 0;
 
 		Repaint();
 } 
 
 void Display::Paint(jgui::Graphics *g)
 {
-	if (g == NULL) {
-		return;
-	}
-
-	if (draw == 0) {
-		jgui::Panel::Paint(g);
-	}
+	jgui::Panel::Paint(g);
 
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
@@ -56,17 +49,13 @@ void Display::Paint(jgui::Graphics *g)
 		size = GetFont()->GetHeight();
 	}
 
-	if (draw == 0) {
-		g->DrawStringJustified(_text, 0, (_height-size)/2, _width-10, _height-4, jgui::RIGHT_ALIGN);
-	} else {
-		g->DrawStringJustified(_operation, 10, (_height-size)/2, 30, _height-4, jgui::LEFT_ALIGN);
-	}
+	g->DrawStringJustified(_text, 0, (_height-size)/2, _width-10, _height-4, jgui::RIGHT_ALIGN);
+	g->DrawStringJustified(_operation, 10, (_height-size)/2, 30, _height-4, jgui::LEFT_ALIGN);
 }
 
 void Display::SetOperation(std::string text)
 {
 		_operation = text;
-		draw = 1;
 
 		Repaint();
 }

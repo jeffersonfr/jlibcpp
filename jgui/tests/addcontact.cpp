@@ -49,9 +49,9 @@ AddContact::AddContact(PhoneDB *base, int x, int y):
 	field2->SetEditable(false);
 	field3->SetEditable(false);
 
-	field1->AddNavigator(NULL, NULL, NULL, field2);
-	field2->AddNavigator(NULL, NULL, field1, field3);
-	field3->AddNavigator(NULL, NULL, field2, NULL);
+	field1->SetNavigation(NULL, NULL, NULL, field2);
+	field2->SetNavigation(NULL, NULL, field1, field3);
+	field3->SetNavigation(NULL, NULL, field2, NULL);
 
 	Add(label1);
 	Add(label2);
@@ -94,9 +94,9 @@ AddContact::AddContact(PhoneDB *base, int index, int x, int y):
 	field2->SetEditable(false);
 	field3->SetEditable(false);
 
-	field1->AddNavigator(NULL, NULL, NULL, field2);
-	field2->AddNavigator(NULL, NULL, field1, field3);
-	field3->AddNavigator(NULL, NULL, field2, NULL);
+	field1->SetNavigation(NULL, NULL, NULL, field2);
+	field2->SetNavigation(NULL, NULL, field1, field3);
+	field3->SetNavigation(NULL, NULL, field2, NULL);
 
 	struct PhoneDB::phone_t *t = db->Get(_index);
 

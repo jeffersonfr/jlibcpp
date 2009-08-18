@@ -277,17 +277,17 @@ void html_parser_test()
 
 int main(int argc, char *argv[])
 {
-	//testObject();
-	//testLink();
-	//testProperties();
-	//testSystem();
-	//testStringToken();
+	// testObject();
+	// testLink();
+	// testProperties();
+	// testSystem();
+	// testStringToken();
 	testURL();
-	//testOptions(argc, argv);
-	//testDate();
-	//justify("This is a simple test with a justify text in your screen. This example show all lines in a text with the same width.", 50);
-	//create_xml_file();
-	//html_parser_test();
+	// testOptions(argc, argv);
+	// testDate();
+	// justify("This is a simple test with a justify text in your screen. This example show all lines in a text with the same width.", 50);
+	// create_xml_file();
+	// html_parser_test();
 
     return EXIT_SUCCESS;
 }
