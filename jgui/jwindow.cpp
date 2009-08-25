@@ -239,8 +239,37 @@ void Window::PutBelow(Window *w)
 
 void Window::SetBounds(int x, int y, int w, int h)
 {
-	SetPosition(x, y);
-	SetSize(w, h);
+	// SetPosition(x, y);
+	// SetSize(w, h);
+
+	_x = x;
+	_y = y;
+	_width = w;
+	_height = h;
+
+	if (_width < _minimum_width) {
+		_width = _minimum_width;
+	}
+
+	if (_height < _minimum_height) {
+		_height = _minimum_height;
+	}
+
+	if (window != NULL) {
+		x = (_x*GFXHandler::GetInstance()->GetScreenWidth())/_scale_width, 
+		y = (_y*GFXHandler::GetInstance()->GetScreenHeight())/_scale_height,
+		w = (_width*GFXHandler::GetInstance()->GetScreenWidth())/_scale_width, 
+		h = (_height*GFXHandler::GetInstance()->GetScreenHeight())/_scale_height;
+
+#ifdef DIRECTFB_UI
+		window->SetBounds(window, x, y, w, h);
+#endif
+	}
+	
+	DoLayout();
+
+	DispatchEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
+	DispatchEvent(new WindowEvent(this, WINDOW_RESIZED_EVENT));
 }
 
 void Window::SetPosition(int x1, int y1)

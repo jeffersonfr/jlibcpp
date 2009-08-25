@@ -194,8 +194,6 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			image_button1 = new jgui::ImageButton("icons/alert_icon.png", "", 150, 760, 80, 60);
 			image_button2 = new jgui::ImageButton("icons/info_icon.png", "", 260, 760, 80, 60);
 			image_button3 = new jgui::ImageButton("icons/error_icon.png", "", 370, 760, 80, 60);
-
-			image_button3->SetBorderSize(10);
 		}
 
 		{

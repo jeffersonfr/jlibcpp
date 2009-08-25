@@ -110,11 +110,9 @@ int main(int argc, char **argv)
 	sleep(4);
 
 	jgui::GFXHandler::GetInstance()->Release();
-	
 	sleep(1);
 	
 	jgui::GFXHandler::GetInstance()->Restore();
-
 	sleep(4);
 
 	return 0;
