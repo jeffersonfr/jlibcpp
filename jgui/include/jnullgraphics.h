@@ -68,6 +68,12 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual jregion_t GetClipBounds();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetClipX();
 		
 		/**
@@ -105,6 +111,18 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual void Translate(int x, int y);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual double Rotate();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jpoint_t Translate();
 
 		/**
 		 * \brief

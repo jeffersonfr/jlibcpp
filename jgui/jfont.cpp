@@ -28,8 +28,7 @@ Font::Font(std::string name, int attr, int height, int scale_width, int scale_he
 {
 	jcommon::Object::SetClassName("jgui::Font");
 
-#ifdef _WIN32
-#else
+#ifdef DIRECTFB_UI
 	_font = NULL;
 #endif
 

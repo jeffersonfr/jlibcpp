@@ -33,7 +33,6 @@ Panel::Panel(int x, int y, int width, int height):
 	SetBorderColor(0x60-d, 0x60-d, 0x80-d, 0xff);
 	SetBackgroundVisible(true);
 	SetBorder(LINE_BORDER);
-	SetOpaque(true);
 }
 
 Panel::~Panel()

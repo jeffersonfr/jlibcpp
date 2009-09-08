@@ -34,6 +34,8 @@ LIBRARIES					= -L$(JLIBCPP_INCLUDE)/lib \
 DEFINITIONS				= -D_GNU_SOURCE \
 										-DJDEBUG_ENABLED \
 										-DDIRECTFB_UI \
+										-D_FILE_OFFSET_BITS=64 \
+										-D_LARGEFILE_SOURCE \
 
 all:
 	g++ <app.cpp> -o <app> $(INCLUDES) $(LIBRARIES) $(DEFINITIONS) 

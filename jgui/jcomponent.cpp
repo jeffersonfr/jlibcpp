@@ -212,6 +212,9 @@ void Component::PaintBorder(Graphics *g)
 			da = _border_alpha;
 	int step = 0x20;
 
+	// g->SetColor(_border_red, _border_green, _border_blue, _border_alpha);
+	g->SetLineWidth(_border_size);
+
 	if (HasFocus() == true) {
 		dr = _borderfocus_red;
 		dg = _borderfocus_green;

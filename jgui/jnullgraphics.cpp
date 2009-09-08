@@ -52,6 +52,20 @@ void NullGraphics::SetClip(int x1, int y1, int width, int height)
 	JDEBUG(JINFO, "called\n");
 }
 
+jregion_t NullGraphics::GetClipBounds()
+{
+	JDEBUG(JINFO, "called\n");
+
+	jregion_t t;
+
+	t.x = 0;
+	t.y = 0;
+	t.width = 0;
+	t.height = 0;
+
+	return t;
+}
+
 int NullGraphics::GetClipX()
 {
 	JDEBUG(JINFO, "called\n");
@@ -349,6 +363,25 @@ void NullGraphics::Rotate(double radians)
 void NullGraphics::Translate(int x, int y)
 {
 	JDEBUG(JINFO, "called\n");
+}
+
+double NullGraphics::Rotate()
+{
+	JDEBUG(JINFO, "called\n");
+
+	return 0.0;
+}
+
+jpoint_t NullGraphics::Translate()
+{
+	JDEBUG(JINFO, "called\n");
+
+	jpoint_t t;
+
+	t.x = 0;
+	t.y = 0;
+
+	return t;
 }
 
 void NullGraphics::DrawStringJustified(std::string full_text, int x, int y, int width, int height, int align)

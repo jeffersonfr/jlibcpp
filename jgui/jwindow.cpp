@@ -255,16 +255,16 @@ void Window::SetBounds(int x, int y, int w, int h)
 		_height = _minimum_height;
 	}
 
+#ifdef DIRECTFB_UI
 	if (window != NULL) {
 		x = (_x*GFXHandler::GetInstance()->GetScreenWidth())/_scale_width, 
 		y = (_y*GFXHandler::GetInstance()->GetScreenHeight())/_scale_height,
 		w = (_width*GFXHandler::GetInstance()->GetScreenWidth())/_scale_width, 
 		h = (_height*GFXHandler::GetInstance()->GetScreenHeight())/_scale_height;
 
-#ifdef DIRECTFB_UI
 		window->SetBounds(window, x, y, w, h);
-#endif
 	}
+#endif
 	
 	DoLayout();
 
@@ -508,8 +508,9 @@ void Window::Repaint(bool all)
 
 	graphics->Reset();
 	Paint(graphics);
-	graphics->Unlock();
 	graphics->Flip();
+	
+	graphics->Unlock();
 
 	Revalidate();
 
@@ -534,12 +535,14 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 	Component *c1 = NULL,
 			  *c2 = NULL;
 
+	jthread::AutoLock lock(&_container_mutex);
+
+	graphics->Lock();
+
 	if (_optimized_paint == false) {
 		std::vector<jgui::Component *> collisions;
 
 		collisions.push_back(c);
-
-		jthread::AutoLock lock(&_container_mutex);
 
 		for (std::vector<jgui::Component *>::iterator i=std::find(_components.begin(), _components.end(), c); i!=_components.end(); i++) {
 			c1 = (*i);
@@ -599,46 +602,44 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 					y2 = y3+h3;
 				}
 
-				graphics->Lock();
 				graphics->Reset();
 				graphics->SetClip(x3, y3, w3, h3);
 
 				c1->Paint(graphics);
-				c1->Revalidate();
 
 				graphics->ReleaseClip();
-				graphics->Unlock();
+				
+				c1->Revalidate();
 			}
 		}
 		
 		if (flag == true) {
-			graphics->Lock();
 			graphics->Flip(x1, y1, x2-x1, y2-y1);
-			graphics->Unlock();
 		}
 	} else {
 		c1 = c;
 
 		if (c1->IsVisible() == true) {
-				int x1 = c1->GetX()-_scroll_x,
-						y1 = c1->GetY()-_scroll_y,
-						w1 = c1->GetWidth(),
-						h1 = c1->GetHeight();
+			int x1 = c1->GetX()-_scroll_x,
+					y1 = c1->GetY()-_scroll_y,
+					w1 = c1->GetWidth(),
+					h1 = c1->GetHeight();
 
 			if ((x1 < GetWidth() && (x1+w1) > 0) && (y1 < GetHeight() && (y1+h1) > 0)) {
-				graphics->Lock();
 				graphics->Reset();
 				graphics->SetClip(x1, y1, w1, h1);
 
 				c1->Paint(graphics);
-				c1->Revalidate();
 
 				graphics->Flip(x1, y1, w1, h1);
 				graphics->ReleaseClip();
-				graphics->Unlock();
+				
+				c1->Revalidate();
 			}
 		}
 	}
+	
+	graphics->Unlock();
 }
 
 bool Window::Show(bool modal)
@@ -688,9 +689,7 @@ void Window::ReleaseWindow()
 {
 #ifdef DIRECTFB_UI
 	if (graphics != NULL) {
-		graphics->Lock();
 		graphics->SetSurface(NULL);
-		graphics->Unlock();
 
 		delete graphics;
 		graphics = NULL;

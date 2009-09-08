@@ -32,7 +32,8 @@ OTHER  		= -Wall -shared -rdynamic
 INCLUDE		= -I. -I$(INCDIR) -Ijcommon/include -Ijio/include -Ijlogger/include -Ijshared/include -Ijsocket/include -Ijthread/include -Ijmath/include -Ijphysic/include -Ijresource/include -Ijmpeg/include -Ijgui/include -I/usr/local/include/directfb -Ijimage/include 
 LIBRARY 	= -L. -L$(LIBDIR) -lpthread -ldl -lrt -ldirectfb
 
-STD				= -D_GNU_SOURCE -D_REENTRANT -DSINGLE_WAIT_CONDITION -DDIRECTFB_UI -DJDEBUG_ENABLED
+#STD				= -D_GNU_SOURCE -D_REENTRANT -DSINGLE_WAIT_CONDITION -DDIRECTFB_UI -DJDEBUG_ENABLED
+STD				= -D_GNU_SOURCE -D_REENTRANT 
 
 ARFLAGS		= -rc
 CFLAGS		= $(INCLUDE) $(DEBUG) $(OPT) $(OTHER) $(STD)

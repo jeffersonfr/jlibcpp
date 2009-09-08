@@ -42,18 +42,11 @@ Mines::Mines(int x, int y):
 	slide->SetInputEnabled(false);
 	slide->Show(false);
 
-	label = new jgui::Label("0", _width-170, _height-240, 90, 40);
-
-	label->SetAlign(jgui::CENTER_ALIGN);
-	label->SetTruncated(false);
-
 	prefetch1 = new jgui::OffScreenImage(size, size);
 	prefetch2 = new jgui::OffScreenImage(size, size);
 	
 	prefetch1->GetGraphics()->DrawImage("icons/bomb2.png", 0, 0, size, size);
 	prefetch2->GetGraphics()->DrawImage("icons/flag1.png", 0, 0, size, size);
-
-	Add(label);
 
 	AddSubtitle("icons/blue_icon.png", "Novo Jogo");
 	AddSubtitle("icons/yellow_icon.png", "Flag");
@@ -67,7 +60,6 @@ Mines::~Mines()
 	jthread::AutoLock lock(&mines_mutex);
 
 	delete board;
-	delete label;
 	delete slide;
 }
 
@@ -513,13 +505,19 @@ void Mines::UpdateBoard(int flag)
 	}
 
 	// INFO:: show number of marked bombs
+	int x = _width-180,
+			y = _height-250,
+			w = 100,
+			h = 50;
 	char tmp[255];
 
 	sprintf(tmp, "%02d", hide_bombs);
 
-	label->SetText(tmp);
- 
-	// Flip();
+	graphics->SetColor(0x00, 0x00, 0x00, 0xff);
+	graphics->FillRectangle(x, y, w, h);
+	graphics->SetColor(0xf0, 0xf0, 0xf0, 0xff);
+	graphics->DrawString(tmp, x+35, y+10);
+	graphics->Flip(x, y, w, h);
 }
 
 }

@@ -118,6 +118,7 @@ class ObjectInputStreamImpl : public ObjectInputStream {
 
 int main() 
 {
+	/*
 	Complex	*a,
 			s(2, 3);
 	
@@ -141,6 +142,16 @@ int main()
 	delete ois;
 	delete fos;
 	delete fis;
+	*/
+
+	jio::File file("/root");
+	std::vector<std::string> *l = file.ListFiles();
+
+	printf("::-> %p\n", l);
+
+	for (std::vector<std::string>::iterator i=l->begin(); i!=l->end(); i++) {
+		printf(":: %s\n", (*i).c_str());
+	}
 
 	return EXIT_SUCCESS;
 }

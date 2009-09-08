@@ -4,7 +4,6 @@
 #include "slidewindow.h"
 
 #include "jframe.h"
-#include "jlabel.h"
 #include "joffscreenimage.h"
 
 #include <string>
@@ -45,7 +44,6 @@ class Mines : public jgui::Frame, public jgui::FrameInputListener{
 				jthread::Mutex mines_mutex;
 
 				jgui::Graphics *graphics;
-				jgui::Label *label;
 				int bx,
 					by,
 					bwidth,

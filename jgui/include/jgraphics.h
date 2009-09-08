@@ -113,7 +113,7 @@ enum jblitting_flags_t {
  */
 enum jline_type_t {
 	RECT_LINE			= 0x01,
-	ROUND_LINE			= 0x02
+	ROUND_LINE		= 0x02
 };
 
 /**
@@ -121,9 +121,9 @@ enum jline_type_t {
  *
  */
 enum jline_style_t {
-	SOLID_LINE			= 0x01,
+	SOLID_LINE		= 0x01,
 	DASH_LINE			= 0x02,
-	DASH_DOT_LINE		= 0x04,
+	DASH_DOT_LINE	= 0x04,
 	DOT_LINE			= 0x08
 };
 
@@ -215,14 +215,11 @@ class Graphics : public virtual jcommon::Object{
 
 		std::vector<struct jregion_t> _clips;
 		struct jregion_t _clip;
+		struct jpoint_t _translate;
+		struct jsize_t _screen;
+		struct jsize_t _scale;
 		Font *_font;
 		double _radians;
-		int	_screen_width, 
-			_screen_height,
-			_scale_width, 
-			_scale_height;
-		int _translate_x,
-				_translate_y;
 		int _red,
 				_green,
 				_blue,
@@ -307,7 +304,25 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual double Rotate();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jpoint_t Translate();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetClip(int x1, int y1, int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jregion_t GetClipBounds();
 		
 		/**
 		 * \brief

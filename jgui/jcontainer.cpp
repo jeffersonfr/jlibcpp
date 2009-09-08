@@ -280,13 +280,9 @@ void Container::Paint(Graphics *g)
 					h1 = GetHeight()-y1;
 				}
 
-				g->Lock();
 				g->SetClip(x1, y1, w1, h1);
-
 				c->Paint(g);
-
 				g->ReleaseClip();
-				g->Unlock();
 			}
 
 			c->Revalidate();
@@ -363,15 +359,7 @@ void Container::Repaint(bool all)
 
 void Container::Repaint(int x, int y, int width, int height)
 {
-	Invalidate();
-
-	if (_ignore_repaint == true) {
-		return;
-	}
-
-	if (_parent != NULL) {
-		_parent->Repaint(_x-_scroll_x, _y-_scroll_y, _width, _height);
-	}
+	Repaint();
 }
 
 void Container::Repaint(Component *c, int x, int y, int width, int height)
@@ -392,6 +380,8 @@ void Container::Add(Component *c, GridBagConstraints *constraints)
 	if (c == NULL) {
 		return;
 	}
+
+	jthread::AutoLock lock(&_container_mutex);
 
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		if (c == (*i)) {
@@ -418,6 +408,8 @@ void Container::Add(jgui::Component *c, std::string id)
 	if (c == NULL) {
 		return;
 	}
+
+	jthread::AutoLock lock(&_container_mutex);
 
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		if (c == (*i)) {
@@ -492,9 +484,11 @@ void Container::Remove(jgui::Component *c)
 
 void Container::RemoveAll()
 {
-	jthread::AutoLock lock(&_container_mutex);
+	{
+		jthread::AutoLock lock(&_container_mutex);
 
-	_components.clear();
+		_components.clear();
+	}
 
 	Repaint();
 }

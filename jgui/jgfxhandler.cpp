@@ -163,8 +163,110 @@ IDirectFBDisplayLayer * GFXHandler::GetDisplayLayer()
 	return _layer;
 }
 
+void GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width, int scale_height)
+{
+	if (scale_width <= 0) {
+		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
+	}
+
+	if (scale_height <= 0) {
+		scale_height = scaleHeight; // DEFAULT_SCALE_HEIGHT;
+	}
+
+	DFBFontDescription font_dsc;
+	DFBTextEncodingID enc_id;
+
+	font_dsc.flags = (DFBFontDescriptionFlags)(DFDESC_HEIGHT);
+	font_dsc.height = (int)round(((double)height*(double)screenHeight)/(double)scale_height);
+
+	if (font_dsc.height < 1) {
+		font_dsc.height = 1;
+	}
+
+	std::string fname = name;
+
+	if (fname == "") {
+		fname = "./fonts/font.ttf";
+	}
+
+	if (_dfb->CreateFont(_dfb, fname.c_str(), &font_dsc, font) != DFB_OK) {
+		(*font) = NULL;
+
+		return;
+	}
+
+	(*font)->FindEncoding(*font, "Latin1", &enc_id);
+	(*font)->SetEncoding(*font, enc_id);
+}
+
+int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity, int scale_width, int scale_height)
+{
+	int x = (xp * screenWidth) / scale_width; 
+	int y = (yp * screenHeight) / scale_height;
+	int width = (widthp * screenWidth) / scale_width;
+	int height = (heightp * screenHeight) / scale_height;
+
+	DFBWindowDescription desc;
+	DFBResult ret;
+
+	if (width < 2) {
+		width = 2;
+	}
+
+	if (height < 2) {
+		height = 2;
+	}
+
+	if (width > screenWidth) {
+		width = screenWidth;
+	}
+
+	if (height > screenHeight) {
+		height = screenHeight;
+	}
+
+	/* Fill the window description. */
+	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_SURFACE_CAPS);
+	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION); // | DWCAPS_DOUBLEBUFFER);
+	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE);
+	desc.posx   = x;
+	desc.posy   = y;
+	desc.width  = width;
+	desc.height = height;
+
+	/* Create the window. */
+	ret = _layer->CreateWindow(_layer, &desc, window);
+	if (ret) {
+		DirectFBError( "IDirectFBDisplayLayer::CreateWindow() failed", ret );
+
+		return -1;
+	}
+
+	/* Get the window's surface. */
+	ret = (*window)->GetSurface( *window, surface );
+	if (ret) {
+		// DirectFBError( "IDirectFBWindow::GetSurface() failed", ret );
+		
+		return -1;
+	}
+
+	// Add ghost option (behave like an overlay)
+	(*window)->SetOptions( (*window), (DFBWindowOptions)(DWOP_ALPHACHANNEL));// | DWOP_GHOST));
+	// Move window to upper stacking class
+	(*window)->SetStackingClass(*window, DWSC_UPPER);
+	// Make it the top most window
+	(*window)->RaiseToTop(*window);
+	(*window)->SetOpacity(*window, opacity);
+	// (*surface)->SetRenderOptions(*surface, DSRO_ALL);
+	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
+
+	return 0;
+}
+#endif
+
 void GFXHandler::SetCursorEnabled(bool b)
 {
+#ifdef DIRECTFB_UI
 	if (_layer == NULL) {
 		return;
 	}
@@ -172,10 +274,12 @@ void GFXHandler::SetCursorEnabled(bool b)
 	int i = (b==false)?0:1;
 
 	_layer->EnableCursor(_layer, i);
+#endif
 }
 
 void GFXHandler::SetCursor(jcursor_style_t t)
 {
+#ifdef DIRECTFB_UI
 	if (_cursor == t) {
 		return;
 	}
@@ -183,6 +287,7 @@ void GFXHandler::SetCursor(jcursor_style_t t)
 	_cursor = t;
 
 	SetCursor(_cursors[_cursor].cursor, _cursors[_cursor].hot_x, _cursors[_cursor].hot_y);
+#endif
 }
 
 void GFXHandler::SetCursor(OffScreenImage *shape, int hotx, int hoty)
@@ -325,107 +430,6 @@ void GFXHandler::InitCursors()
 	SetCursor(_cursors[_cursor].cursor, _cursors[_cursor].hot_x, _cursors[_cursor].hot_y);
 #endif
 }
-
-void GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width, int scale_height)
-{
-	if (scale_width <= 0) {
-		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
-	}
-
-	if (scale_height <= 0) {
-		scale_height = scaleHeight; // DEFAULT_SCALE_HEIGHT;
-	}
-
-	DFBFontDescription font_dsc;
-	DFBTextEncodingID enc_id;
-
-	font_dsc.flags = (DFBFontDescriptionFlags)(DFDESC_HEIGHT);
-	font_dsc.height = (int)round(((double)height*(double)screenHeight)/(double)scale_height);
-
-	if (font_dsc.height < 1) {
-		font_dsc.height = 1;
-	}
-
-	std::string fname = name;
-
-	if (fname == "") {
-		fname = "./fonts/font.ttf";
-	}
-
-	if (_dfb->CreateFont(_dfb, fname.c_str(), &font_dsc, font) != DFB_OK) {
-		(*font) = NULL;
-
-		return;
-	}
-
-	(*font)->FindEncoding(*font, "Latin1", &enc_id);
-	(*font)->SetEncoding(*font, enc_id);
-}
-
-int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity, int scale_width, int scale_height)
-{
-	int x = (xp * screenWidth) / scale_width; 
-	int y = (yp * screenHeight) / scale_height;
-	int width = (widthp * screenWidth) / scale_width;
-	int height = (heightp * screenHeight) / scale_height;
-
-	DFBWindowDescription desc;
-	DFBResult ret;
-
-	if (width < 2) {
-		width = 2;
-	}
-
-	if (height < 2) {
-		height = 2;
-	}
-
-	if (width > screenWidth) {
-		width = screenWidth;
-	}
-
-	if (height > screenHeight) {
-		height = screenHeight;
-	}
-
-	/* Fill the window description. */
-	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS);// | DWDESC_SURFACE_CAPS);
-	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION);// | DWCAPS_DOUBLEBUFFER);
-	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE);
-	desc.posx   = x;
-	desc.posy   = y;
-	desc.width  = width;
-	desc.height = height;
-
-	/* Create the window. */
-	ret = _layer->CreateWindow(_layer, &desc, window);
-	if (ret) {
-		DirectFBError( "IDirectFBDisplayLayer::CreateWindow() failed", ret );
-
-		return -1;
-	}
-
-	/* Get the window's surface. */
-	ret = (*window)->GetSurface( *window, surface );
-	if (ret) {
-		// DirectFBError( "IDirectFBWindow::GetSurface() failed", ret );
-		
-		return -1;
-	}
-
-	// Add ghost option (behave like an overlay)
-	(*window)->SetOptions( (*window), (DFBWindowOptions)(DWOP_ALPHACHANNEL));// | DWOP_GHOST));
-	// Move window to upper stacking class
-	(*window)->SetStackingClass(*window, DWSC_UPPER);
-	// Make it the top most window
-	(*window)->RaiseToTop(*window);
-	(*window)->SetOpacity(*window, opacity);
-	// (*surface)->SetRenderOptions(*surface, DSRO_ALL);
-	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
-
-	return 0;
-}
-#endif
 
 void * GFXHandler::GetGraphicEngine()
 {

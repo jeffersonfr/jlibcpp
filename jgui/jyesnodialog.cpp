@@ -72,18 +72,18 @@ YesNoDialog::~YesNoDialog()
 
 int YesNoDialog::GetResponse()
 {
-		if (GetComponentInFocus() == _yes) {
-			return 1;
-		} else {
-			return 0;
-		}
+	if (GetComponentInFocus() == _yes) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 void YesNoDialog::ActionPerformed(jgui::ButtonEvent *event)
 {
-		jthread::AutoLock lock(&_yesno_mutex);
+	jthread::AutoLock lock(&_yesno_mutex);
 
-		Release();
+	Release();
 }
 
 }
