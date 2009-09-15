@@ -1,5 +1,5 @@
 MODULE		= jlibcpp
-VERSION		= 0.4
+VERSION		= 0.5
 
 EXE			= lib$(MODULE)-$(VERSION).so
 
@@ -22,23 +22,48 @@ OBJDIR		= ./objs
 TESTDIR		= ./tests
 DOCDIR		= ./doc/
 
-INSTALL_DIR	= /usr/lib
+PREFIX		= /usr/local
 
-OPT    		= -fPIC -funroll-loops -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O2
+
+OPT    		= -fPIC -funroll-loops -O2
 DEBUG  		= -g -ggdb 
 
 OTHER  		= -Wall -shared -rdynamic 
 
-INCLUDE		= -I. -I$(INCDIR) -Ijcommon/include -Ijio/include -Ijlogger/include -Ijshared/include -Ijsocket/include -Ijthread/include -Ijmath/include -Ijphysic/include -Ijresource/include -Ijmpeg/include -Ijgui/include -I/usr/local/include/directfb -Ijimage/include 
-LIBRARY 	= -L. -L$(LIBDIR) -lpthread -ldl -lrt -ldirectfb
+INCLUDE		= -I. \
+						-I$(INCDIR) \
+						-Ijcommon/include \
+						-Ijgui/include \
+						-Ijimage/include \
+						-Ijio/include \
+						-Ijlogger/include \
+						-Ijmath/include \
+						-Ijmpeg/include \
+						-Ijphysic/include \
+						-Ijresource/include \
+						-Ijshared/include \
+						-Ijsocket/include \
+						-Ijthread/include \
+						-I/usr/local/include/directfb \
 
-#STD				= -D_GNU_SOURCE -D_REENTRANT -DSINGLE_WAIT_CONDITION -DDIRECTFB_UI -DJDEBUG_ENABLED
-STD				= -D_GNU_SOURCE -D_REENTRANT 
+LIBRARY 	= -L$(LIBDIR) -lpthread -ldl -lrt -lssl
+
+DEFINES		= -D_GNU_SOURCE \
+						-D_REENTRANT \
+						-D_FILE_OFFSET_BITS=64 \
+						-D_LARGEFILE_SOURCE \
+						-DSINGLE_WAIT_CONDITION \
+						-DJDEBUG_ENABLED \
+						-DDIRECTFB_UI \
 
 ARFLAGS		= -rc
-CFLAGS		= $(INCLUDE) $(DEBUG) $(OPT) $(OTHER) $(STD)
+CFLAGS		= $(INCLUDE) $(DEBUG) $(OPT) $(OTHER) $(DEFINES)
 
 OK 				= \033[30;32mOK\033[m
+
+ifeq ($(findstring DIRECTFB_UI,$(DEFINES)), DIRECTFB_UI)
+	LIBRARY += -ldirectfb
+endif
 
 OBJS_jcommon = \
 	   jbitstream.o\
@@ -292,7 +317,7 @@ doc:
 	@mkdir -p $(DOCDIR) 
 
 install: uninstall
-	@install -o nobody -m 644 $(LIBDIR)/$(EXE) $(INSTALL_DIR) && echo -e "Instaling $(EXE) in $(INSTALL_DIR)/lib$(MODULE).so"
+	@echo -e "Instaling include files in $(PREFIX)/include/$(MODULE) $(OK)"
 	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jcommon && install -o nobody -m 644 jcommon/include/* /usr/local/include/jlibcpp/jcommon
 	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jgui && install -o nobody -m 644 jgui/include/* /usr/local/include/jlibcpp/jgui
 	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jio && install -o nobody -m 644 jio/include/* /usr/local/include/jlibcpp/jio
@@ -301,11 +326,13 @@ install: uninstall
 	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jshared && install -o nobody -m 644 jshared/include/* /usr/local/include/jlibcpp/jshared
 	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jsocket && install -o nobody -m 644 jsocket/include/* /usr/local/include/jlibcpp/jsocket
 	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jthread && install -o nobody -m 644 jthread/include/* /usr/local/include/jlibcpp/jthread
-	@ln -s $(INSTALL_DIR)/$(EXE) $(INSTALL_DIR)/lib$(MODULE).so
-	@echo -e "$(OK)"
+	@echo -e "Instaling $(EXE) in $(PREFIX)/lib/lib$(MODULE).so $(OK)"
+	@install -o nobody -m 644 $(LIBDIR)/$(EXE) $(PREFIX)/lib && ln -s $(PREFIX)/lib/$(EXE) $(PREFIX)/lib/lib$(MODULE).so
+	@echo -e "Instaling $(MODULE).pc in $(PREFIX)/lib/pkgconfig $(OK)"
+	@sed -e 's/@module@/$(MODULE)/g' jlibcpp.pc | sed -e 's/@prefix@/$(subst /,\/,$(PREFIX))/g' | sed -e 's/@version@/$(VERSION)/g' | sed -e 's/@cflags@/$(DEFINES)/g' | sed -e 's/@libs@/$(subst /,\/,$(LIBRARY))/g' > $(PREFIX)/lib/pkgconfig/$(MODULE).pc
 
 uninstall:
-	@rm -rf $(INSTALL_DIR)/lib$(MODULE).so $(INSTALL_DIR)/$(EXE)
+	@rm -rf $(PREFIX)/lib/lib$(MODULE).so $(PREFIX)/lib/$(EXE)
 
 clean:
 	@rm -rf $(SRCS) *~ 2> /dev/null && echo -e "$(MODULE) clean $(OK)" 
