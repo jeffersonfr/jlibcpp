@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: @module@
+Description: Portable C++ library.
+Version: @version@
+Requires: directfb
+Libs: -L${libdir} -l@libs@ -ljlibcpp 
+Cflags: @cflags@ -I${includedir}/jlibcpp/jcommon -I${includedir}/jlibcpp/jgui -I${includedir}/jlibcpp/jio -I${includedir}/jlibcpp/jlogger -I${includedir}/jlibcpp/jmpeg -I${includedir}/jlibcpp/jshared -I${includedir}/jlibcpp/jsocket -I${includedir}/jlibcpp/jthread
