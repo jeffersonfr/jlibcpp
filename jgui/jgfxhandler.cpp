@@ -58,16 +58,10 @@ GFXHandler::~GFXHandler()
 
 GFXHandler * GFXHandler::GetInstance()
 {
-	{
-		jLibLock();
+	if (instance == NULL) {
+		instance = new GFXHandler();
 
-		if (instance == NULL) {
-			instance = new GFXHandler();
-
-			instance->InitCursors();
-		}
-			
-		jLibUnlock();
+		instance->InitCursors();
 	}
 
 	return instance;
@@ -490,8 +484,6 @@ void GFXHandler::SetCurrentWorkingScreenSize(int width, int height)
 
 void GFXHandler::Restore()
 {
-	// TODO:: identificar e restaurar os recursos dos objetos OffScreenImage
-	
 #ifdef DIRECTFB_UI
 	// INFO:: restoring engine
 	InitEngine();
@@ -513,9 +505,6 @@ void GFXHandler::Restore()
 
 void GFXHandler::Release()
 {
-	// TODO:: identificar e liberar os recursos dos objetos OffScreenImage
-	// TODO:: identificar e liberar os recursos dos objetos Font
-
 #ifdef DIRECTFB_UI
 	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
 		delete i->second.cursor;

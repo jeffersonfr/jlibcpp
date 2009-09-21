@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GFXHANDLER_H
-#define GFXHANDLER_H
+#ifndef J_GFXHANDLER_H
+#define J_GFXHANDLER_H
 
 #include "jobject.h"
 #include "jmutex.h"

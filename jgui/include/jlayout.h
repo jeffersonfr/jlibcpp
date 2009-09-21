@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef LAYOUT_H
-#define LAYOUT_H
+#ifndef J_LAYOUT_H
+#define J_LAYOUT_H
 
 #include "jgraphics.h"
 

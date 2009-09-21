@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef ADJUSTMENTEVENT_H
-#define ADJUSTMENTEVENT_H
+#ifndef J_ADJUSTMENTEVENT_H
+#define J_ADJUSTMENTEVENT_H
 
 #include "jeventobject.h"
 

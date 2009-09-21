@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef MOUSELISTENER_H
-#define MOUSELISTENER_H
+#ifndef J_MOUSELISTENER_H
+#define J_MOUSELISTENER_H
 
 #include "jmouseevent.h"
 #include "jlistener.h"

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef TREE_H
-#define TREE_H
+#ifndef J_TREE_H
+#define J_TREE_H
 
 #include "jmenu.h"
 
@@ -48,7 +48,7 @@ class Tree : public jgui::Component{
 		jthread::Mutex _tree_mutex;
 
 		std::vector<Tree *> _trees;
-		std::vector<MenuListener *> _listeners;
+		std::vector<MenuListener *> _tree_listeners;
 		TreeItem *_current_item;
 		TreeComponent *_list;
 		int _visible_items;

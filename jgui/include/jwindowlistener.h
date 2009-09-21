@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef WINDOWLISTENER_H
-#define WINDOWLISTENER_H
+#ifndef J_WINDOWLISTENER_H
+#define J_WINDOWLISTENER_H
 
 #include "jwindowevent.h"
 #include "jlistener.h"

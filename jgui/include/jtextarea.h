@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef TEXTAREA_H
-#define TEXTAREA_H
+#ifndef J_TEXTAREA_H
+#define J_TEXTAREA_H
 
 #include "jruntimeexception.h"
 #include "jstringtokenizer.h"

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef	WATCH_H
-#define WATCH_H
+#ifndef	J_WATCH_H
+#define J_WATCH_H
 
 #include "jcomponent.h"
 

@@ -644,7 +644,9 @@ void Container::RegisterContainerListener(ContainerListener *listener)
 		return;
 	}
 
-	_container_listeners.push_back(listener);
+	if (std::find(_container_listeners.begin(), _container_listeners.end(), listener) == _container_listeners.end()) {
+		_container_listeners.push_back(listener);
+	}
 }
 
 void Container::RemoveContainerListener(ContainerListener *listener)
@@ -653,12 +655,10 @@ void Container::RemoveContainerListener(ContainerListener *listener)
 		return;
 	}
 
-	for (std::vector<ContainerListener *>::iterator i=_container_listeners.begin(); i!=_container_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_container_listeners.erase(i);
+	std::vector<ContainerListener *>::iterator i = std::find(_container_listeners.begin(), _container_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _container_listeners.end()) {
+		_container_listeners.erase(i);
 	}
 }
 

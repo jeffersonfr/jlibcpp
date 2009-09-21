@@ -188,7 +188,7 @@ int Mines::DrawBlock(int row, int col, block_type_t type, int value, bool update
 			c[1] = '\0';
 
 			graphics->SetColor(0xff, 0x00, 0x00, 0xff);
-			graphics->DrawStringJustified((const char *)&c, bx+col*(size+delta), by+row*(size+delta), size, size, jgui::CENTER_ALIGN);
+			graphics->DrawString((const char *)&c, bx+col*(size+delta), by+row*(size+delta), size, size, jgui::CENTER_ALIGN);
 		}
 	} else if (type == BOMB_BLOCK) {
 		graphics->SetColor(0xc0, 0xc0, 0xc0, 0xff);

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef FLOWLAYOUT_H
-#define FLOWLAYOUT_H
+#ifndef J_FLOWLAYOUT_H
+#define J_FLOWLAYOUT_H
 
 #include "jlayout.h"
 #include "jcontainer.h"

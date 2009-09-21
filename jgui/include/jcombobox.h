@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef COMBOBOX_H
-#define COMBOBOX_H
+#ifndef J_COMBOBOX_H
+#define J_COMBOBOX_H
 
 #include "jselectlistener.h"
 #include "jcomponent.h"
@@ -53,7 +53,7 @@ class ComboMenu : public jgui::Frame, public jgui::FrameInputListener{
 		jthread::Mutex _menu_mutex;
 
 		std::vector<ComboMenu *> _menus;
-		std::vector<MenuListener *> _listeners;
+		std::vector<MenuListener *> _menu_listeners;
 		MenuItem *_current_item;
 		ComboMenuComponent *_list;
 		int _visible_items;

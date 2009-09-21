@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef MENU_H
-#define MENU_H
+#ifndef J_MENU_H
+#define J_MENU_H
 
 #include "jmenulistener.h"
 #include "jframe.h"
@@ -74,7 +74,7 @@ class Menu : public jgui::Frame, public jgui::FrameInputListener{
 		jthread::Mutex _menu_mutex;
 
 		std::vector<Menu *> _menus;
-		std::vector<MenuListener *> _listeners;
+		std::vector<MenuListener *> _menu_listeners;
 		MenuItem *_current_item;
 		MenuComponent *_list;
 		jmenu_align_t _menu_align;
@@ -120,6 +120,7 @@ class Menu : public jgui::Frame, public jgui::FrameInputListener{
 		void DispatchEvent(MenuEvent *event);
 		std::vector<MenuListener *> & GetMenuListeners();
 
+		virtual void Paint(Graphics *g);
 		virtual void InputChanged(KeyEvent *event);
 };
 

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef IMAGEBUTTON_H
-#define IMAGEBUTTON_H
+#ifndef J_IMAGEBUTTON_H
+#define J_IMAGEBUTTON_H
 
 #include "jbutton.h"
 #include "joffscreenimage.h"

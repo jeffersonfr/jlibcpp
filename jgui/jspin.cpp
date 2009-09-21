@@ -49,7 +49,6 @@ void Spin::SetArrowsSize(int size)
 
 	_arrows_size = size;
 
-	// TODO:: corrigir
 	if (_type == HORIZONTAL_SPIN) {
 		if (_arrows_size > (_width-4)/2) {
 			_arrows_size = (_width-4)/2;
@@ -313,7 +312,7 @@ void Spin::Paint(Graphics *g)
 			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
 
 			if (_list.size() > 0) {
-				g->DrawStringJustified(TruncateString(_list[_index], _width-20), 5, (CENTER_VERTICAL_TEXT), _width-10, _height, CENTER_ALIGN);
+				g->DrawString(TruncateString(_list[_index], _width-20), 5, (CENTER_VERTICAL_TEXT), _width-10, _height, CENTER_ALIGN);
 			}
 		} else if (_type == VERTICAL_SPIN) {
 			int dx = _width-2*_arrows_size-10,
@@ -332,7 +331,7 @@ void Spin::Paint(Graphics *g)
 			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
 
 			if (_list.size() > 0) {
-				g->DrawStringJustified(TruncateString(_list[_index], _width-20), 10, (CENTER_VERTICAL_TEXT), _width-10, _height, LEFT_ALIGN);
+				g->DrawString(TruncateString(_list[_index], _width-20), 10, (CENTER_VERTICAL_TEXT), _width-10, _height, LEFT_ALIGN);
 			}
 		}
 	}
@@ -417,7 +416,9 @@ void Spin::RegisterSelectListener(SelectListener *listener)
 		return;
 	}
 
-	_select_listeners.push_back(listener);
+	if (std::find(_select_listeners.begin(), _select_listeners.end(), listener) == _select_listeners.end()) {
+		_select_listeners.push_back(listener);
+	}
 }
 
 void Spin::RemoveSelectListener(SelectListener *listener)
@@ -426,12 +427,10 @@ void Spin::RemoveSelectListener(SelectListener *listener)
 		return;
 	}
 
-	for (std::vector<SelectListener *>::iterator i=_select_listeners.begin(); i!=_select_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_select_listeners.erase(i);
+	std::vector<SelectListener *>::iterator i = std::find(_select_listeners.begin(), _select_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _select_listeners.end()) {
+		_select_listeners.erase(i);
 	}
 }
 

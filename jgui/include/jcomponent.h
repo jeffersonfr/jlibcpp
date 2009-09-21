@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef COMPONENT_H
-#define COMPONENT_H
+#ifndef J_COMPONENT_H
+#define J_COMPONENT_H
 
 #include "jobject.h"
 #include "jguilib.h"

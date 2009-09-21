@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef MOUSEEVENT_H
-#define MOUSEEVENT_H
+#ifndef J_MOUSEEVENT_H
+#define J_MOUSEEVENT_H
 
 #include "jeventobject.h"
 

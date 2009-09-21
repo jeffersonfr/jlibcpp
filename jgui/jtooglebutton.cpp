@@ -187,7 +187,7 @@ void ToogleButton::Paint(Graphics *g)
 					ts = 0;
 				}
 
-				g->DrawStringJustified(TruncateString(GetName(), ts), align_dx, (CENTER_VERTICAL_TEXT), _width-align_dx, font_height, LEFT_ALIGN);
+				g->DrawString(TruncateString(GetName(), ts), align_dx, (CENTER_VERTICAL_TEXT), _width-align_dx, font_height, LEFT_ALIGN);
 				g->DrawImage(prefetch1, 5, 0, _height, _height);
 			}
 		} else {
@@ -197,7 +197,7 @@ void ToogleButton::Paint(Graphics *g)
 				ts = 0;
 			}
 
-			g->DrawStringJustified(TruncateString(GetName(), ts), align_dx, (CENTER_VERTICAL_TEXT), _width-align_dx, _height, _align);
+			g->DrawString(TruncateString(GetName(), ts), align_dx, (CENTER_VERTICAL_TEXT), _width-align_dx, _height, _align);
 		}
 	}
 

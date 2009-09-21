@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef BORDERLAYOUT_H
-#define BORDERLAYOUT_H
+#ifndef J_BORDERLAYOUT_H
+#define J_BORDERLAYOUT_H
 
 #include "jlayout.h"
 #include "jcomponent.h"

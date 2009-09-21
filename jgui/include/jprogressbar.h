@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef	PROGRESSBAR_H
-#define PROGRESSBAR_H
+#ifndef	J_PROGRESSBAR_H
+#define J_PROGRESSBAR_H
 
 #include "jcomponent.h"
 #include "jthread.h"

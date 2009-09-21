@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CALENDAREVENT_H
-#define CALENDAREVENT_H
+#ifndef J_CALENDAREVENT_H
+#define J_CALENDAREVENT_H
 
 #include "jeventobject.h"
 

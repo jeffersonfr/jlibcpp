@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CONTAINER_H
-#define CONTAINER_H
+#ifndef J_CONTAINER_H
+#define J_CONTAINER_H
 
 #include "jobject.h"
 #include "jguilib.h"

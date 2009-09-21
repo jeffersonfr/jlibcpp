@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CHECKBUTTONEVENT_H
-#define CHECKBUTTONEVENT_H
+#ifndef J_CHECKBUTTONEVENT_H
+#define J_CHECKBUTTONEVENT_H
 
 #include "jeventobject.h"
 

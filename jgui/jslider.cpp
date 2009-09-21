@@ -338,7 +338,9 @@ void Slider::RegisterAdjustmentListener(AdjustmentListener *listener)
 		return;
 	}
 
-	_adjust_listeners.push_back(listener);
+	if (std::find(_adjust_listeners.begin(), _adjust_listeners.end(), listener) == _adjust_listeners.end()) {
+		_adjust_listeners.push_back(listener);
+	}
 }
 
 void Slider::RemoveAdjustmentListener(AdjustmentListener *listener)
@@ -347,12 +349,10 @@ void Slider::RemoveAdjustmentListener(AdjustmentListener *listener)
 		return;
 	}
 
-	for (std::vector<AdjustmentListener *>::iterator i=_adjust_listeners.begin(); i!=_adjust_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_adjust_listeners.erase(i);
+	std::vector<AdjustmentListener *>::iterator i = std::find(_adjust_listeners.begin(), _adjust_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _adjust_listeners.end()) {
+		_adjust_listeners.erase(i);
 	}
 }
 

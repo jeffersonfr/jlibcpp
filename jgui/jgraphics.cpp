@@ -2376,7 +2376,7 @@ jpoint_t Graphics::Translate()
 	return _translate;
 }
 
-void Graphics::DrawStringJustified(std::string full_text, int xp, int yp, int wp, int hp, jalign_t align)
+void Graphics::DrawString(std::string full_text, int xp, int yp, int wp, int hp, jalign_t align)
 {
 	if (wp <= 0 || hp <= 0) {
 		return;
@@ -2731,7 +2731,6 @@ void Graphics::SetRGB(int xp, int yp, uint32_t rgb)
 	dst = (uint32_t *)((uint8_t *)ptr + y * pitch);
 
 	if (_draw_flags == NOFX_FLAG) {
-		// TODO:: usar w e h para limitar
 		*(dst+x) = rgb;
 	} else if (_draw_flags == BLEND_FLAG) {
 		int pixel = *(dst+x),

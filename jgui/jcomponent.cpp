@@ -213,7 +213,7 @@ void Component::PaintBorder(Graphics *g)
 	int step = 0x20;
 
 	// g->SetColor(_border_red, _border_green, _border_blue, _border_alpha);
-	g->SetLineWidth(_border_size);
+	g->SetLineWidth(1);//_border_size);
 
 	if (HasFocus() == true) {
 		dr = _borderfocus_red;
@@ -1101,13 +1101,9 @@ void Component::RegisterFocusListener(FocusListener *listener)
 		return;
 	}
 
-	for (std::vector<FocusListener *>::iterator i=_focus_listeners.begin(); i!=_focus_listeners.end(); i++) {
-		if ((*i) == listener) {
-			return;
-		}
+	if (std::find(_focus_listeners.begin(), _focus_listeners.end(), listener) == _focus_listeners.end()) {
+		_focus_listeners.push_back(listener);
 	}
-
-	_focus_listeners.push_back(listener);
 }
 
 void Component::RemoveFocusListener(FocusListener *listener)
@@ -1116,12 +1112,10 @@ void Component::RemoveFocusListener(FocusListener *listener)
 		return;
 	}
 
-	for (std::vector<FocusListener *>::iterator i=_focus_listeners.begin(); i!=_focus_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_focus_listeners.erase(i);
-
-			break;
-		}
+	std::vector<FocusListener *>::iterator i = std::find(_focus_listeners.begin(), _focus_listeners.end(), listener);
+	
+	if (i != _focus_listeners.end()) {
+		_focus_listeners.erase(i);
 	}
 }
 
@@ -1153,13 +1147,9 @@ void Component::RegisterComponentListener(ComponentListener *listener)
 		return;
 	}
 
-	for (std::vector<ComponentListener *>::iterator i=_component_listeners.begin(); i!=_component_listeners.end(); i++) {
-		if ((*i) == listener) {
-			return;
-		}
+	if (std::find(_component_listeners.begin(), _component_listeners.end(), listener) == _component_listeners.end()) {
+		_component_listeners.push_back(listener);
 	}
-
-	_component_listeners.push_back(listener);
 }
 
 void Component::RemoveComponentListener(ComponentListener *listener)
@@ -1168,12 +1158,10 @@ void Component::RemoveComponentListener(ComponentListener *listener)
 		return;
 	}
 
-	for (std::vector<ComponentListener *>::iterator i=_component_listeners.begin(); i!=_component_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_component_listeners.erase(i);
+	std::vector<ComponentListener *>::iterator i = std::find(_component_listeners.begin(), _component_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _component_listeners.end()) {
+		_component_listeners.erase(i);
 	}
 }
 

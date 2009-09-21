@@ -92,7 +92,7 @@ Keyboard::~Keyboard()
 
 	jthread::AutoLock lock(&_key_mutex);
 
-	_listeners.clear();
+	_keyboard_listeners.clear();
 
 	while (_buttons.size() > 0) {
 			Button *b = (*_buttons.begin());
@@ -870,7 +870,9 @@ void Keyboard::RegisterKeyboardListener(KeyboardListener *listener)
 				return;
 		}
 
-		_listeners.push_back(listener);
+		if (std::find(_keyboard_listeners.begin(), _keyboard_listeners.end(), listener) == _keyboard_listeners.end()) {
+			_keyboard_listeners.push_back(listener);
+		}
 }
 
 void Keyboard::RemoveKeyboardListener(KeyboardListener *listener)
@@ -879,12 +881,10 @@ void Keyboard::RemoveKeyboardListener(KeyboardListener *listener)
 				return;
 		}
 
-		for (std::vector<KeyboardListener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
-				if ((*i) == listener) {
-						_listeners.erase(i);
+		std::vector<KeyboardListener *>::iterator i = std::find(_keyboard_listeners.begin(), _keyboard_listeners.end(), listener);
 
-						break;
-				}
+		if (i != _keyboard_listeners.end()) {
+			_keyboard_listeners.erase(i);
 		}
 }
 
@@ -894,7 +894,7 @@ void Keyboard::DispatchEvent(KeyboardEvent *event)
 				return;
 		}
 
-		for (std::vector<KeyboardListener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
+		for (std::vector<KeyboardListener *>::iterator i=_keyboard_listeners.begin(); i!=_keyboard_listeners.end(); i++) {
 				(*i)->KeyboardUpdated(event);
 		}
 
@@ -903,7 +903,7 @@ void Keyboard::DispatchEvent(KeyboardEvent *event)
 
 std::vector<KeyboardListener *> & Keyboard::GetKeyboardListeners()
 {
-	return _listeners;
+	return _keyboard_listeners;
 }
 
 }

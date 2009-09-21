@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef FOCUSEVENT_H
-#define FOCUSEVENT_H
+#ifndef J_FOCUSEVENT_H
+#define J_FOCUSEVENT_H
 
 #include "jeventobject.h"
 

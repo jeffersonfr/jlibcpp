@@ -38,16 +38,10 @@ LoggerManager::~LoggerManager()
 
 LoggerManager * LoggerManager::GetInstance()
 {
-	{
-		jLibLock();
-
-		if (_manager == NULL) {
-			_manager = new LoggerManager();
-		}
-
-		jLibUnlock();
+	if (_manager == NULL) {
+		_manager = new LoggerManager();
 	}
-    
+
 	return _manager;
 }
     

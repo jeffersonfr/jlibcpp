@@ -49,14 +49,8 @@ ThemeManager::~ThemeManager()
 
 ThemeManager * ThemeManager::GetInstance()
 {
-	{
-		jLibLock();
-
-		if (_instance == NULL) {
-			_instance = new ThemeManager();
-		}
-
-		jLibUnlock();
+	if (_instance == NULL) {
+		_instance = new ThemeManager();
 	}
 
 	return _instance;

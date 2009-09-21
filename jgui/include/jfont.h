@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef FONT_H
-#define FONT_H
+#ifndef J_FONT_H
+#define J_FONT_H
 
 #include "jobject.h"
 #include "jmutex.h"

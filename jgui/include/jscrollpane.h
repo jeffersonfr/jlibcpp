@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef SCROLLPANE_H
-#define SCROLLPANE_H
+#ifndef J_SCROLLPANE_H
+#define J_SCROLLPANE_H
 
 #include "jguilib.h"
 #include "jcontainer.h"

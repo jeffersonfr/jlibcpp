@@ -67,7 +67,9 @@ URL::URL(std::string url_):
 		_file = _host;
 		_query = "/";
 	} else {
-		_query = "/" + host.GetToken(1);
+		for (int i=1; i<host.GetSize(); i++) {
+			_query = _query + "/" + host.GetToken(i);
+		}
 
 		uint32_t index = _query.rfind("/");
 

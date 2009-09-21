@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef FOCUSLISTENER_H
-#define FOCUSLISTENER_H
+#ifndef J_FOCUSLISTENER_H
+#define J_FOCUSLISTENER_H
 
 #include "jfocusevent.h"
 #include "jlistener.h"

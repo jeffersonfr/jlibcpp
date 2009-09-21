@@ -470,7 +470,9 @@ void CalendarDialog::RegisterCalendarListener(CalendarListener *listener)
 		return;
 	}
 
-	_calendar_listeners.push_back(listener);
+	if (std::find(_calendar_listeners.begin(), _calendar_listeners.end(), listener) == _calendar_listeners.end()) {
+		_calendar_listeners.push_back(listener);
+	}
 }
 
 void CalendarDialog::RemoveCalendarListener(CalendarListener *listener)
@@ -479,12 +481,10 @@ void CalendarDialog::RemoveCalendarListener(CalendarListener *listener)
 		return;
 	}
 
-	for (std::vector<CalendarListener *>::iterator i=_calendar_listeners.begin(); i!=_calendar_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_calendar_listeners.erase(i);
-
-			break;
-		}
+	std::vector<CalendarListener *>::iterator i = std::find(_calendar_listeners.begin(), _calendar_listeners.end(), listener);
+	
+	if (i != _calendar_listeners.end()) {
+		_calendar_listeners.erase(i);
 	}
 }
 

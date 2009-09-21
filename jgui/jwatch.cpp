@@ -204,14 +204,14 @@ void Watch::Paint(Graphics *g)
 			t[19] = '\0';
 
 			g->SetColor(_fg_red, _fg_blue, _fg_blue, _fg_alpha);
-			g->DrawStringJustified((char *)(t+10), 5, (CENTER_VERTICAL_TEXT), _width, _height, CENTER_ALIGN);
+			g->DrawString((char *)(t+10), 5, (CENTER_VERTICAL_TEXT), _width, _height, CENTER_ALIGN);
 		} else if (_type == CRONOMETERUP_WATCH || _type == CRONOMETERDOWN_WATCH) {
 			char tmp[256];
 
 			sprintf(tmp, "%02d:%02d:%02d", _hour, _minute, _second);
 
 			g->SetColor(_fg_red, _fg_blue, _fg_blue, _fg_alpha);
-			g->DrawStringJustified(tmp, 5, (CENTER_VERTICAL_TEXT), _width, _height, CENTER_ALIGN);
+			g->DrawString(tmp, 5, (CENTER_VERTICAL_TEXT), _width, _height, CENTER_ALIGN);
 		}
 	}
 

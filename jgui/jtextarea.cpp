@@ -765,7 +765,9 @@ void TextArea::RegisterTextListener(TextListener *listener)
 		return;
 	}
 
-	_text_listeners.push_back(listener);
+	if (std::find(_text_listeners.begin(), _text_listeners.end(), listener) == _text_listeners.end()) {
+		_text_listeners.push_back(listener);
+	}
 }
 
 void TextArea::RemoveTextListener(TextListener *listener)
@@ -774,12 +776,10 @@ void TextArea::RemoveTextListener(TextListener *listener)
 		return;
 	}
 
-	for (std::vector<TextListener *>::iterator i=_text_listeners.begin(); i!=_text_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_text_listeners.erase(i);
+	std::vector<TextListener *>::iterator i = std::find(_text_listeners.begin(), _text_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _text_listeners.end()) {
+		_text_listeners.erase(i);
 	}
 }
 

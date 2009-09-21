@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef INPUTMANAGER_H
-#define INPUTMANAGER_H
+#ifndef J_INPUTMANAGER_H
+#define J_INPUTMANAGER_H
 
 #include "jcomponent.h"
 #include "jkeylistener.h"

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef LISTBOX_H
-#define LISTBOX_H
+#ifndef J_LISTBOX_H
+#define J_LISTBOX_H
 
 #include "jbutton.h"
 #include "jtextarea.h"
@@ -86,7 +86,7 @@ class ListBox : public ButtonListener, public Component{
 		};
 
 	private:
-		std::vector<SelectListener *> _listeners;
+		std::vector<SelectListener *> _listbox_listeners;
 		std::vector<listbox_t> _items;
 		int bx,
 			by,

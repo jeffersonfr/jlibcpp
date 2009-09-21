@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef MENULISTENER_H
-#define MENULISTENER_H
+#ifndef J_MENULISTENER_H
+#define J_MENULISTENER_H
 
 #include "jmenuevent.h"
 #include "jlistener.h"

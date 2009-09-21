@@ -39,14 +39,8 @@ WindowManager::~WindowManager()
 
 WindowManager * WindowManager::GetInstance()
 {
-	{
-		jLibLock();
-
-		if (_instance == NULL) {
-			_instance = new WindowManager();
-		}
-
-		jLibUnlock();
+	if (_instance == NULL) {
+		_instance = new WindowManager();
 	}
 
 	return _instance;

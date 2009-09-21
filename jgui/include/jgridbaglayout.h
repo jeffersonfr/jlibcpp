@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef GRIDBAGLAYOUT_H
-#define GRIDBAGLAYOUT_H
+#ifndef J_GRIDBAGLAYOUT_H
+#define J_GRIDBAGLAYOUT_H
 
 #include "jlayout.h"
 #include "jcomponent.h"

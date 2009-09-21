@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KEYEVENT_H
-#define KEYEVENT_H
+#ifndef J_KEYEVENT_H
+#define J_KEYEVENT_H
 
 #include "jeventobject.h"
 
@@ -41,7 +41,8 @@ namespace jgui {
  */
 enum jkey_type_t {
 	JKEY_PRESSED,
-	JKEY_RELEASED
+	JKEY_RELEASED,
+	JKEY_TYPED
 };
 
 /**
@@ -262,7 +263,11 @@ class KeyEvent : public jcommon::EventObject{
 		 */
 		virtual ~KeyEvent();
 
-		int GetCode();
+		/**
+		 * \brief
+		 *
+		 */
+		int GetKeyCode();
 		
 		/**
 		 * \brief

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef BUTTON_H
-#define BUTTON_H
+#ifndef J_BUTTON_H
+#define J_BUTTON_H
 
 #include "jcomponent.h"
 

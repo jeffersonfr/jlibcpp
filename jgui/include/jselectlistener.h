@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef SELECTLISTENER_H
-#define SELECTLISTENER_H
+#ifndef J_SELECTLISTENER_H
+#define J_SELECTLISTENER_H
 
 #include "jselectevent.h"
 #include "jlistener.h"

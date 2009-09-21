@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef TEXTDIALOG_H
-#define TEXTDIALOG_H
+#ifndef J_TEXTDIALOG_H
+#define J_TEXTDIALOG_H
 
 #include "jbutton.h"
 #include "jbuttonlistener.h"

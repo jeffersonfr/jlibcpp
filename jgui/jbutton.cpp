@@ -54,7 +54,11 @@ void Button::AddName(std::string name)
 
 void Button::RemoveName(int index)
 {
-	// TODO::
+	if (index >= (int)_name_list.size()) {
+		return;
+	}
+
+	_name_list.erase(_name_list.begin()+index);
 }
 
 void Button::SetCurrentNameIndex(int index)
@@ -198,7 +202,7 @@ void Button::Paint(Graphics *g)
 			gap = 0;
 		}
 
-		g->DrawStringJustified(TruncateString(GetName(), _width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, _align);
+		g->DrawString(TruncateString(GetName(), _width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, _align);
 	}
 
 	PaintBorder(g);
@@ -216,7 +220,9 @@ void Button::RegisterButtonListener(ButtonListener *listener)
 		return;
 	}
 
-	_button_listeners.push_back(listener);
+	if (std::find(_button_listeners.begin(), _button_listeners.end(), listener) == _button_listeners.end()) {
+		_button_listeners.push_back(listener);
+	}
 }
 
 void Button::RemoveButtonListener(ButtonListener *listener)
@@ -225,12 +231,10 @@ void Button::RemoveButtonListener(ButtonListener *listener)
 		return;
 	}
 
-	for (std::vector<ButtonListener *>::iterator i=_button_listeners.begin(); i!=_button_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_button_listeners.erase(i);
-
-			break;
-		}
+	std::vector<ButtonListener *>::iterator i = std::find(_button_listeners.begin(), _button_listeners.end(), listener);
+	
+	if (i != _button_listeners.end()) {
+		_button_listeners.erase(i);
 	}
 }
 

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef MESSAGEDIALOG_H
-#define MESSAGEDIALOG_H
+#ifndef J_MESSAGEDIALOG_H
+#define J_MESSAGEDIALOG_H
 
 #include "jbutton.h"
 #include "jbuttonlistener.h"

@@ -183,7 +183,7 @@ void ImageButton::Paint(Graphics *g)
 					gap = 0;
 				}
 
-				g->DrawStringJustified(TruncateString(GetName(), _width-2*gap), _height+gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, LEFT_ALIGN);
+				g->DrawString(TruncateString(GetName(), _width-2*gap), _height+gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, LEFT_ALIGN);
 			}
 		} else {
 			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
@@ -194,7 +194,7 @@ void ImageButton::Paint(Graphics *g)
 				gap = 0;
 			}
 
-			g->DrawStringJustified(TruncateString(GetName(), _width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, _align);
+			g->DrawString(TruncateString(GetName(), _width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, _align);
 		}
 	}
 

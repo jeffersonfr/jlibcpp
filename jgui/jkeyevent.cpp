@@ -36,7 +36,7 @@ KeyEvent::~KeyEvent()
 {
 }
 
-int KeyEvent::GetCode()
+int KeyEvent::GetKeyCode()
 {
 	return _code;
 }

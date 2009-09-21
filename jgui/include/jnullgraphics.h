@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef NULLGRAPHICS_H
-#define NULLGRAPHICS_H
+#ifndef J_NULLGRAPHICS_H
+#define J_NULLGRAPHICS_H
 
 #include "jgraphics.h"
 
@@ -392,7 +392,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void DrawStringJustified(std::string full_text, int x, int y, int width, int height, int align = 3);
+		virtual void DrawString(std::string full_text, int x, int y, int width, int height, int align = 3);
 
 		/**
 		 * \brief

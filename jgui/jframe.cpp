@@ -320,7 +320,7 @@ void Frame::Paint(Graphics *g)
 			}
 
 			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			// g->DrawStringJustified(_title, 0, dy, _width, _height, 1);
+			// g->DrawString(_title, 0, dy, _width, _height, 1);
 			g->DrawString(_title, (_width-_font->GetStringWidth(_title))/2, dy);
 		}
 	}
@@ -627,13 +627,9 @@ void Frame::RegisterInputListener(FrameInputListener *listener)
 		return;
 	}
 
-	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		if ((*i) == listener) {
-			return;
-		}
+	if (std::find(_key_listeners.begin(), _key_listeners.end(), listener) == _key_listeners.end()) {
+		_key_listeners.push_back(listener);
 	}
-
-	_key_listeners.push_back(listener);
 }
 
 void Frame::RemoveInputListener(FrameInputListener *listener)
@@ -642,12 +638,10 @@ void Frame::RemoveInputListener(FrameInputListener *listener)
 		return;
 	}
 
-	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_key_listeners.erase(i);
+	std::vector<FrameInputListener *>::iterator i = std::find(_key_listeners.begin(), _key_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _key_listeners.end()) {
+		_key_listeners.erase(i);
 	}
 }
 

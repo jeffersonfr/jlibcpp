@@ -49,8 +49,8 @@ void Display::Paint(jgui::Graphics *g)
 		size = GetFont()->GetHeight();
 	}
 
-	g->DrawStringJustified(_text, 0, (_height-size)/2, _width-10, _height-4, jgui::RIGHT_ALIGN);
-	g->DrawStringJustified(_operation, 10, (_height-size)/2, 30, _height-4, jgui::LEFT_ALIGN);
+	g->DrawString(_text, 0, (_height-size)/2, _width-10, _height-4, jgui::RIGHT_ALIGN);
+	g->DrawString(_operation, 10, (_height-size)/2, 30, _height-4, jgui::LEFT_ALIGN);
 }
 
 void Display::SetOperation(std::string text)

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CANVAS_H
-#define CANVAS_H
+#ifndef J_CANVAS_H
+#define J_CANVAS_H
 
 #include "jcomponent.h"
 

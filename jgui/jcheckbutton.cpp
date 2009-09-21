@@ -175,7 +175,7 @@ void CheckButton::Paint(Graphics *g)
 		*/
 
 		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-		g->DrawStringJustified(TruncateString(_label, _width-(size+15)), size+10, (CENTER_VERTICAL_TEXT), _width, _height, LEFT_ALIGN);
+		g->DrawString(TruncateString(_label, _width-(size+15)), size+10, (CENTER_VERTICAL_TEXT), _width, _height, LEFT_ALIGN);
 	}
 
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
@@ -221,7 +221,9 @@ void CheckButton::RegisterCheckButtonListener(CheckButtonListener *listener)
 		return;
 	}
 
-	_check_listeners.push_back(listener);
+	if (std::find(_check_listeners.begin(), _check_listeners.end(), listener) == _check_listeners.end()) {
+		_check_listeners.push_back(listener);
+	}
 }
 
 void CheckButton::RemoveCheckButtonListener(CheckButtonListener *listener)
@@ -230,12 +232,10 @@ void CheckButton::RemoveCheckButtonListener(CheckButtonListener *listener)
 		return;
 	}
 
-	for (std::vector<CheckButtonListener *>::iterator i=_check_listeners.begin(); i!=_check_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_check_listeners.erase(i);
-
-			break;
-		}
+	std::vector<CheckButtonListener *>::iterator i = std::find(_check_listeners.begin(), _check_listeners.end(), listener);
+	
+	if (i != _check_listeners.end()) {
+		_check_listeners.erase(i);
 	}
 }
 

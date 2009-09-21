@@ -180,8 +180,8 @@ void Icon::Paint(Graphics *g)
 			gap = 0;
 		}
 
-		g->DrawStringJustified(TruncateString(_text, _width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, CENTER_ALIGN);
-		// CHANGED:: g->DrawStringJustified(TruncateString(_text, _width-10), 5, 5, _width-10, _height, CENTER_ALIGN);
+		g->DrawString(TruncateString(_text, _width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, CENTER_ALIGN);
+		// CHANGED:: g->DrawString(TruncateString(_text, _width-10), 5, 5, _width-10, _height, CENTER_ALIGN);
 	}
 
 	PaintBorder(g);

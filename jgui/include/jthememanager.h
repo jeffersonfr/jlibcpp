@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef THEMEMANAGER_H
-#define THEMEMANAGER_H
+#ifndef J_THEMEMANAGER_H
+#define J_THEMEMANAGER_H
 
 #include "jtheme.h"
 

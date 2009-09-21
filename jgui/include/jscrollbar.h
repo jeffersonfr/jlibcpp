@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef	SCROLLBAR_H
-#define SCROLLBAR_H
+#ifndef	J_SCROLLBAR_H
+#define J_SCROLLBAR_H
 
 #include "jcomponent.h"
 #include "jadjustmentlistener.h"

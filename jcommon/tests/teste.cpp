@@ -129,7 +129,7 @@ void testStringToken()
 
 void testURL()
 {
-	jcommon::URL url_01("http://www.google.com");
+ 	jcommon::URL url_01("http://www.google.com");
 	jcommon::URL url_02("http://charges.com/a?a=1");
 	jcommon::URL url_03("ftp://www.lavid.ufpb.br/cvs#ref");
 	jcommon::URL url_04("http://phrack.com:80/?a=1&b=2");

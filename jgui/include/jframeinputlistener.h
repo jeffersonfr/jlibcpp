@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef FRAMEINPUTLISTENER_H
-#define FRAMEINPUTLISTENER_H
+#ifndef J_FRAMEINPUTLISTENER_H
+#define J_FRAMEINPUTLISTENER_H
 
 #include "jkeylistener.h"
 #include "jmouselistener.h"

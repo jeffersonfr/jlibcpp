@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef COMPONENTLISTENER_H
-#define COMPONENTLISTENER_H
+#ifndef J_COMPONENTLISTENER_H
+#define J_COMPONENTLISTENER_H
 
 #include "jcomponentevent.h"
 #include "jlistener.h"

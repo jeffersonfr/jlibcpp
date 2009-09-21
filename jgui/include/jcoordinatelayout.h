@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef COORDINATELAYOUT_H
-#define COORDINATELAYOUT_H
+#ifndef J_COORDINATELAYOUT_H
+#define J_COORDINATELAYOUT_H
 
 #include "jlayout.h"
 #include "jcontainer.h"

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CONTAINERLISTENER_H
-#define CONTAINERLISTENER_H
+#ifndef J_CONTAINERLISTENER_H
+#define J_CONTAINERLISTENER_H
 
 #include "jcontainerevent.h"
 #include "jlistener.h"

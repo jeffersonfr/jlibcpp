@@ -29,10 +29,12 @@
 #include <stdlib.h>
 #include <signal.h>
 
-#define screenWidth 1920/2
-#define screenHeight 1080/2
+#define screenWidth 1920
+#define screenHeight 1080
+
 #define texWidth 64
 #define texHeight 64
+
 #define mapWidth 24
 #define mapHeight 24
 

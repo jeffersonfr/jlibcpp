@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef WINDOWMANAGER_H
-#define WINDOWMANAGER_H
+#ifndef J_WINDOWMANAGER_H
+#define J_WINDOWMANAGER_H
 
 #include "jwindow.h"
 #include "jobject.h"

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CHECKButton_H
-#define CHECKButton_H
+#ifndef J_CHECKButton_H
+#define J_CHECKButton_H
 
 #include "jcomponent.h"
 

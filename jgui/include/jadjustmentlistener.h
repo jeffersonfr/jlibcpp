@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef ADJUSTMENTLISTENER_H
-#define ADJUSTMENTLISTENER_H
+#ifndef J_ADJUSTMENTLISTENER_H
+#define J_ADJUSTMENTLISTENER_H
 
 #include "jadjustmentevent.h"
 #include "jlistener.h"

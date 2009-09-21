@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef ANIMATION_H
-#define ANIMATION_H
+#ifndef J_ANIMATION_H
+#define J_ANIMATION_H
 
 #include "jruntimeexception.h"
 #include "jstringtokenizer.h"

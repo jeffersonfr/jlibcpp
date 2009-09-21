@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef TEXTEVENT_H
-#define TEXTEVENT_H
+#ifndef J_TEXTEVENT_H
+#define J_TEXTEVENT_H
 
 #include "jeventobject.h"
 

@@ -89,10 +89,10 @@ void Label::Paint(Graphics *g)
 		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
 
 		if (_wrap == false && _truncate_string == true) {
-			g->DrawStringJustified(TruncateString(_text, _width-2*_horizontal_gap), _horizontal_gap, (CENTER_VERTICAL_TEXT), _width-2*_horizontal_gap, _height, _align);
+			g->DrawString(TruncateString(_text, _width-2*_horizontal_gap), _horizontal_gap, (CENTER_VERTICAL_TEXT), _width-2*_horizontal_gap, _height, _align);
 		} else {
-			// g->DrawStringJustified(TruncateString(_text, _width-2*_horizontal_gap), _horizontal_gap, _vertical_gap, _width-2*_horizontal_gap, _height, _align);
-			g->DrawStringJustified(_text, _horizontal_gap, _vertical_gap, _width-2*_horizontal_gap, _height, _align);
+			// g->DrawString(TruncateString(_text, _width-2*_horizontal_gap), _horizontal_gap, _vertical_gap, _width-2*_horizontal_gap, _height, _align);
+			g->DrawString(_text, _horizontal_gap, _vertical_gap, _width-2*_horizontal_gap, _height, _align);
 		}
 	}
 

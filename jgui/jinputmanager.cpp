@@ -381,16 +381,10 @@ jkey_symbol_t InputManager::TranslateToDFBKeySymbol(DFBInputDeviceKeySymbol symb
 
 InputManager * InputManager::GetInstance()
 {
-	{
-		jLibLock();
+	if (instance == NULL){
+		instance = new InputManager();
 
-		if (instance == NULL){
-			instance = new InputManager();
-
-			instance->Start();
-		}
-
-		jLibUnlock();
+		instance->Start();
 	}
 
 	return instance;
@@ -481,25 +475,19 @@ void InputManager::RegisterKeyListener(KeyListener *listener)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<KeyListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		if (listener == (*i)) {
-			return;
-		}
+	if (std::find(_key_listeners.begin(), _key_listeners.end(), listener) == _key_listeners.end()) {
+		_key_listeners.push_back(listener);
 	}
-
-	_key_listeners.push_back(listener);
 }
 
 void InputManager::RemoveKeyListener(KeyListener *listener) 
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<KeyListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		if (listener == (*i)) {
-			_key_listeners.erase(i);
+	std::vector<KeyListener *>::iterator i = std::find(_key_listeners.begin(), _key_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _key_listeners.end()) {
+			_key_listeners.erase(i);
 	}
 
 	for (std::map<KeyListener *, KeyProcess *>::iterator i=_key_processors.begin(); i!=_key_processors.end(); i++) {
@@ -572,13 +560,9 @@ void InputManager::RegisterMouseListener(MouseListener *listener)
 	}
 #endif
 
-	for (std::vector<MouseListener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
-		if (listener == (*i)) {
-			return;
-		}
+	if (std::find(_mouse_listeners.begin(), _mouse_listeners.end(), listener) == _mouse_listeners.end()) {
+		_mouse_listeners.push_back(listener);
 	}
-
-	_mouse_listeners.push_back(listener);
 }
 
 void InputManager::RemoveMouseListener(MouseListener *listener) 
@@ -595,12 +579,10 @@ void InputManager::RemoveMouseListener(MouseListener *listener)
 	}
 #endif
 
-	for (std::vector<MouseListener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
-		if (listener == (*i)) {
-			_mouse_listeners.erase(i);
+	std::vector<MouseListener *>::iterator i = std::find(_mouse_listeners.begin(), _mouse_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _mouse_listeners.end()) {
+		_mouse_listeners.erase(i);
 	}
 
 	for (std::map<MouseListener *, MouseProcess *>::iterator i=_mouse_processors.begin(); i!=_mouse_processors.end(); i++) {
@@ -829,8 +811,7 @@ void InputManager::Run()
 									type, 
 									mod, 
 									TranslateToDFBKeyCode(event.key_code), 
-									TranslateToDFBKeySymbol(event.key_symbol
-										)));
+									TranslateToDFBKeySymbol(event.key_symbol)));
 					}
 
 					// 1.3 events->Reset(events);

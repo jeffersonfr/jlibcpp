@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KEYLISTENER_H
-#define KEYLISTENER_H
+#ifndef J_KEYLISTENER_H
+#define J_KEYLISTENER_H
 
 #include "jkeyevent.h"
 #include "jlistener.h"

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef YESNODIALOG_H
-#define YESNODIALOG_H
+#ifndef J_YESNODIALOG_H
+#define J_YESNODIALOG_H
 
 #include "jbutton.h"
 #include "jbuttonlistener.h"

@@ -124,7 +124,6 @@ int OffScreenImage::GetScaleHeight()
 
 void OffScreenImage::Release()
 {
-	// TODO:: gravar o array em um buffer interno
 #ifdef DIRECTFB_UI
 	if (graphics != NULL) {
 		IDirectFBSurface *surface = (IDirectFBSurface *)graphics->GetSurface();
@@ -162,7 +161,6 @@ void OffScreenImage::Release()
 
 void OffScreenImage::Restore()
 {
-	// TODO:: restaurar o buffer gravado durante o release
 #ifdef DIRECTFB_UI
 	if (graphics == NULL) {
 		IDirectFBSurface *surface = NULL;

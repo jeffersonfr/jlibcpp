@@ -443,7 +443,9 @@ void ComboMenu::RegisterMenuListener(MenuListener *listener)
 		return;
 	}
 
-	_listeners.push_back(listener);
+	if (std::find(_menu_listeners.begin(), _menu_listeners.end(), listener) == _menu_listeners.end()) {
+		_menu_listeners.push_back(listener);
+	}
 }
 
 void ComboMenu::RemoveMenuListener(MenuListener *listener)
@@ -452,12 +454,10 @@ void ComboMenu::RemoveMenuListener(MenuListener *listener)
 		return;
 	}
 
-	for (std::vector<MenuListener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_listeners.erase(i);
-
-			break;
-		}
+	std::vector<MenuListener *>::iterator i = std::find(_menu_listeners.begin(), _menu_listeners.end(), listener);
+	
+	if (i != _menu_listeners.end()) {
+		_menu_listeners.erase(i);
 	}
 }
 
@@ -467,7 +467,7 @@ void ComboMenu::DispatchEvent(MenuEvent *event)
 		return;
 	}
 
-	for (std::vector<MenuListener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
+	for (std::vector<MenuListener *>::iterator i=_menu_listeners.begin(); i!=_menu_listeners.end(); i++) {
 		if (event->GetType() == CHANGE_MENU_ITEM_EVENT) {
 			(*i)->ItemChanged(event);
 		} else if (event->GetType() == SELECT_MENU_ITEM_EVENT) {
@@ -480,7 +480,7 @@ void ComboMenu::DispatchEvent(MenuEvent *event)
 
 std::vector<MenuListener *> & ComboMenu::GetMenuListeners()
 {
-	return _listeners;
+	return _menu_listeners;
 }
 
 ComboMenuComponent::ComboMenuComponent(int x, int y, int width, int visible_items):
@@ -657,15 +657,15 @@ void ComboMenuComponent::Paint(Graphics *g)
 			// TODO::
 		} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
 			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawStringJustified(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
 		} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
 			if (_items[i]->_prefetch == NULL) {
 				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawStringJustified(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
 			} else {
 				g->DrawImage(_items[i]->_prefetch, 10, (font_height+_vertical_gap)*count, font_height, font_height+10);
 				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawStringJustified(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
 			}
 		} else if (_items[i]->GetType() == CHECK_MENU_ITEM) {
 			if (_items[i]->IsSelected() == true) {
@@ -673,7 +673,7 @@ void ComboMenuComponent::Paint(Graphics *g)
 			}
 
 			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawStringJustified(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
 		}
 
 		if (_items[i]->GetEnabled() == false) {
@@ -1076,7 +1076,7 @@ void ComboBox::Paint(Graphics *g)
 		g->FillTriangle(dx+0, dy+0, dx+_arrow_size, dy+0, dx+_arrow_size/2, dy+_arrow_size/2);
 
 		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-		g->DrawStringJustified(TruncateString(GetValue(), dx), 5, (CENTER_VERTICAL_TEXT), dx, _height, CENTER_ALIGN);
+		g->DrawString(TruncateString(GetValue(), dx), 5, (CENTER_VERTICAL_TEXT), dx, _height, CENTER_ALIGN);
 	}
 
 	PaintBorder(g);

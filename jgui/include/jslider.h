@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef	SLIDER_H
-#define SLIDER_H
+#ifndef	J_SLIDER_H
+#define J_SLIDER_H
 
 #include "jcomponent.h"
 #include "jscrollbar.h"

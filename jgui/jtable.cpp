@@ -549,7 +549,7 @@ void Table::Paint(Graphics *g)
 		}
 
 		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-		g->DrawStringJustified(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
+		g->DrawString(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
 	}
 
 	for (; count<_visible_items; count++) {

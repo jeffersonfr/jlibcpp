@@ -474,10 +474,10 @@ void Window::SetUndecorated(bool b)
 {
 	_undecorated = b;
 
-	_insets.left = 0;
-	_insets.right = 0;
-	_insets.top = 0;
-	_insets.bottom = 0;
+	// _insets.left = 0;
+	// _insets.right = 0;
+	// _insets.top = 0;
+	// _insets.bottom = 0;
 
 	Repaint();
 }
@@ -714,13 +714,9 @@ void Window::RegisterWindowListener(WindowListener *listener)
 		return;
 	}
 
-	for (std::vector<WindowListener *>::iterator i=_window_listeners.begin(); i!=_window_listeners.end(); i++) {
-		if ((*i) == listener) {
-			return;
-		}
+	if (std::find(_window_listeners.begin(), _window_listeners.end(), listener) == _window_listeners.end()) {
+		_window_listeners.push_back(listener);
 	}
-
-	_window_listeners.push_back(listener);
 }
 
 void Window::RemoveWindowListener(WindowListener *listener)
@@ -729,12 +725,10 @@ void Window::RemoveWindowListener(WindowListener *listener)
 		return;
 	}
 
-	for (std::vector<WindowListener *>::iterator i=_window_listeners.begin(); i!=_window_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_window_listeners.erase(i);
+	std::vector<WindowListener *>::iterator i = std::find(_window_listeners.begin(), _window_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _window_listeners.end()) {
+		_window_listeners.erase(i);
 	}
 }
 

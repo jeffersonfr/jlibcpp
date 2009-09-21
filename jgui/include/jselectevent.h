@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef SELECTEVENT_H
-#define SELECTEVENT_H
+#ifndef J_SELECTEVENT_H
+#define J_SELECTEVENT_H
 
 #include "jeventobject.h"
 

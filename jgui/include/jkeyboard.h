@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef KEYBOARD_H
-#define KEYBOARD_H
+#ifndef J_KEYBOARD_H
+#define J_KEYBOARD_H
 
 #include "jbutton.h"
 #include "jtextarea.h"
@@ -63,7 +63,7 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::F
 	private:
 		jthread::Mutex _key_mutex;
 
-		std::vector<KeyboardListener *> _listeners;
+		std::vector<KeyboardListener *> _keyboard_listeners;
 		std::vector<Button *> _buttons;
 		TextArea *display;
 		Component *_current_button;

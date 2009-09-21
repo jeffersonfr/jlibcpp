@@ -273,14 +273,13 @@ void ListBox::Paint(Graphics *g)
 		}
 
 		if (_items[i].type == EMPTY_ITEM) {
-			// TODO::
 		} else if (_items[i].type == TEXT_ITEM) {
-			g->DrawStringJustified(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
+			g->DrawString(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
 		} else if (_items[i].type == IMAGE_ITEM) {
 			if (_items[i].image == NULL) {
-				g->DrawStringJustified(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
+				g->DrawString(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
 			} else {
-				g->DrawStringJustified(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
+				g->DrawString(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
 				g->DrawImage(_items[i].image, 10, default_y, _item_size, _item_size);
 			}
 		}
@@ -815,7 +814,9 @@ void ListBox::RegisterSelectListener(SelectListener *listener)
 		return;
 	}
 
-	_listeners.push_back(listener);
+	if (std::find(_listbox_listeners.begin(), _listbox_listeners.end(), listener) == _listbox_listeners.end()) {
+		_listbox_listeners.push_back(listener);
+	}
 }
 
 void ListBox::RemoveSelectListener(SelectListener *listener)
@@ -824,12 +825,10 @@ void ListBox::RemoveSelectListener(SelectListener *listener)
 		return;
 	}
 
-	for (std::vector<SelectListener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_listeners.erase(i);
+	std::vector<SelectListener *>::iterator i = std::find(_listbox_listeners.begin(), _listbox_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _listbox_listeners.end()) {
+		_listbox_listeners.erase(i);
 	}
 }
 
@@ -839,7 +838,7 @@ void ListBox::DispatchEvent(SelectEvent *event)
 		return;
 	}
 
-	for (std::vector<SelectListener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
+	for (std::vector<SelectListener *>::iterator i=_listbox_listeners.begin(); i!=_listbox_listeners.end(); i++) {
 		if (event->GetType() == ACTION_ITEM) {
 			(*i)->ItemSelected(event);
 		} else {
@@ -852,7 +851,7 @@ void ListBox::DispatchEvent(SelectEvent *event)
 
 std::vector<SelectListener *> & ListBox::GetSelectListeners()
 {
-	return _listeners;
+	return _listbox_listeners;
 }
 
 }

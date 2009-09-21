@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef CALENDARDIALOG_H
-#define CALENDARDIALOG_H
+#ifndef J_CALENDARDIALOG_H
+#define J_CALENDARDIALOG_H
 
 #include "jbutton.h"
 #include "jcalendarlistener.h"
@@ -207,7 +207,7 @@ class CalendarDialog : public jgui::Frame, public jgui::ButtonListener, public j
 		 *
 		 */
 		void DispatchEvent(CalendarEvent *event);
-		
+	
 		/**
 		 * \brief
 		 *

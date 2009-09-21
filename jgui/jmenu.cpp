@@ -124,7 +124,7 @@ void Menu::SetTitle(std::string title)
 	} else {
 		_list->SetPosition(_border_size, _insets.top);
 		
-		SetSize(_list->GetWidth()+2*_border_size, _list->GetHeight()+2*_border_size+_insets.top);
+		SetSize(_list->GetWidth()+2*_border_size, _list->GetHeight()+1*_border_size+_insets.top);
 	}
 
 	if ((void *)graphics != NULL) {
@@ -295,6 +295,25 @@ void Menu::RemoveAll()
 	_list->RemoveAll();
 }
 
+void Menu::Paint(Graphics *g)
+{
+	Frame::Paint(g);
+	
+	if (_title != "") {
+		if (IsFontSet() == true) {
+			int font_height = _font->GetHeight(),
+					dy = (_insets.top-font_height)-15;
+
+			if (dy < 0) {
+				dy = 0;
+			}
+
+			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+			g->DrawString(_title, (_width-_font->GetStringWidth(_title))/2, dy);
+		}
+	}
+}
+
 void Menu::InputChanged(KeyEvent *event)
 {
 	jthread::AutoLock lock(&_menu_mutex);
@@ -451,7 +470,9 @@ void Menu::RegisterMenuListener(MenuListener *listener)
 		return;
 	}
 
-	_listeners.push_back(listener);
+	if (std::find(_menu_listeners.begin(), _menu_listeners.end(), listener) == _menu_listeners.end()) {
+		_menu_listeners.push_back(listener);
+	}
 }
 
 void Menu::RemoveMenuListener(MenuListener *listener)
@@ -460,12 +481,10 @@ void Menu::RemoveMenuListener(MenuListener *listener)
 		return;
 	}
 
-	for (std::vector<MenuListener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
-		if ((*i) == listener) {
-			_listeners.erase(i);
+	std::vector<MenuListener *>::iterator i = std::find(_menu_listeners.begin(), _menu_listeners.end(), listener);
 
-			break;
-		}
+	if (i != _menu_listeners.end()) {
+		_menu_listeners.erase(i);
 	}
 }
 
@@ -475,7 +494,7 @@ void Menu::DispatchEvent(MenuEvent *event)
 		return;
 	}
 
-	for (std::vector<MenuListener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
+	for (std::vector<MenuListener *>::iterator i=_menu_listeners.begin(); i!=_menu_listeners.end(); i++) {
 		if (event->GetType() == CHANGE_MENU_ITEM_EVENT) {
 			(*i)->ItemChanged(event);
 		} else if (event->GetType() == SELECT_MENU_ITEM_EVENT) {
@@ -488,7 +507,7 @@ void Menu::DispatchEvent(MenuEvent *event)
 
 std::vector<MenuListener *> & Menu::GetMenuListeners()
 {
-	return _listeners;
+	return _menu_listeners;
 }
 
 MenuComponent::MenuComponent(int x, int y, int width, int visible_items):
@@ -657,15 +676,15 @@ void MenuComponent::Paint(Graphics *g)
 			// TODO::
 		} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
 			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawStringJustified(TruncateString(_items[i]->GetValue(), _width-2*space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
 		} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
 			if (_items[i]->_prefetch == NULL) {
 				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawStringJustified(TruncateString(_items[i]->GetValue(), _width-2*space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
 			} else {
 				g->DrawImage(_items[i]->_prefetch, 10, (font_height+_vertical_gap)*count, font_height, font_height+10);
 				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawStringJustified(TruncateString(_items[i]->GetValue(), _width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
 			}
 		} else if (_items[i]->GetType() == CHECK_MENU_ITEM) {
 			if (_items[i]->IsSelected() == true) {
@@ -673,7 +692,7 @@ void MenuComponent::Paint(Graphics *g)
 			}
 
 			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawStringJustified(TruncateString(_items[i]->GetValue(), _width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
 		}
 
 		if (_items[i]->GetEnabled() == false) {

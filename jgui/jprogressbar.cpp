@@ -176,7 +176,7 @@ void ProgressBar::Paint(Graphics *g)
 
 				if (_label_visible == true) {
 					g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-					g->DrawStringJustified((char *)t, _x, _y+(CENTER_VERTICAL_TEXT), _width, _height-4, CENTER_ALIGN);
+					g->DrawString((char *)t, _x, _y+(CENTER_VERTICAL_TEXT), _width, _height-4, CENTER_ALIGN);
 				}
 			} else if (_type == BOTTOM_UP_DIRECTION) {
 				double d = (_position/100.0)*_height;
@@ -200,7 +200,7 @@ void ProgressBar::Paint(Graphics *g)
 
 				if (_label_visible == true) {
 					g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-					g->DrawStringJustified((char *)t, _x, _y+(CENTER_VERTICAL_TEXT), _width, _height-4, CENTER_ALIGN);
+					g->DrawString((char *)t, _x, _y+(CENTER_VERTICAL_TEXT), _width, _height-4, CENTER_ALIGN);
 				}
 			}
 		} else {
