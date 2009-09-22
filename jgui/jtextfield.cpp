@@ -21,6 +21,8 @@
 #include "jfocusevent.h"
 #include "jcommonlib.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 TextField::TextField(int x, int y, int width, int height, int max_text):

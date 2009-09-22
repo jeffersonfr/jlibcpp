@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "jkeyboard.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool is_password):

@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "jscrollbar.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 ScrollBar::ScrollBar(int x, int y, int width, int height):

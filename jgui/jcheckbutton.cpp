@@ -22,6 +22,8 @@
 #include "jfocusevent.h"
 #include "jcommonlib.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 CheckButton::CheckButton(jcheckbox_type_t type, std::string label, int x, int y, int width, int height):

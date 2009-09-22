@@ -25,6 +25,8 @@
 #include "jcomponentevent.h"
 #include "jcommonlib.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 Container::Container(int x, int y, int width, int height, int scale_width, int scale_height):

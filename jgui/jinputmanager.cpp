@@ -24,6 +24,7 @@
 #include "jcommonlib.h"
 
 #include <iostream>
+#include <algorithm>
 
 #define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 
@@ -811,7 +812,8 @@ void InputManager::Run()
 									type, 
 									mod, 
 									TranslateToDFBKeyCode(event.key_code), 
-									TranslateToDFBKeySymbol(event.key_symbol)));
+									TranslateToDFBKeySymbol(event.key_symbol
+										)));
 					}
 
 					// 1.3 events->Reset(events);

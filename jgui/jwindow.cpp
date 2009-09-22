@@ -24,6 +24,8 @@
 #include "jwindowmanager.h"
 #include "jthememanager.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 Window::Window(int x, int y, int width, int height, int opacity, int scale_width, int scale_height):

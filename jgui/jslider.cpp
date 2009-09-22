@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "jslider.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 Slider::Slider(int x, int y, int width, int height):

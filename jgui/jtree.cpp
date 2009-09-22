@@ -20,6 +20,8 @@
 #include "jtree.h"
 #include "jcommonlib.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 Tree::Tree(int x, int y, int width, int visible_items):

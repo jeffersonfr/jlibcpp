@@ -26,6 +26,8 @@
 #include "jthememanager.h"
 #include "jcommonlib.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 Component::Component(int x, int y, int width, int height):

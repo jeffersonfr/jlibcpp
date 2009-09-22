@@ -20,6 +20,8 @@
 #include "jcalendardialog.h"
 #include "jdate.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 CalendarDialog::CalendarDialog(int x, int y):

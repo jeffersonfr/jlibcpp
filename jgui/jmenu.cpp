@@ -20,6 +20,8 @@
 #include "jmenu.h"
 #include "jcommonlib.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 Menu::Menu(int x, int y, int width, int visible_items):

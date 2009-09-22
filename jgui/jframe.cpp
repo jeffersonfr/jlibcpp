@@ -24,6 +24,8 @@
 #include "jthememanager.h"
 #include "jwindowmanager.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 Frame::Frame(std::string title, int x, int y, int width, int height, int scale_width, int scale_height):

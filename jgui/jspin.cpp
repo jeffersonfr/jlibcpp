@@ -21,6 +21,8 @@
 #include "jfocusevent.h"
 #include "jcommonlib.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 Spin::Spin(int x, int y, int width, int height):

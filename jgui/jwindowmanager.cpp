@@ -23,6 +23,8 @@
 #include "jgraphics.h"
 #include "jcommonlib.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 WindowManager * WindowManager::_instance = NULL;
