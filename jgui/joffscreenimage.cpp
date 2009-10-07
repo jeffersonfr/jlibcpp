@@ -72,7 +72,7 @@ OffScreenImage::OffScreenImage(int width, int height, int scale_width, int scale
 
 	graphics = new Graphics(surface);
 
-	graphics->SetCurrentWorkingScreenSize(_scale_width, _scale_height);
+	graphics->SetWorkingScreenSize(_scale_width, _scale_height);
 #endif
 
 	GFXHandler::GetInstance()->Add(this);
@@ -187,7 +187,7 @@ void OffScreenImage::Restore()
 
 		graphics = new Graphics(surface);
 
-		graphics->SetCurrentWorkingScreenSize(_scale_width, _scale_height);
+		graphics->SetWorkingScreenSize(_scale_width, _scale_height);
 
 		void *ptr;
 		int pitch,

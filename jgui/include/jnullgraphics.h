@@ -50,7 +50,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetCurrentWorkingScreenSize(int width, int height);
+		virtual void SetWorkingScreenSize(int width, int height);
 
 		/**
 		 * \brief

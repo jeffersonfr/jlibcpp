@@ -43,18 +43,17 @@ File::File(std::string filename_, int flags_):
 {
 	jcommon::Object::SetClassName("jio::File");
 	
-	_dir = NULL;
 	_is_closed = true;
 	_exists = true;
 	
-	_filename = filename_;
-	
-	if (_filename == "") {
+	if (filename_ == "") {
 		_exists = false;
 		_is_closed = true;
 
 		return;
 	}
+	
+	_filename = filename_;
 	
 	// int c = filename_.size() - 1;
 	// TODO:: _filename.replace("\\", "/");
@@ -388,9 +387,9 @@ bool File::IsFile()
 	if (S_ISREG(_stat.st_mode) | S_ISFIFO(_stat.st_mode) | S_ISLNK(_stat.st_mode)) {
 		return true;
 	}
+#endif
 
 	return false;
-#endif
 }
 
 bool File::IsDirectory()
@@ -602,13 +601,12 @@ std::vector<std::string> * File::ListFiles(std::string extension)
 {
 #ifdef _WIN32
 	// TODO:: win32 list files
-	return NULL;
 #else
 	if (_type != F_DIRECTORY) {
 		return NULL;
 	}
 
-	if (_exists == false) { // _dir == NULL) {
+	if (_dir == NULL) {
 		return NULL;
 	}
 
@@ -681,7 +679,7 @@ void File::Remove()
 	
 
 	if (_type != F_DIRECTORY) {
-		int r = unlink(s.c_str());
+		int r = remove(s.c_str());
 		
 		if (r < 0) {
 			throw FileException(strerror(errno));

@@ -35,7 +35,7 @@ NullGraphics::~NullGraphics()
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::SetCurrentWorkingScreenSize(int width, int height)
+void NullGraphics::SetWorkingScreenSize(int width, int height)
 {
 	JDEBUG(JINFO, "called\n");
 }

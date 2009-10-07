@@ -443,7 +443,7 @@ void Graphics::SetBlittingFlags(jblitting_flags_t t)
 #endif
 }
 
-void Graphics::SetCurrentWorkingScreenSize(int width, int height)
+void Graphics::SetWorkingScreenSize(int width, int height)
 {
 	_scale.width = width;
 	_scale.height = height;

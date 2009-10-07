@@ -70,7 +70,7 @@ InputManager::~InputManager()
 {
 }
 
-void InputManager::SetCurrentWorkingScreenSize(int width, int height)
+void InputManager::SetWorkingScreenSize(int width, int height)
 {
 	_scale_width = width;
 	_scale_height = height;

@@ -515,6 +515,7 @@ class Streamer: public jthread::Thread{
 				if ((r = input.Read((char *)cursor, MAX)) < 188) {
 					if (loop) {
 						input.Reset();
+						// CHANGED:: primeiro = 0;
 					} else
 						break;
 				}
@@ -525,68 +526,79 @@ class Streamer: public jthread::Thread{
 				
 				uint64_t tosleep;
 #ifndef _WIN32
-				struct timeval 
+				struct timeval t1, 
+							   t2;
 #else
-				DWORD
+				DWORD t1, 
+					  t2;
 #endif
-					t1,
-					t2;
 
-				jmpeg::AdaptationField *field = jmpeg::TransportStreamPacket::GetAdaptationField(buffer);
+				if ((pid >= 0x0000 && pid <= 0x0001) || (pid >= 0x0010 && pid <= 0x1ffe)) {
+					if (jmpeg::TransportStreamPacket::HasAdaptationField(buffer)) {
+						unsigned plength = jmpeg::TransportStreamPacket::GetAdaptationFieldLength(buffer);
+						// Tem adaptation field aqui. Tamanho = plength
+						if (plength > 0) {
+							jmpeg::AdaptationField *field = jmpeg::TransportStreamPacket::GetAdaptationField(buffer);
 
-				if (field != NULL) {
-					if (field->GetPCRFlag()) {
-						if (pid == pidPcr) {
-							ipcr = field->GetPCRBase();
-							pcrExt = field->GetPCRExtension();
-							ipcr = (ipcr * 300LL + pcrExt) / 300LL;
+							if (field->GetPCRFlag()) {
+								if (primeiro == 0) {
+									// Primeiro PCR a passar por aqui
+									if (pidPcr == 0) {
+										pidPcr = pid;
+									}
 
-							if (ipcr >= pcr) {
+									pcr = field->GetPCRBase();
+									pcrExt = field->GetPCRExtension();
+
+									pcr = (pcr * 300 + pcrExt) / 300;
 #ifndef _WIN32
-								gettimeofday(&t2, 0);
-								atual = timeval2int(&t2);
+									gettimeofday(&t1, 0);
+									primeiro = timeval2int(&t1);
 #else
-								atual = GetTickCount();
+									primeiro = GetTickCount();
 #endif
-								factor = (uint64_t)((ipcr-pcr)*CLOCK_2_TIME_CONST);
+								} else if (pid == pidPcr) {
+									if (field->GetLength() > 0) {
+										ipcr = field->GetPCRBase();
+										pcrExt = field->GetPCRExtension();
+										ipcr = (ipcr * 300LL + pcrExt) / 300LL;
 
-								if (atual - primeiro < factor) {
-									tosleep = factor - (atual - primeiro);
+										if (ipcr >= pcr) {
 #ifndef _WIN32
-									usleep(tosleep);
+											gettimeofday(&t2, 0);
+											atual = timeval2int(&t2);
 #else
-									Sleep(tosleep);
+											atual = GetTickCount();
 #endif
-								} else {
-									//cout << "Perdi o tempo, nao vou dormir agora" << endl;
+											factor = (uint64_t)((double)(ipcr-pcr)*CLOCK_2_TIME_CONST);
+
+											if (atual - primeiro < factor) {
+												tosleep = factor - (atual - primeiro);
+#ifndef _WIN32
+												usleep(tosleep);
+#else
+												Sleep(tosleep);
+#endif
+											} else {
+												//cout << "Perdi o tempo, nao vou dormir agora" << endl;
+											}
+										} else {
+											std::cout << "PCR restarted" << std::endl;
+
+											primeiro = 0;
+										}
+									}
 								}
 							} else {
-								primeiro = 0;
+								// Não tem PCR aqui
 							}
-						} else if (primeiro == 0) {
-							// Primeiro PCR a passar por aqui
-							if (pidPcr == 0) {
-								pidPcr = pid;
+							if (field->GetOPCRFlag()) {
+								// Tem OPCR aqui
+							} else {
+								// Não tem OPCR aqui
 							}
-
-							pcr = field->GetPCRBase();
-							pcrExt = field->GetPCRExtension();
-
-							pcr = (pcr * 300 + pcrExt) / 300;
-#ifndef _WIN32
-							gettimeofday(&t1, 0);
-							primeiro = timeval2int(&t1);
-#else
-							primeiro = GetTickCount();
-#endif
 						}
 					}
-
-					/*
-					if (field->GetOPCRFlag()) {
-						// TODO
-					}
-					*/
 				}
 
 				if (pid == 8191) {
@@ -607,7 +619,7 @@ class Streamer: public jthread::Thread{
 						pmtLength = patInfo.GetProgramCount();
 					}
 				} else if (pid == pmtInfo->getVideoPID()) {
-					jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &payloadLength);
+                    jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &payloadLength);
 
 					videoPackets++;
 				} else if (pmtPids != 0) {
@@ -633,13 +645,10 @@ class Streamer: public jthread::Thread{
 					break;
 				}
 
-				/*
 				if ((packetNo % 6) == 0) {
 					//pipe->Write((char*)nullPacket, 188);
 				}
-				*/
 			}
-
 #ifndef _WIN32
 			gettimeofday(&tf, 0);
 			struct timeval tInterval;

@@ -31,7 +31,6 @@ DEBUG  		= -g -ggdb
 OTHER  		= -Wall -shared -rdynamic 
 
 INCLUDE		= -I. \
-						-I$(INCDIR) \
 						-Ijcommon/include \
 						-Ijgui/include \
 						-Ijimage/include \
@@ -46,7 +45,7 @@ INCLUDE		= -I. \
 						-Ijthread/include \
 						-I/usr/local/include/directfb \
 
-LIBRARY 	= -L$(LIBDIR) -lpthread -ldl -lrt -lssl
+LIBRARY 	= -lpthread -ldl -lrt -lssl
 
 DEFINES		= -D_GNU_SOURCE \
 						-D_REENTRANT \
@@ -62,7 +61,7 @@ CFLAGS		= $(INCLUDE) $(DEBUG) $(OPT) $(OTHER) $(DEFINES)
 OK 				= \033[30;32mOK\033[m
 
 ifeq ($(findstring DIRECTFB_UI,$(DEFINES)), DIRECTFB_UI)
-	LIBRARY += -ldirectfb
+	LIBRARY += -L/usr/local/lib -ldirectfb
 endif
 
 OBJS_jcommon = \

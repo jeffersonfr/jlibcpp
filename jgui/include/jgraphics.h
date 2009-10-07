@@ -299,7 +299,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetCurrentWorkingScreenSize(int width, int height);
+		virtual void SetWorkingScreenSize(int width, int height);
 
 		/**
 		 * \brief

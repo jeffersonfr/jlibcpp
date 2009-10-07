@@ -40,8 +40,8 @@ Window::Window(int x, int y, int width, int height, int opacity, int scale_width
 
 	_minimum_width = 16;
 	_minimum_height = 16;
-	_maximum_width = 1920;
-	_maximum_height = 1080;
+	_maximum_width = scale_width;
+	_maximum_height = scale_height;
 	
 	_x = x;
 	_y = y;

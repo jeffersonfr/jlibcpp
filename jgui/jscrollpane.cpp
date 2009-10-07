@@ -65,7 +65,7 @@ void ScrollPane::Paint(Graphics *g)
 	// Component::Paint(g);
 
 	//CHANGE:: permite alteracoes on-the-fly
-	g->SetCurrentWorkingScreenSize(_scale_width, _scale_height);
+	g->SetWorkingScreenSize(_scale_width, _scale_height);
 
 	g->SetDrawingFlags(NOFX_FLAG);
 

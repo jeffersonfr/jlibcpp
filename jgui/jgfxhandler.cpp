@@ -476,7 +476,7 @@ jpoint_t GFXHandler::GetMousePosition()
 	return p;
 }
 
-void GFXHandler::SetCurrentWorkingScreenSize(int width, int height)
+void GFXHandler::SetWorkingScreenSize(int width, int height)
 {
 	scaleWidth = width;
 	scaleHeight = height;
