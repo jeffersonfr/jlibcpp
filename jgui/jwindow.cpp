@@ -111,7 +111,7 @@ Graphics * Window::GetGraphics()
 	return graphics;
 }
 
-void * Window::GetWindowEngine()
+void * Window::GetNativeWindow()
 {
 #ifdef DIRECTFB_UI
 	return window;
@@ -164,7 +164,7 @@ void Window::InnerCreateWindow()
 		if (graphics == NULL) {
 			graphics = new Graphics(s);
 		} else {
-			graphics->SetSurface(s);
+			graphics->SetNativeSurface(s);
 		}
 	}
 
@@ -680,7 +680,7 @@ void Window::DumpScreen(std::string dir, std::string pre)
 {
 #ifdef DIRECTFB_UI
 	if (graphics != NULL) {
-		IDirectFBSurface *surface = (IDirectFBSurface *)graphics->GetSurface();
+		IDirectFBSurface *surface = (IDirectFBSurface *)graphics->GetNativeSurface();
 
 		surface->Dump(surface, dir.c_str(), pre.c_str());
 	}
@@ -691,7 +691,7 @@ void Window::ReleaseWindow()
 {
 #ifdef DIRECTFB_UI
 	if (graphics != NULL) {
-		graphics->SetSurface(NULL);
+		graphics->SetNativeSurface(NULL);
 
 		delete graphics;
 		graphics = NULL;

@@ -33,7 +33,7 @@ namespace jio {
 
 BufferedReader::BufferedReader(InputStream *stream_)
 {
-    jcommon::Object::SetClassName("jio::BufferedReader");
+	jcommon::Object::SetClassName("jio::BufferedReader");
 
 	if (stream_ == NULL) {
 		throw IOException("InputStream null pointer exception");
@@ -52,7 +52,7 @@ int BufferedReader::Available()
 	return _stream->Available();
 }
 
-bool BufferedReader::EndOfFile()
+bool BufferedReader::IsEOF()
 {
 	return _is_eof;
 }
@@ -60,22 +60,22 @@ bool BufferedReader::EndOfFile()
 int BufferedReader::Read()
 {
 	int r;
-	
+
 	r = _stream->Read();
-	
+
 	if (r < 0) {
 		_is_eof = true;
 	} else {
 		_is_eof = false;
 	}
-	
+
 	return r;
 }
 
 int BufferedReader::Read(char *data, int size)
 {
 	int r;
-   
+
 	r = _stream->Read(data, size);
 
 	if (r < 0) {
@@ -83,33 +83,33 @@ int BufferedReader::Read(char *data, int size)
 	} else {
 		_is_eof = false;
 	}
-	
+
 	return r;
 }
-    
+
 std::string BufferedReader::ReadLine(std::string delim)
 {
 	// TODO:: autolock
-	
+
 	char *new_ptr,
-		 *lineptr = new char[LINE_SIZE];
+			 *lineptr = new char[LINE_SIZE];
 	int i,
-	   	n = LINE_SIZE,
-		x,
-	   	tmp;
+			n = LINE_SIZE,
+			x,
+			tmp;
 
 	const char *cdelim = delim.c_str();
 	int csize = delim.size();
-	
+
 	_is_eof = false;
-	
+
 	for (i=0; ; ) {
 		x = _stream->Read();
-		
+
 		if (i >= n) {
 			tmp = n+100;
 			new_ptr = (char *)realloc(lineptr, tmp);
-			
+
 			if (new_ptr == NULL) {
 				delete lineptr;
 				return "";
@@ -128,7 +128,7 @@ std::string BufferedReader::ReadLine(std::string delim)
 			}
 
 			lineptr[i] = 0; 
-			
+
 			return lineptr; 
 		}
 

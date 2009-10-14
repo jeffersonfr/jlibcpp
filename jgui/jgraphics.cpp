@@ -154,7 +154,7 @@ OffScreenImage * Graphics::Create()
 	return image;
 }
 
-void * Graphics::GetSurface()
+void * Graphics::GetNativeSurface()
 {
 #ifdef DIRECTFB_UI
 	return surface;
@@ -163,7 +163,7 @@ void * Graphics::GetSurface()
 #endif
 }
 
-void Graphics::SetSurface(void *addr)
+void Graphics::SetNativeSurface(void *addr)
 {
 #ifdef DIRECTFB_UI
 	Lock();
@@ -3396,7 +3396,7 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 	x = x; // - w2;
 	y = y; // - h2;
 
-	IDirectFBSurface *simg = (IDirectFBSurface *)gimg->GetSurface();
+	IDirectFBSurface *simg = (IDirectFBSurface *)gimg->GetNativeSurface();
 	void *sptr;
 	uint32_t *sdst;
 	int spitch;

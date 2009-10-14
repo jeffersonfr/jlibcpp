@@ -331,7 +331,7 @@ install: uninstall
 	@sed -e 's/@module@/$(MODULE)/g' jlibcpp.pc | sed -e 's/@prefix@/$(subst /,\/,$(PREFIX))/g' | sed -e 's/@version@/$(VERSION)/g' | sed -e 's/@cflags@/$(DEFINES)/g' | sed -e 's/@libs@/$(subst /,\/,$(LIBRARY))/g' > $(PREFIX)/lib/pkgconfig/$(MODULE).pc
 
 uninstall:
-	@rm -rf $(PREFIX)/lib/lib$(MODULE).so $(PREFIX)/lib/$(EXE)
+	@rm -rf $(PREFIX)/lib/pkgconfig/$(MODULE).pc $(PREFIX)/lib/lib$(MODULE).so $(PREFIX)/lib/$(EXE) 
 
 clean:
 	@rm -rf $(SRCS) *~ 2> /dev/null && echo -e "$(MODULE) clean $(OK)" 

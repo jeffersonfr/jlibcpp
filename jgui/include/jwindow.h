@@ -87,7 +87,7 @@ class Window : public Container{
 		 * \brief
 		 *
 		 */
-		void * GetWindowEngine();
+		void * GetNativeWindow();
 
 		/**
 		 * \brief

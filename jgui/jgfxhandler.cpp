@@ -290,7 +290,7 @@ void GFXHandler::SetCursor(OffScreenImage *shape, int hotx, int hoty)
 	IDirectFBSurface *surface = NULL;
 
 	if (shape != NULL) {
-		surface = (IDirectFBSurface *)shape->GetGraphics()->GetSurface();
+		surface = (IDirectFBSurface *)shape->GetGraphics()->GetNativeSurface();
 	}
 
 	/*

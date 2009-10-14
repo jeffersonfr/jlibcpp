@@ -196,7 +196,7 @@ class InputManager : public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		void SetCurrentWorkingScreenSize(int width, int height);
+		void SetWorkingScreenSize(int width, int height);
 
 		/**
 		 * \brief

@@ -84,7 +84,7 @@ OffScreenImage::~OffScreenImage()
 
 #ifdef DIRECTFB_UI
 	if (graphics != NULL) {
-		IDirectFBSurface *surface = (IDirectFBSurface *)graphics->GetSurface();
+		IDirectFBSurface *surface = (IDirectFBSurface *)graphics->GetNativeSurface();
 
 		if (surface != NULL) {
 			// CHANGE:: ReleaseSource()->Release()
@@ -126,7 +126,7 @@ void OffScreenImage::Release()
 {
 #ifdef DIRECTFB_UI
 	if (graphics != NULL) {
-		IDirectFBSurface *surface = (IDirectFBSurface *)graphics->GetSurface();
+		IDirectFBSurface *surface = (IDirectFBSurface *)graphics->GetNativeSurface();
 		
 		void *ptr;
 		int pitch,

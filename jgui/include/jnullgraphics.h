@@ -50,6 +50,18 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual void * GetNativeSurface();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetNativeSurface(void *surface);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWorkingScreenSize(int width, int height);
 
 		/**

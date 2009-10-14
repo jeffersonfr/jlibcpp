@@ -287,13 +287,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void * GetSurface();
+		virtual void * GetNativeSurface();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetSurface(void *surface);
+		virtual void SetNativeSurface(void *surface);
 
 		/**
 		 * \brief

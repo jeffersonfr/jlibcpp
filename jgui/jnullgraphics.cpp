@@ -35,6 +35,15 @@ NullGraphics::~NullGraphics()
 	JDEBUG(JINFO, "called\n");
 }
 
+void * NullGraphics::GetNativeSurface()
+{
+	return NULL;
+}
+
+void NullGraphics::SetNativeSurface(void *surface)
+{
+}
+
 void NullGraphics::SetWorkingScreenSize(int width, int height)
 {
 	JDEBUG(JINFO, "called\n");

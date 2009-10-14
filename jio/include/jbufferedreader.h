@@ -56,7 +56,7 @@ class BufferedReader : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		bool EndOfFile();
+		bool IsEOF();
 		
 		/**
 		 * \brief
