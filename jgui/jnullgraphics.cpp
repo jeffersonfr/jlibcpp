@@ -343,6 +343,13 @@ bool NullGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, in
 	return true;
 }
 
+bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int alpha)
+{
+	JDEBUG(JINFO, "called\n");
+
+	return true;
+}
+
 bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
@@ -351,6 +358,13 @@ bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, in
 }
 
 bool NullGraphics::DrawImage(OffScreenImage *img, int x, int y, int w, int h, int alpha)
+{
+	JDEBUG(JINFO, "called\n");
+
+	return true;
+}
+
+bool NullGraphics::DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
 

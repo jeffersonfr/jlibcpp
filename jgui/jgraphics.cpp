@@ -2055,6 +2055,37 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 	return true;
 }
 
+bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int alpha)
+{
+	IDirectFBImageProvider *imgProvider = NULL;
+	DFBSurfaceDescription desc;
+
+	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = (IDirectFB *)dfb->GetGraphicEngine();
+
+	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
+		return false;
+	}
+
+	if (imgProvider->GetSurfaceDescription (imgProvider, &desc) != DFB_OK) {
+		imgProvider->Release(imgProvider);
+
+		return false;
+	}
+
+	imgProvider->Release(imgProvider);
+
+	int w = desc.width-swp,
+			h = desc.height-shp;
+
+	if (w <= 0 || h <= 0) {
+		return false;
+	}
+
+	// return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, desc.width, desc.height, alpha);
+	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, w, h, alpha);
+}
+
 bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp, int alpha)
 {
 	if (wp <= 0 || hp <= 0) {
@@ -2278,6 +2309,19 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 #endif
 
 	return true;
+}
+
+bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp, int xp, int yp, int alpha)
+{
+	int w = img->GetWidth()-swp,
+			h = img->GetHeight()-shp;
+
+	if (w <= 0 || h <= 0) {
+		return false;
+	}
+
+	// return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, img->GetWidth(), img->GetHeight(), alpha);
+	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, w, h, alpha);
 }
 
 bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp, int alpha)
@@ -3360,8 +3404,6 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 
 	sinTheta = precision*sin(angle);
 	cosTheta = precision*cos(angle);
-
-	SetDrawingFlags(NOFX_FLAG);
 
 	int w2 = width/2,
 			h2 = height/2,

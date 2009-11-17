@@ -623,6 +623,12 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha = 0xff);
 		
 		/**
@@ -636,6 +642,12 @@ class Graphics : public virtual jcommon::Object{
 		 *
 		 */
 		virtual bool DrawImage(OffScreenImage *img, int x, int y, int w, int h, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int alpha = 0xff);
 		
 		/**
 		 * \brief

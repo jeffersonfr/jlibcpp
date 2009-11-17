@@ -386,6 +386,12 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha = 0xff);
 		
 		/**
@@ -393,6 +399,12 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual bool DrawImage(OffScreenImage *img, int x, int y, int w, int h, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int alpha = 0xff);
 		
 		/**
 		 * \brief
