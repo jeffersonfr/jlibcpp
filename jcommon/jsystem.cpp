@@ -371,7 +371,7 @@ int System::Getch(void)
 #ifdef _WIN32
 	return getch();
 #else
-	unsigned char temp;
+	uint8_t temp;
 	
 	/* stdin = fd 0 */
 	if(read(0, &temp, 1) != 1) {

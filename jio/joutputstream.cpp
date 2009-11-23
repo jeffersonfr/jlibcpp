@@ -53,7 +53,7 @@ bool OutputStream::IsClosed()
 	return _is_closed;
 }
 
-long long OutputStream::Write(std::string str)
+int64_t OutputStream::Write(std::string str)
 {
 	return Write((char *)str.c_str(), str.size());
 }

@@ -27,24 +27,6 @@
 #include <iostream>
 #include <cstdlib>
 
-jthread::Mutex _jcommon_instance_mutex;
-
-void jLibLock()
-{
-	try {
-		_jcommon_instance_mutex.Lock();
-	} catch (jthread::MutexException &e) {
-	}
-}
-
-void jLibUnlock()
-{
-	try {
-		_jcommon_instance_mutex.Unlock();
-	} catch (jthread::MutexException &e) {
-	}
-}
-
 int main_common(int argc, char *argv[])
 {
 	return EXIT_SUCCESS;

@@ -59,12 +59,26 @@ void http_stream() {
 }
 
 void http_raw() {
-	std::string buffer = "GET / HTTP/1.0\r\n\r\n";
+	// std::string buffer = "GET / HTTP/1.0\r\n\r\n";
+	std::string buffer = ""
+											 "GET / HTTP/1.0\r\n"
+											 "Accept: */*\r\n"
+											 "User-Agent: NSPlayer/4.1.0.3856\r\n"
+											 "Host: 187.1.144.78:8080\r\n"
+											 "Pragma: xClientGUID={c77e7400-738a-11d2-9add-0020af0a3278}\r\n"
+											 "Pragma: no-cache,rate=1.000000,stream-time=0,stream-offset=0:0,request-context=2,max-duration=0\r\n"
+											 "Pragma: xPlayStrm=1\r\n"
+											 "Pragma: stream-switch-entry=ffff:2:0 ffff:1:0 \r\n"
+											 "Pragma: stream-switch-count=2\r\n"
+											 "Connection: Close\r\n"
+											 "\r\n";
 	char receive[4098];
 	size_t length;
 	
+	std::cout << buffer << std::endl;
 	try {
-		Socket c("127.0.0.1", 6500);
+		// Socket c("127.0.0.1", 6500);
+		Socket c("187.1.144.78", 8080);
 
 		c.Send((char *)buffer.c_str(), buffer.size());
 	
@@ -77,9 +91,10 @@ void http_raw() {
 				break;
 			}
 			
-			receive[length] = '\0';
+			// receive[length] = '\0';
 			
-			std::cout << receive << std::flush;
+			// std::cout << receive << std::flush;
+			write(1, receive, length);
 		} while (true);
 
 		c.Close();
@@ -92,8 +107,8 @@ int main()
 {
 	InitWindowsSocket();
 	
-	http_stream();
-	// http_raw();
+	// http_stream();
+	http_raw();
 
 	ReleaseWindowsSocket();
 }

@@ -69,7 +69,7 @@ class BitStream : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		unsigned char * GetBitsArray(int size);
+		uint8_t* GetBitsArray(int size);
 		
 		/**
 		 * \brief

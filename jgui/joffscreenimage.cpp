@@ -27,13 +27,14 @@
 
 namespace jgui {
 
-OffScreenImage::OffScreenImage(int width, int height, int scale_width, int scale_height)
+OffScreenImage::OffScreenImage(int width, int height, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height)
 {
 	jcommon::Object::SetClassName("jgui::OffScreenImage");
 
 	graphics = NULL;
 
 	_buffer = NULL;
+	_pixelformat = pixelformat;
 	_width = width;
 	_height = height;
 	_scale_width = scale_width;
@@ -55,7 +56,76 @@ OffScreenImage::OffScreenImage(int width, int height, int scale_width, int scale
 	desc.caps = (DFBSurfaceCapabilities)(DSCAPS_SYSTEMONLY);
 	desc.width = SCALE_TO_SCREEN(_width, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width);
 	desc.height = SCALE_TO_SCREEN(_height, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
-	desc.pixelformat = DSPF_ARGB;
+
+	if (pixelformat == SPF_UNKNOWN) {
+		desc.pixelformat = DSPF_UNKNOWN;
+	} else if (pixelformat == SPF_ARGB1555) {
+		desc.pixelformat = DSPF_ARGB1555;
+	} else if (pixelformat == SPF_RGB16) {
+		desc.pixelformat = DSPF_RGB16;
+	} else if (pixelformat == SPF_RGB24) {
+		desc.pixelformat = DSPF_RGB24;
+	} else if (pixelformat == SPF_RGB32) {
+		desc.pixelformat = DSPF_RGB32;
+	} else if (pixelformat == SPF_ARGB) {
+		desc.pixelformat = DSPF_ARGB;
+	} else if (pixelformat == SPF_A8) {
+		desc.pixelformat = DSPF_A8;
+	} else if (pixelformat == SPF_YUY2) {
+		desc.pixelformat = DSPF_YUY2;
+	} else if (pixelformat == SPF_RGB332) {
+		desc.pixelformat = DSPF_RGB332;
+	} else if (pixelformat == SPF_UYVY) {
+		desc.pixelformat = DSPF_UYVY;
+	} else if (pixelformat == SPF_I420) {
+		desc.pixelformat = DSPF_I420;
+	} else if (pixelformat == SPF_YV12) {
+		desc.pixelformat = DSPF_YV12;
+	} else if (pixelformat == SPF_LUT8) {
+		desc.pixelformat = DSPF_LUT8;
+	} else if (pixelformat == SPF_ALUT44) {
+		desc.pixelformat = DSPF_ALUT44;
+	} else if (pixelformat == SPF_AiRGB) {
+		desc.pixelformat = DSPF_AiRGB;
+	} else if (pixelformat == SPF_A1) {
+		desc.pixelformat = DSPF_A1;
+	} else if (pixelformat == SPF_NV12) {
+		desc.pixelformat = DSPF_NV12;
+	} else if (pixelformat == SPF_NV16) {
+		desc.pixelformat = DSPF_NV16;
+	} else if (pixelformat == SPF_ARGB2554) {
+		desc.pixelformat = DSPF_ARGB2554;
+	} else if (pixelformat == SPF_ARGB4444) {
+		desc.pixelformat = DSPF_ARGB4444;
+	} else if (pixelformat == SPF_RGBA4444) {
+		desc.pixelformat = DSPF_RGBA4444;
+	} else if (pixelformat == SPF_NV21) {
+		desc.pixelformat = DSPF_NV21;
+	} else if (pixelformat == SPF_AYUV) {
+		desc.pixelformat = DSPF_AYUV;
+	} else if (pixelformat == SPF_A4) {
+		desc.pixelformat = DSPF_A4;
+	} else if (pixelformat == SPF_ARGB1666) {
+		desc.pixelformat = DSPF_ARGB1666;
+	} else if (pixelformat == SPF_ARGB6666) {
+		desc.pixelformat = DSPF_ARGB6666;
+	} else if (pixelformat == SPF_RGB18) {
+		desc.pixelformat = DSPF_RGB18;
+	} else if (pixelformat == SPF_LUT2) {
+		desc.pixelformat = DSPF_LUT2;
+	} else if (pixelformat == SPF_RGB444) {
+		desc.pixelformat = DSPF_RGB444;
+	} else if (pixelformat == SPF_RGB555) {
+		desc.pixelformat = DSPF_RGB555;
+	} else if (pixelformat == SPF_BGR555) {
+		desc.pixelformat = DSPF_BGR555;
+	} else if (pixelformat == SPF_RGBA5551) {
+		desc.pixelformat = DSPF_RGBA5551;
+	} else if (pixelformat == SPF_AVYU) {
+		desc.pixelformat = DSPF_AVYU;
+	} else if (pixelformat == SPF_VYU) {
+		desc.pixelformat = DSPF_VYU;
+	}
 
 	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
 	IDirectFB *engine = ((IDirectFB *)dfb->GetGraphicEngine());
@@ -100,6 +170,20 @@ OffScreenImage::~OffScreenImage()
 Graphics * OffScreenImage::GetGraphics()
 {
 	return graphics;
+}
+
+OffScreenImage * OffScreenImage::Create()
+{
+	OffScreenImage *off = new OffScreenImage(_width, _height, _pixelformat, _scale_width, _scale_height);
+
+	off->GetGraphics()->DrawImage(this, 0, 0);
+
+	return off;
+}
+
+jsurface_pixelformat_t OffScreenImage::GetPixelFormat()
+{
+	return _pixelformat;
 }
 
 int OffScreenImage::GetWidth()

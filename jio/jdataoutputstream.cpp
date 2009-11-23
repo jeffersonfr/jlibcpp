@@ -51,7 +51,7 @@ bool DataOutputStream::IsEmpty()
 	return Available() == 0;
 }
 
-long long DataOutputStream::Available()
+int64_t DataOutputStream::Available()
 {
 	if (stream != NULL) {
 		return stream->Available();
@@ -96,7 +96,7 @@ int DataOutputStream::Write(uint64_t data)
 	return -1;
 }
 
-long long DataOutputStream::Flush()
+int64_t DataOutputStream::Flush()
 {
 	if (stream != NULL) {
 		return stream->Flush();
@@ -112,7 +112,7 @@ void DataOutputStream::Close()
 	}
 }
 
-long long DataOutputStream::GetSentBytes()
+int64_t DataOutputStream::GetSentBytes()
 {
 	if (stream != NULL) {
 		stream->GetSentBytes();

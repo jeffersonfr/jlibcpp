@@ -80,7 +80,7 @@ bool BitOutputStream::IsEmpty()
 	return Available() == 0;
 }
 
-long long BitOutputStream::Available()
+int64_t BitOutputStream::Available()
 {
 	return 0LL;
 }
@@ -90,12 +90,12 @@ int BitOutputStream::Write(int b)
 	return stream->Write(b);
 }
 
-long long BitOutputStream::Write(char *b, long long size)
+int64_t BitOutputStream::Write(char *b, int64_t size)
 {
 	return stream->Write(b, size);
 }
 
-long long BitOutputStream::Flush()
+int64_t BitOutputStream::Flush()
 {
 	while (bitCount > 0) {
 		WriteBit(1);
@@ -140,7 +140,7 @@ void BitOutputStream::WriteBits(int bits, int num)
 	}
 }
 
-long long BitOutputStream::GetSentBytes()
+int64_t BitOutputStream::GetSentBytes()
 {
 	return 0LL;
 }

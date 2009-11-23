@@ -86,7 +86,7 @@ int SSLSocketInputStream::Read()
 		_receive_bytes += n;
 	}
 	
-	unsigned char c;
+	uint8_t c;
 	
 	c = _buffer[_current_index];
 	

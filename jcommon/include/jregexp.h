@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  a***************************************************************************/
-#ifndef REGEXP_H
-#define REGEXP_H
+#ifndef J_REGEXP_H
+#define J_REGEXP_H
 
 #include "jobject.h"
 #include "jcompileexception.h"
@@ -2165,7 +2165,7 @@ class basic_terminal : public basic_object_parser< E, E, F >
 
 		virtual std::basic_ostream<E>& format( std::basic_ostream<E>& os );    
 
-		// during allocation the value is assigned to unsigned char - for 
+		// during allocation the value is assigned to uint8_t- for 
 		// comparison during parsing
 		E& get_valid()
 		{

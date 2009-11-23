@@ -128,11 +128,18 @@ void NullGraphics::Flip(int xp, int yp, int wp, int hp)
 	JDEBUG(JINFO, "called\n");
 }
 
-uint32_t NullGraphics::GetColor()
+struct jcolor_t NullGraphics::GetColor()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return 0;
+	struct jcolor_t t;
+
+	t.red = 0x00;
+	t.green = 0x00;
+	t.blue = 0x00;
+	t.alpha = 0x00;
+
+	return t;
 }
 
 void NullGraphics::SetColor(uint32_t color)

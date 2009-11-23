@@ -72,13 +72,13 @@ class PipeStream : public jio::InputStream, jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		long Read(char *data_, long length_);
+		int64_t Read(char *data_, int64_t length_);
 
 		/**
 		 * \brief
 		 *
 		 */
-		long Write(const char *data_, long length_);
+		int64_t Write(const char *data_, int64_t length_);
 		
 		/**
 		 * \brief

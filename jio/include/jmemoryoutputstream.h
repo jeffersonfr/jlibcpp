@@ -35,11 +35,11 @@ class MemoryOutputStream : public jio::OutputStream{
 
 	private:
 		/** \brief */
-		unsigned char *_buffer;
+		uint8_t*_buffer;
 		/** \brief */
-		long long _buffer_size;
+		int64_t _buffer_size;
 		/** \brief */
-		long long _buffer_index;
+		int64_t _buffer_index;
 
 		
 	public:
@@ -47,7 +47,7 @@ class MemoryOutputStream : public jio::OutputStream{
 		 * \brief
 		 * 
 		 */
-		MemoryOutputStream(unsigned char *data, int size);
+		MemoryOutputStream(uint8_t*data, int size);
 		
 		/**
 		 * \brief
@@ -65,7 +65,7 @@ class MemoryOutputStream : public jio::OutputStream{
 		 * \brief
 		 * 
 		 */
-		virtual long long Available();
+		virtual int64_t Available();
 
 		/**
 		 * \brief
@@ -77,13 +77,13 @@ class MemoryOutputStream : public jio::OutputStream{
 		 * \brief
 		 * 
 		 */
-		virtual long long Write(char *, long long size);
+		virtual int64_t Write(char *, int64_t size);
     
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual long long Flush();
+		virtual int64_t Flush();
 
 		/**
 		 * \brief
@@ -95,7 +95,7 @@ class MemoryOutputStream : public jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		long long GetSentBytes();
+		int64_t GetSentBytes();
 
 };
 

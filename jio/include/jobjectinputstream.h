@@ -56,19 +56,19 @@ class ObjectInputStream : public jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual long long Available();
+		virtual int64_t Available();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual long long GetSize();
+		virtual int64_t GetSize();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual long long GetPosition();
+		virtual int64_t GetPosition();
 		
 		/**
 		 * \brief
@@ -80,7 +80,7 @@ class ObjectInputStream : public jcommon::Object{
 		 * \brief Salto relativo.
 		 *
 		 */
-		virtual void Skip(long long skip);
+		virtual void Skip(int64_t skip);
 
 		/**
 		 * \brief
@@ -98,7 +98,7 @@ class ObjectInputStream : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual long long GetReceiveBytes();
+		virtual int64_t GetReceiveBytes();
 
 		/**
 		 * \brief

@@ -38,7 +38,7 @@ FileInputStream::FileInputStream(std::string filename_):
 		_flag = 0;
 		_file = new File(filename_);
 
-		_buffer = new unsigned char[4096];
+		_buffer = new uint8_t[4096];
 
 		_buffer_size = 0;
 		_buffer_index = 0;
@@ -58,7 +58,7 @@ FileInputStream::FileInputStream(File *file_):
 	_flag = 1;
 	_file = file_;
 
-	_buffer = new unsigned char[65535];
+	_buffer = new uint8_t[65535];
 
 	_buffer_size = 0;
 	_buffer_index = 0;
@@ -86,17 +86,17 @@ bool FileInputStream::IsEmpty()
 	return (_current >= GetSize());
 }
 
-long long FileInputStream::Available()
+int64_t FileInputStream::Available()
 {
 	return GetSize() - GetPosition();
 }
 
-long long FileInputStream::GetSize()
+int64_t FileInputStream::GetSize()
 {
 	return _file->GetSize();
 }
 
-long long FileInputStream::GetPosition()
+int64_t FileInputStream::GetPosition()
 {
 	return _current;
 }
@@ -153,7 +153,7 @@ int FileInputStream::Read()
 	return (int)c;
 }
 
-long long FileInputStream::Read(char *data, long long size)
+int64_t FileInputStream::Read(char *data, int64_t size)
 {
 	if ((void *)data == NULL) {
 		return -1;
@@ -224,7 +224,7 @@ long long FileInputStream::Read(char *data, long long size)
 	return size;
 }
 
-void FileInputStream::Skip(long long skip)
+void FileInputStream::Skip(int64_t skip)
 {
 	if (skip <= 0) {
 		return;
@@ -255,7 +255,7 @@ void FileInputStream::Close()
 	_file->Close();
 }
 
-long long FileInputStream::GetReceiveBytes()
+int64_t FileInputStream::GetReceiveBytes()
 {
 	return _current;
 }

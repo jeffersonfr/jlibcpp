@@ -94,17 +94,17 @@ bool BitInputStream::IsEmpty()
 	return Available() == 0;
 }
 
-long long BitInputStream::Available()
+int64_t BitInputStream::Available()
 {
 	return stream->Available();
 }
 
-long long BitInputStream::GetSize()
+int64_t BitInputStream::GetSize()
 {
 	return file->GetSize();
 }
 
-long long BitInputStream::GetPosition()
+int64_t BitInputStream::GetPosition()
 {
 	return 0LL;
 }
@@ -120,9 +120,9 @@ int BitInputStream::Read()
 	return next;
 }
 
-long long BitInputStream::Read(char *buffer, long long size)
+int64_t BitInputStream::Read(char *buffer, int64_t size)
 {
-	long long i;
+	int64_t i;
 	int r;
 	
 	for (i=0; i<size; i++) {
@@ -134,7 +134,7 @@ long long BitInputStream::Read(char *buffer, long long size)
 	return i;
 }
 
-void BitInputStream::Skip(long long skip)
+void BitInputStream::Skip(int64_t skip)
 {
 	stream->Skip(skip);
 }
@@ -181,7 +181,7 @@ void BitInputStream::Close()
 	stream->Close();
 }
 
-long long BitInputStream::GetReceiveBytes()
+int64_t BitInputStream::GetReceiveBytes()
 {
 	return 0LL;
 }

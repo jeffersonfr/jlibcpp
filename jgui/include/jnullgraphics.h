@@ -164,7 +164,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual uint32_t GetColor(); 
+		virtual struct jcolor_t GetColor(); 
 		
 		/**
 		 * \brief

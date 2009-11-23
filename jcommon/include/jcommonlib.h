@@ -28,24 +28,21 @@
 
 #ifdef JDEBUG_ENABLED
 
-#define JDEBUG(t, args...) 																				\
-	if (t == JINFO) {																					\
+#define JDEBUG(t, args...) 																																				\
+	if (t == JINFO) {																																								\
 		printf ("\033[37;40mINFO:: %s:%d [%s] \033[37;40m", __FILE__, __LINE__, __PRETTY_FUNCTION__);	\
-	} else if (t == JWARN) {																			\
+	} else if (t == JWARN) {																																				\
 		printf ("\033[33;40mWARN:: %s:%d [%s] \033[37;40m", __FILE__, __LINE__, __PRETTY_FUNCTION__);	\
-	} else if (t == JERRO) {																			\
+	} else if (t == JERRO) {																																				\
 		printf ("\033[31;40mERRO:: %s:%d [%s] \033[37;40m", __FILE__, __LINE__, __PRETTY_FUNCTION__);	\
-	}																									\
-	printf(args);																						\
-	fflush(stdin);																						\
+	}																																																\
+	printf(args);																																										\
+	fflush(stdin);																																									\
 
 #else
 
 #define JDEBUG(t, args...) 
 
 #endif
-
-void jLibLock();
-void jLibUnlock();
 
 #endif

@@ -57,7 +57,7 @@ class DataOutputStream : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual long long Available();
+		virtual int64_t Available();
 
 		/**
 		 * \brief
@@ -87,7 +87,7 @@ class DataOutputStream : public jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual long long Flush();
+		virtual int64_t Flush();
 
 		/**
 		 * \brief
@@ -99,7 +99,7 @@ class DataOutputStream : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		long long GetSentBytes();
+		int64_t GetSentBytes();
 
 };
 

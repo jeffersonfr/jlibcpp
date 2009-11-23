@@ -64,7 +64,7 @@ class OutputStream : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual long long Available() = 0;
+		virtual int64_t Available() = 0;
 
 		/**
 		 * \brief
@@ -82,7 +82,7 @@ class OutputStream : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual long long GetSize() = 0;
+		virtual int64_t GetSize() = 0;
 		
 		/**
 		 * \brief
@@ -94,25 +94,25 @@ class OutputStream : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual long long Write(const char *, long long size) = 0;
+		virtual int64_t Write(const char *, int64_t size) = 0;
     
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual long long Write(std::string);
+		virtual int64_t Write(std::string);
     
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual long long Flush() = 0;
+		virtual int64_t Flush() = 0;
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Seek(long long index) = 0;
+		virtual void Seek(int64_t index) = 0;
 
 		/**
 		 * \brief
@@ -130,7 +130,7 @@ class OutputStream : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual long long GetSentBytes() = 0;
+		virtual int64_t GetSentBytes() = 0;
 
 };
 

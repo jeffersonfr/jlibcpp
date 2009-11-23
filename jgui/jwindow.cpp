@@ -504,7 +504,7 @@ void Window::Repaint(bool all)
 	
 	// CHANGE:: corrigir a limpeza da tela
 	if (_background_visible == false) {
-		graphics->SetDrawingFlags(NOFX_FLAG);
+		graphics->SetDrawingFlags(DF_NOFX);
 		graphics->Clear();
 	}
 

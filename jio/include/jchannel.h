@@ -65,37 +65,37 @@ class Channel : public virtual jcommon::Object{
 		 * \brief Returns this channel's file position.
 		 *
 		 */
-		virtual long long GetPosition();
+		virtual int64_t GetPosition();
 
 		/**
 		 * \brief Sets this channel's file position.
 		 *
 		 */
-		virtual long long SetPosition(long long p);
+		virtual int64_t SetPosition(int64_t p);
 
 		/**
 		 * \brief  Reads a sequence of bytes from this channel into the given buffer.
 		 *
 		 */
-		virtual long long Read(char *b, long long size, long long offset = 0);
+		virtual int64_t Read(char *b, int64_t size, int64_t offset = 0);
 
 		/**
 		 * \brief Returns the current size of this channel's file.
 		 *
 		 */
-		virtual long long GetSize();
+		virtual int64_t GetSize();
 
 		/**
 		 * \brief Writes a sequence of bytes to this channel from the given buffer.
 		 *
 		 */
-		virtual long Write(char *b, long long size, long long offset = 0);
+		virtual int64_t Write(char *b, int64_t size, int64_t offset = 0);
 
 		/**
 		 * \brief Transfers bytes into this channel's file from the given readable byte channel.
 		 *
 		 */
-		virtual long long Transfer(Channel *in, long long count_in, long long position_int, Channel *out, long long count_out, long long position_out);
+		virtual int64_t Transfer(Channel *in, int64_t count_in, int64_t position_int, Channel *out, int64_t count_out, int64_t position_out);
 	
 		/**
 		 * \brief

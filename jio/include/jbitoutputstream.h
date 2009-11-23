@@ -67,7 +67,7 @@ class BitOutputStream : public jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		virtual long long Available();
+		virtual int64_t Available();
 
 		/**
 		 * \brief
@@ -79,13 +79,13 @@ class BitOutputStream : public jio::OutputStream{
 		 * \brief
 		 * 
 		 */
-		virtual long long Write(char *, long long size);
+		virtual int64_t Write(char *, int64_t size);
     
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual long long Flush();
+		virtual int64_t Flush();
 
 		/**
 		 * \brief
@@ -109,7 +109,7 @@ class BitOutputStream : public jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		long long GetSentBytes();
+		int64_t GetSentBytes();
 
 };
 

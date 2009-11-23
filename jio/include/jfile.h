@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef JFILE_H
-#define JFILE_H
+#ifndef J_FILE_H
+#define J_FILE_H
 
 #include "jobject.h"
 
@@ -200,7 +200,7 @@ class File : public virtual jcommon::Object{
 		 * \brief Retorna o tamanho, em bytes, do aquivo.
 		 *
 		 */
-		long long GetSize();
+		int64_t GetSize();
    
 		/**
 		 * \brief Retorna o nome do arquivo/diretorio.
@@ -260,13 +260,13 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		long Read(char *data_, long length_);
+		int64_t Read(char *data_, int64_t length_);
 
 		/**
 		 * \brief
 		 *
 		 */
-		long Write(const char *data_, long length_);
+		int64_t Write(const char *data_, int64_t length_);
 		
 		/**
 		 * \brief
@@ -326,7 +326,7 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		int Seek(int n);
+		int64_t Seek(int64_t n);
 
 		/**
 		 * \brief Find a file in the directory opened.

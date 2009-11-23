@@ -22,19 +22,17 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			cy = GetHeight()/2;
 			k = 0;
 
-			RegisterInputListener(this);
-
-			jgui::InputManager::GetInstance()->SkipMouseEvents(false);
-
-
 			jgui::Container container(10, 10, 100, 100);
 			jgui::Button button("teste", 10, 10, 10, 10);
 			container.Add(&button);
 			button.RequestFocus();
+			
+			RegisterInputListener(this);
 		}
 
 		virtual ~GraphicsTeste()
 		{
+			RemoveInputListener(this);
 		}
 
 		virtual void InputChanged(jgui::MouseEvent *event)
@@ -52,6 +50,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 		virtual void Paint(jgui::Graphics *g)
 		{
 			g->Clear();
+
 			g->SetColor(0xff, 0xff, 0xff, 0xff);
 			g->FillRectangle(cx, 0, 1, _height);
 			g->FillRectangle(0, cy, _width, 1);
@@ -59,7 +58,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 
 };
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
 	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
 

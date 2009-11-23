@@ -42,9 +42,9 @@ SSLSocket::SSLSocket(InetAddress *addr_, int port_, int keysize, int timeout_, i
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 	
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+    _is = NULL;
+    _os = NULL;
+    _address = NULL;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -80,9 +80,9 @@ SSLSocket::SSLSocket(InetAddress *addr_, int port_, InetAddress *local_addr_, in
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 	
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+    _is = NULL;
+    _os = NULL;
+    _address = NULL;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -119,9 +119,9 @@ SSLSocket::SSLSocket(std::string host_, int port_, int keysize, int timeout_, in
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 	
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+    _is = NULL;
+    _os = NULL;
+    _address = NULL;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -163,9 +163,9 @@ SSLSocket::SSLSocket(std::string host_, int port_, InetAddress *local_addr_, int
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 	
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+    _is = NULL;
+    _os = NULL;
+    _address = NULL;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -205,29 +205,29 @@ SSLSocket::SSLSocket(std::string host_, int port_, InetAddress *local_addr_, int
 
 SSLSocket::~SSLSocket()
 {
-	try {
+    try {
 		if (_is_closed == false) {
 			_is_closed = true;
 
-			Close();
+    		Close();
 		}
-	} catch (...) {
-	}
+    } catch (...) {
+    }
 
-	if (_is != NULL) {
-		delete _is;
+    if (_is != NULL) {
+        delete _is;
 		_is = NULL;
-	}
+    }
 
-	if (_os != NULL) {
-		delete _os;
+    if (_os != NULL) {
+        delete _os;
 		_os = NULL;
-	}
+    }
 
-	if (_address != NULL) {
-		delete _address;
+    if (_address != NULL) {
+        delete _address;
 		_address = NULL;
-	}
+    }
 }
 
 /** Private */
@@ -287,15 +287,15 @@ SSLSocket::SSLSocket(int handler_, sockaddr_in server_, int keysize, int timeout
 
 void SSLSocket::CreateSocket()
 {
-	_fd = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
+   _fd = socket (AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 #ifdef _WIN32
-	if (_fd == INVALID_SOCKET) {
+   if (_fd == INVALID_SOCKET) {
 #else
 	if (_fd < 0) {
 #endif
 		throw SocketException("Create socket error");
-	}
+    }
 }
 
 void SSLSocket::BindSocket(InetAddress *local_addr_, int local_port_)
@@ -499,7 +499,7 @@ bool SSLSocket::Accept()
 {
 	if (_fd < 0) {
 		throw SocketException("Accept failed");
-	}
+    }
     
 	if (!CheckContext()) {
 		return false;
@@ -851,20 +851,20 @@ X509 * BuildCertificate(const char *name, const char *organization, const char *
 		return NULL;
 	
 	// Add fields
-	if ( !X509_NAME_add_entry_by_NID(n, NID_commonName, MBSTRING_ASC, (unsigned char*)name, -1, -1, 0) ){
+	if ( !X509_NAME_add_entry_by_NID(n, NID_commonName, MBSTRING_ASC, (uint8_t*)name, -1, -1, 0) ){
 		X509_NAME_free(n);
 		return NULL;
 	}
 
 	if( organization ){
-		if ( !X509_NAME_add_entry_by_NID(n, NID_organizationName, MBSTRING_ASC, (unsigned char*)organization, -1, -1, 0) ){
+		if ( !X509_NAME_add_entry_by_NID(n, NID_organizationName, MBSTRING_ASC, (uint8_t*)organization, -1, -1, 0) ){
 			X509_NAME_free(n);
 			return NULL;
 		}
 	}
 
 	if( country ){
-		if ( !X509_NAME_add_entry_by_NID(n, NID_countryName, MBSTRING_ASC, (unsigned char*)country, -1, -1, 0) ){
+		if ( !X509_NAME_add_entry_by_NID(n, NID_countryName, MBSTRING_ASC, (uint8_t*)country, -1, -1, 0) ){
 			X509_NAME_free(n);
 			return NULL;
 		}

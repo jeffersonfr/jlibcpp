@@ -52,26 +52,26 @@ PipeStream::~PipeStream()
 {
 }
 
-long PipeStream::Read(char *data_, long length_) 
+int64_t PipeStream::Read(char *data_, int64_t length_) 
 {
 	if (_is_open == false) {
 		return 0;
 	}
 	
-	long r;
+	int64_t r;
 	
 #ifdef _WIN32
-	    ReadFile(_fdr, data_, length_, (DWORD *)&r, 0);
+   ReadFile(_fdr, data_, length_, (DWORD *)&r, 0);
 #else
-		r = read(_fds[0], data_, length_);
+	r = read(_fds[0], data_, length_);
 #endif
 	
 	return r;
 }
 
-long PipeStream::Write(const char *data_, long length_) 
+int64_t PipeStream::Write(const char *data_, int64_t length_) 
 {
-	long r;
+	int64_t r;
 	
 #ifdef _WIN32
 	    WriteFile(_fdw, data_, length_, (DWORD *)&r, 0);

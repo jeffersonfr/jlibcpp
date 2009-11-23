@@ -29,7 +29,7 @@
 
 namespace jio {
 
-MemoryInputStream::MemoryInputStream(unsigned char *data, int size):
+MemoryInputStream::MemoryInputStream(uint8_t*data, int size):
 	jio::InputStream()
 {
     jcommon::Object::SetClassName("jio::MemoryInputStream");
@@ -56,17 +56,17 @@ bool MemoryInputStream::IsEmpty()
 	return Available() <= 0;
 }
 
-long long MemoryInputStream::Available()
+int64_t MemoryInputStream::Available()
 {
-	return (long long)(_buffer_size - _buffer_index);
+	return (int64_t)(_buffer_size - _buffer_index);
 }
 
-long long MemoryInputStream::GetSize()
+int64_t MemoryInputStream::GetSize()
 {
 	return _buffer_size;
 }
 
-long long MemoryInputStream::GetPosition()
+int64_t MemoryInputStream::GetPosition()
 {
 	return _buffer_index;
 }
@@ -80,26 +80,26 @@ int MemoryInputStream::Read()
 	return _buffer[_buffer_index++];;
 }
 
-long long MemoryInputStream::Read(char *data, long long size)
+int64_t MemoryInputStream::Read(char *data, int64_t size)
 {
 	if (IsEmpty() == true) {
 		return -1LL;
 	}
 
-	long long r = size;
+	int64_t r = size;
 
 	if (r > Available()) {
 		r = Available();
 	}
 
-	memcpy(data, (unsigned char *)(_buffer + _buffer_index), r);
+	memcpy(data, (uint8_t*)(_buffer + _buffer_index), r);
 
 	return r;
 }
 
-void MemoryInputStream::Skip(long long skip)
+void MemoryInputStream::Skip(int64_t skip)
 {
-	long long r = skip;
+	int64_t r = skip;
 
 	if (r > Available()) {
 		r = Available();
@@ -117,7 +117,7 @@ void MemoryInputStream::Close()
 {
 }
 
-long long MemoryInputStream::GetReceiveBytes()
+int64_t MemoryInputStream::GetReceiveBytes()
 {
 	return _buffer_index;
 }

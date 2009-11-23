@@ -679,7 +679,7 @@ void ComboMenuComponent::Paint(Graphics *g)
 		}
 
 		if (_items[i]->GetEnabled() == false) {
-			g->SetDrawingFlags(BLEND_FLAG);
+			g->SetDrawingFlags(DF_BLEND);
 			g->SetColor(0x00, 0x00, 0x00, 0x80);
 			
 			if ((int)_items.size() > _visible_items) {
@@ -688,7 +688,7 @@ void ComboMenuComponent::Paint(Graphics *g)
 				g->FillRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10);
 			}
 
-			g->SetDrawingFlags(NOFX_FLAG);
+			g->SetDrawingFlags(DF_NOFX);
 		}
 
 		if (_menu != NULL) {

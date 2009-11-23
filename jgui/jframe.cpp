@@ -361,7 +361,7 @@ void Frame::Paint(Graphics *g)
 	int s = _insets.top-30;
 
 	if (s > 4) { 
-		g->SetBlittingFlags(ALPHACHANNEL_BLIT);
+		g->SetBlittingFlags(BF_ALPHACHANNEL);
 
 		// if ((_frame_buttons & FB_RELEASE) != 0) { 
 			g->DrawImage("./icons/close.png", _width-_insets.right-s, 15, s, s);

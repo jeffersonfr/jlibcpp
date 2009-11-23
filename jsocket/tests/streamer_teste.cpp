@@ -44,7 +44,7 @@ uint64_t timeval2int(const timeval *t)
 const double CLOCK_2_TIME_CONST = (double)1.0/90.0;
 #endif
 
-unsigned char nullPacket [188]= {
+uint8_t nullPacket [188]= {
 	0x47, 0x1F, 0xff, 0x1F, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -452,7 +452,7 @@ class Streamer: public jthread::Thread{
 
 			const int MAX = 188;
 
-			unsigned char *buffer = new unsigned char [MAX],
+			uint8_t *buffer = new uint8_t [MAX],
 						  *cursor = buffer;
 			jmpeg::ProgramAssociationSection *pat = 0;
 			jmpeg::ProgramMapSection *pmt = 0;
@@ -514,10 +514,12 @@ class Streamer: public jthread::Thread{
 
 				if ((r = input.Read((char *)cursor, MAX)) < 188) {
 					if (loop) {
+						primeiro = 0;
+
 						input.Reset();
-						// CHANGED:: primeiro = 0;
-					} else
+					} else {
 						break;
+					}
 				}
 
 				pid = jmpeg::TransportStreamPacket::GetProgramID(buffer);

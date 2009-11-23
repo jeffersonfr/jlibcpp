@@ -121,10 +121,10 @@ std::string InetAddress::GetHostAddress()
 	return inet_ntoa(_ip);
 }
 
-std::vector<unsigned char> InetAddress::GetAddress()
+std::vector<uint8_t> InetAddress::GetAddress()
 {
-	unsigned char *ip = (unsigned char *)&_ip;
-	std::vector<unsigned char> addr;
+	uint8_t*ip = (uint8_t*)&_ip;
+	std::vector<uint8_t> addr;
 
 	int size = sizeof(in_addr);
 	

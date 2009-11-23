@@ -45,32 +45,32 @@ void Channel::Lock()
 {
 }
 
-long long Channel::GetPosition()
+int64_t Channel::GetPosition()
 {
 	return 0;
 }
 
-long long Channel::SetPosition(long long p)
+int64_t Channel::SetPosition(int64_t p)
 {
 	return 0;
 }
 
-long long Channel::Read(char *b, long long size, long long offset)
+int64_t Channel::Read(char *b, int64_t size, int64_t offset)
 {
 	return 0;
 }
 
-long long Channel::GetSize()
+int64_t Channel::GetSize()
 {
 	return 0;
 }
 
-long Channel::Write(char *b, long long size, long long offset)
+int64_t Channel::Write(char *b, int64_t size, int64_t offset)
 {
 	return 0;
 }
 
-long long Channel::Transfer(Channel *in, long long count, long long position, Channel *out, long long count2, long long position2)
+int64_t Channel::Transfer(Channel *in, int64_t count, int64_t position, Channel *out, int64_t count2, int64_t position2)
 {
 	return 0;
 }

@@ -52,7 +52,7 @@ bool ObjectOutputStream::IsEmpty()
 	return Available() == 0;
 }
 
-long long ObjectOutputStream::Available()
+int64_t ObjectOutputStream::Available()
 {
 	if (stream != NULL) {
 		return stream->Available();
@@ -84,7 +84,7 @@ int ObjectOutputStream::Write(jcommon::Object *object)
 	return stream->Write("{\"" + name + "\": " + obj->SerializeObject() + "}");
 }
 
-long long ObjectOutputStream::Flush()
+int64_t ObjectOutputStream::Flush()
 {
 	if (stream != NULL) {
 		return stream->Flush();
@@ -100,7 +100,7 @@ void ObjectOutputStream::Close()
 	}
 }
 
-long long ObjectOutputStream::GetSentBytes()
+int64_t ObjectOutputStream::GetSentBytes()
 {
 	if (stream != NULL) {
 		return stream->GetSentBytes();

@@ -95,23 +95,20 @@ Graphics::Graphics(void *s):
 	_clip.width = DEFAULT_SCALE_WIDTH;
 	_clip.height = DEFAULT_SCALE_HEIGHT;
 
+	_color.red = 0x00;
+	_color.green = 0x00;
+	_color.blue = 0x00;
+	_color.alpha = 0x00;
+
 	_font = NULL;
-	_red = 0x00;
-	_green = 0x00;
-	_blue = 0x00;
-	_alpha = 0x00;
-	_color = 0x00000000;
+
 	_line_type = RECT_LINE;
 	_line_style = SOLID_LINE;
 	_line_width = 1;
 
-	_draw_flags = NOFX_FLAG;
-	_blit_flags = NOFX_BLIT;
-	_porter_duff_flags = PD_NONE;
-
-	SetDrawingFlags(BLEND_FLAG);
-	SetPorterDuffFlags(PD_SRC_OVER);
-	SetBlittingFlags(ALPHACHANNEL_BLIT);
+	SetDrawingFlags(DF_BLEND);
+	SetBlittingFlags(BF_ALPHACHANNEL);
+	SetPorterDuffFlags(PDF_SRC_OVER);
 }
 
 Graphics::~Graphics()
@@ -350,31 +347,31 @@ void Graphics::SetPorterDuffFlags(jporter_duff_flags_t t)
 	surface->SetPorterDuff(surface, DSPD_SRC_OVER);
 
 	if (surface != NULL) {
-		if (_porter_duff_flags == PD_NONE) {
+		if (_porter_duff_flags == PDF_NONE) {
 			surface->SetPorterDuff(surface, DSPD_NONE);
-		} else if (_porter_duff_flags == PD_CLEAR) {
+		} else if (_porter_duff_flags == PDF_CLEAR) {
 			surface->SetPorterDuff(surface, DSPD_CLEAR);
-		} else if (_porter_duff_flags == PD_SRC) {
+		} else if (_porter_duff_flags == PDF_SRC) {
 			surface->SetPorterDuff(surface, DSPD_SRC);
-		} else if (_porter_duff_flags == PD_SRC_OVER) {
+		} else if (_porter_duff_flags == PDF_SRC_OVER) {
 			surface->SetPorterDuff(surface, DSPD_SRC_OVER);
-		} else if (_porter_duff_flags == PD_DST_OVER) {
+		} else if (_porter_duff_flags == PDF_DST_OVER) {
 			surface->SetPorterDuff(surface, DSPD_DST_OVER);
-		} else if (_porter_duff_flags == PD_SRC_IN) {
+		} else if (_porter_duff_flags == PDF_SRC_IN) {
 			surface->SetPorterDuff(surface, DSPD_SRC_IN);
-		} else if (_porter_duff_flags == PD_DST_IN) {
+		} else if (_porter_duff_flags == PDF_DST_IN) {
 			surface->SetPorterDuff(surface, DSPD_DST_IN);
-		} else if (_porter_duff_flags == PD_SRC_OUT) {
+		} else if (_porter_duff_flags == PDF_SRC_OUT) {
 			surface->SetPorterDuff(surface, DSPD_SRC_OUT);
-		} else if (_porter_duff_flags == PD_DST_OUT) {
+		} else if (_porter_duff_flags == PDF_DST_OUT) {
 			surface->SetPorterDuff(surface, DSPD_DST_OUT);
-		} else if (_porter_duff_flags == PD_SRC_ATOP) {
+		} else if (_porter_duff_flags == PDF_SRC_ATOP) {
 			surface->SetPorterDuff(surface, DSPD_SRC_ATOP);
-		} else if (_porter_duff_flags == PD_DST_ATOP) {
+		} else if (_porter_duff_flags == PDF_DST_ATOP) {
 			surface->SetPorterDuff(surface, DSPD_DST_ATOP);
-		} else if (_porter_duff_flags == PD_ADD) {
+		} else if (_porter_duff_flags == PDF_ADD) {
 			surface->SetPorterDuff(surface, DSPD_ADD);
-		} else if (_porter_duff_flags == PD_XOR) {
+		} else if (_porter_duff_flags == PDF_XOR) {
 			surface->SetPorterDuff(surface, DSPD_XOR);
 		}
 	}
@@ -391,11 +388,11 @@ void Graphics::SetDrawingFlags(jdrawing_flags_t t)
 	_draw_flags = t;
 
 	if (surface != NULL) {
-		if (_draw_flags == NOFX_FLAG) {
+		if (_draw_flags == DF_NOFX) {
 			surface->SetDrawingFlags(surface, DSDRAW_NOFX);
-		} else if (_draw_flags == BLEND_FLAG) {
+		} else if (_draw_flags == DF_BLEND) {
 			surface->SetDrawingFlags(surface, DSDRAW_BLEND);
-		} else if (_draw_flags == XOR_FLAG) {
+		} else if (_draw_flags == DF_XOR) {
 			surface->SetDrawingFlags(surface, DSDRAW_XOR);
 		}
 	}
@@ -414,27 +411,27 @@ void Graphics::SetBlittingFlags(jblitting_flags_t t)
 	if (surface != NULL) {
 		DFBSurfaceBlittingFlags f = (DFBSurfaceBlittingFlags)0; // NOFX_BLIT;
 
-		if (_blit_flags & NOFX_BLIT) {
+		if (_blit_flags & BF_NOFX) {
 			f = (DFBSurfaceBlittingFlags)(f | DSBLIT_NOFX);
 		}
 
-		if (_blit_flags & ALPHACHANNEL_BLIT) {
+		if (_blit_flags & BF_ALPHACHANNEL) {
 			f = (DFBSurfaceBlittingFlags)(f | DSBLIT_BLEND_ALPHACHANNEL);
 		}
 
-		if (_blit_flags & COLORALPHA_BLIT) {
+		if (_blit_flags & BF_COLORALPHA) {
 			f = (DFBSurfaceBlittingFlags)(f | DSBLIT_BLEND_COLORALPHA);
 		} 
 
-		if (_blit_flags & COLORIZE_BLIT) {
+		if (_blit_flags & BF_COLORIZE) {
 			f = (DFBSurfaceBlittingFlags)(f | DSBLIT_COLORIZE);
 		}
 
-		if (_blit_flags & DEINTERLACE_BLIT) {
+		if (_blit_flags & BF_DEINTERLACE) {
 			f = (DFBSurfaceBlittingFlags)(f | DSBLIT_DEINTERLACE);
 		}
 
-		if (_blit_flags & XOR_BLIT) {
+		if (_blit_flags & BF_XOR) {
 			f = (DFBSurfaceBlittingFlags)(f | DSBLIT_XOR);
 		}
 
@@ -512,58 +509,70 @@ void Graphics::Flip(int xp, int yp, int wp, int hp)
 #endif
 }
 
-uint32_t Graphics::GetColor()
+struct jcolor_t Graphics::GetColor()
 {
 	return _color;
 } 
 
-void Graphics::SetColor(uint32_t c)
+void Graphics::SetColor(struct jcolor_t c)
 {
+	_color.red = c.red;
+	_color.green = c.green;
+	_color.blue = c.blue;
+	_color.alpha = c.alpha;
+
 #ifdef DIRECTFB_UI
-	_red = (c >> 0x10) & 0xff;
-	_green = (c >> 0x08) & 0xff;
-	_blue = (c >> 0x00) & 0xff;
-	_alpha = (c >> 0x18) & 0xff;
-
-	_color = c;
-
 	if (surface == NULL) {
 		return;
 	}
 
-	surface->SetColor(surface, _red, _green, _blue, _alpha);
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
+#endif
+} 
+
+void Graphics::SetColor(uint32_t c)
+{
+	_color.red = (c >> 0x10) & 0xff;
+	_color.green = (c >> 0x08) & 0xff;
+	_color.blue = (c >> 0x00) & 0xff;
+	_color.alpha = (c >> 0x18) & 0xff;
+
+#ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return;
+	}
+
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
 #endif
 } 
 
 void Graphics::SetColor(int r, int g, int b, int a)
 {
-#ifdef DIRECTFB_UI
 	TRUNC_COLOR(r, g, b, a);
 
-	_red = r;
-	_green = g;
-	_blue = b;
-	_alpha = a;
+	_color.red = r;
+	_color.green = g;
+	_color.blue = b;
+	_color.alpha = a;
 
-	_color = a<<24 | r<<16 | g<<8 | b<<0;
-
+#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
-	surface->SetColor(surface, _red, _green, _blue, _alpha);
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
 #endif
 } 
 
 void Graphics::SetFont(Font *font)
 {
-#ifdef DIRECTFB_UI
 	_font = font;
 
 	if (_font == NULL) {
 		return;
 	}
 
+#ifdef DIRECTFB_UI
 	surface->SetFont(surface, font->_font);
 #endif
 }
@@ -624,7 +633,9 @@ int Graphics::GetLineWidth()
 void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	if (_line_width == 1) {
 		int x0 = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
@@ -730,7 +741,9 @@ void Graphics::DrawRectangle(int xp, int yp, int wp, int hp)
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) 	return;
+	if (surface == NULL) {
+		return;
+	}
 
 	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
@@ -765,7 +778,9 @@ void Graphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) 	return;
+	if (surface == NULL) {
+		return;
+	}
 
 	/*
 		 int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
@@ -804,7 +819,9 @@ void Graphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) 	return;
+	if (surface == NULL) {
+		return;
+	}
 
 	/*
 		 int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
@@ -884,7 +901,9 @@ void Graphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) 	return;
+	if (surface == NULL) {
+		return;
+	}
 
 	if (wp < 2*raio) {
 		raio = wp/2;
@@ -984,7 +1003,9 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) 	return;
+	if (surface == NULL) {
+		return;
+	}
 
 	if (_line_width > raio) {
 		raio = _line_width;
@@ -1240,7 +1261,9 @@ void Graphics::FillCircle(int xp, int yp, int raio)
 void Graphics::DrawCircle(int xp, int yp, int raio)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) 	return;
+	if (surface == NULL) {
+		return;
+	}
 
 	// int r = SCALE_TO_SCREEN(raio, _screen.width, _scale.width);
 	int mw = _line_width;
@@ -1331,7 +1354,9 @@ void Graphics::DrawCircle(int xp, int yp, int raio)
 void Graphics::FillArc(int xc, int yc, int rx, int ry, double start_angle, double end_angle)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) 	return;
+	if (surface == NULL) {
+		return;
+	}
 
 	if (start_angle > 360 || start_angle < 360) {
 		start_angle = start_angle-((int)start_angle/360)*360;
@@ -1424,7 +1449,9 @@ void Graphics::FillArc(int xc, int yc, int rx, int ry, double start_angle, doubl
 void Graphics::DrawArc(int xc, int yc, int rx, int ry, double start_angle, double end_angle)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) 	return;
+	if (surface == NULL) {
+		return;
+	}
 
 	if (start_angle > 360 || start_angle < 360) {
 		start_angle = start_angle-((int)start_angle/360)*360;
@@ -1572,7 +1599,9 @@ void Graphics::DrawArc(int xc, int yc, int rx, int ry, double start_angle, doubl
 void Graphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	int x1 = SCALE_TO_SCREEN((_clip.x+x1p), _screen.width, _scale.width); 
 	int y1 = SCALE_TO_SCREEN((_clip.y+y1p), _screen.height, _scale.height);
@@ -1588,7 +1617,9 @@ void Graphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p
 void Graphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	/*
 		 int x1 = SCALE_TO_SCREEN(x1p, _screen.width, _scale.width); 
@@ -1612,7 +1643,9 @@ void Graphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p
 void Graphics::DrawPolygon(int x, int y, jpoint_t *p, int num, bool close)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	int *xpoints = new int[num], 
 			*ypoints = new int[num];
@@ -1649,7 +1682,9 @@ void Graphics::DrawPolygon(int x, int y, jpoint_t *p, int num, bool close)
 void Graphics::FillPolygon(int x, int y, jpoint_t *p, int num)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	/*
 	// Small test application demonstrating the usage of the triangulate class
@@ -1713,7 +1748,9 @@ void Graphics::FillGradientRectangle(int xp, int yp, int wp, int hp, int sr, int
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
@@ -1765,7 +1802,9 @@ void Graphics::DrawString(std::string s, int xp, int yp)
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
@@ -1782,7 +1821,9 @@ void Graphics::DrawGlyph(int symbol, int xp, int yp)
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
@@ -1906,7 +1947,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 		return false;
 	}
 
-	surface->SetColor(surface, _red, _green, _blue, alpha);
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
 	if (_radians != 0.0 || _translate.x != 0 || _translate.y != 0) {
 		int wp = SCREEN_TO_SCALE(desc.width, _screen.width, _scale.width); 
@@ -1916,7 +1957,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_red, _green, _blue, alpha);
+		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
 		off.GetGraphics()->DrawImage(img, 0, 0);
 		
@@ -1984,14 +2025,14 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 	int w = SCALE_TO_SCREEN((_clip.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_clip.y+yp+hp), _screen.height, _scale.height)-y;
 
-	surface->SetColor(surface, _red, _green, _blue, alpha);
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
 	if (_radians != 0.0 || _translate.x != 0 || _translate.y != 0) {
 		OffScreenImage off(wp, hp);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_red, _green, _blue, alpha);
+		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
 		off.GetGraphics()->DrawImage(img, 0, 0, wp, hp);
 		
@@ -2135,14 +2176,14 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	drect.w = w;
 	drect.h = h;
 
-	surface->SetColor(surface, _red, _green, _blue, alpha);
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
 	if (_radians != 0.0 || _translate.x != 0 || _translate.y != 0) {
 		OffScreenImage off(wp, hp);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_red, _green, _blue, alpha);
+		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
 		off.GetGraphics()->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
@@ -2229,7 +2270,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int alpha)
 	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
 
-	surface->SetColor(surface, _red, _green, _blue, alpha);
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
 	if (_radians == 0.0 && _translate.x == 0 && _translate.y == 0) {
 		surface->Blit(surface, g->surface, NULL, x+_translate.x, y+_translate.y);
@@ -2241,7 +2282,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int alpha)
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_red, _green, _blue, alpha);
+		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
 		off.GetGraphics()->DrawImage(img, 0, 0);
 		
@@ -2291,7 +2332,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 	drect.w = w;
 	drect.h = h;
 
-	surface->SetColor(surface, _red, _green, _blue, alpha);
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 	
 	if (_radians == 0.0 && _translate.x == 0 && _translate.y == 0) {
 		surface->StretchBlit(surface, g->surface, NULL, &drect);
@@ -2300,7 +2341,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_red, _green, _blue, alpha);
+		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
 		off.GetGraphics()->DrawImage(img, 0, 0, wp, hp);
 		
@@ -2379,7 +2420,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 	drect.w = w;
 	drect.h = h;
 
-	surface->SetColor(surface, _red, _green, _blue, alpha);
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 	
 	if (_radians == 0.0 && _translate.x == 0 && _translate.y == 0) {
 		surface->StretchBlit(surface, g->surface, &srect, &drect);
@@ -2388,7 +2429,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_red, _green, _blue, alpha);
+		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
 		off.GetGraphics()->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
@@ -2431,7 +2472,9 @@ void Graphics::DrawString(std::string full_text, int xp, int yp, int wp, int hp,
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	std::vector<std::string> words,
 		texts;
@@ -2677,6 +2720,10 @@ void Graphics::DrawString(std::string full_text, int xp, int yp, int wp, int hp,
 uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 {
 #ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return 0x00000000;
+	}
+
 	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
 
@@ -2710,6 +2757,10 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 void Graphics::GetRGBArray(int startxp, int startyp, int wp, int hp, unsigned int **rgb, int offset, int scansize)
 {
 #ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return;
+	}
+
 	int startx = SCALE_TO_SCREEN(startxp, _screen.width, _scale.width); 
 	int starty = SCALE_TO_SCREEN(startyp, _screen.height, _scale.height);
 	// int w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width);
@@ -2754,6 +2805,10 @@ void Graphics::SetRGB(int xp, int yp, uint32_t rgb)
 	}
 
 #ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return;
+	}
+
 	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
 
@@ -2774,9 +2829,9 @@ void Graphics::SetRGB(int xp, int yp, uint32_t rgb)
 
 	dst = (uint32_t *)((uint8_t *)ptr + y * pitch);
 
-	if (_draw_flags == NOFX_FLAG) {
+	if (_draw_flags == DF_NOFX) {
 		*(dst+x) = rgb;
-	} else if (_draw_flags == BLEND_FLAG) {
+	} else if (_draw_flags == DF_BLEND) {
 		int pixel = *(dst+x),
 				r = (rgb>>0x10)&0xff,
 				g = (rgb>>0x08)&0xff,
@@ -2806,7 +2861,7 @@ void Graphics::SetRGB(int xp, int yp, uint32_t rgb)
 		}
 
 		*(dst+x) = (pa << 24) | (pr << 16) | (pg << 8) | (pb << 0);
-	} else if (_draw_flags == XOR_FLAG) {
+	} else if (_draw_flags == DF_XOR) {
 		*(dst+x) ^= rgb;
 	}
 
@@ -2817,6 +2872,10 @@ void Graphics::SetRGB(int xp, int yp, uint32_t rgb)
 void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline) 
 {
 #ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return;
+	}
+
 	void *ptr;
 	uint32_t *dst,
 					 *prgb = rgb;
@@ -2854,14 +2913,14 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 
 	double d = (double)_screen.height/(double)_scale.height; 
 
-	if (_draw_flags == NOFX_FLAG) {
+	if (_draw_flags == DF_NOFX) {
 		double k;
 
 		step = 0;
 
 		for (int j=y; j<hmax-1; j++) {
 			cy = (int)(j*d);//SCALE_TO_SCREEN(j, _screen.height, _scale.height);
-			dst = (uint32_t *)((unsigned char *)ptr+cy*pitch);
+			dst = (uint32_t *)((uint8_t *)ptr+cy*pitch);
 			prgb = (uint32_t *)(rgb+step);
 			step = step+w;
 
@@ -2877,7 +2936,7 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 		/*
 			 for (int j=0; j<h-1; j++) {
 			 y = (int)(j*d);//SCALE_TO_SCREEN(j, _screen.height, _scale.height);
-			 dst = (uint32_t *)((unsigned char *)ptr+y*pitch);
+			 dst = (uint32_t *)((uint8_t *)ptr+y*pitch);
 			 prgb = (uint32_t *)(rgb+step);
 			 step = step+w;
 
@@ -2891,13 +2950,13 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 		}
 	}
 	*/
-	} else if (_draw_flags == BLEND_FLAG) {
+	} else if (_draw_flags == DF_BLEND) {
 		// INFO:: BLEND source with destination
 		double k;
 
 		for (int j=y; j<hmax; j++) {
 			cy = (int)(j*d);//SCALE_TO_SCREEN(j, _screen.height, _scale.height);
-			dst = (uint32_t *)((unsigned char *)ptr+cy*pitch);
+			dst = (uint32_t *)((uint8_t *)ptr+cy*pitch);
 			step = j*w;
 			prgb = (uint32_t *)(rgb+step);
 
@@ -2939,12 +2998,12 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 				*(dst+(int)k) = 0xff000000 | pr | pg | pb;
 			}
 		}
-	} else if (_draw_flags == XOR_FLAG) {
+	} else if (_draw_flags == DF_XOR) {
 		double k;
 
 		for (int j=y; j<hmax; j++) {
 			cy = (int)(j*d);//SCALE_TO_SCREEN(j, _screen.height, _scale.height);
-			dst = (uint32_t *)((unsigned char *)ptr+cy*pitch);
+			dst = (uint32_t *)((uint8_t *)ptr+cy*pitch);
 			step = j*w;
 
 			k = 0.0;
@@ -2956,20 +3015,20 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 				// *(dst+x) = 0xff000000 | rgb[j*w+i];
 			}
 		}
-}
+	}
 
-surface->Unlock(surface);
+	surface->Unlock(surface);
 #endif
 }
 
 void Graphics::Reset()
 {
 	_font = NULL;
-	_red = 0x00;
-	_green = 0x00;
-	_blue = 0x00;
-	_alpha = 0x00;
-	_color = 0x00000000;
+
+	_color.red = 0x00;
+	_color.green = 0x00;
+	_color.blue = 0x00;
+	_color.alpha = 0x00;
 
 	_radians = 0.0;
 	_translate.x = 0;
@@ -2978,29 +3037,19 @@ void Graphics::Reset()
 	_line_type = RECT_LINE;
 	_line_style = SOLID_LINE;
 
-	SetDrawingFlags(BLEND_FLAG);
-	SetPorterDuffFlags(PD_SRC_OVER);
-	SetBlittingFlags((jblitting_flags_t)(ALPHACHANNEL_BLIT | COLORALPHA_BLIT));
+	SetDrawingFlags(DF_BLEND);
+	SetBlittingFlags((jblitting_flags_t)(BF_ALPHACHANNEL | BF_COLORALPHA));
+	SetPorterDuffFlags(PDF_SRC_OVER);
 }
 
 void Graphics::Lock()
 {
 	graphics_mutex.Lock();
-
-	try {
-		// graphics_mutex.Lock();
-	} catch (jthread::MutexException &e) {
-	}
 }
 
 void Graphics::Unlock()
 {
 	graphics_mutex.Unlock();
-
-	try {
-		// graphics_mutex.Unlock();
-	} catch (jthread::MutexException &e) {
-	}
 }
 
 void Graphics::insertEdge(edge_t *list, edge_t *edge)
@@ -3051,15 +3100,18 @@ void Graphics::fillScan(int scan, edge_t *active)
 
 	edge_t *p1,
 				 *p2;
+	uint32_t color;
 	int count;
 
 	p1 = active->next;
+
+	color = _color.alpha << 0x18 | _color.red << 0x10 | _color.green << 0x08 | _color.blue << 0x00;
 
 	while (p1 != NULL) {
 		p2 = p1->next;
 
 		for (count=(int)p1->xIntersect; p2!=NULL && count<=(int)p2->xIntersect; count++) {
-			SetPixel(count, scan, _color);
+			SetPixel(count, scan, color);
 		}
 
 		if (p2 != NULL) {

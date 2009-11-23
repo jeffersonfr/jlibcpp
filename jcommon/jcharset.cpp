@@ -160,7 +160,7 @@ jcharset_result_t Charset::UTF8ToUnicode(const char **src_start, const char *src
 		register Char ch;
 		register unsigned short extra_bytes;
 
-		extra_bytes = UTF8ExtraBytes[(unsigned char)*src];
+		extra_bytes = UTF8ExtraBytes[(uint8_t)*src];
 		/*
 		if (src + extra_bytes > src_end) {
 			result |= SourceExhausted;
@@ -172,7 +172,7 @@ jcharset_result_t Charset::UTF8ToUnicode(const char **src_start, const char *src
 			break;
 		}
 
-		ch = (unsigned char)*src++;
+		ch = (uint8_t)*src++;
 		if (extra_bytes) {
 			if (src >= src_end) {
 				result = (jcharset_result_t)(result | CS_SOURCE_CORRUPT);

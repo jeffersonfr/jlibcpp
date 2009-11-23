@@ -425,7 +425,7 @@ bool File::IsExecutable()
 #endif
 }
 
-long long File::GetSize()
+int64_t File::GetSize()
 {
 #ifdef _WIN32
 	return GetFileSize(_fd,  NULL);
@@ -437,7 +437,7 @@ long long File::GetSize()
 		size = lseek(_fd, 1, SEEK_END);
 		lseek(_fd, cur, SEEK_SET);
 
-		return (long long)size;
+		return (int64_t)size;
 	}
 
 	return _stat.st_size;
@@ -490,9 +490,9 @@ time_t File::GetTimeLastStatusChange()
 	return _stat.st_ctime;
 }
 
-long File::Read(char *data_, long length_) 
+int64_t File::Read(char *data_, int64_t length_) 
 {
-	long r;
+	int64_t r;
 	
 #ifdef _WIN32
 	    ReadFile(_fd, data_, length_, (DWORD *)&r, 0);
@@ -507,9 +507,9 @@ long File::Read(char *data_, long length_)
 	return r;
 }
 
-long File::Write(const char *data_, long length_) 
+int64_t File::Write(const char *data_, int64_t length_) 
 {
-	long r;
+	int64_t r;
 	
 #ifdef _WIN32
 	    WriteFile(_fd, data_, length_, (DWORD *)&r, 0);
@@ -698,7 +698,7 @@ void File::Reset()
 	Seek(0);
 }
 
-int File::Seek(int n) 
+int64_t File::Seek(int64_t n) 
 {
 #ifdef _WIN32
 	LARGE_INTEGER distanceToMove;
@@ -707,7 +707,7 @@ int File::Seek(int n)
 
 	return SetFilePointerEx(_fd, distanceToMove, 0, FILE_BEGIN);
 #else
-	return lseek(_fd, n, SEEK_SET);
+	return lseek(_fd, (off_t)n, SEEK_SET);
 #endif
 }
 

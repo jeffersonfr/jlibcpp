@@ -52,7 +52,7 @@ bool ObjectInputStream::IsEmpty()
 	return Available() == 0;
 }
 
-long long ObjectInputStream::Available()
+int64_t ObjectInputStream::Available()
 {
 	if (stream != NULL) {
 		return stream->Available();
@@ -61,7 +61,7 @@ long long ObjectInputStream::Available()
 	return 0LL;
 }
 
-long long ObjectInputStream::GetSize()
+int64_t ObjectInputStream::GetSize()
 {
 	if (stream != NULL) {
 		return stream->GetSize();
@@ -70,7 +70,7 @@ long long ObjectInputStream::GetSize()
 	return 0LL;
 }
 
-long long ObjectInputStream::GetPosition()
+int64_t ObjectInputStream::GetPosition()
 {
 	return 0LL;
 }
@@ -116,7 +116,7 @@ jcommon::Object * ObjectInputStream::Read()
 	return object;
 }
 
-void ObjectInputStream::Skip(long long skip)
+void ObjectInputStream::Skip(int64_t skip)
 {
 	if (stream != NULL) {
 		stream->Skip(skip);
@@ -137,7 +137,7 @@ void ObjectInputStream::Close()
 	}
 }
 
-long long ObjectInputStream::GetReceiveBytes()
+int64_t ObjectInputStream::GetReceiveBytes()
 {
 	if (stream != NULL) {
 		return stream->GetReceiveBytes();

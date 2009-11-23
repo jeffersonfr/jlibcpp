@@ -40,7 +40,7 @@ TextField::TextField(int x, int y, int width, int height, int max_text):
 	_cursor = UNDERSCORE_CURSOR;
 	_begin_index = 0;
 	_end_index = 0;
-	_horizontal_gap = 2;
+	_horizontal_gap = 4;
 	_vertical_gap = 2;
 	
 	SetFocusable(true);

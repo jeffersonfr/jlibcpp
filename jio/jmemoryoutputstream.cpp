@@ -29,7 +29,7 @@
 
 namespace jio {
 
-MemoryOutputStream::MemoryOutputStream(unsigned char *data, int size):
+MemoryOutputStream::MemoryOutputStream(uint8_t*data, int size):
 	jio::OutputStream()
 {
     jcommon::Object::SetClassName("jio::MemoryOutputStream");
@@ -56,9 +56,9 @@ bool MemoryOutputStream::IsEmpty()
 	return Available() == 0;
 }
 
-long long MemoryOutputStream::Available()
+int64_t MemoryOutputStream::Available()
 {
-	return (long long)(_buffer_size - _buffer_index);
+	return (int64_t)(_buffer_size - _buffer_index);
 }
 
 int MemoryOutputStream::Write(int b)
@@ -67,29 +67,29 @@ int MemoryOutputStream::Write(int b)
 		return 0;
 	}
 
-	_buffer[_buffer_index++] = (unsigned char)b;
+	_buffer[_buffer_index++] = (uint8_t)b;
 
 	return 1;
 }
 
-long long MemoryOutputStream::Write(char *data, long long size)
+int64_t MemoryOutputStream::Write(char *data, int64_t size)
 {
 	if (IsEmpty() == true) {
 		return 0LL;
 	}
 
-	long long r = size;
+	int64_t r = size;
 
 	if (r > Available()) {
 		r = Available();
 	}
 
-	memcpy((unsigned char *)(_buffer + _buffer_index), data, r);
+	memcpy((uint8_t*)(_buffer + _buffer_index), data, r);
 
 	return r;
 }
 
-long long MemoryOutputStream::Flush()
+int64_t MemoryOutputStream::Flush()
 {
 	return 0;
 }
@@ -99,7 +99,7 @@ void MemoryOutputStream::Close()
 	// DO:: nothing
 }
 
-long long MemoryOutputStream::GetSentBytes()
+int64_t MemoryOutputStream::GetSentBytes()
 {
 	return _buffer_index;
 }

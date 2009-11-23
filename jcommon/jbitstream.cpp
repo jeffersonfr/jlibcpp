@@ -95,20 +95,20 @@ unsigned long long BitStream::GetBits(int n)
 	return result;
 }
 
-unsigned char * BitStream::GetBitsArray(int size) 
+uint8_t* BitStream::GetBitsArray(int size) 
 {
 	int i,
 		len8 = size / 8,
 		mod8 = size % 8;
 	
 	try {
-		unsigned char *array = new unsigned char[len8];
+		uint8_t*array = new uint8_t[len8];
 	
 		for (i=0; i<len8; i++) {
-			array[i] = (unsigned char)GetBits(8);
+			array[i] = (uint8_t)GetBits(8);
 		}
 
-		array[i] = (unsigned char)(GetBits(mod8) << (8 - mod8));
+		array[i] = (uint8_t)(GetBits(mod8) << (8 - mod8));
 	
 		return array;
 	} catch (std::bad_alloc &e) {

@@ -34,7 +34,7 @@ class FileOutputStream : public jio::OutputStream{
 
 	private:
 		/** \brief Seek */
-		long long _current;
+		int64_t _current;
 		/** \brief */
 		File *_file;
 		/** \brief */
@@ -44,7 +44,7 @@ class FileOutputStream : public jio::OutputStream{
         /** \brief */
 		int _current_index; 
         /** \brief */
-        long long _sent_bytes;
+        int64_t _sent_bytes;
 
 	public:
 		/**
@@ -75,13 +75,13 @@ class FileOutputStream : public jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		virtual long long Available();
+		virtual int64_t Available();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual long long GetSize();
+		virtual int64_t GetSize();
 		
 		/**
 		 * \brief
@@ -93,19 +93,19 @@ class FileOutputStream : public jio::OutputStream{
 		 * \brief
 		 * 
 		 */
-		virtual long long Write(const char *, long long size);
+		virtual int64_t Write(const char *, int64_t size);
     
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual long long Flush();
+		virtual int64_t Flush();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Seek(long long index);
+		virtual void Seek(int64_t index);
 		
 		/**
 		 * \brief
@@ -117,7 +117,7 @@ class FileOutputStream : public jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		long long GetSentBytes();
+		int64_t GetSentBytes();
 
 };
 

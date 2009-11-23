@@ -50,13 +50,16 @@ enum jkey_type_t {
  *
  */
 enum jinput_modifiers_t {
-	JMOD_SHIFT,
-	JMOD_CONTROL,
-	JMOD_ALT,
-	JMOD_ALTGR,
-	JMOD_META,
-	JMOD_SUPER,
-	JMOD_HYPER
+	JMOD_SHIFT				= 0x0001,
+	JMOD_CONTROL			= 0x0002,
+	JMOD_ALT					= 0x0004,
+	JMOD_ALTGR				= 0x0008,
+	JMOD_META					= 0x0010,
+	JMOD_SUPER				= 0x0020,
+	JMOD_HYPER				= 0x0040,
+	JMOD_CAPS_LOCK		= 0x0080,
+	JMOD_NUM_LOCK			= 0x0100,
+	JMOD_SCROLL_LOCK	= 0x0200
 };
 
 /**

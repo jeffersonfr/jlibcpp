@@ -52,7 +52,7 @@ MultiDestinationBuffer::MultiDestinationBuffer(int size, int chunk, jbuffer_type
 	_buffer = new jringbuffer_t[_buffer_size];
 
 	for (int i=0; i<_buffer_size; i++) {
-		_buffer[i].data = new unsigned char[chunk];
+		_buffer[i].data = new uint8_t[chunk];
 		_buffer[i].size = chunk;
 	}
 }
@@ -147,45 +147,41 @@ int MultiDestinationBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 			}
 		}
 
-		{
-			AutoLock lock(&_mutex);
+		AutoLock lock(&_mutex);
 
-			data->data = _buffer[*rindex].data;
-			data->size = _buffer[*rindex].size;
+		data->data = _buffer[*rindex].data;
+		data->size = _buffer[*rindex].size;
 
-			// memcpy(data->data, _buffer[*rindex].data, data->size);
-		}
-		
+		// memcpy(data->data, _buffer[*rindex].data, data->size);
+
 		if (++(*rindex) >= _buffer_size) {
 			(*rindex) = 0;
 			(*pindex)++;
 		}
+
+		return data->size;
 	} else if (*pindex == (_pass_index-1)) {
+		AutoLock lock(&_mutex);
+
 		if (*rindex > _write_index) {
-			{
-				AutoLock lock(&_mutex);
+			data->data = _buffer[*rindex].data;
+			data->size = _buffer[*rindex].size;
 
-				data->data = _buffer[*rindex].data;
-				data->size = _buffer[*rindex].size;
-
-				// memcpy(data->data, _buffer[*rindex].data, data->size);
-			}
+			// memcpy(data->data, _buffer[*rindex].data, data->size);
 
 			if (++(*rindex) >= _buffer_size) {
 				(*rindex) = 0;
 				(*pindex)++;
 			}
-		} else {
-			return -1;
+
+			return data->size;
 		}
-	} else {
-		return -1;
 	}
 
-	return 0;
+	return -1;
 }
 
-int MultiDestinationBuffer::Write(const unsigned char *data, int size)
+int MultiDestinationBuffer::Write(const uint8_t*data, int size)
 {
 	if ((void *)data == NULL) {
 		return -1;
@@ -230,7 +226,7 @@ int MultiDestinationBuffer::Write(jringbuffer_t *data)
 		return -1;
 	}
 
-	return Write((const unsigned char *)data->data, data->size);
+	return Write((const uint8_t*)data->data, data->size);
 }
 
 }

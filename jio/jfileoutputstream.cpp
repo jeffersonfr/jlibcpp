@@ -92,19 +92,19 @@ bool FileOutputStream::IsEmpty()
 	return Available() == 0;
 }
 
-long long FileOutputStream::Available()
+int64_t FileOutputStream::Available()
 {
 	return 0;
 }
 
-long long FileOutputStream::GetSize()
+int64_t FileOutputStream::GetSize()
 {
 	return _file->GetSize();
 }
 
 int FileOutputStream::Write(int b)
 {
-	_buffer[_current_index++] = (unsigned char)b;
+	_buffer[_current_index++] = (uint8_t)b;
 
 	if (_current_index == _buffer_length) {
 		return Flush();
@@ -113,9 +113,9 @@ int FileOutputStream::Write(int b)
 	return 0;
 }
 
-long long FileOutputStream::Write(const char *data_, long long data_length_)
+int64_t FileOutputStream::Write(const char *data_, int64_t data_length_)
 {
-	long long size,
+	int64_t size,
 		 l = data_length_;
 	
 	while (l > 0LL) {
@@ -140,16 +140,16 @@ long long FileOutputStream::Write(const char *data_, long long data_length_)
 		}
 	}
 
-	return (long long)(data_length_ - l);
+	return (int64_t)(data_length_ - l);
 }
 
-long long FileOutputStream::Flush()
+int64_t FileOutputStream::Flush()
 {
 	if (_current_index == 0) {
 		return 0LL;
 	}
 
-	long long n;
+	int64_t n;
 
 	n = _file->Write(_buffer, (int)_current_index);
 
@@ -161,10 +161,10 @@ long long FileOutputStream::Flush()
 
 	_sent_bytes += n;
 
-	return (long long)n;
+	return (int64_t)n;
 }
 
-void FileOutputStream::Seek(long long index)
+void FileOutputStream::Seek(int64_t index)
 {
 	// TODO:: file seek position
 }
@@ -174,7 +174,7 @@ void FileOutputStream::Close()
 	_file->Close();
 }
 
-long long FileOutputStream::GetSentBytes()
+int64_t FileOutputStream::GetSentBytes()
 {
 	return _sent_bytes;
 }

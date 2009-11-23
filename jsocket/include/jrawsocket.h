@@ -58,12 +58,12 @@ namespace jsocket {
 struct jip_hdr_t {
 	unsigned int ip_hl:4,
 			 	 ip_v:4;
-	unsigned char ip_tos;
+	uint8_t ip_tos;
 	unsigned short ip_len;
 	unsigned short ip_id;
 	unsigned short ip_off;
-	unsigned char ip_ttl;
-	unsigned char ip_p;
+	uint8_t ip_ttl;
+	uint8_t ip_p;
 	unsigned short ip_sum;
 	unsigned long saddr, daddr;
 };
@@ -79,7 +79,7 @@ struct jtcp_hdr_t {
     unsigned long th_syn;
 	unsigned int th_x2:4,
  				 th_off:4;
- 	unsigned char th_flags;
+ 	uint8_t th_flags;
  	unsigned short th_win;
     unsigned short th_sum;
     unsigned short th_urp;
@@ -90,8 +90,8 @@ struct jtcp_hdr_t {
  *
  */
 struct jtcpopt_hdr_t {
-    unsigned char type;
-    unsigned char len;
+    uint8_t type;
+    uint8_t len;
     unsigned short value;
 };
 
@@ -101,7 +101,7 @@ struct jtcpopt_hdr_t {
  */
 struct jpseudo_hdr_t {
     unsigned long saddr, daddr;
-    unsigned char mbz, ptcl;
+    uint8_t mbz, ptcl;
     unsigned short tcpl;
 };
 

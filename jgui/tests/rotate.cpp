@@ -163,9 +163,22 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 				g->FillCircle((int)_bullet_x, (int)_bullet_y, 3);
 			}
 
+			// blue sector
+			int dx = (_tx-_insets.left),
+					dy = (_ty-_insets.top);
+					
+			g->SetColor(0x20, 0x20, 0x80, 0x80);
+			g->FillRectangle((int)(_insets.left+dx), (int)(_insets.top+dy), (int)_tile_w, (int)_tile_h);
+			
+			// tank
 			g->Rotate(_angle);
-
 			g->DrawImage(_image, (int)_tx, (int)_ty);
+			
+			// red sector
+			int bx = (_tx-_insets.left+_tw/2)/_tile_w,
+					by = (_ty-_insets.top+_th/2)/_tile_h;
+			g->SetColor(0x80, 0x20, 0x20, 0x80);
+			g->FillRectangle((int)(_insets.left+bx*_tile_w), (int)(_insets.top+by*_tile_h), (int)_tile_w, (int)_tile_h);
 		}
 
 		virtual void Run() 

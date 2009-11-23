@@ -262,20 +262,20 @@ X509 * SSLServerSocket::BuildCertificate(const char *name, const char *organizat
 		return NULL;
 	
 	// Add fields
-	if ( !X509_NAME_add_entry_by_NID(n, NID_commonName, MBSTRING_ASC, (unsigned char*)name, -1, -1, 0) ){
+	if ( !X509_NAME_add_entry_by_NID(n, NID_commonName, MBSTRING_ASC, (uint8_t*)name, -1, -1, 0) ){
 		X509_NAME_free(n);
 		return NULL;
 	}
 
 	if( organization ){
-		if ( !X509_NAME_add_entry_by_NID(n, NID_organizationName, MBSTRING_ASC, (unsigned char*)organization, -1, -1, 0) ){
+		if ( !X509_NAME_add_entry_by_NID(n, NID_organizationName, MBSTRING_ASC, (uint8_t*)organization, -1, -1, 0) ){
 			X509_NAME_free(n);
 			return NULL;
 		}
 	}
 
 	if( country ){
-		if ( !X509_NAME_add_entry_by_NID(n, NID_countryName, MBSTRING_ASC, (unsigned char*)country, -1, -1, 0) ){
+		if ( !X509_NAME_add_entry_by_NID(n, NID_countryName, MBSTRING_ASC, (uint8_t*)country, -1, -1, 0) ){
 			X509_NAME_free(n);
 			return NULL;
 		}

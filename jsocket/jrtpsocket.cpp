@@ -107,11 +107,11 @@ void *memdup(void *data, int len)
 	return b;
 }
 	
-static void MD5Transform (UINT4[4], unsigned char[64]);
-static void Encode (unsigned char *, UINT4 *, unsigned int);
-static void Decode (UINT4 *, unsigned char *, unsigned int);
+static void MD5Transform (UINT4[4], uint8_t[64]);
+static void Encode (uint8_t*, UINT4 *, unsigned int);
+static void Decode (UINT4 *, uint8_t*, unsigned int);
 
-static unsigned char PADDING[64] = {
+static uint8_tPADDING[64] = {
 	0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -131,7 +131,7 @@ void MD5Init(MD5_CTX *context)
 	context->state[3] = 0x10325476;
 }
 
-void MD5Update(MD5_CTX *context, unsigned char *input, unsigned int inputLen)
+void MD5Update(MD5_CTX *context, uint8_t*input, unsigned int inputLen)
 {
 	unsigned int i, index, partLen;
 	
@@ -164,9 +164,9 @@ void MD5Update(MD5_CTX *context, unsigned char *input, unsigned int inputLen)
 	memcpy((POINTER) & context->buffer[index], (POINTER) & input[i], inputLen - i);
 }
 
-void MD5Final(unsigned char digest[16], MD5_CTX *context) 
+void MD5Final(uint8_tdigest[16], MD5_CTX *context) 
 {
-	unsigned char bits[8];
+	uint8_tbits[8];
 	unsigned int index, padLen;
 	
 	// Save number of bits 
@@ -187,7 +187,7 @@ void MD5Final(unsigned char digest[16], MD5_CTX *context)
 	memset((POINTER) context, 0, sizeof(*context));
 }
 
-static void MD5Transform(UINT4 state[4], unsigned char block[64])
+static void MD5Transform(UINT4 state[4], uint8_tblock[64])
 {
 	UINT4 a = state[0], b = state[1], c = state[2], d = state[3], x[16];
 	
@@ -274,19 +274,19 @@ static void MD5Transform(UINT4 state[4], unsigned char block[64])
 	memset((POINTER) x, 0, sizeof(x));
 }
 
-static void Encode( unsigned char  *output, UINT4 *input, unsigned int len)
+static void Encode( uint8_t *output, UINT4 *input, unsigned int len)
 {
 	unsigned int i, j;
 	
 	for (i = 0, j = 0; j < len; i++, j += 4) {
-		output[j] = (unsigned char) (input[i] & 0xff);
-		output[j + 1] = (unsigned char) ((input[i] >> 8) & 0xff);
-		output[j + 2] = (unsigned char) ((input[i] >> 16) & 0xff);
-		output[j + 3] = (unsigned char) ((input[i] >> 24) & 0xff);
+		output[j] = (uint8_t) (input[i] & 0xff);
+		output[j + 1] = (uint8_t) ((input[i] >> 8) & 0xff);
+		output[j + 2] = (uint8_t) ((input[i] >> 16) & 0xff);
+		output[j + 3] = (uint8_t) ((input[i] >> 24) & 0xff);
 	}
 }
 
-static void Decode(UINT4 *output, unsigned char *input, unsigned int len)
+static void Decode(UINT4 *output, uint8_t*input, unsigned int len)
 {
 	unsigned int i, j;
 	
@@ -539,7 +539,7 @@ void rtp_packet_send(Rtp_Packet packet, int fd, struct sockaddr *toaddr, socklen
 	sendto(fd, (void *) packet -> data, packet -> data_len, 0, toaddr, tolen);
 }
 
-unsigned char rtp_packet_get_version(Rtp_Packet packet)
+uint8_trtp_packet_get_version(Rtp_Packet packet)
 {
   	if (packet == NULL) {
 		return 0;
@@ -548,7 +548,7 @@ unsigned char rtp_packet_get_version(Rtp_Packet packet)
 	return ((Rtp_Header) packet -> data) -> version;
 }
 
-void rtp_packet_set_version(Rtp_Packet packet, unsigned char version)
+void rtp_packet_set_version(Rtp_Packet packet, uint8_tversion)
 {
   	if (packet == NULL) {
 		return;
@@ -561,7 +561,7 @@ void rtp_packet_set_version(Rtp_Packet packet, unsigned char version)
 	((Rtp_Header) packet -> data) -> version = version;
 }
 
-unsigned char rtp_packet_get_padding(Rtp_Packet packet)
+uint8_trtp_packet_get_padding(Rtp_Packet packet)
 {
   	if (packet == NULL) {
 		return 0;
@@ -570,7 +570,7 @@ unsigned char rtp_packet_get_padding(Rtp_Packet packet)
 	return ((Rtp_Header) packet -> data) -> padding;
 }
 
-void rtp_packet_set_padding(Rtp_Packet packet, unsigned char padding)
+void rtp_packet_set_padding(Rtp_Packet packet, uint8_tpadding)
 {
   	if (packet == NULL) {
 		return;
@@ -583,7 +583,7 @@ void rtp_packet_set_padding(Rtp_Packet packet, unsigned char padding)
 	((Rtp_Header) packet -> data) -> padding = padding;
 }
 
-unsigned char rtp_packet_get_csrc_count(Rtp_Packet packet)
+uint8_trtp_packet_get_csrc_count(Rtp_Packet packet)
 {
   	if (packet == NULL) {
 		return 0;
@@ -592,7 +592,7 @@ unsigned char rtp_packet_get_csrc_count(Rtp_Packet packet)
 	return ((Rtp_Header) packet -> data) -> csrc_count;
 }
 
-unsigned char rtp_packet_get_extension(Rtp_Packet packet)
+uint8_trtp_packet_get_extension(Rtp_Packet packet)
 {
   	if (packet == NULL) {
 		return 0;
@@ -601,7 +601,7 @@ unsigned char rtp_packet_get_extension(Rtp_Packet packet)
 	return ((Rtp_Header) packet -> data) -> extension;
 }
 
-void rtp_packet_set_extension(Rtp_Packet packet, unsigned char extension)
+void rtp_packet_set_extension(Rtp_Packet packet, uint8_textension)
 {
   	if (packet == NULL) {
 		return;
@@ -614,7 +614,7 @@ void rtp_packet_set_extension(Rtp_Packet packet, unsigned char extension)
 	((Rtp_Header) packet -> data) -> extension = extension;
 }
 
-void rtp_packet_set_csrc_count(Rtp_Packet packet, unsigned char csrc_count)
+void rtp_packet_set_csrc_count(Rtp_Packet packet, uint8_tcsrc_count)
 {
    	if (packet == NULL) {
 		return;
@@ -627,7 +627,7 @@ void rtp_packet_set_csrc_count(Rtp_Packet packet, unsigned char csrc_count)
 	((Rtp_Header) packet -> data) -> csrc_count = csrc_count;
 }
 
-unsigned char rtp_packet_get_marker(Rtp_Packet packet)
+uint8_trtp_packet_get_marker(Rtp_Packet packet)
 {
   	if (packet == NULL) {
 		return 0;
@@ -636,7 +636,7 @@ unsigned char rtp_packet_get_marker(Rtp_Packet packet)
 	return ((Rtp_Header) packet -> data) -> marker;
 }
 
-void rtp_packet_set_marker(Rtp_Packet packet, unsigned char marker)
+void rtp_packet_set_marker(Rtp_Packet packet, uint8_tmarker)
 {
   	if (packet == NULL) {
 		return;
@@ -649,7 +649,7 @@ void rtp_packet_set_marker(Rtp_Packet packet, unsigned char marker)
 	((Rtp_Header) packet -> data) -> marker = marker;
 }
 
-unsigned char rtp_packet_get_payload_type(Rtp_Packet packet)
+uint8_trtp_packet_get_payload_type(Rtp_Packet packet)
 {
   	if (packet == NULL) {
 		return 0;
@@ -658,7 +658,7 @@ unsigned char rtp_packet_get_payload_type(Rtp_Packet packet)
 	return ((Rtp_Header) packet -> data) -> payload_type;
 }
 
-void rtp_packet_set_payload_type(Rtp_Packet packet, unsigned char payload_type)
+void rtp_packet_set_payload_type(Rtp_Packet packet, uint8_tpayload_type)
 {
   	if (packet == NULL) {
 		return;
@@ -736,7 +736,7 @@ uint32_t rtp_packet_get_payload_len(Rtp_Packet packet)
 	len = packet -> data_len - RTP_HEADER_LEN - rtp_packet_get_csrc_count(packet) * sizeof(uint32_t);
 	
 	if (rtp_packet_get_padding(packet)) {
-		len -= ((unsigned char *) packet -> data)[packet -> data_len - 1];
+		len -= ((uint8_t*) packet -> data)[packet -> data_len - 1];
 	}
 	
 	return len;
@@ -1132,7 +1132,7 @@ void rtcp_compound_set_length(Rtcp_Compound compound, uint16_t len)
 	compound -> data_len = len;
 }
 
-unsigned char rtcp_packet_get_version(Rtcp_Packet packet)
+uint8_trtcp_packet_get_version(Rtcp_Packet packet)
 {
   	if (packet == NULL) {
 		return 0;
@@ -1141,7 +1141,7 @@ unsigned char rtcp_packet_get_version(Rtcp_Packet packet)
 	return ((Rtcp_Common_Header *) packet -> data) -> version;
 }
 
-void rtcp_packet_set_version(Rtcp_Packet packet, unsigned char version)
+void rtcp_packet_set_version(Rtcp_Packet packet, uint8_tversion)
 {
   	if (packet == NULL) {
 		return;
@@ -1154,7 +1154,7 @@ void rtcp_packet_set_version(Rtcp_Packet packet, unsigned char version)
 	((Rtcp_Common_Header *) packet -> data) -> version = version;
 }
 
-unsigned char rtcp_packet_get_padding(Rtcp_Packet packet)
+uint8_trtcp_packet_get_padding(Rtcp_Packet packet)
 {
   	if (packet == NULL) {
 		return 0;
@@ -1163,7 +1163,7 @@ unsigned char rtcp_packet_get_padding(Rtcp_Packet packet)
 	return ((Rtcp_Common_Header *) packet -> data) -> padding;
 }
 
-void rtcp_packet_set_padding(Rtcp_Packet packet, unsigned char padding)
+void rtcp_packet_set_padding(Rtcp_Packet packet, uint8_tpadding)
 {
   	if (packet == NULL) {
 		return;
@@ -1176,7 +1176,7 @@ void rtcp_packet_set_padding(Rtcp_Packet packet, unsigned char padding)
 	((Rtcp_Common_Header *) packet -> data) -> padding = padding;
 }
 
-unsigned char rtcp_packet_get_count(Rtcp_Packet packet)
+uint8_trtcp_packet_get_count(Rtcp_Packet packet)
 {
    	if (packet == NULL) {
 		return 0;
@@ -1185,7 +1185,7 @@ unsigned char rtcp_packet_get_count(Rtcp_Packet packet)
 	return ((Rtcp_Common_Header *) packet -> data) -> count;
 }
 
-void rtcp_packet_set_count(Rtcp_Packet packet, unsigned char count)
+void rtcp_packet_set_count(Rtcp_Packet packet, uint8_tcount)
 {
   	if (packet == NULL) {
 		return;
@@ -1198,7 +1198,7 @@ void rtcp_packet_set_count(Rtcp_Packet packet, unsigned char count)
 	((Rtcp_Common_Header *) packet -> data) -> count = count;
 }
 
-unsigned char rtcp_packet_get_packet_type(Rtcp_Packet packet)
+uint8_trtcp_packet_get_packet_type(Rtcp_Packet packet)
 {
   	if (packet == NULL) {
 		return 0;
@@ -1207,7 +1207,7 @@ unsigned char rtcp_packet_get_packet_type(Rtcp_Packet packet)
 	return ((Rtcp_Common_Header *) packet -> data) -> packet_type;
 }
 
-void rtcp_packet_set_packet_type(Rtcp_Packet packet, unsigned char packet_type)
+void rtcp_packet_set_packet_type(Rtcp_Packet packet, uint8_tpacket_type)
 {
   	if (packet == NULL) {
 		return;
@@ -1602,7 +1602,7 @@ rtp_source * RTPSocket::add_member(uint32_t src, uint16_t seq, struct in_addr *a
 	return s;
 }
 
-void RTPSocket::member_sdes(rtp_source *s, unsigned char type, char *data, unsigned char length)
+void RTPSocket::member_sdes(rtp_source *s, uint8_ttype, char *data, uint8_tlength)
 {
    	if (s == NULL) {
 		return;

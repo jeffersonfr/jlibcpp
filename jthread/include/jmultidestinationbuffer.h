@@ -53,7 +53,7 @@ enum jbuffer_type_t {
  *
  */
 struct jringbuffer_t {
-	unsigned char *data;	// buffer
+	uint8_t*data;	// buffer
 	int size;				// size of buffer
 };
 
@@ -141,7 +141,7 @@ class MultiDestinationBuffer : public virtual jcommon::Object{
          * \brief 
          *
          */
-        int Write(const unsigned char *data, int size);
+        int Write(const uint8_t*data, int size);
         
         /**
          * \brief 

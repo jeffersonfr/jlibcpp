@@ -83,7 +83,7 @@ bool XmlVisitor::Visit(const XmlUnknown& unknown)
 
 bool XmlBase::IsWhiteSpace( char c )
 { 
-	return (isspace( (unsigned char) c ) || c == '\n' || c == '\r');
+	return (isspace( (uint8_t) c ) || c == '\n' || c == '\r');
 }
 
 bool XmlBase::IsWhiteSpace( int c )
@@ -98,7 +98,7 @@ const char * XmlBase::GetChar(const char* p, char* _value, int* length, XmlEncod
 {
 	assert( p );
 	if ( encoding == TIXML_ENCODING_UTF8 ) {
-		*length = utf8ByteTable[ *((const unsigned char*)p) ];
+		*length = utf8ByteTable[ *((const uint8_t *)p) ];
 		assert( *length >= 0 && *length < 5 );
 	} else {
 		*length = 1;
@@ -1018,9 +1018,9 @@ XmlBase::Entity XmlBase::entity[ NUM_ENTITY ] =
 //				ef bf be
 //				ef bf bf 
 
-const unsigned char TIXML_UTF_LEAD_0 = 0xefU;
-const unsigned char TIXML_UTF_LEAD_1 = 0xbbU;
-const unsigned char TIXML_UTF_LEAD_2 = 0xbfU;
+const uint8_t TIXML_UTF_LEAD_0 = 0xefU;
+const uint8_t TIXML_UTF_LEAD_1 = 0xbbU;
+const uint8_t TIXML_UTF_LEAD_2 = 0xbfU;
 
 const int XmlBase::utf8ByteTable[256] = 
 {
@@ -1085,7 +1085,7 @@ void XmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* length
 }
 
 
-/*static*/ int XmlBase::IsAlpha( unsigned char anyByte, XmlEncoding /*encoding*/ )
+/*static*/ int XmlBase::IsAlpha( uint8_t anyByte, XmlEncoding /*encoding*/ )
 {
 	// This will only work for low-ascii, everything else is assumed to be a valid
 	// letter. I'm not sure this is the best approach, but it is quite tricky trying
@@ -1106,7 +1106,7 @@ void XmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* length
 }
 
 
-/*static*/ int XmlBase::IsAlphaNum( unsigned char anyByte, XmlEncoding /*encoding*/ )
+/*static*/ int XmlBase::IsAlphaNum( uint8_t anyByte, XmlEncoding /*encoding*/ )
 {
 	// This will only work for low-ascii, everything else is assumed to be a valid
 	// letter. I'm not sure this is the best approach, but it is quite tricky trying
@@ -1171,7 +1171,7 @@ void XmlParsingData::Stamp( const char* now, XmlEncoding encoding )
 	while ( p < now )
 	{
 		// Treat p as unsigned, so we have a happy compiler.
-		const unsigned char* pU = (const unsigned char*)p;
+		const uint8_t* pU = (const uint8_t *)p;
 
 		// Code contributed by Fletcher Dunn: (modified by lee)
 		switch (*pU) {
@@ -1245,7 +1245,7 @@ void XmlParsingData::Stamp( const char* now, XmlEncoding encoding )
 				if ( encoding == TIXML_ENCODING_UTF8 )
 				{
 					// Eat the 1 to 4 byte utf8 character.
-					int step = XmlBase::utf8ByteTable[*((const unsigned char*)p)];
+					int step = XmlBase::utf8ByteTable[*((const uint8_t *)p)];
 					if ( step == 0 )
 						step = 1;		// Error case from bad encoding, but handle gracefully.
 					p += step;
@@ -1279,7 +1279,7 @@ const char* XmlBase::SkipWhiteSpace( const char* p, XmlEncoding encoding )
 
 	if (encoding == TIXML_ENCODING_UTF8) {
 		while (*p) {
-			const unsigned char* pU = (const unsigned char*)p;
+			const uint8_t *pU = (const uint8_t *)p;
 			
 			// Skip the stupid Microsoft UTF-8 Byte order marks
 			if (*(pU+0)==TIXML_UTF_LEAD_0 && *(pU+1)==TIXML_UTF_LEAD_1 && *(pU+2)==TIXML_UTF_LEAD_2 ) {
@@ -1360,11 +1360,11 @@ const char* XmlBase::ReadName( const char* p, std::string * name, XmlEncoding en
 	// hyphens, or colons. (Colons are valid ony for namespaces,
 	// but tinyxml can't tell namespaces from names.)
 	if (    p && *p 
-		 && ( IsAlpha( (unsigned char) *p, encoding ) || *p == '_' ) )
+		 && ( IsAlpha( (uint8_t) *p, encoding ) || *p == '_' ) )
 	{
 		const char* start = p;
 		while(		p && *p
-				&&	(		IsAlphaNum( (unsigned char ) *p, encoding ) 
+				&&	(		IsAlphaNum( (uint8_t) *p, encoding ) 
 						 || *p == '_'
 						 || *p == '-'
 						 || *p == '.'
@@ -1678,7 +1678,7 @@ const char* XmlDocument::Parse( const char* p, XmlParsingData* prevData, XmlEnco
 	if ( encoding == TIXML_ENCODING_UNKNOWN )
 	{
 		// Check for the Microsoft UTF-8 lead bytes.
-		const unsigned char* pU = (const unsigned char*)p;
+		const uint8_t *pU = (const uint8_t *)p;
 		if (	*(pU+0) && *(pU+0) == TIXML_UTF_LEAD_0
 			 && *(pU+1) && *(pU+1) == TIXML_UTF_LEAD_1
 			 && *(pU+2) && *(pU+2) == TIXML_UTF_LEAD_2 )
@@ -2513,7 +2513,7 @@ void XmlBase::PutString( const std::string& str, std::string* outString )
 
 	while( i<(int)str.length() )
 	{
-		unsigned char c = (unsigned char) str[i];
+		uint8_t c = (uint8_t) str[i];
 
 		if (    c == '&' 
 		     && i < ( (int)str.length() - 2 )
@@ -3513,9 +3513,9 @@ bool XmlDocument::SaveFile( FILE* fp ) const
 {
 	if ( useMicrosoftBOM ) 
 	{
-		const unsigned char TIXML_UTF_LEAD_0 = 0xefU;
-		const unsigned char TIXML_UTF_LEAD_1 = 0xbbU;
-		const unsigned char TIXML_UTF_LEAD_2 = 0xbfU;
+		const uint8_t TIXML_UTF_LEAD_0 = 0xefU;
+		const uint8_t TIXML_UTF_LEAD_1 = 0xbbU;
+		const uint8_t TIXML_UTF_LEAD_2 = 0xbfU;
 
 		fputc( TIXML_UTF_LEAD_0, fp );
 		fputc( TIXML_UTF_LEAD_1, fp );

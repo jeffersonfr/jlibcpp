@@ -210,7 +210,6 @@ void Button::Paint(Graphics *g)
 	PaintBorder(g);
 
 	if (_enabled == false) {
-		g->SetDrawingFlags(BLEND_FLAG);
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
 		g->FillRectangle(0, 0, _width, _height);
 	}

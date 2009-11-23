@@ -417,13 +417,13 @@ class XmlBase{
 		 * Good for approximation, not great for accuracy.
 		 *
 		 */
-		static int IsAlpha(unsigned char anyByte, XmlEncoding encoding);
+		static int IsAlpha(uint8_t anyByte, XmlEncoding encoding);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		static int IsAlphaNum(unsigned char anyByte, XmlEncoding encoding);
+		static int IsAlphaNum(uint8_t anyByte, XmlEncoding encoding);
 		
 		/**
 		 * \brief

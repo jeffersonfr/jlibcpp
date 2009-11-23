@@ -101,7 +101,7 @@ class InetAddress : public virtual jcommon::Object{
         * \brief Get the address IPv4.
         *
         */
-        std::vector<unsigned char> GetAddress();
+        std::vector<uint8_t> GetAddress();
 	
 };
 

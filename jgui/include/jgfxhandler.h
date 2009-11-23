@@ -51,6 +51,8 @@ enum jcursor_style_t {
 };
 
 class OffScreenImage;
+class Window;
+class WindowManager;
 
 /**
  * \brief
@@ -58,6 +60,9 @@ class OffScreenImage;
  * \author Jeff Ferr
  */
 class GFXHandler : public virtual jcommon::Object{
+
+	friend class Window;
+	friend class WindowManager;
 
 	protected:
 		GFXHandler();
@@ -126,6 +131,26 @@ class GFXHandler : public virtual jcommon::Object{
 		 *
 		 */
 		void Remove(OffScreenImage *);
+
+#ifdef DIRECTFB_UI
+		/**
+		 * \brief
+		 *
+		 */
+		IDirectFBDisplayLayer * GetDisplayLayer();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+#endif
 
 	public:
 		/**
@@ -205,26 +230,6 @@ class GFXHandler : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetCursor(OffScreenImage *shape, int hotx, int hoty);
-
-#ifdef DIRECTFB_UI
-		/**
-		 * \brief
-		 *
-		 */
-		IDirectFBDisplayLayer * GetDisplayLayer();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
-#endif
 
 		/**
 		 * \brief

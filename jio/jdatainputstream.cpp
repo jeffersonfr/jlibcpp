@@ -51,12 +51,12 @@ bool DataInputStream::IsEmpty()
 	return Available() == 0;
 }
 
-long long DataInputStream::Available()
+int64_t DataInputStream::Available()
 {
 	return stream->Available();
 }
 
-long long DataInputStream::GetSize()
+int64_t DataInputStream::GetSize()
 {
 	if (stream != NULL) {
 		stream->GetSize();
@@ -65,7 +65,7 @@ long long DataInputStream::GetSize()
 	return 0LL;
 }
 
-long long DataInputStream::GetPosition()
+int64_t DataInputStream::GetPosition()
 {
 	if (stream != NULL) {
 		stream->GetPosition();
@@ -110,7 +110,7 @@ int DataInputStream::Read(uint64_t *data)
 	return -1;
 }
 
-void DataInputStream::Skip(long long skip)
+void DataInputStream::Skip(int64_t skip)
 {
 	if (stream != NULL) {
 		stream->Skip(skip);
@@ -131,7 +131,7 @@ void DataInputStream::Close()
 	}
 }
 
-long long DataInputStream::GetReceiveBytes()
+int64_t DataInputStream::GetReceiveBytes()
 {
 	if (stream != NULL) {
 		return stream->GetReceiveBytes();

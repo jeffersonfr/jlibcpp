@@ -71,7 +71,6 @@
 
 #define SCALE_TO_SCREEN(x, y, z) \
 	(int)floor(((double)x*(double)y)/(double)z) 
-	// (int)round(((double)x*(double)y)/(double)z) 
 
 #define SCREEN_TO_SCALE(x, z, y) \
 	(int)floor(((double)x*(double)y)/(double)z) 
@@ -86,19 +85,19 @@ namespace jgui{
  *
  */
 enum jporter_duff_flags_t {
-	PD_NONE				= 0x0001,	// fs: sa fd: 1.0-sa (defaults)
-	PD_CLEAR			= 0x0002,	// fs: 0.0 fd: 0.0
-	PD_SRC				= 0x0004,	// fs: 1.0 fd: 0.0
-	PD_SRC_OVER		= 0x0008,	// fs: 1.0 fd: 1.0-sa
-	PD_DST_OVER		= 0x0010,	// fs: 1.0-da fd: 1.0
-	PD_SRC_IN			= 0x0020,	// fs: da fd: 0.0
-	PD_DST_IN			= 0x0040,	// fs: 0.0 fd: sa
-	PD_SRC_OUT		= 0x0080,	// fs: 1.0-da fd: 0.0
-	PD_DST_OUT		= 0x0100,	// fs: 0.0 fd: 1.0-sa
-	PD_SRC_ATOP		= 0x0200,	// fs: da fd: 1.0-sa
-	PD_DST_ATOP		= 0x0400,	// fs: 1.0-da fd: sa
-	PD_ADD				= 0x0800,	// fs: 1.0 fd: 1.0
-	PD_XOR				= 0x1000	// fs: 1.0-da fd: 1.0-sa 
+	PDF_NONE			= 0x0001,	// fs: sa fd: 1.0-sa (defaults)
+	PDF_CLEAR			= 0x0002,	// fs: 0.0 fd: 0.0
+	PDF_SRC				= 0x0004,	// fs: 1.0 fd: 0.0
+	PDF_SRC_OVER	= 0x0008,	// fs: 1.0 fd: 1.0-sa
+	PDF_DST_OVER	= 0x0010,	// fs: 1.0-da fd: 1.0
+	PDF_SRC_IN		= 0x0020,	// fs: da fd: 0.0
+	PDF_DST_IN		= 0x0040,	// fs: 0.0 fd: sa
+	PDF_SRC_OUT		= 0x0080,	// fs: 1.0-da fd: 0.0
+	PDF_DST_OUT		= 0x0100,	// fs: 0.0 fd: 1.0-sa
+	PDF_SRC_ATOP	= 0x0200,	// fs: da fd: 1.0-sa
+	PDF_DST_ATOP	= 0x0400,	// fs: 1.0-da fd: sa
+	PDF_ADD				= 0x0800,	// fs: 1.0 fd: 1.0
+	PDF_XOR				= 0x1000	// fs: 1.0-da fd: 1.0-sa 
 };
 
 /**
@@ -106,9 +105,9 @@ enum jporter_duff_flags_t {
  *
  */
 enum jdrawing_flags_t {
-	NOFX_FLAG			= 0x01,
-	BLEND_FLAG		= 0x02,
-	XOR_FLAG			= 0x04
+	DF_NOFX			= 0x01,
+	DF_BLEND		= 0x02,
+	DF_XOR			= 0x04
 };
 
 /**
@@ -116,14 +115,14 @@ enum jdrawing_flags_t {
  *
  */
 enum jblitting_flags_t {
-	NOFX_BLIT					= 0x01,
-	ALPHACHANNEL_BLIT	= 0x02,
-	COLORALPHA_BLIT		= 0x04,
-	COLORIZE_BLIT			= 0x08,
-	DEINTERLACE_BLIT	= 0x10,
-	SRC_COLORKEY_BLIT	= 0x20,
-	DST_COLORKEY_BLIT	= 0x40,
-	XOR_BLIT					= 0x80
+	BF_NOFX					= 0x01,
+	BF_ALPHACHANNEL	= 0x02,
+	BF_COLORALPHA		= 0x04,
+	BF_COLORIZE			= 0x08,
+	BF_DEINTERLACE	= 0x10,
+	BF_SRC_COLORKEY	= 0x20,
+	BF_DST_COLORKEY	= 0x40,
+	BF_XOR					= 0x80
 };
 
 /**
@@ -197,6 +196,17 @@ struct jinsets_t {
 	int bottom;
 };
 
+/**
+ * \brief
+ *
+ */
+struct jcolor_t {
+	uint8_t alpha;
+	uint8_t red;
+	uint8_t green;
+	uint8_t blue;
+};
+
 class Window;
 class Image;
 class Font;
@@ -237,19 +247,15 @@ class Graphics : public virtual jcommon::Object{
 		struct jpoint_t _translate;
 		struct jsize_t _screen;
 		struct jsize_t _scale;
-		Font *_font;
-		double _radians;
-		int _red,
-				_green,
-				_blue,
-				_alpha,
-				_color,
-			_line_width;
+		struct jcolor_t _color;
 		jline_type_t _line_type;
 		jline_style_t _line_style;
 		jdrawing_flags_t _draw_flags;
 		jblitting_flags_t _blit_flags;
 		jporter_duff_flags_t _porter_duff_flags;
+		Font *_font;
+		double _radians;
+		int _line_width;
 
 		// INFO:: polygon functions
 		void insertEdge(edge_t *list, edge_t *edge);
@@ -401,7 +407,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual uint32_t GetColor(); 
+		virtual struct jcolor_t GetColor(); 
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetColor(struct jcolor_t c); 
 		
 		/**
 		 * \brief

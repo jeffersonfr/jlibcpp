@@ -35,18 +35,18 @@ class MemoryInputStream : public jio::InputStream{
 
 	private:
 		/** \brief */
-		unsigned char *_buffer;
+		uint8_t*_buffer;
 		/** \brief */
-		long long _buffer_size;
+		int64_t _buffer_size;
 		/** \brief */
-		long long _buffer_index;
+		int64_t _buffer_index;
 		
 	public:
 		/**
 		 * \brief
 		 * 
 		 */
-		MemoryInputStream(unsigned char *data, int size);
+		MemoryInputStream(uint8_t*data, int size);
 		
 		/**
 		 * \brief
@@ -64,19 +64,19 @@ class MemoryInputStream : public jio::InputStream{
 		 * \brief
 		 * 
 		 */
-		virtual long long Available();
+		virtual int64_t Available();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual long long GetSize();
+		virtual int64_t GetSize();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual long long GetPosition();
+		virtual int64_t GetPosition();
 		
 		/**
 		 * \brief
@@ -88,13 +88,13 @@ class MemoryInputStream : public jio::InputStream{
 		 * \brief
 		 * 
 		 */
-		virtual long long Read(char *, long long size);
+		virtual int64_t Read(char *, int64_t size);
     
 		/**
 		 * \brief Salto relativo.
 		 *
 		 */
-		virtual void Skip(long long skip);
+		virtual void Skip(int64_t skip);
 
 		/**
 		 * \brief
@@ -112,7 +112,7 @@ class MemoryInputStream : public jio::InputStream{
 		 * \brief
 		 *
 		 */
-		virtual long long GetReceiveBytes();
+		virtual int64_t GetReceiveBytes();
 
 };
 

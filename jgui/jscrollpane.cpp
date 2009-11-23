@@ -67,7 +67,7 @@ void ScrollPane::Paint(Graphics *g)
 	//CHANGE:: permite alteracoes on-the-fly
 	g->SetWorkingScreenSize(_scale_width, _scale_height);
 
-	g->SetDrawingFlags(NOFX_FLAG);
+	g->SetDrawingFlags(DF_NOFX);
 
 	if (_background_visible == true) {
 		g->SetColor(_bg_red, _bg_green, _bg_blue, _bg_alpha);

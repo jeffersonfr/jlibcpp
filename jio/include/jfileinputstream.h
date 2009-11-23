@@ -33,19 +33,16 @@ namespace jio {
 class FileInputStream : public jio::InputStream{
 
 	private:
-		/** \brief Seek */
-		int _current;
 		/** \brief */
 		File *_file;
 		/** \brief */
-		unsigned char *_buffer;
-		/** \brief */
-		int _buffer_size;
-		/** \brief */
-		int _buffer_index;
-		/** \brief */
+		uint8_t *_buffer;
+		/** \brief Seek */
+		int64_t _current,
+						_buffer_size,
+						_buffer_index;
 		bool _is_eof,
-			 _flag;
+				 _flag;
 		
 	public:
 		/**
@@ -75,19 +72,19 @@ class FileInputStream : public jio::InputStream{
 		 * \brief
 		 * 
 		 */
-		virtual long long Available();
+		virtual int64_t Available();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual long long GetSize();
+		virtual int64_t GetSize();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual long long GetPosition();
+		virtual int64_t GetPosition();
 		
 		/**
 		 * \brief
@@ -99,13 +96,13 @@ class FileInputStream : public jio::InputStream{
 		 * \brief
 		 * 
 		 */
-		virtual long long Read(char *, long long size);
+		virtual int64_t Read(char *, int64_t size);
     
 		/**
 		 * \brief Salto relativo.
 		 *
 		 */
-		virtual void Skip(long long skip);
+		virtual void Skip(int64_t skip);
 
 		/**
 		 * \brief
@@ -123,7 +120,7 @@ class FileInputStream : public jio::InputStream{
 		 * \brief
 		 *
 		 */
-		virtual long long GetReceiveBytes();
+		virtual int64_t GetReceiveBytes();
 
 };
 
