@@ -616,7 +616,7 @@ void TextField::DispatchEvent(TextEvent *event)
 
 	int k=0;
 
-	while (k++ < _text_listeners.size()) {
+	while (k++ < (int)_text_listeners.size()) {
 		_text_listeners[k-1]->TextChanged(event);
 	}
 
