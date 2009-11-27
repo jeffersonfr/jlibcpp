@@ -155,25 +155,24 @@ void * Graphics::GetNativeSurface()
 {
 #ifdef DIRECTFB_UI
 	return surface;
-#else
-	return NULL;
 #endif
+
+	return NULL;
 }
 
 void Graphics::SetNativeSurface(void *addr)
 {
-#ifdef DIRECTFB_UI
 	Lock();
 
+#ifdef DIRECTFB_UI
 	surface = (IDirectFBSurface *)addr;
+#endif
 
 	Unlock();
-#endif
 }
 
 void Graphics::SetClip(int x, int y, int width, int height)
 {
-#ifdef DIRECTFB_UI
 	if (x < 0) {
 		x = 0;
 	}
@@ -190,27 +189,19 @@ void Graphics::SetClip(int x, int y, int width, int height)
 		height = 0;
 	}
 
-	_clip.x += x;
-	_clip.y += y;
+	_clip.x = x;
+	_clip.y = y;
 	_clip.width = width;
 	_clip.height = height;
 
-	struct jregion_t region;
-
-	region.x = _clip.x;
-	region.y = _clip.y;
-	region.width = _clip.width;
-	region.height = _clip.height;
-
-	_clips.push_back(region);
-
+#ifdef DIRECTFB_UI
 	if (surface != NULL) {
 		DFBRegion rgn;
 
-		rgn.x1 = SCALE_TO_SCREEN(_clip.x, _screen.width, _scale.width);
-		rgn.y1 = SCALE_TO_SCREEN(_clip.y, _screen.height, _scale.height);
-		rgn.x2 = SCALE_TO_SCREEN((_clip.x+_clip.width), _screen.width, _scale.width);
-		rgn.y2 = SCALE_TO_SCREEN((_clip.y+_clip.height), _screen.height, _scale.height);
+		rgn.x1 = SCALE_TO_SCREEN((_translate.x+_clip.x), _screen.width, _scale.width);
+		rgn.y1 = SCALE_TO_SCREEN((_translate.y+_clip.y), _screen.height, _scale.height);
+		rgn.x2 = SCALE_TO_SCREEN((_translate.x+_clip.x+_clip.width), _screen.width, _scale.width);
+		rgn.y2 = SCALE_TO_SCREEN((_translate.y+_clip.y+_clip.height), _screen.height, _scale.height);
 
 		surface->SetClip(surface, NULL);
 		surface->SetClip(surface, &rgn);
@@ -218,119 +209,29 @@ void Graphics::SetClip(int x, int y, int width, int height)
 #endif
 }
 
-jregion_t Graphics::GetClipBounds()
+jregion_t Graphics::GetClip()
 {
 	return _clip;
-}
-
-int Graphics::GetClipX()
-{
-#ifdef DIRECTFB_UI
-	if (_clips.size() > 0) {
-		return (*_clips.rbegin()).x;
-	} else {
-		DFBRegion rgn;
-
-		surface->GetClip(surface, &rgn);
-
-		return SCREEN_TO_SCALE(rgn.x1, _screen.width, _scale.width);
-	}
-#else
-	return 0;
-#endif
-}
-
-int Graphics::GetClipY()
-{
-#ifdef DIRECTFB_UI
-	if (_clips.size() > 0) {
-		return (*_clips.rbegin()).y;
-	} else {
-		DFBRegion rgn;
-
-		surface->GetClip(surface, &rgn);
-
-		return SCREEN_TO_SCALE(rgn.y1, _screen.height, _scale.height);
-	}
-#else
-	return 0;
-#endif
-}
-
-int Graphics::GetClipWidth()
-{
-#ifdef DIRECTFB_UI
-	if (_clips.size() > 0) {
-		return (*_clips.rbegin()).width;
-	} else {
-		DFBRegion rgn;
-
-		surface->GetClip(surface, &rgn);
-
-		return SCREEN_TO_SCALE(rgn.x2-rgn.x1, _screen.width, _scale.width);
-	}
-#else
-	return 0;
-#endif
-}
-
-int Graphics::GetClipHeight()
-{
-#ifdef DIRECTFB_UI
-	if (_clips.size() > 0) {
-		return (*_clips.rbegin()).height;
-	} else {
-		DFBRegion rgn;
-
-		surface->GetClip(surface, &rgn);
-
-		return SCREEN_TO_SCALE(rgn.y2-rgn.y1, _screen.height, _scale.height);
-	}
-#else
-	return 0;
-#endif
 }
 
 void Graphics::ReleaseClip()
 {
 #ifdef DIRECTFB_UI
-	if (_clips.size() > 0) {
-		_clips.erase(_clips.begin()+_clips.size()-1);
-	}
+	DFBRegion rgn;
 
-	if (_clips.size() > 0) {
-		struct jregion_t t = (*_clips.rbegin());
+	_clip.x = 0;
+	_clip.y = 0;
+	_clip.width = _scale.width;
+	_clip.height = _scale.height;
 
-		_clip.x = t.x;
-		_clip.y = t.y;
-		_clip.width = t.width;
-		_clip.height = t.height;
-
-		DFBRegion rgn;
-
-		rgn.x1 = SCALE_TO_SCREEN(t.x, _screen.width, _scale.width);
-		rgn.y1 = SCALE_TO_SCREEN(t.y, _screen.height, _scale.height);
-		rgn.x2 = SCALE_TO_SCREEN((t.x+t.width), _screen.width, _scale.width);
-		rgn.y2 = SCALE_TO_SCREEN((t.y+t.height), _screen.height, _scale.height);
-
-		if (surface != NULL) {
-			surface->SetClip(surface, NULL);
-			surface->SetClip(surface, &rgn);
-		}
-	} else {
-		int width,
-				height;
-
-		surface->GetSize(surface, &width, &height);
+	if (surface != NULL) {
+		surface->SetClip(surface, NULL);
+		surface->GetClip(surface, &rgn);
 
 		_clip.x = 0;
 		_clip.y = 0;
-		_clip.width = SCREEN_TO_SCALE(width, _screen.width, _scale.width);
-		_clip.height = SCREEN_TO_SCALE(height, _screen.height, _scale.height);
-
-		if (surface != NULL) {
-			surface->SetClip(surface, NULL);
-		}
+		_clip.width = SCREEN_TO_SCALE(rgn.x2, _screen.width, _scale.width);
+		_clip.height = SCREEN_TO_SCALE(rgn.y2, _screen.height, _scale.height);
 	}
 #endif
 }
@@ -341,9 +242,9 @@ void Graphics::SetPorterDuffFlags(jporter_duff_flags_t t)
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	_porter_duff_flags = t;
 
+#ifdef DIRECTFB_UI
 	surface->SetPorterDuff(surface, DSPD_SRC_OVER);
 
 	if (surface != NULL) {
@@ -384,9 +285,9 @@ void Graphics::SetDrawingFlags(jdrawing_flags_t t)
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	_draw_flags = t;
 
+#ifdef DIRECTFB_UI
 	if (surface != NULL) {
 		if (_draw_flags == DF_NOFX) {
 			surface->SetDrawingFlags(surface, DSDRAW_NOFX);
@@ -405,9 +306,9 @@ void Graphics::SetBlittingFlags(jblitting_flags_t t)
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	_blit_flags = t;
 
+#ifdef DIRECTFB_UI
 	if (surface != NULL) {
 		DFBSurfaceBlittingFlags f = (DFBSurfaceBlittingFlags)0; // NOFX_BLIT;
 
@@ -457,7 +358,9 @@ void Graphics::SetWorkingScreenSize(int width, int height)
 void Graphics::Clear(int r, int g, int b, int a)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	surface->Clear(surface, r, g, b, a);
 #endif
@@ -476,7 +379,9 @@ void Graphics::Idle()
 void Graphics::Flip()
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	// surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
 	surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
@@ -490,7 +395,9 @@ void Graphics::Flip(int xp, int yp, int wp, int hp)
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) return;
+	if (surface == NULL) {
+		return;
+	}
 
 	int x = SCALE_TO_SCREEN(xp, _screen.width, _scale.width),
 			y = SCALE_TO_SCREEN(yp, _screen.height, _scale.height),
@@ -638,10 +545,10 @@ void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 	}
 
 	if (_line_width == 1) {
-		int x0 = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-		int y0 = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
-		int x1 = SCALE_TO_SCREEN((_clip.x+xf), _screen.width, _scale.width); 
-		int y1 = SCALE_TO_SCREEN((_clip.y+yf), _screen.height, _scale.height);
+		int x0 = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+		int y0 = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+		int x1 = SCALE_TO_SCREEN((_translate.x+xf), _screen.width, _scale.width); 
+		int y1 = SCALE_TO_SCREEN((_translate.y+yf), _screen.height, _scale.height);
 
 		surface->DrawLine( surface, x0, y0, x1, y1);
 	} else {
@@ -713,14 +620,14 @@ void Graphics::FillRectangle(int xp, int yp, int wp, int hp)
 	}
 
 #ifdef DIRECTFB_UI
-	if (surface == NULL) 	return;
+	if (surface == NULL) {
+		return;
+	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
-	// int w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width);
-	// int h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_clip.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_clip.y+yp+hp), _screen.height, _scale.height)-y;
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
 	if (w <= 0) {
 		w = 1;
@@ -730,7 +637,7 @@ void Graphics::FillRectangle(int xp, int yp, int wp, int hp)
 		h = 1;
 	}
 
-	surface->FillRectangle( surface, x, y , w, h );
+	surface->FillRectangle(surface, x, y ,w, h);
 #endif
 }
 
@@ -745,18 +652,16 @@ void Graphics::DrawRectangle(int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
-	// int w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width);
-	// int h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_clip.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_clip.y+yp+hp), _screen.height, _scale.height)-y;
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	if (w <= 0) {
+	if (w < 1) {
 		w = 1;
 	}
 
-	if (h <= 0) {
+	if (h < 1) {
 		h = 1;
 	}
 
@@ -781,17 +686,6 @@ void Graphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 	if (surface == NULL) {
 		return;
 	}
-
-	/*
-		 int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-		 int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
-	// int w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width);
-	// int h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_clip.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_clip.y+yp+hp), _screen.height, _scale.height)-y;
-
-	surface->FillRectangle( surface, x, y , w, h );
-	*/
 
 	if (wp < 2*dx) {
 		dx = wp/2;
@@ -822,17 +716,6 @@ void Graphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 	if (surface == NULL) {
 		return;
 	}
-
-	/*
-		 int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-		 int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
-	// int w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width);
-	// int h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_clip.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_clip.y+yp+hp), _screen.height, _scale.height)-y;
-
-	surface->DrawRectangle( surface, x, y , w, h );
-	*/
 
 	if (wp < 2*dx) {
 		dx = wp/2;
@@ -936,13 +819,13 @@ void Graphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 			x1 = (int)(xp - d);
 			x2 = (int)(xp + d);
 
-			int j = SCALE_TO_SCREEN((_clip.y+y1+raio), _screen.height, _scale.height);
+			int j = SCALE_TO_SCREEN((_translate.y+y1+raio), _screen.height, _scale.height);
 
 			if (l != j) {
 				l = j;
 
-				int px1 = SCALE_TO_SCREEN((_clip.x+x1+raio), _screen.width, _scale.width),
-						px2 = SCALE_TO_SCREEN((_clip.x+x2+wp-raio), _screen.width, _scale.width);
+				int px1 = SCALE_TO_SCREEN((_translate.x+x1+raio), _screen.width, _scale.width),
+						px2 = SCALE_TO_SCREEN((_translate.x+x2+wp-raio), _screen.width, _scale.width);
 
 				surface->DrawLine(surface, px1, l, px2, l);
 			}
@@ -953,7 +836,7 @@ void Graphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 			// INFO:: verifica se a ultima linha estah sobrepondo a primeira linha do retangulo
 			int dy = yp+raio+1,
 					dh = hp-2*raio-1,
-					j = SCALE_TO_SCREEN((_clip.y+dy), _screen.height, _scale.height);
+					j = SCALE_TO_SCREEN((_translate.y+dy), _screen.height, _scale.height);
 
 			if (l == j) {
 				dy = dy + 1;
@@ -976,13 +859,13 @@ void Graphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 			x1 = (int)(xp - d);
 			x2 = (int)(xp + d);
 
-			int j = SCALE_TO_SCREEN((_clip.y+y1+raio), _screen.height, _scale.height);
+			int j = SCALE_TO_SCREEN((_translate.y+y1+raio), _screen.height, _scale.height);
 
 			if (l != j) {
 				l = j;
 
-				int px1 = SCALE_TO_SCREEN((_clip.x+x1+raio), _screen.width, _scale.width),
-						px2 = SCALE_TO_SCREEN((_clip.x+x2+wp-raio), _screen.width, _scale.width);
+				int px1 = SCALE_TO_SCREEN((_translate.x+x1+raio), _screen.width, _scale.width),
+						px2 = SCALE_TO_SCREEN((_translate.x+x2+wp-raio), _screen.width, _scale.width);
 
 				surface->DrawLine(surface, px1, l, px2, l);
 			}
@@ -1029,7 +912,6 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 	DrawLine(xp+wp, yp+raio+1, xp+wp, yp+hp-raio);
 
 	{
-		// int r = SCALE_TO_SCREEN(raio, _screen.width, _scale.width);
 		int mw = _line_width;
 
 		if (mw > raio) {
@@ -1041,8 +923,8 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 
 			mw = mw/2;
 
-			int min_y = SCALE_TO_SCREEN((_clip.y+yp+mw), _screen.height, _scale.height),
-					max_y = SCALE_TO_SCREEN((_clip.y+yp+hp-mw), _screen.height, _scale.height);
+			int min_y = SCALE_TO_SCREEN((_translate.y+yp+mw), _screen.height, _scale.height),
+					max_y = SCALE_TO_SCREEN((_translate.y+yp+hp-mw), _screen.height, _scale.height);
 
 			for (int y1=yp-raio-mw; y1<=yp; y1++) {
 				double max_d = sqrt((raio+mw)*(raio+mw)-(y1-yp)*(y1-yp)),
@@ -1059,15 +941,15 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 						min_x1 = (int)(xp-min_d),
 						min_x2 = (int)(xp+min_d);
 
-				int j = SCALE_TO_SCREEN((_clip.y+y1+raio), _screen.height, _scale.height);
+				int j = SCALE_TO_SCREEN((_translate.y+y1+raio), _screen.height, _scale.height);
 
 				if (l != j) {
 					l = j;
 
-					int max_px1 = SCALE_TO_SCREEN((_clip.x+max_x1+raio), _screen.width, _scale.width),
-							max_px2 = SCALE_TO_SCREEN((_clip.x+max_x2+wp-raio), _screen.width, _scale.width),
-							min_px1 = SCALE_TO_SCREEN((_clip.x+min_x1+raio), _screen.width, _scale.width),
-							min_px2 = SCALE_TO_SCREEN((_clip.x+min_x2+wp-raio), _screen.width, _scale.width);
+					int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1+raio), _screen.width, _scale.width),
+							max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2+wp-raio), _screen.width, _scale.width),
+							min_px1 = SCALE_TO_SCREEN((_translate.x+min_x1+raio), _screen.width, _scale.width),
+							min_px2 = SCALE_TO_SCREEN((_translate.x+min_x2+wp-raio), _screen.width, _scale.width);
 
 					if (l <= min_y) {
 						surface->DrawLine(surface, max_px1, l, max_px2, l);
@@ -1095,15 +977,15 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 						min_x1 = (int)(xp-min_d),
 						min_x2 = (int)(xp+min_d);
 
-				int j = SCALE_TO_SCREEN((_clip.y+y1-raio), _screen.height, _scale.height);
+				int j = SCALE_TO_SCREEN((_translate.y+y1-raio), _screen.height, _scale.height);
 
 				if (l != j) {
 					l = j;
 
-					int max_px1 = SCALE_TO_SCREEN((_clip.x+max_x1+raio), _screen.width, _scale.width),
-							max_px2 = SCALE_TO_SCREEN((_clip.x+max_x2+wp-raio), _screen.width, _scale.width),
-							min_px1 = SCALE_TO_SCREEN((_clip.x+min_x1+raio), _screen.width, _scale.width),
-							min_px2 = SCALE_TO_SCREEN((_clip.x+min_x2+wp-raio), _screen.width, _scale.width);
+					int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1+raio), _screen.width, _scale.width),
+							max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2+wp-raio), _screen.width, _scale.width),
+							min_px1 = SCALE_TO_SCREEN((_translate.x+min_x1+raio), _screen.width, _scale.width),
+							min_px2 = SCALE_TO_SCREEN((_translate.x+min_x2+wp-raio), _screen.width, _scale.width);
 
 					if (l >= max_y) {
 						surface->DrawLine(surface, max_px1, l, max_px2, l);
@@ -1129,13 +1011,13 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 				int max_x1 = (int)(xp-min_d),
 						max_x2 = (int)(xp+min_d);
 
-				int j = SCALE_TO_SCREEN((_clip.y+y1+raio), _screen.height, _scale.height);
+				int j = SCALE_TO_SCREEN((_translate.y+y1+raio), _screen.height, _scale.height);
 
 				if (l != j || y1 == limit) {
 					l = j;
 
-					int max_px1 = SCALE_TO_SCREEN((_clip.x+max_x1+raio), _screen.width, _scale.width),
-							max_px2 = SCALE_TO_SCREEN((_clip.x+max_x2+wp-raio), _screen.width, _scale.width);
+					int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1+raio), _screen.width, _scale.width),
+							max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2+wp-raio), _screen.width, _scale.width);
 
 					if (old_l > 0) {
 						surface->DrawLine(surface, old_max_px1, old_l, max_px1, l);
@@ -1163,13 +1045,13 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int raio)
 				int max_x1 = (int)(xp-min_d),
 						max_x2 = (int)(xp+min_d);
 
-				int j = SCALE_TO_SCREEN((_clip.y+y1+raio), _screen.height, _scale.height);
+				int j = SCALE_TO_SCREEN((_translate.y+y1+raio), _screen.height, _scale.height);
 
 				if (l != j || y1 == limit) {
 					l = j;
 
-					int max_px1 = SCALE_TO_SCREEN((_clip.x+max_x1+raio), _screen.width, _scale.width),
-							max_px2 = SCALE_TO_SCREEN((_clip.x+max_x2+wp-raio), _screen.width, _scale.width);
+					int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1+raio), _screen.width, _scale.width),
+							max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2+wp-raio), _screen.width, _scale.width);
 
 					if (y1 == limit) {
 						surface->DrawLine(surface, old_max_px1, l, old_max_px2, l);
@@ -1213,13 +1095,13 @@ void Graphics::FillCircle(int xp, int yp, int raio)
 		x1 = (int)(xp - d);
 		x2 = (int)(xp + d);
 
-		int j = SCALE_TO_SCREEN((_clip.y+y1), _screen.height, _scale.height);
+		int j = SCALE_TO_SCREEN((_translate.y+y1), _screen.height, _scale.height);
 
 		if (l != j) {
 			l = j;
 
-			int px1 = SCALE_TO_SCREEN((_clip.x+x1), _screen.width, _scale.width),
-					px2 = SCALE_TO_SCREEN((_clip.x+x2), _screen.width, _scale.width);
+			int px1 = SCALE_TO_SCREEN((_translate.x+x1), _screen.width, _scale.width),
+					px2 = SCALE_TO_SCREEN((_translate.x+x2), _screen.width, _scale.width);
 
 			lines[k].x1 = px1;
 			lines[k].y1 = l;
@@ -1231,30 +1113,6 @@ void Graphics::FillCircle(int xp, int yp, int raio)
 	}
 	
 	surface->DrawLines(surface, lines, k-1);
-
-	/*
-	int x1, 
-			x2,
-			l = 0;
-
-	for (int y1=yp-raio; y1<=yp+raio; y1++) {
-		double d = sqrt(raio*raio-(y1-yp)*(y1-yp));
-
-		x1 = (int)(xp - d);
-		x2 = (int)(xp + d);
-
-		int j = SCALE_TO_SCREEN((_clip.y+y1), _screen.height, _scale.height);
-
-		if (l != j) {
-			l = j;
-
-			int px1 = SCALE_TO_SCREEN((_clip.x+x1), _screen.width, _scale.width),
-					px2 = SCALE_TO_SCREEN((_clip.x+x2), _screen.width, _scale.width);
-
-			surface->DrawLine(surface, px1, l, px2, l);
-		}
-	}
-	*/
 #endif
 }
 
@@ -1265,7 +1123,6 @@ void Graphics::DrawCircle(int xp, int yp, int raio)
 		return;
 	}
 
-	// int r = SCALE_TO_SCREEN(raio, _screen.width, _scale.width);
 	int mw = _line_width;
 
 	if (mw > raio) {
@@ -1277,8 +1134,8 @@ void Graphics::DrawCircle(int xp, int yp, int raio)
 
 		mw = mw/2;
 
-		int min_y = SCALE_TO_SCREEN((_clip.y+yp-raio+mw), _screen.height, _scale.height),
-				max_y = SCALE_TO_SCREEN((_clip.y+yp+raio-mw), _screen.height, _scale.height);
+		int min_y = SCALE_TO_SCREEN((_translate.y+yp-raio+mw), _screen.height, _scale.height),
+				max_y = SCALE_TO_SCREEN((_translate.y+yp+raio-mw), _screen.height, _scale.height);
 
 		for (int y1=yp-raio-mw; y1<=yp+raio+mw; y1++) {
 			double max_d = sqrt((raio+mw)*(raio+mw)-(y1-yp)*(y1-yp)),
@@ -1295,15 +1152,15 @@ void Graphics::DrawCircle(int xp, int yp, int raio)
 					min_x1 = (int)(xp-min_d),
 					min_x2 = (int)(xp+min_d);
 
-			int j = SCALE_TO_SCREEN((_clip.y+y1), _screen.height, _scale.height);
+			int j = SCALE_TO_SCREEN((_translate.y+y1), _screen.height, _scale.height);
 
 			if (l != j) {
 				l = j;
 
-				int max_px1 = SCALE_TO_SCREEN((_clip.x+max_x1), _screen.width, _scale.width),
-						max_px2 = SCALE_TO_SCREEN((_clip.x+max_x2), _screen.width, _scale.width),
-						min_px1 = SCALE_TO_SCREEN((_clip.x+min_x1), _screen.width, _scale.width),
-						min_px2 = SCALE_TO_SCREEN((_clip.x+min_x2), _screen.width, _scale.width);
+				int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1), _screen.width, _scale.width),
+						max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2), _screen.width, _scale.width),
+						min_px1 = SCALE_TO_SCREEN((_translate.x+min_x1), _screen.width, _scale.width),
+						min_px2 = SCALE_TO_SCREEN((_translate.x+min_x2), _screen.width, _scale.width);
 
 				if (l <= min_y || l >= max_y) {
 					surface->DrawLine(surface, max_px1, l, max_px2, l);
@@ -1329,13 +1186,13 @@ void Graphics::DrawCircle(int xp, int yp, int raio)
 			int max_x1 = (int)(xp-min_d),
 					max_x2 = (int)(xp+min_d);
 
-			int j = SCALE_TO_SCREEN((_clip.y+y1), _screen.height, _scale.height);
+			int j = SCALE_TO_SCREEN((_translate.y+y1), _screen.height, _scale.height);
 
 			if (l != j || y1 == limit) {
 				l = j;
 
-				int max_px1 = SCALE_TO_SCREEN((_clip.x+max_x1), _screen.width, _scale.width),
-						max_px2 = SCALE_TO_SCREEN((_clip.x+max_x2), _screen.width, _scale.width);
+				int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1), _screen.width, _scale.width),
+						max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2), _screen.width, _scale.width);
 
 				if (old_l > 0) {
 					surface->DrawLine(surface, old_max_px1, old_l, max_px1, l);
@@ -1603,12 +1460,12 @@ void Graphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p
 		return;
 	}
 
-	int x1 = SCALE_TO_SCREEN((_clip.x+x1p), _screen.width, _scale.width); 
-	int y1 = SCALE_TO_SCREEN((_clip.y+y1p), _screen.height, _scale.height);
-	int x2 = SCALE_TO_SCREEN((_clip.x+x2p), _screen.width, _scale.width); 
-	int y2 = SCALE_TO_SCREEN((_clip.y+y2p), _screen.height, _scale.height);
-	int x3 = SCALE_TO_SCREEN((_clip.x+x3p), _screen.width, _scale.width); 
-	int y3 = SCALE_TO_SCREEN((_clip.y+y3p), _screen.height, _scale.height);
+	int x1 = SCALE_TO_SCREEN((_translate.x+x1p), _screen.width, _scale.width); 
+	int y1 = SCALE_TO_SCREEN((_translate.y+y1p), _screen.height, _scale.height);
+	int x2 = SCALE_TO_SCREEN((_translate.x+x2p), _screen.width, _scale.width); 
+	int y2 = SCALE_TO_SCREEN((_translate.y+y2p), _screen.height, _scale.height);
+	int x3 = SCALE_TO_SCREEN((_translate.x+x3p), _screen.width, _scale.width); 
+	int y3 = SCALE_TO_SCREEN((_translate.y+y3p), _screen.height, _scale.height);
 
 	surface->FillTriangle(surface, x1, y1, x2, y2, x3, y3);
 #endif
@@ -1620,19 +1477,6 @@ void Graphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p
 	if (surface == NULL) {
 		return;
 	}
-
-	/*
-		 int x1 = SCALE_TO_SCREEN(x1p, _screen.width, _scale.width); 
-		 int y1 = SCALE_TO_SCREEN(y1p, _screen.height, _scale.height);
-		 int x2 = SCALE_TO_SCREEN(x2p, _screen.width, _scale.width); 
-		 int y2 = SCALE_TO_SCREEN(y2p, _screen.height, _scale.height);
-		 int x3 = SCALE_TO_SCREEN(x3p, _screen.width, _scale.width); 
-		 int y3 = SCALE_TO_SCREEN(y3p, _screen.height, _scale.height);
-
-		 surface->DrawLine(surface, x1, y1, x2, y2);
-		 surface->DrawLine(surface, x2, y2, x3, y3);
-		 surface->DrawLine(surface, x3, y3, x1, y1);
-		 */
 
 	DrawLine(x1p, y1p, x2p, y2p);
 	DrawLine(x2p, y2p, x3p, y3p);
@@ -1686,33 +1530,6 @@ void Graphics::FillPolygon(int x, int y, jpoint_t *p, int num)
 		return;
 	}
 
-	/*
-	// Small test application demonstrating the usage of the triangulate class
-	// Create a pretty complicated little contour by pushing them onto an stl vector
-	Vector2dVector a;
-
-	for (int i=0; i<num; i++) {
-	a.push_back(Vector2d(p[i].x+x,p[i].y+y));
-	}
-
-	// allocate an STL vector to hold the answer.
-	Vector2dVector result;
-
-	//  Invoke the triangulator to triangulate this polygon.
-	Triangulate::Process(a,result);
-
-	// print out the results.
-	int tcount = result.size()/3;
-
-	for (int i=0; i<tcount; i++) {
-	const Vector2d &p1 = result[i*3+0];
-	const Vector2d &p2 = result[i*3+1];
-	const Vector2d &p3 = result[i*3+2];
-
-	FillTriangle((int)p1.GetX(), (int)p1.GetY(), (int)p2.GetX(), (int)p2.GetY(), (int)p3.GetX(), (int)p3.GetY());
-	}
-	*/
-
 	int points[2*num];
 	int i,
 			j=0;
@@ -1752,12 +1569,10 @@ void Graphics::FillGradientRectangle(int xp, int yp, int wp, int hp, int sr, int
 		return;
 	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
-	// int w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width);
-	// int h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_clip.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_clip.y+yp+hp), _screen.height, _scale.height)-y;
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
 	TRUNC_COLOR(sr, sg, sb, sa);
 	TRUNC_COLOR(dr, dg, db, da);
@@ -1806,8 +1621,8 @@ void Graphics::DrawString(std::string s, int xp, int yp)
 		return;
 	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
 	// surface->DrawString(surface, s.c_str(), -1, x, y+_font->GetHeight(), (DFBSurfaceTextFlags)(DSTF_LEFT));
 	surface->DrawString(surface, s.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
@@ -1825,8 +1640,8 @@ void Graphics::DrawGlyph(int symbol, int xp, int yp)
 		return;
 	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
 	IDirectFBFont *font = (IDirectFBFont *)_font->GetFont();
 	DFBRectangle glyphrect;
@@ -1927,8 +1742,8 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 		alpha = 0xff;
 	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
 	IDirectFBSurface *imgSurface = NULL;
 	IDirectFBImageProvider *imgProvider = NULL;
@@ -1949,7 +1764,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
-	if (_radians != 0.0 || _translate.x != 0 || _translate.y != 0) {
+	if (_radians != 0.0) {
 		int wp = SCREEN_TO_SCALE(desc.width, _screen.width, _scale.width); 
 		int hp = SCREEN_TO_SCALE(desc.height, _screen.height, _scale.height);
 
@@ -1961,7 +1776,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 
 		off.GetGraphics()->DrawImage(img, 0, 0);
 		
-		RotateImage(&off, _translate.x, _translate.y, xp, yp, wp, hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
 
 		imgProvider->Release(imgProvider);
 
@@ -2018,16 +1833,14 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 		alpha = 0xff;
 	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
-	// int w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width);
-	// int h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_clip.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_clip.y+yp+hp), _screen.height, _scale.height)-y;
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
-	if (_radians != 0.0 || _translate.x != 0 || _translate.y != 0) {
+	if (_radians != 0.0) {
 		OffScreenImage off(wp, hp);
 		Graphics *g = off.GetGraphics();
 
@@ -2036,7 +1849,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 
 		off.GetGraphics()->DrawImage(img, 0, 0, wp, hp);
 		
-		RotateImage(&off, _translate.x, _translate.y, xp, yp, wp, hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
 
 		return true;
 	}
@@ -2150,18 +1963,10 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 			sy = SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
 			sw = SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
 			sh = SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
-	/*
-		 int sx = SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
-		 sy = SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
-		 sw = SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
-		 sh = SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
-		 */
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height),
-			// w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width),
-			// h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-			w = SCALE_TO_SCREEN((_clip.x+xp+wp), _screen.width, _scale.width)-x,
-			h = SCALE_TO_SCREEN((_clip.y+yp+hp), _screen.height, _scale.height)-y;
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
+			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
+			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
+			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
 	DFBRectangle srect,
 							 drect;
@@ -2178,7 +1983,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
-	if (_radians != 0.0 || _translate.x != 0 || _translate.y != 0) {
+	if (_radians != 0.0) {
 		OffScreenImage off(wp, hp);
 		Graphics *g = off.GetGraphics();
 
@@ -2187,7 +1992,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 
 		off.GetGraphics()->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
-		RotateImage(&off, _translate.x, _translate.y, xp, yp, wp, hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
 
 		return true;
 	}
@@ -2267,13 +2072,14 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int alpha)
 		return false;
 	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
-	if (_radians == 0.0 && _translate.x == 0 && _translate.y == 0) {
-		surface->Blit(surface, g->surface, NULL, x+_translate.x, y+_translate.y);
+	if (_radians == 0.0) {
+		// surface->Blit(surface, g->surface, NULL, x+_translate.x, y+_translate.y);
+		surface->Blit(surface, g->surface, NULL, x, y);
 	} else {
 		int img_wp = img->GetWidth(),
 				img_hp = img->GetHeight();
@@ -2286,7 +2092,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int alpha)
 
 		off.GetGraphics()->DrawImage(img, 0, 0);
 		
-		RotateImage(&off, _translate.x, _translate.y, xp, yp, img_wp, img_hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, img_wp, img_hp, _radians);
 	}
 #endif
 
@@ -2318,12 +2124,10 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 		return false;
 	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
-	// int w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width);
-	// int h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_clip.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_clip.y+yp+hp), _screen.height, _scale.height)-y;
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
 	DFBRectangle drect;
 
@@ -2334,7 +2138,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 	
-	if (_radians == 0.0 && _translate.x == 0 && _translate.y == 0) {
+	if (_radians == 0.0) {
 		surface->StretchBlit(surface, g->surface, NULL, &drect);
 	} else {
 		OffScreenImage off(wp, hp);
@@ -2345,7 +2149,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 
 		off.GetGraphics()->DrawImage(img, 0, 0, wp, hp);
 		
-		RotateImage(&off, _translate.x, _translate.y, xp, yp, wp, hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
 	}
 #endif
 
@@ -2390,22 +2194,14 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 		return false;
 	}
 
-	/*
-		 int sx = sxp, // SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
-		 sy = syp, // SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
-		 sw = swp, // SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
-		 sh = shp; // SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
-		 */
 	int sx = SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
 			sy = SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
 			sw = SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
 			sh = SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height),
-			// w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width),
-			// h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-			w = SCALE_TO_SCREEN((_clip.x+xp+wp), _screen.width, _scale.width)-x,
-			h = SCALE_TO_SCREEN((_clip.y+yp+hp), _screen.height, _scale.height)-y;
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
+			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
+			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
+			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
 	DFBRectangle srect,
 							 drect;
@@ -2422,7 +2218,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 	
-	if (_radians == 0.0 && _translate.x == 0 && _translate.y == 0) {
+	if (_radians == 0.0) {
 		surface->StretchBlit(surface, g->surface, &srect, &drect);
 	} else {
 		OffScreenImage off(wp, hp);
@@ -2433,7 +2229,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 
 		off.GetGraphics()->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
-		RotateImage(&off, _translate.x, _translate.y, xp, yp, wp, hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
 	}
 #endif
 
@@ -2724,8 +2520,8 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 		return 0x00000000;
 	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
 	int swmax,
 			shmax;
@@ -2809,8 +2605,8 @@ void Graphics::SetRGB(int xp, int yp, uint32_t rgb)
 		return;
 	}
 
-	int x = SCALE_TO_SCREEN((_clip.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_clip.y+yp), _screen.height, _scale.height);
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
 	void *ptr;
 	uint32_t *dst;
@@ -3031,8 +2827,8 @@ void Graphics::Reset()
 	_color.alpha = 0x00;
 
 	_radians = 0.0;
-	_translate.x = 0;
-	_translate.y = 0;
+	// _translate.x = 0;
+	// _translate.y = 0;
 	_line_width = 1;
 	_line_type = RECT_LINE;
 	_line_style = SOLID_LINE;
@@ -3510,7 +3306,7 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 	simg->Lock(simg, (DFBSurfaceLockFlags)(DSLF_WRITE), &gptr, &gpitch);
 
 	for (j=height-1+2*dh; j>0; j--) {
-		int sy = ((_clip.y+y+j-dh)*scaleh)/precision;
+		int sy = ((y+j-dh)*scaleh)/precision;
 
 		jPrime = j - height - dh;
 
@@ -3525,14 +3321,14 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 				if ((iOriginal >= xc) && ((iOriginal-xc) <= width-1) && (jOriginal >= yc) && ((jOriginal-yc) <= height-1)) {
 					uint32_t rgb;
 
-					int gx = ((_clip.x+iOriginal-xc)*scalew)/precision;
-					int gy = ((_clip.y+jOriginal-yc)*scaleh)/precision;
+					int gx = ((iOriginal-xc)*scalew)/precision;
+					int gy = ((jOriginal-yc)*scaleh)/precision;
 
 					if ((gx >= 0 && gx < iwmax) && (gy >= 0 && gy < ihmax)) {
 						rgb = *((uint32_t *)((uint8_t *)gptr + gy * gpitch) + gx);
 
 						if (rgb != 0x00000000) {
-							int offset = ((_clip.x+x+i-dw)*scalew)/precision;
+							int offset = ((x+i-dw)*scalew)/precision;
 
 							if (offset >= 0 && offset < swmax) {
 								*(sdst+offset) = rgb;
@@ -3569,7 +3365,7 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 	for (j=height-1+2*dh; j>0; j--) {
 		jPrime = j - height - dh;
 
-		int sy = (_clip.y+y+j-dh)*scaleh;
+		int sy = (_translate.y+y+j-dh)*scaleh;
 
 		sdst = (uint32_t *)((uint8_t *)sptr + sy * spitch);
 
@@ -3581,14 +3377,14 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 			if ((iOriginal >= xc) && ((iOriginal-xc) <= width-1) && (jOriginal >= yc) && ((jOriginal-yc) <= height-1)) {
 				uint32_t rgb;
 				
-				int gx = (_clip.x+iOriginal-xc)*scalew;
-				int gy = (_clip.y+jOriginal-yc)*scaleh;
+				int gx = (_translate.x+iOriginal-xc)*scalew;
+				int gy = (_translate.y+jOriginal-yc)*scaleh;
 
 				gdst = (uint32_t *)((uint8_t *)gptr + gy * gpitch);
 				rgb = *(gdst+gx);
 
 				if (rgb != 0x00000000) {
-					int sx = (_clip.x+x+i-dw)*scalew;
+					int sx = (_translate.x+x+i-dw)*scalew;
 
 					if (sy < shmax) {
 						*(sdst+sx) = rgb;
@@ -3632,15 +3428,15 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 			if ((iOriginal >= xc) && ((iOriginal-xc) <= width-1) && (jOriginal >= yc) && ((jOriginal-yc) <= height-1)) {
 				uint32_t rgb;
 				
-				int gx = (_clip.x+iOriginal-xc)*scalew;
-				int gy = (_clip.y+jOriginal-yc)*scaleh;
+				int gx = (_translate.x+iOriginal-xc)*scalew;
+				int gy = (_translate.y+jOriginal-yc)*scaleh;
 
 				gdst = (uint32_t *)((uint8_t *)gptr + gy * gpitch);
 				rgb = *(gdst+gx);
 
 				if (rgb != 0x00000000) {
-					int sx = (_clip.x+x+i-dw)*scalew;
-					int sy = (_clip.y+y+j-dh)*scaleh;
+					int sx = (_translate.x+x+i-dw)*scalew;
+					int sy = (_translate.y+y+j-dh)*scaleh;
 
 					sdst = (uint32_t *)((uint8_t *)sptr + sy * spitch);
 					*(sdst+sx) = rgb;
@@ -3681,15 +3477,15 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 			if ((iOriginal >= xc) && ((iOriginal-xc) <= width-1) && (jOriginal >= yc) && ((jOriginal-yc) <= height-1)) {
 				uint32_t rgb;
 				
-				int gx = SCALE_TO_SCREEN((_clip.x+iOriginal-xc), _screen.width, _scale.width); 
-				int gy = SCALE_TO_SCREEN((_clip.y+jOriginal-yc), _screen.height, _scale.height);
+				int gx = SCALE_TO_SCREEN((_translate.x+iOriginal-xc), _screen.width, _scale.width); 
+				int gy = SCALE_TO_SCREEN((_translate.y+jOriginal-yc), _screen.height, _scale.height);
 
 				gdst = (uint32_t *)((uint8_t *)gptr + gy * gpitch);
 				rgb = *(gdst+gx);
 
 				if (rgb != 0x00000000) {
-					int sx = SCALE_TO_SCREEN((_clip.x+x+i-dw), _screen.width, _scale.width); 
-					int sy = SCALE_TO_SCREEN((_clip.y+y+j-dh), _screen.height, _scale.height);
+					int sx = SCALE_TO_SCREEN((_translate.x+x+i-dw), _screen.width, _scale.width); 
+					int sy = SCALE_TO_SCREEN((_translate.y+y+j-dh), _screen.height, _scale.height);
 
 					sdst = (uint32_t *)((uint8_t *)sptr + sy * spitch);
 					*(sdst+sx) = rgb;
@@ -3725,8 +3521,8 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 				uint32_t rgb = gimg->GetRGB(iOriginal-xc, jOriginal-yc);
 
 				if (rgb != 0x00000000) {
-					int xx = SCALE_TO_SCREEN((_clip.x+x+i-dw), _screen.width, _scale.width); 
-					int yy = SCALE_TO_SCREEN((_clip.y+y+j-dh), _screen.height, _scale.height);
+					int xx = SCALE_TO_SCREEN((_translate.x+x+i-dw), _screen.width, _scale.width); 
+					int yy = SCALE_TO_SCREEN((_translate.y+y+j-dh), _screen.height, _scale.height);
 
 					dst = (uint32_t *)((uint8_t *)ptr + yy * pitch);
 					*(dst+xx) = rgb;

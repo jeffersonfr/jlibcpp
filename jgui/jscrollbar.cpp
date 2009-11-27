@@ -397,9 +397,17 @@ void ScrollBar::DispatchEvent(AdjustmentEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_adjust_listeners.size()) {
+		_adjust_listeners[k-1]->AdjustmentValueChanged(event);
+	}
+
+	/*
 	for (std::vector<AdjustmentListener *>::iterator i=_adjust_listeners.begin(); i!=_adjust_listeners.end(); i++) {
 		(*i)->AdjustmentValueChanged(event);
 	}
+	*/
 
 	delete event;
 }

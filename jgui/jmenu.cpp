@@ -228,6 +228,13 @@ void Menu::AddMenuItem(MenuItem *item)
 	_list->AddMenuItem(item);
 }
 
+void Menu::AddMenuItems(std::vector<MenuItem *> &items)
+{
+	for (std::vector<MenuItem *>::iterator i=items.begin(); i!=items.end(); i++) {
+		_list->AddMenuItem((*i));
+	}
+}
+
 Menu * Menu::GetCurrentMenu()
 {
 	jthread::AutoLock lock(&_menu_mutex);
@@ -273,17 +280,6 @@ int Menu::GetCurrentIndex()
 	}
 
 	return 0;
-}
-
-void Menu::RemoveItem(int index)
-{
-	{
-		jthread::AutoLock lock(&_menu_mutex);
-
-		// TODO:: 
-	}
-	
-	Repaint();
 }
 
 void Menu::RemoveAll()
@@ -496,6 +492,19 @@ void Menu::DispatchEvent(MenuEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_menu_listeners.size()) {
+		MenuListener *listener = _menu_listeners[k-1];
+
+		if (event->GetType() == CHANGE_MENU_ITEM_EVENT) {
+			listener->ItemChanged(event);
+		} else if (event->GetType() == SELECT_MENU_ITEM_EVENT) {
+			listener->ItemSelected(event);
+		}
+	}
+
+	/*
 	for (std::vector<MenuListener *>::iterator i=_menu_listeners.begin(); i!=_menu_listeners.end(); i++) {
 		if (event->GetType() == CHANGE_MENU_ITEM_EVENT) {
 			(*i)->ItemChanged(event);
@@ -503,6 +512,7 @@ void Menu::DispatchEvent(MenuEvent *event)
 			(*i)->ItemSelected(event);
 		}
 	}
+	*/
 
 	delete event;
 }

@@ -245,9 +245,17 @@ void Button::DispatchEvent(ButtonEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_button_listeners.size()) {
+		_button_listeners[k-1]->ActionPerformed(event);
+	}
+
+	/*
 	for (std::vector<ButtonListener *>::iterator i=_button_listeners.begin(); i!=_button_listeners.end(); i++) {
 		(*i)->ActionPerformed(event);
 	}
+	*/
 
 	delete event;
 }

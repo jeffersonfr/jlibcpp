@@ -101,7 +101,7 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 			sinTheta = sin(angle);
 			cosTheta = cos(angle);
 
-			g->SetDrawingFlags(jgui::NOFX_FLAG);
+			g->SetDrawingFlags(jgui::DF_NOFX);
 
 			int w2 = width/2,
 					h2 = height/2,
@@ -148,7 +148,7 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 		{
 			jgui::Frame::Paint(g);
 
-			g->SetDrawingFlags(jgui::BLEND_FLAG);
+			g->SetDrawingFlags(jgui::DF_BLEND);
 
 			for (int j=0; j<8; j++) {
 				for (int i=0; i<10; i++) {

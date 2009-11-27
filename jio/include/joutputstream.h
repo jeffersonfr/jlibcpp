@@ -21,8 +21,9 @@
 #define J_OUTPUTSTREAM_H
 
 #include "joutputstream.h"
-
 #include "jobject.h"
+
+#include <stdint.h>
 
 namespace jio {
 

@@ -343,6 +343,19 @@ void Tree::DispatchEvent(MenuEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_tree_listeners.size()) {
+		MenuListener *listener = _tree_listeners[k-1];
+
+		if (event->GetType() == CHANGE_MENU_ITEM_EVENT) {
+			listener->ItemChanged(event);
+		} else if (event->GetType() == SELECT_MENU_ITEM_EVENT) {
+			listener->ItemSelected(event);
+		}
+	}
+
+	/*
 	for (std::vector<MenuListener *>::iterator i=_tree_listeners.begin(); i!=_tree_listeners.end(); i++) {
 		if (event->GetType() == CHANGE_MENU_ITEM_EVENT) {
 			(*i)->ItemChanged(event);
@@ -350,6 +363,7 @@ void Tree::DispatchEvent(MenuEvent *event)
 			(*i)->ItemSelected(event);
 		}
 	}
+	*/
 
 	delete event;
 }

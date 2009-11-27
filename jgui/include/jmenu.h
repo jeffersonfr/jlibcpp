@@ -100,10 +100,11 @@ class Menu : public jgui::Frame, public jgui::FrameInputListener{
 		void SetLoop(bool loop);
 		void SetCurrentIndex(int i);
 		void AddMenuItem(MenuItem *item);
+		void AddMenuItem(MenuItem *item, int index);
+		void AddMenuItems(std::vector<MenuItem *> &items);
 		Menu * GetCurrentMenu();
 		MenuItem * GetCurrentItem();
 		int GetCurrentIndex();
-		void RemoveItem(int index);
 		void RemoveAll();
 
 		uint32_t GetItemColor();
@@ -181,115 +182,147 @@ class MenuItem : public virtual jcommon::Object{
 		}
 
 		MenuItem(std::string value, bool checked)
-		{
-			jcommon::Object::SetClassName("jcommon::MenuItem");
+	{
+		jcommon::Object::SetClassName("jcommon::MenuItem");
 
-			_enabled = true;
-			_parent = NULL;
-			_prefetch = NULL;
-			_value = value;
-			_is_checked = checked;
-			_is_visible = true;
-			_type = CHECK_MENU_ITEM;
+		_enabled = true;
+		_parent = NULL;
+		_prefetch = NULL;
+		_value = value;
+		_is_checked = checked;
+		_is_visible = true;
+		_type = CHECK_MENU_ITEM;
+	}
+
+	~MenuItem()
+	{
+	}
+
+	Menu * GetParent()
+	{
+		return _parent;
+	}
+
+	std::vector<MenuItem *> & GetSubItems()
+	{
+		return _childs;
+	}
+
+	void SetEnabled(bool b)
+	{
+		_enabled = b;
+	}
+
+	bool GetEnabled()
+	{
+		return _enabled;
+	}
+
+	void SetVisible(bool b)
+	{
+		_is_visible = b;
+	}
+
+	bool IsVisible()
+	{
+		return _is_visible;
+	}
+
+	bool IsSelected()
+	{
+		return _is_checked;
+	}
+
+	void SetSelected(bool b)
+	{
+		if (_is_checked == b) {
+			return;
 		}
 
-		~MenuItem()
-		{
+		_is_checked = b;
+
+		/*
+		if (_parent != NULL) {
+			_parent->Repaint();
+		}
+		*/
+	}
+
+	void SetParent(Menu *parent)
+	{
+		_parent = parent;
+	}
+
+	void AddSubItem(MenuItem *item)
+	{
+		if (_type == jgui::CHECK_MENU_ITEM) {
+			throw MenuException("Item cannot accept childs");
 		}
 
-		Menu * GetParent()
-		{
-			return _parent;
+		_childs.push_back(item);
+	}
+
+	void AddSubItem(MenuItem *item, int index)
+	{
+		if (index > (int)_childs.size()) {
+			index = _childs.size();
 		}
 
-		std::vector<MenuItem *> & GetSubItems()
-		{
-			return _childs;
+		_childs.insert(_childs.begin()+index, item);
+	}
+
+	void AddSubItems(std::vector<MenuItem *> items)
+	{
+		for (std::vector<MenuItem *>::iterator i=items.begin(); i!=items.end(); i++) {
+			_childs.push_back((*i));
 		}
+	}
 
-		void SetEnabled(bool b)
-		{
-			_enabled = b;
+	void RemoveSubItem(int index)
+	{
+		if (_childs.size() > 0 && index < (int)_childs.size()) {
+			_childs.erase(_childs.begin()+index);
 		}
+	}
 
-		bool GetEnabled()
-		{
-			return _enabled;
+	void RemoveSubItem(MenuItem *item)
+	{
+		std::vector<MenuItem *>::iterator i = std::find(_childs.begin(), _childs.end(), item);
+
+		if (i != _childs.end()) {
+			_childs.erase(i);
 		}
+	}
 
-		void SetVisible(bool b)
-		{
-			_is_visible = b;
-		}
+	std::string GetValue()
+	{
+		return _value;
+	}
 
-		bool IsVisible()
-		{
-			return _is_visible;
-		}
+	std::string GetImage()
+	{
+		return _image;
+	}
 
-		bool IsSelected()
-		{
-			return _is_checked;
-		}
-
-		void SetSelected(bool b)
-		{
-			if (_is_checked == b) {
-				return;
-			}
-
-			_is_checked = b;
-
-			/*
-			if (_parent != NULL) {
-				_parent->Repaint();
-			}
-			*/
-		}
-
-		void SetParent(Menu *parent)
-		{
-			_parent = parent;
-		}
-
-		void AddSubItem(MenuItem *item)
-		{
-			if (_type == jgui::CHECK_MENU_ITEM) {
-				throw MenuException("Item cannot accept childs");
-			}
-
-			_childs.push_back(item);
-		}
-
-		std::string GetValue()
-		{
-			return _value;
-		}
-
-		std::string GetImage()
-		{
-			return _image;
-		}
-
-		jmenuitem_type_t GetType()
-		{
-			return _type;
-		}
+	jmenuitem_type_t GetType()
+	{
+		return _type;
+	}
 
 };
 
 class MenuComponent : public Component{
 
-	friend class Menu;
+friend class Menu;
 
-	private:
-		std::vector<MenuItem *>_items;
-		OffScreenImage *prefetch;
-		Menu *_menu;
-		int bx,
-			by,
-			bwidth,
-			bheight,
+private:
+	std::vector<MenuItem *>_items;
+	OffScreenImage *prefetch;
+	Menu *_menu;
+	int bx,
+		by,
+		bwidth,
+		bheight,
 			_item_size,
 			_index,
 			_top_index,

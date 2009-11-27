@@ -550,7 +550,7 @@ class GraphicPanel : public jgui::Panel{
 		 g->DrawImage(img4, 400+40+1*(200+10), 1*(100+10)+10, 200, 100, 0x10);
 		 */
 
-		g->SetPorterDuffFlags(jgui::PD_NONE);
+		g->SetPorterDuffFlags(jgui::PDF_NONE);
 		g->DrawImage("icons/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+10, 200, 100, 0xff);
 		g->DrawImage("icons/blue_icon.png", 400+40+1*(200+10), 0*(100+10)+10, 200, 100, 0x80);
 		g->DrawImage("icons/blue_icon.png", 400+40+0*(200+10), 1*(100+10)+10, 200, 100, 0x40);

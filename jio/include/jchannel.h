@@ -24,6 +24,8 @@
 
 #include <string>
 
+#include <stdint.h>
+
 namespace jio {
 
 /**

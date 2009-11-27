@@ -469,6 +469,19 @@ void ComboMenu::DispatchEvent(MenuEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_menu_listeners.size()) {
+		MenuListener *listener = _menu_listeners[k-1];
+
+		if (event->GetType() == CHANGE_MENU_ITEM_EVENT) {
+			listener->ItemChanged(event);
+		} else if (event->GetType() == SELECT_MENU_ITEM_EVENT) {
+			listener->ItemSelected(event);
+		}
+	}
+
+	/*
 	for (std::vector<MenuListener *>::iterator i=_menu_listeners.begin(); i!=_menu_listeners.end(); i++) {
 		if (event->GetType() == CHANGE_MENU_ITEM_EVENT) {
 			(*i)->ItemChanged(event);
@@ -476,6 +489,7 @@ void ComboMenu::DispatchEvent(MenuEvent *event)
 			(*i)->ItemSelected(event);
 		}
 	}
+	*/
 
 	delete event;
 }

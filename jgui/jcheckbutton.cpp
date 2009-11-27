@@ -247,9 +247,17 @@ void CheckButton::DispatchEvent(CheckButtonEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_check_listeners.size()) {
+		_check_listeners[k-1]->ButtonSelected(event);
+	}
+
+	/*
 	for (std::vector<CheckButtonListener *>::iterator i=_check_listeners.begin(); i!=_check_listeners.end(); i++) {
 		(*i)->ButtonSelected(event);
 	}
+	*/
 
 	delete event;
 }

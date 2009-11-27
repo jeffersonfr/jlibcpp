@@ -758,7 +758,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			int w = _width,
 				h = _height;
 
-			g->SetDrawingFlags(jgui::NOFX_FLAG);
+			g->SetDrawingFlags(jgui::DF_NOFX);
 
 			time_t t1=jcommon::Date::CurrentTimeMillis();
 			//start the main loop

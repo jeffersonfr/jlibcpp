@@ -37,37 +37,37 @@
 #endif
 
 #define TRUNC_COLOR(red, green, blue, alpha) 	\
-	if (red < 0) { 		\
-		red = 0;		\
-	}					\
-						\
-	if (green < 0) {	\
-		green = 0;		\
-	}					\
-						\
-	if (blue < 0) {		\
-		blue = 0;		\
-	}					\
-						\
-	if (alpha < 0) {	\
-		alpha = 0;		\
-	}					\
-						\
-	if (red > 0xff) {	\
-		red = 0xff;		\
-	}					\
-						\
+	if (red < 0) { 			\
+		red = 0;					\
+	}										\
+											\
+	if (green < 0) {		\
+		green = 0;				\
+	}										\
+											\
+	if (blue < 0) {			\
+		blue = 0;					\
+	}										\
+											\
+	if (alpha < 0) {		\
+		alpha = 0;				\
+	}										\
+											\
+	if (red > 0xff) {		\
+		red = 0xff;				\
+	}										\
+											\
 	if (green > 0xff) {	\
-		green = 0xff;	\
-	}					\
-						\
+		green = 0xff;			\
+	}										\
+											\
 	if (blue > 0xff) {	\
-		blue = 0xff;	\
-	}					\
-						\
+		blue = 0xff;			\
+	}										\
+											\
 	if (alpha > 0xff) {	\
-		alpha = 0xff;	\
-	}					\
+		alpha = 0xff;			\
+	}										\
 
 #define SCALE_TO_SCREEN(x, y, z) \
 	(int)floor(((double)x*(double)y)/(double)z) 
@@ -242,7 +242,6 @@ class Graphics : public virtual jcommon::Object{
 		IDirectFBSurface *surface;
 #endif
 
-		std::vector<struct jregion_t> _clips;
 		struct jregion_t _clip;
 		struct jpoint_t _translate;
 		struct jsize_t _screen;
@@ -347,31 +346,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jregion_t GetClipBounds();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetClipX();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetClipY();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetClipWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetClipHeight();
+		virtual jregion_t GetClip();
 		
 		/**
 		 * \brief

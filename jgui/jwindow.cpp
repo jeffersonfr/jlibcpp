@@ -605,11 +605,13 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 				}
 
 				graphics->Reset();
-				graphics->SetClip(x3, y3, w3, h3);
+				graphics->Translate(x3, y3);
+				graphics->SetClip(0, 0, w3, h3);
 
 				c1->Paint(graphics);
 
 				graphics->ReleaseClip();
+				graphics->Translate(-x3, -y3);
 				
 				c1->Revalidate();
 			}
@@ -629,12 +631,14 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 
 			if ((x1 < GetWidth() && (x1+w1) > 0) && (y1 < GetHeight() && (y1+h1) > 0)) {
 				graphics->Reset();
-				graphics->SetClip(x1, y1, w1, h1);
+				graphics->Translate(x1, y1);
+				graphics->SetClip(0, 0, w1, h1);
 
 				c1->Paint(graphics);
 
 				graphics->Flip(x1, y1, w1, h1);
 				graphics->ReleaseClip();
+				graphics->Translate(-x1, -y1);
 				
 				c1->Revalidate();
 			}
@@ -740,6 +744,25 @@ void Window::DispatchEvent(WindowEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_window_listeners.size()) {
+		WindowListener *listener = _window_listeners[k-1];
+
+		if (event->GetType() == WINDOW_CLOSING_EVENT) {
+			listener->WindowClosing(event);
+		} else if (event->GetType() == WINDOW_CLOSED_EVENT) {
+			listener->WindowClosed(event);
+		} else if (event->GetType() == WINDOW_OPENED_EVENT) {
+			listener->WindowOpened(event);
+		} else if (event->GetType() == WINDOW_RESIZED_EVENT) {
+			listener->WindowResized(event);
+		} else if (event->GetType() == WINDOW_MOVED_EVENT) {
+			listener->WindowMoved(event);
+		}
+	}
+
+	/*
 	for (std::vector<WindowListener *>::iterator i=_window_listeners.begin(); i!=_window_listeners.end(); i++) {
 		if (event->GetType() == WINDOW_CLOSING_EVENT) {
 			(*i)->WindowClosing(event);
@@ -753,6 +776,7 @@ void Window::DispatchEvent(WindowEvent *event)
 			(*i)->WindowMoved(event);
 		}
 	}
+	*/
 
 	delete event;
 }

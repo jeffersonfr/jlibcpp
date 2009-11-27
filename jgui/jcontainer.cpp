@@ -282,9 +282,11 @@ void Container::Paint(Graphics *g)
 					h1 = GetHeight()-y1;
 				}
 
-				g->SetClip(x1, y1, w1, h1);
+				g->Translate(x1, y1);
+				g->SetClip(0, 0, w1, h1);
 				c->Paint(g);
 				g->ReleaseClip();
+				g->Translate(-x1, -y1);
 			}
 
 			c->Revalidate();
@@ -670,6 +672,19 @@ void Container::DispatchEvent(ContainerEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_container_listeners.size()) {
+		ContainerListener *listener = _container_listeners[k-1];
+
+		if (event->GetType() == COMPONENT_ADDED_EVENT) {
+			listener->ComponentAdded(event);
+		} else if (event->GetType() == COMPONENT_ADDED_EVENT) {
+			listener->ComponentRemoved(event);
+		}
+	}
+
+	/*
 	for (std::vector<ContainerListener *>::iterator i=_container_listeners.begin(); i!=_container_listeners.end(); i++) {
 		if (event->GetType() == COMPONENT_ADDED_EVENT) {
 			(*i)->ComponentAdded(event);
@@ -677,6 +692,7 @@ void Container::DispatchEvent(ContainerEvent *event)
 			(*i)->ComponentRemoved(event);
 		}
 	}
+	*/
 
 	delete event;
 }

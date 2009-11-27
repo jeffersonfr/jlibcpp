@@ -840,6 +840,19 @@ void ListBox::DispatchEvent(SelectEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_listbox_listeners.size()) {
+		SelectListener *listener = _listbox_listeners[k-1];
+
+		if (event->GetType() == ACTION_ITEM) {
+			listener->ItemSelected(event);
+		} else {
+			listener->ItemChanged(event);
+		}
+	}
+
+	/*
 	for (std::vector<SelectListener *>::iterator i=_listbox_listeners.begin(); i!=_listbox_listeners.end(); i++) {
 		if (event->GetType() == ACTION_ITEM) {
 			(*i)->ItemSelected(event);
@@ -847,6 +860,7 @@ void ListBox::DispatchEvent(SelectEvent *event)
 			(*i)->ItemChanged(event);
 		}
 	}
+	*/
 
 	delete event;
 }

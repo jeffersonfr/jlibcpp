@@ -496,9 +496,17 @@ void CalendarDialog::DispatchEvent(CalendarEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_calendar_listeners.size()) {
+		_calendar_listeners[k-1]->DateChanged(event);
+	}
+
+	/*
 	for (std::vector<CalendarListener *>::iterator i=_calendar_listeners.begin(); i!=_calendar_listeners.end(); i++) {
 		(*i)->DateChanged(event);
 	}
+	*/
 
 	delete event;
 }

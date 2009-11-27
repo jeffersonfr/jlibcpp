@@ -1127,6 +1127,19 @@ void Component::DispatchEvent(FocusEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_focus_listeners.size()) {
+		FocusListener *listener = _focus_listeners[k-1];
+
+		if (event->GetType() == GAINED_FOCUS_EVENT) {
+			listener->FocusGained(event);
+		} else if (event->GetType() == LOST_FOCUS_EVENT) {
+			listener->FocusLost(event);
+		}
+	}
+
+	/*
 	for (std::vector<FocusListener *>::iterator i=_focus_listeners.begin(); i!=_focus_listeners.end(); i++) {
 		if (event->GetType() == GAINED_FOCUS_EVENT) {
 			(*i)->FocusGained(event);
@@ -1134,6 +1147,7 @@ void Component::DispatchEvent(FocusEvent *event)
 			(*i)->FocusLost(event);
 		}
 	}
+	*/
 
 	delete event;
 }
@@ -1173,6 +1187,23 @@ void Component::DispatchEvent(ComponentEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_component_listeners.size()) {
+		ComponentListener *listener = _component_listeners[k-1];
+
+		if (event->GetType() == COMPONENT_HIDDEN_EVENT) {
+			listener->ComponentHidden(event);
+		} else if (event->GetType() == COMPONENT_SHOWN_EVENT) {
+			listener->ComponentShown(event);
+		} else if (event->GetType() == COMPONENT_MOVED_EVENT) {
+			listener->ComponentMoved(event);
+		} else if (event->GetType() == COMPONENT_PAINT_EVENT) {
+			listener->ComponentRepainted(event);
+		}
+	}
+
+	/*
 	for (std::vector<ComponentListener *>::iterator i=_component_listeners.begin(); i!=_component_listeners.end(); i++) {
 		if (event->GetType() == COMPONENT_HIDDEN_EVENT) {
 			(*i)->ComponentHidden(event);
@@ -1184,6 +1215,7 @@ void Component::DispatchEvent(ComponentEvent *event)
 			(*i)->ComponentRepainted(event);
 		}
 	}
+	*/
 
 	delete event;
 }

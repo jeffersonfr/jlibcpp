@@ -896,9 +896,17 @@ void Keyboard::DispatchEvent(KeyboardEvent *event)
 				return;
 		}
 
+		int k=0;
+
+		while (k++ < (int)_keyboard_listeners.size()) {
+			_keyboard_listeners[k-1]->KeyboardUpdated(event);
+		}
+
+		/*
 		for (std::vector<KeyboardListener *>::iterator i=_keyboard_listeners.begin(); i!=_keyboard_listeners.end(); i++) {
 				(*i)->KeyboardUpdated(event);
 		}
+		*/
 
 		delete event;
 }

@@ -442,6 +442,19 @@ void Spin::DispatchEvent(SelectEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < (int)_select_listeners.size()) {
+		SelectListener *listener = _select_listeners[k-1];
+
+		if (event->GetType() == ACTION_ITEM) {
+			listener->ItemSelected(event);
+		} else {
+			listener->ItemChanged(event);
+		}
+	}
+
+	/*
 	for (std::vector<SelectListener *>::iterator i=_select_listeners.begin(); i!=_select_listeners.end(); i++) {
 		if (event->GetType() == ACTION_ITEM) {
 			(*i)->ItemSelected(event);
@@ -449,6 +462,7 @@ void Spin::DispatchEvent(SelectEvent *event)
 			(*i)->ItemChanged(event);
 		}
 	}
+	*/
 
 	delete event;
 }

@@ -614,9 +614,17 @@ void TextField::DispatchEvent(TextEvent *event)
 		return;
 	}
 
+	int k=0;
+
+	while (k++ < _text_listeners.size()) {
+		_text_listeners[k-1]->TextChanged(event);
+	}
+
+	/*
 	for (std::vector<TextListener *>::iterator i=_text_listeners.begin(); i!=_text_listeners.end(); i++) {
 		(*i)->TextChanged(event);
 	}
+	*/
 
 	delete event;
 }
