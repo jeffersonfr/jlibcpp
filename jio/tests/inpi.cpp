@@ -121,7 +121,7 @@ int removeWhiteSpace(File *file, File *temp, std::string filename)
 	temp->Reset();
 
 	previous_empty = false;
-	while (reader.EndOfFile() != true) {
+	while (reader.IsEOF() != true) {
 		line = reader.ReadLine();
 
 		if (IsEmpty(line) == true) {

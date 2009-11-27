@@ -38,13 +38,13 @@ access: $(OBJS_access)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
 object: $(OBJS_object)
-	$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
 data: $(OBJS_data)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
-	$(CC) $(CCFLAGS) -c $< ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) -c $< ; echo -e "Compiling $< ...  $(OK)" 
 
 install:
 
