@@ -22,7 +22,7 @@
 namespace mcalc {
 
 Display::Display(int x, int y, int width, int height):
-   	jgui::Component(x, y, width, height)
+   	jgui::Panel(x, y, width, height)
 {
 }
 

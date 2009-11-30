@@ -211,6 +211,7 @@ OBJS_jgui = \
 		jbutton.o\
 		jbuttonevent.o\
 		jbuttonlistener.o\
+		jcanvas.o \
 		jcalendardialog.o\
 		jcalendarevent.o\
 		jcalendarlistener.o\
