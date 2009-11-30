@@ -193,9 +193,9 @@ void Button::Paint(Graphics *g)
 		g->SetFont(_font);
 
 		if (_has_focus == true) {
-			g->SetColor(_fgfocus_red, _fgfocus_green, _fgfocus_blue);
+			g->SetColor(_fgfocus_color);
 		} else {
-			g->SetColor(_fg_red, _fg_green, _fg_blue);
+			g->SetColor(_fg_color);
 		}
 
 		int gap = _horizontal_gap+_border_size;
@@ -204,14 +204,14 @@ void Button::Paint(Graphics *g)
 			gap = 0;
 		}
 
-		g->DrawString(TruncateString(GetName(), _width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, _align);
+		g->DrawString(TruncateString(GetName(), _size.width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _size.width-gap, _size.height, _align);
 	}
 
 	PaintBorder(g);
 
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _width, _height);
+		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
 }
 

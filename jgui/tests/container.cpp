@@ -55,6 +55,7 @@
 #include "jtextdialog.h"
 #include "jmenugroup.h"
 #include "jcontainer.h"
+#include "jscrollpane.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -101,7 +102,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		SetIcon("icons/watch_1.png");
 
 		{
-			container = new jgui::Container(0, 0, 1920, 1080);
+			jgui::jinsets_t t = GetInsets();
+
+			container = new jgui::Container(t.left, t.top, 1920-t.left-t.right, 1080-t.top-t.bottom);
 		}
 
 		{
@@ -122,7 +125,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			animation->AddImage("icons/tux11.jpg");
 			animation->AddImage("icons/tux12.jpg");
 
-			animation->Start();
+			// animation->Start();
 		}
 
 		{
@@ -131,7 +134,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			marquee->SetText("Testando Marquee");
 			marquee->SetType(jgui::LOOP_TEXT);
 
-			marquee->Start();
+			// marquee->Start();
 		}
 
 		{
@@ -163,7 +166,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			watch->SetMinutes(0);
 			watch->SetHours(0);
 
-			watch->Start();
+			// watch->Start();
 		}
 
 		{
@@ -174,6 +177,8 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			button1->SetBackgroundFocusColor(0x40, 0xf0, 0x40, 0xff);
 			button2->SetBackgroundFocusColor(0xf0, 0x20, 0x20, 0xff);
 			button3->SetBackgroundFocusColor(0xf0, 0xf0, 0x40, 0xff);
+
+			button1->SetOpaque(false);
 
 			button1->RegisterButtonListener(this);
 			button2->RegisterButtonListener(this);
@@ -479,7 +484,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 int main( int argc, char *argv[] )
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/comic.ttf", 0, 20));
 
 	WindowTeste test;
 

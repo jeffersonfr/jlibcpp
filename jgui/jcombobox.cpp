@@ -100,11 +100,11 @@ void ComboMenu::SetTitle(std::string title)
 	_title = title;
 
 	if (_title == "") {
-		_list->SetPosition(_border_size, _border_size);
+		_list->SetLocation(_border_size, _border_size);
 		
 		SetSize(_list->GetWidth()+2*_border_size, _list->GetHeight()+2*_border_size);
 	} else {
-		_list->SetPosition(_border_size, _insets.top);
+		_list->SetLocation(_border_size, _insets.top);
 		
 		SetSize(_list->GetWidth()+2*_border_size, _list->GetHeight()+2*_border_size+_insets.top);
 	}
@@ -133,23 +133,23 @@ void ComboMenu::SetLoop(bool b)
 	_list->SetLoop(b);
 }
 
-uint32_t ComboMenu::GetItemColor()
+jcolor_t ComboMenu::GetItemColor()
 {
 	return _list->GetItemColor();
 }
 	
-void ComboMenu::SetItemColor(uint32_t color)
+void ComboMenu::SetItemColor(jcolor_t color)
 {
 	_list->SetItemColor(color);
 }
 
-void ComboMenu::SetBackgroundColor(uint32_t color)
+void ComboMenu::SetBackgroundColor(jcolor_t color)
 {
 	_list->SetBackgroundColor(color);
 	Frame::SetBackgroundColor(color);
 }
 
-void ComboMenu::SetForegroundColor(uint32_t color)
+void ComboMenu::SetForegroundColor(jcolor_t color)
 {
 	_list->SetForegroundColor(color);
 	Frame::SetForegroundColor(color);
@@ -352,13 +352,9 @@ void ComboMenu::InputChanged(KeyEvent *event)
 						}
 					}
 
-					uint32_t bg = GetBackgroundColor(),
-							 fg = GetForegroundColor(),
-							 itemg = GetItemColor();
-
-					menu->SetBackgroundColor((bg>>16)&0xff, (bg>>8)&0xff, (bg>>0)&0xff, (bg>>24)&0xff);
-					menu->SetForegroundColor((fg>>16)&0xff, (fg>>8)&0xff, (fg>>0)&0xff, (fg>>24)&0xff);
-					menu->SetItemColor((itemg>>16)&0xff, (itemg>>8)&0xff, (itemg>>0)&0xff, (itemg>>24)&0xff);
+					menu->SetBackgroundColor(GetBackgroundColor());
+					menu->SetForegroundColor(GetForegroundColor());
+					menu->SetItemColor(GetItemColor());
 
 					for (std::vector<MenuItem *>::iterator i=items.begin(); i!=items.end(); i++) {
 						if ((*i)->IsVisible() == true) {
@@ -416,7 +412,7 @@ void ComboMenu::MousePressed(MouseEvent *event)
 
 	jthread::AutoLock lock(&_input_mutex);
 
-	if ((event->GetX() < _x || event->GetX() > (_x+_width)) || (event->GetY() < _y || event->GetY() > (_y+_height))) {
+	if ((event->GetX() < _location.x || event->GetX() > (_location.x+_size.width)) || (event->GetY() < _location.y || event->GetY() > (_location.y+_size.height))) {
 		Release();
 	}
 	
@@ -575,27 +571,24 @@ void ComboMenuComponent::SetLoop(bool loop)
 	Repaint();
 }
 
-uint32_t ComboMenuComponent::GetItemColor()
+jcolor_t ComboMenuComponent::GetItemColor()
 {
-	return (_item_alpha & 0xff) << 24 | (_item_red & 0xff) << 16 | (_item_green & 0xff) << 8 | (_item_blue & 0xff) << 0;
+	return _item_color;
 }
 
-void ComboMenuComponent::SetItemColor(uint32_t color)
+void ComboMenuComponent::SetItemColor(jcolor_t color)
 {
-	_item_red = (color>>0x10)&0xff;
-	_item_green =(color>>0x08)&0xff; 
-	_item_blue = (color>>0x00)&0xff;
-	_item_alpha = (color>>0x18)&0xff;
+	SetItemColor(color.red, color.green, color.blue, color.alpha);
 }
 
 void ComboMenuComponent::SetItemColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_item_red = red;
-	_item_green = green;
-	_item_blue = blue;
-	_item_alpha = alpha;
+	_item_color.red = red;
+	_item_color.green = green;
+	_item_color.blue = blue;
+	_item_color.alpha = alpha;
 }
 
 void ComboMenuComponent::Paint(Graphics *g)
@@ -642,25 +635,25 @@ void ComboMenuComponent::Paint(Graphics *g)
 
 	for (i=position; count<_visible_items && i<(int)_items.size(); i++, count++) {
 		if (_index != i) {
-			g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
+			g->SetColor(_item_color);
 	
 			if ((int)_items.size() > _visible_items) {
-				g->FillRectangle(0, (font_height+_vertical_gap)*count, _width-scroll_width-scroll_gap, font_height+10);
+				g->FillRectangle(0, (font_height+_vertical_gap)*count, _size.width-scroll_width-scroll_gap, font_height+10);
 			} else {
-				g->FillRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10);
+				g->FillRectangle(0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 			}
 		} else {
 			if ((int)_items.size() > _visible_items) {
-				g->SetColor(_bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-				FillRectangle(g, 0, (font_height+_vertical_gap)*count, _width-scroll_width-scroll_gap, font_height+10);
+				g->SetColor(_bgfocus_color);
+				FillRectangle(g, 0, (font_height+_vertical_gap)*count, _size.width-scroll_width-scroll_gap, font_height+10);
 
 				/*
 				g->FillGradientRectangle(0, (font_height+_vertical_gap)*count, _width-scroll_width-scroll_gap, font_height+10, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
 				g->FillGradientRectangle(0, (font_height+_vertical_gap)*count, _width-scroll_width-scroll_gap, font_height+10, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
 				*/
 			} else {
-				g->SetColor(_bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-				FillRectangle(g, 0, (font_height+_vertical_gap)*count, _width, font_height+10);
+				g->SetColor(_bgfocus_color);
+				FillRectangle(g, 0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 
 				/*
 				g->FillGradientRectangle(, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
@@ -672,24 +665,24 @@ void ComboMenuComponent::Paint(Graphics *g)
 		if (_items[i]->GetType() == EMPTY_MENU_ITEM) {
 			// TODO::
 		} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawString(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+			g->SetColor(_fg_color);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 		} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
 			if (_items[i]->_prefetch == NULL) {
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawString(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+				g->SetColor(_fg_color);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 			} else {
 				g->DrawImage(_items[i]->_prefetch, 10, (font_height+_vertical_gap)*count, font_height, font_height+10);
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawString(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+				g->SetColor(_fg_color);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 			}
 		} else if (_items[i]->GetType() == CHECK_MENU_ITEM) {
 			if (_items[i]->IsSelected() == true) {
 				g->DrawImage(prefetch, 10, 5+(font_height+_vertical_gap)*count, font_height, font_height);
 			}
 
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawString(TruncateString(_items[i]->GetValue(), _width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+			g->SetColor(_fg_color);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-scroll_width-scroll_gap-space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 		}
 
 		if (_items[i]->GetEnabled() == false) {
@@ -697,9 +690,9 @@ void ComboMenuComponent::Paint(Graphics *g)
 			g->SetColor(0x00, 0x00, 0x00, 0x80);
 			
 			if ((int)_items.size() > _visible_items) {
-				g->FillRectangle(0, (font_height+_vertical_gap)*count, _width-scroll_width-scroll_gap, font_height+10);
+				g->FillRectangle(0, (font_height+_vertical_gap)*count, _size.width-scroll_width-scroll_gap, font_height+10);
 			} else {
-				g->FillRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10);
+				g->FillRectangle(0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 			}
 
 			g->SetDrawingFlags(DF_NOFX);
@@ -707,7 +700,7 @@ void ComboMenuComponent::Paint(Graphics *g)
 
 		if (_menu != NULL) {
 			if (_menu->_list->_items[i]->_childs.size() > 0) {
-				int dx = _width-font_height/2-4,
+				int dx = _size.width-font_height/2-4,
 					dy = (font_height+_vertical_gap)*count+5;
 
 				g->SetColor(0x80, 0x80, 0xe0, 0xff);
@@ -718,10 +711,10 @@ void ComboMenuComponent::Paint(Graphics *g)
 
 	// scroll bar
 	if ((int)_items.size() > _visible_items) {
-		g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-		g->FillRectangle(_width-scroll_width, 0, scroll_width, _height);
+		g->SetColor(_item_color);
+		g->FillRectangle(_size.width-scroll_width, 0, scroll_width, _size.height);
 				
-		int dx = _width-scroll_width+2,
+		int dx = _size.width-scroll_width+2,
 			dy = 4;
 		
 		scroll_width -= 4;
@@ -741,13 +734,13 @@ void ComboMenuComponent::Paint(Graphics *g)
 			g->SetColor(0x80, 0x80, 0xe0, 0xff);
 		}
 
-		dy = _height-scroll_gap-_item_size/2-4;
+		dy = _size.height-scroll_gap-_item_size/2-4;
 
 		g->SetColor(0x80, 0x80, 0xe0, 0xff);
 		g->FillTriangle(dx+0, dy, dx+scroll_width, dy, dx+scroll_width/2, dy+_item_size/2-2);
 		
 		if (_visible_items <= (int)_items.size()) {
-			double diff = (_height-2*_item_size-8)/(double)(_items.size()-1);
+			double diff = (_size.height-2*_item_size-8)/(double)(_items.size()-1);
 			
 			g->SetColor(0x80, 0x80, 0xe0, 0xff);
 			g->FillRectangle(dx+2, (int)(_item_size/2+diff*_index+4), scroll_width-4, _item_size);
@@ -755,8 +748,8 @@ void ComboMenuComponent::Paint(Graphics *g)
 	}
 
 	for (; count<_visible_items; count++) {
-		g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-		g->FillRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10);
+		g->SetColor(_item_color);
+		g->FillRectangle(0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 	}
 }
 
@@ -956,7 +949,7 @@ ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
 
 	_old_index = 0;
 
-	_menu = new ComboMenu(_x, _y+_height, _width, visible_items);
+	_menu = new ComboMenu(_location.x, _location.y+_size.height, _size.width, visible_items);
 
 	_menu->SetLoop(false);
 	_menu->SetCurrentIndex(0);
@@ -981,8 +974,8 @@ void ComboBox::SetArrowSize(int size)
 
 	_arrow_size = size;
 
-	if (_arrow_size > _width/2) {
-		_arrow_size = _width/2;
+	if (_arrow_size > _size.width/2) {
+		_arrow_size = _size.width/2;
 	}
 
 	Repaint();
@@ -1024,9 +1017,9 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 			y1 = event->GetY(),
 			dx = 10;
 
-		if (x1 > (_x+_width-_arrow_size-dx) && x1 < (_x+_width-dx) && y1 > _y && y1 < (_y+_height)) {
+		if (x1 > (_location.x+_size.width-_arrow_size-dx) && x1 < (_location.x+_size.width-dx) && y1 > _location.y && y1 < (_location.y+_size.height)) {
 			if (_parent != NULL) {
-				_menu->SetPosition(_parent->GetX()+_x, _parent->GetY()+_y+_height+5);
+				_menu->SetLocation(_parent->GetX()+_location.x, _parent->GetY()+_location.y+_size.height+5);
 				_menu->Show();
 			}
 		}
@@ -1057,7 +1050,7 @@ bool ComboBox::ProcessEvent(KeyEvent *event)
 
 	if (action == JKEY_ENTER) {
 		if (_parent != NULL) {
-			_menu->SetPosition(_parent->GetX()+_x, _parent->GetY()+_y+_height+5);
+			_menu->SetLocation(_parent->GetX()+_location.x, _parent->GetY()+_location.y+_size.height+5);
 			_menu->Show();
 		}
 	
@@ -1085,21 +1078,21 @@ void ComboBox::Paint(Graphics *g)
 		}
 		*/
 
-		int dx = _width-_arrow_size-10,
-			dy = _height/3;
+		int dx = _size.width-_arrow_size-10,
+				dy = _size.height/3;
 
 		g->SetColor(0x80, 0x80, 0xe0, 0xff);
 		g->FillTriangle(dx+0, dy+0, dx+_arrow_size, dy+0, dx+_arrow_size/2, dy+_arrow_size/2);
 
-		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-		g->DrawString(TruncateString(GetValue(), dx), 5, (CENTER_VERTICAL_TEXT), dx, _height, CENTER_ALIGN);
+		g->SetColor(_fg_color);
+		g->DrawString(TruncateString(GetValue(), dx), 5, (CENTER_VERTICAL_TEXT), dx, _size.height, CENTER_ALIGN);
 	}
 
 	PaintBorder(g);
 
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _width, _height);
+		FillRectangle(g, 0, 0, _size.width, _size.height);
 	}
 }
 

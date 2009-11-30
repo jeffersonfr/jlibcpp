@@ -26,22 +26,22 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg, int x, int y)
 {
 	jcommon::Object::SetClassName("jgui::InputDialogBox");
 
-	int lines = Component::CountLines(msg, _width-_insets.left-_insets.right-20, _font);
+	int lines = Component::CountLines(msg, _size.width-_insets.left-_insets.right-20, _font);
 
 	if (lines <= 0) {
 		lines = 1;
 	}
 
-	_label = new Label(msg, _insets.left, _insets.top, _width-_insets.left-_insets.right, (lines)*_font->GetHeight()+10);
+	_label = new Label(msg, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, (lines)*_font->GetHeight()+10);
 
 	_label->SetGap(10, 10);
 	_label->SetWrap(true);
 	_label->SetTruncated(false);
 
-	_field = new TextField(_insets.left, _label->GetY()+_label->GetHeight()+10, _width-_insets.left-_insets.right, (int)(_font->GetHeight()));
+	_field = new TextField(_insets.left, _label->GetY()+_label->GetHeight()+10, _size.width-_insets.left-_insets.right, (int)(_font->GetHeight()));
 
-	_ok = new Button("Ok", _width-(2*200+60), _field->GetY()+_field->GetHeight()+20, 200, 40);
-	_cancel = new Button("Cancel", _width-(1*200+60)+30, _field->GetY()+_field->GetHeight()+20, 200, 40);
+	_ok = new Button("Ok", _size.width-(2*200+60), _field->GetY()+_field->GetHeight()+20, 200, 40);
+	_cancel = new Button("Cancel", _size.width-(1*200+60)+30, _field->GetY()+_field->GetHeight()+20, 200, 40);
 	
 	_field->SetNavigation(NULL, NULL, NULL, _ok);
 	_ok->SetNavigation(NULL, _cancel, _field, _cancel);

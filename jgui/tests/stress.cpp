@@ -479,7 +479,7 @@ class GraphicPanel : public jgui::Frame{
 
 int main( int argc, char *argv[] )
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 32));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/comic.ttf", 0, 32));
 
 	GraphicPanel test;
 

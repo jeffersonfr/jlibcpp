@@ -154,8 +154,8 @@ class Tetris : public jgui::Frame, public jthread::Thread, jgui::FrameInputListe
 		Tetris():
 			jgui::Frame("Tetris", 0, 0, 1920, 1080)
 		{
-			smallfont = new jgui::Font("./fonts/font.ttf", 0, 20);
-			largefont = new jgui::Font("./fonts/font.ttf", 0, 28);
+			smallfont = new jgui::Font("./fonts/comic.ttf", 0, 20);
+			largefont = new jgui::Font("./fonts/comic.ttf", 0, 28);
 
 			goff = NULL;
 			ii = NULL;
@@ -205,10 +205,10 @@ class Tetris : public jgui::Frame, public jthread::Thread, jgui::FrameInputListe
 
 			// resize(width+2*barwidth,height+30);
 
-			d.x = _x;
-			d.y = _y;
-			d.width = _width;
-			d.height = _height;
+			d.x = GetX();
+			d.y = GetY();
+			d.width = GetWidth();
+			d.height = GetHeight();
 
 			SetBackgroundColor((background>>0x10)&0xff, (background>>0x08)&0xff, (background>>0x00)&0xff, (background>>0x18)&0xff);
 			SetUndecorated(true);

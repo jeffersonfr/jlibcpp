@@ -9,7 +9,7 @@ namespace magenda {
 ViewMessages::ViewMessages(AgendaDB *base, int x, int y):
 		jgui::Frame("Compromissos", x, y, 600, 600)
 {
-	int max_width = _width-_insets.left-_insets.right,
+	int max_width = GetWidth()-_insets.left-_insets.right,
 		dheight = 40,
 		sheight = 50;
 
@@ -34,8 +34,8 @@ ViewMessages::ViewMessages(AgendaDB *base, int x, int y):
 
 		sprintf(tmp, "%02d:%02d", t->hour, t->minute);
 
-		label_hour = new jgui::Label(tmp, _insets.left+400+10, _insets.top, _width-400-10-_insets.left-_insets.right, dheight);
-		message = new jgui::Label(t->event, _insets.left, _insets.top+sheight, max_width, _height-240);
+		label_hour = new jgui::Label(tmp, _insets.left+400+10, _insets.top, GetWidth()-400-10-_insets.left-_insets.right, dheight);
+		message = new jgui::Label(t->event, _insets.left, _insets.top+sheight, max_width, GetHeight()-240);
 
 		label_hour->SetAlign(jgui::RIGHT_ALIGN);
 		message->SetWrap(true);
@@ -116,7 +116,7 @@ void ViewMessages::InputChanged(jgui::KeyEvent *event)
 		Update();
 	} else if (event->GetSymbol() == jgui::JKEY_F4 || event->GetSymbol() == jgui::JKEY_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialog dialog("Aviso", "Remover o compromisso atual ?", _x, _y+_height+10);
+			jgui::YesNoDialog dialog("Aviso", "Remover o compromisso atual ?", GetX(), GetY()+GetHeight()+10);
 
 			dialog.Show();
 
@@ -136,7 +136,7 @@ void ViewMessages::InputChanged(jgui::KeyEvent *event)
 		if (db->GetSize() > 0) {
 			Hide();
 
-			AddMessage update(db, _index, _x, _y);
+			AddMessage update(db, _index, GetX(), GetY());
 
 			update.Show();
 

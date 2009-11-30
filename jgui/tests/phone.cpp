@@ -36,7 +36,7 @@ PhoneBook::PhoneBook(int x, int y):
 
 	db->Load();
 
-	_list = new jgui::ListBox(_insets.left, _insets.top, _width-_insets.left-_insets.right, 200);
+	_list = new jgui::ListBox(_insets.left, _insets.top, GetWidth()-_insets.left-_insets.right, 230);
 
 	_list->SetBackgroundVisible(false);
 	_list->AddItem("Buscar telefone");
@@ -76,7 +76,7 @@ void PhoneBook::ItemSelected(jgui::SelectEvent *event)
 		if (event->GetIndex() == 0) {
 				Hide();
 
-				SearchContacts app(db, _x, _y);
+				SearchContacts app(db, GetX(), GetY());
 
 				app.Show();
 
@@ -84,13 +84,13 @@ void PhoneBook::ItemSelected(jgui::SelectEvent *event)
 		} else if (event->GetIndex() == 1) {
 				Hide();
 
-				AddContact app(db, _x, 100);
+				AddContact app(db, GetX(), 100);
 
 				app.Show();
 
 				Show(false);
 		} else if (event->GetIndex() == 2) {
-				jgui::YesNoDialog dialog("Aviso", "Remover todos os registros ?", _x-50, _y+_height+10);
+				jgui::YesNoDialog dialog("Aviso", "Remover todos os registros ?", GetX()-50, GetY()+GetHeight()+10);
 
 				dialog.Show();
 
@@ -102,7 +102,7 @@ void PhoneBook::ItemSelected(jgui::SelectEvent *event)
 
 				sprintf(tmp, "Contatos usados : %d/%d", db->GetSize(), db->GetCapacity());
 
-				jgui::MessageDialog dialog("Estado da mem\xf3ria", tmp, _x-50, _y+_height+10);
+				jgui::MessageDialog dialog("Estado da mem\xf3ria", tmp, GetX()-50, GetY()+GetHeight()+10);
 
 				dialog.Show();
 		}

@@ -157,9 +157,9 @@ int Font::GetStringWidth(std::string text)
 	_font->GetStringWidth(_font, text.c_str(), -1, &size);
 
 	return (int)round(((double)size*(double)_scale_width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
-#else
-	return 0;
 #endif
+
+	return 0;
 }
 
 std::string Font::TruncateString(std::string text, std::string extension, int width)

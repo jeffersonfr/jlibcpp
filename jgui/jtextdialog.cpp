@@ -41,20 +41,20 @@ TextDialog::TextDialog(std::string msg, int x, int y, bool wrap):
 		if (font != NULL) {
 			_label = new Label(msg, _insets.left, _insets.bottom, _font->GetStringWidth(msg)+20, _font->GetHeight());
 		} else {
-			_label = new Label(msg, _insets.left, _insets.bottom, _width, _font->GetHeight());
+			_label = new Label(msg, _insets.left, _insets.bottom, _size.width, _font->GetHeight());
 		}
 
 		_label->SetTruncated(false);
 		_label->SetAlign(CENTER_ALIGN);
 		_label->SetWrap(false);
 	} else {
-		int lines = Component::CountLines(msg, _width-_insets.left-_insets.right-20, _font);
+		int lines = Component::CountLines(msg, _size.width-_insets.left-_insets.right-20, _font);
 
 		if (lines <= 0) {
 			lines = 1;
 		}
 
-		_label = new Label(msg, _insets.left, _insets.bottom, _width-_insets.left-_insets.right, (lines)*_font->GetHeight());
+		_label = new Label(msg, _insets.left, _insets.bottom, _size.width-_insets.left-_insets.right, (lines)*_font->GetHeight());
 	}
 
 	_label->SetGap(10, 10);

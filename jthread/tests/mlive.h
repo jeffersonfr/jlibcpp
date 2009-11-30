@@ -188,6 +188,7 @@ class Client : public jthread::Thread {
 		virtual ~Client();
 
 		Connection * GetConnection();
+		client_type_t GetType();
 		void Release();
 		bool IsClosed();
 		int GetOutputRate();
@@ -215,7 +216,7 @@ class Server : public jthread::Thread {
 
 		current_server_status_t current;
 		std::vector<Source *> sources;
-		jthread::Mutex mutex;
+		jthread::Mutex _mutex;
 		int port;
 
 	public:
@@ -223,6 +224,7 @@ class Server : public jthread::Thread {
 		virtual ~Server();
 
 		void HandleRequests();
+		int GetNumberOfSources();
 		bool ProcessClient(jsocket::Socket *socket, std::string receive);
 		void RemoveSources();
 		void Run();

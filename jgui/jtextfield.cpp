@@ -329,7 +329,7 @@ void TextField::Paint(Graphics *g)
 			paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
 		}
 
-		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+		g->SetColor(_fg_color);
 
 		current_text_size = 0;
 
@@ -351,19 +351,19 @@ void TextField::Paint(Graphics *g)
 
 		int offset = 0;
 
-		if (current_text_size > (_width-caret_size-2*_horizontal_gap)) {
+		if (current_text_size > (_size.width-caret_size-2*_horizontal_gap)) {
 			int count = 0;
 
 			do {
 				count++;
 
 				current_text_size = _font->GetStringWidth(s.substr(_position-count, count));
-			} while (current_text_size < (_width-caret_size-2*_horizontal_gap));
+			} while (current_text_size < (_size.width-caret_size-2*_horizontal_gap));
 
 			count = count-1;
 			s = s.substr(_position-count, count);
 			current_text_size = _font->GetStringWidth(s);
-			offset = (_width-current_text_size-caret_size)-caret_size;
+			offset = (_size.width-current_text_size-caret_size)-caret_size;
 
 			if (_position < (int)paint_text.size()) {
 				s = s + paint_text[_position];
@@ -377,7 +377,7 @@ void TextField::Paint(Graphics *g)
 				if (count++ > (int)paint_text.size()) {
 					break;
 				}
-			} while (current_text_size < (_width-caret_size-2*_horizontal_gap));
+			} while (current_text_size < (_size.width-caret_size-2*_horizontal_gap));
 
 			count = count-1;
 
@@ -386,9 +386,9 @@ void TextField::Paint(Graphics *g)
 			if (_align == 0) {
 				pos = 0;
 			} else if (_align == 1) {
-				pos = (_width-current_text_size)/2;
+				pos = (_size.width-current_text_size)/2;
 			} else {
-				pos = _width-current_text_size;
+				pos = _size.width-current_text_size;
 			}
 				
 			current_text_size = _font->GetStringWidth(s.substr(0, _position));
@@ -400,14 +400,14 @@ void TextField::Paint(Graphics *g)
 			dy = 0;
 		}
 
-		g->SetClip(_horizontal_gap, _vertical_gap, _width-2*_horizontal_gap, _height-2*_vertical_gap);
+		g->SetClip(_horizontal_gap, _vertical_gap, _size.width-2*_horizontal_gap, _size.height-2*_vertical_gap);
 		g->DrawString(s, pos+offset, dy);
 
 		if (HasFocus() == true) {
 			if (_is_editable == true && _cursor_visible == true) {
 				g->SetColor(0xff, 0x00, 0x00, 0xff);
 				g->DrawString(cursor, pos+current_text_size+offset, (CENTER_VERTICAL_TEXT));
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+				g->SetColor(_fg_color);
 			}
 		}
 	
@@ -418,7 +418,7 @@ void TextField::Paint(Graphics *g)
 
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _width, _height);
+		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
 }
 

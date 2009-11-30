@@ -28,14 +28,20 @@ Theme::Theme():
 {
 	jcommon::Object::SetClassName("jgui::Theme");
 
-	_component_font = NULL;
-	_component_bgcolor = 0xff153555;
-	_component_fgcolor = 0xfff0f0f0;
-	_component_focus_bgcolor = 0xff0665aa;
-	_component_focus_fgcolor = 0xfff0f0f0;
-	_component_border_color = 0xff606080; // 0xff355575;
+	SetComponentBackgroundColor(0x15, 0x35, 0x55, 0xff);
+	SetComponentForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
+	SetComponentBackgroundFocusColor(0x06, 0x65, 0xaa, 0xff);
+	SetComponentForegroundFocusColor(0xf0, 0xf0, 0xf0, 0xff);
+	SetComponentBorderColor(0x60, 0x60, 0x80, 0xff); // 0xff355575;
+	SetComponentBorderFocusColor(0xf0, 0xf0, 0xf0, 0xff);
+	SetWindowBackgroundColor(0x35, 0x55, 0x75, 0xff);
+	SetWindowForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
+	SetWindowBorderColor(0x35, 0x55, 0x75, 0xff);
+
 	_component_border_size = 1;
 	_component_border = LINE_BORDER;
+
+	_component_font = NULL;
 
 	_gradient_level = 0x40;
 
@@ -45,9 +51,6 @@ Theme::Theme():
 	_insets.bottom = 30;
 	
 	_window_font = NULL;
-	_window_bgcolor = 0xff355575;
-	_window_fgcolor = 0xfff0f0f0;
-	_window_border_color = 0xff355575;
 	_window_border_size = 4;
 	_window_border = GRADIENT_BORDER;
 }
@@ -105,6 +108,7 @@ void Theme::Update(Component *parent)
 			c->SetBackgroundColor(_component_bgcolor);
 			c->SetForegroundColor(_component_fgcolor);
 			c->SetBorderColor(_component_border_color);
+			c->SetBorderFocusColor(_component_border_focus_color);
 			c->SetBackgroundFocusColor(_component_focus_bgcolor);
 			c->SetForegroundFocusColor(_component_focus_fgcolor);
 			c->SetGradientLevel(_gradient_level);
@@ -127,56 +131,90 @@ void Theme::SetWindowBackgroundColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_window_bgcolor = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);
+	_window_bgcolor.red = red;
+	_window_bgcolor.green = green;
+	_window_bgcolor.blue = blue;
+	_window_bgcolor.alpha = alpha;
 }
 
 void Theme::SetWindowForegroundColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_window_fgcolor = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);
+	_window_fgcolor.red = red;
+	_window_fgcolor.green = green;
+	_window_fgcolor.blue = blue;
+	_window_fgcolor.alpha = alpha;
 }
 
 void Theme::SetWindowBorderColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_window_border_color = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);
+	_window_border_color.red = red;
+	_window_border_color.green = green;
+	_window_border_color.blue = blue;
+	_window_border_color.alpha = alpha;
 }
 
 void Theme::SetComponentBackgroundColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_component_bgcolor = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);
+	_component_bgcolor.red = red;
+	_component_bgcolor.green = green;
+	_component_bgcolor.blue = blue;
+	_component_bgcolor.alpha = alpha;
 }
 
 void Theme::SetComponentForegroundColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_component_fgcolor = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);
+	_component_fgcolor.red = red;
+	_component_fgcolor.green = green;
+	_component_fgcolor.blue = blue;
+	_component_fgcolor.alpha = alpha;
 }
 
 void Theme::SetComponentBorderColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_component_border_color = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);
+	_component_border_color.red = red;
+	_component_border_color.green = green;
+	_component_border_color.blue = blue;
+	_component_border_color.alpha = alpha;
 }
 
-void Theme::SetComponentBackgroungFocusColor(int red, int green, int blue, int alpha)
+void Theme::SetComponentBorderFocusColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_component_focus_bgcolor = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);
+	_component_border_focus_color.red = red;
+	_component_border_focus_color.green = green;
+	_component_border_focus_color.blue = blue;
+	_component_border_focus_color.alpha = alpha;
+}
+
+void Theme::SetComponentBackgroundFocusColor(int red, int green, int blue, int alpha)
+{
+	TRUNC_COLOR(red, green, blue, alpha);
+
+	_component_focus_bgcolor.red = red;
+	_component_focus_bgcolor.green = green;
+	_component_focus_bgcolor.blue = blue;
+	_component_focus_bgcolor.alpha = alpha;
 }
 
 void Theme::SetComponentForegroundFocusColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_component_focus_fgcolor = (alpha << 24) | (red << 16) | (green << 8) | (blue << 0);
+	_component_focus_fgcolor.red = red;
+	_component_focus_fgcolor.green = green;
+	_component_focus_fgcolor.blue = blue;
+	_component_focus_fgcolor.alpha = alpha;
 }
 
 void Theme::SetComponentBorder(jcomponent_border_t border)

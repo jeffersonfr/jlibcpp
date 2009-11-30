@@ -26,7 +26,7 @@ MessageDialog::MessageDialog(std::string title, std::string msg, int x, int y):
 {
 	jcommon::Object::SetClassName("jgui::MessageDialog");
 
-	int lines = Component::CountLines(msg, _width-_insets.left-_insets.right-20, _font);
+	int lines = Component::CountLines(msg, _size.width-_insets.left-_insets.right-20, _font);
 
 	if (lines <= 0) {
 		lines = 1;
@@ -34,13 +34,13 @@ MessageDialog::MessageDialog(std::string title, std::string msg, int x, int y):
 
 	SetSize(1000, (_font->GetHeight())*(lines)+100);
 
-	_label = new Label(msg, _insets.left, _insets.top, _width-_insets.left-_insets.right, (lines)*_font->GetHeight()+10);
+	_label = new Label(msg, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, (lines)*_font->GetHeight()+10);
 
 	_label->SetGap(10, 10);
 	_label->SetWrap(true);
 	_label->SetTruncated(false);
 
-	_ok = new Button("Ok", _width-(1*200+60)+30, _label->GetY()+_label->GetHeight()+20, 200, 40);
+	_ok = new Button("Ok", _size.width-(1*200+60)+30, _label->GetY()+_label->GetHeight()+20, 200, 40);
 	
 	_ok->SetAlign(CENTER_ALIGN);
 	_ok->RegisterButtonListener(this);

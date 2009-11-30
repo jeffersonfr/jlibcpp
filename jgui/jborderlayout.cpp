@@ -96,49 +96,44 @@ void BorderLayout::DoLayout(Container *target)
 			bottom = target->GetHeight() - insets.bottom,
 			left = insets.left,
 			right = target->GetWidth() - insets.right;
-	int pwidth,
-			pheight;
+	jsize_t psize;
 	bool ltr = (target->GetComponentOrientation() == LEFT_TO_RIGHT_ORIENTATION);
 	Component *c = NULL;
 
 	if ((c = GetChild(BL_NORTH, ltr)) != NULL) {
 		c->SetSize(right - left, c->GetHeight());
 
-		pwidth = c->GetPreferredWidth();
-		pheight = c->GetPreferredHeight();
+		psize = c->GetPreferredSize();
 
-		c->SetBounds(left, top, right - left, pheight);
-		top += pheight + _vgap;
+		c->SetBounds(left, top, right - left, psize.height);
+		top += psize.height + _vgap;
 	}
 
 	if ((c = GetChild(BL_SOUTH, ltr)) != NULL) {
 		c->SetSize(right - left, c->GetHeight());
 
-		pwidth = c->GetPreferredWidth();
-		pheight = c->GetPreferredHeight();
+		psize = c->GetPreferredSize();
 
-		c->SetBounds(left, bottom - pheight, right - left, pheight);
-		bottom -= pheight + _vgap;
+		c->SetBounds(left, bottom - psize.height, right - left, psize.height);
+		bottom -= psize.height + _vgap;
 	}
 
 	if ((c = GetChild(BL_EAST, ltr)) != NULL) {
 		c->SetSize(c->GetWidth(), bottom - top);
 
-		pwidth = c->GetPreferredWidth();
-		pheight = c->GetPreferredHeight();
+		psize = c->GetPreferredSize();
 
-		c->SetBounds(right - pwidth, top, pwidth, bottom - top);
-		right -= pwidth + _hgap;
+		c->SetBounds(right - psize.width, top, psize.width, bottom - top);
+		right -= psize.width + _hgap;
 	}
 
 	if ((c = GetChild(BL_WEST, ltr)) != NULL) {
 		c->SetSize(c->GetWidth(), bottom - top);
 
-		pwidth = c->GetPreferredWidth();
-		pheight = c->GetPreferredHeight();
+		psize = c->GetPreferredSize();
 
-		c->SetBounds(left, top, pwidth, bottom - top);
-		left += pwidth + _hgap;
+		c->SetBounds(left, top, psize.width, bottom - top);
+		left += psize.width + _hgap;
 	}
 
 	if ((c = GetChild(BL_CENTER, ltr)) != NULL) {

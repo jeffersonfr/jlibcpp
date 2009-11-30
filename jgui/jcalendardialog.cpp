@@ -100,7 +100,12 @@ CalendarDialog::CalendarDialog(int x, int y):
 	lsex->SetAlign(jgui::CENTER_ALIGN);
 	lsab->SetAlign(jgui::CENTER_ALIGN);
 
-	int color = 0xff606080;
+	jcolor_t color;
+
+	color.red = 0x60;
+	color.green = 0x60;
+	color.blue = 0x80;
+	color.alpha = 0xff;
 
 	ldom->SetBackgroundColor(color);
 	lseg->SetBackgroundColor(color);

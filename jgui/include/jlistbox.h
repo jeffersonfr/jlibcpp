@@ -96,10 +96,7 @@ class ListBox : public ButtonListener, public Component{
 			_index,
 			_top_index,
 			_selected_index;
-		int _item_red,
-			_item_green,
-			_item_blue,
-			_item_alpha;
+		jcolor_t _item_color;
 		float delta;
 		bool _input_locked,
 			 _centered_interaction,
@@ -271,13 +268,13 @@ class ListBox : public ButtonListener, public Component{
 		 * \brief
 		 *
 		 */
-		uint32_t GetItemColor();
+		jcolor_t GetItemColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetItemColor(uint32_t color);
+		void SetItemColor(jcolor_t color);
 		
 		/**
 		 * \brief

@@ -28,10 +28,6 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifdef DIRECTFB_UI
-#include <directfb.h>
-#endif
-
 namespace jgui{
 
 class Graphics;

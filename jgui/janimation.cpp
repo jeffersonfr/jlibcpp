@@ -100,9 +100,9 @@ void Animation::AddImage(std::string file)
 {
 		jthread::AutoLock lock(&_component_mutex);
 
-		OffScreenImage *prefetch = new OffScreenImage(_width, _height);
+		OffScreenImage *prefetch = new OffScreenImage(_size.width, _size.height);
 
-		prefetch->GetGraphics()->DrawImage(file, 0, 0, _width, _height);
+		prefetch->GetGraphics()->DrawImage(file, 0, 0, _size.width, _size.height);
 
 		_images.push_back(prefetch);
 }
@@ -116,12 +116,12 @@ void Animation::Paint(Graphics *g)
 		if (_images.size() != 0) {
 			OffScreenImage *image = _images[_index];
 
-			g->DrawImage(image, 0, 0, _width, _height);
+			g->DrawImage(image, 0, 0, _size.width, _size.height);
 		}
 
 		if (_enabled == false) {
 			g->SetColor(0x00, 0x00, 0x00, 0x80);
-			FillRectangle(g, 0, 0, _width, _height);
+			FillRectangle(g, 0, 0, _size.width, _size.height);
 		}
 }
 

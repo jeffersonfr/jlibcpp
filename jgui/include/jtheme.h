@@ -47,12 +47,13 @@ class Theme : public jcommon::Object{
 	friend class Frame;
 
 	private:
-		uint32_t _window_bgcolor,
+		jcolor_t _window_bgcolor,
 						 _window_fgcolor,
 						 _window_border_color,
 						 _component_bgcolor,
 						 _component_fgcolor,
 						 _component_border_color,
+						 _component_border_focus_color,
 						 _component_focus_bgcolor,
 						 _component_focus_fgcolor;
 		int _gradient_level,
@@ -123,7 +124,13 @@ class Theme : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetComponentBackgroungFocusColor(int red, int green, int blue, int alpha);
+		virtual void SetComponentBorderFocusColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetComponentBackgroundFocusColor(int red, int green, int blue, int alpha);
 		
 		/**
 		 * \brief

@@ -29,7 +29,7 @@ AddContact::AddContact(PhoneDB *base, int x, int y):
 	jgui::Frame("Adicionar contato", x, y, 600, 600),
 	jgui::FrameInputListener()
 {
-	int max_width = _width-_insets.left-_insets.right,
+	int max_width = GetWidth()-_insets.left-_insets.right,
 		dheight = 40,
 		sheight = 50;
 
@@ -74,7 +74,7 @@ AddContact::AddContact(PhoneDB *base, int index, int x, int y):
 	jgui::Frame("Adicionar contato", x, y, 600, 600),
 	jgui::FrameInputListener()
 {
-	int max_width = _width-_insets.left-_insets.right,
+	int max_width = GetWidth()-_insets.left-_insets.right,
 		dheight = 40,
 		sheight = 50;
 
@@ -223,7 +223,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 		if (GetComponentInFocus() == field1) {
 			tmp = field1->GetText();
 
-			jgui::Keyboard keyboard(_x+_width+20, _y, jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, false);
 
 			keyboard.SetMaxTextSize(20);
 			keyboard.SetText(field1->GetText());
@@ -239,7 +239,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 		} else if (GetComponentInFocus() == field2) {
 			tmp = field2->GetText();
 
-			jgui::Keyboard keyboard(_x+_width+20, _y, jgui::SMALL_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
 
 			keyboard.SetMaxTextSize(20);
 			keyboard.SetText(field2->GetText());
@@ -255,7 +255,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 		} else if (GetComponentInFocus() == field3) {
 			tmp = field3->GetText();
 
-			jgui::Keyboard keyboard(_x+_width+20, _y, jgui::SMALL_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
 
 			keyboard.SetMaxTextSize(20);
 			keyboard.SetText(field3->GetText());

@@ -107,8 +107,6 @@ int MultiDestinationBuffer::GetAvailable(int *rindex, int *pindex)
 			for (i=*rindex; i<_write_index; i++) {
 				amount = amount + _buffer[i].size;
 			}
-		} else {
-			return -1;
 		}
 	} else if (*pindex == (_pass_index-1)) {
 		if (*rindex > _write_index) {
@@ -118,11 +116,7 @@ int MultiDestinationBuffer::GetAvailable(int *rindex, int *pindex)
 			for (i=0; i<_write_index; i++) {
 				amount = amount + _buffer[i].size;
 			}
-		} else {
-			return -1;
 		}
-	} else {
-		return -1;
 	}
 
 	return amount;

@@ -43,8 +43,14 @@ class DataSource {
 
 		int Read(char *buffer, int size)
 		{
-			// r = _file->Read(data, size);
-			return read(fd, buffer, size);
+			int r = read(fd, buffer, size);
+
+			if (r < 0) {
+				lseek(fd, 0, SEEK_SET);
+				r = read(fd, buffer, size);
+			}
+
+			return r;
 		}
 		
 };
@@ -101,17 +107,53 @@ class Controller {
 		return (i-1)-(NUMBER_OF_TRYS*188);
 	}
 	
+	void Find()
+	{
+		std::map<int, int> pids;
+		uint32_t size_buffer, 
+				 count;
+		uint8_t buffer[188];
+		
+		count = 0;
+		
+		while ((size_buffer = _source->Read((char *)buffer, 188)) == 188) {
+			if (size_buffer != 188) {
+				break;
+			}
+			
+			// TODO:: definir metodos como static para evitar milhares de allocs
+			// criar um metodo Check() para verificar se os 188 bytes sao validos
+			if (jmpeg::TransportStreamPacket::Check(buffer, 188) == false) {
+				std::cout << "Invalid Packet" << std::endl;
+
+				continue;
+			}
+			
+			count++;
+			
+			pids[jmpeg::TransportStreamPacket::GetProgramID(buffer)] += 1;
+			
+			if (count >= 100000) {
+				break;
+			}
+		}
+
+		for (std::map<int, int>::iterator i=pids.begin(); i!=pids.end(); i++) {
+			std::cout << "PID::" << std::hex << "0x" << i->first << ", count:: " << std::dec << i->second << std::endl;
+		}
+	}
+
 	void Process()
 	{
-		jmpeg::ProgramAssociationSection psi;
+		jmpeg::ProgramAssociationSection pat;
+		jmpeg::ProgramMapSection pmt;
 		std::map<int, int> pids;
 		uint32_t size_buffer, 
 				 count,
 				 pat_pid = 0,
 				 pmt_pid = -1;
 		uint8_t buffer[188];
-		bool find_pat = false,
-				 find_pmt = false;
+		bool find_pmt = false;
 		
 		count = 0;
 		
@@ -137,61 +179,73 @@ class Controller {
 			}
 			
 			if (find_pmt == true) {
-				if (jmpeg::TransportStreamPacket::GetProgramID(buffer) == pmt_pid && jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
+				if (jmpeg::TransportStreamPacket::GetProgramID(buffer) == pmt_pid) {
+					if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
+						pmt.Clear();
+					}
+
 					std::cout << "Processing PMT::" << std::endl;
 
-					jmpeg::ProgramMapSection psi;
-
 					uint8_t pointer,
-							payload[188];
+									payload[188];
 					uint32_t size;
 
 					jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &size);
 
 					pointer = jmpeg::TransportStreamPacket::GetPointerField(buffer);
 
-					psi.Push((payload + pointer + 1), size - pointer - 1);
+					pmt.Push((payload + pointer + 1), size - pointer - 1);
 
-					std::vector<jmpeg::ProgramMapSection::Program *> program_map;
-
-					psi.GetPrograms(program_map);
-
-					for (std::vector<jmpeg::ProgramMapSection::Program *>::iterator i=program_map.begin(); i!=program_map.end(); i++) {
-						std::cout << "Find PMT Items:: pid::" << (*i)->GetElementaryPID() << ", type:: " << (*i)->GetStreamType() << std::endl;
+					if (pmt.HasFailed() == true) {
+						pmt.Clear();
 					}
 
-					return;
+					if (pmt.IsComplete() == true) {
+						std::vector<jmpeg::ProgramMapSection::Program *> program_map;
+
+						pmt.GetPrograms(program_map);
+
+						for (std::vector<jmpeg::ProgramMapSection::Program *>::iterator i=program_map.begin(); i!=program_map.end(); i++) {
+							std::cout << "Find PMT Items:: pid::" << std::hex << "0x" << (*i)->GetElementaryPID() << ", type:: " << (*i)->GetStreamType() << std::endl;
+						}
+
+						return;
+					}
 				}
 			} else {
 				if (jmpeg::TransportStreamPacket::GetProgramID(buffer) == pat_pid) {
-					if (find_pat == true || jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
-						find_pat = true;
+					if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
+						pat.Clear();
+					}
 
-						std::cout << "Process PAT" << std::endl;
+					std::cout << "Process PAT" << std::endl;
 
-						uint8_t pointer,
-										payload[188];
-						uint32_t size;
+					uint8_t pointer,
+									payload[188];
+					uint32_t size;
 
-						jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &size);
+					jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &size);
 
-						pointer = jmpeg::TransportStreamPacket::GetPointerField(buffer);
+					pointer = jmpeg::TransportStreamPacket::GetPointerField(buffer);
 
-						psi.Push((payload + pointer + 1), size - pointer - 1);
+					pat.Push((payload + pointer + 1), size - pointer - 1);
 
-						if (psi.IsComplete() == true) {
-							find_pmt = true;
+					if (pat.HasFailed() == true) {
+						pat.Clear();
+					}
 
-							// get pmt pid
-							std::vector<jmpeg::ProgramAssociationSection::Program *> program_map;
+					if (pat.IsComplete() == true) {
+						find_pmt = true;
 
-							psi.GetPrograms(program_map);
+						// get pmt pid
+						std::vector<jmpeg::ProgramAssociationSection::Program *> program_map;
 
-							for (std::vector<jmpeg::ProgramAssociationSection::Program *>::iterator i=program_map.begin(); i!=program_map.end(); i++) {
-								pmt_pid = (*i)->GetProgramID();
+						pat.GetPrograms(program_map);
 
-								std::cout << "Find PMT:: program number::" << (*i)->GetProgramNumber() << ", pid:: " << std::hex << (*i)->GetProgramID() << std::endl;
-							}
+						for (std::vector<jmpeg::ProgramAssociationSection::Program *>::iterator i=program_map.begin(); i!=program_map.end(); i++) {
+							pmt_pid = (*i)->GetProgramID();
+
+							std::cout << "Find PMT:: program number::" << std::hex << "0x" << (*i)->GetProgramNumber() << ", pid:: " << "0x" << (*i)->GetProgramID() << std::endl;
 						}
 					}
 				}
@@ -210,6 +264,7 @@ int main(int argc, char **argv)
 
 	Controller *c = new Controller(new DataSource(argv[1]));
 
+	// c->Find();
 	c->Process();
 
 	return 0;

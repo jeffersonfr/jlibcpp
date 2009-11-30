@@ -51,12 +51,12 @@ void Slider::SetStoneSize(int size)
 	_stone_size = size;
 
 	if (_type == LEFT_RIGHT_SCROLL) {
-		if (_stone_size > _width) {
-			_stone_size = _width;
+		if (_stone_size > _size.width) {
+			_stone_size = _size.width;
 		}
 	} else if (_type == BOTTOM_UP_SCROLL) {
-		if (_stone_size > _height) {
-			_stone_size = _height;
+		if (_stone_size > _size.height) {
+			_stone_size = _size.height;
 		}
 	}
 
@@ -192,22 +192,22 @@ bool Slider::ProcessEvent(MouseEvent *event)
 		RequestFocus();
 
 		if (_type == LEFT_RIGHT_SCROLL) {
-			if (y1 > _y && y1 < (_y+_height)) {
-				double d = (_position*(_width-_stone_size-20))/100.0;
+			if (y1 > _location.y && y1 < (_location.y+_size.height)) {
+				double d = (_position*(_size.width-_stone_size-20))/100.0;
 
-				if (x1 > (_x+dx) && x1 < (_x+dx+(int)d)) {
+				if (x1 > (_location.x+dx) && x1 < (_location.x+dx+(int)d)) {
 					SetPosition(_position-_maximum_tick);
-				} else if (x1 > (_x+dx+(int)d+_stone_size) && x1 < (_x+_width)) {
+				} else if (x1 > (_location.x+dx+(int)d+_stone_size) && x1 < (_location.x+_size.width)) {
 					SetPosition(_position+_maximum_tick);
 				}
 			}
 		} else if (_type == BOTTOM_UP_SCROLL) {
-			if (x1 > _x && x1 < (_x+_width)) {
-				double d = (_position*(_height-_stone_size-20))/100.0;
+			if (x1 > _location.x && x1 < (_location.x+_size.width)) {
+				double d = (_position*(_size.height-_stone_size-20))/100.0;
 
-				if (y1 > (_y+dy) && y1 < (_y+dy+(int)d)) {
+				if (y1 > (_location.y+dy) && y1 < (_location.y+dy+(int)d)) {
 					SetPosition(_position-_maximum_tick);
-				} else if (y1 > (_y+dy+(int)d+_stone_size) && y1 < (_y+_height)) {
+				} else if (y1 > (_location.y+dy+(int)d+_stone_size) && y1 < (_location.y+_size.height)) {
 					SetPosition(_position+_maximum_tick);
 				}
 			}
@@ -280,45 +280,53 @@ void Slider::Paint(Graphics *g)
 
 	g->SetFont(_font);
 
+	jcolor_t color,
+					 scolor = _bgfocus_color.Darker(_gradient_level, _gradient_level, _gradient_level, 0x00);
+
+	color.red = 0x80;
+	color.green = 0x80;
+	color.blue = 0xe0;
+	color.alpha = 0xff;
+
 	{
 		if (_type == LEFT_RIGHT_SCROLL) {
-			double d = (_position*(_width-_stone_size))/100.0;
+			double d = (_position*(_size.width-_stone_size))/100.0;
 
-			if (d > (_width-_stone_size)) {
-				d = _width-_stone_size;
+			if (d > (_size.width-_stone_size)) {
+				d = _size.width-_stone_size;
 			}
 
-			g->FillGradientRectangle(0, 10, _width, 10, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-			g->FillGradientRectangle(0, 10, _width, 10, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+			g->FillGradientRectangle(0, 10, _size.width, 10, scolor, _bgfocus_color);
+			g->FillGradientRectangle(0, 10, _size.width, 10, _bgfocus_color, scolor);
 
-			g->SetColor(0x80, 0x80, 0xe0, 0xff);
+			g->SetColor(color);
 
 			jgui::jpoint_t p[] = {
 				{0, 4},
 				{_stone_size, 4},
-				{_stone_size, (int)(_height*0.4)},
-				{_stone_size/2, (int)(_height*0.8)},
-				{0, (int)(_height*0.4)}
+				{_stone_size, (int)(_size.height*0.4)},
+				{_stone_size/2, (int)(_size.height*0.8)},
+				{0, (int)(_size.height*0.4)}
 			};
 
 			g->FillPolygon((int)(d-2), 0, p, 5);
 		} else if (_type == BOTTOM_UP_SCROLL) {
-			double d = (_position*(_height-_stone_size))/100.0;
+			double d = (_position*(_size.height-_stone_size))/100.0;
 
-			if (d > (_height-_stone_size)) {
-				d = _height-_stone_size;
+			if (d > (_size.height-_stone_size)) {
+				d = _size.height-_stone_size;
 			}
 
-			g->FillGradientRectangle(10, 0, 5, _height, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, false);
-			g->FillGradientRectangle(10+5, 0, 5, _height, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, false);
+			g->FillGradientRectangle(10, 0, 5, _size.height, scolor, _bgfocus_color, false);
+			g->FillGradientRectangle(10+5, 0, 5, _size.height, _bgfocus_color, scolor, false);
 
-			g->SetColor(0x80, 0x80, 0xe0, 0xff);
+			g->SetColor(color);
 
 			jgui::jpoint_t p[] = {
 				{0, 0},
-				{(int)(_width*0.4), 0},
-				{(int)(_width*0.8), _stone_size/2},
-				{(int)(_width*0.4), _stone_size},
+				{(int)(_size.width*0.4), 0},
+				{(int)(_size.width*0.8), _stone_size/2},
+				{(int)(_size.width*0.4), _stone_size},
 				{0, _stone_size}
 			};
 
@@ -330,7 +338,7 @@ void Slider::Paint(Graphics *g)
 
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _width, _height);
+		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
 }
 

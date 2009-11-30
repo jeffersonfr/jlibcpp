@@ -155,15 +155,15 @@ void ProgressBar::Paint(Graphics *g)
 	{
 		if (_indeterminate == false) {
 			if (_type == LEFT_RIGHT_DIRECTION) {
-				double d = (_position/100.0)*_width;
+				double d = (_position/100.0)*_size.width;
 
-				if (d > _width) {
-					d = _width;
+				if (d > _size.width) {
+					d = _size.width;
 				}
 
-				g->SetColor(_bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+				g->SetColor(_bgfocus_color);
 
-				FillRectangle(g, 0, 0, (int)d, _height/2+1);
+				FillRectangle(g, 0, 0, (int)d, _size.height/2+1);
 
 				/*
 				g->FillGradientRectangle(_x, _y, (int)d, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
@@ -175,19 +175,19 @@ void ProgressBar::Paint(Graphics *g)
 				sprintf(t, "%.1f %%", _position);
 
 				if (_label_visible == true) {
-					g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-					g->DrawString((char *)t, _x, _y+(CENTER_VERTICAL_TEXT), _width, _height-4, CENTER_ALIGN);
+					g->SetColor(_fg_color);
+					g->DrawString((char *)t, _location.x, _location.y+(CENTER_VERTICAL_TEXT), _size.width, _size.height-4, CENTER_ALIGN);
 				}
 			} else if (_type == BOTTOM_UP_DIRECTION) {
-				double d = (_position/100.0)*_height;
+				double d = (_position/100.0)*_size.height;
 
-				if (d > _height) {
-					d = _height;
+				if (d > _size.height) {
+					d = _size.height;
 				}
 
-				g->SetColor(_bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+				g->SetColor(_bgfocus_color);
 
-				FillRectangle(g, 0, 0, _width/2+1, (int)d);
+				FillRectangle(g, 0, 0, _size.width/2+1, (int)d);
 
 				/*
 				g->FillGradientRectangle(_x, _y, (int)d, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
@@ -199,17 +199,17 @@ void ProgressBar::Paint(Graphics *g)
 				sprintf(t, "%.1f %%", _position);
 
 				if (_label_visible == true) {
-					g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-					g->DrawString((char *)t, _x, _y+(CENTER_VERTICAL_TEXT), _width, _height-4, CENTER_ALIGN);
+					g->SetColor(_fg_color);
+					g->DrawString((char *)t, _location.x, _location.y+(CENTER_VERTICAL_TEXT), _size.width, _size.height-4, CENTER_ALIGN);
 				}
 			}
 		} else {
 			if (_type == LEFT_RIGHT_DIRECTION) {
 				_index = _index + _delta;
 
-				if ((_index+50) >= (_width-_fixe_delta)) {
+				if ((_index+50) >= (_size.width-_fixe_delta)) {
 					_delta = -_fixe_delta;
-					_index = _width-_fixe_delta-50;
+					_index = _size.width-_fixe_delta-50;
 				}
 
 				if (_index <= _fixe_delta) {
@@ -217,9 +217,9 @@ void ProgressBar::Paint(Graphics *g)
 					_index = _fixe_delta;
 				}
 
-				g->SetColor(_bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+				g->SetColor(_bgfocus_color);
 
-				FillRectangle(g, _index, 0, 50, _height/2+1);
+				FillRectangle(g, _index, 0, 50, _size.height/2+1);
 
 				/*
 				g->FillGradientRectangle(_x+_index, _y, 50, _height/2, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
@@ -234,7 +234,7 @@ void ProgressBar::Paint(Graphics *g)
 	
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _width, _height);
+		FillRectangle(g, 0, 0, _size.width, _size.height);
 	}
 }
 

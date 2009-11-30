@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "jpanel.h"
 #include "jframe.h"
-#include "jfont.h"
 #include "joffscreenimage.h"
 
 #include <stdio.h>
@@ -45,13 +44,13 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 
 		float A, 
 			  B,			// Coordenadas do centro da tela                
-			  TAM,			// Coeficiente de ampliacao                     
+			  TAM,		// Coeficiente de ampliacao                     
 			  nu,			// Quant. subdivisoes no dominio da variavel u
 			  nv,			// Quant. subdivisoes no dominio da variavel v  
 			  teta,
 			  fi,
 			  proj_X, 
-			  proj_Y,		// Coordenadas da projecao do ponto (x, y, z)
+			  proj_Y,	// Coordenadas da projecao do ponto (x, y, z)
 			  angulo;
 		ponto p1, 
 			  p2,
@@ -75,7 +74,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			proj_Y = 0;
 			angulo = M_PI/60.0;
 
-			A = _width/2, B = _height/2;
+			A = GetWidth()/2, B = GetHeight()/2;
 
 			p1.x = -1, p1.y = -1, p1.z = -1;
 			p2.x = 1, p2.y = -1, p2.z = -1;
@@ -144,27 +143,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			g->DrawLine((int)Q2.x, (int)Q2.y, (int)P2.x, (int)P2.y);
 			g->DrawLine((int)Q3.x, (int)Q3.y, (int)P3.x, (int)P3.y);
 			g->DrawLine((int)Q4.x, (int)Q4.y, (int)P4.x, (int)P4.y);
-
-			/*
-			g->SetColor(0x60, 0x60, 0x60, 0xff);
-
-			jgui::point_t f1[] = {
-				{(int)P1.x, (int)P1.y},
-				{(int)P2.x, (int)P2.y},
-				{(int)P3.x, (int)P3.y},
-				{(int)P4.x, (int)P4.y}
-			};
-
-			jgui::point_t f2[] = {
-				{(int)Q1.x, (int)Q1.y},
-				{(int)Q2.x, (int)Q2.y},
-				{(int)Q3.x, (int)Q3.y},
-				{(int)Q4.x, (int)Q4.y}
-			};
-
-			g->FillPolygon(0, 0, f1, 4);
-			g->FillPolygon(0, 0, f2, 4);
-			*/
 		}
 
 		void GiraCubo_z(ponto *p1, ponto *p2, ponto *p3, ponto *p4, ponto *q1, ponto *q2, ponto *q3, ponto *q4, float angulo) 
@@ -249,8 +227,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 				GiraCubo_y(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, angulo*2);
 
 				Repaint();
-
-				// usleep(10000);
 			}
 
 			/*
@@ -282,15 +258,11 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			jgui::Frame::Paint(g);
 
 			DesenhaCubo(g, &p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4);
-
-			g->Flip();
 		}
 };
 
 int main( int argc, char *argv[] )
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
-
 	GraphicsTeste test;
 
 	test.Show();

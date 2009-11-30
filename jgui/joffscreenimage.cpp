@@ -21,10 +21,6 @@
 #include "jgfxhandler.h"
 #include "jgraphics.h"
 
-#ifdef DIRECTFB_UI
-#include <directfb.h>
-#endif
-
 namespace jgui {
 
 OffScreenImage::OffScreenImage(int width, int height, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height)

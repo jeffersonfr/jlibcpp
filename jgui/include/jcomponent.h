@@ -43,7 +43,7 @@
 #define DEFAULT_COMPONENT_HEIGHT	40
 
 #define CENTER_VERTICAL_TEXT \
-	(_font==NULL)?0:(_font->GetHeight()>_height)?0:((_height-_font->GetHeight())/2)
+	(_font==NULL)?0:(_font->GetHeight()>_size.height)?0:((_size.height-_font->GetHeight())/2)
 
 /*
 #define CENTER_VERTICAL_ERROR \
@@ -150,45 +150,25 @@ class Component : public virtual jcommon::Object{
 				  *_down;
 		jgui::Container *_parent;
 		jgui::Font *_font;
-		int _x, 
-			_y, 
-			_width, 
-			_height, 
-			_minimum_width,
-			_minimum_height,
-			_maximum_width,
-			_maximum_height,
-			_preferred_width,
-			_preferred_height,
-			_border_size;
-		// disabled colors
-		int _bg_red,
-			_bg_green,
-			_bg_blue,
-			_bg_alpha,
-			_fg_red,
-			_fg_green,
-			_fg_blue,
-			_fg_alpha,
-			_bgfocus_red,
-			_bgfocus_green,
-			_bgfocus_blue,
-			_bgfocus_alpha,
-			_fgfocus_red,
-			_fgfocus_green,
-			_fgfocus_blue,
-			_fgfocus_alpha,
-			_border_red,
-			_border_green,
-			_border_blue, 
-			_border_alpha,
-			_borderfocus_red,
-			_borderfocus_green,
-			_borderfocus_blue, 
-			_borderfocus_alpha,
-			_gradient_level,
-			_vertical_gap,
-			_horizontal_gap;
+		jpoint_t _location;
+		jsize_t _size,
+						_minimum_size,
+						_maximum_size,
+						_preferred_size;
+		jcolor_t _bg_color,
+						 _fg_color,
+						 _bgfocus_color,
+						 _fgfocus_color,
+						 _border_color,
+						 _borderfocus_color;
+		jcomponent_alignment_t _alignment_x,
+													 _alignment_y;
+		jcomponent_orientation_t _orientation;
+		jcomponent_border_t _border;
+		int _gradient_level,
+				_vertical_gap,
+				_horizontal_gap,
+				_border_size;
 		bool _has_focus,
 			 _is_visible,
 			 _ignore_repaint,
@@ -199,10 +179,6 @@ class Component : public virtual jcommon::Object{
 			 _theme_enabled,
 			 _is_opaque,
 			 _is_valid;
-		jcomponent_border_t _border;
-		jcomponent_alignment_t _alignment_x,
-													 _alignment_y;
-		jcomponent_orientation_t _orientation;
 
 		/**
 		 * \brief
@@ -444,60 +420,6 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetMinimumSize(int w, int h);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMaximumSize(int w, int h);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPreferredSize(int w, int h);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMinimumWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMinimumHeight();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMaximumWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetMaximumHeight();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetPreferredWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetPreferredHeight();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetBorder(jcomponent_border_t t);
 		
 		/**
@@ -510,7 +432,49 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void SetMinimumSize(jsize_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetMaximumSize(jsize_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetPreferredSize(jsize_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetMinimumSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetMaximumSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetPreferredSize();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Move(int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Move(jpoint_t location);
 		
 		/**
 		 * \brief
@@ -522,13 +486,37 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetPosition(int x, int y);
+		virtual void SetBounds(jpoint_t location, jsize_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetBounds(jregion_t region);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetLocation(int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetLocation(jpoint_t point);
 		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void SetSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSize(jsize_t size);
 		
 		/**
 		 * \brief
@@ -553,25 +541,19 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual int GetHeight();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void PaintBorder(Graphics *g);
+		virtual jpoint_t GetLocation();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(bool all = false);
-
+		virtual jsize_t GetSize();
+		
 		/**
 		 * \brief
 		 *
@@ -630,36 +612,6 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetBackgroundColor(uint32_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundColor(uint32_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBackgroundFocusColor(uint32_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundFocusColor(uint32_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBorderColor(uint32_t color);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetBackgroundColor(int red, int green, int blue, int alpha);
 		
 		/**
@@ -667,12 +619,6 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetForegroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBorderColor(int red, int green, int blue, int alpha);
 		
 		/**
 		 * \brief
@@ -690,37 +636,79 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void SetBorderColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBorderFocusColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual unsigned int GetBackgroundColor();
+		virtual void SetBackgroundColor(jcolor_t color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual unsigned int GetForegroundColor();
+		virtual void SetForegroundColor(jcolor_t color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual unsigned int GetBackgroundFocusColor();
+		virtual void SetBackgroundFocusColor(jcolor_t color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual unsigned int GetForegroundFocusColor();
+		virtual void SetForegroundFocusColor(jcolor_t color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual unsigned int GetBorderColor();
+		virtual void SetBorderColor(jcolor_t color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetBorderFocusColor(jcolor_t color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetBackgroundColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetForegroundColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetBackgroundFocusColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetForegroundFocusColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetBorderColor();
 
 		/**
 		 * \brief
@@ -739,6 +727,24 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual bool Intersect(int x, int y);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void PaintBorder(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Repaint(bool all = false);
 
 		/**
 		 * \brief

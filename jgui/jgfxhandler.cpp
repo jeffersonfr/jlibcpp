@@ -71,19 +71,16 @@ int GFXHandler::InitEngine()
 {
 #ifdef DIRECTFB_UI
 	DFBDisplayLayerConfig config;
-	DFBResult ret;
 
-	/* Initialize DirectFB including command line parsing. */
+	// Initialize DirectFB including command line parsing
 	if ((IDirectFB **)_dfb != NULL){
 		Release();
 
 		_dfb = NULL;
 	}
 
-	ret = DirectFBInit(NULL, 0);
-	if (ret) {
-		DirectFBError( "DirectFBInit() failed", ret );
-		return ( 1 );
+	if (DirectFBInit(NULL, 0) != DFB_OK) {
+		return 1;
 	}
 
 	/*
@@ -112,20 +109,16 @@ int GFXHandler::InitEngine()
 	} catch (...) {
 	}
 
-	/* Create the super interface. */
+	// Create the super interface
 	if (_dfb == NULL) {
-		ret = DirectFBCreate((IDirectFB **)&_dfb);
-		if (ret) {
-			DirectFBError( "DirectFBCreate() failed", ret );
-			return ( 2 );
+		if (DirectFBCreate((IDirectFB **)&_dfb) != DFB_OK) {
+			return 2;
 		}
 	}
 
-	/* Get the primary display layer. */
-	ret = _dfb->GetDisplayLayer(_dfb, (DFBDisplayLayerID)DLID_PRIMARY, &_layer);
-	if (ret) {
-		DirectFBError( "IDirectFB::GetDisplayLayer() failed", ret );
-		return ( 3 );
+	// Get the primary display layer
+	if (_dfb->GetDisplayLayer(_dfb, (DFBDisplayLayerID)DLID_PRIMARY, &_layer) != DFB_OK) {
+		return 3;
 	}
 	
 	_layer->SetCooperativeLevel(_layer, (DFBDisplayLayerCooperativeLevel)(DLSCL_ADMINISTRATIVE));
@@ -140,7 +133,7 @@ int GFXHandler::InitEngine()
 	
 	_dfb->GetDeviceDescription(_dfb, &deviceDescription);
 
-	if(!((deviceDescription.blitting_flags & DSBLIT_BLEND_ALPHACHANNEL) && (deviceDescription.blitting_flags & DSBLIT_BLEND_COLORALPHA))){
+	if (!((deviceDescription.blitting_flags & DSBLIT_BLEND_ALPHACHANNEL) && (deviceDescription.blitting_flags & DSBLIT_BLEND_COLORALPHA))) {
 		config.flags = DLCONF_BUFFERMODE;
 		// config.buffermode = DLBM_WINDOWS;
 		config.buffermode = DLBM_BACKSYSTEM;
@@ -201,7 +194,6 @@ int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	int height = (heightp * screenHeight) / scale_height;
 
 	DFBWindowDescription desc;
-	DFBResult ret;
 
 	if (width < 2) {
 		width = 2;
@@ -229,18 +221,12 @@ int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	desc.height = height;
 
 	/* Create the window. */
-	ret = _layer->CreateWindow(_layer, &desc, window);
-	if (ret) {
-		DirectFBError( "IDirectFBDisplayLayer::CreateWindow() failed", ret );
-
+	if (_layer->CreateWindow(_layer, &desc, window) != DFB_OK) {
 		return -1;
 	}
 
 	/* Get the window's surface. */
-	ret = (*window)->GetSurface( *window, surface );
-	if (ret) {
-		// DirectFBError( "IDirectFBWindow::GetSurface() failed", ret );
-		
+	if ((*window)->GetSurface(*window, surface) != DFB_OK) {
 		return -1;
 	}
 
@@ -273,7 +259,6 @@ void GFXHandler::SetCursorEnabled(bool b)
 
 void GFXHandler::SetCursor(jcursor_style_t t)
 {
-#ifdef DIRECTFB_UI
 	if (_cursor == t) {
 		return;
 	}
@@ -281,7 +266,6 @@ void GFXHandler::SetCursor(jcursor_style_t t)
 	_cursor = t;
 
 	SetCursor(_cursors[_cursor].cursor, _cursors[_cursor].hot_x, _cursors[_cursor].hot_y);
-#endif
 }
 
 void GFXHandler::SetCursor(OffScreenImage *shape, int hotx, int hoty)
@@ -429,9 +413,9 @@ void * GFXHandler::GetGraphicEngine()
 {
 #ifdef DIRECTFB_UI
 	return _dfb;
-#else
-	return NULL;
 #endif
+
+	return NULL;
 }
 
 std::string GFXHandler::GetID()
@@ -463,14 +447,14 @@ jpoint_t GFXHandler::GetMousePosition()
 {
 	jpoint_t p;
 
+	p.x = 0;
+	p.y = 0;
+
 #ifdef DIRECTFB_UI
 	_layer->GetCursorPosition(_layer, &p.x, &p.y);
 	
 	p.x = SCREEN_TO_SCALE(p.x, screenWidth, scaleWidth);
 	p.y = SCREEN_TO_SCALE(p.y, screenWidth, scaleWidth);
-#else
-	p.x = 0;
-	p.y = 0;
 #endif
 
 	return p;
@@ -484,7 +468,6 @@ void GFXHandler::SetWorkingScreenSize(int width, int height)
 
 void GFXHandler::Restore()
 {
-#ifdef DIRECTFB_UI
 	// INFO:: restoring engine
 	InitEngine();
 
@@ -500,12 +483,10 @@ void GFXHandler::Restore()
 	
 	// INFO:: restoring windows
 	WindowManager::GetInstance()->Restore();
-#endif
 }
 
 void GFXHandler::Release()
 {
-#ifdef DIRECTFB_UI
 	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
 		delete i->second.cursor;
 	}
@@ -525,6 +506,7 @@ void GFXHandler::Release()
 		(*i)->Release();
 	}
 	
+#ifdef DIRECTFB_UI
 	// INFO:: release layers
 	if (_layer != NULL) {
 		_layer->Release(_layer);

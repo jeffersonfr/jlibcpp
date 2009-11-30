@@ -205,6 +205,31 @@ struct jcolor_t {
 	uint8_t red;
 	uint8_t green;
 	uint8_t blue;
+
+	jcolor_t Brighter(int r, int g, int b, int a)
+	{
+		r = red + r;
+		g = green + g;
+		b = blue + b;
+		a = alpha + a;
+
+		TRUNC_COLOR(r, g, b, a);
+
+		jcolor_t color;
+
+		color.red = r;
+		color.green = g;
+		color.blue = b;
+		color.alpha = a;
+
+		return color;
+	}
+
+	jcolor_t Darker(int r, int g, int b, int a)
+	{
+		return Brighter(-r, -g, -b, -a);
+	}
+
 };
 
 class Window;
@@ -580,7 +605,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void FillGradientRectangle(int x, int y, int w, int h, int sr, int sg, int sb, int sa, int dr, int dg, int db, int da = 0xFF, bool horizontal = true);
+		virtual void FillGradientRectangle(int x, int y, int w, int h, jcolor_t scolor, jcolor_t dcolor, bool horizontal = true);
 		
 		/**
 		 * \brief

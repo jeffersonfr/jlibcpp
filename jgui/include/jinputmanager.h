@@ -31,10 +31,6 @@
 #include <map>
 #include <list>
 
-#ifdef DIRECTFB_UI
-#include <directfb.h>
-#endif
-
 namespace jgui {
 
 /**

@@ -361,7 +361,7 @@ void TextArea::GetLines(std::vector<std::string> *texts)
 	int i,
 		j,
 		word_size,
-		max = _width-1;
+		max = _size.width-1;
 
 	if (EchoCharIsSet() == true) {
 		paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
@@ -517,17 +517,17 @@ void TextArea::Paint(Graphics *g)
 
 		_line_op = 0;
 
-		int max_lines = _height/(font_height+font_space)+0;
+		int max_lines = _size.height/(font_height+font_space)+0;
 
 		// CHANGE:: ao menos 1 linha visivel
 		if (max_lines < 1) {
 			max_lines = 1;
 		}
 
-		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+		g->SetColor(_fg_color);
 
 		{
-			g->SetClip(1, 1, _width-2, _height-2);
+			g->SetClip(1, 1, _size.width-2, _size.height-2);
 
 			// INFO:: Draw text
 			for (int i=0, k=0; i<=(int)texts.size()-1; i++) {
@@ -560,7 +560,7 @@ void TextArea::Paint(Graphics *g)
 							current_text_size = _font->GetStringWidth(texts[i].substr(0, current_length).c_str());
 							g->DrawString(cursor, 2+current_text_size, (int)(k*(font_height+font_space))+font_space);
 
-							g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+							g->SetColor(_fg_color);
 
 							current_length = -1;
 						}
@@ -586,7 +586,7 @@ void TextArea::Paint(Graphics *g)
 
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _width, _height);
+		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
 }
 

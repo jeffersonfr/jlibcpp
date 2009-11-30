@@ -14,7 +14,7 @@ SearchContacts::SearchContacts(PhoneDB *base, int x, int y):
 	char tmp[255];
 	int dheight = 40,
 		sheight = 50,
-	    max_width = _width-_insets.left-_insets.right;
+	    max_width = GetWidth()-_insets.left-_insets.right;
 
 	db = base;
 
@@ -40,7 +40,7 @@ SearchContacts::SearchContacts(PhoneDB *base, int x, int y):
 		label_tel2 = new jgui::Label("Telefone 2", _insets.left, _insets.top+4*sheight, max_width, dheight);
 		tel2 = new jgui::Label(t->phone2, _insets.left, _insets.top+5*sheight, max_width, dheight);
 		left_arrow = new jgui::Icon("icons/left_horizontal_arrow.png", _insets.left, _insets.top+0*sheight, dheight, dheight);
-		right_arrow = new jgui::Icon("icons/right_horizontal_arrow.png", _width-_insets.right-dheight, _insets.top+0*sheight, dheight, dheight);
+		right_arrow = new jgui::Icon("icons/right_horizontal_arrow.png", GetWidth()-_insets.right-dheight, _insets.top+0*sheight, dheight, dheight);
 
 		label_name->SetAlign(jgui::CENTER_ALIGN);
 
@@ -158,7 +158,7 @@ void SearchContacts::InputChanged(jgui::KeyEvent *event)
 	} else if (event->GetSymbol() == jgui::JKEY_F2 || event->GetSymbol() == jgui::JKEY_GREEN) {
 		int index = _index;
 
-		jgui::Keyboard keyboard(_x+_width+20, _y, jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, true);
+		jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, true);
 
 		keyboard.SetMaxTextSize(20);
 		keyboard.RegisterKeyboardListener(this);
@@ -174,7 +174,7 @@ void SearchContacts::InputChanged(jgui::KeyEvent *event)
 		if (db->GetSize() > 0) {
 			Hide();
 
-			AddContact edit(db, _index, _x, _y);
+			AddContact edit(db, _index, GetX(), GetY());
 
 			edit.Show();
 
@@ -183,7 +183,7 @@ void SearchContacts::InputChanged(jgui::KeyEvent *event)
 		}
 	} else if (event->GetSymbol() == jgui::JKEY_F4 || event->GetSymbol() == jgui::JKEY_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialog dialog("Aviso", "Remover o contato atual ?", _x, _y+_height+10);
+			jgui::YesNoDialog dialog("Aviso", "Remover o contato atual ?", GetX(), GetY()+GetHeight()+10);
 
 			dialog.Show();
 
@@ -196,7 +196,7 @@ void SearchContacts::InputChanged(jgui::KeyEvent *event)
 					_index = 0;
 				}
 
-				jgui::MessageDialog dialog("Aviso", "Contato removido com sucesso", _x-50, _y+_height+10);
+				jgui::MessageDialog dialog("Aviso", "Contato removido com sucesso", GetX()-50, GetY()+GetHeight()+10);
 
 				dialog.Show();
 

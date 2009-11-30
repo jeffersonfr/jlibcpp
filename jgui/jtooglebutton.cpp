@@ -139,16 +139,16 @@ void ToogleButton::Paint(Graphics *g)
 		/*
 		if (_has_focus == true) {
 			if (_is_pressed == true) {
-				g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-				g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+				g->FillGradientRectangle(0, 0, _size.width, _height/2+1, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+				g->FillGradientRectangle(0, _height/2, _size.width, _height/2, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
 			} else {
-				g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-				g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+				g->FillGradientRectangle(0, 0, _size.width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+				g->FillGradientRectangle(0, _height/2, _size.width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
 			}
 		} else {
 			if (_is_pressed == true) {
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->FillRectangle(0, 0, _width, _height);
+				g->SetColor(_fg_color);
+				g->FillRectangle(0, 0, _size.width, _height);
 			}
 		}
 		*/
@@ -159,13 +159,13 @@ void ToogleButton::Paint(Graphics *g)
 			align_dx = 0;
 		}
 
-		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+		g->SetColor(_fg_color);
 
 		/*
 		if (_is_pressed == true) {
-			g->SetColor(_bg_red, _bg_green, _bg_blue, _bg_alpha);
+			g->SetColor(_bg_color);
 		} else {
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+			g->SetColor(_fg_color);
 		}
 		*/
 		
@@ -173,38 +173,38 @@ void ToogleButton::Paint(Graphics *g)
 			if (GetName() == "") {
 				if (_has_focus == true) {
 					if (prefetch2 != NULL) {
-						g->DrawImage(prefetch2, 0, 0, _width, _height);
+						g->DrawImage(prefetch2, 0, 0, _size.width, _size.height);
 					} else {
-						g->DrawImage(prefetch1, 0, 0, _width, _height);
+						g->DrawImage(prefetch1, 0, 0, _size.width, _size.height);
 					}
 				} else {
-					g->DrawImage(prefetch1, 0, 0, _width, _height);
+					g->DrawImage(prefetch1, 0, 0, _size.width, _size.height);
 				}
 			} else {
-				int ts = _width-(15+font_height+2*(align_dx+_border_size));
+				int ts = _size.width-(15+font_height+2*(align_dx+_border_size));
 
 				if (ts < 0) {
 					ts = 0;
 				}
 
-				g->DrawString(TruncateString(GetName(), ts), align_dx, (CENTER_VERTICAL_TEXT), _width-align_dx, font_height, LEFT_ALIGN);
-				g->DrawImage(prefetch1, 5, 0, _height, _height);
+				g->DrawString(TruncateString(GetName(), ts), align_dx, (CENTER_VERTICAL_TEXT), _size.width-align_dx, font_height, LEFT_ALIGN);
+				g->DrawImage(prefetch1, 5, 0, _size.height, _size.height);
 			}
 		} else {
-			int ts = _width-2*(align_dx+_border_size);
+			int ts = _size.width-2*(align_dx+_border_size);
 
 			if (ts < 0) {
 				ts = 0;
 			}
 
-			g->DrawString(TruncateString(GetName(), ts), align_dx, (CENTER_VERTICAL_TEXT), _width-align_dx, _height, _align);
+			g->DrawString(TruncateString(GetName(), ts), align_dx, (CENTER_VERTICAL_TEXT), _size.width-align_dx, _size.height, _align);
 		}
 	}
 
 	if(_is_pressed == true) {
 		g->SetDrawingFlags(DF_BLEND);
-		g->SetColor(_bg_red, _bg_green, _bg_blue, 0x40);
-		g->FillRectangle(0, 0, _width, _height);
+		g->SetColor(_bg_color);
+		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
 
 	PaintBorder(g);
@@ -212,7 +212,7 @@ void ToogleButton::Paint(Graphics *g)
 	if (_enabled == false) {
 		g->SetDrawingFlags(DF_BLEND);
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _width, _height);
+		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
 
 }

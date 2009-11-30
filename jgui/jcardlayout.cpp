@@ -229,7 +229,7 @@ jsize_t CardLayout::GetMinimumLayoutSize(Container *parent)
 	for (int i = 0 ; i < ncomponents ; i++) {
 		Component *comp = parent->GetComponents()[i];
 
-		jsize_t d = {comp->GetMinimumWidth(), comp->GetMinimumHeight()};
+		jsize_t d = comp->GetMinimumSize();
 
 		if (d.width > w) {
 			w = d.width;
@@ -262,7 +262,7 @@ jsize_t CardLayout::GetPreferredLayoutSize(Container *parent)
 	for (int i = 0 ; i < ncomponents ; i++) {
 		Component *comp = parent->GetComponents()[i];
 
-		jsize_t d = {comp->GetPreferredWidth(), comp->GetPreferredHeight()};
+		jsize_t d = comp->GetPreferredSize();
 
 		if (d.width > w) {
 			w = d.width;

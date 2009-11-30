@@ -41,8 +41,8 @@ class SignalMetter : public jgui::Component{
 				_interval = 1;
 			}
 
-			if (_interval > _width) {
-				_interval = _width;
+			if (_interval > GetWidth()) {
+				_interval = GetWidth();
 			}
 		}
 
@@ -64,7 +64,7 @@ class SignalMetter : public jgui::Component{
 		{
 			_points.push_back(value);
 
-			if ((int)_points.size() > (_width)/_interval) {
+			if ((int)_points.size() > (GetWidth())/_interval) {
 				_points.erase(_points.begin());
 			}
 
@@ -76,14 +76,14 @@ class SignalMetter : public jgui::Component{
 			Component::Paint(g);
 
 			int x = _interval,
-				y = _height;
+					y = GetHeight();
 
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawRectangle(0, 0, _width, _height);
+			g->DrawRectangle(0, 0, GetWidth(), GetHeight());
 
 			if (_vertical_lines == true) {
-				for (int i=_interval; i<=_width; i+=_interval) {
-					g->DrawLine(i, 0, i, _height-1);
+				for (int i=_interval; i<=GetWidth(); i+=_interval) {
+					g->DrawLine(i, 0, i, GetHeight()-1);
 				}
 			}
 			

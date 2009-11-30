@@ -26,10 +26,6 @@
 
 #include <vector>
 
-#ifdef DIRECTFB_UI
-#include <directfb.h>
-#endif
-
 namespace jgui{
 
 /**

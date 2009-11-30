@@ -29,7 +29,6 @@ RequestParser::RequestParser(std::string s)
 
 	_vars["request_url"] = request.GetToken(1);
 
-
 	std::string file_name = url.GetToken(0).substr(1, url.GetToken(0).size()-1);
 
 	_vars["event_name"] = file_name;
@@ -195,31 +194,20 @@ Configuration::Configuration()
 
 		p.Load("mlive.properties");
 
-		SetProperty("mlive-name", p.GetProperty("", "Mlive Server v0.01"));
-		SetProperty("mlive-id", p.GetProperty("", "1234567890"));
-		SetProperty("max-input-rate", p.GetProperty("", "256000"));
-		SetProperty("max-output-rate", p.GetProperty("", "256000"));
-		SetProperty("max-sources", p.GetProperty("", "4"));
-		SetProperty("max-source-clients", p.GetProperty("", "4"));
-		SetProperty("update-time", p.GetProperty("", "10"));
-		SetProperty("buffer-size", p.GetProperty("", "10240"));
-		SetProperty("error-video", p.GetProperty("", ""));
-		SetProperty("config-update", p.GetProperty("", "yes"));
+		SetProperty("mlive-name", p.GetProperty("mlive-name", "Mlive Server v0.01"));
+		SetProperty("mlive-id", p.GetProperty("mlive-id", "1234567890"));
+		SetProperty("max-input-rate", p.GetProperty("max-input-rate", "10000"));
+		SetProperty("max-output-rate", p.GetProperty("max-output-rate", "10000"));
+		SetProperty("max-sources", p.GetProperty("max-sources", "4"));
+		SetProperty("max-source-clients", p.GetProperty("max-source-clients", "4"));
+		SetProperty("update-time", p.GetProperty("update-time", "60"));
+		SetProperty("buffer-size", p.GetProperty("buffer-size", "256"));
+		SetProperty("error-video", p.GetProperty("error-video", ""));
+		SetProperty("config-update", p.GetProperty("config-update", "no"));
 	} catch (...) {
-		throw;
+		std::cout << "Configuration file mlive.properties not found" << std::endl;
 
-		/*
-		SetProperty("mlive_name", "Mlive Server v0.01");
-		SetProperty("mlive_id", "1234567890");
-		SetProperty("max_in_rate", "256000");
-		SetProperty("max_out_rate" "256000");
-		SetProperty("max_sources", "4");
-		SetProperty("max_source_clients", "4");
-		SetProperty("update_time", "10");
-		SetProperty("buffer_size", "10240");	
-		SetProperty("error_video", "");
-		SetProperty("config_update", "true");
-		*/
+		throw;
 	}
 }
 
@@ -357,7 +345,17 @@ int Source::GetOutputRate()
 
 int Source::GetNumberOfClients()
 {
-	return (int)clients.size();
+	AutoLock lock(&_mutex);
+
+	int n = 0;
+
+	for (std::vector<Client *>::iterator i=clients.begin(); i!=clients.end(); i++) {
+		if ((*i)->IsClosed() == false) {
+			n = n + 1;
+		}
+	}
+
+	return n; // (int)clients.size();
 }
 
 std::string Source::GetSourceName()
@@ -371,12 +369,10 @@ bool Source::AddClient(Socket *socket, RequestParser &parser)
 		return false;
 	}
 
-	Client *client;
+	Client *client = NULL;
 
 	{
-		AutoLock lock(&_mutex);
-
-		if (GetNumberOfClients() >= atoi(Configuration::GetInstance()->GetProperty("max-source-clients").c_str())) {
+		if (GetNumberOfClients() > atoi(Configuration::GetInstance()->GetProperty("max-source-clients").c_str())) {
 			return false;
 		}
 
@@ -385,16 +381,16 @@ bool Source::AddClient(Socket *socket, RequestParser &parser)
 
 			std::cout << "Add HTTP client::[source=" << GetSourceName() << "] [client=0x" << std::hex << (unsigned long)(client) << "]" << std::dec << std::endl;
 		} else if (parser.GetDestinationProtocol() == "udp") {
-			if (parser.GetDestinationHost() != "" && parser.GetDestinationPort() > 128) {
+			if (parser.GetDestinationHost() != "" && parser.GetDestinationPort() > 1024) {
 				client = new Client(socket, parser.GetDestinationHost(), parser.GetDestinationPort(), this);
-			}
 
-			std::cout << "Add UDP client::[source=" << GetSourceName() << "] [client=0x" << std::hex << (unsigned long)(client) << "]" << std::dec << std::endl;
-		} else {
-			return false;
+				std::cout << "Add UDP client::[source=" << GetSourceName() << "] [client=0x" << std::hex << (unsigned long)(client) << "]" << std::dec << std::endl;
+			}
 		}
 
 		if ((void *)client != NULL) {
+			AutoLock lock(&_mutex);
+
 			clients.push_back(client);
 
 			client->Start();
@@ -477,7 +473,7 @@ void Source::ReadStream()
 			break;
 		}
 
-		_buffer->Write((const unsigned char *)receive, r);
+		_buffer->Write((const uint8_t *)receive, r);
 
 		_sent_bytes += r;
 	} while (_running == true);
@@ -569,6 +565,11 @@ Client::~Client()
 {
 }
 
+Client::client_type_t Client::GetType()
+{
+	return type;
+}
+
 Connection * Client::GetConnection()
 {
 	return response;
@@ -627,7 +628,7 @@ void Client::Stop()
 {
 	_running = false;
 	
-	// source->GetBuffer()->Write((const unsigned char *)"\0", 1);
+	// source->GetBuffer()->Write((const uint8_t *)"\0", 1);
 
 	Interrupt();
 	WaitThread();
@@ -831,6 +832,21 @@ void Server::HandleRequests()
 	} while (true);
 }
 
+int Server::GetNumberOfSources()
+{
+	AutoLock lock(&_mutex);
+
+	int n = 0;
+
+	for (std::vector<Source *>::iterator i=sources.begin(); i!=sources.end(); i++) {
+		if ((*i)->IsClosed() == false) {
+			n = n + 1;
+		}
+	}
+
+	return n; // (int)sources.size();
+}
+
 bool Server::ProcessClient(jsocket::Socket *socket, std::string receive)
 {
 	try {
@@ -848,19 +864,22 @@ bool Server::ProcessClient(jsocket::Socket *socket, std::string receive)
 			o << "Connection: close" << "\r\n";
 			o << "\r\n";
 			o << "<mlive type=\"info\">" << "\r\n";
-			o << "\t<server host=\"" << "127.0.0.1" << "\" port=\"" << "80" << "\" />" << "\r\n";
+			
+			// o << "\t<server host=\"" << "127.0.0.1" << "\" port=\"" << "80" << "\" />" << "\r\n";
 
 			if (sources.size() > 0) {
 				o << "\t<events>" << "\r\n";
 
 				for (std::vector<Source *>::iterator i=sources.begin(); i!=sources.end(); i++) {
-					o << "\t\t<event " << 
-						"name=\"" << (*i)->GetSourceName() << "\" " << 
-						"input-rate=\"" << (*i)->GetIncommingRate() << "\" " << 
-						"output-rate=\"" << (*i)->GetOutputRate() << "\" " << 
-						"clients=\"" << (*i)->GetNumberOfClients() << "\" ";
+					Source *source = (*i);
 
-					if ((*i)->IsClosed() == false) {
+					o << "\t\t<event " << 
+						"name=\"" << source->GetSourceName() << "\" " << 
+						"input-rate=\"" << source->GetIncommingRate() << "\" " << 
+						"output-rate=\"" << source->GetOutputRate() << "\" " << 
+						"clients=\"" << source->GetNumberOfClients() << "\" ";
+
+					if (source->IsClosed() == false) {
 						o << "status=\"" << "started" << "\" ";
 					} else {
 						o << "status=\"" << "closed" << "\" ";
@@ -871,13 +890,21 @@ bool Server::ProcessClient(jsocket::Socket *socket, std::string receive)
 					std::vector<Client *> &clients = (*i)->GetClients();
 
 					for (std::vector<Client *>::iterator j=clients.begin(); j!=clients.end(); j++) {
-						o << "\t\t\t<client " << 
-							"id=\"" << (*j) << "\" " << 
-							"output-rate=\"" << (*j)->GetOutputRate() << "\" " << 
-							"start-time=\"" << (*j)->GetStartTime() << "\" " << 
-							"sent-bytes=\"" << (*j)->GetSentBytes() << "\" ";
+						Client *client = (*j);
 
-						if ((*j)->IsClosed() == false) {
+						o << "\t\t\t<client " << 
+							"id=\"" << client << "\" " << 
+							"output-rate=\"" << client->GetOutputRate() << "\" " << 
+							"start-time=\"" << client->GetStartTime() << "\" " << 
+							"sent-bytes=\"" << client->GetSentBytes() << "\" ";
+
+						if (client->GetType() == Client::HTTP_CLIENT_TYPE) {
+							o << "type=\"" << "http" << "\" ";
+						} else if (client->GetType() == Client::UDP_CLIENT_TYPE) {
+							o << "type=\"" << "udp" << "\" ";
+						}
+
+						if (client->IsClosed() == false) {
 							o << "status=\"" << "started" << "\" ";
 						} else {
 							o << "status=\"" << "closed" << "\" ";
@@ -913,7 +940,10 @@ bool Server::ProcessClient(jsocket::Socket *socket, std::string receive)
 
 			for (std::map<std::string, std::string>::iterator i=
 				Configuration::GetInstance()->GetProperties().begin(); i!=Configuration::GetInstance()->GetProperties().end(); i++) {
-				if (i->first != "mlive-name" && i->first != "config-update") {
+				if (i->first != "mlive-id" && 
+						i->first != "mlive-name" && 
+						i->first != "config-update" &&
+						i->first != "error-video") {
 					o << "\t<" << i->first << ">" << atoi(Configuration::GetInstance()->GetProperty(i->first).c_str()) << "</" << i->first << ">" << "\r\n";
 				} else {
 					o << "\t<" << i->first << ">" << Configuration::GetInstance()->GetProperty(i->first) << "</" << i->first << ">" << "\r\n";
@@ -942,7 +972,7 @@ bool Server::ProcessClient(jsocket::Socket *socket, std::string receive)
 			std::cout << "Response stream to [" << socket->GetInetAddress()->GetHostAddress() << ":" << socket->GetPort() << "]" << std::endl;
 
 			{
-				jthread::AutoLock lock(&mutex);
+				jthread::AutoLock lock(&_mutex);
 
 				Source *source = NULL;
 
@@ -969,7 +999,7 @@ bool Server::ProcessClient(jsocket::Socket *socket, std::string receive)
 				}
 
 				if ((void *)source == NULL) {
-					if ((int)sources.size() >= atoi(Configuration::GetInstance()->GetProperty("max-sources").c_str())) {
+					if (GetNumberOfSources() >= atoi(Configuration::GetInstance()->GetProperty("max-sources").c_str())) {
 						return false;
 					}
 
@@ -977,7 +1007,7 @@ bool Server::ProcessClient(jsocket::Socket *socket, std::string receive)
 						return false;
 					}
 
-					if (parser.GetSourceHost() != "" && parser.GetSourcePort() > 128) {
+					if (parser.GetSourceHost() != "" && parser.GetSourcePort() > 1024) {
 						if (parser.GetSourceProtocol() == "http") {
 							source = new Source(
 									parser.GetSourceHost(), 
@@ -988,7 +1018,7 @@ bool Server::ProcessClient(jsocket::Socket *socket, std::string receive)
 									parser.GetDestinationResource());
 
 							std::cout << "Create HTTP source::[" << parser.GetEventName() << " at " << parser.GetSourceHost() << ":" << parser.GetSourcePort() << "]" << std::endl;
-						} else {
+						} else if (parser.GetSourceProtocol() == "udp") {
 							source = new Source(
 									parser.GetSourceHost(), 
 									parser.GetSourcePort(), 
@@ -997,6 +1027,10 @@ bool Server::ProcessClient(jsocket::Socket *socket, std::string receive)
 									this,
 									parser.GetDestinationResource());
 							std::cout << "Create UDP source::[" << parser.GetEventName() << " at " << parser.GetSourceHost() << ":" << parser.GetSourcePort() << "]" << std::endl;
+						}
+
+						if (source == NULL) {
+							return false;
 						}
 
 						sources.push_back(source);
@@ -1060,7 +1094,7 @@ void Server::RemoveSources()
 {
 	while (true) {
 		{
-			jthread::AutoLock lock(&mutex);
+			jthread::AutoLock lock(&_mutex);
 
 			for (std::vector<Source *>::iterator i=sources.begin(); i!=sources.end(); i++) {
 				Source *c = (*i);

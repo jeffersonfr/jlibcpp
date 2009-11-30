@@ -64,8 +64,8 @@ class Cell : public virtual jcommon::Object{
 		void SetValue(std::string value);
 		std::string GetValue();
 
-		void SetCellBackgroundColor(uint32_t color);
-		void SetCellForegroundColor(uint32_t color);
+		void SetCellBackgroundColor(jcolor_t color);
+		void SetCellForegroundColor(jcolor_t color);
 		void SetCellBackgroundColor(int r, int g, int b, int a);
 		void SetCellForegroundColor(int r, int g, int b, int a);
 
@@ -227,13 +227,13 @@ class Table : public Component, public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		uint32_t GetItemColor();
+		jcolor_t GetItemColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetItemColor(uint32_t color);
+		void SetItemColor(jcolor_t color);
 		
 		/**
 		 * \brief
@@ -245,7 +245,7 @@ class Table : public Component, public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void SetGridColor(uint32_t color);
+		void SetGridColor(jcolor_t color);
 		
 		/**
 		 * \brief

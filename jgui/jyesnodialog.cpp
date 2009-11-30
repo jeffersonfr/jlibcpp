@@ -26,7 +26,7 @@ YesNoDialog::YesNoDialog(std::string title, std::string msg, int x, int y):
 {
 	jcommon::Object::SetClassName("jgui::YesNoDialog");
 
-	int lines = Component::CountLines(msg, _width-_insets.left-_insets.right-20, _font);
+	int lines = Component::CountLines(msg, _size.width-_insets.left-_insets.right-20, _font);
 
 	if (lines <= 0) {
 		lines = 1;
@@ -34,14 +34,14 @@ YesNoDialog::YesNoDialog(std::string title, std::string msg, int x, int y):
 
 	SetSize(1000, (_font->GetHeight())*(lines)+100);
 
-	_label = new Label(msg, _insets.left, _insets.top, _width-_insets.left-_insets.right, (lines)*_font->GetHeight()+10);
+	_label = new Label(msg, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, (lines)*_font->GetHeight()+10);
 
 	_label->SetGap(10, 10);
 	_label->SetWrap(true);
 	_label->SetTruncated(false);
 
-	_no = new Button("N\xe3o", _width-(1*200+60)+30, _label->GetY()+_label->GetHeight()+20, 200, 40);
-	_yes = new Button("Sim", _width-(2*200+60), _label->GetY()+_label->GetHeight()+20, 200, 40);
+	_no = new Button("N\xe3o", _size.width-(1*200+60)+30, _label->GetY()+_label->GetHeight()+20, 200, 40);
+	_yes = new Button("Sim", _size.width-(2*200+60), _label->GetY()+_label->GetHeight()+20, 200, 40);
 	
 	_no->SetNavigation(_yes, NULL, _yes, NULL);
 	_yes->SetNavigation(NULL, _no, NULL, _no);

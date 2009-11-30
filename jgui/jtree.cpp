@@ -73,17 +73,22 @@ void Tree::SetLoop(bool b)
 	_list->SetLoop(b);
 }
 
-uint32_t Tree::GetItemColor()
+jcolor_t Tree::GetItemColor()
 {
-	return 0;
+	return _item_color;
 }
 
-void Tree::SetItemColor(uint32_t color)
+void Tree::SetItemColor(jcolor_t color)
 {
+	SetItemColor(color.red, color.green, color.blue, color.alpha);
 }
 
 void Tree::SetItemColor(int red, int green, int blue, int alpha)
 {
+	_item_color.red = red;
+	_item_color.green = green;
+	_item_color.blue = blue;
+	_item_color.alpha = alpha;
 }
 
 void Tree::SetCurrentIndex(int i)
@@ -447,27 +452,24 @@ void TreeComponent::SetLoop(bool loop)
 	Repaint();
 }
 
-uint32_t TreeComponent::GetItemColor()
+jcolor_t TreeComponent::GetItemColor()
 {
-	return (_item_alpha & 0xff) << 24 | (_item_red & 0xff) << 16 | (_item_green & 0xff) << 8 | (_item_blue & 0xff) << 0;
+	return _item_color;
 }
 
-void TreeComponent::SetItemColor(uint32_t color)
+void TreeComponent::SetItemColor(jcolor_t color)
 {
-	_item_red = (color>>0x10)&0xff;
-	_item_green = (color>>0x08)&0xff;
-	_item_blue = (color>>0x00)&0xff;
-	_item_alpha = (color>>0x18)&0xff;
+	SetItemColor(color.red, color.green, color.blue, color.alpha);
 }
 
 void TreeComponent::SetItemColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_item_red = red;
-	_item_green = green;
-	_item_blue = blue;
-	_item_alpha = alpha;
+	_item_color.red = red;
+	_item_color.green = green;
+	_item_color.blue = blue;
+	_item_color.alpha = alpha;
 }
 
 void TreeComponent::Paint(Graphics *g)
@@ -515,46 +517,48 @@ void TreeComponent::Paint(Graphics *g)
 
 	for (i=position; count<_visible_items && i<(int)_items.size(); i++, count++) {
 		if (_index != i) {
-			g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-			g->FillRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10);
+			g->SetColor(_item_color);
+			g->FillRectangle(0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 		} else {
-			g->FillGradientRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-			g->FillGradientRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+			jcolor_t scolor = _bgfocus_color.Darker(_gradient_level, _gradient_level, _gradient_level, 0x00);
+			
+			g->FillGradientRectangle(0, (font_height+_vertical_gap)*count, _size.width, font_height+10, scolor, _bgfocus_color);
+			g->FillGradientRectangle(0, (font_height+_vertical_gap)*count, _size.width, font_height+10, _bgfocus_color, scolor);
 		}
 
 		if (_items[i]->GetType() == EMPTY_MENU_ITEM) {
 			// TODO::
 		} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+			g->SetColor(_fg_color);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 		} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
 			if (_items[i]->_prefetch == NULL) {
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+				g->SetColor(_fg_color);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 			} else {
 				g->DrawImage(_items[i]->_prefetch, 10, (font_height+_vertical_gap)*count, font_height, font_height+10);
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+				g->SetColor(_fg_color);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 			}
 		} else if (_items[i]->GetType() == CHECK_MENU_ITEM) {
 			if (_items[i]->IsSelected() == true) {
 				g->DrawImage(prefetch, 10, 5+(font_height+_vertical_gap)*count, font_height, font_height);
 			}
 
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+			g->SetColor(_fg_color);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 		}
 
 		if (_items[i]->GetEnabled() == false) {
 			g->SetDrawingFlags(DF_BLEND);
 			g->SetColor(0x00, 0x00, 0x00, 0x80);
-			g->FillRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10);
+			g->FillRectangle(0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 			g->SetDrawingFlags(DF_NOFX);
 		}
 
 		if (_tree != NULL) {
 			if (_tree->_list->_items[i]->_childs.size() > 0) {
-				int dx = _width-font_height/2-4,
+				int dx = _size.width-font_height/2-4,
 					dy = (font_height+_vertical_gap)*count+5;
 
 				g->SetColor(0x80, 0x80, 0xe0, 0xff);
@@ -564,8 +568,8 @@ void TreeComponent::Paint(Graphics *g)
 	}
 
 	for (; count<_visible_items; count++) {
-		g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-		g->FillRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10);
+		g->SetColor(_item_color);
+		g->FillRectangle(0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 	}
 }
 

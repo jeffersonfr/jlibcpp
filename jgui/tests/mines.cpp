@@ -88,28 +88,28 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 		if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
 			if (current_col < max_cols-1) {
 				current_col++;
-				slide->SetPosition(bx+_x+current_col*(size+delta), by+_y+current_row*(size+delta));
+				slide->SetPosition(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
 			if (current_col > 0) {
 				current_col--;
-				slide->SetPosition(bx+_x+current_col*(size+delta), by+_y+current_row*(size+delta));
+				slide->SetPosition(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_UP) {
 			if (current_row > 0) {
 				current_row--;
-				slide->SetPosition(bx+_x+current_col*(size+delta), by+_y+current_row*(size+delta));
+				slide->SetPosition(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
 			if (current_row < max_rows-1) {
 				current_row++;
-				slide->SetPosition(bx+_x+current_col*(size+delta), by+_y+current_row*(size+delta));
+				slide->SetPosition(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_ENTER) {
 			UpdateBoard(1);
 		} else if (event->GetSymbol() == jgui::JKEY_RED || event->GetSymbol() == jgui::JKEY_F1) {
 		} else if (event->GetSymbol() == jgui::JKEY_GREEN || event->GetSymbol() == jgui::JKEY_F2) {
-			jgui::MessageDialog dialog("Ajuda", "O jogo termina quando todos os blocos que n\xe3o possuem minas s\xe3o revelados. Utilize as bandeirinhas para ajudar na identificac\xe3o das minas escondidas.", _x+300, _y+200);
+			jgui::MessageDialog dialog("Ajuda", "O jogo termina quando todos os blocos que n\xe3o possuem minas s\xe3o revelados. Utilize as bandeirinhas para ajudar na identificac\xe3o das minas escondidas.", GetX()+300, GetY()+200);
 
 			dialog.Show();
 		} else if (event->GetSymbol() == jgui::JKEY_YELLOW || event->GetSymbol() == jgui::JKEY_F3) {
@@ -121,8 +121,8 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 		if (GetResult() != 0) {
 			if (GetResult() == 1) {
 				graphics->SetColor(0x00, 0x00, 0x00, 0xff);
-				graphics->DrawString("Parabens", _width-190, 100);
-				graphics->DrawImage("icons/flag2.png", _width-190, 180, 160, 140);
+				graphics->DrawString("Parabens", GetWidth()-190, 100);
+				graphics->DrawImage("icons/flag2.png", GetWidth()-190, 180, 160, 140);
 
 				Flip();
 
@@ -138,8 +138,8 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 				}
 			} else if (GetResult() == 2) {
 				graphics->SetColor(0x00, 0x00, 0x00, 0xff);
-				graphics->DrawString("Perdeu", _width-160, 100);
-				graphics->DrawImage("icons/flag3.png", _width-190, 180, 160, 140);
+				graphics->DrawString("Perdeu", GetWidth()-160, 100);
+				graphics->DrawImage("icons/flag3.png", GetWidth()-190, 180, 160, 140);
 
 				Flip();
 
@@ -218,14 +218,14 @@ void Mines::InitializeFlags()
 
 void Mines::SetupBoard()
 {
-	slide->SetPosition(bx+_x, by+_y);
+	slide->SetPosition(bx+GetX(), by+GetY());
 
 	if (graphics == NULL) {
 		return;
 	}
 
-	graphics->DrawImage("icons/flag2.png", _width-190, 180, 160, 140);
-	graphics->DrawImage("icons/bomb2.png", _width-180, 400, 160, 140);
+	graphics->DrawImage("icons/flag2.png", GetWidth()-190, 180, 160, 140);
+	graphics->DrawImage("icons/bomb2.png", GetWidth()-180, 400, 160, 140);
 
 	InitializeFlags();
 
@@ -505,8 +505,8 @@ void Mines::UpdateBoard(int flag)
 	}
 
 	// INFO:: show number of marked bombs
-	int x = _width-180,
-			y = _height-250,
+	int x = GetWidth()-180,
+			y = GetHeight()-250,
 			w = 100,
 			h = 50;
 	char tmp[255];

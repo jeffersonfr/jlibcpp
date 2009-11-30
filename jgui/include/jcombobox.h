@@ -179,25 +179,25 @@ class ComboMenu : public jgui::Frame, public jgui::FrameInputListener{
 		 * \brief
 		 *
 		 */
-		uint32_t GetItemColor();
+		jcolor_t GetItemColor();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetItemColor(uint32_t color);
+		void SetItemColor(jcolor_t color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetForegroundColor(uint32_t color);
+		void SetForegroundColor(jcolor_t color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetBackgroundColor(uint32_t color);
+		void SetBackgroundColor(jcolor_t color);
 		
 		/**
 		 * \brief
@@ -266,10 +266,7 @@ class ComboMenuComponent : public Component{
 			_paint_count,
 			_vertical_gap,
 			_horizontal_gap;
-		int _item_red,
-			_item_green,
-			_item_blue,
-			_item_alpha;
+		jcolor_t _item_color;
 		float delta;
 		bool _input_locked,
 			 _arrows_visible,
@@ -382,13 +379,13 @@ class ComboMenuComponent : public Component{
 		 * \brief
 		 *
 		 */
-		uint32_t GetItemColor();
+		jcolor_t GetItemColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetItemColor(uint32_t color);
+		void SetItemColor(jcolor_t color);
 		
 		/**
 		 * \brief

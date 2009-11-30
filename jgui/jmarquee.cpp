@@ -98,14 +98,14 @@ void Marquee::Run()
 		}
 
 		if (_type == BOUNCE_TEXT) {
-			if (_width < string_width) {
+			if (_size.width < string_width) {
 			} else {
 				if (_position <= _fixe_delta) {
 					_delta = -_fixe_delta;
 					_position = _fixe_delta;
-				} else if ((_position+string_width) >= (_width-_fixe_delta)) {
+				} else if ((_position+string_width) >= (_size.width-_fixe_delta)) {
 					_delta = _fixe_delta;
-					_position = _width-string_width-_fixe_delta;
+					_position = _size.width-string_width-_fixe_delta;
 				}
 
 				_position -= _delta;
@@ -116,7 +116,7 @@ void Marquee::Run()
 			if (_position <= _delta) {
 				if (_index >= (int)full_text.size()) {
 					_index = 0;
-					_position = _width - _delta;
+					_position = _size.width - _delta;
 				} else {
 					_position = _delta;
 					_index++;
@@ -167,19 +167,19 @@ void Marquee::Paint(Graphics *g)
 		g->SetFont(_font);
 
 		if (_type == LOOP_TEXT) {
-			g->SetClip(0, 0, _width-2*_fixe_delta, _height);
+			g->SetClip(0, 0, _size.width-2*_fixe_delta, _size.height);
 		}
 
 		if (_type == BOUNCE_TEXT) {
-			if (_width < string_width) {
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+			if (_size.width < string_width) {
+				g->SetColor(_fg_color);
 				g->DrawString((char *)(full_text.c_str()+_index), _fixe_delta, (CENTER_VERTICAL_TEXT));
 			} else {
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+				g->SetColor(_fg_color);
 				g->DrawString((char *)(full_text.c_str()), _position, (CENTER_VERTICAL_TEXT));
 			}
 		} else {
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+			g->SetColor(_fg_color);
 			g->DrawString((char *)(full_text.c_str()+_index), _position, (CENTER_VERTICAL_TEXT));
 		}
 
@@ -192,7 +192,7 @@ void Marquee::Paint(Graphics *g)
 	
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _width, _height);
+		FillRectangle(g, 0, 0, _size.width, _size.height);
 	}
 }
 

@@ -35,10 +35,10 @@ ImageButton::ImageButton(std::string image, std::string label, int x, int y, int
 	prefetch2 = NULL;
 
 	if (_image != "") {
-		prefetch1 = new OffScreenImage(_width, _height);
+		prefetch1 = new OffScreenImage(_size.width, _size.height);
 		
 		if (prefetch1->GetGraphics() != NULL) {
-			prefetch1->GetGraphics()->DrawImage(_image, 0, 0, _width, _height);
+			prefetch1->GetGraphics()->DrawImage(_image, 0, 0, _size.width, _size.height);
 		}
 	}
 }
@@ -56,27 +56,27 @@ ImageButton::~ImageButton()
 
 void ImageButton::SetSize(int w, int h)
 {
-	if (_width == w && _height == h) {
+	if (_size.width == w && _size.height == h) {
 		return;
 	}
 
-	_width = w;
-	_height = h;
+	_size.width = w;
+	_size.height = h;
 
-	if (_width < _minimum_width) {
-		_width = _minimum_width;
+	if (_size.width < _minimum_size.width) {
+		_size.width = _minimum_size.width;
 	}
 
-	if (_height < _minimum_height) {
-		_height = _minimum_height;
+	if (_size.height < _minimum_size.height) {
+		_size.height = _minimum_size.height;
 	}
 
-	if (_width > _maximum_width) {
-		_width = _maximum_width;
+	if (_size.width > _maximum_size.width) {
+		_size.width = _maximum_size.width;
 	}
 
-	if (_height > _maximum_height) {
-		_height = _maximum_height;
+	if (_size.height > _maximum_size.height) {
+		_size.height = _maximum_size.height;
 	}
 
 	if (_image != "") {
@@ -84,11 +84,11 @@ void ImageButton::SetSize(int w, int h)
 			delete prefetch1;
 		}
 
-		prefetch1 = new OffScreenImage(_width, _height);
+		prefetch1 = new OffScreenImage(_size.width, _size.height);
 		
 		if (prefetch1->GetGraphics() != NULL) {
 			prefetch1->GetGraphics()->Clear();
-			prefetch1->GetGraphics()->DrawImage(_image, 0, 0, _width, _height);
+			prefetch1->GetGraphics()->DrawImage(_image, 0, 0, _size.width, _size.height);
 		}
 	}
 	
@@ -98,10 +98,10 @@ void ImageButton::SetSize(int w, int h)
 				delete prefetch2;
 			}
 
-			prefetch2 = new OffScreenImage(_width, _height);
+			prefetch2 = new OffScreenImage(_size.width, _size.height);
 
 			if (prefetch2->GetGraphics() != NULL) {
-				prefetch2->GetGraphics()->DrawImage(_image_focus, 0, 0, _width, _height);
+				prefetch2->GetGraphics()->DrawImage(_image_focus, 0, 0, _size.width, _size.height);
 			}
 		}
 	}
@@ -118,11 +118,11 @@ void ImageButton::SetImage(std::string image)
 			delete prefetch1;
 		}
 
-		prefetch1 = new OffScreenImage(_width, _height);
+		prefetch1 = new OffScreenImage(_size.width, _size.height);
 		
 		if (prefetch1->GetGraphics() != NULL) {
 			prefetch1->GetGraphics()->Clear();
-			prefetch1->GetGraphics()->DrawImage(_image, 0, 0, _width, _height);
+			prefetch1->GetGraphics()->DrawImage(_image, 0, 0, _size.width, _size.height);
 		}
 	}
 }
@@ -136,10 +136,10 @@ void ImageButton::SetImageFocus(std::string image)
 			delete prefetch2;
 		}
 
-		prefetch2 = new OffScreenImage(_width, _height);
+		prefetch2 = new OffScreenImage(_size.width, _size.height);
 		
 		if (prefetch2->GetGraphics() != NULL) {
-			prefetch2->GetGraphics()->DrawImage(_image_focus, 0, 0, _width, _height);
+			prefetch2->GetGraphics()->DrawImage(_image_focus, 0, 0, _size.width, _size.height);
 		}
 	}
 }
@@ -162,16 +162,16 @@ void ImageButton::Paint(Graphics *g)
 			if (GetName() == "") {
 				if (_has_focus == true) {
 					if (prefetch2 != NULL) {
-						g->DrawImage(prefetch2, 0, 0, _width, _height);
+						g->DrawImage(prefetch2, 0, 0, _size.width, _size.height);
 					} else {
-						g->DrawImage(prefetch1, 0, 0, _width, _height);
+						g->DrawImage(prefetch1, 0, 0, _size.width, _size.height);
 					}
 				} else {
-					g->DrawImage(prefetch1, 0, 0, _width, _height);
+					g->DrawImage(prefetch1, 0, 0, _size.width, _size.height);
 				}
 			} else {
-				g->DrawImage(prefetch1, 0, 0, _height, _height);
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+				g->DrawImage(prefetch1, 0, 0, _size.height, _size.height);
+				g->SetColor(_fg_color);
 
 				int gap = _horizontal_gap+_border_size;
 
@@ -183,10 +183,10 @@ void ImageButton::Paint(Graphics *g)
 					gap = 0;
 				}
 
-				g->DrawString(TruncateString(GetName(), _width-2*gap), _height+gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, LEFT_ALIGN);
+				g->DrawString(TruncateString(GetName(), _size.width-2*gap), _size.height+gap/2, (CENTER_VERTICAL_TEXT), _size.width-gap, _size.height, LEFT_ALIGN);
 			}
 		} else {
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+			g->SetColor(_fg_color);
 
 			int gap = _horizontal_gap+_border_size;
 
@@ -194,7 +194,7 @@ void ImageButton::Paint(Graphics *g)
 				gap = 0;
 			}
 
-			g->DrawString(TruncateString(GetName(), _width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, _align);
+			g->DrawString(TruncateString(GetName(), _size.width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _size.width-gap, _size.height, _align);
 		}
 	}
 
@@ -202,7 +202,7 @@ void ImageButton::Paint(Graphics *g)
 
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _width, _height);
+		FillRectangle(g, 0, 0, _size.width, _size.height);
 	}
 }
 

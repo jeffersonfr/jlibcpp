@@ -54,10 +54,10 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_resize_enabled = false;
 	_frame_buttons = (int)(FB_MAXIMIZE | FB_RELEASE);
 	
-	_old_x = _x;
-	_old_y = _y;
-	_old_width = _width;
-	_old_height = _height;
+	_old_x = _location.x;
+	_old_y = _location.y;
+	_old_width = _size.width;
+	_old_height = _size.height;
 
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();
 
@@ -284,10 +284,10 @@ void Frame::Maximize()
 {
 	_is_maximized = true;
 
-	_old_x = _x;
-	_old_y = _y;
-	_old_width = _width;
-	_old_height = _height;
+	_old_x = _location.x;
+	_old_y = _location.y;
+	_old_width = _size.width;
+	_old_height = _size.height;
 
 	SetBounds(0, 0, _scale_width, _scale_height);
 }
@@ -311,7 +311,7 @@ void Frame::Paint(Graphics *g)
 
 	if (_title != "") {
 		g->SetColor(0xf0, 0xf0, 0xf0, 0x80);
-		g->FillRectangle(_insets.left, _insets.top-10, _width-_insets.left-_insets.right, 5);
+		g->FillRectangle(_insets.left, _insets.top-10, _size.width-_insets.left-_insets.right, 5);
 
 		if (IsFontSet() == true) {
 			int font_height = _font->GetHeight(),
@@ -321,9 +321,9 @@ void Frame::Paint(Graphics *g)
 				dy = 0;
 			}
 
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+			g->SetColor(_fg_color);
 			// g->DrawString(_title, 0, dy, _width, _height, 1);
-			g->DrawString(_title, (_width-_font->GetStringWidth(_title))/2, dy);
+			g->DrawString(_title, (_size.width-_font->GetStringWidth(_title))/2, dy);
 		}
 	}
 
@@ -342,8 +342,8 @@ void Frame::Paint(Graphics *g)
 			if (IsFontSet() == true) {
 				count += _font->GetStringWidth((*i).subtitle.c_str());
 
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawString((*i).subtitle, _width-count, _height-_font->GetHeight()-10);
+				g->SetColor(_fg_color);
+				g->DrawString((*i).subtitle, _size.width-count, _size.height-_font->GetHeight()-10);
 			}
 
 			count += 10;
@@ -351,7 +351,7 @@ void Frame::Paint(Graphics *g)
 			if ((*i).image != "") {
 				count += 40;
 
-				g->DrawImage((char *)(*i).image.c_str(), _width-count, _height-55, 45, 40);
+				g->DrawImage((char *)(*i).image.c_str(), _size.width-count, _size.height-55, 45, 40);
 			}
 
 			count += 20;
@@ -364,14 +364,14 @@ void Frame::Paint(Graphics *g)
 		g->SetBlittingFlags(BF_ALPHACHANNEL);
 
 		// if ((_frame_buttons & FB_RELEASE) != 0) { 
-			g->DrawImage("./icons/close.png", _width-_insets.right-s, 15, s, s);
+			g->DrawImage("./icons/close.png", _size.width-_insets.right-s, 15, s, s);
 		// }
 
 		if (_resize_enabled == true && (_frame_buttons & FB_MAXIMIZE) != 0) { 
 			if (_is_maximized == false) {
-				g->DrawImage("./icons/maximize.png", _width-_insets.right-2*s-10, 15, s, s);
+				g->DrawImage("./icons/maximize.png", _size.width-_insets.right-2*s-10, 15, s, s);
 			} else {
-				g->DrawImage("./icons/restore.png", _width-_insets.right-2*s-10, 15, s, s);
+				g->DrawImage("./icons/restore.png", _size.width-_insets.right-2*s-10, 15, s, s);
 			}
 		}
 	}
@@ -445,8 +445,8 @@ void Frame::MousePressed(MouseEvent *event)
 	if (event->GetButton() == JBUTTON_BUTTON1) {
 		int s = _insets.top-30;
 
-		if ((event->GetY() > _y && event->GetY() < (_y+_insets.top))) {
-			if (event->GetX() > _x && event->GetX() < (_x+_width-_insets.right-2*s-20)) {
+		if ((event->GetY() > _location.y && event->GetY() < (_location.y+_insets.top))) {
+			if (event->GetX() > _location.x && event->GetX() < (_location.x+_size.width-_insets.right-2*s-20)) {
 				if (_move_enabled == true && _is_maximized == false) {
 					_default_cursor = GetCursor();
 					SetCursor(SIZEALL_CURSOR);
@@ -457,7 +457,7 @@ void Frame::MousePressed(MouseEvent *event)
 				}
 			} else {
 				// INFO:: para impedir essas acoes soh eh preciso desabilitar os eventos do mouse
-				if ((_frame_buttons & FB_MAXIMIZE) != 0 && event->GetX() < (_x+_width-_insets.right-s-10)) {
+				if ((_frame_buttons & FB_MAXIMIZE) != 0 && event->GetX() < (_location.x+_size.width-_insets.right-s-10)) {
 					if (_resize_enabled == true) {
 						if (_is_maximized == true) {
 							Restore();
@@ -465,44 +465,44 @@ void Frame::MousePressed(MouseEvent *event)
 							Maximize();
 						}
 					}
-				} else if ((_frame_buttons & FB_RELEASE) != 0 && event->GetX() < (_x+_width-_insets.right)) {
+				} else if ((_frame_buttons & FB_RELEASE) != 0 && event->GetX() < (_location.x+_size.width-_insets.right)) {
 					Release();
 				}
 			}
-		} else if (event->GetX() > (_x+_width-_insets.right) && _resize_enabled == true && _is_maximized == false) {
-			if (event->GetY() > (_y+_height-_insets.bottom)) {
+		} else if (event->GetX() > (_location.x+_size.width-_insets.right) && _resize_enabled == true && _is_maximized == false) {
+			if (event->GetY() > (_location.y+_size.height-_insets.bottom)) {
 				_default_cursor = GetCursor();
 				SetCursor(SIZECORNER_CURSOR);
 
 				_mouse_state = 2; // both resize
 				_relative_mouse_x = event->GetX()-GetX();
 				_relative_mouse_y = event->GetY()-GetY();
-				_relative_mouse_w = GetWidth();
-				_relative_mouse_h = GetHeight();
-			} else if (event->GetX() < (_x+_width)) {
+				_relative_mouse_w = _size.width;
+				_relative_mouse_h = _size.height;
+			} else if (event->GetX() < (_location.x+_size.width)) {
 				_default_cursor = GetCursor();
 				SetCursor(SIZEWE_CURSOR);
 
 				_mouse_state = 3; // horizontal resize
 				_relative_mouse_x = event->GetX()-GetX();
 				_relative_mouse_y = event->GetY()-GetY();
-				_relative_mouse_w = GetWidth();
-				_relative_mouse_h = GetHeight();
+				_relative_mouse_w = _size.width;
+				_relative_mouse_h = _size.height;
 			}
-		} else if (event->GetY() > (_y+_height-_insets.bottom) && _resize_enabled == true && _is_maximized == false) {
-			if (event->GetY() < (_y+_height)) {
+		} else if (event->GetY() > (_location.y+_size.height-_insets.bottom) && _resize_enabled == true && _is_maximized == false) {
+			if (event->GetY() < (_location.y+_size.height)) {
 				_default_cursor = GetCursor();
 				SetCursor(SIZENS_CURSOR);
 
 				_mouse_state = 4; // vertical resize
 				_relative_mouse_x = event->GetX()-GetX();
 				_relative_mouse_y = event->GetY()-GetY();
-				_relative_mouse_w = GetWidth();
-				_relative_mouse_h = GetHeight();
+				_relative_mouse_w = _size.width;
+				_relative_mouse_h = _size.height;
 			}
 		}
 	
-		Component *c = GetTargetComponent(this, event->GetX()-_x, event->GetY()-_y);
+		Component *c = GetTargetComponent(this, event->GetX()-_location.x, event->GetY()-_location.y);
 
 		if (c != this) {
 			c->ProcessEvent(event);

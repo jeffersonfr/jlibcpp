@@ -61,7 +61,7 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 			}
 	}
 
-	_width -= 20;
+	_size.width -= 20;
 
 	_show_text = text_visible;
 	_shift_pressed = false;

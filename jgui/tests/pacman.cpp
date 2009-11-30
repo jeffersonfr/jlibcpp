@@ -220,10 +220,10 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 
 		g = GetGraphics();
 		
-		d.x = _x;
-		d.y = _y;
-		d.w = _width;
-		d.h = _height;
+		d.x = GetX();
+		d.y = GetY();
+		d.w = GetWidth();
+		d.h = GetHeight();
 
 		SetBackgroundColor(0x00, 0x00, 0x00, 0xff);
 		
@@ -681,7 +681,7 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 		
 		goff->SetFont(GetFont());
 		goff->SetColor(96, 128, 255, 0xff);
-		goff->DrawString(tmp, _width-180, scrsize+16);
+		goff->DrawString(tmp, GetWidth()-180, scrsize+16);
 
 		for (i=0; i<pacsleft; i++) {
 			goff->DrawImage(pacman_bmp, 1*blocksize, 1*blocksize, blocksize, blocksize, i*(blocksize+4)+8, scrsize+10, blocksize, blocksize);
@@ -750,7 +750,7 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 
 int main()
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 32));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/comic.ttf", 0, 32));
 
 	PacMan p;
 

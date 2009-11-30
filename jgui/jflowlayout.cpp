@@ -146,9 +146,9 @@ int FlowLayout::MoveComponents(Container *target, int x, int y, int width, int h
 			}
 
 			if (ltr) {
-				m->SetPosition(x, cy);
+				m->SetLocation(x, cy);
 			} else {
-				m->SetPosition(target->GetWidth() - x - m->GetWidth(), cy);
+				m->SetLocation(target->GetWidth() - x - m->GetWidth(), cy);
 			}
 
 			x += m->GetWidth() + _hgap;
@@ -173,7 +173,7 @@ jsize_t FlowLayout::GetMinimumLayoutSize(Container *target)
 		Component *m = target->GetComponents()[i];
 
 		if (m->IsVisible()) {
-			jsize_t d = {m->GetMinimumWidth(), m->GetMinimumHeight()};
+			jsize_t d = m->GetMinimumSize();
 
 			t.height = std::max(t.height, d.height);
 
@@ -230,7 +230,7 @@ jsize_t FlowLayout::GetPreferredLayoutSize(Container *target)
 		Component *m = target->GetComponents()[i];
 
 		if (m->IsVisible()) {
-			jsize_t d = {m->GetMinimumWidth(), m->GetMinimumHeight()};
+			jsize_t d = m->GetMinimumSize();
 
 			t.height = std::max(t.height, d.height);
 
@@ -290,14 +290,13 @@ void FlowLayout::DoLayout(Container *target)
 		Component *m = target->GetComponents()[i];
 
 		if (m->IsVisible() == true) {
-			int pwidth = m->GetPreferredWidth(),
-					pheight = m->GetPreferredHeight();
+			jsize_t psize = m->GetPreferredSize();
 
-			m->SetSize(pwidth, pheight);
+			m->SetSize(psize.width, psize.height);
 
 			if (useBaseline) {
 				/* TODO:: implementar
-					 int baseline = m->GetBaseline(pwidth, pheight);
+					 int baseline = m->GetBaseline(psize.width, psize.height);
 
 					 if (baseline >= 0) {
 					 ascent[i] = baseline;
@@ -308,17 +307,17 @@ void FlowLayout::DoLayout(Container *target)
 					 */
 			}
 
-			if ((x == 0) || ((x + pwidth) <= maxwidth)) {
+			if ((x == 0) || ((x + psize.width) <= maxwidth)) {
 				if (x > 0) {
 					x += _hgap;
 				}
-				x += pwidth;
-				rowh = std::max(rowh, pheight);
+				x += psize.width;
+				rowh = std::max(rowh, psize.height);
 			} else {
 				rowh = MoveComponents(target, insets.left + _hgap, y, maxwidth - x, rowh, start, i, ltr, useBaseline, ascent, descent);
-				x = pwidth;
+				x = psize.width;
 				y += _vgap + rowh;
-				rowh = pheight;
+				rowh = psize.height;
 				start = i;
 			}
 		}

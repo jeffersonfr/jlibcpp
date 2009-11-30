@@ -68,12 +68,12 @@ void ScrollBar::SetStoneSize(int size)
 	_stone_size = size;
 
 	if (_type == LEFT_RIGHT_SCROLL) {
-		if (_stone_size > (_width-2*_arrows_size)/2) {
-			_stone_size = (_width-2*_arrows_size)/2;
+		if (_stone_size > (_size.width-2*_arrows_size)/2) {
+			_stone_size = (_size.width-2*_arrows_size)/2;
 		}
 	} else if (_type == BOTTOM_UP_SCROLL) {
-		if (_stone_size > (_height-2*_arrows_size)/2) {
-			_stone_size = (_height-2*_arrows_size)/2;
+		if (_stone_size > (_size.height-2*_arrows_size)/2) {
+			_stone_size = (_size.height-2*_arrows_size)/2;
 		}
 	}
 
@@ -89,12 +89,12 @@ void ScrollBar::SetArrowsSize(int size)
 	_arrows_size = size;
 
 	if (_type == LEFT_RIGHT_SCROLL) {
-		if (_arrows_size > _width/2) {
-			_arrows_size = _width/2;
+		if (_arrows_size > _size.width/2) {
+			_arrows_size = _size.width/2;
 		}
 	} else if (_type == BOTTOM_UP_SCROLL) {
-		if (_arrows_size > _height/2) {
-			_arrows_size = _height/2;
+		if (_arrows_size > _size.height/2) {
+			_arrows_size = _size.height/2;
 		}
 	}
 
@@ -214,30 +214,30 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 		RequestFocus();
 
 		if (_type == LEFT_RIGHT_SCROLL) {
-			if (y1 > _y && y1 < (_y+_height)) {
-				double d = (_position*(_width-_stone_size-2*_arrows_size-20))/100.0;
+			if (y1 > _location.y && y1 < (_location.y+_size.height)) {
+				double d = (_position*(_size.width-_stone_size-2*_arrows_size-20))/100.0;
 
-				if (x1 > (_x+dx) && x1 < (_x+_arrows_size+dx)) {
+				if (x1 > (_location.x+dx) && x1 < (_location.x+_arrows_size+dx)) {
 					SetPosition(_position-_minimum_tick);
-				} else if (x1 > (_x+_width-_arrows_size-dx) && x1 < (_x+_width-dx)) {
+				} else if (x1 > (_location.x+_size.width-_arrows_size-dx) && x1 < (_location.x+_size.width-dx)) {
 					SetPosition(_position+_minimum_tick);
-				} else if (x1 > (_x+_arrows_size+dx) && x1 < (_x+_arrows_size+dx+(int)d)) {
+				} else if (x1 > (_location.x+_arrows_size+dx) && x1 < (_location.x+_arrows_size+dx+(int)d)) {
 					SetPosition(_position-_maximum_tick);
-				} else if (x1 > (_x+_arrows_size+dx+(int)d+_stone_size) && x1 < (_x+_width-_arrows_size)) {
+				} else if (x1 > (_location.x+_arrows_size+dx+(int)d+_stone_size) && x1 < (_location.x+_size.width-_arrows_size)) {
 					SetPosition(_position+_maximum_tick);
 				}
 			}
 		} else if (_type == BOTTOM_UP_SCROLL) {
-			if (x1 > _x && x1 < (_x+_width)) {
-				double d = (_position*(_height-_stone_size-2*_arrows_size-20))/100.0;
+			if (x1 > _location.x && x1 < (_location.x+_size.width)) {
+				double d = (_position*(_size.height-_stone_size-2*_arrows_size-20))/100.0;
 
-				if (y1 > (_y+dy) && y1 < (_y+_arrows_size+dy)) {
+				if (y1 > (_location.y+dy) && y1 < (_location.y+_arrows_size+dy)) {
 					SetPosition(_position-_minimum_tick);
-				} else if (y1 > (_y+_height-_arrows_size-dy) && y1 < (_y+_height-dy)) {
+				} else if (y1 > (_location.y+_size.height-_arrows_size-dy) && y1 < (_location.y+_size.height-dy)) {
 					SetPosition(_position+_minimum_tick);
-				} else if (y1 > (_y+_arrows_size+dy) && y1 < (_y+_arrows_size+dy+(int)d)) {
+				} else if (y1 > (_location.y+_arrows_size+dy) && y1 < (_location.y+_arrows_size+dy+(int)d)) {
 					SetPosition(_position-_maximum_tick);
-				} else if (y1 > (_y+_arrows_size+dy+(int)d+_stone_size) && y1 < (_y+_height-_arrows_size)) {
+				} else if (y1 > (_location.y+_arrows_size+dy+(int)d+_stone_size) && y1 < (_location.y+_size.height-_arrows_size)) {
 					SetPosition(_position+_maximum_tick);
 				}
 			}
@@ -313,48 +313,49 @@ void ScrollBar::Paint(Graphics *g)
 			_count_paint = 1;
 		}
 
+		jcolor_t color;
+
+		color.red = 0x80;
+		color.green = 0x80;
+		color.blue = 0xe0;
+		color.alpha = 0xff;
+
 		{
 			if (_type == LEFT_RIGHT_SCROLL) {
-				double d = (_position*(_width-_stone_size-2*_arrows_size-20))/100.0;
+				double d = (_position*(_size.width-_stone_size-2*_arrows_size-20))/100.0;
 
-				if (d > (_width-(_arrows_size+10))) {
-					d = _width-(_arrows_size+10);
+				if (d > (_size.width-(_arrows_size+10))) {
+					d = _size.width-(_arrows_size+10);
 				}
 
-				g->SetColor(0x80, 0x80, 0xe0, 0xff);
-				g->FillRectangle((int)(d)+_arrows_size+10, 0, _stone_size, _height);
+				g->SetColor(color);
+				g->FillRectangle((int)(d)+_arrows_size+10, 0, _stone_size, _size.height);
 
-				int dx = _width-_arrows_size-4,
+				int dx = _size.width-_arrows_size-4,
 					dy = 5;
 
-				g->SetColor(0x80, 0x80, 0xe0, 0xff);
-				g->FillTriangle(dx+0, dy+0, dx+_arrows_size, dy+_height/2-5, dx+0, dy+_height-10);
-
+				g->SetColor(_fg_color);
+				g->FillTriangle(dx+0, dy+0, dx+_arrows_size, dy+_size.height/2-5, dx+0, dy+_size.height-10);
 				dx = 4;
-
-				g->SetColor(0x80, 0x80, 0xe0, 0xff);
-				g->FillTriangle(dx+0, dy+_height/2-5, dx+_arrows_size, dy+0, dx+_arrows_size, dy+_height-10);
+				g->FillTriangle(dx+0, dy+_size.height/2-5, dx+_arrows_size, dy+0, dx+_arrows_size, dy+_size.height-10);
 			} else if (_type == BOTTOM_UP_SCROLL) {
-				double d = (_position*(_height-_stone_size-2*_arrows_size-20))/100.0;
+				double d = (_position*(_size.height-_stone_size-2*_arrows_size-20))/100.0;
 
 				// WARN:: verificar se naum eh _stone_size
-				if (d > (_height-(_arrows_size+10))) {
-					d = _height-(_arrows_size+10);
+				if (d > (_size.height-(_arrows_size+10))) {
+					d = _size.height-(_arrows_size+10);
 				}
 
-				g->SetColor(0x80, 0x80, 0xe0, 0xff);
-				g->FillRectangle((int)0, (int)(d)+_arrows_size+10, _width, _stone_size);
+				g->SetColor(color);
+				g->FillRectangle((int)0, (int)(d)+_arrows_size+10, _size.width, _stone_size);
 
 				int dx = 4,
 					dy = 8;
 
-				g->SetColor(0x80, 0x80, 0xe0, 0xff);
-				g->FillTriangle(dx, dy+_arrows_size, dx+(_width-2*dx)/2, dy, dx+(_width-2*dx), dy+_arrows_size);
-
-				dy = _height-_arrows_size-5;
-
-				g->SetColor(0x80, 0x80, 0xe0, 0xff);
-				g->FillTriangle(dx, dy+0, dx+(_width-2*dx), dy+0, dx+(_width-2*dx)/2, dy+_arrows_size-4);
+				g->SetColor(_fg_color);
+				g->FillTriangle(dx, dy+_arrows_size, dx+(_size.width-2*dx)/2, dy, dx+(_size.width-2*dx), dy+_arrows_size);
+				dy = _size.height-_arrows_size-5;
+				g->FillTriangle(dx, dy+0, dx+(_size.width-2*dx), dy+0, dx+(_size.width-2*dx)/2, dy+_arrows_size-4);
 			}
 		}
 	}
@@ -363,7 +364,7 @@ void ScrollBar::Paint(Graphics *g)
 
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _width, _height);
+		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
 }
 

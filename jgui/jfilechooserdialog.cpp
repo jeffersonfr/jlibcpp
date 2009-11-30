@@ -44,7 +44,7 @@ FileChooserDialog::FileChooserDialog(std::string title, std::string directory, i
 {
 	jcommon::Object::SetClassName("jgui::FileChooserDialog");
 
-	list = new jgui::ListBox(_insets.left, _insets.top, _width-_insets.left-_insets.right, 10);
+	list = new jgui::ListBox(_insets.left, _insets.top, _size.width-_insets.left-_insets.right, 10);
 
 	_base_dir = directory;
 	_current_dir = directory;
@@ -59,8 +59,8 @@ FileChooserDialog::FileChooserDialog(std::string title, std::string directory, i
 		label = NULL;
 		file = NULL;
 	} else if (_type == SAVE_FILE_DIALOG) {
-		label = new jgui::Label("File name", _insets.left, list->GetY()+list->GetHeight()+10, _width-_insets.left-_insets.right, 45);
-		file = new jgui::TextField(_insets.left, label->GetY()+label->GetHeight()+10, _width-_insets.left-_insets.right, 45);
+		label = new jgui::Label("File name", _insets.left, list->GetY()+list->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
+		file = new jgui::TextField(_insets.left, label->GetY()+label->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
 
 		label->SetBackgroundVisible(false);
 		label->SetBorder(NONE_BORDER);

@@ -38,8 +38,13 @@ Component::Component(int x, int y, int width, int height):
 	_font = Graphics::GetDefaultFont();
 	// _font = new Font("./fonts/font.ttf", 0, 16);
 
-	_width = 0;
-	_height = 0;
+	_location.x = 0;
+	_location.y = 0;
+	_size.width = 0;
+	_size.height = 0;
+
+	_background_visible = true;
+	_truncate_string = true;
 	_theme_enabled = true;
 	_is_valid = true;
 	_is_opaque = true;
@@ -49,36 +54,43 @@ Component::Component(int x, int y, int width, int height):
 	_has_focus = false;
 	_ignore_repaint = false;
 	
-	_minimum_width = 0;
-	_minimum_height = 0;
-	_maximum_width = 1920;
-	_maximum_height = 1080;
-	_preferred_width = 100;
-	_preferred_height = 50;
 	_parent = NULL;
 	_left = NULL;
 	_right = NULL;
 	_up = NULL;
 	_down = NULL;
-	_truncate_string = true;
-	_background_visible = true;
-	_border = BEVEL_BORDER;
 	_border_size = 1;
-	_border_red = 0x00;
-	_border_green = 0x00;
-	_border_blue = 0x00;
-	_border_alpha = 0x00;
-	_borderfocus_red = 0xf0;
-	_borderfocus_green = 0xf0;
-	_borderfocus_blue = 0xf0;
-	_borderfocus_alpha = 0xff;
+	_border = BEVEL_BORDER;
 	_gradient_level = 0x40;
 	_vertical_gap = 10;
 	_horizontal_gap = 10;
 	_alignment_x = CENTER_ALIGNMENT;
 	_alignment_y = CENTER_ALIGNMENT;
 
-	SetPosition(x, y);
+	_minimum_size.width = 0;
+	_minimum_size.height = 0;
+	_maximum_size.width = 1920;
+	_maximum_size.height = 1080;
+	_preferred_size.width = 100;
+	_preferred_size.height = 40;
+
+	/*
+	_location.x = x;
+	_location.y = y;
+	_size.width = width;
+	_size.height = height;
+	*/
+
+	/*
+	_bg_color;
+	_fg_color;
+	_bgfocus_color;
+	_fgfocus_color;
+	_border_color;
+	_borderfocus_color;
+	*/
+
+	SetLocation(x, y);
 	SetSize(width, height);
 
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();
@@ -205,23 +217,23 @@ void Component::PaintBorder(Graphics *g)
 
 	int xp = 0, 
 			yp = 0,
-			wp = _width-1,
-			hp = _height-1,
+			wp = _size.width-1,
+			hp = _size.height-1,
 			size = _border_size;
-	int dr = _border_red,
-			dg = _border_green,
-			db = _border_blue,
-			da = _border_alpha;
+	int dr = _border_color.red,
+			dg = _border_color.green,
+			db = _border_color.blue,
+			da = _border_color.alpha;
 	int step = 0x20;
 
 	// g->SetColor(_border_red, _border_green, _border_blue, _border_alpha);
 	g->SetLineWidth(1);//_border_size);
 
 	if (HasFocus() == true) {
-		dr = _borderfocus_red;
-		dg = _borderfocus_green;
-		db = _borderfocus_blue;
-		da = _borderfocus_alpha;
+		dr = _borderfocus_color.red;
+		dg = _borderfocus_color.green;
+		db = _borderfocus_color.blue;
+		da = _borderfocus_color.alpha;
 	}
 	
 	if (_border == FLAT_BORDER) {
@@ -272,16 +284,16 @@ void Component::PaintBorder(Graphics *g)
 	} else if (_border == BEVEL_BORDER) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr, dg, db, da);
-			g->DrawBevelRectangle(i, i, _width-2*i, _height-2*i-1);
+			g->DrawBevelRectangle(i, i, _size.width-2*i, _size.height-2*i-1);
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->DrawBevelRectangle(i+2, i+2, _width-2*(i+2), _height-2*(i+2)-1);
+			g->DrawBevelRectangle(i+2, i+2, _size.width-2*(i+2), _size.height-2*(i+2)-1);
 		}
 	} else if (_border == DOWN_BEVEL_BORDER) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->DrawBevelRectangle(i, i, _width-2*i, _height-2*i-1);
+			g->DrawBevelRectangle(i, i, _size.width-2*i, _size.height-2*i-1);
 			g->SetColor(dr, dg, db, da);
-			g->DrawBevelRectangle(i+2, i+2, _width-2*(i+2), _height-2*(i+2)-1);
+			g->DrawBevelRectangle(i+2, i+2, _size.width-2*(i+2), _size.height-2*(i+2)-1);
 		}
 	} else if (_border == ETCHED_BORDER) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
@@ -298,8 +310,8 @@ void Component::Paint(Graphics *g)
 	g->SetFont(_font);
 
 	if (_background_visible == true) {
-		g->SetColor(_bg_red, _bg_green, _bg_blue, _bg_alpha);
-		FillRectangle(g, 0, 0, _width, _height);
+		g->SetColor(_bg_color);
+		FillRectangle(g, 0, 0, _size.width, _size.height);
 	}
 
 	/*
@@ -383,7 +395,7 @@ void Component::Repaint(bool all)
 
 	if (_parent != NULL) {
 		if (all == false && IsOpaque() == true && _parent->IsValid() == true) {
-			_parent->Repaint(this, _x, _y, _width, _height);
+			_parent->Repaint(this, _location.x, _location.y, _size.width, _size.height);
 		} else {
 			_parent->Repaint(true);
 		}
@@ -518,178 +530,188 @@ int Component::CountLines(std::string text, int width, Font *font)
 	return texts.size();
 }
 
-void Component::Move(int x1, int y1)
+void Component::SetMinimumSize(jsize_t size)
 {
-	_x = _x+x1;
-	_y = _y+y1;
+	_minimum_size.width = size.width;
+	_minimum_size.height = size.height;
+
+	if (_minimum_size.width < 0) {
+		_minimum_size.width = 0;
+	}
+
+	if (_minimum_size.height < 0) {
+		_minimum_size.height = 0;
+	}
+
+	if (_minimum_size.width > _maximum_size.width) {
+		_minimum_size.width = _maximum_size.width;
+	}
+
+	if (_minimum_size.height > _maximum_size.height) {
+		_minimum_size.height = _maximum_size.height;
+	}
+
+	if (_size.width < _minimum_size.width || _size.height < _minimum_size.height) {
+		int w = _size.width,
+				h = _size.height;
+
+		if (_size.width < _minimum_size.width) {
+			w = _minimum_size.width;
+		}
+	
+		if (_size.height < _minimum_size.height) {
+			h = _minimum_size.height;
+		}
+
+		SetSize(w, h);
+	}
+}
+
+void Component::SetMaximumSize(jsize_t size)
+{
+	_maximum_size.width = size.width;
+	_maximum_size.height = size.height;
+
+	if (_maximum_size.width > 65535) {
+		_maximum_size.width = 65535;
+	}
+
+	if (_maximum_size.height > 65535) {
+		_maximum_size.height = 65535;
+	}
+
+	if (_minimum_size.width > _maximum_size.width) {
+		_maximum_size.width = _minimum_size.width;
+	}
+
+	if (_minimum_size.height > _maximum_size.height) {
+		_maximum_size.height = _minimum_size.height;
+	}
+
+	if (_size.width > _maximum_size.width || _size.height > _maximum_size.height) {
+		int w = _size.width,
+				h = _size.height;
+
+		if (_size.width > _maximum_size.width) {
+			w = _maximum_size.width;
+		}
+	
+		if (_size.height > _maximum_size.height) {
+			h = _maximum_size.height;
+		}
+
+		SetSize(w, h);
+	}
+}
+
+void Component::SetPreferredSize(jsize_t size)
+{
+	_preferred_size.width = size.width;
+	_preferred_size.height = size.height;
+
+	if (_preferred_size.width < _minimum_size.width) {
+		_preferred_size.width = _minimum_size.width;
+	}
+
+	if (_preferred_size.height < _minimum_size.height) {
+		_preferred_size.height = _minimum_size.height;
+	}
+
+	if (_preferred_size.width > _maximum_size.width) {
+		_preferred_size.width = _maximum_size.width;
+	}
+
+	if (_preferred_size.height > _maximum_size.height) {
+		_preferred_size.height = _maximum_size.height;
+	}
+}
+
+jsize_t Component::GetMinimumSize()
+{
+	return _minimum_size;
+}
+
+jsize_t Component::GetMaximumSize()
+{
+	return _maximum_size;
+}
+
+jsize_t Component::GetPreferredSize()
+{
+	return _preferred_size;
+}
+
+void Component::Move(int x, int y)
+{
+	_location.x = _location.x+x;
+	_location.y = _location.y+y;
 
 	Repaint(true);
 }
 
-void Component::SetMinimumSize(int w, int h)
+void Component::Move(jpoint_t point)
 {
-	_minimum_width = w;
-	_minimum_height = h;
-
-	if (_minimum_width < 0) {
-		_minimum_width = 0;
-	}
-
-	if (_minimum_height < 0) {
-		_minimum_height = 0;
-	}
-
-	if (_minimum_width > _maximum_width) {
-		_minimum_width = _maximum_width;
-	}
-
-	if (_minimum_height > _maximum_height) {
-		_minimum_height = _maximum_height;
-	}
-
-	if (_width < _minimum_width || _height < _minimum_height) {
-		int w = _width,
-			h = _height;
-
-		if (_width < _minimum_width) {
-			w = _minimum_width;
-		}
-	
-		if (_height < _minimum_height) {
-			h = _minimum_height;
-		}
-
-		SetSize(w, h);
-	}
+	Move(point.x, point.y);
 }
 
-void Component::SetMaximumSize(int w, int h)
+void Component::SetBounds(int x, int y, int w, int h)
 {
-	_maximum_width = w;
-	_maximum_height = h;
-
-	if (_maximum_width > 65535) {
-		_maximum_width = 65535;
-	}
-
-	if (_maximum_height > 65535) {
-		_maximum_height = 65535;
-	}
-
-	if (_minimum_width > _maximum_width) {
-		_maximum_width = _minimum_width;
-	}
-
-	if (_minimum_height > _maximum_height) {
-		_maximum_height = _minimum_height;
-	}
-
-	if (_width > _maximum_width || _height > _maximum_height) {
-		int w = _width,
-			h = _height;
-
-		if (_width > _maximum_width) {
-			w = _maximum_width;
-		}
-	
-		if (_height > _maximum_height) {
-			h = _maximum_height;
-		}
-
-		SetSize(w, h);
-	}
+	SetLocation(x, y);
+	SetSize(w, h);
 }
 
-void Component::SetPreferredSize(int w, int h)
+void Component::SetBounds(jpoint_t point, jsize_t size)
 {
-	_preferred_width = w;
-	_preferred_height = h;
-
-	if (_preferred_width < _minimum_width) {
-		_preferred_width = _minimum_width;
-	}
-
-	if (_preferred_height < _minimum_height) {
-		_preferred_height = _minimum_height;
-	}
-
-	if (_preferred_width > _maximum_width) {
-		_preferred_width = _maximum_width;
-	}
-
-	if (_preferred_height > _maximum_height) {
-		_preferred_height = _maximum_height;
-	}
+	SetBounds(point.x, point.y, size.width, size.height);
 }
 
-int Component::GetMinimumWidth()
+void Component::SetBounds(jregion_t region)
 {
-	return _minimum_width;
+	SetBounds(region.x, region.y, region.width, region.height);
 }
 
-int Component::GetMinimumHeight()
+void Component::SetLocation(int x, int y)
 {
-	return _minimum_height;
+	_location.x = x;
+	_location.y = y;
 }
 
-int Component::GetMaximumWidth()
+void Component::SetLocation(jpoint_t point)
 {
-	return _maximum_width;
-}
-
-int Component::GetMaximumHeight()
-{
-	return _maximum_height;
-}
-
-int Component::GetPreferredWidth()
-{
-	return _preferred_width;
-}
-
-int Component::GetPreferredHeight()
-{
-	return _preferred_height;
-}
-
-void Component::SetBounds(int x1, int y1, int w1, int h1)
-{
-	SetPosition(x1, y1);
-	SetSize(w1, h1);
-}
-
-void Component::SetPosition(int x1, int y1)
-{
-	_x = x1;
-	_y = y1;
+	SetLocation(point.x, point.y);
 }
 
 void Component::SetSize(int w, int h)
 {
-	if (_width == w && _height == h) {
+	if (_size.width == w && _size.height == h) {
 		return;
 	}
 
-	_width = w;
-	_height = h;
+	_size.width = w;
+	_size.height = h;
 
-	if (_width < _minimum_width) {
-		_width = _minimum_width;
+	if (_size.width < _minimum_size.width) {
+		_size.width = _minimum_size.width;
 	}
 
-	if (_height < _minimum_height) {
-		_height = _minimum_height;
+	if (_size.height < _minimum_size.height) {
+		_size.height = _minimum_size.height;
 	}
 
-	if (_width > _maximum_width) {
-		_width = _maximum_width;
+	if (_size.width > _maximum_size.width) {
+		_size.width = _maximum_size.width;
 	}
 
-	if (_height > _maximum_height) {
-		_height = _maximum_height;
+	if (_size.height > _maximum_size.height) {
+		_size.height = _maximum_size.height;
 	}
 
 	Repaint(true);
+}
+
+void Component::SetSize(jsize_t size)
+{
+	SetSize(size.width, size.height);
 }
 
 void Component::SetBorderSize(int size)
@@ -713,22 +735,32 @@ void Component::SetBorderSize(int size)
 
 int Component::GetX()
 {
-	return _x;
+	return _location.x;
 }
 
 int Component::GetY()
 {
-	return _y;
+	return _location.y;
 }
 
 int Component::GetWidth()
 {
-	return _width;
+	return _size.width;
 }
 
 int Component::GetHeight()
 {
-	return _height;
+	return _size.height;
+}
+
+jpoint_t Component::GetLocation()
+{
+	return _location;
+}
+
+jsize_t Component::GetSize()
+{
+	return _size;
 }
 
 void Component::SetFont(Font *font)
@@ -816,64 +848,14 @@ int Component::GetGradientLevel()
 	return _gradient_level;
 }
 
-void Component::SetBackgroundColor(uint32_t color)
-{
-	_bg_red = (color>>0x10)&0xff;
-	_bg_green = (color>>0x08)&0xff;
-	_bg_blue = (color>>0x00)&0xff;
-	_bg_alpha = (color>>0x18)&0xff;
-
-	Repaint();
-}
-
-void Component::SetForegroundColor(uint32_t color)
-{
-	_fg_red = (color>>0x10)&0xff;
-	_fg_green = (color>>0x08)&0xff;
-	_fg_blue = (color>>0x00)&0xff;
-	_fg_alpha = (color>>0x18)&0xff;
-
-	Repaint();
-}
-
-void Component::SetBackgroundFocusColor(uint32_t color)
-{
-	_bgfocus_red = (color>>0x10)&0xff;
-	_bgfocus_green = (color>>0x08)&0xff;
-	_bgfocus_blue = (color>>0x00)&0xff;
-	_bgfocus_alpha = (color>>0x18)&0xff;
-
-	Repaint();
-}
-
-void Component::SetForegroundFocusColor(uint32_t color)
-{
-	_fgfocus_red = (color>>0x10)&0xff;
-	_fgfocus_green = (color>>0x08)&0xff;
-	_fgfocus_blue = (color>>0x00)&0xff;
-	_fgfocus_alpha = (color>>0x18)&0xff;
-
-	Repaint();
-}
-
-void Component::SetBorderColor(uint32_t color)
-{
-	_border_red = (color>>0x10)&0xff;
-	_border_green = (color>>0x08)&0xff;
-	_border_blue = (color>>0x00)&0xff;
-	_border_alpha = (color>>0x18)&0xff;
-
-	Repaint();
-}
-
 void Component::SetBackgroundColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_bg_red = red;
-	_bg_green = green;
-	_bg_blue = blue;
-	_bg_alpha = alpha;
+	_bg_color.red = red;
+	_bg_color.green = green;
+	_bg_color.blue = blue;
+	_bg_color.alpha = alpha;
 
 	Repaint();
 }
@@ -882,10 +864,10 @@ void Component::SetForegroundColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_fg_red = red;
-	_fg_green = green;
-	_fg_blue = blue;
-	_fg_alpha = alpha;
+	_fg_color.red = red;
+	_fg_color.green = green;
+	_fg_color.blue = blue;
+	_fg_color.alpha = alpha;
 
 	Repaint();
 }
@@ -894,10 +876,10 @@ void Component::SetBackgroundFocusColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_bgfocus_red = red;
-	_bgfocus_green = green;
-	_bgfocus_blue = blue;
-	_bgfocus_alpha = alpha;
+	_bgfocus_color.red = red;
+	_bgfocus_color.green = green;
+	_bgfocus_color.blue = blue;
+	_bgfocus_color.alpha = alpha;
 
 	Repaint();
 }
@@ -906,10 +888,10 @@ void Component::SetForegroundFocusColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_fgfocus_red = red;
-	_fgfocus_green = green;
-	_fgfocus_blue = blue;
-	_fgfocus_alpha = alpha;
+	_fgfocus_color.red = red;
+	_fgfocus_color.green = green;
+	_fgfocus_color.blue = blue;
+	_fgfocus_color.alpha = alpha;
 
 	Repaint();
 }
@@ -918,10 +900,10 @@ void Component::SetBorderColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_border_red = red;
-	_border_green = green;
-	_border_blue = blue;
-	_border_alpha = alpha;
+	_border_color.red = red;
+	_border_color.green = green;
+	_border_color.blue = blue;
+	_border_color.alpha = alpha;
 
 	Repaint();
 }
@@ -930,37 +912,67 @@ void Component::SetBorderFocusColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_borderfocus_red = red;
-	_borderfocus_green = green;
-	_borderfocus_blue = blue;
-	_borderfocus_alpha = alpha;
+	_borderfocus_color.red = red;
+	_borderfocus_color.green = green;
+	_borderfocus_color.blue = blue;
+	_borderfocus_color.alpha = alpha;
 
 	Repaint();
 }
 
-unsigned int Component::GetBackgroundColor()
+void Component::SetBackgroundColor(jcolor_t color)
 {
-	return (_bg_alpha & 0xff) << 24 | (_bg_red & 0xff) << 16 | (_bg_green & 0xff) << 8 | (_bg_blue & 0xff) << 0;
+	SetBackgroundColor(color.red, color.green, color.blue, color.alpha);
 }
 
-unsigned int Component::GetForegroundColor()
+void Component::SetForegroundColor(jcolor_t color)
 {
-	return (_fg_alpha & 0xff) << 24 | (_fg_red & 0xff) << 16 | (_fg_green & 0xff) << 8 | (_fg_blue & 0xff) << 0;
+	SetForegroundColor(color.red, color.green, color.blue, color.alpha);
 }
 
-unsigned int Component::GetBackgroundFocusColor()
+void Component::SetBackgroundFocusColor(jcolor_t color)
 {
-	return (_bgfocus_alpha & 0xff) << 24 | (_bgfocus_red & 0xff) << 16 | (_bgfocus_green & 0xff) << 8 | (_bgfocus_blue & 0xff) << 0;
+	SetBackgroundFocusColor(color.red, color.green, color.blue, color.alpha);
 }
 
-unsigned int Component::GetForegroundFocusColor()
+void Component::SetForegroundFocusColor(jcolor_t color)
 {
-	return (_fgfocus_alpha & 0xff) << 24 | (_fgfocus_red & 0xff) << 16 | (_fgfocus_green & 0xff) << 8 | (_fgfocus_blue & 0xff) << 0;
+	SetForegroundFocusColor(color.red, color.green, color.blue, color.alpha);
 }
 
-unsigned int Component::GetBorderColor()
+void Component::SetBorderColor(jcolor_t color)
 {
-	return (_border_alpha & 0xff) << 24 | (_border_red & 0xff) << 16 | (_border_green & 0xff) << 8 | (_border_blue & 0xff) << 0;
+	SetBorderColor(color.red, color.green, color.blue, color.alpha);
+}
+
+void Component::SetBorderFocusColor(jcolor_t color)
+{
+	SetBorderFocusColor(color.red, color.green, color.blue, color.alpha);
+}
+
+jcolor_t Component::GetBackgroundColor()
+{
+	return _bg_color;
+}
+
+jcolor_t Component::GetForegroundColor()
+{
+	return _fg_color;
+}
+
+jcolor_t Component::GetBackgroundFocusColor()
+{
+	return _bgfocus_color;
+}
+
+jcolor_t Component::GetForegroundFocusColor()
+{
+	return _fgfocus_color;
+}
+
+jcolor_t Component::GetBorderColor()
+{
+	return _border_color;
 }
 
 void Component::SetNavigation(Component *left, Component *right, Component *up, Component *down)
@@ -993,7 +1005,7 @@ Component * Component::GetDownComponent()
 
 bool Component::Intersect(int x, int y)
 {
-	if ((x>_x && x<(_x+_width)) && (y>_y && y<(_y+_height))) {
+	if ((x>_location.x && x<(_location.x+_size.width)) && (y>_location.y && y<(_location.y+_size.height))) {
 		return true;
 	}
 

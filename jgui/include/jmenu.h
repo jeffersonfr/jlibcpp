@@ -107,11 +107,11 @@ class Menu : public jgui::Frame, public jgui::FrameInputListener{
 		int GetCurrentIndex();
 		void RemoveAll();
 
-		uint32_t GetItemColor();
+		jcolor_t GetItemColor();
 
-		void SetItemColor(uint32_t color);
-		void SetBackgroundColor(uint32_t color);
-		void SetForegroundColor(uint32_t color);
+		void SetItemColor(jcolor_t color);
+		void SetBackgroundColor(jcolor_t color);
+		void SetForegroundColor(jcolor_t color);
 		void SetItemColor(int red, int green, int blue, int alpha);
 		void SetBackgroundColor(int red, int green, int blue, int alpha);
 		void SetForegroundColor(int red, int green, int blue, int alpha);
@@ -330,10 +330,7 @@ private:
 			_paint_count,
 			_vertical_gap,
 			_horizontal_gap;
-		int _item_red,
-			_item_green,
-			_item_blue,
-			_item_alpha;
+		jcolor_t _item_color;
 		float delta;
 		bool _input_locked,
 			 _arrows_visible,
@@ -348,8 +345,8 @@ private:
 
 		void SetCenteredInteraction(bool b);
 		void SetLoop(bool loop);
-		uint32_t GetItemColor();
-		void SetItemColor(uint32_t color);
+		jcolor_t GetItemColor();
+		void SetItemColor(jcolor_t color);
 		void SetItemColor(int red, int green, int blue, int alpha);
 		void SetCurrentIndex(int i);
 		void AddEmptyItem();

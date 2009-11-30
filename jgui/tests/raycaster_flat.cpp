@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "jpanel.h"
 #include "jframe.h"
-#include "jfont.h"
 #include "joffscreenimage.h"
 
 #include <stdio.h>
@@ -93,8 +92,8 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 		{
 			jgui::Frame::Paint(g);
 
-			int w = _width,
-				h = _height;
+			int w = _size.width,
+					h = _size.height;
 
 			// screen(512, 384, 0, "Raycaster");
 			for(int x = 0; x < w; x++) {

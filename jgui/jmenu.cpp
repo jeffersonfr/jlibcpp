@@ -120,11 +120,11 @@ void Menu::SetTitle(std::string title)
 	_title = title;
 
 	if (_title == "") {
-		_list->SetPosition(_border_size, _border_size);
+		_list->SetLocation(_border_size, _border_size);
 		
 		SetSize(_list->GetWidth()+2*_border_size, _list->GetHeight()+2*_border_size);
 	} else {
-		_list->SetPosition(_border_size, _insets.top);
+		_list->SetLocation(_border_size, _insets.top);
 		
 		SetSize(_list->GetWidth()+2*_border_size, _list->GetHeight()+1*_border_size+_insets.top);
 	}
@@ -153,17 +153,17 @@ void Menu::SetLoop(bool b)
 	_list->SetLoop(b);
 }
 
-uint32_t Menu::GetItemColor()
+jcolor_t Menu::GetItemColor()
 {
 	return _list->GetItemColor();
 }
 	
-void Menu::SetItemColor(uint32_t color)
+void Menu::SetItemColor(jcolor_t color)
 {
 	_list->SetItemColor(color);
 }
 
-void Menu::SetBackgroundColor(uint32_t color)
+void Menu::SetBackgroundColor(jcolor_t color)
 {
 	Frame::SetBackgroundColor(color);
 	
@@ -172,7 +172,7 @@ void Menu::SetBackgroundColor(uint32_t color)
 	}
 }
 
-void Menu::SetForegroundColor(uint32_t color)
+void Menu::SetForegroundColor(jcolor_t color)
 {
 	Frame::SetForegroundColor(color);
 	_list->SetForegroundColor(color);
@@ -306,8 +306,8 @@ void Menu::Paint(Graphics *g)
 				dy = 0;
 			}
 
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawString(_title, (_width-_font->GetStringWidth(_title))/2, dy);
+			g->SetColor(_fg_color);
+			g->DrawString(_title, (_size.width-_font->GetStringWidth(_title))/2, dy);
 		}
 	}
 }
@@ -413,13 +413,9 @@ void Menu::InputChanged(KeyEvent *event)
 						}
 					}
 
-					uint32_t bg = GetBackgroundColor(),
-							 fg = GetForegroundColor(),
-							 itemg = GetItemColor();
-
-					menu->SetBackgroundColor((bg>>16)&0xff, (bg>>8)&0xff, (bg>>0)&0xff, (bg>>24)&0xff);
-					menu->SetForegroundColor((fg>>16)&0xff, (fg>>8)&0xff, (fg>>0)&0xff, (fg>>24)&0xff);
-					menu->SetItemColor((itemg>>16)&0xff, (itemg>>8)&0xff, (itemg>>0)&0xff, (itemg>>24)&0xff);
+					menu->SetBackgroundColor(GetBackgroundColor());
+					menu->SetForegroundColor(GetForegroundColor());
+					menu->SetItemColor(GetItemColor());
 
 					for (std::vector<MenuItem *>::iterator i=items.begin(); i!=items.end(); i++) {
 						if ((*i)->IsVisible() == true) {
@@ -597,27 +593,24 @@ void MenuComponent::SetLoop(bool loop)
 	Repaint();
 }
 
-uint32_t MenuComponent::GetItemColor()
+jcolor_t MenuComponent::GetItemColor()
 {
-	return (_item_alpha & 0xff) << 24 | (_item_red & 0xff) << 16 | (_item_green & 0xff) << 8 | (_item_blue & 0xff) << 0;
+	return _item_color;
 }
 	
-void MenuComponent::SetItemColor(uint32_t color)
+void MenuComponent::SetItemColor(jcolor_t color)
 {
-	_item_red = (color>>0x10)&0xff;
-	_item_green = (color>>0x08)&0xff;
-	_item_blue = (color>>0x00)&0xff;
-	_item_alpha = (color>>0x18)&0xff;
+	SetItemColor(color.red, color.green, color.blue, color.alpha);
 }
 
 void MenuComponent::SetItemColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_item_red = red;
-	_item_green = green;
-	_item_blue = blue;
-	_item_alpha = 0xff;//alpha;
+	_item_color.red = red;
+	_item_color.green = green;
+	_item_color.blue = blue;
+	_item_color.alpha = 0xff;//alpha;
 }
 
 void MenuComponent::Paint(Graphics *g)
@@ -672,11 +665,11 @@ void MenuComponent::Paint(Graphics *g)
 
 	for (i=position; count<_visible_items && i<(int)_items.size(); i++, count++) {
 		if (_index != i) {
-			g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-			g->FillRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10);
+			g->SetColor(_item_color);
+			g->FillRectangle(0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 		} else {
-			g->SetColor(_bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-			FillRectangle(g, 0, (font_height+_vertical_gap)*count, _width, font_height+10);
+			g->SetColor(_bgfocus_color);
+			FillRectangle(g, 0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 
 			/*
 			g->FillGradientRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
@@ -687,34 +680,34 @@ void MenuComponent::Paint(Graphics *g)
 		if (_items[i]->GetType() == EMPTY_MENU_ITEM) {
 			// TODO::
 		} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+			g->SetColor(_fg_color);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 		} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
 			if (_items[i]->_prefetch == NULL) {
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+				g->SetColor(_fg_color);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 			} else {
 				g->DrawImage(_items[i]->_prefetch, 10, (font_height+_vertical_gap)*count, font_height, font_height+10);
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-				g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+				g->SetColor(_fg_color);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 			}
 		} else if (_items[i]->GetType() == CHECK_MENU_ITEM) {
 			if (_items[i]->IsSelected() == true) {
 				g->DrawImage(prefetch, 10, 5+(font_height+_vertical_gap)*count, font_height, font_height);
 			}
 
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-			g->DrawString(TruncateString(_items[i]->GetValue(), _width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _width-2*space, font_height, LEFT_ALIGN);
+			g->SetColor(_fg_color);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
 		}
 
 		if (_items[i]->GetEnabled() == false) {
 			g->SetColor(0x00, 0x00, 0x00, 0x80);
-			FillRectangle(g, 0, (font_height+_vertical_gap)*count, _width, font_height+10);
+			FillRectangle(g, 0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 		}
 
 		if (_menu != NULL) {
 			if (_menu->_list->_items[i]->_childs.size() > 0) {
-				int dx = _width-font_height/2-4,
+				int dx = _size.width-font_height/2-4,
 					dy = (font_height+_vertical_gap)*count+5;
 
 				g->SetColor(0x80, 0x80, 0xe0, 0xff);
@@ -724,8 +717,8 @@ void MenuComponent::Paint(Graphics *g)
 	}
 
 	for (; count<_visible_items; count++) {
-		g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-		FillRectangle(g, 0, (font_height+_vertical_gap)*count, _width, font_height+10);
+		g->SetColor(_item_color);
+		FillRectangle(g, 0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
 	}
 }
 

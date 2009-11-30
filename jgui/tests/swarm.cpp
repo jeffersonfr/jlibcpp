@@ -26,6 +26,8 @@
 #include <signal.h>
 #include <math.h>
 
+#define FONT "./fonts/font.ttf"
+
 #define VMAX 100
 
 struct point_t {
@@ -304,6 +306,8 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 int main(int argc, char **argv)
 {
+	jgui::Graphics::SetDefaultFont(new jgui::Font(FONT, 0, 12));
+
 	Main main(50, 100);
 
 	main.Start();

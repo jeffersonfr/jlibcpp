@@ -38,15 +38,15 @@ Window::Window(int x, int y, int width, int height, int opacity, int scale_width
 	_insets.top = 60;
 	_insets.bottom = 30;
 
-	_minimum_width = 16;
-	_minimum_height = 16;
-	_maximum_width = scale_width;
-	_maximum_height = scale_height;
+	_minimum_size.width = 16;
+	_minimum_size.height = 16;
+	_maximum_size.width = scale_width;
+	_maximum_size.height = scale_height;
 	
-	_x = x;
-	_y = y;
-	_width = width;
-	_height = height;
+	_location.x = x;
+	_location.y = y;
+	_size.width = width;
+	_size.height = height;
 	
 	bWidth = 0;
   bHeight = 0;
@@ -115,9 +115,9 @@ void * Window::GetNativeWindow()
 {
 #ifdef DIRECTFB_UI
 	return window;
-#else
-	return NULL;
 #endif
+
+	return NULL;
 }
 
 void Window::SetVisible(bool b)
@@ -156,7 +156,7 @@ void Window::InnerCreateWindow()
 	IDirectFBSurface *s = NULL;
 	GFXHandler *gfx = GFXHandler::GetInstance();
 	
-	gfx->CreateWindow(_x - bWidth, _y - bHeight, _width + 2*bWidth, _height + 2*bHeight, &w, &s, _opacity, _scale_width, _scale_height);
+	gfx->CreateWindow(_location.x - bWidth, _location.y - bHeight, _size.width + 2*bWidth, _size.height + 2*bHeight, &w, &s, _opacity, _scale_width, _scale_height);
 
 	if (s != NULL) {
 		// graphics = new NullGraphics();
@@ -244,25 +244,25 @@ void Window::SetBounds(int x, int y, int w, int h)
 	// SetPosition(x, y);
 	// SetSize(w, h);
 
-	_x = x;
-	_y = y;
-	_width = w;
-	_height = h;
+	_location.x = x;
+	_location.y = y;
+	_size.width = w;
+	_size.height = h;
 
-	if (_width < _minimum_width) {
-		_width = _minimum_width;
+	if (_size.width < _minimum_size.width) {
+		_size.width = _minimum_size.width;
 	}
 
-	if (_height < _minimum_height) {
-		_height = _minimum_height;
+	if (_size.height < _minimum_size.height) {
+		_size.height = _minimum_size.height;
 	}
 
 #ifdef DIRECTFB_UI
 	if (window != NULL) {
-		x = (_x*GFXHandler::GetInstance()->GetScreenWidth())/_scale_width, 
-		y = (_y*GFXHandler::GetInstance()->GetScreenHeight())/_scale_height,
-		w = (_width*GFXHandler::GetInstance()->GetScreenWidth())/_scale_width, 
-		h = (_height*GFXHandler::GetInstance()->GetScreenHeight())/_scale_height;
+		x = SCALE_TO_SCREEN(_location.x, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width),
+		y = SCALE_TO_SCREEN(_location.y, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height),
+		w = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width),
+		h = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
 
 		window->SetBounds(window, x, y, w, h);
 	}
@@ -274,18 +274,18 @@ void Window::SetBounds(int x, int y, int w, int h)
 	DispatchEvent(new WindowEvent(this, WINDOW_RESIZED_EVENT));
 }
 
-void Window::SetPosition(int x1, int y1)
+void Window::SetPosition(int x, int y)
 {
+	_location.x = x;
+	_location.y = y;
+
 #ifdef DIRECTFB_UI
-	int dx = (x1*GFXHandler::GetInstance()->GetScreenWidth())/_scale_width, 
-		dy = (y1*GFXHandler::GetInstance()->GetScreenHeight())/_scale_height;
+	int dx = SCALE_TO_SCREEN(x, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width),
+			dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
 
 	if (window != NULL) {
 		window->MoveTo(window, dx, dy);
 	}
-
-	_x = x1;
-	_y = y1;
 #endif
 	
 	DispatchEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
@@ -293,35 +293,35 @@ void Window::SetPosition(int x1, int y1)
 
 void Window::SetMinimumSize(int w, int h)
 {
-	_minimum_width = w;
-	_minimum_height = h;
+	_minimum_size.width = w;
+	_minimum_size.height = h;
 
-	if (_minimum_width < 16) {
-		_minimum_width = 16;
+	if (_minimum_size.width < 16) {
+		_minimum_size.width = 16;
 	}
 
-	if (_minimum_height < 16) {
-		_minimum_height = 16;
+	if (_minimum_size.height < 16) {
+		_minimum_size.height = 16;
 	}
 
-	if (_minimum_width > _maximum_width) {
-		_minimum_width = _maximum_width;
+	if (_minimum_size.width > _maximum_size.width) {
+		_minimum_size.width = _maximum_size.width;
 	}
 
-	if (_minimum_height > _maximum_height) {
-		_minimum_height = _maximum_height;
+	if (_minimum_size.height > _maximum_size.height) {
+		_minimum_size.height = _maximum_size.height;
 	}
 
-	if (_width < _minimum_width || _height < _minimum_height) {
-		int w = _width,
-			h = _height;
+	if (_size.width < _minimum_size.width || _size.height < _minimum_size.height) {
+		int w = _size.width,
+			h = _size.height;
 
-		if (_width < _minimum_width) {
-			w = _minimum_width;
+		if (_size.width < _minimum_size.width) {
+			w = _minimum_size.width;
 		}
 	
-		if (_height < _minimum_height) {
-			h = _minimum_height;
+		if (_size.height < _minimum_size.height) {
+			h = _minimum_size.height;
 		}
 
 		SetSize(w, h);
@@ -330,35 +330,35 @@ void Window::SetMinimumSize(int w, int h)
 
 void Window::SetMaximumSize(int w, int h)
 {
-	_maximum_width = w;
-	_maximum_height = h;
+	_maximum_size.width = w;
+	_maximum_size.height = h;
 
-	if (_maximum_width > 65535) {
-		_maximum_width = 65535;
+	if (_maximum_size.width > 65535) {
+		_maximum_size.width = 65535;
 	}
 
-	if (_maximum_height > 65535) {
-		_maximum_height = 65535;
+	if (_maximum_size.height > 65535) {
+		_maximum_size.height = 65535;
 	}
 
-	if (_minimum_width > _maximum_width) {
-		_maximum_width = _minimum_width;
+	if (_minimum_size.width > _maximum_size.width) {
+		_maximum_size.width = _minimum_size.width;
 	}
 
-	if (_minimum_height > _maximum_height) {
-		_maximum_height = _minimum_height;
+	if (_minimum_size.height > _maximum_size.height) {
+		_maximum_size.height = _minimum_size.height;
 	}
 
-	if (_width > _maximum_width || _height > _maximum_height) {
-		int w = _width,
-			h = _height;
+	if (_size.width > _maximum_size.width || _size.height > _maximum_size.height) {
+		int w = _size.width,
+			h = _size.height;
 
-		if (_width > _maximum_width) {
-			w = _maximum_width;
+		if (_size.width > _maximum_size.width) {
+			w = _maximum_size.width;
 		}
 	
-		if (_height > _maximum_height) {
-			h = _maximum_height;
+		if (_size.height > _maximum_size.height) {
+			h = _maximum_size.height;
 		}
 
 		SetSize(w, h);
@@ -368,25 +368,25 @@ void Window::SetMaximumSize(int w, int h)
 
 void Window::SetSize(int w, int h)
 {
-	if (_width == w && _height == h) {
+	if (_size.width == w && _size.height == h) {
 		return;
 	}	
 
-	_width = w;
-	_height = h;
+	_size.width = w;
+	_size.height = h;
 
-	if (_width < _minimum_width) {
-		_width = _minimum_width;
+	if (_size.width < _minimum_size.width) {
+		_size.width = _minimum_size.width;
 	}
 
-	if (_height < _minimum_height) {
-		_height = _minimum_height;
+	if (_size.height < _minimum_size.height) {
+		_size.height = _minimum_size.height;
 	}
 
 #ifdef DIRECTFB_UI
 	if (window != NULL) {
-		int width = (_width*GFXHandler::GetInstance()->GetScreenWidth())/_scale_width, 
-			height = (_height*GFXHandler::GetInstance()->GetScreenHeight())/_scale_height;
+		int width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width),
+				height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
 
 		window->Resize(window, width, height);
 	}
@@ -397,18 +397,18 @@ void Window::SetSize(int w, int h)
 	DispatchEvent(new WindowEvent(this, WINDOW_RESIZED_EVENT));
 }
 
-void Window::Move(int x1, int y1)
+void Window::Move(int x, int y)
 {
+	_location.x = _location.x+x;
+	_location.y = _location.y+y;
+
 #ifdef DIRECTFB_UI
-	int dx = (x1*GFXHandler::GetInstance()->GetScreenWidth())/_scale_width, 
-		dy = (y1*GFXHandler::GetInstance()->GetScreenHeight())/_scale_height;
+	int dx = SCALE_TO_SCREEN(x, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width),
+			dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
 
 	if (window != NULL) {
 		window->Move(window, dx, dy);
 	}
-
-	_x = _x+x1;
-	_y = _y+y1;
 #endif
 	
 	DispatchEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
@@ -416,7 +416,6 @@ void Window::Move(int x1, int y1)
 
 void Window::SetOpacity(int i)
 {
-#ifdef DIRECTFB_UI
 	_opacity = i;
 
 	if (_opacity < 0) {
@@ -427,6 +426,7 @@ void Window::SetOpacity(int i)
 		_opacity = 0xff;
 	}
 
+#ifdef DIRECTFB_UI
 	if (window != NULL) {
 		window->SetOpacity(window, _opacity);
 	}
@@ -435,51 +435,38 @@ void Window::SetOpacity(int i)
 
 int Window::GetOpacity()
 {
-	/*
 #ifdef DIRECTFB_UI
-	u8 o;
+	/*
+	uint8_t o;
 
 	if (window != NULL) {
 		window->GetOpacity(window, &o);
 
 		_opacity = o;
 	}
-#endif
 	*/
+#endif
 
 	return _opacity;
 }
 
 void Window::Flip()
 {
-#ifdef DIRECTFB_UI
-	if (graphics == NULL){
-		return;
+	if (graphics != NULL){
+		graphics->Flip();
 	}
-
-	graphics->Flip();
-#endif
 }
 
 void Window::Clear()
 {
-#ifdef DIRECTFB_UI
-	if (graphics == NULL){
-		return;
-	}      
-
-	graphics->Clear();
-#endif
+	if (graphics != NULL){
+		graphics->Clear();
+	}
 }
 
 void Window::SetUndecorated(bool b)
 {
 	_undecorated = b;
-
-	// _insets.left = 0;
-	// _insets.right = 0;
-	// _insets.top = 0;
-	// _insets.bottom = 0;
 
 	Repaint();
 }
@@ -555,7 +542,7 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 						w1 = c1->GetWidth(),
 						h1 = c1->GetHeight();
 
-				if ((x1 < GetWidth() && (x1+w1) > 0) && (y1 < GetHeight() && (y1+h1) > 0)) {
+				if ((x1 < _size.width && (x1+w1) > 0) && (y1 < _size.height && (y1+h1) > 0)) {
 					for (std::vector<jgui::Component *>::iterator j=collisions.begin(); j!=collisions.end(); j++) {
 						c2 = (*j);
 
@@ -629,7 +616,7 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 					w1 = c1->GetWidth(),
 					h1 = c1->GetHeight();
 
-			if ((x1 < GetWidth() && (x1+w1) > 0) && (y1 < GetHeight() && (y1+h1) > 0)) {
+			if ((x1 < _size.width && (x1+w1) > 0) && (y1 < _size.height && (y1+h1) > 0)) {
 				graphics->Reset();
 				graphics->Translate(x1, y1);
 				graphics->SetClip(0, 0, w1, h1);
@@ -660,9 +647,9 @@ bool Window::Show(bool modal)
 	if (window != NULL) {
 		SetOpacity(_opacity);
 	}
+#endif
 
 	Repaint();
-#endif
 
 	return true;
 }

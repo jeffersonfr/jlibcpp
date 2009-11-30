@@ -216,13 +216,13 @@ jregion_t Graphics::GetClip()
 
 void Graphics::ReleaseClip()
 {
-#ifdef DIRECTFB_UI
-	DFBRegion rgn;
-
 	_clip.x = 0;
 	_clip.y = 0;
 	_clip.width = _scale.width;
 	_clip.height = _scale.height;
+
+#ifdef DIRECTFB_UI
+	DFBRegion rgn;
 
 	if (surface != NULL) {
 		surface->SetClip(surface, NULL);
@@ -1558,7 +1558,7 @@ void Graphics::FillPolygon(int x, int y, jpoint_t *p, int num)
 #endif
 }
 
-void Graphics::FillGradientRectangle(int xp, int yp, int wp, int hp, int sr, int sg, int sb, int sa, int dr, int dg, int db, int da, bool horizontal)
+void Graphics::FillGradientRectangle(int xp, int yp, int wp, int hp, jcolor_t scolor, jcolor_t dcolor, bool horizontal)
 {
 	if (wp <= 0 || hp <= 0) {
 		return;
@@ -1574,32 +1574,29 @@ void Graphics::FillGradientRectangle(int xp, int yp, int wp, int hp, int sr, int
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	TRUNC_COLOR(sr, sg, sb, sa);
-	TRUNC_COLOR(dr, dg, db, da);
-
-	int r1 = sr; 
-	int g1 = sg; 
-	int b1 = sb; 
-	int a1 = sa; 
+	int r1 = scolor.red; 
+	int g1 = scolor.green; 
+	int b1 = scolor.blue; 
+	int a1 = scolor.alpha; 
 
 	int line_width = _line_width;
 
 	_line_width = 1;
 
 	if (horizontal){
-		double difr = (double) (dr - sr) / h;
-		double difg = (double) (dg - sg) / h;
-		double difb = (double) (db - sb) / h;
-		double difa = (double) (da - sa) / h;
+		double difr = (double) (dcolor.red - scolor.red) / h;
+		double difg = (double) (dcolor.green - scolor.green) / h;
+		double difb = (double) (dcolor.blue - scolor.blue) / h;
+		double difa = (double) (dcolor.alpha - scolor.alpha) / h;
 		for (int i = 0; i < h; i++){
 			SetColor(r1 + (int) (difr*i), g1 + (int) (difg*i), b1 + (int) (difb*i), a1 + (int) (difa*i) );
 			surface->DrawLine( surface, x, y + i, x + w - 1, y + i );
 		}
 	}else{
-		double difr = (double) (dr - sr) / w;
-		double difg = (double) (dg - sg) / w;
-		double difb = (double) (db - sb) / w;
-		double difa = (double) (da - sa) / w;
+		double difr = (double) (dcolor.red - scolor.red) / w;
+		double difg = (double) (dcolor.green - scolor.green) / w;
+		double difb = (double) (dcolor.blue - scolor.blue) / w;
+		double difa = (double) (dcolor.alpha - scolor.alpha) / w;
 		for (int i = 0; i < w; i++){
 			SetColor(r1 + (int) (difr*i), g1 + (int) (difg*i), b1 + (int) (difb*i), a1 + (int) (difa*i) );
 			surface->DrawLine( surface, x + i, y, x + i, y + h - 1);

@@ -130,7 +130,7 @@ jsize_t GridLayout::GetMinimumLayoutSize(Container *parent)
 	for (int i = 0 ; i < ncomponents ; i++) {
 		Component *comp = parent->GetComponents()[i];
 		
-		jsize_t d = {comp->GetMinimumWidth(), comp->GetMinimumHeight()};
+		jsize_t d = comp->GetMinimumSize();
 
 		if (w < d.width) {
 			w = d.width;
@@ -171,7 +171,7 @@ jsize_t GridLayout::GetPreferredLayoutSize(Container *parent)
 	for (int i = 0 ; i < ncomponents ; i++) {
 		Component *comp = parent->GetComponents()[i];
 
-		jsize_t d = {comp->GetMinimumWidth(), comp->GetMinimumHeight()};
+		jsize_t d = comp->GetMinimumSize();
 
 		if (w < d.width) {
 			w = d.width;

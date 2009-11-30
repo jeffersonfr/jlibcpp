@@ -36,7 +36,7 @@ Spin::Spin(int x, int y, int width, int height):
 	// _type = VERTICAL_SPIN;
 	
 	SetFocusable(true);
-	SetArrowsSize((_height-4)/2);
+	SetArrowsSize((_size.height-4)/2);
 }
 
 Spin::~Spin()
@@ -52,12 +52,12 @@ void Spin::SetArrowsSize(int size)
 	_arrows_size = size;
 
 	if (_type == HORIZONTAL_SPIN) {
-		if (_arrows_size > (_width-4)/2) {
-			_arrows_size = (_width-4)/2;
+		if (_arrows_size > (_size.width-4)/2) {
+			_arrows_size = (_size.width-4)/2;
 		}
 	} else if (_type == VERTICAL_SPIN) {
-		if (_arrows_size > (_height-8)/2) {
-			_arrows_size = (_height-8)/2;
+		if (_arrows_size > (_size.height-8)/2) {
+			_arrows_size = (_size.height-8)/2;
 		}
 	}
 
@@ -117,8 +117,8 @@ bool Spin::ProcessEvent(MouseEvent *event)
 		RequestFocus();
 
 		if (_type == HORIZONTAL_SPIN) {
-			if (y1 > _y && y1 < (_y+_height)) {
-				if (x1 > (_x+_width-_arrows_size-dx) && x1 < (_x+_width-dx)) {
+			if (y1 > _location.y && y1 < (_location.y+_size.height)) {
+				if (x1 > (_location.x+_size.width-_arrows_size-dx) && x1 < (_location.x+_size.width-dx)) {
 					_index++;
 
 					if (_index >= (int)_list.size()) {
@@ -134,7 +134,7 @@ bool Spin::ProcessEvent(MouseEvent *event)
 
 						DispatchEvent(new SelectEvent(this, _list[_index], _index, RIGHT_ITEM));
 					}
-				} else if (x1 > (_x+dx) && x1 < (_x+dx+_arrows_size)) {
+				} else if (x1 > (_location.x+dx) && x1 < (_location.x+dx+_arrows_size)) {
 					_index--;
 
 					if (_index < 0) {
@@ -149,10 +149,10 @@ bool Spin::ProcessEvent(MouseEvent *event)
 				}
 			}
 		} else if (_type == VERTICAL_SPIN) {
-			int py = (_height-8)/2;
+			int py = (_size.height-8)/2;
 
-			if (x1 > (_x+_width-2*_arrows_size-10) && x1 < (_x+_width-10)) {
-				if (y1 > (_y) && y1 < (_y+py+dy)) {
+			if (x1 > (_location.x+_size.width-2*_arrows_size-10) && x1 < (_location.x+_size.width-10)) {
+				if (y1 > (_location.y) && y1 < (_location.y+py+dy)) {
 					_index--;
 
 					if (_index < 0) {
@@ -162,7 +162,7 @@ bool Spin::ProcessEvent(MouseEvent *event)
 					Repaint();
 
 					DispatchEvent(new SelectEvent(this, _list[_index], _index, LEFT_ITEM));
-				} else if (y1 > (_y+py+dy) && y1 < (_y+_height)) {
+				} else if (y1 > (_location.y+py+dy) && y1 < (_location.y+_size.height)) {
 					_index++;
 
 					if (_index >= (int)_list.size()) {
@@ -287,53 +287,55 @@ void Spin::Paint(Graphics *g)
 
 	Component::Paint(g);
 
+	jcolor_t color;
+
+	color.red = 0x80;
+	color.green = 0x80;
+	color.blue = 0xe0;
+	color.alpha = 0xff;
+
 	{
 		/*
 		if (_has_focus == true) {
-				g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-				g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+				g->FillGradientRectangle(0, 0, _size.width, _size.height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+				g->FillGradientRectangle(0, _size.height/2, _size.width, _size.height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
 		}
 		*/
 
 		if (_type == HORIZONTAL_SPIN) {
-			int dx = _width-_arrows_size-4,
-				dy = (_height-2*_arrows_size)/2;
+			int dx = _size.width-_arrows_size-4,
+				dy = (_size.height-2*_arrows_size)/2;
 
-			g->SetColor(0x80, 0x80, 0xe0, 0xff);
+			g->SetColor(color);
 			g->FillTriangle(dx, dy+2, dx+_arrows_size, dy+_arrows_size, dx, dy+2*_arrows_size-4);
-
 			dx = 4;
-
-			g->SetColor(0x80, 0x80, 0xe0, 0xff);
 			g->FillTriangle(dx, dy+_arrows_size, dx+_arrows_size, dy+2, dx+_arrows_size, dy+2*_arrows_size-4);
 
 			if (_loop == true) {
 			} else {
 			}
 
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+			g->SetColor(_fg_color);
 
 			if (_list.size() > 0) {
-				g->DrawString(TruncateString(_list[_index], _width-20), 5, (CENTER_VERTICAL_TEXT), _width-10, _height, CENTER_ALIGN);
+				g->DrawString(TruncateString(_list[_index], _size.width-20), 5, (CENTER_VERTICAL_TEXT), _size.width-10, _size.height, CENTER_ALIGN);
 			}
 		} else if (_type == VERTICAL_SPIN) {
-			int dx = _width-2*_arrows_size-10,
-				dy = (_height-8)/2;
+			int dx = _size.width-2*_arrows_size-10,
+				dy = (_size.height-8)/2;
 
-			g->SetColor(0x80, 0x80, 0xe0, 0xff);
+			g->SetColor(color);
 			g->FillTriangle(dx, dy+2, dx+_arrows_size, 2, dx+2*_arrows_size, dy+2);
-
-			g->SetColor(0x80, 0x80, 0xe0, 0xff);
-			g->FillTriangle(dx, dy+8, dx+2*_arrows_size, dy+8, dx+_arrows_size, _height);
+			g->FillTriangle(dx, dy+8, dx+2*_arrows_size, dy+8, dx+_arrows_size, _size.height);
 
 			if (_loop == true) {
 			} else {
 			}
 
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+			g->SetColor(_fg_color);
 
 			if (_list.size() > 0) {
-				g->DrawString(TruncateString(_list[_index], _width-20), 10, (CENTER_VERTICAL_TEXT), _width-10, _height, LEFT_ALIGN);
+				g->DrawString(TruncateString(_list[_index], _size.width-20), 10, (CENTER_VERTICAL_TEXT), _size.width-10, _size.height, LEFT_ALIGN);
 			}
 		}
 	}
@@ -342,7 +344,7 @@ void Spin::Paint(Graphics *g)
 
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _width, _height);
+		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
 }
 

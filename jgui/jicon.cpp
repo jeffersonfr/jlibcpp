@@ -72,7 +72,7 @@ Icon::Icon(std::string file, int x, int y, int width, int height, int scale_widt
 	_image = new jgui::OffScreenImage(w, h);
 
 	if (_image->GetGraphics() != NULL) {
-		if (_image->GetGraphics()->DrawImage(_file, 0, 0, _width, _height) == true) {
+		if (_image->GetGraphics()->DrawImage(_file, 0, 0, _size.width, _size.height) == true) {
 			Repaint();
 		} else {
 			delete _image;
@@ -89,37 +89,37 @@ Icon::~Icon()
 
 void Icon::SetSize(int w, int h)
 {
-	if (_width == w && _height == h) {
+	if (_size.width == w && _size.height == h) {
 		return;
 	}
 
-	_width = w;
-	_height = h;
+	_size.width = w;
+	_size.height = h;
 
-	if (_width < _minimum_width) {
-		_width = _minimum_width;
+	if (_size.width < _minimum_size.width) {
+		_size.width = _minimum_size.width;
 	}
 
-	if (_height < _minimum_height) {
-		_height = _minimum_height;
+	if (_size.height < _minimum_size.height) {
+		_size.height = _minimum_size.height;
 	}
 
-	if (_width > _maximum_width) {
-		_width = _maximum_width;
+	if (_size.width > _maximum_size.width) {
+		_size.width = _maximum_size.width;
 	}
 
-	if (_height > _maximum_height) {
-		_height = _maximum_height;
+	if (_size.height > _maximum_size.height) {
+		_size.height = _maximum_size.height;
 	}
 
 	if (_image != NULL) {
 		delete _image;
 	}
 
-	_image = new OffScreenImage(_width, _height);
+	_image = new OffScreenImage(_size.width, _size.height);
 
 	if (_image->GetGraphics() != NULL) {
-		if (_image->GetGraphics()->DrawImage(_file, 0, 0, _width, _height) == true) {
+		if (_image->GetGraphics()->DrawImage(_file, 0, 0, _size.width, _size.height) == true) {
 			Repaint();
 		} else {
 			delete _image;
@@ -149,10 +149,10 @@ void Icon::SetImage(std::string file)
 		delete _image;
 	}
 
-	_image = new OffScreenImage(_width, _height);
+	_image = new OffScreenImage(_size.width, _size.height);
 
 	if (_image->GetGraphics() != NULL) {
-		if (_image->GetGraphics()->DrawImage(_file, 0, 0, _width, _height) == true) {
+		if (_image->GetGraphics()->DrawImage(_file, 0, 0, _size.width, _size.height) == true) {
 			Repaint();
 		} else {
 			delete _image;
@@ -170,9 +170,9 @@ void Icon::Paint(Graphics *g)
 	Component::Paint(g);
 
 	if (_image != NULL) {
-		g->DrawImage(_image, 0, 0, _width, _height);
+		g->DrawImage(_image, 0, 0, _size.width, _size.height);
 	} else {
-		g->SetColor(_fg_red, _fg_green, _fg_blue);
+		g->SetColor(_fg_color);
 
 		int gap = _horizontal_gap+_border_size;
 
@@ -180,15 +180,15 @@ void Icon::Paint(Graphics *g)
 			gap = 0;
 		}
 
-		g->DrawString(TruncateString(_text, _width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _width-gap, _height, CENTER_ALIGN);
-		// CHANGED:: g->DrawString(TruncateString(_text, _width-10), 5, 5, _width-10, _height, CENTER_ALIGN);
+		g->DrawString(TruncateString(_text, _size.width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _size.width-gap, _size.height, CENTER_ALIGN);
+		// CHANGED:: g->DrawString(TruncateString(_text, _size.width-10), 5, 5, _size.width-10, _height, CENTER_ALIGN);
 	}
 
 	PaintBorder(g);
 	
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _width, _height);
+		FillRectangle(g, 0, 0, _size.width, _size.height);
 	}
 }
 

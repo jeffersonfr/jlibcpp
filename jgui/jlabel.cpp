@@ -86,13 +86,13 @@ void Label::Paint(Graphics *g)
 	Component::Paint(g);
 
 	if (IsFontSet() == true) {
-		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+		g->SetColor(_fg_color);
 
 		if (_wrap == false && _truncate_string == true) {
-			g->DrawString(TruncateString(_text, _width-2*_horizontal_gap), _horizontal_gap, (CENTER_VERTICAL_TEXT), _width-2*_horizontal_gap, _height, _align);
+			g->DrawString(TruncateString(_text, _size.width-2*_horizontal_gap), _horizontal_gap, (CENTER_VERTICAL_TEXT), _size.width-2*_horizontal_gap, _size.height, _align);
 		} else {
-			// g->DrawString(TruncateString(_text, _width-2*_horizontal_gap), _horizontal_gap, _vertical_gap, _width-2*_horizontal_gap, _height, _align);
-			g->DrawString(_text, _horizontal_gap, _vertical_gap, _width-2*_horizontal_gap, _height, _align);
+			// g->DrawString(TruncateString(_text, _size.width-2*_horizontal_gap), _horizontal_gap, _vertical_gap, _size.width-2*_horizontal_gap, _size.height, _align);
+			g->DrawString(_text, _horizontal_gap, _vertical_gap, _size.width-2*_horizontal_gap, _size.height, _align);
 		}
 	}
 
@@ -100,7 +100,7 @@ void Label::Paint(Graphics *g)
 	
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _width, _height);
+		FillRectangle(g, 0, 0, _size.width, _size.height);
 	}
 }
 

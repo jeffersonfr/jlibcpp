@@ -28,6 +28,8 @@
 #include <signal.h>
 #include <math.h>
 
+#define FONT "./fonts/gothic.ttf"
+
 class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread::Thread{
 
 	private:
@@ -83,72 +85,12 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 		virtual ~Main()
 		{
 			delete _image;
-		}
-
-		void rotate(jgui::Graphics *g, jgui::Graphics *img, int xc, int yc, int x, int y, int width, int height, double angle)
-		{
-			double cosTheta,
-						 sinTheta;
-			int i,
-					j,
-					iOriginal,
-					iPrime,
-					jPrime,
-					jOriginal;
-
-			angle = angle - M_PI_2;
-
-			sinTheta = sin(angle);
-			cosTheta = cos(angle);
-
-			g->SetDrawingFlags(jgui::DF_NOFX);
-
-			int w2 = width/2,
-					h2 = height/2,
-					dw = width,
-					dh = height;
-
-			if (height > width) {
-				dw = height;
-			}
-
-			if (width > height) {
-				dh = width;
-			}
-
-			dw = (dw-width)+h2;
-			dh = (dh-height)+w2;
-
-			xc = xc + w2;
-			yc = yc + h2;
-
-			x = x - w2;
-			y = y - h2;
-
-			for (j=height-1+2*dh; j>0; j--) {
-				jPrime = j - height - dh;
-
-				for (i=width-1+2*dw; i>0; i--) {
-					iPrime = i - width - dw;
-					iOriginal = width + round((iPrime+xc)*cosTheta - (jPrime+yc)*sinTheta);
-					jOriginal = height + round((iPrime+xc)*sinTheta + (jPrime+yc)*cosTheta);
-
-					if ((iOriginal >= xc) && ((iOriginal-xc) <= width-1) && (jOriginal >= yc) && ((jOriginal-yc) <= height-1)) {
-						uint32_t rgb = img->GetRGB(iOriginal-xc, jOriginal-yc);
-
-						if (rgb != 0x00000000) {
-							g->SetRGB(x+i-dw, y+j-dh, rgb);
-						}
-					}
-				}
-			}
+			delete _tiles;
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Frame::Paint(g);
-
-			g->SetDrawingFlags(jgui::DF_BLEND);
 
 			for (int j=0; j<8; j++) {
 				for (int i=0; i<10; i++) {
@@ -162,23 +104,9 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 				g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 				g->FillCircle((int)_bullet_x, (int)_bullet_y, 3);
 			}
-
-			// blue sector
-			int dx = (_tx-_insets.left),
-					dy = (_ty-_insets.top);
-					
-			g->SetColor(0x20, 0x20, 0x80, 0x80);
-			g->FillRectangle((int)(_insets.left+dx), (int)(_insets.top+dy), (int)_tile_w, (int)_tile_h);
 			
-			// tank
 			g->Rotate(_angle);
 			g->DrawImage(_image, (int)_tx, (int)_ty);
-			
-			// red sector
-			int bx = (_tx-_insets.left+_tw/2)/_tile_w,
-					by = (_ty-_insets.top+_th/2)/_tile_h;
-			g->SetColor(0x80, 0x20, 0x20, 0x80);
-			g->FillRectangle((int)(_insets.left+bx*_tile_w), (int)(_insets.top+by*_tile_h), (int)_tile_w, (int)_tile_h);
 		}
 
 		virtual void Run() 
@@ -191,22 +119,22 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 					_tx = (_insets.left);
 				}
 
-				if (_tx > (_width-_insets.right-_tw)) {
-					_tx = (_width-_insets.right-_tw);
+				if (_tx > (GetWidth()-_insets.right-_tw)) {
+					_tx = (GetWidth()-_insets.right-_tw);
 				}
 
 				if (_ty < (_insets.top)) {
 					_ty = (_insets.top);
 				}
 
-				if (_ty > (_height-_insets.bottom-_th)) {
-					_ty = (_height-_insets.bottom-_th);
+				if (_ty > (GetHeight()-_insets.bottom-_th)) {
+					_ty = (GetHeight()-_insets.bottom-_th);
 				}
 
 				_bullet_x = _bullet_x + 12*cos(_bullet_angle);
 				_bullet_y = _bullet_y - 12*sin(_bullet_angle);
 
-				if (_bullet_x < (_insets.left) || _bullet_x > (_width-_insets.right) || _bullet_y < (_insets.top) || _bullet_y > (_height-_insets.bottom)) {
+				if (_bullet_x < (_insets.left) || _bullet_x > (GetWidth()-_insets.right) || _bullet_y < (_insets.top) || _bullet_y > (GetHeight()-_insets.bottom)) {
 					_has_bullet = false;
 				}
 
@@ -256,6 +184,8 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 
 int main(int argc, char **argv)
 {
+	jgui::Graphics::SetDefaultFont(new jgui::Font(FONT, 0, 24));
+
 	Main main(50, 100);
 
 	main.Start();

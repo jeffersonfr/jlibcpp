@@ -86,23 +86,23 @@ Component * Container::GetTargetComponent(Container *target, int x, int y)
 
 void Container::SetSize(int w, int h)
 {
-	_width = w;
-	_height = h;
+	_size.width = w;
+	_size.height = h;
 
-	if (_width < _minimum_width) {
-		_width = _minimum_width;
+	if (_size.width < _minimum_size.width) {
+		_size.width = _minimum_size.width;
 	}
 
-	if (_height < _minimum_height) {
-		_height = _minimum_height;
+	if (_size.height < _minimum_size.height) {
+		_size.height = _minimum_size.height;
 	}
 
-	if (_width > _maximum_width) {
-		_width = _maximum_width;
+	if (_size.width > _maximum_size.width) {
+		_size.width = _maximum_size.width;
 	}
 
-	if (_height > _maximum_height) {
-		_height = _maximum_height;
+	if (_size.height > _maximum_size.height) {
+		_size.height = _maximum_size.height;
 	}
 
 	DoLayout();
@@ -250,9 +250,9 @@ void Container::Paint(Graphics *g)
 	g->SetDrawingFlags(DF_NOFX);
 
 	if (_background_visible == true) {
-		g->SetColor(_bg_red, _bg_green, _bg_blue, _bg_alpha);
+		g->SetColor(_bg_color);
 
-		FillRectangle(g, 0, 0, _width, _height);
+		FillRectangle(g, 0, 0, _size.width, _size.height);
 
 		InvalidateAll();
 	}
@@ -273,13 +273,13 @@ void Container::Paint(Graphics *g)
 					w1 = c->GetWidth(),
 					h1 = c->GetHeight();
 
-			if (paint_components_out_of_range || ((x1 < GetWidth() && (x1+w1) > 0) && (y1 < GetHeight() && (y1+h1) > 0))) {
-				if ((x1+w1) > GetWidth()) {
-					w1 = GetWidth()-x1;
+			if (paint_components_out_of_range || ((x1 < _size.width && (x1+w1) > 0) && (y1 < _size.height && (y1+h1) > 0))) {
+				if ((x1+w1) > _size.width) {
+					w1 = _size.width-x1;
 				}
 
-				if ((y1+h1) > GetHeight()) {
-					h1 = GetHeight()-y1;
+				if ((y1+h1) > _size.height) {
+					h1 = _size.height-y1;
 				}
 
 				g->Translate(x1, y1);
@@ -350,7 +350,7 @@ void Container::Repaint(bool all)
 
 	if (_parent != NULL) {
 		if (all == false && IsOpaque() == true && _parent->IsValid() == true) {
-			_parent->Repaint(this, _x-_scroll_x, _y-_scroll_y, _width, _height);
+			_parent->Repaint(this, _location.x-_scroll_x, _location.y-_scroll_y, _size.width, _size.height);
 		} else {
 			InvalidateAll();
 
@@ -375,7 +375,7 @@ void Container::Repaint(Component *c, int x, int y, int width, int height)
 	}
 
 	if (_parent != NULL) {
-		_parent->Repaint(this, _x-_scroll_x, _y-_scroll_y, _width, _height);
+		_parent->Repaint(this, _location.x-_scroll_x, _location.y-_scroll_y, _size.width, _size.height);
 	}
 }
 

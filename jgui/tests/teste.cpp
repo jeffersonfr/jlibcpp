@@ -57,6 +57,7 @@
 #include "jtable.h"
 #include "jfilechooserdialog.h"
 #include "jthememanager.h"
+#include "jcanvas.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -97,7 +98,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 	public:
 		WindowTeste():
-			jgui::Frame("Cassino Royale", 0, 0, 1920, 1080)
+			jgui::Frame("Frame Test", 0, 0, 1920, 1080)
 	{
 		SetIcon("icons/watch_1.png");
 
@@ -274,6 +275,8 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			combo->Add("opcao 8");
 			combo->Add("opcao 9");
 			combo->Add("opcao 0");
+
+			combo->RegisterSelectListener(this);
 		}
 
 		button1->SetNavigation(NULL, NULL, combo, button2);
@@ -472,14 +475,16 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 };
 
-class GraphicPanel : public jgui::Panel{
+class GraphicPanel : public jgui::Canvas{
 
 	private:
 
 	public:
 		GraphicPanel(int x, int y, int w, int h):
-			jgui::Panel(x, y, w, h)
+			jgui::Canvas(x, y, w, h)
 	{
+		SetBackgroundColor(0x40, 0x40, 0x60, 0xff);
+		SetBackgroundVisible(true);
 	}
 
 	virtual ~GraphicPanel()
@@ -488,7 +493,7 @@ class GraphicPanel : public jgui::Panel{
 
 	virtual void Paint(jgui::Graphics *g)
 	{
-		jgui::Panel::Paint(g);
+		jgui::Canvas::Paint(g);
 
 		// colored bar
 		const int num_colors = 512,
@@ -629,10 +634,10 @@ class GraphicPanel : public jgui::Panel{
 		g->FillCircle(3*200+200+10, 3*(100+10)+10+50, 10);
 
 		// texts
-		jgui::Font *f1 = new jgui::Font("./fonts/font.ttf", 0, 50),
-			*f2 = new jgui::Font("./fonts/font.ttf", 0, 40),
-			*f3 = new jgui::Font("./fonts/font.ttf", 0, 30),
-			*f4 = new jgui::Font("./fonts/font.ttf", 0, 20);
+		jgui::Font *f1 = new jgui::Font("./fonts/comic.ttf", 0, 50),
+			*f2 = new jgui::Font("./fonts/comic.ttf", 0, 40),
+			*f3 = new jgui::Font("./fonts/comic.ttf", 0, 30),
+			*f4 = new jgui::Font("./fonts/comic.ttf", 0, 20);
 		int shadow = 4;
 
 		g->SetColor(0x00, 0x80, 0xe0, 0xff);
@@ -707,7 +712,7 @@ class GraphicsTeste : public jgui::Frame{
 	private:
 		jthread::Mutex teste_mutex;
 
-		jgui::Panel *panel;
+		jgui::Canvas *panel;
 
 	public:
 		GraphicsTeste():
@@ -850,7 +855,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 				teste.Show();
 			} else if (event->GetSource() == button4) {
 				jgui::MessageDialog app("Aviso", "Testando o componente MessageBox com todos os recursos de alinhamento. Pulando linha, \n testando new line em DrawJustified para quebrar linhas.\nTestando multiplas linhas de mensagem em um unico componentes. Finalizando, estou apenas aumentando o tamanho do texto para verificar inconsistencias.", 150, 250);
-				jgui::MessageDialog app1("Aviso", "One Line One Line One Line One Line ... One Line One Line", 150, 250);
+				jgui::MessageDialog app1("Aviso", "JeffersonFerreiradeAraujoAdrianaAraujoLimaMariadeLourdesAraujoLimaAmancioFerreiraLima", 150, 250);
 
 				app.Show();
 				app1.Show();
@@ -913,6 +918,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 
 		virtual void ItemSelected(jgui::MenuEvent *event)
 		{
+			puts("Teste ---->");
 		}
 
 		virtual void ItemChanged(jgui::MenuEvent *event)

@@ -86,16 +86,16 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 		catched = true;
 
 		int x1 = event->GetX(),
-			y1 = event->GetY(),
-			size = _height;
+				y1 = event->GetY(),
+				size = _size.height;
 
-		if (_height > _width) {
-			size = _width;
+		if (_size.height > _size.width) {
+			size = _size.width;
 		}
 
 		RequestFocus();
 
-		if ((x1 > _x && x1 < (_x+size)) && (y1 > _y && y1 < (_y+size))) {
+		if ((x1 > _location.x && x1 < (_location.x+size)) && (y1 > _location.y && y1 < (_location.y+size))) {
 			if (_type == CHECK_TYPE) {
 				if (_checked == true) {
 					SetSelected(false);
@@ -156,7 +156,7 @@ void CheckButton::Paint(Graphics *g)
 	Component::Paint(g);
 
 	int size = DEFAULT_COMPONENT_HEIGHT-2*_border_size,
-			maxwh = std::min(_width, _height);
+			maxwh = std::min(_size.width, _size.height);
 
 	if (size > maxwh) {
 		size = maxwh;
@@ -176,13 +176,13 @@ void CheckButton::Paint(Graphics *g)
 		}
 		*/
 
-		g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-		g->DrawString(TruncateString(_label, _width-(size+15)), size+10, (CENTER_VERTICAL_TEXT), _width, _height, LEFT_ALIGN);
+		g->SetColor(_fg_color);
+		g->DrawString(TruncateString(_label, _size.width-(size+15)), size+10, (CENTER_VERTICAL_TEXT), _size.width, _size.height, LEFT_ALIGN);
 	}
 
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
-	int center = (_height-size)/2;
+	int center = (_size.height-size)/2;
 
 	if (_checked == true) {
 		if (_type == CHECK_TYPE) {
@@ -213,7 +213,7 @@ void CheckButton::Paint(Graphics *g)
 
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _width, _height);
+		FillRectangle(g, 0, 0, _size.width, _size.height);
 	}
 }
 

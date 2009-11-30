@@ -302,11 +302,9 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 
 		/* Cache the current slave's size. */
 		if (sizeflag == GBLS_PREFERREDSIZE) {
-			d.width = comp->GetPreferredWidth();
-			d.height = comp->GetPreferredHeight();
+			d = comp->GetPreferredSize();
 		} else {
-			d.width = comp->GetMinimumWidth();
-			d.height = comp->GetMinimumHeight();
+			d = comp->GetMinimumSize();
 		}
 		constraints->minWidth = d.width;
 		constraints->minHeight = d.height;

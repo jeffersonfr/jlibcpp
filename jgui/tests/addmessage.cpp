@@ -345,7 +345,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 		if (GetComponentInFocus() == hour) {
 			tmp = hour->GetText();
 
-			jgui::Keyboard keyboard(_x+_width+20, _y, jgui::SMALL_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
 
 			keyboard.SetMaxTextSize(20);
 			keyboard.SetText(hour->GetText());
@@ -360,7 +360,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 		} else if (GetComponentInFocus() == minute) {
 			tmp = minute->GetText();
 
-			jgui::Keyboard keyboard(_x+_width+20, _y, jgui::SMALL_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
 
 			keyboard.SetMaxTextSize(20);
 			keyboard.SetText(minute->GetText());
@@ -375,7 +375,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 		} else if (GetComponentInFocus() == date) {
 			tmp = date->GetText();
 
-			jgui::CalendarDialog calendar(_x+_width+20, _y);
+			jgui::CalendarDialog calendar(GetX()+GetWidth()+20, GetY());
 
 			for (int i=0; i<db->GetSize(); i++) {
 				AgendaDB::agenda_t *t = db->Get(i);
@@ -403,7 +403,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 		} else if (GetComponentInFocus() == message) {
 			tmp = message->GetText();
 
-			jgui::Keyboard keyboard(_x+_width+20, _y, jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, false);
 
 			keyboard.SetMaxTextSize(20);
 			keyboard.SetText(message->GetText());

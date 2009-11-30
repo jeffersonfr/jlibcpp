@@ -53,6 +53,7 @@ class Tree : public jgui::Component{
 		TreeComponent *_list;
 		int _visible_items;
 		jmenu_align_t _menu_align;
+		jcolor_t _item_color;
 
 	public:
 		/**
@@ -95,13 +96,13 @@ class Tree : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		uint32_t GetItemColor();
+		jcolor_t GetItemColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetItemColor(uint32_t color);
+		void SetItemColor(jcolor_t color);
 		
 		/**
 		 * \brief
@@ -341,10 +342,7 @@ class TreeComponent : public Component{
 			_paint_count,
 			_vertical_gap,
 			_horizontal_gap;
-		int _item_red,
-			_item_green,
-			_item_blue,
-			_item_alpha;
+		jcolor_t _item_color;
 		float delta;
 		bool _input_locked,
 			 _arrows_visible,
@@ -385,13 +383,13 @@ class TreeComponent : public Component{
 		 * \brief
 		 *
 		 */
-		uint32_t GetItemColor();
+		jcolor_t GetItemColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetItemColor(uint32_t color);
+		void SetItemColor(jcolor_t color);
 		
 		/**
 		 * \brief

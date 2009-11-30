@@ -53,8 +53,8 @@ class Main : public jgui::Frame{
 		static const double D_ACS = 0.85;
 		static const int Q_ACS = 0xf00;
 
-		static const int MAX_COLS = 80;
-		static const int MAX_ROWS = 40;
+		static const int MAX_COLS = 90;
+		static const int MAX_ROWS = 45;
 		
 		static const int BLOCK_WIDTH = 16;
 		static const int BLOCK_HEIGHT = 16;
@@ -288,7 +288,7 @@ class Main : public jgui::Frame{
 			}
 			
 #if DRAW_ANTS == 1
-			g->SetColor(0x00, 0xf0, 0x00, 0xff);
+			g->SetColor(0x00, 0xf0, 0x00);
 
 			for (int j=0; j<K_ANTS; j++) {
 				for (int i=1; i<MAX_COLS; i++) {
@@ -314,7 +314,7 @@ class Main : public jgui::Frame{
 
 			sprintf(tmp, "Current Solution [%d]", best);
 
-			g->DrawString(tmp, _insets.left, _height-50);
+			g->DrawString(tmp, _insets.left, GetHeight()-50);
 		}
 #endif
 

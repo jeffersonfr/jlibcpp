@@ -41,6 +41,8 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 		WatchTeste():
 			jgui::Frame("Watch Teste", 0, 0, 1920/4, 1080/2)
 		{
+			SetMinimumSize(400, 400);
+
 			jcommon::Date date;
 
 			hours = date.GetHour();
@@ -51,7 +53,7 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 			SetResizeEnabled(true);
 
 			_flag = true;
-			_filled = true;
+			_filled = false; // true;
 		}
 
 		virtual ~WatchTeste()
@@ -84,13 +86,13 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 		{
 			jgui::Frame::Paint(g);
 
-			int m = std::min(_width, _height-_insets.top);
+			int m = std::min(GetWidth(), GetHeight()-_insets.top);
 
 			double th = (30*hours+minutes/2)*M_PI/180.0-M_PI/2,
 				tm = (minutes*6+seconds/10)*M_PI/180.0-M_PI/2,
 				ts = (seconds*6)*M_PI/180.0-M_PI/2;
-			double xc = _width/2,
-				yc = (_height-_insets.top)/2+_insets.top,
+			double xc = GetWidth()/2,
+				yc = (GetHeight()-_insets.top)/2+_insets.top,
 				hh = 0.03*m,
 				vh = 0.25*m,
 				hm = 0.02*m,
@@ -162,7 +164,7 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 int main( int argc, char *argv[] )
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/comic.ttf", 0, 20));
 
 	WatchTeste test;
 
@@ -171,4 +173,3 @@ int main( int argc, char *argv[] )
 
 	return 0;
 }
-

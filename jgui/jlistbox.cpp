@@ -76,7 +76,7 @@ void ListBox::SetCenteredInteraction(bool b)
 
 int ListBox::GetVisibleItems()
 {
-	int visible_items = _height/(_item_size+_vertical_gap);
+	int visible_items = _size.height/(_item_size+_vertical_gap);
 
 	if (visible_items < 1) {
 		visible_items = 1;
@@ -129,27 +129,24 @@ void ListBox::SetLoop(bool loop)
 	Repaint();
 }
 
-uint32_t ListBox::GetItemColor()
+jcolor_t ListBox::GetItemColor()
 {
-	return (_item_alpha & 0xff) << 24 | (_item_red & 0xff) << 16 | (_item_green & 0xff) << 8 | (_item_blue & 0xff) << 0;
+	return _item_color;
 }
 
-void ListBox::SetItemColor(uint32_t color)
+void ListBox::SetItemColor(jcolor_t color)
 {
-	_item_red = (color>>0x10)&0xff;
-	_item_green = (color>>0x08)&0xff;
-	_item_blue = (color>>0x00)&0xff;
-	_item_alpha = (color>>0x18)&0xff;
+	SetItemColor(color.red, color.green, color.blue, color.alpha);
 }
 
 void ListBox::SetItemColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_item_red = red;
-	_item_green = green;
-	_item_blue = blue;
-	_item_alpha = alpha;
+	_item_color.red = red;
+	_item_color.green = green;
+	_item_color.blue = blue;
+	_item_color.alpha = alpha;
 }
 
 void ListBox::SetScrollType(jlist_scroll_type_t type)
@@ -230,58 +227,58 @@ void ListBox::Paint(Graphics *g)
 		if (_index != i) {
 			if (_selection == SINGLE_SELECTION) {	
 				if (_selected_index == i) {	
-					g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-					FillRectangle(g, _horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
+					g->SetColor(_fg_color);
+					FillRectangle(g, _horizontal_gap, default_y, _size.width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
 				} else {
-					g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-					FillRectangle(g, _horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
+					g->SetColor(_item_color);
+					FillRectangle(g, _horizontal_gap, default_y, _size.width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
 				}
 			} else if (_selection == MULTI_SELECTION) {	
 				if (_items[i].check == true) {	
-					g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
-					FillRectangle(g, _horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
+					g->SetColor(_fg_color);
+					FillRectangle(g, _horizontal_gap, default_y, _size.width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
 				} else {
-					g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-					FillRectangle(g, _horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
+					g->SetColor(_item_color);
+					FillRectangle(g, _horizontal_gap, default_y, _size.width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
 				}
 			} else {
-				g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-				FillRectangle(g, _horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
+				g->SetColor(_item_color);
+				FillRectangle(g, _horizontal_gap, default_y, _size.width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
 			}
 		} else {
-			g->SetColor(_bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-			FillRectangle(g, _horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
+			g->SetColor(_bgfocus_color);
+			FillRectangle(g, _horizontal_gap, default_y, _size.width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size);
 
 			/*
-			g->FillGradientRectangle(_horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, (int)((_item_size)*0.6), _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+			g->FillGradientRectangle(_horizontal_gap, default_y, _size.width-2*_horizontal_gap-scroll_width-scroll_gap, (int)((_item_size)*0.6), _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
 			g->FillGradientRectangle(_horizontal_gap, default_y+(_item_size)/2, _width-2*_horizontal_gap-scroll_width-scroll_gap, (_item_size)/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
 			*/
 		}
 
 		if (_selection == SINGLE_SELECTION) {
 			if (_selected_index == i) {
-				g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
+				g->SetColor(_item_color);
 			} else {
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+				g->SetColor(_fg_color);
 			}
 		} else if (_selection == MULTI_SELECTION) {	
 			if (_items[i].check == true) {	
-				g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
+				g->SetColor(_item_color);
 			} else {
-				g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+				g->SetColor(_fg_color);
 			}
 		} else {
-			g->SetColor(_fg_red, _fg_green, _fg_blue, _fg_alpha);
+			g->SetColor(_fg_color);
 		}
 
 		if (_items[i].type == EMPTY_ITEM) {
 		} else if (_items[i].type == TEXT_ITEM) {
-			g->DrawString(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
+			g->DrawString(TruncateString(_items[i].text, _size.width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _size.width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
 		} else if (_items[i].type == IMAGE_ITEM) {
 			if (_items[i].image == NULL) {
-				g->DrawString(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
+				g->DrawString(TruncateString(_items[i].text, _size.width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _size.width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
 			} else {
-				g->DrawString(TruncateString(_items[i].text, _width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
+				g->DrawString(TruncateString(_items[i].text, _size.width-space-_horizontal_gap-scroll_width-scroll_gap), space+_horizontal_gap, default_y, _size.width-space-_horizontal_gap-scroll_width-scroll_gap, _item_size, _align);
 				g->DrawImage(_items[i].image, 10, default_y, _item_size, _item_size);
 			}
 		}
@@ -292,19 +289,19 @@ void ListBox::Paint(Graphics *g)
 		
 		int gap = 0;
 
-		if ((default_y+_item_size) >= (_height-_vertical_gap)) {
-			gap = (default_y+_item_size)-(_height-_vertical_gap);
+		if ((default_y+_item_size) >= (_size.height-_vertical_gap)) {
+			gap = (default_y+_item_size)-(_size.height-_vertical_gap);
 		}
 
-		g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-		FillRectangle(g, _horizontal_gap, default_y, _width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size-gap);
+		g->SetColor(_item_color);
+		FillRectangle(g, _horizontal_gap, default_y, _size.width-2*_horizontal_gap-scroll_width-scroll_gap, _item_size-gap);
 	}
 	
 	if (_scroll == SCROLL_BAR) {
-		g->SetColor(_item_red, _item_green, _item_blue, _item_alpha);
-		FillRectangle(g, _width-_horizontal_gap-scroll_width, _vertical_gap, scroll_width, _height-2*_vertical_gap);
+		g->SetColor(_item_color);
+		FillRectangle(g, _size.width-_horizontal_gap-scroll_width, _vertical_gap, scroll_width, _size.height-2*_vertical_gap);
 				
-		int dx = _width-_horizontal_gap-scroll_width+2,
+		int dx = _size.width-_horizontal_gap-scroll_width+2,
 			dy = _vertical_gap+4;
 		
 		scroll_width -= 4;
@@ -340,13 +337,13 @@ void ListBox::Paint(Graphics *g)
 			}
 		}
 
-		dy = _height-_vertical_gap-_item_size/2-4;
+		dy = _size.height-_vertical_gap-_item_size/2-4;
 
 		g->SetColor(0x80, 0x80, 0xe0, 0xff);
 		g->FillTriangle(dx+0, dy, dx+scroll_width, dy, dx+scroll_width/2, dy+_item_size/2-2);
 		
 		if (visible_items <= (int)_items.size()) {
-			double diff = (_height-2*_vertical_gap-2*_item_size-8)/(double)(_items.size()-1);
+			double diff = (_size.height-2*_vertical_gap-2*_item_size-8)/(double)(_items.size()-1);
 			
 			g->SetColor(0x80, 0x80, 0xe0, 0xff);
 			g->FillRectangle(dx+2, (int)(_vertical_gap+_item_size/2+diff*_index+4), scroll_width-4, _item_size);
@@ -357,7 +354,7 @@ void ListBox::Paint(Graphics *g)
 
 	if (_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _width, _height);
+		FillRectangle(g, 0, 0, _size.width, _size.height);
 	}
 }
 

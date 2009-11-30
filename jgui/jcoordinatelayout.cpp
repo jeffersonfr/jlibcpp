@@ -77,8 +77,8 @@ jsize_t CoordinateLayout::GetPreferredSize(Container *target)
 	for (int i=0; i<nmembers; i++) {
 		Component *cmp = target->GetComponents()[i];
 
-		t.width = std::max(t.width, cmp->GetX()+cmp->GetPreferredWidth());
-		t.height = std::max(t.height, cmp->GetY()+cmp->GetPreferredHeight());
+		t.width = std::max(t.width, cmp->GetLocation().x+cmp->GetPreferredSize().width);
+		t.height = std::max(t.height, cmp->GetLocation().y+cmp->GetPreferredSize().height);
 	}
 
 	return t;
@@ -86,7 +86,7 @@ jsize_t CoordinateLayout::GetPreferredSize(Container *target)
 
 void CoordinateLayout::DoLayout(Container *target)
 {
-	if ((void *)target == NULL || target->GetWidth() == 0 || target->GetHeight() == 0) {
+	if ((void *)target == NULL || target->GetSize().width == 0 || target->GetSize().height == 0) {
 		return;
 	}
 
@@ -95,19 +95,19 @@ void CoordinateLayout::DoLayout(Container *target)
 	int nmembers = target->GetComponentCount();
 
 	if ((_type & CL_HORIZONTAL) != 0) {
-		sx = (double)target->GetWidth()/_width;
-		_width = target->GetWidth();
+		sx = (double)target->GetSize().width/_width;
+		_width = target->GetSize().width;
 	}
 
 	if ((_type & CL_VERTICAL) != 0) {
-		sy = (double)target->GetHeight()/_height;
-		_height = target->GetHeight();
+		sy = (double)target->GetSize().height/_height;
+		_height = target->GetSize().height;
 	}
 
 	for (int i = 0 ; i < nmembers ; i++) {
 		Component *m = target->GetComponents()[i];
 
-		m->SetBounds((int)(m->GetX()*sx), (int)(m->GetY()*sy), m->GetPreferredWidth(), m->GetPreferredHeight());
+		m->SetBounds((int)(m->GetLocation().x*sx), (int)(m->GetLocation().y*sy), m->GetPreferredSize().width, m->GetPreferredSize().height);
 	}
 }
 

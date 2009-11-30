@@ -28,6 +28,7 @@
 #include "jgridbaglayout.h"
 #include "jnulllayout.h"
 #include "jthememanager.h"
+#include "jcoordinatelayout.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -163,7 +164,7 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			_c[4]->Add(new jgui::Button("Button 3"), c);
 
 			c->fill = jgui::GBLC_HORIZONTAL;
-			c->ipady = 40;      //make this component tall
+			c->ipady = 40;      // make this component tall
 			c->weightx = 0.0;
 			c->gridwidth = 3;
 			c->gridx = 0;
@@ -171,17 +172,17 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			_c[4]->Add(new jgui::Button("Button 4"), c);
 
 			c->fill = jgui::GBLC_HORIZONTAL;
-			c->ipady = 0;       //reset to default
-			c->weighty = 1.0;   //request any extra vertical space
-			c->weightx = 0.0;   //request any extra vertical space
+			c->ipady = 0;       // reset to default
+			c->weighty = 1.0;   // request any extra vertical space
+			c->weightx = 0.0;   // request any extra vertical space
 			c->anchor = jgui::GBLC_LAST_LINE_START;//PAGE_END; //bottom of space
 			c->insets.left = 0;
 			c->insets.right = 0;
 			c->insets.top = 0;
 			c->insets.bottom = 0;
-			c->gridx = 1;       //aligned with button 2
-			c->gridwidth = 2;   //2 columns wide
-			c->gridy = 2;       //third row
+			c->gridx = 1;       // aligned with button 2
+			c->gridwidth = 2;   // 2 columns wide
+			c->gridy = 2;       // third row
 			_c[4]->Add(new jgui::Button("Button 5"), c);
 
 			// nulllayout
@@ -193,7 +194,7 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			_c[5]->Add(new jgui::Button("Button 3", 2*40, 2*(h1+10), w1, h1));
 			_c[5]->Add(new jgui::Button("Button 4", 3*40, 3*(h1+10), w1, h1));
 			_c[5]->Add(new jgui::Button("Button 5", 4*40, 4*(h1+10), w1, h1));
-
+			
 			// adicionando a legenda nos containers
 			jgui::Label *l1 = new jgui::Label("FlowLayout", 0, 0, 0, 0),
 				*l2 = new jgui::Label("GridLayout", 0, 0, 0, 0),
@@ -201,7 +202,13 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 				*l4 = new jgui::Label("CardLayout", 0, 0, 0, 0),
 				*l5 = new jgui::Label("GridBagLayout", 0, 0, 0, 0),
 				*l6 = new jgui::Label("NullLayout", 0, 0, 0, 0);
-			uint32_t color = 0xff404040;
+			
+			jgui::jcolor_t color;
+			
+			color.red = 0x40;
+			color.green = 0x40;
+			color.blue = 0x40;
+			color.alpha = 0xff;
 
 			l1->SetBackgroundColor(color);
 			l2->SetBackgroundColor(color);
@@ -224,14 +231,16 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 
 		virtual void ActionPerformed(jgui::ButtonEvent *event)
 		{
+			jgui::CardLayout *card = ((jgui::CardLayout *)_c[7]->GetLayout());
+
 			if (event->GetSource() == _first) {
-				((jgui::CardLayout *)_c[7]->GetLayout())->First(_c[7]);
+				card->First(_c[7]);
 			} else if (event->GetSource() == _last) {
-				((jgui::CardLayout *)_c[7]->GetLayout())->Last(_c[7]);
+				card->Last(_c[7]);
 			} else if (event->GetSource() == _previous) {
-				((jgui::CardLayout *)_c[7]->GetLayout())->Previous(_c[7]);
+				card->Previous(_c[7]);
 			} else if (event->GetSource() == _next) {
-				((jgui::CardLayout *)_c[7]->GetLayout())->Next(_c[7]);
+				card->Next(_c[7]);
 			}
 		}
 
