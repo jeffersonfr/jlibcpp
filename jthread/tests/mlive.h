@@ -3,7 +3,7 @@
 #include "jmutex.h"
 #include "jthread.h"
 #include "jthreadexception.h"
-#include "jmultidestinationbuffer.h"
+#include "jindexedbuffer.h"
 #include "jsocket.h"
 #include "jdatagramsocket.h"
 #include "jsocketlib.h"
@@ -122,7 +122,7 @@ class Source : public Thread{
 
 	private:
 		std::vector<Client *> clients;
-		MultiDestinationBuffer *_buffer;
+		IndexedBuffer *_buffer;
 		Mutex _mutex;
 		Server *_server;
 		std::string _event;
@@ -145,7 +145,7 @@ class Source : public Thread{
 		int GetIncommingRate();
 		int GetOutputRate();
 		int GetNumberOfClients();
-		MultiDestinationBuffer * GetBuffer();
+		IndexedBuffer * GetBuffer();
 		std::string GetSourceName();
 		bool AddClient(Socket *socket, RequestParser &parser);
 		void ReadStream();

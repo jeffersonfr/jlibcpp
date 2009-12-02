@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_RINGBUFFER_H
-#define J_RINGBUFFER_H
+#ifndef J_INDEXEDBUFFER_H
+#define J_INDEXEDBUFFER_H
 
 #include "jsemaphore.h"
 #include "jcondition.h"
@@ -58,13 +58,13 @@ struct jringbuffer_t {
 };
 
 /**
- * \brief MultiDestinationBuffer.
+ * \brief IndexedBuffer.
  * 
  * WARNNING:: add -DSINGLE_WAIT_CONDITION to Makefile flags
  *
  * @author Jeff Ferr
  */
-class MultiDestinationBuffer : public virtual jcommon::Object{
+class IndexedBuffer : public virtual jcommon::Object{
 
     private:
 		/** \brief */
@@ -94,13 +94,13 @@ class MultiDestinationBuffer : public virtual jcommon::Object{
          * \brief Construtor.
          *
          */
-        MultiDestinationBuffer(int size = 256, int chunk = MIN_CHUNK_SIZE, jbuffer_type_t type = BUFFER_BLOCK);
+        IndexedBuffer(int size = 256, int chunk = MIN_CHUNK_SIZE, jbuffer_type_t type = BUFFER_BLOCK);
 
         /**
          * \brief Destrutor virtual.
          *
          */
-        virtual ~MultiDestinationBuffer();
+        virtual ~IndexedBuffer();
 
         /**
          * \brief 

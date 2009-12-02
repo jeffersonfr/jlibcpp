@@ -253,7 +253,7 @@ Source::Source(std::string ip, int port, std::string source_name, source_type_t 
 	_current = READSTREAM;
 	_is_closed = false;
 
-	_buffer = new MultiDestinationBuffer(atoi(Configuration::GetInstance()->GetProperty("buffer-size").c_str()), 4096);
+	_buffer = new IndexedBuffer(atoi(Configuration::GetInstance()->GetProperty("buffer-size").c_str()), 4096);
 
 	if (_type == HTTP_SOURCE_TYPE) {
 		_source = dynamic_cast<jsocket::Connection *>(new jsocket::Socket(ip, port));
@@ -309,7 +309,7 @@ int Source::IsClosed()
 	return _is_closed;
 }
 
-MultiDestinationBuffer * Source::GetBuffer() 
+IndexedBuffer * Source::GetBuffer() 
 {
 	return _buffer;
 }
@@ -660,7 +660,7 @@ void Client::ProcessHTTPClient()
 		}
 	}
 
-	MultiDestinationBuffer *buffer = source->GetBuffer();
+	IndexedBuffer *buffer = source->GetBuffer();
 	jio::OutputStream *o = response->GetOutputStream();
 	jringbuffer_t data;
 	int r;
@@ -687,7 +687,7 @@ void Client::ProcessHTTPClient()
 
 void Client::ProcessUDPClient() 
 {
-	MultiDestinationBuffer *buffer = source->GetBuffer();
+	IndexedBuffer *buffer = source->GetBuffer();
 	jio::OutputStream *o = response->GetOutputStream();
 	jringbuffer_t data;
 	int r;

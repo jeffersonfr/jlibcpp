@@ -200,7 +200,7 @@ OBJS_jthread = \
 	   jautolock.o\
 	   jspinlock.o\
 	   jthreadlib.o\
-	   jmultidestinationbuffer.o\
+	   jindexedbuffer.o\
 	   jthreadgroup.o\
 	   jrunnable.o\
 

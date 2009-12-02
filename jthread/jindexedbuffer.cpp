@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmultidestinationbuffer.h"
+#include "jindexedbuffer.h"
 #include "jsemaphoreexception.h"
 #include "jmutexexception.h"
 #include "jbufferexception.h"
@@ -29,10 +29,10 @@ namespace jthread {
 
 // add -DSINGLE_WAIT_CONDITION to Makefile flags
 
-MultiDestinationBuffer::MultiDestinationBuffer(int size, int chunk, jbuffer_type_t type_):
+IndexedBuffer::IndexedBuffer(int size, int chunk, jbuffer_type_t type_):
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jthread::MultiDestinationBuffer");
+	jcommon::Object::SetClassName("jthread::IndexedBuffer");
 	
 	_type = type_;
 	_buffer_size = size;
@@ -57,7 +57,7 @@ MultiDestinationBuffer::MultiDestinationBuffer(int size, int chunk, jbuffer_type
 	}
 }
 
-MultiDestinationBuffer::~MultiDestinationBuffer()
+IndexedBuffer::~IndexedBuffer()
 {
 	if (_buffer != NULL) {
 		for (int i=0; i<_buffer_size; i++) {
@@ -66,7 +66,7 @@ MultiDestinationBuffer::~MultiDestinationBuffer()
 	}
 }
 
-void MultiDestinationBuffer::Reset()
+void IndexedBuffer::Reset()
 {
 	AutoLock lock(&_mutex);
 
@@ -76,12 +76,12 @@ void MultiDestinationBuffer::Reset()
 	// _semaphore.NotifyAll();
 }
 
-void MultiDestinationBuffer::Release()
+void IndexedBuffer::Release()
 {
 	_semaphore.Release();
 }
 
-int MultiDestinationBuffer::GetIndex(int *rindex, int *pindex)
+int IndexedBuffer::GetIndex(int *rindex, int *pindex)
 {
 	AutoLock lock(&_mutex);
 
@@ -91,7 +91,7 @@ int MultiDestinationBuffer::GetIndex(int *rindex, int *pindex)
 	return 0;
 }
 
-int MultiDestinationBuffer::GetAvailable(int *rindex, int *pindex)
+int IndexedBuffer::GetAvailable(int *rindex, int *pindex)
 {
 	if ((*rindex < 0 || *rindex >= _buffer_size) || *pindex < 0) {
 		return -1;
@@ -122,7 +122,7 @@ int MultiDestinationBuffer::GetAvailable(int *rindex, int *pindex)
 	return amount;
 }
 
-int MultiDestinationBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
+int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 {
 	if ((*rindex < 0 || *rindex >= _buffer_size) || *pindex < 0) {
 		return -1;
@@ -175,7 +175,7 @@ int MultiDestinationBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 	return -1;
 }
 
-int MultiDestinationBuffer::Write(const uint8_t*data, int size)
+int IndexedBuffer::Write(const uint8_t*data, int size)
 {
 	if ((void *)data == NULL) {
 		return -1;
@@ -214,7 +214,7 @@ int MultiDestinationBuffer::Write(const uint8_t*data, int size)
 	return size;
 }
 
-int MultiDestinationBuffer::Write(jringbuffer_t *data)
+int IndexedBuffer::Write(jringbuffer_t *data)
 {
 	if ((void *)data == NULL) {
 		return -1;
