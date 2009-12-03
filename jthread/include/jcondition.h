@@ -42,64 +42,64 @@ class Condition : public virtual jcommon::Object{
     private:
 #ifdef _WIN32
 #else
-        /** \brief Descritor */
-        pthread_cond_t _condition;
+			/** \brief Descritor */
+			pthread_cond_t _condition;
 #endif
-        /** \brief Mutex */
-        Mutex _monitor;
-        /** \brief Mutex */
-        int _count;
-        /** \brief Mutex */
-        int _nblock;
-		/** \brief */
-		bool _is_open;
+			/** \brief Mutex */
+			Mutex _monitor;
+			/** \brief Mutex */
+			int _count;
+			/** \brief Mutex */
+			int _nblock;
+			/** \brief */
+			bool _is_open;
 
     public:
-        /**
-         * \brief Construtor.
-         *
-         */
-        Condition(int nblock = 1);
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			Condition(int nblock = 1);
 
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~Condition();
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~Condition();
 
-        /**
-         * \brief Lock semaphore.
-         *
-         */
-        void Wait(Mutex *mutex = NULL);
- 
-		/**
-         * \brief Lock semaphore.
-		 *
-		 * \param time_ is an absolute time specification, zero is the beginning of 
-		 * the epoch (00:00:00 GMT, January 1, 1970).
-         *
-         */
-        void Wait(long long time_, Mutex *mutex = NULL);
-        
-        /**
-         * \brief Notify the locked semaphore.
-         *
-         */
-        void Notify();
-        
-        /**
-         * \brief Notify all the locked semaphores.
-         *
-         */
-        void NotifyAll();
+			/**
+			 * \brief Lock semaphore.
+			 *
+			 */
+			void Wait(Mutex *mutex = NULL);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void Release();
-    
+			/**
+			 * \brief Lock semaphore.
+			 *
+			 * \param time_ is an absolute time specification, zero is the beginning of 
+			 * the epoch (00:00:00 GMT, January 1, 1970).
+			 *
+			 */
+			void Wait(long long time_, Mutex *mutex = NULL);
+
+			/**
+			 * \brief Notify the locked semaphore.
+			 *
+			 */
+			void Notify();
+
+			/**
+			 * \brief Notify all the locked semaphores.
+			 *
+			 */
+			void NotifyAll();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void Release();
+
 };
 
 }

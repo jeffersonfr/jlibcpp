@@ -48,85 +48,85 @@ class Semaphore : public virtual jcommon::Object{
 
     private:
 #ifdef _WIN32
-		/** \brief */
-		long _count; 
-		/** \brief */
-		long _max_count;  
-		/** \brief */
-		BOOL _inherit;   
+			/** \brief */
+			long _count; 
+			/** \brief */
+			long _max_count;  
+			/** \brief */
+			BOOL _inherit;   
 
-		/** \brief */
-	    std::string _semaphore_name;
-		/** \brief */
-		HANDLE _semaphore;
-		/** \brief */
-	    LPSECURITY_ATTRIBUTES _sa;
+			/** \brief */
+			std::string _semaphore_name;
+			/** \brief */
+			HANDLE _semaphore;
+			/** \brief */
+			LPSECURITY_ATTRIBUTES _sa;
 #else
-        /** \brief Semaphore handler. */
-        sem_t _semaphore;
-        /** \brief */
-		int _count;
+			/** \brief Semaphore handler. */
+			sem_t _semaphore;
+			/** \brief */
+			int _count;
 #endif
-		/** \brief */
-		bool _is_open;
-		/** \brief */
-		Mutex mutex;
+			/** \brief */
+			bool _is_open;
+			/** \brief */
+			Mutex mutex;
 
     public:
-        /**
-         * \brief Construtor.
-         *
-         */
-		Semaphore(int = 0);
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			Semaphore(int = 0);
 
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~Semaphore();
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~Semaphore();
 
-        /**
-         * \brief Lock the semaphore.
-         *
-         */
-        void Wait();
+			/**
+			 * \brief Lock the semaphore.
+			 *
+			 */
+			void Wait();
 
-		/**
-		 * \brief Lock semaphore.
-		 *
-		 */
-		void Wait(long long time_);
-		
-        /**
-         * \brief Notify the locked semaphore.
-         *
-         */
-        void Notify();
-        
-        /**
-         * \brief Notify all locked semaphores.
-         *
-         */
-        void NotifyAll();
-        
-        /**
-         * \brief Try lock the semaphore.
-         *
-         */
-        bool TryWait();
-        
-        /**
-         * \brief
-         *
-         */
-        int GetValue();
-        
-        /**
-         * \brief
-         *
-         */
-        void Release();
-        
+			/**
+			 * \brief Lock semaphore.
+			 *
+			 */
+			void Wait(long long time_);
+
+			/**
+			 * \brief Notify the locked semaphore.
+			 *
+			 */
+			void Notify();
+
+			/**
+			 * \brief Notify all locked semaphores.
+			 *
+			 */
+			void NotifyAll();
+
+			/**
+			 * \brief Try lock the semaphore.
+			 *
+			 */
+			bool TryWait();
+
+			/**
+			 * \brief
+			 *
+			 */
+			int GetValue();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void Release();
+
 };
 
 }

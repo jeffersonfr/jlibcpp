@@ -168,7 +168,7 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Get thread identifier
 		 *
 		 */
-		int GetId();
+		int GetID();
 
 		/**
 		 * \brief 

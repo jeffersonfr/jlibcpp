@@ -55,8 +55,10 @@ Thread::~Thread()
 #endif
 }
 
-int Thread::GetId()
+int Thread::GetID()
 {
+	AutoLock lock(&jthread_mutex);
+
 	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
 		jthread_map_t *t = i->second;
 

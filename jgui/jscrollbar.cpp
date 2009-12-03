@@ -137,7 +137,7 @@ void ScrollBar::SetPosition(double i)
 		}
 
 		jadjustment_type_t t = UNIT_INCREMENT;
-		int diff = _position-_old_position;
+		int diff = (int)(_position-_old_position);
 
 		if (diff > _minimum_tick) {
 			t = BLOCK_INCREMENT;

@@ -85,29 +85,30 @@ public:
 	 */
 	bool IsLocked();
 
-        /**
-         * \brief Lock the critial section.
-         *
-         */
-        void Lock();
-        
-        /**
-         * \brief Unlock the critical section.
-         *
-         */
-        void Unlock();
-        
-        /**
-         * \brief Try lock the critical section.
-         *
-         */
-        bool TryLock();
-    
-		/**
-		 * \brief
-		 *
-		 */
-		std::string what();
+	/**
+	 * \brief Lock the critial section.
+	 *
+	 */
+	void Lock();
+
+	/**
+	 * \brief Unlock the critical section.
+	 *
+	 */
+	void Unlock();
+
+	/**
+	 * \brief Try lock the critical section.
+	 *
+	 */
+	bool TryLock();
+
+	/**
+	 * \brief
+	 *
+	 */
+	std::string what();
+
 };
 
 }
