@@ -26,6 +26,7 @@
 #include <map>
 
 #include <stdint.h>
+#include <stdio.h>
 
 namespace jcommon {
 

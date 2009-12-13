@@ -21,8 +21,10 @@
 #define J_INPUTSTREAM_H
 
 #include "jinputstream.h"
-
 #include "jobject.h"
+
+#include <stdint.h>
+#include <stdio.h>
 
 namespace jio {
 

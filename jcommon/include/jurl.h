@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <cstdlib>
 #include <string.h>
+#include <stdio.h>
 
 namespace jcommon {
 
