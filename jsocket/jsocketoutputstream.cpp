@@ -79,7 +79,7 @@ SocketOutputStream::~SocketOutputStream()
 	}
 }
 
-long long SocketOutputStream::Available()
+int64_t SocketOutputStream::Available()
 {
 	return 0LL;
 }
@@ -95,9 +95,9 @@ int SocketOutputStream::Write(int c_)
 	return 0;
 }
 
-long long SocketOutputStream::Write(const char *data_, long long data_length_)
+int64_t SocketOutputStream::Write(const char *data_, int64_t data_length_)
 {
-	long long l = data_length_, size; 
+	int64_t l = data_length_, size; 
 	
 	while (l > 0LL) {
 		size = (_buffer_length - _current_index);
@@ -119,7 +119,7 @@ long long SocketOutputStream::Write(const char *data_, long long data_length_)
 		}
 	}
 
-	return (long long)(data_length_ - l);
+	return (int64_t)(data_length_ - l);
 }
 
 bool SocketOutputStream::IsEmpty()
@@ -132,12 +132,12 @@ int SocketOutputStream::GetAvailable()
 	return _current_index;
 }
 
-long long SocketOutputStream::GetSentBytes()
+int64_t SocketOutputStream::GetSentBytes()
 {
 	return _sent_bytes;
 }
 
-long long SocketOutputStream::Flush()
+int64_t SocketOutputStream::Flush()
 {
 	if ((*_is_closed) == true) {
 		throw SocketException("Connection was closed");
@@ -176,15 +176,15 @@ long long SocketOutputStream::Flush()
 
 	_sent_bytes += n;
 
-	return (long long)n;
+	return (int64_t)n;
 }
 
-long long SocketOutputStream::GetSize()
+int64_t SocketOutputStream::GetSize()
 {
 	return 0LL;
 }
 
-void SocketOutputStream::Seek(long long index)
+void SocketOutputStream::Seek(int64_t index)
 {
 	// DO:: nothing
 }

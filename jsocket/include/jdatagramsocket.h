@@ -74,9 +74,9 @@ class DatagramSocket : public jsocket::Connection{
         /** \brief Output stream. */
         SocketOutputStream *_os;
         /** \brief Bytes sent. */
-        long long _sent_bytes;
+        int64_t _sent_bytes;
         /** \brief Bytes received. */
-        long long _receive_bytes;
+        int64_t _receive_bytes;
         /** \brief Connect or not ? */
 		bool _stream;
         /** \brief */
@@ -207,13 +207,13 @@ class DatagramSocket : public jsocket::Connection{
         * \brief Get sent bytes to destination.
         *
         */
-        virtual long long GetSentBytes();
+        virtual int64_t GetSentBytes();
         
         /**
         * \brief Get received bytes from a source.
         *
         */
-        virtual long long GetReceiveBytes();
+        virtual int64_t GetReceiveBytes();
 
         /**
          * \brief Get a object SocketOption.

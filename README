@@ -22,34 +22,3 @@ all:
 
 ## Makefile -- with pkgconfig -- end ##
 
-## Makefile -- without pkgconfig -- begin ##
-
-JLIBCPP_INCLUDE		=	/usr/local/include/jlibcpp
-DIRECTFB_INCLUDE	=	/usr/local/include/directfb
-
-INCLUDES					= -I$(JLIBCPP_INCLUDE)/jcommon/include \
-										-I$(JLIBCPP_INCLUDE)/jsocket/include \
-										-I$(JLIBCPP_INCLUDE)/jthread/include \
-										-I$(JLIBCPP_INCLUDE)/jio/include \
-										-I$(JLIBCPP_INCLUDE)/jlogger/include \
-										-I$(JLIBCPP_INCLUDE)/jshare/include \
-										-I$(DIRECTFB_INCLUDE) \
-
-LIBRARIES					= -L/usr/lib \
-										-L/usr/local/lib \
-										-ljlibcpp \
-										-lpthread \
-										-ldirectfb \
-										-lssl \
-
-DEFINITIONS				= -D_GNU_SOURCE \
-										-D_FILE_OFFSET_BITS=64 \
-										-D_LARGEFILE_SOURCE \
-										-DJDEBUG_ENABLED \
-										-DDIRECTFB_UI \
-
-all:
-	g++ <app.cpp> -o <app> $(DEFINITIONS) $(INCLUDES) $(LIBRARIES)
-
-## Makefile -- without pkgconfig -- end ##
-

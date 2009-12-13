@@ -98,9 +98,9 @@ class SSLSocket : public jsocket::Connection{
         /** \brief */
         InetAddress *_address;
         /** \brief Bytes sent. */
-        long long _sent_bytes;
+        int64_t _sent_bytes;
         /** \brief Bytes received. */
-        long long _receive_bytes;
+        int64_t _receive_bytes;
         /** \brief */
 		int _timeout;
 
@@ -275,13 +275,13 @@ class SSLSocket : public jsocket::Connection{
         * \brief Get the bytes sent to a destination.
         *
         */
-        virtual long long GetSentBytes();
+        virtual int64_t GetSentBytes();
             
         /**
         * \brief Get de bytes received from a source.
         *
         */
-        virtual long long GetReceiveBytes();
+        virtual int64_t GetReceiveBytes();
 
         /**
          * \brief Get the socket options.

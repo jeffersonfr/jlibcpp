@@ -43,9 +43,14 @@ INCLUDE		= -I. \
 						-Ijshared/include \
 						-Ijsocket/include \
 						-Ijthread/include \
-						-I/usr/local/include/directfb \
+						`pkg-config --cflags libssl` \
 
-LIBRARY 	= -lpthread -ldl -lrt -lssl
+LIBRARY 	= \
+						-lpthread \
+						-ldl \
+						-lrt \
+						-lssl \
+						`pkg-config --cflags libssl` \
 
 DEFINES		= -D_GNU_SOURCE \
 						-D_REENTRANT \
@@ -61,7 +66,8 @@ CFLAGS		= $(INCLUDE) $(DEBUG) $(OPT) $(OTHER) $(DEFINES)
 OK 				= \033[30;32mOK\033[m
 
 ifeq ($(findstring DIRECTFB_UI,$(DEFINES)), DIRECTFB_UI)
-	LIBRARY += -L/usr/local/lib -ldirectfb
+	INCLUDE += `pkg-config --cflags directfb`
+	LIBRARY += `pkg-config --libs directfb`
 endif
 
 OBJS_jcommon = \
@@ -329,7 +335,12 @@ install: uninstall
 	@echo -e "Instaling $(EXE) in $(PREFIX)/lib/lib$(MODULE).so $(OK)"
 	@install -o nobody -m 644 $(LIBDIR)/$(EXE) $(PREFIX)/lib && ln -s $(PREFIX)/lib/$(EXE) $(PREFIX)/lib/lib$(MODULE).so
 	@echo -e "Instaling $(MODULE).pc in $(PREFIX)/lib/pkgconfig $(OK)"
-	@sed -e 's/@module@/$(MODULE)/g' jlibcpp.pc | sed -e 's/@prefix@/$(subst /,\/,$(PREFIX))/g' | sed -e 's/@version@/$(VERSION)/g' | sed -e 's/@cflags@/$(DEFINES)/g' | sed -e 's/@libs@/$(subst /,\/,$(LIBRARY))/g' > $(PREFIX)/lib/pkgconfig/$(MODULE).pc
+	@mkdir -p $(PREFIX)/lib/pkgconfig && \
+		sed -e 's/@module@/$(MODULE)/g' jlibcpp.pc | \
+		sed -e 's/@prefix@/$(subst /,\/,$(PREFIX))/g' | \
+		sed -e 's/@version@/$(VERSION)/g' | \
+		sed -e 's/@cflags@/$(DEFINES)/g' | \
+		sed -e 's/@libs@/$(subst /,\/,$(LIBRARY))/g' > $(PREFIX)/lib/pkgconfig/$(MODULE).pc
 
 uninstall:
 	@rm -rf $(PREFIX)/lib/pkgconfig/$(MODULE).pc $(PREFIX)/lib/lib$(MODULE).so $(PREFIX)/lib/$(EXE) 

@@ -54,7 +54,7 @@ SSLSocketOutputStream::~SSLSocketOutputStream()
 	}
 }
 
-long long SSLSocketOutputStream::Available()
+int64_t SSLSocketOutputStream::Available()
 {
 	return 0LL;
 }
@@ -70,9 +70,9 @@ int SSLSocketOutputStream::Write(int c_)
 	return 0;
 }
 
-long long SSLSocketOutputStream::Write(const char *data_, long long data_length_)
+int64_t SSLSocketOutputStream::Write(const char *data_, int64_t data_length_)
 {
-	long long l = data_length_, size; 
+	int64_t l = data_length_, size; 
 	
 	while (l > 0LL) {
 		size = (_buffer_length - _current_index);
@@ -94,7 +94,7 @@ long long SSLSocketOutputStream::Write(const char *data_, long long data_length_
 		}
 	}
 
-	return (long long)(data_length_ - l);
+	return (int64_t)(data_length_ - l);
 }
 
 bool SSLSocketOutputStream::IsEmpty()
@@ -107,12 +107,12 @@ int SSLSocketOutputStream::GetAvailable()
 	return _current_index;
 }
 
-long long SSLSocketOutputStream::GetSentBytes()
+int64_t SSLSocketOutputStream::GetSentBytes()
 {
 	return _sent_bytes;
 }
 
-long long SSLSocketOutputStream::Flush()
+int64_t SSLSocketOutputStream::Flush()
 {
 	if ((*_is_closed) == true) {
 		throw SocketException("Connection was closed");
@@ -142,15 +142,15 @@ long long SSLSocketOutputStream::Flush()
 
 	_sent_bytes += n;
 
-	return (long long)n;
+	return (int64_t)n;
 }
 
-long long SSLSocketOutputStream::GetSize()
+int64_t SSLSocketOutputStream::GetSize()
 {
 	return 0LL;
 }
 
-void SSLSocketOutputStream::Seek(long long index)
+void SSLSocketOutputStream::Seek(int64_t index)
 {
 	// DO:: nothing
 }

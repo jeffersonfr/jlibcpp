@@ -599,12 +599,12 @@ int DatagramSocket::GetPort()
 	// return _server_sock.sin_port;
 }
 
-long long DatagramSocket::GetSentBytes()
+int64_t DatagramSocket::GetSentBytes()
 {
 	return _sent_bytes + _os->GetSentBytes();
 }
 
-long long DatagramSocket::GetReceiveBytes()
+int64_t DatagramSocket::GetReceiveBytes()
 {
 	return _receive_bytes + _is->GetReceiveBytes();
 }

@@ -98,23 +98,21 @@ enum jcomponent_behavior_t {
 	// consecutive heights and use the return value to determine if you need to pad calculations by 1.  The following shows 
 	// how to calculate the baseline for any height:
 	// <pre>
-	//    Dimension preferredSize = component.getPreferredSize();
-	//       int baseline = getBaseline(preferredSize.width, preferredSize.height);
-	//       int nextBaseline = getBaseline(preferredSize.width, preferredSize.height + 1);
-	// 			 // Amount to add to height when calculating where baseline lands for a particular height:
-	// 			 int padding = 0;
-	// 			 // Where the baseline is relative to the mid point
-	// 			 int baselineOffset = baseline - height / 2;
-	// 			 if (preferredSize.height % 2 == 0 &amp;&amp;
-	// 			 baseline != nextBaseline) {
-	// 			        padding = 1;
-	// 			 } else if (preferredSize.height % 2 == 1 &amp;&amp;
-	// 			        baseline == nextBaseline) {
-	// 			        baselineOffset--;
-	// 			        padding = 1;
-	// 			 }
-	// 			 // The following calculates where the baseline lands for the height z:
-	// 			 int calculatedBaseline = (z + padding) / 2 + baselineOffset;
+	//    jregion_t preferredSize = component->GetPreferredSize();
+	//    int baseline = GetBaseline(preferredSize.width, preferredSize.height);
+	//    int nextBaseline = GetBaseline(preferredSize.width, preferredSize.height + 1);
+	// 		// Amount to add to height when calculating where baseline lands for a particular height:
+	// 		int padding = 0;
+	// 		// Where the baseline is relative to the mid point
+	// 		int baselineOffset = baseline - height / 2;
+	// 		if (preferredSize.height % 2 == 0 && baseline != nextBaseline) {
+	// 			padding = 1;
+	// 		} else if (preferredSize.height % 2 == 1 && baseline == nextBaseline) {
+	// 		  baselineOffset--;
+	// 		  padding = 1;
+	// 		}
+	// 		// The following calculates where the baseline lands for the height z:
+	// 		int calculatedBaseline = (z + padding) / 2 + baselineOffset;
 	// 	</pre>
 	CB_CENTER_OFFSET,
 	// Indicates the baseline resize behavior can not be expressed using any of the other constants.  

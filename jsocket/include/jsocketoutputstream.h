@@ -58,7 +58,7 @@ class SocketOutputStream : public jio::OutputStream{
         /** \brief */
 		int _current_index; 
         /** \brief */
-        long long _sent_bytes;
+        int64_t _sent_bytes;
         /** \brief */
 		bool _stream;
         /** \brief */
@@ -97,19 +97,19 @@ class SocketOutputStream : public jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		virtual long long Available();
+		virtual int64_t Available();
 
 		/**
 		 * \brief jio::OutputStream
 		 *
 		 */
- 		virtual long long GetSize();
+ 		virtual int64_t GetSize();
 
 		/**
 		 * \brief jio::OutputStream
 		 *
 		 */
-		virtual void Seek(long long index);
+		virtual void Seek(int64_t index);
 
         /**
 		 * \brief jio::OutputStream
@@ -127,7 +127,7 @@ class SocketOutputStream : public jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		long long Write(const char *data_, long long data_length_);
+		int64_t Write(const char *data_, int64_t data_length_);
 
 		/**
 		 * \brief
@@ -139,13 +139,13 @@ class SocketOutputStream : public jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		long long GetSentBytes();
+		int64_t GetSentBytes();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual long long Flush();
+		virtual int64_t Flush();
 };
 
 }

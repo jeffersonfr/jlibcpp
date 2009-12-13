@@ -91,8 +91,8 @@ void SocketOption::SetSendTimeout(int time_)
 
 	int time = time_;
 
-	t.tv_sec = (long long)(time/1000LL);
-	t.tv_nsec = (long long)(time%1000LL)*1000;
+	t.tv_sec = (int64_t)(time/1000LL);
+	t.tv_nsec = (int64_t)(time%1000LL)*1000;
 	
 	if (setsockopt(_fd, SOL_SOCKET, SO_SNDTIMEO, &t, sizeof(struct timespec)) < 0) {
 		throw SocketOptionException("Set send timeout error");
@@ -113,8 +113,8 @@ void SocketOption::SetReceiveTimeout(int time_)
 
 	int time = time_;
 		
-	t.tv_sec = (long long)(time/1000LL);
-	t.tv_nsec = (long long)(time%1000LL)*1000;
+	t.tv_sec = (int64_t)(time/1000LL);
+	t.tv_nsec = (int64_t)(time%1000LL)*1000;
 	
 	if (setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(struct timespec)) < 0) {
 		throw SocketOptionException("Set receive timeout error");
@@ -384,7 +384,7 @@ void SocketOption::SetHeaderInclude(bool b_)
 #endif
 }
 
-long long SocketOption::GetTimeStamp()
+int64_t SocketOption::GetTimeStamp()
 {
 #ifdef _WIN32
 	return 0;

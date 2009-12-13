@@ -370,12 +370,12 @@ int RawSocket::GetPort()
 	return ntohs(_server_sock.sin_port);
 }
 
-long long RawSocket::GetSentBytes()
+int64_t RawSocket::GetSentBytes()
 {
 	return _sent_bytes + _os->GetSentBytes();
 }
 
-long long RawSocket::GetReceiveBytes()
+int64_t RawSocket::GetReceiveBytes()
 {
 	return _receive_bytes + _is->GetReceiveBytes();
 }

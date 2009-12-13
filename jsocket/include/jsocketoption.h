@@ -270,7 +270,7 @@ class SocketOption : public virtual jcommon::Object{
          * This is useful for accurate round trip time measurements.
          *
          */
-        long long GetTimeStamp();
+        int64_t GetTimeStamp();
 		
 		/**
 		 * \brief Get MTU.

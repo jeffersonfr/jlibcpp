@@ -128,7 +128,7 @@ int SocketInputStream::Read()
 	return c;
 }
 
-long long SocketInputStream::Read(char *data_, long long data_length_)
+int64_t SocketInputStream::Read(char *data_, int64_t data_length_)
 {
 	if ((*_is_closed) == true) {
 		throw SocketException("Connection is closed");
@@ -137,7 +137,7 @@ long long SocketInputStream::Read(char *data_, long long data_length_)
 	// retorna no maximo o tamanho do buffer em bytes
 	
 	int flags = 0LL;
-	long long d, 
+	int64_t d, 
 		 r;
 	
 	d = _end_index - _current_index;
@@ -186,7 +186,7 @@ long long SocketInputStream::Read(char *data_, long long data_length_)
 		_current_index = _end_index = 0;
 	}
 
-	return (long long)r;
+	return (int64_t)r;
 }
 
 bool SocketInputStream::IsEmpty()
@@ -194,14 +194,14 @@ bool SocketInputStream::IsEmpty()
 	return (_current_index == _end_index);
 }
 
-long long SocketInputStream::Available()
+int64_t SocketInputStream::Available()
 {
-	return (long long)_current_index;
+	return (int64_t)_current_index;
 }
 
-long long SocketInputStream::GetReceiveBytes()
+int64_t SocketInputStream::GetReceiveBytes()
 {
-	return (long long)_receive_bytes;
+	return (int64_t)_receive_bytes;
 }
 
 void SocketInputStream::Close()
@@ -214,17 +214,17 @@ void SocketInputStream::Reset()
 	_current_index = _end_index = 0;
 }
 
-long long SocketInputStream::GetSize()
+int64_t SocketInputStream::GetSize()
 {
 	return 0LL;
 }
 
-long long SocketInputStream::GetPosition()
+int64_t SocketInputStream::GetPosition()
 {
 	return 0LL;
 }
 
-void SocketInputStream::Skip(long long skip)
+void SocketInputStream::Skip(int64_t skip)
 {
 	// DO:: nothing
 }

@@ -150,13 +150,13 @@ class Connection : public virtual jcommon::Object{
         * \brief Get the bytes sent to a destination.
         *
         */
-        virtual long long GetSentBytes() = 0;
+        virtual int64_t GetSentBytes() = 0;
             
         /**
         * \brief Get de bytes received from a source.
         *
         */
-        virtual long long GetReceiveBytes() = 0;
+        virtual int64_t GetReceiveBytes() = 0;
 
 
 };

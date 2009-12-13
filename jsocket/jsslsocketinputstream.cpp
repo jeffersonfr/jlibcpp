@@ -97,7 +97,7 @@ int SSLSocketInputStream::Read()
 	return c;
 }
 
-long long SSLSocketInputStream::Read(char *data_, long long data_length_)
+int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 {
 	if ((*_is_closed) == true) {
 		throw SocketException("Connection is closed");
@@ -105,7 +105,7 @@ long long SSLSocketInputStream::Read(char *data_, long long data_length_)
 	
 	// retorna no maximo o tamanho do buffer em bytes
 	
-	long long d, 
+	int64_t d, 
 		 r;
 	
 	d = _end_index - _current_index;
@@ -149,7 +149,7 @@ long long SSLSocketInputStream::Read(char *data_, long long data_length_)
 		_current_index = _end_index = 0;
 	}
 
-	return (long long)r;
+	return (int64_t)r;
 }
 
 bool SSLSocketInputStream::IsEmpty()
@@ -157,14 +157,14 @@ bool SSLSocketInputStream::IsEmpty()
 	return (_current_index == _end_index);
 }
 
-long long SSLSocketInputStream::Available()
+int64_t SSLSocketInputStream::Available()
 {
-	return (long long)_current_index;
+	return (int64_t)_current_index;
 }
 
-long long SSLSocketInputStream::GetReceiveBytes()
+int64_t SSLSocketInputStream::GetReceiveBytes()
 {
-	return (long long)_receive_bytes;
+	return (int64_t)_receive_bytes;
 }
 
 void SSLSocketInputStream::Close()
@@ -177,17 +177,17 @@ void SSLSocketInputStream::Reset()
 	_current_index = _end_index = 0;
 }
 
-long long SSLSocketInputStream::GetSize()
+int64_t SSLSocketInputStream::GetSize()
 {
 	return 0LL;
 }
 
-long long SSLSocketInputStream::GetPosition()
+int64_t SSLSocketInputStream::GetPosition()
 {
 	return 0LL;
 }
 
-void SSLSocketInputStream::Skip(long long skip)
+void SSLSocketInputStream::Skip(int64_t skip)
 {
 	// DO:: nothing
 }

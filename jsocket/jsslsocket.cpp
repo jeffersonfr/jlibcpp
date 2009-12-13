@@ -786,12 +786,12 @@ int SSLSocket::GetPort()
 	return ntohs(_server_sock.sin_port);
 }
 
-long long SSLSocket::GetSentBytes()
+int64_t SSLSocket::GetSentBytes()
 {
 	return _sent_bytes + _os->GetSentBytes();
 }
 
-long long SSLSocket::GetReceiveBytes()
+int64_t SSLSocket::GetReceiveBytes()
 {
 	return _receive_bytes + _is->GetReceiveBytes();
 }

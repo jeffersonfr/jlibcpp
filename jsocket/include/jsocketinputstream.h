@@ -60,7 +60,7 @@ class SocketInputStream : public jio::InputStream{
         /** \brief */
 		int _end_index;
         /** \brief */
-        long long _receive_bytes;
+        int64_t _receive_bytes;
         /** \brief */
 		bool _stream;
         /** \brief */
@@ -99,25 +99,25 @@ class SocketInputStream : public jio::InputStream{
 		 * \brief jio::InputStream
 		 *
 		 */
-   		virtual long long Available();
+   		virtual int64_t Available();
 
 		/**
 		 * \brief jio::InputStream
 		 *
 		 */
-		virtual long long GetSize();
+		virtual int64_t GetSize();
 
 		/**
 		 * \brief jio::InputStream
 		 *
 		 */
-		virtual long long GetPosition();
+		virtual int64_t GetPosition();
 
 		/**
 		 * \brief jio::InputStream
 		 *
 		 */
-		virtual void Skip(long long skip);
+		virtual void Skip(int64_t skip);
 
 		/**
 		 * \brief jio::InputStream
@@ -149,13 +149,13 @@ class SocketInputStream : public jio::InputStream{
 		 * \exception SocketException an error occurred.
 		 *
 		 */
-		virtual long long Read(char *data_, long long data_length_);
+		virtual int64_t Read(char *data_, int64_t data_length_);
 
 		/**
 		 * \brief
 		 *
 		 */
-		long long GetReceiveBytes();
+		int64_t GetReceiveBytes();
 
 };
 

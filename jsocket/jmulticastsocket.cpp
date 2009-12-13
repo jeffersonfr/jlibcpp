@@ -452,12 +452,12 @@ int MulticastSocket::GetLocalPort()
 	return ntohs(_sock_r.sin_port);
 }
 
-long long MulticastSocket::GetSentBytes()
+int64_t MulticastSocket::GetSentBytes()
 {
 	return _sent_bytes + _os->GetSentBytes();
 }
 
-long long MulticastSocket::GetReceiveBytes()
+int64_t MulticastSocket::GetReceiveBytes()
 {
 	return _receive_bytes + _is->GetReceiveBytes();
 }

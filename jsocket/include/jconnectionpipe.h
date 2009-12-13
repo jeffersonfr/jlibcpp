@@ -200,13 +200,13 @@ class ConnectionPipe : public jsocket::Connection, public jthread::Thread{
         * \brief Get sent bytes to destination.
         *
         */
-        long long GetSentBytes();
+        int64_t GetSentBytes();
         
         /**
         * \brief Get received bytes from a source.
         *
         */
-        long long GetReceiveBytes();
+        int64_t GetReceiveBytes();
 
 		/**
 		 * \brief

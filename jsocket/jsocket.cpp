@@ -588,12 +588,12 @@ int Socket::GetPort()
 	return ntohs(_server_sock.sin_port);
 }
 
-long long Socket::GetSentBytes()
+int64_t Socket::GetSentBytes()
 {
 	return _sent_bytes + _os->GetSentBytes();
 }
 
-long long Socket::GetReceiveBytes()
+int64_t Socket::GetReceiveBytes()
 {
 	return _receive_bytes + _is->GetReceiveBytes();
 }

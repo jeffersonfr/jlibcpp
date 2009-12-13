@@ -71,9 +71,9 @@ class MulticastSocket : public jsocket::Connection{
         /** \brief Output stream */
         SocketOutputStream *_os;
         /** \brief */
-        long long _sent_bytes;
+        int64_t _sent_bytes;
         /** \brief */
-        long long _receive_bytes;
+        int64_t _receive_bytes;
         /** \brief */
         std::vector<std::string> _groups;
         
@@ -202,13 +202,13 @@ class MulticastSocket : public jsocket::Connection{
         * \brief
         *
         */
-        virtual long long GetSentBytes();
+        virtual int64_t GetSentBytes();
         
         /**
         * \brief
         *
         */
-        virtual long long GetReceiveBytes();
+        virtual int64_t GetReceiveBytes();
 
         /**
          * \brief

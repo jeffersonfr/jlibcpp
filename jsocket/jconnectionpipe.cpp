@@ -235,12 +235,12 @@ jio::OutputStream * ConnectionPipe::GetOutputStream()
 	return NULL;
 }
 
-long long ConnectionPipe::GetSentBytes()
+int64_t ConnectionPipe::GetSentBytes()
 {
 	return _connection->GetSentBytes();
 }
 
-long long ConnectionPipe::GetReceiveBytes()
+int64_t ConnectionPipe::GetReceiveBytes()
 {
 	return _connection->GetReceiveBytes();
 }
