@@ -43,14 +43,11 @@ INCLUDE		= -I. \
 						-Ijshared/include \
 						-Ijsocket/include \
 						-Ijthread/include \
-						`pkg-config --cflags libssl` \
 
 LIBRARY 	= \
 						-lpthread \
 						-ldl \
 						-lrt \
-						-lssl \
-						`pkg-config --cflags libssl` \
 
 DEFINES		= -D_GNU_SOURCE \
 						-D_REENTRANT \
@@ -67,7 +64,6 @@ OK 				= \033[30;32mOK\033[m
 
 ifeq ($(findstring DIRECTFB_UI,$(DEFINES)), DIRECTFB_UI)
 	INCLUDE += `pkg-config --cflags directfb`
-	LIBRARY += `pkg-config --libs directfb`
 endif
 
 OBJS_jcommon = \

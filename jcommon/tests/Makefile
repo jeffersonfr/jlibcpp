@@ -8,8 +8,8 @@ OPT    		= -funroll-loops -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O2
 DEBUG  		= -ggdb 
 OTHER  		= -Wall
 
-INCLUDE		= -I. -I../include -I../../jio/include
-LIBRARY 	= -L. -L../../lib -lpthread -ljlibcpp -lssl
+INCLUDE		= -I. `pkg-config --cflags jlibcpp`
+LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
 STD			= -D_GNU_SOURCE  
 

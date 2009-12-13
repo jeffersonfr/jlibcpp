@@ -4,16 +4,13 @@ JAVA		= javac
 
 TARGET_ARCH = linux
 
-OPT    		= -funroll-loops -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O2
-DEBUG  		= -ggdb 
-OTHER  		= -Wall
+DEBUG  		= -g -ggdb 
+OTHER  		= -Wall -funroll-loops -O2
 
-INCLUDE		= -I. -I../include -I../../jcommon/include 
-LIBRARY 	= -L. -L../../lib -lpthread -ljlibcpp -lssl
+INCLUDE		= -I. `pkg-config --cflags jlibcpp`
+LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
-STD			= -D_GNU_SOURCE
-
-CCFLAGS		= $(INCLUDE) $(DEBUG) $(OPT) $(OTHER)
+CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER)
 
 OK 			= \033[30;32mOK!\033[m
 

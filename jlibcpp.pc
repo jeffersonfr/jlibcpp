@@ -6,6 +6,6 @@ includedir=${prefix}/include
 Name: @module@
 Description: Portable C++ library.
 Version: @version@
-Requires: directfb
+Requires: directfb libssl
 Libs: -L${libdir} @libs@ -ljlibcpp 
 Cflags: @cflags@ -I${includedir}/jlibcpp/jcommon -I${includedir}/jlibcpp/jgui -I${includedir}/jlibcpp/jio -I${includedir}/jlibcpp/jlogger -I${includedir}/jlibcpp/jmpeg -I${includedir}/jlibcpp/jshared -I${includedir}/jlibcpp/jsocket -I${includedir}/jlibcpp/jthread
