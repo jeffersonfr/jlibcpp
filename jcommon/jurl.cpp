@@ -35,30 +35,59 @@ URL::URL(std::string url_):
 	jcommon::StringTokenizer proto(_url, "://", SPLIT_FLAG, false);
 
 	if (proto.GetSize() == 1) {
+		jcommon::StringTokenizer proto(_url, ":/", SPLIT_FLAG, false);
+
+		if (proto.GetSize() == 1) {
 			_protocol = "file";
 			_path = _url;
-	} else if (proto.GetSize() == 2) {
+		} else {
+			_protocol = proto.GetToken(0);
+
+			_path = "/";
+
+			for (int i=1; i<proto.GetSize(); i++) {
+				_path += proto.GetToken(1);
+
+				if (i < proto.GetSize()-1) {
+					_path = _path + "://";
+				}
+			}
+		}
+	} else if (proto.GetSize() > 1) {
 		_protocol = proto.GetToken(0);
-		_path = proto.GetToken(1);
-	} else {
-		throw jcommon::RuntimeException("URL malformed exception");
+
+		for (int i=1; i<proto.GetSize(); i++) {
+			_path += proto.GetToken(1);
+
+			if (i < proto.GetSize()-1) {
+				_path = _path + "://";
+			}
+		}
 	}
 	
 	jcommon::StringTokenizer host(proto.GetToken(proto.GetSize() - 1), "/", SPLIT_FLAG, false);
 	jcommon::StringTokenizer port(host.GetToken(0), ":", SPLIT_FLAG, false);
 	
+	_port = -1;
+
 	if (port.GetSize() == 1) {
 		if (_protocol == "http" || _protocol == "https") {
 			_port = 80;
 		} else if (_protocol == "ftp") {
 			_port = 21;
-		} else {
-			_port = -1;
 		}
 	} else if (port.GetSize() == 2) {
 		_port = atoi(port.GetToken(1).c_str());
-	} else {
-		throw jcommon::RuntimeException("URL malformed exception");
+	}
+
+	if (_port < 0) {
+		_host = "";
+		_query = "";
+		_file = "";
+		_params = "";
+		_reference = "";
+
+		return;
 	}
 
 	_host = port.GetToken(0);
@@ -143,7 +172,7 @@ std::string URL::Encode(std::string s_, std::string standard_)
 	char *out = NULL;
 	char *bytes = NULL;
 	
-	if (length > 500) {
+	if (length > 512) {
 		throw RuntimeException("URL too large");
 	}
 	
@@ -214,7 +243,7 @@ std::string URL::Decode(std::string s_, std::string standard_)
 	int i = 0;
 	char *sb;
 
-	if (numChars > 500) {
+	if (numChars > 512) {
 		throw RuntimeException("URL too large");
 	}
 	
@@ -371,11 +400,7 @@ std::string URL::what()
 {
 	std::ostringstream o;
 
-	if (_protocol == "file" || _protocol == "plist" || _protocol == "playlist") {
-		o << _protocol << "://" << GetPath() << std::flush;
-	} else {
-		o << _protocol << "://" << _host << ":" << _port << _query << std::flush;
-	}
+	o << _protocol << "://" << _path << std::flush;
 
 	return o.str();
 }
