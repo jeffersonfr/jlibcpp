@@ -265,7 +265,9 @@ void GFXHandler::SetCursor(jcursor_style_t t)
 
 	_cursor = t;
 
+#ifdef DIRECTFB_UI
 	SetCursor(_cursors[_cursor].cursor, _cursors[_cursor].hot_x, _cursors[_cursor].hot_y);
+#endif
 }
 
 void GFXHandler::SetCursor(OffScreenImage *shape, int hotx, int hoty)
@@ -487,11 +489,13 @@ void GFXHandler::Restore()
 
 void GFXHandler::Release()
 {
+#ifdef DIRECTFB_UI
 	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
 		delete i->second.cursor;
 	}
 
 	_cursors.clear();
+#endif
 
 	// INFO:: release windows
 	WindowManager::GetInstance()->Release();

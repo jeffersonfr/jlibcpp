@@ -1908,6 +1908,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 
 bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int alpha)
 {
+#ifdef DIRECTFB_UI
 	IDirectFBImageProvider *imgProvider = NULL;
 	DFBSurfaceDescription desc;
 
@@ -1935,6 +1936,9 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 
 	// return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, desc.width, desc.height, alpha);
 	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, w, h, alpha);
+#endif
+
+	return false;
 }
 
 bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp, int alpha)

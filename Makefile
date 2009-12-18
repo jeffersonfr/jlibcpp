@@ -54,8 +54,11 @@ DEFINES		= -D_GNU_SOURCE \
 						-D_FILE_OFFSET_BITS=64 \
 						-D_LARGEFILE_SOURCE \
 						-DSINGLE_WAIT_CONDITION \
-						-DJDEBUG_ENABLED \
 						-DDIRECTFB_UI \
+						-DJDEBUG_ENABLED \
+
+REQUIRES	= \
+						libssl \
 
 ARFLAGS		= -rc
 CFLAGS		= $(INCLUDE) $(DEBUG) $(OPT) $(OTHER) $(DEFINES)
@@ -64,6 +67,7 @@ OK 				= \033[30;32mOK\033[m
 
 ifeq ($(findstring DIRECTFB_UI,$(DEFINES)), DIRECTFB_UI)
 	INCLUDE += `pkg-config --cflags directfb`
+	REQUIRES += directfb
 endif
 
 OBJS_jcommon = \
@@ -336,6 +340,7 @@ install: uninstall
 		sed -e 's/@prefix@/$(subst /,\/,$(PREFIX))/g' | \
 		sed -e 's/@version@/$(VERSION)/g' | \
 		sed -e 's/@cflags@/$(DEFINES)/g' | \
+		sed -e 's/@requires@/$(REQUIRES)/g' | \
 		sed -e 's/@libs@/$(subst /,\/,$(LIBRARY))/g' > $(PREFIX)/lib/pkgconfig/$(MODULE).pc
 
 uninstall:
