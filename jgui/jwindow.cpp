@@ -48,9 +48,6 @@ Window::Window(int x, int y, int width, int height, int opacity, int scale_width
 	_size.width = width;
 	_size.height = height;
 	
-	bWidth = 0;
-  bHeight = 0;
-
 #ifdef DIRECTFB_UI
 	surface = NULL;
 	window = NULL;
@@ -63,9 +60,9 @@ Window::Window(int x, int y, int width, int height, int opacity, int scale_width
 
 	SetBackgroundVisible(true);
 
-	WindowManager::GetInstance()->Add(this);
-	
 	DispatchEvent(new WindowEvent(this, WINDOW_OPENED_EVENT));
+
+	WindowManager::GetInstance()->Add(this);
 
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();
 
@@ -97,7 +94,7 @@ Window::~Window()
 	}
 
 	if (window != NULL) {
-		// window->SetOpacity(window, 0x00);
+		window->SetOpacity(window, 0x00);
 		window->Release(window);
 		window = NULL;
 	}
@@ -118,6 +115,17 @@ void * Window::GetNativeWindow()
 #endif
 
 	return NULL;
+}
+
+void Window::SetWorkingScreenSize(int width, int height)
+{
+	if (_scale_width == width || _scale_height == height) {
+		return;
+	}
+
+	Container::SetWorkingScreenSize(width, height);
+
+	InnerCreateWindow();
 }
 
 void Window::SetVisible(bool b)
@@ -148,15 +156,12 @@ void Window::InnerCreateWindow()
 #ifdef DIRECTFB_UI
 	jthread::AutoLock lock(&_inner_mutex);
 
-	// CHANGE:: 
-	// otimizacao :: deletar as window e surface antes de alocar outras novas
-	// problemas :: segmentation fault causado por falta de sincronizacao com o SetSize() e Paint()
-	
+	GFXHandler *gfx = GFXHandler::GetInstance();
+
 	IDirectFBWindow *w = NULL;
 	IDirectFBSurface *s = NULL;
-	GFXHandler *gfx = GFXHandler::GetInstance();
 	
-	gfx->CreateWindow(_location.x - bWidth, _location.y - bHeight, _size.width + 2*bWidth, _size.height + 2*bHeight, &w, &s, _opacity, _scale_width, _scale_height);
+	gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &w, &s, _opacity, _scale_width, _scale_height);
 
 	if (s != NULL) {
 		// graphics = new NullGraphics();
@@ -176,13 +181,14 @@ void Window::InnerCreateWindow()
 		surface = NULL;
 	}
 
+	surface = s;
+
 	if (window != NULL) {
-		window->SetOpacity(window, _opacity);//0x00);
+		window->SetOpacity(window, _opacity);
 		window->Release(window);
 		window = NULL;
 	}
 
-	surface = s;
 	window = w;
 #endif
 }

@@ -46,8 +46,8 @@ MulticastSocket::MulticastSocket(std::string host_, int port_, int rbuf_, int wb
 {
 	jcommon::Object::SetClassName("jsocket::MulticastSocket");
 	
-    _is = NULL;
-    _os = NULL;
+	_is = NULL;
+	_os = NULL;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -68,13 +68,13 @@ MulticastSocket::~MulticastSocket()
 	} catch (...) {
 	}
 
-    if (_is != NULL) {
-        delete _is;
-    }
+	if (_is != NULL) {
+		delete _is;
+	}
 
-    if (_os != NULL) {
-        delete _os;
-    }
+	if (_os != NULL) {
+		delete _os;
+	}
 }
 
 /** Private */
@@ -180,9 +180,9 @@ int MulticastSocket::Receive(char *data_, int size_, int time_)
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket receive timeout exception");
 	} else {
-	    if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
+		if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return MulticastSocket::Receive(data_, size_);
-	    }
+		}
 	}
 #endif
 
@@ -194,10 +194,10 @@ int MulticastSocket::Receive(char *data_, int size_, bool block_)
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
 	}
-	
+
 	int n,
-		flags,
-	   	length = sizeof(_sock_r);
+			flags,
+			length = sizeof(_sock_r);
 
 	if (block_ == true) {
 #ifdef _WIN32
@@ -236,7 +236,7 @@ int MulticastSocket::Receive(char *data_, int size_, bool block_)
 
 	_receive_bytes += n;
 
-    return n;
+	return n;
 }
 
 int MulticastSocket::Send(const char *data, int size, int time_)
@@ -260,9 +260,9 @@ int MulticastSocket::Send(const char *data, int size, int time_)
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket send timeout exception");
 	} else {
-	    if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
+		if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
 			return MulticastSocket::Send(data, size);
-	    }
+		}
 	}
 #endif
 

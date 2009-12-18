@@ -40,3 +40,4 @@ void Canvas::Paint(Graphics *g)
 }
 
 }
+

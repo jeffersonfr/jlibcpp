@@ -41,13 +41,14 @@ class Main : public jgui::Frame{
 
 	public:
 		Main(std::string title, int x, int y, int w, int h, int sw, int sh):
-			jgui::Frame(title, x, y, w, h)
+			jgui::Frame(title, x, y, w, h)//, sw, sh)
 		{
 			_grid_layout = new jgui::GridLayout(4, 4, 10, 10);
 
 			SetLayout(_grid_layout);
 			SetMoveEnabled(true);
 			SetResizeEnabled(true);
+
 			SetWorkingScreenSize(sw, sh);
 
 			for (int i=0; i<5; i++) {

@@ -89,6 +89,12 @@ class Window : public Container{
 		 * \brief
 		 *
 		 */
+		void SetWorkingScreenSize(int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetOpacity(int i);
 		
 		/**

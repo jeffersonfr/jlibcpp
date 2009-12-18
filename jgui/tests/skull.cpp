@@ -2235,8 +2235,8 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 		GraphicsTeste():
 			jgui::Frame("", 0, 0, 1920, 1080)
 	{
-		Width = _width;
-		Height = _height;
+		Width = _size.width;
+		Height = _size.height;
 
 		ScaleFactor *= Height;
 

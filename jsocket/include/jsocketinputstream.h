@@ -47,115 +47,117 @@ class SocketInputStream : public jio::InputStream{
 
     private:
 #ifdef _WIN32
-		SOCKET _fd;
+			/** \brief */
+			SOCKET _fd;
 #else
-		int _fd;
+			/** \brief */
+			int _fd;
 #endif
-       /** \brief */
-        char *_buffer;
-        /** \brief */
-        int _buffer_length;
-        /** \brief */
-		int _current_index; 
-        /** \brief */
-		int _end_index;
-        /** \brief */
-        int64_t _receive_bytes;
-        /** \brief */
-		bool _stream;
-        /** \brief */
-		sockaddr_in _server_sock;
-        /** \brief */
-		bool *_is_closed;
-        /** \brief */
-		Connection *_connection;
+			/** \brief */
+			char *_buffer;
+			/** \brief */
+			int _buffer_length;
+			/** \brief */
+			int _current_index; 
+			/** \brief */
+			int _end_index;
+			/** \brief */
+			int64_t _receive_bytes;
+			/** \brief */
+			bool _stream;
+			/** \brief */
+			sockaddr_in _server_sock;
+			/** \brief */
+			bool *_is_closed;
+			/** \brief */
+			Connection *_connection;
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        SocketInputStream(Connection *conn_, bool *is_closed_, int size_ = 65535);
-        
-        /**
-        * \brief Construtor.
-        *
-        */
-        SocketInputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int size_ = 65535);
-		
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~SocketInputStream();
+		public:
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			SocketInputStream(Connection *conn_, bool *is_closed_, int size_ = 65535);
 
-		/**
-		 * \brief jio::InputStream
-		 *
-		 */
-		virtual bool IsEmpty();
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			SocketInputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int size_ = 65535);
 
-		/**
-		 * \brief jio::InputStream
-		 *
-		 */
-   		virtual int64_t Available();
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~SocketInputStream();
 
-		/**
-		 * \brief jio::InputStream
-		 *
-		 */
-		virtual int64_t GetSize();
+			/**
+			 * \brief jio::InputStream
+			 *
+			 */
+			virtual bool IsEmpty();
 
-		/**
-		 * \brief jio::InputStream
-		 *
-		 */
-		virtual int64_t GetPosition();
+			/**
+			 * \brief jio::InputStream
+			 *
+			 */
+			virtual int64_t Available();
 
-		/**
-		 * \brief jio::InputStream
-		 *
-		 */
-		virtual void Skip(int64_t skip);
+			/**
+			 * \brief jio::InputStream
+			 *
+			 */
+			virtual int64_t GetSize();
 
-		/**
-		 * \brief jio::InputStream
-		 *
-		 */
-		virtual void Reset();
+			/**
+			 * \brief jio::InputStream
+			 *
+			 */
+			virtual int64_t GetPosition();
 
-		/**
-		 * \brief jio::InputStream
-		 *
-		 */
-		virtual void Close();
+			/**
+			 * \brief jio::InputStream
+			 *
+			 */
+			virtual void Skip(int64_t skip);
 
-		/**
-		 * \brief
-		 *
-		 * \return the number of bytes received, or 0 if the peer has shutdown.
-		 *
-		 * \exception SocketException an error occurred.
-		 * 
-		 */
-		virtual int Read();
+			/**
+			 * \brief jio::InputStream
+			 *
+			 */
+			virtual void Reset();
 
-		/**
-		 * \brief
-		 *
-		 * \return the number of bytes received, or 0 if the peer has shutdown.
-		 *
-		 * \exception SocketException an error occurred.
-		 *
-		 */
-		virtual int64_t Read(char *data_, int64_t data_length_);
+			/**
+			 * \brief jio::InputStream
+			 *
+			 */
+			virtual void Close();
 
-		/**
-		 * \brief
-		 *
-		 */
-		int64_t GetReceiveBytes();
+			/**
+			 * \brief
+			 *
+			 * \return the number of bytes received, or 0 if the peer has shutdown.
+			 *
+			 * \exception SocketException an error occurred.
+			 * 
+			 */
+			virtual int Read();
+
+			/**
+			 * \brief
+			 *
+			 * \return the number of bytes received, or 0 if the peer has shutdown.
+			 *
+			 * \exception SocketException an error occurred.
+			 *
+			 */
+			virtual int64_t Read(char *data_, int64_t data_length_);
+
+			/**
+			 * \brief
+			 *
+			 */
+			int64_t GetReceiveBytes();
 
 };
 

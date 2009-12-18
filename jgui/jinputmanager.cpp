@@ -795,13 +795,11 @@ void InputManager::Run()
 					type = (jkey_type_t)(0);
 
 					if (event.type == DIET_KEYPRESS || event.type == DIET_KEYRELEASE) {
-						{
-							// INFO:: just for directfb 1.0.1 or less
-							if (event.type == DIET_KEYPRESS) {
-								type = JKEY_PRESSED;
-							} else if (event.type == DIET_KEYRELEASE) {
-								type = JKEY_RELEASED;
-							}
+						// INFO:: just for directfb 1.0.1 or less
+						if (event.type == DIET_KEYPRESS) {
+							type = JKEY_PRESSED;
+						} else if (event.type == DIET_KEYRELEASE) {
+							type = JKEY_RELEASED;
 						}
 
 						// 1.3

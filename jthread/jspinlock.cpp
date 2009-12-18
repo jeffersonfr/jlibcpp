@@ -202,8 +202,8 @@ void SpinLockReentrant::Enter(unsigned int pnumber)
 	}
     
 	_RealCS.Lock();
-    _nOwner = pnumber;
-    _nLockCount++;
+	_nOwner = pnumber;
+	_nLockCount++;
     
 	return;
 }
@@ -232,9 +232,9 @@ bool SpinLockReentrant::TryEnter(unsigned int pnumber)
     
 	if (_RealCS.TryLock()) {
 		_nOwner = pnumber;
-        _nLockCount++;
+		_nLockCount++;
 
-        return 1;
+		return 1;
 	}
     
 	return 0;

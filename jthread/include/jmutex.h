@@ -54,61 +54,60 @@ class Mutex : public virtual jcommon::Object{
 
 friend class Condition;
 
-private:
+	private:
 #ifdef _WIN32
-	HANDLE _mutex;
+		HANDLE _mutex;
 #else
-	/** \brief */
-	pthread_mutex_t _mutex;
+		/** \brief */
+		pthread_mutex_t _mutex;
 #endif
-	/** \brief */
-	jmutex_type_t _type;
-	/** \brief */
-	int _lock_count;
+		/** \brief */
+		jmutex_type_t _type;
+		/** \brief */
+		int _lock_count;
 
-public:
-	/**
-	 * \brief Construtor.
-	 *
-	 */
-	Mutex(jmutex_type_t = ERROR_CHECK_MUTEX, jmutex_protocol_t protocol_ = NONE_PROT_MUTEX, bool block_in_death = false);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		Mutex(jmutex_type_t = ERROR_CHECK_MUTEX, jmutex_protocol_t protocol_ = NONE_PROT_MUTEX, bool block_in_death = false);
 
-	/**
-	 * \brief Destrutor virtual.
-	 *
-	 */
-	virtual ~Mutex();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~Mutex();
 
-	/**
-	 * \brief Verify if a section is locked.
-	 *
-	 */
-	bool IsLocked();
+		/**
+		 * \brief Verify if a section is locked.
+		 *
+		 */
+		bool IsLocked();
 
-	/**
-	 * \brief Lock the critial section.
-	 *
-	 */
-	void Lock();
+		/**
+		 * \brief Lock the critial section.
+		 *
+		 */
+		void Lock();
 
-	/**
-	 * \brief Unlock the critical section.
-	 *
-	 */
-	void Unlock();
+		/**
+		 * \brief Unlock the critical section.
+		 *
+		 */
+		void Unlock();
 
-	/**
-	 * \brief Try lock the critical section.
-	 *
-	 */
-	bool TryLock();
+		/**
+		 * \brief Try lock the critical section.
+		 *
+		 */
+		bool TryLock();
 
-	/**
-	 * \brief
-	 *
-	 */
-	std::string what();
-
+		/**
+		 * \brief
+		 *
+		 */
+		std::string what();
 };
 
 }

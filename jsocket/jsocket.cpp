@@ -41,9 +41,9 @@ Socket::Socket(InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbuf_
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 	
-    _is = NULL;
-    _os = NULL;
-    _address = NULL;
+	_is = NULL;
+	_os = NULL;
+	_address = NULL;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -61,9 +61,9 @@ Socket::Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int loca
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 	
-    _is = NULL;
-    _os = NULL;
-    _address = NULL;
+	_is = NULL;
+	_os = NULL;
+	_address = NULL;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -82,9 +82,9 @@ Socket::Socket(std::string host_, int port_, int timeout_, int rbuf_, int wbuf_)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 	
-    _is = NULL;
-    _os = NULL;
-    _address = NULL;
+	_is = NULL;
+	_os = NULL;
+	_address = NULL;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -104,9 +104,9 @@ Socket::Socket(std::string host_, int port_, InetAddress *local_addr_, int local
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 	
-    _is = NULL;
-    _os = NULL;
-    _address = NULL;
+	_is = NULL;
+	_os = NULL;
+	_address = NULL;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -124,25 +124,25 @@ Socket::Socket(std::string host_, int port_, InetAddress *local_addr_, int local
 
 Socket::~Socket()
 {
-    try {
-    	Close();
-    } catch (...) {
-    }
+	try {
+		Close();
+	} catch (...) {
+	}
 
-    if (_is != NULL) {
-        delete _is;
+	if (_is != NULL) {
+		delete _is;
 		_is = NULL;
-    }
+	}
 
-    if (_os != NULL) {
-        delete _os;
+	if (_os != NULL) {
+		delete _os;
 		_os = NULL;
-    }
+	}
 
-    if (_address != NULL) {
-        delete _address;
+	if (_address != NULL) {
+		delete _address;
 		_address = NULL;
-    }
+	}
 }
 
 /** Private */

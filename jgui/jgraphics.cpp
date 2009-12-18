@@ -1956,10 +1956,10 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		alpha = 0xff;
 	}
 
-	int sx = SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
-			sy = SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
-			sw = SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
-			sh = SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
+	int sx = sxp, // SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
+			sy = syp, // SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
+			sw = swp, // SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
+			sh = shp; // SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
 			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
 			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,

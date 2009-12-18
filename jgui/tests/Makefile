@@ -88,7 +88,7 @@ OBJS_layouts = \
 OBJS_stress = \
 		stress.o\
 
-all: teste restore raycaster_flat raycaster_texture agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts
+all: teste skull restore raycaster_flat raycaster_texture agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 

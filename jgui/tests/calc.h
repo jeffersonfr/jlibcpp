@@ -33,12 +33,7 @@ class MCalc : public jgui::Frame, public jgui::ButtonListener, public jgui::Fram
 						_number1;
 				std::string _operation;
 				Display *_display;
-				int _state,
-					bx,
-					by,
-					bwidth,
-					bheight;
-				float delta;
+				int _state;
 
 		public:
 				MCalc(int x, int y);

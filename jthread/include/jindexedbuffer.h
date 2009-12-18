@@ -35,7 +35,7 @@
 #define MAX_BUFFER_SIZE	1048576
 
 #define MIN_CHUNK_SIZE	1024
-#define MAX_CHUNK_SIZE	1048576
+#define MAX_CHUNK_SIZE	INT_MAX
 
 namespace jthread {
 
@@ -53,7 +53,7 @@ enum jbuffer_type_t {
  *
  */
 struct jringbuffer_t {
-	uint8_t*data;	// buffer
+	uint8_t *data;	// buffer
 	int size;				// size of buffer
 };
 
@@ -90,65 +90,89 @@ class IndexedBuffer : public virtual jcommon::Object{
 #endif
 		
     public:
-        /**
-         * \brief Construtor.
-         *
-         */
-        IndexedBuffer(int size = 256, int chunk = MIN_CHUNK_SIZE, jbuffer_type_t type = BUFFER_BLOCK);
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		IndexedBuffer(int size = 256, int chunk = MIN_CHUNK_SIZE, jbuffer_type_t type = BUFFER_BLOCK);
 
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~IndexedBuffer();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~IndexedBuffer();
 
-        /**
-         * \brief 
-         *
-         */
-        void Reset();
-        
-        /**
-         * \brief 
-         *
-         */
-        void Release();
-        
+		/**
+		 * \brief 
+		 *
+		 */
+		void Reset();
+
+		/**
+		 * \brief 
+		 *
+		 */
+		void Release();
+
+		/**
+		 * \brief 
+		 *
+		 */
+		void SetChunkSize(int size);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		void SetNodesSize(int size);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		int GetChunkSize();
+
+		/**
+		 * \brief 
+		 *
+		 */
+		int GetNodesSize();
+
 		/**
 		 * \brief
 		 *
 		 */
 		int GetIndex(int *rindex, int *pindex);
 
-        /**
-         * \brief Returns the current size of buffer.
+		/**
+		 * \brief Returns the current size of buffer.
 		 *
 		 * \return -1 caso os indices sejam invalidos, 0 caso esteja vazio, caso contrario 
 		 * retorna o tamanho atual do buffer.
-         *
-         */
-        int GetAvailable(int *rindex, int *pindex);
+		 *
+		 */
+		int GetAvailable(int *rindex, int *pindex);
 
-        /**
-         * \brief Read a chunk.
+		/**
+		 * \brief Read a chunk.
 		 *
 		 * \param data Data deve conter no minimo o tamanho de chunk. A funcao retorna o tamanho lido em size.
-         *
-         */
-        int Read(jringbuffer_t *data, int *rindex, int *pindex);
-        
-        /**
-         * \brief 
-         *
-         */
-        int Write(const uint8_t*data, int size);
-        
-        /**
-         * \brief 
-         *
-         */
-        int Write(jringbuffer_t *data);
-        
+		 *
+		 */
+		int Read(jringbuffer_t *data, int *rindex, int *pindex);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		int Write(uint8_t *data, int size);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		int Write(jringbuffer_t *data);
+
 };
 
 }

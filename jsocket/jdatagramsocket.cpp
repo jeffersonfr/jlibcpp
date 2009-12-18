@@ -42,9 +42,9 @@ DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, int t
 	jcommon::Object::SetClassName("jsocket::DatagramSocket");
 	
 	_stream = stream_;
-    _address = NULL;
-    _is = NULL;
-    _os = NULL;
+	_address = NULL;
+	_is = NULL;
+	_os = NULL;
 	_is_closed = true;
 	_timeout = timeout_;
 
@@ -62,10 +62,10 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 	jsocket::Connection(UDP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::DatagramSocket");
-	
-    _address = NULL;
-    _is = NULL;
-    _os = NULL;
+
+	_address = NULL;
+	_is = NULL;
+	_os = NULL;
 	_is_closed = true;
 	_stream = stream_;
 	_timeout = timeout_;
@@ -108,17 +108,17 @@ DatagramSocket::~DatagramSocket()
 	} catch (...) {
 	}
 
-    if ((void *)_address != NULL) {
+	if ((void *)_address != NULL) {
 		delete _address;
-    }
+	}
 
-    if ((void *)_is != NULL) {
-        delete _is;
-    }
+	if ((void *)_is != NULL) {
+		delete _is;
+	}
 
-    if ((void *)_os != NULL) {
-        delete _os;
-    }
+	if ((void *)_os != NULL) {
+		delete _os;
+	}
 }
 
 /** Private */

@@ -202,8 +202,12 @@ void ToogleButton::Paint(Graphics *g)
 	}
 
 	if(_is_pressed == true) {
+		jcolor_t color = _bg_color;
+
+		color.alpha = 0xa0;
+
 		g->SetDrawingFlags(DF_BLEND);
-		g->SetColor(_bg_color);
+		g->SetColor(color);
 		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
 

@@ -81,6 +81,61 @@ void IndexedBuffer::Release()
 	_semaphore.Release();
 }
 
+void IndexedBuffer::SetChunkSize(int size)
+{
+	// INFO:: a sincronizacao desse metodo eh preocupacao do desenvolvedor da aplicacao
+	_write_index = 0;
+	_pass_index = 0;
+	_chunk_size = size;
+
+	if (size < MIN_CHUNK_SIZE || size > MAX_CHUNK_SIZE) {
+		throw BufferException("Range of chunk size error");
+	}
+
+	for (int i=0; i<_buffer_size; i++) {
+		delete _buffer[i].data;
+
+		_buffer[i].data = new uint8_t[size];
+		_buffer[i].size = size;
+	}
+}
+
+void IndexedBuffer::SetNodesSize(int size)
+{
+	// INFO:: a sincronizacao desse metodo eh preocupacao do desenvolvedor da aplicacao
+	_write_index = 0;
+	_pass_index = 0;
+
+	if (_buffer_size < 1 || _buffer_size > MAX_BUFFER_SIZE) {
+		throw BufferException("Range of buffer size error");
+	}
+
+	for (int i=0; i<_buffer_size; i++) {
+		delete _buffer[i].data;
+	}
+
+	delete _buffer;
+
+	_buffer_size = size;
+
+	_buffer = new jringbuffer_t[_buffer_size];
+
+	for (int i=0; i<_buffer_size; i++) {
+		_buffer[i].data = new uint8_t[_chunk_size];
+		_buffer[i].size = _chunk_size;
+	}
+}
+
+int IndexedBuffer::GetChunkSize()
+{
+	return _chunk_size;
+}
+
+int IndexedBuffer::GetNodesSize()
+{
+	return _buffer_size;
+}
+
 int IndexedBuffer::GetIndex(int *rindex, int *pindex)
 {
 	AutoLock lock(&_mutex);
@@ -124,10 +179,13 @@ int IndexedBuffer::GetAvailable(int *rindex, int *pindex)
 
 int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 {
+	/*
 	if ((*rindex < 0 || *rindex >= _buffer_size) || *pindex < 0) {
 		return -1;
 	}
+	*/
 
+#ifdef _WIN32
 	if (*pindex == _pass_index) {
 		if (*rindex > _write_index) {
 			return -1;
@@ -140,8 +198,24 @@ int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 				// WARN:: return -1; ?
 			}
 		}
-
+	
 		AutoLock lock(&_mutex);
+#else
+	AutoLock lock(&_mutex);
+
+	if (*pindex == _pass_index) {
+		if (*rindex > _write_index) {
+			return -1;
+		}
+
+		while (*rindex == _write_index) {
+			try {
+				_semaphore.Wait(&_mutex);
+			} catch (jthread::SemaphoreException &e) {
+				// WARN:: return -1; ?
+			}
+		}
+#endif
 
 		data->data = _buffer[*rindex].data;
 		data->size = _buffer[*rindex].size;
@@ -175,7 +249,7 @@ int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 	return -1;
 }
 
-int IndexedBuffer::Write(const uint8_t*data, int size)
+int IndexedBuffer::Write(uint8_t*data, int size)
 {
 	if ((void *)data == NULL) {
 		return -1;
@@ -220,7 +294,7 @@ int IndexedBuffer::Write(jringbuffer_t *data)
 		return -1;
 	}
 
-	return Write((const uint8_t*)data->data, data->size);
+	return Write(data->data, data->size);
 }
 
 }
