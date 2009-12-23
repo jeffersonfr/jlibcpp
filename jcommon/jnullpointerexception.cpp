@@ -25,7 +25,6 @@ NullPointerException::NullPointerException(std::string reason_):
 	jcommon::Exception(reason_), std::runtime_error(reason_)
 {
 	jcommon::Object::SetClassName("jcommon::NullPointerException");
-	jcommon::Object::AddParent("jcommon::Exception");
 }
 
 NullPointerException::~NullPointerException() throw()

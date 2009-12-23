@@ -528,38 +528,46 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 	}
 
 	Component *c1 = NULL,
-			  *c2 = NULL;
-
-	jthread::AutoLock lock(&_container_mutex);
-
-	graphics->Lock();
+						*c2 = NULL;
 
 	if (_optimized_paint == false) {
 		std::vector<jgui::Component *> collisions;
 
-		collisions.push_back(c);
+		{
+			jthread::AutoLock lock(&_container_mutex);
 
-		for (std::vector<jgui::Component *>::iterator i=std::find(_components.begin(), _components.end(), c); i!=_components.end(); i++) {
-			c1 = (*i);
+			collisions.push_back(c);
 
-			if (c1->IsVisible() == true) {
-				int x1 = c1->GetX()-_scroll_x,
-						y1 = c1->GetY()-_scroll_y,
-						w1 = c1->GetWidth(),
-						h1 = c1->GetHeight();
+			for (std::vector<jgui::Component *>::iterator i=std::find(_components.begin(), _components.end(), c); i!=_components.end(); i++) {
+				c1 = (*i);
 
-				if ((x1 < _size.width && (x1+w1) > 0) && (y1 < _size.height && (y1+h1) > 0)) {
-					for (std::vector<jgui::Component *>::iterator j=collisions.begin(); j!=collisions.end(); j++) {
-						c2 = (*j);
+				if (c1->IsVisible() == true) {
+					int x1 = c1->GetX()-_scroll_x,
+							y1 = c1->GetY()-_scroll_y,
+							w1 = c1->GetWidth(),
+							h1 = c1->GetHeight();
 
-						if (Intersect(c1, c2) == true) {
-							c1->Invalidate();
+					if ((x1 < _size.width && (x1+w1) > 0) && (y1 < _size.height && (y1+h1) > 0)) {
+						for (std::vector<jgui::Component *>::iterator j=collisions.begin(); j!=collisions.end(); j++) {
+							c2 = (*j);
 
-							collisions.push_back(c1);
+							if (Intersect(c1, c2) == true) {
+								c1->Invalidate();
 
-							break;
+								collisions.push_back(c1);
+
+								break;
+							}
 						}
 					}
+				}
+			}
+
+			collisions.clear();
+
+			for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+				if ((*i)->IsVisible() == true && (*i)->IsValid() == false) {
+					collisions.push_back((*i));
 				}
 			}
 		}
@@ -568,49 +576,46 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 			y1 = 9999999,
 			x2 = -9999999,
 			y2 = -9999999;
-		bool flag = false;
 
-		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+		graphics->Lock();
+
+		for (std::vector<jgui::Component *>::iterator i=collisions.begin(); i!=collisions.end(); i++) {
 			c1 = (*i);
 
-			if (c1->IsVisible() == true && c1->IsValid() == false) {
-				int x3 = c1->GetX()-_scroll_x,
-						y3 = c1->GetY()-_scroll_y,
-						w3 = c1->GetWidth(),
-						h3 = c1->GetHeight();
+			int x3 = c1->GetX()-_scroll_x,
+					y3 = c1->GetY()-_scroll_y,
+					w3 = c1->GetWidth(),
+					h3 = c1->GetHeight();
 
-				flag = true;
-
-				if (x1 > x3) {
-					x1 = x3;
-				}
-
-				if (y1 > y3) {
-					y1 = y3;
-				}
-
-				if (x2 < (x3+w3)) {
-					x2 = x3+w3;
-				}
-
-				if (y2 < (y3+h3)) {
-					y2 = y3+h3;
-				}
-
-				graphics->Reset();
-				graphics->Translate(x3, y3);
-				graphics->SetClip(0, 0, w3, h3);
-
-				c1->Paint(graphics);
-
-				graphics->ReleaseClip();
-				graphics->Translate(-x3, -y3);
-				
-				c1->Revalidate();
+			if (x1 > x3) {
+				x1 = x3;
 			}
+
+			if (y1 > y3) {
+				y1 = y3;
+			}
+
+			if (x2 < (x3+w3)) {
+				x2 = x3+w3;
+			}
+
+			if (y2 < (y3+h3)) {
+				y2 = y3+h3;
+			}
+
+			graphics->Reset();
+			graphics->Translate(x3, y3);
+			graphics->SetClip(0, 0, w3, h3);
+
+			c1->Paint(graphics);
+
+			graphics->ReleaseClip();
+			graphics->Translate(-x3, -y3);
+
+			c1->Revalidate();
 		}
 		
-		if (flag == true) {
+		if (collisions.size() > 0) {
 			graphics->Flip(x1, y1, x2-x1, y2-y1);
 		}
 	} else {
