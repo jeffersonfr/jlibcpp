@@ -1771,7 +1771,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 		g->SetBlittingFlags(_blit_flags);
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
-		off.GetGraphics()->DrawImage(img, 0, 0);
+		g->DrawImage(img, 0, 0);
 		
 		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
 
@@ -1844,7 +1844,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 		g->SetBlittingFlags(_blit_flags);
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
-		off.GetGraphics()->DrawImage(img, 0, 0, wp, hp);
+		g->DrawImage(img, 0, 0, wp, hp);
 		
 		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
 
@@ -1927,14 +1927,17 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 
 	imgProvider->Release(imgProvider);
 
-	int w = desc.width-swp,
-			h = desc.height-shp;
-
-	if (w <= 0 || h <= 0) {
+	if (sxp < 0 || sxp > desc.width) {
 		return false;
 	}
 
-	// return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, desc.width, desc.height, alpha);
+	if (syp < 0 || syp > desc.height) {
+		return false;
+	}
+
+	int w = SCREEN_TO_SCALE(swp, _screen.width, _scale.width),
+			h = SCREEN_TO_SCALE(shp, _screen.height, _scale.height);
+
 	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, w, h, alpha);
 #endif
 
@@ -1991,7 +1994,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		g->SetBlittingFlags(_blit_flags);
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
-		off.GetGraphics()->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
+		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
 		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
 
@@ -2089,9 +2092,12 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int alpha)
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
+		// g->SetDrawingFlags(_draw_flags);
+		// g->SetPorterDuffFlags(_porter_duff_flags);
+
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
-		off.GetGraphics()->DrawImage(img, 0, 0);
+		g->DrawImage(img, 0, 0);
 		
 		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, img_wp, img_hp, _radians);
 	}
@@ -2146,9 +2152,12 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
+		// g->SetDrawingFlags(_draw_flags);
+		// g->SetPorterDuffFlags(_porter_duff_flags);
+
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
-		off.GetGraphics()->DrawImage(img, 0, 0, wp, hp);
+		g->DrawImage(img, 0, 0, wp, hp);
 		
 		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
 	}
@@ -2159,12 +2168,16 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 
 bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp, int xp, int yp, int alpha)
 {
-	int w = img->GetWidth()-swp,
-			h = img->GetHeight()-shp;
-
-	if (w <= 0 || h <= 0) {
+	if (sxp < 0 || sxp > img->GetWidth()) {
 		return false;
 	}
+
+	if (syp < 0 || syp > img->GetHeight()) {
+		return false;
+	}
+
+	int w = img->GetWidth()-sxp,
+			h = img->GetHeight()-syp;
 
 	// return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, img->GetWidth(), img->GetHeight(), alpha);
 	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, w, h, alpha);
@@ -2226,9 +2239,12 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
+		// g->SetDrawingFlags(_draw_flags);
+		// g->SetPorterDuffFlags(_porter_duff_flags);
+
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
-		off.GetGraphics()->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
+		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
 		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
 	}
@@ -2239,7 +2255,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 
 void Graphics::Rotate(double radians)
 {
-	_radians = radians;
+	_radians = fmod(radians, 2.0*M_PI);
 }
 
 void Graphics::Translate(int x, int y)
@@ -2632,13 +2648,18 @@ void Graphics::SetRGB(int xp, int yp, uint32_t rgb)
 		int pixel = *(dst+x),
 				r = (rgb>>0x10)&0xff,
 				g = (rgb>>0x08)&0xff,
-				b = (rgb)&0xff,
+				b = (rgb>>0x00)&0xff,
 				a = (rgb>>0x18)&0xff,
 				pr = (pixel>>0x10)&0xff,
 				pg = (pixel>>0x08)&0xff,
-				pb = (pixel)&0xff,
+				pb = (pixel>>0x00)&0xff,
 				pa = 0xff; // (pixel>>0x18)&0xff;
 
+		pr = (int)(pr*(255-a) + r*a)/255;
+		pg = (int)(pg*(255-a) + g*a)/255;
+		pb = (int)(pb*(255-a) + b*a)/255;
+
+		/*
 		double alpha = ((double)a/255.0);
 
 		pr = (int)(pr*(1.0-alpha) + r*alpha);
@@ -2656,8 +2677,9 @@ void Graphics::SetRGB(int xp, int yp, uint32_t rgb)
 		if (pb > 0xff) {
 			pb = 0xff;
 		}
+		*/
 
-		*(dst+x) = (pa << 24) | (pr << 16) | (pg << 8) | (pb << 0);
+		*(dst+x) = (pa << 0x18) | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
 	} else if (_draw_flags == DF_XOR) {
 		*(dst+x) ^= rgb;
 	}
@@ -2766,6 +2788,24 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 
 				int argb = *(prgb+i),
 						pixel = *(dst+(int)k),
+						r = (argb>>0x10)&0xff,
+						g = (argb>>0x08)&0xff,
+						b = (argb>>0x00)&0xff,
+						a = (argb>>0x18)&0xff,
+						pr = (pixel>>0x10)&0xff,
+						pg = (pixel>>0x08)&0xff,
+						pb = (pixel>>0x00)&0xff,
+						pa = 0xff; // (pixel>>0x18)&0xff;
+
+				pr = (int)(pr*(255-a) + r*a)/255;
+				pg = (int)(pg*(255-a) + g*a)/255;
+				pb = (int)(pb*(255-a) + b*a)/255;
+
+				*(dst+(int)k) = (pa << 0x18) | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
+
+				/*
+				int argb = *(prgb+i),
+						pixel = *(dst+(int)k),
 						r = argb&0x00ff0000,
 						g = argb&0x0000ff00,
 						b = argb&0x000000ff,
@@ -2793,6 +2833,7 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 				}
 
 				*(dst+(int)k) = 0xff000000 | pr | pg | pb;
+				*/
 			}
 		}
 	} else if (_draw_flags == DF_XOR) {
@@ -3303,8 +3344,8 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 	surface->GetSize(surface, &swmax, &shmax);
 	simg->GetSize(simg, &iwmax, &ihmax);
 
-	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_WRITE), &sptr, &spitch);
-	simg->Lock(simg, (DFBSurfaceLockFlags)(DSLF_WRITE), &gptr, &gpitch);
+	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &sptr, &spitch);
+	simg->Lock(simg, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &gptr, &gpitch);
 
 	for (j=height-1+2*dh; j>0; j--) {
 		int sy = ((y+j-dh)*scaleh)/precision;
@@ -3332,7 +3373,22 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 							int offset = ((x+i-dw)*scalew)/precision;
 
 							if (offset >= 0 && offset < swmax) {
-								*(sdst+offset) = rgb;
+								// *(sdst+offset) = rgb;
+
+								uint32_t pixel = *(sdst+offset);
+								uint8_t r = (rgb>>0x10)&0xff,
+												g = (rgb>>0x08)&0xff,
+												b = (rgb>>0x00)&0xff,
+												a = (rgb>>0x18)&0xff,
+												pr = (pixel>>0x10)&0xff,
+												pg = (pixel>>0x08)&0xff,
+												pb = (pixel>>0x00)&0xff;
+
+								pr = (pr*(255-a) + r*a)/255;
+								pg = (pg*(255-a) + g*a)/255;
+								pb = (pb*(255-a) + b*a)/255;
+
+								*(sdst+offset) = (a << 0x18) | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
 							}
 						}
 					}
