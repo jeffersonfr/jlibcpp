@@ -27,6 +27,8 @@
 
 #include <cstring>
 
+#include <stdint.h>
+
 #ifdef _WIN32
 #include <windows.h>
 #else
