@@ -359,10 +359,10 @@ void TextArea::GetLines(std::vector<std::string> *texts)
 		previous,
 		paint_text = _text;
 	int i,
-		j,
-		word_size,
-		max = _size.width-1;
-
+			j,
+			word_size,
+			max = _size.width-2*_horizontal_gap;
+	
 	if (EchoCharIsSet() == true) {
 		paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
 	}
@@ -385,7 +385,7 @@ void TextArea::GetLines(std::vector<std::string> *texts)
 			for (j=0; j<w.GetSize(); j++) {
 				temp = w.GetToken(j);
 
-				if (_font->GetStringWidth(temp.c_str()) > (max-5)) {
+				if (_font->GetStringWidth(temp.c_str()) > max) {
 					bool flag = false;
 
 					while (flag == false) {
@@ -394,7 +394,7 @@ void TextArea::GetLines(std::vector<std::string> *texts)
 						while (p < temp.size()) {
 							p++;
 
-							if (_font->GetStringWidth(temp.substr(0, p)) >= (max-5)) {
+							if (_font->GetStringWidth(temp.substr(0, p)) >= max) {
 								p--;
 
 								if (p < 0) {
@@ -432,7 +432,7 @@ void TextArea::GetLines(std::vector<std::string> *texts)
 
 				word_size = _font->GetStringWidth(temp.c_str());
 
-				if (word_size > (max-5)) {
+				if (word_size > max) {
 					temp = words[j];
 					texts->push_back(previous);
 				}
@@ -450,6 +450,9 @@ void TextArea::Paint(Graphics *g)
 	JDEBUG(JINFO, "paint\n");
 
 	Component::Paint(g);
+
+	int width = _size.width-2*_horizontal_gap,
+			height = _size.height-2*_vertical_gap;
 
 	if (IsFontSet() == true) {
 		int font_height = _font->GetHeight();
@@ -517,7 +520,7 @@ void TextArea::Paint(Graphics *g)
 
 		_line_op = 0;
 
-		int max_lines = _size.height/(font_height+font_space)+0;
+		int max_lines = height/(font_height+font_space)+0;
 
 		// CHANGE:: ao menos 1 linha visivel
 		if (max_lines < 1) {
@@ -527,7 +530,7 @@ void TextArea::Paint(Graphics *g)
 		g->SetColor(_fg_color);
 
 		{
-			g->SetClip(1, 1, _size.width-2, _size.height-2);
+			g->SetClip(_horizontal_gap, _vertical_gap, width, height);
 
 			// INFO:: Draw text
 			for (int i=0, k=0; i<=(int)texts.size()-1; i++) {
@@ -538,9 +541,9 @@ void TextArea::Paint(Graphics *g)
 
 				if (line_number-- < max_lines) {
 					if (strchr(s.c_str(), '\n') == NULL) {
-						g->DrawString(s, 2, (unsigned)(k*(font_height+font_space))+font_space);
+						g->DrawString(s, _horizontal_gap, (unsigned)(k*(font_height+font_space))+font_space+_vertical_gap);
 					} else {
-						g->DrawString(s.substr(0, s.size()-1), 2, (unsigned)(k*(font_height+font_space))+font_space);
+						g->DrawString(s.substr(0, s.size()-1), _horizontal_gap, (unsigned)(k*(font_height+font_space))+font_space+_vertical_gap);
 					}
 
 					if (_is_editable == true && _cursor_visible == true && current_length < (int)s.size() && current_length >= 0) {
@@ -550,7 +553,7 @@ void TextArea::Paint(Graphics *g)
 							std::string cursor;
 
 							if (_cursor_type == UNDERSCORE_CURSOR) {
-								cursor = "_";
+								cursor = "|";
 							} else if (_cursor_type == STICK_CURSOR) {
 								cursor = "|";
 							} else if (_cursor_type == BLOCK_CURSOR) {
@@ -558,7 +561,7 @@ void TextArea::Paint(Graphics *g)
 							}
 
 							current_text_size = _font->GetStringWidth(texts[i].substr(0, current_length).c_str());
-							g->DrawString(cursor, 2+current_text_size, (int)(k*(font_height+font_space))+font_space);
+							g->DrawString(cursor, _horizontal_gap+current_text_size, (int)(k*(font_height+font_space))+font_space+_vertical_gap);
 
 							g->SetColor(_fg_color);
 

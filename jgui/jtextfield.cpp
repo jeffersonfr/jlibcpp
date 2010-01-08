@@ -315,6 +315,9 @@ void TextField::Paint(Graphics *g)
 
 	Component::Paint(g);
 
+	int width = _size.width-2*_horizontal_gap,
+			height = _size.height-2*_vertical_gap;
+
 	if (IsFontSet() == true) {
 		std::string paint_text = _text,
 			cursor,
@@ -384,11 +387,11 @@ void TextField::Paint(Graphics *g)
 			s = s.substr(0, count);
 
 			if (_align == 0) {
-				pos = 0;
+				pos = _horizontal_gap;
 			} else if (_align == 1) {
-				pos = (_size.width-current_text_size)/2;
+				pos = (width-current_text_size)/2;
 			} else {
-				pos = _size.width-current_text_size;
+				pos = width-current_text_size;
 			}
 				
 			current_text_size = _font->GetStringWidth(s.substr(0, _position));
@@ -400,7 +403,8 @@ void TextField::Paint(Graphics *g)
 			dy = 0;
 		}
 
-		g->SetClip(_horizontal_gap, _vertical_gap, _size.width-2*_horizontal_gap, _size.height-2*_vertical_gap);
+		g->SetClip(_horizontal_gap, _vertical_gap, width, height);
+
 		g->DrawString(s, pos+offset, dy);
 
 		if (HasFocus() == true) {

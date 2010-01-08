@@ -244,7 +244,7 @@ void Container::Paint(Graphics *g)
 
 	g->SetFont(_font);
 
-	//CHANGE:: permite alteracoes on-the-fly
+	// INFO:: permite alteracoes on-the-fly
 	g->SetWorkingScreenSize(_scale_width, _scale_height);
 
 	g->SetDrawingFlags(DF_NOFX);
@@ -315,13 +315,13 @@ void Container::Paint(Graphics *g)
 bool Container::Intersect(Component *c1, Component *c2)
 {
 	int ax = c1->GetX(), 
-		ay = c1->GetY(),
-		bx = ax+c1->GetWidth(),
-		by = ay+c1->GetHeight();
+			ay = c1->GetY(),
+			bx = ax+c1->GetWidth(),
+			by = ay+c1->GetHeight();
 	int cx = c2->GetX(), 
-		cy = c2->GetY(),
-		dx = cx+c2->GetWidth(), 
-		dy = cy+c2->GetHeight();
+			cy = c2->GetY(),
+			dx = cx+c2->GetWidth(), 
+			dy = cy+c2->GetHeight();
 
 	return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
 }
@@ -329,13 +329,13 @@ bool Container::Intersect(Component *c1, Component *c2)
 bool Container::Intersect(Component *c1, int x, int y, int w, int h)
 {
 	int ax = c1->GetX(), 
-		ay = c1->GetY(),
-		bx = ax+c1->GetWidth(),
-		by = ay+c1->GetHeight();
+			ay = c1->GetY(),
+			bx = ax+c1->GetWidth(),
+			by = ay+c1->GetHeight();
 	int cx = x, 
-		cy = y,
-		dx = cx+w, 
-		dy = cy+h;
+			cy = y,
+			dx = cx+w, 
+			dy = cy+h;
 
 	return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
 }
@@ -516,7 +516,6 @@ void Container::RequestComponentFocus(jgui::Component *c, bool has_parent)
 	}
 
 	if (_parent != NULL) {
-		// WARNNING:: verificar se a logica estah correta
 		_parent->RequestComponentFocus(c, !IsOpaque());
 	} else {
 		if (has_parent == true) {

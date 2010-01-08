@@ -1769,6 +1769,8 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
+		// g->SetPorterDuffFlags(_porter_duff_flags);
+
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
 		g->DrawImage(img, 0, 0);
@@ -1842,6 +1844,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
+		// g->SetPorterDuffFlags(_porter_duff_flags);
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
 		g->DrawImage(img, 0, 0, wp, hp);
@@ -1992,6 +1995,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
+		// g->SetPorterDuffFlags(_porter_duff_flags);
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);

@@ -135,6 +135,8 @@ OffScreenImage::OffScreenImage(int width, int height, jsurface_pixelformat_t pix
 	surface->SetPorterDuff(surface, DSPD_SRC_OVER);
 
 	surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
+	// surface->Flip(surface, NULL, DSFLIP_NONE);
+	// surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
 
 	graphics = new Graphics(surface);
 
