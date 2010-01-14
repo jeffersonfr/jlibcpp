@@ -25,6 +25,8 @@
 
 #include <sstream>
 
+#include <limits.h>
+
 namespace jthread {
 
 // add -DSINGLE_WAIT_CONDITION to Makefile flags

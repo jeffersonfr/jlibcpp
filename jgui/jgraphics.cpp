@@ -139,7 +139,7 @@ OffScreenImage * Graphics::Create()
 		w = SCREEN_TO_SCALE(w, _screen.width, _scale.width);
 		h = SCREEN_TO_SCALE(h, _screen.height, _scale.height);
 
-		image = new OffScreenImage(w, h);
+		image = new OffScreenImage(w, h, SPF_ARGB, _scale.width, _scale.height);
 
 		IDirectFBSurface *s = image->GetGraphics()->surface;
 
@@ -1765,7 +1765,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 		int wp = SCREEN_TO_SCALE(desc.width, _screen.width, _scale.width); 
 		int hp = SCREEN_TO_SCALE(desc.height, _screen.height, _scale.height);
 
-		OffScreenImage off(wp, hp);
+		OffScreenImage off(wp, hp, SPF_ARGB, _scale.width, _scale.height);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -1840,7 +1840,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
 	if (_radians != 0.0) {
-		OffScreenImage off(wp, hp);
+		OffScreenImage off(wp, hp, SPF_ARGB, _scale.width, _scale.height);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -1991,7 +1991,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
 	if (_radians != 0.0) {
-		OffScreenImage off(wp, hp);
+		OffScreenImage off(wp, hp, SPF_ARGB, _scale.width, _scale.height);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -2092,7 +2092,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int alpha)
 		int img_wp = img->GetWidth(),
 				img_hp = img->GetHeight();
 
-		OffScreenImage off(img_wp, img_hp);
+		OffScreenImage off(img_wp, img_hp, SPF_ARGB, _scale.width, _scale.height);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -2152,7 +2152,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 	if (_radians == 0.0) {
 		surface->StretchBlit(surface, g->surface, NULL, &drect);
 	} else {
-		OffScreenImage off(wp, hp);
+		OffScreenImage off(wp, hp, SPF_ARGB, _scale.width, _scale.height);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -2239,7 +2239,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 	if (_radians == 0.0) {
 		surface->StretchBlit(surface, g->surface, &srect, &drect);
 	} else {
-		OffScreenImage off(wp, hp);
+		OffScreenImage off(wp, hp, SPF_ARGB, _scale.width, _scale.height);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);

@@ -54,8 +54,8 @@ DEFINES		= -D_GNU_SOURCE \
 						-D_FILE_OFFSET_BITS=64 \
 						-D_LARGEFILE_SOURCE \
 						-DSINGLE_WAIT_CONDITION \
-						-DDIRECTFB_UI \
 						-DJDEBUG_ENABLED \
+						-DDIRECTFB_UI \
 
 REQUIRES	= \
 						libssl \
