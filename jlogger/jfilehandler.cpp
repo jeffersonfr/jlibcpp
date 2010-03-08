@@ -31,11 +31,15 @@ FileHandler::FileHandler(std::string filename_):
 	jlogger::StreamHandler()
 {
 	jcommon::Object::SetClassName("jlogger::FileHandler");
+
+	_file = new jio::File(filename_, (jio::file_flags_t)(jio::F_WRITE_ONLY | jio::F_LARGEFILE | jio::F_APPEND));
+
+	if (_file->Exists() == false) {
+		_file = new jio::File(filename_, (jio::file_flags_t)(jio::F_WRITE_ONLY | jio::F_LARGEFILE | jio::F_APPEND | jio::F_CREATE));
 	
-	try {
-		_file = new jio::File(filename_);
-	} catch (jcommon::RuntimeException &e) {
-		throw LoggerException(e.what());
+		if (_file->Exists() == false) {
+			throw LoggerException("Error:: cannot create the Log file");
+		}
 	}
 }
 
@@ -52,6 +56,7 @@ void FileHandler::WriteRecord(LogRecord *record_)
 	_mutex.Lock();
 	
 	_file->Write(record_->GetRecord().c_str(), record_->GetRecord().size());
+	_file->Flush();
 
 	_mutex.Unlock();
 }

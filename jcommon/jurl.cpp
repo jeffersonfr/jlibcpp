@@ -63,8 +63,14 @@ URL::URL(std::string url_):
 				_path = _path + "://";
 			}
 		}
+
+		uint32_t index = _path.rfind("/");
+
+		if (index != std::string::npos) {
+			_file = _path.substr(index+1);
+		}
 	}
-	
+
 	jcommon::StringTokenizer host(proto.GetToken(proto.GetSize() - 1), "/", SPLIT_FLAG, false);
 	jcommon::StringTokenizer port(host.GetToken(0), ":", SPLIT_FLAG, false);
 	
@@ -81,11 +87,13 @@ URL::URL(std::string url_):
 	}
 
 	if (_port < 0) {
+		/*
 		_host = "";
 		_query = "";
 		_file = "";
 		_params = "";
 		_reference = "";
+		*/
 
 		return;
 	}
@@ -95,6 +103,7 @@ URL::URL(std::string url_):
 	if (host.GetSize() == 1) {
 		_file = _host;
 		_query = "/";
+
 	} else {
 		for (int i=1; i<host.GetSize(); i++) {
 			_query = _query + "/" + host.GetToken(i);
