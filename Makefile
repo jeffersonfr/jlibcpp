@@ -33,7 +33,6 @@ OTHER  		= -Wall -shared -rdynamic
 INCLUDE		= -I. \
 						-Ijcommon/include \
 						-Ijgui/include \
-						-Ijimage/include \
 						-Ijio/include \
 						-Ijlogger/include \
 						-Ijmath/include \

@@ -473,7 +473,7 @@ void Source::ReadStream()
 			break;
 		}
 
-		_buffer->Write((const uint8_t *)receive, r);
+		_buffer->Write((uint8_t *)receive, r);
 
 		_sent_bytes += r;
 	} while (_running == true);
