@@ -36,6 +36,13 @@
 #include <directfb.h>
 #endif
 
+#define TRUNC_COLOR(r, g, b, a)			\
+	r = (r < 0)?0:(r > 0xff)?0xff:r;	\
+	g = (g < 0)?0:(g > 0xff)?0xff:g;	\
+	b = (b < 0)?0:(b > 0xff)?0xff:b;	\
+	a = (a < 0)?0:(a > 0xff)?0xff:a;	\
+
+/*
 #define TRUNC_COLOR(red, green, blue, alpha) 	\
 	if (red < 0) { 			\
 		red = 0;					\
@@ -68,6 +75,7 @@
 	if (alpha > 0xff) {	\
 		alpha = 0xff;			\
 	}										\
+*/
 
 #define SCALE_TO_SCREEN(x, y, z) \
 	(int)floor(((double)x*(double)y)/(double)z) 
