@@ -26,7 +26,7 @@
 #include <signal.h>
 
 #define ENABLE_GUI	1
-#define DRAW_ANTS	0
+#define DRAW_ANTS		0
 
 #define FONT "./fonts/font.ttf"
 

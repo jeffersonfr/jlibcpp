@@ -202,7 +202,7 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::F
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(KeyboardEvent *event);
+		void DispatchKeyboardEvent(KeyboardEvent *event);
 
 };
 

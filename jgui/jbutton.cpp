@@ -31,9 +31,11 @@ Button::Button(std::string label, int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Button");
 
-	_index = 0;
-	_align = CENTER_ALIGN;
+	_wrap = false;
+	_halign = CENTER_HALIGN;
+	_valign = CENTER_VALIGN;
 
+	_index = 0;
 	_name_list.push_back(label);
 
 	SetFocusable(true);
@@ -100,20 +102,32 @@ void Button::PreviousName()
 	SetCurrentNameIndex(_index);
 }
 
-void Button::SetAlign(jalign_t align)
+void Button::SetHorizontalAlign(jhorizontal_align_t align)
 {
-	if (_align != align) {
-		jthread::AutoLock lock(&_component_mutex);
-
-		_align = align;
+	if (_halign != align) {
+		_halign = align;
 
 		Repaint();
 	}
 }
 
-jalign_t Button::GetAlign()
+jhorizontal_align_t Button::GetHorizontalAlign()
 {
-	return _align;
+	return _halign;
+}
+
+void Button::SetVerticalAlign(jvertical_align_t align)
+{
+	if (_valign != align) {
+		_valign = align;
+
+		Repaint();
+	}
+}
+
+jvertical_align_t Button::GetVerticalAlign()
+{
+	return _valign;
 }
 
 bool Button::ProcessEvent(MouseEvent *event)
@@ -132,7 +146,7 @@ bool Button::ProcessEvent(MouseEvent *event)
 		catched = true;
 
 		RequestFocus();
-		DispatchEvent(new ButtonEvent(this, GetName()));
+		DispatchButtonEvent(new ButtonEvent(this, GetText()));
 	}
 
 	return catched;
@@ -151,7 +165,7 @@ bool Button::ProcessEvent(KeyEvent *event)
 	bool catched = false;
 
 	if (event->GetSymbol() == JKEY_ENTER) {
-		DispatchEvent(new ButtonEvent(this, GetName()));
+		DispatchButtonEvent(new ButtonEvent(this, GetText()));
 
 		catched = true;
 	}
@@ -159,7 +173,7 @@ bool Button::ProcessEvent(KeyEvent *event)
 	return catched;
 }
 
-std::string Button::GetName()
+std::string Button::GetText()
 {
 	if (_name_list.size() == 0) {
 		return "";
@@ -183,36 +197,54 @@ void Button::Paint(Graphics *g)
 	Component::Paint(g);
 
 	/*
- if (_has_focus == true) {
-	 g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
- 	g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
- }
- */
+	if (_has_focus == true) {
+		g->FillGradientRectangle(0, 0, _width, _height/2+1, 
+			_bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+		g->FillGradientRectangle(0, _height/2, _width, _height/2, 
+			_bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+	}
+	*/
 
 	if (_font != NULL) {
-		g->SetFont(_font);
-
 		if (_has_focus == true) {
 			g->SetColor(_fgfocus_color);
 		} else {
 			g->SetColor(_fg_color);
 		}
 
-		int gap = _horizontal_gap+_border_size;
+		int x = _horizontal_gap+_border_size,
+				y = _vertical_gap+_border_size,
+				w = _size.width-2*x,
+				h = _size.height-2*y,
+				gapx = 0,
+				gapy = 0;
+		int px = x+gapx,
+				py = y+gapy,
+				pw = w-gapx,
+				ph = h-gapy;
 
-		if (gap < 0) {
-			gap = 0;
+		x = (x < 0)?0:x;
+		y = (y < 0)?0:y;
+		w = (w < 0)?0:w;
+		h = (h < 0)?0:h;
+
+		px = (px < 0)?0:px;
+		py = (py < 0)?0:py;
+		pw = (pw < 0)?0:pw;
+		ph = (ph < 0)?0:ph;
+
+		std::string text = GetText();
+
+		if (_wrap == false) {
+			text = _font->TruncateString(text, "...", pw);
 		}
 
-		g->DrawString(TruncateString(GetName(), _size.width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _size.width-gap, _size.height, _align);
+		g->SetClip(0, 0, x+w, y+h);
+		g->DrawString(text, px, py, pw, ph, _halign, _valign);
+		g->SetClip(0, 0, _size.width, _size.height);
 	}
 
-	PaintBorder(g);
-
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _size.width, _size.height);
-	}
+	PaintEdges(g);
 }
 
 void Button::RegisterButtonListener(ButtonListener *listener)
@@ -239,7 +271,7 @@ void Button::RemoveButtonListener(ButtonListener *listener)
 	}
 }
 
-void Button::DispatchEvent(ButtonEvent *event)
+void Button::DispatchButtonEvent(ButtonEvent *event)
 {
 	if (event == NULL) {
 		return;

@@ -18,15 +18,16 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jselectevent.h"
+#include "jitemcomponent.h"
 
 namespace jgui {
 
-SelectEvent::SelectEvent(void *source, std::string text, int index, jselect_type_t type):
+SelectEvent::SelectEvent(void *source, jgui::Item *item, int index, jselect_type_t type):
 	jcommon::EventObject(source)
 {
 	jcommon::Object::SetClassName("jgui::SelectEvent");
 
-	_text = text;
+	_item = item;
 	_index = index;
 	_type = type;
 }
@@ -35,9 +36,9 @@ SelectEvent::~SelectEvent()
 {
 }
 
-std::string SelectEvent::GetText()
+jgui::Item * SelectEvent::GetItem()
 {
-	return _text;
+	return _item;
 }
 
 int SelectEvent::GetIndex()

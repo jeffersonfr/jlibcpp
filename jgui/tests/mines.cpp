@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "mines.h"
-#include "jmessagedialog.h"
+#include "jmessagedialogbox.h"
 
 namespace mines {
 
@@ -109,7 +109,7 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 			UpdateBoard(1);
 		} else if (event->GetSymbol() == jgui::JKEY_RED || event->GetSymbol() == jgui::JKEY_F1) {
 		} else if (event->GetSymbol() == jgui::JKEY_GREEN || event->GetSymbol() == jgui::JKEY_F2) {
-			jgui::MessageDialog dialog("Ajuda", "O jogo termina quando todos os blocos que n\xe3o possuem minas s\xe3o revelados. Utilize as bandeirinhas para ajudar na identificac\xe3o das minas escondidas.", GetX()+300, GetY()+200);
+			jgui::MessageDialogBox dialog("Ajuda", "O jogo termina quando todos os blocos que n\xe3o possuem minas s\xe3o revelados. Utilize as bandeirinhas para ajudar na identificac\xe3o das minas escondidas.", GetX()+300, GetY()+200);
 
 			dialog.Show();
 		} else if (event->GetSymbol() == jgui::JKEY_YELLOW || event->GetSymbol() == jgui::JKEY_F3) {
@@ -188,7 +188,7 @@ int Mines::DrawBlock(int row, int col, block_type_t type, int value, bool update
 			c[1] = '\0';
 
 			graphics->SetColor(0xff, 0x00, 0x00, 0xff);
-			graphics->DrawString((const char *)&c, bx+col*(size+delta), by+row*(size+delta), size, size, jgui::CENTER_ALIGN);
+			graphics->DrawString((const char *)&c, bx+col*(size+delta), by+row*(size+delta), size, size, jgui::CENTER_HALIGN, jgui::CENTER_VALIGN);
 		}
 	} else if (type == BOMB_BLOCK) {
 		graphics->SetColor(0xc0, 0xc0, 0xc0, 0xff);

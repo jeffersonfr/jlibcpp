@@ -78,6 +78,30 @@ class InputDialogBox : public jgui::Frame, public jgui::ButtonListener{
 		 * \brief
 		 *
 		 */
+		void SetHorizontalAlign(jhorizontal_align_t align);
+
+		/**
+		 * \brief
+		 *
+		 */
+		jhorizontal_align_t GetHorizontalAlign();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVerticalAlign(jvertical_align_t align);
+
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void ActionPerformed(jgui::ButtonEvent *event);
 
 };

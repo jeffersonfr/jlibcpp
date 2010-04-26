@@ -61,6 +61,8 @@ class Watch : public jgui::Component, public jthread::Thread{
 		bool _running,
 			 _paused;
 		jwatch_type_t _type;
+		jhorizontal_align_t _halign;
+		jvertical_align_t _valign;
 
 	public:
 		/**
@@ -111,6 +113,30 @@ class Watch : public jgui::Component, public jthread::Thread{
 		 */
 		void Reset();
 
+		/**
+		 * \brief
+		 *
+		 */
+		void SetHorizontalAlign(jhorizontal_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jhorizontal_align_t GetHorizontalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVerticalAlign(jvertical_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
+		
 		/**
 		 * \brief
 		 *

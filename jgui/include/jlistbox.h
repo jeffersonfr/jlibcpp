@@ -20,10 +20,9 @@
 #ifndef J_LISTBOX_H
 #define J_LISTBOX_H
 
-#include "jbutton.h"
-#include "jtextarea.h"
-#include "jselectlistener.h"
 #include "jcomponent.h"
+#include "jselectlistener.h"
+#include "jitemcomponent.h"
 #include "jbuttonlistener.h"
 #include "joffscreenimage.h"
 
@@ -39,16 +38,6 @@
 #include <stdio.h>
 
 namespace jgui {
-
-/**
- * \brief
- *
- */
-enum jlist_item_type_t {
-	TEXT_ITEM,
-	IMAGE_ITEM,
-	EMPTY_ITEM
-};
 
 /**
  * \brief
@@ -75,35 +64,21 @@ enum jlist_selection_type_t {
  *
  * \author Jeff Ferr
  */
-class ListBox : public ButtonListener, public Component{
-
-	private:
-		struct listbox_t {
-			std::string text;
-			bool check;
-			jlist_item_type_t type;
-			jgui::OffScreenImage *image;
-		};
+class ListBox : 
+	public jgui::Component,
+	public jgui::ItemComponent,
+	public jgui::ButtonListener
+{
 
 	private:
 		std::vector<SelectListener *> _listbox_listeners;
-		std::vector<listbox_t> _items;
-		int bx,
-			by,
-			bwidth,
-			bheight,
-			_item_size,
-			_index,
-			_top_index,
-			_selected_index;
-		jcolor_t _item_color;
-		float delta;
-		bool _input_locked,
-			 _centered_interaction,
-			 _loop;
-		jalign_t _align;
 		jlist_scroll_type_t _scroll;
 		jlist_selection_type_t _selection;
+		int _item_size,
+				_top_index,
+				_selected_index;
+		bool _input_locked,
+				 _centered_interaction;
 
 	public:
 		/**
@@ -146,30 +121,6 @@ class ListBox : public ButtonListener, public Component{
 		 * \brief
 		 *
 		 */
-		void SetLoop(bool loop);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetAlign(jalign_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		jalign_t GetAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCurrentIndex(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		bool IsSelected(int i);
 
 		/**
@@ -195,61 +146,7 @@ class ListBox : public ButtonListener, public Component{
 		 * \brief
 		 *
 		 */
-		void AddEmptyItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddItem(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddItem(std::string text, std::string image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetValue(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetCurrentValue();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetCurrentIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		int GetSelectedIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetItemsSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveItem(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveAll();
 		
 		/**
 		 * \brief
@@ -262,25 +159,6 @@ class ListBox : public ButtonListener, public Component{
 		 *
 		 */
 		void SetItemSize(int size);
-		
-
-		/**
-		 * \brief
-		 *
-		 */
-		jcolor_t GetItemColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
@@ -304,25 +182,7 @@ class ListBox : public ButtonListener, public Component{
 		 * \brief
 		 *
 		 */
-		void RegisterSelectListener(SelectListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveSelectListener(SelectListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DispatchEvent(SelectEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<SelectListener *> & GetSelectListeners();
+		virtual void SetCurrentIndex(int i);
 
 };
 

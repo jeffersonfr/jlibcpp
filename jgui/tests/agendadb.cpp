@@ -1,5 +1,7 @@
 #include "agendadb.h"
 
+#include <algorithm>
+
 namespace magenda {
 
 static bool agenda_compare(const AgendaDB::agenda_t &a, const AgendaDB::agenda_t &b) 

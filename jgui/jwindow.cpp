@@ -60,7 +60,7 @@ Window::Window(int x, int y, int width, int height, int opacity, int scale_width
 
 	SetBackgroundVisible(true);
 
-	DispatchEvent(new WindowEvent(this, WINDOW_OPENED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, WINDOW_OPENED_EVENT));
 
 	WindowManager::GetInstance()->Add(this);
 
@@ -71,7 +71,7 @@ Window::Window(int x, int y, int width, int height, int opacity, int scale_width
 
 Window::~Window()
 {
-	DispatchEvent(new WindowEvent(this, WINDOW_CLOSING_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, WINDOW_CLOSING_EVENT));
 
 #ifdef DIRECTFB_UI
 	WindowManager::GetInstance()->Remove(this);
@@ -100,7 +100,7 @@ Window::~Window()
 	}
 #endif
 
-	DispatchEvent(new WindowEvent(this, WINDOW_CLOSED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, WINDOW_CLOSED_EVENT));
 }
 
 Graphics * Window::GetGraphics()
@@ -276,8 +276,8 @@ void Window::SetBounds(int x, int y, int w, int h)
 	
 	DoLayout();
 
-	DispatchEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
-	DispatchEvent(new WindowEvent(this, WINDOW_RESIZED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, WINDOW_RESIZED_EVENT));
 }
 
 void Window::SetPosition(int x, int y)
@@ -294,7 +294,7 @@ void Window::SetPosition(int x, int y)
 	}
 #endif
 	
-	DispatchEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
 }
 
 void Window::SetMinimumSize(int w, int h)
@@ -400,7 +400,7 @@ void Window::SetSize(int w, int h)
 	
 	DoLayout();
 
-	DispatchEvent(new WindowEvent(this, WINDOW_RESIZED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, WINDOW_RESIZED_EVENT));
 }
 
 void Window::Move(int x, int y)
@@ -417,7 +417,7 @@ void Window::Move(int x, int y)
 	}
 #endif
 	
-	DispatchEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
 }
 
 void Window::SetOpacity(int i)
@@ -509,7 +509,7 @@ void Window::Repaint(bool all)
 
 	Revalidate();
 
-	Component::DispatchEvent(new ComponentEvent(this, COMPONENT_PAINT_EVENT));
+	Component::DispatchComponentEvent(new ComponentEvent(this, COMPONENT_PAINT_EVENT));
 }
 
 void Window::Repaint(int x, int y, int width, int height)
@@ -628,17 +628,26 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 					h1 = c1->GetHeight();
 
 			if ((x1 < _size.width && (x1+w1) > 0) && (y1 < _size.height && (y1+h1) > 0)) {
+				// CHANGE:: adicionado para evitar problemas de sincronizacao
+				// jthread::AutoLock lock(&_container_mutex);
+				// jthread::AutoLock lock(&_component_mutex);
+				
+				graphics->Lock();
+
 				graphics->Reset();
 				graphics->Translate(x1, y1);
 				graphics->SetClip(0, 0, w1, h1);
 
 				c1->Paint(graphics);
-
+				
 				graphics->Flip(x1, y1, w1, h1);
+
 				graphics->ReleaseClip();
 				graphics->Translate(-x1, -y1);
 				
 				c1->Revalidate();
+				
+				graphics->Unlock();
 			}
 		}
 	}
@@ -736,7 +745,7 @@ void Window::RemoveWindowListener(WindowListener *listener)
 	}
 }
 
-void Window::DispatchEvent(WindowEvent *event)
+void Window::DispatchWindowEvent(WindowEvent *event)
 {
 	if (event == NULL) {
 		return;

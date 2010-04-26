@@ -22,69 +22,32 @@
 
 namespace jgui {
 
-Icon::Icon(std::string file, int x, int y, int width, int height, int scale_width, int scale_height):
+Icon::Icon(std::string file, int x, int y, int width, int height):
 	Component(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::Icon");
 
-	int w = width,
-		h = height;
+	_halign = CENTER_HALIGN;
+	_valign = CENTER_VALIGN;
 
 	_image = NULL;
 	_file = file;
-	_text = "";
-	_scale_width = scale_width;
-	_scale_height = scale_height;
+	_text = file;
 
-	if (_scale_width <= 0) {
-		_scale_width = DEFAULT_SCALE_WIDTH;
+	_image = new jgui::OffScreenImage(width, height);
+
+	if (_image->GetGraphics() == NULL || _image->GetGraphics()->DrawImage(_file, 0, 0, _size.width, _size.height) == false) {
+		delete _image;
+		_image = NULL;
 	}
-
-	if (_scale_height <= 0) {
-		_scale_height = DEFAULT_SCALE_HEIGHT;
-	}
-
-	if (w <= 0 || h <= 0) {
-#ifdef DIRECTFB_UI
-		IDirectFBImageProvider *provider = NULL;
-		DFBSurfaceDescription desc;
-
-		IDirectFB *engine = (IDirectFB *)GFXHandler::GetInstance()->GetGraphicEngine();
-
-		if (engine->CreateImageProvider(engine, file.c_str(), &provider) != DFB_OK) {
-			return;
-		}
-
-		if (provider->GetSurfaceDescription(provider, &desc) != DFB_OK) {
-			return;
-		}
-
-		if (w <= 0) {
-			w = SCREEN_TO_SCALE(desc.width, GFXHandler::GetInstance()->GetScreenWidth(), scale_width);
-		}
-
-		if (h <= 0) {
-			h = SCREEN_TO_SCALE(desc.height, GFXHandler::GetInstance()->GetScreenHeight(), scale_height);
-		}
-#endif
-	}
-
-	_image = new jgui::OffScreenImage(w, h);
-
-	if (_image->GetGraphics() != NULL) {
-		if (_image->GetGraphics()->DrawImage(_file, 0, 0, _size.width, _size.height) == true) {
-			Repaint();
-		} else {
-			delete _image;
-			_image = NULL;
-		}
-	}
-
-	SetSize(w, h);
 }
 
 Icon::~Icon()
 {
+	if (_image != NULL) {
+		delete _image;
+		_image = NULL;
+	}
 }
 
 void Icon::SetSize(int w, int h)
@@ -118,13 +81,9 @@ void Icon::SetSize(int w, int h)
 
 	_image = new OffScreenImage(_size.width, _size.height);
 
-	if (_image->GetGraphics() != NULL) {
-		if (_image->GetGraphics()->DrawImage(_file, 0, 0, _size.width, _size.height) == true) {
-			Repaint();
-		} else {
-			delete _image;
-			_image = NULL;
-		}
+	if (_image->GetGraphics() == NULL || _image->GetGraphics()->DrawImage(_file, 0, 0, _size.width, _size.height) == false) {
+		delete _image;
+		_image = NULL;
 	}
 
 	Repaint(true);
@@ -139,28 +98,64 @@ void Icon::SetText(std::string text)
 	}
 }
 
+std::string Icon::GetText()
+{
+	return _text;
+}
+
 void Icon::SetImage(std::string file)
 {
 	jthread::AutoLock lock(&_component_mutex);
 
 	_file = file;
 
+	if (_text == "") {
+		_text = file;
+	}
+
 	if (_image != NULL) {
 		delete _image;
+		_image = NULL;
 	}
 
 	_image = new OffScreenImage(_size.width, _size.height);
 
-	if (_image->GetGraphics() != NULL) {
-		if (_image->GetGraphics()->DrawImage(_file, 0, 0, _size.width, _size.height) == true) {
-			Repaint();
-		} else {
-			delete _image;
-			_image = NULL;
-		}
+	if (_image->GetGraphics() == NULL || _image->GetGraphics()->DrawImage(_file, 0, 0, _size.width, _size.height) == false) {
+		delete _image;
+		_image = NULL;
+	}
+
+	Repaint();
+}
+
+void Icon::SetHorizontalAlign(jhorizontal_align_t align)
+{
+	if (_halign != align) {
+		_halign = align;
+
+		Repaint();
 	}
 }
 
+jhorizontal_align_t Icon::GetHorizontalAlign()
+{
+	return _halign;
+}
+
+void Icon::SetVerticalAlign(jvertical_align_t align)
+{
+	if (_valign != align) {
+		_valign = align;
+
+		Repaint();
+	}
+}
+
+jvertical_align_t Icon::GetVerticalAlign()
+{
+	return _valign;
+}
+		
 void Icon::Paint(Graphics *g)
 {
 	jthread::AutoLock lock(&_component_mutex);
@@ -170,26 +165,60 @@ void Icon::Paint(Graphics *g)
 	Component::Paint(g);
 
 	if (_image != NULL) {
-		g->DrawImage(_image, 0, 0, _size.width, _size.height);
+		int x = _horizontal_gap+_border_size,
+				y = _vertical_gap+_border_size,
+				w = _size.width-2*x,
+				h = _size.height-2*y,
+				gapx = 0,
+				gapy = 0;
+		int px = x+gapx,
+				py = y+gapy,
+				pw = w-2*gapx,
+				ph = h-2*gapy;
+
+		g->DrawImage(_image, px, py, pw, ph);
 	} else {
-		g->SetColor(_fg_color);
+		if (_font != NULL) {
+			if (_has_focus == true) {
+				g->SetColor(_fgfocus_color);
+			} else {
+				g->SetColor(_fg_color);
+			}
 
-		int gap = _horizontal_gap+_border_size;
+			int x = _horizontal_gap+_border_size,
+					y = _vertical_gap+_border_size,
+					w = _size.width-2*x,
+					h = _size.height-2*y,
+					gapx = 0,
+					gapy = 0;
+			int px = x+gapx,
+					py = y+gapy,
+					pw = w-gapx,
+					ph = h-gapy;
 
-		if (gap < 0) {
-			gap = 0;
+			x = (x < 0)?0:x;
+			y = (y < 0)?0:y;
+			w = (w < 0)?0:w;
+			h = (h < 0)?0:h;
+
+			px = (px < 0)?0:px;
+			py = (py < 0)?0:py;
+			pw = (pw < 0)?0:pw;
+			ph = (ph < 0)?0:ph;
+
+			std::string text = GetText();
+
+			if (_wrap == false) {
+				text = _font->TruncateString(text, "...", pw);
+			}
+
+			g->SetClip(0, 0, x+w, y+h);
+			g->DrawString(text, px, py, pw, ph, _halign, _valign);
+			g->SetClip(0, 0, _size.width, _size.height);
 		}
-
-		g->DrawString(TruncateString(_text, _size.width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _size.width-gap, _size.height, CENTER_ALIGN);
-		// CHANGED:: g->DrawString(TruncateString(_text, _size.width-10), 5, 5, _size.width-10, _height, CENTER_ALIGN);
 	}
 
-	PaintBorder(g);
-	
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _size.width, _size.height);
-	}
+	PaintEdges(g);
 }
 
 }

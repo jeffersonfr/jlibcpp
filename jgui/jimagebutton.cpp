@@ -24,13 +24,14 @@
 
 namespace jgui {
 
-ImageButton::ImageButton(std::string image, std::string label, int x, int y, int width, int height):
-		Button(label, x, y, width, height)
+ImageButton::ImageButton(std::string label, std::string image, int x, int y, int width, int height):
+	Button(label, x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::ImageButton");
 
 	_image = image;
 	_image_focus = "";
+
 	prefetch1 = NULL;
 	prefetch2 = NULL;
 
@@ -150,60 +151,70 @@ void ImageButton::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	{
-		/*
-		if (_has_focus == true) {
-				g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-				g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-		}
-		*/
+	/*
+	if (_has_focus == true) {
+		g->FillGradientRectangle(0, 0, _width, _height/2+1, 
+			_bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+		g->FillGradientRectangle(0, _height/2, _width, _height/2, 
+			_bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+	}
+	*/
 
-		if (_image != "") {
-			if (GetName() == "") {
-				if (_has_focus == true) {
-					if (prefetch2 != NULL) {
-						g->DrawImage(prefetch2, 0, 0, _size.width, _size.height);
-					} else {
-						g->DrawImage(prefetch1, 0, 0, _size.width, _size.height);
-					}
-				} else {
-					g->DrawImage(prefetch1, 0, 0, _size.width, _size.height);
-				}
+	int x = _horizontal_gap+_border_size,
+			y = _vertical_gap+_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y,
+			gapx = 0,
+			gapy = 0;
+	int px = x+gapx,
+			py = y+gapy,
+			pw = w-2*gapx,
+			ph = h-2*gapy;
+
+	if (_image != "" && GetText() == "") {
+		g->DrawImage((_has_focus == true && prefetch2 != NULL)?prefetch2:prefetch1, px, py, pw, ph);
+	} else {
+		g->DrawImage(prefetch1, px, py, ph, ph);
+
+		if (_font != NULL) {
+			if (_has_focus == true) {
+				g->SetColor(_fgfocus_color);
 			} else {
-				g->DrawImage(prefetch1, 0, 0, _size.height, _size.height);
 				g->SetColor(_fg_color);
-
-				int gap = _horizontal_gap+_border_size;
-
-				if (IsFontSet() == true) {
-					gap = gap + _font->GetHeight();
-				}
-
-				if (gap < 0) {
-					gap = 0;
-				}
-
-				g->DrawString(TruncateString(GetName(), _size.width-2*gap), _size.height+gap/2, (CENTER_VERTICAL_TEXT), _size.width-gap, _size.height, LEFT_ALIGN);
-			}
-		} else {
-			g->SetColor(_fg_color);
-
-			int gap = _horizontal_gap+_border_size;
-
-			if (gap < 0) {
-				gap = 0;
 			}
 
-			g->DrawString(TruncateString(GetName(), _size.width-2*gap), gap/2, (CENTER_VERTICAL_TEXT), _size.width-gap, _size.height, _align);
+			if (_image != "") {
+				gapx = x+ph;
+			}
+
+			px = x+gapx;
+			py = y+gapy;
+			pw = w-gapx;
+			ph = h-gapy;
+
+			x = (x < 0)?0:x;
+			y = (y < 0)?0:y;
+			w = (w < 0)?0:w;
+			h = (h < 0)?0:h;
+
+			px = (px < 0)?0:px;
+			py = (py < 0)?0:py;
+			pw = (pw < 0)?0:pw;
+			ph = (ph < 0)?0:ph;
+
+			std::string text = GetText();
+
+			if (_wrap == false) {
+				text = _font->TruncateString(text, "...", pw);
+			}
+
+			g->SetClip(0, 0, x+w, y+h);
+			g->DrawString(text, px, py, pw, ph, _halign, _valign);
+			g->SetClip(0, 0, _size.width, _size.height);
 		}
 	}
 
-	PaintBorder(g);
-
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _size.width, _size.height);
-	}
+	PaintEdges(g);
 }
 
 }

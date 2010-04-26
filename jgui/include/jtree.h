@@ -32,7 +32,7 @@
 
 namespace jgui {
 
-class TreeItem;
+class MenuItem;
 class TreeComponent;
 
 /**
@@ -49,7 +49,7 @@ class Tree : public jgui::Component{
 
 		std::vector<Tree *> _trees;
 		std::vector<MenuListener *> _tree_listeners;
-		TreeItem *_current_item;
+		MenuItem *_current_item;
 		TreeComponent *_list;
 		int _visible_items;
 		jmenu_align_t _menu_align;
@@ -120,13 +120,13 @@ class Tree : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void AddTreeItem(TreeItem *item);
+		void AddMenuItem(MenuItem *item);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		TreeItem * GetCurrentItem();
+		MenuItem * GetCurrentItem();
 		
 		/**
 		 * \brief
@@ -162,7 +162,7 @@ class Tree : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(MenuEvent *event);
+		void DispatchMenuEvent(MenuEvent *event);
 		
 		/**
 		 * \brief
@@ -183,153 +183,12 @@ class Tree : public jgui::Component{
  *
  * \author Jeff Ferr
  */
-class TreeItem{
-
-	friend class TreeComponent;
-	friend class ComboTreeComponent;
-
-	private:
-		std::vector<TreeItem *> _childs;
-		Tree *_parent;
-		OffScreenImage *_prefetch;
-		std::string _value,
-			_image;
-		jmenuitem_type_t _type;
-		bool _is_checked,
-			 _is_visible,
-			 _enabled;
-
-	public:
-		TreeItem()
-		{
-			_enabled = true;
-			_parent = NULL;
-			_prefetch = NULL;
-			_is_checked = false;
-			_is_visible = true;
-			_type = EMPTY_MENU_ITEM;
-		}
-
-		TreeItem(std::string value)
-		{
-			_enabled = true;
-			_parent = NULL;
-			_prefetch = NULL;
-			_value = value;
-			_is_checked = false;
-			_is_visible = true;
-			_type = TEXT_MENU_ITEM;
-		}
-
-		TreeItem(std::string value, std::string image)
-		{
-			_enabled = true;
-			_parent = NULL;
-			_prefetch = NULL;
-			_image = image;
-			_value = value;
-			_is_checked = false;
-			_is_visible = true;
-			_type = IMAGE_MENU_ITEM;
-		}
-
-		TreeItem(std::string value, bool checked)
-		{
-			_enabled = true;
-			_parent = NULL;
-			_prefetch = NULL;
-			_value = value;
-			_is_checked = checked;
-			_is_visible = true;
-			_type = CHECK_MENU_ITEM;
-		}
-
-		~TreeItem()
-		{
-		}
-
-		Tree * GetParent()
-		{
-			return _parent;
-		}
-
-		std::vector<TreeItem *> & GetSubItems()
-		{
-			return _childs;
-		}
-
-		void SetEnabled(bool b)
-		{
-			_enabled = b;
-		}
-
-		bool GetEnabled()
-		{
-			return _enabled;
-		}
-
-		void SetVisible(bool b)
-		{
-			_is_visible = b;
-		}
-
-		bool IsVisible()
-		{
-			return _is_visible;
-		}
-
-		void SetSelected(bool b)
-		{
-			_is_checked = b;
-		}
-
-		void SetParent(Tree *parent)
-		{
-			_parent = parent;
-		}
-
-		void AddSubItem(TreeItem *item)
-		{
-			if (_type == jgui::CHECK_MENU_ITEM) {
-				throw MenuException("Item cannot accept childs");
-			}
-
-			_childs.push_back(item);
-		}
-
-		std::string GetValue()
-		{
-			return _value;
-		}
-
-		std::string GetImage()
-		{
-			return _image;
-		}
-
-		jmenuitem_type_t GetType()
-		{
-			return _type;
-		}
-
-		bool IsSelected()
-		{
-			return _is_checked;
-		}
-
-};
-
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
 class TreeComponent : public Component{
 
 	friend class Tree;
 
 	private:
-		std::vector<TreeItem *>_items;
+		std::vector<MenuItem *>_items;
 		OffScreenImage *prefetch;
 		Tree *_tree;
 		int bx,
@@ -431,19 +290,19 @@ class TreeComponent : public Component{
 		 * \brief
 		 *
 		 */
-		void AddTreeItem(TreeItem *item);
+		void AddMenuItem(MenuItem *item);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		TreeItem * GetTreeItem(int index);
+		MenuItem * GetMenuItem(int index);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		TreeItem * GetCurrentTreeItem();
+		MenuItem * GetCurrentMenuItem();
 		
 		/**
 		 * \brief

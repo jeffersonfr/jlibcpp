@@ -414,7 +414,7 @@ jpoint_t NullGraphics::Translate()
 	return t;
 }
 
-void NullGraphics::DrawString(std::string full_text, int x, int y, int width, int height, int align)
+void NullGraphics::DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign, jvertical_align_t valign)
 {
 	JDEBUG(JINFO, "called\n");
 }

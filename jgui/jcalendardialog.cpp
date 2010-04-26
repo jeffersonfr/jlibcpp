@@ -57,28 +57,25 @@ CalendarDialog::CalendarDialog(int x, int y):
 	for (int i=1970; i<2199; i++) {
 		sprintf(tmp, "%d", i);
 
-		year->Add(tmp);
+		year->AddTextItem(tmp);
 	}
-
-	year->SetIndex(_year-1970);
 
 	year->RegisterSelectListener(this);
 
 	month = new Spin(bx, by+1*bheight+10, 5*bwidth, 60);
 
-	month->Add("Janeiro");
-	month->Add("Fevereiro");
-	month->Add("Março");
-	month->Add("Abril");
-	month->Add("Maio");
-	month->Add("Junho");
-	month->Add("Julho");
-	month->Add("Agosto");
-	month->Add("Setembro");
-	month->Add("Outubro");
-	month->Add("Novembro");
-	month->Add("Dezembro");
-	month->SetIndex(_month);
+	month->AddTextItem("Janeiro");
+	month->AddTextItem("Fevereiro");
+	month->AddTextItem("Março");
+	month->AddTextItem("Abril");
+	month->AddTextItem("Maio");
+	month->AddTextItem("Junho");
+	month->AddTextItem("Julho");
+	month->AddTextItem("Agosto");
+	month->AddTextItem("Setembro");
+	month->AddTextItem("Outubro");
+	month->AddTextItem("Novembro");
+	month->AddTextItem("Dezembro");
 
 	month->RegisterSelectListener(this);
 
@@ -91,14 +88,6 @@ CalendarDialog::CalendarDialog(int x, int y):
 	lqui = new Label("Q", bx+4*(bwidth+dx), by+170, bwidth, bheight);
 	lsex = new Label("S", bx+5*(bwidth+dx), by+170, bwidth, bheight);
 	lsab = new Label("S", bx+6*(bwidth+dx), by+170, bwidth, bheight);
-
-	ldom->SetAlign(jgui::CENTER_ALIGN);
-	lseg->SetAlign(jgui::CENTER_ALIGN);
-	lter->SetAlign(jgui::CENTER_ALIGN);
-	lqua->SetAlign(jgui::CENTER_ALIGN);
-	lqui->SetAlign(jgui::CENTER_ALIGN);
-	lsex->SetAlign(jgui::CENTER_ALIGN);
-	lsab->SetAlign(jgui::CENTER_ALIGN);
 
 	jcolor_t color;
 
@@ -307,8 +296,8 @@ void CalendarDialog::BuildCalendar()
 		case 12: mes = 31; break;
 	}
 
-	year->SetIndex(_year);
-	month->SetIndex(_month);
+	year->SetCurrentIndex(_year);
+	month->SetCurrentIndex(_month);
 
 	while (_buttons.size() > 0) {
 		b = (*_buttons.begin());
@@ -406,7 +395,7 @@ void CalendarDialog::ActionPerformed(jgui::ButtonEvent *event)
 	b1->SetForegroundColor(0x60, 0x60, 0xc0, 0xff);
 	b1->SetForegroundFocusColor(0x60, 0x60, 0xc0, 0xff);
 
-	_select_day = atoi(b1->GetName().c_str());
+	_select_day = atoi(b1->GetText().c_str());
 	_select_month = (_month+1);
 	_select_year = (_year+1970);
 }
@@ -495,7 +484,7 @@ void CalendarDialog::RemoveCalendarListener(CalendarListener *listener)
 	}
 }
 
-void CalendarDialog::DispatchEvent(CalendarEvent *event)
+void CalendarDialog::DispatchCalendarEvent(CalendarEvent *event)
 {
 	if (event == NULL) {
 		return;

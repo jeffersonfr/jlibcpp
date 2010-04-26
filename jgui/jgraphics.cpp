@@ -139,7 +139,7 @@ OffScreenImage * Graphics::Create()
 		w = SCREEN_TO_SCALE(w, _screen.width, _scale.width);
 		h = SCREEN_TO_SCALE(h, _screen.height, _scale.height);
 
-		image = new OffScreenImage(w, h, SPF_ARGB, _scale.width, _scale.height);
+		image = new OffScreenImage(w, h);
 
 		IDirectFBSurface *s = image->GetGraphics()->surface;
 
@@ -399,8 +399,8 @@ void Graphics::Flip(int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	int x = SCALE_TO_SCREEN(xp, _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN(yp, _screen.height, _scale.height),
+	int x = SCALE_TO_SCREEN(_translate.x+xp, _screen.width, _scale.width),
+			y = SCALE_TO_SCREEN(_translate.y+yp, _screen.height, _scale.height),
 			w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width),
 			h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
 
@@ -1765,7 +1765,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 		int wp = SCREEN_TO_SCALE(desc.width, _screen.width, _scale.width); 
 		int hp = SCREEN_TO_SCALE(desc.height, _screen.height, _scale.height);
 
-		OffScreenImage off(wp, hp, SPF_ARGB, _scale.width, _scale.height);
+		OffScreenImage off(wp, hp);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -1840,7 +1840,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
 	if (_radians != 0.0) {
-		OffScreenImage off(wp, hp, SPF_ARGB, _scale.width, _scale.height);
+		OffScreenImage off(wp, hp);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -1991,7 +1991,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
 
 	if (_radians != 0.0) {
-		OffScreenImage off(wp, hp, SPF_ARGB, _scale.width, _scale.height);
+		OffScreenImage off(wp, hp);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -2092,7 +2092,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int alpha)
 		int img_wp = img->GetWidth(),
 				img_hp = img->GetHeight();
 
-		OffScreenImage off(img_wp, img_hp, SPF_ARGB, _scale.width, _scale.height);
+		OffScreenImage off(img_wp, img_hp);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -2152,7 +2152,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 	if (_radians == 0.0) {
 		surface->StretchBlit(surface, g->surface, NULL, &drect);
 	} else {
-		OffScreenImage off(wp, hp, SPF_ARGB, _scale.width, _scale.height);
+		OffScreenImage off(wp, hp);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -2239,7 +2239,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 	if (_radians == 0.0) {
 		surface->StretchBlit(surface, g->surface, &srect, &drect);
 	} else {
-		OffScreenImage off(wp, hp, SPF_ARGB, _scale.width, _scale.height);
+		OffScreenImage off(wp, hp);
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
@@ -2278,7 +2278,7 @@ jpoint_t Graphics::Translate()
 	return _translate;
 }
 
-void Graphics::DrawString(std::string full_text, int xp, int yp, int wp, int hp, jalign_t align)
+void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign)
 {
 	if (wp <= 0 || hp <= 0) {
 		return;
@@ -2295,240 +2295,228 @@ void Graphics::DrawString(std::string full_text, int xp, int yp, int wp, int hp,
 
 	std::vector<std::string> words,
 		texts;
-	int i = 0,
-			j = 0,
-			num_lines,
-			max_width = wp,
-			min_width = max_width,
-			font_height,
-			size,
+	int dx = 0,
+			dy = 0,
 			max_lines,
-			text_size,
-			word_size,
+			font_height,
 			default_space;
-	double dx = 0,
-				 l,
-				 l_temp;
-	std::string s,
-		temp,
-		previous;
 
 	default_space = _font->GetStringWidth(" ");
 	font_height = _font->GetAscender() + _font->GetDescender();
 
-	if (font_height <= 0) {
-		font_height = 1;
+	if (font_height < 1) {
+		return;
 	}
 
 	max_lines = hp/font_height;
 
-	std::string paint_text = full_text;
-	jcommon::StringTokenizer t(paint_text, "\n", jcommon::SPLIT_FLAG, true);
-	std::vector<std::string> super_lines, 
-		lines;
+	jcommon::StringTokenizer token(text, "\n", jcommon::SPLIT_FLAG, false);
+	std::vector<std::string> lines;
 
-	for (i=0; i<t.GetSize(); i++) {
-		temp = jcommon::StringUtils::ReplaceString(t.GetToken(i), "\t", "    ");
-
-		if (temp == "\n") {
-			super_lines[super_lines.size()-1].append("\n");
-		} else {
-			super_lines.push_back(temp);
-		}
-	}
-
-	for (i=0; i<(int)super_lines.size(); i++) {
-		std::string l = super_lines[i];
-
-		if (align == JUSTIFY_ALIGN) {
-			l = l.erase(0, l.find_first_not_of(" "));
-		}
-
-		jcommon::StringTokenizer w(l, " ", jcommon::SPLIT_FLAG, true);
+	for (int i=0; i<token.GetSize(); i++) {
 		std::vector<std::string> words;
+		
+		std::string line = token.GetToken(i);
 
-		for (j=0; j<w.GetSize(); j++) {
-			temp = w.GetToken(j);
+		line = jcommon::StringUtils::ReplaceString(line, "\n", "");
+		line = jcommon::StringUtils::ReplaceString(line, "\t", "    ");
+		
+		if (halign == JUSTIFY_HALIGN) {
+			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, false);
 
-			if (_font->GetStringWidth(temp) > min_width) {
-				bool flag = false;
+			std::string temp,
+				previous;
 
-				while (flag == false) {
-					unsigned int p = 1;
+			for (int j=0; j<line_token.GetSize(); j++) {
+				temp = jcommon::StringUtils::Trim(line_token.GetToken(j));
 
-					while (p < temp.size()) {
-						p++;
+				if (_font->GetStringWidth(temp) > wp) {
+					int p = 1;
 
-						if (_font->GetStringWidth(temp.substr(0, p)) > min_width) {
-							p--;
+					while (p < (int)temp.size()) {
+						if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
+							words.push_back(temp.substr(0, p-1));
 
-							break;
+							temp = temp.substr(p-1);
+
+							p = 1;
 						}
 					}
 
-					words.push_back(temp.substr(0, p));
+					if (temp != "") {
+						words.push_back(temp.substr(0, p));
+					}
+				} else {
+					words.push_back(temp);
+				}
+			}
 
-					if (p < temp.size()) {
-						temp = temp.substr(p);
-					} else {
-						flag = true;
+			temp = words[0];
+
+			for (int j=1; j<(int)words.size(); j++) {
+				previous = temp;
+				temp += " " + words[j];
+
+				if (_font->GetStringWidth(temp) > wp) {
+					temp = words[j];
+
+					texts.push_back(previous);
+				}
+			}
+
+			texts.push_back("\n" + temp);
+		} else {
+			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, true);
+
+			std::string temp,
+				previous;
+
+			for (int j=0; j<line_token.GetSize(); j++) {
+				temp = line_token.GetToken(j);
+
+				if (_font->GetStringWidth(temp) > wp) {
+					int p = 1;
+
+					while (p < (int)temp.size()) {
+						if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
+							words.push_back(temp.substr(0, p-1));
+
+							temp = temp.substr(p-1);
+
+							p = 1;
+						}
 					}
 
-					if (temp.size() == 0 || p == 1) {
-						flag = true;
+					if (temp != "") {
+						words.push_back(temp.substr(0, p));
 					}
+				} else {
+					words.push_back(temp);
 				}
-			} else {
-				words.push_back(temp);
 			}
-		}
 
-		temp = words[0];
+			temp = words[0];
+			
+			for (int j=1; j<(int)words.size(); j++) {
+				previous = temp;
+				temp += words[j];
 
-		if (align == 3) {
-			temp = temp.erase(0, temp.find_first_not_of(" "));
-		}
+				if (_font->GetStringWidth(temp.c_str()) > wp) {
+					temp = words[j];
 
-		for (j=1; j<(int)words.size(); j++) {
-			previous = temp;
-			temp += words[j];
-
-			word_size = _font->GetStringWidth(temp.c_str());
-
-			if (word_size > max_width) {
-				temp = words[j];
-
-				if (align == 3) {
-					temp = temp.erase(0, temp.find_first_not_of(" "));
-					previous = previous.erase(previous.find_last_not_of(" ")+1, previous.size());
+					texts.push_back(previous);
 				}
-
-				texts.push_back(previous);
 			}
-		}
 
-		texts.push_back(temp);
+			texts.push_back(temp);
+		}
 	}
-
-	num_lines = 0;
 
 	if (max_lines <= 0) {
 		max_lines = 1;
 	}
 
-	if (align == 3) {
-		std::string token_trim;
+	int line_space = 0,
+			line_yinit = 0,
+			line_ydiff = 0;
 
-		for (i=0; i<(int)texts.size()-1 && num_lines<(max_lines-1); i++, num_lines++) {
-			token_trim = texts[i];
+	if (hp > (int)texts.size()*font_height) {
+		int lines = (int)texts.size();
 
-			dx = xp + default_space;
-
-			if (strchr(token_trim.c_str(), '\n') != NULL) {
-				s = jcommon::StringUtils::ReplaceString(token_trim, "\n", "");
-				s = s.erase(0, s.find_first_not_of(" "));
-
-				DrawString(s, (int)(dx), (int)(yp+i*font_height));
-
-				continue;
-			}
-
-			jcommon::StringTokenizer token(token_trim, " ", jcommon::SPLIT_FLAG, false);
-
-			token_trim = token_trim.erase(0, token_trim.find_first_not_of(" "));
-			text_size = _font->GetStringWidth(token_trim + " ");
-			size = max_width - text_size;
-
-			if (token.GetSize() == 0) {
-				s = jcommon::StringUtils::ReplaceString(token_trim, "\n", "");
-				s = s.erase(0, s.find_first_not_of(" "));
-
-				DrawString(s, (int)dx, (int)(yp+i*font_height));
-
-				continue;
-			} else if (token.GetSize() == 1) {
-				s = jcommon::StringUtils::ReplaceString(token.GetToken(0), "\n", "");
-				s = s.erase(0, s.find_first_not_of(" "));
-
-				DrawString(s, (int)dx, (int)(yp+i*font_height));
+		if (valign == TOP_VALIGN) {
+			line_space = 0;
+			line_yinit = 0;
+			line_ydiff = 0;
+		} else if (valign == CENTER_VALIGN) {
+			line_space = 0;
+			line_yinit = (hp-lines*font_height)/2;
+			line_ydiff = 0;
+		} else if (valign == BOTTOM_VALIGN) {
+			line_space = 0;
+			line_yinit = hp-lines*font_height;
+			line_ydiff = 0;
+		} else if (valign == JUSTIFY_VALIGN) {
+			if (lines == 1) {
+				line_yinit = (hp-lines*font_height)/2;
 			} else {
-				// calcula o espacamento perfeito entre as palavras
-				dx = xp + default_space;
-				// remove duas unidades afim de evitar que a ultima palavra fique muito junto do texto
-				l = (double)(size-4)/(double)(token.GetSize()-1);
+				line_space = (hp-lines*font_height)/(lines-1);
+				line_yinit = 0;
+				line_ydiff = (hp-lines*font_height)%(lines-1);
+			}
+		}
+	}
 
-				for (j=0; j<token.GetSize()-1; j++) {
-					word_size = _font->GetStringWidth(token.GetToken(j));
+	if (halign == JUSTIFY_HALIGN) {
+		std::string token_trim;
+			
+		dy = line_yinit;
 
-					dx += (double)word_size + l + (double)default_space;
-				}
+		for (int i=0; i<(int)texts.size() && i<max_lines; i++) {
+			jcommon::StringTokenizer token(texts[i], " ", jcommon::SPLIT_FLAG, false);
 
-				word_size = _font->GetStringWidth(token.GetToken(j));
 
-				l_temp = xp + max_width - word_size - default_space;
+			if (texts[i].find("\n") == 0) {
+				// INFO:: eh soh uma maneira de informar a ultima linha de cada linha terminada com '\n'
+				DrawString(texts[i].substr(1), xp, yp+dy);
+			} else {
+				int size = 0,
+						space = 0,
+						diff = 0;
 
-				if (l_temp > dx) {
-					l += (l_temp-dx)/token.GetSize();
-				}
+				dx = 0;
 
-				// aplica o espacamento entre as palavras
-				dx = xp + default_space;
-				for (j=0; j<token.GetSize(); j++) {
-					word_size = _font->GetStringWidth(token.GetToken(j));
-
-					if (j == token.GetSize() - 1) {
-						dx = xp + max_width - word_size - default_space;
+				if (token.GetSize() > 1) {
+					for (int j=0; j<token.GetSize(); j++) {
+						size = size + _font->GetStringWidth(jcommon::StringUtils::Trim(token.GetToken(j)));
 					}
 
-					s = jcommon::StringUtils::ReplaceString(token.GetToken(j), "\n", "");
-					s = s.erase(0, s.find_first_not_of(" "));
+					space = (wp-size)/(token.GetSize()-1);
+					diff = (wp-size)%(token.GetSize()-1);
+				}
 
-					DrawString(s, (int)dx, (int)(yp+i*font_height));
+				for (int j=0; j<token.GetSize(); j++) {
+					std::string word = jcommon::StringUtils::Trim(token.GetToken(j));
 
-					dx += (double)word_size + l + (double)default_space;
+					DrawString(word, xp+dx, yp+dy);
+
+					dx = dx + space + _font->GetStringWidth(word);
+
+					if (diff-- > 0) {
+						dx++;
+					}
 				}
 			}
+
+			dy = dy+line_space+font_height;
+
+			if (line_ydiff-- > 0) {
+				dy++;
+			}
 		}
-
-		token_trim = texts[i];
-		token_trim = token_trim.erase(0, token_trim.find_first_not_of(" "));
-
-		s = jcommon::StringUtils::ReplaceString(token_trim, "\n", "");
-		s = s.erase(0, s.find_first_not_of(" "));
-
-		DrawString(s, (int)(xp+default_space), (int)(yp+i*font_height));
 	} else {
-		for (i=0; i<(int)texts.size()-1 && num_lines<(max_lines-1); i++, num_lines++) {
-			text_size = _font->GetStringWidth(texts[i]);
+		dy = line_yinit;
 
-			if (align == 0) {
-				dx = 0.0;
-			} else if (align == 1) {
-				dx = (double)(max_width-text_size)/2.0;
-			} else if (align == 2) {
-				dx = (double)(max_width-text_size);
+		for (int i=0; i<(int)texts.size() && i<max_lines; i++) {
+			std::string text = jcommon::StringUtils::Trim(texts[i]);
+			
+			int size = _font->GetStringWidth(text);
+
+			if (halign == LEFT_HALIGN) {
+				dx = 0;
+			} else if (halign == CENTER_HALIGN) {
+				dx = (wp-size)/2;
+			} else if (halign == RIGHT_HALIGN) {
+				dx = wp-size;
 			}
 
-			s = jcommon::StringUtils::ReplaceString(texts[i], "\n", "");
-			s = s.erase(0, s.find_first_not_of(" "));
+			DrawString(text, xp+dx, yp+dy);
 
-			DrawString(s, (int)(xp+dx), (int)(yp+i*font_height));
+			dy = dy+line_space+font_height;
+
+			if (line_ydiff-- > 0) {
+				dy++;
+			}
 		}
-
-		text_size = _font->GetStringWidth(texts[i]);
-
-		if (align == LEFT_ALIGN) {
-			dx = 0.0;
-		} else if (align == CENTER_ALIGN) {
-			dx = (double)(max_width-text_size)/2.0;
-		} else if (align == RIGHT_ALIGN) {
-			dx = (double)(max_width-text_size);
-		}
-
-		s = jcommon::StringUtils::ReplaceString(texts[i], "\n", "");
-		s = s.erase(0, s.find_first_not_of(" "));
-
-		DrawString(s, (int)(xp+dx), (int)(yp+i*font_height));
 	}
 #endif
 }

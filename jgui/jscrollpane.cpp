@@ -149,7 +149,7 @@ void ScrollPane::Paint(Graphics *g)
 		}
 	}
 
-	PaintBorder(g);
+	PaintEdges(g);
 
 	// CHANGE:: estudar melhor o problema de validacao dos containers.
 	// Revalidar os container no metodo Paint() pode gerar problemas de

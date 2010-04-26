@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "jkeyboard.h"
 #include "jcalendardialog.h"
-#include "jyesnodialog.h"
+#include "jyesnodialogbox.h"
 #include "jcheckbutton.h"
 #include "jcheckbuttongroup.h"
 #include "janimation.h"
@@ -39,7 +39,7 @@
 #include "jselectlistener.h"
 #include "jcheckbuttonlistener.h"
 #include "jlabel.h"
-#include "jmessagedialog.h"
+#include "jmessagedialogbox.h"
 #include "jlistbox.h"
 #include "jframe.h"
 #include "jicon.h"
@@ -124,22 +124,23 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			marquee = new jgui::Marquee(500, 100, 700, 40);
+			marquee = new jgui::Marquee("Testando Marquee", 500, 100, 700, 40);
 
-			marquee->SetText("Testando Marquee");
 			marquee->SetType(jgui::LOOP_TEXT);
 
 			marquee->Start();
 		}
 
 		{
-			progress = new jgui::ProgressBar(500, 150, 700, 50);
+			progress = new jgui::ProgressBar(500, 170, 700, 40);
 			slider = new jgui::Slider(500, 170, 700, 40);
 			scroll = new jgui::ScrollBar(500, 230, 700, 40);
 
 			progress->SetPosition(20.0);
 			slider->SetPosition(20.0);
 			scroll->SetPosition(20.0);
+
+			progress->Start();
 		}
 
 		{
@@ -192,16 +193,16 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			image_button1 = new jgui::ImageButton("icons/alert_icon.png", "", 150, 760, 80, 60);
-			image_button2 = new jgui::ImageButton("icons/info_icon.png", "", 260, 760, 80, 60);
-			image_button3 = new jgui::ImageButton("icons/error_icon.png", "", 370, 760, 80, 60);
+			image_button1 = new jgui::ImageButton("", "icons/alert_icon.png", 150, 760, 80, 60);
+			image_button2 = new jgui::ImageButton("", "icons/info_icon.png", 260, 760, 80, 60);
+			image_button3 = new jgui::ImageButton("", "icons/error_icon.png", 370, 760, 80, 60);
 		}
 
 		{
 			spin = new jgui::Spin(150, 850, 300, 40);
 
-			spin->Add("loop");
-			spin->Add("bounce");
+			spin->AddTextItem("loop");
+			spin->AddTextItem("bounce");
 
 			spin->RegisterSelectListener(this);
 		}
@@ -250,31 +251,31 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			list = new jgui::ListBox(1250, 450, 400, 310);
 
-			list->AddItem("opcao 1", std::string("icons/red_icon.png"));
-			list->AddItem("opcao 2");
-			list->AddItem("opcao 3", std::string("icons/green_icon.png"));
-			list->AddItem("opcao 4");
-			list->AddItem("opcao 5", std::string("icons/yellow_icon.png"));
-			list->AddItem("opcao 6");
-			list->AddItem("opcao 7", std::string("icons/blue_icon.png"));
-			list->AddItem("opcao 8");
-			list->AddItem("opcao 9");
-			list->AddItem("opcao 0");
+			list->AddImageItem("opcao 1", std::string("icons/red_icon.png"));
+			list->AddTextItem("opcao 2");
+			list->AddImageItem("opcao 3", std::string("icons/green_icon.png"));
+			list->AddTextItem("opcao 4");
+			list->AddImageItem("opcao 5", std::string("icons/yellow_icon.png"));
+			list->AddTextItem("opcao 6");
+			list->AddImageItem("opcao 7", std::string("icons/blue_icon.png"));
+			list->AddTextItem("opcao 8");
+			list->AddTextItem("opcao 9");
+			list->AddTextItem("opcao 0");
 		}
 
 		{
 			combo = new jgui::ComboBox(1250, 800, 400, 40, 3);
 
-			combo->Add("opcao 1");
-			combo->Add("opcao 2");
-			combo->Add("opcao 3");
-			combo->Add("opcao 4");
-			combo->Add("opcao 5");
-			combo->Add("opcao 6");
-			combo->Add("opcao 7");
-			combo->Add("opcao 8");
-			combo->Add("opcao 9");
-			combo->Add("opcao 0");
+			combo->AddTextItem("opcao 1");
+			combo->AddTextItem("opcao 2");
+			combo->AddTextItem("opcao 3");
+			combo->AddTextItem("opcao 4");
+			combo->AddTextItem("opcao 5");
+			combo->AddTextItem("opcao 6");
+			combo->AddTextItem("opcao 7");
+			combo->AddTextItem("opcao 8");
+			combo->AddTextItem("opcao 9");
+			combo->AddTextItem("opcao 0");
 
 			combo->RegisterSelectListener(this);
 		}
@@ -408,14 +409,14 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 				text_area->SetVisible(true);
 			}
 		} else if (event->GetSource() == radio1) {
-			label1->SetAlign(jgui::LEFT_ALIGN);
-			label2->SetAlign(jgui::LEFT_ALIGN);
+			label1->SetHorizontalAlign(jgui::LEFT_HALIGN);
+			label2->SetHorizontalAlign(jgui::LEFT_HALIGN);
 		} else if (event->GetSource() == radio2) {
-			label1->SetAlign(jgui::CENTER_ALIGN);
-			label2->SetAlign(jgui::CENTER_ALIGN);
+			label1->SetHorizontalAlign(jgui::CENTER_HALIGN);
+			label2->SetHorizontalAlign(jgui::CENTER_HALIGN);
 		} else if (event->GetSource() == radio3) {
-			label1->SetAlign(jgui::RIGHT_ALIGN);
-			label2->SetAlign(jgui::RIGHT_ALIGN);
+			label1->SetHorizontalAlign(jgui::RIGHT_HALIGN);
+			label2->SetHorizontalAlign(jgui::RIGHT_HALIGN);
 		}
 	}
 
@@ -423,9 +424,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 	{
 		jthread::AutoLock lock(&teste_mutex);
 
-		if (spin->GetIndex() == 0) {
+		if (spin->GetCurrentIndex() == 0) {
 			marquee->SetType(jgui::LOOP_TEXT);
-		} else if (spin->GetIndex() == 1) {
+		} else if (spin->GetCurrentIndex() == 1) {
 			marquee->SetType(jgui::BOUNCE_TEXT);
 		}
 	}
@@ -734,7 +735,7 @@ class GraphicsTeste : public jgui::Frame{
 
 };
 
-class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgui::MenuListener{
+class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -854,14 +855,14 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 
 				teste.Show();
 			} else if (event->GetSource() == button4) {
-				jgui::MessageDialog app("Aviso", "Testando o componente MessageBox com todos os recursos de alinhamento. Pulando linha, \n testando new line em DrawJustified para quebrar linhas.\nTestando multiplas linhas de mensagem em um unico componentes. Finalizando, estou apenas aumentando o tamanho do texto para verificar inconsistencias.", 150, 250);
-				jgui::MessageDialog app1("Aviso", "JeffersonFerreiradeAraujoAdrianaAraujoLimaMariadeLourdesAraujoLimaAmancioFerreiraLima", 150, 250);
+				jgui::MessageDialogBox app("Aviso", "Testando o componente MessageBox com todos os recursos de alinhamento. Pulando linha, \n testando new line em DrawJustified para quebrar linhas.\nTestando multiplas linhas de mensagem em um unico componentes. Finalizando, estou apenas aumentando o tamanho do texto para verificar inconsistencias.", 150, 250);
+				jgui::MessageDialogBox app1("Aviso", "JeffersonFerreiradeAraujoAdrianaAraujoLimaMariadeLourdesAraujoLimaAmancioFerreiraLima", 150, 250);
 
 				app.Show();
 				app1.Show();
 			} else if (event->GetSource() == button5) {
-				// jgui::YesNoDialog app("Pergunta", "Testando o componentes YesNoDialog. Voce deseja clicar na opcao Sim ou na opcao Nao ?", 150, 250);
-				jgui::InputDialogBox app("Pergunta", "Quantos anos de experiencia ?", 150, 250);
+				jgui::YesNoDialogBox app("Pergunta", "Testando o componentes YesNoDialog. Voce deseja clicar na opcao Sim ou na opcao Nao ?", 150, 250);
+				// jgui::InputDialogBox app("Pergunta", "Quantos anos de experiencia ?", 150, 250);
 
 				app.Show();
 			} else if (event->GetSource() == button6) {
@@ -870,41 +871,41 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 				teste.Show();
 			} else if (event->GetSource() == button7) {
 				jgui::Menu *menu = new jgui::Menu(100, 100, 300, 4);
-				jgui::MenuItem 
-					*item1 = new jgui::MenuItem("item 1"),
-					*item2 = new jgui::MenuItem("item 2"),
-					*item3 = new jgui::MenuItem("item 3"),
-					*item4 = new jgui::MenuItem("item 4"),
-					*item11 = new jgui::MenuItem("item 1.1"),
-					*item12 = new jgui::MenuItem("item 1.2"),
-					*item111 = new jgui::MenuItem("item 1.1.1", true),
-					*item112 = new jgui::MenuItem("item 1.1.2", false),
-					*item31 = new jgui::MenuItem("item 3.1"),
-					*item32 = new jgui::MenuItem("item 3.2"),
-					*item33 = new jgui::MenuItem("item 3.3");
+				jgui::Item 
+					*item1 = new jgui::Item("item 1"),
+					*item2 = new jgui::Item("item 2"),
+					*item3 = new jgui::Item("item 3"),
+					*item4 = new jgui::Item("item 4"),
+					*item11 = new jgui::Item("item 1.1"),
+					*item12 = new jgui::Item("item 1.2"),
+					*item111 = new jgui::Item("item 1.1.1", true),
+					*item112 = new jgui::Item("item 1.1.2", false),
+					*item31 = new jgui::Item("item 3.1", std::string("icons/alert_icon.png")),
+					*item32 = new jgui::Item("item 3.2"),
+					*item33 = new jgui::Item("item 3.3");
 
-				item1->AddSubItem(item11);
-				item1->AddSubItem(item12);
+				item1->AddChild(item11);
+				item1->AddChild(item12);
 
-				item11->AddSubItem(item111);
-				item11->AddSubItem(item112);
+				item11->AddChild(item111);
+				item11->AddChild(item112);
 
-				item3->AddSubItem(item31);
-				item3->AddSubItem(item32);
-				item3->AddSubItem(item33);
+				item3->AddChild(item31);
+				item3->AddChild(item32);
+				item3->AddChild(item33);
 
-				item4->AddSubItem(item31);
-				item4->AddSubItem(item32);
-				item4->AddSubItem(item33);
+				item4->AddChild(item31);
+				item4->AddChild(item32);
+				item4->AddChild(item33);
 
-				item33->AddSubItem(item31);
+				item33->AddChild(item31);
 
-				menu->AddMenuItem(item1);
-				menu->AddMenuItem(item2);
-				menu->AddMenuItem(item3);
-				menu->AddMenuItem(item4);
+				menu->AddItem(item1);
+				menu->AddItem(item2);
+				menu->AddItem(item3);
+				menu->AddItem(item4);
 
-				menu->RegisterMenuListener(this);
+				menu->RegisterSelectListener(this);
 
 				// INFO:: items group
 				jgui::MenuGroup *group = new jgui::MenuGroup(menu);
@@ -912,18 +913,23 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 				group->Add(item111);
 				group->Add(item112);
 
+				menu->SetTitle("Menu de Teste");
 				menu->Show();
 			}
 		}
 
-		virtual void ItemSelected(jgui::MenuEvent *event)
+		virtual void ItemSelected(jgui::SelectEvent *event)
 		{
-			puts("Teste ---->");
+			jgui::Item *item = event->GetItem();
+
+			if (item != NULL) {
+				printf("Teste ----> %s\n", item->GetValue().c_str());
+			}
 		}
 
-		virtual void ItemChanged(jgui::MenuEvent *event)
+		virtual void ItemChanged(jgui::SelectEvent *event)
 		{
-			jgui::MenuItem *item = event->GetMenuItem();
+			jgui::Item *item = event->GetItem();
 
 			if (item != NULL) {
 				printf("Menu item:: %s\n", item->GetValue().c_str());

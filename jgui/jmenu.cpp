@@ -25,33 +25,31 @@
 namespace jgui {
 
 Menu::Menu(int x, int y, int width, int visible_items):
-   	jgui::Frame("", x, y, width, 1),
+ 	jgui::Frame("", x, y, width, 1),
 	jgui::FrameInputListener()
 {
 	jcommon::Object::SetClassName("jgui::Menu");
 
 	_menu_align = SUBMENU_ALIGN;
-	_current_item = NULL;
 	_visible_items = visible_items;
+	_centered_interaction = true;
 
 	if (_visible_items <= 0) {
 		_visible_items = 1;
 	}
 
-	// _list = new MenuComponent(_border_size, _border_size, width-2*_border_size, _visible_items);
-	_list = new MenuComponent(_border_size, _border_size, width-2*_border_size, _visible_items);
-	
-	_list->SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
-	_list->SetMenu(this);
+	_item_size = DEFAULT_COMPONENT_HEIGHT;
 
-	Add(_list);
-
-	_list->RequestFocus();
+	prefetch = new OffScreenImage(_item_size, _item_size);
 	
+	if (prefetch->GetGraphics() != NULL) {
+		prefetch->GetGraphics()->DrawImage("./icons/check.png", 0, 0, _item_size, _item_size);
+	}
+
 	SetUndecorated(true);
 	SetDefaultExitEnabled(false);
 	SetItemColor(0x17, 0x27, 0x3e, 0xff);
-	SetSize(_list->GetWidth()+2*_border_size, _list->GetHeight()+2*_border_size);
+	SetSize(width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size)-_vertical_gap);
 
 	Frame::RegisterInputListener(this);
 }
@@ -72,9 +70,12 @@ Menu::~Menu()
 		delete menu;
 	}
 
+	if (prefetch != NULL) {
+		delete prefetch;
+		prefetch = NULL;
+	}
+	
 	Release();
-
-	delete _list;
 }
 
 void Menu::MousePressed(MouseEvent *event)
@@ -99,10 +100,6 @@ void Menu::MouseWheel(MouseEvent *event)
 
 bool Menu::Show(bool modal)
 {
-	if (_list != NULL) {
-		_list->RequestFocus();
-	}
-
 	return Frame::Show(modal);
 }
 
@@ -120,23 +117,10 @@ void Menu::SetTitle(std::string title)
 	_title = title;
 
 	if (_title == "") {
-		_list->SetLocation(_border_size, _border_size);
-		
-		SetSize(_list->GetWidth()+2*_border_size, _list->GetHeight()+2*_border_size);
+		SetSize(_size.width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size)-_vertical_gap);
 	} else {
-		_list->SetLocation(_border_size, _insets.top);
-		
-		SetSize(_list->GetWidth()+2*_border_size, _list->GetHeight()+1*_border_size+_insets.top);
+		SetSize(_size.width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size)-_vertical_gap+_insets.top);
 	}
-
-	if ((void *)graphics != NULL) {
-		Repaint();
-	}
-}
-
-int Menu::GetItemsSize()
-{
-	return _list->GetItemsSize();
 }
 
 int Menu::GetVisibleItems()
@@ -144,50 +128,27 @@ int Menu::GetVisibleItems()
 	return _visible_items;
 }
 
-void Menu::SetLoop(bool b)
-{
-	if (_list == NULL) {
-		return;
-	}
-
-	_list->SetLoop(b);
-}
-
-jcolor_t Menu::GetItemColor()
-{
-	return _list->GetItemColor();
-}
-	
 void Menu::SetItemColor(jcolor_t color)
 {
-	_list->SetItemColor(color);
+	SetItemColor(color.red, color.green, color.blue, color.alpha);
 }
 
 void Menu::SetBackgroundColor(jcolor_t color)
 {
-	Frame::SetBackgroundColor(color);
-	
-	for (std::vector<Menu *>::iterator i=_menus.begin(); i!=_menus.end(); i++) {
-		(*i)->SetBackgroundColor(color);
-	}
+	SetBackgroundColor(color.red, color.green, color.blue, color.alpha);
 }
 
 void Menu::SetForegroundColor(jcolor_t color)
 {
-	Frame::SetForegroundColor(color);
-	_list->SetForegroundColor(color);
-	
-	for (std::vector<Menu *>::iterator i=_menus.begin(); i!=_menus.end(); i++) {
-		(*i)->_list->SetForegroundColor(color);
-	}
+	SetForegroundColor(color.red, color.green, color.blue, color.alpha);
 }
 
 void Menu::SetItemColor(int red, int green, int blue, int alpha)
 {
-	_list->SetItemColor(red, green, blue, alpha);
+	ItemComponent::SetItemColor(red, green, blue, alpha);
 	
 	for (std::vector<Menu *>::iterator i=_menus.begin(); i!=_menus.end(); i++) {
-		(*i)->_list->SetItemColor(red, green, blue, alpha);
+		(*i)->SetItemColor(red, green, blue, alpha);
 	}
 }
 
@@ -203,35 +164,9 @@ void Menu::SetBackgroundColor(int red, int green, int blue, int alpha)
 void Menu::SetForegroundColor(int red, int green, int blue, int alpha)
 {
 	Frame::SetForegroundColor(red, green, blue, alpha);
-	_list->SetForegroundColor(red, green, blue, alpha);
 	
 	for (std::vector<Menu *>::iterator i=_menus.begin(); i!=_menus.end(); i++) {
-		(*i)->_list->SetForegroundColor(red, green, blue, alpha);
-	}
-}
-
-void Menu::SetCurrentIndex(int i)
-{
-	jthread::AutoLock lock(&_menu_mutex);
-
-	_list->SetCurrentIndex(i);
-}
-
-void Menu::AddMenuItem(MenuItem *item)
-{
-	jthread::AutoLock lock(&_menu_mutex);
-
-	if (item == NULL) {
-		return;
-	}
-
-	_list->AddMenuItem(item);
-}
-
-void Menu::AddMenuItems(std::vector<MenuItem *> &items)
-{
-	for (std::vector<MenuItem *>::iterator i=items.begin(); i!=items.end(); i++) {
-		_list->AddMenuItem((*i));
+		(*i)->SetForegroundColor(red, green, blue, alpha);
 	}
 }
 
@@ -248,19 +183,19 @@ Menu * Menu::GetCurrentMenu()
 	return NULL;
 }
 
-MenuItem * Menu::GetCurrentItem()
+Item * Menu::GetCurrentItem()
 {
 	jthread::AutoLock lock(&_menu_mutex);
 
 	if (_menus.size() == 0) {
-		if (_list->GetItemsSize() > 0) {
-			return _list->GetCurrentMenuItem();
+		if (GetItemsSize() > 0) {
+			return _items[_index];
 		}
 	} else {
 		Menu *menu = (*_menus.rbegin());
 
-		if (menu->_list->GetItemsSize() > 0) {
-			return menu->_list->GetMenuItem(GetCurrentIndex());
+		if (GetItemsSize() > 0) {
+			return menu->GetCurrentItem();
 		}
 	}
 
@@ -272,43 +207,152 @@ int Menu::GetCurrentIndex()
 	jthread::AutoLock lock(&_menu_mutex);
 
 	if (_menus.size() == 0) {
-		return _list->GetCurrentIndex();
+		return _index;
 	} else {
 		Menu *menu = (*_menus.rbegin());
 
-		return menu->_list->GetCurrentIndex();
+		return menu->GetCurrentIndex();
 	}
 
 	return 0;
-}
-
-void Menu::RemoveAll()
-{
-	if (_list == NULL) {
-		return;
-	}
-
-	jthread::AutoLock lock(&_menu_mutex);
-
-	_list->RemoveAll();
 }
 
 void Menu::Paint(Graphics *g)
 {
 	Frame::Paint(g);
 	
-	if (_title != "") {
-		if (IsFontSet() == true) {
-			int font_height = _font->GetHeight(),
-					dy = (_insets.top-font_height)-15;
+	int x = _horizontal_gap+_border_size,
+			y = _vertical_gap+_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y;
 
-			if (dy < 0) {
-				dy = 0;
-			}
+	x = (x < 0)?0:x;
+	y = (y < 0)?0:y;
+	w = (w < 0)?0:w;
+	h = (h < 0)?0:h;
+
+	if (_title != "") {
+		y = y + _insets.top;
+		
+		g->SetColor(0xf0, 0xf0, 0xf0, 0x80);
+		g->FillRectangle(_insets.left, _insets.top-10, _size.width-_insets.left-_insets.right, 5);
+
+		if (IsFontSet() == true) {
+			std::string text = _title;
+			
+			// if (_wrap == false) {
+				text = _font->TruncateString(text, "...", (_size.width-_insets.left-_insets.right));
+			// }
 
 			g->SetColor(_fg_color);
-			g->DrawString(_title, (_size.width-_font->GetStringWidth(_title))/2, dy);
+		
+			g->SetClip(0, 0, _size.width, _insets.top);
+			g->DrawString(text, _insets.left+(_size.width-_insets.left-_insets.right-_font->GetStringWidth(text))/2, _insets.top-_font->GetHeight()-15);
+			g->SetClip(0, 0, _size.width, _size.height);
 		}
+	}
+
+	int i,
+		count = 0,
+		space = 15;
+
+	int position;
+
+	if (_centered_interaction == true) {
+		position = _index-_visible_items/2;
+	} else {
+		position = _top_index;
+	}
+
+	if (position > (int)(_items.size()-_visible_items)) {
+		position = (_items.size()-_visible_items);
+	}
+
+	if (position < 0) {
+		position = 0;
+	}
+
+	for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
+		if ((*i)->GetType() == IMAGE_MENU_ITEM || (*i)->GetType() == CHECK_MENU_ITEM) {
+			space = 20+_item_size;
+
+			break;
+		}
+	}
+
+	if ((int)_items.size() < _visible_items) {
+		position = 0;
+	}
+
+	for (i=position; count<_visible_items && i<(int)_items.size(); i++, count++) {
+		if (_index != i) {
+			g->SetColor(_item_color);
+			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w, _item_size);
+		} else {
+			g->SetColor(_bgfocus_color);
+			FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, w, _item_size);
+
+			/*
+			g->FillGradientRectangle(0, (_item_size+_vertical_gap)*count, _width, _item_size+10, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+			g->FillGradientRectangle(0, (_item_size+_vertical_gap)*count, _width, _item_size+10, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+			*/
+		}
+
+		if (IsFontSet() == true) {
+			std::string text = _items[i]->GetValue();
+			int px = space,
+					py = (_item_size+_vertical_gap)*count,
+					pw = _size.width-2*space,
+					ph = _item_size;
+
+			g->SetColor(_fg_color);
+
+			if (_items[i]->GetType() == EMPTY_MENU_ITEM) {
+				// TODO::
+			} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
+				// pw = _size.width-2*space;
+			} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
+				if (_items[i]->GetImage() == NULL) {
+					// w = _size.width-2*space;
+				} else {
+					g->DrawImage(_items[i]->GetImage(), x+10, y+(_item_size+_vertical_gap)*count+2, _item_size, _item_size-4);
+
+					pw = pw-_item_size-10;
+				}
+			} else if (_items[i]->GetType() == CHECK_MENU_ITEM) {
+				if (_items[i]->IsSelected() == true) {
+					g->DrawImage(prefetch, x+10, y+(_item_size+_vertical_gap)*count+2, _item_size, _item_size-4);
+				}
+
+				pw = pw-_item_size-10;
+			}
+
+			// if (_wrap == false) {
+				text = _font->TruncateString(text, "...", pw);
+			// }
+
+			// TODO:: g->SetClip(px, py, pw, ph);
+			g->DrawString(text, x+px, y+py, pw, ph, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
+			// g->SetClip(0, 0, _size.width, _size.height);
+		}
+
+		if (_items[i]->GetEnabled() == false) {
+			g->SetColor(0x00, 0x00, 0x00, 0x80);
+			FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, w, _item_size+10);
+		}
+
+		if (_items[i]->GetChildsSize() > 0) {
+			int dx = x+w-_item_size/2-4,
+					dy = y+(_item_size+_vertical_gap)*count;
+
+			g->SetColor(0x80, 0x80, 0xe0, 0xff);
+			g->FillTriangle(dx, dy+2, dx+_item_size/2, dy+_item_size/2, dx, dy+_item_size-4);
+		}
+	}
+
+	for (; count<_visible_items; count++) {
+		g->SetColor(_item_color);
+		FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, _size.width, _item_size+10);
 	}
 }
 
@@ -341,12 +385,66 @@ void Menu::InputChanged(KeyEvent *event)
 
 		Release();
 	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_UP || event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
-		if (last != this) {
-			if (last->_list->ProcessEvent(event) == true) {
-				DispatchEvent(new MenuEvent(this, CHANGE_MENU_ITEM_EVENT, GetCurrentItem()));
+		Menu *menu = last;
+
+		jkey_symbol_t action = event->GetSymbol();
+
+		if (action == JKEY_CURSOR_UP) {
+			int old_index = menu->_index;
+
+			menu->_index--;
+
+			if (menu->_index < 0) {
+				if (menu->_loop == false) {
+					menu->_index = 0;
+				} else {
+					menu->_index = (int)(menu->_items.size()-1);
+				}
 			}
-		} else {
-			DispatchEvent(new MenuEvent(this, CHANGE_MENU_ITEM_EVENT, GetCurrentItem()));
+
+			if (menu->_index < menu->_top_index) {
+				menu->_top_index = menu->_index;
+			}
+
+			if (menu->_index != old_index) {
+				menu->Repaint();
+
+				DispatchSelectEvent(new SelectEvent(this, menu->_items[menu->_index], menu->_index, UP_ITEM)); 
+			}
+		} else if (action == JKEY_CURSOR_DOWN) {
+			int old_index = menu->_index;
+
+			menu->_index++;
+
+			if (menu->_index >= (int)menu->_items.size()) {
+				if (menu->_loop == false) {
+					if (menu->_items.size() > 0) {
+						menu->_index = menu->_items.size()-1;
+					} else {
+						menu->_index = 0;
+					}
+				} else {
+					menu->_index = 0;
+				}
+			}
+
+			if (menu->_index >= (menu->_top_index + menu->_visible_items)) {
+				menu->_top_index = menu->_index-menu->_visible_items+1;
+
+				if (menu->_top_index < 0) {
+					menu->_top_index = 0;
+				}
+			}
+
+			if (menu->_index != old_index) {
+				menu->Repaint();
+
+				DispatchSelectEvent(new SelectEvent(this, menu->_items[_index], _index, DOWN_ITEM)); 
+			}
+		} else if (action == JKEY_ENTER) {
+			if (menu->_items[menu->_index]->GetEnabled() == true) {
+				DispatchSelectEvent(new SelectEvent(this, menu->_items[menu->_index], menu->_index, ACTION_ITEM)); 
+			}
 		}
 	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
 		if (last != this) {
@@ -357,15 +455,9 @@ void Menu::InputChanged(KeyEvent *event)
 			delete last;
 		}
 
-		if (_menus.size() == 0) {
-			_list->RequestFocus();
-		}
-
-		DispatchEvent(new MenuEvent(this, CHANGE_MENU_ITEM_EVENT, GetCurrentItem()));
+		DispatchSelectEvent(new SelectEvent(this, GetCurrentItem(), GetCurrentIndex(), LEFT_ITEM));
 	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT || event->GetSymbol() == jgui::JKEY_ENTER) {
-		// TODO:: DispatchEvent
-
-		MenuItem *item = GetCurrentItem();
+		Item *item = GetCurrentItem();
 
 		if (item != NULL && item->GetEnabled() == true) {
 			if (event->GetSymbol() == jgui::JKEY_ENTER && item->GetType() == jgui::CHECK_MENU_ITEM) {
@@ -375,12 +467,13 @@ void Menu::InputChanged(KeyEvent *event)
 					b = false;
 				}
 
-				// item->SetParent(last);
 				item->SetSelected(b);
 
-				DispatchEvent(new MenuEvent(last, SELECT_MENU_ITEM_EVENT, item));
+				last->Repaint();
+
+				DispatchSelectEvent(new SelectEvent(this, item, GetCurrentIndex(), ACTION_ITEM));
 			} else {
-				std::vector<MenuItem *> items = item->GetSubItems();
+				std::vector<Item *> items = item->GetChilds();
 
 				if (items.size() > 0) {
 					int position = last->GetCurrentIndex();
@@ -400,32 +493,27 @@ void Menu::InputChanged(KeyEvent *event)
 					if (_menu_align == MENU_ALIGN) {
 						menu = new Menu(last->GetX()+last->GetWidth()+5, last->GetY(), last->GetWidth(), items.size());	
 					} else if (_menu_align == SUBMENU_ALIGN) {
-						if (_title == "") {
-							menu = new Menu(last->GetX()+last->GetWidth()+5, last->GetY()+position*(last->GetHeight()/last->GetVisibleItems()), last->GetWidth(), items.size());	
-						} else {
-							int ytitle = 0;
+						int x = last->GetX()+last->GetWidth()+5,
+								y = last->GetY()+position*((last->GetHeight()-_vertical_gap-_border_size)/last->GetVisibleItems());
 
-							if (_menus.size() == 0) {
-								ytitle = _insets.top-position*(_insets.top/last->GetVisibleItems());
-							}
-
-							menu = new Menu(last->GetX()+last->GetWidth()+5, ytitle+last->GetY()+position*(last->GetHeight()/last->GetVisibleItems()), last->GetWidth(), items.size());	
+						if (_title != "" && _menus.size() == 0) {
+							y = last->GetY()+position*((last->GetHeight()-_insets.top-_vertical_gap-_border_size)/last->GetVisibleItems())+_insets.top;
 						}
+
+						menu = new Menu(x, y, last->GetWidth(), items.size());	
 					}
 
 					menu->SetBackgroundColor(GetBackgroundColor());
 					menu->SetForegroundColor(GetForegroundColor());
 					menu->SetItemColor(GetItemColor());
 
-					for (std::vector<MenuItem *>::iterator i=items.begin(); i!=items.end(); i++) {
+					for (std::vector<Item *>::iterator i=items.begin(); i!=items.end(); i++) {
 						if ((*i)->IsVisible() == true) {
-							menu->AddMenuItem((*i));
+							menu->AddItem((*i));
 						}
 					}
 
 					_menus.push_back(menu);
-
-					_current_item = (*items.begin());
 
 					menu->SetInputEnabled(false);
 					menu->Show(false);
@@ -434,7 +522,7 @@ void Menu::InputChanged(KeyEvent *event)
 						GetComponentInFocus()->ReleaseFocus();
 					}
 				
-					DispatchEvent(new MenuEvent(last, CHANGE_MENU_ITEM_EVENT, GetCurrentItem()));
+					DispatchSelectEvent(new SelectEvent(this, GetCurrentItem(), GetCurrentIndex(), RIGHT_ITEM));
 				} else {
 					if (event->GetSymbol() == jgui::JKEY_ENTER) {
 						while (_menus.size() > 0) {
@@ -448,7 +536,8 @@ void Menu::InputChanged(KeyEvent *event)
 						}
 
 						Hide();
-						DispatchEvent(new MenuEvent(NULL, SELECT_MENU_ITEM_EVENT, item));
+						
+						DispatchSelectEvent(new SelectEvent(NULL, item, GetCurrentIndex(), ACTION_ITEM));
 
 						_frame_sem.Notify();
 					}
@@ -458,271 +547,12 @@ void Menu::InputChanged(KeyEvent *event)
 	}
 }
 
-void Menu::RegisterMenuListener(MenuListener *listener)
-{
-	if (listener == NULL) {
-		return;
-	}
-
-	if (std::find(_menu_listeners.begin(), _menu_listeners.end(), listener) == _menu_listeners.end()) {
-		_menu_listeners.push_back(listener);
-	}
-}
-
-void Menu::RemoveMenuListener(MenuListener *listener)
-{
-	if (listener == NULL) {
-		return;
-	}
-
-	std::vector<MenuListener *>::iterator i = std::find(_menu_listeners.begin(), _menu_listeners.end(), listener);
-
-	if (i != _menu_listeners.end()) {
-		_menu_listeners.erase(i);
-	}
-}
-
-void Menu::DispatchEvent(MenuEvent *event)
-{
-	if (event == NULL) {
-		return;
-	}
-
-	int k=0;
-
-	while (k++ < (int)_menu_listeners.size()) {
-		MenuListener *listener = _menu_listeners[k-1];
-
-		if (event->GetType() == CHANGE_MENU_ITEM_EVENT) {
-			listener->ItemChanged(event);
-		} else if (event->GetType() == SELECT_MENU_ITEM_EVENT) {
-			listener->ItemSelected(event);
-		}
-	}
-
-	/*
-	for (std::vector<MenuListener *>::iterator i=_menu_listeners.begin(); i!=_menu_listeners.end(); i++) {
-		if (event->GetType() == CHANGE_MENU_ITEM_EVENT) {
-			(*i)->ItemChanged(event);
-		} else if (event->GetType() == SELECT_MENU_ITEM_EVENT) {
-			(*i)->ItemSelected(event);
-		}
-	}
-	*/
-
-	delete event;
-}
-
-std::vector<MenuListener *> & Menu::GetMenuListeners()
-{
-	return _menu_listeners;
-}
-
-MenuComponent::MenuComponent(int x, int y, int width, int visible_items):
-   	Component(x, y, width, 1)
-{
-	jcommon::Object::SetClassName("jgui::MenuComponent");
-	
-	_centered_interaction = true;
-	_top_index = 0;
-	bx = x+10;
-	by = y+20;
-	bwidth = 30;
-	bheight = 30;
-	_vertical_gap = 16;
-	_horizontal_gap = 16;
-	delta = 1.0f;
-
-	_menu = NULL;
-	_loop = false;
-	_index = 0;
-	_input_locked = false;
-	_visible_items = visible_items;
-
-	_item_size = DEFAULT_COMPONENT_HEIGHT;
-
-	if (_font != NULL) {
-		_item_size = _font->GetHeight();
-	}
-
-	prefetch = new OffScreenImage(_item_size, _item_size);
-	
-	if (prefetch->GetGraphics() != NULL) {
-		prefetch->GetGraphics()->DrawImage("./icons/check.png", 0, 0, _item_size, _item_size);
-	}
-
-	SetSize(width, (_item_size+_vertical_gap)*visible_items-5);
-}
-
-MenuComponent::~MenuComponent() 
-{
-	delete prefetch;
-
-	for (std::vector<MenuItem *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-		OffScreenImage *p = (*i)->_prefetch;
-
-		if (p != NULL) {
-			delete p;
-		}
-	}
-}
-
-void MenuComponent::SetCenteredInteraction(bool b)
+void Menu::SetCenteredInteraction(bool b)
 {
 	_centered_interaction = b;
 }
 
-void MenuComponent::SetMenu(Menu *menu)
-{
-	_menu = menu;
-}
-
-int MenuComponent::GetItemsSize()
-{
-	return _items.size();
-}
-
-void MenuComponent::SetLoop(bool loop)
-{
-	if (_loop == loop) {
-		return;
-	}
-
-	_loop = loop;
-
-	Repaint();
-}
-
-jcolor_t MenuComponent::GetItemColor()
-{
-	return _item_color;
-}
-	
-void MenuComponent::SetItemColor(jcolor_t color)
-{
-	SetItemColor(color.red, color.green, color.blue, color.alpha);
-}
-
-void MenuComponent::SetItemColor(int red, int green, int blue, int alpha)
-{
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_item_color.red = red;
-	_item_color.green = green;
-	_item_color.blue = blue;
-	_item_color.alpha = 0xff;//alpha;
-}
-
-void MenuComponent::Paint(Graphics *g)
-{
-	JDEBUG(JINFO, "paint\n");
-
-	// INFO:: este metodo estah comentado para permitir a atualizacao dos themes
-	// Component::Paint(g);
-
-	g->SetFont(_font);
-
-	int i,
-		count = 0,
-		space = 15,
-		font_height = _item_size;
-
-	if (IsFontSet() == true) {
-		font_height = _font->GetHeight();
-	}
-
-	if (_paint_count == 0) {
-		_paint_count = 1;
-	}
-
-	int position;
-
-	if (_centered_interaction == true) {
-		position = _index-_visible_items/2;
-	} else {
-		position = _top_index;
-	}
-
-	if (position > (int)(_items.size()-_visible_items)) {
-		position = (_items.size()-_visible_items);
-	}
-
-	if (position < 0) {
-		position = 0;
-	}
-
-	for (std::vector<MenuItem *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-		if ((*i)->GetType() == IMAGE_MENU_ITEM || (*i)->GetType() == CHECK_MENU_ITEM) {
-			space = 20+font_height;
-
-			break;
-		}
-	}
-
-	if ((int)_items.size() < _visible_items) {
-		position = 0;
-	}
-
-	for (i=position; count<_visible_items && i<(int)_items.size(); i++, count++) {
-		if (_index != i) {
-			g->SetColor(_item_color);
-			g->FillRectangle(0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
-		} else {
-			g->SetColor(_bgfocus_color);
-			FillRectangle(g, 0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
-
-			/*
-			g->FillGradientRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-			g->FillGradientRectangle(0, (font_height+_vertical_gap)*count, _width, font_height+10, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-			*/
-		}
-
-		if (_items[i]->GetType() == EMPTY_MENU_ITEM) {
-			// TODO::
-		} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
-			g->SetColor(_fg_color);
-			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
-		} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
-			if (_items[i]->_prefetch == NULL) {
-				g->SetColor(_fg_color);
-				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
-			} else {
-				g->DrawImage(_items[i]->_prefetch, 10, (font_height+_vertical_gap)*count, font_height, font_height+10);
-				g->SetColor(_fg_color);
-				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
-			}
-		} else if (_items[i]->GetType() == CHECK_MENU_ITEM) {
-			if (_items[i]->IsSelected() == true) {
-				g->DrawImage(prefetch, 10, 5+(font_height+_vertical_gap)*count, font_height, font_height);
-			}
-
-			g->SetColor(_fg_color);
-			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
-		}
-
-		if (_items[i]->GetEnabled() == false) {
-			g->SetColor(0x00, 0x00, 0x00, 0x80);
-			FillRectangle(g, 0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
-		}
-
-		if (_menu != NULL) {
-			if (_menu->_list->_items[i]->_childs.size() > 0) {
-				int dx = _size.width-font_height/2-4,
-					dy = (font_height+_vertical_gap)*count+5;
-
-				g->SetColor(0x80, 0x80, 0xe0, 0xff);
-				g->FillTriangle(dx, dy+2, dx+font_height/2, dy+font_height/2, dx, dy+font_height-4);
-			}
-		}
-	}
-
-	for (; count<_visible_items; count++) {
-		g->SetColor(_item_color);
-		FillRectangle(g, 0, (font_height+_vertical_gap)*count, _size.width, font_height+10);
-	}
-}
-
-void MenuComponent::SetCurrentIndex(int i)
+void Menu::SetCurrentIndex(int i)
 {
 	if (i < 0) {
 		i = 0;
@@ -779,129 +609,9 @@ void MenuComponent::SetCurrentIndex(int i)
 	}
 }
 
-void MenuComponent::AddEmptyItem()
+/*
+void Menu::InputChanged(KeyEvent *event)
 {
-	MenuItem *item = new MenuItem();
-
-	{
-		jthread::AutoLock lock(&_component_mutex);
-
-		_items.push_back(item);
-	}
-}
-
-void MenuComponent::AddItem(std::string text)
-{
-	MenuItem *item = new MenuItem(text);
-
-	{
-		jthread::AutoLock lock(&_component_mutex);
-
-		_items.push_back(item);
-	}
-}
-
-void MenuComponent::AddItem(std::string text, std::string image)
-{
-	MenuItem *item = new MenuItem(text, image);
-
-	item->_prefetch = new OffScreenImage(_item_size, _item_size);
-
-	if (item->_prefetch->GetGraphics() != NULL) {
-		if (item->_prefetch->GetGraphics()->DrawImage(image, 0, 0, _item_size, _item_size) == false) {
-			delete item->_prefetch;
-			item->_prefetch = NULL;
-		}
-	}
-
-	{
-		jthread::AutoLock lock(&_component_mutex);
-
-		_items.push_back(item);
-	}
-}
-
-void MenuComponent::AddItem(std::string text, bool checked)
-{
-	MenuItem *item = new MenuItem(text, checked);
-
-	{
-		jthread::AutoLock lock(&_component_mutex);
-
-		_items.push_back(item);
-	}
-}
-
-void MenuComponent::AddMenuItem(MenuItem *item)
-{
-	if (item == NULL) {
-		return;
-	}
-
-	{
-		jthread::AutoLock lock(&_component_mutex);
-
-		_items.push_back(item);
-	}
-}
-
-MenuItem * MenuComponent::GetMenuItem(int i)
-{
-	if (i < 0 || i >= (int)_items.size()) {
-		return NULL;
-	}
-
-	if (_items.size() > 0) {
-		return _items[i];
-	}
-
-	return NULL;
-}
-
-MenuItem * MenuComponent::GetCurrentMenuItem()
-{
-	if (_items.size() > 0) {
-		return _items[_index];
-	} 
-
-	return NULL;
-}
-
-int MenuComponent::GetCurrentIndex()
-{
-	return _index;
-}
-
-void MenuComponent::RemoveItem(int index)
-{
-	{
-		jthread::AutoLock lock(&_component_mutex);
-		
-		// remove
-	}
-
-	Repaint();
-}
-
-void MenuComponent::RemoveAll()
-{
-	{
-		jthread::AutoLock lock(&_component_mutex);
-
-		_items.clear();
-	}
-
-	Repaint();
-}
-
-bool MenuComponent::ProcessEvent(KeyEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	bool catched = false;
-
 	jkey_symbol_t action = event->GetSymbol();
 
 	if (action == JKEY_CURSOR_UP) {
@@ -924,10 +634,8 @@ bool MenuComponent::ProcessEvent(KeyEvent *event)
 		if (_index != old_index) {
 			Repaint();
 
-			// DispatchEvent(new SelectEvent(this, _items[_index].text, _index, UP_ITEM)); 
+			// DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, UP_ITEM)); 
 		}
-
-		catched = true;
 	} else if (action == JKEY_CURSOR_DOWN) {
 		int old_index = _index;
 
@@ -956,18 +664,13 @@ bool MenuComponent::ProcessEvent(KeyEvent *event)
 		if (_index != old_index) {
 			Repaint();
 
-			// DispatchEvent(new SelectEvent(this, _items[_index].text, _index, DOWN_ITEM)); 
+			// DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, DOWN_ITEM)); 
 		}
-
-		catched = true;
 	} else if (action == JKEY_ENTER) {
 		if (_items[_index]->GetEnabled() == true) {
-			catched = true;
 		}
 	}
-
-	return catched;
 }
-
+*/
 
 }

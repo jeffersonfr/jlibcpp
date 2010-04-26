@@ -1,6 +1,6 @@
 #include "searchcontacts.h"
-#include "jyesnodialog.h"
-#include "jmessagedialog.h"
+#include "jyesnodialogbox.h"
+#include "jmessagedialogbox.h"
 #include "jcalendardialog.h"
 #include "jkeyboard.h"
 #include "addcontact.h"
@@ -41,8 +41,6 @@ SearchContacts::SearchContacts(PhoneDB *base, int x, int y):
 		tel2 = new jgui::Label(t->phone2, _insets.left, _insets.top+5*sheight, max_width, dheight);
 		left_arrow = new jgui::Icon("icons/left_horizontal_arrow.png", _insets.left, _insets.top+0*sheight, dheight, dheight);
 		right_arrow = new jgui::Icon("icons/right_horizontal_arrow.png", GetWidth()-_insets.right-dheight, _insets.top+0*sheight, dheight, dheight);
-
-		label_name->SetAlign(jgui::CENTER_ALIGN);
 
 		Add(left_arrow);
 		Add(right_arrow);
@@ -183,7 +181,7 @@ void SearchContacts::InputChanged(jgui::KeyEvent *event)
 		}
 	} else if (event->GetSymbol() == jgui::JKEY_F4 || event->GetSymbol() == jgui::JKEY_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialog dialog("Aviso", "Remover o contato atual ?", GetX(), GetY()+GetHeight()+10);
+			jgui::YesNoDialogBox dialog("Aviso", "Remover o contato atual ?", GetX(), GetY()+GetHeight()+10);
 
 			dialog.Show();
 
@@ -196,7 +194,7 @@ void SearchContacts::InputChanged(jgui::KeyEvent *event)
 					_index = 0;
 				}
 
-				jgui::MessageDialog dialog("Aviso", "Contato removido com sucesso", GetX()-50, GetY()+GetHeight()+10);
+				jgui::MessageDialogBox dialog("Aviso", "Contato removido com sucesso", GetX()-50, GetY()+GetHeight()+10);
 
 				dialog.Show();
 

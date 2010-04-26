@@ -33,8 +33,6 @@ AddMessage::AddMessage(AgendaDB *base, int x, int y):
 	label2 = new jgui::Label(":", hour->GetX()+hour->GetWidth(), _insets.top+0*sheight, 20, dheight);
 	minute = new jgui::TextField(label2->GetX()+label2->GetWidth(), _insets.top+0*sheight, 80, dheight, 2);
 
-	// hour->SetAlign(1);
-	// minute->SetAlign(1);
 	hour->SetMaxTextSize(2);
 	minute->SetMaxTextSize(2);
 
@@ -111,8 +109,6 @@ AddMessage::AddMessage(AgendaDB *base, int index, int x, int y):
 	label2 = new jgui::Label(":", hour->GetX()+hour->GetWidth(), _insets.top+0*sheight, 20, dheight);
 	minute = new jgui::TextField(label2->GetX()+label2->GetWidth(), _insets.top+0*sheight, 80, dheight, 2);
 
-	// hour->SetAlign(1);
-	// minute->SetAlign(1);
 	hour->SetMaxTextSize(2);
 	minute->SetMaxTextSize(2);
 	hour->Insert("12");
@@ -262,16 +258,16 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 		return;
 	}
 
-	if (event->GetSymbol() == jgui::JKEY_1 |
-			event->GetSymbol() == jgui::JKEY_2 |
-			event->GetSymbol() == jgui::JKEY_3 |
-			event->GetSymbol() == jgui::JKEY_4 |
-			event->GetSymbol() == jgui::JKEY_5 |
-			event->GetSymbol() == jgui::JKEY_6 |
-			event->GetSymbol() == jgui::JKEY_7 |
-			event->GetSymbol() == jgui::JKEY_8 |
-			event->GetSymbol() == jgui::JKEY_9 |
-			event->GetSymbol() == jgui::JKEY_0) {
+	if ((event->GetSymbol() == jgui::JKEY_1) |
+			(event->GetSymbol() == jgui::JKEY_2) |
+			(event->GetSymbol() == jgui::JKEY_3) |
+			(event->GetSymbol() == jgui::JKEY_4) |
+			(event->GetSymbol() == jgui::JKEY_5) |
+			(event->GetSymbol() == jgui::JKEY_6) |
+			(event->GetSymbol() == jgui::JKEY_7) |
+			(event->GetSymbol() == jgui::JKEY_8) |
+			(event->GetSymbol() == jgui::JKEY_9) |
+			(event->GetSymbol() == jgui::JKEY_0)) {
 		std::string num;
 
 		if (event->GetSymbol() == jgui::JKEY_1) {

@@ -125,16 +125,15 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			animation->AddImage("icons/tux11.jpg");
 			animation->AddImage("icons/tux12.jpg");
 
-			// animation->Start();
+			animation->Start();
 		}
 
 		{
-			marquee = new jgui::Marquee(500, 100, 700, 40);
+			marquee = new jgui::Marquee("Testando Marquee", 500, 100, 700, 40);
 
-			marquee->SetText("Testando Marquee");
 			marquee->SetType(jgui::LOOP_TEXT);
 
-			// marquee->Start();
+			marquee->Start();
 		}
 
 		{
@@ -166,7 +165,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			watch->SetMinutes(0);
 			watch->SetHours(0);
 
-			// watch->Start();
+			watch->Start();
 		}
 
 		{
@@ -199,16 +198,16 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			image_button1 = new jgui::ImageButton("icons/alert_icon.png", "", 150, 760, 80, 60);
-			image_button2 = new jgui::ImageButton("icons/info_icon.png", "", 260, 760, 80, 60);
-			image_button3 = new jgui::ImageButton("icons/error_icon.png", "", 370, 760, 80, 60);
+			image_button1 = new jgui::ImageButton("", "icons/alert_icon.png", 150, 760, 80, 60);
+			image_button2 = new jgui::ImageButton("", "icons/info_icon.png", 260, 760, 80, 60);
+			image_button3 = new jgui::ImageButton("", "icons/error_icon.png", 370, 760, 80, 60);
 		}
 
 		{
 			spin = new jgui::Spin(150, 850, 300, 40);
 
-			spin->Add("loop");
-			spin->Add("bounce");
+			spin->AddTextItem("loop");
+			spin->AddTextItem("bounce");
 
 			spin->RegisterSelectListener(this);
 		}
@@ -257,31 +256,31 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			list = new jgui::ListBox(1250, 450, 400, 310);
 
-			list->AddItem("opcao 1", std::string("icons/red_icon.png"));
-			list->AddItem("opcao 2");
-			list->AddItem("opcao 3", std::string("icons/green_icon.png"));
-			list->AddItem("opcao 4");
-			list->AddItem("opcao 5", std::string("icons/yellow_icon.png"));
-			list->AddItem("opcao 6");
-			list->AddItem("opcao 7", std::string("icons/blue_icon.png"));
-			list->AddItem("opcao 8");
-			list->AddItem("opcao 9");
-			list->AddItem("opcao 0");
+			list->AddImageItem("opcao 1", std::string("icons/red_icon.png"));
+			list->AddTextItem("opcao 2");
+			list->AddImageItem("opcao 3", std::string("icons/green_icon.png"));
+			list->AddTextItem("opcao 4");
+			list->AddImageItem("opcao 5", std::string("icons/yellow_icon.png"));
+			list->AddTextItem("opcao 6");
+			list->AddImageItem("opcao 7", std::string("icons/blue_icon.png"));
+			list->AddTextItem("opcao 8");
+			list->AddTextItem("opcao 9");
+			list->AddTextItem("opcao 0");
 		}
 
 		{
 			combo = new jgui::ComboBox(1250, 800, 400, 40, 3);
 
-			combo->Add("opcao 1");
-			combo->Add("opcao 2");
-			combo->Add("opcao 3");
-			combo->Add("opcao 4");
-			combo->Add("opcao 5");
-			combo->Add("opcao 6");
-			combo->Add("opcao 7");
-			combo->Add("opcao 8");
-			combo->Add("opcao 9");
-			combo->Add("opcao 0");
+			combo->AddTextItem("opcao 1");
+			combo->AddTextItem("opcao 2");
+			combo->AddTextItem("opcao 3");
+			combo->AddTextItem("opcao 4");
+			combo->AddTextItem("opcao 5");
+			combo->AddTextItem("opcao 6");
+			combo->AddTextItem("opcao 7");
+			combo->AddTextItem("opcao 8");
+			combo->AddTextItem("opcao 9");
+			combo->AddTextItem("opcao 0");
 		}
 
 		button1->SetNavigation(NULL, NULL, combo, button2);
@@ -415,14 +414,14 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 				text_area->SetVisible(true);
 			}
 		} else if (event->GetSource() == radio1) {
-			label1->SetAlign(jgui::LEFT_ALIGN);
-			label2->SetAlign(jgui::LEFT_ALIGN);
+			label1->SetHorizontalAlign(jgui::LEFT_HALIGN);
+			label2->SetHorizontalAlign(jgui::LEFT_HALIGN);
 		} else if (event->GetSource() == radio2) {
-			label1->SetAlign(jgui::CENTER_ALIGN);
-			label2->SetAlign(jgui::CENTER_ALIGN);
+			label1->SetHorizontalAlign(jgui::CENTER_HALIGN);
+			label2->SetHorizontalAlign(jgui::CENTER_HALIGN);
 		} else if (event->GetSource() == radio3) {
-			label1->SetAlign(jgui::RIGHT_ALIGN);
-			label2->SetAlign(jgui::RIGHT_ALIGN);
+			label1->SetHorizontalAlign(jgui::RIGHT_HALIGN);
+			label2->SetHorizontalAlign(jgui::RIGHT_HALIGN);
 		}
 	}
 
@@ -430,9 +429,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 	{
 		jthread::AutoLock lock(&teste_mutex);
 
-		if (spin->GetIndex() == 0) {
+		if (spin->GetCurrentIndex() == 0) {
 			marquee->SetType(jgui::LOOP_TEXT);
-		} else if (spin->GetIndex() == 1) {
+		} else if (spin->GetCurrentIndex() == 1) {
 			marquee->SetType(jgui::BOUNCE_TEXT);
 		}
 	}

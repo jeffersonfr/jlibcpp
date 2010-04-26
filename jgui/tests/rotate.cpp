@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "jpanel.h"
 #include "jframe.h"
+#include "jfont.h"
 #include "jthread.h"
 #include "joffscreenimage.h"
 
@@ -26,6 +27,8 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <math.h>
+
+#define FONT "./fonts/font.ttf"
 
 class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread::Thread{
 
@@ -181,6 +184,8 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 
 int main(int argc, char **argv)
 {
+	jgui::Graphics::SetDefaultFont(new jgui::Font(FONT, 0, 24));
+
 	Main main(50, 100);
 
 	main.Start();

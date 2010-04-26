@@ -42,8 +42,16 @@ class Label : public jgui::Component{
 
 	private:
 		std::string _text;
-		jalign_t _align;
+		jhorizontal_align_t _halign;
+		jvertical_align_t _valign;
 		bool _wrap;
+
+	private:
+		/**
+		 * \brief
+		 *
+		 */
+		int CountLines(std::string text);
 
 	public:
 		/**
@@ -80,13 +88,31 @@ class Label : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void SetAlign(jalign_t align);
+		void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jalign_t GetAlign();
+		jhorizontal_align_t GetHorizontalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVerticalAlign(jvertical_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetPreferredSize();
 
 		/**
 		 * \brief

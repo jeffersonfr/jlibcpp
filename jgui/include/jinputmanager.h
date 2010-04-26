@@ -258,7 +258,7 @@ class InputManager : public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(KeyEvent *event);
+		void DispatchKeyEvent(KeyEvent *event);
 		
 		/**
 		 * \brief
@@ -282,7 +282,7 @@ class InputManager : public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(MouseEvent *event);
+		void DispatchMouseEvent(MouseEvent *event);
 		
 		/**
 		 * \brief

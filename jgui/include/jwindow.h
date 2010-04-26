@@ -257,7 +257,7 @@ class Window : public Container{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(WindowEvent *event);
+		void DispatchWindowEvent(WindowEvent *event);
 		
 		/**
 		 * \brief

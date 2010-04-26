@@ -22,6 +22,7 @@
 
 #include "jselectlistener.h"
 #include "jcomponent.h"
+#include "jitemcomponent.h"
 #include "jmenu.h"
 
 #include <iostream>
@@ -37,383 +38,17 @@
 
 namespace jgui {
 
-class MenuItem;
-class ComboMenuComponent;
-
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class ComboMenu : public jgui::Frame, public jgui::FrameInputListener{
-
-	friend class ComboMenuComponent;
+class ComboBox : 
+	public jgui::Component,
+	public jgui::ItemComponent,
+	public jgui::SelectListener
+{
 
 	private:
-		jthread::Mutex _menu_mutex;
-
-		std::vector<ComboMenu *> _menus;
-		std::vector<MenuListener *> _menu_listeners;
-		MenuItem *_current_item;
-		ComboMenuComponent *_list;
-		int _visible_items;
-		jmenu_align_t _menu_align;
-
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MousePressed(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseReleased(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseClicked(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseMoved(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseWheel(MouseEvent *event);
-
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ComboMenu(int x, int y, int width, int visible_items);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ComboMenu();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Show(bool modal = true);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetTitle(std::string title);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void SetComboMenuAlign(jmenu_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetItemsSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetVisibleItems();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetLoop(bool loop);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCurrentIndex(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddMenuItem(MenuItem *item);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		MenuItem * GetCurrentItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetCurrentIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveItem(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveAll();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		jcolor_t GetItemColor();
-
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetForegroundColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetBackgroundColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetForegroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetBackgroundColor(int red, int green, int blue, int alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void RegisterMenuListener(MenuListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveMenuListener(MenuListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DispatchEvent(MenuEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<MenuListener *> & GetMenuListeners();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InputChanged(KeyEvent *event);
-};
-
-class ComboMenuComponent : public Component{
-
-	friend class ComboMenu;
-
-	private:
-		std::vector<MenuItem *>_items;
-		OffScreenImage *prefetch;
-		ComboMenu *_menu;
-		int bx,
-			by,
-			bwidth,
-			bheight,
-			_item_size,
-			_index,
-			_visible_items,
-			_paint_count,
-			_vertical_gap,
-			_horizontal_gap;
-		jcolor_t _item_color;
-		float delta;
-		bool _input_locked,
-			 _arrows_visible,
-			 _loop;
-
-		/**
-		 * \brief
-		 *
-		 */
-		void SetComboMenu(ComboMenu *menu);
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		ComboMenuComponent(int x, int y, int width, int visible_items);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ComboMenuComponent();
-
-		/**
-		 * \brief
-		 *
-		 */
-		void SetGap(int hgap, int vgap);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetLoop(bool loop);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCurrentIndex(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddEmptyItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddItem(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddItem(std::string text, std::string image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddItem(std::string text, bool checked);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddMenuItem(MenuItem *item);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		MenuItem * GetMenuItem(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		MenuItem * GetCurrentMenuItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetCurrentIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetItemsSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveItem(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveAll();
-
-		/**
-		 * \brief
-		 *
-		 */
-		jcolor_t GetItemColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(int red, int green, int blue, int alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool ProcessEvent(KeyEvent *event);
-
-
-};
-class ComboBox : public Component, public MenuListener{//, public jthread::Thread{
-
-	private:
-		std::vector<SelectListener *> _select_listeners;
-		ComboMenu *_menu;
-		int _arrow_size,
-				_old_index;
+		Menu *_menu;
+		jhorizontal_align_t _halign;
+		jvertical_align_t _valign;
+		int _old_index;
 
 	public:
 		/**
@@ -432,110 +67,44 @@ class ComboBox : public Component, public MenuListener{//, public jthread::Threa
 		 * \brief
 		 *
 		 */
-		void SetArrowSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetArrowSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		void SetVisibleItems(int max_items);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetLoop(bool b);
+		void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetIndex(int i);
+		jhorizontal_align_t GetHorizontalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetValue();
+		void SetVerticalAlign(jvertical_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetIndex();
+		jvertical_align_t GetVerticalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Add(std::string text);
+		virtual void ItemSelected(SelectEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Remove(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveAll();
+		virtual void ItemChanged(SelectEvent *event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ItemSelected(MenuEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ItemChanged(MenuEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void RegisterSelectListener(SelectListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveSelectListener(SelectListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DispatchEvent(SelectEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<SelectListener *> & GetSelectListeners();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
-		
 		/**
 		 * \brief
 		 *
@@ -548,6 +117,150 @@ class ComboBox : public Component, public MenuListener{//, public jthread::Threa
 		 */
 		virtual bool ProcessEvent(MouseEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetItemColor();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemColor(jcolor_t color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetItemFocusColor();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemFocusColor(jcolor_t color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemFocusColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		int GetItemsSize();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetLoop(bool loop);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetCurrentIndex(int i);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void AddEmptyItem();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddTextItem(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddImageItem(std::string text, std::string image);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddCheckedItem(std::string text, bool checked);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddItem(Item *item);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void AddItem(Item *item, int index);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void AddItems(std::vector<Item *> &items);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void RemoveItem(Item *item);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void RemoveItem(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void RemoveItems();
+
+		/**
+		 * \brief
+		 *
+		 */
+		Item * GetItem(int index);
+	
+		/**
+		 * \brief
+		 *
+		 */
+		std::vector<Item *> & GetItems();
+	
+		/**
+		 * \brief
+		 *
+		 */
+		Item * GetCurrentItem();
+
+		/**
+		 * \brief
+		 *
+		 */
+		int GetCurrentIndex();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Paint(Graphics *g);
+		
 };
 
 }

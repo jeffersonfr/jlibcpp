@@ -22,6 +22,7 @@
 
 #include "jselectlistener.h"
 #include "jcomponent.h"
+#include "jitemcomponent.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -50,15 +51,18 @@ enum jspin_type_t {
  *
  * \author Jeff Ferr
  */
-class Spin : public Component{
+class Spin : 
+	public jgui::Component,
+	public jgui::ItemComponent
+{
 
 	private:
 		std::vector<SelectListener *> _select_listeners;
-		std::vector<std::string> _list;
-		int _index,
-			_arrows_size;
-		bool _loop;
 		jspin_type_t _type;
+
+	private:
+		void NextItem();
+		void PreviousItem();
 
 	public:
 		/**
@@ -77,18 +81,6 @@ class Spin : public Component{
 		 * \brief
 		 *
 		 */
-		void SetArrowsSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetArrowsSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		void SetType(jspin_type_t type);
 		
 		/**
@@ -101,44 +93,26 @@ class Spin : public Component{
 		 * \brief
 		 *
 		 */
-		void SetLoop(bool b);
+		virtual void AddEmptyItem();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetIndex(int i);
+		virtual void AddTextItem(std::string text);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Add(std::string text);
+		virtual void AddImageItem(std::string text, std::string image);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Remove(int index);
+		virtual void AddCheckedItem(std::string text, bool checked);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveAll();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetValue();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetIndex();
-
 		/**
 		 * \brief
 		 *
@@ -156,30 +130,6 @@ class Spin : public Component{
 		 *
 		 */
 		virtual bool ProcessEvent(KeyEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void RegisterSelectListener(SelectListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveSelectListener(SelectListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DispatchEvent(SelectEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<SelectListener *> & GetSelectListeners();
 
 };
 

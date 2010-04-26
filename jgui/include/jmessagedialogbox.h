@@ -17,32 +17,86 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmenuevent.h"
-#include "jmenu.h"
+#ifndef J_MESSAGEDIALOGBOX_H
+#define J_MESSAGEDIALOGBOX_H
+
+#include "jbutton.h"
+#include "jbuttonlistener.h"
+#include "jlabel.h"
+#include "jframe.h"
+
+#include "jthread.h"
+#include "jmutex.h"
+#include "jdate.h"
+
+#include <string>
+#include <iostream>
+#include <vector>
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
 
 namespace jgui {
 
-MenuEvent::MenuEvent(void *source, jmenu_event_t type, MenuItem *item):
-	jcommon::EventObject(source)
-{
-	jcommon::Object::SetClassName("jgui::MenuEvent");
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class MessageDialogBox : public jgui::Frame, public jgui::ButtonListener{
 
-	_type = type;
-	_item = item;
+	private:
+		jthread::Mutex _message_mutex;
+
+		Label *_label;
+		Button *_ok;
+
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		MessageDialogBox(std::string title, std::string msg, int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~MessageDialogBox();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetHorizontalAlign(jhorizontal_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jhorizontal_align_t GetHorizontalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVerticalAlign(jvertical_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void ActionPerformed(jgui::ButtonEvent *event);
+
+};
+
 }
 
-MenuEvent::~MenuEvent()
-{
-}
-
-jmenu_event_t MenuEvent::GetType()
-{
-	return _type;
-}
-
-MenuItem * MenuEvent::GetMenuItem()
-{
-	return _item;
-}
-
-}
+#endif 

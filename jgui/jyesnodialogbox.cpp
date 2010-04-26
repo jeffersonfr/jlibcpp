@@ -17,14 +17,14 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jinputdialogbox.h"
+#include "jyesnodialogbox.h"
 
 namespace jgui {
 
-InputDialogBox::InputDialogBox(std::string title, std::string msg, int x, int y):
-   		jgui::Frame(title, x, y, 1000, 1)
+YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg, int x, int y):
+	jgui::Frame(title, x, y, 1000, 1)
 {
-	jcommon::Object::SetClassName("jgui::InputDialogBox");
+	jcommon::Object::SetClassName("jgui::YesNoDialogBox");
 
 	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
 
@@ -35,74 +35,67 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg, int x, int y)
 
 	_label->SetSize(_label->GetPreferredSize());
 
-	_field = new TextField(_label->GetX(), _label->GetY()+_label->GetHeight()+10, _label->GetWidth(), 40);
-
-	_ok = new Button("Ok", _label->GetX()+_label->GetWidth()-2*200-1*30, _field->GetY()+_field->GetHeight()+20, 200, 40);
-	_cancel = new Button("Cancel", _label->GetX()+_label->GetWidth()-1*200-0*30, _field->GetY()+_field->GetHeight()+20, 200, 40);
+	_yes = new Button("Sim", _label->GetX()+_label->GetWidth()-2*200-1*30, _label->GetY()+_label->GetHeight()+20, 200, 40);
+	_no = new Button("Nao", _label->GetX()+_label->GetWidth()-1*200-0*30, _label->GetY()+_label->GetHeight()+20, 200, 40);
 	
-	_field->SetNavigation(NULL, NULL, NULL, _ok);
-	_ok->SetNavigation(NULL, _cancel, _field, _cancel);
-	_cancel->SetNavigation(_ok, NULL, _field, NULL);
+	_no->SetNavigation(_yes, NULL, _yes, NULL);
+	_yes->SetNavigation(NULL, _no, NULL, _no);
 
-	_ok->RegisterButtonListener(this);
-	_cancel->RegisterButtonListener(this);
-	
+	_no->RegisterButtonListener(this);
+	_yes->RegisterButtonListener(this);
+
 	Add(_label);
-	Add(_field);
-	Add(_ok);
-	Add(_cancel);
+	Add(_no);
+	Add(_yes);
 
-	_field->RequestFocus();
+	_no->RequestFocus();
 
 	Pack();
 }
 
-InputDialogBox::~InputDialogBox() 
+YesNoDialogBox::~YesNoDialogBox() 
 {
-		jthread::AutoLock lock(&_input_mutex);
+	jthread::AutoLock lock(&_yesno_mutex);
 
-		delete _label;
-		delete _field;
-		delete _ok;
-		delete _cancel;
+	delete _label;
+	delete _yes;
+	delete _no;
 }
 
-std::string InputDialogBox::GetText()
+int YesNoDialogBox::GetResponse()
 {
-	if (_field != NULL) {
-		return _field->GetText();
-	}
-
-	return "";
+		if (GetComponentInFocus() == _yes) {
+			return 1;
+		} else {
+			return 0;
+		}
 }
 
-void InputDialogBox::SetHorizontalAlign(jhorizontal_align_t align)
+void YesNoDialogBox::SetHorizontalAlign(jhorizontal_align_t align)
 {
 	_label->SetHorizontalAlign(align);
 }
 
-jhorizontal_align_t InputDialogBox::GetHorizontalAlign()
+jhorizontal_align_t YesNoDialogBox::GetHorizontalAlign()
 {
 	return _label->GetHorizontalAlign();
 }
 
-void InputDialogBox::SetVerticalAlign(jvertical_align_t align)
+void YesNoDialogBox::SetVerticalAlign(jvertical_align_t align)
 {
 	_label->SetVerticalAlign(align);
 }
 
-jvertical_align_t InputDialogBox::GetVerticalAlign()
+jvertical_align_t YesNoDialogBox::GetVerticalAlign()
 {
 	return _label->GetVerticalAlign();
 }
 
-void InputDialogBox::ActionPerformed(jgui::ButtonEvent *event)
+void YesNoDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 {
-		jthread::AutoLock lock(&_input_mutex);
+		jthread::AutoLock lock(&_yesno_mutex);
 
-		Hide();
-
-		_frame_sem.Notify();
+		Release();
 }
 
 }

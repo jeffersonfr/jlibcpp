@@ -22,7 +22,7 @@
 
 #include "jeventobject.h"
 #include "jmenu.h"
-#include "jmenulistener.h"
+#include "jselectlistener.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -35,10 +35,10 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class MenuGroup : public MenuListener{
+class MenuGroup : public SelectListener{
 
 	private:
-		std::vector<MenuItem *> _items;
+		std::vector<Item *> _items;
 		Menu *_menu;
 
 	protected:
@@ -46,13 +46,13 @@ class MenuGroup : public MenuListener{
 		 * \brief
 		 *
 		 */
-		virtual void ItemSelected(MenuEvent *event);
+		virtual void ItemSelected(SelectEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void ItemChanged(MenuEvent *event);
+		virtual void ItemChanged(SelectEvent *event);
 
 	public:
 		/**
@@ -71,25 +71,25 @@ class MenuGroup : public MenuListener{
 		 * \brief
 		 *
 		 */
-		void Add(MenuItem *item);
+		void Add(Item *item);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Remove(MenuItem *item);
+		void Remove(Item *item);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Select(MenuItem *item);
+		void Select(Item *item);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		MenuItem * GetSelected();
+		Item * GetSelected();
 
 };
 

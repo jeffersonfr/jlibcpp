@@ -1,8 +1,8 @@
 #include "agenda.h"
 #include "jcalendardialog.h"
 #include "jkeyboard.h"
-#include "jyesnodialog.h"
-#include "jmessagedialog.h"
+#include "jyesnodialogbox.h"
+#include "jmessagedialogbox.h"
 #include "viewmessages.h"
 #include "addmessage.h"
 #include "agendadb.h"
@@ -21,10 +21,10 @@ Agenda::Agenda(int x, int y):
 	_list = new jgui::ListBox(_insets.left, _insets.top, GetWidth()-_insets.left-_insets.right, 230);
 
 	_list->SetBackgroundVisible(false);
-	_list->AddItem("Verificar compromissos");
-	_list->AddItem("Adicionar compromisso");
-	_list->AddItem("Limpar todos os registros");
-	_list->AddItem("Estado da mem\xf3ria");
+	_list->AddTextItem("Verificar compromissos");
+	_list->AddTextItem("Adicionar compromisso");
+	_list->AddTextItem("Limpar todos os registros");
+	_list->AddTextItem("Estado da mem\xf3ria");
 	_list->RegisterSelectListener(this);
 
 	Add(_list);
@@ -55,7 +55,7 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 {
 		jthread::AutoLock lock(&agenda_mutex);
 
-		if (event->GetIndex() == 0) {
+		if (_list->GetItem(0) == event->GetItem()) {
 				Hide();
 
 				ViewMessages view(db, GetX(), GetY());
@@ -63,7 +63,7 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 				view.Show();
 
 				Show(false);
-		} else if (event->GetIndex() == 1) {
+		} else if (_list->GetItem(1) == event->GetItem()) {
 			if (db->IsFull() == false) {
 				Hide();
 
@@ -73,7 +73,7 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 
 				Show(false);
 			} else {
-				jgui::YesNoDialog dialog("Aviso", "A agenda está cheia. Deseja limpar a agenda ?", GetX()-50, GetY()+GetHeight()+10);
+				jgui::YesNoDialogBox dialog("Aviso", "A agenda está cheia. Deseja limpar a agenda ?", GetX()-50, GetY()+GetHeight()+10);
 
 				dialog.Show();
 
@@ -81,20 +81,20 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 					db->RemoveAll();
 				}
 			}
-		} else if (event->GetIndex() == 2) {
-				jgui::YesNoDialog dialog("Aviso", "Remover todos os registros ?", GetX()-50, GetY()+GetHeight()+10);
+		} else if (_list->GetItem(2) == event->GetItem()) {
+				jgui::YesNoDialogBox dialog("Aviso", "Remover todos os registros ?", GetX()-50, GetY()+GetHeight()+10);
 
 				dialog.Show();
 
 				if (dialog.GetLastKeyCode() != jgui::JKEY_EXIT && dialog.GetResponse() == 1) {
 						db->RemoveAll();
 				}
-		} else if (event->GetIndex() == 3) {
+		} else if (_list->GetItem(3) == event->GetItem()) {
 				char tmp[255];
 
 				sprintf(tmp, "Contatos usados : %d/%d", db->GetSize(), db->GetCapacity());
 
-				jgui::MessageDialog dialog("Estado da mem\xf3ria", tmp, GetX()-50, GetY()+GetHeight()+10);
+				jgui::MessageDialogBox dialog("Estado da mem\xf3ria", tmp, GetX()-50, GetY()+GetHeight()+10);
 
 				dialog.Show();
 		}

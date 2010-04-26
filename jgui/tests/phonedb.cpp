@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "phonedb.h"
 
+#include <algorithm>
+
 namespace mtel {
 
 static bool phone_compare(const PhoneDB::phone_t &a, const PhoneDB::phone_t &b) 

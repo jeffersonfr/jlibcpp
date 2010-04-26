@@ -21,16 +21,16 @@
 
 namespace jgui {
 
-Marquee::Marquee(int x, int y, int width, int height):
+Marquee::Marquee(std::string text, int x, int y, int width, int height):
    	Component(x, y, width, height),
 	jthread::Thread()
 {
 	jcommon::Object::SetClassName("jgui::Marquee");
 
+	_text = text;
 	_index = 0;
-	_fixe_delta = 10;
-	_delta = _fixe_delta;
-	_position = _fixe_delta;
+	_delta = _horizontal_gap;
+	_position = _horizontal_gap;
 	_running = true;
 
 	SetInterval(100);
@@ -84,37 +84,37 @@ void Marquee::SetType(jmarquee_type_t type)
 
 void Marquee::Run()
 {
+	int string_width = 0; 
+
 	while (_running == true) {
 		Repaint();
 
 		if (_running == false) {
 			return;
 		}
-
-		int string_width = 0; 
 		
-		if (_font != NULL) {
-			string_width = _font->GetStringWidth(full_text.c_str());
-		}
-
 		if (_type == BOUNCE_TEXT) {
+			if (_font != NULL) {
+				string_width = _font->GetStringWidth(_text.c_str());
+			}
+
 			if (_size.width < string_width) {
 			} else {
-				if (_position <= _fixe_delta) {
-					_delta = -_fixe_delta;
-					_position = _fixe_delta;
-				} else if ((_position+string_width) >= (_size.width-_fixe_delta)) {
-					_delta = _fixe_delta;
-					_position = _size.width-string_width-_fixe_delta;
+				if (_position <= _horizontal_gap) {
+					_delta = -_horizontal_gap;
+					_position = _horizontal_gap;
+				} else if ((_position+string_width) >= (_size.width-_horizontal_gap)) {
+					_delta = _horizontal_gap;
+					_position = _size.width-string_width-_horizontal_gap;
 				}
 
 				_position -= _delta;
 			}
 		} else {
-			_delta = _fixe_delta;
+			_delta = _horizontal_gap;
 
 			if (_position <= _delta) {
-				if (_index >= (int)full_text.size()) {
+				if (_index >= (int)_text.size()) {
 					_index = 0;
 					_position = _size.width - _delta;
 				} else {
@@ -147,7 +147,12 @@ void Marquee::SetText(std::string text)
 {
 	jthread::AutoLock lock(&_component_mutex);
 
-	full_text = text;
+	_text = text;
+}
+
+std::string Marquee::GetText()
+{
+	return _text;
 }
 
 void Marquee::Paint(Graphics *g)
@@ -162,38 +167,54 @@ void Marquee::Paint(Graphics *g)
 	*/
 
 	if (IsFontSet() == true) {
-		int string_width = _font->GetStringWidth(full_text.c_str());
-
-		g->SetFont(_font);
-
-		if (_type == LOOP_TEXT) {
-			g->SetClip(0, 0, _size.width-2*_fixe_delta, _size.height);
-		}
-
-		if (_type == BOUNCE_TEXT) {
-			if (_size.width < string_width) {
-				g->SetColor(_fg_color);
-				g->DrawString((char *)(full_text.c_str()+_index), _fixe_delta, (CENTER_VERTICAL_TEXT));
-			} else {
-				g->SetColor(_fg_color);
-				g->DrawString((char *)(full_text.c_str()), _position, (CENTER_VERTICAL_TEXT));
-			}
+		if (_has_focus == true) {
+			g->SetColor(_fgfocus_color);
 		} else {
 			g->SetColor(_fg_color);
-			g->DrawString((char *)(full_text.c_str()+_index), _position, (CENTER_VERTICAL_TEXT));
 		}
 
-		if (_type == LOOP_TEXT) {
-			g->ReleaseClip();
+		int x = _horizontal_gap+_border_size,
+				y = _vertical_gap+_border_size,
+				w = _size.width-2*x,
+				h = _size.height-2*y,
+				gapx = 0,
+				gapy = 0;
+		int px = x+gapx,
+				py = y+gapy,
+				pw = w-gapx,
+				ph = h-gapy;
+
+		if (_type == BOUNCE_TEXT) {
+			if (_size.width < _font->GetStringWidth(_text.c_str())) {
+				_text = (char *)(_text.c_str()+_index);
+				px = px+_horizontal_gap;
+			} else {
+				_text = (char *)(_text.c_str());
+				px = px+_position;
+			}
+		} else {
+			_text = (char *)(_text.c_str()+_index);
+			px = px+_position;
 		}
+
+		x = (x < 0)?0:x;
+		y = (y < 0)?0:y;
+		w = (w < 0)?0:w;
+		h = (h < 0)?0:h;
+
+		px = (px < 0)?0:px;
+		py = (py < 0)?0:py;
+		pw = (pw < 0)?0:pw;
+		ph = (ph < 0)?0:ph;
+
+		std::string text = GetText();
+
+		g->SetClip(0, 0, x+w, y+h);
+		g->DrawString(text, px, py);
+		g->SetClip(0, 0, _size.width, _size.height);
 	}
 
-	PaintBorder(g);
-	
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _size.width, _size.height);
-	}
+	PaintEdges(g);
 }
 
 }

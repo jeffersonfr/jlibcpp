@@ -39,15 +39,16 @@ class Icon : public jgui::Component{
 		jgui::OffScreenImage *_image;
 		std::string _file,
 			_text;
-		int _scale_width,
-			_scale_height;
+		jhorizontal_align_t _halign;
+		jvertical_align_t _valign;
+		bool _wrap;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		Icon(std::string, int x = 0, int y = 0, int width = 0, int height = 0, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Icon(std::string, int x = 0, int y = 0, int width = 0, int height = 0);
 		
 		/**
 		 * \brief
@@ -65,6 +66,12 @@ class Icon : public jgui::Component{
 		 * \brief
 		 *
 		 */
+		std::string GetText();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void SetImage(std::string file);
 
 		/**
@@ -72,6 +79,30 @@ class Icon : public jgui::Component{
 		 *
 		 */
 		virtual void SetSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void SetHorizontalAlign(jhorizontal_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jhorizontal_align_t GetHorizontalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVerticalAlign(jvertical_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
 		
 		/**
 		 * \brief

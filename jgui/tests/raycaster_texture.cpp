@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "jpanel.h"
 #include "jframe.h"
+#include "jfont.h"
 #include "joffscreenimage.h"
 #include "jdate.h"
 
@@ -554,7 +555,7 @@ int decodePNG(std::vector<uint8_t>& out_image_32bit, unsigned long& image_width,
 
 					static unsigned long readBitFromReversedStream(size_t& bitp, const uint8_t* bits) 
 					{
-						unsigned long result = (bits[bitp >> 3] >> (7 - bitp & 0x7)) & 1; bitp++; return result;
+						unsigned long result = ((bits[bitp >> 3] >> (7 - (bitp & 0x7)))) & 1; bitp++; return result;
 					}
 
 					static unsigned long readBitsFromReversedStream(size_t& bitp, const uint8_t* bits, unsigned long nbits)
@@ -566,7 +567,8 @@ int decodePNG(std::vector<uint8_t>& out_image_32bit, unsigned long& image_width,
 
 					void setBitOfReversedStream(size_t& bitp, uint8_t* bits, unsigned long bit) 
 					{ 
-						bits[bitp >> 3] |=  (bit << (7 - bitp & 0x7)); bitp++; 
+						// bits[bitp >> 3] =  bits[bitp >> 3] | (bit << (7 - (bitp & 0x7))); bitp++; 
+						bits[bitp >> 3] =  bits[bitp >> 3] | (bit << (7 - (bitp & 0x7))); bitp++; 
 					}
 
 					unsigned long read32bitInt(const uint8_t* buffer) 
@@ -576,10 +578,21 @@ int decodePNG(std::vector<uint8_t>& out_image_32bit, unsigned long& image_width,
 
 					int checkColorValidity(unsigned long colorType, unsigned long bd) //return type is a LodePNG error code
 					{
-						if((colorType == 2 || colorType == 4 || colorType == 6)) if(!(bd == 8 || bd == 16)) return 37;
-						else if(colorType == 0) if(!(bd == 1 || bd == 2 || bd == 4 || bd == 8 || bd == 16)) return 37;
-						else if(colorType == 3) if(!(bd == 1 || bd == 2 || bd == 4 || bd == 8            )) return 37;
-						else return 31; //unexisting color type
+						if((colorType == 2 || colorType == 4 || colorType == 6)) {
+							if(!(bd == 8 || bd == 16)) {
+								return 37;
+							}
+						} else if(colorType == 0) {
+							if(!(bd == 1 || bd == 2 || bd == 4 || bd == 8 || bd == 16)) {
+								return 37;
+							}
+						} else if(colorType == 3) {
+							if(!(bd == 1 || bd == 2 || bd == 4 || bd == 8)) {
+								return 37;
+							} else {
+								return 31; //unexisting color type
+							}
+						}
 						return 0; //allowed color type / bits combination
 					}
 
@@ -1045,6 +1058,8 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 
 int main( int argc, char *argv[] )
 {
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
+
 	GraphicsTeste test;
 
 	test.Show();

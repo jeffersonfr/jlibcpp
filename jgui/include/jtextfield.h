@@ -56,7 +56,8 @@ class TextField : public Component{
 			_position,
 			_begin_index,
 			_end_index;
-		jalign_t _align;
+		jhorizontal_align_t _halign;
+		jvertical_align_t _valign;
 		bool _cursor_visible,
 			 _is_editable;
 		char _echo_char;
@@ -109,13 +110,25 @@ class TextField : public Component{
 		 * \brief
 		 *
 		 */
-		void SetAlign(jalign_t align);
+		void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jalign_t GetAlign();
+		jhorizontal_align_t GetHorizontalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVerticalAlign(jvertical_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
 		
 		/**
 		 * \brief
@@ -235,7 +248,7 @@ class TextField : public Component{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(TextEvent *event);
+		void DispatchTextEvent(TextEvent *event);
 		
 		/**
 		 * \brief

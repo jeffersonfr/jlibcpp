@@ -30,7 +30,12 @@ TextField::TextField(int x, int y, int width, int height, int max_text):
 {
 	jcommon::Object::SetClassName("jgui::TextField");
 
-	_align = LEFT_ALIGN;
+	_halign = LEFT_HALIGN;
+	_valign = CENTER_VALIGN;
+	
+	_horizontal_gap = 4;
+	_vertical_gap = 2;
+	
 	_position = 0;
 	_max_text_length = max_text;
 	_echo_char = '\0';
@@ -40,11 +45,8 @@ TextField::TextField(int x, int y, int width, int height, int max_text):
 	_cursor = UNDERSCORE_CURSOR;
 	_begin_index = 0;
 	_end_index = 0;
-	_horizontal_gap = 4;
-	_vertical_gap = 2;
 	
 	SetFocusable(true);
-	SetAlign(LEFT_ALIGN);
 }
 
 TextField::~TextField()
@@ -105,20 +107,32 @@ bool TextField::IsEditable()
 	return _is_editable;
 }
 
-void TextField::SetAlign(jalign_t align)
+void TextField::SetHorizontalAlign(jhorizontal_align_t align)
 {
-	if (_align != align) {
-		jthread::AutoLock lock(&_component_mutex);
-
-		_align = align;
+	if (_halign != align) {
+		_halign = align;
 
 		Repaint();
 	}
 }
 
-jalign_t TextField::GetAlign()
+jhorizontal_align_t TextField::GetHorizontalAlign()
 {
-	return _align;
+	return _halign;
+}
+
+void TextField::SetVerticalAlign(jvertical_align_t align)
+{
+	if (_valign != align) {
+		_valign = align;
+
+		Repaint();
+	}
+}
+
+jvertical_align_t TextField::GetVerticalAlign()
+{
+	return _valign;
 }
 
 void TextField::SetCaretType(jcursor_type_t t)
@@ -315,115 +329,122 @@ void TextField::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int width = _size.width-2*_horizontal_gap,
-			height = _size.height-2*_vertical_gap;
+	int width = _size.width-2*_horizontal_gap;
+			// height = _size.height-2*_vertical_gap;
 
-	if (IsFontSet() == true) {
-		std::string paint_text = _text,
-			cursor,
-			temp, 
-			previous,
-			s = paint_text;
-		int caret_size = 0,
-				current_text_size,
-				pos = 0;
+	if (IsFontSet() == false) {
+		return;
+	}
 
-		if (EchoCharIsSet() == true) {
-			paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
-		}
+	std::string paint_text = _text,
+		cursor,
+		temp, 
+		previous,
+		s = paint_text;
+	int caret_size = 0,
+			current_text_size,
+			pos = 0;
 
-		g->SetColor(_fg_color);
+	if (EchoCharIsSet() == true) {
+		paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
+	}
 
-		current_text_size = 0;
+	g->SetColor(_fg_color);
 
-		if (_font != NULL) {
-			if (_cursor_visible == true) {
-				if (_cursor == UNDERSCORE_CURSOR) {
-					cursor = "_";
-				} else if (_cursor == STICK_CURSOR) {
-					cursor = "|";
-				} else if (_cursor == BLOCK_CURSOR) {
-					cursor = "?";
-				}
-			
-				caret_size = _font->GetStringWidth(cursor);
+	current_text_size = 0;
+
+	if (_font != NULL) {
+		if (_cursor_visible == true) {
+			if (_cursor == UNDERSCORE_CURSOR) {
+				cursor = "_";
+			} else if (_cursor == STICK_CURSOR) {
+				cursor = "|";
+			} else if (_cursor == BLOCK_CURSOR) {
+				cursor = "?";
 			}
 
-			current_text_size = _font->GetStringWidth(s.substr(0, _position));
+			caret_size = _font->GetStringWidth(cursor);
 		}
 
-		int offset = 0;
+		current_text_size = _font->GetStringWidth(s.substr(0, _position));
+	}
 
-		if (current_text_size > (_size.width-caret_size-2*_horizontal_gap)) {
-			int count = 0;
+	int offset = 0;
 
-			do {
-				count++;
+	if (current_text_size > (_size.width-caret_size-2*_horizontal_gap)) {
+		int count = 0;
 
-				current_text_size = _font->GetStringWidth(s.substr(_position-count, count));
-			} while (current_text_size < (_size.width-caret_size-2*_horizontal_gap));
+		do {
+			count++;
 
-			count = count-1;
-			s = s.substr(_position-count, count);
-			current_text_size = _font->GetStringWidth(s);
-			offset = (_size.width-current_text_size-caret_size)-caret_size;
+			current_text_size = _font->GetStringWidth(s.substr(_position-count, count));
+		} while (current_text_size < (_size.width-caret_size-2*_horizontal_gap));
 
-			if (_position < (int)paint_text.size()) {
-				s = s + paint_text[_position];
+		count = count-1;
+		s = s.substr(_position-count, count);
+		current_text_size = _font->GetStringWidth(s);
+		offset = (_size.width-current_text_size-caret_size)-caret_size;
+
+		if (_position < (int)paint_text.size()) {
+			s = s + paint_text[_position];
+		}
+	} else {
+		int count = 1;
+
+		do {
+			current_text_size = _font->GetStringWidth(s.substr(0, count));
+
+			if (count++ > (int)paint_text.size()) {
+				break;
 			}
+		} while (current_text_size < (_size.width-caret_size-2*_horizontal_gap));
+
+		count = count-1;
+
+		s = s.substr(0, count);
+
+		if (_halign == LEFT_HALIGN) {
+			pos = _horizontal_gap;
+		} else if (_halign == CENTER_HALIGN) {
+			pos = (width-current_text_size)/2;
+		} else if (_halign == RIGHT_HALIGN) {
+			pos = width-current_text_size;
+		} else if (_halign == JUSTIFY_HALIGN) {
+			pos = _horizontal_gap;
+		}
+
+		current_text_size = _font->GetStringWidth(s.substr(0, _position));
+	}
+
+	int ty = (_font->GetHeight()>_size.height)?0:((_size.height-_font->GetHeight())/2),
+			dy = ty-_vertical_gap;
+
+	if (dy < 0) {
+		dy = 0;
+	}
+
+	int x = _horizontal_gap+_border_size,
+			y = _vertical_gap+_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y;
+
+	g->SetClip(x, y, w, h);
+	g->DrawString(s, pos+offset, dy);
+
+	if (_is_editable == true && _cursor_visible == true) {
+		if (_has_focus == true) {
+			g->SetColor(0xff, 0x00, 0x00, 0xff);
+			// g->SetColor(_fgfocus_color);
 		} else {
-			int count = 1;
-
-			do {
-				current_text_size = _font->GetStringWidth(s.substr(0, count));
-				
-				if (count++ > (int)paint_text.size()) {
-					break;
-				}
-			} while (current_text_size < (_size.width-caret_size-2*_horizontal_gap));
-
-			count = count-1;
-
-			s = s.substr(0, count);
-
-			if (_align == 0) {
-				pos = _horizontal_gap;
-			} else if (_align == 1) {
-				pos = (width-current_text_size)/2;
-			} else {
-				pos = width-current_text_size;
-			}
-				
-			current_text_size = _font->GetStringWidth(s.substr(0, _position));
+			g->SetColor(_fg_color);
 		}
 
-		int dy = ((CENTER_VERTICAL_TEXT)-_vertical_gap);
-
-		if (dy < 0) {
-			dy = 0;
-		}
-
-		g->SetClip(_horizontal_gap, _vertical_gap, width, height);
-
-		g->DrawString(s, pos+offset, dy);
-
-		if (HasFocus() == true) {
-			if (_is_editable == true && _cursor_visible == true) {
-				g->SetColor(0xff, 0x00, 0x00, 0xff);
-				g->DrawString(cursor, pos+current_text_size+offset, (CENTER_VERTICAL_TEXT));
-				g->SetColor(_fg_color);
-			}
-		}
-	
-		g->ReleaseClip();
+		g->DrawString(cursor, pos+current_text_size+offset, (_font->GetHeight()>_size.height)?0:((_size.height-_font->GetHeight())/2));
 	}
 
-	PaintBorder(g);
+	g->SetClip(0, 0, _size.width, _size.height);
 
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _size.width, _size.height);
-	}
+	PaintEdges(g);
 }
 
 void TextField::Clear()
@@ -498,7 +519,7 @@ void TextField::Insert(std::string text, int pos)
 	_end_index = 0;
 	_selected_text = "";
 
-	DispatchEvent(new TextEvent(this, _text));
+	DispatchTextEvent(new TextEvent(this, _text));
 }
 
 void TextField::Append(std::string text)
@@ -527,7 +548,7 @@ void TextField::SetText(std::string text)
 
 	Repaint();
 	
-	DispatchEvent(new TextEvent(this, _text));
+	DispatchTextEvent(new TextEvent(this, _text));
 }
 
 void TextField::Backspace()
@@ -580,7 +601,7 @@ void TextField::Delete()
 
 	Repaint();
 
-	DispatchEvent(new TextEvent(this, _text));
+	DispatchTextEvent(new TextEvent(this, _text));
 }
 
 std::string TextField::GetText()
@@ -612,7 +633,7 @@ void TextField::RemoveTextListener(TextListener *listener)
 	}
 }
 
-void TextField::DispatchEvent(TextEvent *event)
+void TextField::DispatchTextEvent(TextEvent *event)
 {
 	if (event == NULL) {
 		return;

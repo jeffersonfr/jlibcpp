@@ -29,7 +29,6 @@ ScrollBar::ScrollBar(int x, int y, int width, int height):
 	jcommon::Object::SetClassName("jgui::ScrollBar");
 
 	_stone_size = 40;
-	_arrows_size = 30;
 	_label_visible = true;
 	_running = false;
 	_position = 0.0;
@@ -65,15 +64,27 @@ jscroll_orientation_t ScrollBar::GetOrientation()
 
 void ScrollBar::SetStoneSize(int size)
 {
+	int x = _vertical_gap-_border_size,
+			y = _horizontal_gap-_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y,
+			arrow_size;
+
+	if (_type == LEFT_RIGHT_SCROLL) {
+		arrow_size = h/2;
+	} else {
+		arrow_size = w/2;
+	}
+
 	_stone_size = size;
 
 	if (_type == LEFT_RIGHT_SCROLL) {
-		if (_stone_size > (_size.width-2*_arrows_size)/2) {
-			_stone_size = (_size.width-2*_arrows_size)/2;
+		if (_stone_size > (_size.width-2*arrow_size)/2) {
+			_stone_size = (_size.width-2*arrow_size)/2;
 		}
 	} else if (_type == BOTTOM_UP_SCROLL) {
-		if (_stone_size > (_size.height-2*_arrows_size)/2) {
-			_stone_size = (_size.height-2*_arrows_size)/2;
+		if (_stone_size > (_size.height-2*arrow_size)/2) {
+			_stone_size = (_size.height-2*arrow_size)/2;
 		}
 	}
 
@@ -84,35 +95,9 @@ void ScrollBar::SetStoneSize(int size)
 	Repaint();
 }
 
-void ScrollBar::SetArrowsSize(int size)
-{
-	_arrows_size = size;
-
-	if (_type == LEFT_RIGHT_SCROLL) {
-		if (_arrows_size > _size.width/2) {
-			_arrows_size = _size.width/2;
-		}
-	} else if (_type == BOTTOM_UP_SCROLL) {
-		if (_arrows_size > _size.height/2) {
-			_arrows_size = _size.height/2;
-		}
-	}
-
-	if (_arrows_size < 1) {
-		_arrows_size = 1;
-	}
-
-	Repaint();
-}
-
 int ScrollBar::GetStoneSize()
 {
 	return _stone_size;
-}
-
-int ScrollBar::GetArrowsSize()
-{
-	return _arrows_size;
 }
 
 double ScrollBar::GetPosition()
@@ -149,7 +134,7 @@ void ScrollBar::SetPosition(double i)
 			t = UNIT_DECREMENT;
 		}
 
-		DispatchEvent(new AdjustmentEvent(this, t, _position));
+		DispatchAdjustmentEvent(new AdjustmentEvent(this, t, _position));
 	}
 
 	Repaint();
@@ -213,31 +198,43 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 
 		RequestFocus();
 
+		int x = _vertical_gap-_border_size,
+				y = _horizontal_gap-_border_size,
+				w = _size.width-2*x,
+				h = _size.height-2*y,
+				arrow_size;
+
+		if (_type == LEFT_RIGHT_SCROLL) {
+			arrow_size = h/2;
+		} else {
+			arrow_size = w/2;
+		}
+
 		if (_type == LEFT_RIGHT_SCROLL) {
 			if (y1 > _location.y && y1 < (_location.y+_size.height)) {
-				double d = (_position*(_size.width-_stone_size-2*_arrows_size-20))/100.0;
+				double d = (_position*(_size.width-_stone_size-2*arrow_size-20))/100.0;
 
-				if (x1 > (_location.x+dx) && x1 < (_location.x+_arrows_size+dx)) {
+				if (x1 > (_location.x+dx) && x1 < (_location.x+arrow_size+dx)) {
 					SetPosition(_position-_minimum_tick);
-				} else if (x1 > (_location.x+_size.width-_arrows_size-dx) && x1 < (_location.x+_size.width-dx)) {
+				} else if (x1 > (_location.x+_size.width-arrow_size-dx) && x1 < (_location.x+_size.width-dx)) {
 					SetPosition(_position+_minimum_tick);
-				} else if (x1 > (_location.x+_arrows_size+dx) && x1 < (_location.x+_arrows_size+dx+(int)d)) {
+				} else if (x1 > (_location.x+arrow_size+dx) && x1 < (_location.x+arrow_size+dx+(int)d)) {
 					SetPosition(_position-_maximum_tick);
-				} else if (x1 > (_location.x+_arrows_size+dx+(int)d+_stone_size) && x1 < (_location.x+_size.width-_arrows_size)) {
+				} else if (x1 > (_location.x+arrow_size+dx+(int)d+_stone_size) && x1 < (_location.x+_size.width-arrow_size)) {
 					SetPosition(_position+_maximum_tick);
 				}
 			}
 		} else if (_type == BOTTOM_UP_SCROLL) {
 			if (x1 > _location.x && x1 < (_location.x+_size.width)) {
-				double d = (_position*(_size.height-_stone_size-2*_arrows_size-20))/100.0;
+				double d = (_position*(_size.height-_stone_size-2*arrow_size-20))/100.0;
 
-				if (y1 > (_location.y+dy) && y1 < (_location.y+_arrows_size+dy)) {
+				if (y1 > (_location.y+dy) && y1 < (_location.y+arrow_size+dy)) {
 					SetPosition(_position-_minimum_tick);
-				} else if (y1 > (_location.y+_size.height-_arrows_size-dy) && y1 < (_location.y+_size.height-dy)) {
+				} else if (y1 > (_location.y+_size.height-arrow_size-dy) && y1 < (_location.y+_size.height-dy)) {
 					SetPosition(_position+_minimum_tick);
-				} else if (y1 > (_location.y+_arrows_size+dy) && y1 < (_location.y+_arrows_size+dy+(int)d)) {
+				} else if (y1 > (_location.y+arrow_size+dy) && y1 < (_location.y+arrow_size+dy+(int)d)) {
 					SetPosition(_position-_maximum_tick);
-				} else if (y1 > (_location.y+_arrows_size+dy+(int)d+_stone_size) && y1 < (_location.y+_size.height-_arrows_size)) {
+				} else if (y1 > (_location.y+arrow_size+dy+(int)d+_stone_size) && y1 < (_location.y+_size.height-arrow_size)) {
 					SetPosition(_position+_maximum_tick);
 				}
 			}
@@ -270,11 +267,11 @@ bool ScrollBar::ProcessEvent(KeyEvent *event)
 			SetPosition(_position+_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_UP) {
+		} else if (action == JKEY_PAGE_DOWN) {
 			SetPosition(_position-_maximum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_DOWN) {
+		} else if (action == JKEY_PAGE_UP) {
 			SetPosition(_position+_maximum_tick);
 
 			catched = true;
@@ -288,11 +285,11 @@ bool ScrollBar::ProcessEvent(KeyEvent *event)
 			SetPosition(_position+_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_UP) {
+		} else if (action == JKEY_PAGE_DOWN) {
 			SetPosition(_position-_maximum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_DOWN) {
+		} else if (action == JKEY_PAGE_UP) {
 			SetPosition(_position+_maximum_tick);
 
 			catched = true;
@@ -308,64 +305,55 @@ void ScrollBar::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	{
-		if (_count_paint == 0) {
-			_count_paint = 1;
-		}
-
-		jcolor_t color;
-
-		color.red = 0x80;
-		color.green = 0x80;
-		color.blue = 0xe0;
-		color.alpha = 0xff;
-
-		{
-			if (_type == LEFT_RIGHT_SCROLL) {
-				double d = (_position*(_size.width-_stone_size-2*_arrows_size-20))/100.0;
-
-				if (d > (_size.width-(_arrows_size+10))) {
-					d = _size.width-(_arrows_size+10);
-				}
-
-				g->SetColor(color);
-				g->FillRectangle((int)(d)+_arrows_size+10, 0, _stone_size, _size.height);
-
-				int dx = _size.width-_arrows_size-4,
-					dy = 5;
-
-				g->SetColor(_fg_color);
-				g->FillTriangle(dx+0, dy+0, dx+_arrows_size, dy+_size.height/2-5, dx+0, dy+_size.height-10);
-				dx = 4;
-				g->FillTriangle(dx+0, dy+_size.height/2-5, dx+_arrows_size, dy+0, dx+_arrows_size, dy+_size.height-10);
-			} else if (_type == BOTTOM_UP_SCROLL) {
-				double d = (_position*(_size.height-_stone_size-2*_arrows_size-20))/100.0;
-
-				// WARN:: verificar se naum eh _stone_size
-				if (d > (_size.height-(_arrows_size+10))) {
-					d = _size.height-(_arrows_size+10);
-				}
-
-				g->SetColor(color);
-				g->FillRectangle((int)0, (int)(d)+_arrows_size+10, _size.width, _stone_size);
-
-				int dx = 4,
-					dy = 8;
-
-				g->SetColor(_fg_color);
-				g->FillTriangle(dx, dy+_arrows_size, dx+(_size.width-2*dx)/2, dy, dx+(_size.width-2*dx), dy+_arrows_size);
-				dy = _size.height-_arrows_size-5;
-				g->FillTriangle(dx, dy+0, dx+(_size.width-2*dx), dy+0, dx+(_size.width-2*dx)/2, dy+_arrows_size-4);
-			}
-		}
+	if (_count_paint == 0) {
+		_count_paint = 1;
 	}
 
-	PaintBorder(g);
+	jcolor_t color;
 
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _size.width, _size.height);
+	color.red = 0x80;
+	color.green = 0x80;
+	color.blue = 0xe0;
+	color.alpha = 0xff;
+	
+	int x = _vertical_gap-_border_size,
+			y = _horizontal_gap-_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y;
+
+	if (_type == LEFT_RIGHT_SCROLL) {
+		int arrow_size = h/2,
+				limit = w-_stone_size-2*arrow_size;
+
+		double d = (_position*limit)/100.0;
+
+		if (d > limit) {
+			d = limit;
+		}
+
+		g->SetColor(color);
+		FillRectangle(g, (int)d+arrow_size+x, y, _stone_size, h);
+
+		g->FillTriangle(x+w, y+arrow_size, x+w-arrow_size, y, x+w-arrow_size, y+2*arrow_size);
+		g->FillTriangle(x, y+arrow_size, x+arrow_size, y, x+arrow_size, y+2*arrow_size);
+	} else if (_type == BOTTOM_UP_SCROLL) {
+		int arrow_size = w/2,
+				limit = h-_stone_size-2*arrow_size;
+
+		double d = (_position*limit)/100.0;
+
+		if (d > limit) {
+			d = limit;
+		}
+
+		g->SetColor(color);
+		FillRectangle(g, x, (int)d+arrow_size+y, w, _stone_size);
+
+		g->FillTriangle(x, y+arrow_size, x+w/2, y,x+w, y+arrow_size);
+		g->FillTriangle(x, y+h-arrow_size, x+w/2, y+h,x+w, y+h-arrow_size);
 	}
+
+	PaintEdges(g);
 }
 
 void ScrollBar::RegisterAdjustmentListener(AdjustmentListener *listener)
@@ -392,7 +380,7 @@ void ScrollBar::RemoveAdjustmentListener(AdjustmentListener *listener)
 	}
 }
 
-void ScrollBar::DispatchEvent(AdjustmentEvent *event)
+void ScrollBar::DispatchAdjustmentEvent(AdjustmentEvent *event)
 {
 	if (event == NULL) {
 		return;

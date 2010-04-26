@@ -96,7 +96,7 @@ void Tree::SetCurrentIndex(int i)
 	jthread::AutoLock lock(&_tree_mutex);
 }
 
-void Tree::AddTreeItem(TreeItem *item)
+void Tree::AddMenuItem(MenuItem *item)
 {
 	jthread::AutoLock lock(&_tree_mutex);
 
@@ -105,19 +105,19 @@ void Tree::AddTreeItem(TreeItem *item)
 	}
 }
 
-TreeItem * Tree::GetCurrentItem()
+MenuItem * Tree::GetCurrentItem()
 {
 	jthread::AutoLock lock(&_tree_mutex);
 
 	if (_trees.size() == 0) {
 		if (_list->GetItemsSize() > 0) {
-			return _list->GetCurrentTreeItem();
+			return _list->GetCurrentMenuItem();
 		}
 	} else {
 		Tree *tree = (*_trees.rbegin());
 
 		if (tree->_list->GetItemsSize() > 0) {
-			return tree->_list->GetTreeItem(GetCurrentIndex());
+			return tree->_list->GetMenuItem(GetCurrentIndex());
 		}
 	}
 
@@ -191,10 +191,10 @@ bool Tree::ProcessEvent(KeyEvent *event)
 	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_UP || event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
 		if (last != this) {
 			if (last->_list->ProcessEvent(event) == true) {
-				DispatchEvent(new MenuEvent(this, CHANGE_MENU_ITEM, GetCurrentItem()));
+				DispatchMenuEvent(new MenuEvent(this, CHANGE_MENU_ITEM, GetCurrentItem()));
 			}
 		} else {
-			DispatchEvent(new MenuEvent(this, CHANGE_MENU_ITEM, GetCurrentItem()));
+			DispatchMenuEvent(new MenuEvent(this, CHANGE_MENU_ITEM, GetCurrentItem()));
 		}
 	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
 		if (last != this) {
@@ -209,11 +209,11 @@ bool Tree::ProcessEvent(KeyEvent *event)
 			_list->RequestFocus();
 		}
 
-		DispatchEvent(new MenuEvent(this, CHANGE_MENU_ITEM, GetCurrentItem()));
+		DispatchMenuEvent(new MenuEvent(this, CHANGE_MENU_ITEM, GetCurrentItem()));
 	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT || event->GetSymbol() == jgui::JKEY_ENTER) {
 		// TODO:: DispatchEvent
 
-		TreeItem *item = GetCurrentItem();
+		MenuItem *item = GetCurrentItem();
 
 		if (item != NULL && item->GetEnabled() == true) {
 			if (event->GetSymbol() == jgui::JKEY_ENTER && item->GetType() == jgui::CHECK_MENU_ITEM) {
@@ -226,14 +226,14 @@ bool Tree::ProcessEvent(KeyEvent *event)
 				item->SetSelected(b);
 
 				// CHANGE:: needs friend class
-				last->_list->GetCurrentTreeItem()->SetSelected(b);
+				last->_list->GetCurrentMenuItem()->SetSelected(b);
 
 				last->Repaint();
 			
-				DispatchEvent(new MenuEvent(last, SELECT_MENU_ITEM, item));
-				// DispatchEvent(new MenuEvent(last, CHANGE_MENU_ITEM, GetCurrentItem()));
+				DispatchMenuEvent(new MenuEvent(last, SELECT_MENU_ITEM, item));
+				// DispatchMenuEvent(new MenuEvent(last, CHANGE_MENU_ITEM, GetCurrentItem()));
 			} else {
-				std::vector<TreeItem *> items = item->GetSubItems();
+				std::vector<MenuItem *> items = item->GetSubItems();
 
 				if (items.size() > 0) {
 					int position = last->GetCurrentIndex();
@@ -274,9 +274,9 @@ bool Tree::ProcessEvent(KeyEvent *event)
 					tree->SetForegroundColor((fg>>16)&0xff, (fg>>8)&0xff, (fg>>0)&0xff, (fg>>24)&0xff);
 					tree->SetItemColor((itemg>>16)&0xff, (itemg>>8)&0xff, (itemg>>0)&0xff, (itemg>>24)&0xff);
 
-					for (std::vector<TreeItem *>::iterator i=items.begin(); i!=items.end(); i++) {
+					for (std::vector<MenuItem *>::iterator i=items.begin(); i!=items.end(); i++) {
 						if ((*i)->IsVisible() == true) {
-							tree->AddTreeItem((*i));
+							tree->AddMenuItem((*i));
 						}
 					}
 
@@ -291,7 +291,7 @@ bool Tree::ProcessEvent(KeyEvent *event)
 						GetComponentInFocus()->ReleaseFocus();
 					}
 				
-					DispatchEvent(new MenuEvent(last, CHANGE_MENU_ITEM, GetCurrentItem()));
+					DispatchMenuEvent(new MenuEvent(last, CHANGE_MENU_ITEM, GetCurrentItem()));
 				} else {
 					if (event->GetSymbol() == jgui::JKEY_ENTER) {
 						while (_trees.size() > 0) {
@@ -305,7 +305,7 @@ bool Tree::ProcessEvent(KeyEvent *event)
 						}
 
 						Hide();
-						DispatchEvent(new MenuEvent(NULL, SELECT_MENU_ITEM, item));
+						DispatchMenuEvent(new MenuEvent(NULL, SELECT_MENU_ITEM, item));
 
 						_frame_sem.Notify();
 					}
@@ -342,7 +342,7 @@ void Tree::RemoveMenuListener(MenuListener *listener)
 	}
 }
 
-void Tree::DispatchEvent(MenuEvent *event)
+void Tree::DispatchMenuEvent(MenuEvent *event)
 {
 	if (event == NULL) {
 		return;
@@ -413,14 +413,6 @@ TreeComponent::TreeComponent(int x, int y, int width, int visible_items):
 TreeComponent::~TreeComponent() 
 {
 	delete prefetch;
-
-	for (std::vector<TreeItem *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-		OffScreenImage *p = (*i)->_prefetch;
-
-		if (p != NULL) {
-			delete p;
-		}
-	}
 }
 
 void TreeComponent::SetTree(Tree *tree)
@@ -503,7 +495,7 @@ void TreeComponent::Paint(Graphics *g)
 		position = 0;
 	}
 
-	for (std::vector<TreeItem *>::iterator i=_items.begin(); i!=_items.end(); i++) {
+	for (std::vector<MenuItem *>::iterator i=_items.begin(); i!=_items.end(); i++) {
 		if ((*i)->GetType() == IMAGE_MENU_ITEM || (*i)->GetType() == CHECK_MENU_ITEM) {
 			space = 20+font_height;
 
@@ -530,15 +522,15 @@ void TreeComponent::Paint(Graphics *g)
 			// TODO::
 		} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
 			g->SetColor(_fg_color);
-			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_HALIGN, CENTER_VALIGN);
 		} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
 			if (_items[i]->_prefetch == NULL) {
 				g->SetColor(_fg_color);
-				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_HALIGN, CENTER_VALIGN);
 			} else {
 				g->DrawImage(_items[i]->_prefetch, 10, (font_height+_vertical_gap)*count, font_height, font_height+10);
 				g->SetColor(_fg_color);
-				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
+				g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_HALIGN, CENTER_VALIGN);
 			}
 		} else if (_items[i]->GetType() == CHECK_MENU_ITEM) {
 			if (_items[i]->IsSelected() == true) {
@@ -546,7 +538,7 @@ void TreeComponent::Paint(Graphics *g)
 			}
 
 			g->SetColor(_fg_color);
-			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_ALIGN);
+			g->DrawString(TruncateString(_items[i]->GetValue(), _size.width-2*space+font_height+10), space, (font_height+_vertical_gap)*count+5, _size.width-2*space, font_height, LEFT_HALIGN, CENTER_VALIGN);
 		}
 
 		if (_items[i]->GetEnabled() == false) {
@@ -600,7 +592,7 @@ void TreeComponent::SetCurrentIndex(int i)
 
 void TreeComponent::AddEmptyItem()
 {
-	TreeItem *item = new TreeItem();
+	MenuItem *item = new MenuItem();
 
 	{
 		jthread::AutoLock lock(&_component_mutex);
@@ -611,7 +603,7 @@ void TreeComponent::AddEmptyItem()
 
 void TreeComponent::AddItem(std::string text)
 {
-	TreeItem *item = new TreeItem(text);
+	MenuItem *item = new MenuItem(text);
 
 	{
 		jthread::AutoLock lock(&_component_mutex);
@@ -622,7 +614,7 @@ void TreeComponent::AddItem(std::string text)
 
 void TreeComponent::AddItem(std::string text, std::string image)
 {
-	TreeItem *item = new TreeItem(text, image);
+	MenuItem *item = new MenuItem(text, image);
 
 	item->_prefetch = new OffScreenImage(_item_size, _item_size);
 
@@ -642,7 +634,7 @@ void TreeComponent::AddItem(std::string text, std::string image)
 
 void TreeComponent::AddItem(std::string text, bool checked)
 {
-	TreeItem *item = new TreeItem(text, checked);
+	MenuItem *item = new MenuItem(text, checked);
 
 	{
 		jthread::AutoLock lock(&_component_mutex);
@@ -651,7 +643,7 @@ void TreeComponent::AddItem(std::string text, bool checked)
 	}
 }
 
-void TreeComponent::AddTreeItem(TreeItem *item)
+void TreeComponent::AddMenuItem(MenuItem *item)
 {
 	if (item == NULL) {
 		return;
@@ -664,7 +656,7 @@ void TreeComponent::AddTreeItem(TreeItem *item)
 	}
 }
 
-TreeItem * TreeComponent::GetTreeItem(int i)
+MenuItem * TreeComponent::GetMenuItem(int i)
 {
 	if (i < 0 || i >= (int)_items.size()) {
 		return NULL;
@@ -677,7 +669,7 @@ TreeItem * TreeComponent::GetTreeItem(int i)
 	return NULL;
 }
 
-TreeItem * TreeComponent::GetCurrentTreeItem()
+MenuItem * TreeComponent::GetCurrentMenuItem()
 {
 	if (_items.size() > 0) {
 		return _items[_index];

@@ -38,6 +38,7 @@ Slider::Slider(int x, int y, int width, int height):
 	_maximum_tick = 10;
 	_inverted = false;
 	_type = LEFT_RIGHT_SCROLL;
+	// _type = BOTTOM_UP_SCROLL;
 
 	SetFocusable(true);
 }
@@ -116,7 +117,7 @@ void Slider::SetPosition(double i)
 			t = UNIT_DECREMENT;
 		}
 
-		DispatchEvent(new AdjustmentEvent(this, t, _position));
+		DispatchAdjustmentEvent(new AdjustmentEvent(this, t, _position));
 	}
 
 	Repaint();
@@ -240,11 +241,11 @@ bool Slider::ProcessEvent(KeyEvent *event)
 			SetPosition(_position+_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_UP) {
+		} else if (action == JKEY_PAGE_DOWN) {
 			SetPosition(_position-_maximum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_DOWN) {
+		} else if (action == JKEY_PAGE_UP) {
 			SetPosition(_position+_maximum_tick);
 
 			catched = true;
@@ -258,11 +259,11 @@ bool Slider::ProcessEvent(KeyEvent *event)
 			SetPosition(_position+_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_UP) {
+		} else if (action == JKEY_PAGE_DOWN) {
 			SetPosition(_position-_maximum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_DOWN) {
+		} else if (action == JKEY_PAGE_UP) {
 			SetPosition(_position+_maximum_tick);
 
 			catched = true;
@@ -278,68 +279,66 @@ void Slider::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	g->SetFont(_font);
+	int diff = 0x40;
 
 	jcolor_t color,
-					 scolor = _bgfocus_color.Darker(_gradient_level, _gradient_level, _gradient_level, 0x00);
+					 bar;
 
 	color.red = 0x80;
 	color.green = 0x80;
 	color.blue = 0xe0;
 	color.alpha = 0xff;
+	
+	bar = color.Darker(diff, diff, diff, 0x00);
 
-	{
-		if (_type == LEFT_RIGHT_SCROLL) {
-			double d = (_position*(_size.width-_stone_size))/100.0;
+	int x = _vertical_gap-_border_size,
+			y = _horizontal_gap-_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y;
 
-			if (d > (_size.width-_stone_size)) {
-				d = _size.width-_stone_size;
-			}
+	if (_type == LEFT_RIGHT_SCROLL) {
+		double d = (_position*(w-_stone_size))/100.0;
 
-			g->FillGradientRectangle(0, 10, _size.width, 10, scolor, _bgfocus_color);
-			g->FillGradientRectangle(0, 10, _size.width, 10, _bgfocus_color, scolor);
-
-			g->SetColor(color);
-
-			jgui::jpoint_t p[] = {
-				{0, 4},
-				{_stone_size, 4},
-				{_stone_size, (int)(_size.height*0.4)},
-				{_stone_size/2, (int)(_size.height*0.8)},
-				{0, (int)(_size.height*0.4)}
-			};
-
-			g->FillPolygon((int)(d-2), 0, p, 5);
-		} else if (_type == BOTTOM_UP_SCROLL) {
-			double d = (_position*(_size.height-_stone_size))/100.0;
-
-			if (d > (_size.height-_stone_size)) {
-				d = _size.height-_stone_size;
-			}
-
-			g->FillGradientRectangle(10, 0, 5, _size.height, scolor, _bgfocus_color, false);
-			g->FillGradientRectangle(10+5, 0, 5, _size.height, _bgfocus_color, scolor, false);
-
-			g->SetColor(color);
-
-			jgui::jpoint_t p[] = {
-				{0, 0},
-				{(int)(_size.width*0.4), 0},
-				{(int)(_size.width*0.8), _stone_size/2},
-				{(int)(_size.width*0.4), _stone_size},
-				{0, _stone_size}
-			};
-
-			g->FillPolygon(4, (int)d, p, 5);
+		if (d > (w-_stone_size)) {
+			d = w-_stone_size;
 		}
+
+		g->SetColor(bar);
+		FillRectangle(g, x, (h-10)/2+y, w, 10);
+
+		jgui::jpoint_t p[] = {
+			{0, 0},
+			{_stone_size, 0},
+			{_stone_size, (int)(h*0.4)},
+			{_stone_size/2, h},
+			{0, (int)(h*0.4)}
+		};
+
+		g->SetColor(color);
+		g->FillPolygon((int)d+x, y, p, 5);
+	} else if (_type == BOTTOM_UP_SCROLL) {
+		double d = (_position*(h-_stone_size))/100.0;
+
+		if (d > (h-_stone_size)) {
+			d = h-_stone_size;
+		}
+
+		g->SetColor(bar);
+		FillRectangle(g, (w-10)/2+x, y, 10, h);
+
+		jgui::jpoint_t p[] = {
+			{0, 0},
+			{(int)(_size.width*0.4), 0},
+			{w, _stone_size/2},
+			{(int)(_size.width*0.4), _stone_size},
+			{0, _stone_size}
+		};
+
+		g->SetColor(color);
+		g->FillPolygon(x, (int)d+y, p, 5);
 	}
 
-	PaintBorder(g);
-
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _size.width, _size.height);
-	}
+	PaintEdges(g);
 }
 
 void Slider::RegisterAdjustmentListener(AdjustmentListener *listener)
@@ -366,7 +365,7 @@ void Slider::RemoveAdjustmentListener(AdjustmentListener *listener)
 	}
 }
 
-void Slider::DispatchEvent(AdjustmentEvent *event)
+void Slider::DispatchAdjustmentEvent(AdjustmentEvent *event)
 {
 	if (event == NULL) {
 		return;

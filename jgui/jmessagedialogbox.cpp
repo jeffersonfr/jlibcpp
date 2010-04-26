@@ -17,58 +17,69 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jtextdialog.h"
+#include "jmessagedialogbox.h"
 
 namespace jgui {
 
-TextDialog::TextDialog(std::string msg, int x, int y, bool wrap):
-   	jgui::Frame("", x, y, 1000, 1)
+MessageDialogBox::MessageDialogBox(std::string title, std::string msg, int x, int y):
+   	jgui::Frame(title, x, y, 1000, 1)
 {
-	jcommon::Object::SetClassName("jgui::TextDialog");
+	jcommon::Object::SetClassName("jgui::MessageDialogBox");
 
-	_insets.left = 10;
-	_insets.top = 10;
-	_insets.right = 10;
-	_insets.bottom = 10;
-
-	if (wrap == false) {
-		jgui::Font *font = GetFont();
-
-		if (msg == "") {
-			msg = " ";
-		}
-
-		if (font != NULL) {
-			_label = new Label(msg, _insets.left, _insets.bottom, _font->GetStringWidth(msg)+20, _font->GetHeight());
-		} else {
-			_label = new Label(msg, _insets.left, _insets.bottom, _size.width, _font->GetHeight());
-		}
-
-		_label->SetTruncated(false);
-		_label->SetAlign(CENTER_ALIGN);
-		_label->SetWrap(false);
-	} else {
-		int lines = Component::CountLines(msg, _size.width-_insets.left-_insets.right-20, _font);
-
-		if (lines <= 0) {
-			lines = 1;
-		}
-
-		_label = new Label(msg, _insets.left, _insets.bottom, _size.width-_insets.left-_insets.right, (lines)*_font->GetHeight());
-	}
+	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
 
 	_label->SetGap(10, 10);
 	_label->SetWrap(true);
-	_label->SetTruncated(false);
+	_label->SetHorizontalAlign(JUSTIFY_HALIGN);
+	_label->SetVerticalAlign(TOP_VALIGN);
+
+	_label->SetSize(_label->GetPreferredSize());
+
+	_ok = new Button("Ok", _label->GetX()+_label->GetWidth()-200, _label->GetY()+_label->GetHeight()+20, 200, 40);
+	
+	_ok->RegisterButtonListener(this);
 
 	Add(_label);
+	Add(_ok);
+
+	_ok->RequestFocus();
 
 	Pack();
 }
 
-TextDialog::~TextDialog() 
+MessageDialogBox::~MessageDialogBox() 
 {
+		jthread::AutoLock lock(&_message_mutex);
+
 		delete _label;
+		delete _ok;
+}
+
+void MessageDialogBox::SetHorizontalAlign(jhorizontal_align_t align)
+{
+	_label->SetHorizontalAlign(align);
+}
+
+jhorizontal_align_t MessageDialogBox::GetHorizontalAlign()
+{
+	return _label->GetHorizontalAlign();
+}
+
+void MessageDialogBox::SetVerticalAlign(jvertical_align_t align)
+{
+	_label->SetVerticalAlign(align);
+}
+
+jvertical_align_t MessageDialogBox::GetVerticalAlign()
+{
+	return _label->GetVerticalAlign();
+}
+
+void MessageDialogBox::ActionPerformed(jgui::ButtonEvent *event)
+{
+		jthread::AutoLock lock(&_message_mutex);
+
+		Release();
 }
 
 }

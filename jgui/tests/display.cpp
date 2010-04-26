@@ -22,7 +22,7 @@
 namespace mcalc {
 
 Display::Display(int x, int y, int width, int height):
-   	jgui::Panel(x, y, width, height)
+   	jgui::Component(x, y, width, height)
 {
 }
 
@@ -56,8 +56,8 @@ void Display::Paint(jgui::Graphics *g)
 		g->SetFont(_font);
 	}
 
-	g->DrawString(_text, 0, (GetHeight()-size)/2, GetWidth()-10, GetHeight()-4, jgui::RIGHT_ALIGN);
-	g->DrawString(_operation, 10, (GetHeight()-size)/2, 30, GetHeight()-4, jgui::LEFT_ALIGN);
+	g->DrawString(_text, 0, (GetHeight()-size)/2, GetWidth()-10, GetHeight()-4, jgui::RIGHT_HALIGN, jgui::CENTER_VALIGN);
+	g->DrawString(_operation, 10, (GetHeight()-size)/2, 30, GetHeight()-4, jgui::LEFT_HALIGN, jgui::CENTER_VALIGN);
 }
 
 void Display::SetOperation(std::string text)

@@ -1,9 +1,9 @@
 /***************************************************************************
- *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   Copyright (C) 2005 _insets.top Jeff Ferr                                       *
  *   root@sat                                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
+ *   it under the terms of the GNU General Public License as published _insets.top  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
@@ -29,36 +29,34 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 {
 	jcommon::Object::SetClassName("jgui::Keyboard");
 
-	bx = _insets.left;
-	by = _insets.top;
 	bwidth = 90;
 	bheight = 60;
 	delta = 1.0f;
 	
 	if (text_visible == true) {
-			if (type == SMALL_NUMERIC_KEYBOARD) {
-					SetSize(11*bwidth, 8*bheight+50);
-			} else if (type == FULL_NUMERIC_KEYBOARD) {
-					SetSize(11*bwidth, 11*bheight+50);
-			} else if (type == SMALL_ALPHA_NUMERIC_KEYBOARD) {
-					SetSize(11*bwidth, 11*bheight+50);
-			} else if (type == FULL_ALPHA_NUMERIC_KEYBOARD) {
-					SetSize(15*bwidth, 11*bheight+50);
-			} else if (type == FULL_WEB_KEYBOARD) {
-					SetSize(11*bwidth, 11*bheight+50);
-			}
+		if (type == SMALL_NUMERIC_KEYBOARD) {
+			SetSize(11*bwidth, 8*bheight+50);
+		} else if (type == FULL_NUMERIC_KEYBOARD) {
+			SetSize(11*bwidth, 11*bheight+50);
+		} else if (type == SMALL_ALPHA_NUMERIC_KEYBOARD) {
+			SetSize(11*bwidth, 11*bheight+50);
+		} else if (type == FULL_ALPHA_NUMERIC_KEYBOARD) {
+			SetSize(15*bwidth, 11*bheight+50);
+		} else if (type == FULL_WEB_KEYBOARD) {
+			SetSize(11*bwidth, 11*bheight+50);
+		}
 	} else {
-			if (type == SMALL_NUMERIC_KEYBOARD) {
-					SetSize(5*bwidth-10, 7*bheight+40);
-			} else if (type == FULL_NUMERIC_KEYBOARD) {
-					SetSize(7*bwidth-10, 7*bheight+40);
-			} else if (type == SMALL_ALPHA_NUMERIC_KEYBOARD) {
-					SetSize(9*bwidth-10, 7*bheight+40);
-			} else if (type == FULL_ALPHA_NUMERIC_KEYBOARD) {
-					SetSize(15*bwidth-10, 7*bheight+40);
-			} else if (type == FULL_WEB_KEYBOARD) {
-					SetSize(11*bwidth-10, 7*bheight+40);
-			}
+		if (type == SMALL_NUMERIC_KEYBOARD) {
+			SetSize(5*bwidth-10, 7*bheight+40);
+		} else if (type == FULL_NUMERIC_KEYBOARD) {
+			SetSize(7*bwidth-10, 7*bheight+40);
+		} else if (type == SMALL_ALPHA_NUMERIC_KEYBOARD) {
+			SetSize(9*bwidth-10, 7*bheight+40);
+		} else if (type == FULL_ALPHA_NUMERIC_KEYBOARD) {
+			SetSize(15*bwidth-10, 7*bheight+40);
+		} else if (type == FULL_WEB_KEYBOARD) {
+			SetSize(11*bwidth-10, 7*bheight+40);
+		}
 	}
 
 	_size.width -= 20;
@@ -97,103 +95,103 @@ Keyboard::~Keyboard()
 	_keyboard_listeners.clear();
 
 	while (_buttons.size() > 0) {
-			Button *b = (*_buttons.begin());
+		Button *b = (*_buttons.begin());
 
-			_buttons.erase(_buttons.begin());
+		_buttons.erase(_buttons.begin());
 
-			delete b;
+		delete b;
 	}
 
 	if (display != NULL) {
-			delete display;
+		delete display;
 	}
 }
 
 void Keyboard::InputChanged(jgui::KeyEvent *event)
 {
-		if (event->GetSymbol() == JKEY_BLUE || event->GetSymbol() == JKEY_F4) {
-				jgui::Frame::Hide();
+	if (event->GetSymbol() == JKEY_BLUE || event->GetSymbol() == JKEY_F4) {
+		jgui::Frame::Hide();
 
-				_frame_sem.Notify();
-		}
+		_frame_sem.Notify();
+	}
 }
 
 void Keyboard::ActionPerformed(ButtonEvent *event)
 {
-		jthread::AutoLock lock(&_key_mutex);
+	jthread::AutoLock lock(&_key_mutex);
 
-		Button *button = (Button *)event->GetSource();
-		std::string symbol;
-		bool any = false;
+	Button *button = (Button *)event->GetSource();
+	std::string symbol;
+	bool any = false;
 
-		if (button->GetName() == "caps") {
-				ProcessCaps(button);
-		} else if (button->GetName() == "shift") {
-				if (_shift_pressed == true) {
-						_shift_pressed = false;
-				} else {
-						_shift_pressed = true;
-				}
-
-				ProcessCaps(button);
-		} else if (button->GetName() == "back") {
-				if (_show_text == true) {
-						display->Backspace();
-				}
-
-				symbol = "\x8";
-		} else if (button->GetName() == "enter") {
-				if (_show_text == true) {
-						display->Insert("\n");
-				}
-
-				symbol = "\n";
-		} else if (button->GetName() == "tab") {
-				if (_show_text == true) {
-						display->Insert("    ");
-				}
-
-				symbol = "    ";
-		} else if (button->GetName() == "space") {
-				if (_show_text == true) {
-						display->Insert(" ");
-				}
-
-				symbol = " ";
-		} else if (button->GetName() == "e" && (_type == SMALL_NUMERIC_KEYBOARD || _type == FULL_NUMERIC_KEYBOARD)) {
-				if (_show_text == true) {
-						display->Insert("2.71828182845904523536");
-				}
-
-				symbol = "2.71828182845904523536";
-		} else if (button->GetName() == "pi" && (_type == SMALL_NUMERIC_KEYBOARD || _type == FULL_NUMERIC_KEYBOARD)) {
-				if (_show_text == true) {
-						display->Insert("3.14159265358979323846");
-				}
-
-				symbol = "3.14159265358979323846";
-		} else {
-				if (_show_text == true) {
-						display->Insert(button->GetName());
-				}
-
-				any = true;
-				symbol = button->GetName();
-		}
-
-		if (_show_text == true) {
-				DispatchEvent(new KeyboardEvent(this, symbol, display->GetText()));
-		} else {
-				DispatchEvent(new KeyboardEvent(this, symbol, ""));
-		}
-
+	if (button->GetText() == "caps") {
+		ProcessCaps(button);
+	} else if (button->GetText() == "shift") {
 		if (_shift_pressed == true) {
-				if (any == true) {
-						ProcessCaps(button);
-
-						_shift_pressed = false;
-				}
+			_shift_pressed = false;
+		} else {
+			_shift_pressed = true;
 		}
+
+		ProcessCaps(button);
+	} else if (button->GetText() == "back") {
+		if (_show_text == true) {
+			display->Backspace();
+		}
+
+		symbol = "\x8";
+	} else if (button->GetText() == "enter") {
+		if (_show_text == true) {
+			display->Insert("\n");
+		}
+
+		symbol = "\n";
+	} else if (button->GetText() == "tab") {
+		if (_show_text == true) {
+			display->Insert("    ");
+		}
+
+		symbol = "    ";
+	} else if (button->GetText() == "space") {
+		if (_show_text == true) {
+			display->Insert(" ");
+		}
+
+		symbol = " ";
+	} else if (button->GetText() == "e" && (_type == SMALL_NUMERIC_KEYBOARD || _type == FULL_NUMERIC_KEYBOARD)) {
+		if (_show_text == true) {
+			display->Insert("2.71828182845904523536");
+		}
+
+		symbol = "2.71828182845904523536";
+	} else if (button->GetText() == "pi" && (_type == SMALL_NUMERIC_KEYBOARD || _type == FULL_NUMERIC_KEYBOARD)) {
+		if (_show_text == true) {
+			display->Insert("3.14159265358979323846");
+		}
+
+		symbol = "3.14159265358979323846";
+	} else {
+		if (_show_text == true) {
+			display->Insert(button->GetText());
+		}
+
+		any = true;
+		symbol = button->GetText();
+	}
+
+	if (_show_text == true) {
+		DispatchKeyboardEvent(new KeyboardEvent(this, symbol, display->GetText()));
+	} else {
+		DispatchKeyboardEvent(new KeyboardEvent(this, symbol, ""));
+	}
+
+	if (_shift_pressed == true) {
+		if (any == true) {
+			ProcessCaps(button);
+
+			_shift_pressed = false;
+		}
+	}
 }
 
 void Keyboard::TextChanged(TextEvent *event)
@@ -205,42 +203,42 @@ void Keyboard::TextChanged(TextEvent *event)
 		symbol = text[text.size()-1];
 	}
 
-	DispatchEvent(new KeyboardEvent(this, symbol, text));
+	DispatchKeyboardEvent(new KeyboardEvent(this, symbol, text));
 }
 
 void Keyboard::SetMaxTextSize(int max)
 {
-		if (_show_text == true) {
-			display->SetMaxTextSize(max);
-		}
+	if (_show_text == true) {
+		display->SetMaxTextSize(max);
+	}
 }
 
 void Keyboard::SetWrap(bool b)
 {
-		if (_show_text == true && display != NULL) {
-				display->SetWrap(b);
-		} 
+	if (_show_text == true && display != NULL) {
+		display->SetWrap(b);
+	} 
 }
 
 void Keyboard::Clear()
 {
-		if (_show_text == true && display != NULL) {
-				display->Clear();
-		} 
+	if (_show_text == true && display != NULL) {
+		display->Clear();
+	} 
 }
 
 void Keyboard::SetText(std::string text)
 {
-		if (_show_text == true && display != NULL) {
-				display->Clear();
-				display->Insert(text);
-		} 
+	if (_show_text == true && display != NULL) {
+		display->Clear();
+		display->Insert(text);
+	} 
 }
 
 void Keyboard::BuildWebKeyboard()
 {
 	if (_show_text == true) {
-		display = new TextArea(bx, by+6*bheight-40, 10*bwidth, 4*bheight);
+		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*bwidth, 4*bheight);
 
 		if (_is_password == true) {
 			display->SetEchoChar('*');
@@ -253,56 +251,56 @@ void Keyboard::BuildWebKeyboard()
 	}
 
 	Button *b[] = { 
-		         new Button("1", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("2", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("3", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("4", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("5", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("6", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("7", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("8", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("9", (int)(bx+(bwidth*8*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("0", (int)(bx+(bwidth*9*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
+		new Button("1", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("2", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("3", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("4", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("5", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("6", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("7", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("8", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("9", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("0", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
 
-		         new Button("q", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("w", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("e", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("r", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("t", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("y", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("u", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("i", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("o", (int)(bx+(bwidth*8*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("p", (int)(bx+(bwidth*9*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
+		new Button("q", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("w", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("e", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("r", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("t", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("y", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("u", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("i", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("o", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("p", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
 
-		         new Button("a", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("s", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("d", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("f", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("g", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("h", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("j", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("k", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("l", (int)(bx+(bwidth*8*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("~", (int)(bx+(bwidth*9*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
+		new Button("a", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("s", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("d", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("f", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("g", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("h", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("j", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("k", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("l", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("~", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
 
-		         new Button("z", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("x", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("c", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("v", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("b", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("n", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("m", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("?", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("/", (int)(bx+(bwidth*8*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("_", (int)(bx+(bwidth*9*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
+		new Button("z", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("x", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("c", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("v", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("b", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("n", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("m", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("?", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("/", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("_", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
 
-		         new Button("del", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*4*delta)), 2*bwidth, bheight),
-		         new Button("http://", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*4*delta)), 2*bwidth, bheight),
-		         new Button("www.", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*4*delta)), 2*bwidth, bheight),
-		         new Button(".com", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*4*delta)), 2*bwidth, bheight),
-		         new Button(".", (int)(bx+(bwidth*8*delta)), (int)(by+(bheight*4*delta)), bwidth, bheight),
-		         new Button("-", (int)(bx+(bwidth*9*delta)), (int)(by+(bheight*4*delta)), bwidth, bheight),
+		new Button("del", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button("http://", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button("www.", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button(".com", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button(".", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*4*delta)), bwidth, bheight),
+		new Button("-", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*4*delta)), bwidth, bheight),
 	};
 
 	if (_show_text == true) {
@@ -370,12 +368,11 @@ void Keyboard::BuildWebKeyboard()
 	}
 
 	for (int i=0; i<46; i++) {
-			b[i]->RegisterButtonListener(this);
-			b[i]->SetAlign(CENTER_ALIGN);
+		b[i]->RegisterButtonListener(this);
 
-			_buttons.push_back(b[i]);
+		_buttons.push_back(b[i]);
 
-			Add(b[i]);
+		Add(b[i]);
 	}
 
 	b[0]->RequestFocus();
@@ -384,7 +381,7 @@ void Keyboard::BuildWebKeyboard()
 void Keyboard::BuildSmallAlphaNumericKeyboard()
 {
 	if (_show_text == true) {
-		display = new TextArea(bx, by+6*bheight-40, 10*bwidth, 4*bheight);
+		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*bwidth, 4*bheight);
 
 		if (_is_password == true) {
 			display->SetEchoChar('*');
@@ -397,46 +394,46 @@ void Keyboard::BuildSmallAlphaNumericKeyboard()
 	}
 
 	Button *b[] = { 
-		         new Button("a", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("b", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("c", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("d", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("e", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("f", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("g", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("h", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
+		new Button("a", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("b", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("c", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("d", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("e", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("f", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("g", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("h", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
 
-		         new Button("i", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("j", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("k", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("l", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("m", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("n", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("o", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("p", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
+		new Button("i", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("j", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("k", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("l", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("m", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("n", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("o", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("p", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
 
-		         new Button("q", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("r", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("s", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("t", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("u", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("v", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("x", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("w", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
+		new Button("q", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("r", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("s", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("t", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("u", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("v", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("x", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("w", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
 
-		         new Button("y", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("z", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("@", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("(", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button(")", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button(".", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button(";", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("/", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
+		new Button("y", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("z", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("@", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("(", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button(")", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button(".", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button(";", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("/", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
 
-		         new Button("caps", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*4*delta)), 2*bwidth, bheight),
-		         new Button("space", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*4*delta)), 2*bwidth, bheight),
-		         new Button("del", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*4*delta)), 2*bwidth, bheight),
-		         new Button("enter", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button("caps", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button("space", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button("del", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button("enter", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
 	};
 
 	if (_show_text == true) {
@@ -480,20 +477,19 @@ void Keyboard::BuildSmallAlphaNumericKeyboard()
 	b[31]->SetNavigation(b[30], NULL, b[23], b[35]);	b[31]->AddName("?");
 
 	if (_show_text == true) {
-			b[32]->SetNavigation(NULL, b[33], b[24], display);;
-			b[33]->SetNavigation(b[32], b[34], b[26], display);
-			b[34]->SetNavigation(b[33], b[35], b[28], display);
-			b[35]->SetNavigation(b[34], NULL, b[30], display);
+		b[32]->SetNavigation(NULL, b[33], b[24], display);;
+		b[33]->SetNavigation(b[32], b[34], b[26], display);
+		b[34]->SetNavigation(b[33], b[35], b[28], display);
+		b[35]->SetNavigation(b[34], NULL, b[30], display);
 	} else {
-			b[32]->SetNavigation(NULL, b[33], b[24], NULL); 
-			b[33]->SetNavigation(b[32], b[34], b[26], NULL);
-			b[34]->SetNavigation(b[33], b[35], b[28], NULL);
-			b[35]->SetNavigation(b[34], NULL, b[30], NULL);
+		b[32]->SetNavigation(NULL, b[33], b[24], NULL); 
+		b[33]->SetNavigation(b[32], b[34], b[26], NULL);
+		b[34]->SetNavigation(b[33], b[35], b[28], NULL);
+		b[35]->SetNavigation(b[34], NULL, b[30], NULL);
 	}
 
 	for (int i=0; i<36; i++) {
 		b[i]->RegisterButtonListener(this);
-		b[i]->SetAlign(CENTER_ALIGN);
 
 		_buttons.push_back(b[i]);
 
@@ -506,7 +502,7 @@ void Keyboard::BuildSmallAlphaNumericKeyboard()
 void Keyboard::BuildFullAlphaNumericKeyboard()
 {
 	if (_show_text == true) {
-		display = new TextArea(bx, by+6*bheight-40, 14*bwidth, 4*bheight);
+		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 14*bwidth, 4*bheight);
 
 		if (_is_password == true) {
 			display->SetEchoChar('*');
@@ -519,65 +515,65 @@ void Keyboard::BuildFullAlphaNumericKeyboard()
 	}
 
 	Button *b[] = { 
-			 new Button("'", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*0*delta)), 2*bwidth, bheight),
-		         new Button("1", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("2", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("3", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("4", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("5", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("6", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("7", (int)(bx+(bwidth*8*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("8", (int)(bx+(bwidth*9*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("9", (int)(bx+(bwidth*10*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("0", (int)(bx+(bwidth*11*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("-", (int)(bx+(bwidth*12*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("=", (int)(bx+(bwidth*13*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
+		new Button("'", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*0*delta)), 2*bwidth, bheight),
+		new Button("1", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("2", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("3", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("4", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("5", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("6", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("7", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("8", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("9", (int)(_insets.left+(bwidth*10*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("0", (int)(_insets.left+(bwidth*11*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("-", (int)(_insets.left+(bwidth*12*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("=", (int)(_insets.left+(bwidth*13*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
 
-		         new Button("tab", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*1*delta)), 2*bwidth, bheight),
-		         new Button("q", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("w", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("e", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("r", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("t", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("y", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("u", (int)(bx+(bwidth*8*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("i", (int)(bx+(bwidth*9*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("o", (int)(bx+(bwidth*10*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("p", (int)(bx+(bwidth*11*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("'", (int)(bx+(bwidth*12*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("[", (int)(bx+(bwidth*13*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
+		new Button("tab", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*1*delta)), 2*bwidth, bheight),
+		new Button("q", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("w", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("e", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("r", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("t", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("y", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("u", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("i", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("o", (int)(_insets.left+(bwidth*10*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("p", (int)(_insets.left+(bwidth*11*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("'", (int)(_insets.left+(bwidth*12*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("[", (int)(_insets.left+(bwidth*13*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
 
-		         new Button("caps", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*2*delta)), 2*bwidth, bheight),
-		         new Button("a", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("s", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("d", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("f", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("g", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("h", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("j", (int)(bx+(bwidth*8*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("k", (int)(bx+(bwidth*9*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("l", (int)(bx+(bwidth*10*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("c", (int)(bx+(bwidth*11*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("~", (int)(bx+(bwidth*12*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("]", (int)(bx+(bwidth*13*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
+		new Button("caps", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*2*delta)), 2*bwidth, bheight),
+		new Button("a", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("s", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("d", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("f", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("g", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("h", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("j", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("k", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("l", (int)(_insets.left+(bwidth*10*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("c", (int)(_insets.left+(bwidth*11*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("~", (int)(_insets.left+(bwidth*12*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("]", (int)(_insets.left+(bwidth*13*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
 
-		         new Button("shift", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*3*delta)), 2*bwidth, bheight),
-		         new Button("\\", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("z", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("x", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("c", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("v", (int)(bx+(bwidth*6*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("b", (int)(bx+(bwidth*7*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("n", (int)(bx+(bwidth*8*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("m", (int)(bx+(bwidth*9*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button(",", (int)(bx+(bwidth*10*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button(".", (int)(bx+(bwidth*11*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button(";", (int)(bx+(bwidth*12*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("/", (int)(bx+(bwidth*13*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
+		new Button("shift", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*3*delta)), 2*bwidth, bheight),
+		new Button("\\", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("z", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("x", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("c", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("v", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("b", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("n", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("m", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button(",", (int)(_insets.left+(bwidth*10*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button(".", (int)(_insets.left+(bwidth*11*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button(";", (int)(_insets.left+(bwidth*12*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("/", (int)(_insets.left+(bwidth*13*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
 
-		         new Button("back", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*4*delta)), 4*bwidth, bheight),
-		         new Button("space", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*4*delta)), 6*bwidth, bheight),
-		         new Button("enter", (int)(bx+(bwidth*10*delta)), (int)(by+(bheight*4*delta)), 4*bwidth, bheight)
+		new Button("back", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*4*delta)), 4*bwidth, bheight),
+		new Button("space", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*4*delta)), 6*bwidth, bheight),
+		new Button("enter", (int)(_insets.left+(bwidth*10*delta)), (int)(_insets.top+(bheight*4*delta)), 4*bwidth, bheight)
 	};
 
 	if (_show_text == true) {
@@ -652,7 +648,6 @@ void Keyboard::BuildFullAlphaNumericKeyboard()
 
 	for (int i=0; i<55; i++) {
 		b[i]->RegisterButtonListener(this);
-		b[i]->SetAlign(CENTER_ALIGN);
 
 		_buttons.push_back(b[i]);
 
@@ -665,7 +660,7 @@ void Keyboard::BuildFullAlphaNumericKeyboard()
 void Keyboard::BuildFullNumericKeyboard()
 {
 	if (_show_text == true) {
-		display = new TextArea(bx, by+6*bheight-40, 10*bwidth, 4*bheight);
+		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*bwidth, 4*bheight);
 
 		if (_is_password == true) {
 			display->SetEchoChar('*');
@@ -678,35 +673,35 @@ void Keyboard::BuildFullNumericKeyboard()
 	}
 
 	Button *b[] = { 
-			 new Button("(", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button(")", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("7", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("8", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("9", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("+", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
+		new Button("(", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button(")", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("7", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("8", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("9", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("+", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
 
-		         new Button("%", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("$", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("4", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("5", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("6", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("-", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
+		new Button("%", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("$", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("4", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("5", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("6", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("-", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
 
-		         new Button("e", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("pi", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("1", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("2", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-				 new Button("3", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("*", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
+		new Button("e", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("pi", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("1", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("2", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("3", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("*", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
 
-		         new Button("del", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*3*delta)), 2*bwidth, bheight),
-		         new Button("#", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button(".", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("=", (int)(bx+(bwidth*4*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-				 new Button("/", (int)(bx+(bwidth*5*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
+		new Button("del", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*3*delta)), 2*bwidth, bheight),
+		new Button("#", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button(".", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("=", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("/", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
 
-		         new Button("space", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*4*delta)), 3*bwidth, bheight),
-		         new Button("enter", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*4*delta)), 3*bwidth, bheight),
+		new Button("space", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*4*delta)), 3*bwidth, bheight),
+		new Button("enter", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*4*delta)), 3*bwidth, bheight),
 	};
 
 	if (_show_text == true) {
@@ -733,7 +728,7 @@ void Keyboard::BuildFullNumericKeyboard()
 	b[15]->SetNavigation(b[14], b[16], b[9], b[20]);
 	b[16]->SetNavigation(b[15], b[17], b[10], b[21]);
 	b[17]->SetNavigation(b[16], NULL, b[11], b[22]);
-	
+
 	b[18]->SetNavigation(NULL, b[19], b[12], b[23]);
 	b[19]->SetNavigation(b[18], b[20], b[14], b[23]);
 	b[20]->SetNavigation(b[19], b[21], b[15], b[24]);
@@ -750,7 +745,6 @@ void Keyboard::BuildFullNumericKeyboard()
 
 	for (int i=0; i<25; i++) {
 		b[i]->RegisterButtonListener(this);
-		b[i]->SetAlign(CENTER_ALIGN);
 
 		_buttons.push_back(b[i]);
 
@@ -763,7 +757,7 @@ void Keyboard::BuildFullNumericKeyboard()
 void Keyboard::BuildSmallNumericKeyboard()
 {
 	if (_show_text == true) {
-		display = new TextArea(bx, by+6*bheight-40, 10*bwidth, 1*bheight);
+		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*bwidth, 1*bheight);
 
 		if (_is_password == true) {
 			display->SetEchoChar('*');
@@ -776,29 +770,29 @@ void Keyboard::BuildSmallNumericKeyboard()
 	}
 
 	Button *b[] = { 
-			 new Button("+", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("-", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("*", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
-		         new Button("/", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*0*delta)), bwidth, bheight),
+		new Button("+", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("-", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("*", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("/", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
 
-		         new Button("7", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("8", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("9", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
-		         new Button("(", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*1*delta)), bwidth, bheight),
+		new Button("7", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("8", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("9", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("(", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
 
-		         new Button("4", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("5", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button("6", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
-		         new Button(")", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*2*delta)), bwidth, bheight),
+		new Button("4", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("5", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("6", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button(")", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
 
-		         new Button("1", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("2", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("3", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         new Button("%", (int)(bx+(bwidth*3*delta)), (int)(by+(bheight*3*delta)), bwidth, bheight),
-		         
-				 new Button("0", (int)(bx+(bwidth*0*delta)), (int)(by+(bheight*4*delta)), bwidth, bheight),
-		         new Button(",", (int)(bx+(bwidth*1*delta)), (int)(by+(bheight*4*delta)), bwidth, bheight),
-		         new Button("back", (int)(bx+(bwidth*2*delta)), (int)(by+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button("1", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("2", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("3", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("%", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+
+		new Button("0", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*4*delta)), bwidth, bheight),
+		new Button(",", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*4*delta)), bwidth, bheight),
+		new Button("back", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
 	};
 
 	if (_show_text == true) {
@@ -838,7 +832,6 @@ void Keyboard::BuildSmallNumericKeyboard()
 
 	for (int i=0; i<19; i++) {
 		b[i]->RegisterButtonListener(this);
-		b[i]->SetAlign(CENTER_ALIGN);
 
 		_buttons.push_back(b[i]);
 
@@ -850,65 +843,65 @@ void Keyboard::BuildSmallNumericKeyboard()
 
 void Keyboard::ProcessCaps(Button *button)
 {
-		for (std::vector<Button *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
-				(*i)->NextName();
-		}
+	for (std::vector<Button *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
+		(*i)->NextName();
+	}
 
-		button->RequestFocus();
+	button->RequestFocus();
 }
 
 std::string Keyboard::GetText()
 {
-		if (_show_text == true) {
-				return display->GetText();
-		} else {
-				return std::string("");
-		}
+	if (_show_text == true) {
+		return display->GetText();
+	} else {
+		return std::string("");
+	}
 }
 
 void Keyboard::RegisterKeyboardListener(KeyboardListener *listener)
 {
-		if (listener == NULL) {
-				return;
-		}
+	if (listener == NULL) {
+		return;
+	}
 
-		if (std::find(_keyboard_listeners.begin(), _keyboard_listeners.end(), listener) == _keyboard_listeners.end()) {
-			_keyboard_listeners.push_back(listener);
-		}
+	if (std::find(_keyboard_listeners.begin(), _keyboard_listeners.end(), listener) == _keyboard_listeners.end()) {
+		_keyboard_listeners.push_back(listener);
+	}
 }
 
 void Keyboard::RemoveKeyboardListener(KeyboardListener *listener)
 {
-		if (listener == NULL) {
-				return;
-		}
+	if (listener == NULL) {
+		return;
+	}
 
-		std::vector<KeyboardListener *>::iterator i = std::find(_keyboard_listeners.begin(), _keyboard_listeners.end(), listener);
+	std::vector<KeyboardListener *>::iterator i = std::find(_keyboard_listeners.begin(), _keyboard_listeners.end(), listener);
 
-		if (i != _keyboard_listeners.end()) {
-			_keyboard_listeners.erase(i);
-		}
+	if (i != _keyboard_listeners.end()) {
+		_keyboard_listeners.erase(i);
+	}
 }
 
-void Keyboard::DispatchEvent(KeyboardEvent *event)
+void Keyboard::DispatchKeyboardEvent(KeyboardEvent *event)
 {
-		if (event == NULL) {
-				return;
-		}
+	if (event == NULL) {
+		return;
+	}
 
-		int k=0;
+	int k=0;
 
-		while (k++ < (int)_keyboard_listeners.size()) {
-			_keyboard_listeners[k-1]->KeyboardUpdated(event);
-		}
+	while (k++ < (int)_keyboard_listeners.size()) {
+		_keyboard_listeners[k-1]->KeyboardUpdated(event);
+	}
 
-		/*
-		for (std::vector<KeyboardListener *>::iterator i=_keyboard_listeners.begin(); i!=_keyboard_listeners.end(); i++) {
-				(*i)->KeyboardUpdated(event);
-		}
-		*/
+	/*
+		 for (std::vector<KeyboardListener *>::iterator i=_keyboard_listeners.begin(); i!=_keyboard_listeners.end(); i++) {
+		 (*i)->KeyboardUpdated(event);
+		 }
+		 */
 
-		delete event;
+	delete event;
 }
 
 std::vector<KeyboardListener *> & Keyboard::GetKeyboardListeners()

@@ -90,7 +90,7 @@ class TextArea : public Component{
 		 * \brief
 		 *
 		 */
-		void GetLines(std::vector<std::string> *texts);
+		void GetLines(std::vector<std::string> &texts);
 
 	public:
 		/**
@@ -289,7 +289,7 @@ class TextArea : public Component{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(TextEvent *event);
+		void DispatchTextEvent(TextEvent *event);
 
 		/**
 		 * \brief

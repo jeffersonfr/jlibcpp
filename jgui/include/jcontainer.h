@@ -305,7 +305,7 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(ContainerEvent *event);
+		void DispatchContainerEvent(ContainerEvent *event);
 		
 		/**
 		 * \brief

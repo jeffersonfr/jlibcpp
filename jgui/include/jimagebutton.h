@@ -52,7 +52,7 @@ class ImageButton : public Button{
 		 * \brief
 		 *
 		 */
-		ImageButton(std::string image, std::string label, int x = 0, int y = 0, int width = 0, int height = 0);
+		ImageButton(std::string label, std::string image, int x = 0, int y = 0, int width = 0, int height = 0);
 		
 		/**
 		 * \brief

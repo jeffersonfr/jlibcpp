@@ -42,17 +42,6 @@
 #define DEFAULT_COMPONENT_WIDTH		100
 #define DEFAULT_COMPONENT_HEIGHT	40
 
-#define CENTER_VERTICAL_TEXT \
-	(_font==NULL)?0:(_font->GetHeight()>_size.height)?0:((_size.height-_font->GetHeight())/2)
-
-/*
-#define CENTER_VERTICAL_ERROR \
-	(int)(_font->GetHeight()/(2.25*(double)GFXHandler::GetInstance()->GetScreenHeight()/(double)DEFAULT_SCALE_HEIGHT))
-
-#define CENTER_VERTICAL_TEXT \
-	(_font==NULL)?0:(_font->GetHeight()>_height)?0:((_height-_font->GetHeight())/2-CENTER_VERTICAL_ERROR)<0?0:((_height-_font->GetHeight())/2-CENTER_VERTICAL_ERROR)
-*/
-
 namespace jgui {
 
 enum jcomponent_alignment_t {
@@ -170,19 +159,12 @@ class Component : public virtual jcommon::Object{
 		bool _has_focus,
 			 _is_visible,
 			 _ignore_repaint,
-			 _truncate_string,
 			 _background_visible,
 			 _is_focusable,
 			 _enabled,
 			 _theme_enabled,
 			 _is_opaque,
 			 _is_valid;
-
-		/**
-		 * \brief
-		 *
-		 */
-		std::string TruncateString(std::string text, int width);
 
 	protected:
 		/**
@@ -203,12 +185,6 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual ~Component();
-
-		/**
-		 * \brief
-		 *
-		 */
-		static int CountLines(std::string text, int width, Font *font);
 
 		/**
 		 * \brief
@@ -329,12 +305,6 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetBackgroundVisible(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetTruncated(bool b);
 		
 		/**
 		 * \brief
@@ -736,7 +706,7 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void PaintBorder(Graphics *g);
+		virtual void PaintEdges(Graphics *g);
 		
 		/**
 		 * \brief
@@ -760,7 +730,7 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(FocusEvent *event);
+		void DispatchFocusEvent(FocusEvent *event);
 		
 		/**
 		 * \brief
@@ -784,7 +754,7 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(ComponentEvent *event);
+		void DispatchComponentEvent(ComponentEvent *event);
 		
 		/**
 		 * \brief

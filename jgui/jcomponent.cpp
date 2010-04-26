@@ -40,11 +40,11 @@ Component::Component(int x, int y, int width, int height):
 
 	_location.x = 0;
 	_location.y = 0;
+
 	_size.width = 0;
 	_size.height = 0;
 
 	_background_visible = true;
-	_truncate_string = true;
 	_theme_enabled = true;
 	_is_valid = true;
 	_is_opaque = true;
@@ -62,8 +62,8 @@ Component::Component(int x, int y, int width, int height):
 	_border_size = 1;
 	_border = BEVEL_BORDER;
 	_gradient_level = 0x40;
-	_vertical_gap = 10;
-	_horizontal_gap = 10;
+	_vertical_gap = 5;
+	_horizontal_gap = 5;
 	_alignment_x = CENTER_ALIGNMENT;
 	_alignment_y = CENTER_ALIGNMENT;
 
@@ -209,7 +209,7 @@ void Component::SetGap(int hgap, int vgap)
 	Repaint();
 }
 
-void Component::PaintBorder(Graphics *g)
+void Component::PaintEdges(Graphics *g)
 {
 	if (g == NULL) {
 		return;
@@ -303,6 +303,11 @@ void Component::PaintBorder(Graphics *g)
 			g->DrawRectangle(xp+(i+2), yp+(i+2), wp-2*(i+2), hp-2*(i+2));
 		}
 	}
+
+	if (_enabled == false) {
+		g->SetColor(0x00, 0x00, 0x00, 0x80);
+		g->FillRectangle(0, 0, _size.width, _size.height);
+	}
 }
 
 void Component::Paint(Graphics *g)
@@ -313,17 +318,6 @@ void Component::Paint(Graphics *g)
 		g->SetColor(_bg_color);
 		FillRectangle(g, 0, 0, _size.width, _size.height);
 	}
-
-	/*
-	int d = 0x10;
-
-	if (_background_visible == true) {
-		g->SetColor(_bg_red, _bg_green, _bg_blue, _bg_alpha);
-		FillRectangle(g, 0, 0, _width, _height/2);
-		g->SetColor(_bg_red-d, _bg_green-d, _bg_blue-d, _bg_alpha);
-		FillRectangle(g, 0, _height/2, _width, _height/2);
-	}
-	*/
 }
 
 Container * Component::GetParent()
@@ -354,13 +348,6 @@ void Component::SetBackgroundVisible(bool b)
 	}
 
 	_background_visible = b;
-
-	Repaint();
-}
-
-void Component::SetTruncated(bool b)
-{
-	_truncate_string = b;
 
 	Repaint();
 }
@@ -401,133 +388,7 @@ void Component::Repaint(bool all)
 		}
 	}
 
-	DispatchEvent(new ComponentEvent(this, COMPONENT_PAINT_EVENT));
-}
-
-std::string Component::TruncateString(std::string text, int width)
-{
-	if (_truncate_string == false) {
-		return text;
-	}
-
-	if (_font == NULL) {
-		return text;
-	}
-
-	return _font->TruncateString(text, "...", width);
-}
-
-int Component::CountLines(std::string text, int width, Font *font)
-{
-	if (font == NULL) {
-		return 0;
-	}
-
-	std::vector<std::string> words,
-		texts;
-	int i = 0,
-		j = 0,
-		max_width = width,
-		word_size;
-	std::string s,
-		temp,
-		previous;
-
-	jcommon::StringTokenizer t(text, "\n", jcommon::SPLIT_FLAG, true);
-	std::vector<std::string> super_lines, 
-		lines;
-
-	for (i=0; i<t.GetSize(); i++) {
-		temp = jcommon::StringUtils::ReplaceString(t.GetToken(i), "\t", "    ");
-
-		if (temp == "\n") {
-			super_lines[super_lines.size()-1].append("\n");
-		} else {
-			super_lines.push_back(temp);
-		}
-	}
-
-	for (i=0; i<(int)super_lines.size(); i++) {
-		std::string l = super_lines[i];
-
-		jcommon::StringTokenizer w(l, " ", jcommon::SPLIT_FLAG, true);
-		std::vector<std::string> words;
-
-		for (j=0; j<w.GetSize(); j++) {
-			temp = w.GetToken(j);
-
-			if (font->GetStringWidth(temp.c_str()) > (width-5)) {
-				bool flag = false;
-
-				while (flag == false) {
-					unsigned int p = 1;
-
-					while (p < temp.size()) {
-						p++;
-
-						if (font->GetStringWidth(temp.substr(0, p)) >= (width-5)) {
-							break;
-						}
-					}
-
-					words.push_back(temp.substr(0, p-1));
-
-					temp = temp.substr(p-1);
-
-					if (temp.size() == 0 || p == 1) {
-						flag = true;
-					}
-				}
-			} else {
-				words.push_back(temp);
-			}
-
-			/*
-			   temp = w.GetToken(j);
-
-			   if (font->GetStringWidth(temp.c_str()) > (width-5)) {
-			   bool flag = false;
-
-				while (flag == false) {
-					unsigned int p = 1;
-
-					while (p < temp.size() && font->GetStringWidth(temp.substr(0, p)) < (width-5)) {
-						p++;
-					}
-
-					words.push_back(temp.substr(0, p));
-
-					if (p >= temp.size()) {
-						flag = true;
-					}
-
-					temp = temp.substr(p);
-				}
-			} else {
-				words.push_back(temp);
-			}
-			*/
-		}
-
-		temp = words[0];
-
-		for (j=1; j<(int)words.size(); j++) {
-			previous = temp;
-			temp += words[j];
-
-			word_size = font->GetStringWidth(temp.c_str());
-
-			if (word_size > max_width) {
-				temp = words[j];
-		
-				texts.push_back(previous);
-			}
-		}
-
-		texts.push_back(temp);
-	}
-
-	return texts.size();
+	DispatchComponentEvent(new ComponentEvent(this, COMPONENT_PAINT_EVENT));
 }
 
 void Component::SetMinimumSize(jsize_t size)
@@ -1133,7 +994,7 @@ void Component::RemoveFocusListener(FocusListener *listener)
 	}
 }
 
-void Component::DispatchEvent(FocusEvent *event)
+void Component::DispatchFocusEvent(FocusEvent *event)
 {
 	if (event == NULL) {
 		return;
@@ -1193,7 +1054,7 @@ void Component::RemoveComponentListener(ComponentListener *listener)
 	}
 }
 
-void Component::DispatchEvent(ComponentEvent *event)
+void Component::DispatchComponentEvent(ComponentEvent *event)
 {
 	if (event == NULL) {
 		return;

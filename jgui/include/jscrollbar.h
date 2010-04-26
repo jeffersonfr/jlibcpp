@@ -50,16 +50,15 @@ class ScrollBar : public jgui::Component{
 	private:
 		std::vector<AdjustmentListener *> _adjust_listeners;
 		double _position,
-			   _minimum_tick,
-			   _maximum_tick,
-			   _old_position;
+					 _minimum_tick,
+					 _maximum_tick,
+					 _old_position;
 		int _index,
-			_stone_size,
-			_arrows_size,
-			_count_paint;
+				_stone_size,
+				_count_paint;
 		bool _label_visible,
-			 _indeterminate,
-			 _running;
+				 _indeterminate,
+				 _running;
 		jscroll_orientation_t _type;
 		
 	public:
@@ -97,19 +96,7 @@ class ScrollBar : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void SetArrowsSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		int GetStoneSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetArrowsSize();
 		
 		/**
 		 * \brief
@@ -181,7 +168,7 @@ class ScrollBar : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(AdjustmentEvent *event);
+		void DispatchAdjustmentEvent(AdjustmentEvent *event);
 		
 		/**
 		 * \brief

@@ -293,7 +293,7 @@ void Container::Paint(Graphics *g)
 		}
 	}
 
-	PaintBorder(g);
+	PaintEdges(g);
 
 	// WARNNING:: estudar melhor o problema de validacao dos containers.
 	// Revalidar o container no metodo Paint() pode gerar problemas de
@@ -358,7 +358,7 @@ void Container::Repaint(bool all)
 		}
 	}
 
-	Component::DispatchEvent(new ComponentEvent(this, COMPONENT_PAINT_EVENT));
+	Component::DispatchComponentEvent(new ComponentEvent(this, COMPONENT_PAINT_EVENT));
 }
 
 void Container::Repaint(int x, int y, int width, int height)
@@ -404,7 +404,7 @@ void Container::Add(Component *c, GridBagConstraints *constraints)
 	c->SetParent(this);
 	// c->Repaint();
 
-	DispatchEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
+	DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
 }
 
 void Container::Add(jgui::Component *c, std::string id)
@@ -432,7 +432,7 @@ void Container::Add(jgui::Component *c, std::string id)
 	c->SetParent(this);
 	// c->Repaint();
 
-	DispatchEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
+	DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
 }
 
 void Container::Add(jgui::Component *c, jborderlayout_align_t align)
@@ -458,7 +458,7 @@ void Container::Add(jgui::Component *c, jborderlayout_align_t align)
 	c->SetParent(this);
 	// c->Repaint();
 
-	DispatchEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
+	DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
 }
 
 void Container::Remove(jgui::Component *c)
@@ -479,7 +479,7 @@ void Container::Remove(jgui::Component *c)
 
 			_components.erase(i);
 
-			DispatchEvent(new ContainerEvent(this, c, jgui::COMPONENT_REMOVED_EVENT));
+			DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_REMOVED_EVENT));
 
 			return;
 		}
@@ -530,7 +530,7 @@ void Container::RequestComponentFocus(jgui::Component *c, bool has_parent)
 
 		_focus->Invalidate();
 
-		dynamic_cast<Component *>(_focus)->DispatchEvent(new FocusEvent(_focus, GAINED_FOCUS_EVENT));
+		dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, GAINED_FOCUS_EVENT));
 	
 		c->Repaint();
 		
@@ -553,7 +553,7 @@ void Container::ReleaseComponentFocus(jgui::Component *c)
 		if (_focus != NULL && _focus == c) {
 			_focus->Repaint();
 
-			dynamic_cast<Component *>(_focus)->DispatchEvent(new FocusEvent(_focus, LOST_FOCUS_EVENT));
+			dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, LOST_FOCUS_EVENT));
 		}
 
 		_focus = NULL;
@@ -665,7 +665,7 @@ void Container::RemoveContainerListener(ContainerListener *listener)
 	}
 }
 
-void Container::DispatchEvent(ContainerEvent *event)
+void Container::DispatchContainerEvent(ContainerEvent *event)
 {
 	if (event == NULL) {
 		return;

@@ -26,21 +26,35 @@
 
 namespace jgui {
 
-CheckButton::CheckButton(jcheckbox_type_t type, std::string label, int x, int y, int width, int height):
+CheckButton::CheckButton(jcheckbox_type_t type, std::string text, int x, int y, int width, int height):
 	Component(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::CheckButton");
 
+	_halign = LEFT_HALIGN;
+	_valign = CENTER_VALIGN;
+
 	_type = type;
-	_label = label;
+	_text = text;
 	_checked = false;
 
 	SetFocusable(true);
-	SetSize(width, height);
 }
 
 CheckButton::~CheckButton()
 {
+}
+
+void CheckButton::SetText(std::string text)
+{
+	_text = text;
+
+	Repaint();
+}
+
+std::string CheckButton::GetText()
+{
+	return _text;
 }
 
 void CheckButton::SetType(jcheckbox_type_t type)
@@ -64,12 +78,40 @@ void CheckButton::SetSelected(bool b)
 			_checked = b;
 		}
 
-		DispatchEvent(new CheckButtonEvent(this, _checked));
+		DispatchCheckButtonEvent(new CheckButtonEvent(this, _checked));
 
 		Repaint();
 	}
 }
 
+void CheckButton::SetHorizontalAlign(jhorizontal_align_t align)
+{
+	if (_halign != align) {
+		_halign = align;
+
+		Repaint();
+	}
+}
+
+jhorizontal_align_t CheckButton::GetHorizontalAlign()
+{
+	return _halign;
+}
+
+void CheckButton::SetVerticalAlign(jvertical_align_t align)
+{
+	if (_valign != align) {
+		_valign = align;
+
+		Repaint();
+	}
+}
+
+jvertical_align_t CheckButton::GetVerticalAlign()
+{
+	return _valign;
+}
+		
 bool CheckButton::ProcessEvent(MouseEvent *event)
 {
 	if (Component::ProcessEvent(event) == true) {
@@ -155,66 +197,85 @@ void CheckButton::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int size = DEFAULT_COMPONENT_HEIGHT-2*_border_size,
-			maxwh = std::min(_size.width, _size.height);
+	int x = _horizontal_gap+_border_size,
+			y = _vertical_gap+_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y,
+			size = h/2;
 
-	if (size > maxwh) {
-		size = maxwh;
+	if (size < 0) {
+		size = 0;
 	}
 
-	int raio = size/2 - 4;
-
-	if (raio < 0) {
-		raio = 0;
+	if (w > h) {
+		w = h;
 	}
-
-	if (IsFontSet() == true) {
-		/*
-		if (_has_focus == true) {
-			g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-			g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-		}
-		*/
-
-		g->SetColor(_fg_color);
-		g->DrawString(TruncateString(_label, _size.width-(size+15)), size+10, (CENTER_VERTICAL_TEXT), _size.width, _size.height, LEFT_ALIGN);
+	
+	/*
+	if (_has_focus == true) {
+		g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+		g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
 	}
+	*/
 
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
-	int center = (_size.height-size)/2;
+	if (_type == CHECK_TYPE) {
+		FillRectangle(g, x, y, w, h);
+	} else {
+		g->FillCircle(x+size, y+size, size);
+	}
 
 	if (_checked == true) {
-		if (_type == CHECK_TYPE) {
-			FillRectangle(g, 2, 2+center, size-4, size-4);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			FillRectangle(g, 6, 6+center, size-12, size-12);
-			// g->DrawRectangle(2, 2, size-4, size-4);
-		} else {
-			g->FillCircle(size/2, size/2+center, raio);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->FillCircle(size/2, size/2+center, (int)(size*0.2));
-			// g->DrawCircle(size/2, size/2, size/2);
-		}
-	} else {
-		if (_type == CHECK_TYPE) {
-			FillRectangle(g, 2, 2+center, size-4, size-4);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			// g->DrawRectangle(2, 2, size-4, size-4);
-		} else {
-			g->FillCircle(size/2, size/2+center, raio);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			// g->DrawCircle(size/2, size/2, size/2);
-		}
+		g->SetColor(0x00, 0x00, 0x00, 0xff);
 
+		if (_type == CHECK_TYPE) {
+			FillRectangle(g, x+4, y+4, w-8, h-8);
+		} else {
+			g->FillCircle(x+size, y+size, size/2);
+		}
 	}
 
-	PaintBorder(g);
+	if (IsFontSet() == true) {
+		if (_has_focus == true) {
+			g->SetColor(_fgfocus_color);
+		} else {
+			g->SetColor(_fg_color);
+		}
 
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _size.width, _size.height);
+		int x = _horizontal_gap+_border_size,
+				y = _vertical_gap+_border_size,
+				w = _size.width-2*x,
+				h = _size.height-2*y,
+				gapx = size+20,
+				gapy = 0;
+		int px = x+gapx,
+				py = y+gapy,
+				pw = w-gapx,
+				ph = h-gapy;
+
+		x = (x < 0)?0:x;
+		y = (y < 0)?0:y;
+		w = (w < 0)?0:w;
+		h = (h < 0)?0:h;
+
+		px = (px < 0)?0:px;
+		py = (py < 0)?0:py;
+		pw = (pw < 0)?0:pw;
+		ph = (ph < 0)?0:ph;
+
+		std::string text = GetText();
+
+		if (_wrap == false) {
+			text = _font->TruncateString(text, "...", pw);
+		}
+
+		g->SetClip(0, 0, x+w, y+h);
+		g->DrawString(text, px, py, pw, ph, _halign, _valign);
+		g->SetClip(0, 0, _size.width, _size.height);
 	}
+
+	PaintEdges(g);
 }
 
 void CheckButton::RegisterCheckButtonListener(CheckButtonListener *listener)
@@ -241,7 +302,7 @@ void CheckButton::RemoveCheckButtonListener(CheckButtonListener *listener)
 	}
 }
 
-void CheckButton::DispatchEvent(CheckButtonEvent *event)
+void CheckButton::DispatchCheckButtonEvent(CheckButtonEvent *event)
 {
 	if (event == NULL) {
 		return;

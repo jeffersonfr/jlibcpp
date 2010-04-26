@@ -157,7 +157,7 @@ class Slider : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(AdjustmentEvent *event);
+		void DispatchAdjustmentEvent(AdjustmentEvent *event);
 		
 		/**
 		 * \brief

@@ -94,8 +94,6 @@ MCalc::MCalc(int x, int y):
 	container->SetLayout(new jgui::GridLayout(4, 5, 2, 2));
 
 	for (int i=0; i<20; i++) {
-			b[i]->SetAlign(jgui::CENTER_ALIGN);
-
 			_buttons.push_back(b[i]);
 
 			b[i]->RegisterButtonListener(this);
@@ -158,13 +156,13 @@ void MCalc::Process(std::string type)
 					type == "0") {
 				if (_state == 1 || _state == 2 || _state == 5 || _state == 7 || _state == 8) {
 						if (_state == 1 || _state == 5 || _state == 7) {
-								_number0 = button->GetName();
+								_number0 = button->GetText();
 						} else {
-								if (_number0.size() < 9 && (_number0 != "0" || button->GetName() != "0")) {
+								if (_number0.size() < 9 && (_number0 != "0" || button->GetText() != "0")) {
 										if (_number0 == "0") {
-												_number0 = button->GetName();
+												_number0 = button->GetText();
 										} else {
-												_number0 += button->GetName();
+												_number0 += button->GetText();
 										}
 								}
 						}
@@ -172,13 +170,13 @@ void MCalc::Process(std::string type)
 						_state = 2;
 				} else if (_state == 3 || _state == 4 || _state == 6) {
 						if (_state == 3 || _state == 6) {
-								_number1 = button->GetName();
+								_number1 = button->GetText();
 						} else {
-								if (_number1.size() < 9 && (_number1 != "0" || button->GetName() != "0")) {
+								if (_number1.size() < 9 && (_number1 != "0" || button->GetText() != "0")) {
 										if (_number1 == "0") {
-												_number1 = button->GetName();
+												_number1 = button->GetText();
 										} else {
-												_number1 += button->GetName();
+												_number1 += button->GetText();
 										}
 								}
 						}
@@ -217,7 +215,7 @@ void MCalc::Process(std::string type)
 				}
 
 				if (_state == 3 || _state == 6) {
-						_display->SetOperation(button->GetName());
+						_display->SetOperation(button->GetText());
 				}
 		} else if (type == "raiz") {
 				if (_state == 2 || _state == 3 || _state == 4 || _state == 5 || _state == 6 || _state == 7) {
@@ -228,8 +226,8 @@ void MCalc::Process(std::string type)
 						_state = 7;
 
 						double a1 = atof(_number0.c_str());
-						char *i1,
-							 tmp[255];
+						const char *i1;
+						char tmp[255];
 
 						if (a1 < 0) {
 								_state = 255;
@@ -279,8 +277,8 @@ void MCalc::Process(std::string type)
 
 						double a1 = atof(_number0.c_str()),
 							   a2 = atof(_number1.c_str());
-						char *i1,
-							 tmp[255];
+						const char *i1;
+						char tmp[255];
 
 						if (_operation == "/") {
 								if (a2 == 0) {
@@ -335,8 +333,8 @@ void MCalc::Process(std::string type)
 
 						double a1 = atof(_number0.c_str()),
 							   a2 = atof(_number1.c_str());
-						char *i1,
-							 tmp[255];
+						const char *i1;
+						char tmp[255];
 
 						a2 = a1*(a2/100.0);
 
@@ -620,7 +618,7 @@ void MCalc::ActionPerformed(jgui::ButtonEvent *event)
 
 int main()
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 18));
+	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 22));
 
 	mcalc::MCalc app(100, 100);
 

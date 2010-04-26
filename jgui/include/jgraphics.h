@@ -42,41 +42,6 @@
 	b = (b < 0)?0:(b > 0xff)?0xff:b;	\
 	a = (a < 0)?0:(a > 0xff)?0xff:a;	\
 
-/*
-#define TRUNC_COLOR(red, green, blue, alpha) 	\
-	if (red < 0) { 			\
-		red = 0;					\
-	}										\
-											\
-	if (green < 0) {		\
-		green = 0;				\
-	}										\
-											\
-	if (blue < 0) {			\
-		blue = 0;					\
-	}										\
-											\
-	if (alpha < 0) {		\
-		alpha = 0;				\
-	}										\
-											\
-	if (red > 0xff) {		\
-		red = 0xff;				\
-	}										\
-											\
-	if (green > 0xff) {	\
-		green = 0xff;			\
-	}										\
-											\
-	if (blue > 0xff) {	\
-		blue = 0xff;			\
-	}										\
-											\
-	if (alpha > 0xff) {	\
-		alpha = 0xff;			\
-	}										\
-*/
-
 #define SCALE_TO_SCREEN(x, y, z) \
 	(int)floor(((double)x*(double)y)/(double)z) 
 
@@ -137,6 +102,28 @@ enum jblitting_flags_t {
  * \brief
  *
  */
+enum jhorizontal_align_t {
+	LEFT_HALIGN,
+	CENTER_HALIGN,
+	RIGHT_HALIGN,
+	JUSTIFY_HALIGN
+};
+
+/**
+ * \brief
+ *
+ */
+enum jvertical_align_t {
+	TOP_VALIGN,
+	CENTER_VALIGN,
+	BOTTOM_VALIGN,
+	JUSTIFY_VALIGN
+};
+
+/**
+ * \brief
+ *
+ */
 enum jline_type_t {
 	RECT_LINE			= 0x01,
 	ROUND_LINE		= 0x02
@@ -151,17 +138,6 @@ enum jline_style_t {
 	DASH_LINE			= 0x02,
 	DASH_DOT_LINE	= 0x04,
 	DOT_LINE			= 0x08
-};
-
-/**
- * \brief
- *
- */
-enum jalign_t {
-	LEFT_ALIGN,
-	CENTER_ALIGN,
-	RIGHT_ALIGN,
-	JUSTIFY_ALIGN
 };
 
 /**
@@ -685,7 +661,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string full_text, int x, int y, int width, int height, jalign_t align = JUSTIFY_ALIGN);
+		virtual void DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN);
 
 		/**
 		 * \brief

@@ -23,7 +23,7 @@
 namespace jgui {
 
 Animation::Animation(int x, int y, int width, int height):
-   	Component(x, y, width, height),
+ 	Component(x, y, width, height),
 	jthread::Thread()
 {
 	SetClassName("jgui::Animation");
@@ -36,25 +36,26 @@ Animation::Animation(int x, int y, int width, int height):
 
 Animation::~Animation()
 {
-		SetVisible(false);
-		WaitThread();
+	SetVisible(false);
+	
+	WaitThread();
 
-		while (_images.size() > 0) {
-				OffScreenImage *prefetch = (*_images.begin());
+	while (_images.size() > 0) {
+		OffScreenImage *prefetch = (*_images.begin());
 
-				_images.erase(_images.begin());
+		_images.erase(_images.begin());
 
-				delete prefetch;
-		}
+		delete prefetch;
+	}
 }
 
 void Animation::Release()
 {
-		{
-			jthread::AutoLock lock(&_component_mutex);
+	{
+		jthread::AutoLock lock(&_component_mutex);
 
-			_running = false;
-		}
+		_running = false;
+	}
 }
 
 void Animation::SetVisible(bool b)
@@ -84,64 +85,70 @@ void Animation::SetVisible(bool b)
 
 void Animation::RemoveAll()
 {
-		jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_component_mutex);
 
-		_images.clear();
+	_images.clear();
 }
 
 void Animation::SetInterval(int i)
 {
-		jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_component_mutex);
 
-		_interval = i;
+	_interval = i;
 }
 
 void Animation::AddImage(std::string file)
 {
-		jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_component_mutex);
 
-		OffScreenImage *prefetch = new OffScreenImage(_size.width, _size.height);
+	OffScreenImage *prefetch = new OffScreenImage(_size.width, _size.height);
 
-		prefetch->GetGraphics()->DrawImage(file, 0, 0, _size.width, _size.height);
+	prefetch->GetGraphics()->DrawImage(file, 0, 0, _size.width, _size.height);
 
-		_images.push_back(prefetch);
+	_images.push_back(prefetch);
 }
 
 void Animation::Paint(Graphics *g)
 {
-		// JDEBUG(JINFO, "paint\n");
-		
-		Component::Paint(g);
+	// JDEBUG(JINFO, "paint\n");
 
-		if (_images.size() != 0) {
-			OffScreenImage *image = _images[_index];
+	Component::Paint(g);
 
-			g->DrawImage(image, 0, 0, _size.width, _size.height);
-		}
+	int x = _horizontal_gap+_border_size,
+			y = _vertical_gap+_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y,
+			gapx = 0,
+			gapy = 0;
+	int px = x+gapx,
+			py = y+gapy,
+			pw = w-gapx,
+			ph = h-gapy;
 
-		if (_enabled == false) {
-			g->SetColor(0x00, 0x00, 0x00, 0x80);
-			FillRectangle(g, 0, 0, _size.width, _size.height);
-		}
+	if (_images.size() != 0) {
+		OffScreenImage *image = _images[_index];
+
+		g->DrawImage(image, px, py, pw, ph);
+	}
 }
 
 void Animation::Run()
 {
-		while (_running == true) {
-				Repaint();
+	while (_running == true) {
+		Repaint();
 
-				if (_running == false) {
-						return;
-				}
-
-				_index++;
-
-				if (_index >= (int)_images.size()) {
-					_index = 0;
-				}
-
-				jthread::Thread::Sleep(_interval);
+		if (_running == false) {
+			return;
 		}
+
+		_index++;
+
+		if (_index >= (int)_images.size()) {
+			_index = 0;
+		}
+
+		jthread::Thread::Sleep(_interval);
+	}
 }
 
 }

@@ -314,16 +314,23 @@ void Frame::Paint(Graphics *g)
 		g->FillRectangle(_insets.left, _insets.top-10, _size.width-_insets.left-_insets.right, 5);
 
 		if (IsFontSet() == true) {
-			int font_height = _font->GetHeight(),
-					dy = (_insets.top-font_height)-15;
+			int y = _insets.top-_font->GetHeight()-15;
 
-			if (dy < 0) {
-				dy = 0;
+			if (y < 0) {
+				y = 0;
 			}
 
+			std::string text = _title;
+			
+			// if (_wrap == false) {
+				text = _font->TruncateString(text, "...", (_size.width-_insets.left-_insets.right));
+			// }
+
 			g->SetColor(_fg_color);
-			// g->DrawString(_title, 0, dy, _width, _height, 1);
-			g->DrawString(_title, (_size.width-_font->GetStringWidth(_title))/2, dy);
+		
+			g->SetClip(0, 0, _size.width, _insets.top);
+			g->DrawString(text, _insets.left+(_size.width-_insets.left-_insets.right-_font->GetStringWidth(text))/2, y);
+			g->SetClip(0, 0, _size.width, _size.height);
 		}
 	}
 
@@ -377,7 +384,7 @@ void Frame::Paint(Graphics *g)
 	}
 
 	// INFO:: render over window attributes
-	PaintBorder(g);
+	PaintEdges(g);
 }
 
 void Frame::KeyPressed(KeyEvent *event)

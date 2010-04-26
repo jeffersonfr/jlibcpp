@@ -27,24 +27,41 @@ Cell::Cell(Table *table)
 	jcommon::Object::SetClassName("jgui::Cell");
 
 	_table = table;
+
+	_halign = CENTER_HALIGN;
+	_valign = CENTER_VALIGN;
 }
 
 Cell::~Cell()
 {
 }
 
-void Cell::SetAlign(jalign_t align)
+void Cell::SetHorizontalAlign(jhorizontal_align_t align)
 {
-	if (_align != align) {
-		_align = align;
+	if (_halign != align) {
+		_halign = align;
 
 		_table->Repaint();
 	}
 }
 
-jalign_t Cell::GetAlign()
+jhorizontal_align_t Cell::GetHorizontalAlign()
 {
-	return _align;
+	return _halign;
+}
+
+void Cell::SetVerticalAlign(jvertical_align_t align)
+{
+	if (_valign != align) {
+		_valign = align;
+
+		_table->Repaint();
+	}
+}
+
+jvertical_align_t Cell::GetVerticalAlign()
+{
+	return _valign;
 }
 
 void Cell::SetValue(std::string value)
@@ -447,7 +464,7 @@ bool Table::ProcessEvent(KeyEvent *event)
 			if (_row != old_index) {
 				Repaint();
 
-				// TODO:: DispatchEvent(new SelectEvent(this, _cells[_index].text, _index, UP_ITEM)); 
+				// TODO:: DispatchSelectEvent(new SelectEvent(this, _cells[_index].text, _index, UP_ITEM)); 
 			}
 		}
 
@@ -473,14 +490,14 @@ bool Table::ProcessEvent(KeyEvent *event)
 			if (_row != old_index) {
 				Repaint();
 
-				// TODO:: DispatchEvent(new SelectEvent(this, _items[_index].text, _index, DOWN_ITEM)); 
+				// TODO:: DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, DOWN_ITEM)); 
 			}
 		}
 
 		catched = true;
 	} else if (action == JKEY_ENTER) {
 		if (_cells.size() > 0) { 
-			// TODO:: DispatchEvent(new SelectEvent(this, _items[_index].text, _index, ACTION_ITEM));
+			// TODO:: DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, ACTION_ITEM));
 		}
 
 		catched = true;

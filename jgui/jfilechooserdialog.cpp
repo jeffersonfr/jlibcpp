@@ -88,6 +88,10 @@ FileChooserDialog::FileChooserDialog(std::string title, std::string directory, i
 
 FileChooserDialog::~FileChooserDialog()
 {
+	for (std::vector<jgui::Item *>::iterator i=list->GetItems().begin(); i!=list->GetItems().end(); i++) {
+		delete (*i);
+	}
+
 	if (list != NULL) {
 		delete list;
 	}
@@ -111,7 +115,7 @@ bool FileChooserDialog::Show(bool modal)
 std::string FileChooserDialog::GetFile()
 {
 	std::string path,
-		selectedItem = list->GetCurrentValue();
+		selectedItem = list->GetCurrentItem()->GetValue();
 
 	if (list->GetCurrentIndex() == 0) {
 		selectedItem = "";
@@ -133,7 +137,7 @@ std::string FileChooserDialog::GetFile()
 
 std::string FileChooserDialog::GetName()
 {
-	return list->GetCurrentValue();
+	return list->GetCurrentItem()->GetValue();
 }
 
 std::string FileChooserDialog::GetCurrentDirectory()
@@ -164,11 +168,11 @@ void FileChooserDialog::SetExtensionIgnoreCase(bool b)
 void FileChooserDialog::ShowFiles()
 {
 	list->SetIgnoreRepaint(true);
-	list->RemoveAll();
+	list->RemoveItems();
 
 	std::vector<std::string> files = ListFiles(_current_dir);
 
-	list->AddItem("../", "./icons/folder.png");
+	list->AddImageItem("../", "./icons/folder.png");
 
 	if (_filter == DIRECTORY_ONLY || _filter == FILE_AND_DIRECTORY) {
 		for (unsigned int i=0; i<files.size(); i++) {
@@ -178,7 +182,7 @@ void FileChooserDialog::ShowFiles()
 
 			if (IsDirectory(_current_dir + "/" + files[i])) {
 				// adiciona um icone para o diretorio
-				list->AddItem(files[i], "./icons/folder.png"); 
+				list->AddImageItem(files[i], "./icons/folder.png"); 
 			}
 		}
 	}
@@ -211,7 +215,7 @@ void FileChooserDialog::ShowFiles()
 
 			if (b == true) {
 				if (IsFile(_current_dir + "/" + file)) {
-					list->AddItem(file, "./icons/file.png");
+					list->AddImageItem(file, "./icons/file.png");
 				}
 			}
 		}
@@ -289,7 +293,7 @@ bool FileChooserDialog::IsFile(std::string path)
 
 void FileChooserDialog::ItemSelected(jgui::SelectEvent *event)
 {
-	std::string selectedItem = list->GetCurrentValue();
+	std::string selectedItem = list->GetCurrentItem()->GetValue();
 
 	if (selectedItem == "../") {
 		if (_has_parent) {

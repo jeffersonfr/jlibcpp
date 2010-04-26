@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_TEXTDIALOG_H
-#define J_TEXTDIALOG_H
+#ifndef J_YESNODIALOGBOX_H
+#define J_YESNODIALOGBOX_H
 
 #include "jbutton.h"
 #include "jbuttonlistener.h"
@@ -39,23 +39,68 @@
 
 namespace jgui {
 
-class TextDialog : public jgui::Frame, public jgui::ButtonListener{
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class YesNoDialogBox : public jgui::Frame, public jgui::ButtonListener{
 
 	private:
+		jthread::Mutex _yesno_mutex;
+
 		Label *_label;
+		Button *_yes,
+			   *_no;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		TextDialog(std::string msg, int x, int y, bool wrap = false);
+		YesNoDialogBox(std::string title, std::string msg, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~TextDialog();
+		virtual ~YesNoDialogBox();
+
+		/**
+		 * \brief
+		 *
+		 */
+		int GetResponse();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetHorizontalAlign(jhorizontal_align_t align);
+
+		/**
+		 * \brief
+		 *
+		 */
+		jhorizontal_align_t GetHorizontalAlign();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVerticalAlign(jvertical_align_t align);
+
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ActionPerformed(jgui::ButtonEvent *event);
 
 };
 

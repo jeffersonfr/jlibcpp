@@ -47,23 +47,38 @@ class CheckButton : public Component{
 
 	private:
 		std::vector<CheckButtonListener *> _check_listeners;
-		std::string _label;
+		std::string _text;
 		jcheckbox_type_t _type;
+		jhorizontal_align_t _halign;
+		jvertical_align_t _valign;
 		bool _checked,
-			 _just_check;
+				 _just_check,
+				 _wrap;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		CheckButton(jcheckbox_type_t type, std::string label, int x = 0, int y = 0, int width = 0, int height = 0);
+		CheckButton(jcheckbox_type_t type, std::string text, int x = 0, int y = 0, int width = 0, int height = 0);
 	
 		/**
 		 * \brief
 		 *
 		 */
 		virtual ~CheckButton();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetText(std::string text);
+
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetText();
 
 		/**
 		 * \brief
@@ -89,6 +104,30 @@ class CheckButton : public Component{
 		 */
 		void SetSelected(bool b);
 
+		/**
+		 * \brief
+		 *
+		 */
+		void SetHorizontalAlign(jhorizontal_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jhorizontal_align_t GetHorizontalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVerticalAlign(jvertical_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
+		
 		/**
 		 * \brief
 		 *
@@ -123,7 +162,7 @@ class CheckButton : public Component{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(CheckButtonEvent *event);
+		void DispatchCheckButtonEvent(CheckButtonEvent *event);
 		
 		/**
 		 * \brief

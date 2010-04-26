@@ -20,12 +20,11 @@
 #ifndef J_MENU_H
 #define J_MENU_H
 
-#include "jmenulistener.h"
 #include "jframe.h"
 #include "jlistbox.h"
-#include "jmenuexception.h"
 #include "joffscreenimage.h"
 #include "jmouselistener.h"
+#include "jitemcomponent.h"
 
 #include <string>
 #include <iostream>
@@ -46,19 +45,6 @@ enum jmenu_align_t {
 	SUBMENU_ALIGN
 };
 
-/**
- * \brief
- *
- */
-enum jmenuitem_type_t {
-	TEXT_MENU_ITEM,
-	IMAGE_MENU_ITEM,
-	CHECK_MENU_ITEM,
-	EMPTY_MENU_ITEM
-};
-
-class MenuItem;
-class MenuComponent;
 class ComboMenuComponent;
 
 /**
@@ -66,306 +52,173 @@ class ComboMenuComponent;
  *
  * \author Jeff Ferr
  */
-class Menu : public jgui::Frame, public jgui::FrameInputListener{
+class Menu : 
+	public jgui::Frame,
+	public jgui::FrameInputListener,
+	public jgui::ItemComponent 
+{
 
-	friend class MenuComponent;
+	friend class ComboBox;
 
 	private:
 		jthread::Mutex _menu_mutex;
 
 		std::vector<Menu *> _menus;
-		std::vector<MenuListener *> _menu_listeners;
-		MenuItem *_current_item;
-		MenuComponent *_list;
+		jgui::OffScreenImage *prefetch;
 		jmenu_align_t _menu_align;
-		int _visible_items;
+		int _top_index,
+				_item_size,
+				_visible_items,
+				_centered_interaction;
 
 	private:
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MousePressed(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseReleased(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseClicked(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseMoved(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void MouseWheel(MouseEvent *event);
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Menu(int x, int y, int width, int visible_items);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Menu();
-
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetTitle(std::string title);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool Show(bool modal = true);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void SetCenteredInteraction(bool b);
 
+		/**
+		 * \brief
+		 *
+		 */
 		void SetMenuAlign(jmenu_align_t align);
-		int GetItemsSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetVisibleItems();
-		void SetLoop(bool loop);
-		void SetCurrentIndex(int i);
-		void AddMenuItem(MenuItem *item);
-		void AddMenuItem(MenuItem *item, int index);
-		void AddMenuItems(std::vector<MenuItem *> &items);
+
+		/**
+		 * \brief
+		 *
+		 */
 		Menu * GetCurrentMenu();
-		MenuItem * GetCurrentItem();
-		int GetCurrentIndex();
-		void RemoveAll();
 
-		jcolor_t GetItemColor();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemColor(jcolor_t color);
 
-		void SetItemColor(jcolor_t color);
-		void SetBackgroundColor(jcolor_t color);
-		void SetForegroundColor(jcolor_t color);
-		void SetItemColor(int red, int green, int blue, int alpha);
-		void SetBackgroundColor(int red, int green, int blue, int alpha);
-		void SetForegroundColor(int red, int green, int blue, int alpha);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetBackgroundColor(jcolor_t color);
 
-		void RegisterMenuListener(MenuListener *listener);
-		void RemoveMenuListener(MenuListener *listener);
-		void DispatchEvent(MenuEvent *event);
-		std::vector<MenuListener *> & GetMenuListeners();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetForegroundColor(jcolor_t color);
 
-		virtual void Paint(Graphics *g);
-		virtual void InputChanged(KeyEvent *event);
-};
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemColor(int red, int green, int blue, int alpha);
 
-class MenuItem : public virtual jcommon::Object{
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetBackgroundColor(int red, int green, int blue, int alpha);
 
-	friend class MenuComponent;
-	friend class ComboMenuComponent;
-
-	private:
-		std::vector<MenuItem *> _childs;
-		Menu *_parent;
-		OffScreenImage *_prefetch;
-		std::string _value,
-			_image;
-		jmenuitem_type_t _type;
-		bool _is_checked,
-			 _is_visible,
-			 _enabled;
-
-	public:
-		MenuItem()
-		{
-			jcommon::Object::SetClassName("jcommon::MenuItem");
-
-			_enabled = true;
-			_parent = NULL;
-			_prefetch = NULL;
-			_is_checked = false;
-			_is_visible = true;
-			_type = EMPTY_MENU_ITEM;
-		}
-
-		MenuItem(std::string value)
-		{
-			jcommon::Object::SetClassName("jcommon::MenuItem");
-
-			_enabled = true;
-			_parent = NULL;
-			_prefetch = NULL;
-			_value = value;
-			_is_checked = false;
-			_is_visible = true;
-			_type = TEXT_MENU_ITEM;
-		}
-
-		MenuItem(std::string value, std::string image)
-		{
-			jcommon::Object::SetClassName("jcommon::MenuItem");
-
-			_enabled = true;
-			_parent = NULL;
-			_prefetch = NULL;
-			_image = image;
-			_value = value;
-			_is_checked = false;
-			_is_visible = true;
-			_type = IMAGE_MENU_ITEM;
-		}
-
-		MenuItem(std::string value, bool checked)
-	{
-		jcommon::Object::SetClassName("jcommon::MenuItem");
-
-		_enabled = true;
-		_parent = NULL;
-		_prefetch = NULL;
-		_value = value;
-		_is_checked = checked;
-		_is_visible = true;
-		_type = CHECK_MENU_ITEM;
-	}
-
-	~MenuItem()
-	{
-	}
-
-	Menu * GetParent()
-	{
-		return _parent;
-	}
-
-	std::vector<MenuItem *> & GetSubItems()
-	{
-		return _childs;
-	}
-
-	void SetEnabled(bool b)
-	{
-		_enabled = b;
-	}
-
-	bool GetEnabled()
-	{
-		return _enabled;
-	}
-
-	void SetVisible(bool b)
-	{
-		_is_visible = b;
-	}
-
-	bool IsVisible()
-	{
-		return _is_visible;
-	}
-
-	bool IsSelected()
-	{
-		return _is_checked;
-	}
-
-	void SetSelected(bool b)
-	{
-		if (_is_checked == b) {
-			return;
-		}
-
-		_is_checked = b;
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetForegroundColor(int red, int green, int blue, int alpha);
 
 		/*
-		if (_parent != NULL) {
-			_parent->Repaint();
-		}
-		*/
-	}
+		 * \brief
+		 *
+		 */
+		virtual void SetCurrentIndex(int i);
 
-	void SetParent(Menu *parent)
-	{
-		_parent = parent;
-	}
+		/*
+		 * \brief
+		 *
+		 */
+		virtual Item * GetCurrentItem();
 
-	void AddSubItem(MenuItem *item)
-	{
-		if (_type == jgui::CHECK_MENU_ITEM) {
-			throw MenuException("Item cannot accept childs");
-		}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetCurrentIndex();
 
-		_childs.push_back(item);
-	}
-
-	void AddSubItem(MenuItem *item, int index)
-	{
-		if (index > (int)_childs.size()) {
-			index = _childs.size();
-		}
-
-		_childs.insert(_childs.begin()+index, item);
-	}
-
-	void AddSubItems(std::vector<MenuItem *> items)
-	{
-		for (std::vector<MenuItem *>::iterator i=items.begin(); i!=items.end(); i++) {
-			_childs.push_back((*i));
-		}
-	}
-
-	void RemoveSubItem(int index)
-	{
-		if (_childs.size() > 0 && index < (int)_childs.size()) {
-			_childs.erase(_childs.begin()+index);
-		}
-	}
-
-	void RemoveSubItem(MenuItem *item)
-	{
-		std::vector<MenuItem *>::iterator i = std::find(_childs.begin(), _childs.end(), item);
-
-		if (i != _childs.end()) {
-			_childs.erase(i);
-		}
-	}
-
-	std::string GetValue()
-	{
-		return _value;
-	}
-
-	std::string GetImage()
-	{
-		return _image;
-	}
-
-	jmenuitem_type_t GetType()
-	{
-		return _type;
-	}
-
-};
-
-class MenuComponent : public Component{
-
-friend class Menu;
-
-private:
-	std::vector<MenuItem *>_items;
-	OffScreenImage *prefetch;
-	Menu *_menu;
-	int bx,
-		by,
-		bwidth,
-		bheight,
-			_item_size,
-			_index,
-			_top_index,
-			_visible_items,
-			_paint_count,
-			_vertical_gap,
-			_horizontal_gap;
-		jcolor_t _item_color;
-		float delta;
-		bool _input_locked,
-			 _arrows_visible,
-			 _loop,
-			 _centered_interaction;
-
-		void SetMenu(Menu *menu);
-
-	public:
-		MenuComponent(int x, int y, int width, int visible_items);
-		virtual ~MenuComponent();
-
-		void SetCenteredInteraction(bool b);
-		void SetLoop(bool loop);
-		jcolor_t GetItemColor();
-		void SetItemColor(jcolor_t color);
-		void SetItemColor(int red, int green, int blue, int alpha);
-		void SetCurrentIndex(int i);
-		void AddEmptyItem();
-		void AddItem(std::string text);
-		void AddItem(std::string text, std::string image);
-		void AddItem(std::string text, bool checked);
-		void AddMenuItem(MenuItem *item);
-		MenuItem * GetMenuItem(int index);
-		MenuItem * GetCurrentMenuItem();
-		int GetCurrentIndex();
-		int GetItemsSize();
-		void RemoveItem(int index);
-		void RemoveAll();
-
-		virtual bool ProcessEvent(KeyEvent *event);
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InputChanged(KeyEvent *event);
 };
 
 }
 
 #endif 
+

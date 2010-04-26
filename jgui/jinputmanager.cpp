@@ -505,7 +505,7 @@ std::vector<KeyListener *> & InputManager::GetKeyListeners()
 	return _key_listeners;
 }
 
-void InputManager::DispatchEvent(KeyEvent *event)
+void InputManager::DispatchKeyEvent(KeyEvent *event)
 {
 	if (IsKeyEventsEnabled() == false) {
 		return;
@@ -595,7 +595,7 @@ void InputManager::RemoveMouseListener(MouseListener *listener)
 	}
 }
 
-void InputManager::DispatchEvent(MouseEvent *event)
+void InputManager::DispatchMouseEvent(MouseEvent *event)
 {
 	if (IsMouseEventsEnabled() == false) {
 		return;
@@ -693,7 +693,7 @@ void InputManager::Run()
 			// 1.3 engine->WaitIdle(engine);
 
 			if (event.clazz == DFEC_WINDOW) {
-				DFBWindowEvent *wevent = (DFBWindowEvent *)(void *)&event;
+				DFBWindowEvent *wevent = reinterpret_cast<DFBWindowEvent *>(&event);
 
 				std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
 				Window *current = NULL;
@@ -746,9 +746,9 @@ void InputManager::Run()
 							type = JMOUSE_PRESSED_EVENT;
 						}
 
-						if ((wevent->buttons &DIBM_LEFT) != 0) {
+						if ((wevent->buttons & DIBM_LEFT) != 0) {
 							button = (jmouse_button_t)(button | JBUTTON_BUTTON1);
-						} else if ((wevent->button &DIBM_RIGHT) != 0) {
+						} else if ((wevent->button & DIBM_RIGHT) != 0) {
 							button = (jmouse_button_t)(button | JBUTTON_BUTTON2);
 						} else if ((wevent->button & DIBI_MIDDLE) != 0) {
 							button = (jmouse_button_t)(button | JBUTTON_BUTTON3);
@@ -762,7 +762,7 @@ void InputManager::Run()
 							count = mouse_z + 1;
 						}
 
-						DispatchEvent(new MouseEvent(current, type, button, count, cx, cy));
+						DispatchMouseEvent(new MouseEvent(current, type, button, count, cx, cy));
 					} 
 				} else {
 					GFXHandler::GetInstance()->SetCursor(ARROW_CURSOR);
@@ -805,7 +805,7 @@ void InputManager::Run()
 						// 1.3
 						usleep(10000);
 
-						DispatchEvent(new KeyEvent(
+						DispatchKeyEvent(new KeyEvent(
 									WindowManager::GetInstance()->GetWindowInFocus(), 
 									type, 
 									mod, 
@@ -908,7 +908,7 @@ void InputManager::Run()
 					*/
 
 					if (current == NULL) {
-						DispatchEvent(new MouseEvent(NULL, type, button, count, cx, cy));
+						DispatchMouseEvent(new MouseEvent(NULL, type, button, count, cx, cy));
 					}
 				}
 			}

@@ -416,7 +416,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string full_text, int x, int y, int width, int height, int align = 3);
+		virtual void DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN);
 
 		/**
 		 * \brief

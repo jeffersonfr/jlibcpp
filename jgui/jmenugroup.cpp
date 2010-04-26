@@ -28,18 +28,18 @@ MenuGroup::MenuGroup(Menu *menu)
 	_menu = menu;
 
 	if (_menu != NULL) {
-		_menu->RegisterMenuListener(this);
+		_menu->RegisterSelectListener(this);
 	}
 }
 
 MenuGroup::~MenuGroup()
 {
 	if (_menu != NULL) {
-		_menu->RegisterMenuListener(this);
+		_menu->RegisterSelectListener(this);
 	}
 }
 
-void MenuGroup::Add(MenuItem *item)
+void MenuGroup::Add(Item *item)
 {
 	if (item->GetType() != jgui::CHECK_MENU_ITEM) {
 		return;
@@ -48,11 +48,11 @@ void MenuGroup::Add(MenuItem *item)
 	_items.push_back(item);
 }
 
-void MenuGroup::Remove(MenuItem *item)
+void MenuGroup::Remove(Item *item)
 {
-	for (std::vector<MenuItem *>::iterator i=_items.begin(); i!=_items.end(); i++) {
+	for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
 		if (item == (*i)) {
-			_menu->RemoveMenuListener(this);
+			_menu->RemoveSelectListener(this);
 
 			_items.erase(i);
 
@@ -61,14 +61,14 @@ void MenuGroup::Remove(MenuItem *item)
 	}
 }
 
-void MenuGroup::ItemSelected(MenuEvent *event)
+void MenuGroup::ItemSelected(SelectEvent *event)
 {
-	MenuItem *item = (MenuItem *)event->GetMenuItem();
+	Item *item = (Item *)event->GetItem();
 	Menu *menu = (Menu *)event->GetSource();
 
-	for (std::vector<MenuItem *>::iterator i=_items.begin(); i!=_items.end(); i++) {
+	for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
 		if (item == (*i)) {
-			for (std::vector<MenuItem *>::iterator i=_items.begin(); i!=_items.end(); i++) {
+			for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
 				if (item != (*i)) {
 					(*i)->SetSelected(false);
 				}
@@ -83,18 +83,18 @@ void MenuGroup::ItemSelected(MenuEvent *event)
 	}
 }
 
-void MenuGroup::ItemChanged(MenuEvent *event)
+void MenuGroup::ItemChanged(SelectEvent *event)
 {
 }
 
-void MenuGroup::Select(MenuItem *item)
+void MenuGroup::Select(Item *item)
 {
 	item->SetSelected(true);
 }
 
-MenuItem * MenuGroup::GetSelected()
+Item * MenuGroup::GetSelected()
 {
-	for (std::vector<MenuItem *>::iterator i=_items.begin(); i!=_items.end(); i++) {
+	for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
 		if ((*i)->IsSelected() == true) {
 			return (*i);
 		}

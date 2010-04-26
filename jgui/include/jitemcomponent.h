@@ -17,13 +17,14 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_TABLE_H
-#define J_TABLE_H
+#ifndef	J_ITEMCOMPONENT_H
+#define J_ITEMCOMPONENT_H
 
 #include "jcomponent.h"
+#include "jselectlistener.h"
+#include "joffscreenimage.h"
 
 #include <string>
-#include <vector>
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -31,39 +32,163 @@
 
 namespace jgui {
 
-class Table;
-
 /**
  * \brief
  *
- * \author Jeff Ferr
  */
-class Cell : public virtual jcommon::Object{
+enum jmenuitem_type_t {
+	TEXT_MENU_ITEM,
+	IMAGE_MENU_ITEM,
+	CHECK_MENU_ITEM,
+	EMPTY_MENU_ITEM
+};
+
+class Item : public virtual jcommon::Object{
 
 	private:
-		Table *_table;
-		std::string _value;
-		int _bgcell_red,
-			_bgcell_green,
-			_bgcell_blue,
-			_bgcell_alpha;
-		int _fgcell_red,
-			_fgcell_green,
-			_fgcell_blue,
-			_fgcell_alpha;
+		std::vector<Item *> _childs;
+		OffScreenImage *_prefetch;
+		std::string _value,
+			_image;
+		jmenuitem_type_t _type;
 		jhorizontal_align_t _halign;
 		jvertical_align_t _valign;
-
-		Cell(Table *table);
+		bool _is_checked,
+				 _is_visible,
+				 _enabled;
 
 	public:
-		virtual ~Cell();
+		/**
+		 * \brief
+		 *
+		 */
+		Item();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetValue(std::string value);
+		Item(std::string value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		Item(std::string value, std::string image);
+
+		/**
+		 * \brief
+		 *
+		 */
+		Item(std::string value, bool checked);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~Item();
+
+		/**
+		 * \brief
+		 *
+		 */
+		std::vector<Item *> & GetChilds();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetHorizontalAlign(jhorizontal_align_t align);
+
+		/**
+		 * \brief
+		 *
+		 */
+		jhorizontal_align_t GetHorizontalAlign();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVerticalAlign(jvertical_align_t align);
+
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetEnabled(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		bool GetEnabled();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVisible(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		bool IsVisible();
+
+		/**
+		 * \brief
+		 *
+		 */
+		bool IsSelected();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetSelected(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void AddChild(Item *item);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void AddChild(Item *item, int index);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void AddChilds(std::vector<Item *> &items);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void RemoveChild(int index);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void RemoveChild(Item *item);
+
+		/**
+		 * \brief
+		 *
+		 */
+		int GetChildsSize();
 
 		/**
 		 * \brief
@@ -75,50 +200,14 @@ class Cell : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void SetCellBackgroundColor(jcolor_t color);
+		jgui::OffScreenImage * GetImage();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCellForegroundColor(jcolor_t color);
+		jmenuitem_type_t GetType();
 
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCellBackgroundColor(int r, int g, int b, int a);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCellForegroundColor(int r, int g, int b, int a);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		jhorizontal_align_t GetHorizontalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetVerticalAlign(jvertical_align_t align);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		jvertical_align_t GetVerticalAlign();
-		
 };
 
 /**
@@ -126,218 +215,195 @@ class Cell : public virtual jcommon::Object{
  *
  * \author Jeff Ferr
  */
-class Table : public Component, public virtual jcommon::Object{
+class ItemComponent : public virtual jcommon::Object{
 
-	friend class Cell;
+	protected:
+		std::vector<SelectListener *> _listbox_listeners;
+		std::vector<Item *> _items,
+			_internal;
+		jcolor_t _item_color,
+						 _itemfocus_color;
+		std::string _text;
+		int _index;
+		bool _loop;
 
-	private:
-		std::vector<int> _row_size;
-		std::vector<int> _column_size;
-		std::vector<Cell *> _header;
-		std::vector<std::vector<Cell *> * > _cells;
-		int _column,
-			_row;
-		int _columns,
-			_rows;
-		int _grid_red,
-			_grid_green,
-			_grid_blue,
-			_grid_alpha;
-		bool _header_visible,
-			 _loop;
+	protected:
+		void AddInternalItem(Item *item);
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		Table(int x = 0, int y = 0, int width = 0, int height = 0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Table();
+		ItemComponent();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetLoop(bool loop);
+		virtual ~ItemComponent();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetNumberOfColumns();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetNumberOfRows();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetNumberOfColumns(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetNumberOfRows(int size);
+		virtual jcolor_t GetItemColor();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void InsertColumn(std::string text, int index = -1);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void InsertRow(std::string text, int index = -1);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveColumn(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveRow(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetHeaderValue(std::string text, int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetHeaderValue(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetHeaderVisible(bool visible);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		bool IsHeaderVisible();
+		virtual void SetItemColor(jcolor_t color);
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetCurrentColumn();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetCurrentRow();
+		virtual void SetItemColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
 		 *
 		 */
-		Cell * GetCurrentCell();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCurrentCell(int row, int column);
+		virtual jcolor_t GetItemFocusColor();
 
 		/**
 		 * \brief
 		 *
 		 */
-		Cell * GetCell(int row, int column);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCell(Cell *cell, int row, int column);
+		virtual void SetItemFocusColor(jcolor_t color);
 
 		/**
 		 * \brief
 		 *
 		 */
-		jcolor_t GetItemColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetGridColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetGridColor(int r, int g, int b, int a);
+		virtual void SetItemFocusColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetColumnSize(int index, int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetColumnSize(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetRowSize(int index, int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetRowSize(int index);
+		virtual int GetItemsSize();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(KeyEvent *event);
+		virtual void SetLoop(bool loop);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCurrentIndex(int i);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void AddEmptyItem();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Paint(Graphics *g);
+		virtual void AddTextItem(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void AddImageItem(std::string text, std::string image);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void AddCheckedItem(std::string text, bool checked);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void AddItem(Item *item);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void AddItem(Item *item, int index);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void AddItems(std::vector<Item *> &items);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveItem(Item *item);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveItem(int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveItems();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Item * GetItem(int index);
+	
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::vector<Item *> & GetItems();
+	
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Item * GetCurrentItem();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetCurrentIndex();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void RegisterSelectListener(SelectListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void RemoveSelectListener(SelectListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void DispatchSelectEvent(SelectEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		std::vector<SelectListener *> & GetSelectListeners();
 
 };
 

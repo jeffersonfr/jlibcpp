@@ -26,6 +26,9 @@ Watch::Watch(int x, int y, int width, int height, jwatch_type_t type):
 {
 	jcommon::Object::SetClassName("jgui::Watch");
 
+	_halign = CENTER_HALIGN;
+	_valign = CENTER_VALIGN;
+
 	_running = true;
 	_type = type;
 	_paused = false;
@@ -180,6 +183,34 @@ void Watch::SetHours(int i)
 	_hour = i;
 }
 
+void Watch::SetHorizontalAlign(jhorizontal_align_t align)
+{
+	if (_halign != align) {
+		_halign = align;
+
+		Repaint();
+	}
+}
+
+jhorizontal_align_t Watch::GetHorizontalAlign()
+{
+	return _halign;
+}
+
+void Watch::SetVerticalAlign(jvertical_align_t align)
+{
+	if (_valign != align) {
+		_valign = align;
+
+		Repaint();
+	}
+}
+
+jvertical_align_t Watch::GetVerticalAlign()
+{
+	return _valign;
+}
+		
 void Watch::Paint(Graphics *g)
 {	
 	// JDEBUG(JINFO, "paint\n");
@@ -194,6 +225,35 @@ void Watch::Paint(Graphics *g)
 	*/
 
 	if (IsFontSet() == true) {
+		if (_has_focus == true) {
+			g->SetColor(_fgfocus_color);
+		} else {
+			g->SetColor(_fg_color);
+		}
+
+		int x = _horizontal_gap+_border_size,
+				y = _vertical_gap+_border_size,
+				w = _size.width-2*x,
+				h = _size.height-2*y,
+				gapx = 0,
+				gapy = 0;
+		int px = x+gapx,
+				py = y+(h-_font->GetHeight())/2+gapy,
+				pw = w-gapx,
+				ph = h-gapy;
+
+		x = (x < 0)?0:x;
+		y = (y < 0)?0:y;
+		w = (w < 0)?0:w;
+		h = (h < 0)?0:h;
+
+		px = (px < 0)?0:px;
+		py = (py < 0)?0:py;
+		pw = (pw < 0)?0:pw;
+		ph = (ph < 0)?0:ph;
+
+		std::string text;
+
 		if (_type == ANALOGIC_WATCH) {
 			time_t raw;
 			char *t;
@@ -203,24 +263,25 @@ void Watch::Paint(Graphics *g)
 
 			t[19] = '\0';
 
-			g->SetColor(_fg_color);
-			g->DrawString((char *)(t+10), 5, (CENTER_VERTICAL_TEXT), _size.width, _size.height, CENTER_ALIGN);
+			text = (char *)(t+10);
 		} else if (_type == CRONOMETERUP_WATCH || _type == CRONOMETERDOWN_WATCH) {
 			char tmp[256];
 
 			sprintf(tmp, "%02d:%02d:%02d", _hour, _minute, _second);
 
-			g->SetColor(_fg_color);
-			g->DrawString(tmp, 5, (CENTER_VERTICAL_TEXT), _size.width, _size.height, CENTER_ALIGN);
+			text = tmp;
 		}
+		
+		// if (_wrap == false) {
+			text = _font->TruncateString(text, "...", w);
+		// }
+
+		g->SetClip(0, 0, x+w, y+h);
+		g->DrawString(text, px, py, pw, ph, _halign, _valign);
+		g->SetClip(0, 0, _size.width, _size.height);
 	}
 
-	PaintBorder(g);
-	
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _size.width, _size.height);
-	}
+	PaintEdges(g);
 }
 
 }

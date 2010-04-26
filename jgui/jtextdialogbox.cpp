@@ -17,73 +17,52 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jyesnodialog.h"
+#include "jtextdialogbox.h"
 
 namespace jgui {
 
-YesNoDialog::YesNoDialog(std::string title, std::string msg, int x, int y):
-	jgui::Frame(title, x, y, 1000, 1)
+TextDialogBox::TextDialogBox(std::string msg, int x, int y, bool wrap):
+   	jgui::Frame("", x, y, 1000, 1)
 {
-	jcommon::Object::SetClassName("jgui::YesNoDialog");
+	jcommon::Object::SetClassName("jgui::TextDialogBox");
 
-	int lines = Component::CountLines(msg, _size.width-_insets.left-_insets.right-20, _font);
-
-	if (lines <= 0) {
-		lines = 1;
-	}
-
-	SetSize(1000, (_font->GetHeight())*(lines)+100);
-
-	_label = new Label(msg, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, (lines)*_font->GetHeight()+10);
+	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
 
 	_label->SetGap(10, 10);
 	_label->SetWrap(true);
-	_label->SetTruncated(false);
+	_label->SetHorizontalAlign(JUSTIFY_HALIGN);
+	_label->SetVerticalAlign(TOP_VALIGN);
 
-	_no = new Button("N\xe3o", _size.width-(1*200+60)+30, _label->GetY()+_label->GetHeight()+20, 200, 40);
-	_yes = new Button("Sim", _size.width-(2*200+60), _label->GetY()+_label->GetHeight()+20, 200, 40);
-	
-	_no->SetNavigation(_yes, NULL, _yes, NULL);
-	_yes->SetNavigation(NULL, _no, NULL, _no);
-
-	_no->SetAlign(CENTER_ALIGN);
-	_yes->SetAlign(CENTER_ALIGN);
-
-	_no->RegisterButtonListener(this);
-	_yes->RegisterButtonListener(this);
+	_label->SetSize(_label->GetPreferredSize());
 
 	Add(_label);
-	Add(_no);
-	Add(_yes);
-
-	_no->RequestFocus();
 
 	Pack();
 }
 
-YesNoDialog::~YesNoDialog() 
+TextDialogBox::~TextDialogBox() 
 {
-	jthread::AutoLock lock(&_yesno_mutex);
-
-	delete _label;
-	delete _yes;
-	delete _no;
+		delete _label;
 }
 
-int YesNoDialog::GetResponse()
+void TextDialogBox::SetHorizontalAlign(jhorizontal_align_t align)
 {
-		if (GetComponentInFocus() == _yes) {
-			return 1;
-		} else {
-			return 0;
-		}
+	_label->SetHorizontalAlign(align);
 }
 
-void YesNoDialog::ActionPerformed(jgui::ButtonEvent *event)
+jhorizontal_align_t TextDialogBox::GetHorizontalAlign()
 {
-		jthread::AutoLock lock(&_yesno_mutex);
+	return _label->GetHorizontalAlign();
+}
 
-		Release();
+void TextDialogBox::SetVerticalAlign(jvertical_align_t align)
+{
+	_label->SetVerticalAlign(align);
+}
+
+jvertical_align_t TextDialogBox::GetVerticalAlign()
+{
+	return _label->GetVerticalAlign();
 }
 
 }

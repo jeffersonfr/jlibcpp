@@ -30,8 +30,10 @@ ProgressBar::ProgressBar(int x, int y, int width, int height, jprogress_type_t t
 	_label_visible = true;
 	_running = false;
 	_type = type;
-	_indeterminate = false;
+	_indeterminate = true;
 	_position = 0.0;
+	_fixe_delta = 10;
+	_delta = _fixe_delta;
 }
 
 ProgressBar::~ProgressBar()
@@ -131,8 +133,8 @@ void ProgressBar::Release()
 
 void ProgressBar::Run()
 {
+	_running = true;
 	_index = 0;
-	_fixe_delta = 10;
 	_delta = _fixe_delta;
 
 	while (_running == true) {
@@ -152,89 +154,122 @@ void ProgressBar::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	{
-		if (_indeterminate == false) {
-			if (_type == LEFT_RIGHT_DIRECTION) {
-				double d = (_position/100.0)*_size.width;
+	jcolor_t color;
 
-				if (d > _size.width) {
-					d = _size.width;
-				}
+	color.red = 0x80;
+	color.green = 0x80;
+	color.blue = 0xe0;
+	color.alpha = 0xff;
 
-				g->SetColor(_bgfocus_color);
+	int x = _vertical_gap-_border_size,
+			y = _horizontal_gap-_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y,
+			gapx = 0,
+			gapy = 0;
 
-				FillRectangle(g, 0, 0, (int)d, _size.height/2+1);
+	std::string text;
 
-				/*
-				g->FillGradientRectangle(_x, _y, (int)d, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-				g->FillGradientRectangle(_x, _y+_height/2, (int)d, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-				*/
+	if (_indeterminate == false) {
+		if (_type == LEFT_RIGHT_DIRECTION) {
+			double d = (_position*w)/100.0;
 
-				char t[255];
-
-				sprintf(t, "%.1f %%", _position);
-
-				if (_label_visible == true) {
-					g->SetColor(_fg_color);
-					g->DrawString((char *)t, _location.x, _location.y+(CENTER_VERTICAL_TEXT), _size.width, _size.height-4, CENTER_ALIGN);
-				}
-			} else if (_type == BOTTOM_UP_DIRECTION) {
-				double d = (_position/100.0)*_size.height;
-
-				if (d > _size.height) {
-					d = _size.height;
-				}
-
-				g->SetColor(_bgfocus_color);
-
-				FillRectangle(g, 0, 0, _size.width/2+1, (int)d);
-
-				/*
-				g->FillGradientRectangle(_x, _y, (int)d, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-				g->FillGradientRectangle(_x, _y+_height/2, (int)d, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-				*/
-
-				char t[255];
-
-				sprintf(t, "%.1f %%", _position);
-
-				if (_label_visible == true) {
-					g->SetColor(_fg_color);
-					g->DrawString((char *)t, _location.x, _location.y+(CENTER_VERTICAL_TEXT), _size.width, _size.height-4, CENTER_ALIGN);
-				}
+			if (d > w) {
+				d = w;
 			}
-		} else {
-			if (_type == LEFT_RIGHT_DIRECTION) {
+
+			g->SetColor(color);
+			FillRectangle(g, x, y, (int)d, h);
+
+			char t[255];
+
+			sprintf(t, "%.1f %%", _position);
+
+			text = (char *)t;
+		} else if (_type == BOTTOM_UP_DIRECTION) {
+			double d = (_position*h)/100.0;
+
+			if (d > h) {
+				d = h;
+			}
+
+			g->SetColor(color);
+			FillRectangle(g, x, y, w, (int)d);
+
+			char t[255];
+
+			sprintf(t, "%.1f %%", _position);
+
+			text = (char *)t;
+		}
+
+		if (_label_visible == true) {
+			if (_has_focus == true) {
+				g->SetColor(_fgfocus_color);
+			} else {
+				g->SetColor(_fg_color);
+			}
+
+			int px = x+gapx,
+					py = y+gapy,
+					pw = w-gapx,
+					ph = h-gapy;
+
+			x = (x < 0)?0:x;
+			y = (y < 0)?0:y;
+			w = (w < 0)?0:w;
+			h = (h < 0)?0:h;
+
+			px = (px < 0)?0:px;
+			py = (py < 0)?0:py;
+			pw = (pw < 0)?0:pw;
+			ph = (ph < 0)?0:ph;
+
+			// if (_wrap == false) {
+			text = _font->TruncateString(text, "...", w);
+			px = px+(w-_font->GetStringWidth(text))/2;
+			// }
+
+			g->SetClip(0, 0, x+w, y+h);
+			g->DrawString(text, px, py);
+			g->SetClip(0, 0, _size.width, _size.height);
+		}
+	} else {
+		if (_type == LEFT_RIGHT_DIRECTION) {
+			_index = _index + _delta;
+
+			if (_index > (w-40)) {
+				_delta = -_fixe_delta;
+				_index = w-40;
+			}
+
+			if (_index < 0) {
+				_delta = _fixe_delta;
+				_index = 0;
+			}
+
+			g->SetColor(color);
+			FillRectangle(g, x+_index, y, 40, h);
+		} else if (_type == BOTTOM_UP_DIRECTION) {
+			if (_type == BOTTOM_UP_DIRECTION) {
 				_index = _index + _delta;
 
-				if ((_index+50) >= (_size.width-_fixe_delta)) {
+				if (_index > (h-40)) {
 					_delta = -_fixe_delta;
-					_index = _size.width-_fixe_delta-50;
+					_index = h-40;
 				}
 
-				if (_index <= _fixe_delta) {
+				if (_index < 0) {
 					_delta = _fixe_delta;
-					_index = _fixe_delta;
+					_index = 0;
 				}
 
-				g->SetColor(_bgfocus_color);
-
-				FillRectangle(g, _index, 0, 50, _size.height/2+1);
-
-				/*
-				g->FillGradientRectangle(_x+_index, _y, 50, _height/2, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-				g->FillGradientRectangle(_x+_index, _y+_height/2, 50, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-				*/
-			} else if (_type == BOTTOM_UP_DIRECTION) {
+				g->SetColor(color);
+				FillRectangle(g, x, y+_index, w, 40);
 			}
 		}
-	}
 
-	PaintBorder(g);
-	
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		FillRectangle(g, 0, 0, _size.width, _size.height);
+		PaintEdges(g);
 	}
 }
 

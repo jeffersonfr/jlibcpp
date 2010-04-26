@@ -206,7 +206,7 @@ class CalendarDialog : public jgui::Frame, public jgui::ButtonListener, public j
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(CalendarEvent *event);
+		void DispatchCalendarEvent(CalendarEvent *event);
 	
 		/**
 		 * \brief

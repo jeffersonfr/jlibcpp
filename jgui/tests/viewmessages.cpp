@@ -1,5 +1,5 @@
 #include "viewmessages.h"
-#include "jyesnodialog.h"
+#include "jyesnodialogbox.h"
 #include "jcalendardialog.h"
 #include "jkeyboard.h"
 #include "addmessage.h"
@@ -37,7 +37,7 @@ ViewMessages::ViewMessages(AgendaDB *base, int x, int y):
 		label_hour = new jgui::Label(tmp, _insets.left+400+10, _insets.top, GetWidth()-400-10-_insets.left-_insets.right, dheight);
 		message = new jgui::Label(t->event, _insets.left, _insets.top+sheight, max_width, GetHeight()-240);
 
-		label_hour->SetAlign(jgui::RIGHT_ALIGN);
+		label_hour->SetHorizontalAlign(jgui::RIGHT_HALIGN);
 		message->SetWrap(true);
 
 		Add(label_date);
@@ -116,7 +116,7 @@ void ViewMessages::InputChanged(jgui::KeyEvent *event)
 		Update();
 	} else if (event->GetSymbol() == jgui::JKEY_F4 || event->GetSymbol() == jgui::JKEY_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialog dialog("Aviso", "Remover o compromisso atual ?", GetX(), GetY()+GetHeight()+10);
+			jgui::YesNoDialogBox dialog("Aviso", "Remover o compromisso atual ?", GetX(), GetY()+GetHeight()+10);
 
 			dialog.Show();
 

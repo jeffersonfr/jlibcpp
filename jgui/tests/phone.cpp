@@ -24,8 +24,8 @@
 
 #include "jkeyboard.h"
 #include "jcomponent.h"
-#include "jyesnodialog.h"
-#include "jmessagedialog.h"
+#include "jyesnodialogbox.h"
+#include "jmessagedialogbox.h"
 
 namespace mtel {
 
@@ -39,10 +39,10 @@ PhoneBook::PhoneBook(int x, int y):
 	_list = new jgui::ListBox(_insets.left, _insets.top, GetWidth()-_insets.left-_insets.right, 230);
 
 	_list->SetBackgroundVisible(false);
-	_list->AddItem("Buscar telefone");
-	_list->AddItem("Adicionar contato");
-	_list->AddItem("Limpar todos os contatos");
-	_list->AddItem("Estado da mem\xf3ria");
+	_list->AddTextItem("Buscar telefone");
+	_list->AddTextItem("Adicionar contato");
+	_list->AddTextItem("Limpar todos os contatos");
+	_list->AddTextItem("Estado da mem\xf3ria");
 	_list->RegisterSelectListener(this);
 
 	Add(_list);
@@ -71,41 +71,41 @@ PhoneBook::~PhoneBook()
 
 void PhoneBook::ItemSelected(jgui::SelectEvent *event)
 {
-		jthread::AutoLock lock(&phone_mutex);
+	jthread::AutoLock lock(&phone_mutex);
 
-		if (event->GetIndex() == 0) {
-				Hide();
+	if (_list->GetItem(0) == event->GetItem()) {
+		Hide();
 
-				SearchContacts app(db, GetX(), GetY());
+		SearchContacts app(db, GetX(), GetY());
 
-				app.Show();
+		app.Show();
 
-				Show(false);
-		} else if (event->GetIndex() == 1) {
-				Hide();
+		Show(false);
+	} else if (_list->GetItem(1) == event->GetItem()) {
+		Hide();
 
-				AddContact app(db, GetX(), 100);
+		AddContact app(db, GetX(), 100);
 
-				app.Show();
+		app.Show();
 
-				Show(false);
-		} else if (event->GetIndex() == 2) {
-				jgui::YesNoDialog dialog("Aviso", "Remover todos os registros ?", GetX()-50, GetY()+GetHeight()+10);
+		Show(false);
+	} else if (_list->GetItem(2) == event->GetItem()) {
+		jgui::YesNoDialogBox dialog("Aviso", "Remover todos os registros ?", GetX()-50, GetY()+GetHeight()+10);
 
-				dialog.Show();
+		dialog.Show();
 
-				if (dialog.GetLastKeyCode() != jgui::JKEY_EXIT && dialog.GetResponse() == 1) {
-						db->RemoveAll();
-				}
-		} else if (event->GetIndex() == 3) {
-				char tmp[255];
-
-				sprintf(tmp, "Contatos usados : %d/%d", db->GetSize(), db->GetCapacity());
-
-				jgui::MessageDialog dialog("Estado da mem\xf3ria", tmp, GetX()-50, GetY()+GetHeight()+10);
-
-				dialog.Show();
+		if (dialog.GetLastKeyCode() != jgui::JKEY_EXIT && dialog.GetResponse() == 1) {
+			db->RemoveAll();
 		}
+	} else if (_list->GetItem(3) == event->GetItem()) {
+		char tmp[255];
+
+		sprintf(tmp, "Contatos usados : %d/%d", db->GetSize(), db->GetCapacity());
+
+		jgui::MessageDialogBox dialog("Estado da mem\xf3ria", tmp, GetX()-50, GetY()+GetHeight()+10);
+
+		dialog.Show();
+	}
 }
 
 }

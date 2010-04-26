@@ -46,7 +46,9 @@ class Button : public Component{
 		int _index;
 
 	protected:
-		jalign_t _align;
+		jhorizontal_align_t _halign;
+		jvertical_align_t _valign;
+		bool _wrap;
 
 	public:
 		/**
@@ -101,19 +103,31 @@ class Button : public Component{
 		 * \brief
 		 *
 		 */
-		void SetAlign(jalign_t align);
+		void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jalign_t GetAlign();
+		jhorizontal_align_t GetHorizontalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetName();
+		void SetVerticalAlign(jvertical_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetText();
 
 		/**
 		 * \brief
@@ -149,7 +163,7 @@ class Button : public Component{
 		 * \brief
 		 *
 		 */
-		void DispatchEvent(ButtonEvent *event);
+		void DispatchButtonEvent(ButtonEvent *event);
 		
 		/**
 		 * \brief

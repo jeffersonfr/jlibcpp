@@ -352,72 +352,77 @@ void TextArea::DecLine()
 	Repaint();
 }
 
-void TextArea::GetLines(std::vector<std::string> *texts)
+void TextArea::GetLines(std::vector<std::string> &texts)
 {
-	std::vector<std::string> super_lines;
-	std::string temp,
-		previous,
-		paint_text = _text;
-	int i,
-			j,
-			word_size,
-			max = _size.width-2*_horizontal_gap;
-	
+	std::string text = _text;
+
 	if (EchoCharIsSet() == true) {
-		paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
+		text = text.replace(text.begin(), text.end(), text.size(), _echo_char);
 	}
 
-	jcommon::StringTokenizer t(paint_text, "\n", jcommon::SPLIT_FLAG, false);
+	if (_is_wrap == false) {
+		texts.push_back(jcommon::StringUtils::ReplaceString(text, "\n", " ") + " ");
 
-	if (_is_wrap == true) {
-		for (i=0; i<t.GetSize(); i++) {
-			temp = jcommon::StringUtils::ReplaceString(t.GetToken(i) + "\n", "\t", " ");
+		return;
+	}
 
-			super_lines.push_back(temp);
-		}
+	std::vector<std::string> words;
+	int font_height,
+			default_space;
 
-		for (i=0; i<(int)super_lines.size(); i++) {
-			jcommon::StringTokenizer w(super_lines[i], " ", jcommon::SPLIT_FLAG, true);
-			std::vector<std::string> words;
-			std::string s1,
-				s2;
+	int xp = _horizontal_gap+_border_size,
+			yp = _vertical_gap+_border_size,
+			wp = _size.width-2*xp,
+			hp = _size.height-2*yp;
 
-			for (j=0; j<w.GetSize(); j++) {
-				temp = w.GetToken(j);
+		xp = (xp < 0)?0:xp;
+		yp = (yp < 0)?0:yp;
+		wp = (wp < 0)?0:wp;
+		hp = (hp < 0)?0:hp;
 
-				if (_font->GetStringWidth(temp.c_str()) > max) {
-					bool flag = false;
+	default_space = _font->GetStringWidth(" ");
+	font_height = _font->GetAscender() + _font->GetDescender();
 
-					while (flag == false) {
-						unsigned int p = 1;
+	if (font_height < 1) {
+		return;
+	}
 
-						while (p < temp.size()) {
-							p++;
+	jcommon::StringTokenizer token(text, "\n", jcommon::SPLIT_FLAG, false);
+	std::vector<std::string> lines;
 
-							if (_font->GetStringWidth(temp.substr(0, p)) >= max) {
-								p--;
+	for (int i=0; i<token.GetSize(); i++) {
+		std::vector<std::string> words;
+		
+		std::string line = token.GetToken(i);
 
-								if (p < 0) {
-									p = 0;
-								}
+		line = jcommon::StringUtils::ReplaceString(line, "\n", "");
+		line = jcommon::StringUtils::ReplaceString(line, "\t", "    ");
+		
+		/*
+		if (halign == JUSTIFY_HALIGN) {
+			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, false);
 
-								break;
+			std::string temp,
+				previous;
 
-								break;
-							}
+			for (int j=0; j<line_token.GetSize(); j++) {
+				temp = jcommon::StringUtils::Trim(line_token.GetToken(j));
+
+				if (_font->GetStringWidth(temp) > wp) {
+					int p = 1;
+
+					while (p < (int)temp.size()) {
+						if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
+							words.push_back(temp.substr(0, p-1));
+
+							temp = temp.substr(p-1);
+
+							p = 1;
 						}
+					}
 
+					if (temp != "") {
 						words.push_back(temp.substr(0, p));
-
-						if (p < temp.size()) {
-							temp = temp.substr(p);
-						} else {
-							flag = true;
-						}
-
-						if (temp.size() == 0 || p <= 1) {
-							flag = true;
-						}
 					}
 				} else {
 					words.push_back(temp);
@@ -426,22 +431,64 @@ void TextArea::GetLines(std::vector<std::string> *texts)
 
 			temp = words[0];
 
-			for (j=1; j<(int)words.size(); j++) {
+			for (int j=1; j<(int)words.size(); j++) {
 				previous = temp;
-				temp += words[j];
+				temp += " " + words[j];
 
-				word_size = _font->GetStringWidth(temp.c_str());
-
-				if (word_size > max) {
+				if (_font->GetStringWidth(temp) > wp) {
 					temp = words[j];
-					texts->push_back(previous);
+
+					texts.push_back(previous);
 				}
 			}
 
-			texts->push_back(temp);
+			texts.push_back("\n" + temp);
+		} else 
+		*/{
+			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, true);
+
+			std::string temp,
+				previous;
+
+			for (int j=0; j<line_token.GetSize(); j++) {
+				temp = line_token.GetToken(j);
+
+				if (_font->GetStringWidth(temp) > wp) {
+					int p = 1;
+
+					while (p < (int)temp.size()) {
+						if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
+							words.push_back(temp.substr(0, p-1));
+
+							temp = temp.substr(p-1);
+
+							p = 1;
+						}
+					}
+
+					if (temp != "") {
+						words.push_back(temp.substr(0, p));
+					}
+				} else {
+					words.push_back(temp);
+				}
+			}
+
+			temp = words[0];
+			
+			for (int j=1; j<(int)words.size(); j++) {
+				previous = temp;
+				temp += words[j];
+
+				if (_font->GetStringWidth(temp.c_str()) > wp) {
+					temp = words[j];
+
+					texts.push_back(previous);
+				}
+			}
+
+			texts.push_back(temp);
 		}
-	} else {
-		texts->push_back(jcommon::StringUtils::ReplaceString(paint_text, "\n", " ") + " ");
 	}
 }
 
@@ -451,23 +498,24 @@ void TextArea::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int width = _size.width-2*_horizontal_gap,
-			height = _size.height-2*_vertical_gap;
+	int x = _horizontal_gap+_border_size,
+			y = _vertical_gap+_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y;
 
 	if (IsFontSet() == true) {
-		int font_height = _font->GetHeight();
+		int font_height = _font->GetAscender()+_font->GetDescender();
 
 		std::vector<std::string> super_lines, 
 			lines,
 			texts;
 		int i,
-				font_space = 0, //_font->GetDescender(),
 				text_size;
 		int current_length = _position,
 				current_text_size,
 				line_number = 0;
 
-		GetLines(&texts);
+		GetLines(texts);
 
 		// INFO:: line number
 		for (i=0; i<=(int)texts.size()-1; i++) {
@@ -520,17 +568,14 @@ void TextArea::Paint(Graphics *g)
 
 		_line_op = 0;
 
-		int max_lines = height/(font_height+font_space)+0;
+		int max_lines = h/font_height;
 
-		// CHANGE:: ao menos 1 linha visivel
 		if (max_lines < 1) {
 			max_lines = 1;
 		}
 
-		g->SetColor(_fg_color);
-
 		{
-			g->SetClip(_horizontal_gap, _vertical_gap, width, height);
+			g->SetClip(x, y, w, h);
 
 			// INFO:: Draw text
 			for (int i=0, k=0; i<=(int)texts.size()-1; i++) {
@@ -540,20 +585,24 @@ void TextArea::Paint(Graphics *g)
 				text_size = _font->GetStringWidth(texts[i].substr(0, _position).c_str());
 
 				if (line_number-- < max_lines) {
-					if (strchr(s.c_str(), '\n') == NULL) {
-						g->DrawString(s, _horizontal_gap, (unsigned)(k*(font_height+font_space))+font_space+_vertical_gap);
-					} else {
-						g->DrawString(s.substr(0, s.size()-1), _horizontal_gap, (unsigned)(k*(font_height+font_space))+font_space+_vertical_gap);
+					if (strchr(s.c_str(), '\n') != NULL) {
+						s = s.substr(0, s.size()-1);
 					}
+					
+					if (_has_focus == true) {
+						g->SetColor(_fgfocus_color);
+					} else {
+						g->SetColor(_fg_color);
+					}
+
+					g->DrawString(s, x, y+k*font_height);
 
 					if (_is_editable == true && _cursor_visible == true && current_length < (int)s.size() && current_length >= 0) {
 						if (HasFocus() == true) {
-							g->SetColor(0xff, 0x00, 0x00, 0xff);
-
 							std::string cursor;
 
 							if (_cursor_type == UNDERSCORE_CURSOR) {
-								cursor = "|";
+								cursor = "_";
 							} else if (_cursor_type == STICK_CURSOR) {
 								cursor = "|";
 							} else if (_cursor_type == BLOCK_CURSOR) {
@@ -561,9 +610,9 @@ void TextArea::Paint(Graphics *g)
 							}
 
 							current_text_size = _font->GetStringWidth(texts[i].substr(0, current_length).c_str());
-							g->DrawString(cursor, _horizontal_gap+current_text_size, (int)(k*(font_height+font_space))+font_space+_vertical_gap);
 
-							g->SetColor(_fg_color);
+							g->SetColor(0xff, 0x00, 0x00, 0xff);
+							g->DrawString(cursor, x+current_text_size, y+k*font_height);
 
 							current_length = -1;
 						}
@@ -581,16 +630,11 @@ void TextArea::Paint(Graphics *g)
 				}
 			}
 				
-			g->ReleaseClip();
+			g->SetClip(0, 0, _size.width, _size.height);
 		}
 	}
 
-	PaintBorder(g);
-
-	if (_enabled == false) {
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _size.width, _size.height);
-	}
+	PaintEdges(g);
 }
 
 void TextArea::Clear()
@@ -664,7 +708,7 @@ void TextArea::Insert(std::string text, int pos)
 		Repaint();
 	}
 
-	DispatchEvent(new TextEvent(this, _text));
+	DispatchTextEvent(new TextEvent(this, _text));
 }
 
 void TextArea::Append(std::string text)
@@ -693,7 +737,7 @@ void TextArea::SetText(std::string text)
 
 	Repaint();
 	
-	DispatchEvent(new TextEvent(this, _text));
+	DispatchTextEvent(new TextEvent(this, _text));
 }
 
 void TextArea::Backspace()
@@ -746,7 +790,7 @@ void TextArea::Delete()
 
 	Repaint();
 
-	DispatchEvent(new TextEvent(this, _text));
+	DispatchTextEvent(new TextEvent(this, _text));
 }
 
 std::string TextArea::GetText()
@@ -788,7 +832,7 @@ void TextArea::RemoveTextListener(TextListener *listener)
 	}
 }
 
-void TextArea::DispatchEvent(TextEvent *event)
+void TextArea::DispatchTextEvent(TextEvent *event)
 {
 	if (event == NULL) {
 		return;

@@ -58,13 +58,12 @@ enum jmarquee_type_t {
 class Marquee : public Component, public jthread::Thread{
 
 	private:
-		std::string full_text;
+		std::string _text;
 		jmarquee_type_t _type;
 		int _position,
-			_delta,
-			_fixe_delta,
-			_interval,
-			_index;
+				_delta,
+				_interval,
+				_index;
 		bool _running;
 
 	public:
@@ -72,7 +71,7 @@ class Marquee : public Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		Marquee(int x = 0, int y = 0, int width = 0, int height = 0);
+		Marquee(std::string text, int x = 0, int y = 0, int width = 0, int height = 0);
 		
 		/**
 		 * \brief
@@ -103,6 +102,12 @@ class Marquee : public Component, public jthread::Thread{
 		 *
 		 */
 		void SetText(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetText();
 		
 		/**
 		 * \brief

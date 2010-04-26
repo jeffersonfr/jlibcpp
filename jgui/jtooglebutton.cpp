@@ -24,9 +24,11 @@
 namespace jgui {
 
 ToogleButton::ToogleButton(std::string label, int x, int y, int width, int height):
-	ImageButton("", label, x, y, width, height)
+	ImageButton(label, "", x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::ToogleButton");
+
+	_halign = CENTER_HALIGN;
 
 	_is_pressed = false;
 	
@@ -34,7 +36,7 @@ ToogleButton::ToogleButton(std::string label, int x, int y, int width, int heigh
 }
 
 ToogleButton::ToogleButton(std::string image, std::string label, int x, int y, int width, int height):
-	ImageButton(image, label, x, y, width, height)
+	ImageButton(label, image, x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::ToogleButton");
 
@@ -84,7 +86,7 @@ bool ToogleButton::ProcessEvent(MouseEvent *event)
 
 		RequestFocus();
 		Repaint();
-		DispatchEvent(new ButtonEvent(this, GetName()));
+		DispatchButtonEvent(new ButtonEvent(this, GetText()));
 	}
 
 	return catched;
@@ -113,7 +115,7 @@ bool ToogleButton::ProcessEvent(KeyEvent *event)
 
 		Repaint();
 
-		DispatchEvent(new ButtonEvent(this, GetName()));
+		DispatchButtonEvent(new ButtonEvent(this, GetText()));
 
 		catched = true;
 	}
@@ -125,81 +127,7 @@ void ToogleButton::Paint(Graphics *g)
 {
 	JDEBUG(JINFO, "paint\n");
 
-	Component::Paint(g);
-
-	int font_height = DEFAULT_COMPONENT_HEIGHT;
-	
-	if (_font != NULL) {
-		font_height = _font->GetHeight();
-	}
-
-	g->SetFont(_font);
-
-	{
-		/*
-		if (_has_focus == true) {
-			if (_is_pressed == true) {
-				g->FillGradientRectangle(0, 0, _size.width, _height/2+1, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-				g->FillGradientRectangle(0, _height/2, _size.width, _height/2, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-			} else {
-				g->FillGradientRectangle(0, 0, _size.width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-				g->FillGradientRectangle(0, _height/2, _size.width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-			}
-		} else {
-			if (_is_pressed == true) {
-				g->SetColor(_fg_color);
-				g->FillRectangle(0, 0, _size.width, _height);
-			}
-		}
-		*/
-
-		int align_dx = 10;
-
-		if (_align == 1) {
-			align_dx = 0;
-		}
-
-		g->SetColor(_fg_color);
-
-		/*
-		if (_is_pressed == true) {
-			g->SetColor(_bg_color);
-		} else {
-			g->SetColor(_fg_color);
-		}
-		*/
-		
-		if (_image != "") {
-			if (GetName() == "") {
-				if (_has_focus == true) {
-					if (prefetch2 != NULL) {
-						g->DrawImage(prefetch2, 0, 0, _size.width, _size.height);
-					} else {
-						g->DrawImage(prefetch1, 0, 0, _size.width, _size.height);
-					}
-				} else {
-					g->DrawImage(prefetch1, 0, 0, _size.width, _size.height);
-				}
-			} else {
-				int ts = _size.width-(15+font_height+2*(align_dx+_border_size));
-
-				if (ts < 0) {
-					ts = 0;
-				}
-
-				g->DrawString(TruncateString(GetName(), ts), align_dx, (CENTER_VERTICAL_TEXT), _size.width-align_dx, font_height, LEFT_ALIGN);
-				g->DrawImage(prefetch1, 5, 0, _size.height, _size.height);
-			}
-		} else {
-			int ts = _size.width-2*(align_dx+_border_size);
-
-			if (ts < 0) {
-				ts = 0;
-			}
-
-			g->DrawString(TruncateString(GetName(), ts), align_dx, (CENTER_VERTICAL_TEXT), _size.width-align_dx, _size.height, _align);
-		}
-	}
+	ImageButton::Paint(g);
 
 	if(_is_pressed == true) {
 		jcolor_t color = _bg_color;
@@ -210,15 +138,6 @@ void ToogleButton::Paint(Graphics *g)
 		g->SetColor(color);
 		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
-
-	PaintBorder(g);
-
-	if (_enabled == false) {
-		g->SetDrawingFlags(DF_BLEND);
-		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _size.width, _size.height);
-	}
-
 }
 
 }

@@ -17,60 +17,72 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmessagedialog.h"
+#ifndef J_TEXTDIALOGBOX_H
+#define J_TEXTDIALOGBOX_H
+
+#include "jbutton.h"
+#include "jbuttonlistener.h"
+#include "jlabel.h"
+#include "jframe.h"
+
+#include "jthread.h"
+#include "jmutex.h"
+#include "jdate.h"
+
+#include <string>
+#include <iostream>
+#include <vector>
+
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
 
 namespace jgui {
 
-MessageDialog::MessageDialog(std::string title, std::string msg, int x, int y):
-   	jgui::Frame(title, x, y, 1000, 1)
-{
-	jcommon::Object::SetClassName("jgui::MessageDialog");
+class TextDialogBox : public jgui::Frame{
 
-	int lines = Component::CountLines(msg, _size.width-_insets.left-_insets.right-20, _font);
+	private:
+		Label *_label;
 
-	if (lines <= 0) {
-		lines = 1;
-	}
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		TextDialogBox(std::string msg, int x, int y, bool wrap = false);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~TextDialogBox();
 
-	SetSize(1000, (_font->GetHeight())*(lines)+100);
+		/**
+		 * \brief
+		 *
+		 */
+		void SetHorizontalAlign(jhorizontal_align_t align);
 
-	_label = new Label(msg, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, (lines)*_font->GetHeight()+10);
+		/**
+		 * \brief
+		 *
+		 */
+		jhorizontal_align_t GetHorizontalAlign();
 
-	_label->SetGap(10, 10);
-	_label->SetWrap(true);
-	_label->SetTruncated(false);
+		/**
+		 * \brief
+		 *
+		 */
+		void SetVerticalAlign(jvertical_align_t align);
 
-	_ok = new Button("Ok", _size.width-(1*200+60)+30, _label->GetY()+_label->GetHeight()+20, 200, 40);
-	
-	_ok->SetAlign(CENTER_ALIGN);
-	_ok->RegisterButtonListener(this);
+		/**
+		 * \brief
+		 *
+		 */
+		jvertical_align_t GetVerticalAlign();
 
-	Add(_label);
-	Add(_ok);
-
-	_ok->RequestFocus();
-
-	Pack();
-}
-
-MessageDialog::~MessageDialog() 
-{
-		jthread::AutoLock lock(&_message_mutex);
-
-		delete _label;
-		delete _ok;
-}
-
-void MessageDialog::SetAlign(jalign_t align)
-{
-	_label->SetAlign(align);
-}
-	
-void MessageDialog::ActionPerformed(jgui::ButtonEvent *event)
-{
-		jthread::AutoLock lock(&_message_mutex);
-
-		Release();
-}
+};
 
 }
+
+#endif 

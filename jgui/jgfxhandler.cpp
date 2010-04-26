@@ -212,9 +212,10 @@ int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	}
 
 	/* Fill the window description. */
-	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_SURFACE_CAPS);
+	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_SURFACE_CAPS | DWDESC_PIXELFORMAT);
 	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION); // | DWCAPS_DOUBLEBUFFER);
 	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE);
+	desc.pixelformat = DSPF_ARGB;
 	desc.posx   = x;
 	desc.posy   = y;
 	desc.width  = width;
