@@ -54,6 +54,11 @@ void Object::AddParent(std::string parent)
 	}
 }
 
+std::vector<std::string> & Object::GetParents()
+{
+	return _parents;
+}
+
 std::string Object::GetNameSpace()
 {
 	return _namespace;
@@ -114,9 +119,9 @@ Object * Object::Clone()
 	return this;
 }
 
-unsigned long long Object::Hash()
+uint64_t Object::Hash()
 {
-	return (unsigned long long)(unsigned long)this;
+	return (uint64_t)(unsigned long)this;
 }
 
 std::string Object::what()

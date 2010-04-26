@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include <stdint.h>
+
 namespace jcommon {
 
 /**
@@ -59,6 +61,12 @@ class Object{
 		 */
 		void AddParent(std::string parent);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		std::vector<std::string> & GetParents();
+
 		/**
 		 * \brief
 		 *
@@ -111,8 +119,8 @@ class Object{
 		 * \brief
 		 *
 		 */
-		virtual void Copy(Object *);
-		
+		void Copy(Object *o);
+
 		/**
 		 * \brief
 		 *
@@ -123,7 +131,7 @@ class Object{
 		 * \brief
 		 * 
 		 */
-		virtual unsigned long long Hash();
+		virtual uint64_t Hash();
 		
 		/**
 		 * \brief
