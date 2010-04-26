@@ -21,6 +21,7 @@
 #define J_TREE_H
 
 #include "jmenu.h"
+#include "jitemcomponent.h"
 
 #include <string>
 #include <iostream>
@@ -32,28 +33,56 @@
 
 namespace jgui {
 
-class MenuItem;
-class TreeComponent;
-
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class Tree : public jgui::Component{
-
-	friend class TreeComponent;
+class Tree : 
+	public jgui::Component,
+	public jgui::ItemComponent
+{
 
 	private:
 		jthread::Mutex _tree_mutex;
 
-		std::vector<Tree *> _trees;
-		std::vector<MenuListener *> _tree_listeners;
-		MenuItem *_current_item;
-		TreeComponent *_list;
-		int _visible_items;
-		jmenu_align_t _menu_align;
-		jcolor_t _item_color;
+		jgui::OffScreenImage *_icon_plus,
+			*_icon_minus;
+		std::string _title;
+		int _top_index,
+				_item_size,
+				_centered_interaction;
+
+	private:
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void MousePressed(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void MouseReleased(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void MouseClicked(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void MouseMoved(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void MouseWheel(MouseEvent *event);
 
 	public:
 		/**
@@ -72,276 +101,46 @@ class Tree : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void SetTreeAlign(jmenu_align_t align);
+		virtual void SetTitle(std::string title);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetItemsSize();
-		
-		/**
+		void SetCenteredInteraction(bool b);
+
+		/*
 		 * \brief
 		 *
 		 */
-		int GetVisibleItems();
-		
-		/**
+		virtual void SetCurrentIndex(int i);
+
+		/*
 		 * \brief
 		 *
 		 */
-		void SetLoop(bool loop);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		jcolor_t GetItemColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCurrentIndex(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddMenuItem(MenuItem *item);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		MenuItem * GetCurrentItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetCurrentIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveItem(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveAll();
+		virtual Item * GetCurrentItem();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RegisterMenuListener(MenuListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveMenuListener(MenuListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DispatchMenuEvent(MenuEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<MenuListener *> & GetMenuListeners();
+		virtual int GetCurrentIndex();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool ProcessEvent(KeyEvent *event);
-
-};
-
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class TreeComponent : public Component{
-
-	friend class Tree;
-
-	private:
-		std::vector<MenuItem *>_items;
-		OffScreenImage *prefetch;
-		Tree *_tree;
-		int bx,
-			by,
-			bwidth,
-			bheight,
-			_item_size,
-			_index,
-			_visible_items,
-			_paint_count,
-			_vertical_gap,
-			_horizontal_gap;
-		jcolor_t _item_color;
-		float delta;
-		bool _input_locked,
-			 _arrows_visible,
-			 _loop;
-
-		/**
-		 * \brief
-		 *
-		 */
-		void SetTree(Tree *tree);
-
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		TreeComponent(int x, int y, int width, int visible_items);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~TreeComponent();
-
-		/**
-		 * \brief
-		 *
-		 */
-		void SetGap(int hgap, int vgap);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetLoop(bool loop);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		jcolor_t GetItemColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCurrentIndex(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddEmptyItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddItem(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddItem(std::string text, std::string image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddItem(std::string text, bool checked);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void AddMenuItem(MenuItem *item);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		MenuItem * GetMenuItem(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		MenuItem * GetCurrentMenuItem();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetCurrentIndex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetItemsSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveItem(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveAll();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool ProcessEvent(KeyEvent *event);
-		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void Paint(Graphics *g);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool ProcessEvent(KeyEvent *event);
+
 };
 
 }
 
-#endif 
+#endif
