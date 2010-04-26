@@ -20,8 +20,6 @@
 #ifndef	J_ITEMCOMPONENT_H
 #define J_ITEMCOMPONENT_H
 
-#include "jcomponent.h"
-#include "jselectlistener.h"
 #include "joffscreenimage.h"
 
 #include <string>
@@ -42,6 +40,9 @@ enum jmenuitem_type_t {
 	CHECK_MENU_ITEM,
 	EMPTY_MENU_ITEM
 };
+
+class SelectEvent;
+class SelectListener;
 
 class Item : public virtual jcommon::Object{
 
@@ -218,7 +219,7 @@ class Item : public virtual jcommon::Object{
 class ItemComponent : public virtual jcommon::Object{
 
 	protected:
-		std::vector<SelectListener *> _listbox_listeners;
+		std::vector<SelectListener *> _select_listeners;
 		std::vector<Item *> _items,
 			_internal;
 		jcolor_t _item_color,

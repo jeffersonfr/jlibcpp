@@ -19,14 +19,16 @@
  ***************************************************************************/
 #include "jitemcomponent.h"
 #include "jruntimeexception.h"
+#include "jselectlistener.h"
 
 #include <algorithm>
 
 namespace jgui {
 
-Item::Item()
+Item::Item():
+	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Item");
+	jcommon::Object::SetClassName("jgui::Item");
 
 	_halign = CENTER_HALIGN;
 	_valign = CENTER_VALIGN;
@@ -38,9 +40,10 @@ Item::Item()
 	_type = EMPTY_MENU_ITEM;
 }
 
-Item::Item(std::string value)
+Item::Item(std::string value):
+	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Item");
+	jcommon::Object::SetClassName("jgui::Item");
 
 	_halign = CENTER_HALIGN;
 	_valign = CENTER_VALIGN;
@@ -53,9 +56,10 @@ Item::Item(std::string value)
 	_type = TEXT_MENU_ITEM;
 }
 
-Item::Item(std::string value, std::string image)
+Item::Item(std::string value, std::string image):
+	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Item");
+	jcommon::Object::SetClassName("jgui::Item");
 
 	_halign = CENTER_HALIGN;
 	_valign = CENTER_VALIGN;
@@ -81,9 +85,10 @@ Item::Item(std::string value, std::string image)
 	}
 }
 
-Item::Item(std::string value, bool checked)
+Item::Item(std::string value, bool checked):
+	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Item");
+	jcommon::Object::SetClassName("jgui::Item");
 
 	_halign = CENTER_HALIGN;
 	_valign = CENTER_VALIGN;
@@ -439,8 +444,8 @@ void ItemComponent::RegisterSelectListener(SelectListener *listener)
 		return;
 	}
 
-	if (std::find(_listbox_listeners.begin(), _listbox_listeners.end(), listener) == _listbox_listeners.end()) {
-		_listbox_listeners.push_back(listener);
+	if (std::find(_select_listeners.begin(), _select_listeners.end(), listener) == _select_listeners.end()) {
+		_select_listeners.push_back(listener);
 	}
 }
 
@@ -450,10 +455,10 @@ void ItemComponent::RemoveSelectListener(SelectListener *listener)
 		return;
 	}
 
-	std::vector<SelectListener *>::iterator i = std::find(_listbox_listeners.begin(), _listbox_listeners.end(), listener);
+	std::vector<SelectListener *>::iterator i = std::find(_select_listeners.begin(), _select_listeners.end(), listener);
 
-	if (i != _listbox_listeners.end()) {
-		_listbox_listeners.erase(i);
+	if (i != _select_listeners.end()) {
+		_select_listeners.erase(i);
 	}
 }
 
@@ -465,8 +470,8 @@ void ItemComponent::DispatchSelectEvent(SelectEvent *event)
 
 	int k=0;
 
-	while (k++ < (int)_listbox_listeners.size()) {
-		SelectListener *listener = _listbox_listeners[k-1];
+	while (k++ < (int)_select_listeners.size()) {
+		SelectListener *listener = _select_listeners[k-1];
 
 		if (event->GetType() == ACTION_ITEM) {
 			listener->ItemSelected(event);
@@ -476,7 +481,7 @@ void ItemComponent::DispatchSelectEvent(SelectEvent *event)
 	}
 
 	/*
-	for (std::vector<SelectListener *>::iterator i=_listbox_listeners.begin(); i!=_listbox_listeners.end(); i++) {
+	for (std::vector<SelectListener *>::iterator i=_select_listeners.begin(); i!=_select_listeners.end(); i++) {
 		if (event->GetType() == ACTION_ITEM) {
 			(*i)->ItemSelected(event);
 		} else {
@@ -490,7 +495,7 @@ void ItemComponent::DispatchSelectEvent(SelectEvent *event)
 
 std::vector<SelectListener *> & ItemComponent::GetSelectListeners()
 {
-	return _listbox_listeners;
+	return _select_listeners;
 }
 
 }

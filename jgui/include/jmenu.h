@@ -58,8 +58,6 @@ class Menu :
 	public jgui::ItemComponent 
 {
 
-	friend class ComboBox;
-
 	private:
 		jthread::Mutex _menu_mutex;
 

@@ -22,6 +22,7 @@
 
 #include <sstream>
 
+#include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
 
@@ -53,12 +54,13 @@ void StringTokenizer::BuildTokens(std::string string_, std::string token_, jtoke
 	*/
 
 	if (flag_ == TOKEN_FLAG) {
-		unsigned long idx = 0; 
+		std::string::size_type idx = 0; 
 		
 		while (true) {
 			if (idx < string_.size()) {
 				std::string::size_type s = string_.find_first_of(token_, idx);
 				std::string::size_type e = string_.find_first_not_of(token_, idx);
+
 				if ( !(s == idx && return_tokens_) ) {
 					s = e;
 					e = string_.find_first_of(token_, s);
@@ -78,7 +80,7 @@ void StringTokenizer::BuildTokens(std::string string_, std::string token_, jtoke
 			}
 		}
 	} else if (flag_ == SPLIT_FLAG) {
-		unsigned int pos = string_.find(token_);
+		std::string::size_type pos = string_.find(token_);
 
 		/*
 		// CHANGE:: remove pos != 0, caso entre em loop

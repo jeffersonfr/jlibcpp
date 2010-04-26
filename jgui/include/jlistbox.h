@@ -71,7 +71,6 @@ class ListBox :
 {
 
 	private:
-		std::vector<SelectListener *> _listbox_listeners;
 		jlist_scroll_type_t _scroll;
 		jlist_selection_type_t _selection;
 		int _item_size,

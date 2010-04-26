@@ -21,6 +21,7 @@
 #define J_SELECTEVENT_H
 
 #include "jeventobject.h"
+#include "jitemcomponent.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -34,8 +35,6 @@
 #include <time.h>
 
 namespace jgui {
-
-class Item;
 
 /**
  * \brief

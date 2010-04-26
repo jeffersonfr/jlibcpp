@@ -26,7 +26,8 @@ namespace jgui {
 
 Menu::Menu(int x, int y, int width, int visible_items):
  	jgui::Frame("", x, y, width, 1),
-	jgui::FrameInputListener()
+	jgui::FrameInputListener(),
+	jgui::ItemComponent()
 {
 	jcommon::Object::SetClassName("jgui::Menu");
 
@@ -34,7 +35,7 @@ Menu::Menu(int x, int y, int width, int visible_items):
 	_visible_items = visible_items;
 	_centered_interaction = true;
 
-	if (_visible_items <= 0) {
+	if (_visible_items < 1) {
 		_visible_items = 1;
 	}
 
@@ -48,7 +49,6 @@ Menu::Menu(int x, int y, int width, int visible_items):
 
 	SetUndecorated(true);
 	SetDefaultExitEnabled(false);
-	SetItemColor(0x17, 0x27, 0x3e, 0xff);
 	SetSize(width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size)-_vertical_gap);
 
 	Frame::RegisterInputListener(this);
@@ -409,7 +409,7 @@ void Menu::InputChanged(KeyEvent *event)
 			if (menu->_index != old_index) {
 				menu->Repaint();
 
-				DispatchSelectEvent(new SelectEvent(this, menu->_items[menu->_index], menu->_index, UP_ITEM)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), UP_ITEM)); 
 			}
 		} else if (action == JKEY_CURSOR_DOWN) {
 			int old_index = menu->_index;
@@ -439,11 +439,11 @@ void Menu::InputChanged(KeyEvent *event)
 			if (menu->_index != old_index) {
 				menu->Repaint();
 
-				DispatchSelectEvent(new SelectEvent(this, menu->_items[_index], _index, DOWN_ITEM)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), DOWN_ITEM)); 
 			}
 		} else if (action == JKEY_ENTER) {
 			if (menu->_items[menu->_index]->GetEnabled() == true) {
-				DispatchSelectEvent(new SelectEvent(this, menu->_items[menu->_index], menu->_index, ACTION_ITEM)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), ACTION_ITEM)); 
 			}
 		}
 	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
@@ -455,23 +455,17 @@ void Menu::InputChanged(KeyEvent *event)
 			delete last;
 		}
 
-		DispatchSelectEvent(new SelectEvent(this, GetCurrentItem(), GetCurrentIndex(), LEFT_ITEM));
+		DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), LEFT_ITEM));
 	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT || event->GetSymbol() == jgui::JKEY_ENTER) {
 		Item *item = GetCurrentItem();
 
 		if (item != NULL && item->GetEnabled() == true) {
 			if (event->GetSymbol() == jgui::JKEY_ENTER && item->GetType() == jgui::CHECK_MENU_ITEM) {
-				bool b = true;
-
-				if (item->IsSelected() == true) {
-					b = false;
-				}
-
-				item->SetSelected(b);
+				item->SetSelected(item->IsSelected()^true);
 
 				last->Repaint();
 
-				DispatchSelectEvent(new SelectEvent(this, item, GetCurrentIndex(), ACTION_ITEM));
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), ACTION_ITEM)); 
 			} else {
 				std::vector<Item *> items = item->GetChilds();
 
@@ -522,9 +516,14 @@ void Menu::InputChanged(KeyEvent *event)
 						GetComponentInFocus()->ReleaseFocus();
 					}
 				
-					DispatchSelectEvent(new SelectEvent(this, GetCurrentItem(), GetCurrentIndex(), RIGHT_ITEM));
+					DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), RIGHT_ITEM));
 				} else {
 					if (event->GetSymbol() == jgui::JKEY_ENTER) {
+						Item *item = GetCurrentItem();
+						int index = GetCurrentIndex();
+
+						Hide();
+
 						while (_menus.size() > 0) {
 							Menu *m = *(_menus.begin()+_menus.size()-1);
 
@@ -534,10 +533,8 @@ void Menu::InputChanged(KeyEvent *event)
 
 							delete m;
 						}
-
-						Hide();
 						
-						DispatchSelectEvent(new SelectEvent(NULL, item, GetCurrentIndex(), ACTION_ITEM));
+						DispatchSelectEvent(new SelectEvent(this, item, index, ACTION_ITEM)); 
 
 						_frame_sem.Notify();
 					}
@@ -608,69 +605,5 @@ void Menu::SetCurrentIndex(int i)
 		}
 	}
 }
-
-/*
-void Menu::InputChanged(KeyEvent *event)
-{
-	jkey_symbol_t action = event->GetSymbol();
-
-	if (action == JKEY_CURSOR_UP) {
-		int old_index = _index;
-
-		_index--;
-
-		if (_index < 0) {
-			if (_loop == false) {
-				_index = 0;
-			} else {
-				_index = (int)(_items.size()-1);
-			}
-		}
-
-		if (_index < _top_index) {
-			_top_index = _index;
-		}
-
-		if (_index != old_index) {
-			Repaint();
-
-			// DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, UP_ITEM)); 
-		}
-	} else if (action == JKEY_CURSOR_DOWN) {
-		int old_index = _index;
-
-		_index++;
-
-		if (_index >= (int)_items.size()) {
-			if (_loop == false) {
-				if (_items.size() > 0) {
-					_index = _items.size()-1;
-				} else {
-					_index = 0;
-				}
-			} else {
-				_index = 0;
-			}
-		}
-
-		if (_index >= (_top_index + _visible_items)) {
-			_top_index = _index-_visible_items+1;
-
-			if (_top_index < 0) {
-				_top_index = 0;
-			}
-		}
-
-		if (_index != old_index) {
-			Repaint();
-
-			// DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, DOWN_ITEM)); 
-		}
-	} else if (action == JKEY_ENTER) {
-		if (_items[_index]->GetEnabled() == true) {
-		}
-	}
-}
-*/
 
 }

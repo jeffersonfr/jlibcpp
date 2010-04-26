@@ -247,6 +247,7 @@ OBJS_jgui = \
 		jkeylistener.o\
 		jkeyevent.o\
 		jinputmanager.o\
+		jitemcomponent.o\
 		jlabel.o\
 		jlayout.o\
 		jnulllayout.o\
@@ -260,10 +261,7 @@ OBJS_jgui = \
 		jmarquee.o\
 		jmenu.o\
 		jmenugroup.o\
-		jmenuexception.o\
-		jmenuevent.o\
-		jmenulistener.o\
-		jmessagedialog.o\
+		jmessagedialogbox.o\
 		jinputdialogbox.o\
 		joffscreenimage.o\
 		jpanel.o\
@@ -276,12 +274,12 @@ OBJS_jgui = \
 		jscrollbar.o\
 		jspin.o\
 		jtextarea.o\
-		jtextdialog.o\
+		jtextdialogbox.o\
 		jtextevent.o\
 		jtextfield.o\
 		jtextlistener.o\
 		jwatch.o\
-		jyesnodialog.o\
+		jyesnodialogbox.o\
 		jwindow.o\
 		jtable.o\
 		jtooglebutton.o\

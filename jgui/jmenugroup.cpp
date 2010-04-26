@@ -67,16 +67,10 @@ void MenuGroup::ItemSelected(SelectEvent *event)
 	Menu *menu = (Menu *)event->GetSource();
 
 	for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-		if (item == (*i)) {
-			for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-				if (item != (*i)) {
-					(*i)->SetSelected(false);
-				}
-			}
-
-			item->SetSelected(true);
-		}
+		(*i)->SetSelected(false);
 	}
+	
+	item->SetSelected(true);
 
 	if (menu != NULL) {
 		menu->Repaint();
