@@ -20,6 +20,7 @@
 #ifndef	J_ITEMCOMPONENT_H
 #define J_ITEMCOMPONENT_H
 
+#include "jcomponent.h"
 #include "joffscreenimage.h"
 
 #include <string>
@@ -216,14 +217,16 @@ class Item : public virtual jcommon::Object{
  *
  * \author Jeff Ferr
  */
-class ItemComponent : public virtual jcommon::Object{
+class ItemComponent : public jgui::Component{
 
 	protected:
 		std::vector<SelectListener *> _select_listeners;
 		std::vector<Item *> _items,
 			_internal;
 		jcolor_t _item_color,
-						 _itemfocus_color;
+						 _item_focus_color,
+						 _item_fgcolor,
+						 _item_focus_fgcolor;
 		std::string _text;
 		int _index;
 		bool _loop;
@@ -236,7 +239,7 @@ class ItemComponent : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		ItemComponent();
+		ItemComponent(int x, int y, int width, int height);
 
 		/**
 		 * \brief
@@ -254,6 +257,24 @@ class ItemComponent : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual jcolor_t GetItemFocusColor();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetItemForegroundColor();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetItemForegroundFocusColor();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetItemColor(jcolor_t color);
 
 		/**
@@ -266,12 +287,6 @@ class ItemComponent : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetItemFocusColor();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetItemFocusColor(jcolor_t color);
 
 		/**
@@ -279,6 +294,30 @@ class ItemComponent : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetItemFocusColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundColor(jcolor_t color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundFocusColor(jcolor_t color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundFocusColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief

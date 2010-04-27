@@ -290,7 +290,7 @@ class GridBagConstraints{
 		}
 };
 
-class GridBagLayoutInfo {
+class GridBagLayoutInfo{
 
 	public:
 		int width, 

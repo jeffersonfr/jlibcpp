@@ -203,10 +203,30 @@ jcomponent_orientation_t Component::GetComponentOrientation()
 
 void Component::SetGap(int hgap, int vgap)
 {
-	_vertical_gap = vgap;
 	_horizontal_gap = hgap;
+	_vertical_gap = vgap;
 
 	Repaint();
+}
+
+void Component::SetHorizontalGap(int hgap)
+{
+	SetGap(hgap, _vertical_gap);
+}
+
+void Component::SetVerticalGap(int vgap)
+{
+	SetGap(_horizontal_gap, vgap);
+}
+
+int Component::GetHorizontalGap()
+{
+	return _horizontal_gap;
+}
+
+int Component::GetVerticalGap()
+{
+	return _vertical_gap;
 }
 
 void Component::PaintEdges(Graphics *g)
@@ -592,6 +612,11 @@ void Component::SetBorderSize(int size)
 	}
 
 	Repaint();
+}
+
+int Component::GetBorderSize()
+{
+	return _border_size;
 }
 
 int Component::GetX()

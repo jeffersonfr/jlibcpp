@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jmenu.h"
+#include "jselectevent.h"
 #include "jcommonlib.h"
 
 #include <algorithm>
@@ -25,9 +26,7 @@
 namespace jgui {
 
 Menu::Menu(int x, int y, int width, int visible_items):
- 	jgui::Frame("", x, y, width, 1),
-	jgui::FrameInputListener(),
-	jgui::ItemComponent()
+	jgui::ItemComponent(0, 0, 0, 0)
 {
 	jcommon::Object::SetClassName("jgui::Menu");
 
@@ -47,16 +46,17 @@ Menu::Menu(int x, int y, int width, int visible_items):
 		prefetch->GetGraphics()->DrawImage("./icons/check.png", 0, 0, _item_size, _item_size);
 	}
 
-	SetUndecorated(true);
-	SetDefaultExitEnabled(false);
-	SetSize(width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size)-_vertical_gap);
+	_frame = new Frame("", x, y, width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size));
 
-	Frame::RegisterInputListener(this);
+	_frame->SetUndecorated(true);
+	_frame->SetDefaultExitEnabled(false);
+
+	_frame->RegisterInputListener(this);
 }
 
 Menu::~Menu() 
 {
-	Frame::RemoveInputListener(this);
+	_frame->RemoveInputListener(this);
 
 	jthread::AutoLock lock(&_menu_mutex);
 
@@ -75,7 +75,9 @@ Menu::~Menu()
 		prefetch = NULL;
 	}
 	
-	Release();
+	_frame->Release();
+
+	delete _frame;
 }
 
 void Menu::MousePressed(MouseEvent *event)
@@ -98,9 +100,61 @@ void Menu::MouseWheel(MouseEvent *event)
 {
 }
 
+jpoint_t Menu::GetLocation()
+{
+	return _frame->GetLocation();
+}
+
+jsize_t Menu::GetSize()
+{
+	return _frame->GetSize();
+}
+
+int Menu::GetX()
+{
+	return _frame->GetX();
+}
+
+int Menu::GetY()
+{
+	return _frame->GetY();
+}
+
+int Menu::GetWidth()
+{
+	return _frame->GetWidth();
+}
+
+int Menu::GetHeight()
+{
+	return _frame->GetHeight();
+}
+
 bool Menu::Show(bool modal)
 {
-	return Frame::Show(modal);
+	if (_frame->Show(false) == false) {
+		return false;
+	}
+
+	Repaint();
+
+	if (modal == true) {
+		_menu_sem.Wait();
+	}
+
+	return true;
+}
+
+bool Menu::Hide()
+{
+	return _frame->Hide();
+}
+
+void Menu::Release()
+{
+	_menu_sem.Notify();
+
+	_frame->Release();
 }
 
 void Menu::SetMenuAlign(jmenu_align_t align)
@@ -116,11 +170,20 @@ void Menu::SetTitle(std::string title)
 
 	_title = title;
 
-	if (_title == "") {
-		SetSize(_size.width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size)-_vertical_gap);
-	} else {
-		SetSize(_size.width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size)-_vertical_gap+_insets.top);
+	_size = _frame->GetSize();
+	_location = _frame->GetLocation();
+	_horizontal_gap = _frame->GetHorizontalGap();
+	_vertical_gap = _frame->GetVerticalGap();
+	_border_size = _frame->GetBorderSize();
+
+	int w = _size.width,
+			h = _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size);
+
+	if (_title != "") {
+		h = h + _frame->GetInsets().top-_vertical_gap;
 	}
+
+	_frame->SetSize(w, h);
 }
 
 int Menu::GetVisibleItems()
@@ -154,7 +217,7 @@ void Menu::SetItemColor(int red, int green, int blue, int alpha)
 
 void Menu::SetBackgroundColor(int red, int green, int blue, int alpha)
 {
-	Frame::SetBackgroundColor(red, green, blue, alpha);
+	_frame->SetBackgroundColor(red, green, blue, alpha);
 
 	for (std::vector<Menu *>::iterator i=_menus.begin(); i!=_menus.end(); i++) {
 		(*i)->SetBackgroundColor(red, green, blue, alpha);
@@ -163,7 +226,7 @@ void Menu::SetBackgroundColor(int red, int green, int blue, int alpha)
 
 void Menu::SetForegroundColor(int red, int green, int blue, int alpha)
 {
-	Frame::SetForegroundColor(red, green, blue, alpha);
+	_frame->SetForegroundColor(red, green, blue, alpha);
 	
 	for (std::vector<Menu *>::iterator i=_menus.begin(); i!=_menus.end(); i++) {
 		(*i)->SetForegroundColor(red, green, blue, alpha);
@@ -217,10 +280,19 @@ int Menu::GetCurrentIndex()
 	return 0;
 }
 
+void Menu::Repaint()
+{
+	Paint(_frame->GetGraphics());
+}
+
 void Menu::Paint(Graphics *g)
 {
-	Frame::Paint(g);
-	
+	_size = _frame->GetSize();
+	_location = _frame->GetLocation();
+	_horizontal_gap = _frame->GetHorizontalGap();
+	_vertical_gap = _frame->GetVerticalGap();
+	_border_size = _frame->GetBorderSize();
+
 	int x = _horizontal_gap+_border_size,
 			y = _vertical_gap+_border_size,
 			w = _size.width-2*x,
@@ -231,37 +303,35 @@ void Menu::Paint(Graphics *g)
 	w = (w < 0)?0:w;
 	h = (h < 0)?0:h;
 
+	g->SetFont(_font);
+
 	if (_title != "") {
-		y = y + _insets.top;
-		
+		jinsets_t insets = _frame->GetInsets();
+
 		g->SetColor(0xf0, 0xf0, 0xf0, 0x80);
-		g->FillRectangle(_insets.left, _insets.top-10, _size.width-_insets.left-_insets.right, 5);
+		g->FillRectangle(x, insets.top, w, 5);
 
 		if (IsFontSet() == true) {
 			std::string text = _title;
 			
 			// if (_wrap == false) {
-				text = _font->TruncateString(text, "...", (_size.width-_insets.left-_insets.right));
+				text = _font->TruncateString(text, "...", w);
 			// }
 
 			g->SetColor(_fg_color);
-		
-			g->SetClip(0, 0, _size.width, _insets.top);
-			g->DrawString(text, _insets.left+(_size.width-_insets.left-_insets.right-_font->GetStringWidth(text))/2, _insets.top-_font->GetHeight()-15);
-			g->SetClip(0, 0, _size.width, _size.height);
+			g->DrawString(text, x+(w-_font->GetStringWidth(text))/2, y+(insets.top-_font->GetHeight())/2);
 		}
+		
+		y = y + insets.top;
 	}
 
 	int i,
-		count = 0,
-		space = 15;
-
-	int position;
+			count = 0,
+			space = 15,
+			position = _top_index;
 
 	if (_centered_interaction == true) {
 		position = _index-_visible_items/2;
-	} else {
-		position = _top_index;
 	}
 
 	if (position > (int)(_items.size()-_visible_items)) {
@@ -354,6 +424,8 @@ void Menu::Paint(Graphics *g)
 		g->SetColor(_item_color);
 		FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, _size.width, _item_size+10);
 	}
+
+	g->Flip();
 }
 
 void Menu::InputChanged(KeyEvent *event)
@@ -487,19 +559,16 @@ void Menu::InputChanged(KeyEvent *event)
 					if (_menu_align == MENU_ALIGN) {
 						menu = new Menu(last->GetX()+last->GetWidth()+5, last->GetY(), last->GetWidth(), items.size());	
 					} else if (_menu_align == SUBMENU_ALIGN) {
+						jinsets_t insets = _frame->GetInsets();
 						int x = last->GetX()+last->GetWidth()+5,
 								y = last->GetY()+position*((last->GetHeight()-_vertical_gap-_border_size)/last->GetVisibleItems());
 
 						if (_title != "" && _menus.size() == 0) {
-							y = last->GetY()+position*((last->GetHeight()-_insets.top-_vertical_gap-_border_size)/last->GetVisibleItems())+_insets.top;
+							y = last->GetY()+position*((last->GetHeight()-insets.top-_vertical_gap-_border_size)/last->GetVisibleItems())+insets.top;
 						}
 
-						menu = new Menu(x, y, last->GetWidth(), items.size());	
+						menu = new Menu(x, y, last->GetWidth(), items.size());
 					}
-
-					menu->SetBackgroundColor(GetBackgroundColor());
-					menu->SetForegroundColor(GetForegroundColor());
-					menu->SetItemColor(GetItemColor());
 
 					for (std::vector<Item *>::iterator i=items.begin(); i!=items.end(); i++) {
 						if ((*i)->IsVisible() == true) {
@@ -509,13 +578,11 @@ void Menu::InputChanged(KeyEvent *event)
 
 					_menus.push_back(menu);
 
-					menu->SetInputEnabled(false);
-					menu->Show(false);
+					menu->_frame->SetInputEnabled(false);
 
-					if (GetComponentInFocus() != NULL) {
-						GetComponentInFocus()->ReleaseFocus();
-					}
-				
+					menu->Show(false);
+					menu->Repaint();
+
 					DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), RIGHT_ITEM));
 				} else {
 					if (event->GetSymbol() == jgui::JKEY_ENTER) {
@@ -536,7 +603,7 @@ void Menu::InputChanged(KeyEvent *event)
 						
 						DispatchSelectEvent(new SelectEvent(this, item, index, ACTION_ITEM)); 
 
-						_frame_sem.Notify();
+						_menu_sem.Notify();
 					}
 				}
 			}

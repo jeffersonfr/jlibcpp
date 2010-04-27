@@ -28,15 +28,21 @@ Theme::Theme():
 {
 	jcommon::Object::SetClassName("jgui::Theme");
 
+	SetWindowBackgroundColor(0x35, 0x55, 0x75, 0xff);
+	SetWindowForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
+	SetWindowBorderColor(0x35, 0x55, 0x75, 0xff);
+
 	SetComponentBackgroundColor(0x15, 0x35, 0x55, 0xff);
 	SetComponentForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
 	SetComponentBackgroundFocusColor(0x06, 0x65, 0xaa, 0xff);
 	SetComponentForegroundFocusColor(0xf0, 0xf0, 0xf0, 0xff);
 	SetComponentBorderColor(0x60, 0x60, 0x80, 0xff); // 0xff355575;
 	SetComponentBorderFocusColor(0xf0, 0xf0, 0xf0, 0xff);
-	SetWindowBackgroundColor(0x35, 0x55, 0x75, 0xff);
-	SetWindowForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
-	SetWindowBorderColor(0x35, 0x55, 0x75, 0xff);
+	
+	SetItemColor(0x17, 0x27, 0x3e, 0xff);
+	SetItemFocusColor(0x37, 0x47, 0x5e, 0xff);
+	SetItemForegroundColor(0x17, 0x27, 0x3e, 0xff);
+	SetItemForegroundFocusColor(0x37, 0x47, 0x5e, 0xff);
 
 	_component_border_size = 1;
 	_component_border = LINE_BORDER;
@@ -215,6 +221,46 @@ void Theme::SetComponentForegroundFocusColor(int red, int green, int blue, int a
 	_component_focus_fgcolor.green = green;
 	_component_focus_fgcolor.blue = blue;
 	_component_focus_fgcolor.alpha = alpha;
+}
+
+void Theme::SetItemColor(int red, int green, int blue, int alpha)
+{
+	TRUNC_COLOR(red, green, blue, alpha);
+
+	_item_color.red = red;
+	_item_color.green = green;
+	_item_color.blue = blue;
+	_item_color.alpha = alpha;
+}
+
+void Theme::SetItemFocusColor(int red, int green, int blue, int alpha)
+{
+	TRUNC_COLOR(red, green, blue, alpha);
+
+	_item_focus_color.red = red;
+	_item_focus_color.green = green;
+	_item_focus_color.blue = blue;
+	_item_focus_color.alpha = alpha;
+}
+
+void Theme::SetItemForegroundColor(int red, int green, int blue, int alpha)
+{
+	TRUNC_COLOR(red, green, blue, alpha);
+
+	_item_fgcolor.red = red;
+	_item_fgcolor.green = green;
+	_item_fgcolor.blue = blue;
+	_item_fgcolor.alpha = alpha;
+}
+
+void Theme::SetItemForegroundFocusColor(int red, int green, int blue, int alpha)
+{
+	TRUNC_COLOR(red, green, blue, alpha);
+
+	_item_focus_fgcolor.red = red;
+	_item_focus_fgcolor.green = green;
+	_item_focus_fgcolor.blue = blue;
+	_item_focus_fgcolor.alpha = alpha;
 }
 
 void Theme::SetComponentBorder(jcomponent_border_t border)

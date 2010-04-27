@@ -229,16 +229,18 @@ jmenuitem_type_t Item::GetType()
 	return _type;
 }
 
-ItemComponent::ItemComponent():
- 	jcommon::Object()
+ItemComponent::ItemComponent(int x, int y, int width, int height):
+  jgui::Component(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::ItemComponent");
 
 	_index = 0;
 	_loop = false;
-
+	
 	SetItemColor(0x17, 0x27, 0x3e, 0xff);
 	SetItemFocusColor(0x37, 0x47, 0x5e, 0xff);
+	SetItemForegroundColor(0x17, 0x27, 0x3e, 0xff);
+	SetItemForegroundFocusColor(0x37, 0x47, 0x5e, 0xff);
 }
 
 ItemComponent::~ItemComponent()
@@ -262,6 +264,21 @@ jcolor_t ItemComponent::GetItemColor()
 	return _item_color;
 }
 
+jcolor_t ItemComponent::GetItemFocusColor()
+{
+	return _item_focus_color;
+}
+
+jcolor_t ItemComponent::GetItemForegroundColor()
+{
+	return _item_fgcolor;
+}
+
+jcolor_t ItemComponent::GetItemForegroundFocusColor()
+{
+	return _item_focus_fgcolor;
+}
+
 void ItemComponent::SetItemColor(jcolor_t color)
 {
 	SetItemColor(color.red, color.green, color.blue, color.alpha);
@@ -277,11 +294,6 @@ void ItemComponent::SetItemColor(int red, int green, int blue, int alpha)
 	_item_color.alpha = alpha;
 }
 
-jcolor_t ItemComponent::GetItemFocusColor()
-{
-	return _itemfocus_color;
-}
-
 void ItemComponent::SetItemFocusColor(jcolor_t color)
 {
 	SetItemFocusColor(color.red, color.green, color.blue, color.alpha);
@@ -291,10 +303,40 @@ void ItemComponent::SetItemFocusColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
 
-	_itemfocus_color.red = red;
-	_itemfocus_color.green = green;
-	_itemfocus_color.blue = blue;
-	_itemfocus_color.alpha = alpha;
+	_item_focus_color.red = red;
+	_item_focus_color.green = green;
+	_item_focus_color.blue = blue;
+	_item_focus_color.alpha = alpha;
+}
+
+void ItemComponent::SetItemForegroundColor(jcolor_t color)
+{
+	SetItemForegroundFocusColor(color.red, color.green, color.blue, color.alpha);
+}
+
+void ItemComponent::SetItemForegroundColor(int red, int green, int blue, int alpha)
+{
+	TRUNC_COLOR(red, green, blue, alpha);
+
+	_item_fgcolor.red = red;
+	_item_fgcolor.green = green;
+	_item_fgcolor.blue = blue;
+	_item_fgcolor.alpha = alpha;
+}
+
+void ItemComponent::SetItemForegroundFocusColor(jcolor_t color)
+{
+	SetItemForegroundFocusColor(color.red, color.green, color.blue, color.alpha);
+}
+
+void ItemComponent::SetItemForegroundFocusColor(int red, int green, int blue, int alpha)
+{
+	TRUNC_COLOR(red, green, blue, alpha);
+
+	_item_focus_fgcolor.red = red;
+	_item_focus_fgcolor.green = green;
+	_item_focus_fgcolor.blue = blue;
+	_item_focus_fgcolor.alpha = alpha;
 }
 
 int ItemComponent::GetItemsSize()

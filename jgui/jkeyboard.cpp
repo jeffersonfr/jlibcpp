@@ -223,15 +223,16 @@ void Keyboard::SetWrap(bool b)
 void Keyboard::Clear()
 {
 	if (_show_text == true && display != NULL) {
-		display->Clear();
+		display->SetText("");
+		display->Repaint();
 	} 
 }
 
 void Keyboard::SetText(std::string text)
 {
 	if (_show_text == true && display != NULL) {
-		display->Clear();
-		display->Insert(text);
+		display->SetText(text);
+		display->Repaint();
 	} 
 }
 

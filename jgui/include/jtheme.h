@@ -47,6 +47,9 @@ class Theme : public jcommon::Object{
 	friend class Frame;
 
 	private:
+		Font *_window_font,
+				 *_component_font;
+		jinsets_t _insets;
 		jcolor_t _window_bgcolor,
 						 _window_fgcolor,
 						 _window_border_color,
@@ -55,15 +58,16 @@ class Theme : public jcommon::Object{
 						 _component_border_color,
 						 _component_border_focus_color,
 						 _component_focus_bgcolor,
-						 _component_focus_fgcolor;
+						 _component_focus_fgcolor,
+						 _item_color,
+						 _item_focus_color,
+						 _item_fgcolor,
+						 _item_focus_fgcolor;
+		jcomponent_border_t _component_border,
+												_window_border;
 		int _gradient_level,
 				_window_border_size,
 				_component_border_size;
-		jinsets_t _insets;
-		Font *_window_font,
-				 *_component_font;
-		jcomponent_border_t _component_border,
-									 _window_border;
 
 		/**
 		 * \brief
@@ -138,6 +142,30 @@ class Theme : public jcommon::Object{
 		 */
 		virtual void SetComponentForegroundFocusColor(int red, int green, int blue, int alpha);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemFocusColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundFocusColor(int red, int green, int blue, int alpha);
+
 		/**
 		 * \brief
 		 *

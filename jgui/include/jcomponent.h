@@ -298,6 +298,30 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void SetHorizontalGap(int hgap);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetVerticalGap(int vgap);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetHorizontalGap();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetVerticalGap();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetParent(Container *parent);
 		
 		/**
@@ -395,6 +419,12 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetBorderSize(int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetBorderSize();
 		
 		/**
 		 * \brief

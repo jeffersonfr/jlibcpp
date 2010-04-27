@@ -20,12 +20,7 @@
 #ifndef J_TEXTAREA_H
 #define J_TEXTAREA_H
 
-#include "jruntimeexception.h"
-#include "jstringtokenizer.h"
-#include "jstringutils.h"
-
-#include "jtextlistener.h"
-#include "jcomponent.h"
+#include "jtextcomponent.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -44,35 +39,13 @@ namespace jgui {
 /**
  * \brief
  *
- */
-enum jcursor_type_t {
-	NONE_CURSOR,
-	UNDERSCORE_CURSOR,
-	STICK_CURSOR,
-	BLOCK_CURSOR
-};
-
-/**
- * \brief
- *
  * \author Jeff Ferr
  */
-class TextArea : public Component{
+class TextArea : public jgui::TextComponent{
 
 	private:
-		std::vector<TextListener *> _text_listeners;
-		std::string _text,
-			_selected_text;
-		int _max_text_length,
-			_position,
-			_line_op, // 0-nop, 1-inc, 2-dec
-			_begin_index,
-			_end_index;
-		bool _is_wrap,
-			 _cursor_visible,
-			 _is_editable;
-		char _echo_char;
-		jcursor_type_t _cursor_type;
+		int _line_op; // 0-nop, 1-inc, 2-dec
+		bool _is_wrap;
 
 		/**
 		 * \brief
@@ -97,7 +70,7 @@ class TextArea : public Component{
 		 * \brief
 		 *
 		 */
-		TextArea(int x = 0, int y = 0, int width = 0, int height = 0, int max_text = -1);
+		TextArea(int x = 0, int y = 0, int width = 0, int height = 0);
 		
 		/**
 		 * \brief
@@ -109,72 +82,6 @@ class TextArea : public Component{
 		 * \brief
 		 *
 		 */
-		void SetEchoChar(char echo_char);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		char GetEchoChar();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		bool EchoCharIsSet();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetEditable(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		bool IsEditable();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCaretPosition(int pos);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetCaretPosition();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCaretVisible(bool visible);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetCaretType(jcursor_type_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		jcursor_type_t GetCaretType();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Clear();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		void Backspace();
 		
 		/**
@@ -182,12 +89,6 @@ class TextArea : public Component{
 		 *
 		 */
 		void Delete();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetMaxTextSize(int max);
 		
 		/**
 		 * \brief
@@ -212,30 +113,6 @@ class TextArea : public Component{
 		 *
 		 */
 		void Append(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetText(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetText();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		bool SetSelectedText(int begin, int end);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetSelectedText();
 		
 		/**
 		 * \brief
@@ -272,30 +149,6 @@ class TextArea : public Component{
 		 *
 		 */
 		virtual bool ProcessEvent(MouseEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void RegisterTextListener(TextListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveTextListener(TextListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DispatchTextEvent(TextEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<TextListener *> & GetTextListeners();
 
 };
 

@@ -21,7 +21,6 @@
 #define J_COMBOBOX_H
 
 #include "jselectlistener.h"
-#include "jcomponent.h"
 #include "jitemcomponent.h"
 #include "jmenu.h"
 
@@ -38,11 +37,7 @@
 
 namespace jgui {
 
-class ComboBox : 
-	public jgui::Component,
-	public jgui::ItemComponent,
-	public jgui::SelectListener
-{
+class ComboBox : public jgui::ItemComponent, public jgui::SelectListener{
 
 	private:
 		Menu *_menu;
@@ -55,7 +50,7 @@ class ComboBox :
 		 * \brief
 		 *
 		 */
-		ComboBox(int x = 0, int y = 0, int width = 0, int height = 0, int visible_items = 3);
+		ComboBox(int x = 0, int y = 0, int width = 0, int height = 0, int visible_items = 5);
 		
 		/**
 		 * \brief

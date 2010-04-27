@@ -20,7 +20,6 @@
 #ifndef J_LISTBOX_H
 #define J_LISTBOX_H
 
-#include "jcomponent.h"
 #include "jselectlistener.h"
 #include "jitemcomponent.h"
 #include "jbuttonlistener.h"
@@ -64,11 +63,7 @@ enum jlist_selection_type_t {
  *
  * \author Jeff Ferr
  */
-class ListBox : 
-	public jgui::Component,
-	public jgui::ItemComponent,
-	public jgui::ButtonListener
-{
+class ListBox : public jgui::ItemComponent{
 
 	private:
 		jlist_scroll_type_t _scroll;

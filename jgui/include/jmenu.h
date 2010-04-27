@@ -21,7 +21,7 @@
 #define J_MENU_H
 
 #include "jframe.h"
-#include "jlistbox.h"
+#include "jframeinputlistener.h"
 #include "joffscreenimage.h"
 #include "jmouselistener.h"
 #include "jitemcomponent.h"
@@ -52,18 +52,17 @@ class ComboMenuComponent;
  *
  * \author Jeff Ferr
  */
-class Menu : 
-	public jgui::Frame,
-	public jgui::FrameInputListener,
-	public jgui::ItemComponent 
-{
+class Menu : public jgui::ItemComponent, public jgui::FrameInputListener{
 
 	private:
 		jthread::Mutex _menu_mutex;
+		jthread::Condition _menu_sem;
 
 		std::vector<Menu *> _menus;
+		jgui::Frame *_frame;
 		jgui::OffScreenImage *prefetch;
 		jmenu_align_t _menu_align;
+		std::string _title;
 		int _top_index,
 				_item_size,
 				_visible_items,
@@ -123,7 +122,55 @@ class Menu :
 		 * \brief
 		 *
 		 */
+		virtual jpoint_t GetLocation();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetX();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetY();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool Show(bool modal = true);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool Hide();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Release();
 		
 		/**
 		 * \brief
@@ -202,6 +249,12 @@ class Menu :
 		 *
 		 */
 		virtual int GetCurrentIndex();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Repaint();
 
 		/**
 		 * \brief

@@ -21,7 +21,6 @@
 #define J_SPIN_H
 
 #include "jselectlistener.h"
-#include "jcomponent.h"
 #include "jitemcomponent.h"
 
 #include <iostream>
@@ -51,10 +50,7 @@ enum jspin_type_t {
  *
  * \author Jeff Ferr
  */
-class Spin : 
-	public jgui::Component,
-	public jgui::ItemComponent
-{
+class Spin : public jgui::ItemComponent{
 
 	private:
 		std::vector<SelectListener *> _select_listeners;

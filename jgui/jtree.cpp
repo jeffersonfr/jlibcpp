@@ -25,8 +25,7 @@
 namespace jgui {
 
 Tree::Tree(int x, int y, int width, int visible_items):
-   	jgui::Component(x, y, width, 1),
-   	jgui::ItemComponent()
+   	jgui::ItemComponent(x, y, width, 0)
 {
 	jcommon::Object::SetClassName("jgui::Tree");
 

@@ -19,141 +19,25 @@
  ***************************************************************************/
 #include "jtextfield.h"
 #include "jfocusevent.h"
+#include "jruntimeexception.h"
+#include "jstringtokenizer.h"
+#include "jstringutils.h"
 #include "jcommonlib.h"
 
 #include <algorithm>
 
 namespace jgui {
 
-TextField::TextField(int x, int y, int width, int height, int max_text):
-	Component(x, y, width, height)
+TextField::TextField(int x, int y, int width, int height):
+	jgui::TextComponent(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::TextField");
 
-	_halign = LEFT_HALIGN;
-	_valign = CENTER_VALIGN;
-	
-	_horizontal_gap = 4;
-	_vertical_gap = 2;
-	
-	_position = 0;
-	_max_text_length = max_text;
-	_echo_char = '\0';
-	_has_focus = false;
-	_cursor_visible = true;
-	_is_editable = true;
-	_cursor = UNDERSCORE_CURSOR;
-	_begin_index = 0;
-	_end_index = 0;
-	
 	SetFocusable(true);
 }
 
 TextField::~TextField()
 {
-}
-
-bool TextField::SetSelectedText(int begin, int end)
-{
-	if (begin < 0 || begin >= (int)_text.size()) {
-		return false;
-	}
-
-	if (end <= begin || end > (int)_text.size()) {
-		return false;
-	}
-
-	_begin_index = begin;
-	_end_index = end;
-
-	_selected_text = _text.substr(_begin_index, _end_index);
-
-	return true;
-}
-
-std::string TextField::GetSelectedText()
-{
-	return _selected_text;
-}
-
-void TextField::SetEchoChar(char echo_char)
-{
-	if (_echo_char == echo_char) {
-		return;
-	}
-
-	_echo_char = echo_char;
-
-	Repaint();
-}
-
-char TextField::GetEchoChar()
-{
-	return _echo_char;
-}
-
-bool TextField::EchoCharIsSet()
-{
-	return (_echo_char != '\0');
-}
-
-void TextField::SetEditable(bool b)
-{
-	_is_editable = b;
-}
-
-bool TextField::IsEditable()
-{
-	return _is_editable;
-}
-
-void TextField::SetHorizontalAlign(jhorizontal_align_t align)
-{
-	if (_halign != align) {
-		_halign = align;
-
-		Repaint();
-	}
-}
-
-jhorizontal_align_t TextField::GetHorizontalAlign()
-{
-	return _halign;
-}
-
-void TextField::SetVerticalAlign(jvertical_align_t align)
-{
-	if (_valign != align) {
-		_valign = align;
-
-		Repaint();
-	}
-}
-
-jvertical_align_t TextField::GetVerticalAlign()
-{
-	return _valign;
-}
-
-void TextField::SetCaretType(jcursor_type_t t)
-{
-	_cursor = t;
-
-	Repaint();
-}
-
-void TextField::SetCaretVisible(bool visible)
-{
-	_cursor_visible = visible;
-
-	Repaint();
-}
-
-void TextField::SetMaxTextSize(int max)
-{
-	jthread::AutoLock lock(&_component_mutex);
-
-	_max_text_length = max;
 }
 
 bool TextField::ProcessEvent(MouseEvent *event)
@@ -196,11 +80,11 @@ bool TextField::ProcessEvent(KeyEvent *event)
 	} else if (action == JKEY_CURSOR_RIGHT) {
 		IncCaretPosition(1);
 	} else if (action == JKEY_HOME) {
-		_position = 0;
+		_caret_position = 0;
 
 		Repaint();
 	} else if (action == JKEY_END) {
-		_position = _text.size();
+		_caret_position = _text.size();
 
 		Repaint();
 	} else if (action == JKEY_BACKSPACE) {
@@ -315,7 +199,7 @@ bool TextField::ProcessEvent(KeyEvent *event)
 		if (s != "") {
 			Insert(s);
 		
-			//_position++;
+			//_caret_position++;
 		}
 
 	}
@@ -329,9 +213,6 @@ void TextField::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int width = _size.width-2*_horizontal_gap;
-			// height = _size.height-2*_vertical_gap;
-
 	if (IsFontSet() == false) {
 		return;
 	}
@@ -342,8 +223,7 @@ void TextField::Paint(Graphics *g)
 		previous,
 		s = paint_text;
 	int caret_size = 0,
-			current_text_size,
-			pos = 0;
+			current_text_size;
 
 	if (EchoCharIsSet() == true) {
 		paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
@@ -354,39 +234,43 @@ void TextField::Paint(Graphics *g)
 	current_text_size = 0;
 
 	if (_font != NULL) {
-		if (_cursor_visible == true) {
-			if (_cursor == UNDERSCORE_CURSOR) {
+		if (_caret_visible == true) {
+			if (_caret_type == UNDERSCORE_CURSOR) {
 				cursor = "_";
-			} else if (_cursor == STICK_CURSOR) {
+			} else if (_caret_type == STICK_CURSOR) {
 				cursor = "|";
-			} else if (_cursor == BLOCK_CURSOR) {
+			} else if (_caret_type == BLOCK_CURSOR) {
 				cursor = "?";
 			}
 
 			caret_size = _font->GetStringWidth(cursor);
 		}
 
-		current_text_size = _font->GetStringWidth(s.substr(0, _position));
+		current_text_size = _font->GetStringWidth(s.substr(0, _caret_position));
 	}
 
+	int x = _horizontal_gap+_border_size,
+			y = _vertical_gap+_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y;
 	int offset = 0;
 
-	if (current_text_size > (_size.width-caret_size-2*_horizontal_gap)) {
+	if (current_text_size > (w-caret_size)) {
 		int count = 0;
 
 		do {
 			count++;
 
-			current_text_size = _font->GetStringWidth(s.substr(_position-count, count));
-		} while (current_text_size < (_size.width-caret_size-2*_horizontal_gap));
+			current_text_size = _font->GetStringWidth(s.substr(_caret_position-count, count));
+		} while (current_text_size < (w-caret_size));
 
 		count = count-1;
-		s = s.substr(_position-count, count);
+		s = s.substr(_caret_position-count, count);
 		current_text_size = _font->GetStringWidth(s);
-		offset = (_size.width-current_text_size-caret_size)-caret_size;
+		offset = (w-current_text_size-caret_size)-caret_size;
 
-		if (_position < (int)paint_text.size()) {
-			s = s + paint_text[_position];
+		if (_caret_position < (int)paint_text.size()) {
+			s = s + paint_text[_caret_position];
 		}
 	} else {
 		int count = 1;
@@ -397,41 +281,19 @@ void TextField::Paint(Graphics *g)
 			if (count++ > (int)paint_text.size()) {
 				break;
 			}
-		} while (current_text_size < (_size.width-caret_size-2*_horizontal_gap));
+		} while (current_text_size < (w-caret_size));
 
 		count = count-1;
 
 		s = s.substr(0, count);
 
-		if (_halign == LEFT_HALIGN) {
-			pos = _horizontal_gap;
-		} else if (_halign == CENTER_HALIGN) {
-			pos = (width-current_text_size)/2;
-		} else if (_halign == RIGHT_HALIGN) {
-			pos = width-current_text_size;
-		} else if (_halign == JUSTIFY_HALIGN) {
-			pos = _horizontal_gap;
-		}
-
-		current_text_size = _font->GetStringWidth(s.substr(0, _position));
+		current_text_size = _font->GetStringWidth(s.substr(0, _caret_position));
 	}
-
-	int ty = (_font->GetHeight()>_size.height)?0:((_size.height-_font->GetHeight())/2),
-			dy = ty-_vertical_gap;
-
-	if (dy < 0) {
-		dy = 0;
-	}
-
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
-			w = _size.width-2*x,
-			h = _size.height-2*y;
 
 	g->SetClip(x, y, w, h);
-	g->DrawString(s, pos+offset, dy);
+	g->DrawString(s, x+offset, y, w, h);
 
-	if (_is_editable == true && _cursor_visible == true) {
+	if (_is_editable == true && _caret_visible == true) {
 		if (_has_focus == true) {
 			g->SetColor(0xff, 0x00, 0x00, 0xff);
 			// g->SetColor(_fgfocus_color);
@@ -439,7 +301,7 @@ void TextField::Paint(Graphics *g)
 			g->SetColor(_fg_color);
 		}
 
-		g->DrawString(cursor, pos+current_text_size+offset, (_font->GetHeight()>_size.height)?0:((_size.height-_font->GetHeight())/2));
+		g->DrawString(cursor,x+current_text_size+offset, y, w, h);
 	}
 
 	g->SetClip(0, 0, _size.width, _size.height);
@@ -447,30 +309,18 @@ void TextField::Paint(Graphics *g)
 	PaintEdges(g);
 }
 
-void TextField::Clear()
-{
-	{
-		jthread::AutoLock lock(&_component_mutex);
-
-		_position = 0;
-		_text = "";
-	}
-
-	Repaint();
-}
-
 void TextField::IncCaretPosition(int size)
 {
 	{
 		jthread::AutoLock lock(&_component_mutex);
 
-		_position += size;
+		_caret_position += size;
 
-		if (_position > (int)_text.size()) {
-			_position = _text.size();
+		if (_caret_position > (int)_text.size()) {
+			_caret_position = _text.size();
 		} else {
-			if (_text[_position] == -61) {
-				_position++;
+			if (_text[_caret_position] == -61) {
+				_caret_position++;
 			}
 		}
 	}
@@ -483,13 +333,13 @@ void TextField::DecCaretPosition()
 	{
 		jthread::AutoLock lock(&_component_mutex);
 
-		_position--;
+		_caret_position--;
 
-		if (_position < 0) {
-			_position = 0;
+		if (_caret_position < 0) {
+			_caret_position = 0;
 		} else {
-			if (_text[_position] == -89) {
-				_position--;
+			if (_text[_caret_position] == -89) {
+				_caret_position--;
 			}
 		}
 	}
@@ -504,7 +354,7 @@ void TextField::Insert(std::string text, int pos)
 	}
 
 	if (pos < 0) {
-		pos = _position;
+		pos = _caret_position;
 	}
 
 	if ((int)_text.size() < _max_text_length || _max_text_length == -1) {
@@ -515,9 +365,8 @@ void TextField::Insert(std::string text, int pos)
 		Repaint();
 	}
 	
-	_begin_index = 0;
-	_end_index = 0;
-	_selected_text = "";
+	_selection_start = 0;
+	_selection_end = 0;
 
 	DispatchTextEvent(new TextEvent(this, _text));
 }
@@ -530,35 +379,19 @@ void TextField::Append(std::string text)
 		size = size - 1;
 	}
 
-	_begin_index = 0;
-	_end_index = 0;
-	_selected_text = "";
+	_selection_start = 0;
+	_selection_end = 0;
 
 	Insert(text, size);
 }
 
-void TextField::SetText(std::string text)
-{
-	_text = text;
-	_position = 0;
-
-	_begin_index = 0;
-	_end_index = 0;
-	_selected_text = "";
-
-	Repaint();
-	
-	DispatchTextEvent(new TextEvent(this, _text));
-}
-
 void TextField::Backspace()
 {
-	if (_position > 0) {
-		_position--;
+	if (_caret_position > 0) {
+		_caret_position--;
 
-		_begin_index = 0;
-		_end_index = 0;
-		_selected_text = "";
+		_selection_start = 0;
+		_selection_end = 0;
 
 		Delete();
 	}
@@ -566,97 +399,41 @@ void TextField::Backspace()
 
 void TextField::Delete()
 {
-	if (_begin_index != _end_index) {
-		_text = _text.substr(0, _begin_index) + _text.substr(_end_index, _text.size());
+	if (_selection_start != _selection_end) {
+		_text = _text.substr(0, _selection_start) + _text.substr(_selection_end, _text.size());
 	} else {
-		if (_position >= (int)_text.size()) {
+		if (_caret_position >= (int)_text.size()) {
 			if (_text.size() > 0) {
-				if (_text[_position-1] == -89) {
+				if (_text[_caret_position-1] == -89) {
 					_text = _text.substr(0, _text.size()-2);
 
-					_position--;
+					_caret_position--;
 				} else {
 					_text = _text.substr(0, _text.size()-1);
 				}
 
-				_position--;
+				_caret_position--;
 			} else {
 				return;
 			}
 		} else {
-			// _text = _text.substr(0, _position) + _text.substr(_position+1, _text.size());
-			if (_text[_position] == -61) {
-				_text = _text.erase(_position, 2);
-			} else if (_text[_position] == -89) {
-				_text = _text.erase(_position-1, 2);
+			// _text = _text.substr(0, _caret_position) + _text.substr(_caret_position+1, _text.size());
+			if (_text[_caret_position] == -61) {
+				_text = _text.erase(_caret_position, 2);
+			} else if (_text[_caret_position] == -89) {
+				_text = _text.erase(_caret_position-1, 2);
 			} else {
-				_text = _text.erase(_position, 1);
+				_text = _text.erase(_caret_position, 1);
 			}
 		}
 	}
 
-	_begin_index = 0;
-	_end_index = 0;
-	_selected_text = "";
+	_selection_start = 0;
+	_selection_end = 0;
 
 	Repaint();
 
 	DispatchTextEvent(new TextEvent(this, _text));
-}
-
-std::string TextField::GetText()
-{
-	return _text;
-}
-
-void TextField::RegisterTextListener(TextListener *listener)
-{
-	if (listener == NULL) {
-		return;
-	}
-
-	if (std::find(_text_listeners.begin(), _text_listeners.end(), listener) == _text_listeners.end()) {
-		_text_listeners.push_back(listener);
-	}
-}
-
-void TextField::RemoveTextListener(TextListener *listener)
-{
-	if (listener == NULL) {
-		return;
-	}
-
-	std::vector<TextListener *>::iterator i = std::find(_text_listeners.begin(), _text_listeners.end(), listener);
-
-	if (i != _text_listeners.end()) {
-		_text_listeners.erase(i);
-	}
-}
-
-void TextField::DispatchTextEvent(TextEvent *event)
-{
-	if (event == NULL) {
-		return;
-	}
-
-	int k=0;
-
-	while (k++ < (int)_text_listeners.size()) {
-		_text_listeners[k-1]->TextChanged(event);
-	}
-
-	/*
-	for (std::vector<TextListener *>::iterator i=_text_listeners.begin(); i!=_text_listeners.end(); i++) {
-		(*i)->TextChanged(event);
-	}
-	*/
-
-	delete event;
-}
-
-std::vector<TextListener *> & TextField::GetTextListeners()
-{
-	return _text_listeners;
 }
 
 }

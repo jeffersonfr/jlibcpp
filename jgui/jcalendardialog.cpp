@@ -60,6 +60,7 @@ CalendarDialog::CalendarDialog(int x, int y):
 		year->AddTextItem(tmp);
 	}
 
+	year->SetLoop(true);
 	year->RegisterSelectListener(this);
 
 	month = new Spin(bx, by+1*bheight+10, 5*bwidth, 60);
@@ -77,6 +78,7 @@ CalendarDialog::CalendarDialog(int x, int y):
 	month->AddTextItem("Novembro");
 	month->AddTextItem("Dezembro");
 
+	month->SetLoop(true);
 	month->RegisterSelectListener(this);
 
 	int dx = 0;

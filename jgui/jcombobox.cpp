@@ -26,9 +26,7 @@
 namespace jgui {
 
 ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
-	Component(x, y, width, height),
-	ItemComponent(),
-	SelectListener()
+	ItemComponent(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::ComboBox");
 

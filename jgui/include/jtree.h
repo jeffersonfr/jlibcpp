@@ -38,10 +38,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class Tree : 
-	public jgui::Component,
-	public jgui::ItemComponent
-{
+class Tree : public jgui::ItemComponent{
 
 	private:
 		jthread::Mutex _tree_mutex;
@@ -108,12 +105,6 @@ class Tree :
 		 *
 		 */
 		void SetCenteredInteraction(bool b);
-
-		/*
-		 * \brief
-		 *
-		 */
-		virtual void SetCurrentIndex(int i);
 
 		/*
 		 * \brief
