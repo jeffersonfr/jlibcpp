@@ -20,6 +20,7 @@
 #include "jitemcomponent.h"
 #include "jruntimeexception.h"
 #include "jselectlistener.h"
+#include "jthememanager.h"
 
 #include <algorithm>
 
@@ -237,10 +238,9 @@ ItemComponent::ItemComponent(int x, int y, int width, int height):
 	_index = 0;
 	_loop = false;
 	
-	SetItemColor(0x17, 0x27, 0x3e, 0xff);
-	SetItemFocusColor(0x37, 0x47, 0x5e, 0xff);
-	SetItemForegroundColor(0x17, 0x27, 0x3e, 0xff);
-	SetItemForegroundFocusColor(0x37, 0x47, 0x5e, 0xff);
+	Theme *theme = ThemeManager::GetInstance()->GetTheme();
+
+	theme->Update(this);
 }
 
 ItemComponent::~ItemComponent()

@@ -20,6 +20,7 @@
 #include "jtheme.h"
 #include "jcomponent.h"
 #include "jwindow.h"
+#include "jitemcomponent.h"
 
 namespace jgui {
 
@@ -123,6 +124,15 @@ void Theme::Update(Component *parent)
 
 			if (_component_font != NULL) {
 				c->SetFont(_component_font);
+			}
+		
+			if (c->InstanceOf("jgui::ItemComponent") == true) {
+				ItemComponent *ic = (ItemComponent *)c;
+
+				ic->SetItemColor(_item_color);
+				ic->SetItemFocusColor(_item_focus_color);
+				ic->SetItemForegroundColor(_item_fgcolor);
+				ic->SetItemForegroundFocusColor(_item_focus_fgcolor);
 			}
 		}
 

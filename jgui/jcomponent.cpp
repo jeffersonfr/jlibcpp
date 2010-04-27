@@ -74,22 +74,6 @@ Component::Component(int x, int y, int width, int height):
 	_preferred_size.width = 100;
 	_preferred_size.height = 40;
 
-	/*
-	_location.x = x;
-	_location.y = y;
-	_size.width = width;
-	_size.height = height;
-	*/
-
-	/*
-	_bg_color;
-	_fg_color;
-	_bgfocus_color;
-	_fgfocus_color;
-	_border_color;
-	_borderfocus_color;
-	*/
-
 	SetLocation(x, y);
 	SetSize(width, height);
 

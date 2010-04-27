@@ -33,6 +33,7 @@ namespace jgui {
 
 class Component;
 class Window;
+class ItemComponent;
 
 /**
  * \brief
@@ -44,6 +45,7 @@ class Theme : public jcommon::Object{
 	friend class ThemeManager;
 	friend class Component;
 	friend class Window;
+	friend class ItemComponent;
 	friend class Frame;
 
 	private:
