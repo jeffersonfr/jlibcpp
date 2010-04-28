@@ -35,7 +35,7 @@ ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
 
 	_old_index = 0;
 
-	_menu = new Menu(_location.x, _location.y+_size.height, _size.width, visible_items);
+	_menu = new Menu(_location.x, _location.y+_size.height+4, _size.width, visible_items);
 
 	_menu->SetLoop(false);
 	_menu->SetCurrentIndex(0);
@@ -83,7 +83,6 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 
 		if (x1 > (_location.x+x+w-arrow_size-2) && x1 < (_location.x+x+w-2) && y1 > (_location.y+y) && y1 < (_location.y+y+h)) {
 			if (_parent != NULL) {
-				_menu->SetLocation(_parent->GetX()+_location.x, _parent->GetY()+_location.y+_size.height+5);
 				_menu->Show();
 			}
 		}
@@ -114,7 +113,6 @@ bool ComboBox::ProcessEvent(KeyEvent *event)
 
 	if (action == JKEY_ENTER) {
 		if (_parent != NULL) {
-			_menu->SetLocation(_parent->GetX()+_location.x, _parent->GetY()+_location.y+_size.height+5);
 			_menu->Show();
 		}
 	
@@ -298,7 +296,7 @@ void ComboBox::Paint(Graphics *g)
 
 	jpoint_t t = g->Translate();
 
-	_menu->SetLocation(t.x, t.y);
+	_menu->SetLocation(t.x, t.y+_size.height+4);
 
 	{
 		/*
