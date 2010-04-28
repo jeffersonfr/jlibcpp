@@ -59,42 +59,6 @@ class TextField : public jgui::TextComponent{
 		 * \brief
 		 *
 		 */
-		void Backspace();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Delete();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void IncCaretPosition(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DecCaretPosition();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Append(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Insert(std::string text, int pos = -1);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Paint(Graphics *g);
 		
 		/**

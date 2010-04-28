@@ -76,9 +76,9 @@ bool TextField::ProcessEvent(KeyEvent *event)
 	jkey_symbol_t action = event->GetSymbol();
 
 	if (action == JKEY_CURSOR_LEFT) {
-		DecCaretPosition();
+		DecrementCaretPosition(1);
 	} else if (action == JKEY_CURSOR_RIGHT) {
-		IncCaretPosition(1);
+		IncrementCaretPosition(1);
 	} else if (action == JKEY_HOME) {
 		_caret_position = 0;
 
@@ -293,13 +293,9 @@ void TextField::Paint(Graphics *g)
 	g->SetClip(x, y, w, h);
 	g->DrawString(s, x+offset, y, w, h);
 
-	if (_is_editable == true && _caret_visible == true) {
-		if (_has_focus == true) {
-			g->SetColor(0xff, 0x00, 0x00, 0xff);
-			// g->SetColor(_fgfocus_color);
-		} else {
-			g->SetColor(_fg_color);
-		}
+	if (_has_focus == true && _is_editable == true && _caret_visible == true) {
+		g->SetColor(0xff, 0x00, 0x00, 0xff);
+		// g->SetColor(_fgfocus_color);
 
 		g->DrawString(cursor,x+current_text_size+offset, y, w, h);
 	}

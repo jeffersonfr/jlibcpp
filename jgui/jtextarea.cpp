@@ -92,11 +92,11 @@ bool TextArea::ProcessEvent(KeyEvent *event)
 	jkey_symbol_t action = event->GetSymbol();
 
 	if (action == JKEY_CURSOR_LEFT) {
-		DecCaretPosition();
+		DecrementCaretPosition(1);
 
 		catched = true;
 	} else if (action == JKEY_CURSOR_RIGHT) {
-		IncCaretPosition(1);
+		IncrementCaretPosition(1);
 
 		catched = true;
 	} else if (action == JKEY_CURSOR_UP) {
@@ -218,8 +218,7 @@ bool TextArea::ProcessEvent(KeyEvent *event)
 			case JKEY_CURLY_BRACKET_RIGHT: s = "}"; break;
 			case JKEY_TILDE: s = "~"; break;
 			case JKEY_DELETE: Delete(); break;
-			default:
-							  break;
+			default: break;
 		}
 
 		if (s != "") {
@@ -285,11 +284,8 @@ void TextArea::GetLines(std::vector<std::string> &texts)
 	for (int i=0; i<token.GetSize(); i++) {
 		std::vector<std::string> words;
 		
-		std::string line = token.GetToken(i);
+		std::string line = token.GetToken(i) + "\n";
 
-		line = jcommon::StringUtils::ReplaceString(line, "\n", "");
-		line = jcommon::StringUtils::ReplaceString(line, "\t", "    ");
-		
 		/*
 		if (halign == JUSTIFY_HALIGN) {
 			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, false);
@@ -477,8 +473,10 @@ void TextArea::Paint(Graphics *g)
 				text_size = _font->GetStringWidth(texts[i].substr(0, _caret_position).c_str());
 
 				if (line_number-- < max_lines) {
-					if (strchr(s.c_str(), '\n') != NULL) {
-						s = s.substr(0, s.size()-1);
+					char *c = (char *)strchr(s.c_str(), '\n');
+					
+					if (c != NULL) {
+						c[0] = ' ';
 					}
 					
 					if (_has_focus == true) {
@@ -489,25 +487,23 @@ void TextArea::Paint(Graphics *g)
 
 					g->DrawString(s, x, y+k*font_height);
 
-					if (_is_editable == true && _caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
-						if (HasFocus() == true) {
-							std::string cursor;
+					if (_has_focus && _is_editable == true && _caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
+						std::string cursor;
 
-							if (_caret_type == UNDERSCORE_CURSOR) {
-								cursor = "_";
-							} else if (_caret_type == STICK_CURSOR) {
-								cursor = "|";
-							} else if (_caret_type == BLOCK_CURSOR) {
-								cursor = "?";
-							}
-
-							current_text_size = _font->GetStringWidth(texts[i].substr(0, current_length).c_str());
-
-							g->SetColor(0xff, 0x00, 0x00, 0xff);
-							g->DrawString(cursor, x+current_text_size, y+k*font_height);
-
-							current_length = -1;
+						if (_caret_type == UNDERSCORE_CURSOR) {
+							cursor = "_";
+						} else if (_caret_type == STICK_CURSOR) {
+							cursor = "|";
+						} else if (_caret_type == BLOCK_CURSOR) {
+							cursor = "?";
 						}
+
+						current_text_size = _font->GetStringWidth(texts[i].substr(0, current_length).c_str());
+
+						g->SetColor(0xff, 0x00, 0x00, 0xff);
+						g->DrawString(cursor, x+current_text_size, y+k*font_height);
+
+						current_length = -1;
 					}
 
 					k++;

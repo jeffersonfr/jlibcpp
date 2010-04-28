@@ -82,42 +82,6 @@ class TextArea : public jgui::TextComponent{
 		 * \brief
 		 *
 		 */
-		void Backspace();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Delete();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void IncCaretPosition(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DecCaretPosition();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Insert(std::string text, int pos = -1);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Append(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		void ScrollUp();
 		
 		/**
