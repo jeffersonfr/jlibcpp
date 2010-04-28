@@ -280,7 +280,7 @@ void Window::SetBounds(int x, int y, int w, int h)
 	DispatchWindowEvent(new WindowEvent(this, WINDOW_RESIZED_EVENT));
 }
 
-void Window::SetPosition(int x, int y)
+void Window::SetLocation(int x, int y)
 {
 	_location.x = x;
 	_location.y = y;

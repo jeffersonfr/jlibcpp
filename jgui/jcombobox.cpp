@@ -296,7 +296,9 @@ void ComboBox::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	g->SetFont(_font);
+	jpoint_t t = g->Translate();
+
+	_menu->SetLocation(t.x, t.y);
 
 	{
 		/*

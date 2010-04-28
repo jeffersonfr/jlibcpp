@@ -206,25 +206,26 @@ void Keyboard::TextChanged(TextEvent *event)
 	DispatchKeyboardEvent(new KeyboardEvent(this, symbol, text));
 }
 
-void Keyboard::SetMaxTextSize(int max)
+void Keyboard::SetTextSize(int max)
 {
 	if (_show_text == true) {
 		display->SetTextSize(max);
 	}
 }
 
+int Keyboard::GetTextSize()
+{
+	if (_show_text == true) {
+		return display->GetTextSize();
+	}
+
+	return -1;
+}
+
 void Keyboard::SetWrap(bool b)
 {
 	if (_show_text == true && display != NULL) {
 		display->SetWrap(b);
-	} 
-}
-
-void Keyboard::Clear()
-{
-	if (_show_text == true && display != NULL) {
-		display->SetText("");
-		display->Repaint();
 	} 
 }
 

@@ -85,9 +85,9 @@ void Marquee::SetType(jmarquee_type_t type)
 void Marquee::Run()
 {
 	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
-			w = _size.width-2*x,
-			h = _size.height-2*y;
+			// y = _vertical_gap+_border_size,
+			w = _size.width-2*x;
+			// h = _size.height-2*y;
 	int string_width = 0; 
 
 	while (_running == true) {

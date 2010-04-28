@@ -100,6 +100,26 @@ void Menu::MouseWheel(MouseEvent *event)
 {
 }
 
+void Menu::SetBounds(int x, int y, int w, int h)
+{
+	_frame->SetBounds(x, y, w, h);
+}
+
+void Menu::SetLocation(int x, int y)
+{
+	_frame->SetLocation(x, y);
+}
+
+void Menu::SetSize(int w, int h)
+{
+	_frame->SetSize(w, h);
+}
+
+void Menu::Move(int x, int y)
+{
+	_frame->Move(x, y);
+}
+
 jpoint_t Menu::GetLocation()
 {
 	return _frame->GetLocation();

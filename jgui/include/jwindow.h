@@ -149,7 +149,7 @@ class Window : public Container{
 		 * \brief
 		 *
 		 */
-		virtual void SetPosition(int x1, int y1);
+		virtual void SetLocation(int x1, int y1);
 		
 		/**
 		 * \brief

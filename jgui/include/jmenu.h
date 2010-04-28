@@ -45,8 +45,6 @@ enum jmenu_align_t {
 	SUBMENU_ALIGN
 };
 
-class ComboMenuComponent;
-
 /**
  * \brief
  *
@@ -118,6 +116,30 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener{
 		 */
 		virtual void SetTitle(std::string title);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetBounds(int x, int y, int w, int h);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetLocation(int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSize(int w, int h);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Move(int x, int y);
+
 		/**
 		 * \brief
 		 *

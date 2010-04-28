@@ -330,7 +330,7 @@ void Frame::Paint(Graphics *g)
 		
 			g->SetClip(0, 0, _size.width, _insets.top);
 			g->DrawString(text, _insets.left+(_size.width-_insets.left-_insets.right-_font->GetStringWidth(text))/2, y);
-			g->SetClip(0, 0, _size.width, _size.height);
+			g->ReleaseClip();
 		}
 	}
 
@@ -382,6 +382,8 @@ void Frame::Paint(Graphics *g)
 			}
 		}
 	}
+
+	g->Reset();
 
 	// INFO:: render over window attributes
 	PaintEdges(g);

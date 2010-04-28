@@ -130,13 +130,13 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::F
 		 * \brief
 		 *
 		 */
-		virtual void SetMaxTextSize(int max);
+		virtual void SetTextSize(int max);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Clear();
+		virtual int GetTextSize();
 		
 		/**
 		 * \brief
