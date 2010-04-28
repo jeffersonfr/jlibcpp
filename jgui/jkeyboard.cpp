@@ -209,7 +209,7 @@ void Keyboard::TextChanged(TextEvent *event)
 void Keyboard::SetMaxTextSize(int max)
 {
 	if (_show_text == true) {
-		display->SetMaxTextSize(max);
+		display->SetTextSize(max);
 	}
 }
 

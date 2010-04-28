@@ -267,6 +267,24 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener{
 		 *
 		 */
 		virtual void InputChanged(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void RegisterInputListener(FrameInputListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void RemoveInputListener(FrameInputListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		std::vector<FrameInputListener *> & GetFrameInputListeners();
 };
 
 }

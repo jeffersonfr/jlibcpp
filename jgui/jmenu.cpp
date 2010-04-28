@@ -673,4 +673,19 @@ void Menu::SetCurrentIndex(int i)
 	}
 }
 
+void Menu::RegisterInputListener(FrameInputListener *listener)
+{
+	_frame->RegisterInputListener(listener);
+}
+
+void Menu::RemoveInputListener(FrameInputListener *listener)
+{
+	_frame->RemoveInputListener(listener);
+}
+
+std::vector<FrameInputListener *> & Menu::GetFrameInputListeners()
+{
+	return _frame->GetFrameInputListeners();
+}
+
 }
