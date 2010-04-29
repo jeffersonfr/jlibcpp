@@ -43,7 +43,7 @@ void ComponentListener::ComponentMoved(ComponentEvent *event)
 {
 }
 
-void ComponentListener::ComponentRepainted(ComponentEvent *event)
+void ComponentListener::ComponentPainted(ComponentEvent *event)
 {
 }
 

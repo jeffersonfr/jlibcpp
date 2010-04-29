@@ -51,4 +51,8 @@ void WindowListener::WindowMoved(WindowEvent *event)
 {
 }
 
+void WindowListener::WindowPainted(WindowEvent *event)
+{
+}
+
 }

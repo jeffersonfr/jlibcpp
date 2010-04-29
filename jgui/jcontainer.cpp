@@ -358,7 +358,7 @@ void Container::Repaint(bool all)
 		}
 	}
 
-	Component::DispatchComponentEvent(new ComponentEvent(this, COMPONENT_PAINT_EVENT));
+	Component::DispatchComponentEvent(new ComponentEvent(this, COMPONENT_PAINTED_EVENT));
 }
 
 void Container::Repaint(int x, int y, int width, int height)

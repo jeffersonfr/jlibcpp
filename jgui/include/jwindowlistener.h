@@ -87,6 +87,12 @@ class WindowListener : public jcommon::Listener{
 		 */
 		virtual void WindowMoved(WindowEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void WindowPainted(WindowEvent *event);
+
 };
 
 }

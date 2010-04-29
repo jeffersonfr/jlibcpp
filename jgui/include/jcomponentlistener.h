@@ -79,7 +79,7 @@ class ComponentListener : public jcommon::Listener{
 		 * \brief
 		 *
 		 */
-		virtual void ComponentRepainted(ComponentEvent *event);
+		virtual void ComponentPainted(ComponentEvent *event);
 
 };
 

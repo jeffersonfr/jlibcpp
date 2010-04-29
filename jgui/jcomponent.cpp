@@ -392,7 +392,7 @@ void Component::Repaint(bool all)
 		}
 	}
 
-	DispatchComponentEvent(new ComponentEvent(this, COMPONENT_PAINT_EVENT));
+	DispatchComponentEvent(new ComponentEvent(this, COMPONENT_PAINTED_EVENT));
 }
 
 void Component::SetMinimumSize(jsize_t size)
@@ -1085,8 +1085,8 @@ void Component::DispatchComponentEvent(ComponentEvent *event)
 			listener->ComponentShown(event);
 		} else if (event->GetType() == COMPONENT_MOVED_EVENT) {
 			listener->ComponentMoved(event);
-		} else if (event->GetType() == COMPONENT_PAINT_EVENT) {
-			listener->ComponentRepainted(event);
+		} else if (event->GetType() == COMPONENT_PAINTED_EVENT) {
+			listener->ComponentPainted(event);
 		}
 	}
 

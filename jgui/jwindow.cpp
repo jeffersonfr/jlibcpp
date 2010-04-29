@@ -509,7 +509,7 @@ void Window::Repaint(bool all)
 
 	Revalidate();
 
-	Component::DispatchComponentEvent(new ComponentEvent(this, COMPONENT_PAINT_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, WINDOW_PAINTED_EVENT));
 }
 
 void Window::Repaint(int x, int y, int width, int height)
@@ -766,6 +766,8 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 			listener->WindowResized(event);
 		} else if (event->GetType() == WINDOW_MOVED_EVENT) {
 			listener->WindowMoved(event);
+		} else if (event->GetType() == WINDOW_PAINTED_EVENT) {
+			listener->WindowPainted(event);
 		}
 	}
 
