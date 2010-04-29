@@ -207,9 +207,9 @@ void Button::Paint(Graphics *g)
 
 	if (_font != NULL) {
 		if (_has_focus == true) {
-			g->SetColor(_fgfocus_color);
+			g->SetColor(_focus_fgcolor);
 		} else {
-			g->SetColor(_fg_color);
+			g->SetColor(_fgcolor);
 		}
 
 		int x = _horizontal_gap+_border_size,

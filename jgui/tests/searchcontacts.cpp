@@ -158,7 +158,7 @@ void SearchContacts::InputChanged(jgui::KeyEvent *event)
 
 		jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, true);
 
-		keyboard.SetMaxTextSize(20);
+		keyboard.SetTextSize(20);
 		keyboard.RegisterKeyboardListener(this);
 
 		keyboard.Show();

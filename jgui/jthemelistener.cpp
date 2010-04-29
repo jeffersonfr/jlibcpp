@@ -17,98 +17,22 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_THEMEMANAGER_H
-#define J_THEMEMANAGER_H
-
-#include "jtheme.h"
 #include "jthemelistener.h"
-
-#include <string>
-
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 
 namespace jgui {
 
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class ThemeManager : public jcommon::Object{
-
-	private:
-		static ThemeManager *_instance;
-
-		std::vector<ThemeListener *> _theme_listeners;
-		Theme *_theme,
-					*_default_theme;
-
-		/**
-		 * \brief
-		 *
-		 */
-		ThemeManager();
-
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ThemeManager();
-
-		/**
-		 * \brief
-		 *
-		 */
-		static ThemeManager * GetInstance();
-
-		/**
-		 * \brief
-		 *
-		 */
-		Theme * GetDefaultTheme();
-
-		/**
-		 * \brief
-		 *
-		 */
-		void SetTheme(Theme *theme);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		Theme * GetTheme();
-
-		/**
-		 * \brief
-		 *
-		 */
-		void RegisterThemeListener(ThemeListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveThemeListener(ThemeListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DispatchThemeEvent(ThemeEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<ThemeListener *> & GetThemeListeners();
-
-};
-
+ThemeListener::ThemeListener():
+	jcommon::Listener()
+{
+	jcommon::Object::SetClassName("jgui::ThemeListener");
 }
 
-#endif
+ThemeListener::~ThemeListener()
+{
+}
 
+void ThemeListener::ThemeChanged(ThemeEvent *event)
+{
+}
+
+}

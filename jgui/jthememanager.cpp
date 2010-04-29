@@ -69,7 +69,7 @@ void ThemeManager::SetTheme(Theme *theme)
 
 	_theme = theme;
 
-	Update();
+	DispatchThemeEvent(new ThemeEvent(this, _theme));
 }
 
 Theme * ThemeManager::GetTheme()
@@ -81,19 +81,64 @@ Theme * ThemeManager::GetTheme()
 	return _default_theme;
 }
 
-void ThemeManager::Update()
+void ThemeManager::RegisterThemeListener(ThemeListener *listener)
 {
-	if (_theme == NULL) {
+	if (listener == NULL) {
 		return;
 	}
 
-	std::vector<Window *>::reverse_iterator i;
+	if (std::find(_theme_listeners.begin(), _theme_listeners.end(), listener) == _theme_listeners.end()) {
+		_theme_listeners.push_back(listener);
 
-	for (i=WindowManager::GetInstance()->GetWindows().rbegin(); i!=WindowManager::GetInstance()->GetWindows().rend(); i++) {
-		if ((*i)->IsThemeEnabled() == true) {
-			_theme->Update(*i);
+		if (_theme != NULL) {
+			ThemeEvent *event = new ThemeEvent(this, _theme);
+
+			listener->ThemeChanged(event);
+
+			delete event;
 		}
 	}
+}
+
+void ThemeManager::RemoveThemeListener(ThemeListener *listener)
+{
+	if (listener == NULL) {
+		return;
+	}
+
+	std::vector<ThemeListener *>::iterator i = std::find(_theme_listeners.begin(), _theme_listeners.end(), listener);
+	
+	if (i != _theme_listeners.end()) {
+		_theme_listeners.erase(i);
+	}
+}
+
+void ThemeManager::DispatchThemeEvent(ThemeEvent *event)
+{
+	if (event == NULL) {
+		return;
+	}
+
+	int k=0;
+
+	while (k++ < (int)_theme_listeners.size()) {
+		ThemeListener *listener = _theme_listeners[k-1];
+
+		listener->ThemeChanged(event);
+	}
+
+	/*
+	for (std::vector<ThemeListener *>::iterator i=_theme_listeners.begin(); i!=_theme_listeners.end(); i++) {
+		listener->ChangedTheme(event);
+	}
+	*/
+
+	delete event;
+}
+
+std::vector<ThemeListener *> & ThemeManager::GetThemeListeners()
+{
+	return _theme_listeners;
 }
 
 }

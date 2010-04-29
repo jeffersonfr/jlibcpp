@@ -177,7 +177,7 @@ jcolor_t ComboBox::GetItemColor()
 
 void ComboBox::SetItemColor(jcolor_t color)
 {
-	_menu->SetItemColor(color);
+	((jgui::ItemComponent *)_menu)->SetItemColor(color);
 }
 
 void ComboBox::SetItemColor(int red, int green, int blue, int alpha)
@@ -323,9 +323,9 @@ void ComboBox::Paint(Graphics *g)
 
 		if (item != NULL && _font != NULL) {
 			if (_has_focus == true) {
-				g->SetColor(_fgfocus_color);
+				g->SetColor(_focus_fgcolor);
 			} else {
-				g->SetColor(_fg_color);
+				g->SetColor(_fgcolor);
 			}
 
 			int px = x+gapx,

@@ -480,9 +480,9 @@ void TextArea::Paint(Graphics *g)
 					}
 					
 					if (_has_focus == true) {
-						g->SetColor(_fgfocus_color);
+						g->SetColor(_focus_fgcolor);
 					} else {
-						g->SetColor(_fg_color);
+						g->SetColor(_fgcolor);
 					}
 
 					g->DrawString(s, x, y+k*font_height);

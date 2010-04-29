@@ -229,7 +229,7 @@ void TextField::Paint(Graphics *g)
 		paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
 	}
 
-	g->SetColor(_fg_color);
+	g->SetColor(_fgcolor);
 
 	current_text_size = 0;
 
@@ -295,7 +295,6 @@ void TextField::Paint(Graphics *g)
 
 	if (_has_focus == true && _is_editable == true && _caret_visible == true) {
 		g->SetColor(0xff, 0x00, 0x00, 0xff);
-		// g->SetColor(_fgfocus_color);
 
 		g->DrawString(cursor,x+current_text_size+offset, y, w, h);
 	}

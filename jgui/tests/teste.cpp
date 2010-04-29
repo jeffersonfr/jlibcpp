@@ -52,7 +52,7 @@
 #include "jmenu.h"
 #include "jfont.h"
 #include "joffscreenimage.h"
-#include "jtextdialog.h"
+#include "jtextdialogbox.h"
 #include "jmenugroup.h"
 #include "jtable.h"
 #include "jfilechooserdialog.h"
@@ -144,7 +144,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			text_field = new jgui::TextField(500, 290, 700, 40, -1);
+			text_field = new jgui::TextField(500, 290, 700, 40);
 
 			text_field->Insert("TextField");
 		}
@@ -880,7 +880,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 					*item12 = new jgui::Item("item 1.2"),
 					*item111 = new jgui::Item("item 1.1.1", true),
 					*item112 = new jgui::Item("item 1.1.2", false),
-					*item31 = new jgui::Item("item 3.1", std::string("icons/alert_icon.png")),
+					*item31 = new jgui::Item("item 3.1"),
 					*item32 = new jgui::Item("item 3.2"),
 					*item33 = new jgui::Item("item 3.3");
 
@@ -913,7 +913,6 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 				group->Add(item111);
 				group->Add(item112);
 
-				menu->SetTitle("Menu de Teste");
 				menu->Show();
 			}
 		}

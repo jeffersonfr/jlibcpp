@@ -17,262 +17,273 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_WINDOW_H
-#define J_WINDOW_H
+#ifndef	J_TEXTCOMPONENT_H
+#define J_TEXTCOMPONENT_H
 
-#include "jcontainer.h"
-#include "jwindowlistener.h"
-#include "joffscreenimage.h"
-#include "jthemelistener.h"
-#include "jmutex.h"
+#include "jcomponent.h"
+#include "jtextlistener.h"
+#include "jgraphics.h"
 
-#include <stdint.h>
-#include <string.h>
+#include <string>
 
-namespace jgui{
+#include <stdlib.h>
+#include <unistd.h>
+#include <stdio.h>
 
-class Graphics;
-class InputManager;
+namespace jgui {
+
+/**
+ * \brief
+ *
+ */
+enum jcursor_type_t {
+	NONE_CURSOR,
+	UNDERSCORE_CURSOR,
+	STICK_CURSOR,
+	BLOCK_CURSOR
+};
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class Window : public jgui::Container, public jgui::ThemeListener{
-
-	friend class InputManager;
-	friend class WindowManager;
+class TextComponent : public jgui::Component{
 
 	protected:
-#ifdef DIRECTFB_UI
-		IDirectFBWindow *window;
-		IDirectFBSurface *surface;
-#endif
-
-		std::vector<WindowListener *> _window_listeners;
-		jthread::Mutex _inner_mutex;
-		Graphics *graphics;
-		int bWidth, 
-			bHeight,
-			_opacity;
-		bool _undecorated;
-		jcursor_style_t _cursor;
-
-		void InnerCreateWindow();
+		std::vector<TextListener *> _text_listeners;
+		jhorizontal_align_t _halign;
+		jvertical_align_t _valign;
+		jcursor_type_t _caret_type;
+		std::string _text;
+		int _caret_position,
+				_selection_start,
+				_selection_end,
+				_max_text_length;
+		bool _is_editable,
+				 _caret_visible;
+		char _echo_char;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		Window(int x, int y, int width, int height, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		TextComponent(int x, int y, int width, int height);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~Window();
+		virtual ~TextComponent();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetTextSize(int max);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetTextSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetEchoChar(char echo_char);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual char GetEchoChar();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool EchoCharIsSet();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCaretType(jcursor_type_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCaretVisible(bool visible);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetSelectedText();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsEditable();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetEditable(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetSelectionStart();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSelectionStart(int position);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetSelectionEnd();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSelectionEnd(int position);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Select(int start, int end);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SelectAll();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCaretPosition(int position);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetCaretPosition();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetText(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetText();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void IncrementCaretPosition(int size = 1);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DecrementCaretPosition(int size = 1);
 
 		/**
 		 * \brief
 		 *
 		 */
-		Graphics * GetGraphics();
+		virtual void Insert(std::string text);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void * GetNativeWindow();
+		virtual void Append(std::string text);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetWorkingScreenSize(int width, int height);
+		virtual void Backspace();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetOpacity(int i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetOpacity();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVisible(bool b);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetUndecorated(bool b);
+		virtual void Delete();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetCursor(jcursor_style_t t);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcursor_style_t GetCursor();
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jvertical_align_t GetVerticalAlign();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetMinimumSize(int w, int h);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMaximumSize(int w, int h);
+		virtual jhorizontal_align_t GetHorizontalAlign();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetBounds(int x1, int y1, int w1, int h1);
+		void RegisterTextListener(TextListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetLocation(int x1, int y1);
+		void RemoveTextListener(TextListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetSize(int w, int h);
+		void DispatchTextEvent(TextEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Move(int x1, int y1);
+		std::vector<TextListener *> & GetTextListeners();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Flip();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Clear();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Hide();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Show(bool modal = true);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Repaint(bool all = false);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Repaint(int x, int y, int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Repaint(Component *c, int x, int y, int width, int height);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ReleaseWindow();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RaiseToTop();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void LowerToBottom();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PutAtop(Window *w);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PutBelow(Window *w);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DumpScreen(std::string dir, std::string pre);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void RegisterWindowListener(WindowListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveWindowListener(WindowListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DispatchWindowEvent(WindowEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<WindowListener *> & GetWindowListeners();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ThemeChanged(ThemeEvent *event);
 };
 
 }
 
-#endif 
+#endif
+

@@ -142,12 +142,12 @@ class Component : public virtual jcommon::Object{
 						_minimum_size,
 						_maximum_size,
 						_preferred_size;
-		jcolor_t _bg_color,
-						 _fg_color,
-						 _bgfocus_color,
-						 _fgfocus_color,
+		jcolor_t _bgcolor,
+						 _fgcolor,
+						 _focus_bgcolor,
+						 _focus_fgcolor,
 						 _border_color,
-						 _borderfocus_color;
+						 _focus_border_color;
 		jcomponent_alignment_t _alignment_x,
 													 _alignment_y;
 		jcomponent_orientation_t _orientation;
@@ -157,14 +157,14 @@ class Component : public virtual jcommon::Object{
 				_horizontal_gap,
 				_border_size;
 		bool _has_focus,
-			 _is_visible,
-			 _ignore_repaint,
-			 _background_visible,
-			 _is_focusable,
-			 _enabled,
-			 _theme_enabled,
-			 _is_opaque,
-			 _is_valid;
+				 _is_visible,
+				 _ignore_repaint,
+				 _background_visible,
+				 _is_focusable,
+				 _enabled,
+				 _theme_enabled,
+				 _is_opaque,
+				 _is_valid;
 
 	protected:
 		/**
@@ -707,6 +707,12 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual jcolor_t GetBorderColor();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetBorderFocusColor();
 
 		/**
 		 * \brief

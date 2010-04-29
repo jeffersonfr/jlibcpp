@@ -37,20 +37,20 @@ Theme::Theme():
 	SetComponentForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
 	SetComponentBackgroundFocusColor(0x06, 0x65, 0xaa, 0xff);
 	SetComponentForegroundFocusColor(0xf0, 0xf0, 0xf0, 0xff);
-	SetComponentBorderColor(0x60, 0x60, 0x80, 0xff); // 0xff355575;
+	SetComponentBorderColor(0x60, 0x60, 0x80, 0xff);
 	SetComponentBorderFocusColor(0xf0, 0xf0, 0xf0, 0xff);
 	
 	SetItemColor(0x17, 0x27, 0x3e, 0xff);
-	SetItemFocusColor(0x37, 0x47, 0x5e, 0xff);
-	SetItemForegroundColor(0x17, 0x27, 0x3e, 0xff);
-	SetItemForegroundFocusColor(0x37, 0x47, 0x5e, 0xff);
+	SetItemFocusColor(0x57, 0x67, 0x7e, 0xff);
+	SetSelectedItemColor(0x80, 0x80, 0x80, 0xff);
+	SetSelectedItemForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
+	SetItemForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
+	SetItemForegroundFocusColor(0xf0, 0xf0, 0xf0, 0xff);
 
 	_component_border_size = 1;
 	_component_border = LINE_BORDER;
 
 	_component_font = NULL;
-
-	_gradient_level = 0x40;
 
 	_insets.left = 30;
 	_insets.top = 60;
@@ -78,8 +78,6 @@ void Theme::Update(Component *parent)
 
 	// WARN:: esse metodo pode causar problemas pela falta de sincronizacao com a Window (em caso de remocao ou adicao de componentes)
 	
-	parent->SetIgnoreRepaint(true);
-
 	if (parent->InstanceOf("jgui::Window") == true) {
 		Window *w = (Window *)parent;
 
@@ -118,7 +116,6 @@ void Theme::Update(Component *parent)
 			c->SetBorderFocusColor(_component_border_focus_color);
 			c->SetBackgroundFocusColor(_component_focus_bgcolor);
 			c->SetForegroundFocusColor(_component_focus_fgcolor);
-			c->SetGradientLevel(_gradient_level);
 			c->SetBorderSize(_component_border_size);
 			c->SetBorder(_component_border);
 
@@ -131,6 +128,8 @@ void Theme::Update(Component *parent)
 
 				ic->SetItemColor(_item_color);
 				ic->SetItemFocusColor(_item_focus_color);
+				ic->SetSelectedItemColor(_item_selected_color);
+				ic->SetSelectedItemForegroundColor(_item_selected_fgcolor);
 				ic->SetItemForegroundColor(_item_fgcolor);
 				ic->SetItemForegroundFocusColor(_item_focus_fgcolor);
 			}
@@ -138,9 +137,6 @@ void Theme::Update(Component *parent)
 
 		stack.erase(stack.begin());
 	}
-
-	parent->SetIgnoreRepaint(false);
-	parent->Repaint();
 }
 
 void Theme::SetWindowBackgroundColor(int red, int green, int blue, int alpha)
@@ -253,6 +249,26 @@ void Theme::SetItemFocusColor(int red, int green, int blue, int alpha)
 	_item_focus_color.alpha = alpha;
 }
 
+void Theme::SetSelectedItemColor(int red, int green, int blue, int alpha)
+{
+	TRUNC_COLOR(red, green, blue, alpha);
+
+	_item_selected_color.red = red;
+	_item_selected_color.green = green;
+	_item_selected_color.blue = blue;
+	_item_selected_color.alpha = alpha;
+}
+
+void Theme::SetSelectedItemForegroundColor(int red, int green, int blue, int alpha)
+{
+	TRUNC_COLOR(red, green, blue, alpha);
+
+	_item_selected_fgcolor.red = red;
+	_item_selected_fgcolor.green = green;
+	_item_selected_fgcolor.blue = blue;
+	_item_selected_fgcolor.alpha = alpha;
+}
+
 void Theme::SetItemForegroundColor(int red, int green, int blue, int alpha)
 {
 	TRUNC_COLOR(red, green, blue, alpha);
@@ -311,9 +327,114 @@ void Theme::SetComponentFont(Font *font)
 	_component_font = font;
 }
 
-void Theme::SetGradientLevel(int level)
+jcolor_t Theme::GetWindowBackgroundColor()
 {
-	_gradient_level = level;
+	return _window_bgcolor;
+}
+
+jcolor_t Theme::GetWindowForegroundColor()
+{
+	return _window_fgcolor;
+}
+
+jcolor_t Theme::GetWindowBorderColor()
+{
+	return _window_border_color;
+}
+
+jcolor_t Theme::GetComponentBackgroundColor()
+{
+	return _component_bgcolor;
+}
+
+jcolor_t Theme::GetComponentForegroundColor()
+{
+	return _component_fgcolor;
+}
+
+jcolor_t Theme::GetComponentBorderColor()
+{
+	return _component_border_color;
+}
+
+jcolor_t Theme::GetComponentBorderFocusColor()
+{
+	return _component_border_focus_color;
+}
+
+jcolor_t Theme::GetComponentBackgroundFocusColor()
+{
+	return _component_focus_bgcolor;
+}
+
+jcolor_t Theme::GetComponentForegroundFocusColor()
+{
+	return _component_focus_fgcolor;
+}
+
+jcolor_t Theme::GetItemColor()
+{
+	return _item_color;
+}
+
+jcolor_t Theme::GetItemFocusColor()
+{
+	return _item_focus_color;
+}
+
+jcolor_t Theme::GetSelectedItemColor()
+{
+	return _item_selected_color;
+}
+
+jcolor_t Theme::GetSelectedItemForegroundColor()
+{
+	return _item_selected_fgcolor;
+}
+
+jcolor_t Theme::GetItemForegroundColor()
+{
+	return _item_fgcolor;
+}
+
+jcolor_t Theme::GetItemForegroundFocusColor()
+{
+	return _item_focus_fgcolor;
+}
+
+jcomponent_border_t Theme::GetComponentBorder()
+{
+	return _component_border;
+}
+
+jcomponent_border_t Theme::GetWindowBorder()
+{
+	return _window_border;
+}
+
+jinsets_t Theme::GetWindowInsets()
+{
+	return _insets;
+}
+
+int Theme::GetWindowBorderSize()
+{
+	return _window_border_size;
+}
+
+int Theme::GetComponentBorderSize()
+{
+	return _component_border_size;
+}
+
+Font * Theme::GetWindowFont()
+{
+	return _window_font;
+}
+
+Font * Theme::GetComponentFont()
+{
+	return _component_font;
 }
 
 }

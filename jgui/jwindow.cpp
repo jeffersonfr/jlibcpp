@@ -64,13 +64,13 @@ Window::Window(int x, int y, int width, int height, int opacity, int scale_width
 
 	WindowManager::GetInstance()->Add(this);
 
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	theme->Update(this);
+	ThemeManager::GetInstance()->RegisterThemeListener(this);
 }
 
 Window::~Window()
 {
+	ThemeManager::GetInstance()->RemoveThemeListener(this);
+
 	DispatchWindowEvent(new WindowEvent(this, WINDOW_CLOSING_EVENT));
 
 #ifdef DIRECTFB_UI
@@ -791,6 +791,18 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 std::vector<WindowListener *> & Window::GetWindowListeners()
 {
 	return _window_listeners;
+}
+
+void Window::ThemeChanged(ThemeEvent *event)
+{
+	SetIgnoreRepaint(true);
+
+	Theme *theme = event->GetTheme();
+
+	theme->Update(this);
+	
+	SetIgnoreRepaint(false);
+	Repaint();
 }
 
 }

@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "addcontact.h"
-#include "jyesnodialog.h"
+#include "jyesnodialogbox.h"
 #include "jkeyboard.h"
 #include "jlabel.h"
 #include "jtextfield.h"
@@ -42,9 +42,13 @@ AddContact::AddContact(PhoneDB *base, int x, int y):
 	label2 = new jgui::Label("Telefone 1", _insets.left, _insets.top+2*sheight, max_width, dheight);
 	label3 = new jgui::Label("Telefone 2", _insets.left, _insets.top+4*sheight, max_width, dheight);
 
-	field1 = new jgui::TextField(_insets.left, _insets.top+1*sheight, max_width, dheight, 20);
-	field2 = new jgui::TextField(_insets.left, _insets.top+3*sheight, max_width, dheight, 20);
-	field3 = new jgui::TextField(_insets.left, _insets.top+5*sheight, max_width, dheight, 20);
+	field1 = new jgui::TextField(_insets.left, _insets.top+1*sheight, max_width, dheight);
+	field2 = new jgui::TextField(_insets.left, _insets.top+3*sheight, max_width, dheight);
+	field3 = new jgui::TextField(_insets.left, _insets.top+5*sheight, max_width, dheight);
+
+	field1->SetTextSize(20);
+	field2->SetTextSize(20);
+	field3->SetTextSize(20);
 
 	field2->SetEditable(false);
 	field3->SetEditable(false);
@@ -87,10 +91,14 @@ AddContact::AddContact(PhoneDB *base, int index, int x, int y):
 	label2 = new jgui::Label("Telefone 1", _insets.left, _insets.top+2*sheight, max_width, dheight);
 	label3 = new jgui::Label("Telefone 2", _insets.left, _insets.top+4*sheight, max_width, dheight);
 
-	field1 = new jgui::TextField(_insets.left, _insets.top+1*sheight, max_width, dheight, 20);
-	field2 = new jgui::TextField(_insets.left, _insets.top+3*sheight, max_width, dheight, 20);
-	field3 = new jgui::TextField(_insets.left, _insets.top+5*sheight, max_width, dheight, 20);
+	field1 = new jgui::TextField(_insets.left, _insets.top+1*sheight, max_width, dheight);
+	field2 = new jgui::TextField(_insets.left, _insets.top+3*sheight, max_width, dheight);
+	field3 = new jgui::TextField(_insets.left, _insets.top+5*sheight, max_width, dheight);
 
+	field1->SetTextSize(20);
+	field2->SetTextSize(20);
+	field3->SetTextSize(20);
+	
 	field2->SetEditable(false);
 	field3->SetEditable(false);
 
@@ -225,7 +233,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, false);
 
-			keyboard.SetMaxTextSize(20);
+			keyboard.SetTextSize(20);
 			keyboard.SetText(field1->GetText());
 			keyboard.RegisterKeyboardListener(this);
 
@@ -233,7 +241,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 
 			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE &&
 					keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
-				field1->Clear();
+				field1->SetText("");
 				field1->Insert(tmp);
 			}
 		} else if (GetComponentInFocus() == field2) {
@@ -241,7 +249,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
 
-			keyboard.SetMaxTextSize(20);
+			keyboard.SetTextSize(20);
 			keyboard.SetText(field2->GetText());
 			keyboard.RegisterKeyboardListener(this);
 
@@ -249,7 +257,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 
 			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE &&
 					keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
-				field2->Clear();
+				field2->SetText("");
 				field2->Insert(tmp);
 			}
 		} else if (GetComponentInFocus() == field3) {
@@ -257,7 +265,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
 
-			keyboard.SetMaxTextSize(20);
+			keyboard.SetTextSize(20);
 			keyboard.SetText(field3->GetText());
 			keyboard.RegisterKeyboardListener(this);
 
@@ -265,7 +273,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 
 			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE ||
 					keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
-				field3->Clear();
+				field3->SetText("");
 				field3->Insert(tmp);
 			}
 		}

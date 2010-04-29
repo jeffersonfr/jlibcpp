@@ -1,10 +1,11 @@
 #include "addmessage.h"
-#include "jyesnodialog.h"
 #include "jcalendardialog.h"
 #include "jkeyboard.h"
 #include "jlabel.h"
+#include "jtextarea.h"
 #include "jtextfield.h"
-#include "jmessagedialog.h"
+#include "jyesnodialogbox.h"
+#include "jmessagedialogbox.h"
 #include "jdate.h"
 
 namespace magenda {
@@ -29,12 +30,12 @@ AddMessage::AddMessage(AgendaDB *base, int x, int y):
 	_minute = 0;
 
 	label1 = new jgui::Label("Hora", _insets.left, _insets.top+0*sheight, 350, dheight);
-	hour = new jgui::TextField(label1->GetX()+label1->GetWidth()+10, _insets.top+0*sheight, 80, dheight, 2);
+	hour = new jgui::TextField(label1->GetX()+label1->GetWidth()+10, _insets.top+0*sheight, 80, dheight);
 	label2 = new jgui::Label(":", hour->GetX()+hour->GetWidth(), _insets.top+0*sheight, 20, dheight);
-	minute = new jgui::TextField(label2->GetX()+label2->GetWidth(), _insets.top+0*sheight, 80, dheight, 2);
+	minute = new jgui::TextField(label2->GetX()+label2->GetWidth(), _insets.top+0*sheight, 80, dheight);
 
-	hour->SetMaxTextSize(2);
-	minute->SetMaxTextSize(2);
+	hour->SetTextSize(2);
+	minute->SetTextSize(2);
 
 	hour->Insert("12");
 	minute->Insert("00");
@@ -105,12 +106,12 @@ AddMessage::AddMessage(AgendaDB *base, int index, int x, int y):
 
 
 	label1 = new jgui::Label("Hora", _insets.left, _insets.top+0*sheight, 350, dheight);
-	hour = new jgui::TextField(label1->GetX()+label1->GetWidth()+10, _insets.top+0*sheight, 80, dheight, 2);
+	hour = new jgui::TextField(label1->GetX()+label1->GetWidth()+10, _insets.top+0*sheight, 80, dheight);
 	label2 = new jgui::Label(":", hour->GetX()+hour->GetWidth(), _insets.top+0*sheight, 20, dheight);
-	minute = new jgui::TextField(label2->GetX()+label2->GetWidth(), _insets.top+0*sheight, 80, dheight, 2);
+	minute = new jgui::TextField(label2->GetX()+label2->GetWidth(), _insets.top+0*sheight, 80, dheight);
 
-	hour->SetMaxTextSize(2);
-	minute->SetMaxTextSize(2);
+	hour->SetTextSize(2);
+	minute->SetTextSize(2);
 	hour->Insert("12");
 	minute->Insert("00");
 
@@ -205,7 +206,7 @@ void AddMessage::KeyboardUpdated(jgui::KeyboardEvent *event)
 					    delta = atoi(num.c_str());
 					char tmp[255];
 
-					hour->Clear();
+					hour->SetText("");
 
 					if (h == 0) {
 						sprintf(tmp, "0%d", delta);
@@ -229,7 +230,7 @@ void AddMessage::KeyboardUpdated(jgui::KeyboardEvent *event)
 					    delta = atoi(num.c_str());
 					char tmp[255];
 
-					minute->Clear();
+					minute->SetText("");
 
 					if (h == 0) {
 						sprintf(tmp, "0%d", delta);
@@ -297,7 +298,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 			    delta = atoi(num.c_str());
 			char tmp[255];
 
-			hour->Clear();
+			hour->SetText("");
 
 			if (h == 0) {
 				sprintf(tmp, "0%d", delta);
@@ -321,7 +322,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 			    delta = atoi(num.c_str());
 			char tmp[255];
 
-			minute->Clear();
+			minute->SetText("");
 
 			if (h == 0) {
 				sprintf(tmp, "0%d", delta);
@@ -343,14 +344,14 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
 
-			keyboard.SetMaxTextSize(20);
+			keyboard.SetTextSize(20);
 			keyboard.SetText(hour->GetText());
 			keyboard.RegisterKeyboardListener(this);
 
 			keyboard.Show();
 
 			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE && keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
-				hour->Clear();
+				hour->SetText("");
 				hour->Insert(tmp);
 			}
 		} else if (GetComponentInFocus() == minute) {
@@ -358,14 +359,14 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
 
-			keyboard.SetMaxTextSize(20);
+			keyboard.SetTextSize(20);
 			keyboard.SetText(minute->GetText());
 			keyboard.RegisterKeyboardListener(this);
 
 			keyboard.Show();
 
 			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE && keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
-				minute->Clear();
+				minute->SetText("");
 				minute->Insert(tmp);
 			}
 		} else if (GetComponentInFocus() == date) {
@@ -386,14 +387,14 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 
 				sprintf(tmp, "%02d/%02d/%04d", calendar.GetDay(), calendar.GetMonth(), calendar.GetYear());
 
-				date->Clear();
+				date->SetText("");
 				date->Insert(tmp);
 
 				_day = calendar.GetDay();
 				_month = calendar.GetMonth();
 				_year = calendar.GetYear();
 			} else {
-				date->Clear();
+				date->SetText("");
 				date->Insert(tmp);
 			}
 		} else if (GetComponentInFocus() == message) {
@@ -401,14 +402,14 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, false);
 
-			keyboard.SetMaxTextSize(20);
+			keyboard.SetTextSize(20);
 			keyboard.SetText(message->GetText());
 			keyboard.RegisterKeyboardListener(this);
 
 			keyboard.Show();
 
 			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE && keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
-				message->Clear();
+				message->SetText("");
 				message->Insert(tmp);
 			}
 		}

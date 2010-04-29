@@ -158,6 +158,12 @@ class ListBox : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
+		virtual void SetCurrentIndex(int i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
 		
 		/**
@@ -176,7 +182,13 @@ class ListBox : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		virtual void SetCurrentIndex(int i);
+		virtual void SetForegroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetForegroundFocusColor(int red, int green, int blue, int alpha);
 
 };
 

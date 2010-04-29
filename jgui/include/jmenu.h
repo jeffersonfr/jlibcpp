@@ -25,6 +25,7 @@
 #include "joffscreenimage.h"
 #include "jmouselistener.h"
 #include "jitemcomponent.h"
+#include "jthememanager.h"
 
 #include <string>
 #include <iostream>
@@ -50,7 +51,7 @@ enum jmenu_align_t {
  *
  * \author Jeff Ferr
  */
-class Menu : public jgui::ItemComponent, public jgui::FrameInputListener{
+class Menu : public jgui::ItemComponent, public jgui::FrameInputListener, public jgui::ThemeListener{
 
 	private:
 		jthread::Mutex _menu_mutex;
@@ -222,25 +223,13 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener{
 		 * \brief
 		 *
 		 */
-		virtual void SetItemColor(jcolor_t color);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBackgroundColor(jcolor_t color);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundColor(jcolor_t color);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetItemColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
@@ -307,6 +296,12 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener{
 		 *
 		 */
 		std::vector<FrameInputListener *> & GetFrameInputListeners();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ThemeChanged(ThemeEvent *event);
 };
 
 }

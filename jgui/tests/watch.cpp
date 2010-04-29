@@ -158,6 +158,8 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 			// draw second
 			g->DrawLine((int)(xc), (int)(yc), (int)(xc+vs*cos(ts)), (int)(yc+vs*sin(ts)));
 			g->DrawLine((int)(xc), (int)(yc), (int)(xc+hs*cos(ts+M_PI)), (int)(yc+hs*sin(ts+M_PI)));
+
+			g->Flip();
 		}
 
 };

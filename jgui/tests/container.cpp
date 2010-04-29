@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "jkeyboard.h"
 #include "jcalendardialog.h"
-#include "jyesnodialog.h"
 #include "jcheckbutton.h"
 #include "jcheckbuttongroup.h"
 #include "janimation.h"
@@ -39,7 +38,6 @@
 #include "jselectlistener.h"
 #include "jcheckbuttonlistener.h"
 #include "jlabel.h"
-#include "jmessagedialog.h"
 #include "jlistbox.h"
 #include "jframe.h"
 #include "jicon.h"
@@ -52,7 +50,6 @@
 #include "jmenu.h"
 #include "jfont.h"
 #include "joffscreenimage.h"
-#include "jtextdialog.h"
 #include "jmenugroup.h"
 #include "jcontainer.h"
 #include "jscrollpane.h"
@@ -147,7 +144,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			text_field = new jgui::TextField(500, 290, 700, 40, -1);
+			text_field = new jgui::TextField(500, 290, 700, 40);
 
 			text_field->Insert("TextField");
 		}

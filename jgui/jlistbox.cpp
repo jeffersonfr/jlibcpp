@@ -101,6 +101,16 @@ void ListBox::SetScrollType(jlist_scroll_type_t type)
 	_scroll = type;
 }
 
+void ListBox::SetForegroundColor(int red, int green, int blue, int alpha)
+{
+	SetItemForegroundColor(red, green, blue, alpha);
+}
+
+void ListBox::SetForegroundFocusColor(int red, int green, int blue, int alpha)
+{
+	SetItemForegroundFocusColor(red, green, blue, alpha);
+}
+
 void ListBox::Paint(Graphics *g)
 {
 	JDEBUG(JINFO, "paint\n");
@@ -159,50 +169,33 @@ void ListBox::Paint(Graphics *g)
 		default_y = (_item_size+y)*count+y;
 
 		if (_index != i) {
+			g->SetColor(_item_color);
+
 			if (_selection == SINGLE_SELECTION) {	
 				if (_selected_index == i) {	
-					g->SetColor(_fg_color);
-					FillRectangle(g, x, default_y, w-scroll_width-scroll_gap, _item_size);
-				} else {
-					g->SetColor(_item_color);
-					FillRectangle(g, x, default_y, w-scroll_width-scroll_gap, _item_size);
+					g->SetColor(_selected_item_color);
 				}
 			} else if (_selection == MULTI_SELECTION) {	
 				if (_items[i]->IsSelected() == true) {	
-					g->SetColor(_fg_color);
-					FillRectangle(g, x, default_y, w-scroll_width-scroll_gap, _item_size);
-				} else {
-					g->SetColor(_item_color);
-					FillRectangle(g, x, default_y, w-scroll_width-scroll_gap, _item_size);
+					g->SetColor(_selected_item_color);
 				}
-			} else {
-				g->SetColor(_item_color);
-				FillRectangle(g, x, default_y, w-scroll_width-scroll_gap, _item_size);
 			}
 		} else {
-			g->SetColor(_bgfocus_color);
-			FillRectangle(g, x, default_y, w-scroll_width-scroll_gap, _item_size);
-
-			/*
-			g->FillGradientRectangle(x, default_y, w-scroll_width-scroll_gap, (int)((_item_size)*0.6), _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-			g->FillGradientRectangle(x, default_y+(_item_size)/2, _width-2*x-scroll_width-scroll_gap, (_item_size)/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
-			*/
+			g->SetColor(_focus_item_color);
 		}
+
+		FillRectangle(g, x, default_y, w-scroll_width-scroll_gap, _item_size);
+
+		g->SetColor(_item_color);
 
 		if (_selection == SINGLE_SELECTION) {
 			if (_selected_index == i) {
-				g->SetColor(_item_color);
-			} else {
-				g->SetColor(_fg_color);
+				g->SetColor(_selected_item_color);
 			}
 		} else if (_selection == MULTI_SELECTION) {	
 			if (_items[i]->IsSelected() == true) {	
-				g->SetColor(_item_color);
-			} else {
-				g->SetColor(_fg_color);
+				g->SetColor(_selected_item_color);
 			}
-		} else {
-			g->SetColor(_fg_color);
 		}
 
 		if (_items[i]->GetType() == EMPTY_MENU_ITEM) {
@@ -215,9 +208,9 @@ void ListBox::Paint(Graphics *g)
 
 		if (IsFontSet() == true) {
 			if (_has_focus == true) {
-				g->SetColor(_fgfocus_color);
+				g->SetColor(_focus_item_fgcolor);
 			} else {
-				g->SetColor(_fg_color);
+				g->SetColor(_item_fgcolor);
 			}
 
 			int gapx = space;

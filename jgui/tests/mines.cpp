@@ -88,22 +88,22 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 		if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
 			if (current_col < max_cols-1) {
 				current_col++;
-				slide->SetPosition(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
+				slide->SetLocation(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
 			if (current_col > 0) {
 				current_col--;
-				slide->SetPosition(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
+				slide->SetLocation(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_UP) {
 			if (current_row > 0) {
 				current_row--;
-				slide->SetPosition(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
+				slide->SetLocation(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
 			if (current_row < max_rows-1) {
 				current_row++;
-				slide->SetPosition(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
+				slide->SetLocation(bx+GetX()+current_col*(size+delta), by+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_ENTER) {
 			UpdateBoard(1);
@@ -218,7 +218,7 @@ void Mines::InitializeFlags()
 
 void Mines::SetupBoard()
 {
-	slide->SetPosition(bx+GetX(), by+GetY());
+	slide->SetLocation(bx+GetX(), by+GetY());
 
 	if (graphics == NULL) {
 		return;

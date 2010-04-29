@@ -250,7 +250,7 @@ void Container::Paint(Graphics *g)
 	g->SetDrawingFlags(DF_NOFX);
 
 	if (_background_visible == true) {
-		g->SetColor(_bg_color);
+		g->SetColor(_bgcolor);
 
 		FillRectangle(g, 0, 0, _size.width, _size.height);
 

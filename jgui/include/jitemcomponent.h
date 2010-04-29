@@ -224,9 +224,11 @@ class ItemComponent : public jgui::Component{
 		std::vector<Item *> _items,
 			_internal;
 		jcolor_t _item_color,
-						 _item_focus_color,
+						 _focus_item_color,
+						 _selected_item_color,
+						 _selected_item_fgcolor,
 						 _item_fgcolor,
-						 _item_focus_fgcolor;
+						 _focus_item_fgcolor;
 		std::string _text;
 		int _index;
 		bool _loop;
@@ -263,6 +265,18 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
+		virtual jcolor_t GetSelectedItemColor();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcolor_t GetSelectedItemForegroundColor();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jcolor_t GetItemForegroundColor();
 
 		/**
@@ -288,6 +302,30 @@ class ItemComponent : public jgui::Component{
 		 *
 		 */
 		virtual void SetItemFocusColor(jcolor_t color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSelectedItemColor(jcolor_t color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSelectedItemColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSelectedItemForegroundColor(jcolor_t color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSelectedItemForegroundColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief

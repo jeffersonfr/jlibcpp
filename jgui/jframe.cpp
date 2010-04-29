@@ -58,10 +58,6 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_old_y = _location.y;
 	_old_width = _size.width;
 	_old_height = _size.height;
-
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	theme->Update(this);
 }
 
 Frame::~Frame() 
@@ -326,7 +322,7 @@ void Frame::Paint(Graphics *g)
 				text = _font->TruncateString(text, "...", (_size.width-_insets.left-_insets.right));
 			// }
 
-			g->SetColor(_fg_color);
+			g->SetColor(_fgcolor);
 		
 			g->SetClip(0, 0, _size.width, _insets.top);
 			g->DrawString(text, _insets.left+(_size.width-_insets.left-_insets.right-_font->GetStringWidth(text))/2, y);
@@ -349,7 +345,7 @@ void Frame::Paint(Graphics *g)
 			if (IsFontSet() == true) {
 				count += _font->GetStringWidth((*i).subtitle.c_str());
 
-				g->SetColor(_fg_color);
+				g->SetColor(_fgcolor);
 				g->DrawString((*i).subtitle, _size.width-count, _size.height-_font->GetHeight()-10);
 			}
 

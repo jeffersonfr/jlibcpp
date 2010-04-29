@@ -52,10 +52,14 @@ Menu::Menu(int x, int y, int width, int visible_items):
 	_frame->SetDefaultExitEnabled(false);
 
 	_frame->RegisterInputListener(this);
+	
+	ThemeManager::GetInstance()->RegisterThemeListener(this);
 }
 
 Menu::~Menu() 
 {
+	ThemeManager::GetInstance()->RemoveThemeListener(this);
+
 	_frame->RemoveInputListener(this);
 
 	jthread::AutoLock lock(&_menu_mutex);
@@ -211,21 +215,6 @@ int Menu::GetVisibleItems()
 	return _visible_items;
 }
 
-void Menu::SetItemColor(jcolor_t color)
-{
-	SetItemColor(color.red, color.green, color.blue, color.alpha);
-}
-
-void Menu::SetBackgroundColor(jcolor_t color)
-{
-	SetBackgroundColor(color.red, color.green, color.blue, color.alpha);
-}
-
-void Menu::SetForegroundColor(jcolor_t color)
-{
-	SetForegroundColor(color.red, color.green, color.blue, color.alpha);
-}
-
 void Menu::SetItemColor(int red, int green, int blue, int alpha)
 {
 	ItemComponent::SetItemColor(red, green, blue, alpha);
@@ -235,9 +224,18 @@ void Menu::SetItemColor(int red, int green, int blue, int alpha)
 	}
 }
 
+void Menu::SetItemForegroundColor(int red, int green, int blue, int alpha)
+{
+	ItemComponent::SetItemForegroundColor(red, green, blue, alpha);
+	
+	for (std::vector<Menu *>::iterator i=_menus.begin(); i!=_menus.end(); i++) {
+		(*i)->SetItemForegroundColor(red, green, blue, alpha);
+	}
+}
+
 void Menu::SetBackgroundColor(int red, int green, int blue, int alpha)
 {
-	_frame->SetBackgroundColor(red, green, blue, alpha);
+	ItemComponent::SetBackgroundColor(red, green, blue, alpha);
 
 	for (std::vector<Menu *>::iterator i=_menus.begin(); i!=_menus.end(); i++) {
 		(*i)->SetBackgroundColor(red, green, blue, alpha);
@@ -246,7 +244,7 @@ void Menu::SetBackgroundColor(int red, int green, int blue, int alpha)
 
 void Menu::SetForegroundColor(int red, int green, int blue, int alpha)
 {
-	_frame->SetForegroundColor(red, green, blue, alpha);
+	ItemComponent::SetForegroundColor(red, green, blue, alpha);
 	
 	for (std::vector<Menu *>::iterator i=_menus.begin(); i!=_menus.end(); i++) {
 		(*i)->SetForegroundColor(red, green, blue, alpha);
@@ -302,11 +300,21 @@ int Menu::GetCurrentIndex()
 
 void Menu::Repaint()
 {
-	Paint(_frame->GetGraphics());
+	if (_ignore_repaint == true) {
+		return;
+	}
+
+	if (_frame->GetGraphics() != NULL) {
+		Paint(_frame->GetGraphics());
+	}
 }
 
 void Menu::Paint(Graphics *g)
 {
+	// JDEBUG(JINFO, "paint\n");
+
+	// Component::Paint(g);
+
 	_size = _frame->GetSize();
 	_location = _frame->GetLocation();
 	_horizontal_gap = _frame->GetHorizontalGap();
@@ -323,8 +331,6 @@ void Menu::Paint(Graphics *g)
 	w = (w < 0)?0:w;
 	h = (h < 0)?0:h;
 
-	g->SetFont(_font);
-
 	if (_title != "") {
 		jinsets_t insets = _frame->GetInsets();
 
@@ -338,7 +344,7 @@ void Menu::Paint(Graphics *g)
 				text = _font->TruncateString(text, "...", w);
 			// }
 
-			g->SetColor(_fg_color);
+			g->SetColor(_fgcolor);
 			g->DrawString(text, x+(w-_font->GetStringWidth(text))/2, y+(insets.top-_font->GetHeight())/2);
 		}
 		
@@ -379,7 +385,7 @@ void Menu::Paint(Graphics *g)
 			g->SetColor(_item_color);
 			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w, _item_size);
 		} else {
-			g->SetColor(_bgfocus_color);
+			g->SetColor(_focus_item_color);
 			FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, w, _item_size);
 
 			/*
@@ -395,7 +401,11 @@ void Menu::Paint(Graphics *g)
 					pw = _size.width-2*space,
 					ph = _item_size;
 
-			g->SetColor(_fg_color);
+			if (_has_focus == true) {
+				g->SetColor(_focus_item_fgcolor);
+			} else {
+				g->SetColor(_item_fgcolor);
+			}
 
 			if (_items[i]->GetType() == EMPTY_MENU_ITEM) {
 				// TODO::
@@ -706,6 +716,15 @@ void Menu::RemoveInputListener(FrameInputListener *listener)
 std::vector<FrameInputListener *> & Menu::GetFrameInputListeners()
 {
 	return _frame->GetFrameInputListeners();
+}
+
+void Menu::ThemeChanged(ThemeEvent *event)
+{
+	Theme *theme = event->GetTheme();
+
+	theme->Update(this);
+
+	Repaint();
 }
 
 }

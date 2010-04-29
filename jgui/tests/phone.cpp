@@ -112,7 +112,7 @@ void PhoneBook::ItemSelected(jgui::SelectEvent *event)
 
 int main()
 {
-	jgui::Font *font = new jgui::Font("./fonts/font.ttf", 0, 28);
+	jgui::Font *font = new jgui::Font("./fonts/font.ttf", 0, 20);
 
 	font->SetEncoding("Latin1");
 

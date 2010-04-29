@@ -130,7 +130,7 @@ void ToogleButton::Paint(Graphics *g)
 	ImageButton::Paint(g);
 
 	if(_is_pressed == true) {
-		jcolor_t color = _bg_color;
+		jcolor_t color = _bgcolor;
 
 		color.alpha = 0xa0;
 
