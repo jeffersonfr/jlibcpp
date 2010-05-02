@@ -70,6 +70,8 @@ class GraphicPanel : public jgui::Frame{
 				round = 40,
 				iterations = 2000;
 
+		g->SetFont(_font);
+
 		g->SetDrawingFlags(jgui::DF_BLEND);
 		g->SetBlittingFlags(jgui::BF_ALPHACHANNEL);
 
@@ -479,7 +481,7 @@ class GraphicPanel : public jgui::Frame{
 
 int main( int argc, char *argv[] )
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 32));
+	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
 
 	GraphicPanel test;
 

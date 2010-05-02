@@ -79,7 +79,7 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
+	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
 	
 	font = new jgui::Font("fonts/font.ttf", 0, 24, 720, 480);
 	Main main1("Scale 720x480", 0, 0, 500, 400, 720, 480);

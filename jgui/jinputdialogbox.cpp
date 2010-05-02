@@ -26,6 +26,9 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg, int x, int y)
 {
 	jcommon::Object::SetClassName("jgui::InputDialogBox");
 
+	int cw = DEFAULT_COMPONENT_WIDTH,
+			ch = DEFAULT_COMPONENT_HEIGHT;
+
 	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
 
 	_label->SetGap(10, 10);
@@ -37,8 +40,8 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg, int x, int y)
 
 	_field = new TextField(_label->GetX(), _label->GetY()+_label->GetHeight()+10, _label->GetWidth(), 40);
 
-	_ok = new Button("Ok", _label->GetX()+_label->GetWidth()-2*200-1*30, _field->GetY()+_field->GetHeight()+20, 200, 40);
-	_cancel = new Button("Cancel", _label->GetX()+_label->GetWidth()-1*200-0*30, _field->GetY()+_field->GetHeight()+20, 200, 40);
+	_ok = new Button("Ok", _label->GetX()+_label->GetWidth()-2*cw-1*30, _field->GetY()+_field->GetHeight()+20, cw, ch);
+	_cancel = new Button("Cancel", _label->GetX()+_label->GetWidth()-1*cw-0*30, _field->GetY()+_field->GetHeight()+20, cw, ch);
 	
 	_field->SetNavigation(NULL, NULL, NULL, _ok);
 	_ok->SetNavigation(NULL, _cancel, _field, _cancel);

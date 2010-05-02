@@ -21,7 +21,7 @@
 
 namespace jgui {
 
-Watch::Watch(int x, int y, int width, int height, jwatch_type_t type):
+Watch::Watch(jwatch_type_t type, int x, int y, int width, int height):
 	Component(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::Watch");

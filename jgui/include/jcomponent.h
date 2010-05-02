@@ -39,8 +39,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
-#define DEFAULT_COMPONENT_WIDTH		100
-#define DEFAULT_COMPONENT_HEIGHT	40
+#define DEFAULT_COMPONENT_WIDTH		192
+#define DEFAULT_COMPONENT_HEIGHT	54
 
 namespace jgui {
 

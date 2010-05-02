@@ -36,6 +36,11 @@
 #include <directfb.h>
 #endif
 
+#define DEFAULT_SCALE_WIDTH		1920
+#define DEFAULT_SCALE_HEIGHT	1080
+
+#define DEFAULT_FONT_SIZE			20
+
 #define TRUNC_COLOR(r, g, b, a)			\
 	r = (r < 0)?0:(r > 0xff)?0xff:r;	\
 	g = (g < 0)?0:(g > 0xff)?0xff:g;	\
@@ -47,9 +52,6 @@
 
 #define SCREEN_TO_SCALE(x, z, y) \
 	(int)floor(((double)x*(double)y)/(double)z) 
-
-#define DEFAULT_SCALE_WIDTH		1920
-#define DEFAULT_SCALE_HEIGHT	1080
 
 namespace jgui{
 
@@ -243,8 +245,6 @@ class Graphics : public virtual jcommon::Object{
 		};
 
 	private:
-		static Font *_default_font;
-
 		jthread::Mutex graphics_mutex;
 
 #ifdef DIRECTFB_UI
@@ -285,18 +285,6 @@ class Graphics : public virtual jcommon::Object{
 		 */
 		virtual ~Graphics();
 
-		/**
-		 * \brief
-		 *
-		 */
-		static void SetDefaultFont(Font *font);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static Font * GetDefaultFont();
-		
 		/**
 		 * \brief
 		 *

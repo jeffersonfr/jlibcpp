@@ -197,18 +197,18 @@ void CheckButton::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
-			w = _size.width-2*x,
-			h = _size.height-2*y,
-			size = h/2;
+	int cx = _horizontal_gap+_border_size,
+			cy = _vertical_gap+_border_size,
+			cw = _size.width-2*cx,
+			ch = _size.height-2*cy,
+			csize = ch/2;
 
-	if (size < 0) {
-		size = 0;
+	if (csize < 0) {
+		csize = 0;
 	}
 
-	if (w > h) {
-		w = h;
+	if (cw > ch) {
+		cw = ch;
 	}
 	
 	/*
@@ -221,18 +221,18 @@ void CheckButton::Paint(Graphics *g)
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
 	if (_type == CHECK_TYPE) {
-		FillRectangle(g, x, y, w, h);
+		FillRectangle(g, cx, cy, cw, ch);
 	} else {
-		g->FillCircle(x+size, y+size, size);
+		g->FillCircle(cx+csize, cy+csize, csize);
 	}
 
 	if (_checked == true) {
 		g->SetColor(0x00, 0x00, 0x00, 0xff);
 
 		if (_type == CHECK_TYPE) {
-			FillRectangle(g, x+4, y+4, w-8, h-8);
+			FillRectangle(g, cx+4, cy+4, cw-8, ch-8);
 		} else {
-			g->FillCircle(x+size, y+size, size/2);
+			g->FillCircle(cx+csize, cy+csize, csize/2);
 		}
 	}
 
@@ -247,7 +247,7 @@ void CheckButton::Paint(Graphics *g)
 				y = _vertical_gap+_border_size,
 				w = _size.width-2*x,
 				h = _size.height-2*y,
-				gapx = size+20,
+				gapx = cx+cw+5,
 				gapy = 0;
 		int px = x+gapx,
 				py = y+gapy,

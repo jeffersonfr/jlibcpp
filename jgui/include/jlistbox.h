@@ -164,6 +164,24 @@ class ListBox : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
+		virtual void SetForegroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetForegroundFocusColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetPreferredSize();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
 		
 		/**
@@ -177,18 +195,6 @@ class ListBox : public jgui::ItemComponent{
 		 *
 		 */
 		virtual void Paint(Graphics *g);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundFocusColor(int red, int green, int blue, int alpha);
 
 };
 

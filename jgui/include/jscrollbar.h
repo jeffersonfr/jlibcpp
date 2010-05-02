@@ -66,7 +66,7 @@ class ScrollBar : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		ScrollBar(int x = 0, int y = 0, int width = 0, int height = 0);
+		ScrollBar(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
 		
 		/**
 		 * \brief

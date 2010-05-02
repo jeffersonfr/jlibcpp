@@ -112,11 +112,7 @@ void PhoneBook::ItemSelected(jgui::SelectEvent *event)
 
 int main()
 {
-	jgui::Font *font = new jgui::Font("./fonts/font.ttf", 0, 20);
-
-	font->SetEncoding("Latin1");
-
-	jgui::Graphics::SetDefaultFont(font);
+	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
 
 	mtel::PhoneBook app(100, 100);
 

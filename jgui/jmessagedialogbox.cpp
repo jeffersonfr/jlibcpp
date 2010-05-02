@@ -26,6 +26,9 @@ MessageDialogBox::MessageDialogBox(std::string title, std::string msg, int x, in
 {
 	jcommon::Object::SetClassName("jgui::MessageDialogBox");
 
+	int cw = DEFAULT_COMPONENT_WIDTH,
+			ch = DEFAULT_COMPONENT_HEIGHT;
+
 	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
 
 	_label->SetGap(10, 10);
@@ -35,7 +38,7 @@ MessageDialogBox::MessageDialogBox(std::string title, std::string msg, int x, in
 
 	_label->SetSize(_label->GetPreferredSize());
 
-	_ok = new Button("Ok", _label->GetX()+_label->GetWidth()-200, _label->GetY()+_label->GetHeight()+20, 200, 40);
+	_ok = new Button("Ok", _label->GetX()+_label->GetWidth()-cw, _label->GetY()+_label->GetHeight()+20, cw, ch);
 	
 	_ok->RegisterButtonListener(this);
 

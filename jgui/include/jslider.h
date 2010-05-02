@@ -61,7 +61,7 @@ class Slider : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		Slider(int x = 0, int y = 0, int width = 0, int height = 0);
+		Slider(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
 		
 		/**
 		 * \brief

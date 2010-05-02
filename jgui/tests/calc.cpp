@@ -618,7 +618,7 @@ void MCalc::ActionPerformed(jgui::ButtonEvent *event)
 
 int main()
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 22));
+	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
 
 	mcalc::MCalc app(100, 100);
 

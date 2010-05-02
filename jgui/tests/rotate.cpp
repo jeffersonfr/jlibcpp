@@ -184,8 +184,6 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 
 int main(int argc, char **argv)
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font(FONT, 0, 24));
-
 	Main main(50, 100);
 
 	main.Start();

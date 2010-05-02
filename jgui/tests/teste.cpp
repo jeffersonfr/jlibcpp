@@ -103,7 +103,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		SetIcon("icons/watch_1.png");
 
 		{
-			animation = new jgui::Animation(150, 100, 150, 150);
+			animation = new jgui::Animation(150, 110, 150, 150);
 
 			animation->SetInterval(2000);
 
@@ -124,7 +124,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			marquee = new jgui::Marquee("Testando Marquee", 500, 100, 700, 40);
+			marquee = new jgui::Marquee("Testando Marquee", 500, 110, 700);
 
 			marquee->SetType(jgui::LOOP_TEXT);
 
@@ -132,9 +132,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			progress = new jgui::ProgressBar(500, 170, 700, 40);
-			slider = new jgui::Slider(500, 170, 700, 40);
-			scroll = new jgui::ScrollBar(500, 230, 700, 40);
+			progress = new jgui::ProgressBar(500, 170, 700);
+			slider = new jgui::Slider(500, 170, 700);
+			scroll = new jgui::ScrollBar(500, 230, 700);
 
 			progress->SetPosition(20.0);
 			slider->SetPosition(20.0);
@@ -144,7 +144,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			text_field = new jgui::TextField(500, 290, 700, 40);
+			text_field = new jgui::TextField(500, 290, 700);
 
 			text_field->Insert("TextField");
 		}
@@ -156,7 +156,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			watch = new jgui::Watch(150, 300, 300, 40, jgui::CRONOMETERDOWN_WATCH);
+			watch = new jgui::Watch(jgui::CRONOMETERDOWN_WATCH, 150, 300, 300);
 
 			watch->SetSeconds(10);
 			watch->SetMinutes(0);
@@ -166,8 +166,8 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			button1 = new jgui::Button("inc prog", 150, 380, 300, 40);
-			button2 = new jgui::Button("dec prog", 150, 450, 300, 40);
+			button1 = new jgui::Button("inc prog", 150, 380, 300);
+			button2 = new jgui::Button("dec prog", 150, 450, 300);
 			button3 = new jgui::Button("testando o componente jgui::Button com um texto longo", 150, 590, 300, 150);
 
 			button1->SetBackgroundFocusColor(0x40, 0xf0, 0x40, 0xff);
@@ -189,7 +189,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			toogle = new jgui::ToogleButton("toogle button", 150, 520, 300, 40);
+			toogle = new jgui::ToogleButton("toogle button", 150, 520, 300);
 		}
 
 		{
@@ -199,7 +199,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			spin = new jgui::Spin(150, 850, 300, 40);
+			spin = new jgui::Spin(150, 850, 300);
 
 			spin->AddTextItem("loop");
 			spin->AddTextItem("bounce");
@@ -208,14 +208,14 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			label1 = new jgui::Label("Label teste 1", 500, 700, 340, 40);
-			label2 = new jgui::Label("Label teste 2", 860, 700, 340, 40);
+			label1 = new jgui::Label("Label teste 1", 500, 680, 300);
+			label2 = new jgui::Label("Label teste 2", 860, 680, 300);
 		}
 
 		{
-			check1 = new jgui::CheckButton(jgui::CHECK_TYPE, "wrap", 500, 750, 340, 40);
-			check2 = new jgui::CheckButton(jgui::CHECK_TYPE, "password", 500, 800, 340, 40);
-			check3 = new jgui::CheckButton(jgui::CHECK_TYPE, "hide", 500, 850, 340, 40);
+			check1 = new jgui::CheckButton(jgui::CHECK_TYPE, "wrap", 500, 740, 300);
+			check2 = new jgui::CheckButton(jgui::CHECK_TYPE, "password", 500, 795, 300);
+			check3 = new jgui::CheckButton(jgui::CHECK_TYPE, "hide", 500, 850, 300);
 
 			check1->SetSelected(true);
 
@@ -225,9 +225,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			radio1 = new jgui::CheckButton(jgui::RADIO_TYPE, "left", 860, 750, 340, 40);
-			radio2 = new jgui::CheckButton(jgui::RADIO_TYPE, "center", 860, 800, 340, 40);
-			radio3 = new jgui::CheckButton(jgui::RADIO_TYPE, "right", 860, 850, 340, 40);
+			radio1 = new jgui::CheckButton(jgui::RADIO_TYPE, "left", 860, 740, 300);
+			radio2 = new jgui::CheckButton(jgui::RADIO_TYPE, "center", 860, 795, 300);
+			radio3 = new jgui::CheckButton(jgui::RADIO_TYPE, "right", 860, 850, 300);
 
 			group = new jgui::CheckButtonGroup();
 
@@ -243,13 +243,13 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			static_image = new jgui::Icon("icons/green_icon.png", 1250, 100, 400, 300);
+			static_image = new jgui::Icon("icons/green_icon.png", 1250, 110, 400, 300);
 
 			static_image->SetText("Green Button");
 		}
 
 		{
-			list = new jgui::ListBox(1250, 450, 400, 310);
+			list = new jgui::ListBox(1250, 450, 400, 280);
 
 			list->AddImageItem("opcao 1", std::string("icons/red_icon.png"));
 			list->AddTextItem("opcao 2");
@@ -264,7 +264,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			combo = new jgui::ComboBox(1250, 800, 400, 40, 3);
+			combo = new jgui::ComboBox(1250, 800, 400, DEFAULT_COMPONENT_HEIGHT, 3);
 
 			combo->AddTextItem("opcao 1");
 			combo->AddTextItem("opcao 2");
@@ -939,7 +939,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 
 int main( int argc, char *argv[] )
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
+	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
 
 	ModulesTeste test;
 

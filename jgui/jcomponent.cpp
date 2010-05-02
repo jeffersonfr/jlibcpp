@@ -35,8 +35,7 @@ Component::Component(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Component");
 		
-	_font = Graphics::GetDefaultFont();
-	// _font = new Font("./fonts/font.ttf", 0, 16);
+	_font = jgui::GFXHandler::GetInstance()->GetDefaultFont();
 
 	_location.x = 0;
 	_location.y = 0;
@@ -59,7 +58,7 @@ Component::Component(int x, int y, int width, int height):
 	_right = NULL;
 	_up = NULL;
 	_down = NULL;
-	_border_size = 1;
+	_border_size = 2;
 	_border = BEVEL_BORDER;
 	_gradient_level = 0x40;
 	_vertical_gap = 5;
@@ -316,7 +315,9 @@ void Component::PaintEdges(Graphics *g)
 
 void Component::Paint(Graphics *g)
 {
-	g->SetFont(_font);
+	if (_font != NULL) {
+		g->SetFont(_font);
+	}
 
 	if (_background_visible == true) {
 		g->SetColor(_bgcolor);

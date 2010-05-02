@@ -36,8 +36,6 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 
 	SetWorkingScreenSize(scale_width, scale_height);
 
-	_font = Graphics::GetDefaultFont();
-
 	_focus = NULL;
 	_orientation = LEFT_TO_RIGHT_ORIENTATION;
 	_scroll_x = 0;
@@ -242,7 +240,9 @@ void Container::Paint(Graphics *g)
 
 	// Component::Paint(g);
 
-	g->SetFont(_font);
+	if (_font != NULL) {
+		g->SetFont(_font);
+	}
 
 	// INFO:: permite alteracoes on-the-fly
 	g->SetWorkingScreenSize(_scale_width, _scale_height);

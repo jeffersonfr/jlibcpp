@@ -69,8 +69,6 @@ class Triangulate {
 // Vector of vertices which are used to represent a polygon/contour and a series of triangles
 typedef std::vector< Vector2d > Vector2dVector;
 
-Font *Graphics::_default_font = NULL;
-
 Graphics::Graphics(void *s):
 	jcommon::Object()
 {
@@ -113,16 +111,6 @@ Graphics::Graphics(void *s):
 
 Graphics::~Graphics()
 {
-}
-
-void Graphics::SetDefaultFont(Font *font)
-{
-	_default_font = font;
-}
-
-Font * Graphics::GetDefaultFont()
-{
-	return _default_font;
 }
 
 OffScreenImage * Graphics::Create()

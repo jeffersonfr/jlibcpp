@@ -2409,8 +2409,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 
 int main( int argc, char *argv[] )
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 20));
-
 	GraphicsTeste test;
 
 	test.Show();

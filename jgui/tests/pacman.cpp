@@ -750,8 +750,6 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 
 int main()
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 32));
-
 	PacMan p;
 
 	p.Show(false);

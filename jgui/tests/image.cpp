@@ -141,8 +141,6 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font(FONT, 0, 12));
-
 	Main main;
 
 	main.Show(false);

@@ -36,12 +36,7 @@ ListBox::ListBox(int x, int y, int width, int height):
 	_input_locked = false;
 	_scroll = SCROLL_BAR;
 	_selection = NONE_SELECTION;
-
-	_item_size = DEFAULT_COMPONENT_HEIGHT;
-
-	if (_font != NULL) {
-		_item_size = _font->GetHeight();
-	}
+	_item_size = DEFAULT_ITEM_SIZE;
 
 	SetFocusable(true);
 }
@@ -109,6 +104,156 @@ void ListBox::SetForegroundColor(int red, int green, int blue, int alpha)
 void ListBox::SetForegroundFocusColor(int red, int green, int blue, int alpha)
 {
 	SetItemForegroundFocusColor(red, green, blue, alpha);
+}
+
+void ListBox::SetCurrentIndex(int i)
+{
+	int visible_items = GetVisibleItems();
+
+	if (i < 0) {
+		i = 0;
+	}
+
+	if (_centered_interaction == true) {
+		if (i >= (int)_items.size()) {
+			if (_items.size() > 0) {
+				i = _items.size()-1;
+			} else {
+				i = 0;
+			}
+		}
+
+		if (_index != i) {
+			{
+				jthread::AutoLock lock(&_component_mutex);
+
+				_index = i;
+			}
+
+			Repaint();
+		}
+	} else {
+		if (i >= (int)_items.size()) {
+			i = 0;
+		}
+
+		if (_index != i) {
+			{
+				jthread::AutoLock lock(&_component_mutex);
+
+				_index = i;
+
+				if (_index >= (int)_items.size()) {
+					_index = 0;
+				}
+
+				if (_index < _top_index) {
+					_top_index = _index;
+				}
+
+				if (_index >= (_top_index + visible_items)) {
+					_top_index = _index-visible_items+1;
+
+					if (_top_index < 0) {
+						_top_index = 0;
+					}
+				}
+			}
+
+			Repaint();
+		}
+	}
+}
+
+bool ListBox::IsSelected(int i)
+{
+	if (i < 0 || i >= (int)_items.size()) {
+		return false;
+	}
+
+	if (_selection == SINGLE_SELECTION) {
+		if (_selected_index == i) {
+			return true;
+		}
+	} else if (_selection == MULTI_SELECTION) {
+		return _items[i]->IsSelected();
+	}
+
+	return false;
+}
+
+void ListBox::SetSelected(int i)
+{
+	if (i < 0 || i >= (int)_items.size()) {
+		return;
+	}
+
+	if (_selection == SINGLE_SELECTION) {
+		if (_selected_index == i) {
+			_selected_index = -1;
+		} else {
+			_selected_index = i;
+		}
+
+		Repaint();
+	} else if (_selection == MULTI_SELECTION) {
+		if (_items[i]->IsSelected()) {
+			_items[i]->SetSelected(false);
+		} else {
+			_items[i]->SetSelected(true);
+		}
+
+		Repaint();
+	}
+}
+
+void ListBox::Select(int i)
+{
+	if (i < 0 || i >= (int)_items.size()) {
+		return;
+	}
+
+	if (_selection == SINGLE_SELECTION) {
+		_selected_index = i;
+
+		Repaint();
+	} else if (_selection == MULTI_SELECTION) {
+		_items[i]->SetSelected(true);
+
+		Repaint();
+	}
+}
+
+void ListBox::Deselect(int i)
+{
+	if (i < 0 || i >= (int)_items.size()) {
+		return;
+	}
+
+	if (_selection == SINGLE_SELECTION) {
+		_selected_index = -1;
+
+		Repaint();
+	} else if (_selection == MULTI_SELECTION) {
+		_items[i]->SetSelected(false);
+
+		Repaint();
+	}
+}
+
+int ListBox::GetSelectedIndex()
+{
+	return _selected_index;
+}
+
+jsize_t ListBox::GetPreferredSize()
+{
+	jsize_t size;
+
+	size.width = _size.width;
+	size.height = 2*(_vertical_gap+_border_size)+_items.size()*(_item_size+_vertical_gap);
+
+	return size;
 }
 
 void ListBox::Paint(Graphics *g)
@@ -298,146 +443,6 @@ void ListBox::Paint(Graphics *g)
 	}
 
 	PaintEdges(g);
-}
-
-void ListBox::SetCurrentIndex(int i)
-{
-	int visible_items = GetVisibleItems();
-
-	if (i < 0) {
-		i = 0;
-	}
-
-	if (_centered_interaction == true) {
-		if (i >= (int)_items.size()) {
-			if (_items.size() > 0) {
-				i = _items.size()-1;
-			} else {
-				i = 0;
-			}
-		}
-
-		if (_index != i) {
-			{
-				jthread::AutoLock lock(&_component_mutex);
-
-				_index = i;
-			}
-
-			Repaint();
-		}
-	} else {
-		if (i >= (int)_items.size()) {
-			i = 0;
-		}
-
-		if (_index != i) {
-			{
-				jthread::AutoLock lock(&_component_mutex);
-
-				_index = i;
-
-				if (_index >= (int)_items.size()) {
-					_index = 0;
-				}
-
-				if (_index < _top_index) {
-					_top_index = _index;
-				}
-
-				if (_index >= (_top_index + visible_items)) {
-					_top_index = _index-visible_items+1;
-
-					if (_top_index < 0) {
-						_top_index = 0;
-					}
-				}
-			}
-
-			Repaint();
-		}
-	}
-}
-
-bool ListBox::IsSelected(int i)
-{
-	if (i < 0 || i >= (int)_items.size()) {
-		return false;
-	}
-
-	if (_selection == SINGLE_SELECTION) {
-		if (_selected_index == i) {
-			return true;
-		}
-	} else if (_selection == MULTI_SELECTION) {
-		return _items[i]->IsSelected();
-	}
-
-	return false;
-}
-
-void ListBox::SetSelected(int i)
-{
-	if (i < 0 || i >= (int)_items.size()) {
-		return;
-	}
-
-	if (_selection == SINGLE_SELECTION) {
-		if (_selected_index == i) {
-			_selected_index = -1;
-		} else {
-			_selected_index = i;
-		}
-
-		Repaint();
-	} else if (_selection == MULTI_SELECTION) {
-		if (_items[i]->IsSelected()) {
-			_items[i]->SetSelected(false);
-		} else {
-			_items[i]->SetSelected(true);
-		}
-
-		Repaint();
-	}
-}
-
-void ListBox::Select(int i)
-{
-	if (i < 0 || i >= (int)_items.size()) {
-		return;
-	}
-
-	if (_selection == SINGLE_SELECTION) {
-		_selected_index = i;
-
-		Repaint();
-	} else if (_selection == MULTI_SELECTION) {
-		_items[i]->SetSelected(true);
-
-		Repaint();
-	}
-}
-
-void ListBox::Deselect(int i)
-{
-	if (i < 0 || i >= (int)_items.size()) {
-		return;
-	}
-
-	if (_selection == SINGLE_SELECTION) {
-		_selected_index = -1;
-
-		Repaint();
-	} else if (_selection == MULTI_SELECTION) {
-		_items[i]->SetSelected(false);
-
-		Repaint();
-	}
-}
-
-int ListBox::GetSelectedIndex()
-{
-	return _selected_index;
 }
 
 bool ListBox::ProcessEvent(MouseEvent *event)

@@ -50,9 +50,10 @@ enum jcursor_style_t {
 	WAIT_CURSOR
 };
 
-class OffScreenImage;
 class Window;
 class WindowManager;
+class Font;
+class OffScreenImage;
 
 /**
  * \brief
@@ -63,22 +64,12 @@ class GFXHandler : public virtual jcommon::Object{
 
 	friend class Window;
 	friend class WindowManager;
-
-	protected:
-		GFXHandler();
-
-		/**
-		 * \brief
-		 *
-		 */
-		int InitEngine();
+	friend class Font;
+	friend class OffScreenImage;
 
 	private:
-		static GFXHandler * instance;
+		static GFXHandler * _instance;
 		
-		jthread::Mutex _mutex;
-		jcursor_style_t _cursor;
-
 #ifdef DIRECTFB_UI
 		IDirectFB *_dfb;
 		IDirectFBDisplayLayer *_layer;
@@ -92,22 +83,39 @@ class GFXHandler : public virtual jcommon::Object{
 		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 #endif 
 
+		std::vector<OffScreenImage *> _offscreenimages;
+		std::vector<Font *> _fonts;
+		Font *_default_font;
+		jthread::Mutex _mutex;
+		jcursor_style_t _cursor;
 		int r,
 				g,
 				b, 
 				a;
 		int screenWidth, 
-			screenHeight,
-			scaleWidth, 
-			scaleHeight;
+				screenHeight,
+				scaleWidth, 
+				scaleHeight;
 
 	private:
-		friend class Font;
-		friend class OffScreenImage;
+		/**
+		 * \brief
+		 *
+		 */
+		GFXHandler();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitEngine();
 
-		std::vector<Font *> _fonts;
-		std::vector<OffScreenImage *> _offscreenimages;
-
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitCursors();
+		
 		/**
 		 * \brief
 		 *
@@ -169,14 +177,26 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static std::string GetID();
+		void * GetGraphicEngine();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetDefaultFont(Font *font);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void * GetGraphicEngine();
-
+		Font * GetDefaultFont();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		static std::string GetID();
+		
 		/**
 		 * \brief
 		 *
@@ -207,12 +227,6 @@ class GFXHandler : public virtual jcommon::Object{
 		 */
 		virtual void SetMousePosition(int x, int y);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InitCursors();
-		
 		/**
 		 * \brief
 		 *

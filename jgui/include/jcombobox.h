@@ -50,7 +50,7 @@ class ComboBox : public jgui::ItemComponent, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		ComboBox(int x = 0, int y = 0, int width = 0, int height = 0, int visible_items = 5);
+		ComboBox(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT, int visible_items = 5);
 		
 		/**
 		 * \brief

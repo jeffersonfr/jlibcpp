@@ -55,7 +55,7 @@ class Button : public Component{
 		 * \brief
 		 *
 		 */
-		Button(std::string label, int x = 0, int y = 0, int width = 0, int height = 0);
+		Button(std::string label, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
 		
 		/**
 		 * \brief

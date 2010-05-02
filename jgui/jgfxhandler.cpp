@@ -25,12 +25,13 @@
 #include "jgraphics.h"
 #include "joffscreenimage.h"
 #include "jwindowmanager.h"
+#include "jruntimeexception.h"
 #include "jproperties.h"
 #include "jcommonlib.h"
 
 namespace jgui {
 
-GFXHandler * GFXHandler::instance = NULL;
+GFXHandler * GFXHandler::_instance = NULL;
 
 GFXHandler::GFXHandler():
 	jcommon::Object()
@@ -39,109 +40,22 @@ GFXHandler::GFXHandler():
 
 	screenWidth = 0;
 	screenHeight = 0;
+
 	scaleWidth = DEFAULT_SCALE_WIDTH;
 	scaleHeight = DEFAULT_SCALE_HEIGHT;
 	
+	_default_font = NULL;
+
 #ifdef DIRECTFB_UI
 	_cursor = ARROW_CURSOR;
 	_dfb = NULL;
 	_layer = NULL;
 #endif
-	
-	InitEngine();
 }
 
 GFXHandler::~GFXHandler()
 {
 	Release();
-}
-
-GFXHandler * GFXHandler::GetInstance()
-{
-	if (instance == NULL) {
-		instance = new GFXHandler();
-
-		instance->InitCursors();
-	}
-
-	return instance;
-}
-
-int GFXHandler::InitEngine()
-{
-#ifdef DIRECTFB_UI
-	DFBDisplayLayerConfig config;
-
-	// Initialize DirectFB including command line parsing
-	if ((IDirectFB **)_dfb != NULL){
-		Release();
-
-		_dfb = NULL;
-	}
-
-	if (DirectFBInit(NULL, 0) != DFB_OK) {
-		return 1;
-	}
-
-	/*
-	DirectFBSetOption("system", "sdl");
-	DirectFBSetOption("mode", "960x540");
-	DirectFBSetOption("pixelformat", "RGB32");
-	DirectFBSetOption("linux-input-devices", "keyboard");
-	*/
-
-	jcommon::Properties p;
-	std::vector<std::string> v;
-
-	try {
-		p.Load("/etc/directfbrc");
-
-		v = p.GetProperties();
-
-		for (std::vector<std::string>::iterator i=v.begin(); i!=v.end(); i++) {
-			std::string value = p.GetProperty((*i), "nono");
-
-			if (value != "nono") {
-				// INFO:: /usr/local/etc/directfbrc
-				DirectFBSetOption((*i).c_str(), value.c_str());
-			}
-		}
-	} catch (...) {
-	}
-
-	// Create the super interface
-	if (_dfb == NULL) {
-		if (DirectFBCreate((IDirectFB **)&_dfb) != DFB_OK) {
-			return 2;
-		}
-	}
-
-	// Get the primary display layer
-	if (_dfb->GetDisplayLayer(_dfb, (DFBDisplayLayerID)DLID_PRIMARY, &_layer) != DFB_OK) {
-		return 3;
-	}
-	
-	_layer->SetCooperativeLevel(_layer, (DFBDisplayLayerCooperativeLevel)(DLSCL_ADMINISTRATIVE));
-	// _layer->SetCooperativeLevel(_layer, (DFBDisplayLayerCooperativeLevel)(DLSCL_EXCLUSIVE));
-
-	DFBGraphicsDeviceDescription deviceDescription;
-	
-	_layer->GetConfiguration(_layer, &config);
-
-	screenWidth = config.width;
-	screenHeight = config.height;
-	
-	_dfb->GetDeviceDescription(_dfb, &deviceDescription);
-
-	if (!((deviceDescription.blitting_flags & DSBLIT_BLEND_ALPHACHANNEL) && (deviceDescription.blitting_flags & DSBLIT_BLEND_COLORALPHA))) {
-		config.flags = DLCONF_BUFFERMODE;
-		// config.buffermode = DLBM_WINDOWS;
-		config.buffermode = DLBM_BACKSYSTEM;
-		_layer->SetConfiguration(_layer, &config);
-	}
-#endif
-
-	return 0;
 }
 
 #ifdef DIRECTFB_UI
@@ -244,6 +158,116 @@ int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	return 0;
 }
 #endif
+
+void GFXHandler::InitEngine()
+{
+#ifdef DIRECTFB_UI
+	DFBDisplayLayerConfig config;
+
+	if ((IDirectFB **)_dfb != NULL) {
+		return;
+	}
+
+	// Initialize DirectFB including command line parsing
+	if ((IDirectFB **)_dfb != NULL) {
+		Release();
+
+		_dfb = NULL;
+	}
+
+	if (DirectFBInit(NULL, 0) != DFB_OK) {
+		throw jcommon::RuntimeException("Problem to init directfb");
+	}
+
+	/*
+	DirectFBSetOption("system", "sdl");
+	DirectFBSetOption("mode", "960x540");
+	DirectFBSetOption("pixelformat", "RGB32");
+	DirectFBSetOption("linux-input-devices", "keyboard");
+	*/
+
+	jcommon::Properties p;
+	std::vector<std::string> v;
+
+	try {
+		p.Load("/etc/directfbrc");
+
+		v = p.GetProperties();
+
+		for (std::vector<std::string>::iterator i=v.begin(); i!=v.end(); i++) {
+			std::string value = p.GetProperty((*i), "nono");
+
+			if (value != "nono") {
+				// INFO:: /usr/local/etc/directfbrc
+				DirectFBSetOption((*i).c_str(), value.c_str());
+			}
+		}
+	} catch (...) {
+	}
+
+	// Create the super interface
+	if (_dfb == NULL) {
+		if (DirectFBCreate((IDirectFB **)&_dfb) != DFB_OK) {
+			throw jcommon::RuntimeException("Problem to create directfb reference");
+		}
+	}
+
+	// Get the primary display layer
+	if (_dfb->GetDisplayLayer(_dfb, (DFBDisplayLayerID)DLID_PRIMARY, &_layer) != DFB_OK) {
+		throw jcommon::RuntimeException("Problem to get display layer");
+	}
+	
+	_layer->SetCooperativeLevel(_layer, (DFBDisplayLayerCooperativeLevel)(DLSCL_ADMINISTRATIVE));
+	// _layer->SetCooperativeLevel(_layer, (DFBDisplayLayerCooperativeLevel)(DLSCL_EXCLUSIVE));
+
+	DFBGraphicsDeviceDescription deviceDescription;
+	
+	_layer->GetConfiguration(_layer, &config);
+
+	screenWidth = config.width;
+	screenHeight = config.height;
+	
+	_dfb->GetDeviceDescription(_dfb, &deviceDescription);
+
+	if (!((deviceDescription.blitting_flags & DSBLIT_BLEND_ALPHACHANNEL) && (deviceDescription.blitting_flags & DSBLIT_BLEND_COLORALPHA))) {
+		config.flags = DLCONF_BUFFERMODE;
+		// config.buffermode = DLBM_WINDOWS;
+		config.buffermode = DLBM_BACKSYSTEM;
+		_layer->SetConfiguration(_layer, &config);
+	}
+#endif
+}
+
+GFXHandler * GFXHandler::GetInstance()
+{
+	if (_instance == NULL) {
+		try {
+			_instance = new GFXHandler();
+
+			_instance->InitEngine();
+			_instance->InitCursors();
+		} catch (...) {
+			_instance = NULL;
+		}
+	}
+
+	return _instance;
+}
+
+void GFXHandler::SetDefaultFont(Font *font)
+{
+	if (_default_font != NULL) {
+		delete _default_font;
+		_default_font = NULL;
+	}
+
+	_default_font = font;
+}
+
+Font * GFXHandler::GetDefaultFont()
+{
+	return _default_font;
+}
 
 void GFXHandler::SetCursorEnabled(bool b)
 {

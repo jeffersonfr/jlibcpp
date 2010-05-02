@@ -99,9 +99,7 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	jgui::Font *font = new jgui::Font("fonts/font.ttf", 0, 24, 1920, 1080);
-
-	jgui::Graphics::SetDefaultFont(font);
+	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
 
 	Main main("Reconfiguracao da Engine Grafica Em Tempo Real", 100, 100, 900, 800);
 

@@ -63,7 +63,8 @@ class Main : public jgui::Frame{
 		
 		static const int TRY_BETTER = 5;
 
-		jgui::Font *fresult;
+		jgui::Font *fdefault,
+			*fweights;
 		path_t *board,
 			   *solution[MAX_COLS],
 			   *try_solutions;
@@ -87,9 +88,10 @@ class Main : public jgui::Frame{
 			_insets.right = 10;
 			_insets.top = 60;
 
-			fresult = new jgui::Font(FONT, 0, 24);
+			fdefault = new jgui::Font(FONT, 0, DEFAULT_FONT_SIZE);
+			fweights = new jgui::Font(FONT, 0, 12);
 
-			SetFont(fresult);
+			SetFont(fdefault);
 #endif
 
 			board = new path_t[MAX_COLS*MAX_ROWS];
@@ -161,6 +163,8 @@ class Main : public jgui::Frame{
 
 		virtual ~Main()
 		{
+			delete fdefault;
+			delete fweights;
 		}
 
 		void Init()
@@ -272,11 +276,17 @@ class Main : public jgui::Frame{
 		{
 			jgui::Frame::Paint(g);
 
-			g->SetFont(jgui::Graphics::GetDefaultFont());
-			
 			int dx = _insets.left,
-				dy = _insets.top;
+					dy = _insets.top;
 			char tmp[255];
+
+			sprintf(tmp, "Current Solution [%d]", best);
+
+			g->SetFont(fdefault);
+			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->DrawString(tmp, _insets.left, GetHeight()-50);
+			
+			g->SetFont(fweights);
 
 			for (int i=0; i<MAX_COLS*MAX_ROWS; i++) {
 				sprintf(tmp, "%d", board[i].value);
@@ -308,13 +318,6 @@ class Main : public jgui::Frame{
 					dx+solution[i]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
 					dy+solution[i]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2);
 			}
-
-			g->SetFont(fresult);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
-
-			sprintf(tmp, "Current Solution [%d]", best);
-
-			g->DrawString(tmp, _insets.left, GetHeight()-50);
 		}
 #endif
 
@@ -322,10 +325,6 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-#if ENABLE_GUI == 1
-	jgui::Graphics::SetDefaultFont(new jgui::Font(FONT, 0, 12));
-#endif
-
 	Main main(0, 0);
 
 #if ENABLE_GUI == 1

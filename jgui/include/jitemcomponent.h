@@ -29,6 +29,8 @@
 #include <unistd.h>
 #include <stdio.h>
 
+#define DEFAULT_ITEM_SIZE		48
+
 namespace jgui {
 
 /**

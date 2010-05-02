@@ -38,7 +38,7 @@ Menu::Menu(int x, int y, int width, int visible_items):
 		_visible_items = 1;
 	}
 
-	_item_size = DEFAULT_COMPONENT_HEIGHT;
+	_item_size = DEFAULT_ITEM_SIZE;
 
 	prefetch = new OffScreenImage(_item_size, _item_size);
 	

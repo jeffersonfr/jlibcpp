@@ -26,6 +26,9 @@ YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg, int x, int y)
 {
 	jcommon::Object::SetClassName("jgui::YesNoDialogBox");
 
+	int cw = DEFAULT_COMPONENT_WIDTH,
+			ch = DEFAULT_COMPONENT_HEIGHT;
+
 	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
 
 	_label->SetGap(10, 10);
@@ -35,8 +38,8 @@ YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg, int x, int y)
 
 	_label->SetSize(_label->GetPreferredSize());
 
-	_yes = new Button("Sim", _label->GetX()+_label->GetWidth()-2*200-1*30, _label->GetY()+_label->GetHeight()+20, 200, 40);
-	_no = new Button("Nao", _label->GetX()+_label->GetWidth()-1*200-0*30, _label->GetY()+_label->GetHeight()+20, 200, 40);
+	_yes = new Button("Sim", _label->GetX()+_label->GetWidth()-2*cw-1*30, _label->GetY()+_label->GetHeight()+20, cw, ch);
+	_no = new Button("Nao", _label->GetX()+_label->GetWidth()-1*cw-0*30, _label->GetY()+_label->GetHeight()+20, cw, ch);
 	
 	_no->SetNavigation(_yes, NULL, _yes, NULL);
 	_yes->SetNavigation(NULL, _no, NULL, _no);

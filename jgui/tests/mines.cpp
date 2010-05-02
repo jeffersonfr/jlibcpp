@@ -23,7 +23,7 @@
 namespace mines {
 
 Mines::Mines(int x, int y):
-		jgui::Frame("Minas", 150, 100, 920, 820)
+	jgui::Frame("Minas", 150, 100, 920, 820)
 {
 	bx = 20;
 	by = 100;
@@ -223,6 +223,8 @@ void Mines::SetupBoard()
 	if (graphics == NULL) {
 		return;
 	}
+
+	graphics->SetFont(_font);
 
 	graphics->DrawImage("icons/flag2.png", GetWidth()-190, 180, 160, 140);
 	graphics->DrawImage("icons/bomb2.png", GetWidth()-180, 400, 160, 140);
@@ -524,7 +526,7 @@ void Mines::UpdateBoard(int flag)
 
 int main()
 {
-	jgui::Graphics::SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, 28));
+	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
 	
 	mines::Mines app(100, 100);
 
