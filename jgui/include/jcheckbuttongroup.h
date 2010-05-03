@@ -65,19 +65,19 @@ class CheckButtonGroup : public CheckButtonListener{
 		 * \brief
 		 *
 		 */
-		void Add(CheckButton *button);
+		virtual void Add(CheckButton *button);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Remove(CheckButton *button);
+		virtual void Remove(CheckButton *button);
 
 		/**
 		 * \brief
 		 *
 		 */
-		CheckButton * GetSelected();
+		virtual CheckButton * GetSelected();
 
 };
 

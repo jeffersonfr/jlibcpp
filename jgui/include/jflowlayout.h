@@ -72,55 +72,55 @@ class FlowLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		jflowlayout_align_t GetAlign();
+		virtual jflowlayout_align_t GetAlign();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetHGap();
+		virtual int GetHGap();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetVGap();
+		virtual int GetVGap();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool GetAlignOnBaseline();
+		virtual bool GetAlignOnBaseline();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetAlign(jflowlayout_align_t align);
+		virtual void SetAlign(jflowlayout_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHGap(int hgap);
+		virtual void SetHGap(int hgap);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVGap(int vgap);
+		virtual void SetVGap(int vgap);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetAlignOnBaseline(bool align_on_baseline);
+		virtual void SetAlignOnBaseline(bool align_on_baseline);
 
 		/**
 		 * \brief
 		 *
 		 */
-		int MoveComponents(Container *target, int x, int y, int width, int height, int rowStart, int rowEnd, bool ltr, bool useBaseline, int *ascent, int *descent);
+		virtual int MoveComponents(Container *target, int x, int y, int width, int height, int rowStart, int rowEnd, bool ltr, bool useBaseline, int *ascent, int *descent);
 
 		/**
 		 * \brief

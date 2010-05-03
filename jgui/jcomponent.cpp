@@ -61,8 +61,8 @@ Component::Component(int x, int y, int width, int height):
 	_border_size = 2;
 	_border = BEVEL_BORDER;
 	_gradient_level = 0x40;
-	_vertical_gap = 5;
-	_horizontal_gap = 5;
+	_vertical_gap = 4;
+	_horizontal_gap = 4;
 	_alignment_x = CENTER_ALIGNMENT;
 	_alignment_y = CENTER_ALIGNMENT;
 
@@ -70,8 +70,6 @@ Component::Component(int x, int y, int width, int height):
 	_minimum_size.height = 0;
 	_maximum_size.width = 1920;
 	_maximum_size.height = 1080;
-	_preferred_size.width = 100;
-	_preferred_size.height = 40;
 
 	SetLocation(x, y);
 	SetSize(width, height);
@@ -470,28 +468,6 @@ void Component::SetMaximumSize(jsize_t size)
 	}
 }
 
-void Component::SetPreferredSize(jsize_t size)
-{
-	_preferred_size.width = size.width;
-	_preferred_size.height = size.height;
-
-	if (_preferred_size.width < _minimum_size.width) {
-		_preferred_size.width = _minimum_size.width;
-	}
-
-	if (_preferred_size.height < _minimum_size.height) {
-		_preferred_size.height = _minimum_size.height;
-	}
-
-	if (_preferred_size.width > _maximum_size.width) {
-		_preferred_size.width = _maximum_size.width;
-	}
-
-	if (_preferred_size.height > _maximum_size.height) {
-		_preferred_size.height = _maximum_size.height;
-	}
-}
-
 jsize_t Component::GetMinimumSize()
 {
 	return _minimum_size;
@@ -504,7 +480,12 @@ jsize_t Component::GetMaximumSize()
 
 jsize_t Component::GetPreferredSize()
 {
-	return _preferred_size;
+	jsize_t t;
+
+	t.width = _minimum_size.width;
+	t.height = _minimum_size.height;
+
+	return t;
 }
 
 void Component::Move(int x, int y)

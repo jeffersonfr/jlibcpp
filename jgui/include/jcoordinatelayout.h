@@ -67,43 +67,43 @@ class CoordinateLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		void SetWidth(int width);
+		virtual void SetWidth(int width);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHeight(int height);
+		virtual void SetHeight(int height);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetType(jcoordinate_layout_t type);
+		virtual void SetType(jcoordinate_layout_t type);
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetWidth();
+		virtual int GetWidth();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetHeight();
+		virtual int GetHeight();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jcoordinate_layout_t GetType();
+		virtual jcoordinate_layout_t GetType();
 
 		/**
 		 * \brief
 		 *
 		 */
-		jsize_t GetPreferredSize(Container *target);
+		virtual jsize_t GetPreferredSize(Container *target);
 
 		/**
 		 * \brief

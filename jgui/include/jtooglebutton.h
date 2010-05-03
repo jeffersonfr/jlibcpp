@@ -67,13 +67,13 @@ class ToogleButton : public ImageButton{
 		 * \brief
 		 *
 		 */
-		void SetButtonPressed(bool b);
+		virtual void SetButtonPressed(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsPressed();
+		virtual bool IsPressed();
 				
 		/**
 		 * \brief

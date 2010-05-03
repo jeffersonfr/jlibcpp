@@ -1,5 +1,5 @@
 #include "addmessage.h"
-#include "jcalendardialog.h"
+#include "jcalendardialogbox.h"
 #include "jkeyboard.h"
 #include "jlabel.h"
 #include "jtextarea.h"
@@ -372,7 +372,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 		} else if (GetComponentInFocus() == date) {
 			tmp = date->GetText();
 
-			jgui::CalendarDialog calendar(GetX()+GetWidth()+20, GetY());
+			jgui::CalendarDialogBox calendar(GetX()+GetWidth()+20, GetY());
 
 			for (int i=0; i<db->GetSize(); i++) {
 				AgendaDB::agenda_t *t = db->Get(i);

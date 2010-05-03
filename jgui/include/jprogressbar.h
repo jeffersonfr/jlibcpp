@@ -77,37 +77,37 @@ class ProgressBar : public jgui::Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		double GetPosition();
+		virtual double GetPosition();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetPosition(double i);
+		virtual void SetPosition(double i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetStringPainted(bool b);
+		virtual void SetStringPainted(bool b);
 	
 		/**
 		 * \brief
 		 *
 		 */
-		void SetIndeterminate(bool b);
+		virtual void SetIndeterminate(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsStringPainted();
+		virtual bool IsStringPainted();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 		/**
 		 * \brief
@@ -119,14 +119,14 @@ class ProgressBar : public jgui::Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void Run();
-		
+		virtual void Paint(Graphics *g);
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Paint(Graphics *g);
-
+		virtual void Run();
+		
 };
 
 }

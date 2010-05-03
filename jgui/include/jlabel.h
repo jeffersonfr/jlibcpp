@@ -70,43 +70,43 @@ class Label : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void SetWrap(bool b);
+		virtual void SetText(std::string text);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetText(std::string text);
+		virtual std::string GetText();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetText();
+		virtual void SetWrap(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jhorizontal_align_t GetHorizontalAlign();
+		virtual jhorizontal_align_t GetHorizontalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalAlign(jvertical_align_t align);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jvertical_align_t GetVerticalAlign();
+		virtual	jvertical_align_t GetVerticalAlign();
 		
 		/**
 		 * \brief

@@ -39,6 +39,11 @@
 
 namespace jgui {
 
+enum jyesno_response_t {
+	YES_RESPONSE,
+	NO_RESPONSE
+};
+
 /**
  * \brief
  *
@@ -51,7 +56,7 @@ class YesNoDialogBox : public jgui::Frame, public jgui::ButtonListener{
 
 		Label *_label;
 		Button *_yes,
-			   *_no;
+					 *_no;
 
 	public:
 		/**
@@ -70,31 +75,31 @@ class YesNoDialogBox : public jgui::Frame, public jgui::ButtonListener{
 		 * \brief
 		 *
 		 */
-		int GetResponse();
+		virtual jyesno_response_t GetResponse();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 
 		/**
 		 * \brief
 		 *
 		 */
-		jhorizontal_align_t GetHorizontalAlign();
+		virtual jhorizontal_align_t GetHorizontalAlign();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalAlign(jvertical_align_t align);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 
 		/**
 		 * \brief
 		 *
 		 */
-		jvertical_align_t GetVerticalAlign();
+		virtual jvertical_align_t GetVerticalAlign();
 		
 		/**
 		 * \brief

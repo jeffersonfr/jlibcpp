@@ -261,25 +261,25 @@ class TextComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void RegisterTextListener(TextListener *listener);
+		virtual void RegisterTextListener(TextListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveTextListener(TextListener *listener);
+		virtual void RemoveTextListener(TextListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchTextEvent(TextEvent *event);
+		virtual void DispatchTextEvent(TextEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<TextListener *> & GetTextListeners();
+		virtual std::vector<TextListener *> & GetTextListeners();
 
 };
 

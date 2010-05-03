@@ -71,7 +71,7 @@ class FocusEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		jfocus_event_t GetType();
+		virtual jfocus_event_t GetType();
 
 };
 

@@ -64,61 +64,61 @@ class WindowManager : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		std::vector<Window *> & GetWindows();
+		virtual std::vector<Window *> & GetWindows();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		Window * GetWindowInFocus();
+		virtual Window * GetWindowInFocus();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Add(Window *w);
+		virtual void Add(Window *w);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Remove(Window *w);
+		virtual void Remove(Window *w);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Restore();
+		virtual void Restore();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RaiseToTop(Window *c);
+		virtual void RaiseToTop(Window *c);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void LowerToBottom(Window *c);
+		virtual void LowerToBottom(Window *c);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void PutWindowATop(Window *c, Window *c1);
+		virtual void PutWindowATop(Window *c, Window *c1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void PutWindowBelow(Window *c, Window *c1);
+		virtual void PutWindowBelow(Window *c, Window *c1);
 
 };
 

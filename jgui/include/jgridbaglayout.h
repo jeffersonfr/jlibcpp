@@ -284,7 +284,7 @@ class GridBagConstraints{
 		{
 		}
 
-		bool IsVerticallyResizable() 
+		virtual bool IsVerticallyResizable() 
 		{
 			return (fill == GBLC_BOTH || fill == GBLC_VERTICAL);
 		}
@@ -369,14 +369,14 @@ class GridBagLayoutInfo{
 			}
 		}
 
-		bool HasConstantDescent(int row) 
+		virtual bool HasConstantDescent(int row) 
 		{
 			int ordinal = 0; // TODO:: Component.BaselineResizeBehavior.CONSTANT_DESCENT.ordinal();
 
 			return ((baselineType[row] & (1 << ordinal)) != 0);
 		}
 
-		bool HasBaseline(int row) 
+		virtual bool HasBaseline(int row) 
 		{
 			return (hasBaseline && baselineType[row] != 0);
 		}
@@ -412,103 +412,103 @@ class GridBagLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		void SetConstraints(Component *comp, GridBagConstraints *constraints);
+		virtual void SetConstraints(Component *comp, GridBagConstraints *constraints);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		GridBagConstraints * GetConstraints(Component *comp);
+		virtual GridBagConstraints * GetConstraints(Component *comp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		GridBagConstraints * LookupConstraints(Component *comp);
+		virtual GridBagConstraints * LookupConstraints(Component *comp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveConstraints(Component *comp);
+		virtual void RemoveConstraints(Component *comp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jpoint_t GetLayoutOrigin();
+		virtual jpoint_t GetLayoutOrigin();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void AddLayoutComponent(Component *comp, GridBagConstraints *constraints);
+		virtual void AddLayoutComponent(Component *comp, GridBagConstraints *constraints);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveLayoutComponent(Component *comp);
+		virtual void RemoveLayoutComponent(Component *comp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		GridBagLayoutInfo * GetLayoutInfo(Container *parent, int sizeflag);
+		virtual GridBagLayoutInfo * GetLayoutInfo(Container *parent, int sizeflag);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int64_t * PreInitMaximumArraySizes(Container *parent);
+		virtual int64_t * PreInitMaximumArraySizes(Container *parent);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool CalculateBaseline(Component *c, GridBagConstraints *constraints, jsize_t size);
+		virtual bool CalculateBaseline(Component *c, GridBagConstraints *constraints, jsize_t size);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void AdjustForGravity(GridBagConstraints *constraints, jregion_t *r);
+		virtual void AdjustForGravity(GridBagConstraints *constraints, jregion_t *r);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void AlignOnBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
+		virtual void AlignOnBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void AlignAboveBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
+		virtual void AlignAboveBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void AlignBelowBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
+		virtual void AlignBelowBaseline(GridBagConstraints *cons, jregion_t *r, int cellY, int cellHeight);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void CenterVertically(GridBagConstraints *cons, jregion_t *r, int cellHeight);
+		virtual void CenterVertically(GridBagConstraints *cons, jregion_t *r, int cellHeight);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jsize_t GetMinSize(Container *parent, GridBagLayoutInfo *info);
+		virtual jsize_t GetMinSize(Container *parent, GridBagLayoutInfo *info);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void ArrangeGrid(Container *parent);
+		virtual void ArrangeGrid(Container *parent);
 
 		/**
 		 * \brief

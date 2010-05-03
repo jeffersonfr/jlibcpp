@@ -1,7 +1,6 @@
 #include "searchcontacts.h"
 #include "jyesnodialogbox.h"
 #include "jmessagedialogbox.h"
-#include "jcalendardialog.h"
 #include "jkeyboard.h"
 #include "addcontact.h"
 

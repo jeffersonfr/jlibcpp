@@ -58,49 +58,49 @@ class GridLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		int GetRows();
+		virtual int GetRows();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetColumns();
+		virtual int GetColumns();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetHorizontalGap();
+		virtual int GetHorizontalGap();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetVerticalGap();
+		virtual int GetVerticalGap();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetRows(int rows);
+		virtual void SetRows(int rows);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetColumns(int cols);
+		virtual void SetColumns(int cols);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHorizontalGap(int hgap);
+		virtual void SetHorizontalGap(int hgap);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalGap(int vgap);
+		virtual void SetVerticalGap(int vgap);
 
 		/**
 		 * \brief

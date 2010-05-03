@@ -65,13 +65,13 @@ YesNoDialogBox::~YesNoDialogBox()
 	delete _no;
 }
 
-int YesNoDialogBox::GetResponse()
+jyesno_response_t YesNoDialogBox::GetResponse()
 {
-		if (GetComponentInFocus() == _yes) {
-			return 1;
-		} else {
-			return 0;
-		}
+	if (GetComponentInFocus() == _yes) {
+		return YES_RESPONSE;
+	}
+
+	return NO_RESPONSE;
 }
 
 void YesNoDialogBox::SetHorizontalAlign(jhorizontal_align_t align)

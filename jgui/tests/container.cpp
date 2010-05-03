@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jkeyboard.h"
-#include "jcalendardialog.h"
 #include "jcheckbutton.h"
 #include "jcheckbuttongroup.h"
 #include "janimation.h"

@@ -72,25 +72,25 @@ class Animation : public Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		void AddImage(std::string file);
+		virtual void AddImage(std::string file);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetInterval(int i);
+		virtual void SetInterval(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveAll();
+		virtual void RemoveAll();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 		
 		/**
 		 * \brief

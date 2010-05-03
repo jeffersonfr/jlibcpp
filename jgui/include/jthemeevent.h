@@ -52,7 +52,7 @@ class ThemeEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		Theme * GetTheme();
+		virtual Theme * GetTheme();
 
 };
 

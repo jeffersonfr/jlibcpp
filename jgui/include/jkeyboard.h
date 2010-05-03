@@ -59,7 +59,6 @@ enum jkeyboard_type_t {
  */
 class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::FrameInputListener, public jgui::TextListener {
 
-	public:
 	private:
 		jthread::Mutex _key_mutex;
 
@@ -83,19 +82,7 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::F
 			 _input_locked,
 			 _is_password;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible = true, bool is_password = false);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Keyboard();
-
+	private:
 		/**
 		 * \brief
 		 *
@@ -125,6 +112,19 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::F
 		 *
 		 */
 		void BuildSmallNumericKeyboard();
+
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible = true, bool is_password = false);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~Keyboard();
 
 		/**
 		 * \brief
@@ -184,25 +184,25 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::F
 		 * \brief
 		 *
 		 */
-		std::vector<KeyboardListener *> & GetKeyboardListeners();
+		virtual std::vector<KeyboardListener *> & GetKeyboardListeners();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RegisterKeyboardListener(KeyboardListener *listener);
+		virtual void RegisterKeyboardListener(KeyboardListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveKeyboardListener(KeyboardListener *listener);
+		virtual void RemoveKeyboardListener(KeyboardListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchKeyboardEvent(KeyboardEvent *event);
+		virtual void DispatchKeyboardEvent(KeyboardEvent *event);
 
 };
 

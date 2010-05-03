@@ -217,7 +217,7 @@ OBJS_jgui = \
 		 jbutton.o\
 		 jbuttonevent.o\
 		 jbuttonlistener.o\
-		 jcalendardialog.o\
+		 jcalendardialogbox.o\
 		 jcalendarevent.o\
 		 jcalendarlistener.o\
 		 jcanvas.o\
@@ -325,7 +325,7 @@ doc:
 	@mkdir -p $(DOCDIR) 
 
 install: uninstall
-	@echo -e "Instaling include files in $(PREFIX)/include/$(MODULE) $(OK)"
+	@echo -e "Instaling include files in $(PREFIX)/include/$(MODULE)" && mkdir -p $(PREFIX)/include/$(MODULE) && echo -e "$(OK)"
 	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jcommon && install -o nobody -m 644 jcommon/include/* /usr/local/include/jlibcpp/jcommon
 	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jgui && install -o nobody -m 644 jgui/include/* /usr/local/include/jlibcpp/jgui
 	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jio && install -o nobody -m 644 jio/include/* /usr/local/include/jlibcpp/jio
@@ -367,5 +367,5 @@ ultraclean: clean uninstall
 	@cd jsocket/tests && make clean && cd -
 	@cd jthread/tests && make clean &&cd -
 	@rm -rf /usr/local/include/jlibcpp
-	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) 2> /dev/null && echo -e "$(MODULE) ultraclean $(OK)" 
+	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(PREFIX)/lib/$(EXE) $(PREFIX)/include/jlibcpp 2> /dev/null && echo -e "$(MODULE) ultraclean $(OK)" 
 

@@ -1,6 +1,5 @@
 #include "viewmessages.h"
 #include "jyesnodialogbox.h"
-#include "jcalendardialog.h"
 #include "jkeyboard.h"
 #include "addmessage.h"
 

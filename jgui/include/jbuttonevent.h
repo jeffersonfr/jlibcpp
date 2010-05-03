@@ -63,7 +63,7 @@ class ButtonEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		std::string GetSymbol();
+		virtual std::string GetSymbol();
 
 };
 

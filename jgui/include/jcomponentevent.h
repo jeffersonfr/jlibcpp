@@ -73,7 +73,7 @@ class ComponentEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		jcomponent_event_t GetType();
+		virtual jcomponent_event_t GetType();
 
 };
 

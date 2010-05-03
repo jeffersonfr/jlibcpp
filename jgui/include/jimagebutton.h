@@ -64,13 +64,13 @@ class ImageButton : public Button{
 		 * \brief
 		 *
 		 */
-		void SetImage(std::string image);
+		virtual void SetImage(std::string image);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetImageFocus(std::string image);
+		virtual void SetImageFocus(std::string image);
 		
 		/**
 		 * \brief

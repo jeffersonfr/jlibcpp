@@ -87,55 +87,55 @@ class Watch : public jgui::Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		void SetSeconds(int i);
+		virtual void SetSeconds(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetMinutes(int i);
+		virtual void SetMinutes(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHours(int i);
+		virtual void SetHours(int i);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Pause();
+		virtual void Pause();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Reset();
+		virtual void Reset();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jhorizontal_align_t GetHorizontalAlign();
+		virtual jhorizontal_align_t GetHorizontalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalAlign(jvertical_align_t align);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jvertical_align_t GetVerticalAlign();
+		virtual jvertical_align_t GetVerticalAlign();
 		
 		/**
 		 * \brief
@@ -153,7 +153,7 @@ class Watch : public jgui::Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 };
 

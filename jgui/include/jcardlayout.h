@@ -66,73 +66,73 @@ class CardLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		int GetHGap();
+		virtual int GetHGap();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetVGap();
+		virtual int GetVGap();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHGap(int hgap);
+		virtual void SetHGap(int hgap);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVGap(int vgap);
+		virtual void SetVGap(int vgap);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AddLayoutComponent(std::string name, Component *comp);
+		virtual void AddLayoutComponent(std::string name, Component *comp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveLayoutComponent(Component *comp);
+		virtual void RemoveLayoutComponent(Component *comp);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void CheckLayout(Container *parent);
+		virtual void CheckLayout(Container *parent);
 	
 		/**
 		 * \brief
 		 *
 		 */
-		void First(Container *parent);
+		virtual void First(Container *parent);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Next(Container *parent);
+		virtual void Next(Container *parent);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Previous(Container *parent);
+		virtual void Previous(Container *parent);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Last(Container *parent);
+		virtual void Last(Container *parent);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void ShowDefaultComponent(Container *parent);
+		virtual void ShowDefaultComponent(Container *parent);
 
 		/**
 		 * \brief

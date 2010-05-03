@@ -91,31 +91,31 @@ class MouseEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		jmouse_event_t GetType();
+		virtual jmouse_event_t GetType();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetClickCount();
+		virtual int GetClickCount();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jmouse_button_t GetButton();
+		virtual jmouse_button_t GetButton();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetX();
+		virtual int GetX();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetY();
+		virtual int GetY();
 
 };
 

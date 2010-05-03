@@ -62,7 +62,7 @@ class KeyProcess : public jthread::Thread{
 			delete event;
 		}
 
-		void SetListener(KeyListener *listener, KeyEvent *event)
+		virtual void SetListener(KeyListener *listener, KeyEvent *event)
 		{
 			_listener = listener;
 			_event = event;
@@ -109,7 +109,7 @@ class MouseProcess : public jthread::Thread{
 			delete event;
 		}
 
-		void SetListener(MouseListener *listener, MouseEvent *event)
+		virtual void SetListener(MouseListener *listener, MouseEvent *event)
 		{
 			_listener = listener;
 			_event = event;
@@ -192,109 +192,109 @@ class InputManager : public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		void SetWorkingScreenSize(int width, int height);
+		virtual void SetWorkingScreenSize(int width, int height);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SkipKeyEvents(bool b);
+		virtual void SkipKeyEvents(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SkipMouseEvents(bool b);
+		virtual void SkipMouseEvents(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetKeyEventsEnabled(bool b);
+		virtual void SetKeyEventsEnabled(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetMouseEventsEnabled(bool b);
+		virtual void SetMouseEventsEnabled(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsKeyEventsEnabled();
+		virtual bool IsKeyEventsEnabled();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsMouseEventsEnabled();
+		virtual bool IsMouseEventsEnabled();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void PostEvent(KeyEvent *event);
+		virtual void PostEvent(KeyEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void PostEvent(MouseEvent *event);
+		virtual void PostEvent(MouseEvent *event);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RegisterKeyListener(KeyListener *listener);
+		virtual void RegisterKeyListener(KeyListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveKeyListener(KeyListener *listener);
+		virtual void RemoveKeyListener(KeyListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchKeyEvent(KeyEvent *event);
+		virtual void DispatchKeyEvent(KeyEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<KeyListener *> & GetKeyListeners();
+		virtual std::vector<KeyListener *> & GetKeyListeners();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RegisterMouseListener(MouseListener *listener);
+		virtual void RegisterMouseListener(MouseListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveMouseListener(MouseListener *listener);
+		virtual void RemoveMouseListener(MouseListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchMouseEvent(MouseEvent *event);
+		virtual void DispatchMouseEvent(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<MouseListener *> & GetMouseListeners();
+		virtual std::vector<MouseListener *> & GetMouseListeners();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void WaitEvents();
+		virtual void WaitEvents();
 
 		/**
 		 * \brief

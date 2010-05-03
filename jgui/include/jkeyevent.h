@@ -270,25 +270,25 @@ class KeyEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		int GetKeyCode();
+		virtual int GetKeyCode();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jkey_symbol_t GetSymbol();
+		virtual jkey_symbol_t GetSymbol();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jkey_type_t GetType();
+		virtual jkey_type_t GetType();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jinput_modifiers_t GetModifiers();
+		virtual jinput_modifiers_t GetModifiers();
 
 };
 

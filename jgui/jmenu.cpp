@@ -351,9 +351,8 @@ void Menu::Paint(Graphics *g)
 		y = y + insets.top;
 	}
 
-	int i,
-			count = 0,
-			space = 15,
+	int count = 0,
+			space = 0,
 			position = _top_index;
 
 	if (_centered_interaction == true) {
@@ -370,7 +369,7 @@ void Menu::Paint(Graphics *g)
 
 	for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
 		if ((*i)->GetType() == IMAGE_MENU_ITEM || (*i)->GetType() == CHECK_MENU_ITEM) {
-			space = 20+_item_size;
+			space = _item_size+10;
 
 			break;
 		}
@@ -380,7 +379,7 @@ void Menu::Paint(Graphics *g)
 		position = 0;
 	}
 
-	for (i=position; count<_visible_items && i<(int)_items.size(); i++, count++) {
+	for (int i=position; count<_visible_items && i<(int)_items.size(); i++, count++) {
 		if (_index != i) {
 			g->SetColor(_item_color);
 			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w, _item_size);
@@ -396,9 +395,9 @@ void Menu::Paint(Graphics *g)
 
 		if (IsFontSet() == true) {
 			std::string text = _items[i]->GetValue();
-			int px = space,
-					py = (_item_size+_vertical_gap)*count,
-					pw = _size.width-2*space,
+			int px = x+space,
+					py = y+(_item_size+_vertical_gap)*count,
+					pw = w-space,
 					ph = _item_size;
 
 			if (_has_focus == true) {
@@ -408,23 +407,16 @@ void Menu::Paint(Graphics *g)
 			}
 
 			if (_items[i]->GetType() == EMPTY_MENU_ITEM) {
-				// TODO::
 			} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
-				// pw = _size.width-2*space;
 			} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
 				if (_items[i]->GetImage() == NULL) {
-					// w = _size.width-2*space;
 				} else {
-					g->DrawImage(_items[i]->GetImage(), x+10, y+(_item_size+_vertical_gap)*count+2, _item_size, _item_size-4);
-
-					pw = pw-_item_size-10;
+					g->DrawImage(_items[i]->GetImage(), x, y+(_item_size+_vertical_gap)*count+2, _item_size, _item_size-4);
 				}
 			} else if (_items[i]->GetType() == CHECK_MENU_ITEM) {
 				if (_items[i]->IsSelected() == true) {
-					g->DrawImage(prefetch, x+10, y+(_item_size+_vertical_gap)*count+2, _item_size, _item_size-4);
+					g->DrawImage(prefetch, x, y+(_item_size+_vertical_gap)*count+2, _item_size, _item_size-4);
 				}
-
-				pw = pw-_item_size-10;
 			}
 
 			// if (_wrap == false) {
@@ -432,7 +424,7 @@ void Menu::Paint(Graphics *g)
 			// }
 
 			// TODO:: g->SetClip(px, py, pw, ph);
-			g->DrawString(text, x+px, y+py, pw, ph, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
+			g->DrawString(text, px, py, pw, ph, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
 			// g->SetClip(0, 0, _size.width, _size.height);
 		}
 

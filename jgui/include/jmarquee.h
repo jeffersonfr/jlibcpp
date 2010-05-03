@@ -89,25 +89,25 @@ class Marquee : public Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		void SetType(jmarquee_type_t type);
+		virtual void SetType(jmarquee_type_t type);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetInterval(int i);
+		virtual void SetInterval(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetText(std::string text);
+		virtual void SetText(std::string text);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetText();
+		virtual std::string GetText();
 		
 		/**
 		 * \brief
@@ -125,7 +125,7 @@ class Marquee : public Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 };
 

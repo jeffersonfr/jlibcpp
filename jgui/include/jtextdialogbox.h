@@ -61,25 +61,25 @@ class TextDialogBox : public jgui::Frame{
 		 * \brief
 		 *
 		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 
 		/**
 		 * \brief
 		 *
 		 */
-		jhorizontal_align_t GetHorizontalAlign();
+		virtual jhorizontal_align_t GetHorizontalAlign();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalAlign(jvertical_align_t align);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 
 		/**
 		 * \brief
 		 *
 		 */
-		jvertical_align_t GetVerticalAlign();
+		virtual jvertical_align_t GetVerticalAlign();
 
 };
 

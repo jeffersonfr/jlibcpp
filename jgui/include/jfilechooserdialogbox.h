@@ -121,55 +121,55 @@ class FileChooserDialog : public jgui::Frame, public jgui::SelectListener, publi
 		 * \brief
 		 *
 		 */
-		std::string GetName();
+		virtual std::string GetName();
 
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetFile();
+		virtual std::string GetFile();
 
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetCurrentDirectory();
+		virtual std::string GetCurrentDirectory();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCurrentDirectory(std::string directory);
+		virtual void SetCurrentDirectory(std::string directory);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AddExtension(std::string ext);
+		virtual void AddExtension(std::string ext);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetExtensionIgnoreCase(bool b);
+		virtual void SetExtensionIgnoreCase(bool b);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetFileFilter(jfilechooser_filter_t filter);
+		virtual void SetFileFilter(jfilechooser_filter_t filter);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void ItemSelected(jgui::SelectEvent *event);
+		virtual void ItemSelected(jgui::SelectEvent *event);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void InputChanged(jgui::KeyEvent *event);
+		virtual void InputChanged(jgui::KeyEvent *event);
 
 		/**
 		 * \brief

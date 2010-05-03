@@ -72,61 +72,61 @@ class CheckButton : public Component{
 		 * \brief
 		 *
 		 */
-		void SetText(std::string text);
+		virtual void SetText(std::string text);
 
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetText();
+		virtual std::string GetText();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetType(jcheckbox_type_t type);
+		virtual void SetType(jcheckbox_type_t type);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jcheckbox_type_t GetType();
+		virtual jcheckbox_type_t GetType();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsSelected();
+		virtual bool IsSelected();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetSelected(bool b);
+		virtual void SetSelected(bool b);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jhorizontal_align_t GetHorizontalAlign();
+		virtual jhorizontal_align_t GetHorizontalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalAlign(jvertical_align_t align);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jvertical_align_t GetVerticalAlign();
+		virtual jvertical_align_t GetVerticalAlign();
 		
 		/**
 		 * \brief
@@ -150,25 +150,25 @@ class CheckButton : public Component{
 		 * \brief
 		 *
 		 */
-		void RegisterCheckButtonListener(CheckButtonListener *listener);
+		virtual void RegisterCheckButtonListener(CheckButtonListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveCheckButtonListener(CheckButtonListener *listener);
+		virtual void RemoveCheckButtonListener(CheckButtonListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchCheckButtonEvent(CheckButtonEvent *event);
+		virtual void DispatchCheckButtonEvent(CheckButtonEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<CheckButtonListener *> & GetCheckButtonListeners();
+		virtual std::vector<CheckButtonListener *> & GetCheckButtonListeners();
 
 };
 

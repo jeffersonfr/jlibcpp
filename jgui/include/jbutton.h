@@ -67,67 +67,67 @@ class Button : public Component{
 		 * \brief
 		 *
 		 */
-		void SetText(std::string text);
+		virtual void SetText(std::string text);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void AddName(std::string);
+		virtual void AddName(std::string);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveName(int index);
+		virtual void RemoveName(int index);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCurrentNameIndex(int index);
+		virtual void SetCurrentNameIndex(int index);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void NextName();
+		virtual void NextName();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void PreviousName();
+		virtual void PreviousName();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jhorizontal_align_t GetHorizontalAlign();
+		virtual jhorizontal_align_t GetHorizontalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalAlign(jvertical_align_t align);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jvertical_align_t GetVerticalAlign();
+		virtual jvertical_align_t GetVerticalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetText();
+		virtual std::string GetText();
 
 		/**
 		 * \brief
@@ -151,25 +151,25 @@ class Button : public Component{
 		 * \brief
 		 *
 		 */
-		void RegisterButtonListener(ButtonListener *listener);
+		virtual void RegisterButtonListener(ButtonListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveButtonListener(ButtonListener *listener);
+		virtual void RemoveButtonListener(ButtonListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchButtonEvent(ButtonEvent *event);
+		virtual void DispatchButtonEvent(ButtonEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<ButtonListener *> & GetButtonListeners();
+		virtual std::vector<ButtonListener *> & GetButtonListeners();
 
 };
 

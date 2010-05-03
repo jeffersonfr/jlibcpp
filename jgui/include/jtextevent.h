@@ -62,7 +62,7 @@ class TextEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		std::string GetText();
+		virtual std::string GetText();
 
 };
 

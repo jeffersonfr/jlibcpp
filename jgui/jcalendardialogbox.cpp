@@ -17,18 +17,18 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jcalendardialog.h"
+#include "jcalendardialogbox.h"
 #include "jdate.h"
 
 #include <algorithm>
 
 namespace jgui {
 
-CalendarDialog::CalendarDialog(int x, int y):
+CalendarDialogBox::CalendarDialogBox(int x, int y):
 	jgui::Frame("Calendar", x, y, 1, 1),
 	jgui::FrameInputListener()
 {
-	jcommon::Object::SetClassName("jgui::CalendarDialog");
+	jcommon::Object::SetClassName("jgui::CalendarDialogBox");
 
 	bx = _insets.left;
 	by = _insets.top;
@@ -123,7 +123,7 @@ CalendarDialog::CalendarDialog(int x, int y):
 	Frame::RegisterInputListener(this);
 }
 
-CalendarDialog::~CalendarDialog() 
+CalendarDialogBox::~CalendarDialogBox() 
 {
 	Frame::RemoveInputListener(this);
 
@@ -172,7 +172,7 @@ CalendarDialog::~CalendarDialog()
 	}
 }
 
-void CalendarDialog::SetDay(int d)
+void CalendarDialogBox::SetDay(int d)
 {
 	if (d < 1) {
 		d = 1;
@@ -185,7 +185,7 @@ void CalendarDialog::SetDay(int d)
 	_day = d-1;
 }
 
-void CalendarDialog::SetMonth(int m)
+void CalendarDialogBox::SetMonth(int m)
 {
 	if (m < 1) {
 		m = 1;
@@ -198,7 +198,7 @@ void CalendarDialog::SetMonth(int m)
 	_month = m-1;
 }
 
-void CalendarDialog::SetYear(int y)
+void CalendarDialogBox::SetYear(int y)
 {
 	if (y < 1970) {
 		y = 1970;
@@ -211,22 +211,22 @@ void CalendarDialog::SetYear(int y)
 	_year = y-1970;
 }
 
-int CalendarDialog::GetDay()
+int CalendarDialogBox::GetDay()
 {
 	return _select_day;
 }
 
-int CalendarDialog::GetMonth()
+int CalendarDialogBox::GetMonth()
 {
 	return _select_month; // _month+1;
 }
 
-int CalendarDialog::GetYear()
+int CalendarDialogBox::GetYear()
 {
 	return _select_year; // _year+1970;
 }
 
-void CalendarDialog::AddWarnning(int day, int month, int year, int red, int green, int blue)
+void CalendarDialogBox::AddWarnning(int day, int month, int year, int red, int green, int blue)
 {
 	jcalendar_warnning_t t;
 
@@ -240,7 +240,7 @@ void CalendarDialog::AddWarnning(int day, int month, int year, int red, int gree
 	_warnning_days.push_back(t);
 }
 
-void CalendarDialog::RemoveWarnning(jcalendar_warnning_t t)
+void CalendarDialogBox::RemoveWarnning(jcalendar_warnning_t t)
 {
 	for (std::vector<jcalendar_warnning_t >::iterator i=_warnning_days.begin(); i!=_warnning_days.end(); i++) {
 		if (t.day == (*i).day &&
@@ -256,12 +256,12 @@ void CalendarDialog::RemoveWarnning(jcalendar_warnning_t t)
 	}
 }
 
-void CalendarDialog::RemoveAll()
+void CalendarDialogBox::RemoveAll()
 {
 	_warnning_days.clear();
 }
 
-void CalendarDialog::BuildCalendar()
+void CalendarDialogBox::BuildCalendar()
 {
 	jthread::AutoLock lock(&_cal_mutex);
 
@@ -375,14 +375,14 @@ void CalendarDialog::BuildCalendar()
 	Repaint();
 }
 
-void CalendarDialog::InputChanged(jgui::KeyEvent *event)
+void CalendarDialogBox::InputChanged(jgui::KeyEvent *event)
 {
 	if (event->GetSymbol() == JKEY_BLUE || event->GetSymbol() == JKEY_F4) {
 		Release();
 	}
 }
 
-void CalendarDialog::ActionPerformed(jgui::ButtonEvent *event)
+void CalendarDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 {
 	Button *b1 = (jgui::Button *)event->GetSource(),
 		   *b2 = _buttons[_select_day-1];
@@ -402,7 +402,7 @@ void CalendarDialog::ActionPerformed(jgui::ButtonEvent *event)
 	_select_year = (_year+1970);
 }
 
-void CalendarDialog::ItemChanged(SelectEvent *event)
+void CalendarDialogBox::ItemChanged(SelectEvent *event)
 {
 	{
 		jthread::AutoLock lock(&_cal_mutex);
@@ -462,7 +462,7 @@ void CalendarDialog::ItemChanged(SelectEvent *event)
 	BuildCalendar();
 }
 
-void CalendarDialog::RegisterCalendarListener(CalendarListener *listener)
+void CalendarDialogBox::RegisterCalendarListener(CalendarListener *listener)
 {
 	if (listener == NULL) {
 		return;
@@ -473,7 +473,7 @@ void CalendarDialog::RegisterCalendarListener(CalendarListener *listener)
 	}
 }
 
-void CalendarDialog::RemoveCalendarListener(CalendarListener *listener)
+void CalendarDialogBox::RemoveCalendarListener(CalendarListener *listener)
 {
 	if (listener == NULL) {
 		return;
@@ -486,7 +486,7 @@ void CalendarDialog::RemoveCalendarListener(CalendarListener *listener)
 	}
 }
 
-void CalendarDialog::DispatchCalendarEvent(CalendarEvent *event)
+void CalendarDialogBox::DispatchCalendarEvent(CalendarEvent *event)
 {
 	if (event == NULL) {
 		return;
@@ -507,7 +507,7 @@ void CalendarDialog::DispatchCalendarEvent(CalendarEvent *event)
 	delete event;
 }
 
-std::vector<CalendarListener *> & CalendarDialog::GetCalendarListeners()
+std::vector<CalendarListener *> & CalendarDialogBox::GetCalendarListeners()
 {
 	return _calendar_listeners;
 }

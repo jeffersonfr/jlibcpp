@@ -101,55 +101,55 @@ class OffScreenImage : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		Graphics * GetGraphics();
+		virtual Graphics * GetGraphics();
 
 		/**
 		 * \brief
 		 *
 		 */
-		OffScreenImage * Create();
+		virtual OffScreenImage * Create();
 
 		/**
 		 * \brief
 		 *
 		 */
-		jsurface_pixelformat_t GetPixelFormat();
+		virtual jsurface_pixelformat_t GetPixelFormat();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetWidth();
+		virtual int GetWidth();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetHeight();
+		virtual int GetHeight();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetScaleWidth();
+		virtual int GetScaleWidth();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetScaleHeight();
+		virtual int GetScaleHeight();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Restore();
+		virtual void Restore();
 
 };
 

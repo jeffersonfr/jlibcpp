@@ -61,7 +61,7 @@ class CheckButtonEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		bool IsSelected();
+		virtual bool IsSelected();
 
 };
 

@@ -60,19 +60,19 @@ class Icon : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void SetText(std::string text);
+		virtual void SetText(std::string text);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetText();
+		virtual std::string GetText();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetImage(std::string file);
+		virtual void SetImage(std::string file);
 
 		/**
 		 * \brief
@@ -84,25 +84,25 @@ class Icon : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jhorizontal_align_t GetHorizontalAlign();
+		virtual jhorizontal_align_t GetHorizontalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalAlign(jvertical_align_t align);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jvertical_align_t GetVerticalAlign();
+		virtual jvertical_align_t GetVerticalAlign();
 		
 		/**
 		 * \brief

@@ -65,13 +65,13 @@ class KeyboardEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		std::string GetSymbol();
+		virtual std::string GetSymbol();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetText();
+		virtual std::string GetText();
 
 };
 

@@ -82,13 +82,13 @@ class TextArea : public jgui::TextComponent{
 		 * \brief
 		 *
 		 */
-		void ScrollUp();
+		virtual void ScrollUp();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void ScrollDown();
+		virtual void ScrollDown();
 
 		/**
 		 * \brief

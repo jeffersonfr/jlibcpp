@@ -104,7 +104,7 @@ class Tree : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		void SetCenteredInteraction(bool b);
+		virtual void SetCenteredInteraction(bool b);
 
 		/*
 		 * \brief

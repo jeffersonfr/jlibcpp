@@ -78,19 +78,19 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
-		Graphics * GetGraphics();
+		virtual Graphics * GetGraphics();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void * GetNativeWindow();
+		virtual void * GetNativeWindow();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetWorkingScreenSize(int width, int height);
+		virtual void SetWorkingScreenSize(int width, int height);
 
 		/**
 		 * \brief
@@ -246,25 +246,25 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
-		void RegisterWindowListener(WindowListener *listener);
+		virtual void RegisterWindowListener(WindowListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveWindowListener(WindowListener *listener);
+		virtual void RemoveWindowListener(WindowListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchWindowEvent(WindowEvent *event);
+		virtual void DispatchWindowEvent(WindowEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<WindowListener *> & GetWindowListeners();
+		virtual std::vector<WindowListener *> & GetWindowListeners();
 
 		/**
 		 * \brief

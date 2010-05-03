@@ -73,55 +73,55 @@ class Slider : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void SetStoneSize(int size);
+		virtual void SetStoneSize(int size);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetOrientation(jscroll_orientation_t type);
+		virtual void SetOrientation(jscroll_orientation_t type);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		double GetPosition();
+		virtual double GetPosition();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetPosition(double i);
+		virtual void SetPosition(double i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetInverted(bool b);
+		virtual void SetInverted(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		double GetMinorTickSpacing();
+		virtual double GetMinorTickSpacing();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		double GetMajorTickSpacing();
+		virtual double GetMajorTickSpacing();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetMinorTickSpacing(double i);
+		virtual void SetMinorTickSpacing(double i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetMajorTickSpacing(double i);
+		virtual void SetMajorTickSpacing(double i);
 
 		/**
 		 * \brief
@@ -145,25 +145,25 @@ class Slider : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void RegisterAdjustmentListener(AdjustmentListener *listener);
+		virtual void RegisterAdjustmentListener(AdjustmentListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveAdjustmentListener(AdjustmentListener *listener);
+		virtual void RemoveAdjustmentListener(AdjustmentListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchAdjustmentEvent(AdjustmentEvent *event);
+		virtual void DispatchAdjustmentEvent(AdjustmentEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<AdjustmentListener *> & GetAdjustmentListeners();
+		virtual std::vector<AdjustmentListener *> & GetAdjustmentListeners();
 };
 
 }

@@ -76,13 +76,13 @@ class AdjustmentEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		double GetValue();
+		virtual double GetValue();
 
 		/**
 		 * \brief
 		 *
 		 */
-		jadjustment_type_t GetType();
+		virtual jadjustment_type_t GetType();
 
 };
 

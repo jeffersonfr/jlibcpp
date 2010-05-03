@@ -218,12 +218,12 @@ jvertical_align_t Label::GetVerticalAlign()
 
 jsize_t Label::GetPreferredSize()
 {
-	jsize_t size;
+	jsize_t t;
 
-	size.width = _size.width;
-	size.height = CountLines(_text)*(_font->GetAscender()+_font->GetDescender())+2*(_vertical_gap+_border_size);
+	t.width = _size.width;
+	t.height = CountLines(_text)*(_font->GetAscender()+_font->GetDescender())+2*(_vertical_gap+_border_size);
 
-	return size;
+	return t;
 }
 
 void Label::Paint(Graphics *g)

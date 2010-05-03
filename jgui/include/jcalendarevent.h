@@ -44,8 +44,8 @@ class CalendarEvent : public jcommon::EventObject{
 
 	private:
 		int _day,
-			_month,
-			_year;
+				_month,
+				_year;
 
 	public:
 		/**
@@ -64,19 +64,19 @@ class CalendarEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		int GetDay();
+		virtual int GetDay();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetMonth();
+		virtual int GetMonth();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetYear();
+		virtual int GetYear();
 
 };
 

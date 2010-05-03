@@ -75,7 +75,7 @@ class WindowEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		jwindow_event_t GetType();
+		virtual jwindow_event_t GetType();
 			
 };
 

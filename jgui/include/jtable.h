@@ -63,61 +63,61 @@ class Cell : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void SetValue(std::string value);
+		virtual void SetValue(std::string value);
 
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetValue();
+		virtual std::string GetValue();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCellBackgroundColor(jcolor_t color);
+		virtual void SetCellBackgroundColor(jcolor_t color);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCellForegroundColor(jcolor_t color);
+		virtual void SetCellForegroundColor(jcolor_t color);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCellBackgroundColor(int r, int g, int b, int a);
+		virtual void SetCellBackgroundColor(int r, int g, int b, int a);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCellForegroundColor(int r, int g, int b, int a);
+		virtual void SetCellForegroundColor(int r, int g, int b, int a);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jhorizontal_align_t GetHorizontalAlign();
+		virtual jhorizontal_align_t GetHorizontalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalAlign(jvertical_align_t align);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jvertical_align_t GetVerticalAlign();
+		virtual jvertical_align_t GetVerticalAlign();
 		
 };
 
@@ -163,169 +163,151 @@ class Table : public Component, public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void SetLoop(bool loop);
+		virtual void SetLoop(bool loop);
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetNumberOfColumns();
+		virtual int GetNumberOfColumns();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetNumberOfRows();
+		virtual int GetNumberOfRows();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetNumberOfColumns(int size);
+		virtual void SetNumberOfColumns(int size);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetNumberOfRows(int size);
+		virtual void SetNumberOfRows(int size);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void InsertColumn(std::string text, int index = -1);
+		virtual void InsertColumn(std::string text, int index = -1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void InsertRow(std::string text, int index = -1);
+		virtual void InsertRow(std::string text, int index = -1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveColumn(int index);
+		virtual void RemoveColumn(int index);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveRow(int index);
+		virtual void RemoveRow(int index);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHeaderValue(std::string text, int index);
+		virtual void SetHeaderValue(std::string text, int index);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetHeaderValue(int index);
+		virtual std::string GetHeaderValue(int index);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHeaderVisible(bool visible);
+		virtual void SetHeaderVisible(bool visible);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsHeaderVisible();
+		virtual bool IsHeaderVisible();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetCurrentColumn();
+		virtual int GetCurrentColumn();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetCurrentRow();
+		virtual int GetCurrentRow();
 
 		/**
 		 * \brief
 		 *
 		 */
-		Cell * GetCurrentCell();
+		virtual Cell * GetCurrentCell();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCurrentCell(int row, int column);
+		virtual void SetCurrentCell(int row, int column);
 
 		/**
 		 * \brief
 		 *
 		 */
-		Cell * GetCell(int row, int column);
+		virtual Cell * GetCell(int row, int column);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCell(Cell *cell, int row, int column);
+		virtual void SetCell(Cell *cell, int row, int column);
 
 		/**
 		 * \brief
 		 *
 		 */
-		jcolor_t GetItemColor();
+		virtual void SetGridColor(jcolor_t color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetItemColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetItemColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetGridColor(jcolor_t color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetGridColor(int r, int g, int b, int a);
+		virtual void SetGridColor(int r, int g, int b, int a);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetColumnSize(int index, int size);
+		virtual void SetColumnSize(int index, int size);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetColumnSize(int index);
+		virtual int GetColumnSize(int index);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetRowSize(int index, int size);
+		virtual void SetRowSize(int index, int size);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetRowSize(int index);
+		virtual int GetRowSize(int index);
 
 		/**
 		 * \brief

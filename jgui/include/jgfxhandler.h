@@ -171,31 +171,31 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		static std::string GetID();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		static GFXHandler * GetInstance();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void * GetGraphicEngine();
+		virtual void * GetGraphicEngine();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetDefaultFont(Font *font);
+		virtual void SetDefaultFont(Font *font);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		Font * GetDefaultFont();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetID();
+		virtual Font * GetDefaultFont();
 		
 		/**
 		 * \brief

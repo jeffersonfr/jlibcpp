@@ -87,6 +87,8 @@ void ListBox::SetItemSize(int size)
 	}
 
 	_item_size = size;
+	
+	Repaint();
 }
 
 void ListBox::SetScrollType(jlist_scroll_type_t type)
@@ -94,6 +96,8 @@ void ListBox::SetScrollType(jlist_scroll_type_t type)
 	jthread::AutoLock lock(&_component_mutex);
 
 	_scroll = type;
+
+	Repaint();
 }
 
 void ListBox::SetForegroundColor(int red, int green, int blue, int alpha)
@@ -248,12 +252,12 @@ int ListBox::GetSelectedIndex()
 
 jsize_t ListBox::GetPreferredSize()
 {
-	jsize_t size;
+	jsize_t t;
 
-	size.width = _size.width;
-	size.height = 2*(_vertical_gap+_border_size)+_items.size()*(_item_size+_vertical_gap);
+	t.width = _size.width;
+	t.height = 2*(_vertical_gap+_border_size)+_items.size()*(_item_size+_vertical_gap);
 
-	return size;
+	return t;
 }
 
 void ListBox::Paint(Graphics *g)
@@ -284,10 +288,8 @@ void ListBox::Paint(Graphics *g)
 			w = _size.width-2*x,
 			h = _size.height-2*y;
 
-	int i,
-			count = 0,
-			default_y = 0,
-			space = 5,
+	int count = 0,
+			space = 0,
 			scroll_width = 0,
 			scroll_gap = 0;
 
@@ -303,16 +305,12 @@ void ListBox::Paint(Graphics *g)
 		position = 0;
 	}
 
-	default_y = (_item_size+y)*count+y;
-
 	if (_scroll == SCROLL_BAR) {
 		scroll_width = 30;
 		scroll_gap = 5;
 	}
 
-	for (i=position; count<visible_items && i<(int)_items.size(); i++, count++) {
-		default_y = (_item_size+y)*count+y;
-
+	for (int i=position; count<visible_items && i<(int)_items.size(); i++, count++) {
 		if (_index != i) {
 			g->SetColor(_item_color);
 
@@ -329,7 +327,7 @@ void ListBox::Paint(Graphics *g)
 			g->SetColor(_focus_item_color);
 		}
 
-		FillRectangle(g, x, default_y, w-scroll_width-scroll_gap, _item_size);
+		FillRectangle(g, x, y+(_item_size+y)*count, w-scroll_width-scroll_gap, _item_size);
 
 		g->SetColor(_item_color);
 
@@ -347,7 +345,7 @@ void ListBox::Paint(Graphics *g)
 		} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
 		} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
 			if (_items[i]->GetImage() != NULL) {
-				g->DrawImage(_items[i]->GetImage(), 10, default_y, _item_size, _item_size);
+				g->DrawImage(_items[i]->GetImage(), _horizontal_gap, y+(_item_size+y)*count, _item_size, _item_size);
 			}
 		}
 
@@ -361,7 +359,7 @@ void ListBox::Paint(Graphics *g)
 			int gapx = space;
 
 			int px = x+gapx,
-					py = default_y,
+					py = y+(_item_size+y)*count,
 					pw = w-gapx-scroll_width-scroll_gap,
 					ph = _item_size;
 
@@ -378,7 +376,7 @@ void ListBox::Paint(Graphics *g)
 			std::string text = _items[i]->GetValue();
 
 			// if (_wrap == false) {
-				text = _font->TruncateString(text, "...", w);
+				text = _font->TruncateString(text, "...", pw);
 			// }
 
 			g->SetClip(0, 0, x+w, y+h);
@@ -388,16 +386,15 @@ void ListBox::Paint(Graphics *g)
 	}
 
 	for (; count<visible_items+1; count++) {
-		default_y = (_item_size+y)*count+y;
+		int dy = (_item_size+y)*count+y;
 		
-		int gap = 0;
-
-		if ((default_y+_item_size) >= (_size.height-y)) {
-			gap = (default_y+_item_size)-(_size.height-y);
-		}
-
 		g->SetColor(_item_color);
-		FillRectangle(g, x, default_y, w-scroll_width-scroll_gap, _item_size-gap);
+
+		if ((dy+_item_size) < (_size.height-dy)) {
+			FillRectangle(g, x, dy, w-scroll_width-scroll_gap, _item_size);
+		} else {
+			FillRectangle(g, x, dy, w-scroll_width-scroll_gap, _item_size-((y+_item_size)-(_size.height-y)));
+		}
 	}
 	
 	if (_scroll == SCROLL_BAR) {

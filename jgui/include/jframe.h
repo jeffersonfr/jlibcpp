@@ -301,19 +301,19 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 * \brief
 		 *
 		 */
-		void RegisterInputListener(FrameInputListener *listener);
+		virtual void RegisterInputListener(FrameInputListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveInputListener(FrameInputListener *listener);
+		virtual void RemoveInputListener(FrameInputListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<FrameInputListener *> & GetFrameInputListeners();
+		virtual std::vector<FrameInputListener *> & GetFrameInputListeners();
 
 };
 

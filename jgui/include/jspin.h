@@ -77,13 +77,13 @@ class Spin : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		void SetType(jspin_type_t type);
+		virtual void SetType(jspin_type_t type);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jspin_type_t GetType();
+		virtual jspin_type_t GetType();
 		
 		/**
 		 * \brief

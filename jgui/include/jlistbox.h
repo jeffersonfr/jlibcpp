@@ -91,68 +91,68 @@ class ListBox : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		void SetCenteredInteraction(bool b);
+		virtual void SetCenteredInteraction(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetScrollType(jlist_scroll_type_t type);
+		virtual void SetScrollType(jlist_scroll_type_t type);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetSelectionType(jlist_selection_type_t type);
+		virtual void SetSelectionType(jlist_selection_type_t type);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetVisibleItems();
+		virtual int GetVisibleItems();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsSelected(int i);
+		virtual bool IsSelected(int i);
 
 		/**
 		 * \brief Invert current selection state from item. Use with IsSelected() to avoid
 		 * unexpected states.
 		 *
 		 */
-		void SetSelected(int i);
+		virtual void SetSelected(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Select(int i);
+		virtual void Select(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Deselect(int i);
+		virtual void Deselect(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetSelectedIndex();
+		virtual int GetSelectedIndex();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetItemSize();
+		virtual int GetItemSize();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetItemSize(int size);
+		virtual void SetItemSize(int size);
 
 		/**
 		 * \brief
@@ -176,12 +176,6 @@ class ListBox : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		virtual jsize_t GetPreferredSize();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual bool ProcessEvent(KeyEvent *event);
 		
 		/**
@@ -190,6 +184,12 @@ class ListBox : public jgui::ItemComponent{
 		 */
 		virtual bool ProcessEvent(MouseEvent *event);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetPreferredSize();
+
 		/**
 		 * \brief
 		 *

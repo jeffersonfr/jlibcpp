@@ -1,5 +1,4 @@
 #include "agenda.h"
-#include "jcalendardialog.h"
 #include "jkeyboard.h"
 #include "jyesnodialogbox.h"
 #include "jmessagedialogbox.h"

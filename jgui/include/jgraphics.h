@@ -685,13 +685,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void Lock();
+		virtual void Lock();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Unlock();
+		virtual void Unlock();
 
 };
 

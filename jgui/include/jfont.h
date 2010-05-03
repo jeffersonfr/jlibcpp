@@ -74,86 +74,86 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void * GetFont();
+		virtual void * GetFont();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetWorkingScreenSize(int width, int height);
+		virtual void SetWorkingScreenSize(int width, int height);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool SetEncoding(std::string code);
+		virtual bool SetEncoding(std::string code);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetName();
+		virtual std::string GetName();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetVirtualHeight();
+		virtual int GetVirtualHeight();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetHeight();
+		virtual int GetHeight();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetAscender();
+		virtual int GetAscender();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetDescender();
+		virtual int GetDescender();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetMaxAdvanced();
+		virtual int GetMaxAdvanced();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetLeading();
+		virtual int GetLeading();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetStringWidth(std::string text);
+		virtual int GetStringWidth(std::string text);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string TruncateString(std::string text, std::string extension, int width);
+		virtual void Release();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Release();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Restore();
+		virtual void Restore();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string TruncateString(std::string text, std::string extension, int width);
+		
 };
 
 }

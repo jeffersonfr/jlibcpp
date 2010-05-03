@@ -199,25 +199,25 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener, public
 		 * \brief
 		 *
 		 */
-		void SetCenteredInteraction(bool b);
+		virtual void SetCenteredInteraction(bool b);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetMenuAlign(jmenu_align_t align);
+		virtual void SetMenuAlign(jmenu_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetVisibleItems();
+		virtual int GetVisibleItems();
 
 		/**
 		 * \brief
 		 *
 		 */
-		Menu * GetCurrentMenu();
+		virtual Menu * GetCurrentMenu();
 
 		/**
 		 * \brief
@@ -283,19 +283,19 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener, public
 		 * \brief
 		 *
 		 */
-		void RegisterInputListener(FrameInputListener *listener);
+		virtual void RegisterInputListener(FrameInputListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveInputListener(FrameInputListener *listener);
+		virtual void RemoveInputListener(FrameInputListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<FrameInputListener *> & GetFrameInputListeners();
+		virtual std::vector<FrameInputListener *> & GetFrameInputListeners();
 		
 		/**
 		 * \brief

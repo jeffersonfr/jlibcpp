@@ -96,121 +96,121 @@ class Item : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		std::vector<Item *> & GetChilds();
+		virtual std::vector<Item *> & GetChilds();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 
 		/**
 		 * \brief
 		 *
 		 */
-		jhorizontal_align_t GetHorizontalAlign();
+		virtual jhorizontal_align_t GetHorizontalAlign();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalAlign(jvertical_align_t align);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 
 		/**
 		 * \brief
 		 *
 		 */
-		jvertical_align_t GetVerticalAlign();
+		virtual jvertical_align_t GetVerticalAlign();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetEnabled(bool b);
+		virtual void SetEnabled(bool b);
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool GetEnabled();
+		virtual bool GetEnabled();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVisible(bool b);
+		virtual void SetVisible(bool b);
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsVisible();
+		virtual bool IsVisible();
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsSelected();
+		virtual bool IsSelected();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetSelected(bool b);
+		virtual void SetSelected(bool b);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AddChild(Item *item);
+		virtual void AddChild(Item *item);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AddChild(Item *item, int index);
+		virtual void AddChild(Item *item, int index);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AddChilds(std::vector<Item *> &items);
+		virtual void AddChilds(std::vector<Item *> &items);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveChild(int index);
+		virtual void RemoveChild(int index);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveChild(Item *item);
+		virtual void RemoveChild(Item *item);
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetChildsSize();
+		virtual int GetChildsSize();
 
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetValue();
+		virtual std::string GetValue();
 
 		/**
 		 * \brief
 		 *
 		 */
-		jgui::OffScreenImage * GetImage();
+		virtual jgui::OffScreenImage * GetImage();
 
 		/**
 		 * \brief
 		 *
 		 */
-		jmenuitem_type_t GetType();
+		virtual jmenuitem_type_t GetType();
 
 };
 
@@ -465,25 +465,25 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void RegisterSelectListener(SelectListener *listener);
+		virtual void RegisterSelectListener(SelectListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveSelectListener(SelectListener *listener);
+		virtual void RemoveSelectListener(SelectListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchSelectEvent(SelectEvent *event);
+		virtual void DispatchSelectEvent(SelectEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<SelectListener *> & GetSelectListeners();
+		virtual std::vector<SelectListener *> & GetSelectListeners();
 
 };
 

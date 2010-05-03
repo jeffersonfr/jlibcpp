@@ -60,7 +60,7 @@ struct jcalendar_warnning_t {
  *
  * \author Jeff Ferr
  */
-class CalendarDialog : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public FrameInputListener{
+class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public FrameInputListener{
 
 	private:
 		jthread::Mutex _cal_mutex;
@@ -99,78 +99,79 @@ class CalendarDialog : public jgui::Frame, public jgui::ButtonListener, public j
 			 _show_text,
 			 _response;
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		CalendarDialog(int x, int y);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~CalendarDialog();
-
+	private:
 		/**
 		 * \brief
 		 *
 		 */
 		void BuildCalendar();
 
+	public:
 		/**
 		 * \brief
 		 *
 		 */
-		void SetDay(int d);
+		CalendarDialogBox(int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetMonth(int m);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetYear(int y);
+		virtual ~CalendarDialogBox();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetDay();
+		virtual void SetDay(int d);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetMonth();
+		virtual void SetMonth(int m);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetYear();
+		virtual void SetYear(int y);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AddWarnning(int day, int month, int year, int red = 0xf0, int green = 0x20, int blue = 0x20);
+		virtual int GetDay();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveWarnning(jcalendar_warnning_t t);
+		virtual int GetMonth();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveAll();
+		virtual int GetYear();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void AddWarnning(int day, int month, int year, int red = 0xf0, int green = 0x20, int blue = 0x20);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveWarnning(jcalendar_warnning_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveAll();
 
 		/**
 		 * \brief
@@ -188,31 +189,31 @@ class CalendarDialog : public jgui::Frame, public jgui::ButtonListener, public j
 		 * \brief
 		 *
 		 */
-		void InputChanged(jgui::KeyEvent *event);
+		virtual void InputChanged(jgui::KeyEvent *event);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RegisterCalendarListener(CalendarListener *listener);
+		virtual void RegisterCalendarListener(CalendarListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveCalendarListener(CalendarListener *listener);
+		virtual void RemoveCalendarListener(CalendarListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchCalendarEvent(CalendarEvent *event);
+		virtual void DispatchCalendarEvent(CalendarEvent *event);
 	
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<CalendarListener *> & GetCalendarListeners();
+		virtual std::vector<CalendarListener *> & GetCalendarListeners();
 
 };
 

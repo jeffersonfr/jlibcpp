@@ -68,43 +68,43 @@ class ThemeManager : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		Theme * GetDefaultTheme();
+		virtual Theme * GetDefaultTheme();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetTheme(Theme *theme);
+		virtual void SetTheme(Theme *theme);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		Theme * GetTheme();
+		virtual Theme * GetTheme();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RegisterThemeListener(ThemeListener *listener);
+		virtual void RegisterThemeListener(ThemeListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveThemeListener(ThemeListener *listener);
+		virtual void RemoveThemeListener(ThemeListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchThemeEvent(ThemeEvent *event);
+		virtual void DispatchThemeEvent(ThemeEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<ThemeListener *> & GetThemeListeners();
+		virtual std::vector<ThemeListener *> & GetThemeListeners();
 
 };
 

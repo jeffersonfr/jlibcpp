@@ -87,67 +87,67 @@ class BorderLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		int GetHGap();
+		virtual int GetHGap();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetVGap();
+		virtual int GetVGap();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHGap(int hgap);
+		virtual void SetHGap(int hgap);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVgap(int vgap);
+		virtual void SetVgap(int vgap);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AddLayoutComponent(Component *c, jborderlayout_align_t align);
+		virtual void AddLayoutComponent(Component *c, jborderlayout_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveLayoutComponent(Component *c);
+		virtual void RemoveLayoutComponent(Component *c);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveLayoutComponents();
+		virtual void RemoveLayoutComponents();
 
 		/**
 		 * \brief
 		 *
 		 */
-		jborderlayout_align_t GetConstraints(Component *c);
+		virtual jborderlayout_align_t GetConstraints(Component *c);
 
 		/**
 		 * \brief
 		 *
 		 */
-		Component * GetLayoutComponent(jborderlayout_align_t align);
+		virtual Component * GetLayoutComponent(jborderlayout_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		Component * GetLayoutComponent(Container *target, jborderlayout_align_t align);
+		virtual Component * GetLayoutComponent(Container *target, jborderlayout_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		Component * GetChild(jborderlayout_align_t key, bool ltr);
+		virtual Component * GetChild(jborderlayout_align_t key, bool ltr);
 
 		/**
 		 * \brief

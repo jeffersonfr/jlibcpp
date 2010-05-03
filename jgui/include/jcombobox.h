@@ -62,31 +62,31 @@ class ComboBox : public jgui::ItemComponent, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		void SetVisibleItems(int max_items);
+		virtual void SetVisibleItems(int max_items);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetHorizontalAlign(jhorizontal_align_t align);
+		virtual void SetHorizontalAlign(jhorizontal_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jhorizontal_align_t GetHorizontalAlign();
+		virtual jhorizontal_align_t GetHorizontalAlign();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetVerticalAlign(jvertical_align_t align);
+		virtual void SetVerticalAlign(jvertical_align_t align);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jvertical_align_t GetVerticalAlign();
+		virtual jvertical_align_t GetVerticalAlign();
 		
 		/**
 		 * \brief
@@ -152,103 +152,103 @@ class ComboBox : public jgui::ItemComponent, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		int GetItemsSize();
+		virtual int GetItemsSize();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetLoop(bool loop);
+		virtual void SetLoop(bool loop);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCurrentIndex(int i);
+		virtual void SetCurrentIndex(int i);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AddEmptyItem();
+		virtual void AddEmptyItem();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void AddTextItem(std::string text);
+		virtual void AddTextItem(std::string text);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void AddImageItem(std::string text, std::string image);
+		virtual void AddImageItem(std::string text, std::string image);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void AddCheckedItem(std::string text, bool checked);
+		virtual void AddCheckedItem(std::string text, bool checked);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void AddItem(Item *item);
+		virtual void AddItem(Item *item);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AddItem(Item *item, int index);
+		virtual void AddItem(Item *item, int index);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AddItems(std::vector<Item *> &items);
+		virtual void AddItems(std::vector<Item *> &items);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveItem(Item *item);
+		virtual void RemoveItem(Item *item);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveItem(int index);
+		virtual void RemoveItem(int index);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveItems();
+		virtual void RemoveItems();
 
 		/**
 		 * \brief
 		 *
 		 */
-		Item * GetItem(int index);
+		virtual Item * GetItem(int index);
 	
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<Item *> & GetItems();
+		virtual std::vector<Item *> & GetItems();
 	
 		/**
 		 * \brief
 		 *
 		 */
-		Item * GetCurrentItem();
+		virtual Item * GetCurrentItem();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetCurrentIndex();
+		virtual int GetCurrentIndex();
 
 		/**
 		 * \brief

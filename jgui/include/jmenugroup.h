@@ -71,25 +71,25 @@ class MenuGroup : public SelectListener{
 		 * \brief
 		 *
 		 */
-		void Add(Item *item);
+		virtual void Add(Item *item);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Remove(Item *item);
+		virtual void Remove(Item *item);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Select(Item *item);
+		virtual void Select(Item *item);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		Item * GetSelected();
+		virtual Item * GetSelected();
 
 };
 

@@ -77,19 +77,19 @@ class SelectEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		jgui::Item * GetItem();
+		virtual jgui::Item * GetItem();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetIndex();
+		virtual int GetIndex();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jselect_type_t GetType();
+		virtual jselect_type_t GetType();
 
 };
 

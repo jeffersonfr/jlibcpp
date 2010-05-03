@@ -78,61 +78,85 @@ class ScrollBar : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void SetOrientation(jscroll_orientation_t type);
+		virtual void SetOrientation(jscroll_orientation_t type);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jscroll_orientation_t GetOrientation();
+		virtual jscroll_orientation_t GetOrientation();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetStoneSize(int size);
+		virtual void SetStoneSize(int size);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetStoneSize();
+		virtual int GetStoneSize();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		double GetPosition();
+		virtual double GetPosition();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		double GetMinorTickSpacing();
+		virtual double GetMinorTickSpacing();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		double GetMajorTickSpacing();
+		virtual double GetMajorTickSpacing();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetPosition(double i);
+		virtual void SetPosition(double i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetMinorTickSpacing(double i);
+		virtual void SetMinorTickSpacing(double i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetMajorTickSpacing(double i);
+		virtual void SetMajorTickSpacing(double i);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RegisterAdjustmentListener(AdjustmentListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveAdjustmentListener(AdjustmentListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DispatchAdjustmentEvent(AdjustmentEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::vector<AdjustmentListener *> & GetAdjustmentListeners();
 
 		/**
 		 * \brief
@@ -151,30 +175,6 @@ class ScrollBar : public jgui::Component{
 		 *
 		 */
 		virtual bool ProcessEvent(MouseEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void RegisterAdjustmentListener(AdjustmentListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemoveAdjustmentListener(AdjustmentListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void DispatchAdjustmentEvent(AdjustmentEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<AdjustmentListener *> & GetAdjustmentListeners();
 
 };
 

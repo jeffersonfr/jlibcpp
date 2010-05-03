@@ -203,7 +203,7 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		std::vector<Component *> & GetComponents();
+		virtual std::vector<Component *> & GetComponents();
 
 		/**
 		 * \brief
@@ -293,25 +293,25 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		void RegisterContainerListener(ContainerListener *listener);
+		virtual void RegisterContainerListener(ContainerListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveContainerListener(ContainerListener *listener);
+		virtual void RemoveContainerListener(ContainerListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchContainerEvent(ContainerEvent *event);
+		virtual void DispatchContainerEvent(ContainerEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<ContainerListener *> & GetFrameListeners();
+		virtual std::vector<ContainerListener *> & GetFrameListeners();
 
 };
 

@@ -140,8 +140,7 @@ class Component : public virtual jcommon::Object{
 		jpoint_t _location;
 		jsize_t _size,
 						_minimum_size,
-						_maximum_size,
-						_preferred_size;
+						_maximum_size;
 		jcolor_t _bgcolor,
 						 _fgcolor,
 						 _focus_bgcolor,
@@ -437,12 +436,6 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetMaximumSize(jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPreferredSize(jsize_t size);
 		
 		/**
 		 * \brief
@@ -754,49 +747,49 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void RegisterFocusListener(FocusListener *listener);
+		virtual void RegisterFocusListener(FocusListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveFocusListener(FocusListener *listener);
+		virtual void RemoveFocusListener(FocusListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchFocusEvent(FocusEvent *event);
+		virtual void DispatchFocusEvent(FocusEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<FocusListener *> & GetFocusListeners();
+		virtual std::vector<FocusListener *> & GetFocusListeners();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void RegisterComponentListener(ComponentListener *listener);
+		virtual void RegisterComponentListener(ComponentListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RemoveComponentListener(ComponentListener *listener);
+		virtual void RemoveComponentListener(ComponentListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DispatchComponentEvent(ComponentEvent *event);
+		virtual void DispatchComponentEvent(ComponentEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<ComponentListener *> & GetComponentListeners();
+		virtual std::vector<ComponentListener *> & GetComponentListeners();
 
 };
 

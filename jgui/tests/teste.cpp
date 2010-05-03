@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jkeyboard.h"
-#include "jcalendardialog.h"
+#include "jcalendardialogbox.h"
 #include "jyesnodialogbox.h"
 #include "jcheckbutton.h"
 #include "jcheckbuttongroup.h"
@@ -353,16 +353,18 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		delete image_button3;
 		delete spin;
 		delete combo;
+		delete list;
+		delete label1;
+		delete label2;
+
+		// INFO:: deletar o grupo antes dos componentes check/radio
+		delete group;
 		delete check1;
 		delete check2;
 		delete check3;
 		delete radio1;
 		delete radio2;
 		delete radio3;
-		delete group;
-		delete label1;
-		delete label2;
-		delete list;
 	}
 
 	virtual void InputChanged(jgui::KeyEvent *event)
@@ -845,7 +847,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 					app.Show();
 				}
 			} else if (event->GetSource() == button2) {
-				jgui::CalendarDialog app(150, 100);
+				jgui::CalendarDialogBox app(150, 100);
 
 				app.AddWarnning(2, 11, 2007);
 				app.Show();
@@ -882,6 +884,9 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 					*item31 = new jgui::Item("item 3.1"),
 					*item32 = new jgui::Item("item 3.2"),
 					*item33 = new jgui::Item("item 3.3");
+
+				item111->SetHorizontalAlign(jgui::LEFT_HALIGN);
+				item112->SetHorizontalAlign(jgui::LEFT_HALIGN);
 
 				item1->AddChild(item11);
 				item1->AddChild(item12);
