@@ -12,7 +12,7 @@
 
 namespace mcalc {
 
-class Display : public jgui::Panel{
+class Display : public jgui::Component{
 
 		private:
 				std::string _text,

@@ -55,7 +55,6 @@
 #include "jtextdialogbox.h"
 #include "jmenugroup.h"
 #include "jtable.h"
-#include "jfilechooserdialog.h"
 #include "jthememanager.h"
 #include "jcanvas.h"
 

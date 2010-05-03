@@ -3,6 +3,7 @@
 
 #include "agendadb.h"
 #include "jlabel.h"
+#include "jtextarea.h"
 #include "jtextfield.h"
 #include "jkeyboardlistener.h"
 #include "jframe.h"

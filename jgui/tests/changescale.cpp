@@ -17,14 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jpanel.h"
 #include "jframe.h"
-#include "jfont.h"
-#include "jfilechooserdialog.h"
+#include "jbutton.h"
 #include "jgridlayout.h"
-#include "jflowlayout.h"
-#include "jborderlayout.h"
-#include "jcardlayout.h"
 
 #include <stdio.h>
 #include <stdlib.h>
