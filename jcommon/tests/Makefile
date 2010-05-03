@@ -4,16 +4,13 @@ JAVA		= javac
 
 TARGET_ARCH = linux
 
-OPT    		= -funroll-loops -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -O2
 DEBUG  		= -ggdb 
-OTHER  		= -Wall
+OTHER  		= -Wall -funroll-loops -O2
 
 INCLUDE		= -I. `pkg-config --cflags jlibcpp`
 LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
-STD			= -D_GNU_SOURCE  
-
-CCFLAGS		= $(INCLUDE) $(DEBUG) $(OPT) $(OTHER) $(STD)
+CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER) $(STD)
 
 OK 			= \033[30;32mOK!\033[m
 
@@ -34,6 +31,9 @@ OBJS_jsondom = \
 
 OBJS_gcteste = \
 	   gcteste.o\
+
+OBJS_pointer = \
+	   pointer.o\
 
 OBJS_jsonpull = \
 	   jsonpull.o\
@@ -67,6 +67,9 @@ jsonpull: $(OBJS_jsonpull)
 gcteste: $(OBJS_gcteste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
 
+pointer: $(OBJS_pointer)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+
 unit: $(OBJS_unit)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
 
@@ -79,4 +82,4 @@ calc_unit: $(OBJS_calc_unit)
 install:
 
 clean:
-	@rm -rvf *.o *.xml *~ teste xml_teste xml_agenda myfile_teste.xml regexp jsondom jsonpull gcteste unit calc_unit
+	@rm -rvf *.o *.xml *~ teste xml_teste xml_agenda myfile_teste.xml regexp jsondom jsonpull gcteste pointer unit calc_unit

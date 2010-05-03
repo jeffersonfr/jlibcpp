@@ -85,6 +85,7 @@ OBJS_jcommon = \
 	   jobserver.o\
 	   joutofboundsexception.o\
 	   jproperties.o\
+		 jpointer.o\
 	   jpolices.o\
 	   jruntimeexception.o\
 	   jnullpointerexception.o\
