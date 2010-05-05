@@ -16,7 +16,7 @@
 #define THR_PER_LWP       4
 
 /* cast the void to a one byte quanitity and compute the offset */
-#define SUB(a, n)      ((void *) (((unsigned char *) (a)) + ((n) * width)))
+#define SUB(a, n)      ((void *) (((uint8_t *) (a)) + ((n) * width)))
 
 typedef struct {
   void    *sa_base;
@@ -31,7 +31,7 @@ static int threads_avail;
 #define SWAP(a, i, j, width) \
 { \
   int n; \
-  unsigned char uc; \
+  uint8_t uc; \
   unsigned short us; \
   unsigned long ul; \
   unsigned long long ull; \
@@ -44,9 +44,9 @@ static int threads_avail;
   /* one of the more convoluted swaps I've done */ \
   switch(width) { \
   case 1: \
-    uc = *((unsigned char *) SUB(a, i)); \
-    *((unsigned char *) SUB(a, i)) = *((unsigned char *) SUB(a, j)); \
-    *((unsigned char *) SUB(a, j)) = uc; \
+    uc = *((uint8_t *) SUB(a, i)); \
+    *((uint8_t *) SUB(a, i)) = *((uint8_t *) SUB(a, j)); \
+    *((uint8_t *) SUB(a, j)) = uc; \
     break; \
   case 2: \
     us = *((unsigned short *) SUB(a, i)); \
@@ -65,9 +65,9 @@ static int threads_avail;
     break; \
   default: \
     for(n=0; n<width; n++) { \
-      uc = ((unsigned char *) SUB(a, i))[n]; \
-      ((unsigned char *) SUB(a, i))[n] = ((unsigned char *) SUB(a, j))[n]; \
-      ((unsigned char *) SUB(a, j))[n] = uc; \
+      uc = ((uint8_t *) SUB(a, i))[n]; \
+      ((uint8_t *) SUB(a, i))[n] = ((uint8_t *) SUB(a, j))[n]; \
+      ((uint8_t *) SUB(a, j))[n] = uc; \
     } \
     break; \
   } \

@@ -12,9 +12,9 @@
 #include <unistd.h>
 #include <sys/time.h>
 
-#define MAX_LOOP_THREAD		3000
-#define MAX_LOOP_SEMAPHORE	1000000
-#define MAX_LOOP_MUTEX		100000000
+#define MAX_LOOP_THREAD		300
+#define MAX_LOOP_SEMAPHORE	100000
+#define MAX_LOOP_MUTEX		1000000
 
 class T : public jthread::Thread{
 
@@ -26,7 +26,7 @@ class T : public jthread::Thread{
 			i = 10;
 		}
 
-		~T() 
+		virtual ~T() 
 		{
 		}
 

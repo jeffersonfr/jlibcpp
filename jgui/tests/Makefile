@@ -31,15 +31,9 @@ OBJS_raycaster_texture = \
 
 OBJS_agenda = \
 	   agenda.o\
-	   agendadb.o\
-	   addmessage.o\
-	   viewmessages.o\
 
 OBJS_phone = \
-	   addcontact.o\
 	   phone.o\
-	   phonedb.o\
-	   searchcontacts.o\
 
 OBJS_calc = \
 	   calc.o\

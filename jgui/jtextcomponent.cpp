@@ -32,7 +32,7 @@ TextComponent::TextComponent(int x, int y, int width, int height):
 	jcommon::Object::SetClassName("jgui::TextComponent");
 
 	_halign = LEFT_HALIGN;
-	_valign = TOP_VALIGN;
+	_valign = CENTER_VALIGN;
 	
 	_caret_position = 0;
 	_echo_char = '\0';

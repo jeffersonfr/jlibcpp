@@ -18,7 +18,7 @@ int main() {
 	int size;
 
 	memset(buffer, 0, 1024);
-	memset(receive, 1, 1024);
+	memset(receive, 0, 1024);
 
 	try {
 		DatagramSocket s("127.0.0.1", 1234);

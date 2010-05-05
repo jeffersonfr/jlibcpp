@@ -28,6 +28,7 @@
 #include <cstring>
 
 #include <stdint.h>
+#include <limits.h>
 
 #ifdef _WIN32
 #include <windows.h>

@@ -17,16 +17,17 @@ void dump_stream()
 	memset(receive, 0, 1024);
 
 	try {
-		DatagramSocket s(1234);
+		DatagramSocket s(4001);
 
 		InputStream *i = s.GetInputStream();
 
 		do {
-			r = i->Read(receive, 10);
+			r = i->Read(receive, 4096);
 
-			receive[10] = '\0';
+			// receive[10] = '\0';
 
-			std::cout << "char: " << receive << std::endl;
+			// std::cout << "char: " << receive << std::endl;
+			putchar('+'); fflush(stdout);
 		} while (r != 0);
 
 		s.Close();
@@ -37,11 +38,11 @@ void dump_stream()
 
 void dump_raw() 
 {
-	char receive[1024];
+	char receive[4096];//1024];
 	int r;
 
 	try {
-		DatagramSocket s(1234);
+		DatagramSocket s(4001);
 
 		jsocket::SocketOption *opt = s.GetSocketOption();
 
@@ -52,9 +53,10 @@ void dump_raw()
 		delete opt;
 
 		do {
-			r = s.Receive(receive, 1500);
+			r = s.Receive(receive, 4096);//1500);
 
-			std::cout << "UDP Read:: " << r << std::endl;
+			// std::cout << "UDP Read:: " << r << std::endl;
+			putchar('+'); fflush(stdout);
 		} while (r >= 0);
 
 		s.Close();

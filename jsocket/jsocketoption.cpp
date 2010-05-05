@@ -30,6 +30,8 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <errno.h>
+#include <netinet/tcp.h>
+//#include <linux/tcp.h>
 #endif
 
 namespace jsocket {
@@ -62,6 +64,19 @@ void SocketOption::SetKeepAlive(bool b_)
 #endif
 		throw SocketOptionException("Set keep alive error");
 	}
+}
+
+void SocketOption::SetNoDelay(bool b_)
+{
+#ifdef _WIN32
+#else
+	int flag = (b_ == false)?0:1;
+
+	// if (setsockopt(_fd, SOL_SOCKET, SO_OOBINLINE, &b_, sizeof(bool)) < 0) {
+	if (setsockopt(_fd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int)) < 0) {
+		throw SocketOptionException("Set out of band error");
+	}
+#endif
 }
 
 void SocketOption::SetOutOfBandInLine(bool b_)

@@ -33,6 +33,8 @@ TextArea::TextArea(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::TextArea");
 
+	_valign = TOP_VALIGN;
+	
 	_is_wrap = true;
 	_line_op = 0;
 

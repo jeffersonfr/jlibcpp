@@ -295,12 +295,12 @@ File::File(std::string prefix, std::string sufix, bool scramble):
 #elif __CYGWIN32__
 #else
 	std::string t = prefix + "XXXXXX";
-	char *tfile = new char[t.size() + 1];
+	char *tfile = NULL;
 
 	tfile = strdup(t.c_str());
-	tfile = mktemp((char *)tfile);
+	_fd = mkstemp((char *)tfile);
 
-	if ((void *)tfile == NULL) {
+	if (_fd < 0) {
 		// throw FileException("Temporary file cannot be create");
 		
 		delete tfile;
@@ -314,19 +314,6 @@ File::File(std::string prefix, std::string sufix, bool scramble):
 	_filename = std::string(tfile) + "." + sufix;
 
 	delete tfile;
-	
-	_fd = open(_filename.c_str(), O_RDWR | O_LARGEFILE | O_CREAT | O_EXCL, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH);
-
-	if (_fd == -1) {
-		_fd = open(_filename.c_str(), O_RDWR | O_LARGEFILE, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH);
-
-		if (_fd == -1) {
-			_exists = false;
-			_is_closed = true;
-
-			return;
-		}
-	}
 #endif
 	
 	_exists = true;

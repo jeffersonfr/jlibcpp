@@ -255,48 +255,60 @@ void TextField::Paint(Graphics *g)
 			h = _size.height-2*y;
 	int offset = 0;
 
-	if (current_text_size > (w-caret_size)) {
-		int count = 0;
+	if (w > 0 && h > 0) { 
+		if (current_text_size > (w-caret_size)) {
+			int count = 0;
 
-		do {
-			count++;
+			do {
+				count++;
 
-			current_text_size = _font->GetStringWidth(s.substr(_caret_position-count, count));
-		} while (current_text_size < (w-caret_size));
+				current_text_size = _font->GetStringWidth(s.substr(_caret_position-count, count));
+			} while (current_text_size < (w-caret_size));
 
-		count = count-1;
-		s = s.substr(_caret_position-count, count);
-		current_text_size = _font->GetStringWidth(s);
-		offset = (w-current_text_size-caret_size)-caret_size;
+			count = count-1;
+			s = s.substr(_caret_position-count, count);
+			current_text_size = _font->GetStringWidth(s);
+			offset = (w-current_text_size-caret_size)-caret_size;
 
-		if (_caret_position < (int)paint_text.size()) {
-			s = s + paint_text[_caret_position];
-		}
-	} else {
-		int count = 1;
-
-		do {
-			current_text_size = _font->GetStringWidth(s.substr(0, count));
-
-			if (count++ > (int)paint_text.size()) {
-				break;
+			if (_caret_position < (int)paint_text.size()) {
+				s = s + paint_text[_caret_position];
 			}
-		} while (current_text_size < (w-caret_size));
+		} else {
+			int count = 1;
 
-		count = count-1;
+			do {
+				current_text_size = _font->GetStringWidth(s.substr(0, count));
 
-		s = s.substr(0, count);
+				if (count++ > (int)paint_text.size()) {
+					break;
+				}
+			} while (current_text_size < (w-caret_size));
 
-		current_text_size = _font->GetStringWidth(s.substr(0, _caret_position));
-	}
+			count = count-1;
 
-	g->SetClip(x, y, w, h);
-	g->DrawString(s, x+offset, y, w, h);
+			s = s.substr(0, count);
 
-	if (_has_focus == true && _is_editable == true && _caret_visible == true) {
-		g->SetColor(0xff, 0x00, 0x00, 0xff);
+			if (_halign == LEFT_HALIGN) {
+				offset = 0;
+			} else if (_halign == CENTER_HALIGN) {
+				offset = (w-current_text_size)/2;
+			} else if (_halign == RIGHT_HALIGN) {
+				offset = w-current_text_size;
+			} else if (_halign == JUSTIFY_HALIGN) {
+				offset = 0;
+			}
 
-		g->DrawString(cursor,x+current_text_size+offset, y, w, h);
+			current_text_size = _font->GetStringWidth(s.substr(0, _caret_position));
+		}
+
+		g->SetClip(x, y, w, h);
+		g->DrawString(s, x+offset, y, w, h, LEFT_HALIGN, _valign);
+
+		if (_has_focus == true && _is_editable == true && _caret_visible == true) {
+			g->SetColor(0xff, 0x00, 0x00, 0xff);
+
+			g->DrawString(cursor, x+current_text_size+offset, y, w, h, LEFT_HALIGN, _valign);
+		}
 	}
 
 	g->SetClip(0, 0, _size.width, _size.height);

@@ -165,6 +165,18 @@ class Thread : public virtual jcommon::Object{
 		virtual ~Thread();
 
 		/**
+		 * \brief
+		 *
+		 */
+		static void Sleep(long long time_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static void USleep(long long time_);
+
+		/**
 		 * \brief Get thread identifier
 		 *
 		 */
@@ -205,18 +217,6 @@ class Thread : public virtual jcommon::Object{
 		 *
 		 */
 		bool IsRunning(int key = 0);
-
-		/**
-		 * \brief
-		 *
-		 */
-		static void Sleep(long long time_);
-
-		/**
-		 * \brief
-		 *
-		 */
-		static void USleep(long long time_);
 
 		/**
 		 * \bried

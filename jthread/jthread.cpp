@@ -55,6 +55,26 @@ Thread::~Thread()
 #endif
 }
 
+void Thread::Sleep(long long time_)
+{
+#ifdef _WIN32
+	::Sleep(time_);
+#else
+	long long t = time_ * 1000LL;
+
+	usleep((useconds_t)t);
+#endif
+}
+
+void Thread::USleep(long long time_)
+{
+#ifdef _WIN32
+	::Sleep(time_/999);
+#else
+	usleep(time_);
+#endif
+}
+
 int Thread::GetID()
 {
 	AutoLock lock(&jthread_mutex);
@@ -383,26 +403,6 @@ bool Thread::IsRunning(int key)
 	}
 
 	return false;
-}
-
-void Thread::Sleep(long long time_)
-{
-#ifdef _WIN32
-	::Sleep(time_);
-#else
-	long long t = time_ * 1000LL;
-
-	usleep((useconds_t)t);
-#endif
-}
-
-void Thread::USleep(long long time_)
-{
-#ifdef _WIN32
-	::Sleep(time_/999);
-#else
-	usleep(time_);
-#endif
 }
 
 void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)

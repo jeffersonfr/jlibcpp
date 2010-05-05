@@ -193,6 +193,12 @@ class SocketOption : public virtual jcommon::Object{
          */
         void SetBroadcast(bool opt_);
 
+				/**
+				 * \brief
+				 *
+				 */
+				void SetNoDelay(bool b_);
+
         /**
          * \brief Sets or gets the maximum socket send buffer in bytes
          *

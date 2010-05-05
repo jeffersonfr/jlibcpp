@@ -68,6 +68,12 @@ class ProgramSystemInformationSection{
 		 * \brief
 		 *
 		 */
+		void Clear();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Push(uint8_t *buffer, uint32_t size);
 		
 		/**

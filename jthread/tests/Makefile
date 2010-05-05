@@ -20,9 +20,6 @@ OBJS_counter = \
 OBJS_stress = \
 		stress.o\
 
-OBJS_mlive = \
-		mlive.o\
-
 OBJS_quicksort = \
 		quicksort.o\
 
@@ -35,15 +32,12 @@ OBJS_producer_consumer = \
 OBJS_pi = \
 		pi.o\
 
-all: counter stress mlive quicksort philosopher producer_consumer pi
+all: counter stress quicksort philosopher producer_consumer pi
 
 counter: $(OBJS_counter)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
 stress: $(OBJS_stress)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
-        
-mlive: $(OBJS_mlive)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
 quicksort: $(OBJS_quicksort)
@@ -65,4 +59,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ counter stress mlive quicksort philosopher producer_consumer pi
+	@rm -rvf *.o *~ counter stress quicksort philosopher producer_consumer pi

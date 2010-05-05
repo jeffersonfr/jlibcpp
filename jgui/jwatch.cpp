@@ -238,7 +238,7 @@ void Watch::Paint(Graphics *g)
 				gapx = 0,
 				gapy = 0;
 		int px = x+gapx,
-				py = y+(h-_font->GetHeight())/2+gapy,
+				py = y+gapy,
 				pw = w-gapx,
 				ph = h-gapy;
 

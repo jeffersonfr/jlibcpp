@@ -7,6 +7,7 @@
 #include "jcondition.h"
 #include "jmutex.h"
 #include "jautolock.h"
+#include "jmonitor.h"
 
 #include <stdio.h>
 
@@ -32,41 +33,45 @@ void init(struct prodcons * b)
 
 void put(struct prodcons * b, int data)
 {
-	jthread::AutoLock l(&b->lock);
-
 	/* Wait until buffer is not full */
-	while ((b->writepos + 1) % BUFFER_SIZE == b->readpos) {
-		b->notfull.Wait(&b->lock);
+	monitor(0) {
+		jthread::AutoLock l(&b->lock);
+
+		while ((b->writepos + 1) % BUFFER_SIZE == b->readpos) {
+			b->notfull.Wait(&b->lock);
+		}
+
+		b->buffer[b->writepos] = data;
+		b->writepos++;
+
+		if (b->writepos >= BUFFER_SIZE) {
+			b->writepos = 0;
+		}
+
+		b->notempty.Notify();
 	}
-
-	b->buffer[b->writepos] = data;
-	b->writepos++;
-
-	if (b->writepos >= BUFFER_SIZE) {
-		b->writepos = 0;
-	}
-
-	b->notempty.Notify();
 }
 
 int get(struct prodcons * b)
 {
-	int data;
+	int data = 0;
 
-	jthread::AutoLock l(&b->lock);
+	monitor(0) {
+		jthread::AutoLock l(&b->lock);
 
-	while (b->writepos == b->readpos) {
-		b->notempty.Wait(&b->lock);
+		while (b->writepos == b->readpos) {
+			b->notempty.Wait(&b->lock);
+		}
+
+		data = b->buffer[b->readpos];
+		b->readpos++;
+
+		if (b->readpos >= BUFFER_SIZE) {
+			b->readpos = 0;
+		}
+
+		b->notfull.Notify();
 	}
-
-	data = b->buffer[b->readpos];
-	b->readpos++;
-	
-	if (b->readpos >= BUFFER_SIZE) {
-		b->readpos = 0;
-	}
-
-	b->notfull.Notify();
 
 	return data;
 }
@@ -85,7 +90,7 @@ class Producer : public jthread::Thread{
 		{
 			int n;
 
-			for (n = 0; n < 10000; n++) {
+			for (n = 0; n < 1000000; n++) {
 		  		// printf("P %d\n", n);
 		  		putchar('+');
 		  		put(&buffer, n);

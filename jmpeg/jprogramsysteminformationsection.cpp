@@ -28,12 +28,12 @@ namespace jmpeg {
 
 ProgramSystemInformationSection::ProgramSystemInformationSection()
 {
-	_data = new uint8_t[1024];
-
 	_data_size = 1024;
 	_data_index = 0;
 	_is_complete = false;
 	_has_failed = false;
+	
+	_data = new uint8_t[_data_size];
 }
 
 ProgramSystemInformationSection::~ProgramSystemInformationSection()
@@ -50,6 +50,15 @@ bool ProgramSystemInformationSection::HasFailed()
 	return _has_failed;
 }
 
+void ProgramSystemInformationSection::Clear()
+{
+	_data_index = 0;
+	_is_complete = false;
+	_has_failed = false;
+
+	memset(_data, 0, _data_size);
+}
+
 void ProgramSystemInformationSection::Push(uint8_t *buffer, uint32_t size)
 {
 	if (buffer == NULL) {
@@ -57,7 +66,9 @@ void ProgramSystemInformationSection::Push(uint8_t *buffer, uint32_t size)
 	}
 
 	if (size > (uint32_t)(1024 - _data_index - 3)) {
-		throw jcommon::OutOfBoundsException("Overflow index of section");
+		_has_failed = true;
+
+		// throw jcommon::OutOfBoundsException("Overflow index of section");
 	}
 
 	memcpy((_data + _data_index), buffer, size);

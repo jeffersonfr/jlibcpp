@@ -52,7 +52,7 @@ void ListBox::SetCenteredInteraction(bool b)
 
 int ListBox::GetVisibleItems()
 {
-	int visible_items = (_size.height-2*(_vertical_gap+_border_size))/(_item_size+_vertical_gap);
+	int visible_items = (_size.height-2*(_vertical_gap+_border_size)+_vertical_gap)/(_item_size+_vertical_gap);
 
 	if (visible_items < 1) {
 		visible_items = 1;
@@ -255,7 +255,7 @@ jsize_t ListBox::GetPreferredSize()
 	jsize_t t;
 
 	t.width = _size.width;
-	t.height = 2*(_vertical_gap+_border_size)+_items.size()*(_item_size+_vertical_gap);
+	t.height = 2*(_vertical_gap+_border_size)+_items.size()*(_item_size+_vertical_gap)-_vertical_gap;
 
 	return t;
 }
@@ -327,7 +327,7 @@ void ListBox::Paint(Graphics *g)
 			g->SetColor(_focus_item_color);
 		}
 
-		FillRectangle(g, x, y+(_item_size+y)*count, w-scroll_width-scroll_gap, _item_size);
+		FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, _item_size);
 
 		g->SetColor(_item_color);
 
@@ -345,7 +345,7 @@ void ListBox::Paint(Graphics *g)
 		} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
 		} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
 			if (_items[i]->GetImage() != NULL) {
-				g->DrawImage(_items[i]->GetImage(), _horizontal_gap, y+(_item_size+y)*count, _item_size, _item_size);
+				g->DrawImage(_items[i]->GetImage(), _horizontal_gap, y+(_item_size+_vertical_gap)*count, _item_size, _item_size);
 			}
 		}
 
@@ -359,7 +359,7 @@ void ListBox::Paint(Graphics *g)
 			int gapx = space;
 
 			int px = x+gapx,
-					py = y+(_item_size+y)*count,
+					py = y+(_item_size+_vertical_gap)*count,
 					pw = w-gapx-scroll_width-scroll_gap,
 					ph = _item_size;
 
@@ -386,14 +386,16 @@ void ListBox::Paint(Graphics *g)
 	}
 
 	for (; count<visible_items+1; count++) {
-		int dy = (_item_size+y)*count+y;
+		int dy = y+(_item_size+_vertical_gap)*count;
 		
 		g->SetColor(_item_color);
 
 		if ((dy+_item_size) < (_size.height-dy)) {
 			FillRectangle(g, x, dy, w-scroll_width-scroll_gap, _item_size);
 		} else {
-			FillRectangle(g, x, dy, w-scroll_width-scroll_gap, _item_size-((y+_item_size)-(_size.height-y)));
+			int gap = dy-y-h;
+
+			FillRectangle(g, x, dy, w-scroll_width-scroll_gap, (gap>0)?gap-_vertical_gap:-gap);
 		}
 	}
 	

@@ -24,11 +24,9 @@ DOCDIR		= ./doc/
 
 PREFIX		= /usr/local
 
-
-OPT    		= -fPIC -funroll-loops -O2
 DEBUG  		= -g -ggdb 
 
-OTHER  		= -Wall -shared -rdynamic 
+OTHER  		= -fPIC -funroll-loops -Wall -shared -rdynamic -O2
 
 INCLUDE		= -I. \
 						-Ijcommon/include \
@@ -60,7 +58,7 @@ REQUIRES	= \
 						libssl \
 
 ARFLAGS		= -rc
-CFLAGS		= $(INCLUDE) $(DEBUG) $(OPT) $(OTHER) $(DEFINES)
+CFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER) $(DEFINES)
 
 OK 				= \033[30;32mOK\033[m
 
@@ -367,6 +365,5 @@ ultraclean: clean uninstall
 	@cd jshared/tests && make clean && cd -
 	@cd jsocket/tests && make clean && cd -
 	@cd jthread/tests && make clean &&cd -
-	@rm -rf /usr/local/include/jlibcpp
 	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(PREFIX)/lib/$(EXE) $(PREFIX)/include/jlibcpp 2> /dev/null && echo -e "$(MODULE) ultraclean $(OK)" 
 
