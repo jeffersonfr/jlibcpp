@@ -157,7 +157,7 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 * \brief
 		 *
 		 */
-		virtual void Pack();
+		virtual void Pack(bool fit = true);
 		
 		/**
 		 * \brief

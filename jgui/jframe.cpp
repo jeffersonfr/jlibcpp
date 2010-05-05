@@ -150,13 +150,38 @@ void Frame::SetInputEnabled(bool b)
 	}
 }
 
-void Frame::Pack()
+void Frame::Pack(bool fit)
 {
 	jthread::AutoLock lock(&_container_mutex);
 
 	Component *c;
+	int min_x = _insets.left,
+			min_y = _insets.top;
 	int max_width = 0,
-		max_height = 0;
+			max_height = 0;
+
+	if (fit == true) {
+		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+			c = (*i);
+
+			if (c->GetX() < min_x) {
+				min_x = c->GetX();
+			}
+
+			if (c->GetY() < min_y) {
+				min_y = c->GetY();
+			}
+		}
+
+		min_x = _insets.left-min_x;
+		min_y = _insets.top-min_y;
+
+		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+			c = (*i);
+
+			c->SetLocation(c->GetX()+min_x, c->GetY()+min_y);
+		}
+	}
 
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		c = (*i);
