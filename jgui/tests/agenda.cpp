@@ -40,7 +40,8 @@ Agenda::Agenda():
 
 	db->Load();
 
-	_list = new jgui::ListBox(_insets.left, _insets.top, 600);
+	// _list = new jgui::ListBox(_insets.left, _insets.top, 600);
+	_list = new jgui::ListBox(0, 0, 600);
 
 	_list->AddTextItem("Verificar compromissos");
 	_list->AddTextItem("Adicionar compromisso");
@@ -150,6 +151,8 @@ static bool agenda_compare(const AgendaDB::agenda_t &a, const AgendaDB::agenda_t
 			}
 		}
 	}
+
+	return false;
 }
 
 AgendaDB::AgendaDB(std::string file)

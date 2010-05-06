@@ -37,11 +37,17 @@ Component::Component(int x, int y, int width, int height):
 		
 	_font = jgui::GFXHandler::GetInstance()->GetDefaultFont();
 
-	_location.x = 0;
-	_location.y = 0;
+	_location.x = x;
+	_location.y = y;
+	_size.width = width;
+	_size.height = height;
 
-	_size.width = 0;
-	_size.height = 0;
+	_preferred_size.width = DEFAULT_COMPONENT_WIDTH;
+	_preferred_size.height = DEFAULT_COMPONENT_HEIGHT;
+	_minimum_size.width = 0;
+	_minimum_size.height = 0;
+	_maximum_size.width = 1920;
+	_maximum_size.height = 1080;
 
 	_background_visible = true;
 	_theme_enabled = true;
@@ -65,14 +71,6 @@ Component::Component(int x, int y, int width, int height):
 	_horizontal_gap = 4;
 	_alignment_x = CENTER_ALIGNMENT;
 	_alignment_y = CENTER_ALIGNMENT;
-
-	_minimum_size.width = 0;
-	_minimum_size.height = 0;
-	_maximum_size.width = 1920;
-	_maximum_size.height = 1080;
-
-	SetLocation(x, y);
-	SetSize(width, height);
 
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();
 
@@ -468,6 +466,28 @@ void Component::SetMaximumSize(jsize_t size)
 	}
 }
 
+void Component::SetPreferredSize(jsize_t size)
+{
+	_preferred_size.width = size.width;
+	_preferred_size.height = size.height;
+
+	if (_preferred_size.width < _minimum_size.width) {
+		_preferred_size.width = _minimum_size.width;
+	}
+
+	if (_preferred_size.height < _minimum_size.height) {
+		_preferred_size.height = _minimum_size.height;
+	}
+
+	if (_preferred_size.width > _maximum_size.width) {
+		_preferred_size.width = _maximum_size.width;
+	}
+
+	if (_preferred_size.height > _maximum_size.height) {
+		_preferred_size.height = _maximum_size.height;
+	}
+}
+
 jsize_t Component::GetMinimumSize()
 {
 	return _minimum_size;
@@ -480,12 +500,7 @@ jsize_t Component::GetMaximumSize()
 
 jsize_t Component::GetPreferredSize()
 {
-	jsize_t t;
-
-	t.width = _minimum_size.width;
-	t.height = _minimum_size.height;
-
-	return t;
+	return _preferred_size;
 }
 
 void Component::Move(int x, int y)

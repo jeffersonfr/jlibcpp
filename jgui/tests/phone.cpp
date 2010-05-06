@@ -34,7 +34,7 @@ Phone::Phone():
 
 	db->Load();
 
-	_list = new jgui::ListBox(_insets.left, _insets.top, 600);
+	_list = new jgui::ListBox(0, 0, 600);
 
 	_list->SetBackgroundVisible(false);
 	_list->AddTextItem("Buscar telefone");

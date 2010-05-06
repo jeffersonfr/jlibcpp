@@ -24,6 +24,7 @@
 #include "jborderlayout.h"
 #include "jcardlayout.h"
 #include "jgridbaglayout.h"
+#include "jcoordinatelayout.h"
 #include "jnulllayout.h"
 #include "jbuttonlistener.h"
 
@@ -32,8 +33,10 @@
 #include <signal.h>
 #include <math.h>
 
-jgui::Font *font = NULL;
-
+/**
+ * \brief Ajuste o PreferredSize() caso deseje um nivel diferente de adaptacao dos layouts.
+ *
+ */
 class Main : public jgui::Frame, public jgui::ButtonListener{
 
 	private:
@@ -183,14 +186,11 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			_c[4]->Add(new jgui::Button("Button 5"), c);
 
 			// nulllayout
-			int w1 = 200,
-					h1 = 60;
-
-			_c[5]->Add(new jgui::Button("Button 1", 0*20, 0*(h1+10), w1, h1));
-			_c[5]->Add(new jgui::Button("Button 2", 1*40, 1*(h1+10), w1, h1));
-			_c[5]->Add(new jgui::Button("Button 3", 2*40, 2*(h1+10), w1, h1));
-			_c[5]->Add(new jgui::Button("Button 4", 3*40, 3*(h1+10), w1, h1));
-			_c[5]->Add(new jgui::Button("Button 5", 4*40, 4*(h1+10), w1, h1));
+			_c[5]->Add(new jgui::Button("Button 1", 0*40, 0*(DEFAULT_COMPONENT_HEIGHT+10)));
+			_c[5]->Add(new jgui::Button("Button 2", 1*40, 1*(DEFAULT_COMPONENT_HEIGHT+10)));
+			_c[5]->Add(new jgui::Button("Button 3", 2*40, 2*(DEFAULT_COMPONENT_HEIGHT+10)));
+			_c[5]->Add(new jgui::Button("Button 4", 3*40, 3*(DEFAULT_COMPONENT_HEIGHT+10)));
+			_c[5]->Add(new jgui::Button("Button 5", 4*40, 4*(DEFAULT_COMPONENT_HEIGHT+10)));
 			
 			// adicionando a legenda nos containers
 			jgui::Label *l1 = new jgui::Label("FlowLayout", 0, 0, 0, 0),

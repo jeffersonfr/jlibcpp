@@ -55,7 +55,7 @@ class CoordinateLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		CoordinateLayout(int hgap = 10, int vgap = 10, jcoordinate_layout_t type = (jcoordinate_layout_t)(CL_HORIZONTAL | CL_VERTICAL));
+		CoordinateLayout(int width = -1, int height = -1, jcoordinate_layout_t type = (jcoordinate_layout_t)(CL_HORIZONTAL | CL_VERTICAL));
 		
 		/**
 		 * \brief

@@ -139,6 +139,7 @@ class Component : public virtual jcommon::Object{
 		jgui::Font *_font;
 		jpoint_t _location;
 		jsize_t _size,
+						_preferred_size,
 						_minimum_size,
 						_maximum_size;
 		jcolor_t _bgcolor,
@@ -436,6 +437,12 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetMaximumSize(jsize_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetPreferredSize(jsize_t size);
 		
 		/**
 		 * \brief

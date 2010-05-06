@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jnulllayout.h"
+#include "jcontainer.h"
 
 #include <limits.h>
 
@@ -49,12 +50,12 @@ jsize_t NullLayout::GetMaximumLayoutSize(Container *parent)
 
 jsize_t NullLayout::GetPreferredLayoutSize(Container *parent)
 {
-	jsize_t t = {0, 0};
+	jsize_t t = {100, 100};
 
 	return t;
 }
 
-void NullLayout::DoLayout(Container *c)
+void NullLayout::DoLayout(Container *target)
 {
 }
 

@@ -134,7 +134,7 @@ class Plotter : public jgui::Frame, public jthread::Thread {
 		Plotter(int x, int y):
 			Frame("Signal Strength", x, y, 1, 1)
 		{
-			_signal = new SignalMetter(_insets.left, _insets.top, 400, 400);
+			_signal = new SignalMetter(0, 0, 400, 400);
 
 			Add(_signal);
 

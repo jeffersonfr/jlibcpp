@@ -70,15 +70,25 @@ jcoordinate_layout_t CoordinateLayout::GetType()
 
 jsize_t CoordinateLayout::GetPreferredSize(Container *target) 
 {
+	if ((void *)target == NULL) {
+		jsize_t t = {0, 0};
+
+		return t;
+	}
+
+	jinsets_t insets = target->GetInsets();
 	jsize_t t = {0, 0};
 
-	int nmembers = target->GetComponentCount();
+	int members = target->GetComponentCount();
 
-	for (int i=0; i<nmembers; i++) {
+	for (int i=0; i<members; i++) {
 		Component *cmp = target->GetComponents()[i];
 
-		t.width = std::max(t.width, cmp->GetLocation().x+cmp->GetPreferredSize().width);
-		t.height = std::max(t.height, cmp->GetLocation().y+cmp->GetPreferredSize().height);
+		jpoint_t point = cmp->GetLocation();
+		jsize_t size = cmp->GetSize();
+
+		t.width = std::max(t.width, point.x+size.width+(insets.left+insets.right));
+		t.height = std::max(t.height, point.y+size.height+(insets.top+insets.bottom));
 	}
 
 	return t;
@@ -86,29 +96,43 @@ jsize_t CoordinateLayout::GetPreferredSize(Container *target)
 
 void CoordinateLayout::DoLayout(Container *target)
 {
-	if ((void *)target == NULL || target->GetSize().width == 0 || target->GetSize().height == 0) {
+	if ((void *)target == NULL) {
 		return;
 	}
 
-	double sx = 1.0,
-				 sy = 1.0;
+	jsize_t tsize = target->GetSize();
+
 	int nmembers = target->GetComponentCount();
 
+	double sx = 1.0,
+				 sy = 1.0;
+
+	if (_width < 0) {
+		_width = tsize.width;
+	}
+
+	if (_height < 0) {
+		_height = tsize.height;
+	}
+
 	if ((_type & CL_HORIZONTAL) != 0) {
-		sx = (double)target->GetSize().width/_width;
-		_width = target->GetSize().width;
+		sx = (double)tsize.width/_width;
 	}
 
 	if ((_type & CL_VERTICAL) != 0) {
-		sy = (double)target->GetSize().height/_height;
-		_height = target->GetSize().height;
+		sy = (double)tsize.height/_height;
 	}
 
 	for (int i = 0 ; i < nmembers ; i++) {
-		Component *m = target->GetComponents()[i];
+		Component *c = target->GetComponents()[i];
 
-		m->SetBounds((int)(m->GetLocation().x*sx), (int)(m->GetLocation().y*sy), m->GetPreferredSize().width, m->GetPreferredSize().height);
+		jpoint_t point = c->GetLocation();
+
+		c->SetLocation((int)(point.x*sx), (int)(point.y*sy));
 	}
+
+	_width = target->GetSize().width;
+	_height = target->GetSize().height;
 }
 
 }
