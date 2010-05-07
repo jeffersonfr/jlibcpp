@@ -144,25 +144,25 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
-		virtual void SetBounds(int x1, int y1, int w1, int h1);
+		virtual void SetBounds(int x, int y, int w, int h);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetLocation(int x1, int y1);
+		virtual void SetLocation(int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetSize(int w, int h);
+		virtual void SetSize(int width, int height);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Move(int x1, int y1);
+		virtual void Move(int x, int y);
 
 		/**
 		 * \brief

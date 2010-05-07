@@ -201,12 +201,6 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual int GetScreenWidth();
 		
 		/**
@@ -214,6 +208,24 @@ class GFXHandler : public virtual jcommon::Object{
 		 *
 		 */
 		virtual int GetScreenHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetWorkingScreenSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetWorkingScreenWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetWorkingScreenHeight();
 		
 		/**
 		 * \brief

@@ -113,6 +113,49 @@ Graphics::~Graphics()
 {
 }
 
+bool Graphics::GetImageSize(std::string img, int *width, int *height)
+{
+	if (width != NULL) {
+		*width = -1;
+	}
+
+	if (height != NULL) {
+		*height = -1;
+	}
+
+#ifdef DIRECTFB_UI
+	IDirectFBImageProvider *imgProvider = NULL;
+	DFBSurfaceDescription desc;
+
+	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = (IDirectFB *)dfb->GetGraphicEngine();
+
+	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
+		return false;
+	}
+
+	if (imgProvider->GetSurfaceDescription (imgProvider, &desc) != DFB_OK) {
+		imgProvider->Release(imgProvider);
+
+		return false;
+	}
+
+	imgProvider->GetSurfaceDescription(imgProvider, &desc);
+
+	if (width != NULL) {
+		*width = desc.width;
+	}
+
+	if (height != NULL) {
+		*height = desc.height;
+	}
+
+	return true;
+#endif
+	
+	return false;
+}
+
 OffScreenImage * Graphics::Create()
 {
 	OffScreenImage *image = NULL;
@@ -1653,64 +1696,6 @@ void Graphics::DrawGlyph(int symbol, int xp, int yp)
 #endif
 }
 
-bool Graphics::GetImageSize(std::string img, int *real_width, int *real_height, int *scaled_width, int *scaled_height)
-{
-#ifdef DIRECTFB_UI
-	IDirectFBImageProvider *imgProvider = NULL;
-	DFBSurfaceDescription desc;
-
-	if (real_width != NULL) {
-		*real_width = -1;
-	}
-
-	if (real_height != NULL) {
-		*real_height = -1;
-	}
-
-	if (scaled_width != NULL) {
-		*scaled_width = -1;
-	}
-
-	if (scaled_height != NULL) {
-		*scaled_height = -1;
-	}
-
-	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = (IDirectFB *)dfb->GetGraphicEngine();
-
-	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
-		return false;
-	}
-
-	if (imgProvider->GetSurfaceDescription (imgProvider, &desc) != DFB_OK) {
-		imgProvider->Release(imgProvider);
-
-		return false;
-	}
-
-	imgProvider->GetSurfaceDescription(imgProvider, &desc);
-
-	if (real_width != NULL) {
-		*real_width = desc.width;
-	}
-
-	if (real_height != NULL) {
-		*real_height = desc.height;
-	}
-
-	if (scaled_width != NULL) {
-		*scaled_width = SCALE_TO_SCREEN(desc.width, _screen.width, _scale.width); 
-	}
-
-	if (scaled_height != NULL) {
-		*scaled_height = SCALE_TO_SCREEN(desc.height, _screen.height, _scale.height);
-	}
-
-	return true;
-#endif
-	
-	return false;
-}
 
 bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 {

@@ -460,6 +460,22 @@ int GFXHandler::GetScreenHeight()
 	return screenHeight;
 }
 
+void GFXHandler::SetWorkingScreenSize(int width, int height)
+{
+	scaleWidth = width;
+	scaleHeight = height;
+}
+
+int GFXHandler::GetWorkingScreenWidth()
+{
+	return scaleWidth;
+}
+
+int GFXHandler::GetWorkingScreenHeight()
+{
+	return scaleHeight;
+}
+
 void GFXHandler::SetMousePosition(int x, int y)
 {
 #ifdef DIRECTFB_UI
@@ -485,12 +501,6 @@ jpoint_t GFXHandler::GetMousePosition()
 #endif
 
 	return p;
-}
-
-void GFXHandler::SetWorkingScreenSize(int width, int height)
-{
-	scaleWidth = width;
-	scaleHeight = height;
 }
 
 void GFXHandler::Restore()

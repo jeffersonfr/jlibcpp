@@ -42,8 +42,8 @@ class ButtonEvent;
 class ImageButton : public Button{
 
 	protected:
-		OffScreenImage *prefetch1,
-			  *prefetch2;
+		OffScreenImage *_image_icon,
+			*_image_focus_icon;
 		std::string _image,
 			_image_focus;
 

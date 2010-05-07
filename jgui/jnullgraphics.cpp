@@ -313,29 +313,6 @@ void NullGraphics::DrawGlyph(int symbol, int xp, int yp)
 	JDEBUG(JINFO, "called\n");
 }
 
-bool NullGraphics::GetImageSize(std::string img, int *real_width, int *real_height, int *scaled_width, int *scaled_height)
-{
-	JDEBUG(JINFO, "called\n");
-
-	if (real_width != NULL) {
-		*real_width = -1;
-	}
-
-	if (real_height != NULL) {
-		*real_height = -1;
-	}
-
-	if (scaled_width != NULL) {
-		*scaled_width = -1;
-	}
-
-	if (scaled_height != NULL) {
-		*scaled_height = -1;
-	}
-
-	return true;
-}
-
 bool NullGraphics::DrawImage(std::string img, int x, int y, int alpha)
 {
 	JDEBUG(JINFO, "called\n");

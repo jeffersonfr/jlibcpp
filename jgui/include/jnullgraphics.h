@@ -74,7 +74,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetClip(int x1, int y1, int width, int height);
+		virtual void SetClip(int x, int y, int width, int height);
 		
 		/**
 		 * \brief
@@ -363,12 +363,6 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual void DrawGlyph(int symbol, int xp, int yp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool GetImageSize(std::string img, int *real_width, int *real_height, int *scaled_width, int *scaled_height);
 		
 		/**
 		 * \brief

@@ -149,7 +149,7 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void SetSize(int w, int h);
+		virtual void SetSize(int width, int height);
 		
 		/**
 		 * \brief

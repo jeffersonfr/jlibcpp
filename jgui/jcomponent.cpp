@@ -37,11 +37,6 @@ Component::Component(int x, int y, int width, int height):
 		
 	_font = jgui::GFXHandler::GetInstance()->GetDefaultFont();
 
-	_location.x = x;
-	_location.y = y;
-	_size.width = width;
-	_size.height = height;
-
 	_preferred_size.width = DEFAULT_COMPONENT_WIDTH;
 	_preferred_size.height = DEFAULT_COMPONENT_HEIGHT;
 	_minimum_size.width = 0;
@@ -71,6 +66,16 @@ Component::Component(int x, int y, int width, int height):
 	_horizontal_gap = 4;
 	_alignment_x = CENTER_ALIGNMENT;
 	_alignment_y = CENTER_ALIGNMENT;
+
+	_ignore_repaint = true;
+	SetBounds(x, y, width, height);
+	_ignore_repaint = false;
+
+	_location.x = x;
+	_location.y = y;
+	_size.width = width;
+	_size.height = height;
+
 
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();
 

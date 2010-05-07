@@ -133,7 +133,7 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener, public
 		 * \brief
 		 *
 		 */
-		virtual void SetSize(int w, int h);
+		virtual void SetSize(int width, int height);
 		
 		/**
 		 * \brief

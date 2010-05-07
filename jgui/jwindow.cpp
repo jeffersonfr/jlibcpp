@@ -372,14 +372,14 @@ void Window::SetMaximumSize(int w, int h)
 }
 
 
-void Window::SetSize(int w, int h)
+void Window::SetSize(int width, int height)
 {
-	if (_size.width == w && _size.height == h) {
+	if (_size.width == width && _size.height == height) {
 		return;
 	}	
 
-	_size.width = w;
-	_size.height = h;
+	_size.width = width;
+	_size.height = height;
 
 	if (_size.width < _minimum_size.width) {
 		_size.width = _minimum_size.width;
@@ -391,8 +391,8 @@ void Window::SetSize(int w, int h)
 
 #ifdef DIRECTFB_UI
 	if (window != NULL) {
-		int width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width),
-				height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
+		width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width);
+		height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
 
 		window->Resize(window, width, height);
 	}

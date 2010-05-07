@@ -132,9 +132,9 @@ class Component : public virtual jcommon::Object{
 		std::vector<FocusListener *> _focus_listeners;
 		std::vector<ComponentListener *> _component_listeners;
 		Component *_left, 
-				  *_right,
-				  *_up,
-				  *_down;
+							*_right,
+							*_up,
+							*_down;
 		jgui::Container *_parent;
 		jgui::Font *_font;
 		jpoint_t _location;
