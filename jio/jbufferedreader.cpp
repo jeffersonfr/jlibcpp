@@ -89,8 +89,6 @@ int BufferedReader::Read(char *data, int size)
 
 std::string BufferedReader::ReadLine(std::string delim)
 {
-	// TODO:: autolock
-
 	char *new_ptr,
 			 *lineptr = new char[LINE_SIZE];
 	int i,

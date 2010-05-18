@@ -61,7 +61,7 @@ void CardLayout::SetVGap(int vgap)
 
 void CardLayout::AddLayoutComponent(std::string name, Component *comp) 
 {
-	// TODO:: sync
+	// WARN:: sync
 	if (!vector.empty()) {
 		comp->SetVisible(false);
 	}
@@ -83,7 +83,7 @@ void CardLayout::AddLayoutComponent(std::string name, Component *comp)
 
 void CardLayout::RemoveLayoutComponent(Component *comp) 
 {
-	// TODO:: sync
+	// WARN:: sync
 	for (int i = 0; i < (int)vector.size(); i++) {
 		if (vector[i].component == comp) { 
 			// if we remove current component we should show next one
@@ -91,7 +91,7 @@ void CardLayout::RemoveLayoutComponent(Component *comp)
 				Next(comp->GetParent());
 			}
 
-			// TODO:: vector.remove(i);
+			// WARN:: vector.remove(i);
 
 			// correct currentCard if this is necessary
 			if (_current_card > i) {
@@ -116,7 +116,7 @@ void CardLayout::CheckLayout(Container *parent)
 
 void CardLayout::First(Container *parent) 
 {
-	// TODO:: sync
+	// WARN:: sync
 		CheckLayout(parent);
 
 		int ncomponents = parent->GetComponentCount();
@@ -136,13 +136,13 @@ void CardLayout::First(Container *parent)
 			_current_card = 0;
 		
 			parent->GetComponents()[0]->SetVisible(true);
-			// TODO:: parent.validate();
+			// WARN:: parent.validate();
 		}
 }
 
 void CardLayout::Next(Container *parent) 
 {
-	// TODO:: sync
+	// WARN:: sync
 	CheckLayout(parent);
 
 	int ncomponents = parent->GetComponentCount();
@@ -155,7 +155,7 @@ void CardLayout::Next(Container *parent)
 			_current_card = (i + 1) % ncomponents;
 			comp = parent->GetComponents()[_current_card];
 			comp->SetVisible(true);
-			// TODO:: parent.validate();
+			// WARN:: parent.validate();
 			return;
 		}
 	}
@@ -165,7 +165,7 @@ void CardLayout::Next(Container *parent)
 
 void CardLayout::Previous(Container *parent) 
 {
-	// TODO:: sync
+	// WARN:: sync
 		CheckLayout(parent);
 		
 		int ncomponents = parent->GetComponentCount();
@@ -177,7 +177,7 @@ void CardLayout::Previous(Container *parent)
 				_current_card = ((i > 0) ? i-1 : ncomponents-1);
 				comp = parent->GetComponents()[_current_card];
 				comp->SetVisible(true);
-				// TODO:: parent.validate();
+				// WARN:: parent.validate();
 				return;
 			}
 		}
@@ -190,13 +190,13 @@ void CardLayout::ShowDefaultComponent(Container *parent)
 	if (parent->GetComponentCount() > 0) {
 	  _current_card = 0;
 		parent->GetComponents()[0]->SetVisible(true);
-		// TODO:: parent.validate();
+		// WARN:: parent.validate();
 	}
 }
 
 void CardLayout::Last(Container *parent) 
 {
-	// TODO:: sync
+	// WARN:: sync
 		CheckLayout(parent);
 
 		int ncomponents = parent->GetComponentCount();
@@ -214,13 +214,13 @@ void CardLayout::Last(Container *parent)
 		if (ncomponents > 0) {
 			_current_card = ncomponents - 1;
 			parent->GetComponents()[_current_card]->SetVisible(true);
-			// TODO:: parent.validate();
+			// WARN:: parent.validate();
 		}
 }
 
 jsize_t CardLayout::GetMinimumLayoutSize(Container *parent)
 {
-	// TODO:: sync parent
+	// WARN:: sync parent
 	jinsets_t insets = parent->GetInsets();
 	int ncomponents = parent->GetComponentCount(),
 			w = 0,
@@ -253,7 +253,7 @@ jsize_t CardLayout::GetMaximumLayoutSize(Container *parent)
 
 jsize_t CardLayout::GetPreferredLayoutSize(Container *parent)
 {
-	// TODO:: sync parent
+	// WARN:: sync parent
 	jinsets_t insets = parent->GetInsets();
 	int ncomponents = parent->GetComponentCount(),
 			w = 0,
@@ -279,7 +279,7 @@ jsize_t CardLayout::GetPreferredLayoutSize(Container *parent)
 
 void CardLayout::DoLayout(Container *parent)
 {
-	// TODO:: sync
+	// WARN:: sync
 	jinsets_t insets = parent->GetInsets();
 	Component *comp = NULL;
 	int ncomponents = parent->GetComponentCount();

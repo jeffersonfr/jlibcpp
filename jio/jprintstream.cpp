@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jprintstream.h"
+#include "jnullpointerexception.h"
 
 #include <iostream>
 #include <string>
@@ -31,6 +32,10 @@ PrintStream::PrintStream(OutputStream *stream)
 {
 	jcommon::Object::SetClassName("jio::PrintStream");
 
+	if ((void *)stream == NULL) {
+		throw jcommon::NullPointerException("PrintStream cannot process null stream");
+	}
+
 	_stream = stream;
 }
 
@@ -40,7 +45,7 @@ PrintStream::~PrintStream()
 
 void PrintStream::Flush()
 {
-	// TODO::
+	_stream->Flush();
 }
 
 int PrintStream::Write(char c)
@@ -48,11 +53,9 @@ int PrintStream::Write(char c)
 	return Write((char *)&c, 1);
 }
 
-int PrintStream::Write(char *, int size)
+int PrintStream::Write(char *data, int size)
 {
-	// TODO::
-	
-	return 0;
+	return _stream->Write(data, size);
 }
 
 }

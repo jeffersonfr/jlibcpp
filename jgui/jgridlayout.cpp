@@ -113,7 +113,7 @@ void GridLayout::SetVerticalGap(int vgap)
 
 jsize_t GridLayout::GetMinimumLayoutSize(Container *parent)
 {
-	// TODO:: sync parent
+	// WARN:: sync parent
 	jinsets_t insets = parent->GetInsets();
 	int ncomponents = parent->GetComponentCount(),
 			nrows = _rows,
@@ -154,7 +154,7 @@ jsize_t GridLayout::GetMaximumLayoutSize(Container *parent)
 
 jsize_t GridLayout::GetPreferredLayoutSize(Container *parent)
 {
-	// TODO:: sync parent
+	// WARN:: sync parent
 	jinsets_t insets = parent->GetInsets();
 	int ncomponents = parent->GetComponentCount(),
 			nrows = _rows,
@@ -188,7 +188,7 @@ jsize_t GridLayout::GetPreferredLayoutSize(Container *parent)
 
 void GridLayout::DoLayout(Container *parent)
 {
-	// TODO:: sync with parent container
+	// WARN:: sync with parent container
 	int ncomponents = parent->GetComponentCount(),
 			nrows = _rows,
 			ncols = _cols;

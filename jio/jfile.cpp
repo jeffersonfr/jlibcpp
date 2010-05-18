@@ -55,9 +55,10 @@ File::File(std::string filename_, int flags_):
 	
 	_filename = filename_;
 	
+	// TODO::
 	// int c = filename_.size() - 1;
-	// TODO:: _filename.replace("\\", "/");
-	// TODO:: _filename.remove(c); remove the last slash from url
+	// _filename.replace("\\", "/");
+	// _filename.remove(c); remove the last slash from url
 	
 #ifdef _WIN32
 	int opt = 0;
@@ -72,7 +73,8 @@ File::File(std::string filename_, int flags_):
 		opt |= GENERIC_READ | GENERIC_WRITE;
 	}
 
-	// TODO:: http://msdn.microsoft.com/library/default.asp?url=/library/en-us/ipc/base/createnamedpipe.asp
+	// TODO:: 
+	// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/ipc/base/createnamedpipe.asp
 	// CreateHardLink
 	// CreateSymbolicLink
 	// CreateDirectory
@@ -91,10 +93,10 @@ File::File(std::string filename_, int flags_):
 			FORMAT_MESSAGE_ALLOCATE_BUFFER |
 			FORMAT_MESSAGE_FROM_SYSTEM,
 			0,			        // no source buffer needed
-			code,				// error code for this message
-			0,					// default language ID
+			code,						// error code for this message
+			0,							// default language ID
 			(LPTSTR)&msg,		// allocated by fcn
-			0,					// minimum size of buffer
+			0,							// minimum size of buffer
 			(va_list *)NULL);	// no inserts
 
 		_exists = false;
@@ -358,7 +360,6 @@ file_type_t File::GetType()
 
 std::string File::GetDirectoryDelimiter()
 {
-	// static
 #ifdef _WIN32
 	return "\\";
 #else
@@ -382,6 +383,26 @@ bool File::IsFile()
 bool File::IsDirectory()
 {
 #ifdef _WIN32
+	std::string path = GetAbsolutePath();
+
+	TCHAR szDir[MAX_PATH];
+	WIN32_FIND_DATA ffd;
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+
+	// Find the first file in the directory.
+
+	hFind = FindFirstFile(szDir, &ffd);
+
+	if (INVALID_HANDLE_VALUE == hFind) {
+		return NULL;
+	}
+
+	FindClose(hFind);
+
+	if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+		return true;
+	}
+
 	return false;
 #else
 	return (_dir != NULL);
@@ -391,23 +412,26 @@ bool File::IsDirectory()
 bool File::IsExecutable()
 {
 #ifdef _WIN32
-	// TODO:: win32 is executable
+	std::string s = GetAbsolutePath();
+	DWORD d;
+
+	return (bool)GetBinaryType(s.c_str(), &d);
 #else
 	if (S_ISDIR(_stat.st_mode)) {
 		return false;
 	}
 	
-	/* check for user permissions */
+	// check for user permissions
 	if (_stat.st_uid == getuid()) {
 		return (_stat.st_mode & S_IXUSR)?true:false;
 	}
 	
-	/* check for group permissions */
+	// check for group permissions
 	if (_stat.st_gid == getgid()) {
 		return (_stat.st_mode & S_IXGRP)?true:false;
 	}
 	
-	/* check for world permissions */
+	// check for world permissions
 	return (_stat.st_mode & S_IXOTH)?true:false;
 #endif
 }
@@ -443,24 +467,16 @@ std::string File::GetPath()
 
 std::string File::GetAbsolutePath()
 {
-	return GetCurrentDirectory();
-}
+	std::string delimiter;
 
 #ifdef _WIN32
+	delimiter = "\\";
 #else
-uid_t File::GetUserID()
-{
-	return _stat.st_uid;
-}
+	delimiter = "/";
 #endif
 
-#ifdef _WIN32
-#else
-gid_t File::GetGroupID()
-{
-	return _stat.st_gid;
+	return GetCurrentDirectory() + delimiter + GetName();
 }
-#endif
 
 time_t File::GetTimeLastAccess()
 {
@@ -533,7 +549,7 @@ bool File::IsClosed()
 void File::Flush()
 {
 #ifdef _WIN32
-	// TODO:: win32 flush
+	FlushFileBuffers(_fd);
 #else
 	if (fsync(_fd) < 0) {
 		throw FileException("Flushing file error");
@@ -558,25 +574,25 @@ std::string File::GetCurrentDirectory()
 {
 #ifdef _WIN32
 	char buffer[_MAX_PATH];
-	DWORD n = ::GetCurrentDirectory((DWORD)sizeof(buffer), (LPSTR)buffer);
+	DWORD n;
+	
+	n = ::GetCurrentDirectory((DWORD)sizeof(buffer), (LPSTR)buffer);
 
-	if (n > 0 && n < sizeof(buffer)) {
-		std::string result(buffer, n);
-		
-		if (result[n - 1] != '\\') {
-			result.append("\\");
-		}
-		
-		return std::string(result);
-	} else {
+	if (n < 0 || n > sizeof(buffer)) {
 		throw FileException("Cannot return the path");
 	}
+
+	std::string result(buffer, n);
+
+	if (result[n - 1] != '\\') {
+		result.append("\\");
+	}
+
+	return std::string(result);
 #else
-	char path[65536], *r = NULL;
+	char path[65536];
 	
-	r = getcwd(path, 65536);
-	
-	if (r == NULL) {
+	if (getcwd(path, 65536) == NULL) {
 		throw FileException(strerror(errno));
 	}
 
@@ -586,20 +602,80 @@ std::string File::GetCurrentDirectory()
 
 std::vector<std::string> * File::ListFiles(std::string extension)
 {
-#ifdef _WIN32
-	// TODO:: win32 list files
-#else
-	if (_type != F_DIRECTORY) {
+	if (IsDirectory() == false) {
 		return NULL;
 	}
 
+	std::vector<std::string> *l = NULL;
+
+#ifdef _WIN32
+	std::string path = GetAbsolutePath();
+
+	TCHAR szDir[MAX_PATH];
+	WIN32_FIND_DATA ffd;
+	LARGE_INTEGER filesize;
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+	size_t length_of_arg;
+
+	// Check that the input path plus 3 is not longer than MAX_PATH (three characters are for the "\*" plus NULL).
+
+	StringCchLength(path.c_str(), MAX_PATH, &length_of_arg);
+
+	if (length_of_arg > (MAX_PATH - 3)) {
+		// directory path is too long
+		return NULL;
+	}
+
+	// First, copy the string to a buffer, then append '\*' to the directory name.
+
+	StringCchCopy(szDir, MAX_PATH, path.c_str());
+	StringCchCat(szDir, MAX_PATH, TEXT("\\*"));
+
+	// Find the first file in the directory.
+
+	hFind = FindFirstFile(szDir, &ffd);
+
+	if (INVALID_HANDLE_VALUE == hFind) {
+		return NULL;
+	}
+
+	// List all the files in the directory with some info about them.
+
+	l = new std::vector<std::string>();
+
+	do {
+		if (extension == "") {
+			l->push_back(std::string(ffd.cFileName));
+		} else {
+			std::string file = std::string(ffd.cFileName);
+
+			if (file.size() > extension.size()) {
+				if (strcmp((const char *)(file.c_str()-extension.size()), extension.c_str()) == 0) {
+					l->push_back(file);
+				}
+			}
+		}
+
+		/*
+		if (ffd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			a_tprintf(TEXT("  %s   <DIR>\n"), ffd.cFileName);
+		} else {
+			filesize.LowPart = ffd.nFileSizeLow;
+			filesize.HighPart = ffd.nFileSizeHigh;
+			_tprintf(TEXT("  %s   %ld bytes\n"), ffd.cFileName, filesize.QuadPart);
+		}
+		*/
+	} while (FindNextFile(hFind, &ffd) != 0);
+
+	FindClose(hFind);
+#else
 	if (_dir == NULL) {
 		return NULL;
 	}
 
+	l = new std::vector<std::string>();
+
 	struct dirent *namelist;
-	
-	std::vector<std::string> *l = new std::vector<std::string>();
 	
 	rewinddir(_dir);
 
@@ -624,23 +700,23 @@ std::vector<std::string> * File::ListFiles(std::string extension)
 			// WARN:: delete ??
 		}
 	}
+#endif
 	
 	if (l->size() == 0) {
 		delete l;
-		return NULL;
+		l = NULL;
 	}
 	
 	return l;
-#endif
 }
 
 void File::Rename(std::string newpath_)
 {
-#ifdef _WIN32
-	// TODO:: win32 rename
-#else
-	std::string o = GetAbsolutePath() + "/" + GetName();
+	std::string o = GetAbsolutePath();
 	
+#ifdef _WIN32
+	MoveFile(o.c_str(), newpath_.c_str());
+#else
 	if (_type != F_DIRECTORY) {
 		o += "/";
 	}
@@ -660,24 +736,25 @@ void File::Rename(std::string newpath_)
 
 void File::Remove() 
 {
-	// CHANGE:: posso trocar por remove(3) que jah verifica se eh dirtorio ou arquivo
-	
-	std::string s = GetAbsolutePath() + "/" + GetName();
-	
+	std::string s = GetAbsolutePath();
 
-	if (_type != F_DIRECTORY) {
-		int r = remove(s.c_str());
-		
-		if (r < 0) {
-			throw FileException(strerror(errno));
+#ifdef _WIN32
+	if (IsDirectory() == false) {
+		if (DeleteFile(s.c_str()) == 0) {
+			throw FileException("Delete file exception");
 		}
-	} else if (_type == F_DIRECTORY) {
-		int r = rmdir(s.c_str());
-		
-		if (r < 0) {
-			throw FileException(strerror(errno));
+	} else {
+		if (RemoveDirectory(s.c_str()) == 0) {
+			throw FileException("Delete directory exception");
 		}
 	}
+#else
+	int r = remove(s.c_str());
+
+	if (r < 0) {
+		throw FileException(strerror(errno));
+	}
+#endif
 }
 
 void File::Reset() 

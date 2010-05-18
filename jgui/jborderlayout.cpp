@@ -90,7 +90,7 @@ jsize_t BorderLayout::GetPreferredLayoutSize(Container *parent)
 
 void BorderLayout::DoLayout(Container *target)
 {
-	// TODO:: sync with jframe
+	// WARN:: sync with jframe
 	jinsets_t insets = target->GetInsets();
 	int top = insets.top,
 			bottom = target->GetHeight() - insets.bottom,
@@ -143,7 +143,7 @@ void BorderLayout::DoLayout(Container *target)
 
 void BorderLayout::AddLayoutComponent(Component *c, jborderlayout_align_t align) 
 {
-	// TODO:: sync with jframe
+	// WARN:: sync with jframe
 	if (align == BL_CENTER) {
 		center = c;
 	} else if (align == BL_NORTH) {
@@ -167,7 +167,7 @@ void BorderLayout::AddLayoutComponent(Component *c, jborderlayout_align_t align)
 
 void BorderLayout::RemoveLayoutComponent(Component *c) 
 {
-	// TODO:: sync with jframe
+	// WARN:: sync with jframe
 	if (c == center) {
 		center = NULL;
 	} else if (c == north) {
@@ -193,7 +193,7 @@ void BorderLayout::RemoveLayoutComponent(Component *c)
 
 void BorderLayout::RemoveLayoutComponents() 
 {
-	// TODO:: sync with jframe
+	// WARN:: sync with jframe
 	center = NULL;
 	north = NULL;
 	south = NULL;

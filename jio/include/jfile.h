@@ -222,24 +222,6 @@ class File : public virtual jcommon::Object{
 		std::string GetAbsolutePath();
 		
 		/**
-		 * \brief Retorna o identificador de usuario do arquivo.
-		 *
-		 */
-#ifdef _WIN32
-#else
-		uid_t GetUserID();
-#endif
-		
-		/**
-		 * \brief Retorna o identificador de grupo do arquivo.
-		 *
-		 */
-#ifdef _WIN32
-#else
-		gid_t GetGroupID();
-#endif
-	
-		/**
 		 * \brief Retorna a data do ultimo acesso do arquivo.
 		 *
 		 */

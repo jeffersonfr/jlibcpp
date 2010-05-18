@@ -162,7 +162,7 @@ jsize_t FlowLayout::GetMinimumLayoutSize(Container *target)
 {
 	jsize_t t = {0, 0};
 
-	// TODO:: sync parent
+	// WARN:: sync parent
 	int nmembers = target->GetComponentCount(),
 			maxAscent = 0,
 			maxDescent = 0;
@@ -219,7 +219,7 @@ jsize_t FlowLayout::GetPreferredLayoutSize(Container *target)
 {
 	jsize_t t = {0, 0};
 
-	// TODO:: sync parent
+	// WARN:: sync parent
 	int nmembers = target->GetComponentCount(),
 			maxAscent = 0,
 			maxDescent = 0;
@@ -266,7 +266,7 @@ jsize_t FlowLayout::GetPreferredLayoutSize(Container *target)
 
 void FlowLayout::DoLayout(Container *target)
 {
-	// TODO:: syn with jframe
+	// WARN:: syn with jframe
 	jinsets_t insets = target->GetInsets();
 
 	int maxwidth = target->GetWidth() - (insets.left + insets.right + _hgap*2),
@@ -295,7 +295,7 @@ void FlowLayout::DoLayout(Container *target)
 			m->SetSize(psize.width, psize.height);
 
 			if (useBaseline) {
-				/* TODO:: implementar
+				/* WARN:: implementar
 					 int baseline = m->GetBaseline(psize.width, psize.height);
 
 					 if (baseline >= 0) {

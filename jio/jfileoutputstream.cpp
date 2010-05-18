@@ -166,7 +166,7 @@ int64_t FileOutputStream::Flush()
 
 void FileOutputStream::Seek(int64_t index)
 {
-	// TODO:: file seek position
+	_file->Seek(index);
 }
 
 void FileOutputStream::Close()

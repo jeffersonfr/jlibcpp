@@ -201,7 +201,7 @@ int64_t * GridBagLayout::PreInitMaximumArraySizes(Container *parent)
 
 GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag) 
 {
-	// TODO:: sync parent
+	// WARN:: sync parent
 	GridBagLayoutInfo *r;
 	Component *comp;
 	GridBagConstraints *constraints;
@@ -461,7 +461,7 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 							}
 						}
 
-						int ordinal = 0; // TODO:: constraints->baselineResizeBehavior.ordinal();
+						int ordinal = 0; // WARN:: constraints->baselineResizeBehavior.ordinal();
 
 						if (constraints->baselineResizeBehavior == CB_CONSTANT_DESCENT) {
 							baselineType[curY + curHeight - 1] |= (1 << ordinal); 

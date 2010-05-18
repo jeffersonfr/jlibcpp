@@ -34,7 +34,6 @@ WorkerThread::WorkerThread(ThreadPool *group)
 
 WorkerThread::~WorkerThread()
 {
-	// TODO:: delete all workthreads
 }
 
 bool WorkerThread::IsRunning()

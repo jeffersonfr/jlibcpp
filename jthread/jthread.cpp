@@ -119,7 +119,6 @@ int Thread::GetKey()
 		jthread_map_t *t = i->second;
 
 #ifdef _WIN32
-		// TODO:: corrigir
 		if (t->thread == GetCurrentThread()) {
 			return i->first;
 		}
