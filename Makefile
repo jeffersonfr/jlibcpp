@@ -68,13 +68,14 @@ ifeq ($(findstring DIRECTFB_UI,$(DEFINES)), DIRECTFB_UI)
 endif
 
 OBJS_jcommon = \
-	   jbitstream.o\
+		 jbitstream.o\
 	   jcalendar.o\
 	   jcharset.o\
 	   jsystem.o\
 	   jdate.o\
 	   jdynamiclink.o\
 	   jexception.o\
+		 jillegalargumentexception.o\
 	   jjson.o\
 	   jgc.o\
 	   jhtmlparser.o\
@@ -192,21 +193,24 @@ OBJS_jsocket = \
 	   jsslsocketoutputstream.o\
 
 OBJS_jthread = \
-	   jbufferexception.o\
-	   jcondition.o\
-	   jmutex.o\
-	   jsemaphore.o\
-	   jthread.o\
-	   jthreadexception.o\
-	   jsemaphoreexception.o\
-	   jsemaphoretimeoutexception.o\
-	   jmutexexception.o\
 	   jautolock.o\
-	   jspinlock.o\
-	   jthreadlib.o\
-	   jindexedbuffer.o\
-	   jthreadgroup.o\
-	   jrunnable.o\
+	   jbufferexception.o\
+		 jcondition.o\
+		 jillegalstateexception.o\
+		 jmutex.o\
+		 jmutexexception.o\
+		 jrunnable.o\
+		 jsemaphore.o\
+		 jspinlock.o\
+		 jthread.o\
+		 jthreadexception.o\
+		 jsemaphoreexception.o\
+		 jsemaphoretimeoutexception.o\
+		 jthreadlib.o\
+		 jindexedbuffer.o\
+		 jthreadgroup.o\
+		 jthreadpool.o\
+		 jtimer.o\
 
 OBJS_jgui = \
      jadjustmentevent.o\

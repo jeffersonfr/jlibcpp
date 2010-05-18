@@ -767,34 +767,6 @@ void HTMLParser::InnerDump(Tag *t, std::string tab)
 			printf("%s</%s>\n", tab.c_str(), t->GetName().c_str());
 		}
 	}
-
-	/*
-	if (t->GetType() == BODY_TAG) {
-		std::string attr;
-
-		for (std::map<std::string, std::string>::iterator i=t->GetAttributes().begin(); i!=t->GetAttributes().end(); i++) {
-			attr = attr + " " + i->first + "=\"" + i->second + "\"";
-		}
-
-		if (t->GetChilds().size() > 0) {
-			printf("%s<%s%s>\n", tab.c_str(), t->GetName().c_str(), attr.c_str());
-		} else {
-			printf("%s<%s%s />\n", tab.c_str(), t->GetName().c_str(), attr.c_str());
-		}
-	} else {
-		printf("%s%s\n", tab.c_str(), t->GetName().c_str());
-	}
-
-	for (std::list<Tag *>::iterator i=t->GetChilds().begin(); i!=t->GetChilds().end(); i++) {
-		InnerDump((*i), tab+"  ");
-	}
-
-	if (t->GetType() == BODY_TAG) {
-		if (t->GetChilds().size() > 0) {
-			printf("%s</%s>\n", tab.c_str(), t->GetName().c_str());
-		}
-	}
-	*/
 }
 
 void HTMLParser::Dump()

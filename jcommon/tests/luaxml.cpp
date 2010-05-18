@@ -54,7 +54,6 @@ std::string xmlmap(std::string id)
 
 				tags.push_back(t);
 
-				// printf(":: state::[%d], tag::[%s] index::[0]\n", state, tag.c_str());
 				tag = "";
 			} else if (c == ':') {
 				struct luaxml_t t;
@@ -65,7 +64,6 @@ std::string xmlmap(std::string id)
 
 				tags.push_back(t);
 
-				// printf(":: state::[%d], tag::[%s] index::[0]\n", state, tag.c_str());
 				tag = "";
 				state = 2;
 			} else if (c == '[') {
@@ -83,7 +81,6 @@ std::string xmlmap(std::string id)
 
 				tags.push_back(t);
 
-				// printf(":: state::[%d], tag::[%s] index::[%s]\n", state, tag.c_str(), index.c_str());
 				state = 255;
 			} else if (c >= '0' && c <= '9') {
 				index = index + c;
@@ -104,7 +101,6 @@ std::string xmlmap(std::string id)
 
 				tags.push_back(t);
 
-				// printf(":: state::[%d], index::[%s]\n", state, index.c_str());
 				break;
 			} else if (c >= '0' && c <= '9') {
 				index = index + c;
@@ -121,7 +117,6 @@ std::string xmlmap(std::string id)
 
 		tags.push_back(t);
 
-		// printf(":: state::[%d], tag::[%s] index::[0]\n", state, tag.c_str());
 	} else if (state == 2) {
 		struct luaxml_t t;
 
@@ -131,12 +126,6 @@ std::string xmlmap(std::string id)
 
 		tags.push_back(t);
 
-		// printf(":: state::[%d], tag::[%s] index::[0]\n", state, tag.c_str());
-	}
-
-	printf(":: %s\n", id.c_str());
-	for (std::vector<struct luaxml_t>::iterator i=tags.begin(); i!=tags.end(); i++) {
-		// printf("::tag:: %s, index:: %d\n", (*i).id.c_str(), (*i).index);
 	}
 
 	// xml parser
@@ -244,17 +233,17 @@ int main()
 	std::string s;
 
 	s = xmlmap("html.body.p");
-	printf("Return:: [%s]\n", s.c_str());
+	std::cout << "Return:: [" << s << "]" << std::endl;
 	s = xmlmap("html.body.p[2]");
-	printf("Return:: [%s]\n", s.c_str());
+	std::cout << "Return:: [" << s << "]" << std::endl;
 	s = xmlmap("html.body.p[3].font");
-	printf("Return:: [%s]\n", s.c_str());
+	std::cout << "Return:: [" << s << "]" << std::endl;
 	s = xmlmap("html.body.[1]");
-	printf("Return:: [%s]\n", s.c_str());
+	std::cout << "Return:: [" << s << "]" << std::endl;
 	s = xmlmap("html.body.p[3].font:size");
-	printf("Return:: [%s]\n", s.c_str());
+	std::cout << "Return:: [" << s << "]" << std::endl;
 	s = xmlmap("html.body.p[3].font:[2]");
-	printf("Return:: [%s]\n", s.c_str());
+	std::cout << "Return:: [" << s << "]" << std::endl;
 	
 	return 0;
 }

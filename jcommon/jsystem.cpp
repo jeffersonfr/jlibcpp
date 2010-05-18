@@ -104,16 +104,16 @@ void System::Beep(int freq, int delay)
 		delay = DEFAULT_DELAY;
 	}
 	
-  	if ((console = open("/dev/console", O_WRONLY)) == -1) {
-	  	printf("\a");
+	if ((console = open("/dev/console", O_WRONLY)) == -1) {
+		printf("\a");
 		return;
 	}
-	
+
 	if (ioctl(console, KIOCSOUND, (int)(CLOCK_TICK_RATE/freq)) < 0) {
 		printf("\a");
 		return;
 	}
-	
+
 	usleep(1000*delay);
 	ioctl(console, KIOCSOUND, 0);
 	

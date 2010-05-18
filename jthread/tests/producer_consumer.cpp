@@ -34,44 +34,40 @@ void init(struct prodcons * b)
 void put(struct prodcons * b, int data)
 {
 	/* Wait until buffer is not full */
-	monitor(0) {
-		jthread::AutoLock l(&b->lock);
+	jthread::AutoLock l(&b->lock);
 
-		while ((b->writepos + 1) % BUFFER_SIZE == b->readpos) {
-			b->notfull.Wait(&b->lock);
-		}
-
-		b->buffer[b->writepos] = data;
-		b->writepos++;
-
-		if (b->writepos >= BUFFER_SIZE) {
-			b->writepos = 0;
-		}
-
-		b->notempty.Notify();
+	while ((b->writepos + 1) % BUFFER_SIZE == b->readpos) {
+		b->notfull.Wait(&b->lock);
 	}
+
+	b->buffer[b->writepos] = data;
+	b->writepos++;
+
+	if (b->writepos >= BUFFER_SIZE) {
+		b->writepos = 0;
+	}
+
+	b->notempty.Notify();
 }
 
 int get(struct prodcons * b)
 {
 	int data = 0;
 
-	monitor(0) {
-		jthread::AutoLock l(&b->lock);
+	jthread::AutoLock l(&b->lock);
 
-		while (b->writepos == b->readpos) {
-			b->notempty.Wait(&b->lock);
-		}
-
-		data = b->buffer[b->readpos];
-		b->readpos++;
-
-		if (b->readpos >= BUFFER_SIZE) {
-			b->readpos = 0;
-		}
-
-		b->notfull.Notify();
+	while (b->writepos == b->readpos) {
+		b->notempty.Wait(&b->lock);
 	}
+
+	data = b->buffer[b->readpos];
+	b->readpos++;
+
+	if (b->readpos >= BUFFER_SIZE) {
+		b->readpos = 0;
+	}
+
+	b->notfull.Notify();
 
 	return data;
 }
@@ -91,7 +87,6 @@ class Producer : public jthread::Thread{
 			int n;
 
 			for (n = 0; n < 1000000; n++) {
-		  		// printf("P %d\n", n);
 		  		putchar('+');
 		  		put(&buffer, n);
 			}
@@ -121,7 +116,6 @@ class Consumer : public jthread::Thread{
 					break;
 				}
 
-				// printf("C %d\n", d);
 				putchar('-');
 			}
 		}
@@ -139,8 +133,6 @@ int main()
 
 	p.WaitThread();
 	c.WaitThread();
-
-	puts("");
 
 	return 0;
 }

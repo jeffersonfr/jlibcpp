@@ -1,11 +1,13 @@
 #include "jmemorymap.h"
 
+#include <stdio.h>
+
 using namespace jshared;
 
 int main(int argc, char **argv)
 {
 	if (argc < 2) {
-		puts("use:: ./ipcmap <id>");
+		std::cout << "use:: ./ipcmap <id>" << std::endl;
 
 		return -1;
 	}
@@ -26,7 +28,7 @@ int main(int argc, char **argv)
 		try {
 			m = new MemoryMap(key, MEM_OPEN, jshared::MEM_WRITE, true);
 		} catch (...) {
-			puts("Cannot create the memory map");
+			std::cout << "Cannot create the memory map" << std::endl;
 
 			return -1;
 		}

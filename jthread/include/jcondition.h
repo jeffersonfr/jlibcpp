@@ -41,18 +41,13 @@ class Condition : public virtual jcommon::Object{
 
     private:
 #ifdef _WIN32
+			Semaphore _semaphore;
 #else
+			/** \brief Mutex */
+			Mutex _monitor;
 			/** \brief Descritor */
 			pthread_cond_t _condition;
 #endif
-			/** \brief Mutex */
-			Mutex _monitor;
-			/** \brief Mutex */
-			int _count;
-			/** \brief Mutex */
-			int _nblock;
-			/** \brief */
-			bool _is_open;
 
     public:
 			/**

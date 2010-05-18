@@ -865,8 +865,7 @@ void JSONPullParser :: setError( const char * error )
 		}
 
 		char msg[ 512 ];
-		snprintf( msg, sizeof( msg), "%s ( occured at row(%d), col(%d) : %s )",
-				error, mRowIndex + 1, mColIndex + 1, segment );
+		snprintf( msg, sizeof( msg), "%s ( occured at row(%d), col(%d) : %s )", error, mRowIndex + 1, mColIndex + 1, segment );
 
 		mError = strdup( msg );
 	}
@@ -980,7 +979,6 @@ JSONReader :: ~JSONReader()
 
 void JSONReader :: changeReader( JSONPullParser * parser, JSONReader * reader )
 {
-	//printf( "\nchange: %s\n", typeid( *reader ).name() );
 	parser->changeReader( reader );
 }
 

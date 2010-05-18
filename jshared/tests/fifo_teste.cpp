@@ -1,6 +1,7 @@
 #include "jsharedfifo.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <wait.h>
 
 #define TESTBLOCKSZ	1024  /* Max number of int's in each test block  */
@@ -34,46 +35,42 @@ void fifo_teste()
 			int sz;
 			unsigned checksum=0;
 			
-			/* generate random block */
+			// generate random block
 			sz = rand()%TESTBLOCKSZ; 
 			
-			/* Create random block of sz integers + checksum */
+			// Create random block of sz integers + checksum
 			for(pos=0;pos<sz;pos++){
 				buf[pos] = rand();
 				checksum+=buf[pos];
 			}
-			buf[sz]=checksum; /* each block has sz+1 elements. */
-			/* [0..(sz-1)] is random, [sz] is checksum */
 			
+			// each block has sz+1 elements
+			buf[sz]=checksum; 
+			// [0..(sz-1)] is random, [sz] is checksum
 			
-			printf("pushing block %d of %d ints. chksum: %x\r", i,sz,checksum);
-			fflush(stdout);
+			std::cout << "pushing block " << i << " of " << sz << " ints. chksum: " << std::hex << checksum << std::dec;
 			while(fifo->Put(buf,(sz+1)*sizeof(int))==-1){
-				printf("no free mem left? waiting a bit...\n");
+				std::cout << "\nno free mem left? waiting a bit..." << std::flush;
 				mypriv.counter++;
 				fifo->Setpriv(&mypriv);
-				fflush(stdout);
 				sleep(1);
 				if(waitpid(child,&status,WNOHANG)){
-					printf("BUG! child already died!!\n");
+					std::cout << "\nBUG! child already died !";
 					exit(1);
 				}
 			};	   
 		}
 		
-		printf("\n");
-		fflush(stdout);
-		
-		printf("waiting for child\n");
-		fflush(stdout);
+		std::cout << "\nwaiting for child" << std::endl;
 		wait(&status);
 		sleep(1);
-		printf("parent quit\n");
+		std::cout << "parent quit" << std::endl;
 		fifo->Detach();
 		fifo->Dealloc();
+		
 		exit(0);
-	}else{
-		/* child */
+	} else {
+		// child
 		int i;
 		int buf[TESTBLOCKSZ];
 		struct priv mypriv;
@@ -84,10 +81,10 @@ void fifo_teste()
 			unsigned checksum=0;
 			int pos;
 			fifo->Getpriv(&mypriv);
-			printf("waitcounter: %d\r",mypriv.counter);
+			std::cout << "waitcounter: " << mypriv.counter << std::endl;
 			/* fetch block */
 			while((sz = fifo->Get(buf,sizeof(buf)))==-1){
-				printf("nothing in shmem? waiting...\n");
+				std::cout << "nothing in shmem? waiting..." << std::endl;
 				sleep(1);
 			};
 			// checking it;
@@ -95,21 +92,19 @@ void fifo_teste()
 			for(pos=0;pos<sz-1;pos++){
 				checksum+=buf[pos];
 			}
-			printf("got block %d of sz %d sum %x:%x .. ", i,sz-1,checksum,buf[sz-1]);
+			std::cout << "got block " << i << " of sz " << sz-1 << " sum " << std::hex << checksum << ":" << buf[sz-1] << std::dec << std::endl;
 			if(checksum!=(unsigned int)buf[sz-1]){
-				printf("ERROR!!!!\n");
+				std::cout << "ERROR !!!!" << std::endl;
 				abort();
-			}else
-				printf("OK\n");
-			fflush(stdout);
+			} else {
+				std::cout << "OK" << std::endl;
+			}
 		}
 	
-		printf("\n");
-		fflush(stdout);
-		
-		printf("child finished\n");
-		printf("All %d tests are passed successfully!\n",NTESTS);
-		printf("waitcounter: %d\n",mypriv.counter);
+		std::cout << "child finished" << std::endl;
+		std::cout << "All " << NTESTS << " tests are passed successfully !" << std::endl;
+		std::cout << "waitcounter: " << mypriv.counter << std::endl;
+
 		fifo->Detach();
 	}
 }
@@ -119,9 +114,8 @@ int main(void)
 	try {
 		fifo_teste();
 	} catch (...) {
-		printf("Fifo teste aborted !\n");
+		std::cout << "Fifo teste aborted !" << std::endl;
 	}
 	
-	return 1;
-	
+	return 0;
 }

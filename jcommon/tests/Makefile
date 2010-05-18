@@ -4,13 +4,13 @@ JAVA		= javac
 
 TARGET_ARCH = linux
 
-DEBUG  		= -ggdb 
+DEBUG  		= -g -ggdb 
 OTHER  		= -Wall -funroll-loops -O2
 
 INCLUDE		= -I. `pkg-config --cflags jlibcpp`
 LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
-CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER) $(STD)
+CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER)
 
 OK 			= \033[30;32mOK!\033[m
 

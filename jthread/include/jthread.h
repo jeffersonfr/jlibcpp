@@ -24,6 +24,7 @@
 #include "jcondition.h"
 #include "jthreadexception.h"
 #include "jobject.h"
+#include "jrunnable.h"
 
 #include <map>
 #include <cstdlib>
@@ -35,6 +36,23 @@
 
 namespace jthread{
 
+enum jthread_type_t {
+	DETACH_THREAD,
+	JOINABLE_THREAD
+};
+
+enum jthread_priority_t {
+	LOW_PRIORITY,
+	NORMAL_PRIORITY,
+	HIGH_PRIORITY
+};
+
+enum jthread_policy_t {
+	POLICY_OTHER,				// Normal thread
+	POLICY_FIFO,				// Real-time thread fifo
+	POLICY_ROUND_ROBIN	// Round robin thread round robin
+};
+
 struct jthread_map_t {
 #ifdef _WIN32
 	HANDLE thread;
@@ -44,28 +62,7 @@ struct jthread_map_t {
 	bool alive;
 };
 
-enum jthread_type_t {
-	DETACH_THREAD,
-	JOINABLE_THREAD
-};
-
-enum jthread_policy_t {
-#ifdef _WIN32
-	POLICY_OTHER		= 1,	// Normal thread
-	POLICY_FIFO			= 2,	// Real-time thread fifo
-	POLICY_ROUND_ROBIN	= 3		// Round robin thread round robin
-#else
-	POLICY_OTHER		= SCHED_OTHER,	// Normal thread
-	POLICY_FIFO			= SCHED_FIFO,	// Real-time thread fifo
-	POLICY_ROUND_ROBIN	= SCHED_RR		// Round robin thread round robin
-#endif
-};
-
-enum jthread_priority_t {
-	LOW_PRIORITY = 0,
-	NORMAL_PRIORITY = 5,
-	HIGH_PRIORITY = 10
-};
+class ThreadGroup;
 
 /**
  * \brief Thread.
@@ -99,15 +96,19 @@ class Thread : public virtual jcommon::Object{
 		Condition _condition;
 #endif
 		/** \brief */
+		std::map<int, jthread_map_t *> _threads;
+		/** \brief */
 		Mutex jthread_mutex;
+		/** \brief */
+		Runnable *_runnable;
+		/** \brief */
+		ThreadGroup *_group;
 		/** \brief */
 		jthread_type_t _type;
 		/** \brief */
 		int _key;
 		/** \brief */
 		bool _is_running;
-		/** \brief */
-		std::map<int, jthread_map_t *> _threads;
 
 		/**
 		 * \brief
@@ -117,14 +118,7 @@ class Thread : public virtual jcommon::Object{
 		static DWORD WINAPI ThreadMain(void *owner_);
 #else
 		static void * ThreadMain(void *owner_);
-		static void CleanUpMain(void *owner_);
 #endif
-
-		/**
-		 * \brief Notify the end of thread.
-		 *
-		 */
-		void SignalThreadDead();
 
 		/**
 		 * \brief Notify the end of thread.
@@ -156,7 +150,13 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Construtor.
 		 *
 		 */
-		Thread(jthread_type_t type = JOINABLE_THREAD);
+		Thread(jthread_type_t type = JOINABLE_THREAD, ThreadGroup *group = NULL);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		Thread(Runnable *runnable, jthread_type_t type = JOINABLE_THREAD, ThreadGroup *group = NULL);
 
 		/**
 		 * \brief Destrutor virtual.
@@ -168,7 +168,19 @@ class Thread : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		ThreadGroup * GetThreadGroup();
+
+		/**
+		 * \brief
+		 *
+		 */
 		static void Sleep(long long time_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static void MSleep(long long time_);
 
 		/**
 		 * \brief
@@ -180,7 +192,7 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Get thread identifier
 		 *
 		 */
-		int GetID();
+		int GetKey();
 
 		/**
 		 * \brief 
@@ -235,6 +247,12 @@ class Thread : public virtual jcommon::Object{
 		 *
 		 */
 		void WaitThread(int key = 0);
+
+		/**
+		 * \brief Wait for end of thread.
+		 *
+		 */
+		void Release();
 
 };
 

@@ -19,20 +19,25 @@ using namespace jcommon;
 bool XmlTest (const char* testString, const char* expected, const char* found, bool noEcho = false)
 {
 	bool pass = !strcmp( expected, found );
-	if ( pass )
-		printf ("[pass]");
-	else
-		printf ("[fail]");
 
-	if ( noEcho )
-		printf (" %s\n", testString);
-	else
-		printf (" %s [%s][%s]\n", testString, expected, found);
+	if ( pass ) {
+		std::cout << "[pass]" << std::endl;
+	} else {
+		std::cout << "[fail]" << std::endl;
+	}
 
-	if ( pass )
+	if ( noEcho ) {
+		std::cout << " " << testString << std::endl;
+	} else {
+		std::cout << " " << testString << " [" << expected << "][" << found << "]" << std::endl;
+	}
+
+	if ( pass ) {
 		++gPass;
-	else
+	} else {
 		++gFail;
+	}
+
 	return pass;
 }
 
@@ -40,37 +45,36 @@ bool XmlTest (const char* testString, const char* expected, const char* found, b
 bool XmlTest( const char* testString, int expected, int found, bool noEcho = false )
 {
 	bool pass = ( expected == found );
-	if ( pass )
-		printf ("[pass]");
-	else
-		printf ("[fail]");
 
-	if ( noEcho )
-		printf (" %s\n", testString);
-	else
-		printf (" %s [%d][%d]\n", testString, expected, found);
+	if ( pass ) {
+		std::cout << "[pass]" << std::endl;
+	} else {
+		std::cout << "[fail]" << std::endl;
+	}
 
-	if ( pass )
+	if ( noEcho ) {
+		std::cout << " " << testString << std::endl;
+	} else {
+		std::cout << " " << testString << " [" << expected << "][" << found << "]" << std::endl;
+	}
+
+	if ( pass ) {
 		++gPass;
-	else
+	} else {
 		++gFail;
+	}
+
 	return pass;
 }
 
-
-//
 // This file demonstrates some basic functionality of nyXml.
 // Note that the example is very contrived. It presumes you know
 // what is in the XML file. But it does test the basic operations,
 // and show how to add and remove nodes.
-//
-
 int main()
 {
-	//
 	// We start with the 'demoStart' todo list. Process it. And
 	// should hopefully end up with the todo list as illustrated.
-	//
 	const char* demoStart =
 		"<?xml version=\"1.0\"  standalone='no' >\n"
 		"<!-- Our to do list data -->"
@@ -116,41 +120,43 @@ int main()
 			XmlDocument doc( "demotest.xml" );
 			doc.Parse( demoStart );
 
-			if ( doc.Error() )
-			{
-				printf( "Error in %s: %s\n", doc.Value(), doc.ErrorDesc() );
+			if ( doc.Error() ) {
+				std::cout << "Error in " << doc.Value() << ": " << doc.ErrorDesc() << std::endl;
+
 				exit( 1 );
 			}
+
 			doc.SaveFile();
 		}
 
 		XmlDocument doc( "demotest.xml" );
 		bool loadOkay = doc.LoadFile();
 
-		if ( !loadOkay )
-		{
-			printf( "Could not load test file 'demotest.xml'. Error='%s'. Exiting.\n", doc.ErrorDesc() );
+		if ( !loadOkay ) {
+			std::cout << "Could not load test file 'demotest.xml'. Error='" << doc.ErrorDesc() << "'. Exiting." << std::endl;
+
 			exit( 1 );
 		}
 
-		printf( "** Demo doc read from disk: ** \n\n" );
-		printf( "** Printing via doc.Print **\n" );
+		std::cout << "** Demo doc read from disk: **\n" << std::endl;
+		std::cout << "** Printing via doc.Print **" << std::endl;
+
 		doc.Print( stdout );
 
 		{
-			printf( "** Printing via XmlPrinter **\n" );
+			std::cout << "** Printing via XmlPrinter **" << std::endl;
 			XmlPrinter printer;
 			doc.Accept( &printer );
-			fprintf( stdout, "%s", printer.CStr() );
+			std::cout << printer.CStr() << std::cout;
 		}
+
 		{
-			printf( "** Printing via operator<< **\n" );
-			std::cout << doc;
+			std::cout << "** Printing via operator<< **\n" << doc << std::endl;
 		}
+
 		XmlNode* node = 0;
 		XmlElement* todoElement = 0;
 		XmlElement* itemElement = 0;
-
 
 		// --------------------------------------------------------
 		// An example of changing existing attributes, and removing
@@ -228,12 +234,11 @@ int main()
 
 		todoElement->InsertAfterChild( itemElement, item );
 
-		printf( "\n** Demo doc processed: ** \n\n" );
+		std::cout << "\n** Demo doc processed: **\n" << std::endl;
+		
 		doc.Print( stdout );
 
-
-		printf( "** Demo doc processed to stream: ** \n\n" );
-		cout << doc << endl << endl;
+		std::cout << "** Demo doc processed to stream: **\n" << doc << endl << endl;
 
 		// --------------------------------------------------------
 		// Different tests...do we have what we expect?
@@ -264,46 +269,38 @@ int main()
 		XmlTest ( "First child exists.", true, ( node != 0 && node->ToText() ) );
 		XmlTest ( "Value is 'Go to the'.", "Go to the", node->Value() );
 
-
 		//////////////////////////////////////////////////////
-		printf ("\n** Iterators. **\n");
+		std::cout << "\n** Iterators. **" << std::endl;
 
 		// Walk all the top level nodes of the document.
 		count = 0;
-		for( node = doc.FirstChild();
-			 node;
-			 node = node->NextSibling() )
-		{
+		
+		for( node = doc.FirstChild(); node; node = node->NextSibling() ) {
 			count++;
 		}
+
 		XmlTest( "Top level nodes, using First / Next.", 3, count );
 
 		count = 0;
-		for( node = doc.LastChild();
-			 node;
-			 node = node->PreviousSibling() )
-		{
+
+		for( node = doc.LastChild(); node; node = node->PreviousSibling() ) {
 			count++;
 		}
+
 		XmlTest( "Top level nodes, using Last / Previous.", 3, count );
 
-		// Walk all the top level nodes of the document,
-		// using a different syntax.
+		// Walk all the top level nodes of the document, using a different syntax.
 		count = 0;
-		for( node = doc.IterateChildren( 0 );
-			 node;
-			 node = doc.IterateChildren( node ) )
-		{
+
+		for( node = doc.IterateChildren( 0 ); node; node = doc.IterateChildren( node ) ) {
 			count++;
 		}
+
 		XmlTest( "Top level nodes, using IterateChildren.", 3, count );
 
 		// Walk all the elements in a node.
 		count = 0;
-		for( element = todoElement->FirstChildElement();
-			 element;
-			 element = element->NextSiblingElement() )
-		{
+		for( element = todoElement->FirstChildElement(); element; element = element->NextSiblingElement() ) {
 			count++;
 		}
 		XmlTest( "Children of the 'ToDo' element, using First / Next.",
@@ -311,21 +308,18 @@ int main()
 
 		// Walk all the elements in a node by value.
 		count = 0;
-		for( node = todoElement->FirstChild( "Item" );
-			 node;
-			 node = node->NextSibling( "Item" ) )
-		{
+		for( node = todoElement->FirstChild( "Item" ); node; node = node->NextSibling( "Item" ) ) {
 			count++;
 		}
+
 		XmlTest( "'Item' children of the 'ToDo' element, using First/Next.", 3, count );
 
 		count = 0;
-		for( node = todoElement->LastChild( "Item" );
-			 node;
-			 node = node->PreviousSibling( "Item" ) )
-		{
+
+		for( node = todoElement->LastChild( "Item" ); node; node = node->PreviousSibling( "Item" ) ) {
 			count++;
 		}
+
 		XmlTest( "'Item' children of the 'ToDo' element, using Last/Previous.", 3, count );
 
 		{
@@ -350,8 +344,6 @@ int main()
 			docTest.Parse( error );
 			XmlTest( "Error row", docTest.ErrorRow(), 3 );
 			XmlTest( "Error column", docTest.ErrorCol(), 17 );
-			//printf( "error=%d id='%s' row %d col%d\n", (int) doc.Error(), doc.ErrorDesc(), doc.ErrorRow()+1, doc.ErrorCol() + 1 );
-
 		}
 
 		{
@@ -369,14 +361,12 @@ int main()
 			ostringstream outputStream0( ostringstream::out );
 			outputStream0 << document0;
 
-			XmlTest( "Stream round trip correct.",	string( demoEnd ).c_str(), 
-													outputStream0.str().c_str(), true );
+			XmlTest( "Stream round trip correct.",	string( demoEnd ).c_str(), outputStream0.str().c_str(), true );
 
 			std::string str;
 			str << document0;
 
-			XmlTest( "String printing correct.", string( demoEnd ).c_str(), 
-												 str.c_str(), true );
+			XmlTest( "String printing correct.", string( demoEnd ).c_str(), str.c_str(), true );
 		}
 	}
 	
@@ -489,38 +479,30 @@ int main()
 	//	2. Row, Col functionality
 	//	3. Correct output
 	// --------------------------------------------------------
-	printf ("\n** UTF-8 **\n");
+	std::cout << "\n** UTF-8 **" << std::endl;
 	{
 		XmlDocument doc( "utf8test.xml" );
 		doc.LoadFile();
 		if ( doc.Error() && doc.ErrorId() == XmlBase::TIXML_ERROR_OPENING_FILE ) {
-			printf( "WARNING: File 'utf8test.xml' not found.\n"
-					"(Are you running the test from the wrong directory?)\n"
-				    "Could not test UTF-8 functionality.\n" );
-		}
-		else
-		{
+			std::cout << "WARNING: File 'utf8test.xml' not found.\n(Are you running the test from the wrong directory?)\nCould not test UTF-8 functionality." << std::endl;
+		} else {
 			XmlHandle docH( &doc );
 			// Get the attribute "value" from the "Russian" element and check it.
 			XmlElement* element = docH.FirstChildElement( "document" ).FirstChildElement( "Russian" ).Element();
-			const unsigned char correctValue[] = {	0xd1U, 0x86U, 0xd0U, 0xb5U, 0xd0U, 0xbdU, 0xd0U, 0xbdU, 
-													0xd0U, 0xbeU, 0xd1U, 0x81U, 0xd1U, 0x82U, 0xd1U, 0x8cU, 0 };
+			const uint8_t correctValue[] = {	
+				0xd1U, 0x86U, 0xd0U, 0xb5U, 0xd0U, 0xbdU, 0xd0U, 0xbdU, 0xd0U, 0xbeU, 0xd1U, 0x81U, 0xd1U, 0x82U, 0xd1U, 0x8cU, 0 };
 
 			XmlTest( "UTF-8: Russian value.", (const char*)correctValue, element->Attribute( "value" ), true );
 			XmlTest( "UTF-8: Russian value row.", 4, element->Row() );
 			XmlTest( "UTF-8: Russian value column.", 5, element->Column() );
 
-			const unsigned char russianElementName[] = {	0xd0U, 0xa0U, 0xd1U, 0x83U,
-															0xd1U, 0x81U, 0xd1U, 0x81U,
-															0xd0U, 0xbaU, 0xd0U, 0xb8U,
-															0xd0U, 0xb9U, 0 };
+			const uint8_t russianElementName[] = {	
+				0xd0U, 0xa0U, 0xd1U, 0x83U, 0xd1U, 0x81U, 0xd1U, 0x81U, 0xd0U, 0xbaU, 0xd0U, 0xb8U, 0xd0U, 0xb9U, 0 };
+
 			const char russianText[] = "<\xD0\xB8\xD0\xBC\xD0\xB5\xD0\xB5\xD1\x82>";
 
 			XmlText* text = docH.FirstChildElement( "document" ).FirstChildElement( (const char*) russianElementName ).Child( 0 ).Text();
-			XmlTest( "UTF-8: Browsing russian element name.",
-					 russianText,
-					 text->Value(),
-					 true );
+			XmlTest( "UTF-8: Browsing russian element name.", russianText, text->Value(), true );
 			XmlTest( "UTF-8: Russian element name row.", 7, text->Row() );
 			XmlTest( "UTF-8: Russian element name column.", 47, text->Column() );
 
@@ -571,7 +553,7 @@ int main()
 	//////////////////////
 	// Copy and assignment
 	//////////////////////
-	printf ("\n** Copy and Assignment **\n");
+	std::cout << "** Copy and Assignment **" << std::endl;
 	{
 		XmlElement element( "foo" );
 		element.Parse( "<element name='value' />", 0, TIXML_ENCODING_UNKNOWN );
@@ -640,7 +622,7 @@ int main()
 	}	
 
 	//////////////////////////////////////////////////////
-	printf ("\n** Parsing, no Condense Whitespace **\n");
+	std::cout << "** Parsing, no Condense Whitespace **" << std::endl;
 	XmlBase::SetCondenseWhiteSpace( false );
 	{
 		istringstream parse1( "<start>This  is    \ntext</start>" );
@@ -776,13 +758,12 @@ int main()
 								 "<b>I am > the rules!</b>\n...since I make symbolic puns",
 								 true );
 	}
+	
 	//////////////////////////////////////////////////////
 	// Visit()
-
-
-
 	//////////////////////////////////////////////////////
-	printf( "\n** Fuzzing... **\n" );
+	
+	std::cout << "** Fuzzing... **" << std::endl;
 
 	const int FUZZ_ITERATION = 300;
 
@@ -802,10 +783,11 @@ int main()
 
 		delete [] demoCopy;
 	}
-	printf( "** Fuzzing Complete. **\n" );
+	
+	std::cout << "** Fuzzing Complete. **" << std::endl;
 	
 	//////////////////////////////////////////////////////
-	printf ("\n** Bug regression tests **\n");
+	std::cout << "** Bug regression tests **" << std::endl;
 
 	// InsertBeforeChild and InsertAfterChild causes crash.
 	{
@@ -834,13 +816,13 @@ int main()
 		// Missing constructor implementation. No test -- just compiles.
 		XmlText text( "Missing" );
 
-			// Missing implementation:
-			XmlDocument doc;
-			string name = "missing";
-			doc.LoadFile( name );
+		// Missing implementation:
+		XmlDocument doc;
+		string name = "missing";
+		doc.LoadFile( name );
 
-			XmlText textSTL( name );
- 	}
+		XmlText textSTL( name );
+	}
 
 	// Long filenames crashing STL version
 	{
@@ -871,15 +853,13 @@ int main()
 		XmlTest( "Entity transformation: read. ", expected, context, true );
 
 		FILE* textfile = fopen( "textfile.txt", "w" );
-		if ( textfile )
-		{
+		if ( textfile ) {
 			psg->Print( textfile, 0 );
 			fclose( textfile );
 		}
 		textfile = fopen( "textfile.txt", "r" );
 		assert( textfile );
-		if ( textfile )
-		{
+		if ( textfile ) {
 			char buf[ 1024 ];
 			fgets( buf, 1024, textfile );
 			XmlTest( "Entity transformation: write. ",
@@ -891,35 +871,32 @@ int main()
 		fclose( textfile );
 	}
 
-    {
+	{
 		FILE* textfile = fopen( "test5.xml", "w" );
-		if ( textfile )
-		{
-            fputs("<?xml version='1.0'?><a.elem xmi.version='2.0'/>", textfile);
-            fclose(textfile);
+		if ( textfile ) {
+			fputs("<?xml version='1.0'?><a.elem xmi.version='2.0'/>", textfile);
+			fclose(textfile);
 
 			XmlDocument doc;
-            doc.LoadFile( "test5.xml" );
-            XmlTest( "dot in element attributes and names", doc.Error(), 0);
+			doc.LoadFile( "test5.xml" );
+			XmlTest( "dot in element attributes and names", doc.Error(), 0);
 		}
-    }
+	}
 
 	{
 		FILE* textfile = fopen( "test6.xml", "w" );
-		if ( textfile )
-		{
-            fputs("<element><Name>1.1 Start easy ignore fin thickness&#xA;</Name></element>", textfile );
-            fclose(textfile);
+		if ( textfile ) {
+			fputs("<element><Name>1.1 Start easy ignore fin thickness&#xA;</Name></element>", textfile );
+			fclose(textfile);
 
-            XmlDocument doc;
-            bool result = doc.LoadFile( "test6.xml" );
-            XmlTest( "Entity with one digit.", result, true );
+			XmlDocument doc;
+			bool result = doc.LoadFile( "test6.xml" );
+			XmlTest( "Entity with one digit.", result, true );
 
 			XmlText* text = doc.FirstChildElement()->FirstChildElement()->FirstChild()->ToText();
-			XmlTest( "Entity with one digit.",
-						text->Value(), "1.1 Start easy ignore fin thickness\n" );
+			XmlTest( "Entity with one digit.", text->Value(), "1.1 Start easy ignore fin thickness\n" );
 		}
-    }
+	}
 
 	{
 		// DOCTYPE not preserved (950171)
@@ -949,8 +926,7 @@ int main()
 	{
 		// [ 791411 ] Formatting bug
 		// Comments do not stream out correctly.
-		const char* doctype = 
-			"<!-- Somewhat<evil> -->";
+		const char* doctype =  "<!-- Somewhat<evil> -->";
 		XmlDocument doc;
 		doc.Parse( doctype );
 
@@ -1032,24 +1008,24 @@ int main()
 		XmlTest( "Embedded null throws error.", true, doc.Error() );
 	}
 
-    {
-            // Legacy mode test. (This test may only pass on a western system)
-            const char* str =
-                        "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
-                        "<ä>"
-                        "CöntäntßäöüÄÖÜ"
-                        "</ä>";
+	{
+		// Legacy mode test. (This test may only pass on a western system)
+		const char* str =
+			"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
+			"<ä>"
+			"CöntäntßäöüÄÖÜ"
+			"</ä>";
 
-            XmlDocument doc;
-            doc.Parse( str );
+		XmlDocument doc;
+		doc.Parse( str );
 
-            XmlHandle docHandle( &doc );
-            XmlHandle aHandle = docHandle.FirstChildElement( "ä" );
-            XmlHandle tHandle = aHandle.Child( 0 );
-            assert( aHandle.Element() );
-            assert( tHandle.Text() );
-            XmlTest( "ISO-8859-1 Parsing.", "CöntäntßäöüÄÖÜ", tHandle.Text()->Value() );
-    }
+		XmlHandle docHandle( &doc );
+		XmlHandle aHandle = docHandle.FirstChildElement( "ä" );
+		XmlHandle tHandle = aHandle.Child( 0 );
+		assert( aHandle.Element() );
+		assert( tHandle.Text() );
+		XmlTest( "ISO-8859-1 Parsing.", "CöntäntßäöüÄÖÜ", tHandle.Text()->Value() );
+	}
 
 	{
 		// Empty documents should return TIXML_ERROR_PARSING_EMPTY, bug 1070717
@@ -1074,16 +1050,14 @@ int main()
 		doc.Parse("<p><pb></pb>test</p>");
 	} 
 	
-	/* CHANGE:: retirar comentario
 	{
 		// Low entities
 		XmlDocument xml;
 		xml.Parse( "<test>&#x0e;</test>" );
 		const char result[] = { 0x0e, 0 };
-		XmlTest( "Low entities.", xml.FirstChildElement()->GetText(), result );
+		XmlTest( "Low entities.", xml.FirstChildElement()->GetText().c_str(), result );
 		xml.Print();
 	}
-	*/
 
 	{
 		// Bug [ 1451649 ] Attribute values with trailing quotes not handled correctly
@@ -1160,7 +1134,8 @@ int main()
 	_CrtMemDumpStatistics( &diffMemState );
 	#endif
 
-	printf ("\nPass %d, Fail %d\n", gPass, gFail);
+	std::cout << "\nPass " << gPass << ", Fail " << gFail << std::endl;
+
 	return gFail;
 }
 

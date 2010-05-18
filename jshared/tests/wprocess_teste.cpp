@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <sstream>
+
+#include <string.h>
 #include <assert.h>
 
 using namespace std;
@@ -29,18 +31,15 @@ int main()
 {
   ostream_test();
   
-  char *params[] = {"-i", 
-	  "-v", 
-	  "test"
+  char *params[] = {
+		(char *)"-i", 
+	  (char *)"-v", 
+	  (char *)"test"
   };
-  char *dum[] = {"-l"
-  };
-  char *s = "			\
-	  This is\n			\
-	  a small test\n	\
-	  very small\n		\
-	  but a test\n		\
-	  ";
+  char *dum[] = {
+		(char *)"-l"
+	};
+  char *s = (char *)"This is\na small test\nvery small\nbut a test\n";
   
   WrapperProcess grep("/bin/grep", params);
   WrapperProcess wc("/usr/bin/wc", dum);    

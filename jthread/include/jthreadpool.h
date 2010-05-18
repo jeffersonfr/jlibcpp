@@ -17,72 +17,162 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_THREADGROUP_H
-#define J_THREADGROUP_H
+#ifndef J_THREADPOOL_H
+#define J_THREADPOOL_H
 
+#include "jrunnable.h"
 #include "jthread.h"
 #include "jsemaphore.h"
 #include "jobject.h"
 
-#include <vector>
-#include <string>
+#include <map>
+#include <queue>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#endif
 
 namespace jthread{
 
-/**
- * \brief ThreadGroup.
- *
- * @author Jeff Ferr
- */
-class ThreadGroup : public virtual jcommon::Object{
+enum jthread_pool_priority_t {
+	THREAD_GROUP_LOW,
+	THREAD_GROUP_MEDIUM,
+	THREAD_GROUP_HIGH
+};
 
-	friend class Thread;
+class ThreadPool;
+
+class WorkerThread : public jthread::Thread{
 
 	private:
 		/** \brief */
-		std::vector<Thread *> _threads;
+		ThreadPool *_group;
+		/** \brief */
+		Runnable *_runnable;
+		/** \brief */
+		Semaphore _sem;
 		/** \brief */
 		Mutex _mutex;
 		/** \brief */
-		std::string _name;
-
-	private:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		void RegisterThread(Thread *thread);
-
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		void UnregisterThread(Thread *thread);
+		bool _is_locked;
 
 	public:
 		/**
-		 * \brief Construtor.
+		 * \brief
 		 *
 		 */
-		ThreadGroup(std::string name);
+		WorkerThread(ThreadPool *group);
 
 		/**
-		 * \brief Destrutor virtual.
+		 * \brief
 		 *
 		 */
-		virtual ~ThreadGroup();
+		virtual ~WorkerThread();
 
 		/**
 		 * \brief 
 		 *
 		 */
-		void InterruptAll();
+		bool IsRunning();
+
+		/**
+		 * \brief 
+		 *
+		 */
+		void WaitThread();
+
+		/**
+		 * \brief 
+		 *
+		 */
+		void AttachThread(Runnable *r);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		void DetachThread(Runnable *r);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Run();
+
+};
+
+/**
+ * \brief ThreadPool.
+ *
+ * @author Jeff Ferr
+ */
+class ThreadPool : public virtual jcommon::Object{
+
+    private:
+		/** \brief */
+		std::vector<WorkerThread *> _threads;
+		/** \brief */
+		std::queue<Runnable *> _low_threads;
+		/** \brief */
+		std::queue<Runnable *> _medium_threads;
+		/** \brief */
+		std::queue<Runnable *> _high_threads;
+		/** \brief */
+		Mutex _mutex;
+		/** \brief */
+		Semaphore _sem;
+		/** \brief */
+		int _max_threads;
+
+    public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ThreadPool(int max_threads);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~ThreadPool();
+
+		/**
+		 * \brief 
+		 *
+		 */
+		bool AttachThread(Runnable *r, jthread_pool_priority_t t = THREAD_GROUP_MEDIUM);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		bool DetachThread(Runnable *r);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		void Interrupt();
 
 		/**
 		 * \brief
 		 *
 		 */
 		void WaitForAll();
+
+		/**
+		 * \brief Return true if thread is started, false if not.
+		 *
+		 */
+		int CountActiveThreads();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void ReleaseWorkerThread(WorkerThread *t);
 
 };
 

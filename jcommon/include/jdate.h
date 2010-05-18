@@ -98,6 +98,12 @@ class Date : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		uint64_t GetTime();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int GetDayOfMonth();
 		
 		/**

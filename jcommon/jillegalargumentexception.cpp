@@ -17,63 +17,23 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jthreadgroup.h"
-#include "jthreadexception.h"
-#include "jsemaphoreexception.h"
+#include "jillegalargumentexception.h"
 
-#include <algorithm>
+namespace jcommon {
 
-#include <errno.h>
-
-namespace jthread {
-
-ThreadGroup::ThreadGroup(std::string name):
-	jcommon::Object()
+IllegalArgumentException::IllegalArgumentException(std::string reason_):
+	jcommon::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jthread::ThreadGroup");
-
-	_name = name;
+	jcommon::Object::SetClassName("jcommon::IllegalArgumentException");
 }
 
-ThreadGroup::~ThreadGroup()
+IllegalArgumentException::~IllegalArgumentException() throw()
 {
 }
 
-void ThreadGroup::RegisterThread(Thread *thread)
+std::string IllegalArgumentException::what()
 {
-	if (std::find(_threads.begin(), _threads.end(), thread) == _threads.end()) {
-		_threads.push_back(thread);
-	}
-}
-
-void ThreadGroup::UnregisterThread(Thread *thread)
-{
-	std::vector<Thread *>::iterator i = std::find(_threads.begin(), _threads.end(), thread);
-
-	if (i != _threads.end()) {
-		_threads.erase(i);
-	}
-}
-
-void ThreadGroup::InterruptAll()
-{
-	for (std::vector<Thread *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
-		try {
-			(*i)->Interrupt();
-		} catch (ThreadException &e) {
-		}
-	}
-}
-
-void ThreadGroup::WaitForAll()
-{
-	for (std::vector<Thread *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
-		try {
-			(*i)->WaitThread();
-		} catch (ThreadException &e) {
-		}
-	}
+	return std::runtime_error::what();
 }
 
 }
-

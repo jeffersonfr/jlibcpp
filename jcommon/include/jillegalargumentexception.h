@@ -17,63 +17,46 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jthreadgroup.h"
-#include "jthreadexception.h"
-#include "jsemaphoreexception.h"
+#ifndef J_ILLEGALARGUMENTEXCEPTION_H
+#define J_ILLEGALARGUMENTEXCEPTION_H
 
-#include <algorithm>
+#include "jruntimeexception.h"
 
-#include <errno.h>
+#include <stdexcept>
+#include <string>
 
-namespace jthread {
+namespace jcommon {
 
-ThreadGroup::ThreadGroup(std::string name):
-	jcommon::Object()
-{
-	jcommon::Object::SetClassName("jthread::ThreadGroup");
+/**
+ * \brief Exception.
+ *
+ * \author Jeff Ferr
+ */
+class IllegalArgumentException : public jcommon::RuntimeException{
 
-	_name = name;
-}
+	private:
 
-ThreadGroup::~ThreadGroup()
-{
-}
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		IllegalArgumentException(std::string reason);
 
-void ThreadGroup::RegisterThread(Thread *thread)
-{
-	if (std::find(_threads.begin(), _threads.end(), thread) == _threads.end()) {
-		_threads.push_back(thread);
-	}
-}
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~IllegalArgumentException() throw();
 
-void ThreadGroup::UnregisterThread(Thread *thread)
-{
-	std::vector<Thread *>::iterator i = std::find(_threads.begin(), _threads.end(), thread);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string what();
 
-	if (i != _threads.end()) {
-		_threads.erase(i);
-	}
-}
-
-void ThreadGroup::InterruptAll()
-{
-	for (std::vector<Thread *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
-		try {
-			(*i)->Interrupt();
-		} catch (ThreadException &e) {
-		}
-	}
-}
-
-void ThreadGroup::WaitForAll()
-{
-	for (std::vector<Thread *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
-		try {
-			(*i)->WaitThread();
-		} catch (ThreadException &e) {
-		}
-	}
-}
+};
 
 }
 
+#endif

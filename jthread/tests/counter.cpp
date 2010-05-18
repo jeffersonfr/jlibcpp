@@ -2,8 +2,10 @@
 #include "jsemaphore.h"
 #include "jmutex.h"
 #include "jthread.h"
-#include "jthreadgroup.h"
+#include "jthreadpool.h"
 #include "jthreadexception.h"
+
+#include <iostream>
 
 #ifdef _WIN32
 #include <winbase.h>
@@ -22,9 +24,8 @@ int thread_ids[3] = {0, 1, 2};
 
 jthread::Mutex monitor;
 jthread::Semaphore sem;
-// jthread::Condition sem;
 
-class IncCount : public jthread::Runnable {
+class IncCount : public jthread::Thread {
 	private:
 		int id;
 
@@ -34,14 +35,14 @@ class IncCount : public jthread::Runnable {
 			id = i;
 		}
 		
-		~IncCount()
+		virtual ~IncCount()
 		{
 			if (monitor.IsLocked() == true) {
 				monitor.Unlock();
 			}
 		}
 
-		void Routine() {
+		void Run() {
 			int i;
 
 			for (i=0; i<TCOUNT; i++) {
@@ -53,7 +54,7 @@ class IncCount : public jthread::Runnable {
 					sem.Notify();
 				}
 					
-				printf("inc: thread %d, count %d, unlock mutex.\n", id, count);
+				std::cout << "inc: thread " << id << ", count " << count << ", unlock mutex." << std::endl;
 
 				monitor.Unlock();
 
@@ -62,7 +63,7 @@ class IncCount : public jthread::Runnable {
 
 };
 
-class WatchCount : public jthread::Runnable {
+class WatchCount : public jthread::Thread {
 	private:
 		int id, c;
 
@@ -73,20 +74,20 @@ class WatchCount : public jthread::Runnable {
 			c = 0;
 		}
 
-		~WatchCount()
+		virtual ~WatchCount()
 		{
 			if (monitor.IsLocked() == true) {
 				monitor.Unlock();
 			}
 		}
 
-		void Routine() {
-			printf("Starting watch count: thread %d\n", id);
+		void Run() {
+			std::cout << "Starting watch count: thread " << id << std::endl;
 			
 			while (count < COUNT_LIMIT) {
 				sem.Wait(10000000LL);
 
-				printf("Watch count: thread %d, count %d, condition signal received.\n", id, count);
+				std::cout << "Watch count: thread " << id << ", count " << count << ", condition signal received." << std::endl;
 			}
 		}
 		
@@ -95,19 +96,18 @@ class WatchCount : public jthread::Runnable {
 int main() 
 {
 	try {
-		jthread::ThreadGroup group1(3);
-
 		IncCount inc1(thread_ids[0]), 
 				 inc2(thread_ids[1]);
 		WatchCount watch1(thread_ids[2]);
 
-		group1.AttachThread(&watch1);
-		group1.AttachThread(&inc1);
-		group1.AttachThread(&inc2);
+		watch1.Start();
+		inc1.Start();
+		inc2.Start();
 
-		group1.WaitForAll();
+		watch1.WaitThread();
+		inc1.WaitThread();
+		inc2.WaitThread();
 	} catch (...) {
-		puts("...");
 	}
 	
 	return 0;

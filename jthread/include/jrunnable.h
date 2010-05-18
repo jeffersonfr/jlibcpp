@@ -31,27 +31,27 @@ namespace jthread{
  */
 class Runnable : public virtual jcommon::Object{
 
-    private:
+	private:
 
-    public:
-        /**
-         * \brief Construtor.
-         *
-         */
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		Runnable();
 
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~Runnable();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~Runnable();
 
-        /**
-         * \brief 
-         *
-         */
-		virtual void Routine();
-		
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual void Run();
+
 };
 
 }

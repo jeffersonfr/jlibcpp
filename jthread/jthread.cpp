@@ -20,17 +20,27 @@
 #include "jthread.h"
 #include "jautolock.h"
 #include "jthreadexception.h"
+#include "jthreadgroup.h"
+
+#include <algorithm>
 
 #include <errno.h>
 
 namespace jthread {
 
-Thread::Thread(jthread_type_t type):
+struct jthread_arg_t {
+	Thread *thread;
+	jthread_map_t *map;
+};
+
+Thread::Thread(jthread_type_t type, ThreadGroup *group):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jthread::Thread");
 
+	_runnable = NULL;
 	_type = type;
+	_group = group;
 
 #ifdef _WIN32
 	_sa = (LPSECURITY_ATTRIBUTES)HeapAlloc(GetProcessHeap(), 0, sizeof(SECURITY_ATTRIBUTES));
@@ -41,41 +51,67 @@ Thread::Thread(jthread_type_t type):
 #endif
 }
 
-Thread::~Thread()
+Thread::Thread(Runnable *runnable, jthread_type_t type, ThreadGroup *group):
+	jcommon::Object()
 {
-	KillAllThreads();
+	jcommon::Object::SetClassName("jthread::Thread");
+
+	_runnable = runnable;
+	_type = type;
+	_group = group;
 
 #ifdef _WIN32
-	if ((void *)_sa != NULL) {
-		HeapFree(GetProcessHeap(), 0, _sa); 
-
-		_sa = NULL;
-	}
+	_sa = (LPSECURITY_ATTRIBUTES)HeapAlloc(GetProcessHeap(), 0, sizeof(SECURITY_ATTRIBUTES));
+	_sa->nLength = sizeof(SECURITY_ATTRIBUTES);
+	_sa->lpSecurityDescriptor = NULL;
+	_sa->bInheritHandle = FALSE;
 #else
 #endif
+
+	if (_group != NULL) {
+		_group->RegisterThread(this);
+	}
+}
+
+Thread::~Thread()
+{
+	Release();
+}
+
+ThreadGroup * Thread::GetThreadGroup()
+{
+	return _group;
 }
 
 void Thread::Sleep(long long time_)
 {
 #ifdef _WIN32
+	::Sleep((DWORD)(time_*1000LL));
+#else
+	// usleep((useconds_t)(time_*1000000LL));
+	sleep((useconds_t)time_);
+#endif
+}
+
+void Thread::MSleep(long long time_)
+{
+#ifdef _WIN32
 	::Sleep(time_);
 #else
-	long long t = time_ * 1000LL;
-
-	usleep((useconds_t)t);
+	usleep((useconds_t)(time_*1000LL));
 #endif
 }
 
 void Thread::USleep(long long time_)
 {
 #ifdef _WIN32
-	::Sleep(time_/999);
+	::Sleep(time_/999LL);
 #else
 	usleep(time_);
 #endif
 }
 
-int Thread::GetID()
+int Thread::GetKey()
 {
 	AutoLock lock(&jthread_mutex);
 
@@ -121,17 +157,11 @@ void * Thread::ThreadMain(void *owner_)
 #endif
 {
 	if (owner_ == NULL) {
-#ifdef _WIN32
 		return 0;
-#else
-		return NULL;
-#endif
 	}
 
 #ifdef _WIN32
 #else
-	pthread_cleanup_push(&(Thread::CleanUpMain), (void *)owner_);
-
 	if (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == EINVAL) {
 		// throw ThreadException("Interrupt is not allowed");
 	}
@@ -142,18 +172,15 @@ void * Thread::ThreadMain(void *owner_)
 	}
 #endif
 
-	Thread *owner = (Thread *)(owner_);
+	jthread_arg_t *arg = (jthread_arg_t *)owner_;
 
-	int key = owner->_key;
-
-	if (owner->SetUp() == 0) {
-		// owner->_running[key] = true;
-
+	if (arg->thread->SetUp() == 0) {
 #ifdef _WIN32
 #else
 		pthread_testcancel();
 #endif
-		owner->Run();
+	
+		arg->thread->Run();
 
 #ifdef _WIN32
 #else
@@ -163,38 +190,13 @@ void * Thread::ThreadMain(void *owner_)
 #endif
 	}
 
-	// owner->CleanUp();
+	arg->thread->CleanUp();
 
-	jthread_map_t *t = owner->GetMap(key);
-	
-	if (t != NULL) {
-		t->alive = false;
-	}
+	arg->map->alive = false;
 
-	// owner->SignalThreadDead();
+	delete arg;
 
-#ifdef _WIN32
-		return 0;
-#else
-		pthread_cleanup_pop(0);
-
-		return NULL;
-#endif
-	}
-
-#ifdef _WIN32
-#else
-void Thread::CleanUpMain(void *owner_)
-{
-	Thread *owner = (Thread *)(owner_);
-
-	owner->CleanUp();
-}
-#endif
-
-void Thread::SignalThreadDead()
-{
-	// _condition.Notify();
+	return 0;
 }
 
 jthread_map_t * Thread::GetMap(int key)
@@ -219,6 +221,10 @@ int Thread::SetUp()
 
 void Thread::Run() 
 {
+	if (_runnable != NULL) {
+		_runnable->Run();
+	}
+
 	return;
 }
 
@@ -244,14 +250,17 @@ void Thread::Start(int key)
 	t->thread = 0;
 	t->alive = true;
 
-#ifdef _WIN32
-	_key = key;
+	jthread_arg_t *arg = new jthread_arg_t;
 
+	arg->thread = this;
+	arg->map = t;
+
+#ifdef _WIN32
 	if ((_thread = CreateThread(
 					_sa,				// security attributes
 					0,					// stack size
 					Thread::ThreadMain,	// function thread
-					this,				// thread arguments
+					arg,				// thread arguments
 					0,					// flag
 					&_thread_id)) == NULL) {
 		throw ThreadException("Create thread failed");
@@ -259,9 +268,7 @@ void Thread::Start(int key)
 
 	t->thread = _thread;
 #else
-	_key = key;
-
-	if (pthread_create(&_thread, NULL, &(Thread::ThreadMain), this)) {
+	if (pthread_create(&_thread, NULL, &(Thread::ThreadMain), arg)) {
 		t->alive = false;
 
 		throw ThreadException("Thread create failed");
@@ -339,9 +346,7 @@ bool Thread::Interrupt(int key)
 		 */
 #endif
 
-	SignalThreadDead();
-
-	// CleanUp();
+	CleanUp();
 
 	return true;
 }
@@ -409,19 +414,49 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 {
 	AutoLock lock(&jthread_mutex);
 
+	int tpriority = 0;
+
+	if (priority == LOW_PRIORITY) {
+		tpriority = 0;
+	} else if (priority == NORMAL_PRIORITY) {
+		tpriority = 5;
+	} else if (priority == HIGH_PRIORITY) {
+		tpriority = 10;
+	}
+
+	int tpolicy = 0;
+
+	if (policy == POLICY_OTHER) {
 #ifdef _WIN32
-	if (SetThreadPriority(_thread, priority) == 0) {
+		tpolicy = 1;
+#else
+		tpolicy = SCHED_OTHER;
+#endif
+	} else if (policy == POLICY_FIFO) {
+#ifdef _WIN32
+		tpolicy = 2;
+#else
+		tpolicy = SCHED_FIFO;
+#endif
+	} else if (policy == POLICY_ROUND_ROBIN) {
+#ifdef _WIN32
+		tpolicy = 3;
+#else
+		tpolicy = SCHED_RR;
+#endif
+	}
+
+#ifdef _WIN32
+	if (SetThreadPriority(_thread, tpriority) == 0) {
 		throw ThreadException("Unknown exception in set policy !");
 	}
 #else
 	struct sched_param param;
 
-#ifdef _WIN32
-	param.sched_priority = priority;
-#elif __CYGWIN32__
-	param.sched_priority = priority;
+#if __CYGWIN32__
+	param.sched_priority = tpriority;
 #else
-	param.__sched_priority = priority;
+	param.__sched_priority = tpriority;
 #endif
 
 	int result;
@@ -563,6 +598,23 @@ void Thread::WaitThread(int key)
 
 	if (result != NULL) {
 		free(result);
+	}
+#endif
+}
+
+void Thread::Release()
+{
+	if (_group != NULL) {
+		_group->RegisterThread(this);
+	}
+
+	KillAllThreads();
+
+#ifdef _WIN32
+	if ((void *)_sa != NULL) {
+		HeapFree(GetProcessHeap(), 0, _sa); 
+
+		_sa = NULL;
 	}
 #endif
 }

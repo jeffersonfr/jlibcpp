@@ -36,7 +36,7 @@ int main(void)
 	string host = "localhost";
 	int port    = 5555;
 
-	printf("Connecting to %s:%d", host.c_str(), port);
+	std::cout << "Connecting to " << host << ":" << port << std::endl;
 
 	// WARN:: try-catch
 	SSLSocket mySocket(host, port);
@@ -46,16 +46,14 @@ int main(void)
 	while(true){
 		//No response, try again later
 		if( i > 20 ){
-			printf("\nClient timeout!\n");
+			std::cout << "\nClient timeout !" << std::endl;
 			exit(-1);
 		}
 		
-		printf("."); fflush(NULL);
+		std::cout << "." << std::flush;
 		sleep(3);
 		i++;
 	}
-	
-	// printf("\nConnected to %s:%d (%s)\n\n", mySocket.get_peerName().c_str(), mySocket.get_peerPort(), mySocket.get_peerAddr().c_str());
 	
 	// Create a new process for handling input from stdin and then handle stdout ourself
 	pid_t pid;
@@ -102,7 +100,8 @@ int main(void)
 			wait(NULL);         // Wait for send process to die
 				
 			if (interrupted == true ){
-				printf("\nConnection to %s closed.\n", host.c_str());
+				std::cout << "\nConnection to " << host << " was closed" << std::endl;
+
 				mySocket.Close();
 				
 				return 0;

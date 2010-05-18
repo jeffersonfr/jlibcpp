@@ -11,7 +11,7 @@ using namespace jsocket;
 int main(int argc, char **argv)
 {
 	if (argc < 2) {
-		printf("use:: %s <host>\n", argv[0]);
+		std::cout << "use:: " << argv[0] << " <host>" << std::endl;
 
 		return -1;
 	}
@@ -20,12 +20,12 @@ int main(int argc, char **argv)
 
 	InetAddress *inet = InetAddress::GetByName(argv[1]);
 
-	printf("by name:: [%s, %s]\n", inet->GetHostName().c_str(), inet->GetHostAddress().c_str());
+	std::cout << "by name:: [" << inet->GetHostName() << ", " << inet->GetHostAddress() << "]" << std::endl;
 
 	std::vector<InetAddress *> inets = InetAddress::GetAllByName(argv[1]);
 
 	for (std::vector<InetAddress *>::iterator i=inets.begin(); i!=inets.end(); i++) {
-		printf("all by name:: [%s, %s]\n", (*i)->GetHostName().c_str(), (*i)->GetHostAddress().c_str());
+		std::cout << "all by name:: [" << (*i)->GetHostName() << ", " << (*i)->GetHostAddress()%s << "]" << std::endl;
 	}
 
 	ReleaseWindowsSocket();

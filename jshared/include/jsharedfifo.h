@@ -179,12 +179,6 @@ class SharedFifo : public virtual jcommon::Object{
 		 */
 		void Close();
 		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string what();
-
 };
 
 };

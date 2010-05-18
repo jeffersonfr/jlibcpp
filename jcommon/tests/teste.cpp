@@ -27,7 +27,7 @@ class Teste : public jcommon::Object{
 		{
 			jcommon::Object::SetClassName("teste::Teste");
 			
-			printf("Hello, world !\n");
+			std::cout << "Hello, world !" << std::cout;
 		}
 };
 
@@ -50,15 +50,16 @@ void testObject()
 
 void testLink()
 {
-	/*
 	jcommon::DynamicLink link;
-	double (*cossine)(double);
 
-	link.Load("libm.so", RTLD_LAZY);
+	link.Load("libm.so", jcommon::LAZY_LINK);
+	
+	double (*cossine)(double);
 	*(void **)(&cossine) = link.FindSymbol("cos");
-	printf("Cos(0.0) = %.2f\n", (*cossine)(0.0));
-	link.Unload("");
-	*/
+
+	std::cout << "Cos(0.0) = " << (*cossine)(0.0) << std::endl;
+	
+	link.Unload();
 }
 
 void testProperties()
@@ -123,13 +124,13 @@ void testStringToken()
 	}
 
 	for (int i=0; i<(int)texts.size(); i++) {
-		puts(texts[i].c_str());
+		std::cout << texts[i] << std::endl;
 	}
 }
 
 void testURL()
 {
- 	jcommon::URL url_01("http://www.google.com");
+	jcommon::URL url_01("http://www.google.com/url/http://redirect.org");
 	jcommon::URL url_02("http://charges.com/a?a=1");
 	jcommon::URL url_03("ftp://www.lavid.ufpb.br/cvs#ref");
 	jcommon::URL url_04("http://phrack.com:80/?a=1&b=2");
@@ -137,7 +138,7 @@ void testURL()
 	jcommon::URL url_06("./file.mpg");
 	jcommon::URL url_07("/file.mpg");
 	jcommon::URL url_08("file.mpg");
-	jcommon::URL url_09("file://file.mpg");
+	jcommon::URL url_09("file:/file.mpg");
 
 	std::cout << "URL 01:: " << url_01.what() << std::endl;
 	std::cout << "URL 02:: " << url_02.what() << std::endl;
@@ -148,6 +149,16 @@ void testURL()
 	std::cout << "URL 07:: " << url_07.what() << std::endl;
 	std::cout << "URL 08:: " << url_08.what() << std::endl;
 	std::cout << "URL 09:: " << url_09.what() << std::endl;
+
+	std::cout << "URL 01:: " << url_01.GetPath() << std::endl;
+	std::cout << "URL 02:: " << url_02.GetPath() << std::endl;
+	std::cout << "URL 03:: " << url_03.GetPath() << std::endl;
+	std::cout << "URL 04:: " << url_04.GetPath() << std::endl;
+	std::cout << "URL 05:: " << url_05.GetPath() << std::endl;
+	std::cout << "URL 06:: " << url_06.GetPath() << std::endl;
+	std::cout << "URL 07:: " << url_07.GetPath() << std::endl;
+	std::cout << "URL 08:: " << url_08.GetPath() << std::endl;
+	std::cout << "URL 09:: " << url_09.GetPath() << std::endl;
 }
 
 void testOptions(int argc, char **argv)
@@ -156,7 +167,7 @@ void testOptions(int argc, char **argv)
 
 	o.SetOptions("a:");
 
-	printf("Options:: %d, %d, %s, %s\n", o.ExistsOption("a"), o.ExistsOption("b"), o.GetArgument("a").c_str(), o.GetArgument("b").c_str());
+	std::cout << "Options:: " << o.ExistsOption("a") << ", " << o.ExistsOption("b") << ", " << o.GetArgument("a") << ", " << o.GetArgument("b") << std::endl;
 }
 
 void testDate()
@@ -168,91 +179,6 @@ void testDate()
 	jcommon::Date d((time_t)t);
 
 	std::cout << "Date:: " << d.what() << std::endl;
-}
-
-int justify(std::string full_text, int max)
-{
-	std::vector<std::string> words, 
-		texts;
-	int i = 0, 
-		k = 0;
-	std::string temp, 
-		previous;
-
-	// filtra o texto, procurando pelas palavras
-	for (i=0; i<(int)full_text.size(); i++) {
-		if (isspace((int)full_text[i]) == 0) {
-			std::string temp = "";
-
-			do {
-				temp += full_text[i];
-			} while (i++ < (int)full_text.size() && isspace((int)full_text[i]) == 0);
-
-			words.push_back(temp);
-
-			while (i++ < (int)full_text.size() && isspace((int)full_text[i]) != 0);
-
-			i--;
-
-		}
-	}
-
-	// filtra cada linha com o texto maximo permitido
-	i = 0;
-	while (i < (int)words.size() - 1) {
-		temp = words[i] + " ";
-		k = 0;
-
-		do {
-			previous = temp;
-			temp += words[i+1] + " ";
-		} while (++i < (int)(words.size()-1) && (int)(temp.size()) < (max + 1));
-
-		if (i != ((int)words.size()-1)) {
-			texts.push_back(previous);
-			printf("%s\n", previous.c_str());
-		}
-	}
-
-	temp = previous;
-	if (i < (int)words.size()) {
-		for (; i<(int)words.size(); i++) {
-			temp += words[i] + " ";
-		}
-
-		texts.push_back(temp);
-		printf("%s\n\n", temp.c_str());
-	}
-
-	// justifica o text
-	int size;
-	for (i=0; i<(int)texts.size()-1; i++) {
-		jcommon::StringTokenizer token(texts[i], " ");
-
-		size = (max - (texts[i].size() - token.GetSize()));
-
-		for (int j=0; j<token.GetSize(); j++) {
-			printf("%s", token.GetToken(j).c_str());
-			
-			for (int s=0; s<size/(token.GetSize()-1); s++) {
-				printf(" ");
-			}
-		}
-
-		printf("\n");
-	}
-
-	jcommon::StringTokenizer token(texts[i], " ");
-
-	size = (max - (texts[i].size() - token.GetSize()));
-
-	for (int j=0; j<token.GetSize(); j++) {
-		printf("%s ", token.GetToken(j).c_str());
-	}
-
-	printf("\n");
-
-	return 0;
 }
 
 void create_xml_file()
@@ -277,19 +203,18 @@ void html_parser_test()
 
 int main(int argc, char *argv[])
 {
-	// testObject();
-	// testLink();
-	// testProperties();
-	// testSystem();
-	// testStringToken();
+	//testObject();
+	//testLink();
+	//testProperties();
+	//testSystem();
+	//testStringToken();
 	testURL();
-	// testOptions(argc, argv);
-	// testDate();
-	// justify("This is a simple test with a justify text in your screen. This example show all lines in a text with the same width.", 50);
-	// create_xml_file();
-	// html_parser_test();
+	//testOptions(argc, argv);
+	//testDate();
+	//create_xml_file();
+	//html_parser_test();
 
-    return EXIT_SUCCESS;
+	return EXIT_SUCCESS;
 }
 
 

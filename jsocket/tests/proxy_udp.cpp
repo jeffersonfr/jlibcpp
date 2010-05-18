@@ -48,7 +48,7 @@ int init_args(int argc, char **argv)
 	Connection *host;
 	std::string line;
 
-	while (reader->EndOfFile() == false) {
+	while (reader->IsEOF() == false) {
 		try {
 			line = reader->ReadLine();
 			

@@ -353,7 +353,6 @@ int WrapperProcess::WriteBuffer(const char *data_, int data_length_)
 			l = 0;
 			break;
 		} else {
-			printf(":::::::: %d, %d, %d, %d, %d\n", _wbuffer_length, _wcurrent_index, data_length_, l, size);
 			memcpy((_wbuffer + _wcurrent_index), (data_ + data_length_ - l), size);
 			_wcurrent_index += size;
 			l -= size;

@@ -33,12 +33,12 @@ using namespace jio;
 void set_col(char fg_color,char bg_color)
 {
 	fg_color += 30; bg_color += 40;
-    printf ("\033[%d;%dm",fg_color,bg_color);
+	std::cout << "\033[" << fg_color << ";" << bg_color << "m" << std::flush;
 }
 
 void nocol(void)
 {
-	printf("%s",RESET);
+	std::cout << RESET << std::endl;
 }
 
 char * Indirizzo(unsigned int I)
@@ -51,101 +51,91 @@ char * Indirizzo(unsigned int I)
 			
 void LoggaUDP(struct udphdr *uh, unsigned long S, unsigned long D )
 {
-	struct servent *P; //porta --> servizio
-	P=NULL;
 	set_col(CYN,BLK);
-	printf("UDP  ");
+	std::cout << "UDP  ";
 	nocol();
 	set_col(RED,BLK);
-	printf("packet       ");
-
-	printf("from %15s on (%5d)", Indirizzo(S), ntohs(uh->dest));
+	std::cout << "packet from " << Indirizzo(S) << " on (" << ntohs(uh->dest) << ")";
 	nocol();
-	printf("\n");
-	fflush(stdout);
+	std::cout << std::endl;
 }
 
 void LoggaICMP(struct icmphdr * ih, unsigned long S , unsigned long D )
 {
 	set_col(BLU,BLK);
-	printf("ICMP");
+	std::cout << "ICMP";
 	nocol();
 	set_col(GRN,BLK);
-	switch (ih->type)
-	{
+
+	switch (ih->type) {
 		case ICMP_ECHOREPLY:
-			printf(" echo reply  ");
+			std::cout << " echo reply  ";
 			break;
 		case ICMP_DEST_UNREACH:
-			printf(" dest unreach");
+			std::cout << " dest unreach";
 			break;
 		case ICMP_ECHO:
-			printf(" echo request");
+			std::cout << " echo request";
 			break;
 		case ICMP_SOURCE_QUENCH:
-			printf(" SourceQuench");
+			std::cout << " SourceQuench";
 			break;
 		case ICMP_REDIRECT:
-			printf(" Redirect    ");
+			std::cout << " Redirect    ";
 			break;
 		case ICMP_TIME_EXCEEDED:
-			printf(" TimeExcedeed");
+			std::cout << " TimeExcedeed";
 			break;
 		case ICMP_PARAMETERPROB:
-			printf(" ParamProblem");
+			std::cout << " ParamProblem";
 			break;
 		case ICMP_TIMESTAMP:
-			printf(" TimeStampREQ");
+			std::cout << " TimeStampREQ";
 			break;
 		case ICMP_TIMESTAMPREPLY:
-			printf(" TimeStampREP");
+			std::cout << " TimeStampREP";
 			break;
 		case ICMP_INFO_REQUEST:
-			printf(" Info Request");
+			std::cout << " Info Request";
 			break;
 		case ICMP_INFO_REPLY:
-			printf(" Info Reply  ");
+			std::cout << " Info Reply  ";
 			break;
 		case ICMP_ADDRESS:
-			printf(" Addr MasqReq");
+			std::cout << " Addr MasqReq";
 			break;
 		case ICMP_ADDRESSREPLY:
-			printf(" Addr MasqRep");
+			std::cout << " Addr MasqRep";
 			break;
 	}
 
-	printf(" from %15s", Indirizzo(S));
+	std::cout << " from " << Indirizzo(S);
 	nocol();
-	printf("\n");			
-	fflush(stdout);
+	std::cout << std::endl;
 }
 
 void LoggaTCP(void)
 {
 	set_col(RED, BLK);
-	printf("TCP\n");
+	std::cout << "TCP\n";
 	nocol();
-	fflush(stdout);
+	std::cout << std::endl;
 }
 
 void LoggaConnessioneTCP( struct tcphdr  * th, unsigned long S, unsigned long D)
 {
-	struct servent *P; //porta --> servizio
-	P=NULL;
+	struct servent *P = NULL; //porta --> servizio
+	
 	set_col(RED,BLK);
-	printf("TCP  ");
+	std::cout << "TCP  ";
 	nocol();
 	set_col(YEL,BLK);
-	printf("connection   ");
-	    printf("from %15s on (%5d)", Indirizzo(S), ntohs(th->dest));
-	if ((P!=NULL))
-	{
-		printf(" <%s>", P->s_name);
+	std::cout << "connection from " << Indirizzo(S) << " on (" << ntohs(th->dest) << ")";
+	if ((P!=NULL)) {
+		std::cout << " <" << P->s_name << ">";
 	}
 	nocol();
-	printf("\n");
-	
-	fflush(stdout);
+	std::cout << std::endl;
 }
 void sniffer() 
 {

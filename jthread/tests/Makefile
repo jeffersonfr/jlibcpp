@@ -32,7 +32,22 @@ OBJS_producer_consumer = \
 OBJS_pi = \
 		pi.o\
 
-all: counter stress quicksort philosopher producer_consumer pi
+OBJS_monitor1 = \
+		monitor1.o\
+
+OBJS_monitor2 = \
+		monitor2.o\
+
+OBJS_monitor3 = \
+		monitor3.o\
+
+OBJS_monitor4 = \
+		monitor4.o\
+
+OBJS_timertask = \
+		timertask.o\
+
+all: counter stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask
 
 counter: $(OBJS_counter)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
@@ -52,6 +67,21 @@ producer_consumer: $(OBJS_producer_consumer)
 pi: $(OBJS_pi)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
+monitor1: $(OBJS_monitor1)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+        
+monitor2: $(OBJS_monitor2)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+        
+monitor3: $(OBJS_monitor3)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+        
+monitor4: $(OBJS_monitor4)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+        
+timertask: $(OBJS_timertask)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; echo -e "Compiling $< ...  $(OK)" 
 
@@ -59,4 +89,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ counter stress quicksort philosopher producer_consumer pi
+	@rm -rvf *.o *~ counter stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask

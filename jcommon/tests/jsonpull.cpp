@@ -3,12 +3,14 @@
  * For license terms, see the file COPYING along with this library.
  */
 
+#include "jjson.h"
+
+#include <iostream>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
-
-#include "jjson.h"
 
 using namespace jcommon;
 
@@ -17,7 +19,7 @@ int main( int argc, char * argv[] )
 	char * filename = NULL;
 
 	if( argc < 2 ) {
-		printf( "Usage: %s <json_file>\n", argv[0] );
+		std::cout << "Usage: " << argv[0] << " <json_file>" << std::endl;
 		exit( -1 );
 	} else {
 		filename = argv[1];
@@ -25,7 +27,7 @@ int main( int argc, char * argv[] )
 
 	FILE * fp = fopen ( filename, "r" );
 	if( NULL == fp ) {
-		printf( "cannot not open %s\n", filename );
+		std::cout << "cannot not open " << filename << std::endl;
 		exit( -1 );
 	}
 
@@ -48,37 +50,37 @@ int main( int argc, char * argv[] )
 
 		switch( event->getEventType() ) {
 			case JSONPullEvent::eStartObject:
-				printf( "{\n" );
+				std::cout << "{" << std::endl;
 				break;
 			case JSONPullEvent::eEndObject:
-				printf( "},\n" );
+				std::cout << "}," << std::endl;
 				break;
 			case JSONPullEvent::eStartArray:
-				printf( "[" );
+				std::cout << "[";
 				break;
 			case JSONPullEvent::eEndArray:
-				printf( "],\n" );
+				std::cout << "]," << std::endl;
 				break;
 			case JSONPullEvent::eNull:
-				printf( "null,\n" );
+				std::cout << "null,\n" << std::endl;
 				break;
 			case JSONPullEvent::eName:
-				printf( "\"%s\" : ", ((JSONTextEvent*)event)->getText() );
+				std::cout << "\"" << ((JSONTextEvent*)event)->getText() << "\" : "; 
 				break;
 			case JSONPullEvent::eString:
-				printf( "\"%s\",\n", ((JSONTextEvent*)event)->getText() );
+				std::cout << "\"" << ((JSONTextEvent*)event)->getText() << "\", " << std::endl;
 				break;
 			case JSONPullEvent::eNumber:
-				printf( "%s,\n", ((JSONTextEvent*)event)->getText() );
+				std::cout << ((JSONTextEvent*)event)->getText() << ", " << std::endl;
 				break;
 			case JSONPullEvent::eBoolean:
-				printf( "%s,\n", ((JSONTextEvent*)event)->getText() );
+				std::cout << ((JSONTextEvent*)event)->getText() << ", " << std::endl;
 				break;
 			case JSONPullEvent::eComment:
-				printf( "//%s\n", ((JSONTextEvent*)event)->getText() );
+				std::cout << "//" << ((JSONTextEvent*)event)->getText() << std::endl;
 				break;
 			case JSONPullEvent::ePadding:
-				printf( "%s\n", ((JSONTextEvent*)event)->getText() );
+				std::cout << ((JSONTextEvent*)event)->getText() << std::endl;
 				break;
 		}
 
@@ -86,7 +88,7 @@ int main( int argc, char * argv[] )
 	}
 
 	if( NULL != parser.getError() ) {
-		printf( "\n\nerror: %s\n", parser.getError() );
+		std::cout << "\nerror: " << parser.getError() << std::endl;
 	}
 
 	return 0;

@@ -34,20 +34,20 @@ namespace jcommon {
  */
 class RuntimeException : public jcommon::Exception, public std::runtime_error{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        RuntimeException(std::string reason);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~RuntimeException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		RuntimeException(std::string reason);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~RuntimeException() throw();
 
 		/**
 		 * \brief

@@ -104,12 +104,6 @@ void Polices::Load(std::string filename)
 			}
 		}
 	}
-
-	/*
-	   for (std::vector<struct police_t>::iterator i=_polices.begin(); i!=_polices.end(); i++) {
-	   printf(":: id [%s], content [%s] %d\n", (*i).key.c_str(), (*i).value.c_str(), (*i).id);
-	   }
-	   */
 }
 
 void Polices::Save()

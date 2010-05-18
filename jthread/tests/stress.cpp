@@ -9,6 +9,9 @@
 #include "jthreadexception.h"
 #include "jdate.h"
 
+#include <iostream>
+
+#include <stdio.h>
 #include <unistd.h>
 #include <sys/time.h>
 
@@ -32,7 +35,7 @@ class T : public jthread::Thread{
 
 		virtual void Start()
 		{
-			printf("Hello, world %d\n", i);
+			std::cout << "Hello, world %d" << std::endl;
 		}
 
 };
@@ -62,7 +65,7 @@ int main() {
 	
 	finish = get_current_time();
 	
-	printf("Thread loop: %.4f ms\n", (finish - start)/1000.0);
+	std::cout << "Thread loop: " << (finish - start)/1000.0 << " ms" << std::endl;
 	
 	/*
 	// Semaphore loop
@@ -74,7 +77,7 @@ int main() {
 	
 	finish = get_current_time();
 	
-	printf("Semaphore loop: %.4f ms\n", (finish - start)/1000.0);
+	std::cout << "Semaphore loop: " << (finish - start)/1000.0 << " ms" << std::endl;
 	
 	// Mutex loop
 	start = get_current_time();
@@ -88,7 +91,7 @@ int main() {
 	
 	finish = get_current_time();
 	
-	printf("Mutex loop: %.4f ms\n", (finish - start)/1000.0);
+	std::cout << "Mutex loop: " << (finish - start)/1000.0 << " ms" << std::endl;
 	*/
 
 	return 0;

@@ -6,6 +6,9 @@
 
 #include "jthread.h"
 
+#include <iostream>
+
+#include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 
@@ -30,12 +33,6 @@ static int threads_avail;
 
 #define SWAP(a, i, j, width) \
 { \
-  int n; \
-  uint8_t uc; \
-  unsigned short us; \
-  unsigned long ul; \
-  unsigned long long ull; \
- \
   if (SUB(a, i) == pivot) \
     pivot = SUB(a, j); \
   else if (SUB(a, j) == pivot) \
@@ -44,32 +41,47 @@ static int threads_avail;
   /* one of the more convoluted swaps I've done */ \
   switch(width) { \
   case 1: \
-    uc = *((uint8_t *) SUB(a, i)); \
+		{ \
+		uint8_t u; \
+    u = *((uint8_t *) SUB(a, i)); \
     *((uint8_t *) SUB(a, i)) = *((uint8_t *) SUB(a, j)); \
-    *((uint8_t *) SUB(a, j)) = uc; \
+    *((uint8_t *) SUB(a, j)) = u; \
     break; \
+		} \
   case 2: \
-    us = *((unsigned short *) SUB(a, i)); \
+		{ \
+		uint16_t u; \
+    u = *((unsigned short *) SUB(a, i)); \
     *((unsigned short *) SUB(a, i)) = *((unsigned short *) SUB(a, j)); \
-    *((unsigned short *) SUB(a, j)) = us; \
+    *((unsigned short *) SUB(a, j)) = u; \
     break; \
+		} \
   case 4: \
-    ul = *((unsigned long *) SUB(a, i)); \
-    *((unsigned long *) SUB(a, i)) = *((unsigned long *) SUB(a, j)); \
-    *((unsigned long *) SUB(a, j)) = ul; \
+		{ \
+		uint32_t u; \
+    u = *((uint32_t *) SUB(a, i)); \
+    *((uint32_t *) SUB(a, i)) = *((uint32_t *) SUB(a, j)); \
+    *((uint32_t *) SUB(a, j)) = u; \
     break; \
+		} \
   case 8: \
-    ull = *((unsigned long long *) SUB(a, i)); \
+		{ \
+		uint64_t u; \
+    u = *((unsigned long long *) SUB(a, i)); \
     *((unsigned long long *) SUB(a,i)) = *((unsigned long long *) SUB(a,j)); \
-    *((unsigned long long *) SUB(a, j)) = ull; \
+    *((unsigned long long *) SUB(a, j)) = u; \
     break; \
+		} \
   default: \
+		{ \
+		uint8_t u; \
     for(n=0; n<width; n++) { \
-      uc = ((uint8_t *) SUB(a, i))[n]; \
+      u = ((uint8_t *) SUB(a, i))[n]; \
       ((uint8_t *) SUB(a, i))[n] = ((uint8_t *) SUB(a, j))[n]; \
-      ((uint8_t *) SUB(a, j))[n] = uc; \
+      ((uint8_t *) SUB(a, j))[n] = u; \
     } \
     break; \
+		} \
   } \
 }
 
@@ -302,10 +314,10 @@ int main()
 	q.Start();
 	q.WaitThread();
 
-	printf("Print sorted array\n");
+	std::cout << "Print sorted array" << std::endl;
 	
 	for (int i=0; i<10; i++) {
-		printf("%d\n", elements[i]);
+		std::cout << elements[i] << std::endl;
 	}
 
 	return 0;

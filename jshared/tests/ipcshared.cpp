@@ -1,11 +1,15 @@
 #include "jsharedmemory.h"
 
+#include <iostream>
+
+#include <stdlib.h>
+
 using namespace jshared;
 
 int main(int argc, char **argv)
 {
 	if (argc < 2) {
-		puts("use:: ./ipcmap <id>");
+		std::cout << "use:: ./ipcmap <id>" << std::endl;
 
 		return -1;
 	}
@@ -20,7 +24,7 @@ int main(int argc, char **argv)
 		try {
 			m = new SharedMemory(key, 10000);
 		} catch (...) {
-			puts("Cannot create the shared memory");
+			std::cout << "Cannot create the shared memory" << std::endl;
 
 			return -1;
 		}

@@ -103,7 +103,7 @@ void sayerror(char *msg, jsocket::Socket *sockIn, jsocket::Socket *sockOut);
 int process_request(jsocket::Socket *sockIn);
 
 // global constants
-char *BADREQ =
+char *BADREQ = (char *)
 	"HTTP/1.0 400 ERROR\r\n"
 	"Server: thproxyd\r\n"
 	"Content-type: text/html\r\n"
@@ -115,7 +115,7 @@ char *BADREQ =
 	"Reason: Invalid or unsupported method.<P>\n"
 	"</BODY>\n";
 
-char *SERVERR =
+char *SERVERR = (char *)
 	"HTTP/1.0 500 ERROR\r\n"
 	"Server: thproxyd\r\n"
 	"Content-type: text/html\r\n"
@@ -126,7 +126,7 @@ char *SERVERR =
 	"Reason: Internal proxy error.<P>\n"
 	"</BODY>\n";
 
-char *SERVCOERR =
+char *SERVCOERR = (char *)
 	"HTTP/1.0 500 ERROR\r\n"
 	"Server: thproxyd\r\n"
 	"Content-type: text/html\r\n"
@@ -137,7 +137,7 @@ char *SERVCOERR =
 	"Reason: Invalid connection.<P>\n"
 	"</BODY>\n";
 
-char *SERVDNSERR =
+char *SERVDNSERR = (char *)
 	"HTTP/1.0 500 ERROR\r\n"
 	"Server: thproxyd\r\n"
 	"Content-type: text/html\r\n"
@@ -148,7 +148,7 @@ char *SERVDNSERR =
 	"Reason: Bad address - DNS cann't resolve address.<P>\n"
 	"</BODY>\n";
 
-char *SERVTIMEOUT =
+char *SERVTIMEOUT = (char *)
 	"HTTP/1.0 500 ERROR\r\n"
 	"Server: thproxyd\r\n"
 	"Content-type: text/html\r\n"
@@ -159,7 +159,7 @@ char *SERVTIMEOUT =
 	"Reason: Server time out while connection establishment or data transfer.<P>\n"
 	"</BODY>\n";
 
-char *POSTERR =
+char *POSTERR = (char *)
 	"HTTP/1.0 500 ERROR\r\n"
 	"Server: thproxyd\r\n"
 	"Content-type: text/html\r\n"
@@ -173,22 +173,21 @@ char *POSTERR =
 /* displays the right syntax to call Webroute */
 void help()
 {
-	fprintf(stdout, "Syntax:\n");
-	fprintf(stdout, "webroute [ -p port ] [ -x h:p ] [ -t timeout ] [ -m max_threads ] [ -n ]\n");
-	fprintf(stdout, "Available options are:\n");
-	fprintf(stdout, "  -p allows you to run webroute on the port <port>.\n");
-	fprintf(stdout, "     If you don't have superuser privileges, you must use a port > 5000.\n");
-	fprintf(stdout, "     The default port is %d.\n", LISTENPORT);
-	fprintf(stdout, "  -x enables multi-proxy feature. This means that this instance of Webroute\n");
-	fprintf(stdout, "     doesn't have itself access to the internet, but the one which is running\n");
-	fprintf(stdout, "     on port <p> of host <h> can provide an access. It's possible to chain\n");
-	fprintf(stdout, "     as many instances of Webroute as you want. That depends of your network\n");
-	fprintf(stdout, "     topology\n");
-	fprintf(stdout, "  -t <timeout> specifies how many seconds the connection will stay connected (or trying to connect) when\n");
-	fprintf(stdout, "     no data arrives. After this time, the connection will be canceled.\n");
-	fprintf(stdout, "  -n prevents browsers from retrieving web pages from their own cache when the\n");
-	fprintf(stdout, "     user asks for a \"Reload\". The page will then always be reloaded.\n");
-	fprintf(stdout, "  -m max count of proxy threads allocated to serve the requests\n");
+	std::cout << "Syntax:" << std::endl;
+	std::cout << "webroute [ -p port ] [ -x h:p ] [ -t timeout ] [ -m max_threads ] [ -n ]" << std::endl;
+	std::cout << "Available options are:" << std::endl;
+	std::cout << "  -p allows you to run webroute on the port <port>." << std::endl;
+	std::cout << "     If you don't have superuser privileges, you must use a port > 5000." << std::endl;
+	std::cout << "     The default port is " << LISTENPORT << std::endl;
+	std::cout << "  -x enables multi-proxy feature. This means that this instance of Webroute" << std::endl;
+	std::cout << "     doesn't have itself access to the internet, but the one which is running" << std::endl;
+	std::cout << "     on port <p> of host <h> can provide an access. It's possible to chain" << std::endl;
+	std::cout << "     as many instances of Webroute as you want. That depends of your network topology" << std::endl;
+	std::cout << "  -t <timeout> specifies how many seconds the connection will stay connected (or trying to connect) when" << std::endl;
+	std::cout << "     no data arrives. After this time, the connection will be canceled." << std::endl;
+	std::cout << "  -n prevents browsers from retrieving web pages from their own cache when the" << std::endl;
+	std::cout << "     user asks for a \"Reload\". The page will then always be reloaded." << std::endl;
+	std::cout << "  -m max count of proxy threads allocated to serve the requests" << std::endl;
 }
 
 class Client : public jthread::Thread{
@@ -555,7 +554,7 @@ int main(int argc, char **argv)
 			char *p;
 			p = strchr(optarg, ':');
 			if (p == NULL) {	/* unspecified port number. let's quit */
-				fprintf(stderr, "missing port for next proxy\n");
+				std::cout << "missing port for next proxy" << std::endl;
 				help();
 				exit(1);
 			}

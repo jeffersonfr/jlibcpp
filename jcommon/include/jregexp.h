@@ -2702,11 +2702,11 @@ unsigned long basic_string_parser<E>::parse( const E* buf, const unsigned long b
 	int i = 0;
 	for( i=0; i<(int)buf_length && buf[i] != this->m_separator; i++ )
 	{
-		if( this->m_directives & NO_NEW_LINES && buf[i] == NEW_LINE ||
-				this->m_directives & NO_SPACES && buf[i] == SPACE ||
-				this->m_directives & NO_TABS && buf[i] == TAB ||
-				this->m_directives & NO_CARRIAGE_RETURNS && buf[i] == CARRIAGE_RETURN ||
-				this->m_directives & NO_LINE_FEEDS && buf[i] == LINE_FEED )
+		if( ((this->m_directives & NO_NEW_LINES) && (buf[i] == NEW_LINE)) ||
+				((this->m_directives & NO_SPACES) && (buf[i] == SPACE)) ||
+				((this->m_directives & NO_TABS) && (buf[i] == TAB)) ||
+				((this->m_directives & NO_CARRIAGE_RETURNS) && (buf[i] == CARRIAGE_RETURN)) ||
+				((this->m_directives & NO_LINE_FEEDS) && (buf[i] == LINE_FEED)) )
 		{
 			this->m_is_parsed = false;
 			break;
@@ -2737,11 +2737,12 @@ std::basic_istream<E>& basic_string_parser<E>::parse( std::basic_istream<E>& is 
 	while( it != buf.str().end() )
 	{
 		input = (*it);
-		if( this->m_directives & NO_NEW_LINES && input == NEW_LINE ||
-				this->m_directives & NO_SPACES && input == SPACE ||
-				this->m_directives & NO_TABS && input == TAB ||
-				this->m_directives & NO_CARRIAGE_RETURNS && input == CARRIAGE_RETURN ||
-				this->m_directives & NO_LINE_FEEDS && input == LINE_FEED )
+		// WARN:: para remover os warnnings foram adicionados parenteses no 'if' abaixo
+		if( ((this->m_directives & NO_NEW_LINES) && (input == NEW_LINE)) ||
+				((this->m_directives & NO_SPACES) && (input == SPACE)) ||
+				((this->m_directives & NO_TABS) && (input == TAB)) ||
+				((this->m_directives & NO_CARRIAGE_RETURNS) && (input == CARRIAGE_RETURN)) ||
+				((this->m_directives & NO_LINE_FEEDS) && (input == LINE_FEED)) )
 		{
 			this->m_is_parsed = false;
 			break;

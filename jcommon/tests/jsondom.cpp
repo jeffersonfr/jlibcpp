@@ -3,14 +3,16 @@
  * For license terms, see the file COPYING along with this library.
  */
 
+#include "jjson.h"
+
+#include <iostream>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <unistd.h>
 #include <assert.h>
-
-#include "jjson.h"
 
 using namespace jcommon;
 
@@ -23,15 +25,17 @@ static void postPrint( const JSONNode * node )
 		}
 
 		if( JSONNode::eObject == parent->getType() ) {
-			printf( "}" );
+			std::cout << "}";
 		} else {
 			assert( JSONNode::eArray == parent->getType() );
-			printf( "]" );
+			std::cout << "]";
 		}
 
 		postPrint( parent );
 	} else {
-		if( NULL != node->getParent() ) printf( "," );
+		if( NULL != node->getParent() ) {
+			std::cout << ",";
+		}
 	}
 }
 
@@ -40,7 +44,7 @@ int main( int argc, char * argv[] )
 	char * filename = NULL;
 
 	if( argc < 2 ) {
-		printf( "Usage: %s <json_file>\n", argv[0] );
+		std::cout << "usage: " << argv[0] << " <json_file>" << std::endl;
 		exit( -1 );
 	} else {
 		filename = argv[1];
@@ -48,7 +52,7 @@ int main( int argc, char * argv[] )
 
 	FILE * fp = fopen ( filename, "r" );
 	if( NULL == fp ) {
-		printf( "cannot not open %s\n", filename );
+		std::cout << "cannot not open " << filename << std::endl;
 		exit( -1 );
 	}
 
@@ -64,20 +68,18 @@ int main( int argc, char * argv[] )
 	parser.append( source, strlen( source ) );
 
 	if( NULL != parser.getError() ) {
-		printf( "\n\nerror: %s\n", parser.getError() );
+		std::cout << "\n\nerror: " << parser.getError() << std::endl;
 	}
 
 	free( source );
 
-	printf( "Test DomBuffer\n" );
+	std::cout << "Test DomBuffer" << std::endl;
 
 	JSONDomBuffer buffer( parser.getValue(), 1 );
 
-	printf( "%s\n", buffer.getBuffer() );
+	std::cout << buffer.getBuffer() << std::endl << std::endl;
 
-	printf( "\n" );
-
-	printf( "Test Iterator\n" );
+	std::cout << "Test Iterator" << std::endl;
 
 	JSONIterator iterator( parser.getValue() );
 
@@ -87,54 +89,52 @@ int main( int argc, char * argv[] )
 
 		switch( node->getType() ) {
 			case JSONNode::eObject:
-				printf( "{" );
+				std::cout << "{";
 				break;
 			case JSONNode::eArray:
-				printf( "[" );
+				std::cout << "[";
 				break;
 			case JSONNode::ePair:
 			{
 				JSONStringBuffer buffer;
 				JSONCodec::encode( ((JSONPairNode*)node)->getName(), &buffer );
-				printf( "\"%s\" : ", buffer.getBuffer() );
+				std::cout << "\"" << buffer.getBuffer() << "\" : ";
 				break;
 			}
 			case JSONNode::eString:
 			{
 				JSONStringBuffer buffer;
 				JSONCodec::encode( ((JSONStringNode*)node)->getValue(), &buffer );
-				printf( "\"%s\"", buffer.getBuffer() );
+				std::cout << "\"" << buffer.getBuffer() << "\"";
 				postPrint( node );
 				break;
 			}
 			case JSONNode::eNull:
-				printf( "null" );
+			std::cout << "null";
 				postPrint( node );
 				break;
 			case JSONNode::eDouble:
-				printf( "%lf", ((JSONDoubleNode*)node)->getValue() );
+				std::cout << ((JSONDoubleNode*)node)->getValue();
 				postPrint( node );
 				break;
 			case JSONNode::eInt:
-				printf( "%d", ((JSONIntNode*)node)->getValue() );
+				std::cout << ((JSONIntNode*)node)->getValue();
 				postPrint( node );
 				break;
 			case JSONNode::eBoolean:
-				printf( "%s", ((JSONBooleanNode*)node)->getValue() ? "true" : "false" );
+				std::cout << ((((JSONBooleanNode*)node)->getValue() == true)?"true":"false");
 				postPrint( node );
 				break;
 			case JSONNode::eComment:
-				printf( "//%s\n", ((JSONCommentNode*)node)->getValue() );
+				std::cout << "//" << ((JSONCommentNode*)node)->getValue() << std::endl;
 				break;
 			default:
-				printf( "unknown\n" );
+				std::cout << "unknown" << std::endl;
 				break;
 		}
-
-
 	}
 
-	printf( "\n" );
+	std::cout << std::endl;
 
 	return 0;
 }

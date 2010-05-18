@@ -475,47 +475,4 @@ void SharedFifo::Close()
 {
 }
 
-std::string SharedFifo::what()
-{
-#ifdef _WIN32
-#else
-	/*
-   	   struct shmprefix_t *p;
-	   
-	   printf("My Shared Memory information:\n");
-	   if(shm==NULL) {
-	   printf("Handle is NULL!\n");
-	   return;
-	   }
-	   
-	   if(shm->mem == NULL) {
-	   printf("isn't attached to shared mem\n");
-	   return;
-	   }
-	   p=(struct shmprefix*)shm->mem;
-	   
-	   printf("Segment id: %d\nMem: %p\nRead pos: %d\nWrite pos: %d\n", _shm->sid,shm->mem,p->read,p->write);
-	   
-	   if(p->read == p->write) {
-	   printf("No blocks in shared memory\n");
-	   } else {
-	   void *ptr = (char*)shm->mem + p->read;
-	   int count=0;
-	   while(ptr != (char*)shm->mem + p->write) {
-	   struct shmbh_t *h = (struct shmbh_t *)ptr;
-	   count++;
-	   printf("block: %d ",count);
-	   printf("size: %d ",h->sz);
-	   printf("\n");
-	   (char*)ptr += h->sz + sizeof(struct shmbh_t);
-	   }
-	   printf("---\n");
-   	   
-	   }
-	 */
-#endif
-
-	return "SharedFifo";
-}
-
 }

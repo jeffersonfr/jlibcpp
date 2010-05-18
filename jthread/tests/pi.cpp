@@ -1,5 +1,5 @@
 #include "jthread.h"
-#include "jthreadgroup.h"
+#include "jthreadpool.h"
 #include "jruntimeexception.h"
 #include "jcondition.h"
 #include "jmutex.h"
@@ -78,7 +78,7 @@ class CPI : public jthread::Runnable{
 		{
 		}
 
-		virtual void Routine()
+		virtual void Run()
 		{
 			int myid = p->id;
 			int numprocs = p->noproc;
@@ -112,26 +112,25 @@ class CPI : public jthread::Runnable{
 					pi += finals[i];
 				}
 				endwtime = clock();
-				printf("pi is approximately %.16f, Error is %.16f\n", pi, fabs(pi - PI25DT));
-				printf("wall clock time = %f\n", (endwtime - startwtime) / CLOCKS_PER_SEC);
+				std::cout << "pi is approximately " << pi << ", Error is " << fabs(pi - PI25DT) << std::endl;
+				std::cout << "wall clock time = " << (endwtime-startwtime)/CLOCKS_PER_SEC << std::endl;
 			}
 		}
 };
 
 int main(int argc, char **argv)
 {
-	int n, i;
-		// done = 0, myid, numprocs, rc;
-	// double startwtime, endwtime;
 	parm *arg;
+	int n, 
+			i;
 
 	if (argc != 2) {
-		printf("Usage: %s n\n  where n is no. of thread\n", argv[0]);
+		std::cout << "usage: " << argv[0] << " n [where n is no. of thread]" << std::endl;
 		exit(1);
 	}
 	n = atoi(argv[1]);
 	if ((n < 1) || (n > MAX_THREAD)) {
-		printf("The no of thread should between 1 and %d.\n", MAX_THREAD);
+		std::cout << "The no of thread should between 1 and " << MAX_THREAD << std::endl;
 		exit(1);
 	}
 
@@ -146,7 +145,7 @@ int main(int argc, char **argv)
 	arg=(parm *)malloc(sizeof(parm)*n);
 
 	try {
-		jthread::ThreadGroup group1(n);
+		jthread::ThreadPool group1(n);
 
 		for (i = 0; i < n; i++) {
 			arg[i].id = i;

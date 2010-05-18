@@ -30,14 +30,10 @@
 
 namespace jthread {
 
-bool is_wait_time_out = false;
-	
 Semaphore::Semaphore(int value_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jthread::Semaphore");
-	
-	_is_open = false;
 	
 #ifdef _WIN32
 	_sa = NULL;
@@ -91,45 +87,15 @@ Semaphore::Semaphore(int value_):
 		}
 	}
 #endif
-
-	_is_open = true;
 }
 
 Semaphore::~Semaphore()
 {
-	if (_is_open == true) {
-		_is_open = false;
-
-#ifdef _WIN32
-		if ((void *)_sa != NULL) {
-			HeapFree(GetProcessHeap(), 0, _sa);
-		}
-
-		if ((void *)_semaphore != NULL) {
-			if (CloseHandle(_semaphore) == 0) {
-				throw SemaphoreException("Close semaphore failed");
-			}
-
-			_semaphore = NULL;
-		}
-#else
-		while (sem_destroy(&_semaphore) < 0) {
-			if (errno == EBUSY) {
-				Notify();
-			}
-		}
-
-		sem_destroy(&_semaphore);
-#endif
-	}
+	Release();
 }
 
 void Semaphore::Wait()
 {
-	if (_is_open == false) {
-		return;
-	}
-
 #ifdef _WIN32
 	switch (WaitForSingleObject(_semaphore, INFINITE)) {
 		case WAIT_OBJECT_0:
@@ -146,10 +112,6 @@ void Semaphore::Wait()
 
 void Semaphore::Wait(long long time_)
 {
-	if (_is_open == false) {
-		return;
-	}
-	
 #ifdef _WIN32
 	time_ /= 100000L;
 	
@@ -188,10 +150,6 @@ void Semaphore::Notify()
 {
 	AutoLock lock(&mutex);
 
-	if (_is_open == false) {
-		return;
-	}
-	
 #ifdef _WIN32
 		if (ReleaseSemaphore(_semaphore, 1, NULL) == 0) {
 			throw SemaphoreException("Notify semaphore failed");
@@ -211,17 +169,21 @@ void Semaphore::NotifyAll()
 {
 	AutoLock lock(&mutex);
 
-	if (_is_open == false) {
-		return;
-	}
-	
 #ifdef _WIN32
-	while (ReleaseSemaphore(_semaphore, 1, NULL) != 0);
+	LONG value;
+
+	ReleaseSemaphore(_semaphore, 0, &value);
+
+	if (value > 0) {
+		ReleaseSemaphore(_semaphore, value, NULL);
+	}
 #else
-	while (GetValue() <= 0) {
-		if (sem_post(&_semaphore) < 0) {
-			throw SemaphoreException("Notify semaphore failed");
-		}
+	int r;
+    
+	sem_getvalue(&_semaphore, &r);
+
+	while (r-- > 0) {
+		sem_post(&_semaphore);
 	}
 #endif
 }
@@ -230,10 +192,6 @@ bool Semaphore::TryWait()
 {
 	AutoLock lock(&mutex);
 
-	if (_is_open == false) {
-		return false;
-	}
-	
 #ifdef _WIN32
 	switch (WaitForSingleObject(_semaphore, 0L)) {
 		case WAIT_OBJECT_0:
@@ -258,12 +216,12 @@ bool Semaphore::TryWait()
 
 int Semaphore::GetValue()
 {
-	if (_is_open == false) {
-		return 0;
-	}
-
 #ifdef _WIN32
-	return 0;
+	LONG value;
+
+	ReleaseSemaphore(_semaphore, 0, &value);
+	
+	return value;
 #else
 	int r;
     
@@ -275,6 +233,26 @@ int Semaphore::GetValue()
 
 void Semaphore::Release()
 {
+	try {
+		NotifyAll();
+	} catch (SemaphoreException &e) {
+	}
+
+#ifdef _WIN32
+	if ((void *)_sa != NULL) {
+		HeapFree(GetProcessHeap(), 0, _sa);
+	}
+
+	if ((void *)_semaphore != NULL) {
+		if (CloseHandle(_semaphore) == 0) {
+			throw SemaphoreException("Close semaphore failed");
+		}
+
+		_semaphore = NULL;
+	}
+#else
+	sem_destroy(&_semaphore);
+#endif
 }
 
 }

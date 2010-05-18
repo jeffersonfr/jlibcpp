@@ -8,7 +8,7 @@
 
 using namespace jshared;
 
-// a estrutura naum pode conter ponteiros
+// WARNNING:: a estrutura naum pode conter ponteiros
 typedef struct {
 	char phone[20];
 	char callbk[20];
@@ -20,8 +20,8 @@ static MessageQueue *msqid = NULL;
 
 void usage() 
 {
-	puts("client use: ./msg_teste -k <key> [-p <priority>]");
-	puts("server use: ./msg_teste -s <tty> -k <key>");
+	std::cout << "client use: ./msg_teste -k <key> [-p <priority>]" << std::endl;
+	std::cout << "server use: ./msg_teste -s <tty> -k <key>" << std::endl;
 
 	exit(1);
 }
@@ -37,7 +37,7 @@ void server()
 			break;
 		}
 		
-		printf("ATDT %s %s\n", req.phone, req.callbk);
+		std::cout << "ATDT " << req.phone << " " << req.callbk << std::endl;
 
 		sleep(2);
 	}
@@ -91,12 +91,13 @@ int main(int argc, char **argv)
 	}
 
 	if (cmdopt_s && optind < argc) {
-		puts("Server mode does not accept args\n");
+		std::cout << "Server mode does not accept args\n" << std::endl;
+
 		usage();
 	}
 
 	if (!cmdopt_k) {
-		puts("Must supply IPC key in -k option\n");
+		std::cout << "Must supply IPC key in -k option\n" << std::endl;
 		usage();
 	}
 

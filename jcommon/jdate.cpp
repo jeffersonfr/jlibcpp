@@ -198,6 +198,11 @@ uint64_t Date::CurrentTimeMicros()
 #endif
 }
 
+uint64_t Date::GetTime()
+{
+	return _time;
+}
+
 int Date::GetDayOfMonth()
 {
 #ifdef _WIN32

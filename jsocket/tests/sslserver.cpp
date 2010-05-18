@@ -28,11 +28,11 @@ int main(void)
 		if (r > 0) {
 			msg[r] = 0;
 
-			printf("Received [%d]: %s\n", r, msg);
+			std::cout << "Received [" << r << "]: " << msg << std::endl;
 
 			s->Send("Hello Client!", 13);
 		} else {
-			printf("Erro no receive\n");
+			std::cout << "Erro no receive" << std::endl;
 		}
 
 		s->Close();
