@@ -35,11 +35,15 @@ Date::Date():
 {
 	jcommon::Object::SetClassName("jcommon::Date");
 	
-	_time = time(NULL);
-	
 #ifdef _WIN32
+	FILETIME ft;
+
 	GetLocalTime(&_zone);
+
+	GetSystemTimeAsFileTime(&ft);
+	FileTimeToSystemTime(&ft, _time);
 #else
+	_time = time(NULL);
 	_zone = localtime(&_time);
 	
 	if (_zone == NULL) {
@@ -62,22 +66,20 @@ Date::Date(time_t time_):
 	_time = time_;
 	
 #ifdef _WIN32
-	// GetLocalTime(&_zone);
-
 	int Y2, 
-		M2, 
-		Y, 
-		M, 
-		D, 
-		K,
-		hora,
-		horas, 
-		minutos, 
-		segundos,
-		MJD;
+			M2, 
+			Y, 
+			M, 
+			D, 
+			K,
+			hora,
+			horas, 
+			minutos, 
+			segundos,
+			MJD;
 
 	MJD = time_ >> 24;
-	hora = time_ & 0xFFFFFF;
+	hora = time_ & 0xffffff;
 
 	Y2 = (int) ((MJD - 15078.2) / 365.25);
 	M2 = (int) ((MJD - 14956.1 - (int) (Y2 * 365.25)) / 30.6001);
@@ -86,9 +88,9 @@ Date::Date(time_t time_):
 	Y  = Y2 + K;
 	M  = M2 - 1 - K * 12;
 
-	horas    = ((hora >> 20) & 0x0F) * 10 + ((hora >> 16) & 0x0F);
-	minutos  = ((hora >> 12) & 0x0F) * 10 + ((hora >>  8) & 0x0F);
-	segundos = ((hora >>  4) & 0x0F) * 10 + ((hora >>  0) & 0x0F);
+	horas    = ((hora >> 20) & 0x0f) * 10 + ((hora >> 16) & 0x0f);
+	minutos  = ((hora >> 12) & 0x0f) * 10 + ((hora >>  8) & 0x0f);
+	segundos = ((hora >>  4) & 0x0f) * 10 + ((hora >>  0) & 0x0f);
 
 	_zone.wDay = D; // 1-31
 	_zone.wMonth = M; // 1-12
@@ -117,23 +119,87 @@ Date::Date(int day, int month, int year):
 	jcommon::Object::SetClassName("jcommon::Date");
 	
 #ifdef _WIN32
+	FILETIME ft;
+
 	GetLocalTime(&_zone);
 	
-	// TODO:: win32 RtlTimeToSecondsSince1970
+	_zone.wDay = day; // 1-31
+	_zone.wMonth = month; // 1-12
+	_zone.wYear = year; // 1601-30827
+	// _zone.wSecond = seconds; // 0-59
+	// _zone.wMinute = minutes; // 0-59
+	// _zone.wHour = hour; // 0-23
+
+	SystemTimeToFileTime(&_zone, &ft);
+	FileTimeToSystemTime(&ft, _time);
 #else
+	_time = time(NULL);
+
+	struct tm t,
+						*l = localtime(&_time);
+
+	t.tm_sec = l->tm_sec;   // seconds (0 - 60) 
+	t.tm_min = l->tm_min;   // minutes (0 - 59) 
+	t.tm_hour = l->tm_hour; // hours (0 - 23) 
+	t.tm_mday = day;    		// day of month (1 - 31) 
+	t.tm_mon = month-1; 		// month of year (0 - 11) 
+	t.tm_year = year-1900;	// year - 1900 
+	t.tm_wday = 0;					// day of week (Sunday = 0) 
+	t.tm_yday = 0;    			// day of year (0 - 365) 
+	t.tm_isdst = 0;   			// is summer time in effect? 
+	t.tm_zone = NULL;  			// abbreviation of timezone name 
+	// long tm_gmtoff; 			// offset from UTC in seconds 
+
+	_time = mktime(&t);
+	_zone = localtime(&_time);
+	
+	if (_zone == NULL) {
+		try {
+			_zone = new struct tm;
+		} catch (std::bad_alloc &e) {
+			jcommon::RuntimeException("Cannot allocate memory");
+		}
+
+		memset(_zone, 0, sizeof(struct tm));
+	}
+#endif
+}
+
+Date::Date(int day, int month, int year, int hours, int minutes, int seconds):
+	jcommon::Object()
+{
+	jcommon::Object::SetClassName("jcommon::Date");
+	
+#ifdef _WIN32
+	FILETIME ft;
+
+	GetLocalTime(&_zone);
+	
+	_zone.wDay = day; // 1-31
+	_zone.wMonth = month; // 1-12
+	_zone.wYear = year; // 1601-30827
+	_zone.wHour = hours; // 0-23
+	_zone.wMinute = minutes; // 0-59
+	_zone.wSecond = seconds; // 0-59
+
+	SystemTimeToFileTime(&_zone, &ft);
+	FileTimeToSystemTime(&ft, _time);
+#else
+	_time = time(NULL);
+
 	struct tm t;
 
-	t.tm_sec = 0;     		// seconds (0 - 60) 
-	t.tm_min = 0;     		// minutes (0 - 59) 
-	t.tm_hour = 0;    		// hours (0 - 23) 
-	t.tm_mday = day;    	// day of month (1 - 31) 
-	t.tm_mon = month-1; 	// month of year (0 - 11) 
+	t.tm_sec = seconds;   	// seconds (0 - 60) 
+	t.tm_min = minutes;   	// minutes (0 - 59) 
+	t.tm_hour = hours; 			// hours (0 - 23) 
+	t.tm_mday = day;    		// day of month (1 - 31) 
+	t.tm_mon = month-1; 		// month of year (0 - 11) 
 	t.tm_year = year-1900;	// year - 1900 
-	t.tm_wday = 0;    		// day of week (Sunday = 0) 
-	t.tm_yday = 0;    		// day of year (0 - 365) 
-	t.tm_isdst = 0;   		// is summer time in effect? 
-	t.tm_zone = NULL;  		// abbreviation of timezone name 
-	// long tm_gmtoff; 		// offset from UTC in seconds 
+	t.tm_wday = 0;					// day of week (Sunday = 0) 
+	t.tm_yday = 0;    			// day of year (0 - 365) 
+	t.tm_isdst = 0;   			// is summer time in effect? 
+	t.tm_zone = NULL;  			// abbreviation of timezone name 
+	// long tm_gmtoff; 			// offset from UTC in seconds 
 
 	_time = mktime(&t);
 	_zone = localtime(&_time);
@@ -163,7 +229,7 @@ Date::~Date()
 uint64_t Date::CurrentTimeSeconds()
 {
 #ifdef _WIN32
-	return (long long)(GetTickCount()/1000);
+	return (long long)(GetTickCount64()/1000);
 #else
 	return (uint64_t)time(NULL);
 #endif
@@ -173,7 +239,7 @@ uint64_t Date::CurrentTimeMillis()
 {
 #ifdef _WIN32
 	// EXCLUDE:: win32 return clock();
-	return (long long)GetTickCount();
+	return (long long)GetTickCount64();
 #else
 	timeval t;
 
@@ -188,7 +254,7 @@ uint64_t Date::CurrentTimeMicros()
 {
 #ifdef _WIN32
 	// EXCLUDE:: win32 return clock()*1000;
-	return (long long)GetTickCount();
+	return (uint64_t)(GetTickCount64()*1000LL);
 #else
 	timeval t;
 

@@ -53,95 +53,101 @@ class Date : public virtual jcommon::Object{
 		
 	public:
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		Date();
-		
+
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		Date(time_t time_);
-		
+
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		Date(int day, int month, int year);
-		
+
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
+		Date(int day, int month, int year, int hours, int minutes, int seconds);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Date();
 
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static uint64_t CurrentTimeSeconds();
-		
+
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static uint64_t CurrentTimeMillis();
 
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static uint64_t CurrentTimeMicros();
-		
+
 		/**
 		 * \brief
 		 *
 		 */
 		uint64_t GetTime();
-		
+
 		/**
 		 * \brief
 		 *
 		 */
 		int GetDayOfMonth();
-		
+
 		/**
 		 * \brief
 		 *
 		 */
 		int GetMonth();
-		
+
 		/**
 		 * \brief The number of years since 1900.
 		 *
 		 */
 		int GetYear();
-		
+
 		/**
 		 * \brief
 		 *
 		 */
 		int GetSecond();
-		
+
 		/**
 		 * \brief
 		 *
 		 */
 		int GetMinute();
-		
+
 		/**
 		 * \brief
 		 *
 		 */
 		int GetHour();
-		
+
 		/**
 		 * \brief
 		 *
 		 */
 		int GetDayOfWeek();
-		
+
 		/**
 		 * \brief
 		 *
@@ -153,7 +159,7 @@ class Date : public virtual jcommon::Object{
 		 *
 		 */
 		std::string what();
-		
+
 };
 
 }

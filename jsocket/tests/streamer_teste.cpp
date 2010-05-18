@@ -30,19 +30,7 @@
 using namespace jsocket;
 using namespace jio;
 
-bool pipeCreated = false;
-int pipes[2];
-
-#ifndef _WIN32
 const double CLOCK_2_TIME_CONST = (double)1.0/0.09;
-
-uint64_t timeval2int(const timeval *t) 
-{
-   return (uint64_t)((t->tv_sec)*1000000LL+t->tv_usec);
-}
-#else
-const double CLOCK_2_TIME_CONST = (double)1.0/90.0;
-#endif
 
 uint8_t nullPacket [188]= {
 	0x47, 0x1F, 0xff, 0x1F, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -489,21 +477,19 @@ class Streamer: public jthread::Thread{
 
 			jio::FileInputStream input(&file);
 
-#ifndef _WIN32
-			struct timeval t0, tf;
-			gettimeofday(&t0, 0);
-#else
-			DWORD t0, tf;
-			t0 = GetTickCount();
-#endif
-			uint64_t atual = 0,
-					 primeiro = 0,
-					 pcrExt = 0;
+			uint64_t t0,
+							 tf;
+			uint64_t atual = 0LL,
+							 primeiro = 0LL,
+							 pcrExt = 0LL,
+							 tosleep = 0LL;
 			int r,
-				packetNo = 0;
+					packetNo = 0LL;
 
 			running = true;
 			stop = false;
+
+			t0 = jcommon::Date::CurrentTimeMillis();
 
 			while (!stop) {
 				while (paused) {
@@ -526,15 +512,6 @@ class Streamer: public jthread::Thread{
 
 				pids [pid]++;
 				
-				uint64_t tosleep;
-#ifndef _WIN32
-				struct timeval t1, 
-							   t2;
-#else
-				DWORD t1, 
-					  t2;
-#endif
-
 				if ((pid >= 0x0000 && pid <= 0x0001) || (pid >= 0x0010 && pid <= 0x1ffe)) {
 					if (jmpeg::TransportStreamPacket::HasAdaptationField(buffer)) {
 						unsigned plength = jmpeg::TransportStreamPacket::GetAdaptationFieldLength(buffer);
@@ -553,12 +530,8 @@ class Streamer: public jthread::Thread{
 									pcrExt = field->GetPCRExtension();
 
 									pcr = (pcr * 300 + pcrExt) / 300;
-#ifndef _WIN32
-									gettimeofday(&t1, 0);
-									primeiro = timeval2int(&t1);
-#else
-									primeiro = GetTickCount();
-#endif
+									
+									primeiro = jcommon::Date::CurrentTimeMillis();
 								} else if (pid == pidPcr) {
 									if (field->GetLength() > 0) {
 										ipcr = field->GetPCRBase();
@@ -566,21 +539,13 @@ class Streamer: public jthread::Thread{
 										ipcr = (ipcr * 300LL + pcrExt) / 300LL;
 
 										if (ipcr >= pcr) {
-#ifndef _WIN32
-											gettimeofday(&t2, 0);
-											atual = timeval2int(&t2);
-#else
-											atual = GetTickCount();
-#endif
+											atual = jcommon::Date::CurrentTimeMillis();
 											factor = (uint64_t)((double)(ipcr-pcr)*CLOCK_2_TIME_CONST);
 
 											if (atual - primeiro < factor) {
 												tosleep = factor - (atual - primeiro);
-#ifndef _WIN32
-												usleep(tosleep);
-#else
-												Sleep(tosleep);
-#endif
+
+												jthread::Thread::MSleep(tosleep);
 											} else {
 												//cout << "Perdi o tempo, nao vou dormir agora" << endl;
 											}
@@ -651,18 +616,14 @@ class Streamer: public jthread::Thread{
 					//pipe->Write((char*)nullPacket, 188);
 				}
 			}
-#ifndef _WIN32
-			gettimeofday(&tf, 0);
-			struct timeval tInterval;
-			timersub(&tf, &t0, &tInterval);
-			int hour = (int)tInterval.tv_sec / 3600;
-			int min = (int)tInterval.tv_sec / 60, sec = (int) tInterval.tv_sec % 60;
-#else
-			tf = GetTickCount();
-			unsigned long tInterval = tf - t0;
-			unsigned long sec = tInterval / 1000;
-			int hour = sec / 3600, min = sec / 60;
-#endif
+
+			tf = jcommon::Date::CurrentTimeMillis();
+
+			uint64_t diff = (tf-t0)/1000LL,
+							 hour = diff/3600LL,
+							 min = (diff%3600LL)/60LL,
+							 sec = (diff%60LL);
+
 			std::cout << std::dec << "Elapsed time: " << std::setfill('0') << std::setw(2) << hour << ':' << std::setw(2) << min << ':' << std::setw(2) << sec << std::endl;
 
 			running = false;
