@@ -197,6 +197,7 @@ OBJS_jthread = \
 	   jbufferexception.o\
 		 jcondition.o\
 		 jillegalstateexception.o\
+		 jmonitor.o\
 		 jmutex.o\
 		 jmutexexception.o\
 		 jrunnable.o\

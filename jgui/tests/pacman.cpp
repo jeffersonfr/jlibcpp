@@ -318,7 +318,7 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 			if (event->GetSymbol() == jgui::JKEY_ESCAPE) {
 				flag = false;
 
-				Release();
+				jgui::Frame::Release();
 
 				return;
 			}
