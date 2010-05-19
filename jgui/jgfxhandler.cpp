@@ -187,21 +187,23 @@ void GFXHandler::InitEngine()
 	*/
 
 	jcommon::Properties p;
-	std::vector<std::string> v;
+	std::vector<std::string> *v;
 
 	try {
 		p.Load("/etc/directfbrc");
 
 		v = p.GetProperties();
 
-		for (std::vector<std::string>::iterator i=v.begin(); i!=v.end(); i++) {
-			std::string value = p.GetProperty((*i), "nono");
+		for (std::vector<std::string>::iterator i=v->begin(); i!=v->end(); i++) {
+			std::string value = p.GetPropertyByName((*i), "nono");
 
 			if (value != "nono") {
 				// INFO:: /usr/local/etc/directfbrc
 				DirectFBSetOption((*i).c_str(), value.c_str());
 			}
 		}
+
+		delete v;
 	} catch (...) {
 	}
 
