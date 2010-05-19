@@ -48,6 +48,15 @@ void testObject()
 	}
 }
 
+void testTrim()
+{
+	std::string text = " Testando a chamada de funcao Trim\t\t\t\t  ";
+
+	text = jcommon::StringUtils::Trim(text);
+
+	std::cout << ":: Trim :: [" << text << "]" << std::endl << std::endl;
+}
+
 void testLink()
 {
 	jcommon::DynamicLink link;
@@ -204,6 +213,7 @@ void html_parser_test()
 int main(int argc, char *argv[])
 {
 	//testObject();
+	testTrim();
 	//testLink();
 	//testProperties();
 	//testSystem();

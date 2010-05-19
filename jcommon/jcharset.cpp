@@ -25,8 +25,8 @@
 
 #include <time.h>
 
-static const unsigned long ReplacementChar = 0x0000FFFDUL;
-static const unsigned long MaximumChar     = 0x7FFFFFFFUL;
+static const uint64_t ReplacementChar = 0x0000FFFDUL;
+static const uint64_t MaximumChar     = 0x7FFFFFFFUL;
 
 static const uint8_t UTF8ExtraBytes[256] = {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -43,7 +43,7 @@ static const uint8_t FirstByteBits[7] = {
 	0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC
 };
 
-static const unsigned long FirstByteMask[6] = {
+static const uint64_t FirstByteMask[6] = {
 	0xFF, 0x1F, 0x0F, 0x07, 0x03, 0x03
 };
 
@@ -113,18 +113,24 @@ jcharset_result_t Charset::UnicodeToUTF8(const Char **src_start, const Char *src
 	register char * dst = *dst_start;
 
 	while (src < src_end) {
-		register unsigned long ch;
-		register unsigned short bytes_to_write;
-		register unsigned short extra_bytes;
+		register uint64_t ch;
+		register uint32_t bytes_to_write,
+						 extra_bytes;
 
 		ch = *src++;
 
-		if (ch < 0x80) {                bytes_to_write = 1;
-		} else if (ch < 0x800) {        bytes_to_write = 2;
-		} else if (ch < 0x10000) {      bytes_to_write = 3;
-		} else if (ch < 0x200000) {     bytes_to_write = 4;
-		} else if (ch < 0x4000000) {    bytes_to_write = 5;
-		} else if (ch <= MaximumChar){  bytes_to_write = 6;
+		if (ch < 0x80) {
+			bytes_to_write = 1;
+		} else if (ch < 0x800) {
+			bytes_to_write = 2;
+		} else if (ch < 0x10000) {
+			bytes_to_write = 3;
+		} else if (ch < 0x200000) {
+			bytes_to_write = 4;
+		} else if (ch < 0x4000000) {
+			bytes_to_write = 5;
+		} else if (ch <= MaximumChar) {
+			bytes_to_write = 6;
 		} else {
 			bytes_to_write = 2;
 			ch = ReplacementChar;
@@ -308,9 +314,9 @@ int Charset::ReadUTF8(FILE *f, Char * dst)
 	return result;
 }
 
-char * Charset::ReadLatin1File(FILE *f, long *nbytes, long *nchars, long stop)
+char * Charset::ReadLatin1File(FILE *f, int64_t *nbytes, int64_t *nchars, int64_t stop)
 {
-	long pos, nch, max;
+	int64_t pos, nch, max;
 	char *line;
 	char *c;
 	int ch;
@@ -372,9 +378,11 @@ char * Charset::ReadLatin1File(FILE *f, long *nbytes, long *nchars, long stop)
 	return line;
 }
 
-char * Charset::ReadUTF8File(FILE *f, long *nbytes, long *nchars, long stop)
+char * Charset::ReadUTF8File(FILE *f, int64_t *nbytes, int64_t *nchars, int64_t stop)
 {
-	long pos, nch, max;
+	int64_t pos, 
+					nch, 
+					max;
 	char *line;
 	char *c;
 	int ch;
@@ -416,33 +424,33 @@ char * Charset::ReadUTF8File(FILE *f, long *nbytes, long *nchars, long stop)
 	return line;
 }
 
-char *Charset::ReadLatin1Buffer(FILE *f, long *nbytes, long *nchars)
+char *Charset::ReadLatin1Buffer(FILE *f, int64_t *nbytes, int64_t *nchars)
 {
 	return ReadLatin1File(f, nbytes, nchars, EOF);
 }
 
-char *Charset::ReadUTF8Buffer(FILE *f, long *nbytes, long *nchars)
+char *Charset::ReadUTF8Buffer(FILE *f, int64_t *nbytes, int64_t *nchars)
 {
 	return ReadUTF8File(f, nbytes, nchars, EOF);
 }
 
-char *Charset::ReadLatin1Line(FILE *f, long *nbytes, long *nchars)
+char *Charset::ReadLatin1Line(FILE *f, int64_t *nbytes, int64_t *nchars)
 {
 	return ReadLatin1File(f, nbytes, nchars, '\n');
 }
 
-char *Charset::ReadUTF8Line(FILE *f, long *nbytes, long *nchars)
+char *Charset::ReadUTF8Line(FILE *f, int64_t *nbytes, int64_t *nchars)
 {
 	return ReadUTF8File(f, nbytes, nchars, '\n');
 }
 
-int Charset::WriteLatin1(FILE *f, const char *utf8, long nbytes)
+int Charset::WriteLatin1(FILE *f, const char *utf8, int64_t nbytes)
 {
 	Char buf[1];
 	Char *bp;
 	char ch;
 	const char *sp;
-	long total = 0L;
+	int64_t total = 0LL;
 
 	sp = utf8;
 	while (nbytes > 0) {
@@ -450,7 +458,7 @@ int Charset::WriteLatin1(FILE *f, const char *utf8, long nbytes)
 		bp = buf;
 		UTF8ToUnicode(&sp, sp+7, &bp, bp+1);
 		/* determine what happened */
-		nbytes -= (long) (sp - utf8);
+		nbytes -= (int64_t) (sp - utf8);
 		utf8 = sp;
 		/* force Unicode Char into a Latin-1 char */
 		ch = (char) (buf[0] & 0x00FF);
@@ -461,16 +469,16 @@ int Charset::WriteLatin1(FILE *f, const char *utf8, long nbytes)
 	return total;
 }
 
-int Charset::WriteUTF8(FILE *f, const char *utf8, long nbytes)
+int Charset::WriteUTF8(FILE *f, const char *utf8, int64_t nbytes)
 {
-	long n, total = 0L;
+	int64_t n, total = 0LL;
 
 	while (nbytes > 256) {
-		n = (long) fwrite(utf8, 1, 256, f);
+		n = (int64_t) fwrite(utf8, 1, 256, f);
 		total += n;
 		nbytes -= n;
 	}
-	total += (long) fwrite(utf8, 1, nbytes, f);
+	total += (int64_t) fwrite(utf8, 1, nbytes, f);
 	fflush(f);
 	return total;
 }
@@ -480,8 +488,8 @@ char * Charset::UTF8ToLatin1(const char *utf8, int *bytes)
 	Char buf[1];
 	Char *bp;
 	const char *sp;
-	long total = 0L;
-	long nbytes = *bytes;
+	int64_t total = 0LL;
+	int64_t nbytes = *bytes;
 	char *dp;
 	char *dest;
 
@@ -498,7 +506,7 @@ char * Charset::UTF8ToLatin1(const char *utf8, int *bytes)
 		bp = buf;
 		UTF8ToUnicode(&sp, sp+7, &bp, bp+1);
 		/* determine what happened */
-		nbytes -= (long) (sp - utf8);
+		nbytes -= (int64_t) (sp - utf8);
 		utf8 = sp;
 		/* force Unicode Char into a Latin-1 char */
 		*dp++ = (char) (buf[0] & 0x00FF);
@@ -515,8 +523,8 @@ char * Charset::CorrectUTF8(const char *s, int *bytes)
 	Char *bp;
 	const Char *cbp;
 	const char *sp;
-	long total;
-	long nbytes = *bytes;
+	int64_t total;
+	int64_t nbytes = *bytes;
 	char *dp;
 	char *dest;
 	char tmp[8];
@@ -541,7 +549,7 @@ char * Charset::CorrectUTF8(const char *s, int *bytes)
 		UTF8ToUnicode(&sp, sp+7, &bp, bp+1);
 
 		/* determine what happened */
-		nbytes -= (long) (sp - s);
+		nbytes -= (int64_t) (sp - s);
 
 		/* check for any difference, copy string also */
 		cbp = buf;
@@ -549,7 +557,7 @@ char * Charset::CorrectUTF8(const char *s, int *bytes)
 		UnicodeToUTF8(&cbp, cbp+1, &tp, tp+7);
 		i = (int) (dp-dest);
 		if (total-i < tp-tmp) {
-			total = i + (long) (tp-tmp);
+			total = i + (int64_t) (tp-tmp);
 			dest = (char *)realloc(dest, total+1);
 			dp = dest + i;
 		}
@@ -571,9 +579,9 @@ char * Charset::CorrectUTF8(const char *s, int *bytes)
 	return dest;
 }
 
-int Charset::IsASCII(const char *utf8, long nbytes)
+int Charset::IsASCII(const char *utf8, int64_t nbytes)
 {
-	long i;
+	int64_t i;
 
 	for (i=0; i < nbytes; i++) {
 		if (*utf8 & 0x80)
@@ -583,9 +591,9 @@ int Charset::IsASCII(const char *utf8, long nbytes)
 	return 1;
 }
 
-int Charset::IsLatin1(const char *utf8, long nbytes)
+int Charset::IsLatin1(const char *utf8, int64_t nbytes)
 {
-	long i;
+	int64_t i;
 
 	for (i=0; i < nbytes; i++) {
 		if (*utf8 & 0x80) {

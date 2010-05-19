@@ -123,7 +123,7 @@ template< typename E >class basic_parser
 		 * basic_object_parser. For parse method is used different implementation 
 		 * depending on type of parser - if terminal_type, non_terminal_type or choice_type.
 		 */
-		virtual unsigned long parse( const E *buf, const unsigned long buf_length ) = 0;
+		virtual uint64_t parse( const E *buf, const uint64_t buf_length ) = 0;
 
 		/*
 		 * \brief The parse method using which the input stream is searched and the value 
@@ -143,7 +143,7 @@ template< typename E >class basic_parser
 		 * \brief Returns the size of buffer succesfully parsed last time.
 		 *
 		 */
-		unsigned long parsed_size() const 
+		uint64_t parsed_size() const 
 		{
 			return this->m_parsed_size; 
 		}
@@ -152,7 +152,7 @@ template< typename E >class basic_parser
 		 * \brief Returns the size of data succesfully formatted into output.
 		 *
 		 */
-		unsigned long formatted_size() const 
+		uint64_t formatted_size() const 
 		{
 			return this->m_formatted_size; 
 		}
@@ -227,9 +227,9 @@ template< typename E >class basic_parser
 		//! Flag identifyng the result of last call to \ref format() method.
 		bool m_is_formatted;
 		//! The size of succesfully parsed data, can be zero, if \ref parse() failed.
-		unsigned long m_parsed_size;
+		uint64_t m_parsed_size;
 		//! The size of succesfully formatted data, can be zero, if \ref format() failed.
-		unsigned long m_formatted_size;
+		uint64_t m_formatted_size;
 		//! Used for trace and/or debugging
 		const char *m_name;
 
@@ -284,9 +284,9 @@ template< typename E >class basic_parser
 		 * \return previous size value
 		 *
 		 */
-		unsigned long change_parsed_size( const unsigned long the_parsed_size )
+		uint64_t change_parsed_size( const uint64_t the_parsed_size )
 		{
-			unsigned long size = this->m_parsed_size;
+			uint64_t size = this->m_parsed_size;
 			this->m_parsed_size = the_parsed_size;
 			return size;
 		}
@@ -297,9 +297,9 @@ template< typename E >class basic_parser
 		 * \return previous size value
 		 *
 		 */
-		unsigned long change_formatted_size( const unsigned long the_formatted_size )
+		uint64_t change_formatted_size( const uint64_t the_formatted_size )
 		{
-			unsigned long size = this->m_formatted_size;
+			uint64_t size = this->m_formatted_size;
 			this->m_formatted_size = the_formatted_size;
 			return size;
 		}
@@ -506,7 +506,7 @@ class basic_non_terminal : public basic_object_parser<E,A,F>
 		 * parsed objects manipulated by \sa basic_object_parser, which inherits from auto_ptr.
 		 *
 		 */
-		virtual unsigned long parse( const E *buf, const unsigned long buf_length );
+		virtual uint64_t parse( const E *buf, const uint64_t buf_length );
 
 		/*
 		 * \brief This parse method is taking symbols from the begin of istream to the end, 
@@ -597,7 +597,7 @@ class basic_subset : public basic_non_terminal<E, A>
 		typedef typename basic_parser<E>::parser_list_iterator parser_list_iterator;
 		basic_subset();
 		~basic_subset();
-		virtual unsigned long parse( const E *buf, const unsigned long buf_lenght );
+		virtual uint64_t parse( const E *buf, const uint64_t buf_lenght );
 		virtual std::basic_istream<E>& parse( std::basic_istream<E>& is );
 };
 
@@ -613,7 +613,7 @@ basic_subset<E,A>::~basic_subset()
 }
 
 	template< typename E, typename A >
-unsigned long basic_subset<E,A>::parse( const E *buf, const unsigned long buf_length )
+uint64_t basic_subset<E,A>::parse( const E *buf, const uint64_t buf_length )
 {
 	this->prepare_for_parsing();
 
@@ -740,7 +740,7 @@ class basic_ascii_range_terminal : public basic_object_parser<E,E,F>
 		 * \param[in]	buf_length	Length of the buffer
 		 * \return The lenght of the buffer part, which was parsed (==1), 0 if parse failed.
 		 */
-		unsigned long parse( const E *buf, const unsigned long buf_length );
+		uint64_t parse( const E *buf, const uint64_t buf_length );
 		std::basic_istream<E>& parse( std::basic_istream<E>& is );
 
 		/*
@@ -876,7 +876,7 @@ template< typename TracedObject > class tracer
 			return a_tracer;
 		}
 
-		friend inline tracer& operator << (tracer& a_tracer, unsigned long i)
+		friend inline tracer& operator << (tracer& a_tracer, uint64_t i)
 		{	
 			if( a_tracer.to_trace() )
 			{ 
@@ -1001,7 +1001,7 @@ template<typename TracedObject> tracer<TracedObject>& endl(tracer<TracedObject>&
 
 
 	template< typename E, E A, E B, typename F >
-unsigned long basic_ascii_range_terminal<E,A,B,F>::parse( const E *buf, const unsigned long buf_length )
+uint64_t basic_ascii_range_terminal<E,A,B,F>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_ascii_range_terminal<E,A,B,F> > t(*this, "parse", __FILE__, __LINE__);
@@ -1161,7 +1161,7 @@ class basic_choice :
 		 * \return The length of succesfully parsed word 
 		 *
 		 */
-		virtual unsigned long parse( const E *buf, const unsigned long buf_length );
+		virtual uint64_t parse( const E *buf, const uint64_t buf_length );
 
 		/*
 		 * \brief The method tries to parse any of the symbols, stops when finds the first successive parser
@@ -1196,7 +1196,7 @@ class basic_except_terminal : public basic_object_parser<E,E>
 		/*
 		 * \brief The method succeedes if input word is not recognized by except_choice.
 		 */
-		unsigned long parse( const E *buf, const unsigned long buf_length )
+		uint64_t parse( const E *buf, const uint64_t buf_length )
 		{
 			this->prepare_for_parsing();
 
@@ -1302,7 +1302,7 @@ class basic_set : public basic_non_terminal<E, A>
 		typedef typename basic_parser<E>::parser_list_iterator parser_list_iterator;
 		basic_set();
 		virtual ~basic_set();
-		virtual unsigned long parse( const E *buf, const unsigned long buf_length );
+		virtual uint64_t parse( const E *buf, const uint64_t buf_length );
 		virtual std::basic_istream<E>& parse( std::basic_istream<E>& is );
 };
 
@@ -1313,7 +1313,7 @@ basic_set<E,A>::basic_set() : basic_non_terminal<E,A>()
 
 
 	template< typename E, typename A >
-unsigned long basic_set<E,A>::parse( const E *buf, const unsigned long buf_length )
+uint64_t basic_set<E,A>::parse( const E *buf, const uint64_t buf_length )
 {
 	this->prepare_for_parsing();
 
@@ -1450,7 +1450,7 @@ template<typename E,
 		 * \brief The parse method tries to parse the subsequence as may times as possible
 		 *
 		 */
-		virtual unsigned long parse( const E *buf, const unsigned long buf_length );
+		virtual uint64_t parse( const E *buf, const uint64_t buf_length );
 
 		/*
 		 * \brief The parse method tries to parse the subsequence as may times as possible
@@ -1564,7 +1564,7 @@ std::basic_istream<E>& basic_repeated_sequence<E,P,F>::parse( std::basic_istream
 }
 
 	template<typename E, typename P, typename F >
-unsigned long basic_repeated_sequence<E,P,F>::parse( const E *buf, const unsigned long buf_length )
+uint64_t basic_repeated_sequence<E,P,F>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_repeated_sequence<E,P,F> >
@@ -1774,8 +1774,8 @@ template< typename E, typename A, typename F >
 }
 
 template< typename E, typename A, typename F >
-	unsigned long basic_non_terminal<E,A,F>
-::parse( const E *buf, const unsigned long buf_length )
+	uint64_t basic_non_terminal<E,A,F>
+::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_non_terminal<E,A,F> > t(*this, "parse", __FILE__, __LINE__);
@@ -1877,7 +1877,7 @@ class basic_pattern_parser :
 		 * \return the size of parsed string, if succesfullt, otherwise zero
 		 *
 		 */
-		virtual unsigned long parse( const E *buf, const unsigned long buf_length );
+		virtual uint64_t parse( const E *buf, const uint64_t buf_length );
 
 		/*
 		 * \brief The method succeedes if input is same as pattern passed to constructor
@@ -1957,7 +1957,7 @@ class basic_pattern_parser :
 
 
 	template< typename E >
-unsigned long basic_pattern_parser<E>::parse( const E *buf, const unsigned long buf_length )
+uint64_t basic_pattern_parser<E>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_pattern_parser<E> > t(*this, "parse", __FILE__, __LINE__);
@@ -2131,8 +2131,8 @@ class basic_terminal : public basic_object_parser< E, E, F >
 		basic_terminal();
 		virtual ~basic_terminal();
 
-		virtual unsigned long parse( const E *buf, 
-				const unsigned long buf_length )
+		virtual uint64_t parse( const E *buf, 
+				const uint64_t buf_length )
 		{
 #ifdef TRACE
 			tracer<basic_terminal<E,value> > t(*this, "parse", __FILE__, __LINE__);
@@ -2312,7 +2312,7 @@ class basic_option : public basic_non_terminal<E, A>
 		typedef typename basic_parser<E>::parser_list_iterator parser_list_iterator;
 		basic_option();
 		virtual ~basic_option();
-		virtual unsigned long parse( const E *buf, const unsigned long buf_length );
+		virtual uint64_t parse( const E *buf, const uint64_t buf_length );
 		virtual std::basic_istream<E>& parse( std::basic_istream<E>& is );
 
 		const char* get_name() const
@@ -2327,7 +2327,7 @@ basic_option<E,A>::basic_option() : basic_non_terminal<E,A>()
 }
 
 	template< typename E, typename A >
-unsigned long basic_option<E,A>::parse( const E *buf, const unsigned long buf_length )
+uint64_t basic_option<E,A>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_option<E,A> > t(*this, "parse", __FILE__, __LINE__);
@@ -2525,8 +2525,8 @@ basic_choice<E,A,F>::~basic_choice()
 }
 
 	template< typename E, typename A, typename F >
-unsigned long basic_choice<E,A,F>::parse( const E *buf, 
-		const unsigned long buf_length )
+uint64_t basic_choice<E,A,F>::parse( const E *buf, 
+		const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_choice<E,A,F> > t(*this, "parse", __FILE__, __LINE__);
@@ -2620,7 +2620,7 @@ class basic_value_parser : public basic_default_type_parser<E,A>
 		basic_value_parser();
 
 		~basic_value_parser();
-		virtual unsigned long parse( const E* buf, const unsigned long buf_length );
+		virtual uint64_t parse( const E* buf, const uint64_t buf_length );
 		virtual std::basic_istream<E>& parse( std::basic_istream<E>& is );
 
 };
@@ -2662,7 +2662,7 @@ class basic_string_parser :
 		basic_string_parser(const E separator, int a_directives);
 		~basic_string_parser();
 
-		unsigned long parse( const E* buf, const unsigned long buf_length );
+		uint64_t parse( const E* buf, const uint64_t buf_length );
 		std::basic_istream<E>& parse( std::basic_istream<E>& is );
 
 		operator std::basic_string<E>() 
@@ -2694,7 +2694,7 @@ basic_string_parser<E>::~basic_string_parser()
 }
 
 	template< typename E >
-unsigned long basic_string_parser<E>::parse( const E* buf, const unsigned long buf_length )
+uint64_t basic_string_parser<E>::parse( const E* buf, const uint64_t buf_length )
 {
 	this->prepare_for_parsing();
 
@@ -2807,7 +2807,7 @@ template<typename E,
 		 * (template parameter) the number of times defined by template parameter P.
 		 *
 		 */
-		virtual unsigned long parse( const E *buf, const unsigned long buf_length );
+		virtual uint64_t parse( const E *buf, const uint64_t buf_length );
 
 		/*
 		 * \brief The parse method tries to parse the sequence represented by factor 
@@ -2937,9 +2937,9 @@ template< typename E, unsigned int N, typename P, typename F >
 }
 
 template<typename E, unsigned int N, typename P, typename F >
-unsigned long basic_factor_with_repetition<E,N,P,F>::parse( 
+uint64_t basic_factor_with_repetition<E,N,P,F>::parse( 
 		const E *buf, 
-		const unsigned long buf_length )
+		const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_factor_with_repetition<E,N,P,F> >
@@ -3031,7 +3031,7 @@ class basic_term_with_exception : public basic_object_parser<E,A,F>
 		 * continues parsing the term.
 		 *
 		 */
-		virtual unsigned long parse( const E *buf, const unsigned long buf_length );
+		virtual uint64_t parse( const E *buf, const uint64_t buf_length );
 
 		/*
 		 * \brief The parse method tries to parse exception at first - if exception is found 
@@ -3133,7 +3133,7 @@ std::basic_istream<E>& basic_term_with_exception<E,A,B,F>::parse( std::basic_ist
 }
 
 	template< typename E, typename A, typename B, typename F >
-unsigned long basic_term_with_exception<E,A,B,F>::parse( const E *buf, const unsigned long buf_length )
+uint64_t basic_term_with_exception<E,A,B,F>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_term_with_exception<E,A,B> > t(*this, "parse", __FILE__, __LINE__);
@@ -3171,8 +3171,8 @@ basic_value_parser<E,A>::~basic_value_parser()
 }
 
 	template< typename E, typename A >
-unsigned long basic_value_parser<E,A>::parse( const E* buf, 
-		const unsigned long buf_length )
+uint64_t basic_value_parser<E,A>::parse( const E* buf, 
+		const uint64_t buf_length )
 {
 	this->prepare_for_parsing();
 
@@ -3237,12 +3237,12 @@ class wvalue_parser : public basic_value_parser<wchar_t,A>
 
 class match
 {
-	unsigned long 	m_pos;
-	unsigned long 	m_size;
+	uint64_t 	m_pos;
+	uint64_t 	m_size;
 	bool			m_is_valid;
 	public:
 	match() : m_pos(0), m_size(0), m_is_valid(false) {};
-	match( unsigned long pos, unsigned long size ) :
+	match( uint64_t pos, uint64_t size ) :
 		m_pos(pos), 
 		m_size(size), 
 		m_is_valid(true) 
@@ -3253,22 +3253,22 @@ class match
 	{
 	}
 
-	unsigned long get_pos() const
+	uint64_t get_pos() const
 	{
 		return this->m_pos;
 	}
 
-	unsigned long get_size() const
+	uint64_t get_size() const
 	{
 		return this->m_size;
 	}
 
-	void set_pos( unsigned long pos )
+	void set_pos( uint64_t pos )
 	{
 		this->m_pos = pos;
 	}
 
-	void set_size( unsigned long size )
+	void set_size( uint64_t size )
 	{
 		this->m_size = size;
 	}
@@ -3372,8 +3372,8 @@ class ere_base
 	typedef typename basic_parser<E>::parser_list parser_list;
 
 	protected:
-	unsigned long	m_rec_size;
-	unsigned long	m_rec_pos;
+	uint64_t	m_rec_size;
+	uint64_t	m_rec_pos;
 	bool			m_is_rec;
 	public:
 	ere_base()
@@ -3400,19 +3400,19 @@ class ere_base
 		this->m_is_rec = false;
 	}
 
-	void set( const unsigned long pos, const unsigned long size )
+	void set( const uint64_t pos, const uint64_t size )
 	{
 		this->m_is_rec = true;
 		this->m_rec_pos = pos;
 		this->m_rec_size = size;
 	}
 
-	unsigned long recognized_size() 
+	uint64_t recognized_size() 
 	{
 		return this->m_rec_size;
 	}
 
-	unsigned long recognized_position() 
+	uint64_t recognized_position() 
 	{
 		return this->m_rec_pos;
 	}
@@ -3422,11 +3422,11 @@ class ere_base
 		return this->m_match( this->m_rec_pos, this->m_rec_size );
 	}
 
-	virtual void assign_matches( matches::match_key parent_address, unsigned long& branch_pos, matches& m ) = 0;
-	virtual unsigned long recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions = true ) = 0;
+	virtual void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m ) = 0;
+	virtual uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true ) = 0;
 	virtual void push_parsers( parser_list& l ) = 0;
 
-	std::string to_str( const unsigned long i )
+	std::string to_str( const uint64_t i )
 	{
 		std::stringstream ss;
 		ss << i;
@@ -3464,7 +3464,7 @@ class ere_dupl_symbol
 	{
 		protected:
 			basic_terminal<E,'{'>				m_left_bracket;
-			basic_value_parser<E,unsigned long>	m_repeat_min;
+			basic_value_parser<E,uint64_t>	m_repeat_min;
 			basic_terminal<E,'}'>				m_right_bracket;
 		public:
 			virtual ~dup_count()
@@ -3479,11 +3479,11 @@ class ere_dupl_symbol
 			}
 			const char* get_name() const { return "{repeat_min}"; }
 
-			virtual unsigned long get_min()
+			virtual uint64_t get_min()
 			{
 				return this->m_repeat_min.get_valid();
 			}
-			virtual unsigned long get_max()
+			virtual uint64_t get_max()
 			{
 				return this->m_repeat_min.get_valid();
 			}
@@ -3503,11 +3503,11 @@ class ere_dupl_symbol
 			}
 			const char* get_name() const { return "{repeat_min,}"; }
 
-			unsigned long get_max()
+			uint64_t get_max()
 			{
 				// TODO - find the maximum integer
 				long i = -1;
-				return (unsigned long)i;
+				return (uint64_t)i;
 				// return MAX_INT;
 			}
 
@@ -3516,7 +3516,7 @@ class ere_dupl_symbol
 	class dup_count_max : public dup_count_unbound
 	{
 		protected:
-			basic_value_parser<E,unsigned long> m_repeat_max;
+			basic_value_parser<E,uint64_t> m_repeat_max;
 		public:
 			void push_parsers( parser_list &l )
 			{
@@ -3528,7 +3528,7 @@ class ere_dupl_symbol
 			}
 			const char* get_name() const { return "{repeat_min,repeat_max}"; }
 
-			unsigned long get_max()
+			uint64_t get_max()
 			{
 				return this->m_repeat_max.get_valid();
 			}
@@ -3572,7 +3572,7 @@ class ere_dupl_symbol
 	basic_non_terminal<E,dup_count_max>
 		m_dup_max;
 
-	unsigned long								m_rep;
+	uint64_t								m_rep;
 	public:
 
 	ere_dupl_symbol() : 
@@ -3593,7 +3593,7 @@ class ere_dupl_symbol
 		return this->m_lazy_star.is_parsed() || this->m_lazy_plus.is_parsed();
 	}
 
-	unsigned long get_min()
+	uint64_t get_min()
 	{
 		if( this->m_star.is_parsed() ) return 0;
 		else if( this->m_plus.is_parsed() ) return 1;
@@ -3605,7 +3605,7 @@ class ere_dupl_symbol
 		else return this->m_dup_max->get_min();
 	}
 
-	unsigned long get_max()
+	uint64_t get_max()
 	{
 		if( this->m_star.is_parsed() ) return INT_MAX;
 		else if( this->m_plus.is_parsed() ) return INT_MAX;
@@ -3617,12 +3617,12 @@ class ere_dupl_symbol
 		else return this->m_dup_max->get_max();
 	}
 
-	void set_recognized_dup( unsigned long rec_dup )
+	void set_recognized_dup( uint64_t rec_dup )
 	{
 		this->m_rep = rec_dup;
 	}
 
-	unsigned long get_recognized_dup()
+	uint64_t get_recognized_dup()
 	{
 		return this->m_rep;
 	}
@@ -3670,7 +3670,7 @@ class ere_dups
 	typedef typename basic_parser<E>::parser_list 
 		parser_list;
 
-	unsigned long m_rep;
+	uint64_t m_rep;
 	class dup_and_dup_branch
 	{
 		basic_choice<E,ere_dupl_symbol<E> > 
@@ -3686,7 +3686,7 @@ class ere_dups
 		const char* get_name() const { return "ere_dup,ere_dups"; }
 
 
-		unsigned long get_max()
+		uint64_t get_max()
 		{
 			double max = this->m_dup->get_max();
 			if( max == INT_MAX )
@@ -3700,7 +3700,7 @@ class ere_dups
 			if( max >= INT_MAX )
 				return INT_MAX;
 
-			return (unsigned long)max;
+			return (uint64_t)max;
 		}
 
 		bool is_lazy()
@@ -3709,7 +3709,7 @@ class ere_dups
 				(this->m_dups.is_parsed() && this->m_dups->is_lazy());
 		}
 
-		unsigned long get_min()
+		uint64_t get_min()
 		{
 			return this->m_dup->get_min() * this->m_dups->get_min();
 		}
@@ -3736,17 +3736,17 @@ class ere_dups
 		return "ere_dups"; 
 	}
 
-	void set_recognized_dup( unsigned long rec_dup )
+	void set_recognized_dup( uint64_t rec_dup )
 	{
 		this->m_rep = rec_dup;
 	}
 
-	unsigned long get_recognized_dup()
+	uint64_t get_recognized_dup()
 	{
 		return this->m_rep;
 	}
 
-	unsigned long get_max()
+	uint64_t get_max()
 	{
 		if( this->m_dup_and_dups.is_parsed() )
 			return this->m_dup_and_dups->get_max();
@@ -3754,7 +3754,7 @@ class ere_dups
 			return this->m_dup->get_max();
 	}
 
-	unsigned long get_min()
+	uint64_t get_min()
 	{
 		if( this->m_dup_and_dups.is_parsed() )
 			return this->m_dup_and_dups->get_min();
@@ -3793,7 +3793,7 @@ class meta_char_choice
 	}	
 	const char* get_name() const { return "^|-|]"; }
 
-	int compare( const E* buf, const unsigned long buf_length )
+	int compare( const E* buf, const uint64_t buf_length )
 	{
 		if( this->m_hyphen.is_parsed() )
 		{
@@ -3865,7 +3865,7 @@ class collating_symbol
 		}
 		const char* get_name() const { return "'[','.',collating_element_single,'.',']'"; }
 
-		int compare( const E* buf, const unsigned long buf_length )
+		int compare( const E* buf, const uint64_t buf_length )
 		{
 			int ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf, buf, this->m_coll_elem_single.get(), this->m_coll_elem_single.get() );
 			if( ret == 0 ) 
@@ -3904,9 +3904,9 @@ class collating_symbol
 			return "'[','.',collating_element_multi,'.',']'"; 
 		}
 
-		int compare( const E* buf, const unsigned long buf_length )
+		int compare( const E* buf, const uint64_t buf_length )
 		{			
-			unsigned long to_compare_length =
+			uint64_t to_compare_length =
 				collating_symbol<E>::get_symbol_len(buf,buf_length);
 			std::basic_string<E> multichar = *(m_coll_elem_multi.get());
 			// check the size of element in buf  - try the longest
@@ -3935,7 +3935,7 @@ class collating_symbol
 		}	
 		const char* get_name() const { return "'[','.',meta_char,'.',']'"; }
 
-		int compare( const E* buf, const unsigned long buf_length )
+		int compare( const E* buf, const uint64_t buf_length )
 		{
 			int ret = this->m_meta_char->compare(buf,buf_length);
 			this->m_size = 1; //this->m_meta_char->matched_size();
@@ -3963,7 +3963,7 @@ class collating_symbol
 	const char* get_name() const { return "collating_symbol"; }
 
 	int matched_size() { return this->m_size; }
-	int compare( const E* buf, const unsigned long buf_length )
+	int compare( const E* buf, const uint64_t buf_length )
 	{
 		int ret = 0;
 		if( this->m_coll_elem_single.is_parsed() )
@@ -3983,7 +3983,7 @@ class collating_symbol
 		}
 		return ret;
 	}
-	static unsigned long get_symbol_len( const E* buf, const unsigned long buf_length )
+	static uint64_t get_symbol_len( const E* buf, const uint64_t buf_length )
 	{
 		return 1; // TODO - see below commented out methods for the problem
 	}
@@ -4039,7 +4039,7 @@ class collating_choice
 	basic_except_terminal<E,meta_char_choice<E> >	m_non_metas;
 	basic_choice<E,collating_symbol<E> >		m_collating_symbol;
 
-	unsigned long m_size;
+	uint64_t m_size;
 
 	public:
 	collating_choice() : m_size(0) 
@@ -4055,13 +4055,13 @@ class collating_choice
 		return this->m_size; 
 	}
 
-	int compare( const E* buf, const unsigned long buf_length )
+	int compare( const E* buf, const uint64_t buf_length )
 	{
 		int ret = -1;
 		this->m_size = 0;
 		if( this->m_non_metas.is_parsed() )
 		{
-			unsigned long to_compare_length = 
+			uint64_t to_compare_length = 
 				collating_symbol<E>::get_symbol_len(buf,buf_length);
 
 			ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf, buf+to_compare_length, this->m_non_metas.get(),	this->m_non_metas.get()+1 );
@@ -4069,7 +4069,7 @@ class collating_choice
 		}
 		else if( this->m_escaped_right_bracket.is_parsed() )
 		{
-			unsigned long to_compare_length = 
+			uint64_t to_compare_length = 
 				collating_symbol<E>::get_symbol_len(buf,buf_length);
 			const E i(']');
 			ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf,buf+to_compare_length,&i, &i+1 );
@@ -4078,7 +4078,7 @@ class collating_choice
 		}
 		else if( this->m_escaped_hyphen.is_parsed() )
 		{
-			unsigned long to_compare_length = 
+			uint64_t to_compare_length = 
 				collating_symbol<E>::get_symbol_len(buf,buf_length);
 			const E i('-');
 			ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf,buf+to_compare_length,&i,&i+1 );
@@ -4086,7 +4086,7 @@ class collating_choice
 		}
 		else if( this->m_escaped_circumflex.is_parsed() )
 		{
-			unsigned long to_compare_length = 
+			uint64_t to_compare_length = 
 				collating_symbol<E>::get_symbol_len(buf,buf_length);
 			const E i('^');
 			ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf,buf+to_compare_length,&i,&i+1 );
@@ -4173,7 +4173,7 @@ class class_name
 		return "class_name"; 
 	}
 
-	unsigned long compare( const E* buf, const unsigned long buf_length )
+	uint64_t compare( const E* buf, const uint64_t buf_length )
 	{
 		// CHANGE:: std::ctype_base t;
 		// CHANGE:: int ret = 0;
@@ -4236,12 +4236,12 @@ class character_class
 	}
 	const char* get_name() const { return "'[',':',class_name,':',']'"; }
 
-	int compare( const E* buf, const unsigned long buf_length )
+	int compare( const E* buf, const uint64_t buf_length )
 	{
 		return this->m_class_name->compare(buf,buf_length);
 	}
 
-	unsigned long matched_size() { return this->m_class_name->matched_size(); }
+	uint64_t matched_size() { return this->m_class_name->matched_size(); }
 
 };
 
@@ -4279,7 +4279,7 @@ class equivalence_class
 		}
 		const char* get_name() const { return "'[','=',collating_elem_single,'=',']'"; }
 
-		int compare( const E* buf, const unsigned long buf_length )
+		int compare( const E* buf, const uint64_t buf_length )
 		{
 			int ret = std::use_facet< std::collate<E> >(std::locale()).compare(
 					buf,
@@ -4315,9 +4315,9 @@ class equivalence_class
 		}
 		const char* get_name() const { return "'[','.',collating_elem_multi,'.',']'"; }
 
-		int compare( const E* buf, const unsigned long buf_length )
+		int compare( const E* buf, const uint64_t buf_length )
 		{
-			unsigned long to_compare_length = 0;
+			uint64_t to_compare_length = 0;
 			// check the size of element in buf  - try the longest
 			while( to_compare_length < buf_length )
 			{
@@ -4368,7 +4368,7 @@ class equivalence_class
 		return "equivalence_class"; 
 	}
 
-	int compare( const E* buf, const unsigned long buf_length )
+	int compare( const E* buf, const uint64_t buf_length )
 	{
 		int ret = 0;
 		if( this->m_coll_elem_single.is_parsed() )
@@ -4395,7 +4395,7 @@ class single_expression
 	basic_choice<E,equivalence_class<E> > m_equivalence_class;
 
 	public:
-	unsigned long recognize( const E* buf, const unsigned long buf_length )
+	uint64_t recognize( const E* buf, const uint64_t buf_length )
 	{
 		int ret = 0;
 		int size = 0;
@@ -4451,7 +4451,7 @@ class start_range
 	basic_terminal<E,'-'>				m_hyphen;
 	int m_size;
 	public:
-	int compare(const E* buf, const unsigned long buf_length)
+	int compare(const E* buf, const uint64_t buf_length)
 	{
 		// CHANGE:: int ret = this->m_collating_choice->compare(buf, buf_length);
 
@@ -4498,7 +4498,7 @@ class range_expression
 		basic_choice<E,collating_choice<E> > m_end_range;
 
 		public:
-		unsigned long recognize( const E* buf, const unsigned long buf_length )
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
 			int start_ret = this->m_start_range->compare(buf,buf_length);
 			int size = this->m_start_range->matched_size();
@@ -4544,7 +4544,7 @@ class range_expression
 		basic_terminal<E,'-'>	m_hyphen;
 
 		public:
-		unsigned long recognize( const E* buf, const unsigned long buf_length )
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
 			int start_ret = this->m_start_range->compare(buf,buf_length);
 			int size = this->m_start_range->matched_size();
@@ -4606,7 +4606,7 @@ class range_expression
 	basic_non_terminal<E,start_range_and_hyphen >	m_start_and_hyphen;
 
 	public:
-	unsigned long recognize( const E* buf, const unsigned long buf_length )
+	uint64_t recognize( const E* buf, const uint64_t buf_length )
 	{
 		if( this->m_start_end_range.is_parsed() )
 		{
@@ -4639,7 +4639,7 @@ class expression_term
 		m_range_expression;
 
 	public:
-	unsigned long recognize( const E* buf, const unsigned long buf_length )
+	uint64_t recognize( const E* buf, const uint64_t buf_length )
 	{
 		if( this->m_single_expression.is_parsed() )
 		{
@@ -4683,9 +4683,9 @@ class follow_list
 		basic_choice<E,expression_term<E> >		m_expression_term;
 
 		public:
-		unsigned long recognize( const E* buf, const unsigned long buf_length )
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
-			unsigned long size = this->m_follow_list->recognize(buf,buf_length);
+			uint64_t size = this->m_follow_list->recognize(buf,buf_length);
 			if( size == 0 )
 			{
 				size = this->m_expression_term->recognize(buf,buf_length);
@@ -4718,7 +4718,7 @@ class follow_list
 	basic_non_terminal<E,follow_list_and_expression_term > m_follow_and_expression;
 
 	public:
-	unsigned long recognize( const E* buf, const unsigned long buf_length )
+	uint64_t recognize( const E* buf, const uint64_t buf_length )
 	{
 		if( this->m_expression_term.is_parsed() )
 		{
@@ -4763,9 +4763,9 @@ class bracket_list
 		basic_terminal<E,'-'>		m_hyphen;
 
 		public:
-		unsigned long recognize( const E* buf, const unsigned long buf_length )
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
-			unsigned long size = this->m_follow_list->recognize(buf,buf_length);
+			uint64_t size = this->m_follow_list->recognize(buf,buf_length);
 			if( size == 0 )
 			{
 				if( buf[0] == this->m_hyphen.get_valid() )
@@ -4792,7 +4792,7 @@ class bracket_list
 		basic_terminal<E,'-'>					m_hyphen;
 		basic_choice<E,follow_list<E> >			m_follow_list;
 		public:
-		unsigned long recognize( const E* buf, const unsigned long buf_length )
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
 			if( buf[0] == this->m_hyphen.get_valid() )
 			{
@@ -4822,7 +4822,7 @@ class bracket_list
 			{
 			}
 
-			virtual unsigned long recognize( const E* buf, const unsigned long buf_length )
+			virtual uint64_t recognize( const E* buf, const uint64_t buf_length )
 			{
 				std::locale l;
 
@@ -4870,7 +4870,7 @@ class bracket_list
 			{
 			}
 
-			virtual unsigned long recognize( const E* buf, const unsigned long buf_length )
+			virtual uint64_t recognize( const E* buf, const uint64_t buf_length )
 			{
 				int ret = hyphen_hyphen_end_range::recognize(buf,buf_length);
 				if( ret == 0 )
@@ -4905,7 +4905,7 @@ class bracket_list
 			{
 			}
 
-			virtual unsigned long recognize( const E* buf, const unsigned long buf_length )
+			virtual uint64_t recognize( const E* buf, const uint64_t buf_length )
 			{
 				if( buf_length > 0 && buf[0] == ']' )
 				{
@@ -4933,7 +4933,7 @@ class bracket_list
 	basic_terminal<E,']'>	m_right_bracket;
 
 	public:
-	unsigned long recognize( const E* buf, const unsigned long buf_length )
+	uint64_t recognize( const E* buf, const uint64_t buf_length )
 	{
 		if( this->m_follow_list.is_parsed() )
 		{
@@ -5008,7 +5008,7 @@ class nonmatching_list
 	basic_terminal<E, '^'>				m_circumflex;
 	basic_choice<E, bracket_list<E> >	m_bracket_list;
 	public:
-	unsigned long recognize( const E* buf, const unsigned long buf_length )
+	uint64_t recognize( const E* buf, const uint64_t buf_length )
 	{
 		// not recognized
 		if( this->m_bracket_list->recognize(buf,buf_length) == 0 )
@@ -5047,7 +5047,7 @@ class matching_list
 	typedef typename basic_parser<E>::parser_list parser_list;
 	basic_choice<E,bracket_list<E> >	m_bracket_list;
 	public:
-	unsigned long recognize( const E* buf, const unsigned long buf_length )
+	uint64_t recognize( const E* buf, const uint64_t buf_length )
 	{
 		return this->m_bracket_list->recognize(buf,buf_length);
 	}
@@ -5082,7 +5082,7 @@ class bracket_expr
 		basic_non_terminal<E,nonmatching_list<E> > m_nonmatching_list;
 		basic_terminal<E,']'> m_right_bracket;
 		public:
-		unsigned long recognize( const E* buf, const unsigned long buf_length )
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
 			return this->m_nonmatching_list->recognize(buf,buf_length);
 		}
@@ -5115,7 +5115,7 @@ class bracket_expr
 		basic_non_terminal<E,matching_list<E> >	m_matching_list;
 		basic_terminal<E,']'>					m_right_bracket;
 		public:
-		unsigned long recognize( const E* buf, const unsigned long buf_length )
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
 			return this->m_matching_list->recognize(buf,buf_length);
 		}
@@ -5147,7 +5147,7 @@ class bracket_expr
 	basic_non_terminal<E,left_bracket_nonmatching_list_right_bracket > m_nonmatching;
 
 	public:
-	unsigned long recognize( const E* buf, const unsigned long buf_length )
+	uint64_t recognize( const E* buf, const uint64_t buf_length )
 	{
 		if( this->m_matching.is_parsed() )
 		{
@@ -5235,7 +5235,7 @@ class special_chars
 	}
 
 
-	unsigned long recognize( const E* buf, const unsigned long buf_length )
+	uint64_t recognize( const E* buf, const uint64_t buf_length )
 	{
 		E c=0;
 		if( this->m_period.is_parsed() ) c = this->m_period.get_valid();
@@ -5304,8 +5304,8 @@ class one_char_or_coll_elem_ere
 		}
 		const char* get_name() const { return "\\special_chars"; }
 
-		unsigned long recognize( const E* buf, 
-				const unsigned long buf_length )
+		uint64_t recognize( const E* buf, 
+				const uint64_t buf_length )
 		{
 			return this->m_spec_chars->recognize(buf,buf_length);
 		}
@@ -5337,7 +5337,7 @@ class one_char_or_coll_elem_ere
 		return "one_char|collating_element"; 
 	}
 
-	unsigned long recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset )
+	uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset )
 	{
 		if( this->m_ord_char.is_parsed() )
 		{
@@ -5401,8 +5401,8 @@ class ere_expression : public ere_base<E>
 		{
 		}
 
-		unsigned long recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions = true );
-		void assign_matches( matches::match_key key, unsigned long& branch_pos, matches& m );
+		uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
+		void assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m );
 
 		void push_parsers( parser_list& l );
 		const char* get_name() const 
@@ -5432,7 +5432,7 @@ class ere_expression : public ere_base<E>
 		basic_choice<E, ere_dups<E> > m_dup;
 		matches	m_matches;
 
-		unsigned long divide_and_recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, unsigned long rep, bool assign_matches );
+		uint64_t divide_and_recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, uint64_t rep, bool assign_matches );
 		public: 
 		ere_expression_and_dupl() : ere_base<E>() 
 		{
@@ -5442,8 +5442,8 @@ class ere_expression : public ere_base<E>
 		{
 		}
 
-		unsigned long recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions = true );
-		void assign_matches( matches::match_key key, unsigned long& branch_pos, matches& m );
+		uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
+		void assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m );
 		void push_parsers( parser_list& l );
 		const char* get_name() const 
 		{
@@ -5495,8 +5495,8 @@ class ere_expression : public ere_base<E>
 		return this->m_ere_expr_and_dup.is_parsed() && this->m_ere_expr_and_dup->is_lazy(); 
 	}
 
-	unsigned long recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions = true );
-	void assign_matches( matches::match_key key, unsigned long& branch_pos, matches& m );
+	uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
+	void assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m );
 	void push_parsers( parser_list& l );
 	const char* get_name() const 
 	{ 
@@ -5540,15 +5540,15 @@ class ere_branch : public ere_base<E>
 		ere_expression_ere_branch() : ere_base<E>() {};
 		~ere_expression_ere_branch() {};
 
-		unsigned long recognize( const E* buf, 
-				const unsigned long buf_length, 
-				const unsigned long buf_offset,
+		uint64_t recognize( const E* buf, 
+				const uint64_t buf_length, 
+				const uint64_t buf_offset,
 				bool try_positions = true );
 		void push_parsers( parser_list& l );
 		const char* get_name() const { return "ere_expression,ere_branch"; }
 
 		void assign_matches( matches::match_key parent_address, 
-				unsigned long& branch_pos, 
+				uint64_t& branch_pos, 
 				matches& m );
 	};
 
@@ -5566,9 +5566,9 @@ class ere_branch : public ere_base<E>
 	{
 	}
 
-	unsigned long recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions = true );
+	uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
 
-	void assign_matches( matches::match_key parent_address, unsigned long& branch_pos, matches& m );
+	void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m );
 
 	bool is_right_anchor()
 	{
@@ -5584,7 +5584,7 @@ class ere_branch : public ere_base<E>
 };
 
 /*
-   unsigned long collating_symbol<char>::get_symbol_len( const char* buf, const unsigned long buf_length )
+   uint64_t collating_symbol<char>::get_symbol_len( const char* buf, const uint64_t buf_length )
    {
 // TODO - don't know how to test this - when mbrlen returns value > 1?
 // I tested with setting the diferent locales and sending digraph values (like ch for 
@@ -5597,11 +5597,11 @@ if( len < 0 )
 {
 len = 0;
 }
-return (unsigned long)len;
+return (uint64_t)len;
 }
 
-unsigned long collating_symbol<wchar_t>::get_symbol_len( const wchar_t* buf,
-const unsigned long buf_length )
+uint64_t collating_symbol<wchar_t>::get_symbol_len( const wchar_t* buf,
+const uint64_t buf_length )
 {
 // TODO - check, if this is OK
 if( buf_length > 0 )
@@ -5648,8 +5648,8 @@ class extended_reg_exp : public ere_base<E>
 		{
 		}
 
-		unsigned long recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions = true );
-		void assign_matches( matches::match_key parent_address, unsigned long& branch_pos, matches& m );
+		uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
+		void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m );
 		void push_parsers( parser_list& l );
 		const char* get_name() const 
 		{
@@ -5673,8 +5673,8 @@ class extended_reg_exp : public ere_base<E>
 	{
 	}
 
-	unsigned long recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions = true  );
-	void assign_matches( matches::match_key parent_address, unsigned long& branch_pos, matches& m );
+	uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true  );
+	void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m );
 
 	void push_parsers( parser_list& l );
 	const char* get_name() const 
@@ -5685,7 +5685,7 @@ class extended_reg_exp : public ere_base<E>
 };
 
 	template< typename E > 
-unsigned long ere_expression<E>::subexpression::recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions )
+uint64_t ere_expression<E>::subexpression::recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions )
 {
 	this->m_extened_regexp->recognize( buf, buf_length, buf_offset );
 	this->m_is_rec = this->m_extened_regexp->is_recognized();
@@ -5698,7 +5698,7 @@ unsigned long ere_expression<E>::subexpression::recognize( const E* buf, const u
 }
 
 	template< typename E > 
-void ere_expression<E>::subexpression::assign_matches( matches::match_key key, unsigned long& branch_pos, matches& m )
+void ere_expression<E>::subexpression::assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m )
 {
 	key += '.';
 	key += this->to_str(branch_pos);
@@ -5715,7 +5715,7 @@ void ere_expression<E>::subexpression::push_parsers( parser_list& l )
 }
 
 	template< typename E > 
-unsigned long ere_expression<E>::ere_expression_and_dupl::divide_and_recognize(	const E* buf, const unsigned long buf_length, const unsigned long buf_offset, unsigned long rep, bool assign_matches )
+uint64_t ere_expression<E>::ere_expression_and_dupl::divide_and_recognize(	const E* buf, const uint64_t buf_length, const uint64_t buf_offset, uint64_t rep, bool assign_matches )
 {
 	this->m_is_rec = true;
 	if( rep == this->m_dup->get_max() )
@@ -5723,10 +5723,10 @@ unsigned long ere_expression<E>::ere_expression_and_dupl::divide_and_recognize(	
 		this->m_dup->set_recognized_dup(rep);
 		return 0;
 	}
-	unsigned long best_left_side_buf_len = 0;
-	unsigned long best_rec_size = 0;
-	unsigned long left_side_buf_len = buf_length;
-	unsigned long left_rec_size = 0;
+	uint64_t best_left_side_buf_len = 0;
+	uint64_t best_rec_size = 0;
+	uint64_t left_side_buf_len = buf_length;
+	uint64_t left_rec_size = 0;
 	while( this->m_is_rec )
 	{
 		this->m_ere->recognize( buf, left_side_buf_len, buf_offset, true );
@@ -5763,7 +5763,7 @@ unsigned long ere_expression<E>::ere_expression_and_dupl::divide_and_recognize(	
 		if( assign_matches )
 		{
 			this->m_ere->recognize( buf, best_left_side_buf_len, buf_offset, true );
-			unsigned long branch_pos = rep;
+			uint64_t branch_pos = rep;
 			this->m_ere->assign_matches( "", branch_pos, this->m_matches );
 
 			this->m_rec_size = 0;
@@ -5796,9 +5796,9 @@ unsigned long ere_expression<E>::ere_expression_and_dupl::divide_and_recognize(	
 
 
 	template< typename E > 
-unsigned long ere_expression<E>::ere_expression_and_dupl::recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions )
+uint64_t ere_expression<E>::ere_expression_and_dupl::recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions )
 {
-	unsigned long rep = 1;
+	uint64_t rep = 1;
 
 	if( this->m_ere->is_subexpression() )
 	{
@@ -5824,7 +5824,7 @@ unsigned long ere_expression<E>::ere_expression_and_dupl::recognize( const E* bu
 
 	if( this->m_ere->is_recognized() && this->m_ere->is_subexpression() )
 	{
-		unsigned long branch_pos = 0;
+		uint64_t branch_pos = 0;
 		this->m_ere->assign_matches( "", branch_pos, this->m_matches );
 	}
 
@@ -5856,7 +5856,7 @@ unsigned long ere_expression<E>::ere_expression_and_dupl::recognize( const E* bu
 }
 
 	template< typename E > 
-void ere_expression<E>::ere_expression_and_dupl::assign_matches( matches::match_key key, unsigned long& branch_pos, matches& m )
+void ere_expression<E>::ere_expression_and_dupl::assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m )
 {
 	if( this->m_ere->is_subexpression() )
 	{
@@ -5881,7 +5881,7 @@ void ere_expression<E>::ere_expression_and_dupl::push_parsers( parser_list& l )
 }
 
 	template<typename E>
-unsigned long ere_expression<E>::recognize(const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions)	
+uint64_t ere_expression<E>::recognize(const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions)	
 {
 	this->m_is_rec = false;
 	this->m_rec_pos = buf_offset;
@@ -5926,7 +5926,7 @@ unsigned long ere_expression<E>::recognize(const E* buf, const unsigned long buf
 		this->m_subexpression->recognize( buf, buf_length, buf_offset );
 		this->m_is_rec = this->m_subexpression->is_recognized();
 		// Dont check in
-		unsigned long off = buf_offset;
+		uint64_t off = buf_offset;
 		while( !this->m_is_rec && off < buf_length )
 		{
 			off++;
@@ -5943,7 +5943,7 @@ unsigned long ere_expression<E>::recognize(const E* buf, const unsigned long buf
 }
 
 	template<typename E>
-void ere_expression<E>::assign_matches( matches::match_key key, unsigned long& branch_pos, matches& m )
+void ere_expression<E>::assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m )
 {
 	if( this->m_subexpression.is_parsed() )
 	{
@@ -5967,7 +5967,7 @@ void ere_expression<E>::push_parsers( parser_list& l )
 }
 
 	template<typename E>
-unsigned long ere_branch<E>::ere_expression_ere_branch::recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions )
+uint64_t ere_branch<E>::ere_expression_ere_branch::recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions )
 {
 	this->m_is_rec = false;
 	this->m_rec_pos = 0;
@@ -6004,11 +6004,11 @@ unsigned long ere_branch<E>::ere_expression_ere_branch::recognize( const E* buf,
 	}
 
 
-	unsigned long buf_split = 0;
-	unsigned long longest_recognized_size = 0;
-	unsigned long buf_split_for_shortest_size = 0;
-	unsigned long shortest_left_recognized_size = INT_MAX;
-	unsigned long buf_split_for_longest_size = buf_split;
+	uint64_t buf_split = 0;
+	uint64_t longest_recognized_size = 0;
+	uint64_t buf_split_for_shortest_size = 0;
+	uint64_t shortest_left_recognized_size = INT_MAX;
+	uint64_t buf_split_for_longest_size = buf_split;
 	bool left_side_recognized = true;
 	this->m_is_rec = true;
 
@@ -6094,7 +6094,7 @@ unsigned long ere_branch<E>::ere_expression_ere_branch::recognize( const E* buf,
 }	
 
 	template<typename E>
-void ere_branch<E>::ere_expression_ere_branch::assign_matches( matches::match_key parent_address, unsigned long& branch_pos, matches& m )
+void ere_branch<E>::ere_expression_ere_branch::assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m )
 {
 	if( this->m_ere_branch.is_parsed() && this->m_ere_expression.is_parsed() )
 	{
@@ -6111,7 +6111,7 @@ void ere_branch<E>::ere_expression_ere_branch::push_parsers( parser_list& l )
 }
 
 	template<typename E>
-unsigned long ere_branch<E>::recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset, bool try_positions )
+uint64_t ere_branch<E>::recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions )
 {
 	if( this->m_ere.is_parsed() )
 	{
@@ -6131,7 +6131,7 @@ unsigned long ere_branch<E>::recognize( const E* buf, const unsigned long buf_le
 }
 
 	template<typename E>
-void ere_branch<E>::assign_matches( matches::match_key parent_address, unsigned long& branch_pos, matches& m )
+void ere_branch<E>::assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m )
 {
 	if( this->m_ere.is_parsed() )
 	{
@@ -6151,7 +6151,7 @@ void ere_branch<E>::push_parsers( parser_list& l )
 }
 
 	template<typename E>
-unsigned long extended_reg_exp<E>::ere_branch_or_extended_reg_exp::recognize( const E* buf, const unsigned long buf_length,	const unsigned long buf_offset, bool try_positions )
+uint64_t extended_reg_exp<E>::ere_branch_or_extended_reg_exp::recognize( const E* buf, const uint64_t buf_length,	const uint64_t buf_offset, bool try_positions )
 {
 	this->m_rec_size = 0;
 	this->m_rec_pos = 0;
@@ -6189,7 +6189,7 @@ unsigned long extended_reg_exp<E>::ere_branch_or_extended_reg_exp::recognize( co
 }
 
 	template<typename E>
-void extended_reg_exp<E>::ere_branch_or_extended_reg_exp::assign_matches( matches::match_key parent_address, unsigned long& branch_pos, matches& m )
+void extended_reg_exp<E>::ere_branch_or_extended_reg_exp::assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m )
 {
 	if( this->m_branch->is_recognized() )
 	{
@@ -6210,7 +6210,7 @@ void extended_reg_exp<E>::ere_branch_or_extended_reg_exp::push_parsers( parser_l
 }
 
 	template<typename E>
-unsigned long extended_reg_exp<E>::recognize( const E* buf, const unsigned long buf_length, const unsigned long buf_offset,	bool try_positions )
+uint64_t extended_reg_exp<E>::recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset,	bool try_positions )
 {
 	this->m_rec_pos = 0;
 	this->m_rec_size = 0;
@@ -6238,10 +6238,10 @@ unsigned long extended_reg_exp<E>::recognize( const E* buf, const unsigned long 
 }
 
 	template<typename E>
-void extended_reg_exp<E>::assign_matches( matches::match_key key, unsigned long& branch_pos, matches& m )
+void extended_reg_exp<E>::assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m )
 {
 	m.insert( key, match( this->m_rec_pos, this->m_rec_size ) );
-	unsigned long new_branch_pos = 0;
+	uint64_t new_branch_pos = 0;
 	if( this->m_branch.is_parsed() )
 	{
 		this->m_branch->assign_matches( key, new_branch_pos, m );
@@ -6265,8 +6265,8 @@ class ere
 	typedef typename basic_parser<E>::parser_list parser_list;
 
 	basic_choice< E, extended_reg_exp<E> >	m_ext_reg_exp;
-	unsigned long	m_rec_size;
-	unsigned long	m_rec_pos;
+	uint64_t	m_rec_size;
+	uint64_t	m_rec_pos;
 	bool			m_is_rec;
 
 	public:
@@ -6278,7 +6278,7 @@ class ere
 	{
 	}
 
-	unsigned long recognize( const E* buf, const unsigned long buf_length, bool try_positions = true )
+	uint64_t recognize( const E* buf, const uint64_t buf_length, bool try_positions = true )
 	{
 		this->m_ext_reg_exp->recognize( buf, buf_length, 0, try_positions );
 		this->m_is_rec = this->m_ext_reg_exp->is_recognized();
@@ -6289,7 +6289,7 @@ class ere
 
 	void assign_matches( matches& m )
 	{
-		unsigned long branch_pos = 0;
+		uint64_t branch_pos = 0;
 		matches::match_key key = "1";
 		if( this->m_ext_reg_exp.is_parsed() ) this->m_ext_reg_exp->assign_matches( key, branch_pos, m );
 	}
@@ -6309,12 +6309,12 @@ class ere
 		return this->m_is_rec;
 	}
 
-	const unsigned long recognized_size() const
+	const uint64_t recognized_size() const
 	{
 		return this->m_rec_size;
 	}
 
-	const unsigned long recognized_position() const
+	const uint64_t recognized_position() const
 	{
 		return this->m_rec_pos;
 	}
@@ -6327,12 +6327,12 @@ class ere
    choice<collating_choice> m_end_range;
 
    public:
-   bool is_greater_or_equals( const E* buf, const unsigned long buf_length )
+   bool is_greater_or_equals( const E* buf, const uint64_t buf_length )
    {
    return this->m_collating_choice->is_greater_ro_equals(buf,buf_length);
    }
 
-   unsigned long recognized_size()
+   uint64_t recognized_size()
    {
    return this->m_collating_choice->recognized_size();
    }
@@ -6911,7 +6911,7 @@ class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> 
 		  \param buf_length input buffer length
 		  \return parsed size
 		  */	
-		virtual unsigned long parse( const E *buf, const unsigned long buf_length )
+		virtual uint64_t parse( const E *buf, const uint64_t buf_length )
 		{
 			this->prepare_for_parsing();
 
@@ -6948,7 +6948,7 @@ class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> 
 			if( is.good() )
 			{
 				is.get( buf );
-				unsigned long length = buf.str().length();
+				uint64_t length = buf.str().length();
 				if( this->is_valid() )
 				{
 					this->m_regexp->recognize( buf.str().c_str(), length );
@@ -6977,7 +6977,7 @@ class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> 
 		}
 
 		//! Returns the match position in the input
-		unsigned long recognized_position()
+		uint64_t recognized_position()
 		{
 			if( is_pattern_valid() && this->m_regexp->is_recognized() )
 			{
@@ -6990,7 +6990,7 @@ class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> 
 		}
 
 		//! Returns the match size in the input
-		unsigned long recognized_size()
+		uint64_t recognized_size()
 		{
 			if( is_pattern_valid() && this->m_regexp->is_recognized() )
 			{

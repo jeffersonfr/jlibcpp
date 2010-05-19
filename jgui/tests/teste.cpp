@@ -926,7 +926,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			jgui::Item *item = event->GetItem();
 
 			if (item != NULL) {
-				printf("Teste ----> %s\n", item->GetValue().c_str());
+				std::cout << "ItemSelected [" << item->GetValue() << std::endl;
 			}
 		}
 
@@ -935,7 +935,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			jgui::Item *item = event->GetItem();
 
 			if (item != NULL) {
-				printf("Menu item:: %s\n", item->GetValue().c_str());
+				std::cout << "ItemChanged [" << item->GetValue() << std::endl;
 			}
 		}
 

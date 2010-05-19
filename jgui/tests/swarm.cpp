@@ -91,7 +91,6 @@ class Main : public jgui::Frame, public jthread::Thread{
 				_particles[i].vi.y = 0;
 
 				if (_gbest.pi_value > k) {
-					// printf("Best:: %.2f\n", k);
 					_gbest = _particles[i];
 					_gbest.xi.x = _particles[i].pi.x;
 					_gbest.xi.y = _particles[i].pi.y;
@@ -157,8 +156,6 @@ class Main : public jgui::Frame, public jthread::Thread{
 						p->pi.x = p->xi.x;
 						p->pi.y = p->xi.y;
 						p->pi_value = k;
-						
-						// printf("Pi Value:: %.2f\n", k);
 					}
 
 					if (k < _gbest.pi_value) {
@@ -166,7 +163,7 @@ class Main : public jgui::Frame, public jthread::Thread{
 						_gbest.xi.y = p->xi.y;
 						_gbest.pi_value = k;
 						
-						printf("Gi Value:: %.8f\n", k);
+						std::cout << "Gi Value:: " << k << std::endl;
 					} else {
 							scrumble++;
 

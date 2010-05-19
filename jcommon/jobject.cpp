@@ -71,9 +71,9 @@ std::string Object::GetClassName()
 
 void Object::SetClassName(std::string name)
 {
-	unsigned long r = name.rfind("::");
+	int r = name.rfind("::");
 
-	if (r != std::string::npos) {
+	if (r != (int)std::string::npos) {
 		_namespace = name.substr(0, r);
 		_classname = name.substr(r + 2, name.size());
 	} else {

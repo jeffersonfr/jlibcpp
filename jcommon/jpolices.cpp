@@ -21,10 +21,12 @@
 #include "jruntimeexception.h"
 #include "jstringutils.h"
 #include "jfile.h"
+#include "jautolock.h"
 
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <algorithm>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -41,15 +43,16 @@ Polices::~Polices()
 {
 }
 
-void Polices::Load(std::string filename) 
+void Polices::Load(std::string filename, std::string escape)
 {
+	jthread::AutoLock lock(&_mutex);
+
 	_filename = filename;
 
 	jio::File file(_filename);
 
-	std::string tag;
 	int r,
-		state = 0;
+			state = 0;
 	char c;
 
 	std::string id,
@@ -60,45 +63,21 @@ void Polices::Load(std::string filename)
 			id = "";
 			content = "";
 
-			if (c == '#') {
-				content = "#";
-				state = 1;
-			} else if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+			if (isalnum(c) == true) {
 				id = id + c;
-				state = 2;
+				state = 1;
 			}
 		} else if (state == 1) {
-			if (c == '\n') {
-				struct jpolice_t t;
-
-				t.key = jcommon::StringUtils::Trim(id);
-				t.value = jcommon::StringUtils::Trim(content);
-				t.id = 1;
-
-				_polices.push_back(t);
-
-				content = "";
-				state = 0;
-			} else {
-				content = content + c;
-			}
-		} else if (state == 2) {
 			if (c != '{' && c != '\n') {
 				id = id + c;
 			} else {
-				state = 3;
+				state = 2;
 			}
-		} else if (state == 3) {
+		} else if (state == 2) {
 			if (c != '}' ) {
 				content = content + c;
 			} else {
-				struct jpolice_t t;
-
-				t.key = jcommon::StringUtils::Trim(id);
-				t.value = jcommon::StringUtils::Trim(content);
-				t.id = 1;
-
-				_polices.push_back(t);
+				_polices[jcommon::StringUtils::Trim(id)] = jcommon::StringUtils::Trim(content);
 
 				state = 0;
 			}
@@ -106,23 +85,19 @@ void Polices::Load(std::string filename)
 	}
 }
 
-void Polices::Save()
+void Polices::Save(std::string escape)
 {
+	jthread::AutoLock lock(&_mutex);
+
 	try {
 		jio::File f(_filename, jio::F_WRITE_ONLY | jio::F_LARGEFILE | jio::F_TRUNCATE);
 
-		for (std::vector<struct jpolice_t>::iterator i=_polices.begin(); i!=_polices.end(); i++) {
+		for (std::map<std::string, std::string>::iterator i=_polices.begin(); i!=_polices.end(); i++) {
 			std::ostringstream o;
 
-			struct jpolice_t p = *i;
+			o << i->first << " {\n" << i->second << "\n}\n" << std::endl;
 
-			if (p.id == 0) {
-				o << p.value << std::endl;
-			} else {
-				o << p.key << " {\n\t" << p.value << "\n}\n" << std::endl;
-			}
-
-			f.Write(o.str().c_str(), (long)o.str().size());
+			f.Write(o.str().c_str(), (uint64_t)o.str().size());
 		}
 
 		f.Flush();
@@ -131,27 +106,98 @@ void Polices::Save()
 	}
 }
 
-int Polices::GetSize()
+void Polices::AddPolice(std::string police)
 {
-	return _polices.size();
+	jthread::AutoLock lock(&_mutex);
+
+	_polices[police];
 }
 
-std::vector<struct jpolice_t> & Polices::GetPolices()
+std::vector<std::string> * Polices::GetPolices()
 {
-	return _polices;
+	jthread::AutoLock lock(&_mutex);
+
+	std::vector<std::string> *polices = new std::vector<std::string>();
+
+	for (std::map<std::string, std::string>::iterator i=_polices.begin(); i!=_polices.end(); i++) {
+		polices->push_back(i->first);
+	}
+
+	return polices;
 }
 
-std::string Polices::GetContent(std::string id) 
+std::string Polices::GetPoliceByName(std::string police)
 {
-	for (std::vector<struct jpolice_t>::iterator i=_polices.begin(); i!=_polices.end(); i++) {
-		if ((*i).id == 1) {
-			return (*i).value;
+	jthread::AutoLock lock(&_mutex);
+
+	std::map<std::string, std::string>::iterator i = _polices.find(police);
+	
+	if (i != _polices.end()) {
+		return i->second;
+	}
+
+	throw jcommon::RuntimeException("Index out of bounds exception");
+}
+
+std::string Polices::GetPoliceByIndex(int index)
+{
+	jthread::AutoLock lock(&_mutex);
+
+	if (index >= 0 && index < (int)_polices.size()) {
+		int k = 0;
+
+		for (std::map<std::string, std::string>::iterator i=_polices.begin(); i!=_polices.end(); i++, k++) {
+			if (k == index) {
+				return i->second;
+			}
 		}
 	}
 
-	return "";
+	throw jcommon::RuntimeException("Index out of bounds exception");
 }
 
+void Polices::RemovePoliceByName(std::string police)
+{
+	jthread::AutoLock lock(&_mutex);
+
+	std::map<std::string, std::string>::iterator i = _polices.find(police);
+	
+	if (i == _polices.end()) {
+		throw jcommon::RuntimeException("Cannot find police");
+	}
+
+	_polices.erase(i);
+}
+
+void Polices::RemovePoliceByIndex(int index)
+{
+	jthread::AutoLock lock(&_mutex);
+
+	if (index >= 0 && index < (int)_polices.size()) {
+		int k = 0;
+
+		for (std::map<std::string, std::string>::iterator i=_polices.begin(); i!=_polices.end(); i++, k++) {
+			if (k == index) {
+				_polices.erase(i);
+
+				break;
+			}
+		}
+	}
+}
+
+void Polices::SetPoliceContent(std::string police, std::string value)
+{
+	jthread::AutoLock lock(&_mutex);
+
+	std::map<std::string, std::string>::iterator i = _polices.find(police);
+	
+	if (i == _polices.end()) {
+		throw jcommon::RuntimeException("Cannot find police");
+	}
+		
+	_polices[police] = value;
+}
 
 }
 

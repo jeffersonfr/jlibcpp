@@ -232,7 +232,7 @@ class Main : public jgui::Frame{
 
 					// compare the solutions
 					if (count < best) {
-						printf("Solution:: [%d => %d]\n", best, count);
+						std::cout << "Solution:: [" << best << " => " << count << "]" << std::endl;
 
 						best = count;
 
@@ -262,13 +262,13 @@ class Main : public jgui::Frame{
 			}
 
 			// print best solution
-			printf("Best Solution::\n");
+			std::cout << "Best Solution::" << std::endl;
 
 			for (int i=0; i<MAX_COLS; i++) {
-				printf("%d ", solution[i]->value);
+				std::cout << solution[i]->value << " ";
 			}
 
-			printf("\n");
+			std::cout << std::endl;
 		}
 
 #if ENABLE_GUI == 1

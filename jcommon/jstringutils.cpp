@@ -48,93 +48,54 @@ StringUtils::~StringUtils()
 
 std::string StringUtils::LeftTrim(std::string str)
 {
-	return str.erase(0, str.find_first_not_of(" "));
+	int index;
 
-	/*
-	if ((*str) == NULL) {
-		return 0;
-	}
-	
-	char *p;
-	int count;
+_loop:
+	index = str.find_first_not_of(" ");
 
-	p = (*str);
-	
-	while (*p == ' ') {
-		p++;
+	if (index != (int)std::string::npos && index > 0) {
+		str.erase(0, index);
 	}
 
-	if (p == (*str)) {
-		return length;
+	index = str.find_first_not_of("\t");
+
+	if (index != (int)std::string::npos && index > 0) {
+		str.erase(0, index);
+
+		goto _loop;
 	}
 
-	count = p - (*str);
-
-	memcpy((*str), p, length - count + 1);
-
-	(*str)[length - count + 1] = '\0';
-
-	return (length - count);
-	*/
+	return str;
 }
 
 std::string StringUtils::RightTrim(std::string str)
 {
-	return str.erase(str.find_last_not_of(" ")+1, str.size());
+	int index;
 
-	/*
-	if ((*str) == NULL) {
-		return 0;
-	}
-	
-	char *q;
+_loop:
+	index = str.find_last_not_of(" ");
 
-	q = (*str) + length - 1;
-
-	while (*q == ' ' && q != (*str)) {
-		q--;
+	if (index != (int)std::string::npos && index < (int)str.size()-1) {
+		str.erase(index+1, str.size());
 	}
 
-	if (q == ((*str) + length - 1)) {
-		return length;
+	index = str.find_last_not_of("\t");
+
+	if (index != (int)std::string::npos && index < (int)str.size()-1) {
+		str.erase(index+1, str.size());
+
+		goto _loop;
 	}
 
-	*(++q) = '\0';
-
-	return ((*str) - q - 1);
-	*/
+	return str;
 }
 
 std::string StringUtils::Trim(std::string str)
 {
-	std::string tmp;
+	str = LeftTrim(str);
+	str = RightTrim(str);
 
-	tmp = str.erase(0, str.find_first_not_of(" "));
-	
-	return tmp.erase(tmp.find_last_not_of(" ")+1, tmp.size());
-
-	/*
-	int length;
-
-	if (limit > 10*1024*1024) { // 10 MB
-		return -1;
-	}
-
-#ifdef _WIN32
-	length = strlen(*str);
-#else
-	length = strnlen(*str, limit);
-#endif
-	length = LeftTrim(str, length);
-
-	if (length == -1) {
-		return -1;
-	}
-	
-	length = RightTrim(str, length);
-	
-	return length;
-	*/
+	return str;
 }
 
 std::string StringUtils::ToLower(std::string str)

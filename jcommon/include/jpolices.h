@@ -20,10 +20,11 @@
 #ifndef J_POLICES_H
 #define J_POLICES_H
 
-#include "jobject.h"
+#include "jthread.h"
 
 #include <string>
 #include <map>
+#include <vector>
 
 namespace jcommon {
 
@@ -32,28 +33,83 @@ namespace jcommon {
  * 
  * \author Jeff Ferr
  */
-struct jpolice_t {
-	std::string key,
-		value;
-	int id; // 0 - comment, 1 - id
-};
-
 class Polices : public virtual jcommon::Object{
 
 	private:
-		std::vector<struct jpolice_t> _polices;
+		/** \brief  */
+		jthread::Mutex _mutex;
+		/** \brief  */
+		std::map<std::string, std::string> _polices;
+		/** \brief  */
 		std::string _filename;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
 		Polices();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Polices();
 
-		void Load(std::string filename);
-		void Save();
-		int GetSize();
-		std::vector<struct jpolice_t> & GetPolices();
-		std::string GetContent(std::string id);
+		/**
+		 * \brief
+		 *
+		 */
+		void Load(std::string filename, std::string escape = "=");
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void Save(std::string escape = "=");
+	
+		/**
+		 * \brief
+		 *
+		 */
+		void AddPolice(std::string police);
 
+		/**
+		 * \brief
+		 *
+		 */
+		std::vector<std::string> * GetPolices();
+
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetPoliceByName(std::string police);
+
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetPoliceByIndex(int index);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void RemovePoliceByName(std::string police);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void RemovePoliceByIndex(int index);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetPoliceContent(std::string police, std::string value);
+	
 };
 
 }

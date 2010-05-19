@@ -20,7 +20,7 @@
 #ifndef J_PROPERTIES_H
 #define J_PROPERTIES_H
 
-#include "jobject.h"
+#include "jmutex.h"
 
 #include <string>
 #include <cstring>
@@ -42,6 +42,8 @@ struct jproperty_t {
 class Properties : public virtual jcommon::Object{
 
 	private:
+		/** \brief */
+		jthread::Mutex _mutex;
 		/** \brief */
 		std::map<std::string, std::string> _props;
 		/** \brief */
@@ -98,20 +100,38 @@ class Properties : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		std::vector<std::string> GetProperties();
-
+		void SetPropertyByName(std::string key, std::string value);
+	
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetProperty(std::string key, std::string reserv = std::string(""));
+		std::string GetPropertyByName(std::string key, std::string reserv = std::string(""));
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetProperty(std::string key, std::string value);
+		std::string GetPropertyByIndex(int index, std::string reserv = std::string(""));
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void RemovePropertyByName(std::string key);
 	
+		/**
+		 * \brief
+		 *
+		 */
+		void RemovePropertyByIndex(int index);
+	
+		/**
+		 * \brief
+		 *
+		 */
+		std::vector<std::string> * GetProperties();
+
 };
 
 }
