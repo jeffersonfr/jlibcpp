@@ -44,7 +44,10 @@ OBJS_unit = \
 OBJS_calc_unit = \
 	   calc_unit.o\
 
-all: teste xml_teste xml_agenda regexp jsondom jsonpull gcteste unit calc_unit
+OBJS_access = \
+	   access.o\
+
+all: teste xml_teste xml_agenda regexp jsondom jsonpull gcteste unit calc_unit access
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
@@ -76,10 +79,13 @@ unit: $(OBJS_unit)
 calc_unit: $(OBJS_calc_unit)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
 
+access: $(OBJS_access)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; echo -e "Compiling $< ...  $(OK)" 
 
 install:
 
 clean:
-	@rm -rvf *.o *.xml *~ teste xml_teste xml_agenda myfile_teste.xml regexp jsondom jsonpull gcteste pointer unit calc_unit
+	@rm -rvf *.o *.xml *~ teste xml_teste xml_agenda myfile_teste.xml regexp jsondom jsonpull gcteste pointer unit calc_unit access

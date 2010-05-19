@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_POLICES_H
-#define J_POLICES_H
+#ifndef J_POLICIES_H
+#define J_POLICIES_H
 
 #include "jthread.h"
 
@@ -33,7 +33,7 @@ namespace jcommon {
  * 
  * \author Jeff Ferr
  */
-class Polices : public virtual jcommon::Object{
+class Policies : public virtual jcommon::Object{
 
 	private:
 		/** \brief  */
@@ -48,13 +48,13 @@ class Polices : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		Polices();
+		Policies();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~Polices();
+		virtual ~Policies();
 
 		/**
 		 * \brief
@@ -78,7 +78,7 @@ class Polices : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		std::vector<std::string> * GetPolices();
+		std::vector<std::string> * GetPolicies();
 
 		/**
 		 * \brief

@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jpolices.h"
+#include "jpolicies.h"
 #include "jruntimeexception.h"
 #include "jstringutils.h"
 #include "jfile.h"
@@ -35,15 +35,15 @@
 
 namespace jcommon {
 
-Polices::Polices()
+Policies::Policies()
 {
 }
 
-Polices::~Polices()
+Policies::~Policies()
 {
 }
 
-void Polices::Load(std::string filename, std::string escape)
+void Policies::Load(std::string filename, std::string escape)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -51,21 +51,24 @@ void Polices::Load(std::string filename, std::string escape)
 
 	jio::File file(_filename);
 
-	int r,
-			state = 0;
-	char c;
-
 	std::string id,
 		content;
+	int r,
+		state = 0;
+	char c;
 
 	while ((r = file.Read((char *)&c, 1)) != EOF) {
-		if (state == 0) {
-			id = "";
-			content = "";
-
-			if (isalnum(c) == true) {
+		if (state == -1) {
+			// remove comment from file
+			if (c == '\n') {
+				state = 0;
+			}
+		} else if (state == 0) {
+			if (isalnum(c) != 0) {
 				id = id + c;
 				state = 1;
+			} else if (c == '#') {
+				state = -1;
 			}
 		} else if (state == 1) {
 			if (c != '{' && c != '\n') {
@@ -80,12 +83,14 @@ void Polices::Load(std::string filename, std::string escape)
 				_polices[jcommon::StringUtils::Trim(id)] = jcommon::StringUtils::Trim(content);
 
 				state = 0;
+				id = "";
+				content = "";
 			}
 		}
 	}
 }
 
-void Polices::Save(std::string escape)
+void Policies::Save(std::string escape)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -106,14 +111,14 @@ void Polices::Save(std::string escape)
 	}
 }
 
-void Polices::AddPolice(std::string police)
+void Policies::AddPolice(std::string police)
 {
 	jthread::AutoLock lock(&_mutex);
 
 	_polices[police];
 }
 
-std::vector<std::string> * Polices::GetPolices()
+std::vector<std::string> * Policies::GetPolicies()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -126,7 +131,7 @@ std::vector<std::string> * Polices::GetPolices()
 	return polices;
 }
 
-std::string Polices::GetPoliceByName(std::string police)
+std::string Policies::GetPoliceByName(std::string police)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -139,7 +144,7 @@ std::string Polices::GetPoliceByName(std::string police)
 	throw jcommon::RuntimeException("Index out of bounds exception");
 }
 
-std::string Polices::GetPoliceByIndex(int index)
+std::string Policies::GetPoliceByIndex(int index)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -156,7 +161,7 @@ std::string Polices::GetPoliceByIndex(int index)
 	throw jcommon::RuntimeException("Index out of bounds exception");
 }
 
-void Polices::RemovePoliceByName(std::string police)
+void Policies::RemovePoliceByName(std::string police)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -169,7 +174,7 @@ void Polices::RemovePoliceByName(std::string police)
 	_polices.erase(i);
 }
 
-void Polices::RemovePoliceByIndex(int index)
+void Policies::RemovePoliceByIndex(int index)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -186,7 +191,7 @@ void Polices::RemovePoliceByIndex(int index)
 	}
 }
 
-void Polices::SetPoliceContent(std::string police, std::string value)
+void Policies::SetPoliceContent(std::string police, std::string value)
 {
 	jthread::AutoLock lock(&_mutex);
 

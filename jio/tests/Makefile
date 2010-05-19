@@ -17,21 +17,15 @@ OK 			= \033[30;32mOK!\033[m
 OBJS_inpi = \
 	   inpi.o\
 
-OBJS_access = \
-	   access.o\
-
 OBJS_object = \
 	   object.o\
 
 OBJS_data = \
 	   data.o\
 
-all: inpi access object data
+all: inpi object data
 	
 inpi: $(OBJS_inpi)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
-        
-access: $(OBJS_access)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
 object: $(OBJS_object)
@@ -47,4 +41,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ inpi access object data
+	@rm -rvf *.o *~ inpi object data

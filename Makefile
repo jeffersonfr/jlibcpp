@@ -85,7 +85,7 @@ OBJS_jcommon = \
 	   joutofboundsexception.o\
 	   jproperties.o\
 		 jpointer.o\
-	   jpolices.o\
+	   jpolicies.o\
 	   jruntimeexception.o\
 	   jnullpointerexception.o\
 	   jserializable.o\
