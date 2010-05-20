@@ -309,6 +309,12 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		int64_t Tell();
+
+		/**
+		 * \brief
+		 *
+		 */
 		int64_t Seek(int64_t n);
 
 		/**

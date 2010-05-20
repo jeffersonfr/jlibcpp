@@ -71,9 +71,7 @@ void DynamicLink::Load(std::string lib, jlink_flags_t mode)
 void * DynamicLink::FindSymbol(std::string symbol)
 {
 #ifdef WIN32
-	// TODO:: win32 return GetProcAddress((HINSTANCE)_handler, symbol.c_str());
-	
-	return NULL;
+	return GetProcAddress((HMODULE)hdl, tchartoachar(symbol.c_str()));
 #else
 	void *sym = dlsym(_handle, symbol.c_str());
 

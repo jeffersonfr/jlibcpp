@@ -534,14 +534,11 @@ bool SSLSocket::Accept()
 		// Get the client's certificate (optional)
 		client_cert = SSL_get_peer_certificate(ssl);
 		if (client_cert != NULL) {
-			printf ("Client certificate:\n");     
 			str = X509_NAME_oneline(X509_get_subject_name(client_cert), 0, 0);
 			RETURN_NULL(str);
-			printf ("\t subject: %s\n", str);
 			free (str);
 			str = X509_NAME_oneline(X509_get_issuer_name(client_cert), 0, 0);
 			RETURN_NULL(str);
-			printf ("\t issuer: %s\n", str);
 			free (str);
 			X509_free(client_cert);
 		} 

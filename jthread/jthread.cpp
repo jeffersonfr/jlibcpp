@@ -267,6 +267,7 @@ void Thread::Start(int key)
 
 	t->thread = _thread;
 #else
+	// pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 	if (pthread_create(&_thread, NULL, &(Thread::ThreadMain), arg)) {
 		t->alive = false;
 

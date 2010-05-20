@@ -30,18 +30,45 @@
 
 namespace jcommon {
 
+#ifdef _WIN32
+
+#define EPOCH_BIAS 116444736000000000i64
+
+#define IS_LEAP_YEAR(year) ((year & 3) == 0)
+
+int _days[] = { 
+	-1, 30, 58, 89, 119, 150, 180, 211, 242, 272, 303, 333, 364 
+};
+
+SystemTime2LongTime(SYSTEMTIME *stm) 
+{
+	uint64_t t;
+	int tmpdays,
+			year = stm->wYear - 1900;
+
+	tmpdays = stm->wDay + _days[stm->wMonth - 1];
+	
+	if (IS_LEAP_YEAR(year) && stm->wMonth > 2) {
+		tmpdays++;
+	}
+
+	t = ((year - _BASE_YEAR) * 365LL +	((year - 1LL) >> 2LL) - _LEAP_YEAR_ADJUST + tmpdays) * 24LL + stm->wHour;
+	t = (t * 60LL + stm->wMinute) * 60LL + stm->wSecond;
+	t += _timezone;
+
+	return t;
+}
+#endif
+
 Date::Date():
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jcommon::Date");
 	
 #ifdef _WIN32
-	FILETIME ft;
-
 	GetLocalTime(&_zone);
 
-	GetSystemTimeAsFileTime(&ft);
-	FileTimeToSystemTime(&ft, _time);
+	_time = (time_t)SystemTime2LongTime(&_zone);
 #else
 	_time = time(NULL);
 	_zone = localtime(&_time);
@@ -78,8 +105,8 @@ Date::Date(time_t time_):
 			segundos,
 			MJD;
 
-	MJD = time_ >> 24;
-	hora = time_ & 0xffffff;
+	MJD = _time >> 24;
+	hora = _time & 0xffffff;
 
 	Y2 = (int) ((MJD - 15078.2) / 365.25);
 	M2 = (int) ((MJD - 14956.1 - (int) (Y2 * 365.25)) / 30.6001);
@@ -119,8 +146,6 @@ Date::Date(int day, int month, int year):
 	jcommon::Object::SetClassName("jcommon::Date");
 	
 #ifdef _WIN32
-	FILETIME ft;
-
 	GetLocalTime(&_zone);
 	
 	_zone.wDay = day; // 1-31
@@ -130,8 +155,7 @@ Date::Date(int day, int month, int year):
 	// _zone.wMinute = minutes; // 0-59
 	// _zone.wHour = hour; // 0-23
 
-	SystemTimeToFileTime(&_zone, &ft);
-	FileTimeToSystemTime(&ft, _time);
+	_time = (time_t)SystemTime2LongTime(&_zone);
 #else
 	_time = time(NULL);
 
@@ -171,8 +195,6 @@ Date::Date(int day, int month, int year, int hours, int minutes, int seconds):
 	jcommon::Object::SetClassName("jcommon::Date");
 	
 #ifdef _WIN32
-	FILETIME ft;
-
 	GetLocalTime(&_zone);
 	
 	_zone.wDay = day; // 1-31
@@ -182,8 +204,7 @@ Date::Date(int day, int month, int year, int hours, int minutes, int seconds):
 	_zone.wMinute = minutes; // 0-59
 	_zone.wSecond = seconds; // 0-59
 
-	SystemTimeToFileTime(&_zone, &ft);
-	FileTimeToSystemTime(&ft, _time);
+	_time = (time_t)SystemTime2LongTime(&_zone);
 #else
 	_time = time(NULL);
 
@@ -229,7 +250,7 @@ Date::~Date()
 uint64_t Date::CurrentTimeSeconds()
 {
 #ifdef _WIN32
-	return (long long)(GetTickCount64()/1000);
+	return (uint64_t)(GetTickCount64()/1000);
 #else
 	return (uint64_t)time(NULL);
 #endif
@@ -238,8 +259,7 @@ uint64_t Date::CurrentTimeSeconds()
 uint64_t Date::CurrentTimeMillis()
 {
 #ifdef _WIN32
-	// EXCLUDE:: win32 return clock();
-	return (long long)GetTickCount64();
+	return (uint64_t)GetTickCount64();
 #else
 	timeval t;
 
@@ -253,8 +273,17 @@ uint64_t Date::CurrentTimeMillis()
 uint64_t Date::CurrentTimeMicros()
 {
 #ifdef _WIN32
-	// EXCLUDE:: win32 return clock()*1000;
-	return (uint64_t)(GetTickCount64()*1000LL);
+	// return (uint64_t)(GetTickCount64()*1000LL);
+
+	union {
+		uint64_t u64;
+		FILETIME ft;
+	} ft;
+	usec_t usec;
+
+	GetSystemTimeAsFileTime(&ft.ft);
+	
+	return (uint64_t)((ft.u64 - EPOCH_BIAS)/10LL);
 #else
 	timeval t;
 

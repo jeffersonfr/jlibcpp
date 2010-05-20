@@ -974,7 +974,7 @@ void rtcp_read_sdes(Rtcp_Packet packet, Rtcp_Find_Member_Func find_member, Rtcp_
 	}
 	
 	if (count >= 0) {
-		puts("Trouble parsing an RTCP SDES packet.");
+		std::cout << "Trouble parsing an RTCP SDES packet." << std::endl;
 	}
 }
 

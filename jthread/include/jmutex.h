@@ -52,7 +52,8 @@ enum jmutex_protocol_t {
 */
 class Mutex : public virtual jcommon::Object{
 
-friend class Condition;
+	friend class Condition;
+	friend class Event;
 
 	private:
 #ifdef _WIN32

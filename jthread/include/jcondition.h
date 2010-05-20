@@ -41,7 +41,7 @@ class Condition : public virtual jcommon::Object{
 
     private:
 #ifdef _WIN32
-			Semaphore _semaphore;
+			HANDLE _event;
 #else
 			/** \brief Mutex */
 			Mutex _monitor;

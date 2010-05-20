@@ -394,7 +394,7 @@ bool File::IsDirectory()
 	hFind = FindFirstFile(szDir, &ffd);
 
 	if (INVALID_HANDLE_VALUE == hFind) {
-		return NULL;
+		return false;
 	}
 
 	FindClose(hFind);
@@ -615,24 +615,16 @@ std::vector<std::string> * File::ListFiles(std::string extension)
 	WIN32_FIND_DATA ffd;
 	LARGE_INTEGER filesize;
 	HANDLE hFind = INVALID_HANDLE_VALUE;
-	size_t length_of_arg;
 
 	// Check that the input path plus 3 is not longer than MAX_PATH (three characters are for the "\*" plus NULL).
-
-	StringCchLength(path.c_str(), MAX_PATH, &length_of_arg);
-
-	if (length_of_arg > (MAX_PATH - 3)) {
-		// directory path is too long
+	if (path.size() > (MAX_PATH - 3)) {
 		return NULL;
 	}
 
 	// First, copy the string to a buffer, then append '\*' to the directory name.
-
-	StringCchCopy(szDir, MAX_PATH, path.c_str());
-	StringCchCat(szDir, MAX_PATH, TEXT("\\*"));
+	path = path + "\\*";
 
 	// Find the first file in the directory.
-
 	hFind = FindFirstFile(szDir, &ffd);
 
 	if (INVALID_HANDLE_VALUE == hFind) {
@@ -760,6 +752,25 @@ void File::Remove()
 void File::Reset() 
 {
 	Seek(0);
+}
+
+int64_t File::Tell() 
+{
+#ifdef _WIN32
+	DWORD d;
+
+	if ((d = SetFilePointer((HANDLE)fd, 0, 0, FILE_CURRENT)) != -1) {
+		return (int64_t)d;
+	}
+#else
+	off_t d;
+	
+	if ((d = lseek(_fd, 0, SEEK_CUR)) != -1) {
+		return (int64_t)d;
+	}
+#endif
+		
+	return -1LL;
 }
 
 int64_t File::Seek(int64_t n) 
