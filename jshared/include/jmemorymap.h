@@ -25,21 +25,13 @@
 #include <iostream>
 
 #ifdef _WIN32
-#include <windows.h>
-#include <winsock.h>
 #else
-#include <sys/socket.h>
-#endif
-
-#include <unistd.h>
-#include <stdint.h>
-
-#ifdef _WIN32
-#else
+#include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/mman.h>
-#include <fcntl.h>
+#include <unistd.h>
 #endif
+
+#include <stdint.h>
 
 namespace jshared {
 
@@ -65,74 +57,74 @@ class MemoryMap : public virtual jcommon::Object{
 
     private:
 #ifdef _WIN32
-        /** \brief Socket handler. */
-		HANDLE _fd;
+			/** \brief Socket handler. */
+			HANDLE _fd;
 #else
-        /** \brief Socket handler. */
-        int _fd;
+			/** \brief Socket handler. */
+			int _fd;
 #endif
-        /** \brief */
-		void *_start;
-        /** \brief */
-		std::string _filename;
-        /** \brief */
-		bool _is_open;
-        /** \brief */
-		int _timeout;
-        /** \brief */
-		struct stat _stats;
-        /** \brief */
-		jmemory_perms_t _perms;
+			/** \brief */
+			struct stat _stats;
+			/** \brief */
+			void *_start;
+			/** \brief */
+			std::string _filename;
+			/** \brief */
+			int _timeout;
+			/** \brief */
+			jmemory_perms_t _perms;
+			/** \brief */
+			bool _is_open;
 
-	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		MemoryMap(std::string sharedfile_, jmemory_flags_t flags_ = MEM_OPEN, jmemory_perms_t perms_ = MEM_READ_WRITE, bool private_ = true);
-	
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		MemoryMap(std::string sharedfile_);
-	
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~MemoryMap();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		long long Get(char *data_, int size_, int offset_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		long long Put(const char *data_, int size_, int offset_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPermission(jmemory_perms_t perms_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		long long GetSize();
+		public:
+			/**
+			 * \brief Constructor.
+			 *
+			 */
+			MemoryMap(std::string sharedfile_, jmemory_flags_t flags_ = MEM_OPEN, jmemory_perms_t perms_ = MEM_READ_WRITE, bool private_ = true);
 
-		/**
-		 * \brief 
-		 *
-		 */
-		void Release();
-		
+			/**
+			 * \brief Constructor.
+			 *
+			 */
+			MemoryMap(std::string sharedfile_);
+
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~MemoryMap();
+
+			/**
+			 * \brief
+			 *
+			 */
+			int64_t Get(char *data_, int64_t size_, int64_t offset_);
+
+			/**
+			 * \brief
+			 *
+			 */
+			int64_t Put(const char *data_, int64_t size_, int64_t offset_);
+
+			/**
+			 * \brief
+			 *
+			 */
+			void SetPermission(jmemory_perms_t perms_);
+
+			/**
+			 * \brief
+			 *
+			 */
+			int64_t GetSize();
+
+			/**
+			 * \brief 
+			 *
+			 */
+			void Release();
+
 };
 
 }

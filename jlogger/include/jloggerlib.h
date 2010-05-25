@@ -20,4 +20,18 @@
 #ifndef J_LOGGERLIB_H
 #define J_LOGGERLIB_H
 
+#include "jconsolehandler.h"
+#include "jfilehandler.h"
+#include "jformatter.h"
+#include "jhandler.h"
+#include "jlogger.h"
+#include "jloggerexception.h"
+#include "jloggermanager.h"
+#include "jlogrecord.h"
+#include "jmemoryhandler.h"
+#include "jsimpleformatter.h"
+#include "jsockethandler.h"
+#include "jstreamhandler.h"
+#include "jxmlformatter.h"
+
 #endif

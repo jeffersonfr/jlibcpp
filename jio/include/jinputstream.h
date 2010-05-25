@@ -20,7 +20,6 @@
 #ifndef J_INPUTSTREAM_H
 #define J_INPUTSTREAM_H
 
-#include "jinputstream.h"
 #include "jobject.h"
 
 #include <stdint.h>
@@ -96,7 +95,7 @@ class InputStream : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual int Read() = 0;
+		virtual int64_t Read() = 0;
 
 		/**
 		 * \brief
@@ -108,7 +107,7 @@ class InputStream : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual std::string Read(int size);
+		virtual std::string Read(int64_t size);
     
 		/**
 		 * \brief Salto relativo.

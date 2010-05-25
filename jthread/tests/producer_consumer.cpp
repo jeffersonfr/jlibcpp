@@ -1,13 +1,5 @@
-/**
- * A test program: one thread inserts integers from 1 to 10000, the other reads them and prints them
- *
- */
-
-#include "jthread.h"
-#include "jcondition.h"
-#include "jmutex.h"
-#include "jautolock.h"
-#include "jmonitor.h"
+// A test program: one thread inserts integers from 1 to 10000, the other reads them and prints them
+#include "jthreadlib.h"
 
 #include <stdio.h>
 

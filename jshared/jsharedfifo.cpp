@@ -17,24 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsharedfifo.h"
-#include "jfifoexception.h"
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#include <stdio.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <sys/sem.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <string.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <errno.h>
-#endif
+#include "Stdafx.h"
+#include "jsharedlib.h"
 
 namespace jshared {
 
@@ -119,6 +103,7 @@ SharedFifo::~SharedFifo()
 int SharedFifo::LLMemFree()
 {
 #ifdef _WIN32
+	return 0;
 #else
 	struct jshmprefix_t *p;
 	int count;
@@ -139,6 +124,7 @@ int SharedFifo::LLMemFree()
 int SharedFifo::LLMemUsed()
 {
 #ifdef _WIN32
+	return 0;
 #else
 	struct jshmprefix_t *p= (struct jshmprefix_t *)_shm->mem;
 	int count;
@@ -157,6 +143,7 @@ int SharedFifo::LLMemUsed()
 int SharedFifo::LLPut(void *data, int sz)
 {
 #ifdef _WIN32
+	return 0;
 #else
 	struct jshmprefix_t *p = (struct jshmprefix_t *)_shm->mem;
 	int copysz;
@@ -192,6 +179,7 @@ int SharedFifo::LLPut(void *data, int sz)
 int SharedFifo::LLGet(void *data, int sz)
 {
 #ifdef _WIN32
+	return 0;
 #else
 	struct jshmprefix_t*p;
 	int copysz;
@@ -371,6 +359,7 @@ void SharedFifo::Getpriv(void *priv)
 int SharedFifo::Get(void *data,int sz)
 {
 #ifdef _WIN32
+	return 0;
 #else
 	if ((void *)data == NULL) {
 		throw FifoException("Null pointer in data parameter");
@@ -423,6 +412,7 @@ int SharedFifo::Get(void *data,int sz)
 int SharedFifo::Put(void *data, int sz)
 {
 #ifdef _WIN32
+	return 0;
 #else
 	if ((void *)data == NULL) {
 		throw FifoException("Null pointer in data parameter");
@@ -452,6 +442,7 @@ int SharedFifo::Put(void *data, int sz)
 bool SharedFifo::IsEmpty()
 {
 #ifdef _WIN32
+	return true;
 #else
   	if ((void *)_shm == NULL) {
 		throw FifoException("Parameter shm is null");

@@ -17,14 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jlogger.h"
-#include "jhandler.h"
-#include "jformatter.h"
-
-#include <iostream>
-
-#include <stdio.h>
-#include <stdarg.h>
+#include "Stdafx.h"
+#include "jloggerlib.h"
 
 namespace jlogger {
 
@@ -72,7 +66,7 @@ void Logger::SendLogger(jrecord_type_t type_, std::string record_)
 		_handler->WriteRecord(record);
 
 		delete record;
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 		if (record != NULL) {
 			delete record;
 		}
@@ -108,7 +102,7 @@ void Logger::SendLogger(jrecord_type_t type_, const char *fmt, ...)
 		_handler->WriteRecord(record);
 
 		delete record;
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 		if (record != NULL) {
 			delete record;
 		}
@@ -172,7 +166,7 @@ void Logger::Release()
 
 			delete record;
 		}
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 		if (record != NULL) {
 			delete record;
 		}

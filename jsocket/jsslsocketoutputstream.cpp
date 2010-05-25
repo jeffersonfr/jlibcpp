@@ -17,12 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsslsocketoutputstream.h"
-#include "jsocketexception.h"
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 
-SSLSocketOutputStream::SSLSocketOutputStream(Connection *conn_, bool *is_closed_, SSL *ssl, int size_):
+SSLSocketOutputStream::SSLSocketOutputStream(Connection *conn_, bool *is_closed_, SSL *ssl, int64_t size_):
 	jio::OutputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocketOutputStream");
@@ -59,7 +59,7 @@ int64_t SSLSocketOutputStream::Available()
 	return 0LL;
 }
 
-int SSLSocketOutputStream::Write(int c_)
+int64_t SSLSocketOutputStream::Write(int64_t c_)
 {
 	_buffer[_current_index++] = c_;
 
@@ -102,7 +102,7 @@ bool SSLSocketOutputStream::IsEmpty()
 	return (_current_index == 0);
 }
 
-int SSLSocketOutputStream::GetAvailable()
+int64_t SSLSocketOutputStream::GetAvailable()
 {
 	return _current_index;
 }

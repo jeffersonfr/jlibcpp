@@ -1,6 +1,4 @@
-#include "jthread.h"
-#include "jsemaphore.h"
-#include "jmutex.h"
+#include "jthreadlib.h"
 
 #include <iostream>
 #include <string>
@@ -124,7 +122,7 @@ bool Dining::isLocked(int p_no)
 {
   	bool locked;
 
-	if (locked = (p_fork[p_no].TryLock() == false)) {
+	if ((locked = (p_fork[p_no].TryLock()) == false)) {
 		p_fork[p_no].Unlock();
 	}
 

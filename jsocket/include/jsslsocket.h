@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SOCKET_H
-#define J_SOCKET_H
+#ifndef J_SSLSOCKET_H
+#define J_SSLSOCKET_H
 
 #include "jinetaddress.h"
 #include "jserversocket.h"
@@ -27,13 +27,8 @@
 #include "jsslsocketoutputstream.h"
 #include "jconnection.h"
 
-#include "jobject.h"
-
-#include <iostream>
-
 #ifdef _WIN32
 #include <windows.h>
-#include <winsock.h>
 #else
 #include <sys/socket.h>
 #include <openssl/ssl.h>
@@ -43,7 +38,6 @@
 #include <openssl/rand.h>
 #endif
 
-#include <unistd.h>
 #include <stdint.h>
 
 /**

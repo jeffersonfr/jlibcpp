@@ -62,19 +62,19 @@ class BufferedReader : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		int Available();
+		int64_t Available();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		int Read();
+		int64_t Read();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		int Read(char *, int size);
+		int64_t Read(char *, int64_t size);
     
 		/**
 		 * \brief

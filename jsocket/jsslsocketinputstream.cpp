@@ -17,12 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsslsocketinputstream.h"
-#include "jsocketexception.h"
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 
-SSLSocketInputStream::SSLSocketInputStream(Connection *conn_, bool *is_closed_, SSL *ssl, int size_):
+SSLSocketInputStream::SSLSocketInputStream(Connection *conn_, bool *is_closed_, SSL *ssl, int64_t size_):
 	jio::InputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocketInputStream");
@@ -55,7 +55,7 @@ SSLSocketInputStream::~SSLSocketInputStream()
 	}
 }
 
-int SSLSocketInputStream::Read()
+int64_t SSLSocketInputStream::Read()
 {
 	if ((*_is_closed) == true) {
 		throw SocketException("Connection is closed");
@@ -78,7 +78,7 @@ int SSLSocketInputStream::Read()
 		if (n <= 0) {
 #endif
 			// throw SocketException("Read socket error !");
-			return -1;
+			return -1LL;
 		}
 			
 		_current_index = 0;
@@ -94,7 +94,7 @@ int SSLSocketInputStream::Read()
 		_current_index = _end_index = 0;
 	}
 	
-	return c;
+	return (int64_t)c;
 }
 
 int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)

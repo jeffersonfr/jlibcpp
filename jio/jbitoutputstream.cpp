@@ -17,31 +17,24 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jbitoutputstream.h"
-#include "jfileoutputstream.h"
-#include "joutofboundsexception.h"
-#include "jioexception.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
+#include "jcommonlib.h"
 
 namespace jio {
 
 BitOutputStream::BitOutputStream(std::string filename):
 	OutputStream()
 {
-    jcommon::Object::SetClassName("jio::BitOutputStream");
-    jcommon::Object::SetClassName("jio::OutputStream");
-	
-    stream = NULL;
+	jcommon::Object::SetClassName("jio::BitOutputStream");
+	jcommon::Object::SetClassName("jio::OutputStream");
+
+	stream = NULL;
 	haveByte = false;
 	show = false;
-    bitCount = 0;
+	bitCount = 0;
 	currentByte = 0;
-	
+
 	try {
 		stream = new FileOutputStream(filename);
 	} catch (...) {
@@ -54,9 +47,9 @@ BitOutputStream::BitOutputStream(std::string filename):
 BitOutputStream::BitOutputStream(OutputStream *os):
 	OutputStream()
 {
-    jcommon::Object::SetClassName("jio::BitOutputStream");
-    jcommon::Object::SetClassName("jio::OutputStream");
-	
+	jcommon::Object::SetClassName("jio::BitOutputStream");
+	jcommon::Object::SetClassName("jio::OutputStream");
+
 	if ((void *)os == NULL) {
 		throw IOException("Null pointer exception");
 	}
@@ -64,7 +57,7 @@ BitOutputStream::BitOutputStream(OutputStream *os):
 	stream = os;
 	haveByte = false;
 	show = false;
-    bitCount = 0;
+	bitCount = 0;
 	currentByte = 0;
 }
 
@@ -85,7 +78,7 @@ int64_t BitOutputStream::Available()
 	return 0LL;
 }
 
-int BitOutputStream::Write(int b)
+int64_t BitOutputStream::Write(int b)
 {
 	return stream->Write(b);
 }

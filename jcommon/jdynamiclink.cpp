@@ -17,19 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jdynamiclink.h"
-#include "jruntimeexception.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
-
-#ifdef _WIN32
-#include <windows.h>
-#else
-#endif
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 namespace jcommon {
 
@@ -46,7 +35,7 @@ DynamicLink::~DynamicLink()
 void DynamicLink::Load(std::string lib, jlink_flags_t mode)
 {
 #ifdef _WIN32
-	_handle = LoadLibrary(lib.c_str());
+	// _handle = LoadLibrary(_T(lib.c_str()));
 #else
 	int m = 0;
 
@@ -71,7 +60,7 @@ void DynamicLink::Load(std::string lib, jlink_flags_t mode)
 void * DynamicLink::FindSymbol(std::string symbol)
 {
 #ifdef WIN32
-	return GetProcAddress((HMODULE)hdl, tchartoachar(symbol.c_str()));
+	return GetProcAddress((HMODULE)_handle, symbol.c_str());
 #else
 	void *sym = dlsym(_handle, symbol.c_str());
 

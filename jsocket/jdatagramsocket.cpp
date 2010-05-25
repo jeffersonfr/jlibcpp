@@ -17,20 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jdatagramsocket.h"
-#include "jsocketexception.h"
-#include "jsockettimeoutexception.h"
-#include "jsocketstreamexception.h"
-#include "junknownhostexception.h"
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#include <poll.h>
-#endif
-
-#include <errno.h>
-#include <stdio.h>
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 
@@ -72,7 +60,7 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 
 	try {
 		_address = InetAddress::GetByName("localhost");
-	} catch (UnknownHostException &e) {
+	} catch (UnknownHostException &) {
 		// WARN:: verify if GetInetAddress() == NULL
 		_address = NULL;
 	}
@@ -83,7 +71,7 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 		while(true) {
 			try {
 				BindSocket(_address, ++_used_port);
-			} catch(SocketException &e) {
+			} catch(SocketException &) {
 				continue;
 			}
 
@@ -513,7 +501,6 @@ int DatagramSocket::Send(const char *data_, int size_, bool block_)
 #endif
 	}
 
-
 	if (_stream == true) {	
 #ifdef _WIN32
 		n = ::send(_fd, data_, size_, flags);
@@ -621,7 +608,7 @@ SocketOption * DatagramSocket::GetSocketOption()
 std::string DatagramSocket::what()
 {
 	char port[20];
-    
+   
 	sprintf(port, "%u", GetPort());
 
 	return GetInetAddress()->GetHostName() + ":" + port;

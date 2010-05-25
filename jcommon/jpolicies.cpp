@@ -17,21 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jpolicies.h"
-#include "jruntimeexception.h"
-#include "jstringutils.h"
-#include "jfile.h"
-#include "jautolock.h"
-
-#include <sstream>
-#include <iostream>
-#include <vector>
-#include <algorithm>
-
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
+#include "jiolib.h"
+#include "jthreadlib.h"
 
 namespace jcommon {
 
@@ -53,7 +42,7 @@ void Policies::Load(std::string filename, std::string escape)
 
 	std::string id,
 		content;
-	int r,
+	int64_t r,
 		state = 0;
 	char c;
 

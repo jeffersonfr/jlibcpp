@@ -43,10 +43,8 @@
 #include <sys/ioctl.h>
 #include <net/if.h>
 #include <arpa/inet.h>
-
 #endif
 
-#include <unistd.h>
 #include <stdint.h>
 
 namespace jsocket {

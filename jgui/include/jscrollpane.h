@@ -20,7 +20,6 @@
 #ifndef J_SCROLLPANE_H
 #define J_SCROLLPANE_H
 
-#include "jguilib.h"
 #include "jcontainer.h"
 #include "jscrollbar.h"
 
@@ -29,8 +28,6 @@
 #include <algorithm>
 
 #include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 
 namespace jgui {
 

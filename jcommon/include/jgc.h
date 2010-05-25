@@ -20,8 +20,7 @@
 #ifndef J_GC_H
 #define J_GC_H
 
-#include "jobject.h"
-#include "jexception.h"
+#include "jruntimeexception.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable : 4786)
@@ -47,6 +46,7 @@
 #include <memory.h>
 #include <string.h>
 #endif
+
 #include <set>
 #include <map>
 #include <vector>
@@ -56,6 +56,8 @@
 #include <exception>
 #include <stdexcept>
 #include <iostream>
+#include <functional>
+#include <new>
 
 #ifndef _SMGC_POOR_STL
 #include <cstdlib>
@@ -64,8 +66,6 @@
 #include <stdlib.h>
 #include <stddef.h>
 #endif
-#include <exception>
-#include <stdexcept>
 
 #ifndef _SMGC_POOR_STL
 #include <cstdlib>
@@ -78,10 +78,6 @@
 #include <limits.h>
 #include <assert.h>
 #endif
-#include <exception>
-#include <stdexcept>
-#include <functional>
-#include <new>
 
 #if defined(_MSC_VER) && (_MSVC <= 1200)
 #define _SMGC_NO_FRIEND_TEMPLATES
@@ -107,8 +103,6 @@
 # endif
 #endif
 
-using namespace std;
-
 namespace jcommon {
 
 template<typename T> class gc_ptr;
@@ -127,24 +121,6 @@ size_t get_dynamic_threshold();
 
 extern const size_t no_threshold;
 extern const size_t default_threshold;
-
-struct bad_reg: public exception {
-	virtual ~bad_reg() throw();
-	virtual const char *what() const throw();
-};
-
-struct no_space: public exception {
-	virtual ~no_space() throw();
-	virtual const char *what() const throw();
-};
-
-class mem_corrupt: public Exception {
-	char* msg;
-	public:
-	mem_corrupt(const char *txt="");
-	virtual ~mem_corrupt() throw();
-	virtual const char *what() const throw();
-};
 
 struct gc_t {
 };
@@ -182,11 +158,11 @@ struct pointer_base {
 	int pos;
 #ifndef NDEBUG
 	bool destroyed;
-# ifdef DEBUG_COMPILER
+#ifdef DEBUG_COMPILER
 	char *trash;
 	//void assert_valid()
 	//{ ASSERT_VALID; }
-# endif
+#endif
 #endif
 
 	protected:
@@ -210,9 +186,9 @@ struct weak_base {
 	int pos;
 #ifndef NDEBUG
 	bool destroyed;
-# ifdef DEBUG_COMPILER
+#ifdef DEBUG_COMPILER
 	char *trash;
-# endif
+#endif
 #endif
 
 	protected:
@@ -622,424 +598,6 @@ template<typename T>class gc_ptr: public const_gc_ptr<T> {
 			super::swap(p);
 		}
 };
-
-
-
-
-
-
-
-
-
-
-/*
-  template<typename T>
-  class const_gc_ptr: public pointer_base
-  {
-#ifdef _SMGC_NO_FRIEND_TEMPLATES
-  public:
-#else
-  protected:
-    template<typename U> friend class const_gc_ptr;
-    template<typename U> friend class gc_ptr;
-    template<typename U> friend class const_wk_ptr;
-    template<typename U> friend class wk_ptr;
-    friend struct std::less<const_gc_ptr<T> >;
-    friend struct std::less<gc_ptr<T> >;
-#endif
-    friend void collect();
-
-    T* ptr;
-
-  public:
-    typedef T element_type;
-
-  private:
-    typedef pointer_base super;
-
-  protected:
-    template <typename U>
-    void reset_node(const U* obj)
-    {
-      super::reset_node(obj, destructor<U>::destroy);
-    }
-
-
-    const_gc_ptr(const light_cons_t&) {}
-
-  public:
-    const_gc_ptr(): ptr(0) {}
-
-    const_gc_ptr(const gc_null_t&): ptr(0) {}
-
-    template<typename U>
-    explicit const_gc_ptr(const U *p)//: ptr(0)
-    {
-      reset(p);
-    }
-
-    template<typename U>
-    const_gc_ptr(const U *p, const dynamic_cast_t*)//: ptr(0)
-    {
-      reset(dynamic_cast<T*>(p));
-    }
-
-    template<typename U>
-    const_gc_ptr(const U *p, const static_cast_t*)//: ptr(0)
-    {
-      reset(static_cast<T*>(p));
-    }
-
-    const_gc_ptr(const T *p)//: ptr(0)
-    {
-      reset(p);
-    }
-
-    template<typename U>
-    const_gc_ptr(const const_gc_ptr<U> &p): super(p), ptr(implicit_cast<T*>(p.ptr)) {}
-
-    template<typename U>
-    const_gc_ptr(const const_gc_ptr<U> &p, const dynamic_cast_t*):
-      super(p), ptr(dynamic_cast<T*>(p.ptr)) {}
-
-    template<typename U>
-    const_gc_ptr(const const_gc_ptr<U> &p, const static_cast_t*):
-      super(p), ptr(static_cast<T*>(p.ptr)) {}
-
-#ifndef NDEBUG
-    ~const_gc_ptr()
-    {
-      ptr=0;
-    }
-#endif
-
-    const_gc_ptr<T>& operator = (const gc_null_t&)
-    {
-      ASSERT_VALID;
-      ptr = 0;
-      return *this;
-    }
-
-    template<typename U>
-    const_gc_ptr<T>& operator = (const U *p)
-    {
-      ASSERT_VALID;
-      reset(p);
-      return *this;
-    }
-
-    template<typename U>
-    const_gc_ptr<T>& operator = (const const_gc_ptr<U> &p)
-    {
-      ASSERT_VALID;
-      ptr = p.ptr;
-      return *this;
-    }
-
-    const T& operator * () const
-    {
-      ASSERT_VALID;
-      return *ptr;
-    }
-
-    const T* operator -> () const
-    {
-      ASSERT_VALID;
-      return ptr;
-    }
-
-    const T* get() const
-    {
-      ASSERT_VALID;
-      return ptr;
-    }
-
-    bool operator ! () const
-    {
-      ASSERT_VALID;
-      return ptr==0;
-    }
-
-    operator bool () const
-    {
-      ASSERT_VALID;
-      return ptr!=0;
-    }
-
-    bool operator ==(const gc_null_t&) const
-    {
-      ASSERT_VALID;
-      return ptr == 0;
-    }
-
-    bool operator !=(const gc_null_t&) const
-    {
-      ASSERT_VALID;
-      return ptr != 0;
-    }
-
-    template<typename U>
-    bool operator ==(const const_gc_ptr<U> &p) const
-    {
-      ASSERT_VALID;
-      return ptr == p.ptr;
-    }
-
-    template<typename U>
-    bool operator !=(const const_gc_ptr<U> &p) const
-    {
-      ASSERT_VALID;
-      return ptr != p.ptr;
-    }
-
-    template<typename U>
-    bool operator <=(const const_gc_ptr<U> &p) const
-    {
-      ASSERT_VALID;
-      return ptr <= p.ptr;
-    }
-
-    template<typename U>
-    bool operator >=(const const_gc_ptr<U> &p) const
-    {
-      ASSERT_VALID;
-      return ptr >= p.ptr;
-    }
-
-    template<typename U>
-    bool operator <(const const_gc_ptr<U> &p) const
-    {
-      ASSERT_VALID;
-      return ptr < p.ptr;
-    }
-
-    template<typename U>
-    bool operator >(const const_gc_ptr<U> &p) const
-    {
-      ASSERT_VALID;
-      return ptr > p.ptr;
-    }
-
-
-    template<typename U>
-    bool operator ==(const U *p) const
-    {
-      ASSERT_VALID;
-      return ptr == p;
-    }
-
-    template<typename U>
-    bool operator !=(const U *p) const
-    {
-      ASSERT_VALID;
-      return ptr != p;
-    }
-
-#ifdef _SMGC_PTR_COMPARABLE
-    template<typename U>
-    bool operator <=(const U *p) const
-    {
-      ASSERT_VALID;
-      return ptr <= p;
-    }
-
-    template<typename U>
-    bool operator >=(const U *p) const
-    {
-      ASSERT_VALID;
-      return ptr >= p;
-    }
-
-    template<typename U>
-    bool operator <(const U *p) const
-    {
-      ASSERT_VALID;
-      return ptr < p;
-    }
-
-    template<typename U>
-    bool operator >(const U *p) const
-    {
-      ASSERT_VALID;
-      return ptr > p;
-    }
-#endif
-
-    void reset(const T* p=0)
-    {
-      ASSERT_VALID;
-      reset_node(p);
-      ptr = const_cast<T*>(p);
-    }
-
-    void swap(const_gc_ptr &p)
-    {
-      ASSERT_VALID;
-      T* tmp = ptr;
-      ptr = p.ptr;
-      p.ptr = tmp;
-      super::swap(p);
-    }
-  };
-
-
-
-
-
-
-
-
-
-
-
-
-
-  template<typename T>
-  class gc_ptr: public const_gc_ptr<T>
-  {
-  public:
-    typedef T element_type;
-
-  private:
-    typedef const_gc_ptr<T> super;
-
-  public:
-    gc_ptr() {}
-
-    gc_ptr(const gc_null_t&) {}
-
-    template<typename U>
-    explicit gc_ptr(U *p): super(light_cons_t())
-    {
-      reset(p);
-    }
-
-    template<typename U>
-    gc_ptr(U *p, const dynamic_cast_t*): super(light_cons_t())
-    {
-      reset(dynamic_cast<T*>(p));
-    }
-
-    template<typename U>
-    gc_ptr(U *p, const static_cast_t*): super(light_cons_t())
-    {
-      reset(static_cast<T*>(p));
-    }
-
-    template<typename U>
-    gc_ptr(const U *p, const const_cast_t*): super(light_cons_t())
-    {
-      reset(const_cast<T*>(p));
-    }
-
-    gc_ptr(T *p): super(light_cons_t())
-    {
-      reset(p);
-    }
-
-    template<typename U>
-    gc_ptr(const gc_ptr<U> &p): super(p) {}
-
-    template<typename U>
-    gc_ptr(const gc_ptr<U> &p, const dynamic_cast_t*):
-      super(p, static_cast<dynamic_cast_t*>(0)) {}
-
-    template<typename U>
-    gc_ptr(const gc_ptr<U> &p, const static_cast_t*):
-      super(p, static_cast<static_cast_t*>(0)) {}
-
-    template<typename U>
-    gc_ptr(const const_gc_ptr<U> &p, const const_cast_t*):
-      super(p) {}
-
-#ifndef NDEBUG
-    ~gc_ptr()
-    {
-      ASSERT_SUPER_VALID;
-      super::ptr=0;
-    }
-#endif
-
-    gc_ptr<T>& operator = (const gc_null_t&)
-    {
-      ASSERT_SUPER_VALID;
-      super::ptr = 0;
-      return *this;
-    }
-
-    template<typename U>
-    gc_ptr<T>& operator = (U *p)
-    {
-      ASSERT_SUPER_VALID;
-      reset(p);
-      return *this;
-    }
-
-    template<typename U>
-    gc_ptr<T>& operator = (const gc_ptr<U> &p)
-    {
-      ASSERT_SUPER_VALID;
-      super::ptr = const_cast<U*>(p.ptr);
-      return *this;
-    }
-
-    T& operator * () const
-    {
-      ASSERT_SUPER_VALID;
-      return *super::ptr;
-    }
-
-    T* operator -> () const
-    {
-      ASSERT_SUPER_VALID;
-      return super::ptr;
-    }
-
-    T* get() const
-    {
-      ASSERT_SUPER_VALID;
-      return super::ptr;
-    }
-
-    void reset(T* p=0)
-    {
-      ASSERT_SUPER_VALID;
-      reset_node(p);
-      super::ptr = p;
-    }
-
-    void swap(gc_ptr &p)
-    {
-      ASSERT_SUPER_VALID;
-      T* tmp = super::ptr;
-      super::ptr = p.ptr;
-      p.ptr = tmp;
-      super::swap(p);
-    }
-  };
-
-	*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 template<typename U>bool operator ==(const gc_null_t &l, const const_gc_ptr<U> &p)
 {
@@ -2117,17 +1675,17 @@ struct node_less {
 	bool operator()(const node_t* x, const node_t* y) const
 	{
 		//return (static_cast<const char*>(x->base) + x->size) <= static_cast<const char*>(y->base);
-		static const less<const void*> cmp = less<const void*>();
+		static const std::less<const void*> cmp = std::less<const void*>();
 		return !cmp(static_cast<const char*>(y->base), static_cast<const char*>(x->base) + x->size);
 	}
 } node_cmp;
 
-typedef pair<pointer_base*, node_t*> ptr_pair;
-typedef pair<weak_base*, node_t*> weak_pair;
+typedef std::pair<pointer_base*, node_t*> ptr_pair;
+typedef std::pair<weak_base*, node_t*> weak_pair;
 typedef fastvec<ptr_pair> ptr_vector;
 typedef fastvec<node_t*> node_vector;
 typedef fastvec<weak_pair> weak_vector;
-typedef deque<ptr_vector::iterator> ptr_queue;
+typedef std::deque<ptr_vector::iterator> ptr_queue;
 
 struct data_t {
 	data_t(): 
@@ -2233,7 +1791,7 @@ void node_t::kill(node_t *node)
 
 bool node_t::contains(const void* obj)
 {
-	static const less<const void*> cmp = less<const void*>();
+	static const std::less<const void*> cmp = std::less<const void*>();
 	if(cmp(obj, base))
 		return false;
 	return cmp(obj, static_cast<const char*>(base) + size);
@@ -2243,7 +1801,7 @@ void * node_t::operator new(size_t s)
 {
 	void *res = malloc(s);
 	if(res == 0)
-		throw bad_alloc();
+		throw std::bad_alloc();
 	return res;
 }
 
@@ -2255,7 +1813,7 @@ void * node_t::operator new(size_t s, void *place)
 void node_t::operator delete(void *n)
 {
 #ifndef NDEBUG
-	cerr << "Internal error -- badly written software" << endl;
+	std::cerr << "Internal error -- badly written software" << std::endl;
 	abort();
 #endif
 }
@@ -2269,10 +1827,10 @@ node_t* find_node(const void* obj)
 	// if the node at this point contains the specified object.  If the
 	// insertion point is at the end or does not contain the object then
 	// we've failed to find the node and return an iterator to the end.
-	node_vector::iterator i = lower_bound(data().new_nodes.begin(), data().new_nodes.end(), &temp, node_cmp);
+	node_vector::iterator i = std::lower_bound(data().new_nodes.begin(), data().new_nodes.end(), &temp, node_cmp);
 	if(i == data().new_nodes.end() || !(*i)->contains(obj))
 	{
-		i = lower_bound(data().old_nodes.begin(), data().old_nodes.end(), &temp, node_cmp);
+		i = std::lower_bound(data().old_nodes.begin(), data().old_nodes.end(), &temp, node_cmp);
 		if (i == data().old_nodes.end() || !(*i)->contains(obj))
 			return NULL;
 	}
@@ -2289,7 +1847,7 @@ node_t* find_new_node(const void* obj)
 	// if the node at this point contains the specified object.  If the
 	// insertion point is at the end or does not contain the object then
 	// we've failed to find the node and return an iterator to the end.
-	node_vector::iterator i = lower_bound(data().new_nodes.begin(), data().new_nodes.end(), &temp, node_cmp);
+	node_vector::iterator i = std::lower_bound(data().new_nodes.begin(), data().new_nodes.end(), &temp, node_cmp);
 	if(i == data().new_nodes.end() || !(*i)->contains(obj))
 		return NULL;
 
@@ -2353,7 +1911,7 @@ void mark(ptr_vector::iterator i, ptr_queue &que)
 
 void presort_ptr_vect(ptr_vector::iterator begin, ptr_vector::iterator end)
 {
-	static const less<pointer_base*> cmp = less<pointer_base*>();
+	static const std::less<pointer_base*> cmp = std::less<pointer_base*>();
 	if(end-begin < 16)
 		return;
 
@@ -2394,7 +1952,7 @@ void presort_ptr_vect(ptr_vector::iterator begin, ptr_vector::iterator end)
 
 void sort_ptr_vect(ptr_vector &v)
 {
-	static const less<pointer_base*> cmp = less<pointer_base*>();
+	static const std::less<pointer_base*> cmp = std::less<pointer_base*>();
 
 	ptr_vector::iterator begin = v.begin();
 	ptr_vector::iterator end = v.end();
@@ -2440,7 +1998,7 @@ void sort_ptr_vect(ptr_vector &v)
 		//if(cmp(i->first, p.first))
 		if(i->first <= p.first && p.first)
 		{
-			throw mem_corrupt("smartpointer order lost");
+			throw jcommon::RuntimeException("smartpointer order lost");
 			//cerr << "Order lost at " << (i-begin) << endl;
 			//abort();
 		}
@@ -2495,7 +2053,7 @@ void sort_node_vect(node_vector &v)
 
 	if(end-begin < 32)
 	{
-		sort(begin, end, node_cmp);
+		std::sort(begin, end, node_cmp);
 		return;
 	}
 
@@ -2555,12 +2113,14 @@ void clean_merge_ptr()
 	ptr_vector::reverse_iterator r = ops.rbegin()+nps.size();
 	ptr_vector::reverse_iterator n = nps.rbegin();
 	size_t os = ops.size();
-#ifdef _SMGC_POOR_STL
+
+#ifdef _WIN32
 	if (os > INT_MAX)
 #else
-		if ((int)os > numeric_limits<int>::max())
+	if ((int)os > std::numeric_limits<int>::max())
 #endif
-			throw no_space();
+		throw jcommon::RuntimeException("No space exception");
+
 	int s = (int)os;
 	while(r != ops.rend() && n != nps.rend()) {
 		--s;
@@ -2584,16 +2144,16 @@ void clean_merge_ptr()
 	}
 #ifndef NDEBUG
 	if(s != 0)
-		throw mem_corrupt("internal error in ptr_vectors merge");
+		throw jcommon::RuntimeException("internal error in ptr_vectors merge");
 	void *old = 0;
 	end = ops.end();
 	for(ptr_vector::iterator c = ops.begin(); c != end; ++c)
 	{
 		ASSERT_PTR_VALID(*(c->first));
 		if(c->first == old)
-			throw mem_corrupt("duplicated pointer");
+			throw jcommon::RuntimeException("duplicated pointer");
 		else if(c->first < old)
-			throw mem_corrupt("pointer order lost");
+			throw jcommon::RuntimeException("pointer order lost");
 		old = c->first;
 	}
 #endif
@@ -2655,15 +2215,15 @@ void clean_merge_nodes(size_t new_sweeped_out)
 	}
 #ifndef NDEBUG
 	if(s != 0)
-		throw mem_corrupt("internal error in node_sets merge");
+		throw jcommon::RuntimeException("internal error in node_sets merge");
 	node_t *old = 0;
 	end = onv.end();
 	for(node_vector::iterator c = onv.begin(); c != end; ++c)
 	{
 		if(*c == old)
-			throw mem_corrupt("duplicated node");
+			throw jcommon::RuntimeException("duplicated node");
 		else if(old && !node_cmp(old, *c))
-			throw mem_corrupt("node order lost");
+			throw jcommon::RuntimeException("node order lost");
 		old = *c;
 	}
 #endif
@@ -2693,7 +2253,7 @@ template<class A>void* gnew(size_t size, const A& a)
 	void* obj = 0;
 	try {
 	   	obj = a.alloc(size); 
-	} catch(bad_alloc&) { 
+	} catch(std::bad_alloc&) { 
 		if (collected) throw; 
 	}
 
@@ -2714,14 +2274,14 @@ template<class A>void* gnew(size_t size, const A& a)
 			else
 				node = new node_t(obj, size);
 			if(node == 0) // Dealing with VC++ 6.0 quirk
-				throw bad_alloc();
+				throw std::bad_alloc();
 			data().born_nodes.push_back(node);
 		}
 	} catch (...) {
 		// If inserting into the map failed clean up and simply throw
 		// a bad_alloc exception.
 		a.free(obj);
-		throw bad_alloc();
+		throw std::bad_alloc();
 	}
 
 	return obj;
@@ -2814,9 +2374,9 @@ pointer_base::pointer_base()
 
 #ifndef NDEBUG
 	destroyed = false;
-# ifdef DEBUG_COMPILER
+#ifdef DEBUG_COMPILER
 	trash = new char[1];
-# endif
+#endif
 #endif
 	ptr_vector &ps = data().new_pointers;
 	pos = ps.size();
@@ -2829,9 +2389,9 @@ pointer_base::pointer_base(const pointer_base &pb)
 
 #ifndef NDEBUG
 	destroyed = false;
-# ifdef DEBUG_COMPILER
+#ifdef DEBUG_COMPILER
 	trash = new char[3];
-# endif
+#endif
 #endif
 	ptr_vector &ps = data().new_pointers;
 	pos = ps.size();
@@ -2848,9 +2408,9 @@ pointer_base::~pointer_base()
 	data_lock lock;
 
 #ifndef NDEBUG
-# ifdef DEBUG_COMPILER
+#ifdef DEBUG_COMPILER
 	delete[] trash;
-# endif
+#endif
 	destroyed = true;
 #endif
 	if(pos >= 0)
@@ -2864,13 +2424,13 @@ pointer_base::~pointer_base()
 			if(ps[pos].first->pos != (int)(ps.size()-1)) {
 				//cerr << "GC: memory corrupted; smartpointer lost!" << endl;
 				//abort();
-				throw mem_corrupt("smartpointer lost");
+				throw jcommon::RuntimeException("smartpointer lost");
 			}
 
 			if(ps[pos].first->destroyed) {
 				//cerr << "GC: memory corrupted; smartpointer destructed 2 times or overwritten!" << endl;
 				//abort();
-				throw mem_corrupt("smartpointer overwritten or double destructed");
+				throw jcommon::RuntimeException("smartpointer overwritten or double destructed");
 			}
 #endif
 			ps[pos].first->pos = pos;
@@ -2893,9 +2453,9 @@ weak_base::weak_base()
 
 #ifndef NDEBUG
 	destroyed = false;
-# ifdef DEBUG_COMPILER
+#ifdef DEBUG_COMPILER
 	trash = new char[2];
-# endif
+#endif
 #endif
 	weak_vector &ps = data().weak_pointers;
 	pos = ps.size();
@@ -2908,9 +2468,9 @@ weak_base::weak_base(const weak_base &pb)
 
 #ifndef NDEBUG
 	destroyed = false;
-# ifdef DEBUG_COMPILER
+#ifdef DEBUG_COMPILER
 	trash = new char[4];
-# endif
+#endif
 #endif
 	weak_vector &ps = data().weak_pointers;
 	pos = ps.size();
@@ -2922,9 +2482,9 @@ weak_base::~weak_base()
 	data_lock lock;
 
 #ifndef NDEBUG
-# ifdef DEBUG_COMPILER
+#ifdef DEBUG_COMPILER
 	delete[] trash;
-# endif
+#endif
 	destroyed = true;
 #endif
 	weak_vector &ps = data().weak_pointers;
@@ -2934,11 +2494,11 @@ weak_base::~weak_base()
 		ps[pos] = ps.back();
 #ifndef NDEBUG
 		if(ps[pos].first->pos != (int)(ps.size()-1)) {
-			throw mem_corrupt("weakpointer lost");
+			throw jcommon::RuntimeException("weakpointer lost");
 		}
 
 		if(ps[pos].first->destroyed) {
-			throw mem_corrupt("weakpointer overwritten or double destructed");
+			throw jcommon::RuntimeException("weakpointer overwritten or double destructed");
 		}
 #endif
 		ps[pos].first->pos = pos;
@@ -2971,7 +2531,7 @@ void reg(void *obj, size_t size, void (*destroy)(void*, void*, size_t))
 		{
 			node_t *node = new node_t(obj, size);
 			if(node == 0)
-				throw bad_alloc();
+				throw std::bad_alloc();
 			data().new_nodes.push_back(node);
 			node->destroy = destroy;
 			node->object = const_cast<void*>(obj);
@@ -2981,54 +2541,17 @@ void reg(void *obj, size_t size, void (*destroy)(void*, void*, size_t))
 	{
 		// If inserting into the map failed simply throw
 		// a bad_reg exception.
-		throw bad_reg();
+		throw jcommon::RuntimeException("Bad reg exception");
 	}
-}
-
-bad_reg::~bad_reg() throw() 
-{
-}
-
-const char* bad_reg::what() const throw()
-{
-	return "unable to register pointer in GC";
-}
-
-no_space::~no_space() throw() 
-{
-}
-
-const char* no_space::what() const throw()
-{
-	return "out of pointer space";
-}
-
-mem_corrupt::mem_corrupt(const char *txt):
-	Exception("Memory corrupted exception")
-{
-	msg = new char[strlen("GC detected memory corruption: ")+strlen(txt)+1];
-	strcpy(msg, "GC detected memory corruption: ");
-	strcat(msg, txt);
-}
-
-mem_corrupt::~mem_corrupt() throw() 
-{
-	delete[] msg; 
-}
-
-const char* mem_corrupt::what() const throw()
-{
-	return msg;
 }
 
 #if (defined(_MSC_VER) && (_MSVC <= 1200)) || defined(_SMGC_POOR_STL)
 const size_t no_threshold = ~((size_t)0);
 #else
-const size_t no_threshold = numeric_limits<size_t>::max();
+const size_t no_threshold = std::numeric_limits<size_t>::max();
 #endif
 
 const size_t default_threshold = (INT_MAX>=4194304*8)?4194304:(INT_MAX/8);
-
 
 void collect()
 {
@@ -3305,20 +2828,18 @@ namespace std {
 }
 
 #ifndef _SMGC_NO_PLACEMENT_NEW
-void* operator new(size_t s, const jcommon::gc_t&) throw (bad_alloc);
+void* operator new(size_t s, const jcommon::gc_t&) throw (std::bad_alloc);
 void operator delete(void *obj, const jcommon::gc_t&) throw ();
-#  ifndef _SMGC_NO_ARRAY_NEW
-void* operator new[](size_t s, const jcommon::gc_t&) throw (bad_alloc);
+#ifndef _SMGC_NO_ARRAY_NEW
+void* operator new[](size_t s, const jcommon::gc_t&) throw (std::bad_alloc);
 void operator delete[](void *obj, const jcommon::gc_t&) throw ();
 #endif
 #endif
 
 #undef GC_INTERNAL
 
-#endif
-
 #ifndef _SMGC_NO_PLACEMENT_NEW
-void* operator new(size_t s, const jcommon::gc_t&) throw (bad_alloc)
+void* operator new(size_t s, const jcommon::gc_t&) throw (std::bad_alloc)
 {
 	return gnew(s, jcommon::alloc_single);
 }
@@ -3328,8 +2849,8 @@ void operator delete(void *obj, const jcommon::gc_t&) throw ()
 	gfree(obj, jcommon::alloc_single);
 }
 
-#  ifndef _SMGC_NO_ARRAY_NEW
-void* operator new[](size_t s, const jcommon::gc_t&) throw (bad_alloc)
+#ifndef _SMGC_NO_ARRAY_NEW
+void* operator new[](size_t s, const jcommon::gc_t&) throw (std::bad_alloc)
 {
 	return gnew(s, jcommon::alloc_array);
 }
@@ -3340,5 +2861,7 @@ void operator delete[](void *obj, const jcommon::gc_t&) throw ()
 }
 
 #endif
+#endif
+
 #endif
 

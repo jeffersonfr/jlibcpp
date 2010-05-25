@@ -17,10 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jflowlayout.h"
-#include "jcontainer.h"
-
-#include <limits.h>
+#include "Stdafx.h"
+#include "jguilib.h"
+#include "jmathlib.h"
 
 namespace jgui {
 
@@ -122,15 +121,16 @@ int FlowLayout::MoveComponents(Container *target, int x, int y, int width, int h
 
 			if (m->IsVisible() == true) {
 				if (ascent[i] >= 0) {
-					maxAscent = std::max(maxAscent, ascent[i]);
-					maxDescent = std::max(maxDescent, descent[i]);
+					maxAscent = jmath::Math<int>::Max(maxAscent, ascent[i]);
+					maxDescent = jmath::Math<int>::Max(maxDescent, descent[i]);
 				} else {
-					nonbaselineHeight = std::max(m->GetHeight(), nonbaselineHeight);
+					nonbaselineHeight = jmath::Math<int>::Max(m->GetHeight(), nonbaselineHeight);
 				}
 			}
 		}
 
-		height = std::max(maxAscent + maxDescent, nonbaselineHeight);
+		height = jmath::Math<int>::Max(maxAscent + maxDescent, nonbaselineHeight);
+
 		baselineOffset = (height - maxAscent - maxDescent) / 2;
 	}
 
@@ -175,7 +175,7 @@ jsize_t FlowLayout::GetMinimumLayoutSize(Container *target)
 		if (m->IsVisible()) {
 			jsize_t d = m->GetMinimumSize();
 
-			t.height = std::max(t.height, d.height);
+			t.height = jmath::Math<int>::Max(t.height, d.height);
 
 			if (firstVisibleComponent) {
 				firstVisibleComponent = false;
@@ -189,15 +189,15 @@ jsize_t FlowLayout::GetMinimumLayoutSize(Container *target)
 				int baseline = m->GetBaseline(d.width, d.height);
 
 				if (baseline >= 0) {
-					maxAscent = std::max(maxAscent, baseline);
-					maxDescent = std::max(maxDescent, t.height - baseline);
+					maxAscent = jmath::Math<int>::Max(maxAscent, baseline);
+					maxDescent = jmath::Math<int>::Max(maxDescent, t.height - baseline);
 				}
 			}
 		}
 	}
 
 	if (useBaseline) {
-		t.height = std::max(maxAscent + maxDescent, t.height);
+		t.height = jmath::Math<int>::Max(maxAscent + maxDescent, t.height);
 	}
 
 	jinsets_t insets = target->GetInsets();
@@ -232,7 +232,7 @@ jsize_t FlowLayout::GetPreferredLayoutSize(Container *target)
 		if (m->IsVisible()) {
 			jsize_t d = m->GetMinimumSize();
 
-			t.height = std::max(t.height, d.height);
+			t.height = jmath::Math<int>::Max(t.height, d.height);
 
 			if (firstVisibleComponent) {
 				firstVisibleComponent = false;
@@ -245,15 +245,15 @@ jsize_t FlowLayout::GetPreferredLayoutSize(Container *target)
 			if (useBaseline) {
 				int baseline = m->GetBaseline(d.width, d.height);
 				if (baseline >= 0) {
-					maxAscent = std::max(maxAscent, baseline);
-					maxDescent = std::max(maxDescent, d.height - baseline);
+					maxAscent = jmath::Math<int>::Max(maxAscent, baseline);
+					maxDescent = jmath::Math<int>::Max(maxDescent, d.height - baseline);
 				}
 			}
 		}
 	}
 
 	if (useBaseline) {
-		t.height = std::max(maxAscent + maxDescent, t.height);
+		t.height = jmath::Math<int>::Max(maxAscent + maxDescent, t.height);
 	}
 
 	jinsets_t insets = target->GetInsets();
@@ -312,7 +312,8 @@ void FlowLayout::DoLayout(Container *target)
 					x += _hgap;
 				}
 				x += psize.width;
-				rowh = std::max(rowh, psize.height);
+
+				rowh = jmath::Math<int>::Max(rowh, psize.height);
 			} else {
 				rowh = MoveComponents(target, insets.left + _hgap, y, maxwidth - x, rowh, start, i, ltr, useBaseline, ascent, descent);
 				x = psize.width;

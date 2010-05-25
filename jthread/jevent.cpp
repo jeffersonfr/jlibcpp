@@ -17,11 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jevent.h"
-#include "jsemaphoreexception.h"
-#include "jsemaphoretimeoutexception.h"
-
-#include <errno.h>
+#include "Stdafx.h"
+#include "jthreadlib.h"
 
 namespace jthread {
 
@@ -116,8 +113,8 @@ void Event::Wait(uint64_t time_)
 	} else {
 		clock_gettime(CLOCK_REALTIME, &t);
 		
-		t.tv_sec += (long long)(time_/1000000LL);
-		t.tv_nsec += (long long)((time_%1000000LL)*1000LL);
+		t.tv_sec += (int64_t)(time_/1000000LL);
+		t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
 		
 		_count++;
 		rc = pthread_cond_timedwait(&_condition, &_mutex._mutex, &t);

@@ -4,7 +4,7 @@ JAVA		= javac
 
 TARGET_ARCH = linux
 
-DEBUG  		= -g -ggdb 
+DEBUG  		= -ggdb 
 OTHER  		= -Wall -funroll-loops -O2
 
 INCLUDE		= -I. `pkg-config --cflags jlibcpp`
@@ -12,7 +12,7 @@ LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
 CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER)
 
-OK 			= \033[30;32mOK!\033[m
+OK 				= \033[30;32mOK!\033[m
 
 OBJS_teste = \
 	   teste.o\
@@ -81,11 +81,12 @@ calc_unit: $(OBJS_calc_unit)
 
 access: $(OBJS_access)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
-
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; echo -e "Compiling $< ...  $(OK)" 
 
 install:
+
 
 clean:
 	@rm -rvf *.o *.xml *~ teste xml_teste xml_agenda myfile_teste.xml regexp jsondom jsonpull gcteste pointer unit calc_unit access

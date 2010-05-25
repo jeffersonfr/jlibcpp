@@ -17,17 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jobjectinputstream.h"
-#include "jfileinputstream.h"
-#include "jioexception.h"
-#include "joutofboundsexception.h"
-#include "jserializable.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
 
 namespace jio {
 
@@ -104,8 +95,8 @@ jcommon::Object * ObjectInputStream::Read()
 	object = CreateObject((tmp+2));
 
 	if (object != NULL) {
-		if (object->InstanceOf("jcommon::Serializable") == true) {
-			((jcommon::Serializable *)object)->AssemblyObject(description);
+		if (object->InstanceOf("jio::Serializable") == true) {
+			((jio::Serializable *)object)->AssemblyObject(description);
 		} else {
 			delete object;
 			object = NULL;

@@ -1,10 +1,9 @@
-#include "jwrapperprocess.h"
+#include "jsharedlib.h"
 
 #include <iostream>
 #include <sstream>
 
 #include <string.h>
-#include <assert.h>
 
 using namespace std;
 using namespace jshared;

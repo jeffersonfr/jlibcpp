@@ -17,13 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmonitor.h"
-#include "jsemaphoretimeoutexception.h"
-
-#include <algorithm>
-
-#include <stdio.h>
-#include <errno.h>
+#include "Stdafx.h"
+#include "jthreadlib.h"
 
 namespace jthread {
 
@@ -56,7 +51,7 @@ jmonitor_map_t * Monitor::GetCurrentThread()
 {
 #ifdef _WIN32
 	std::map<HANDLE, jmonitor_map_t *>::iterator i;
-	HANDLE key = GetCurrentThread();
+	HANDLE key = ::GetCurrentThread();
 #else
 	std::map<pthread_t, jmonitor_map_t *>::iterator i;
 	pthread_t key = pthread_self();
@@ -235,7 +230,7 @@ void Monitor::Wait()
 	_mutex.Unlock();
 }
 
-bool Monitor::Wait(long long timeout)
+bool Monitor::Wait(uint64_t timeout)
 {
 	_mutex.Lock();
 
@@ -266,7 +261,7 @@ bool Monitor::Wait(long long timeout)
 	
 	try {
 		thread->sem.Wait(timeout);
-	} catch (SemaphoreTimeoutException &e) {
+	} catch (SemaphoreTimeoutException &) {
 		std::vector<jmonitor_map_t *>::iterator i = std::find(waitQ.begin(), waitQ.end(), thread);
 
 		if (i != waitQ.end()) {

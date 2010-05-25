@@ -17,16 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jcalendar.h"
-#include "jruntimeexception.h"
-
-#include <sstream>
-
-#include <sys/time.h>
-#include <unistd.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 namespace jcommon {
-
 	
 Calendar::Calendar():
 	jcommon::Object()
@@ -59,20 +53,6 @@ bool Calendar::is_bissexto(int ano)
 	}
 
 	return false;
-}
-
-time_t Calendar::GetTimeInSeconds()
-{
-	time_t time;
-	
-	ctime(&time);
-
-	return time;
-}
-
-void Calendar::SetTimeInSeconds(time_t secs)
-{
-	// WARNNING:: 
 }
 
 void Calendar::SetTime(int day, int month, int year)

@@ -63,7 +63,7 @@ class BitStream : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		unsigned long long GetBits(int size);
+		uint64_t GetBits(int size);
 		
 		/**
 		 * \brief

@@ -17,13 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jwindowmanager.h"
-#include "jwindow.h"
-#include "jautolock.h"
-#include "jgraphics.h"
-#include "jcommonlib.h"
-
-#include <algorithm>
+#include "Stdafx.h"
+#include "jguilib.h"
 
 namespace jgui {
 

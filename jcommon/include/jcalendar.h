@@ -68,18 +68,6 @@ class Calendar : public jcommon::Object{
 		* \brief
 		*
 		*/
-		time_t GetTimeInSeconds();
-		
-		/**
-		* \brief
-		*
-		*/
-		void SetTimeInSeconds(time_t secs);
-		
-		/**
-		* \brief
-		*
-		*/
 		void SetTime(int day, int month, int year);
 		
 		/**

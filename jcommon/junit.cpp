@@ -17,14 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "junit.h"
-
-#include <iostream>
-#include <string>
-#include <algorithm>
-#include <functional>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 namespace jcommon {
 

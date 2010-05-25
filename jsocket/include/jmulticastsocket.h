@@ -222,12 +222,6 @@ class MulticastSocket : public jsocket::Connection{
          */
         SocketOption * GetSocketOption();
         
-        /**
-        * \brief
-        *
-        */
-        std::string what();
-
 };
 
 }

@@ -1,11 +1,4 @@
-#include "jlogger.h"
-#include "jloggermanager.h"
-#include "jsimpleformatter.h"
-#include "jsockethandler.h"
-#include "jxmlformatter.h"
-
-#include <iostream>
-#include <cstdlib>
+#include "jloggerlib.h"
 
 using namespace std;
 
@@ -14,8 +7,9 @@ int main(int argc, char *argv[])
 	jlogger::Logger *g_default_logger = NULL;
 
     try {
-    	g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger(NULL, NULL);
+    	// g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger(NULL, NULL);
 			// g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger(NULL, new jlogger::XMLFormatter());
+			g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger((jlogger::Handler *)(new jlogger::FileHandler("teste.log")), new jlogger::XMLFormatter());
 			// g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger((jlogger::Handler *)(new jlogger::SocketHandler(1234)), new jlogger::XMLFormatter());
 
 			// g_default_logger->SetOutput(jlogger::INFO_LOGGER);

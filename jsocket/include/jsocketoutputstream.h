@@ -20,7 +20,6 @@
 #ifndef J_SOCKET_OUTPUT_STREAM_H
 #define J_SOCKET_OUTPUT_STREAM_H
 
-#include "jobject.h"
 #include "joutputstream.h"
 #include "jconnection.h"
 
@@ -47,105 +46,105 @@ class SocketOutputStream : public jio::OutputStream{
 
     private:
 #ifdef _WIN32
-		SOCKET _fd;
+			SOCKET _fd;
 #else
-		int _fd;
+			int _fd;
 #endif
-       /** \brief */
-        char *_buffer;
-        /** \brief */
-        int _buffer_length;
-        /** \brief */
-		int _current_index; 
-        /** \brief */
-        int64_t _sent_bytes;
-        /** \brief */
-		bool _stream;
-        /** \brief */
-		sockaddr_in _server_sock;
-        /** \brief */
-		bool *_is_closed;
-		/** \brief */
-		Connection *_connection;
+			/** \brief */
+			char *_buffer;
+			/** \brief */
+			int64_t _buffer_length;
+			/** \brief */
+			int64_t _current_index; 
+			/** \brief */
+			int64_t _sent_bytes;
+			/** \brief */
+			bool _stream;
+			/** \brief */
+			sockaddr_in _server_sock;
+			/** \brief */
+			bool *_is_closed;
+			/** \brief */
+			Connection *_connection;
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        SocketOutputStream(Connection *conn_, bool *is_closed, int size_ = 4096);
-        
-        /**
-        * \brief Construtor.
-        *
-        */
-        SocketOutputStream(Connection *conn_, bool *is_closed, sockaddr_in server_sock_, int size_ = 65535);
-		
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~SocketOutputStream();
+		public:
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			SocketOutputStream(Connection *conn_, bool *is_closed, int64_t size_ = 4096LL);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsEmpty();
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			SocketOutputStream(Connection *conn_, bool *is_closed, sockaddr_in server_sock_, int64_t size_ = 65535LL);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Available();
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~SocketOutputStream();
 
-		/**
-		 * \brief jio::OutputStream
-		 *
-		 */
- 		virtual int64_t GetSize();
+			/**
+			 * \brief
+			 *
+			 */
+			virtual bool IsEmpty();
 
-		/**
-		 * \brief jio::OutputStream
-		 *
-		 */
-		virtual void Seek(int64_t index);
+			/**
+			 * \brief
+			 *
+			 */
+			virtual int64_t Available();
 
-        /**
-		 * \brief jio::OutputStream
-		 *
-		 */
-        virtual void Close();
+			/**
+			 * \brief jio::OutputStream
+			 *
+			 */
+			virtual int64_t GetSize();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Write(int c_);
+			/**
+			 * \brief jio::OutputStream
+			 *
+			 */
+			virtual void Seek(int64_t index);
 
-		/**
-		 * \brief
-		 *
-		 */
-		int64_t Write(const char *data_, int64_t data_length_);
+			/**
+			 * \brief jio::OutputStream
+			 *
+			 */
+			virtual void Close();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetAvailable();
+			/**
+			 * \brief
+			 *
+			 */
+			virtual int64_t Write(int64_t c_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		int64_t GetSentBytes();
+			/**
+			 * \brief
+			 *
+			 */
+			virtual int64_t Write(const char *data_, int64_t data_length_);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int64_t Flush();
+			/**
+			 * \brief
+			 *
+			 */
+			virtual int64_t GetAvailable();
+
+			/**
+			 * \brief
+			 *
+			 */
+			virtual int64_t GetSentBytes();
+
+			/**
+			 * \brief
+			 *
+			 */
+			virtual int64_t Flush();
 };
 
 }

@@ -38,7 +38,6 @@
 #include <sys/socket.h>
 #endif
 
-#include <unistd.h>
 #include <stdint.h>
 
 namespace jsocket {
@@ -101,7 +100,7 @@ class Socket : public jsocket::Connection{
         * \brief
         *
         */
-        void InitStreams(int rbuf_, int wbuf_);
+        void InitStreams(int64_t rbuf_, int64_t wbuf_);
 
     public:
 		/**

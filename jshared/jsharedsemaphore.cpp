@@ -17,19 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsharedsemaphore.h"
-#include "jsemaphoreexception.h"
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#include <sys/wait.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <errno.h>
-#include <stdio.h>
-#endif
+#include "Stdafx.h"
+#include "jsharedlib.h"
+#include "jthreadlib.h"
 
 namespace jshared {
 

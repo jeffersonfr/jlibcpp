@@ -1,13 +1,7 @@
 /**
  *	compile: g++ teste.cpp -o teste -L. -ljthread -lpthread
  */
-
-#include "jcondition.h"
-#include "jmutex.h"
-#include "jsemaphore.h"
-#include "jthread.h"
-#include "jthreadexception.h"
-#include "jdate.h"
+#include "jthreadlib.h"
 
 #include <iostream>
 

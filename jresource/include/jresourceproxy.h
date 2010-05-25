@@ -17,33 +17,47 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jserializable.h"
+#ifndef J_RESOURCEPROXY_H
+#define J_RESOURCEPROXY_H
 
-#include <iostream>
+#include "jresourceclient.h"
+
 #include <string>
-#include <sstream>
 
-#include <time.h>
+namespace jresource {
 
-namespace jcommon {
+/**
+ * \brief
+ * 
+ * \author Jeff Ferr
+ */
+class ResourceProxy{
 
-Serializable::Serializable():
-	jcommon::Object()
-{
-	jcommon::Object::SetClassName("jcommon::Serializable");
+	private:
+
+		
+	public:
+		/**
+		 * \brief
+		 * 
+		 */
+		ResourceProxy();
+		
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual ~ResourceProxy();
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual ResourceClient *GetClient() = 0;
+
+    
+};
+
 }
 
-Serializable::~Serializable()
-{
-}
-
-std::string Serializable::SerializeObject()
-{
-	return "";
-}
-
-void Serializable::AssemblyObject(std::string object)
-{
-}
-
-}
+#endif

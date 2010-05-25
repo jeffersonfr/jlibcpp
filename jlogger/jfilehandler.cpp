@@ -17,13 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jfilehandler.h"
-#include "jloggerexception.h"
-
-#include <sstream>
-
-#include <errno.h>
-#include <string.h>
+#include "Stdafx.h"
+#include "jloggerlib.h"
 
 namespace jlogger {
 

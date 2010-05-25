@@ -20,14 +20,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "jpanel.h"
-
-#include <string>
-
-#include <directfb.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
+#include "jguilib.h"
 
 namespace mcalc {
 

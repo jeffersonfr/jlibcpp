@@ -17,10 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jloggermanager.h"
-#include "jconsolehandler.h"
-#include "jsimpleformatter.h"
-#include "jcommonlib.h"
+#include "Stdafx.h"
+#include "jloggerlib.h"
 
 namespace jlogger {
 
@@ -44,7 +42,7 @@ LoggerManager * LoggerManager::GetInstance()
 
 	return _manager;
 }
-    
+ 
 Logger * LoggerManager::CreateLogger(Handler *handler_, Formatter *format_, Logger *group_)
 {
 	Handler *h;
@@ -56,19 +54,19 @@ Logger * LoggerManager::CreateLogger(Handler *handler_, Formatter *format_, Logg
 	if (h == NULL) {
 		h = new ConsoleHandler();
 	}
-    
+   
 	if (f == NULL) {
 		f = new SimpleFormatter();
 	}
-    
+   
 	Logger *l = new Logger(h, f);
-    
+   
 	if (group_ != NULL) {
 		group_->AddLogger(l);
 	}
 	
 	_loggers.push_back(l);
-    
+   
 	return l;
 }
 

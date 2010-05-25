@@ -17,16 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jdataoutputstream.h"
-#include "jfileoutputstream.h"
-#include "joutofboundsexception.h"
-#include "jioexception.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
 
 namespace jio {
 
@@ -60,40 +52,40 @@ int64_t DataOutputStream::Available()
 	return 0LL;
 }
 
-int DataOutputStream::Write(uint8_t data)
+int64_t DataOutputStream::Write(uint8_t data)
 {
 	if (stream != NULL) {
 		return stream->Write((const char *)&data, sizeof(uint8_t));
 	}
 
-	return -1;
+	return -1LL;
 }
 
-int DataOutputStream::Write(uint16_t data)
+int64_t DataOutputStream::Write(uint16_t data)
 {
 	if (stream != NULL) {
 		return stream->Write((const char *)&data, sizeof(uint16_t));
 	}
 
-	return -1;
+	return -1LL;
 }
 
-int DataOutputStream::Write(uint32_t data)
+int64_t DataOutputStream::Write(uint32_t data)
 {
 	if (stream != NULL) {
 		return stream->Write((const char *)&data, sizeof(uint32_t));
 	}
 
-	return -1;
+	return -1LL;
 }
 
-int DataOutputStream::Write(uint64_t data)
+int64_t DataOutputStream::Write(uint64_t data)
 {
 	if (stream != NULL) {
 		return stream->Write((const char *)&data, sizeof(uint64_t));
 	}
 
-	return -1;
+	return -1LL;
 }
 
 int64_t DataOutputStream::Flush()

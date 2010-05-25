@@ -25,8 +25,6 @@
 #include <string>
 
 #include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 
 namespace jgui {
 

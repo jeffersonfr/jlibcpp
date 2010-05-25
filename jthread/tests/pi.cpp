@@ -1,8 +1,4 @@
-#include "jthread.h"
-#include "jthreadpool.h"
-#include "jruntimeexception.h"
-#include "jcondition.h"
-#include "jmutex.h"
+#include "jthreadlib.h"
 
 #include <iostream>
 

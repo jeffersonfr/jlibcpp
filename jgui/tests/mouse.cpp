@@ -17,13 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jwindow.h"
-#include "jmouselistener.h"
-#include "jinputmanager.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
+#include "jguilib.h"
 
 class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 

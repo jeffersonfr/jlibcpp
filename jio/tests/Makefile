@@ -4,7 +4,7 @@ JAVA		= javac
 
 TARGET_ARCH = linux
 
-DEBUG  		= -g -ggdb 
+DEBUG  		= -ggdb 
 OTHER  		= -Wall -funroll-loops -O2
 
 INCLUDE		= -I. `pkg-config --cflags jlibcpp`
@@ -12,7 +12,7 @@ LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
 CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER)
 
-OK 			= \033[30;32mOK!\033[m
+OK 				= \033[30;32mOK!\033[m
 
 OBJS_inpi = \
 	   inpi.o\
@@ -34,6 +34,9 @@ object: $(OBJS_object)
 data: $(OBJS_data)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
+teste: teste.o
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; echo -e "Compiling $< ...  $(OK)" 
 
@@ -41,4 +44,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ inpi object data
+	@rm -rvf *.o *~ teste inpi object data

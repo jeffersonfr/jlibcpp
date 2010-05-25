@@ -1,16 +1,8 @@
-/*
- * Copyright 2008 Stephen Liu
- * For license terms, see the file COPYING along with this library.
- */
+#include "jcommonlib.h"
 
-#include "jjson.h"
-
-#include <iostream>
-
-#include <stdio.h>
-#include <stdlib.h>
+#include <sys/types.h>
 #include <sys/stat.h>
-#include <string.h>
+#include <unistd.h>
 
 using namespace jcommon;
 

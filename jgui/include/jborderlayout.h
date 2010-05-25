@@ -20,8 +20,8 @@
 #ifndef J_BORDERLAYOUT_H
 #define J_BORDERLAYOUT_H
 
-#include "jlayout.h"
 #include "jcomponent.h"
+#include "jlayout.h"
 
 #include <iostream>
 #include <cstdlib>

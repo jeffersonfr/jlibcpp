@@ -1,7 +1,7 @@
-#include "jmonitor.h"
+#include "jthreadlib.h"
 
-#include <assert.h>
 #include <stdio.h>
+#include <assert.h>
 
 enum GAME_STATE {
   START_GAME,

@@ -17,34 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jrawsocket.h"
-#include "jsocketexception.h"
-#include "jsockettimeoutexception.h"
-#include "jsocketstreamexception.h"
-
-#ifdef _WIN32
-#elif _CYGWIN 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <w32api/winsock2.h>
-#else
-#include <poll.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <linux/if_packet.h>
-#include <linux/if_ether.h>
-#endif
-
-#include <errno.h>
-#include <stdio.h>
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 
@@ -57,9 +31,9 @@ RawSocket::RawSocket(std::string device_, bool promisc_, int timeout_, int rbuf_
 	
 	_device = device_;
 	_promisc = promisc_;
-    _address = NULL;
-    _is = NULL;
-    _os = NULL;
+	_address = NULL;
+	_is = NULL;
+	_os = NULL;
 	_is_closed = true;
 	_timeout = timeout_;
 
@@ -69,7 +43,7 @@ RawSocket::RawSocket(std::string device_, bool promisc_, int timeout_, int rbuf_
 
 	_sent_bytes = 0;
 	_receive_bytes = 0;
-	
+
 	_is_closed = false;
 }
 
@@ -83,18 +57,18 @@ RawSocket::~RawSocket()
 	}
 
 	/*
-    if (_address) {
-        delete _address;
-    }
+		 if (_address) {
+		 delete _address;
+		 }
 
-    if (_is) {
-        delete _is;
-    }
+		 if (_is) {
+		 delete _is;
+		 }
 
-    if (_os) {
-        delete _os;
-    }
-	*/
+		 if (_os) {
+		 delete _os;
+		 }
+		 */
 }
 
 /** Private */
@@ -102,14 +76,14 @@ RawSocket::~RawSocket()
 void RawSocket::CreateSocket()
 {
 #ifdef _WIN32
-   _fd = socket(PF_INET, SOCK_RAW, IPPROTO_RAW);
+	_fd = socket(PF_INET, SOCK_RAW, IPPROTO_RAW);
 
-   if (_fd == INVALID_SOCKET) {
+	if (_fd == INVALID_SOCKET) {
 		throw SocketException("Create socket raw error");
 	}
 #else
-   _fd = ::socket(PF_PACKET, SOCK_RAW, (_promisc == true)?ETH_P_ALL:ETH_P_IP);
-	
+	_fd = ::socket(PF_PACKET, SOCK_RAW, (_promisc == true)?ETH_P_ALL:ETH_P_IP);
+
 	if (_fd < 0) {
 		throw SocketException("Create socket raw error");
 	}
@@ -147,7 +121,7 @@ void RawSocket::CreateSocket()
 
 void RawSocket::BindSocket()
 {
-    struct sockaddr_ll sock_ether;
+	struct sockaddr_ll sock_ether;
 
 	memset(&sock_ether, 0, sizeof(sock_ether));
 	sock_ether.sll_family = AF_PACKET;
@@ -192,7 +166,7 @@ int RawSocket::Receive(char *data_, int size_, int time_)
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
 	}
-	
+
 #ifdef _WIN32
 	return RawSocket::Receive(data_, size_);
 #else
@@ -208,9 +182,9 @@ int RawSocket::Receive(char *data_, int size_, int time_)
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket receive timeout exception");
 	} else {
-	    if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
+		if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return RawSocket::Receive(data_, size_);
-	    }
+		}
 	}
 #endif
 
@@ -222,29 +196,29 @@ int RawSocket::Receive(char *data_, int size_, bool block_)
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
 	}
-	
+
 	int n;
 
 #ifdef _WIN32
 	/*
-	n = ::recvfrom(_fd, data_, size_, 0, (struct sockaddr *)&_server_sock, &length);
+		 n = ::recvfrom(_fd, data_, size_, 0, (struct sockaddr *)&_server_sock, &length);
 
-	if (n == SOCKET_ERROR) {
-		if (WSAGetLastError() == WSAETIMEDOUT) {
-			throw SocketTimeoutException("Socket receive timeout exception");
-		} else {
-			throw SocketStreamException("Read socket error");
-		}
-	} else if (n == 0) {
-		throw SocketException("Connection closed");
-	}
-	*/
+		 if (n == SOCKET_ERROR) {
+		 if (WSAGetLastError() == WSAETIMEDOUT) {
+		 throw SocketTimeoutException("Socket receive timeout exception");
+		 } else {
+		 throw SocketStreamException("Read socket error");
+		 }
+		 } else if (n == 0) {
+		 throw SocketException("Connection closed");
+		 }
+		 */
 #else
 	// n = ::recvfrom(_fd, data_, size_, 0, (struct sockaddr *)&_lsock, (socklen_t *)&length);
 	n = ::read(_fd, data_, size_);
-	
+
 	if (n < 0) {
-	   if (errno == EAGAIN) {
+		if (errno == EAGAIN) {
 			throw SocketTimeoutException("Socket receive timeout exception");
 		} else {
 			throw SocketStreamException("Read socket error");
@@ -254,7 +228,7 @@ int RawSocket::Receive(char *data_, int size_, bool block_)
 
 	_receive_bytes += n;
 
-    return n;
+	return n;
 }
 
 int RawSocket::Send(const char *data_, int size_, int time_)
@@ -278,9 +252,9 @@ int RawSocket::Send(const char *data_, int size_, int time_)
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket send timeout exception");
 	} else {
-	    if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
+		if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
 			return RawSocket::Send(data_, size_);
-	    }
+		}
 	}
 #endif
 
@@ -292,7 +266,7 @@ int RawSocket::Send(const char *data_, int size_, bool block_)
 	if (_is_closed == true) {
 		throw SocketException("Connection was closed");
 	}
-	
+
 	int n;
 
 #ifdef _WIN32
@@ -311,7 +285,7 @@ int RawSocket::Send(const char *data_, int size_, bool block_)
 	}
 #else
 	if (n < 0) {
-	   if (errno == EAGAIN) {
+		if (errno == EAGAIN) {
 			throw SocketTimeoutException("Socket send timeout exception");
 		} else {
 			throw SocketStreamException("Send udp data error");
@@ -320,7 +294,7 @@ int RawSocket::Send(const char *data_, int size_, bool block_)
 #endif
 
 	_sent_bytes += n;
-	
+
 	return n;
 }
 
@@ -412,7 +386,7 @@ unsigned short RawSocket::Checksum(unsigned short *addr, int len)
 std::string RawSocket::what()
 {
 	char port[20];
-    
+
 	sprintf(port, "%u", GetPort());
 
 	return GetInetAddress()->GetHostName() + ":" + port;

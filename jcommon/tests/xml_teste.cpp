@@ -1,8 +1,4 @@
-#include "jxmlparser.h"
-
-#include <iostream>
-#include <iostream>
-#include <sstream>
+#include "jcommonlib.h"
 
 #if defined( WIN32 ) && defined( TUNE )
 #include <crtdbg.h>
@@ -13,7 +9,6 @@ _CrtMemState endMemState;
 static int gPass = 0;
 static int gFail = 0;
 
-using namespace std;
 using namespace jcommon;
 
 bool XmlTest (const char* testString, const char* expected, const char* found, bool noEcho = false)
@@ -238,7 +233,7 @@ int main()
 		
 		doc.Print( stdout );
 
-		std::cout << "** Demo doc processed to stream: **\n" << doc << endl << endl;
+		std::cout << "** Demo doc processed to stream: **\n" << doc << std::endl << std::endl;
 
 		// --------------------------------------------------------
 		// Different tests...do we have what we expect?
@@ -249,10 +244,10 @@ int main()
 
 		//////////////////////////////////////////////////////
 
-		cout << "** Basic structure. **\n";
-		ostringstream outputStream( ostringstream::out );
+		std::cout << "** Basic structure. **\n";
+		std::ostringstream outputStream( std::ostringstream::out );
 		outputStream << doc;
-		XmlTest( "Output stream correct.",	string( demoEnd ).c_str(),
+		XmlTest( "Output stream correct.",	std::string( demoEnd ).c_str(),
 											outputStream.str().c_str(), true );
 
 		node = doc.RootElement();
@@ -323,8 +318,8 @@ int main()
 		XmlTest( "'Item' children of the 'ToDo' element, using Last/Previous.", 3, count );
 
 		{
-			cout << "\n** Parsing. **\n";
-			istringstream parse0( "<Element0 attribute0='foo0' attribute1= noquotes attribute2 = '&gt;' />" );
+			std::cout << "\n** Parsing. **\n";
+			std::istringstream parse0( "<Element0 attribute0='foo0' attribute1= noquotes attribute2 = '&gt;' />" );
 			XmlElement element0( "default" );
 			parse0 >> element0;
 
@@ -348,25 +343,25 @@ int main()
 
 		{
 			//////////////////////////////////////////////////////
-			cout << "\n** Streaming. **\n";
+			std::cout << "\n** Streaming. **\n";
 
 			// Round trip check: stream in, then stream back out to verify. The stream
 			// out has already been checked, above. We use the output
 
-			istringstream inputStringStream( outputStream.str() );
+			std::istringstream inputStringStream( outputStream.str() );
 			XmlDocument document0;
 
 			inputStringStream >> document0;
 
-			ostringstream outputStream0( ostringstream::out );
+			std::ostringstream outputStream0( std::ostringstream::out );
 			outputStream0 << document0;
 
-			XmlTest( "Stream round trip correct.",	string( demoEnd ).c_str(), outputStream0.str().c_str(), true );
+			XmlTest( "Stream round trip correct.",	std::string( demoEnd ).c_str(), outputStream0.str().c_str(), true );
 
 			std::string str;
 			str << document0;
 
-			XmlTest( "String printing correct.", string( demoEnd ).c_str(), str.c_str(), true );
+			XmlTest( "String printing correct.", std::string( demoEnd ).c_str(), str.c_str(), true );
 		}
 	}
 	
@@ -625,7 +620,7 @@ int main()
 	std::cout << "** Parsing, no Condense Whitespace **" << std::endl;
 	XmlBase::SetCondenseWhiteSpace( false );
 	{
-		istringstream parse1( "<start>This  is    \ntext</start>" );
+		std::istringstream parse1( "<start>This  is    \ntext</start>" );
 		XmlElement text1( "text" );
 		parse1 >> text1;
 
@@ -684,7 +679,7 @@ int main()
 
 		doc.Clear();
 
-		istringstream parse0( str );
+		std::istringstream parse0( str );
 		parse0 >> doc;
 		//cout << doc << '\n';
 
@@ -718,7 +713,7 @@ int main()
 		XmlTest( "CDATA with all bytes #1.", str.c_str(), printer.CStr(), true );
 
 		doc.Clear();
-		istringstream iss( printer.Str() );
+		std::istringstream iss( printer.Str() );
 		iss >> doc;
 		std::string out;
 		out << doc;
@@ -744,7 +739,7 @@ int main()
 
 		doc.Clear();
 
-		istringstream parse0( str );
+		std::istringstream parse0( str );
 		parse0 >> doc;
 
 		XmlTest( "CDATA stream. [ 1480107 ]", doc.FirstChildElement()->FirstChild()->Value(), 
@@ -818,7 +813,7 @@ int main()
 
 		// Missing implementation:
 		XmlDocument doc;
-		string name = "missing";
+		std::string name = "missing";
 		doc.LoadFile( name );
 
 		XmlText textSTL( name );
@@ -1001,7 +996,7 @@ int main()
 		doc.Parse( doctype );
 		XmlTest( "Embedded null throws error.", true, doc.Error() );
 
-		istringstream strm( doctype );
+		std::istringstream strm( doctype );
 		doc.Clear();
 		doc.ClearError();
 		strm >> doc;

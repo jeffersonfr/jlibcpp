@@ -60,13 +60,13 @@ class PrintStream : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		int Write(char c);
+		int64_t Write(char c);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		int Write(char *, int size);
+		int64_t Write(char *, int size);
     
 };
 

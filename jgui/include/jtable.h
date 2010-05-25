@@ -26,8 +26,6 @@
 #include <vector>
 
 #include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 
 namespace jgui {
 
@@ -39,6 +37,8 @@ class Table;
  * \author Jeff Ferr
  */
 class Cell : public virtual jcommon::Object{
+
+	friend class Table;
 
 	private:
 		Table *_table;

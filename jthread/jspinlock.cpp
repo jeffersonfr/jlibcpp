@@ -17,12 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jspinlock.h"
-#include "jsemaphoreexception.h"
+#include "Stdafx.h"
+#include "jthreadlib.h"
 
 #ifdef _WIN32
 #elif __CYGWIN32__
-#include <errno.h>
 
 #define LOCK_SECTION_NAME           			\
 	".text.lock." __stringify(KBUILD_BASENAME)
@@ -52,8 +51,6 @@
 #define __stringify(x)      __stringify_1(x)
 
 #endif  /* !__LINUX_STRINGIFY_H */
-
-#include <errno.h>
 
 #define LOCK_SECTION_NAME           			\
 	".text.lock." __stringify(KBUILD_BASENAME)
@@ -86,28 +83,16 @@ SpinLock::~SpinLock()
 void SpinLock::Lock()
 {
 #ifdef _WIN32 // __i686__
-  __asm__ __volatile__(
+	/*
+	__asm__ __volatile__(
 	"mov $1, %%eax\r\n"		\
 	"loop:\r\n"				\
 	"xchgl %%eax, %0\r\n"	\
 	"test %%eax, %%eax\r\n"		\
 	"jnz loop"
 	: "=m"(_lock.lock) : :);
-#elif _SH4
-	int k, a = 1;
+	*/
 
-	do {
-		k = a;
-		a = _lock.lock;
-		_lock.lock = k;
-
-		if (a == 0) {
-			goto end;
-		}
-	} while(true);
-	end:
-		return;
-#elif __CYGWIN32__
 	int k, a = 1;
 
 	do {
@@ -140,11 +125,13 @@ void SpinLock::Lock()
 void SpinLock::Unlock()
 {
 #ifdef _WIN32
-  __asm__ __volatile__(
+	/*
+	__asm__ __volatile__(
 	"mov $0, %%eax\r\n"		\
 	"xchgl %%eax, %0\r\n"	\
 	: "=m"(_lock.lock) : :);
-#elif _SH4
+	*/
+
 	_lock.lock = 0;
 #else
 	__asm__ __volatile__(
@@ -157,6 +144,7 @@ void SpinLock::Unlock()
 bool SpinLock::TryLock()
 {
 #ifdef _WIN32
+	/*
 	char oldval;
 	
 	__asm__ __volatile__(
@@ -165,7 +153,8 @@ bool SpinLock::TryLock()
 			:"0" (0) : "memory");
 	
 	return (oldval > 0);
-#elif _SH4
+	*/
+
 	return false;
 #else
 	char oldval;

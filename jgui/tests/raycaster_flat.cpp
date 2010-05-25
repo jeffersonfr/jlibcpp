@@ -17,14 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jpanel.h"
-#include "jframe.h"
-#include "jfont.h"
-#include "joffscreenimage.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
+#include "jguilib.h"
 
 #define mapWidth 24
 #define mapHeight 24

@@ -17,16 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jbitinputstream.h"
-#include "jfileinputstream.h"
-#include "jioexception.h"
-#include "joutofboundsexception.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
+#include "jcommonlib.h"
 
 namespace jio {
 
@@ -40,32 +33,32 @@ BitInputStream::BitInputStream(std::string filename):
 	InputStream()
 {
 	jcommon::Object::SetClassName("jio::BitInputStream");
-	
+
 	haveByte = false;
 	show = false;
-	currentMask = 0;
-	currentByte = 0;
-     
-	 try {
-		 file = new File(filename);
-		 stream = new FileInputStream(file);
-	 } catch (...) {
-		 if (file != NULL) {
-			 delete file;
-		 }
+	currentMask = 0LL;
+	currentByte = 0LL;
 
-		 file = NULL;
-		 stream = NULL;
-		 
-		 throw IOException("Cannot open file in BitInputStream");
-	 }
+	try {
+		file = new File(filename);
+		stream = new FileInputStream(file);
+	} catch (...) {
+		if (file != NULL) {
+			delete file;
+		}
+
+		file = NULL;
+		stream = NULL;
+
+		throw IOException("Cannot open file in BitInputStream");
+	}
 }
 
 BitInputStream::BitInputStream(InputStream *is):
 	InputStream()
 {
 	jcommon::Object::SetClassName("jio::BitInputStream");
-		
+
 	if ((void *)is == NULL) {
 		throw IOException("Null pointer exception");
 	}
@@ -83,7 +76,7 @@ BitInputStream::~BitInputStream()
 	if (stream != NULL) {
 		delete stream;
 	}
-	
+
 	if (file != NULL) {
 		delete file;
 	}
@@ -109,28 +102,28 @@ int64_t BitInputStream::GetPosition()
 	return 0LL;
 }
 
-int BitInputStream::Read()
+int64_t BitInputStream::Read()
 {
-	int next = stream->Read();
-	
-	if (next < 0) {
-		return -1;
+	int64_t next = stream->Read();
+
+	if (next < 0LL) {
+		return -1LL;
 	}
-	
+
 	return next;
 }
 
 int64_t BitInputStream::Read(char *buffer, int64_t size)
 {
-	int64_t i;
-	int r;
-	
+	int64_t i,
+		r;
+
 	for (i=0; i<size; i++) {
-		if ((r = Read()) > 0) {
-			buffer[i] = r;
+		if ((r = Read()) > 0LL) {
+			buffer[i] = (char)r;
 		}
 	}
-	
+
 	return i;
 }
 
@@ -150,15 +143,15 @@ int BitInputStream::ReadBit()
 		currentByte = Read();
 		haveByte = true;
 	}
-	
+
 	int value = (currentByte & masks[currentMask]) / masks[currentMask];
-	
+
 	currentMask++;
 	if (currentMask == MASKS_LENGTH) {
 		haveByte = false;
 		currentMask = 0;
 	}
-	
+
 	return value;
 }
 
@@ -167,7 +160,7 @@ int BitInputStream::ReadBits(int num)
 	if ((num < 0) || (num > 32)) {
 		throw new jcommon::OutOfBoundsException("Number of bits is out of range");
 	}
-	
+
 	int bits = 0;
 	for (int i=0; i<num; i++) {
 		bits = (bits << 1) | ReadBit();

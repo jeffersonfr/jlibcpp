@@ -1,6 +1,6 @@
-#include "jmemorymap.h"
+#include "jsharedlib.h"
 
-#include <stdio.h>
+#include <iostream>
 
 using namespace jshared;
 

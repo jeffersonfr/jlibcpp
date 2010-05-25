@@ -17,15 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmemoryinputstream.h"
-
-#include "jruntimeexception.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
 
 namespace jio {
 
@@ -53,7 +46,7 @@ MemoryInputStream::~MemoryInputStream()
 
 bool MemoryInputStream::IsEmpty()
 {
-	return Available() <= 0;
+	return Available() <= 0LL;
 }
 
 int64_t MemoryInputStream::Available()
@@ -71,10 +64,10 @@ int64_t MemoryInputStream::GetPosition()
 	return _buffer_index;
 }
 
-int MemoryInputStream::Read()
+int64_t MemoryInputStream::Read()
 {
 	if (IsEmpty() == true) {
-		return -1;
+		return -1LL;
 	}
 
 	return _buffer[_buffer_index++];;
@@ -92,7 +85,7 @@ int64_t MemoryInputStream::Read(char *data, int64_t size)
 		r = Available();
 	}
 
-	memcpy(data, (uint8_t*)(_buffer + _buffer_index), r);
+	memcpy(data, (uint8_t*)(_buffer + _buffer_index), (size_t)r);
 
 	return r;
 }

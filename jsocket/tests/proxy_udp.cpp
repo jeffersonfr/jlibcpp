@@ -1,14 +1,10 @@
-#include "jdatagramsocket.h"
 #include "jsocketlib.h"
-#include "jfileinputstream.h"
-#include "jbufferedreader.h"
-#include "jstringtokenizer.h"
-#include "jsocket.h"
+#include "jiolib.h"
+#include "jcommonlib.h"
 
 #include <iostream>
 #include <stdexcept>
 
-#include <fcntl.h>
 
 using namespace jsocket;
 

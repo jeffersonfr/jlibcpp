@@ -17,14 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
-#include "jbutton.h"
-#include "jgridlayout.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <math.h>
+#include "jguilib.h"
 
 jgui::Font *font = NULL;
 

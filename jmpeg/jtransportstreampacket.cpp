@@ -17,13 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jtransportstreampacket.h"
-#include "jnullpointerexception.h"
-#include "jmpegexception.h"
-
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
+#include "Stdafx.h"
+#include "jmpeglib.h"
 
 namespace jmpeg {
 

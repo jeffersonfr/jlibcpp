@@ -17,16 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsemaphore.h"
-#include "jsemaphoreexception.h"
-#include "jsemaphoretimeoutexception.h"
-#include "jmutex.h"
-
-#ifdef _WIN32
-#else
-#include <semaphore.h>
-#include <errno.h>
-#endif
+#include "Stdafx.h"
+#include "jthreadlib.h"
 
 namespace jthread {
 
@@ -38,7 +30,6 @@ Semaphore::Semaphore(int value_):
 #ifdef _WIN32
 	_sa = NULL;
 	_semaphore = NULL;
-	_max_count = 65536; // CHANGE:: pode aumentar
 	_inherit = TRUE;
 
 	_sa = (LPSECURITY_ATTRIBUTES)HeapAlloc(GetProcessHeap(), 0, sizeof(SECURITY_ATTRIBUTES));
@@ -47,33 +38,25 @@ Semaphore::Semaphore(int value_):
 	_sa->lpSecurityDescriptor = NULL;
 	_sa->bInheritHandle = TRUE;
 
-	if (_max_count <= 0) {
-		throw SemaphoreException("Semaphre value can't be <= 0");
-	}
-
 	if (value_ < 0) {
 		value_ = 0;
 	}
 
-	if (value_ > _max_count) {
-		value_ = _max_count;
-	}
-
 	// if ((_semaphore = CreateSemaphore(_sa, _count, _max_count, "NTcourse.semaphore.empty")) == NULL) {
-	if ((_semaphore = CreateSemaphore(_sa, value_, _max_count, NULL)) == NULL) {
+	if ((_semaphore = CreateSemaphore(_sa, value_, 65535, NULL)) == NULL) {
 		// if ((_semaphore = OpenSemaphore(SEMAPHORE_ALL_ACCESS, _inherit, "NTcourse.semaphore.empty")) == NULL) {
 		DWORD code = GetLastError();
-		LPTSTR msg;
+		char *msg = NULL;
 
 		FormatMessage(
 				FORMAT_MESSAGE_ALLOCATE_BUFFER |
 				FORMAT_MESSAGE_FROM_SYSTEM,
 				0,			        	// no source buffer needed
-				code,							// error code for this message
-				0,								// default language ID
-				(LPTSTR)&msg,			// allocated by fcn
-				0,								// minimum size of buffer
-				(va_list *)NULL);	// no inserts
+				code,					// error code for this message
+				0,						// default language ID
+				(LPTSTR)msg,			// allocated by fcn
+				0,						// minimum size of buffer
+				(va_list *)NULL);		// no inserts
 
 		throw SemaphoreException(msg);
 		// }
@@ -110,7 +93,7 @@ void Semaphore::Wait()
 #endif
 }
 
-void Semaphore::Wait(long long time_)
+void Semaphore::Wait(uint64_t time_)
 {
 #ifdef _WIN32
 	time_ /= 100000L;
@@ -129,8 +112,8 @@ void Semaphore::Wait(long long time_)
 
 	clock_gettime(CLOCK_REALTIME, &t);
 
-	t.tv_sec += (long long)(time_/1000000LL);
-	t.tv_nsec += (long long)((time_%1000000LL)*1000LL);
+	t.tv_sec += (int64_t)(time_/1000000LL);
+	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
 
 	while ((result = sem_timedwait(&_semaphore, &t)) == -1 && errno == EINTR) {
 		continue; 
@@ -235,7 +218,7 @@ void Semaphore::Release()
 {
 	try {
 		NotifyAll();
-	} catch (SemaphoreException &e) {
+	} catch (SemaphoreException &) {
 	}
 
 #ifdef _WIN32

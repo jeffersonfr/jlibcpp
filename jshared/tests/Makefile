@@ -1,10 +1,10 @@
-AR			= ar
-CC			= g++
-JAVA		= javac
+AR				= ar
+CC				= g++
+JAVA			= javac
 
 TARGET_ARCH = linux
 
-DEBUG  		= -g -ggdb 
+DEBUG  		= -ggdb 
 OTHER  		= -Wall -funroll-loops -O2
 
 INCLUDE		= -I. `pkg-config --cflags jlibcpp`
@@ -12,7 +12,7 @@ LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
 CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER)
 
-OK 			= \033[30;32mOK!\033[m
+OK 				= \033[30;32mOK!\033[m
 
 OBJS_fifo_teste = \
 	   fifo_teste.o\

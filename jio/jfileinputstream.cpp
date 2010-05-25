@@ -17,15 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jfileinputstream.h"
-#include "jioexception.h"
-#include "jnullpointerexception.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
+#include "jcommonlib.h"
 
 namespace jio {
 
@@ -101,10 +95,10 @@ int64_t FileInputStream::GetPosition()
 	return _current;
 }
 
-int FileInputStream::Read()
+int64_t FileInputStream::Read()
 {
 	if (IsEmpty() == true) {
-		return -1;
+		return -1LL;
 	}
 
 	/* correct:: slow
@@ -119,10 +113,10 @@ int FileInputStream::Read()
 	
 	_current++;
 	
-	return (int)c;
+	return (int64_t)c;
 	*/
 
-	int r,
+	int64_t r,
 		d = _buffer_size - _buffer_index;
 	char c;
 	
@@ -150,7 +144,7 @@ int FileInputStream::Read()
 	
 	_current++;
 
-	return (int)c;
+	return (int64_t)c;
 }
 
 int64_t FileInputStream::Read(char *data, int64_t size)
@@ -177,7 +171,7 @@ int64_t FileInputStream::Read(char *data, int64_t size)
 	return r;
 	*/
 
-	int r,
+	int64_t r,
 		d,
 		count = size;
 	
@@ -210,7 +204,7 @@ int64_t FileInputStream::Read(char *data, int64_t size)
 			r = d;
 		}
 
-		memcpy((char *)(data + size - count), (char *)(_buffer + _buffer_index), r);
+		memcpy((char *)(data + size - count), (char *)(_buffer + _buffer_index), (size_t)r);
 
 		_buffer_index += r;
 		_current += r;
@@ -230,13 +224,13 @@ void FileInputStream::Skip(int64_t skip)
 		return;
 	}
 
-	int r = skip;
+	int64_t r = skip;
 
 	if (skip > Available()) {
 		r = Available();
 	}
 
-	char *tmp = new char[r];
+	char *tmp = new char[(int)r];
 
 	r = _file->Read((char *)tmp, r);
 

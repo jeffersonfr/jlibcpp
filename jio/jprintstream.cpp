@@ -17,14 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jprintstream.h"
-#include "jnullpointerexception.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
+#include "jcommonlib.h"
 
 namespace jio {
 
@@ -48,12 +43,12 @@ void PrintStream::Flush()
 	_stream->Flush();
 }
 
-int PrintStream::Write(char c)
+int64_t PrintStream::Write(char c)
 {
 	return Write((char *)&c, 1);
 }
 
-int PrintStream::Write(char *data, int size)
+int64_t PrintStream::Write(char *data, int size)
 {
 	return _stream->Write(data, size);
 }

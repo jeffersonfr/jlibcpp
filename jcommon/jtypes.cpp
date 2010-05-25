@@ -17,13 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jtypes.h"
-#include "joutofboundsexception.h"
-
-#include <sstream>
-
-#include <sys/time.h>
-#include <unistd.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 namespace jcommon {
 
@@ -37,7 +32,7 @@ Types::~Types()
 {
 }
 
-int StringToInteger(std::string s, int radix)
+int Types::StringToInteger(std::string s, int radix)
 {
 	if (radix < 2 || radix > 32) {
 		throw OutOfBoundsException("Bounds of radix exception");
@@ -46,51 +41,56 @@ int StringToInteger(std::string s, int radix)
 	return (int)strtol(s.c_str(), NULL, radix);
 }
 
-std::string IntegerToString(int i, int radix)
+std::string Types::IntegerToString(int i, int radix)
 {
 	return "";
 }
 
-long long StringToLong(std::string s, int radix)
+int64_t Types::StringToLong(std::string s, int radix)
 {
 	if (radix < 2 || radix > 32) {
 		throw OutOfBoundsException("Bounds of radix exception");
 	}
 	
-#ifndef __CYGWIN32__
-	return (long long)strtoll(s.c_str(), NULL, radix);
+#ifdef __CYGWIN32__
+	return (int64_t)strtol(s.c_str(), NULL, radix);
+#elif _WIN32
+	return (int64_t)strtol(s.c_str(), NULL, radix);
 #else 
-	// TODO:: cygwin
-	return (long long)strtol(s.c_str(), NULL, radix);
+	return (int64_t)strtoll(s.c_str(), NULL, radix);
 #endif
 }
 
-std::string LongToString(long long i, int radix)
+std::string Types::LongToString(int64_t i, int radix)
 {
 	return "";
 }
 
-float StringToFloat(std::string s)
+float Types::StringToFloat(std::string s)
 {
+#ifdef _WIN32
+	return (float)strtod(s.c_str(), NULL);
+#else
 	return strtof(s.c_str(), NULL);
+#endif
 }
 
-std::string FloatToString(float i, int radix)
+std::string Types::FloatToString(float i, int radix)
 {
 	return "";
 }
 
-double StringToDouble(std::string s)
+double Types::StringToDouble(std::string s)
 {
 	return strtod(s.c_str(), NULL);
 }
 
-std::string DoubleToString(double i, int radix)
+std::string Types::DoubleToString(double i, int radix)
 {
 	return "";
 }
 
-std::string LongToRadix(long long i, int radix)
+std::string Types::LongToRadix(int64_t i, int radix)
 {
 	return "";
 }

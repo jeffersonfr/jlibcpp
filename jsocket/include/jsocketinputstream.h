@@ -30,7 +30,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <winsock.h>
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -54,36 +53,36 @@ class SocketInputStream : public jio::InputStream{
 			int _fd;
 #endif
 			/** \brief */
+			Connection *_connection;
+			/** \brief */
 			char *_buffer;
 			/** \brief */
-			int _buffer_length;
+			int64_t _buffer_length;
 			/** \brief */
-			int _current_index; 
+			int64_t _current_index; 
 			/** \brief */
-			int _end_index;
+			int64_t _end_index;
 			/** \brief */
 			int64_t _receive_bytes;
-			/** \brief */
-			bool _stream;
 			/** \brief */
 			sockaddr_in _server_sock;
 			/** \brief */
 			bool *_is_closed;
 			/** \brief */
-			Connection *_connection;
+			bool _stream;
 
 		public:
 			/**
 			 * \brief Construtor.
 			 *
 			 */
-			SocketInputStream(Connection *conn_, bool *is_closed_, int size_ = 65535);
+			SocketInputStream(Connection *conn_, bool *is_closed_, int64_t size_ = 65535LL);
 
 			/**
 			 * \brief Construtor.
 			 *
 			 */
-			SocketInputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int size_ = 65535);
+			SocketInputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int64_t size_ = 65535LL);
 
 			/**
 			 * \brief Destrutor virtual.
@@ -141,7 +140,7 @@ class SocketInputStream : public jio::InputStream{
 			 * \exception SocketException an error occurred.
 			 * 
 			 */
-			virtual int Read();
+			virtual int64_t Read();
 
 			/**
 			 * \brief
@@ -157,7 +156,7 @@ class SocketInputStream : public jio::InputStream{
 			 * \brief
 			 *
 			 */
-			int64_t GetReceiveBytes();
+			virtual int64_t GetReceiveBytes();
 
 };
 

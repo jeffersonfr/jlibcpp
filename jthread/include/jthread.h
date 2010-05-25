@@ -174,19 +174,19 @@ class Thread : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static void Sleep(long long time_);
+		static void Sleep(uint64_t time_);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static void MSleep(long long time_);
+		static void MSleep(uint64_t time_);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static void USleep(long long time_);
+		static void USleep(uint64_t time_);
 
 		/**
 		 * \brief Get thread identifier

@@ -20,7 +20,7 @@
 #ifndef J_WRAPPERPROCESS_H
 #define J_WRAPPERPROCESS_H
 
-#include "jobject.h"
+#include "jprivateprocess.h"
 
 #include <iostream>
 #include <string>
@@ -30,12 +30,9 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <winsock.h>
 #else
-#include <sys/socket.h>
 #endif
 
-#include <unistd.h>
 #include <stdint.h>
 
 namespace jshared {
@@ -52,11 +49,6 @@ enum jwprocess_flag_t {
 	PROCESS_LOCK	/** \brief Create a new process and block parent */
 };
 
-enum jwprocess_type_t {
-	PROCESS_CHILD,
-	PROCESS_PARENT
-};
-
 /**
  * \brief Socket.
  *
@@ -66,203 +58,203 @@ class WrapperProcess : public virtual jcommon::Object{
 
     private:
 #ifdef _WIN32
-        /** \brief Socket handler. */
-		HANDLE _pid;
+			/** \brief */
+			HANDLE _pid;
 #else
-        /** \brief Socket handler. */
-        pid_t _pid;
+			/** \brief */
+			pid_t _pid;
+			/** \brief */
+			pid_t chldpid; 
 #endif
-        /** \brief */
-		int _pchild[2];
-        /** \brief */
-		int _pparent[2];
-        /** \brief */
-		pid_t chldpid; 
-        /** \brief */
-		bool _is_running;
+			/** \brief */
+			int _pchild[2];
+			/** \brief */
+			int _pparent[2];
+			/** \brief */
+			bool _is_running;
 
-		/**
-		 * \brief 
-		 *
-		 */
-	  	int ReadIns(char *b, int size);
-		
-		/**
-		 * \brief 
-		 *
-		 */
-		void ReadWrite(jwprocess_mode_t m);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void MakeHandleGreaterThan2(int fd);
-		
-		/**
-		 * \brief 
-		 *
-		 */
-		void ForkChild(const char *prog, char **args);
-		
-	protected:
+			/**
+			 * \brief 
+			 *
+			 */
+			int ReadIns(char *b, int size);
 
-		/**
-		 * \brief InputStream parameters
-		 *
-		 */
-		
-		/** \brief */
-		char *_rbuffer;
-		/** \brief */
-		int _rbuffer_length;
-		/** \brief */
-		int _rcurrent_index;
-		/** \brief */
-		int _rend_index;
+			/**
+			 * \brief 
+			 *
+			 */
+			void ReadWrite(jwprocess_mode_t m);
 
-		/**
-		 * \brief
-		 *
-		 */
-		int ReadBuffer(char *data_, int data_length_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		bool IsReadBufferEmpty();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetReadBufferAvailable();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void ResetReadBuffer();
-										
+			/**
+			 * \brief
+			 *
+			 */
+			void MakeHandleGreaterThan2(int fd);
 
-		/**
-		 * \brief OutputStream parameters
-		 *
-		 */
-		
-		/** \brief */
-		char *_wbuffer;
-		/** \brief */
-		int _wbuffer_length;
-		/** \brief */
-		int _wcurrent_index;
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int WriteBuffer(const char *data_, int data_length_);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		bool IsWriteBufferEmpty();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int GetWriteBufferAvailable();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int FlushWriteBuffer();
-		
-	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 * \param args_ Contem um array de parametros, com o ultimo parametro igual a NULL
-		 *
-		 */
-		WrapperProcess(std::string prog_, char **args_);
-		
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		WrapperProcess(std::string prog_);
-	
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~WrapperProcess();
-		
-		/**
-		 * \brief 
-		 *
-		 */
-		void Flush();
+			/**
+			 * \brief 
+			 *
+			 */
+			void ForkChild(const char *prog, char **args);
 
-		/**
-		 * \brief
-		 *
-		 */
-	  	int Read(char *buf, int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int Write(const char *buf, int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Write(std::string s);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void WaitAnyData();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void WaitAllData();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		jwprocess_type_t CreateProcess();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void WaitProcess();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Interrupt();
-		
-		/**
-		 * \brief 
-		 *
-		 */
-		void Release();
-		
+		protected:
+
+			/**
+			 * \brief InputStream parameters
+			 *
+			 */
+
+			/** \brief */
+			char *_rbuffer;
+			/** \brief */
+			int _rbuffer_length;
+			/** \brief */
+			int _rcurrent_index;
+			/** \brief */
+			int _rend_index;
+
+			/**
+			 * \brief
+			 *
+			 */
+			int ReadBuffer(char *data_, int data_length_);
+
+			/**
+			 * \brief
+			 *
+			 */
+			bool IsReadBufferEmpty();
+
+			/**
+			 * \brief
+			 *
+			 */
+			int GetReadBufferAvailable();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void ResetReadBuffer();
+
+
+			/**
+			 * \brief OutputStream parameters
+			 *
+			 */
+
+			/** \brief */
+			char *_wbuffer;
+			/** \brief */
+			int _wbuffer_length;
+			/** \brief */
+			int _wcurrent_index;
+
+			/**
+			 * \brief
+			 *
+			 */
+			int WriteBuffer(const char *data_, int data_length_);
+
+			/**
+			 * \brief
+			 *
+			 */
+			bool IsWriteBufferEmpty();
+
+			/**
+			 * \brief
+			 *
+			 */
+			int GetWriteBufferAvailable();
+
+			/**
+			 * \brief
+			 *
+			 */
+			int FlushWriteBuffer();
+
+		public:
+			/**
+			 * \brief Constructor.
+			 *
+			 * \param args_ Contem um array de parametros, com o ultimo parametro igual a NULL
+			 *
+			 */
+			WrapperProcess(std::string prog_, char **args_);
+
+			/**
+			 * \brief Constructor.
+			 *
+			 */
+			WrapperProcess(std::string prog_);
+
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~WrapperProcess();
+
+			/**
+			 * \brief 
+			 *
+			 */
+			void Flush();
+
+			/**
+			 * \brief
+			 *
+			 */
+			int Read(char *buf, int size);
+
+			/**
+			 * \brief
+			 *
+			 */
+			int Write(const char *buf, int size);
+
+			/**
+			 * \brief
+			 *
+			 */
+			void Write(std::string s);
+
+			/**
+			 * \brief
+			 *
+			 */
+			void WaitAnyData();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void WaitAllData();
+
+			/**
+			 * \brief
+			 *
+			 */
+			jprocess_type_t CreateProcess();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void WaitProcess();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void Interrupt();
+
+			/**
+			 * \brief 
+			 *
+			 */
+			void Release();
+
 };
 
 }

@@ -17,12 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jtimer.h"
-#include "jsemaphoretimeoutexception.h"
-
-#include <iostream>
-#include <algorithm>
-#include <stdio.h>
+#include "Stdafx.h"
+#include "jthreadlib.h"
 
 static bool tasks_compare(jthread::TimerTask *a, jthread::TimerTask *b) 
 {

@@ -4,7 +4,7 @@
  *  Adaptado por Jeff
  */
 
-#include "jthread.h"
+#include "jthreadlib.h"
 
 #include <iostream>
 
@@ -163,11 +163,12 @@ class QuickSort : public jthread::Thread{
 							b[0] = b[1];
 							b[1] = t;
 						}
-						if ((*compar)(b[0], b[2]) != 0)
+						if ((*compar)(b[0], b[2]) != 0) {
 							if ((*compar)(b[0], b[1]) < 0)
 								pivot = b[1];
 							else
 								pivot = b[2];
+						}
 					}
 					break;
 			}

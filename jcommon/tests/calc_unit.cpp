@@ -1,9 +1,5 @@
-#include "junit.h"
+#include "jcommonlib.h"
 
-#include <sstream>
-#include <stdexcept>
-
-using namespace std;
 using namespace jcommon;
 
 // Unit++ Test

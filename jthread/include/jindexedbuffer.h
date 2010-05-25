@@ -63,8 +63,6 @@ struct jringbuffer_t {
 /**
  * \brief IndexedBuffer.
  * 
- * WARNNING:: add -DSINGLE_WAIT_CONDITION to Makefile flags
- *
  * @author Jeff Ferr
  */
 class IndexedBuffer : public virtual jcommon::Object{

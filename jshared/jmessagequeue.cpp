@@ -17,21 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmessagequeue.h"
-#include "jmessageexception.h"
-
-#ifdef _WIN32
-// #include <msgqueue.h>
-#else 
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/msg.h>
-#include <sys/ioctl.h>
-#endif
-
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
+#include "Stdafx.h"
+#include "jsharedlib.h"
 
 namespace jshared {
 

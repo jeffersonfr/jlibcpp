@@ -17,13 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jpanel.h"
-#include "jframe.h"
-#include "jfont.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
+#include "jguilib.h"
 
 #define ENABLE_GUI	1
 #define DRAW_ANTS		0

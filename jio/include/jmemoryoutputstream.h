@@ -71,7 +71,7 @@ class MemoryOutputStream : public jio::OutputStream{
 		 * \brief
 		 * 
 		 */
-		virtual int Write(int b);
+		virtual int64_t Write(int64_t b);
 
 		/**
 		 * \brief
@@ -95,7 +95,7 @@ class MemoryOutputStream : public jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		int64_t GetSentBytes();
+		virtual int64_t GetSentBytes();
 
 };
 

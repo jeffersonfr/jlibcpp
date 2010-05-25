@@ -25,7 +25,6 @@
 #include <string>
 
 #include <stdint.h>
-#include <cstdlib>
 
 namespace jcommon {
 
@@ -67,13 +66,13 @@ class Types : public virtual jcommon::Object{
 		* \brief
 		*
 		*/
-		static long long StringToLong(std::string s, int radix = 10);
+		static int64_t StringToLong(std::string s, int radix = 10);
 
 		/**
 		* \brief
 		*
 		*/
-		static std::string LongToString(long long i, int radix = 10);
+		static std::string LongToString(int64_t i, int radix = 10);
 
 		/**
 		* \brief
@@ -103,7 +102,7 @@ class Types : public virtual jcommon::Object{
 		* \brief
 		*
 		*/
-		static std::string LongToRadix(long long i, int radix);
+		static std::string LongToRadix(int64_t i, int radix);
 		
 };
 

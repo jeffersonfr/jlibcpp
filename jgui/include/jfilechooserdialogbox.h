@@ -33,8 +33,6 @@
 #include <algorithm>
 
 #include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 
 namespace jgui {
 
@@ -88,7 +86,7 @@ class FileChooserDialog : public jgui::Frame, public jgui::SelectListener, publi
 		 * \brief
 		 *
 		 */
-		std::vector<std::string> ListFiles(std::string dirPath);
+		std::vector<std::string> * ListFiles(std::string dirPath);
 
 		/**
 		 * \brief

@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jtable.h"
+#include "Stdafx.h"
+#include "jguilib.h"
 #include "jcommonlib.h"
 
 namespace jgui {
@@ -125,7 +126,7 @@ Table::Table(int x, int y, int width, int height):
 	SetFocusable(true);
 }
 
-Table::~Table() 
+Table::~Table()
 {
 	// TODO:: remove all cell from table
 }
@@ -191,7 +192,7 @@ void Table::InsertColumn(std::string text, int index)
 		std::vector<Cell *> *v = (std::vector<Cell *> *)(*i);
 
 		if (v != NULL) {
-			v->insert(v->begin()+index, NULL);
+			v->insert(v->begin()+index, new Cell(this));
 		}
 	}
 

@@ -21,7 +21,6 @@
 #define J_COMPONENT_H
 
 #include "jobject.h"
-#include "jguilib.h"
 #include "jkeyevent.h"
 #include "jgraphics.h"
 #include "jmutex.h"
@@ -34,10 +33,6 @@
 
 #include <string>
 #include <vector>
-
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 
 #define DEFAULT_COMPONENT_WIDTH		192
 #define DEFAULT_COMPONENT_HEIGHT	54

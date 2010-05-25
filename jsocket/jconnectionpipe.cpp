@@ -17,21 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jconnectionpipe.h"
-#include "jsocketexception.h"
-#include "jsockettimeoutexception.h"
-#include "jsocketstreamexception.h"
-#include "jconnection.h"
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#include <fcntl.h>
-#include <poll.h>
-#endif
-
-#include <stdio.h>
-#include <errno.h>
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 
@@ -121,7 +108,6 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 	}
 	
 	int r = 0;
-	char *c;
 
 #ifdef _WIN32
 	ReadFile(_pipe[0], data_, size_, (DWORD *)&r, 0);
@@ -130,10 +116,10 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 		throw SocketStreamException("Socket broken pipe");
 	}
 #else
-	c = data_;
-		
+	char *c = data_;
+	
 	r = read(_pipe[0], c, size_);
-		
+	
 	if (r < 0) {
 		if (errno == EAGAIN) {
 			return -1;
@@ -224,7 +210,7 @@ int ConnectionPipe::GetHandler()
 {
 	return _connection->GetHandler();
 }
-        
+
 jio::InputStream * ConnectionPipe::GetInputStream()
 {
 	return NULL;
@@ -259,16 +245,16 @@ void ConnectionPipe::Run()
 void ConnectionPipe::main_pipe_receiver()
 {
 #ifdef _WIN32
-	int n, 
+	int n,
 		length = 0,
 		size_buffer = _size_pipe;
 	HANDLE pipe = _pipe[0];
 	char *c,
-		 buffer[size_buffer];
+		 *buffer = new char[size_buffer];
 
 	_current_send = 0;
 #else
-	int n, 
+	int n,
 		pipe = _pipe[1],
 		size_buffer = PIPE_BUF;
 	char *c,
@@ -285,6 +271,11 @@ void ConnectionPipe::main_pipe_receiver()
 		try {
 			n = _connection->Receive(buffer, size_buffer);
 		} catch (...) {
+#ifdef _WIN32
+			delete buffer;
+			buffer = NULL;
+#endif
+
 			return;
 		}
 
@@ -310,7 +301,7 @@ void ConnectionPipe::main_pipe_sender()
 		size_buffer = _size_pipe;
 	HANDLE pipe = _pipe[0];
 	char *c,
-		 buffer[size_buffer];
+		 *buffer = new char[size_buffer];
 	bool stream = _stream;
 
 	while (true) {
@@ -325,7 +316,7 @@ void ConnectionPipe::main_pipe_sender()
 			}
 		}
 #else
-	int n, 
+	int n,
 		r = 0,
 		count = 0,
 		pipe = _pipe[0],
@@ -351,6 +342,11 @@ void ConnectionPipe::main_pipe_sender()
 		try {
 			n = _connection->Send(buffer, size_buffer); // MSG_NOSIGNAL
 		} catch (...) {
+#ifdef _WIN32
+			delete buffer;
+			buffer = NULL;
+#endif
+
 			return;
 		}
 

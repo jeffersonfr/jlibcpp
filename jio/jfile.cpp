@@ -17,24 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jfile.h"
-#include "jioexception.h"
-#include "jfileexception.h"
-
-#include <iostream>
-#include <sstream>
-
-#ifdef _WIN32
-#include <windows.h>
-#include <sys/stat.h>
-#else
-#include <sys/types.h>
-#include <dirent.h>
-#endif
-
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
+#include "Stdafx.h"
+#include "jiolib.h"
 
 namespace jio {
 
@@ -498,13 +482,13 @@ int64_t File::Read(char *data_, int64_t length_)
 	int64_t r;
 	
 #ifdef _WIN32
-	    ReadFile(_fd, data_, length_, (DWORD *)&r, 0);
+	    ReadFile(_fd, data_, (DWORD)length_, (DWORD *)&r, 0);
 #else
-		r = read(_fd, data_, length_);
+		r = read(_fd, data_, (size_t)length_);
 #endif
 	
-	if (r <= 0) {
-		return -1;
+	if (r <= 0LL) {
+		return -1LL;
 	}
 	
 	return r;
@@ -515,9 +499,9 @@ int64_t File::Write(const char *data_, int64_t length_)
 	int64_t r;
 	
 #ifdef _WIN32
-	    WriteFile(_fd, data_, length_, (DWORD *)&r, 0);
+	    WriteFile(_fd, data_, (DWORD)length_, (DWORD *)&r, 0);
 #else
-		r = write(_fd, data_, length_);
+		r = write(_fd, data_, (size_t)length_);
 #endif
 
 	return r;

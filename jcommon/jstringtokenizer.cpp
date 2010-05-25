@@ -17,14 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jstringtokenizer.h"
-#include "jruntimeexception.h"
-
-#include <sstream>
-
-#include <stdio.h>
-#include <sys/time.h>
-#include <unistd.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 namespace jcommon {
 

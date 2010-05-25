@@ -75,7 +75,7 @@ class Condition : public virtual jcommon::Object{
 			 * the epoch (00:00:00 GMT, January 1, 1970).
 			 *
 			 */
-			void Wait(long long time_, Mutex *mutex = NULL);
+			void Wait(uint64_t time_, Mutex *mutex = NULL);
 
 			/**
 			 * \brief Notify the locked semaphore.

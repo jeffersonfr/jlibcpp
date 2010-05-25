@@ -1,18 +1,6 @@
-#include "jcondition.h"
-#include "jsemaphore.h"
-#include "jmutex.h"
-#include "jthread.h"
-#include "jthreadpool.h"
-#include "jthreadexception.h"
+#include "jthreadlib.h"
 
 #include <iostream>
-
-#ifdef _WIN32
-#include <winbase.h>
-#endif
-
-#include <unistd.h>
-#include <stdio.h>
 
 #define NUM_THREADS	3
 #define TCOUNT		10

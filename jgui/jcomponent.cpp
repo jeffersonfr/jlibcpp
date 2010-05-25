@@ -17,16 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jcomponent.h"
-#include "jfocusevent.h"
-#include "jfocuslistener.h"
-#include "jframe.h"
-#include "jstringtokenizer.h"
-#include "jstringutils.h"
-#include "jthememanager.h"
-#include "jcommonlib.h"
-
-#include <algorithm>
+#include "Stdafx.h"
+#include "jguilib.h"
 
 namespace jgui {
 

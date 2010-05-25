@@ -22,19 +22,13 @@
 
 #include "jobject.h"
 
-#include <iostream>
-
 #ifdef _WIN32
-#include <windows.h>
-#include <winsock.h>
 #else
-#include <sys/stat.h>
+#include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/msg.h>
-#include <sys/socket.h>
 #endif
 
-#include <unistd.h>
 #include <stdint.h>
 
 #define MAX_PACKET_SIZE	256

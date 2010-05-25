@@ -35,7 +35,6 @@
 #endif
 
 #include <sys/types.h>
-#include <netinet/in.h>
 #include <stdint.h>
 
 namespace jsocket {

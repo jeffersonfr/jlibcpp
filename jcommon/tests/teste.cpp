@@ -1,22 +1,4 @@
-#include "jobject.h"
-#include "jproperties.h"
-#include "jdynamiclink.h"
-#include "jsystem.h"
-#include "jurl.h"
-#include "jstringtokenizer.h"
-#include "jstringutils.h"
-#include "joptions.h"
-#include "jdate.h"
-#include "jsystem.h"
-#include "jxmlparser.h"
-#include "jhtmlparser.h"
-
-#include <iostream>
-#include <cstdlib>
-
-#include <stdio.h>
-
-using namespace std;
+#include "jcommonlib.h"
 
 namespace teste {
 	

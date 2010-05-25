@@ -17,19 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jjson.h"
-
-#include <sstream>
-
-#include <sys/time.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-#include <typeinfo>
-#include <math.h>
-#include <ctype.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 namespace jcommon {
 
@@ -178,12 +167,18 @@ int JSONNode :: isLastChild() const
 JSONStringNode :: JSONStringNode( const char * value )
 	: JSONNode( eString )
 {
+#ifdef _WIN32
+	mValue = _strdup( value );
+#else
 	mValue = strdup( value );
+#endif
 }
 
 JSONStringNode :: ~JSONStringNode()
 {
-	if( NULL != mValue ) free( mValue );
+	if( NULL != mValue ) 
+		free( mValue );
+
 	mValue = NULL;
 }
 
@@ -249,7 +244,11 @@ bool JSONBooleanNode :: getValue()
 JSONCommentNode :: JSONCommentNode( const char * comment )
 	: JSONNode( eComment )
 {
+#ifdef _WIN32
+	mValue = _strdup( comment );
+#else
 	mValue = strdup( comment );
+#endif
 }
 
 JSONCommentNode :: ~JSONCommentNode()
@@ -281,8 +280,14 @@ JSONPairNode :: ~JSONPairNode()
 void JSONPairNode :: setName( const char * name )
 {
 	if( name != mName ) {
-		if( NULL != mName ) free( mName );
+		if( NULL != mName ) 
+			free( mName );
+
+#ifdef _WIN32
+		mName = _strdup( name );
+#else
 		mName = strdup( name );
+#endif
 	}
 }
 
@@ -532,7 +537,12 @@ void JSONDomParser :: buildTree()
 			{
 				const char * text = ((JSONTextEvent*)event)->getText();
 				
+#ifdef _WIN32
+				JSONBooleanNode * newBoolean = new JSONBooleanNode( 0 == _stricmp( text, "true" ) );
+#else
 				JSONBooleanNode * newBoolean = new JSONBooleanNode( 0 == strcasecmp( text, "true" ) );
+#endif
+
 				addNode( newBoolean );
 				break;
 			}
@@ -585,16 +595,13 @@ int JSONDomBuffer :: getSize() const
 	return mBuffer->getSize();
 }
 
-void JSONDomBuffer :: dump( const JSONNode * node,
-		JSONStringBuffer * buffer, int level )
+void JSONDomBuffer :: dump( const JSONNode * node, JSONStringBuffer * buffer, int level )
 {
 	if( JSONNode::eObject == node->getType() ) {
 		dumpObject( node, buffer, level );
 	} else if( JSONNode::eArray == node->getType() ) {
 		dumpArray( node, buffer, level );
 	} else {
-		char tmpBuffer[ 128 ] = { 0 };
-
 		if( JSONNode::eString == node->getType() ) {
 			buffer->append( '"' );
 			JSONCodec::encode( ((JSONStringNode*)node)->getValue(), buffer );
@@ -602,8 +609,11 @@ void JSONDomBuffer :: dump( const JSONNode * node,
 		} else if( JSONNode::eDouble == node->getType() ) {
 			JSONCodec::encode( ((JSONDoubleNode*)node)->getValue(), buffer );
 		} else if( JSONNode::eInt == node->getType() ) {
-			snprintf( tmpBuffer, sizeof( tmpBuffer ), "%d", ((JSONIntNode*)node)->getValue() );
-			buffer->append( tmpBuffer );
+			std::ostringstream o;
+
+			o << ((JSONIntNode*)node)->getValue();
+
+			buffer->append( o.str().c_str() );
 		} else if( JSONNode::eBoolean == node->getType() ) {
 			buffer->append( ((JSONBooleanNode*)node)->getValue() ? "true" : "false" );
 		} else if( JSONNode::eNull == node->getType() ) {
@@ -772,7 +782,7 @@ void JSONPullParser :: changeReader( JSONReader * reader )
 	if( NULL != event ) {
 		const int eventType = event->getEventType();
 
-		char errmsg[ 256 ] = { 0 };
+		std::ostringstream errmsg;
 
 		if( JSONPullEvent::eStartObject == eventType ) {
 			mStack->append( (void*)"o" );
@@ -780,16 +790,15 @@ void JSONPullParser :: changeReader( JSONReader * reader )
 			++mObjectCount;
 		} else if( JSONPullEvent::eEndObject == eventType ) {
 			if( mObjectCount <= mNameList->getCount() ) {
-				snprintf( errmsg, sizeof( errmsg ), "miss value for name \"%s\"",
-						(char*)mNameList->getItem( JSONArrayList::LAST_INDEX ) );
+				errmsg << "miss value for name \"" << (char*)mNameList->getItem( JSONArrayList::LAST_INDEX ) << "\"";
 			} else {
 				char * last = (char*)mStack->takeItem( JSONArrayList::LAST_INDEX );
 				if( NULL != last ) {
 					if( 'o' != *last ) {
-						snprintf( errmsg, sizeof( errmsg ), "mismatched object, start-with<%s>", last );
+						errmsg << "mismatched object, start-with<" << last << ">";
 					}
 				} else {
-					snprintf( errmsg, sizeof( errmsg ), "mismatched object, start-with<NULL>" );
+					errmsg << "mismatched object, start-with<NULL>";
 				}
 
 				--mObjectCount;
@@ -801,15 +810,19 @@ void JSONPullParser :: changeReader( JSONReader * reader )
 			char * last = (char*)mStack->takeItem( JSONArrayList::LAST_INDEX );
 			if( NULL != last ) {
 				if( 'a' != *last ) {
-					snprintf( errmsg, sizeof( errmsg ), "mismatched array, start-with<%s>", last );
+					errmsg << "mismatched array, start-with<" << last << ">";
 				}
 			} else {
-				snprintf( errmsg, sizeof( errmsg ), "mismatched array, start-with<NULL>" );
+				errmsg << "mismatched array, start-with<NULL>";
 			}
 
 			if( isObjectParent() ) free( mNameList->takeItem( JSONArrayList::LAST_INDEX ) );
 		} else if( JSONPullEvent::eName == eventType ) {
+#ifdef _WIN32
+			mNameList->append( _strdup( ((JSONNameEvent*)event)->getText() ) );
+#else
 			mNameList->append( strdup( ((JSONNameEvent*)event)->getText() ) );
+#endif
 		} else if( JSONPullEvent::eString == eventType
 				|| JSONPullEvent::eNumber == eventType
 				|| JSONPullEvent::eBoolean == eventType
@@ -817,11 +830,11 @@ void JSONPullParser :: changeReader( JSONReader * reader )
 			if( isObjectParent() ) free( mNameList->takeItem( JSONArrayList::LAST_INDEX ) );
 		}
 
-		if( '\0' == errmsg[0] ) {
+		if( errmsg.str().size() > 0 ) {
 			mEventQueue->enqueue( event );
 		} else {
 			delete event;
-			setError( errmsg );
+			setError( errmsg.str().c_str() );
 		}
 	}
 
@@ -841,11 +854,22 @@ void JSONPullParser :: setError( const char * error )
 			char temp[ sizeof( mErrorSegment ) + 1 ];
 			memset( temp, 0, sizeof( temp ) );
 			if( mErrorIndex < (int)sizeof( mErrorSegment ) ) {
+#ifdef _WIN32
+				strncpy_s( temp, mErrorSegment, mErrorIndex );
+#else
 				strncpy( temp, mErrorSegment, mErrorIndex );
+#endif
 			} else {
 				int offset = mErrorIndex % sizeof( mErrorSegment );
+
+#ifdef _WIN32
+				strncpy_s( temp, mErrorSegment + offset, sizeof( mErrorSegment ) - offset );
+				// TODO:: naum consigo compilar essa linha no VC2010
+				// strncpy_s( temp + sizeof( mErrorSegment ) - offse), mErrorSegment, offset );
+#else
 				strncpy( temp, mErrorSegment + offset, sizeof( mErrorSegment ) - offset );
 				strncpy( temp + sizeof( mErrorSegment ) - offset, mErrorSegment, offset );
+#endif
 			}
 
 			for( char * pos = temp, * dest = segment; '\0' != *pos; pos++ ) {
@@ -865,9 +889,14 @@ void JSONPullParser :: setError( const char * error )
 		}
 
 		char msg[ 512 ];
-		snprintf( msg, sizeof( msg), "%s ( occured at row(%d), col(%d) : %s )", error, mRowIndex + 1, mColIndex + 1, segment );
 
+#ifdef _WIN32
+		sprintf_s( msg, sizeof( msg), "%s ( occured at row(%d), col(%d) : %s )", error, mRowIndex + 1, mColIndex + 1, segment );
+		mError = _strdup( msg );
+#else
+		snprintf( msg, sizeof( msg), "%s ( occured at row(%d), col(%d) : %s )", error, mRowIndex + 1, mColIndex + 1, segment );
 		mError = strdup( msg );
+#endif
 	}
 }
 
@@ -956,15 +985,15 @@ int JSONCodec :: encode( const char * decodeValue,
 
 int JSONCodec :: encode( double value, JSONStringBuffer * outBuffer )
 {
-	char buffer[ 128 ] = { 0 };
+	std::ostringstream o;
 
 	if( ((double)ceil( value )) == value ) {
-		snprintf( buffer, sizeof( 128 ), "%.0f", value );
+		o << (int64_t)value;
 	} else {
-		snprintf( buffer, sizeof( 128 ), "%f", value );
+		o << value;
 	}
 
-	return outBuffer->append( buffer );
+	return outBuffer->append( o.str().c_str() );
 }
 
 JSONReader :: JSONReader()

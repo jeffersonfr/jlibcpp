@@ -17,22 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jrtpsocket.h"
-#include "junknownhostexception.h"
-#include "jsocketexception.h"
-
-#include <string.h>
-
-#include <stdlib.h>
-#include <math.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <string.h>
-#include <errno.h>
-#include <unistd.h>
-#include <sys/time.h>
-#include <sys/utsname.h>
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 // F, G, H and I are basic MD5 functions
 #define F(x, y, z) (((x) & (y)) | ((~x) & (z)))

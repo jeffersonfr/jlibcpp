@@ -24,15 +24,6 @@
 
 #include <iostream>
 
-#ifdef _WIN32
-#include <windows.h>
-#include <winsock.h>
-#else
-#include <sys/socket.h>
-#include <sys/ipc.h>
-#endif
-
-#include <unistd.h>
 #include <stdint.h>
 
 namespace jshared {

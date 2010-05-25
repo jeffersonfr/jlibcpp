@@ -63,7 +63,7 @@ class ObjectOutputStream : public jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual int Write(Object *object);
+		virtual int64_t Write(Object *object);
 
 		/**
 		 * \brief
@@ -81,7 +81,7 @@ class ObjectOutputStream : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		int64_t GetSentBytes();
+		virtual int64_t GetSentBytes();
 
 };
 

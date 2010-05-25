@@ -17,27 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmulticastsocket.h"
-#include "jsocketexception.h"
-#include "jsocketstreamexception.h"
-#include "jsockettimeoutexception.h"
-
-#ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#else
-#include <poll.h>
-#endif
-
-#include <errno.h>
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
-
-#ifdef _WIN32
-SOCKET g_fd;
-#else
-int g_fd;
-#endif
 
 int MulticastSocket::_used_port = 1024;
 
@@ -92,8 +75,6 @@ void MulticastSocket::CreateSocket()
 	if (_fdr < 0) {
 		throw SocketException("Create multicast socket error");
 	}
-
-	g_fd = _fds;
 }
 
 void MulticastSocket::BindSocket(InetAddress *addr_, int local_port_)
@@ -131,11 +112,8 @@ void MulticastSocket::ConnectSocket(InetAddress *addr_, int port_)
 
 void MulticastSocket::InitStream(int rbuf_, int wbuf_)
 {
-	g_fd = _fdr;
 	_is = new SocketInputStream((Connection *)this, &_is_closed, _sock_r, rbuf_);
-	g_fd = _fds;
 	_os = new SocketOutputStream((Connection *)this, &_is_closed, _sock_s, wbuf_);
-	g_fd = _fdr;
 }
 
 /** End */
@@ -146,7 +124,7 @@ SOCKET MulticastSocket::GetHandler()
 int MulticastSocket::GetHandler()
 #endif
 {
-	return g_fd;
+	return _fdr;
 }
 
 jio::InputStream * MulticastSocket::GetInputStream()
@@ -480,11 +458,6 @@ SocketOption * MulticastSocket::GetSocketOption()
 	}
 	
 	return new SocketOption(_fdr, MCAST_SOCKET);
-}
-
-std::string MulticastSocket::what()
-{
-	return "Multicast";
 }
 
 }

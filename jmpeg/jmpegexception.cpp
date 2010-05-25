@@ -17,23 +17,19 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmpegexception.h"
+#include "Stdafx.h"
+#include "jmpeglib.h"
 
 namespace jcommon {
 
 MpegException::MpegException(std::string reason_):
-	jcommon::Exception(reason_), std::runtime_error(reason_)
+	jcommon::RuntimeException(reason_)
 {
 	jcommon::Object::SetClassName("jcommon::MpegException");
 }
 
 MpegException::~MpegException() throw()
 {
-}
-
-std::string MpegException::what()
-{
-	return std::runtime_error::what();
 }
 
 }

@@ -1,5 +1,4 @@
-#include "jmonitor.h"
-#include "jthread.h"
+#include "jthreadlib.h"
 
 #include <iostream>
 

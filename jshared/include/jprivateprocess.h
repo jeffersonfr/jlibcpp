@@ -24,14 +24,6 @@
 
 #include <iostream>
 
-#ifdef _WIN32
-#include <windows.h>
-#include <winsock.h>
-#else
-#include <sys/socket.h>
-#endif
-
-#include <unistd.h>
 #include <stdint.h>
 
 namespace jshared {
@@ -97,13 +89,21 @@ class PrivateProcess : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+#ifdef _WIN32
+		HANDLE GetPID();
+#else
 		pid_t GetPID();
+#endif
 		
 		/**
 		 * \brief
 		 *
 		 */
+#ifdef _WIN32
+		HANDLE GetParentPID();
+#else
 		pid_t GetParentPID();
+#endif
 		
 		/**
 		 * \brief

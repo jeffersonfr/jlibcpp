@@ -18,16 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "agenda.h"
-#include "jkeyboard.h"
-#include "jyesnodialogbox.h"
-#include "jmessagedialogbox.h"
-#include "jcalendardialogbox.h"
-#include "jlabel.h"
-#include "jtextarea.h"
-#include "jtextfield.h"
-#include "jdate.h"
-
-#include <algorithm>
 
 namespace magenda {
 

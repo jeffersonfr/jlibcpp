@@ -29,7 +29,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <winsock2.h>
 #elif __CYGWIN32__
 #include <netdb.h>
 #include <cygwin/socket.h>

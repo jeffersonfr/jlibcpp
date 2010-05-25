@@ -17,22 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsocketoption.h"
-#include "jsocketoptionexception.h"
-
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include "jsslsocket.h"
-#include <netinet/in.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <errno.h>
-#include <netinet/tcp.h>
-//#include <linux/tcp.h>
-#endif
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 
@@ -221,7 +207,11 @@ bool SocketOption::GetSocketAcceptConnection()
 		throw SocketOptionException("Get socket accept connection error");
 	}
 
+#ifdef _WIN32
+	return b != 0;
+#else
 	return b;
+#endif
 }
 
 void SocketOption::SetRoute(bool b_)

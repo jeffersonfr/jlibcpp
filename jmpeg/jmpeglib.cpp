@@ -17,14 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <iostream>
-#include <cstdlib>
-
-using namespace std;
+#include "Stdafx.h"
+#include "jmpeglib.h"
 
 int main_mpeg(int argc, char *argv[])
 {

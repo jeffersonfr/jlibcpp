@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jprogressbar.h"
+#include "Stdafx.h"
+#include "jguilib.h"
 #include "jcommonlib.h"
 
 namespace jgui {
@@ -183,7 +184,11 @@ void ProgressBar::Paint(Graphics *g)
 
 			char t[255];
 
-			sprintf(t, "%.1f %%", _position);
+#ifdef _WIN32
+			sprintf_s(t, 255-1, "%.1f %%", _position);
+#else
+			snprintf(t, 255-1, "%.1f %%", _position);
+#endif
 
 			text = (char *)t;
 		} else if (_type == BOTTOM_UP_DIRECTION) {
@@ -198,7 +203,11 @@ void ProgressBar::Paint(Graphics *g)
 
 			char t[255];
 
-			sprintf(t, "%.1f %%", _position);
+#ifdef _WIN32
+			sprintf_s(t, 255-1, "%.1f %%", _position);
+#else
+			snprintf(t, 255-1, "%.1f %%", _position);
+#endif
 
 			text = (char *)t;
 		}

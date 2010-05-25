@@ -21,7 +21,6 @@
 #define J_CONTAINER_H
 
 #include "jobject.h"
-#include "jguilib.h"
 #include "jgraphics.h"
 #include "jcomponent.h"
 #include "jcontainerlistener.h"
@@ -35,8 +34,6 @@
 #include <algorithm>
 
 #include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 
 namespace jgui {
 

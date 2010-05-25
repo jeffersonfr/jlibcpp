@@ -1,9 +1,3 @@
-#include "jsocketoption.h"
-#include "jsocket.h"
-#include "jdatagramsocket.h"
-#include "jsocketexception.h"
-#include "jsockettimeoutexception.h"
-#include "jsystem.h"
 #include "jsocketlib.h"
 
 #include <iostream>
@@ -47,7 +41,7 @@ int main() {
 	} catch (SocketTimeoutException &e) {
 		std::cout << "Socket timeout" << std::endl;
 	} catch (jcommon::RuntimeException &e) {
-		std::cout << "Unknown error::" << e.what() << " -> " << jcommon::System::GetLastErrorMessage() << std::endl;
+		std::cout << "Unknown error" << std::endl;
 	}
 
 	delete [] buffer;

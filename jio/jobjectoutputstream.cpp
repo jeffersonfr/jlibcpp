@@ -17,30 +17,21 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jobjectoutputstream.h"
-#include "jfileoutputstream.h"
-#include "joutofboundsexception.h"
-#include "jioexception.h"
-#include "jserializable.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
 
 namespace jio {
 
 ObjectOutputStream::ObjectOutputStream(OutputStream *os):
 	Object()
 {
-    jcommon::Object::SetClassName("jio::ObjectOutputStream");
+	jcommon::Object::SetClassName("jio::ObjectOutputStream");
 	
 	if ((void *)os == NULL) {
 		throw IOException("Null pointer exception");
 	}
 
-    stream = os;
+	stream = os;
 }
 
 ObjectOutputStream::~ObjectOutputStream()
@@ -61,17 +52,17 @@ int64_t ObjectOutputStream::Available()
 	return 0LL;
 }
 
-int ObjectOutputStream::Write(jcommon::Object *object)
+int64_t ObjectOutputStream::Write(jcommon::Object *object)
 {
 	if (object == NULL || stream == NULL) {
 		return -1;
 	}
 
-	if (object->InstanceOf("jcommon::Serializable") == false) {
+	if (object->InstanceOf("jio::Serializable") == false) {
 		return -1;
 	}
 
-	jcommon::Serializable *obj = (jcommon::Serializable *)object;
+	jio::Serializable *obj = (jio::Serializable *)object;
 
 	std::string name = obj->GetNameSpace();
 

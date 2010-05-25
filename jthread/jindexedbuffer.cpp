@@ -17,17 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jindexedbuffer.h"
-#include "jsemaphoreexception.h"
-#include "jmutexexception.h"
-#include "jbufferexception.h"
-#include "jautolock.h"
-
-#include <sstream>
+#include "Stdafx.h"
+#include "jthreadlib.h"
 
 namespace jthread {
-
-// add -DSINGLE_WAIT_CONDITION to Makefile flags
 
 IndexedBuffer::IndexedBuffer(int size, int chunk, jbuffer_type_t type_):
 	jcommon::Object()
@@ -194,7 +187,7 @@ int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 		while (*rindex == _write_index) {
 			try {
 				_semaphore.Wait();
-			} catch (jthread::SemaphoreException &e) {
+			} catch (jthread::SemaphoreException &) {
 				// WARN:: return -1; ?
 			}
 		}
@@ -281,7 +274,7 @@ int IndexedBuffer::Write(uint8_t*data, int size)
 		try {
 			// WARNNING:: em caso de erro modificar para Notify()
 			_semaphore.NotifyAll();
-		} catch (jthread::SemaphoreException &e) {
+		} catch (jthread::SemaphoreException &) {
 		}
 	}
 	

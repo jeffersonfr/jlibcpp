@@ -1,23 +1,12 @@
 #include "jsocketlib.h"
-#include "jsocketinputstream.h"
-#include "jsocketoutputstream.h"
-#include "jsocketexception.h"
-#include "junknownhostexception.h"
-#include "jsocket.h"
-#include "jinputstream.h"
-#include "joutputstream.h"
-#include "jstringtokenizer.h"
-#include "jstringutils.h"
-#include "jthread.h"
+#include "jcommonlib.h"
 
 #include <sstream>
 #include <iostream>
 #include <stdexcept>
 
-#include <string.h>
-#include <errno.h>
-
 #include <fcntl.h>
+#include <errno.h>
 
 using namespace jsocket;
 using namespace jio;

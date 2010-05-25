@@ -20,7 +20,41 @@
 #ifndef J_COMMONLIB_H
 #define J_COMMONLIB_H
 
-#include "jmutex.h"
+#include "jbitstream.h"
+#include "jcalendar.h"
+#include "jcharset.h"
+#include "jdate.h"
+#include "jdynamiclink.h"
+#include "jeventobject.h"
+#include "jexception.h"
+// #include "jgc.h"
+#include "jhtmlparser.h"
+#include "jillegalargumentexception.h"
+#include "jjson.h"
+#include "jlistener.h"
+#include "jnullpointerexception.h"
+#include "jobject.h"
+#include "jobservable.h"
+#include "jobserver.h"
+#include "joptions.h"
+#include "joutofboundsexception.h"
+#include "jpointer.h"
+#include "jpolicies.h"
+#include "jproperties.h"
+// #include "jregexp.h"
+#include "jruntimeexception.h"
+#include "jstringtokenizer.h"
+#include "jstringutils.h"
+#include "jsystem.h"
+#include "jtypes.h"
+#include "junit.h"
+#include "jurl.h"
+#include "jxmlparser.h"
+
+#ifdef _WIN32
+#else
+#include "jhttp.h"
+#endif
 
 #define JINFO	1
 #define JWARN	2
@@ -41,7 +75,7 @@
 
 #else
 
-#define JDEBUG(t, args...) 
+#define JDEBUG(...) while (0) {}																																	\
 
 #endif
 

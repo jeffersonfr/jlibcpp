@@ -26,7 +26,6 @@
 #include <string>
 
 #include <stdlib.h>
-#include <unistd.h>
 #include <stdio.h>
 
 #define DEFAULT_ITEM_SIZE		48

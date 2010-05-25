@@ -17,14 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jfilechooserdialogbox.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <dirent.h>
+#include "Stdafx.h"
+#include "jguilib.h"
+#include "jiolib.h"
 
 namespace jgui {
 
@@ -170,27 +165,27 @@ void FileChooserDialog::ShowFiles()
 	list->SetIgnoreRepaint(true);
 	list->RemoveItems();
 
-	std::vector<std::string> files = ListFiles(_current_dir);
+	std::vector<std::string> *files = ListFiles(_current_dir);
 
 	list->AddImageItem("../", "./icons/folder.png");
 
 	if (_filter == DIRECTORY_ONLY || _filter == FILE_AND_DIRECTORY) {
-		for (unsigned int i=0; i<files.size(); i++) {
-			if (files[i] == "..") {
+		for (unsigned int i=0; i<files->size(); i++) {
+			if ((*files)[i] == "..") {
 				continue;
 			}
 
-			if (IsDirectory(_current_dir + "/" + files[i])) {
+			if (IsDirectory(_current_dir + "/" + (*files)[i])) {
 				// adiciona um icone para o diretorio
-				list->AddImageItem(files[i], "./icons/folder.png"); 
+				list->AddImageItem((*files)[i], "./icons/folder.png"); 
 			}
 		}
 	}
 
 	if (_filter == FILE_ONLY || _filter == FILE_AND_DIRECTORY) {
-		for (unsigned int i=0; i<files.size(); i++) {
+		for (unsigned int i=0; i<files->size(); i++) {
 			std::string ext,
-				file = files[i];
+				file = (*files)[i];
 			bool b = false;
 
 			if (_extensions.size() == 0) {
@@ -201,7 +196,11 @@ void FileChooserDialog::ShowFiles()
 
 					if (file.size() > ext.size()) {
 						if (_extension_ignorecase == true) {
+#ifdef _WIN32
+							if (_stricmp(file.c_str()+(file.size()-ext.size()), ext.c_str()) == 0) {
+#else
 							if (strcasecmp(file.c_str()+(file.size()-ext.size()), ext.c_str()) == 0) {
+#endif
 								b = true;
 							}
 						} else {
@@ -221,74 +220,38 @@ void FileChooserDialog::ShowFiles()
 		}
 	}
 
+	delete files;
+
 	list->SetCurrentIndex(0);
 	list->SetIgnoreRepaint(false);
 	list->Repaint();
 }
 
-std::vector<std::string> FileChooserDialog::ListFiles(std::string dirPath)
+std::vector<std::string> * FileChooserDialog::ListFiles(std::string dirPath)
 {
-	std::vector<std::string> files;
-	struct dirent *namelist;
-	DIR *dir = NULL;
+	std::vector<std::string> *files = NULL;
 
-	try {
-		dir = opendir(dirPath.c_str());
+	jio::File file(dirPath);
 
-		if (dir != NULL) {
-			while ((namelist = readdir(dir)) != NULL) {
-				if (namelist->d_name[0] == '.' && namelist->d_name[1] == '\0') {
-					continue;//Ignora diretório corrente
-				}
+	files = file.ListFiles();
 
-				files.push_back(namelist->d_name);
-			}
-		}
-
-		closedir(dir);
-	} catch(...) {
-		if(dir != NULL) {
-			closedir(dir);
-		}
-	}
-
-	std::sort(files.begin(), files.end(), ascending_sort());
+	std::sort(files->begin(), files->end(), ascending_sort());
 
 	return files;
 }
 
 bool FileChooserDialog::IsDirectory(std::string path)
 {
-	struct stat st;
-	int r;
-	r = stat(path.c_str(), &st);
+	jio::File file(path);
 
-	if (r != -1) {
-		if (S_ISDIR(st.st_mode)) {
-			return true;
-		} else {
-			return false;
-		}
-	} else {
-		return false;
-	}
+	return file.IsDirectory();
 }
 
 bool FileChooserDialog::IsFile(std::string path)
 {
-	struct stat st;
-	int r;
-	r = stat(path.c_str(), &st);
+	jio::File file(path);
 
-	if(r != -1) {
-		if(S_ISDIR(st.st_mode)) {
-			return false;
-		} else {
-			return true;
-		}
-	} else {
-		return false;
-	}
+	return file.IsFile();
 }
 
 void FileChooserDialog::ItemSelected(jgui::SelectEvent *event)

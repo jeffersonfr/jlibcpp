@@ -1,17 +1,7 @@
-#include "jfileinputstream.h"
-#include "jfileoutputstream.h"
-#include "jdatainputstream.h"
-#include "jdataoutputstream.h"
-
-#include <sstream>
-#include <iostream>
-#include <cstdlib>
-#include <list>
-#include <map>
+#include "jiolib.h"
 
 using namespace std;
 using namespace jio;
-using namespace jcommon;
 
 int main() 
 {
@@ -28,6 +18,7 @@ int main()
 	uint32_t ui;
 	uint64_t ul;
 	
+
 	oos->Write((uint8_t)1);
 	oos->Write((uint16_t)1);
 	oos->Write((uint32_t)1);

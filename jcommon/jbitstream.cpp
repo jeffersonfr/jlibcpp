@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jbitstream.h"
-#include "jruntimeexception.h"
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 namespace jcommon {
 	
@@ -63,11 +63,11 @@ void BitStream::Reset() {
 	_consumed = 0;
 }
 	
-unsigned long long BitStream::GetBits(int n) 
+uint64_t BitStream::GetBits(int n) 
 {
 	// WARNNING: veridy bug when n > 24
 	
-	unsigned long long result = 0LL;
+	uint64_t result = 0LL;
 	int bitsToConsume = n;
 	int bitsToConsumeNow;
 	
@@ -111,7 +111,7 @@ uint8_t* BitStream::GetBitsArray(int size)
 		array[i] = (uint8_t)(GetBits(mod8) << (8 - mod8));
 	
 		return array;
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 		return NULL;
 	}
 
@@ -165,8 +165,7 @@ bool BitStream::TestBit(int index)
 	   	throw std::out_of_range("Index is out of range !");
 	}  
 	
-	return (_stream[(unsigned int)(index/8)] & (1 << (unsigned int)(index%8)));
+	return (_stream[(unsigned int)(index/8)] & (1 << (unsigned int)(index%8))) != 0;
 }
 
 }
-

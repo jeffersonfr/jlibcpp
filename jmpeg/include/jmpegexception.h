@@ -17,13 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_RUNTIMEEXCEPTION_H
-#define J_RUNTIMEEXCEPTION_H
+#ifndef J_MPEGEXCEPTION_H
+#define J_MPEGEXCEPTION_H
 
-#include "jexception.h"
-
-#include <stdexcept>
-#include <string>
+#include "jruntimeexception.h"
 
 namespace jcommon {
 
@@ -32,28 +29,22 @@ namespace jcommon {
  *
  * \author Jeff Ferr
  */
-class MpegException : public jcommon::Exception, std::runtime_error{
+class MpegException : public jcommon::RuntimeException{
 
     private:
 
     public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        MpegException(std::string reason);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~MpegException() throw();
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			MpegException(std::string reason);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string what();
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~MpegException() throw();
 
 };
 

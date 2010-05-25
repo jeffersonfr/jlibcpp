@@ -17,19 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  *a**************************************************************************/
-#include "jprivateprocess.h"
-#include "jprocessexception.h"
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <signal.h>
-#endif
-
-#include <errno.h>
-#include <stdio.h>
+#include "Stdafx.h"
+#include "jsharedlib.h"
 
 namespace jshared {
 
@@ -48,6 +37,7 @@ PrivateProcess::~PrivateProcess()
 jprocess_type_t PrivateProcess::CreateProcess()
 {
 #ifdef _WIN32
+	return PROCESS_PARENT;
 #else
 	// vfork para travar o processo pai
 	
@@ -103,10 +93,14 @@ void PrivateProcess::WaitProcess()
 #endif
 }
 
+#ifdef _WIN32
+HANDLE PrivateProcess::GetPID()
+#else
 pid_t PrivateProcess::GetPID()
+#endif
 {
 #ifdef _WIN32
-	return 0;
+	return _pid;
 #else
 	if (_pid == 0) {
 		return getpid();
@@ -116,10 +110,14 @@ pid_t PrivateProcess::GetPID()
 #endif
 }
 
+#ifdef _WIN32
+HANDLE PrivateProcess::GetParentPID()
+#else
 pid_t PrivateProcess::GetParentPID()
+#endif
 {
 #ifdef _WIN32
-	return 0;
+	return _pid;
 #else
 	if (_pid == 0) {
 		return getppid();

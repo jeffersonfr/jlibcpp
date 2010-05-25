@@ -17,15 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jbufferedreader.h"
-#include "jfile.h"
-#include "jioexception.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
 
 #define LINE_SIZE	1024
 
@@ -47,7 +40,7 @@ BufferedReader::~BufferedReader()
 {
 }
 
-int BufferedReader::Available()
+int64_t BufferedReader::Available()
 {
 	return _stream->Available();
 }
@@ -57,13 +50,13 @@ bool BufferedReader::IsEOF()
 	return _is_eof;
 }
 
-int BufferedReader::Read()
+int64_t BufferedReader::Read()
 {
-	int r;
+	int64_t r;
 
 	r = _stream->Read();
 
-	if (r < 0) {
+	if (r < 0LL) {
 		_is_eof = true;
 	} else {
 		_is_eof = false;
@@ -72,13 +65,13 @@ int BufferedReader::Read()
 	return r;
 }
 
-int BufferedReader::Read(char *data, int size)
+int64_t BufferedReader::Read(char *data, int64_t size)
 {
-	int r;
+	int64_t r;
 
 	r = _stream->Read(data, size);
 
-	if (r < 0) {
+	if (r < 0LL) {
 		_is_eof = true;
 	} else {
 		_is_eof = false;
@@ -102,7 +95,7 @@ std::string BufferedReader::ReadLine(std::string delim)
 	_is_eof = false;
 
 	for (i=0; ; ) {
-		x = _stream->Read();
+		x = (int)_stream->Read();
 
 		if (i >= n) {
 			tmp = n+100;

@@ -17,10 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jcoordinatelayout.h"
-#include "jcontainer.h"
-
-#include <limits.h>
+#include "Stdafx.h"
+#include "jguilib.h"
+#include "jmathlib.h"
 
 namespace jgui {
 
@@ -87,8 +86,8 @@ jsize_t CoordinateLayout::GetPreferredSize(Container *target)
 		jpoint_t point = cmp->GetLocation();
 		jsize_t size = cmp->GetSize();
 
-		t.width = std::max(t.width, point.x+size.width+(insets.left+insets.right));
-		t.height = std::max(t.height, point.y+size.height+(insets.top+insets.bottom));
+		t.width = jmath::Math<int>::Max(t.width, point.x+size.width+(insets.left+insets.right));
+		t.height = jmath::Math<int>::Max(t.height, point.y+size.height+(insets.top+insets.bottom));
 	}
 
 	return t;

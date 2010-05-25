@@ -99,12 +99,6 @@ class Channel : public virtual jcommon::Object{
 		 */
 		virtual int64_t Transfer(Channel *in, int64_t count_in, int64_t position_int, Channel *out, int64_t count_out, int64_t position_out);
 	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string what();	
-
 };
 
 }

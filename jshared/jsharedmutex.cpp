@@ -17,22 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsharedmutex.h"
-#include "jmemoryexception.h"
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/ipc.h>
-#include <sys/mman.h>
-#include <errno.h>
-#include <stdio.h>
-#endif
+#include "Stdafx.h"
+#include "jsharedlib.h"
 
 namespace jshared {
 
-SharedMutex::SharedMutex(mutex_flags_t flags_):
+SharedMutex::SharedMutex(jmutex_flags_t flags_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::SharedMutex");
@@ -40,27 +30,27 @@ SharedMutex::SharedMutex(mutex_flags_t flags_):
 #ifdef _WIN32
 #else	
 	_flags = flags_;
-	_memory = NULL;
-	_size = 0;
+	_shmp = NULL;
+	_size = 0LL;
 #endif
 }
 
-SharedMutex::SharedMutex(void *data_, long long size_):
+SharedMutex::SharedMutex(void *data_, int64_t size_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::SharedMutex");
 	
 #ifdef _WIN32
 #else	
-	_flags = MCL_CURRENT | MCL_FUTURE;
-	_memory = data_;
+	_flags = (jmutex_flags_t)(MUTEX_CURRENT | MUTEX_FUTURE);
+	_shmp = (char *)data_;
 	_size = size_;
 
 	if ((void *)data_ == NULL) {
 		throw MemoryException("Data parameter was NULL");
 	}
 	
-	if (_size <= 0) {
+	if (_size <= 0LL) {
 		throw MemoryException("Size parameter was 0");
 	}
 #endif
@@ -75,11 +65,11 @@ void SharedMutex::Lock()
 {
 #ifdef _WIN32
 #else	
-	if ((void *)_memory == NULL) {
+	if ((void *)_shmp == NULL) {
 		throw MemoryException("Null pointer exception");
 	}
 	
-	if (mlock(_data, _size) < 0) {
+	if (mlock(_shmp, (size_t)_size) < 0) {
 		throw MemoryException("Lock memory error");
 	}
 #endif
@@ -89,11 +79,11 @@ void SharedMutex::Unlock()
 {
 #ifdef _WIN32
 #else	
-	if ((void *)_memory == NULL) {
+	if ((void *)_shmp == NULL) {
 		throw MemoryException("Null pointer exception");
 	}
 	
-	if (munlock(_data, _size) < 0) {
+	if (munlock(_shmp, (size_t)_size) < 0) {
 		throw MemoryException("Unlock memory error");
 	}
 #endif
@@ -103,11 +93,21 @@ void SharedMutex::LockAll()
 {
 #ifdef _WIN32
 #else	
-	if ((void *)_memory != NULL) {
+	if ((void *)_shmp != NULL) {
 		throw MemoryException("Null pointer exception");
 	}
 	
-	if (mlockall(_flags) < 0) {
+	int flags = 0;
+
+	if ((_flags & MUTEX_CURRENT) != 0) {
+		flags = flags | MCL_CURRENT;
+	}
+
+	if ((_flags & MUTEX_FUTURE) != 0) {
+		flags = flags | MCL_FUTURE;
+	}
+
+	if (mlockall(flags) < 0) {
 		throw MemoryException("Lock error");
 	}
 #endif
@@ -117,7 +117,7 @@ void SharedMutex::UnlockAll()
 {
 #ifdef _WIN32
 #else	
-	if ((void *)_memory == NULL) {
+	if ((void *)_shmp == NULL) {
 		throw MemoryException("Null pointer exception");
 	}
 	

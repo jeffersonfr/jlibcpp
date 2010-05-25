@@ -1,11 +1,11 @@
-#include "jsharedfifo.h"
+#include "jsharedlib.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <wait.h>
 
-#define TESTBLOCKSZ	1024  /* Max number of int's in each test block  */
-#define NTESTS		1000
+#define TESTBLOCKSZ		1024  /* Max number of int's in each test block  */
+#define NTESTS				1000
 
 struct priv {
    int counter;

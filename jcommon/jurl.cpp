@@ -17,11 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jurl.h"
-#include "jruntimeexception.h"
-#include "jstringtokenizer.h"
-
-#include <sstream>
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 namespace jcommon {
 
@@ -139,15 +136,22 @@ URL::~URL()
 
 std::string URL::Encode(std::string s_)
 {
-	std::string str;
-
 	try {
-	    str = Encode(s_, "ISO-8859-1");
+		return Encode(s_, "ISO-8859-1");
 	} catch (...) {
-		return s_;
 	}
 
-	return str;
+	return s_;
+}
+
+std::string URL::Decode(std::string s_)
+{
+	try {
+		return Decode(s_, "ISO-8859-1");
+	} catch (...) {
+	}
+
+	return s_;
 }
 
 std::string URL::Encode(std::string s_, std::string standard_)
@@ -168,126 +172,72 @@ std::string URL::Encode(std::string s_, std::string standard_)
 	    dontNeedEncoding.set(i);
 	}
 	
-	dontNeedEncoding.set(' ');
+	dontNeedEncoding.set('&');
+	dontNeedEncoding.set('=');
 	dontNeedEncoding.set('-');
 	dontNeedEncoding.set('_');
 	dontNeedEncoding.set('.');
 	dontNeedEncoding.set('*');
+	dontNeedEncoding.set(':');
+	dontNeedEncoding.set('/');
+	dontNeedEncoding.set('?');
 	
 	bool needToChange = false;
-	bool wroteUnencodedChar = false;
-	int maxBytesPerChar = 10,
-		length = (int)s_.length();
-	char *out = NULL;
-	char *bytes = NULL;
 	
-	if (length > 512) {
+	if ((int)s_.length() > 512) {
 		throw RuntimeException("URL too large");
 	}
-	
-	out = new char[length * 3];
-	bytes = new char[maxBytesPerChar];
 
-	out[0] = '\0';
-	bytes[0] = '\0';
-	
-	for (int i=0; i<length; i++) {
+	std::ostringstream o;
+
+	for (int i=0; i<(int)s_.length(); i++) {
 		int c = (int)s_[i];
 
 		if (dontNeedEncoding[c] == true) {
-			if (c == ' ') {
-				c = '+';
-				needToChange = true;
-			}
-
-			char t[] = {c, '\0'};
-			
-			strcat(out, t);
-			wroteUnencodedChar = true;
+			o << (char)c;
 		} else {
-			try {
-				if (wroteUnencodedChar == true) {
-					if ((void *)bytes != NULL) {
-						delete [] bytes;
-					}
-					
-					bytes = new char[maxBytesPerChar];
-
-					wroteUnencodedChar = false;
-				}
-
-				char t[] = {c, '\0'};
-
-				strcat(bytes, t);
-			} catch (...) {
-				bytes[0] = '\0';
-
-				continue;
-			}
-
-			int ba_length = strlen(bytes);
-			char t[4],
-				 p[] = {'%', '\0'},
-				 *ba = bytes;
-			
-			for (int j=0; j<ba_length; j++) {
-				strcat(out, p);
-				sprintf(t, "%x", ba[j] & 0xff);
-				strcat(out, t);
-			}
-
-			bytes[0] = '\0';
-
 			needToChange = true;
+
+			o << "%" << std::hex << (int)c;
 		}
 	}
 
-	return ((needToChange == true)?std::string(out):s_);
+	return ((needToChange == true)?o.str():s_);
 }
 
 std::string URL::Decode(std::string s_, std::string standard_)
 {
+	int i = 0,
+		numChars = s_.length();
 	bool needToChange = false;
-	int numChars = s_.length();
-	int i = 0;
-	char *sb;
 
 	if (numChars > 512) {
 		throw RuntimeException("URL too large");
 	}
-	
-	sb = new char[s_.length()+1];
-	sb[0] = '\0';
+
+	std::ostringstream o;
 	
 	if (standard_ == "") {
 		standard_ = "iso-8859-1";
 	}
 	
-	char c,
-		 *bytes = NULL;
+	char c;
 
 	while (i < numChars) {
 		c = s_[i];
 
 		switch (c) {
 			case '+':
-					strcat(sb, " ");
-					i++;
 					needToChange = true;
+					o << " ";
+					i++;
 					break;
 			case '%':
 					try {
-						if (bytes == NULL) {
-							bytes = new char[(numChars-i)/3];
-						}
-
-						int pos = 0;
-
 						while (((i+2) < numChars) && (c == '%')) {
 							char t[2+1] = {s_[i+1], s_[i+2], '\0'};
-							int r;
 
-							r = bytes[pos++] = (char)strtol(t, NULL, 16);
+							o << (char)strtol(t, NULL, 16);
 							
 							i += 3;
 
@@ -296,33 +246,24 @@ std::string URL::Decode(std::string s_, std::string standard_)
 							}
 						}
 
-						bytes[pos] = '\0';
-
 						if ((i < numChars) && (c == '%')) {
 							throw RuntimeException("URL decoder imcomplete trailing escape '%' pattern");
 						}
-
-						strcat(sb, bytes);
 					} catch (...) {
 							throw RuntimeException("URL decoder illegal hex characters in escape '%' pattern");
 					}
 
 					needToChange = true;
+
 					break;
 				default:
-					char t[2];
-
-					t[0] = (char)c;
-					t[1] = '\0';
-		
-					strcat(sb, t);
+					o << (char)c;
 					i++;
-
 					break;
 		}
 	}
 
-	return ((needToChange == true)?sb:s_);
+	return ((needToChange == true)?o.str():s_);
 }
 
 std::string URL::GetHost()

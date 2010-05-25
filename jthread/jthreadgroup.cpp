@@ -17,13 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jthreadgroup.h"
-#include "jthreadexception.h"
-#include "jsemaphoreexception.h"
-
-#include <algorithm>
-
-#include <errno.h>
+#include "Stdafx.h"
+#include "jthreadlib.h"
 
 namespace jthread {
 
@@ -60,7 +55,7 @@ void ThreadGroup::InterruptAll()
 	for (std::vector<Thread *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
 		try {
 			(*i)->Interrupt();
-		} catch (ThreadException &e) {
+		} catch (ThreadException &) {
 		}
 	}
 }
@@ -70,7 +65,7 @@ void ThreadGroup::WaitForAll()
 	for (std::vector<Thread *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
 		try {
 			(*i)->WaitThread();
-		} catch (ThreadException &e) {
+		} catch (ThreadException &) {
 		}
 	}
 }

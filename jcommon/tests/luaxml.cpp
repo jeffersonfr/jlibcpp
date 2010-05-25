@@ -1,9 +1,4 @@
-#include "jxmlparser.h"
-
-#include <string>
-#include <iostream>
-#include <iostream>
-#include <sstream>
+#include "jcommonlib.h"
 
 using namespace jcommon;
 

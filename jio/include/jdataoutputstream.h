@@ -63,25 +63,25 @@ class DataOutputStream : public jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual int Write(uint8_t data);
+		virtual int64_t Write(uint8_t data);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual int Write(uint16_t data);
+		virtual int64_t Write(uint16_t data);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual int Write(uint32_t data);
+		virtual int64_t Write(uint32_t data);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual int Write(uint64_t data);
+		virtual int64_t Write(uint64_t data);
 
 		/**
 		 * \brief
@@ -99,7 +99,7 @@ class DataOutputStream : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		int64_t GetSentBytes();
+		virtual int64_t GetSentBytes();
 
 };
 

@@ -17,13 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jinputstream.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
 
 namespace jio {
 
@@ -54,16 +49,16 @@ bool InputStream::IsClosed()
 	return _is_closed;
 }
 
-std::string InputStream::Read(int size)
+std::string InputStream::Read(int64_t size)
 {
 	if (size <= 0) {
 		return "";
 	}
 
-	char *buf = new char[size + 1];
+	char *buf = new char[(int)size + 1];
 	int r;
 	
-	if ((r = Read(buf, size)) == EOF || r <= 0) {
+	if ((r = (int)Read(buf, (int)size)) == EOF || r <= 0) {
 		delete buf;
 
 		return "";

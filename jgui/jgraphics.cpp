@@ -17,18 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jgraphics.h"
-#include "jautolock.h"
-#include "jstringtokenizer.h"
-#include "jstringutils.h"
-#include "jwindow.h"
-#include "joffscreenimage.h"
-#include "jfont.h"
-#include "jgfxhandler.h"
-#include "jmutexexception.h"
+#include "Stdafx.h"
 #include "jguilib.h"
-#include "jdate.h"
-#include "jcommonlib.h"
+#include "jmathlib.h"
 
 namespace jgui {
 
@@ -2232,7 +2223,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 
 void Graphics::Rotate(double radians)
 {
-	_radians = fmod(radians, 2.0*M_PI);
+	_radians = fmod(radians, 2.0*jmath::Math<double>::PI);
 }
 
 void Graphics::Translate(int x, int y)

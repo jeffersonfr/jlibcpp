@@ -1,12 +1,5 @@
-#include "jbufferedreader.h"
-#include "jfileinputstream.h"
-#include "jfileoutputstream.h"
-#include "jfile.h"
-#include "jioexception.h"
-#include "joptions.h"
-
-#include <iostream>
-#include <cstdlib>
+#include "jiolib.h"
+#include "jcommonlib.h"
 
 using namespace std;
 using namespace jio;
@@ -27,7 +20,7 @@ bool IsEmpty(std::string str)
 
 int removeComment(File *f, File *t)
 {
- 	unsigned char c, old;
+ 	uint8_t c, old;
 	int r;
 
 	t->Reset();
@@ -188,7 +181,7 @@ int inpi_extract_process(std::string filename)
 		File file(filename);
 		int r, k;
 		char filename[256];
- 		unsigned char c, previous = 0;
+ 		uint8_t c, previous = 0;
 
 		while ((r = file.Read((char *)&c, 1)) != EOF && r != 0) {
 			if (c == '/') {

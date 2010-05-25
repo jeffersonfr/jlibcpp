@@ -17,45 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jkeyboard.h"
-#include "jcheckbutton.h"
-#include "jcheckbuttongroup.h"
-#include "janimation.h"
-#include "jmarquee.h"
-#include "jtextfield.h"
-#include "jprogressbar.h"
-#include "jwatch.h"
-#include "jtextarea.h"
-#include "jspin.h"
-#include "jinputdialogbox.h"
-#include "jbutton.h"
-#include "jspin.h"
-#include "jpanel.h"
-#include "jtextarea.h"
-#include "jbuttonlistener.h"
-#include "jselectlistener.h"
-#include "jselectlistener.h"
-#include "jcheckbuttonlistener.h"
-#include "jlabel.h"
-#include "jlistbox.h"
-#include "jframe.h"
-#include "jicon.h"
-#include "jslider.h"
-#include "jscrollbar.h"
-#include "jimagebutton.h"
-#include "jfile.h"
-#include "jtooglebutton.h"
-#include "jcombobox.h"
-#include "jmenu.h"
-#include "jfont.h"
-#include "joffscreenimage.h"
-#include "jmenugroup.h"
-#include "jcontainer.h"
-#include "jscrollpane.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
+#include "jguilib.h"
 
 class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener, public jgui::FrameInputListener{
 

@@ -17,17 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jstringutils.h"
-#include "jruntimeexception.h"
-
-#include <sstream>
-#include <iostream>
-#include <vector>
-
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 namespace jcommon {
 

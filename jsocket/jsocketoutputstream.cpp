@@ -17,12 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsocketoutputstream.h"
-#include "jsocketexception.h"
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 
-SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, int size_):
+SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, int64_t size_):
 	jio::OutputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SocketOutputStream");
@@ -37,8 +37,8 @@ SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, int 
 	_blocked = true;
 	
 	try {
-		_buffer = new char[_buffer_length];
-	} catch (std::bad_alloc &e) {
+		_buffer = new char[(int)_buffer_length];
+	} catch (std::bad_alloc &) {
 		_buffer = NULL;
 
 		_buffer_length = 0;
@@ -46,7 +46,7 @@ SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, int 
 	}
 }
 
-SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int size_):
+SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int64_t size_):
 	jio::OutputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SocketOutputStream");
@@ -55,7 +55,7 @@ SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, sock
 	_fd = conn_->GetHandler();
 	_is_closed = is_closed_;
 	_buffer_length = size_;
-	_current_index = 0;
+	_current_index = 0LL;
 	_sent_bytes = 0;
 	_stream = false;
 	_blocked = true;
@@ -63,8 +63,8 @@ SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, sock
 	memcpy(&_server_sock, &server_sock_, sizeof(server_sock_));
 
 	try {
-		_buffer = new char[_buffer_length];
-	} catch (std::bad_alloc &e) {
+		_buffer = new char[(int)_buffer_length];
+	} catch (std::bad_alloc &) {
 		_buffer = NULL;
 
 		_buffer_length = 0;
@@ -84,31 +84,32 @@ int64_t SocketOutputStream::Available()
 	return 0LL;
 }
 
-int SocketOutputStream::Write(int c_)
+int64_t SocketOutputStream::Write(int64_t c_)
 {
-	_buffer[_current_index++] = c_;
+	_buffer[_current_index++] = (char)c_;
 
 	if (_current_index == _buffer_length) {
 		return Flush();
 	}
 
-	return 0;
+	return 0LL;
 }
 
 int64_t SocketOutputStream::Write(const char *data_, int64_t data_length_)
 {
-	int64_t l = data_length_, size; 
+	int64_t l = data_length_, 
+		size; 
 	
 	while (l > 0LL) {
 		size = (_buffer_length - _current_index);
 		
 		if (l < size) {
-			memcpy((_buffer + _current_index), (data_ + data_length_ - l), l);
+			memcpy((_buffer + (size_t)_current_index), (data_ + (size_t)(data_length_ - l)), (size_t)l);
 			_current_index += l;
 			
 			break;
 		} else {
-			memcpy((_buffer + _current_index), (data_ + data_length_ - l), size);
+			memcpy((_buffer + _current_index), (data_ + data_length_ - l), (size_t)size);
 
 			l = l - size;
 			_current_index = _buffer_length;
@@ -127,7 +128,7 @@ bool SocketOutputStream::IsEmpty()
 	return (_current_index == 0);
 }
 
-int SocketOutputStream::GetAvailable()
+int64_t SocketOutputStream::GetAvailable()
 {
 	return _current_index;
 }
@@ -159,9 +160,9 @@ int64_t SocketOutputStream::Flush()
 #endif
 
 	if (_stream == true) {
-		n = ::send(_fd, _buffer, _current_index, flags);
+		n = ::send(_fd, _buffer, (size_t)_current_index, flags);
 	} else {
-		n = ::sendto(_fd, _buffer, _current_index, flags, (sockaddr *)&_server_sock, sizeof(_server_sock));
+		n = ::sendto(_fd, _buffer, (size_t)_current_index, flags, (sockaddr *)&_server_sock, sizeof(_server_sock));
 	}
 
 	_current_index = 0;

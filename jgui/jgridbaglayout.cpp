@@ -13,14 +13,13 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   aint64_t with this program; if not, write to the                         *
+ *   aint64_t with this program; if not, write to the                      *
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jgridbaglayout.h"
-#include "jcontainer.h"
-
-#include <limits.h>
+#include "Stdafx.h"
+#include "jguilib.h"
+#include "jmathlib.h"
 
 namespace jgui {
 
@@ -186,8 +185,8 @@ int64_t * GridBagLayout::PreInitMaximumArraySizes(Container *parent)
 			curHeight = 1;
 		}
 
-		preMaximumArrayXIndex = std::max(curY + curHeight, preMaximumArrayXIndex);
-		preMaximumArrayYIndex = std::max(curX + curWidth, preMaximumArrayYIndex);
+		preMaximumArrayXIndex = jmath::Math<int>::Max(curY + curHeight, preMaximumArrayXIndex);
+		preMaximumArrayYIndex = jmath::Math<int>::Max(curX + curWidth, preMaximumArrayYIndex);
 	} //for (components) loop
 	// Must specify index++ to allocate well-working arrays.
 	/* fix for 4623196.
@@ -441,23 +440,15 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 				case GBLC_BASELINE_TRAILING:
 					if (constraints->ascent >= 0) {
 						if (curHeight == 1) {
-							maxAscent[curY] =
-								std::max(maxAscent[curY],
-										constraints->ascent);
-							maxDescent[curY] =
-								std::max(maxDescent[curY],
-										constraints->descent);
-						}
-						else {
+							maxAscent[curY] = jmath::Math<int>::Max(maxAscent[curY], constraints->ascent);
+							maxDescent[curY] = jmath::Math<int>::Max(maxDescent[curY], constraints->descent);
+						} else {
 							if (constraints->baselineResizeBehavior == CB_CONSTANT_DESCENT) {
 								maxDescent[curY + curHeight - 1] =
-									std::max(maxDescent[curY + curHeight
-											- 1],
-											constraints->descent);
+									jmath::Math<int>::Max(maxDescent[curY + curHeight - 1], constraints->descent);
 							}
 							else {
-								maxAscent[curY] = std::max(maxAscent[curY],
-										constraints->ascent);
+								maxAscent[curY] = jmath::Math<int>::Max(maxAscent[curY], constraints->ascent);
 							}
 						}
 
@@ -478,13 +469,9 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 					// To make the bottom edge of the component aligned
 					// with the baseline the bottom inset is
 					// added to the descent, the rest to the ascent.
-					pixels_diff = constraints->minHeight +
-						constraints->insets.top +
-						constraints->ipady;
-					maxAscent[curY] = std::max(maxAscent[curY],
-							pixels_diff);
-					maxDescent[curY] = std::max(maxDescent[curY],
-							constraints->insets.bottom);
+					pixels_diff = constraints->minHeight + constraints->insets.top + constraints->ipady;
+					maxAscent[curY] = jmath::Math<int>::Max(maxAscent[curY], pixels_diff);
+					maxDescent[curY] = jmath::Math<int>::Max(maxDescent[curY], constraints->insets.bottom);
 					break;
 				case GBLC_BELOW_BASELINE:
 				case GBLC_BELOW_BASELINE_LEADING:
@@ -493,12 +480,9 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 					// To make the top edge of the component aligned
 					// with the baseline the top inset is
 					// added to the ascent, the rest to the descent.
-					pixels_diff = constraints->minHeight +
-						constraints->insets.bottom + constraints->ipady;
-					maxDescent[curY] = std::max(maxDescent[curY],
-							pixels_diff);
-					maxAscent[curY] = std::max(maxAscent[curY],
-							constraints->insets.top);
+					pixels_diff = constraints->minHeight + constraints->insets.bottom + constraints->ipady;
+					maxDescent[curY] = jmath::Math<int>::Max(maxDescent[curY], pixels_diff);
+					maxAscent[curY] = jmath::Math<int>::Max(maxAscent[curY], constraints->insets.top);
 					break;
 			}
 		}
@@ -1017,15 +1001,13 @@ void GridBagLayout::AlignOnBaseline(GridBagConstraints *cons, jregion_t *r, int 
 			if (cons->IsVerticallyResizable()) {
 				switch(cons->baselineResizeBehavior) {
 					case CB_CONSTANT_ASCENT:
-						r->height = std::max(cons->minHeight,cellY + cellHeight -
-								r->y - cons->insets.bottom);
+						r->height = jmath::Math<int>::Max(cons->minHeight,cellY + cellHeight - r->y - cons->insets.bottom);
 						break;
 					case CB_CENTER_OFFSET:
 						{
 							int upper = r->y - cellY - cons->insets.top;
-							int lower = cellY + cellHeight - r->y -
-								cons->minHeight - cons->insets.bottom;
-							int delta = std::min(upper, lower);
+							int lower = cellY + cellHeight - r->y -	cons->minHeight - cons->insets.bottom;
+							int delta = jmath::Math<int>::Min(upper, lower);
 							delta += delta;
 							if (delta > 0 &&
 									(cons->minHeight + cons->centerPadding +
@@ -1105,9 +1087,7 @@ void GridBagLayout::AlignBelowBaseline(GridBagConstraints *cons, jregion_t *r, i
 void GridBagLayout::CenterVertically(GridBagConstraints *cons, jregion_t *r, int cellHeight) 
 {
 	if (!cons->IsVerticallyResizable()) {
-		r->y += std::max(0, (cellHeight - cons->insets.top -
-					cons->insets.bottom - cons->minHeight -
-					cons->ipady) / 2);
+		r->y += jmath::Math<int>::Max(0, (cellHeight - cons->insets.top - cons->insets.bottom - cons->minHeight - cons->ipady) / 2);
 	}
 }
 

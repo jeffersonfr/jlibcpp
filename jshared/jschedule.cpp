@@ -17,25 +17,16 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  *a**************************************************************************/
-#include "jschedule.h"
-#include "jprocessexception.h"
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#endif
-
-#ifdef _WIN32
-#else
-#include <unistd.h>
-#include <errno.h>
-#include <stdio.h>
-#include <sched.h>
-#endif
+#include "Stdafx.h"
+#include "jsharedlib.h"
 
 namespace jshared {
 
+#ifdef _WIN32
+Schedule::Schedule(HANDLE pid_):
+#else	
 Schedule::Schedule(pid_t pid_):
+#endif
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::Schedule");
@@ -55,12 +46,13 @@ Schedule::~Schedule()
 }
 
 #ifdef _WIN32
+HANDLE Schedule::GetPID()
 #else
 pid_t Schedule::GetPID()
+#endif
 {
 	return _pid;
 }
-#endif
 
 void Schedule::SetSchedulerParameter(const jschedule_param_t *param_)
 {
@@ -104,15 +96,25 @@ void Schedule::GetSchedulerParameter(jschedule_param_t *param_)
 #endif
 }
 
-void Schedule::SetScheduler(jschedule_type_t policy_, const jschedule_param_t *param_)
+void Schedule::SetScheduler(jschedule_type_t type_, const jschedule_param_t *param_)
 {
 #ifdef _WIN32
 #else	
 	struct sched_param param;
 
 	param.sched_priority = param_->priority;
-	
-	int r = sched_setscheduler(_pid, policy_, &param);
+
+	int type = 0;
+
+	if (type_ == PRIORITY_PROCESS) {
+		type = PRIO_PROCESS;
+	} else if (type_ == PRIORITY_GROUP) {
+		type = PRIO_PGRP;
+	} else if (type_ == PRIORITY_USER) {
+		type = PRIO_USER;
+	}
+
+	int r = sched_setscheduler(_pid, type_, &param);
 
 	if (r < 0) {
 		if (errno == EPERM) {
@@ -127,6 +129,7 @@ void Schedule::SetScheduler(jschedule_type_t policy_, const jschedule_param_t *p
 jschedule_policy_t Schedule::GetScheduler()
 {
 #ifdef _WIN32
+	return SCHEDULE_FIFO;
 #else	
 	int r = sched_getscheduler(_pid);
 
@@ -151,6 +154,7 @@ jschedule_policy_t Schedule::GetScheduler()
 int Schedule::GetMaximumPriority()
 {
 #ifdef _WIN32
+	return 0;
 #else	
 	int r = sched_get_priority_max(GetScheduler());
 
@@ -165,6 +169,7 @@ int Schedule::GetMaximumPriority()
 int Schedule::GetMinimumPriority()
 {
 #ifdef _WIN32
+	return 0;
 #else	
 	int r = sched_get_priority_min(GetScheduler());
 
@@ -264,9 +269,19 @@ void Schedule::SetPriority(int n, jschedule_type_t type_)
 	if (n < GetMinimumPriority() || n > GetMaximumPriority()) {
 		throw ProcessException("Range of priority error");
 	}
-	
+
+	int type = 0;
+
+	if (type_ == PRIORITY_PROCESS) {
+		type = PRIO_PROCESS;
+	} else if (type_ == PRIORITY_GROUP) {
+		type = PRIO_PGRP;
+	} else if (type_ == PRIORITY_USER) {
+		type = PRIO_USER;
+	}
+
 	// valores de prioridade baixos aumentam a preferencia do escalonador
-	setpriority(type_, 0, -n);
+	setpriority(type, 0, -n);
 #endif
 }
 
@@ -277,8 +292,18 @@ int Schedule::GetPriority(jschedule_type_t type_)
 #elif __CYGWIN32__
 	return 0;
 #else	
+	int type = 0;
+
+	if (type_ == PRIORITY_PROCESS) {
+		type = PRIO_PROCESS;
+	} else if (type_ == PRIORITY_GROUP) {
+		type = PRIO_PGRP;
+	} else if (type_ == PRIORITY_USER) {
+		type = PRIO_USER;
+	}
+
 	// valores de prioridade altos diminuem a preferencia do escalonador
-	int r = getpriority(type_, 0);
+	int r = getpriority(type, 0);
 
 	if (r < 0) {
 		if (errno == EACCES) {

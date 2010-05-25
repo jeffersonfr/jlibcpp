@@ -20,9 +20,31 @@
 #ifndef J_SOCKLIB_H
 #define J_SOCKLIB_H
 
+#include "jconnection.h"
+#include "jconnectionpipe.h"
+#include "jdatagramsocket.h"
+#include "jhttprequester.h"
+#include "jinetaddress.h"
+#include "jmulticastsocket.h"
+// #include "jrtpsocket.h"
+#include "jserversocket.h"
+#include "jsocket.h"
+#include "jsocketexception.h"
+#include "jsocketinputstream.h"
+#include "jsocketoption.h"
+#include "jsocketoptionexception.h"
+#include "jsocketoutputstream.h"
+#include "jsocketstreamexception.h"
+#include "jsockettimeoutexception.h"
+#include "junknownhostexception.h"
+
 #ifdef _WIN32
-#include <windows.h>
-#include <winsock.h>
+#else
+#include "jrawsocket.h"
+#include "jsslserversocket.h"
+#include "jsslsocket.h"
+#include "jsslsocketinputstream.h"
+#include "jsslsocketoutputstream.h"
 #endif
 
 void InitWindowsSocket();

@@ -17,17 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
+#include "Stdafx.h"
 #include "jthreadlib.h"
-
-#include <iostream>
-#include <cstdlib>
-
-using namespace std;
 
 int main_thread(int argc, char *argv[])
 {

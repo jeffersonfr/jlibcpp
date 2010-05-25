@@ -26,20 +26,15 @@
 #include "jsocketoutputstream.h"
 #include "jconnection.h"
 
-#include "jobject.h"
-
-#include <iostream>
 #include <string>
 
 #ifdef _WIN32
 #include <windows.h>
-#include <winsock.h>
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
 
-#include <unistd.h>
 #include <stdint.h>
 
 namespace jsocket {

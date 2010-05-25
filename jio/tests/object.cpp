@@ -1,20 +1,8 @@
-#include "jfileinputstream.h"
-#include "jioexception.h"
-#include "jserializable.h"
-#include "jobjectinputstream.h"
-#include "jobjectoutputstream.h"
-#include "jjson.h"
-#include "jfileoutputstream.h"
-
-#include <sstream>
-#include <iostream>
-#include <cstdlib>
-#include <list>
-#include <map>
+#include "jiolib.h"
+#include "jcommonlib.h"
 
 using namespace std;
 using namespace jio;
-using namespace jcommon;
 
 class Complex : public Serializable {
 
@@ -24,7 +12,7 @@ class Complex : public Serializable {
 
 	public:
 		Complex():
-			jcommon::Serializable()
+			jio::Serializable()
 		{
 			Serializable::SetClassName("Complex");
 
@@ -33,7 +21,7 @@ class Complex : public Serializable {
 		}
 
 		Complex(int r, int i):
-			jcommon::Serializable()
+			jio::Serializable()
 		{
 			Serializable::SetClassName("Complex");
 
@@ -56,7 +44,7 @@ class Complex : public Serializable {
 
 		virtual void AssemblyObject(std::string object)
 		{
-			JSONDomParser parser;
+			jcommon::JSONDomParser parser;
 
 			parser.append(object.c_str(), object.size());
 
@@ -64,12 +52,12 @@ class Complex : public Serializable {
 				return;
 			}
 
-			JSONIterator iterator(parser.getValue());
+			jcommon::JSONIterator iterator(parser.getValue());
 
-			for (const JSONNode *node=iterator.getNext(); node!=NULL; node=iterator.getNext()) {
-				if (node->getType() == JSONNode::ePair) {
-					JSONPairNode *pnode = ((JSONPairNode*)node);
-					JSONIntNode *inode = ((JSONIntNode*)pnode->getValue());
+			for (const jcommon::JSONNode *node=iterator.getNext(); node!=NULL; node=iterator.getNext()) {
+				if (node->getType() == jcommon::JSONNode::ePair) {
+					jcommon::JSONPairNode *pnode = ((jcommon::JSONPairNode*)node);
+					jcommon::JSONIntNode *inode = ((jcommon::JSONIntNode*)pnode->getValue());
 
 					if (strcmp(pnode->getName(), "real") == 0) {
 						real = inode->getValue();
@@ -118,7 +106,6 @@ class ObjectInputStreamImpl : public ObjectInputStream {
 
 int main() 
 {
-	/*
 	Complex	*a,
 			s(2, 3);
 	
@@ -142,16 +129,6 @@ int main()
 	delete ois;
 	delete fos;
 	delete fis;
-	*/
-
-	jio::File file("/root");
-	std::vector<std::string> *l = file.ListFiles();
-
-	printf("::-> %p\n", l);
-
-	for (std::vector<std::string>::iterator i=l->begin(); i!=l->end(); i++) {
-		printf(":: %s\n", (*i).c_str());
-	}
 
 	return EXIT_SUCCESS;
 }

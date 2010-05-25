@@ -17,30 +17,24 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jfileoutputstream.h"
-#include "jioexception.h"
-#include "jnullpointerexception.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
+#include "jcommonlib.h"
 
 namespace jio {
 
 FileOutputStream::FileOutputStream(std::string filename_):
 	jio::OutputStream()
 {
-    jcommon::Object::SetClassName("jio::FileOutputStream");
-	
+	jcommon::Object::SetClassName("jio::FileOutputStream");
+
 	_buffer_length = 4096;
 	_current_index = 0;
 	_sent_bytes = 0;
 	
 	try {
-		_buffer = new char[_buffer_length];
-	} catch (std::bad_alloc &e) {
+		_buffer = new char[(int)_buffer_length];
+	} catch (std::bad_alloc &) {
 		throw IOException("Out of memory");
 	}
 
@@ -69,8 +63,8 @@ FileOutputStream::FileOutputStream(File *file_):
 	_sent_bytes = 0;
 	
 	try {
-		_buffer = new char[_buffer_length];
-	} catch (std::bad_alloc &e) {
+		_buffer = new char[(int)_buffer_length];
+	} catch (std::bad_alloc &) {
 		throw IOException("Out of memory");
 	}
 
@@ -94,7 +88,7 @@ bool FileOutputStream::IsEmpty()
 
 int64_t FileOutputStream::Available()
 {
-	return 0;
+	return 0LL;
 }
 
 int64_t FileOutputStream::GetSize()
@@ -102,7 +96,7 @@ int64_t FileOutputStream::GetSize()
 	return _file->GetSize();
 }
 
-int FileOutputStream::Write(int b)
+int64_t FileOutputStream::Write(int64_t b)
 {
 	_buffer[_current_index++] = (uint8_t)b;
 
@@ -110,7 +104,7 @@ int FileOutputStream::Write(int b)
 		return Flush();
 	}
 
-	return 0;
+	return 0LL;
 }
 
 int64_t FileOutputStream::Write(const char *data_, int64_t data_length_)
@@ -122,14 +116,14 @@ int64_t FileOutputStream::Write(const char *data_, int64_t data_length_)
 		size = (_buffer_length - _current_index);
 
 		if (l < size) {
-			memcpy((_buffer + _current_index), (data_ + (int)(data_length_ - l)), (int)l);
+			memcpy((_buffer + _current_index), (data_ + (int)(data_length_ - l)), (size_t)l);
 
 			_current_index += l;
 			l = 0;
 
 			break;
 		} else {
-			memcpy((_buffer + _current_index), (data_ + data_length_ - l), size);
+			memcpy((_buffer + _current_index), (data_ + data_length_ - l), (size_t)size);
 
 			l = l - size;
 			_current_index = _buffer_length;

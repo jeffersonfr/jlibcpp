@@ -17,17 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jpanel.h"
-#include "jframe.h"
-#include "jfont.h"
-#include "joffscreenimage.h"
-#include "jdate.h"
+#include "jguilib.h"
 
 #include <fstream>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <signal.h>
 
 #define screenWidth 1920
 #define screenHeight 1080
@@ -770,7 +762,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 
 			g->SetDrawingFlags(jgui::DF_NOFX);
 
-			time_t t1=jcommon::Date::CurrentTimeMillis();
 			//start the main loop
 			for(int x = 0; x < w; x++) {
 				//calculate ray position and direction 
@@ -934,8 +925,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 					buffer[h-y][x] = texture[6][index];
 				}
 			}
-			time_t t2=jcommon::Date::CurrentTimeMillis();
-			printf(":delay: %ld\n", (t2-t1));
 
 			//SPRITE CASTING
 			//sort sprites from far to close

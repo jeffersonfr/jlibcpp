@@ -26,9 +26,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <winsock.h>
 #else
-#include <sys/socket.h>
 #include <sys/stat.h>
 #include <sys/ipc.h>
 #include <unistd.h>
@@ -37,14 +35,11 @@
 
 namespace jshared {
 
+// MCL_CURRENT,
+// MCL_FUTURE
 enum jmutex_flags_t {
-#ifdef _WIN32
-	MUTEX_CURRENT = 0,
-	MUTEX_FUTURE = 0
-#else
-	MUTEX_CURRENT = MCL_CURRENT,
-	MUTEX_FUTURE = MCL_FUTURE
-#endif
+	MUTEX_CURRENT = 1,
+	MUTEX_FUTURE = 2
 };
 
 /**
@@ -55,73 +50,72 @@ enum jmutex_flags_t {
 class SharedMutex : public virtual jcommon::Object{
 
     private:
-		/** \brief Socket handler. */
+			/** \brief Socket handler. */
 #ifdef _WIN32
-        int _id;
+			int _id;
 #else
-        key_t _id;
+			key_t _id;
 #endif
-        /** \brief */
-		char *_shmp;
-        /** \brief */
-		int _memsize;
-        /** \brief */
-		bool _is_open;
-        /** \brief */
-		jmutex_flags_t _flags;
+			/** \brief */
+			int64_t _size;
+			/** \brief */
+			char *_shmp;
+			/** \brief */
+			bool _is_open;
+			/** \brief */
+			jmutex_flags_t _flags;
 
-    public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-        SharedMutex(jmutex_flags_t flags_ = MUTEX_CURRENT | MUTEX_FUTURE);
-	
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-        SharedMutex(void *data_, long long size_);
-	
-        /**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~SharedMutex();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Lock();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Unlock();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void LockAll();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void UnlockAll();
-		
-		/**
-		 * \brief 
-		 *
-		 */
-		void Release();
-        
+		public:
+			/**
+			 * \brief Constructor.
+			 *
+			 */
+			SharedMutex(jmutex_flags_t flags_ = jmutex_flags_t(MUTEX_CURRENT | MUTEX_FUTURE));
+
+			/**
+			 * \brief Constructor.
+			 *
+			 */
+			SharedMutex(void *data_, int64_t size_);
+
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~SharedMutex();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void Lock();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void Unlock();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void LockAll();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void UnlockAll();
+
+			/**
+			 * \brief 
+			 *
+			 */
+			void Release();
+
 };
 
 }
-
 
 #endif

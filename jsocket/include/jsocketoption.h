@@ -20,16 +20,12 @@
 #ifndef J_SOCKET_OPTION_H
 #define J_SOCKET_OPTION_H
 
-#include "jobject.h"
 #include "jconnection.h"
 
 #include <string>
 
-#include <stdint.h>
-
 #ifdef _WIN32
 #include <windows.h>
-#include <winsock.h>
 #else
 #include <sys/socket.h>
 #endif

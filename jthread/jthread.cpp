@@ -17,14 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jthread.h"
-#include "jautolock.h"
-#include "jthreadexception.h"
-#include "jthreadgroup.h"
-
-#include <algorithm>
-
-#include <errno.h>
+#include "Stdafx.h"
+#include "jthreadlib.h"
 
 namespace jthread {
 
@@ -83,7 +77,7 @@ ThreadGroup * Thread::GetThreadGroup()
 	return _group;
 }
 
-void Thread::Sleep(long long time_)
+void Thread::Sleep(uint64_t time_)
 {
 #ifdef _WIN32
 	::Sleep((DWORD)(time_*1000LL));
@@ -93,21 +87,21 @@ void Thread::Sleep(long long time_)
 #endif
 }
 
-void Thread::MSleep(long long time_)
+void Thread::MSleep(uint64_t time_)
 {
 #ifdef _WIN32
-	::Sleep(time_);
+	::Sleep((DWORD)time_);
 #else
 	usleep((useconds_t)(time_*1000LL));
 #endif
 }
 
-void Thread::USleep(long long time_)
+void Thread::USleep(uint64_t time_)
 {
 #ifdef _WIN32
-	::Sleep(time_/999LL);
+	::Sleep((DWORD)(time_/999LL));
 #else
-	usleep(time_);
+	usleep((useconds_t)time_);
 #endif
 }
 

@@ -86,7 +86,7 @@ class Semaphore : public virtual jcommon::Object{
 			 * \brief Lock semaphore.
 			 *
 			 */
-			void Wait(long long time_);
+			void Wait(uint64_t time_);
 
 			/**
 			 * \brief Notify the locked semaphore.

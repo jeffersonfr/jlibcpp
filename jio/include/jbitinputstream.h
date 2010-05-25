@@ -34,11 +34,11 @@ class BitInputStream : public jio::InputStream{
 
 	private:
 		InputStream *stream;
-		bool haveByte;
-		bool show;
-		int currentMask;
-		int currentByte;
 		File *file;
+		int64_t currentMask,
+			currentByte;
+		bool haveByte,
+			show;
 		
 	public:
 		/**
@@ -84,7 +84,7 @@ class BitInputStream : public jio::InputStream{
 		 * \brief
 		 * 
 		 */
-		virtual int Read();
+		virtual int64_t Read();
 
 		/**
 		 * \brief
@@ -108,13 +108,13 @@ class BitInputStream : public jio::InputStream{
 		 * \brief
 		 *
 		 */
-		int ReadBit();
+		virtual int ReadBit();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int ReadBits(int num);
+		virtual int ReadBits(int num);
 		
 		/**
 		 * \brief

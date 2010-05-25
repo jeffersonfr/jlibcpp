@@ -1,18 +1,9 @@
 // Exemplo adaptado do streamer feito por <Marcos Vasconcelos> (marcovas@lavid.ufpb.br)
 
-#include "jsocket.h"
-#include "jdatagramsocket.h"
-#include "jsocketexception.h"
 #include "jsocketlib.h"
-#include "jconnectionpipe.h"
-#include "jsocketinputstream.h"
-#include "jfileinputstream.h"
-#include "jdate.h"
-#include "jthread.h"
-#include "jtransportstreampacket.h"
-#include "jprogramsysteminformationsection.h"
-#include "jprogramassociationsection.h"
-#include "jprogrammapsection.h"
+#include "jiolib.h"
+#include "jcommonlib.h"
+#include "jmpeglib.h"
 
 #include <iostream>
 #include <vector>

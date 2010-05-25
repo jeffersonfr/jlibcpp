@@ -21,7 +21,6 @@
 #define J_REGEXP_H
 
 #include "jobject.h"
-#include "jcompileexception.h"
 
 #include <sstream>
 #include <string>

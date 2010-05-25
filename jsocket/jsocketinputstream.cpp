@@ -17,12 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsocketinputstream.h"
-#include "jsocketexception.h"
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 
-SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, int size_):
+SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, int64_t size_):
 	jio::InputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SocketInputStream");
@@ -32,22 +32,22 @@ SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, int si
 	_is_closed = is_closed_;
 	_stream = true;
 	_buffer_length = size_;
-	_current_index = 0;
-	_end_index = 0;
-	_receive_bytes = 0;
+	_current_index = 0LL;
+	_end_index = 0LL;
+	_receive_bytes = 0LL;
 	_blocked = true;
 	
 	try {
-		_buffer = new char[_buffer_length];
-	} catch (std::bad_alloc &e) {
+		_buffer = new char[(int)_buffer_length];
+	} catch (std::bad_alloc &) {
 		_buffer = NULL;
 
-		_buffer_length = 0;
-		_current_index = 0;
+		_buffer_length = 0LL;
+		_current_index = 0LL;
 	}
 }
 
-SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int size_):
+SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int64_t size_):
 	jio::InputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SocketInputStream");
@@ -57,19 +57,19 @@ SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, sockad
 	_is_closed = is_closed_;
 	_stream = false;
 	_buffer_length = size_;
-	_current_index = 0;
-	_end_index = 0;
-	_receive_bytes = 0;
+	_current_index = 0LL;
+	_end_index = 0LL;
+	_receive_bytes = 0LL;
 	_server_sock = server_sock_;
 	_blocked = true;
 	
 	try {
-		_buffer = new char[_buffer_length];
-	} catch (std::bad_alloc &e) {
+		_buffer = new char[(int)_buffer_length];
+	} catch (std::bad_alloc &) {
 		_buffer = NULL;
 
-		_buffer_length = 0;
-		_current_index = 0;
+		_buffer_length = 0LL;
+		_current_index = 0LL;
 	}
 }
 
@@ -80,26 +80,26 @@ SocketInputStream::~SocketInputStream()
 	}
 }
 
-int SocketInputStream::Read()
+int64_t SocketInputStream::Read()
 {
 	if ((*_is_closed) == true) {
 		throw SocketException("Connection is closed");
 	}
 	
 	int flags = 0,
-		d = _end_index - _current_index;
+		d = (int)(_end_index - _current_index);
 
 	if (d == 0) {
 		int n,
 			length = sizeof(_server_sock);
 
 		if (_stream == true) {
-			n = ::recv(_fd, _buffer, _buffer_length, flags);
+			n = ::recv(_fd, _buffer, (size_t)_buffer_length, flags);
 		} else {
 #ifdef _WIN32
-			n = ::recvfrom(_fd, _buffer, _buffer_length, flags, (struct sockaddr *)&_server_sock, (int *)&length);
+			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, (struct sockaddr *)&_server_sock, (int *)&length);
 #else
-			n = ::recvfrom(_fd, _buffer, _buffer_length, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
+			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
 #endif
 		}
 		
@@ -109,7 +109,7 @@ int SocketInputStream::Read()
 		if (n <= 0) {
 #endif
 			// throw SocketException("Read socket error !");
-			return -1;
+			return -1LL;
 		}
 			
 		_current_index = 0;
@@ -125,7 +125,7 @@ int SocketInputStream::Read()
 		_current_index = _end_index = 0;
 	}
 	
-	return c;
+	return (int64_t)c;
 }
 
 int64_t SocketInputStream::Read(char *data_, int64_t data_length_)
@@ -137,22 +137,22 @@ int64_t SocketInputStream::Read(char *data_, int64_t data_length_)
 	// retorna no maximo o tamanho do buffer em bytes
 	
 	int flags = 0LL;
-	int64_t d, 
-		 r;
+	int d, 
+		r;
 	
-	d = _end_index - _current_index;
+	d = (int)(_end_index - _current_index);
 
-	if (d == 0LL) {
+	if (d == 0) {
 		int n,
 			length = sizeof(_server_sock);
 
 		if (_stream == true) {
-			n = ::recv(_fd, _buffer, _buffer_length, flags);
+			n = ::recv(_fd, _buffer, (size_t)_buffer_length, flags);
 		} else {
 #ifdef _WIN32
-			n = ::recvfrom(_fd, _buffer, _buffer_length, flags, (struct sockaddr *)&_server_sock, (int *)&length);
+			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, (struct sockaddr *)&_server_sock, (int *)&length);
 #else 
-			n = ::recvfrom(_fd, _buffer, _buffer_length, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
+			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
 #endif
 		}
 		
@@ -173,11 +173,11 @@ int64_t SocketInputStream::Read(char *data_, int64_t data_length_)
 	}
 	
 	if (data_length_ <= d) {
-		memcpy(data_, (_buffer + _current_index), data_length_);
+		memcpy(data_, (_buffer + (size_t)_current_index), (size_t)data_length_);
 		_current_index += data_length_;
-		r = data_length_;
+		r = (int)data_length_;
 	} else {
-		memcpy(data_, (_buffer + _current_index), d);
+		memcpy(data_, (_buffer + (size_t)_current_index), d);
 		_current_index += d;
 		r = d;
 	}

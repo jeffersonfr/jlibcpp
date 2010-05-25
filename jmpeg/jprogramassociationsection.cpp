@@ -17,14 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jprogramassociationsection.h"
-#include "jnullpointerexception.h"
-#include "joutofboundsexception.h"
-
-#include <map>
-
-#include <unistd.h>
-#include <string.h>
+#include "Stdafx.h"
+#include "jmpeglib.h"
 
 namespace jmpeg {
 

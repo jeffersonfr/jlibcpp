@@ -71,6 +71,12 @@ class URL : public virtual jcommon::Object{
 		static std::string Encode(std::string);
 		
 		/**
+		* \brief
+		*
+		*/
+		static std::string Decode(std::string);
+		
+		/**
 		 * \brief
 		 *
 		 */

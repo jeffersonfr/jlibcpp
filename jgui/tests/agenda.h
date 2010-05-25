@@ -20,24 +20,8 @@
 #ifndef AGENDA_H_
 #define AGENDA_H_
 
-#include "jlistbox.h"
-#include "jframe.h"
-#include "jselectlistener.h"
-#include "jxmlparser.h"
-#include "jlabel.h"
-#include "jtextarea.h"
-#include "jtextfield.h"
-#include "jkeyboardlistener.h"
-
-#include <string>
-#include <iostream>
-#include <list>
-using namespace std;
-
-#include <directfb.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
+#include "jguilib.h"
+#include "jcommonlib.h"
 
 namespace magenda {
 

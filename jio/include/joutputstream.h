@@ -89,7 +89,7 @@ class OutputStream : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual int Write(int b) = 0;
+		virtual int64_t Write(int64_t b) = 0;
 
 		/**
 		 * \brief

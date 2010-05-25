@@ -1,14 +1,10 @@
-#include "jtransportstreampacket.h"
-#include "jprogramsysteminformationsection.h"
-#include "jprogramassociationsection.h"
-#include "jprogrammapsection.h"
-#include "jfile.h"
+#include "jmpeglib.h"
 
 #include <iostream>
-#include <stdexcept>
 #include <map>
 
-#include <unistd.h>
+#include <stdlib.h>
+#include <fcntl.h>
 
 #define TS_PACKET_SIZE				0xbc
 #define TS_HEADER_SYNC_BYTE		0x47
@@ -257,7 +253,7 @@ class Controller {
 int main(int argc, char **argv)
 {
 	if (argc != 2) {
-		printf("usage:: %s <file.ts>\n", argv[0]);
+		std::cout << "usage:: " << argv[0] << " <file.ts>" << std::endl;
 
 		exit(0);
 	}

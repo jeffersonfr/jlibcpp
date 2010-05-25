@@ -17,17 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmutex.h"
-#include "jmutexexception.h"
-
-#include <sstream>
-
-#ifdef _WIN32
-#include <windows.h>
-#else 
-#include <errno.h>
-#include <pthread.h>
-#endif
+#include "Stdafx.h"
+#include "jthreadlib.h"
 
 namespace jthread {
 

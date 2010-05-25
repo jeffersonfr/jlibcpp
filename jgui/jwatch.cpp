@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jwatch.h"
+#include "Stdafx.h"
+#include "jguilib.h"
 
 namespace jgui {
 
@@ -210,7 +211,7 @@ jvertical_align_t Watch::GetVerticalAlign()
 {
 	return _valign;
 }
-		
+
 void Watch::Paint(Graphics *g)
 {	
 	// JDEBUG(JINFO, "paint\n");

@@ -1,11 +1,7 @@
-#include "jsocket.h"
-#include "jdatagramsocket.h"
 #include "jsocketlib.h"
 
 #include <iostream>
 #include <stdexcept>
-
-#include <errno.h>
 
 using namespace jsocket;
 
@@ -39,7 +35,6 @@ int main() {
 		
 		client->Close();
 	} catch (std::runtime_error &e) {
-		std::cout << strerror(errno) << std::endl;
 		std::cout << "error " << e.what() << std::endl;
 	}
 

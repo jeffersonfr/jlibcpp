@@ -1,8 +1,4 @@
-#include "jsocket.h"
-#include "jdatagramsocket.h"
-#include "jsocketexception.h"
 #include "jsocketlib.h"
-#include "jsocketinputstream.h"
 
 #include <iostream>
 

@@ -17,19 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "joptions.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 extern int opterr;
 
 #ifdef _WIN32
-
-#include <windows.h>
 
 char	*optarg;		// global argument pointer
 int		optind = 0; 	// global argv index
@@ -37,30 +30,31 @@ int		optind = 0; 	// global argv index
 int getopt(int argc, TCHAR *argv[], TCHAR *optstring)
 {
 	static TCHAR *next = NULL;
+
 	if (optind == 0)
 		next = NULL;
 
 	optarg = NULL;
 
-	if (next == NULL || *next == '\0')
-	{
-		if (optind == 0)
+	if (next == NULL || *next == '\0') {
+		if (optind == 0) {
 			optind++;
+		}
 
-		if (optind >= argc || argv[optind][0] != '-' || argv[optind][1] == '\0')
-		{
+		if (optind >= argc || argv[optind][0] != '-' || argv[optind][1] == '\0') {
 			optarg = NULL;
-			if (optind < argc)
-				optarg = argv[optind];
+			if (optind < argc) {
+				optarg = (char *)argv[optind];
+			}
 			return EOF;
 		}
 
-		if (strcmp(argv[optind], "--") == 0)
-		{
+		if (strcmp((char *)argv[optind], "--") == 0) {
 			optind++;
 			optarg = NULL;
-			if (optind < argc)
-				optarg = argv[optind];
+			if (optind < argc) {
+				optarg = (char *)argv[optind];
+			}
 			return EOF;
 		}
 
@@ -69,27 +63,21 @@ int getopt(int argc, TCHAR *argv[], TCHAR *optstring)
 		optind++;
 	}
 
-	char c = *next++;
-	char *cp = strchr(optstring, c);
+	char c = (char)*next++;
+	char *cp = strchr((char *)optstring, c);
 
 	if (cp == NULL || c == ':')
 		return '?';
 
 	cp++;
-	if (*cp == ':')
-	{
-		if (*next != '\0')
-		{
-			optarg = next;
+	if (*cp == ':') {
+		if (*next != '\0') {
+			optarg = (char *)next;
 			next = NULL;
-		}
-		else if (optind < argc)
-		{
-			optarg = argv[optind];
+		} else if (optind < argc) {
+			optarg = (char *)argv[optind];
 			optind++;
-		}
-		else
-		{
+		} else {
 			return '?';
 		}
 	}
@@ -130,7 +118,7 @@ void Options::SetOptions(std::string options)
 	_is_default = false;
 
 #ifdef _WIN32
-	while ((opt = getopt(_argc, _argv, (TCHAR *)options.c_str())) != EOF) {
+	while ((opt = getopt(_argc, (TCHAR **)_argv, (TCHAR *)options.c_str())) != EOF) {
 #else
 	while ((opt = getopt(_argc, _argv, options.c_str())) != EOF) {
 #endif

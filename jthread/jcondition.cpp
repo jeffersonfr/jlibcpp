@@ -17,14 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jcondition.h"
-#include "jsemaphoreexception.h"
-#include "jsemaphoretimeoutexception.h"
-#include "jautolock.h"
-
-#include <errno.h>
-
-// #define SINGLE_WAIT_CONDITION
+#include "Stdafx.h"
+#include "jthreadlib.h"
 
 namespace jthread {
 
@@ -58,7 +52,7 @@ void Condition::Release()
 {
 	try {
 		NotifyAll();
-	} catch (SemaphoreException &e) {
+	} catch (SemaphoreException &) {
 	}
 		
 #ifdef _WIN32
@@ -93,7 +87,7 @@ void Condition::Wait(Mutex *mutex)
 #endif
 }
 
-void Condition::Wait(long long time_, Mutex *mutex)
+void Condition::Wait(uint64_t time_, Mutex *mutex)
 {
 #ifdef _WIN32
 	DWORD millisecs,
@@ -113,8 +107,8 @@ void Condition::Wait(long long time_, Mutex *mutex)
 
 	clock_gettime(CLOCK_REALTIME, &t);
 
-	t.tv_sec += (long long)(time_/1000000LL);
-	t.tv_nsec += (long long)((time_%1000000LL)*1000LL);
+	t.tv_sec += (int64_t)(time_/1000000LL);
+	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
 
 	if ((void *)mutex == NULL) {
 		jthread::AutoLock lock(&_monitor);

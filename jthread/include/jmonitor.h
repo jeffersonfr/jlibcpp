@@ -119,7 +119,7 @@ class Monitor {
 		 * to sleep until the Monitor is signalled or the timeout expires. Lock is re-acquired 
 		 * before control returns to the caller. 
 		 */
-		bool Wait(long long secs);
+		bool Wait(uint64_t secs);
 
 		/**
 		 * \brief Signals and wakes up one thread waiting on the Monitor object. The thread woken 

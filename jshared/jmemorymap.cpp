@@ -17,19 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmemorymap.h"
-#include "jmemoryexception.h"
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#endif
-
-#include <errno.h>
-#include <stdio.h>
-#include <fcntl.h>
-#include <string.h>
+#include "Stdafx.h"
+#include "jsharedlib.h"
 
 namespace jshared {
 
@@ -117,9 +106,10 @@ MemoryMap::~MemoryMap()
 	Release();
 }
 
-long long MemoryMap::Get(char *data_, int size_, int offset_)
+int64_t MemoryMap::Get(char *data_, int64_t size_, int64_t offset_)
 {
 #ifdef _WIN32
+	return 0LL;
 #else
 	// TODO:: tratar mmap2 com offset
 	if (size_ > _stats.st_size) {
@@ -134,9 +124,10 @@ long long MemoryMap::Get(char *data_, int size_, int offset_)
 #endif
 }
 
-long long MemoryMap::Put(const char *data_, int size_, int offset_)
+int64_t MemoryMap::Put(const char *data_, int64_t size_, int64_t offset_)
 {
 #ifdef _WIN32
+	return 0LL;
 #else
 	// TODO:: tratar mmap2 com offset
 	if (size_ > _stats.st_size) {
@@ -181,11 +172,12 @@ void MemoryMap::SetPermission(jmemory_perms_t perms_)
 #endif
 }
 
-long long MemoryMap::GetSize()
+int64_t MemoryMap::GetSize()
 {
 #ifdef _WIN32
+	return 0LL;
 #else
-	return (long long)_stats.st_size;
+	return (int64_t)_stats.st_size;
 #endif
 }
 

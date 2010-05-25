@@ -17,16 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jhtmlparser.h"
-#include "jfileinputstream.h"
-#include "jstringutils.h"
-#include "jioexception.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdint.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
+#include "jiolib.h"
 
 namespace jcommon{
 
@@ -36,7 +29,6 @@ enum jtag_state_t {
 	COMMENT_STATE,
 	WHITE_STATE
 };
-
 
 Tag::Tag(std::string name, jtag_type_t type)
 {
@@ -174,7 +166,7 @@ void HTMLParser::Parse(std::string file)
 		input = new jio::FileInputStream(file);
 
 		Parse(input);
-	} catch (jio::IOException &e) {
+	} catch (jio::IOException &) {
 		if (input != NULL) {
 			delete input;
 		}
@@ -199,7 +191,7 @@ void HTMLParser::Parse(jio::InputStream *input)
 
 	tags.push_back(root);
 
-	while ((r  = input->Read((char *)&c, 1)) != EOF) {
+	while ((r  = (int)input->Read((char *)&c, 1)) != EOF) {
 		if (c == '\n' || c == '\r' || c == '\t') {
 			c = ' ';
 		}

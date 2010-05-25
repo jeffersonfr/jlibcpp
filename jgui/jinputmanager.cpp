@@ -17,14 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jinputmanager.h"
-#include "jgfxhandler.h"
-#include "jcomponent.h"
-#include "jwindowmanager.h"
-#include "jcommonlib.h"
-
-#include <iostream>
-#include <algorithm>
+#include "Stdafx.h"
+#include "jguilib.h"
 
 #define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 

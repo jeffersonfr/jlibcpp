@@ -13,7 +13,7 @@
  *   GNU General Public License for more details.                          *
  *                                                                         *
  *   You should have received a copy of the GNU General Public License     *
- *   aint64_t with this program; if not, write to the                         *
+ *   along with this program; if not, write to the                         *
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
@@ -171,25 +171,25 @@ class Charset : public virtual jcommon::Object{
 		 *  If the 'stop' character is EOF, this function reads the
 		 *  entire file.
 		 */
-		char * ReadLatin1File(FILE *f, int64_t *nbytes, int64_t *nchars, int64_t stop);
+		char * ReadLatin1File(FILE *f, int *nbytes, int *nchars, int stop);
 
 		/**
 		 * \brief
 		 *
 		 */
-		char * ReadUTF8File(FILE *f, int64_t *nbytes, int64_t *nchars, int64_t stop);
+		char * ReadUTF8File(FILE *f, int *nbytes, int *nchars, int stop);
 
 		/*
 		 * \brief Read an entire file into a memory char array. Return NULL if the file is empty.
 		 *
 		 */
-		char * ReadLatin1Buffer(FILE *f, int64_t *nbytes, int64_t *nchars);
+		char * ReadLatin1Buffer(FILE *f, int *nbytes, int *nchars);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		char * ReadUTF8Buffer(FILE *f, int64_t *nbytes, int64_t *nchars);
+		char * ReadUTF8Buffer(FILE *f, int *nbytes, int *nchars);
 
 		/*
 		 * \brief A function for reading one line of input from a file.
@@ -202,25 +202,25 @@ class Charset : public virtual jcommon::Object{
 		 *  Otherwise, a newline character will be the last character
 		 *  in the char array.
 		 */
-		char * ReadLatin1Line(FILE *f, int64_t *nbytes, int64_t *nchars);
+		char * ReadLatin1Line(FILE *f, int *nbytes, int *nchars);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		char * ReadUTF8Line(FILE *f, int64_t *nbytes, int64_t *nchars);
+		char * ReadUTF8Line(FILE *f, int *nbytes, int *nchars);
 
 		/*
 		 * \brief Write a UTF-8 char array to a file as ISO Latin 1 (non ISO-Latin-1 characters 
 		 * will be distorted by this process). Assume the UTF-8 char array is correct.
 		 */
-		int WriteLatin1(FILE *f, const char *utf8, int64_t nbytes);
+		int WriteLatin1(FILE *f, const char *utf8, int nbytes);
 
 		/*
 		 * \brief Write a UTF-8 char array to a file as UTF-8. Assume the UTF-8 char array is correct.
 		 *
 		 */
-		int WriteUTF8(FILE *f, const char *utf8, int64_t nbytes);
+		int WriteUTF8(FILE *f, const char *utf8, int nbytes);
 
 		/*
 		 *  Convert a UTF-8 char array to an ISO Latin 1 char array (non ISO Latin 1 characters 
@@ -241,13 +241,13 @@ class Charset : public virtual jcommon::Object{
 		 * \brief Return non-zero (true) if the given UTF-8 char array contains
 		 * only ASCII characters, otherwise return zero. 
 		 */
-		int IsASCII(const char *utf8, int64_t nbytes);
+		int IsASCII(const char *utf8, int nbytes);
 
 		/*
 		 * \brief Return non-zero (true) if the given UTF-8 char array contains
 		 *  only ASCII and ISO Latin-1 characters, otherwise return zero. 
 		 */
-		int IsLatin1(const char *utf8, int64_t nbytes);
+		int IsLatin1(const char *utf8, int nbytes);
 
 		/**
 		 * \brief

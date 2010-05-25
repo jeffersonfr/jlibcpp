@@ -17,19 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsharedmemory.h"
-#include "jmemoryexception.h"
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#include <sys/stat.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-#endif
+#include "Stdafx.h"
+#include "jsharedlib.h"
 
 namespace jshared {
 
@@ -136,6 +125,7 @@ void SharedMemory::Dealloc()
 int SharedMemory::Get(char *data_, int size_)
 {
 #ifdef _WIN32
+	return 0;
 #else	
 	if ((void *)data_ == NULL) {
 		throw MemoryException("Null pointer in data parameter");
@@ -154,6 +144,7 @@ int SharedMemory::Get(char *data_, int size_)
 int SharedMemory::Put(const char *data_, int size_)
 {
 #ifdef _WIN32
+	return 0;
 #else	
 	if ((void *)data_ == NULL) {
 		throw MemoryException("Null pointer in data parameter");

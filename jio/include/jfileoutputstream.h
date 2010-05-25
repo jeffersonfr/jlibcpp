@@ -33,16 +33,16 @@ namespace jio {
 class FileOutputStream : public jio::OutputStream{
 
 	private:
-		/** \brief Seek */
-		int64_t _current;
 		/** \brief */
 		File *_file;
 		/** \brief */
         char *_buffer;
+		/** \brief Seek */
+		int64_t _current;
         /** \brief */
-        int _buffer_length;
+        int64_t _buffer_length;
         /** \brief */
-		int _current_index; 
+		int64_t _current_index; 
         /** \brief */
         int64_t _sent_bytes;
 
@@ -87,7 +87,7 @@ class FileOutputStream : public jio::OutputStream{
 		 * \brief
 		 * 
 		 */
-		virtual int Write(int b);
+		virtual int64_t Write(int64_t b);
 
 		/**
 		 * \brief
@@ -117,7 +117,7 @@ class FileOutputStream : public jio::OutputStream{
 		 * \brief
 		 *
 		 */
-		int64_t GetSentBytes();
+		virtual int64_t GetSentBytes();
 
 };
 

@@ -17,9 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jinetaddress.h"
-#include "junknownhostexception.h"
-#include "jsocketexception.h"
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 
@@ -45,7 +44,7 @@ InetAddress * InetAddress::GetByName(std::string host_)
 	if (h == NULL) {
 		throw UnknownHostException("Host not found");
   }
-    
+   
 	InetAddress *addr = new InetAddress(host_, *(in_addr *)h->h_addr_list[0]);
 
 	// free(h);
@@ -55,14 +54,14 @@ InetAddress * InetAddress::GetByName(std::string host_)
 
 std::vector<InetAddress *> InetAddress::GetAllByName(std::string host_name_)
 {
-	hostent *aux, 
-					*aux2;
-	in_addr ip;
 	std::vector<InetAddress *> vip;
 
 #ifdef _WIN32
 	return vip;
 #else
+	hostent *aux;
+	in_addr ip;
+
 	if (inet_aton(host_name_.c_str(), &ip) == 0) {
 		aux = gethostbyname(host_name_.c_str());
 	} else {
@@ -76,6 +75,8 @@ std::vector<InetAddress *> InetAddress::GetAllByName(std::string host_name_)
 	if (aux == NULL) {
 		throw UnknownHostException("IP group not found");
 	} else {
+		hostent *aux2;
+
 		for(int i=0; aux->h_addr_list[i] != NULL; ++i) {
 			aux2 = gethostbyaddr(aux->h_addr_list[i], sizeof(aux->h_addr_list[i]),AF_INET);
 			
@@ -131,7 +132,7 @@ std::vector<uint8_t> InetAddress::GetAddress()
 	for (int i=0; i<size; ++i) {
 		addr.push_back(ip[i]);
 	}
-		
+	
 	return addr;
 }
 
@@ -160,7 +161,7 @@ char * itoa(int num_, char *num_char_)
 	for (i=0; aux >= 0; i++, aux--) {
 		aux_num[i] = num_char_[aux];
 	}
-	
+
 	aux_num[i++] = '\0';
 	strcpy(num_char_, aux_num);
 	

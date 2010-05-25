@@ -20,4 +20,26 @@
 #ifndef J_IOLIB_H
 #define J_IOLIB_H
 
+#include "jbitinputstream.h"
+#include "jbitoutputstream.h"
+#include "jbufferedreader.h"
+#include "jchannel.h"
+#include "jdatainputstream.h"
+#include "jdataoutputstream.h"
+#include "jfile.h"
+#include "jfileexception.h"
+#include "jfileinputstream.h"
+#include "jfileoutputstream.h"
+#include "jinputstream.h"
+#include "jioexception.h"
+#include "jmemoryinputstream.h"
+#include "jmemoryoutputstream.h"
+#include "jobjectinputstream.h"
+#include "jobjectoutputstream.h"
+#include "joutputstream.h"
+#include "jpipeexception.h"
+#include "jpipestream.h"
+#include "jprintstream.h"
+#include "jserializable.h"
+
 #endif

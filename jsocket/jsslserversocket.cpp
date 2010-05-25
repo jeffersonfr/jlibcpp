@@ -17,12 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsslserversocket.h"
-#include "jsocketstreamexception.h"
-#include "jsslsocket.h"
-#include "jsocketexception.h"
-
-#include <fcntl.h>
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 

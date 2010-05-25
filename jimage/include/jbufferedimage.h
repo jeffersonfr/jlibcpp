@@ -17,48 +17,56 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SERIALIZABLE_H
-#define J_SERIALIZABLE_H
+#ifndef J_BUFFEREDIMAGE_H
+#define J_BUFFEREDIMAGE_H
 
-#include "jobject.h"
+#include "jimage.h"
 
-namespace jcommon {
+#include <string>
+
+namespace jimage {
 
 /**
  * \brief
  * 
  * \author Jeff Ferr
  */
-class Serializable : public jcommon::Object{
+class BufferedImage : public Image{
 
 	private:
-
+		Image *_image;
 		
 	public:
 		/**
 		 * \brief
 		 * 
 		 */
-		Serializable();
+		BufferedImage(Image *img);
 		
 		/**
 		 * \brief
-		 *
+		 * 
 		 */
-		virtual ~Serializable();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string SerializeObject();
+		BufferedImage(Image *img, image_type_t type);
 		
 		/**
 		 * \brief
+		 * 
+		 */
+		BufferedImage(int width, int height, image_type_t type);
+		
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual ~BufferedImage();
+
+		/**
+		 * \brief Retorna um array contendo os pixels da imagem criada, whitout headers.
 		 *
 		 */
-		virtual void AssemblyObject(std::string object);
-
+		void GetRawImage(void *img, int *size);
+		
 };
 
 }

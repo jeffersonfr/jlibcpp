@@ -17,13 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jcharset.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 static const uint64_t ReplacementChar = 0x0000FFFDUL;
 static const uint64_t MaximumChar     = 0x7FFFFFFFUL;
@@ -91,8 +86,6 @@ static const UTF32 halfMask = 0x3FFUL;
 #define UNI_SUR_HIGH_END    (UTF32)0xDBFF
 #define UNI_SUR_LOW_START   (UTF32)0xDC00
 #define UNI_SUR_LOW_END     (UTF32)0xDFFF
-#define false	   0
-#define true	    1
 
 namespace jcommon {
 
@@ -314,9 +307,11 @@ int Charset::ReadUTF8(FILE *f, Char * dst)
 	return result;
 }
 
-char * Charset::ReadLatin1File(FILE *f, int64_t *nbytes, int64_t *nchars, int64_t stop)
+char * Charset::ReadLatin1File(FILE *f, int *nbytes, int *nchars, int stop)
 {
-	int64_t pos, nch, max;
+	int pos, 
+		nch, 
+		max;
 	char *line;
 	char *c;
 	int ch;
@@ -365,8 +360,10 @@ char * Charset::ReadLatin1File(FILE *f, int64_t *nbytes, int64_t *nchars, int64_
 			}
 			nch++;
 		}
-		if (ch == stop)
+
+		if (ch == stop) {
 			break;
+		}
 	}
 
 	/* shrink array to smallest required space */
@@ -375,14 +372,15 @@ char * Charset::ReadLatin1File(FILE *f, int64_t *nbytes, int64_t *nchars, int64_
 
 	*nbytes = pos;
 	*nchars = nch;
+
 	return line;
 }
 
-char * Charset::ReadUTF8File(FILE *f, int64_t *nbytes, int64_t *nchars, int64_t stop)
+char * Charset::ReadUTF8File(FILE *f, int *nbytes, int *nchars, int stop)
 {
-	int64_t pos, 
-					nch, 
-					max;
+	int pos,
+			nch, 
+			max;
 	char *line;
 	char *c;
 	int ch;
@@ -403,16 +401,22 @@ char * Charset::ReadUTF8File(FILE *f, int64_t *nbytes, int64_t *nchars, int64_t 
 		*c = ch;
 		c++;
 		pos++;
+
 		if (pos == max) {
 			/* realloc buffer twice the size */
 			max += max;
 			line = (char *)realloc(line, max);
 			c = & line[pos];
 		}
-		if ((ch & 0xC0) != 0xC0) /* i.e. not 10xxxxxx */
+		
+		// i.e. not 10xxxxxx
+		if ((ch & 0xC0) != 0xC0) {
 			nch++;
-		if (ch == stop)
+		}
+		
+		if (ch == (int)stop) {
 			break;
+		}
 	}
 
 	/* shrink array to smallest required space */
@@ -424,33 +428,33 @@ char * Charset::ReadUTF8File(FILE *f, int64_t *nbytes, int64_t *nchars, int64_t 
 	return line;
 }
 
-char *Charset::ReadLatin1Buffer(FILE *f, int64_t *nbytes, int64_t *nchars)
+char *Charset::ReadLatin1Buffer(FILE *f, int *nbytes, int *nchars)
 {
 	return ReadLatin1File(f, nbytes, nchars, EOF);
 }
 
-char *Charset::ReadUTF8Buffer(FILE *f, int64_t *nbytes, int64_t *nchars)
+char *Charset::ReadUTF8Buffer(FILE *f, int *nbytes, int *nchars)
 {
 	return ReadUTF8File(f, nbytes, nchars, EOF);
 }
 
-char *Charset::ReadLatin1Line(FILE *f, int64_t *nbytes, int64_t *nchars)
+char *Charset::ReadLatin1Line(FILE *f, int *nbytes, int *nchars)
 {
 	return ReadLatin1File(f, nbytes, nchars, '\n');
 }
 
-char *Charset::ReadUTF8Line(FILE *f, int64_t *nbytes, int64_t *nchars)
+char *Charset::ReadUTF8Line(FILE *f, int *nbytes, int *nchars)
 {
 	return ReadUTF8File(f, nbytes, nchars, '\n');
 }
 
-int Charset::WriteLatin1(FILE *f, const char *utf8, int64_t nbytes)
+int Charset::WriteLatin1(FILE *f, const char *utf8, int nbytes)
 {
 	Char buf[1];
 	Char *bp;
 	char ch;
 	const char *sp;
-	int64_t total = 0LL;
+	size_t total = 0;
 
 	sp = utf8;
 	while (nbytes > 0) {
@@ -465,21 +469,27 @@ int Charset::WriteLatin1(FILE *f, const char *utf8, int64_t nbytes)
 		putc(ch, f);
 		total++;
 	}
+
 	fflush(f);
+	
 	return total;
 }
 
-int Charset::WriteUTF8(FILE *f, const char *utf8, int64_t nbytes)
+int Charset::WriteUTF8(FILE *f, const char *utf8, int nbytes)
 {
-	int64_t n, total = 0LL;
+	int n, 
+		total = 0;
 
 	while (nbytes > 256) {
 		n = (int64_t) fwrite(utf8, 1, 256, f);
 		total += n;
 		nbytes -= n;
 	}
-	total += (int64_t) fwrite(utf8, 1, nbytes, f);
+
+	total += fwrite(utf8, 1, nbytes, f);
+	
 	fflush(f);
+	
 	return total;
 }
 
@@ -488,8 +498,8 @@ char * Charset::UTF8ToLatin1(const char *utf8, int *bytes)
 	Char buf[1];
 	Char *bp;
 	const char *sp;
-	int64_t total = 0LL;
-	int64_t nbytes = *bytes;
+	int total = 0,
+			nbytes = *bytes;
 	char *dp;
 	char *dest;
 
@@ -523,8 +533,8 @@ char * Charset::CorrectUTF8(const char *s, int *bytes)
 	Char *bp;
 	const Char *cbp;
 	const char *sp;
-	int64_t total;
-	int64_t nbytes = *bytes;
+	int total,
+		nbytes = *bytes;
 	char *dp;
 	char *dest;
 	char tmp[8];
@@ -549,7 +559,7 @@ char * Charset::CorrectUTF8(const char *s, int *bytes)
 		UTF8ToUnicode(&sp, sp+7, &bp, bp+1);
 
 		/* determine what happened */
-		nbytes -= (int64_t) (sp - s);
+		nbytes -= (size_t) (sp - s);
 
 		/* check for any difference, copy string also */
 		cbp = buf;
@@ -557,7 +567,7 @@ char * Charset::CorrectUTF8(const char *s, int *bytes)
 		UnicodeToUTF8(&cbp, cbp+1, &tp, tp+7);
 		i = (int) (dp-dest);
 		if (total-i < tp-tmp) {
-			total = i + (int64_t) (tp-tmp);
+			total = i + (size_t) (tp-tmp);
 			dest = (char *)realloc(dest, total+1);
 			dp = dest + i;
 		}
@@ -579,35 +589,41 @@ char * Charset::CorrectUTF8(const char *s, int *bytes)
 	return dest;
 }
 
-int Charset::IsASCII(const char *utf8, int64_t nbytes)
+int Charset::IsASCII(const char *utf8, int nbytes)
 {
-	int64_t i;
-
-	for (i=0; i < nbytes; i++) {
+	for (int i=0; i < nbytes; i++) {
 		if (*utf8 & 0x80)
 			return 0;
 		utf8++;
 	}
+
 	return 1;
 }
 
-int Charset::IsLatin1(const char *utf8, int64_t nbytes)
+int Charset::IsLatin1(const char *utf8, int nbytes)
 {
-	int64_t i;
-
-	for (i=0; i < nbytes; i++) {
+	for (int i=0; i < (int)nbytes; i++) {
 		if (*utf8 & 0x80) {
-			if ((*utf8 & 0xFC) != 0xC0) /* not 110-000xx */
+			// not 110-000xx
+			if ((*utf8 & 0xFC) != 0xC0) {
 				return 0;
+			}
+
 			utf8++;
 			i++;
-			if (i >= nbytes)
+	
+			if (i >= nbytes) {
 				return 0;
-			if ((*utf8 & 0xC0) != 0x80) /* not 10-xxxxxx */
+			}
+
+			// not 10-xxxxxx
+			if ((*utf8 & 0xC0) != 0x80) {
 				return 0;
+			}
 		}
 		utf8++;
 	}
+
 	return 1;
 }
 

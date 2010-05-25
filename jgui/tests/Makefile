@@ -12,10 +12,13 @@ LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
 CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER)
 
-OK 			= \033[30;32mOK!\033[m
+OK 				= \033[30;32mOK!\033[m
 
 OBJS_teste = \
 	   teste.o\
+
+OBJS_databuffer = \
+	   databuffer.o\
 
 OBJS_restore = \
 	   restore.o\
@@ -82,12 +85,21 @@ OBJS_layouts = \
 OBJS_stress = \
 		stress.o\
 
+OBJS_mhp = \
+		mhp.o\
+
 OBJS_image = \
 		image.o\
 
-all: teste skull restore raycaster_flat raycaster_texture agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts image
+OBJS_game = \
+		game.o\
+
+all: teste skull databuffer restore raycaster_flat raycaster_texture agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image 
 	
 teste: $(OBJS_teste)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+        
+databuffer: $(OBJS_databuffer)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
 restore: $(OBJS_restore)
@@ -153,7 +165,13 @@ stress: $(OBJS_stress)
 layouts: $(OBJS_layouts)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
+mhp: $(OBJS_mhp)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+        
 image: $(OBJS_image)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+        
+game: $(OBJS_game)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
@@ -161,5 +179,6 @@ image: $(OBJS_image)
 
 install:
 
+
 clean:
-	@rm -rvf *.o *.xml *~ teste restore agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts image
+	@rm -rvf *.o *.xml *~ teste restore agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image

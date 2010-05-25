@@ -34,7 +34,6 @@
 #include <sched.h>
 #endif
 
-#include <unistd.h>
 #include <stdint.h>
 
 namespace jshared {
@@ -44,12 +43,9 @@ namespace jshared {
  *
  */
 enum jschedule_policy_t {
-#ifdef _WIN32
-#else
-	SCHEDULE_FIFO			= SCHED_FIFO,
-	SCHEDULE_ROUND_ROBIN	= SCHED_RR,
-	SCHEDULE_OTHER			= SCHED_OTHER
-#endif
+	SCHEDULE_FIFO,
+	SCHEDULE_ROUND_ROBIN,
+	SCHEDULE_OTHER
 };
 
 /**
@@ -101,7 +97,11 @@ class Schedule : public virtual jcommon::Object{
 		 * \brief Constructor.
 		 *
 		 */
+#ifdef _WIN32
+		Schedule(HANDLE pid_ = 0);
+#else
 		Schedule(pid_t pid_ = 0);
+#endif
 	
 		/**
 		 * \brief Destrutor virtual.
@@ -109,12 +109,13 @@ class Schedule : public virtual jcommon::Object{
 		 */
 		virtual ~Schedule();
 		
-#ifdef _WIN32
-#else
 		/**
 		 * \brief
 		 *
 		 */
+#ifdef _WIN32
+		HANDLE GetPID();
+#else
 		pid_t GetPID();
 #endif
 		

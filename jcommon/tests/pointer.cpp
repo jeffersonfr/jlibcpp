@@ -1,9 +1,4 @@
-#include "jpointer.h"
-
-#include <iostream>
-#include <vector>
-
-#include <stdlib.h>
+#include "jcommonlib.h"
 
 class C {
 

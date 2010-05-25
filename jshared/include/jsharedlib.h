@@ -20,4 +20,19 @@
 #ifndef J_SHAREDLIB_H
 #define J_SHAREDLIB_H
 
+#include "jfifoexception.h"
+#include "jmemoryexception.h"
+#include "jmemorymap.h"
+#include "jmessageexception.h"
+#include "jmessagequeue.h"
+#include "jpipe.h"
+#include "jprivateprocess.h"
+#include "jprocessexception.h"
+#include "jschedule.h"
+#include "jsharedfifo.h"
+#include "jsharedmemory.h"
+#include "jsharedmutex.h"
+#include "jsharedsemaphore.h"
+#include "jwrapperprocess.h"
+
 #endif

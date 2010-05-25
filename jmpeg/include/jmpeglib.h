@@ -20,4 +20,15 @@
 #ifndef J_MPEGLIB_H
 #define J_MPEGLIB_H
 
+#include "jadaptationfield.h"
+#include "jmpegexception.h"
+#include "jprogramassociationsection.h"
+#include "jprogramassociationtable.h"
+#include "jprogramelementarystreamsection.h"
+#include "jprogrammapsection.h"
+#include "jprogramsysteminformationsection.h"
+#include "jprogramsysteminformationtable.h"
+#include "jsection.h"
+#include "jtransportstreampacket.h"
+
 #endif

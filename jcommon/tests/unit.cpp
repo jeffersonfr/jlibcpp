@@ -1,11 +1,5 @@
-// Copyright (C) 2001 Claus Dreby
+#include "jcommonlib.h"
 
-#include "junit.h"
-
-#include <sstream>
-#include <stdexcept>
-
-using namespace std;
 using namespace jcommon;
 
 // Unit++ Test
@@ -21,7 +15,7 @@ class test_test : public Test {
 			exotic 
 		};
 	
-		test_test(string name, result res = succes): 
+		test_test(std::string name, result res = succes): 
 			Test(name), res(res) 
 		{
 		}
@@ -49,7 +43,7 @@ class UnitTestSample : public Suite {
 
 	void assert_ok()
 	{
-		string s("ok");
+		std::string s("ok");
 		assert_true("assert_true(true)", true);
 		assert_eq("assert_eq(int)", 7, 7);
 		assert_eq("assert_eq(char*, string)", "ok", s);
@@ -57,13 +51,13 @@ class UnitTestSample : public Suite {
 
 	void fail()
 	{
-		string s("fejl");
+		std::string s("fejl");
 		bool ok = true;
 		try {
 			assert_true("assert_true(false)", false);
 			ok = false;
 		} catch (AssertionError e) {
-			ostringstream oss;
+			std::ostringstream oss;
 			oss << e;
 			assert_eq("assert_true(false) output", "assert_true(false) [assertion failed]", oss.str());
 		}
@@ -73,7 +67,7 @@ class UnitTestSample : public Suite {
 			assert_eq("assert_eq(int)", 5, 7);
 			ok = false;
 		} catch (AssertValueError<int,int> e) {
-			ostringstream oss;
+			std::ostringstream oss;
 			oss << e;
 			assert_eq("assert_eq(int) output", "assert_eq(int) [expected: `5' got: `7']", oss.str());
 		}
@@ -82,8 +76,8 @@ class UnitTestSample : public Suite {
 		try {
 			assert_eq("assert_eq(char*, string)", "ok", s);
 			ok = false;
-		} catch (AssertValueError<const char*, string> e) {
-		} catch (AssertValueError<char*, string> e) { // MSVC++ bug
+		} catch (AssertValueError<const char*, std::string> e) {
+		} catch (AssertValueError<char*, std::string> e) { // MSVC++ bug
 		}
 
 		if (!ok)
@@ -92,7 +86,7 @@ class UnitTestSample : public Suite {
 
 	void tester_visit()
 	{
-		ostringstream os;
+		std::ostringstream os;
 		Tester tst(os);
 		root.Visit(&tst);
 		assert_eq("tests ok", 3, tst.res_tests().n_ok());
@@ -105,7 +99,7 @@ class UnitTestSample : public Suite {
 	
 	void ex_test()
 	{
-		throw out_of_range("expected");
+		throw std::out_of_range("expected");
 	}
 
 	void get_by_id()
@@ -122,11 +116,11 @@ class UnitTestSample : public Suite {
 
 	void vec()
 	{
-		string s = "three.blind.mice";
-		vector<string> v(vectorize(s,'.'));
-		assert_eq("v[0]", string("three"), v[0]);
-		assert_eq("v[1]", string("blind"), v[1]);
-		assert_eq("v[2]", string("mice"), v[2]);
+		std::string s = "three.blind.mice";
+		std::vector<std::string> v(vectorize(s,'.'));
+		assert_eq("v[0]", std::string("three"), v[0]);
+		assert_eq("v[1]", std::string("blind"), v[1]);
+		assert_eq("v[2]", std::string("mice"), v[2]);
 		assert_eq("size", size_t(3), v.size());
 		v = vectorize(s,'-');
 		assert_eq("no match", s, v[0]);
@@ -135,14 +129,14 @@ class UnitTestSample : public Suite {
 
 	void empty_vec()
 	{
-		string s("");
-		vector<string> v(vectorize(s,'.'));
+		std::string s("");
+		std::vector<std::string> v(vectorize(s,'.'));
 		assert_eq("size", size_t(0), v.size());
 		s = "one..three";
 		v = vectorize(s,'.');
-		assert_eq("v[0]", string("one"), v[0]);
-		assert_eq("v[1]", string(""), v[1]);
-		assert_eq("v[2]", string("three"), v[2]);
+		assert_eq("v[0]", std::string("one"), v[0]);
+		assert_eq("v[1]", std::string(""), v[1]);
+		assert_eq("v[2]", std::string("three"), v[2]);
 		assert_eq("size", size_t(3), v.size());
 	}
 
@@ -165,9 +159,9 @@ class UnitTestSample : public Suite {
 
 	void test_line()
 	{
-		ostringstream os;
+		std::ostringstream os;
 		Tester tst(os, false, true);
-		string fname(__FILE__);
+		std::string fname(__FILE__);
 		// int l = __LINE__ + 4;
 		struct loc_test : Test {
 			loc_test() : Test("local") {}
@@ -214,7 +208,7 @@ public:
 		Add("assert_ok", TestCase(this, "Assert ok", &UnitTestSample::assert_ok));
 		Add("fail", TestCase(this, "Assert fail", &UnitTestSample::fail));
 		Add("tester_visit", TestCase(this, "Visit", &UnitTestSample::tester_visit));
-		Add("exception", TestCase(new ExceptionTest<out_of_range>(
+		Add("exception", TestCase(new ExceptionTest<std::out_of_range>(
 			__FILE__, __LINE__, TestCase(this, "gen ex", &UnitTestSample::ex_test))));
 		Add("id_get", TestCase(this, "Get by id", &UnitTestSample::get_by_id));
 		Add("vec", TestCase(this, "Vectorize", &UnitTestSample::vec));

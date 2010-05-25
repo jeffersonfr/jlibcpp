@@ -20,20 +20,8 @@
 #ifndef MINES_H_
 #define MINES_H_
 
+#include "jguilib.h"
 #include "slidewindow.h"
-
-#include "jframe.h"
-#include "joffscreenimage.h"
-
-#include <string>
-#include <iostream>
-#include <list>
-using namespace std;
-
-#include <directfb.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 
 namespace mines {
 

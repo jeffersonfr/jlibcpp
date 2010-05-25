@@ -17,20 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jproperties.h"
-#include "jfile.h"
-#include "jautolock.h"
-#include "jruntimeexception.h"
-#include "jillegalargumentexception.h"
-
-#include <sstream>
-#include <iostream>
-#include <vector>
-
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
+#include "jiolib.h"
+#include "jthreadlib.h"
 
 namespace jcommon {
 
@@ -176,77 +166,33 @@ void Properties::Load(std::string filename_, std::string escape_)
 
 	_filename = filename_;
 
-	FILE *fd = fopen(filename_.c_str(), "r");
+	jio::FileInputStream is(_filename);
+	jio::BufferedReader reader(&is);
 
-	if (fd == NULL) {
-		throw Exception("File not found !");
-	}
+	while (reader.IsEOF() == false) {
+		std::string line = jcommon::StringUtils::Trim(reader.ReadLine());
 
-	int len = 0, 
-		c;
-	char *line = NULL;
-	
-	while ((c = getline(&line, (size_t *)&len, fd)) != EOF) {
-		char *p = NULL,
-			 *q = NULL,
-			 *r = NULL,
-			 *comment = NULL;
-
-		p = strstr(line, escape_.c_str());
-		comment = strstr(line, "#");
-
-		if (p != NULL && comment == NULL) {
-			p = strtok(line, escape_.c_str());
-			
-			if (p != NULL) {
-				q = strtok(NULL, escape_.c_str());
-			}
-
-			if (q != NULL) {
-				r = strchr(q, '\n');
-
-				if (r != NULL) {
-					*r = '\0';
-				}
-		
-				Trim(&p);
-				Trim(&q);
-				
-				try {
-					struct jproperty_t prop;
-
-					prop.key = p;
-					prop.value = q;
-					prop.comment = false;
-
-					properties.push_back(prop);
-				} catch (std::bad_alloc &e) {
-				}
-			}
-		} else {
-			r = strchr(line, '\n');
-
-			if (r != NULL) {
-				*r = '\0';
-			}
-			
-			try {
+		if (line.find("#") == 0) {
 				struct jproperty_t prop;
 	
 				prop.value = line;
 				prop.comment = true;
 					
 				properties.push_back(prop);
-			} catch (std::bad_alloc &e) {
+		} else {
+			jcommon::StringTokenizer tokens(line, escape_, jcommon::SPLIT_FLAG, false);
+
+			if (tokens.GetSize() == 2) {
+					struct jproperty_t prop;
+
+					prop.key = jcommon::StringUtils::Trim(tokens.GetToken(0));
+					prop.value = jcommon::StringUtils::Trim(tokens.GetToken(1));
+					prop.comment = false;
+
+					properties.push_back(prop);
 			}
 		}
 	}
-
-	if (line != NULL) {
-		free(line);
-	}
-
-	fclose(fd);	
 }
 
 void Properties::Save(std::string escape_)

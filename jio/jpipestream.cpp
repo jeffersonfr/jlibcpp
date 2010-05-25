@@ -17,14 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jpipestream.h"
-#include "jioexception.h"
-#include "jfileexception.h"
-
-#include <iostream>
-
-#include <fcntl.h>
-#include <unistd.h>
+#include "Stdafx.h"
+#include "jiolib.h"
 
 namespace jio {
 
@@ -61,7 +55,7 @@ int64_t PipeStream::Read(char *data_, int64_t length_)
 	int64_t r;
 	
 #ifdef _WIN32
-   ReadFile(_fdr, data_, length_, (DWORD *)&r, 0);
+   ReadFile(_fdr, data_, (DWORD)length_, (DWORD *)&r, 0);
 #else
 	r = read(_fds[0], data_, length_);
 #endif
@@ -74,7 +68,7 @@ int64_t PipeStream::Write(const char *data_, int64_t length_)
 	int64_t r;
 	
 #ifdef _WIN32
-	    WriteFile(_fdw, data_, length_, (DWORD *)&r, 0);
+	    WriteFile(_fdw, data_, (DWORD)length_, (DWORD *)&r, 0);
 #else
 		r = write(_fds[1], data_, length_);
 #endif

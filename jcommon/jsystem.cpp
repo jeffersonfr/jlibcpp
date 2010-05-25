@@ -17,39 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsystem.h"
-#include "jruntimeexception.h"
-#include "jautolock.h"
+#include "Stdafx.h"
 #include "jcommonlib.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <errno.h>
-#include <time.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-
-#ifdef _WIN32
-#include <windows.h>
-#include <conio.h>
-#elif __CYGWIN32__
-#include <sys/ioctl.h>
-#include <termios.h>
-#include <pwd.h>
-#else
-#include <sys/ioctl.h>
-#include <linux/kd.h>
-#include <termios.h>
-#include <pwd.h>
-#include <linux/kd.h>
-#endif
 
 #ifndef CLOCK_TICK_RATE
 #define CLOCK_TICK_RATE 1193180
@@ -129,7 +98,7 @@ std::string System::GetCurrentUserName()
     char name[256];
     DWORD r = 256;
     
-    GetUserName( name , &r);
+    GetUserName(name , &r);
 
 	return name;
 #else
@@ -258,7 +227,7 @@ std::string System::GetLastErrorMessage()
 {
 #ifdef _WIN32
 	DWORD code = GetLastErrorCode();
-	LPTSTR msg;
+	char *msg;
 	
 	FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER |

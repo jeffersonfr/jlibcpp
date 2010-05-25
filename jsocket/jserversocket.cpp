@@ -17,11 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jserversocket.h"
-#include "jsocketstreamexception.h"
-#include "jsocket.h"
-#include "jsocketexception.h"
-#include "junknownhostexception.h"
+#include "Stdafx.h"
+#include "jsocketlib.h"
 
 namespace jsocket {
 
@@ -38,7 +35,7 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
 			InetAddress *a = InetAddress::GetLocalHost();
         
 			addr_ = a;
-		} catch (UnknownHostException &e) {
+		} catch (UnknownHostException &) {
 			addr_ = NULL;
 		}
 	}

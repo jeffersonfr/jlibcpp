@@ -32,8 +32,6 @@
 #include <vector>
 
 #include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
 
 namespace jgui {
 
@@ -64,8 +62,8 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener, public
 		std::string _title;
 		int _top_index,
 				_item_size,
-				_visible_items,
-				_centered_interaction;
+				_visible_items;
+		bool _centered_interaction;
 
 	private:
 		/**

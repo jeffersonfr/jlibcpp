@@ -1,4 +1,4 @@
-#include "jtimer.h"
+#include "jthreadlib.h"
 
 #include <iostream>
 

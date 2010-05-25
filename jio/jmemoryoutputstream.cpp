@@ -17,22 +17,17 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "Stdafx.h"
+#include "jiolib.h"
 #include "jmemoryoutputstream.h"
-
 #include "jruntimeexception.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
 
 namespace jio {
 
 MemoryOutputStream::MemoryOutputStream(uint8_t*data, int size):
 	jio::OutputStream()
 {
-    jcommon::Object::SetClassName("jio::MemoryOutputStream");
+	jcommon::Object::SetClassName("jio::MemoryOutputStream");
 	
 	if ((void *)data == NULL) {
 		throw jcommon::RuntimeException("Null pointer exception");
@@ -61,7 +56,7 @@ int64_t MemoryOutputStream::Available()
 	return (int64_t)(_buffer_size - _buffer_index);
 }
 
-int MemoryOutputStream::Write(int b)
+int64_t MemoryOutputStream::Write(int64_t b)
 {
 	if (IsEmpty() == true) {
 		return 0;
@@ -84,7 +79,7 @@ int64_t MemoryOutputStream::Write(char *data, int64_t size)
 		r = Available();
 	}
 
-	memcpy((uint8_t*)(_buffer + _buffer_index), data, r);
+	memcpy((uint8_t*)(_buffer + _buffer_index), data, (size_t)r);
 
 	return r;
 }

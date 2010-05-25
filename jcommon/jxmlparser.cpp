@@ -17,13 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jxmlparser.h"
-#include "jioexception.h"
-
-#include <fstream>
-
-#include <stdio.h>
-#include <stdarg.h>
+#include "Stdafx.h"
+#include "jcommonlib.h"
 
 namespace jcommon {
 
@@ -382,7 +377,7 @@ XmlDocument* XmlNode::GetDocument()
 
 bool XmlNode::HasChildren() const
 {
-	return firstChild;
+	return firstChild != NULL;
 }
 
 const XmlDocument * XmlNode::ToDocument() const
@@ -1804,7 +1799,7 @@ XmlNode * XmlNode::Identify( const char* p, XmlEncoding encoding )
 		} else {
 			returnNode = new XmlUnknown();
 		}
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 		returnNode = NULL;
 	}
 
@@ -2080,7 +2075,7 @@ const char * XmlElement::Parse( const char* p, XmlParsingData* data, XmlEncoding
 				}
 
 				attributeSet.Add( attrib );
-			} catch (std::bad_alloc &e) {
+			} catch (std::bad_alloc &) {
 			}
 		}
 	}
@@ -2114,7 +2109,7 @@ const char * XmlElement::ReadValue(const char* p, XmlParsingData* data, XmlEncod
 				} else {
 					delete textNode;
 				}
-			} catch (std::bad_alloc &e) {
+			} catch (std::bad_alloc &) {
 				if (document) {
 					document->SetError( TIXML_ERROR_OUT_OF_MEMORY, 0, 0, encoding );
 				}
@@ -3141,7 +3136,7 @@ void XmlElement::SetAttribute( const char * cname, const char * cvalue )
 		if ( attrib ) {
 			attributeSet.Add( attrib );
 		}
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 		XmlDocument* document = GetDocument();
 
 		if ( document ) {
@@ -3165,7 +3160,7 @@ void XmlElement::SetAttribute( const std::string& name, const std::string& _valu
 		if ( attrib ) {
 			attributeSet.Add( attrib );
 		}
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 		XmlDocument* document = GetDocument();
 
 		if ( document ) {
@@ -3272,7 +3267,7 @@ XmlNode* XmlElement::Clone() const
 		CopyTo( clone );
 		
 		return clone;
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 	}
 	
 	return NULL;
@@ -3426,7 +3421,7 @@ bool XmlDocument::LoadFile( FILE* file, XmlEncoding encoding )
 	
 	try {
 		buf = new char[ length+1 ];
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 		return false;
 	}
 
@@ -3549,7 +3544,7 @@ XmlNode * XmlDocument::Clone() const
 		CopyTo( clone );
 		
 		return clone;
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 	}
 
 	return NULL;
@@ -3738,7 +3733,7 @@ XmlNode* XmlComment::Clone() const
 		CopyTo( clone );
 	
 		return clone;
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 	}
 
 	return NULL;
@@ -3796,7 +3791,7 @@ XmlNode* XmlText::Clone() const
 		CopyTo( clone );
 	
 		return clone;
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 	}
 
 	return NULL;
@@ -3885,7 +3880,7 @@ XmlNode* XmlDeclaration::Clone() const
 		CopyTo( clone );
 	
 		return clone;
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 	}
 
 	return NULL;
@@ -3920,7 +3915,7 @@ XmlNode* XmlUnknown::Clone() const
 		CopyTo( clone );
 
 		return clone;
-	} catch (std::bad_alloc &e) {
+	} catch (std::bad_alloc &) {
 	}
 
 	return NULL;

@@ -17,9 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsockethandler.h"
-
-#include <sstream>
+#include "Stdafx.h"
+#include "jloggerlib.h"
 
 namespace jlogger {
 
@@ -67,7 +66,7 @@ void SocketHandler::WriteRecord(LogRecord *record_)
 	if (_logs.size() > _limit) {
 		_logs.pop_front();
 	}
-		
+	
 	_mutex.Unlock();
 }
 

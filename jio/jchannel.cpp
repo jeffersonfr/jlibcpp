@@ -17,13 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jchannel.h"
-
-#include <iostream>
-#include <string>
-#include <sstream>
-
-#include <time.h>
+#include "Stdafx.h"
+#include "jiolib.h"
 
 namespace jio {
 
@@ -73,11 +68,6 @@ int64_t Channel::Write(char *b, int64_t size, int64_t offset)
 int64_t Channel::Transfer(Channel *in, int64_t count, int64_t position, Channel *out, int64_t count2, int64_t position2)
 {
 	return 0;
-}
-
-std::string Channel::what()
-{
-	return "";
 }
 
 }

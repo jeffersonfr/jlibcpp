@@ -17,10 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jprogramelementarystreamsection.h"
-
-#include <unistd.h>
-#include <string.h>
+#include "Stdafx.h"
+#include "jmpeglib.h"
 
 namespace jmpeg {
 

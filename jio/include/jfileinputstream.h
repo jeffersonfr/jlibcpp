@@ -90,7 +90,7 @@ class FileInputStream : public jio::InputStream{
 		 * \brief
 		 * 
 		 */
-		virtual int Read();
+		virtual int64_t Read();
 
 		/**
 		 * \brief

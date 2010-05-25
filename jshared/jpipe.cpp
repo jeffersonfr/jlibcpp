@@ -17,19 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jpipe.h"
-#include "jpipeexception.h"
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#endif
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <errno.h>
-#include <stdio.h>
+#include "Stdafx.h"
+#include "jsharedlib.h"
 
 namespace jshared {
 

@@ -17,24 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jwrapperprocess.h"
-#include "jprocessexception.h"
-
-#include <cstdio>
-#include <algorithm>
-
-#ifdef _WIN32
-#else 
-#include <sys/ioctl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#endif
-
-#include <fcntl.h>
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
+#include "Stdafx.h"
+#include "jsharedlib.h"
 
 #define MAX_BUFFER_SIZE	4096
 
@@ -264,6 +248,7 @@ int WrapperProcess::ReadBuffer(char *data_, int data_length_)
 	}
 	
 #ifdef _WIN32
+	return -1;
 #else
 	int n = 0, 
 		d = _rend_index - _rcurrent_index;
@@ -389,6 +374,7 @@ int WrapperProcess::FlushWriteBuffer()
 	}
 	
 #ifdef _WIN32
+	return 0;
 #else
 	fd_set writefs;
 	struct timeval waittime;
@@ -422,9 +408,10 @@ int WrapperProcess::FlushWriteBuffer()
 
 /** End */
 
-jwprocess_type_t WrapperProcess::CreateProcess()
+jprocess_type_t WrapperProcess::CreateProcess()
 {
 #ifdef _WIN32
+	return PROCESS_PARENT;
 #else
 	return PROCESS_CHILD;
 #endif
@@ -481,9 +468,12 @@ void WrapperProcess::Interrupt()
 
 void WrapperProcess::Flush()
 {
+#ifdef _WIN32
+#else
 	if (::close(_pchild[1]) < 0) {
 		// throw ProcessException("Close failed for pipe from child: ");
 	}
+#endif
 }
 
 void WrapperProcess::Release()
