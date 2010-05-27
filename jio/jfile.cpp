@@ -59,9 +59,20 @@ File::File(std::string filename_, int flags_):
 
 	// TODO:: 
 	// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/ipc/base/createnamedpipe.asp
-	// CreateHardLink
-	// CreateSymbolicLink
-	// CreateDirectory
+	
+	/**
+	 * TODO:: CreateDirectory
+	SECURITY_ATTRIBUTES sa;
+	_WinPerms wperm;
+
+	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sa.lpSecurityDescriptor = wperm.pdesc;
+	sa.bInheritHandle = FALSE;
+
+	if (::CreateDirectory(RemoveTrailingSeperator(path)->GetChars(), &sa) != TRUE) {
+		throw new IOException(Environment::LastErrorMessage());
+	}
+	*/
 	
 	if ((flags_ & F_CREATE) == 0) {
 		_fd = CreateFile (filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
@@ -144,6 +155,16 @@ File::File(std::string filename_, int flags_):
 	if ((opt & F_CREATE) != 0) {
 		flags_ |= O_CREAT;
 	}
+
+	/**
+	 * TODO:: CreateDirectory
+	mode_t mode;
+	EncodePermissions(perm, mode);
+
+	if (::mkdir(path.GetChars(), mode) != 0) {
+		throw new IOException(Environment::LastErrorMessage());
+	}
+	*/
 
 	_fd = open(filename_.c_str(), flags_, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH);
 
@@ -396,8 +417,29 @@ bool File::IsDirectory()
 	}
 
 	return false;
+
+	/*
+	struct _stat stbuf;
+
+	if (_stat(RemoveTrailingSeperator(path)->GetChars(), &stbuf) != 0)
+	{
+		return false;
+	}
+
+	return (stbuf.st_mode & _S_IFDIR) != 0;
+	*/
 #else
 	return (_dir != NULL);
+	
+	/*
+	struct stat stbuf;
+
+	if(stat(path.GetChars(), &stbuf) != 0) {
+		return false;
+	}
+
+	return S_ISDIR(stbuf.st_mode);
+	*/
 #endif
 }
 

@@ -143,6 +143,12 @@ class System{
 		 * \brief
 		 *
 		 */
+		void ChangeWorkingDirectory(std::string dir);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetProcessName();
 		
 		/**

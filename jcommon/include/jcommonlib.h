@@ -29,6 +29,7 @@
 #include "jexception.h"
 // #include "jgc.h"
 #include "jhtmlparser.h"
+#include "jinvalidargumentexception.h"
 #include "jillegalargumentexception.h"
 #include "jjson.h"
 #include "jlistener.h"

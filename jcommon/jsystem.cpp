@@ -357,6 +357,17 @@ int System::Getch(void)
 #endif
 }
 
+void System::ChangeWorkingDirectory(std::string dir)
+{
+#ifdef WIN32
+	if (_chdir(dir.c_str()) != 0) {
+#else
+	if (chdir(dir.c_str()) != 0) {
+#endif
+		throw new InvalidArgumentException("Change working directory exception");
+	}
+}
+
 std::string System::GetProcessName()
 {
 #ifdef _WIN32
