@@ -106,6 +106,12 @@ class Properties : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		void SetPropertyByIndex(int index, std::string value);
+	
+		/**
+		 * \brief
+		 *
+		 */
 		std::string GetPropertyByName(std::string key, std::string reserv = std::string(""));
 		
 		/**

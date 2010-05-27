@@ -28,9 +28,10 @@ Semaphore::Semaphore(int value_):
 	jcommon::Object::SetClassName("jthread::Semaphore");
 	
 #ifdef _WIN32
+	BOOL inherit = TRUE;
+
 	_sa = NULL;
 	_semaphore = NULL;
-	_inherit = TRUE;
 
 	_sa = (LPSECURITY_ATTRIBUTES)HeapAlloc(GetProcessHeap(), 0, sizeof(SECURITY_ATTRIBUTES));
 	
@@ -44,7 +45,7 @@ Semaphore::Semaphore(int value_):
 
 	// if ((_semaphore = CreateSemaphore(_sa, _count, _max_count, "NTcourse.semaphore.empty")) == NULL) {
 	if ((_semaphore = CreateSemaphore(_sa, value_, 65535, NULL)) == NULL) {
-		// if ((_semaphore = OpenSemaphore(SEMAPHORE_ALL_ACCESS, _inherit, "NTcourse.semaphore.empty")) == NULL) {
+		// if ((_semaphore = OpenSemaphore(SEMAPHORE_ALL_ACCESS, inherit, "NTcourse.semaphore.empty")) == NULL) {
 		DWORD code = GetLastError();
 		char *msg = NULL;
 

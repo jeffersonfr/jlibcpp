@@ -140,15 +140,59 @@ class System{
 		static int Getch(void);
 
 		/**
-		 * \brief Expand a pathname getting rid of special shell characters like ~.$, etc.
-		 * For Unix/Win32 compatibility use $(XXX) instead of $XXX when using
-		 * environment variables in a pathname. If compatibility is not an issue
-		 * you can use on Unix directly $XXX. This is a protected function called
-		 * from the OS specific system classes, like TUnixSystem and TWinNTSystem.
+		 * \brief
 		 *
 		 */
-		static std::string ExpandFileName(std::string fname);
-
+		std::string GetProcessName();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetUserName();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetHostName();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetHostArchitecture();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetOSName();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetOSVersion();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		std::string GetTempDirectory();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		uint64_t GetDiskFreeSpace();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int GetProcessorCount();
+		
 		/**
 		 * \brief Reset the system.
 		 *

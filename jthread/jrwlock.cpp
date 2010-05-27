@@ -22,125 +22,107 @@
 
 namespace jthread {
 
-Mutex::Mutex(jmutex_type_t type_, jmutex_protocol_t protocol_, bool block_in_death):
+RWLock::RWLock():
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jthread::Mutex");
+	jcommon::Object::SetClassName("jthread::RWLock");
 	
 #ifdef _WIN32
-	InitializeCriticalSection(&_mutex);
+	InitializeSRWLock(&_rwlock);
 #else 
-	pthread_mutexattr_t attr;
-    
-	pthread_mutexattr_init(&attr);
-    
-	if (type_ == FAST_MUTEX) {
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_FAST_NP);
-	} else if (type_ == RECURSIVE_MUTEX) {
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
-	} else if (type_ == ERROR_CHECK_MUTEX) {
-		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK_NP);
-	}
-
-	/*
-	if (protocol_ == NONE_PROT_MUTEX) {
-		pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_NONE);
-	} else if (protocol_ == INHERIT_PROT_MUTEX) {
-		pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT);
-	} else if (protocol_ == PROTECT_PROT_MUTEX) {
-		pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_PROTECT);
-	}
-
-	if (block_in_death == true) {
-		pthread_mutexattr_setrobust_np(&attr, PTHREAD_MUTEX_STALLED_NP);
-	} else {
-		pthread_mutexattr_setrobust_np(&attr, PTHREAD_MUTEX_ROBUST_NP);
-	}
-
-	pthread_mutexattr_setprioceiling(&attr, 0); 
-	*/
-
-	pthread_mutex_init(&_mutex, &attr);
-#endif
-
-	_type = type_;
-	_lock_count = 0;
-}
-
-Mutex::~Mutex()
-{
-#ifdef _WIN32
-	DeleteCriticalSection(&_mutex);
-#else 
-	/*
-	while (pthread_mutex_destroy(&_mutex) == EBUSY) {
-		Lock();
-		Unlock();
-	}
-	*/
-
-	pthread_mutex_destroy(&_mutex);
+	pthread_rwlock_init(&_rwlock, NULL);
 #endif
 }
 
-bool Mutex::IsLocked()
-{
-	return (_lock_count != 0);
-}
-
-void Mutex::Lock()
+RWLock::~RWLock()
 {
 #ifdef _WIN32
-	EnterCriticalSection(&_mutex);
 #else 
-	if (pthread_mutex_lock(&_mutex) != 0) {
+	pthread_rwlock_destroy(&_rwlock);
+#endif
+}
+
+void RWLock::ReadLock()
+{
+#ifdef _WIN32
+	AcquireSRWLockShared(&_rwlock);
+#else 
+	if (pthread_rwlock_rdlock(&_rwlock) != 0) {
 		if (errno == EDEADLK) {
 			throw MutexException("Error check monitor, dead lock ... !");
-		} else {
-			throw MutexException("Mutex lock failed !");
 		}
 	}
 #endif
-
-	_lock_count++;
 }
 
-void Mutex::Unlock()
+void RWLock::WriteLock()
 {
 #ifdef _WIN32
-	LeaveCriticalSection(&_mutex);
+	AcquireSRWLockExclusive(&_rwlock);
 #else 
-	if (pthread_mutex_unlock(&_mutex) != 0) {
+	if (pthread_rwlock_wrlock(&_rwlock) != 0) {
+		if (errno == EDEADLK) {
+			throw MutexException("Error check monitor, dead lock ... !");
+		}
+	}
+#endif
+}
+
+void RWLock::ReadUnlock()
+{
+#ifdef _WIN32
+	ReleaseSRWLockShared(&_rwlock);
+#else 
+	if (pthread_rwlock_unlock(&_rwlock) != 0) {
 		if (errno == EINVAL || errno == EFAULT || errno == EPERM) {
 			throw MutexException("Error check monitor, calling thread does ... !");
-		} else {
-			// throw MutexException("Mutex unlock failed !");
 		}
 	}
 #endif
-
-	if (_type == FAST_MUTEX) {
-		_lock_count = 0;
-	} else {
-		_lock_count--;
-	}
 }
 
-bool Mutex::TryLock()
+void RWLock::WriteUnlock()
 {
 #ifdef _WIN32
-	if (TryEnterCriticalSection(&_mutex) == 0) {
+	ReleaseSRWLockExclusive(&_rwlock);
+#else 
+	if (pthread_rwlock_unlock(&_rwlock) != 0) {
+		if (errno == EINVAL || errno == EFAULT || errno == EPERM) {
+			throw MutexException("Error check monitor, calling thread does ... !");
+		}
+	}
+#endif
+}
+
+bool RWLock::TryReadLock()
+{
+#ifdef _WIN32
+	if (TryAcquireSRWLockShared(&_rwlock) == 0) {
 		return false;
 	}
 #else 
-	if (pthread_mutex_trylock(&_mutex) != 0) {
+	if (pthread_rwlock_tryrdlock(&_rwlock) != 0) {
 		return false;
 	}
 #endif 
-    
-	_lock_count++;
+
+	return true;
+}
+
+bool RWLock::TryWriteLock()
+{
+#ifdef _WIN32
+	if (TryAcquireSRWLockExclusive(&_rwlock) == 0) {
+		return false;
+	}
+#else 
+	if (pthread_rwlock_trywrlock(&_rwlock) != 0) {
+		return false;
+	}
+#endif 
 
 	return true;
 }
 
 }
+

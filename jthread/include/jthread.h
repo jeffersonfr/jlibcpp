@@ -234,6 +234,12 @@ class Thread : public virtual jcommon::Object{
 		 * \bried
 		 *
 		 */
+		void Yield();
+
+		/**
+		 * \bried
+		 *
+		 */
 		void SetPolicy(jthread_policy_t policy, jthread_priority_t priority);
 
 		/**

@@ -57,7 +57,7 @@ class Mutex : public virtual jcommon::Object{
 
 	private:
 #ifdef _WIN32
-		HANDLE _mutex;
+		CRITICAL_SECTION _mutex;
 #else
 		/** \brief */
 		pthread_mutex_t _mutex;
@@ -104,11 +104,6 @@ class Mutex : public virtual jcommon::Object{
 		 */
 		bool TryLock();
 
-		/**
-		 * \brief
-		 *
-		 */
-		std::string what();
 };
 
 }

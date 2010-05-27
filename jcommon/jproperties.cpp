@@ -244,6 +244,25 @@ void Properties::SetPropertyByName(std::string key, std::string value)
 	properties.push_back(p);
 }
 
+void Properties::SetPropertyByIndex(int index, std::string value)
+{
+	if ((int)properties.size() == 0 || index < 0 || index > (int)properties.size()-1) {
+		throw IllegalArgumentException("Index out of bounds");
+	}
+
+	int k = 0;
+
+	for (std::vector<struct jproperty_t>::iterator i=properties.begin(); i != properties.end(); i++, k++) {
+		if (k == index) {
+			jproperty_t p = *i;
+
+			p.value = value;
+
+			break;
+		}
+	}
+}
+
 std::string Properties::GetPropertyByName(std::string key, std::string reserv)
 {
 	jthread::AutoLock lock(&_mutex);

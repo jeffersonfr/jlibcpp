@@ -354,7 +354,15 @@ std::string File::GetDirectoryDelimiter()
 bool File::IsFile()
 {
 #ifdef _WIN32
-	return true;
+	std::string o = GetAbsolutePath();
+
+	struct _stat stbuf;
+
+	if (::_stat(o.c_str(), &stbuf) != 0) {
+		return false;
+	}
+
+	return (stbuf.st_mode & _S_IFREG) != 0;
 #else
 	if (S_ISREG(_stat.st_mode) | S_ISFIFO(_stat.st_mode) | S_ISLNK(_stat.st_mode)) {
 		return true;
@@ -462,19 +470,55 @@ std::string File::GetAbsolutePath()
 	return GetCurrentDirectory() + delimiter + GetName();
 }
 
-time_t File::GetTimeLastAccess()
+time_t File::GetLastAccessTime()
 {
+#ifdef _WIN32
+	std::string o = GetAbsolutePath();
+
+	struct _stat stbuf;
+
+	if (::_stat(o.c_str(), &stbuf) != 0) {
+		return false;
+	}
+
+	return stbuf.st_atime;
+#else
 	return _stat.st_atime;
+#endif
 }
 
-time_t File::GetTimeLastModification()
+time_t File::GetLastModificationTime()
 {
+#ifdef _WIN32
+	std::string o = GetAbsolutePath();
+
+	struct _stat stbuf;
+
+	if (::_stat(o.c_str(), &stbuf) != 0) {
+		return false;
+	}
+
+	return stbuf.st_mtime;
+#else
 	return _stat.st_mtime;
+#endif
 }
 
-time_t File::GetTimeLastStatusChange()
+time_t File::GetLastStatusChangeTime()
 {
+#ifdef _WIN32
+	std::string o = GetAbsolutePath();
+
+	struct _stat stbuf;
+
+	if (::_stat(o.c_str(), &stbuf) != 0) {
+		return false;
+	}
+
+	return stbuf.st_ctime;
+#else
 	return _stat.st_ctime;
+#endif
 }
 
 int64_t File::Read(char *data_, int64_t length_) 
@@ -684,6 +728,25 @@ std::vector<std::string> * File::ListFiles(std::string extension)
 	}
 	
 	return l;
+}
+
+void File::Move(std::string newpath_)
+{
+	std::string o = GetAbsolutePath();
+	
+#ifdef _WIN32
+	MoveFile(o.c_str(), newpath_.c_str());
+#else
+	if (::link(o.c_str(), newpath_.c_str()) != 0) {
+		throw FileException(strerror(errno));
+	}
+
+	if (::unlink(o.c_str()) != 0) {
+		::unlink(newpath_.c_str());
+
+		throw FileException(strerror(errno));
+	}
+#endif
 }
 
 void File::Rename(std::string newpath_)

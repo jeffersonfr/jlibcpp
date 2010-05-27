@@ -17,102 +17,85 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SEMAPHORE_H
-#define J_SEMAPHORE_H
-
-#include "jthread.h"
+#ifndef J_RWLOCK_H
+#define J_RWLOCK_H
 
 #include "jobject.h"
-#include "jautolock.h"
+
+#include <string>
 
 #ifdef _WIN32
 #include <windows.h>
-#include <winuser.h>
-#include <winbase.h>
-#include <string>
 #else
-#include <sys/types.h>
+#include <pthread.h>
 #include <semaphore.h>
 #endif
-
-#include <stdint.h>
 
 namespace jthread {
 
 /**
- * \brief Semaphore.
- *
- * @author Jeff Ferr
- */
-class Semaphore : public virtual jcommon::Object{
+* \brief Monitor.
+*
+* @author Jeff Ferr
+*/
+class RWLock : public virtual jcommon::Object{
 
-    private:
+	private:
 #ifdef _WIN32
-			/** \brief */
-			HANDLE _semaphore;
-			/** \brief */
-			LPSECURITY_ATTRIBUTES _sa;
+		SRWLock _rwlock;
 #else
-			/** \brief Semaphore handler. */
-			sem_t _semaphore;
+		/** \brief */
+		pthread_rwlock_t _rwlock;
 #endif
-			/** \brief */
-			Mutex mutex;
 
-    public:
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			Semaphore(int = 0);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		RWLock();
 
-			/**
-			 * \brief Destrutor virtual.
-			 *
-			 */
-			virtual ~Semaphore();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~RWLock();
 
-			/**
-			 * \brief Lock the semaphore.
-			 *
-			 */
-			void Wait();
+		/**
+		 * \brief Lock the critial section.
+		 *
+		 */
+		void ReadLock();
 
-			/**
-			 * \brief Lock semaphore.
-			 *
-			 */
-			void Wait(uint64_t time_);
+		/**
+		 * \brief Lock the critial section.
+		 *
+		 */
+		void WriteLock();
 
-			/**
-			 * \brief Notify the locked semaphore.
-			 *
-			 */
-			void Notify();
+		/**
+		 * \brief Unlock the critical section.
+		 *
+		 */
+		void ReadUnlock();
 
-			/**
-			 * \brief Notify all locked semaphores.
-			 *
-			 */
-			void NotifyAll();
+		/**
+		 * \brief Unlock the critical section.
+		 *
+		 */
+		void WriteUnlock();
 
-			/**
-			 * \brief Try lock the semaphore.
-			 *
-			 */
-			bool TryWait();
+		/**
+		 * \brief Try lock the critical section.
+		 *
+		 */
+		bool TryReadLock();
 
-			/**
-			 * \brief
-			 *
-			 */
-			int GetValue();
-
-			/**
-			 * \brief
-			 *
-			 */
-			void Release();
+		/**
+		 * \brief Try lock the critical section.
+		 *
+		 */
+		bool TryWriteLock();
 
 };
 

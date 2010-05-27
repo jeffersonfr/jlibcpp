@@ -225,19 +225,19 @@ class File : public virtual jcommon::Object{
 		 * \brief Retorna a data do ultimo acesso do arquivo.
 		 *
 		 */
-		time_t GetTimeLastAccess();
+		time_t GetLastAccessTime();
 		
 		/**
 		 * \brief Retorna a data da ultima modificacao do arquivo.
 		 *
 		 */
-		time_t GetTimeLastModification();
+		time_t GetLastModificationTime();
 		
 		/**
 		 * \brief Retorna a data da ultima modificacao do status do arquivo.
 		 *
 		 */
-		time_t GetTimeLastStatusChange();
+		time_t GetLastStatusChangeTime();
 
 		/**
 		 * \brief
@@ -287,6 +287,12 @@ class File : public virtual jcommon::Object{
 		 */
 		bool IsClosed();
 	
+		/**
+		 * \brief
+		 *
+		 */
+		void Move(std::string newpath_);
+		
 		/**
 		 * \brief
 		 *

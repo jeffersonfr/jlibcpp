@@ -323,21 +323,7 @@ bool Thread::Interrupt(int key)
 		}
 	}
 
-	/* CHANGE:: original
-		 if (_type == JOINABLE_THREAD) {
-		 if (pthread_detach(thread) != 0) {
-		 return false; // CHANGE:: throw ThreadException("Thread cancel exception !");
-		 }
-		 }
-
-		 if (pthread_cancel(thread) != 0) {
-		 return false; // CHANGE:: throw ThreadException("Thread cancel exception !");
-		 }
-
-		 if (pthread_join(thread, NULL) != 0) {
-		 return false; // CHANGE:: throw ThreadException("Wait thread failed");
-		 }
-		 */
+	// memset(&thread, 0, sizeof(pthread_t));
 #endif
 
 	CleanUp();
@@ -404,12 +390,30 @@ bool Thread::IsRunning(int key)
 	return false;
 }
 
+void Thread::Yield()
+{
+#ifdef _WIN32
+	Thread::MSleep(1);
+#else
+	pthread_yield();
+#endif
+}
+
 void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 {
 	AutoLock lock(&jthread_mutex);
 
 	int tpriority = 0;
 
+#ifdef _WIN32
+	if (priority == LOW_PRIORITY) {
+		tpriority = THREAD_PRIORITY_BELOW_NORMAL;
+	} else if (priority == NORMAL_PRIORITY) {
+		tpriority = THREAD_PRIORITY_NORMAL;
+	} else if (priority == HIGH_PRIORITY) {
+		tpriority = THREAD_PRIORITY_ABOVE_NORMAL;
+	}
+#else
 	if (priority == LOW_PRIORITY) {
 		tpriority = 0;
 	} else if (priority == NORMAL_PRIORITY) {
@@ -417,28 +421,27 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 	} else if (priority == HIGH_PRIORITY) {
 		tpriority = 10;
 	}
+#endif
 
 	int tpolicy = 0;
 
+#ifdef _WIN32
 	if (policy == POLICY_OTHER) {
-#ifdef _WIN32
 		tpolicy = 1;
-#else
-		tpolicy = SCHED_OTHER;
-#endif
 	} else if (policy == POLICY_FIFO) {
-#ifdef _WIN32
 		tpolicy = 2;
-#else
-		tpolicy = SCHED_FIFO;
-#endif
 	} else if (policy == POLICY_ROUND_ROBIN) {
-#ifdef _WIN32
 		tpolicy = 3;
-#else
-		tpolicy = SCHED_RR;
-#endif
 	}
+#else
+	if (policy == POLICY_OTHER) {
+		tpolicy = SCHED_OTHER;
+	} else if (policy == POLICY_FIFO) {
+		tpolicy = SCHED_FIFO;
+	} else if (policy == POLICY_ROUND_ROBIN) {
+		tpolicy = SCHED_RR;
+	}
+#endif
 
 #ifdef _WIN32
 	if (SetThreadPriority(_thread, tpriority) == 0) {

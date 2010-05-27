@@ -28,14 +28,7 @@ Condition::Condition(int nblock):
 	jcommon::Object::SetClassName("jthread::Condition");
 
 #ifdef _WIN32
-	// single event
-	// event = CreateEvent(NULL, FALSE, FALSE, NULL);
-	// broadcast event
-	_event = CreateEvent(NULL, TRUE, FALSE, NULL);
-
-	if (_event == INVALID_HANDLE_VALUE) {
-		throw SemaphoreException("Init semaphore error !");
-	}
+	InitializeConditionVariable(&_condition);
 #else
 	if (pthread_cond_init(&_condition, NULL) != 0) { //&cond) != 0) {
 		throw SemaphoreException("Init condition error !");
@@ -69,8 +62,16 @@ void Condition::Release()
 void Condition::Wait(Mutex *mutex)
 {
 #ifdef _WIN32
-	if (WaitForSingleObject(_event, INFINITE) == WAIT_FAILED) {
-		throw SemaphoreException("Condition wait error !");
+	if ((void *)mutex == NULL) {
+		jthread::AutoLock lock(&_monitor);
+
+		if (SleepConditionVariableCS(&_condition, &_monitor._mutex, INFINITE) == 0) {
+			throw SemaphoreException("Condition wait error !");
+		}
+	} else {
+		if (SleepConditionVariableCS(&_condition, &monitor._mutex, INFINITE) == 0) {
+			throw SemaphoreException("Condition wait error !");
+		}
 	}
 #else
 	if ((void *)mutex == NULL) {
@@ -90,16 +91,23 @@ void Condition::Wait(Mutex *mutex)
 void Condition::Wait(uint64_t time_, Mutex *mutex)
 {
 #ifdef _WIN32
-	DWORD millisecs,
-				status;
+	DWORD d = (DWORD)(time_/1000LL);
+	DWORD result;
 
-	millisecs = (DWORD)(time_*1000LL);
-	status = WaitForSingleObject(_event, millisecs);
+	if ((void *)mutex == NULL) {
+		jthread::AutoLock lock(&_monitor);
 
-	if (status == WAIT_TIMEOUT) {
-		throw SemaphoreTimeoutException("Semaphore wait timeout");
-	} else if (status == WAIT_FAILED) {
-		throw SemaphoreTimeoutException("Semaphore wait failed");
+		result = SleepConditionVariableCS(&_condition, &_monitor._mutex, d);
+	} else {
+		result = SleepConditionVariableCS(&_condition, &monitor._mutex, d);
+	}
+
+	if (result == 0) {
+		if (GetLastError() == WAIT_TIMEOUT) {
+			throw SemaphoreTimeoutException("Semaphore wait timeout");
+		} else {
+			throw SemaphoreTimeoutException("Semaphore wait failed");
+		}
 	}
 #else
 	struct timespec t;
@@ -129,14 +137,7 @@ void Condition::Wait(uint64_t time_, Mutex *mutex)
 void Condition::Notify()
 {
 #ifdef _WIN32
-	BOOL success = FALSE;
-
-	// single event
-	success = SetEvent(_event);
-
-	if (!success) {
-		throw SemaphoreException("Semaphore notify error !");
-	}
+	WakeConditionVariable(&_condition);
 #else
 	if (pthread_cond_signal(&_condition) != 0) {
 		throw SemaphoreException("Condition notify error !");
@@ -147,14 +148,7 @@ void Condition::Notify()
 void Condition::NotifyAll()
 {
 #ifdef _WIN32
-	BOOL success = FALSE;
-
-	// broadcast event
-	success = PulseEvent(_event);
-
-	if (!success) {
-		throw SemaphoreException("Semaphore notify error !");
-	}
+	WakeAllConditionVariable(&_condition);
 #else
 	if (pthread_cond_broadcast(&_condition) != 0) {
 		throw SemaphoreException("Condition notify all error !");

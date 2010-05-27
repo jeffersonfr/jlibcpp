@@ -20,6 +20,13 @@
 #include "Stdafx.h"
 #include "jcommonlib.h"
 
+#include <sstream>
+
+#ifdef _WIN32
+#else
+#include <sys/vfs.h>
+#endif
+
 #ifndef CLOCK_TICK_RATE
 #define CLOCK_TICK_RATE 1193180
 #endif
@@ -147,20 +154,19 @@ std::string System::GetHomeDirectory()
 {
 #ifdef _WIN32
 	// CHANGE:: procurar por getuserdirectory ou algo parecido
-    char name[256];
-    DWORD r = 256;
-    
-    GetWindowsDirectory( name , r);
+	char name[256];
+	DWORD r = 256;
+
+	GetWindowsDirectory( name , r);
 
 	return name;
 #else
-    struct passwd *pw;
+	struct passwd *pw;
 
-    pw = getpwuid(0);
+	pw = getpwuid(0);
 
 	if (pw != NULL) {
-		// WARNNING:: free pointer
-	    return pw->pw_dir;
+		return pw->pw_dir;
 	}
 #endif
 
@@ -170,9 +176,9 @@ std::string System::GetHomeDirectory()
 std::string System::GetEnviromentVariable(std::string key_, std::string default_)
 {
 #ifdef _WIN32
-    char name[4096];
-    
-	GetEnvironmentVariable(key_.c_str() , name, 4096); 
+	char name[4096];
+
+	GetEnvironmentVariable(key_.c_str(), name, 4096); 
 
 	if (name == NULL) {
 		return default_;
@@ -351,112 +357,244 @@ int System::Getch(void)
 #endif
 }
 
-std::string System::ExpandFileName(std::string fname)
+std::string System::GetProcessName()
 {
-	/** TODO::
-   const int   kBufSize = kMAXPATHLEN;
-   int         n, ier, iter, lx, ncopy;
-   char       *inp, *out, *c, *b, *e, *x, *t, buff[kBufSize*3];
-   const char *p;
-   static char xname[kBufSize];
+#ifdef _WIN32
+	char path[512];
 
-   R__LOCKGUARD2(gSystemMutex);
+	if (!GetModuleFileName(NULL, path, sizeof(path)) || !path[0]) {
+		return "unknown";
+	}
 
-   iter = 0; xname[0] = 0; inp = buff + kBufSize; out = inp + kBufSize;
-   inp[-1] = ' '; inp[0] = 0; out[-1] = ' ';
-   c = (char *)fname + strspn(fname, " \t\f\r");
-   //VP  if (isalnum(c[0])) { strcpy(inp, WorkingDirectory()); strcat(inp, "/"); } // add $cwd
-
-   strcat(inp, c);
-
-again:
-   iter++; c = inp; ier = 0;
-   x = out; x[0] = 0;
-
-   for ( ; c[0]; c++) {
-
-      p = 0; e = 0;
-      if (c[0] == '~' && c[1] == '/') { // ~/ case
-         p = HomeDirectory(); e = c + 1; if (!p) ier++;
-      }
-      if (p) {                         // we have smth to copy
-         strcpy(x, p); x += strlen(p); c = e-1; continue;
-      }
-
-      p = 0;
-      if (c[0] == '~' && c[1] != '/') { // ~user case
-         n = strcspn(c+1, "/ "); buff[0] = 0; strncat(buff, c+1, n);
-         p = HomeDirectory(buff); e = c+1+n;
-      }
-      if (p) {                          // we have smth to copy
-         strcpy(x,p); x += strlen(p); c = e-1; continue;
-      }
-
-      p = 0;
-      if (c[0] == '.' && c[1] == '/' && c[-1] == ' ') { // $cwd
-         p = strcpy(buff, WorkingDirectory()); e = c + 1; if (!p) ier++;
-      }
-
-      if (p) {                          // we have smth to copy
-         strcpy(x,p); x += strlen(p); c = e-1; continue;
-      }
-
-      if (c[0] != '$') {                // not $, simple copy
-         x++[0] = c[0];
-      } else {                          // we have a $
-         b = c+1;
-         if (c[1] == '(') b++;
-         if (c[1] == '{') b++;
-         if (b[0] == '$')
-            e = b+1;
-         else
-            for (e = b; isalnum(e[0]) || e[0] == '_'; e++) ;
-         buff[0] = 0; strncat(buff, b, e-b);
-         p = Getenv(buff);
-         if (!p) {                      // too bad, try UPPER case
-            for (t = buff; (t[0] = toupper(t[0])); t++) ;
-            p = Getenv(buff);
-         }
-         if (!p) {                      // too bad, try Lower case
-            for (t = buff; (t[0] = tolower(t[0])); t++) ;
-            p = Getenv(buff);
-         }
-         if (!p && !strcmp(buff, "cwd")) { // it is $cwd
-            p = strcpy(buff, WorkingDirectory());
-         }
-         if (!p && !strcmp(buff, "$")) { // it is $$ (replace by GetPid())
-            sprintf(buff, "%d", GetPid());
-            p = buff;
-         }
-         if (!p) {                      // too bad, nothing can help
-#ifdef WIN32
-            // if we're on windows, we can have \\SomeMachine\C$ - don't
-            // complain about that, if '$' is followed by nothing or a
-            // path delimiter.
-            if (c[1] && c[1]!='\\' && c[1]!=';' && c[1]!='/')
-               ier++;
+	return std::string(path);
 #else
-            ier++;
+	pid_t pid = getpid();
+	
+	std::ostringstream o;
+	o << "/proc/" << pid << "/execname";
+
+	/*
+	if (File::Exists(path) == true) {
+		std::ostringstream o;
+		o << "/proc/" << pid << "/cmdline";
+
+		if (File::Exists(path) == false) {
+			return "unknown";
+		}
+
+		// TODO:: parse
+	}
+	*/
+
+	return o.str();
 #endif
-            x++[0] = c[0];
-         } else {                       // It is OK, copy result
-            strcpy(x,p); x += strlen(p); c = (b==c+1) ? e-1 : e;
-         }
-      }
-   }
+}
 
-   x[0] = 0; lx = x - out;
-   if (ier && iter < 3) { strcpy(inp,out); goto again; }
-   ncopy = (lx >= kBufSize) ? kBufSize-1 : lx;
-   xname[0] = 0; strncat(xname,out,ncopy);
+std::string System::GetUserName()
+{
+#ifdef _WIN32
+	char buf[256];
 
-   if (ier || ncopy != lx)
-      Error("ExpandFileName", "input: %s, output: %s", fname, xname);
+	DWORD size = (DWORD)sizeof(buf);
 
-   return xname;
-   */
+	if (::GetUserName(ubuf, &size) != TRUE) {
+		throw new Exception("Cannot retrieve user name");
+	}
 
-	return "";
+	return buf;
+#else
+	passwd *pw = getpwuid(geteuid());
+
+	if (!pw) {
+		throw new Exception("getpwuid error");
+	}
+
+	return pw->pw_name;
+#endif
+}
+
+std::string System::GetHostName()
+{
+#ifdef _WIN32
+	char hbuf[512];
+
+	DWORD size = (DWORD)sizeof(hbuf);
+
+	if(::GetComputerName(hbuf, &size) != TRUE) {
+		throw new Exception("Cannot retrieve the computer name");
+	}
+
+	return hbuf;
+#else
+    struct utsname uts;
+
+    uname(&uts);
+    
+		return uts.nodename;
+#endif
+}
+
+std::string System::GetHostArchitecture()
+{
+#ifdef _WIN32
+	SYSTEM_INFO sys_info;
+
+	::GetSystemInfo(&sys_info);
+
+	switch(sys_info.dwProcessorType) {
+		case PROCESSOR_INTEL_386:
+		case PROCESSOR_INTEL_486:
+		case PROCESSOR_INTEL_PENTIUM:
+			return "x86";
+		case 2200:
+			return "ia64";
+#ifdef PROCESSOR_AMD_X8664
+		case PROCESSOR_AMD_X8664:
+			return "amd8664";
+#endif
+		default:
+			return "unknown";
+	}
+
+#else
+	struct utsname uts;
+
+	uname(&uts);
+	
+	return uts.machine;
+#endif
+}
+
+std::string System::GetOSName()
+{
+#ifdef _WIN32
+	return "Windows";
+#else
+	struct utsname uts;
+
+	uname(&uts);
+
+	return uts.sysname;
+#endif
+}
+
+std::string System::GetOSVersion()
+{
+#ifdef _WIN32
+	OSVERSIONINFO os_info;
+
+	os_info.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	
+	::GetVersionEx(&os_info);
+
+	switch(os_info.dwMajorVersion) {
+		case 4:
+			switch(os_info.dwMinorVersion) {
+				case 0:
+					if(os_info.dwPlatformId == VER_PLATFORM_WIN32_NT)
+						return "NT 4.0";
+					else
+						return "95";
+					break;
+				case 10:
+					return "98";
+				case 90:
+					return "ME";
+				default:
+					return "unknown";
+			}
+			break;
+		case 5:
+			switch(os_info.dwMinorVersion) {
+				case 0:
+					return "2000";
+				case 1:
+					return "XP";
+				case 2:
+					return "Server 2003";
+				default:
+					return "unknown";
+			}
+			break;
+		case 6:
+			return "Vista";
+		case 7:
+			return "7";
+		default:
+			return "unknown";
+	}
+#else
+	struct utsname uts;
+
+	uname(&uts);
+	
+	return uts.release;
+#endif
+}
+
+std::string System::GetTempDirectory()
+{
+#ifdef _WIN32
+	// DWORD length = ::GetTempPath(0, NULL);
+	
+	char buf = char[512];
+	
+	::GetTempPath(0, buf);
+	
+	return buf;
+#else
+	std::string buf;
+	
+	buf = GetEnviromentVariable("TMPDIR", "nono");
+
+	if (buf != "nono") {
+		return buf;
+	}
+
+	buf = GetEnviromentVariable("TMPDIR", "nono");
+	
+	if (buf != "nono") {
+		return buf;
+	}
+
+	return "/tmp";
+#endif
+}
+
+uint64_t System::GetDiskFreeSpace()
+{
+#ifdef _WIN32
+	ULARGE_INTEGER x, avail;
+
+	if(::GetDiskFreeSpaceEx("\\", &x, &x,	&avail) == FALSE) {
+		return 0LL;
+	}
+
+	return (uint64_t)avail.QuadPart;
+#else
+	struct statfs buf;
+
+	if(::statfs("/", &buf) != 0) {
+		return 0LL;
+	}
+
+	return (uint64_t)(buf.f_bavail) * 1024LL;
+#endif
+}
+
+int System::GetProcessorCount()
+{
+#ifdef _WIN32
+	SYSTEM_INFO si;
+
+	::GetSystemInfo(&si);
+	
+	return si.dwNumberOfProcessors;
+#else
+	// const char *info = "/proc/cpuinfo";
+
+	return 1;
+#endif
 }
 
 int System::ResetSystem()
@@ -557,3 +695,4 @@ void System::ResetProgram(std::string program, char **argv, char **envp)
 }
 		
 }
+

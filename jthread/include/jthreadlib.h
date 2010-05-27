@@ -30,6 +30,7 @@
 #include "jmutex.h"
 #include "jmutexexception.h"
 #include "jrunnable.h"
+#include "jrwlock.h"
 #include "jsemaphore.h"
 #include "jsemaphoreexception.h"
 #include "jsemaphoretimeoutexception.h"

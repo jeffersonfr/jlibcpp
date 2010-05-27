@@ -22,8 +22,6 @@
 
 #include "jmutex.h"
 
-#include "jobject.h"
-
 #ifdef _WIN32
 #else
 #include <pthread.h>
@@ -40,11 +38,12 @@ namespace jthread {
 class Condition : public virtual jcommon::Object{
 
     private:
-#ifdef _WIN32
-			HANDLE _event;
-#else
 			/** \brief Mutex */
 			Mutex _monitor;
+
+#ifdef _WIN32
+			CONDITION_VARIABLE _condition;
+#else
 			/** \brief Descritor */
 			pthread_cond_t _condition;
 #endif
