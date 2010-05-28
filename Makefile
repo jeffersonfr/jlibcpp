@@ -80,6 +80,7 @@ OBJS_jcommon = \
 	   jjson.o\
 	   jgc.o\
 	   jhtmlparser.o\
+		 jinvalidargumentexception.o\
 		 jillegalargumentexception.o\
 	   jlistener.o\
 	   jeventobject.o\
