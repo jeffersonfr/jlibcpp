@@ -17,6 +17,9 @@ OK 				= \033[30;32mOK!\033[m
 OBJS_counter = \
 	   counter.o\
 
+OBJS_buffer = \
+		buffer.o\
+
 OBJS_stress = \
 		stress.o\
 
@@ -47,14 +50,17 @@ OBJS_monitor4 = \
 OBJS_timertask = \
 		timertask.o\
 
-all: counter stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask
+all: counter buffer stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask
 
 counter: $(OBJS_counter)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
+buffer: $(OBJS_buffer)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+ 
 stress: $(OBJS_stress)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
-        
+ 
 quicksort: $(OBJS_quicksort)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
@@ -89,4 +95,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ counter stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask
+	@rm -rvf *.o *~ counter buffer stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask

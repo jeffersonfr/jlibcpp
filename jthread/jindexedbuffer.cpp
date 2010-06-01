@@ -178,22 +178,6 @@ int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 	}
 	*/
 
-#ifdef _WIN32
-	if (*pindex == _pass_index) {
-		if (*rindex > _write_index) {
-			return -1;
-		}
-
-		while (*rindex == _write_index) {
-			try {
-				_semaphore.Wait();
-			} catch (jthread::SemaphoreException &) {
-				// WARN:: return -1; ?
-			}
-		}
-	
-		AutoLock lock(&_mutex);
-#else
 	AutoLock lock(&_mutex);
 
 	if (*pindex == _pass_index) {
@@ -208,7 +192,6 @@ int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 				// WARN:: return -1; ?
 			}
 		}
-#endif
 
 		data->data = _buffer[*rindex].data;
 		data->size = _buffer[*rindex].size;
