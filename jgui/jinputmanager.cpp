@@ -651,7 +651,7 @@ void InputManager::WaitEvents()
 
 		if (i != _key_processors.end()) {
 			while ((*i).second->IsRunning() == true) {
-				Thread::Sleep(100);
+				Thread::MSleep(100);
 			}
 		}
 	}
@@ -661,7 +661,7 @@ void InputManager::WaitEvents()
 
 		if (i != _mouse_processors.end()) {
 			while ((*i).second->IsRunning() == true) {
-				Thread::Sleep(100);
+				Thread::MSleep(100);
 			}
 		}
 	}
@@ -678,8 +678,6 @@ void InputManager::Run()
 
 	while (true) {
 		DFBInputEvent event;
-
-		// DFBWindowEvent event;
 
 		// 1.3 events->WaitForEventWithTimeout(events, 0, 100);
 
@@ -797,7 +795,7 @@ void InputManager::Run()
 						}
 
 						// 1.3
-						usleep(10000);
+						Thread::MSleep(100);
 
 						DispatchKeyEvent(new KeyEvent(
 									WindowManager::GetInstance()->GetWindowInFocus(), 

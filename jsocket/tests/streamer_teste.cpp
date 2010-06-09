@@ -486,7 +486,7 @@ class Streamer: public jthread::Thread{
 				while (paused) {
 					primeiro = 0;
 
-					jthread::Thread::Sleep(100);
+					jthread::Thread::MSleep(100);
 				}
 
 				if ((r = input.Read((char *)cursor, MAX)) < 188) {

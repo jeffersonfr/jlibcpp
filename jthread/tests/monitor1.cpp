@@ -56,7 +56,7 @@ int main()
 
 	t1->Start();
 	
-	jthread::Thread::Sleep(1);
+	jthread::Thread::Sleep(1LL);
 	
 	t2->Start();
 	t3->Start();
@@ -65,7 +65,7 @@ int main()
 	t2->WaitThread();
 	t3->WaitThread();
 
-	jthread::Thread::Sleep(10);
+	jthread::Thread::Sleep(10LL);
 
 	return 0;
 }	

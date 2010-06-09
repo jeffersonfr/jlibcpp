@@ -127,9 +127,72 @@ void ToogleButton::Paint(Graphics *g)
 {
 	JDEBUG(JINFO, "paint\n");
 
-	ImageButton::Paint(g);
+	Component::Paint(g);
 
-	if(_is_pressed == true) {
+	/*
+	if (_has_focus == true) {
+		g->FillGradientRectangle(0, 0, _width, _height/2+1, 
+			_bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+		g->FillGradientRectangle(0, _height/2, _width, _height/2, 
+			_bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+	}
+	*/
+
+	int x = _horizontal_gap+_border_size,
+			y = _vertical_gap+_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y,
+			gapx = 0,
+			gapy = 0;
+	int px = x+gapx,
+			py = y+gapy,
+			pw = w-gapx,
+			ph = h-gapy;
+
+	if (GetText() == "") {
+		g->DrawImage((_has_focus == true && _image_focus_icon != NULL)?_image_focus_icon:_image_icon, px, py, pw, ph);
+	} else {
+		g->DrawImage((_has_focus == true && _image_focus_icon != NULL)?_image_focus_icon:_image_icon, px, py, ph, ph);
+
+		if (_font != NULL) {
+			if (_has_focus == true) {
+				g->SetColor(_focus_fgcolor);
+			} else {
+				g->SetColor(_fgcolor);
+			}
+
+			if (_image != "") {
+				gapx = x+ph;
+			}
+
+			px = x+gapx;
+			py = y+gapy;
+			pw = w-gapx;
+			ph = h-gapy;
+
+			x = (x < 0)?0:x;
+			y = (y < 0)?0:y;
+			w = (w < 0)?0:w;
+			h = (h < 0)?0:h;
+
+			px = (px < 0)?0:px;
+			py = (py < 0)?0:py;
+			pw = (pw < 0)?0:pw;
+			ph = (ph < 0)?0:ph;
+
+			std::string text = GetText();
+
+			if (_wrap == false) {
+				text = _font->TruncateString(text, "...", pw);
+			}
+
+			g->SetClip(0, 0, x+w, y+h);
+			g->DrawString(text, px, py, pw, ph, _halign, _valign);
+			g->SetClip(0, 0, _size.width, _size.height);
+		}
+	}
+
+	if (_is_pressed == true && _enabled == true) {
 		jcolor_t color = _bgcolor;
 
 		color.alpha = 0xa0;
@@ -138,6 +201,8 @@ void ToogleButton::Paint(Graphics *g)
 		g->SetColor(color);
 		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
+	
+	PaintEdges(g);
 }
 
 }

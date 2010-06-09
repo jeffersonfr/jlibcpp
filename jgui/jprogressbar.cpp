@@ -145,7 +145,7 @@ void ProgressBar::Run()
 			return;
 		}
 
-		jthread::Thread::Sleep(200);
+		jthread::Thread::MSleep(200);
 	}
 }
 

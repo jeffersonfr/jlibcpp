@@ -844,11 +844,17 @@ void Keyboard::BuildSmallNumericKeyboard()
 
 void Keyboard::ProcessCaps(Button *button)
 {
+	SetIgnoreRepaint(true);
+
 	for (std::vector<Button *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
 		(*i)->NextName();
 	}
+	
+	SetIgnoreRepaint(false);
 
 	button->RequestFocus();
+
+	Repaint();
 }
 
 std::string Keyboard::GetText()

@@ -219,13 +219,13 @@ bool Frame::Show(bool modal)
 		int k=0;
 
 		// TODO:: tentar esperar a saida de outra forma
-		while (_input_locked == true && k<10) {
-			jthread::Thread::Sleep(100);
+		while (_input_locked == true && k < 10) {
+			jthread::Thread::MSleep(100);
 
 			k++;
 		}
 
-		jthread::Thread::Sleep(100);
+		jthread::Thread::MSleep(100);
 
 		jthread::AutoLock lock(&_input_mutex);
 	}

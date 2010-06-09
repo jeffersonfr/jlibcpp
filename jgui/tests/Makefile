@@ -91,10 +91,13 @@ OBJS_mhp = \
 OBJS_image = \
 		image.o\
 
+OBJS_stock = \
+		stock.o\
+
 OBJS_game = \
 		game.o\
 
-all: teste skull databuffer restore raycaster_flat raycaster_texture agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image 
+all: teste skull databuffer restore raycaster_flat raycaster_texture agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image stock
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
@@ -171,6 +174,9 @@ mhp: $(OBJS_mhp)
 image: $(OBJS_image)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
+stock: $(OBJS_stock)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+        
 game: $(OBJS_game)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
         
@@ -181,4 +187,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste restore agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image
+	@rm -rvf *.o *.xml *~ teste restore agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image stock

@@ -62,7 +62,7 @@ void http_stream()
 void http_raw() {
 	std::string buffer = "GET / HTTP/1.0\r\n\r\n";
 	char receive[4098];
-	size_t length;
+	int length;
 
 	try {
 		Socket c("127.0.0.1", 80);
@@ -72,7 +72,7 @@ void http_raw() {
 		do {
 			length = c.Receive(receive, 4096);
 
-			if (length == 0) {
+			if (length <= 0) {
 				std::cerr << "Host disconnect" << std::endl;
 
 				break;

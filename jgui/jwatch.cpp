@@ -141,7 +141,7 @@ void Watch::Run()
 			}
 		}
 
-		jthread::Thread::Sleep(1000);
+		jthread::Thread::MSleep(1000);
 	}
 }
 

@@ -1,70 +1,79 @@
-// A test program: one thread inserts integers from 1 to 10000, the other reads them and prints them
 #include "jthreadlib.h"
 
-#include <stdio.h>
+#include <iostream>
 
-#define BUFFER_SIZE 16
+#define BUFFER_SIZE		1024
 
-#define OVER (-1)
+class Buffer {
 
-struct prodcons {
-  	int buffer[BUFFER_SIZE];
-	jthread::Mutex lock;
-	int readpos, writepos;
-	jthread::Condition notempty;
-	jthread::Condition notfull;	
+	private:
+		jthread::Mutex _lock;
+		jthread::Condition _empty,
+			_full;
+		char **_buffer;
+		int _index,
+				_buffer_size,
+				*_buffer_index;
+
+	public:
+		Buffer(int size = BUFFER_SIZE)
+		{
+			_buffer_size = size;
+
+			_buffer = new char*[size];
+			_buffer_index = new int[size];
+
+			Reset();
+		}
+
+		virtual ~Buffer()
+		{
+		}
+
+		void Reset()
+		{
+			_index = -1;
+		}
+
+		void Put(char *buffer, int size)
+		{
+			jthread::AutoLock l(&_lock);
+
+			while (_index == _buffer_size) {
+				_full.Wait(&_lock);
+			}
+
+			_index++;
+
+			_buffer[_index] = buffer;
+			_buffer_index[_index] = size;
+
+			_empty.Notify();
+		}
+
+		void Get(char **buffer, int *size)
+		{
+			jthread::AutoLock l(&_lock);
+
+			while (_index < 0) {
+				_empty.Wait(&_lock);
+			}
+
+			memcpy(*buffer, _buffer[_index], _buffer_index[_index]);
+
+			*size = _buffer_index[_index];
+
+			_index--;
+
+			_full.Notify();
+		}
+
 };
 
-struct prodcons buffer;
+Buffer buffer;
 
-void init(struct prodcons * b)
-{
-	b->readpos = 0;
-	b->writepos = 0;
-}
+class Producer : public jthread::Thread {
 
-void put(struct prodcons * b, int data)
-{
-	/* Wait until buffer is not full */
-	jthread::AutoLock l(&b->lock);
-
-	while ((b->writepos + 1) % BUFFER_SIZE == b->readpos) {
-		b->notfull.Wait(&b->lock);
-	}
-
-	b->buffer[b->writepos] = data;
-	b->writepos++;
-
-	if (b->writepos >= BUFFER_SIZE) {
-		b->writepos = 0;
-	}
-
-	b->notempty.Notify();
-}
-
-int get(struct prodcons * b)
-{
-	int data = 0;
-
-	jthread::AutoLock l(&b->lock);
-
-	while (b->writepos == b->readpos) {
-		b->notempty.Wait(&b->lock);
-	}
-
-	data = b->buffer[b->readpos];
-	b->readpos++;
-
-	if (b->readpos >= BUFFER_SIZE) {
-		b->readpos = 0;
-	}
-
-	b->notfull.Notify();
-
-	return data;
-}
-
-class Producer : public jthread::Thread{
 	public:
 		Producer()
 		{
@@ -76,18 +85,19 @@ class Producer : public jthread::Thread{
 
 		virtual void Run()
 		{
-			int n;
+			std::string s = "Jeff";
 
-			for (n = 0; n < 1000000; n++) {
-		  		putchar('+');
-		  		put(&buffer, n);
+			for (int n = 0; n < 1000000; n++) {
+		  		buffer.Put((char *)s.c_str(), s.size());
 			}
 
-			put(&buffer, OVER);
+			buffer.Put(NULL, 0);
 		}
+
 };
 
-class Consumer : public jthread::Thread{
+class Consumer : public jthread::Thread {
+
 	public:
 		Consumer()
 		{
@@ -99,24 +109,24 @@ class Consumer : public jthread::Thread{
 
 		virtual void Run()
 		{
-			int d;
+			char *ptr = new char[BUFFER_SIZE];
+			int size = 0;
 			
-			while (1) {
-				d = get(&buffer);
+			do {
+				buffer.Get(&ptr, &size);
+			
+				std::cout << ptr << std::flush;
+			} while (ptr != NULL);
 
-				if (d == OVER) {
-					break;
-				}
+			delete ptr;
 
-				putchar('-');
-			}
+			std::cout << "[over]" << std::endl;
 		}
+
 };
 
 int main()
 {
-	init(&buffer);
-	
 	Producer p;
 	Consumer c;
 

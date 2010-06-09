@@ -147,7 +147,7 @@ void Animation::Run()
 			_index = 0;
 		}
 
-		jthread::Thread::Sleep(_interval);
+		jthread::Thread::MSleep(_interval);
 	}
 }
 

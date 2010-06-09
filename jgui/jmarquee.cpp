@@ -135,7 +135,7 @@ void Marquee::Run()
 			}
 		}
 
-		jthread::Thread::Sleep(_interval);
+		jthread::Thread::MSleep(_interval);
 	}
 }
 
