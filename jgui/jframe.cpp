@@ -54,19 +54,15 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 
 Frame::~Frame() 
 {
-	{
-		jthread::AutoLock lock(&_input_mutex);
+	InputManager::GetInstance()->RemoveKeyListener(this);
+	InputManager::GetInstance()->RemoveMouseListener(this);
 
-		InputManager::GetInstance()->RemoveKeyListener(this);
-		InputManager::GetInstance()->RemoveMouseListener(this);
+	while (_paint_mutex.TryLock() == false) {
+		jthread::Thread::MSleep(100);
 	}
 
-	{
-		jthread::AutoLock lock(&_input_mutex);
-	}
-
-	{
-		jthread::AutoLock lock(&_paint_mutex);
+	while (_input_mutex.TryLock() == false) {
+		jthread::Thread::MSleep(100);
 	}
 }
 
@@ -198,15 +194,13 @@ void Frame::Pack(bool fit)
 
 bool Frame::Show(bool modal)
 {
+	jthread::AutoLock lock(&_input_mutex);
+
 	_is_visible = true;
 
 	DoLayout();
 
-	{
-		jthread::AutoLock lock(&_input_mutex);
-
-		Window::Show();
-	}
+	Window::Show();
 
 	if (_input_enabled == true) {
 		InputManager::GetInstance()->RegisterKeyListener(this);
@@ -214,20 +208,7 @@ bool Frame::Show(bool modal)
 	}
 
 	if (modal == true) {
-		_frame_sem.Wait();
-
-		int k=0;
-
-		// TODO:: tentar esperar a saida de outra forma
-		while (_input_locked == true && k < 10) {
-			jthread::Thread::MSleep(100);
-
-			k++;
-		}
-
-		jthread::Thread::MSleep(100);
-
-		jthread::AutoLock lock(&_input_mutex);
+		_frame_sem.Wait(&_input_mutex);
 	}
 
 	return true;
@@ -314,13 +295,13 @@ void Frame::Restore()
 
 void Frame::Paint(Graphics *g)
 {
+	jthread::AutoLock lock(&_paint_mutex);
+
 	Window::Paint(g);
 
 	if (_undecorated == true) {
 		return;
 	}
-
-	jthread::AutoLock lock(&_paint_mutex);
 
 	if (_title != "") {
 		g->SetColor(0xf0, 0xf0, 0xf0, 0x80);
