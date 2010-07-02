@@ -173,6 +173,18 @@ class InputManager : public jthread::Thread{
 		 *
 		 */
 		jkey_symbol_t TranslateToDFBKeySymbol(DFBInputDeviceKeySymbol symbol);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void ProcessInputEvent(DFBInputEvent event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void ProcessWindowEvent(DFBWindowEvent event);
 #endif
 
 	public:
