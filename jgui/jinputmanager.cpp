@@ -47,7 +47,8 @@ InputManager::InputManager()
 	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
 	IDirectFB *engine = ((IDirectFB *)dfb->GetGraphicEngine());
 
-	if (engine->CreateEventBuffer(engine, &events) != DFB_OK) {
+	if (engine->CreateInputEventBuffer(engine, DICAPS_ALL, DFB_TRUE, &events) != DFB_OK) {
+	// if (engine->CreateEventBuffer(engine, &events) != DFB_OK) {
 		events = NULL;
 	}
 #endif
@@ -686,6 +687,253 @@ void InputManager::WaitEvents()
 	}
 }
 
+#ifdef DIRECTFB_UI
+void InputManager::ProcessInputEvent(DFBInputEvent event)
+{
+	if (event.type == DIET_KEYPRESS || event.type == DIET_KEYRELEASE) {
+		jkey_type_t type;
+		jinput_modifiers_t mod;
+
+		mod = (jinput_modifiers_t)(0);
+
+		if ((event.flags & DIEF_MODIFIERS) != 0) {
+			if ((event.modifiers & DIMM_SHIFT) != 0) {
+				mod = (jinput_modifiers_t)(mod | JMOD_SHIFT);
+			} else if ((event.modifiers & DIMM_CONTROL) != 0) {
+				mod = (jinput_modifiers_t)(mod | JMOD_CONTROL);
+			} else if ((event.modifiers & DIMM_ALT) != 0) {
+				mod = (jinput_modifiers_t)(mod | JMOD_ALT);
+			} else if ((event.modifiers & DIMM_ALTGR) != 0) {
+				mod = (jinput_modifiers_t)(mod | JMOD_ALTGR);
+			} else if ((event.modifiers & DIMM_META) != 0) {
+				mod = (jinput_modifiers_t)(mod | JMOD_META);
+			} else if ((event.modifiers & DIMM_SUPER) != 0) {
+				mod = (jinput_modifiers_t)(mod | JMOD_SUPER);
+			} else if ((event.modifiers & DIMM_HYPER) != 0) {
+				mod = (jinput_modifiers_t)(mod | JMOD_HYPER);
+			}
+		}
+
+		type = (jkey_type_t)(0);
+
+		if (event.type == DIET_KEYPRESS) {
+			type = JKEY_PRESSED;
+		} else if (event.type == DIET_KEYRELEASE) {
+			type = JKEY_RELEASED;
+		}
+
+		DispatchKeyEvent(new KeyEvent(
+					WindowManager::GetInstance()->GetWindowInFocus(), 
+					type, 
+					mod, 
+					TranslateToDFBKeyCode(event.key_code), 
+					TranslateToDFBKeySymbol(event.key_symbol)
+		));
+	} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE || event.type == DIET_AXISMOTION) {
+		int mouse_z = -1,
+				count = 1;
+		jmouse_button_t button = JBUTTON_UNKNOWN;
+		jmouse_event_t type = JMOUSE_CLICKED_EVENT;
+
+		if (event.type == DIET_AXISMOTION) {
+			if (event.flags & DIEF_AXISABS) {
+				if (event.axis == DIAI_X) {
+					type = JMOUSE_MOVED_EVENT;
+					_mouse_x = event.axisabs;
+				} else if (event.axis == DIAI_Y) {
+					type = JMOUSE_MOVED_EVENT;
+					_mouse_y = event.axisabs;
+				} else if (event.axis == DIAI_Z) {
+					button = JBUTTON_WHEEL;
+					type = JMOUSE_WHEEL_EVENT;
+					mouse_z = event.axisabs;
+				}
+			} else if (event.flags & DIEF_AXISREL) {
+				if (event.axis == DIAI_X) {
+					type = JMOUSE_MOVED_EVENT;
+					_mouse_x += event.axisrel;
+				} else if (event.axis == DIAI_Y) {
+					type = JMOUSE_MOVED_EVENT;
+					_mouse_y += event.axisrel;
+				} else if (event.axis == DIAI_Z) {
+					button = JBUTTON_WHEEL;
+					type = JMOUSE_WHEEL_EVENT;
+					mouse_z += event.axisrel;
+				}
+			}
+
+			_mouse_x = CLAMP(_mouse_x, 0, _screen_width-1);
+			_mouse_y = CLAMP(_mouse_y, 0, _screen_height-1);
+			// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
+		} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE) {
+			if (event.type == DIET_BUTTONPRESS) {
+				type = JMOUSE_PRESSED_EVENT;
+			} else if (event.type == DIET_BUTTONRELEASE) {
+				type = JMOUSE_RELEASED_EVENT;
+			}
+
+			if (event.button == DIBI_LEFT) {
+				button = JBUTTON_BUTTON1;
+			} else if (event.button == DIBI_RIGHT) {
+				button = JBUTTON_BUTTON2;
+			} else if (event.button == DIBI_MIDDLE) {
+				button = JBUTTON_BUTTON3;
+			}
+		}
+
+		if (type == JMOUSE_WHEEL_EVENT) {
+			count = mouse_z + 1;
+		}
+
+		int cx = SCREEN_TO_SCALE(_mouse_x, _screen_width, _scale_width),
+				cy = SCREEN_TO_SCALE(_mouse_y, _screen_height, _scale_height);
+
+		std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
+		Window *current = NULL;
+
+		for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
+			Window *w = (*i);
+
+			if (w->IsVisible() == true) {
+				cx = SCREEN_TO_SCALE(_mouse_x, _screen_width, w->GetWorkingWidth());
+				cy = SCREEN_TO_SCALE(_mouse_y, _screen_height, w->GetWorkingHeight());
+
+				if ((cx > w->GetX() && cx < (w->GetX() + w->GetWidth()) && (cy > w->GetY() && cy < (w->GetY() + w->GetHeight())))) {
+					current = w;
+				}
+
+				break;
+			}
+		}
+
+		if (current == NULL) {
+			DispatchMouseEvent(new MouseEvent(NULL, type, button, count, cx, cy));
+		}
+	}
+}
+
+void InputManager::ProcessWindowEvent(DFBWindowEvent event)
+{
+	if (event.type == DWET_KEYDOWN || event.type == DWET_KEYUP) {
+		jkey_type_t type;
+		jinput_modifiers_t mod;
+
+		mod = (jinput_modifiers_t)(0);
+
+		if ((event.modifiers & DIMM_SHIFT) != 0) {
+			mod = (jinput_modifiers_t)(mod | JMOD_SHIFT);
+		} else if ((event.modifiers & DIMM_CONTROL) != 0) {
+			mod = (jinput_modifiers_t)(mod | JMOD_CONTROL);
+		} else if ((event.modifiers & DIMM_ALT) != 0) {
+			mod = (jinput_modifiers_t)(mod | JMOD_ALT);
+		} else if ((event.modifiers & DIMM_ALTGR) != 0) {
+			mod = (jinput_modifiers_t)(mod | JMOD_ALTGR);
+		} else if ((event.modifiers & DIMM_META) != 0) {
+			mod = (jinput_modifiers_t)(mod | JMOD_META);
+		} else if ((event.modifiers & DIMM_SUPER) != 0) {
+			mod = (jinput_modifiers_t)(mod | JMOD_SUPER);
+		} else if ((event.modifiers & DIMM_HYPER) != 0) {
+			mod = (jinput_modifiers_t)(mod | JMOD_HYPER);
+		}
+
+		type = (jkey_type_t)(0);
+
+		if (event.type == DWET_KEYDOWN) {
+			type = JKEY_PRESSED;
+		} else if (event.type == DWET_KEYUP) {
+			type = JKEY_RELEASED;
+		}
+
+		DispatchKeyEvent(new KeyEvent(
+					WindowManager::GetInstance()->GetWindowInFocus(), 
+					type, 
+					mod, 
+					TranslateToDFBKeyCode(event.key_code), 
+					TranslateToDFBKeySymbol(event.key_symbol
+						)));
+	} else if (
+			event.type == DWET_ENTER || 
+			event.type == DWET_LEAVE || 
+			event.type == DWET_BUTTONUP || 
+			event.type == DWET_BUTTONDOWN || 
+			event.type == DWET_MOTION || 
+			event.type == DWET_WHEEL) {
+		std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
+		Window *current = NULL;
+		int cx = SCREEN_TO_SCALE(event.cx, _screen_width, _scale_width),
+				cy = SCREEN_TO_SCALE(event.cy, _screen_height, _scale_height);
+		int mouse_z = -1,
+				count = 1;
+
+		for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
+			Window *w = (*i);
+
+			if (w->IsVisible() == true) {
+				cx = SCREEN_TO_SCALE(event.cx, _screen_width, w->GetWorkingWidth());
+				cy = SCREEN_TO_SCALE(event.cy, _screen_height, w->GetWorkingHeight());
+
+				if ((cx > w->GetX() && cx < (w->GetX() + w->GetWidth()) && (cy > w->GetY() && cy < (w->GetY() + w->GetHeight())))) {
+					current = w;
+				}
+
+				break;
+			}
+		}
+		
+		if (current != NULL) {
+			if (event.type == DWET_ENTER) {
+				GFXHandler::GetInstance()->SetCursor(current->GetCursor());
+			} else if (event.type == DWET_LEAVE) {
+				GFXHandler::GetInstance()->SetCursor(ARROW_CURSOR);
+			} else if (event.type == DWET_BUTTONUP || event.type == DWET_BUTTONDOWN || event.type == DWET_MOTION || event.type == DWET_WHEEL) {
+				jmouse_button_t button = JBUTTON_UNKNOWN;
+				jmouse_event_t type = JMOUSE_UNKNOWN_EVENT;
+
+				if (event.type == DWET_MOTION) {
+					type = JMOUSE_MOVED_EVENT;
+					_mouse_x = event.cx;
+					_mouse_y = event.cy;
+				} else if (event.type == DWET_WHEEL) {
+					type = JMOUSE_WHEEL_EVENT;
+					button = JBUTTON_WHEEL;
+					mouse_z = event.step;
+				} else if (event.type == DWET_BUTTONUP) {
+					type = JMOUSE_RELEASED_EVENT;
+
+					if (event.button == DIBI_LEFT) {
+						button = JBUTTON_BUTTON1;
+					} else if (event.button == DIBI_RIGHT) {
+						button = JBUTTON_BUTTON2;
+					} else if (event.button == DIBI_MIDDLE) {
+						button = JBUTTON_BUTTON3;
+					}
+				} else if (event.type == DWET_BUTTONDOWN) {
+					type = JMOUSE_PRESSED_EVENT;
+				}
+
+				if ((event.buttons & DIBM_LEFT) != 0) {
+					button = (jmouse_button_t)(button | JBUTTON_BUTTON1);
+				} else if ((event.button & DIBM_RIGHT) != 0) {
+					button = (jmouse_button_t)(button | JBUTTON_BUTTON2);
+				} else if ((event.button & DIBI_MIDDLE) != 0) {
+					button = (jmouse_button_t)(button | JBUTTON_BUTTON3);
+				}
+
+				_mouse_x = CLAMP(_mouse_x, 0, _screen_width-1);
+				_mouse_y = CLAMP(_mouse_y, 0, _screen_height-1);
+				// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
+
+				if (type == JMOUSE_WHEEL_EVENT) {
+					count = mouse_z + 1;
+				}
+
+				DispatchMouseEvent(new MouseEvent(current, type, button, count, cx, cy));
+			} 
+		}
+	}
+}
+#endif
+
 void InputManager::Run()
 {
 #ifdef DIRECTFB_UI
@@ -696,152 +944,25 @@ void InputManager::Run()
 	// 1.3 IDirectFB *engine = (IDirectFB *)GFXHandler::GetInstance()->GetGraphicEngine();
 
 	while (true) {
-		DFBWindowEvent event;
+		events->WaitForEventWithTimeout(events, 0, 100);
 
-		events->WaitForEventWithTimeout(events, 0, 10);
+		while (events->HasEvent(events) == DFB_OK) {
+			DFBInputEvent ievent;
 
-		while (events->GetEvent(events, DFB_EVENT(&event)) == DFB_OK) {
-			// 1.3 engine->WaitIdle(engine);
+			events->PeekEvent(events, DFB_EVENT(&ievent));
 
-			if (event.type == DWET_KEYDOWN || event.type == DWET_KEYUP) {
-				jkey_type_t type;
-				jinput_modifiers_t mod;
+			if (ievent.clazz == DFEC_INPUT) {
+				DFBInputEvent event;
 
-				mod = (jinput_modifiers_t)(0);
+				events->GetEvent(events, DFB_EVENT(&event));
 
-				if ((event.modifiers & DIMM_SHIFT) != 0) {
-					mod = (jinput_modifiers_t)(mod | JMOD_SHIFT);
-				} else if ((event.modifiers & DIMM_CONTROL) != 0) {
-					mod = (jinput_modifiers_t)(mod | JMOD_CONTROL);
-				} else if ((event.modifiers & DIMM_ALT) != 0) {
-					mod = (jinput_modifiers_t)(mod | JMOD_ALT);
-				} else if ((event.modifiers & DIMM_ALTGR) != 0) {
-					mod = (jinput_modifiers_t)(mod | JMOD_ALTGR);
-				} else if ((event.modifiers & DIMM_META) != 0) {
-					mod = (jinput_modifiers_t)(mod | JMOD_META);
-				} else if ((event.modifiers & DIMM_SUPER) != 0) {
-					mod = (jinput_modifiers_t)(mod | JMOD_SUPER);
-				} else if ((event.modifiers & DIMM_HYPER) != 0) {
-					mod = (jinput_modifiers_t)(mod | JMOD_HYPER);
-				}
+				ProcessInputEvent(event);
+			} else if (ievent.clazz == DFEC_WINDOW) {
+				DFBWindowEvent event;
 
-				type = (jkey_type_t)(0);
+				events->GetEvent(events, DFB_EVENT(&event));
 
-				if (event.type == DWET_KEYDOWN) {
-					type = JKEY_PRESSED;
-				} else if (event.type == DWET_KEYUP) {
-					type = JKEY_RELEASED;
-				}
-
-				DispatchKeyEvent(new KeyEvent(
-							WindowManager::GetInstance()->GetWindowInFocus(), 
-							type, 
-							mod, 
-							TranslateToDFBKeyCode(event.key_code), 
-							TranslateToDFBKeySymbol(event.key_symbol
-								)));
-			} else if (
-					event.type == DWET_ENTER || 
-					event.type == DWET_LEAVE || 
-					event.type == DWET_BUTTONUP || 
-					event.type == DWET_BUTTONDOWN || 
-					event.type == DWET_MOTION || 
-					event.type == DWET_WHEEL) {
-				std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
-				Window *current = NULL;
-				int cx = SCREEN_TO_SCALE(event.cx, _screen_width, _scale_width),
-						cy = SCREEN_TO_SCALE(event.cy, _screen_height, _scale_height);
-				int mouse_z = -1,
-						count = 1;
-
-				for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
-					Window *w = (*i);
-
-					if (w->IsVisible() == true) {
-						cx = SCREEN_TO_SCALE(event.cx, _screen_width, w->GetWorkingWidth());
-						cy = SCREEN_TO_SCALE(event.cy, _screen_height, w->GetWorkingHeight());
-
-						if ((cx > w->GetX() && cx < (w->GetX() + w->GetWidth()) && (cy > w->GetY() && cy < (w->GetY() + w->GetHeight())))) {
-							current = w;
-						}
-
-						break;
-					}
-				}
-
-				if (current != NULL) {
-					if (event.type == DWET_ENTER) {
-						GFXHandler::GetInstance()->SetCursor(current->GetCursor());
-					} else if (event.type == DWET_LEAVE) {
-						GFXHandler::GetInstance()->SetCursor(ARROW_CURSOR);
-					} else if (event.type == DWET_BUTTONUP || event.type == DWET_BUTTONDOWN || event.type == DWET_MOTION || event.type == DWET_WHEEL) {
-						jmouse_button_t button = JBUTTON_UNKNOWN;
-						jmouse_event_t type = JMOUSE_UNKNOWN_EVENT;
-
-						if (event.type == DWET_MOTION) {
-							type = JMOUSE_MOVED_EVENT;
-							_mouse_x = event.cx;
-							_mouse_y = event.cy;
-						} else if (event.type == DWET_WHEEL) {
-							type = JMOUSE_WHEEL_EVENT;
-							button = JBUTTON_WHEEL;
-							mouse_z = event.step;
-						} else if (event.type == DWET_BUTTONUP) {
-							type = JMOUSE_RELEASED_EVENT;
-
-							if (event.button == DIBI_LEFT) {
-								button = JBUTTON_BUTTON1;
-							} else if (event.button == DIBI_RIGHT) {
-								button = JBUTTON_BUTTON2;
-							} else if (event.button == DIBI_MIDDLE) {
-								button = JBUTTON_BUTTON3;
-							}
-						} else if (event.type == DWET_BUTTONDOWN) {
-							type = JMOUSE_PRESSED_EVENT;
-						}
-
-						if ((event.buttons & DIBM_LEFT) != 0) {
-							button = (jmouse_button_t)(button | JBUTTON_BUTTON1);
-						} else if ((event.button & DIBM_RIGHT) != 0) {
-							button = (jmouse_button_t)(button | JBUTTON_BUTTON2);
-						} else if ((event.button & DIBI_MIDDLE) != 0) {
-							button = (jmouse_button_t)(button | JBUTTON_BUTTON3);
-						}
-
-						_mouse_x = CLAMP(_mouse_x, 0, _screen_width-1);
-						_mouse_y = CLAMP(_mouse_y, 0, _screen_height-1);
-						// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
-
-						if (type == JMOUSE_WHEEL_EVENT) {
-							count = mouse_z + 1;
-						}
-
-						DispatchMouseEvent(new MouseEvent(current, type, button, count, cx, cy));
-					} 
-				}
-
-				/*
-				int cx = SCREEN_TO_SCALE(_mouse_x, _screen_width, _scale_width),
-						cy = SCREEN_TO_SCALE(_mouse_y, _screen_height, _scale_height);
-
-				std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
-				Window *current = NULL;
-
-				for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
-					Window *w = (*i);
-
-					if (w->IsVisible() == true) {
-						cx = SCREEN_TO_SCALE(_mouse_x, _screen_width, w->GetWorkingWidth());
-						cy = SCREEN_TO_SCALE(_mouse_y, _screen_height, w->GetWorkingHeight());
-
-						if ((cx > w->GetX() && cx < (w->GetX() + w->GetWidth()) && (cy > w->GetY() && cy < (w->GetY() + w->GetHeight())))) {
-							current = w;
-						}
-
-						break;
-					}
-				}
-				*/
+				ProcessWindowEvent(event);
 			}
 		}
 	}
