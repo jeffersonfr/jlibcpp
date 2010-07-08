@@ -190,6 +190,13 @@ void Properties::Load(std::string filename_, std::string escape_)
 					prop.comment = false;
 
 					properties.push_back(prop);
+			} else {
+				struct jproperty_t prop;
+	
+				prop.value = line;
+				prop.comment = true;
+					
+				properties.push_back(prop);
 			}
 		}
 	}
