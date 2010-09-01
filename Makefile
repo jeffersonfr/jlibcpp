@@ -374,18 +374,18 @@ doc:
 
 install: uninstall
 	@echo -e "Instaling include files in $(PREFIX)/include/$(MODULE)" && mkdir -p $(PREFIX)/include/$(MODULE) && echo -e "$(OK)"
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jcommon && install -o nobody -m 644 jcommon/include/* /usr/local/include/jlibcpp/jcommon
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jgui && install -o nobody -m 644 jgui/include/* /usr/local/include/jlibcpp/jgui
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jimage && install -o nobody -m 644 jimage/include/* /usr/local/include/jlibcpp/jimage
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jio && install -o nobody -m 644 jio/include/* /usr/local/include/jlibcpp/jio
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jlogger && install -o nobody -m 644 jlogger/include/* /usr/local/include/jlibcpp/jlogger
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jmpeg && install -o nobody -m 644 jmpeg/include/* /usr/local/include/jlibcpp/jmpeg
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jshared && install -o nobody -m 644 jshared/include/* /usr/local/include/jlibcpp/jshared
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jsocket && install -o nobody -m 644 jsocket/include/* /usr/local/include/jlibcpp/jsocket
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jthread && install -o nobody -m 644 jthread/include/* /usr/local/include/jlibcpp/jthread
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jmath && install -o nobody -m 644 jmath/include/* /usr/local/include/jlibcpp/jmath
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jresource && install -o nobody -m 644 jresource/include/* /usr/local/include/jlibcpp/jresource
-	@install -d -o nobody -m 755 /usr/local/include/jlibcpp/jsecurity && install -o nobody -m 644 jsecurity/include/* /usr/local/include/jlibcpp/jsecurity
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jcommon && install -o nobody -m 644 jcommon/include/* $(PREFIX)/include/jlibcpp/jcommon
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jgui && install -o nobody -m 644 jgui/include/* $(PREFIX)/include/jlibcpp/jgui
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jimage && install -o nobody -m 644 jimage/include/* $(PREFIX)/include/jlibcpp/jimage
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jio && install -o nobody -m 644 jio/include/* $(PREFIX)/include/jlibcpp/jio
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jlogger && install -o nobody -m 644 jlogger/include/* $(PREFIX)/include/jlibcpp/jlogger
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jmpeg && install -o nobody -m 644 jmpeg/include/* $(PREFIX)/include/jlibcpp/jmpeg
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jshared && install -o nobody -m 644 jshared/include/* $(PREFIX)/include/jlibcpp/jshared
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jsocket && install -o nobody -m 644 jsocket/include/* $(PREFIX)/include/jlibcpp/jsocket
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jthread && install -o nobody -m 644 jthread/include/* $(PREFIX)/include/jlibcpp/jthread
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jmath && install -o nobody -m 644 jmath/include/* $(PREFIX)/include/jlibcpp/jmath
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jresource && install -o nobody -m 644 jresource/include/* $(PREFIX)/include/jlibcpp/jresource
+	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jsecurity && install -o nobody -m 644 jsecurity/include/* $(PREFIX)/include/jlibcpp/jsecurity
 	@echo -e "Instaling $(EXE) in $(PREFIX)/lib/lib$(MODULE).so $(OK)"
 	@install -o nobody -m 644 $(LIBDIR)/$(EXE) $(PREFIX)/lib && ln -s $(PREFIX)/lib/$(EXE) $(PREFIX)/lib/lib$(MODULE).so
 	@echo -e "Instaling $(MODULE).pc in $(PREFIX)/lib/pkgconfig $(OK)"
