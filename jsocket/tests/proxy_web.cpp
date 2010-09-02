@@ -19,8 +19,15 @@
  *             - add an option to supply an access log with hostnames and requests
  */
 
-#include "jsocketlib.h"
+#include "jserversocket.h"
+#include "jsocket.h"
+#include "jsocketexception.h"
 #include "jthreadlib.h"
+#include "jthread.h"
+#include "jsemaphoretimeoutexception.h"
+#include "jautolock.h"
+
+#include <iostream>
 
 #include <stdio.h>
 #include <stdlib.h>

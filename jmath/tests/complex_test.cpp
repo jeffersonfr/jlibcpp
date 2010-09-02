@@ -1,4 +1,8 @@
-#include "jmathlib.h"
+#include "jcomplex.h"
+
+#include <iostream>
+
+#include <stdlib.h>
 
 int main( int argc, char **argv )
 {

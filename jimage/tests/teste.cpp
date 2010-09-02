@@ -1,5 +1,10 @@
-#include "jimagelib.h"
-#include "jcommonlib.h"
+#include "jbitmap.h"
+#include "jruntimeexception.h"
+
+#include <iostream>
+
+#include <string.h>
+#include <stdlib.h>
 
 #define zero_rep_stosl(dest, count)	\
 	__asm__ __volatile__ (						\

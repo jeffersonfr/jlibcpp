@@ -1,4 +1,4 @@
-#include "jsharedlib.h"
+#include "jmemorymap.h"
 
 #include <iostream>
 

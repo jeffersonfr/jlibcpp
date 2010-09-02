@@ -1,4 +1,4 @@
-#include "jsharedlib.h"
+#include "jwrapperprocess.h"
 
 #include <iostream>
 

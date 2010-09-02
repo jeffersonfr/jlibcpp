@@ -1,3 +1,4 @@
+#include "jdatagramsocket.h"
 #include "jsocketlib.h"
 
 #include <iostream>

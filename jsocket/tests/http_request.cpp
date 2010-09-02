@@ -1,5 +1,9 @@
+#include "jsocket.h"
+#include "jsocketexception.h"
+#include "junknownhostexception.h"
+#include "jthread.h"
+#include "jstringtokenizer.h"
 #include "jsocketlib.h"
-#include "jcommonlib.h"
 
 #include <sstream>
 #include <iostream>

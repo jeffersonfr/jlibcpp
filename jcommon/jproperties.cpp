@@ -18,9 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jcommonlib.h"
-#include "jiolib.h"
-#include "jthreadlib.h"
+#include "jproperties.h"
+#include "jstringutils.h"
+#include "jstringtokenizer.h"
+#include "jautolock.h"
+#include "jfileinputstream.h"
+#include "jbufferedreader.h"
+#include "jruntimeexception.h"
+#include "jillegalargumentexception.h"
 
 namespace jcommon {
 

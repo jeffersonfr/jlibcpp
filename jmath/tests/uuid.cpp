@@ -27,7 +27,7 @@
 **  uuid_cli.c: command line tool
 */
 
-#include "jmathlib.h"
+#include "juuid.h"
 
 #include <errno.h>
 

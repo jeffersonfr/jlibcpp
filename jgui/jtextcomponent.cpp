@@ -18,7 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jguilib.h"
+#include "jtextcomponent.h"
+#include "joutofboundsexception.h"
+#include "jstringutils.h"
 
 namespace jgui {
 
@@ -118,7 +120,7 @@ void TextComponent::Select(int start, int end)
 {
 	// WARNNING:: no caso de nao haver texto esse metodo irah lancar excecao
 	if ((start < 0 || start >= (int)_text.size()) || (end <= start || end > (int)_text.size())) {
-		throw jcommon::RuntimeException("Index out of range");
+		throw jcommon::OutOfBoundsException("Index out of range");
 	}
 
 	_selection_start = start;

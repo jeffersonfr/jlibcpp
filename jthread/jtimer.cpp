@@ -18,7 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jthreadlib.h"
+#include "jtimer.h"
+#include "jsemaphoretimeoutexception.h"
 
 static bool tasks_compare(jthread::TimerTask *a, jthread::TimerTask *b) 
 {

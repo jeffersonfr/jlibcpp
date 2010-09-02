@@ -20,25 +20,4 @@
 #ifndef J_THREADLIB_H
 #define J_THREADLIB_H
 
-#include "jautolock.h"
-#include "jbufferexception.h"
-#include "jcondition.h"
-#include "jevent.h"
-#include "jillegalstateexception.h"
-#include "jindexedbuffer.h"
-#include "jmonitor.h"
-#include "jmutex.h"
-#include "jmutexexception.h"
-#include "jrunnable.h"
-#include "jrwlock.h"
-#include "jsemaphore.h"
-#include "jsemaphoreexception.h"
-#include "jsemaphoretimeoutexception.h"
-#include "jspinlock.h"
-#include "jthread.h"
-#include "jthreadexception.h"
-#include "jthreadgroup.h"
-#include "jthreadpool.h"
-#include "jtimer.h"
-
 #endif

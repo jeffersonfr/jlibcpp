@@ -1,4 +1,7 @@
-#include "jmathlib.h"
+#include "jmath.h"
+#include "jmatrix.h"
+
+#include <iostream>
 
 using namespace jmath;
 using namespace std;

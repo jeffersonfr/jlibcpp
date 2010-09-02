@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsharedlib.h"
-#include "jthreadlib.h"
+#include "jsharedsemaphore.h"
+#include "jsemaphoreexception.h"
 
 namespace jshared {
 

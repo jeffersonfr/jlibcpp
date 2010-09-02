@@ -1,3 +1,6 @@
+#include "jdatagramsocket.h"
+#include "jsocketexception.h"
+#include "jsockettimeoutexception.h"
 #include "jsocketlib.h"
 
 #include <iostream>

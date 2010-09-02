@@ -1,4 +1,6 @@
-#include "jsharedlib.h"
+#include "jsharedfifo.h"
+
+#include <iostream>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,7 +13,7 @@ struct priv {
    int counter;
 };
 
-jshared::SharedFifo *fifo;
+jshared::SharedFifo *fifo = NULL;
 
 void fifo_teste() 
 {

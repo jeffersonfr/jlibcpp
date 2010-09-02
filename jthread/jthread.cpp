@@ -18,7 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jthreadlib.h"
+#include "jthread.h"
+#include "jthreadgroup.h"
+#include "jthreadexception.h"
+#include "jautolock.h"
 
 namespace jthread {
 

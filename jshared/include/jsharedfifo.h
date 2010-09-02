@@ -24,6 +24,8 @@
 
 #include <iostream>
 
+#include <sys/ipc.h>
+#include <sys/shm.h>
 #include <stdint.h>
 
 namespace jshared {
@@ -54,7 +56,7 @@ struct jshmbh_t {
  */
 class SharedFifo : public virtual jcommon::Object{
 
-    private:
+	private:
 		struct jshmhandle_t *_shm;
 
 		/**
@@ -99,18 +101,18 @@ class SharedFifo : public virtual jcommon::Object{
 		 */
 		void Unlock();
 
-    public:
+	public:
 		/**
 		 * \brief Constructor. 
 		 *
 		 */
 #ifdef _WIN32
-        SharedFifo(int key_, int npages_, int struct_size_);
+		SharedFifo(int key_, int npages_, int struct_size_);
 #else
-        SharedFifo(key_t key_, int npages_, int struct_size_);
+		SharedFifo(key_t key_, int npages_, int struct_size_);
 #endif
 	
-        /**
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
@@ -172,6 +174,6 @@ class SharedFifo : public virtual jcommon::Object{
 		
 };
 
-};
+}
 
 #endif

@@ -1,4 +1,6 @@
-#include "jsharedlib.h"
+#include "jmessagequeue.h"
+
+#include <iostream>
 
 #include <stdlib.h>
 #include <string.h>

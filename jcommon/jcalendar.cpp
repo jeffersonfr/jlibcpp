@@ -18,7 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jcommonlib.h"
+#include "jcalendar.h"
+#include "jillegalargumentexception.h"
 
 namespace jcommon {
 	
@@ -232,7 +233,7 @@ bool Calendar::Equals(Object *o)
 int Calendar::Compare(Object *o)
 {
 	if (o->InstanceOf("jcommon::Calendar") == false) {
-		throw RuntimeException("Compare with Incompatible types");
+		throw IllegalArgumentException("Compare with Incompatible types");
 	}
 
 	Calendar *date = (Calendar *)o;

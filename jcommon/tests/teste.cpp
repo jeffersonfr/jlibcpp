@@ -1,4 +1,15 @@
-#include "jcommonlib.h"
+#include "jsystem.h"
+#include "jurl.h"
+#include "jdate.h"
+#include "jproperties.h"
+#include "jxmlparser.h"
+#include "jhtmlparser.h"
+#include "jstringutils.h"
+#include "jstringtokenizer.h"
+#include "jdynamiclink.h"
+#include "joptions.h"
+
+#include <iostream>
 
 namespace teste {
 	

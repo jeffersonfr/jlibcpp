@@ -1,4 +1,7 @@
-#include "jmpeglib.h"
+#include "jtransportstreampacket.h"
+#include "jprogramassociationsection.h"
+#include "jprogrammapsection.h"
+#include "jruntimeexception.h"
 
 #include <iostream>
 #include <map>
@@ -61,7 +64,7 @@ class Controller {
 		_source = source;
 		
 		if (_source == NULL) {
-			throw std::runtime_error("Data source null pointer !");
+			throw jcommon::RuntimeException("Data source null pointer !");
 		}
 	}
 	

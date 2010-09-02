@@ -20,9 +20,8 @@
 #ifndef J_MONITOR_H
 #define J_MONITOR_H
 
-#include "jthread.h"
 #include "jmutex.h"
-#include "jsemaphore.h"
+#include "jcondition.h"
 
 #include <map>
 
@@ -60,7 +59,7 @@ class Monitor {
 		 * \brief
 		 *
 		 */
-		Monitor(const Monitor&);
+		// Monitor(const Monitor&);
 		
 		/** 
 		 * \brief
@@ -79,7 +78,7 @@ class Monitor {
 		 * \brief Creates a Monitor Object.
 		 *
 		 */
-		explicit Monitor();
+		Monitor();
 
 		/**
 		 * \brief Destroys a Monitor object.
@@ -138,5 +137,4 @@ class Monitor {
 }
 
 #endif
-
 

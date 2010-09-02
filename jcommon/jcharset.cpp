@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jcommonlib.h"
+#include "jcharset.h"
 
 static const uint64_t ReplacementChar = 0x0000FFFDUL;
 static const uint64_t MaximumChar     = 0x7FFFFFFFUL;

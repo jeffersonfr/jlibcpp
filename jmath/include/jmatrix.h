@@ -3041,7 +3041,7 @@ template<class T> T NormInf(const Matrix<T> &M)
 
 	for (int i=rlo; i<=rhi; i++) 
 		for (int j=clo; j<=chi; j++) 
-			if (abs(v[i][j] > max)) 
+			if (abs(v[i][j]) > max) 
 				max = abs(v[i][j]);
 	
 	return max;

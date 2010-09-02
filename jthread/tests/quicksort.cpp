@@ -4,7 +4,7 @@
  *  Adaptado por Jeff
  */
 
-#include "jthreadlib.h"
+#include "jthread.h"
 
 #include <iostream>
 

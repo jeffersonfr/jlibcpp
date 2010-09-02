@@ -1,5 +1,12 @@
-#include "jiolib.h"
-#include "jcommonlib.h"
+#include "jfileinputstream.h"
+#include "jfileoutputstream.h"
+#include "jobjectinputstream.h"
+#include "jobjectoutputstream.h"
+#include "jserializable.h"
+#include "jjson.h"
+
+#include <iostream>
+#include <sstream>
 
 using namespace std;
 using namespace jio;

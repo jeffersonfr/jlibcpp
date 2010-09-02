@@ -18,8 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jmathlib.h"
-#include "jthreadlib.h"
+#include "juuid.h"
+#include "jmd5.h"
+#include "jsha1.h"
+#include "jthread.h"
 
 #if HAVE_LONG_LONG
 #define LLONG long long

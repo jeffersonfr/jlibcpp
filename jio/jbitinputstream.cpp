@@ -18,8 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jiolib.h"
-#include "jcommonlib.h"
+#include "jbitinputstream.h"
+#include "jfileinputstream.h"
+#include "jioexception.h"
+#include "joutofboundsexception.h"
 
 namespace jio {
 

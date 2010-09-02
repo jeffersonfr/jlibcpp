@@ -18,7 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsharedlib.h"
+#include "jsharedfifo.h"
+#include "jfifoexception.h"
 
 namespace jshared {
 

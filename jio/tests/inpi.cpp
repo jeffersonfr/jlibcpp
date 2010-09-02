@@ -1,5 +1,11 @@
-#include "jiolib.h"
-#include "jcommonlib.h"
+#include "jfileinputstream.h"
+#include "jfileoutputstream.h"
+#include "jbufferedreader.h"
+#include "jruntimeexception.h"
+#include "joptions.h"
+
+#include <iostream>
+#include <string>
 
 using namespace std;
 using namespace jio;

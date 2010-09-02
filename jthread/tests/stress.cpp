@@ -1,7 +1,8 @@
 /**
  *	compile: g++ teste.cpp -o teste -L. -ljthread -lpthread
  */
-#include "jthreadlib.h"
+#include "jthread.h"
+#include "jdate.h"
 
 #include <iostream>
 

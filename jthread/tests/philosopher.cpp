@@ -1,4 +1,5 @@
-#include "jthreadlib.h"
+#include "jthread.h"
+#include "jsemaphore.h"
 
 #include <iostream>
 #include <string>

@@ -20,13 +20,4 @@
 #ifndef J_IMAGELIB_H
 #define J_IMAGELIB_H
 
-#include "jbitmap.h"
-// #include "jbufferedimage.h"
-// #include "jgif.h"
-#include "jimage.h"
-#include "jimageexception.h"
-// #include "jjpg.h"
-// #include "jpng.h"
-// #include "jppm.h"
-
 #endif

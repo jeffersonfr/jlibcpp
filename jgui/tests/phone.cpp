@@ -18,7 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "phone.h"
-#include "jcommonlib.h"
+#include "jkeyboard.h"
+#include "jmessagedialogbox.h"
+#include "jyesnodialogbox.h"
+#include "jxmlparser.h"
 
 namespace phone {
 

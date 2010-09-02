@@ -1,3 +1,5 @@
+#include "jrawsocket.h"
+#include "jsocketexception.h"
 #include "jsocketlib.h"
 
 #include <iostream>

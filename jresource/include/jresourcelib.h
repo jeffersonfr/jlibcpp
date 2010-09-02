@@ -20,11 +20,4 @@
 #ifndef J_RESOURCElIB_H
 #define J_RESOURCELIB_H
 
-#include "jresourceclient.h"
-#include "jresourceexception.h"
-#include "jresourceproxy.h"
-#include "jresourceserver.h"
-#include "jresourcestatusevent.h"
-#include "jresourcestatuslistener.h"
-
 #endif

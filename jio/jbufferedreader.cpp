@@ -18,7 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jiolib.h"
+#include "jbufferedreader.h"
+#include "jioexception.h"
 
 #define LINE_SIZE	1024
 

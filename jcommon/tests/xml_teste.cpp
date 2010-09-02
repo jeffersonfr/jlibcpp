@@ -1,4 +1,4 @@
-#include "jcommonlib.h"
+#include "jxmlparser.h"
 
 #if defined( WIN32 ) && defined( TUNE )
 #include <crtdbg.h>

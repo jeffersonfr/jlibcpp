@@ -1,4 +1,4 @@
-#include "jcommonlib.h"
+#include "junit.h"
 
 using namespace jcommon;
 

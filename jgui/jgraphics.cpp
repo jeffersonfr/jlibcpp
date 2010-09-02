@@ -18,8 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jguilib.h"
-#include "jmathlib.h"
+#include "jgraphics.h"
+#include "jmath.h"
+#include "jstringtokenizer.h"
+#include "joffscreenimage.h"
+#include "jgfxhandler.h"
+#include "jfont.h"
+#include "jstringutils.h"
 
 namespace jgui {
 

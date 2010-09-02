@@ -8,8 +8,9 @@
  *
  */
 
-#include "jsocketlib.h"
+#include "jsslsocket.h"
 
+#include <iostream>
 #include <string>
 
 #include <stdio.h>

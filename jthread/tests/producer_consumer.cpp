@@ -1,6 +1,11 @@
-#include "jthreadlib.h"
+#include "jthread.h"
+#include "jmutex.h"
+#include "jcondition.h"
+#include "jautolock.h"
 
 #include <iostream>
+
+#include <string.h>
 
 #define BUFFER_SIZE		1024
 

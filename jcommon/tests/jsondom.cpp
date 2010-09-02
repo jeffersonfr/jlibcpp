@@ -1,5 +1,10 @@
-#include "jcommonlib.h"
+#include "jjson.h"
 
+#include <iostream>
+
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>

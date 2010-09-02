@@ -18,7 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jloggerlib.h"
+#include "jloggermanager.h"
+#include "jconsolehandler.h"
+#include "jsimpleformatter.h"
 
 namespace jlogger {
 

@@ -18,8 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jguilib.h"
-#include "jcommonlib.h"
+#include "jcheckbutton.h"
+#include "jcheckbuttonlistener.h"
+#include "jdebug.h"
 
 namespace jgui {
 

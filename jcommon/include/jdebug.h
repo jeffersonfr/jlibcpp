@@ -17,7 +17,30 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_IOLIB_H
-#define J_IOLIB_H
+#ifndef J_DEBUG_H
+#define J_DEBUG_H
+
+#define JINFO	1
+#define JWARN	2
+#define JERRO	3
+
+#ifdef JDEBUG_ENABLED
+
+#define JDEBUG(t, args...) 																																				\
+	if (t == JINFO) {																																								\
+		printf ("\033[37;40mINFO:: %s:%d [%s] \033[37;40m", __FILE__, __LINE__, __PRETTY_FUNCTION__);	\
+	} else if (t == JWARN) {																																				\
+		printf ("\033[33;40mWARN:: %s:%d [%s] \033[37;40m", __FILE__, __LINE__, __PRETTY_FUNCTION__);	\
+	} else if (t == JERRO) {																																				\
+		printf ("\033[31;40mERRO:: %s:%d [%s] \033[37;40m", __FILE__, __LINE__, __PRETTY_FUNCTION__);	\
+	}																																																\
+	printf(args);																																										\
+	fflush(stdin);																																									\
+
+#else
+
+#define JDEBUG(...) while (0) {}																																	\
+
+#endif
 
 #endif

@@ -17,7 +17,15 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jguilib.h"
+#include "jframe.h"
+#include "jbutton.h"
+#include "jlabel.h"
+#include "jbuttonlistener.h"
+#include "jcardlayout.h"
+#include "jgridlayout.h"
+#include "jborderlayout.h"
+#include "jnulllayout.h"
+#include "jflowlayout.h"
 
 /**
  * \brief Ajuste o PreferredSize() caso deseje um nivel diferente de adaptacao dos layouts.

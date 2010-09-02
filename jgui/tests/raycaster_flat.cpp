@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jguilib.h"
+#include "jframe.h"
 
 #define mapWidth 24
 #define mapHeight 24

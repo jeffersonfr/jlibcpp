@@ -18,8 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jimagelib.h"
-#include "jiolib.h"
+#include "jbitmap.h"
+#include "jfileinputstream.h"
+#include "jfileoutputstream.h"
+#include "jioexception.h"
+#include "jruntimeexception.h"
 
 namespace jimage {
 

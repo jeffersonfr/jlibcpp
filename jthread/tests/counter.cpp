@@ -1,4 +1,6 @@
-#include "jthreadlib.h"
+#include "jthread.h"
+#include "jsemaphore.h"
+#include "jmutex.h"
 
 #include <iostream>
 

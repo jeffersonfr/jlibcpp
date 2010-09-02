@@ -18,7 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsocketlib.h"
+#include "jdatagramsocket.h"
+#include "jsocketexception.h"
+#include "jsockettimeoutexception.h"
+#include "jsocketstreamexception.h"
+#include "junknownhostexception.h"
 
 namespace jsocket {
 

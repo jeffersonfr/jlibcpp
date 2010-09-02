@@ -1,3 +1,5 @@
+#include "jserversocket.h"
+#include "jsocket.h"
 #include "jsocketlib.h"
 
 #include <iostream>

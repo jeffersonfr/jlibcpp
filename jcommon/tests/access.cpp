@@ -1,4 +1,6 @@
-#include "jcommonlib.h"
+#include "jpolicies.h"
+
+#include <iostream>
 
 int main() 
 {

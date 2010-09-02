@@ -1,5 +1,10 @@
-#include "jimagelib.h"
-#include "jcommonlib.h"
+#include "jbitmap.h"
+#include "jruntimeexception.h"
+
+#include <iostream>
+
+#include <string.h>
+#include <stdlib.h>
 
 #define MAX_LOOP	120
 

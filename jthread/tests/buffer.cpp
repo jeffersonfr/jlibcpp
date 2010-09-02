@@ -1,5 +1,5 @@
-#include "jthreadlib.h"
-#include "jsocketlib.h"
+#include "jindexedbuffer.h"
+#include "jsocket.h"
 
 #define MAX_CLIENTS		1000
 

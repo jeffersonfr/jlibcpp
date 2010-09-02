@@ -1,9 +1,14 @@
 // Exemplo adaptado do streamer feito por <Marcos Vasconcelos> (marcovas@lavid.ufpb.br)
 
+#include "jdatagramsocket.h"
+#include "jconnectionpipe.h"
+#include "jprogramassociationsection.h"
+#include "jprogrammapsection.h"
+#include "jtransportstreampacket.h"
+#include "jfile.h"
+#include "jfileinputstream.h"
+#include "jdate.h"
 #include "jsocketlib.h"
-#include "jiolib.h"
-#include "jcommonlib.h"
-#include "jmpeglib.h"
 
 #include <iostream>
 #include <vector>
@@ -635,14 +640,14 @@ void frame_rate(std::string iFile, std::string address, int port, bool loop)
 
 void fixed_rate(std::string filename, std::string host, int port, uint32_t taxa)
 {
-	long long tempoini,
+	uint64_t tempoini,
 		 tempocor,
 		 tempoesp,
 		 count = 0LL,
-		 rate = (long long)(taxa/8.1);
+		 rate = (long long)(taxa/8);
 	int r;
 
-	if (rate <= 0) {
+	if (rate <= 0LL) {
 		std::cout << "Incorrent rate" << std::endl;
 
 		exit(0);
@@ -650,35 +655,33 @@ void fixed_rate(std::string filename, std::string host, int port, uint32_t taxa)
 
 	tempoini = jcommon::Date::CurrentTimeMicros();
 
-	InitWindowsSocket();
-
 	try {
 		DatagramSocket s(host, port, false, 0, 65535, 1500);
 		OutputStream *o = s.GetOutputStream();
 		FileInputStream file(filename);
-		char receive[1500];
+		char receive[65535];
 
 		std::cout << "Streamming " << filename << std::endl;
 
 		do {
 			r = file.Read(receive, 1500);
 
-			count += r;
-
 			if (r <= 0) {
 				break;
 			}
+			
+			count += (int64_t)r;
 
 			o->Write(receive, r);
 
-			tempoesp = (long long)(tempoini+(long long)((1000LL*count)/rate));
+			tempoesp = (uint64_t)(tempoini+(uint64_t)((1000000LL*count)/rate));
 			tempocor = jcommon::Date::CurrentTimeMicros(); 
 
 			if (tempoesp > tempocor) {
-				jthread::Thread::USleep((uint32_t)(tempoesp-tempocor));
+				jthread::Thread::USleep((uint64_t)(tempoesp-tempocor));
 			}
 
-			std::cout << (count*8000LL)/(tempocor-tempoini) << " bits/sec\r" << std::flush;
+			std::cout << (count*8000000LL)/(tempocor-tempoini) << " bits/sec\r" << std::flush;
 		} while (r != 0);
 
 		s.Close();
@@ -723,7 +726,7 @@ int main(int argc, char **argv)
 
 	ReleaseWindowsSocket();
 
-  	return EXIT_SUCCESS;
+ 	return EXIT_SUCCESS;
 
 error:
 	std::cout << "use:: " << argv[0] << " fixedrate <file> <host> <port> <rate>" << std::endl;

@@ -17,8 +17,13 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jguilib.h"
-#include "jsocketlib.h"
+#include "jframe.h"
+#include "jtextfield.h"
+#include "jlabel.h"
+#include "jstringtokenizer.h"
+#include "jstringutils.h"
+#include "jsocket.h"
+#include "jsocketexception.h"
 
 #include <sstream>
 

@@ -1,4 +1,7 @@
-#include "jsocketlib.h"
+#include "jsslserversocket.h"
+#include "jsslsocket.h"
+
+#include <iostream>
 
 #include <stdio.h>
 #include <sys/types.h>

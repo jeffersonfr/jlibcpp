@@ -1,4 +1,8 @@
-#include "jloggerlib.h"
+#include "jloggermanager.h"
+#include "jfilehandler.h"
+#include "jxmlformatter.h"
+
+#include <stdlib.h>
 
 using namespace std;
 

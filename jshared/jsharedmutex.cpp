@@ -18,7 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsharedlib.h"
+#include "jsharedmutex.h"
+#include "jmemoryexception.h"
 
 namespace jshared {
 

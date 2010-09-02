@@ -1,4 +1,6 @@
-#include "jcommonlib.h"
+#include "junit.h"
+
+#include <sstream>
 
 using namespace jcommon;
 

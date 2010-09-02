@@ -20,16 +20,4 @@
 #ifndef J_MATHLIB_H
 #define J_MATHLIB_H
 
-#include "jbase64.h"
-// #include "jbigdecimal.h"
-// #include "jbiginteger.h"
-#include "jcomplex.h"
-#include "jcrc32.h"
-#include "jmath.h"
-#include "jmatrix.h"
-#include "jmd5.h"
-#include "jrandom.h"
-#include "jsha1.h"
-#include "juuid.h"
-
 #endif

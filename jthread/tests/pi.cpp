@@ -1,4 +1,5 @@
-#include "jthreadlib.h"
+#include "jthreadpool.h"
+#include "jrunnable.h"
 
 #include <iostream>
 

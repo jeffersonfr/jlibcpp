@@ -18,7 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jcommonlib.h"
+#include "jstringtokenizer.h"
+#include "joutofboundsexception.h"
 
 namespace jcommon {
 
@@ -102,8 +103,6 @@ void StringTokenizer::BuildTokens(std::string string_, std::string token_, jtoke
 		} else {
 			_tokens.push_back(string_);
 		}
-	} else {
-		throw RuntimeException("Unknown token flag");
 	}
 }
 
@@ -115,7 +114,7 @@ int StringTokenizer::GetSize()
 std::string StringTokenizer::GetToken(int i)
 {
 	if (i < 0 || i > GetSize()) {
-		throw RuntimeException("Range of tokens exception");
+		throw OutOfBoundsException("Range of tokens exception");
 	}
 	
 	return _tokens[i];

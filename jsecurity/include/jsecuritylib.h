@@ -20,11 +20,4 @@
 #ifndef J_SECURITYlIB_H
 #define J_SECURITYLIB_H
 
-#include "jaccesscontroller.h"
-#include "jfileaccesscontroller.h"
-#include "jgroup.h"
-#include "jsecurityexception.h"
-#include "jsecuritymanager.h"
-#include "juser.h"
-
 #endif

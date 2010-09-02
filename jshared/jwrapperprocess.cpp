@@ -18,7 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsharedlib.h"
+#include "jwrapperprocess.h"
+#include "jprocessexception.h"
 
 #define MAX_BUFFER_SIZE	4096
 
