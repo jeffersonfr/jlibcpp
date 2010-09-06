@@ -20,7 +20,7 @@
 #ifndef SLIDEWINDOW_H_
 #define SLIDEWINDOW_H_
 
-#include "jguilib.h"
+#include "jframe.h"
 
 namespace mines {
 

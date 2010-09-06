@@ -20,8 +20,10 @@
 #ifndef MCALC_H_
 #define MCALC_H_
 
-#include "jguilib.h"
-#include "jthreadlib.h"
+#include "jframe.h"
+#include "jbutton.h"
+#include "jbuttonlistener.h"
+#include "jmutex.h"
 #include "display.h"
 
 #include <list>

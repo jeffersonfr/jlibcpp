@@ -20,7 +20,12 @@
 #ifndef PHONEBOOK_H_
 #define PHONEBOOK_H_
 
-#include "jguilib.h"
+#include "jframe.h"
+#include "jlabel.h"
+#include "jlistbox.h"
+#include "jkeyboardlistener.h"
+#include "jtextfield.h"
+#include "jselectlistener.h"
 
 namespace phone {
 

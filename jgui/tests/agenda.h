@@ -20,8 +20,12 @@
 #ifndef AGENDA_H_
 #define AGENDA_H_
 
-#include "jguilib.h"
-#include "jcommonlib.h"
+#include "jframe.h"
+#include "jlabel.h"
+#include "jlistbox.h"
+#include "jtextfield.h"
+#include "jtextarea.h"
+#include "jkeyboardlistener.h"
 
 namespace magenda {
 
@@ -32,18 +36,18 @@ class Agenda : public jgui::Frame, public jgui::SelectListener{
 		private:
 			jthread::Mutex agenda_mutex;
 
-				jgui::ListBox *_list;
-				AgendaDB *db;
-				int _state;
-				bool started;
+			jgui::ListBox *_list;
+			AgendaDB *db;
+			int _state;
+			bool started;
 
 		public:
-				Agenda();
-				virtual ~Agenda();
+			Agenda();
+			virtual ~Agenda();
 
-				void Process(std::string type);
+			void Process(std::string type);
 
-				virtual void ItemSelected(jgui::SelectEvent *event);
+			virtual void ItemSelected(jgui::SelectEvent *event);
 };
 
 class AgendaDB{
@@ -83,19 +87,19 @@ class AgendaDB{
 
 class AddMessage : public jgui::Frame, public jgui::KeyboardListener, public jgui::FrameInputListener{
 
-		private:
-			jthread::Mutex add_mutex;
+	private:
+		jthread::Mutex add_mutex;
 
-			jgui::Label *label1,
-				*label2,
-				*label3,
-				*label4;
-			jgui::TextField *hour,
-				*minute;
-			jgui::TextField *date;
-			jgui::TextArea *message;
-			AgendaDB *db;
-			int _day,
+		jgui::Label *label1,
+			*label2,
+			*label3,
+			*label4;
+		jgui::TextField *hour,
+			*minute;
+		jgui::TextField *date;
+		jgui::TextArea *message;
+		AgendaDB *db;
+		int _day,
 				_month,
 				_year,
 				_hour,
@@ -103,34 +107,34 @@ class AddMessage : public jgui::Frame, public jgui::KeyboardListener, public jgu
 				_index,
 				_state;
 
-		public:
-			AddMessage(AgendaDB *db, int index);
-			virtual ~AddMessage();
+	public:
+		AddMessage(AgendaDB *db, int index);
+		virtual ~AddMessage();
 
-			virtual void KeyboardUpdated(jgui::KeyboardEvent *event);
-			virtual void InputChanged(jgui::KeyEvent *event);
+		virtual void KeyboardUpdated(jgui::KeyboardEvent *event);
+		virtual void InputChanged(jgui::KeyEvent *event);
 
 };
 
 class ViewMessages : public jgui::Frame, public jgui::FrameInputListener{
 
-		private:
-				jthread::Mutex view_mutex;
+	private:
+		jthread::Mutex view_mutex;
 
-				AgendaDB *db;
-				jgui::Label *label_date,
-					*label_hour,
-					*message;
-				int _index;
+		AgendaDB *db;
+		jgui::Label *label_date,
+			*label_hour,
+			*message;
+		int _index;
 
-		private:
-				void Update();
+	private:
+		void Update();
 
-		public:
-				ViewMessages(AgendaDB *db);
-				virtual ~ViewMessages();
+	public:
+		ViewMessages(AgendaDB *db);
+		virtual ~ViewMessages();
 
-				virtual void InputChanged(jgui::KeyEvent *event);
+		virtual void InputChanged(jgui::KeyEvent *event);
 
 };
 

@@ -20,7 +20,7 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 
-#include "jguilib.h"
+#include "jcomponent.h"
 
 namespace mcalc {
 
