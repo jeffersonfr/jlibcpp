@@ -321,11 +321,11 @@ $(EXE): $(SRCS)
 	@$(CPP) $(CXXFLAGS) -c $< -o $@ && echo Compiling $< ...  $(OK)
 
 strip:
-	@echo -e "Strip $(EXE)...  $(OK)"
+	@echo "Strip $(EXE)...  $(OK)"
 	@$(STRIP) $(LIBDIR)/$(EXE)
 
 tests:
-	@cd $(TESTDIR) && make && cd .. &&  echo -e "Compiling $< ...  $(OK)" 
+	@cd $(TESTDIR) && make && cd .. &&  echo "Compiling $< ...  $(OK)" 
 
 doc:
 	@mkdir -p $(DOCDIR) 

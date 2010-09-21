@@ -26,16 +26,16 @@ OBJS_matrix = \
 all: complex_test uuid matrix
 	
 complex_test: $(OBJS_complex_test)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 uuid: $(OBJS_uuid)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 matrix: $(OBJS_matrix)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
-	@$(CC) $(CCFLAGS) -c $< ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) -c $< ; echo "Compiling $< ...  $(OK)" 
 
 install:
 

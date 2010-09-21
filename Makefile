@@ -363,32 +363,32 @@ $(EXE): $(SRCS)
 	@mkdir -p $(BINDIR) $(LIBDIR) && mv $(EXE) $(LIBDIR)
 
 .cpp.o: $<  
-	@$(CC) $(CFLAGS) -c $< -o $@ && echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CFLAGS) -c $< -o $@ && echo "Compiling $< ...  $(OK)" 
 
 strip:
-	@echo -e "Strip $(EXE)...  $(OK)"
+	@echo "Strip $(EXE)...  $(OK)"
 	@$(STRIP) $(LIBDIR)/$(EXE)
 
 doc:
 	@mkdir -p $(DOCDIR) 
 
 install: uninstall
-	@echo -e "Instaling include files in $(PREFIX)/include/$(MODULE)" && mkdir -p $(PREFIX)/include/$(MODULE) && echo -e "$(OK)"
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jcommon && install -o nobody -m 644 jcommon/include/* $(PREFIX)/include/jlibcpp/jcommon
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jgui && install -o nobody -m 644 jgui/include/* $(PREFIX)/include/jlibcpp/jgui
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jimage && install -o nobody -m 644 jimage/include/* $(PREFIX)/include/jlibcpp/jimage
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jio && install -o nobody -m 644 jio/include/* $(PREFIX)/include/jlibcpp/jio
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jlogger && install -o nobody -m 644 jlogger/include/* $(PREFIX)/include/jlibcpp/jlogger
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jmpeg && install -o nobody -m 644 jmpeg/include/* $(PREFIX)/include/jlibcpp/jmpeg
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jshared && install -o nobody -m 644 jshared/include/* $(PREFIX)/include/jlibcpp/jshared
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jsocket && install -o nobody -m 644 jsocket/include/* $(PREFIX)/include/jlibcpp/jsocket
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jthread && install -o nobody -m 644 jthread/include/* $(PREFIX)/include/jlibcpp/jthread
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jmath && install -o nobody -m 644 jmath/include/* $(PREFIX)/include/jlibcpp/jmath
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jresource && install -o nobody -m 644 jresource/include/* $(PREFIX)/include/jlibcpp/jresource
-	@install -d -o nobody -m 755 $(PREFIX)/include/jlibcpp/jsecurity && install -o nobody -m 644 jsecurity/include/* $(PREFIX)/include/jlibcpp/jsecurity
-	@echo -e "Instaling $(EXE) in $(PREFIX)/lib/lib$(MODULE).so $(OK)"
+	@echo "Installing include files in $(PREFIX)/include/$(MODULE) $(OK)" && mkdir -p $(PREFIX)/include/$(MODULE)
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jcommon && install -o nobody -m 644 jcommon/include/* $(PREFIX)/include/$(MODULE)/jcommon
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jgui && install -o nobody -m 644 jgui/include/* $(PREFIX)/include/$(MODULE)/jgui
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jimage && install -o nobody -m 644 jimage/include/* $(PREFIX)/include/$(MODULE)/jimage
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jio && install -o nobody -m 644 jio/include/* $(PREFIX)/include/$(MODULE)/jio
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jlogger && install -o nobody -m 644 jlogger/include/* $(PREFIX)/include/$(MODULE)/jlogger
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmpeg && install -o nobody -m 644 jmpeg/include/* $(PREFIX)/include/$(MODULE)/jmpeg
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jshared && install -o nobody -m 644 jshared/include/* $(PREFIX)/include/$(MODULE)/jshared
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsocket && install -o nobody -m 644 jsocket/include/* $(PREFIX)/include/$(MODULE)/jsocket
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jthread && install -o nobody -m 644 jthread/include/* $(PREFIX)/include/$(MODULE)/jthread
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmath && install -o nobody -m 644 jmath/include/* $(PREFIX)/include/$(MODULE)/jmath
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jresource && install -o nobody -m 644 jresource/include/* $(PREFIX)/include/$(MODULE)/jresource
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsecurity && install -o nobody -m 644 jsecurity/include/* $(PREFIX)/include/$(MODULE)/jsecurity
+	@echo "Installing $(EXE) in $(PREFIX)/lib/lib$(MODULE).so $(OK)"
 	@install -o nobody -m 644 $(LIBDIR)/$(EXE) $(PREFIX)/lib && ln -s $(PREFIX)/lib/$(EXE) $(PREFIX)/lib/lib$(MODULE).so
-	@echo -e "Instaling $(MODULE).pc in $(PREFIX)/lib/pkgconfig $(OK)"
+	@echo "Installing $(MODULE).pc in $(PREFIX)/lib/pkgconfig $(OK)"
 	@mkdir -p $(PREFIX)/lib/pkgconfig && \
 		sed -e 's/@module@/$(MODULE)/g' jlibcpp.pc | \
 		sed -e 's/@prefix@/$(subst /,\/,$(PREFIX))/g' | \
@@ -401,7 +401,7 @@ uninstall:
 	@rm -rf $(PREFIX)/lib/pkgconfig/$(MODULE).pc $(PREFIX)/lib/lib$(MODULE).so $(PREFIX)/lib/$(EXE) 
 
 clean:
-	@rm -rf $(SRCS) *~ 2> /dev/null && echo -e "$(MODULE) clean $(OK)" 
+	@rm -rf $(SRCS) *~ 2> /dev/null && echo "$(MODULE) clean $(OK)" 
 
 ultraclean: clean uninstall
 	@find -iname "*.o" -exec rm {} \;;
@@ -422,5 +422,5 @@ ultraclean: clean uninstall
 	@cd jshared/tests && make clean && cd -
 	@cd jsocket/tests && make clean && cd -
 	@cd jthread/tests && make clean && cd -
-	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(PREFIX)/lib/$(EXE) $(PREFIX)/include/jlibcpp 2> /dev/null && echo -e "$(MODULE) ultraclean $(OK)" 
+	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(PREFIX)/lib/$(EXE) $(PREFIX)/include/$(MODULE) 2> /dev/null && echo "$(MODULE) ultraclean $(OK)" 
 

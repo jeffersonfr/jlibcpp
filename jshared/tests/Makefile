@@ -35,25 +35,25 @@ OBJS_ipcshared = \
 all: fifo_teste msg_teste wprocess_teste wsort_teste ipcmap ipcshared
 	
 fifo_teste: $(OBJS_fifo_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
 
 msg_teste: $(OBJS_msg_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
 
 wprocess_teste: $(OBJS_wprocess_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
 
 wsort_teste: $(OBJS_wsort_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
 
 ipcmap: $(OBJS_ipcmap)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
 
 ipcshared: $(OBJS_ipcshared)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
 
 .cpp.o: $<  
-	@$(CC) $(CCFLAGS) -c $< && echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) -c $< && echo "Compiling $< ...  $(OK)" 
 
 install:
 

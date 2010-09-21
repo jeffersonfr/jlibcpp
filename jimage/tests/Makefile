@@ -5,7 +5,7 @@ JAVA		= javac
 TARGET_ARCH = linux
 
 DEBUG  		= -ggdb 
-OTHER  		= -Wall -funroll-loops -O2 -mfpmath=sse -mmmx -msse2 -m3dnow 
+OTHER  		= -Wall -funroll-loops -O2 -mfpmath=sse -mmmx -msse2 
 
 INCLUDE		= -I. `pkg-config --cflags jlibcpp`
 LIBRARY 	= -L. `pkg-config --libs jlibcpp`
@@ -41,31 +41,31 @@ OBJS_teste_watch = \
 all: teste trip
 	
 teste: $(OBJS_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 trip: $(OBJS_trip)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 teste_zoom: $(OBJS_teste_zoom)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 teste_textarea: $(OBJS_teste_textarea)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 teste_justify: $(OBJS_teste_justify)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 teste_circle: $(OBJS_teste_circle)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 teste_mines: $(OBJS_teste_mines)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 teste_watch: $(OBJS_teste_watch)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
-	@$(CC) $(CCFLAGS) -c $< ; echo -e "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) -c $< ; echo "Compiling $< ...  $(OK)" 
 
 install:
 
