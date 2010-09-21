@@ -37,6 +37,7 @@ INCLUDE		= -I. \
 						-Ijlogger/include \
 						-Ijmath/include \
 						-Ijmpeg/include \
+						-Ijphysic/include \
 						-Ijresource/include \
 						-Ijsecurity/include \
 						-Ijshared/include \
@@ -136,6 +137,11 @@ OBJS_jresource = \
 	   jresourceserver.o\
 	   jresourcestatusevent.o\
 	   jresourcestatuslistener.o\
+	   
+OBJS_jphysic = \
+	   jcpu.o\
+	   jnetwork.o\
+	   jmemory.o\
 	   
 OBJS_jio = \
 	   jbitinputstream.o\
@@ -383,6 +389,7 @@ install: uninstall
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jshared && install -o nobody -m 644 jshared/include/* $(PREFIX)/include/$(MODULE)/jshared
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsocket && install -o nobody -m 644 jsocket/include/* $(PREFIX)/include/$(MODULE)/jsocket
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jthread && install -o nobody -m 644 jthread/include/* $(PREFIX)/include/$(MODULE)/jthread
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jphysic && install -o nobody -m 644 jphysic/include/* $(PREFIX)/include/$(MODULE)/jphysic
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmath && install -o nobody -m 644 jmath/include/* $(PREFIX)/include/$(MODULE)/jmath
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jresource && install -o nobody -m 644 jresource/include/* $(PREFIX)/include/$(MODULE)/jresource
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsecurity && install -o nobody -m 644 jsecurity/include/* $(PREFIX)/include/$(MODULE)/jsecurity
