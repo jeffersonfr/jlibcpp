@@ -28,10 +28,10 @@ FileHandler::FileHandler(std::string filename_):
 {
 	jcommon::Object::SetClassName("jlogger::FileHandler");
 
-	_file = new jio::File(filename_, (jio::file_flags_t)(jio::F_WRITE_ONLY | jio::F_LARGEFILE | jio::F_APPEND));
+	_file = new jio::File(filename_, (jio::jfile_flags_t)(jio::F_WRITE_ONLY | jio::F_LARGEFILE | jio::F_APPEND));
 
 	if (_file->Exists() == false) {
-		_file = new jio::File(filename_, (jio::file_flags_t)(jio::F_WRITE_ONLY | jio::F_LARGEFILE | jio::F_APPEND | jio::F_CREATE));
+		_file = new jio::File(filename_, (jio::jfile_flags_t)(jio::F_WRITE_ONLY | jio::F_LARGEFILE | jio::F_APPEND | jio::F_CREATE));
 	
 		if (_file->Exists() == false) {
 			throw LoggerException("Error:: cannot create the Log file");

@@ -37,12 +37,12 @@
 
 namespace jmath {
 
-typedef enum {
+enum jsha1_rc_t {
     SHA1_RC_OK  = 0,
     SHA1_RC_ARG = 1,
     SHA1_RC_MEM = 2,
     SHA1_RC_INT = 3
-} sha1_rc_t;
+};
 
 enum {
     shaSuccess = 0,

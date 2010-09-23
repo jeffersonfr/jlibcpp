@@ -23,7 +23,7 @@ OBJS_object = \
 OBJS_data = \
 	   data.o\
 
-all: inpi object data
+all: inpi object data teste
 	
 inpi: $(OBJS_inpi)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 

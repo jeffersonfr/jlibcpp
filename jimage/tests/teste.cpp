@@ -29,7 +29,7 @@
 	: "D"(dest), "c"(count)						\
 	: )
 
-#define MAX_LOOP	1
+#define MAX_LOOP	30
 
 using namespace std;
 

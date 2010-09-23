@@ -63,7 +63,7 @@
 
 namespace jmath {
 
-enum md5_rc_t {
+enum jmd5_rc_t {
     MD5_RC_OK  = 0,
     MD5_RC_ARG = 1,
     MD5_RC_MEM = 2

@@ -44,7 +44,7 @@ namespace jio {
  * \brief Tipo de arquivo.
  *
  */
-enum file_type_t {
+enum jfile_type_t {
 	F_REGULAR,
 	F_DIRECTORY,
 	F_CHAR_DEVICE,
@@ -64,7 +64,7 @@ enum file_type_t {
  * \brief Flags de arquivo.
  * 
  */
-enum file_flags_t {
+enum jfile_flags_t {
 	F_WRITE_ONLY	= 0x0001,
 	F_READ_ONLY 	= 0x0002,
 	F_READ_WRITE 	= 0x0004,
@@ -102,7 +102,7 @@ class File : public virtual jcommon::Object{
 		/** \brief */
 		struct stat _stat;
 		/** \brief */
-	 	file_type_t _type;
+	 	jfile_type_t _type;
 		/** \brief */
 		bool _is_closed;
 		/** \brief */
@@ -159,7 +159,7 @@ class File : public virtual jcommon::Object{
 		 * \brief Retorna o tipo do arquivo.
 		 *
 		 */
-		file_type_t GetType();
+		jfile_type_t GetType();
 		
 		/**
 		 * \brief

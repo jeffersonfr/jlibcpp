@@ -360,7 +360,7 @@ bool File::Exists()
 	return _exists; 
 }
 
-file_type_t File::GetType()
+jfile_type_t File::GetType()
 {
 	return _type; 
 }

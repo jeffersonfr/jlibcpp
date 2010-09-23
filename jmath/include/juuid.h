@@ -304,16 +304,16 @@ extern unsigned int  uuid_hash        (uuid_t *,               int *);
 struct prng_st;
 typedef struct prng_st prng_t;
 
-enum prng_rc_t {
+enum jprng_rc_t {
     PRNG_RC_OK  = 0,
     PRNG_RC_ARG = 1,
     PRNG_RC_MEM = 2,
     PRNG_RC_INT = 3
 };
 
-extern prng_rc_t prng_create  (prng_t **prng);
-extern prng_rc_t prng_data    (prng_t  *prng, void *data_ptr, size_t data_len);
-extern prng_rc_t prng_destroy (prng_t  *prng);
+extern jprng_rc_t prng_create  (prng_t **prng);
+extern jprng_rc_t prng_data    (prng_t  *prng, void *data_ptr, size_t data_len);
+extern jprng_rc_t prng_destroy (prng_t  *prng);
 
 extern int   str_vsnprintf (char  *, size_t, const char *, va_list);
 extern int   str_snprintf  (char  *, size_t, const char *, ...);
@@ -422,7 +422,7 @@ extern int mac_address(uint8_t *_data_ptr, size_t _data_len);
 #define UUID_LEN_SIV  (39  /*int(log(10,exp(2,128)-1)+1) digits*/)
 
 // API return codes 
-enum  uuid_rc_t{
+enum juuid_rc_t{
     UUID_RC_OK   = 0,        // everything ok    
     UUID_RC_ARG  = 1,        // invalid argument 
     UUID_RC_MEM  = 2,        // out of memory    
@@ -441,7 +441,7 @@ enum {
 };
 
 // UUID import/export formats 
-enum uuid_fmt_t {
+enum juuid_fmt_t {
     UUID_FMT_BIN = 0,        // binary representation (import/export) 
     UUID_FMT_STR = 1,        // string representation (import/export) 
     UUID_FMT_SIV = 2,        // single integer value  (import/export) 
@@ -453,24 +453,24 @@ struct uuid_st;
 typedef struct uuid_st uuid_t;
 
 // UUID object handling 
-extern uuid_rc_t     uuid_create   (      uuid_t **_uuid);
-extern uuid_rc_t     uuid_destroy  (      uuid_t  *_uuid);
-extern uuid_rc_t     uuid_clone    (const uuid_t  *_uuid, uuid_t **_clone);
+extern juuid_rc_t     uuid_create   (      uuid_t **_uuid);
+extern juuid_rc_t     uuid_destroy  (      uuid_t  *_uuid);
+extern juuid_rc_t     uuid_clone    (const uuid_t  *_uuid, uuid_t **_clone);
 
 // UUID generation 
-extern uuid_rc_t     uuid_load     (      uuid_t  *_uuid, const char *_name);
-extern uuid_rc_t     uuid_make     (      uuid_t  *_uuid, unsigned int _mode, ...);
+extern juuid_rc_t     uuid_load     (      uuid_t  *_uuid, const char *_name);
+extern juuid_rc_t     uuid_make     (      uuid_t  *_uuid, unsigned int _mode, ...);
 
 // UUID comparison 
-extern uuid_rc_t     uuid_isnil    (const uuid_t  *_uuid,                       int *_result);
-extern uuid_rc_t     uuid_compare  (const uuid_t  *_uuid, const uuid_t *_uuid2, int *_result);
+extern juuid_rc_t     uuid_isnil    (const uuid_t  *_uuid,                       int *_result);
+extern juuid_rc_t     uuid_compare  (const uuid_t  *_uuid, const uuid_t *_uuid2, int *_result);
 
 // UUID import/export 
-extern uuid_rc_t     uuid_import   (      uuid_t  *_uuid, uuid_fmt_t _fmt, const void  *_data_ptr, size_t  _data_len);
-extern uuid_rc_t     uuid_export   (const uuid_t  *_uuid, uuid_fmt_t _fmt,       void  *_data_ptr, size_t *_data_len);
+extern juuid_rc_t     uuid_import   (      uuid_t  *_uuid, juuid_fmt_t _fmt, const void  *_data_ptr, size_t  _data_len);
+extern juuid_rc_t     uuid_export   (const uuid_t  *_uuid, juuid_fmt_t _fmt,       void  *_data_ptr, size_t *_data_len);
 
 // library utilities 
-extern std::string   uuid_error    (uuid_rc_t _rc);
+extern std::string   uuid_error    (juuid_rc_t _rc);
 extern unsigned long uuid_version  (void);
 
 }
