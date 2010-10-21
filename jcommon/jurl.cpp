@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "jurl.h"
 #include "jstringtokenizer.h"
+#include "jstringutils.h"
 #include "jruntimeexception.h"
 
 namespace jcommon {
@@ -29,106 +30,87 @@ URL::URL(std::string url_):
 {
 	jcommon::Object::SetClassName("jcommon::URL");
 
-	_url = url_;
+	_url = StringUtils::Trim(url_);
 
-	jcommon::StringTokenizer proto(_url, "://", SPLIT_FLAG, false);
+	uint32_t proto_index = _url.find("://"),
+					 file_proto = _url.find(":/"),
+					 slash_index = _url.find("/");
 
-	if (proto.GetSize() == 1) {
-		jcommon::StringTokenizer proto(_url, ":/", SPLIT_FLAG, false);
-
-		if (proto.GetSize() == 1) {
+	if (proto_index != std::string::npos && proto_index == (slash_index-1)) {
+		_protocol = _url.substr(0, proto_index);
+		_path = _url.substr(proto_index+3, _url.size());
+	} else {
+		if (file_proto != std::string::npos && file_proto == (slash_index-1)) {
+			_protocol = _url.substr(0, file_proto);
+			_path = _url.substr(file_proto+2, _url.size());
+		} else {
 			_protocol = "file";
 			_path = _url;
-		} else {
-			_protocol = proto.GetToken(0);
-
-			_path = "/";
-
-			for (int i=1; i<proto.GetSize(); i++) {
-				_path += proto.GetToken(1);
-
-				if (i < proto.GetSize()-1) {
-					_path = _path + "://";
-				}
-			}
-		}
-	} else if (proto.GetSize() > 1) {
-		_protocol = proto.GetToken(0);
-
-		for (int i=1; i<proto.GetSize(); i++) {
-			_path += proto.GetToken(1);
-
-			if (i < proto.GetSize()-1) {
-				_path = _path + "://";
-			}
-		}
-
-		uint32_t index = _path.rfind("/");
-
-		if (index != std::string::npos) {
-			_file = _path.substr(index+1);
 		}
 	}
 
-	jcommon::StringTokenizer host(proto.GetToken(proto.GetSize() - 1), "/", SPLIT_FLAG, false);
-	jcommon::StringTokenizer port(host.GetToken(0), ":", SPLIT_FLAG, false);
-	
-	_port = -1;
+	_protocol = StringUtils::ToLower(_protocol);
 
-	if (port.GetSize() == 1) {
-		if (_protocol == "http" || _protocol == "https") {
+	slash_index = _path.find("/");
+
+	if (slash_index != std::string::npos) {
+		_host = _path.substr(0, slash_index);
+	} else {
+		_host = _path;
+	}
+
+	uint32_t port_index = _host.find(":");
+
+	if (port_index != std::string::npos) {
+		if (slash_index != std::string::npos && port_index < slash_index) {
+			_port = atoi(_path.substr(port_index+1, slash_index).c_str());
+		} else {
+			_port = atoi(_path.substr(port_index+1).c_str());
+		}
+	} else {
+		_port = -1;
+
+		if (_protocol == "http") {
 			_port = 80;
+		} else if (_protocol == "https") {
+			_port = 443;
 		} else if (_protocol == "ftp") {
 			_port = 21;
+		} else if (_protocol == "pop") {
+			_port = 110;
 		}
-	} else if (port.GetSize() == 2) {
-		_port = atoi(port.GetToken(1).c_str());
 	}
 
-	if (_port < 0) {
-		/*
-		_host = "";
-		_query = "";
-		_file = "";
-		_params = "";
-		_reference = "";
-		*/
+	uint32_t file_slash = _path.rfind("/");
+
+	if (file_slash != std::string::npos) {
+		_file = _path.substr(file_slash+1);
+	} else {
+		_file = _path;
+	}
+	
+	if (slash_index == std::string::npos) {
+		_query = "/";
 
 		return;
 	}
 
-	_host = port.GetToken(0);
+	_query = _path.substr(slash_index);
+	file_proto = _query.find(":/");
 
-	if (host.GetSize() == 1) {
-		_file = _host;
-		_query = "/";
+	uint32_t param_index = _query.find("?");
 
-	} else {
-		for (int i=1; i<host.GetSize(); i++) {
-			_query = _query + "/" + host.GetToken(i);
+	if (param_index != std::string::npos) {
+		if (file_proto == std::string::npos || (file_proto != std::string::npos && file_proto > param_index)) {
+			_params = _query.substr(param_index+1);
 		}
+	}
 
-		uint32_t index = _query.rfind("/");
+	uint32_t ref_index = _file.find("#");
 
-		if (index != std::string::npos) {
-			_file = _query.substr(index+1);
-		} else {
-			_file = "";
-		}
-		
-		jcommon::StringTokenizer params(_file, "?", SPLIT_FLAG, false);
-
-		if (params.GetSize() == 2) {
-			_file = params.GetToken(0);
-			_params = params.GetToken(1);
-		}
-
-		jcommon::StringTokenizer reference(_file, "#", SPLIT_FLAG, false);
-
-		if (reference.GetSize() == 2) {
-			_file = reference.GetToken(0);
-			_reference = reference.GetToken(1);
-		}
+	if (ref_index != std::string::npos) {
+		_reference = _file.substr(ref_index+1);
+		_file = _file.substr(0, ref_index);
 	}
 }
 

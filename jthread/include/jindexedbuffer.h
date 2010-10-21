@@ -57,7 +57,8 @@ enum jbuffer_type_t {
  */
 struct jringbuffer_t {
 	uint8_t *data;	// buffer
-	int size;				// size of buffer
+	int size,				// size of buffer
+			index;			// read index
 };
 
 /**
@@ -82,13 +83,8 @@ class IndexedBuffer : public virtual jcommon::Object{
 		jbuffer_type_t _type;
 		/** \brief */
 		Mutex _mutex;
-#ifdef _WIN32
-		/** \brief */
-		Semaphore _semaphore;
-#else
 		/** \brief */
 		Condition _semaphore;
-#endif
 		
     public:
 		/**
@@ -161,6 +157,14 @@ class IndexedBuffer : public virtual jcommon::Object{
 		 *
 		 */
 		int Read(jringbuffer_t *data, int *rindex, int *pindex);
+
+		/**
+		 * \brief Read a chunk.
+		 *
+		 * \param data Data deve conter no minimo o tamanho de chunk. A funcao retorna o tamanho lido em size.
+		 *
+		 */
+		int Read(uint8_t *data, int size, int *rindex, int *pindex);
 
 		/**
 		 * \brief 

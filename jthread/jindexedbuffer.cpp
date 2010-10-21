@@ -195,32 +195,119 @@ int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 			}
 		}
 
-		data->data = _buffer[*rindex].data;
-		data->size = _buffer[*rindex].size;
+		struct jringbuffer_t *t = &_buffer[*rindex];
 
-		// memcpy(data->data, _buffer[*rindex].data, data->size);
+		// memcpy(data->data, t->data, t->size);
+
+		data->data = t->data;
+		data->size = t->size;
 
 		if (++(*rindex) >= _buffer_size) {
 			(*rindex) = 0;
 			(*pindex)++;
 		}
 
-		return data->size;
+		return t->size;
 	} else if (*pindex == (_pass_index-1)) {
 		AutoLock lock(&_mutex);
 
 		if (*rindex > _write_index) {
-			data->data = _buffer[*rindex].data;
-			data->size = _buffer[*rindex].size;
+			struct jringbuffer_t *t = &_buffer[*rindex];
 
-			// memcpy(data->data, _buffer[*rindex].data, data->size);
+			// memcpy(data->data, t->data, t->size);
+
+			data->data = t->data;
+			data->size = t->size;
 
 			if (++(*rindex) >= _buffer_size) {
 				(*rindex) = 0;
 				(*pindex)++;
 			}
 
-			return data->size;
+			return t->size;
+		}
+	}
+
+	return -1;
+}
+
+int IndexedBuffer::Read(uint8_t *data, int size, int *rindex, int *pindex)
+{
+	/*
+	if ((*rindex < 0 || *rindex >= _buffer_size) || *pindex < 0) {
+		return -1;
+	}
+	*/
+
+	AutoLock lock(&_mutex);
+
+	if (*pindex == _pass_index) {
+		if (*rindex > _write_index) {
+			return -1;
+		}
+
+		while (*rindex == _write_index) {
+			try {
+				_semaphore.Wait(&_mutex);
+			} catch (jthread::SemaphoreException &e) {
+				// WARN:: return -1; ?
+			}
+		}
+
+		struct jringbuffer_t *t = &_buffer[*rindex];
+
+		if (size <= (t->size-t->index)) {
+			memcpy(data, t->data+t->index, size);
+			
+			t->index = t->index + size;
+
+			if (t->index == t->size) {
+				if (++(*rindex) >= _buffer_size) {
+					(*rindex) = 0;
+					(*pindex)++;
+				}
+			}
+
+			return size;
+		} else {
+			memcpy(data, t->data+t->index, t->size-t->index);
+
+			if (++(*rindex) >= _buffer_size) {
+				(*rindex) = 0;
+				(*pindex)++;
+			}
+
+			return t->size-t->index;
+		}
+	} else if (*pindex == (_pass_index-1)) {
+		AutoLock lock(&_mutex);
+
+		if (*rindex > _write_index) {
+			struct jringbuffer_t *t = &_buffer[*rindex];
+
+			if (size <= (t->size-t->index)) {
+				memcpy(data, t->data+t->index, size);
+
+				t->index = t->index + size;
+
+				if (t->index == t->size) {
+					if (++(*rindex) >= _buffer_size) {
+						(*rindex) = 0;
+						(*pindex)++;
+					}
+				}
+
+				return size;
+			} else {
+				memcpy(data, t->data+t->index, t->size-t->index);
+
+				if (++(*rindex) >= _buffer_size) {
+					(*rindex) = 0;
+					(*pindex)++;
+				}
+
+				return t->size-t->index;
+			}
 		}
 	}
 
@@ -246,10 +333,12 @@ int IndexedBuffer::Write(uint8_t*data, int size)
 	{
 		AutoLock lock(&_mutex);
 		
-		jringbuffer_t *rb = &_buffer[_write_index++];
+		jringbuffer_t *t = &_buffer[_write_index++];
 	
-		memcpy(rb->data, data, length);
-		rb->size = length;
+		memcpy(t->data, data, length);
+		
+		t->size = length;
+		t->index = 0;
 
 		if (_write_index >= _buffer_size) {
 			_write_index = 0;

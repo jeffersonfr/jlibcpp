@@ -1,4 +1,27 @@
-#include "jcommonlib.h"
+/***************************************************************************
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   root@sat                                                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#include "jpointer.h"
+
+#include <iostream>
+
+#include <stdlib.h>
 
 class C {
 
@@ -11,17 +34,17 @@ class C {
 		C() 
 		{
 			y = ++x;
-			std::cout << "\tcriou C " << y << std::endl;
+
+			std::cout << "\tcreate C " << y << std::endl;
 		}
 
 		virtual ~C() 
 		{
-			std::cout << "\tdestruiu C " << y << std::endl;
+			std::cout << "\tdestrut C " << y << std::endl;
 		}
 
-		void talvezLanceExcecao() 
+		void MaybeThrowException() 
 		{
-			srand((unsigned) time(0));
 			if (rand() % 2 == 0) {
 				throw "erro";
 			}
@@ -35,36 +58,36 @@ class D: public C {
 	public:
 		D():C() 
 		{
-			std::cout << "\tcriou D " << y << std::endl;
+			std::cout << "\tcreate D " << y << std::endl;
 		}
 
 		virtual ~D() 
 		{
-			std::cout << "\tdestruiu D " << y << std::endl;
+			std::cout << "\tdestruct D " << y << std::endl;
 		}
 };
 
 class E {
 
 	public:
-		jcommon::ptr<E> filho;
+		jcommon::ptr<E> child;
 
 	public:
 		E() 
 		{
-			std::cout << "\tcriou E" << std::endl;
+			std::cout << "\tcreate E" << std::endl;
 		}
 
 		virtual ~E() 
 		{
-			std::cout << "\tdestruiu E" << std::endl;
+			std::cout << "\tdestruct E" << std::endl;
 		}
 };
 
-void testeDeleteAutomaticoVariavelLocal() 
+void AutoDeleteLocalVariableTest() 
 {
 
-	std::cout << "inicio do metodo" << std::endl;
+	std::cout << "init" << std::endl;
 
 	jcommon::ptr<C> c = new C();
 	jcommon::ptr<D> d = new D();
@@ -72,72 +95,79 @@ void testeDeleteAutomaticoVariavelLocal()
 	//delete d;		<--- nao eh mais necessario
 	//delete c;		<--- nao eh mais necessario
 
-	std::cout << "fim do metodo" << std::endl;
+	std::cout << "end" << std::endl;
 }
 
-void testeDeleteAutomaticoObjetoNaoReferenciado() 
+void AutoDeleteNonReferencedObjectTest() 
 {
-	std::cout << "vai alocar um objeto" << std::endl;
+	std::cout << "allocate object" << std::endl;
+
 	jcommon::ptr<C> c = new C();
 
-	std::cout << "o mesmo ponteiro vai referenciar outro objeto" << std::endl;
+	std::cout << "same pointer referencing another object" << std::endl;
+
 	// a linha seguinte geraria um vazamento de memoria pois
 	// o objeto alocado na inicializacao nao foi liberado
 	c = new C();
 
 	//delete c;		<--- nao eh mais necessario
-	std::cout << "fim do metodo" << std::endl;
+	std::cout << "end" << std::endl;
 }
 
-void testeDeleteAutomaticoObjetoNaoReferenciadoComHeranca() 
+void AutoDeleteNonReferencedObjectWithInheritance()
 {
 	// analogo ao teste anterior, mas, nesse caso, envolve heranca
 	// essa eh a vantagem da classe ptr sobre a counted_ptr (padrao)
-	std::cout << "aloca C" << std::endl;
+	std::cout << "allocate C" << std::endl;
+
 	jcommon::ptr<C> c = new C();
 
-	std::cout << "aloca D" << std::endl;
+	std::cout << "allocate D" << std::endl;
+
 	jcommon::ptr<D> d = new D();
 
-	std::cout << "c aponta para D" << std::endl;
+	std::cout << "c referencing D" << std::endl;
+
 	c = d;
 
 	//delete c;		<--- nao eh mais necessario
-	std::cout << "fim do metodo" << std::endl;
+	std::cout << "end" << std::endl;
 }
 
-jcommon::ptr<C> criaObjeto() 
+jcommon::ptr<C> createObject() 
 {
 	return new C();
 }
 
-void testeObjetoRetornadoPorFuncao() 
+void ObjectReturnedByFunctionTest() 
 {
-	std::cout << "guarda objeto retornado pela funcao" << std::endl;
-	jcommon::ptr<C> r = criaObjeto();
+	std::cout << "keep the object returned by function" << std::endl;
 
-	std::cout << "NAO guarda objeto retornado pela funcao" << std::endl;
-	criaObjeto();
+	jcommon::ptr<C> r = createObject();
 
-	std::cout << "fim do metodo" << std::endl;
+	std::cout << "dont keep the object returned by function" << std::endl;
+
+	createObject();
+
+	std::cout << "end" << std::endl;
 }
 
-void testeTratamentoExcecao() 
+void ThrowExceptionTest() 
 {
 	jcommon::ptr<C> c;
 
 	try {
 
 		c = new C();
-		c->talvezLanceExcecao();
+		c->MaybeThrowException();
 		//delete c;		<--- nao eh mais necessario
-		std::cout << "NAO lancou excecao" << std::endl;
+		std::cout << "dont throw exception" << std::endl;
 
 	} catch (...) {
 
 		//delete c;		<--- nao eh mais necessario
 		// trata excecao
-		std::cout << "lancou excecao" << std::endl;
+		std::cout << "throw exception" << std::endl;
 
 	}
 
@@ -167,47 +197,49 @@ void testeTratamentoExcecao()
 	//
 }
 
-void testeReferenciaCircular() 
+void CyclicReferenceTest() 
 {
 	// esse eh o unico caso em que o ptr nao funciona
 	jcommon::ptr<E> e1 = new E();
 	jcommon::ptr<E> e2 = new E();
 	jcommon::ptr<E> e3 = new E();
-	e1->filho = e2;
-	e2->filho = e3;
-	e3->filho = e1;
+	e1->child = e2;
+	e2->child = e3;
+	e3->child = e1;
 }
 
 int main() 
 {
+	srand(time(0));
+
 	std::cout << "------------------\n" << std::endl;
 	std::cout << "teste: delete automatico de variavel local\n" << std::endl;
-	testeDeleteAutomaticoVariavelLocal();
+	AutoDeleteLocalVariableTest();
 	std::cout << std::endl;
 
 	std::cout << "------------------\n" << std::endl;
 	std::cout << "teste: delete automatico de objeto nao referenciado\n" << std::endl;
-	testeDeleteAutomaticoObjetoNaoReferenciado();
+	AutoDeleteNonReferencedObjectTest();
 	std::cout << std::endl;
 
 	std::cout << "------------------\n" << std::endl;
 	std::cout << "teste: delete automatico de objeto nao referenciado envolvendo heranca\n" << std::endl;
-	testeDeleteAutomaticoObjetoNaoReferenciadoComHeranca();
+	AutoDeleteNonReferencedObjectWithInheritance();
 	std::cout << std::endl;
 
 	std::cout << "------------------'n" << std::endl;
 	std::cout << "teste: objeto retornado por funcao\n" << std::endl;
-	testeObjetoRetornadoPorFuncao();
+	ObjectReturnedByFunctionTest();
 	std::cout << std::endl;
 
 	std::cout << "------------------\n" << std::endl;
 	std::cout << "teste: tratamento de excecao\n" << std::endl;
-	testeTratamentoExcecao();
+	ThrowExceptionTest();
 	std::cout << std::endl;
 
 	std::cout << "------------------\n" << std::endl;
 	std::cout << "teste: referencia circular ---> nao funciona!\n" << std::endl;
-	testeReferenciaCircular();
+	CyclicReferenceTest();
 	std::cout << std::endl;
 
 	std::cout << "------------------" << std::endl;

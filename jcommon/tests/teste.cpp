@@ -1,3 +1,22 @@
+/***************************************************************************
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   root@sat                                                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
 #include "jsystem.h"
 #include "jurl.h"
 #include "jdate.h"
@@ -132,35 +151,35 @@ void testStringToken()
 
 void testURL()
 {
-	jcommon::URL url_01("http://www.google.com/url/http://redirect.org");
-	jcommon::URL url_02("http://charges.com/a?a=1");
-	jcommon::URL url_03("ftp://www.lavid.ufpb.br/cvs#ref");
-	jcommon::URL url_04("http://phrack.com:80/?a=1&b=2");
-	jcommon::URL url_05("file:///test/file.mpg");
-	jcommon::URL url_06("./file.mpg");
-	jcommon::URL url_07("/file.mpg");
-	jcommon::URL url_08("file.mpg");
-	jcommon::URL url_09("file:/file.mpg");
+	jcommon::URL *url[] = {
+		new jcommon::URL("http://www.google.com/url/http://redirect.org"),
+		new jcommon::URL("http://www.google.com/?url=http://redirect.org"),
+		new jcommon::URL("http://charges.com/a?a=1"),
+		new jcommon::URL("ftp://www.lavid.ufpb.br/cvs#ref"),
+		new jcommon::URL("http://phrack.com:80/?a=1&b=2"),
+		new jcommon::URL("http://phrack.com:80"),
+		new jcommon::URL("file:///test/file.mpg"),
+		new jcommon::URL("file://test/file.mpg"),
+		new jcommon::URL("./file.mpg"),
+		new jcommon::URL("/file.mpg"),
+		new jcommon::URL("file.mpg"),
+		new jcommon::URL("file:/file.mpg")
+	};
 
-	std::cout << "URL 01:: " << url_01.what() << std::endl;
-	std::cout << "URL 02:: " << url_02.what() << std::endl;
-	std::cout << "URL 03:: " << url_03.what() << std::endl;
-	std::cout << "URL 04:: " << url_04.what() << std::endl;
-	std::cout << "URL 05:: " << url_05.what() << std::endl;
-	std::cout << "URL 06:: " << url_06.what() << std::endl;
-	std::cout << "URL 07:: " << url_07.what() << std::endl;
-	std::cout << "URL 08:: " << url_08.what() << std::endl;
-	std::cout << "URL 09:: " << url_09.what() << std::endl;
+	for (int i=0; i<12; i++) {
+		std::cout << "-------------------------------" << std::endl;
+		std::cout << "URL: [" << url[i]->what() << "]" << std::endl;
+		std::cout << "GetProtocol(): " << url[i]->GetProtocol() << std::endl;
+		std::cout << "GetPath(): " << url[i]->GetPath() << std::endl;
+		std::cout << "GetQuery(): " << url[i]->GetQuery() << std::endl;
+		std::cout << "GetHost(): " << url[i]->GetHost() << std::endl;
+		std::cout << "GetPort(): " << url[i]->GetPort() << std::endl;
+		std::cout << "GetFile(): " << url[i]->GetFile() << std::endl;
+		std::cout << "GetParameters(): " << url[i]->GetParameters() << std::endl;
+		std::cout << "GetReference(): " << url[i]->GetReference() << std::endl;
 
-	std::cout << "URL 01:: " << url_01.GetPath() << std::endl;
-	std::cout << "URL 02:: " << url_02.GetPath() << std::endl;
-	std::cout << "URL 03:: " << url_03.GetPath() << std::endl;
-	std::cout << "URL 04:: " << url_04.GetPath() << std::endl;
-	std::cout << "URL 05:: " << url_05.GetPath() << std::endl;
-	std::cout << "URL 06:: " << url_06.GetPath() << std::endl;
-	std::cout << "URL 07:: " << url_07.GetPath() << std::endl;
-	std::cout << "URL 08:: " << url_08.GetPath() << std::endl;
-	std::cout << "URL 09:: " << url_09.GetPath() << std::endl;
+		delete url[i];
+	}
 }
 
 void testOptions(int argc, char **argv)

@@ -61,102 +61,102 @@ class Connection : public virtual jcommon::Object{
 	friend class MulticastSocket;
 	friend class RawSocket;
 	
-    protected:
-		/** \brief */
-		jconnection_type_t _type;
-		/** \brief */
-		bool _is_closed;
-	
-		/**
-		 * \brief
-		 *
-		 */
-		Connection(jconnection_type_t type);
+	protected:
+	/** \brief */
+	jconnection_type_t _type;
+	/** \brief */
+	bool _is_closed;
 
-    public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jconnection_type_t GetType();
-		
-        /**
-        * \brief Send bytes to a destination.
-        *
-        */
-		virtual bool IsClosed();
+	/**
+	 * \brief
+	 *
+	 */
+	Connection(jconnection_type_t type);
 
-        /**
-        * \brief Send bytes to a destination.
-        *
-        */
-        virtual int Send(const char *b_, int size_, bool block_ = true) = 0;
-        
-        /**
-        * \brief Send bytes to a destination.
-        *
-        */
-        virtual int Send(const char *b_, int size_, int time_) = 0;
-        
-        /**
-        * \brief Receive bytes from a source.
-		*
-		* \return the number of bytes received, or 0 if the peer has shutdown.
-		*
-		* \exception SocketException an error occurred.
-        *
-        */
-        virtual int Receive(char *data_, int data_length_, bool block_ = true) = 0;
+	public:
+	/**
+	 * \brief
+	 *
+	 */
+	virtual jconnection_type_t GetType();
 
-        /**
-        * \brief Receive bytes from a source.
-		*
-		* \return the number of bytes received, or 0 if the peer has shutdown.
-		*
-		* \exception SocketException an error occurred.
-        *
-        */
-        virtual int Receive(char *data_, int data_length_, int time_) = 0;
+	/**
+	 * \brief Send bytes to a destination.
+	 *
+	 */
+	virtual bool IsClosed();
 
-        /**
-        * \brief Close the socket.
-        *
-        */
-        virtual void Close() = 0;
-        
-		/**
-        * \brief 
-        *
-        */
+	/**
+	 * \brief Send bytes to a destination.
+	 *
+	 */
+	virtual int Send(const char *b_, int size_, bool block_ = true) = 0;
+
+	/**
+	 * \brief Send bytes to a destination.
+	 *
+	 */
+	virtual int Send(const char *b_, int size_, int time_) = 0;
+
+	/**
+	 * \brief Receive bytes from a source.
+	 *
+	 * \return the number of bytes received, or 0 if the peer has shutdown.
+	 *
+	 * \exception SocketException an error occurred.
+	 *
+	 */
+	virtual int Receive(char *data_, int data_length_, bool block_ = true) = 0;
+
+	/**
+	 * \brief Receive bytes from a source.
+	 *
+	 * \return the number of bytes received, or 0 if the peer has shutdown.
+	 *
+	 * \exception SocketException an error occurred.
+	 *
+	 */
+	virtual int Receive(char *data_, int data_length_, int time_) = 0;
+
+	/**
+	 * \brief Close the socket.
+	 *
+	 */
+	virtual void Close() = 0;
+
+	/**
+	 * \brief 
+	 *
+	 */
 #ifdef _WIN32
 		virtual SOCKET GetHandler() = 0;
 #else
 		virtual int GetHandler() = 0;
 #endif
         
-        /**
-        * \brief
-        *
-        */
-        virtual jio::InputStream * GetInputStream() = 0;
-        
-        /**
-        * \brief
-        *
-        */
-        virtual jio::OutputStream * GetOutputStream() = 0;
-        
-        /**
-        * \brief Get the bytes sent to a destination.
-        *
-        */
-        virtual int64_t GetSentBytes() = 0;
-            
-        /**
-        * \brief Get de bytes received from a source.
-        *
-        */
-        virtual int64_t GetReceiveBytes() = 0;
+	/**
+    * \brief
+    *
+    */
+	virtual jio::InputStream * GetInputStream() = 0;
+
+	/**
+	 * \brief
+	 *
+	 */
+	virtual jio::OutputStream * GetOutputStream() = 0;
+
+	/**
+	 * \brief Get the bytes sent to a destination.
+	 *
+	 */
+	virtual int64_t GetSentBytes() = 0;
+
+	/**
+	 * \brief Get de bytes received from a source.
+	 *
+	 */
+	virtual int64_t GetReceiveBytes() = 0;
 
 
 };
