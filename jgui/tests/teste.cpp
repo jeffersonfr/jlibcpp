@@ -228,7 +228,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			list = new jgui::ListBox(1250, 450, 400, 280);
+			list = new jgui::ListBox(1250, 450, 400, 300);
 
 			list->AddImageItem("opcao 1", std::string("icons/red_icon.png"));
 			list->AddTextItem("opcao 2");
@@ -238,7 +238,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			list->AddTextItem("opcao 6");
 			list->AddImageItem("opcao 7", std::string("icons/blue_icon.png"));
 			list->AddTextItem("opcao 8");
-			list->AddTextItem("opcao 9");
+			list->AddImageItem("opcao 9", std::string("icons/red_icon.png"));
 			list->AddTextItem("opcao 0");
 		}
 

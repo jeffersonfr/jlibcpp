@@ -107,6 +107,30 @@ class ListBox : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
+		void AddEmptyItem();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddTextItem(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddImageItem(std::string text, std::string image);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddCheckedItem(std::string text, bool checked);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetVisibleItems();
 		
 		/**
