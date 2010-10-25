@@ -82,8 +82,8 @@ Window::~Window()
 	}
 
 	if (surface != NULL) {
-		surface->SetDrawingFlags(surface, DSDRAW_NOFX);
-		surface->SetBlittingFlags(surface, DSBLIT_NOFX);
+		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_NOFX));
+		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_NOFX));
 		surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
 		// CHANGE:: ReleaseSource() -> Release()
 		surface->Release(surface);
@@ -111,6 +111,47 @@ void * Window::GetNativeWindow()
 #endif
 
 	return NULL;
+}
+
+void Window::SetNativeWindow(void *native)
+{
+	if (native == NULL) {
+		return;
+	}
+
+	ReleaseWindow();
+
+#ifdef DIRECTFB_UI
+	IDirectFBSurface *window_surface = NULL;
+
+	window = (IDirectFBWindow *)native;
+	
+	if (window->GetSurface(window, &window_surface) != DFB_OK) {
+		window->Release(window);
+
+		window = NULL;
+		surface = NULL;
+
+		return;
+	}
+
+	if (graphics == NULL) {
+		graphics = new Graphics(window_surface);
+	} else {
+		graphics->SetNativeSurface(window_surface);
+	}
+
+	if (surface != NULL) {
+		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_NOFX));
+		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_NOFX));
+		// CHANGE:: ReleaseSource() -> Release()
+		surface->Release(surface);
+
+		surface = NULL;
+	}
+
+	surface = window_surface;
+#endif
 }
 
 void Window::SetWorkingScreenSize(int width, int height)
@@ -147,7 +188,7 @@ jcursor_style_t Window::GetCursor()
 	return _cursor;
 }
 
-void Window::InnerCreateWindow()
+void Window::InnerCreateWindow(void *params)
 {
 #ifdef DIRECTFB_UI
 	jthread::AutoLock lock(&_inner_mutex);
@@ -157,7 +198,13 @@ void Window::InnerCreateWindow()
 	IDirectFBWindow *w = NULL;
 	IDirectFBSurface *s = NULL;
 	
-	gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &w, &s, _opacity, _scale_width, _scale_height);
+	if (params == NULL) {
+		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &w, &s, _opacity, _scale_width, _scale_height);
+	} else {
+		DFBWindowDescription desc = *(DFBWindowDescription *)params;
+
+		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &w, &s, desc, _opacity, _scale_width, _scale_height);
+	}
 
 	if (s != NULL) {
 		// graphics = new NullGraphics();
@@ -170,8 +217,8 @@ void Window::InnerCreateWindow()
 	}
 
 	if (surface != NULL) {
-		surface->SetDrawingFlags(surface, DSDRAW_NOFX);
-		surface->SetBlittingFlags(surface, DSBLIT_NOFX);
+		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_NOFX));
+		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_NOFX));
 		// CHANGE:: ReleaseSource() -> Release()
 		surface->Release(surface);
 		surface = NULL;
@@ -266,7 +313,7 @@ void Window::SetBounds(int x, int y, int w, int h)
 		w = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width),
 		h = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
 
-		window->SetBounds(window, x, y, w, h);
+		while (window->SetBounds(window, x, y, w, h) == DFB_LOCKED);
 	}
 #endif
 	
@@ -286,7 +333,7 @@ void Window::SetLocation(int x, int y)
 			dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
 
 	if (window != NULL) {
-		window->MoveTo(window, dx, dy);
+		while (window->MoveTo(window, dx, dy) == DFB_LOCKED);
 	}
 #endif
 	
@@ -390,7 +437,7 @@ void Window::SetSize(int width, int height)
 		width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width);
 		height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
 
-		window->Resize(window, width, height);
+		while (window->Resize(window, width, height) == DFB_LOCKED);
 	}
 #endif
 	
@@ -409,7 +456,7 @@ void Window::Move(int x, int y)
 			dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
 
 	if (window != NULL) {
-		window->Move(window, dx, dy);
+		while (window->Move(window, dx, dy) == DFB_LOCKED);
 	}
 #endif
 	

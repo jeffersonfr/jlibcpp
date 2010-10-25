@@ -99,7 +99,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			animation->AddImage("icons/tux11.jpg");
 			animation->AddImage("icons/tux12.jpg");
 
-			animation->Start();
+			// animation->Start();
 		}
 
 		{
@@ -107,7 +107,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 			marquee->SetType(jgui::LOOP_TEXT);
 
-			marquee->Start();
+			// marquee->Start();
 		}
 
 		{
@@ -119,7 +119,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			slider->SetPosition(20.0);
 			scroll->SetPosition(20.0);
 
-			progress->Start();
+			// progress->Start();
 		}
 
 		{
@@ -141,7 +141,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			watch->SetMinutes(0);
 			watch->SetHours(0);
 
-			watch->Start();
+			// watch->Start();
 		}
 
 		{
@@ -735,13 +735,13 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 	{
 		int h = 100;
 
-		button1 = new jgui::Button("Keyboard Test", 150, 0*h+100, 500, h);
-		button2 = new jgui::Button("Calendar Test", 150, 1*h+100, 500, h);
-		button3 = new jgui::Button("Components Test", 150, 2*h+100, 500, h);
-		button4 = new jgui::Button("MessageDialog Test", 150, 3*h+100, 500, h);
-		button5 = new jgui::Button("InputDialogBox Test", 150, 4*h+100, 500, h);
-		button6 = new jgui::Button("Graphics Test", 150, 5*h+100, 500, h);
-		button7 = new jgui::Button("Menu Test", 150, 6*h+100, 500, h);
+		button1 = new jgui::Button("Keyboard Test", 150, 0*(h+10)+100, 500, h);
+		button2 = new jgui::Button("Calendar Test", 150, 1*(h+10)+100, 500, h);
+		button3 = new jgui::Button("Components Test", 150, 2*(h+10)+100, 500, h);
+		button4 = new jgui::Button("MessageDialog Test", 150, 3*(h+10)+100, 500, h);
+		button5 = new jgui::Button("InputDialogBox Test", 150, 4*(h+10)+100, 500, h);
+		button6 = new jgui::Button("Graphics Test", 150, 5*(h+10)+100, 500, h);
+		button7 = new jgui::Button("Menu Test", 150, 6*(h+10)+100, 500, h);
 
 		button1->RegisterButtonListener(this);
 		button2->RegisterButtonListener(this);

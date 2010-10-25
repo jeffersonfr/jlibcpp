@@ -60,7 +60,7 @@ IDirectFBDisplayLayer * GFXHandler::GetDisplayLayer()
 	return _layer;
 }
 
-void GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width, int scale_height)
+int GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width, int scale_height)
 {
 	if (scale_width <= 0) {
 		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
@@ -89,21 +89,66 @@ void GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, 
 	if (_dfb->CreateFont(_dfb, fname.c_str(), &font_dsc, font) != DFB_OK) {
 		(*font) = NULL;
 
-		return;
+		return -1;
 	}
 
 	(*font)->FindEncoding(*font, "Latin1", &enc_id);
 	(*font)->SetEncoding(*font, enc_id);
+
+	return 0;
 }
 
-int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity, int scale_width, int scale_height)
+int GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, DFBFontDescription font_desc, int scale_width, int scale_height)
 {
-	int x = (xp * screenWidth) / scale_width; 
-	int y = (yp * screenHeight) / scale_height;
+	if (scale_width <= 0) {
+		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
+	}
+
+	if (scale_height <= 0) {
+		scale_height = scaleHeight; // DEFAULT_SCALE_HEIGHT;
+	}
+
+	DFBFontDescription font_dsc;
+	DFBTextEncodingID enc_id;
+
+	font_dsc.flags = (DFBFontDescriptionFlags)(DFDESC_HEIGHT | font_desc.flags);
+	font_dsc.attributes = (DFBFontAttributes)(font_desc.attributes);
+	font_dsc.height = (int)round(((double)height*(double)screenHeight)/(double)scale_height);
+
+	if (font_dsc.height < 1) {
+		font_dsc.height = 1;
+	}
+
+	std::string fname = name;
+
+	if (fname == "") {
+		fname = "./fonts/font.ttf";
+	}
+
+	if (_dfb->CreateFont(_dfb, fname.c_str(), &font_dsc, font) != DFB_OK) {
+		(*font) = NULL;
+
+		return -1;
+	}
+
+	(*font)->FindEncoding(*font, "Latin1", &enc_id);
+	(*font)->SetEncoding(*font, enc_id);
+
+	return 0;
+}
+
+int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height)
+{
+	if (scale_width <= 0) {
+		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
+	}
+
+	if (scale_height <= 0) {
+		scale_height = scaleHeight; // DEFAULT_SCALE_HEIGHT;
+	}
+
 	int width = (widthp * screenWidth) / scale_width;
 	int height = (heightp * screenHeight) / scale_height;
-
-	DFBWindowDescription desc;
 
 	if (width < 2) {
 		width = 2;
@@ -121,10 +166,183 @@ int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 		height = screenHeight;
 	}
 
+	DFBSurfaceDescription desc;
+
+	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
+	desc.caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_SYSTEMONLY);
+	desc.width = width;
+	desc.height = height;
+
+	if (pixelformat == SPF_UNKNOWN) {
+		desc.pixelformat = DSPF_UNKNOWN;
+	} else if (pixelformat == SPF_ARGB1555) {
+		desc.pixelformat = DSPF_ARGB1555;
+	} else if (pixelformat == SPF_RGB16) {
+		desc.pixelformat = DSPF_RGB16;
+	} else if (pixelformat == SPF_RGB24) {
+		desc.pixelformat = DSPF_RGB24;
+	} else if (pixelformat == SPF_RGB32) {
+		desc.pixelformat = DSPF_RGB32;
+	} else if (pixelformat == SPF_ARGB) {
+		desc.pixelformat = DSPF_ARGB;
+	} else if (pixelformat == SPF_A8) {
+		desc.pixelformat = DSPF_A8;
+	} else if (pixelformat == SPF_YUY2) {
+		desc.pixelformat = DSPF_YUY2;
+	} else if (pixelformat == SPF_RGB332) {
+		desc.pixelformat = DSPF_RGB332;
+	} else if (pixelformat == SPF_UYVY) {
+		desc.pixelformat = DSPF_UYVY;
+	} else if (pixelformat == SPF_I420) {
+		desc.pixelformat = DSPF_I420;
+	} else if (pixelformat == SPF_YV12) {
+		desc.pixelformat = DSPF_YV12;
+	} else if (pixelformat == SPF_LUT8) {
+		desc.pixelformat = DSPF_LUT8;
+	} else if (pixelformat == SPF_ALUT44) {
+		desc.pixelformat = DSPF_ALUT44;
+	} else if (pixelformat == SPF_AiRGB) {
+		desc.pixelformat = DSPF_AiRGB;
+	} else if (pixelformat == SPF_A1) {
+		desc.pixelformat = DSPF_A1;
+	} else if (pixelformat == SPF_NV12) {
+		desc.pixelformat = DSPF_NV12;
+	} else if (pixelformat == SPF_NV16) {
+		desc.pixelformat = DSPF_NV16;
+	} else if (pixelformat == SPF_ARGB2554) {
+		desc.pixelformat = DSPF_ARGB2554;
+	} else if (pixelformat == SPF_ARGB4444) {
+		desc.pixelformat = DSPF_ARGB4444;
+	} else if (pixelformat == SPF_RGBA4444) {
+		desc.pixelformat = DSPF_RGBA4444;
+	} else if (pixelformat == SPF_NV21) {
+		desc.pixelformat = DSPF_NV21;
+	} else if (pixelformat == SPF_AYUV) {
+		desc.pixelformat = DSPF_AYUV;
+	} else if (pixelformat == SPF_A4) {
+		desc.pixelformat = DSPF_A4;
+	} else if (pixelformat == SPF_ARGB1666) {
+		desc.pixelformat = DSPF_ARGB1666;
+	} else if (pixelformat == SPF_ARGB6666) {
+		desc.pixelformat = DSPF_ARGB6666;
+	} else if (pixelformat == SPF_RGB18) {
+		desc.pixelformat = DSPF_RGB18;
+	} else if (pixelformat == SPF_LUT2) {
+		desc.pixelformat = DSPF_LUT2;
+	} else if (pixelformat == SPF_RGB444) {
+		desc.pixelformat = DSPF_RGB444;
+	} else if (pixelformat == SPF_RGB555) {
+		desc.pixelformat = DSPF_RGB555;
+	} else if (pixelformat == SPF_BGR555) {
+		desc.pixelformat = DSPF_BGR555;
+	} else if (pixelformat == SPF_RGBA5551) {
+		desc.pixelformat = DSPF_RGBA5551;
+	} else if (pixelformat == SPF_AVYU) {
+		desc.pixelformat = DSPF_AVYU;
+	} else if (pixelformat == SPF_VYU) {
+		desc.pixelformat = DSPF_VYU;
+	}
+
+	if (_dfb->CreateSurface(_dfb, &desc, surface) != DFB_OK) {
+		(*surface) = NULL;
+
+		return -1;
+	}
+
+	(*surface)->SetBlittingFlags((*surface), (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_BLEND_ALPHACHANNEL));
+	(*surface)->SetDrawingFlags((*surface), (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_BLEND));
+	(*surface)->SetPorterDuff((*surface), DSPD_SRC_OVER);
+
+	(*surface)->Clear((*surface), 0x00, 0x00, 0x00, 0x00);
+	// surface->Flip(surface, NULL, DSFLIP_NONE);
+	// surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
+
+	return 0;
+}
+
+int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, DFBSurfaceDescription surface_desc, int scale_width, int scale_height)
+{
+	if (scale_width <= 0) {
+		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
+	}
+
+	if (scale_height <= 0) {
+		scale_height = scaleHeight; // DEFAULT_SCALE_HEIGHT;
+	}
+
+	int width = (widthp * screenWidth) / scale_width;
+	int height = (heightp * screenHeight) / scale_height;
+
+	if (width < 2) {
+		width = 2;
+	}
+
+	if (height < 2) {
+		height = 2;
+	}
+
+	if (width > screenWidth) {
+		width = screenWidth;
+	}
+
+	if (height > screenHeight) {
+		height = screenHeight;
+	}
+
+	DFBSurfaceDescription desc;
+
+	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | surface_desc.flags);
+	desc.caps = (DFBSurfaceCapabilities)(surface_desc.caps);
+	desc.width = width;
+	desc.height = height;
+
+	if (_dfb->CreateSurface(_dfb, &desc, surface) != DFB_OK) {
+		(*surface) = NULL;
+
+		return -1;
+	}
+
+	(*surface)->SetBlittingFlags((*surface), (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_BLEND_ALPHACHANNEL));
+	(*surface)->SetDrawingFlags((*surface), (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_BLEND));
+	(*surface)->SetPorterDuff((*surface), DSPD_SRC_OVER);
+
+	(*surface)->Clear((*surface), 0x00, 0x00, 0x00, 0x00);
+	// surface->Flip(surface, NULL, DSFLIP_NONE);
+	// surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
+
+	return 0;
+}
+
+int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity, int scale_width, int scale_height)
+{
+
+	int x = (xp * screenWidth) / scale_width; 
+	int y = (yp * screenHeight) / scale_height;
+	int width = (widthp * screenWidth) / scale_width;
+	int height = (heightp * screenHeight) / scale_height;
+
+	if (width < 2) {
+		width = 2;
+	}
+
+	if (height < 2) {
+		height = 2;
+	}
+
+	if (width > screenWidth) {
+		width = screenWidth;
+	}
+
+	if (height > screenHeight) {
+		height = screenHeight;
+	}
+
+	DFBWindowDescription desc;
+
 	/* Fill the window description. */
 	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_SURFACE_CAPS | DWDESC_PIXELFORMAT);
 	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION); // | DWCAPS_DOUBLEBUFFER);
-	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE);
+	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE | DSCAPS_PREMULTIPLIED);
 	desc.pixelformat = DSPF_ARGB;
 	desc.posx   = x;
 	desc.posy   = y;
@@ -133,18 +351,92 @@ int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 
 	/* Create the window. */
 	if (_layer->CreateWindow(_layer, &desc, window) != DFB_OK) {
+		(*window) = NULL;
+		(*surface) = NULL;
+
 		return -1;
 	}
 
 	/* Get the window's surface. */
 	if ((*window)->GetSurface(*window, surface) != DFB_OK) {
+		(*window)->Release(*window);
+
+		(*window) = NULL;
+		(*surface) = NULL;
+
 		return -1;
 	}
 
 	// Add ghost option (behave like an overlay)
 	(*window)->SetOptions( (*window), (DFBWindowOptions)(DWOP_ALPHACHANNEL));// | DWOP_GHOST));
 	// Move window to upper stacking class
-	(*window)->SetStackingClass(*window, DWSC_UPPER);
+	// (*window)->SetStackingClass(*window, DWSC_UPPER);
+	// Make it the top most window
+	(*window)->RaiseToTop(*window);
+	(*window)->SetOpacity(*window, opacity);
+	// (*surface)->SetRenderOptions(*surface, DSRO_ALL);
+	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
+
+	return 0;
+}
+
+int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBWindow **window, IDirectFBSurface **surface, DFBWindowDescription window_desc, int opacity, int scale_width, int scale_height)
+{
+	int x = (xp * screenWidth) / scale_width; 
+	int y = (yp * screenHeight) / scale_height;
+	int width = (widthp * screenWidth) / scale_width;
+	int height = (heightp * screenHeight) / scale_height;
+
+	if (width < 2) {
+		width = 2;
+	}
+
+	if (height < 2) {
+		height = 2;
+	}
+
+	if (width > screenWidth) {
+		width = screenWidth;
+	}
+
+	if (height > screenHeight) {
+		height = screenHeight;
+	}
+
+	DFBWindowDescription desc;
+
+	/* Fill the window description. */
+	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | window_desc.flags);
+	desc.caps   = (DFBWindowCapabilities)(window_desc.caps);
+	desc.surface_caps = (DFBSurfaceCapabilities)(window_desc.surface_caps);
+	desc.pixelformat = window_desc.pixelformat;
+	desc.posx   = x;
+	desc.posy   = y;
+	desc.width  = width;
+	desc.height = height;
+
+	/* Create the window. */
+	if (_layer->CreateWindow(_layer, &desc, window) != DFB_OK) {
+		(*window) = NULL;
+		(*surface) = NULL;
+
+		return -1;
+	}
+
+	/* Get the window's surface. */
+	if ((*window)->GetSurface(*window, surface) != DFB_OK) {
+		(*window)->Release(*window);
+
+		(*window) = NULL;
+		(*surface) = NULL;
+
+		return -1;
+	}
+
+	// Add ghost option (behave like an overlay)
+	(*window)->SetOptions( (*window), (DFBWindowOptions)(DWOP_ALPHACHANNEL));// | DWOP_GHOST));
+	// Move window to upper stacking class
+	// (*window)->SetStackingClass(*window, DWSC_UPPER);
 	// Make it the top most window
 	(*window)->RaiseToTop(*window);
 	(*window)->SetOpacity(*window, opacity);

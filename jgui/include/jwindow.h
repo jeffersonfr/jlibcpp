@@ -59,7 +59,7 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		bool _undecorated;
 		jcursor_style_t _cursor;
 
-		void InnerCreateWindow();
+		void InnerCreateWindow(void *params = NULL);
 
 	public:
 		/**
@@ -85,6 +85,12 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 *
 		 */
 		virtual void * GetNativeWindow();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetNativeWindow(void *native);
 
 		/**
 		 * \brief

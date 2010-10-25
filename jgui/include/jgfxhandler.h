@@ -23,6 +23,7 @@
 #include "jobject.h"
 #include "jmutex.h"
 #include "jgraphics.h"
+#include "joffscreenimage.h"
 
 #include <vector>
 #include <map>
@@ -151,13 +152,37 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		int CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int CreateFont(std::string name, int height, IDirectFBFont **font, DFBFontDescription font_desc, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, DFBSurfaceDescription surface_desc, int scale_width, int scale_height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, DFBWindowDescription window_desc, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 #endif
 
 	public:

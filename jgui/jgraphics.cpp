@@ -316,13 +316,17 @@ void Graphics::SetDrawingFlags(jdrawing_flags_t t)
 
 #ifdef DIRECTFB_UI
 	if (surface != NULL) {
+		DFBSurfaceDrawingFlags flags = (DFBSurfaceDrawingFlags)DSDRAW_SRC_PREMULTIPLY;
+
 		if (_draw_flags == DF_NOFX) {
-			surface->SetDrawingFlags(surface, DSDRAW_NOFX);
+			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_NOFX);
 		} else if (_draw_flags == DF_BLEND) {
-			surface->SetDrawingFlags(surface, DSDRAW_BLEND);
+			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_BLEND);
 		} else if (_draw_flags == DF_XOR) {
-			surface->SetDrawingFlags(surface, DSDRAW_XOR);
+			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_XOR);
 		}
+			
+		surface->SetDrawingFlags(surface, flags);
 	}
 #endif
 }
@@ -337,7 +341,12 @@ void Graphics::SetBlittingFlags(jblitting_flags_t t)
 
 #ifdef DIRECTFB_UI
 	if (surface != NULL) {
-		DFBSurfaceBlittingFlags f = (DFBSurfaceBlittingFlags)0; // NOFX_BLIT;
+		DFBSurfaceBlittingFlags f = (DFBSurfaceBlittingFlags)0;//DSBLIT_SRC_PREMULTIPLY; // NOFX_BLIT;
+
+		if (_blit_flags & BF_COLORALPHA) {
+			// f = (DFBSurfaceBlittingFlags)(f | DSBLIT_BLEND_COLORALPHA);
+			f = (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_COLORALPHA);
+		} 
 
 		if (_blit_flags & BF_NOFX) {
 			f = (DFBSurfaceBlittingFlags)(f | DSBLIT_NOFX);
@@ -346,10 +355,6 @@ void Graphics::SetBlittingFlags(jblitting_flags_t t)
 		if (_blit_flags & BF_ALPHACHANNEL) {
 			f = (DFBSurfaceBlittingFlags)(f | DSBLIT_BLEND_ALPHACHANNEL);
 		}
-
-		if (_blit_flags & BF_COLORALPHA) {
-			f = (DFBSurfaceBlittingFlags)(f | DSBLIT_BLEND_COLORALPHA);
-		} 
 
 		if (_blit_flags & BF_COLORIZE) {
 			f = (DFBSurfaceBlittingFlags)(f | DSBLIT_COLORIZE);
@@ -410,8 +415,8 @@ void Graphics::Flip()
 		return;
 	}
 
-	// surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
-	surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
+	surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+	// surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
 #endif
 }
 
@@ -438,8 +443,8 @@ void Graphics::Flip(int xp, int yp, int wp, int hp)
 	rgn.x2 = x+w;
 	rgn.y2 = y+h;
 
-	// surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC | DSFLIP_BLIT));
-	surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
+	surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+	// surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
 #endif
 }
 
@@ -1758,7 +1763,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 	}
 
 	// imgSurface->Clear(surface, 0, 0, 0, 0);
-	imgSurface->SetBlittingFlags(imgSurface, DSBLIT_BLEND_ALPHACHANNEL);
+	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_BLEND_ALPHACHANNEL));
 
 	if (imgProvider->RenderTo(imgProvider, imgSurface, NULL) != DFB_OK) {
 		imgProvider->Release(imgProvider);
@@ -1858,7 +1863,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 
 	// imgSurface->Clear(surface, 0, 0, 0, 0);
 	
-	imgSurface->SetBlittingFlags(imgSurface, DSBLIT_BLEND_ALPHACHANNEL);
+	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_BLEND_ALPHACHANNEL));
 
 	if (imgProvider->RenderTo(imgProvider, imgSurface, &rect) != DFB_OK) {
 		imgProvider->Release(imgProvider);
@@ -2000,8 +2005,8 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		return false;
 	}
 
-	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-	imgSurface->SetDrawingFlags(imgSurface, DSDRAW_BLEND);
+	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_BLEND_ALPHACHANNEL));
+	imgSurface->SetDrawingFlags(imgSurface, (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_BLEND));
 	imgSurface->SetPorterDuff(imgSurface, DSPD_SRC_OVER);
 	
 	// imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
