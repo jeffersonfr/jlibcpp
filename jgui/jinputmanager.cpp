@@ -21,7 +21,9 @@
 #include "jinputmanager.h"
 #include "jwindowmanager.h"
 
+#ifndef CLAMP
 #define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+#endif
 
 namespace jgui {
 	
