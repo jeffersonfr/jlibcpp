@@ -108,12 +108,13 @@ class File : public virtual jcommon::Object{
 		/** \brief */
 		bool _exists;
 
+	private:
 		/**
 		 * \brief Construtor.
 		 *
 		 */
 		File(std::string prefix, std::string sufix, bool scramble);
-		
+	
 	public:
 		/**
 		 * \brief Create a new file.
@@ -138,7 +139,20 @@ class File : public virtual jcommon::Object{
 		 *
 		 */
 		static File * CreateTemporary(std::string prefix, std::string sufix = std::string(""));
+
+		/**
+		 * \brief
+		 *
+		 */
+		static std::string Normalize(std::string pathname);
 		
+		/**
+		 * \brief Check that the given pathname is normal.  If not, invoke the real normalizer on the part of the 
+		 * pathname that requires normalization. This way we iterate through the whole pathname string only once.
+		 *
+		 */
+		static std::string Normalize(std::string pathname, int len, int off);
+
 		/**
 		 * \brief Retorna o descritor para o arquivo.
 		 *

@@ -29,7 +29,7 @@ using namespace jio;
 
 int main()
 {
-	FileInputStream is("/etc/channels.conf");
+	FileInputStream is(File::Normalize("/etc/channels.conf"));
 	BufferedReader reader(&is);
 
 	while (reader.IsEOF() == false) {

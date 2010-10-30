@@ -346,6 +346,72 @@ File * File::CreateTemporary(std::string prefix, std::string sufix)
 	return file;
 }
 
+std::string File::Normalize(std::string pathname, int len, int off) 
+{
+	if (len == 0) 
+		return pathname;
+
+	int n = len;
+
+	while ((n > 0) && (pathname[n - 1] == '/')) {
+		n--;
+	}
+
+	if (n == 0) {
+		return "/";
+	}
+
+	std::ostringstream o;
+	
+	if (off > 0) 
+		o << pathname.substr(0, off);
+
+	char prevChar = 0;
+
+	for (int i = off; i < n; i++) {
+		char c = pathname[i];
+
+		if ((prevChar == '/') && (c == '/')) 
+			continue;
+
+		if ((c == '.') && (pathname[i+1] == '/')) {
+			i++;
+
+			continue;
+		}
+
+		o << c;
+
+		prevChar = c;
+	}
+
+	return o.str();
+}
+
+std::string File::Normalize(std::string pathname) 
+{
+	int n = pathname.length();
+	char prevChar = 0;
+	
+	for (int i = 0; i < n; i++) {
+	    char c = pathname[i];
+	   
+			if ((prevChar == '/') && (c == '/'))
+				return Normalize(pathname, n, i - 1);
+	  
+			if ((prevChar == '.') && (c == '/'))
+				return Normalize(pathname, n, i - 1);
+	  
+			prevChar = c;
+	}
+
+	if (prevChar == '/') 
+		return Normalize(pathname, n, n - 1);
+	
+	return pathname;
+  
+}
+
 #ifdef _WIN32
 HANDLE File::GetFileDescriptor()
 #else
