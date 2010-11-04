@@ -20,10 +20,16 @@ OBJS_inpi = \
 OBJS_object = \
 	   object.o\
 
+OBJS_teste = \
+	   teste.o\
+
+OBJS_file = \
+	   file.o\
+
 OBJS_data = \
 	   data.o\
 
-all: inpi object data teste
+all: inpi object data teste file
 	
 inpi: $(OBJS_inpi)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
@@ -31,10 +37,13 @@ inpi: $(OBJS_inpi)
 object: $(OBJS_object)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
-data: $(OBJS_data)
+teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
-teste: teste.o
+file: $(OBJS_file)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+        
+data: $(OBJS_data)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
@@ -44,4 +53,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ teste inpi object data
+	@rm -rvf *.o *~ teste inpi object data file
