@@ -152,6 +152,36 @@ int System::GetProcessID()
 #endif
 }
 
+std::string System::GetCurrentDirectory()
+{
+#ifdef _WIN32
+	char buffer[_MAX_PATH];
+	DWORD n;
+	
+	n = ::GetCurrentDirectory((DWORD)sizeof(buffer), (LPSTR)buffer);
+
+	if (n < 0 || n > sizeof(buffer)) {
+		throw FileException("Cannot return the path");
+	}
+
+	std::string result(buffer, n);
+
+	if (result[n - 1] != '\\') {
+		result.append("\\");
+	}
+
+	return std::string(result);
+#else
+	char path[65536];
+	
+	if (getcwd(path, 65536) == NULL) {
+		throw RuntimeException(strerror(errno));
+	}
+
+	return path;
+#endif
+}
+
 std::string System::GetHomeDirectory()
 {
 #ifdef _WIN32

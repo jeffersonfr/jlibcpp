@@ -99,7 +99,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			animation->AddImage("icons/tux11.jpg");
 			animation->AddImage("icons/tux12.jpg");
 
-			// animation->Start();
+			animation->Start();
 		}
 
 		{
@@ -107,7 +107,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 			marquee->SetType(jgui::LOOP_TEXT);
 
-			// marquee->Start();
+			marquee->Start();
 		}
 
 		{
@@ -119,7 +119,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			slider->SetPosition(20.0);
 			scroll->SetPosition(20.0);
 
-			// progress->Start();
+			progress->Start();
 		}
 
 		{
@@ -141,7 +141,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			watch->SetMinutes(0);
 			watch->SetHours(0);
 
-			// watch->Start();
+			watch->Start();
 		}
 
 		{
@@ -210,7 +210,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 			group = new jgui::CheckButtonGroup();
 
-			radio1->SetSelected(true);
+			radio2->SetSelected(true);
 
 			group->Add(radio1);
 			group->Add(radio2);

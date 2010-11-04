@@ -656,10 +656,12 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 			graphics->Translate(-x3, -y3);
 
 			c1->Revalidate();
+			
+			graphics->Flip(x3, y3, w3, h3);
 		}
 		
 		if (collisions.size() > 0) {
-			graphics->Flip(x1, y1, x2-x1, y2-y1);
+			// graphics->Flip(x1, y1, x2-x1, y2-y1);
 		}
 	} else {
 		c1 = c;

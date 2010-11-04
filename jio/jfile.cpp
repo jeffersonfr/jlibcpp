@@ -21,6 +21,8 @@
 #include "jfile.h"
 #include "jfileexception.h"
 #include "jioexception.h"
+#include "jstringtokenizer.h"
+#include "jsystem.h"
 
 namespace jio {
 
@@ -334,22 +336,25 @@ File::~File()
 	Close();
 }
 
-File * File::CreateTemporary(std::string prefix, std::string sufix)
+std::string File::GetDelimiter()
 {
-	File *file = new File(prefix, sufix, true); // F_READ_WRITE | F_LARGEFILE | F_CREAT);
-
-	if (file->Exists() == false) {
-		delete file;
-		file = NULL;
-	}
-
-	return file;
+#ifdef _WIN32
+	return "\\";
+#else
+	return "/";
+#endif
 }
 
-std::string File::Normalize(std::string pathname, int len, int off) 
+/**
+ * \brief Check that the given pathname is normal.  If not, invoke the real normalizer on the part of the 
+ * pathname that requires normalization. This way we iterate through the whole pathname string only once.
+ *
+ */
+std::string Normalize(std::string pathname, char delimiter, int len, int off) 
 {
-	if (len == 0) 
+	if (len == 0) {
 		return pathname;
+	}
 
 	int n = len;
 
@@ -363,21 +368,24 @@ std::string File::Normalize(std::string pathname, int len, int off)
 
 	std::ostringstream o;
 	
-	if (off > 0) 
+	if (off > 0) {
 		o << pathname.substr(0, off);
+	}
 
 	char prevChar = 0;
 
 	for (int i = off; i < n; i++) {
 		char c = pathname[i];
 
-		if ((prevChar == '/') && (c == '/')) 
+		if ((prevChar == delimiter) && (c == delimiter)) 
 			continue;
 
-		if ((c == '.') && (pathname[i+1] == '/')) {
-			i++;
+		if ((prevChar != '.') && (c == '.')) {
+			if (pathname[i+1] == delimiter) {
+				i++;
 
-			continue;
+				continue;
+			}
 		}
 
 		o << c;
@@ -388,28 +396,82 @@ std::string File::Normalize(std::string pathname, int len, int off)
 	return o.str();
 }
 
-std::string File::Normalize(std::string pathname) 
+std::string File::NormalizePath(std::string pathname) 
 {
-	int n = pathname.length();
-	char prevChar = 0;
+	int n = (int)pathname.length();
+	char delimiter = GetDelimiter()[0],
+			 prevChar = '\0';
 	
 	for (int i = 0; i < n; i++) {
-	    char c = pathname[i];
-	   
-			if ((prevChar == '/') && (c == '/'))
-				return Normalize(pathname, n, i - 1);
-	  
-			if ((prevChar == '.') && (c == '/'))
-				return Normalize(pathname, n, i - 1);
-	  
-			prevChar = c;
+		char c = pathname[i];
+
+		if ((prevChar == delimiter) && (c == delimiter)) {
+			return Normalize(pathname, delimiter, n, i - 1);
+		}
+
+		if ((prevChar == '.') && (c == delimiter)) {
+			int k = 0;
+
+			if (i > 1) {
+				k++;
+			}
+
+			return Normalize(pathname, delimiter, n, i - k - 1);
+		}
+
+		prevChar = c;
 	}
 
-	if (prevChar == '/') 
-		return Normalize(pathname, n, n - 1);
-	
+	if (prevChar == delimiter) 
+		return Normalize(pathname, delimiter, n, n - 1);
+
 	return pathname;
-  
+}
+
+std::string File::ProcessPath(std::string pathname)
+{
+	jcommon::StringTokenizer tokens(NormalizePath(pathname), GetDelimiter(), jcommon::SPLIT_FLAG, false);
+	std::vector<std::string> path;
+
+	for (int i=0; i<tokens.GetSize(); i++) {
+		std::string token = tokens.GetToken(i);
+
+		if (token != "..") {
+			path.push_back(token);
+		} else {
+			if (path.size() > 0) {
+				path.erase(path.begin()+path.size()-1);
+			}
+		}
+	}
+
+	if (pathname.find(GetDelimiter()) == 0) {
+		pathname = GetDelimiter();
+	} else {
+		pathname = "";
+	}
+
+	for (int i=0; i<(int)path.size(); i++) {
+		pathname = pathname + path[i];
+
+		if (i < (int)(path.size()-1)) {
+			pathname = pathname + GetDelimiter();
+		}
+	}
+
+	return pathname;
+}
+
+File * File::CreateTemporary(std::string prefix, std::string sufix)
+{
+	File *file = new File(prefix, sufix, true); // F_READ_WRITE | F_LARGEFILE | F_CREAT);
+
+	if (file->Exists() == false) {
+		delete file;
+		file = NULL;
+	}
+
+	return file;
 }
 
 #ifdef _WIN32
@@ -559,25 +621,38 @@ int64_t File::GetSize()
 
 std::string File::GetName() 
 {
-	return _filename;
+	std::string name = NormalizePath(_filename);
+
+	size_t i = name.rfind(GetDelimiter());
+
+	if (i != std::string::npos) {
+		name = name.substr(i+1);
+
+		if (name == "") {
+			return GetDelimiter();
+		}
+	}
+
+	return name;
 }
 
 std::string File::GetPath()
 {
-	return GetAbsolutePath();
+	return _filename;
+}
+
+std::string File::GetCanonicalPath()
+{
+	return ProcessPath(GetAbsolutePath());
 }
 
 std::string File::GetAbsolutePath()
 {
-	std::string delimiter;
+	if (_filename.find(GetDelimiter()) == 0) {
+		return GetPath();
+	}
 
-#ifdef _WIN32
-	delimiter = "\\";
-#else
-	delimiter = "/";
-#endif
-
-	return GetCurrentDirectory() + delimiter + GetName();
+	return jcommon::System::GetCurrentDirectory() + GetDelimiter() + GetPath();
 }
 
 time_t File::GetLastAccessTime()
@@ -692,49 +767,6 @@ void File::Flush()
 	if (fsync(_fd) < 0) {
 		throw FileException("Flushing file error");
 	}
-#endif
-}
-
-void File::SetCurrentDirectory(std::string dir_)
-{
-#ifdef _WIN32
-	// TODO:: win32 set current dir
-#else
-	int r = chdir(dir_.c_str());
-
-	if (r < 0) {
-		throw IOException(strerror(errno));
-	}
-#endif
-}
-
-std::string File::GetCurrentDirectory()
-{
-#ifdef _WIN32
-	char buffer[_MAX_PATH];
-	DWORD n;
-	
-	n = ::GetCurrentDirectory((DWORD)sizeof(buffer), (LPSTR)buffer);
-
-	if (n < 0 || n > sizeof(buffer)) {
-		throw FileException("Cannot return the path");
-	}
-
-	std::string result(buffer, n);
-
-	if (result[n - 1] != '\\') {
-		result.append("\\");
-	}
-
-	return std::string(result);
-#else
-	char path[65536];
-	
-	if (getcwd(path, 65536) == NULL) {
-		throw FileException(strerror(errno));
-	}
-
-	return path;
 #endif
 }
 
@@ -945,7 +977,7 @@ int64_t File::Seek(int64_t n)
 
 std::string File::what()
 {
-	return "File";
+	return "file:" + GetAbsolutePath();
 }
 
 }

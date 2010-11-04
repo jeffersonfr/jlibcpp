@@ -138,20 +138,25 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static File * CreateTemporary(std::string prefix, std::string sufix = std::string(""));
+		static std::string GetDelimiter();
 
 		/**
 		 * \brief
 		 *
 		 */
-		static std::string Normalize(std::string pathname);
+		static std::string ProcessPath(std::string pathname);
 		
 		/**
-		 * \brief Check that the given pathname is normal.  If not, invoke the real normalizer on the part of the 
-		 * pathname that requires normalization. This way we iterate through the whole pathname string only once.
+		 * \brief
 		 *
 		 */
-		static std::string Normalize(std::string pathname, int len, int off);
+		static std::string NormalizePath(std::string pathname);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		static File * CreateTemporary(std::string prefix, std::string sufix = std::string(""));
 
 		/**
 		 * \brief Retorna o descritor para o arquivo.
@@ -229,6 +234,12 @@ class File : public virtual jcommon::Object{
 		 */
 		std::string GetPath();
 
+		/**
+		 * \brief Retorna o caminho absoluto do arquivo/diretorio.
+		 *
+		 */
+		std::string GetCanonicalPath();
+		
 		/**
 		 * \brief Retorna o caminho absoluto do arquivo/diretorio.
 		 *
