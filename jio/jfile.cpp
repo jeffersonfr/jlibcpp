@@ -432,6 +432,7 @@ std::string File::ProcessPath(std::string pathname)
 {
 	jcommon::StringTokenizer tokens(NormalizePath(pathname), GetDelimiter(), jcommon::SPLIT_FLAG, false);
 	std::vector<std::string> path;
+	std::vector<std::string>::iterator ipath;
 
 	for (int i=0; i<tokens.GetSize(); i++) {
 		std::string token = tokens.GetToken(i);
@@ -439,17 +440,15 @@ std::string File::ProcessPath(std::string pathname)
 		if (token != "..") {
 			path.push_back(token);
 		} else {
-			if (path.size() > 0) {
+			if (path.size() > 1) {
 				path.erase(path.begin()+path.size()-1);
+			} else {
+				path.push_back(token);
 			}
 		}
 	}
 
-	if (pathname.find(GetDelimiter()) == 0) {
-		pathname = GetDelimiter();
-	} else {
-		pathname = "";
-	}
+	pathname = "";
 
 	for (int i=0; i<(int)path.size(); i++) {
 		pathname = pathname + path[i];

@@ -221,6 +221,60 @@ Date::Date(int day, int month, int year, int hours, int minutes, int seconds):
 #endif
 }
 
+Date::Date(double julian)
+{
+	jcommon::Object::SetClassName("jcommon::Date");
+
+	_time = ((julian-2299160.5)*864000000000.0);
+	
+#ifdef _WIN32
+	int Y2, 
+			M2, 
+			Y, 
+			M, 
+			D, 
+			K,
+			hora,
+			horas, 
+			minutos, 
+			segundos,
+			MJD;
+
+	MJD = (int)(_time >> 24);
+	hora = (int)(_time & 0xffffff);
+
+	Y2 = (int) ((MJD - 15078.2) / 365.25);
+	M2 = (int) ((MJD - 14956.1 - (int) (Y2 * 365.25)) / 30.6001);
+	D  = MJD - 14956 - (int) (Y2 * 365.25) - (int) (M2 * 30.6001);
+	K  = M2 == 14 || M2 == 15 ? 1 : 0;
+	Y  = Y2 + K;
+	M  = M2 - 1 - K * 12;
+
+	horas    = ((hora >> 20) & 0x0f) * 10 + ((hora >> 16) & 0x0f);
+	minutos  = ((hora >> 12) & 0x0f) * 10 + ((hora >>  8) & 0x0f);
+	segundos = ((hora >>  4) & 0x0f) * 10 + ((hora >>  0) & 0x0f);
+
+	_zone.wDay = D; // 1-31
+	_zone.wMonth = M; // 1-12
+	_zone.wYear = Y + 1900; // 1601-30827
+	_zone.wHour = horas; // 0-23
+	_zone.wMinute = minutos; // 0-59
+	_zone.wSecond = segundos; // 0-59
+#else
+	_zone = localtime(&_time);
+	
+	if (_zone == NULL) {
+		try {
+			_zone = new struct tm;
+		} catch (std::bad_alloc &e) {
+			jcommon::RuntimeException("Cannot allocate memory");
+		}
+
+		memset(_zone, 0, sizeof(struct tm));
+	}
+#endif
+}
+
 Date::~Date()
 {
 #ifdef _WIN32
@@ -229,6 +283,11 @@ Date::~Date()
 		// free(_zone);
 	}
 #endif
+}
+
+double Date::ToJulian()
+{
+	return double(_time)/864000000000.0+2299160.5; // first day of Gregorian reform (Oct 15 1582)
 }
 
 uint64_t Date::CurrentTimeSeconds()

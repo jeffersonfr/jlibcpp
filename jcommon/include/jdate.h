@@ -80,7 +80,19 @@ class Date : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		Date(double julian);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Date();
+
+		/**
+		 * \brief
+		 *
+		 */
+		double ToJulian();
 
 		/**
 		 * \brief
