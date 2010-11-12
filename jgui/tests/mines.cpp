@@ -42,11 +42,17 @@ Mines::Mines(int x, int y):
 	slide->SetInputEnabled(false);
 	slide->Show(false);
 
-	prefetch1 = new jgui::OffScreenImage(size, size);
-	prefetch2 = new jgui::OffScreenImage(size, size);
+	small_bomb = new jgui::OffScreenImage(size, size);
+	huge_bomb = new jgui::OffScreenImage(4*size, 4*size);
+	flag = new jgui::OffScreenImage(size, size);
+	smile_face = new jgui::OffScreenImage(4*size, 4*size);
+	dead_face = new jgui::OffScreenImage(4*size, 4*size);
 	
-	prefetch1->GetGraphics()->DrawImage("icons/bomb.png", 0, 0, size, size);
-	prefetch2->GetGraphics()->DrawImage("icons/flag.png", 0, 0, size, size);
+	small_bomb->GetGraphics()->DrawImage("icons/bomb.png", 0, 0, size, size);
+	huge_bomb->GetGraphics()->DrawImage("icons/bomb.png", 0, 0, 4*size, 4*size);
+	flag->GetGraphics()->DrawImage("icons/flag.png", 0, 0, size, size);
+	smile_face->GetGraphics()->DrawImage("icons/smile_face.png", 0, 0, 4*size, 4*size);
+	dead_face->GetGraphics()->DrawImage("icons/dead_face.png", 0, 0, 4*size, 4*size);
 
 	AddSubtitle("icons/blue_icon.png", "Novo Jogo");
 	AddSubtitle("icons/yellow_icon.png", "Flag");
@@ -122,7 +128,7 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 			if (GetResult() == 1) {
 				graphics->SetColor(0x00, 0x00, 0x00, 0xff);
 				graphics->DrawString("Parabens", GetWidth()-190, 100);
-				graphics->DrawImage("icons/flag2.png", GetWidth()-190, 180, 160, 140);
+				graphics->DrawImage(smile_face, GetWidth()-210, 180, 160, 140);
 
 				Flip();
 
@@ -139,7 +145,7 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 			} else if (GetResult() == 2) {
 				graphics->SetColor(0x00, 0x00, 0x00, 0xff);
 				graphics->DrawString("Perdeu", GetWidth()-160, 100);
-				graphics->DrawImage("icons/flag3.png", GetWidth()-190, 180, 160, 140);
+				graphics->DrawImage(dead_face, GetWidth()-210, 180, 160, 140);
 
 				Flip();
 
@@ -194,11 +200,11 @@ int Mines::DrawBlock(int row, int col, block_type_t type, int value, bool update
 		graphics->SetColor(0xc0, 0xc0, 0xc0, 0xff);
 		graphics->FillRectangle(bx+col*(size+delta), by+row*(size+delta), size, size);
 
-		graphics->DrawImage(prefetch1, bx+col*(size+delta)+2, by+row*(size+delta)+2, prefetch1->GetWidth(), prefetch1->GetHeight());
+		graphics->DrawImage(small_bomb, bx+col*(size+delta)+2, by+row*(size+delta)+2);
 	} else if (type == MARKED_BLOCK) {
 		graphics->SetColor(0xc0, 0xc0, 0xc0, 0xff);
 		graphics->FillRectangle(bx+col*(size+delta), by+row*(size+delta), size, size);
-		graphics->DrawImage(prefetch2, bx+col*(size+delta)+2, by+row*(size+delta)+2, prefetch2->GetWidth(), prefetch2->GetHeight());
+		graphics->DrawImage(flag, bx+col*(size+delta)+2, by+row*(size+delta)+2);
 	}
 
 	if (update == true) {
@@ -226,8 +232,8 @@ void Mines::SetupBoard()
 
 	graphics->SetFont(_font);
 
-	graphics->DrawImage("icons/flag2.png", GetWidth()-190, 180, 160, 140);
-	graphics->DrawImage("icons/bomb.png", GetWidth()-180, 400, 160, 140);
+	graphics->DrawImage(smile_face, GetWidth()-210, 180, 160, 140);
+	graphics->DrawImage(huge_bomb, GetWidth()-200, 400, 160, 140);
 
 	InitializeFlags();
 

@@ -65,8 +65,11 @@ class Mines : public jgui::Frame, public jgui::FrameInputListener{
 					game_state;
 				block_t *board;
 				SlideWindow *slide;
-				jgui::OffScreenImage *prefetch1,
-					*prefetch2;
+				jgui::OffScreenImage *small_bomb,
+					*huge_bomb,
+					*flag,
+					*smile_face,
+					*dead_face;
 
 		public:
 				Mines(int x, int y);
