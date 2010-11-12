@@ -634,9 +634,23 @@ int System::GetProcessorCount()
 	
 	return si.dwNumberOfProcessors;
 #else
-	// const char *info = "/proc/cpuinfo";
+	return sysconf(_SC_NPROCESSORS_CONF);
 
-	return 1;
+	/*
+	int nprocs = sysconf(_SC_NPROCESSORS_ONLN);
+
+  if (nprocs < 1) {
+		return -1;
+	}
+  
+	nprocs_max = sysconf(_SC_NPROCESSORS_CONF);
+  
+	if (nprocs_max < 1) {
+		return -1;
+  }
+
+  printf ("%ld of %ld processors online\n",nprocs, nprocs_max);
+	*/
 #endif
 }
 

@@ -538,10 +538,12 @@ class GraphicPanel : public jgui::Canvas{
 		 */
 
 		g->SetPorterDuffFlags(jgui::PDF_NONE);
-		g->DrawImage("icons/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+10, 200, 100, 0xff);
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORALPHA));
+
+		g->DrawImage("icons/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+10, 200, 100, 0xf0);
 		g->DrawImage("icons/blue_icon.png", 400+40+1*(200+10), 0*(100+10)+10, 200, 100, 0x80);
-		g->DrawImage("icons/blue_icon.png", 400+40+0*(200+10), 1*(100+10)+10, 200, 100, 0x40);
-		g->DrawImage("icons/blue_icon.png", 400+40+1*(200+10), 1*(100+10)+10, 200, 100, 0x10);
+		g->DrawImage("icons/blue_icon.png", 400+40+0*(200+10), 1*(100+10)+10, 200, 100, 0x60);
+		g->DrawImage("icons/blue_icon.png", 400+40+1*(200+10), 1*(100+10)+10, 200, 100, 0x40);
 
 		// line
 		g->SetColor(0xf0, 0xf0, 0x00, 0xff);

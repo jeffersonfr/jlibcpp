@@ -113,7 +113,7 @@ class File : public virtual jcommon::Object{
 		 * \brief Construtor.
 		 *
 		 */
-		File(std::string prefix, std::string sufix, bool scramble);
+		File(std::string prefix, std::string sufix);
 	
 	public:
 		/**

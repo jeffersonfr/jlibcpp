@@ -63,16 +63,17 @@ enum jporter_duff_flags_t {
 	PDF_NONE			= 0x0001,	// fs: sa fd: 1.0-sa (defaults)
 	PDF_CLEAR			= 0x0002,	// fs: 0.0 fd: 0.0
 	PDF_SRC				= 0x0004,	// fs: 1.0 fd: 0.0
-	PDF_SRC_OVER	= 0x0008,	// fs: 1.0 fd: 1.0-sa
-	PDF_DST_OVER	= 0x0010,	// fs: 1.0-da fd: 1.0
-	PDF_SRC_IN		= 0x0020,	// fs: da fd: 0.0
-	PDF_DST_IN		= 0x0040,	// fs: 0.0 fd: sa
-	PDF_SRC_OUT		= 0x0080,	// fs: 1.0-da fd: 0.0
-	PDF_DST_OUT		= 0x0100,	// fs: 0.0 fd: 1.0-sa
-	PDF_SRC_ATOP	= 0x0200,	// fs: da fd: 1.0-sa
-	PDF_DST_ATOP	= 0x0400,	// fs: 1.0-da fd: sa
-	PDF_ADD				= 0x0800,	// fs: 1.0 fd: 1.0
-	PDF_XOR				= 0x1000	// fs: 1.0-da fd: 1.0-sa 
+	PDF_DST				= 0x0008,	// fs: 1.0 fd: 0.0
+	PDF_SRC_OVER	= 0x0010,	// fs: 1.0 fd: 1.0-sa
+	PDF_DST_OVER	= 0x0020,	// fs: 1.0-da fd: 1.0
+	PDF_SRC_IN		= 0x0040,	// fs: da fd: 0.0
+	PDF_DST_IN		= 0x0080,	// fs: 0.0 fd: sa
+	PDF_SRC_OUT		= 0x0100,	// fs: 1.0-da fd: 0.0
+	PDF_DST_OUT		= 0x0200,	// fs: 0.0 fd: 1.0-sa
+	PDF_SRC_ATOP	= 0x0400,	// fs: da fd: 1.0-sa
+	PDF_DST_ATOP	= 0x0800,	// fs: 1.0-da fd: sa
+	PDF_ADD				= 0x1000,	// fs: 1.0 fd: 1.0
+	PDF_XOR				= 0x2000	// fs: 1.0-da fd: 1.0-sa 
 };
 
 /**
@@ -94,9 +95,6 @@ enum jblitting_flags_t {
 	BF_ALPHACHANNEL	= 0x02,
 	BF_COLORALPHA		= 0x04,
 	BF_COLORIZE			= 0x08,
-	BF_DEINTERLACE	= 0x10,
-	BF_SRC_COLORKEY	= 0x20,
-	BF_DST_COLORKEY	= 0x40,
 	BF_XOR					= 0x80
 };
 
@@ -237,14 +235,6 @@ class Graphics : public virtual jcommon::Object{
 		Graphics(void *s);
 
 	private:
-		struct edge_t {
-			int yUpper;
-			double xIntersect;
-			double dxPerScan;
-			struct edge_t *next;
-		};
-
-	private:
 		jthread::Mutex graphics_mutex;
 
 #ifdef DIRECTFB_UI
@@ -265,7 +255,14 @@ class Graphics : public virtual jcommon::Object{
 		double _radians;
 		int _line_width;
 
-		// INFO:: polygon functions
+#ifdef DIRECTFB_UI
+		struct edge_t {
+			int yUpper;
+			double xIntersect;
+			double dxPerScan;
+			struct edge_t *next;
+		};
+
 		void insertEdge(edge_t *list, edge_t *edge);
 		void makeEdgeRec(struct jpoint_t lower, struct jpoint_t upper, int yComp, edge_t *edge, edge_t *edges[]);
 		void fillScan(int scan, edge_t *active);
@@ -275,7 +272,9 @@ class Graphics : public virtual jcommon::Object{
 		void Polygon(int n, int coordinates[]);
 		void Fill_polygon(int n, int ppts[]);
 
-		// INFO:: render rotated images
+		DFBSurfaceBlittingFlags GetBlittingFlags(jblitting_flags_t t);
+#endif
+		
 		void RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle);
 
 	public:
@@ -416,6 +415,24 @@ class Graphics : public virtual jcommon::Object{
 		 *
 		 */
 		virtual Font * GetFont(); 
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jporter_duff_flags_t GetPorterDuffFlags();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jdrawing_flags_t GetDrawingFlags();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jblitting_flags_t GetBlittingFlags();
 		
 		/**
 		 * \brief

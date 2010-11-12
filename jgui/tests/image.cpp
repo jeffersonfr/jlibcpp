@@ -114,7 +114,8 @@ class Main : public jgui::Frame{
 		 	off.GetGraphics()->DrawImage("icons/green_icon.png", 0, 0, image_width, image_height);
 		 
 			g->SetBlittingFlags(jgui::BF_ALPHACHANNEL);
-			g->SetPorterDuffFlags(jgui::PDF_NONE);
+			g->SetPorterDuffFlags(jgui::PDF_SRC_OVER);
+			// g->SetPorterDuffFlags(jgui::PDF_NONE);
 
 			for (int k=0,j=-1; j<=1; k++,j++) {
 				g->Translate(j*translate_x, j*translate_y);

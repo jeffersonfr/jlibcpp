@@ -45,8 +45,8 @@ Mines::Mines(int x, int y):
 	prefetch1 = new jgui::OffScreenImage(size, size);
 	prefetch2 = new jgui::OffScreenImage(size, size);
 	
-	prefetch1->GetGraphics()->DrawImage("icons/bomb2.png", 0, 0, size, size);
-	prefetch2->GetGraphics()->DrawImage("icons/flag1.png", 0, 0, size, size);
+	prefetch1->GetGraphics()->DrawImage("icons/bomb.png", 0, 0, size, size);
+	prefetch2->GetGraphics()->DrawImage("icons/flag.png", 0, 0, size, size);
 
 	AddSubtitle("icons/blue_icon.png", "Novo Jogo");
 	AddSubtitle("icons/yellow_icon.png", "Flag");
@@ -83,7 +83,7 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 	}
 
 	if (GetResult() == 0) {
-		int delta = 5;
+		int delta = 4;
 
 		if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
 			if (current_col < max_cols-1) {
@@ -165,7 +165,7 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 
 int Mines::DrawBlock(int row, int col, block_type_t type, int value, bool update)
 {
-	int delta = 5;
+	int delta = 4;
 
 	if (graphics == NULL) {
 		return -1;
@@ -227,7 +227,7 @@ void Mines::SetupBoard()
 	graphics->SetFont(_font);
 
 	graphics->DrawImage("icons/flag2.png", GetWidth()-190, 180, 160, 140);
-	graphics->DrawImage("icons/bomb2.png", GetWidth()-180, 400, 160, 140);
+	graphics->DrawImage("icons/bomb.png", GetWidth()-180, 400, 160, 140);
 
 	InitializeFlags();
 

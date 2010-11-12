@@ -23,19 +23,25 @@
 
 int main()
 {
-	jio::File *files[6];
-
-	files[0] = new jio::File("./file");
-	files[1] = new jio::File("././././../../teste/file");
-	files[2] = new jio::File("/file");
-	files[3] = new jio::File("../../../file");
-	files[4] = new jio::File("/teste1/../../teste2/./././////file");
-	files[5] = new jio::File("/../../teste/./././././././file");
-	// files[5] = new jio::File("../../../..");
+	char *args[6] = {
+		(char *)"./file", 
+		(char *)"/file",
+		(char *)"../../../file",
+		(char *)"././././../../teste/file",
+		(char *)"/teste1/../../teste2/./././////file",
+		(char *)"/../../teste/./././././././file"
+	};
 
 	for (int i=0; i<6; i++) {
-		std::cout << "Path: [" << files[i]->GetPath() << "] Name: [" << files[i]->GetName() << "] Normalize: [" << jio::File::NormalizePath(files[i]->GetPath()) << "] Process: [" << jio::File::ProcessPath(files[i]->GetPath()) << "]" << std::endl;
-		std::cout << "Canonical: [" << files[i]->GetCanonicalPath() << "] Absolute: [" << files[i]->GetAbsolutePath() << "]\n" << std::endl;
+		jio::File file(args[i]);
+
+		std::cout << "File Reference: [" << args[i] << "]" << std::endl;
+		std::cout << "GetPath: [" << file.GetPath() << "]" << std::endl;
+		std::cout << "GetName: [" << file.GetName() << "]" << std::endl;
+		std::cout << "Normalize: [" << jio::File::NormalizePath(file.GetPath()) << "]" << std::endl;
+		std::cout << "Process: [" << jio::File::ProcessPath(file.GetPath()) << "]" << std::endl;
+		std::cout << "GetAbsolutePath: [" << file.GetAbsolutePath() << "]" << std::endl;
+		std::cout << "GetCanonicalPath: [" << file.GetCanonicalPath() << "]\n" << std::endl;
 	}
 
 	return 0;

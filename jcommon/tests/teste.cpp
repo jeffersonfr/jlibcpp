@@ -171,7 +171,13 @@ void testURL()
 		std::cout << "-------------------------------" << std::endl;
 		std::cout << "URL: [" << url[i]->what() << "]" << std::endl;
 		std::cout << "GetProtocol(): " << url[i]->GetProtocol() << std::endl;
-		std::cout << "GetPath(): " << jio::File::Normalize(url[i]->GetPath()) << std::endl;
+
+		if (url[i]->GetProtocol() == "file") {
+			std::cout << "GetPath(): " << jio::File::NormalizePath(url[i]->GetPath()) << std::endl;
+		} else {
+			std::cout << "GetPath(): " << url[i]->GetPath() << std::endl;
+		}
+
 		std::cout << "GetQuery(): " << url[i]->GetQuery() << std::endl;
 		std::cout << "GetHost(): " << url[i]->GetHost() << std::endl;
 		std::cout << "GetPort(): " << url[i]->GetPort() << std::endl;

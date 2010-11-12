@@ -262,7 +262,7 @@ File::File(std::string filename_, int flags_):
 	_is_closed = false;
 }
 	
-File::File(std::string prefix, std::string sufix, bool scramble):
+File::File(std::string prefix, std::string sufix):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jio::File");
@@ -463,7 +463,7 @@ std::string File::ProcessPath(std::string pathname)
 
 File * File::CreateTemporary(std::string prefix, std::string sufix)
 {
-	File *file = new File(prefix, sufix, true); // F_READ_WRITE | F_LARGEFILE | F_CREAT);
+	File *file = new File(prefix, sufix); // F_READ_WRITE | F_LARGEFILE | F_CREAT);
 
 	if (file->Exists() == false) {
 		delete file;
