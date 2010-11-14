@@ -20,71 +20,65 @@
 #ifndef MINES_H_
 #define MINES_H_
 
-#include "jguilib.h"
-#include "slidewindow.h"
+#include "jframe.h"
 
 namespace mines {
 
 class Mines : public jgui::Frame, public jgui::FrameInputListener{
 
-		enum block_type_t {
-				CLOSED_BLOCK = 0,
-				BOMB_BLOCK = -1,
-				BLANK_BLOCK = -2,
-				MARKED_BLOCK = -3,
-				NUMBER_BLOCK = -4
-		};
+	enum game_status_t {
+		NONE,
+		WIN,
+		LOSE
+	};
 
-		enum block_state_t {
-				EMPTY_STATE = -1,
-				MARKED_STATE = -2,
-				UNAVAILABLE_STATE = -255
-		};
+	enum block_type_t {
+		BOMB_BLOCK,
+		SAFE_BLOCK
+	};
 
-		struct block_t {
-				block_type_t type;
-				// block_state_t state;
-				int state;
-		};
+	enum block_state_t {
+		CLOSED_BLOCK,
+		OPENED_BLOCK,
+		MARKED_BLOCK
+	};
 
-		private:
-				jthread::Mutex mines_mutex;
+	struct block_t {
+		block_type_t type;
+		block_state_t state;
+		int value;
+	};
 
-				jgui::Graphics *graphics;
-				int bx,
-					by,
-					bwidth,
-					bheight;
-				int size,
-					max_rows,
-					max_cols,
-					current_row,
-					current_col,
-					max_bombs,
-					hide_bombs,
-					game_state;
-				block_t *board;
-				SlideWindow *slide;
-				jgui::OffScreenImage *small_bomb,
-					*huge_bomb,
-					*flag,
-					*smile_face,
-					*dead_face;
+	private:
+	jthread::Mutex mines_mutex;
+	jgui::OffScreenImage *small_bomb,
+		*huge_bomb,
+		*flag,
+		*smile_face,
+		*dead_face;
+	jgui::Window *slide;
+	block_t *board;
+	int size,
+			max_rows,
+			max_cols,
+			current_row,
+			current_col,
+			max_bombs,
+			hide_bombs;
+	game_status_t game_state;
 
-		public:
-				Mines(int x, int y);
-				virtual ~Mines();
+	public:
+	Mines(int x, int y);
+	virtual ~Mines();
 
-				virtual void Paint(jgui::Graphics *g);
+	virtual void Paint(jgui::Graphics *g);
 
-				int DrawBlock(int row, int col, block_type_t type, int value = 0, bool update = true);
-				void InitializeFlags();
-				void SetupBoard();
-				void Expose(int row, int col);
-				int GetResult();
-				void UpdateBoard(int flag);
+	void InitializeFlags();
+	void SetupBoard();
+	void Expose(int row, int col);
+	game_status_t GetResult();
 
-				virtual void InputChanged(jgui::KeyEvent *event);
+	virtual void InputChanged(jgui::KeyEvent *event);
 
 };
 
