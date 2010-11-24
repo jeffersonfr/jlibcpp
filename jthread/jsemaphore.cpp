@@ -105,7 +105,7 @@ void Semaphore::Wait(uint64_t time_)
 		case WAIT_OBJECT_0:
 			break;
 		case WAIT_TIMEOUT:
-			throw SemaphoreException("Waiting time out exception");
+			throw SemaphoreTimeoutException("Waiting time out exception");
 		default:
 			throw SemaphoreException("Waiting semaphore failed"); 
 	}
@@ -126,7 +126,7 @@ void Semaphore::Wait(uint64_t time_)
 		if (errno == ETIMEDOUT) {
 			throw SemaphoreTimeoutException("Semaphore wait timeout");
 		} else {
-			throw SemaphoreTimeoutException("Semaphore wait failed");
+			throw SemaphoreException("Semaphore wait failed");
 		}
 	}
 #endif

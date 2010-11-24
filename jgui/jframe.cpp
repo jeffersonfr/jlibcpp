@@ -345,7 +345,7 @@ void Frame::Paint(Graphics *g)
 				count += _font->GetStringWidth((*i).subtitle.c_str());
 
 				g->SetColor(_fgcolor);
-				g->DrawString((*i).subtitle, _size.width-count, _size.height-_font->GetHeight()-10);
+				g->DrawString((*i).subtitle, _size.width-count, _size.height-_insets.bottom-_border_size-_font->GetHeight()/2);
 			}
 
 			count += 10;
@@ -353,7 +353,7 @@ void Frame::Paint(Graphics *g)
 			if ((*i).image != "") {
 				count += 40;
 
-				g->DrawImage((char *)(*i).image.c_str(), _size.width-count, _size.height-55, 45, 40);
+				g->DrawImage((char *)(*i).image.c_str(), _size.width-count, _size.height-_insets.bottom-_border_size-20, 45, 40);
 			}
 
 			count += 20;

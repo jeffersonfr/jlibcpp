@@ -754,7 +754,7 @@ ViewMessages::ViewMessages(AgendaDB *base):
 	label_hour = new jgui::Label(tmp, _insets.left+400+10, _insets.top, GetWidth()-400-10-_insets.left-_insets.right, dheight);
 	message = new jgui::Label(t->event, _insets.left, _insets.top+sheight, max_width, GetHeight()-240);
 
-	label_hour->SetHorizontalAlign(jgui::RIGHT_HALIGN);
+	message->SetHorizontalAlign(jgui::LEFT_HALIGN);
 	message->SetVerticalAlign(jgui::TOP_VALIGN);
 
 	Add(label_date);

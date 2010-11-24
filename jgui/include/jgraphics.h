@@ -275,7 +275,7 @@ class Graphics : public virtual jcommon::Object{
 		DFBSurfaceBlittingFlags GetBlittingFlags(jblitting_flags_t t);
 #endif
 		
-		void RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle);
+		void RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
 
 	public:
 		/**

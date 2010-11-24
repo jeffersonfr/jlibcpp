@@ -113,9 +113,11 @@ class Main : public jgui::Frame{
 
 		 	off.GetGraphics()->DrawImage("icons/green_icon.png", 0, 0, image_width, image_height);
 		 
-			g->SetBlittingFlags(jgui::BF_ALPHACHANNEL);
+			// g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_COLORALPHA | jgui::BF_ALPHACHANNEL));
 			g->SetPorterDuffFlags(jgui::PDF_SRC_OVER);
-			// g->SetPorterDuffFlags(jgui::PDF_NONE);
+			g->SetPorterDuffFlags(jgui::PDF_NONE);
+
+			int alpha = 0xff;
 
 			for (int k=0,j=-1; j<=1; k++,j++) {
 				g->Translate(j*translate_x, j*translate_y);
@@ -123,15 +125,15 @@ class Main : public jgui::Frame{
 				for (int i=0; i<3; i++) {
 					g->Rotate(radians[i]);
 
-					g->DrawImage("icons/blue_icon.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+0*box_height);
-					g->DrawImage("icons/blue_icon.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+1*box_height, image_width, image_height);
-					g->DrawImage("icons/blue_icon.png", 0, 0, 50, 50, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+2*box_height);
-					g->DrawImage("icons/blue_icon.png", 0, 0, 50, 50, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+3*box_height, image_width, image_height);
+					g->DrawImage("icons/blue_icon.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+0*box_height, alpha);
+					g->DrawImage("icons/blue_icon.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+1*box_height, image_width, image_height, alpha);
+					g->DrawImage("icons/blue_icon.png", 0, 0, 50, 50, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+2*box_height, alpha);
+					g->DrawImage("icons/blue_icon.png", 0, 0, 50, 50, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+3*box_height, image_width, image_height, alpha);
 				
-					g->DrawImage(&off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+4*box_height);
-					g->DrawImage(&off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+5*box_height, image_width, image_height);
-					g->DrawImage(&off, 0, 0, image_width, image_height, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+6*box_height);
-					g->DrawImage(&off, 0, 0, image_width, image_height, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+7*box_height, image_width, image_height);
+					g->DrawImage(&off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+4*box_height, alpha);
+					g->DrawImage(&off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+5*box_height, image_width, image_height, alpha);
+					g->DrawImage(&off, 0, 0, image_width, image_height, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+6*box_height, alpha);
+					g->DrawImage(&off, 0, 0, image_width, image_height, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+7*box_height, image_width, image_height, alpha);
 				}
 
 				g->Translate(-j*translate_x, -j*translate_y);

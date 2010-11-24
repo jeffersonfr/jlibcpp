@@ -30,41 +30,14 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 
 	bwidth = 90;
 	bheight = 60;
-	delta = 1.0f;
+	delta = 2;
 	
-	if (text_visible == true) {
-		if (type == SMALL_NUMERIC_KEYBOARD) {
-			SetSize(11*bwidth, 8*bheight+50);
-		} else if (type == FULL_NUMERIC_KEYBOARD) {
-			SetSize(11*bwidth, 11*bheight+50);
-		} else if (type == SMALL_ALPHA_NUMERIC_KEYBOARD) {
-			SetSize(11*bwidth, 11*bheight+50);
-		} else if (type == FULL_ALPHA_NUMERIC_KEYBOARD) {
-			SetSize(15*bwidth, 11*bheight+50);
-		} else if (type == FULL_WEB_KEYBOARD) {
-			SetSize(11*bwidth, 11*bheight+50);
-		}
-	} else {
-		if (type == SMALL_NUMERIC_KEYBOARD) {
-			SetSize(5*bwidth-10, 7*bheight+40);
-		} else if (type == FULL_NUMERIC_KEYBOARD) {
-			SetSize(7*bwidth-10, 7*bheight+40);
-		} else if (type == SMALL_ALPHA_NUMERIC_KEYBOARD) {
-			SetSize(9*bwidth-10, 7*bheight+40);
-		} else if (type == FULL_ALPHA_NUMERIC_KEYBOARD) {
-			SetSize(15*bwidth-10, 7*bheight+40);
-		} else if (type == FULL_WEB_KEYBOARD) {
-			SetSize(11*bwidth-10, 7*bheight+40);
-		}
-	}
-
-	_size.width -= 20;
+	display = NULL;
 
 	_show_text = text_visible;
 	_shift_pressed = false;
 	_type = type;
 	_is_password = is_password;
-	display = NULL;
 
 	if (_type == FULL_WEB_KEYBOARD) {
 		BuildWebKeyboard();
@@ -78,11 +51,13 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 		BuildSmallNumericKeyboard();
 	}
 
+	SetOptimizedPaint(true);
+
 	AddSubtitle("icons/blue_icon.png", "Confirmar");
 
-	Frame::RegisterInputListener(this);
+	Pack();
 
-	SetOptimizedPaint(true);
+	Frame::RegisterInputListener(this);
 }
 
 Keyboard::~Keyboard() 
@@ -238,8 +213,11 @@ void Keyboard::SetText(std::string text)
 
 void Keyboard::BuildWebKeyboard()
 {
+	int xwidth = bwidth+delta,
+			xheight = bheight+delta;
+
 	if (_show_text == true) {
-		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*bwidth, 4*bheight);
+		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*xwidth-delta, 4*xheight-delta);
 
 		if (_is_password == true) {
 			display->SetEchoChar('*');
@@ -252,56 +230,56 @@ void Keyboard::BuildWebKeyboard()
 	}
 
 	Button *b[] = { 
-		new Button("1", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("2", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("3", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("4", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("5", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("6", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("7", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("8", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("9", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("0", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("1", _insets.left+(xwidth*0), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("2", _insets.left+(xwidth*1), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("3", _insets.left+(xwidth*2), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("4", _insets.left+(xwidth*3), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("5", _insets.left+(xwidth*4), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("6", _insets.left+(xwidth*5), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("7", _insets.left+(xwidth*6), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("8", _insets.left+(xwidth*7), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("9", _insets.left+(xwidth*8), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("0", _insets.left+(xwidth*9), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("q", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("w", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("e", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("r", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("t", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("y", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("u", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("i", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("o", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("p", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("q", _insets.left+(xwidth*0), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("w", _insets.left+(xwidth*1), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("e", _insets.left+(xwidth*2), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("r", _insets.left+(xwidth*3), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("t", _insets.left+(xwidth*4), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("y", _insets.left+(xwidth*5), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("u", _insets.left+(xwidth*6), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("i", _insets.left+(xwidth*7), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("o", _insets.left+(xwidth*8), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("p", _insets.left+(xwidth*9), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("a", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("s", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("d", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("f", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("g", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("h", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("j", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("k", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("l", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("~", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("a", _insets.left+(xwidth*0), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("s", _insets.left+(xwidth*1), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("d", _insets.left+(xwidth*2), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("f", _insets.left+(xwidth*3), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("g", _insets.left+(xwidth*4), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("h", _insets.left+(xwidth*5), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("j", _insets.left+(xwidth*6), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("k", _insets.left+(xwidth*7), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("l", _insets.left+(xwidth*8), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("~", _insets.left+(xwidth*9), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("z", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("x", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("c", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("v", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("b", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("n", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("m", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("?", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("/", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("_", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("z", _insets.left+(xwidth*0), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("x", _insets.left+(xwidth*1), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("c", _insets.left+(xwidth*2), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("v", _insets.left+(xwidth*3), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("b", _insets.left+(xwidth*4), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("n", _insets.left+(xwidth*5), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("m", _insets.left+(xwidth*6), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("?", _insets.left+(xwidth*7), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("/", _insets.left+(xwidth*8), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("_", _insets.left+(xwidth*9), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("del", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
-		new Button("http://", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
-		new Button("www.", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
-		new Button(".com", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
-		new Button(".", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*4*delta)), bwidth, bheight),
-		new Button("-", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*4*delta)), bwidth, bheight),
+		new Button("del", _insets.left+(xwidth*0), _insets.top+(xheight*4), 2*xwidth-delta, 1*xheight-delta),
+		new Button("http://", _insets.left+(xwidth*2), _insets.top+(xheight*4), 2*xwidth-delta, 1*xheight-delta),
+		new Button("www.", _insets.left+(xwidth*4), _insets.top+(xheight*4), 2*xwidth-delta, 1*xheight-delta),
+		new Button(".com", _insets.left+(xwidth*6), _insets.top+(xheight*4), 2*xwidth-delta, 1*xheight-delta),
+		new Button(".", _insets.left+(xwidth*8), _insets.top+(xheight*4), 1*xwidth-delta, 1*xheight-delta),
+		new Button("-", _insets.left+(xwidth*9), _insets.top+(xheight*4), 1*xwidth-delta, 1*xheight-delta),
 	};
 
 	if (_show_text == true) {
@@ -381,8 +359,11 @@ void Keyboard::BuildWebKeyboard()
 
 void Keyboard::BuildSmallAlphaNumericKeyboard()
 {
+	int xwidth = bwidth+delta,
+			xheight = bheight+delta;
+
 	if (_show_text == true) {
-		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*bwidth, 4*bheight);
+		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*xwidth-delta, 4*xheight-delta);
 
 		if (_is_password == true) {
 			display->SetEchoChar('*');
@@ -395,46 +376,46 @@ void Keyboard::BuildSmallAlphaNumericKeyboard()
 	}
 
 	Button *b[] = { 
-		new Button("a", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("b", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("c", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("d", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("e", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("f", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("g", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("h", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("a", _insets.left+(xwidth*0), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("b", _insets.left+(xwidth*1), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("c", _insets.left+(xwidth*2), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("d", _insets.left+(xwidth*3), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("e", _insets.left+(xwidth*4), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("f", _insets.left+(xwidth*5), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("g", _insets.left+(xwidth*6), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("h", _insets.left+(xwidth*7), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("i", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("j", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("k", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("l", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("m", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("n", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("o", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("p", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("i", _insets.left+(xwidth*0), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("j", _insets.left+(xwidth*1), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("k", _insets.left+(xwidth*2), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("l", _insets.left+(xwidth*3), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("m", _insets.left+(xwidth*4), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("n", _insets.left+(xwidth*5), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("o", _insets.left+(xwidth*6), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("p", _insets.left+(xwidth*7), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("q", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("r", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("s", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("t", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("u", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("v", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("x", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("w", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("q", _insets.left+(xwidth*0), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("r", _insets.left+(xwidth*1), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("s", _insets.left+(xwidth*2), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("t", _insets.left+(xwidth*3), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("u", _insets.left+(xwidth*4), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("v", _insets.left+(xwidth*5), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("x", _insets.left+(xwidth*6), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("w", _insets.left+(xwidth*7), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("y", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("z", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("@", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("(", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button(")", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button(".", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button(";", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("/", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("y", _insets.left+(xwidth*0), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("z", _insets.left+(xwidth*1), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("@", _insets.left+(xwidth*2), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("(", _insets.left+(xwidth*3), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button(")", _insets.left+(xwidth*4), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button(".", _insets.left+(xwidth*5), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button(";", _insets.left+(xwidth*6), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("/", _insets.left+(xwidth*7), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("caps", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
-		new Button("space", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
-		new Button("del", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
-		new Button("enter", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button("caps", _insets.left+(xwidth*0), _insets.top+(xheight*4), 2*xwidth-delta, 1*xheight-delta),
+		new Button("space", _insets.left+(xwidth*2), _insets.top+(xheight*4), 2*xwidth-delta, 1*xheight-delta),
+		new Button("del", _insets.left+(xwidth*4), _insets.top+(xheight*4), 2*xwidth-delta, 1*xheight-delta),
+		new Button("enter", _insets.left+(xwidth*6), _insets.top+(xheight*4), 2*xwidth-delta, 1*xheight-delta),
 	};
 
 	if (_show_text == true) {
@@ -502,8 +483,11 @@ void Keyboard::BuildSmallAlphaNumericKeyboard()
 
 void Keyboard::BuildFullAlphaNumericKeyboard()
 {
+	int xwidth = bwidth+delta,
+			xheight = bheight+delta;
+
 	if (_show_text == true) {
-		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 14*bwidth, 4*bheight);
+		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 14*xwidth-delta, 4*xheight-delta);
 
 		if (_is_password == true) {
 			display->SetEchoChar('*');
@@ -516,65 +500,65 @@ void Keyboard::BuildFullAlphaNumericKeyboard()
 	}
 
 	Button *b[] = { 
-		new Button("'", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*0*delta)), 2*bwidth, bheight),
-		new Button("1", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("2", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("3", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("4", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("5", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("6", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("7", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("8", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("9", (int)(_insets.left+(bwidth*10*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("0", (int)(_insets.left+(bwidth*11*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("-", (int)(_insets.left+(bwidth*12*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("=", (int)(_insets.left+(bwidth*13*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("'", _insets.left+(xwidth*0), _insets.top+(xheight*0), 2*xwidth-delta, 1*xheight-delta),
+		new Button("1", _insets.left+(xwidth*2), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("2", _insets.left+(xwidth*3), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("3", _insets.left+(xwidth*4), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("4", _insets.left+(xwidth*5), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("5", _insets.left+(xwidth*6), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("6", _insets.left+(xwidth*7), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("7", _insets.left+(xwidth*8), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("8", _insets.left+(xwidth*9), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("9", _insets.left+(xwidth*10), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("0", _insets.left+(xwidth*11), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("-", _insets.left+(xwidth*12), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("=", _insets.left+(xwidth*13), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("tab", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*1*delta)), 2*bwidth, bheight),
-		new Button("q", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("w", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("e", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("r", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("t", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("y", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("u", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("i", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("o", (int)(_insets.left+(bwidth*10*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("p", (int)(_insets.left+(bwidth*11*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("'", (int)(_insets.left+(bwidth*12*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("[", (int)(_insets.left+(bwidth*13*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("tab", _insets.left+(xwidth*0), _insets.top+(xheight*1), 2*xwidth-delta, 1*xheight-delta),
+		new Button("q", _insets.left+(xwidth*2), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("w", _insets.left+(xwidth*3), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("e", _insets.left+(xwidth*4), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("r", _insets.left+(xwidth*5), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("t", _insets.left+(xwidth*6), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("y", _insets.left+(xwidth*7), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("u", _insets.left+(xwidth*8), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("i", _insets.left+(xwidth*9), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("o", _insets.left+(xwidth*10), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("p", _insets.left+(xwidth*11), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("'", _insets.left+(xwidth*12), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("[", _insets.left+(xwidth*13), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("caps", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*2*delta)), 2*bwidth, bheight),
-		new Button("a", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("s", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("d", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("f", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("g", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("h", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("j", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("k", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("l", (int)(_insets.left+(bwidth*10*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("c", (int)(_insets.left+(bwidth*11*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("~", (int)(_insets.left+(bwidth*12*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("]", (int)(_insets.left+(bwidth*13*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("caps", _insets.left+(xwidth*0), _insets.top+(xheight*2), 2*xwidth-delta, 1*xheight-delta),
+		new Button("a", _insets.left+(xwidth*2), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("s", _insets.left+(xwidth*3), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("d", _insets.left+(xwidth*4), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("f", _insets.left+(xwidth*5), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("g", _insets.left+(xwidth*6), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("h", _insets.left+(xwidth*7), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("j", _insets.left+(xwidth*8), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("k", _insets.left+(xwidth*9), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("l", _insets.left+(xwidth*10), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("c", _insets.left+(xwidth*11), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("~", _insets.left+(xwidth*12), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("]", _insets.left+(xwidth*13), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("shift", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*3*delta)), 2*bwidth, bheight),
-		new Button("\\", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("z", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("x", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("c", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("v", (int)(_insets.left+(bwidth*6*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("b", (int)(_insets.left+(bwidth*7*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("n", (int)(_insets.left+(bwidth*8*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("m", (int)(_insets.left+(bwidth*9*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button(",", (int)(_insets.left+(bwidth*10*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button(".", (int)(_insets.left+(bwidth*11*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button(";", (int)(_insets.left+(bwidth*12*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("/", (int)(_insets.left+(bwidth*13*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("shift", _insets.left+(xwidth*0), _insets.top+(xheight*3), 2*xwidth-delta, 1*xheight-delta),
+		new Button("\\", _insets.left+(xwidth*2), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("z", _insets.left+(xwidth*3), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("x", _insets.left+(xwidth*4), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("c", _insets.left+(xwidth*5), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("v", _insets.left+(xwidth*6), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("b", _insets.left+(xwidth*7), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("n", _insets.left+(xwidth*8), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("m", _insets.left+(xwidth*9), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button(",", _insets.left+(xwidth*10), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button(".", _insets.left+(xwidth*11), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button(";", _insets.left+(xwidth*12), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("/", _insets.left+(xwidth*13), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("back", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*4*delta)), 4*bwidth, bheight),
-		new Button("space", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*4*delta)), 6*bwidth, bheight),
-		new Button("enter", (int)(_insets.left+(bwidth*10*delta)), (int)(_insets.top+(bheight*4*delta)), 4*bwidth, bheight)
+		new Button("back", _insets.left+(xwidth*0), _insets.top+(xheight*4), 4*xwidth-delta, 1*xheight-delta),
+		new Button("space", _insets.left+(xwidth*4), _insets.top+(xheight*4), 6*xwidth-delta, 1*xheight-delta),
+		new Button("enter", _insets.left+(xwidth*10), _insets.top+(xheight*4), 4*xwidth-delta, 1*xheight-delta)
 	};
 
 	if (_show_text == true) {
@@ -660,8 +644,11 @@ void Keyboard::BuildFullAlphaNumericKeyboard()
 
 void Keyboard::BuildFullNumericKeyboard()
 {
+	int xwidth = bwidth+delta,
+			xheight = bheight+delta;
+
 	if (_show_text == true) {
-		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*bwidth, 4*bheight);
+		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*xwidth-delta, 4*xheight-delta);
 
 		if (_is_password == true) {
 			display->SetEchoChar('*');
@@ -674,35 +661,35 @@ void Keyboard::BuildFullNumericKeyboard()
 	}
 
 	Button *b[] = { 
-		new Button("(", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button(")", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("7", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("8", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("9", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("+", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("(", _insets.left+(xwidth*0), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button(")", _insets.left+(xwidth*1), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("7", _insets.left+(xwidth*2), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("8", _insets.left+(xwidth*3), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("9", _insets.left+(xwidth*4), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("+", _insets.left+(xwidth*5), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("%", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("$", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("4", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("5", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("6", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("-", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("%", _insets.left+(xwidth*0), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("$", _insets.left+(xwidth*1), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("4", _insets.left+(xwidth*2), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("5", _insets.left+(xwidth*3), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("6", _insets.left+(xwidth*4), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("-", _insets.left+(xwidth*5), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("e", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("pi", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("1", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("2", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("3", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("*", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("e", _insets.left+(xwidth*0), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("pi", _insets.left+(xwidth*1), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("1", _insets.left+(xwidth*2), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("2", _insets.left+(xwidth*3), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("3", _insets.left+(xwidth*4), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("*", _insets.left+(xwidth*5), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("del", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*3*delta)), 2*bwidth, bheight),
-		new Button("#", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button(".", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("=", (int)(_insets.left+(bwidth*4*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("/", (int)(_insets.left+(bwidth*5*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("del", _insets.left+(xwidth*0), _insets.top+(xheight*3), 2*xwidth-delta, 1*xheight-delta),
+		new Button("#", _insets.left+(xwidth*2), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button(".", _insets.left+(xwidth*3), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("=", _insets.left+(xwidth*4), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("/", _insets.left+(xwidth*5), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("space", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*4*delta)), 3*bwidth, bheight),
-		new Button("enter", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*4*delta)), 3*bwidth, bheight),
+		new Button("space", _insets.left+(xwidth*0), _insets.top+(xheight*4), 3*xwidth-delta, 1*xheight-delta),
+		new Button("enter", _insets.left+(xwidth*3), _insets.top+(xheight*4), 3*xwidth-delta, 1*xheight-delta),
 	};
 
 	if (_show_text == true) {
@@ -757,8 +744,11 @@ void Keyboard::BuildFullNumericKeyboard()
 
 void Keyboard::BuildSmallNumericKeyboard()
 {
+	int xwidth = bwidth+delta,
+			xheight = bheight+delta;
+
 	if (_show_text == true) {
-		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*bwidth, 1*bheight);
+		display = new TextArea(_insets.left, _insets.top+6*bheight-40, 10*xwidth-delta, 1*xheight-delta);
 
 		if (_is_password == true) {
 			display->SetEchoChar('*');
@@ -771,29 +761,29 @@ void Keyboard::BuildSmallNumericKeyboard()
 	}
 
 	Button *b[] = { 
-		new Button("+", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("-", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("*", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
-		new Button("/", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*0*delta)), bwidth, bheight),
+		new Button("+", _insets.left+(xwidth*0), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("-", _insets.left+(xwidth*1), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("*", _insets.left+(xwidth*2), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
+		new Button("/", _insets.left+(xwidth*3), _insets.top+(xheight*0), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("7", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("8", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("9", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
-		new Button("(", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*1*delta)), bwidth, bheight),
+		new Button("7", _insets.left+(xwidth*0), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("8", _insets.left+(xwidth*1), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("9", _insets.left+(xwidth*2), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
+		new Button("(", _insets.left+(xwidth*3), _insets.top+(xheight*1), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("4", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("5", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button("6", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
-		new Button(")", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*2*delta)), bwidth, bheight),
+		new Button("4", _insets.left+(xwidth*0), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("5", _insets.left+(xwidth*1), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button("6", _insets.left+(xwidth*2), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
+		new Button(")", _insets.left+(xwidth*3), _insets.top+(xheight*2), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("1", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("2", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("3", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
-		new Button("%", (int)(_insets.left+(bwidth*3*delta)), (int)(_insets.top+(bheight*3*delta)), bwidth, bheight),
+		new Button("1", _insets.left+(xwidth*0), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("2", _insets.left+(xwidth*1), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("3", _insets.left+(xwidth*2), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
+		new Button("%", _insets.left+(xwidth*3), _insets.top+(xheight*3), 1*xwidth-delta, 1*xheight-delta),
 
-		new Button("0", (int)(_insets.left+(bwidth*0*delta)), (int)(_insets.top+(bheight*4*delta)), bwidth, bheight),
-		new Button(",", (int)(_insets.left+(bwidth*1*delta)), (int)(_insets.top+(bheight*4*delta)), bwidth, bheight),
-		new Button("back", (int)(_insets.left+(bwidth*2*delta)), (int)(_insets.top+(bheight*4*delta)), 2*bwidth, bheight),
+		new Button("0", _insets.left+(xwidth*0), _insets.top+(xheight*4), 1*xwidth-delta, 1*xheight-delta),
+		new Button(",", _insets.left+(xwidth*1), _insets.top+(xheight*4), 1*xwidth-delta, 1*xheight-delta),
+		new Button("back", _insets.left+(xwidth*2), _insets.top+(xheight*4), 2*xwidth-delta, 1*xheight-delta),
 	};
 
 	if (_show_text == true) {

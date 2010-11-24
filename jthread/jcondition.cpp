@@ -109,7 +109,7 @@ void Condition::Wait(uint64_t time_, Mutex *mutex)
 		if (GetLastError() == WAIT_TIMEOUT) {
 			throw SemaphoreTimeoutException("Semaphore wait timeout");
 		} else {
-			throw SemaphoreTimeoutException("Semaphore wait failed");
+			throw SemaphoreException("Semaphore wait failed");
 		}
 	}
 #else
@@ -132,7 +132,7 @@ void Condition::Wait(uint64_t time_, Mutex *mutex)
 	if (result == ETIMEDOUT) {
 		throw SemaphoreTimeoutException("Semaphore wait timeout");
 	} else if (result < 0) {
-		throw SemaphoreTimeoutException("Semaphore wait failed");
+		throw SemaphoreException("Semaphore wait failed");
 	}
 #endif
 }

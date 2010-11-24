@@ -20,6 +20,7 @@
 #include "jthread.h"
 #include "jsemaphore.h"
 #include "jmutex.h"
+#include "jsemaphoretimeoutexception.h"
 
 #include <iostream>
 
@@ -93,10 +94,14 @@ class WatchCount : public jthread::Thread {
 		void Run() {
 			std::cout << "Starting watch count: thread " << id << std::endl;
 			
-			while (count < COUNT_LIMIT) {
-				sem.Wait(10000000LL);
+			while (count < COUNT_LIMIT+10) {
+				try {
+					sem.Wait(10*1000000LL);
+				} catch (jthread::SemaphoreTimeoutException &e) {
+					std::cout << "Watch count: thread " << id << ", count " << count << ", condition signal received." << std::endl;
 
-				std::cout << "Watch count: thread " << id << ", count " << count << ", condition signal received." << std::endl;
+					break;
+				}
 			}
 		}
 		

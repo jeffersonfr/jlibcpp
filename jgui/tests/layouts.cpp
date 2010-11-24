@@ -58,6 +58,14 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			SetResizeEnabled(true);
 			SetIcon("./icons/keyboard_icon.png");
 		
+			_flow = new jgui::FlowLayout();
+			_grid = new jgui::GridLayout(3, 3);
+			_border = new jgui::BorderLayout();
+			_border = new jgui::BorderLayout();
+			_card = new jgui::BorderLayout();
+			_gridbag = new jgui::GridBagLayout();
+			_null = new jgui::NullLayout();
+
 			for (int i=0; i<6; i++) {
 				_b.push_back(new jgui::Container(0, 0, 0, 0));
 				_c.push_back(new jgui::Container(0, 0, 0, 0));
@@ -68,12 +76,12 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 				Add(_b[i]);
 			}
 
-			_c[0]->SetLayout(_flow = new jgui::FlowLayout());
-			_c[1]->SetLayout(_grid = new jgui::GridLayout(3, 3));
-			_c[2]->SetLayout(_border = new jgui::BorderLayout());
-			_c[3]->SetLayout(_card = new jgui::BorderLayout());
-			_c[4]->SetLayout(_gridbag = new jgui::GridBagLayout());
-			_c[5]->SetLayout(_null = new jgui::NullLayout());
+			_c[0]->SetLayout(_flow);
+			_c[1]->SetLayout(_grid);
+			_c[2]->SetLayout(_border);
+			_c[3]->SetLayout(_card);
+			_c[4]->SetLayout(_gridbag);
+			_c[5]->SetLayout(_null);
 
 			// flowlayout
 			_c[0]->Add(new jgui::Button("Button 1", 0, 0, 100, 100));
@@ -218,6 +226,36 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 
 		virtual ~Main()
 		{
+			RemoveAll();
+
+			for (int i=0; i<6; i++) {
+				jgui::Container *bcontainer = _b[i];
+				jgui::Container *ccontainer = _c[i];
+
+				for (std::vector<Component *>::iterator iccomponent=ccontainer->GetComponents().begin(); iccomponent!=ccontainer->GetComponents().end(); iccomponent++) {
+					delete (*iccomponent);
+				}
+
+				ccontainer->RemoveAll();
+
+				for (std::vector<Component *>::iterator ibcomponent=bcontainer->GetComponents().begin(); ibcomponent!=bcontainer->GetComponents().end(); ibcomponent++) {
+					delete (*ibcomponent);
+				}
+
+				delete bcontainer->GetLayout();
+
+				bcontainer->RemoveAll();
+
+				delete ccontainer;
+				delete bcontainer;
+			}
+
+			delete _flow;
+			delete _grid;
+			delete _border;
+			delete _card;
+			delete _gridbag;
+			delete _null;
 		}
 
 		virtual void ActionPerformed(jgui::ButtonEvent *event)

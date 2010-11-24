@@ -67,18 +67,18 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::F
 
 		jkeyboard_type_t _type;
 		std::string _text;
-		int bx,
-			by,
-			bwidth,
-			bheight,
-			_state;
-		float delta;
+		int delta,
+				bx,
+				by,
+				bwidth,
+				bheight,
+				_state;
 		bool started,
-			 _shift_pressed,
-			 _show_text,
-			 _response,
-			 _input_locked,
-			 _is_password;
+				 _shift_pressed,
+				 _show_text,
+				 _response,
+				 _input_locked,
+				 _is_password;
 
 	private:
 		/**

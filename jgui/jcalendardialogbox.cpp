@@ -32,9 +32,9 @@ CalendarDialogBox::CalendarDialogBox(int x, int y):
 	by = _insets.top;
 	bwidth = 90;
 	bheight = 70;
-	delta = 1.0f;
+	delta = 2;
 
-	SetSize(8*bwidth-30, 11*bheight+10);
+	SetSize(8*(bwidth+delta)-30, 11*(bheight+delta)+10);
 
 	_input_locked = false;
 
@@ -50,7 +50,7 @@ CalendarDialogBox::CalendarDialogBox(int x, int y):
 
 	char tmp[255];
 
-	year = new Spin(bx, by+0*bheight+10, 5*bwidth, 60);
+	year = new Spin(bx, by+0*bheight+10, 5*(bwidth+delta)-delta, 60);
 
 	for (int i=1970; i<2199; i++) {
 		sprintf(tmp, "%d", i);
@@ -61,7 +61,7 @@ CalendarDialogBox::CalendarDialogBox(int x, int y):
 	year->SetLoop(true);
 	year->RegisterSelectListener(this);
 
-	month = new Spin(bx, by+1*bheight+10, 5*bwidth, 60);
+	month = new Spin(bx, by+1*bheight+10, 5*(bwidth+delta)-delta, 60);
 
 	month->AddTextItem("Janeiro");
 	month->AddTextItem("Fevereiro");
@@ -81,13 +81,13 @@ CalendarDialogBox::CalendarDialogBox(int x, int y):
 
 	int dx = 0;
 
-	ldom = new Label("D", bx+0*(bwidth+dx), by+170, bwidth, bheight);
-	lseg = new Label("S", bx+1*(bwidth+dx), by+170, bwidth, bheight);
-	lter = new Label("T", bx+2*(bwidth+dx), by+170, bwidth, bheight);
-	lqua = new Label("Q", bx+3*(bwidth+dx), by+170, bwidth, bheight);
-	lqui = new Label("Q", bx+4*(bwidth+dx), by+170, bwidth, bheight);
-	lsex = new Label("S", bx+5*(bwidth+dx), by+170, bwidth, bheight);
-	lsab = new Label("S", bx+6*(bwidth+dx), by+170, bwidth, bheight);
+	ldom = new Label("D", bx+0*(bwidth+delta+dx), by+170, bwidth, bheight);
+	lseg = new Label("S", bx+1*(bwidth+delta+dx), by+170, bwidth, bheight);
+	lter = new Label("T", bx+2*(bwidth+delta+dx), by+170, bwidth, bheight);
+	lqua = new Label("Q", bx+3*(bwidth+delta+dx), by+170, bwidth, bheight);
+	lqui = new Label("Q", bx+4*(bwidth+delta+dx), by+170, bwidth, bheight);
+	lsex = new Label("S", bx+5*(bwidth+delta+dx), by+170, bwidth, bheight);
+	lsab = new Label("S", bx+6*(bwidth+delta+dx), by+170, bwidth, bheight);
 
 	jcolor_t color;
 
@@ -314,7 +314,7 @@ void CalendarDialogBox::BuildCalendar()
 	for (int i=0; i<mes; i++) {
 		sprintf(tmp, "%d", (i+1));
 
-		b = new Button(tmp, (int)(bx+(bwidth*first_day*delta)), (int)(by+(bheight*k*delta)-30), bwidth, bheight);
+		b = new Button(tmp, bx+(bwidth+delta)*first_day, by+(bheight+delta)*k-30, bwidth, bheight);
 
 		first_day = ((first_day+1)%7);
 

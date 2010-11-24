@@ -1733,7 +1733,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 
 		g->DrawImage(img, 0, 0);
 		
-		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		imgProvider->Release(imgProvider);
 
@@ -1801,7 +1801,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 
 		g->DrawImage(img, 0, 0, wp, hp);
 		
-		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		return true;
 	}
@@ -1949,7 +1949,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
-		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		return true;
 	}
@@ -2039,7 +2039,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int alpha)
 
 		g->DrawImage(img, 0, 0);
 		
-		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, img_wp, img_hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, img_wp, img_hp, _radians, alpha);
 
 		return true;
 	}
@@ -2098,7 +2098,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 
 		g->DrawImage(img, 0, 0, wp, hp);
 		
-		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		return true;
 	}
@@ -2183,7 +2183,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
-		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians);
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		return true;
 	}
@@ -3155,7 +3155,7 @@ DFBSurfaceBlittingFlags Graphics::GetBlittingFlags(jblitting_flags_t t)
 }
 #endif
 
-void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle)
+void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha)
 {
 #ifdef DIRECTFB_UI
 	Graphics *gimg = img->GetGraphics();
@@ -3252,19 +3252,29 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 						int offset = ((x+i-dw)*scalew)/precision;
 
 						if (offset >= 0 && offset < swmax) {
-							uint32_t pixel = *(sdst+offset);
-							uint32_t gr = (rgb >> 0x10) & 0xff,
+							int32_t pixel = *(sdst+offset);
+							int32_t gr = (rgb >> 0x10) & 0xff,
 											 gg = (rgb >> 0x08) & 0xff,
 											 gb = (rgb >> 0x00) & 0xff,
 											 ga = (rgb >> 0x18) & 0xff;
-							uint32_t sr = (pixel >> 0x10) & 0xff,
+							int32_t sr = (pixel >> 0x10) & 0xff,
 											 sg = (pixel >> 0x08) & 0xff,
 											 sb = (pixel >> 0x00) & 0xff,
-											 sa = (255 - ga);
-							uint32_t dr = sr,
+											 sa = (0xff - ga);
+							int32_t dr = sr,
 											 dg = sg,
 											 db = sb,
 											 da = ga;
+
+							if (_blit_flags & BF_COLORALPHA) {
+								ga = ga - alpha;
+
+								if (ga < 0) {
+									ga = 0;
+								}
+
+								sa = 0xff - ga;
+							}
 
 							if (_blit_flags & BF_ALPHACHANNEL) {
 								if (_porter_duff_flags == PDF_NONE) {
@@ -3276,21 +3286,21 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 									dg = 0;
 									db = 0;
 								} else if (_porter_duff_flags == PDF_SRC) {
-									dr = gr*255;
-									dg = gg*255;
-									db = gb*255;
+									dr = gr*0xff;
+									dg = gg*0xff;
+									db = gb*0xff;
 								} else if (_porter_duff_flags == PDF_DST) {
-									dr = sr*255;
-									dg = sg*255;
-									db = sb*255;
+									dr = sr*0xff;
+									dg = sg*0xff;
+									db = sb*0xff;
 								} else if (_porter_duff_flags == PDF_SRC_OVER) {
-									dr = (gr*255 + sr*sa);
-									dg = (gg*255 + sg*sa);
-									db = (gb*255 + sb*sa);
+									dr = (gr*0xff + sr*sa);
+									dg = (gg*0xff + sg*sa);
+									db = (gb*0xff + sb*sa);
 								} else if (_porter_duff_flags == PDF_DST_OVER) {
-									dr = (gr*ga + sr*255);
-									dg = (sg*ga + sg*255);
-									db = (sb*ga + sb*255);
+									dr = (gr*ga + sr*0xff);
+									dg = (sg*ga + sg*0xff);
+									db = (sb*ga + sb*0xff);
 								} else if (_porter_duff_flags == PDF_SRC_IN) {
 									dr = gr*sa;
 									dg = gg*sa;
@@ -3316,9 +3326,9 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 									dg = (sg*ga + sg*ga);
 									db = (sb*ga + sb*ga);
 								} else if (_porter_duff_flags == PDF_ADD) {
-									dr = sr*255 + ga*255;
-									dg = sg*255 + ga*255;
-									db = sb*255 + ga*255;
+									dr = sr*0xff + ga*0xff;
+									dg = sg*0xff + ga*0xff;
+									db = sb*0xff + ga*0xff;
 									da = 0xff;
 								} else if (_porter_duff_flags == PDF_XOR) {
 									dr = (gr*ga + sr*sa);

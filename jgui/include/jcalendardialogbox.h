@@ -78,24 +78,24 @@ class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, publi
 			 *month;
 
 		std::string _text;
-		int bx,
-			by,
-			bwidth,
-			bheight,
-			_state;
-		float delta;
+		int delta,
+				bx,
+				by,
+				bwidth,
+				bheight,
+				_state;
 		int _day,
-			_month,
-			_year,
-			_current_day,
-			_current_month,
-			_current_year,
-			_select_day,
-			_select_month,
-			_select_year;
+				_month,
+				_year,
+				_current_day,
+				_current_month,
+				_current_year,
+				_select_day,
+				_select_month,
+				_select_year;
 		bool started,
-			 _show_text,
-			 _response;
+				 _show_text,
+				 _response;
 
 	private:
 		/**
