@@ -27,6 +27,22 @@
 #include "jnulllayout.h"
 #include "jflowlayout.h"
 
+class RectangleContainer : public jgui::Container {
+
+	public:
+		RectangleContainer():
+			jgui::Container(x, y, w, h)
+		{
+		}
+
+		virtual ~RectangleContainer()
+		{
+		}
+
+		virtual void Paint(jgui::Graphics *g) {
+		}
+};
+
 /**
  * \brief Ajuste o PreferredSize() caso deseje um nivel diferente de adaptacao dos layouts.
  *

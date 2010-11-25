@@ -59,6 +59,8 @@ int TextComponent::GetTextSize()
 void TextComponent::SetEchoChar(char echo_char)
 {
 	_echo_char = echo_char;
+
+	Repaint();
 }
 
 char TextComponent::GetEchoChar()
@@ -94,6 +96,8 @@ bool TextComponent::IsEditable()
 void TextComponent::SetEditable(bool b)
 {
 	_is_editable = b;
+
+	Repaint();
 }
 
 int TextComponent::GetSelectionStart()
@@ -104,6 +108,8 @@ int TextComponent::GetSelectionStart()
 void TextComponent::SetSelectionStart(int position)
 {
 	_selection_start = position;
+
+	Repaint();
 }
 
 int TextComponent::GetSelectionEnd()
@@ -114,6 +120,8 @@ int TextComponent::GetSelectionEnd()
 void TextComponent::SetSelectionEnd(int position)
 {
 	_selection_end = position;
+
+	Repaint();
 }
 
 void TextComponent::Select(int start, int end)
@@ -125,12 +133,16 @@ void TextComponent::Select(int start, int end)
 
 	_selection_start = start;
 	_selection_end = end;
+
+	Repaint();
 }
 
 void TextComponent::SelectAll()
 {
 	_selection_start = 0;
 	_selection_end = _text.size();
+
+	Repaint();
 }
 
 void TextComponent::SetCaretPosition(int position)
@@ -144,6 +156,8 @@ void TextComponent::SetCaretPosition(int position)
 			_caret_position++;
 		}
 	}
+
+	Repaint();
 }
 
 int TextComponent::GetCaretPosition()
@@ -159,6 +173,8 @@ void TextComponent::SetText(std::string text)
 	_selection_start = 0;
 	_selection_end = 0;
 	
+	Repaint();
+
 	DispatchTextEvent(new TextEvent(this, _text));
 }
 
@@ -285,11 +301,15 @@ void TextComponent::Delete()
 void TextComponent::SetVerticalAlign(jvertical_align_t align)
 {
 	_valign = align;
+	
+	Repaint();
 }
 
 void TextComponent::SetHorizontalAlign(jhorizontal_align_t align)
 {
 	_halign = align;
+	
+	Repaint();
 }
 
 jvertical_align_t TextComponent::GetVerticalAlign()

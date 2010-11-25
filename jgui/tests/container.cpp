@@ -212,7 +212,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 			group = new jgui::CheckButtonGroup();
 
-			radio1->SetSelected(true);
+			radio2->SetSelected(true);
 
 			group->Add(radio1);
 			group->Add(radio2);

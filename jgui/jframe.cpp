@@ -506,10 +506,17 @@ void Frame::MousePressed(MouseEvent *event)
 			}
 		}
 	
-		Component *c = GetTargetComponent(this, event->GetX()-_location.x, event->GetY()-_location.y);
+		int dx,
+				dy;
+
+		Component *c = GetTargetComponent(this, event->GetX()-_location.x, event->GetY()-_location.y, &dx, &dy);
 
 		if (c != this) {
-			c->ProcessEvent(event);
+			MouseEvent *e = new MouseEvent(event->GetSource(), event->GetType(), event->GetButton(), event->GetClickCount(), dx, dy);
+
+			c->ProcessEvent(e);
+
+			delete e;
 		}
 	}
 	

@@ -254,7 +254,7 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual Component * GetTargetComponent(Container *target, int x, int y);
+		virtual Component * GetTargetComponent(Container *target, int x, int y, int *dx = NULL, int *dy = NULL);
 
 		/**
 		 * \brief

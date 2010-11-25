@@ -57,7 +57,7 @@ Container::~Container()
 	}
 }
 
-Component * Container::GetTargetComponent(Container *target, int x, int y)
+Component * Container::GetTargetComponent(Container *target, int x, int y, int *dx, int *dy)
 {
 	for (std::vector<jgui::Component *>::reverse_iterator i=target->GetComponents().rbegin(); i!=target->GetComponents().rend(); i++) {
 		Component *c = (*i);
@@ -67,7 +67,15 @@ Component * Container::GetTargetComponent(Container *target, int x, int y)
 
 		if (c->Intersect(x, y) == true) {
 			if (c->InstanceOf("jgui::Container") == true) {
-				return GetTargetComponent((Container *)c, x-x1, y-y1);
+				return GetTargetComponent((Container *)c, x-x1, y-y1, dx, dy);
+			}
+
+			if ((void *)dx != NULL) {
+				*dx = x;
+			}
+
+			if ((void *)dy != NULL) {
+				*dy = y;
 			}
 
 			return c;
