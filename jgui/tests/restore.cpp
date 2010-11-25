@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 
 	jgui::GFXHandler::GetInstance()->Release();
 	
-	sleep(10);
+	sleep(2);
 	
 	jgui::GFXHandler::GetInstance()->Restore();
 

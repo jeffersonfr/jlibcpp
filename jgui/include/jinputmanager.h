@@ -124,6 +124,8 @@ class MouseProcess : public jthread::Thread{
 
 class InputManager : public jthread::Thread{
 
+	friend class GFXHandler;
+
 	private:
 		static InputManager *instance;
 		
@@ -137,23 +139,41 @@ class InputManager : public jthread::Thread{
 		std::map<MouseListener *, MouseProcess *> _mouse_processors;
 		std::vector<KeyListener *> _key_listeners;
 		std::map<KeyListener *, KeyProcess *> _key_processors;
-		int _state,
-			_screen_width,
-			_screen_height,
-			_scale_width,
-			_scale_height;
+		int _initialized,
+				_screen_width,
+				_screen_height,
+				_scale_width,
+				_scale_height;
 		int _mouse_x,
-			_mouse_y;
+				_mouse_y;
 		bool _is_key_enabled,
 				 _is_mouse_enabled,
-			 _skip_key_events,
-			 _skip_mouse_events;
+				 _skip_key_events,
+				 _skip_mouse_events;
 
 		/**
 		 * \brief
 		 *
 		 */
 		InputManager();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void Init();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void Restore();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void Release();
 
 #ifdef DIRECTFB_UI
 		/**

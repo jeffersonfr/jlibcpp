@@ -24,6 +24,7 @@
 #include "jproperties.h"
 #include "jfont.h"
 #include "jwindowmanager.h"
+#include "jinputmanager.h"
 
 namespace jgui {
 
@@ -810,6 +811,9 @@ void GFXHandler::Restore()
 	
 	// INFO:: restoring windows
 	WindowManager::GetInstance()->Restore();
+
+	// INFO:: restoring input events
+	InputManager::GetInstance()->Restore();
 }
 
 void GFXHandler::Release()
@@ -835,6 +839,8 @@ void GFXHandler::Release()
 		(*i)->Release();
 	}
 	
+	InputManager::GetInstance()->Release();
+
 #ifdef DIRECTFB_UI
 	// INFO:: release layers
 	if (_layer != NULL) {

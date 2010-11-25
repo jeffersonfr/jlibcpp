@@ -30,7 +30,7 @@
 class RectangleContainer : public jgui::Container {
 
 	public:
-		RectangleContainer():
+		RectangleContainer(int x, int y, int w, int h):
 			jgui::Container(x, y, w, h)
 		{
 		}
@@ -39,7 +39,12 @@ class RectangleContainer : public jgui::Container {
 		{
 		}
 
-		virtual void Paint(jgui::Graphics *g) {
+		virtual void Paint(jgui::Graphics *g) 
+		{
+			jgui::Container::Paint(g);
+
+			g->SetColor(0xff, 0xff, 0x00, 0xff);
+			g->DrawRectangle(0, 0, GetWidth(), GetHeight());
 		}
 };
 
@@ -83,7 +88,8 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			_null = new jgui::NullLayout();
 
 			for (int i=0; i<6; i++) {
-				_b.push_back(new jgui::Container(0, 0, 0, 0));
+				// _b.push_back(new jgui::Container(0, 0, 0, 0));
+				_b.push_back(new RectangleContainer(0, 0, 0, 0));
 				_c.push_back(new jgui::Container(0, 0, 0, 0));
 
 				_b[i]->SetLayout(new jgui::BorderLayout());

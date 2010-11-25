@@ -55,6 +55,7 @@ class Window;
 class WindowManager;
 class Font;
 class OffScreenImage;
+class InputManager;
 
 /**
  * \brief
@@ -67,6 +68,7 @@ class GFXHandler : public virtual jcommon::Object{
 	friend class WindowManager;
 	friend class Font;
 	friend class OffScreenImage;
+	friend class InputManager;
 
 	private:
 		static GFXHandler * _instance;

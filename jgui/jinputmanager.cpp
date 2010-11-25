@@ -35,10 +35,7 @@ InputManager::InputManager()
 
 	jpoint_t p = GFXHandler::GetInstance()->GetMousePosition();
 
-#ifdef DIRECTFB_UI
-	events = NULL;
-#endif
-
+	_initialized = false;
 	_mouse_x = p.x;
 	_mouse_y = p.y;
 	_is_key_enabled = true;
@@ -46,16 +43,6 @@ InputManager::InputManager()
 	_skip_key_events = true;
 	_skip_mouse_events = true;
 	
-#ifdef DIRECTFB_UI
-	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = ((IDirectFB *)dfb->GetGraphicEngine());
-
-	if (engine->CreateInputEventBuffer(engine, DICAPS_ALL, DFB_TRUE, &events) != DFB_OK) {
-	// if (engine->CreateEventBuffer(engine, &events) != DFB_OK) {
-		events = NULL;
-	}
-#endif
-
 	_screen_width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen_height = GFXHandler::GetInstance()->GetScreenHeight();
 
@@ -65,6 +52,74 @@ InputManager::InputManager()
 
 InputManager::~InputManager() 
 {
+}
+
+InputManager * InputManager::GetInstance()
+{
+	if (instance == NULL){
+		instance = new InputManager();
+
+		instance->Init();
+		instance->Start();
+	}
+
+	return instance;
+}
+
+void InputManager::Init()
+{
+	jthread::AutoLock lock(&_mutex);
+
+#ifdef DIRECTFB_UI
+	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = ((IDirectFB *)dfb->GetGraphicEngine());
+
+	if (engine->CreateInputEventBuffer(engine, DICAPS_ALL, DFB_TRUE, &events) != DFB_OK) {
+		events = NULL;
+	}
+
+	_initialized = true;
+#endif
+}
+
+void InputManager::Restore()
+{
+	if (events != NULL) {
+		return;
+	}
+
+	Init();
+
+	for (std::vector<KeyListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
+		KeyListener *listener = (*i);
+
+#ifdef DIRECTFB_UI
+		if (listener->InstanceOf("jgui::Window") == true) {
+			Window *win = dynamic_cast<Window *>(listener);
+
+			if (win->window != NULL) {
+				win->window->AttachEventBuffer(win->window, events);
+			}
+		}
+#endif
+	}
+
+	Start();
+}
+
+void InputManager::Release()
+{
+	jthread::AutoLock lock(&_mutex);
+
+	_initialized = false;
+
+	if (IsRunning() == true) {
+		WaitThread();
+	}
+
+	events->Release(events);
+
+	events = NULL;
 }
 
 void InputManager::SetWorkingScreenSize(int width, int height)
@@ -376,17 +431,6 @@ jkey_symbol_t InputManager::TranslateToDFBKeySymbol(DFBInputDeviceKeySymbol symb
 	return JKEY_UNKNOWN;
 }
 #endif
-
-InputManager * InputManager::GetInstance()
-{
-	if (instance == NULL){
-		instance = new InputManager();
-
-		instance->Start();
-	}
-
-	return instance;
-}
 
 void InputManager::SkipKeyEvents(bool b)
 {
@@ -946,7 +990,7 @@ void InputManager::Run()
 
 	// 1.3 IDirectFB *engine = (IDirectFB *)GFXHandler::GetInstance()->GetGraphicEngine();
 
-	while (true) {
+	while (_initialized == true) {
 		events->WaitForEventWithTimeout(events, 0, 100);
 
 		while (events->HasEvent(events) == DFB_OK) {
