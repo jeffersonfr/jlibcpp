@@ -503,6 +503,74 @@ void ListBox::Paint(Graphics *g)
 	PaintEdges(g);
 }
 
+void ListBox::PreviousItem()
+{
+	int visible_items = GetVisibleItems();
+
+	if (_items.size() > 0) {
+		int old_index = _index;
+
+		_index--;
+		// _index = _index - visible_items;
+
+		if (_index < 0) {
+			if (_loop == false) {
+				_index = 0;
+			} else {
+				_index = (int)(_items.size()-1);
+			}
+		}
+
+		if (_index < _top_index) {
+			_top_index = _index;
+		}
+
+		if (_index != old_index) {
+			Repaint();
+
+			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, UP_ITEM)); 
+		}
+	}
+}
+
+void ListBox::NextItem()
+{
+	int visible_items = GetVisibleItems();
+
+	if (_items.size() > 0) { 
+		int old_index = _index;
+
+		_index++;
+		// _index = _index + visible_items;
+
+		if (_index >= (int)_items.size()) {
+			if (_loop == false) {
+				if (_items.size() > 0) {
+					_index = _items.size()-1;
+				} else {
+					_index = 0;
+				}
+			} else {
+				_index = 0;
+			}
+		}
+
+		if (_index >= (_top_index + visible_items)) {
+			_top_index = _index-visible_items+1;
+
+			if (_top_index < 0) {
+				_top_index = 0;
+			}
+		}
+
+		if (_index != old_index) {
+			Repaint();
+
+			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, DOWN_ITEM)); 
+		}
+	}
+}
+
 bool ListBox::ProcessEvent(MouseEvent *event)
 {
 	if (Component::ProcessEvent(event) == true) {
@@ -519,6 +587,20 @@ bool ListBox::ProcessEvent(MouseEvent *event)
 		catched = true;
 
 		RequestFocus();
+		
+		int x1 = event->GetX(),
+				y1 = event->GetY();
+		int scroll_width = 30;
+
+		if (_scroll == SCROLL_BAR) {
+			if (x1 > (_location.x+_size.width-scroll_width-_horizontal_gap+_border_size) && x1 < (_location.x+_size.width-_horizontal_gap+_border_size)) {
+				if (y1 > (_location.y+_vertical_gap+_border_size) && y1 < (_location.y+_item_size/2+_vertical_gap+_border_size)) {
+					PreviousItem();
+				} else if (y1 > (_location.y+_size.height-_item_size/2-_vertical_gap+_border_size) && y1 < (_location.y+_size.height-_vertical_gap+_border_size)) {
+					NextItem();
+				}
+			}
+		}
 	}
 
 	return catched;
@@ -534,77 +616,16 @@ bool ListBox::ProcessEvent(KeyEvent *event)
 		return false;
 	}
 
-	int visible_items = GetVisibleItems();
 	bool catched = false;
 
 	jkey_symbol_t action = event->GetSymbol();
 
 	if (action == JKEY_CURSOR_UP || action == JKEY_PAGE_UP) {
-		if (_items.size() > 0) {
-			int old_index = _index;
-
-			if (action == JKEY_CURSOR_UP) {
-				_index--;
-			} else {
-				_index = _index - visible_items;
-			}
-
-			if (_index < 0) {
-				if (_loop == false) {
-					_index = 0;
-				} else {
-					_index = (int)(_items.size()-1);
-				}
-			}
-
-			if (_index < _top_index) {
-				_top_index = _index;
-			}
-
-			if (_index != old_index) {
-				Repaint();
-
-				DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, UP_ITEM)); 
-			}
-		}
-
+		PreviousItem();
+		
 		catched = true;
 	} else if (action == JKEY_CURSOR_DOWN || action == JKEY_PAGE_DOWN) {
-		if (_items.size() > 0) { 
-			int old_index = _index;
-
-			if (action == JKEY_CURSOR_DOWN) {
-				_index++;
-			} else {
-				_index = _index + visible_items;
-			}
-
-			if (_index >= (int)_items.size()) {
-				if (_loop == false) {
-					if (_items.size() > 0) {
-						_index = _items.size()-1;
-					} else {
-						_index = 0;
-					}
-				} else {
-					_index = 0;
-				}
-			}
-
-			if (_index >= (_top_index + visible_items)) {
-				_top_index = _index-visible_items+1;
-
-				if (_top_index < 0) {
-					_top_index = 0;
-				}
-			}
-
-			if (_index != old_index) {
-				Repaint();
-
-				DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, DOWN_ITEM)); 
-			}
-		}
+		NextItem();
 
 		catched = true;
 	} else if (action == JKEY_ENTER) {

@@ -312,7 +312,7 @@ void ComboBox::Paint(Graphics *g)
 				gapy = 0;
 		int arrow_size = h,
 				dx = x+w-arrow_size-2,
-				dy = y+4;
+				dy = y+(h-arrow_size/2)/2;
 
 		g->SetColor(0x80, 0x80, 0xe0, 0xff);
 		g->FillTriangle(dx, dy, dx+arrow_size, dy, dx+arrow_size/2, dy+arrow_size/2);

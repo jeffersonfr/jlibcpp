@@ -311,6 +311,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		button1->RequestFocus();
 
 		Frame::RegisterInputListener(this);
+		jgui::InputManager::GetInstance()->SkipKeyEvents(false);
 	}
 
 	virtual ~WindowTeste()

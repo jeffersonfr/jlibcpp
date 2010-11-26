@@ -2394,6 +2394,13 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 				} else {
 					PrimitiveType = FLAT_SHADED;
 				}
+			} else if (event->GetSymbol() == jgui::JKEY_SPACE) {
+				for (int i=0; i<1000; i++) {
+					Rotate (step * 2, 'x');
+					Rotate (step * 2, 'y');
+
+					Repaint();
+				}
 			}
 
 			Repaint();

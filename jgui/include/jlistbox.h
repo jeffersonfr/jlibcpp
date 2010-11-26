@@ -72,6 +72,19 @@ class ListBox : public jgui::ItemComponent{
 		bool _input_locked,
 				 _centered_interaction;
 
+	private:
+		/**
+		 * \brief
+		 *
+		 */
+		void PreviousItem();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void NextItem();
+
 	public:
 		/**
 		 * \brief

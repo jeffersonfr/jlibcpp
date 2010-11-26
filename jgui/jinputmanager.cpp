@@ -523,6 +523,7 @@ void InputManager::RegisterKeyListener(KeyListener *listener)
 			Window *win = dynamic_cast<Window *>(listener);
 
 			if (win->window != NULL) {
+				win->window->DetachEventBuffer(win->window, events);
 				win->window->AttachEventBuffer(win->window, events);
 			}
 		}
@@ -577,21 +578,24 @@ void InputManager::DispatchKeyEvent(KeyEvent *event)
 	}
 
 	KeyListener *listener = NULL;
-	std::map<KeyListener *, KeyProcess *>::iterator i;
 
-	{
-		// WARN:: verificar se eh necessario sincronizar o dispatch todo
-		jthread::AutoLock lock(&_mutex);
+	jthread::AutoLock lock(&_mutex);
 
-		if (_key_listeners.size() == 0) {
+	if (_key_listeners.size() == 0) {
+		return;
+	}
+
+	listener = (*_key_listeners.rbegin());
+
+	if (event->GetSource() == NULL) {
+		if (listener->InstanceOf("jgui::Window") == true) {
 			return;
 		}
-	
-		listener = (*_key_listeners.rbegin());
-		i = _key_processors.find(listener);
 	}
 
 	if (_skip_key_events == true) {
+		std::map<KeyListener *, KeyProcess *>::iterator i = _key_processors.find(listener);
+	
 		if (i != _key_processors.end()) {
 			if (_key_processors[listener]->IsRunning() == false) {
 				_key_processors[listener]->SetListener(listener, event);
@@ -618,6 +622,7 @@ void InputManager::RegisterMouseListener(MouseListener *listener)
 			Window *win = dynamic_cast<Window *>(listener);
 
 			if (win->window != NULL) {
+				win->window->DetachEventBuffer(win->window, events);
 				win->window->AttachEventBuffer(win->window, events);
 			}
 		}
@@ -666,20 +671,21 @@ void InputManager::DispatchMouseEvent(MouseEvent *event)
 		return;
 	}
 
+	MouseListener *listener = NULL;
+
 	jthread::AutoLock lock(&_mutex);
-	
+
 	if (_mouse_listeners.size() == 0) {
 		return;
 	}
 
-	MouseListener *listener;
-
 	listener = (*_mouse_listeners.rbegin());
 
-	/* TODO:: verificar se existe os eventos de mouse soh serao usados por windows 
-	if (event->GetSource() != NULL && listener->InstanceOf("jcommon::Window") == true) {
+	if (event->GetSource() == NULL) {
+		if (listener->InstanceOf("jgui::Window") == true) {
+			return;
+		}
 	}
-	*/
 
 	if (_skip_mouse_events == true) {
 		std::map<MouseListener *, MouseProcess *>::iterator i=_mouse_processors.find(listener);
@@ -769,13 +775,8 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 			type = JKEY_RELEASED;
 		}
 
-		DispatchKeyEvent(new KeyEvent(
-					WindowManager::GetInstance()->GetWindowInFocus(), 
-					type, 
-					mod, 
-					TranslateToDFBKeyCode(event.key_code), 
-					TranslateToDFBKeySymbol(event.key_symbol)
-		));
+		DispatchKeyEvent(new KeyEvent( NULL, type, mod, TranslateToDFBKeyCode(event.key_code), TranslateToDFBKeySymbol(event.key_symbol)));
+		// DispatchKeyEvent(new KeyEvent( WindowManager::GetInstance()->GetWindowInFocus(), type, mod, TranslateToDFBKeyCode(event.key_code), TranslateToDFBKeySymbol(event.key_symbol)));
 	} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE || event.type == DIET_AXISMOTION) {
 		int mouse_z = -1,
 				count = 1;
@@ -835,6 +836,7 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 		int cx = SCREEN_TO_SCALE(_mouse_x, _screen_width, _scale_width),
 				cy = SCREEN_TO_SCALE(_mouse_y, _screen_height, _scale_height);
 
+		/*
 		std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
 		Window *current = NULL;
 
@@ -856,6 +858,9 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 		if (current == NULL) {
 			DispatchMouseEvent(new MouseEvent(NULL, type, button, count, cx, cy));
 		}
+		*/
+			
+		DispatchMouseEvent(new MouseEvent(NULL, type, button, count, cx, cy));
 	}
 }
 
