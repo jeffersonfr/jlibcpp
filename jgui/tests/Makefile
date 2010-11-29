@@ -44,7 +44,6 @@ OBJS_calc = \
 
 OBJS_mines = \
 	   mines.o\
-	   slidewindow.o\
 
 OBJS_ants = \
 		ants.o\
