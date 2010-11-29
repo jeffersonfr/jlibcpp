@@ -1,5 +1,6 @@
 MODULE		= jlibcpp
-VERSION		= 0.8
+
+VERSION		= 0.9
 
 EXE			= lib$(MODULE)-$(VERSION).so
 
@@ -26,7 +27,12 @@ PREFIX		= /usr/local
 
 DEBUG  		= -g -ggdb 
 
-OTHER  		= -fPIC -funroll-loops -Wall -shared -rdynamic -O2
+ENABLE_DEBUG		?= yes
+ENABLE_DIRECTFB	?= yes
+
+# -ansi: problemas com va_copy()
+ARFLAGS		= -rc
+CFLAGS		= -fPIC -funroll-loops -Wall -shared -rdynamic -O2
 
 INCLUDE		= -I. \
 						-Iwin32/win32 \
@@ -53,21 +59,33 @@ DEFINES		= -D_GNU_SOURCE \
 						-D_REENTRANT \
 						-D_FILE_OFFSET_BITS=64 \
 						-D_LARGEFILE_SOURCE \
-						-DSINGLE_WAIT_CONDITION \
-						-DJDEBUG_ENABLED \
-						-DDIRECTFB_UI \
 
 REQUIRES	= \
 						libssl \
 
-ARFLAGS		= -rc
-CFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER) $(DEFINES)
+ARFLAGS		+= 
+CFLAGS		+= $(INCLUDE) $(DEBUG) $(OTHER) $(DEFINES)
 
 OK 				= \033[30;32mOK\033[m
 
-ifeq ($(findstring DIRECTFB_UI,$(DEFINES)), DIRECTFB_UI)
-	INCLUDE += `pkg-config --cflags directfb`
-	REQUIRES += directfb
+ifeq ($(ENABLE_DEBUG),yes)
+	INCLUDE 	+= \
+
+	DEFINES		+= \
+							 -DJDEBUG_ENABLED \
+
+endif
+
+ifeq ($(ENABLE_DIRECTFB),yes)
+	INCLUDE 	+= \
+							 `pkg-config --cflags directfb` \
+
+	DEFINES		+= \
+							 -DDIRECTFB_UI \
+
+	REQUIRES += \
+							directfb \
+
 endif
 
 OBJS_jcommon = \

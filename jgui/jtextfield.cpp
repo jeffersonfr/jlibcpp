@@ -83,9 +83,9 @@ bool TextField::ProcessEvent(KeyEvent *event)
 
 		Repaint();
 	} else if (action == JKEY_BACKSPACE) {
-			Backspace();
+		Backspace();
 	} else if (action == JKEY_DELETE) {
-			Delete();
+		Delete();
 	} else {
 		std::string s;
 

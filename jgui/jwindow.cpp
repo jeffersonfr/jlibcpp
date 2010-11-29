@@ -566,7 +566,7 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 		return;
 	}
 
-	if (c == NULL || graphics == NULL) {
+	if (graphics == NULL || c == NULL) {
 		return;
 	}
 
@@ -615,13 +615,6 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 			}
 		}
 
-		int x1 = 9999999,
-			y1 = 9999999,
-			x2 = -9999999,
-			y2 = -9999999;
-
-		graphics->Lock();
-
 		for (std::vector<jgui::Component *>::iterator i=collisions.begin(); i!=collisions.end(); i++) {
 			c1 = (*i);
 
@@ -630,23 +623,10 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 					w3 = c1->GetWidth(),
 					h3 = c1->GetHeight();
 
-			if (x1 > x3) {
-				x1 = x3;
-			}
-
-			if (y1 > y3) {
-				y1 = y3;
-			}
-
-			if (x2 < (x3+w3)) {
-				x2 = x3+w3;
-			}
-
-			if (y2 < (y3+h3)) {
-				y2 = y3+h3;
-			}
-
+			graphics->Lock();
+			
 			graphics->Reset();
+
 			graphics->Translate(x3, y3);
 			graphics->SetClip(0, 0, w3, h3);
 
@@ -658,10 +638,8 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 			c1->Revalidate();
 			
 			graphics->Flip(x3, y3, w3, h3);
-		}
 		
-		if (collisions.size() > 0) {
-			// graphics->Flip(x1, y1, x2-x1, y2-y1);
+			graphics->Unlock();
 		}
 	} else {
 		c1 = c;
@@ -696,8 +674,6 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 			}
 		}
 	}
-	
-	graphics->Unlock();
 }
 
 bool Window::Show(bool modal)

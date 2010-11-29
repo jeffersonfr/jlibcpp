@@ -505,8 +505,6 @@ void ListBox::Paint(Graphics *g)
 
 void ListBox::PreviousItem()
 {
-	int visible_items = GetVisibleItems();
-
 	if (_items.size() > 0) {
 		int old_index = _index;
 

@@ -236,7 +236,6 @@ void TextComponent::Insert(std::string text)
 		_text = _text.substr(0, _caret_position) + text + _text.substr(_caret_position, _text.size());
 			
 		IncrementCaretPosition(text.size());
-		Repaint();
 	}
 
 	DispatchTextEvent(new TextEvent(this, _text));

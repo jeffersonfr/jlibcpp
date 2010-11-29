@@ -387,14 +387,20 @@ void Frame::Paint(Graphics *g)
 void Frame::KeyPressed(KeyEvent *event)
 {
 	// JDEBUG(JINFO, "antes\n");
+	
+	/*
+	if (_input_locked == true) {
+		return;
+	}
+	*/
+
+	_input_locked = true;
+
+	if (_enabled == false) {
+		return;
+	}
 
 	if (event->GetType() == JKEY_PRESSED) {
-		if (event->GetType() != JKEY_PRESSED || _input_locked == true || _enabled == false) {
-			return;
-		}
-
-		_input_locked = true;
-
 		jthread::AutoLock lock(&_input_mutex);
 
 		if (_is_visible == false) {
@@ -405,7 +411,7 @@ void Frame::KeyPressed(KeyEvent *event)
 
 		_last_key_code = event->GetSymbol();
 
-		if (_default_exit == true && (event->GetSymbol() == JKEY_ESCAPE || event->GetSymbol() == JKEY_EXIT)) {
+		if ((event->GetSymbol() == JKEY_ESCAPE || event->GetSymbol() == JKEY_EXIT) && _default_exit == true) {
 			_input_locked = false;
 			_last_key_code = JKEY_EXIT;
 

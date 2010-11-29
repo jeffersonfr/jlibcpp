@@ -339,9 +339,11 @@ void Graphics::SetBlittingFlags(jblitting_flags_t t)
 
 	_blit_flags = t;
 
+#ifdef DIRECTFB_UI
 	if (surface != NULL) {
 		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | GetBlittingFlags(_blit_flags)));
 	}
+#endif
 }
 
 jporter_duff_flags_t Graphics::GetPorterDuffFlags()
@@ -408,10 +410,6 @@ void Graphics::Flip()
 
 void Graphics::Flip(int xp, int yp, int wp, int hp)
 {
-	if (wp <= 0 || hp <= 0) {
-		return;
-	}
-
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;

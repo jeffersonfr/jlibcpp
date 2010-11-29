@@ -84,6 +84,7 @@ void InputManager::Init()
 
 void InputManager::Restore()
 {
+#ifdef DIRECTFB_UI
 	if (events != NULL) {
 		return;
 	}
@@ -93,7 +94,6 @@ void InputManager::Restore()
 	for (std::vector<KeyListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
 		KeyListener *listener = (*i);
 
-#ifdef DIRECTFB_UI
 		if (listener->InstanceOf("jgui::Window") == true) {
 			Window *win = dynamic_cast<Window *>(listener);
 
@@ -101,16 +101,17 @@ void InputManager::Restore()
 				win->window->AttachEventBuffer(win->window, events);
 			}
 		}
-#endif
 	}
 
 	Start();
+#endif
 }
 
 void InputManager::Release()
 {
 	jthread::AutoLock lock(&_mutex);
 
+#ifdef DIRECTFB_UI
 	_initialized = false;
 
 	if (IsRunning() == true) {
@@ -120,6 +121,7 @@ void InputManager::Release()
 	events->Release(events);
 
 	events = NULL;
+#endif
 }
 
 void InputManager::SetWorkingScreenSize(int width, int height)
@@ -622,8 +624,8 @@ void InputManager::RegisterMouseListener(MouseListener *listener)
 			Window *win = dynamic_cast<Window *>(listener);
 
 			if (win->window != NULL) {
-				win->window->DetachEventBuffer(win->window, events);
-				win->window->AttachEventBuffer(win->window, events);
+				// win->window->DetachEventBuffer(win->window, events);
+				// win->window->AttachEventBuffer(win->window, events);
 			}
 		}
 #endif
@@ -683,7 +685,7 @@ void InputManager::DispatchMouseEvent(MouseEvent *event)
 
 	if (event->GetSource() == NULL) {
 		if (listener->InstanceOf("jgui::Window") == true) {
-			return;
+			// return;
 		}
 	}
 
@@ -855,11 +857,9 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 			}
 		}
 
-		if (current == NULL) {
-			DispatchMouseEvent(new MouseEvent(NULL, type, button, count, cx, cy));
-		}
+		DispatchMouseEvent(new MouseEvent(current, type, button, count, cx, cy));
 		*/
-			
+		
 		DispatchMouseEvent(new MouseEvent(NULL, type, button, count, cx, cy));
 	}
 }
