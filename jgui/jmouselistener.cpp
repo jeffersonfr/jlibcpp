@@ -25,7 +25,7 @@ namespace jgui {
 MouseListener::MouseListener():
 	jcommon::Listener()
 {
-	jcommon::Object::SetClassName("jgui::MenuListener");
+	jcommon::Object::SetClassName("jgui::MouseListener");
 }
 
 MouseListener::~MouseListener() 

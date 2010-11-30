@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jframe.h"
-#include "jtextfield.h"
 
 class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 
@@ -47,7 +46,7 @@ class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 			// INFO:: necessario para receber os eventos de mouse
 			InnerCreateWindow();
 
-			jgui::InputManager::GetInstance()->SkipMouseEvents(false);
+			// jgui::InputManager::GetInstance()->SkipMouseEvents(false);
 			jgui::InputManager::GetInstance()->RegisterMouseListener(this);
 		}
 

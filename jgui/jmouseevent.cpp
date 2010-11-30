@@ -25,7 +25,7 @@ namespace jgui {
 MouseEvent::MouseEvent(void *source, jmouse_event_t type, jmouse_button_t button, int click_count, int x, int y):
 	jcommon::EventObject(source)
 {
-	jcommon::Object::SetClassName("jgui::MenuEvent");
+	jcommon::Object::SetClassName("jgui::MouseEvent");
 
 	_type = type;
 	_button = button;

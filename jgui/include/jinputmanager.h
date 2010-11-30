@@ -26,6 +26,7 @@
 #include "jthread.h"
 #include "jmutex.h"
 #include "jautolock.h"
+#include "jcondition.h"
 
 #include <vector>
 #include <map>
@@ -33,92 +34,45 @@
 
 namespace jgui {
 
+enum jbroadcaster_event_t {
+	JBROADCAST_UNKNOWN		= 0x00,
+	JBROADCAST_KEYEVENT		= 0x01,
+	JBROADCAST_MOUSEEVENT	= 0x02
+};
+
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class KeyProcess : public jthread::Thread{
+class EventBroadcaster : public jthread::Thread {
 
 	private:
-		KeyListener *_listener;
-		KeyEvent *_event;
+		std::vector<jcommon::EventObject *> _events;
+		jcommon::Listener *_listener;
+		jthread::Condition _sem;
+		jthread::Mutex _mutex;
+		jbroadcaster_event_t _type;
+		bool _running;
 
 	public:
-		KeyProcess():
-			jthread::Thread(jthread::DETACH_THREAD)
-		{
-		}
+		EventBroadcaster(jcommon::Listener *listener);
 
-		virtual ~KeyProcess()
-		{
-			_event = NULL;
-		}
+		virtual ~EventBroadcaster();
 
-		static void ProcessEvent(KeyListener *listener, KeyEvent *event)
-		{
-			listener->KeyPressed(event);
+		jcommon::Listener * GetListener();
 
-			delete event;
-		}
+		void SetBroadcastEvent(jbroadcaster_event_t t);
+		jbroadcaster_event_t GetBroadcastEvent();
 
-		virtual void SetListener(KeyListener *listener, KeyEvent *event)
-		{
-			_listener = listener;
-			_event = event;
-		}
+		void Add(jcommon::EventObject *event, int limit = 0);
 
-		virtual void Run()
-		{
-			KeyProcess::ProcessEvent(_listener, _event);
-		}
+		void Reset();
+		void Release();
 
-};
+		void Wait();
 
-class MouseProcess : public jthread::Thread{
-
-	private:
-		MouseListener *_listener;
-		MouseEvent *_event;
-
-	public:
-		MouseProcess():
-			jthread::Thread(jthread::DETACH_THREAD)
-		{
-		}
-
-		virtual ~MouseProcess()
-		{
-			_event = NULL;
-		}
-
-		static void ProcessEvent(MouseListener *listener, MouseEvent *event)
-		{
-			if (event->GetType() == JMOUSE_CLICKED_EVENT) {
-				listener->MouseClicked(event);
-			} else if (event->GetType() == JMOUSE_PRESSED_EVENT) {
-				listener->MousePressed(event);
-			} else if (event->GetType() == JMOUSE_RELEASED_EVENT) {
-				listener->MouseReleased(event);
-			} else if (event->GetType() == JMOUSE_MOVED_EVENT) {
-				listener->MouseMoved(event);
-			} else if (event->GetType() == JMOUSE_WHEEL_EVENT) {
-				listener->MouseWheel(event);
-			}
-
-			delete event;
-		}
-
-		virtual void SetListener(MouseListener *listener, MouseEvent *event)
-		{
-			_listener = listener;
-			_event = event;
-		}
-
-		virtual void Run()
-		{
-			MouseProcess::ProcessEvent(_listener, _event);
-		}
+		virtual void Run();
 
 };
 
@@ -135,10 +89,7 @@ class InputManager : public jthread::Thread{
 		IDirectFBEventBuffer *events;
 #endif
 
-		std::vector<MouseListener *> _mouse_listeners;
-		std::map<MouseListener *, MouseProcess *> _mouse_processors;
-		std::vector<KeyListener *> _key_listeners;
-		std::map<KeyListener *, KeyProcess *> _key_processors;
+		std::vector<EventBroadcaster *> _broadcasters;
 		int _initialized,
 				_screen_width,
 				_screen_height,
@@ -290,18 +241,6 @@ class InputManager : public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void DispatchKeyEvent(KeyEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::vector<KeyListener *> & GetKeyListeners();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void RegisterMouseListener(MouseListener *listener);
 		
 		/**
@@ -314,14 +253,8 @@ class InputManager : public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void DispatchMouseEvent(MouseEvent *event);
+		virtual void DispatchEvent(jcommon::EventObject *event);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::vector<MouseListener *> & GetMouseListeners();
-
 		/**
 		 * \brief
 		 *
