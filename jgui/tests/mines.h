@@ -56,7 +56,6 @@ class Mines : public jgui::Frame, public jgui::FrameInputListener{
 		*flag,
 		*smile_face,
 		*dead_face;
-	jgui::Window *slide;
 	block_t *board;
 	int size,
 			max_rows,

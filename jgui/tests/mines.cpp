@@ -34,13 +34,6 @@ Mines::Mines(int x, int y):
 
 	board = new block_t[max_rows*max_cols+10]; // 10 _insets.toptes para overflow
 
-	slide = new jgui::Window(_insets.left+x, _insets.top+y, size, size);
-
-	slide->SetBackgroundColor(0x00, 0x00, 0x00, 0x80);
-	slide->SetUndecorated(true);
-	slide->Show(false);
-	slide->RaiseToTop();
-
 	small_bomb = new jgui::OffScreenImage(size, size);
 	huge_bomb = new jgui::OffScreenImage(4*size, 4*size);
 	flag = new jgui::OffScreenImage(size, size);
@@ -67,7 +60,6 @@ Mines::~Mines()
 	jthread::AutoLock lock(&mines_mutex);
 
 	delete board;
-	delete slide;
 
 	delete small_bomb;
 	delete huge_bomb;
@@ -138,6 +130,9 @@ void Mines::Paint(jgui::Graphics *g)
 	g->FillRectangle(x, y+h+10, w, _font->GetHeight());
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 	g->DrawString(tmp, x+10, y+h+10);
+				
+	g->SetColor(0x20, 0x40, 0xa0, 0x80);
+	g->FillRectangle(_insets.left+current_col*(size+delta), _insets.top+current_row*(size+delta), size, size);
 }
 
 void Mines::InputChanged(jgui::KeyEvent *event)
@@ -149,27 +144,21 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 	}
 
 	if (GetResult() == NONE) {
-		int delta = 4;
-
 		if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
 			if (current_col < max_cols-1) {
 				current_col++;
-				slide->SetLocation(_insets.left+GetX()+current_col*(size+delta), _insets.top+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
 			if (current_col > 0) {
 				current_col--;
-				slide->SetLocation(_insets.left+GetX()+current_col*(size+delta), _insets.top+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_UP) {
 			if (current_row > 0) {
 				current_row--;
-				slide->SetLocation(_insets.left+GetX()+current_col*(size+delta), _insets.top+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
 			if (current_row < max_rows-1) {
 				current_row++;
-				slide->SetLocation(_insets.left+GetX()+current_col*(size+delta), _insets.top+GetY()+current_row*(size+delta));
 			}
 		} else if (event->GetSymbol() == jgui::JKEY_ENTER) {
 			block_t *block = &board[current_row*max_cols+current_col];
@@ -262,8 +251,6 @@ void Mines::InitializeFlags()
 
 void Mines::SetupBoard()
 {
-	slide->SetLocation(_insets.left+GetX(), _insets.top+GetY());
-
 	InitializeFlags();
 
 	for (int i=0; i<max_rows*max_cols; i++) {
