@@ -743,7 +743,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			exit(1);
 		}
 
-		jgui::Frame::RegisterInputListener(this);
+		Frame::RegisterInputListener(this);
 	}
 
 		virtual ~GraphicsTeste()

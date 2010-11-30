@@ -46,7 +46,7 @@ class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 			// INFO:: necessario para receber os eventos de mouse
 			InnerCreateWindow();
 
-			// jgui::InputManager::GetInstance()->SkipMouseEvents(false);
+			jgui::InputManager::GetInstance()->SkipMouseEvents(false);
 			jgui::InputManager::GetInstance()->RegisterMouseListener(this);
 		}
 
