@@ -24,7 +24,7 @@
 namespace jgui {
 
 Frame::Frame(std::string title, int x, int y, int width, int height, int scale_width, int scale_height):
-	Window(x, y, width, height, 0xff, scale_width, scale_height)
+	Window(x, y, width, height, scale_width, scale_height)
 {
 	jcommon::Object::SetClassName("jgui::Frame");
 

@@ -24,11 +24,12 @@
 
 namespace jgui {
 
-Window::Window(int x, int y, int width, int height, int opacity, int scale_width, int scale_height):
+Window::Window(int x, int y, int width, int height, int scale_width, int scale_height):
 	Container(x, y, width, height, scale_width, scale_height)
 {
 	jcommon::Object::SetClassName("jgui::Window");
 
+	printf("1 CreateWindow:: %d, %d, %d, %d\n", scale_width, scale_height, _scale_width, _scale_height);
 	_insets.left = 30;
 	_insets.right = 30;
 	_insets.top = 60;
@@ -51,7 +52,7 @@ Window::Window(int x, int y, int width, int height, int opacity, int scale_width
 
 	graphics = NULL;
 
-	_opacity = opacity;
+	_opacity = 0xff;
 	_cursor = ARROW_CURSOR;
 
 	SetBackgroundVisible(true);
@@ -199,6 +200,7 @@ void Window::InnerCreateWindow(void *params)
 	IDirectFBSurface *s = NULL;
 	
 	if (params == NULL) {
+		printf("CreateWindow:: %d, %d, %d, %d\n", _size.width, _size.height, _scale_width, _scale_height);
 		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &w, &s, _opacity, _scale_width, _scale_height);
 	} else {
 		DFBWindowDescription desc = *(DFBWindowDescription *)params;
