@@ -17,72 +17,108 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "Stdafx.h"
-#include "jobservable.h"
-#include "jautolock.h"
+#ifndef J_PROCESSINPUTSTREAM_H
+#define J_PROCESSINPUTSTREAM_H
 
-namespace jcommon {
+#include "jprivateprocess.h"
+#include "jinputstream.h"
+#include "joutputstream.h"
 
-Observable::Observable():
-	jcommon::Object()
-{
-	jcommon::Object::SetClassName("jcommon::Observable");
+#include <stdint.h>
+
+namespace jshared {
+
+/**
+ * \brief Socket.
+ *
+ * \author Jeff Ferr
+ */
+class ProcessInputStream : public jio::InputStream {
+
+	private:
+		int _fd;
+
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		ProcessInputStream(int fd);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~ProcessInputStream();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsEmpty();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Available();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetPosition();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Read();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Read(char *data, int64_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Skip(int64_t skip);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Reset();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Close();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsClosed();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetReceiveBytes();
+
+};
+
 }
 
-Observable::~Observable()
-{
-}
-
-void Observable::AddObserver(Observer *o)
-{
-	jthread::AutoLock lock(&_mutex);
-
-	_observers.push_back(o);
-}
-
-void Observable::RemoveObserver(Observer *o)
-{
-	jthread::AutoLock lock(&_mutex);
-
-	std::vector<Observer *>::iterator i = std::find(_observers.begin(), _observers.end(), o);
-
-	if (i != _observers.end()) {
-		_observers.erase(i);
-	}
-}
-
-void Observable::RemoveAllObservers()
-{
-	jthread::AutoLock lock(&_mutex);
-
-	_observers.clear();
-}
-
-void Observable::NotifyObservers(void *v)
-{
-	jthread::AutoLock lock(&_mutex);
-
-	for (std::vector<Observer *>::iterator i=_observers.begin(); i!=_observers.end(); i++) {
-		(*i)->Update(v);
-	}
-}
-
-void Observable::SetChanged(bool b)
-{
-	_changed = b; 
-}
-
-bool Observable::HasChanged()
-{
-	return _changed;
-}
-
-int Observable::CountObservers()
-{
-	jthread::AutoLock lock(&_mutex);
-
-	return _observers.size();
-}
-
-}
-
+#endif

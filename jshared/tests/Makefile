@@ -20,11 +20,8 @@ OBJS_fifo_teste = \
 OBJS_msg_teste = \
 	   msg_teste.o\
 
-OBJS_wprocess_teste = \
-	   wprocess_teste.o\
-
-OBJS_wsort_teste = \
-	   wsort_teste.o\
+OBJS_process = \
+	   process.o\
 
 OBJS_ipcmap = \
 	   ipcmap.o\
@@ -32,7 +29,7 @@ OBJS_ipcmap = \
 OBJS_ipcshared = \
 	   ipcshared.o\
 
-all: fifo_teste msg_teste wprocess_teste wsort_teste ipcmap ipcshared
+all: fifo_teste msg_teste process ipcmap ipcshared
 	
 fifo_teste: $(OBJS_fifo_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
@@ -40,10 +37,8 @@ fifo_teste: $(OBJS_fifo_teste)
 msg_teste: $(OBJS_msg_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
 
-wprocess_teste: $(OBJS_wprocess_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
-
-wsort_teste: $(OBJS_wsort_teste)
+process: $(OBJS_process)
+	@$(CC) $(CCFLAGS) multiply.cpp -o multiply $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
 
 ipcmap: $(OBJS_ipcmap)
@@ -58,4 +53,4 @@ ipcshared: $(OBJS_ipcshared)
 install:
 
 clean:
-	@rm -rvf *.o *~ fifo_teste msg_teste wprocess_teste wsort_teste ipcmap ipcshared
+	@rm -rvf *.o *~ fifo_teste msg_teste process ipcmap ipcshared multiply

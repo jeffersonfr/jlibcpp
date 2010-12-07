@@ -59,13 +59,13 @@ class InputStream : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void SetBlocking(bool block_);
+		virtual void SetBlocking(bool block_);
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsBlocking();
+		virtual bool IsBlocking();
 
 		/**
 		 * \brief

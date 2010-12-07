@@ -31,7 +31,11 @@
 #endif
 
 struct jspinlock_t {
-    volatile unsigned long lock;
+#ifdef _WIN32
+	volatile unsigned long lock;
+#else
+	pthread_spinlock_t lock;
+#endif
 };
 
 namespace jthread {
@@ -43,90 +47,45 @@ namespace jthread {
  */
 class SpinLock : public virtual jcommon::Object{
 
-    private:
+	private:
 		jspinlock_t _lock;
 
-    public:
-        /**
-         * \brief Construtor.
-         *
-         */
-        SpinLock();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SpinLock();
 
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~SpinLock();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~SpinLock();
 
-        /**
-         * \brief Lock the semaphore.
-         *
-         */
-        void Lock();
+		/**
+		 * \brief Lock the semaphore.
+		 *
+		 */
+		void Lock();
 
-        /**
-         * \brief Notify the locked semaphore.
-         *
-         */
-        void Unlock();
-        
-        /**
-         * \brief Try lock the semaphore.
-         *
-         */
-        bool TryLock();
-        
-        /**
-         * \brief
-         *
-         */
-        void Release();
-        
-};
+		/**
+		 * \brief Notify the locked semaphore.
+		 *
+		 */
+		void Unlock();
 
-class SpinLockReentrant{
-    private:
-		SpinLock _RealCS;
-	    unsigned int _nLockCount;
-		unsigned int _nOwner;
+		/**
+		 * \brief Try lock the semaphore.
+		 *
+		 */
+		bool TryLock();
 
-    public:
-        /**
-         * \brief Construtor.
-         *
-         */
-        SpinLockReentrant();
-
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~SpinLockReentrant();
-
-        /**
-         * \brief Lock the semaphore.
-         *
-         */
-        void Enter(unsigned int pnumber);
-
-        /**
-         * \brief Notify the locked semaphore.
-         *
-         */
-        void Leave(unsigned int pnumber);
-        
-        /**
-         * \brief Try lock the semaphore.
-         *
-         */
-        bool TryEnter(unsigned int pnumber);
-        
-        /**
-         * \brief
-         *
-         */
-        void Release();
+		/**
+		 * \brief
+		 *
+		 */
+		void Release();
 
 };
 

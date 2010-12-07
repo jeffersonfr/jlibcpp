@@ -18,70 +18,107 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jobservable.h"
-#include "jautolock.h"
+#include "jprocessinputstream.h"
 
-namespace jcommon {
+using namespace std;
 
-Observable::Observable():
+namespace jshared {
+
+ProcessInputStream::ProcessInputStream(int fd):
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Observable");
+	jcommon::Object::SetClassName("jshared::ProcessInputStream");
+	
+	_fd = fd;
 }
 
-Observable::~Observable()
+ProcessInputStream::~ProcessInputStream()
 {
 }
 
-void Observable::AddObserver(Observer *o)
+bool ProcessInputStream::IsEmpty() 
 {
-	jthread::AutoLock lock(&_mutex);
-
-	_observers.push_back(o);
+	return false;
 }
 
-void Observable::RemoveObserver(Observer *o)
+int64_t ProcessInputStream::Available()
 {
-	jthread::AutoLock lock(&_mutex);
+	return 0LL;
+}
 
-	std::vector<Observer *>::iterator i = std::find(_observers.begin(), _observers.end(), o);
+int64_t ProcessInputStream::GetSize()
+{
+	return 0LL;
+}
 
-	if (i != _observers.end()) {
-		_observers.erase(i);
+int64_t ProcessInputStream::GetPosition()
+{
+	return 0LL;
+}
+
+int64_t ProcessInputStream::Read()
+{
+	int64_t r;
+	char byte;
+
+	if ((r = Read(&byte, 1LL)) <= 0LL) {
+		return -1LL;
 	}
+
+	return (int64_t)byte;
 }
 
-void Observable::RemoveAllObservers()
+int64_t ProcessInputStream::Read(char *data, int64_t size)
 {
-	jthread::AutoLock lock(&_mutex);
+#ifdef _WIN32
+	return -1;
+#else
+	if (IsBlocking() == true) {
+		return ::read(_fd, data, size);
+	} else {
+		struct timeval t;
+		fd_set readfs;
 
-	_observers.clear();
-}
+		FD_ZERO(&readfs);
+		FD_SET(_fd, &readfs);
 
-void Observable::NotifyObservers(void *v)
-{
-	jthread::AutoLock lock(&_mutex);
+		t.tv_sec = 1L;
+		t.tv_usec = 0L;
 
-	for (std::vector<Observer *>::iterator i=_observers.begin(); i!=_observers.end(); i++) {
-		(*i)->Update(v);
+		if (select(_fd+1, &readfs, NULL, NULL, &t) < 0) {
+			return -1;
+		}
+
+		if (FD_ISSET(_fd, &readfs)) {
+			return ::read(_fd, data, size);
+		}
 	}
+
+	return -1;
+#endif
 }
 
-void Observable::SetChanged(bool b)
+void ProcessInputStream::Skip(int64_t skip)
 {
-	_changed = b; 
 }
 
-bool Observable::HasChanged()
+void ProcessInputStream::Reset()
 {
-	return _changed;
 }
 
-int Observable::CountObservers()
+void ProcessInputStream::Close()
 {
-	jthread::AutoLock lock(&_mutex);
+	::close(_fd);
+}
 
-	return _observers.size();
+bool ProcessInputStream::IsClosed()
+{
+	return false;
+}
+
+int64_t ProcessInputStream::GetReceiveBytes()
+{
+	return 0LL;
 }
 
 }

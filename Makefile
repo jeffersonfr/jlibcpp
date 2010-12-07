@@ -210,7 +210,9 @@ OBJS_jshared = \
 	   jprocessexception.o\
 	   jmessagequeue.o\
 	   jprivateprocess.o\
-	   jwrapperprocess.o\
+	   jprocess.o\
+	   jprocessinputstream.o\
+	   jprocessoutputstream.o\
 	   jsharedfifo.o\
 	   jsharedlib.o\
 	   jmessageexception.o\

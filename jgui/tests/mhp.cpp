@@ -223,6 +223,8 @@ class LayersManager{
 			_background_layer->Show();
 			_video_layer->Show();
 			_graphic_layer->Show();
+			
+			GetBackgroundLayer()->SetImage("icons/background.png");
 		}
 
 	public:
@@ -328,11 +330,11 @@ class TestScene : public Scene{
 		{
 			Add(_label = new jgui::Label("Reposicionamento da Video", 10, 10, 960-2*10, 100));
 
-			Add(_button1 = new jgui::Button("Full Screen", (960-400)/2, 0*(100+10)+180, 400, 100));
-			Add(_button2 = new jgui::Button("Streched", (960-400)/2, 1*(100+10)+180, 400, 100));
-			Add(_button3 = new jgui::Button("Exit", (960-400)/2, 2*(100+10)+180, 400, 100));
-
 			_label->SetBackgroundVisible(false);
+
+			Add(_button1 = new jgui::Button("Full Screen", (960-400)/2, 0*(100+10)+180, 400, 100));
+			Add(_button2 = new jgui::Button("Streched Screen", (960-400)/2, 1*(100+10)+180, 400, 100));
+			Add(_button3 = new jgui::Button("Exit", (960-400)/2, 2*(100+10)+180, 400, 100));
 
 			_button1->SetNavigation(NULL, NULL, _button3, _button2);
 			_button2->SetNavigation(NULL, NULL, _button1, _button3);
@@ -341,8 +343,6 @@ class TestScene : public Scene{
 			_button1->RequestFocus();
 
 			SetBackgroundColor(0x00, 0x00, 0x00, 0xa0);
-
-			Repaint();
 		}
 
 		virtual ~TestScene()
@@ -359,7 +359,7 @@ class TestScene : public Scene{
 		virtual void InputReceived(jgui::KeyEvent *event)
 		{
 			LayersManager *layers = LayersManager::GetInstance();
-
+ 
 			if (GetComponentInFocus() == _button1) {
 				layers->GetVideoLayer()->SetBounds(0, 0, 1920, 1080);
 			} else if (GetComponentInFocus() == _button2) {
@@ -375,16 +375,16 @@ LayersManager *LayersManager::_instance = NULL;
 
 int main(int argc, char **argv)
 {
+	if (argc < 2) {
+		std::cout << "use: " << argv[0] << " <video>" << std::endl;
+
+		return -1;
+	}
+
 	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
 	
-	LayersManager *layers = LayersManager::GetInstance();
+	LayersManager::GetInstance()->GetVideoLayer()->SetFile(argv[1]);
 
-	// INFO:: init background layer
-	layers->GetBackgroundLayer()->SetImage("icons/background.png");
-	
-	// INFO:: init video layer
-	layers->GetVideoLayer()->SetFile("/jeff/miscelaneous/channels/channel14");
-	
 	TestScene test;
 
 	sleep(100000);

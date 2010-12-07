@@ -18,70 +18,110 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jobservable.h"
-#include "jautolock.h"
+#include "jprocessoutputstream.h"
 
-namespace jcommon {
+using namespace std;
 
-Observable::Observable():
-	jcommon::Object()
+namespace jshared {
+
+ProcessOutputStream::ProcessOutputStream(int fd)
 {
-	jcommon::Object::SetClassName("jcommon::Observable");
+	_fd = fd;
 }
 
-Observable::~Observable()
+ProcessOutputStream::~ProcessOutputStream()
 {
 }
 
-void Observable::AddObserver(Observer *o)
+bool ProcessOutputStream::IsEmpty()
 {
-	jthread::AutoLock lock(&_mutex);
-
-	_observers.push_back(o);
+	return false;
 }
 
-void Observable::RemoveObserver(Observer *o)
+int64_t ProcessOutputStream::Available()
 {
-	jthread::AutoLock lock(&_mutex);
+	return 0LL;
+}
 
-	std::vector<Observer *>::iterator i = std::find(_observers.begin(), _observers.end(), o);
+int64_t ProcessOutputStream::GetSize()
+{
+	return 0LL;
+}
 
-	if (i != _observers.end()) {
-		_observers.erase(i);
+int64_t ProcessOutputStream::Write(int64_t b)
+{
+	char byte = (char)b;
+
+	return Write((const char *)&byte, 1LL);
+}
+
+int64_t ProcessOutputStream::Write(const char *data, int64_t size)
+{
+#ifdef _WIN32
+	return -1LL;
+#else
+	if (IsBlocking() == true) {
+		int64_t n = 0LL;
+
+		if ((n = ::write(_fd, data, size)) > 0) {
+			// fsync(_fd);
+		}
+
+		return n;
+	} else {
+		struct timeval waittime;
+		fd_set writefs;
+
+		FD_ZERO(&writefs);
+		FD_SET(_fd, &writefs);
+
+		waittime.tv_sec = 1L;	// TODO:: usuario especifica ou use pool
+		waittime.tv_usec = 0L;
+
+		if (select(_fd+1, NULL, &writefs, NULL, &waittime) < 0) {
+			return -1LL;
+		}
+
+		int64_t n = 0LL;
+
+		if (FD_ISSET(_fd, &writefs)) {
+			if ((n = ::write(_fd, data, size)) > 0) {
+				fsync(_fd);
+			}
+		}
+
+		return n;
 	}
+#endif
 }
 
-void Observable::RemoveAllObservers()
+int64_t ProcessOutputStream::Write(std::string)
 {
-	jthread::AutoLock lock(&_mutex);
-
-	_observers.clear();
+	return 0LL;
 }
 
-void Observable::NotifyObservers(void *v)
+int64_t ProcessOutputStream::Flush()
 {
-	jthread::AutoLock lock(&_mutex);
-
-	for (std::vector<Observer *>::iterator i=_observers.begin(); i!=_observers.end(); i++) {
-		(*i)->Update(v);
-	}
+	return 0LL;
 }
 
-void Observable::SetChanged(bool b)
+void ProcessOutputStream::Seek(int64_t index)
 {
-	_changed = b; 
 }
 
-bool Observable::HasChanged()
+void ProcessOutputStream::Close()
 {
-	return _changed;
+	::close(_fd);
 }
 
-int Observable::CountObservers()
+bool ProcessOutputStream::IsClosed()
 {
-	jthread::AutoLock lock(&_mutex);
+	return false;
+}
 
-	return _observers.size();
+int64_t ProcessOutputStream::GetSentBytes()
+{
+	return 0LL;
 }
 
 }

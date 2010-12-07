@@ -3233,12 +3233,12 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 			sdst = (uint32_t *)((uint8_t *)sptr + sy * spitch);
 
 			for (i=width-1+2*dw; i>0; i--) {
-				iPrime = i + - width - dw;
+				iPrime = i - width - dw;
 			
 				iOriginal = width + ((iPrime+xc)*cosTheta - (jPrime+yc)*sinTheta)/precision;
 				jOriginal = height + ((iPrime+xc)*sinTheta + (jPrime+yc)*cosTheta)/precision;
 
-				if ((iOriginal >= xc) && ((iOriginal-xc) <= width-1) && (jOriginal >= yc) && ((jOriginal-yc) <= height-1)) {
+				if ((iOriginal >= xc) && ((iOriginal-xc) < width) && (jOriginal >= yc) && ((jOriginal-yc) < height)) {
 					uint32_t rgb;
 
 					int gx = ((iOriginal-xc)*scalew)/precision;

@@ -21,7 +21,7 @@
 #define J_OBSERVABLE_H
 
 #include "jobserver.h"
-#include "jobject.h"
+#include "jmutex.h"
 
 #include <string>
 #include <vector>
@@ -40,6 +40,7 @@ class Observable : public virtual jcommon::Object{
 
 	private:
 		std::vector<Observer *> _observers;
+		jthread::Mutex _mutex;
 		bool _changed;
 		
 	public:

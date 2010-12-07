@@ -17,71 +17,108 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jwrapperprocess.h"
+#ifndef J_PROCESSOUTPUTSTREAM_H_
+#define J_PROCESSOUTPUTSTREAM_H_
 
-#include <iostream>
-#include <sstream>
+#include "jprivateprocess.h"
+#include "jinputstream.h"
+#include "joutputstream.h"
 
-#include <string.h>
+#include <stdint.h>
 
-using namespace std;
-using namespace jshared;
+namespace jshared {
 
-int ostream_test()
-{
-  WrapperProcess grep("/bin/ls -l");
+/**
+ * \brief Socket.
+ *
+ * \author Jeff Ferr
+ */
+class ProcessOutputStream : public jio::OutputStream {
 
-  grep.Write("This is the first line");
-  grep.Write("This is Seven: 7");
-  
-  stringbuf sb;
-  char buf[200];
+	private:
+		int _fd;
 
-  grep.Read(buf, 200);
-  
-  cout << "ostream test OK!" << endl;
-  cout << buf << endl;
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		ProcessOutputStream(int fd);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~ProcessOutputStream();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsEmpty();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Available();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Write(int64_t b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Write(const char *data, int64_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Write(std::string);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Flush();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Seek(int64_t index);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Close();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsClosed();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetSentBytes();
 
-  return 0;
+};
+
 }
 
-int main() 
-{
-  ostream_test();
-  
-  char *params[] = {
-		(char *)"-i", 
-	  (char *)"-v", 
-	  (char *)"test"
-  };
-  char *dum[] = {
-		(char *)"-l"
-	};
-  char *s = (char *)"This is\na small test\nvery small\nbut a test\n";
-  
-  WrapperProcess grep("/bin/grep", params);
-  WrapperProcess wc("/usr/bin/wc", dum);    
-
-  grep.Write(s, strlen(s));
-  wc.Write(s, strlen(s));
-
-  grep.WaitAllData();
- 
-  char buf[256];
-  int len = grep.Read(buf, 255);
-  
-  buf[len] = 0;
-  
-  cout << "read " << len << " bytes: " << buf << endl;
-  
-  wc.Write(buf,len);
-  wc.WaitAllData();
-  
-  len = wc.Read(buf, 255);
-  buf[len] = 0;
- 
-  cout << "read " << len << " bytes: " << buf << endl;
-
-  return 0;
-}
-
+#endif

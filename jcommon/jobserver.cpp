@@ -32,7 +32,7 @@ Observer::~Observer()
 {
 }
 
-void Observer::Update(void *)
+void Observer::Update(void *v)
 {
 }
 

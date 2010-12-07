@@ -17,31 +17,77 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jwrapperprocess.h"
+#include "jprocess.h"
 
 #include <iostream>
+#include <sstream>
 
+#include <string.h>
+
+using namespace std;
 using namespace jshared;
+
+void test1()
+{
+	std::cout << ".. test1 .." << std::endl; 
+
+	int length;
+  char buf[256];
+ 
+  Process ls("/bin/ls -l");
+
+	while ((length = ls.GetInputStream()->Read(buf, 255)) > 0) {
+		if (::write(1, buf, length) < 0) {
+			break;
+		}
+	}
+}
+
+void test2()
+{
+	std::cout << ".. test2 .." << std::endl; 
+
+	// std::string s = "This is\na small test\nvery small\nbut a test\n";
+	std::string s = "12\n13\n";
+	int length;
+  char buf[256];
+  
+ 	Process grep("./multiply");
+
+  grep.GetOutputStream()->Write(s.c_str(), s.size());
+
+	while ((length = grep.GetInputStream()->Read(buf, 255)) > 0) {
+		if (::write(1, buf, length) < 0) {
+			break;
+		}
+	}
+}
+
+void test3()
+{
+	std::cout << ".. test3 .." << std::endl; 
+
+	std::string s = "Peter Winston\nPhilip Johnson\nAnna Anderson\n";
+	int length;
+  char buf[256];
+  
+	Process sort("sort -k 2");
+
+  sort.GetOutputStream()->Write(s.c_str(), s.size());
+
+	while ((length = sort.GetInputStream()->Read(buf, 255)) > 0) {
+		if (::write(1, buf, length) < 0) {
+			break;
+		}
+	}
+}
 
 int main() 
 {
-	// string s = "Peter Winston\nPhilip Johnson\nAnna Anderson\n";
-	std::string s = "<html>";
-
-	// WrapperProcess sort("sort -k 2");
-	WrapperProcess sort("php");
-
-	sort.Write(s);
-	// sort.Close();
-
-	char buf[256 + 1];
-	int r;
-
-	while ((r = sort.Read(buf, 256)) > 0) {
-		buf[r] = '\0';
-		
-		std::cout << buf << std::endl;
-	}
-
-	return 0;
+  test1();
+ 	test2();
+  test3();
+  
+  return 0;
 }
+

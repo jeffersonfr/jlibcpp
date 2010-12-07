@@ -605,7 +605,7 @@ void Thread::WaitThread(int key)
 void Thread::Release()
 {
 	if (_group != NULL) {
-		_group->RegisterThread(this);
+		_group->UnregisterThread(this);
 	}
 
 	KillAllThreads();

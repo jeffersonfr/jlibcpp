@@ -29,7 +29,6 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 {
 	jcommon::Object::SetClassName("jgui::Window");
 
-	printf("1 CreateWindow:: %d, %d, %d, %d\n", scale_width, scale_height, _scale_width, _scale_height);
 	_insets.left = 30;
 	_insets.right = 30;
 	_insets.top = 60;
@@ -200,7 +199,6 @@ void Window::InnerCreateWindow(void *params)
 	IDirectFBSurface *s = NULL;
 	
 	if (params == NULL) {
-		printf("CreateWindow:: %d, %d, %d, %d\n", _size.width, _size.height, _scale_width, _scale_height);
 		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &w, &s, _opacity, _scale_width, _scale_height);
 	} else {
 		DFBWindowDescription desc = *(DFBWindowDescription *)params;
@@ -292,8 +290,9 @@ void Window::PutBelow(Window *w)
 
 void Window::SetBounds(int x, int y, int w, int h)
 {
-	// SetPosition(x, y);
-	// SetSize(w, h);
+	if (_location.x == x && _location.y == y && _size.width == w && _size.height == h) {
+		return;
+	}
 
 	_location.x = x;
 	_location.y = y;
@@ -327,6 +326,10 @@ void Window::SetBounds(int x, int y, int w, int h)
 
 void Window::SetLocation(int x, int y)
 {
+	if (_location.x == x && _location.y == y) {
+		return;
+	}
+
 	_location.x = x;
 	_location.y = y;
 

@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jthreadgroup.h"
+#include "jautolock.h"
 
 namespace jthread {
 
@@ -36,6 +37,8 @@ ThreadGroup::~ThreadGroup()
 
 void ThreadGroup::RegisterThread(Thread *thread)
 {
+	jthread::AutoLock lock(&_mutex);
+
 	if (std::find(_threads.begin(), _threads.end(), thread) == _threads.end()) {
 		_threads.push_back(thread);
 	}
@@ -43,6 +46,8 @@ void ThreadGroup::RegisterThread(Thread *thread)
 
 void ThreadGroup::UnregisterThread(Thread *thread)
 {
+	jthread::AutoLock lock(&_mutex);
+
 	std::vector<Thread *>::iterator i = std::find(_threads.begin(), _threads.end(), thread);
 
 	if (i != _threads.end()) {
@@ -52,6 +57,8 @@ void ThreadGroup::UnregisterThread(Thread *thread)
 
 void ThreadGroup::InterruptAll()
 {
+	jthread::AutoLock lock(&_mutex);
+
 	for (std::vector<Thread *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
 		try {
 			(*i)->Interrupt();
@@ -62,6 +69,8 @@ void ThreadGroup::InterruptAll()
 
 void ThreadGroup::WaitForAll()
 {
+	jthread::AutoLock lock(&_mutex);
+
 	for (std::vector<Thread *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
 		try {
 			(*i)->WaitThread();
