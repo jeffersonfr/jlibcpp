@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_FILESYSTEMDIALOG_H
-#define J_FILESYSTEMDIALOG_H
+#ifndef J_FILESYSTEMDIALOGBOX_H
+#define J_FILESYSTEMDIALOGBOX_H
 
 #include "jframe.h"
 #include "jselectlistener.h"
@@ -60,15 +60,14 @@ enum jfilechooser_filter_t {
  *
  * \author Jeff Ferr
  */
-class FileChooserDialog : public jgui::Frame, public jgui::SelectListener, public jgui::FrameInputListener{
+class FileChooserDialogBox : public jgui::Frame, public jgui::SelectListener, public jgui::FrameInputListener{
 
 	private:
-		jthread::Mutex _filesystem_mutex;
-
 		std::vector<std::string> _extensions;
-		jgui::Label *label;
-		jgui::ListBox *list;
-		jgui::TextField *file;
+		jthread::Mutex _mutex;
+		jgui::Label *_label;
+		jgui::ListBox *_list;
+		jgui::TextField *_file;
 		std::string _base_dir,
 			_current_dir;
 		jfilechooser_type_t _type;
@@ -80,7 +79,7 @@ class FileChooserDialog : public jgui::Frame, public jgui::SelectListener, publi
 		 * \brief
 		 *
 		 */
-		void ShowFiles();
+		bool ShowFiles(std::string current_dir);
 
 		/**
 		 * \brief
@@ -106,13 +105,13 @@ class FileChooserDialog : public jgui::Frame, public jgui::SelectListener, publi
 		 * \brief
 		 *
 		 */
-		FileChooserDialog(std::string title, std::string directory, int x, int y, jfilechooser_type_t type = OPEN_FILE_DIALOG);
+		FileChooserDialogBox(std::string title, std::string directory, int x, int y, jfilechooser_type_t type = OPEN_FILE_DIALOG);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~FileChooserDialog();
+		virtual ~FileChooserDialogBox();
 
 
 		/**
@@ -168,12 +167,6 @@ class FileChooserDialog : public jgui::Frame, public jgui::SelectListener, publi
 		 *
 		 */
 		virtual void InputChanged(jgui::KeyEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Show(bool modal = true);
 
 };
 

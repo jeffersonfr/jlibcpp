@@ -31,13 +31,11 @@ File::File(std::string filename_, int flags_):
 {
 	jcommon::Object::SetClassName("jio::File");
 	
+	_type = F_UNKNOWN;
 	_is_closed = true;
-	_exists = true;
+	_exists = false;
 	
 	if (filename_ == "") {
-		_exists = false;
-		_is_closed = true;
-
 		return;
 	}
 	
@@ -84,7 +82,8 @@ File::File(std::string filename_, int flags_):
 		_fd = CreateFile (filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	}
 	
-	if (_fd == INVALID_HANDLE_VALUE) {
+	if (_fd != INVALID_HANDLE_VALUE) {
+		/*
 		DWORD code = GetLastError();
 		LPTSTR msg;
 
@@ -97,13 +96,14 @@ File::File(std::string filename_, int flags_):
 			(LPTSTR)&msg,		// allocated by fcn
 			0,							// minimum size of buffer
 			(va_list *)NULL);	// no inserts
+		*/
 
-		_exists = false;
-		_is_closed = true;
-
-		return;
+		_is_closed = false;
+		_exists = true;
 	}
 #else
+	_dir = NULL;
+
 	int opt = flags_;
 
 	flags_ = 0;
@@ -160,23 +160,11 @@ File::File(std::string filename_, int flags_):
 		flags_ |= O_CREAT;
 	}
 
-	/**
-	 * TODO:: CreateDirectory
-	mode_t mode;
-	EncodePermissions(perm, mode);
-
-	if (::mkdir(path.GetChars(), mode) != 0) {
-		throw new IOException(Environment::LastErrorMessage());
-	}
-	*/
-
 	_fd = open(filename_.c_str(), flags_, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH);
 
-	if (_fd == -1) {
-		_exists = false;
-		_is_closed = true;
-
-		return;
+	if (_fd > 0) {
+		_is_closed = false;
+		_exists = true;
 	}
 #endif
 
@@ -184,13 +172,10 @@ File::File(std::string filename_, int flags_):
 	DWORD r = GetFileAttributes(filename_.c_str()); 
 
 	if (r == INVALID_FILE_ATTRIBUTES) {
-		// throw std::runtime_error("File stats not can be retrieve !");
-
-		_exists = false;
-		_is_closed = true;
-
 		return;
 	}
+
+	_exists = true;
 
 	if ((r & FILE_ATTRIBUTE_NORMAL) != 0) {
 		_type = F_REGULAR;
@@ -212,16 +197,11 @@ File::File(std::string filename_, int flags_):
 		_type = F_UNKNOWN;
 	}
 #else
-	int r = fstat(_fd, &_stat);
-
-	if (r == -1) {
-		// throw std::runtime_error("File stats not can be retrieve !");
-		
-		_exists = false;
-		_is_closed = true;
-
+	if (stat(_filename.c_str(), &_stat) < 0) {
 		return;
 	}
+
+	_exists = true;
 
 	if (S_ISREG(_stat.st_mode)) {
 		_type = F_REGULAR;
@@ -241,50 +221,43 @@ File::File(std::string filename_, int flags_):
 		_type = F_UNKNOWN;
 	}
 
-	_dir = NULL;
-
 	if (_type == F_DIRECTORY) {
 		close(_fd);
 
 		_dir = opendir(_filename.c_str());
 
-		if (_dir == NULL) {
-			// throw std::runtime_error("Directory cannot be accessed");
-
-			_exists = false;
-			_is_closed = true;
-
-			return;
+		if (_dir != NULL) {
+			_is_closed = false;
+			_exists = true;
 		}
 	}
 #endif
-
-	_is_closed = false;
 }
 	
-File::File(std::string prefix, std::string sufix):
+File::File(std::string prefix, std::string sufix, bool is_directory):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jio::File");
 	
-	_exists = true;
+	_type = F_UNKNOWN;
 	_is_closed = true;
-	_filename = prefix;
+	_exists = false;
 	
 #ifdef _WIN32
-	int r = 1 + (int)(1000000.0 * (rand() / (RAND_MAX + 1.0)));
+	char *tmp = new char[_filename.size()+6+1];
 
-	std::ostringstream o;
+	sprintf(tmp, "%s%6x", prefix.c_str(), 1 + (int)(1000000.0 * (rand() / (RAND_MAX + 1.0))));
 
-	if (sufix == "") {
-		o << _filename << r << std::flush;
-	} else {
-		o << _filename << r << "." << sufix << std::flush;
+	_filename = tmp;
+
+	if (sufix != "") {
+		_filename = _filename + "." + sufix;
 	}
 
 	_fd = CreateFile (_filename.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	
-	if (_fd == INVALID_HANDLE_VALUE) {
+	if (_fd != INVALID_HANDLE_VALUE) {
+		/*
 		DWORD code = GetLastError();
 		LPTSTR msg;
 
@@ -300,35 +273,53 @@ File::File(std::string prefix, std::string sufix):
 
 			_exists = false;
 			_is_closed = true;
+		*/
 
-			return;
+		_is_closed = false;
+		_exists = true;
 	}
+
+	if (is_directory == true) {
+		_type = F_REGULAR;
+	} else {
+		_type = F_DIRECTORY;
+	}
+
+	delete tmp;
 #elif __CYGWIN32__
 #else
-	std::string t = prefix + "XXXXXX";
-	char *tfile = NULL;
+	char *tmp = new char[prefix.size()+6+1];
 
-	tfile = strdup(t.c_str());
-	_fd = mkstemp((char *)tfile);
+	sprintf(tmp, "%sXXXXXX", prefix.c_str());
 
-	if (_fd < 0) {
-		// throw FileException("Temporary file cannot be create");
-		
-		delete tfile;
+	_filename = mktemp(tmp);
 
-		_exists = false;
-		_is_closed = true;
-
-		return;
+	if (sufix != "") {
+		_filename = _filename + "." + sufix;
 	}
 
-	_filename = std::string(tfile) + "." + sufix;
+	if (is_directory == true) {
+		_fd = open(_filename.c_str(), O_RDWR | O_LARGEFILE | O_CREAT, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH);
 
-	delete tfile;
+		if (_fd > 0) {
+			_is_closed = false;
+			_exists = true;
+		}
+
+		_type = F_REGULAR;
+	} else {
+		_dir = opendir(_filename.c_str());
+
+		if (_dir != NULL) {
+			_is_closed = false;
+			_exists = true;
+		}
+
+		_type = F_DIRECTORY;
+	}
+
+	delete tmp;
 #endif
-	
-	_exists = true;
-	_is_closed = false;
 }
 
 File::~File()
@@ -461,9 +452,21 @@ std::string File::ProcessPath(std::string pathname)
 	return pathname;
 }
 
-File * File::CreateTemporary(std::string prefix, std::string sufix)
+File * File::CreateTemporaryFile(std::string prefix, std::string sufix)
 {
-	File *file = new File(prefix, sufix); // F_READ_WRITE | F_LARGEFILE | F_CREAT);
+	File *file = new File(prefix, sufix, false);
+
+	if (file->Exists() == false) {
+		delete file;
+		file = NULL;
+	}
+
+	return file;
+}
+
+File * File::CreateTemporaryDirectory(std::string prefix, std::string sufix)
+{
+	File *file = new File(prefix, sufix, true);
 
 	if (file->Exists() == false) {
 		delete file;
@@ -558,17 +561,7 @@ bool File::IsDirectory()
 	return (stbuf.st_mode & _S_IFDIR) != 0;
 	*/
 #else
-	return (_dir != NULL);
-	
-	/*
-	struct stat stbuf;
-
-	if(stat(path.GetChars(), &stbuf) != 0) {
-		return false;
-	}
-
-	return S_ISDIR(stbuf.st_mode);
-	*/
+	return (_type == F_DIRECTORY);
 #endif
 }
 

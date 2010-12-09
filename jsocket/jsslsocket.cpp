@@ -28,7 +28,7 @@ namespace jsocket {
 SSLSocket::SSLSocket(InetAddress *addr_, int port_, int keysize, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
-	jcommon::Object::SetClassName("jsocket::Socket");
+	jcommon::Object::SetClassName("jsocket::SSLSocket");
 	
 	_is = NULL;
 	_os = NULL;
@@ -66,7 +66,7 @@ SSLSocket::SSLSocket(InetAddress *addr_, int port_, int keysize, int timeout_, i
 SSLSocket::SSLSocket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
-	jcommon::Object::SetClassName("jsocket::Socket");
+	jcommon::Object::SetClassName("jsocket::SSLSocket");
 
 	_is = NULL;
 	_os = NULL;
@@ -105,7 +105,7 @@ SSLSocket::SSLSocket(InetAddress *addr_, int port_, InetAddress *local_addr_, in
 SSLSocket::SSLSocket(std::string host_, int port_, int keysize, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
-	jcommon::Object::SetClassName("jsocket::Socket");
+	jcommon::Object::SetClassName("jsocket::SSLSocket");
 
 	_is = NULL;
 	_os = NULL;
@@ -149,7 +149,7 @@ SSLSocket::SSLSocket(std::string host_, int port_, int keysize, int timeout_, in
 SSLSocket::SSLSocket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
-	jcommon::Object::SetClassName("jsocket::Socket");
+	jcommon::Object::SetClassName("jsocket::SSLSocket");
 
 	_is = NULL;
 	_os = NULL;
@@ -223,7 +223,7 @@ SSLSocket::~SSLSocket()
 SSLSocket::SSLSocket(int handler_, sockaddr_in server_, int keysize, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
-	jcommon::Object::SetClassName("jsocket::Socket");
+	jcommon::Object::SetClassName("jsocket::SSLSocket");
 
 #ifdef _WIN32
 	// int len;

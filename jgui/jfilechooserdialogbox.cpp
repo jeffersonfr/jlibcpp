@@ -34,12 +34,15 @@ struct ascending_sort {
 	}
 };
 
-FileChooserDialog::FileChooserDialog(std::string title, std::string directory, int x, int y, jfilechooser_type_t type):
+FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string directory, int x, int y, jfilechooser_type_t type):
 	jgui::Frame(title, x, y, 1000, 600)
 {
-	jcommon::Object::SetClassName("jgui::FileChooserDialog");
+	jcommon::Object::SetClassName("jgui::FileChooserDialogBox");
 
-	list = new jgui::ListBox(_insets.left, _insets.top, _size.width-_insets.left-_insets.right, 10);
+	SetMoveEnabled(true);
+
+	_label = NULL;
+	_file = NULL;
 
 	_base_dir = directory;
 	_current_dir = directory;
@@ -48,29 +51,28 @@ FileChooserDialog::FileChooserDialog(std::string title, std::string directory, i
 	_filter = FILE_AND_DIRECTORY;
 	_extension_ignorecase = true;
 
-	Add(list);
+	_list = new jgui::ListBox(_insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
 
-	if (_type == OPEN_FILE_DIALOG) {
-		label = NULL;
-		file = NULL;
-	} else if (_type == SAVE_FILE_DIALOG) {
-		label = new jgui::Label("File name", _insets.left, list->GetY()+list->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
-		file = new jgui::TextField(_insets.left, label->GetY()+label->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
+	Add(_list);
 
-		label->SetBackgroundVisible(false);
-		label->SetBorder(NONE_BORDER);
+	if (_type == SAVE_FILE_DIALOG) {
+		_label = new jgui::Label("File name", _insets.left, _list->GetY()+_list->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
+		_file = new jgui::TextField(_insets.left, _label->GetY()+_label->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
 
-		Add(label);
-		Add(file);
+		_label->SetBackgroundVisible(false);
+		_label->SetBorder(NONE_BORDER);
 
-		list->SetNavigation(file, file, NULL, NULL);
-		file->SetNavigation(NULL, NULL, list, list);
+		Add(_label);
+		Add(_file);
+
+		_list->SetNavigation(_file, _file, NULL, NULL);
+		_file->SetNavigation(NULL, NULL, _list, _list);
 	}
 
-	list->RequestFocus();
-	list->RegisterSelectListener(this);
+	_list->RequestFocus();
+	_list->RegisterSelectListener(this);
 
-	RegisterInputListener(this);
+	ShowFiles(_current_dir);
 
 	if (_type == OPEN_FILE_DIALOG) {
 		AddSubtitle("icons/blue_icon.png", "Open");
@@ -79,105 +81,109 @@ FileChooserDialog::FileChooserDialog(std::string title, std::string directory, i
 	}
 
 	Pack();
+	
+	RegisterInputListener(this);
 }
 
-FileChooserDialog::~FileChooserDialog()
+FileChooserDialogBox::~FileChooserDialogBox()
 {
-	for (std::vector<jgui::Item *>::iterator i=list->GetItems().begin(); i!=list->GetItems().end(); i++) {
-		delete (*i);
+	jthread::AutoLock lock(&_mutex);
+
+	_list->RemoveSelectListener(this);
+
+	if (_list != NULL) {
+		delete _list;
 	}
 
-	if (list != NULL) {
-		delete list;
+	if (_label != NULL) {
+		delete _label;
 	}
 
-	if (label != NULL) {
-		delete label;
-	}
-
-	if (file != NULL) {
-		delete file;
+	if (_file != NULL) {
+		delete _file;
 	}
 }
 
-bool FileChooserDialog::Show(bool modal)
-{
-	ShowFiles();
-
-	return Frame::Show(modal);
-}
-
-std::string FileChooserDialog::GetFile()
+std::string FileChooserDialogBox::GetFile()
 {
 	std::string path,
-		selectedItem = list->GetCurrentItem()->GetValue();
+		selectedItem = _list->GetCurrentItem()->GetValue();
 
-	if (list->GetCurrentIndex() == 0) {
+	if (_list->GetCurrentIndex() == 0) {
 		selectedItem = "";
 	}
 
 	if (_type == OPEN_FILE_DIALOG) {
 	} else {
-		selectedItem = file->GetText();
+		selectedItem = _file->GetText();
 	}
 
+#ifdef _WIN32
+	if (_current_dir[_current_dir.size()-1] == '\\') {
+#else
 	if (_current_dir[_current_dir.size()-1] == '/') {
+#endif
 		path = _current_dir + selectedItem;
 	} else {
-		path = _current_dir + "/" + selectedItem;
+		path = _current_dir + jio::File::GetDelimiter() + selectedItem;
 	}
 
 	return path;
 }
 
-std::string FileChooserDialog::GetName()
+std::string FileChooserDialogBox::GetName()
 {
-	return list->GetCurrentItem()->GetValue();
+	return _list->GetCurrentItem()->GetValue();
 }
 
-std::string FileChooserDialog::GetCurrentDirectory()
+std::string FileChooserDialogBox::GetCurrentDirectory()
 {
 	return _current_dir;
 }
 
-void FileChooserDialog::SetCurrentDirectory(std::string directory)
+void FileChooserDialogBox::SetCurrentDirectory(std::string directory)
 {
 	_current_dir = directory;
 }
 
-void FileChooserDialog::AddExtension(std::string ext)
+void FileChooserDialogBox::AddExtension(std::string ext)
 {
 	_extensions.push_back(ext);
 }
 
-void FileChooserDialog::SetFileFilter(jfilechooser_filter_t filter)
+void FileChooserDialogBox::SetFileFilter(jfilechooser_filter_t filter)
 {
 	_filter = filter;
 }
 
-void FileChooserDialog::SetExtensionIgnoreCase(bool b)
+void FileChooserDialogBox::SetExtensionIgnoreCase(bool b)
 {
 	_extension_ignorecase = b;
 }
 
-void FileChooserDialog::ShowFiles()
+bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 {
-	list->SetIgnoreRepaint(true);
-	list->RemoveItems();
+	std::vector<std::string> *files = ListFiles(current_dir);
 
-	std::vector<std::string> *files = ListFiles(_current_dir);
+	if ((void *)files == NULL) {
+		return false;
+	}
 
-	list->AddImageItem("../", "./icons/folder.png");
+	_list->SetIgnoreRepaint(true);
+	_list->RemoveItems();
+	_list->AddImageItem("..", "./icons/folder.png");
+
+	std::sort(files->begin(), files->end(), ascending_sort());
 
 	if (_filter == DIRECTORY_ONLY || _filter == FILE_AND_DIRECTORY) {
 		for (unsigned int i=0; i<files->size(); i++) {
-			if ((*files)[i] == "..") {
+			if ((*files)[i] == "." || (*files)[i] == "..") {
 				continue;
 			}
 
-			if (IsDirectory(_current_dir + "/" + (*files)[i])) {
+			if (IsDirectory(current_dir +jio::File::GetDelimiter() + (*files)[i])) {
 				// adiciona um icone para o diretorio
-				list->AddImageItem((*files)[i], "./icons/folder.png"); 
+				_list->AddImageItem((*files)[i], "./icons/folder.png"); 
 			}
 		}
 	}
@@ -213,8 +219,8 @@ void FileChooserDialog::ShowFiles()
 			}
 
 			if (b == true) {
-				if (IsFile(_current_dir + "/" + file)) {
-					list->AddImageItem(file, "./icons/file.png");
+				if (IsFile(current_dir + jio::File::GetDelimiter() + file)) {
+					_list->AddImageItem(file, "./icons/file.png");
 				}
 			}
 		}
@@ -222,12 +228,14 @@ void FileChooserDialog::ShowFiles()
 
 	delete files;
 
-	list->SetCurrentIndex(0);
-	list->SetIgnoreRepaint(false);
-	list->Repaint();
+	_list->SetCurrentIndex(0);
+	_list->SetIgnoreRepaint(false);
+	_list->Repaint();
+
+	return true;
 }
 
-std::vector<std::string> * FileChooserDialog::ListFiles(std::string dirPath)
+std::vector<std::string> * FileChooserDialogBox::ListFiles(std::string dirPath)
 {
 	std::vector<std::string> *files = NULL;
 
@@ -235,36 +243,40 @@ std::vector<std::string> * FileChooserDialog::ListFiles(std::string dirPath)
 
 	files = file.ListFiles();
 
-	std::sort(files->begin(), files->end(), ascending_sort());
-
 	return files;
 }
 
-bool FileChooserDialog::IsDirectory(std::string path)
+bool FileChooserDialogBox::IsDirectory(std::string path)
 {
 	jio::File file(path);
 
 	return file.IsDirectory();
 }
 
-bool FileChooserDialog::IsFile(std::string path)
+bool FileChooserDialogBox::IsFile(std::string path)
 {
 	jio::File file(path);
 
 	return file.IsFile();
 }
 
-void FileChooserDialog::ItemSelected(jgui::SelectEvent *event)
+void FileChooserDialogBox::ItemSelected(jgui::SelectEvent *event)
 {
-	std::string selectedItem = list->GetCurrentItem()->GetValue();
+	jthread::AutoLock lock(&_mutex);
 
+	std::string selectedItem = _list->GetCurrentItem()->GetValue();
+
+#ifdef _WIN32
+	if (selectedItem == "..\\") {
+#else
 	if (selectedItem == "../") {
+#endif
 		if (_has_parent) {
 			std::string::size_type idx = _current_dir.substr(0, _current_dir.length()-1).rfind('/');
 			std::string aux = _current_dir.substr(0, idx+1);
 
 			if (aux.find(_base_dir) == 0) {
-				if (aux == "/") {
+				if (aux == jio::File::GetDelimiter()) {
 					_current_dir = aux;
 					_has_parent = false;
 				} else {
@@ -272,44 +284,53 @@ void FileChooserDialog::ItemSelected(jgui::SelectEvent *event)
 					_has_parent = true;
 				}
 
-				ShowFiles();
+				ShowFiles(_current_dir);
 			}
 		}
 	} else {
 		std::string path;
 
+#ifdef _WIN32
+		if (_current_dir[_current_dir.size()-1] == '\\') {
+#else
 		if (_current_dir[_current_dir.size()-1] == '/') {
+#endif
 			path = _current_dir + selectedItem;
 		} else {
-			path = _current_dir + "/" + selectedItem;
+			path = _current_dir + jio::File::GetDelimiter() + selectedItem;
 		}
 
 		if (IsDirectory(path)) {
 			// INFO:: selecionar um diretorio
-			_current_dir = path;
-			ShowFiles();
-			_has_parent = true;
+			if (ShowFiles(path) == true) {
+				_current_dir = path;
+				_has_parent = true;
+			}
 		} else { 
 			// INFO:: Selecionar um arquivo
 			if (_type == OPEN_FILE_DIALOG) {
 				Release();
+
 				_last_key_code = jgui::JKEY_BLUE; 
 			} else {
-				file->SetText(selectedItem);
+				_file->SetText(selectedItem);
 			}
 		}
 	}
 }
 
-void FileChooserDialog::InputChanged(jgui::KeyEvent *event)
+void FileChooserDialogBox::InputChanged(jgui::KeyEvent *event)
 {
+	jthread::AutoLock lock(&_mutex);
+
 	if (event->GetSymbol() == jgui::JKEY_BLUE || event->GetSymbol() == jgui::JKEY_F4) {
 		if (_type == OPEN_FILE_DIALOG) {
 			Release();
 			_last_key_code = jgui::JKEY_BLUE; 
 		} else {
-			if (file->GetText() != "") {
+			if (_file->GetText() != "") {
 				Release();
+
 				_last_key_code = jgui::JKEY_BLUE; 
 			}
 		}

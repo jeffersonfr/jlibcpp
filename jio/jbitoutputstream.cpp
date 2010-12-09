@@ -29,7 +29,6 @@ BitOutputStream::BitOutputStream(std::string filename):
 	OutputStream()
 {
 	jcommon::Object::SetClassName("jio::BitOutputStream");
-	jcommon::Object::SetClassName("jio::OutputStream");
 
 	stream = NULL;
 	haveByte = false;
@@ -50,7 +49,6 @@ BitOutputStream::BitOutputStream(OutputStream *os):
 	OutputStream()
 {
 	jcommon::Object::SetClassName("jio::BitOutputStream");
-	jcommon::Object::SetClassName("jio::OutputStream");
 
 	if ((void *)os == NULL) {
 		throw IOException("Null pointer exception");

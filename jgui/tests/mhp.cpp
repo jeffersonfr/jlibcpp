@@ -154,6 +154,13 @@ class VideoLayer : public ScreenLayer{
 			_file = file;
 
 			IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
+			IDirectFBSurface *surface = (IDirectFBSurface *)GetGraphics()->GetNativeSurface();
+
+			if ((void *)_thread == NULL) {
+				_thread = new VideoLayerThread(surface);
+
+				_thread->Start();
+			}
 
 			if (directfb->CreateVideoProvider(directfb, _file.c_str(), &_provider) != DFB_OK) {
 				return;
@@ -165,12 +172,6 @@ class VideoLayer : public ScreenLayer{
 		void Play() 
 		{
 			jthread::AutoLock lock(&_mutex);
-
-			IDirectFBSurface *surface = (IDirectFBSurface *)GetGraphics()->GetNativeSurface();
-
-			_thread = new VideoLayerThread(surface);
-
-			_thread->Start();
 
 			if (_provider != NULL) {
 				// _provider->PlayTo(_provider, surface, NULL, VideoLayer::callback, surface);
@@ -384,6 +385,22 @@ int main(int argc, char **argv)
 	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
 	
 	LayersManager::GetInstance()->GetVideoLayer()->SetFile(argv[1]);
+
+	VideoLayer layer1,
+						 layer2,
+						 layer3;
+
+	layer1.SetBounds(100, 100, 100, 100);
+	layer2.SetBounds(300, 100, 720, 480);
+	layer3.SetBounds(10, 10, 10, 10);
+
+	layer1.Show();
+	layer2.Show();
+	layer3.Show();
+
+	layer1.SetFile(argv[1]);
+	layer2.SetFile(argv[1]);
+	layer3.SetFile(argv[1]);
 
 	TestScene test;
 

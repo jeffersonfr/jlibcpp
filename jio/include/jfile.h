@@ -45,6 +45,7 @@ namespace jio {
  *
  */
 enum jfile_type_t {
+	F_UNKNOWN,
 	F_REGULAR,
 	F_DIRECTORY,
 	F_CHAR_DEVICE,
@@ -57,7 +58,6 @@ enum jfile_type_t {
 	F_FIFO,
 	F_SYMBOLIC_LINK,
 	F_SOCKET,
-	F_UNKNOWN
 };
 
 /**
@@ -70,14 +70,14 @@ enum jfile_flags_t {
 	F_READ_WRITE 	= 0x0004,
 	F_EXCLUSIVE		= 0x0008,
 	F_TRUNCATE 		= 0x0010,
-	F_APPEND 		= 0x0020,
+	F_APPEND 			= 0x0020,
 	F_NON_BLOCK 	= 0x0040,
-	F_SYNC 			= 0x0080,
+	F_SYNC 				= 0x0080,
 	F_NON_FOLLOW 	= 0x0100,
-	F_DIR		 	= 0x0200,
-	F_ASYNC 		= 0x0400,
+	F_DIR		 			= 0x0200,
+	F_ASYNC 			= 0x0400,
 	F_LARGEFILE 	= 0x0800,
-	F_CREATE		= 0x1000,
+	F_CREATE			= 0x1000,
 };
 
 /**
@@ -113,7 +113,7 @@ class File : public virtual jcommon::Object{
 		 * \brief Construtor.
 		 *
 		 */
-		File(std::string prefix, std::string sufix);
+		File(std::string prefix, std::string sufix, bool is_directory);
 	
 	public:
 		/**
@@ -156,7 +156,13 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static File * CreateTemporary(std::string prefix, std::string sufix = std::string(""));
+		static File * CreateTemporaryFile(std::string prefix, std::string sufix = std::string(""));
+
+		/**
+		 * \brief
+		 *
+		 */
+		static File * CreateTemporaryDirectory(std::string prefix, std::string sufix = std::string(""));
 
 		/**
 		 * \brief Retorna o descritor para o arquivo.

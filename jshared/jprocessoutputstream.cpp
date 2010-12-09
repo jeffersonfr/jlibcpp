@@ -24,8 +24,11 @@ using namespace std;
 
 namespace jshared {
 
-ProcessOutputStream::ProcessOutputStream(int fd)
+ProcessOutputStream::ProcessOutputStream(int fd):
+	jcommon::Object()
 {
+	jcommon::Object::SetClassName("jshared::ProcessOutputStream");
+
 	_fd = fd;
 }
 
