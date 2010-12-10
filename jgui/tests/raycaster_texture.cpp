@@ -1047,8 +1047,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 
 int main( int argc, char *argv[] )
 {
-	jgui::InputManager::GetInstance()->SkipKeyEvents(true);
-
 	GraphicsTeste test;
 
 	test.Show();

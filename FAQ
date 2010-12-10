@@ -1,0 +1,2 @@
+1. How can I get take the applications more faster ?
+R. In Makefile, set ENABLE_DEBUG to "no"

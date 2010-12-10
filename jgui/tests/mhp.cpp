@@ -27,6 +27,7 @@ class ScreenLayer : public jgui::Window{
 		ScreenLayer():
 			jgui::Window(0, 0, 1920, 1080)
 		{
+			Show();
 		}
 
 		virtual ~ScreenLayer()
@@ -86,7 +87,8 @@ class VideoLayer : public ScreenLayer{
 		private:
 			IDirectFBSurface *_surface;
 			jthread::Condition _semaphore;
-			bool _flipping;
+			bool _flipping,
+					 _is_running;
 
 		public:
 			VideoLayerThread(IDirectFBSurface *surface) 
@@ -94,6 +96,7 @@ class VideoLayer : public ScreenLayer{
 				_surface = surface;
 
 				_flipping = false;
+				_is_running = false;
 			}
 
 			virtual ~VideoLayerThread()
@@ -109,11 +112,24 @@ class VideoLayer : public ScreenLayer{
 				}
 			}
 
+			void Interrupt()
+			{
+				_is_running = false;
+
+				WaitThread();
+			}
+
 			virtual void Run()
 			{
-				while (true) {
+				_is_running = true;
+
+				while (_is_running) {
 					while (_flipping == false) {
 						_semaphore.Wait();
+					}
+
+					if (_is_running == false) {
+						break;
 					}
 
 					_surface->Flip(_surface, 0, DSFLIP_NONE);
@@ -132,9 +148,7 @@ class VideoLayer : public ScreenLayer{
 	private:
 		static void callback(void *ctx)
 		{
-			VideoLayerThread *thread = (VideoLayerThread *)ctx;
-
-			thread->Flip();
+			reinterpret_cast<VideoLayerThread *>(ctx)->Flip();
 		}
 
 	public:
@@ -147,6 +161,11 @@ class VideoLayer : public ScreenLayer{
 
 		virtual ~VideoLayer()
 		{
+			if ((void *)_thread != NULL) {
+				_thread->Interrupt();
+
+				delete _thread;
+			}
 		}
 
 		void SetFile(std::string file)
@@ -156,17 +175,19 @@ class VideoLayer : public ScreenLayer{
 			IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
 			IDirectFBSurface *surface = (IDirectFBSurface *)GetGraphics()->GetNativeSurface();
 
-			if ((void *)_thread == NULL) {
-				_thread = new VideoLayerThread(surface);
+			if ((void *)_thread != NULL) {
+				_thread->Interrupt();
 
-				_thread->Start();
+				delete _thread;
 			}
 
 			if (directfb->CreateVideoProvider(directfb, _file.c_str(), &_provider) != DFB_OK) {
 				return;
 			}
+			
+			_thread = new VideoLayerThread(surface);
 
-			Play();
+			_thread->Start();
 		}
 
 		void Play() 
@@ -174,7 +195,6 @@ class VideoLayer : public ScreenLayer{
 			jthread::AutoLock lock(&_mutex);
 
 			if (_provider != NULL) {
-				// _provider->PlayTo(_provider, surface, NULL, VideoLayer::callback, surface);
 				_provider->PlayTo(_provider, surface, NULL, VideoLayer::callback, _thread);
 			}
 		}
@@ -221,10 +241,6 @@ class LayersManager{
 			_video_layer = new VideoLayer();
 			_graphic_layer = new GraphicLayer();
 
-			_background_layer->Show();
-			_video_layer->Show();
-			_graphic_layer->Show();
-			
 			GetBackgroundLayer()->SetImage("icons/background.png");
 		}
 
@@ -385,22 +401,7 @@ int main(int argc, char **argv)
 	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
 	
 	LayersManager::GetInstance()->GetVideoLayer()->SetFile(argv[1]);
-
-	VideoLayer layer1,
-						 layer2,
-						 layer3;
-
-	layer1.SetBounds(100, 100, 100, 100);
-	layer2.SetBounds(300, 100, 720, 480);
-	layer3.SetBounds(10, 10, 10, 10);
-
-	layer1.Show();
-	layer2.Show();
-	layer3.Show();
-
-	layer1.SetFile(argv[1]);
-	layer2.SetFile(argv[1]);
-	layer3.SetFile(argv[1]);
+	LayersManager::GetInstance()->GetVideoLayer()->Play();
 
 	TestScene test;
 
@@ -408,5 +409,4 @@ int main(int argc, char **argv)
 
 	return 0;
 }
-
 

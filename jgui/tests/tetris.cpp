@@ -206,13 +206,10 @@ class Tetris : public jgui::Frame, public jthread::Thread, jgui::FrameInputListe
 			SetSize(width+2*barwidth, height+2*barwidth);
 
 			RegisterInputListener(this);
-			
-			jgui::InputManager::GetInstance()->SkipKeyEvents(false);
 		}
 
 		virtual ~Tetris()
 		{
-			jgui::InputManager::GetInstance()->SkipKeyEvents(true);
 		}
 
 		void init()

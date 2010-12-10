@@ -200,26 +200,10 @@ void Graphics::SetNativeSurface(void *addr)
 
 void Graphics::SetClip(int x, int y, int width, int height)
 {
-	if (x < 0) {
-		x = 0;
-	}
-
-	if (y < 0) {
-		y = 0;
-	}
-
-	if (width < 0) {
-		width = 0;
-	}
-
-	if (height < 0) {
-		height = 0;
-	}
-
-	_clip.x = x;
-	_clip.y = y;
-	_clip.width = width;
-	_clip.height = height;
+	_clip.x = (x < 0)?0:(x > _clip.width)?_clip.width:x;
+	_clip.y = (y < 0)?0:(y > _clip.height)?_clip.height:y;
+	_clip.width = (width < 0)?0:(width > (_clip.width-_clip.x))?_clip.width-_clip.x:width;
+	_clip.height = (height < 0)?0:(height > (_clip.height-_clip.y))?_clip.height-_clip.y:height;
 
 #ifdef DIRECTFB_UI
 	if (surface != NULL) {

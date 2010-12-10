@@ -183,7 +183,7 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 
 			if (IsDirectory(current_dir +jio::File::GetDelimiter() + (*files)[i])) {
 				// adiciona um icone para o diretorio
-				_list->AddImageItem((*files)[i], "./icons/folder.png"); 
+				_list->AddImageItem((*files)[i], "./icons/lockfolder.png"); 
 			}
 		}
 	}
@@ -220,7 +220,7 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 
 			if (b == true) {
 				if (IsFile(current_dir + jio::File::GetDelimiter() + file)) {
-					_list->AddImageItem(file, "./icons/file.png");
+					_list->AddImageItem(file, "./icons/lockfile.png");
 				}
 			}
 		}

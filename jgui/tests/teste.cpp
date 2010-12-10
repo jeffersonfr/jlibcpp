@@ -41,6 +41,7 @@
 #include "jmessagedialogbox.h"
 #include "jyesnodialogbox.h"
 #include "jmenugroup.h"
+#include "jfilechooserdialogbox.h"
 
 class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener, public jgui::FrameInputListener{
 

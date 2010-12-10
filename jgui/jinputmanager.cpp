@@ -159,8 +159,8 @@ InputManager::InputManager()
 	_mouse_y = p.y;
 	_is_key_enabled = true;
 	_is_mouse_enabled = true;
-	_skip_key_events = false; // true;
-	_skip_mouse_events = false; // true;
+	_skip_key_events = true; 
+	_skip_mouse_events = true; 
 	
 	_screen_width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen_height = GFXHandler::GetInstance()->GetScreenHeight();
