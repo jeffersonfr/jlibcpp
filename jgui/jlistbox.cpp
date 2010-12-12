@@ -436,7 +436,7 @@ void ListBox::Paint(Graphics *g)
 			int px = x+space,
 					py = y+(_item_size+_vertical_gap)*count,
 					pw = (w-space-4)-scroll_width-scroll_gap,
-					ph = _item_size;
+					ph = _item_size-1;
 
 			x = (x < 0)?0:x;
 			y = (y < 0)?0:y;
@@ -481,9 +481,11 @@ void ListBox::Paint(Graphics *g)
 				}
 
 				// INFO:: weird clip
-				g->SetClip(cx, cy, cw, cy+ch);
+				g->SetClip(cx, cy, cw, ch);
+				// g->SetClip(cx, cy, cw, cy+ch);
 
-				g->DrawString(text, px, py, pw, _item_size, _items[count]->GetHorizontalAlign(), _items[count]->GetVerticalAlign());
+				g->DrawString(text, px, py, pw, _item_size, _items[count]->GetHorizontalAlign(), _items[count]->GetVerticalAlign(), false);
+				// g->DrawString(text, px, py, pw, _item_size, _items[count]->GetHorizontalAlign(), _items[count]->GetVerticalAlign());
 
 				g->SetClip(clip.x, clip.y, clip.width, clip.height);
 			}

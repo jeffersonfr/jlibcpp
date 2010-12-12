@@ -21,6 +21,8 @@
 #include "jcontainer.h"
 #include "jfocuslistener.h"
 #include "jcardlayout.h"
+#include "joutofboundsexception.h"
+#include "jnullpointerexception.h"
 
 namespace jgui {
 
@@ -260,41 +262,45 @@ void Container::Paint(Graphics *g)
 		InvalidateAll();
 	}
 
-	Component *c = NULL;
-
-	// CHANGE:: descarta componentes fora dos limites de desenho
-	bool paint_components_out_of_range = false;
-
 	jthread::AutoLock lock(&_container_mutex);
 
+	jregion_t clip = g->GetClip();
+
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-		c = (*i);
+		Component *c = (*i);
 
 		if (c->IsVisible() == true && c->IsValid() == false) {
-			int x1 = c->GetX()-_scroll_x,
-					y1 = c->GetY()-_scroll_y,
-					w1 = c->GetWidth(),
-					h1 = c->GetHeight();
+			int cx = c->GetX()-_scroll_x,
+					cy = c->GetY()-_scroll_y,
+					cw = c->GetWidth(),
+					ch = c->GetHeight();
 
-			if (paint_components_out_of_range || ((x1 < _size.width && (x1+w1) > 0) && (y1 < _size.height && (y1+h1) > 0))) {
-				if ((x1+w1) > _size.width) {
-					w1 = _size.width-x1;
-				}
-
-				if ((y1+h1) > _size.height) {
-					h1 = _size.height-y1;
-				}
-
-				g->Translate(x1, y1);
-				g->SetClip(0, 0, w1-1, h1-1);
-				c->Paint(g);
-				g->ReleaseClip();
-				g->Translate(-x1, -y1);
+			if (cx > clip.width) {
+				cx = clip.width;
 			}
+
+			if (cy > clip.height) {
+				cy = clip.height;
+			}
+
+			if (cw > (clip.width-cx)) {
+				cw = clip.width-cx;
+			}
+
+			if (ch > (clip.height-cy)) {
+				ch = clip.height-cy;
+			}
+
+			g->Translate(cx, cy);
+			g->SetClip(0, 0, cw-1, ch-1);
+			c->Paint(g);
+			g->Translate(-cx, -cy);
 
 			c->Revalidate();
 		}
 	}
+		
+	g->SetClip(clip.x, clip.y, clip.width, clip.height);
 
 	PaintEdges(g);
 
@@ -382,86 +388,67 @@ void Container::Repaint(Component *c, int x, int y, int width, int height)
 	}
 }
 
-void Container::Add(Component *c, GridBagConstraints *constraints)
+void Container::Add(Component *c, int index)
 {
+	if (index < 0 || index > GetComponentCount()) {
+		throw jcommon::OutOfBoundsException("Index out of range");
+	}
+
 	if (c == NULL) {
-		return;
+		throw jcommon::NullPointerException("Adding null component to container");
+	}
+
+	if (dynamic_cast<jgui::Container *>(c) == this) {
+		throw jcommon::RuntimeException("Adding own container");
 	}
 
 	jthread::AutoLock lock(&_container_mutex);
 
-	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-		if (c == (*i)) {
-			return;
-		}
+	if (std::find(_components.begin(), _components.end(), c) == _components.end()) {
+		_components.insert(_components.begin()+index, c);
+
+		c->SetParent(this);
+
+		DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
 	}
+}
 
-	_components.push_back(c);
+void Container::Add(Component *c)
+{
+	Add(c, GetComponentCount());
+}
 
+void Container::Add(Component *c, GridBagConstraints *constraints)
+{
+	Add(c, GetComponentCount());
+	
 	if (_layout != NULL) {
 		if (_layout->InstanceOf("jgui::GridBagLayout") == true) {
 			((GridBagLayout *)_layout)->AddLayoutComponent(c, constraints);
 		}
 	}
-
-	c->SetParent(this);
-	// c->Repaint();
-
-	DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
 }
 
 void Container::Add(jgui::Component *c, std::string id)
 {
-	if (c == NULL) {
-		return;
-	}
-
-	jthread::AutoLock lock(&_container_mutex);
-
-	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-		if (c == (*i)) {
-			return;
-		}
-	}
-
-	_components.push_back(c);
+	Add(c, GetComponentCount());
 
 	if (_layout != NULL) {
 		if (_layout->InstanceOf("jgui::CardLayout") == true) {
 			((CardLayout *)_layout)->AddLayoutComponent(id, c);
 		}
 	}
-
-	c->SetParent(this);
-	// c->Repaint();
-
-	DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
 }
 
 void Container::Add(jgui::Component *c, jborderlayout_align_t align)
 {
-	if (c == NULL) {
-		return;
-	}
-
-	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-		if (c == (*i)) {
-			return;
-		}
-	}
-
-	_components.push_back(c);
-
+	Add(c, GetComponentCount());
+	
 	if (_layout != NULL) {
 		if (_layout->InstanceOf("jgui::BorderLayout") == true) {
 			((BorderLayout *)_layout)->AddLayoutComponent(c, align);
 		}
 	}
-
-	c->SetParent(this);
-	// c->Repaint();
-
-	DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
 }
 
 void Container::Remove(jgui::Component *c)

@@ -164,7 +164,13 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void Add(Component *c, jborderlayout_align_t align = BL_CENTER);
+		virtual void Add(Component *c, int index);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Add(Component *c);
 		
 		/**
 		 * \brief
@@ -177,6 +183,12 @@ class Container : public jgui::Component{
 		 *
 		 */
 		virtual void Add(Component *c, std::string id);
+		
+		/**
+		 * \brief Appends the specified component to the end of this container.
+		 *
+		 */
+		virtual void Add(Component *c, jborderlayout_align_t align);
 		
 		/**
 		 * \brief

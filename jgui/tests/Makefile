@@ -32,6 +32,9 @@ OBJS_skull = \
 OBJS_raycaster_texture = \
 	   raycaster_texture.o\
 
+OBJS_clip = \
+	   clip.o\
+
 OBJS_agenda = \
 	   agenda.o\
 
@@ -96,7 +99,7 @@ OBJS_stock = \
 OBJS_game = \
 		game.o\
 
-all: teste skull databuffer restore raycaster_flat raycaster_texture agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image stock
+all: teste skull databuffer restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image stock
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
@@ -114,6 +117,9 @@ skull: $(OBJS_skull)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 raycaster_texture: $(OBJS_raycaster_texture)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+        
+clip: $(OBJS_clip)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 agenda: $(OBJS_agenda)
@@ -186,4 +192,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste restore agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image stock
+	@rm -rvf *.o *.xml *~ teste restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image stock

@@ -22,6 +22,7 @@
 #include "jruntimeexception.h"
 #include "jthememanager.h"
 #include "jselectlistener.h"
+#include "joutofboundsexception.h"
 
 namespace jgui {
 
@@ -391,7 +392,7 @@ void ItemComponent::SetLoop(bool loop)
 void ItemComponent::SetCurrentIndex(int i)
 {
 	if (i < 0 || i >= (int)_items.size()) {
-		throw jcommon::RuntimeException("Index out of range");
+		throw jcommon::OutOfBoundsException("Index out of range");
 	}
 
 	_index = i;
@@ -437,7 +438,7 @@ void ItemComponent::AddItem(Item *item)
 void ItemComponent::AddItem(Item *item, int index)
 {
 	if (index < 0 || index > (int)_items.size()) {
-		throw jcommon::RuntimeException("Index out of range");
+		throw jcommon::OutOfBoundsException("Index out of range");
 	}
 
 	if (item == NULL) {
@@ -476,7 +477,7 @@ void ItemComponent::RemoveItem(Item *item)
 void ItemComponent::RemoveItem(int index)
 {
 	if (index < 0 || index >= (int)_items.size()) {
-		throw jcommon::RuntimeException("Index out of range");
+		throw jcommon::OutOfBoundsException("Index out of range");
 	}
 
 	// jthread::AutoLock lock(&_component_mutex);
