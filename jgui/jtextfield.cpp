@@ -296,7 +296,6 @@ void TextField::Paint(Graphics *g)
 			current_text_size = _font->GetStringWidth(s.substr(0, _caret_position));
 		}
 
-		g->SetClip(x, y, w, h);
 		g->DrawString(s, x+offset, y, w, h, LEFT_HALIGN, _valign);
 
 		if (_has_focus == true && _is_editable == true && _caret_visible == true) {
@@ -305,8 +304,6 @@ void TextField::Paint(Graphics *g)
 			g->DrawString(cursor, x+current_text_size+offset, y, w, h, LEFT_HALIGN, _valign);
 		}
 	}
-
-	g->SetClip(0, 0, _size.width, _size.height);
 
 	PaintEdges(g);
 }

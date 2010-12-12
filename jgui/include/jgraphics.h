@@ -408,6 +408,12 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual bool HasFont(); 
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetFont(Font *font); 
 		
 		/**
@@ -660,13 +666,19 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JUSTIFY_HALIGN);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawString(std::string s, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN);
+		virtual void DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
 
 		/**
 		 * \brief

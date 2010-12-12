@@ -461,64 +461,86 @@ void TextArea::Paint(Graphics *g)
 			max_lines = 1;
 		}
 
-		{
-			g->SetClip(x, y, w, h);
+		// INFO:: paint lines
+		jregion_t clip = g->GetClip();
 
-			// INFO:: Draw text
-			for (int i=0, k=0; i<=(int)texts.size()-1; i++) {
-				std::string s = texts[i];
+		int cx = x,
+				cy = y,
+				cw = w,
+				ch = h;
 
-				text_size = _font->GetStringWidth(texts[i].c_str());
-				text_size = _font->GetStringWidth(texts[i].substr(0, _caret_position).c_str());
-
-				if (line_number-- < max_lines) {
-					char *c = (char *)strchr(s.c_str(), '\n');
-					
-					if (c != NULL) {
-						c[0] = ' ';
-					}
-					
-					if (_has_focus == true) {
-						g->SetColor(_focus_fgcolor);
-					} else {
-						g->SetColor(_fgcolor);
-					}
-
-					g->DrawString(s, x, y+k*font_height);
-
-					if (_has_focus && _is_editable == true && _caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
-						std::string cursor;
-
-						if (_caret_type == UNDERSCORE_CURSOR) {
-							cursor = "_";
-						} else if (_caret_type == STICK_CURSOR) {
-							cursor = "|";
-						} else if (_caret_type == BLOCK_CURSOR) {
-							cursor = "?";
-						}
-
-						current_text_size = _font->GetStringWidth(texts[i].substr(0, current_length).c_str());
-
-						g->SetColor(0xff, 0x00, 0x00, 0xff);
-						g->DrawString(cursor, x+current_text_size, y+k*font_height);
-
-						current_length = -1;
-					}
-
-					k++;
-				}
-
-				if (current_length >= (int)s.size()) {
-					current_length -= s.size();
-				}
-
-				if (k >= max_lines) {
-					break;
-				}
-			}
-				
-			g->SetClip(0, 0, _size.width, _size.height);
+		if (cx > clip.width) {
+			cx = clip.width;
 		}
+
+		if (cy > clip.height) {
+			cy = clip.height;
+		}
+
+		if (cw > (clip.width-cx)) {
+			cw = clip.width-cx;
+		}
+
+		if (ch > (clip.height-cy)) {
+			ch = clip.height-cy;
+		}
+
+		g->SetClip(cx, cy, cw, ch);
+
+		// INFO:: Draw text
+		for (int i=0, k=0; i<=(int)texts.size()-1; i++) {
+			std::string s = texts[i];
+
+			text_size = _font->GetStringWidth(texts[i].c_str());
+			text_size = _font->GetStringWidth(texts[i].substr(0, _caret_position).c_str());
+
+			if (line_number-- < max_lines) {
+				char *c = (char *)strchr(s.c_str(), '\n');
+
+				if (c != NULL) {
+					c[0] = ' ';
+				}
+
+				if (_has_focus == true) {
+					g->SetColor(_focus_fgcolor);
+				} else {
+					g->SetColor(_fgcolor);
+				}
+
+				g->DrawString(s, x, y+k*font_height);
+
+				if (_has_focus && _is_editable == true && _caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
+					std::string cursor;
+
+					if (_caret_type == UNDERSCORE_CURSOR) {
+						cursor = "_";
+					} else if (_caret_type == STICK_CURSOR) {
+						cursor = "|";
+					} else if (_caret_type == BLOCK_CURSOR) {
+						cursor = "?";
+					}
+
+					current_text_size = _font->GetStringWidth(texts[i].substr(0, current_length).c_str());
+
+					g->SetColor(0xff, 0x00, 0x00, 0xff);
+					g->DrawString(cursor, x+current_text_size, y+k*font_height);
+
+					current_length = -1;
+				}
+
+				k++;
+			}
+
+			if (current_length >= (int)s.size()) {
+				current_length -= s.size();
+			}
+
+			if (k >= max_lines) {
+				break;
+			}
+		}
+
+		g->SetClip(clip.x, clip.y, clip.width, clip.height);
 	}
 
 	PaintEdges(g);

@@ -286,7 +286,7 @@ void Container::Paint(Graphics *g)
 				}
 
 				g->Translate(x1, y1);
-				g->SetClip(0, 0, w1, h1);
+				g->SetClip(0, 0, w1-1, h1-1);
 				c->Paint(g);
 				g->ReleaseClip();
 				g->Translate(-x1, -y1);

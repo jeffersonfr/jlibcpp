@@ -115,13 +115,9 @@ void ScrollPane::Paint(Graphics *g)
 					h1 = _size.height-y1;
 				}
 
-				g->Lock();
 				g->SetClip(x1, y1, w1, h1);
-
 				c->Paint(g);
-
 				g->ReleaseClip();
-				g->Unlock();
 			}
 
 			c->Revalidate();
@@ -133,20 +129,16 @@ void ScrollPane::Paint(Graphics *g)
 			offset = stone_size;
 
 			_vertical_scroll->SetBounds(_size.width-stone_size, 0, stone_size, _size.height);
-			g->Lock();
 			g->SetClip(_size.width-stone_size, 0, stone_size, _size.height);
 			_vertical_scroll->Paint(g);
 			g->ReleaseClip();
-			g->Unlock();
 		}
 		
 		if (hscroll == true && (_scroll_type == HORIZONTAL_SCROLL || _scroll_type == BOTH_SCROLL)) {
 			_horizontal_scroll->SetBounds(0, _size.height-stone_size, _size.width-offset, stone_size);
-			g->Lock();
 			g->SetClip(0, _size.height-stone_size, _size.width-offset, stone_size);
 			_horizontal_scroll->Paint(g);
 			g->ReleaseClip();
-			g->Unlock();
 		}
 	}
 

@@ -239,9 +239,7 @@ void ProgressBar::Paint(Graphics *g)
 			px = px+(w-_font->GetStringWidth(text))/2;
 			// }
 
-			g->SetClip(0, 0, x+w, y+h);
-			g->DrawString(text, px, py);
-			g->SetClip(0, 0, _size.width, _size.height);
+			g->DrawString(text, px, py, pw, ph);
 		}
 	} else {
 		if (_type == LEFT_RIGHT_DIRECTION) {

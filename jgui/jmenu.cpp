@@ -421,9 +421,7 @@ void Menu::Paint(Graphics *g)
 				text = _font->TruncateString(text, "...", pw);
 			// }
 
-			// TODO:: g->SetClip(px, py, pw, ph);
 			g->DrawString(text, px, py, pw, ph, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
-			// g->SetClip(0, 0, _size.width, _size.height);
 		}
 
 		if (_items[i]->GetEnabled() == false) {

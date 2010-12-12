@@ -206,9 +206,7 @@ void Marquee::Paint(Graphics *g)
 		pw = (pw < 0)?0:pw;
 		ph = (ph < 0)?0:ph;
 
-		g->SetClip(0, 0, x+w, y+h);
 		g->DrawString(text, px, py);
-		g->SetClip(0, 0, _size.width, _size.height);
 	}
 
 	PaintEdges(g);

@@ -394,12 +394,34 @@ void ListBox::Paint(Graphics *g)
 				if (count != visible_items) {
 					g->DrawImage(_items[i]->GetImage(), _horizontal_gap, y+(_item_size+_vertical_gap)*count, _item_size, _item_size);
 				} else {
-					int py = y+(_item_size+_vertical_gap)*count, 
-							ph = py-y-h;
+					jregion_t clip = g->GetClip();
 
-					g->SetClip(x, py, w-scroll_width-scroll_gap, (ph>0)?ph:-ph);
+					int cx = x,
+							cy = y+(_item_size+_vertical_gap)*count,
+							cw = w-scroll_width-scroll_gap,
+							ch = ::abs(cy-y-h)-1;
+
+					if (cx > clip.width) {
+						cx = clip.width;
+					}
+
+					if (cy > clip.height) {
+						cy = clip.height;
+					}
+
+					if (cw > (clip.width-cx)) {
+						cw = clip.width-cx;
+					}
+
+					if (ch > (clip.height-cy)) {
+						ch = clip.height-cy;
+					}
+
+					g->SetClip(cx, cy, cw, ch);
+
 					g->DrawImage(_items[i]->GetImage(), _horizontal_gap, y+(_item_size+_vertical_gap)*count, _item_size, _item_size);
-					g->SetClip(0, 0, _size.width, _size.height);
+		
+					g->SetClip(clip.x, clip.y, clip.width, clip.height);
 				}
 			}
 		}
@@ -433,15 +455,37 @@ void ListBox::Paint(Graphics *g)
 			// }
 
 			if (count != visible_items) {
-				g->SetClip(0, 0, x+w, y+h);
 				g->DrawString(text, px, py, pw, ph, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
-				g->SetClip(0, 0, _size.width, _size.height);
 			} else {
-				ph = py-y-h;
+				jregion_t clip = g->GetClip();
 
-				g->SetClip(x, py, w-scroll_width-scroll_gap, (ph>0)?ph:-ph);
+				int cx = px,
+						cy = py,
+						cw = pw,
+						ch = ::abs(cy-y-h)-1;
+
+				if (cx > clip.width) {
+					cx = clip.width;
+				}
+
+				if (cy > clip.height) {
+					cy = clip.height;
+				}
+
+				if (cw > (clip.width-cx)) {
+					cw = clip.width-cx;
+				}
+
+				if (ch > (clip.height-cy)) {
+					ch = clip.height-cy;
+				}
+
+				// INFO:: weird clip
+				g->SetClip(cx, cy, cw, cy+ch);
+
 				g->DrawString(text, px, py, pw, _item_size, _items[count]->GetHorizontalAlign(), _items[count]->GetVerticalAlign());
-				g->SetClip(0, 0, _size.width, _size.height);
+
+				g->SetClip(clip.x, clip.y, clip.width, clip.height);
 			}
 		}
 	}

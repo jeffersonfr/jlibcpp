@@ -334,9 +334,7 @@ void Spin::Paint(Graphics *g)
 					text = _font->TruncateString(text, "...", w);
 				// }
 
-				g->SetClip(0, 0, x+w, y+h);
 				g->DrawString(text, px, py, pw, ph, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
-				g->SetClip(0, 0, _size.width, _size.height);
 			}
 		}
 	} else if (_type == VERTICAL_SPIN) {
@@ -391,9 +389,7 @@ void Spin::Paint(Graphics *g)
 					text = _font->TruncateString(text, "...", w);
 				// }
 
-				g->SetClip(0, 0, x+w, y+h);
 				g->DrawString(text, px, py, pw, ph, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
-				g->SetClip(0, 0, _size.width, _size.height);
 			}
 		}
 	}

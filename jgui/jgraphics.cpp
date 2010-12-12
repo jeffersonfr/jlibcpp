@@ -200,10 +200,10 @@ void Graphics::SetNativeSurface(void *addr)
 
 void Graphics::SetClip(int x, int y, int width, int height)
 {
-	_clip.x = (x < 0)?0:(x > _clip.width)?_clip.width:x;
-	_clip.y = (y < 0)?0:(y > _clip.height)?_clip.height:y;
-	_clip.width = (width < 0)?0:(width > (_clip.width-_clip.x))?_clip.width-_clip.x:width;
-	_clip.height = (height < 0)?0:(height > (_clip.height-_clip.y))?_clip.height-_clip.y:height;
+	_clip.x = (x < 0)?0:x;
+	_clip.y = (y < 0)?0:y;
+	_clip.width = (width < 0)?0:width;
+	_clip.height = (height < 0)?0:height;
 
 #ifdef DIRECTFB_UI
 	if (surface != NULL) {
@@ -471,16 +471,19 @@ void Graphics::SetColor(int r, int g, int b, int a)
 #endif
 } 
 
+bool Graphics::HasFont()
+{
+	return (_font != NULL);
+}
+
 void Graphics::SetFont(Font *font)
 {
 	_font = font;
 
-	if (_font == NULL) {
-		return;
-	}
-
 #ifdef DIRECTFB_UI
-	surface->SetFont(surface, font->_font);
+	if (_font != NULL) {
+		surface->SetFont(surface, font->_font);
+	}
 #endif
 }
 
@@ -1609,10 +1612,6 @@ void Graphics::FillGradientRectangle(int xp, int yp, int wp, int hp, jcolor_t sc
 
 void Graphics::DrawString(std::string s, int xp, int yp)
 {
-	if (_font == NULL) {
-		return;
-	}
-
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
@@ -1628,10 +1627,6 @@ void Graphics::DrawString(std::string s, int xp, int yp)
 
 void Graphics::DrawGlyph(int symbol, int xp, int yp)
 {
-	if (_font == NULL) {
-		return;
-	}
-
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
@@ -2197,40 +2192,13 @@ jpoint_t Graphics::Translate()
 	return _translate;
 }
 
-void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign)
+void Graphics::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign)
 {
-	if (wp <= 0 || hp <= 0) {
+	if (wp < 0 || hp < 0) {
 		return;
 	}
-
-	if (_font == NULL) {
-		return;
-	}
-
-#ifdef DIRECTFB_UI
-	if (surface == NULL) {
-		return;
-	}
-
-	std::vector<std::string> words,
-		texts;
-	int dx = 0,
-			dy = 0,
-			max_lines,
-			font_height,
-			default_space;
-
-	default_space = _font->GetStringWidth(" ");
-	font_height = _font->GetAscender() + _font->GetDescender();
-
-	if (font_height < 1) {
-		return;
-	}
-
-	max_lines = hp/font_height;
 
 	jcommon::StringTokenizer token(text, "\n", jcommon::SPLIT_FLAG, false);
-	std::vector<std::string> lines;
 
 	for (int i=0; i<token.GetSize(); i++) {
 		std::vector<std::string> words;
@@ -2279,11 +2247,11 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 				if (_font->GetStringWidth(temp) > wp) {
 					temp = words[j];
 
-					texts.push_back(previous);
+					lines->push_back(previous);
 				}
 			}
 
-			texts.push_back("\n" + temp);
+			lines->push_back("\n" + temp);
 		} else {
 			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, true);
 
@@ -2323,13 +2291,36 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 				if (_font->GetStringWidth(temp.c_str()) > wp) {
 					temp = words[j];
 
-					texts.push_back(previous);
+					lines->push_back(previous);
 				}
 			}
 
-			texts.push_back(temp);
+			lines->push_back(temp);
 		}
 	}
+}
+
+void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
+{
+	if (wp < 0 || hp < 0) {
+		return;
+	}
+
+#ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return;
+	}
+
+	std::vector<std::string> words,
+		lines;
+	int dx = 0,
+			dy = 0,
+			max_lines,
+			font_height = _font->GetAscender() + _font->GetDescender();
+
+	GetStringBreak(&lines, text, wp, hp, halign);
+
+	max_lines = hp/font_height;
 
 	if (max_lines <= 0) {
 		max_lines = 1;
@@ -2339,8 +2330,8 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 			line_yinit = 0,
 			line_ydiff = 0;
 
-	if (hp > (int)texts.size()*font_height) {
-		int lines = (int)texts.size();
+	if (hp > (int)lines.size()*font_height) {
+		int nlines = (int)lines.size();
 
 		if (valign == TOP_VALIGN) {
 			line_space = 0;
@@ -2348,35 +2339,62 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 			line_ydiff = 0;
 		} else if (valign == CENTER_VALIGN) {
 			line_space = 0;
-			line_yinit = (hp-lines*font_height)/2;
+			line_yinit = (hp-nlines*font_height)/2;
 			line_ydiff = 0;
 		} else if (valign == BOTTOM_VALIGN) {
 			line_space = 0;
-			line_yinit = hp-lines*font_height;
+			line_yinit = hp-nlines*font_height;
 			line_ydiff = 0;
 		} else if (valign == JUSTIFY_VALIGN) {
-			if (lines == 1) {
-				line_yinit = (hp-lines*font_height)/2;
+			if (nlines == 1) {
+				line_yinit = (hp-nlines*font_height)/2;
 			} else {
-				line_space = (hp-lines*font_height)/(lines-1);
+				line_space = (hp-nlines*font_height)/(nlines-1);
 				line_yinit = 0;
-				line_ydiff = (hp-lines*font_height)%(lines-1);
+				line_ydiff = (hp-nlines*font_height)%(nlines-1);
 			}
 		}
 	}
 
+	jregion_t clip = GetClip();
+
+	if (clipped == true) {
+		int cx = xp,
+				cy = yp,
+				cw = wp,
+				ch = hp;
+
+		if (cx > clip.width) {
+			cx = clip.width;
+		}
+
+		if (cy > clip.height) {
+			cy = clip.height;
+		}
+
+		if (cw > (clip.width-cx)) {
+			cw = clip.width-cx;
+		}
+
+		if (ch > (clip.height-cy)) {
+			ch = clip.height-cy;
+		}
+
+		SetClip(cx, cy, cw, ch);
+	}
+	
 	if (halign == JUSTIFY_HALIGN) {
 		std::string token_trim;
 			
 		dy = line_yinit;
 
-		for (int i=0; i<(int)texts.size() && i<max_lines; i++) {
-			jcommon::StringTokenizer token(texts[i], " ", jcommon::SPLIT_FLAG, false);
+		for (int i=0; i<(int)lines.size() && i<max_lines; i++) {
+			jcommon::StringTokenizer token(lines[i], " ", jcommon::SPLIT_FLAG, false);
 
 
-			if (texts[i].find("\n") == 0) {
+			if (lines[i].find("\n") == 0) {
 				// INFO:: eh soh uma maneira de informar a ultima linha de cada linha terminada com '\n'
-				DrawString(texts[i].substr(1), xp, yp+dy);
+				DrawString(lines[i].substr(1), xp, yp+dy);
 			} else {
 				int size = 0,
 						space = 0,
@@ -2415,8 +2433,8 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 	} else {
 		dy = line_yinit;
 
-		for (int i=0; i<(int)texts.size() && i<max_lines; i++) {
-			std::string text = jcommon::StringUtils::Trim(texts[i]);
+		for (int i=0; i<(int)lines.size() && i<max_lines; i++) {
+			std::string text = jcommon::StringUtils::Trim(lines[i]);
 			
 			int size = _font->GetStringWidth(text);
 
@@ -2437,9 +2455,12 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 			}
 		}
 	}
+	
+	if (clipped == true) {
+		SetClip(clip.x, clip.y, clip.width, clip.height);
+	}
 #endif
 }
-
 
 uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 {

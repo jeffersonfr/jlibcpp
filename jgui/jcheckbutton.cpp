@@ -268,9 +268,7 @@ void CheckButton::Paint(Graphics *g)
 			text = _font->TruncateString(text, "...", pw);
 		}
 
-		g->SetClip(0, 0, x+w, y+h);
 		g->DrawString(text, px, py, pw, ph, _halign, _valign);
-		g->SetClip(0, 0, _size.width, _size.height);
 	}
 
 	PaintEdges(g);

@@ -80,31 +80,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual jregion_t GetClipBounds();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetClipX();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetClipY();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetClipWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetClipHeight();
+		virtual jregion_t GetClip();
 		
 		/**
 		 * \brief
@@ -177,6 +153,12 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual void SetColor(int r, int g, int b, int a = 0xFF); 
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool HasFont(); 
 		
 		/**
 		 * \brief
@@ -356,7 +338,19 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JUSTIFY_HALIGN);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawString(std::string s, int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
 		
 		/**
 		 * \brief
@@ -392,6 +386,12 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual bool DrawImage(OffScreenImage *img, int x, int y, int alpha = 0xff);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool DrawImage(OffScreenImage *img, int x, int y, int w, int h, int alpha = 0xff);
 		
 		/**
@@ -406,12 +406,6 @@ class NullGraphics : public Graphics{
 		 */
 		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha = 0xff);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN);
-
 		/**
 		 * \brief
 		 *

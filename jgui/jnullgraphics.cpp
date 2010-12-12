@@ -57,12 +57,12 @@ OffScreenImage * NullGraphics::Create()
 	return NULL;
 }
 
-void NullGraphics::SetClip(int x1, int y1, int width, int height)
+void NullGraphics::SetClip(int x, int y, int width, int height)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-jregion_t NullGraphics::GetClipBounds()
+jregion_t NullGraphics::GetClip()
 {
 	JDEBUG(JINFO, "called\n");
 
@@ -74,34 +74,6 @@ jregion_t NullGraphics::GetClipBounds()
 	t.height = 0;
 
 	return t;
-}
-
-int NullGraphics::GetClipX()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return 0;
-}
-
-int NullGraphics::GetClipY()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return 0;
-}
-
-int NullGraphics::GetClipWidth()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return 0;
-}
-
-int NullGraphics::GetClipHeight()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return 0;
 }
 
 void NullGraphics::ReleaseClip()
@@ -152,6 +124,13 @@ void NullGraphics::SetColor(int r, int g, int b, int a)
 {
 	JDEBUG(JINFO, "called\n");
 } 
+
+bool NullGraphics::HasFont()
+{
+	JDEBUG(JINFO, "called\n");
+
+	return false;
+}
 
 void NullGraphics::SetFont(Font *font)
 {
@@ -304,7 +283,17 @@ void NullGraphics::FillGradientRectangle(int xp, int yp, int wp, int hp, int sr,
 	JDEBUG(JINFO, "called\n");
 }
 
+void NullGraphics::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign)
+{
+	JDEBUG(JINFO, "called\n");
+}
+
 void NullGraphics::DrawString(std::string s, int xp, int yp)
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+void NullGraphics::DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -318,49 +307,56 @@ bool NullGraphics::DrawImage(std::string img, int x, int y, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return true;
+	return false;
 }
 
-bool NullGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int alpha)
+bool NullGraphics::DrawImage(std::string img, int x, int y, int w, int h, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return true;
+	return false;
 }
 
 bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return true;
+	return false;
 }
 
 bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return true;
+	return false;
+}
+
+bool NullGraphics::DrawImage(OffScreenImage *img, int x, int y, int alpha)
+{
+	JDEBUG(JINFO, "called\n");
+
+	return false;
 }
 
 bool NullGraphics::DrawImage(OffScreenImage *img, int x, int y, int w, int h, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return true;
+	return false;
 }
 
 bool NullGraphics::DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return true;
+	return false;
 }
 
 bool NullGraphics::DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return true;
+	return false;
 }
 
 void NullGraphics::Rotate(double radians)
@@ -390,11 +386,6 @@ jpoint_t NullGraphics::Translate()
 	t.y = 0;
 
 	return t;
-}
-
-void NullGraphics::DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign, jvertical_align_t valign)
-{
-	JDEBUG(JINFO, "called\n");
 }
 
 uint32_t NullGraphics::GetRGB(int xp, int yp, uint32_t pixel)

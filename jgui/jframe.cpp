@@ -323,9 +323,7 @@ void Frame::Paint(Graphics *g)
 
 			g->SetColor(_fgcolor);
 		
-			g->SetClip(0, 0, _size.width, _insets.top);
 			g->DrawString(text, _insets.left+(_size.width-_insets.left-_insets.right-_font->GetStringWidth(text))/2, y);
-			g->ReleaseClip();
 		}
 	}
 
