@@ -169,7 +169,6 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 		return false;
 	}
 
-	_list->SetIgnoreRepaint(true);
 	_list->RemoveItems();
 	_list->AddImageItem("..", "./icons/folder.png");
 
@@ -229,7 +228,6 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 	delete files;
 
 	_list->SetCurrentIndex(0);
-	_list->SetIgnoreRepaint(false);
 	_list->Repaint();
 
 	return true;

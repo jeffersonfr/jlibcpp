@@ -20,6 +20,9 @@ OBJS_teste = \
 OBJS_databuffer = \
 	   databuffer.o\
 
+OBJS_ball = \
+	   ball.o\
+
 OBJS_restore = \
 	   restore.o\
 
@@ -99,12 +102,15 @@ OBJS_stock = \
 OBJS_game = \
 		game.o\
 
-all: teste skull databuffer restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image stock
+all: teste skull databuffer ball restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image stock
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 databuffer: $(OBJS_databuffer)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+        
+ball: $(OBJS_ball)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
 restore: $(OBJS_restore)
@@ -192,4 +198,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image stock
+	@rm -rvf *.o *.xml *~ teste ball restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image stock
