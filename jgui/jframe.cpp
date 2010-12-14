@@ -34,7 +34,7 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_relative_mouse_h = 0;
 	_mouse_state = 0;
 
-	_default_exit = true;
+	_release_enabled = true;
 	_is_maximized = false;
 	_title = title;
 	_input_locked = false;
@@ -45,7 +45,7 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_background_visible = true;
 	_move_enabled = false;
 	_resize_enabled = false;
-	_frame_buttons = (int)(FB_MAXIMIZE | FB_RELEASE);
+	_frame_buttons = (jframe_button_t)(FB_CLOSE);
 	
 	_old_x = _location.x;
 	_old_y = _location.y;
@@ -79,12 +79,12 @@ void Frame::SetIcon(std::string icon)
 	Repaint();
 }
 
-int Frame::GetFrameButtons()
+jframe_button_t Frame::GetFrameButtons()
 {
 	return _frame_buttons;
 }
 
-void Frame::SetFrameButtons(int buttons)
+void Frame::SetFrameButtons(jframe_button_t buttons)
 {
 	_frame_buttons = buttons;
 }
@@ -111,7 +111,7 @@ bool Frame::IsResizeEnabled()
 
 void Frame::SetDefaultExitEnabled(bool b)
 {
-	_default_exit = b;
+	_release_enabled = b;
 }
 
 void Frame::SetTitle(std::string title)
@@ -363,11 +363,11 @@ void Frame::Paint(Graphics *g)
 	if (s > 4) { 
 		g->SetBlittingFlags(BF_ALPHACHANNEL);
 
-		// if ((_frame_buttons & FB_RELEASE) != 0) { 
+		if (_release_enabled == true && (_frame_buttons & FB_CLOSE) != 0) {
 			g->DrawImage("./icons/close.png", _size.width-_insets.right-s, 15, s, s);
-		// }
+		}
 
-		if (_resize_enabled == true && (_frame_buttons & FB_MAXIMIZE) != 0) { 
+		if ((_frame_buttons & FB_MAXIMIZE) != 0) { 
 			if (_is_maximized == false) {
 				g->DrawImage("./icons/maximize.png", _size.width-_insets.right-2*s-10, 15, s, s);
 			} else {
@@ -409,7 +409,7 @@ void Frame::KeyPressed(KeyEvent *event)
 
 		_last_key_code = event->GetSymbol();
 
-		if ((event->GetSymbol() == JKEY_ESCAPE || event->GetSymbol() == JKEY_EXIT) && _default_exit == true) {
+		if ((event->GetSymbol() == JKEY_ESCAPE || event->GetSymbol() == JKEY_EXIT) && _release_enabled == true) {
 			_input_locked = false;
 			_last_key_code = JKEY_EXIT;
 
@@ -473,7 +473,7 @@ void Frame::MousePressed(MouseEvent *event)
 							Maximize();
 						}
 					}
-				} else if ((_frame_buttons & FB_RELEASE) != 0 && event->GetX() < (_location.x+_size.width-_insets.right)) {
+				} else if ((_frame_buttons & FB_CLOSE) != 0 && event->GetX() < (_location.x+_size.width-_insets.right) && _release_enabled == true) {
 					Release();
 				}
 			}

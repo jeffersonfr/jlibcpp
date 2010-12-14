@@ -930,7 +930,6 @@ int main( int argc, char *argv[] )
 
 	ModulesTeste test;
 
-	test.SetFrameButtons(jgui::FB_NONE);
 	test.Show();
 
 	return 0;

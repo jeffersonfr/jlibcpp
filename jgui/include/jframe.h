@@ -45,10 +45,10 @@ namespace jgui {
  * \brief
  *
  */
-enum jframe_buttons_t {
-	FB_NONE = 0,
+enum jframe_button_t {
+	FB_MINIMIZE = 1,
 	FB_MAXIMIZE = 1,
-	FB_RELEASE = 2
+	FB_CLOSE = 2
 };
 
 /**
@@ -122,19 +122,19 @@ class Frame : public KeyListener, public MouseListener, public Window {
 			_relative_mouse_y,
 			_relative_mouse_w,
 			_relative_mouse_h,
-			_mouse_state,
-			_frame_buttons;
+			_mouse_state;
 		int _old_x,
 				_old_y,
 				_old_width,
 				_old_height;
 		bool _input_locked,
-			 _input_enabled,
-			 _background_visible,
-			 _default_exit,
-			 _move_enabled,
-			 _resize_enabled,
-			 _is_maximized;
+				 _input_enabled,
+				 _background_visible,
+				 _move_enabled,
+				 _release_enabled,
+				 _resize_enabled,
+				 _is_maximized;
+		jframe_button_t _frame_buttons;
 		jkey_symbol_t _last_key_code;
 		jcursor_style_t _default_cursor;
 
@@ -209,13 +209,13 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 * \brief
 		 *
 		 */
-		virtual int GetFrameButtons();
+		virtual jframe_button_t GetFrameButtons();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetFrameButtons(int buttons);
+		virtual void SetFrameButtons(jframe_button_t buttons);
 
 		/**
 		 * \brief
