@@ -430,8 +430,6 @@ class Breakout : public jgui::Frame, public jgui::FrameInputListener, public jth
 
 int main(int argc, char **argv) 
 {
-	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
-
 	Breakout breakout;
 
 	breakout.Show();

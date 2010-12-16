@@ -462,8 +462,6 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 int main( int argc, char *argv[] )
 {
-	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
-
 	WindowTeste test;
 
 	test.Show();

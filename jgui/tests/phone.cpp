@@ -723,8 +723,6 @@ void SearchContacts::InputChanged(jgui::KeyEvent *event)
 
 int main()
 {
-	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
-
 	phone::Phone app;
 
 	app.Show();

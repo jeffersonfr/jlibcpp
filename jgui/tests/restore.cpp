@@ -93,8 +93,6 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
-
 	Main main("Reconfiguracao da Engine Grafica Em Tempo Real", 100, 100, 900, 800);
 
 	main.Show(false);

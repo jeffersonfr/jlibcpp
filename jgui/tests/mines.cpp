@@ -355,8 +355,6 @@ Mines::game_status_t Mines::GetResult()
 
 int main()
 {
-	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
-
 	srand((int)time(NULL));
 
 	mines::Mines app(100, 100);

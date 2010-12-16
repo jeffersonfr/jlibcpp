@@ -45,6 +45,8 @@ class Font : public virtual jcommon::Object{
 	friend class Graphics;
 
 	private:
+		static Font *_default_font;
+
 #ifdef DIRECTFB_UI
 		IDirectFBFont *_font;
 #endif
@@ -70,6 +72,12 @@ class Font : public virtual jcommon::Object{
 		 */
 		virtual ~Font();
 
+		/**
+		 * \brief
+		 *
+		 */
+		static Font * GetDefaultFont();
+		
 		/**
 		 * \brief
 		 *

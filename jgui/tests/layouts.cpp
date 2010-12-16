@@ -299,8 +299,6 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 
 int main(int argc, char **argv)
 {
-	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
-	
 	Main main("Layouts", 50, 50, 1820, 980);
 
 	main.Show();

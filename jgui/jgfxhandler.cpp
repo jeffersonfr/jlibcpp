@@ -41,8 +41,6 @@ GFXHandler::GFXHandler():
 	scaleWidth = DEFAULT_SCALE_WIDTH;
 	scaleHeight = DEFAULT_SCALE_HEIGHT;
 	
-	_default_font = NULL;
-
 #ifdef DIRECTFB_UI
 	_cursor = ARROW_CURSOR;
 	_dfb = NULL;
@@ -537,27 +535,13 @@ GFXHandler * GFXHandler::GetInstance()
 
 			_instance->InitEngine();
 			_instance->InitCursors();
+			_instance->InitResources();
 		} catch (...) {
 			_instance = NULL;
 		}
 	}
 
 	return _instance;
-}
-
-void GFXHandler::SetDefaultFont(Font *font)
-{
-	if (_default_font != NULL) {
-		delete _default_font;
-		_default_font = NULL;
-	}
-
-	_default_font = font;
-}
-
-Font * GFXHandler::GetDefaultFont()
-{
-	return _default_font;
 }
 
 void GFXHandler::SetCursorEnabled(bool b)
@@ -603,6 +587,10 @@ void GFXHandler::SetCursor(OffScreenImage *shape, int hotx, int hoty)
 
 	GFXHandler::GetInstance()->GetDisplayLayer()->SetCursorShape(GFXHandler::GetInstance()->GetDisplayLayer(), surface, hotx, hoty);
 #endif
+}
+
+void GFXHandler::InitResources()
+{
 }
 
 void GFXHandler::InitCursors()

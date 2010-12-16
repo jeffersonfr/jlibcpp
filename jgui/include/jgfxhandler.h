@@ -88,7 +88,6 @@ class GFXHandler : public virtual jcommon::Object{
 
 		std::vector<OffScreenImage *> _offscreenimages;
 		std::vector<Font *> _fonts;
-		Font *_default_font;
 		jthread::Mutex _mutex;
 		jcursor_style_t _cursor;
 		int r,
@@ -118,6 +117,12 @@ class GFXHandler : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void InitCursors();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitResources();
 		
 		/**
 		 * \brief
@@ -212,18 +217,6 @@ class GFXHandler : public virtual jcommon::Object{
 		 */
 		virtual void * GetGraphicEngine();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDefaultFont(Font *font);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Font * GetDefaultFont();
-		
 		/**
 		 * \brief
 		 *

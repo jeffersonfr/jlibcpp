@@ -74,8 +74,6 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
-	
 	Main main("Clip", 100, 100, 720, 480);
 
 	main.Show();

@@ -209,9 +209,6 @@ class Stock : public jgui::Frame, public jgui::FrameInputListener {
 
 int main()
 {
-	jgui::GFXHandler::GetInstance()->SetDefaultFont(
-			new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
-
 	Stock stock(100, 100);
 
 	stock.Show();

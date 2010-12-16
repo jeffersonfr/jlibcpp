@@ -288,13 +288,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static bool GetImageSize(std::string img, int *width, int *height);
+		virtual void * GetNativeSurface();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void * GetNativeSurface();
+		static bool GetImageSize(std::string img, int *width, int *height);
 		
 		/**
 		 * \brief

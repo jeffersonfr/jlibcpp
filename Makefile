@@ -1,6 +1,6 @@
 MODULE		= jlibcpp
 
-VERSION		= 0.9
+VERSION		= 1.0
 
 EXE			= lib$(MODULE)-$(VERSION).so
 
@@ -63,8 +63,13 @@ DEFINES		= -D_GNU_SOURCE \
 REQUIRES	= \
 						libssl \
 
-ARFLAGS		+= 
-CFLAGS		+= $(INCLUDE) $(DEBUG) $(OTHER) $(DEFINES)
+ARFLAGS		+= \
+
+CFLAGS		+= \
+						 $(DEFINES) \
+						 $(DEBUG) \
+						 $(INCLUDE) \
+						-D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" \
 
 OK 				= \033[30;32mOK\033[m
 
@@ -399,6 +404,10 @@ doc:
 	@mkdir -p $(DOCDIR) 
 
 install: uninstall
+	@echo "Installing resources files in $(PREFIX)/$(MODULE) $(OK)" && mkdir -p $(PREFIX)/$(MODULE)
+	@install -d -o nobody -m 755 $(PREFIX)/$(MODULE)/fonts && install -o nobody -m 644 resources/fonts/* $(PREFIX)/$(MODULE)/fonts
+	@install -d -o nobody -m 755 $(PREFIX)/$(MODULE)/images && install -o nobody -m 644 resources/images/* $(PREFIX)/$(MODULE)/images
+	@install -d -o nobody -m 755 $(PREFIX)/$(MODULE)/sounds && install -o nobody -m 644 resources/sounds/* $(PREFIX)/$(MODULE)/sounds
 	@echo "Installing include files in $(PREFIX)/include/$(MODULE) $(OK)" && mkdir -p $(PREFIX)/include/$(MODULE)
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jcommon && install -o nobody -m 644 jcommon/include/* $(PREFIX)/include/$(MODULE)/jcommon
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jgui && install -o nobody -m 644 jgui/include/* $(PREFIX)/include/$(MODULE)/jgui
@@ -449,5 +458,5 @@ ultraclean: clean uninstall
 	@cd jshared/tests && make clean && cd -
 	@cd jsocket/tests && make clean && cd -
 	@cd jthread/tests && make clean && cd -
-	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(PREFIX)/lib/$(EXE) $(PREFIX)/include/$(MODULE) 2> /dev/null && echo "$(MODULE) ultraclean $(OK)" 
+	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(PREFIX)/$(MODULE) $(PREFIX)/lib/$(EXE) $(PREFIX)/include/$(MODULE) 2> /dev/null && echo "$(MODULE) ultraclean $(OK)" 
 

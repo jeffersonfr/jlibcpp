@@ -329,6 +329,12 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual bool IsEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetEnabled(bool b);
 		
 		/**

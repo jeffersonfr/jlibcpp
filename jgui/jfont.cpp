@@ -23,6 +23,8 @@
 
 namespace jgui {
 
+Font *Font::_default_font = NULL;
+
 Font::Font(std::string name, int attr, int height, int scale_width, int scale_height):
 	jcommon::Object()
 {
@@ -70,6 +72,15 @@ Font::~Font()
 		_font->Release(_font);
 	}
 #endif
+}
+
+Font * Font::GetDefaultFont()
+{
+	if (_default_font == NULL) {
+		_default_font = new jgui::Font(_DATA_PREFIX"/fonts/font.ttf", 0, DEFAULT_FONT_SIZE);
+	}
+
+	return _default_font;
 }
 
 void Font::SetWorkingScreenSize(int width, int height)

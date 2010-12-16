@@ -474,8 +474,6 @@ class GraphicPanel : public jgui::Frame{
 
 int main( int argc, char *argv[] )
 {
-	jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
-
 	GraphicPanel test;
 
 	test.Show();
