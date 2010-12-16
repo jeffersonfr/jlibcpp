@@ -41,7 +41,7 @@ Menu::Menu(int x, int y, int width, int visible_items):
 	prefetch = new OffScreenImage(_item_size, _item_size);
 	
 	if (prefetch->GetGraphics() != NULL) {
-		prefetch->GetGraphics()->DrawImage("./icons/check.png", 0, 0, _item_size, _item_size);
+		prefetch->GetGraphics()->DrawImage(_DATA_PREFIX"/images/check.png", 0, 0, _item_size, _item_size);
 	}
 
 	_frame = new Frame("", x, y, width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size));

@@ -75,9 +75,9 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 	ShowFiles(_current_dir);
 
 	if (_type == OPEN_FILE_DIALOG) {
-		AddSubtitle("icons/blue_icon.png", "Open");
+		AddSubtitle(_DATA_PREFIX"images/blue_icon.png", "Open");
 	} else {
-		AddSubtitle("icons/blue_icon.png", "Save");
+		AddSubtitle(_DATA_PREFIX"images/blue_icon.png", "Save");
 	}
 
 	Pack();
@@ -170,7 +170,7 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 	}
 
 	_list->RemoveItems();
-	_list->AddImageItem("..", "./icons/folder.png");
+	_list->AddImageItem("..", _DATA_PREFIX"/images/folder.png");
 
 	std::sort(files->begin(), files->end(), ascending_sort());
 
@@ -182,7 +182,7 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 
 			if (IsDirectory(current_dir +jio::File::GetDelimiter() + (*files)[i])) {
 				// adiciona um icone para o diretorio
-				_list->AddImageItem((*files)[i], "./icons/lockfolder.png"); 
+				_list->AddImageItem((*files)[i], _DATA_PREFIX"/images/lockfolder.png"); 
 			}
 		}
 	}
@@ -219,7 +219,7 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 
 			if (b == true) {
 				if (IsFile(current_dir + jio::File::GetDelimiter() + file)) {
-					_list->AddImageItem(file, "./icons/lockfile.png");
+					_list->AddImageItem(file, _DATA_PREFIX"/images/lockfile.png");
 				}
 			}
 		}

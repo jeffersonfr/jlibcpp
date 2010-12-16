@@ -364,14 +364,14 @@ void Frame::Paint(Graphics *g)
 		g->SetBlittingFlags(BF_ALPHACHANNEL);
 
 		if (_release_enabled == true && (_frame_buttons & FB_CLOSE) != 0) {
-			g->DrawImage("./icons/close.png", _size.width-_insets.right-s, 15, s, s);
+			g->DrawImage(_DATA_PREFIX"/images/close.png", _size.width-_insets.right-s, 15, s, s);
 		}
 
 		if ((_frame_buttons & FB_MAXIMIZE) != 0) { 
 			if (_is_maximized == false) {
-				g->DrawImage("./icons/maximize.png", _size.width-_insets.right-2*s-10, 15, s, s);
+				g->DrawImage(_DATA_PREFIX"/images/maximize.png", _size.width-_insets.right-2*s-10, 15, s, s);
 			} else {
-				g->DrawImage("./icons/restore.png", _size.width-_insets.right-2*s-10, 15, s, s);
+				g->DrawImage(_DATA_PREFIX"/images/restore.png", _size.width-_insets.right-2*s-10, 15, s, s);
 			}
 		}
 	}

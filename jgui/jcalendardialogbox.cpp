@@ -114,7 +114,7 @@ CalendarDialogBox::CalendarDialogBox(int x, int y):
 	Add(lsex);
 	Add(lsab);
 
-	AddSubtitle("icons/blue_icon.png", "Confirmar");
+	AddSubtitle(_DATA_PREFIX"images/blue_icon.png", "Confirmar");
 
 	BuildCalendar();
 

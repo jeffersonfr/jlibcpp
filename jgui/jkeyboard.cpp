@@ -53,7 +53,7 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 
 	SetOptimizedPaint(true);
 
-	AddSubtitle("icons/blue_icon.png", "Confirmar");
+	AddSubtitle(_DATA_PREFIX"images/blue_icon.png", "Confirmar");
 
 	Pack();
 
