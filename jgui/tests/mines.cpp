@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "mines.h"
 #include "jmessagedialogbox.h"
+#include "jsystem.h"
 
 namespace mines {
 
@@ -48,9 +49,9 @@ Mines::Mines(int x, int y):
 
 	SetupBoard();
 
-	AddSubtitle("icons/blue_icon.png", "Novo Jogo");
-	AddSubtitle("icons/yellow_icon.png", "Flag");
-	AddSubtitle("icons/green_icon.png", "Ajuda");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Novo Jogo");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png", "Flag");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/green_icon.png", "Ajuda");
 
 	Frame::RegisterInputListener(this);
 }

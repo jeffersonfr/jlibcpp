@@ -319,7 +319,7 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main(0, 0);
+	Main main(10, 10);
 
 #if ENABLE_GUI == 1
 	main.Show(false);

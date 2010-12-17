@@ -77,7 +77,6 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			SetLayout(_main = new jgui::GridLayout(2, 3));
 			SetMoveEnabled(true);
 			SetResizeEnabled(true);
-			SetIcon("./icons/keyboard_icon.png");
 		
 			_flow = new jgui::FlowLayout();
 			_grid = new jgui::GridLayout(3, 3);

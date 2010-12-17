@@ -20,6 +20,7 @@
 #include "jframe.h"
 #include "jgridlayout.h"
 #include "jbutton.h"
+#include "jsystem.h"
 
 jgui::Font *font = NULL;
 
@@ -69,11 +70,11 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	font = new jgui::Font("fonts/font.ttf", 0, 24, 720, 480);
+	font = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 24, 720, 480);
 	Main main1("Scale 720x480", 0, 0, 500, 400, 720, 480);
 	main1.SetFont(font);
 	
-	font = new jgui::Font("fonts/font.ttf", 0, 24, 1920, 1080);
+	font = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 24, 1920, 1080);
 	Main main2("Scale 1920x1080", 1100, 300, 500, 400, 1920, 1080);
 	main2.SetFont(font);
 

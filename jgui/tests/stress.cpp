@@ -337,7 +337,7 @@ class GraphicPanel : public jgui::Frame{
 
 		jgui::OffScreenImage off(200, 200);
 
-		off.GetGraphics()->DrawImage("icons/goku.png", 0, 0, 200, 200);
+		off.GetGraphics()->DrawImage("icons/gnu.png", 0, 0, 200, 200);
 
 		// Blit [file]
 		DrawString(g, "Blit [file]");
@@ -346,7 +346,7 @@ class GraphicPanel : public jgui::Frame{
 			x = rand()%(1920-w-_insets.left-_insets.right);
 			y = rand()%(1080-h-_insets.top-_insets.bottom);
 
-			g->DrawImage("icons/goku.png", x+_insets.left, y+_insets.top, w, h);
+			g->DrawImage("icons/gnu.png", x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
 		}
@@ -385,7 +385,7 @@ class GraphicPanel : public jgui::Frame{
 			x = (1920-size)/2;
 			y = (1080-size)/2;
 
-			g->DrawImage("icons/goku.png", x, y, size, size);
+			g->DrawImage("icons/gnu.png", x, y, size, size);
 
 			g->Flip(x, y, size, size);
 			

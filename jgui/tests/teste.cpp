@@ -41,7 +41,7 @@
 #include "jmessagedialogbox.h"
 #include "jyesnodialogbox.h"
 #include "jmenugroup.h"
-#include "jfilechooserdialogbox.h"
+#include "jsystem.h"
 
 class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener, public jgui::FrameInputListener{
 
@@ -80,8 +80,6 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		WindowTeste():
 			jgui::Frame("Frame Test", 0, 0, 1920, 1080)
 	{
-		SetIcon("icons/watch_1.png");
-
 		{
 			animation = new jgui::Animation(150, 110, 150, 150);
 
@@ -223,7 +221,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			static_image = new jgui::Icon("icons/green_icon.png", 1250, 110, 400, 300);
+			static_image = new jgui::Icon(jcommon::System::GetResourceDirectory() + "/images/green_icon.png", 1250, 110, 400, 300);
 
 			static_image->SetText("Green Button");
 		}
@@ -231,15 +229,15 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			list = new jgui::ListBox(1250, 450, 400, 300);
 
-			list->AddImageItem("opcao 1", std::string("icons/red_icon.png"));
+			list->AddImageItem("opcao 1", jcommon::System::GetResourceDirectory() + "/images/red_icon.png");
 			list->AddTextItem("opcao 2");
-			list->AddImageItem("opcao 3", std::string("icons/green_icon.png"));
+			list->AddImageItem("opcao 3", jcommon::System::GetResourceDirectory() + "/images/green_icon.png");
 			list->AddTextItem("opcao 4");
-			list->AddImageItem("opcao 5", std::string("icons/yellow_icon.png"));
+			list->AddImageItem("opcao 5", jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png");
 			list->AddTextItem("opcao 6");
-			list->AddImageItem("opcao 7", std::string("icons/blue_icon.png"));
+			list->AddImageItem("opcao 7", jcommon::System::GetResourceDirectory() + "/images/blue_icon.png");
 			list->AddTextItem("opcao 8");
-			list->AddImageItem("opcao 9", std::string("icons/red_icon.png"));
+			list->AddImageItem("opcao 9", jcommon::System::GetResourceDirectory() + "/images/red_icon.png");
 			list->AddTextItem("opcao 0");
 		}
 
@@ -522,15 +520,16 @@ class GraphicPanel : public jgui::Canvas{
 
 		// draw images
 		/*
-		   jgui::OffScreenImage *img1 = new jgui::OffScreenImage(200, 100),
+	   jgui::OffScreenImage *img1 = new jgui::OffScreenImage(200, 100),
+
 		 *img2 = new jgui::OffScreenImage(200, 100),
 		 *img3 = new jgui::OffScreenImage(200, 100),
 		 *img4 = new jgui::OffScreenImage(200, 100);
 
-		 img1->GetGraphics()->DrawImage("icons/blue_icon.png", 0, 0, 200, 100);
-		 img2->GetGraphics()->DrawImage("icons/green_icon.png", 0, 0, 200, 100);
-		 img3->GetGraphics()->DrawImage("icons/yellow_icon.png", 0, 0, 200, 100);
-		 img4->GetGraphics()->DrawImage("icons/red_icon.png", 0, 0, 200, 100);
+		 img1->GetGraphics()->DrawImage(jcommon::System::GetResourceDirectory() + "images/blue_icon.png", 0, 0, 200, 100);
+		 img2->GetGraphics()->DrawImage(jcommon::System::GetResourceDirectory() + "images/green_icon.png", 0, 0, 200, 100);
+		 img3->GetGraphics()->DrawImage(jcommon::System::GetResourceDirectory() + "images/yellow_icon.png", 0, 0, 200, 100);
+		 img4->GetGraphics()->DrawImage(jcommon::System::GetResourceDirectory() + "images/red_icon.png", 0, 0, 200, 100);
 
 		 g->DrawImage(img1, 400+40+0*(200+10), 0*(100+10)+10, 200, 100, 0xff);
 		 g->DrawImage(img2, 400+40+1*(200+10), 0*(100+10)+10, 200, 100, 0x80);
@@ -541,10 +540,10 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetPorterDuffFlags(jgui::PDF_NONE);
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORALPHA));
 
-		g->DrawImage("icons/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+10, 200, 100, 0xf0);
-		g->DrawImage("icons/blue_icon.png", 400+40+1*(200+10), 0*(100+10)+10, 200, 100, 0x80);
-		g->DrawImage("icons/blue_icon.png", 400+40+0*(200+10), 1*(100+10)+10, 200, 100, 0x60);
-		g->DrawImage("icons/blue_icon.png", 400+40+1*(200+10), 1*(100+10)+10, 200, 100, 0x40);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+10, 200, 100, 0xf0);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 0*(100+10)+10, 200, 100, 0x80);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 1*(100+10)+10, 200, 100, 0x60);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 1*(100+10)+10, 200, 100, 0x40);
 
 		// line
 		g->SetColor(0xf0, 0xf0, 0x00, 0xff);
@@ -619,10 +618,10 @@ class GraphicPanel : public jgui::Canvas{
 		g->FillCircle(3*200+200+10, 3*(100+10)+10+50, 10);
 
 		// texts
-		jgui::Font *f1 = new jgui::Font("./fonts/font.ttf", 0, 50),
-			*f2 = new jgui::Font("./fonts/font.ttf", 0, 40),
-			*f3 = new jgui::Font("./fonts/font.ttf", 0, 30),
-			*f4 = new jgui::Font("./fonts/font.ttf", 0, 20);
+		jgui::Font *f1 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 50),
+			*f2 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 40),
+			*f3 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 30),
+			*f4 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 20);
 		int shadow = 4;
 
 		g->SetColor(0x00, 0x80, 0xe0, 0xff);

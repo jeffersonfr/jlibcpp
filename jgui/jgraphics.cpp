@@ -2316,15 +2316,21 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 	int dx = 0,
 			dy = 0,
 			max_lines,
-			font_height = _font->GetAscender() + _font->GetDescender();
+			font_height;
+	
+	font_height = _font->GetAscender() + _font->GetDescender();
 
-	GetStringBreak(&lines, text, wp, hp, halign);
+	if (font_height <= 0) {
+		return;
+	}
 
 	max_lines = hp/font_height;
 
 	if (max_lines <= 0) {
 		max_lines = 1;
 	}
+
+	GetStringBreak(&lines, text, wp, hp, halign);
 
 	int line_space = 0,
 			line_yinit = 0,

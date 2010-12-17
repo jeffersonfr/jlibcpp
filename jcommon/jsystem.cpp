@@ -152,6 +152,34 @@ int System::GetProcessID()
 #endif
 }
 
+std::string System::GetResourceDirectory()
+{
+	return _DATA_PREFIX;
+}
+
+std::string System::GetHomeDirectory()
+{
+#ifdef _WIN32
+	// CHANGE:: procurar por getuserdirectory ou algo parecido
+	char name[256];
+	DWORD r = 256;
+
+	GetWindowsDirectory( name , r);
+
+	return name;
+#else
+	struct passwd *pw;
+
+	pw = getpwuid(0);
+
+	if (pw != NULL) {
+		return pw->pw_dir;
+	}
+#endif
+
+	return "";
+}
+
 std::string System::GetCurrentDirectory()
 {
 #ifdef _WIN32
@@ -180,29 +208,6 @@ std::string System::GetCurrentDirectory()
 
 	return path;
 #endif
-}
-
-std::string System::GetHomeDirectory()
-{
-#ifdef _WIN32
-	// CHANGE:: procurar por getuserdirectory ou algo parecido
-	char name[256];
-	DWORD r = 256;
-
-	GetWindowsDirectory( name , r);
-
-	return name;
-#else
-	struct passwd *pw;
-
-	pw = getpwuid(0);
-
-	if (pw != NULL) {
-		return pw->pw_dir;
-	}
-#endif
-
-	return "";
 }
 
 std::string System::GetEnviromentVariable(std::string key_, std::string default_)

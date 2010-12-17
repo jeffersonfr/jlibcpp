@@ -36,6 +36,7 @@
 #include "jscrollbar.h"
 #include "jcombobox.h"
 #include "jtooglebutton.h"
+#include "jsystem.h"
 
 class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener, public jgui::FrameInputListener{
 
@@ -75,8 +76,6 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		WindowTeste():
 			jgui::Frame("Cassino Royale", 0, 0, 1920, 1080)
 	{
-		SetIcon("icons/watch_1.png");
-
 		{
 			jgui::jinsets_t t = GetInsets();
 
@@ -224,7 +223,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			static_image = new jgui::Icon("icons/green_icon.png", 1250, 110, 400, 300);
+			static_image = new jgui::Icon(jcommon::System::GetResourceDirectory() + "/images/green_icon.png", 1250, 110, 400, 300);
 
 			static_image->SetText("Green Button");
 		}
@@ -232,15 +231,15 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			list = new jgui::ListBox(1250, 450, 400, 280);
 
-			list->AddImageItem("opcao 1", std::string("icons/red_icon.png"));
+			list->AddImageItem("opcao 1", std::string("icons/tux01.jpg"));
 			list->AddTextItem("opcao 2");
-			list->AddImageItem("opcao 3", std::string("icons/green_icon.png"));
+			list->AddImageItem("opcao 3", std::string("icons/tux02.jpg"));
 			list->AddTextItem("opcao 4");
-			list->AddImageItem("opcao 5", std::string("icons/yellow_icon.png"));
+			list->AddImageItem("opcao 5", std::string("icons/tux03.jpg"));
 			list->AddTextItem("opcao 6");
-			list->AddImageItem("opcao 7", std::string("icons/blue_icon.png"));
+			list->AddImageItem("opcao 7", std::string("icons/tux04.jpg"));
 			list->AddTextItem("opcao 8");
-			list->AddTextItem("opcao 9");
+			list->AddImageItem("opcao 9", std::string("icons/tux05.jpg"));
 			list->AddTextItem("opcao 0");
 		}
 

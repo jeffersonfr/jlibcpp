@@ -83,13 +83,19 @@ class System{
 		 * \brief
 		 *
 		 */
-		static std::string GetCurrentDirectory();
+		static std::string GetResourceDirectory();
 
 		/**
 		 * \brief
 		 *
 		 */
 		static std::string GetHomeDirectory();
+
+		/**
+		 * \brief
+		 *
+		 */
+		static std::string GetCurrentDirectory();
 
 		/**
 		 * \brief

@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jcalendardialogbox.h"
+#include "jsystem.h"
 
 namespace jgui {
 
@@ -27,6 +28,8 @@ CalendarDialogBox::CalendarDialogBox(int x, int y):
 	jgui::FrameInputListener()
 {
 	jcommon::Object::SetClassName("jgui::CalendarDialogBox");
+
+	SetIcon(jcommon::System::GetResourceDirectory() + "/images/calendar_icon.png");
 
 	bx = _insets.left;
 	by = _insets.top;

@@ -610,6 +610,48 @@ int Component::GetY()
 	return _location.y;
 }
 
+int Component::GetAbsoluteX()
+{
+	Container *parent = GetParent();
+
+	if ((void *)parent == NULL) {
+		return -1;
+	}
+
+	int location = _location.x;
+
+	do {
+		if (parent->GetParent() != NULL) {
+			location = location + parent->GetX();	
+		}
+		
+		parent = parent->GetParent();
+	} while ((void *)parent != NULL);
+
+	return location;
+}
+
+int Component::GetAbsoluteY()
+{
+	Container *parent = GetParent();
+
+	if ((void *)parent == NULL) {
+		return -1;
+	}
+
+	int location = _location.y;
+
+	do {
+		if (parent->GetParent() != NULL) {
+			location = location + parent->GetY();	
+		}
+		
+		parent = parent->GetParent();
+	} while ((void *)parent != NULL);
+
+	return location;
+}
+
 int Component::GetWidth()
 {
 	return _size.width;

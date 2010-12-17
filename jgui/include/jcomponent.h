@@ -533,6 +533,18 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual int GetAbsoluteX();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetAbsoluteY();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetWidth();
 		
 		/**

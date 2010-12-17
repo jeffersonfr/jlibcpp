@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jkeyboard.h"
+#include "jsystem.h"
 
 namespace jgui {
 
@@ -27,6 +28,8 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 	jgui::FrameInputListener()
 {
 	jcommon::Object::SetClassName("jgui::Keyboard");
+
+	SetIcon(jcommon::System::GetResourceDirectory() + "/images/keyboard_icon.png");
 
 	bwidth = 90;
 	bheight = 60;

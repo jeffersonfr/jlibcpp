@@ -28,6 +28,8 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 {
 	jcommon::Object::SetClassName("jgui::Frame");
 
+	_icon = _DATA_PREFIX"/images/small-gnu.png";
+
 	_relative_mouse_x = 0;
 	_relative_mouse_y = 0;
 	_relative_mouse_w = 0;

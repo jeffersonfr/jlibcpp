@@ -22,6 +22,7 @@
 #include "jmessagedialogbox.h"
 #include "jyesnodialogbox.h"
 #include "jxmlparser.h"
+#include "jsystem.h"
 
 namespace phone {
 
@@ -365,8 +366,8 @@ AddContact::AddContact(PhoneDB *base, int index):
 
 	field1->RequestFocus();
 
-	AddSubtitle("icons/blue_icon.png", "Adicionar");
-	AddSubtitle("icons/vertical_arrows.png", "Selecionar");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Adicionar");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/vertical_arrows.png", "Selecionar");
 
 	Pack();
 
@@ -554,8 +555,8 @@ SearchContacts::SearchContacts(PhoneDB *base):
 		tel1 = new jgui::Label(t->phone1, _insets.left, _insets.top+3*height, max_width);
 		label_tel2 = new jgui::Label("Telefone 2", _insets.left, _insets.top+4*height, max_width);
 		tel2 = new jgui::Label(t->phone2, _insets.left, _insets.top+5*height, max_width);
-		left_arrow = new jgui::Icon("icons/left_horizontal_arrow.png", _insets.left, _insets.top+0*height, height);
-		right_arrow = new jgui::Icon("icons/right_horizontal_arrow.png", GetWidth()-_insets.right-height, _insets.top+0*height, height);
+		left_arrow = new jgui::Icon(jcommon::System::GetResourceDirectory() + "/images/left_horizontal_arrow.png", _insets.left, _insets.top+0*height, height);
+		right_arrow = new jgui::Icon(jcommon::System::GetResourceDirectory() + "/images/right_horizontal_arrow.png", GetWidth()-_insets.right-height, _insets.top+0*height, height);
 
 		Add(left_arrow);
 		Add(right_arrow);
@@ -565,9 +566,9 @@ SearchContacts::SearchContacts(PhoneDB *base):
 		Add(label_tel2);
 		Add(tel2);
 
-		AddSubtitle("icons/blue_icon.png", "Apagar");
-		AddSubtitle("icons/yellow_icon.png", "Editar");
-		AddSubtitle("icons/green_icon.png", "Buscar");
+		AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Apagar");
+		AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png", "Editar");
+		AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/green_icon.png", "Buscar");
 	}
 
 	Pack();

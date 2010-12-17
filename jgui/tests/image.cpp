@@ -111,7 +111,7 @@ class Main : public jgui::Frame{
 
 			jgui::OffScreenImage off(image_width, image_height);
 
-		 	off.GetGraphics()->DrawImage("icons/green_icon.png", 0, 0, image_width, image_height);
+		 	off.GetGraphics()->DrawImage("icons/square.png", 0, 0, image_width, image_height);
 		 
 			// g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_COLORALPHA | jgui::BF_ALPHACHANNEL));
 			g->SetPorterDuffFlags(jgui::PDF_SRC_OVER);
@@ -125,10 +125,10 @@ class Main : public jgui::Frame{
 				for (int i=0; i<3; i++) {
 					g->Rotate(radians[i]);
 
-					g->DrawImage("icons/blue_icon.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+0*box_height, alpha);
-					g->DrawImage("icons/blue_icon.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+1*box_height, image_width, image_height, alpha);
-					g->DrawImage("icons/blue_icon.png", 0, 0, 50, 50, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+2*box_height, alpha);
-					g->DrawImage("icons/blue_icon.png", 0, 0, 50, 50, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+3*box_height, image_width, image_height, alpha);
+					g->DrawImage("icons/square.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+0*box_height, alpha);
+					g->DrawImage("icons/square.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+1*box_height, image_width, image_height, alpha);
+					g->DrawImage("icons/square.png", 0, 0, 50, 50, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+2*box_height, alpha);
+					g->DrawImage("icons/square.png", 0, 0, 50, 50, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+3*box_height, image_width, image_height, alpha);
 				
 					g->DrawImage(&off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+4*box_height, alpha);
 					g->DrawImage(&off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+5*box_height, image_width, image_height, alpha);

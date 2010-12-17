@@ -212,6 +212,8 @@ class Breakout : public jgui::Frame, public jgui::FrameInputListener, public jth
 				count = screendelay; 
 				showtitle = !showtitle;
 			}
+			
+			goff->DrawString("Pressione SPACE para iniciar", (GetWidth()-_font->GetStringWidth("Pressione SPACE para iniciar"))/2, GetHeight()/2);
 		}
 
 		void DrawBricks()

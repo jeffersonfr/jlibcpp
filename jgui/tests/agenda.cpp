@@ -23,6 +23,7 @@
 #include "jkeyboard.h"
 #include "jcalendardialogbox.h"
 #include "jxmlparser.h"
+#include "jsystem.h"
 
 namespace magenda {
 
@@ -462,8 +463,8 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 
 	hour->RequestFocus();
 
-	AddSubtitle("icons/blue_icon.png", "Adicionar");
-	AddSubtitle("icons/vertical_arrows.png", "Selecionar");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Adicionar");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/vertical_arrows.png", "Selecionar");
 
 	Pack();
 
@@ -761,9 +762,9 @@ ViewMessages::ViewMessages(AgendaDB *base):
 	Add(label_hour);
 	Add(message);
 
-	AddSubtitle("icons/blue_icon.png", "Apagar");
-	AddSubtitle("icons/yellow_icon.png", "Editar");
-	AddSubtitle("icons/horizontal_arrows.png", "Listar");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Apagar");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png", "Editar");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/horizontal_arrows.png", "Listar");
 
 	Pack();
 
