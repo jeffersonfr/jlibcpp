@@ -271,8 +271,6 @@ class Graphics : public virtual jcommon::Object{
 		void updateActiveList(int scan, edge_t *active);
 		void Polygon(int n, int coordinates[]);
 		void Fill_polygon(int n, int ppts[]);
-
-		DFBSurfaceBlittingFlags GetBlittingFlags(jblitting_flags_t t);
 #endif
 		
 		void RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
