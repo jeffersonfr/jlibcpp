@@ -1695,14 +1695,6 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 			iheight;
 
 	if (GetImageSize(img, &iwidth, &iheight) != false) {
-		if (sxp < 0 || sxp > iwidth) {
-			return false;
-		}
-
-		if (syp < 0 || syp > iheight) {
-			return false;
-		}
-
 		return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, swp, shp, alpha);
 	}
 
@@ -1711,7 +1703,11 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 
 bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp, int alpha)
 {
-	if (wp <= 0 || hp <= 0) {
+	if (sxp < 0 || syp < 0 || xp < 0 || yp < 0) {
+		return false;
+	}
+
+	if (swp < 0 || shp < 0 || wp < 0 || hp < 0) {
 		return false;
 	}
 
@@ -1802,7 +1798,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 
 bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int alpha)
 {
-	if (img == NULL) {
+	if ((void *)img == NULL) {
 		return false;
 	}
 
@@ -1811,7 +1807,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int alpha)
 
 bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, int alpha)
 {
-	if (img == NULL) {
+	if ((void *)img == NULL) {
 		return false;
 	}
 
@@ -1820,34 +1816,27 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp, in
 
 bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp, int xp, int yp, int alpha)
 {
-	if (sxp < 0 || sxp > img->GetWidth()) {
+	if ((void *)img == NULL) {
 		return false;
 	}
 
-	if (syp < 0 || syp > img->GetHeight()) {
-		return false;
-	}
-
-	int wp = img->GetWidth()-sxp,
-			hp = img->GetHeight()-syp;
-
-	return DrawImage(img, sxp, syp, swp, shp, xp, yp, wp, hp, alpha);
+	return DrawImage(img, sxp, syp, swp, shp, xp, yp, swp, shp, alpha);
 }
 
 bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp, int alpha)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) {
+	if ((void *)surface == NULL) {
 		return false;
 	}
 
-	if (img == NULL) {
+	if ((void *)img == NULL) {
 		return false;
 	}
 
 	Graphics *g = img->GetGraphics();
 
-	if (g == NULL) {
+	if ((void *)g == NULL) {
 		return false;
 	}
 

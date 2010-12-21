@@ -126,13 +126,13 @@ class Main : public jgui::Frame{
 
 					g->DrawImage("icons/square.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+0*box_height, alpha);
 					g->DrawImage("icons/square.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+1*box_height, image_width, image_height, alpha);
-					g->DrawImage("icons/square.png", 0, 0, 64, 64, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+2*box_height, alpha);
+					g->DrawImage("icons/square.png", 32, 32, 64, 64, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+2*box_height, alpha);
 					g->DrawImage("icons/square.png", 0, 0, 64, 64, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+3*box_height, image_width, image_height, alpha);
 				
 					g->DrawImage(&off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+4*box_height, alpha);
 					g->DrawImage(&off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+5*box_height, image_width, image_height, alpha);
-					g->DrawImage(&off, 0, 0, image_width, image_height, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+6*box_height, alpha);
-					g->DrawImage(&off, 0, 0, image_width, image_height, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+7*box_height, image_width, image_height, alpha);
+					g->DrawImage(&off, off.GetWidth()/2, off.GetHeight()/2, off.GetWidth()/2, off.GetHeight()/2, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+6*box_height, alpha);
+					g->DrawImage(&off, 0, 0, off.GetWidth(), off.GetHeight(), (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+7*box_height, image_width, image_height, alpha);
 				}
 
 				g->Translate(-j*translate_x, -j*translate_y);
