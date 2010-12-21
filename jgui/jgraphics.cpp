@@ -1706,8 +1706,8 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 			return false;
 		}
 
-		int wp = SCREEN_TO_SCALE(swp, _screen.width, _scale.width),
-				hp = SCREEN_TO_SCALE(shp, _screen.height, _scale.height);
+		int wp = SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
+				hp = SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
 
 		return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, wp, hp, alpha);
 	}
@@ -1882,17 +1882,41 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 	alpha = (alpha < 0)?0:(alpha > 0xff)?0xff:alpha;
 
 	if (_radians != 0.0) {
-		surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
-		RotateImage(img, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
-		surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
+		OffScreenImage off(wp, hp);
+		
+		Graphics *g = off.GetGraphics();
+
+		g->SetBlittingFlags(_blit_flags);
+		g->SetColor(_color.red, _color.green, _color.blue, alpha);
+		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
+
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		return true;
 	}
-		
+
+	DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
+
+	if (_blit_flags & BF_ALPHACHANNEL) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_ALPHACHANNEL);
+	}
+
+	if (_blit_flags & BF_COLORALPHA) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA);
+	} 
+
+	if (_blit_flags & BF_COLORIZE) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE);
+	}
+
+	if (_blit_flags & BF_XOR) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
+	}
+
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_DST_PREMULTIPLY | DSBLIT_BLEND_ALPHACHANNEL));
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_DST_PREMULTIPLY | flags));
 	surface->StretchBlit(surface, g->surface, &srect, &drect);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_BLEND_ALPHACHANNEL));
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
 #endif
 
@@ -2940,8 +2964,17 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &sptr, &spitch);
 	simg->Lock(simg, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &gptr, &gpitch);
 
+	int old_x = -1,
+			old_y = -1;
+
 	for (j=height-1+2*dh; j>0; j--) {
 		int sy = ((y+j-dh)*scaleh)/precision;
+
+		if (sy == old_y) {
+			continue;
+		}
+
+		old_y = sy;
 
 		jPrime = j - height - dh;
 
@@ -2960,6 +2993,12 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 
 					if ((gx >= 0 && gx < iwmax) && (gy >= 0 && gy < ihmax)) {
 						int offset = ((x+i-dw)*scalew)/precision;
+
+						if (offset == old_x) {
+							continue;
+						}
+
+						old_x = offset;
 
 						if (offset >= 0 && offset < swmax) {
 							uint32_t spixel = *((uint32_t *)((uint8_t *)gptr + gy * gpitch) + gx);

@@ -61,7 +61,7 @@ class GraphicPanel : public jgui::Frame{
 				a1;
 		int size,
 				round = 40,
-				iterations = 2000;
+				iterations = 1000;
 
 		g->SetFont(_font);
 
@@ -186,8 +186,8 @@ class GraphicPanel : public jgui::Frame{
 
 		Clear(g);
 
-		// rectangles [blend]
-		DrawString(g, "FillRectangle [BLEND]");
+		// triangles [blend]
+		DrawString(g, "FillTriangle [BLEND]");
 
 		for (int i=0; i<iterations; i++) {
 			x = rand()%(1920-w-_insets.left-_insets.right);
@@ -335,9 +335,9 @@ class GraphicPanel : public jgui::Frame{
 
 		Clear(g);
 
-		jgui::OffScreenImage off(200, 200);
+		jgui::OffScreenImage off(8*128, 8*128);
 
-		off.GetGraphics()->DrawImage("icons/gnu.png", 0, 0, 200, 200);
+		off.GetGraphics()->DrawImage("icons/goku.png", 0, 0, 8*128, 8*128);
 
 		// Blit [file]
 		DrawString(g, "Blit [file]");
@@ -346,7 +346,7 @@ class GraphicPanel : public jgui::Frame{
 			x = rand()%(1920-w-_insets.left-_insets.right);
 			y = rand()%(1080-h-_insets.top-_insets.bottom);
 
-			g->DrawImage("icons/gnu.png", x+_insets.left, y+_insets.top, w, h);
+			g->DrawImage("icons/goku.png", x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
 		}
@@ -365,8 +365,8 @@ class GraphicPanel : public jgui::Frame{
 			y = rand()%(1080-h-_insets.top-_insets.bottom);
 
 			g->SetColor(color);
-			g->DrawImage(&off, x+_insets.left, y+_insets.top);
-
+			g->DrawImage(&off, x+_insets.left, y+_insets.top, w, h);
+			
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
 		}
 		
@@ -385,7 +385,7 @@ class GraphicPanel : public jgui::Frame{
 			x = (1920-size)/2;
 			y = (1080-size)/2;
 
-			g->DrawImage("icons/gnu.png", x, y, size, size);
+			g->DrawImage("icons/goku.png", x, y, size, size);
 
 			g->Flip(x, y, size, size);
 			
@@ -429,8 +429,8 @@ class GraphicPanel : public jgui::Frame{
 
 		Clear(g);
 
-		// Rotate [offscreen]
-		DrawString(g, "Rotate [offscreen]");
+		// Rotate [file]
+		DrawString(g, "Rotate [file]");
 
 		size = 10;
 		color = 0xffffffff;;
@@ -438,6 +438,43 @@ class GraphicPanel : public jgui::Frame{
 		double angle = 0.1;
 
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
+
+		for (int i=0; i<iterations; i++) {
+			x = (1920-size)/2;
+			y = (1080-size)/2;
+
+			if (fmod(angle, 0.1) == 0) {
+				color = (rand()%0xf0f0f0) | 0xff000000;
+			}
+
+			g->Rotate(angle);
+			g->SetColor(color);
+			g->DrawImage("icons/goku.png", x, y, size, size);
+
+			g->Flip(x, y, size, size);
+
+			size = size + 4;
+
+			if (size > 900) {
+				size = 10;
+			}
+
+			angle = angle + 0.1;
+
+			if (angle > 2*M_PI) {
+				angle = 0.1;
+			}
+		}
+
+		Clear(g);
+
+		// Rotate [offscreen]
+		DrawString(g, "Rotate [offscreen]");
+
+		size = 10;
+		color = 0xffffffff;;
+
+		angle = 0.1;
 
 		for (int i=0; i<iterations; i++) {
 			x = (1920-size)/2;
