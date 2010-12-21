@@ -1671,10 +1671,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 			iheight;
 
 	if (GetImageSize(img, &iwidth, &iheight) != false) {
-		int wp = SCALE_TO_SCREEN(iwidth, _screen.width, _scale.width); 
-		int hp = SCALE_TO_SCREEN(iheight, _screen.height, _scale.height);
-
-		return DrawImage(img, 0, 0, iwidth, iheight, xp, yp, wp, hp, alpha);
+		return DrawImage(img, 0, 0, iwidth, iheight, xp, yp, iwidth, iheight, alpha);
 	}
 
 	return false;
@@ -1706,10 +1703,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 			return false;
 		}
 
-		int wp = SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
-				hp = SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
-
-		return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, wp, hp, alpha);
+		return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, swp, shp, alpha);
 	}
 
 	return false;
