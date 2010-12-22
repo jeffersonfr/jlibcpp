@@ -127,7 +127,6 @@ void SocketOption::SetReceiveTimeout(int time_)
 void SocketOption::SetPassCredentials(bool b_)
 {
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_PASSCRED, &b_, sizeof(bool)) < 0) {
 		throw SocketOptionException("Set pass credentials error");
@@ -151,7 +150,6 @@ void SocketOption::GetPeerCredentials(void *v_)
 void SocketOption::BindToDevice(std::string dev_)
 {
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_BINDTODEVICE, dev_.c_str(), dev_.size()+1) < 0) {
 		throw SocketOptionException("Bind to device error");
@@ -320,7 +318,6 @@ void SocketOption::SetLinger(bool on, int linger_)
 void SocketOption::SetPriority(int p_)
 {
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_PRIORITY, &p_, sizeof(int)) < 0) {
 		throw SocketOptionException("Set priority error");
@@ -382,7 +379,6 @@ void SocketOption::SetTimeToLive(int t_)
 void SocketOption::SetHeaderInclude(bool b_)
 {
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 	if (setsockopt(_fd, IPPROTO_IP, IP_HDRINCL, &b_, sizeof(bool)) < 0) {
 		throw SocketOptionException("Set header include error");
@@ -393,8 +389,6 @@ void SocketOption::SetHeaderInclude(bool b_)
 int64_t SocketOption::GetTimeStamp()
 {
 #ifdef _WIN32
-	return 0;
-#elif __CYGWIN32__
 	return 0;
 #else
 	struct timespec t;

@@ -453,11 +453,8 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 #else
 	struct sched_param param;
 
-#if __CYGWIN32__
-	param.sched_priority = tpriority;
-#else
+	// param.sched_priority = tpriority;
 	param.__sched_priority = tpriority;
-#endif
 
 	int result;
 
@@ -523,46 +520,43 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 		throw ThreadException("Unknown exception in get policy !");
 	}
 
-#ifdef __CYGWIN32__
-	switch (param.sched_priority) {
-#else
-		switch (param.__sched_priority) {
-#endif
-			case 0:
-				(*priority) = LOW_PRIORITY;
-				break;
-			case 1:
-			case 2:
-			case 3:
-			case 4:
-			case 5:
-				(*priority) = NORMAL_PRIORITY;
-				break;
-			case 6:
-			case 7:
-			case 8:
-			case 9:
-			case 10:
-				(*priority) = HIGH_PRIORITY;
-				break;
-			default:
-				(*priority) = NORMAL_PRIORITY;
-				break;
-		}
-
-		switch (policy_int) {
-			case SCHED_OTHER:
-				(*policy) = POLICY_OTHER;
-				break;
-			case SCHED_FIFO:
-				(*policy) = POLICY_FIFO;
-				break;
-			case SCHED_RR:
-				(*policy) = POLICY_ROUND_ROBIN;
-				break;
-		}
-#endif
+	// switch (param.sched_priority) {
+	switch (param.__sched_priority) {
+		case 0:
+			(*priority) = LOW_PRIORITY;
+			break;
+		case 1:
+		case 2:
+		case 3:
+		case 4:
+		case 5:
+			(*priority) = NORMAL_PRIORITY;
+			break;
+		case 6:
+		case 7:
+		case 8:
+		case 9:
+		case 10:
+			(*priority) = HIGH_PRIORITY;
+			break;
+		default:
+			(*priority) = NORMAL_PRIORITY;
+			break;
 	}
+
+	switch (policy_int) {
+		case SCHED_OTHER:
+			(*policy) = POLICY_OTHER;
+			break;
+		case SCHED_FIFO:
+			(*policy) = POLICY_FIFO;
+			break;
+		case SCHED_RR:
+			(*policy) = POLICY_ROUND_ROBIN;
+			break;
+	}
+#endif
+}
 
 void Thread::WaitThread(int key)
 {

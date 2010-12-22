@@ -103,27 +103,15 @@ void Process::ForkChild(const char *prog, char **args)
 		close(_poutput[0]);
 		close(_perror[0]);
 
-#ifdef __CYGWIN32__
-		if (dup2(_pinput[0], 0) < 0) {
-#else
 		if (dup2(_pinput[0], fileno(stdin)) < 0) {
-#endif
 			JDEBUG(JINFO, "unable to dup2() stdin\n");
 		}
 	
-#ifdef __CYGWIN32__
-		if (dup2(_poutput[1], 1) < 0) {
-#else
 		if (dup2(_poutput[1], fileno(stdout)) < 0) {
-#endif
 			JDEBUG(JINFO, "unable to dup2() stdout\n");
 		}
 
-#ifdef __CYGWIN32__
-		if (dup2(_perror[1], 2) < 0) {
-#else
 		if (dup2(_perror[1], fileno(stderr)) < 0) {
-#endif
 			JDEBUG(JINFO, "unable to dup2() stderr\n");
 		}
 

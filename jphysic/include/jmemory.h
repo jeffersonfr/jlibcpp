@@ -23,7 +23,6 @@
 #include "jdevice.h"
 
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 #include <sys/sysinfo.h>
 #endif
@@ -39,7 +38,6 @@ class Memory{
 
 	private:
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 		/** \brief */
 		struct sysinfo info;

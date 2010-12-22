@@ -36,7 +36,6 @@ Memory::~Memory()
 void Memory::Builder()
 {
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 	memset(&info, 0, sizeof(info));
 	
@@ -51,8 +50,6 @@ std::string Memory::what()
 	std::ostringstream o;
 
 #ifdef _WIN32
-	return "";
-#elif __CYGWIN32__
 	return "";
 #else
 	o << "Uptime: " << info.uptime << std::endl;

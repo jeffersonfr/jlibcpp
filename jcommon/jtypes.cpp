@@ -53,9 +53,7 @@ int64_t Types::StringToLong(std::string s, int radix)
 		throw OutOfBoundsException("Bounds of radix exception");
 	}
 	
-#ifdef __CYGWIN32__
-	return (int64_t)strtol(s.c_str(), NULL, radix);
-#elif _WIN32
+#ifdef _WIN32
 	return (int64_t)strtol(s.c_str(), NULL, radix);
 #else 
 	return (int64_t)strtoll(s.c_str(), NULL, radix);

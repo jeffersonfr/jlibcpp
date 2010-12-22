@@ -42,11 +42,7 @@ MemoryMap::MemoryMap(std::string filename_, jmemory_flags_t flags_, jmemory_perm
 		f = (jmemory_flags_t)(f | O_CREAT | O_EXCL | O_TRUNC);
 	}
 
-#ifdef __CYGWIN32__
-	_fd = open(filename_.c_str(), t | O_RDWR, (mode_t)0600); 
-#else
 	_fd = open(filename_.c_str(), f | O_RDWR | O_LARGEFILE, (mode_t)0600); 
-#endif
 	
 	if (_fd < 0) {
 		if ((f | MEM_CREAT) != 0) {
@@ -57,7 +53,9 @@ MemoryMap::MemoryMap(std::string filename_, jmemory_flags_t flags_, jmemory_perm
 	}
 	
 	if ((flags_ & MEM_CREAT) != 0) {
-		write(_fd, "", 1);
+		if (write(_fd, "", 1) < 0) {
+			throw MemoryException("Error creating shared memory");
+		}
 	}
 
 	if (fstat(_fd, &_stats) < 0) {

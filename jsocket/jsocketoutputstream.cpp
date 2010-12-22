@@ -154,8 +154,6 @@ int64_t SocketOutputStream::Flush()
 
 #ifdef _WIN32
 		flags = 0;
-#elif _CYGWIN
-		flags = 0;
 #else
 		flags = MSG_NOSIGNAL;
 #endif

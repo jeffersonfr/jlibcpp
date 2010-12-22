@@ -126,7 +126,7 @@ class Main : public jgui::Frame{
 
 					g->DrawImage("icons/square.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+0*box_height, alpha);
 					g->DrawImage("icons/square.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+1*box_height, image_width, image_height, alpha);
-					g->DrawImage("icons/square.png", 32, 32, 64, 64, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+2*box_height, alpha);
+					g->DrawImage("icons/square.png", 32, 32, 32, 32, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+2*box_height, alpha);
 					g->DrawImage("icons/square.png", 0, 0, 64, 64, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+3*box_height, image_width, image_height, alpha);
 				
 					g->DrawImage(&off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+4*box_height, alpha);

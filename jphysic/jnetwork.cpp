@@ -40,7 +40,6 @@ Network::~Network()
 void Network::Builder()
 {
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 	struct jnetdevice_info_t *info;
 	struct ifreq req;
@@ -225,8 +224,6 @@ void Network::Builder()
 std::string Network::what()
 {
 #ifdef _WIN32
-	return "";
-#elif __CYGWIN32__
 	return "";
 #else
 	std::ostringstream o, flags;

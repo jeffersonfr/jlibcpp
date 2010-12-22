@@ -177,21 +177,11 @@ int MulticastSocket::Receive(char *data_, int size_, bool block_)
 	}
 
 	int n,
-			flags,
+			flags = 0,
 			length = sizeof(_sock_r);
 
-	if (block_ == true) {
+	if (block_ == false) {
 #ifdef _WIN32
-		flags = 0;
-#elif _CYGWIN
-		flags = 0;
-#else
-		flags = 0;
-#endif
-	} else {
-#ifdef _WIN32
-		flags = 0;
-#elif _CYGWIN
 		flags = 0;
 #else
 		flags = MSG_DONTWAIT;
@@ -261,15 +251,11 @@ int MulticastSocket::Send(const char *data, int size, bool block_)
 	if (block_ == true) {
 #ifdef _WIN32
 		flags = 0;
-#elif _CYGWIN
-		flags = 0;
 #else
 		flags = MSG_NOSIGNAL;
 #endif
 	} else {
 #ifdef _WIN32
-		flags = 0;
-#elif _CYGWIN
 		flags = 0;
 #else
 		flags = MSG_NOSIGNAL | MSG_DONTWAIT;

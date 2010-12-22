@@ -286,7 +286,6 @@ File::File(std::string prefix, std::string sufix, bool is_directory):
 	}
 
 	delete tmp;
-#elif __CYGWIN32__
 #else
 	char *tmp = new char[prefix.size()+6+1];
 

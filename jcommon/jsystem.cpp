@@ -41,7 +41,6 @@ namespace jcommon {
 bool _keyboard;
 
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 struct termios g_old_kbd_mode;
 int console = -1;
@@ -61,7 +60,6 @@ static void cooked()
 System::~System()
 {
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 	cooked();
 #endif
@@ -71,8 +69,6 @@ void System::Beep(int freq, int delay)
 {
 #ifdef _WIN32
 	Beep(freq, delay);
-#elif __CYGWIN32__
-	printf("\a");
 #else
 	if (freq < 0) {
 		freq = DEFAULT_FREQ;
@@ -84,11 +80,13 @@ void System::Beep(int freq, int delay)
 	
 	if ((console = open("/dev/console", O_WRONLY)) == -1) {
 		printf("\a");
+
 		return;
 	}
 
 	if (ioctl(console, KIOCSOUND, (int)(CLOCK_TICK_RATE/freq)) < 0) {
 		printf("\a");
+
 		return;
 	}
 
@@ -239,8 +237,6 @@ void System::UnsetEnviromentVariable(std::string key_)
 {
 #ifdef _WIN32
 	SetEnvironmentVariable(key_.c_str(), "");
-#elif __CYGWIN32__
-	// TODO:: unsetenv(key_.c_str());
 #else
 	unsetenv(key_.c_str());
 #endif
@@ -250,8 +246,6 @@ int System::SetEnviromentVariable(std::string key_, std::string value_, bool ove
 {
 #ifdef _WIN32
 	SetEnvironmentVariable(key_.c_str(), value_.c_str());
-#elif __CYGWIN32__
-	return 0; // TODO:: setenv(key_.c_str(), "");
 #else
 	return setenv(key_.c_str(), value_.c_str(), overwrite_);
 #endif
@@ -291,7 +285,6 @@ std::string System::GetLastErrorMessage()
 void System::EnableKeyboardBuffer(bool b)
 {
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 	struct termios new_kbd_mode;
  	static char init;
@@ -325,8 +318,6 @@ void System::EnableEcho(bool b)
 {
 #ifdef _WIN32
 	// TODO::
-#elif __CYGWIN32__
-	// TODO::
 #else
 	struct termios new_kbd_mode;
  	static char init;
@@ -355,8 +346,6 @@ void System::EnableEcho(bool b)
 int System::KbHit(void)
 {
 #ifdef _WIN32
-	return 0;
-#elif __CYGWIN32__
 	return 0;
 #else
 	struct timeval timeout;

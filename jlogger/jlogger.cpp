@@ -83,11 +83,7 @@ void Logger::SendLogger(jrecord_type_t type_, const char *fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-#ifdef __CYGWIN32__
-	vsprintf(tmp, fmt, va); tmp[255] = 0;
-#else
 	vsnprintf(tmp, 256, fmt, va); tmp[255] = 0;
-#endif
 	va_end(va);
 
 	LogRecord *record = NULL;

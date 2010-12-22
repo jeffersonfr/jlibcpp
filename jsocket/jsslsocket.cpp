@@ -592,7 +592,6 @@ void SSLSocket::CreateSocket()
 
 #ifdef _WIN32
 			int n = ::send(_fd, data_, size_, 0);
-#elif _CYGWIN
 #else
 			int n = SSL_write(ssl, data_, size_);
 #endif
@@ -657,15 +656,11 @@ void SSLSocket::CreateSocket()
 				if (block_ == true) {
 #ifdef _WIN32
 					flags = 0;
-#elif _CYGWIN
-					flags = 0;
 #else
 					flags = 0;
 #endif
 				} else {
 #ifdef _WIN32
-					flags = 0;
-#elif _CYGWIN
 					flags = 0;
 #else
 					flags = MSG_DONTWAIT;
@@ -674,7 +669,6 @@ void SSLSocket::CreateSocket()
 
 #ifdef _WIN32
 				int n = ::recv(_fd, data_, size_, flags);
-#elif _CYGWIN
 #else
 				if (ssl == NULL) {
 					return -1;

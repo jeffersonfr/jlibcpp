@@ -400,15 +400,11 @@ int DatagramSocket::Receive(char *data_, int size_, bool block_)
 
 #ifdef _WIN32
 		flags = 0;
-#elif _CYGWIN
-		flags = 0;
 #else
 		flags = 0;
 #endif
 	} else {
 #ifdef _WIN32
-		flags = 0;
-#elif _CYGWIN
 		flags = 0;
 #else
 		flags = MSG_DONTWAIT;
@@ -485,20 +481,10 @@ int DatagramSocket::Send(const char *data_, int size_, bool block_)
 	}
 	
 	int n,
-	   	flags;
+	   	flags = 0;
 
-	if (block_ == true) {
+	if (block_ == false) {
 #ifdef _WIN32
-		flags = 0;
-#elif _CYGWIN
-		flags = 0;
-#else
-		flags = MSG_NOSIGNAL;
-#endif
-	} else {
-#ifdef _WIN32
-		flags = 0;
-#elif _CYGWIN
 		flags = 0;
 #else
 		flags = MSG_NOSIGNAL | MSG_DONTWAIT;
@@ -506,11 +492,7 @@ int DatagramSocket::Send(const char *data_, int size_, bool block_)
 	}
 
 	if (_stream == true) {	
-#ifdef _WIN32
 		n = ::send(_fd, data_, size_, flags);
-#else
-		n = ::send(_fd, data_, size_, flags);
-#endif
 	} else {
 		n = ::sendto(_fd, data_, size_, flags, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 	}

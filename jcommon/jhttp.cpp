@@ -557,17 +557,12 @@ std::string HTTP::GetMIME()
 
 #ifdef _WIN32
 	// TODO:: rindex(r.arquivo,'.');
-#elif __CYGWIN32__
-	// TODO:: cygwin
 #else
 	ext = rindex(r.arquivo,'.');
 #endif
 
 #ifdef _WIN32
 	// TODO:: rindex(r.arquivo,'.');
-#elif __CYGWIN32__
-	// TODO::
-	ext = NULL;
 #else
 	if(ext == NULL) 
 		return "application/octet-stream";

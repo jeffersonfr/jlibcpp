@@ -145,7 +145,6 @@ void SharedSemaphore::SetTimeout(int millis_, jsem_op_t *op)
 	}
 
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else	
 	struct sembuf *sops;
 	jsem_op_t *p = op;

@@ -185,7 +185,6 @@ int Schedule::GetMinimumPriority()
 void Schedule::SetScheduleAffinity(unsigned long mask)
 {
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else
 	int r = sched_setaffinity(_pid, 1, (cpu_set_t *)&mask);
 
@@ -204,8 +203,6 @@ void Schedule::SetScheduleAffinity(unsigned long mask)
 unsigned long Schedule::GetScheduleAffinity()
 {
 #ifdef _WIN32
-	return 0;
-#elif __CYGWIN32__
 	return 0;
 #else	
 	unsigned long mask;
@@ -265,7 +262,6 @@ void Schedule::DecreaseNice()
 void Schedule::SetPriority(int n, jschedule_type_t type_)
 {
 #ifdef _WIN32
-#elif __CYGWIN32__
 #else	
 	if (n < GetMinimumPriority() || n > GetMaximumPriority()) {
 		throw ProcessException("Range of priority error");
@@ -289,8 +285,6 @@ void Schedule::SetPriority(int n, jschedule_type_t type_)
 int Schedule::GetPriority(jschedule_type_t type_)
 {
 #ifdef _WIN32
-	return 0;
-#elif __CYGWIN32__
 	return 0;
 #else	
 	int type = 0;

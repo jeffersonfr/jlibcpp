@@ -29,10 +29,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#elif __CYGWIN32__
-#include <netdb.h>
-#include <cygwin/socket.h>
-#include <arpa/inet.h>
 #else
 #include <netdb.h>
 #include <arpa/inet.h>

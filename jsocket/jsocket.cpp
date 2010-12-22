@@ -412,15 +412,11 @@ void Socket::CreateSocket()
 			if (block_ == true) {
 #ifdef _WIN32
 				flags = 0;
-#elif _CYGWIN
-				flags = 0;
 #else
 				flags = MSG_NOSIGNAL;
 #endif
 			} else {
 #ifdef _WIN32
-				flags = 0;
-#elif _CYGWIN
 				flags = 0;
 #else
 				flags = MSG_NOSIGNAL | MSG_DONTWAIT;
@@ -484,20 +480,10 @@ void Socket::CreateSocket()
 					throw SocketException("Connection is closed");
 				}
 
-				int flags;
+				int flags = 0;
 
-				if (block_ == true) {
+				if (block_ == false) {
 #ifdef _WIN32
-					flags = 0;
-#elif _CYGWIN
-					flags = 0;
-#else
-					flags = 0;
-#endif
-				} else {
-#ifdef _WIN32
-					flags = 0;
-#elif _CYGWIN
 					flags = 0;
 #else
 					flags = MSG_DONTWAIT;

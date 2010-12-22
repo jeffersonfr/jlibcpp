@@ -423,7 +423,7 @@ install: uninstall
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jresource && install -o nobody -m 644 jresource/include/* $(PREFIX)/include/$(MODULE)/jresource
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsecurity && install -o nobody -m 644 jsecurity/include/* $(PREFIX)/include/$(MODULE)/jsecurity
 	@echo "Installing $(EXE) in $(PREFIX)/lib/lib$(MODULE).so $(OK)"
-	@install -o nobody -m 644 $(LIBDIR)/$(EXE) $(PREFIX)/lib && ln -s $(PREFIX)/lib/$(EXE) $(PREFIX)/lib/lib$(MODULE).so
+	@install -d -o nobody -m 755 $(PREFIX)/lib && install -o nobody -m 644 $(LIBDIR)/$(EXE) $(PREFIX)/lib && ln -s $(PREFIX)/lib/$(EXE) $(PREFIX)/lib/lib$(MODULE).so
 	@echo "Installing $(MODULE).pc in $(PREFIX)/lib/pkgconfig $(OK)"
 	@mkdir -p $(PREFIX)/lib/pkgconfig && \
 		sed -e 's/@module@/$(MODULE)/g' jlibcpp.pc | \

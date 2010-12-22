@@ -40,11 +40,9 @@ struct jpage_msg_t {
 	char msg[MAX_PACKET_SIZE];
 };
 
-#ifdef __CYGWIN32__
 struct msgbuf {
 	int mtype;
 };
-#endif
 
 union msg_t {
 #ifdef _WIN32

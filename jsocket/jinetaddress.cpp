@@ -66,11 +66,7 @@ std::vector<InetAddress *> InetAddress::GetAllByName(std::string host_name_)
 	if (inet_aton(host_name_.c_str(), &ip) == 0) {
 		aux = gethostbyname(host_name_.c_str());
 	} else {
-#ifdef __CYGWIN32__
-		aux = gethostbyaddr((const char *)&ip, sizeof(ip), AF_INET);
-#else
 		aux = gethostbyaddr(&ip, sizeof(ip), AF_INET);
-#endif
 	}
 
 	if (aux == NULL) {
