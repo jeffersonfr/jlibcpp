@@ -1671,7 +1671,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 			iheight;
 
 	if (GetImageSize(img, &iwidth, &iheight) != false) {
-		return DrawImage(img, 0, 0, iwidth, iheight, xp, yp, iwidth, iheight, alpha);
+		return Graphics::DrawImage(img, 0, 0, iwidth, iheight, xp, yp, iwidth, iheight, alpha);
 	}
 
 	return false;
@@ -1683,7 +1683,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 			iheight;
 
 	if (GetImageSize(img, &iwidth, &iheight) != false) {
-		return DrawImage(img, 0, 0, iwidth, iheight, xp, yp, wp, hp, alpha);
+		return Graphics::DrawImage(img, 0, 0, iwidth, iheight, xp, yp, wp, hp, alpha);
 	}
 
 	return false;
@@ -1716,27 +1716,14 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		return false;
 	}
 
-	int sx = sxp, // SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
-			sy = syp, // SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
+	int sx = SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
+			sy = SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
 			sw = swp, // SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
 			sh = shp; // SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
 			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
 			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
 			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-
-	DFBRectangle srect,
-							 drect;
-
-	srect.x = sx;
-	srect.y = sy;
-	srect.w = sw;
-	srect.h = sh;
-
-	drect.x = x;
-	drect.y = y;
-	drect.w = w;
-	drect.h = h;
 
 	alpha = (alpha < 0)?0:(alpha > 0xff)?0xff:alpha;
 
@@ -1746,7 +1733,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 
 		g->SetBlittingFlags(_blit_flags);
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
-		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
+		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp, 0xff);
 		
 		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
@@ -1770,6 +1757,13 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		return false;
 	}
 
+	// INFO:: soh para garantir que as imagens seraum as mesmas
+	int dw = desc.width,
+			dh = desc.height;
+
+	desc.width = (w*dw)/sw;
+	desc.height = (h*dh)/sh;
+
 	if (engine->CreateSurface(engine, &desc, &imgSurface) != DFB_OK) {
 		imgProvider->Release(imgProvider);
 
@@ -1777,6 +1771,10 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	}
 
 	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+	imgSurface->SetDrawingFlags(imgSurface, (DFBSurfaceDrawingFlags)(DSDRAW_NOFX));
+	imgSurface->SetPorterDuff(imgSurface, DSPD_NONE);
+
+	imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
 	
 	if (imgProvider->RenderTo(imgProvider, imgSurface, NULL) != DFB_OK) {
 		imgProvider->Release(imgProvider);
@@ -1785,8 +1783,41 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		return false;
 	}
 
+	DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
+
+	if (_blit_flags & BF_ALPHACHANNEL) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_ALPHACHANNEL);
+	}
+
+	if (_blit_flags & BF_COLORALPHA) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA);
+	} 
+
+	if (_blit_flags & BF_COLORIZE) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE);
+	}
+
+	if (_blit_flags & BF_XOR) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
+	}
+
+	DFBRectangle srect,
+							 drect;
+
+	srect.x = sx;
+	srect.y = sy;
+	srect.w = w;
+	srect.h = h;
+
+	drect.x = x;
+	drect.y = y;
+	drect.w = w;
+	drect.h = h;
+
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_DST_PREMULTIPLY | flags));
 	surface->StretchBlit(surface, imgSurface, &srect, &drect);
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
 
 	imgProvider->Release(imgProvider);
@@ -1871,7 +1902,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 
 		g->SetBlittingFlags(_blit_flags);
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
-		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
+		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp, 0xff);
 
 		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
@@ -2984,8 +3015,13 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 						old_x = offset;
 
 						if (offset >= 0 && offset < swmax) {
-							uint32_t spixel = *((uint32_t *)((uint8_t *)gptr + gy * gpitch) + gx);
+							uint32_t spixel = *((uint32_t *)((uint8_t *)gptr + gy * gpitch) + gx),
+											 salpha = (spixel >> 0x18) + 1;
 							uint32_t dpixel = *(sdst+offset);
+
+							spixel = ((((spixel & 0x00ff00ff) * salpha) >> 8) & 0x00ff00ff) |
+								       ((((spixel & 0x0000ff00) * salpha) >> 8) & 0x0000ff00) |
+								       ((((spixel & 0xff000000))));
 
 							int32_t gr = (spixel >> 0x10) & 0xff,
 											gg = (spixel >> 0x08) & 0xff,
@@ -3004,20 +3040,15 @@ void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, in
 								continue;
 							}
 
-							sr+=8;
-							sg+=8;
-							sb+=8;
-							sa+=8;
-							gr+=8;
-							gg+=8;
-							gb+=8;
-							ga+=8;
-
-							// INFO:: premultiplied conversion
-							gr = (gr * ga) >> 8;
-							gg = (gg * ga) >> 8;
-							gb = (gb * ga) >> 8;
-							ga = 255;
+							// INFO:: needed
+							sr += 8;
+							sg += 8;
+							sb += 8;
+							sa += 8;
+							gr += 8;
+							gg += 8;
+							gb += 8;
+							ga = 0xff;
 							
 							if (_blit_flags & BF_COLORALPHA) {
 								sa = alpha;
