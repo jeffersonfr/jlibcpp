@@ -31,7 +31,7 @@ Marquee::Marquee(std::string text, int x, int y, int width, int height):
 
 	_text = text;
 	_index = 0;
-	_delta = _horizontal_gap;
+	_step = 10;
 	_position = _horizontal_gap;
 	_running = true;
 
@@ -70,6 +70,13 @@ void Marquee::SetVisible(bool b)
 	}
 }
 
+void Marquee::SetStep(int i)
+{
+	jthread::AutoLock lock(&_component_mutex);
+
+	_step = i;
+}
+
 void Marquee::SetInterval(int i)
 {
 	jthread::AutoLock lock(&_component_mutex);
@@ -82,62 +89,6 @@ void Marquee::SetType(jmarquee_type_t type)
 	jthread::AutoLock lock(&_component_mutex);
 
 	_type = type;
-}
-
-void Marquee::Run()
-{
-	int x = _horizontal_gap+_border_size,
-			// y = _vertical_gap+_border_size,
-			w = _size.width-2*x;
-			// h = _size.height-2*y;
-	int string_width = 0; 
-
-	while (_running == true) {
-		Repaint();
-
-		if (_running == false) {
-			return;
-		}
-		
-		if (_type == BOUNCE_TEXT) {
-			if (_font != NULL) {
-				string_width = _font->GetStringWidth(_text.c_str());
-			}
-
-			if (w < string_width) {
-			} else {
-				if (_position <= _horizontal_gap) {
-					_delta = -x;
-					_position = 0;
-				} else if ((_position+string_width) >= w) {
-					_delta = x;
-					_position = w-string_width;
-				}
-
-				_position -= _delta;
-			}
-		} else {
-			_delta = x;
-
-			if (_position <= _delta) {
-				if (_index >= (int)_text.size()) {
-					_index = 0;
-					_position = w-_delta;
-				} else {
-					_position = 0;
-					_index++;
-				}
-			} else {
-				_position -= _delta;
-
-				if (_position < _delta) {
-					_position = 0;
-				}
-			}
-		}
-
-		jthread::Thread::MSleep(_interval);
-	}
 }
 
 void Marquee::Release()
@@ -190,7 +141,7 @@ void Marquee::Paint(Graphics *g)
 				pw = w-gapx,
 				ph = h-gapy;
 
-		std::string text = (char *)(_text.c_str()+_index);
+		std::string text = _text;
 
 		if (_type == BOUNCE_TEXT && _size.width >= _font->GetStringWidth(_text.c_str())) {
 			text = (char *)(_text.c_str());
@@ -206,10 +157,86 @@ void Marquee::Paint(Graphics *g)
 		pw = (pw < 0)?0:pw;
 		ph = (ph < 0)?0:ph;
 
-		g->DrawString(text, px, py);
+		jregion_t clip = g->GetClip();
+
+		int cx = px,
+				cy = py,
+				cw = pw,
+				ch = ph;
+
+		if (cx > clip.width) {
+			cx = clip.width;
+		}
+
+		if (cy > clip.height) {
+			cy = clip.height;
+		}
+
+		if (cw > (clip.width-cx)) {
+			cw = clip.width-cx;
+		}
+
+		if (ch > (clip.height-cy)) {
+			ch = clip.height-cy;
+		}
+
+		g->SetClip(cx, cy, cw, ch);
+
+		g->DrawString(text, px-_index, py);
+
+		g->SetClip(clip.x, clip.y, clip.width, clip.height);
 	}
 
 	PaintEdges(g);
+}
+
+void Marquee::Run()
+{
+	int x = _horizontal_gap+_border_size,
+			w = _size.width-2*x;
+
+	if (_font == NULL) {
+		return;
+	}
+
+	while (_running == true) {
+		int string_width = _font->GetStringWidth(_text.c_str());
+
+		if (_type == BOUNCE_TEXT) {
+			if (w < string_width) {
+			} else {
+				if (_position <= _horizontal_gap) {
+					_step = -_step;
+					_position = 0;
+				} else if ((_position+string_width) >= w) {
+					_step = -_step;
+					_position = w-string_width;
+				}
+
+				_position -= _step;
+			}
+		} else {
+			if (_position <= x) {
+				if (_index >= string_width) {
+					_index = 0;
+					_position = w-_step;
+				} else {
+					_position = 0;
+					_index = _index+_step;
+				}
+			} else {
+				_position -= _step;
+
+				if (_position < x) {
+					_position = 0;
+				}
+			}
+		}
+
+		Repaint();
+
+		jthread::Thread::MSleep(_interval);
+	}
 }
 
 }

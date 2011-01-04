@@ -68,8 +68,10 @@ class ListBox : public jgui::ItemComponent{
 		jlist_selection_type_t _selection;
 		int _item_size,
 				_top_index,
-				_selected_index;
-		bool _input_locked,
+				_selected_index,
+				_stone_size,
+				_scroll_width;
+		bool _pressed,
 				 _centered_interaction;
 
 	private:
@@ -98,6 +100,18 @@ class ListBox : public jgui::ItemComponent{
 		 */
 		virtual ~ListBox();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetStoneSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetStoneSize(int size);
+		
 		/**
 		 * \brief
 		 *
@@ -211,6 +225,12 @@ class ListBox : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
+		virtual jsize_t GetPreferredSize();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
 		
 		/**
@@ -219,12 +239,6 @@ class ListBox : public jgui::ItemComponent{
 		 */
 		virtual bool ProcessEvent(MouseEvent *event);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetPreferredSize();
-
 		/**
 		 * \brief
 		 *

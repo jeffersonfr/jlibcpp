@@ -670,13 +670,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string s, int x, int y);
+		virtual void DrawString(std::string text, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
+		virtual void DrawString(std::string text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
 
 		/**
 		 * \brief

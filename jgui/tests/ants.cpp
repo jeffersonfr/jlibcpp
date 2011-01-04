@@ -18,11 +18,10 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jframe.h"
+#include "jsystem.h"
 
 #define ENABLE_GUI	1
 #define DRAW_ANTS		0
-
-#define FONT "./fonts/font.ttf"
 
 struct path_t {
 	int x;
@@ -57,8 +56,7 @@ class Main : public jgui::Frame{
 		
 		static const int TRY_BETTER = 5;
 
-		jgui::Font *fdefault,
-			*fweights;
+		jgui::Font *fweights;
 		path_t *board,
 			   *solution[MAX_COLS],
 			   *try_solutions;
@@ -82,10 +80,7 @@ class Main : public jgui::Frame{
 			_insets.right = 10;
 			_insets.top = 60;
 
-			fdefault = new jgui::Font(FONT, 0, DEFAULT_FONT_SIZE);
-			fweights = new jgui::Font(FONT, 0, 12);
-
-			SetFont(fdefault);
+			fweights = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 12);
 #endif
 
 			board = new path_t[MAX_COLS*MAX_ROWS];
@@ -157,7 +152,6 @@ class Main : public jgui::Frame{
 
 		virtual ~Main()
 		{
-			delete fdefault;
 			delete fweights;
 		}
 
@@ -276,7 +270,7 @@ class Main : public jgui::Frame{
 
 			sprintf(tmp, "Current Solution [%d]", best);
 
-			g->SetFont(fdefault);
+			g->SetFont(jgui::Font::GetDefaultFont());
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
 			g->DrawString(tmp, _insets.left, GetHeight()-50);
 			

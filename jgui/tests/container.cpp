@@ -116,9 +116,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			slider = new jgui::Slider(500, 170, 700);
 			scroll = new jgui::ScrollBar(500, 230, 700);
 
-			progress->SetPosition(20.0);
-			slider->SetPosition(20.0);
-			scroll->SetPosition(20.0);
+			progress->SetValue(20.0);
+			slider->SetValue(20.0);
+			scroll->SetValue(20.0);
 
 			progress->Start();
 		}
@@ -419,8 +419,8 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		jthread::AutoLock lock(&teste_mutex);
 
 		if (event->GetSource() == button1) {
-			progress->SetPosition(progress->GetPosition()+10);
-			slider->SetPosition(slider->GetPosition()+10);
+			progress->SetValue(progress->GetValue()+10);
+			slider->SetValue(slider->GetValue()+10);
 
 			/*
 			jgui::Theme *t = new jgui::Theme();
@@ -431,8 +431,8 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			jgui::ThemeManager::GetInstance()->SetTheme(t);
 			*/
 		} else if (event->GetSource() == button2) {
-			progress->SetPosition(progress->GetPosition()-10);
-			slider->SetPosition(slider->GetPosition()-10);
+			progress->SetValue(progress->GetValue()-10);
+			slider->SetValue(slider->GetValue()-10);
 		}
 	}
 

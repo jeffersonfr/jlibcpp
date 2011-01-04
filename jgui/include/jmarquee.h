@@ -58,9 +58,9 @@ class Marquee : public Component, public jthread::Thread{
 		std::string _text;
 		jmarquee_type_t _type;
 		int _position,
-				_delta,
 				_interval,
-				_index;
+				_index,
+				_step;
 		bool _running;
 
 	public:
@@ -92,6 +92,12 @@ class Marquee : public Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
+		virtual void SetStep(int i);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetInterval(int i);
 		
 		/**
@@ -110,6 +116,12 @@ class Marquee : public Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
+		virtual void Release();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 		
 		/**
@@ -117,12 +129,6 @@ class Marquee : public Component, public jthread::Thread{
 		 *
 		 */
 		virtual void Run();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Release();
 
 };
 

@@ -348,6 +348,7 @@ OBJS_jgui = \
 		jselectevent.o\
 		jselectlistener.o\
 		jslider.o\
+		jslidercomponent.o\
 		jspin.o\
 		jtextarea.o\
 		jtextcomponent.o\

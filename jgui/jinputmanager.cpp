@@ -829,7 +829,7 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 	} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE || event.type == DIET_AXISMOTION) {
 		int mouse_z = -1,
 				count = 1;
-		jmouse_button_t button = JBUTTON_UNKNOWN;
+		jmouse_button_t button = JMOUSE_UNKNOWN;
 		jmouse_event_t type = JMOUSE_CLICKED_EVENT;
 
 		if (event.type == DIET_AXISMOTION) {
@@ -841,7 +841,7 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 					type = JMOUSE_MOVED_EVENT;
 					_mouse_y = event.axisabs;
 				} else if (event.axis == DIAI_Z) {
-					button = JBUTTON_WHEEL;
+					button = JMOUSE_WHEEL;
 					type = JMOUSE_WHEEL_EVENT;
 					mouse_z = event.axisabs;
 				}
@@ -853,7 +853,7 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 					type = JMOUSE_MOVED_EVENT;
 					_mouse_y += event.axisrel;
 				} else if (event.axis == DIAI_Z) {
-					button = JBUTTON_WHEEL;
+					button = JMOUSE_WHEEL;
 					type = JMOUSE_WHEEL_EVENT;
 					mouse_z += event.axisrel;
 				}
@@ -870,11 +870,11 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 			}
 
 			if (event.button == DIBI_LEFT) {
-				button = JBUTTON_BUTTON1;
+				button = JMOUSE_BUTTON1;
 			} else if (event.button == DIBI_RIGHT) {
-				button = JBUTTON_BUTTON2;
+				button = JMOUSE_BUTTON2;
 			} else if (event.button == DIBI_MIDDLE) {
-				button = JBUTTON_BUTTON3;
+				button = JMOUSE_BUTTON3;
 			}
 		}
 
@@ -979,7 +979,7 @@ void InputManager::ProcessWindowEvent(DFBWindowEvent event)
 			} else if (event.type == DWET_LEAVE) {
 				GFXHandler::GetInstance()->SetCursor(ARROW_CURSOR);
 			} else if (event.type == DWET_BUTTONUP || event.type == DWET_BUTTONDOWN || event.type == DWET_MOTION || event.type == DWET_WHEEL) {
-				jmouse_button_t button = JBUTTON_UNKNOWN;
+				jmouse_button_t button = JMOUSE_UNKNOWN;
 				jmouse_event_t type = JMOUSE_UNKNOWN_EVENT;
 
 				if (event.type == DWET_MOTION) {
@@ -988,28 +988,28 @@ void InputManager::ProcessWindowEvent(DFBWindowEvent event)
 					_mouse_y = event.cy;
 				} else if (event.type == DWET_WHEEL) {
 					type = JMOUSE_WHEEL_EVENT;
-					button = JBUTTON_WHEEL;
+					button = JMOUSE_WHEEL;
 					mouse_z = event.step;
 				} else if (event.type == DWET_BUTTONUP) {
 					type = JMOUSE_RELEASED_EVENT;
 
 					if (event.button == DIBI_LEFT) {
-						button = JBUTTON_BUTTON1;
+						button = JMOUSE_BUTTON1;
 					} else if (event.button == DIBI_RIGHT) {
-						button = JBUTTON_BUTTON2;
+						button = JMOUSE_BUTTON2;
 					} else if (event.button == DIBI_MIDDLE) {
-						button = JBUTTON_BUTTON3;
+						button = JMOUSE_BUTTON3;
 					}
 				} else if (event.type == DWET_BUTTONDOWN) {
 					type = JMOUSE_PRESSED_EVENT;
 				}
 
 				if ((event.buttons & DIBM_LEFT) != 0) {
-					button = (jmouse_button_t)(button | JBUTTON_BUTTON1);
+					button = (jmouse_button_t)(button | JMOUSE_BUTTON1);
 				} else if ((event.button & DIBM_RIGHT) != 0) {
-					button = (jmouse_button_t)(button | JBUTTON_BUTTON2);
+					button = (jmouse_button_t)(button | JMOUSE_BUTTON2);
 				} else if ((event.button & DIBI_MIDDLE) != 0) {
-					button = (jmouse_button_t)(button | JBUTTON_BUTTON3);
+					button = (jmouse_button_t)(button | JMOUSE_BUTTON3);
 				}
 
 				_mouse_x = CLAMP(_mouse_x, 0, _screen_width-1);

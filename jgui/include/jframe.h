@@ -127,8 +127,7 @@ class Frame : public KeyListener, public MouseListener, public Window {
 				_old_y,
 				_old_width,
 				_old_height;
-		bool _input_locked,
-				 _input_enabled,
+		bool _input_enabled,
 				 _background_visible,
 				 _move_enabled,
 				 _release_enabled,

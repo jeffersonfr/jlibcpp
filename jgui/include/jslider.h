@@ -20,9 +20,7 @@
 #ifndef	J_SLIDER_H
 #define J_SLIDER_H
 
-#include "jcomponent.h"
-#include "jscrollbar.h"
-#include "jadjustmentlistener.h"
+#include "jslidercomponent.h"
 
 #include <string>
 
@@ -35,24 +33,12 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class Slider : public jgui::Component{
+class Slider : public jgui::SliderComponent{
 
 	private:
-		std::vector<AdjustmentListener *> _adjust_listeners;
-		double _position,
-			   _minimum_tick,
-			   _maximum_tick,
-			   _old_position;
-		int _index,
-			_delta,
-			_fixe_delta,
-			_count_paint,
-			_stone_size;
-		bool _label_visible,
-			 _indeterminate,
-			 _running,
-			 _inverted;
-		jscroll_orientation_t _type;
+		int _stone_size;
+		bool _pressed,
+				 _inverted;
 
 	public:
 		/**
@@ -71,25 +57,13 @@ class Slider : public jgui::Component{
 		 * \brief
 		 *
 		 */
+		virtual int GetStoneSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetStoneSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetOrientation(jscroll_orientation_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetPosition();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPosition(double i);
 		
 		/**
 		 * \brief
@@ -97,30 +71,6 @@ class Slider : public jgui::Component{
 		 */
 		virtual void SetInverted(bool b);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetMinorTickSpacing();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetMajorTickSpacing();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMinorTickSpacing(double i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMajorTickSpacing(double i);
-
 		/**
 		 * \brief
 		 *
@@ -139,29 +89,6 @@ class Slider : public jgui::Component{
 		 */
 		virtual void Paint(Graphics *g);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterAdjustmentListener(AdjustmentListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveAdjustmentListener(AdjustmentListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchAdjustmentEvent(AdjustmentEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::vector<AdjustmentListener *> & GetAdjustmentListeners();
 };
 
 }

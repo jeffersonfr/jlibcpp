@@ -250,8 +250,6 @@ void Graphics::SetPorterDuffFlags(jporter_duff_flags_t t)
 	_porter_duff_flags = t;
 
 #ifdef DIRECTFB_UI
-	surface->SetPorterDuff(surface, DSPD_SRC_OVER);
-
 	if (surface != NULL) {
 		if (_porter_duff_flags == PDF_NONE) {
 			surface->SetPorterDuff(surface, DSPD_NONE);
@@ -290,17 +288,15 @@ void Graphics::SetDrawingFlags(jdrawing_flags_t t)
 
 #ifdef DIRECTFB_UI
 	if (surface != NULL) {
-		DFBSurfaceDrawingFlags flags = (DFBSurfaceDrawingFlags)DSDRAW_SRC_PREMULTIPLY;
+		DFBSurfaceDrawingFlags flags = (DFBSurfaceDrawingFlags)DSDRAW_NOFX;
 
-		if (_draw_flags == DF_NOFX) {
-			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_NOFX);
-		} else if (_draw_flags == DF_BLEND) {
+		if (_draw_flags == DF_BLEND) {
 			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_BLEND);
 		} else if (_draw_flags == DF_XOR) {
 			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_XOR);
 		}
 			
-		surface->SetDrawingFlags(surface, flags);
+		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | flags));
 	}
 #endif
 }
@@ -1614,18 +1610,32 @@ void Graphics::FillGradientRectangle(int xp, int yp, int wp, int hp, jcolor_t sc
 #endif
 }
 
-void Graphics::DrawString(std::string s, int xp, int yp)
+void Graphics::DrawString(std::string text, int xp, int yp)
 {
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
+	if (_font != NULL) {
+		OffScreenImage off(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
+
+		off.GetGraphics()->SetFont(_font);
+		off.GetGraphics()->SetColor(_color);
+
+		IDirectFBSurface *imgSurface = (IDirectFBSurface *)(off.GetGraphics()->GetNativeSurface());
+
+		imgSurface->DrawString(imgSurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+
+		DrawImage(&off, xp, yp);
+	}
+	
+	/*
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
-	// surface->DrawString(surface, s.c_str(), -1, x, y+_font->GetHeight(), (DFBSurfaceTextFlags)(DSTF_LEFT));
-	surface->DrawString(surface, s.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+	surface->DrawString(surface, text.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+	*/
 #endif
 }
 
@@ -1671,7 +1681,10 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 			iheight;
 
 	if (GetImageSize(img, &iwidth, &iheight) != false) {
-		return Graphics::DrawImage(img, 0, 0, iwidth, iheight, xp, yp, iwidth, iheight, alpha);
+		int wp = SCREEN_TO_SCALE((iwidth), _screen.width, _scale.width),
+				hp = SCREEN_TO_SCALE((iheight), _screen.height, _scale.height);
+
+		return Graphics::DrawImage(img, xp, yp, wp, hp, alpha);
 	}
 
 	return false;
@@ -1679,6 +1692,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int alpha)
 
 bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int alpha)
 {
+	/*
 	int iwidth,
 			iheight;
 
@@ -1687,18 +1701,215 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 	}
 
 	return false;
+	*/
+
+	if (xp < 0 || yp < 0) {
+		return false;
+	}
+
+	if (wp < 0 || hp < 0) {
+		return false;
+	}
+
+#ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return false;
+	}
+
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
+			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
+			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
+			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
+
+	alpha = (alpha < 0)?0:(alpha > 0xff)?0xff:alpha;
+
+	if (_radians != 0.0) {
+		OffScreenImage off(wp, hp);
+		Graphics *g = off.GetGraphics();
+
+		g->SetBlittingFlags(_blit_flags);
+		g->SetColor(_color.red, _color.green, _color.blue, alpha);
+		g->DrawImage(img, 0, 0, wp, hp, 0xff);
+		
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
+
+		return true;
+	}
+
+	IDirectFBSurface *imgSurface = NULL;
+	IDirectFBImageProvider *imgProvider = NULL;
+	DFBSurfaceDescription desc;
+
+	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = (IDirectFB *)dfb->GetGraphicEngine();
+
+	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
+		return false;
+	}
+
+	if (imgProvider->GetSurfaceDescription (imgProvider, &desc) != DFB_OK) {
+		imgProvider->Release(imgProvider);
+
+		return false;
+	}
+
+	desc.width = w;
+	desc.height = h;
+
+	if (engine->CreateSurface(engine, &desc, &imgSurface) != DFB_OK) {
+		imgProvider->Release(imgProvider);
+
+		return false;
+	}
+
+	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+	imgSurface->SetDrawingFlags(imgSurface, (DFBSurfaceDrawingFlags)(DSDRAW_NOFX));
+	imgSurface->SetPorterDuff(imgSurface, DSPD_NONE);
+
+	imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
+	
+	if (imgProvider->RenderTo(imgProvider, imgSurface, NULL) != DFB_OK) {
+		imgProvider->Release(imgProvider);
+		imgSurface->Release(imgSurface);
+
+		return false;
+	}
+
+	DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
+
+	if (_blit_flags & BF_ALPHACHANNEL) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_ALPHACHANNEL);
+	}
+
+	if (_blit_flags & BF_COLORALPHA) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA);
+	} 
+
+	if (_blit_flags & BF_COLORIZE) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE);
+	}
+
+	if (_blit_flags & BF_XOR) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
+	}
+
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(flags));
+	surface->Blit(surface, imgSurface, NULL, x, y);
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
+
+	imgProvider->Release(imgProvider);
+	imgSurface->Release(imgSurface);
+#endif
+
+	return true;
 }
 
 bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int alpha)
 {
-	int iwidth,
-			iheight;
-
-	if (GetImageSize(img, &iwidth, &iheight) != false) {
-		return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, swp, shp, alpha);
+	if (sxp < 0 || syp < 0 || swp < 0 || shp < 0) {
+		return false;
 	}
 
-	return false;
+#ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return false;
+	}
+
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
+			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+
+	alpha = (alpha < 0)?0:(alpha > 0xff)?0xff:alpha;
+
+	if (_radians != 0.0) {
+		int wp = SCREEN_TO_SCALE((swp), _screen.width, _scale.width),
+				hp = SCREEN_TO_SCALE((shp), _screen.height, _scale.height);
+
+		OffScreenImage off(wp, hp);
+		Graphics *g = off.GetGraphics();
+
+		g->SetBlittingFlags(_blit_flags);
+		g->SetColor(_color.red, _color.green, _color.blue, alpha);
+		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, 0xff);
+		
+		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
+
+		return true;
+	}
+
+	IDirectFBSurface *imgSurface = NULL;
+	IDirectFBImageProvider *imgProvider = NULL;
+	DFBSurfaceDescription desc;
+
+	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = (IDirectFB *)dfb->GetGraphicEngine();
+
+	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
+		return false;
+	}
+
+	if (imgProvider->GetSurfaceDescription (imgProvider, &desc) != DFB_OK) {
+		imgProvider->Release(imgProvider);
+
+		return false;
+	}
+
+	if (engine->CreateSurface(engine, &desc, &imgSurface) != DFB_OK) {
+		imgProvider->Release(imgProvider);
+
+		return false;
+	}
+
+	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_NOFX));
+	imgSurface->SetDrawingFlags(imgSurface, (DFBSurfaceDrawingFlags)(DSDRAW_NOFX));
+	imgSurface->SetPorterDuff(imgSurface, DSPD_NONE);
+
+	imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
+	
+	if (imgProvider->RenderTo(imgProvider, imgSurface, NULL) != DFB_OK) {
+		imgProvider->Release(imgProvider);
+		imgSurface->Release(imgSurface);
+
+		return false;
+	}
+	
+	DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
+
+	if (_blit_flags & BF_ALPHACHANNEL) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_ALPHACHANNEL);
+	}
+
+	if (_blit_flags & BF_COLORALPHA) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA);
+	} 
+
+	if (_blit_flags & BF_COLORIZE) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE);
+	}
+
+	if (_blit_flags & BF_XOR) {
+		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
+	}
+
+	DFBRectangle srect;
+
+	srect.x = sxp;
+	srect.y = syp;
+	srect.w = swp;
+	srect.h = shp;
+
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(flags));
+	surface->Blit(surface, imgSurface, &srect, x, y);
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
+	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
+
+	imgProvider->Release(imgProvider);
+	imgSurface->Release(imgSurface);
+#endif
+
+	return true;
 }
 
 bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp, int alpha)
@@ -1716,8 +1927,8 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		return false;
 	}
 
-	int sx = SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
-			sy = SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
+	int sx = sxp, // SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
+			sy = syp, // SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
 			sw = swp, // SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
 			sh = shp; // SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
@@ -1804,8 +2015,9 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	DFBRectangle srect,
 							 drect;
 
-	srect.x = sx;
-	srect.y = sy;
+	printf("::: %d, %d, %d, %d, %d, %d\n", sx, sy, sw, sh, desc.width, desc.height);
+	srect.x = (sx*desc.width)/dw;
+	srect.y = (sy*desc.height)/dh;
 	srect.w = w;
 	srect.h = h;
 
@@ -1815,7 +2027,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	drect.h = h;
 
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_DST_PREMULTIPLY | flags));
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(flags));
 	surface->StretchBlit(surface, imgSurface, &srect, &drect);
 	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
@@ -1928,7 +2140,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 	}
 
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_DST_PREMULTIPLY | flags));
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(flags));
 	surface->StretchBlit(surface, g->surface, &srect, &drect);
 	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
@@ -2490,7 +2702,7 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 
 void Graphics::Reset()
 {
-	_font = NULL;
+	_font = Font::GetDefaultFont();
 
 	_color.red = 0x00;
 	_color.green = 0x00;

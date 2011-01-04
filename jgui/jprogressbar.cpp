@@ -32,7 +32,7 @@ ProgressBar::ProgressBar(int x, int y, int width, int height, jprogress_type_t t
 	_running = false;
 	_type = type;
 	_indeterminate = true;
-	_position = 0.0;
+	_value = 0.0;
 	_fixe_delta = 10;
 	_delta = _fixe_delta;
 }
@@ -43,9 +43,9 @@ ProgressBar::~ProgressBar()
 	WaitThread();
 }
 
-double ProgressBar::GetPosition()
+double ProgressBar::GetValue()
 {
-	return _position;
+	return _value;
 }
 
 void ProgressBar::SetIndeterminate(bool b)
@@ -65,19 +65,19 @@ void ProgressBar::SetIndeterminate(bool b)
 	}
 }
 
-void ProgressBar::SetPosition(double i)
+void ProgressBar::SetValue(double i)
 {
 	{
 		jthread::AutoLock lock(&_component_mutex);
 
-		_position = i;
+		_value = i;
 
-		if (_position < 0.0) {
-			_position = 0.0;
+		if (_value < 0.0) {
+			_value = 0.0;
 		}
 
-		if (_position > 100.0) {
-			_position = 100.0;
+		if (_value > 100.0) {
+			_value = 100.0;
 		}
 	}
 
@@ -173,7 +173,7 @@ void ProgressBar::Paint(Graphics *g)
 
 	if (_indeterminate == false) {
 		if (_type == LEFT_RIGHT_DIRECTION) {
-			double d = (_position*w)/100.0;
+			double d = (_value*w)/100.0;
 
 			if (d > w) {
 				d = w;
@@ -185,14 +185,14 @@ void ProgressBar::Paint(Graphics *g)
 			char t[255];
 
 #ifdef _WIN32
-			sprintf_s(t, 255-1, "%.1f %%", _position);
+			sprintf_s(t, 255-1, "d %%", _value);
 #else
-			snprintf(t, 255-1, "%.1f %%", _position);
+			snprintf(t, 255-1, "%d %%", _value);
 #endif
 
 			text = (char *)t;
 		} else if (_type == BOTTOM_UP_DIRECTION) {
-			double d = (_position*h)/100.0;
+			double d = (_value*h)/100.0;
 
 			if (d > h) {
 				d = h;
@@ -204,9 +204,9 @@ void ProgressBar::Paint(Graphics *g)
 			char t[255];
 
 #ifdef _WIN32
-			sprintf_s(t, 255-1, "%.1f %%", _position);
+			sprintf_s(t, 255-1, "%d %%", _value);
 #else
-			snprintf(t, 255-1, "%.1f %%", _position);
+			snprintf(t, 255-1, "%d %%", _value);
 #endif
 
 			text = (char *)t;

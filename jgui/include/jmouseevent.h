@@ -52,11 +52,11 @@ enum jmouse_event_t {
  *
  */
 enum jmouse_button_t {
-	JBUTTON_UNKNOWN = 0x0,
-	JBUTTON_BUTTON1 = 0x1,
-	JBUTTON_BUTTON2 = 0x2,
-	JBUTTON_BUTTON3 = 0x4,
-	JBUTTON_WHEEL = 0x08
+	JMOUSE_UNKNOWN = 0x0,
+	JMOUSE_BUTTON1 = 0x1,
+	JMOUSE_BUTTON2 = 0x2,
+	JMOUSE_BUTTON3 = 0x4,
+	JMOUSE_WHEEL = 0x08
 };
 
 /**

@@ -20,8 +20,7 @@
 #ifndef	J_SCROLLBAR_H
 #define J_SCROLLBAR_H
 
-#include "jcomponent.h"
-#include "jadjustmentlistener.h"
+#include "jslidercomponent.h"
 
 #include <string>
 
@@ -32,32 +31,17 @@ namespace jgui {
 /**
  * \brief
  *
- */
-enum jscroll_orientation_t {
-	LEFT_RIGHT_SCROLL,
-	BOTTOM_UP_SCROLL
-};
-
-/**
- * \brief
- *
  * \author Jeff Ferr
  */
-class ScrollBar : public jgui::Component{
+class ScrollBar : public jgui::SliderComponent{
 
 	private:
 		std::vector<AdjustmentListener *> _adjust_listeners;
-		double _position,
-					 _minimum_tick,
-					 _maximum_tick,
-					 _old_position;
 		int _index,
 				_stone_size,
 				_count_paint;
-		bool _label_visible,
-				 _indeterminate,
-				 _running;
-		jscroll_orientation_t _type;
+		bool _pressed,
+				 _label_visible;
 		
 	public:
 		/**
@@ -76,91 +60,13 @@ class ScrollBar : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void SetOrientation(jscroll_orientation_t type);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jscroll_orientation_t GetOrientation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetStoneSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual int GetStoneSize();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual double GetPosition();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetMinorTickSpacing();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetMajorTickSpacing();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPosition(double i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMinorTickSpacing(double i);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMajorTickSpacing(double i);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterAdjustmentListener(AdjustmentListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveAdjustmentListener(AdjustmentListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchAdjustmentEvent(AdjustmentEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::vector<AdjustmentListener *> & GetAdjustmentListeners();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Paint(Graphics *g);
+		virtual void SetStoneSize(int size);
 		
 		/**
 		 * \brief
@@ -174,6 +80,12 @@ class ScrollBar : public jgui::Component{
 		 */
 		virtual bool ProcessEvent(MouseEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Paint(Graphics *g);
+		
 };
 
 }

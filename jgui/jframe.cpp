@@ -39,7 +39,6 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_release_enabled = true;
 	_is_maximized = false;
 	_title = title;
-	_input_locked = false;
 	_is_visible = false;
 	_undecorated = false;
 	_last_key_code = JKEY_UNKNOWN;
@@ -388,14 +387,6 @@ void Frame::KeyPressed(KeyEvent *event)
 {
 	// JDEBUG(JINFO, "antes\n");
 	
-	/*
-	if (_input_locked == true) {
-		return;
-	}
-	*/
-
-	_input_locked = true;
-
 	if (_enabled == false) {
 		return;
 	}
@@ -404,15 +395,12 @@ void Frame::KeyPressed(KeyEvent *event)
 		jthread::AutoLock lock(&_input_mutex);
 
 		if (_is_visible == false) {
-			_input_locked = false;
-
 			return;
 		}
 
 		_last_key_code = event->GetSymbol();
 
 		if ((event->GetSymbol() == JKEY_ESCAPE || event->GetSymbol() == JKEY_EXIT) && _release_enabled == true) {
-			_input_locked = false;
 			_last_key_code = JKEY_EXIT;
 
 			Release();
@@ -427,32 +415,26 @@ void Frame::KeyPressed(KeyEvent *event)
 		}
 	}
 
+	jthread::AutoLock lock(&_input_mutex);
+	
 	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
 		(*i)->InputChanged(event);
 	}
-
-	_input_locked = false;
-	
-	// JDEBUG(JINFO, "depois\n");
 }
 
 void Frame::MousePressed(MouseEvent *event)
 {
-	if (_input_locked == true || _enabled == false) {
+	if (_enabled == false) {
 		return;
 	}
 	
-	_input_locked = true;
-
-	jthread::AutoLock lock(&_input_mutex);
-
 	if (_mouse_state != 0) {
 		SetCursor(_default_cursor);
 
 		_mouse_state = 0;
 	}
 
-	if (event->GetButton() == JBUTTON_BUTTON1) {
+	if (event->GetButton() == JMOUSE_BUTTON1) {
 		int s = _insets.top-30;
 
 		if ((event->GetY() > _location.y && event->GetY() < (_location.y+_insets.top))) {
@@ -511,86 +493,97 @@ void Frame::MousePressed(MouseEvent *event)
 				_relative_mouse_h = _size.height;
 			}
 		}
-	
-		int dx,
-				dy;
-
-		Component *c = GetTargetComponent(this, event->GetX()-_location.x, event->GetY()-_location.y, &dx, &dy);
-
-		if (c != this) {
-			MouseEvent *e = new MouseEvent(event->GetSource(), event->GetType(), event->GetButton(), event->GetClickCount(), dx, dy);
-
-			c->ProcessEvent(e);
-
-			delete e;
-		}
 	}
 	
+	int dx,
+			dy;
+
+	Component *c = GetTargetComponent(this, event->GetX()-_location.x, event->GetY()-_location.y, &dx, &dy);
+
+	if (c != this) {
+		MouseEvent *e = new MouseEvent(event->GetSource(), event->GetType(), event->GetButton(), event->GetClickCount(), dx, dy);
+
+		c->ProcessEvent(e);
+
+		delete e;
+	}
+
+	jthread::AutoLock lock(&_input_mutex);
+
 	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
 		(*i)->InputChanged(event);
 	}
-	
-	_input_locked = false;
 }
 
 void Frame::MouseReleased(MouseEvent *event)
 {
-	if (_input_locked == true || _enabled == false) {
+	if (_enabled == false) {
 		return;
 	}
 	
-	_input_locked = true;
+	if (_mouse_state != 0) {
+		if (event->GetButton() == JMOUSE_BUTTON1) {
+			SetCursor(_default_cursor);
+
+			_relative_mouse_x = 0;
+			_relative_mouse_y = 0;
+			
+			_mouse_state = 0;
+		}
+	}
+	
+	int dx,
+			dy;
+
+	Component *c = GetTargetComponent(this, event->GetX()-_location.x, event->GetY()-_location.y, &dx, &dy);
+
+	if (c != this) {
+		MouseEvent *e = new MouseEvent(event->GetSource(), event->GetType(), event->GetButton(), event->GetClickCount(), dx, dy);
+
+		c->ProcessEvent(e);
+
+		delete e;
+	}
 
 	jthread::AutoLock lock(&_input_mutex);
-
-	if (_mouse_state == 0) {
-		_input_locked = false;
-
-		return;
-	}
-
-	if (event->GetButton() == JBUTTON_BUTTON1) {
-		SetCursor(_default_cursor);
-
-		_mouse_state = 0;
-		_relative_mouse_x = 0;
-		_relative_mouse_y = 0;
-	}
 	
 	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
 		(*i)->InputChanged(event);
 	}
-	
-	_input_locked = false;
 }
 
 void Frame::MouseClicked(MouseEvent *event)
 {
-	if (_input_locked == true || _enabled == false) {
+	if (_enabled == false) {
 		return;
 	}
 	
-	_input_locked = true;
+	int dx,
+			dy;
+
+	Component *c = GetTargetComponent(this, event->GetX()-_location.x, event->GetY()-_location.y, &dx, &dy);
+
+	if (c != this) {
+		MouseEvent *e = new MouseEvent(event->GetSource(), event->GetType(), event->GetButton(), event->GetClickCount(), dx, dy);
+
+		c->ProcessEvent(e);
+
+		delete e;
+	}
 
 	jthread::AutoLock lock(&_input_mutex);
 	
 	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
 		(*i)->InputChanged(event);
 	}
-	
-	_input_locked = false;
 }
 
 void Frame::MouseMoved(MouseEvent *event)
 {
-	if (_input_locked == true || _enabled == false) {
+	if (_enabled == false) {
 		return;
 	}
 	
-	_input_locked = true;
-
-	jthread::AutoLock lock(&_input_mutex);
-
 	if (_mouse_state == 1 && _move_enabled == true) {
 		Move(event->GetX()-GetX()-_relative_mouse_x, event->GetY()-GetY()-_relative_mouse_y);
 	} else if (_mouse_state == 2 && _resize_enabled == true) {
@@ -601,28 +594,50 @@ void Frame::MouseMoved(MouseEvent *event)
 		SetSize(_relative_mouse_w, _relative_mouse_h+event->GetY()-GetY()-_relative_mouse_y);
 	}
 	
-	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		(*i)->InputChanged(event);
-	}
-	
-	_input_locked = false;
-}
+	int dx,
+			dy;
 
-void Frame::MouseWheel(MouseEvent *event)
-{
-	if (_input_locked == true || _enabled == false) {
-		return;
+	Component *c = GetTargetComponent(this, event->GetX()-_location.x, event->GetY()-_location.y, &dx, &dy);
+
+	if (c != this) {
+		MouseEvent *e = new MouseEvent(event->GetSource(), event->GetType(), event->GetButton(), event->GetClickCount(), dx, dy);
+
+		c->ProcessEvent(e);
+
+		delete e;
 	}
-	
-	_input_locked = true;
 
 	jthread::AutoLock lock(&_input_mutex);
 	
 	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
 		(*i)->InputChanged(event);
 	}
+}
+
+void Frame::MouseWheel(MouseEvent *event)
+{
+	if (_enabled == false) {
+		return;
+	}
 	
-	_input_locked = false;
+	int dx,
+			dy;
+
+	Component *c = GetTargetComponent(this, event->GetX()-_location.x, event->GetY()-_location.y, &dx, &dy);
+
+	if (c != this) {
+		MouseEvent *e = new MouseEvent(event->GetSource(), event->GetType(), event->GetButton(), event->GetClickCount(), dx, dy);
+
+		c->ProcessEvent(e);
+
+		delete e;
+	}
+
+	jthread::AutoLock lock(&_input_mutex);
+	
+	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
+		(*i)->InputChanged(event);
+	}
 }
 
 void Frame::Release()
@@ -630,7 +645,7 @@ void Frame::Release()
 	// WARNNING:: agora o frame estah sendo removido do WindowManager no metodo Release()
 	WindowManager::GetInstance()->Remove(this);
 
-	_input_locked = false;
+	_enabled = false;
 
 	InputManager::GetInstance()->RemoveKeyListener(this);
 	InputManager::GetInstance()->RemoveMouseListener(this);

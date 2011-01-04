@@ -24,42 +24,19 @@
 namespace jgui {
 
 ScrollBar::ScrollBar(int x, int y, int width, int height):
-   	Component(x, y, width, height)
+	SliderComponent(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::ScrollBar");
 
+	_pressed = false;
 	_stone_size = 40;
 	_label_visible = true;
-	_running = false;
-	_position = 0.0;
-	_old_position = 0.0;
-	_count_paint = 0;
-	_minimum_tick = 1;
-	_maximum_tick = 10;
-	_type = LEFT_RIGHT_SCROLL;
-	// _type = BOTTOM_UP_SCROLL;
 	
 	SetFocusable(true);
 }
 
 ScrollBar::~ScrollBar()
 {
-}
-
-void ScrollBar::SetOrientation(jscroll_orientation_t type)
-{
-	if (_type == type) {
-		return;
-	}
-
-	_type = type;
-
-	Repaint(true);
-}
-
-jscroll_orientation_t ScrollBar::GetOrientation()
-{
-	return _type;
 }
 
 void ScrollBar::SetStoneSize(int size)
@@ -88,160 +65,12 @@ void ScrollBar::SetStoneSize(int size)
 		}
 	}
 
-	if (_stone_size < 1) {
-		_stone_size = 1;
-	}
-
 	Repaint();
 }
 
 int ScrollBar::GetStoneSize()
 {
 	return _stone_size;
-}
-
-double ScrollBar::GetPosition()
-{
-	return _position;
-}
-
-void ScrollBar::SetPosition(double i)
-{
-	{
-		jthread::AutoLock lock(&_component_mutex);
-
-		_old_position = _position;
-		_position = i;
-
-		if (_position < 0.0) {
-			_position = 0.0;
-		}
-
-		if (_position > 100.0) {
-			_position = 100.0;
-		}
-
-		jadjustment_type_t t = UNIT_INCREMENT;
-		int diff = (int)(_position-_old_position);
-
-		if (diff > _minimum_tick) {
-			t = BLOCK_INCREMENT;
-		} else if (diff < -_minimum_tick) {
-			t = BLOCK_DECREMENT;
-		} else if (diff > 0 && diff <= _minimum_tick) {
-			t = UNIT_INCREMENT;
-		} else if (diff < 0 && diff >= -_minimum_tick) {
-			t = UNIT_DECREMENT;
-		}
-
-		DispatchAdjustmentEvent(new AdjustmentEvent(this, t, _position));
-	}
-
-	Repaint();
-}
-
-double ScrollBar::GetMinorTickSpacing()
-{
-	return _minimum_tick;
-}
-
-double ScrollBar::GetMajorTickSpacing()
-{
-	return _maximum_tick;
-}
-
-void ScrollBar::SetMinorTickSpacing(double i)
-{
-	_minimum_tick = i;
-
-	if (_minimum_tick < 0.0) {
-		_minimum_tick = 0.0;
-	}
-
-	if (_minimum_tick > 100.0) {
-		_minimum_tick = 100.0;
-	}
-}
-
-void ScrollBar::SetMajorTickSpacing(double i)
-{
-	_maximum_tick = i;
-
-	if (_maximum_tick < 0.0) {
-		_maximum_tick = 0.0;
-	}
-
-	if (_maximum_tick > 100.0) {
-		_maximum_tick = 100.0;
-	}
-}
-
-bool ScrollBar::ProcessEvent(MouseEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false) {
-		return false;
-	}
-
-	bool catched = false;
-
-	if (event->GetType() == JMOUSE_PRESSED_EVENT) {
-		catched = true;
-
-		int x1 = event->GetX(),
-			y1 = event->GetY(),
-			dx = 2,
-			dy = 2;
-
-		RequestFocus();
-
-		int x = _vertical_gap-_border_size,
-				y = _horizontal_gap-_border_size,
-				w = _size.width-2*x,
-				h = _size.height-2*y,
-				arrow_size;
-
-		if (_type == LEFT_RIGHT_SCROLL) {
-			arrow_size = h/2;
-		} else {
-			arrow_size = w/2;
-		}
-
-		if (_type == LEFT_RIGHT_SCROLL) {
-			if (y1 > _location.y && y1 < (_location.y+_size.height)) {
-				double d = (_position*(_size.width-_stone_size-2*arrow_size-20))/100.0;
-
-				if (x1 > (_location.x+dx) && x1 < (_location.x+arrow_size+dx)) {
-					SetPosition(_position-_minimum_tick);
-				} else if (x1 > (_location.x+_size.width-arrow_size-dx) && x1 < (_location.x+_size.width-dx)) {
-					SetPosition(_position+_minimum_tick);
-				} else if (x1 > (_location.x+arrow_size+dx) && x1 < (_location.x+arrow_size+dx+(int)d)) {
-					SetPosition(_position-_maximum_tick);
-				} else if (x1 > (_location.x+arrow_size+dx+(int)d+_stone_size) && x1 < (_location.x+_size.width-arrow_size)) {
-					SetPosition(_position+_maximum_tick);
-				}
-			}
-		} else if (_type == BOTTOM_UP_SCROLL) {
-			if (x1 > _location.x && x1 < (_location.x+_size.width)) {
-				double d = (_position*(_size.height-_stone_size-2*arrow_size-20))/100.0;
-
-				if (y1 > (_location.y+dy) && y1 < (_location.y+arrow_size+dy)) {
-					SetPosition(_position-_minimum_tick);
-				} else if (y1 > (_location.y+_size.height-arrow_size-dy) && y1 < (_location.y+_size.height-dy)) {
-					SetPosition(_position+_minimum_tick);
-				} else if (y1 > (_location.y+arrow_size+dy) && y1 < (_location.y+arrow_size+dy+(int)d)) {
-					SetPosition(_position-_maximum_tick);
-				} else if (y1 > (_location.y+arrow_size+dy+(int)d+_stone_size) && y1 < (_location.y+_size.height-arrow_size)) {
-					SetPosition(_position+_maximum_tick);
-				}
-			}
-		}
-	}
-
-	return catched;
 }
 
 bool ScrollBar::ProcessEvent(KeyEvent *event)
@@ -260,40 +89,123 @@ bool ScrollBar::ProcessEvent(KeyEvent *event)
 
 	if (_type == LEFT_RIGHT_SCROLL) {
 		if (action == JKEY_CURSOR_LEFT) {
-			SetPosition(_position-_minimum_tick);
+			SetValue(_value-_minimum_tick);
 
 			catched = true;
 		} else if (action == JKEY_CURSOR_RIGHT) {
-			SetPosition(_position+_minimum_tick);
+			SetValue(_value+_minimum_tick);
 
 			catched = true;
 		} else if (action == JKEY_PAGE_DOWN) {
-			SetPosition(_position-_maximum_tick);
+			SetValue(_value-_maximum_tick);
 
 			catched = true;
 		} else if (action == JKEY_PAGE_UP) {
-			SetPosition(_position+_maximum_tick);
+			SetValue(_value+_maximum_tick);
 
 			catched = true;
 		}
 	} else if (_type == BOTTOM_UP_SCROLL) {
 		if (action == JKEY_CURSOR_UP) {
-			SetPosition(_position-_minimum_tick);
+			SetValue(_value-_minimum_tick);
 
 			catched = true;
 		} else if (action == JKEY_CURSOR_DOWN) {
-			SetPosition(_position+_minimum_tick);
+			SetValue(_value+_minimum_tick);
 
 			catched = true;
 		} else if (action == JKEY_PAGE_DOWN) {
-			SetPosition(_position-_maximum_tick);
+			SetValue(_value-_maximum_tick);
 
 			catched = true;
 		} else if (action == JKEY_PAGE_UP) {
-			SetPosition(_position+_maximum_tick);
+			SetValue(_value+_maximum_tick);
 
 			catched = true;
 		}
+	}
+
+	return catched;
+}
+
+bool ScrollBar::ProcessEvent(MouseEvent *event)
+{
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (_enabled == false) {
+		return false;
+	}
+
+	int arrow_size,
+			x1 = event->GetX(),
+			y1 = event->GetY(),
+			dx = _vertical_gap-_border_size,
+			dy = _horizontal_gap-_border_size,
+			dw = _size.width-2*dx-_stone_size,
+			dh = _size.height-2*dy-_stone_size;
+
+	bool catched = false;
+
+	if (event->GetType() == JMOUSE_PRESSED_EVENT && event->GetButton() == JMOUSE_BUTTON1) {
+		catched = true;
+
+		RequestFocus();
+
+		if (_type == LEFT_RIGHT_SCROLL) {
+			arrow_size = dh/2;
+		} else {
+			arrow_size = dw/2;
+		}
+
+		if (_type == LEFT_RIGHT_SCROLL) {
+			if (y1 > _location.y && y1 < (_location.y+_size.height)) {
+				int d = (int)((_value*(dw-2*arrow_size))/(GetMaximum()-GetMinimum()));
+
+				_pressed = false;
+
+				if (x1 > (_location.x+dx) && x1 < (_location.x+arrow_size+dx)) {
+					SetValue(_value-_minimum_tick);
+				} else if (x1 > (_location.x+_size.width-arrow_size-dx) && x1 < (_location.x+_size.width-dx)) {
+					SetValue(_value+_minimum_tick);
+				} else if (x1 > (_location.x+arrow_size+dx) && x1 < (_location.x+arrow_size+dx+d)) {
+					SetValue(_value-_maximum_tick);
+				} else if (x1 > (_location.x+arrow_size+dx+d+_stone_size) && x1 < (_location.x+_size.width-arrow_size)) {
+					SetValue(_value+_maximum_tick);
+				} else if (x1 > (_location.x+arrow_size+dx+d) && x1 < (_location.x+arrow_size+dx+d+_stone_size)) {
+					_pressed = true;
+				}
+			}
+		} else if (_type == BOTTOM_UP_SCROLL) {
+			if (x1 > _location.x && x1 < (_location.x+_size.width)) {
+				int d = (int)((_value*(dh-2*arrow_size))/(GetMaximum()-GetMinimum()));
+
+				_pressed = false;
+
+				if (y1 > (_location.y+dy) && y1 < (_location.y+arrow_size+dy)) {
+					SetValue(_value-_minimum_tick);
+				} else if (y1 > (_location.y+_size.height-arrow_size-dy) && y1 < (_location.y+_size.height-dy)) {
+					SetValue(_value+_minimum_tick);
+				} else if (y1 > (_location.y+arrow_size+dy) && y1 < (_location.y+arrow_size+dy+d)) {
+					SetValue(_value-_maximum_tick);
+				} else if (y1 > (_location.y+arrow_size+dy+d+_stone_size) && y1 < (_location.y+_size.height-arrow_size)) {
+					SetValue(_value+_maximum_tick);
+				} else if (y1 > (_location.y+arrow_size+dy+d) && y1 < (_location.y+arrow_size+dy+d+_stone_size)) {
+					_pressed = true;
+				}
+			}
+		}
+	} else if (event->GetType() == JMOUSE_MOVED_EVENT) {
+		if (_pressed == true) {
+			if (_type == LEFT_RIGHT_SCROLL) {
+				SetValue((((GetMaximum()-GetMinimum())*(x1-_stone_size/2-GetX()))/dw));
+			} else if (_type == BOTTOM_UP_SCROLL) {
+				SetValue((((GetMaximum()-GetMinimum())*(y1-_stone_size/2-GetY()))/dh));
+			}
+		}
+	} else {
+		_pressed = false;
 	}
 
 	return catched;
@@ -304,10 +216,6 @@ void ScrollBar::Paint(Graphics *g)
 	// JDEBUG(JINFO, "paint\n");
 
 	Component::Paint(g);
-
-	if (_count_paint == 0) {
-		_count_paint = 1;
-	}
 
 	jcolor_t color;
 
@@ -325,7 +233,7 @@ void ScrollBar::Paint(Graphics *g)
 		int arrow_size = h/2,
 				limit = w-_stone_size-2*arrow_size;
 
-		double d = (_position*limit)/100.0;
+		double d = (_value*limit)/(GetMaximum()-GetMinimum());
 
 		if (d > limit) {
 			d = limit;
@@ -340,7 +248,7 @@ void ScrollBar::Paint(Graphics *g)
 		int arrow_size = w/2,
 				limit = h-_stone_size-2*arrow_size;
 
-		double d = (_position*limit)/100.0;
+		double d = (_value*limit)/(GetMaximum()-GetMinimum());
 
 		if (d > limit) {
 			d = limit;
@@ -354,56 +262,6 @@ void ScrollBar::Paint(Graphics *g)
 	}
 
 	PaintEdges(g);
-}
-
-void ScrollBar::RegisterAdjustmentListener(AdjustmentListener *listener)
-{
-	if (listener == NULL) {
-		return;
-	}
-
-	if (std::find(_adjust_listeners.begin(), _adjust_listeners.end(), listener) == _adjust_listeners.end()) {
-		_adjust_listeners.push_back(listener);
-	}
-}
-
-void ScrollBar::RemoveAdjustmentListener(AdjustmentListener *listener)
-{
-	if (listener == NULL) {
-		return;
-	}
-
-	std::vector<AdjustmentListener *>::iterator i = std::find(_adjust_listeners.begin(), _adjust_listeners.end(), listener);
-
-	if (i != _adjust_listeners.end()) {
-		_adjust_listeners.erase(i);
-	}
-}
-
-void ScrollBar::DispatchAdjustmentEvent(AdjustmentEvent *event)
-{
-	if (event == NULL) {
-		return;
-	}
-
-	int k=0;
-
-	while (k++ < (int)_adjust_listeners.size()) {
-		_adjust_listeners[k-1]->AdjustmentValueChanged(event);
-	}
-
-	/*
-	for (std::vector<AdjustmentListener *>::iterator i=_adjust_listeners.begin(); i!=_adjust_listeners.end(); i++) {
-		(*i)->AdjustmentValueChanged(event);
-	}
-	*/
-
-	delete event;
-}
-
-std::vector<AdjustmentListener *> & ScrollBar::GetAdjustmentListeners()
-{
-	return _adjust_listeners;
 }
 
 }

@@ -50,13 +50,13 @@ class ProgressBar : public jgui::Component, public jthread::Thread{
 
 	private:
 		jprogress_type_t _type;
-		double _position;
-		int _index,
-			_delta,
-			_fixe_delta;
+		int _value,
+				_index,
+				_delta,
+				_fixe_delta;
 		bool _label_visible,
-			 _indeterminate,
-			 _running;
+				 _indeterminate,
+				 _running;
 
 	public:
 		/**
@@ -75,13 +75,13 @@ class ProgressBar : public jgui::Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual double GetPosition();
+		virtual double GetValue();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetPosition(double i);
+		virtual void SetValue(double i);
 		
 		/**
 		 * \brief

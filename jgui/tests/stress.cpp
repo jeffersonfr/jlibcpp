@@ -466,6 +466,8 @@ class GraphicPanel : public jgui::Frame{
 			}
 		}
 
+		g->Rotate(0.0);
+
 		Clear(g);
 
 		// Rotate [offscreen]
@@ -502,6 +504,8 @@ class GraphicPanel : public jgui::Frame{
 				angle = 0.1;
 			}
 		}
+
+		g->Rotate(0.0);
 
 		sleep(2);
 

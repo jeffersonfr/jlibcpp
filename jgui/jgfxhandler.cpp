@@ -169,6 +169,7 @@ int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 
 	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
 	desc.caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_SYSTEMONLY);
+	// desc.caps = (DFBSurfaceCapabilities)(DSCAPS_SYSTEMONLY);
 	desc.width = width;
 	desc.height = height;
 
@@ -248,13 +249,13 @@ int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 		return -1;
 	}
 
-	(*surface)->SetBlittingFlags((*surface), (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_BLEND_ALPHACHANNEL));
-	(*surface)->SetDrawingFlags((*surface), (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_BLEND));
-	(*surface)->SetPorterDuff((*surface), DSPD_SRC_OVER);
+	// (*surface)->SetBlittingFlags((*surface), (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY));
+	// (*surface)->SetDrawingFlags((*surface), (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY));
+	(*surface)->SetBlittingFlags((*surface), (DFBSurfaceBlittingFlags)(DSBLIT_NOFX));
+	(*surface)->SetDrawingFlags((*surface), (DFBSurfaceDrawingFlags)(DSDRAW_NOFX));
+	(*surface)->SetPorterDuff((*surface), DSPD_NONE);
 
 	(*surface)->Clear((*surface), 0x00, 0x00, 0x00, 0x00);
-	// surface->Flip(surface, NULL, DSFLIP_NONE);
-	// surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
 
 	return 0;
 }
@@ -301,13 +302,13 @@ int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 		return -1;
 	}
 
-	(*surface)->SetBlittingFlags((*surface), (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_BLEND_ALPHACHANNEL));
-	(*surface)->SetDrawingFlags((*surface), (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_BLEND));
-	(*surface)->SetPorterDuff((*surface), DSPD_SRC_OVER);
+	// (*surface)->SetBlittingFlags((*surface), (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY));
+	// (*surface)->SetDrawingFlags((*surface), (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY));
+	(*surface)->SetBlittingFlags((*surface), (DFBSurfaceBlittingFlags)(DSBLIT_NOFX));
+	(*surface)->SetDrawingFlags((*surface), (DFBSurfaceDrawingFlags)(DSDRAW_NOFX));
+	(*surface)->SetPorterDuff((*surface), DSPD_NONE);
 
 	(*surface)->Clear((*surface), 0x00, 0x00, 0x00, 0x00);
-	// surface->Flip(surface, NULL, DSFLIP_NONE);
-	// surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
 
 	return 0;
 }
@@ -341,7 +342,8 @@ int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	/* Fill the window description. */
 	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_SURFACE_CAPS | DWDESC_PIXELFORMAT);
 	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION); // | DWCAPS_DOUBLEBUFFER);
-	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE | DSCAPS_PREMULTIPLIED);
+	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_DOUBLE);
+	// desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE);
 	desc.pixelformat = DSPF_ARGB;
 	desc.posx   = x;
 	desc.posy   = y;

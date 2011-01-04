@@ -39,8 +39,6 @@ CalendarDialogBox::CalendarDialogBox(int x, int y):
 
 	SetSize(8*(bwidth+delta)-30, 11*(bheight+delta)+10);
 
-	_input_locked = false;
-
 	jcommon::Date date;
 
 	_select_day = _current_day = date.GetDayOfMonth();
