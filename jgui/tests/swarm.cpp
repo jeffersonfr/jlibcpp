@@ -19,8 +19,6 @@
  ***************************************************************************/
 #include "jframe.h"
 
-#define FONT "./fonts/font.ttf"
-
 #define VMAX 100
 
 struct point_t {

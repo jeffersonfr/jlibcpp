@@ -99,13 +99,16 @@ OBJS_mhp = \
 OBJS_image = \
 		image.o\
 
+OBJS_sort = \
+		sort.o\
+
 OBJS_stock = \
 		stock.o\
 
 OBJS_game = \
 		game.o\
 
-all: teste skull databuffer ball breakout restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image stock
+all: teste skull databuffer ball breakout restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image sort stock
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
@@ -191,6 +194,9 @@ mhp: $(OBJS_mhp)
 image: $(OBJS_image)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
+sort: $(OBJS_sort)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+        
 stock: $(OBJS_stock)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
         
@@ -204,4 +210,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste ball breakout restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image stock
+	@rm -rvf *.o *.xml *~ teste ball breakout restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image sort stock

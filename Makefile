@@ -34,7 +34,8 @@ ENABLE_DIRECTFB	?= yes
 ARFLAGS		= -rc
 CFLAGS		= -fPIC -funroll-loops -Wall -shared -rdynamic -O2
 
-INCLUDE		= -I. \
+INCLUDE		= \
+						-I. \
 						-Iwin32/win32 \
 						-Ijcommon/include \
 						-Ijgui/include \

@@ -925,8 +925,6 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 
 int main( int argc, char *argv[] )
 {
-	// jgui::GFXHandler::GetInstance()->SetDefaultFont(new jgui::Font("./fonts/font.ttf", 0, DEFAULT_FONT_SIZE));
-
 	ModulesTeste test;
 
 	test.Show();

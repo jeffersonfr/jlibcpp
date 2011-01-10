@@ -19,8 +19,6 @@
  ***************************************************************************/
 #include "jframe.h"
 
-#define FONT "./fonts/font.ttf"
-
 class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread::Thread{
 
 	private:

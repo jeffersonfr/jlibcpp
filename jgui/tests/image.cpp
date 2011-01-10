@@ -28,8 +28,6 @@
 #define ENABLE_GUI	1
 #define DRAW_ANTS	0
 
-#define FONT "./fonts/font.ttf"
-
 class Main : public jgui::Frame{
 
 	private:

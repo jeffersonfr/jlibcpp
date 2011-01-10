@@ -399,8 +399,8 @@ void Graphics::Flip(int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	int x = SCALE_TO_SCREEN(_translate.x+xp, _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN(_translate.y+yp, _screen.height, _scale.height),
+	int x = SCALE_TO_SCREEN(xp, _screen.width, _scale.width),
+			y = SCALE_TO_SCREEN(yp, _screen.height, _scale.height),
 			w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width),
 			h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
 
@@ -411,7 +411,7 @@ void Graphics::Flip(int xp, int yp, int wp, int hp)
 	rgn.x2 = x+w;
 	rgn.y2 = y+h;
 
-	surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+	surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
 	// surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
 #endif
 }
@@ -2015,7 +2015,6 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	DFBRectangle srect,
 							 drect;
 
-	printf("::: %d, %d, %d, %d, %d, %d\n", sx, sy, sw, sh, desc.width, desc.height);
 	srect.x = (sx*desc.width)/dw;
 	srect.y = (sy*desc.height)/dh;
 	srect.w = w;

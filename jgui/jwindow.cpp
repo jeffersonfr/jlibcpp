@@ -620,62 +620,72 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 			}
 		}
 
+		jpoint_t translate;
+		int x,
+				y,
+				w,
+				h;
+
 		for (std::vector<jgui::Component *>::iterator i=collisions.begin(); i!=collisions.end(); i++) {
 			c1 = (*i);
 
-			int x3 = c1->GetX()-_scroll_x,
-					y3 = c1->GetY()-_scroll_y,
-					w3 = c1->GetWidth(),
-					h3 = c1->GetHeight();
+			x = c1->GetX()-_scroll_x;
+			y = c1->GetY()-_scroll_y;
+			w = c1->GetWidth();
+			h = c1->GetHeight();
 
 			graphics->Lock();
 			
+			translate = graphics->Translate();
+			
 			graphics->Reset();
-
-			graphics->Translate(x3, y3);
-			graphics->SetClip(0, 0, w3, h3);
+			graphics->Translate(x, y);
+			graphics->SetClip(0, 0, w, h);
 
 			c1->Paint(graphics);
 
 			graphics->ReleaseClip();
-			graphics->Translate(-x3, -y3);
+			graphics->Translate(-x, -y);
+			
+			// graphics->Flip(translate.x+x, translate.y+y, w, h);
+
+			graphics->Unlock();
 
 			c1->Revalidate();
 			
-			graphics->Flip(x3, y3, w3, h3);
-		
-			graphics->Unlock();
+			graphics->Flip(translate.x+x, translate.y+y, w, h);
 		}
 	} else {
 		c1 = c;
 
 		if (c1->IsVisible() == true) {
-			int x1 = c1->GetX()-_scroll_x,
-					y1 = c1->GetY()-_scroll_y,
-					w1 = c1->GetWidth(),
-					h1 = c1->GetHeight();
+			jpoint_t translate;
+			int x = c1->GetX()-_scroll_x,
+					y = c1->GetY()-_scroll_y,
+					w = c1->GetWidth(),
+					h = c1->GetHeight();
 
-			if ((x1 < _size.width && (x1+w1) > 0) && (y1 < _size.height && (y1+h1) > 0)) {
-				// CHANGE:: adicionado para evitar problemas de sincronizacao
-				// jthread::AutoLock lock(&_container_mutex);
-				// jthread::AutoLock lock(&_component_mutex);
-				
+			if ((x < _size.width && (x+w) > 0) && (y < _size.height && (y+h) > 0)) {
 				graphics->Lock();
 
+				translate = graphics->Translate();
+
 				graphics->Reset();
-				graphics->Translate(x1, y1);
-				graphics->SetClip(0, 0, w1, h1);
+				graphics->Translate(x, y);
+				graphics->SetClip(0, 0, w, h);
 
 				c1->Paint(graphics);
 				
-				graphics->Flip(x1, y1, w1, h1);
+				graphics->Flip(translate.x+x, translate.y+y, w, h);
 
 				graphics->ReleaseClip();
-				graphics->Translate(-x1, -y1);
+				graphics->Translate(-x, -y);
+				
+				graphics->Unlock();
 				
 				c1->Revalidate();
 				
-				graphics->Unlock();
+				graphics->Flip(translate.x+x, translate.y+y, w, h);
 			}
 		}
 	}
