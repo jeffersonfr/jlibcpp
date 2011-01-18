@@ -88,7 +88,7 @@ void Component::FillRectangle(Graphics *g, int x, int y, int width, int height)
 	} else if (_border == GRADIENT_BORDER) {
 		g->FillRectangle(x, y, width, height);
 	} else if (_border == ROUND_BORDER) {
-		g->FillRoundRectangle(x, y, width-1, height-1, 20);
+		g->FillRoundRectangle(x, y, width-1, height-1);
 	} else if (_border == BEVEL_BORDER) {
 		g->FillBevelRectangle(x, y, width, height);
 	} else if (_border == DOWN_BEVEL_BORDER) {
@@ -273,7 +273,7 @@ void Component::PaintEdges(Graphics *g)
 	} else if (_border == ROUND_BORDER) {
 		g->SetColor(dr, dg, db, da);
 		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->DrawRoundRectangle(xp+i, yp+i, wp-2*i, hp-2*i-1, 20);
+			g->DrawRoundRectangle(xp+i, yp+i, wp-2*i, hp-2*i-1);
 		}
 	} else if (_border == BEVEL_BORDER) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {

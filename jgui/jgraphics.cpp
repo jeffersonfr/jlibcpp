@@ -96,7 +96,7 @@ Graphics::Graphics(void *s):
 
 	_font = NULL;
 
-	_line_type = RECT_LINE;
+	_line_join = BEVEL_JOIN;
 	_line_style = SOLID_LINE;
 	_line_width = 1;
 
@@ -502,9 +502,9 @@ uint32_t Graphics::GetPixel(int xp, int yp)
 	return GetRGB(xp, yp);
 }
 
-void Graphics::SetLineType(jline_type_t t)
+void Graphics::SetLineJoin(jline_join_t t)
 {
-	_line_type = t;
+	_line_join = t;
 }
 
 void Graphics::SetLineStyle(jline_style_t t)
@@ -515,19 +515,11 @@ void Graphics::SetLineStyle(jline_style_t t)
 void Graphics::SetLineWidth(int size)
 {
 	_line_width = size;
-
-	if (_line_width < 1) {
-		_line_width = 1;
-	}
-
-	if ((_line_width%2) == 0) {
-		_line_width++;
-	}
 }
 
-jline_type_t Graphics::GetLineType()
+jline_join_t Graphics::GetLineJoin()
 {
-	return _line_type;
+	return _line_join;
 }
 
 jline_style_t Graphics::GetLineStyle()
@@ -542,6 +534,10 @@ int Graphics::GetLineWidth()
 
 void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 {
+	if (_line_width == 0) {
+		return;
+	}
+
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
@@ -562,7 +558,7 @@ void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 				FillRectangle(xp-_line_width/2, yf, _line_width, yp-yf);
 			}
 
-			if (_line_type == ROUND_LINE) {
+			if (_line_join == ROUND_JOIN) {
 				FillArc(xp, yp, _line_width/2, _line_width/2, 0, 360);
 				FillArc(xp, yf, _line_width/2, _line_width/2, 0, 360);
 			}
@@ -573,7 +569,7 @@ void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 				FillRectangle(xf, yp-_line_width/2, xp-xf, _line_width);
 			}
 
-			if (_line_type == ROUND_LINE) {
+			if (_line_join == ROUND_JOIN) {
 				FillArc(xp, yp, _line_width/2, _line_width/2, 0, 360);
 				FillArc(xf, yp, _line_width/2, _line_width/2, 0, 360);
 			}
@@ -603,7 +599,7 @@ void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 			FillTriangle((int)(xp-xdiff), (int)(yp-ydiff), (int)(xp+dx-xdiff), (int)(yp+dy-ydiff), (int)(xp+c-xdiff), (int)(yp-s-ydiff));
 			FillTriangle((int)(xp+dx-xdiff), (int)(yp+dy-ydiff), (int)(xp+c-xdiff), (int)(yp-s-ydiff), (int)(xp+c+dx-xdiff), (int)(yp-s+dy-ydiff));
 
-			if (_line_type == ROUND_LINE) {
+			if (_line_join == ROUND_JOIN) {
 				FillArc(xp-1, yp-1, r1, r1, 0, 360);
 				FillArc((int)(xp+dx), (int)(yp+dy), r1, r1, 0, 360);
 			}
@@ -612,8 +608,117 @@ void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 #endif
 }
 
-void Graphics::DrawBezierCurve(jpoint_t *points, int n_points)
+double EvaluateBezier0(double *data, int ndata, double t) 
 {
+	if (t < 0.0) {
+		return(data[0]);
+	}
+
+	if (t >= (double)ndata) {
+		return data[ndata-1];
+	}
+
+	double result,
+				 blend,
+				 mu,
+				 muk,
+				 munk;
+	int n,
+			k,
+			kn,
+			nn,
+			nkn;
+
+	mu = t/(double)ndata;
+
+	n = ndata-1;
+	result = 0.0;
+	muk = 1;
+	munk = pow(1-mu,(double)n);
+
+	for (k=0; k<=n; k++) {
+		nn = n;
+		kn = k;
+		nkn = n - k;
+		blend = muk * munk;
+		muk *= mu;
+		munk /= (1-mu);
+
+		while (nn >= 1) {
+			blend *= nn;
+			nn--;
+
+			if (kn > 1) {
+				blend /= (double)kn;
+				kn--;
+			}
+
+			if (nkn > 1) {
+				blend /= (double)nkn;
+				nkn--;
+			}
+		}
+
+		result += data[k] * blend;
+	}
+
+	return result;
+}
+
+void Graphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
+{
+	if (_line_width == 0) {
+		return;
+	}
+
+	if (npoints < 3) {
+		return;
+	}
+
+	if (interpolation < 2) {
+		return;
+	}
+
+	double *x, 
+				 *y, 
+				 stepsize;
+	int x1, 
+			y1, 
+			x2, 
+			y2;
+
+	stepsize = (double)1.0/(double)interpolation;
+
+	x = new double[npoints+1];
+	y = new double[npoints+1];
+
+	for (int i=0; i<npoints; i++) {
+		x[i] = (double)SCALE_TO_SCREEN((p[i].x), _screen.width, _scale.width); 
+		y[i] = (double)SCALE_TO_SCREEN((p[i].y), _screen.height, _scale.height);
+	}
+
+	x[npoints] = (double)SCALE_TO_SCREEN((p[0].x), _screen.width, _scale.width); 
+	y[npoints] = (double)SCALE_TO_SCREEN((p[0].y), _screen.height, _scale.height);
+
+	double t = 0.0;
+	
+	x1 = lrint(EvaluateBezier0(x, npoints+1, t));
+	y1 = lrint(EvaluateBezier0(y, npoints+1, t));
+	
+	for (int i=0; i<=(npoints*interpolation); i++) {
+		t = t + stepsize;
+
+		x2 = EvaluateBezier0(x, npoints, t);
+		y2 = EvaluateBezier0(y, npoints, t);
+	
+		surface->DrawLine(surface, x1, y1, x2, y2);
+		
+		x1 = x2;
+		y1 = y2;
+	}
+
+	delete [] x;
+	delete [] y;
 }
 
 void Graphics::FillRectangle(int xp, int yp, int wp, int hp)
@@ -646,672 +751,112 @@ void Graphics::FillRectangle(int xp, int yp, int wp, int hp)
 
 void Graphics::DrawRectangle(int xp, int yp, int wp, int hp)
 {
-	if (wp <= 0 || hp <= 0) {
-		return;
-	}
-
 #ifdef DIRECTFB_UI
-	if (surface == NULL) {
-		return;
-	}
-
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-
-	if (w < 1) {
-		w = 1;
-	}
-
-	if (h < 1) {
-		h = 1;
-	}
-
-	surface->DrawRectangle(surface, x, y, w, h);
-
-	if (_line_width >= 1) {
-		for (int i=1; i<_line_width/2; i++) {
-			surface->DrawRectangle(surface, x+i, y+i , w-2*i, h-2*i);
-			surface->DrawRectangle(surface, x-i, y-i , w+2*i, h+2*i);
-		}
-	}
+	DrawRectangle0(xp, yp, wp, hp, MITER_JOIN, _line_width);
 #endif
 }
 
-void Graphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
+void Graphics::FillBevelRectangle(int xp, int yp, int wp, int hp)
 {
-	if (wp <= 0 || hp <= 0) {
-		return;
-	}
-
 #ifdef DIRECTFB_UI
-	if (surface == NULL) {
-		return;
-	}
-
-	if (wp < 2*dx) {
-		dx = wp/2;
-	}
-
-	if (hp < 2*dy) {
-		dy = hp/2;
-	}
-
-	FillRectangle(xp+dx, yp, wp-2*dx, hp);
-	FillRectangle(xp, yp+dy, dx, hp-2*dy);
-	FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
-
-	FillTriangle(xp+dx, yp, xp+dx, yp+dy, xp, yp+dy);
-	FillTriangle(xp+wp-dx, yp, xp+wp, yp+dy, xp+wp-dx, yp+dy);
-	FillTriangle(xp, yp+hp-dy, xp+dx, yp+hp-dy, xp+dx, yp+hp);
-	FillTriangle(xp+wp-dx, yp+hp, xp+wp-dx, yp+hp-dy, xp+wp, yp+hp-dy);
+	DrawRectangle0(xp, yp, wp, hp, BEVEL_JOIN, std::max(wp, hp));
 #endif
 }
 
-void Graphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
+void Graphics::DrawBevelRectangle(int xp, int yp, int wp, int hp)
 {
-	if (wp <= 0 || hp <= 0) {
-		return;
-	}
-
 #ifdef DIRECTFB_UI
-	if (surface == NULL) {
+	DrawRectangle0(xp, yp, wp, hp, BEVEL_JOIN, _line_width);
+#endif
+}
+
+void Graphics::FillRoundRectangle(int xp, int yp, int wp, int hp)
+{
+#ifdef DIRECTFB_UI
+	DrawRectangle0(xp, yp, wp, hp, ROUND_JOIN, std::max(wp, hp));
+#endif
+}
+
+void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp)
+{
+#ifdef DIRECTFB_UI
+	DrawRectangle0(xp, yp, wp, hp, ROUND_JOIN, _line_width);
+#endif
+}
+
+void Graphics::FillCircle(int xcp, int ycp, int rp)
+{
+#ifdef DIRECTFB_UI
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int r = SCALE_TO_SCREEN((_translate.x+xcp+rp), _screen.width, _scale.width)-xc;
+
+	DrawEllipse0(xc, yc, r, r, r);
+#endif
+}
+
+void Graphics::DrawCircle(int xcp, int ycp, int rp)
+{
+#ifdef DIRECTFB_UI
+	if (_line_width == 0) {
 		return;
 	}
 
-	if (wp < 2*dx) {
-		dx = wp/2;
-	}
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int r = SCALE_TO_SCREEN((_translate.x+xcp+rp), _screen.width, _scale.width)-xc;
 
-	if (hp < 2*dy) {
-		dy = hp/2;
-	}
-
-	int r = _line_width/2;
-
-	DrawLine(xp+dx, yp, xp+wp-dx, yp);
-	DrawLine(xp+dx, yp+hp, xp+wp-dx, yp+hp);
-	DrawLine(xp, yp+dy, xp, yp+hp-dy);
-	DrawLine(xp+wp, yp+dy, xp+wp, yp+hp-dy);
-
-	if (_line_width == 1) {
-		DrawLine(xp+dx, yp, xp, yp+dy);
-		DrawLine(xp+wp-dx, yp, xp+wp, yp+dy);
-		DrawLine(xp, yp+hp-dy, xp+dx, yp+hp);
-		DrawLine(xp+wp-dx, yp+hp, xp+wp, yp+hp-dy);
+	if (_line_width < 0) {
+		DrawEllipse0(xc, yc, r, r, -_line_width);
 	} else {
-		jgui::jpoint_t p1[] = {
-			{0, dy+r},
-			{dx+r, 0},
-			{dx+r, 2*r},
-			{2*r, dy+r}
-		};
-
-		FillPolygon(xp-r, yp-r, p1, 4);
-
-		jgui::jpoint_t p2[] = {
-			{0, 0},
-			{dx+r, dy+r},
-			{dx-r, dy+r},
-			{0, 2*r}
-		};
-
-		FillPolygon(xp+wp-dx, yp-r, p2, 4);
-
-		jgui::jpoint_t p3[] = {
-			{0, 0},
-			{2*r, 0},
-			{r+dx, dy-r},
-			{r+dx, r+dy}
-		};
-
-		FillPolygon(xp-r, yp+hp-dy, p3, 4);
-
-		jgui::jpoint_t p4[] = {
-			{dx-r, 0},
-			{dx+r, 0},
-			{0, dy+r},
-			{0, dy-r}
-		};
-
-		FillPolygon(xp+wp-dx-2, yp+hp-dy-2, p4, 4);
+		DrawEllipse0(xc, yc, r+_line_width, r+_line_width, _line_width);
 	}
 #endif
 }
 
-void Graphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int raio)
+void Graphics::FillEllipse(int xcp, int ycp, int rxp, int ryp)
 {
-	if (wp <= 0 || hp <= 0) {
-		return;
-	}
-
 #ifdef DIRECTFB_UI
-	if (surface == NULL) {
-		return;
-	}
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
+	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
 
-	if (wp < 2*raio) {
-		raio = wp/2;
-	}
-
-	if (hp < 2*raio) {
-		raio = hp/2;
-	}
-
-	jline_type_t type = _line_type;
-	jline_style_t style = _line_style;
-
-	_line_type = RECT_LINE;
-	_line_style = SOLID_LINE;
-
-	int line_width = _line_width;
-
-	_line_width = 1;
-
-	// INFO:: draw top
-	{
-		int x1, 
-				x2,
-				l = 0;
-
-		for (int y1=yp-raio; y1<=yp; y1++) {
-			double r = raio,
-						 d = sqrt(r*r-(y1-yp)*(y1-yp));
-
-			x1 = (int)(xp - d);
-			x2 = (int)(xp + d);
-
-			int j = SCALE_TO_SCREEN((_translate.y+y1+raio), _screen.height, _scale.height);
-
-			if (l != j) {
-				l = j;
-
-				int px1 = SCALE_TO_SCREEN((_translate.x+x1+raio), _screen.width, _scale.width),
-						px2 = SCALE_TO_SCREEN((_translate.x+x2+wp-raio), _screen.width, _scale.width);
-
-				surface->DrawLine(surface, px1, l, px2, l);
-			}
-		}
-
-		// INFO:: draw center
-		{
-			// INFO:: verifica se a ultima linha estah sobrepondo a primeira linha do retangulo
-			int dy = yp+raio+1,
-					dh = hp-2*raio-1,
-					j = SCALE_TO_SCREEN((_translate.y+dy), _screen.height, _scale.height);
-
-			if (l == j) {
-				dy = dy + 1;
-				dh = dh - 1;
-			}
-
-			FillRectangle(xp, dy, wp, dh);
-
-			// FillRectangle(xp, yp+raio+1, wp, hp-2*raio-1);
-		}
-
-		// INFO:: draw bottop
-
-		int dy = yp+hp-2*raio;
-
-		for (int y1=dy; y1<=dy+raio; y1++) {
-			double r = raio,
-						 d = sqrt(r*r-(y1-dy)*(y1-dy));
-
-			x1 = (int)(xp - d);
-			x2 = (int)(xp + d);
-
-			int j = SCALE_TO_SCREEN((_translate.y+y1+raio), _screen.height, _scale.height);
-
-			if (l != j) {
-				l = j;
-
-				int px1 = SCALE_TO_SCREEN((_translate.x+x1+raio), _screen.width, _scale.width),
-						px2 = SCALE_TO_SCREEN((_translate.x+x2+wp-raio), _screen.width, _scale.width);
-
-				surface->DrawLine(surface, px1, l, px2, l);
-			}
-		}
-	}
-
-	_line_width = line_width;
-
-	_line_type = type;
-	_line_style = style;
+	DrawEllipse0(xc, yc, rx, ry, std::max(rx, ry));
 #endif
 }
 
-void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int raio)
-{
-	if (wp <= 0 || hp <= 0) {
-		return;
-	}
-
-#ifdef DIRECTFB_UI
-	if (surface == NULL) {
-		return;
-	}
-
-	if (_line_width > raio) {
-		raio = _line_width;
-	}
-
-	if (wp < 2*raio) {
-		raio = wp/2;
-	}
-
-	if (hp < 2*raio) {
-		raio = hp/2;
-	}
-
-	jline_type_t type = _line_type;
-	jline_style_t style = _line_style;
-
-	_line_type = RECT_LINE;
-	_line_style = SOLID_LINE;
-
-	DrawLine(xp, yp+raio+1, xp, yp+hp-raio);
-	DrawLine(xp+wp, yp+raio+1, xp+wp, yp+hp-raio);
-
-	{
-		int mw = _line_width;
-
-		if (mw > raio) {
-			mw = raio;
-		}
-
-		if (mw > 1) {
-			int l = 0;
-
-			mw = mw/2;
-
-			int min_y = SCALE_TO_SCREEN((_translate.y+yp+mw), _screen.height, _scale.height),
-					max_y = SCALE_TO_SCREEN((_translate.y+yp+hp-mw), _screen.height, _scale.height);
-
-			for (int y1=yp-raio-mw; y1<=yp; y1++) {
-				double max_d = sqrt((raio+mw)*(raio+mw)-(y1-yp)*(y1-yp)),
-							 min_d = (raio-mw)*(raio-mw)-(y1-yp)*(y1-yp);
-
-				if (min_d < 0) {
-					min_d = 0.0;
-				} else {
-					min_d = sqrt(min_d);
-				}
-
-				int max_x1 = (int)(xp-max_d),
-						max_x2 = (int)(xp+max_d),
-						min_x1 = (int)(xp-min_d),
-						min_x2 = (int)(xp+min_d);
-
-				int j = SCALE_TO_SCREEN((_translate.y+y1+raio), _screen.height, _scale.height);
-
-				if (l != j) {
-					l = j;
-
-					int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1+raio), _screen.width, _scale.width),
-							max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2+wp-raio), _screen.width, _scale.width),
-							min_px1 = SCALE_TO_SCREEN((_translate.x+min_x1+raio), _screen.width, _scale.width),
-							min_px2 = SCALE_TO_SCREEN((_translate.x+min_x2+wp-raio), _screen.width, _scale.width);
-
-					if (l <= min_y) {
-						surface->DrawLine(surface, max_px1, l, max_px2, l);
-					} else {
-						surface->DrawLine(surface, max_px1, l, min_px1, l);
-						surface->DrawLine(surface, max_px2, l, min_px2, l);
-					}
-				}
-			}
-
-			yp = yp + hp;
-
-			for (int y1=yp; y1<=yp+raio+mw; y1++) {
-				double max_d = sqrt((raio+mw)*(raio+mw)-(y1-yp)*(y1-yp)),
-							 min_d = (raio-mw)*(raio-mw)-(y1-yp)*(y1-yp);
-
-				if (min_d < 0) {
-					min_d = 0.0;
-				} else {
-					min_d = sqrt(min_d);
-				}
-
-				int max_x1 = (int)(xp-max_d),
-						max_x2 = (int)(xp+max_d),
-						min_x1 = (int)(xp-min_d),
-						min_x2 = (int)(xp+min_d);
-
-				int j = SCALE_TO_SCREEN((_translate.y+y1-raio), _screen.height, _scale.height);
-
-				if (l != j) {
-					l = j;
-
-					int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1+raio), _screen.width, _scale.width),
-							max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2+wp-raio), _screen.width, _scale.width),
-							min_px1 = SCALE_TO_SCREEN((_translate.x+min_x1+raio), _screen.width, _scale.width),
-							min_px2 = SCALE_TO_SCREEN((_translate.x+min_x2+wp-raio), _screen.width, _scale.width);
-
-					if (l >= max_y) {
-						surface->DrawLine(surface, max_px1, l, max_px2, l);
-					} else {
-						surface->DrawLine(surface, max_px1, l, min_px1, l);
-						surface->DrawLine(surface, max_px2, l, min_px2, l);
-					}
-				}
-			}
-		} else {
-			int l = 0;
-
-			mw = 0;
-
-			int old_max_px1 = -1,
-					old_max_px2 = -1,
-					old_l = -1;
-			int limit = yp;
-
-			for (int y1=yp-raio-mw; y1<=limit; y1++) {
-				double min_d = sqrt((raio-mw)*(raio-mw)-(y1-yp)*(y1-yp));
-
-				int max_x1 = (int)(xp-min_d),
-						max_x2 = (int)(xp+min_d);
-
-				int j = SCALE_TO_SCREEN((_translate.y+y1+raio), _screen.height, _scale.height);
-
-				if (l != j || y1 == limit) {
-					l = j;
-
-					int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1+raio), _screen.width, _scale.width),
-							max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2+wp-raio), _screen.width, _scale.width);
-
-					if (old_l > 0) {
-						surface->DrawLine(surface, old_max_px1, old_l, max_px1, l);
-						surface->DrawLine(surface, old_max_px2, old_l, max_px2, l);
-					} else {
-						surface->DrawLine(surface, max_px1, l, max_px2, l);
-					}
-
-					old_max_px1 = max_px1;
-					old_max_px2 = max_px2;
-					old_l = l;
-				}
-			}
-
-			yp = yp+hp-2*raio;
-
-			old_max_px1 = -1;
-			old_max_px2 = -1;
-			old_l = -1;
-			limit = yp+raio;
-
-			for (int y1=yp; y1<=limit; y1++) {
-				double min_d = sqrt((raio-mw)*(raio-mw)-(y1-yp)*(y1-yp));
-
-				int max_x1 = (int)(xp-min_d),
-						max_x2 = (int)(xp+min_d);
-
-				int j = SCALE_TO_SCREEN((_translate.y+y1+raio), _screen.height, _scale.height);
-
-				if (l != j || y1 == limit) {
-					l = j;
-
-					int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1+raio), _screen.width, _scale.width),
-							max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2+wp-raio), _screen.width, _scale.width);
-
-					if (y1 == limit) {
-						surface->DrawLine(surface, old_max_px1, l, old_max_px2, l);
-					} else if (old_l > 0) {
-						surface->DrawLine(surface, old_max_px1, old_l, max_px1, l);
-						surface->DrawLine(surface, old_max_px2, old_l, max_px2, l);
-					}
-
-					old_max_px1 = max_px1;
-					old_max_px2 = max_px2;
-					old_l = l;
-				}
-			}
-
-		}
-	}
-
-	_line_type = type;
-	_line_style = style;
-#endif
-}
-
-void Graphics::FillCircle(int xp, int yp, int raio)
+void Graphics::DrawEllipse(int xcp, int ycp, int rxp, int ryp)
 {
 #ifdef DIRECTFB_UI
-	if (surface == NULL) {
+	if (_line_width == 0) {
 		return;
 	}
 
-	int x1, 
-			x2,
-			l = 0,
-			k = 0,
-			nlines = 2*raio;
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
+	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
 
-	DFBRegion lines[nlines];
-
-	for (int y1=yp-raio; y1<=yp+raio; y1++) {
-		double d = sqrt(raio*raio-(y1-yp)*(y1-yp));
-
-		x1 = (int)(xp - d);
-		x2 = (int)(xp + d);
-
-		int j = SCALE_TO_SCREEN((_translate.y+y1), _screen.height, _scale.height);
-
-		if (l != j) {
-			l = j;
-
-			int px1 = SCALE_TO_SCREEN((_translate.x+x1), _screen.width, _scale.width),
-					px2 = SCALE_TO_SCREEN((_translate.x+x2), _screen.width, _scale.width);
-
-			lines[k].x1 = px1;
-			lines[k].y1 = l;
-			lines[k].x2 = px2;
-			lines[k].y2 = l;
-
-			k++;
-		}
-	}
-	
-	surface->DrawLines(surface, lines, k-1);
-#endif
-}
-
-void Graphics::DrawCircle(int xp, int yp, int raio)
-{
-#ifdef DIRECTFB_UI
-	if (surface == NULL) {
-		return;
-	}
-
-	int mw = _line_width;
-
-	if (mw > raio) {
-		mw = raio;
-	}
-
-	if (mw > 1) {
-		int l = 0;
-
-		mw = mw/2;
-
-		int min_y = SCALE_TO_SCREEN((_translate.y+yp-raio+mw), _screen.height, _scale.height),
-				max_y = SCALE_TO_SCREEN((_translate.y+yp+raio-mw), _screen.height, _scale.height);
-
-		for (int y1=yp-raio-mw; y1<=yp+raio+mw; y1++) {
-			double max_d = sqrt((raio+mw)*(raio+mw)-(y1-yp)*(y1-yp)),
-						 min_d = (raio-mw)*(raio-mw)-(y1-yp)*(y1-yp);
-
-			if (min_d < 0) {
-				min_d = 0;
-			} else {
-				min_d = sqrt(min_d);
-			}
-
-			int max_x1 = (int)(xp-max_d),
-					max_x2 = (int)(xp+max_d),
-					min_x1 = (int)(xp-min_d),
-					min_x2 = (int)(xp+min_d);
-
-			int j = SCALE_TO_SCREEN((_translate.y+y1), _screen.height, _scale.height);
-
-			if (l != j) {
-				l = j;
-
-				int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1), _screen.width, _scale.width),
-						max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2), _screen.width, _scale.width),
-						min_px1 = SCALE_TO_SCREEN((_translate.x+min_x1), _screen.width, _scale.width),
-						min_px2 = SCALE_TO_SCREEN((_translate.x+min_x2), _screen.width, _scale.width);
-
-				if (l <= min_y || l >= max_y) {
-					surface->DrawLine(surface, max_px1, l, max_px2, l);
-				} else {
-					surface->DrawLine(surface, max_px1, l, min_px1, l);
-					surface->DrawLine(surface, max_px2, l, min_px2, l);
-				}
-			}
-		}
+	if (_line_width < 0) {
+		DrawEllipse0(xc, yc, rx, ry, -_line_width);
 	} else {
-		int l = 0;
-
-		mw = 0;
-
-		int old_max_px1 = -1,
-				old_max_px2 = -1,
-				old_l = -1;
-		int limit = yp+raio+mw;
-
-		for (int y1=yp-raio-mw; y1<=limit; y1++) {
-			double min_d = sqrt((raio-mw)*(raio-mw)-(y1-yp)*(y1-yp));
-
-			int max_x1 = (int)(xp-min_d),
-					max_x2 = (int)(xp+min_d);
-
-			int j = SCALE_TO_SCREEN((_translate.y+y1), _screen.height, _scale.height);
-
-			if (l != j || y1 == limit) {
-				l = j;
-
-				int max_px1 = SCALE_TO_SCREEN((_translate.x+max_x1), _screen.width, _scale.width),
-						max_px2 = SCALE_TO_SCREEN((_translate.x+max_x2), _screen.width, _scale.width);
-
-				if (old_l > 0) {
-					surface->DrawLine(surface, old_max_px1, old_l, max_px1, l);
-					surface->DrawLine(surface, old_max_px2, old_l, max_px2, l);
-				}
-
-				old_max_px1 = max_px1;
-				old_max_px2 = max_px2;
-				old_l = l;
-			}
-		}
+		DrawEllipse0(xc, yc, rx+_line_width, ry+_line_width, _line_width);
 	}
 #endif
 }
 
-void Graphics::FillArc(int xc, int yc, int rx, int ry, double start_angle, double end_angle)
+void Graphics::FillChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
 {
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
-	if (start_angle > 360 || start_angle < 360) {
-		start_angle = start_angle-((int)start_angle/360)*360;
-	}
-
-	if (end_angle > 360 || end_angle < 360) {
-		end_angle = end_angle-((int)end_angle/360)*360;
-	}
-
-	if (start_angle < 0) {
-		start_angle = 360+start_angle;
-	}
-
-	if (end_angle < 0) {
-		end_angle = 360+end_angle;
-	}
-
-	jline_type_t type = _line_type;
-	jline_style_t style = _line_style;
-
-	_line_type = RECT_LINE;
-	_line_style = SOLID_LINE;
-
-	int line_width = _line_width;
-
-	_line_width = 1;
-
-	if (start_angle <= end_angle) {
-		int r = _line_width;
-
-		if (r > rx) {
-			r = rx;
-		}
-
-		if (r > ry) {
-			r = ry;
-		}
-
-		rx = rx + r/2; // + line_width/2;
-		ry = ry + r/2; // + line_width/2;
-
-		// while (r-- > 0) {
-		double angle = start_angle*(M_PI/180),
-					 range = end_angle*(M_PI/180),
-					 x = (rx*cos(angle)),
-					 y = (ry*sin(angle));
-		double x1 = 0.0,
-					 y1 = 0.0,
-					 old_x1,
-					 old_y1;
-
-		old_x1 = (xc+x);
-		old_y1 = (yc-y);
-
-		do {
-			x1 = (xc+x);
-			y1 = (yc-y);
-
-			FillTriangle((int)old_x1, (int)old_y1, (int)x1, (int)y1, (int)xc, (int)yc);
-
-			old_x1 = x1;
-			old_y1 = y1;
-
-			angle += 0.01;
-
-			x=(rx*cos(angle));
-			y=(ry*sin(angle));
-		} while(angle<range);
-
-		x1 = (xc+x);
-		y1 = (yc-y);
-
-		FillTriangle((int)old_x1, (int)old_y1, (int)x1, (int)y1, (int)xc, (int)yc);
-
-		// rx--;
-		// ry--;
-		// }
-	} else {
-		FillArc(xc, yc, rx, ry, start_angle, 360);
-		FillArc(xc, yc, rx, ry, 0, end_angle);
-	}
-
-	_line_width = line_width;
-
-	_line_type = type;
-	_line_style = style;
-#endif
-}
-
-void Graphics::DrawArc(int xc, int yc, int rx, int ry, double start_angle, double end_angle)
-{
-#ifdef DIRECTFB_UI
-	if (surface == NULL) {
-		return;
-	}
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
+	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
 
 	if (start_angle > 360 || start_angle < 360) {
 		start_angle = start_angle-((int)start_angle/360)*360;
@@ -1329,133 +874,202 @@ void Graphics::DrawArc(int xc, int yc, int rx, int ry, double start_angle, doubl
 		end_angle = 360-end_angle;
 	}
 
-	jline_type_t type = _line_type;
-	jline_style_t style = _line_style;
-
-	_line_type = RECT_LINE;
-	_line_style = SOLID_LINE;
-
-	if (_line_width > 1) {
-		int line_width = _line_width;
-
-		_line_width = 1;
-
-		if (start_angle <= end_angle) {
-			int r = line_width;
-
-			if (r > rx) {
-				r = rx;
-			}
-
-			if (r > ry) {
-				r = ry;
-			}
-
-			// while (r-- > 0) {
-			double angle = start_angle*(M_PI/180),
-						 range = end_angle*(M_PI/180),
-						 step_angle = 0.1,
-						 x = ((rx+r/2)*cos(angle)),
-						 y = ((ry+r/2)*sin(angle)),
-						 mxc = ((rx-r/2)*cos(angle)),
-						 myc = ((ry-r/2)*sin(angle));
-			double x1 = 0.0,
-						 y1 = 0.0,
-						 old_x1,
-						 old_y1;
-
-			old_x1 = (xc+x);
-			old_y1 = (yc-y);
-
-			do {
-				x1 = (xc+x);
-				y1 = (yc-y);
-				mxc = (xc+mxc);
-				myc = (yc-myc);
-
-				FillTriangle((int)old_x1, (int)old_y1, (int)x1, (int)y1, (int)mxc, (int)myc);
-
-				angle += step_angle;
-
-				{
-					double nxc=((rx-r/2)*cos(angle)),
-								 nyc=((ry-r/2)*sin(angle));
-
-					nxc = (xc+nxc);
-					nyc = (yc-nyc);
-
-					FillTriangle((int)mxc, (int)myc, (int)x1, (int)y1, (int)nxc, (int)nyc);
-				}
-
-				old_x1 = x1;
-				old_y1 = y1;
-
-				x=((rx+r/2)*cos(angle));
-				y=((ry+r/2)*sin(angle));
-				mxc=((rx-r/2)*cos(angle));
-				myc=((ry-r/2)*sin(angle));
-			} while(angle<range);
-
-			x1 = (xc+x);
-			y1 = (yc-y);
-			mxc = (xc+mxc);
-			myc = (yc-myc);
-
-			FillTriangle((int)old_x1, (int)old_y1, (int)x1, (int)y1, (int)mxc, (int)myc);
-
-			// rx--;
-			// ry--;
-			// }
-		} else {
-			DrawArc(xc, yc, rx, ry, start_angle, 360);
-			DrawArc(xc, yc, rx, ry, 0, end_angle);
-		}
-
-		_line_width = line_width;
-	} else {
-		if (start_angle <= end_angle) {
-			double angle = start_angle*(M_PI/180),
-						 range = end_angle*(M_PI/180),
-						 x = (rx*cos(angle)),
-						 y = (ry*sin(angle));
-			double x1 = 0.0,
-						 y1 = 0.0,
-						 old_x1,
-						 old_y1;
-
-			old_x1 = (xc+x);
-			old_y1 = (yc-y);
-
-			do {
-				x1 = (xc+x);
-				y1 = (yc-y);
-
-				DrawLine((int)old_x1, (int)old_y1, (int)x1, (int)y1);
-
-				old_x1 = x1;
-				old_y1 = y1;
-
-				angle += 0.1;
-
-				x=(rx*cos(angle));
-				y=(ry*sin(angle));
-			} while(angle<=range);
-
-			x1 = (xc+x);
-			y1 = (yc-y);
-
-			DrawLine((int)old_x1, (int)old_y1, (int)x1, (int)y1);
-		} else {
-			DrawArc(xc, yc, rx, ry, start_angle, 360);
-			DrawArc(xc, yc, rx, ry, 0, end_angle);
-		}
-	}
-
-	_line_type = type;
-	_line_style = style;
+	DrawChord0(xc, yc, rx, ry, start_angle*(M_PI/180.0), end_angle*(M_PI/180.0), std::max(rx, ry));
 #endif
 }
 
+void Graphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+{
+#ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return;
+	}
+
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
+	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
+
+	if (start_angle > 360 || start_angle < 360) {
+		start_angle = start_angle-((int)start_angle/360)*360;
+	}
+
+	if (end_angle > 360 || end_angle < 360) {
+		end_angle = end_angle-((int)end_angle/360)*360;
+	}
+
+	if (start_angle < 0) {
+		start_angle = 360-start_angle;
+	}
+
+	if (end_angle < 0) {
+		end_angle = 360-end_angle;
+	}
+
+	if (_line_width < 0) {
+		DrawChord0(xc, yc, rx, ry, start_angle*(M_PI/180.0), end_angle*(M_PI/180.0), -_line_width);
+	} else {
+		DrawChord0(xc, yc, rx+_line_width, ry+_line_width, start_angle*(M_PI/180.0), end_angle*(M_PI/180.0), _line_width);
+	}
+#endif
+}
+
+void Graphics::FillArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+{
+#ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return;
+	}
+
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
+	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
+
+	start_angle = fmod(start_angle, 360.0);
+	end_angle = fmod(end_angle, 360.0);
+
+	if (start_angle < 0) {
+		start_angle = 360+start_angle;
+	}
+
+	if (end_angle < 0) {
+		end_angle = 360+end_angle;
+	}
+
+	int quadrant = -1;
+
+	if (start_angle >= 0.0 && start_angle < 90.0) {
+		quadrant = 0;
+	} else if (start_angle >= 90.0 && start_angle < 180.0) {
+		quadrant = 1;
+	} else if (start_angle >= 180.0 && start_angle < 270.0) {
+		quadrant = 2;
+	} else if (start_angle >= 270.0 && start_angle < 360.0) {
+		quadrant = 3;
+	}
+
+	if (end_angle < start_angle) {
+		end_angle = end_angle + 360.0;
+	}
+
+	while (start_angle < end_angle) {
+		double b = end_angle,
+					 q = quadrant;
+
+		if (quadrant == 0) {
+			if (end_angle > 90.0) {
+				b = 90.0;
+			}
+		} else if (quadrant == 1) {
+			if (end_angle > 180.0) {
+				b = 180.0;
+			}
+		} else if (quadrant == 2) {
+			if (end_angle > 270.0) {
+				b = 270.0;
+			}
+		} else if (quadrant == 3) {
+			if (end_angle > 360.0) {
+				b = 0.0;
+
+				end_angle = end_angle-360.0;
+			}
+		}
+
+		DrawArc0(xc, yc, rx, ry, start_angle, b, std::max(rx, ry), q);
+
+		start_angle = b;
+		quadrant = (quadrant+1)%4;
+	}
+#endif
+}
+
+void Graphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+{
+#ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return;
+	}
+
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
+	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
+
+	start_angle = fmod(start_angle, 360.0);
+	end_angle = fmod(end_angle, 360.0);
+
+	if (start_angle < 0) {
+		start_angle = 360+start_angle;
+	}
+
+	if (end_angle < 0) {
+		end_angle = 360+end_angle;
+	}
+
+	int quadrant = -1;
+
+	if (start_angle >= 0.0 && start_angle < 90.0) {
+		quadrant = 0;
+	} else if (start_angle >= 90.0 && start_angle < 180.0) {
+		quadrant = 1;
+	} else if (start_angle >= 180.0 && start_angle < 270.0) {
+		quadrant = 2;
+	} else if (start_angle >= 270.0 && start_angle < 360.0) {
+		quadrant = 3;
+	}
+
+	if (end_angle < start_angle) {
+		end_angle = end_angle + 360.0;
+	}
+
+	while (start_angle < end_angle) {
+		double b = end_angle,
+					 q = quadrant;
+
+		if (quadrant == 0) {
+			if (end_angle > 90.0) {
+				b = 90.0;
+			}
+		} else if (quadrant == 1) {
+			if (end_angle > 180.0) {
+				b = 180.0;
+			}
+		} else if (quadrant == 2) {
+			if (end_angle > 270.0) {
+				b = 270.0;
+			}
+		} else if (quadrant == 3) {
+			if (end_angle > 360.0) {
+				b = 0.0;
+
+				end_angle = end_angle-360.0;
+			}
+		}
+
+		if (_line_width < 0) {
+			DrawArc0(xc, yc, rx, ry, start_angle, b, -_line_width, q);
+		} else {
+			DrawArc0(xc, yc, rx+_line_width, ry+_line_width, start_angle, b, _line_width, q);
+		}
+
+		start_angle = b;
+		quadrant = (quadrant+1)%4;
+	}
+#endif
+}
+
+void Graphics::FillPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+{
+	FillArc(xcp, ycp, rxp, ryp, start_angle, end_angle);
+}
+
+void Graphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+{
+	DrawArc(xcp, ycp, rxp, ryp, start_angle, end_angle);
+}
+		
 void Graphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
 #ifdef DIRECTFB_UI
@@ -1477,86 +1091,153 @@ void Graphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p
 void Graphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
 #ifdef DIRECTFB_UI
+	jpoint_t p[3];
+
+	p[0].x = x1p;
+	p[0].y = y1p;
+	p[1].x = x2p;
+	p[1].y = y2p;
+	p[2].x = x3p;
+	p[2].y = y3p;
+
+	DrawPolygon(0, 0, p, 3, true);
+#endif
+}
+
+void Graphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
+{
+	if (_line_width <= 0) {
+		return;
+	}
+
+#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
-	DrawLine(x1p, y1p, x2p, y2p);
-	DrawLine(x2p, y2p, x3p, y3p);
-	DrawLine(x3p, y3p, x1p, y1p);
+	if (_line_width == 1) {
+		int ox = p[0].x + xp, 
+				oy = p[0].y + yp, 
+				tx, 
+				ty;
+
+		for (int i=1; i<npoints; i++) {
+			tx = p[i].x + xp;
+			ty = p[i].y + yp;
+
+			DrawLine(ox, oy, tx, ty);
+
+			ox = tx;
+			oy = ty;
+		}
+
+		if (close) {
+			DrawLine(ox, oy, p[0].x + xp, p[0].y + yp);
+		}
+	} else {
+		jgui::jpoint_t scaled[6];
+		int opened = (close == true)?0:1;
+
+		for (int i=0; i<npoints-opened; i++) {
+			int	dx = p[(i+1)%npoints].x-p[i].x,
+					dy = p[(i+1)%npoints].y-p[i].y,
+					d = sqrt((dx*dx)+(dy*dy));
+
+			if (d > 0) {
+				int c = (int)((_line_width*dy)/d),
+						s = (int)((_line_width*dx)/d),
+						xr = p[i].x-c,
+						yr = p[i].y+s,
+						index = i*2;
+
+				FillTriangle(xp+xr, yp+yr, xp+xr+dx, yp+yr+dy, xp+xr+c, yp+yr-s);
+				FillTriangle(xp+xr+dx, yp+yr+dy, xp+xr+c, yp+yr-s, xp+xr+c+dx, yp+yr-s+dy);
+
+				scaled[index+0].x = xr;
+				scaled[index+0].y = yr;
+				scaled[index+1].x = xr+dx;
+				scaled[index+1].y = yr+dy;
+			}
+		}
+
+		if (opened != 0) {
+			opened++;
+		}
+
+		for (int i=0; i<npoints-opened; i++) {
+			if (_line_join == BEVEL_JOIN) {
+				FillTriangle(
+						xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
+						xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y, 
+						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
+			} else if (_line_join == ROUND_JOIN) {
+				int a1 = scaled[((i+0)%npoints)*2+0].y-scaled[((i+0)%npoints)*2+1].y,
+						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x;
+				int a2 = scaled[((i+1)%npoints)*2+0].y-scaled[((i+1)%npoints)*2+1].y,
+						b2 = scaled[((i+1)%npoints)*2+0].x-scaled[((i+1)%npoints)*2+1].x;
+
+				double tan0 = (double)(p[(i+1)%npoints].x-scaled[((i+0)%npoints)*2+1].x)/(double)(p[(i+1)%npoints].y-scaled[((i+0)%npoints)*2+1].y),
+							 // tan1 = (double)(p[(i+1)%npoints].x-scaled[((i+1)%npoints)*2+0].x)/(double)(p[(i+1)%npoints].y-scaled[((i+1)%npoints)*2+0].y),
+							 cos0 = (a1*a2+b1*b2)/(sqrt(a1*a1+b1*b1)*sqrt(a2*a2+b2*b2)), // angulo entre retas
+							 ang0 = atan(tan0)+M_PI_2,
+							 ang1 = atan(tan0)+acos(cos0)+M_PI_2;
+
+				FillArc(xp+p[(i+1)%npoints].x-1, yp+p[(i+1)%npoints].y-1, _line_width, _line_width, (180.0*ang0)/M_PI, (180.0*ang1)/M_PI);
+			} else if (_line_join == MITER_JOIN) {
+				int a1 = scaled[((i+0)%npoints)*2+0].y-scaled[((i+0)%npoints)*2+1].y,
+						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x,
+						c1 = scaled[((i+0)%npoints)*2+0].x*scaled[((i+0)%npoints)*2+1].y-scaled[((i+0)%npoints)*2+1].x*scaled[((i+0)%npoints)*2+0].y;
+				int a2 = scaled[((i+1)%npoints)*2+0].y-scaled[((i+1)%npoints)*2+1].y,
+						b2 = scaled[((i+1)%npoints)*2+0].x-scaled[((i+1)%npoints)*2+1].x,
+						c2 = scaled[((i+1)%npoints)*2+0].x*scaled[((i+1)%npoints)*2+1].y-scaled[((i+1)%npoints)*2+1].x*scaled[((i+1)%npoints)*2+0].y;
+				int x0 = (b1*c2-b2*c1)/(a1*b2-a2*b1),
+						y0 = (a1*c2-a2*c1)/(a1*b2-a2*b1);
+
+				FillTriangle(
+						xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
+						xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y, 
+						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
+				FillTriangle(
+						xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
+						xp+x0, yp+y0,
+						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
+			}
+		}
+	}
 #endif
 }
 
-void Graphics::DrawPolygon(int x, int y, jpoint_t *p, int num, bool close)
+void Graphics::FillPolygon(int x, int y, jpoint_t *p, int npoints)
 {
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
-	int *xpoints = new int[num], 
-			*ypoints = new int[num];
-
-	for (int i=0; i<num; i++) {
-		xpoints[i] = p[i].x;
-		ypoints[i] = p[i].y;
-	}
-
-	int ox, oy, tx, ty;
-
-	ox = xpoints[0] + x;
-	oy = ypoints[0] + y;
-
-	for (int i=1; i<num; i++) {
-		tx = xpoints[i] + x;
-		ty = ypoints[i] + y;
-
-		DrawLine(ox, oy, tx, ty);
-
-		ox = tx;
-		oy = ty;
-	}
-
-	if (close) {
-		DrawLine(ox, oy, xpoints[0] + x, ypoints[0] + y);
-	}
-
-	delete xpoints;
-	delete ypoints;
-#endif
-}
-
-void Graphics::FillPolygon(int x, int y, jpoint_t *p, int num)
-{
-#ifdef DIRECTFB_UI
-	if (surface == NULL) {
-		return;
-	}
-
-	int points[2*num];
+	int points[2*npoints];
 	int i,
 			j=0;
 
-	for (i=0; i<num; i++) {
+	for (i=0; i<npoints; i++) {
 		points[j++] = p[i].x + x;
 		points[j++] = p[i].y + y;
 	}
 
-	jline_type_t type = _line_type;
+	jline_join_t type = _line_join;
 	jline_style_t style = _line_style;
 
-	_line_type = RECT_LINE;
+	_line_join= BEVEL_JOIN;
 	_line_style = SOLID_LINE;
 
 	int line_width = _line_width;
 
 	_line_width = 1;
 
-	Fill_polygon(num, points);
+	FillPolygon0(npoints, points);
 
 	_line_width = line_width;
 
-	_line_type = type;
+	_line_join = type;
 	_line_style = style;
 #endif
 }
@@ -1731,7 +1412,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 		g->DrawImage(img, 0, 0, wp, hp, 0xff);
 		
-		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
+		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		return true;
 	}
@@ -1833,7 +1514,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, 0xff);
 		
-		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
+		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		return true;
 	}
@@ -1946,7 +1627,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp, 0xff);
 		
-		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
+		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		return true;
 	}
@@ -2115,7 +1796,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 		g->SetColor(_color.red, _color.green, _color.blue, alpha);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp, 0xff);
 
-		RotateImage(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
+		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		return true;
 	}
@@ -2526,13 +2207,8 @@ void Graphics::GetRGBArray(int startxp, int startyp, int wp, int hp, unsigned in
 #endif
 }
 
-void Graphics::SetRGB(int xp, int yp, uint32_t rgb) 
+void Graphics::SetRGB(int xp, int yp, uint32_t argb) 
 {
-	if (xp < 0 || yp < 0) {
-		return;
-	}
-
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -2540,46 +2216,13 @@ void Graphics::SetRGB(int xp, int yp, uint32_t rgb)
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
-	void *ptr;
-	uint32_t *dst;
-	int pitch;
-	int swmax,
-			shmax;
+	int r = (argb >> 0x10) & 0xff,
+			g = (argb >> 0x08) & 0xff,
+			b = (argb >> 0x00) & 0xff,
+			a = (argb >> 0x18) & 0xff;
 
-	surface->GetSize(surface, &swmax, &shmax);
-
-	if ((x < 0 || x >= swmax) || (y < 0 || y >= shmax)) {
-		return;
-	}
-
-	// surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
-	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_WRITE), &ptr, &pitch);
-
-	dst = (uint32_t *)((uint8_t *)ptr + y * pitch);
-
-	if (_draw_flags == DF_NOFX) {
-		*(dst+x) = rgb;
-	} else if (_draw_flags == DF_BLEND) {
-		int pixel = *(dst+x),
-				r = (rgb>>0x10)&0xff,
-				g = (rgb>>0x08)&0xff,
-				b = (rgb>>0x00)&0xff,
-				a = (rgb>>0x18)&0xff,
-				pr = (pixel>>0x10)&0xff,
-				pg = (pixel>>0x08)&0xff,
-				pb = (pixel>>0x00)&0xff;
-
-		pr = (pr*(255-a) + r*a) >> 8;
-		pg = (pg*(255-a) + g*a) >> 8;
-		pb = (pb*(255-a) + b*a) >> 8;
-
-		*(dst+x) = 0xff000000 | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
-	} else if (_draw_flags == DF_XOR) {
-		*(dst+x) ^= rgb;
-	}
-
-	surface->Unlock(surface);
-#endif
+	surface->SetColor(surface, r, g, b, a);
+	surface->DrawLine(surface, x, y, x, y);
 }
 
 void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline) 
@@ -2712,7 +2355,7 @@ void Graphics::Reset()
 	// _translate.x = 0;
 	// _translate.y = 0;
 	_line_width = 1;
-	_line_type = RECT_LINE;
+	_line_join = BEVEL_JOIN;
 	_line_style = SOLID_LINE;
 
 	SetDrawingFlags(DF_BLEND);
@@ -2731,7 +2374,7 @@ void Graphics::Unlock()
 }
 
 #ifdef DIRECTFB_UI
-void Graphics::insertEdge(edge_t *list, edge_t *edge)
+void Graphics::InsertEdge(edge_t *list, edge_t *edge)
 {
 	jcommon::Object::SetClassName("jgui::Graphics");
 
@@ -2757,7 +2400,7 @@ void Graphics::insertEdge(edge_t *list, edge_t *edge)
 	q->next=edge;
 }
 
-void Graphics::makeEdgeRec(struct jpoint_t lower, struct jpoint_t upper, int yComp, edge_t *edge, edge_t *edges[])
+void Graphics::MakeEdgeRec(struct jpoint_t lower, struct jpoint_t upper, int yComp, edge_t *edge, edge_t *edges[])
 {
 	edge->dxPerScan = ((double)(upper.x-lower.x)/(double)(upper.y-lower.y));
 	edge->xIntersect = lower.x;
@@ -2768,10 +2411,10 @@ void Graphics::makeEdgeRec(struct jpoint_t lower, struct jpoint_t upper, int yCo
 		edge->yUpper = upper.y;
 	}
 
-	insertEdge(edges[(int)lower.y], edge);
+	InsertEdge(edges[(int)lower.y], edge);
 }
 
-void Graphics::fillScan(int scan, edge_t *active)
+void Graphics::FillScan(int scan, edge_t *active)
 {
 	if (active == NULL) {
 		return;
@@ -2801,7 +2444,7 @@ void Graphics::fillScan(int scan, edge_t *active)
 	}
 }
 
-int Graphics::yNext(int k, int cnt, jpoint_t pts[])
+int Graphics::YNext(int k, int cnt, jpoint_t pts[])
 {
 	int j;
 
@@ -2823,7 +2466,7 @@ int Graphics::yNext(int k, int cnt, jpoint_t pts[])
 }
 
 
-void Graphics::buildEdgeList(int cnt, jpoint_t pts[], edge_t *edges[])
+void Graphics::BuildEdgeList(int cnt, jpoint_t pts[], edge_t *edges[])
 {
 	edge_t *edge;
 	jpoint_t v1,
@@ -2842,9 +2485,9 @@ void Graphics::buildEdgeList(int cnt, jpoint_t pts[], edge_t *edges[])
 			edge = (edge_t *) malloc (sizeof(edge_t));
 
 			if (v1.y<v2.y) {
-				makeEdgeRec(v1, v2, yNext(count,cnt,pts), edge,edges);
+				MakeEdgeRec(v1, v2, YNext(count,cnt,pts), edge,edges);
 			} else {
-				makeEdgeRec(v2, v1, yPrev, edge, edges);
+				MakeEdgeRec(v2, v1, yPrev, edge, edges);
 			}
 		}
 
@@ -2854,7 +2497,7 @@ void Graphics::buildEdgeList(int cnt, jpoint_t pts[], edge_t *edges[])
 
 }
 
-void Graphics::updateActiveList(int scan, edge_t *active)
+void Graphics::UpdateActiveList(int scan, edge_t *active)
 {
 	edge_t *q = active,
 				 *p = active->next,
@@ -2889,12 +2532,12 @@ void Graphics::Polygon(int n, int coordinates[])
 	}
 }
 
-void Graphics::Fill_polygon(int n, int ppts[])
+void Graphics::FillPolygon0(int n, int ppts[])
 {
 	const int max_points = 10*1024;
 
-	edge_t *edges[max_points],
-				 *active;
+	struct edge_t *edges[max_points],
+								*active;
 	int count_1,
 			count_2,
 			count_3;
@@ -2911,7 +2554,7 @@ void Graphics::Fill_polygon(int n, int ppts[])
 		edges[count_2]->next = NULL;
 	}
 
-	buildEdgeList(n, pts, edges);
+	BuildEdgeList(n, pts, edges);
 
 	active = new edge_t;
 	active->next = NULL;
@@ -2926,14 +2569,14 @@ void Graphics::Fill_polygon(int n, int ppts[])
 		while(p) {
 			q = p->next;
 
-			insertEdge(active, p);
+			InsertEdge(active, p);
 
 			p = q;
 		}
 
 		if (active->next) {
-			fillScan(count_3, active);
-			updateActiveList(count_3, active);
+			FillScan(count_3, active);
+			UpdateActiveList(count_3, active);
 
 			// resort active list
 			edge_t *q,
@@ -2944,7 +2587,7 @@ void Graphics::Fill_polygon(int n, int ppts[])
 			while (p) {
 				q = p->next;
 
-				insertEdge(active, p);
+				InsertEdge(active, p);
 
 				p = q;
 			}
@@ -3116,9 +2759,431 @@ bool Triangulate::InsideTriangle(float Ax, float Ay, float Bx, float By, float C
 
 	return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
 }
+
+void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, jline_join_t join, int size)
+{ 
+	if (wp <= 0 || hp <= 0) {
+		return;
+	}
+
+	if (_line_width == 0) {
+		return;
+	}
+
+	if (surface == NULL) {
+		return;
+	}
+
+	bool close = false;
+
+	if (size < 0) {
+		size = -size;
+
+		if (size > (std::min(wp, hp)/2-1)) {
+			size = std::min(wp, hp)/2-1;
+
+			close = true;
+		}
+
+		xp = xp + size;
+		yp = yp + size;
+		wp = wp - 2*size;
+		hp = hp - 2*size;
+	}
+
+	if (join == BEVEL_JOIN) {
+		FillRectangle(xp, yp-size, wp, size);
+		FillRectangle(xp, yp+hp, wp, size);
+		FillRectangle(xp-size, yp, size, hp);
+		FillRectangle(xp+wp, yp, size, hp);
+
+		FillTriangle(xp, yp-size, xp, yp, xp-size, yp);
+		FillTriangle(xp-size, yp+hp, xp, yp+hp, xp, yp+hp+size);
+		FillTriangle(xp+wp, yp+hp, xp+wp+size, yp+hp, xp+wp, yp+hp+size);
+		FillTriangle(xp+wp, yp-size, xp+wp, yp, xp+wp+size, yp);
+	} else if (join == ROUND_JOIN) {
+		FillRectangle(xp, yp-size, wp, size);
+		FillRectangle(xp, yp+hp, wp, size);
+		FillRectangle(xp-size, yp, size, hp);
+		FillRectangle(xp+wp, yp, size, hp);
+
+		FillArc(xp-1, yp-1, size, size, 90.0, 180.0);
+		FillArc(xp-1, yp+hp-1, size, size, 180.0, 270.0);
+		FillArc(xp+wp-1, yp+hp-1, size, size, 270.0, 360.0);
+		FillArc(xp+wp-1, yp-1, size, size, 0.0, 90.0);
+	} else if (join == MITER_JOIN) {
+		FillRectangle(xp-size, yp-size, wp+2*size, size);
+		FillRectangle(xp-size, yp+hp, wp+2*size, size);
+		FillRectangle(xp-size, yp, size, hp);
+		FillRectangle(xp+wp, yp, size, hp);
+	}
+
+	if (close == true) {
+		FillRectangle(xp, yp, wp, hp);
+	}
+}
+
+void Graphics::DrawChord0(int xc, int yc, int rx, int ry, double start_angle, double end_angle, int size)
+{
+	if (surface == NULL) {
+		return;
+	}
+
+	if (_line_width == 0) {
+		return;
+	}
+
+	double line_width = (double)size;
+	
+	if (line_width > std::max(rx, ry)) {
+		line_width = std::max(rx, ry);
+	}
+	
+	double min_rx = rx-line_width,
+				 min_ry = ry-line_width,
+				 max_rx = rx,
+				 max_ry = ry;
+	double dmin_rx = min_rx*min_rx,
+				 dmin_ry = min_ry*min_ry,
+				 dmax_rx = max_rx*max_rx,
+				 dmax_ry = max_ry*max_ry;
+	double x_inf = max_rx*cos(start_angle),
+				 y_inf = max_ry*sin(start_angle),
+				 x_sup = max_rx*cos(end_angle),
+				 y_sup = max_ry*sin(end_angle);
+	double a = (y_inf-y_sup),
+				 b = (x_inf-x_sup),
+				 c = (x_inf*y_sup-x_sup*y_inf);
+
+	for (double y=-max_ry; y<max_ry; y+=1.0) {
+		for (double x=-max_rx; x<max_rx; x+=1.0) {
+			double min_ellipse,
+						 max_ellipse;
+
+			if (dmin_rx == 0.0 || dmin_ry == 0.0) {
+				min_ellipse = 1.0;
+				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
+			} else {
+				min_ellipse = (x*x)/dmin_rx+(y*y)/dmin_ry;
+				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
+			}
+
+			double eq_y_inf = a*x+b*y+c,
+						 eq_y_sup = a*x+b*y+c+2*max_rx*size;
+
+			if (max_ellipse <= 1.0) {
+				if (eq_y_inf <= 0.0) {
+					if (min_ellipse >= 1.0 || eq_y_sup >= 0.0) {
+						surface->DrawLine(surface, xc+x, yc+y, xc+x, yc+y);
+					}
+				}
+			}
+		}
+	}
+}
+
+void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double start_angle, double end_angle, int size, int quadrant)
+{
+	if (surface == NULL) {
+		return;
+	}
+
+	if (_line_width == 0) {
+		return;
+	}
+
+	double line_width = (double)size;
+	
+	if (line_width > std::max(rx, ry)) {
+		line_width = std::max(rx, ry);
+	}
+	
+	if (quadrant == 0) {
+		start_angle = start_angle-0.0;
+		end_angle = end_angle-0.0;
+	} else if (quadrant == 1) {
+		double t0 = start_angle;
+
+		start_angle = 180.0-end_angle;
+		end_angle = 180.0-t0;
+	} else if (quadrant == 2) {
+		start_angle = start_angle-180.0;
+		end_angle = end_angle-180.0;
+	} else if (quadrant == 3) {
+		double t0 = start_angle;
+
+		start_angle = 360.0-end_angle;
+		end_angle = 360.0-t0;
+	}
+		
+	start_angle = (start_angle*M_PI)/180.0;
+	end_angle = (end_angle*M_PI)/180.0;
+
+	double min_rx = rx-line_width,
+				 min_ry = ry-line_width,
+				 max_rx = rx,
+				 max_ry = ry;
+	double dmin_rx = min_rx*min_rx,
+				 dmin_ry = min_ry*min_ry,
+				 dmax_rx = max_rx*max_rx,
+				 dmax_ry = max_ry*max_ry;
+	double x_inf = max_rx*cos(start_angle),
+				 y_inf = max_ry*sin(start_angle),
+				 x_sup = max_rx*cos(end_angle),
+				 y_sup = max_ry*sin(end_angle);
+	DFBRegion lines[4*(int)max_ry];
+	int old_x = -1,
+			old_y = -1;
+	int k = 0;
+
+	for (double y=0; y<max_ry; y+=1.0) {
+		double eq_y_sup0 = x_sup*y,
+					 eq_y_inf0 = x_inf*y;
+		double xi = -1.0,
+					 xf = -1.0;
+
+		for (double x=0; x<max_rx; x+=1.0) {
+			double min_ellipse,
+						 max_ellipse;
+
+			if (dmin_rx == 0.0 || dmin_ry == 0.0) {
+				min_ellipse = 1.0;
+				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
+			} else {
+				min_ellipse = (x*x)/dmin_rx+(y*y)/dmin_ry;
+				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
+			}
+
+			if (min_ellipse >= 1.0 && max_ellipse <= 1.0) {
+				double eq_y_sup = eq_y_sup0-y_sup*x,
+							 eq_y_inf = eq_y_inf0-y_inf*x;
+
+				eq_y_sup = eq_y_inf0-y_inf*x;
+				eq_y_inf = eq_y_sup0-y_sup*x;
+
+				if (eq_y_sup >= 0.0 && eq_y_inf <= 0.0) {
+						if (xi < 0.0) {
+						xi = x;
+					}
+
+					xf = x;
+				}
+			}
+		}
+
+		if  (xi < 0.0 || xf < 0.0) {
+			continue;
+		}
+
+		if (line_width <= 1) {
+			if (old_x < 0) {
+				old_x = xi;
+			}
+
+			if (old_y < 0) {
+				old_y = y;
+			}
+
+			if (quadrant == 0) {
+				lines[k].x1 = (int)(xc+old_x);
+				lines[k].y1 = (int)(yc-y);
+				lines[k].x2 = (int)(xc+xi);
+				lines[k].y2 = (int)(yc-y);
+			} else if (quadrant == 1) {
+				lines[k].x1 = (int)(xc-old_x);
+				lines[k].y1 = (int)(yc-y);
+				lines[k].x2 = (int)(xc-xi+1);
+				lines[k].y2 = (int)(yc-y);
+			} else if (quadrant == 2) {
+				lines[k].x1 = (int)(xc-old_x);
+				lines[k].y1 = (int)(yc+y+1);
+				lines[k].x2 = (int)(xc-xi+1);
+				lines[k].y2 = (int)(yc+y+1);
+			} else if (quadrant == 3) {
+				lines[k].x1 = (int)(xc+old_x);
+				lines[k].y1 = (int)(yc+y+1);
+				lines[k].x2 = (int)(xc+xi);
+				lines[k].y2 = (int)(yc+y+1);
+			}
+
+			k++;
+
+			old_x = xi;
+			old_y = y;
+		} else {
+			if (quadrant == 0) {
+				lines[k].x1 = (int)(xc+xi);
+				lines[k].y1 = (int)(yc-y);
+				lines[k].x2 = (int)(xc+xf);
+				lines[k].y2 = (int)(yc-y);
+			} else if (quadrant == 1) {
+				lines[k].x1 = (int)(xc-xf);
+				lines[k].y1 = (int)(yc-y);
+				lines[k].x2 = (int)(xc-xi+1);
+				lines[k].y2 = (int)(yc-y);
+			} else if (quadrant == 2) {
+				lines[k].x1 = (int)(xc-xf);
+				lines[k].y1 = (int)(yc+y+1);
+				lines[k].x2 = (int)(xc-xi+1);
+				lines[k].y2 = (int)(yc+y+1);
+			} else if (quadrant == 3) {
+				lines[k].x1 = (int)(xc+xi);
+				lines[k].y1 = (int)(yc+y+1);
+				lines[k].x2 = (int)(xc+xf);
+				lines[k].y2 = (int)(yc+y+1);
+			}
+
+			k++;
+		}
+	}
+			
+	surface->DrawLines(surface, lines, k);
+}
+
+void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
+{
+	if (surface == NULL) {
+		return;
+	}
+
+	if (_line_width == 0) {
+		return;
+	}
+
+	double line_width = (double)size;
+	
+	if (line_width > std::max(rx, ry)) {
+		line_width = std::max(rx, ry);
+	}
+	
+	double min_rx = rx-line_width,
+				 min_ry = ry-line_width,
+				 max_rx = rx,
+				 max_ry = ry;
+	double dmin_rx = min_rx*min_rx,
+				 dmin_ry = min_ry*min_ry,
+				 dmax_rx = max_rx*max_rx,
+				 dmax_ry = max_ry*max_ry;
+	DFBRegion lines[4*(int)max_ry];
+	int old_x = max_rx,
+			old_y = 0;
+	int k = 0;
+
+	for (double y=0.0; y<max_ry; y+=1.0) {
+		double xi = -1.0,
+					 xf = -1.0;
+
+		for (double x=0.0; x<max_rx; x+=1.0) {
+			/* circle
+			double dsqrt = (x*x+y*y);
+
+			if (dsqrt >= (min_rx*min_rx) && dsqrt <= (max_rx*max_rx)) {
+				if (xi < 0.0) {
+					xi = x;
+				}
+
+				xf = x;
+			}
+			*/
+
+			double min_ellipse,
+						 max_ellipse;
+
+			if (dmin_rx == 0.0 || dmin_ry == 0.0) {
+				min_ellipse = 1.0;
+				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
+			} else {
+				min_ellipse = (x*x)/dmin_rx+(y*y)/dmin_ry;
+				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
+			}
+
+			if (min_ellipse >= 1.0 && max_ellipse <= 1.0) {
+				if (xi < 0.0) {
+					xi = x;
+				}
+
+				xf = x;
+			}
+		}
+
+		if (line_width <= 1) {
+			// quadrante 0
+			lines[k].x1 = (int)(xc+old_x);
+			lines[k].y1 = (int)(yc-y);
+			lines[k].x2 = (int)(xc+xi);
+			lines[k].y2 = (int)(yc-y);
+
+			k++;
+
+			// quadrante 1
+			lines[k].x1 = (int)(xc-old_x-1);
+			lines[k].y1 = (int)(yc-y);
+			lines[k].x2 = (int)(xc-xi-1);
+			lines[k].y2 = (int)(yc-y);
+
+			k++;
+
+			// quadrante 2
+			lines[k].x1 = (int)(xc-old_x-1);
+			lines[k].y1 = (int)(yc+y+1);
+			lines[k].x2 = (int)(xc-xi-1);
+			lines[k].y2 = (int)(yc+y+1);
+
+			k++;
+
+			// quadrante 3
+			lines[k].x1 = (int)(xc+old_x);
+			lines[k].y1 = (int)(yc+y+1);
+			lines[k].x2 = (int)(xc+xi);
+			lines[k].y2 = (int)(yc+y+1);
+
+			k++;
+
+			old_x = xi;
+			old_y = y;
+		} else {
+			// quadrante 0
+			lines[k].x1 = (int)(xc+xi);
+			lines[k].y1 = (int)(yc-y);
+			lines[k].x2 = (int)(xc+xf);
+			lines[k].y2 = (int)(yc-y);
+
+			k++;
+
+			// quadrante 1
+			lines[k].x1 = (int)(xc-xf-1);
+			lines[k].y1 = (int)(yc-y);
+			lines[k].x2 = (int)(xc-xi-1);
+			lines[k].y2 = (int)(yc-y);
+
+			k++;
+
+			// quadrante 2
+			lines[k].x1 = (int)(xc-xf-1);
+			lines[k].y1 = (int)(yc+y+1);
+			lines[k].x2 = (int)(xc-xi-1);
+			lines[k].y2 = (int)(yc+y+1);
+
+			k++;
+
+			// quadrante 3
+			lines[k].x1 = (int)(xc+xi);
+			lines[k].y1 = (int)(yc+y+1);
+			lines[k].x2 = (int)(xc+xf);
+			lines[k].y2 = (int)(yc+y+1);
+
+			k++;
+		}
+	}
+			
+	surface->DrawLines(surface, lines, k);
+
+	for (int i=0; i<k; i++) {
+	}
+}
 #endif
 
-void Graphics::RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha)
+void Graphics::RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha)
 {
 #ifdef DIRECTFB_UI
 	Graphics *gimg = img->GetGraphics();

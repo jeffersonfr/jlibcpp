@@ -476,6 +476,40 @@ class GraphicPanel : public jgui::Canvas{
 	{
 		jgui::Canvas::Paint(g);
 
+		g->SetDrawingFlags(jgui::DF_BLEND);
+
+		g->SetColor(0xff, 0x00, 0x00, 0x80);
+		//g->FillArc(700, 200, 100, 100, 0, 30);
+		g->SetColor(0xff, 0xff, 0x00, 0x80);
+		//g->FillArc(700, 200, 100, 100, 30, 60);
+		g->SetColor(0xff, 0x00, 0xff, 0x80);
+		//g->FillArc(700, 200, 100, 100, 60, 90);
+		g->SetColor(0x00, 0xff, 0x00, 0xa0);
+		g->DrawArc(700, 500, 100, 100, 195, 305);
+		g->SetColor(0x00, 0xff, 0x00, 0x80);
+		//g->FillArc(800, 500, 100, 100, 0, 90);
+		
+		/*
+		g->SetColor(0xff, 0x00, 0xff, 0x80);
+		g->DrawEllipse(700, 200, 100, 200);
+		g->SetColor(0x00, 0xff, 0x00, 0x80);
+		g->DrawEllipse(700, 500, 100, 200);
+		g->SetColor(0x00, 0xff, 0x00, 0x80);
+		g->DrawEllipse(800, 500, 200, 100);
+		g->SetColor(0x00, 0xff, 0x00, 0x80);
+		g->DrawEllipse(600, 400, 100, 100);
+
+		g->SetColor(0xff, 0xf0, 0xff, 0x80);
+		g->FillEllipse(400, 200, 100, 200);
+		g->SetColor(0x00, 0xff, 0xf0, 0x80);
+		g->FillEllipse(500, 500, 100, 200);
+		g->SetColor(0x00, 0xff, 0xf0, 0x80);
+		g->FillEllipse(500, 500, 200, 100);
+		g->SetColor(0x00, 0xff, 0xf0, 0x80);
+		g->FillEllipse(400, 400, 100, 100);
+		*/
+		return;
+
 		// colored bar
 		const int num_colors = 512,
 			  bar_width = 400;
@@ -591,14 +625,14 @@ class GraphicPanel : public jgui::Canvas{
 		// ellipses horizontais
 		g->SetColor(0xf0, 0x80, 0x80, 0xff);
 		g->FillArc(10+1*(200+10)+100, 3*(100+10)+10+20, 100, 20, 0, 360);
-		g->FillArc(10+1*(200+10)+100, 3*(100+10)+10+20+50, 100, 20, 0, 360);
+		g->FillEllipse(10+1*(200+10)+100, 3*(100+10)+10+20+50, 100, 20);
 		g->DrawRectangle(10+1*(200+10)+100-100, 3*(100+10)+10+20-20, 2*100, 2*20);
 		g->DrawRectangle(10+1*(200+10)+100-100, 3*(100+10)+10+20+50-20, 2*100, 2*20);
 
 		// ellipses verticais
 		g->SetColor(0xf0, 0x80, 0xf0, 0xff);
 		g->FillArc(10+2*(200+10)+50, 3*(100+10)+10+50, 45, 50, 0, 360);
-		g->FillArc(10+2*(200+10)+150, 3*(100+10)+10+50, 45, 50, 0, 360);
+		g->FillEllipse(10+2*(200+10)+150, 3*(100+10)+10+50, 45, 50);
 		g->DrawRectangle(10+2*(200+10)+50-45, 3*(100+10)+10+50-50, 2*45, 2*50);
 		g->DrawRectangle(10+2*(200+10)+150-45, 3*(100+10)+10+50-50, 2*45, 2*50);
 
@@ -660,11 +694,11 @@ class GraphicPanel : public jgui::Canvas{
 		// round rectangle
 		g->SetLineWidth(1);
 		g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-		g->DrawRoundRectangle(700, 500, 150, 200, 20);
+		g->DrawRoundRectangle(700, 500, 150, 200);
 		g->SetColor(0x40, 0x80, 0xc0, 0xff);
-		g->FillRoundRectangle(720, 520, 110, 160, 20);
+		g->FillRoundRectangle(720, 520, 110, 160);
 		g->SetColor(0xa0, 0x00, 0x00, 0xff);
-		g->DrawRoundRectangle(720, 520, 110, 160, 20);
+		g->DrawRoundRectangle(720, 520, 110, 160);
 
 		/* INFO:: circle teste
 		g->SetLineWidth(40);

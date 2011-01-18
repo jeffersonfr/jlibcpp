@@ -60,7 +60,6 @@ class GraphicPanel : public jgui::Frame{
 				b1,
 				a1;
 		int size,
-				round = 40,
 				iterations = 1000;
 
 		g->SetFont(_font);
@@ -262,9 +261,9 @@ class GraphicPanel : public jgui::Frame{
 			b1 = rand()%0xff;
 
 			g->SetColor(r1, g1, b1, 0xff);
-			g->FillRoundRectangle(x+_insets.left, y+_insets.top, w, h, round);
+			g->FillRoundRectangle(x+_insets.left, y+_insets.top, w, h);
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h, round);
+			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
 		}
@@ -283,9 +282,9 @@ class GraphicPanel : public jgui::Frame{
 			a1 = rand()%0x80;
 
 			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillRoundRectangle(x+_insets.left, y+_insets.top, w, h, round);
+			g->FillRoundRectangle(x+_insets.left, y+_insets.top, w, h);
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h, round);
+			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
 		}

@@ -200,7 +200,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetLineType(jline_type_t t);
+		virtual void SetLineJoin(jline_join_t t);
 		
 		/**
 		 * \brief
@@ -218,7 +218,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual jline_type_t GetLineType();
+		virtual jline_join_t GetLineJoin();
 		
 		/**
 		 * \brief
@@ -242,43 +242,43 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void DrawBezierCurve(jpoint_t *points, int n_points);
+		virtual void DrawBezierCurve(jpoint_t *p, int npoints, int interpolation);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillRectangle(int x, int y, int w, int h);
+		virtual void FillRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawRectangle(int x, int y, int w, int h);
+		virtual void DrawRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillBevelRectangle(int x, int y, int w, int h, int dx = 10, int dy = 10);
+		virtual void FillBevelRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawBevelRectangle(int x, int y, int w, int h, int dx = 10, int dy = 10);
+		virtual void DrawBevelRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillRoundRectangle(int x, int y, int w, int h, int raio = 10);
+		virtual void FillRoundRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawRoundRectangle(int x, int y, int w, int h, int raio = 10);
+		virtual void DrawRoundRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
@@ -296,6 +296,30 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		void FillEllipse(int xcp, int ycp, int rxp, int ryp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void DrawEllipse(int xcp, int ycp, int rxp, int ryp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void FillChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DrawChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void FillArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
 		
 		/**
@@ -303,6 +327,18 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual void DrawArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void FillPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DrawPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
 		
 		/**
 		 * \brief
@@ -320,13 +356,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillPolygon(int x, int y, jpoint_t *p, int num);
+		virtual void FillPolygon(int x, int y, jpoint_t *p, int npoints);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawPolygon(int x, int y, jpoint_t *p, int num, bool close);
+		virtual void DrawPolygon(int x, int y, jpoint_t *p, int npoints, bool close);
 		
 		/**
 		 * \brief

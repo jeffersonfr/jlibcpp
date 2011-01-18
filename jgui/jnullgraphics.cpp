@@ -164,7 +164,7 @@ unsigned int NullGraphics::GetPixel(int xp, int yp)
 	return 0;
 }
 
-void NullGraphics::SetLineType(jline_type_t t)
+void NullGraphics::SetLineJoin(jline_join_t t)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -179,11 +179,11 @@ void NullGraphics::SetLineWidth(int size)
 	JDEBUG(JINFO, "called\n");
 }
 
-jline_type_t NullGraphics::GetLineType()
+jline_join_t NullGraphics::GetLineJoin()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return (jline_type_t)0;
+	return (jline_join_t)0;
 }
 
 jline_style_t NullGraphics::GetLineStyle()
@@ -203,7 +203,7 @@ void NullGraphics::DrawLine(int xp, int yp, int xf, int yf)
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawBezierCurve(jpoint_t *points, int n_points)
+void NullGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -218,22 +218,22 @@ void NullGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
+void NullGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
+void NullGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int raio)
+void NullGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int raio)
+void NullGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -248,6 +248,26 @@ void NullGraphics::DrawCircle(int xp, int yp, int raio)
 	JDEBUG(JINFO, "called\n");
 }
 
+void NullGraphics::FillEllipse(int xcp, int ycp, int rxp, int ryp)
+{
+	JDEBUG(JINFO, "called\n");
+}
+		
+void NullGraphics::DrawEllipse(int xcp, int ycp, int rxp, int ryp)
+{
+	JDEBUG(JINFO, "called\n");
+}
+		
+void NullGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+{
+	JDEBUG(JINFO, "called\n");
+}
+		
+void NullGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+{
+	JDEBUG(JINFO, "called\n");
+}
+		
 void NullGraphics::FillArc(int xc, int yc, int rx, int ry, double start_angle, double end_angle)
 {
 	JDEBUG(JINFO, "called\n");
@@ -258,6 +278,16 @@ void NullGraphics::DrawArc(int xc, int yc, int rx, int ry, double start_angle, d
 	JDEBUG(JINFO, "called\n");
 }
 
+void NullGraphics::FillPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+void NullGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+{
+	JDEBUG(JINFO, "called\n");
+}
+		
 void NullGraphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
 	JDEBUG(JINFO, "called\n");
@@ -268,12 +298,12 @@ void NullGraphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawPolygon(int x, int y, jpoint_t *p, int num, bool close)
+void NullGraphics::FillPolygon(int x, int y, jpoint_t *p, int npoints)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillPolygon(int x, int y, jpoint_t *p, int num)
+void NullGraphics::DrawPolygon(int x, int y, jpoint_t *p, int npoints, bool close)
 {
 	JDEBUG(JINFO, "called\n");
 }

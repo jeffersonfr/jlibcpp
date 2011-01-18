@@ -124,9 +124,10 @@ enum jvertical_align_t {
  * \brief
  *
  */
-enum jline_type_t {
-	RECT_LINE			= 0x01,
-	ROUND_LINE		= 0x02
+enum jline_join_t {
+	BEVEL_JOIN		= 0x01,
+	ROUND_JOIN		= 0x02,
+	MITER_JOIN		= 0x04,
 };
 
 /**
@@ -246,7 +247,7 @@ class Graphics : public virtual jcommon::Object{
 		struct jsize_t _screen;
 		struct jsize_t _scale;
 		struct jcolor_t _color;
-		jline_type_t _line_type;
+		jline_join_t _line_join;
 		jline_style_t _line_style;
 		jdrawing_flags_t _draw_flags;
 		jblitting_flags_t _blit_flags;
@@ -257,23 +258,28 @@ class Graphics : public virtual jcommon::Object{
 
 #ifdef DIRECTFB_UI
 		struct edge_t {
+			struct edge_t *next;
+
 			int yUpper;
 			double xIntersect;
 			double dxPerScan;
-			struct edge_t *next;
 		};
 
-		void insertEdge(edge_t *list, edge_t *edge);
-		void makeEdgeRec(struct jpoint_t lower, struct jpoint_t upper, int yComp, edge_t *edge, edge_t *edges[]);
-		void fillScan(int scan, edge_t *active);
-		int yNext(int k, int cnt, jpoint_t pts[]);
-		void buildEdgeList(int cnt, jpoint_t pts[], edge_t *edges[]);
-		void updateActiveList(int scan, edge_t *active);
+		void MakeEdgeRec(struct jpoint_t lower, struct jpoint_t upper, int yComp, edge_t *edge, edge_t *edges[]);
+		void FillScan(int scan, edge_t *active);
+		int YNext(int k, int cnt, jpoint_t pts[]);
+		void BuildEdgeList(int cnt, jpoint_t pts[], edge_t *edges[]);
+		void InsertEdge(edge_t *list, edge_t *edge);
+		void UpdateActiveList(int scan, edge_t *active);
 		void Polygon(int n, int coordinates[]);
-		void Fill_polygon(int n, int ppts[]);
-#endif
+		void FillPolygon0(int n, int ppts[]);
 		
-		void RotateImage(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
+		void DrawRectangle0(int xp, int yp, int wp, int hp, jline_join_t join, int size);
+		void DrawChord0(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle, int size);
+		void DrawArc0(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle, int size, int quadrant);
+		void DrawEllipse0(int xcp, int ycp, int rxp, int ryp, int size);
+		void RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
+#endif
 
 	public:
 		/**
@@ -472,7 +478,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetLineType(jline_type_t t);
+		virtual void SetLineJoin(jline_join_t t);
 		
 		/**
 		 * \brief
@@ -490,7 +496,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jline_type_t GetLineType();
+		virtual jline_join_t GetLineJoin();
 		
 		/**
 		 * \brief
@@ -513,56 +519,84 @@ class Graphics : public virtual jcommon::Object{
 		/**
 		 * \brief
 		 *
+		 * \param p Vertex array containing (x, y) coordinates of the points of the bezier curve.
+		 * \param npoints Number of points in the vertex array. Minimum number is 3.
+		 * \param interpolation Number of steps for the interpolation. Minimum number is 2.
+		 *
 		 */
-		virtual void DrawBezierCurve(jpoint_t *points, int n_points);
+		virtual void DrawBezierCurve(jpoint_t *p, int npoints, int interpolation);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillRectangle(int x, int y, int w, int h);
+		virtual void FillRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawRectangle(int x, int y, int w, int h);
+		virtual void DrawRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillBevelRectangle(int x, int y, int w, int h, int dx = 10, int dy = 10);
+		virtual void FillBevelRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawBevelRectangle(int x, int y, int w, int h, int dx = 10, int dy = 10);
+		virtual void DrawBevelRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillRoundRectangle(int x, int y, int w, int h, int raio = 10);
+		virtual void FillRoundRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawRoundRectangle(int x, int y, int w, int h, int raio = 10);
+		virtual void DrawRoundRectangle(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillCircle(int xp, int yp, int raio);
+		virtual void FillCircle(int xp, int yp, int rp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawCircle(int xp, int yp, int raio);
+		virtual void DrawCircle(int xp, int yp, int rp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void FillEllipse(int xcp, int ycp, int rxp, int ryp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void DrawEllipse(int xcp, int ycp, int rxp, int ryp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void FillChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DrawChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
 		
 		/**
 		 * \brief
@@ -575,6 +609,18 @@ class Graphics : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void DrawArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void FillPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DrawPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
 		
 		/**
 		 * \brief
