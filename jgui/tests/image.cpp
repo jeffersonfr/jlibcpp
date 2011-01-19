@@ -112,7 +112,7 @@ class Main : public jgui::Frame{
 		 	off.GetGraphics()->DrawImage("icons/square.png", 0, 0, image_width, image_height);
 		 
 			// g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_COLORALPHA | jgui::BF_ALPHACHANNEL));
-			g->SetPorterDuffFlags(jgui::PDF_NONE);
+			// g->SetPorterDuffFlags(jgui::PDF_NONE);
 
 			int alpha = 0x80;
 
@@ -145,9 +145,11 @@ int main(int argc, char **argv)
 
 	main.Show(false);
 
-	for (double i=0.0; i<200*M_PI; i+=0.1) {
-		main.SetAngle(i);
-		main.Repaint();
+	for (int i=0; i<100; i++) {
+		for (double j=0.0; j<2*M_PI; j+=0.1) {
+			main.SetAngle(j);
+			main.Repaint();
+		}
 	}
 
 	return 0;

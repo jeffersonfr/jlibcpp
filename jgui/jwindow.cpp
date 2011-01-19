@@ -77,15 +77,13 @@ Window::~Window()
 	}
 
 	if (graphics != NULL) {
+		graphics->Clear();
+
 		delete graphics;
 		graphics = NULL;
 	}
 
 	if (surface != NULL) {
-		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_NOFX));
-		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_NOFX));
-		surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
-		// CHANGE:: ReleaseSource() -> Release()
 		surface->Release(surface);
 	}
 
@@ -136,15 +134,12 @@ void Window::SetNativeWindow(void *native)
 	}
 
 	if (graphics == NULL) {
-		graphics = new Graphics(window_surface);
+		graphics = new Graphics(window_surface, false);
 	} else {
 		graphics->SetNativeSurface(window_surface);
 	}
 
 	if (surface != NULL) {
-		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_NOFX));
-		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_NOFX));
-		// CHANGE:: ReleaseSource() -> Release()
 		surface->Release(surface);
 
 		surface = NULL;
@@ -210,17 +205,15 @@ void Window::InnerCreateWindow(void *params)
 		// graphics = new NullGraphics();
 
 		if (graphics == NULL) {
-			graphics = new Graphics(s);
+			graphics = new Graphics(s, false);
 		} else {
 			graphics->SetNativeSurface(s);
 		}
 	}
 
 	if (surface != NULL) {
-		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_NOFX));
-		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_NOFX));
-		// CHANGE:: ReleaseSource() -> Release()
 		surface->Release(surface);
+
 		surface = NULL;
 	}
 

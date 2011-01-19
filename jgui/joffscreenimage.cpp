@@ -49,7 +49,7 @@ OffScreenImage::OffScreenImage(int width, int height, jsurface_pixelformat_t pix
 
 	GFXHandler::GetInstance()->CreateSurface(width, height, &surface, pixelformat, _scale_width, _scale_height);
 
-	graphics = new Graphics(surface);
+	graphics = new Graphics(surface, true);
 
 	graphics->SetWorkingScreenSize(_scale_width, _scale_height);
 #endif
@@ -172,13 +172,13 @@ void OffScreenImage::Restore()
 			return;
 		}
 
-		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | DSBLIT_BLEND_ALPHACHANNEL));
-		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | DSDRAW_BLEND));
+		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_BLEND));
 		surface->SetPorterDuff(surface, DSPD_SRC_OVER);
 
 		surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
 
-		graphics = new Graphics(surface);
+		graphics = new Graphics(surface, true);
 
 		graphics->SetWorkingScreenSize(_scale_width, _scale_height);
 

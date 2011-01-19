@@ -377,10 +377,10 @@ void Frame::Paint(Graphics *g)
 		}
 	}
 
-	g->Reset();
-
 	// INFO:: render over window attributes
 	PaintEdges(g);
+
+	g->Reset();
 }
 
 void Frame::KeyPressed(KeyEvent *event)

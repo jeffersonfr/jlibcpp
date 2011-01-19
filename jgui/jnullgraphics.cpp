@@ -24,7 +24,7 @@
 namespace jgui {
 
 NullGraphics::NullGraphics():
-	Graphics(NULL)
+	Graphics(NULL, false)
 {
 	jcommon::Object::SetClassName("jgui::NullGraphics");
 
@@ -115,6 +115,11 @@ struct jcolor_t NullGraphics::GetColor()
 	return t;
 }
 
+void NullGraphics::SetColor(struct jcolor_t c)
+{
+	JDEBUG(JINFO, "called\n");
+}
+
 void NullGraphics::SetColor(uint32_t color)
 {
 	JDEBUG(JINFO, "called\n");
@@ -135,6 +140,39 @@ bool NullGraphics::HasFont()
 void NullGraphics::SetFont(Font *font)
 {
 	JDEBUG(JINFO, "called\n");
+}
+
+Font * NullGraphics::GetFont()
+{
+	JDEBUG(JINFO, "called\n");
+
+	return NULL;
+}
+
+void NullGraphics::SetAntiAliasEnabled(bool b)
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+jdrawing_flags_t NullGraphics::GetDrawingFlags()
+{
+	JDEBUG(JINFO, "called\n");
+	
+	return DF_NOFX;
+}
+
+jblitting_flags_t NullGraphics::GetBlittingFlags()
+{
+	JDEBUG(JINFO, "called\n");
+
+	return BF_NOFX;
+}
+
+jporter_duff_flags_t NullGraphics::GetPorterDuffFlags()
+{
+	JDEBUG(JINFO, "called\n");
+
+	return PDF_NONE;
 }
 
 void NullGraphics::SetPorterDuffFlags(jporter_duff_flags_t t)
@@ -308,7 +346,7 @@ void NullGraphics::DrawPolygon(int x, int y, jpoint_t *p, int npoints, bool clos
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillGradientRectangle(int xp, int yp, int wp, int hp, int sr, int sg, int sb, int sa, int dr, int dg, int db, int da, bool horizontal)
+void NullGraphics::FillGradientRectangle(int x, int y, int w, int h, jcolor_t scolor, jcolor_t dcolor, bool horizontal)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -430,7 +468,7 @@ void NullGraphics::GetRGBArray(int startxp, int startyp, int wp, int hp, unsigne
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::SetRGB(int xp, int yp, int rgb) 
+void NullGraphics::SetRGB(int xp, int yp, uint32_t rgb) 
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -441,6 +479,16 @@ void NullGraphics::SetRGB(unsigned int *rgb, int x, int y, int w, int h, int sca
 }
 
 void NullGraphics::Reset()
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+void NullGraphics::Lock()
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+void NullGraphics::Unlock()
 {
 	JDEBUG(JINFO, "called\n");
 }

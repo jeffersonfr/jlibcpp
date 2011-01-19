@@ -56,6 +56,12 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		static bool GetImageSize(std::string img, int *width, int *height);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetNativeSurface(void *surface);
 
 		/**
@@ -69,24 +75,6 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual OffScreenImage * Create();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetClip(int x, int y, int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jregion_t GetClip();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ReleaseClip();
 
 		/**
 		 * \brief
@@ -116,6 +104,24 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual void SetClip(int x, int y, int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jregion_t GetClip();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ReleaseClip();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Clear(int r = 0xff, int g = 0xff, int b = 0xff, int a = 0x00);
 		
 		/**
@@ -135,7 +141,7 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual void Flip(int x, int y, int w, int h);
-		
+
 		/**
 		 * \brief
 		 *
@@ -146,13 +152,19 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetColor(uint32_t color); 
+		virtual void SetColor(struct jcolor_t c); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetColor(int r, int g, int b, int a = 0xFF); 
+		virtual void SetColor(uint32_t c); 
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetColor(int r, int g, int b, int a = 0xff); 
 		
 		/**
 		 * \brief
@@ -165,6 +177,36 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual void SetFont(Font *font); 
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Font * GetFont(); 
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetAntiAliasEnabled(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jporter_duff_flags_t GetPorterDuffFlags();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jdrawing_flags_t GetDrawingFlags();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jblitting_flags_t GetBlittingFlags();
 		
 		/**
 		 * \brief
@@ -241,6 +283,10 @@ class NullGraphics : public Graphics{
 		/**
 		 * \brief
 		 *
+		 * \param p Vertex array containing (x, y) coordinates of the points of the bezier curve.
+		 * \param npoints Number of points in the vertex array. Minimum number is 3.
+		 * \param interpolation Number of steps for the interpolation. Minimum number is 2.
+		 *
 		 */
 		virtual void DrawBezierCurve(jpoint_t *p, int npoints, int interpolation);
 		
@@ -284,13 +330,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillCircle(int xp, int yp, int raio);
+		virtual void FillCircle(int xp, int yp, int rp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawCircle(int xp, int yp, int raio);
+		virtual void DrawCircle(int xp, int yp, int rp);
 		
 		/**
 		 * \brief
@@ -356,37 +402,19 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillPolygon(int x, int y, jpoint_t *p, int npoints);
+		virtual void FillPolygon(int x, int y, jpoint_t *p, int num);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawPolygon(int x, int y, jpoint_t *p, int npoints, bool close);
+		virtual void DrawPolygon(int x, int y, jpoint_t *p, int num, bool close);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillGradientRectangle(int x, int y, int w, int h, int sr, int sg, int sb, int sa, int dr, int dg, int db, int da = 0xFF, bool horizontal = true);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JUSTIFY_HALIGN);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DrawString(std::string s, int x, int y);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
+		virtual void FillGradientRectangle(int x, int y, int w, int h, jcolor_t scolor, jcolor_t dcolor, bool horizontal = true);
 		
 		/**
 		 * \brief
@@ -446,6 +474,24 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JUSTIFY_HALIGN);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DrawString(std::string text, int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DrawString(std::string text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual uint32_t GetRGB(int xp, int yp, uint32_t pixel = 0xff000000);
 		
 		/**
@@ -458,19 +504,31 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetRGB(int xp, int yp, int rgb);
+		virtual void SetRGB(int xp, int yp, uint32_t rgb);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline);
-		
+		virtual void SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline);
+	
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void Reset();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Lock();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Unlock();
 
 };
 

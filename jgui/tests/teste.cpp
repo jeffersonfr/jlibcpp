@@ -476,40 +476,6 @@ class GraphicPanel : public jgui::Canvas{
 	{
 		jgui::Canvas::Paint(g);
 
-		g->SetDrawingFlags(jgui::DF_BLEND);
-
-		g->SetColor(0xff, 0x00, 0x00, 0x80);
-		//g->FillArc(700, 200, 100, 100, 0, 30);
-		g->SetColor(0xff, 0xff, 0x00, 0x80);
-		//g->FillArc(700, 200, 100, 100, 30, 60);
-		g->SetColor(0xff, 0x00, 0xff, 0x80);
-		//g->FillArc(700, 200, 100, 100, 60, 90);
-		g->SetColor(0x00, 0xff, 0x00, 0xa0);
-		g->DrawArc(700, 500, 100, 100, 195, 305);
-		g->SetColor(0x00, 0xff, 0x00, 0x80);
-		//g->FillArc(800, 500, 100, 100, 0, 90);
-		
-		/*
-		g->SetColor(0xff, 0x00, 0xff, 0x80);
-		g->DrawEllipse(700, 200, 100, 200);
-		g->SetColor(0x00, 0xff, 0x00, 0x80);
-		g->DrawEllipse(700, 500, 100, 200);
-		g->SetColor(0x00, 0xff, 0x00, 0x80);
-		g->DrawEllipse(800, 500, 200, 100);
-		g->SetColor(0x00, 0xff, 0x00, 0x80);
-		g->DrawEllipse(600, 400, 100, 100);
-
-		g->SetColor(0xff, 0xf0, 0xff, 0x80);
-		g->FillEllipse(400, 200, 100, 200);
-		g->SetColor(0x00, 0xff, 0xf0, 0x80);
-		g->FillEllipse(500, 500, 100, 200);
-		g->SetColor(0x00, 0xff, 0xf0, 0x80);
-		g->FillEllipse(500, 500, 200, 100);
-		g->SetColor(0x00, 0xff, 0xf0, 0x80);
-		g->FillEllipse(400, 400, 100, 100);
-		*/
-		return;
-
 		// colored bar
 		const int num_colors = 512,
 			  bar_width = 400;
@@ -552,58 +518,210 @@ class GraphicPanel : public jgui::Canvas{
 			g->DrawLine(i+10, 1*(100+10)+10, i+10, 1*(100+10)+100+10);
 		}
 
-		// draw images
-		/*
-	   jgui::OffScreenImage *img1 = new jgui::OffScreenImage(200, 100),
-
-		 *img2 = new jgui::OffScreenImage(200, 100),
-		 *img3 = new jgui::OffScreenImage(200, 100),
-		 *img4 = new jgui::OffScreenImage(200, 100);
-
-		 img1->GetGraphics()->DrawImage(jcommon::System::GetResourceDirectory() + "images/blue_icon.png", 0, 0, 200, 100);
-		 img2->GetGraphics()->DrawImage(jcommon::System::GetResourceDirectory() + "images/green_icon.png", 0, 0, 200, 100);
-		 img3->GetGraphics()->DrawImage(jcommon::System::GetResourceDirectory() + "images/yellow_icon.png", 0, 0, 200, 100);
-		 img4->GetGraphics()->DrawImage(jcommon::System::GetResourceDirectory() + "images/red_icon.png", 0, 0, 200, 100);
-
-		 g->DrawImage(img1, 400+40+0*(200+10), 0*(100+10)+10, 200, 100, 0xff);
-		 g->DrawImage(img2, 400+40+1*(200+10), 0*(100+10)+10, 200, 100, 0x80);
-		 g->DrawImage(img3, 400+40+0*(200+10), 1*(100+10)+10, 200, 100, 0x40);
-		 g->DrawImage(img4, 400+40+1*(200+10), 1*(100+10)+10, 200, 100, 0x10);
-		 */
-
-		g->SetPorterDuffFlags(jgui::PDF_NONE);
+		// draw image
+		//g->SetPorterDuffFlags(jgui::PDF_NONE);
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORALPHA));
 
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+10, 200, 100, 0xf0);
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 0*(100+10)+10, 200, 100, 0x80);
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 1*(100+10)+10, 200, 100, 0x60);
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 1*(100+10)+10, 200, 100, 0x40);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+20, 200, 100, 0xf0);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 0*(100+10)+20, 200, 100, 0x80);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 1*(100+10)+20, 200, 100, 0x40);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 1*(100+10)+20, 200, 100, 0x10);
 
-		// line
-		g->SetColor(0xf0, 0xf0, 0x00, 0xff);
-		g->DrawLine(10, 2*(100+10)+10, 10, 2*(100+10)+100+10);
-		g->DrawLine(10, 2*(100+10)+100+10, 10+200-10, 2*(100+10)+10);
-		g->DrawLine(10+200-10, 2*(100+10)+10, 10+200-10, 2*(100+10)+100+10);
+		jgui::jcolor_t pcolor,
+			ccolor;
 
-		// g->DrawLine(10, 2*(100+10)+100+10, 10+200-10, 2*(100+10)+10);
-		//g->DrawLine(10, 2*(100+10)+10, 10+200-10, 2*(100+10)+100+10);
+		pcolor.red = 0xf0;
+		pcolor.green = 0xf0;
+		pcolor.blue = 0xf0;
+		pcolor.alpha = 0x80;
 
-		// rectangled
-		g->SetColor(0x00, 0xf0, 0xf0, 0xff);
-		g->DrawRectangle(10+200+10, 2*(100+10)+10, 200-10, 100);
-		g->SetColor(0xf0, 0x00, 0xf0, 0xff);
-		g->FillRectangle(10+200+10+40, 2*(100+10)+10+20, 200-10-2*40, 100-2*20);
+		ccolor.red = 0x00;
+		ccolor.green = 0x00;
+		ccolor.blue = 0x00;
+		ccolor.alpha = 0x80;
 
-		// triangles
-		g->SetColor(0x80, 0xf0, 0x80, 0xff);
-		g->FillTriangle(10+2*(200+10), 2*(100+10)+10, 10+2*(200+10)+100, 2*(100+10)+10+50, 10+2*(200+10), 2*(100+10)+10+100);
-		g->SetColor(0xf0, 0x80, 0x80, 0xff);
-		g->DrawTriangle(10+2*(200+10), 2*(100+10)+10, 10+2*(200+10)+100, 2*(100+10)+10+50, 10+2*(200+10), 2*(100+10)+10+100);
-		g->SetColor(0xf0, 0x80, 0x80, 0xff);
-		g->DrawTriangle(10+2*(200+10)+100+50, 2*(100+10)+10, 10+2*(200+10)+100+100, 2*(100+10)+10+25, 10+2*(200+10)+100+50, +2*(100+10)+10+50);
-		g->DrawTriangle(10+2*(200+10)+100+50, 2*(100+10)+10+50, 10+2*(200+10)+100+100, 2*(100+10)+10+25+50, 10+2*(200+10)+100+50, 2*(100+10)+10+50+50);
+		g->SetPorterDuffFlags(jgui::PDF_SRC_OVER);
+		g->SetDrawingFlags(jgui::DF_BLEND);
 
-		// polygon
+		// draw circle
+		g->SetColor(pcolor);
+		g->SetLineWidth(-10);
+		g->DrawCircle(10+0*(120+10)+60, 10+3*(120+10)+40, 50);
+		g->SetLineWidth(+10);
+		g->DrawCircle(10+0*(120+10)+60, 10+4*(120+10)+40, 50);
+		g->FillCircle(10+0*(120+10)+60, 10+5*(120+10)+40, 50);
+		g->SetColor(ccolor);
+		g->SetLineWidth(1);
+		g->DrawCircle(10+0*(120+10)+60, 10+2*(120+10)+40, 50);
+		g->DrawCircle(10+0*(120+10)+60, 10+3*(120+10)+40, 50);
+		g->DrawCircle(10+0*(120+10)+60, 10+4*(120+10)+40, 50);
+		g->DrawCircle(10+0*(120+10)+60, 10+5*(120+10)+40, 50);
+
+		// draw ellipse
+		g->SetColor(pcolor);
+		g->SetLineWidth(-10);
+		g->DrawEllipse(10+1*(120+10)+60, 10+3*(120+10)+40, 30, 50);
+		g->SetLineWidth(+10);
+		g->DrawEllipse(10+1*(120+10)+60, 10+4*(120+10)+40, 30, 50);
+		g->FillEllipse(10+1*(120+10)+60, 10+5*(120+10)+40, 30, 50);
+		g->SetColor(ccolor);
+		g->SetLineWidth(1);
+		g->DrawEllipse(10+1*(120+10)+60, 10+2*(120+10)+40, 30, 50);
+		g->DrawEllipse(10+1*(120+10)+60, 10+3*(120+10)+40, 30, 50);
+		g->DrawEllipse(10+1*(120+10)+60, 10+4*(120+10)+40, 30, 50);
+		g->DrawEllipse(10+1*(120+10)+60, 10+5*(120+10)+40, 30, 50);
+
+		g->SetColor(pcolor);
+		g->SetLineWidth(-10);
+		g->DrawEllipse(10+2*(120+10)+60, 10+3*(120+10)+40, 50, 30);
+		g->SetLineWidth(+10);
+		g->DrawEllipse(10+2*(120+10)+60, 10+4*(120+10)+40, 50, 30);
+		g->FillEllipse(10+2*(120+10)+60, 10+5*(120+10)+40, 50, 30);
+		g->SetColor(ccolor);
+		g->SetLineWidth(1);
+		g->DrawEllipse(10+2*(120+10)+60, 10+2*(120+10)+40, 50, 30);
+		g->DrawEllipse(10+2*(120+10)+60, 10+3*(120+10)+40, 50, 30);
+		g->DrawEllipse(10+2*(120+10)+60, 10+4*(120+10)+40, 50, 30);
+		g->DrawEllipse(10+2*(120+10)+60, 10+5*(120+10)+40, 50, 30);
+
+		// draw arc
+		double arc0 = M_PI/6.0,
+					 arc1 = -arc0;
+
+		g->SetColor(pcolor);
+		g->SetLineWidth(-10);
+		g->DrawArc(10+3*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
+		g->SetLineWidth(+10);
+		g->DrawArc(10+3*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
+		g->FillArc(10+3*(120+10)+60, 10+5*(120+10)+40, 50, 50, arc0, arc1);
+		g->SetColor(ccolor);
+		g->SetLineWidth(1);
+		g->DrawArc(10+3*(120+10)+60, 10+2*(120+10)+40, 50, 50, arc0, arc1);
+		g->DrawArc(10+3*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
+		g->DrawArc(10+3*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
+		g->DrawArc(10+3*(120+10)+60, 10+5*(120+10)+40, 50, 50, arc0, arc1);
+
+		// draw chord
+		arc0 = 3*M_PI_2+1*M_PI/3.0;
+		// arc1 = -arc0/2.0;
+		arc1 = 1*M_PI_2+1*M_PI/3.0;
+
+		g->SetColor(pcolor);
+		g->SetLineWidth(-10);
+		g->DrawChord(10+4*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
+		g->SetLineWidth(+10);
+		g->DrawChord(10+4*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
+		g->FillChord(10+4*(120+10)+60, 10+5*(120+10)+40, 50, 50, arc0, arc1);
+		g->SetColor(ccolor);
+		g->SetLineWidth(1);
+		g->DrawChord(10+4*(120+10)+60, 10+2*(120+10)+40, 50, 50, arc0, arc1);
+		g->DrawChord(10+4*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
+		g->DrawChord(10+4*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
+		g->DrawChord(10+4*(120+10)+60, 10+5*(120+10)+40, 50, 50, arc0, arc1);
+
+		// draw pie
+		arc0 = M_PI/6.0;
+		arc1 = -arc0;
+
+		g->SetColor(pcolor);
+		g->SetLineWidth(-10);
+		g->DrawPie(10+5*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
+		g->SetLineWidth(+10);
+		g->DrawPie(10+5*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
+		g->FillPie(10+5*(120+10)+60, 10+5*(120+10)+40, 50, 50, arc0, arc1);
+		g->SetColor(ccolor);
+		g->SetLineWidth(1);
+		g->DrawPie(10+5*(120+10)+60, 10+2*(120+10)+40, 50, 50, arc0, arc1);
+		g->DrawPie(10+5*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
+		g->DrawPie(10+5*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
+		g->DrawPie(10+5*(120+10)+60, 10+5*(120+10)+40, 50, 50, arc0, arc1);
+
+		// draw rectangle miter
+		g->SetColor(pcolor);
+		g->SetLineWidth(-10);
+		g->DrawRectangle(10+6*(120+10)+10, 3*(120+10), 100, 100);
+		g->SetLineWidth(+10);
+		g->DrawRectangle(10+6*(120+10)+10, 4*(120+10), 100, 100);
+		g->FillRectangle(10+6*(120+10)+10, 5*(120+10), 100, 100);
+		g->SetColor(ccolor);
+		g->SetLineWidth(1);
+		for (int i=0; i<=6; i++) {
+			g->DrawRectangle(10+i*(120+10)+10, 2*(120+10), 100, 100);
+			g->DrawRectangle(10+i*(120+10)+10, 3*(120+10), 100, 100);
+			g->DrawRectangle(10+i*(120+10)+10, 4*(120+10), 100, 100);
+			g->DrawRectangle(10+i*(120+10)+10, 5*(120+10), 100, 100);
+		}
+
+		// draw rectangle bevel
+		g->SetColor(pcolor);
+		g->SetLineWidth(-10);
+		g->DrawBevelRectangle(10+7*(120+10)+10, 3*(120+10), 100, 100);
+		g->SetLineWidth(+10);
+		g->DrawBevelRectangle(10+7*(120+10)+10, 4*(120+10), 100, 100);
+		g->FillBevelRectangle(10+7*(120+10)+10, 5*(120+10), 100, 100);
+		g->SetColor(ccolor);
+		g->SetLineWidth(1);
+		g->DrawBevelRectangle(10+7*(120+10)+10, 2*(120+10), 100, 100);
+		g->DrawBevelRectangle(10+7*(120+10)+10, 3*(120+10), 100, 100);
+		g->DrawBevelRectangle(10+7*(120+10)+10, 4*(120+10), 100, 100);
+		g->DrawBevelRectangle(10+7*(120+10)+10, 5*(120+10), 100, 100);
+
+		// draw rectangle round
+		g->SetColor(pcolor);
+		g->SetLineWidth(-10);
+		g->DrawRoundRectangle(10+8*(120+10)+10, 3*(120+10), 100, 100);
+		g->SetLineWidth(+10);
+		g->DrawRoundRectangle(10+8*(120+10)+10, 4*(120+10), 100, 100);
+		g->FillRoundRectangle(10+8*(120+10)+10, 5*(120+10), 100, 100);
+		g->SetColor(ccolor);
+		g->SetLineWidth(1);
+		g->DrawRoundRectangle(10+8*(120+10)+10, 2*(120+10), 100, 100);
+		g->DrawRoundRectangle(10+8*(120+10)+10, 3*(120+10), 100, 100);
+		g->DrawRoundRectangle(10+8*(120+10)+10, 4*(120+10), 100, 100);
+		g->DrawRoundRectangle(10+8*(120+10)+10, 5*(120+10), 100, 100);
+
+		// draw triangle
+		g->SetColor(pcolor);
+		g->SetLineWidth(1);
+		g->DrawTriangle(10+9*(120+10)+10, 2*(120+10)+100, 10+9*(120+10)+10+100, 2*(120+10)+100, 10+9*(120+10)+10+100/2, 2*(120+10));
+		g->SetLineWidth(+10);
+		g->SetLineJoin(jgui::BEVEL_JOIN);
+		g->DrawTriangle(10+9*(120+10)+10, 3*(120+10)+100, 10+9*(120+10)+10+100, 3*(120+10)+100, 10+9*(120+10)+10+100/2, 3*(120+10));
+		g->SetLineJoin(jgui::ROUND_JOIN);
+		g->DrawTriangle(10+9*(120+10)+10, 4*(120+10)+100, 10+9*(120+10)+10+100, 4*(120+10)+100, 10+9*(120+10)+10+100/2, 4*(120+10));
+		g->SetLineJoin(jgui::MITER_JOIN);
+		g->DrawTriangle(10+9*(120+10)+10, 5*(120+10)+100, 10+9*(120+10)+10+100, 5*(120+10)+100, 10+9*(120+10)+10+100/2, 5*(120+10));
+		g->SetColor(ccolor);
+		g->SetLineWidth(1);
+		g->DrawRoundRectangle(10+9*(120+10)+10, 2*(120+10), 100, 100);
+		g->DrawRoundRectangle(10+9*(120+10)+10, 3*(120+10), 100, 100);
+		g->DrawRoundRectangle(10+9*(120+10)+10, 4*(120+10), 100, 100);
+		g->DrawRoundRectangle(10+9*(120+10)+10, 5*(120+10), 100, 100);
+
+		// draw bezier curve
+		int x0 = 10+10*(120+10)+10,
+				y0 = 2*(120+10),
+				w0 = 240+10,
+				h0 = 100;
+
+		jgui::jpoint_t pb1[] = {
+			{x0, y0},
+			{x0, y0+h0},
+			{x0+w0, y0+h0}
+		};
+		jgui::jpoint_t pb2[] = {
+			{x0, y0},
+			{x0+w0, y0},
+			{x0+w0, y0+h0}
+		};
+
+		g->SetColor(pcolor);
+		g->DrawBezierCurve(pb1, 3, 100);
+		g->DrawBezierCurve(pb2, 3, 100);
+		g->SetColor(ccolor);
+		g->DrawRectangle(x0, y0, w0, h0);
+
+		// draw polygon
 		jgui::jpoint_t p[] = {
 			{0, 0},
 			{100, 0},
@@ -611,116 +729,74 @@ class GraphicPanel : public jgui::Canvas{
 			{100, 100},
 			{0, 0}
 		};
-		g->SetColor(0x80, 0x80, 0xf0, 0xff);
-		g->DrawPolygon(10+3*(200+10)+10, 10+2*(100+10), p, 5, false);
-		g->SetColor(0xf0, 0xf0, 0x80, 0xff);
-		g->FillPolygon(10+3*(200+10)+10+100+10, 10+2*(100+10), p, 5);
 
-		// arcs
-		g->SetColor(0x80, 0xf0, 0x80, 0xff);
-		g->FillArc(10, 3*(100+10)+10+50, 100, 50, 270, 90);
-		g->DrawArc(10+100+40, 3*(100+10)+10+50-25, 50, 25, 0, 90);
-		g->DrawArc(10+100+40, 3*(100+10)+10+50+25, 50, 25, 0, 90);
+		g->SetLineJoin(jgui::BEVEL_JOIN);
 
-		// ellipses horizontais
-		g->SetColor(0xf0, 0x80, 0x80, 0xff);
-		g->FillArc(10+1*(200+10)+100, 3*(100+10)+10+20, 100, 20, 0, 360);
-		g->FillEllipse(10+1*(200+10)+100, 3*(100+10)+10+20+50, 100, 20);
-		g->DrawRectangle(10+1*(200+10)+100-100, 3*(100+10)+10+20-20, 2*100, 2*20);
-		g->DrawRectangle(10+1*(200+10)+100-100, 3*(100+10)+10+20+50-20, 2*100, 2*20);
+		g->SetLineWidth(1);
+		g->SetColor(pcolor);
+		g->DrawPolygon(10+10*(120+10)+10, 3*(120+10), p, 5, false);
+		g->FillPolygon(10+11*(120+10)+10+20, 3*(120+10), p, 5);
 
-		// ellipses verticais
-		g->SetColor(0xf0, 0x80, 0xf0, 0xff);
-		g->FillArc(10+2*(200+10)+50, 3*(100+10)+10+50, 45, 50, 0, 360);
-		g->FillEllipse(10+2*(200+10)+150, 3*(100+10)+10+50, 45, 50);
-		g->DrawRectangle(10+2*(200+10)+50-45, 3*(100+10)+10+50-50, 2*45, 2*50);
-		g->DrawRectangle(10+2*(200+10)+150-45, 3*(100+10)+10+50-50, 2*45, 2*50);
+		// draw line
+		x0 = 10+10*(120+10)+10;
+		y0 = 4*(120+10);
 
-		// circles
-		g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-		g->DrawCircle(3*200+100, 3*(100+10)+10+50, 50);
-		g->SetColor(0x00, 0x00, 0x00, 0xff);
-		g->FillCircle(3*200+100, 3*(100+10)+10+50, 30);
-		g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-		g->DrawCircle(3*200+100, 3*(100+10)+10+50, 10);
+		g->SetColor(pcolor);
+		g->SetLineWidth(40);
+		g->DrawLine(x0, y0, x0+100, y0+(240-10));
+		g->DrawLine(x0, y0+(240-10), x0+100, y0);
+		g->DrawLine(x0, y0+(240-10)/2, x0+120, y0+(240-10)/2);
+		g->SetLineWidth(40);
+		g->DrawLine(x0+150, y0, x0+250, y0+(240-10));
+		g->SetLineWidth(20);
+		g->DrawLine(x0+150, y0+(240-10), x0+250, y0);
+		g->SetLineWidth(10);
+		g->DrawLine(x0+150, y0+(240-10)/2, x0+250, y0+(240-10)/2);
+		g->SetLineWidth(1);
+		g->SetColor(ccolor);
+		g->DrawRectangle(x0, y0, 250, (240-10));
+		g->DrawLine(x0, y0+(240-10)/2, x0+300, y0+(240-10)/2);
 
-		g->SetColor(0x00, 0x00, 0x00, 0xff);
-		g->FillCircle(3*200+200+10, 3*(100+10)+10+50, 50);
-		g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-		g->DrawCircle(3*200+200+10, 3*(100+10)+10+50, 30);
-		g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-		g->FillCircle(3*200+200+10, 3*(100+10)+10+50, 10);
-
-		// texts
+		// draw string
 		jgui::Font *f1 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 50),
 			*f2 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 40),
 			*f3 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 30),
 			*f4 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 20);
 		int shadow = 4;
 
-		g->SetColor(0x00, 0x80, 0xe0, 0xff);
-		g->SetFont(f1); g->DrawString("DrawString", 10+0*(200+10)+shadow, 4*(100+10)+0*80+shadow);
-		g->SetFont(f2); g->DrawString("DrawString", 10+0*(200+10)+shadow, 4*(100+10)+1*80+shadow);
-		g->SetFont(f3); g->DrawString("DrawString", 10+0*(200+10)+shadow, 4*(100+10)+2*80+shadow);
-		g->SetFont(f4); g->DrawString("DrawString", 10+0*(200+10)+shadow, 4*(100+10)+3*80+shadow);
+		std::string text = "DrawString";
 
-		g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-		g->SetFont(f1); g->DrawString("DrawString", 10+0*(200+10)+0, 4*(100+10)+0*80+0);
-		g->SetFont(f2); g->DrawString("DrawString", 10+0*(200+10)+0, 4*(100+10)+1*80+0);
-		g->SetFont(f3); g->DrawString("DrawString", 10+0*(200+10)+0, 4*(100+10)+2*80+0);
-		g->SetFont(f4); g->DrawString("DrawString", 10+0*(200+10)+0, 4*(100+10)+3*80+0);
+		g->Rotate(0.0);
+		g->SetColor(ccolor);
+		g->SetFont(f1); g->DrawString(text, 10+7*(120+10)+10+shadow, 0*(45+10)+20+shadow);
+		g->SetFont(f2); g->DrawString(text, 10+7*(120+10)+10+shadow, 1*(45+10)+20+shadow);
+		g->SetFont(f3); g->DrawString(text, 10+7*(120+10)+10+shadow, 2*(45+10)+20+shadow);
+		g->SetFont(f4); g->DrawString(text, 10+7*(120+10)+10+shadow, 3*(45+10)+20+shadow);
 
-		// line type
-		g->SetColor(0xf0, 0xf0, 0x00, 0xff);
+		g->SetColor(pcolor);
+		g->SetFont(f1); g->DrawString(text, 10+7*(120+10)+10, 0*(45+10)+20);
+		g->SetFont(f2); g->DrawString(text, 10+7*(120+10)+10, 1*(45+10)+20);
+		g->SetFont(f3); g->DrawString(text, 10+7*(120+10)+10, 2*(45+10)+20);
+		g->SetFont(f4); g->DrawString(text, 10+7*(120+10)+10, 3*(45+10)+20);
 
-		g->SetLineWidth(40);
-		g->DrawLine(350, 500, 450, 700);
-		g->DrawLine(350, 700, 450, 500);
-		g->DrawLine(350, 600, 450, 600);
-		// g->DrawLine(400, 500, 400, 700);
+		g->Translate(-(120+10), -(45+10+10));
+		
+		text = "RotateString";
 
-		g->SetLineWidth(40);
-		g->DrawLine(550, 500, 650, 700);
-		g->SetLineWidth(20);
-		g->DrawLine(550, 700, 650, 500);
-		g->SetLineWidth(10);
-		g->DrawLine(550, 600, 650, 600);
+		g->Rotate(M_PI);
+		g->SetColor(ccolor);
+		g->SetFont(f1); g->DrawString(text, 10+10*(120+10)+10+shadow, 0*(45+10)+20+shadow);
+		g->SetFont(f2); g->DrawString(text, 10+10*(120+10)+10+shadow, 1*(45+10)+20+shadow);
+		g->SetFont(f3); g->DrawString(text, 10+10*(120+10)+10+shadow, 2*(45+10)+20+shadow);
+		g->SetFont(f4); g->DrawString(text, 10+10*(120+10)+10+shadow, 3*(45+10)+20+shadow);
 
-		g->SetLineWidth(1);
-		g->SetColor(0x00, 0xf0, 0xf0, 0xff);
-		g->DrawRectangle(350, 500, 300, 200);
-		g->DrawLine(350, 600, 350+300, 600);
-
-		// round rectangle
-		g->SetLineWidth(1);
-		g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-		g->DrawRoundRectangle(700, 500, 150, 200);
-		g->SetColor(0x40, 0x80, 0xc0, 0xff);
-		g->FillRoundRectangle(720, 520, 110, 160);
-		g->SetColor(0xa0, 0x00, 0x00, 0xff);
-		g->DrawRoundRectangle(720, 520, 110, 160);
-
-		/* INFO:: circle teste
-		g->SetLineWidth(40);
-		g->SetColor(0xf0, 0xf0, 0xf0, 0x8f);
-		g->FillCircle(450, 400, 350);
-		g->SetColor(0x00, 0xf0, 0x00, 0x8f);
-		g->DrawCircle(450, 400, 350);
-		g->SetLineWidth(1);
-		g->SetColor(0xf0, 0x0, 0x00, 0xaf);
-		g->DrawCircle(450, 400, 250);
-		*/
-
-		/* INFO:: elipse teste
-		g->SetLineWidth(40);
-		g->SetColor(0xf0, 0xf0, 0xf0, 0x8f);
-		g->FillArc(450, 400, 350, 350/2, 0, 360);
-		g->SetColor(0x00, 0xf0, 0x00, 0x8f);
-		g->DrawArc(450, 400, 350, 350/2, 0, 360);
-		g->SetLineWidth(1);
-		g->SetColor(0xf0, 0x0, 0x00, 0xaf);
-		g->DrawArc(450, 400, 250, 250/2, 0, 360);
-		*/
+		g->SetColor(pcolor);
+		g->SetFont(f1); g->DrawString(text, 10+10*(120+10)+10, 0*(45+10)+20);
+		g->SetFont(f2); g->DrawString(text, 10+10*(120+10)+10, 1*(45+10)+20);
+		g->SetFont(f3); g->DrawString(text, 10+10*(120+10)+10, 2*(45+10)+20);
+		g->SetFont(f4); g->DrawString(text, 10+10*(120+10)+10, 3*(45+10)+20);
+		
+		g->Translate((120+10), (45+10+10));
 	}
 
 };
@@ -736,7 +812,7 @@ class GraphicsTeste : public jgui::Frame{
 		GraphicsTeste():
 			jgui::Frame("Graphics Teste", 0, 0, 1920, 1080)
 	{
-		panel = new GraphicPanel((1920-900)/2, 100, 900, 800);
+		panel = new GraphicPanel((1920-1600)/2, 100, 1600, 800);
 
 		Add(panel);
 	}

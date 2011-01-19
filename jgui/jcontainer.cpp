@@ -319,6 +319,8 @@ void Container::Paint(Graphics *g)
 	// quando na verdade deveria ser validado somente apos a chamada do
 	// metodo Repaint().
 	Revalidate();
+
+	g->Reset();
 }
 
 bool Container::Intersect(Component *c1, Component *c2)

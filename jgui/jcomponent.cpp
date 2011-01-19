@@ -205,9 +205,7 @@ int Component::GetVerticalGap()
 
 void Component::PaintEdges(Graphics *g)
 {
-	if (g == NULL) {
-		return;
-	}
+	g->Reset();
 
 	int xp = 0, 
 			yp = 0,
@@ -220,8 +218,7 @@ void Component::PaintEdges(Graphics *g)
 			da = _border_color.alpha;
 	int step = 0x20;
 
-	// g->SetColor(_border_red, _border_green, _border_blue, _border_alpha);
-	g->SetLineWidth(1); // _border_size);
+	g->SetLineWidth(_border_size);
 	
 	if (HasFocus() == true) {
 		dr = _focus_border_color.red;
@@ -306,6 +303,8 @@ void Component::PaintEdges(Graphics *g)
 
 void Component::Paint(Graphics *g)
 {
+	g->Reset();
+
 	if (_font != NULL) {
 		g->SetFont(_font);
 	}

@@ -65,10 +65,13 @@ class Triangulate {
 // Vector of vertices which are used to represent a polygon/contour and a series of triangles
 typedef std::vector< Vector2d > Vector2dVector;
 
-Graphics::Graphics(void *s):
+Graphics::Graphics(void *s, bool offscreen):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jgui::Graphics");
+
+	_is_offscreen = offscreen;
+	_antialias_enabled = false;
 
 	_radians = 0.0;
 	_translate.x = 0;
@@ -295,8 +298,12 @@ void Graphics::SetDrawingFlags(jdrawing_flags_t t)
 		} else if (_draw_flags == DF_XOR) {
 			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_XOR);
 		}
-			
-		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_SRC_PREMULTIPLY | flags));
+		
+		if (_is_offscreen == false) {
+			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_SRC_PREMULTIPLY);
+		}
+
+		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)flags);
 	}
 #endif
 }
@@ -325,7 +332,11 @@ void Graphics::SetBlittingFlags(jblitting_flags_t t)
 			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
 		}
 
-		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
+		if (_is_offscreen == false) {
+			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_SRC_PREMULTIPLY);
+		}
+
+		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)flags);
 	}
 #endif
 }
@@ -492,6 +503,11 @@ Font * Graphics::GetFont()
 	return _font;
 }
 
+void Graphics::SetAntiAliasEnabled(bool b)
+{
+	_antialias_enabled = b;
+}
+
 void Graphics::SetPixel(int xp, int yp, uint32_t pixel)
 {
 	SetRGB(xp, yp, pixel);
@@ -559,8 +575,8 @@ void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 			}
 
 			if (_line_join == ROUND_JOIN) {
-				FillArc(xp, yp, _line_width/2, _line_width/2, 0, 360);
-				FillArc(xp, yf, _line_width/2, _line_width/2, 0, 360);
+				FillArc(xp, yp, _line_width/2, _line_width/2, 0, 2*M_PI);
+				FillArc(xp, yf, _line_width/2, _line_width/2, 0, 2*M_PI);
 			}
 		} else if (yp == yf) {
 			if (xp < xf) {
@@ -570,8 +586,8 @@ void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 			}
 
 			if (_line_join == ROUND_JOIN) {
-				FillArc(xp, yp, _line_width/2, _line_width/2, 0, 360);
-				FillArc(xf, yp, _line_width/2, _line_width/2, 0, 360);
+				FillArc(xp, yp, _line_width/2, _line_width/2, 0, 2*M_PI);
+				FillArc(xf, yp, _line_width/2, _line_width/2, 0, 2*M_PI);
 			}
 		} else {
 			double r = (_line_width),
@@ -600,69 +616,12 @@ void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 			FillTriangle((int)(xp+dx-xdiff), (int)(yp+dy-ydiff), (int)(xp+c-xdiff), (int)(yp-s-ydiff), (int)(xp+c+dx-xdiff), (int)(yp-s+dy-ydiff));
 
 			if (_line_join == ROUND_JOIN) {
-				FillArc(xp-1, yp-1, r1, r1, 0, 360);
-				FillArc((int)(xp+dx), (int)(yp+dy), r1, r1, 0, 360);
+				FillArc(xp, yp, r1, r1, 0, 2*M_PI);
+				FillArc((int)(xp+dx), (int)(yp+dy), r1, r1, 0, 2*M_PI);
 			}
 		}
 	}
 #endif
-}
-
-double EvaluateBezier0(double *data, int ndata, double t) 
-{
-	if (t < 0.0) {
-		return(data[0]);
-	}
-
-	if (t >= (double)ndata) {
-		return data[ndata-1];
-	}
-
-	double result,
-				 blend,
-				 mu,
-				 muk,
-				 munk;
-	int n,
-			k,
-			kn,
-			nn,
-			nkn;
-
-	mu = t/(double)ndata;
-
-	n = ndata-1;
-	result = 0.0;
-	muk = 1;
-	munk = pow(1-mu,(double)n);
-
-	for (k=0; k<=n; k++) {
-		nn = n;
-		kn = k;
-		nkn = n - k;
-		blend = muk * munk;
-		muk *= mu;
-		munk /= (1-mu);
-
-		while (nn >= 1) {
-			blend *= nn;
-			nn--;
-
-			if (kn > 1) {
-				blend /= (double)kn;
-				kn--;
-			}
-
-			if (nkn > 1) {
-				blend /= (double)nkn;
-				nkn--;
-			}
-		}
-
-		result += data[k] * blend;
-	}
-
-	return result;
 }
 
 void Graphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
@@ -693,12 +652,12 @@ void Graphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 	y = new double[npoints+1];
 
 	for (int i=0; i<npoints; i++) {
-		x[i] = (double)SCALE_TO_SCREEN((p[i].x), _screen.width, _scale.width); 
-		y[i] = (double)SCALE_TO_SCREEN((p[i].y), _screen.height, _scale.height);
+		x[i] = (double)SCALE_TO_SCREEN((_translate.x+p[i].x), _screen.width, _scale.width); 
+		y[i] = (double)SCALE_TO_SCREEN((_translate.y+p[i].y), _screen.height, _scale.height);
 	}
 
-	x[npoints] = (double)SCALE_TO_SCREEN((p[0].x), _screen.width, _scale.width); 
-	y[npoints] = (double)SCALE_TO_SCREEN((p[0].y), _screen.height, _scale.height);
+	x[npoints] = (double)SCALE_TO_SCREEN((_translate.x+p[0].x), _screen.width, _scale.width); 
+	y[npoints] = (double)SCALE_TO_SCREEN((_translate.y+p[0].y), _screen.height, _scale.height);
 
 	double t = 0.0;
 	
@@ -759,7 +718,7 @@ void Graphics::DrawRectangle(int xp, int yp, int wp, int hp)
 void Graphics::FillBevelRectangle(int xp, int yp, int wp, int hp)
 {
 #ifdef DIRECTFB_UI
-	DrawRectangle0(xp, yp, wp, hp, BEVEL_JOIN, std::max(wp, hp));
+	DrawRectangle0(xp, yp, wp, hp, BEVEL_JOIN, -std::max(wp, hp));
 #endif
 }
 
@@ -773,7 +732,7 @@ void Graphics::DrawBevelRectangle(int xp, int yp, int wp, int hp)
 void Graphics::FillRoundRectangle(int xp, int yp, int wp, int hp)
 {
 #ifdef DIRECTFB_UI
-	DrawRectangle0(xp, yp, wp, hp, ROUND_JOIN, std::max(wp, hp));
+	DrawRectangle0(xp, yp, wp, hp, ROUND_JOIN, -std::max(wp, hp));
 #endif
 }
 
@@ -853,28 +812,23 @@ void Graphics::FillChord(int xcp, int ycp, int rxp, int ryp, double start_angle,
 		return;
 	}
 
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width)-1; 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
 	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
 
-	if (start_angle > 360 || start_angle < 360) {
-		start_angle = start_angle-((int)start_angle/360)*360;
+	start_angle = fmod(start_angle, 2*M_PI);
+	end_angle = fmod(end_angle, 2*M_PI);
+
+	if (start_angle < 0.0) {
+		start_angle = 2*M_PI + start_angle;
 	}
 
-	if (end_angle > 360 || end_angle < 360) {
-		end_angle = end_angle-((int)end_angle/360)*360;
+	if (end_angle < 0.0) {
+		end_angle = 2*M_PI + end_angle;
 	}
 
-	if (start_angle < 0) {
-		start_angle = 360-start_angle;
-	}
-
-	if (end_angle < 0) {
-		end_angle = 360-end_angle;
-	}
-
-	DrawChord0(xc, yc, rx, ry, start_angle*(M_PI/180.0), end_angle*(M_PI/180.0), std::max(rx, ry));
+	DrawChord0(xc, yc, rx, ry, start_angle, end_angle, std::max(rx, ry));
 #endif
 }
 
@@ -885,31 +839,26 @@ void Graphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double start_angle,
 		return;
 	}
 
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width)-1; 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
 	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
 
-	if (start_angle > 360 || start_angle < 360) {
-		start_angle = start_angle-((int)start_angle/360)*360;
+	start_angle = fmod(start_angle, 2*M_PI);
+	end_angle = fmod(end_angle, 2*M_PI);
+
+	if (start_angle < 0.0) {
+		start_angle = 2*M_PI + start_angle;
 	}
 
-	if (end_angle > 360 || end_angle < 360) {
-		end_angle = end_angle-((int)end_angle/360)*360;
-	}
-
-	if (start_angle < 0) {
-		start_angle = 360-start_angle;
-	}
-
-	if (end_angle < 0) {
-		end_angle = 360-end_angle;
+	if (end_angle < 0.0) {
+		end_angle = 2*M_PI + end_angle;
 	}
 
 	if (_line_width < 0) {
-		DrawChord0(xc, yc, rx, ry, start_angle*(M_PI/180.0), end_angle*(M_PI/180.0), -_line_width);
+		DrawChord0(xc, yc, rx, ry, start_angle, end_angle, -_line_width);
 	} else {
-		DrawChord0(xc, yc, rx+_line_width, ry+_line_width, start_angle*(M_PI/180.0), end_angle*(M_PI/180.0), _line_width);
+		DrawChord0(xc, yc, rx+_line_width, ry+_line_width, start_angle, end_angle, _line_width);
 	}
 #endif
 }
@@ -921,36 +870,36 @@ void Graphics::FillArc(int xcp, int ycp, int rxp, int ryp, double start_angle, d
 		return;
 	}
 
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width)-1; 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
 	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
 
-	start_angle = fmod(start_angle, 360.0);
-	end_angle = fmod(end_angle, 360.0);
+	start_angle = fmod(start_angle, 2*M_PI);
+	end_angle = fmod(end_angle, 2*M_PI);
 
-	if (start_angle < 0) {
-		start_angle = 360+start_angle;
+	if (start_angle < 0.0) {
+		start_angle = 2*M_PI + start_angle;
 	}
 
-	if (end_angle < 0) {
-		end_angle = 360+end_angle;
+	if (end_angle < 0.0) {
+		end_angle = 2*M_PI + end_angle;
 	}
 
 	int quadrant = -1;
 
-	if (start_angle >= 0.0 && start_angle < 90.0) {
+	if (start_angle >= 0.0 && start_angle < M_PI_2) {
 		quadrant = 0;
-	} else if (start_angle >= 90.0 && start_angle < 180.0) {
+	} else if (start_angle >= M_PI_2 && start_angle < M_PI) {
 		quadrant = 1;
-	} else if (start_angle >= 180.0 && start_angle < 270.0) {
+	} else if (start_angle >= M_PI && start_angle < (M_PI+M_PI_2)) {
 		quadrant = 2;
-	} else if (start_angle >= 270.0 && start_angle < 360.0) {
+	} else if (start_angle >= (M_PI+M_PI_2) && start_angle < 2*M_PI) {
 		quadrant = 3;
 	}
 
 	if (end_angle < start_angle) {
-		end_angle = end_angle + 360.0;
+		end_angle = end_angle + 2*M_PI;
 	}
 
 	while (start_angle < end_angle) {
@@ -958,22 +907,22 @@ void Graphics::FillArc(int xcp, int ycp, int rxp, int ryp, double start_angle, d
 					 q = quadrant;
 
 		if (quadrant == 0) {
-			if (end_angle > 90.0) {
-				b = 90.0;
+			if (end_angle > M_PI_2) {
+				b = M_PI_2;
 			}
 		} else if (quadrant == 1) {
-			if (end_angle > 180.0) {
-				b = 180.0;
+			if (end_angle > M_PI) {
+				b = M_PI;
 			}
 		} else if (quadrant == 2) {
-			if (end_angle > 270.0) {
-				b = 270.0;
+			if (end_angle > (M_PI+M_PI_2)) {
+				b = (M_PI+M_PI_2);
 			}
 		} else if (quadrant == 3) {
-			if (end_angle > 360.0) {
+			if (end_angle > 2*M_PI) {
 				b = 0.0;
 
-				end_angle = end_angle-360.0;
+				end_angle = end_angle-2*M_PI;
 			}
 		}
 
@@ -992,36 +941,36 @@ void Graphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double start_angle, d
 		return;
 	}
 
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width)-1; 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
 	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
 
-	start_angle = fmod(start_angle, 360.0);
-	end_angle = fmod(end_angle, 360.0);
+	start_angle = fmod(start_angle, 2*M_PI);
+	end_angle = fmod(end_angle, 2*M_PI);
 
-	if (start_angle < 0) {
-		start_angle = 360+start_angle;
+	if (start_angle < 0.0) {
+		start_angle = 2*M_PI + start_angle;
 	}
 
-	if (end_angle < 0) {
-		end_angle = 360+end_angle;
+	if (end_angle < 0.0) {
+		end_angle = 2*M_PI + end_angle;
 	}
 
 	int quadrant = -1;
 
-	if (start_angle >= 0.0 && start_angle < 90.0) {
+	if (start_angle >= 0.0 && start_angle < M_PI_2) {
 		quadrant = 0;
-	} else if (start_angle >= 90.0 && start_angle < 180.0) {
+	} else if (start_angle >= M_PI_2 && start_angle < M_PI) {
 		quadrant = 1;
-	} else if (start_angle >= 180.0 && start_angle < 270.0) {
+	} else if (start_angle >= M_PI && start_angle < (M_PI+M_PI_2)) {
 		quadrant = 2;
-	} else if (start_angle >= 270.0 && start_angle < 360.0) {
+	} else if (start_angle >= (M_PI+M_PI_2) && start_angle < 2*M_PI) {
 		quadrant = 3;
 	}
 
 	if (end_angle < start_angle) {
-		end_angle = end_angle + 360.0;
+		end_angle = end_angle + 2*M_PI;
 	}
 
 	while (start_angle < end_angle) {
@@ -1029,22 +978,22 @@ void Graphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double start_angle, d
 					 q = quadrant;
 
 		if (quadrant == 0) {
-			if (end_angle > 90.0) {
-				b = 90.0;
+			if (end_angle > M_PI_2) {
+				b = M_PI_2;
 			}
 		} else if (quadrant == 1) {
-			if (end_angle > 180.0) {
-				b = 180.0;
+			if (end_angle > M_PI) {
+				b = M_PI;
 			}
 		} else if (quadrant == 2) {
-			if (end_angle > 270.0) {
-				b = 270.0;
+			if (end_angle > (M_PI+M_PI_2)) {
+				b = (M_PI+M_PI_2);
 			}
 		} else if (quadrant == 3) {
-			if (end_angle > 360.0) {
+			if (end_angle > 2*M_PI) {
 				b = 0.0;
 
-				end_angle = end_angle-360.0;
+				end_angle = end_angle-2*M_PI;
 			}
 		}
 
@@ -1068,6 +1017,36 @@ void Graphics::FillPie(int xcp, int ycp, int rxp, int ryp, double start_angle, d
 void Graphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
 {
 	DrawArc(xcp, ycp, rxp, ryp, start_angle, end_angle);
+
+	int line_width = _line_width;
+
+	if (_line_width < 0) {
+		_line_width = 1;
+	}
+
+	double t0 = fmod(start_angle, 2*M_PI),
+				 t1 = fmod(end_angle, 2*M_PI);
+
+	if (t0 < 0.0) {
+		t0 = M_PI+t0;
+	}
+
+	if (t1 < 0.0) {
+		t1 = 2*M_PI+t1;
+	}
+
+	jpoint_t p[3];
+
+	p[0].x = rxp*cos(t1);
+	p[0].y = ryp*sin(t1);
+	p[1].x = 0;
+	p[1].y = 0;
+	p[2].x = rxp*cos(t0);
+	p[2].y = ryp*sin(t0);
+	
+	DrawPolygon(xcp, ycp, p, 3, false);
+
+	_line_width = line_width;
 }
 		
 void Graphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
@@ -1171,18 +1150,34 @@ void Graphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
 						xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y, 
 						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
 			} else if (_line_join == ROUND_JOIN) {
-				int a1 = scaled[((i+0)%npoints)*2+0].y-scaled[((i+0)%npoints)*2+1].y,
-						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x;
-				int a2 = scaled[((i+1)%npoints)*2+0].y-scaled[((i+1)%npoints)*2+1].y,
-						b2 = scaled[((i+1)%npoints)*2+0].x-scaled[((i+1)%npoints)*2+1].x;
+				double dx0 = p[(i+1)%npoints].x-p[(i+0)%npoints].x,
+							 dy0 = p[(i+1)%npoints].y-p[(i+0)%npoints].y,
+							 dx1 = p[(i+2)%npoints].x-p[(i+1)%npoints].x,
+							 dy1 = p[(i+2)%npoints].y-p[(i+1)%npoints].y,
+							 tan0 = (double)(dx0)/(double)(dy0),
+							 tan1 = (double)(dx1)/(double)(dy1),
+							 ang0 = atan(tan0),
+							 ang1 = atan(tan1);
 
-				double tan0 = (double)(p[(i+1)%npoints].x-scaled[((i+0)%npoints)*2+1].x)/(double)(p[(i+1)%npoints].y-scaled[((i+0)%npoints)*2+1].y),
-							 // tan1 = (double)(p[(i+1)%npoints].x-scaled[((i+1)%npoints)*2+0].x)/(double)(p[(i+1)%npoints].y-scaled[((i+1)%npoints)*2+0].y),
-							 cos0 = (a1*a2+b1*b2)/(sqrt(a1*a1+b1*b1)*sqrt(a2*a2+b2*b2)), // angulo entre retas
-							 ang0 = atan(tan0)+M_PI_2,
-							 ang1 = atan(tan0)+acos(cos0)+M_PI_2;
+				if (tan0 >= 0.0) {
+					if (dx0 >= 0.0) {
+						ang0 = ang0 + M_PI;
+						puts("01");
+					} else {
+						puts("02");
+					}
+				} else {
+					if (dx0 >= 0.0) {
+						puts("03");
+					} else {
+						ang0 = ang0 + M_PI;
+						puts("04");
+					}
+				}
 
-				FillArc(xp+p[(i+1)%npoints].x-1, yp+p[(i+1)%npoints].y-1, _line_width, _line_width, (180.0*ang0)/M_PI, (180.0*ang1)/M_PI);
+				printf("ang:: %f, %f, %f, %f\n", tan0, tan1, (ang0*180.0)/M_PI, (ang1*180.0)/M_PI);
+
+				FillArc(xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y+1, _line_width-1, _line_width-1, ang0, ang1);
 			} else if (_line_join == MITER_JOIN) {
 				int a1 = scaled[((i+0)%npoints)*2+0].y-scaled[((i+0)%npoints)*2+1].y,
 						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x,
@@ -1409,8 +1404,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_color.red, _color.green, _color.blue, alpha);
-		g->DrawImage(img, 0, 0, wp, hp, 0xff);
+		g->DrawImage(img, 0, 0, wp, hp, alpha);
 		
 		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
@@ -1443,9 +1437,8 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 		return false;
 	}
 
-	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-	imgSurface->SetDrawingFlags(imgSurface, (DFBSurfaceDrawingFlags)(DSDRAW_NOFX));
 	imgSurface->SetPorterDuff(imgSurface, DSPD_NONE);
+	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
 
 	imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
 	
@@ -1456,28 +1449,8 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp, int al
 		return false;
 	}
 
-	DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
-
-	if (_blit_flags & BF_ALPHACHANNEL) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_ALPHACHANNEL);
-	}
-
-	if (_blit_flags & BF_COLORALPHA) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA);
-	} 
-
-	if (_blit_flags & BF_COLORIZE) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE);
-	}
-
-	if (_blit_flags & BF_XOR) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
-	}
-
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(flags));
 	surface->Blit(surface, imgSurface, NULL, x, y);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
 
 	imgProvider->Release(imgProvider);
@@ -1511,8 +1484,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_color.red, _color.green, _color.blue, alpha);
-		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, 0xff);
+		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, alpha);
 		
 		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
@@ -1542,9 +1514,8 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		return false;
 	}
 
-	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_NOFX));
-	imgSurface->SetDrawingFlags(imgSurface, (DFBSurfaceDrawingFlags)(DSDRAW_NOFX));
 	imgSurface->SetPorterDuff(imgSurface, DSPD_NONE);
+	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
 
 	imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
 	
@@ -1555,24 +1526,6 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		return false;
 	}
 	
-	DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
-
-	if (_blit_flags & BF_ALPHACHANNEL) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_ALPHACHANNEL);
-	}
-
-	if (_blit_flags & BF_COLORALPHA) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA);
-	} 
-
-	if (_blit_flags & BF_COLORIZE) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE);
-	}
-
-	if (_blit_flags & BF_XOR) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
-	}
-
 	DFBRectangle srect;
 
 	srect.x = sxp;
@@ -1581,9 +1534,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	srect.h = shp;
 
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(flags));
 	surface->Blit(surface, imgSurface, &srect, x, y);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
 
 	imgProvider->Release(imgProvider);
@@ -1624,8 +1575,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_color.red, _color.green, _color.blue, alpha);
-		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp, 0xff);
+		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp, alpha);
 		
 		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
@@ -1662,9 +1612,8 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		return false;
 	}
 
-	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-	imgSurface->SetDrawingFlags(imgSurface, (DFBSurfaceDrawingFlags)(DSDRAW_NOFX));
 	imgSurface->SetPorterDuff(imgSurface, DSPD_NONE);
+	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
 
 	imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
 	
@@ -1673,24 +1622,6 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		imgSurface->Release(imgSurface);
 
 		return false;
-	}
-
-	DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
-
-	if (_blit_flags & BF_ALPHACHANNEL) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_ALPHACHANNEL);
-	}
-
-	if (_blit_flags & BF_COLORALPHA) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA);
-	} 
-
-	if (_blit_flags & BF_COLORIZE) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE);
-	}
-
-	if (_blit_flags & BF_XOR) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
 	}
 
 	DFBRectangle srect,
@@ -1707,9 +1638,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	drect.h = h;
 
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(flags));
 	surface->StretchBlit(surface, imgSurface, &srect, &drect);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
 
 	imgProvider->Release(imgProvider);
@@ -1793,36 +1722,15 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 		Graphics *g = off.GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_color.red, _color.green, _color.blue, alpha);
-		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp, 0xff);
+		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp, alpha);
 
 		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, alpha);
 
 		return true;
 	}
 
-	DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
-
-	if (_blit_flags & BF_ALPHACHANNEL) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_ALPHACHANNEL);
-	}
-
-	if (_blit_flags & BF_COLORALPHA) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA);
-	} 
-
-	if (_blit_flags & BF_COLORIZE) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE);
-	}
-
-	if (_blit_flags & BF_XOR) {
-		flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
-	}
-
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, alpha);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(flags));
 	surface->StretchBlit(surface, g->surface, &srect, &drect);
-	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_SRC_PREMULTIPLY | flags));
 	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
 #endif
 
@@ -1831,7 +1739,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 
 void Graphics::Rotate(double radians)
 {
-	_radians = fmod(radians, 2.0*jmath::Math<double>::PI);
+	_radians = fmod(radians, 2*M_PI);
 }
 
 void Graphics::Translate(int x, int y)
@@ -2352,8 +2260,6 @@ void Graphics::Reset()
 	_color.alpha = 0x00;
 
 	_radians = 0.0;
-	// _translate.x = 0;
-	// _translate.y = 0;
 	_line_width = 1;
 	_line_join = BEVEL_JOIN;
 	_line_style = SOLID_LINE;
@@ -2760,13 +2666,70 @@ bool Triangulate::InsideTriangle(float Ax, float Ay, float Bx, float By, float C
 	return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
 }
 
+double Graphics::EvaluateBezier0(double *data, int ndata, double t) 
+{
+	if (t < 0.0) {
+		return(data[0]);
+	}
+
+	if (t >= (double)ndata) {
+		return data[ndata-1];
+	}
+
+	double result,
+				 blend,
+				 mu,
+				 muk,
+				 munk;
+	int n,
+			k,
+			kn,
+			nn,
+			nkn;
+
+	mu = t/(double)ndata;
+
+	n = ndata-1;
+	result = 0.0;
+	muk = 1;
+	munk = pow(1-mu,(double)n);
+
+	for (k=0; k<=n; k++) {
+		nn = n;
+		kn = k;
+		nkn = n - k;
+		blend = muk * munk;
+		muk *= mu;
+		munk /= (1-mu);
+
+		while (nn >= 1) {
+			blend *= nn;
+			nn--;
+
+			if (kn > 1) {
+				blend /= (double)kn;
+				kn--;
+			}
+
+			if (nkn > 1) {
+				blend /= (double)nkn;
+				nkn--;
+			}
+		}
+
+		result += data[k] * blend;
+	}
+
+	return result;
+}
+
 void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, jline_join_t join, int size)
 { 
 	if (wp <= 0 || hp <= 0) {
 		return;
 	}
 
-	if (_line_width == 0) {
+	if (size == 0) {
 		return;
 	}
 
@@ -2807,10 +2770,12 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, jline_join_t join,
 		FillRectangle(xp-size, yp, size, hp);
 		FillRectangle(xp+wp, yp, size, hp);
 
-		FillArc(xp-1, yp-1, size, size, 90.0, 180.0);
-		FillArc(xp-1, yp+hp-1, size, size, 180.0, 270.0);
-		FillArc(xp+wp-1, yp+hp-1, size, size, 270.0, 360.0);
-		FillArc(xp+wp-1, yp-1, size, size, 0.0, 90.0);
+		size = size - 1;
+
+		FillArc(xp, yp, size, size, M_PI_2, M_PI);
+		FillArc(xp, yp+hp, size, size, M_PI, M_PI+M_PI_2);
+		FillArc(xp+wp, yp+hp, size, size, M_PI+M_PI_2, 2*M_PI);
+		FillArc(xp+wp, yp, size, size, 0.0, M_PI_2);
 	} else if (join == MITER_JOIN) {
 		FillRectangle(xp-size, yp-size, wp+2*size, size);
 		FillRectangle(xp-size, yp+hp, wp+2*size, size);
@@ -2825,11 +2790,11 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, jline_join_t join,
 
 void Graphics::DrawChord0(int xc, int yc, int rx, int ry, double start_angle, double end_angle, int size)
 {
-	if (surface == NULL) {
+	if (size == 0) {
 		return;
 	}
 
-	if (_line_width == 0) {
+	if (surface == NULL) {
 		return;
 	}
 
@@ -2854,8 +2819,27 @@ void Graphics::DrawChord0(int xc, int yc, int rx, int ry, double start_angle, do
 	double a = (y_inf-y_sup),
 				 b = (x_inf-x_sup),
 				 c = (x_inf*y_sup-x_sup*y_inf);
+	double x0_inf = min_rx*cos(start_angle),
+				 y0_inf = min_ry*sin(start_angle),
+				 x0_sup = min_rx*cos(end_angle),
+				 y0_sup = min_ry*sin(end_angle);
+	double a0 = (y0_inf-y0_sup),
+				 b0 = (x0_inf-x0_sup),
+				 c0 = (x0_inf*y0_sup-x0_sup*y0_inf);
+	
+	DFBRegion lines[4*(int)max_ry];
+	int xi,
+			xf,
+			k = 0;
+
+			double d = (c)/(sqrt(a*a+b*b));
+
+			printf(":: %f\n", d);
 
 	for (double y=-max_ry; y<max_ry; y+=1.0) {
+		xi = -1;
+		xf = -1;
+
 		for (double x=-max_rx; x<max_rx; x+=1.0) {
 			double min_ellipse,
 						 max_ellipse;
@@ -2868,27 +2852,55 @@ void Graphics::DrawChord0(int xc, int yc, int rx, int ry, double start_angle, do
 				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
 			}
 
-			double eq_y_inf = a*x+b*y+c,
-						 eq_y_sup = a*x+b*y+c+2*max_rx*size;
+			double eq_y_inf = a0*x+b0*y+c0,
+						 eq_y_sup = a*x+b*y+c;
 
 			if (max_ellipse <= 1.0) {
-				if (eq_y_inf <= 0.0) {
-					if (min_ellipse >= 1.0 || eq_y_sup >= 0.0) {
-						surface->DrawLine(surface, xc+x, yc+y, xc+x, yc+y);
+				if (eq_y_sup <= 0.0) {
+					if (min_ellipse >= 1.0 || eq_y_inf >= 0.0) {
+						// surface->DrawLine(surface, xc+x, yc+y, xc+x, yc+y);
+						 
+						if (xi < 0) {
+							xi = xc+x;
+						}
+
+						xf = xc+x;
+					} else if (min_ellipse < 1.0) {
+						if (xi > 1) {
+							lines[k].x1 = (int)(xi);
+							lines[k].y1 = (int)(yc+y);
+							lines[k].x2 = (int)(xc+x);
+							lines[k].y2 = (int)(yc+y);
+
+							xi = -1;
+
+							k++;
+						}
 					}
 				}
 			}
 		}
+
+		if (xi > 0) {
+			lines[k].x1 = (int)(xi);
+			lines[k].y1 = (int)(yc+y);
+			lines[k].x2 = (int)(xf);
+			lines[k].y2 = (int)(yc+y);
+
+			k++;
+		}
 	}
+	
+	surface->DrawLines(surface, lines, k);
 }
 
 void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double start_angle, double end_angle, int size, int quadrant)
 {
-	if (surface == NULL) {
+	if (size == 0) {
 		return;
 	}
 
-	if (_line_width == 0) {
+	if (surface == NULL) {
 		return;
 	}
 
@@ -2904,21 +2916,18 @@ void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double start_angle, doub
 	} else if (quadrant == 1) {
 		double t0 = start_angle;
 
-		start_angle = 180.0-end_angle;
-		end_angle = 180.0-t0;
+		start_angle = M_PI-end_angle;
+		end_angle = M_PI-t0;
 	} else if (quadrant == 2) {
-		start_angle = start_angle-180.0;
-		end_angle = end_angle-180.0;
+		start_angle = start_angle-M_PI;
+		end_angle = end_angle-M_PI;
 	} else if (quadrant == 3) {
 		double t0 = start_angle;
 
-		start_angle = 360.0-end_angle;
-		end_angle = 360.0-t0;
+		start_angle = 2*M_PI-end_angle;
+		end_angle = 2*M_PI-t0;
 	}
 		
-	start_angle = (start_angle*M_PI)/180.0;
-	end_angle = (end_angle*M_PI)/180.0;
-
 	double min_rx = rx-line_width,
 				 min_ry = ry-line_width,
 				 max_rx = rx,
@@ -3038,15 +3047,72 @@ void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double start_angle, doub
 	}
 			
 	surface->DrawLines(surface, lines, k);
+	
+	if (_antialias_enabled == true) {
+		int cx = 0,
+				cy = 0;
+
+		if (quadrant == 0 || quadrant == 3) {
+			for (int y=1; y<k; y++) {
+				if (lines[y].x2 < lines[y-1].x2) {
+					cx = 1;
+					cy = lines[y-1].x2-lines[y].x2;
+				} else if (lines[y].x2 == lines[y-1].x2) {
+					if (cx > 0) {
+						cx = cx + 1;
+						cy = 0;
+					}
+				}
+
+				if (cx > 0) {
+					surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*cx));
+					surface->DrawLine(surface, lines[y].x2+1, lines[y].y1, lines[y].x2+1, lines[y].y1);
+
+					if (cy > 1) {
+						for (int i=1; i<cy; i++) {
+							surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*i));
+							surface->DrawLine(surface, lines[y].x2+i+1, lines[y].y1, lines[y].x2+i+1, lines[y].y1);
+						}
+					}
+				}
+			}
+		} else if (quadrant == 1 || quadrant == 2) {
+			for (int y=1; y<k; y++) {
+				if (lines[y].x1 > lines[y-1].x1) {
+					cx = 1;
+					cy = lines[y].x1-lines[y-1].x1;
+				} else if (lines[y].x1 == lines[y-1].x1) {
+					if (cx > 0) {
+						cx = cx + 1;
+						cy = 0;
+					}
+				}
+
+				if (cx > 0) {
+					surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*cx));
+					surface->DrawLine(surface, lines[y].x1-1, lines[y].y1, lines[y].x1-1, lines[y].y1);
+
+					if (cy > 1) {
+						for (int i=1; i<cy; i++) {
+							surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*i));
+							surface->DrawLine(surface, lines[y].x1-i-1, lines[y].y1, lines[y].x1-i-1, lines[y].y1);
+						}
+					}
+				}
+			}
+		}
+
+		surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
+	}
 }
 
 void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
 {
-	if (surface == NULL) {
+	if (size == 0) {
 		return;
 	}
 
-	if (_line_width == 0) {
+	if (surface == NULL) {
 		return;
 	}
 
@@ -3175,10 +3241,68 @@ void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
 			k++;
 		}
 	}
-			
+	
 	surface->DrawLines(surface, lines, k);
 
-	for (int i=0; i<k; i++) {
+	if (_antialias_enabled == true) {
+		int cx = 0,
+				cy = 0;
+
+		// quadrant 0, 1
+		for (int y=4; y<k; y+=4) {
+			if (lines[y+1].x1 > lines[y-4+1].x1) {
+				cx = 1;
+				cy = lines[y+1].x1-lines[y-4+1].x1;
+			} else if (lines[y+1].x1 == lines[y-4+1].x1) {
+				if (cx > 0) {
+					cx = cx + 1;
+					cy = 0;
+				}
+			}
+
+			if (cx > 0) {
+				surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*cx));
+				surface->DrawLine(surface, lines[y+1].x1-1, lines[y+1].y1, lines[y+1].x1-1, lines[y+1].y1);
+				surface->DrawLine(surface, lines[y+0].x2+1, lines[y+0].y2, lines[y+0].x2+1, lines[y+0].y2);
+
+				if (cy > 1) {
+					for (int i=1; i<cy; i++) {
+						surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*i));
+						surface->DrawLine(surface, lines[y+1].x1-i-1, lines[y+1].y1, lines[y+1].x1-i-1, lines[y+1].y1);
+						surface->DrawLine(surface, lines[y+0].x2+i+1, lines[y+0].y2, lines[y+0].x2+i+1, lines[y+0].y2);
+					}
+				}
+			}
+		}
+
+		// quadrant 2, 3
+		for (int y=4; y<k; y+=4) {
+			if (lines[y+2].x1 > lines[y-4+2].x1) {
+				cx = 1;
+				cy = lines[y+1].x1-lines[y-4+1].x1;
+			} else if (lines[y+2].x1 == lines[y-4+2].x1) {
+				if (cx > 0) {
+					cx = cx + 1;
+					cy = 0;
+				}
+			}
+
+			if (cx > 0) {
+				surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*cx));
+				surface->DrawLine(surface, lines[y+2].x1-1, lines[y+2].y1, lines[y+2].x1-1, lines[y+2].y1);
+				surface->DrawLine(surface, lines[y+3].x2+1, lines[y+3].y2, lines[y+3].x2+1, lines[y+3].y2);
+
+				if (cy > 1) {
+					for (int i=1; i<cy; i++) {
+						surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*i));
+						surface->DrawLine(surface, lines[y+2].x1-i-1, lines[y+2].y1, lines[y+2].x1-i-1, lines[y+2].y1);
+						surface->DrawLine(surface, lines[y+3].x2+i+1, lines[y+3].y2, lines[y+3].x2+i+1, lines[y+3].y2);
+					}
+				}
+			}
+		}
+
+		surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
 	}
 }
 #endif
@@ -3316,20 +3440,7 @@ void Graphics::RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, i
 								continue;
 							}
 
-							// INFO:: needed
-							sr += 8;
-							sg += 8;
-							sb += 8;
-							sa += 8;
-							gr += 8;
-							gg += 8;
-							gb += 8;
 							ga = 0xff;
-							
-							if (_blit_flags & BF_COLORALPHA) {
-								sa = alpha;
-								ga = (ga*(0xff-alpha)) >> 8;
-							}
 
 							if (_blit_flags & BF_ALPHACHANNEL) {
 								if (_porter_duff_flags == PDF_NONE) {

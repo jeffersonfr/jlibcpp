@@ -232,9 +232,6 @@ class Graphics : public virtual jcommon::Object{
 	friend class Window;
 	friend class OffScreenImage;
 
-	protected:
-		Graphics(void *s);
-
 	private:
 		jthread::Mutex graphics_mutex;
 
@@ -255,6 +252,8 @@ class Graphics : public virtual jcommon::Object{
 		Font *_font;
 		double _radians;
 		int _line_width;
+		bool _is_offscreen,
+				 _antialias_enabled;
 
 #ifdef DIRECTFB_UI
 		struct edge_t {
@@ -274,12 +273,17 @@ class Graphics : public virtual jcommon::Object{
 		void Polygon(int n, int coordinates[]);
 		void FillPolygon0(int n, int ppts[]);
 		
+		double EvaluateBezier0(double *data, int ndata, double t);
+
 		void DrawRectangle0(int xp, int yp, int wp, int hp, jline_join_t join, int size);
 		void DrawChord0(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle, int size);
 		void DrawArc0(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle, int size, int quadrant);
 		void DrawEllipse0(int xcp, int ycp, int rxp, int ryp, int size);
 		void RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
 #endif
+
+	protected:
+		Graphics(void *s, bool offscreen);
 
 	public:
 		/**
@@ -426,6 +430,12 @@ class Graphics : public virtual jcommon::Object{
 		 */
 		virtual Font * GetFont(); 
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetAntiAliasEnabled(bool b);
+
 		/**
 		 * \brief
 		 *
