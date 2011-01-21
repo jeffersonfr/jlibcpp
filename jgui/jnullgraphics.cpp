@@ -256,22 +256,22 @@ void NullGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp)
+void NullGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp)
+void NullGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp)
+void NullGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp)
+void NullGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -296,32 +296,32 @@ void NullGraphics::DrawEllipse(int xcp, int ycp, int rxp, int ryp)
 	JDEBUG(JINFO, "called\n");
 }
 		
-void NullGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+void NullGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
 }
 		
-void NullGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+void NullGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
 }
 		
-void NullGraphics::FillArc(int xc, int yc, int rx, int ry, double start_angle, double end_angle)
+void NullGraphics::FillArc(int xc, int yc, int rx, int ry, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawArc(int xc, int yc, int rx, int ry, double start_angle, double end_angle)
+void NullGraphics::DrawArc(int xc, int yc, int rx, int ry, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+void NullGraphics::FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle)
+void NullGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -371,56 +371,56 @@ void NullGraphics::DrawGlyph(int symbol, int xp, int yp)
 	JDEBUG(JINFO, "called\n");
 }
 
-bool NullGraphics::DrawImage(std::string img, int x, int y, int alpha)
+bool NullGraphics::DrawImage(std::string img, int x, int y)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(std::string img, int x, int y, int w, int h, int alpha)
+bool NullGraphics::DrawImage(std::string img, int x, int y, int w, int h)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int alpha)
+bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha)
+bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(OffScreenImage *img, int x, int y, int alpha)
+bool NullGraphics::DrawImage(OffScreenImage *img, int x, int y)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(OffScreenImage *img, int x, int y, int w, int h, int alpha)
+bool NullGraphics::DrawImage(OffScreenImage *img, int x, int y, int w, int h)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int alpha)
+bool NullGraphics::DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha)
+bool NullGraphics::DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h)
 {
 	JDEBUG(JINFO, "called\n");
 

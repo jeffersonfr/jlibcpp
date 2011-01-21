@@ -306,25 +306,25 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillBevelRectangle(int xp, int yp, int wp, int hp);
+		virtual void FillBevelRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawBevelRectangle(int xp, int yp, int wp, int hp);
+		virtual void DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillRoundRectangle(int xp, int yp, int wp, int hp);
+		virtual void FillRoundRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawRoundRectangle(int xp, int yp, int wp, int hp);
+		virtual void DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
 		
 		/**
 		 * \brief
@@ -354,37 +354,37 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
@@ -426,49 +426,49 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int x, int y, int alpha = 0xff);
+		virtual bool DrawImage(std::string img, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int x, int y, int w, int h, int alpha = 0xff);
+		virtual bool DrawImage(std::string img, int x, int y, int w, int h);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int alpha = 0xff);
+		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha = 0xff);
+		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int x, int y, int alpha = 0xff);
+		virtual bool DrawImage(OffScreenImage *img, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int x, int y, int w, int h, int alpha = 0xff);
+		virtual bool DrawImage(OffScreenImage *img, int x, int y, int w, int h);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int alpha = 0xff);
+		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha = 0xff);
+		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h);
 		
 		/**
 		 * \brief

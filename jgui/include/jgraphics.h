@@ -252,7 +252,7 @@ class Graphics : public virtual jcommon::Object{
 		Font *_font;
 		double _radians;
 		int _line_width;
-		bool _is_offscreen,
+		bool _is_premultiply,
 				 _antialias_enabled;
 
 #ifdef DIRECTFB_UI
@@ -275,10 +275,12 @@ class Graphics : public virtual jcommon::Object{
 		
 		double EvaluateBezier0(double *data, int ndata, double t);
 
-		void DrawRectangle0(int xp, int yp, int wp, int hp, jline_join_t join, int size);
-		void DrawChord0(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle, int size);
-		void DrawArc0(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle, int size, int quadrant);
+		void DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jline_join_t join, int size);
 		void DrawEllipse0(int xcp, int ycp, int rxp, int ryp, int size);
+		void DrawArc0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size, int quadrant);
+		void DrawPie0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size);
+		void DrawChord0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size);
+		
 		void RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
 #endif
 
@@ -552,25 +554,25 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void FillBevelRectangle(int xp, int yp, int wp, int hp);
+		virtual void FillBevelRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawBevelRectangle(int xp, int yp, int wp, int hp);
+		virtual void DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillRoundRectangle(int xp, int yp, int wp, int hp);
+		virtual void FillRoundRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawRoundRectangle(int xp, int yp, int wp, int hp);
+		virtual void DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
 		
 		/**
 		 * \brief
@@ -600,37 +602,37 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void FillChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawChord(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawArc(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawPie(int xcp, int ycp, int rxp, int ryp, double start_angle, double end_angle);
+		virtual void DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1);
 		
 		/**
 		 * \brief
@@ -672,49 +674,49 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int x, int y, int alpha = 0xff);
+		virtual bool DrawImage(std::string img, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int x, int y, int w, int h, int alpha = 0xff);
+		virtual bool DrawImage(std::string img, int x, int y, int w, int h);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int alpha = 0xff);
+		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha = 0xff);
+		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int x, int y, int alpha = 0xff);
+		virtual bool DrawImage(OffScreenImage *img, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int x, int y, int w, int h, int alpha = 0xff);
+		virtual bool DrawImage(OffScreenImage *img, int x, int y, int w, int h);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int alpha = 0xff);
+		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h, int alpha = 0xff);
+		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h);
 		
 		/**
 		 * \brief

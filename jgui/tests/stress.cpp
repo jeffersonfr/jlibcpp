@@ -60,7 +60,7 @@ class GraphicPanel : public jgui::Frame{
 				b1,
 				a1;
 		int size,
-				iterations = 1000;
+				iterations = 10;
 
 		g->SetFont(_font);
 
@@ -177,7 +177,7 @@ class GraphicPanel : public jgui::Frame{
 
 			g->SetColor(r1, g1, b1, 0xff);
 			g->FillTriangle(x, y, x+w/2, y-h, x+w, y);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawTriangle(x, y, x+w/2, y-h, x+w, y);
 
 			g->Flip(x, y-h, w, h);
@@ -201,7 +201,7 @@ class GraphicPanel : public jgui::Frame{
 
 			g->SetColor(r1, g1, b1, a1+0x80);
 			g->FillTriangle(x, y, x+w/2, y-h, x+w, y);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawTriangle(x, y, x+w/2, y-h, x+w, y);
 
 			g->Flip(x, y-h, w, h);
@@ -221,7 +221,7 @@ class GraphicPanel : public jgui::Frame{
 
 			g->SetColor(r1, g1, b1, 0xff);
 			g->FillRectangle(x+_insets.left, y+_insets.top, w, h);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawRectangle(x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
@@ -242,7 +242,7 @@ class GraphicPanel : public jgui::Frame{
 
 			g->SetColor(r1, g1, b1, a1+0x80);
 			g->FillRectangle(x+_insets.left, y+_insets.top, w, h);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawRectangle(x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
@@ -261,11 +261,12 @@ class GraphicPanel : public jgui::Frame{
 			b1 = rand()%0xff;
 
 			g->SetColor(r1, g1, b1, 0xff);
-			g->FillRoundRectangle(x+_insets.left, y+_insets.top, w, h);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->FillRoundRectangle(x+_insets.left, y+_insets.top, w, h, 40, 40);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
+			sleep(1);
 		}
 
 		Clear(g);
@@ -283,8 +284,49 @@ class GraphicPanel : public jgui::Frame{
 
 			g->SetColor(r1, g1, b1, a1+0x80);
 			g->FillRoundRectangle(x+_insets.left, y+_insets.top, w, h);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h);
+
+			g->Flip(x+_insets.left, y+_insets.top, w, h);
+		}
+
+		Clear(g);
+
+		// bevel rectangles
+		DrawString(g, "FillBevelRectangle");
+
+		for (int i=0; i<iterations; i++) {
+			x = rand()%(1920-w-_insets.left-_insets.right);
+			y = rand()%(1080-h-_insets.top-_insets.bottom);
+			r1 = rand()%0xff;
+			g1 = rand()%0xff;
+			b1 = rand()%0xff;
+
+			g->SetColor(r1, g1, b1, 0xff);
+			g->FillBevelRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
+			g->DrawBevelRectangle(x+_insets.left, y+_insets.top, w, h);
+
+			g->Flip(x+_insets.left, y+_insets.top, w, h);
+		}
+
+		Clear(g);
+
+		// bevel rectangles [blend]
+		DrawString(g, "FillBevelRectangle [BLEND]");
+
+		for (int i=0; i<iterations; i++) {
+			x = rand()%(1920-w-_insets.left-_insets.right);
+			y = rand()%(1080-h-_insets.top-_insets.bottom);
+			r1 = rand()%0xff;
+			g1 = rand()%0xff;
+			b1 = rand()%0xff;
+			a1 = rand()%0x80;
+
+			g->SetColor(r1, g1, b1, a1+0x80);
+			g->FillBevelRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
+			g->DrawBevelRectangle(x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
 		}
@@ -304,7 +346,7 @@ class GraphicPanel : public jgui::Frame{
 
 			g->SetColor(r1, g1, b1, 0xff);
 			g->FillCircle(x+_insets.left+200, y+_insets.top+200, z);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawCircle(x+_insets.left+200, y+_insets.top+200, z);
 
 			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
@@ -326,8 +368,94 @@ class GraphicPanel : public jgui::Frame{
 
 			g->SetColor(r1, g1, b1, a1+0x80);
 			g->FillCircle(x+_insets.left+200, y+_insets.top+200, z);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawCircle(x+_insets.left+200, y+_insets.top+200, z);
+
+			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
+		}
+
+		Clear(g);
+
+		// arcs
+		DrawString(g, "FillArc");
+
+		for (int i=0; i<iterations; i++) {
+			x = rand()%(1920-w-_insets.left-_insets.right-200);
+			y = rand()%(1080-h-_insets.top-_insets.bottom-200);
+			z = rand()%100+100;
+			r1 = rand()%0xff;
+			g1 = rand()%0xff;
+			b1 = rand()%0xff;
+
+			g->SetColor(r1, g1, b1, 0xff);
+			g->FillArc(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
+			g->DrawArc(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+
+			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
+		}
+		
+		Clear(g);
+
+		// arcs [blend]
+		DrawString(g, "FillArc [BLEND]");
+
+		for (int i=0; i<iterations; i++) {
+			x = rand()%(1920-w-_insets.left-_insets.right-200);
+			y = rand()%(1080-h-_insets.top-_insets.bottom-200);
+			z = rand()%100+100;
+			r1 = rand()%0xff;
+			g1 = rand()%0xff;
+			b1 = rand()%0xff;
+			a1 = rand()%0x80;
+
+			g->SetColor(r1, g1, b1, a1+0x80);
+			g->FillArc(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
+			g->DrawArc(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+
+			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
+		}
+
+		Clear(g);
+
+		// chord
+		DrawString(g, "FillChord");
+
+		for (int i=0; i<iterations; i++) {
+			x = rand()%(1920-w-_insets.left-_insets.right-200);
+			y = rand()%(1080-h-_insets.top-_insets.bottom-200);
+			z = rand()%100+100;
+			r1 = rand()%0xff;
+			g1 = rand()%0xff;
+			b1 = rand()%0xff;
+
+			g->SetColor(r1, g1, b1, 0xff);
+			g->FillChord(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
+			g->DrawChord(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+
+			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
+		}
+		
+		Clear(g);
+
+		// chord [blend]
+		DrawString(g, "FillChord [BLEND]");
+
+		for (int i=0; i<iterations; i++) {
+			x = rand()%(1920-w-_insets.left-_insets.right-200);
+			y = rand()%(1080-h-_insets.top-_insets.bottom-200);
+			z = rand()%100+100;
+			r1 = rand()%0xff;
+			g1 = rand()%0xff;
+			b1 = rand()%0xff;
+			a1 = rand()%0x80;
+
+			g->SetColor(r1, g1, b1, a1+0x80);
+			g->FillChord(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->SetColor(0x80, 0x80, 0x80, 0xff);
+			g->DrawChord(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
 
 			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
 		}
@@ -435,7 +563,7 @@ class GraphicPanel : public jgui::Frame{
 		color = 0xffffffff;;
 
 		double angle = 0.1;
-
+			
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
 
 		for (int i=0; i<iterations; i++) {
@@ -446,8 +574,8 @@ class GraphicPanel : public jgui::Frame{
 				color = (rand()%0xf0f0f0) | 0xff000000;
 			}
 
-			g->Rotate(angle);
 			g->SetColor(color);
+			g->Rotate(angle);
 			g->DrawImage("icons/goku.png", x, y, size, size);
 
 			g->Flip(x, y, size, size);
@@ -477,6 +605,8 @@ class GraphicPanel : public jgui::Frame{
 
 		angle = 0.1;
 
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
+
 		for (int i=0; i<iterations; i++) {
 			x = (1920-size)/2;
 			y = (1080-size)/2;
@@ -485,8 +615,8 @@ class GraphicPanel : public jgui::Frame{
 				color = (rand()%0xf0f0f0) | 0xff000000;
 			}
 
-			g->Rotate(angle);
 			g->SetColor(color);
+			g->Rotate(angle);
 			g->DrawImage(&off, x, y, size, size);
 
 			g->Flip(x, y, size, size);

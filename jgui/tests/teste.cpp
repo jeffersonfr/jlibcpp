@@ -519,16 +519,20 @@ class GraphicPanel : public jgui::Canvas{
 		}
 
 		// draw image
-		//g->SetPorterDuffFlags(jgui::PDF_NONE);
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORALPHA));
 
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+20, 200, 100, 0xf0);
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 0*(100+10)+20, 200, 100, 0x80);
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 1*(100+10)+20, 200, 100, 0x40);
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 1*(100+10)+20, 200, 100, 0x10);
+		g->SetColor(0x00, 0x00, 0x00, 0xf0);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+20, 200, 100);
+		g->SetColor(0x00, 0x00, 0x00, 0x80);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 0*(100+10)+20, 200, 100);
+		g->SetColor(0x00, 0x00, 0x00, 0x40);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 1*(100+10)+20, 200, 100);
+		g->SetColor(0x00, 0x00, 0x00, 0x10);
+		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 1*(100+10)+20, 200, 100);
 
 		jgui::jcolor_t pcolor,
-			ccolor;
+			ccolor,
+			rcolor;
 
 		pcolor.red = 0xf0;
 		pcolor.green = 0xf0;
@@ -536,12 +540,26 @@ class GraphicPanel : public jgui::Canvas{
 		pcolor.alpha = 0x80;
 
 		ccolor.red = 0x00;
-		ccolor.green = 0x00;
-		ccolor.blue = 0x00;
+		ccolor.green = 0xa0;
+		ccolor.blue = 0xa0;
 		ccolor.alpha = 0x80;
+
+		rcolor.red = 0x00;
+		rcolor.green = 0x00;
+		rcolor.blue = 0x00;
+		rcolor.alpha = 0x80;
 
 		g->SetPorterDuffFlags(jgui::PDF_SRC_OVER);
 		g->SetDrawingFlags(jgui::DF_BLEND);
+
+		g->SetColor(rcolor);
+		g->SetLineWidth(1);
+		for (int i=0; i<=9; i++) {
+			g->DrawRectangle(10+i*(120+10)+10, 2*(120+10), 100, 100);
+			g->DrawRectangle(10+i*(120+10)+10, 3*(120+10), 100, 100);
+			g->DrawRectangle(10+i*(120+10)+10, 4*(120+10), 100, 100);
+			g->DrawRectangle(10+i*(120+10)+10, 5*(120+10), 100, 100);
+		}
 
 		// draw circle
 		g->SetColor(pcolor);
@@ -603,7 +621,6 @@ class GraphicPanel : public jgui::Canvas{
 
 		// draw chord
 		arc0 = 3*M_PI_2+1*M_PI/3.0;
-		// arc1 = -arc0/2.0;
 		arc1 = 1*M_PI_2+1*M_PI/3.0;
 
 		g->SetColor(pcolor);
@@ -622,6 +639,7 @@ class GraphicPanel : public jgui::Canvas{
 		// draw pie
 		arc0 = M_PI/6.0;
 		arc1 = -arc0;
+		//arc1 = M_PI-arc0;
 
 		g->SetColor(pcolor);
 		g->SetLineWidth(-10);
@@ -645,12 +663,10 @@ class GraphicPanel : public jgui::Canvas{
 		g->FillRectangle(10+6*(120+10)+10, 5*(120+10), 100, 100);
 		g->SetColor(ccolor);
 		g->SetLineWidth(1);
-		for (int i=0; i<=6; i++) {
-			g->DrawRectangle(10+i*(120+10)+10, 2*(120+10), 100, 100);
-			g->DrawRectangle(10+i*(120+10)+10, 3*(120+10), 100, 100);
-			g->DrawRectangle(10+i*(120+10)+10, 4*(120+10), 100, 100);
-			g->DrawRectangle(10+i*(120+10)+10, 5*(120+10), 100, 100);
-		}
+		g->DrawRectangle(10+6*(120+10)+10, 2*(120+10), 100, 100);
+		g->DrawRectangle(10+6*(120+10)+10, 3*(120+10), 100, 100);
+		g->DrawRectangle(10+6*(120+10)+10, 4*(120+10), 100, 100);
+		g->DrawRectangle(10+6*(120+10)+10, 5*(120+10), 100, 100);
 
 		// draw rectangle bevel
 		g->SetColor(pcolor);
@@ -681,9 +697,10 @@ class GraphicPanel : public jgui::Canvas{
 		g->DrawRoundRectangle(10+8*(120+10)+10, 5*(120+10), 100, 100);
 
 		// draw triangle
-		g->SetColor(pcolor);
+		g->SetColor(ccolor);
 		g->SetLineWidth(1);
 		g->DrawTriangle(10+9*(120+10)+10, 2*(120+10)+100, 10+9*(120+10)+10+100, 2*(120+10)+100, 10+9*(120+10)+10+100/2, 2*(120+10));
+		g->SetColor(pcolor);
 		g->SetLineWidth(+10);
 		g->SetLineJoin(jgui::BEVEL_JOIN);
 		g->DrawTriangle(10+9*(120+10)+10, 3*(120+10)+100, 10+9*(120+10)+10+100, 3*(120+10)+100, 10+9*(120+10)+10+100/2, 3*(120+10));
@@ -691,12 +708,6 @@ class GraphicPanel : public jgui::Canvas{
 		g->DrawTriangle(10+9*(120+10)+10, 4*(120+10)+100, 10+9*(120+10)+10+100, 4*(120+10)+100, 10+9*(120+10)+10+100/2, 4*(120+10));
 		g->SetLineJoin(jgui::MITER_JOIN);
 		g->DrawTriangle(10+9*(120+10)+10, 5*(120+10)+100, 10+9*(120+10)+10+100, 5*(120+10)+100, 10+9*(120+10)+10+100/2, 5*(120+10));
-		g->SetColor(ccolor);
-		g->SetLineWidth(1);
-		g->DrawRoundRectangle(10+9*(120+10)+10, 2*(120+10), 100, 100);
-		g->DrawRoundRectangle(10+9*(120+10)+10, 3*(120+10), 100, 100);
-		g->DrawRoundRectangle(10+9*(120+10)+10, 4*(120+10), 100, 100);
-		g->DrawRoundRectangle(10+9*(120+10)+10, 5*(120+10), 100, 100);
 
 		// draw bezier curve
 		int x0 = 10+10*(120+10)+10,
@@ -715,11 +726,12 @@ class GraphicPanel : public jgui::Canvas{
 			{x0+w0, y0+h0}
 		};
 
-		g->SetColor(pcolor);
+		g->SetColor(rcolor);
+		g->SetLineWidth(1);
+		g->DrawRectangle(x0, y0, w0, h0);
+		g->SetColor(ccolor);
 		g->DrawBezierCurve(pb1, 3, 100);
 		g->DrawBezierCurve(pb2, 3, 100);
-		g->SetColor(ccolor);
-		g->DrawRectangle(x0, y0, w0, h0);
 
 		// draw polygon
 		jgui::jpoint_t p[] = {
@@ -736,7 +748,7 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetColor(pcolor);
 		g->DrawPolygon(10+10*(120+10)+10, 3*(120+10), p, 5, false);
 		g->FillPolygon(10+11*(120+10)+10+20, 3*(120+10), p, 5);
-
+		
 		// draw line
 		x0 = 10+10*(120+10)+10;
 		y0 = 4*(120+10);
@@ -753,11 +765,13 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetLineWidth(10);
 		g->DrawLine(x0+150, y0+(240-10)/2, x0+250, y0+(240-10)/2);
 		g->SetLineWidth(1);
-		g->SetColor(ccolor);
+		g->SetColor(rcolor);
 		g->DrawRectangle(x0, y0, 250, (240-10));
 		g->DrawLine(x0, y0+(240-10)/2, x0+300, y0+(240-10)/2);
 
-		// draw string
+		// draw string (disable COLORALPHA)
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL));
+
 		jgui::Font *f1 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 50),
 			*f2 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 40),
 			*f3 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 30),
@@ -766,8 +780,10 @@ class GraphicPanel : public jgui::Canvas{
 
 		std::string text = "DrawString";
 
+		pcolor.alpha = 0xa0;
+
 		g->Rotate(0.0);
-		g->SetColor(ccolor);
+		g->SetColor(rcolor);
 		g->SetFont(f1); g->DrawString(text, 10+7*(120+10)+10+shadow, 0*(45+10)+20+shadow);
 		g->SetFont(f2); g->DrawString(text, 10+7*(120+10)+10+shadow, 1*(45+10)+20+shadow);
 		g->SetFont(f3); g->DrawString(text, 10+7*(120+10)+10+shadow, 2*(45+10)+20+shadow);
@@ -784,7 +800,7 @@ class GraphicPanel : public jgui::Canvas{
 		text = "RotateString";
 
 		g->Rotate(M_PI);
-		g->SetColor(ccolor);
+		g->SetColor(rcolor);
 		g->SetFont(f1); g->DrawString(text, 10+10*(120+10)+10+shadow, 0*(45+10)+20+shadow);
 		g->SetFont(f2); g->DrawString(text, 10+10*(120+10)+10+shadow, 1*(45+10)+20+shadow);
 		g->SetFont(f3); g->DrawString(text, 10+10*(120+10)+10+shadow, 2*(45+10)+20+shadow);
