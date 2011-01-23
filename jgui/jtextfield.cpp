@@ -305,7 +305,7 @@ void TextField::Paint(Graphics *g)
 		}
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 }

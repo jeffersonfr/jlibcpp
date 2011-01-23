@@ -219,7 +219,7 @@ void CheckButton::Paint(Graphics *g)
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
 	if (_type == CHECK_TYPE) {
-		FillRectangle(g, cx, cy, cw, ch);
+		g->FillRectangle(cx, cy, cw, ch);
 	} else {
 		g->FillCircle(cx+csize, cy+csize, csize);
 	}
@@ -228,7 +228,7 @@ void CheckButton::Paint(Graphics *g)
 		g->SetColor(0x00, 0x00, 0x00, 0xff);
 
 		if (_type == CHECK_TYPE) {
-			FillRectangle(g, cx+4, cy+4, cw-8, ch-8);
+			g->FillRectangle(cx+4, cy+4, cw-8, ch-8);
 		} else {
 			g->FillCircle(cx+csize, cy+csize, csize/2);
 		}
@@ -271,7 +271,7 @@ void CheckButton::Paint(Graphics *g)
 		g->DrawString(text, px, py, pw, ph, _halign, _valign);
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 void CheckButton::RegisterCheckButtonListener(CheckButtonListener *listener)

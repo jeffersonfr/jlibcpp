@@ -543,7 +543,7 @@ void TextArea::Paint(Graphics *g)
 		g->SetClip(clip.x, clip.y, clip.width, clip.height);
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 void TextArea::ScrollUp()

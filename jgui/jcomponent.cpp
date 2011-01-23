@@ -79,27 +79,6 @@ Component::~Component()
 	}
 }
 
-void Component::FillRectangle(Graphics *g, int x, int y, int width, int height)
-{
-	if (_border == FLAT_BORDER) {
-		g->FillRectangle(x, y, width, height);
-	} else if (_border == LINE_BORDER) {
-		g->FillRectangle(x, y, width, height);
-	} else if (_border == GRADIENT_BORDER) {
-		g->FillRectangle(x, y, width, height);
-	} else if (_border == ROUND_BORDER) {
-		g->FillRoundRectangle(x, y, width-1, height-1);
-	} else if (_border == BEVEL_BORDER) {
-		g->FillBevelRectangle(x, y, width, height);
-	} else if (_border == DOWN_BEVEL_BORDER) {
-		g->FillBevelRectangle(x, y, width, height);
-	} else if (_border == ETCHED_BORDER) {
-		g->FillRectangle(x, y, width, height);
-	} else {
-		g->FillRectangle(x, y, width, height);
-	}
-}
-
 void Component::SetThemeEnabled(bool b)
 {
 	_theme_enabled = b;
@@ -203,7 +182,17 @@ int Component::GetVerticalGap()
 	return _vertical_gap;
 }
 
-void Component::PaintEdges(Graphics *g)
+void Component::PaintBorderBackground(Graphics *g)
+{
+	int x = 0,
+			y = 0,
+			w = _size.width+1,
+			h = _size.height+1;
+
+	g->FillRectangle(x, y, w, h);
+}
+
+void Component::PaintBorderEdges(Graphics *g)
 {
 	g->Reset();
 
@@ -303,15 +292,14 @@ void Component::PaintEdges(Graphics *g)
 
 void Component::Paint(Graphics *g)
 {
-	g->Reset();
-
 	if (_font != NULL) {
 		g->SetFont(_font);
 	}
 
+	g->SetColor(_bgcolor);
+
 	if (_background_visible == true) {
-		g->SetColor(_bgcolor);
-		FillRectangle(g, 0, 0, _size.width, _size.height);
+		PaintBorderBackground(g);
 	}
 }
 

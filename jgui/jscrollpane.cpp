@@ -73,7 +73,7 @@ void ScrollPane::Paint(Graphics *g)
 	if (_background_visible == true) {
 		g->SetColor(_bgcolor);
 
-		FillRectangle(g, 0, 0, _size.width, _size.height);
+		g->FillRectangle(0, 0, _size.width, _size.height);
 
 		InvalidateAll();
 	}
@@ -142,7 +142,7 @@ void ScrollPane::Paint(Graphics *g)
 		}
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 
 	// CHANGE:: estudar melhor o problema de validacao dos containers.
 	// Revalidar os container no metodo Paint() pode gerar problemas de

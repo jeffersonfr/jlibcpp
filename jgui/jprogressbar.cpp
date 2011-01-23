@@ -180,7 +180,7 @@ void ProgressBar::Paint(Graphics *g)
 			}
 
 			g->SetColor(color);
-			FillRectangle(g, x, y, (int)d, h);
+			g->FillRectangle(x, y, (int)d, h);
 
 			char t[255];
 
@@ -199,7 +199,7 @@ void ProgressBar::Paint(Graphics *g)
 			}
 
 			g->SetColor(color);
-			FillRectangle(g, x, y, w, (int)d);
+			g->FillRectangle(x, y, w, (int)d);
 
 			char t[255];
 
@@ -256,7 +256,7 @@ void ProgressBar::Paint(Graphics *g)
 			}
 
 			g->SetColor(color);
-			FillRectangle(g, x+_index, y, 40, h);
+			g->FillRectangle(x+_index, y, 40, h);
 		} else if (_type == BOTTOM_UP_DIRECTION) {
 			if (_type == BOTTOM_UP_DIRECTION) {
 				_index = _index + _delta;
@@ -272,11 +272,11 @@ void ProgressBar::Paint(Graphics *g)
 				}
 
 				g->SetColor(color);
-				FillRectangle(g, x, y+_index, w, 40);
+				g->FillRectangle(x, y+_index, w, 40);
 			}
 		}
 
-		PaintEdges(g);
+		PaintBorderEdges(g);
 	}
 }
 

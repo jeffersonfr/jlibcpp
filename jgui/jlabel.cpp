@@ -270,7 +270,7 @@ void Label::Paint(Graphics *g)
 		g->DrawString(text, px, py, pw, ph, _halign, _valign);
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 }

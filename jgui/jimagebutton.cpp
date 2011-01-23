@@ -232,7 +232,7 @@ void ImageButton::Paint(Graphics *g)
 		}
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 }

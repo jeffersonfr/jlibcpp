@@ -223,7 +223,7 @@ void Icon::Paint(Graphics *g)
 		}
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 }

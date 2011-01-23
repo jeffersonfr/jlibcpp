@@ -383,7 +383,7 @@ void Menu::Paint(Graphics *g)
 			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w, _item_size);
 		} else {
 			g->SetColor(_focus_item_color);
-			FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, w, _item_size);
+			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w, _item_size);
 
 			/*
 			g->FillGradientRectangle(0, (_item_size+_vertical_gap)*count, _width, _item_size+10, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
@@ -426,7 +426,7 @@ void Menu::Paint(Graphics *g)
 
 		if (_items[i]->GetEnabled() == false) {
 			g->SetColor(0x00, 0x00, 0x00, 0x80);
-			FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, w, _item_size+10);
+			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w, _item_size+10);
 		}
 
 		if (_items[i]->GetChildsSize() > 0) {
@@ -440,7 +440,7 @@ void Menu::Paint(Graphics *g)
 
 	for (; count<_visible_items; count++) {
 		g->SetColor(_item_color);
-		FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, _size.width, _item_size+10);
+		g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, _size.width, _item_size+10);
 	}
 
 	g->Flip();

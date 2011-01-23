@@ -394,7 +394,7 @@ void Spin::Paint(Graphics *g)
 		}
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 }

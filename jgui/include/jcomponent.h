@@ -162,11 +162,6 @@ class Component : public virtual jcommon::Object{
 				 _is_valid;
 
 	protected:
-		/**
-		 * \brief render surface using component_border_t parameter
-		 *
-		 */
-		void FillRectangle(Graphics *g, int x, int y, int width, int height);
 
 	public:
 		/**
@@ -755,7 +750,12 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void PaintEdges(Graphics *g);
+		virtual void PaintBorderBackground(Graphics *g);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void PaintBorderEdges(Graphics *g);
 		
 		/**
 		 * \brief

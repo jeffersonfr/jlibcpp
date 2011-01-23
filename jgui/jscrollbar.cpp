@@ -240,7 +240,7 @@ void ScrollBar::Paint(Graphics *g)
 		}
 
 		g->SetColor(color);
-		FillRectangle(g, (int)d+arrow_size+x, y, _stone_size, h);
+		g->FillRectangle((int)d+arrow_size+x, y, _stone_size, h);
 
 		g->FillTriangle(x+w, y+arrow_size, x+w-arrow_size, y, x+w-arrow_size, y+2*arrow_size);
 		g->FillTriangle(x, y+arrow_size, x+arrow_size, y, x+arrow_size, y+2*arrow_size);
@@ -255,13 +255,13 @@ void ScrollBar::Paint(Graphics *g)
 		}
 
 		g->SetColor(color);
-		FillRectangle(g, x, (int)d+arrow_size+y, w, _stone_size);
+		g->FillRectangle(x, (int)d+arrow_size+y, w, _stone_size);
 
 		g->FillTriangle(x, y+arrow_size, x+w/2, y,x+w, y+arrow_size);
 		g->FillTriangle(x, y+h-arrow_size, x+w/2, y+h,x+w, y+h-arrow_size);
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 }

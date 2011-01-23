@@ -351,7 +351,7 @@ void ComboBox::Paint(Graphics *g)
 		}
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 }

@@ -378,7 +378,7 @@ void Frame::Paint(Graphics *g)
 	}
 
 	// INFO:: render over window attributes
-	PaintEdges(g);
+	PaintBorderEdges(g);
 
 	g->Reset();
 }

@@ -696,11 +696,11 @@ void Graphics::FillRectangle(int xp, int yp, int wp, int hp)
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	if (w <= 0) {
+	if (w < 1) {
 		w = 1;
 	}
 
-	if (h <= 0) {
+	if (h < 1) {
 		h = 1;
 	}
 
@@ -728,7 +728,7 @@ void Graphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 	if (_line_width < 0) {
 		DrawRectangle0(xp, yp, wp, hp, dx, dy, BEVEL_JOIN, _line_width);
 	} else {
-		DrawRectangle0(xp-_line_width, yp-_line_width, wp+2*_line_width, hp+2*_line_width, dx, dy, BEVEL_JOIN, -_line_width);
+		DrawRectangle0(xp-_line_width, yp-_line_width, wp+2*_line_width, hp+2*_line_width, dx+_line_width, dy+_line_width, BEVEL_JOIN, -_line_width);
 	}
 #endif
 }
@@ -772,11 +772,16 @@ void Graphics::DrawCircle(int xcp, int ycp, int rp)
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int r = SCALE_TO_SCREEN((_translate.x+xcp+rp), _screen.width, _scale.width)-xc;
+	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
+
+	if (lw == 0 && _line_width != 0) {
+		lw = 1;
+	}
 
 	if (_line_width < 0) {
-		DrawEllipse0(xc, yc, r, r, -_line_width);
+		DrawEllipse0(xc, yc, r, r, -lw);
 	} else {
-		DrawEllipse0(xc, yc, r+_line_width, r+_line_width, _line_width);
+		DrawEllipse0(xc, yc, r+lw, r+lw, lw);
 	}
 #endif
 }
@@ -804,11 +809,16 @@ void Graphics::DrawEllipse(int xcp, int ycp, int rxp, int ryp)
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
 	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
+	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
+
+	if (lw == 0 && _line_width != 0) {
+		lw = 1;
+	}
 
 	if (_line_width < 0) {
-		DrawEllipse0(xc, yc, rx, ry, -_line_width);
+		DrawEllipse0(xc, yc, rx, ry, -lw);
 	} else {
-		DrawEllipse0(xc, yc, rx+_line_width, ry+_line_width, _line_width);
+		DrawEllipse0(xc, yc, rx+lw, ry+lw, lw);
 	}
 #endif
 }
@@ -851,6 +861,11 @@ void Graphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
 	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
+	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
+
+	if (lw == 0 && _line_width != 0) {
+		lw = 1;
+	}
 
 	arc0 = fmod(arc0, 2*M_PI);
 	arc1 = fmod(arc1, 2*M_PI);
@@ -864,9 +879,9 @@ void Graphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double
 	}
 
 	if (_line_width < 0) {
-		DrawChord0(xc, yc, rx, ry, arc0, arc1, -_line_width);
+		DrawChord0(xc, yc, rx, ry, arc0, arc1, -lw);
 	} else {
-		DrawChord0(xc, yc, rx+_line_width, ry+_line_width, arc0, arc1, _line_width);
+		DrawChord0(xc, yc, rx+lw, ry+lw, arc0, arc1, lw);
 	}
 #endif
 }
@@ -953,6 +968,11 @@ void Graphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double a
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
 	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
+	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
+
+	if (lw == 0 && _line_width != 0) {
+		lw = 1;
+	}
 
 	arc0 = fmod(arc0, 2*M_PI);
 	arc1 = fmod(arc1, 2*M_PI);
@@ -1006,9 +1026,9 @@ void Graphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double a
 		}
 
 		if (_line_width < 0) {
-			DrawArc0(xc, yc, rx, ry, arc0, b, -_line_width, q);
+			DrawArc0(xc, yc, rx, ry, arc0, b, -lw, q);
 		} else {
-			DrawArc0(xc, yc, rx+_line_width, ry+_line_width, arc0, b, _line_width, q);
+			DrawArc0(xc, yc, rx+lw, ry+lw, arc0, b, lw, q);
 		}
 
 		arc0 = b;
@@ -1189,24 +1209,22 @@ void Graphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
 							 dy0 = p[(i+1)%npoints].y-p[(i+0)%npoints].y,
 							 dx1 = p[(i+2)%npoints].x-p[(i+1)%npoints].x,
 							 dy1 = p[(i+2)%npoints].y-p[(i+1)%npoints].y,
-							 tan0 = (double)(dx0)/(double)(dy0),
-							 tan1 = (double)(dx1)/(double)(dy1),
-							 ang0 = atan(tan0),
-							 ang1 = atan(tan1);
+							 ang0 = asin(sqrt((dx0*dx0)/(dx0*dx0+dy0*dy0))),
+							 ang1 = asin(sqrt(dx1*dx1)/sqrt(dx1*dx1+dy1*dy1));
 
-				if (tan0 >= 0.0) {
-					if (dx0 >= 0.0) {
-						ang0 = ang0 + M_PI;
-					} else {
-					}
-				} else {
-					if (dx0 >= 0.0) {
-					} else {
-						ang0 = ang0 + M_PI;
-					}
+				if (dx0 > 0.0) {
+					ang0 = ang0 + M_PI;
+				} else if (dy0 > 0.0) {
+					ang0 = M_PI - ang0;
 				}
 
-				FillArc(xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y+1, _line_width-1, _line_width-1, ang0, ang1);
+				if (dx1 > 0.0) {
+					ang1 = ang1 + M_PI;
+				} else if (dy1 > 0.0) {
+					ang1 = M_PI - ang1;
+				}
+
+				FillArc(xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y+1, _line_width-1, _line_width-2, ang0, ang1);
 			} else if (_line_join == MITER_JOIN) {
 				int a1 = scaled[((i+0)%npoints)*2+0].y-scaled[((i+0)%npoints)*2+1].y,
 						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x,
@@ -2761,9 +2779,9 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 		if (size < 0) {
 			size = -size;
 
-			if (size > (std::min(wp, hp)/2-1)) {
-				size = std::min(wp, hp)/2-1;
-
+			if (size > (std::min(wp, hp)/2)) {
+				size = std::min(wp, hp)/2;
+	
 				close = true;
 			}
 
@@ -2773,10 +2791,10 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 			hp = hp - 2*size;
 		}
 
-		FillRectangle(xp-size, yp-size, wp+2*size, size);
-		FillRectangle(xp-size, yp+hp, wp+2*size, size);
-		FillRectangle(xp-size, yp, size, hp);
-		FillRectangle(xp+wp, yp, size, hp);
+		FillRectangle(xp-size+1, yp-size+1, wp+2*size-1, size);
+		FillRectangle(xp-size+1, yp+hp, wp+2*size-1, size);
+		FillRectangle(xp-size+1, yp+1, size, hp-1);
+		FillRectangle(xp+wp, yp+1, size, hp-1);
 	} else if (join == BEVEL_JOIN) {
 		if (size < 0) {
 			size = -size;
@@ -2796,26 +2814,40 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 			}
 
 			if (size <= (std::max(dx, dy))) {
+				// TODO::
+				FillTriangle(xp+dx, yp, xp, yp+dy, xp+size, yp+dy);
+				FillTriangle(xp+size, yp+dy, xp+dx, yp, xp+dx, yp+size);
+
+				FillTriangle(xp+wp-dx, yp, xp+wp-dx, yp+size, xp+wp, yp+dy);
+				FillTriangle(xp+wp-dx, yp+size, xp+wp-size, yp+dy,  xp+wp, yp+dy);
+
+				FillTriangle(xp+wp-size, yp+hp-dy, xp+wp, yp+hp-dy, xp+wp-dx, yp+hp);
+				FillTriangle(xp+wp-size, yp+hp-dy, xp+wp-dx, yp+hp, xp+wp-dx, yp+hp-size);
+
+				FillTriangle(xp, yp+hp-dy, xp+size, yp+hp-dy, xp+dx, yp+hp);
+				FillTriangle(xp+size, yp+hp-dy, xp+dx, yp+hp-size, xp+dx, yp+hp);
+
 				FillRectangle(xp+dx, yp, wp-2*dx, size);
 				FillRectangle(xp+dx, yp+hp-size, wp-2*dx, size);
 				FillRectangle(xp, yp+dy, size, hp-2*dy);
 				FillRectangle(xp+wp-size, yp+dy, size, hp-2*dy);
 			} else {
+				FillTriangle(xp+dx, yp, xp, yp+dy, xp+dx, yp+dy);
+				FillTriangle(xp+wp-dx, yp, xp+wp, yp+dy, xp+wp-dx, yp+dy);
+				FillTriangle(xp, yp+hp-dy, xp+dx, yp+hp-dy, xp+dx, yp+hp);
+				FillTriangle(xp+wp-dx, yp+hp-dy, xp+wp, yp+hp-dy, xp+wp-dx, yp+hp);
+
 				FillRectangle(xp+dx, yp, wp-2*dx, dy);
 				FillRectangle(xp+dx, yp+hp-dy, wp-2*dx, dy);
 				FillRectangle(xp, yp+dy, dx, hp-2*dy);
 				FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
-				FillRectangle(xp+dx, yp+dy, wp-2*dx, hp-2*dy);
+
+				DrawRectangle0(xp+dx-1, yp+dy-1, wp-2*dx+1, hp-2*dy+1, 0, 0, MITER_JOIN, -size-1);
 			}
 
 			if (_line_width > 0) {
 				_line_width = -_line_width;
 			}
-
-			//DrawArc(xp+dx, yp+dy, dx-1, dy-1, M_PI_2, M_PI);
-			//DrawArc(xp+dx, yp+hp-dy, dx-1, dy-1, M_PI, M_PI+M_PI_2);
-			//DrawArc(xp+wp-dx, yp+hp-dy, dx-1, dy-1, M_PI+M_PI_2, 2*M_PI);
-			//DrawArc(xp+wp-dx, yp+dy, dx-1, dy-1, 0.0, M_PI_2);
 		}
 	} else if (join == ROUND_JOIN) {
 		if (size < 0) {
@@ -2854,7 +2886,8 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 				FillRectangle(xp+dx, yp+hp-dy, wp-2*dx, dy);
 				FillRectangle(xp, yp+dy, dx, hp-2*dy);
 				FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
-				FillRectangle(xp+dx, yp+dy, wp-2*dx, hp-2*dy);
+				
+				DrawRectangle0(xp+dx-1, yp+dy-1, wp-2*dx+1, hp-2*dy+1, 0, 0, MITER_JOIN, -size-1);
 			}
 		}
 	}

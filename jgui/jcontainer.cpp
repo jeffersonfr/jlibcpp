@@ -243,22 +243,11 @@ void Container::Paint(Graphics *g)
 {
 	// JDEBUG(JINFO, "paint\n");
 
-	// Component::Paint(g);
+	Component::Paint(g);
 
-	if (_font != NULL) {
-		g->SetFont(_font);
-	}
-
-	// INFO:: permite alteracoes on-the-fly
 	g->SetWorkingScreenSize(_scale_width, _scale_height);
 
-	g->SetDrawingFlags(DF_NOFX);
-
 	if (_background_visible == true) {
-		g->SetColor(_bgcolor);
-
-		FillRectangle(g, 0, 0, _size.width, _size.height);
-
 		InvalidateAll();
 	}
 
@@ -292,8 +281,9 @@ void Container::Paint(Graphics *g)
 			}
 
 			g->Translate(cx, cy);
-			g->SetClip(0, 0, cw-1, ch-1);
+			g->SetClip(0, 0, cw, ch);
 			c->Paint(g);
+			g->ReleaseClip();
 			g->Translate(-cx, -cy);
 
 			c->Revalidate();
@@ -302,7 +292,7 @@ void Container::Paint(Graphics *g)
 		
 	g->SetClip(clip.x, clip.y, clip.width, clip.height);
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 
 	// WARNNING:: estudar melhor o problema de validacao dos containers.
 	// Revalidar o container no metodo Paint() pode gerar problemas de

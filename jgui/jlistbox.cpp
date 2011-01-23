@@ -475,22 +475,22 @@ void ListBox::Paint(Graphics *g)
 		}
 
 		if (count != visible_items) {
-			FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, _item_size);
+			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, _item_size);
 		} else {
 			int ph = y+(_item_size+_vertical_gap)*count-y-h;
 
-			FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, (ph>0)?ph-_vertical_gap:-ph);
+			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, (ph>0)?ph-_vertical_gap:-ph);
 		} 
 
 		if (_index == i) {
 			g->SetColor(_focus_item_color);
 		
 			if (count != visible_items) {
-				FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, _item_size);
+				g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, _item_size);
 			} else {
 				int ph = y+(_item_size+_vertical_gap)*count-y-h;
 
-				FillRectangle(g, x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, (ph>0)?ph-_vertical_gap:-ph);
+				g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, (ph>0)?ph-_vertical_gap:-ph);
 			} 
 		}
 
@@ -617,9 +617,9 @@ void ListBox::Paint(Graphics *g)
 		g->SetColor(_item_color);
 
 		if ((dy+_item_size) < (_size.height-dy)) {
-			FillRectangle(g, x, dy, w-scroll_width-scroll_gap, _item_size);
+			g->FillRectangle(x, dy, w-scroll_width-scroll_gap, _item_size);
 		} else {
-			FillRectangle(g, x, dy, w-scroll_width-scroll_gap, ((dy-y-h)>0)?(dy-y-h)-_vertical_gap:-(dy-y-h));
+			g->FillRectangle(x, dy, w-scroll_width-scroll_gap, ((dy-y-h)>0)?(dy-y-h)-_vertical_gap:-(dy-y-h));
 		}
 	}
 	
@@ -636,7 +636,7 @@ void ListBox::Paint(Graphics *g)
 		disable = color.Darker(diff, diff, diff, 0x00);
 
 		g->SetColor(_item_color);
-		FillRectangle(g, _size.width-x-scroll_width, y, scroll_width, h);
+		g->FillRectangle(_size.width-x-scroll_width, y, scroll_width, h);
 
 		if ((_centered_interaction == true && _index > 0) | (_centered_interaction == false && _top_index > 0)) {
 			g->SetColor(color);
@@ -661,11 +661,11 @@ void ListBox::Paint(Graphics *g)
 		if (visible_items <= (int)_items.size()) {
 			double diff = (h-4*(scroll_width-2))/(double)(_items.size()-1);
 			
-			FillRectangle(g, x, (int)(y+scroll_width+diff*_index+2), scroll_width, _stone_size);
+			g->FillRectangle(x, (int)(y+scroll_width+diff*_index+2), scroll_width, _stone_size);
 		}
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 void ListBox::PreviousItem()

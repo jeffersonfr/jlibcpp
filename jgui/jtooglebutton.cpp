@@ -201,7 +201,7 @@ void ToogleButton::Paint(Graphics *g)
 		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
 	
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 }

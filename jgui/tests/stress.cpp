@@ -60,7 +60,7 @@ class GraphicPanel : public jgui::Frame{
 				b1,
 				a1;
 		int size,
-				iterations = 10;
+				iterations = 1000;
 
 		g->SetFont(_font);
 
@@ -266,7 +266,6 @@ class GraphicPanel : public jgui::Frame{
 			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
-			sleep(1);
 		}
 
 		Clear(g);

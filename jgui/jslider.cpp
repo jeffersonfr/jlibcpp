@@ -224,7 +224,7 @@ void Slider::Paint(Graphics *g)
 		}
 
 		g->SetColor(bar);
-		FillRectangle(g, x, (h-10)/2+y, w, 10);
+		g->FillRectangle(x, (h-10)/2+y, w, 10);
 		g->SetColor(color);
 
 		if (_inverted == false) {
@@ -256,7 +256,7 @@ void Slider::Paint(Graphics *g)
 		}
 
 		g->SetColor(bar);
-		FillRectangle(g, (w-10)/2+x, y, 10, h);
+		g->FillRectangle((w-10)/2+x, y, 10, h);
 		g->SetColor(color);
 
 		if (_inverted == false) {
@@ -282,7 +282,7 @@ void Slider::Paint(Graphics *g)
 		}
 	}
 
-	PaintEdges(g);
+	PaintBorderEdges(g);
 }
 
 }
