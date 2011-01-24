@@ -216,6 +216,12 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
+		virtual void Paint(Graphics *g);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ReleaseWindow();
 
 		/**

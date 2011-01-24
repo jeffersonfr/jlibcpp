@@ -97,8 +97,7 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 			g->SetColor(0x40, 0x80, 0x60, 0xff);
 			g->SetLineWidth(10);
-			// g->DrawCircle((int)xc, (int)yc, (int)(vs+10));
-			g->DrawArc((int)xc, (int)yc, (int)(vs+10), (int)(vs+10), 0, 360);
+			g->DrawArc((int)xc, (int)yc, (int)(vs+10), (int)(vs+10), 0.0, 2*M_PI);
 			g->SetLineWidth(1);
 			g->SetColor(0x80, 0xc0, 0xf0, 0xff);
 

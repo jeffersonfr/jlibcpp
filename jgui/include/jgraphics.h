@@ -48,10 +48,10 @@
 	a = (a < 0)?0:(a > 0xff)?0xff:a;	\
 
 #define SCALE_TO_SCREEN(x, y, z) \
-	(int)floor(((double)x*(double)y)/(double)z) 
+	(int)round(((double)x*(double)y)/(double)z) 
 
 #define SCREEN_TO_SCALE(x, z, y) \
-	(int)floor(((double)x*(double)y)/(double)z) 
+	(int)round(((double)x*(double)y)/(double)z) 
 
 namespace jgui{
 

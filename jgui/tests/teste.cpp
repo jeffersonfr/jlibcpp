@@ -757,7 +757,7 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetLineWidth(40);
 		g->DrawLine(x0, y0, x0+100, y0+(240-10));
 		g->DrawLine(x0, y0+(240-10), x0+100, y0);
-		g->DrawLine(x0, y0+(240-10)/2, x0+120, y0+(240-10)/2);
+		g->DrawLine(x0, y0+(240-10)/2, x0+100, y0+(240-10)/2);
 		g->SetLineWidth(40);
 		g->DrawLine(x0+150, y0, x0+250, y0+(240-10));
 		g->SetLineWidth(20);

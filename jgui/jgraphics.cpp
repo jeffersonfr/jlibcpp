@@ -567,59 +567,27 @@ void Graphics::DrawLine(int xp, int yp, int xf, int yf)
 
 		surface->DrawLine( surface, x0, y0, x1, y1);
 	} else {
-		if (xp == xf) {
-			if (yp < yf) {
-				FillRectangle(xp-_line_width/2, yp, _line_width, yf-yp);
-			} else {
-				FillRectangle(xp-_line_width/2, yf, _line_width, yp-yf);
-			}
+		double r = (_line_width),
+					 dx = xf-xp,
+					 dy = yf-yp,
+					 d = sqrt((dx*dx)+(dy*dy));
 
-			if (_line_join == ROUND_JOIN) {
-				FillArc(xp, yp, _line_width/2, _line_width/2, 0, 2*M_PI);
-				FillArc(xp, yf, _line_width/2, _line_width/2, 0, 2*M_PI);
-			}
-		} else if (yp == yf) {
-			if (xp < xf) {
-				FillRectangle(xp, yp-_line_width/2, xf-xp, _line_width);
-			} else {
-				FillRectangle(xf, yp-_line_width/2, xp-xf, _line_width);
-			}
-
-			if (_line_join == ROUND_JOIN) {
-				FillArc(xp, yp, _line_width/2, _line_width/2, 0, 2*M_PI);
-				FillArc(xf, yp, _line_width/2, _line_width/2, 0, 2*M_PI);
-			}
-		} else {
-			double r = (_line_width),
-						 dx = xf-xp,
-						 dy = yf-yp,
-						 d = sqrt((dx*dx)+(dy*dy));
-
-			if (d < 1.0) {
-				d = 1.0;
-			}
-
-			// FillTriangle(xp+r*dy/d, yp+r*dx/d, xp+r*dy/d+dx, yp+r*dx/d+dy, xp+r*dy/d, yp-r*dx/d);
-			// FillTriangle(xp+r*dy/d+dx, yp+r*dx/d+dy, xp+r*dy/d, yp-r*dx/d, xp+r*dy/d+dx, yp-r*dx/d+dy);
-
-			int c = (int)((r*dy)/d),
-					s = (int)((r*dx)/d),
-					xdiff = (int)(c/2),
-					ydiff = (int)(-s/2),
-					r1 = s;
-
-			if (_line_width < 2*r1) {
-				r1 = c;
-			}
-
-			FillTriangle((int)(xp-xdiff), (int)(yp-ydiff), (int)(xp+dx-xdiff), (int)(yp+dy-ydiff), (int)(xp+c-xdiff), (int)(yp-s-ydiff));
-			FillTriangle((int)(xp+dx-xdiff), (int)(yp+dy-ydiff), (int)(xp+c-xdiff), (int)(yp-s-ydiff), (int)(xp+c+dx-xdiff), (int)(yp-s+dy-ydiff));
-
-			if (_line_join == ROUND_JOIN) {
-				FillArc(xp, yp, r1, r1, 0, 2*M_PI);
-				FillArc((int)(xp+dx), (int)(yp+dy), r1, r1, 0, 2*M_PI);
-			}
+		if (d < 1.0) {
+			d = 1.0;
 		}
+
+		int c = (int)((r*dy)/d),
+				s = (int)((r*dx)/d),
+				xdiff = (int)(c/2),
+				ydiff = (int)(-s/2),
+				r1 = s;
+
+		if (_line_width < 2*r1) {
+			r1 = c;
+		}
+
+		FillTriangle((int)(xp-xdiff), (int)(yp-ydiff), (int)(xp+dx-xdiff), (int)(yp+dy-ydiff), (int)(xp+c-xdiff), (int)(yp-s-ydiff));
+		FillTriangle((int)(xp+dx-xdiff), (int)(yp+dy-ydiff), (int)(xp+c-xdiff), (int)(yp-s-ydiff), (int)(xp+c+dx-xdiff), (int)(yp-s+dy-ydiff));
 	}
 #endif
 }
@@ -746,7 +714,7 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 	if (_line_width < 0) {
 		DrawRectangle0(xp, yp, wp, hp, dx, dy, ROUND_JOIN, _line_width);
 	} else {
-		DrawRectangle0(xp-_line_width, yp-_line_width, wp+2*_line_width, hp+2*_line_width, dx, dy, ROUND_JOIN, -_line_width);
+		DrawRectangle0(xp-_line_width, yp-_line_width, wp+2*_line_width, hp+2*_line_width, dx+_line_width, dy+_line_width, ROUND_JOIN, -_line_width);
 	}
 #endif
 }
@@ -838,6 +806,10 @@ void Graphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, double
 	arc0 = fmod(arc0, 2*M_PI);
 	arc1 = fmod(arc1, 2*M_PI);
 
+	if (arc1 == 0.0) {
+		arc1 = 2*M_PI;
+	}
+
 	if (arc0 < 0.0) {
 		arc0 = 2*M_PI + arc0;
 	}
@@ -870,6 +842,10 @@ void Graphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double
 	arc0 = fmod(arc0, 2*M_PI);
 	arc1 = fmod(arc1, 2*M_PI);
 
+	if (arc1 == 0.0) {
+		arc1 = 2*M_PI;
+	}
+
 	if (arc0 < 0.0) {
 		arc0 = 2*M_PI + arc0;
 	}
@@ -895,11 +871,15 @@ void Graphics::FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, double a
 
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width)-1; 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
-	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
-	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
+	int rx = SCALE_TO_SCREEN((rxp), _screen.width, _scale.width);
+	int ry = SCALE_TO_SCREEN((ryp), _screen.height, _scale.height);
 
 	arc0 = fmod(arc0, 2*M_PI);
 	arc1 = fmod(arc1, 2*M_PI);
+
+	if (arc1 == 0.0) {
+		arc1 = 2*M_PI;
+	}
 
 	if (arc0 < 0.0) {
 		arc0 = 2*M_PI + arc0;
@@ -976,6 +956,10 @@ void Graphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double a
 
 	arc0 = fmod(arc0, 2*M_PI);
 	arc1 = fmod(arc1, 2*M_PI);
+
+	if (arc1 == 0.0) {
+		arc1 = 2*M_PI;
+	}
 
 	if (arc0 < 0.0) {
 		arc0 = 2*M_PI + arc0;
@@ -1056,6 +1040,10 @@ void Graphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double a
 
 	double t0 = fmod(arc0, 2*M_PI),
 				 t1 = fmod(arc1, 2*M_PI);
+
+	if (t1 == 0.0) {
+		t1 = 2*M_PI;
+	}
 
 	if (t0 < 0.0) {
 		t0 = M_PI+t0;

@@ -682,6 +682,13 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 	}
 }
 
+void Window::Paint(Graphics *g)
+{
+	g->SetDrawingFlags(DF_NOFX);
+
+	Container::Paint(g);
+}
+
 bool Window::Show(bool modal)
 {
 	_is_visible = true;

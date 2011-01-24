@@ -2240,7 +2240,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 		dxL = 11;
 		dyL = 7;
 
-		SetBackgroundColor(0, 0, 0, 0);
+		SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
 
 		Frame::RegisterInputListener(this);
 	}
