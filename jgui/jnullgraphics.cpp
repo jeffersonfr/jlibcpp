@@ -336,12 +336,12 @@ void NullGraphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillPolygon(int x, int y, jpoint_t *p, int npoints)
+void NullGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawPolygon(int x, int y, jpoint_t *p, int npoints, bool close)
+void NullGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
 {
 	JDEBUG(JINFO, "called\n");
 }

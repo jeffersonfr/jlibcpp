@@ -539,9 +539,9 @@ class GraphicPanel : public jgui::Canvas{
 		pcolor.blue = 0xf0;
 		pcolor.alpha = 0x80;
 
-		ccolor.red = 0x00;
-		ccolor.green = 0xa0;
-		ccolor.blue = 0xa0;
+		ccolor.red = 0x20;
+		ccolor.green = 0xf0;
+		ccolor.blue = 0x20;
 		ccolor.alpha = 0x80;
 
 		rcolor.red = 0x00;

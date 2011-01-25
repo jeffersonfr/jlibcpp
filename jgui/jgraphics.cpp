@@ -1237,7 +1237,7 @@ void Graphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
 #endif
 }
 
-void Graphics::FillPolygon(int x, int y, jpoint_t *p, int npoints)
+void Graphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints)
 {
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
@@ -1249,26 +1249,11 @@ void Graphics::FillPolygon(int x, int y, jpoint_t *p, int npoints)
 			j=0;
 
 	for (i=0; i<npoints; i++) {
-		points[j++] = p[i].x + x;
-		points[j++] = p[i].y + y;
+		points[j++] = SCALE_TO_SCREEN((_translate.x+p[i].x + xp), _screen.width, _scale.width);
+		points[j++] = SCALE_TO_SCREEN((_translate.y+p[i].y + yp), _screen.height, _scale.height);
 	}
 
-	jline_join_t type = _line_join;
-	jline_style_t style = _line_style;
-
-	_line_join= BEVEL_JOIN;
-	_line_style = SOLID_LINE;
-
-	int line_width = _line_width;
-
-	_line_width = 1;
-
 	FillPolygon0(npoints, points);
-
-	_line_width = line_width;
-
-	_line_join = type;
-	_line_style = style;
 #endif
 }
 
@@ -2350,18 +2335,15 @@ void Graphics::FillScan(int scan, edge_t *active)
 
 	edge_t *p1,
 				 *p2;
-	uint32_t color;
 	int count;
 
 	p1 = active->next;
-
-	color = _color.alpha << 0x18 | _color.red << 0x10 | _color.green << 0x08 | _color.blue << 0x00;
 
 	while (p1 != NULL) {
 		p2 = p1->next;
 
 		for (count=(int)p1->xIntersect; p2!=NULL && count<=(int)p2->xIntersect; count++) {
-			SetPixel(count, scan, color);
+			surface->DrawLine(surface, count, scan, count, scan);
 		}
 
 		if (p2 != NULL) {
@@ -2447,19 +2429,6 @@ void Graphics::UpdateActiveList(int scan, edge_t *active)
 	}
 }
 
-void Graphics::Polygon(int n, int coordinates[])
-{
-	int count;
-
-	if (n >= 2) {
-		DrawLine(coordinates[0],coordinates[1], coordinates[2],coordinates[3]);
-
-		for(count=1;count<(n-1);count++) {
-			DrawLine(coordinates[(count*2)], coordinates[((count*2)+1)], coordinates[((count+1)*2)], coordinates[(((count+1)*2)+1)]);
-		}
-	}
-}
-
 void Graphics::FillPolygon0(int n, int ppts[])
 {
 	const int max_points = 10*1024;
@@ -2522,7 +2491,16 @@ void Graphics::FillPolygon0(int n, int ppts[])
 		}
 	}
 
-	Polygon(n, ppts);
+	// draw edges
+	/*
+	if (n >= 2) {
+		surface->DrawLine(surface, ppts[0], ppts[1], ppts[2], ppts[3]);
+
+		for (int count=1; count<(n-1); count++) {
+			surface->DrawLine(surface, ppts[(count*2)], ppts[((count*2)+1)], ppts[((count+1)*2)], ppts[(((count+1)*2)+1)]);
+		}
+	}
+	*/
 
 	for (count_2=0; count_2<max_points; count_2++) {
 		delete edges[count_2];

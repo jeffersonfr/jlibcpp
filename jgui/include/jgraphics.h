@@ -270,7 +270,6 @@ class Graphics : public virtual jcommon::Object{
 		void BuildEdgeList(int cnt, jpoint_t pts[], edge_t *edges[]);
 		void InsertEdge(edge_t *list, edge_t *edge);
 		void UpdateActiveList(int scan, edge_t *active);
-		void Polygon(int n, int coordinates[]);
 		void FillPolygon0(int n, int ppts[]);
 		
 		double EvaluateBezier0(double *data, int ndata, double t);
@@ -650,13 +649,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void FillPolygon(int x, int y, jpoint_t *p, int num);
+		virtual void FillPolygon(int xp, int yp, jpoint_t *p, int num);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawPolygon(int x, int y, jpoint_t *p, int num, bool close);
+		virtual void DrawPolygon(int xp, int yp, jpoint_t *p, int num, bool close);
 		
 		/**
 		 * \brief

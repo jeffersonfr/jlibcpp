@@ -402,13 +402,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillPolygon(int x, int y, jpoint_t *p, int num);
+		virtual void FillPolygon(int xp, int yp, jpoint_t *p, int num);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawPolygon(int x, int y, jpoint_t *p, int num, bool close);
+		virtual void DrawPolygon(int xp, int yp, jpoint_t *p, int num, bool close);
 		
 		/**
 		 * \brief
