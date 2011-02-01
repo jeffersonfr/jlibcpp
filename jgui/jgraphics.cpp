@@ -694,9 +694,9 @@ void Graphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 {
 #ifdef DIRECTFB_UI
 	if (_line_width < 0) {
-		DrawRectangle0(xp, yp, wp, hp, dx, dy, BEVEL_JOIN, _line_width);
+		DrawRectangle0(xp+1, yp+1, wp-1, hp-1, dx, dy, BEVEL_JOIN, _line_width);
 	} else {
-		DrawRectangle0(xp-_line_width, yp-_line_width, wp+2*_line_width, hp+2*_line_width, dx+_line_width, dy+_line_width, BEVEL_JOIN, -_line_width);
+		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*_line_width-1, hp+2*_line_width-1, dx+_line_width, dy+_line_width, BEVEL_JOIN, -_line_width);
 	}
 #endif
 }
@@ -712,9 +712,9 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 {
 #ifdef DIRECTFB_UI
 	if (_line_width < 0) {
-		DrawRectangle0(xp, yp, wp, hp, dx, dy, ROUND_JOIN, _line_width);
+		DrawRectangle0(xp+1, yp+1, wp-1, hp-1, dx, dy, ROUND_JOIN, _line_width);
 	} else {
-		DrawRectangle0(xp-_line_width, yp-_line_width, wp+2*_line_width, hp+2*_line_width, dx+_line_width, dy+_line_width, ROUND_JOIN, -_line_width);
+		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*_line_width-1, hp+2*_line_width-1, dx+_line_width, dy+_line_width, ROUND_JOIN, -_line_width);
 	}
 #endif
 }
@@ -1010,9 +1010,9 @@ void Graphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double a
 		}
 
 		if (_line_width < 0) {
-			DrawArc0(xc, yc, rx, ry, arc0, b, -lw, q);
+			DrawArc0(xc, yc, rx-1, ry-1, arc0, b, -lw, q);
 		} else {
-			DrawArc0(xc, yc, rx+lw, ry+lw, arc0, b, lw, q);
+			DrawArc0(xc, yc, rx+lw-1, ry+lw-1, arc0, b, lw, q);
 		}
 
 		arc0 = b;
@@ -1212,7 +1212,7 @@ void Graphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
 					ang1 = M_PI - ang1;
 				}
 
-				FillArc(xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y+1, _line_width-1, _line_width-2, ang0, ang1);
+				FillArc(xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y+1, _line_width, _line_width-1, ang0, ang1);
 			} else if (_line_join == MITER_JOIN) {
 				int a1 = scaled[((i+0)%npoints)*2+0].y-scaled[((i+0)%npoints)*2+1].y,
 						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x,
@@ -1314,7 +1314,7 @@ void Graphics::DrawString(std::string text, int xp, int yp)
 	}
 
 	if (_font != NULL) {
-		OffScreenImage off(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
+		OffScreenImage off(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), SPF_A8, _scale.width, _scale.height);
 
 		off.GetGraphics()->SetFont(_font);
 		off.GetGraphics()->SetColor(_color);
@@ -2259,7 +2259,7 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 
 void Graphics::Reset()
 {
-	_font = Font::GetDefaultFont();
+	// _font = Font::GetDefaultFont();
 
 	_color.red = 0x00;
 	_color.green = 0x00;
@@ -2272,7 +2272,7 @@ void Graphics::Reset()
 	_line_style = SOLID_LINE;
 
 	SetDrawingFlags(DF_BLEND);
-	SetBlittingFlags((jblitting_flags_t)(BF_ALPHACHANNEL)); // | BF_COLORALPHA));
+	SetBlittingFlags(BF_ALPHACHANNEL);
 	SetPorterDuffFlags(PDF_SRC_OVER);
 }
 
@@ -2780,18 +2780,24 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 			}
 
 			if (size <= (std::max(dx, dy))) {
-				// TODO::
-				FillTriangle(xp+dx, yp, xp, yp+dy, xp+size, yp+dy);
-				FillTriangle(xp+size, yp+dy, xp+dx, yp, xp+dx, yp+size);
+				if (size == 1) {
+					DrawLine(xp+dx, yp, xp, yp+dy);
+					DrawLine(xp+wp-dx-1, yp, xp+wp-1, yp+dy);
+					DrawLine(xp+wp-1, yp+hp-dy, xp+wp-dx-1, yp+hp);
+					DrawLine(xp, yp+hp-dy, xp+dx, yp+hp);
+				} else {
+					FillTriangle(xp+dx, yp, xp, yp+dy, xp+size, yp+dy);
+					FillTriangle(xp+size, yp+dy, xp+dx, yp, xp+dx, yp+size);
 
-				FillTriangle(xp+wp-dx, yp, xp+wp-dx, yp+size, xp+wp, yp+dy);
-				FillTriangle(xp+wp-dx, yp+size, xp+wp-size, yp+dy,  xp+wp, yp+dy);
+					FillTriangle(xp+wp-dx, yp, xp+wp-dx, yp+size, xp+wp, yp+dy);
+					FillTriangle(xp+wp-dx, yp+size, xp+wp-size, yp+dy,  xp+wp, yp+dy);
 
-				FillTriangle(xp+wp-size, yp+hp-dy, xp+wp, yp+hp-dy, xp+wp-dx, yp+hp);
-				FillTriangle(xp+wp-size, yp+hp-dy, xp+wp-dx, yp+hp, xp+wp-dx, yp+hp-size);
+					FillTriangle(xp+wp-size, yp+hp-dy, xp+wp, yp+hp-dy, xp+wp-dx, yp+hp);
+					FillTriangle(xp+wp-size, yp+hp-dy, xp+wp-dx, yp+hp, xp+wp-dx, yp+hp-size);
 
-				FillTriangle(xp, yp+hp-dy, xp+size, yp+hp-dy, xp+dx, yp+hp);
-				FillTriangle(xp+size, yp+hp-dy, xp+dx, yp+hp-size, xp+dx, yp+hp);
+					FillTriangle(xp, yp+hp-dy, xp+size, yp+hp-dy, xp+dx, yp+hp);
+					FillTriangle(xp+size, yp+hp-dy, xp+dx, yp+hp-size, xp+dx, yp+hp);
+				} 
 
 				FillRectangle(xp+dx, yp, wp-2*dx, size);
 				FillRectangle(xp+dx, yp+hp-size, wp-2*dx, size);
@@ -2821,10 +2827,10 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 				_line_width = size;
 			}
 
-			DrawArc(xp+dx, yp+dy, dx-1, dy-1, M_PI_2, M_PI);
-			DrawArc(xp+dx, yp+hp-dy, dx-1, dy-1, M_PI, M_PI+M_PI_2);
-			DrawArc(xp+wp-dx, yp+hp-dy, dx-1, dy-1, M_PI+M_PI_2, 2*M_PI);
-			DrawArc(xp+wp-dx, yp+dy, dx-1, dy-1, 0.0, M_PI_2);
+			DrawArc(xp+dx, yp+dy, dx, dy, M_PI_2, M_PI);
+			DrawArc(xp+dx, yp+hp-dy, dx, dy, M_PI, M_PI+M_PI_2);
+			DrawArc(xp+wp-dx, yp+hp-dy, dx, dy, M_PI+M_PI_2, 2*M_PI);
+			DrawArc(xp+wp-dx, yp+dy, dx, dy, 0.0, M_PI_2);
 			
 			size = -size;
 

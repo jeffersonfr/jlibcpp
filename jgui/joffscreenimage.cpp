@@ -148,7 +148,6 @@ void OffScreenImage::Release()
 		delete graphics;
 		graphics = NULL;
 	}
-
 #endif
 }
 
@@ -157,26 +156,8 @@ void OffScreenImage::Restore()
 #ifdef DIRECTFB_UI
 	if (graphics == NULL) {
 		IDirectFBSurface *surface = NULL;
-		DFBSurfaceDescription desc;
 
-		desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
-		desc.caps = (DFBSurfaceCapabilities)(DSCAPS_SYSTEMONLY);
-		desc.width = SCALE_TO_SCREEN(_width, GFXHandler::GetInstance()->GetScreenWidth(), _scale_width);
-		desc.height = SCALE_TO_SCREEN(_height, GFXHandler::GetInstance()->GetScreenHeight(), _scale_height);
-		desc.pixelformat = DSPF_ARGB;
-
-		GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
-		IDirectFB *engine = ((IDirectFB *)dfb->GetGraphicEngine());
-
-		if (engine->CreateSurface(engine, &desc, &surface) != DFB_OK) {
-			return;
-		}
-
-		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)(DSDRAW_BLEND));
-		surface->SetPorterDuff(surface, DSPD_SRC_OVER);
-
-		surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
+		GFXHandler::GetInstance()->CreateSurface(_width, _height, &surface, _pixelformat, _scale_width, _scale_height);
 
 		graphics = new Graphics(surface, true);
 

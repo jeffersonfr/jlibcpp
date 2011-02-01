@@ -1,6 +1,6 @@
-AR			= ar
-CC			= g++
-JAVA		= javac
+AR				= ar
+CC				= g++
+JAVA			= javac
 
 TARGET_ARCH = linux
 
@@ -11,6 +11,8 @@ INCLUDE		= -I. `pkg-config --cflags jlibcpp`
 LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
 CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER)
+
+ECHO			= echo -e
 
 OK 				= \033[30;32mOK!\033[m
 
@@ -50,40 +52,40 @@ OBJS_access = \
 all: teste xml_teste xml_agenda regexp jsondom jsonpull gcteste unit calc_unit access
 	
 teste: $(OBJS_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 xml_teste: $(OBJS_xml_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 xml_agenda: $(OBJS_xml_agenda)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 regexp: $(OBJS_regexp)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 jsondom: $(OBJS_jsondom)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 jsonpull: $(OBJS_jsonpull)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 gcteste: $(OBJS_gcteste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 pointer: $(OBJS_pointer)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 unit: $(OBJS_unit)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 calc_unit: $(OBJS_calc_unit)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 access: $(OBJS_access)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
-	@$(CC) $(CCFLAGS) -c $< ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 install:
 

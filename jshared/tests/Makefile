@@ -12,6 +12,8 @@ LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
 CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER)
 
+ECHO			= echo -e
+
 OK 				= \033[30;32mOK!\033[m
 
 OBJS_fifo_teste = \
@@ -32,23 +34,23 @@ OBJS_ipcshared = \
 all: fifo_teste msg_teste process ipcmap ipcshared
 	
 fifo_teste: $(OBJS_fifo_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 msg_teste: $(OBJS_msg_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 process: $(OBJS_process)
-	@$(CC) $(CCFLAGS) multiply.cpp -o multiply $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) multiply.cpp -o multiply $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 ipcmap: $(OBJS_ipcmap)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 ipcshared: $(OBJS_ipcshared)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 .cpp.o: $<  
-	@$(CC) $(CCFLAGS) -c $< && echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) -c $< && $(ECHO) "Compiling $< ...  $(OK)" 
 
 install:
 

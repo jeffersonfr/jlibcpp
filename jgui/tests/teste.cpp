@@ -622,7 +622,7 @@ class GraphicPanel : public jgui::Canvas{
 		// draw chord
 		arc0 = 3*M_PI_2+1*M_PI/3.0;
 		arc1 = 1*M_PI_2+1*M_PI/3.0;
-
+		
 		g->SetColor(pcolor);
 		g->SetLineWidth(-10);
 		g->DrawChord(10+4*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);

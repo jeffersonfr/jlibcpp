@@ -12,6 +12,8 @@ LIBRARY 		= -L. `pkg-config --libs jlibcpp`
 
 CCFLAGS			= $(INCLUDE) $(DEBUG) $(OTHER)
 
+ECHO				= echo -e
+
 OK 					= \033[30;32mOK!\033[m
 
 OBJS_teste = \
@@ -20,10 +22,10 @@ OBJS_teste = \
 all: teste
 	
 teste: $(OBJS_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
-	@$(CC) $(CCFLAGS) -c $< ; echo "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 install:
 

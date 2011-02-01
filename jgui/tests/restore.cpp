@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "jframe.h"
 #include "jbutton.h"
+#include "jsystem.h"
 
 class ImageTest : public jgui::Component{
 

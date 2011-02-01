@@ -284,7 +284,7 @@ class Graphics : public virtual jcommon::Object{
 #endif
 
 	protected:
-		Graphics(void *s, bool offscreen);
+		Graphics(void *s, bool premultiplied);
 
 	public:
 		/**

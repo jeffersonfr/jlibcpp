@@ -97,14 +97,14 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 			g->SetColor(0x40, 0x80, 0x60, 0xff);
 			g->SetLineWidth(10);
-			g->DrawArc((int)xc, (int)yc, (int)(vs+10), (int)(vs+10), 0.0, 2*M_PI);
+			g->DrawCircle((int)xc, (int)yc, (int)(vs+10));
 			g->SetLineWidth(1);
 			g->SetColor(0x80, 0xc0, 0xf0, 0xff);
 
 			for (int i=0; i<12; i++) {
 				double teta = (i*30)*M_PI/180.0;
 
-				g->DrawLine((int)(xc+(vs+5)*cos(teta)), (int)(yc+(vs+5)*sin(teta)), (int)(xc+(vs+5+10)*cos(teta)), (int)(yc+(vs+5+10)*sin(teta)));
+				g->DrawLine((int)(xc+(vs+10)*cos(teta)), (int)(yc+(vs+10)*sin(teta)), (int)(xc+(vs+10+10)*cos(teta)), (int)(yc+(vs+10+10)*sin(teta)));
 			}
 
 			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);

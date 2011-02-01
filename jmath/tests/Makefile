@@ -1,6 +1,6 @@
-AR			= ar
-CC			= g++
-JAVA		= javac
+AR				= ar
+CC				= g++
+JAVA			= javac
 
 TARGET_ARCH = linux
 
@@ -11,6 +11,8 @@ INCLUDE		= -I. `pkg-config --cflags jlibcpp`
 LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
 CCFLAGS		= $(INCLUDE) $(DEBUG) $(OTHER)
+
+ECHO			= echo -e
 
 OK 				= \033[30;32mOK!\033[m
 
