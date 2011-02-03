@@ -2784,7 +2784,7 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 			}
 
 			if (size > (std::min(wp, hp)/2-1)) {
-				size = std::min(wp-2*dx, hp-2*dy)/2-1;
+				size = std::min(wp, hp)/2-1;
 
 				close = true;
 			}
@@ -2824,13 +2824,13 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 				FillRectangle(xp, yp+dy, dx, hp-2*dy);
 				FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
 
-				DrawRectangle0(xp+dx-1, yp+dy-1, wp-2*dx+1, hp-2*dy+1, 0, 0, MITER_JOIN, -size-1);
+				DrawRectangle0(xp+dx-1, yp+dy-1, wp-2*dx+1, hp-2*dy+1, 0, 0, MITER_JOIN, -size+std::max(dx, dy)-1);
 				
 				if (close == true) {
-					int x = xp+dx+size+1, 
-							y = yp+dy+size+1, 
-							w = wp-2*(dx+size+1), 
-							h = hp-2*(dy+size+1);
+					int x = xp+size+1, 
+							y = yp+size+1, 
+							w = wp-2*(size+1), 
+							h = hp-2*(size+1);
 					
 					_line_width = 1;
 
@@ -2860,7 +2860,7 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 			}
 
 			if (size > (std::min(wp, hp)/2-1)) {
-				size = std::min(wp-2*dx, hp-2*dy)/2-1;
+				size = std::min(wp, hp)/2-1;
 
 				close = true;
 			}
@@ -2876,13 +2876,13 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 				FillRectangle(xp, yp+dy, dx, hp-2*dy);
 				FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
 				
-				DrawRectangle0(xp+dx-1, yp+dy-1, wp-2*dx+1, hp-2*dy+1, 0, 0, MITER_JOIN, -size-1);
+				DrawRectangle0(xp+dx-1, yp+dy-1, wp-2*dx+1, hp-2*dy+1, 0, 0, MITER_JOIN, -size+std::max(dx, dy)-1);
 				
 				if (close == true) {
-					int x = xp+dx+size+1, 
-							y = yp+dy+size+1, 
-							w = wp-2*(dx+size+1), 
-							h = hp-2*(dy+size+1);
+					int x = xp+size+1, 
+							y = yp+size+1, 
+							w = wp-2*(size+1), 
+							h = hp-2*(size+1);
 					
 					_line_width = 1;
 

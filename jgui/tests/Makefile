@@ -107,10 +107,19 @@ OBJS_sort = \
 OBJS_stock = \
 		stock.o\
 
+OBJS_noise = \
+		noise.o\
+
+OBJS_kmeans = \
+		kmeans.o\
+
+OBJS_som = \
+		som.o\
+
 OBJS_game = \
 		game.o\
 
-all: teste skull databuffer ball breakout restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image sort stock
+all: teste skull databuffer ball breakout restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image sort noise kmeans som stock
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -202,6 +211,15 @@ sort: $(OBJS_sort)
 stock: $(OBJS_stock)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+noise: $(OBJS_noise)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+kmeans: $(OBJS_kmeans)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+som: $(OBJS_som)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 game: $(OBJS_game)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
@@ -212,4 +230,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste ball breakout restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image sort stock
+	@rm -rvf *.o *.xml *~ teste ball breakout restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image sort noise kmeans som stock

@@ -669,7 +669,7 @@ class GraphicPanel : public jgui::Canvas{
 
 		// draw rectangle round
 		g->SetColor(pcolor);
-		g->SetLineWidth(-50);
+		g->SetLineWidth(-10);
 		g->DrawRoundRectangle(10+8*(120+10)+10, 3*(120+10), 100, 100);
 		g->SetLineWidth(+10);
 		g->DrawRoundRectangle(10+8*(120+10)+10, 4*(120+10), 100, 100);
