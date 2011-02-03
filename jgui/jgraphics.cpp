@@ -2825,17 +2825,24 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 				FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
 
 				DrawRectangle0(xp+dx-1, yp+dy-1, wp-2*dx+1, hp-2*dy+1, 0, 0, MITER_JOIN, -size-1);
-			}
+				
+				if (close == true) {
+					int x = xp+dx+size+1, 
+							y = yp+dy+size+1, 
+							w = wp-2*(dx+size+1), 
+							h = hp-2*(dy+size+1);
+					
+					_line_width = 1;
 
-			if (_line_width > 0) {
-				_line_width = -_line_width;
+					if (w > 0 && h > 0) {
+						DrawLine(x, y, x+w-1, y+h-1);
+					}
+				}
 			}
 		}
 	} else if (join == ROUND_JOIN) {
 		if (size < 0) {
-			if (_line_width > 0) {
-				_line_width = size;
-			}
+			_line_width = size;
 
 			DrawArc(xp+dx, yp+dy, dx, dy, M_PI_2, M_PI);
 			DrawArc(xp+dx, yp+hp-dy, dx, dy, M_PI, M_PI+M_PI_2);
@@ -2870,6 +2877,19 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 				FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
 				
 				DrawRectangle0(xp+dx-1, yp+dy-1, wp-2*dx+1, hp-2*dy+1, 0, 0, MITER_JOIN, -size-1);
+				
+				if (close == true) {
+					int x = xp+dx+size+1, 
+							y = yp+dy+size+1, 
+							w = wp-2*(dx+size+1), 
+							h = hp-2*(dy+size+1);
+					
+					_line_width = 1;
+
+					if (w > 0 && h > 0) {
+						DrawLine(x, y, x+w-1, y+h-1);
+					}
+				}
 			}
 		}
 	}

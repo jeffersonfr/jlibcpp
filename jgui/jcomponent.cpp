@@ -189,17 +189,29 @@ void Component::PaintBorderBackground(Graphics *g)
 			w = _size.width+1,
 			h = _size.height+1;
 
-	g->FillRectangle(x, y, w, h);
+	g->SetColor(_bgcolor);
+
+	if (_border == ROUND_BORDER) {
+		g->FillRoundRectangle(x, y, w, h);
+	} else if (_border == BEVEL_BORDER) {
+		g->FillBevelRectangle(x, y, w, h);
+	} else {
+		g->FillRectangle(x, y, w, h);
+	}
 }
 
 void Component::PaintBorderEdges(Graphics *g)
 {
+	if (_border == EMPTY_BORDER) {
+		return;
+	}
+
 	g->Reset();
 
 	int xp = 0, 
 			yp = 0,
-			wp = _size.width-1,
-			hp = _size.height-1,
+			wp = _size.width,
+			hp = _size.height,
 			size = _border_size;
 	int dr = _border_color.GetRed(),
 			dg = _border_color.GetGreen(),
@@ -207,74 +219,99 @@ void Component::PaintBorderEdges(Graphics *g)
 			da = _border_color.GetAlpha();
 	int step = 0x20;
 
-	g->SetLineWidth(_border_size);
-	
 	if (HasFocus() == true) {
 		dr = _focus_border_color.GetRed();
 		dg = _focus_border_color.GetGreen();
 		db = _focus_border_color.GetBlue();
 		da = _focus_border_color.GetAlpha();
 	}
-	
-	if (_border == FLAT_BORDER) {
+
+	g->SetLineWidth(1);
+
+	if (_border == LINE_BORDER) {
 		g->SetColor(dr, dg, db, da);
-		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->DrawRectangle(xp+i, yp+i, wp-2*i, hp-2*i);
-		}
-	} else if (_border == LINE_BORDER) {
-		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->SetColor(dr+step, dg+step, db+step);
-			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
-			g->SetColor(dr-step, dg-step, db-step);
-			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
-		}
-
-		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->SetColor(dr+step, dg+step, db+step);
-			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
-			g->SetColor(dr-step, dg-step, db-step);
-			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
-		}
-	} else if (_border == GRADIENT_BORDER) {
-		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
-			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
-			g->SetColor(dr-step*(size-i), dg-step*(size-i), db-step*(size-i));
-			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
-		}
-
-		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
-			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
-			g->SetColor(dr-step*(size-i), dg-step*(size-i), db-step*(size-i));
-			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
-		}
+		g->SetLineWidth(-_border_size);
+		g->DrawRectangle(xp, yp, wp+1, hp+1);
+	} else if (_border == BEVEL_BORDER) {
+		g->SetColor(dr, dg, db, da);
+		g->SetLineWidth(-_border_size);
+		g->DrawBevelRectangle(xp, yp, wp+1, hp+1);
 	} else if (_border == ROUND_BORDER) {
 		g->SetColor(dr, dg, db, da);
+		g->SetLineWidth(-_border_size);
+		g->DrawRoundRectangle(xp, yp, wp+1, hp+1);
+	} else if (_border == RAISED_GRADIENT_BORDER) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->DrawRoundRectangle(xp+i, yp+i, wp-2*i, hp-2*i-1);
+			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
+			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+			g->SetColor(dr-step*(size-i), dg-step*(size-i), db-step*(size-i));
+			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
 		}
-	} else if (_border == BEVEL_BORDER) {
+
 		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->SetColor(dr, dg, db, da);
-			g->DrawBevelRectangle(i, i, _size.width-2*i, _size.height-2*i-1);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->DrawBevelRectangle(i+2, i+2, _size.width-2*(i+2), _size.height-2*(i+2)-1);
+			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
+			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+			g->SetColor(dr-step*(size-i), dg-step*(size-i), db-step*(size-i));
+			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
-	} else if (_border == DOWN_BEVEL_BORDER) {
+	} else if (_border == LOWERED_GRADIENT_BORDER) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->DrawBevelRectangle(i, i, _size.width-2*i, _size.height-2*i-1);
-			g->SetColor(dr, dg, db, da);
-			g->DrawBevelRectangle(i+2, i+2, _size.width-2*(i+2), _size.height-2*(i+2)-1);
+			g->SetColor(dr-step*(size-i), dg-step*(size-i), db-step*(size-i));
+			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
+			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
 		}
-	} else if (_border == ETCHED_BORDER) {
+
 		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->SetColor(dr+step, dg+step, db+step, da);
-			g->DrawRectangle(xp+i, yp+i, wp-2*i, hp-2*i);
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->DrawRectangle(xp+(i+2), yp+(i+2), wp-2*(i+2), hp-2*(i+2));
+			g->SetColor(dr-step*(size-i), dg-step*(size-i), db-step*(size-i));
+			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
+			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
+	} else if (_border == RAISED_BEVEL_BORDER) {
+		for (int i=0; i<size && i<wp && i<hp; i++) {
+			g->SetColor(dr+step, dg+step, db+step);
+			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+			g->SetColor(dr-step, dg-step, db-step);
+			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+		}
+
+		for (int i=0; i<size && i<wp && i<hp; i++) {
+			g->SetColor(dr+step, dg+step, db+step);
+			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+			g->SetColor(dr-step, dg-step, db-step);
+			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+		}
+	} else if (_border == LOWERED_BEVEL_BORDER) {
+		for (int i=0; i<size && i<wp && i<hp; i++) {
+			g->SetColor(dr-step, dg-step, db-step);
+			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
+			g->SetColor(dr+step, dg+step, db+step);
+			g->DrawLine(xp+i, yp+hp-i, xp+wp-i, yp+hp-i); //baixo
+		}
+
+		for (int i=0; i<size && i<wp && i<hp; i++) {
+			g->SetColor(dr-step, dg-step, db-step);
+			g->DrawLine(xp+i, yp+i, xp+i, yp+hp-i); //esquerda
+			g->SetColor(dr+step, dg+step, db+step);
+			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
+		}
+	} else if (_border == RAISED_ETCHED_BORDER) {
+		g->SetColor(dr+step, dg+step, db+step, da);
+		g->SetLineWidth(-_border_size);
+		g->DrawRectangle(xp, yp, wp+1, hp+1);
+		
+		g->SetColor(dr-step, dg-step, db-step, da);
+		g->SetLineWidth(-_border_size/2);
+		g->DrawRectangle(xp, yp, wp+1-_border_size/2, hp+1-_border_size/2);
+	} else if (_border == LOWERED_ETCHED_BORDER) {
+		g->SetColor(dr-step, dg-step, db-step, da);
+		g->SetLineWidth(-_border_size);
+		g->DrawRectangle(xp, yp, wp+1, hp+1);
+		
+		g->SetColor(dr+step, dg+step, db+step, da);
+		g->SetLineWidth(-_border_size/2);
+		g->DrawRectangle(xp, yp, wp+1-_border_size/2, hp+1-_border_size/2);
 	}
 
 	if (_enabled == false) {
@@ -288,8 +325,6 @@ void Component::Paint(Graphics *g)
 	if (_font != NULL) {
 		g->SetFont(_font);
 	}
-
-	g->SetColor(_bgcolor);
 
 	if (_background_visible == true) {
 		PaintBorderBackground(g);

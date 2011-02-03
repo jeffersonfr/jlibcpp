@@ -49,7 +49,7 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 	_insets.bottom = 0;
 
 	SetBackgroundVisible(false);
-	SetBorder(NONE_BORDER);
+	SetBorder(EMPTY_BORDER);
 }
 
 Container::~Container()

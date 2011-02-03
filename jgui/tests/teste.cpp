@@ -464,8 +464,7 @@ class GraphicPanel : public jgui::Canvas{
 		GraphicPanel(int x, int y, int w, int h):
 			jgui::Canvas(x, y, w, h)
 	{
-		// SetBackgroundColor((jgui::Color &)jgui::Color::lime);//0x40, 0x40, 0x60, 0xff);
-		SetBackgroundColor(0, 0, 0, 0);//0x40, 0x40, 0x60, 0xff);
+		SetBackgroundColor(0x40, 0x40, 0x60, 0xff);
 		SetBackgroundVisible(true);
 	}
 
@@ -670,7 +669,7 @@ class GraphicPanel : public jgui::Canvas{
 
 		// draw rectangle round
 		g->SetColor(pcolor);
-		g->SetLineWidth(-10);
+		g->SetLineWidth(-50);
 		g->DrawRoundRectangle(10+8*(120+10)+10, 3*(120+10), 100, 100);
 		g->SetLineWidth(+10);
 		g->DrawRoundRectangle(10+8*(120+10)+10, 4*(120+10), 100, 100);

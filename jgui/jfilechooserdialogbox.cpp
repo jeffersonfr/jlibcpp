@@ -60,7 +60,7 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 		_file = new jgui::TextField(_insets.left, _label->GetY()+_label->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
 
 		_label->SetBackgroundVisible(false);
-		_label->SetBorder(NONE_BORDER);
+		_label->SetBorder(EMPTY_BORDER);
 
 		Add(_label);
 		Add(_file);

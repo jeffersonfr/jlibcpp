@@ -59,7 +59,7 @@ Theme::Theme():
 	
 	_window_font = NULL;
 	_window_border_size = 4;
-	_window_border = GRADIENT_BORDER;
+	_window_border = RAISED_GRADIENT_BORDER;
 }
 
 Theme::~Theme()
