@@ -81,7 +81,7 @@ void NullGraphics::ReleaseClip()
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::Clear(int r, int g, int b, int a)
+void NullGraphics::Clear(int red, int green, int blue, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -101,21 +101,14 @@ void NullGraphics::Flip(int xp, int yp, int wp, int hp)
 	JDEBUG(JINFO, "called\n");
 }
 
-struct jcolor_t NullGraphics::GetColor()
+Color & NullGraphics::GetColor()
 {
 	JDEBUG(JINFO, "called\n");
 
-	struct jcolor_t t;
-
-	t.red = 0x00;
-	t.green = 0x00;
-	t.blue = 0x00;
-	t.alpha = 0x00;
-
-	return t;
+	return _color;
 }
 
-void NullGraphics::SetColor(struct jcolor_t c)
+void NullGraphics::SetColor(Color &color)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -125,7 +118,7 @@ void NullGraphics::SetColor(uint32_t color)
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::SetColor(int r, int g, int b, int a)
+void NullGraphics::SetColor(int red, int green, int blue, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
 } 
@@ -346,7 +339,12 @@ void NullGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool cl
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillGradientRectangle(int x, int y, int w, int h, jcolor_t scolor, jcolor_t dcolor, bool horizontal)
+void NullGraphics::FillHorizontalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor)
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+void NullGraphics::FillVerticalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor)
 {
 	JDEBUG(JINFO, "called\n");
 }

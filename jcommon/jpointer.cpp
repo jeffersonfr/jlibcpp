@@ -52,7 +52,7 @@ void ReferenceCounter::Allocate(void *p)
 
 void ReferenceCounter::Free(void *p) 
 {
-	if (!contem(p)) {
+	if (!HasReference(p)) {
 		return;
 	}
 
@@ -63,7 +63,7 @@ void ReferenceCounter::Free(void *p)
 	}
 }
 
-bool ReferenceCounter::contem(void *p) 
+bool ReferenceCounter::HasReference(void *p) 
 {
 	return (p != NULL) && (_counter.count(p) > 0);
 }

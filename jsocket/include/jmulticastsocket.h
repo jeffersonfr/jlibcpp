@@ -53,67 +53,67 @@ namespace jsocket {
  */
 class MulticastSocket : public jsocket::Connection{
 
-    private:
-        /** \brief Use to bind the socket in a free port */
-        static int _used_port;
+	private:
+		/** \brief Use to bind the socket in a free port */
+		static int _used_port;
         
 #ifdef _WIN32
-        /** \brief Socket handler. */
+		/** \brief Socket handler. */
 		SOCKET _fds, _fdr;
 #else
-        /** \brief Descriptor */
-        int _fds, _fdr;
+		/** \brief Descriptor */
+		int _fds, _fdr;
 #endif
-        /** \brief Local socket */
-        sockaddr_in _sock_s, _sock_r;
-        /** \brief Input stream */
-        SocketInputStream *_is;
-        /** \brief Output stream */
-        SocketOutputStream *_os;
-        /** \brief */
-        int64_t _sent_bytes;
-        /** \brief */
-        int64_t _receive_bytes;
-        /** \brief */
-        std::vector<std::string> _groups;
-        
-        /**
-        * \brief Create a new socket
-        *
-        */
-        void CreateSocket();
-        
-        /**
-        * \brief Bind socket
-        *
-        */
-        void BindSocket(InetAddress *addr_, int local_port_);
-        
-        /**
-        * \brief Connect socket
-        *
-        */
-        void ConnectSocket(InetAddress *addr_, int port_);
-        
-        /**
-        * \brief
-        *
-        */
-        void InitStream(int rbuf_, int wbuf_);
+		/** \brief Local socket */
+		sockaddr_in _sock_s, _sock_r;
+		/** \brief Input stream */
+		SocketInputStream *_is;
+		/** \brief Output stream */
+		SocketOutputStream *_os;
+		/** \brief */
+		int64_t _sent_bytes;
+		/** \brief */
+		int64_t _receive_bytes;
+		/** \brief */
+		std::vector<std::string> _groups;
 
-    public:
-        /**
-        * \brief 
-        *
-        */
-        MulticastSocket(std::string addr_, int port_, int rbuf_ = 65535, int wbuf_ = 4096);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~MulticastSocket();
-        
+		/**
+		 * \brief Create a new socket
+		 *
+		 */
+		void CreateSocket();
+
+		/**
+		 * \brief Bind socket
+		 *
+		 */
+		void BindSocket(InetAddress *addr_, int local_port_);
+
+		/**
+		 * \brief Connect socket
+		 *
+		 */
+		void ConnectSocket(InetAddress *addr_, int port_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void InitStream(int rbuf_, int wbuf_);
+
+	public:
+		/**
+		 * \brief 
+		 *
+		 */
+		MulticastSocket(std::string addr_, int port_, int rbuf_ = 65535, int wbuf_ = 4096);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~MulticastSocket();
+
 #ifdef _WIN32
 		virtual SOCKET GetHandler();
 #else
@@ -121,107 +121,107 @@ class MulticastSocket : public jsocket::Connection{
 #endif
  
 		/**
-        * \brief
-        *
-        */
-        virtual jio::InputStream * GetInputStream();
-        
-        /**
-        * \brief
-        *
-        */
-        virtual jio::OutputStream * GetOutputStream();
-        
-        /**
-        * \brief
-        *
-        */
-        virtual int Receive(char *data_, int size_, bool block_ = true);
-        
-        /**
-        * \brief
-        *
-        */
-        virtual int Receive(char *data_, int size_, int time_);
-        
-        /**
-        * \brief
-        *
-        */
-        virtual int Send(const char *data_, int size_, bool block_ = true);
-        
+		 * \brief
+		 *
+		 */
+		virtual jio::InputStream * GetInputStream();
+
 		/**
-        * \brief
-        *
-        */
-        virtual int Send(const char *data_, int size_, int time_);
+		 * \brief
+		 *
+		 */
+		virtual jio::OutputStream * GetOutputStream();
 
-        /**
-         * \brief
-         *
-         */
-        void Join(std::string group_);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int Receive(char *data_, int size_, bool block_ = true);
 
-        /**
-         * \brief
-         *
-         */
-        void Join(InetAddress *group_);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int Receive(char *data_, int size_, int time_);
 
-        /**
-         * \brief
-         *
-         */
-        void Leave(std::string group_);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int Send(const char *data_, int size_, bool block_ = true);
 
-        /**
-         * \brief
-         *
-         */
-        void Leave(InetAddress *group_);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int Send(const char *data_, int size_, int time_);
 
-        /**
-         * \brief
-         *
-         */
-        std::vector<std::string> & GetGroupList();
+		/**
+		 * \brief
+		 *
+		 */
+		void Join(std::string group_);
 
-        /**
-        * \brief
-        *
-        */
-        virtual void Close();
-        
-        /**
-        * \brief
-        *
-        */
-        int GetLocalPort();
-        
-        /**
-        * \brief
-        *
-        */
-        virtual int64_t GetSentBytes();
-        
-        /**
-        * \brief
-        *
-        */
-        virtual int64_t GetReceiveBytes();
+		/**
+		 * \brief
+		 *
+		 */
+		void Join(InetAddress *group_);
 
-        /**
-         * \brief
-         *
-         */
-        void SetMulticastTTL(char ttl_);
-        
-        /**
-         * \brief
-         *
-         */
-        SocketOption * GetSocketOption();
-        
+		/**
+		 * \brief
+		 *
+		 */
+		void Leave(std::string group_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void Leave(InetAddress *group_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		std::vector<std::string> & GetGroupList();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Close();
+
+		/**
+		 * \brief
+		 *
+		 */
+		int GetLocalPort();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetSentBytes();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetReceiveBytes();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetMulticastTTL(char ttl_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		SocketOption * GetSocketOption();
+
 };
 
 }

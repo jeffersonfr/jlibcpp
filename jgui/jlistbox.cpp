@@ -36,7 +36,7 @@ ListBox::ListBox(int x, int y, int width, int height):
 	_top_index = 0;
 	_selected_index = -1;
 	_scroll = SCROLL_BAR;
-	_selection = MULTI_SELECTION;
+	_selection = NONE_SELECTION;
 
 	SetFocusable(true);
 }
@@ -624,16 +624,8 @@ void ListBox::Paint(Graphics *g)
 	}
 	
 	if (_scroll == SCROLL_BAR) {
-		jcolor_t color,
-						 disable;
-		int diff = 0x40;
-
-		color.red = 0x80;
-		color.green = 0x80;
-		color.blue = 0xe0;
-		color.alpha = 0xff;
-
-		disable = color.Darker(diff, diff, diff, 0x00);
+		Color color(0x80, 0x80, 0xe0, 0xff),
+					disable = color.Darker(0.1);
 
 		g->SetColor(_item_color);
 		g->FillRectangle(_size.width-x-scroll_width, y, scroll_width, h);

@@ -46,181 +46,181 @@ namespace jsocket {
  */
 class DatagramSocket : public jsocket::Connection{
 
-    private:
-        /** \brief Use to bind the socket in a free port. */
-        static int _used_port;
-        
-        /** \brief Socket handler. */
+	private:
+		/** \brief Use to bind the socket in a free port. */
+		static int _used_port;
+
+		/** \brief Socket handler. */
 #ifdef _WIN32
 		SOCKET _fd;
 #else
-        int _fd;
+		int _fd;
 #endif
-        /** \brief Local socket. */
-        sockaddr_in _lsock;
-        /** \brief Server socket UDP. */
-        sockaddr_in _server_sock;
-        /** \brief Local inetaddress. */
-        InetAddress *_local;
-        /** \brief Remote inetaddress. */
-        InetAddress *_address;
-        /** \brief Input stream. */
-        SocketInputStream *_is;
-        /** \brief Output stream. */
-        SocketOutputStream *_os;
-        /** \brief Bytes sent. */
-        int64_t _sent_bytes;
-        /** \brief Bytes received. */
-        int64_t _receive_bytes;
-        /** \brief Connect or not ? */
+		/** \brief Local socket. */
+		sockaddr_in _lsock;
+		/** \brief Server socket UDP. */
+		sockaddr_in _server_sock;
+		/** \brief Local inetaddress. */
+		InetAddress *_local;
+		/** \brief Remote inetaddress. */
+		InetAddress *_address;
+		/** \brief Input stream. */
+		SocketInputStream *_is;
+		/** \brief Output stream. */
+		SocketOutputStream *_os;
+		/** \brief Bytes sent. */
+		int64_t _sent_bytes;
+		/** \brief Bytes received. */
+		int64_t _receive_bytes;
+		/** \brief Connect or not ? */
 		bool _stream;
-        /** \brief */
+		/** \brief */
 		int _timeout;
 
-        /**
-        * \brief Create a new socket.
-        *
-        */
-        void CreateSocket();
-        
-        /**
-        * \brief Bind socket.
-        *
-        */
-        void BindSocket(InetAddress *addr_, int local_port_);
-        
-        /**
-        * \brief Connect socket.
-        *
-        */
-        void ConnectSocket(InetAddress *addr_, int port_);
-        
-        /**
-        * \brief Init the stream.
-        *
-        */
-        void InitStream(int rbuf_, int wbuf_);
+		/**
+		 * \brief Create a new socket.
+		 *
+		 */
+		void CreateSocket();
 
-    public:
-        /**
-        * \brief Construtor UDP client.
-        *
-        */
-        DatagramSocket(std::string addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-        
-        /**
-        * \brief Construtor UDP server.
-        *
-        */
-        DatagramSocket(int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-        
-        /**
-        * \brief Destructor virtual.
-        *
-        */
-        virtual ~DatagramSocket();
-        
+		/**
+		 * \brief Bind socket.
+		 *
+		 */
+		void BindSocket(InetAddress *addr_, int local_port_);
+
+		/**
+		 * \brief Connect socket.
+		 *
+		 */
+		void ConnectSocket(InetAddress *addr_, int port_);
+
+		/**
+		 * \brief Init the stream.
+		 *
+		 */
+		void InitStream(int rbuf_, int wbuf_);
+
+	public:
+		/**
+		 * \brief Construtor UDP client.
+		 *
+		 */
+		DatagramSocket(std::string addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+
+		/**
+		 * \brief Construtor UDP server.
+		 *
+		 */
+		DatagramSocket(int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+
+		/**
+		 * \brief Destructor virtual.
+		 *
+		 */
+		virtual ~DatagramSocket();
+
 #ifdef _WIN32
 		virtual SOCKET GetHandler();
 #else
 		virtual int GetHandler();
 #endif
 
-        /**
-        * \brief 
-        *
-        */
-        virtual jio::InputStream * GetInputStream();
-        
-        /**
-        * \brief
-        *
-        */
-        virtual jio::OutputStream * GetOutputStream();
-        
-        /**
-        * \brief Read data from a source.
-        *
-        */
-        virtual int Receive(char *data_, int size_, bool block_ = true);
-        
-        /**
-        * \brief Read data from a source.
-        *
-        */
-        virtual int Receive(char *data_, int size_, int time_);
-        
-        /**
-        * \brief Write data to a source.
-        *
-        */
-        virtual int Send(const char *data_, int size_, bool block_ = true);
-        
-        /**
-        * \brief Write data to a source.
-        *
-        */
-        virtual int Send(const char *data_, int size_, int time_);
-        
-        /**
-        * \brief Close the socket.
-        *
-        */
-        virtual void Close();        
-        
-        /**
-        * \brief
-        *
-        */
-        sockaddr_in LocalAddress();
-        
-        /**
-        * \brief
-        *
-        */
-        sockaddr_in RemoteAddress();
-        
-        /**
-        * \brief Get InetAddress.
-        *
-        */
-        InetAddress * GetInetAddress();
-        
-        /**
-        * \brief Get the local port.
-        *
-        */
-        int GetLocalPort();
-        
-        /**
-        * \brief Get port.
-        *
-        */
-        int GetPort();
-        
-        /**
-        * \brief Get sent bytes to destination.
-        *
-        */
-        virtual int64_t GetSentBytes();
-        
-        /**
-        * \brief Get received bytes from a source.
-        *
-        */
-        virtual int64_t GetReceiveBytes();
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual jio::InputStream * GetInputStream();
 
-        /**
-         * \brief Get a object SocketOption.
-         *
-         */
-        SocketOption * GetSocketOption();
-        
-        /**
-        * \brief
-        *
-        */
-        std::string what();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jio::OutputStream * GetOutputStream();
+
+		/**
+		 * \brief Read data from a source.
+		 *
+		 */
+		virtual int Receive(char *data_, int size_, bool block_ = true);
+
+		/**
+		 * \brief Read data from a source.
+		 *
+		 */
+		virtual int Receive(char *data_, int size_, int time_);
+
+		/**
+		 * \brief Write data to a source.
+		 *
+		 */
+		virtual int Send(const char *data_, int size_, bool block_ = true);
+
+		/**
+		 * \brief Write data to a source.
+		 *
+		 */
+		virtual int Send(const char *data_, int size_, int time_);
+
+		/**
+		 * \brief Close the socket.
+		 *
+		 */
+		virtual void Close();        
+
+		/**
+		 * \brief
+		 *
+		 */
+		sockaddr_in LocalAddress();
+
+		/**
+		 * \brief
+		 *
+		 */
+		sockaddr_in RemoteAddress();
+
+		/**
+		 * \brief Get InetAddress.
+		 *
+		 */
+		InetAddress * GetInetAddress();
+
+		/**
+		 * \brief Get the local port.
+		 *
+		 */
+		int GetLocalPort();
+
+		/**
+		 * \brief Get port.
+		 *
+		 */
+		int GetPort();
+
+		/**
+		 * \brief Get sent bytes to destination.
+		 *
+		 */
+		virtual int64_t GetSentBytes();
+
+		/**
+		 * \brief Get received bytes from a source.
+		 *
+		 */
+		virtual int64_t GetReceiveBytes();
+
+		/**
+		 * \brief Get a object SocketOption.
+		 *
+		 */
+		SocketOption * GetSocketOption();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string what();
 
 };
 

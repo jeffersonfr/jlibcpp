@@ -364,7 +364,7 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		std::string what();
+		virtual std::string what();
 };
 
 }

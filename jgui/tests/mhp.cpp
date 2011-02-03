@@ -40,16 +40,13 @@ class BackgroundLayer : public ScreenLayer{
 
 	private:
 		std::string _image;
-		jgui::jcolor_t _color;
+		jgui::Color _color;
 
 	public:
 		BackgroundLayer():
 			ScreenLayer()
 		{
-			_color.red = 0x00;
-			_color.green = 0x00;
-			_color.blue = 0x00;
-			_color.alpha = 0xff;
+			_color = jgui::Color(0x00, 0x00, 0x00, 0xff);
 		}
 
 		virtual ~BackgroundLayer()
@@ -58,9 +55,7 @@ class BackgroundLayer : public ScreenLayer{
 
 		void SetColor(uint8_t red, uint8_t green, uint8_t blue)
 		{
-			_color.red = red;
-			_color.green = green;
-			_color.blue = blue;
+			_color = jgui::Color(red, green, blue, 0xff);
 
 			Repaint();
 		}

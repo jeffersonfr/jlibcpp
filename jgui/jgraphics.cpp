@@ -92,11 +92,6 @@ Graphics::Graphics(void *s, bool premultiplied):
 	_clip.width = DEFAULT_SCALE_WIDTH;
 	_clip.height = DEFAULT_SCALE_HEIGHT;
 
-	_color.red = 0x00;
-	_color.green = 0x00;
-	_color.blue = 0x00;
-	_color.alpha = 0x00;
-
 	_font = NULL;
 
 	_line_join = BEVEL_JOIN;
@@ -370,14 +365,14 @@ void Graphics::SetWorkingScreenSize(int width, int height)
 	}
 }
 
-void Graphics::Clear(int r, int g, int b, int a)
+void Graphics::Clear(int red, int green, int blue, int alpha)
 {
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
-	surface->Clear(surface, r, g, b, a);
+	surface->Clear(surface, red, green, blue, alpha);
 #endif
 }
 
@@ -427,58 +422,47 @@ void Graphics::Flip(int xp, int yp, int wp, int hp)
 #endif
 }
 
-struct jcolor_t Graphics::GetColor()
+Color & Graphics::GetColor()
 {
 	return _color;
 } 
 
-void Graphics::SetColor(struct jcolor_t c)
+void Graphics::SetColor(Color &color)
 {
-	_color.red = c.red;
-	_color.green = c.green;
-	_color.blue = c.blue;
-	_color.alpha = c.alpha;
+	_color = color;
 
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
-	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
+	surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
 #endif
 } 
 
-void Graphics::SetColor(uint32_t c)
+void Graphics::SetColor(uint32_t color)
 {
-	_color.red = (c >> 0x10) & 0xff;
-	_color.green = (c >> 0x08) & 0xff;
-	_color.blue = (c >> 0x00) & 0xff;
-	_color.alpha = (c >> 0x18) & 0xff;
+	_color = Color(color);
 
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
-	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
+	surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
 #endif
 } 
 
-void Graphics::SetColor(int r, int g, int b, int a)
+void Graphics::SetColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(r, g, b, a);
-
-	_color.red = r;
-	_color.green = g;
-	_color.blue = b;
-	_color.alpha = a;
+	_color = Color(red, green, blue, alpha);
 
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
-	surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
+	surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
 #endif
 } 
 
@@ -1257,7 +1241,7 @@ void Graphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints)
 #endif
 }
 
-void Graphics::FillGradientRectangle(int xp, int yp, int wp, int hp, jcolor_t scolor, jcolor_t dcolor, bool horizontal)
+void Graphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
 {
 	if (wp <= 0 || hp <= 0) {
 		return;
@@ -1273,33 +1257,62 @@ void Graphics::FillGradientRectangle(int xp, int yp, int wp, int hp, jcolor_t sc
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	int r1 = scolor.red; 
-	int g1 = scolor.green; 
-	int b1 = scolor.blue; 
-	int a1 = scolor.alpha; 
+	int sr = scolor.GetRed(),
+			sg = scolor.GetGreen(),
+			sb = scolor.GetBlue(),
+			sa = scolor.GetAlpha(); 
 
 	int line_width = _line_width;
 
 	_line_width = 1;
 
-	if (horizontal){
-		double difr = (double) (dcolor.red - scolor.red) / h;
-		double difg = (double) (dcolor.green - scolor.green) / h;
-		double difb = (double) (dcolor.blue - scolor.blue) / h;
-		double difa = (double) (dcolor.alpha - scolor.alpha) / h;
-		for (int i = 0; i < h; i++){
-			SetColor(r1 + (int) (difr*i), g1 + (int) (difg*i), b1 + (int) (difb*i), a1 + (int) (difa*i) );
-			surface->DrawLine( surface, x, y + i, x + w - 1, y + i );
-		}
-	}else{
-		double difr = (double) (dcolor.red - scolor.red) / w;
-		double difg = (double) (dcolor.green - scolor.green) / w;
-		double difb = (double) (dcolor.blue - scolor.blue) / w;
-		double difa = (double) (dcolor.alpha - scolor.alpha) / w;
-		for (int i = 0; i < w; i++){
-			SetColor(r1 + (int) (difr*i), g1 + (int) (difg*i), b1 + (int) (difb*i), a1 + (int) (difa*i) );
-			surface->DrawLine( surface, x + i, y, x + i, y + h - 1);
-		}
+	double difr = (double) (dcolor.GetRed() - sr) / h;
+	double difg = (double) (dcolor.GetGreen() - sg) / h;
+	double difb = (double) (dcolor.GetBlue() - sb) / h;
+	double difa = (double) (dcolor.GetAlpha() - sa) / h;
+
+	for (int i = 0; i < h; i++){
+		SetColor(sr + (int)(difr*i), sg + (int)(difg*i), sb + (int)(difb*i), sa + (int)(difa*i));
+		surface->DrawLine( surface, x, y + i, x + w - 1, y + i );
+	}
+
+	_line_width = line_width;
+#endif
+}
+
+void Graphics::FillVerticalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
+{
+	if (wp <= 0 || hp <= 0) {
+		return;
+	}
+
+#ifdef DIRECTFB_UI
+	if (surface == NULL) {
+		return;
+	}
+
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
+
+	int sr = scolor.GetRed(),
+			sg = scolor.GetGreen(),
+			sb = scolor.GetBlue(),
+			sa = scolor.GetAlpha(); 
+
+	int line_width = _line_width;
+
+	_line_width = 1;
+
+	double difr = (double) (dcolor.GetRed() - sr) / h;
+	double difg = (double) (dcolor.GetGreen() - sg) / h;
+	double difb = (double) (dcolor.GetBlue() - sb) / h;
+	double difa = (double) (dcolor.GetAlpha() - sa) / h;
+
+	for (int i = 0; i < w; i++){
+		SetColor(sr + (int)(difr*i), sg + (int)(difg*i), sb + (int)(difb*i), sa + (int)(difa*i));
+		surface->DrawLine( surface, x + i, y, x + i, y + h - 1);
 	}
 
 	_line_width = line_width;
@@ -1424,7 +1437,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 		g->SetColor(_color);
 		g->DrawImage(img, 0, 0, wp, hp);
 		
-		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.alpha);
+		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
 
 		return true;
 	}
@@ -1501,7 +1514,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		g->SetColor(_color);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0);
 		
-		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.alpha);
+		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
 
 		return true;
 	}
@@ -1589,7 +1602,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		g->SetColor(_color);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
-		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.alpha);
+		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
 
 		return true;
 	}
@@ -1733,7 +1746,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 		g->SetColor(_color);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 
-		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.alpha);
+		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
 
 		return true;
 	}
@@ -2261,10 +2274,7 @@ void Graphics::Reset()
 {
 	// _font = Font::GetDefaultFont();
 
-	_color.red = 0x00;
-	_color.green = 0x00;
-	_color.blue = 0x00;
-	_color.alpha = 0x00;
+	_color = Color(0x00, 0x00, 0x00, 0x00);
 
 	_radians = 0.0;
 	_line_width = 1;
@@ -3038,12 +3048,12 @@ void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double arc1
 				}
 
 				if (cx > 0) {
-					surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*cx));
+					surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*cx));
 					surface->DrawLine(surface, lines[y].x2+1, lines[y].y1, lines[y].x2+1, lines[y].y1);
 
 					if (cy > 1) {
 						for (int i=1; i<cy; i++) {
-							surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*i));
+							surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*i));
 							surface->DrawLine(surface, lines[y].x2+i+1, lines[y].y1, lines[y].x2+i+1, lines[y].y1);
 						}
 					}
@@ -3062,12 +3072,12 @@ void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double arc1
 				}
 
 				if (cx > 0) {
-					surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*cx));
+					surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*cx));
 					surface->DrawLine(surface, lines[y].x1-1, lines[y].y1, lines[y].x1-1, lines[y].y1);
 
 					if (cy > 1) {
 						for (int i=1; i<cy; i++) {
-							surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*i));
+							surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*i));
 							surface->DrawLine(surface, lines[y].x1-i-1, lines[y].y1, lines[y].x1-i-1, lines[y].y1);
 						}
 					}
@@ -3075,7 +3085,7 @@ void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double arc1
 			}
 		}
 
-		surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
+		surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
 	}
 }
 
@@ -3234,13 +3244,13 @@ void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
 			}
 
 			if (cx > 0) {
-				surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*cx));
+				surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*cx));
 				surface->DrawLine(surface, lines[y+1].x1-1, lines[y+1].y1, lines[y+1].x1-1, lines[y+1].y1);
 				surface->DrawLine(surface, lines[y+0].x2+1, lines[y+0].y2, lines[y+0].x2+1, lines[y+0].y2);
 
 				if (cy > 1) {
 					for (int i=1; i<cy; i++) {
-						surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*i));
+						surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*i));
 						surface->DrawLine(surface, lines[y+1].x1-i-1, lines[y+1].y1, lines[y+1].x1-i-1, lines[y+1].y1);
 						surface->DrawLine(surface, lines[y+0].x2+i+1, lines[y+0].y2, lines[y+0].x2+i+1, lines[y+0].y2);
 					}
@@ -3261,13 +3271,13 @@ void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
 			}
 
 			if (cx > 0) {
-				surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*cx));
+				surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*cx));
 				surface->DrawLine(surface, lines[y+2].x1-1, lines[y+2].y1, lines[y+2].x1-1, lines[y+2].y1);
 				surface->DrawLine(surface, lines[y+3].x2+1, lines[y+3].y2, lines[y+3].x2+1, lines[y+3].y2);
 
 				if (cy > 1) {
 					for (int i=1; i<cy; i++) {
-						surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha/(2*i));
+						surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*i));
 						surface->DrawLine(surface, lines[y+2].x1-i-1, lines[y+2].y1, lines[y+2].x1-i-1, lines[y+2].y1);
 						surface->DrawLine(surface, lines[y+3].x2+i+1, lines[y+3].y2, lines[y+3].x2+i+1, lines[y+3].y2);
 					}
@@ -3275,7 +3285,7 @@ void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
 			}
 		}
 
-		surface->SetColor(surface, _color.red, _color.green, _color.blue, _color.alpha);
+		surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
 	}
 }
 

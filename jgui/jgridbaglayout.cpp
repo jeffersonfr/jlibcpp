@@ -145,13 +145,16 @@ void GridBagLayout::RemoveLayoutComponent(Component *comp)
 int64_t * GridBagLayout::PreInitMaximumArraySizes(Container *parent)
 {
 	std::vector<Component *> &components = parent->GetComponents();
+
 	Component *comp;
 	GridBagConstraints *constraints;
-	int curX, curY;
-	int curWidth, curHeight;
-	int preMaximumArrayXIndex = 0;
-	int preMaximumArrayYIndex = 0;
 	int64_t *returnArray = new int64_t[2];
+	int curX, 
+			curY;
+	int curWidth, 
+			curHeight;
+	int preMaximumArrayXIndex = 0,
+			preMaximumArrayYIndex = 0;
 
 	for (int compId = 0 ; compId < (int)components.size() ; compId++) {
 		comp = components[compId];
@@ -201,12 +204,13 @@ int64_t * GridBagLayout::PreInitMaximumArraySizes(Container *parent)
 
 GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag) 
 {
+	std::vector<Component *> &components = parent->GetComponents();
+
 	// WARN:: sync parent
 	GridBagLayoutInfo *r;
 	Component *comp;
 	GridBagConstraints *constraints;
 	jsize_t d;
-	std::vector<Component *> &components = parent->GetComponents();
 	// Code below will address index curX+curWidth in the case of yMaxArray, weightY
 	// ( respectively curY+curHeight for xMaxArray, weightX ) where
 	//  curX in 0 to preInitMaximumArraySizes.y
@@ -214,17 +218,25 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 	// be calculated in the following code is curX+curX.
 	// EmpericMultier equals 2 because of this.
 
-	int layoutWidth, layoutHeight;
-	int compindex, i, k, px, py, pixels_diff, nextSize;
-	int curX = 0; // constraints->gridx
-	int curY = 0; // constraints->gridy
-	int curWidth = 1;  // constraints->gridwidth
-	int curHeight = 1;  // constraints->gridheight
-	int curRow, curCol;
 	double weight_diff, weight;
-	int maximumArrayXIndex = 0;
-	int maximumArrayYIndex = 0;
+	int layoutWidth, 
+			layoutHeight;
+	int compindex, 
+			i, 
+			k, 
+			px, 
+			py, 
+			pixels_diff, 
+			nextSize;
 	int anchor;
+	int curX = 0,	// constraints->gridx
+			curY = 0; // constraints->gridy
+	int curWidth = 1,		// constraints->gridwidth
+			curHeight = 1;	// constraints->gridheight
+	int curRow, 
+			curCol;
+	int maximumArrayXIndex = 0,
+			maximumArrayYIndex = 0;
 
 	/*
 	 * Pass #1
@@ -1115,16 +1127,19 @@ jsize_t GridBagLayout::GetMinSize(Container *parent, GridBagLayoutInfo *info)
 
 void GridBagLayout::ArrangeGrid(Container *parent) 
 {
-	Component *comp;
-	int compindex;
-	GridBagConstraints *constraints;
-	jinsets_t insets = parent->GetInsets();
 	std::vector<Component *> &components = parent->GetComponents();
-	jsize_t d;
-	jregion_t r = {0, 0};
-	int i, diffw, diffh;
-	double weight;
+
+	Component *comp;
+	GridBagConstraints *constraints;
 	GridBagLayoutInfo *info;
+	jinsets_t insets = parent->GetInsets();
+	jregion_t r = {0, 0};
+	jsize_t d;
+	double weight;
+	int compindex;
+	int i, 
+			diffw, 
+			diffh;
 
 	rightToLeft = !(parent->GetComponentOrientation() == LEFT_TO_RIGHT_ORIENTATION);
 

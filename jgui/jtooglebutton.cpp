@@ -192,9 +192,9 @@ void ToogleButton::Paint(Graphics *g)
 	}
 
 	if (_is_pressed == true && _enabled == true) {
-		jcolor_t color = _bgcolor;
+		Color color = GetBackgroundColor().Brighter(0.4);
 
-		color.alpha = 0xa0;
+		color.SetAlpha(0x80);
 
 		g->SetDrawingFlags(DF_BLEND);
 		g->SetColor(color);

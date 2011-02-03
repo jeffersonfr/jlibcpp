@@ -371,7 +371,7 @@ class SSLSocket : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		std::string what();
+		virtual std::string what();
 
 };
 

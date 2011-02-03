@@ -20,7 +20,6 @@
 #ifndef J_THEME_H
 #define J_THEME_H
 
-#include "jgraphics.h"
 #include "jcomponent.h"
 
 #include <string>
@@ -50,21 +49,21 @@ class Theme : public jcommon::Object{
 		Font *_window_font,
 				 *_component_font;
 		jinsets_t _insets;
-		jcolor_t _window_bgcolor,
-						 _window_fgcolor,
-						 _window_border_color,
-						 _component_bgcolor,
-						 _component_fgcolor,
-						 _component_border_color,
-						 _component_border_focus_color,
-						 _component_focus_bgcolor,
-						 _component_focus_fgcolor,
-						 _item_color,
-						 _item_focus_color,
-						 _item_selected_color,
-						 _item_selected_fgcolor,
-						 _item_fgcolor,
-						 _item_focus_fgcolor;
+		Color _window_bgcolor,
+					_window_fgcolor,
+					_window_border_color,
+					_component_bgcolor,
+					_component_fgcolor,
+					_component_border_color,
+					_component_border_focus_color,
+					_component_focus_bgcolor,
+					_component_focus_fgcolor,
+					_item_color,
+					_item_focus_color,
+					_item_selected_color,
+					_item_selected_fgcolor,
+					_item_fgcolor,
+					_item_focus_fgcolor;
 		jcomponent_border_t _component_border,
 												_window_border;
 		int _window_border_size,
@@ -225,91 +224,91 @@ class Theme : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetWindowBackgroundColor();
+		virtual Color & GetWindowBackgroundColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetWindowForegroundColor();
+		virtual Color & GetWindowForegroundColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetWindowBorderColor();
+		virtual Color & GetWindowBorderColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetComponentBackgroundColor();
+		virtual Color & GetComponentBackgroundColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetComponentForegroundColor();
+		virtual Color & GetComponentForegroundColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetComponentBorderColor();
+		virtual Color & GetComponentBorderColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetComponentBorderFocusColor();
+		virtual Color & GetComponentBorderFocusColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetComponentBackgroundFocusColor();
+		virtual Color & GetComponentBackgroundFocusColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetComponentForegroundFocusColor();
+		virtual Color & GetComponentForegroundFocusColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetItemColor();
+		virtual Color & GetItemColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetItemFocusColor();
+		virtual Color & GetItemFocusColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetSelectedItemColor();
+		virtual Color & GetSelectedItemColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetSelectedItemForegroundColor();
+		virtual Color & GetSelectedItemForegroundColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetItemForegroundColor();
+		virtual Color & GetItemForegroundColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetItemForegroundFocusColor();
+		virtual Color & GetItemForegroundFocusColor();
 		
 		/**
 		 * \brief

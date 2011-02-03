@@ -90,12 +90,7 @@ CalendarDialogBox::CalendarDialogBox(int x, int y):
 	lsex = new Label("S", bx+5*(bwidth+delta+dx), by+170, bwidth, bheight);
 	lsab = new Label("S", bx+6*(bwidth+delta+dx), by+170, bwidth, bheight);
 
-	jcolor_t color;
-
-	color.red = 0x60;
-	color.green = 0x60;
-	color.blue = 0x80;
-	color.alpha = 0xff;
+	Color color(0x60, 0x60, 0x80, 0xff);
 
 	ldom->SetBackgroundColor(color);
 	lseg->SetBackgroundColor(color);

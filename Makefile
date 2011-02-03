@@ -303,6 +303,7 @@ OBJS_jgui = \
 		jcheckbuttonevent.o\
 		jcheckbuttongroup.o\
 		jcheckbuttonlistener.o\
+		jcolor.o\
 		jcombobox.o\
 		jcomponent.o\
 		jcomponentevent.o\

@@ -55,7 +55,7 @@ namespace jsocket {
  */
 struct jip_hdr_t {
 	unsigned int ip_hl:4,
-			 	 ip_v:4;
+							 ip_v:4;
 	uint8_t ip_tos;
 	unsigned short ip_len;
 	unsigned short ip_id;
@@ -71,16 +71,16 @@ struct jip_hdr_t {
  *
  */
 struct jtcp_hdr_t {
-    unsigned short th_sport;
-    unsigned short th_dport;
-    unsigned long th_seq;
-    unsigned long th_syn;
+	unsigned short th_sport;
+	unsigned short th_dport;
+	unsigned long th_seq;
+	unsigned long th_syn;
 	unsigned int th_x2:4,
- 				 th_off:4;
- 	uint8_t th_flags;
- 	unsigned short th_win;
-    unsigned short th_sum;
-    unsigned short th_urp;
+							 th_off:4;
+	uint8_t th_flags;
+	unsigned short th_win;
+	unsigned short th_sum;
+	unsigned short th_urp;
 };
 
 /**
@@ -88,9 +88,9 @@ struct jtcp_hdr_t {
  *
  */
 struct jtcpopt_hdr_t {
-    uint8_t type;
-    uint8_t len;
-    unsigned short value;
+	uint8_t type;
+	uint8_t len;
+	unsigned short value;
 };
 
 /**
@@ -98,9 +98,9 @@ struct jtcpopt_hdr_t {
  *
  */
 struct jpseudo_hdr_t {
-    unsigned long saddr, daddr;
-    uint8_t mbz, ptcl;
-    unsigned short tcpl;
+	unsigned long saddr, daddr;
+	uint8_t mbz, ptcl;
+	unsigned short tcpl;
 };
 
 /**
@@ -108,8 +108,8 @@ struct jpseudo_hdr_t {
  *
  */
 struct jpacket_t {
-    struct iphdr ip;
-    struct tcphdr tcp;
+	struct iphdr ip;
+	struct tcphdr tcp;
 };
 
 /**
@@ -117,8 +117,8 @@ struct jpacket_t {
  *
  */
 struct jcksum_t {
-    struct jpseudo_hdr_t pseudo;
-    struct tcphdr tcp; // WARN:: eh isso mesmo ?
+	struct jpseudo_hdr_t pseudo;
+	struct tcphdr tcp; // WARN:: eh isso mesmo ?
 };
 
 /**
@@ -128,185 +128,185 @@ struct jcksum_t {
  */
 class RawSocket : public jsocket::Connection{
 
-    private:
-        /** \brief Use to bind the socket in a free port. */
-        static int _used_port;
-        
-        /** \brief Socket handler. */
+	private:
+		/** \brief Use to bind the socket in a free port. */
+		static int _used_port;
+
+		/** \brief Socket handler. */
 #ifdef _WIN32
 		SOCKET _fd;
 #else
-        int _fd;
+		int _fd;
 #endif
-        /** \brief Local socket. */
-        sockaddr_in _lsock;
-        /** \brief Server socket UDP. */
-        sockaddr_in _server_sock;
-        /** \brief Local inetaddress. */
-        InetAddress *_local;
-        /** \brief Remote inetaddress. */
-        InetAddress *_address;
-        /** \brief Input stream. */
-        SocketInputStream *_is;
-        /** \brief Output stream. */
-        SocketOutputStream *_os;
-        /** \brief Bytes sent. */
-        int64_t _sent_bytes;
-        /** \brief Bytes received. */
-        int64_t _receive_bytes;
-        /** \brief */
+		/** \brief Local socket. */
+		sockaddr_in _lsock;
+		/** \brief Server socket UDP. */
+		sockaddr_in _server_sock;
+		/** \brief Local inetaddress. */
+		InetAddress *_local;
+		/** \brief Remote inetaddress. */
+		InetAddress *_address;
+		/** \brief Input stream. */
+		SocketInputStream *_is;
+		/** \brief Output stream. */
+		SocketOutputStream *_os;
+		/** \brief Bytes sent. */
+		int64_t _sent_bytes;
+		/** \brief Bytes received. */
+		int64_t _receive_bytes;
+		/** \brief */
 		int _timeout;
-        /** \brief */
+		/** \brief */
 		struct ifreq _ifr;
-        /** \brief */
+		/** \brief */
 		int _index_device;
-        /** \brief */
+		/** \brief */
 		bool _promisc;
-        /** \brief */
+		/** \brief */
 		std::string _device;
 
-        /**
-        * \brief Create a new socket.
-        *
-        */
-        void CreateSocket();
-        
-        /**
-        * \brief Bind socket.
-        *
-        */
-        void BindSocket();
-        
-        /**
-        * \brief Init the stream.
-        *
-        */
-        void InitStream(int rbuf_, int wbuf_);
-
-    public:
-        /**
-        * \brief Construtor UDP client.
-        *
-        */
-        RawSocket(std::string device_ = "lo", bool promisc_ = true, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-        
-        /**
-        * \brief Destructor virtual.
-        *
-        */
-        virtual ~RawSocket();
-        
-        /**
-        * \brief 
-        *
-        */
-        virtual jio::InputStream * GetInputStream();
-        
-        /**
-        * \brief
-        *
-        */
-        virtual jio::OutputStream * GetOutputStream();
-        
 		/**
-        * \brief 
-        *
-        */
+		 * \brief Create a new socket.
+		 *
+		 */
+		void CreateSocket();
+
+		/**
+		 * \brief Bind socket.
+		 *
+		 */
+		void BindSocket();
+
+		/**
+		 * \brief Init the stream.
+		 *
+		 */
+		void InitStream(int rbuf_, int wbuf_);
+
+	public:
+		/**
+		 * \brief Construtor UDP client.
+		 *
+		 */
+		RawSocket(std::string device_ = "lo", bool promisc_ = true, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+
+		/**
+		 * \brief Destructor virtual.
+		 *
+		 */
+		virtual ~RawSocket();
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual jio::InputStream * GetInputStream();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jio::OutputStream * GetOutputStream();
+
+		/**
+		 * \brief 
+		 *
+		 */
 #ifdef _WIN32
 		virtual SOCKET GetHandler();
 #else
 		virtual int GetHandler();
 #endif
 
-        /**
-        * \brief Read data from a source.
-        *
-        */
-        virtual int Receive(char *data_, int size_, int time_);
-        
-        /**
-        * \brief Read data from a source.
-        *
-        */
-        virtual int Receive(char *data_, int size_, bool block_ = true);
-        
-        /**
-        * \brief Write data to a source.
-        *
-        */
-        virtual int Send(const char *data_, int size_, int time_);
-        
-        /**
-        * \brief Write data to a source.
-        *
-        */
-        virtual int Send(const char *data_, int size_, bool block_ = true);
-        
-        /**
-        * \brief Close the socket.
-        *
-        */
-        virtual void Close();
-        
-        /**
-        * \brief
-        *
-        */
-        sockaddr_in LocalAddress();
-        
-        /**
-        * \brief
-        *
-        */
-        sockaddr_in RemoteAddress();
-        
-        /**
-        * \brief Get InetAddress.
-        *
-        */
-        InetAddress * GetInetAddress();
-        
-        /**
-        * \brief Get the local port.
-        *
-        */
-        int GetLocalPort();
-        
-        /**
-        * \brief Get port.
-        *
-        */
-        int GetPort();
-        
-        /**
-        * \brief Get sent bytes to destination.
-        *
-        */
-        virtual int64_t GetSentBytes();
-        
-        /**
-        * \brief Get received bytes from a source.
-        *
-        */
-        virtual int64_t GetReceiveBytes();
+		/**
+		 * \brief Read data from a source.
+		 *
+		 */
+		virtual int Receive(char *data_, int size_, int time_);
 
-        /**
-         * \brief Get a object SocketOption.
-         *
-         */
-        SocketOption * GetSocketOption();
-        
+		/**
+		 * \brief Read data from a source.
+		 *
+		 */
+		virtual int Receive(char *data_, int size_, bool block_ = true);
+
+		/**
+		 * \brief Write data to a source.
+		 *
+		 */
+		virtual int Send(const char *data_, int size_, int time_);
+
+		/**
+		 * \brief Write data to a source.
+		 *
+		 */
+		virtual int Send(const char *data_, int size_, bool block_ = true);
+
+		/**
+		 * \brief Close the socket.
+		 *
+		 */
+		virtual void Close();
+
+		/**
+		 * \brief
+		 *
+		 */
+		sockaddr_in LocalAddress();
+
+		/**
+		 * \brief
+		 *
+		 */
+		sockaddr_in RemoteAddress();
+
+		/**
+		 * \brief Get InetAddress.
+		 *
+		 */
+		InetAddress * GetInetAddress();
+
+		/**
+		 * \brief Get the local port.
+		 *
+		 */
+		int GetLocalPort();
+
+		/**
+		 * \brief Get port.
+		 *
+		 */
+		int GetPort();
+
+		/**
+		 * \brief Get sent bytes to destination.
+		 *
+		 */
+		virtual int64_t GetSentBytes();
+
+		/**
+		 * \brief Get received bytes from a source.
+		 *
+		 */
+		virtual int64_t GetReceiveBytes();
+
+		/**
+		 * \brief Get a object SocketOption.
+		 *
+		 */
+		SocketOption * GetSocketOption();
+
 		/**
 		 * \brief
 		 *
 		 */
 		unsigned short Checksum(unsigned short *addr, int len);
 
-        /**
-        * \brief
-        *
-        */
-        std::string what();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string what();
 
 };
 

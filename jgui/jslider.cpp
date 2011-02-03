@@ -199,17 +199,8 @@ void Slider::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int diff = 0x40;
-
-	jcolor_t color,
-					 bar;
-
-	color.red = 0x80;
-	color.green = 0x80;
-	color.blue = 0xe0;
-	color.alpha = 0xff;
-	
-	bar = color.Darker(diff, diff, diff, 0x00);
+	Color color(0x80, 0x80, 0xe0, 0xff),
+				bar = color.Darker(0.1);
 
 	int x = _vertical_gap-_border_size,
 			y = _horizontal_gap-_border_size,

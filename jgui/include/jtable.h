@@ -42,15 +42,9 @@ class Cell : public virtual jcommon::Object{
 
 	private:
 		Table *_table;
+		Color _cell_bgcolor,
+					_cell_fgcolor;
 		std::string _value;
-		int _bgcell_red,
-			_bgcell_green,
-			_bgcell_blue,
-			_bgcell_alpha;
-		int _fgcell_red,
-			_fgcell_green,
-			_fgcell_blue,
-			_fgcell_alpha;
 		jhorizontal_align_t _halign;
 		jvertical_align_t _valign;
 
@@ -75,19 +69,31 @@ class Cell : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetCellBackgroundColor(jcolor_t color);
+		virtual Color & GetCellBackgroundColor();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetCellForegroundColor(jcolor_t color);
+		virtual Color & GetCellForegroundColor();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetCellBackgroundColor(int r, int g, int b, int a);
+		virtual void SetCellBackgroundColor(Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCellForegroundColor(Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCellBackgroundColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
@@ -135,16 +141,13 @@ class Table : public Component, public virtual jcommon::Object{
 		std::vector<int> _column_size;
 		std::vector<Cell *> _header;
 		std::vector<std::vector<Cell *> * > _cells;
+		Color _grid_color;
 		int _column,
-			_row;
+				_row;
 		int _columns,
-			_rows;
-		int _grid_red,
-			_grid_green,
-			_grid_blue,
-			_grid_alpha;
+				_rows;
 		bool _header_visible,
-			 _loop;
+				 _loop;
 
 	public:
 		/**
@@ -277,13 +280,19 @@ class Table : public Component, public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetGridColor(jcolor_t color);
+		virtual Color & GetGridColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetGridColor(int r, int g, int b, int a);
+		virtual void SetGridColor(Color &color);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetGridColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief

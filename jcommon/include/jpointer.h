@@ -111,7 +111,7 @@ class ReferenceCounter {
 		 *
 		 * @return true se contador(ponteiro) > 0 e false em caso contrario.
 		 */
-		bool contem(void *p);
+		bool HasReference(void *p);
 };
 
 /**
@@ -181,7 +181,7 @@ template <class X> class ptr {
 			if (_pointer != NULL) {
 				ReferenceCounter::getInstance()->Free(_pointer);
 
-				if (!ReferenceCounter::getInstance()->contem(_pointer)) {
+				if (!ReferenceCounter::getInstance()->HasReference(_pointer)) {
 					delete _pointer;
 				}
 

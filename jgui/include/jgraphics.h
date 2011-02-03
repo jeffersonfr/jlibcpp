@@ -20,7 +20,7 @@
 #ifndef J_GRAPHICS_H
 #define J_GRAPHICS_H
 
-#include "jobject.h"
+#include "jcolor.h"
 #include "jmutex.h"
 
 #include <stdlib.h>
@@ -40,12 +40,6 @@
 #define DEFAULT_SCALE_HEIGHT	1080
 
 #define DEFAULT_FONT_SIZE			20
-
-#define TRUNC_COLOR(r, g, b, a)			\
-	r = (r < 0)?0:(r > 0xff)?0xff:r;	\
-	g = (g < 0)?0:(g > 0xff)?0xff:g;	\
-	b = (b < 0)?0:(b > 0xff)?0xff:b;	\
-	a = (a < 0)?0:(a > 0xff)?0xff:a;	\
 
 #define SCALE_TO_SCREEN(x, y, z) \
 	(int)round(((double)x*(double)y)/(double)z) 
@@ -181,42 +175,6 @@ struct jinsets_t {
 	int bottom;
 };
 
-/**
- * \brief
- *
- */
-struct jcolor_t {
-	uint8_t alpha;
-	uint8_t red;
-	uint8_t green;
-	uint8_t blue;
-
-	jcolor_t Brighter(int r, int g, int b, int a)
-	{
-		r = red + r;
-		g = green + g;
-		b = blue + b;
-		a = alpha + a;
-
-		TRUNC_COLOR(r, g, b, a);
-
-		jcolor_t color;
-
-		color.red = r;
-		color.green = g;
-		color.blue = b;
-		color.alpha = a;
-
-		return color;
-	}
-
-	jcolor_t Darker(int r, int g, int b, int a)
-	{
-		return Brighter(-r, -g, -b, -a);
-	}
-
-};
-
 class Window;
 class Image;
 class Font;
@@ -232,30 +190,29 @@ class Graphics : public virtual jcommon::Object{
 	friend class Window;
 	friend class OffScreenImage;
 
-	private:
+	protected:
 		jthread::Mutex graphics_mutex;
-
-#ifdef DIRECTFB_UI
-		IDirectFBSurface *surface;
-#endif
 
 		struct jregion_t _clip;
 		struct jpoint_t _translate;
 		struct jsize_t _screen;
 		struct jsize_t _scale;
-		struct jcolor_t _color;
 		jline_join_t _line_join;
 		jline_style_t _line_style;
 		jdrawing_flags_t _draw_flags;
 		jblitting_flags_t _blit_flags;
 		jporter_duff_flags_t _porter_duff_flags;
 		Font *_font;
+		Color _color;
 		double _radians;
 		int _line_width;
 		bool _is_premultiply,
 				 _antialias_enabled;
 
+	private:
 #ifdef DIRECTFB_UI
+		IDirectFBSurface *surface;
+		
 		struct edge_t {
 			struct edge_t *next;
 
@@ -393,25 +350,25 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual struct jcolor_t GetColor(); 
+		virtual Color & GetColor(); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetColor(struct jcolor_t c); 
+		virtual void SetColor(Color &color); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetColor(uint32_t c); 
+		virtual void SetColor(uint32_t color); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetColor(int r, int g, int b, int a = 0xff); 
+		virtual void SetColor(int red, int green, int blue, int alpha = 0xff); 
 		
 		/**
 		 * \brief
@@ -661,7 +618,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void FillGradientRectangle(int x, int y, int w, int h, jcolor_t scolor, jcolor_t dcolor, bool horizontal = true);
+		virtual void FillHorizontalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void FillVerticalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor);
 		
 		/**
 		 * \brief

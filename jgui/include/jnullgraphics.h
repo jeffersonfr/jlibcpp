@@ -146,13 +146,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual struct jcolor_t GetColor(); 
+		virtual Color & GetColor(); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetColor(struct jcolor_t c); 
+		virtual void SetColor(Color &color); 
 		
 		/**
 		 * \brief
@@ -414,7 +414,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillGradientRectangle(int x, int y, int w, int h, jcolor_t scolor, jcolor_t dcolor, bool horizontal = true);
+		virtual void FillHorizontalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void FillVerticalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor);
 		
 		/**
 		 * \brief

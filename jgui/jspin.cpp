@@ -250,16 +250,8 @@ void Spin::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	jcolor_t color,
-					 disable;
-	int diff = 0x40;
-
-	color.red = 0x80;
-	color.green = 0x80;
-	color.blue = 0xe0;
-	color.alpha = 0xff;
-
-	disable = color.Darker(diff, diff, diff, 0x00);
+	Color color(0x80, 0x80, 0xe0, 0xff),
+				disable = color.Darker(0.1);
 
 	/*
 	if (_has_focus == true) {

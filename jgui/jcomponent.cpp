@@ -55,7 +55,7 @@ Component::Component(int x, int y, int width, int height):
 	_up = NULL;
 	_down = NULL;
 	_border_size = 2;
-	_border = BEVEL_BORDER;
+	_border = LINE_BORDER;
 	_gradient_level = 0x40;
 	_vertical_gap = 4;
 	_horizontal_gap = 4;
@@ -201,19 +201,19 @@ void Component::PaintBorderEdges(Graphics *g)
 			wp = _size.width-1,
 			hp = _size.height-1,
 			size = _border_size;
-	int dr = _border_color.red,
-			dg = _border_color.green,
-			db = _border_color.blue,
-			da = _border_color.alpha;
+	int dr = _border_color.GetRed(),
+			dg = _border_color.GetGreen(),
+			db = _border_color.GetBlue(),
+			da = _border_color.GetAlpha();
 	int step = 0x20;
 
 	g->SetLineWidth(_border_size);
 	
 	if (HasFocus() == true) {
-		dr = _focus_border_color.red;
-		dg = _focus_border_color.green;
-		db = _focus_border_color.blue;
-		da = _focus_border_color.alpha;
+		dr = _focus_border_color.GetRed();
+		dg = _focus_border_color.GetGreen();
+		db = _focus_border_color.GetBlue();
+		da = _focus_border_color.GetAlpha();
 	}
 	
 	if (_border == FLAT_BORDER) {
@@ -235,13 +235,6 @@ void Component::PaintBorderEdges(Graphics *g)
 			g->SetColor(dr-step, dg-step, db-step);
 			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
-
-		/*
-		g->SetColor(dr, dg, db, da);
-		for (int i=0; i<size && i<wp && i<hp; i++) {
-			g->DrawRectangle(xp+i, yp+i, wp-2*i, hp-2*i);
-		}
-		*/
 	} else if (_border == GRADIENT_BORDER) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
@@ -746,132 +739,102 @@ int Component::GetGradientLevel()
 
 void Component::SetBackgroundColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_bgcolor.red = red;
-	_bgcolor.green = green;
-	_bgcolor.blue = blue;
-	_bgcolor.alpha = alpha;
+	_bgcolor = Color(red, green, blue, alpha);
 
 	Repaint();
 }
 
 void Component::SetForegroundColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_fgcolor.red = red;
-	_fgcolor.green = green;
-	_fgcolor.blue = blue;
-	_fgcolor.alpha = alpha;
+	_fgcolor = Color(red, green, blue, alpha);
 
 	Repaint();
 }
 
 void Component::SetBackgroundFocusColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_focus_bgcolor.red = red;
-	_focus_bgcolor.green = green;
-	_focus_bgcolor.blue = blue;
-	_focus_bgcolor.alpha = alpha;
+	_focus_bgcolor = Color(red, green, blue, alpha);
 
 	Repaint();
 }
 
 void Component::SetForegroundFocusColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_focus_fgcolor.red = red;
-	_focus_fgcolor.green = green;
-	_focus_fgcolor.blue = blue;
-	_focus_fgcolor.alpha = alpha;
+	_focus_fgcolor = Color(red, green, blue, alpha);
 
 	Repaint();
 }
 
 void Component::SetBorderColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_border_color.red = red;
-	_border_color.green = green;
-	_border_color.blue = blue;
-	_border_color.alpha = alpha;
+	_border_color = Color(red, green, blue, alpha);
 
 	Repaint();
 }
 
 void Component::SetBorderFocusColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_focus_border_color.red = red;
-	_focus_border_color.green = green;
-	_focus_border_color.blue = blue;
-	_focus_border_color.alpha = alpha;
+	_focus_border_color = Color(red, green, blue, alpha);
 
 	Repaint();
 }
 
-void Component::SetBackgroundColor(jcolor_t color)
+void Component::SetBackgroundColor(Color &color)
 {
-	SetBackgroundColor(color.red, color.green, color.blue, color.alpha);
+	_bgcolor = color;
 }
 
-void Component::SetForegroundColor(jcolor_t color)
+void Component::SetForegroundColor(Color &color)
 {
-	SetForegroundColor(color.red, color.green, color.blue, color.alpha);
+	_fgcolor = color;
 }
 
-void Component::SetBackgroundFocusColor(jcolor_t color)
+void Component::SetBackgroundFocusColor(Color &color)
 {
-	SetBackgroundFocusColor(color.red, color.green, color.blue, color.alpha);
+	_focus_bgcolor = color;
 }
 
-void Component::SetForegroundFocusColor(jcolor_t color)
+void Component::SetForegroundFocusColor(Color &color)
 {
-	SetForegroundFocusColor(color.red, color.green, color.blue, color.alpha);
+	_focus_fgcolor = color;
 }
 
-void Component::SetBorderColor(jcolor_t color)
+void Component::SetBorderColor(Color &color)
 {
-	SetBorderColor(color.red, color.green, color.blue, color.alpha);
+	_border_color = color;
 }
 
-void Component::SetBorderFocusColor(jcolor_t color)
+void Component::SetBorderFocusColor(Color &color)
 {
-	SetBorderFocusColor(color.red, color.green, color.blue, color.alpha);
+	_focus_border_color = color;
 }
 
-jcolor_t Component::GetBackgroundColor()
+Color & Component::GetBackgroundColor()
 {
 	return _bgcolor;
 }
 
-jcolor_t Component::GetForegroundColor()
+Color & Component::GetForegroundColor()
 {
 	return _fgcolor;
 }
 
-jcolor_t Component::GetBackgroundFocusColor()
+Color & Component::GetBackgroundFocusColor()
 {
 	return _focus_bgcolor;
 }
 
-jcolor_t Component::GetForegroundFocusColor()
+Color & Component::GetForegroundFocusColor()
 {
 	return _focus_fgcolor;
 }
 
-jcolor_t Component::GetBorderColor()
+Color & Component::GetBorderColor()
 {
 	return _border_color;
 }
 
-jcolor_t Component::GetBorderFocusColor()
+Color & Component::GetBorderFocusColor()
 {
 	return _focus_border_color;
 }

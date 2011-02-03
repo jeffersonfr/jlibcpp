@@ -51,93 +51,93 @@ class ServerSocket;
  */
 class Socket : public jsocket::Connection{
 
-    friend class ServerSocket; //Socket * ServerSocket::Accept();
+	friend class ServerSocket; //Socket * ServerSocket::Accept();
 
-    private:
+   private:
 #ifdef _WIN32
-        /** \brief Socket handler. */
+		/** \brief Socket handler. */
 		SOCKET _fd;
 #else
-        /** \brief Socket handler. */
-        int _fd;
+		/** \brief Socket handler. */
+		int _fd;
 #endif
-        /** \brief */
-        SocketInputStream *_is;
-        /** \brief */
-        SocketOutputStream *_os;
-        /** \brief */
-        sockaddr_in _lsock;
-        /** \brief */
-        sockaddr_in _server_sock;
-        /** \brief */
-        InetAddress *_address;
-        /** \brief Bytes sent. */
-        int64_t _sent_bytes;
-        /** \brief Bytes received. */
-        int64_t _receive_bytes;
-        /** \brief */
+		/** \brief */
+		SocketInputStream *_is;
+		/** \brief */
+		SocketOutputStream *_os;
+		/** \brief */
+		sockaddr_in _lsock;
+		/** \brief */
+		sockaddr_in _server_sock;
+		/** \brief */
+		InetAddress *_address;
+		/** \brief Bytes sent. */
+		int64_t _sent_bytes;
+		/** \brief Bytes received. */
+		int64_t _receive_bytes;
+		/** \brief */
 		int _timeout;
 
-        /**
-        * \brief Create a new socket.
-        *
-        */
-        void CreateSocket();
-        
-        /**
-        * \brief
-        *
-        */
-        void BindSocket(InetAddress *, int);
-        
-        /**
-        * \brief Connect the socket.
-        *
-        */
-        void ConnectSocket(InetAddress *, int);
-        
-        /**
-        * \brief
-        *
-        */
-        void InitStreams(int64_t rbuf_, int64_t wbuf_);
+		/**
+		 * \brief Create a new socket.
+		 *
+		 */
+		void CreateSocket();
 
-    public:
+		/**
+		 * \brief
+		 *
+		 */
+		void BindSocket(InetAddress *, int);
+
+		/**
+		 * \brief Connect the socket.
+		 *
+		 */
+		void ConnectSocket(InetAddress *, int);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void InitStreams(int64_t rbuf_, int64_t wbuf_);
+
+	 public:
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-        Socket(int handler_, sockaddr_in server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket(int handler_, sockaddr_in server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 	
-        /**
-        * \brief Constructor.
-        *
-        */
-        Socket(InetAddress *addr_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-        
-        /**
-        * \brief Constructor.
-        *
-        */
-        Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-        
-        /**
-        * \brief
-        *
-        */
-        Socket(std::string host_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-        
-        /**
-        * \brief Constructor.
-        *
-        */
-        Socket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~Socket();
+		/**
+		 * \brief Constructor.
+		 *
+		 */
+		Socket(InetAddress *addr_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+
+		/**
+		 * \brief Constructor.
+		 *
+		 */
+		Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+
+		/**
+		 * \brief
+		 *
+		 */
+		Socket(std::string host_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+
+		/**
+		 * \brief Constructor.
+		 *
+		 */
+		Socket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~Socket();
 
 #ifdef _WIN32
 		virtual SOCKET GetHandler();
@@ -145,93 +145,93 @@ class Socket : public jsocket::Connection{
 		virtual int GetHandler();
 #endif
 
-        /**
-        * \brief Send bytes to a destination.
-        *
-        */
-        virtual int Send(const char *b_, int size_, bool block_ = true);
-        
-        /**
-        * \brief Send bytes to a destination waiting a timeout.
-        *
-        */
-        virtual int Send(const char *b_, int size_, int time_);
-        
-        /**
-        * \brief Receive bytes from a source.
-		*
-		* \return the number of bytes received, or 0 if the peer has shutdown (now throws).
-		*
-		* \exception SocketException an error occurred.
-        *
-        */
-        virtual int Receive(char *data_, int data_length_, bool block_ = true);
+		/**
+		 * \brief Send bytes to a destination.
+		 *
+		 */
+		virtual int Send(const char *b_, int size_, bool block_ = true);
 
-        /**
-        * \brief Receive bytes from a source waiting a timeout.
-        *
-        */
-        virtual int Receive(char *data_, int data_length_, int time_);
-		
-        /**
-        * \brief Close the socket.
-        *
-        */
-        virtual void Close();
-        
-        /**
-        * \brief
-        *
-        */
-        virtual jio::InputStream * GetInputStream();
-        
-        /**
-        * \brief
-        *
-        */
-        virtual jio::OutputStream * GetOutputStream();
-        
-        /**
-        * \brief
-        *
-        */
-        InetAddress * GetInetAddress();
-        
-        /**
-        * \brief Get the local port.
-        *
-        */
-        int GetLocalPort();
-        
-        /**
-        * \brief Get the port.
-        *
-        */
-        int GetPort();
+		/**
+		 * \brief Send bytes to a destination waiting a timeout.
+		 *
+		 */
+		virtual int Send(const char *b_, int size_, int time_);
 
-        /**
-        * \brief Get the bytes sent to a destination.
-        *
-        */
-        virtual int64_t GetSentBytes();
-            
-        /**
-        * \brief Get de bytes received from a source.
-        *
-        */
-        virtual int64_t GetReceiveBytes();
+		/**
+		 * \brief Receive bytes from a source.
+		 *
+		 * \return the number of bytes received, or 0 if the peer has shutdown (now throws).
+		 *
+		 * \exception SocketException an error occurred.
+		 *
+		 */
+		virtual int Receive(char *data_, int data_length_, bool block_ = true);
 
-        /**
-         * \brief Get the socket options.
-         *
-         */
-        SocketOption * GetSocketOption();
-        
-        /**
-        * \brief
-        *
-        */
-        std::string what();
+		/**
+		 * \brief Receive bytes from a source waiting a timeout.
+		 *
+		 */
+		virtual int Receive(char *data_, int data_length_, int time_);
+
+		/**
+		 * \brief Close the socket.
+		 *
+		 */
+		virtual void Close();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jio::InputStream * GetInputStream();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jio::OutputStream * GetOutputStream();
+
+		/**
+		 * \brief
+		 *
+		 */
+		InetAddress * GetInetAddress();
+
+		/**
+		 * \brief Get the local port.
+		 *
+		 */
+		int GetLocalPort();
+
+		/**
+		 * \brief Get the port.
+		 *
+		 */
+		int GetPort();
+
+		/**
+		 * \brief Get the bytes sent to a destination.
+		 *
+		 */
+		virtual int64_t GetSentBytes();
+
+		/**
+		 * \brief Get de bytes received from a source.
+		 *
+		 */
+		virtual int64_t GetReceiveBytes();
+
+		/**
+		 * \brief Get the socket options.
+		 *
+		 */
+		SocketOption * GetSocketOption();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string what();
 
 };
 

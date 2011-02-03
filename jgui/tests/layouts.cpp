@@ -223,13 +223,8 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 				*l5 = new jgui::Label("GridBagLayout", 0, 0, 0, 0),
 				*l6 = new jgui::Label("NullLayout", 0, 0, 0, 0);
 			
-			jgui::jcolor_t color;
+			jgui::Color color(0x40, 0x40, 0x40, 0xff);
 			
-			color.red = 0x40;
-			color.green = 0x40;
-			color.blue = 0x40;
-			color.alpha = 0xff;
-
 			l1->SetBackgroundColor(color);
 			l2->SetBackgroundColor(color);
 			l3->SetBackgroundColor(color);

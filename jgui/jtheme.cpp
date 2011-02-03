@@ -141,152 +141,77 @@ void Theme::Update(Component *parent)
 
 void Theme::SetWindowBackgroundColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_window_bgcolor.red = red;
-	_window_bgcolor.green = green;
-	_window_bgcolor.blue = blue;
-	_window_bgcolor.alpha = alpha;
+	_window_bgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetWindowForegroundColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_window_fgcolor.red = red;
-	_window_fgcolor.green = green;
-	_window_fgcolor.blue = blue;
-	_window_fgcolor.alpha = alpha;
+	_window_fgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetWindowBorderColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_window_border_color.red = red;
-	_window_border_color.green = green;
-	_window_border_color.blue = blue;
-	_window_border_color.alpha = alpha;
+	_window_border_color = Color(red, green, blue, alpha);
 }
 
 void Theme::SetComponentBackgroundColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_component_bgcolor.red = red;
-	_component_bgcolor.green = green;
-	_component_bgcolor.blue = blue;
-	_component_bgcolor.alpha = alpha;
+	_component_bgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetComponentForegroundColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_component_fgcolor.red = red;
-	_component_fgcolor.green = green;
-	_component_fgcolor.blue = blue;
-	_component_fgcolor.alpha = alpha;
+	_component_fgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetComponentBorderColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_component_border_color.red = red;
-	_component_border_color.green = green;
-	_component_border_color.blue = blue;
-	_component_border_color.alpha = alpha;
+	_component_border_color = Color(red, green, blue, alpha);
 }
 
 void Theme::SetComponentBorderFocusColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_component_border_focus_color.red = red;
-	_component_border_focus_color.green = green;
-	_component_border_focus_color.blue = blue;
-	_component_border_focus_color.alpha = alpha;
+	_component_border_focus_color = Color(red, green, blue, alpha);
 }
 
 void Theme::SetComponentBackgroundFocusColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_component_focus_bgcolor.red = red;
-	_component_focus_bgcolor.green = green;
-	_component_focus_bgcolor.blue = blue;
-	_component_focus_bgcolor.alpha = alpha;
+	_component_focus_bgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetComponentForegroundFocusColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_component_focus_fgcolor.red = red;
-	_component_focus_fgcolor.green = green;
-	_component_focus_fgcolor.blue = blue;
-	_component_focus_fgcolor.alpha = alpha;
+	_component_focus_fgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetItemColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_item_color.red = red;
-	_item_color.green = green;
-	_item_color.blue = blue;
-	_item_color.alpha = alpha;
+	_item_color = Color(red, green, blue, alpha);
 }
 
 void Theme::SetItemFocusColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_item_focus_color.red = red;
-	_item_focus_color.green = green;
-	_item_focus_color.blue = blue;
-	_item_focus_color.alpha = alpha;
+	_item_focus_color = Color(red, green, blue, alpha);
 }
 
 void Theme::SetSelectedItemColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_item_selected_color.red = red;
-	_item_selected_color.green = green;
-	_item_selected_color.blue = blue;
-	_item_selected_color.alpha = alpha;
+	_item_selected_color = Color(red, green, blue, alpha);
 }
 
 void Theme::SetSelectedItemForegroundColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_item_selected_fgcolor.red = red;
-	_item_selected_fgcolor.green = green;
-	_item_selected_fgcolor.blue = blue;
-	_item_selected_fgcolor.alpha = alpha;
+	_item_selected_fgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetItemForegroundColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_item_fgcolor.red = red;
-	_item_fgcolor.green = green;
-	_item_fgcolor.blue = blue;
-	_item_fgcolor.alpha = alpha;
+	_item_fgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetItemForegroundFocusColor(int red, int green, int blue, int alpha)
 {
-	TRUNC_COLOR(red, green, blue, alpha);
-
-	_item_focus_fgcolor.red = red;
-	_item_focus_fgcolor.green = green;
-	_item_focus_fgcolor.blue = blue;
-	_item_focus_fgcolor.alpha = alpha;
+	_item_focus_fgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetComponentBorder(jcomponent_border_t border)
@@ -327,77 +252,77 @@ void Theme::SetComponentFont(Font *font)
 	_component_font = font;
 }
 
-jcolor_t Theme::GetWindowBackgroundColor()
+Color & Theme::GetWindowBackgroundColor()
 {
 	return _window_bgcolor;
 }
 
-jcolor_t Theme::GetWindowForegroundColor()
+Color & Theme::GetWindowForegroundColor()
 {
 	return _window_fgcolor;
 }
 
-jcolor_t Theme::GetWindowBorderColor()
+Color & Theme::GetWindowBorderColor()
 {
 	return _window_border_color;
 }
 
-jcolor_t Theme::GetComponentBackgroundColor()
+Color & Theme::GetComponentBackgroundColor()
 {
 	return _component_bgcolor;
 }
 
-jcolor_t Theme::GetComponentForegroundColor()
+Color & Theme::GetComponentForegroundColor()
 {
 	return _component_fgcolor;
 }
 
-jcolor_t Theme::GetComponentBorderColor()
+Color & Theme::GetComponentBorderColor()
 {
 	return _component_border_color;
 }
 
-jcolor_t Theme::GetComponentBorderFocusColor()
+Color & Theme::GetComponentBorderFocusColor()
 {
 	return _component_border_focus_color;
 }
 
-jcolor_t Theme::GetComponentBackgroundFocusColor()
+Color & Theme::GetComponentBackgroundFocusColor()
 {
 	return _component_focus_bgcolor;
 }
 
-jcolor_t Theme::GetComponentForegroundFocusColor()
+Color & Theme::GetComponentForegroundFocusColor()
 {
 	return _component_focus_fgcolor;
 }
 
-jcolor_t Theme::GetItemColor()
+Color & Theme::GetItemColor()
 {
 	return _item_color;
 }
 
-jcolor_t Theme::GetItemFocusColor()
+Color & Theme::GetItemFocusColor()
 {
 	return _item_focus_color;
 }
 
-jcolor_t Theme::GetSelectedItemColor()
+Color & Theme::GetSelectedItemColor()
 {
 	return _item_selected_color;
 }
 
-jcolor_t Theme::GetSelectedItemForegroundColor()
+Color & Theme::GetSelectedItemForegroundColor()
 {
 	return _item_selected_fgcolor;
 }
 
-jcolor_t Theme::GetItemForegroundColor()
+Color & Theme::GetItemForegroundColor()
 {
 	return _item_fgcolor;
 }
 
-jcolor_t Theme::GetItemForegroundFocusColor()
+Color & Theme::GetItemForegroundFocusColor()
 {
 	return _item_focus_fgcolor;
 }

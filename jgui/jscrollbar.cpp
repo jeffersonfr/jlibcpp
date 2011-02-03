@@ -217,12 +217,7 @@ void ScrollBar::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	jcolor_t color;
-
-	color.red = 0x80;
-	color.green = 0x80;
-	color.blue = 0xe0;
-	color.alpha = 0xff;
+	Color color(0x80, 0x80, 0xe0, 0xff);
 	
 	int x = _vertical_gap-_border_size,
 			y = _horizontal_gap-_border_size,

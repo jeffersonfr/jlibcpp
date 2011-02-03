@@ -464,7 +464,8 @@ class GraphicPanel : public jgui::Canvas{
 		GraphicPanel(int x, int y, int w, int h):
 			jgui::Canvas(x, y, w, h)
 	{
-		SetBackgroundColor(0x40, 0x40, 0x60, 0xff);
+		// SetBackgroundColor((jgui::Color &)jgui::Color::lime);//0x40, 0x40, 0x60, 0xff);
+		SetBackgroundColor(0, 0, 0, 0);//0x40, 0x40, 0x60, 0xff);
 		SetBackgroundVisible(true);
 	}
 
@@ -530,24 +531,9 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetColor(0x00, 0x00, 0x00, 0x10);
 		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 1*(100+10)+20, 200, 100);
 
-		jgui::jcolor_t pcolor,
-			ccolor,
-			rcolor;
-
-		pcolor.red = 0xf0;
-		pcolor.green = 0xf0;
-		pcolor.blue = 0xf0;
-		pcolor.alpha = 0x80;
-
-		ccolor.red = 0x20;
-		ccolor.green = 0xf0;
-		ccolor.blue = 0x20;
-		ccolor.alpha = 0x80;
-
-		rcolor.red = 0x00;
-		rcolor.green = 0x00;
-		rcolor.blue = 0x00;
-		rcolor.alpha = 0x80;
+		jgui::Color pcolor(0xf0, 0xf0, 0xf0, 0x80),
+			ccolor(0x20, 0xf0, 0x20, 0x80),
+			rcolor(0x00, 0x00, 0x00, 0x80);
 
 		g->SetPorterDuffFlags(jgui::PDF_SRC_OVER);
 		g->SetDrawingFlags(jgui::DF_BLEND);
@@ -780,7 +766,7 @@ class GraphicPanel : public jgui::Canvas{
 
 		std::string text = "DrawString";
 
-		pcolor.alpha = 0xa0;
+		pcolor.SetAlpha(0xa0);
 
 		g->Rotate(0.0);
 		g->SetColor(rcolor);

@@ -137,12 +137,12 @@ class Component : public virtual jcommon::Object{
 						_preferred_size,
 						_minimum_size,
 						_maximum_size;
-		jcolor_t _bgcolor,
-						 _fgcolor,
-						 _focus_bgcolor,
-						 _focus_fgcolor,
-						 _border_color,
-						 _focus_border_color;
+		Color _bgcolor,
+					_fgcolor,
+					_focus_bgcolor,
+					_focus_fgcolor,
+					_border_color,
+					_focus_border_color;
 		jcomponent_alignment_t _alignment_x,
 													 _alignment_y;
 		jcomponent_orientation_t _orientation;
@@ -654,73 +654,73 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetBackgroundColor(jcolor_t color);
+		virtual void SetBackgroundColor(Color &color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetForegroundColor(jcolor_t color);
+		virtual void SetForegroundColor(Color &color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetBackgroundFocusColor(jcolor_t color);
+		virtual void SetBackgroundFocusColor(Color &color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetForegroundFocusColor(jcolor_t color);
+		virtual void SetForegroundFocusColor(Color &color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetBorderColor(jcolor_t color);
+		virtual void SetBorderColor(Color &color);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetBorderFocusColor(jcolor_t color);
+		virtual void SetBorderFocusColor(Color &color);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetBackgroundColor();
+		virtual Color & GetBackgroundColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetForegroundColor();
+		virtual Color & GetForegroundColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetBackgroundFocusColor();
+		virtual Color & GetBackgroundFocusColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetForegroundFocusColor();
+		virtual Color & GetForegroundFocusColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetBorderColor();
+		virtual Color & GetBorderColor();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jcolor_t GetBorderFocusColor();
+		virtual Color & GetBorderFocusColor();
 
 		/**
 		 * \brief

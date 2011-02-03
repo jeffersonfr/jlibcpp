@@ -94,7 +94,7 @@ class Complex : public Serializable {
 			}
 		}
 
-		std::string what()
+		virtual std::string what()
 		{
 			std::ostringstream o;
 

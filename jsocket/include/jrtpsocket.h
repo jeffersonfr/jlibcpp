@@ -436,7 +436,7 @@ typedef struct {
  */
 class RTPSocket : public virtual jcommon::Object{
 
-    private:
+	private:
 		/** \brief */
 		int Remote_Port;
 		/** \brief */
@@ -466,19 +466,19 @@ class RTPSocket : public virtual jcommon::Object{
 		/** \brief */
 		int We_Called;
 		
-    public:
+	public:
 		/**
 		 * \brief
 		 *
 		 */
 		RTPSocket();
-		
-        /**
+
+		/**
 		 * \brief Destructor virtual.
-         *
-         */
-        virtual ~RTPSocket();
-        
+		 *
+		 */
+		virtual ~RTPSocket();
+
 
 		/**
 		 * \brief
@@ -496,198 +496,182 @@ class RTPSocket : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-        virtual int Send(const char *b_, int size_);
+		virtual int Send(const char *b_, int size_);
 
 		/**
 		 * \brief
 		 *
 		 */
-        virtual int Receive(char *data_, int data_length_);
+		virtual int Receive(char *data_, int data_length_);
 
 		/**
 		 * \brief
 		 *
 		 */
-        virtual void Close();
+		virtual void Close();
 
 		/**
 		 * \brief
 		 *
 		 */
-        virtual SocketInputStream * GetInputStream();
+		virtual SocketInputStream * GetInputStream();
 
 		/**
 		 * \brief
 		 *
 		 */
-        virtual SocketOutputStream * GetOutputStream();
+		virtual SocketOutputStream * GetOutputStream();
 
 		/**
 		 * \brief
 		 *
 		 */
-        virtual int64_t GetSentBytes();
+		virtual int64_t GetSentBytes();
 
 		/**
 		 * \brief
 		 *
 		 */
-        virtual int64_t GetReceiveBytes();
+		virtual int64_t GetReceiveBytes();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		
-		
-        /**
-        * \brief
-        *
-        */
+		/**
+		 * \brief
+		 *
+		 */
 		int ssrc_equal(const void *a, const void *b);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		unsigned int ssrc_hash(const void *key);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void open_sockets(int port);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void set_next_report_time(int packetsize, int init);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		char * make_cname(void);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		int send_rtcp_sr(void);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void send_switch_packet(void);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void maybe_send_rtcp(void);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void connection_init(int port);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void connection_call(char *hostname);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		bool connection_connected(void);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		char * connection_hostname(void);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		rtp_source * find_member(uint32_t src);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		rtp_source * add_member(uint32_t src, uint16_t seq, struct in_addr *addr);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void member_sdes(rtp_source *s, uint8_ttype, char *data, uint8_tlength);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		bool check_from(struct sockaddr_in *fromaddr, rtp_source *s);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void rtp_send(char *buf, int nbytes, rtp_payload_t pt, uint32_t nsamp);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void parse_rtp_packet(Rtp_Packet packet, struct sockaddr_in *fromaddr);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void parse_rtcp_app_packet(Rtcp_Packet packet, struct sockaddr_in *fromaddr);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void parse_rtcp_packet(Rtcp_Packet packet, struct sockaddr_in *fromaddr);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		void parse_rtcp_compound(Rtcp_Compound compound, struct sockaddr_in *fromaddr);
-		
-        /**
-        * \brief
-        *
-        */
+
+		/**
+		 * \brief
+		 *
+		 */
 		int connection_listen(float timeout);
-		
-        /**
-        * \brief
-        *
-        */
-        std::string what();
-	
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string what();
+
 };
 
 }
