@@ -44,7 +44,7 @@ INCLUDE		= \
 						-Ijlogger/include \
 						-Ijmath/include \
 						-Ijmpeg/include \
-						-Ijphysic/include \
+						-Ijdevice/include \
 						-Ijresource/include \
 						-Ijsecurity/include \
 						-Ijshared/include \
@@ -164,7 +164,7 @@ OBJS_jresource = \
 	   jresourcestatusevent.o\
 	   jresourcestatuslistener.o\
 	   
-OBJS_jphysic = \
+OBJS_jdevice = \
 	   jcpu.o\
 	   jnetwork.o\
 	   jmemory.o\
@@ -382,15 +382,15 @@ SRCS_jio			= $(addprefix jio/,$(OBJS_jio))
 SRCS_jlogger	= $(addprefix jlogger/,$(OBJS_jlogger))
 SRCS_jmath		= $(addprefix jmath/,$(OBJS_jmath))
 SRCS_jmpeg		= $(addprefix jmpeg/,$(OBJS_jmpeg))
-SRCS_jphysic	= $(addprefix jphysic/,$(OBJS_jphysic))
+SRCS_jdevice	= $(addprefix jdevice/,$(OBJS_jdevice))
 SRCS_jresource	= $(addprefix jresource/,$(OBJS_jresource))
 SRCS_jsecurity	= $(addprefix jsecurity/,$(OBJS_jsecurity))
 SRCS_jshared	= $(addprefix jshared/,$(OBJS_jshared))
 SRCS_jsocket	= $(addprefix jsocket/,$(OBJS_jsocket))
 SRCS_jthread	= $(addprefix jthread/,$(OBJS_jthread))
 
-OBJS	= $(OBJS_jcommon) $(OBJS_jmath) $(OBJS_jmpeg) $(OBJS_jphysic) $(OBJS_jresource) $(OBJS_jsecurity) $(OBJS_jio) $(OBJS_jlogger) $(OBJS_jshared) $(OBJS_jsocket) $(OBJS_jthread) $(OBJS_jimage) $(OBJS_jgui)
-SRCS	= $(SRCS_jcommon) $(SRCS_jmath) $(SRCS_jmpeg) $(SRCS_jphysic) $(SRCS_jresource) $(SRCS_jsecurity) $(SRCS_jio) $(SRCS_jlogger) $(SRCS_jshared) $(SRCS_jsocket) $(SRCS_jthread) $(SRCS_jimage) $(SRCS_jgui)
+OBJS	= $(OBJS_jcommon) $(OBJS_jmath) $(OBJS_jmpeg) $(OBJS_jdevice) $(OBJS_jresource) $(OBJS_jsecurity) $(OBJS_jio) $(OBJS_jlogger) $(OBJS_jshared) $(OBJS_jsocket) $(OBJS_jthread) $(OBJS_jimage) $(OBJS_jgui)
+SRCS	= $(SRCS_jcommon) $(SRCS_jmath) $(SRCS_jmpeg) $(SRCS_jdevice) $(SRCS_jresource) $(SRCS_jsecurity) $(SRCS_jio) $(SRCS_jlogger) $(SRCS_jshared) $(SRCS_jsocket) $(SRCS_jthread) $(SRCS_jimage) $(SRCS_jgui)
 
 all: $(EXE)
 
@@ -423,7 +423,7 @@ install: uninstall
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jshared && install -o nobody -m 644 jshared/include/* $(PREFIX)/include/$(MODULE)/jshared
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsocket && install -o nobody -m 644 jsocket/include/* $(PREFIX)/include/$(MODULE)/jsocket
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jthread && install -o nobody -m 644 jthread/include/* $(PREFIX)/include/$(MODULE)/jthread
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jphysic && install -o nobody -m 644 jphysic/include/* $(PREFIX)/include/$(MODULE)/jphysic
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jdevice && install -o nobody -m 644 jdevice/include/* $(PREFIX)/include/$(MODULE)/jdevice
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmath && install -o nobody -m 644 jmath/include/* $(PREFIX)/include/$(MODULE)/jmath
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jresource && install -o nobody -m 644 jresource/include/* $(PREFIX)/include/$(MODULE)/jresource
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsecurity && install -o nobody -m 644 jsecurity/include/* $(PREFIX)/include/$(MODULE)/jsecurity
