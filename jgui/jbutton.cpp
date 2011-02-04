@@ -273,10 +273,17 @@ void Button::DispatchButtonEvent(ButtonEvent *event)
 		return;
 	}
 
-	int k=0;
+	int k = 0,
+			size = (int)_button_listeners.size();
 
 	while (k++ < (int)_button_listeners.size()) {
 		_button_listeners[k-1]->ActionPerformed(event);
+
+		if (size != (int)_button_listeners.size()) {
+			size = (int)_button_listeners.size();
+
+			k--;
+		}
 	}
 
 	/*

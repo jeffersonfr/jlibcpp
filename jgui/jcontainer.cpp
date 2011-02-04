@@ -653,7 +653,8 @@ void Container::DispatchContainerEvent(ContainerEvent *event)
 		return;
 	}
 
-	int k=0;
+	int k = 0,
+			size = (int)_container_listeners.size();
 
 	while (k++ < (int)_container_listeners.size()) {
 		ContainerListener *listener = _container_listeners[k-1];
@@ -662,6 +663,12 @@ void Container::DispatchContainerEvent(ContainerEvent *event)
 			listener->ComponentAdded(event);
 		} else if (event->GetType() == COMPONENT_ADDED_EVENT) {
 			listener->ComponentRemoved(event);
+		}
+
+		if (size != (int)_container_listeners.size()) {
+			size = (int)_container_listeners.size();
+
+			k--;
 		}
 	}
 

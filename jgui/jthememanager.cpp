@@ -117,12 +117,19 @@ void ThemeManager::DispatchThemeEvent(ThemeEvent *event)
 		return;
 	}
 
-	int k=0;
+	int k = 0,
+			size = (int)_theme_listeners.size();
 
 	while (k++ < (int)_theme_listeners.size()) {
 		ThemeListener *listener = _theme_listeners[k-1];
 
 		listener->ThemeChanged(event);
+
+		if (size != (int)_theme_listeners.size()) {
+			size = (int)_theme_listeners.size();
+
+			k--;
+		}
 	}
 
 	/*

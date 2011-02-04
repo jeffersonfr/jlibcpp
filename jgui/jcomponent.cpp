@@ -1038,7 +1038,8 @@ void Component::DispatchFocusEvent(FocusEvent *event)
 		return;
 	}
 
-	int k=0;
+	int k = 0,
+			size = (int)_component_listeners.size();
 
 	while (k++ < (int)_focus_listeners.size()) {
 		FocusListener *listener = _focus_listeners[k-1];
@@ -1047,6 +1048,12 @@ void Component::DispatchFocusEvent(FocusEvent *event)
 			listener->FocusGained(event);
 		} else if (event->GetType() == LOST_FOCUS_EVENT) {
 			listener->FocusLost(event);
+		}
+
+		if (size != (int)_focus_listeners.size()) {
+			size = (int)_focus_listeners.size();
+
+			k--;
 		}
 	}
 
@@ -1098,7 +1105,8 @@ void Component::DispatchComponentEvent(ComponentEvent *event)
 		return;
 	}
 
-	int k=0;
+	int k = 0,
+			size = (int)_component_listeners.size();
 
 	while (k++ < (int)_component_listeners.size()) {
 		ComponentListener *listener = _component_listeners[k-1];
@@ -1111,6 +1119,12 @@ void Component::DispatchComponentEvent(ComponentEvent *event)
 			listener->ComponentMoved(event);
 		} else if (event->GetType() == COMPONENT_PAINTED_EVENT) {
 			listener->ComponentPainted(event);
+		}
+
+		if (size != (int)_component_listeners.size()) {
+			size = (int)_component_listeners.size();
+
+			k--;
 		}
 	}
 

@@ -23,6 +23,7 @@
 #include "jresourcestatuslistener.h"
 #include "jresourcestatusevent.h"
 
+#include <vector>
 #include <string>
 
 namespace jresource {
@@ -35,7 +36,7 @@ namespace jresource {
 class ResourceServer{
 
 	private:
-
+		std::vector<ResourceStatusListener *> _status_listeners;
 		
 	public:
 		/**
@@ -54,7 +55,7 @@ class ResourceServer{
 		 * \brief
 		 * 
 		 */
-		void AddResourceStatusListener(ResourceStatusListener *listener);
+		void RegisterResourceStatusListener(ResourceStatusListener *listener);
 
 		/**
 		 * \brief

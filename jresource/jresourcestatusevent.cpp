@@ -32,7 +32,7 @@ ResourceStatusEvent::~ResourceStatusEvent()
 {
 }
 
-resource_event_type_t  ResourceStatusEvent::GetType()
+jresource_event_type_t  ResourceStatusEvent::GetType()
 {
 	return _type;
 }

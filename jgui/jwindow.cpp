@@ -785,7 +785,8 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 		return;
 	}
 
-	int k=0;
+	int k = 0,
+			size = (int)_window_listeners.size();
 
 	while (k++ < (int)_window_listeners.size()) {
 		WindowListener *listener = _window_listeners[k-1];
@@ -802,6 +803,12 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 			listener->WindowMoved(event);
 		} else if (event->GetType() == WINDOW_PAINTED_EVENT) {
 			listener->WindowPainted(event);
+		}
+
+		if (size != (int)_window_listeners.size()) {
+			size = (int)_window_listeners.size();
+
+			k--;
 		}
 	}
 

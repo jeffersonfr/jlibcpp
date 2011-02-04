@@ -520,7 +520,8 @@ void ItemComponent::DispatchSelectEvent(SelectEvent *event)
 		return;
 	}
 
-	int k=0;
+	int k = 0,
+			size = (int)_select_listeners.size();
 
 	while (k++ < (int)_select_listeners.size()) {
 		SelectListener *listener = _select_listeners[k-1];
@@ -529,6 +530,12 @@ void ItemComponent::DispatchSelectEvent(SelectEvent *event)
 			listener->ItemSelected(event);
 		} else {
 			listener->ItemChanged(event);
+		}
+
+		if (size != (int)_select_listeners.size()) {
+			size = (int)_select_listeners.size();
+
+			k--;
 		}
 	}
 

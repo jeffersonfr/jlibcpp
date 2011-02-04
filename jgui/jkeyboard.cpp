@@ -889,10 +889,17 @@ void Keyboard::DispatchKeyboardEvent(KeyboardEvent *event)
 		return;
 	}
 
-	int k=0;
+	int k = 0,
+			size = (int)_keyboard_listeners.size();
 
 	while (k++ < (int)_keyboard_listeners.size()) {
 		_keyboard_listeners[k-1]->KeyboardUpdated(event);
+
+		if (size != (int)_keyboard_listeners.size()) {
+			size = (int)_keyboard_listeners.size();
+
+			k--;
+		}
 	}
 
 	/*

@@ -351,10 +351,17 @@ void TextComponent::DispatchTextEvent(TextEvent *event)
 		return;
 	}
 
-	int k=0;
+	int k = 0,
+			size = (int)_text_listeners.size();
 
 	while (k++ < (int)_text_listeners.size()) {
 		_text_listeners[k-1]->TextChanged(event);
+
+		if (size != (int)_text_listeners.size()) {
+			size = (int)_text_listeners.size();
+
+			k--;
+		}
 	}
 
 	/*

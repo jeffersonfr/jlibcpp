@@ -54,7 +54,7 @@ class ResourceStatusListener : public jcommon::Listener{
 		 * \brief
 		 * 
 		 */
-		virtual void statusChanged(ResourceStatusEvent *event) = 0;
+		virtual void StatusChanged(ResourceStatusEvent *event);
 
 };
 

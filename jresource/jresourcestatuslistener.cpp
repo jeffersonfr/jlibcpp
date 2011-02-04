@@ -31,4 +31,8 @@ ResourceStatusListener::~ResourceStatusListener()
 {
 }
 
+void ResourceStatusListener::StatusChanged(ResourceStatusEvent *event)
+{
+}
+
 }

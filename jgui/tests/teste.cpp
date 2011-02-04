@@ -734,7 +734,7 @@ class GraphicPanel : public jgui::Canvas{
 		g->DrawPolygon(10+10*(120+10)+10, 3*(120+10), p, 5, false);
 		g->FillPolygon(10+11*(120+10)+10+20, 3*(120+10), p, 5);
 		
-		// draw line
+		// draw lines
 		x0 = 10+10*(120+10)+10;
 		y0 = 4*(120+10);
 
@@ -752,7 +752,7 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetLineWidth(1);
 		g->SetColor(rcolor);
 		g->DrawRectangle(x0, y0, 250, (240-10));
-		g->DrawLine(x0, y0+(240-10)/2, x0+300, y0+(240-10)/2);
+		g->DrawLine(x0, y0+(240-10)/2, x0+250, y0+(240-10)/2);
 
 		// draw string (disable COLORALPHA)
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL));
