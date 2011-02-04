@@ -59,7 +59,7 @@ IDirectFBDisplayLayer * GFXHandler::GetDisplayLayer()
 	return _layer;
 }
 
-int GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width, int scale_height)
+int GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width, int scale_height, double radians)
 {
 	if (scale_width <= 0) {
 		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
@@ -72,8 +72,9 @@ int GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, i
 	DFBFontDescription font_dsc;
 	DFBTextEncodingID enc_id;
 
-	font_dsc.flags = (DFBFontDescriptionFlags)(DFDESC_HEIGHT);
+	font_dsc.flags = (DFBFontDescriptionFlags)(DFDESC_HEIGHT | DFDESC_ROTATION);
 	font_dsc.height = (int)round(((double)height*(double)screenHeight)/(double)scale_height);
+	font_dsc.rotation = DFB_RADIANS(radians);
 
 	if (font_dsc.height < 1) {
 		font_dsc.height = 1;

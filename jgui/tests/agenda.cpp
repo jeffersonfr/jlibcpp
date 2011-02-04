@@ -401,7 +401,7 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 	message = new jgui::TextArea(_insets.left, _insets.top+3*height, minute->GetX()+minute->GetWidth()-_insets.left, 400);
 
 	label2->SetBackgroundVisible(false);
-	label2->SetBorder(jgui::NONE_BORDER);
+	label2->SetBorder(jgui::EMPTY_BORDER);
 
 	hour->Insert("12");
 	hour->SetCaretType(jgui::NONE_CURSOR);

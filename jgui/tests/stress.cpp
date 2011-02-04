@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jframe.h"
+#include "jsystem.h"
 
 class GraphicPanel : public jgui::Frame{
 
@@ -109,6 +110,41 @@ class GraphicPanel : public jgui::Frame{
 
 		Clear(g);
 
+		// rotate string
+		DrawString(g, "Rotate String");
+
+		jgui::Font font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 72);
+
+		double angle = 0.1;
+		
+		g->SetFont(&font);
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
+
+		for (int i=0; i<iterations; i++) {
+			r1 = rand()%0xff;
+			g1 = rand()%0xff;
+			b1 = rand()%0xff;
+			a1 = rand()%0x80;
+
+			g->SetColor(r1, g1, b1, a1+0x80);
+			g->Rotate(angle);
+			g->DrawString("Font Testing", 1920/2, 1080/2);
+
+			g->Flip();
+
+			angle = angle + 0.1;
+
+			if (angle > 2*M_PI) {
+				angle = 0.1;
+			}
+		}
+
+		g->SetFont(_font);
+		g->Rotate(0.0);
+
+		Clear(g);
+
+		// draw lines
 		for (int k=0; k<3; k++) {
 			if (k == 0) {
 				g->SetLineWidth(1);
@@ -560,8 +596,7 @@ class GraphicPanel : public jgui::Frame{
 
 		size = 10;
 		color = 0xffffffff;;
-
-		double angle = 0.1;
+		angle = 0.1;
 			
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
 

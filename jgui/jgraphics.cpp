@@ -442,28 +442,12 @@ void Graphics::SetColor(Color &color)
 
 void Graphics::SetColor(uint32_t color)
 {
-	_color = Color(color);
-
-#ifdef DIRECTFB_UI
-	if (surface == NULL) {
-		return;
-	}
-
-	surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
-#endif
+	SetColor(_color = Color(color));
 } 
 
 void Graphics::SetColor(int red, int green, int blue, int alpha)
 {
-	_color = Color(red, green, blue, alpha);
-
-#ifdef DIRECTFB_UI
-	if (surface == NULL) {
-		return;
-	}
-
-	surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
-#endif
+	SetColor(_color = Color(red, green, blue, alpha));
 } 
 
 bool Graphics::HasFont()
@@ -1326,25 +1310,41 @@ void Graphics::DrawString(std::string text, int xp, int yp)
 		return;
 	}
 
-	if (_font != NULL) {
-		OffScreenImage off(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), SPF_A8, _scale.width, _scale.height);
-
-		off.GetGraphics()->SetFont(_font);
-		off.GetGraphics()->SetColor(_color);
-
-		IDirectFBSurface *imgSurface = (IDirectFBSurface *)(off.GetGraphics()->GetNativeSurface());
-
-		imgSurface->DrawString(imgSurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
-
-		DrawImage(&off, xp, yp);
+	if (_font == NULL) {
+		return;
 	}
-	
+
 	/*
+	OffScreenImage off(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
+
+	off.GetGraphics()->SetFont(_font);
+	off.GetGraphics()->SetColor(_color);
+
+	IDirectFBSurface *fsurface = (IDirectFBSurface *)(off.GetGraphics()->GetNativeSurface());
+
+	fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+	fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+
+	DrawImage(&off, xp, yp);
+	*/
+
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
-	surface->DrawString(surface, text.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
-	*/
+	if (_radians == 0.0) {
+		surface->DrawString(surface, text.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+	} else {
+		IDirectFBFont *font = NULL;
+
+		if (jgui::GFXHandler::GetInstance()->CreateFont(_font->GetName(), _font->GetVirtualHeight(), &font, _font->_scale.width, _font->_scale.height, _radians) == 0) {
+			surface->SetFont(surface, font);
+			surface->DrawString(surface, text.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+			surface->SetFont(surface, _font->_font);
+
+			font->Dispose(font);
+			font->Release(font);
+		}
+	}
 #endif
 }
 

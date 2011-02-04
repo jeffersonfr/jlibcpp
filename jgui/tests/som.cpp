@@ -130,9 +130,11 @@ class som : public jgui::Frame, public jthread::Thread {
 		}
 
 		void Run() {
-			int idx,j;
-			double x1,x2,mindist;
-			int count = 0;
+			double x1,
+						 x2,
+						 mindist;
+			int j;
+
 			while(!please_stop) {
 				counter++;
 
@@ -173,9 +175,6 @@ class som : public jgui::Frame, public jthread::Thread {
 
 				// RE-COMPUTE r MATRIX
 				makeR(theta);
-
-				// PLOT RESULT EVERY 10 SESSIONS
-				count = (count++)%10;
 
 				Repaint();
 			}

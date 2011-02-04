@@ -50,12 +50,11 @@ class Font : public virtual jcommon::Object{
 #ifdef DIRECTFB_UI
 		IDirectFBFont *_font;
 #endif
+		struct jsize_t _scale;
 		int _height,
 			_ascender,
 			_descender,
 			_max_advance,
-			_scale_width,
-			_scale_height,
 			_virtual_height;
 		std::string _name;
 
@@ -144,6 +143,12 @@ class Font : public virtual jcommon::Object{
 		 */
 		virtual int GetStringWidth(std::string text);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		jregion_t GetStringExtends(std::string text);
+
 		/**
 		 * \brief
 		 *

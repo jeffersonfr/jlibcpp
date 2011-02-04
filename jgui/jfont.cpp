@@ -39,19 +39,19 @@ Font::Font(std::string name, int attr, int height, int scale_width, int scale_he
 	_ascender = 0;
 	_descender = 0;
 	_virtual_height = height;
-	_scale_width = scale_width;
-	_scale_height = scale_height;
+	_scale.width = scale_width;
+	_scale.height = scale_height;
 
-	if (_scale_width <= 0) {
-		_scale_width = DEFAULT_SCALE_WIDTH;
+	if (_scale.width <= 0) {
+		_scale.width = DEFAULT_SCALE_WIDTH;
 	}
 
-	if (_scale_height <= 0) {
-		_scale_height = DEFAULT_SCALE_HEIGHT;
+	if (_scale.height <= 0) {
+		_scale.height = DEFAULT_SCALE_HEIGHT;
 	}
 
 #ifdef DIRECTFB_UI
-	((GFXHandler *)GFXHandler::GetInstance())->CreateFont(name, height, &_font, _scale_width, _scale_height);
+	((GFXHandler *)GFXHandler::GetInstance())->CreateFont(name, height, &_font, _scale.width, _scale.height);
 
 	if (_font != NULL) {
 		_font->GetHeight(_font, &_height);
@@ -85,8 +85,8 @@ Font * Font::GetDefaultFont()
 
 void Font::SetWorkingScreenSize(int width, int height)
 {
-	_scale_width = width;
-	_scale_height = height;
+	_scale.width = width;
+	_scale.height = height;
 }
 
 void * Font::GetFont()
@@ -133,44 +133,70 @@ int Font::GetVirtualHeight()
 
 int Font::GetHeight()
 {
-	return (int)ceil(((double)_height*(double)_scale_height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
+	return (int)ceil(((double)_height*(double)_scale.height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
 }
 
 int Font::GetAscender()
 {
-	return (int)ceil(((double)_ascender*(double)_scale_width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	return (int)ceil(((double)_ascender*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
 }
 
 int Font::GetDescender()
 {
-	return (int)ceil(((double)abs(_descender)*(double)_scale_width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	return (int)ceil(((double)abs(_descender)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
 }
 
 int Font::GetMaxAdvanced()
 {
-	return (int)ceil(((double)_max_advance*(double)_scale_width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	return (int)ceil(((double)_max_advance*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
 }
 
 int Font::GetLeading()
 {
-	return (int)ceil(((double)(_height/2)*(double)_scale_width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	return (int)ceil(((double)(_height/2)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
 }
 
 int Font::GetStringWidth(std::string text)
 {
+	int size = 0;
+
 #ifdef DIRECTFB_UI
 	if (_font == NULL) {
 		return 0;
 	}
 
-	int size;
-
 	_font->GetStringWidth(_font, text.c_str(), -1, &size);
-
-	return (int)round(((double)size*(double)_scale_width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
 #endif
+	
+	return (int)round(((double)size*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+}
 
-	return 0;
+jregion_t Font::GetStringExtends(std::string text)
+{
+	jregion_t region;
+
+	region.x = 0;
+	region.y = 0;
+	region.width = 0;
+	region.height = 0;
+
+#ifdef DIRECTFB_UI
+	if (_font == NULL) {
+		return region;
+	}
+
+	DFBRectangle lrect;
+							 // irect;
+
+	_font->GetStringExtents(_font, text.c_str(), -1, &lrect, NULL); // &irect);
+
+	region.x = (int)round(((double)(lrect.x)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	region.y = (int)round(((double)(lrect.y)*(double)_scale.height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
+	region.width = (int)round(((double)(lrect.w)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	region.height = (int)round(((double)(lrect.h)*(double)_scale.height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
+#endif
+	
+	return region;
 }
 
 std::string Font::TruncateString(std::string text, std::string extension, int width)
@@ -206,6 +232,7 @@ void Font::Release()
 {
 #ifdef DIRECTFB_UI
 	if (_font != NULL) {
+		_font->Dispose(_font);
 		_font->Release(_font);
 		_font = NULL;
 	}
@@ -216,7 +243,7 @@ void Font::Restore()
 {
 #ifdef DIRECTFB_UI
 	if (_font == NULL) {
-		((GFXHandler *)GFXHandler::GetInstance())->CreateFont(_name, _virtual_height, &_font, _scale_width, _scale_height);
+		((GFXHandler *)GFXHandler::GetInstance())->CreateFont(_name, _virtual_height, &_font, _scale.width, _scale.height);
 	}
 #endif
 }

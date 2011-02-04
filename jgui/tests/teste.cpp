@@ -765,6 +765,7 @@ class GraphicPanel : public jgui::Canvas{
 
 		std::string text = "DrawString";
 
+		rcolor.SetAlpha(0xa0);
 		pcolor.SetAlpha(0xa0);
 
 		g->Rotate(0.0);
@@ -780,24 +781,18 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetFont(f3); g->DrawString(text, 10+7*(120+10)+10, 2*(45+10)+20);
 		g->SetFont(f4); g->DrawString(text, 10+7*(120+10)+10, 3*(45+10)+20);
 
-		g->Translate(-(120+10), -(45+10+10));
-		
-		text = "RotateString";
-
 		g->Rotate(M_PI);
 		g->SetColor(rcolor);
-		g->SetFont(f1); g->DrawString(text, 10+10*(120+10)+10+shadow, 0*(45+10)+20+shadow);
-		g->SetFont(f2); g->DrawString(text, 10+10*(120+10)+10+shadow, 1*(45+10)+20+shadow);
-		g->SetFont(f3); g->DrawString(text, 10+10*(120+10)+10+shadow, 2*(45+10)+20+shadow);
-		g->SetFont(f4); g->DrawString(text, 10+10*(120+10)+10+shadow, 3*(45+10)+20+shadow);
+		g->SetFont(f1); g->DrawString(text, 10+12*(120+10)+10+shadow, GetFont()->GetHeight()+1*(45+0)+20+shadow);
+		g->SetFont(f2); g->DrawString(text, 10+12*(120+10)+10+shadow, GetFont()->GetHeight()+2*(45+0)+20+shadow);
+		g->SetFont(f3); g->DrawString(text, 10+12*(120+10)+10+shadow, GetFont()->GetHeight()+3*(45+0)+20+shadow);
+		g->SetFont(f4); g->DrawString(text, 10+12*(120+10)+10+shadow, GetFont()->GetHeight()+4*(45+0)+20+shadow);
 
 		g->SetColor(pcolor);
-		g->SetFont(f1); g->DrawString(text, 10+10*(120+10)+10, 0*(45+10)+20);
-		g->SetFont(f2); g->DrawString(text, 10+10*(120+10)+10, 1*(45+10)+20);
-		g->SetFont(f3); g->DrawString(text, 10+10*(120+10)+10, 2*(45+10)+20);
-		g->SetFont(f4); g->DrawString(text, 10+10*(120+10)+10, 3*(45+10)+20);
-		
-		g->Translate((120+10), (45+10+10));
+		g->SetFont(f1); g->DrawString(text, 10+12*(120+10)+10, GetFont()->GetHeight()+1*(45+0)+20);
+		g->SetFont(f2); g->DrawString(text, 10+12*(120+10)+10, GetFont()->GetHeight()+2*(45+0)+20);
+		g->SetFont(f3); g->DrawString(text, 10+12*(120+10)+10, GetFont()->GetHeight()+3*(45+0)+20);
+		g->SetFont(f4); g->DrawString(text, 10+12*(120+10)+10, GetFont()->GetHeight()+4*(45+0)+20);
 	}
 
 };

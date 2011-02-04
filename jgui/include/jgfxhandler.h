@@ -64,6 +64,7 @@ class InputManager;
  */
 class GFXHandler : public virtual jcommon::Object{
 
+	friend class Graphics;
 	friend class Window;
 	friend class WindowManager;
 	friend class Font;
@@ -159,7 +160,7 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		int CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		int CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT, double radians = 0.0);
 		
 		/**
 		 * \brief
