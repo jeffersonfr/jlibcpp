@@ -1314,7 +1314,6 @@ void Graphics::DrawString(std::string text, int xp, int yp)
 		return;
 	}
 
-	/*
 	OffScreenImage off(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
 
 	off.GetGraphics()->SetFont(_font);
@@ -1326,8 +1325,8 @@ void Graphics::DrawString(std::string text, int xp, int yp)
 	fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
 
 	DrawImage(&off, xp, yp);
-	*/
 
+	/*
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
@@ -1345,6 +1344,7 @@ void Graphics::DrawString(std::string text, int xp, int yp)
 			font->Release(font);
 		}
 	}
+	*/
 #endif
 }
 
