@@ -153,6 +153,12 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		jregion_t GetGlyphExtends(int symbol);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Release();
 		
 		/**

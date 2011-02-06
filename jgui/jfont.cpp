@@ -199,6 +199,34 @@ jregion_t Font::GetStringExtends(std::string text)
 	return region;
 }
 
+jregion_t Font::GetGlyphExtends(int symbol)
+{
+	jregion_t region;
+
+	region.x = 0;
+	region.y = 0;
+	region.width = 0;
+	region.height = 0;
+
+#ifdef DIRECTFB_UI
+	if (_font == NULL) {
+		return region;
+	}
+
+	DFBRectangle lrect;
+	int advance;
+
+	_font->GetGlyphExtents(_font, symbol, &lrect, &advance);
+
+	region.x = (int)round(((double)(lrect.x)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	region.y = (int)round(((double)(lrect.y)*(double)_scale.height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
+	region.width = (int)round(((double)(lrect.w)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	region.height = (int)round(((double)(lrect.h)*(double)_scale.height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
+#endif
+	
+	return region;
+}
+
 std::string Font::TruncateString(std::string text, std::string extension, int width)
 {
 	if (text.size() <= 1 || width <= 0) {

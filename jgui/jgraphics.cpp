@@ -1357,31 +1357,45 @@ void Graphics::DrawGlyph(int symbol, int xp, int yp)
 		return;
 	}
 
+	if (_font == NULL) {
+		return;
+	}
+
+	int advance;
+
+	_font->_font->GetGlyphExtents(_font->_font, symbol, NULL, &advance);
+
+	OffScreenImage off(advance, _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
+
+	off.GetGraphics()->SetFont(_font);
+	off.GetGraphics()->SetColor(_color);
+
+	IDirectFBSurface *fsurface = (IDirectFBSurface *)(off.GetGraphics()->GetNativeSurface());
+
+	fsurface->DrawGlyph(fsurface, symbol, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+	fsurface->DrawGlyph(fsurface, symbol, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+
+	DrawImage(&off, xp, yp);
+
+	/*
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
-	IDirectFBFont *font = (IDirectFBFont *)_font->GetFont();
-	DFBRectangle glyphrect;
-	DFBTextEncodingID enc;
-	int glyphindex,
-			glyphadvance;
+	if (_radians == 0.0) {
+		surface->DrawGlyph(surface, symbol, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+	} else {
+		IDirectFBFont *font = NULL;
 
-	font->GetGlyphExtents(font, symbol, &glyphrect, &glyphadvance);
-	font->FindEncoding(font, "UTF8", &enc);
-	font->SetEncoding(font, enc);
+		if (jgui::GFXHandler::GetInstance()->CreateFont(_font->GetName(), _font->GetVirtualHeight(), &font, _font->_scale.width, _font->_scale.height, _radians) == 0) {
+			surface->SetFont(surface, font);
+			surface->DrawGlyph(surface, symbol, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+			surface->SetFont(surface, _font->_font);
 
-	surface->SetFont(surface, NULL);      
-	surface->SetFont(surface, font);
-
-	surface->DrawGlyph(surface, symbol, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
-
-	font->FindEncoding(font, "Latin1", &enc);
-	font->SetEncoding(font, enc);
-
-	surface->SetFont(surface, NULL);      
-	surface->SetFont(surface, font);
-
-	glyphindex = 0;
+			font->Dispose(font);
+			font->Release(font);
+		}
+	}
+	*/
 #endif
 }
 
