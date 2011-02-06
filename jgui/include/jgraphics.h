@@ -194,7 +194,8 @@ class Graphics : public virtual jcommon::Object{
 		jthread::Mutex graphics_mutex;
 
 		struct jregion_t _clip;
-		struct jpoint_t _translate;
+		struct jpoint_t _translate,
+										_translate_image;
 		struct jsize_t _screen;
 		struct jsize_t _scale;
 		jline_join_t _line_join;
@@ -296,6 +297,12 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void TranslateImage(int x, int y);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual double Rotate();
 		
 		/**
@@ -303,6 +310,12 @@ class Graphics : public virtual jcommon::Object{
 		 *
 		 */
 		virtual jpoint_t Translate();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jpoint_t TranslateImage();
 
 		/**
 		 * \brief

@@ -435,6 +435,11 @@ void NullGraphics::Translate(int x, int y)
 	JDEBUG(JINFO, "called\n");
 }
 
+void NullGraphics::TranslateImage(int x, int y)
+{
+	JDEBUG(JINFO, "called\n");
+}
+
 double NullGraphics::Rotate()
 {
 	JDEBUG(JINFO, "called\n");
@@ -443,6 +448,18 @@ double NullGraphics::Rotate()
 }
 
 jpoint_t NullGraphics::Translate()
+{
+	JDEBUG(JINFO, "called\n");
+
+	jpoint_t t;
+
+	t.x = 0;
+	t.y = 0;
+
+	return t;
+}
+
+jpoint_t NullGraphics::TranslateImage()
 {
 	JDEBUG(JINFO, "called\n");
 

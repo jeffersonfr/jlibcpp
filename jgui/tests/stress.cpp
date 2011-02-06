@@ -126,7 +126,7 @@ class GraphicPanel : public jgui::Frame{
 		x = (1920+sw)/2;
 		y = (1080+sh)/2;
 
-		g->Translate(-sw, 0);
+		g->TranslateImage(-sw, 0);
 
 		for (int i=0; i<iterations; i++) {
 			r1 = rand()%0xff;
@@ -147,7 +147,6 @@ class GraphicPanel : public jgui::Frame{
 			}
 		}
 
-		g->Translate(sw, 0);
 		g->SetFont(_font);
 		g->Rotate(0.0);
 
@@ -649,6 +648,8 @@ class GraphicPanel : public jgui::Frame{
 		angle = 0.1;
 
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
+
+		g->TranslateImage(0, 0);
 
 		for (int i=0; i<iterations; i++) {
 			x = (1920-size)/2;

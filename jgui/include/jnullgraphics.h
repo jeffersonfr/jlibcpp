@@ -92,6 +92,12 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual void TranslateImage(int x, int y);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual double Rotate();
 		
 		/**
@@ -99,6 +105,12 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual jpoint_t Translate();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jpoint_t TranslateImage();
 
 		/**
 		 * \brief

@@ -76,6 +76,8 @@ Graphics::Graphics(void *s, bool premultiplied):
 	_radians = 0.0;
 	_translate.x = 0;
 	_translate.y = 0;
+	_translate_image.x = 0;
+	_translate_image.y = 0;
 
 	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
@@ -1437,7 +1439,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 		g->SetColor(_color);
 		g->DrawImage(img, 0, 0, wp, hp);
 		
-		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+		RotateImage0(&off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
 
 		return true;
 	}
@@ -1514,7 +1516,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		g->SetColor(_color);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0);
 		
-		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+		RotateImage0(&off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
 
 		return true;
 	}
@@ -1602,7 +1604,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		g->SetColor(_color);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
-		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+		RotateImage0(&off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
 
 		return true;
 	}
@@ -1746,7 +1748,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 		g->SetColor(_color);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 
-		RotateImage0(&off, -_translate.x, -_translate.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+		RotateImage0(&off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
 
 		return true;
 	}
@@ -1768,6 +1770,12 @@ void Graphics::Translate(int x, int y)
 	_translate.y += y;
 }
 
+void Graphics::TranslateImage(int x, int y)
+{
+	_translate_image.x = x;
+	_translate_image.y = y;
+}
+
 double Graphics::Rotate()
 {
 	return _radians;
@@ -1776,6 +1784,11 @@ double Graphics::Rotate()
 jpoint_t Graphics::Translate()
 {
 	return _translate;
+}
+
+jpoint_t Graphics::TranslateImage()
+{
+	return _translate_image;
 }
 
 void Graphics::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign)
@@ -2277,6 +2290,10 @@ void Graphics::Reset()
 	_color = Color(0x00, 0x00, 0x00, 0x00);
 
 	_radians = 0.0;
+
+	_translate_image.x = 0;
+	_translate_image.y = 0;
+
 	_line_width = 1;
 	_line_join = BEVEL_JOIN;
 	_line_style = SOLID_LINE;
@@ -3416,9 +3433,16 @@ void Graphics::DrawChord0(int xc, int yc, int rx, int ry, double arc0, double ar
 
 #endif
 
-void Graphics::RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha)
+void Graphics::RotateImage0(OffScreenImage *img, int xcp, int ycp, int xp, int yp, int wp, int hp, double angle, uint8_t alpha)
 {
 #ifdef DIRECTFB_UI
+	int xc = SCALE_TO_SCREEN((xcp), _screen.width, _scale.width),
+			yc = SCALE_TO_SCREEN((ycp), _screen.height, _scale.height);
+	int x = SCALE_TO_SCREEN((xp), _screen.width, _scale.width),
+			y = SCALE_TO_SCREEN((yp), _screen.height, _scale.height),
+			width = SCALE_TO_SCREEN((xp+wp), _screen.width, _scale.width)-x,
+			height = SCALE_TO_SCREEN((yp+hp), _screen.height, _scale.height)-y;
+
 	Graphics *gimg = img->GetGraphics();
 	int cosTheta,
 			sinTheta,
@@ -3435,38 +3459,32 @@ void Graphics::RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, i
 	sinTheta = precision*sin(angle);
 	cosTheta = precision*cos(angle);
 
-	int w2 = width/2,
-			h2 = height/2,
-			dw = width,
+	int dw = width,
 			dh = height,
 			size = width;
 
 	if (xc == 0 && yc == 0) {
 		if (height > width) {
 			dw = height;
-		}
-
-		if (width > height) {
 			dh = width;
 		}
 
-		dw = dw+w2+xc-width;
-		dh = dh+h2+yc-height;
+		dw = dw+width/2-width+jmath::Math<int>::Abs(xc);
+		dh = dh+height/2-height+jmath::Math<int>::Abs(yc);
 	} else {
-
 		if (height > width) {
 			size = height;
 		}
 
-		dw = size+2*(w2+h2)+xc;
-		dh = size+2*(w2+w2)+yc;
+		dw = 2*(size+jmath::Math<int>::Abs(xc)+jmath::Math<int>::Abs(yc));
+		dh = 2*(size+jmath::Math<int>::Abs(xc)+jmath::Math<int>::Abs(yc));
 	}
 
-	xc = xc + w2;
-	yc = yc + h2;
+	xc = xc + width/2;
+	yc = yc + height/2;
 
-	x = x; // - w2;
-	y = y; // - h2;
+	x = x;
+	y = y;
 
 	IDirectFBSurface *simg = (IDirectFBSurface *)gimg->GetNativeSurface();
 	void *sptr;
@@ -3478,8 +3496,6 @@ void Graphics::RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, i
 			shmax;
 	int iwmax,
 			ihmax;
-	int scalew = precision*((double)_screen.width/(double)_scale.width),
-			scaleh = precision*((double)_screen.height/(double)_scale.height);
 
 	surface->GetSize(surface, &swmax, &shmax);
 	simg->GetSize(simg, &iwmax, &ihmax);
@@ -3490,12 +3506,8 @@ void Graphics::RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, i
 	int old_x = -1,
 			old_y = -1;
 
-	for (j=height-1+2*dh; j>0; j--) {
-		int sy = ((y+j-dh)*scaleh)/precision;
-
-		if (sy == old_y) {
-			continue;
-		}
+	for (j=height+2*dh-1; j>0; j--) {
+		int sy = y+j-dh;
 
 		old_y = sy;
 
@@ -3504,22 +3516,18 @@ void Graphics::RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, i
 		if (sy >=0 && sy < shmax) {
 			sdst = (uint32_t *)((uint8_t *)sptr + sy * spitch);
 
-			for (i=width-1+2*dw; i>0; i--) {
+			for (i=width+2*dw-1; i>0; i--) {
 				iPrime = i - width - dw;
 			
 				iOriginal = width + ((iPrime+xc)*cosTheta - (jPrime+yc)*sinTheta)/precision;
 				jOriginal = height + ((iPrime+xc)*sinTheta + (jPrime+yc)*cosTheta)/precision;
 
 				if ((iOriginal >= xc) && ((iOriginal-xc) < width) && (jOriginal >= yc) && ((jOriginal-yc) < height)) {
-					int gx = ((iOriginal-xc)*scalew)/precision;
-					int gy = ((jOriginal-yc)*scaleh)/precision;
+					int gx = iOriginal-xc;
+					int gy = jOriginal-yc;
 
 					if ((gx >= 0 && gx < iwmax) && (gy >= 0 && gy < ihmax)) {
-						int offset = ((x+i-dw)*scalew)/precision;
-
-						if (offset == old_x) {
-							continue;
-						}
+						int offset = x+i-dw;
 
 						old_x = offset;
 
