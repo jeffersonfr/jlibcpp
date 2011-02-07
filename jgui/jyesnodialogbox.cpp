@@ -68,7 +68,7 @@ YesNoDialogBox::~YesNoDialogBox()
 
 jyesno_response_t YesNoDialogBox::GetResponse()
 {
-	if (GetComponentInFocus() == _yes) {
+	if (GetFocusOwner() == _yes) {
 		return YES_RESPONSE;
 	}
 

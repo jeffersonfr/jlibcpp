@@ -56,10 +56,8 @@ class Container : public jgui::Component{
 		Component *_focus;
 		jgui::Layout *_layout;
 		jinsets_t _insets;
-		int _scale_width, 
-			_scale_height,
-			_scroll_x,
-			_scroll_y;
+		jsize_t _scale;
+		jpoint_t _scroll;
 		bool _optimized_paint;
 
 	protected:
@@ -92,6 +90,18 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
+		virtual void SetWorkingScreenSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetWorkingScreenSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Container * GetParent();
 		
 		/**
@@ -117,24 +127,6 @@ class Container : public jgui::Component{
 		 *
 		 */
 		virtual void SetOptimizedPaint(bool b);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetWorkingWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetWorkingHeight();
 
 		/**
 		 * \brief
@@ -272,7 +264,7 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual jgui::Component * GetComponentInFocus();
+		virtual jgui::Component * GetFocusOwner();
 
 		/**
 		 * \brief

@@ -88,14 +88,12 @@ class InputManager : public jthread::Thread{
 #endif
 
 		std::vector<EventBroadcaster *> _broadcasters;
-		int _initialized,
-				_screen_width,
-				_screen_height,
-				_scale_width,
-				_scale_height;
+		jsize_t _screen,
+						_scale;
 		int _mouse_x,
 				_mouse_y;
-		bool _is_key_enabled,
+		bool _initialized,
+				 _is_key_enabled,
 				 _is_mouse_enabled,
 				 _skip_key_events,
 				 _skip_mouse_events;
@@ -174,6 +172,12 @@ class InputManager : public jthread::Thread{
 		 *
 		 */
 		virtual void SetWorkingScreenSize(int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetWorkingScreenSize();
 
 		/**
 		 * \brief

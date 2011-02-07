@@ -22,8 +22,6 @@
 #include "jbutton.h"
 #include "jsystem.h"
 
-jgui::Font *font = NULL;
-
 class Main : public jgui::Frame{
 
 	private:
@@ -32,15 +30,15 @@ class Main : public jgui::Frame{
 
 	public:
 		Main(std::string title, int x, int y, int w, int h, int sw, int sh):
-			jgui::Frame(title, x, y, w, h)//, sw, sh)
+			jgui::Frame(title, x, y, w, h, sw, sh)
 		{
+			SetFont(new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 24, sw, sh));
+
 			_grid_layout = new jgui::GridLayout(4, 4, 10, 10);
 
 			SetLayout(_grid_layout);
 			SetMoveEnabled(true);
 			SetResizeEnabled(true);
-
-			SetWorkingScreenSize(sw, sh);
 
 			for (int i=0; i<5; i++) {
 				char tmp[255];
@@ -49,7 +47,7 @@ class Main : public jgui::Frame{
 
 				b[i] = new jgui::Button(tmp, 10, 10, 200, 200);
 
-				b[i]->SetFont(font);
+				b[i]->SetFont(_font);
 
 				Add(b[i]);
 			}
@@ -64,22 +62,19 @@ class Main : public jgui::Frame{
 			for (int i=0; i<5; i++) {
 				delete b[i];
 			}
+
+			delete _font;
 		}
 
 };
 
 int main(int argc, char **argv)
 {
-	font = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 24, 720, 480);
-	Main main1("Scale 720x480", 0, 0, 500, 400, 720, 480);
-	main1.SetFont(font);
-	
-	font = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 24, 1920, 1080);
-	Main main2("Scale 1920x1080", 1100, 300, 500, 400, 1920, 1080);
-	main2.SetFont(font);
+	Main main_1("Scale 720x480", 0, 0, 500, 400, 720, 480),
+			 main_2("Scale 1920x1080", 1100, 300, 500, 400, 1920, 1080);
 
-	main1.Show(false);
-	main2.Show(false);
+	main_1.Show(false);
+	main_2.Show(false);
 
 	sleep(100);
 

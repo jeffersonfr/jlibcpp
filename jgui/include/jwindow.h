@@ -46,18 +46,16 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 
 	protected:
 #ifdef DIRECTFB_UI
-		IDirectFBWindow *window;
-		IDirectFBSurface *surface;
+		IDirectFBWindow *_window;
+		IDirectFBSurface *_surface;
 #endif
 
 		std::vector<WindowListener *> _window_listeners;
 		jthread::Mutex _inner_mutex;
-		Graphics *graphics;
-		int bWidth, 
-			bHeight,
-			_opacity;
-		bool _undecorated;
+		Graphics *_graphics;
 		jcursor_style_t _cursor;
+		int _opacity;
+		bool _undecorated;
 
 		void InnerCreateWindow(void *params = NULL);
 
@@ -169,18 +167,6 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 *
 		 */
 		virtual void Move(int x, int y);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Flip();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Clear();
 
 		/**
 		 * \brief

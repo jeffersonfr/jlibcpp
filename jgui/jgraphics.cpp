@@ -367,6 +367,11 @@ void Graphics::SetWorkingScreenSize(int width, int height)
 	}
 }
 
+jsize_t Graphics::GetWorkingScreenSize()
+{
+	return _scale;
+}
+
 void Graphics::Clear(int red, int green, int blue, int alpha)
 {
 #ifdef DIRECTFB_UI
@@ -649,7 +654,11 @@ void Graphics::FillRectangle(int xp, int yp, int wp, int hp)
 void Graphics::DrawRectangle(int xp, int yp, int wp, int hp)
 {
 #ifdef DIRECTFB_UI
-	DrawRectangle0(xp, yp, wp, hp, 0, 0, MITER_JOIN, _line_width);
+	if (_line_width < 0) {
+		DrawRectangle0(xp, yp, wp, hp, 0, 0, MITER_JOIN, _line_width);
+	} else {
+		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*(_line_width-1), hp+2*(_line_width-1), 0, 0, MITER_JOIN, -_line_width);
+	}
 #endif
 }
 
@@ -664,9 +673,9 @@ void Graphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 {
 #ifdef DIRECTFB_UI
 	if (_line_width < 0) {
-		DrawRectangle0(xp+1, yp+1, wp-1, hp-1, dx, dy, BEVEL_JOIN, _line_width);
+		DrawRectangle0(xp, yp, wp, hp, dx, dy, BEVEL_JOIN, _line_width);
 	} else {
-		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*_line_width-1, hp+2*_line_width-1, dx+_line_width, dy+_line_width, BEVEL_JOIN, -_line_width);
+		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*(_line_width-1), hp+2*(_line_width-1), dx+_line_width, dy+_line_width, BEVEL_JOIN, -_line_width);
 	}
 #endif
 }
@@ -682,9 +691,9 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 {
 #ifdef DIRECTFB_UI
 	if (_line_width < 0) {
-		DrawRectangle0(xp+1, yp+1, wp-1, hp-1, dx, dy, ROUND_JOIN, _line_width);
+		DrawRectangle0(xp, yp, wp, hp, dx, dy, ROUND_JOIN, _line_width);
 	} else {
-		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*_line_width-1, hp+2*_line_width-1, dx+_line_width, dy+_line_width, ROUND_JOIN, -_line_width);
+		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*(_line_width-1), hp+2*(_line_width-1), dx+_line_width, dy+_line_width, ROUND_JOIN, -_line_width);
 	}
 #endif
 }
@@ -2770,7 +2779,7 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 		return;
 	}
 
-	if (size == 0) {
+	if (size >= 0) {
 		return;
 	}
 
@@ -2778,150 +2787,106 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 		return;
 	}
 
-	int line_width = _line_width;
-
+	int line_width = _line_width,
+			size_param = size;
 	bool close = false;
 
+	size = -size;
+
+	if (size > (std::min(wp, hp)/2)) {
+		size = std::min(wp, hp)/2;
+
+		close = true;
+	}
+
 	if (join == MITER_JOIN) {
-		if (size < 0) {
-			size = -size;
+		xp = xp + size;
+		yp = yp + size;
+		wp = wp - 2*size;
+		hp = hp - 2*size;
 
-			if (size > (std::min(wp, hp)/2)) {
-				size = std::min(wp, hp)/2;
-	
-				close = true;
-			}
+		FillRectangle(xp-size, yp-size, wp+2*size, size);
+		FillRectangle(xp-size, yp+hp, wp+2*size, size);
+		FillRectangle(xp-size, yp, size, hp);
+		FillRectangle(xp+wp, yp, size, hp);
 
-			xp = xp + size;
-			yp = yp + size;
-			wp = wp - 2*size;
-			hp = hp - 2*size;
+		if (close == true) {
+			FillRectangle(xp, yp, wp, hp);
+		}
+	} else if (join == BEVEL_JOIN) {
+		if (dx > wp/2) {
+			dx = wp/2;
 		}
 
-		FillRectangle(xp-size+1, yp-size+1, wp+2*size-1, size);
-		FillRectangle(xp-size+1, yp+hp, wp+2*size-1, size);
-		FillRectangle(xp-size+1, yp+1, size, hp-1);
-		FillRectangle(xp+wp, yp+1, size, hp-1);
-	} else if (join == BEVEL_JOIN) {
-		if (size < 0) {
-			size = -size;
+		if (dy > hp/2) {
+			dy = hp/2;
+		}
 
-			if (dx > wp/2) {
-				dx = wp/2;
-			}
-
-			if (dy > hp/2) {
-				dy = hp/2;
-			}
-
-			if (size > (std::min(wp, hp)/2-1)) {
-				size = std::min(wp, hp)/2-1;
-
-				close = true;
-			}
-
-			if (size <= (std::max(dx, dy))) {
-				if (size == 1) {
-					DrawLine(xp+dx, yp, xp, yp+dy);
-					DrawLine(xp+wp-dx-1, yp, xp+wp-1, yp+dy);
-					DrawLine(xp+wp-1, yp+hp-dy, xp+wp-dx-1, yp+hp);
-					DrawLine(xp, yp+hp-dy, xp+dx, yp+hp);
-				} else {
-					FillTriangle(xp+dx, yp, xp, yp+dy, xp+size, yp+dy);
-					FillTriangle(xp+size, yp+dy, xp+dx, yp, xp+dx, yp+size);
-
-					FillTriangle(xp+wp-dx, yp, xp+wp-dx, yp+size, xp+wp, yp+dy);
-					FillTriangle(xp+wp-dx, yp+size, xp+wp-size, yp+dy,  xp+wp, yp+dy);
-
-					FillTriangle(xp+wp-size, yp+hp-dy, xp+wp, yp+hp-dy, xp+wp-dx, yp+hp);
-					FillTriangle(xp+wp-size, yp+hp-dy, xp+wp-dx, yp+hp, xp+wp-dx, yp+hp-size);
-
-					FillTriangle(xp, yp+hp-dy, xp+size, yp+hp-dy, xp+dx, yp+hp);
-					FillTriangle(xp+size, yp+hp-dy, xp+dx, yp+hp-size, xp+dx, yp+hp);
-				} 
-
-				FillRectangle(xp+dx, yp, wp-2*dx, size);
-				FillRectangle(xp+dx, yp+hp-size, wp-2*dx, size);
-				FillRectangle(xp, yp+dy, size, hp-2*dy);
-				FillRectangle(xp+wp-size, yp+dy, size, hp-2*dy);
+		if (size <= (std::max(dx, dy))) {
+			if (size == 1) {
+				DrawLine(xp+dx, yp, xp, yp+dy);
+				DrawLine(xp+wp-dx-1, yp, xp+wp-1, yp+dy);
+				DrawLine(xp+wp-1, yp+hp-dy, xp+wp-dx-1, yp+hp);
+				DrawLine(xp, yp+hp-dy, xp+dx, yp+hp);
 			} else {
-				FillTriangle(xp+dx, yp, xp, yp+dy, xp+dx, yp+dy);
-				FillTriangle(xp+wp-dx, yp, xp+wp, yp+dy, xp+wp-dx, yp+dy);
-				FillTriangle(xp, yp+hp-dy, xp+dx, yp+hp-dy, xp+dx, yp+hp);
-				FillTriangle(xp+wp-dx, yp+hp-dy, xp+wp, yp+hp-dy, xp+wp-dx, yp+hp);
+				FillTriangle(xp+dx, yp, xp, yp+dy, xp+size, yp+dy);
+				FillTriangle(xp+size, yp+dy, xp+dx, yp, xp+dx, yp+size);
 
-				FillRectangle(xp+dx, yp, wp-2*dx, dy);
-				FillRectangle(xp+dx, yp+hp-dy, wp-2*dx, dy);
-				FillRectangle(xp, yp+dy, dx, hp-2*dy);
-				FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
+				FillTriangle(xp+wp-dx, yp, xp+wp-dx, yp+size, xp+wp, yp+dy);
+				FillTriangle(xp+wp-dx, yp+size, xp+wp-size, yp+dy,  xp+wp, yp+dy);
 
-				DrawRectangle0(xp+dx-1, yp+dy-1, wp-2*dx+1, hp-2*dy+1, 0, 0, MITER_JOIN, -size+std::max(dx, dy)-1);
-				
-				if (close == true) {
-					int x = xp+size+1, 
-							y = yp+size+1, 
-							w = wp-2*(size+1), 
-							h = hp-2*(size+1);
-					
-					_line_width = 1;
+				FillTriangle(xp+wp-size, yp+hp-dy, xp+wp, yp+hp-dy, xp+wp-dx, yp+hp);
+				FillTriangle(xp+wp-size, yp+hp-dy, xp+wp-dx, yp+hp, xp+wp-dx, yp+hp-size);
 
-					if (w > 0 && h > 0) {
-						DrawLine(x, y, x+w-1, y+h-1);
-					}
-				}
-			}
+				FillTriangle(xp, yp+hp-dy, xp+size, yp+hp-dy, xp+dx, yp+hp);
+				FillTriangle(xp+size, yp+hp-dy, xp+dx, yp+hp-size, xp+dx, yp+hp);
+			} 
+
+			FillRectangle(xp+dx, yp, wp-2*dx, size);
+			FillRectangle(xp+dx, yp+hp-size, wp-2*dx, size);
+			FillRectangle(xp, yp+dy, size, hp-2*dy);
+			FillRectangle(xp+wp-size, yp+dy, size, hp-2*dy);
+		} else {
+			FillTriangle(xp+dx, yp, xp, yp+dy, xp+dx, yp+dy);
+			FillTriangle(xp+wp-dx, yp, xp+wp, yp+dy, xp+wp-dx, yp+dy);
+			FillTriangle(xp, yp+hp-dy, xp+dx, yp+hp-dy, xp+dx, yp+hp);
+			FillTriangle(xp+wp-dx, yp+hp-dy, xp+wp, yp+hp-dy, xp+wp-dx, yp+hp);
+
+			FillRectangle(xp+dx, yp, wp-2*dx, dy);
+			FillRectangle(xp+dx, yp+hp-dy, wp-2*dx, dy);
+			FillRectangle(xp, yp+dy, dx, hp-2*dy);
+			FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
+
+			DrawRectangle0(xp+dx, yp+dy, wp-2*dx, hp-2*dy, 0, 0, MITER_JOIN, std::max(dx, dy)-size-1);
 		}
 	} else if (join == ROUND_JOIN) {
-		if (size < 0) {
-			_line_width = size;
+		_line_width = size_param;
 
-			DrawArc(xp+dx, yp+dy, dx, dy, M_PI_2, M_PI);
-			DrawArc(xp+dx, yp+hp-dy, dx, dy, M_PI, M_PI+M_PI_2);
-			DrawArc(xp+wp-dx, yp+hp-dy, dx, dy, M_PI+M_PI_2, 2*M_PI);
-			DrawArc(xp+wp-dx, yp+dy, dx, dy, 0.0, M_PI_2);
-			
-			size = -size;
+		DrawArc(xp+dx, yp+dy, dx, dy, M_PI_2, M_PI);
+		DrawArc(xp+dx, yp+hp-dy, dx, dy, M_PI, M_PI+M_PI_2);
+		DrawArc(xp+wp-dx, yp+hp-dy, dx, dy, M_PI+M_PI_2, 2*M_PI);
+		DrawArc(xp+wp-dx, yp+dy, dx, dy, 0.0, M_PI_2);
 
-			if (dx > wp/2) {
-				dx = wp/2;
-			}
+		if (dx > wp/2) {
+			dx = wp/2;
+		}
 
-			if (dy > hp/2) {
-				dy = hp/2;
-			}
+		if (dy > hp/2) {
+			dy = hp/2;
+		}
 
-			if (size > (std::min(wp, hp)/2-1)) {
-				size = std::min(wp, hp)/2-1;
+		if (size <= (std::max(dx, dy))) {
+			FillRectangle(xp+dx, yp, wp-2*dx, size);
+			FillRectangle(xp+dx, yp+hp-size, wp-2*dx, size);
+			FillRectangle(xp, yp+dy, size, hp-2*dy);
+			FillRectangle(xp+wp-size, yp+dy, size, hp-2*dy);
+		} else {
+			FillRectangle(xp+dx, yp, wp-2*dx, dy);
+			FillRectangle(xp+dx, yp+hp-dy, wp-2*dx, dy);
+			FillRectangle(xp, yp+dy, dx, hp-2*dy);
+			FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
 
-				close = true;
-			}
-
-			if (size <= (std::max(dx, dy))) {
-				FillRectangle(xp+dx, yp, wp-2*dx, size);
-				FillRectangle(xp+dx, yp+hp-size, wp-2*dx, size);
-				FillRectangle(xp, yp+dy, size, hp-2*dy);
-				FillRectangle(xp+wp-size, yp+dy, size, hp-2*dy);
-			} else {
-				FillRectangle(xp+dx, yp, wp-2*dx, dy);
-				FillRectangle(xp+dx, yp+hp-dy, wp-2*dx, dy);
-				FillRectangle(xp, yp+dy, dx, hp-2*dy);
-				FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
-				
-				DrawRectangle0(xp+dx-1, yp+dy-1, wp-2*dx+1, hp-2*dy+1, 0, 0, MITER_JOIN, -size+std::max(dx, dy)-1);
-				
-				if (close == true) {
-					int x = xp+size+1, 
-							y = yp+size+1, 
-							w = wp-2*(size+1), 
-							h = hp-2*(size+1);
-					
-					_line_width = 1;
-
-					if (w > 0 && h > 0) {
-						DrawLine(x, y, x+w-1, y+h-1);
-					}
-				}
-			}
+			DrawRectangle0(xp+dx, yp+dy, wp-2*dx, hp-2*dy, 0, 0, MITER_JOIN, std::max(dx, dy)-size-1);
 		}
 	}
 

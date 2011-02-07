@@ -50,6 +50,18 @@ void NullGraphics::SetWorkingScreenSize(int width, int height)
 	JDEBUG(JINFO, "called\n");
 }
 
+jsize_t NullGraphics::GetWorkingScreenSize()
+{
+	JDEBUG(JINFO, "called\n");
+
+	jsize_t t;
+
+	t.width = 0;
+	t.height = 0;
+
+	return t;
+}
+
 OffScreenImage * NullGraphics::Create()
 {
 	JDEBUG(JINFO, "called\n");

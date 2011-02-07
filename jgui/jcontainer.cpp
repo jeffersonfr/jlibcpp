@@ -35,8 +35,8 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 
 	_focus = NULL;
 	_orientation = LEFT_TO_RIGHT_ORIENTATION;
-	_scroll_x = 0;
-	_scroll_y = 0;
+	_scroll.x = 0;
+	_scroll.y = 0;
 	_layout = NULL;
 	_enabled = true;
 	_is_visible = true;
@@ -57,6 +57,17 @@ Container::~Container()
 	if (_layout != NULL) {
 		delete _layout;
 	}
+}
+
+void Container::SetWorkingScreenSize(int width, int height)
+{
+	_scale.width = width;
+	_scale.height = height;
+}
+
+jsize_t Container::GetWorkingScreenSize()
+{
+	return _scale;
 }
 
 Component * Container::GetTargetComponent(Container *target, int x, int y, int *dx, int *dy)
@@ -223,29 +234,13 @@ void Container::RevalidateAll()
 	} while (containers.size() > 0);
 }
 
-void Container::SetWorkingScreenSize(int width, int height)
-{
-	_scale_width = width;
-	_scale_height = height;
-}
-
-int Container::GetWorkingWidth()
-{
-	return _scale_width;
-}
-
-int Container::GetWorkingHeight()
-{
-	return _scale_height;
-}
-
 void Container::Paint(Graphics *g)
 {
 	// JDEBUG(JINFO, "paint\n");
 
-	Component::Paint(g);
+	g->SetWorkingScreenSize(_scale.width, _scale.height);
 
-	g->SetWorkingScreenSize(_scale_width, _scale_height);
+	Component::Paint(g);
 
 	if (_background_visible == true) {
 		InvalidateAll();
@@ -259,8 +254,8 @@ void Container::Paint(Graphics *g)
 		Component *c = (*i);
 
 		if (c->IsVisible() == true && c->IsValid() == false) {
-			int cx = c->GetX()-_scroll_x,
-					cy = c->GetY()-_scroll_y,
+			int cx = c->GetX()-_scroll.x,
+					cy = c->GetY()-_scroll.y,
 					cw = c->GetWidth(),
 					ch = c->GetHeight();
 
@@ -281,12 +276,14 @@ void Container::Paint(Graphics *g)
 			}
 
 			g->Translate(cx, cy);
-			g->SetClip(0, 0, cw, ch);
+			g->SetClip(0, 0, cw-1, ch-1);
 			c->Paint(g);
 			g->ReleaseClip();
 			g->Translate(-cx, -cy);
 
 			c->Revalidate();
+			
+			g->SetWorkingScreenSize(_scale.width, _scale.height);
 		}
 	}
 		
@@ -351,7 +348,7 @@ void Container::Repaint(bool all)
 
 	if (_parent != NULL) {
 		if (all == false && IsOpaque() == true && _parent->IsValid() == true) {
-			_parent->Repaint(this, _location.x-_scroll_x, _location.y-_scroll_y, _size.width, _size.height);
+			_parent->Repaint(this, _location.x-_scroll.x, _location.y-_scroll.y, _size.width, _size.height);
 		} else {
 			InvalidateAll();
 
@@ -376,7 +373,7 @@ void Container::Repaint(Component *c, int x, int y, int width, int height)
 	}
 
 	if (_parent != NULL) {
-		_parent->Repaint(this, _location.x-_scroll_x, _location.y-_scroll_y, _size.width, _size.height);
+		_parent->Repaint(this, _location.x-_scroll.x, _location.y-_scroll.y, _size.width, _size.height);
 	}
 }
 
@@ -542,10 +539,10 @@ void Container::ReleaseComponentFocus(jgui::Component *c)
 	}
 }
 
-jgui::Component * Container::GetComponentInFocus()
+jgui::Component * Container::GetFocusOwner()
 {
 	if (_parent != NULL) {
-		return _parent->GetComponentInFocus();
+		return _parent->GetFocusOwner();
 	}
 
 	return _focus;

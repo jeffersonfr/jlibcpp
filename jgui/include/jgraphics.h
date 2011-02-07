@@ -279,6 +279,12 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual jsize_t GetWorkingScreenSize();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual OffScreenImage * Create();
 
 		/**

@@ -90,15 +90,13 @@ class GFXHandler : public virtual jcommon::Object{
 		std::vector<OffScreenImage *> _offscreenimages;
 		std::vector<Font *> _fonts;
 		jthread::Mutex _mutex;
+		jsize_t _screen,
+						_scale;
 		jcursor_style_t _cursor;
 		int r,
 				g,
 				b, 
 				a;
-		int screenWidth, 
-				screenHeight,
-				scaleWidth, 
-				scaleHeight;
 
 	private:
 		/**
@@ -234,19 +232,19 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual jsize_t GetScreenSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWorkingScreenSize(int width, int height);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetWorkingScreenWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetWorkingScreenHeight();
+		virtual jsize_t GetWorkingScreenSize();
 		
 		/**
 		 * \brief
@@ -289,6 +287,24 @@ class GFXHandler : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void Release();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Suspend();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Resume();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void WaitIdle();
 
 };
 

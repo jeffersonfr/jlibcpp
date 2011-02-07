@@ -362,7 +362,7 @@ void CalendarDialogBox::BuildCalendar()
 	year->SetNavigation(NULL, NULL, NULL, month);	
 	month->SetNavigation(NULL, NULL, year, _buttons[0]);	
 
-	if (GetComponentInFocus() == NULL) {
+	if (GetFocusOwner() == NULL) {
 		_buttons[_day]->RequestFocus();
 	}
 

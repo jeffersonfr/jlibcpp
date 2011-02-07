@@ -119,9 +119,7 @@ void Frame::SetTitle(std::string title)
 {
 	_title = title;
 
-	if ((void *)graphics != NULL) {
-		Repaint();
-	}
+	Repaint();
 }
 
 std::string Frame::GetTitle()
@@ -262,18 +260,14 @@ void Frame::AddSubtitle(std::string image, std::string label)
 
 	_subtitles.push_back(t);
 
-	if ((void *)graphics != NULL) {
-		Repaint();
-	}
+	Repaint();
 }
 
 void Frame::RemoveAllSubtitles()
 {
 	_subtitles.clear();
 
-	if ((void *)graphics != NULL) {
-		Repaint();
-	}
+	Repaint();
 }
 
 void Frame::Maximize()
@@ -285,7 +279,7 @@ void Frame::Maximize()
 	_old_width = _size.width;
 	_old_height = _size.height;
 
-	SetBounds(0, 0, _scale_width, _scale_height);
+	SetBounds(0, 0, _scale.width, _scale.height);
 }
 
 void Frame::Restore()

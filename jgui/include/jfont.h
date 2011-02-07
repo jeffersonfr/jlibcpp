@@ -93,6 +93,12 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual jsize_t GetWorkingScreenSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool SetEncoding(std::string code);
 		
 		/**

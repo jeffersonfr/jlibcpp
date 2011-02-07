@@ -89,6 +89,11 @@ void Font::SetWorkingScreenSize(int width, int height)
 	_scale.height = height;
 }
 
+jsize_t Font::GetWorkingScreenSize()
+{
+	return _scale;
+}
+
 void * Font::GetFont()
 {
 #ifdef DIRECTFB_UI

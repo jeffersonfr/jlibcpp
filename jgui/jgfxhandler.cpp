@@ -35,11 +35,11 @@ GFXHandler::GFXHandler():
 {
 	jcommon::Object::SetClassName("jgui::GFXHandler");
 
-	screenWidth = 0;
-	screenHeight = 0;
+	_screen.width = 0;
+	_screen.height = 0;
 
-	scaleWidth = DEFAULT_SCALE_WIDTH;
-	scaleHeight = DEFAULT_SCALE_HEIGHT;
+	_scale.width = DEFAULT_SCALE_WIDTH;
+	_scale.height = DEFAULT_SCALE_HEIGHT;
 	
 #ifdef DIRECTFB_UI
 	_cursor = ARROW_CURSOR;
@@ -62,18 +62,18 @@ IDirectFBDisplayLayer * GFXHandler::GetDisplayLayer()
 int GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width, int scale_height, double radians)
 {
 	if (scale_width <= 0) {
-		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
+		scale_width = _scale.width; // DEFAULT_SCALE_WIDTH;
 	}
 
 	if (scale_height <= 0) {
-		scale_height = scaleHeight; // DEFAULT_SCALE_HEIGHT;
+		scale_height = _scale.height; // DEFAULT_SCALE_HEIGHT;
 	}
 
 	DFBFontDescription font_dsc;
 	DFBTextEncodingID enc_id;
 
 	font_dsc.flags = (DFBFontDescriptionFlags)(DFDESC_HEIGHT | DFDESC_ROTATION);
-	font_dsc.height = (int)round(((double)height*(double)screenHeight)/(double)scale_height);
+	font_dsc.height = (int)round(((double)height*(double)_screen.height)/(double)scale_height);
 	font_dsc.rotation = DFB_RADIANS(radians);
 
 	if (font_dsc.height < 1) {
@@ -101,11 +101,11 @@ int GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, i
 int GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, DFBFontDescription font_desc, int scale_width, int scale_height)
 {
 	if (scale_width <= 0) {
-		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
+		scale_width = _scale.width; // DEFAULT_SCALE_WIDTH;
 	}
 
 	if (scale_height <= 0) {
-		scale_height = scaleHeight; // DEFAULT_SCALE_HEIGHT;
+		scale_height = _scale.height; // DEFAULT_SCALE_HEIGHT;
 	}
 
 	DFBFontDescription font_dsc;
@@ -113,7 +113,7 @@ int GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, D
 
 	font_dsc.flags = (DFBFontDescriptionFlags)(DFDESC_HEIGHT | font_desc.flags);
 	font_dsc.attributes = (DFBFontAttributes)(font_desc.attributes);
-	font_dsc.height = (int)round(((double)height*(double)screenHeight)/(double)scale_height);
+	font_dsc.height = (int)round(((double)height*(double)_screen.height)/(double)scale_height);
 
 	if (font_dsc.height < 1) {
 		font_dsc.height = 1;
@@ -140,15 +140,15 @@ int GFXHandler::CreateFont(std::string name, int height, IDirectFBFont **font, D
 int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height)
 {
 	if (scale_width <= 0) {
-		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
+		scale_width = _scale.width; // DEFAULT_SCALE_WIDTH;
 	}
 
 	if (scale_height <= 0) {
-		scale_height = scaleHeight; // DEFAULT_SCALE_HEIGHT;
+		scale_height = _scale.height; // DEFAULT_SCALE_HEIGHT;
 	}
 
-	int width = (widthp * screenWidth) / scale_width;
-	int height = (heightp * screenHeight) / scale_height;
+	int width = (widthp * _screen.width) / scale_width;
+	int height = (heightp * _screen.height) / scale_height;
 
 	if (width < 2) {
 		width = 2;
@@ -158,12 +158,12 @@ int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 		height = 2;
 	}
 
-	if (width > screenWidth) {
-		width = screenWidth;
+	if (width > _screen.width) {
+		width = _screen.width;
 	}
 
-	if (height > screenHeight) {
-		height = screenHeight;
+	if (height > _screen.height) {
+		height = _screen.height;
 	}
 
 	DFBSurfaceDescription desc;
@@ -262,15 +262,15 @@ int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, DFBSurfaceDescription surface_desc, int scale_width, int scale_height)
 {
 	if (scale_width <= 0) {
-		scale_width = scaleWidth; // DEFAULT_SCALE_WIDTH;
+		scale_width = _scale.width; // DEFAULT_SCALE_WIDTH;
 	}
 
 	if (scale_height <= 0) {
-		scale_height = scaleHeight; // DEFAULT_SCALE_HEIGHT;
+		scale_height = _scale.height; // DEFAULT_SCALE_HEIGHT;
 	}
 
-	int width = (widthp * screenWidth) / scale_width;
-	int height = (heightp * screenHeight) / scale_height;
+	int width = (widthp * _screen.width) / scale_width;
+	int height = (heightp * _screen.height) / scale_height;
 
 	if (width < 2) {
 		width = 2;
@@ -280,12 +280,12 @@ int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 		height = 2;
 	}
 
-	if (width > screenWidth) {
-		width = screenWidth;
+	if (width > _screen.width) {
+		width = _screen.width;
 	}
 
-	if (height > screenHeight) {
-		height = screenHeight;
+	if (height > _screen.height) {
+		height = _screen.height;
 	}
 
 	DFBSurfaceDescription desc;
@@ -313,10 +313,10 @@ int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity, int scale_width, int scale_height)
 {
 
-	int x = (xp * screenWidth) / scale_width; 
-	int y = (yp * screenHeight) / scale_height;
-	int width = (widthp * screenWidth) / scale_width;
-	int height = (heightp * screenHeight) / scale_height;
+	int x = (xp * _screen.width) / scale_width; 
+	int y = (yp * _screen.height) / scale_height;
+	int width = (widthp * _screen.width) / scale_width;
+	int height = (heightp * _screen.height) / scale_height;
 
 	if (width < 2) {
 		width = 2;
@@ -326,12 +326,12 @@ int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 		height = 2;
 	}
 
-	if (width > screenWidth) {
-		width = screenWidth;
+	if (width > _screen.width) {
+		width = _screen.width;
 	}
 
-	if (height > screenHeight) {
-		height = screenHeight;
+	if (height > _screen.height) {
+		height = _screen.height;
 	}
 
 	DFBWindowDescription desc;
@@ -380,10 +380,10 @@ int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 
 int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBWindow **window, IDirectFBSurface **surface, DFBWindowDescription window_desc, int opacity, int scale_width, int scale_height)
 {
-	int x = (xp * screenWidth) / scale_width; 
-	int y = (yp * screenHeight) / scale_height;
-	int width = (widthp * screenWidth) / scale_width;
-	int height = (heightp * screenHeight) / scale_height;
+	int x = (xp * _screen.width) / scale_width; 
+	int y = (yp * _screen.height) / scale_height;
+	int width = (widthp * _screen.width) / scale_width;
+	int height = (heightp * _screen.height) / scale_height;
 
 	if (width < 2) {
 		width = 2;
@@ -393,12 +393,12 @@ int GFXHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 		height = 2;
 	}
 
-	if (width > screenWidth) {
-		width = screenWidth;
+	if (width > _screen.width) {
+		width = _screen.width;
 	}
 
-	if (height > screenHeight) {
-		height = screenHeight;
+	if (height > _screen.height) {
+		height = _screen.height;
 	}
 
 	DFBWindowDescription desc;
@@ -512,8 +512,8 @@ void GFXHandler::InitEngine()
 	
 	_layer->GetConfiguration(_layer, &config);
 
-	screenWidth = config.width;
-	screenHeight = config.height;
+	_screen.width = config.width;
+	_screen.height = config.height;
 	
 	_dfb->GetDeviceDescription(_dfb, &deviceDescription);
 
@@ -601,8 +601,8 @@ void GFXHandler::InitCursors()
 		h = 32;
 
 	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(0, screenWidth, scaleWidth);
-	t.hot_y = SCALE_TO_SCREEN(0, screenHeight, scaleHeight);
+	t.hot_x = SCALE_TO_SCREEN(0, _screen.width, _scale.width);
+	t.hot_y = SCALE_TO_SCREEN(0, _screen.height, _scale.height);
 
 	_cursors[ARROW_CURSOR] = t;
 	
@@ -614,8 +614,8 @@ void GFXHandler::InitCursors()
 	g->Flip();
 
 	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(30, screenWidth, scaleWidth);
-	t.hot_y = SCALE_TO_SCREEN(30, screenHeight, scaleHeight);
+	t.hot_x = SCALE_TO_SCREEN(30, _screen.width, _scale.width);
+	t.hot_y = SCALE_TO_SCREEN(30, _screen.height, _scale.height);
 
 	_cursors[SIZECORNER_CURSOR] = t;
 	
@@ -627,8 +627,8 @@ void GFXHandler::InitCursors()
 	g->Flip();
 	
 	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, screenWidth, scaleWidth);
-	t.hot_y = SCALE_TO_SCREEN(16, screenHeight, scaleHeight);
+	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
+	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
 
 	_cursors[SIZEALL_CURSOR] = t;
 	
@@ -643,8 +643,8 @@ void GFXHandler::InitCursors()
 	g->Flip();
 	
 	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, screenWidth, scaleWidth);
-	t.hot_y = SCALE_TO_SCREEN(16, screenHeight, scaleHeight);
+	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
+	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
 
 	_cursors[SIZENS_CURSOR] = t;
 	
@@ -657,8 +657,8 @@ void GFXHandler::InitCursors()
 	g->Flip();
 	
 	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, screenWidth, scaleWidth);
-	t.hot_y = SCALE_TO_SCREEN(16, screenHeight, scaleHeight);
+	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
+	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
 
 	_cursors[SIZEWE_CURSOR] = t;
 	
@@ -671,8 +671,8 @@ void GFXHandler::InitCursors()
 	g->Flip();
 	
 	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, screenWidth, scaleWidth);
-	t.hot_y = SCALE_TO_SCREEN(16, screenHeight, scaleHeight);
+	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
+	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
 
 	_cursors[SIZENWSE_CURSOR] = t;
 	
@@ -685,8 +685,8 @@ void GFXHandler::InitCursors()
 	g->Flip();
 	
 	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, screenWidth, scaleWidth);
-	t.hot_y = SCALE_TO_SCREEN(16, screenHeight, scaleHeight);
+	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
+	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
 
 	_cursors[SIZENESW_CURSOR] = t;
 	
@@ -699,8 +699,8 @@ void GFXHandler::InitCursors()
 	g->Flip();
 	
 	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, screenWidth, scaleWidth);
-	t.hot_y = SCALE_TO_SCREEN(16, screenHeight, scaleHeight);
+	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
+	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
 
 	_cursors[WAIT_CURSOR] = t;
 	
@@ -730,35 +730,35 @@ std::string GFXHandler::GetID()
 
 int GFXHandler::GetScreenWidth()
 {
-	return screenWidth;
+	return _screen.width;
 }
 
 int GFXHandler::GetScreenHeight()
 {
-	return screenHeight;
+	return _screen.height;
+}
+
+jsize_t GFXHandler::GetScreenSize()
+{
+	return _screen;
 }
 
 void GFXHandler::SetWorkingScreenSize(int width, int height)
 {
-	scaleWidth = width;
-	scaleHeight = height;
+	_scale.width = width;
+	_scale.height = height;
 }
 
-int GFXHandler::GetWorkingScreenWidth()
+jsize_t GFXHandler::GetWorkingScreenSize()
 {
-	return scaleWidth;
-}
-
-int GFXHandler::GetWorkingScreenHeight()
-{
-	return scaleHeight;
+	return _scale;
 }
 
 void GFXHandler::SetMousePosition(int x, int y)
 {
 #ifdef DIRECTFB_UI
-	x = SCALE_TO_SCREEN(x, screenWidth, scaleWidth);
-	y = SCALE_TO_SCREEN(y, screenWidth, scaleWidth);
+	x = SCALE_TO_SCREEN(x, _screen.width, _scale.width);
+	y = SCALE_TO_SCREEN(y, _screen.width, _scale.width);
 
 	_layer->WarpCursor(_layer, x, y);
 #endif
@@ -774,8 +774,8 @@ jpoint_t GFXHandler::GetMousePosition()
 #ifdef DIRECTFB_UI
 	_layer->GetCursorPosition(_layer, &p.x, &p.y);
 	
-	p.x = SCREEN_TO_SCALE(p.x, screenWidth, scaleWidth);
-	p.y = SCREEN_TO_SCALE(p.y, screenWidth, scaleWidth);
+	p.x = SCREEN_TO_SCALE(p.x, _screen.width, _scale.width);
+	p.y = SCREEN_TO_SCALE(p.y, _screen.width, _scale.width);
 #endif
 
 	return p;
@@ -841,6 +841,21 @@ void GFXHandler::Release()
 		_dfb = NULL;
 	}
 #endif
+}
+
+void GFXHandler::Suspend()
+{
+	_dfb->Suspend(_dfb);
+}
+
+void GFXHandler::Resume()
+{
+	_dfb->Resume(_dfb);
+}
+
+void GFXHandler::WaitIdle()
+{
+	_dfb->WaitIdle(_dfb);
 }
 
 void GFXHandler::Add(Font *font)

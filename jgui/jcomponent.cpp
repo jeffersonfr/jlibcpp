@@ -54,7 +54,7 @@ Component::Component(int x, int y, int width, int height):
 	_right = NULL;
 	_up = NULL;
 	_down = NULL;
-	_border_size = 2;
+	_border_size = 1;
 	_border = LINE_BORDER;
 	_gradient_level = 0x40;
 	_vertical_gap = 4;
@@ -231,15 +231,15 @@ void Component::PaintBorderEdges(Graphics *g)
 	if (_border == LINE_BORDER) {
 		g->SetColor(dr, dg, db, da);
 		g->SetLineWidth(-_border_size);
-		g->DrawRectangle(xp, yp, wp+1, hp+1);
+		g->DrawRectangle(xp, yp, wp, hp);
 	} else if (_border == BEVEL_BORDER) {
 		g->SetColor(dr, dg, db, da);
 		g->SetLineWidth(-_border_size);
-		g->DrawBevelRectangle(xp, yp, wp+1, hp+1);
+		g->DrawBevelRectangle(xp, yp, wp, hp);
 	} else if (_border == ROUND_BORDER) {
 		g->SetColor(dr, dg, db, da);
 		g->SetLineWidth(-_border_size);
-		g->DrawRoundRectangle(xp, yp, wp+1, hp+1);
+		g->DrawRoundRectangle(xp, yp, wp, hp);
 	} else if (_border == RAISED_GRADIENT_BORDER) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
@@ -299,19 +299,19 @@ void Component::PaintBorderEdges(Graphics *g)
 	} else if (_border == RAISED_ETCHED_BORDER) {
 		g->SetColor(dr+step, dg+step, db+step, da);
 		g->SetLineWidth(-_border_size);
-		g->DrawRectangle(xp, yp, wp+1, hp+1);
+		g->DrawRectangle(xp, yp, wp, hp);
 		
 		g->SetColor(dr-step, dg-step, db-step, da);
 		g->SetLineWidth(-_border_size/2);
-		g->DrawRectangle(xp, yp, wp+1-_border_size/2, hp+1-_border_size/2);
+		g->DrawRectangle(xp, yp, wp-_border_size/2, hp-_border_size/2);
 	} else if (_border == LOWERED_ETCHED_BORDER) {
 		g->SetColor(dr-step, dg-step, db-step, da);
 		g->SetLineWidth(-_border_size);
-		g->DrawRectangle(xp, yp, wp+1, hp+1);
+		g->DrawRectangle(xp, yp, wp, hp);
 		
 		g->SetColor(dr+step, dg+step, db+step, da);
 		g->SetLineWidth(-_border_size/2);
-		g->DrawRectangle(xp, yp, wp+1-_border_size/2, hp+1-_border_size/2);
+		g->DrawRectangle(xp, yp, wp-_border_size/2, hp-_border_size/2);
 	}
 
 	if (_enabled == false) {
@@ -603,8 +603,8 @@ void Component::SetBorderSize(int size)
 		_border_size = 0;
 	}
 
-	if (_border_size > 10000) {
-		_border_size = 10000;
+	if (_border_size > 65535) {
+		_border_size = 65535;
 	}
 
 	Repaint();

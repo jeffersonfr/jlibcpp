@@ -48,7 +48,7 @@ std::vector<Window *> & WindowManager::GetWindows()
 	return windows;
 }
 
-Window * WindowManager::GetWindowInFocus()
+Window * WindowManager::GetFocusOwner()
 {
 	if (windows.size() > 0) {
 		return *windows.begin();

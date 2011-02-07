@@ -74,6 +74,12 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual jsize_t GetWorkingScreenSize();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual OffScreenImage * Create();
 
 		/**

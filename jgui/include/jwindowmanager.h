@@ -70,7 +70,7 @@ class WindowManager : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual Window * GetWindowInFocus();
+		virtual Window * GetFocusOwner();
 		
 		/**
 		 * \brief
