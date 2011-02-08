@@ -186,8 +186,8 @@ void Component::PaintBorderBackground(Graphics *g)
 {
 	int x = 0,
 			y = 0,
-			w = _size.width+1,
-			h = _size.height+1;
+			w = _size.width,
+			h = _size.height;
 
 	g->SetColor(_bgcolor);
 
