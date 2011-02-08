@@ -461,8 +461,6 @@ void Window::SetSize(int width, int height)
 		height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
 
 		while (_window->Resize(_window, width, height) == DFB_LOCKED);
-
-		_graphics->SetClip(t.x, t.y, t.width, t.height);
 	}
 #endif
 	
@@ -548,6 +546,8 @@ void Window::Repaint(bool all)
 	InvalidateAll();
 
 	_graphics->Lock();
+		
+	_graphics->ReleaseClip();
 	
 	// CHANGE:: corrigir a limpeza da tela
 	if (_background_visible == false) {

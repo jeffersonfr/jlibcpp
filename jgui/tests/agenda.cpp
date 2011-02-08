@@ -486,13 +486,13 @@ AddMessage::~AddMessage()
 void AddMessage::KeyboardUpdated(jgui::KeyboardEvent *event)
 {
 	if (event->GetSymbol() == "back") {
-		if (GetComponentInFocus() == date) {
+		if (GetFocusOwner() == date) {
 			date->Backspace();
-		} else if (GetComponentInFocus() == message) {
+		} else if (GetFocusOwner() == message) {
 			message->Delete();
 		}
 	} else {
-		if (GetComponentInFocus() == hour || GetComponentInFocus() == minute) {
+		if (GetFocusOwner() == hour || GetFocusOwner() == minute) {
 			if (event->GetSymbol() == "1" ||
 					event->GetSymbol() == "2" ||
 					event->GetSymbol() == "3" ||
@@ -505,7 +505,7 @@ void AddMessage::KeyboardUpdated(jgui::KeyboardEvent *event)
 					event->GetSymbol() == "0") {
 				std::string num = event->GetSymbol();
 
-				if (GetComponentInFocus() == hour) {
+				if (GetFocusOwner() == hour) {
 					int h = atoi(hour->GetText().c_str()),
 					    delta = atoi(num.c_str());
 					char tmp[255];
@@ -529,7 +529,7 @@ void AddMessage::KeyboardUpdated(jgui::KeyboardEvent *event)
 					hour->Insert(tmp);
 
 					_hour = atoi(tmp);
-				} else if (GetComponentInFocus() == minute) {
+				} else if (GetFocusOwner() == minute) {
 					int h = atoi(minute->GetText().c_str()),
 					    delta = atoi(num.c_str());
 					char tmp[255];
@@ -549,8 +549,8 @@ void AddMessage::KeyboardUpdated(jgui::KeyboardEvent *event)
 					_minute = atoi(tmp);
 				}
 			}
-		} else if (GetComponentInFocus() == message) {
-			((jgui::TextArea *)(GetComponentInFocus()))->Insert(event->GetSymbol());
+		} else if (GetFocusOwner() == message) {
+			((jgui::TextArea *)(GetFocusOwner()))->Insert(event->GetSymbol());
 		}
 	}
 }
@@ -597,7 +597,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 			num = "0";
 		}
 
-		if (GetComponentInFocus() == hour) {
+		if (GetFocusOwner() == hour) {
 			int h = atoi(hour->GetText().c_str()),
 			    delta = atoi(num.c_str());
 			char tmp[255];
@@ -621,7 +621,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 			hour->Insert(tmp);
 
 			_hour = atoi(tmp);
-		} else if (GetComponentInFocus() == minute) {
+		} else if (GetFocusOwner() == minute) {
 			int h = atoi(minute->GetText().c_str()),
 			    delta = atoi(num.c_str());
 			char tmp[255];
@@ -643,7 +643,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 	} else if (event->GetSymbol() == jgui::JKEY_ENTER) {
 		std::string tmp;
 
-		if (GetComponentInFocus() == hour) {
+		if (GetFocusOwner() == hour) {
 			tmp = hour->GetText();
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
@@ -658,7 +658,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 				hour->SetText("");
 				hour->Insert(tmp);
 			}
-		} else if (GetComponentInFocus() == minute) {
+		} else if (GetFocusOwner() == minute) {
 			tmp = minute->GetText();
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
@@ -673,7 +673,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 				minute->SetText("");
 				minute->Insert(tmp);
 			}
-		} else if (GetComponentInFocus() == date) {
+		} else if (GetFocusOwner() == date) {
 			tmp = date->GetText();
 
 			jgui::CalendarDialogBox calendar(GetX()+GetWidth()+20, GetY());
@@ -701,7 +701,7 @@ void AddMessage::InputChanged(jgui::KeyEvent *event)
 				date->SetText("");
 				date->Insert(tmp);
 			}
-		} else if (GetComponentInFocus() == message) {
+		} else if (GetFocusOwner() == message) {
 			tmp = message->GetText();
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, false);

@@ -85,12 +85,14 @@
     <ClCompile Include="..\..\jcommon\jcharset.cpp" />
     <ClCompile Include="..\..\jcommon\jcommonlib.cpp" />
     <ClCompile Include="..\..\jcommon\jdate.cpp" />
+    <ClCompile Include="..\..\jcommon\jdebug.cpp" />
     <ClCompile Include="..\..\jcommon\jdynamiclink.cpp" />
     <ClCompile Include="..\..\jcommon\jeventobject.cpp" />
     <ClCompile Include="..\..\jcommon\jexception.cpp" />
     <ClCompile Include="..\..\jcommon\jgc.cpp" />
     <ClCompile Include="..\..\jcommon\jhtmlparser.cpp" />
     <ClCompile Include="..\..\jcommon\jillegalargumentexception.cpp" />
+    <ClCompile Include="..\..\jcommon\jinvalidargumentexception.cpp" />
     <ClCompile Include="..\..\jcommon\jjson.cpp" />
     <ClCompile Include="..\..\jcommon\jlistener.cpp" />
     <ClCompile Include="..\..\jcommon\jnullpointerexception.cpp" />
@@ -127,6 +129,7 @@
     <ClCompile Include="..\..\jgui\jcheckbuttonevent.cpp" />
     <ClCompile Include="..\..\jgui\jcheckbuttongroup.cpp" />
     <ClCompile Include="..\..\jgui\jcheckbuttonlistener.cpp" />
+    <ClCompile Include="..\..\jgui\jcolor.cpp" />
     <ClCompile Include="..\..\jgui\jcombobox.cpp" />
     <ClCompile Include="..\..\jgui\jcomponent.cpp" />
     <ClCompile Include="..\..\jgui\jcomponentevent.cpp" />
@@ -294,6 +297,7 @@
     <ClCompile Include="..\..\jthread\jmonitor.cpp" />
     <ClCompile Include="..\..\jthread\jmutex.cpp" />
     <ClCompile Include="..\..\jthread\jmutexexception.cpp" />
+    <ClCompile Include="..\..\jthread\jrwlock.cpp" />
     <ClCompile Include="..\..\jthread\jrunnable.cpp" />
     <ClCompile Include="..\..\jthread\jsemaphore.cpp" />
     <ClCompile Include="..\..\jthread\jsemaphoreexception.cpp" />
@@ -302,6 +306,7 @@
     <ClCompile Include="..\..\jthread\jthread.cpp" />
     <ClCompile Include="..\..\jthread\jthreadexception.cpp" />
     <ClCompile Include="..\..\jthread\jthreadgroup.cpp" />
+    <ClCompile Include="..\..\jthread\jthreadpool.cpp" />
     <ClCompile Include="..\..\jthread\jthreadlib.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

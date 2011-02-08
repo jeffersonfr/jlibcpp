@@ -127,7 +127,7 @@ MCalc::~MCalc()
 
 void MCalc::Process(std::string type)
 {
-		jgui::Button *button = (jgui::Button *)GetComponentInFocus();
+		jgui::Button *button = (jgui::Button *)GetFocusOwner();
 
 		if (type == ".") {
 				if (_state == 2 || _state == 5) {

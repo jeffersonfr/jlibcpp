@@ -553,6 +553,8 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 		x_index = x_index*blocksize;
 		y_index = y_index*blocksize;
 
+		goff->SetPorterDuffFlags(jgui::PDF_NONE);
+
 		goff->DrawImage(ghost_bmp, x_index, y_index, blocksize, blocksize, x, y, blocksize, blocksize);
 	}
 

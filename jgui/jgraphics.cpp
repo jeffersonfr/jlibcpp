@@ -1698,11 +1698,19 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 
 bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp)
 {
+	/*
 	if ((void *)img == NULL) {
 		return false;
 	}
 
 	return DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight(), xp, yp, img->GetWidth(), img->GetHeight());
+	*/
+
+	if ((void *)img == NULL) {
+		return false;
+	}
+
+	return DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight(), xp, yp);
 }
 
 bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp)
@@ -1716,11 +1724,61 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp)
 
 bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
+	/*
 	if ((void *)img == NULL) {
 		return false;
 	}
 
 	return DrawImage(img, sxp, syp, swp, shp, xp, yp, swp, shp);
+	*/
+
+#ifdef DIRECTFB_UI
+	if ((void *)surface == NULL) {
+		return false;
+	}
+
+	if ((void *)img == NULL) {
+		return false;
+	}
+
+	Graphics *g = img->GetGraphics();
+
+	if ((void *)g == NULL) {
+		return false;
+	}
+
+	int sx = SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
+			sy = SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
+			sw = SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
+			sh = SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
+			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+
+	DFBRectangle drect;
+
+	drect.x = sx;
+	drect.y = sy;
+	drect.w = sw;
+	drect.h = sh;
+
+	if (_radians != 0.0) {
+		OffScreenImage off(img->GetWidth(), img->GetHeight());
+		
+		Graphics *g = off.GetGraphics();
+
+		g->SetBlittingFlags(_blit_flags);
+		g->SetColor(_color);
+		g->DrawImage(img, sxp, syp, swp, shp, 0, 0);
+
+		RotateImage0(&off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, img->GetWidth(), img->GetHeight(), _radians, _color.GetAlpha());
+
+		return true;
+	}
+
+	surface->Blit(surface, g->surface, &drect, x, y);
+#endif
+
+	return true;
 }
 
 bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)

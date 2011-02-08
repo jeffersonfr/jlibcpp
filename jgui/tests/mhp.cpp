@@ -190,7 +190,7 @@ class VideoLayer : public ScreenLayer{
 			jthread::AutoLock lock(&_mutex);
 
 			if (_provider != NULL) {
-				_provider->PlayTo(_provider, surface, NULL, VideoLayer::callback, _thread);
+				_provider->PlayTo(_provider, _surface, NULL, VideoLayer::callback, _thread);
 			}
 		}
 
@@ -313,7 +313,7 @@ class Scene : public jgui::Container, public jgui::KeyListener{
 				return;
 			}
 
-			jgui::Component *focus = GetComponentInFocus();
+			jgui::Component *focus = GetFocusOwner();
 
 			if (focus != NULL) {
 				focus->ProcessEvent(event);
@@ -372,11 +372,11 @@ class TestScene : public Scene{
 		{
 			LayersManager *layers = LayersManager::GetInstance();
  
-			if (GetComponentInFocus() == _button1) {
+			if (GetFocusOwner() == _button1) {
 				layers->GetVideoLayer()->SetBounds(0, 0, 1920, 1080);
-			} else if (GetComponentInFocus() == _button2) {
+			} else if (GetFocusOwner() == _button2) {
 				layers->GetVideoLayer()->SetBounds(100, 100, 720, 480);
-			} else if (GetComponentInFocus() == _button3) {
+			} else if (GetFocusOwner() == _button3) {
 				exit(0);
 			}
 		}

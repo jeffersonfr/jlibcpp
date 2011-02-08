@@ -358,7 +358,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		if (event->GetSymbol() == jgui::JKEY_ENTER) {
-			if (GetComponentInFocus() == text_field) {
+			if (GetFocusOwner() == text_field) {
 				jgui::Keyboard keyboard(500, 400, jgui::FULL_ALPHA_NUMERIC_KEYBOARD, false);
 
 				keyboard.RegisterKeyboardListener(dynamic_cast<jgui::KeyboardListener *>(this));
@@ -438,7 +438,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 	virtual void KeyboardUpdated(jgui::KeyboardEvent *event)
 	{
-		if (GetComponentInFocus() == text_field) {
+		if (GetFocusOwner() == text_field) {
 			if (event->GetSymbol() == "back") {
 				text_field->Delete();
 			} else if (event->GetSymbol() == "enter") {
@@ -446,7 +446,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			} else {
 				text_field->Insert(event->GetSymbol());
 			}
-		} else if (GetComponentInFocus() == text_area) {
+		} else if (GetFocusOwner() == text_area) {
 			if (event->GetSymbol() == "back") {
 				text_area->Delete();
 			} else if (event->GetSymbol() == "enter") {

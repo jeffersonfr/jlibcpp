@@ -389,9 +389,9 @@ AddContact::~AddContact()
 void AddContact::KeyboardUpdated(jgui::KeyboardEvent *event)
 {
 	if (event->GetSymbol() == "back") {
-		((jgui::TextField *)(GetComponentInFocus()))->Backspace();
+		((jgui::TextField *)(GetFocusOwner()))->Backspace();
 	} else {
-		if (GetComponentInFocus() == field2 || GetComponentInFocus() == field3) {
+		if (GetFocusOwner() == field2 || GetFocusOwner() == field3) {
 			if (event->GetSymbol() == "1" ||
 					event->GetSymbol() == "2" ||
 					event->GetSymbol() == "3" ||
@@ -402,10 +402,10 @@ void AddContact::KeyboardUpdated(jgui::KeyboardEvent *event)
 					event->GetSymbol() == "8" ||
 					event->GetSymbol() == "9" ||
 					event->GetSymbol() == "0") {
-				((jgui::TextField *)(GetComponentInFocus()))->Insert(event->GetSymbol());
+				((jgui::TextField *)(GetFocusOwner()))->Insert(event->GetSymbol());
 			}
 		} else {
-			((jgui::TextField *)(GetComponentInFocus()))->Insert(event->GetSymbol());
+			((jgui::TextField *)(GetFocusOwner()))->Insert(event->GetSymbol());
 		}
 	}
 }
@@ -452,9 +452,9 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 			num = "0";
 		}
 
-		if (GetComponentInFocus() == field2) {
+		if (GetFocusOwner() == field2) {
 			field2->Insert(num);
-		} else if (GetComponentInFocus() == field3) {
+		} else if (GetFocusOwner() == field3) {
 			field3->Insert(num);
 		}
 	} else if (event->GetSymbol() == jgui::JKEY_BLUE || event->GetSymbol() == jgui::JKEY_F4) {
@@ -472,7 +472,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 	} else if (event->GetSymbol() == jgui::JKEY_ENTER) {
 		std::string tmp;
 
-		if (GetComponentInFocus() == field1) {
+		if (GetFocusOwner() == field1) {
 			tmp = field1->GetText();
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, false);
@@ -488,7 +488,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 				field1->SetText("");
 				field1->Insert(tmp);
 			}
-		} else if (GetComponentInFocus() == field2) {
+		} else if (GetFocusOwner() == field2) {
 			tmp = field2->GetText();
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
@@ -504,7 +504,7 @@ void AddContact::InputChanged(jgui::KeyEvent *event)
 				field2->SetText("");
 				field2->Insert(tmp);
 			}
-		} else if (GetComponentInFocus() == field3) {
+		} else if (GetFocusOwner() == field3) {
 			tmp = field3->GetText();
 
 			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);

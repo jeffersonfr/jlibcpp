@@ -184,7 +184,7 @@ class Stock : public jgui::Frame, public jgui::FrameInputListener {
 				return;
 			}
 
-			if (event->GetSymbol() == jgui::JKEY_ENTER && GetComponentInFocus() == acao) {
+			if (event->GetSymbol() == jgui::JKEY_ENTER && GetFocusOwner() == acao) {
 				std::map<std::string, std::string> quotes = RequestQuotes(acao->GetText() + ".sa");
 			
 				vdata->SetText(quotes["data"]);

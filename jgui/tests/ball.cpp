@@ -180,10 +180,8 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 
 	public:
 		BallDrop():
-			jgui::Frame("Ball Drop", 10, 10, 100, 100)
+			jgui::Frame("Ball Drop", 0, 0, 720, 480)
 		{
-			SetBounds(10, 10, 720, 480);
-
 			int w = 16,
 					h = 16;
 
@@ -325,7 +323,9 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 
 		void UpdateRack(jgui::Graphics *g) 
 		{
-			int i,pinx,piny;
+			int i,
+					pinx,
+					piny;
 
 			for(i=0;i<numracks;++i) {
 				while(rackdel[i]>0) {
