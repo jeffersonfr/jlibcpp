@@ -28,37 +28,59 @@
 
 namespace jgui {
 
-static const float EPSILON = 0.0000000001f;
+static const double EPSILON = 0.0000000001f;
 
 class Vector2d {
 
 	private:
-		float mX;
-		float mY;
+		double mX;
+		double mY;
 
 	public:
-		Vector2d(float x,float y);
+		Vector2d(double x, double y);
 
-		float GetX(void) const;
-		float GetY(void) const;
-		void  Set(float x,float y);
+		double GetX() const;
+		double GetY() const;
+
+		void SetXY(double x, double y);
 
 };
 
-// Vector of vertices which are used to represent a polygon/contour and a series of triangles
+/**
+ * \brief Vector of vertices which are used to represent a polygon/contour and a series of triangles
+ *
+ */
 typedef std::vector< Vector2d > Vector2dVector;
 
 class Triangulate {
+
 	private:
-		static bool Snip(const Vector2dVector &contour,int u,int v,int w,int n,int *V);
+		static bool Snip(const Vector2dVector &contour, int u, int v, int w, int n, int *V);
 
 	public:
-  		// triangulate a contour/polygon, places results in STL vector as series of triangles
+  	/**
+		 * \brief triangulate a contour/polygon, places results in STL vector as series of triangles
+		 *
+		 */
 		static bool Process(const Vector2dVector &contour, Vector2dVector &result);
-		// compute area of a contour/polygon
-		static float Area(const Vector2dVector &contour);
-		// decide if point Px/Py is inside triangle defined by (Ax,Ay) (Bx,By) (Cx,Cy)
-		static bool InsideTriangle(float Ax, float Ay, float Bx, float By, float Cx, float Cy, float Px, float Py);
+
+		/**
+		 * \brief compute area of a contour/polygon
+		 *
+		 */
+		static double Area(const Vector2dVector &contour);
+
+		/**
+		 * \brief decide if point Px/Py is inside triangle defined by (Ax,Ay) (Bx,By) (Cx,Cy)
+		 *
+		 */
+		static bool InsideTriangle(double p1x, double p1y, double p2x, double p2y, double p3x, double p3y, double px, double py);
+
+		/**
+		 * \brief decide if point Px/Py is inside triangle defined by (Ax,Ay) (Bx,By) (Cx,Cy)
+		 *
+		 */
+		static bool InsideTriangle(int p1x, int p1y, int p2x, int p2y, int p3x, int p3y, int px, int py);
 
 };
 
@@ -2623,30 +2645,30 @@ void Graphics::FillPolygon0(int n, int ppts[])
 	delete [] pts;
 }
 
-Vector2d::Vector2d(float x,float y)
+Vector2d::Vector2d(double x, double y)
 {
-	Set(x,y);
+	SetXY(x,y);
 }
 
-float Vector2d::GetX(void) const 
+double Vector2d::GetX() const 
 { 
 	return mX; 
 }
 
-float Vector2d::GetY(void) const 
+double Vector2d::GetY() const 
 {
 	return mY; 
 }
 
-void  Vector2d::Set(float x,float y)
+void  Vector2d::SetXY(double x, double y)
 {
 	mX = x;
 	mY = y;
 }
 
-bool Triangulate::Snip(const Vector2dVector &contour,int u,int v,int w,int n,int *V)
+bool Triangulate::Snip(const Vector2dVector &contour, int u, int v, int w, int n, int *V)
 {
-	float Ax, Ay, Bx, By, Cx, Cy, Px, Py;
+	double Ax, Ay, Bx, By, Cx, Cy, Px, Py;
 	int p;
 
 	Ax = contour[V[u]].GetX();
@@ -2673,7 +2695,6 @@ bool Triangulate::Snip(const Vector2dVector &contour,int u,int v,int w,int n,int
 	return true;
 }
 
-// triangulate a contour/polygon, places results in STL vector as series of triangles
 bool Triangulate::Process(const Vector2dVector &contour, Vector2dVector &result)
 {
 	// allocate and initialize list of Vertices in polygon
@@ -2734,10 +2755,9 @@ bool Triangulate::Process(const Vector2dVector &contour, Vector2dVector &result)
 	return true;
 }
 
-// compute area of a contour/polygon
-float Triangulate::Area(const Vector2dVector &contour)
+double Triangulate::Area(const Vector2dVector &contour)
 {
-	float A = 0.0f;
+	double A = 0.0f;
 	int n = contour.size();
 
 	for(int p=n-1,q=0; q<n; p=q++) {
@@ -2747,37 +2767,48 @@ float Triangulate::Area(const Vector2dVector &contour)
 	return A*0.5f;
 }
 
-// decide if point Px/Py is inside triangle defined by (Ax,Ay) (Bx,By) (Cx,Cy)
-bool Triangulate::InsideTriangle(float Ax, float Ay, float Bx, float By, float Cx, float Cy, float Px, float Py)
+bool Triangulate::InsideTriangle(double p1x, double p1y, double p2x, double p2y, double p3x, double p3y, double px, double py)
 {
-	float ax, 
-				ay, 
-				bx, 
-				by, 
-				cx, 
-				cy, 
-				apx, 
-				apy, 
-				bpx, 
-				bpy, 
-				cpx, 
-				cpy,
-				cCROSSap, 
-				bCROSScp, 
-				aCROSSbp;
+	double ax, 
+				 ay, 
+				 bx, 
+				 by, 
+				 cx, 
+				 cy, 
+				 apx, 
+				 apy, 
+				 bpx, 
+				 bpy, 
+				 cpx, 
+				 cpy,
+				 cCROSSap, 
+				 bCROSScp, 
+				 aCROSSbp;
 
-	ax = Cx - Bx;  ay = Cy - By;
-	bx = Ax - Cx;  by = Ay - Cy;
-	cx = Bx - Ax;  cy = By - Ay;
-	apx= Px - Ax;  apy= Py - Ay;
-	bpx= Px - Bx;  bpy= Py - By;
-	cpx= Px - Cx;  cpy= Py - Cy;
+	ax = p3x - p2x; ay = p3y - p2y;
+	bx = p1x - p3x; by = p1y - p3y;
+	cx = p2x - p1x; cy = p2y - p1y;
+	apx = px - p1x; apy = py - p1y;
+	bpx = px - p2x; bpy = py - p2y;
+	cpx = px - p3x; cpy = py - p3y;
 
 	aCROSSbp = ax*bpy - ay*bpx;
 	cCROSSap = cx*apy - cy*apx;
 	bCROSScp = bx*cpy - by*cpx;
 
 	return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
+}
+
+bool Triangulate::InsideTriangle(int p1x, int p1y, int p2x, int p2y, int p3x, int p3y, int px, int py)
+{
+	// A(PP1P2) + A(PP2P3) + A(PP3P1) > A(P1P2P3) is out
+
+	int area1 = abs(px*p1y+p2x*py+p1x*p2y-p2x*p1y-px*p2y-p1x*py),
+			area2 = abs(px*p3y+p2x*py+p3x*p2y-p2x*p3y-px*p2y-p3x*py),
+			area3 = abs(px*p1y+p3x*py+p1x*p3y-p3x*p1y-px*p3y-p1x*py),
+			areat = abs(p3x*p1y+p2x*p3y+p1x*p2y-p2x*p1y-p3x*p2y-p1x*py);
+
+	return (area1+area2+area3) <= areat;
 }
 
 double Graphics::EvaluateBezier0(double *data, int ndata, double t) 
@@ -3013,6 +3044,7 @@ void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double arc1
 					 eq_y_inf0 = x_inf*y;
 		double xi = -1.0,
 					 xf = -1.0;
+		bool flag = false;
 
 		for (double x=0; x<max_rx; x+=1.0) {
 			double min_ellipse,
@@ -3034,8 +3066,10 @@ void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double arc1
 				eq_y_inf = eq_y_sup0-y_sup*x;
 
 				if (eq_y_sup >= 0.0 && eq_y_inf <= 0.0) {
-						if (xi < 0.0) {
+						if (flag == false) {
 						xi = x;
+
+						flag = true;
 					}
 
 					xf = x;
@@ -3043,7 +3077,7 @@ void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double arc1
 			}
 		}
 
-		if  (xi < 0.0 || xf < 0.0) {
+		if  (flag == false) {
 			continue;
 		}
 
@@ -3108,65 +3142,8 @@ void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double arc1
 			k++;
 		}
 	}
-			
-	surface->DrawLines(surface, lines, k);
 	
-	if (_antialias_enabled == true) {
-		int cx = 0,
-				cy = 0;
-
-		if (quadrant == 0 || quadrant == 3) {
-			for (int y=1; y<k; y++) {
-				if (lines[y].x2 < lines[y-1].x2) {
-					cx = 1;
-					cy = lines[y-1].x2-lines[y].x2;
-				} else if (lines[y].x2 == lines[y-1].x2) {
-					if (cx > 0) {
-						cx = cx + 1;
-						cy = 0;
-					}
-				}
-
-				if (cx > 0) {
-					surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*cx));
-					surface->DrawLine(surface, lines[y].x2+1, lines[y].y1, lines[y].x2+1, lines[y].y1);
-
-					if (cy > 1) {
-						for (int i=1; i<cy; i++) {
-							surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*i));
-							surface->DrawLine(surface, lines[y].x2+i+1, lines[y].y1, lines[y].x2+i+1, lines[y].y1);
-						}
-					}
-				}
-			}
-		} else if (quadrant == 1 || quadrant == 2) {
-			for (int y=1; y<k; y++) {
-				if (lines[y].x1 > lines[y-1].x1) {
-					cx = 1;
-					cy = lines[y].x1-lines[y-1].x1;
-				} else if (lines[y].x1 == lines[y-1].x1) {
-					if (cx > 0) {
-						cx = cx + 1;
-						cy = 0;
-					}
-				}
-
-				if (cx > 0) {
-					surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*cx));
-					surface->DrawLine(surface, lines[y].x1-1, lines[y].y1, lines[y].x1-1, lines[y].y1);
-
-					if (cy > 1) {
-						for (int i=1; i<cy; i++) {
-							surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*i));
-							surface->DrawLine(surface, lines[y].x1-i-1, lines[y].y1, lines[y].x1-i-1, lines[y].y1);
-						}
-					}
-				}
-			}
-		}
-
-		surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
-	}
+	surface->DrawLines(surface, lines, k);
 }
 
 void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
@@ -3220,35 +3197,38 @@ void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
 	for (double y=-amax; y<amax; y+=1.0) {
 		double xi = -1.0,
 					 xf = -1.0;
+		bool flag = false;
 
 		for (double x=-amax; x<amax; x+=1.0) {
 			double min_ellipse = A_min*x*x + B_min*y*y + 2*C_min*x*y + F_min,
 						 max_ellipse = A_max*x*x + B_max*y*y + 2*C_max*x*y + F_max;
 
 			if (min_ellipse >= 0.0 && max_ellipse <= 0.0) {
-				if (xi < 0) {
-					xi = xc+x;
+				if (flag == false) {
+					xi = x;
+				
+					flag = true;
 				}
 
-				xf = xc+x;
+				xf = x;
 			} else if (min_ellipse < 1.0) {
-				if (xi > 1) {
-					lines[k].x1 = (int)(xi);
+				if (flag == true) {
+					lines[k].x1 = (int)(xc+xi);
 					lines[k].y1 = (int)(yc+y);
 					lines[k].x2 = (int)(xc+x);
 					lines[k].y2 = (int)(yc+y);
 
-					xi = -1;
-
 					k++;
+				
+					flag = false;
 				}
 			}
 		}
 
-		if (xi > 0) {
-			lines[k].x1 = (int)(xi);
+		if (flag == true) {
+			lines[k].x1 = (int)(xc+xi);
 			lines[k].y1 = (int)(yc+y);
-			lines[k].x2 = (int)(xf);
+			lines[k].x2 = (int)(xc+xf);
 			lines[k].y2 = (int)(yc+y);
 
 			k++;
@@ -3256,67 +3236,6 @@ void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
 	}
 	
 	surface->DrawLines(surface, lines, k);
-
-	if (_antialias_enabled == true) {
-		int cx = 0,
-				cy = 0;
-
-		// quadrant 0, 1
-		for (int y=4; y<k; y+=4) {
-			if (lines[y+1].x1 > lines[y-4+1].x1) {
-				cx = 1;
-				cy = lines[y+1].x1-lines[y-4+1].x1;
-			} else if (lines[y+1].x1 == lines[y-4+1].x1) {
-				if (cx > 0) {
-					cx = cx + 1;
-					cy = 0;
-				}
-			}
-
-			if (cx > 0) {
-				surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*cx));
-				surface->DrawLine(surface, lines[y+1].x1-1, lines[y+1].y1, lines[y+1].x1-1, lines[y+1].y1);
-				surface->DrawLine(surface, lines[y+0].x2+1, lines[y+0].y2, lines[y+0].x2+1, lines[y+0].y2);
-
-				if (cy > 1) {
-					for (int i=1; i<cy; i++) {
-						surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*i));
-						surface->DrawLine(surface, lines[y+1].x1-i-1, lines[y+1].y1, lines[y+1].x1-i-1, lines[y+1].y1);
-						surface->DrawLine(surface, lines[y+0].x2+i+1, lines[y+0].y2, lines[y+0].x2+i+1, lines[y+0].y2);
-					}
-				}
-			}
-		}
-
-		// quadrant 2, 3
-		for (int y=4; y<k; y+=4) {
-			if (lines[y+2].x1 > lines[y-4+2].x1) {
-				cx = 1;
-				cy = lines[y+1].x1-lines[y-4+1].x1;
-			} else if (lines[y+2].x1 == lines[y-4+2].x1) {
-				if (cx > 0) {
-					cx = cx + 1;
-					cy = 0;
-				}
-			}
-
-			if (cx > 0) {
-				surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*cx));
-				surface->DrawLine(surface, lines[y+2].x1-1, lines[y+2].y1, lines[y+2].x1-1, lines[y+2].y1);
-				surface->DrawLine(surface, lines[y+3].x2+1, lines[y+3].y2, lines[y+3].x2+1, lines[y+3].y2);
-
-				if (cy > 1) {
-					for (int i=1; i<cy; i++) {
-						surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(2*i));
-						surface->DrawLine(surface, lines[y+2].x1-i-1, lines[y+2].y1, lines[y+2].x1-i-1, lines[y+2].y1);
-						surface->DrawLine(surface, lines[y+3].x2+i+1, lines[y+3].y2, lines[y+3].x2+i+1, lines[y+3].y2);
-					}
-				}
-			}
-		}
-
-		surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
-	}
 }
 
 void Graphics::DrawChord0(int xc, int yc, int rx, int ry, double arc0, double arc1, int size)
@@ -3362,13 +3281,12 @@ void Graphics::DrawChord0(int xc, int yc, int rx, int ry, double arc0, double ar
 				 c0 = (x0_inf*y0_sup-x0_sup*y0_inf);
 	
 	DFBRegion lines[4*(int)max_ry];
-	int xi,
-			xf,
-			k = 0;
+	int k = 0;
 
 	for (double y=-max_ry; y<max_ry; y+=1.0) {
-		xi = -1;
-		xf = -1;
+		double xi = -1.0,
+					 xf = -1.0;
+		bool flag = false;
 
 		for (double x=-max_rx; x<max_rx; x+=1.0) {
 			double min_ellipse,
@@ -3388,31 +3306,33 @@ void Graphics::DrawChord0(int xc, int yc, int rx, int ry, double arc0, double ar
 			if (max_ellipse <= 1.0) {
 				if (eq_y_sup <= 0.0) {
 					if (min_ellipse >= 1.0 || eq_y_inf >= 0.0) {
-						if (xi < 0) {
-							xi = xc+x;
+						if (flag == false) {
+							xi = x;
+
+							flag = true;
 						}
 
-						xf = xc+x;
+						xf = x;
 					} else if (min_ellipse < 1.0) {
-						if (xi > 1) {
-							lines[k].x1 = (int)(xi);
+						if (flag == true) {
+							lines[k].x1 = (int)(xc+xi);
 							lines[k].y1 = (int)(yc+y);
 							lines[k].x2 = (int)(xc+x);
 							lines[k].y2 = (int)(yc+y);
 
-							xi = -1;
-
 							k++;
+
+							flag = false;
 						}
 					}
 				}
 			}
 		}
 
-		if (xi > 0) {
-			lines[k].x1 = (int)(xi);
+		if (flag == true) {
+			lines[k].x1 = (int)(xc+xi);
 			lines[k].y1 = (int)(yc+y);
-			lines[k].x2 = (int)(xf);
+			lines[k].x2 = (int)(xc+xf);
 			lines[k].y2 = (int)(yc+y);
 
 			k++;
@@ -3422,11 +3342,100 @@ void Graphics::DrawChord0(int xc, int yc, int rx, int ry, double arc0, double ar
 	surface->DrawLines(surface, lines, k);
 }
 
-#endif
+void Graphics::AntiAlias0(DFBRegion *lines, int size)
+{
+	int cx1 = 0,
+			cx2 = 0,
+			cy1 = 0,
+			cy2 = 0;
+	int level = 4;
+	double up,
+				 alpha = 1.5;
+
+	for (int y=0; y<size; y++) {
+		// lines[y].x1 = lines[y].x1 + 1;
+		lines[y].x2 = lines[y].x2 - 1;
+
+		if ((lines[y].x2 - lines[y].x1) < 0) {
+			lines[y].x1 = lines[y].x2;
+		}
+	}
+
+	for (int y=0; y<size; y++) {
+		if (lines[y].x1 > lines[y+1].x1) {
+			up = true;
+			cx1 = 1;
+			cy1 = lines[y].x1-lines[y+1].x1-1;
+		} else if (lines[y].x1 < lines[y+1].x1) {
+			up = false;
+			cx1 = 1;
+			cy1 = lines[y+1].x1-lines[y].x1-1;
+		} else if (lines[y].x1 == lines[y+1].x1) {
+			if (cx1 > 0) {
+				cx1 = cx1 + 1;
+			}
+		}
+
+		if (lines[y].x2 > lines[y+1].x2) {
+			up = true;
+			cx2 = 1;
+			cy2 = lines[y].x2-lines[y+1].x2-1;
+		} else if (lines[y].x2 < lines[y+1].x2) {
+			up = false;
+			cx2 = 1;
+			cy2 = lines[y+1].x2-lines[y].x2-1;
+		} else if (lines[y].x2 == lines[y+1].x2) {
+			if (cx2 > 0) {
+				cx2 = cx2 + 1;
+			}
+		}
+
+		if (cx1 > level) {
+			cx1 = level;
+		}
+
+		if (cy1 > level) {
+			cy1 = level;
+		}
+
+		if (cx2 > level) {
+			cx2 = level;
+		}
+
+		if (cy2 > level) {
+			cy2 = level;
+		}
+
+		if (cx1 > 0) {
+			surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(alpha*cx1));
+			surface->DrawLine(surface, lines[y].x1-1, lines[y].y1, lines[y].x1-1, lines[y].y1);
+
+			if (cy1 > 0) {
+				for (int i=1; i<cy1; i++) {
+					surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(alpha*(i+1)));
+					surface->DrawLine(surface, lines[y].x1-i-1, lines[y].y1, lines[y].x1-i-1, lines[y].y1);
+				}
+			}
+		}
+
+		if (cx2 > 0) {
+			surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(alpha*cx2));
+			surface->DrawLine(surface, lines[y].x2+1, lines[y].y1, lines[y].x2+1, lines[y].y1);
+
+			if (cy2 > 0) {
+				for (int i=1; i<cy2; i++) {
+					surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha()/(alpha*(i+1)));
+					surface->DrawLine(surface, lines[y].x2+i+1, lines[y].y1, lines[y].x2+i+1, lines[y].y1);
+				}
+			}
+		}
+	}
+
+	surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
+}
 
 void Graphics::RotateImage0(OffScreenImage *img, int xcp, int ycp, int xp, int yp, int wp, int hp, double angle, uint8_t alpha)
 {
-#ifdef DIRECTFB_UI
 	int xc = SCALE_TO_SCREEN((xcp), _screen.width, _scale.width),
 			yc = SCALE_TO_SCREEN((ycp), _screen.height, _scale.height);
 	int x = SCALE_TO_SCREEN((xp), _screen.width, _scale.width),
@@ -3637,7 +3646,7 @@ void Graphics::RotateImage0(OffScreenImage *img, int xcp, int ycp, int xp, int y
 	
 	simg->Unlock(simg);
 	surface->Unlock(surface);
-#endif
 }
+#endif
 
 }

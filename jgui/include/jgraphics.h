@@ -238,6 +238,8 @@ class Graphics : public virtual jcommon::Object{
 		void DrawPie0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size);
 		void DrawChord0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size);
 		
+		void AntiAlias0(DFBRegion *lines, int size);
+
 		void RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
 #endif
 
