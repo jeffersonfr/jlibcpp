@@ -1064,7 +1064,7 @@ void Graphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double a
 
 	jline_join_t line_join = _line_join;
 
-	_line_join = MITER_JOIN;
+	_line_join = BEVEL_JOIN;
 
 	DrawPolygon(xcp, ycp, p, 3, false);
 
@@ -1199,17 +1199,23 @@ void Graphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
 				int a2 = scaled[((i+1)%npoints)*2+0].y-scaled[((i+1)%npoints)*2+1].y,
 						b2 = scaled[((i+1)%npoints)*2+0].x-scaled[((i+1)%npoints)*2+1].x,
 						c2 = scaled[((i+1)%npoints)*2+0].x*scaled[((i+1)%npoints)*2+1].y-scaled[((i+1)%npoints)*2+1].x*scaled[((i+1)%npoints)*2+0].y;
-				int x0 = (b1*c2-b2*c1)/(a1*b2-a2*b1),
-						y0 = (a1*c2-a2*c1)/(a1*b2-a2*b1);
-
+				int dx0 = (a1*b2-a2*b1),
+						dy0 = (a1*b2-a2*b1);
+				
 				FillTriangle(
 						xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
 						xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y, 
 						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
-				FillTriangle(
-						xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
-						xp+x0, yp+y0,
-						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
+				
+				if (dx0 != 0 && dy0 != 0) {
+					int x0 = (b1*c2-b2*c1)/(a1*b2-a2*b1),
+							y0 = (a1*c2-a2*c1)/(a1*b2-a2*b1);
+
+					FillTriangle(
+							xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
+							xp+x0, yp+y0,
+							xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
+				}
 			}
 		}
 	}
@@ -2963,8 +2969,8 @@ void Graphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double arc1
 
 	double line_width = (double)size;
 	
-	if (line_width > std::max(rx, ry)) {
-		line_width = std::max(rx, ry);
+	if (line_width > std::max(rx, ry)-1) {
+		line_width = std::max(rx, ry)-1;
 	}
 	
 	if (quadrant == 0) {
