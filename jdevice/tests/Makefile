@@ -1,16 +1,18 @@
-AR					= ar
-CC					= g++
-JAVA				= javac
+HOST			= 
 
-TARGET_ARCH = linux
+AR				= $(HOST)ar
+CC				= $(HOST)g++
+RANLIB		= $(HOST)ranlib
+JAVA			= $(HOST)javac
 
-DEBUG  			= -g -ggdb 
-OTHER  			= -Wall  -fomit-frame-pointer -O2
+STRIP			= $(HOST)strip
 
-INCLUDE			= -I. `pkg-config --cflags jlibcpp`
-LIBRARY 		= -L. `pkg-config --libs jlibcpp`
+DEBUG  		= -g -ggdb 
 
-CCFLAGS			= $(INCLUDE) $(DEBUG) $(OTHER)
+INCLUDE		= -I. `pkg-config --cflags jlibcpp`
+LIBRARY 	= -L. `pkg-config --libs jlibcpp`
+
+CCFLAGS		= -Wall -funroll-loops -O2 $(LDFLAGS) $(INCLUDE) $(DEBUG)
 
 ECHO				= echo -e
 

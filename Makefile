@@ -4,16 +4,16 @@ VERSION		= 1.0.0
 
 EXE			= lib$(MODULE)-$(VERSION).so
 
-AR			= ar
-CC			= g++
-RANLIB	= ranlib
-JAVA		= javac
+HOST			= 
 
-STRIP		= strip
+AR				= $(HOST)ar
+CC				= $(HOST)g++
+RANLIB		= $(HOST)ranlib
+JAVA			= $(HOST)javac
+
+STRIP			= $(HOST)strip
 
 DOXYGEN	= doxygen
-
-TARGET_ARCH = linux
 
 INCDIR		= ./include
 LIBDIR		= ./lib
@@ -30,9 +30,9 @@ DEBUG  		= -g -ggdb
 ENABLE_DEBUG		?= yes
 ENABLE_DIRECTFB	?= yes
 
-# -ansi: problemas com va_copy()
 ARFLAGS		= -rc
-CFLAGS		= -fPIC -funroll-loops -Wall -shared -rdynamic -O2
+# -ansi: problemas com va_copy()
+CCFLAGS		= -Wall -shared -rdynamic -fpic -funroll-loops -O2
 
 INCLUDE		= \
 						-I. \
@@ -66,7 +66,7 @@ REQUIRES	= \
 
 ARFLAGS		+= \
 
-CFLAGS		+= \
+CCFLAGS		+= \
 						 $(DEFINES) \
 						 $(DEBUG) \
 						 $(INCLUDE) \
@@ -395,11 +395,11 @@ SRCS	= $(SRCS_jcommon) $(SRCS_jmath) $(SRCS_jmpeg) $(SRCS_jdevice) $(SRCS_jresou
 all: $(EXE)
 
 $(EXE): $(SRCS)
-	@$(CC) $(CFLAGS) -o $(EXE) $(SRCS) $(LIBRARY)
+	@$(CC) $(CCFLAGS) -o $(EXE) $(SRCS) $(LIBRARY)
 	@mkdir -p $(BINDIR) $(LIBDIR) && mv $(EXE) $(LIBDIR)
 
 .cpp.o: $<  
-	@$(CC) $(CFLAGS) -c $< -o $@ && $(ECHO) "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) -c $< -o $@ && $(ECHO) "Compiling $< ...  $(OK)" 
 
 strip:
 	@$(ECHO) "Strip $(EXE)...  $(OK)"

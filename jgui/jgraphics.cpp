@@ -3183,117 +3183,67 @@ void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
 				 min_ry = ry-line_width,
 				 max_rx = rx,
 				 max_ry = ry;
-	double dmin_rx = min_rx*min_rx,
-				 dmin_ry = min_ry*min_ry,
-				 dmax_rx = max_rx*max_rx,
-				 dmax_ry = max_ry*max_ry;
-	DFBRegion lines[4*(int)max_ry];
-	int old_x = max_rx,
-			old_y = 0;
+	DFBRegion lines[4*(int)(max_rx+max_ry)];
 	int k = 0;
 
-	for (double y=0.0; y<max_ry; y+=1.0) {
+	double angle = _radians;
+
+	if (max_rx < max_ry) {
+		angle = M_PI_2 - angle;
+	}
+
+	double amax = std::max(max_rx, max_ry),
+				 bmax = std::min(max_rx, max_ry),
+				 cmax = sqrt(amax*amax-bmax*bmax),
+				 xc_max = cmax*cos(angle),
+				 yc_max = cmax*sin(angle),
+				 A_max = amax*amax-xc_max*xc_max,
+				 B_max = amax*amax-yc_max*yc_max,
+				 C_max = -xc_max*yc_max,
+				 F_max = -amax*amax*bmax*bmax;
+	double amin = std::max(min_rx, min_ry),
+				 bmin = std::min(min_rx, min_ry),
+				 cmin = sqrt(amin*amin-bmin*bmin),
+				 xc_min = cmin*cos(angle),
+				 yc_min = cmin*sin(angle),
+				 A_min = amin*amin-xc_min*xc_min,
+				 B_min = amin*amin-yc_min*yc_min,
+				 C_min = -xc_min*yc_min,
+				 F_min = -amin*amin*bmin*bmin;
+
+	for (double y=-amax; y<amax; y+=1.0) {
 		double xi = -1.0,
 					 xf = -1.0;
 
-		for (double x=0.0; x<max_rx; x+=1.0) {
-			/* circle
-			double dsqrt = (x*x+y*y);
+		for (double x=-amax; x<amax; x+=1.0) {
+			double min_ellipse = A_min*x*x + B_min*y*y + 2*C_min*x*y + F_min,
+						 max_ellipse = A_max*x*x + B_max*y*y + 2*C_max*x*y + F_max;
 
-			if (dsqrt >= (min_rx*min_rx) && dsqrt <= (max_rx*max_rx)) {
-				if (xi < 0.0) {
-					xi = x;
+			if (min_ellipse >= 0.0 && max_ellipse <= 0.0) {
+				if (xi < 0) {
+					xi = xc+x;
 				}
 
-				xf = x;
-			}
-			*/
+				xf = xc+x;
+			} else if (min_ellipse < 1.0) {
+				if (xi > 1) {
+					lines[k].x1 = (int)(xi);
+					lines[k].y1 = (int)(yc+y);
+					lines[k].x2 = (int)(xc+x);
+					lines[k].y2 = (int)(yc+y);
 
-			double min_ellipse,
-						 max_ellipse;
+					xi = -1;
 
-			if (dmin_rx == 0.0 || dmin_ry == 0.0) {
-				min_ellipse = 1.0;
-				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
-			} else {
-				min_ellipse = (x*x)/dmin_rx+(y*y)/dmin_ry;
-				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
-			}
-
-			if (min_ellipse >= 1.0 && max_ellipse <= 1.0) {
-				if (xi < 0.0) {
-					xi = x;
+					k++;
 				}
-
-				xf = x;
 			}
 		}
 
-		if (line_width <= 1) {
-			// quadrante 0
-			lines[k].x1 = (int)(xc+old_x);
-			lines[k].y1 = (int)(yc-y);
-			lines[k].x2 = (int)(xc+xi);
-			lines[k].y2 = (int)(yc-y);
-
-			k++;
-
-			// quadrante 1
-			lines[k].x1 = (int)(xc-old_x-1);
-			lines[k].y1 = (int)(yc-y);
-			lines[k].x2 = (int)(xc-xi-1);
-			lines[k].y2 = (int)(yc-y);
-
-			k++;
-
-			// quadrante 2
-			lines[k].x1 = (int)(xc-old_x-1);
-			lines[k].y1 = (int)(yc+y+1);
-			lines[k].x2 = (int)(xc-xi-1);
-			lines[k].y2 = (int)(yc+y+1);
-
-			k++;
-
-			// quadrante 3
-			lines[k].x1 = (int)(xc+old_x);
-			lines[k].y1 = (int)(yc+y+1);
-			lines[k].x2 = (int)(xc+xi);
-			lines[k].y2 = (int)(yc+y+1);
-
-			k++;
-
-			old_x = xi;
-			old_y = y;
-		} else {
-			// quadrante 0
-			lines[k].x1 = (int)(xc+xi);
-			lines[k].y1 = (int)(yc-y);
-			lines[k].x2 = (int)(xc+xf);
-			lines[k].y2 = (int)(yc-y);
-
-			k++;
-
-			// quadrante 1
-			lines[k].x1 = (int)(xc-xf-1);
-			lines[k].y1 = (int)(yc-y);
-			lines[k].x2 = (int)(xc-xi-1);
-			lines[k].y2 = (int)(yc-y);
-
-			k++;
-
-			// quadrante 2
-			lines[k].x1 = (int)(xc-xf-1);
-			lines[k].y1 = (int)(yc+y+1);
-			lines[k].x2 = (int)(xc-xi-1);
-			lines[k].y2 = (int)(yc+y+1);
-
-			k++;
-
-			// quadrante 3
-			lines[k].x1 = (int)(xc+xi);
-			lines[k].y1 = (int)(yc+y+1);
-			lines[k].x2 = (int)(xc+xf);
-			lines[k].y2 = (int)(yc+y+1);
+		if (xi > 0) {
+			lines[k].x1 = (int)(xi);
+			lines[k].y1 = (int)(yc+y);
+			lines[k].x2 = (int)(xf);
+			lines[k].y2 = (int)(yc+y);
 
 			k++;
 		}
@@ -3432,8 +3382,6 @@ void Graphics::DrawChord0(int xc, int yc, int rx, int ry, double arc0, double ar
 			if (max_ellipse <= 1.0) {
 				if (eq_y_sup <= 0.0) {
 					if (min_ellipse >= 1.0 || eq_y_inf >= 0.0) {
-						// surface->DrawLine(surface, xc+x, yc+y, xc+x, yc+y);
-						 
 						if (xi < 0) {
 							xi = xc+x;
 						}
