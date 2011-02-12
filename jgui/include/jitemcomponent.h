@@ -290,19 +290,7 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void SetItemColor(Color &color);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetItemColor(int red, int green, int blue, int alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetItemFocusColor(Color &color);
 
 		/**
 		 * \brief
@@ -320,25 +308,7 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void SetSelectedItemColor(Color &color);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSelectedItemForegroundColor(Color &color);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetSelectedItemForegroundColor(int red, int green, int blue, int alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetItemForegroundColor(Color &color);
 
 		/**
 		 * \brief
@@ -350,13 +320,43 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void SetItemForegroundFocusColor(Color &color);
+		virtual void SetItemForegroundFocusColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetItemForegroundFocusColor(int red, int green, int blue, int alpha);
+		virtual void SetItemColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemFocusColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSelectedItemColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSelectedItemForegroundColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundFocusColor(const Color &color);
 
 		/**
 		 * \brief

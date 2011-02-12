@@ -81,25 +81,25 @@ class Cell : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetCellBackgroundColor(Color &color);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCellForegroundColor(Color &color);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetCellBackgroundColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetCellForegroundColor(int r, int g, int b, int a);
+		virtual void SetCellForegroundColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCellBackgroundColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCellForegroundColor(const Color &color);
 
 		/**
 		 * \brief
@@ -286,14 +286,14 @@ class Table : public Component, public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetGridColor(Color &color);
-		
+		virtual void SetGridColor(int red, int green, int blue, int alpha);
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetGridColor(int red, int green, int blue, int alpha);
-
+		virtual void SetGridColor(const Color &color);
+		
 		/**
 		 * \brief
 		 *

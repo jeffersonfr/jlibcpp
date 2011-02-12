@@ -814,32 +814,32 @@ void Component::SetBorderFocusColor(int red, int green, int blue, int alpha)
 	Repaint();
 }
 
-void Component::SetBackgroundColor(Color &color)
+void Component::SetBackgroundColor(const Color &color)
 {
 	_bgcolor = color;
 }
 
-void Component::SetForegroundColor(Color &color)
+void Component::SetForegroundColor(const Color &color)
 {
 	_fgcolor = color;
 }
 
-void Component::SetBackgroundFocusColor(Color &color)
+void Component::SetBackgroundFocusColor(const Color &color)
 {
 	_focus_bgcolor = color;
 }
 
-void Component::SetForegroundFocusColor(Color &color)
+void Component::SetForegroundFocusColor(const Color &color)
 {
 	_focus_fgcolor = color;
 }
 
-void Component::SetBorderColor(Color &color)
+void Component::SetBorderColor(const Color &color)
 {
 	_border_color = color;
 }
 
-void Component::SetBorderFocusColor(Color &color)
+void Component::SetBorderFocusColor(const Color &color)
 {
 	_focus_border_color = color;
 }

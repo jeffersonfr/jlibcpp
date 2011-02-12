@@ -289,19 +289,9 @@ Color & ItemComponent::GetItemForegroundFocusColor()
 	return _focus_item_fgcolor;
 }
 
-void ItemComponent::SetItemColor(Color &color)
-{
-	_item_color = color;
-}
-
 void ItemComponent::SetItemColor(int red, int green, int blue, int alpha)
 {
 	_item_color = Color(red, green, blue, alpha);
-}
-
-void ItemComponent::SetItemFocusColor(Color &color)
-{
-	_focus_item_color = color;
 }
 
 void ItemComponent::SetItemFocusColor(int red, int green, int blue, int alpha)
@@ -309,19 +299,9 @@ void ItemComponent::SetItemFocusColor(int red, int green, int blue, int alpha)
 	_focus_item_color = Color(red, green, blue, alpha);
 }
 
-void ItemComponent::SetSelectedItemColor(Color &color)
-{
-	_selected_item_color = color;
-}
-
 void ItemComponent::SetSelectedItemColor(int red, int green, int blue, int alpha)
 {
 	_selected_item_color = Color(red, green, blue, alpha);
-}
-
-void ItemComponent::SetSelectedItemForegroundColor(Color &color)
-{
-	_selected_item_fgcolor = color;
 }
 
 void ItemComponent::SetSelectedItemForegroundColor(int red, int green, int blue, int alpha)
@@ -329,24 +309,44 @@ void ItemComponent::SetSelectedItemForegroundColor(int red, int green, int blue,
 	_selected_item_fgcolor = Color(red, green, blue, alpha);
 }
 
-void ItemComponent::SetItemForegroundColor(Color &color)
-{
-	_item_fgcolor = color;
-}
-
 void ItemComponent::SetItemForegroundColor(int red, int green, int blue, int alpha)
 {
 	_item_fgcolor = Color(red, green, blue, alpha);
 }
 
-void ItemComponent::SetItemForegroundFocusColor(Color &color)
-{
-	_focus_item_fgcolor = color;
-}
-
 void ItemComponent::SetItemForegroundFocusColor(int red, int green, int blue, int alpha)
 {
 	_focus_item_fgcolor = Color(red, green, blue, alpha);
+}
+
+void ItemComponent::SetItemColor(const Color &color)
+{
+	_item_color = color;
+}
+
+void ItemComponent::SetItemFocusColor(const Color &color)
+{
+	_focus_item_color = color;
+}
+
+void ItemComponent::SetSelectedItemColor(const Color &color)
+{
+	_selected_item_color = color;
+}
+
+void ItemComponent::SetSelectedItemForegroundColor(const Color &color)
+{
+	_selected_item_fgcolor = color;
+}
+
+void ItemComponent::SetItemForegroundColor(const Color &color)
+{
+	_item_fgcolor = color;
+}
+
+void ItemComponent::SetItemForegroundFocusColor(const Color &color)
+{
+	_focus_item_fgcolor = color;
 }
 
 int ItemComponent::GetItemsSize()

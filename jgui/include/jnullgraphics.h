@@ -170,7 +170,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetColor(Color &color); 
+		virtual void SetColor(const Color &color); 
 		
 		/**
 		 * \brief

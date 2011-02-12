@@ -377,7 +377,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetColor(Color &color); 
+		virtual void SetColor(const Color &color); 
 		
 		/**
 		 * \brief

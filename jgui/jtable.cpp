@@ -87,12 +87,12 @@ Color & Cell::GetCellForegroundColor()
 	return _cell_fgcolor;
 }
 
-void Cell::SetCellBackgroundColor(Color &color)
+void Cell::SetCellBackgroundColor(const Color &color)
 {
 	_cell_bgcolor = color;
 }
 
-void Cell::SetCellForegroundColor(Color &color)
+void Cell::SetCellForegroundColor(const Color &color)
 {
 	_cell_fgcolor = color;
 }
@@ -392,7 +392,7 @@ Color & Table::GetGridColor()
 	return _grid_color;
 }
 
-void Table::SetGridColor(Color &color)
+void Table::SetGridColor(const Color &color)
 {
 	_grid_color = color;
 }

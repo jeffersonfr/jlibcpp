@@ -173,9 +173,9 @@ Color & ComboBox::GetItemColor()
 	return _menu->GetItemColor();
 }
 
-void ComboBox::SetItemColor(Color &color)
+Color & ComboBox::GetItemFocusColor()
 {
-	((jgui::ItemComponent *)_menu)->SetItemColor(color);
+	return _menu->GetItemFocusColor();
 }
 
 void ComboBox::SetItemColor(int red, int green, int blue, int alpha)
@@ -183,19 +183,19 @@ void ComboBox::SetItemColor(int red, int green, int blue, int alpha)
 	_menu->SetItemColor(red, green, blue, alpha);
 }
 
-Color & ComboBox::GetItemFocusColor()
-{
-	return _menu->GetItemFocusColor();
-}
-
-void ComboBox::SetItemFocusColor(Color &color)
-{
-	_menu->SetItemFocusColor(color);
-}
-
 void ComboBox::SetItemFocusColor(int red, int green, int blue, int alpha)
 {
 	_menu->SetItemFocusColor(red, green, blue, alpha);
+}
+
+void ComboBox::SetItemColor(const Color &color)
+{
+	((jgui::ItemComponent *)_menu)->SetItemColor(color);
+}
+
+void ComboBox::SetItemFocusColor(const Color &color)
+{
+	_menu->SetItemFocusColor(color);
 }
 
 int ComboBox::GetItemsSize()

@@ -119,7 +119,7 @@ class ComboBox : public jgui::ItemComponent, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		virtual void SetItemColor(Color &color);
+		virtual Color & GetItemFocusColor();
 
 		/**
 		 * \brief
@@ -131,19 +131,19 @@ class ComboBox : public jgui::ItemComponent, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		virtual Color & GetItemFocusColor();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetItemFocusColor(Color &color);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetItemFocusColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemFocusColor(const Color &color);
 
 		/**
 		 * \brief

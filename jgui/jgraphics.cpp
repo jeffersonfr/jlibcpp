@@ -456,7 +456,7 @@ Color & Graphics::GetColor()
 	return _color;
 } 
 
-void Graphics::SetColor(Color &color)
+void Graphics::SetColor(const Color &color)
 {
 	_color = color;
 

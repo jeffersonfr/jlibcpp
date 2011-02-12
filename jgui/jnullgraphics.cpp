@@ -120,7 +120,7 @@ Color & NullGraphics::GetColor()
 	return _color;
 }
 
-void NullGraphics::SetColor(Color &color)
+void NullGraphics::SetColor(const Color &color)
 {
 	JDEBUG(JINFO, "called\n");
 }

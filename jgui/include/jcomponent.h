@@ -656,37 +656,37 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetBackgroundColor(Color &color);
+		virtual void SetBackgroundColor(const Color &color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetForegroundColor(Color &color);
+		virtual void SetForegroundColor(const Color &color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetBackgroundFocusColor(Color &color);
+		virtual void SetBackgroundFocusColor(const Color &color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetForegroundFocusColor(Color &color);
+		virtual void SetForegroundFocusColor(const Color &color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetBorderColor(Color &color);
+		virtual void SetBorderColor(const Color &color);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetBorderFocusColor(Color &color);
+		virtual void SetBorderFocusColor(const Color &color);
 
 		/**
 		 * \brief
