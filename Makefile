@@ -39,7 +39,6 @@ INCLUDE		= \
 						-Iwin32/win32 \
 						-Ijcommon/include \
 						-Ijgui/include \
-						-Ijimage/include \
 						-Ijio/include \
 						-Ijlogger/include \
 						-Ijmath/include \
@@ -275,17 +274,6 @@ OBJS_jthread = \
 		 jtimer.o\
 	   jrunnable.o\
 
-OBJS_jimage = \
-		jimage.o\
-		jbitmap.o\
-		jimageexception.o\
-		jimagelib.o\
-		#jbufferedimage.o\
-		jgif.o\
-		jjpg.o\
-		jpng.o\
-		jppm.o\
-
 OBJS_jgui = \
 		jadjustmentevent.o\
 		jadjustmentlistener.o\
@@ -324,6 +312,9 @@ OBJS_jgui = \
 		jgridbaglayout.o\
 		jgridlayout.o\
 		jicon.o\
+		jimage.o\
+		jimageexception.o\
+		jindexedimage.o\
 		jimagebutton.o\
 		jinputdialogbox.o\
 		jinputmanager.o\
@@ -344,7 +335,6 @@ OBJS_jgui = \
 		jmouselistener.o\
 		jnullgraphics.o\
 		jnulllayout.o\
-		joffscreenimage.o\
 		jpanel.o\
 		jprogressbar.o\
 		jscrollbar.o\
@@ -377,7 +367,6 @@ OBJS_jgui = \
 
 SRCS_jcommon	= $(addprefix jcommon/,$(OBJS_jcommon))
 SRCS_jgui			= $(addprefix jgui/,$(OBJS_jgui))
-SRCS_jimage		= $(addprefix jimage/,$(OBJS_jimage))
 SRCS_jio			= $(addprefix jio/,$(OBJS_jio))
 SRCS_jlogger	= $(addprefix jlogger/,$(OBJS_jlogger))
 SRCS_jmath		= $(addprefix jmath/,$(OBJS_jmath))
@@ -389,8 +378,8 @@ SRCS_jshared	= $(addprefix jshared/,$(OBJS_jshared))
 SRCS_jsocket	= $(addprefix jsocket/,$(OBJS_jsocket))
 SRCS_jthread	= $(addprefix jthread/,$(OBJS_jthread))
 
-OBJS	= $(OBJS_jcommon) $(OBJS_jmath) $(OBJS_jmpeg) $(OBJS_jdevice) $(OBJS_jresource) $(OBJS_jsecurity) $(OBJS_jio) $(OBJS_jlogger) $(OBJS_jshared) $(OBJS_jsocket) $(OBJS_jthread) $(OBJS_jimage) $(OBJS_jgui)
-SRCS	= $(SRCS_jcommon) $(SRCS_jmath) $(SRCS_jmpeg) $(SRCS_jdevice) $(SRCS_jresource) $(SRCS_jsecurity) $(SRCS_jio) $(SRCS_jlogger) $(SRCS_jshared) $(SRCS_jsocket) $(SRCS_jthread) $(SRCS_jimage) $(SRCS_jgui)
+OBJS	= $(OBJS_jcommon) $(OBJS_jmath) $(OBJS_jmpeg) $(OBJS_jdevice) $(OBJS_jresource) $(OBJS_jsecurity) $(OBJS_jio) $(OBJS_jlogger) $(OBJS_jshared) $(OBJS_jsocket) $(OBJS_jthread) $(OBJS_jgui)
+SRCS	= $(SRCS_jcommon) $(SRCS_jmath) $(SRCS_jmpeg) $(SRCS_jdevice) $(SRCS_jresource) $(SRCS_jsecurity) $(SRCS_jio) $(SRCS_jlogger) $(SRCS_jshared) $(SRCS_jsocket) $(SRCS_jthread) $(SRCS_jgui)
 
 all: $(EXE)
 
@@ -416,7 +405,6 @@ install: uninstall
 	@$(ECHO) "Installing include files in $(PREFIX)/include/$(MODULE) $(OK)" && mkdir -p $(PREFIX)/include/$(MODULE)
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jcommon && install -o nobody -m 644 jcommon/include/* $(PREFIX)/include/$(MODULE)/jcommon
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jgui && install -o nobody -m 644 jgui/include/* $(PREFIX)/include/$(MODULE)/jgui
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jimage && install -o nobody -m 644 jimage/include/* $(PREFIX)/include/$(MODULE)/jimage
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jio && install -o nobody -m 644 jio/include/* $(PREFIX)/include/$(MODULE)/jio
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jlogger && install -o nobody -m 644 jlogger/include/* $(PREFIX)/include/$(MODULE)/jlogger
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmpeg && install -o nobody -m 644 jmpeg/include/* $(PREFIX)/include/$(MODULE)/jmpeg
@@ -453,7 +441,6 @@ ultraclean: clean uninstall
 	@find -iname "*~" -exec rm {} \;;
 	@cd jcommon/tests && make clean && cd -
 	@cd jgui/tests && make clean && cd -
-	@cd jimage/tests && make clean && cd -
 	@cd jio/tests && make clean && cd -
 	@cd jlogger/tests && make clean && cd -
 	@cd jmath/tests && make clean && cd -

@@ -103,8 +103,12 @@ OBJS_stress = \
 OBJS_mhp = \
 		mhp.o\
 
-OBJS_image = \
-		image.o\
+OBJS_drawimage = \
+		drawimage.o\
+		quantization.o\
+
+OBJS_rotateimage = \
+		rotateimage.o\
 
 OBJS_sort = \
 		sort.o\
@@ -124,7 +128,7 @@ OBJS_som = \
 OBJS_game = \
 		game.o\
 
-all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp image sort noise kmeans som stock
+all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -210,7 +214,10 @@ layouts: $(OBJS_layouts)
 mhp: $(OBJS_mhp)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-image: $(OBJS_image)
+drawimage: $(OBJS_drawimage)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+rotateimage: $(OBJS_rotateimage)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 sort: $(OBJS_sort)
@@ -238,4 +245,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp image sort noise kmeans som stock
+	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp drawimage rotateimage sort noise kmeans som stock
