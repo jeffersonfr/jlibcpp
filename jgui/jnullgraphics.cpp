@@ -62,7 +62,7 @@ jsize_t NullGraphics::GetWorkingScreenSize()
 	return t;
 }
 
-OffScreenImage * NullGraphics::Create()
+Image * NullGraphics::Create()
 {
 	JDEBUG(JINFO, "called\n");
 
@@ -351,12 +351,17 @@ void NullGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool cl
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillHorizontalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor)
+void NullGraphics::FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillVerticalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor)
+void NullGraphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+void NullGraphics::FillVerticalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -371,7 +376,7 @@ void NullGraphics::DrawString(std::string s, int xp, int yp)
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawString(std::string full_text, int x, int y, int width, int height, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
+void NullGraphics::DrawString(std::string full_text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -381,56 +386,56 @@ void NullGraphics::DrawGlyph(int symbol, int xp, int yp)
 	JDEBUG(JINFO, "called\n");
 }
 
-bool NullGraphics::DrawImage(std::string img, int x, int y)
+bool NullGraphics::DrawImage(std::string img, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(std::string img, int x, int y, int w, int h)
+bool NullGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y)
+bool NullGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h)
+bool NullGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(OffScreenImage *img, int x, int y)
+bool NullGraphics::DrawImage(Image *img, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(OffScreenImage *img, int x, int y, int w, int h)
+bool NullGraphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y)
+bool NullGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
 
 	return false;
 }
 
-bool NullGraphics::DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h)
+bool NullGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
@@ -490,7 +495,7 @@ uint32_t NullGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 	return pixel;
 }
 
-void NullGraphics::GetRGBArray(int startxp, int startyp, int wp, int hp, unsigned int **rgb, int offset, int scansize)
+void NullGraphics::GetRGB(int startxp, int startyp, int wp, int hp, unsigned int **rgb, int offset, int scansize)
 {
 	JDEBUG(JINFO, "called\n");
 }

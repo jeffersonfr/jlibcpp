@@ -41,7 +41,7 @@ Animation::~Animation()
 	WaitThread();
 
 	while (_images.size() > 0) {
-		OffScreenImage *prefetch = (*_images.begin());
+		Image *prefetch = (*_images.begin());
 
 		_images.erase(_images.begin());
 
@@ -101,9 +101,7 @@ void Animation::AddImage(std::string file)
 {
 	jthread::AutoLock lock(&_component_mutex);
 
-	OffScreenImage *prefetch = new OffScreenImage(_size.width, _size.height);
-
-	prefetch->GetGraphics()->DrawImage(file, 0, 0, _size.width, _size.height);
+	Image *prefetch = Image::CreateImage(file);
 
 	_images.push_back(prefetch);
 }
@@ -126,7 +124,7 @@ void Animation::Paint(Graphics *g)
 			ph = h-gapy;
 
 	if (_images.size() != 0) {
-		OffScreenImage *image = _images[_index];
+		Image *image = _images[_index];
 
 		g->DrawImage(image, px, py, pw, ph);
 	}

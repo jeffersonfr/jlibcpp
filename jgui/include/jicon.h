@@ -21,7 +21,7 @@
 #define J_ICON_H
 
 #include "jcomponent.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -36,7 +36,7 @@ namespace jgui{
 class Icon : public jgui::Component{
 
 	private:
-		jgui::OffScreenImage *_image;
+		jgui::Image *_image;
 		std::string _file,
 			_text;
 		jhorizontal_align_t _halign;
@@ -74,12 +74,6 @@ class Icon : public jgui::Component{
 		 */
 		virtual void SetImage(std::string file);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSize(int width, int height);
-		
 		/**
 		 * \brief
 		 *

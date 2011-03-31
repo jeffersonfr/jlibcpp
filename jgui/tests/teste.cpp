@@ -85,18 +85,27 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 			animation->SetInterval(2000);
 
-			animation->AddImage("icons/tux01.jpg");
-			animation->AddImage("icons/tux02.jpg");
-			animation->AddImage("icons/tux03.jpg");
-			animation->AddImage("icons/tux04.jpg");
-			animation->AddImage("icons/tux05.jpg");
-			animation->AddImage("icons/tux06.jpg");
-			animation->AddImage("icons/tux07.jpg");
-			animation->AddImage("icons/tux08.jpg");
-			animation->AddImage("icons/tux09.jpg");
-			animation->AddImage("icons/tux10.jpg");
-			animation->AddImage("icons/tux11.jpg");
-			animation->AddImage("icons/tux12.jpg");
+			animation->AddImage("images/tux-alien.png");
+			animation->AddImage("images/tux-bart.png");
+			animation->AddImage("images/tux-batman.png");
+			animation->AddImage("images/tux-freddy.png");
+			animation->AddImage("images/tux-homer.png");
+			animation->AddImage("images/tux-indiana.png");
+			animation->AddImage("images/tux-ipod.png");
+			animation->AddImage("images/tux-jamaican.png");
+			animation->AddImage("images/tux-jason.png");
+			animation->AddImage("images/tux-kenny.png");
+			animation->AddImage("images/tux-mario.png");
+			animation->AddImage("images/tux-neo.png");
+			animation->AddImage("images/tux-potter.png");
+			animation->AddImage("images/tux-raider.png");
+			animation->AddImage("images/tux-rambo.png");
+			animation->AddImage("images/tux-rapper.png");
+			animation->AddImage("images/tux-shrek.png");
+			animation->AddImage("images/tux-spiderman.png");
+			animation->AddImage("images/tux-turtle.png");
+			animation->AddImage("images/tux-wolverine.png");
+			animation->AddImage("images/tux-zombie.png");
 
 			animation->Start();
 		}
@@ -171,9 +180,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			image_button1 = new jgui::ImageButton("", "icons/alert_icon.png", 150, 760, 80, 60);
-			image_button2 = new jgui::ImageButton("", "icons/info_icon.png", 260, 760, 80, 60);
-			image_button3 = new jgui::ImageButton("", "icons/error_icon.png", 370, 760, 80, 60);
+			image_button1 = new jgui::ImageButton("", "images/alert_icon.png", 150, 760, 80, 60);
+			image_button2 = new jgui::ImageButton("", "images/info_icon.png", 260, 760, 80, 60);
+			image_button3 = new jgui::ImageButton("", "images/error_icon.png", 370, 760, 80, 60);
 		}
 
 		{
@@ -229,16 +238,48 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			list = new jgui::ListBox(1250, 450, 400, 300);
 
-			list->AddImageItem("opcao 1", jcommon::System::GetResourceDirectory() + "/images/red_icon.png");
-			list->AddTextItem("opcao 2");
-			list->AddImageItem("opcao 3", jcommon::System::GetResourceDirectory() + "/images/green_icon.png");
-			list->AddTextItem("opcao 4");
-			list->AddImageItem("opcao 5", jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png");
-			list->AddTextItem("opcao 6");
-			list->AddImageItem("opcao 7", jcommon::System::GetResourceDirectory() + "/images/blue_icon.png");
-			list->AddTextItem("opcao 8");
-			list->AddImageItem("opcao 9", jcommon::System::GetResourceDirectory() + "/images/red_icon.png");
-			list->AddTextItem("opcao 0");
+			list->AddImageItem("opcao 01", std::string("images/tux-alien.png"));
+			list->AddTextItem("opcao 02");
+			list->AddImageItem("opcao 03", std::string("images/tux-bart.png"));
+			list->AddTextItem("opcao 04");
+			list->AddImageItem("opcao 05", std::string("images/tux-batman.png"));
+			list->AddTextItem("opcao 06");
+			list->AddImageItem("opcao 07", std::string("images/tux-freddy.png"));
+			list->AddTextItem("opcao 08");
+			list->AddImageItem("opcao 09", std::string("images/tux-homer.png"));
+			list->AddTextItem("opcao 10");
+			list->AddImageItem("opcao 11", std::string("images/tux-indiana.png"));
+			list->AddTextItem("opcao 12");
+			list->AddImageItem("opcao 13", std::string("images/tux-ipod.png"));
+			list->AddTextItem("opcao 14");
+			list->AddImageItem("opcao 15", std::string("images/tux-jamaican.png"));
+			list->AddTextItem("opcao 16");
+			list->AddImageItem("opcao 17", std::string("images/tux-jason.png"));
+			list->AddTextItem("opcao 18");
+			list->AddImageItem("opcao 19", std::string("images/tux-kenny.png"));
+			list->AddTextItem("opcao 20");
+			list->AddImageItem("opcao 21", std::string("images/tux-mario.png"));
+			list->AddTextItem("opcao 22");
+			list->AddImageItem("opcao 23", std::string("images/tux-neo.png"));
+			list->AddTextItem("opcao 24");
+			list->AddImageItem("opcao 25", std::string("images/tux-potter.png"));
+			list->AddTextItem("opcao 26");
+			list->AddImageItem("opcao 27", std::string("images/tux-raider.png"));
+			list->AddTextItem("opcao 28");
+			list->AddImageItem("opcao 29", std::string("images/tux-rambo.png"));
+			list->AddTextItem("opcao 30");
+			list->AddImageItem("opcao 31", std::string("images/tux-rapper.png"));
+			list->AddTextItem("opcao 32");
+			list->AddImageItem("opcao 33", std::string("images/tux-shrek.png"));
+			list->AddTextItem("opcao 34");
+			list->AddImageItem("opcao 35", std::string("images/tux-spiderman.png"));
+			list->AddTextItem("opcao 36");
+			list->AddImageItem("opcao 37", std::string("images/tux-turtle.png"));
+			list->AddTextItem("opcao 38");
+			list->AddImageItem("opcao 39", std::string("images/tux-wolverine.png"));
+			list->AddTextItem("opcao 40");
+			list->AddImageItem("opcao 41", std::string("images/tux-zombie.png"));
+			list->AddTextItem("opcao 42");
 		}
 
 		{

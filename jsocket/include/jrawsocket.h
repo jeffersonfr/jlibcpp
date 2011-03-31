@@ -288,7 +288,7 @@ class RawSocket : public jsocket::Connection{
 		 * \brief Get received bytes from a source.
 		 *
 		 */
-		virtual int64_t GetReceiveBytes();
+		virtual int64_t GetReadedBytes();
 
 		/**
 		 * \brief Get a object SocketOption.

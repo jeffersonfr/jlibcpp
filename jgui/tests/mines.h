@@ -51,7 +51,7 @@ class Mines : public jgui::Frame, public jgui::FrameInputListener{
 
 	private:
 	jthread::Mutex mines_mutex;
-	jgui::OffScreenImage *small_bomb,
+	jgui::Image *small_bomb,
 		*huge_bomb,
 		*flag,
 		*smile_face,

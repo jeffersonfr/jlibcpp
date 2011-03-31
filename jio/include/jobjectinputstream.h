@@ -98,7 +98,7 @@ class ObjectInputStream : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual int64_t GetReceiveBytes();
+		virtual int64_t GetReadedBytes();
 
 		/**
 		 * \brief

@@ -124,10 +124,10 @@ void DataInputStream::Close()
 	}
 }
 
-int64_t DataInputStream::GetReceiveBytes()
+int64_t DataInputStream::GetReadedBytes()
 {
 	if (stream != NULL) {
-		return stream->GetReceiveBytes();
+		return stream->GetReadedBytes();
 	}
 
 	return 0LL;

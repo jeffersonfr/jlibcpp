@@ -21,7 +21,7 @@
 #define J_IMAGEBUTTON_H
 
 #include "jbutton.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 
 #include <string>
 
@@ -40,7 +40,7 @@ class ButtonEvent;
 class ImageButton : public Button{
 
 	protected:
-		OffScreenImage *_image_icon,
+		Image *_image_icon,
 			*_image_focus_icon;
 		std::string _image,
 			_image_focus;
@@ -69,12 +69,6 @@ class ImageButton : public Button{
 		 *
 		 */
 		virtual void SetImageFocus(std::string image);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSize(int width, int height);
 		
 		/**
 		 * \brief

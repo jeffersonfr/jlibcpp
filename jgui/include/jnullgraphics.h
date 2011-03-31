@@ -80,7 +80,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual OffScreenImage * Create();
+		virtual Image * Create();
 
 		/**
 		 * \brief
@@ -432,13 +432,19 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillHorizontalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor);
+		virtual void FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillVerticalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor);
+		virtual void FillVerticalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor);
 		
 		/**
 		 * \brief
@@ -450,49 +456,49 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int x, int y);
+		virtual bool DrawImage(std::string img, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int x, int y, int w, int h);
+		virtual bool DrawImage(std::string img, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y);
+		virtual bool DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h);
+		virtual bool DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int x, int y);
+		virtual bool DrawImage(Image *img, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int x, int y, int w, int h);
+		virtual bool DrawImage(Image *img, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y);
+		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h);
+		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
@@ -504,13 +510,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string text, int x, int y);
+		virtual void DrawString(std::string text, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
+		virtual void DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
 
 		/**
 		 * \brief
@@ -522,7 +528,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void GetRGBArray(int startxp, int startyp, int widthp, int heightp, uint32_t **rgb, int offset, int scansize);
+		virtual void GetRGB(int startxp, int startyp, int widthp, int heightp, uint32_t **rgb, int offset, int scansize);
 		
 		/**
 		 * \brief

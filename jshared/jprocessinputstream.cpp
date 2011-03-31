@@ -116,7 +116,7 @@ bool ProcessInputStream::IsClosed()
 	return false;
 }
 
-int64_t ProcessInputStream::GetReceiveBytes()
+int64_t ProcessInputStream::GetReadedBytes()
 {
 	return 0LL;
 }

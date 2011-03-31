@@ -208,7 +208,7 @@ class MulticastSocket : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		virtual int64_t GetReceiveBytes();
+		virtual int64_t GetReadedBytes();
 
 		/**
 		 * \brief

@@ -770,9 +770,9 @@ void SSLSocket::CreateSocket()
 							return _sent_bytes + _os->GetSentBytes();
 						}
 
-						int64_t SSLSocket::GetReceiveBytes()
+						int64_t SSLSocket::GetReadedBytes()
 						{
-							return _receive_bytes + _is->GetReceiveBytes();
+							return _receive_bytes + _is->GetReadedBytes();
 						}
 
 						SocketOption * SSLSocket::GetSocketOption()

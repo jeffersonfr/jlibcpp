@@ -18,13 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 
-/*
+/**
  * \brief Original code from balldrop applet.
  *
  */
 
 #include "jframe.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 #include "jmath.h"
 #include "jdate.h"
 
@@ -54,7 +54,7 @@ class Ball {
 					 vlen;
 		int w,
 				h;
-		jgui::OffScreenImage *_image;
+		jgui::Image *_image;
 
 	public:
 		Ball(double tx, double ty) 
@@ -134,7 +134,7 @@ class Ball {
 			return false;
 		}
 
-		void SetImage(jgui::OffScreenImage *image) 
+		void SetImage(jgui::Image *image) 
 		{
 			_image = image;
 			w = _image->GetWidth();
@@ -148,7 +148,7 @@ class Ball {
 				g->DrawImage(_image, (int)x-w/2, (int)y-h/2);
 		}
 
-		void Update(jgui::OffScreenImage *img, int x, int y, int width, int height) 
+		void Update(jgui::Image *img, int x, int y, int width, int height) 
 		{
 			if (img == _image) {
 				w = width;
@@ -165,7 +165,7 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 		std::vector<Ball *> _balls;
 		jgui::jsize_t offDimension,
 			backDimension;
-		jgui::OffScreenImage *offImage,
+		jgui::Image *offImage,
 			*backImage,
 			*pin,
 			*ball;
@@ -185,11 +185,11 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 			int w = 16,
 					h = 16;
 
-			ball = new jgui::OffScreenImage(w/2, h/2);
-			pin = new jgui::OffScreenImage(w, h);
+			ball = jgui::Image::CreateImage(w/2, h/2);
+			pin = jgui::Image::CreateImage(w, h);
 
-			ball->GetGraphics()->DrawImage("icons/smallball.png", 0, 0, ball->GetWidth(), ball->GetHeight());
-			pin->GetGraphics()->DrawImage("icons/smallpin.png", 0, 0, pin->GetWidth(), pin->GetHeight());
+			ball->GetGraphics()->DrawImage("images/smallball.png", 0, 0, ball->GetWidth(), ball->GetHeight());
+			pin->GetGraphics()->DrawImage("images/smallpin.png", 0, 0, pin->GetWidth(), pin->GetHeight());
 
 			pinw = pin->GetWidth();
 			pinh = pin->GetHeight();
@@ -246,7 +246,7 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 				jgui::Graphics *backGraphics;
 
 				backDimension = _size;
-				backImage = new jgui::OffScreenImage(_size.width, _size.height);
+				backImage = jgui::Image::CreateImage(_size.width, _size.height);
 				backGraphics = backImage->GetGraphics();
 
 				// Erase the previous image.
@@ -262,7 +262,7 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 
 			if ( (offImage == NULL) || (_size.width != offDimension.width) || (_size.height != offDimension.height) ) {
 				offDimension = _size;
-				offImage = new jgui::OffScreenImage(_size.width, _size.height);
+				offImage = jgui::Image::CreateImage(_size.width, _size.height);
 			}
 
 			offImage->GetGraphics()->DrawImage(backImage, 0, 0);

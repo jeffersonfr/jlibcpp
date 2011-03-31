@@ -120,7 +120,7 @@ class FileInputStream : public jio::InputStream{
 		 * \brief
 		 *
 		 */
-		virtual int64_t GetReceiveBytes();
+		virtual int64_t GetReadedBytes();
 
 };
 

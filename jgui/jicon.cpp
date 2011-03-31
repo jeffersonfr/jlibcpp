@@ -35,19 +35,7 @@ Icon::Icon(std::string file, int x, int y, int width, int height):
 	_file = file;
 	_text = file;
 
-	{
-		int x = _horizontal_gap+_border_size,
-				y = _vertical_gap+_border_size,
-				w = _size.width-2*x,
-				h = _size.height-2*y;
-
-		_image = new jgui::OffScreenImage(w, h);
-
-		if (_image->GetGraphics() == NULL || _image->GetGraphics()->DrawImage(_file, 0, 0, _image->GetWidth(), _image->GetHeight()) == false) {
-			delete _image;
-			_image = NULL;
-		}
-	}
+	_image = Image::CreateImage(_file);
 }
 
 Icon::~Icon()
@@ -56,50 +44,6 @@ Icon::~Icon()
 		delete _image;
 		_image = NULL;
 	}
-}
-
-void Icon::SetSize(int width, int height)
-{
-	if (_size.width == width && _size.height == height) {
-		return;
-	}
-
-	_size.width = width;
-	_size.height = height;
-
-	if (_size.width < _minimum_size.width) {
-		_size.width = _minimum_size.width;
-	}
-
-	if (_size.height < _minimum_size.height) {
-		_size.height = _minimum_size.height;
-	}
-
-	if (_size.width > _maximum_size.width) {
-		_size.width = _maximum_size.width;
-	}
-
-	if (_size.height > _maximum_size.height) {
-		_size.height = _maximum_size.height;
-	}
-
-	if (_image != NULL) {
-		delete _image;
-	}
-
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
-			w = _size.width-2*x,
-			h = _size.height-2*y;
-
-	_image = new OffScreenImage(w, h);
-
-	if (_image->GetGraphics() == NULL || _image->GetGraphics()->DrawImage(_file, 0, 0, _image->GetWidth(), _image->GetHeight()) == false) {
-		delete _image;
-		_image = NULL;
-	}
-
-	Repaint(true);
 }
 
 void Icon::SetText(std::string text)
@@ -131,17 +75,7 @@ void Icon::SetImage(std::string file)
 		_image = NULL;
 	}
 
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
-			w = _size.width-2*x,
-			h = _size.height-2*y;
-
-	_image = new OffScreenImage(w, h);
-
-	if (_image->GetGraphics() == NULL || _image->GetGraphics()->DrawImage(_file, 0, 0, _image->GetWidth(), _image->GetHeight()) == false) {
-		delete _image;
-		_image = NULL;
-	}
+	_image = Image::CreateImage(_file);
 
 	Repaint();
 }

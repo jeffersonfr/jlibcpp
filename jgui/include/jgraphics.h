@@ -178,7 +178,7 @@ struct jinsets_t {
 class Window;
 class Image;
 class Font;
-class OffScreenImage;
+class Image;
 
 /**
  * \brief
@@ -188,7 +188,7 @@ class OffScreenImage;
 class Graphics : public virtual jcommon::Object{
 	
 	friend class Window;
-	friend class OffScreenImage;
+	friend class Image;
 
 	protected:
 		jthread::Mutex graphics_mutex;
@@ -222,6 +222,9 @@ class Graphics : public virtual jcommon::Object{
 			double dxPerScan;
 		};
 
+		int CalculateGradientChannel(int schannel, int dchannel, int distance, int offset); 
+		void UpdateGradientColor(Color &scolor, Color &dcolor, int distance, int offset);
+
 		void MakeEdgeRec(struct jpoint_t lower, struct jpoint_t upper, int yComp, edge_t *edge, edge_t *edges[]);
 		void FillScan(int scan, edge_t *active);
 		int YNext(int k, int cnt, jpoint_t pts[]);
@@ -240,7 +243,7 @@ class Graphics : public virtual jcommon::Object{
 		
 		void AntiAlias0(DFBRegion *lines, int size);
 
-		void RotateImage0(OffScreenImage *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
+		void RotateImage0(Image *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
 #endif
 
 	protected:
@@ -263,12 +266,6 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static bool GetImageSize(std::string img, int *width, int *height);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetNativeSurface(void *surface);
 
 		/**
@@ -282,12 +279,6 @@ class Graphics : public virtual jcommon::Object{
 		 *
 		 */
 		virtual jsize_t GetWorkingScreenSize();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual OffScreenImage * Create();
 
 		/**
 		 * \brief
@@ -639,13 +630,19 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void FillHorizontalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor);
+		virtual void FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillVerticalGradient(int x, int y, int w, int h, Color &scolor, Color &dcolor);
+		virtual void FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void FillVerticalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor);
 		
 		/**
 		 * \brief
@@ -657,49 +654,49 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int x, int y);
+		virtual bool DrawImage(std::string img, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int x, int y, int w, int h);
+		virtual bool DrawImage(std::string img, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y);
+		virtual bool DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int sx, int sy, int sw, int sh, int x, int y, int w, int h);
+		virtual bool DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int x, int y);
+		virtual bool DrawImage(Image *img, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int x, int y, int w, int h);
+		virtual bool DrawImage(Image *img, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y);
+		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(OffScreenImage *img, int sx, int sy, int sw, int sh, int x, int y, int w, int h);
+		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
@@ -711,13 +708,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string text, int x, int y);
+		virtual void DrawString(std::string text, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string text, int x, int y, int width, int height, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
+		virtual void DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
 
 		/**
 		 * \brief
@@ -729,7 +726,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void GetRGBArray(int startxp, int startyp, int widthp, int heightp, uint32_t **rgb, int offset, int scansize);
+		virtual void GetRGB(int startxp, int startyp, int widthp, int heightp, uint32_t **rgb, int scansize);
 		
 		/**
 		 * \brief

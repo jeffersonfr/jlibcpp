@@ -568,9 +568,9 @@ void Socket::CreateSocket()
 							return _sent_bytes + _os->GetSentBytes();
 						}
 
-						int64_t Socket::GetReceiveBytes()
+						int64_t Socket::GetReadedBytes()
 						{
-							return _receive_bytes + _is->GetReceiveBytes();
+							return _receive_bytes + _is->GetReadedBytes();
 						}
 
 						SocketOption * Socket::GetSocketOption()

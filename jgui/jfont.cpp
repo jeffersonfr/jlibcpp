@@ -39,6 +39,10 @@ Font::Font(std::string name, int attr, int height, int scale_width, int scale_he
 	_ascender = 0;
 	_descender = 0;
 	_virtual_height = height;
+	
+	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
+	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
+
 	_scale.width = scale_width;
 	_scale.height = scale_height;
 
@@ -138,27 +142,27 @@ int Font::GetVirtualHeight()
 
 int Font::GetHeight()
 {
-	return (int)ceil(((double)_height*(double)_scale.height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
+	return SCREEN_TO_SCALE(_height, _screen.width, _scale.width);
 }
 
 int Font::GetAscender()
 {
-	return (int)ceil(((double)_ascender*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	return SCREEN_TO_SCALE(_ascender, _screen.width, _scale.width);
 }
 
 int Font::GetDescender()
 {
-	return (int)ceil(((double)abs(_descender)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	return SCREEN_TO_SCALE(abs(_descender), _screen.width, _scale.width);
 }
 
 int Font::GetMaxAdvanced()
 {
-	return (int)ceil(((double)_max_advance*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	return SCREEN_TO_SCALE(_max_advance, _screen.width, _scale.width);
 }
 
 int Font::GetLeading()
 {
-	return (int)ceil(((double)(_height/2)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	return SCREEN_TO_SCALE(_height/2.0, _screen.width, _scale.width);
 }
 
 int Font::GetStringWidth(std::string text)
@@ -173,7 +177,7 @@ int Font::GetStringWidth(std::string text)
 	_font->GetStringWidth(_font, text.c_str(), -1, &size);
 #endif
 	
-	return (int)round(((double)size*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
+	return SCREEN_TO_SCALE(size, _screen.width, _scale.width);
 }
 
 jregion_t Font::GetStringExtends(std::string text)
@@ -195,10 +199,10 @@ jregion_t Font::GetStringExtends(std::string text)
 
 	_font->GetStringExtents(_font, text.c_str(), -1, &lrect, NULL); // &irect);
 
-	region.x = (int)round(((double)(lrect.x)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
-	region.y = (int)round(((double)(lrect.y)*(double)_scale.height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
-	region.width = (int)round(((double)(lrect.w)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
-	region.height = (int)round(((double)(lrect.h)*(double)_scale.height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
+	region.x = SCREEN_TO_SCALE(lrect.x, _screen.width, _scale.width);
+	region.y = SCREEN_TO_SCALE(lrect.y, _screen.width, _scale.width);
+	region.width = SCREEN_TO_SCALE(lrect.w, _screen.width, _scale.width);
+	region.height = SCREEN_TO_SCALE(lrect.h, _screen.width, _scale.width);
 #endif
 	
 	return region;
@@ -223,10 +227,10 @@ jregion_t Font::GetGlyphExtends(int symbol)
 
 	_font->GetGlyphExtents(_font, symbol, &lrect, &advance);
 
-	region.x = (int)round(((double)(lrect.x)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
-	region.y = (int)round(((double)(lrect.y)*(double)_scale.height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
-	region.width = (int)round(((double)(lrect.w)*(double)_scale.width)/(double)GFXHandler::GetInstance()->GetScreenWidth());
-	region.height = (int)round(((double)(lrect.h)*(double)_scale.height)/(double)GFXHandler::GetInstance()->GetScreenHeight());
+	region.x = SCREEN_TO_SCALE(lrect.x, _screen.width, _scale.width);
+	region.y = SCREEN_TO_SCALE(lrect.y, _screen.width, _scale.width);
+	region.width = SCREEN_TO_SCALE(lrect.w, _screen.width, _scale.width);
+	region.height = SCREEN_TO_SCALE(lrect.h, _screen.width, _scale.width);
 #endif
 	
 	return region;
@@ -274,6 +278,9 @@ void Font::Release()
 
 void Font::Restore()
 {
+	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
+	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
+
 #ifdef DIRECTFB_UI
 	if (_font == NULL) {
 		((GFXHandler *)GFXHandler::GetInstance())->CreateFont(_name, _virtual_height, &_font, _scale.width, _scale.height);

@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jgfxhandler.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 #include "jruntimeexception.h"
 #include "jproperties.h"
 #include "jfont.h"
@@ -42,7 +42,7 @@ GFXHandler::GFXHandler():
 	_scale.height = DEFAULT_SCALE_HEIGHT;
 	
 #ifdef DIRECTFB_UI
-	_cursor = ARROW_CURSOR;
+	_cursor = DEFAULT_CURSOR;
 	_dfb = NULL;
 	_layer = NULL;
 #endif
@@ -569,22 +569,17 @@ void GFXHandler::SetCursor(jcursor_style_t t)
 #endif
 }
 
-void GFXHandler::SetCursor(OffScreenImage *shape, int hotx, int hoty)
+void GFXHandler::SetCursor(Image *shape, int hotx, int hoty)
 {
+	if ((void *)shape == NULL) {
+		return;
+	}
+
 #ifdef DIRECTFB_UI
-	IDirectFBSurface *surface = NULL;
+	IDirectFBDisplayLayer *layer = GFXHandler::GetInstance()->GetDisplayLayer();
+	IDirectFBSurface *surface = (IDirectFBSurface *)shape->GetGraphics()->GetNativeSurface();
 
-	if (shape != NULL) {
-		surface = (IDirectFBSurface *)shape->GetGraphics()->GetNativeSurface();
-	}
-
-	/*
-	if (window != NULL) {
-		window->SetCursorShape(window, surface, hotx, hoty);
-	}
-	*/
-
-	GFXHandler::GetInstance()->GetDisplayLayer()->SetCursorShape(GFXHandler::GetInstance()->GetDisplayLayer(), surface, hotx, hoty);
+	layer->SetCursorShape(layer, surface, hotx, hoty);
 #endif
 }
 
@@ -595,122 +590,40 @@ void GFXHandler::InitResources()
 void GFXHandler::InitCursors()
 {
 #ifdef DIRECTFB_UI
-	jgui::Graphics *g = NULL;
+
+#define CURSOR_INIT(type, ix, iy, hotx, hoty) 																\
+	t.cursor = Image::CreateImage(w, h);																				\
+																																							\
+	t.hot_x = SCALE_TO_SCREEN((hotx), _screen.width, _scale.width);							\
+	t.hot_y = SCALE_TO_SCREEN((hoty), _screen.height, _scale.height);						\
+	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);				\
+																																							\
+	_cursors[type] = t;																													\
+
 	struct cursor_params_t t;
-	int w = 32,
-		h = 32;
+	int w = 30,
+			h = 30;
 
-	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(0, _screen.width, _scale.width);
-	t.hot_y = SCALE_TO_SCREEN(0, _screen.height, _scale.height);
+	Image *cursors = Image::CreateImage(_DATA_PREFIX"/images/cursors.png");
 
-	_cursors[ARROW_CURSOR] = t;
+	CURSOR_INIT(DEFAULT_CURSOR, 0, 0, 8, 8);
+	CURSOR_INIT(CROSSHAIR_CURSOR, 4, 3, 15, 15);
+	CURSOR_INIT(EAST_CURSOR, 4, 4, 22, 15);
+	CURSOR_INIT(WEST_CURSOR, 5, 4, 9, 15);
+	CURSOR_INIT(NORTH_CURSOR, 6, 4, 15, 8);
+	CURSOR_INIT(SOUTH_CURSOR, 7, 4, 15, 22);
+	CURSOR_INIT(HAND_CURSOR, 1, 0, 15, 15);
+	CURSOR_INIT(MOVE_CURSOR, 8, 4, 15, 15);
+	CURSOR_INIT(NS_CURSOR, 2, 4, 15, 15);
+	CURSOR_INIT(WE_CURSOR, 3, 4, 15, 15);
+	CURSOR_INIT(NW_CORNER_CURSOR, 8, 1, 10, 10);
+	CURSOR_INIT(NE_CORNER_CURSOR, 9, 1, 20, 10);
+	CURSOR_INIT(SW_CORNER_CURSOR, 6, 1, 10, 20);
+	CURSOR_INIT(SE_CORNER_CURSOR, 7, 1, 20, 20);
+	CURSOR_INIT(TEXT_CURSOR, 7, 0, 15, 15);
+	CURSOR_INIT(WAIT_CURSOR, 8, 0, 15, 15);
 	
-	g = t.cursor->GetGraphics();
-	g->SetLineWidth(4);
-	g->SetColor(0xa0, 0xa0, 0xa0, 0xff);
-	g->FillTriangle(0, 0, 16, 0, 0, 16);
-	g->DrawLine(0, 0, 32, 32);
-	g->Flip();
-
-	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(30, _screen.width, _scale.width);
-	t.hot_y = SCALE_TO_SCREEN(30, _screen.height, _scale.height);
-
-	_cursors[SIZECORNER_CURSOR] = t;
-	
-	g = t.cursor->GetGraphics();
-	g->SetColor(0xa0, 0xa0, 0xa0, 0xff);
-	g->FillTriangle(16, 32, 32, 32, 32, 16);
-	g->SetLineWidth(4);
-	g->DrawTriangle(0, 32, 32, 0, 32, 32);
-	g->Flip();
-	
-	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
-	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
-
-	_cursors[SIZEALL_CURSOR] = t;
-	
-	g = t.cursor->GetGraphics();
-	g->SetColor(0xa0, 0xa0, 0xa0, 0xff);
-	g->FillTriangle(16, 0, 16+8, 8, 16-8, 8);
-	g->FillTriangle(16, 32, 16+6, 32-6, 16-6, 32-6);
-	g->FillTriangle(0, 16, 6, 16-6, 6, 16+6);
-	g->FillTriangle(32, 16, 32-6, 16+6, 32-6, 16-6);
-	g->DrawLine(16, 4, 16, 32);
-	g->DrawLine(0, 16, 32, 16);
-	g->Flip();
-	
-	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
-	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
-
-	_cursors[SIZENS_CURSOR] = t;
-	
-	g = t.cursor->GetGraphics();
-	g->SetLineWidth(4);
-	g->SetColor(0xa0, 0xa0, 0xa0, 0xff);
-	g->FillTriangle(16, 0, 16+8, 8, 16-8, 8);
-	g->FillTriangle(16, 32, 16+6, 32-6, 16-6, 32-6);
-	g->DrawLine(16, 4, 16, 32-4);
-	g->Flip();
-	
-	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
-	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
-
-	_cursors[SIZEWE_CURSOR] = t;
-	
-	g = t.cursor->GetGraphics();
-	g->SetLineWidth(4);
-	g->SetColor(0xa0, 0xa0, 0xa0, 0xff);
-	g->FillTriangle(0, 16, 6, 16-6, 6, 16+6);
-	g->FillTriangle(32, 16, 32-6, 16+6, 32-6, 16-6);
-	g->DrawLine(4, 16, 32-4, 16);
-	g->Flip();
-	
-	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
-	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
-
-	_cursors[SIZENWSE_CURSOR] = t;
-	
-	g = t.cursor->GetGraphics();
-	g->SetLineWidth(4);
-	g->SetColor(0xa0, 0xa0, 0xa0, 0xff);
-	g->FillTriangle(0, 0, 16, 0, 0, 16);
-	g->FillTriangle(32, 32, 16, 32, 32, 16);
-	g->DrawLine(0, 0, 32, 32);
-	g->Flip();
-	
-	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
-	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
-
-	_cursors[SIZENESW_CURSOR] = t;
-	
-	g = t.cursor->GetGraphics();
-	g->SetLineWidth(4);
-	g->SetColor(0xa0, 0xa0, 0xa0, 0xff);
-	g->FillTriangle(16, 0, 32, 0, 32, 16);
-	g->FillTriangle(0, 16, 0, 32, 16, 32);
-	g->DrawLine(0, 32, 32, 0);
-	g->Flip();
-	
-	t.cursor = new OffScreenImage(w, h);
-	t.hot_x = SCALE_TO_SCREEN(16, _screen.width, _scale.width);
-	t.hot_y = SCALE_TO_SCREEN(16, _screen.height, _scale.height);
-
-	_cursors[WAIT_CURSOR] = t;
-	
-	g = t.cursor->GetGraphics();
-	g->SetColor(0xa0, 0xa0, 0xa0, 0xff);
-	g->FillTriangle(0, 0, 32, 0, 16, 18);
-	g->FillTriangle(0, 32, 32, 32, 16, 14);
-	g->Flip();
-	
-	SetCursor(_cursors[_cursor].cursor, _cursors[_cursor].hot_x, _cursors[_cursor].hot_y);
+	SetCursor(_cursors[DEFAULT_CURSOR].cursor, _cursors[DEFAULT_CURSOR].hot_x, _cursors[DEFAULT_CURSOR].hot_y);
 #endif
 }
 
@@ -791,8 +704,8 @@ void GFXHandler::Restore()
 		(*i)->Restore();
 	}
 	
-	// INFO:: restoring offscreenimages
-	for (std::vector<OffScreenImage *>::iterator i=_offscreenimages.begin(); i!=_offscreenimages.end(); i++) {
+	// INFO:: restoring images
+	for (std::vector<Image *>::iterator i=_images.begin(); i!=_images.end(); i++) {
 		(*i)->Restore();
 	}
 	
@@ -816,8 +729,8 @@ void GFXHandler::Release()
 	// INFO:: release windows
 	WindowManager::GetInstance()->Release();
 	
-	// INFO:: release offscreenimage
-	for (std::vector<OffScreenImage *>::iterator i=_offscreenimages.begin(); i!=_offscreenimages.end(); i++) {
+	// INFO:: release image
+	for (std::vector<Image *>::iterator i=_images.begin(); i!=_images.end(); i++) {
 		(*i)->Release();
 	}
 	
@@ -878,20 +791,20 @@ void GFXHandler::Remove(Font *font)
 	}
 }
 
-void GFXHandler::Add(OffScreenImage *image)
+void GFXHandler::Add(Image *image)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	_offscreenimages.push_back(image);
+	_images.push_back(image);
 }
 
-void GFXHandler::Remove(OffScreenImage *image)
+void GFXHandler::Remove(Image *image)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<OffScreenImage *>::iterator i=_offscreenimages.begin(); i!=_offscreenimages.end(); i++) {
+	for (std::vector<Image *>::iterator i=_images.begin(); i!=_images.end(); i++) {
 		if (image == (*i)) {
-			_offscreenimages.erase(i);
+			_images.erase(i);
 
 			break;
 		}

@@ -532,7 +532,7 @@ class RTPSocket : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual int64_t GetReceiveBytes();
+		virtual int64_t GetReadedBytes();
 
 		/**
 		 * \brief

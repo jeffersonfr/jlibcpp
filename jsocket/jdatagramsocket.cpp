@@ -577,9 +577,9 @@ int64_t DatagramSocket::GetSentBytes()
 	return _sent_bytes + _os->GetSentBytes();
 }
 
-int64_t DatagramSocket::GetReceiveBytes()
+int64_t DatagramSocket::GetReadedBytes()
 {
-	return _receive_bytes + _is->GetReceiveBytes();
+	return _receive_bytes + _is->GetReadedBytes();
 }
 
 SocketOption * DatagramSocket::GetSocketOption()

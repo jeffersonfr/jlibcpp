@@ -22,7 +22,7 @@
 
 #include "jcontainer.h"
 #include "jwindowlistener.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 #include "jthemelistener.h"
 #include "jmutex.h"
 

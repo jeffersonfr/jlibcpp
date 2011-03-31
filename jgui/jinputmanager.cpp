@@ -190,8 +190,8 @@ void InputManager::Init()
 	jthread::AutoLock lock(&_mutex);
 
 #ifdef DIRECTFB_UI
-	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = ((IDirectFB *)dfb->GetGraphicEngine());
+	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = ((IDirectFB *)handler->GetGraphicEngine());
 
 	if (engine->CreateInputEventBuffer(engine, DICAPS_ALL, DFB_TRUE, &events) != DFB_OK) {
 		events = NULL;
@@ -990,7 +990,7 @@ void InputManager::ProcessWindowEvent(DFBWindowEvent event)
 			if (event.type == DWET_ENTER) {
 				GFXHandler::GetInstance()->SetCursor(current->GetCursor());
 			} else if (event.type == DWET_LEAVE) {
-				GFXHandler::GetInstance()->SetCursor(ARROW_CURSOR);
+				// CHANGED:: GFXHandler::GetInstance()->SetCursor(DEFAULT_CURSOR);
 			} else if (event.type == DWET_BUTTONUP || event.type == DWET_BUTTONDOWN || event.type == DWET_MOTION || event.type == DWET_WHEEL) {
 				jmouse_button_t button = JMOUSE_UNKNOWN;
 				jmouse_event_t type = JMOUSE_UNKNOWN_EVENT;

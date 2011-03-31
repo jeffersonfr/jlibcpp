@@ -156,7 +156,7 @@ class Connection : public virtual jcommon::Object{
 	 * \brief Get de bytes received from a source.
 	 *
 	 */
-	virtual int64_t GetReceiveBytes() = 0;
+	virtual int64_t GetReadedBytes() = 0;
 
 
 };

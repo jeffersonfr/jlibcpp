@@ -1,0 +1,242 @@
+/***************************************************************************
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   root@sat                                                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#include "Stdafx.h"
+#include "jindexedimage.h"
+#include "jimageexception.h"
+#include "jgfxhandler.h"
+
+namespace jgui {
+
+IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int width, int height, int scale_width, int scale_height):
+	Image(width, height, scale_width, scale_height)
+{
+	jcommon::Object::SetClassName("jgui::IndexedImage");
+	
+	_palette = new uint32_t[palette_size];
+	_palette_size = palette_size;
+	
+	memcpy(_palette, palette, palette_size*sizeof(uint32_t));
+	
+	int size = width*height;
+
+	_data = new uint8_t[size];
+	
+	memcpy(_data, data, size*sizeof(uint8_t));
+}
+
+IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int width, int height, int scale_width, int scale_height):
+	Image(width, height, scale_width, scale_height)
+{
+	jcommon::Object::SetClassName("jgui::IndexedImage");
+
+	_palette = new uint32_t[palette_size];
+	_palette_size = palette_size;
+	
+	memcpy(_palette, palette, palette_size*sizeof(uint32_t));
+	
+	int size = width*height;
+
+	_data = new uint8_t[size];
+
+	for (int i=0; i<size; i++) {
+		_data[i] = 0;
+
+		for (int j=0; j<_palette_size; j++) {
+			if (argb[i] == _palette[j]) {
+				_data[i] = j;
+
+				break;
+			}
+		}
+	}
+}
+
+IndexedImage::~IndexedImage()
+{
+	if ((void *)_palette != NULL) {
+		delete [] _palette;
+		_palette = NULL;
+	}
+
+	if ((void *)_data != NULL) {
+		delete [] _data;
+		_data = NULL;
+	}
+}
+
+IndexedImage * IndexedImage::Pack(Image *image)
+{
+	if ((void *)image != NULL) {
+		if (image->GetGraphics() != NULL) {
+			uint32_t *rgb = NULL;
+
+			image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
+
+			return Pack(rgb, image->GetWidth(), image->GetHeight(), image->GetScaleWidth(), image->GetScaleHeight());
+		}
+	}
+
+	return NULL;
+}
+
+IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height, int scale_width, int scale_height)
+{
+	uint32_t tempPalette[256];
+	int size = width*height;
+	int paletteLocation = 0;
+
+	for (int i=0; i<size; i++) {
+		uint32_t current = rgb[i];
+		bool flag = false;
+
+		for (int j=0; j<paletteLocation; j++) {
+			if (tempPalette[j] == current) {
+				flag = true;
+
+				break;
+			}
+		}
+		
+		if (flag == false) {
+			tempPalette[paletteLocation++] = current;
+		}
+
+		if (paletteLocation == 256) {
+			return NULL;
+		}
+	}
+
+	return new IndexedImage(tempPalette, paletteLocation, rgb, width, height, scale_width, scale_height);
+}
+
+uint8_t * IndexedImage::ScaleArray(uint8_t *array, int width, int height) 
+{
+	int srcWidth = GetWidth();
+	int srcHeight = GetHeight();
+	int srcSize = GetWidth()*GetHeight();
+	int size = width*height;
+	int yRatio = (srcHeight << 16) / height;
+	int xRatio = (srcWidth << 16) / width;
+	int xPos = xRatio / 2;
+	int yPos = yRatio / 2;
+	uint8_t *data = new uint8_t[size];
+
+	for (int x = 0; x < width; x++) {
+		int srcX = xPos >> 16;
+
+		for(int y = 0 ; y < height ; y++) {
+			int srcY = yPos >> 16;
+			int destPixel = x + y * width;
+			int srcPixel = srcX + srcY * srcWidth;
+
+			if((destPixel >= 0 && destPixel < size) && (srcPixel >= 0 && srcPixel < srcSize)) {
+				data[destPixel] = array[srcPixel];
+			}
+
+			yPos += yRatio;
+		}
+
+		yPos = yRatio / 2;
+		xPos += xRatio;
+	}
+
+	return data;
+}
+
+Image * IndexedImage::Scaled(int width, int height)
+{
+	return new IndexedImage(_palette, _palette_size, ScaleArray(_data, width, height), width, height, GetScaleWidth(), GetScaleHeight());
+}
+
+Image * IndexedImage::SubImage(int x, int y, int width, int height)
+{
+	if (width <= 0 || height <= 0) {
+		return NULL;
+	}
+
+	int size = width*height;
+	uint8_t data[size];
+
+	for (int i=0; i<size; i++) {
+		data[i] = _data[x + i%width + ((y + i/width) * _size.width)];
+	}
+
+	return new IndexedImage(_palette, _palette_size, data, width, height, GetScaleWidth(), GetScaleHeight());
+}
+
+void IndexedImage::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
+{
+	int width = GetWidth(),
+			height = GetHeight();
+
+	if ((xp+wp) > width || (yp+hp) > height) {
+		(*rgb) = NULL;
+
+		return;
+	}
+
+	if (*rgb == NULL) {
+		(*rgb) = new uint32_t[wp*hp];
+	}
+
+	int line,
+			data;
+
+	for (int j=0; j<hp; j++) {
+		data = (yp+j)*width+xp;
+		line = j*wp;
+
+		for (int i=0; i<wp; i++) {
+			*rgb[line + i] = _palette[_data[data+i]];
+		}
+	}
+}
+		
+void IndexedImage::GetPalette(uint32_t **palette, int *size)
+{
+	if (palette != NULL) {
+		*palette = _palette;
+	}
+
+	if (size != NULL) {
+		*size = _palette_size;
+	}
+}
+
+void IndexedImage::SetPalette(uint32_t *palette, int palette_size)
+{
+	_palette = new uint32_t[palette_size];
+	_palette_size = palette_size;
+	
+	memcpy(_palette, palette, palette_size*sizeof(uint32_t));
+}
+
+void IndexedImage::Release()
+{
+	// do nothing
+}
+
+void IndexedImage::Restore()
+{
+	// do nothing
+}
+
+}
+

@@ -22,7 +22,7 @@
 
 #include "jframe.h"
 #include "jframeinputlistener.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 #include "jmouselistener.h"
 #include "jitemcomponent.h"
 #include "jthememanager.h"
@@ -57,7 +57,7 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener, public
 
 		std::vector<Menu *> _menus;
 		jgui::Frame *_frame;
-		jgui::OffScreenImage *prefetch;
+		jgui::Image *prefetch;
 		jmenu_align_t _menu_align;
 		std::string _title;
 		int _top_index,

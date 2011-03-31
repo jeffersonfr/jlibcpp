@@ -100,7 +100,7 @@ class Tetris : public jgui::Frame, public jthread::Thread, jgui::FrameInputListe
 
 	public:
 		jgui::Graphics *goff;
-		jgui::OffScreenImage *ii;
+		jgui::Image *ii;
 		jgui::Font *largefont,
 			 *smallfont;
 		uint32_t blocks[7],
@@ -303,7 +303,7 @@ class Tetris : public jgui::Frame, public jthread::Thread, jgui::FrameInputListe
 		virtual void Paint(jgui::Graphics *g)
 		{
 			if (goff == NULL && d.width>0 && d.height>0) {
-				ii = new jgui::OffScreenImage(d.width, d.height);
+				ii = jgui::Image::CreateImage(d.width, d.height);
 
 				goff = ii->GetGraphics();
 			}

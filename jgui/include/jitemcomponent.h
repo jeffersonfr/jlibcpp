@@ -21,7 +21,7 @@
 #define J_ITEMCOMPONENT_H
 
 #include "jcomponent.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 
 #include <string>
 
@@ -50,7 +50,7 @@ class Item : public virtual jcommon::Object{
 
 	private:
 		std::vector<Item *> _childs;
-		OffScreenImage *_prefetch;
+		Image *_prefetch;
 		std::string _value,
 			_image;
 		jmenuitem_type_t _type;
@@ -203,7 +203,7 @@ class Item : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jgui::OffScreenImage * GetImage();
+		virtual jgui::Image * GetImage();
 
 		/**
 		 * \brief

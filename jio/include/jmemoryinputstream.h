@@ -35,7 +35,7 @@ class MemoryInputStream : public jio::InputStream{
 
 	private:
 		/** \brief */
-		uint8_t*_buffer;
+		uint8_t *_buffer;
 		/** \brief */
 		int64_t _buffer_size;
 		/** \brief */
@@ -46,7 +46,7 @@ class MemoryInputStream : public jio::InputStream{
 		 * \brief
 		 * 
 		 */
-		MemoryInputStream(uint8_t*data, int size);
+		MemoryInputStream(uint8_t *data, uint64_t size);
 		
 		/**
 		 * \brief
@@ -88,7 +88,7 @@ class MemoryInputStream : public jio::InputStream{
 		 * \brief
 		 * 
 		 */
-		virtual int64_t Read(char *, int64_t size);
+		virtual int64_t Read(char *data, int64_t size);
     
 		/**
 		 * \brief Salto relativo.
@@ -112,7 +112,7 @@ class MemoryInputStream : public jio::InputStream{
 		 * \brief
 		 *
 		 */
-		virtual int64_t GetReceiveBytes();
+		virtual int64_t GetReadedBytes();
 
 };
 

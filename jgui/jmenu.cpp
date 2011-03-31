@@ -31,17 +31,10 @@ Menu::Menu(int x, int y, int width, int visible_items):
 	_menu_align = SUBMENU_ALIGN;
 	_visible_items = visible_items;
 	_centered_interaction = true;
+	_item_size = DEFAULT_ITEM_SIZE;
 
 	if (_visible_items < 1) {
 		_visible_items = 1;
-	}
-
-	_item_size = DEFAULT_ITEM_SIZE;
-
-	prefetch = new OffScreenImage(_item_size, _item_size);
-	
-	if (prefetch->GetGraphics() != NULL) {
-		prefetch->GetGraphics()->DrawImage(_DATA_PREFIX"/images/check.png", 0, 0, _item_size, _item_size);
 	}
 
 	_frame = new Frame("", x, y, width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size));
@@ -50,6 +43,8 @@ Menu::Menu(int x, int y, int width, int visible_items):
 	_frame->SetDefaultExitEnabled(false);
 
 	_frame->RegisterInputListener(this);
+	
+	prefetch = Image::CreateImage(_DATA_PREFIX"/images/check.png");
 	
 	ThemeManager::GetInstance()->RegisterThemeListener(this);
 }

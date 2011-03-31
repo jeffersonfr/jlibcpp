@@ -163,7 +163,7 @@ int64_t SSLSocketInputStream::Available()
 	return (int64_t)_current_index;
 }
 
-int64_t SSLSocketInputStream::GetReceiveBytes()
+int64_t SSLSocketInputStream::GetReadedBytes()
 {
 	return (int64_t)_receive_bytes;
 }

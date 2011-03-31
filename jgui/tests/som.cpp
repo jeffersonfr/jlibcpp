@@ -1,5 +1,5 @@
 #include "jframe.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 #include "jthread.h"
 
 #include <stdio.h>
@@ -61,7 +61,7 @@ class som : public jgui::Frame, public jthread::Thread {
 		};
 	
 	public:
-		jgui::OffScreenImage *offscreen;
+		jgui::Image *offscreen;
 		int	W,
 				H,
 				NGEONEURON,
@@ -249,7 +249,7 @@ class som : public jgui::Frame, public jthread::Thread {
 			g->FillRectangle(0, 0, _size.width, _size.height);
 
 			if ((offscreen == NULL) || ((imagewidth != w) || (imageheight != h))) {
-				offscreen = new jgui::OffScreenImage(w, h);
+				offscreen = jgui::Image::CreateImage(w, h);
 				imagewidth = w;
 				imageheight = h;
 			}

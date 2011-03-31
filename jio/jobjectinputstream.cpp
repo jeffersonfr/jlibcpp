@@ -130,10 +130,10 @@ void ObjectInputStream::Close()
 	}
 }
 
-int64_t ObjectInputStream::GetReceiveBytes()
+int64_t ObjectInputStream::GetReadedBytes()
 {
 	if (stream != NULL) {
-		return stream->GetReceiveBytes();
+		return stream->GetReadedBytes();
 	}
 
 	return 0LL;

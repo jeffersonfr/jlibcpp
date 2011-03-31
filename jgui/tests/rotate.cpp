@@ -22,7 +22,7 @@
 class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread::Thread{
 
 	private:
-		jgui::OffScreenImage *_image,
+		jgui::Image *_image,
 			*_tiles;
 		double _tx,
 			_ty,
@@ -60,11 +60,11 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 
 			_tc = _tc/2;
 
-			_image = new jgui::OffScreenImage(_tw, _th);
-			_tiles = new jgui::OffScreenImage((10*_tile_w), (4*_tile_h));
+			_image = jgui::Image::CreateImage(_tw, _th);
+			_tiles = jgui::Image::CreateImage((10*_tile_w), (4*_tile_h));
 
-			_image->GetGraphics()->DrawImage("icons/tank2.png", 0, 0, _tw, _th);
-			_tiles->GetGraphics()->DrawImage("icons/tiles.png", 0, 0, (10*_tile_w), (4*_tile_h));
+			_image->GetGraphics()->DrawImage("images/tank2.png", 0, 0, _tw, _th);
+			_tiles->GetGraphics()->DrawImage("images/tiles.png", 0, 0, (10*_tile_w), (4*_tile_h));
 
 			SetSize((int)(10*_tile_w+_insets.left+_insets.right), (8*_tile_h+_insets.top+_insets.bottom));
 

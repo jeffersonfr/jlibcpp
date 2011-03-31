@@ -52,7 +52,7 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 	_graphics = NULL;
 
 	_opacity = 0xff;
-	_cursor = ARROW_CURSOR;
+	_cursor = DEFAULT_CURSOR;
 
 	SetBackgroundVisible(true);
 
@@ -684,7 +684,7 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 
 				c1->Paint(_graphics);
 				
-				_graphics->Flip(translate.x+x, translate.y+y, w, h);
+				// _graphics->Flip(translate.x+x, translate.y+y, w, h);
 
 				_graphics->ReleaseClip();
 				_graphics->Translate(-x, -y);

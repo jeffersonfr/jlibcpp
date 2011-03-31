@@ -41,7 +41,7 @@ class Tree : public jgui::ItemComponent{
 	private:
 		jthread::Mutex _tree_mutex;
 
-		jgui::OffScreenImage *_icon_plus,
+		jgui::Image *_icon_plus,
 			*_icon_minus;
 		std::string _title;
 		int _top_index,

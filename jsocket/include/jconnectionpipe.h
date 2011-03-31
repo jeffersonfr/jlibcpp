@@ -193,7 +193,7 @@ class ConnectionPipe : public jsocket::Connection, public jthread::Thread{
         * \brief Get received bytes from a source.
         *
         */
-        int64_t GetReceiveBytes();
+        int64_t GetReadedBytes();
 
 		/**
 		 * \brief

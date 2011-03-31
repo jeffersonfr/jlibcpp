@@ -23,7 +23,7 @@
 #include "jselectlistener.h"
 #include "jitemcomponent.h"
 #include "jbuttonlistener.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 
 #include "jthread.h"
 #include "jmutex.h"

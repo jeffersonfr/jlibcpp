@@ -505,9 +505,7 @@ class GraphicPanel : public jgui::Frame{
 
 		Clear(g);
 
-		jgui::OffScreenImage off(8*128, 8*128);
-
-		off.GetGraphics()->DrawImage("icons/goku.png", 0, 0, 8*128, 8*128);
+		jgui::Image *off = jgui::Image::CreateImage("images/tux-zombie.png");
 
 		// Blit [file]
 		DrawString(g, "Blit [file]");
@@ -516,7 +514,7 @@ class GraphicPanel : public jgui::Frame{
 			x = rand()%(1920-w-_insets.left-_insets.right);
 			y = rand()%(1080-h-_insets.top-_insets.bottom);
 
-			g->DrawImage("icons/goku.png", x+_insets.left, y+_insets.top, w, h);
+			g->DrawImage("images/tux-zombie.png", x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
 		}
@@ -535,7 +533,7 @@ class GraphicPanel : public jgui::Frame{
 			y = rand()%(1080-h-_insets.top-_insets.bottom);
 
 			g->SetColor(color);
-			g->DrawImage(&off, x+_insets.left, y+_insets.top, w, h);
+			g->DrawImage(off, x+_insets.left, y+_insets.top, w, h);
 			
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
 		}
@@ -555,7 +553,7 @@ class GraphicPanel : public jgui::Frame{
 			x = (1920-size)/2;
 			y = (1080-size)/2;
 
-			g->DrawImage("icons/goku.png", x, y, size, size);
+			g->DrawImage("images/tux-zombie.png", x, y, size, size);
 
 			g->Flip(x, y, size, size);
 			
@@ -586,7 +584,7 @@ class GraphicPanel : public jgui::Frame{
 			y = (1080-size)/2;
 
 			g->SetColor(color);
-			g->DrawImage(&off, x, y, size, size);
+			g->DrawImage(off, x, y, size, size);
 
 			g->Flip(x, y, size, size);
 			
@@ -618,7 +616,7 @@ class GraphicPanel : public jgui::Frame{
 
 			g->SetColor(color);
 			g->Rotate(angle);
-			g->DrawImage("icons/goku.png", x, y, size, size);
+			g->DrawImage("images/tux-zombie.png", x, y, size, size);
 
 			g->Flip(x, y, size, size);
 
@@ -661,7 +659,7 @@ class GraphicPanel : public jgui::Frame{
 
 			g->SetColor(color);
 			g->Rotate(angle);
-			g->DrawImage(&off, x, y, size, size);
+			g->DrawImage(off, x, y, size, size);
 
 			g->Flip(x, y, size, size);
 
@@ -679,6 +677,8 @@ class GraphicPanel : public jgui::Frame{
 		}
 
 		g->Rotate(0.0);
+
+		delete off;
 
 		sleep(2);
 

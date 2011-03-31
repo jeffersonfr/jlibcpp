@@ -53,7 +53,7 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 	private:
 
 	jgui::Graphics *goff;
-	jgui::OffScreenImage *ii;
+	jgui::Image *ii;
 	
 	dimension_t d;
 	
@@ -108,7 +108,7 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 		 scared,
 		 dying,
 		 flag;
-	jgui::OffScreenImage *ghost_bmp,
+	jgui::Image *ghost_bmp,
 		*pacman_bmp;
 
 	public:
@@ -285,9 +285,9 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 		scared=false;
 	}
 
-	jgui::OffScreenImage * GetImage(std::string image, int w, int h)
+	jgui::Image * GetImage(std::string image, int w, int h)
 	{
-		jgui::OffScreenImage *o = new jgui::OffScreenImage(w, h);
+		jgui::Image *o = jgui::Image::CreateImage(w, h);
 
 		o->GetGraphics()->DrawImage(image, 0, 0, w, h);
 
@@ -299,8 +299,8 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 		int w = blocksize,
 			h = blocksize;
 
-		ghost_bmp = GetImage("icons/ghosts.png", 8*w, 6*h);
-		pacman_bmp = GetImage("icons/pacman.png", 3*w, 5*h);
+		ghost_bmp = GetImage("images/ghosts.png", 8*w, 6*h);
+		pacman_bmp = GetImage("images/pacman.png", 3*w, 5*h);
 	}
 
 	virtual void InputChanged(jgui::KeyEvent *event)
@@ -356,7 +356,7 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 		std::string s;
 
 		if (goff == NULL && d.w>0 && d.h>0) {
-			ii = new jgui::OffScreenImage(d.w, d.h);
+			ii = jgui::Image::CreateImage(d.w, d.h);
 
 			goff = ii->GetGraphics();
 		}

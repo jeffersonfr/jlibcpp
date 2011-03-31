@@ -34,18 +34,7 @@ ImageButton::ImageButton(std::string label, std::string image, int x, int y, int
 	_image_icon = NULL;
 	_image_focus_icon = NULL;
 
-	if (_image != "") {
-		int x = _horizontal_gap+_border_size,
-				y = _vertical_gap+_border_size,
-				w = _size.width-2*x,
-				h = _size.height-2*y;
-
-		_image_icon = new OffScreenImage(w, h);
-		
-		if (_image_icon->GetGraphics() != NULL) {
-			_image_icon->GetGraphics()->DrawImage(_image, 0, 0, _image_icon->GetWidth(), _image_icon->GetHeight());
-		}
-	}
+	_image_icon = Image::CreateImage(_image);
 }
 
 ImageButton::~ImageButton()
@@ -59,110 +48,26 @@ ImageButton::~ImageButton()
 	}
 }
 
-void ImageButton::SetSize(int width, int height)
-{
-	if (_size.width == width && _size.height == height) {
-		return;
-	}
-
-	_size.width = width;
-	_size.height = height;
-
-	if (_size.width < _minimum_size.width) {
-		_size.width = _minimum_size.width;
-	}
-
-	if (_size.height < _minimum_size.height) {
-		_size.height = _minimum_size.height;
-	}
-
-	if (_size.width > _maximum_size.width) {
-		_size.width = _maximum_size.width;
-	}
-
-	if (_size.height > _maximum_size.height) {
-		_size.height = _maximum_size.height;
-	}
-
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
-			w = _size.width-2*x,
-			h = _size.height-2*y;
-
-	if (_image != "") {
-		if (_image_icon != NULL) {
-			delete _image_icon;
-		}
-
-		_image_icon = new OffScreenImage(w, h);
-		
-		if (_image_icon->GetGraphics() != NULL) {
-			_image_icon->GetGraphics()->Clear();
-			_image_icon->GetGraphics()->DrawImage(_image, 0, 0, _image_icon->GetWidth(), _image_icon->GetHeight());
-		}
-	}
-	
-	if (_image_focus != "") {
-		if (_image_focus_icon != NULL) {
-			if (_image_focus_icon != NULL) {
-				delete _image_focus_icon;
-			}
-
-			_image_focus_icon = new OffScreenImage(w, h);
-
-			if (_image_focus_icon->GetGraphics() != NULL) {
-				_image_focus_icon->GetGraphics()->DrawImage(_image_focus, 0, 0, _image_focus_icon->GetWidth(), _image_focus_icon->GetHeight());
-			}
-		}
-	}
-
-	Repaint(true);
-}
-
 void ImageButton::SetImage(std::string image)
 {
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
-			w = _size.width-2*x,
-			h = _size.height-2*y;
-
 	_image = image;
 
-	if (_image != "") {
-		if (_image_icon != NULL) {
-			delete _image_icon;
-			_image_icon = NULL;
-		}
-
-		_image_icon = new OffScreenImage(w, h);
-		
-		if (_image_icon->GetGraphics() != NULL) {
-			_image_icon->GetGraphics()->Clear();
-			_image_icon->GetGraphics()->DrawImage(_image, 0, 0, _image_icon->GetWidth(), _image_icon->GetHeight());
-		}
+	if (_image_icon != NULL) {
+		delete _image_icon;
 	}
+
+	_image_icon = Image::CreateImage(_image);
 }
 
 void ImageButton::SetImageFocus(std::string image)
 {
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
-			w = _size.width-2*x,
-			h = _size.height-2*y;
-
 	_image_focus = image;
 
 	if (_image_focus_icon != NULL) {
-		if (_image_focus_icon != NULL) {
-			delete _image_focus_icon;
-		}
-
-		_image_focus_icon = new OffScreenImage(w, h);
-		
-		if (_image_focus_icon->GetGraphics() != NULL) {
-			_image_focus_icon->GetGraphics()->DrawImage(_image_focus, 0, 0, _image_focus_icon->GetWidth(), _image_focus_icon->GetHeight());
-		}
+		delete _image_focus_icon;
 	}
+
+	_image_focus_icon = Image::CreateImage(_image_focus);
 }
 
 void ImageButton::Paint(Graphics *g)

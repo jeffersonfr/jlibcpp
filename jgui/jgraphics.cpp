@@ -21,7 +21,7 @@
 #include "jgraphics.h"
 #include "jmath.h"
 #include "jstringtokenizer.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 #include "jgfxhandler.h"
 #include "jfont.h"
 #include "jstringutils.h"
@@ -129,73 +129,6 @@ Graphics::Graphics(void *s, bool premultiplied):
 
 Graphics::~Graphics()
 {
-}
-
-bool Graphics::GetImageSize(std::string img, int *width, int *height)
-{
-	if (width != NULL) {
-		*width = -1;
-	}
-
-	if (height != NULL) {
-		*height = -1;
-	}
-
-#ifdef DIRECTFB_UI
-	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = (IDirectFB *)dfb->GetGraphicEngine();
-
-	IDirectFBImageProvider *provider = NULL;
-	DFBSurfaceDescription desc;
-
-	if (engine->CreateImageProvider(engine, img.c_str(), &provider) != DFB_OK) {
-		return false;
-	}
-
-	if (provider->GetSurfaceDescription(provider, &desc) == DFB_OK) {
-		provider->Release(provider);
-
-		if (width != NULL) {
-			*width = desc.width;
-		}
-
-		if (height != NULL) {
-			*height = desc.height;
-		}
-
-		return true;
-	}
-
-	provider->Release(provider);
-#endif
-	
-	return false;
-}
-
-OffScreenImage * Graphics::Create()
-{
-	OffScreenImage *image = NULL;
-
-#ifdef DIRECTFB_UI
-	if (surface != NULL) {
-		int w,
-				h;
-
-		surface->GetSize(surface, &w, &h);
-
-		w = SCREEN_TO_SCALE(w, _screen.width, _scale.width);
-		h = SCREEN_TO_SCALE(h, _screen.height, _scale.height);
-
-		image = new OffScreenImage(w, h);
-
-		IDirectFBSurface *s = image->GetGraphics()->surface;
-
-		s->Blit(s, surface, NULL, 0, 0);
-		s->Flip(s, NULL, DSFLIP_NONE);
-	}
-#endif
-
-	return image;
 }
 
 void * Graphics::GetNativeSurface()
@@ -408,10 +341,10 @@ void Graphics::Clear(int red, int green, int blue, int alpha)
 void Graphics::Idle()
 {
 #ifdef DIRECTFB_UI
-	IDirectFB *dfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
+	IDirectFB *engine = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
 
-	dfb->WaitIdle(dfb);
-	dfb->WaitForSync(dfb);
+	engine->WaitIdle(engine);
+	engine->WaitForSync(engine);
 #endif
 }
 
@@ -1264,6 +1197,44 @@ void Graphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints)
 #endif
 }
 
+int Graphics::CalculateGradientChannel(int schannel, int dchannel, int distance, int offset) 
+{
+	if (schannel == dchannel) {
+		return schannel;
+	}
+
+	return (int)(schannel-((schannel-dchannel)*((double)offset/(double)distance))) & 0xff;
+}
+
+void Graphics::UpdateGradientColor(Color &scolor, Color &dcolor, int distance, int offset) 
+{
+	int a = CalculateGradientChannel(scolor.GetAlpha(), dcolor.GetAlpha(), distance, offset);
+	int r = CalculateGradientChannel(scolor.GetRed(), dcolor.GetRed(), distance, offset);
+	int g = CalculateGradientChannel(scolor.GetGreen(), dcolor.GetGreen(), distance, offset);
+	int b = CalculateGradientChannel(scolor.GetBlue(), dcolor.GetBlue(), distance, offset);
+	
+	SetColor((a << 24) | (r << 16) | (g << 8) | (b << 0));
+}
+
+void Graphics::FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
+{
+	Color color = GetColor();
+
+	int height = hp;
+
+	while (wp > 0 && hp > 0) {
+		UpdateGradientColor(scolor, dcolor, height, hp);
+		FillArc(xp, yp, wp, hp, 0, 360);
+
+		xp += 1;
+		yp += 1;
+		wp -= 2;
+		hp -= 2;
+	}
+
+	SetColor(color);
+}
+
 void Graphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
 {
 	if (wp <= 0 || hp <= 0) {
@@ -1280,24 +1251,18 @@ void Graphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &sco
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	int sr = scolor.GetRed(),
-			sg = scolor.GetGreen(),
-			sb = scolor.GetBlue(),
-			sa = scolor.GetAlpha(); 
-
 	int line_width = _line_width;
 
 	_line_width = 1;
 
-	double difr = (double) (dcolor.GetRed() - sr) / h;
-	double difg = (double) (dcolor.GetGreen() - sg) / h;
-	double difb = (double) (dcolor.GetBlue() - sb) / h;
-	double difa = (double) (dcolor.GetAlpha() - sa) / h;
+	Color color = GetColor();
 
-	for (int i = 0; i < h; i++){
-		SetColor(sr + (int)(difr*i), sg + (int)(difg*i), sb + (int)(difb*i), sa + (int)(difa*i));
-		surface->DrawLine( surface, x, y + i, x + w - 1, y + i );
+	for (int i=0; i<w; i++) {
+		UpdateGradientColor(scolor, dcolor, w, i);
+		surface->DrawLine(surface, x+i, y, x+i, y+h-1);
 	}
+
+	SetColor(color);
 
 	_line_width = line_width;
 #endif
@@ -1319,24 +1284,18 @@ void Graphics::FillVerticalGradient(int xp, int yp, int wp, int hp, Color &scolo
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	int sr = scolor.GetRed(),
-			sg = scolor.GetGreen(),
-			sb = scolor.GetBlue(),
-			sa = scolor.GetAlpha(); 
-
 	int line_width = _line_width;
 
 	_line_width = 1;
 
-	double difr = (double) (dcolor.GetRed() - sr) / h;
-	double difg = (double) (dcolor.GetGreen() - sg) / h;
-	double difb = (double) (dcolor.GetBlue() - sb) / h;
-	double difa = (double) (dcolor.GetAlpha() - sa) / h;
+	Color color = GetColor();
 
-	for (int i = 0; i < w; i++){
-		SetColor(sr + (int)(difr*i), sg + (int)(difg*i), sb + (int)(difb*i), sa + (int)(difa*i));
-		surface->DrawLine( surface, x + i, y, x + i, y + h - 1);
+	for (int i=0; i<h; i++) {
+		UpdateGradientColor(scolor, dcolor, w, i);
+		surface->DrawLine(surface, x, y+i, x+w-1, y+i);
 	}
+
+	SetColor(color);
 
 	_line_width = line_width;
 #endif
@@ -1353,17 +1312,19 @@ void Graphics::DrawString(std::string text, int xp, int yp)
 		return;
 	}
 
-	OffScreenImage off(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
+	Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
 
-	off.GetGraphics()->SetFont(_font);
-	off.GetGraphics()->SetColor(_color);
+	off->GetGraphics()->SetFont(_font);
+	off->GetGraphics()->SetColor(_color);
 
-	IDirectFBSurface *fsurface = (IDirectFBSurface *)(off.GetGraphics()->GetNativeSurface());
+	IDirectFBSurface *fsurface = (IDirectFBSurface *)(off->GetGraphics()->GetNativeSurface());
 
 	fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
 	fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
 
-	DrawImage(&off, xp, yp);
+	DrawImage(off, xp, yp);
+
+	delete off;
 
 	/*
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
@@ -1402,17 +1363,19 @@ void Graphics::DrawGlyph(int symbol, int xp, int yp)
 
 	_font->_font->GetGlyphExtents(_font->_font, symbol, NULL, &advance);
 
-	OffScreenImage off(advance, _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
+	Image *off = Image::CreateImage(advance, _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
 
-	off.GetGraphics()->SetFont(_font);
-	off.GetGraphics()->SetColor(_color);
+	off->GetGraphics()->SetFont(_font);
+	off->GetGraphics()->SetColor(_color);
 
-	IDirectFBSurface *fsurface = (IDirectFBSurface *)(off.GetGraphics()->GetNativeSurface());
+	IDirectFBSurface *fsurface = (IDirectFBSurface *)(off->GetGraphics()->GetNativeSurface());
 
 	fsurface->DrawGlyph(fsurface, symbol, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
 	fsurface->DrawGlyph(fsurface, symbol, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
 
-	DrawImage(&off, xp, yp);
+	DrawImage(off, xp, yp);
+
+	delete off;
 
 	/*
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
@@ -1441,7 +1404,7 @@ bool Graphics::DrawImage(std::string img, int xp, int yp)
 	int iwidth,
 			iheight;
 
-	if (GetImageSize(img, &iwidth, &iheight) != false) {
+	if (Image::GetImageSize(img, &iwidth, &iheight) != false) {
 		int wp = SCREEN_TO_SCALE((iwidth), _screen.width, _scale.width),
 				hp = SCREEN_TO_SCALE((iheight), _screen.height, _scale.height);
 
@@ -1483,14 +1446,16 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
 	if (_radians != 0.0) {
-		OffScreenImage off(wp, hp);
-		Graphics *g = off.GetGraphics();
+		Image *off = Image::CreateImage(wp, hp);
+		Graphics *g = off->GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
 		g->SetColor(_color);
 		g->DrawImage(img, 0, 0, wp, hp);
 		
-		RotateImage0(&off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+		RotateImage0(off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+
+		delete off;
 
 		return true;
 	}
@@ -1499,8 +1464,8 @@ bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 	IDirectFBImageProvider *imgProvider = NULL;
 	DFBSurfaceDescription desc;
 
-	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = (IDirectFB *)dfb->GetGraphicEngine();
+	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
 
 	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
 		return false;
@@ -1560,14 +1525,16 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 		int wp = SCREEN_TO_SCALE((swp), _screen.width, _scale.width),
 				hp = SCREEN_TO_SCALE((shp), _screen.height, _scale.height);
 
-		OffScreenImage off(wp, hp);
-		Graphics *g = off.GetGraphics();
+		Image *off = Image::CreateImage(wp, hp);
+		Graphics *g = off->GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
 		g->SetColor(_color);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0);
 		
-		RotateImage0(&off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+		RotateImage0(off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+
+		delete off;
 
 		return true;
 	}
@@ -1576,8 +1543,8 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	IDirectFBImageProvider *imgProvider = NULL;
 	DFBSurfaceDescription desc;
 
-	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = (IDirectFB *)dfb->GetGraphicEngine();
+	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
 
 	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
 		return false;
@@ -1648,14 +1615,16 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
 	if (_radians != 0.0) {
-		OffScreenImage off(wp, hp);
-		Graphics *g = off.GetGraphics();
+		Image *off = Image::CreateImage(wp, hp);
+		Graphics *g = off->GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
 		g->SetColor(_color);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 		
-		RotateImage0(&off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+		RotateImage0(off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+
+		delete off;
 
 		return true;
 	}
@@ -1664,8 +1633,8 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	IDirectFBImageProvider *imgProvider = NULL;
 	DFBSurfaceDescription desc;
 
-	GFXHandler *dfb = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = (IDirectFB *)dfb->GetGraphicEngine();
+	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
 
 	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
 		return false;
@@ -1724,7 +1693,7 @@ bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, in
 	return true;
 }
 
-bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp)
+bool Graphics::DrawImage(Image *img, int xp, int yp)
 {
 	/*
 	if ((void *)img == NULL) {
@@ -1741,7 +1710,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp)
 	return DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight(), xp, yp);
 }
 
-bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp)
+bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 {
 	if ((void *)img == NULL) {
 		return false;
@@ -1750,7 +1719,7 @@ bool Graphics::DrawImage(OffScreenImage *img, int xp, int yp, int wp, int hp)
 	return DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight(), xp, yp, wp, hp);
 }
 
-bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp, int xp, int yp)
+bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
 	/*
 	if ((void *)img == NULL) {
@@ -1771,14 +1740,10 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 
 	Graphics *g = img->GetGraphics();
 
-	if ((void *)g == NULL) {
-		return false;
-	}
-
-	int sx = SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
-			sy = SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
-			sw = SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
-			sh = SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
+	int sx = SCALE_TO_SCREEN(sxp, _screen.width, img->GetScaleWidth()),
+			sy = SCALE_TO_SCREEN(syp, _screen.height, img->GetScaleHeight()),
+			sw = SCALE_TO_SCREEN(swp, _screen.width, img->GetScaleWidth()),
+			sh = SCALE_TO_SCREEN(shp, _screen.height, img->GetScaleHeight());
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
 			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
@@ -1790,26 +1755,46 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 	drect.h = sh;
 
 	if (_radians != 0.0) {
-		OffScreenImage off(img->GetWidth(), img->GetHeight());
-		
-		Graphics *g = off.GetGraphics();
+		Image *off = Image::CreateImage(img->GetWidth(), img->GetHeight());
+		Graphics *g = off->GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
 		g->SetColor(_color);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0);
 
-		RotateImage0(&off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, img->GetWidth(), img->GetHeight(), _radians, _color.GetAlpha());
+		RotateImage0(off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, img->GetWidth(), img->GetHeight(), _radians, _color.GetAlpha());
+
+		delete off;
 
 		return true;
 	}
 
-	surface->Blit(surface, g->surface, &drect, x, y);
+	if ((void *)g != NULL) {
+		surface->Blit(surface, g->surface, &drect, x, y);
+	} else {
+		Image *image = img->SubImage(sxp, syp, swp, shp);
+
+		uint32_t *rgb;
+
+		image->GetRGB(&rgb, 0, 0, img->GetWidth(), img->GetHeight());
+	
+		if (rgb != NULL) {
+			swp = (swp*_scale.width)/img->GetScaleWidth();
+			shp = (shp*_scale.height)/img->GetScaleHeight();
+
+			SetRGB(rgb, xp, yp, swp, shp, swp);
+
+			delete [] rgb;
+		}
+
+		delete image;
+	}
 #endif
 
 	return true;
 }
 
-bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
+bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
 #ifdef DIRECTFB_UI
 	if ((void *)surface == NULL) {
@@ -1822,14 +1807,10 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 
 	Graphics *g = img->GetGraphics();
 
-	if ((void *)g == NULL) {
-		return false;
-	}
-
-	int sx = SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
-			sy = SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
-			sw = SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
-			sh = SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
+	int sx = SCALE_TO_SCREEN(sxp, _screen.width, img->GetScaleWidth()),
+			sy = SCALE_TO_SCREEN(syp, _screen.height, img->GetScaleHeight()),
+			sw = SCALE_TO_SCREEN(swp, _screen.width, img->GetScaleWidth()),
+			sh = SCALE_TO_SCREEN(shp, _screen.height, img->GetScaleHeight());
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
 			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
 			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
@@ -1849,20 +1830,40 @@ bool Graphics::DrawImage(OffScreenImage *img, int sxp, int syp, int swp, int shp
 	drect.h = h;
 
 	if (_radians != 0.0) {
-		OffScreenImage off(wp, hp);
-		
-		Graphics *g = off.GetGraphics();
+		Image *off = Image::CreateImage(wp, hp);
+		Graphics *g = off->GetGraphics();
 
 		g->SetBlittingFlags(_blit_flags);
 		g->SetColor(_color);
 		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
 
-		RotateImage0(&off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+		RotateImage0(off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
+
+		delete off;
 
 		return true;
 	}
 
-	surface->StretchBlit(surface, g->surface, &srect, &drect);
+	if ((void *)g != NULL) {
+		surface->StretchBlit(surface, g->surface, &srect, &drect);
+	} else {
+		int iwp = (wp*img->GetScaleWidth())/_scale.width;
+		int ihp = (hp*img->GetScaleHeight())/_scale.height;
+
+		Image *image = img->Scaled((iwp*img->GetWidth())/swp, (ihp*img->GetHeight())/shp);
+
+		uint32_t *rgb = NULL;
+
+		image->GetRGB(&rgb, 0, 0, img->GetWidth(), img->GetHeight());
+		
+		if (rgb != NULL) {
+			SetRGB(rgb, _translate.x+xp, _translate.y+yp, wp, hp, wp);
+
+			delete [] rgb;
+		}
+
+		delete image;
+	}
 #endif
 
 	return true;
@@ -2213,7 +2214,7 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 	return pixel;
 }
 
-void Graphics::GetRGBArray(int startxp, int startyp, int wp, int hp, unsigned int **rgb, int offset, int scansize)
+void Graphics::GetRGB(int startxp, int startyp, int wp, int hp, unsigned int **rgb, int scansize)
 {
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
@@ -2231,23 +2232,37 @@ void Graphics::GetRGBArray(int startxp, int startyp, int wp, int hp, unsigned in
 	uint32_t *dst;
 	int x,
 			y,
-			depth,
 			pitch;
 	uint32_t *array = (*rgb);
 
-	depth = (scansize/wp);
-	scansize = depth*w;
-
 	if (*rgb == NULL) {
-		array = new uint32_t[(w-startx)*(h-starty)*depth];
+		array = new uint32_t[w*h];
+	}
+
+	int img_w,
+			img_h;
+	int max_w = startx+w,
+			max_h = starty+h;
+
+	surface->GetSize(surface, &img_w, &img_h);
+
+	if (max_w > img_w || max_h > img_h) {
+		(*rgb) = NULL;
+
+		return;
 	}
 
 	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
 
-	for (y=starty; y<starty+h; y++) {
-		for (x=startx; x<startx+w; x++) {
-			dst = (uint32_t *)((uint8_t *)ptr + (starty + y) * pitch);
-			array[offset + (y-starty)*scansize + (x-startx)] = *(dst + x + startx);
+	int line;
+
+	for (y=starty; y<max_h; y++) {
+		line = (y-starty)*scansize;
+
+		dst = (uint32_t *)((uint8_t *)ptr + (y+starty)*pitch);
+
+		for (x=startx; x<max_w; x++) {
+			array[line + (x-startx)] = *(dst + x + startx);
 		}
 	}
 
@@ -2275,7 +2290,7 @@ void Graphics::SetRGB(int xp, int yp, uint32_t argb)
 	surface->DrawLine(surface, x, y, x, y);
 }
 
-void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline) 
+void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline) 
 {
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
@@ -2284,32 +2299,33 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 
 	void *ptr;
 	uint32_t *dst,
-					 *prgb = rgb;
-	int cy,
-			step,
+					 *src = rgb;
+	int step = 0,
 			pitch;
 	int wmax,
 			hmax;
 
+	int x = SCALE_TO_SCREEN((xp), _screen.width, _scale.width),
+			y = SCALE_TO_SCREEN((yp), _screen.height, _scale.height),
+			w = SCALE_TO_SCREEN((xp+wp), _screen.width, _scale.width)-x,
+			h = SCALE_TO_SCREEN((yp+hp), _screen.height, _scale.height)-y;
+
 	surface->GetSize(surface, &wmax, &hmax);
 
-	wmax = SCREEN_TO_SCALE(wmax, _screen.width, _scale.width);
-	hmax = SCREEN_TO_SCALE(hmax, _screen.height, _scale.height);
-
-	if (w > wmax) {
-		w = wmax;
+	if (x > wmax) {
+		x = wmax;
 	}
 
-	if (x > w) {
-		x = w;
+	if (y > hmax) {
+		y = hmax;
 	}
 
-	if (h >= hmax) {
-		h = hmax-1;
+	if (x+w > wmax) {
+		w = wmax-x;
 	}
-
-	if (y > h) {
-		y = h;
+	
+	if (y+h > hmax) {
+		h = hmax-y;
 	}
 
 	wmax = x+w;
@@ -2317,73 +2333,49 @@ void Graphics::SetRGB(uint32_t *rgb, int x, int y, int w, int h, int scanline)
 
 	surface->Lock(surface, DSLF_WRITE, &ptr, &pitch);
 
-	double d = (double)_screen.height/(double)_scale.height; 
-
+	_draw_flags = DF_NOFX;
 	if (_draw_flags == DF_NOFX) {
-		double k;
-
-		step = 0;
-
-		for (int j=y; j<hmax-1; j++) {
-			cy = (int)(j*d);//SCALE_TO_SCREEN(j, _screen.height, _scale.height);
-			dst = (uint32_t *)((uint8_t *)ptr+cy*pitch);
-			prgb = (uint32_t *)(rgb+step);
+		for (int j=y; j<hmax; j++) {
+			dst = (uint32_t *)((uint8_t *)ptr+j*pitch);
+			src = (uint32_t *)(rgb+step-x);
 			step = step+w;
 
-			k = 0.0;
-
 			for (int i=x; i<wmax; i++) {
-				k = k+d;//SCALE_TO_SCREEN(i, _screen.width, _scale.width); 
-
-				*(dst+(int)k) = *(prgb+i);
+				*(dst+i) = *(src+i);
 			}
 		}
 	} else if (_draw_flags == DF_BLEND) {
-		// INFO:: BLEND source with destination
-		double k;
-
 		for (int j=y; j<hmax; j++) {
-			cy = (int)(j*d);//SCALE_TO_SCREEN(j, _screen.height, _scale.height);
-			dst = (uint32_t *)((uint8_t *)ptr+cy*pitch);
-			step = j*w;
-			prgb = (uint32_t *)(rgb+step);
-
-			k = 0.0;
+			dst = (uint32_t *)((uint8_t *)ptr+j*pitch);
+			src = (uint32_t *)(rgb+step-x);
+			step = step+w;
 
 			for (int i=x; i<wmax; i++) {
-				k = k+d;//SCALE_TO_SCREEN(i, _screen.width, _scale.width); 
+				int argb = *(src+i),
+						pixel = *(dst+i),
+						r = (argb >> 0x10) & 0xff,
+						g = (argb >> 0x08) & 0xff,
+						b = (argb >> 0x00) & 0xff,
+						a = (argb >> 0x18) & 0xff,
+						pr = (pixel >> 0x10) & 0xff,
+						pg = (pixel >> 0x08) & 0xff,
+						pb = (pixel >> 0x00) & 0xff;
 
-				int argb = *(prgb+i),
-						pixel = *(dst+(int)k),
-						r = (argb>>0x10)&0xff,
-						g = (argb>>0x08)&0xff,
-						b = (argb>>0x00)&0xff,
-						a = (argb>>0x18)&0xff,
-						pr = (pixel>>0x10)&0xff,
-						pg = (pixel>>0x08)&0xff,
-						pb = (pixel>>0x00)&0xff;
+				pr = (int)(pr*(0xff-a) + r*a) >> 0x08;
+				pg = (int)(pg*(0xff-a) + g*a) >> 0x08;
+				pb = (int)(pb*(0xff-a) + b*a) >> 0x08;
 
-				pr = (int)(pr*(255-a) + r*a) >> 8;
-				pg = (int)(pg*(255-a) + g*a) >> 8;
-				pb = (int)(pb*(255-a) + b*a) >> 8;
-
-				*(dst+(int)k) = 0xff000000 | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
+				*(dst+i) = 0xff000000 | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
 			}
 		}
 	} else if (_draw_flags == DF_XOR) {
-		double k;
-
 		for (int j=y; j<hmax; j++) {
-			cy = (int)(j*d);//SCALE_TO_SCREEN(j, _screen.height, _scale.height);
-			dst = (uint32_t *)((uint8_t *)ptr+cy*pitch);
-			step = j*w;
-
-			k = 0.0;
+			dst = (uint32_t *)((uint8_t *)ptr+j*pitch);
+			src = (uint32_t *)(rgb+step-x);
+			step = step+w;
 
 			for (int i=x; i<wmax; i++) {
-				k = k+d;//SCALE_TO_SCREEN(i, _screen.width, _scale.width); 
-
-				*(dst+(int)k) ^= rgb[step+i];
+				*(dst+i) ^= *(src+i);
 			}
 		}
 	}
@@ -3434,7 +3426,7 @@ void Graphics::AntiAlias0(DFBRegion *lines, int size)
 	surface->SetColor(surface, _color.GetRed(),_color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
 }
 
-void Graphics::RotateImage0(OffScreenImage *img, int xcp, int ycp, int xp, int yp, int wp, int hp, double angle, uint8_t alpha)
+void Graphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int wp, int hp, double angle, uint8_t alpha)
 {
 	int xc = SCALE_TO_SCREEN((xcp), _screen.width, _scale.width),
 			yc = SCALE_TO_SCREEN((ycp), _screen.height, _scale.height);

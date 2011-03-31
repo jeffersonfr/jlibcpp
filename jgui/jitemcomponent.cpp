@@ -73,17 +73,7 @@ Item::Item(std::string value, std::string image):
 	_is_visible = true;
 	_type = IMAGE_MENU_ITEM;
 	
-	int w = 128,
-			h = 128;
-
-	_prefetch = new OffScreenImage(w, h);
-
-	if (_prefetch->GetGraphics() != NULL) {
-		if (_prefetch->GetGraphics()->DrawImage(_image, 0, 0, w, h) == false) {
-			delete _prefetch;
-			_prefetch = NULL;
-		}
-	}
+	_prefetch = Image::CreateImage(_image);
 }
 
 Item::Item(std::string value, bool checked):
@@ -220,7 +210,7 @@ std::string Item::GetValue()
 	return _value;
 }
 
-jgui::OffScreenImage * Item::GetImage()
+jgui::Image * Item::GetImage()
 {
 	return _prefetch;
 }

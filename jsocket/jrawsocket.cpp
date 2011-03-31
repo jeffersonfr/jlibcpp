@@ -352,9 +352,9 @@ int64_t RawSocket::GetSentBytes()
 	return _sent_bytes + _os->GetSentBytes();
 }
 
-int64_t RawSocket::GetReceiveBytes()
+int64_t RawSocket::GetReadedBytes()
 {
-	return _receive_bytes + _is->GetReceiveBytes();
+	return _receive_bytes + _is->GetReadedBytes();
 }
 
 SocketOption * RawSocket::GetSocketOption()

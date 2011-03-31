@@ -137,7 +137,7 @@ class InputStream : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual int64_t GetReceiveBytes() = 0;
+		virtual int64_t GetReadedBytes() = 0;
 
 };
 

@@ -50,6 +50,7 @@ class Font : public virtual jcommon::Object{
 #ifdef DIRECTFB_UI
 		IDirectFBFont *_font;
 #endif
+		struct jsize_t _screen;
 		struct jsize_t _scale;
 		int _height,
 			_ascender,

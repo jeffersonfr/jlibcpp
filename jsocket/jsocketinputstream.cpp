@@ -200,7 +200,7 @@ int64_t SocketInputStream::Available()
 	return (int64_t)_current_index;
 }
 
-int64_t SocketInputStream::GetReceiveBytes()
+int64_t SocketInputStream::GetReadedBytes()
 {
 	return (int64_t)_receive_bytes;
 }

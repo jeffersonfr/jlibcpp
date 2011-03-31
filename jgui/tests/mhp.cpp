@@ -236,7 +236,7 @@ class LayersManager{
 			_video_layer = new VideoLayer();
 			_graphic_layer = new GraphicLayer();
 
-			GetBackgroundLayer()->SetImage("icons/background.png");
+			GetBackgroundLayer()->SetImage("images/background.png");
 		}
 
 	public:

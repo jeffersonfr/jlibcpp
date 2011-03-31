@@ -24,17 +24,13 @@
 
 namespace jio {
 
-MemoryOutputStream::MemoryOutputStream(uint8_t*data, int size):
+MemoryOutputStream::MemoryOutputStream(uint8_t*data, uint64_t size):
 	jio::OutputStream()
 {
 	jcommon::Object::SetClassName("jio::MemoryOutputStream");
 	
 	if ((void *)data == NULL) {
 		throw jcommon::RuntimeException("Null pointer exception");
-	}
-
-	if (size <= 0) {
-		throw jcommon::RuntimeException("Size is out of range");
 	}
 
 	_buffer = data;
@@ -73,15 +69,15 @@ int64_t MemoryOutputStream::Write(char *data, int64_t size)
 		return 0LL;
 	}
 
-	int64_t r = size;
-
-	if (r > Available()) {
-		r = Available();
+	if (size > Available()) {
+		size = Available();
 	}
 
-	memcpy((uint8_t*)(_buffer + _buffer_index), data, (size_t)r);
+	memcpy((uint8_t*)(_buffer + _buffer_index), data, (uint32_t)size);
 
-	return r;
+	_buffer_index = _buffer_index + size;
+
+	return size;
 }
 
 int64_t MemoryOutputStream::Flush()

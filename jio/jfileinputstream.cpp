@@ -151,11 +151,11 @@ int64_t FileInputStream::Read()
 int64_t FileInputStream::Read(char *data, int64_t size)
 {
 	if ((void *)data == NULL) {
-		return -1;
+		return -1LL;
 	}
 
 	if (IsEmpty() == true) {
-		return -1;
+		return -1LL;
 	}
 
 	/*
@@ -205,7 +205,7 @@ int64_t FileInputStream::Read(char *data, int64_t size)
 			r = d;
 		}
 
-		memcpy((char *)(data + size - count), (char *)(_buffer + _buffer_index), (size_t)r);
+		memcpy((char *)(data + size - count), (char *)(_buffer + _buffer_index), (uint32_t)r);
 
 		_buffer_index += r;
 		_current += r;
@@ -250,7 +250,7 @@ void FileInputStream::Close()
 	_file->Close();
 }
 
-int64_t FileInputStream::GetReceiveBytes()
+int64_t FileInputStream::GetReadedBytes()
 {
 	return _current;
 }

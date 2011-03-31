@@ -27,7 +27,7 @@
 
 #include "jtextlistener.h"
 #include "jcomponent.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -43,7 +43,7 @@ namespace jgui {
 class Animation : public Component, public jthread::Thread{
 
 	private:
-		std::vector<OffScreenImage *> _images;
+		std::vector<Image *> _images;
 		int _index,
 			_interval;
 		bool _running;

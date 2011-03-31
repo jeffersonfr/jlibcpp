@@ -24,13 +24,13 @@
 class ImageTest : public jgui::Component{
 
 	private:
-		jgui::OffScreenImage *_image;
+		jgui::Image *_image;
 
 	public:
 		ImageTest():
 			jgui::Component()
 		{
-			_image = new jgui::OffScreenImage(100, 100);
+			_image = jgui::Image::CreateImage(100, 100);
 
 			jgui::Graphics *g = _image->GetGraphics();
 

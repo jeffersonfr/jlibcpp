@@ -24,7 +24,7 @@
  */
 
 #include "jframe.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 #include "jdate.h"
 #include "jthread.h"
 
@@ -49,7 +49,7 @@ double myrandom()
 class Breakout : public jgui::Frame, public jgui::FrameInputListener, public jthread::Thread {
 
 	private:
-		jgui::OffScreenImage *off;
+		jgui::Image *off;
 		jgui::Graphics *goff;
 		int		player1score,
 					ballx,
@@ -164,7 +164,7 @@ class Breakout : public jgui::Frame, public jgui::FrameInputListener, public jth
 		virtual void Paint(jgui::Graphics *g)
 		{
 			if (goff == NULL && _size.width > 0 && _size.height > 0) {
-				off = new jgui::OffScreenImage(_size.width, _size.height);
+				off = jgui::Image::CreateImage(_size.width, _size.height);
 
 				goff = off->GetGraphics();
 			}

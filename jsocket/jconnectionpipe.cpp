@@ -229,9 +229,9 @@ int64_t ConnectionPipe::GetSentBytes()
 	return _connection->GetSentBytes();
 }
 
-int64_t ConnectionPipe::GetReceiveBytes()
+int64_t ConnectionPipe::GetReadedBytes()
 {
-	return _connection->GetReceiveBytes();
+	return _connection->GetReadedBytes();
 }
 
 // thread members

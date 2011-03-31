@@ -23,17 +23,13 @@
 
 namespace jio {
 
-MemoryInputStream::MemoryInputStream(uint8_t*data, int size):
+MemoryInputStream::MemoryInputStream(uint8_t *data, uint64_t size):
 	jio::InputStream()
 {
-    jcommon::Object::SetClassName("jio::MemoryInputStream");
+	jcommon::Object::SetClassName("jio::MemoryInputStream");
 
 	if ((void *)data == NULL) {
 		throw jcommon::RuntimeException("Null pointer exception");
-	}
-
-	if (size <= 0) {
-		throw jcommon::RuntimeException("Size is out of range");
 	}
 
 	_buffer = data;
@@ -47,12 +43,12 @@ MemoryInputStream::~MemoryInputStream()
 
 bool MemoryInputStream::IsEmpty()
 {
-	return Available() <= 0LL;
+	return _buffer_size == _buffer_index;
 }
 
 int64_t MemoryInputStream::Available()
 {
-	return (int64_t)(_buffer_size - _buffer_index);
+	return _buffer_size - _buffer_index;
 }
 
 int64_t MemoryInputStream::GetSize()
@@ -76,30 +72,32 @@ int64_t MemoryInputStream::Read()
 
 int64_t MemoryInputStream::Read(char *data, int64_t size)
 {
+	if ((void *)data == NULL) {
+		return -1LL;
+	}
+
 	if (IsEmpty() == true) {
 		return -1LL;
 	}
 
-	int64_t r = size;
-
-	if (r > Available()) {
-		r = Available();
+	if (size > Available()) {
+		size = Available();
 	}
 
-	memcpy(data, (uint8_t*)(_buffer + _buffer_index), (size_t)r);
+	memcpy(data, (uint8_t *)(_buffer + _buffer_index), (uint32_t)size);
 
-	return r;
+	_buffer_index = _buffer_index + size;
+
+	return size;
 }
 
 void MemoryInputStream::Skip(int64_t skip)
 {
-	int64_t r = skip;
+	_buffer_index += skip;
 
-	if (r > Available()) {
-		r = Available();
+	if (_buffer_index > Available()) {
+		_buffer_index = Available();
 	}
-
-	_buffer_index += r;
 }
 
 void MemoryInputStream::Reset()
@@ -111,7 +109,7 @@ void MemoryInputStream::Close()
 {
 }
 
-int64_t MemoryInputStream::GetReceiveBytes()
+int64_t MemoryInputStream::GetReadedBytes()
 {
 	return _buffer_index;
 }

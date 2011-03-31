@@ -424,9 +424,9 @@ int64_t MulticastSocket::GetSentBytes()
 	return _sent_bytes + _os->GetSentBytes();
 }
 
-int64_t MulticastSocket::GetReceiveBytes()
+int64_t MulticastSocket::GetReadedBytes()
 {
-	return _receive_bytes + _is->GetReceiveBytes();
+	return _receive_bytes + _is->GetReadedBytes();
 }
 
 void MulticastSocket::SetMulticastTTL(char ttl_)

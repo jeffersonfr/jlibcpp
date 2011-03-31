@@ -435,7 +435,7 @@ void Frame::MousePressed(MouseEvent *event)
 			if (event->GetX() > _location.x && event->GetX() < (_location.x+_size.width-_insets.right-2*s-20)) {
 				if (_move_enabled == true && _is_maximized == false) {
 					_default_cursor = GetCursor();
-					SetCursor(SIZEALL_CURSOR);
+					SetCursor(MOVE_CURSOR);
 
 					_mouse_state = 1; // move
 					_relative_mouse_x = event->GetX()-GetX();
@@ -458,7 +458,7 @@ void Frame::MousePressed(MouseEvent *event)
 		} else if (event->GetX() > (_location.x+_size.width-_insets.right) && _resize_enabled == true && _is_maximized == false) {
 			if (event->GetY() > (_location.y+_size.height-_insets.bottom)) {
 				_default_cursor = GetCursor();
-				SetCursor(SIZECORNER_CURSOR);
+				SetCursor(SE_CORNER_CURSOR);
 
 				_mouse_state = 2; // both resize
 				_relative_mouse_x = event->GetX()-GetX();
@@ -467,7 +467,7 @@ void Frame::MousePressed(MouseEvent *event)
 				_relative_mouse_h = _size.height;
 			} else if (event->GetX() < (_location.x+_size.width)) {
 				_default_cursor = GetCursor();
-				SetCursor(SIZEWE_CURSOR);
+				SetCursor(WE_CURSOR);
 
 				_mouse_state = 3; // horizontal resize
 				_relative_mouse_x = event->GetX()-GetX();
@@ -478,7 +478,7 @@ void Frame::MousePressed(MouseEvent *event)
 		} else if (event->GetY() > (_location.y+_size.height-_insets.bottom) && _resize_enabled == true && _is_maximized == false) {
 			if (event->GetY() < (_location.y+_size.height)) {
 				_default_cursor = GetCursor();
-				SetCursor(SIZENS_CURSOR);
+				SetCursor(NS_CURSOR);
 
 				_mouse_state = 4; // vertical resize
 				_relative_mouse_x = event->GetX()-GetX();

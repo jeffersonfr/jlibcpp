@@ -219,7 +219,7 @@ class Socket : public jsocket::Connection{
 		 * \brief Get de bytes received from a source.
 		 *
 		 */
-		virtual int64_t GetReceiveBytes();
+		virtual int64_t GetReadedBytes();
 
 		/**
 		 * \brief Get the socket options.

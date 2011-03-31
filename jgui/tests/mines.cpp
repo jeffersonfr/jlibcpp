@@ -35,17 +35,17 @@ Mines::Mines(int x, int y):
 
 	board = new block_t[max_rows*max_cols+10]; // 10 _insets.toptes para overflow
 
-	small_bomb = new jgui::OffScreenImage(size, size);
-	huge_bomb = new jgui::OffScreenImage(4*size, 4*size);
-	flag = new jgui::OffScreenImage(size, size);
-	smile_face = new jgui::OffScreenImage(4*size, 4*size);
-	dead_face = new jgui::OffScreenImage(4*size, 4*size);
+	small_bomb = jgui::Image::CreateImage(size, size);
+	huge_bomb = jgui::Image::CreateImage(4*size, 4*size);
+	flag = jgui::Image::CreateImage(size, size);
+	smile_face = jgui::Image::CreateImage(4*size, 4*size);
+	dead_face = jgui::Image::CreateImage(4*size, 4*size);
 
-	small_bomb->GetGraphics()->DrawImage("icons/bomb.png", 0, 0, size, size);
-	huge_bomb->GetGraphics()->DrawImage("icons/bomb.png", 0, 0, 4*size, 4*size);
-	flag->GetGraphics()->DrawImage("icons/flag.png", 0, 0, size, size);
-	smile_face->GetGraphics()->DrawImage("icons/smile_face.png", 0, 0, 4*size, 4*size);
-	dead_face->GetGraphics()->DrawImage("icons/dead_face.png", 0, 0, 4*size, 4*size);
+	small_bomb->GetGraphics()->DrawImage("images/bomb.png", 0, 0, size, size);
+	huge_bomb->GetGraphics()->DrawImage("images/bomb.png", 0, 0, 4*size, 4*size);
+	flag->GetGraphics()->DrawImage("images/flag.png", 0, 0, size, size);
+	smile_face->GetGraphics()->DrawImage("images/smile_face.png", 0, 0, 4*size, 4*size);
+	dead_face->GetGraphics()->DrawImage("images/dead_face.png", 0, 0, 4*size, 4*size);
 
 	SetupBoard();
 

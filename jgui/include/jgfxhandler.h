@@ -23,7 +23,7 @@
 #include "jobject.h"
 #include "jmutex.h"
 #include "jgraphics.h"
-#include "joffscreenimage.h"
+#include "jimage.h"
 
 #include <vector>
 #include <map>
@@ -41,20 +41,28 @@ namespace jgui{
  *
  */
 enum jcursor_style_t {
-	ARROW_CURSOR,
-	SIZECORNER_CURSOR,
-	SIZEALL_CURSOR,
-	SIZENS_CURSOR,
-	SIZEWE_CURSOR,
-	SIZENWSE_CURSOR,
-	SIZENESW_CURSOR,
+	DEFAULT_CURSOR,
+	CROSSHAIR_CURSOR,
+	EAST_CURSOR,
+	WEST_CURSOR,
+	NORTH_CURSOR,
+	SOUTH_CURSOR,
+	HAND_CURSOR,
+	MOVE_CURSOR,
+	NS_CURSOR,
+	WE_CURSOR,
+	NW_CORNER_CURSOR,
+	NE_CORNER_CURSOR,
+	SW_CORNER_CURSOR,
+	SE_CORNER_CURSOR,
+	TEXT_CURSOR,
 	WAIT_CURSOR
 };
 
 class Window;
 class WindowManager;
 class Font;
-class OffScreenImage;
+class Image;
 class InputManager;
 
 /**
@@ -68,7 +76,7 @@ class GFXHandler : public virtual jcommon::Object{
 	friend class Window;
 	friend class WindowManager;
 	friend class Font;
-	friend class OffScreenImage;
+	friend class Image;
 	friend class InputManager;
 
 	private:
@@ -79,7 +87,7 @@ class GFXHandler : public virtual jcommon::Object{
 		IDirectFBDisplayLayer *_layer;
 		
 		struct cursor_params_t {
-			OffScreenImage *cursor;
+			Image *cursor;
 			int hot_x;
 			int hot_y;
 		};
@@ -87,7 +95,7 @@ class GFXHandler : public virtual jcommon::Object{
 		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 #endif 
 
-		std::vector<OffScreenImage *> _offscreenimages;
+		std::vector<Image *> _images;
 		std::vector<Font *> _fonts;
 		jthread::Mutex _mutex;
 		jsize_t _screen,
@@ -139,13 +147,13 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void Add(OffScreenImage *);
+		void Add(Image *);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Remove(OffScreenImage *);
+		void Remove(Image *);
 
 #ifdef DIRECTFB_UI
 		/**
@@ -274,7 +282,7 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetCursor(OffScreenImage *shape, int hotx, int hoty);
+		virtual void SetCursor(Image *shape, int hotx, int hoty);
 
 		/**
 		 * \brief

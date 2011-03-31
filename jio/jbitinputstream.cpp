@@ -176,7 +176,7 @@ void BitInputStream::Close()
 	stream->Close();
 }
 
-int64_t BitInputStream::GetReceiveBytes()
+int64_t BitInputStream::GetReadedBytes()
 {
 	return 0LL;
 }
