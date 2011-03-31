@@ -2312,12 +2312,8 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 
 	surface->GetSize(surface, &wmax, &hmax);
 
-	if (x > wmax) {
-		x = wmax;
-	}
-
-	if (y > hmax) {
-		y = hmax;
+	if (x > wmax || y > hmax) {
+		return;
 	}
 
 	if (x+w > wmax) {

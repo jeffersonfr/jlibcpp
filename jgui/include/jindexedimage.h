@@ -46,13 +46,13 @@ class IndexedImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
-		IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int width, int height);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int width, int height);
 		
 		/**
 		 * \brief
@@ -70,7 +70,7 @@ class IndexedImage : public jgui::Image{
 		 * \brief Packs the source argb image.
 		 *
 		 */
-		static IndexedImage * Pack(uint32_t *rgb, int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		static IndexedImage * Pack(uint32_t *rgb, int width, int height);
 
 		/**
 		 * \brief

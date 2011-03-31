@@ -24,11 +24,14 @@
 
 namespace jgui {
 
-IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int width, int height, int scale_width, int scale_height):
-	Image(width, height, scale_width, scale_height)
+IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int width, int height):
+	Image(width, height, 0, 0)
 {
 	jcommon::Object::SetClassName("jgui::IndexedImage");
 	
+	_scale.width = GFXHandler::GetInstance()->GetScreenWidth();
+	_scale.height = GFXHandler::GetInstance()->GetScreenHeight();
+
 	_palette = new uint32_t[palette_size];
 	_palette_size = palette_size;
 	
@@ -41,10 +44,13 @@ IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, i
 	memcpy(_data, data, size*sizeof(uint8_t));
 }
 
-IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int width, int height, int scale_width, int scale_height):
-	Image(width, height, scale_width, scale_height)
+IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int width, int height):
+	Image(width, height, 0, 0)
 {
 	jcommon::Object::SetClassName("jgui::IndexedImage");
+
+	_scale.width = GFXHandler::GetInstance()->GetScreenWidth();
+	_scale.height = GFXHandler::GetInstance()->GetScreenHeight();
 
 	_palette = new uint32_t[palette_size];
 	_palette_size = palette_size;
@@ -85,18 +91,24 @@ IndexedImage * IndexedImage::Pack(Image *image)
 {
 	if ((void *)image != NULL) {
 		if (image->GetGraphics() != NULL) {
+			int size_w = image->GetWidth(),
+					size_h = image->GetHeight();
+			int screen_w = GFXHandler::GetInstance()->GetScreenWidth(),
+					screen_h = GFXHandler::GetInstance()->GetScreenHeight();
+			int scale_w = image->GetScaleWidth(),
+					scale_h = image->GetScaleHeight();
 			uint32_t *rgb = NULL;
 
-			image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
+			image->GetRGB(&rgb, 0, 0, size_w, size_h);
 
-			return Pack(rgb, image->GetWidth(), image->GetHeight(), image->GetScaleWidth(), image->GetScaleHeight());
+			return Pack(rgb, SCALE_TO_SCREEN(size_w, screen_w, scale_w), SCALE_TO_SCREEN(size_h, screen_h, scale_h));
 		}
 	}
 
 	return NULL;
 }
 
-IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height, int scale_width, int scale_height)
+IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
 {
 	uint32_t tempPalette[256];
 	int size = width*height;
@@ -123,7 +135,7 @@ IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height, int scal
 		}
 	}
 
-	return new IndexedImage(tempPalette, paletteLocation, rgb, width, height, scale_width, scale_height);
+	return new IndexedImage(tempPalette, paletteLocation, rgb, width, height);
 }
 
 uint8_t * IndexedImage::ScaleArray(uint8_t *array, int width, int height) 
@@ -162,7 +174,7 @@ uint8_t * IndexedImage::ScaleArray(uint8_t *array, int width, int height)
 
 Image * IndexedImage::Scaled(int width, int height)
 {
-	return new IndexedImage(_palette, _palette_size, ScaleArray(_data, width, height), width, height, GetScaleWidth(), GetScaleHeight());
+	return new IndexedImage(_palette, _palette_size, ScaleArray(_data, width, height), width, height);
 }
 
 Image * IndexedImage::SubImage(int x, int y, int width, int height)
@@ -178,7 +190,7 @@ Image * IndexedImage::SubImage(int x, int y, int width, int height)
 		data[i] = _data[x + i%width + ((y + i/width) * _size.width)];
 	}
 
-	return new IndexedImage(_palette, _palette_size, data, width, height, GetScaleWidth(), GetScaleHeight());
+	return new IndexedImage(_palette, _palette_size, data, width, height);
 }
 
 void IndexedImage::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
@@ -235,6 +247,9 @@ void IndexedImage::Release()
 
 void IndexedImage::Restore()
 {
+	_scale.width = GFXHandler::GetInstance()->GetScreenWidth();
+	_scale.height = GFXHandler::GetInstance()->GetScreenHeight();
+
 	// do nothing
 }
 
