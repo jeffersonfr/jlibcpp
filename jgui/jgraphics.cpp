@@ -528,6 +528,7 @@ void Graphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 		return;
 	}
 
+#ifdef DIRECTFB_UI
 	if (npoints < 3) {
 		return;
 	}
@@ -576,6 +577,7 @@ void Graphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 
 	delete [] x;
 	delete [] y;
+#endif
 }
 
 void Graphics::FillRectangle(int xp, int yp, int wp, int hp)
@@ -1197,27 +1199,9 @@ void Graphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints)
 #endif
 }
 
-int Graphics::CalculateGradientChannel(int schannel, int dchannel, int distance, int offset) 
-{
-	if (schannel == dchannel) {
-		return schannel;
-	}
-
-	return (int)(schannel-((schannel-dchannel)*((double)offset/(double)distance))) & 0xff;
-}
-
-void Graphics::UpdateGradientColor(Color &scolor, Color &dcolor, int distance, int offset) 
-{
-	int a = CalculateGradientChannel(scolor.GetAlpha(), dcolor.GetAlpha(), distance, offset);
-	int r = CalculateGradientChannel(scolor.GetRed(), dcolor.GetRed(), distance, offset);
-	int g = CalculateGradientChannel(scolor.GetGreen(), dcolor.GetGreen(), distance, offset);
-	int b = CalculateGradientChannel(scolor.GetBlue(), dcolor.GetBlue(), distance, offset);
-	
-	SetColor((a << 24) | (r << 16) | (g << 8) | (b << 0));
-}
-
 void Graphics::FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
 {
+#ifdef DIRECTFB_UI
 	Color color = GetColor();
 
 	int height = hp;
@@ -1233,6 +1217,7 @@ void Graphics::FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor,
 	}
 
 	SetColor(color);
+#endif
 }
 
 void Graphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
@@ -2274,6 +2259,7 @@ void Graphics::GetRGB(int startxp, int startyp, int wp, int hp, unsigned int **r
 
 void Graphics::SetRGB(int xp, int yp, uint32_t argb) 
 {
+#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -2288,6 +2274,7 @@ void Graphics::SetRGB(int xp, int yp, uint32_t argb)
 
 	surface->SetColor(surface, r, g, b, a);
 	surface->DrawLine(surface, x, y, x, y);
+#endif
 }
 
 void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline) 
@@ -2435,6 +2422,25 @@ void Graphics::InsertEdge(edge_t *list, edge_t *edge)
 
 	edge->next=q->next;
 	q->next=edge;
+}
+
+int Graphics::CalculateGradientChannel(int schannel, int dchannel, int distance, int offset) 
+{
+	if (schannel == dchannel) {
+		return schannel;
+	}
+
+	return (int)(schannel-((schannel-dchannel)*((double)offset/(double)distance))) & 0xff;
+}
+
+void Graphics::UpdateGradientColor(Color &scolor, Color &dcolor, int distance, int offset) 
+{
+	int a = CalculateGradientChannel(scolor.GetAlpha(), dcolor.GetAlpha(), distance, offset);
+	int r = CalculateGradientChannel(scolor.GetRed(), dcolor.GetRed(), distance, offset);
+	int g = CalculateGradientChannel(scolor.GetGreen(), dcolor.GetGreen(), distance, offset);
+	int b = CalculateGradientChannel(scolor.GetBlue(), dcolor.GetBlue(), distance, offset);
+	
+	SetColor((a << 24) | (r << 16) | (g << 8) | (b << 0));
 }
 
 void Graphics::MakeEdgeRec(struct jpoint_t lower, struct jpoint_t upper, int yComp, edge_t *edge, edge_t *edges[])

@@ -758,17 +758,23 @@ void GFXHandler::Release()
 
 void GFXHandler::Suspend()
 {
+#ifdef DIRECTFB_UI
 	_dfb->Suspend(_dfb);
+#endif
 }
 
 void GFXHandler::Resume()
 {
+#ifdef DIRECTFB_UI
 	_dfb->Resume(_dfb);
+#endif
 }
 
 void GFXHandler::WaitIdle()
 {
+#ifdef DIRECTFB_UI
 	_dfb->WaitIdle(_dfb);
+#endif
 }
 
 void GFXHandler::Add(Font *font)

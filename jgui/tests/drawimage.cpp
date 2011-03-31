@@ -157,7 +157,9 @@ class BufferedImageTest : public Picture {
 
 			_image = jgui::Image::CreateImage(iw, ih);
 
-			_image->GetGraphics()->DrawImage(FILENAME, 0, 0, _image->GetWidth(), _image->GetHeight());
+			if (_image->GetGraphics() != NULL) {
+				_image->GetGraphics()->DrawImage(FILENAME, 0, 0, _image->GetWidth(), _image->GetHeight());
+			}
 
 			_title = "Buffered Image";
 		}
@@ -234,24 +236,29 @@ class IndexedImageTest : public Picture {
 		{
 			jgui::Image *image = jgui::Image::CreateImage(FILENAME);
 
-			int size = image->GetWidth()*image->GetHeight();
-			uint32_t *pix = new uint32_t[size];
-			uint32_t *rgb = NULL;
-			uint32_t *palette = NULL;
+			/*
+			if (image != NULL) {
+				int size = image->GetWidth()*image->GetHeight();
+				uint32_t *pix = new uint32_t[size];
+				uint32_t *rgb = NULL;
+				uint32_t *palette = NULL;
 
-			image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
+				image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
 
-			Cube *cube = Quantization::GetInstance()->quantizeImage(rgb, image->GetWidth()*image->GetHeight(), 255);
+				Cube *cube = Quantization::GetInstance()->quantizeImage(rgb, image->GetWidth()*image->GetHeight(), 255);
 
-			cube->GetPalette(&palette); 
+				cube->GetPalette(&palette); 
 
-			for (int i=0; i<size; i++) {
-				pix[i] = palette[rgb[i]];
+				for (int i=0; i<size; i++) {
+					pix[i] = palette[rgb[i]];
+				}
+
+				delete cube;
+
+				_image = jgui::IndexedImage::Pack(pix, image->GetWidth(), image->GetHeight());
 			}
-			
-			delete cube;
+			*/
 
-			_image = jgui::IndexedImage::Pack(pix, image->GetWidth(), image->GetHeight(), image->GetScaleWidth(), image->GetScaleHeight());
 			_title = "Indexed Image";
 		}
 

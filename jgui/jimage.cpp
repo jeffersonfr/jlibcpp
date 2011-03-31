@@ -25,6 +25,7 @@
 
 namespace jgui {
 
+#ifdef DIRECTFB_UI
 class MediaLoaderThread : public jthread::Thread {
 	
 	private:
@@ -79,6 +80,7 @@ class MediaLoaderThread : public jthread::Thread {
 		}
 
 };
+#endif
 
 Image::Image(int width, int height, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height)
 {
@@ -264,6 +266,7 @@ Image * Image::CreateImage(jio::InputStream *stream)
 		return NULL;
 	}
 
+#ifdef DIRECTFB_UI
 	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
 	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
 
@@ -303,10 +306,17 @@ Image * Image::CreateImage(jio::InputStream *stream)
 	buffer->Release( buffer );
 
 	return image;
+#endif
+
+	return NULL;
 }
 
 Image * Image::CreateImage(Image *image)
 {
+	if ((void *)image == NULL) {
+		return NULL;
+	}
+
 	Image *clone = new Image(image->GetWidth(), image->GetHeight(), image->GetPixelFormat(), image->GetScaleWidth(), image->GetScaleHeight());
 
 	if (clone->GetGraphics()->DrawImage(image, 0, 0) == false) {
