@@ -1839,7 +1839,7 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 
 		uint32_t *rgb = NULL;
 
-		image->GetRGB(&rgb, 0, 0, img->GetWidth(), img->GetHeight());
+		image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
 		
 		if (rgb != NULL) {
 			SetRGB(rgb, _translate.x+xp, _translate.y+yp, wp, hp, wp);

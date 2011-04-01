@@ -236,7 +236,6 @@ class IndexedImageTest : public Picture {
 		{
 			jgui::Image *image = jgui::Image::CreateImage(FILENAME);
 
-			/*
 			if (image != NULL) {
 				int size = image->GetWidth()*image->GetHeight();
 				uint32_t *pix = new uint32_t[size];
@@ -257,7 +256,6 @@ class IndexedImageTest : public Picture {
 
 				_image = jgui::IndexedImage::Pack(pix, image->GetWidth(), image->GetHeight());
 			}
-			*/
 
 			_title = "Indexed Image";
 		}

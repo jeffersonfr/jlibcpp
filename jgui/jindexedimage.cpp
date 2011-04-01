@@ -91,17 +91,16 @@ IndexedImage * IndexedImage::Pack(Image *image)
 {
 	if ((void *)image != NULL) {
 		if (image->GetGraphics() != NULL) {
+			GFXHandler *handler = GFXHandler::GetInstance();
 			int size_w = image->GetWidth(),
 					size_h = image->GetHeight();
-			int screen_w = GFXHandler::GetInstance()->GetScreenWidth(),
-					screen_h = GFXHandler::GetInstance()->GetScreenHeight();
 			int scale_w = image->GetScaleWidth(),
 					scale_h = image->GetScaleHeight();
 			uint32_t *rgb = NULL;
 
 			image->GetRGB(&rgb, 0, 0, size_w, size_h);
 
-			return Pack(rgb, SCALE_TO_SCREEN(size_w, screen_w, scale_w), SCALE_TO_SCREEN(size_h, screen_h, scale_h));
+			return Pack(rgb, SCALE_TO_SCREEN(size_w, handler->GetScreenWidth(), scale_w), SCALE_TO_SCREEN(size_h, handler->GetScreenHeight(), scale_h));
 		}
 	}
 
@@ -110,16 +109,22 @@ IndexedImage * IndexedImage::Pack(Image *image)
 
 IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
 {
-	uint32_t tempPalette[256];
+	if ((void *)rgb == NULL) {
+		return NULL;
+	}
+
+	uint32_t palette[256];
+	uint32_t current;
 	int size = width*height;
-	int paletteLocation = 0;
+	int palette_location = 0;
+	bool flag;
 
 	for (int i=0; i<size; i++) {
-		uint32_t current = rgb[i];
-		bool flag = false;
+		current = rgb[i];
+		flag = false;
 
-		for (int j=0; j<paletteLocation; j++) {
-			if (tempPalette[j] == current) {
+		for (int j=0; j<palette_location; j++) {
+			if (palette[j] == current) {
 				flag = true;
 
 				break;
@@ -127,15 +132,15 @@ IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
 		}
 		
 		if (flag == false) {
-			tempPalette[paletteLocation++] = current;
+			palette[palette_location++] = current;
 		}
 
-		if (paletteLocation == 256) {
+		if (palette_location == 256) {
 			return NULL;
 		}
 	}
 
-	return new IndexedImage(tempPalette, paletteLocation, rgb, width, height);
+	return new IndexedImage(palette, palette_location, rgb, width, height);
 }
 
 uint8_t * IndexedImage::ScaleArray(uint8_t *array, int width, int height) 
@@ -195,8 +200,8 @@ Image * IndexedImage::SubImage(int x, int y, int width, int height)
 
 void IndexedImage::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
-	int width = GetWidth(),
-			height = GetHeight();
+	int width = _size.width,
+			height = _size.height;
 
 	if ((xp+wp) > width || (yp+hp) > height) {
 		(*rgb) = NULL;
@@ -204,8 +209,10 @@ void IndexedImage::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
 		return;
 	}
 
+	uint32_t *buffer = NULL;
+
 	if (*rgb == NULL) {
-		(*rgb) = new uint32_t[wp*hp];
+		buffer = new uint32_t[wp*hp];
 	}
 
 	int line,
@@ -216,9 +223,11 @@ void IndexedImage::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
 		line = j*wp;
 
 		for (int i=0; i<wp; i++) {
-			*rgb[line + i] = _palette[_data[data+i]];
+			buffer[line + i] = _palette[_data[data+i]];
 		}
 	}
+
+	*rgb = buffer;
 }
 		
 void IndexedImage::GetPalette(uint32_t **palette, int *size)
