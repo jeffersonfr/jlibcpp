@@ -21,8 +21,9 @@
 
 #include <fstream>
 
-#define screenWidth 1920
-#define screenHeight 1080
+#define SCREEN_WIDTH 1920
+#define SCREEN_HEIGHT 1080
+
 #define texWidth 64
 #define texHeight 64
 #define mapWidth 24
@@ -93,10 +94,10 @@ Sprite sprite[numSprites] =
   {10.5, 15.8,8},
 };
 
-uint32_t buffer[screenHeight][screenWidth];
+uint32_t buffer[SCREEN_HEIGHT][SCREEN_WIDTH];
 
 //1D Zbuffer
-double ZBuffer[screenWidth];
+double ZBuffer[SCREEN_WIDTH];
 
 //arrays used to sort the sprites
 int spriteOrder[numSprites];
@@ -709,7 +710,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 
 	public:
 		GraphicsTeste():
-			jgui::Frame("Graphics Teste", 0, 0, screenWidth, screenHeight)
+			jgui::Frame("Graphics Teste", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 	{
 		posX = 22.0;
 		posY = 11.5; //x and y start position
@@ -993,7 +994,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 				}
 			}
 
-			g->SetRGB((uint32_t *)buffer, 0, 0, screenWidth, screenHeight, screenWidth*4);
+			g->SetRGB((uint32_t *)buffer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH);
 		}
 
 		virtual void InputChanged(jgui::KeyEvent *event)

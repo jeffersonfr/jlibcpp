@@ -2287,7 +2287,7 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 	void *ptr;
 	uint32_t *dst,
 					 *src = rgb;
-	int step = 0,
+	int step,
 			pitch;
 	int wmax,
 			hmax;
@@ -2311,30 +2311,34 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 		h = hmax-y;
 	}
 
+	step = -x;
 	wmax = x+w;
 	hmax = y+h;
 
 	surface->Lock(surface, DSLF_WRITE, &ptr, &pitch);
 
+	double scale_x = (double)_scale.width/(double)_screen.width,
+				 scale_y = (double)_scale.height/(double)_screen.height;
+
 	_draw_flags = DF_NOFX;
 	if (_draw_flags == DF_NOFX) {
 		for (int j=y; j<hmax; j++) {
 			dst = (uint32_t *)((uint8_t *)ptr+j*pitch);
-			src = (uint32_t *)(rgb+step-x);
-			step = step+w;
+			src = (uint32_t *)(rgb+(int)(step*scale_y));
+			step = step+scanline;
 
 			for (int i=x; i<wmax; i++) {
-				*(dst+i) = *(src+i);
+				*(dst+i) = *(src+(int)(i*scale_x));
 			}
 		}
 	} else if (_draw_flags == DF_BLEND) {
 		for (int j=y; j<hmax; j++) {
 			dst = (uint32_t *)((uint8_t *)ptr+j*pitch);
-			src = (uint32_t *)(rgb+step-x);
-			step = step+w;
+			src = (uint32_t *)(rgb+(int)(step*scale_y));
+			step = step+scanline;
 
 			for (int i=x; i<wmax; i++) {
-				int argb = *(src+i),
+				int argb = *(src+(int)(i*scale_x)),
 						pixel = *(dst+i),
 						r = (argb >> 0x10) & 0xff,
 						g = (argb >> 0x08) & 0xff,
@@ -2354,11 +2358,11 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 	} else if (_draw_flags == DF_XOR) {
 		for (int j=y; j<hmax; j++) {
 			dst = (uint32_t *)((uint8_t *)ptr+j*pitch);
-			src = (uint32_t *)(rgb+step-x);
-			step = step+w;
+			src = (uint32_t *)(rgb+(int)(step*scale_y));
+			step = step+scanline;
 
 			for (int i=x; i<wmax; i++) {
-				*(dst+i) ^= *(src+i);
+				*(dst+i) ^= *(src+(int)(i*scale_x));
 			}
 		}
 	}
