@@ -1757,22 +1757,15 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 	if ((void *)g != NULL) {
 		surface->Blit(surface, g->surface, &drect, x, y);
 	} else {
-		Image *image = img->SubImage(sxp, syp, swp, shp);
+		uint32_t *rgb = NULL;
 
-		uint32_t *rgb;
-
-		image->GetRGB(&rgb, 0, 0, img->GetWidth(), img->GetHeight());
+		img->GetRGB(&rgb, sxp, syp, swp, shp);
 	
 		if (rgb != NULL) {
-			swp = (swp*_scale.width)/img->GetScaleWidth();
-			shp = (shp*_scale.height)/img->GetScaleHeight();
-
-			SetRGB(rgb, xp, yp, swp, shp, swp);
+			SetRGB(rgb, _translate.x+xp, _translate.y+yp, swp, shp, swp);
 
 			delete [] rgb;
 		}
-
-		delete image;
 	}
 #endif
 
@@ -1832,10 +1825,10 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 	if ((void *)g != NULL) {
 		surface->StretchBlit(surface, g->surface, &srect, &drect);
 	} else {
-		int iwp = (wp*img->GetScaleWidth())/_scale.width;
-		int ihp = (hp*img->GetScaleHeight())/_scale.height;
+		int iwp = (wp*img->GetScaleWidth())/_screen.width;
+		int ihp = (hp*img->GetScaleHeight())/_screen.height;
 
-		Image *image = img->Scaled((iwp*img->GetWidth())/swp, (ihp*img->GetHeight())/shp);
+		Image *image = img->Scaled(iwp, ihp);
 
 		uint32_t *rgb = NULL;
 
@@ -2320,7 +2313,6 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 	double scale_x = (double)_scale.width/(double)_screen.width,
 				 scale_y = (double)_scale.height/(double)_screen.height;
 
-	_draw_flags = DF_NOFX;
 	if (_draw_flags == DF_NOFX) {
 		for (int j=y; j<hmax; j++) {
 			dst = (uint32_t *)((uint8_t *)ptr+j*pitch);

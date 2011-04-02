@@ -591,14 +591,15 @@ void GFXHandler::InitCursors()
 {
 #ifdef DIRECTFB_UI
 
-#define CURSOR_INIT(type, ix, iy, hotx, hoty) 																\
-	t.cursor = Image::CreateImage(w, h);																				\
-																																							\
-	t.hot_x = SCALE_TO_SCREEN((hotx), _screen.width, _scale.width);							\
-	t.hot_y = SCALE_TO_SCREEN((hoty), _screen.height, _scale.height);						\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);				\
-																																							\
-	_cursors[type] = t;																													\
+#define CURSOR_INIT(type, ix, iy, hotx, hoty) 																	\
+	t.cursor = Image::CreateImage(w, h, SPF_ARGB, _screen.width, _screen.height);	\
+																																								\
+	t.hot_x = hotx;																																\
+	t.hot_y = hoty;																																\
+																																								\
+	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);					\
+																																								\
+	_cursors[type] = t;																														\
 
 	struct cursor_params_t t;
 	int w = 30,

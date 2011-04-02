@@ -606,6 +606,8 @@ class GraphicPanel : public jgui::Frame{
 			
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
 
+		g->TranslateImage(0, 0);
+
 		for (int i=0; i<iterations; i++) {
 			x = (1920-size)/2;
 			y = (1080-size)/2;
@@ -618,7 +620,7 @@ class GraphicPanel : public jgui::Frame{
 			g->Rotate(angle);
 			g->DrawImage("images/tux-zombie.png", x, y, size, size);
 
-			g->Flip(x, y, size, size);
+			g->Flip();
 
 			size = size + 4;
 
@@ -661,7 +663,7 @@ class GraphicPanel : public jgui::Frame{
 			g->Rotate(angle);
 			g->DrawImage(off, x, y, size, size);
 
-			g->Flip(x, y, size, size);
+			g->Flip();
 
 			size = size + 4;
 
