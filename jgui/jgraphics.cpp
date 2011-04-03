@@ -2192,29 +2192,30 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 	return pixel;
 }
 
-void Graphics::GetRGB(int startxp, int startyp, int wp, int hp, unsigned int **rgb, int scansize)
+void Graphics::GetRGB(int xp, int yp, int wp, int hp, unsigned int **rgb, int scansize)
 {
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
-	int startx = SCALE_TO_SCREEN(startxp, _screen.width, _scale.width); 
-	int starty = SCALE_TO_SCREEN(startyp, _screen.height, _scale.height);
+	int startx = SCALE_TO_SCREEN(xp, _screen.width, _scale.width); 
+	int starty = SCALE_TO_SCREEN(yp, _screen.height, _scale.height);
 	// int w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width);
 	// int h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((startxp+wp), _screen.width, _scale.width)-startx;
-	int h = SCALE_TO_SCREEN((startyp+hp), _screen.height, _scale.height)-starty;
+	int w = SCALE_TO_SCREEN((xp+wp), _screen.width, _scale.width)-startx;
+	int h = SCALE_TO_SCREEN((yp+hp), _screen.height, _scale.height)-starty;
 
 	void *ptr;
-	uint32_t *dst;
+	uint32_t *src,
+					 *dst;
 	int x,
 			y,
 			pitch;
 	uint32_t *array = (*rgb);
 
 	if (*rgb == NULL) {
-		array = new uint32_t[w*h];
+		array = new uint32_t[wp*hp];
 	}
 
 	int img_w,
@@ -2232,15 +2233,15 @@ void Graphics::GetRGB(int startxp, int startyp, int wp, int hp, unsigned int **r
 
 	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
 
-	int line;
+	double scale_x = (double)_screen.width/(double)_scale.width,
+				 scale_y = (double)_screen.height/(double)_scale.height;
 
-	for (y=starty; y<max_h; y++) {
-		line = (y-starty)*scansize;
-
-		dst = (uint32_t *)((uint8_t *)ptr + (y+starty)*pitch);
-
-		for (x=startx; x<max_w; x++) {
-			array[line + (x-startx)] = *(dst + x + startx);
+	for (y=0; y<hp; y++) {
+		src = (uint32_t *)(array + y * scansize);
+		dst = (uint32_t *)((uint8_t *)ptr + ((int)(y * scale_y) + starty) * pitch);
+		
+		for (x=0; x<wp; x++) {
+			*(src + x) = *(dst + (int)((startx + x) * scale_x));
 		}
 	}
 
