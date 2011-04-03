@@ -2238,10 +2238,10 @@ void Graphics::GetRGB(int xp, int yp, int wp, int hp, unsigned int **rgb, int sc
 
 	for (y=0; y<hp; y++) {
 		src = (uint32_t *)(array + y * scansize);
-		dst = (uint32_t *)((uint8_t *)ptr + ((int)(y * scale_y) + starty) * pitch);
+		dst = (uint32_t *)((uint8_t *)ptr + ((int)((yp + y) * scale_y)) * pitch);
 		
 		for (x=0; x<wp; x++) {
-			*(src + x) = *(dst + (int)((startx + x) * scale_x));
+			*(src + x) = *(dst + (int)((xp + x) * scale_x));
 		}
 	}
 
