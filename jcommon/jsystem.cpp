@@ -405,23 +405,10 @@ std::string System::GetProcessName()
 
 	return std::string(path);
 #else
+	std::ostringstream o;
 	pid_t pid = getpid();
 	
-	std::ostringstream o;
 	o << "/proc/" << pid << "/execname";
-
-	/*
-	if (File::Exists(path) == true) {
-		std::ostringstream o;
-		o << "/proc/" << pid << "/cmdline";
-
-		if (File::Exists(path) == false) {
-			return "unknown";
-		}
-
-		// TODO:: parse
-	}
-	*/
 
 	return o.str();
 #endif
@@ -726,7 +713,7 @@ void System::ResetProgram(std::string program, char **argv, char **envp)
 #ifdef _WIN32
 	PROCESS_INFORMATION info;
 
-	/*
+	/* TODO::
 	BOOL CreateProcess( 
 		program.c_str(), 
 		argv, 

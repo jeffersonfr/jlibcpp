@@ -20,7 +20,6 @@
 #ifndef J_PROCESS_H
 #define J_PROCESS_H
 
-#include "jprivateprocess.h"
 #include "jinputstream.h"
 #include "joutputstream.h"
 
@@ -39,16 +38,21 @@
 
 namespace jshared {
 
-enum jwprocess_mode_t {
-	FLUSH_WRITE_BUFFER, 
-	WAIT_ANY_INPUT, 
-	WAIT_ALL_INPUT, 
-	TRY_ONCE
+enum jprocess_type_t {
+	CHILD_PROCESS,
+	PARENT_PROCESS
+};
+
+enum jprocess_mode_t {
+	AUTO_FLUSH_MODE,
+	WAIT_ANY_INPUT_MODE, 
+	WAIT_ALL_INPUT_MODE, 
+	TRY_ONCE_MODE
 };
   
-enum jwprocess_flag_t {
-	PROCESS_CREAT,	// \brief Create a new process
-	PROCESS_LOCK		// \brief Create a new process and block parent
+enum jprocess_flag_t {
+	CREATE_PROCESS,	// \brief Create a new process
+	LOCK_PROCESS		// \brief Create a new process and block parent
 };
 
 /**
@@ -65,6 +69,8 @@ class Process : public virtual jcommon::Object{
 			jio::OutputStream *_output;
 			/** \brief */
 			jio::InputStream *_error;
+			/** \brief */
+			std::string _process;
 #ifdef _WIN32
 			/** \brief */
 			HANDLE _pid;
@@ -77,7 +83,7 @@ class Process : public virtual jcommon::Object{
 					_poutput[2],
 					_perror[2];
 			/** \brief */
-			bool _is_running;
+			jprocess_type_t _type;
 
 		private:
 			/**
@@ -106,6 +112,32 @@ class Process : public virtual jcommon::Object{
 			virtual ~Process();
 
 			/**
+			 * \brief
+			 *
+			 */
+			jprocess_type_t GetType();
+
+			/**
+			 * \brief
+			 *
+			 */
+#ifdef _WIN32
+			HANDLE GetPID();
+#else
+			pid_t GetPID();
+#endif
+
+			/**
+			 * \brief
+			 *
+			 */
+#ifdef _WIN32
+			HANDLE GetParentPID();
+#else
+			pid_t GetParentPID();
+#endif
+
+			/**
 			 * \brief 
 			 *
 			 */
@@ -123,6 +155,18 @@ class Process : public virtual jcommon::Object{
 			 */
 			jio::InputStream * GetErrorStream();
 			
+			/**
+			 * \brief
+			 *
+			 */
+			void Start();
+		
+			/**
+			 * \brief
+			 *
+			 */
+			bool IsRunning();
+
 			/**
 			 * \brief
 			 *

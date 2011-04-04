@@ -216,7 +216,6 @@ OBJS_jshared = \
 	   jmemoryexception.o\
 	   jprocessexception.o\
 	   jmessagequeue.o\
-	   jprivateprocess.o\
 	   jprocess.o\
 	   jprocessinputstream.o\
 	   jprocessoutputstream.o\

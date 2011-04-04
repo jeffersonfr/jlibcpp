@@ -136,7 +136,7 @@ void BitInputStream::Skip(int64_t skip)
 
 void BitInputStream::Reset()
 {
-	// TODO:: seek file to begin
+	stream->Reset();
 }
 
 int BitInputStream::ReadBit()

@@ -38,28 +38,11 @@ Process::Process(std::string process):
 {
 	jcommon::Object::SetClassName("jshared::Process");
 	
+	_process = process;
 	_input = NULL;
 	_output = NULL;
 	_error = NULL;
-
-	_is_running = false;
-	
-#ifdef _WIN32
-#else
-	jcommon::StringTokenizer tokens(process, " ", jcommon::SPLIT_FLAG, false);
-	
-	char **argv = new char*[tokens.GetSize()+1];
-	
-	for (int i=0; i!=tokens.GetSize(); i++) {
-		argv[i] = (char *)tokens.GetToken(i).c_str();
-	}
-	
-	argv[tokens.GetSize()] = NULL;
-
-	ForkChild(argv[0], argv);
-	
-	delete [] argv;
-#endif
+	_type = PARENT_PROCESS;
 }
 
 Process::~Process()
@@ -99,6 +82,8 @@ void Process::ForkChild(const char *prog, char **args)
 	} 
 	
 	if (pid == 0) {
+		_type = CHILD_PROCESS;
+
 		close(_pinput[1]);
 		close(_poutput[0]);
 		close(_perror[0]);
@@ -130,8 +115,8 @@ void Process::ForkChild(const char *prog, char **args)
 	_output = new ProcessOutputStream(_pinput[1]); 
 	_error = new ProcessInputStream(_perror[0]); 
 
+	_type = PARENT_PROCESS;
 	_pid = pid;
-	_is_running = true;
 #endif
 }
 
@@ -139,9 +124,9 @@ int Process::MakeHandleGreaterThan2(int fd)
 {
 #ifdef _WIN32
 #else
-	int t = fcntl(fd, F_DUPFD, 2);
+	int t;
 	
-	if (t > 0) {
+	if ((t = fcntl(fd, F_DUPFD, 2)) > 0) {
 		close(fd);
 
 		return t;
@@ -153,6 +138,45 @@ int Process::MakeHandleGreaterThan2(int fd)
 
 /** End */
 	
+jprocess_type_t Process::GetType()
+{
+	return _type;
+}
+
+#ifdef _WIN32
+HANDLE Process::GetPID()
+#else
+pid_t Process::GetPID()
+#endif
+{
+#ifdef _WIN32
+	return _pid;
+#else
+	if (_pid == 0) {
+		return getpid();
+	}
+
+	return _pid;
+#endif
+}
+
+#ifdef _WIN32
+HANDLE Process::GetParentPID()
+#else
+pid_t Process::GetParentPID()
+#endif
+{
+#ifdef _WIN32
+	return _pid;
+#else
+	if (_pid == 0) {
+		return getppid();
+	}
+
+	return getpid();
+#endif
+}
+
 jio::InputStream * Process::GetInputStream()
 {
 	return _input;
@@ -172,17 +196,18 @@ jio::InputStream * Process::GetErrorStream()
 void Process::WaitProcess()
 {
 #ifdef _WIN32
+	 if (WaitForSingleObject(hProcess, INFINITE) == WAIT_FAILED) {
+		 throw ProcessException("Waiting process failed");
+	 }
 #else
 	int r,
-		status;
-	
-	if (_pid != 0) {
-		r = waitpid(_pid, &status, 0);
+			status;
 
-		if (r < 0) {
+	if (_pid != 0) {
+		if ((r = waitpid(_pid, &status, 0)) < 0) {
 			throw ProcessException("Waiting process failed");
 		}
-		
+
 		if (WIFEXITED(status) == true) {
 			if (WEXITSTATUS(status) == true) {
 				// status da saida
@@ -192,7 +217,7 @@ void Process::WaitProcess()
 		}
 		
 		if (WIFSIGNALED(status) == true) {
-			throw ProcessException("Signal was not caught");
+			// throw ProcessException("Signal was not caught");
 		
 			if (WTERMSIG(status) == true) {
 				// retorna o sinal nao capturado
@@ -202,24 +227,125 @@ void Process::WaitProcess()
 #endif
 }
 
-void Process::Interrupt()
+void Process::Start()
 {
 #ifdef _WIN32
-#else
-	if (_is_running > 0) {
-		_is_running = false;
+	HANDLE hOutputReadTmp, hInputRead;
+	HANDLE hInputWriteTmp, hOutputWrite;
+	HANDLE hErrorWrite;
+	SECURITY_ATTRIBUTES sa;
 
-		kill(_pid, SIGKILL);
+	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sa.lpSecurityDescriptor = NULL;
+	sa.bInheritHandle = TRUE;
 
-		_input->Close();
-		_output->Close();
-		_error->Close();
+	HANDLE hp = GetCurrentProcess();
 
-		delete _input;
-		delete _output;
-		delete _error;
+	CreatePipe(&hOutputReadTmp, &hOutputWrite, &sa, 0);
+	DuplicateHandle(hp, hOutputWrite, hp, &hErrorWrite, 0, TRUE, DUPLICATE_SAME_ACCESS);
+	CreatePipe(&hInputRead, &hInputWriteTmp, &sa, 0);
+	DuplicateHandle(hp, hOutputReadTmp, hp, &hOutputRead, 0, FALSE, DUPLICATE_SAME_ACCESS);
+	DuplicateHandle(hp, hInputWriteTmp, hp, &hInputWrite, 0, FALSE, DUPLICATE_SAME_ACCESS);
+	CloseHandle(hOutputReadTmp);
+	CloseHandle(hInputWriteTmp);
+
+	PROCESS_INFORMATION pi;
+	STARTUPINFO si;
+	ZeroMemory(&si, sizeof(STARTUPINFO));
+	si.cb = sizeof(STARTUPINFO);
+	si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
+	si.wShowWindow = SW_HIDE;
+	si.hStdInput  = hInputRead;
+	si.hStdOutput = hOutputWrite;
+	si.hStdError  = hErrorWrite;
+	int n = (int)strlen(command) + 1;
+	Buffer<char> cmd(n);
+	memcpy(cmd, command, n);
+	bool h = CreateProcess(NULL, cmd, &sa, &sa, TRUE,
+			NORMAL_PRIORITY_CLASS, (void *)envptr, NULL, &si, &pi);
+	LLOG("CreateProcess " << (h ? "succeeded" : "failed"));
+	CloseHandle(hErrorWrite);
+	CloseHandle(hInputRead);
+	CloseHandle(hOutputWrite);
+	if(h) {
+		hProcess = pi.hProcess;
+		CloseHandle(pi.hThread);
+	}	else {
+		Free();
+		return false;
+		//		throw Exc(NFormat("Error running process: %s\nCommand: %s", GetErrorMessage(GetLastError()), command));
 	}
+	return true;
+#else
+	jcommon::StringTokenizer tokens(_process, " ", jcommon::SPLIT_FLAG, false);
+
+	char **argv = new char*[tokens.GetSize()+1];
+
+	for (int i=0; i!=tokens.GetSize(); i++) {
+		argv[i] = (char *)tokens.GetToken(i).c_str();
+	}
+	
+	argv[tokens.GetSize()] = NULL;
+
+	ForkChild(argv[0], argv);
+	
+	delete [] argv;
 #endif
+}
+
+bool Process::IsRunning()
+{
+#ifdef _WIN32
+	DWORD exitcode;
+
+	if (GetExitCodeProcess(_pid, &exitcode) && exitcode == STILL_ACTIVE) {
+		return true;
+	}
+
+	return false;
+#else
+	int status;
+
+	if (waitpid(_pid, &status, WNOHANG | WUNTRACED) == 0) {
+		if (WIFEXITED(status) || WIFSIGNALED(status) || WIFSTOPPED(status)) {
+			return false;
+		}
+	}
+
+	return true;
+#endif
+}
+
+void Process::Interrupt()
+{
+	if (IsRunning() == true) {
+#ifdef _WIN32
+		TerminateProcess(_pid, (DWORD)-1);
+		CloseHandle(_pid);
+#else
+		kill(_pid, SIGKILL);
+#endif
+	}
+
+	if ((void *)_input != NULL) {
+		_input->Close();
+		delete _input;
+		_input = NULL;
+	}
+
+	if ((void *)_output != NULL) {
+		_output->Close();
+		delete _output;
+		_output = NULL;
+	}
+
+	if ((void *)_error != NULL) {
+		_error->Close();
+		delete _error;
+		_error = NULL;
+	}
+
+	_pid = 0;
 }
 
 }

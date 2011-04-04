@@ -179,7 +179,6 @@ void Mines::InputChanged(jgui::KeyEvent *event)
 				game_state = LOSE;
 			}
 
-			// TODO:: verificar vitoria
 			int count = 0;
 
 			for (int i=0; i<max_rows*max_cols; i++) {

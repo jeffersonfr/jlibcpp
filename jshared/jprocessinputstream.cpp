@@ -24,7 +24,11 @@ using namespace std;
 
 namespace jshared {
 
+#ifdef _WIN32
+ProcessInputStream::ProcessInputStream(HANDLE fd):
+#else
 ProcessInputStream::ProcessInputStream(int fd):
+#endif
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::ProcessInputStream");
@@ -71,7 +75,23 @@ int64_t ProcessInputStream::Read()
 int64_t ProcessInputStream::Read(char *data, int64_t size)
 {
 #ifdef _WIN32
-	return -1;
+	DWORD n;
+
+	if (IsBlocking() == true) {
+		if (ReadFile(_fd, data, sizeof(buffer), &n, NULL) == TRUE) {
+			return (int64_t)n;
+		}
+	} else {
+		if (!PeekNamedPipe(_fd, NULL, 0, NULL, &n, NULL) || n == 0) {
+			return 0LL;
+		}
+
+		if (ReadFile(_fd, data, sizeof(buffer), &n, NULL) == TRUE) {
+			return (int64_t)n;
+		}
+	}
+
+	return -1LL;
 #else
 	if (IsBlocking() == true) {
 		return ::read(_fd, data, size);
@@ -82,11 +102,11 @@ int64_t ProcessInputStream::Read(char *data, int64_t size)
 		FD_ZERO(&readfs);
 		FD_SET(_fd, &readfs);
 
-		t.tv_sec = 1L;
-		t.tv_usec = 0L;
+		t.tv_sec = 1LL;
+		t.tv_usec = 0LL;
 
 		if (select(_fd+1, &readfs, NULL, NULL, &t) < 0) {
-			return -1;
+			return -1LL;
 		}
 
 		if (FD_ISSET(_fd, &readfs)) {
@@ -94,7 +114,7 @@ int64_t ProcessInputStream::Read(char *data, int64_t size)
 		}
 	}
 
-	return -1;
+	return -1LL;
 #endif
 }
 
@@ -108,7 +128,11 @@ void ProcessInputStream::Reset()
 
 void ProcessInputStream::Close()
 {
+#ifdef _WIN32
+	CloseHandle(_fd);
+#else
 	::close(_fd);
+#endif
 }
 
 bool ProcessInputStream::IsClosed()

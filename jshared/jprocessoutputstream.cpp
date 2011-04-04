@@ -24,7 +24,11 @@ using namespace std;
 
 namespace jshared {
 
+#ifdef _WIN32
+ProcessOutputStream::ProcessOutputStream(HANDLE fd):
+#else
 ProcessOutputStream::ProcessOutputStream(int fd):
+#endif
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::ProcessOutputStream");
@@ -61,6 +65,12 @@ int64_t ProcessOutputStream::Write(int64_t b)
 int64_t ProcessOutputStream::Write(const char *data, int64_t size)
 {
 #ifdef _WIN32
+	DWORD n;
+	
+	if (WriteFile(_fd, data, size, &n, NULL) == TRUE) {
+		return (int64_t)n;
+	}
+
 	return -1LL;
 #else
 	if (IsBlocking() == true) {
@@ -114,7 +124,11 @@ void ProcessOutputStream::Seek(int64_t index)
 
 void ProcessOutputStream::Close()
 {
+#ifdef _WIN32
+	CloseHandle(_fd);
+#else
 	::close(_fd);
+#endif
 }
 
 bool ProcessOutputStream::IsClosed()

@@ -20,13 +20,14 @@
 #ifndef J_PROCESSOUTPUTSTREAM_H_
 #define J_PROCESSOUTPUTSTREAM_H_
 
-#include "jprivateprocess.h"
 #include "jinputstream.h"
 #include "joutputstream.h"
 
 #include <stdint.h>
 
 namespace jshared {
+
+class Process;
 
 /**
  * \brief Socket.
@@ -35,16 +36,27 @@ namespace jshared {
  */
 class ProcessOutputStream : public jio::OutputStream {
 
-	private:
-		int _fd;
+	friend class Process;
 
-	public:
+	private:
+#ifdef _WIN32
+		HANDLE _fd;
+#else
+		int _fd;
+#endif
+
+	private:
 		/**
 		 * \brief
 		 *
 		 */
+#ifdef _WIN32
+		ProcessOutputStream(HANDLE fd);
+#else
 		ProcessOutputStream(int fd);
+#endif
 		
+	public:
 		/**
 		 * \brief
 		 *
