@@ -171,7 +171,7 @@
     <ClCompile Include="..\..\jgui\jmouselistener.cpp" />
     <ClCompile Include="..\..\jgui\jnullgraphics.cpp" />
     <ClCompile Include="..\..\jgui\jnulllayout.cpp" />
-    <ClCompile Include="..\..\jgui\joffscreenimage.cpp" />
+    <ClCompile Include="..\..\jgui\jimage.cpp" />
     <ClCompile Include="..\..\jgui\jpanel.cpp" />
     <ClCompile Include="..\..\jgui\jprogressbar.cpp" />
     <ClCompile Include="..\..\jgui\jscrollbar.cpp" />

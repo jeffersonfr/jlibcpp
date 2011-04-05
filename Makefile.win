@@ -267,7 +267,7 @@ OBJS_jgui = \
 		jmenulistener.o\
 		jmessagedialog.o\
 		jinputdialogbox.o\
-		joffscreenimage.o\
+		jimage.o\
 		jpanel.o\
 		jprogressbar.o\
 		jmouselistener.o\
