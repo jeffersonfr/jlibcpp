@@ -24,7 +24,7 @@
 namespace jgui {
 
 NullGraphics::NullGraphics():
-	Graphics(NULL, false)
+	Graphics()
 {
 	jcommon::Object::SetClassName("jgui::NullGraphics");
 

@@ -247,7 +247,17 @@ class Graphics : public virtual jcommon::Object{
 #endif
 
 	protected:
-		Graphics(void *s, bool premultiplied);
+		/**
+		 * \brief
+		 *
+		 */
+		Graphics();
+
+		/**
+		 * \brief
+		 *
+		 */
+		Graphics(void *surface, bool premultiplied);
 
 	public:
 		/**

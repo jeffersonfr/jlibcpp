@@ -87,7 +87,47 @@ class Triangulate {
 // Vector of vertices which are used to represent a polygon/contour and a series of triangles
 typedef std::vector< Vector2d > Vector2dVector;
 
-Graphics::Graphics(void *s, bool premultiplied):
+Graphics::Graphics():
+	jcommon::Object()
+{
+	jcommon::Object::SetClassName("jgui::Graphics");
+
+	_is_premultiply = false;
+	_antialias_enabled = false;
+
+	_radians = 0.0;
+	_translate.x = 0;
+	_translate.y = 0;
+	_translate_image.x = 0;
+	_translate_image.y = 0;
+
+	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
+	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
+
+	_scale.width = DEFAULT_SCALE_WIDTH;
+	_scale.height = DEFAULT_SCALE_HEIGHT;
+
+#ifdef DIRECTFB_UI
+	surface = NULL;
+#endif
+
+	_clip.x = 0;
+	_clip.y = 0;
+	_clip.width = DEFAULT_SCALE_WIDTH;
+	_clip.height = DEFAULT_SCALE_HEIGHT;
+
+	_font = NULL;
+
+	_line_join = BEVEL_JOIN;
+	_line_style = SOLID_LINE;
+	_line_width = 1;
+
+	SetDrawingFlags(DF_BLEND);
+	SetBlittingFlags(BF_ALPHACHANNEL);
+	SetPorterDuffFlags(PDF_SRC_OVER);
+}
+
+Graphics::Graphics(void *surface, bool premultiplied):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jgui::Graphics");
@@ -108,7 +148,7 @@ Graphics::Graphics(void *s, bool premultiplied):
 	_scale.height = DEFAULT_SCALE_HEIGHT;
 
 #ifdef DIRECTFB_UI
-	surface = (IDirectFBSurface *)s;
+	surface = (IDirectFBSurface *)surface;
 #endif
 
 	_clip.x = 0;
