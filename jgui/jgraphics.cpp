@@ -148,7 +148,7 @@ Graphics::Graphics(void *surface, bool premultiplied):
 	_scale.height = DEFAULT_SCALE_HEIGHT;
 
 #ifdef DIRECTFB_UI
-	surface = (IDirectFBSurface *)surface;
+	this->surface = (IDirectFBSurface *)surface;
 #endif
 
 	_clip.x = 0;
