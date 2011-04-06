@@ -42,6 +42,7 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 	_is_visible = true;
 	_parent = NULL;
 	_optimized_paint = false;
+	_is_opaque = false;
 
 	_insets.left = 0;
 	_insets.right = 0;

@@ -556,9 +556,10 @@ void Window::Repaint(bool all)
 	}
 
 	_graphics->Reset();
+
 	Paint(_graphics);
+
 	_graphics->Flip();
-	
 	_graphics->Unlock();
 
 	Revalidate();
@@ -647,7 +648,7 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 			_graphics->Lock();
 			
 			translate = _graphics->Translate();
-			
+		
 			_graphics->Reset();
 			_graphics->Translate(x, y);
 			_graphics->SetClip(0, 0, w, h);
