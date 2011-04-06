@@ -648,7 +648,7 @@ void Window::Repaint(Component *c, int x, int y, int width, int height)
 			_graphics->Lock();
 			
 			translate = _graphics->Translate();
-		
+			
 			_graphics->Reset();
 			_graphics->Translate(x, y);
 			_graphics->SetClip(0, 0, w, h);

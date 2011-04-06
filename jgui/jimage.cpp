@@ -359,7 +359,7 @@ Image * Image::SubImage(int x, int y, int width, int height)
 void Image::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
 	if (_graphics != NULL) {
-		_graphics->GetRGB(xp, yp, wp, hp, rgb, GetWidth());
+		_graphics->GetRGB(rgb, xp, yp, wp, hp, GetWidth());
 
 		return;
 	}

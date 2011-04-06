@@ -495,17 +495,17 @@ uint32_t NullGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 	return pixel;
 }
 
-void NullGraphics::GetRGB(int startxp, int startyp, int wp, int hp, unsigned int **rgb, int offset, int scansize)
+void NullGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::SetRGB(int xp, int yp, uint32_t rgb) 
+void NullGraphics::SetRGB(uint32_t rgb, int xp, int yp) 
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::SetRGB(unsigned int *rgb, int x, int y, int w, int h, int scanline) 
+void NullGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline) 
 {
 	JDEBUG(JINFO, "called\n");
 }

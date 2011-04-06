@@ -528,13 +528,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void GetRGB(int startxp, int startyp, int widthp, int heightp, uint32_t **rgb, int offset, int scansize);
+		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetRGB(int xp, int yp, uint32_t rgb);
+		virtual void SetRGB(uint32_t rgb, int xp, int yp);
 		
 		/**
 		 * \brief

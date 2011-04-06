@@ -736,13 +736,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void GetRGB(int startxp, int startyp, int widthp, int heightp, uint32_t **rgb, int scansize);
+		virtual void GetRGB(uint32_t **rgb, int startxp, int startyp, int widthp, int heightp, int scansize);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetRGB(int xp, int yp, uint32_t rgb);
+		virtual void SetRGB(uint32_t rgb, int xp, int yp);
 		
 		/**
 		 * \brief

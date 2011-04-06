@@ -480,7 +480,7 @@ void Graphics::SetAntiAliasEnabled(bool b)
 
 void Graphics::SetPixel(int xp, int yp, uint32_t pixel)
 {
-	SetRGB(xp, yp, pixel);
+	SetRGB(pixel, xp, yp);
 }
 
 uint32_t Graphics::GetPixel(int xp, int yp)
@@ -2232,7 +2232,7 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 	return pixel;
 }
 
-void Graphics::GetRGB(int xp, int yp, int wp, int hp, unsigned int **rgb, int scansize)
+void Graphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize)
 {
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
@@ -2291,7 +2291,7 @@ void Graphics::GetRGB(int xp, int yp, int wp, int hp, unsigned int **rgb, int sc
 #endif
 }
 
-void Graphics::SetRGB(int xp, int yp, uint32_t argb) 
+void Graphics::SetRGB(uint32_t argb, int xp, int yp) 
 {
 #ifdef DIRECTFB_UI
 	if (surface == NULL) {
