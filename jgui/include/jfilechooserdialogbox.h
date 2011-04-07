@@ -60,7 +60,7 @@ enum jfilechooser_filter_t {
  *
  * \author Jeff Ferr
  */
-class FileChooserDialogBox : public jgui::Frame, public jgui::SelectListener, public jgui::FrameInputListener{
+class FileChooserDialogBox : public jgui::Frame, public jgui::SelectListener{
 
 	private:
 		std::vector<std::string> _extensions;
@@ -166,7 +166,7 @@ class FileChooserDialogBox : public jgui::Frame, public jgui::SelectListener, pu
 		 * \brief
 		 *
 		 */
-		virtual void InputChanged(jgui::KeyEvent *event);
+		virtual void InputReceived(jgui::KeyEvent *event);
 
 };
 

@@ -26,7 +26,6 @@
 #include "jwindow.h"
 #include "jfont.h"
 #include "jcontainer.h"
-#include "jframeinputlistener.h"
 #include "jicon.h"
 #include "jthread.h"
 #include "jmutex.h"
@@ -108,13 +107,10 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		virtual void MouseWheel(MouseEvent *event);
 
 	protected:
+		std::vector<frame_subtitle_t> _subtitles;
 		jthread::Mutex _input_mutex,
 			_paint_mutex;
 		jthread::Condition _frame_sem;
-
-		std::vector<FrameInputListener *> _key_listeners;
-		std::vector<frame_subtitle_t> _subtitles;
-
 		std::string _title,
 			_icon;
 		int _init_type,
@@ -298,19 +294,13 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 * \brief
 		 *
 		 */
-		virtual void RegisterInputListener(FrameInputListener *listener);
+		virtual void InputReceived(KeyEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void RemoveInputListener(FrameInputListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::vector<FrameInputListener *> & GetFrameInputListeners();
+		virtual void InputReceived(MouseEvent *event);
 
 };
 

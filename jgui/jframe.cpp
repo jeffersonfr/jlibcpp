@@ -377,6 +377,14 @@ void Frame::Paint(Graphics *g)
 	g->Reset();
 }
 
+void Frame::InputReceived(KeyEvent *event)
+{
+}
+
+void Frame::InputReceived(MouseEvent *event)
+{
+}
+
 void Frame::KeyPressed(KeyEvent *event)
 {
 	// JDEBUG(JINFO, "antes\n");
@@ -411,9 +419,7 @@ void Frame::KeyPressed(KeyEvent *event)
 
 	jthread::AutoLock lock(&_input_mutex);
 	
-	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		(*i)->InputChanged(event);
-	}
+	InputReceived(event);
 }
 
 void Frame::MousePressed(MouseEvent *event)
@@ -504,9 +510,7 @@ void Frame::MousePressed(MouseEvent *event)
 
 	jthread::AutoLock lock(&_input_mutex);
 
-	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		(*i)->InputChanged(event);
-	}
+	InputReceived(event);
 }
 
 void Frame::MouseReleased(MouseEvent *event)
@@ -541,9 +545,7 @@ void Frame::MouseReleased(MouseEvent *event)
 
 	jthread::AutoLock lock(&_input_mutex);
 	
-	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		(*i)->InputChanged(event);
-	}
+	InputReceived(event);
 }
 
 void Frame::MouseClicked(MouseEvent *event)
@@ -567,9 +569,7 @@ void Frame::MouseClicked(MouseEvent *event)
 
 	jthread::AutoLock lock(&_input_mutex);
 	
-	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		(*i)->InputChanged(event);
-	}
+	InputReceived(event);
 }
 
 void Frame::MouseMoved(MouseEvent *event)
@@ -603,9 +603,7 @@ void Frame::MouseMoved(MouseEvent *event)
 
 	jthread::AutoLock lock(&_input_mutex);
 	
-	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		(*i)->InputChanged(event);
-	}
+	InputReceived(event);
 }
 
 void Frame::MouseWheel(MouseEvent *event)
@@ -629,9 +627,7 @@ void Frame::MouseWheel(MouseEvent *event)
 
 	jthread::AutoLock lock(&_input_mutex);
 	
-	for (std::vector<FrameInputListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		(*i)->InputChanged(event);
-	}
+	InputReceived(event);
 }
 
 void Frame::Release()
@@ -647,35 +643,6 @@ void Frame::Release()
 	SetVisible(false);
 	
 	_frame_sem.Notify();
-}
-
-void Frame::RegisterInputListener(FrameInputListener *listener)
-{
-	if (listener == NULL) {
-		return;
-	}
-
-	if (std::find(_key_listeners.begin(), _key_listeners.end(), listener) == _key_listeners.end()) {
-		_key_listeners.push_back(listener);
-	}
-}
-
-void Frame::RemoveInputListener(FrameInputListener *listener)
-{
-	if (listener == NULL) {
-		return;
-	}
-
-	std::vector<FrameInputListener *>::iterator i = std::find(_key_listeners.begin(), _key_listeners.end(), listener);
-
-	if (i != _key_listeners.end()) {
-		_key_listeners.erase(i);
-	}
-}
-
-std::vector<FrameInputListener *> & Frame::GetFrameInputListeners()
-{
-	return _key_listeners;
 }
 
 }

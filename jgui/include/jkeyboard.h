@@ -55,7 +55,7 @@ enum jkeyboard_type_t {
  *
  * \author Jeff Ferr
  */
-class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::FrameInputListener, public jgui::TextListener {
+class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::TextListener {
 
 	private:
 		jthread::Mutex _key_mutex;
@@ -170,7 +170,7 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::F
 		 * \brief
 		 *
 		 */
-		virtual void InputChanged(jgui::KeyEvent *event);
+		virtual void InputReceived(jgui::KeyEvent *event);
 		
 		/**
 		 * \brief

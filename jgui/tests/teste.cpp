@@ -43,7 +43,7 @@
 #include "jmenugroup.h"
 #include "jsystem.h"
 
-class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener, public jgui::FrameInputListener{
+class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -349,8 +349,6 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		Add(list);
 
 		button1->RequestFocus();
-
-		Frame::RegisterInputListener(this);
 	}
 
 	virtual ~WindowTeste()
@@ -387,7 +385,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		delete radio3;
 	}
 
-	virtual void InputChanged(jgui::KeyEvent *event)
+	virtual void InputReceived(jgui::KeyEvent *event)
 	{
 		jthread::AutoLock lock(&teste_mutex);
 

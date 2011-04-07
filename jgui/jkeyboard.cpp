@@ -24,8 +24,7 @@
 namespace jgui {
 
 Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool is_password):
-   	jgui::Frame("Teclado Virtual", x, y, 15*30+20, 1),
-	jgui::FrameInputListener()
+ 	jgui::Frame("Teclado Virtual", x, y, 15*30+20, 1)
 {
 	jcommon::Object::SetClassName("jgui::Keyboard");
 
@@ -59,14 +58,10 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 	AddSubtitle(_DATA_PREFIX"images/blue_icon.png", "Confirmar");
 
 	Pack();
-
-	Frame::RegisterInputListener(this);
 }
 
 Keyboard::~Keyboard() 
 {
-	Frame::RemoveInputListener(this);
-
 	jthread::AutoLock lock(&_key_mutex);
 
 	_keyboard_listeners.clear();
@@ -84,7 +79,7 @@ Keyboard::~Keyboard()
 	}
 }
 
-void Keyboard::InputChanged(jgui::KeyEvent *event)
+void Keyboard::InputReceived(jgui::KeyEvent *event)
 {
 	if (event->GetSymbol() == JKEY_BLUE || event->GetSymbol() == JKEY_F4) {
 		jgui::Frame::Hide();

@@ -24,8 +24,7 @@
 namespace jgui {
 
 CalendarDialogBox::CalendarDialogBox(int x, int y):
-	jgui::Frame("Calendar", x, y, 1, 1),
-	jgui::FrameInputListener()
+	jgui::Frame("Calendar", x, y, 1, 1)
 {
 	jcommon::Object::SetClassName("jgui::CalendarDialogBox");
 
@@ -113,14 +112,10 @@ CalendarDialogBox::CalendarDialogBox(int x, int y):
 	AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
 
 	BuildCalendar();
-
-	Frame::RegisterInputListener(this);
 }
 
 CalendarDialogBox::~CalendarDialogBox() 
 {
-	Frame::RemoveInputListener(this);
-
 	while (_buttons.size() > 0) {
 		Button *b = (*_buttons.begin());
 
@@ -369,7 +364,7 @@ void CalendarDialogBox::BuildCalendar()
 	Repaint();
 }
 
-void CalendarDialogBox::InputChanged(jgui::KeyEvent *event)
+void CalendarDialogBox::InputReceived(jgui::KeyEvent *event)
 {
 	if (event->GetSymbol() == JKEY_BLUE || event->GetSymbol() == JKEY_F4) {
 		Release();

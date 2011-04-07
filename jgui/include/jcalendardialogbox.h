@@ -58,7 +58,7 @@ struct jcalendar_warnning_t {
  *
  * \author Jeff Ferr
  */
-class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public FrameInputListener{
+class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener{
 
 	private:
 		jthread::Mutex _cal_mutex;
@@ -187,7 +187,7 @@ class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, publi
 		 * \brief
 		 *
 		 */
-		virtual void InputChanged(jgui::KeyEvent *event);
+		virtual void InputReceived(jgui::KeyEvent *event);
 
 		/**
 		 * \brief

@@ -81,8 +81,6 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 	}
 
 	Pack();
-	
-	RegisterInputListener(this);
 }
 
 FileChooserDialogBox::~FileChooserDialogBox()
@@ -317,7 +315,7 @@ void FileChooserDialogBox::ItemSelected(jgui::SelectEvent *event)
 	}
 }
 
-void FileChooserDialogBox::InputChanged(jgui::KeyEvent *event)
+void FileChooserDialogBox::InputReceived(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&_mutex);
 

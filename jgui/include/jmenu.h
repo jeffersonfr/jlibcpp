@@ -21,7 +21,6 @@
 #define J_MENU_H
 
 #include "jframe.h"
-#include "jframeinputlistener.h"
 #include "jimage.h"
 #include "jmouselistener.h"
 #include "jitemcomponent.h"
@@ -49,7 +48,7 @@ enum jmenu_align_t {
  *
  * \author Jeff Ferr
  */
-class Menu : public jgui::ItemComponent, public jgui::FrameInputListener, public jgui::ThemeListener{
+class Menu : public KeyListener, public MouseListener, public jgui::ItemComponent, public jgui::ThemeListener{
 
 	private:
 		jthread::Mutex _menu_mutex;
@@ -57,7 +56,7 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener, public
 
 		std::vector<Menu *> _menus;
 		jgui::Frame *_frame;
-		jgui::Image *prefetch;
+		jgui::Image *_check;
 		jmenu_align_t _menu_align;
 		std::string _title;
 		int _top_index,
@@ -70,26 +69,32 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener, public
 		 * \brief
 		 *
 		 */
-		virtual void MousePressed(MouseEvent *event);
+		virtual void KeyPressed(KeyEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void MousePressed(MouseEvent *event);
+		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void MouseReleased(MouseEvent *event);
-
+		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void MouseClicked(MouseEvent *event);
-
+		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void MouseMoved(MouseEvent *event);
-
+		
 		/**
 		 * \brief
 		 *
@@ -271,30 +276,6 @@ class Menu : public jgui::ItemComponent, public jgui::FrameInputListener, public
 		 */
 		virtual void Paint(Graphics *g);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InputChanged(KeyEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterInputListener(FrameInputListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveInputListener(FrameInputListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::vector<FrameInputListener *> & GetFrameInputListeners();
-		
 		/**
 		 * \brief
 		 *
