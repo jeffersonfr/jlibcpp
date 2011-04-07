@@ -2219,7 +2219,7 @@ static void DrawTriangle(jgui::Graphics *g, float light1, float light2, Tri3D* t
 	}
 }
 
-class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
+class GraphicsTeste : public jgui::Frame{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -2241,8 +2241,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 		dyL = 7;
 
 		SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
-
-		Frame::RegisterInputListener(this);
 	}
 
 		virtual ~GraphicsTeste()
@@ -2362,7 +2360,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			}
 		}
 
-		virtual void InputChanged(jgui::KeyEvent *event)
+		virtual void InputReceived(jgui::KeyEvent *event)
 		{
 			jthread::AutoLock lock(&teste_mutex);
 

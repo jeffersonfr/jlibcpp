@@ -316,8 +316,7 @@ void PhoneDB::RemoveAll()
 }
 
 AddContact::AddContact(PhoneDB *base, int index):
-	jgui::Frame("Adicionar contato", (1920-600)/2, 300, 600, 400),
-	jgui::FrameInputListener()
+	jgui::Frame("Adicionar contato", (1920-600)/2, 300, 600, 400)
 {
 	int max_width = GetWidth()-_insets.left-_insets.right,
 			height = DEFAULT_COMPONENT_HEIGHT+4;
@@ -370,8 +369,6 @@ AddContact::AddContact(PhoneDB *base, int index):
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/vertical_arrows.png", "Selecionar");
 
 	Pack();
-
-	Frame::RegisterInputListener(this);
 }
 
 AddContact::~AddContact() 
@@ -410,7 +407,7 @@ void AddContact::KeyboardUpdated(jgui::KeyboardEvent *event)
 	}
 }
 
-void AddContact::InputChanged(jgui::KeyEvent *event)
+void AddContact::InputReceived(jgui::KeyEvent *event)
 {
 	if (event->GetType() != jgui::JKEY_PRESSED) {
 		return;
@@ -572,8 +569,6 @@ SearchContacts::SearchContacts(PhoneDB *base):
 	}
 
 	Pack();
-
-	Frame::RegisterInputListener(this);
 }
 
 SearchContacts::~SearchContacts() 
@@ -645,7 +640,7 @@ void SearchContacts::KeyboardUpdated(jgui::KeyboardEvent *event)
 	}
 }
 
-void SearchContacts::InputChanged(jgui::KeyEvent *event)
+void SearchContacts::InputReceived(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&search_mutex);
 

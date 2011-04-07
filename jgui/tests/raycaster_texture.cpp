@@ -695,7 +695,7 @@ int loadImage(std::vector<uint32_t>& out, unsigned long& w, unsigned long& h, co
 	return 0;
 }
 
-class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
+class GraphicsTeste : public jgui::Frame{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -743,8 +743,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 		if(error) { 
 			exit(1);
 		}
-
-		Frame::RegisterInputListener(this);
 	}
 
 		virtual ~GraphicsTeste()
@@ -997,7 +995,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			g->SetRGB((uint32_t *)buffer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH);
 		}
 
-		virtual void InputChanged(jgui::KeyEvent *event)
+		virtual void InputReceived(jgui::KeyEvent *event)
 		{
 			jthread::AutoLock lock(&teste_mutex);
 

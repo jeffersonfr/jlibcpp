@@ -96,7 +96,7 @@ int checks[] = {
 	-1,1,  0,1,  1,1,  1,1
 };
 
-class Tetris : public jgui::Frame, public jthread::Thread, jgui::FrameInputListener {
+class Tetris : public jgui::Frame, public jthread::Thread{
 
 	public:
 		jgui::Graphics *goff;
@@ -204,8 +204,6 @@ class Tetris : public jgui::Frame, public jthread::Thread, jgui::FrameInputListe
 			SetBackgroundColor((background>>0x10)&0xff, (background>>0x08)&0xff, (background>>0x00)&0xff, (background>>0x18)&0xff);
 			SetUndecorated(true);
 			SetSize(width+2*barwidth, height+2*barwidth);
-
-			RegisterInputListener(this);
 		}
 
 		virtual ~Tetris()
@@ -274,7 +272,7 @@ class Tetris : public jgui::Frame, public jthread::Thread, jgui::FrameInputListe
 			}
 		}
 
-		virtual void InputChanged(jgui::KeyEvent *event)
+		virtual void InputReceived(jgui::KeyEvent *event)
 		{
 			if (event->GetType() == jgui::JKEY_PRESSED) {
 				if (ingame) {

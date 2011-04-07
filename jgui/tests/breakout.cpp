@@ -46,7 +46,7 @@ double myrandom()
 	return ((double)(random()%1000))/1000.0;
 }
 
-class Breakout : public jgui::Frame, public jgui::FrameInputListener, public jthread::Thread {
+class Breakout : public jgui::Frame, public jthread::Thread {
 
 	private:
 		jgui::Image *off;
@@ -98,8 +98,6 @@ class Breakout : public jgui::Frame, public jgui::FrameInputListener, public jth
 			GameInit();
 
 			Start();
-	
-			Frame::RegisterInputListener(this);
 		}
 
 		void GameInit()
@@ -130,7 +128,7 @@ class Breakout : public jgui::Frame, public jgui::FrameInputListener, public jth
 				showbrick[i] = true;
 		}
 
-		virtual void InputChanged(jgui::KeyEvent *event)
+		virtual void InputReceived(jgui::KeyEvent *event)
 		{
 			if (event->GetType() == jgui::JKEY_RELEASED) {
 				batdpos = 0;

@@ -30,7 +30,7 @@ typedef struct {
 		  y; 
 } ponto_plano;
 
-class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
+class GraphicsTeste : public jgui::Frame{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -80,8 +80,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			q4.x = -1, q4.y = 1, q4.z = 1;
 
 			SetUndecorated(true);
-
-			Frame::RegisterInputListener(this);
 		}
 
 		virtual ~GraphicsTeste()
@@ -211,7 +209,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 
 		}
 
-		virtual void InputChanged(jgui::KeyEvent *event)
+		virtual void InputReceived(jgui::KeyEvent *event)
 		{
 			jthread::AutoLock lock(&teste_mutex);
 

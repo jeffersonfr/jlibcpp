@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "jframe.h"
 
-class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread::Thread{
+class Main : public jgui::Frame, public jthread::Thread{
 
 	private:
 		jgui::Image *_image,
@@ -67,8 +67,6 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 			_tiles->GetGraphics()->DrawImage("images/tiles.png", 0, 0, (10*_tile_w), (4*_tile_h));
 
 			SetSize((int)(10*_tile_w+_insets.left+_insets.right), (8*_tile_h+_insets.top+_insets.bottom));
-
-			RegisterInputListener(this);
 		}
 
 		virtual ~Main()
@@ -133,7 +131,7 @@ class Main : public jgui::Frame, public jgui::FrameInputListener, public jthread
 			}
 		}
 
-		virtual void InputChanged(jgui::KeyEvent *event)
+		virtual void InputReceived(jgui::KeyEvent *event)
 		{
 			double angle_step = 0.1;
 

@@ -85,7 +85,7 @@ class AgendaDB{
 
 };
 
-class AddMessage : public jgui::Frame, public jgui::KeyboardListener, public jgui::FrameInputListener{
+class AddMessage : public jgui::Frame, public jgui::KeyboardListener{
 
 	private:
 		jthread::Mutex add_mutex;
@@ -112,11 +112,11 @@ class AddMessage : public jgui::Frame, public jgui::KeyboardListener, public jgu
 		virtual ~AddMessage();
 
 		virtual void KeyboardUpdated(jgui::KeyboardEvent *event);
-		virtual void InputChanged(jgui::KeyEvent *event);
+		virtual void InputReceived(jgui::KeyEvent *event);
 
 };
 
-class ViewMessages : public jgui::Frame, public jgui::FrameInputListener{
+class ViewMessages : public jgui::Frame{
 
 	private:
 		jthread::Mutex view_mutex;
@@ -134,7 +134,7 @@ class ViewMessages : public jgui::Frame, public jgui::FrameInputListener{
 		ViewMessages(AgendaDB *db);
 		virtual ~ViewMessages();
 
-		virtual void InputChanged(jgui::KeyEvent *event);
+		virtual void InputReceived(jgui::KeyEvent *event);
 
 };
 

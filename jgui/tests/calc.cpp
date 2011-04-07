@@ -103,8 +103,6 @@ MCalc::MCalc(int x, int y):
 	Add(container, jgui::BL_CENTER);
 
 	b[10]->RequestFocus();
-
-	Frame::RegisterInputListener(this);
 }
 
 MCalc::~MCalc() 
@@ -405,7 +403,7 @@ void MCalc::Process(std::string type)
 		}
 }
 
-void MCalc::InputChanged(jgui::KeyEvent *event)
+void MCalc::InputReceived(jgui::KeyEvent *event)
 {
 		jthread::AutoLock lock(&mcalc_mutex);
 

@@ -467,8 +467,6 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/vertical_arrows.png", "Selecionar");
 
 	Pack();
-
-	Frame::RegisterInputListener(this);
 }
 
 AddMessage::~AddMessage() 
@@ -555,7 +553,7 @@ void AddMessage::KeyboardUpdated(jgui::KeyboardEvent *event)
 	}
 }
 
-void AddMessage::InputChanged(jgui::KeyEvent *event)
+void AddMessage::InputReceived(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&add_mutex);
 
@@ -767,8 +765,6 @@ ViewMessages::ViewMessages(AgendaDB *base):
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/horizontal_arrows.png", "Listar");
 
 	Pack();
-
-	Frame::RegisterInputListener(this);
 }
 
 ViewMessages::~ViewMessages() 
@@ -808,7 +804,7 @@ void ViewMessages::Update()
 	}
 }
 
-void ViewMessages::InputChanged(jgui::KeyEvent *event)
+void ViewMessages::InputReceived(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&view_mutex);
 

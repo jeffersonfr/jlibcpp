@@ -27,7 +27,7 @@
 
 #include <sstream>
 
-class Stock : public jgui::Frame, public jgui::FrameInputListener {
+class Stock : public jgui::Frame{
 
 	private:
 			jgui::TextField *acao;
@@ -100,14 +100,10 @@ class Stock : public jgui::Frame, public jgui::FrameInputListener {
 			acao->RequestFocus();
 
 			Pack();
-			
-			RegisterInputListener(this);
 		}
 
 		virtual ~Stock() 
 		{
-			RemoveInputListener(this);
-
 			delete acao;
 			delete ldata;
 			delete lcotacao;
@@ -178,7 +174,7 @@ class Stock : public jgui::Frame, public jgui::FrameInputListener {
 			return quotes;
 		}
 
-		virtual void InputChanged(jgui::KeyEvent *event)
+		virtual void InputReceived(jgui::KeyEvent *event)
 		{
 			if (event->GetType() != jgui::JKEY_PRESSED) {
 				return;

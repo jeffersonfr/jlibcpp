@@ -24,7 +24,7 @@
 
 namespace mines {
 
-class Mines : public jgui::Frame, public jgui::FrameInputListener{
+class Mines : public jgui::Frame{
 
 	enum game_status_t {
 		NONE,
@@ -77,7 +77,7 @@ class Mines : public jgui::Frame, public jgui::FrameInputListener{
 	void Expose(int row, int col);
 	game_status_t GetResult();
 
-	virtual void InputChanged(jgui::KeyEvent *event);
+	virtual void InputReceived(jgui::KeyEvent *event);
 
 };
 

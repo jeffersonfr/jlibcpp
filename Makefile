@@ -305,7 +305,6 @@ OBJS_jgui = \
 		jfocuslistener.o\
 		jfont.o\
 		jframe.o\
-		jframeinputlistener.o\
 		jgfxhandler.o\
 		jgraphics.o\
 		jgridbaglayout.o\

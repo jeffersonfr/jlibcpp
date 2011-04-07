@@ -52,8 +52,6 @@ Mines::Mines(int x, int y):
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Novo Jogo");
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png", "Flag");
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/green_icon.png", "Ajuda");
-
-	Frame::RegisterInputListener(this);
 }
 
 Mines::~Mines() 
@@ -136,7 +134,7 @@ void Mines::Paint(jgui::Graphics *g)
 	g->FillRectangle(_insets.left+current_col*(size+delta), _insets.top+current_row*(size+delta), size, size);
 }
 
-void Mines::InputChanged(jgui::KeyEvent *event)
+void Mines::InputReceived(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&mines_mutex);
 

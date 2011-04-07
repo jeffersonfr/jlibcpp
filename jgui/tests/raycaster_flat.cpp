@@ -50,7 +50,7 @@ int worldMap[mapWidth][mapHeight]=
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
+class GraphicsTeste : public jgui::Frame{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -71,8 +71,6 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			dirY = 0; //initial direction vector
 			planeX = 0;
 			planeY = 0.66; //the 2d raycaster version of camera plane
-
-			Frame::RegisterInputListener(this);
 		}
 
 		virtual ~GraphicsTeste()
@@ -182,7 +180,7 @@ class GraphicsTeste : public jgui::Frame, public jgui::FrameInputListener{
 			}
 		}
 
-		virtual void InputChanged(jgui::KeyEvent *event)
+		virtual void InputReceived(jgui::KeyEvent *event)
 		{
 			jthread::AutoLock lock(&teste_mutex);
 

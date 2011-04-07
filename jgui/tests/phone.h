@@ -83,7 +83,7 @@ class PhoneDB{
 
 };
 
-class AddContact : public jgui::Frame, public jgui::KeyboardListener, public jgui::FrameInputListener{
+class AddContact : public jgui::Frame, public jgui::KeyboardListener{
 
 		private:
 			jthread::Mutex add_mutex;
@@ -103,11 +103,11 @@ class AddContact : public jgui::Frame, public jgui::KeyboardListener, public jgu
 			virtual ~AddContact();
 
 			virtual void KeyboardUpdated(jgui::KeyboardEvent *event);
-			virtual void InputChanged(jgui::KeyEvent *event);
+			virtual void InputReceived(jgui::KeyEvent *event);
 
 };
 
-class SearchContacts : public jgui::Frame, public jgui::KeyboardListener, public jgui::FrameInputListener{
+class SearchContacts : public jgui::Frame, public jgui::KeyboardListener{
 
 	private:
 		jthread::Mutex search_mutex;
@@ -131,7 +131,7 @@ class SearchContacts : public jgui::Frame, public jgui::KeyboardListener, public
 		virtual ~SearchContacts();
 
 		virtual void KeyboardUpdated(jgui::KeyboardEvent *event);
-		virtual void InputChanged(jgui::KeyEvent *event);
+		virtual void InputReceived(jgui::KeyEvent *event);
 
 };
 

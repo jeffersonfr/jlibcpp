@@ -30,7 +30,7 @@
 
 namespace mcalc {
 
-class MCalc : public jgui::Frame, public jgui::ButtonListener, public jgui::FrameInputListener{
+class MCalc : public jgui::Frame, public jgui::ButtonListener{
 
 		private:
 			jthread::Mutex mcalc_mutex;
@@ -48,7 +48,7 @@ class MCalc : public jgui::Frame, public jgui::ButtonListener, public jgui::Fram
 
 			void Process(std::string type);
 
-			virtual void InputChanged(jgui::KeyEvent *event);
+			virtual void InputReceived(jgui::KeyEvent *event);
 			virtual void ActionPerformed(jgui::ButtonEvent *event);
 
 };

@@ -48,7 +48,7 @@ int	validspeeds[] = {
 	1, 2, 3, 4, 6, 8 
 };
 
-class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInputListener {
+class PacMan : public jgui::Frame, public jthread::Thread {
 
 	private:
 
@@ -192,8 +192,6 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 
 		SetDefaultExitEnabled(false);
 		SetSize(scrsize+4, scrsize+nrofblocks+blocksize+10);
-
-		Frame::RegisterInputListener(this);
 	}
 	
 	virtual ~PacMan()
@@ -303,7 +301,7 @@ class PacMan : public jgui::Frame, public jthread::Thread, public jgui::FrameInp
 		pacman_bmp = GetImage("images/pacman.png", 3*w, 5*h);
 	}
 
-	virtual void InputChanged(jgui::KeyEvent *event)
+	virtual void InputReceived(jgui::KeyEvent *event)
 	{
 		if (event->GetType() == jgui::JKEY_PRESSED) {
 			if (event->GetSymbol() == jgui::JKEY_ESCAPE) {
