@@ -307,7 +307,7 @@ class GraphicPanel : public jgui::Frame{
 			g->SetColor(r1, g1, b1, 0xff);
 			g->FillRoundRectangle(x+_insets.left, y+_insets.top, w, h, 40, 40);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h, 40, 40);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
 		}
