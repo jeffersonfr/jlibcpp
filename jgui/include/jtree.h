@@ -65,12 +65,6 @@ class Tree : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		virtual void MouseClicked(MouseEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void MouseMoved(MouseEvent *event);
 
 		/**

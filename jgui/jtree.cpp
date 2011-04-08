@@ -43,10 +43,6 @@ void Tree::MouseReleased(MouseEvent *event)
 {
 }
 
-void Tree::MouseClicked(MouseEvent *event)
-{
-}
-
 void Tree::MouseMoved(MouseEvent *event)
 {
 }

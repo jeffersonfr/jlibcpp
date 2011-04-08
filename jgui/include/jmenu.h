@@ -87,12 +87,6 @@ class Menu : public KeyListener, public MouseListener, public jgui::ItemComponen
 		 * \brief
 		 *
 		 */
-		virtual void MouseClicked(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void MouseMoved(MouseEvent *event);
 		
 		/**

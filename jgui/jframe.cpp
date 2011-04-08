@@ -548,30 +548,6 @@ void Frame::MouseReleased(MouseEvent *event)
 	InputReceived(event);
 }
 
-void Frame::MouseClicked(MouseEvent *event)
-{
-	if (_enabled == false) {
-		return;
-	}
-	
-	int dx,
-			dy;
-
-	Component *c = GetTargetComponent(this, event->GetX()-_location.x, event->GetY()-_location.y, &dx, &dy);
-
-	if (c != this) {
-		MouseEvent *e = new MouseEvent(event->GetSource(), event->GetType(), event->GetButton(), event->GetClickCount(), dx, dy);
-
-		c->ProcessEvent(e);
-
-		delete e;
-	}
-
-	jthread::AutoLock lock(&_input_mutex);
-	
-	InputReceived(event);
-}
-
 void Frame::MouseMoved(MouseEvent *event)
 {
 	if (_enabled == false) {

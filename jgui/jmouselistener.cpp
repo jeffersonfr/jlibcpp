@@ -40,10 +40,6 @@ void MouseListener::MouseReleased(MouseEvent *event)
 {
 }
 
-void MouseListener::MouseClicked(MouseEvent *event)
-{
-}
-
 void MouseListener::MouseMoved(MouseEvent *event)
 {
 }

@@ -92,12 +92,6 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 * \brief
 		 *
 		 */
-		virtual void MouseClicked(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void MouseMoved(MouseEvent *event);
 		
 		/**

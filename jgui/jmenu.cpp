@@ -270,10 +270,6 @@ void Menu::MouseReleased(MouseEvent *event)
 {
 }
 
-void Menu::MouseClicked(MouseEvent *event)
-{
-}
-
 void Menu::MouseMoved(MouseEvent *event)
 {
 }

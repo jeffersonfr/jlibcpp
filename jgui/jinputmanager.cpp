@@ -130,9 +130,7 @@ void EventBroadcaster::Run()
 				jgui::MouseListener *mlistener = dynamic_cast<jgui::MouseListener *>(_listener);
 				jgui::MouseEvent *mevent = dynamic_cast<jgui::MouseEvent *>(event);
 
-				if (mevent->GetType() == JMOUSE_CLICKED_EVENT) {
-					mlistener->MouseClicked(mevent);
-				} else if (mevent->GetType() == JMOUSE_PRESSED_EVENT) {
+				if (mevent->GetType() == JMOUSE_PRESSED_EVENT) {
 					mlistener->MousePressed(mevent);
 				} else if (mevent->GetType() == JMOUSE_RELEASED_EVENT) {
 					mlistener->MouseReleased(mevent);
@@ -835,7 +833,7 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 		int mouse_z = -1,
 				count = 1;
 		jmouse_button_t button = JMOUSE_UNKNOWN;
-		jmouse_event_t type = JMOUSE_CLICKED_EVENT;
+		jmouse_event_t type = JMOUSE_UNKNOWN_EVENT;
 
 		if (event.type == DIET_AXISMOTION) {
 			if (event.flags & DIEF_AXISABS) {
