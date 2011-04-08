@@ -150,20 +150,12 @@ int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 	int width = (widthp * _screen.width) / scale_width;
 	int height = (heightp * _screen.height) / scale_height;
 
-	if (width < 2) {
-		width = 2;
+	if (width < 1) {
+		width = 1;
 	}
 
-	if (height < 2) {
-		height = 2;
-	}
-
-	if (width > _screen.width) {
-		width = _screen.width;
-	}
-
-	if (height > _screen.height) {
-		height = _screen.height;
+	if (height < 1) {
+		height = 1;
 	}
 
 	DFBSurfaceDescription desc;
@@ -272,20 +264,12 @@ int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 	int width = (widthp * _screen.width) / scale_width;
 	int height = (heightp * _screen.height) / scale_height;
 
-	if (width < 2) {
-		width = 2;
+	if (width < 1) {
+		width = 1;
 	}
 
-	if (height < 2) {
-		height = 2;
-	}
-
-	if (width > _screen.width) {
-		width = _screen.width;
-	}
-
-	if (height > _screen.height) {
-		height = _screen.height;
+	if (height < 1) {
+		height = 1;
 	}
 
 	DFBSurfaceDescription desc;
