@@ -88,10 +88,13 @@ class InputManager : public jthread::Thread{
 #endif
 
 		std::vector<EventBroadcaster *> _broadcasters;
+		uint64_t _last_keypress;
 		jsize_t _screen,
 						_scale;
 		int _mouse_x,
-				_mouse_y;
+				_mouse_y,
+				_click_delay,
+				_click_count;
 		bool _initialized,
 				 _is_key_enabled,
 				 _is_mouse_enabled,
@@ -215,6 +218,18 @@ class InputManager : public jthread::Thread{
 		 */
 		virtual bool IsMouseEventsEnabled();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetClickDelay(int ms);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetClickDelay();
+		
 		/**
 		 * \brief
 		 *

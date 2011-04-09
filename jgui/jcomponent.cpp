@@ -1039,7 +1039,7 @@ void Component::DispatchFocusEvent(FocusEvent *event)
 	}
 
 	int k = 0,
-			size = (int)_component_listeners.size();
+			size = (int)_focus_listeners.size();
 
 	while (k++ < (int)_focus_listeners.size()) {
 		FocusListener *listener = _focus_listeners[k-1];

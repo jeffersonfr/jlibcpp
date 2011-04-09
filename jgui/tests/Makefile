@@ -125,8 +125,8 @@ OBJS_kmeans = \
 OBJS_som = \
 		som.o\
 
-OBJS_game = \
-		game.o\
+OBJS_events = \
+		events.o\
 
 all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock
 	
@@ -235,7 +235,7 @@ kmeans: $(OBJS_kmeans)
 som: $(OBJS_som)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-game: $(OBJS_game)
+events: $(OBJS_events)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
@@ -245,4 +245,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp drawimage rotateimage sort noise kmeans som stock
+	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp drawimage rotateimage sort noise kmeans som stock events

@@ -67,8 +67,8 @@ class MouseEvent : public jcommon::EventObject{
 
 	private:
 		int _x,
-			_y,
-			_click_count;
+				_y,
+				_click_count;
 		jmouse_event_t _type;
 		jmouse_button_t _button;
 

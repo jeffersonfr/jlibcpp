@@ -89,6 +89,10 @@ class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 		{
 		}
 
+		virtual void MouseClicked(jgui::MouseEvent *event)
+		{
+		}
+
 		virtual void MouseMoved(jgui::MouseEvent *event)
 		{
 			cx = event->GetX();

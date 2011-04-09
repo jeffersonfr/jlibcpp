@@ -3225,12 +3225,12 @@ void Graphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
 				 C_min = -xc_min*yc_min,
 				 F_min = -amin*amin*bmin*bmin;
 
-	for (double y=-amax; y<amax; y+=1.0) {
+	for (double y=-amax; y<=amax; y+=1.0) {
 		double xi = -1.0,
 					 xf = -1.0;
 		bool flag = false;
 
-		for (double x=-amax; x<amax; x+=1.0) {
+		for (double x=-amax; x<=amax; x+=1.0) {
 			double min_ellipse = A_min*x*x + B_min*y*y + 2*C_min*x*y + F_min,
 						 max_ellipse = A_max*x*x + B_max*y*y + 2*C_max*x*y + F_max;
 

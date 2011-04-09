@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "jinputmanager.h"
 #include "jwindowmanager.h"
+#include "jdate.h"
 
 #ifndef CLAMP
 #define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
@@ -159,6 +160,9 @@ InputManager::InputManager()
 	_is_mouse_enabled = true;
 	_skip_key_events = true; 
 	_skip_mouse_events = true; 
+	_last_keypress = 0LL;
+	_click_count = 1;
+	_click_delay = 200;
 	
 	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
@@ -584,6 +588,18 @@ bool InputManager::IsMouseEventsEnabled()
 	return _is_mouse_enabled;
 }
 
+void InputManager::SetClickDelay(int ms)
+{
+	if (ms > 0) {
+		_click_delay = ms;
+	}
+}
+
+int InputManager::GetClickDelay()
+{
+	return _click_delay;
+}
+
 void InputManager::PostEvent(KeyEvent *event)
 {
 #ifdef DIRECTFB_UI
@@ -830,8 +846,7 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 		DispatchEvent(new KeyEvent(NULL, type, mod, TranslateToDFBKeyCode(event.key_code), TranslateToDFBKeySymbol(event.key_symbol)));
 		// DispatchEvent(new KeyEvent(WindowManager::GetInstance()->GetFocusOwner(), type, mod, TranslateToDFBKeyCode(event.key_code), TranslateToDFBKeySymbol(event.key_symbol)));
 	} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE || event.type == DIET_AXISMOTION) {
-		int mouse_z = -1,
-				count = 1;
+		int mouse_z = -1;
 		jmouse_button_t button = JMOUSE_UNKNOWN;
 		jmouse_event_t type = JMOUSE_UNKNOWN_EVENT;
 
@@ -865,6 +880,10 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 			_mouse_x = CLAMP(_mouse_x, 0, _screen.width-1);
 			_mouse_y = CLAMP(_mouse_y, 0, _screen.height-1);
 			// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
+		
+			if (type == JMOUSE_WHEEL_EVENT) {
+				mouse_z = mouse_z + 1;
+			}
 		} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE) {
 			if (event.type == DIET_BUTTONPRESS) {
 				type = JMOUSE_PRESSED_EVENT;
@@ -879,10 +898,18 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 			} else if (event.button == DIBI_MIDDLE) {
 				button = JMOUSE_BUTTON3;
 			}
-		}
 
-		if (type == JMOUSE_WHEEL_EVENT) {
-			count = mouse_z + 1;
+			if (type == JMOUSE_PRESSED_EVENT) {
+				if ((jcommon::Date::CurrentTimeMillis()-_last_keypress) < 200L) {
+					_click_count = _click_count + 1;
+				} else {
+					_click_count = 1;
+				}
+			
+				_last_keypress = jcommon::Date::CurrentTimeMillis();
+
+				mouse_z = _click_count;
+			}
 		}
 
 		Window *current = WindowManager::GetInstance()->GetFocusOwner();
@@ -919,10 +946,10 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 			}
 		}
 
-		DispatchEvent(new MouseEvent(current, type, button, count, cx, cy));
+		DispatchEvent(new MouseEvent(current, type, button, mouse_z, cx, cy));
 		*/
 		
-		DispatchEvent(new MouseEvent(NULL, type, button, count, cx, cy));
+		DispatchEvent(new MouseEvent(NULL, type, button, mouse_z, cx, cy));
 	}
 }
 
@@ -1029,6 +1056,16 @@ void InputManager::ProcessWindowEvent(DFBWindowEvent event)
 
 				if (type == JMOUSE_WHEEL_EVENT) {
 					mouse_z = mouse_z + 1;
+				} else if (type == JMOUSE_PRESSED_EVENT) {
+					if ((jcommon::Date::CurrentTimeMillis()-_last_keypress) < 200L) {
+						_click_count = _click_count + 1;
+					} else {
+						_click_count = 1;
+					}
+
+					_last_keypress = jcommon::Date::CurrentTimeMillis();
+
+					mouse_z = _click_count;
 				}
 
 				DispatchEvent(new MouseEvent(current, type, button, mouse_z, cx, cy));
