@@ -2321,10 +2321,9 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 	void *ptr;
 	uint32_t *dst,
 					 *src = rgb;
-	int step,
-			pitch;
 	int wmax,
-			hmax;
+			hmax,
+			pitch;
 
 	int x = SCALE_TO_SCREEN((xp), _screen.width, _scale.width),
 			y = SCALE_TO_SCREEN((yp), _screen.height, _scale.height),
@@ -2345,7 +2344,6 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 		h = hmax-y;
 	}
 
-	step = -x;
 	wmax = x+w;
 	hmax = y+h;
 
@@ -2355,24 +2353,22 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 				 scale_y = (double)_scale.height/(double)_screen.height;
 
 	if (_draw_flags == DF_NOFX) {
-		for (int j=y; j<hmax; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+j*pitch);
-			src = (uint32_t *)(rgb+(int)(step*scale_y));
-			step = step+scanline;
+		for (int j=0; j<h; j++) {
+			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
+			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
 
-			for (int i=x; i<wmax; i++) {
-				*(dst+i) = *(src+(int)(i*scale_x));
+			for (int i=0; i<w; i++) {
+				*(dst+x+i) = *(src+(int)(i*scale_x));
 			}
 		}
 	} else if (_draw_flags == DF_BLEND) {
-		for (int j=y; j<hmax; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+j*pitch);
-			src = (uint32_t *)(rgb+(int)(step*scale_y));
-			step = step+scanline;
+		for (int j=0; j<h; j++) {
+			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
+			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
 
-			for (int i=x; i<wmax; i++) {
+			for (int i=0; i<w; i++) {
 				int argb = *(src+(int)(i*scale_x)),
-						pixel = *(dst+i),
+						pixel = *(dst+x+i),
 						r = (argb >> 0x10) & 0xff,
 						g = (argb >> 0x08) & 0xff,
 						b = (argb >> 0x00) & 0xff,
@@ -2385,17 +2381,16 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 				pg = (int)(pg*(0xff-a) + g*a) >> 0x08;
 				pb = (int)(pb*(0xff-a) + b*a) >> 0x08;
 
-				*(dst+i) = 0xff000000 | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
+				*(dst+x+i) = 0xff000000 | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
 			}
 		}
 	} else if (_draw_flags == DF_XOR) {
-		for (int j=y; j<hmax; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+j*pitch);
-			src = (uint32_t *)(rgb+(int)(step*scale_y));
-			step = step+scanline;
+		for (int j=0; j<h; j++) {
+			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
+			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
 
-			for (int i=x; i<wmax; i++) {
-				*(dst+i) ^= *(src+(int)(i*scale_x));
+			for (int i=0; i<w; i++) {
+				*(dst+x+i) ^= *(src+(int)(i*scale_x));
 			}
 		}
 	}
