@@ -415,9 +415,9 @@ class Test : public jgui::Window, public UserEventListener {
 			std::cout << "OnKeyPress: " << event->GetKeyCode() << std::endl;
 		}
 
-		virtual void OnKeyRelease(UserEvent *event)
+		virtual void OnKeyUp(UserEvent *event)
 		{
-			std::cout << "OnKeyRelease: " << event->GetKeyCode() << std::endl;
+			std::cout << "OnKeyUp: " << event->GetKeyCode() << std::endl;
 		}
 
 		virtual void OnKeyLongPress(UserEvent *event)
