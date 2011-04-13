@@ -435,21 +435,21 @@ void Frame::MousePressed(MouseEvent *event)
 	}
 
 	if (event->GetButton() == JMOUSE_BUTTON1) {
-		int s = _insets.top-30;
+		int lwidth = _location.x + _size.width-_insets.right,
+				lheight = _location.y + _size.height-_insets.bottom;
+		int btn = (_insets.top-30)+10,
+				gap = ((_frame_buttons & FB_MAXIMIZE) != 0)? 2 : ((_frame_buttons & FB_CLOSE) != 0)? 1 : 0;
 
 		if ((event->GetY() > _location.y && event->GetY() < (_location.y+_insets.top))) {
-			if (event->GetX() > _location.x && event->GetX() < (_location.x+_size.width-_insets.right-2*s-20)) {
-				if (_move_enabled == true && _is_maximized == false) {
+			if (event->GetX() > _location.x) {
+				if (event->GetX() < (lwidth-gap*btn) && _move_enabled == true && _is_maximized == false) {
 					_default_cursor = GetCursor();
 					SetCursor(MOVE_CURSOR);
 
 					_mouse_state = 1; // move
 					_relative_mouse_x = event->GetX()-GetX();
 					_relative_mouse_y = event->GetY()-GetY();
-				}
-			} else {
-				// INFO:: para impedir essas acoes soh eh preciso desabilitar os eventos do mouse
-				if ((_frame_buttons & FB_MAXIMIZE) != 0 && event->GetX() < (_location.x+_size.width-_insets.right-s-10)) {
+				} else if (event->GetX() < (lwidth-1*btn) && gap == 2) {
 					if (_resize_enabled == true) {
 						if (_is_maximized == true) {
 							Restore();
@@ -457,32 +457,45 @@ void Frame::MousePressed(MouseEvent *event)
 							Maximize();
 						}
 					}
-				} else if ((_frame_buttons & FB_CLOSE) != 0 && event->GetX() < (_location.x+_size.width-_insets.right) && _release_enabled == true) {
-					Release();
+				} else if (event->GetX() < (lwidth-0*btn) && gap == 1) {
+					if (_release_enabled == true) {
+						Release();
+					}
+				} else if (event->GetX() > lwidth) {
+					_default_cursor = GetCursor();
+					SetCursor(WE_CURSOR);
+
+					_mouse_state = 3; // horizontal resize
+					_relative_mouse_x = event->GetX()-GetX();
+					_relative_mouse_y = event->GetY()-GetY();
+					_relative_mouse_w = _size.width;
+					_relative_mouse_h = _size.height;
 				}
 			}
-		} else if (event->GetX() > (_location.x+_size.width-_insets.right) && _resize_enabled == true && _is_maximized == false) {
-			if (event->GetY() > (_location.y+_size.height-_insets.bottom)) {
-				_default_cursor = GetCursor();
-				SetCursor(SE_CORNER_CURSOR);
+		} else if (_resize_enabled == true && _is_maximized == false) {
+			if ((event->GetY() > _location.y && event->GetY() < (_location.y+_size.height))) {
+				if (event->GetX() > lwidth) {
+					if (event->GetY() > lheight) {
+						_default_cursor = GetCursor();
+						SetCursor(SE_CORNER_CURSOR);
 
-				_mouse_state = 2; // both resize
-				_relative_mouse_x = event->GetX()-GetX();
-				_relative_mouse_y = event->GetY()-GetY();
-				_relative_mouse_w = _size.width;
-				_relative_mouse_h = _size.height;
-			} else if (event->GetX() < (_location.x+_size.width)) {
-				_default_cursor = GetCursor();
-				SetCursor(WE_CURSOR);
+						_mouse_state = 2; // both resize
+						_relative_mouse_x = event->GetX()-GetX();
+						_relative_mouse_y = event->GetY()-GetY();
+						_relative_mouse_w = _size.width;
+						_relative_mouse_h = _size.height;
+					} else {
+						_default_cursor = GetCursor();
+						SetCursor(WE_CURSOR);
 
-				_mouse_state = 3; // horizontal resize
-				_relative_mouse_x = event->GetX()-GetX();
-				_relative_mouse_y = event->GetY()-GetY();
-				_relative_mouse_w = _size.width;
-				_relative_mouse_h = _size.height;
-			}
-		} else if (event->GetY() > (_location.y+_size.height-_insets.bottom) && _resize_enabled == true && _is_maximized == false) {
-			if (event->GetY() < (_location.y+_size.height)) {
+						_mouse_state = 3; // horizontal resize
+						_relative_mouse_x = event->GetX()-GetX();
+						_relative_mouse_y = event->GetY()-GetY();
+						_relative_mouse_w = _size.width;
+						_relative_mouse_h = _size.height;
+					}
+				}
+			} else if (event->GetY() > lheight) {
 				_default_cursor = GetCursor();
 				SetCursor(NS_CURSOR);
 
@@ -494,7 +507,7 @@ void Frame::MousePressed(MouseEvent *event)
 			}
 		}
 	}
-	
+
 	int dx,
 			dy;
 

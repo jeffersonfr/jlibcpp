@@ -317,7 +317,9 @@ Image * Image::CreateImage(Image *image)
 		return NULL;
 	}
 
-	Image *clone = new Image(image->GetWidth(), image->GetHeight(), image->GetPixelFormat(), image->GetScaleWidth(), image->GetScaleHeight());
+	jsize_t scale = image->GetWorkingScreenSize();
+
+	Image *clone = new Image(image->GetWidth(), image->GetHeight(), image->GetPixelFormat(), scale.width, scale.height);
 
 	if (clone->GetGraphics()->DrawImage(image, 0, 0) == false) {
 		delete clone;
@@ -327,6 +329,11 @@ Image * Image::CreateImage(Image *image)
 	return clone;
 }
 
+jsize_t Image::GetWorkingScreenSize()
+{
+	return _scale;
+}
+
 Graphics * Image::GetGraphics()
 {
 	return _graphics;
@@ -334,7 +341,7 @@ Graphics * Image::GetGraphics()
 
 Image * Image::Scaled(int width, int height)
 {
-	Image *image = new Image(width, height, GetPixelFormat(), GetScaleWidth(), GetScaleHeight());
+	Image *image = new Image(width, height, GetPixelFormat(), _scale.width, _scale.height);
 
 	if (image->GetGraphics()->DrawImage(this, 0, 0, width, height) == false) {
 		delete image;
@@ -346,7 +353,7 @@ Image * Image::Scaled(int width, int height)
 
 Image * Image::SubImage(int x, int y, int width, int height)
 {
-	Image *image = new Image(width, height, GetPixelFormat(), GetScaleWidth(), GetScaleHeight());
+	Image *image = new Image(width, height, GetPixelFormat(), _scale.width, _scale.height);
 
 	if (image->GetGraphics()->DrawImage(this, x, y, width, height, 0, 0) == false) {
 		delete image;
@@ -380,16 +387,6 @@ int Image::GetWidth()
 int Image::GetHeight()
 {
 	return _size.height;
-}
-
-int Image::GetScaleWidth()
-{
-	return _scale.width;
-}
-
-int Image::GetScaleHeight()
-{
-	return _scale.height;
 }
 
 void Image::Release()

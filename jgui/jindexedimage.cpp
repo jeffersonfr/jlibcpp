@@ -94,16 +94,15 @@ IndexedImage * IndexedImage::Pack(Image *image)
 	if ((void *)image != NULL) {
 		if (image->GetGraphics() != NULL) {
 			GFXHandler *handler = GFXHandler::GetInstance();
+			jsize_t scale = image->GetWorkingScreenSize();
 			int size_w = image->GetWidth(),
 					size_h = image->GetHeight();
-			int scale_w = image->GetScaleWidth(),
-					scale_h = image->GetScaleHeight();
 			uint32_t *rgb = NULL;
 
 			image->GetRGB(&rgb, 0, 0, size_w, size_h);
 
 			if ((void *)rgb != NULL) {
-				packed = Pack(rgb, SCALE_TO_SCREEN(size_w, handler->GetScreenWidth(), scale_w), SCALE_TO_SCREEN(size_h, handler->GetScreenHeight(), scale_h));
+				packed = Pack(rgb, SCALE_TO_SCREEN(size_w, handler->GetScreenWidth(), scale.width), SCALE_TO_SCREEN(size_h, handler->GetScreenHeight(), scale.height));
 
 				delete [] rgb;
 			}

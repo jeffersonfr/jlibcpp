@@ -1763,21 +1763,14 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 		return false;
 	}
 
-	Graphics *g = img->GetGraphics();
+	jsize_t scale = img->GetWorkingScreenSize();
 
-	int sx = SCALE_TO_SCREEN(sxp, _screen.width, img->GetScaleWidth()),
-			sy = SCALE_TO_SCREEN(syp, _screen.height, img->GetScaleHeight()),
-			sw = SCALE_TO_SCREEN(swp, _screen.width, img->GetScaleWidth()),
-			sh = SCALE_TO_SCREEN(shp, _screen.height, img->GetScaleHeight());
+	int sx = SCALE_TO_SCREEN(sxp, _screen.width, scale.width),
+			sy = SCALE_TO_SCREEN(syp, _screen.height, scale.height),
+			sw = SCALE_TO_SCREEN(swp, _screen.width, scale.width),
+			sh = SCALE_TO_SCREEN(shp, _screen.height, scale.height);
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
 			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-
-	DFBRectangle drect;
-
-	drect.x = sx;
-	drect.y = sy;
-	drect.w = sw;
-	drect.h = sh;
 
 	if (_radians != 0.0) {
 		Image *off = Image::CreateImage(img->GetWidth(), img->GetHeight());
@@ -1794,7 +1787,16 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 		return true;
 	}
 
+	Graphics *g = img->GetGraphics();
+
 	if ((void *)g != NULL) {
+		DFBRectangle drect;
+
+		drect.x = sx;
+		drect.y = sy;
+		drect.w = sw;
+		drect.h = sh;
+
 		surface->Blit(surface, g->surface, &drect, x, y);
 	} else {
 		uint32_t *rgb = NULL;
@@ -1823,29 +1825,16 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 		return false;
 	}
 
-	Graphics *g = img->GetGraphics();
+	jsize_t scale = img->GetWorkingScreenSize();
 
-	int sx = SCALE_TO_SCREEN(sxp, _screen.width, img->GetScaleWidth()),
-			sy = SCALE_TO_SCREEN(syp, _screen.height, img->GetScaleHeight()),
-			sw = SCALE_TO_SCREEN(swp, _screen.width, img->GetScaleWidth()),
-			sh = SCALE_TO_SCREEN(shp, _screen.height, img->GetScaleHeight());
+	int sx = SCALE_TO_SCREEN(sxp, _screen.width, scale.width),
+			sy = SCALE_TO_SCREEN(syp, _screen.height, scale.height),
+			sw = SCALE_TO_SCREEN(swp, _screen.width, scale.width),
+			sh = SCALE_TO_SCREEN(shp, _screen.height, scale.height);
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
 			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
 			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
 			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-
-	DFBRectangle srect,
-							 drect;
-
-	srect.x = sx;
-	srect.y = sy;
-	srect.w = sw;
-	srect.h = sh;
-
-	drect.x = x;
-	drect.y = y;
-	drect.w = w;
-	drect.h = h;
 
 	if (_radians != 0.0) {
 		Image *off = Image::CreateImage(wp, hp);
@@ -1862,11 +1851,28 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 		return true;
 	}
 
+	Graphics *g = img->GetGraphics();
+
 	if ((void *)g != NULL) {
+		DFBRectangle srect,
+								 drect;
+
+		srect.x = sx;
+		srect.y = sy;
+		srect.w = sw;
+		srect.h = sh;
+
+		drect.x = x;
+		drect.y = y;
+		drect.w = w;
+		drect.h = h;
+
 		surface->StretchBlit(surface, g->surface, &srect, &drect);
 	} else {
-		int iwp = (wp*img->GetScaleWidth())/_screen.width;
-		int ihp = (hp*img->GetScaleHeight())/_screen.height;
+		jsize_t scale = img->GetWorkingScreenSize();
+
+		int iwp = (wp*scale.width)/_screen.width;
+		int ihp = (hp*scale.height)/_screen.height;
 
 		Image *image = img->Scaled(iwp, ihp);
 

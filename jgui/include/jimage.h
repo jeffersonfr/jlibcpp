@@ -158,6 +158,12 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual jsize_t GetWorkingScreenSize();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Graphics * GetGraphics();
 
 		/**
@@ -195,18 +201,6 @@ class Image : public virtual jcommon::Object{
 		 *
 		 */
 		virtual int GetHeight();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScaleWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScaleHeight();
 
 		/**
 		 * \brief
