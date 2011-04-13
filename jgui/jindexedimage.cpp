@@ -89,6 +89,8 @@ IndexedImage::~IndexedImage()
 
 IndexedImage * IndexedImage::Pack(Image *image)
 {
+	IndexedImage *packed = NULL;
+
 	if ((void *)image != NULL) {
 		if (image->GetGraphics() != NULL) {
 			GFXHandler *handler = GFXHandler::GetInstance();
@@ -100,11 +102,15 @@ IndexedImage * IndexedImage::Pack(Image *image)
 
 			image->GetRGB(&rgb, 0, 0, size_w, size_h);
 
-			return Pack(rgb, SCALE_TO_SCREEN(size_w, handler->GetScreenWidth(), scale_w), SCALE_TO_SCREEN(size_h, handler->GetScreenHeight(), scale_h));
+			if ((void *)rgb != NULL) {
+				packed = Pack(rgb, SCALE_TO_SCREEN(size_w, handler->GetScreenWidth(), scale_w), SCALE_TO_SCREEN(size_h, handler->GetScreenHeight(), scale_h));
+
+				delete [] rgb;
+			}
 		}
 	}
 
-	return NULL;
+	return packed;
 }
 
 IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
@@ -143,43 +149,41 @@ IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
 	return new IndexedImage(palette, palette_location, rgb, width, height);
 }
 
-uint8_t * IndexedImage::ScaleArray(uint8_t *array, int width, int height) 
+Image * IndexedImage::Scaled(int width, int height)
 {
-	int srcWidth = GetWidth();
-	int srcHeight = GetHeight();
-	int srcSize = GetWidth()*GetHeight();
-	int size = width*height;
-	int yRatio = (srcHeight << 16) / height;
-	int xRatio = (srcWidth << 16) / width;
-	int xPos = xRatio / 2;
-	int yPos = yRatio / 2;
-	uint8_t *data = new uint8_t[size];
+	if (width <= 0 || height <= 0) {
+		return NULL;
+	}
+
+	int size = width*height,
+			srcWidth = GetWidth(),
+			srcHeight = GetHeight(),
+			srcSize = GetWidth()*GetHeight(),
+			yRatio = (srcHeight << 16) / height,
+			xRatio = (srcWidth << 16) / width,
+			xPos = xRatio / 2,
+			yPos = yRatio / 2;
+	uint8_t data[size];
 
 	for (int x = 0; x < width; x++) {
 		int srcX = xPos >> 16;
 
 		for(int y = 0 ; y < height ; y++) {
-			int srcY = yPos >> 16;
-			int destPixel = x + y * width;
-			int srcPixel = srcX + srcY * srcWidth;
+			int dpixel = x + y * width,
+					spixel = srcX + (yPos >> 16) * srcWidth;
 
-			if((destPixel >= 0 && destPixel < size) && (srcPixel >= 0 && srcPixel < srcSize)) {
-				data[destPixel] = array[srcPixel];
+			if((dpixel >= 0 && dpixel < size) && (spixel >= 0 && spixel < srcSize)) {
+				data[dpixel] = _data[spixel];
 			}
 
-			yPos += yRatio;
+			yPos = yPos + yRatio;
 		}
 
 		yPos = yRatio / 2;
-		xPos += xRatio;
+		xPos = xPos + xRatio;
 	}
 
-	return data;
-}
-
-Image * IndexedImage::Scaled(int width, int height)
-{
-	return new IndexedImage(_palette, _palette_size, ScaleArray(_data, width, height), width, height);
+	return new IndexedImage(_palette, _palette_size, data, width, height);
 }
 
 Image * IndexedImage::SubImage(int x, int y, int width, int height)

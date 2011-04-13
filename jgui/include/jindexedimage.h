@@ -38,9 +38,6 @@ class IndexedImage : public jgui::Image{
 		int _palette_size;
 		uint8_t *_data;
 
-	private:
-		uint8_t * ScaleArray(uint8_t *array, int width, int height);
-
 	public:
 		/**
 		 * \brief
