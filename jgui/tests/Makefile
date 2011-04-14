@@ -128,7 +128,7 @@ OBJS_som = \
 OBJS_events = \
 		events.o\
 
-all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock
+all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock events
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 

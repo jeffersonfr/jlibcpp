@@ -457,7 +457,7 @@ void Frame::MousePressed(MouseEvent *event)
 							Maximize();
 						}
 					}
-				} else if (event->GetX() < (lwidth-0*btn) && gap == 1) {
+				} else if (event->GetX() < (lwidth-0*btn) && (_frame_buttons & FB_CLOSE) != 0) {
 					if (_release_enabled == true) {
 						Release();
 					}
