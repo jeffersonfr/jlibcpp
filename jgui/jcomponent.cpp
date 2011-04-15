@@ -336,6 +336,21 @@ Container * Component::GetParent()
 	return _parent;
 }
 
+Container * Component::GetTopLevelAncestor()
+{
+	Container *parent = GetParent();
+
+	while ((void *)parent != NULL) {
+		if (parent->GetParent() == NULL) {
+			return parent;
+		}
+		
+		parent = parent->GetParent();
+	}
+
+	return NULL;
+}
+
 bool Component::IsEnabled()
 {
 	return _enabled;

@@ -176,11 +176,6 @@ jinsets_t Container::GetInsets()
 	return _insets;
 }
 
-Container * Container::GetParent()
-{
-	return _parent;
-}
-
 void Container::InvalidateAll()
 {
 	jthread::AutoLock lock(&_container_mutex);

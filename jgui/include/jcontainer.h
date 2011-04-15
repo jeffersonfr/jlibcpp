@@ -102,12 +102,6 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual Container * GetParent();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetLayout(jgui::Layout *layout);
 		
 		/**

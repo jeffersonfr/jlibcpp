@@ -188,6 +188,12 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual Container * GetTopLevelAncestor();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetBaseline(int width, int height);
 		
 		/**
