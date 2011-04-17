@@ -105,7 +105,6 @@ OBJS_mhp = \
 
 OBJS_drawimage = \
 		drawimage.o\
-		quantization.o\
 
 OBJS_rotateimage = \
 		rotateimage.o\

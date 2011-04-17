@@ -21,6 +21,7 @@
 #include "jindexedimage.h"
 #include "jimageexception.h"
 #include "jgfxhandler.h"
+#include "jruntimeexception.h"
 
 namespace jgui {
 
@@ -141,7 +142,7 @@ IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
 		}
 
 		if (palette_location == 256) {
-			return NULL;
+			throw jcommon::RuntimeException("IndexedImage cannot support palettes with more than 256 colors");
 		}
 	}
 
