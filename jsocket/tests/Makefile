@@ -12,7 +12,7 @@ DEBUG  		= -g -ggdb
 INCLUDE		= -I. `pkg-config --cflags jlibcpp`
 LIBRARY 	= -L. `pkg-config --libs jlibcpp`
 
-CCFLAGS		= -Wall -funroll-loops -O2 $(LDFLAGS) $(INCLUDE) $(DEBUG)
+CCFLAGS		= -Wall -funroll-loops $(LDFLAGS) $(INCLUDE) $(DEBUG)
 
 ECHO			= echo -e
 
@@ -57,7 +57,7 @@ OBJS_sslserver = \
 OBJS_ssltelnet = \
 		ssltelnet.o\
 
-all: proxy_udp opt_teste http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request sslclient sslserver ssltelnet
+all: proxy_udp opt_teste http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request sslclient sslserver ssltelnet lookup
 	
 proxy_udp: $(OBJS_proxy_udp)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 

@@ -137,6 +137,8 @@ void LocalServerSocket::Close()
 			throw SocketException("Close socket error");
 		}
 	}
+	
+	unlink(_file.c_str());
 #endif
 }
 

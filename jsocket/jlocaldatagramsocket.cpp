@@ -61,7 +61,7 @@ LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int r
 	throw jcommon::SocketException("Unamed socket unsupported.");
 #endif
 
-	_server_file = server;
+	_client_file = server;
 	_is = NULL;
 	_os = NULL;
 	_is_closed = true;
@@ -114,9 +114,9 @@ void LocalDatagramSocket::BindSocket()
 
 	_server.sun_family = PF_UNIX;
 
-	strncpy(_server.sun_path, _server_file.c_str(), 255);
+	strncpy(_server.sun_path, _client_file.c_str(), 255);
 
-	unlink(_server_file.c_str());
+	unlink(_client_file.c_str());
 
 	if (bind(_fd, (const struct sockaddr *)&_server, sizeof(_server)) < 0) {
 		throw SocketException("Bind datagram socket error");
@@ -339,6 +339,8 @@ void LocalDatagramSocket::Close()
 			throw SocketException("Close socket error");
 		}
 	}
+
+	unlink(_client_file.c_str());
 #endif
 }
 

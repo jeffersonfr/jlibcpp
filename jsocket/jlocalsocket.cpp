@@ -105,6 +105,8 @@ void LocalSocket::ConnectSocket()
 	int r,
 			address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, 255);
 
+	unlink(_file.c_str());
+
 	if (_timeout > 0) {
 		int opt = 1;
 
@@ -340,6 +342,8 @@ void LocalSocket::Close()
 			throw SocketException("Close socket error");
 		}
 	}
+	
+	unlink(_file.c_str());
 #endif
 }
 
