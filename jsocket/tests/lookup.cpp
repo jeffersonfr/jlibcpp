@@ -17,6 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "jinetaddress.h"
 #include "jsocketlib.h"
 
 #include <iostream>
@@ -40,7 +41,7 @@ int main(int argc, char **argv)
 	std::vector<InetAddress *> inets = InetAddress::GetAllByName(argv[1]);
 
 	for (std::vector<InetAddress *>::iterator i=inets.begin(); i!=inets.end(); i++) {
-		std::cout << "all by name:: [" << (*i)->GetHostName() << ", " << (*i)->GetHostAddress()%s << "]" << std::endl;
+		std::cout << "all by name:: [" << (*i)->GetHostName() << ", " << (*i)->GetHostAddress() << "]" << std::endl;
 	}
 
 	ReleaseWindowsSocket();

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SOCKET_INPUT_STREAM_H
-#define J_SOCKET_INPUT_STREAM_H
+#ifndef J_SOCKETINPUTSTREAM_H
+#define J_SOCKETINPUTSTREAM_H
 
 #include "jobject.h"
 #include "jinputstream.h"
@@ -55,6 +55,8 @@ class SocketInputStream : public jio::InputStream{
 			/** \brief */
 			Connection *_connection;
 			/** \brief */
+			struct sockaddr *_address;
+			/** \brief */
 			char *_buffer;
 			/** \brief */
 			int64_t _buffer_length;
@@ -64,8 +66,6 @@ class SocketInputStream : public jio::InputStream{
 			int64_t _end_index;
 			/** \brief */
 			int64_t _receive_bytes;
-			/** \brief */
-			sockaddr_in _server_sock;
 			/** \brief */
 			bool *_is_closed;
 			/** \brief */
@@ -82,7 +82,7 @@ class SocketInputStream : public jio::InputStream{
 			 * \brief Construtor.
 			 *
 			 */
-			SocketInputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int64_t size_ = 65535LL);
+			SocketInputStream(Connection *conn_, bool *is_closed_, struct sockaddr *address_, int64_t size_ = 65535LL);
 
 			/**
 			 * \brief Destrutor virtual.

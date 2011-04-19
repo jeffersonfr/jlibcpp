@@ -172,7 +172,7 @@ int inpi_compress_process(std::string filename)
 	try {
 		file = new File(filename);
 
-		temp = File::CreateTemporary("jeff");
+		temp = File::CreateTemporaryFile("jeff");
 
 		if ((void *)temp == NULL) {
 			std::cout << "Cannot create temporary file !" << std::endl;

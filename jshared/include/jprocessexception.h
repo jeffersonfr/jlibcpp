@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PROCESS_EXCEPTION_H
-#define J_PROCESS_EXCEPTION_H
+#ifndef J_PROCESSEXCEPTION_H
+#define J_PROCESSEXCEPTION_H
 
 #include "jruntimeexception.h"
 

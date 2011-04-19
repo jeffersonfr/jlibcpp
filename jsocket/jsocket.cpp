@@ -136,7 +136,11 @@ Socket::~Socket()
 
 /** Private */
 
+#ifdef _WIN32
+Socket::Socket(SOCKET handler_, sockaddr_in server_, int timeout_, int rbuf_, int wbuf_):
+#else
 Socket::Socket(int handler_, sockaddr_in server_, int timeout_, int rbuf_, int wbuf_):
+#endif
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");

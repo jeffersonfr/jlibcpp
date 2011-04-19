@@ -249,18 +249,6 @@ class RawSocket : public jsocket::Connection{
 		virtual void Close();
 
 		/**
-		 * \brief
-		 *
-		 */
-		sockaddr_in LocalAddress();
-
-		/**
-		 * \brief
-		 *
-		 */
-		sockaddr_in RemoteAddress();
-
-		/**
 		 * \brief Get InetAddress.
 		 *
 		 */

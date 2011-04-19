@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SSLSOCKET_OUTPUT_STREAM_H
-#define J_SSLSOCKET_OUTPUT_STREAM_H
+#ifndef J_SSLSOCKETOUTPUTSTREAM_H
+#define J_SSLSOCKETOUTPUTSTREAM_H
 
 #include "jobject.h"
 #include "joutputstream.h"

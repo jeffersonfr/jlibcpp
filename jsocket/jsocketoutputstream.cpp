@@ -47,7 +47,7 @@ SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, int6
 	}
 }
 
-SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int64_t size_):
+SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, struct sockaddr *address, int64_t size_):
 	jio::OutputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SocketOutputStream");
@@ -60,8 +60,7 @@ SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, sock
 	_sent_bytes = 0;
 	_stream = false;
 	_blocked = true;
-	
-	memcpy(&_server_sock, &server_sock_, sizeof(server_sock_));
+	_address = address;
 
 	try {
 		_buffer = new char[(int)_buffer_length];
@@ -161,7 +160,7 @@ int64_t SocketOutputStream::Flush()
 	if (_stream == true) {
 		n = ::send(_fd, _buffer, (size_t)_current_index, flags);
 	} else {
-		n = ::sendto(_fd, _buffer, (size_t)_current_index, flags, (sockaddr *)&_server_sock, sizeof(_server_sock));
+		n = ::sendto(_fd, _buffer, (size_t)_current_index, flags, _address, sizeof(*_address));
 	}
 
 	_current_index = 0;

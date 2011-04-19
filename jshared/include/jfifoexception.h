@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_FIFO_EXCEPTION_H
-#define J_FIFO_EXCEPTION_H
+#ifndef J_FIFOEXCEPTION_H
+#define J_FIFOEXCEPTION_H
 
 #include "jruntimeexception.h"
 

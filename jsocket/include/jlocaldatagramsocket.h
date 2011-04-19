@@ -17,20 +17,17 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_DATAGRAMSOCKET_H
-#define J_DATAGRAMSOCKET_H
+#ifndef J_LOCALDATAGRAMSOCKET_H
+#define J_LOCALDATAGRAMSOCKET_H
 
-#include "jinetaddress.h"
-#include "jsocketoption.h"
-#include "jsocketinputstream.h"
-#include "jsocketoutputstream.h"
-#include "jconnection.h"
+#include "jdatagramsocket.h"
 
 #include <string>
 
 #ifdef _WIN32
 #include <windows.h>
 #else
+#include <sys/un.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
@@ -44,30 +41,26 @@ namespace jsocket {
  *
  * \author Jeff Ferr
  */
-class DatagramSocket : public jsocket::Connection{
+class LocalDatagramSocket : public jsocket::Connection{
 
 	private:
-		/** \brief Use to bind the socket in a free port. */
-		static int _used_port;
-
 		/** \brief Socket handler. */
 #ifdef _WIN32
-		SOCKET _fd;
 #else
 		int _fd;
 #endif
-		/** \brief Local socket. */
-		sockaddr_in _lsock;
-		/** \brief Server socket UDP. */
-		sockaddr_in _server_sock;
-		/** \brief Local inetaddress. */
-		InetAddress *_local;
-		/** \brief Remote inetaddress. */
-		InetAddress *_address;
+		/** \brief */
+		struct sockaddr_un _client;
+		/** \brief */
+		struct sockaddr_un _server;
 		/** \brief Input stream. */
 		SocketInputStream *_is;
 		/** \brief Output stream. */
 		SocketOutputStream *_os;
+		/** \brief */
+		std::string _client_file;
+		/** \brief */
+		std::string _server_file;
 		/** \brief Bytes sent. */
 		int64_t _sent_bytes;
 		/** \brief Bytes received. */
@@ -87,13 +80,13 @@ class DatagramSocket : public jsocket::Connection{
 		 * \brief Bind socket.
 		 *
 		 */
-		void BindSocket(InetAddress *addr_, int local_port_);
+		void BindSocket();
 
 		/**
 		 * \brief Connect socket.
 		 *
 		 */
-		void ConnectSocket(InetAddress *addr_, int port_);
+		void ConnectSocket();
 
 		/**
 		 * \brief Init the stream.
@@ -106,20 +99,24 @@ class DatagramSocket : public jsocket::Connection{
 		 * \brief Construtor UDP client.
 		 *
 		 */
-		DatagramSocket(std::string addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		LocalDatagramSocket(std::string client, std::string server, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief Construtor UDP server.
 		 *
 		 */
-		DatagramSocket(int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		LocalDatagramSocket(std::string server, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief Destructor virtual.
 		 *
 		 */
-		virtual ~DatagramSocket();
+		virtual ~LocalDatagramSocket();
 
+		/**
+		 * \brief
+		 *
+		 */
 #ifdef _WIN32
 		virtual SOCKET GetHandler();
 #else
@@ -137,6 +134,18 @@ class DatagramSocket : public jsocket::Connection{
 		 *
 		 */
 		virtual jio::OutputStream * GetOutputStream();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetServerFile();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetLocalFile();
 
 		/**
 		 * \brief Read data from a source.
@@ -169,24 +178,6 @@ class DatagramSocket : public jsocket::Connection{
 		virtual void Close();        
 
 		/**
-		 * \brief Get InetAddress.
-		 *
-		 */
-		InetAddress * GetInetAddress();
-
-		/**
-		 * \brief Get the local port.
-		 *
-		 */
-		int GetLocalPort();
-
-		/**
-		 * \brief Get port.
-		 *
-		 */
-		int GetPort();
-
-		/**
 		 * \brief Get sent bytes to destination.
 		 *
 		 */
@@ -203,12 +194,6 @@ class DatagramSocket : public jsocket::Connection{
 		 *
 		 */
 		SocketOption * GetSocketOption();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string what();
 
 };
 

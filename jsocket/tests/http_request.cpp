@@ -28,8 +28,10 @@
 #include <iostream>
 #include <stdexcept>
 
-#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <errno.h>
+#include <fcntl.h>
 
 using namespace jsocket;
 using namespace jio;
@@ -310,10 +312,10 @@ int main(int argc, char **argv)
 	// if (data != NULL && r.GetResponseCode() == 200) {
 		int fd;
 
-		fd = open("/tmp/t.png", O_CREAT | O_RDWR);
+		fd = open("/tmp/t.png", (int)(O_CREAT | O_RDWR));
 
 		if (fd <= 0) {
-			fd = open("/tmp/t.png", O_TRUNC | O_RDWR);
+			fd = open("/tmp/t.png", (int)(O_TRUNC | O_RDWR));
 		}
 
 		write(fd, data, size);

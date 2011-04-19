@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_UNKNOWN_HOST_EXCEPTION_H
-#define J_UNKNOWN_HOST_EXCEPTION_H
+#ifndef J_UNKNOWNHOSTEXCEPTION_H
+#define J_UNKNOWNHOSTEXCEPTION_H
 
 #include "jruntimeexception.h"
 

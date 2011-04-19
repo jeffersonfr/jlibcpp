@@ -326,8 +326,8 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 void DatagramSocket::InitStream(int rbuf_, int wbuf_)
 {
 	if (_stream == false) {
-		_is = new SocketInputStream((Connection *)this, &_is_closed, RemoteAddress(), rbuf_);
-		_os = new SocketOutputStream((Connection *)this, &_is_closed, RemoteAddress(), wbuf_);
+		_is = new SocketInputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_server_sock, rbuf_);
+		_os = new SocketOutputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_server_sock, wbuf_);
 	} else {
 		_is = new SocketInputStream((Connection *)this, &_is_closed, rbuf_);
 		_os = new SocketOutputStream((Connection *)this, &_is_closed, wbuf_);
@@ -543,16 +543,6 @@ void DatagramSocket::Close()
 		}
 	}
 #endif
-}
-
-sockaddr_in DatagramSocket::LocalAddress()
-{
-	return _lsock;
-}
-
-sockaddr_in DatagramSocket::RemoteAddress()
-{
-	return _server_sock;
 }
 
 InetAddress * DatagramSocket::GetInetAddress()

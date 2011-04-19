@@ -17,17 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SOCKET_H
-#define J_SOCKET_H
+#ifndef J_LOCALSOCKET_H
+#define J_LOCALSOCKET_H
 
-#include "jinetaddress.h"
-#include "jserversocket.h"
-#include "jsocketoption.h"
-#include "jsocketinputstream.h"
-#include "jsocketoutputstream.h"
-#include "jconnection.h"
-
-#include "jobject.h"
+#include "jsocket.h"
 
 #include <iostream>
 
@@ -36,41 +29,35 @@
 #include <winsock.h>
 #else
 #include <sys/socket.h>
+#include <sys/un.h>
 #endif
 
 #include <stdint.h>
 
 namespace jsocket {
 
-class ServerSocket;
+class LocalServerSocket;
 
 /**
  * \brief Socket.
  *
  * \author Jeff Ferr
  */
-class Socket : public jsocket::Connection{
+class LocalSocket : public jsocket::Connection{
 
-	friend class ServerSocket; //Socket * ServerSocket::Accept();
+	friend class LocalServerSocket; //Socket * ServerSocket::Accept();
 
    private:
-#ifdef _WIN32
-		/** \brief Socket handler. */
-		SOCKET _fd;
-#else
 		/** \brief Socket handler. */
 		int _fd;
-#endif
+		/** \brief */
+		struct sockaddr_un _address;
 		/** \brief */
 		SocketInputStream *_is;
 		/** \brief */
 		SocketOutputStream *_os;
 		/** \brief */
-		sockaddr_in _lsock;
-		/** \brief */
-		sockaddr_in _server_sock;
-		/** \brief */
-		InetAddress *_address;
+		std::string _file;
 		/** \brief Bytes sent. */
 		int64_t _sent_bytes;
 		/** \brief Bytes received. */
@@ -85,16 +72,10 @@ class Socket : public jsocket::Connection{
 		void CreateSocket();
 
 		/**
-		 * \brief
-		 *
-		 */
-		void BindSocket(InetAddress *, int);
-
-		/**
 		 * \brief Connect the socket.
 		 *
 		 */
-		void ConnectSocket(InetAddress *, int);
+		void ConnectSocket();
 
 		/**
 		 * \brief
@@ -107,48 +88,36 @@ class Socket : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-#ifdef _WIN32
-		Socket(SOCKET handler_, sockaddr_in server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-#else
-		Socket(int handler_, sockaddr_in server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-#endif
-	
+		LocalSocket(int handler_, std::string file_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+
 	 public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		Socket(InetAddress *addr_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-
 		/**
 		 * \brief
 		 *
 		 */
-		Socket(std::string host_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		Socket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
+		LocalSocket(std::string file, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual ~Socket();
+		virtual ~LocalSocket();
 
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
 #ifdef _WIN32
 		virtual SOCKET GetHandler();
 #else
 		virtual int GetHandler();
 #endif
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetLocalFile();
 
 		/**
 		 * \brief Send bytes to a destination.
@@ -197,24 +166,6 @@ class Socket : public jsocket::Connection{
 		virtual jio::OutputStream * GetOutputStream();
 
 		/**
-		 * \brief
-		 *
-		 */
-		InetAddress * GetInetAddress();
-
-		/**
-		 * \brief Get the local port.
-		 *
-		 */
-		int GetLocalPort();
-
-		/**
-		 * \brief Get the port.
-		 *
-		 */
-		int GetPort();
-
-		/**
 		 * \brief Get the bytes sent to a destination.
 		 *
 		 */
@@ -231,12 +182,6 @@ class Socket : public jsocket::Connection{
 		 *
 		 */
 		SocketOption * GetSocketOption();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string what();
 
 };
 

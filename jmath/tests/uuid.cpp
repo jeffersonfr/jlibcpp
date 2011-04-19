@@ -92,14 +92,14 @@ int main(int argc, char *argv[])
     char uuid_buf_siv[UUID_LEN_SIV+1];
     uuid_t *uuid;
     uuid_t *uuid_ns;
-    uuid_rc_t rc;
+    juuid_rc_t rc;
     FILE *fp;
     char *p;
     int ch;
     int count;
     int i;
     int iterate;
-    uuid_fmt_t fmt;
+    juuid_fmt_t fmt;
     int decode;
     void *vp;
     size_t n;

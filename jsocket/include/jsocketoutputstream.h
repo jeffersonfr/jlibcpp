@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SOCKET_OUTPUT_STREAM_H
-#define J_SOCKET_OUTPUT_STREAM_H
+#ifndef J_SOCKETOUTPUTSTREAM_H
+#define J_SOCKETOUTPUTSTREAM_H
 
 #include "joutputstream.h"
 #include "jconnection.h"
@@ -44,107 +44,107 @@ namespace jsocket {
  */
 class SocketOutputStream : public jio::OutputStream{
 
-    private:
+	private:
 #ifdef _WIN32
-			SOCKET _fd;
+		SOCKET _fd;
 #else
-			int _fd;
+		int _fd;
 #endif
-			/** \brief */
-			char *_buffer;
-			/** \brief */
-			int64_t _buffer_length;
-			/** \brief */
-			int64_t _current_index; 
-			/** \brief */
-			int64_t _sent_bytes;
-			/** \brief */
-			bool _stream;
-			/** \brief */
-			sockaddr_in _server_sock;
-			/** \brief */
-			bool *_is_closed;
-			/** \brief */
-			Connection *_connection;
+		/** \brief */
+		struct sockaddr *_address;
+		/** \brief */
+		char *_buffer;
+		/** \brief */
+		int64_t _buffer_length;
+		/** \brief */
+		int64_t _current_index; 
+		/** \brief */
+		int64_t _sent_bytes;
+		/** \brief */
+		bool _stream;
+		/** \brief */
+		bool *_is_closed;
+		/** \brief */
+		Connection *_connection;
 
-		public:
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			SocketOutputStream(Connection *conn_, bool *is_closed, int64_t size_ = 4096LL);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SocketOutputStream(Connection *conn_, bool *is_closed, int64_t size_ = 4096LL);
 
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			SocketOutputStream(Connection *conn_, bool *is_closed, sockaddr_in server_sock_, int64_t size_ = 65535LL);
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SocketOutputStream(Connection *conn_, bool *is_closed, struct sockaddr *address_, int64_t size_ = 65535LL);
 
-			/**
-			 * \brief Destrutor virtual.
-			 *
-			 */
-			virtual ~SocketOutputStream();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~SocketOutputStream();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual bool IsEmpty();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsEmpty();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual int64_t Available();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Available();
 
-			/**
-			 * \brief jio::OutputStream
-			 *
-			 */
-			virtual int64_t GetSize();
+		/**
+		 * \brief jio::OutputStream
+		 *
+		 */
+		virtual int64_t GetSize();
 
-			/**
-			 * \brief jio::OutputStream
-			 *
-			 */
-			virtual void Seek(int64_t index);
+		/**
+		 * \brief jio::OutputStream
+		 *
+		 */
+		virtual void Seek(int64_t index);
 
-			/**
-			 * \brief jio::OutputStream
-			 *
-			 */
-			virtual void Close();
+		/**
+		 * \brief jio::OutputStream
+		 *
+		 */
+		virtual void Close();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual int64_t Write(int64_t c_);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Write(int64_t c_);
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual int64_t Write(const char *data_, int64_t data_length_);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Write(const char *data_, int64_t data_length_);
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual int64_t GetAvailable();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetAvailable();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual int64_t GetSentBytes();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetSentBytes();
 
-			/**
-			 * \brief
-			 *
-			 */
-			virtual int64_t Flush();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t Flush();
 };
 
 }

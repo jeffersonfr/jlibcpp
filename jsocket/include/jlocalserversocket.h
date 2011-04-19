@@ -17,38 +17,105 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SOCKETTIMEOUTEXCEPTION_H
-#define J_SOCKETTIMEOUTEXCEPTION_H
+#ifndef J_LOCALSERVERSOCKET_H
+#define J_LOCALSERVERSOCKET_H
 
-#include "jruntimeexception.h"
+#include "jinetaddress.h"
+#include "jlocalsocket.h"
 
-#include <stdexcept>
-#include <string>
+#ifdef _WIN32
+#include <windows.h>
+#include <winsock.h>
+#else
+#include <sys/un.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#endif
+
+#include <stdint.h>
 
 namespace jsocket {
 
+class Socket;
+
 /**
- * \brief SocketTimeoutException.
+ * \brief ServerSocket.
  *
  * \author Jeff Ferr
  */
-class SocketTimeoutException : public jcommon::RuntimeException{
+class LocalServerSocket : public virtual jcommon::Object{
 
-    private:
+	private:
+		/** \brief Socket handler. */
+#ifdef _WIN32
+#else
+		int _fd;
+#endif
+		/** \brief Local socket. */
+		sockaddr_un _address;
+		/** \brief */
+		std::string _file;
+		/** \brief */
+		bool _is_closed;
 
+		/**
+		 * \brief
+		 *
+		 */
+		void CreateSocket();
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        SocketTimeoutException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~SocketTimeoutException() throw();
+		/**
+		 * \brief
+		 *
+		 */
+		void BindSocket();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void ListenSocket(int);
+
+	public:
+		/**
+		 * \brief Constructor.
+		 *
+		 */
+		LocalServerSocket(std::string file, int backlog = 5);
+
+		/**
+		 * \brief Destructor virtual.
+		 *
+		 */
+		virtual ~LocalServerSocket();
+
+		/**
+		 * \brief
+		 *
+		 */
+#ifdef _WIN32
+		virtual SOCKET GetHandler();
+#else
+		virtual int GetHandler();
+#endif
+
+		/**
+		 * \brief Get the local port.
+		 *
+		 */
+		std::string GetServerFile();
+
+		/**
+		 * \brief Accept a new socket.
+		 *
+		 */
+		LocalSocket * Accept();
+
+		/**
+		 * \brief Close the server socket.
+		 *
+		 */
+		void Close();
 
 };
 

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_MULTICAST_SOCKET_H
-#define J_MULTICAST_SOCKET_H
+#ifndef J_MULTICASTSOCKET_H
+#define J_MULTICASTSOCKET_H
 
 #include "jinetaddress.h"
 #include "jsocketoption.h"

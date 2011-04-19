@@ -139,10 +139,10 @@ IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
 		
 		if (flag == false) {
 			palette[palette_location++] = current;
-		}
 
-		if (palette_location == 256) {
-			throw jcommon::RuntimeException("IndexedImage cannot support palettes with more than 256 colors");
+			if (palette_location >= 256) {
+				throw jcommon::RuntimeException("IndexedImage cannot support palettes with more than 256 colors");
+			}
 		}
 	}
 

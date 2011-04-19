@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_MUTEX_EXCEPTION_H
-#define J_MUTEX_EXCEPTION_H
+#ifndef J_MUTEXEXCEPTION_H
+#define J_MUTEXEXCEPTION_H
 
 #include "jruntimeexception.h"
 

@@ -503,12 +503,12 @@ class Quantization {
 				throw jcommon::RuntimeException("Sample must be 1..30");
 			}
 
-			if (colors < 4) {
-				colors = 4;
+			if (colors < 2) {
+				colors = 2;
 			}
 
-			if (colors > 256) {
-				colors = 256;
+			if (colors > 255) {
+				colors = 255;
 			}
 
 			if (sample < 1) {
@@ -519,8 +519,7 @@ class Quantization {
 				sample = 30;
 			}
 
-			_netsize = colors;
-
+			_netsize = colors + 1;
 			_network = NULL;
 			_bias = NULL;
 			_freq = NULL;
@@ -834,7 +833,7 @@ class IndexedImageTest : public Picture {
 
 				image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
 
-    		Quantization q(rgb, image->GetWidth(), image->GetHeight(), 8, 1.0);
+    		Quantization q(rgb, image->GetWidth(), image->GetHeight(), 255, 1.0);
 
 				q.Start();
 

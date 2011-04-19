@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SOCKET_OPTION_EXCEPTION_H
-#define J_SOCKET_OPTION_EXCEPTION_H
+#ifndef J_SOCKETOPTIONEXCEPTION_H
+#define J_SOCKETOPTIONEXCEPTION_H
 
 #include "jruntimeexception.h"
 

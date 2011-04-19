@@ -48,7 +48,7 @@ SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, int64_
 	}
 }
 
-SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, sockaddr_in server_sock_, int64_t size_):
+SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, struct sockaddr *address, int64_t size_):
 	jio::InputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SocketInputStream");
@@ -61,7 +61,7 @@ SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, sockad
 	_current_index = 0LL;
 	_end_index = 0LL;
 	_receive_bytes = 0LL;
-	_server_sock = server_sock_;
+	_address = address;
 	_blocked = true;
 	
 	try {
@@ -92,15 +92,15 @@ int64_t SocketInputStream::Read()
 
 	if (d == 0) {
 		int n,
-			length = sizeof(_server_sock);
+			length = sizeof(*_address);
 
 		if (_stream == true) {
 			n = ::recv(_fd, _buffer, (size_t)_buffer_length, flags);
 		} else {
 #ifdef _WIN32
-			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, (struct sockaddr *)&_server_sock, (int *)&length);
+			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, _address, (int *)&length);
 #else
-			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
+			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, _address, (socklen_t *)&length);
 #endif
 		}
 		
@@ -145,15 +145,15 @@ int64_t SocketInputStream::Read(char *data_, int64_t data_length_)
 
 	if (d == 0) {
 		int n,
-			length = sizeof(_server_sock);
+			length = sizeof(*_address);
 
 		if (_stream == true) {
 			n = ::recv(_fd, _buffer, (size_t)_buffer_length, flags);
 		} else {
 #ifdef _WIN32
-			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, (struct sockaddr *)&_server_sock, (int *)&length);
+			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, _address, (int *)&length);
 #else 
-			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
+			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, _address, (socklen_t *)&length);
 #endif
 		}
 		
