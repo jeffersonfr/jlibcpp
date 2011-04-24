@@ -28,13 +28,19 @@
 #include <windows.h>
 #else
 #include <sys/socket.h>
+#include <netinet/in.h>
 #endif
 
 namespace jsocket {
 
 class Socket;
-class SSLSocket;
+class Socket6;
 class DatagramSocket;
+class DatagramSocket6;
+class SSLSocket;
+class SSLSocket6;
+class MulticastSocket;
+class MulticastSocket6;
 class LocalSocket;
 class LocalDatagramSocket;
 
@@ -62,10 +68,14 @@ enum socket_shutdown_t {
 class SocketOption : public virtual jcommon::Object{
 
 	friend class Socket;
-	friend class SSLSocket;
+	friend class Socket6;
 	friend class DatagramSocket;
-	friend class RawSocket;
+	friend class DatagramSocket6;
+	friend class SSLSocket;
+	friend class SSLSocket6;
 	friend class MulticastSocket;
+	friend class MulticastSocket6;
+	friend class RawSocket;
 	friend class SocketPipe;
 	friend class PromiscSocket;
 	friend class LocalSocket;
@@ -73,23 +83,23 @@ class SocketOption : public virtual jcommon::Object{
 
 	private:
 #ifdef _WIN32
-	/** \brief Socket handler. */
-	SOCKET _fd;
+		/** \brief Socket handler. */
+		SOCKET _fd;
 #else
-	/** \brief Socket handler. */
-	int _fd;
+		/** \brief Socket handler. */
+		int _fd;
 #endif
-	/** \brief Type of socket */
-	jconnection_type_t _type;
+		/** \brief Type of socket */
+		jconnection_type_t _type;
 
-	/**
-	 * \brief
-	 *
-	 */
+		/**
+		 * \brief
+		 *
+		 */
 #ifdef _WIN32
-	SocketOption(SOCKET fd_, jconnection_type_t type_);
+		SocketOption(SOCKET fd_, jconnection_type_t type_);
 #else
-	SocketOption(int fd_, jconnection_type_t type_);
+		SocketOption(int fd_, jconnection_type_t type_);
 #endif
 
 	public:
@@ -306,6 +316,25 @@ class SocketOption : public virtual jcommon::Object{
 		 *
 		 */
 		void SetShutdown(socket_shutdown_t opt_);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void SetIPv6UnicastHops(int opt_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		int GetIPv6UnicastHops();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetIPv6Only(bool opt_);
+
 };
 
 }

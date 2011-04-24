@@ -18,22 +18,22 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsslserversocket.h"
+#include "jsslserversocket6.h"
 #include "jsocketexception.h"
 #include "jsocketstreamexception.h"
 
 namespace jsocket {
 
-SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddress *addr_):
+SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAddress6 *addr_):
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jsocket::SSLServerSocket");
+	jcommon::Object::SetClassName("jsocket::SSLServerSocket6");
 	
     _local = NULL;
 	_is_closed = false;
 
 	if (addr_ == NULL) {
-		InetAddress *a = InetAddress::GetLocalHost();
+		InetAddress6 *a = InetAddress6::GetLocalHost();
         
 		addr_ = a;
 	}
@@ -78,7 +78,7 @@ SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddre
 	}
 }
 
-SSLServerSocket::~SSLServerSocket()
+SSLServerSocket6::~SSLServerSocket6()
 {
 	try {
   	Close();
@@ -92,7 +92,7 @@ SSLServerSocket::~SSLServerSocket()
 
 /** Private */
 
-void SSLServerSocket::CreateSocket()
+void SSLServerSocket6::CreateSocket()
 {
 	_fd = ::socket(PF_INET, SOCK_STREAM, 0);
     
@@ -101,7 +101,7 @@ void SSLServerSocket::CreateSocket()
 	}
 }
 
-void SSLServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
+void SSLServerSocket6::BindSocket(InetAddress6 *local_addr_, int local_port_)
 {
 	int opt = 1;
     
@@ -109,9 +109,11 @@ void SSLServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
    
 	memset(&_lsock, 0, sizeof(_lsock));
     
-	_lsock.sin_family = AF_INET;
-	_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
-	_lsock.sin_port = htons(local_port_);
+	_lsock.sin6_family = AF_INET6;
+	_lsock.sin6_flowinfo = 0;
+	_lsock.sin6_scope_id = 0;
+	_lsock.sin6_addr = in6addr_any;
+	_lsock.sin6_port = htons(local_port_);
 
 #ifdef _WIN32
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
@@ -124,7 +126,7 @@ void SSLServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 	}
 }
 
-void SSLServerSocket::ListenSocket(int backlog_)
+void SSLServerSocket6::ListenSocket(int backlog_)
 {
 	if (::listen(_fd, backlog_) < 0) {
 		throw SocketException("Listen port error");
@@ -133,7 +135,7 @@ void SSLServerSocket::ListenSocket(int backlog_)
 
 /** End */
 
-SSLSocket * SSLServerSocket::Accept()
+SSLSocket6 * SSLServerSocket6::Accept()
 {
 #ifdef _WIN32
 	int sock_size;
@@ -159,7 +161,7 @@ SSLSocket * SSLServerSocket::Accept()
 	}
 	*/
 
-	SSLSocket *s = new SSLSocket(handler, _rsock, rsa_keysize);
+	SSLSocket6 *s = new SSLSocket6(handler, _rsock, rsa_keysize);
 	
 	s->ctx = ctx;
 	s->have_cert = have_cert;
@@ -172,17 +174,17 @@ SSLSocket * SSLServerSocket::Accept()
 	return s;
 }
 
-InetAddress * SSLServerSocket::GetInetAddress()
+InetAddress6 * SSLServerSocket6::GetInetAddress()
 {
 	return _local;
 }
 
-int SSLServerSocket::GetLocalPort()
+int SSLServerSocket6::GetLocalPort()
 {
-	return ntohs(_lsock.sin_port);
+	return ntohs(_lsock.sin6_port);
 }
 
-void SSLServerSocket::Close()
+void SSLServerSocket6::Close()
 {
 #ifdef _WIN32
 	if (_is_closed == false) {
@@ -207,7 +209,7 @@ void SSLServerSocket::Close()
 #endif
 }
 
-bool SSLServerSocket::CheckContext()
+bool SSLServerSocket6::CheckContext()
 {
 	if (ctx == NULL) {
 		//init new generic CTX object
@@ -224,12 +226,12 @@ bool SSLServerSocket::CheckContext()
 	return true;
 }
 
-RSA * SSLServerSocket::GenerateRSAKey(int len, int exp) 
+RSA * SSLServerSocket6::GenerateRSAKey(int len, int exp) 
 {
 	return RSA_generate_key(len,exp,NULL,NULL);
 }
 
-EVP_PKEY * SSLServerSocket::GeneratePKey(RSA *rsakey) 
+EVP_PKEY * SSLServerSocket6::GeneratePKey(RSA *rsakey) 
 {
 	EVP_PKEY *pkey=NULL;
 
@@ -244,7 +246,7 @@ EVP_PKEY * SSLServerSocket::GeneratePKey(RSA *rsakey)
 	return(pkey);
 }
 
-X509 * SSLServerSocket::BuildCertificate(const char *name, const char *organization, const char *country, EVP_PKEY *key) 
+X509 * SSLServerSocket6::BuildCertificate(const char *name, const char *organization, const char *country, EVP_PKEY *key) 
 {
 	// Atleast a name should be provided
 	if( !name )
@@ -312,7 +314,7 @@ X509 * SSLServerSocket::BuildCertificate(const char *name, const char *organizat
 	return c;
 }
 
-bool SSLServerSocket::CheckCert()
+bool SSLServerSocket6::CheckCert()
 {
 	// FIXME: rsa_key, evp_pkey and cert are never deleted. However, they are only created once so there is no memory leak.
 	
@@ -365,7 +367,7 @@ static int pem_passwd_cb_server(char *buf, int size, int rwflag, void *password)
 	return(strlen(buf));
 }
 
-bool SSLServerSocket::UseCertPassword(const char *cert_file, const char *private_key_file, std::string password)
+bool SSLServerSocket6::UseCertPassword(const char *cert_file, const char *private_key_file, std::string password)
 {
 	if (ud) {
 		delete[] ud;
@@ -379,7 +381,7 @@ bool SSLServerSocket::UseCertPassword(const char *cert_file, const char *private
 	return UseCertCallback(cert_file, private_key_file, &pem_passwd_cb_server, ud);
 }
 
-bool SSLServerSocket::UseCertCallback(const char *cert_file, const char *private_key_file, int passwd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata)
+bool SSLServerSocket6::UseCertCallback(const char *cert_file, const char *private_key_file, int passwd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata)
 {
 	if (cert_file == NULL || private_key_file == NULL) {
 		// invalid argument
@@ -432,7 +434,7 @@ bool SSLServerSocket::UseCertCallback(const char *cert_file, const char *private
 	return true;
 }
 
-bool SSLServerSocket::UseDHFile(const char *dh_file)
+bool SSLServerSocket6::UseDHFile(const char *dh_file)
 {
 	if (!dh_file) {
 		return false;

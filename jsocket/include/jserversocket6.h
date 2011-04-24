@@ -17,10 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SERVERSOCKET_H
-#define J_SERVERSOCKET_H
+#ifndef J_SERVERSOCKET6_H
+#define J_SERVERSOCKET6_H
 
-#include "jinetaddress.h"
+#include "jinetaddress6.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -33,14 +33,14 @@
 
 namespace jsocket {
 
-class Socket;
+class Socket6;
 
 /**
  * \brief ServerSocket.
  *
  * \author Jeff Ferr
  */
-class ServerSocket : public virtual jcommon::Object{
+class ServerSocket6 : public virtual jcommon::Object{
 
 	private:
 #ifdef _WIN32
@@ -51,14 +51,14 @@ class ServerSocket : public virtual jcommon::Object{
 		int _fd;
 #endif
 		/** \brief Local socket. */
-		struct sockaddr_in _lsock;
+		struct sockaddr_in6 _lsock;
 		/** \brief Remote socket. */
-		struct sockaddr_in _rsock;
+		struct sockaddr_in6 _rsock;
 		/** \brief */
-		InetAddress *_local;
+		InetAddress6 *_local;
 		/** \brief */
 		bool _is_closed;
-
+        
 		/**
 		 * \brief
 		 *
@@ -69,7 +69,7 @@ class ServerSocket : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void BindSocket(InetAddress *, int);
+		void BindSocket(InetAddress6 *, int);
 
 		/**
 		 * \brief
@@ -82,25 +82,25 @@ class ServerSocket : public virtual jcommon::Object{
 		 * \brief Constructor.
 		 *
 		 */
-		ServerSocket(int port, int backlog = 5, InetAddress * = NULL);
+		ServerSocket6(int port, int backlog = 5, InetAddress6 * = NULL);
 
 		/**
 		 * \brief Destructor virtual.
 		 *
 		 */
-		virtual ~ServerSocket();
+		virtual ~ServerSocket6();
 
 		/**
 		 * \brief Accept a new socket.
 		 *
 		 */
-		Socket * Accept();
+		Socket6 * Accept();
 
 		/**
 		 * \brief
 		 *
 		 */
-		InetAddress * GetInetAddress();
+		InetAddress6 * GetInetAddress();
 
 		/**
 		 * \brief Get the local port.

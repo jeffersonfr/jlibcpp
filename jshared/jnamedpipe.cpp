@@ -18,78 +18,87 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsockethandler.h"
-#include "jserversocket.h"
-#include "jsocket.h"
+#include "jnamedpipe.h"
 
-namespace jlogger {
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
-SocketHandler::SocketHandler(int port, int limit):
-	jlogger::StreamHandler()//, jthread::Thread()
+namespace jshared {
+
+NamedPipe::NamedPipe(std::string name, int mode):
+	jcommon::Object()
 {
-	jlogger::StreamHandler::SetClassName("jlogger::SocketHandler");
-
-	 _server = new jsocket::ServerSocket(port);
-
-	if (limit < 1) {
-		_limit = 1;
-	} else {
-		_limit = limit;
-	}
+	jcommon::Object::SetClassName("jshared::NamedPipe");
 	
-	Start();
-}
-
-SocketHandler::~SocketHandler()
-{
-}
-
-void SocketHandler::WriteRecord(LogRecord *record_)
-{
-	std::string type;
+	_name = name;
 	
-	time_t curtime = time(NULL);
-	char *loctime = asctime(localtime (&curtime));
-	
-	std::ostringstream log, date;
-		
-	if (loctime != NULL) {
-		loctime[strlen(loctime)-1] = '\0';
-	
-		date << " [" << (loctime + 4) << "]  ";
-	}
-	
-	_mutex.Lock();
-	
-	log << record_->GetRecord() << std::flush;
-
-	_logs.push_back(log.str());
-
-	if (_logs.size() > _limit) {
-		_logs.pop_front();
-	}
-	
-	_mutex.Unlock();
-}
-
-void SocketHandler::Run()
-{
-	std::deque<std::string>::iterator i;
-	jsocket::Socket *socket;
-		
-	while (true) {
-		try {
-			socket = _server->Accept();
-
-			for (i=_logs.begin(); i!=_logs.end(); i++) {
-				socket->Send((*i).c_str(), (*i).size());
-			}
-			
-			socket->Close();
-
-			delete socket;
-		} catch (...) {
+#ifdef _WIN32
+#else
+	if ((_fd = open(_name.c_str(), O_RDWR)) < 0) {
+		if (mkfifo(name.c_str(), mode) != 0) {
+			// throw
 		}
+	
+		if ((_fd = open(_name.c_str(), O_RDWR)) < 0) {
+			// throw
+		}
+	}
+#endif
+	
+	_is_closed = false;
+}
+
+NamedPipe::~NamedPipe()
+{
+	Close();
+}
+
+int NamedPipe::Receive(char *data_, int length_)
+{
+	if (_is_closed == true) {
+		return 0;
+	}
+
+	long r;
+
+#ifdef _WIN32
+	ReadFile(_fd, data_, length_, (DWORD *)&r, 0);
+#else
+	r = read(_fd, data_, length_);
+#endif
+
+	return r;
+}
+
+int NamedPipe::Send(const char *data_, int length_)
+{
+	long r;
+
+#ifdef _WIN32
+	WriteFile(_fd, data_, length_, (DWORD *)&r, 0);
+#else
+	r = write(_fd, data_, length_);
+#endif
+
+	return r;
+}
+
+bool NamedPipe::IsClosed()
+{
+	return _is_closed;
+}
+
+void NamedPipe::Close()
+{
+	if (_is_closed == false) {
+		_is_closed = true;
+
+#ifdef _WIN32
+		CloseHandle(_fd);
+#else
+		close(_fd);
+#endif
 	}
 }
 

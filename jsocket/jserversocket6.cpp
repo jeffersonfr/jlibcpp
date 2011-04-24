@@ -18,67 +18,99 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jlocalserversocket.h"
-#include "jsocket.h"
+#include "jserversocket6.h"
+#include "jsocket6.h"
 #include "junknownhostexception.h"
 #include "jsocketexception.h"
 #include "jsocketstreamexception.h"
 
 namespace jsocket {
 
-LocalServerSocket::LocalServerSocket(std::string file, int backlog_):
+ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress6 *addr_):
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jsocket::ServerSocket");
+	jcommon::Object::SetClassName("jsocket::ServerSocket6");
 	
-	_file = file;
+  _local = NULL;
 	_is_closed = false;
 
+	if (addr_ == NULL) {
+		try {
+			InetAddress6 *a = InetAddress6::GetLocalHost();
+        
+			addr_ = a;
+		} catch (UnknownHostException &) {
+			addr_ = NULL;
+		}
+	}
+
 	CreateSocket();
-	BindSocket();
-	ListenSocket(backlog_);
+
+	if (port_ != 0) {
+		BindSocket(addr_, port_);
+		ListenSocket(backlog_);
+	} else {
+#ifdef _WIN32
+		int len;
+#else
+		socklen_t len;
+#endif
+		
+		ListenSocket(backlog_);
+		
+		if(getsockname(_fd, (struct sockaddr *)&_lsock, &len) < 0) {
+			throw SocketStreamException("Connect error");
+		}
+	}
 }
 
-LocalServerSocket::~LocalServerSocket()
+ServerSocket6::~ServerSocket6()
 {
 	try {
 		Close();
 	} catch (...) {
 	}
+
+	if (_local) {
+		delete _local;
+	}
 }
 
 /** Private */
 
-void LocalServerSocket::CreateSocket()
+void ServerSocket6::CreateSocket()
 {
-#ifdef _WIN32
-#else
-	_fd = socket (PF_UNIX, SOCK_STREAM, 0); // IPPROTO_TCP);
-
-	if (_fd < 0) {
+	if ((_fd = ::socket(PF_INET6, SOCK_STREAM, 0)) < 0) {
 		throw SocketException("Create socket error");
 	}
-#endif
 }
 
-void LocalServerSocket::BindSocket()
+void ServerSocket6::BindSocket(InetAddress6 *local_addr_, int local_port_)
 {
+	bool opt = 1;
+    
+	_local = local_addr_;
+   
+	memset(&_lsock, 0, sizeof(_lsock));
+    
+	_lsock.sin6_family = AF_INET6;
+	_lsock.sin6_flowinfo = 0;
+	_lsock.sin6_scope_id = 0;
+	_lsock.sin6_addr = in6addr_any;
+	_lsock.sin6_port = htons(local_port_);
+
 #ifdef _WIN32
+	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
 #else
-	unlink(_file.c_str());
-
-	_address.sun_family = AF_UNIX;
-	strncpy(_address.sun_path, _file.c_str(), 255);
-	
-	int address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, 255);
-
-	if (bind(_fd, (struct sockaddr *) &_address, address_length) != 0) {
+	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
+#endif
+    
+	if (::bind(_fd, (struct sockaddr *) &_lsock, sizeof(_lsock)) < 0) {
 		throw SocketException("Bind socket error");
 	}
-#endif
 }
 
-void LocalServerSocket::ListenSocket(int backlog_)
+void ServerSocket6::ListenSocket(int backlog_)
 {
 	if (::listen(_fd, backlog_) < 0) {
 		throw SocketException("Listen port error");
@@ -87,44 +119,51 @@ void LocalServerSocket::ListenSocket(int backlog_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET LocalServerSocket::GetHandler()
-#else
-int LocalServerSocket::GetHandler()
-#endif
+Socket6 * ServerSocket6::Accept()
 {
 #ifdef _WIN32
-	return -1;
-#else
-	return _fd;
-#endif
-}
-
-LocalSocket * LocalServerSocket::Accept()
-{
-#ifdef _WIN32
-	return NULL;
-#else 
-	sockaddr_un address;
-	socklen_t address_length;
+	int sock_size;
 	int handler;
 	
-	if ((handler = ::accept(_fd, (struct sockaddr *)&address, &address_length)) < 0) {
+	sock_size = sizeof(_rsock);
+	handler = ::accept(_fd, (struct sockaddr *) &_rsock, &sock_size);
+#else 
+	socklen_t sock_size;
+	int handler;
+	
+	sock_size = sizeof(_rsock);
+	handler = ::accept(_fd, (struct sockaddr *) &_rsock, &sock_size);
+#endif
+    
+	if (handler < 0) {
 		throw SocketException("Accept failed");
 	}
 
-	return new LocalSocket(handler, _file);
-#endif
+	Socket6 *s = new Socket6(handler, _rsock);
+    
+	return s;
 }
 
-std::string LocalServerSocket::GetServerFile()
+InetAddress6 * ServerSocket6::GetInetAddress()
 {
-	return _file;
+	return _local;
 }
 
-void LocalServerSocket::Close()
+int ServerSocket6::GetLocalPort()
+{
+	return ntohs(_lsock.sin6_port);
+}
+
+void ServerSocket6::Close()
 {
 #ifdef _WIN32
+	if (_is_closed == false) {
+		_is_closed = true;
+
+		if (closesocket(_fd) < 0) {
+			throw SocketException("Close socket error");
+		}
+	}
 #else
 	if (_is_closed == false) {
 		_is_closed = true;
@@ -133,8 +172,6 @@ void LocalServerSocket::Close()
 			throw SocketException("Close socket error");
 		}
 	}
-	
-	unlink(_file.c_str());
 #endif
 }
 

@@ -86,7 +86,7 @@ ServerSocket::~ServerSocket()
 
 void ServerSocket::CreateSocket()
 {
-	_fd = ::socket(AF_INET, SOCK_STREAM, 0);
+	_fd = ::socket(PF_INET, SOCK_STREAM, 0);
     
 	if (_fd < 0) {
 		throw SocketException("Create socket error");

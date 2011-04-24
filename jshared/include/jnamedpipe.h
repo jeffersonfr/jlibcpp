@@ -17,80 +17,76 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "Stdafx.h"
-#include "jsockethandler.h"
-#include "jserversocket.h"
-#include "jsocket.h"
+#ifndef J_NAMEDPIPE_H
+#define J_NAMEDPIPE_H
 
-namespace jlogger {
+#include "jobject.h"
 
-SocketHandler::SocketHandler(int port, int limit):
-	jlogger::StreamHandler()//, jthread::Thread()
-{
-	jlogger::StreamHandler::SetClassName("jlogger::SocketHandler");
+#include <iostream>
 
-	 _server = new jsocket::ServerSocket(port);
+#include <stdint.h>
 
-	if (limit < 1) {
-		_limit = 1;
-	} else {
-		_limit = limit;
-	}
-	
-	Start();
-}
+namespace jshared {
 
-SocketHandler::~SocketHandler()
-{
-}
+/**
+ * \brief Socket.
+ *
+ * \author Jeff Ferr
+ */
+class NamedPipe : public virtual jcommon::Object{
 
-void SocketHandler::WriteRecord(LogRecord *record_)
-{
-	std::string type;
-	
-	time_t curtime = time(NULL);
-	char *loctime = asctime(localtime (&curtime));
-	
-	std::ostringstream log, date;
-		
-	if (loctime != NULL) {
-		loctime[strlen(loctime)-1] = '\0';
-	
-		date << " [" << (loctime + 4) << "]  ";
-	}
-	
-	_mutex.Lock();
-	
-	log << record_->GetRecord() << std::flush;
+	private:
+		/** \brief */
+		std::string _name;
+#ifdef _WIN32
+		/** \brief Socket handler. */
+		HANDLE _fd, 
+#else
+		/** \brief */
+		int _fd;
+#endif
+		/** \brief */
+		bool _is_closed;
 
-	_logs.push_back(log.str());
+	public:
+		/**
+		 * \brief Constructor.
+		 *
+		 */
+		NamedPipe(std::string name, int mode);
 
-	if (_logs.size() > _limit) {
-		_logs.pop_front();
-	}
-	
-	_mutex.Unlock();
-}
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~NamedPipe();
 
-void SocketHandler::Run()
-{
-	std::deque<std::string>::iterator i;
-	jsocket::Socket *socket;
-		
-	while (true) {
-		try {
-			socket = _server->Accept();
+		/**
+		 * \brief
+		 *
+		 */
+		int Send(const char *data_, int data_length);
 
-			for (i=_logs.begin(); i!=_logs.end(); i++) {
-				socket->Send((*i).c_str(), (*i).size());
-			}
-			
-			socket->Close();
+		/**
+		 * \brief
+		 *
+		 */
+		int Receive(char *data_, int data_length_);
 
-			delete socket;
-		} catch (...) {
-		}
-	}
-}
+		/**
+		 * \brief
+		 *
+		 */
+		bool IsClosed();
+
+		/**
+		 * \brief Close.
+		 *
+		 */
+		void Close();
+
+};
 
 }
+
+#endif

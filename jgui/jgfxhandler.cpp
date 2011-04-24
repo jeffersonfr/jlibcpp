@@ -456,15 +456,14 @@ void GFXHandler::InitEngine()
 	DirectFBSetOption("linux-input-devices", "keyboard");
 	*/
 
+	std::vector<std::string> v;
 	jcommon::Properties p;
-	std::vector<std::string> *v;
 
 	try {
 		p.Load("/etc/directfbrc");
-
 		v = p.GetProperties();
 
-		for (std::vector<std::string>::iterator i=v->begin(); i!=v->end(); i++) {
+		for (std::vector<std::string>::iterator i=v.begin(); i!=v.end(); i++) {
 			std::string value = p.GetPropertyByName((*i), "nono");
 
 			if (value != "nono") {
@@ -472,8 +471,6 @@ void GFXHandler::InitEngine()
 				DirectFBSetOption((*i).c_str(), value.c_str());
 			}
 		}
-
-		delete v;
 	} catch (...) {
 	}
 

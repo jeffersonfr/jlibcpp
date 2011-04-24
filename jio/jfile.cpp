@@ -761,13 +761,13 @@ void File::Flush()
 #endif
 }
 
-std::vector<std::string> * File::ListFiles(std::string extension)
+std::vector<std::string> File::ListFiles(std::string extension)
 {
-	if (IsDirectory() == false) {
-		return NULL;
-	}
+	std::vector<std::string> files;
 
-	std::vector<std::string> *l = NULL;
+	if (IsDirectory() == false) {
+		return files;
+	}
 
 #ifdef _WIN32
 	std::string path = GetAbsolutePath();
@@ -794,17 +794,15 @@ std::vector<std::string> * File::ListFiles(std::string extension)
 
 	// List all the files in the directory with some info about them.
 
-	l = new std::vector<std::string>();
-
 	do {
 		if (extension == "") {
-			l->push_back(std::string(ffd.cFileName));
+			files.push_back(std::string(ffd.cFileName));
 		} else {
 			std::string file = std::string(ffd.cFileName);
 
 			if (file.size() > extension.size()) {
 				if (strcmp((const char *)(file.c_str()-extension.size()), extension.c_str()) == 0) {
-					l->push_back(file);
+					files.push_back(file);
 				}
 			}
 		}
@@ -823,10 +821,8 @@ std::vector<std::string> * File::ListFiles(std::string extension)
 	FindClose(hFind);
 #else
 	if (_dir == NULL) {
-		return NULL;
+		return files;
 	}
-
-	l = new std::vector<std::string>();
 
 	struct dirent *namelist;
 	
@@ -834,7 +830,7 @@ std::vector<std::string> * File::ListFiles(std::string extension)
 
 	if (extension == "") {
 		while ((namelist = readdir(_dir)) != NULL) {
-			l->push_back(namelist->d_name);
+			files.push_back(namelist->d_name);
 
 			// WARN:: delete ??
 		}
@@ -846,7 +842,7 @@ std::vector<std::string> * File::ListFiles(std::string extension)
 
 			if (file.size() > extension.size()) {
 				if (strcmp((const char *)(file.c_str()-extension.size()), extension.c_str()) == 0) {
-					l->push_back(file);
+					files.push_back(file);
 				}
 			}
 
@@ -855,12 +851,7 @@ std::vector<std::string> * File::ListFiles(std::string extension)
 	}
 #endif
 	
-	if (l->size() == 0) {
-		delete l;
-		l = NULL;
-	}
-	
-	return l;
+	return files;
 }
 
 void File::Move(std::string newpath_)

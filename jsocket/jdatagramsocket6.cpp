@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jdatagramsocket.h"
+#include "jdatagramsocket6.h"
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
 #include "jsocketstreamexception.h"
@@ -26,12 +26,12 @@
 
 namespace jsocket {
 
-int DatagramSocket::_used_port = 1024;
+int DatagramSocket6::_used_port = 1024;
 
-DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
+DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(UDP_SOCKET)
 {
-	jcommon::Object::SetClassName("jsocket::DatagramSocket");
+	jcommon::Object::SetClassName("jsocket::DatagramSocket6");
 	
 	_stream = stream_;
 	_address = NULL;
@@ -41,7 +41,7 @@ DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, int t
 	_timeout = timeout_;
 
 	CreateSocket();
-	ConnectSocket(InetAddress::GetByName(host_), port_);
+	ConnectSocket(InetAddress6::GetByName(host_), port_);
 	InitStream(rbuf_, wbuf_);
 
 	_sent_bytes = 0;
@@ -50,10 +50,10 @@ DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, int t
 	_is_closed = false;
 }
 
-DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
+DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(UDP_SOCKET)
 {
-	jcommon::Object::SetClassName("jsocket::DatagramSocket");
+	jcommon::Object::SetClassName("jsocket::DatagramSocket6");
 
 	_address = NULL;
 	_is = NULL;
@@ -63,9 +63,9 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 	_timeout = timeout_;
 
 	try {
-		_address = InetAddress::GetByName("localhost");
+		_address = InetAddress6::GetByName("localhost");
 	} catch (UnknownHostException &) {
-		// WARN:: verify if GetInetAddress() == NULL
+		// WARN:: verify if GetInetAddress6() == NULL
 		_address = NULL;
 	}
 
@@ -93,7 +93,7 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 	_is_closed = false;
 }
 
-DatagramSocket::~DatagramSocket()
+DatagramSocket6::~DatagramSocket6()
 {
 	try {
 		Close();
@@ -115,34 +115,34 @@ DatagramSocket::~DatagramSocket()
 
 /** Private */
 
-void DatagramSocket::CreateSocket()
+void DatagramSocket6::CreateSocket()
 {
-#ifdef _WIN32
-   _fd = socket (PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-
-   if (_fd == INVALID_SOCKET) {
-#else
-	_fd = ::socket(PF_INET, SOCK_DGRAM,IPPROTO_UDP);
+	_fd = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	
+#ifdef _WIN32
+	if (_fd == INVALID_SOCKET) {
+#else
 	if (_fd < 0) {
 #endif
 		throw SocketException("Create datagram socket error");
 	}
 }
 
-void DatagramSocket::BindSocket(InetAddress *addr_, int local_port_)
+void DatagramSocket6::BindSocket(InetAddress6 *addr_, int local_port_)
 {
 	int opt = 1;
 
 	memset(&_lsock, 0, sizeof(_lsock));
    
-	_lsock.sin_family = AF_INET;
-	_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
+	_lsock.sin6_family = AF_INET6;
+	_lsock.sin6_flowinfo = 0;
+	_lsock.sin6_addr = in6addr_any;
+	_lsock.sin6_scope_id = 0;
    
 	if(local_port_ > 0) {
-		_lsock.sin_port = htons(local_port_);
+		_lsock.sin6_port = htons(local_port_);
 	} else {
-		_lsock.sin_port = htons(-1);
+		_lsock.sin6_port = htons(-1);
 	}
 
 #ifdef _WIN32
@@ -160,159 +160,160 @@ void DatagramSocket::BindSocket(InetAddress *addr_, int local_port_)
 	}
 }
 
-void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
+void DatagramSocket6::ConnectSocket(InetAddress6 *addr_, int port_)
 {
 	_address = addr_;
 	
 	memset(&_server_sock, 0, sizeof(_server_sock));
 	
-	_server_sock.sin_family = AF_INET;
+	_lsock.sin6_family = AF_INET6;
+	_lsock.sin6_flowinfo = 0;
+	_lsock.sin6_scope_id = 0;
+	_lsock.sin6_port = htons(port_);
 	
 	if(_address == NULL) {
-		_server_sock.sin_addr.s_addr = htonl(INADDR_ANY);
+		_lsock.sin6_addr = in6addr_any;
 	} else {
-		_server_sock.sin_addr.s_addr = ::inet_addr(_address->GetHostAddress().c_str());
+		inet_pton(AF_INET6, _address->GetHostAddress().c_str(), &(_lsock.sin6_addr));
 	}
-	
-	_server_sock.sin_port = htons(port_);
 
 	int r;
 	
 	if (_stream == true) {
 #ifdef _WIN32
-		if (_timeout > 0) {
-			u_long opt = 1;
-			
+	if (_timeout > 0) {
+		u_long opt = 1;
+
+		if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
+			throw SocketException("Socket non-blocking error");
+		}
+
+		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
+
+		if (WSAGetLastError() != WSAEWOULDBLOCK) {
+			opt = 0;
+
 			if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
 				throw SocketException("Socket non-blocking error");
 			}
-			
-			r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
-			
-			if (WSAGetLastError() != WSAEWOULDBLOCK) {
+
+			throw SocketException("Connect socket error");
+		}
+
+		if (r != 0) {
+			fd_set wset;
+			struct timeval t;
+
+			t.tv_sec = _timeout/1000;
+			t.tv_usec = (_timeout%1000)*1000;
+
+			FD_ZERO(&wset);
+			FD_SET(_fd, &wset);
+
+			r = select(_fd + 1, &wset, &wset, &wset, &t);
+
+			if (r <= 0) {
 				opt = 0;
-				
+
 				if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
 					throw SocketException("Socket non-blocking error");
 				}
-				
-				throw SocketException("Connect socket error");
+
+				shutdown(_fd, 2);
+
+				if (r == 0) {
+					throw SocketException("Connect timeout error");
+				} else if (r < 0) {
+					throw SocketException("Connect socket error");
+				}
 			}
-			
+
+			int optlen = sizeof(r);
+
+			getsockopt(_fd, SOL_SOCKET, SO_ERROR, (char *)&r, &optlen);
+
 			if (r != 0) {
-				fd_set wset;
-				struct timeval t;
-				
-				t.tv_sec = _timeout/1000;
-				t.tv_usec = (_timeout%1000)*1000;
-				
-				FD_ZERO(&wset);
-				FD_SET(_fd, &wset);
-				
-				r = select(_fd + 1, &wset, &wset, &wset, &t);
-				
-				if (r <= 0) {
-					opt = 0;
-					
-					if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-						throw SocketException("Socket non-blocking error");
-					}
-					
-					shutdown(_fd, 2);
-					
-					if (r == 0) {
-						throw SocketException("Connect timeout error");
-					} else if (r < 0) {
-						throw SocketException("Connect socket error");
-					}
-				}
-				
-				int optlen = sizeof(r);
-				
-				getsockopt(_fd, SOL_SOCKET, SO_ERROR, (char *)&r, &optlen);
-				
-				if (r != 0) {
-					throw SocketException("Can't connect socket");
-				}
+				throw SocketException("Can't connect socket");
 			}
-			
-			opt = 0;
-			
-			if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-				throw SocketException("Socket non-blocking error");
-			}
-		} else {
-			r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 		}
+
+		opt = 0;
+
+		if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
+			throw SocketException("Socket non-blocking error");
+		}
+	} else {
+		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
+	}
 #else
-		if (_timeout > 0) {
-			int opt = 1;
-			
+	if (_timeout > 0) {
+		int opt = 1;
+
+		if (ioctl(_fd, FIONBIO, &opt) < 0) {
+			throw SocketException("Socket non-blocking error");
+		}
+
+		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
+
+		if (errno != EINPROGRESS) {
+			opt = 0;
+
 			if (ioctl(_fd, FIONBIO, &opt) < 0) {
 				throw SocketException("Socket non-blocking error");
 			}
-			
-			r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
-			
-			if (errno != EINPROGRESS) {
+
+			throw SocketException("Connect socket error");
+		}
+
+		if (r != 0) {
+			fd_set wset;
+			struct timeval t;
+
+			t.tv_sec = _timeout/1000;
+			t.tv_usec = (_timeout%1000)*1000;
+
+			FD_ZERO(&wset);
+			FD_SET(_fd, &wset);
+
+			r = select(_fd + 1, &wset, &wset, &wset, &t);
+
+			if (r <= 0) {
 				opt = 0;
-				
+
 				if (ioctl(_fd, FIONBIO, &opt) < 0) {
 					throw SocketException("Socket non-blocking error");
 				}
-				
-				throw SocketException("Connect socket error");
+
+				shutdown(_fd, SHUT_RDWR);
+
+				if (r == 0) {
+					throw SocketException("Connect timeout error");
+				} else if (r < 0) {
+					throw SocketException("Connect socket error");
+				}
 			}
-			
+
+			int optlen = sizeof(r);
+
+			getsockopt(_fd, SOL_SOCKET, SO_ERROR, (void *)&r, (socklen_t *)&optlen);
+
 			if (r != 0) {
-				fd_set wset;
-				struct timeval t;
-				
-				t.tv_sec = _timeout/1000;
-				t.tv_usec = (_timeout%1000)*1000;
-				
-				FD_ZERO(&wset);
-				FD_SET(_fd, &wset);
-				
-				r = select(_fd + 1, &wset, &wset, &wset, &t);
-				
-				if (r <= 0) {
-					opt = 0;
-					
-					if (ioctl(_fd, FIONBIO, &opt) < 0) {
-						throw SocketException("Socket non-blocking error");
-					}
-					
-					shutdown(_fd, SHUT_RDWR);
-					
-					if (r == 0) {
-						throw SocketException("Connect timeout error");
-					} else if (r < 0) {
-						throw SocketException("Connect socket error");
-					}
-				}
-				
-				int optlen = sizeof(r);
-				
-				getsockopt(_fd, SOL_SOCKET, SO_ERROR, (void *)&r, (socklen_t *)&optlen);
-				
-				if (r != 0) {
-					throw SocketException("Can't connect socket");
-				}
+				throw SocketException("Can't connect socket");
 			}
-			
-			opt = 0;
-			
-			if (ioctl(_fd, FIONBIO, &opt) < 0) {
-				throw SocketException("Socket non-blocking error");
-			}
-		} else {
-			r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 		}
+
+		opt = 0;
+
+		if (ioctl(_fd, FIONBIO, &opt) < 0) {
+			throw SocketException("Socket non-blocking error");
+		}
+	} else {
+		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
+	}
 #endif
-		
+
 #ifdef _WIN32
-		if (r == SOCKET_ERROR) {
+	if (r == SOCKET_ERROR) {
 #else
 		if (r < 0) {
 #endif
@@ -321,7 +322,7 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 	}
 }
 
-void DatagramSocket::InitStream(int rbuf_, int wbuf_)
+void DatagramSocket6::InitStream(int rbuf_, int wbuf_)
 {
 	if (_stream == false) {
 		_is = new SocketInputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_server_sock, rbuf_);
@@ -335,32 +336,32 @@ void DatagramSocket::InitStream(int rbuf_, int wbuf_)
 /** End */
 
 #ifdef _WIN32
-SOCKET DatagramSocket::GetHandler()
+SOCKET DatagramSocket6::GetHandler()
 #else
-int DatagramSocket::GetHandler()
+int DatagramSocket6::GetHandler()
 #endif
 {
 	return _fd;
 }
 
-jio::InputStream * DatagramSocket::GetInputStream()
+jio::InputStream * DatagramSocket6::GetInputStream()
 {
 	return (jio::InputStream *)_is;
 }
 
-jio::OutputStream * DatagramSocket::GetOutputStream()
+jio::OutputStream * DatagramSocket6::GetOutputStream()
 {
 	return (jio::OutputStream *)_os;
 }
 
-int DatagramSocket::Receive(char *data_, int size_, int time_)
+int DatagramSocket6::Receive(char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
 	}
 	
 #ifdef _WIN32
-	return DatagramSocket::Receive(data_, size_);
+	return DatagramSocket6::Receive(data_, size_);
 #else
 	struct pollfd ufds[1];
 
@@ -375,7 +376,7 @@ int DatagramSocket::Receive(char *data_, int size_, int time_)
 		throw SocketTimeoutException("Socket receive timeout exception");
 	} else {
 	    if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
-			return DatagramSocket::Receive(data_, size_, true);
+			return DatagramSocket6::Receive(data_, size_, true);
 	    }
 	}
 #endif
@@ -383,7 +384,7 @@ int DatagramSocket::Receive(char *data_, int size_, int time_)
 	return -1;
 }
 
-int DatagramSocket::Receive(char *data_, int size_, bool block_)
+int DatagramSocket6::Receive(char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
@@ -442,14 +443,14 @@ int DatagramSocket::Receive(char *data_, int size_, bool block_)
     return n;
 }
 
-int DatagramSocket::Send(const char *data_, int size_, int time_)
+int DatagramSocket6::Send(const char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection was closed");
 	}
 	
 #ifdef _WIN32
-	return DatagramSocket::Send(data_, size_);
+	return DatagramSocket6::Send(data_, size_);
 #else
 	struct pollfd ufds[1];
 
@@ -464,7 +465,7 @@ int DatagramSocket::Send(const char *data_, int size_, int time_)
 		throw SocketTimeoutException("Socket send timeout exception");
 	} else {
 	    if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
-			return DatagramSocket::Send(data_, size_);
+			return DatagramSocket6::Send(data_, size_);
 	    }
 	}
 #endif
@@ -472,7 +473,7 @@ int DatagramSocket::Send(const char *data_, int size_, int time_)
 	return -1;
 }
 
-int DatagramSocket::Send(const char *data_, int size_, bool block_)
+int DatagramSocket6::Send(const char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection was closed");
@@ -522,7 +523,7 @@ int DatagramSocket::Send(const char *data_, int size_, bool block_)
 	return n;
 }
 
-void DatagramSocket::Close()
+void DatagramSocket6::Close()
 {
 #ifdef _WIN32
 	if (_is_closed == false) {
@@ -543,34 +544,32 @@ void DatagramSocket::Close()
 #endif
 }
 
-InetAddress * DatagramSocket::GetInetAddress()
+InetAddress6 * DatagramSocket6::GetInetAddress()
 {
 	return _address;
 }
 
-int DatagramSocket::GetLocalPort()
+int DatagramSocket6::GetLocalPort()
 {
-	return ntohs(_lsock.sin_port);
-	// return _lsock.sin_port;
+	return ntohs(_lsock.sin6_port);
 }
 
-int DatagramSocket::GetPort()
+int DatagramSocket6::GetPort()
 {
-	return ntohs(_server_sock.sin_port);
-	// return _server_sock.sin_port;
+	return ntohs(_server_sock.sin6_port);
 }
 
-int64_t DatagramSocket::GetSentBytes()
+int64_t DatagramSocket6::GetSentBytes()
 {
 	return _sent_bytes + _os->GetSentBytes();
 }
 
-int64_t DatagramSocket::GetReadedBytes()
+int64_t DatagramSocket6::GetReadedBytes()
 {
 	return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOption * DatagramSocket::GetSocketOption()
+SocketOption * DatagramSocket6::GetSocketOption()
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
@@ -579,7 +578,7 @@ SocketOption * DatagramSocket::GetSocketOption()
 	return new SocketOption(_fd, UDP_SOCKET);
 }
 
-std::string DatagramSocket::what()
+std::string DatagramSocket6::what()
 {
 	char port[20];
    

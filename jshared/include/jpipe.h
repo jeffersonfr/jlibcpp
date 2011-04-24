@@ -35,48 +35,54 @@ namespace jshared {
  */
 class Pipe : public virtual jcommon::Object{
 
-    private:
+	private:
 #ifdef _WIN32
-        /** \brief Socket handler. */
-	HANDLE _fdr, _fdw;
+		/** \brief Socket handler. */
+		HANDLE _fdr, _fdw;
 #else
-	/** \brief */
-	int _pipe[2];
+		/** \brief */
+		int _pipe[2];
 #endif
-	/** \brief */
-	bool _is_open;
+		/** \brief */
+		bool _is_closed;
 
-    public:
+	public:
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-        Pipe(int size_, int perms_);
-	
-        /**
+		Pipe(int size_, int mode_);
+
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
 		virtual ~Pipe();
-		
+
 		/**
 		 * \brief
 		 *
 		 */
-		int Send(const char *b_, int size_);
-		
+		int Send(const char *data_, int data_length);
+
 		/**
 		 * \brief
 		 *
 		 */
 		int Receive(char *data_, int data_length_);
-		
+
+		/**
+		 * \brief
+		 *
+		 */
+		bool IsClosed();
+
 		/**
 		 * \brief Close.
 		 *
 		 */
 		void Close();
-		
+
 };
 
 }

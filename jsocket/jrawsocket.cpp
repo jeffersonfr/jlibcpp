@@ -58,20 +58,6 @@ RawSocket::~RawSocket()
 		Close();
 	} catch (...) {
 	}
-
-	/*
-		 if (_address) {
-		 delete _address;
-		 }
-
-		 if (_is) {
-		 delete _is;
-		 }
-
-		 if (_os) {
-		 delete _os;
-		 }
-		 */
 }
 
 /** Private */

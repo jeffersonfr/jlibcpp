@@ -161,34 +161,34 @@ void FileChooserDialogBox::SetExtensionIgnoreCase(bool b)
 
 bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 {
-	std::vector<std::string> *files = ListFiles(current_dir);
+	std::vector<std::string> files = ListFiles(current_dir);
 
-	if ((void *)files == NULL) {
+	if (files.size() == 0) {
 		return false;
 	}
 
 	_list->RemoveItems();
 	_list->AddImageItem("..", _DATA_PREFIX"/images/folder.png");
 
-	std::sort(files->begin(), files->end(), ascending_sort());
+	std::sort(files.begin(), files.end(), ascending_sort());
 
 	if (_filter == DIRECTORY_ONLY || _filter == FILE_AND_DIRECTORY) {
-		for (unsigned int i=0; i<files->size(); i++) {
-			if ((*files)[i] == "." || (*files)[i] == "..") {
+		for (unsigned int i=0; i<files.size(); i++) {
+			if (files[i] == "." || files[i] == "..") {
 				continue;
 			}
 
-			if (IsDirectory(current_dir +jio::File::GetDelimiter() + (*files)[i])) {
+			if (IsDirectory(current_dir +jio::File::GetDelimiter() + files[i])) {
 				// adiciona um icone para o diretorio
-				_list->AddImageItem((*files)[i], _DATA_PREFIX"/images/lockfolder.png"); 
+				_list->AddImageItem(files[i], _DATA_PREFIX"/images/lockfolder.png"); 
 			}
 		}
 	}
 
 	if (_filter == FILE_ONLY || _filter == FILE_AND_DIRECTORY) {
-		for (unsigned int i=0; i<files->size(); i++) {
+		for (unsigned int i=0; i<files.size(); i++) {
 			std::string ext,
-				file = (*files)[i];
+				file = files[i];
 			bool b = false;
 
 			if (_extensions.size() == 0) {
@@ -223,23 +223,17 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 		}
 	}
 
-	delete files;
-
 	_list->SetCurrentIndex(0);
 	_list->Repaint();
 
 	return true;
 }
 
-std::vector<std::string> * FileChooserDialogBox::ListFiles(std::string dirPath)
+std::vector<std::string> FileChooserDialogBox::ListFiles(std::string dirPath)
 {
-	std::vector<std::string> *files = NULL;
-
 	jio::File file(dirPath);
 
-	files = file.ListFiles();
-
-	return files;
+	return file.ListFiles();
 }
 
 bool FileChooserDialogBox::IsDirectory(std::string path)

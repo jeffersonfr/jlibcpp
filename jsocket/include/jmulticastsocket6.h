@@ -17,117 +17,111 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_DATAGRAMSOCKET_H
-#define J_DATAGRAMSOCKET_H
+#ifndef J_MULTICASTSOCKET6_H
+#define J_MULTICASTSOCKET6_H
 
-#include "jinetaddress.h"
+#include "jinetaddress6.h"
 #include "jsocketoption.h"
 #include "jsocketinputstream.h"
 #include "jsocketoutputstream.h"
 #include "jconnection.h"
 
+#include "jobject.h"
+
+#include <iostream>
 #include <string>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
+#include <winsock.h>
 #else
-#include <sys/socket.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #endif
 
+#include <sys/types.h>
 #include <stdint.h>
 
 namespace jsocket {
 
 /**
- * \brief Socket UDP.
+ * \brief MulticastSocket.
  *
  * \author Jeff Ferr
  */
-class DatagramSocket : public jsocket::Connection{
+class MulticastSocket6 : public jsocket::Connection{
 
 	private:
-		/** \brief Use to bind the socket in a free port. */
+		/** \brief Use to bind the socket in a free port */
 		static int _used_port;
-
-		/** \brief Socket handler. */
+        
 #ifdef _WIN32
-		SOCKET _fd;
+		/** \brief Socket handler. */
+		SOCKET _fds, _fdr;
 #else
-		int _fd;
+		/** \brief Descriptor */
+		int _fds, _fdr;
 #endif
-		/** \brief Local socket. */
-		struct sockaddr_in _lsock;
-		/** \brief Server socket UDP. */
-		struct sockaddr_in _server_sock;
-		/** \brief Local inetaddress. */
-		InetAddress *_local;
-		/** \brief Remote inetaddress. */
-		InetAddress *_address;
-		/** \brief Input stream. */
+		/** \brief Local socket */
+		struct sockaddr_in6 _sock_s, _sock_r;
+		/** \brief Input stream */
 		SocketInputStream *_is;
-		/** \brief Output stream. */
+		/** \brief Output stream */
 		SocketOutputStream *_os;
-		/** \brief Bytes sent. */
-		int64_t _sent_bytes;
-		/** \brief Bytes received. */
-		int64_t _receive_bytes;
-		/** \brief Connect or not ? */
-		bool _stream;
 		/** \brief */
-		int _timeout;
+		int64_t _sent_bytes;
+		/** \brief */
+		int64_t _receive_bytes;
+		/** \brief */
+		std::vector<std::string> _groups;
 
 		/**
-		 * \brief Create a new socket.
+		 * \brief Create a new socket
 		 *
 		 */
 		void CreateSocket();
 
 		/**
-		 * \brief Bind socket.
+		 * \brief Bind socket
 		 *
 		 */
-		void BindSocket(InetAddress *addr_, int local_port_);
+		void BindSocket(InetAddress6 *addr_, int local_port_);
 
 		/**
-		 * \brief Connect socket.
+		 * \brief Connect socket
 		 *
 		 */
-		void ConnectSocket(InetAddress *addr_, int port_);
+		void ConnectSocket(InetAddress6 *addr_, int port_);
 
 		/**
-		 * \brief Init the stream.
+		 * \brief
 		 *
 		 */
 		void InitStream(int rbuf_, int wbuf_);
 
 	public:
 		/**
-		 * \brief Construtor UDP client.
+		 * \brief 
 		 *
 		 */
-		DatagramSocket(std::string addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		MulticastSocket6(std::string addr_, int port_, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
-		 * \brief Construtor UDP server.
+		 * \brief Destrutor virtual.
 		 *
 		 */
-		DatagramSocket(int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-
-		/**
-		 * \brief Destructor virtual.
-		 *
-		 */
-		virtual ~DatagramSocket();
+		virtual ~MulticastSocket6();
 
 #ifdef _WIN32
 		virtual SOCKET GetHandler();
 #else
 		virtual int GetHandler();
 #endif
-
+ 
 		/**
-		 * \brief 
+		 * \brief
 		 *
 		 */
 		virtual jio::InputStream * GetInputStream();
@@ -139,76 +133,94 @@ class DatagramSocket : public jsocket::Connection{
 		virtual jio::OutputStream * GetOutputStream();
 
 		/**
-		 * \brief Read data from a source.
+		 * \brief
 		 *
 		 */
 		virtual int Receive(char *data_, int size_, bool block_ = true);
 
 		/**
-		 * \brief Read data from a source.
+		 * \brief
 		 *
 		 */
 		virtual int Receive(char *data_, int size_, int time_);
 
 		/**
-		 * \brief Write data to a source.
+		 * \brief
 		 *
 		 */
 		virtual int Send(const char *data_, int size_, bool block_ = true);
 
 		/**
-		 * \brief Write data to a source.
+		 * \brief
 		 *
 		 */
 		virtual int Send(const char *data_, int size_, int time_);
 
 		/**
-		 * \brief Close the socket.
+		 * \brief
 		 *
 		 */
-		virtual void Close();        
-
-		/**
-		 * \brief Get InetAddress.
-		 *
-		 */
-		InetAddress * GetInetAddress();
-
-		/**
-		 * \brief Get the local port.
-		 *
-		 */
-		int GetLocalPort();
-
-		/**
-		 * \brief Get port.
-		 *
-		 */
-		int GetPort();
-
-		/**
-		 * \brief Get sent bytes to destination.
-		 *
-		 */
-		virtual int64_t GetSentBytes();
-
-		/**
-		 * \brief Get received bytes from a source.
-		 *
-		 */
-		virtual int64_t GetReadedBytes();
-
-		/**
-		 * \brief Get a object SocketOption.
-		 *
-		 */
-		SocketOption * GetSocketOption();
+		void Join(std::string group_);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual std::string what();
+		void Join(InetAddress6 *group_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void Leave(std::string group_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void Leave(InetAddress6 *group_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		std::vector<std::string> & GetGroupList();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Close();
+
+		/**
+		 * \brief
+		 *
+		 */
+		int GetLocalPort();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetSentBytes();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int64_t GetReadedBytes();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void SetMulticastTTL(char ttl_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		SocketOption * GetSocketOption();
 
 };
 

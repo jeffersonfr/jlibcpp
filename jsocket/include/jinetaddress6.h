@@ -17,102 +17,92 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SERVERSOCKET_H
-#define J_SERVERSOCKET_H
+#ifndef J_INETADDRESS6_H
+#define J_INETADDRESS6_H
 
-#include "jinetaddress.h"
+#include "jobject.h"
+
+#include <string>
+#include <vector>
+#include <cstring>
+#include <cstdlib>
 
 #ifdef _WIN32
 #include <windows.h>
-#include <winsock.h>
 #else
-#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
 #endif
-
-#include <stdint.h>
 
 namespace jsocket {
 
-class Socket;
-
 /**
- * \brief ServerSocket.
+ * \brief InetAddress.
  *
  * \author Jeff Ferr
  */
-class ServerSocket : public virtual jcommon::Object{
+class InetAddress6 : public virtual jcommon::Object{
 
 	private:
-#ifdef _WIN32
-		/** \brief Socket handler. */
-		SOCKET _fd;
-#else
-		/** \brief Socket handler. */
-		int _fd;
-#endif
-		/** \brief Local socket. */
-		struct sockaddr_in _lsock;
-		/** \brief Remote socket. */
-		struct sockaddr_in _rsock;
-		/** \brief */
-		InetAddress *_local;
-		/** \brief */
-		bool _is_closed;
+		/** \brief Host name. */
+		std::string _host;
+		/** \brief Host ip. */
+		struct in6_addr _ip;
 
 		/**
-		 * \brief
+		 * \brief Constructor private.
 		 *
 		 */
-		void CreateSocket();
-
-		/**
-		 * \brief
-		 *
-		 */
-		void BindSocket(InetAddress *, int);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void ListenSocket(int);
+		InetAddress6(std::string, struct in6_addr);
 
 	public:
-		/**
-		 * \brief Constructor.
-		 *
-		 */
-		ServerSocket(int port, int backlog = 5, InetAddress * = NULL);
-
 		/**
 		 * \brief Destructor virtual.
 		 *
 		 */
-		virtual ~ServerSocket();
+		virtual ~InetAddress6();
 
 		/**
-		 * \brief Accept a new socket.
+		 * \brief Get adresses by name.
 		 *
 		 */
-		Socket * Accept();
+		static InetAddress6 * GetByName(std::string);
+
+		/**
+		 * \brief Get all addresses from a host.
+		 *
+		 */
+		static std::vector<InetAddress6 *> GetAllByName(std::string);
+
+		/**
+		 * \brief Get the local host.
+		 *
+		 */
+		static InetAddress6 * GetLocalHost();
 
 		/**
 		 * \brief
 		 *
 		 */
-		InetAddress * GetInetAddress();
+		virtual bool IsReachable();
 
 		/**
-		 * \brief Get the local port.
+		 * \brief Get the host name.
 		 *
 		 */
-		int GetLocalPort();
+		std::string GetHostName();
 
 		/**
-		 * \brief Close the server socket.
+		 * \brief Get the host address.
 		 *
 		 */
-		void Close();
+		std::string GetHostAddress();
+
+		/**
+		 * \brief Get the address IPv4.
+		 *
+		 */
+		std::vector<uint8_t> GetAddress();
 
 };
 

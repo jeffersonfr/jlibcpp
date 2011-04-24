@@ -183,7 +183,7 @@ void Properties::Load(std::string filename_, std::string escape_)
 				prop.value = line;
 				prop.comment = true;
 					
-				properties.push_back(prop);
+				_properties.push_back(prop);
 		} else {
 			jcommon::StringTokenizer tokens(line, escape_, jcommon::SPLIT_FLAG, false);
 
@@ -194,14 +194,14 @@ void Properties::Load(std::string filename_, std::string escape_)
 					prop.value = jcommon::StringUtils::Trim(tokens.GetToken(1));
 					prop.comment = false;
 
-					properties.push_back(prop);
+					_properties.push_back(prop);
 			} else {
 				struct jproperty_t prop;
 	
 				prop.value = line;
 				prop.comment = true;
 					
-				properties.push_back(prop);
+				_properties.push_back(prop);
 			}
 		}
 	}
@@ -214,7 +214,7 @@ void Properties::Save(std::string escape_)
 	try {
 		jio::File f(_filename, jio::F_WRITE_ONLY | jio::F_LARGEFILE | jio::F_TRUNCATE);
 	
-		for (std::vector<struct jproperty_t>::iterator i=properties.begin(); i != properties.end(); i++) {
+		for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
 			std::ostringstream o;
 			
 			jproperty_t p = *i;
@@ -239,7 +239,7 @@ void Properties::SetPropertyByName(std::string key, std::string value)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<struct jproperty_t>::iterator i=properties.begin(); i != properties.end(); i++) {
+	for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
 		if ((*i).comment == false && (*i).key == key) {
 			(*i).value = value;
 
@@ -253,18 +253,18 @@ void Properties::SetPropertyByName(std::string key, std::string value)
 	p.value = value;
 	p.comment = false;
 
-	properties.push_back(p);
+	_properties.push_back(p);
 }
 
 void Properties::SetPropertyByIndex(int index, std::string value)
 {
-	if ((int)properties.size() == 0 || index < 0 || index > (int)properties.size()-1) {
+	if ((int)_properties.size() == 0 || index < 0 || index > (int)_properties.size()-1) {
 		throw IllegalArgumentException("Index out of bounds");
 	}
 
 	int k = 0;
 
-	for (std::vector<struct jproperty_t>::iterator i=properties.begin(); i != properties.end(); i++, k++) {
+	for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++, k++) {
 		if (k == index) {
 			jproperty_t p = *i;
 
@@ -279,7 +279,7 @@ std::string Properties::GetPropertyByName(std::string key, std::string reserv)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<struct jproperty_t>::iterator i=properties.begin(); i != properties.end(); i++) {
+	for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
 		jproperty_t p = *i;
 		
 		if (p.comment == false && p.key == key) {
@@ -294,20 +294,20 @@ std::string Properties::GetPropertyByIndex(int index, std::string reserv)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if ((int)properties.size() == 0 || index < 0 || index > (int)properties.size()-1) {
+	if ((int)_properties.size() == 0 || index < 0 || index > (int)_properties.size()-1) {
 		return reserv;
 	}
 
-	return properties[index].value;
+	return _properties[index].value;
 }
 
 void Properties::RemovePropertyByName(std::string key)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<struct jproperty_t>::iterator i=properties.begin(); i != properties.end(); i++) {
+	for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
 		if ((*i).key == key) {
-			properties.erase(i);
+			_properties.erase(i);
 
 			break;
 		}
@@ -318,26 +318,26 @@ void Properties::RemovePropertyByIndex(int index)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if ((int)properties.size() == 0 || index < 0 || index > (int)properties.size()-1) {
+	if ((int)_properties.size() == 0 || index < 0 || index > (int)_properties.size()-1) {
 		throw IllegalArgumentException("Index out of bounds");
 	}
 
-	properties.erase(properties.begin()+index);
+	_properties.erase(_properties.begin()+index);
 }
 
-std::vector<std::string> * Properties::GetProperties()
+std::vector<std::string> Properties::GetProperties()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	std::vector<std::string> *v = new std::vector<std::string>();
+	std::vector<std::string> properties;
 
-	for (std::vector<struct jproperty_t>::iterator i=properties.begin(); i != properties.end(); i++) {
+	for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
 		if ((*i).comment == false) {
-			v->push_back((*i).key);	
+			properties.push_back((*i).key);	
 		}
 	}
 	
-	return v;
+	return properties;
 }
 
 }

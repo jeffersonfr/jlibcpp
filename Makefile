@@ -209,50 +209,61 @@ OBJS_jlogger = \
 	   jloggerlib.o
 
 OBJS_jshared = \
-	   jpipe.o\
-	   jmemorymap.o\
-	   jsharedmemory.o\
-	   jsharedsemaphore.o\
-	   jmemoryexception.o\
-	   jprocessexception.o\
-	   jmessagequeue.o\
-	   jprocess.o\
-	   jprocessinputstream.o\
-	   jprocessoutputstream.o\
-	   jsharedfifo.o\
-	   jsharedlib.o\
-	   jmessageexception.o\
-	   jfifoexception.o\
-	   jschedule.o\
-	   jsharedmutex.o\
+		 jfifoexception.o\
+		 jmemoryexception.o\
+		 jmemorymap.o\
+		 jmessageexception.o\
+		 jmessagequeue.o\
+		 jnamedpipe.o\
+		 jpipe.o\
+		 jprocess.o\
+		 jprocessexception.o\
+		 jprocessinputstream.o\
+		 jprocessoutputstream.o\
+		 jschedule.o\
+		 jsharedfifo.o\
+		 jsharedlib.o\
+		 jsharedmemory.o\
+		 jsharedmutex.o\
+		 jsharedsemaphore.o\
 
 OBJS_jsocket = \
-	   jconnection.o\
-	   jconnectionpipe.o\
-	   jsocketexception.o\
-	   jsockettimeoutexception.o\
-	   junknownhostexception.o\
-	   jsocketoptionexception.o\
-	   jinetaddress.o\
-	   jsocket.o\
-	   jhttprequester.o\
-	   jdatagramsocket.o\
-	   jmulticastsocket.o\
-	   jserversocket.o\
-	   jsocketoption.o\
-	   jsocketinputstream.o\
-	   jsocketoutputstream.o\
-	   jsocketstreamexception.o\
-	   jsocketlib.o\
-	   jrawsocket.o\
-	   jsslsocket.o\
-	   jsslserversocket.o\
-	   jsslsocketinputstream.o\
-	   jsslsocketoutputstream.o\
-	   #jrtpsocket.o\
+		 jconnectionpipe.o\
+		 jdatagramsocket.o\
+		 jdatagramsocket6.o\
+		 jhttprequester.o\
+		 jinetaddress.o\
+		 jinetaddress6.o\
+		 jlocaldatagramsocket.o\
+		 jlocalserversocket.o\
+		 jlocalsocket.o\
+		 jmulticastsocket.o\
+		 jmulticastsocket6.o\
+		 jnetworkinterface.o\
+		 jrawsocket.o\
+		 jserversocket.o\
+		 jserversocket6.o\
+		 jsocket.o\
+		 jsocket6.o\
+		 jsocketexception.o\
+		 jsocketinputstream.o\
+		 jsocketlib.o\
+		 jsocketoption.o\
+		 jsocketoptionexception.o\
+		 jsocketoutputstream.o\
+		 jsocketstreamexception.o\
+		 jsockettimeoutexception.o\
+		 jsslserversocket.o\
+		 jsslserversocket6.o\
+		 jsslsocket.o\
+		 jsslsocket6.o\
+		 jsslsocketinputstream.o\
+		 jsslsocketoutputstream.o\
+		 junknownhostexception.o\
+		 #jrtpsocket.o\
 
 OBJS_jthread = \
-	   jbufferexception.o\
+		 jbufferexception.o\
 	   jcondition.o\
 		 jevent.o\
 		 jillegalstateexception.o\

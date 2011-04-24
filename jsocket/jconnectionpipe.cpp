@@ -61,11 +61,7 @@ ConnectionPipe::ConnectionPipe(Connection *conn, jconnection_pipe_t type_, int s
 ConnectionPipe::~ConnectionPipe()
 {
 	try {
-		if (_is_closed == false) {
-			_is_closed = true;
-			
-			Close();
-		}
+		Close();
 	} catch (...) {
 	}
 

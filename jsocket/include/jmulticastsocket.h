@@ -65,7 +65,7 @@ class MulticastSocket : public jsocket::Connection{
 		int _fds, _fdr;
 #endif
 		/** \brief Local socket */
-		sockaddr_in _sock_s, _sock_r;
+		struct sockaddr_in _sock_s, _sock_r;
 		/** \brief Input stream */
 		SocketInputStream *_is;
 		/** \brief Output stream */

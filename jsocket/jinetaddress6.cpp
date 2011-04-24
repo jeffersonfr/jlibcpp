@@ -18,27 +18,27 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jinetaddress.h"
+#include "jinetaddress6.h"
 #include "junknownhostexception.h"
 
 namespace jsocket {
 
-InetAddress::InetAddress(std::string name_, struct in_addr ip_):
+InetAddress6::InetAddress6(std::string name_, struct in6_addr ip_):
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jsocket::InetAddress");
+	jcommon::Object::SetClassName("jsocket::InetAddress6");
 	
 	_host = name_;
 	_ip = ip_;
 }
 
-InetAddress::~InetAddress()
+InetAddress6::~InetAddress6()
 {
 }
 
 /** Static */
 
-InetAddress * InetAddress::GetByName(std::string host_)
+InetAddress6 * InetAddress6::GetByName(std::string host_)
 {
 	struct hostent *h = gethostbyname(host_.c_str());
     
@@ -46,27 +46,27 @@ InetAddress * InetAddress::GetByName(std::string host_)
 		throw UnknownHostException("Host not found");
   }
    
-	InetAddress *addr = new InetAddress(host_, *(in_addr *)h->h_addr_list[0]);
+	InetAddress6 *addr = new InetAddress6(host_, *(in6_addr *)h->h_addr_list[0]);
 
 	// free(h);
 
 	return addr;
 }
 
-std::vector<InetAddress *> InetAddress::GetAllByName(std::string host_name_)
+std::vector<InetAddress6 *> InetAddress6::GetAllByName(std::string host_name_)
 {
-	std::vector<InetAddress *> vip;
+	std::vector<InetAddress6 *> vip;
 
 #ifdef _WIN32
 	return vip;
 #else
 	struct hostent *aux = NULL;
-	in_addr ip;
+	in6_addr ip;
 
-	if (inet_aton(host_name_.c_str(), &ip) == 0) {
+	if (inet_pton(AF_INET6, host_name_.c_str(), &ip) == 0) {
 		aux = gethostbyname(host_name_.c_str());
 	} else {
-		aux = gethostbyaddr(&ip, sizeof(ip), PF_INET);
+		aux = gethostbyaddr(&ip, sizeof(ip), PF_INET6);
 	}
 
 	if (aux == NULL) {
@@ -75,10 +75,10 @@ std::vector<InetAddress *> InetAddress::GetAllByName(std::string host_name_)
 		struct hostent *aux2;
 
 		for(int i=0; aux->h_addr_list[i] != NULL; ++i) {
-			aux2 = gethostbyaddr(aux->h_addr_list[i], sizeof(aux->h_addr_list[i]),PF_INET);
+			aux2 = gethostbyaddr(aux->h_addr_list[i], sizeof(aux->h_addr_list[i]), PF_INET6);
 			
 			if ((void *)aux2 != NULL) {
-				vip.push_back(new InetAddress(aux2->h_name, *(in_addr *)aux2->h_addr_list[0]));
+				vip.push_back(new InetAddress6(aux2->h_name, *(in6_addr *)aux2->h_addr_list[0]));
 			}
 		}
 
@@ -89,7 +89,7 @@ std::vector<InetAddress *> InetAddress::GetAllByName(std::string host_name_)
 	return vip;
 }
 
-InetAddress * InetAddress::GetLocalHost()
+InetAddress6 * InetAddress6::GetLocalHost()
 {
 	struct hostent  *aux;
 	char localName[260];
@@ -101,7 +101,7 @@ InetAddress * InetAddress::GetLocalHost()
 	if (aux == NULL) {
 		throw UnknownHostException("Local IP not found");
 	} else {
-		InetAddress *lhost = new InetAddress(aux->h_name, *(in_addr *) aux->h_addr_list[0]);
+		InetAddress6 *lhost = new InetAddress6(aux->h_name, *(in6_addr *) aux->h_addr_list[0]);
 
 		return lhost;
 	}
@@ -109,65 +109,35 @@ InetAddress * InetAddress::GetLocalHost()
 
 /** End */
 
-bool InetAddress::IsReachable()
+bool InetAddress6::IsReachable()
 {
 	return true;
 }
 
-std::string InetAddress::GetHostName()
+std::string InetAddress6::GetHostName()
 {
 	return _host;
 }
 
-std::string InetAddress::GetHostAddress()
+std::string InetAddress6::GetHostAddress()
 {
-	return inet_ntoa(_ip);
+	char addr[256];
+
+	return std::string(inet_ntop(PF_INET6, &_ip, addr, 255));
 }
 
-std::vector<uint8_t> InetAddress::GetAddress()
+std::vector<uint8_t> InetAddress6::GetAddress()
 {
 	uint8_t*ip = (uint8_t*)&_ip;
 	std::vector<uint8_t> addr;
 
-	int size = sizeof(in_addr);
+	int size = sizeof(in6_addr);
 	
 	for (int i=0; i<size; ++i) {
 		addr.push_back(ip[i]);
 	}
 	
 	return addr;
-}
-
-char * itoa(int num_, char *num_char_)
-{
-	int aux, i=0;
-	char *aux_num;
-	
-	if (num_ == 0) {
-		num_char_[i] = 48; //Conversão ASCII
-		num_char_[i+1] = '\0';
-		return NULL;
-	} else {
-		for(i=0; num_ != 0; i++){
-			aux = num_ % 10;
-			num_char_[i] = aux + 48;
-			num_ = (int)num_ / 10;
-		}
-		
-		num_char_[i] = '\0';
-	}
-	
-	aux = strlen(num_char_)-1;
-	aux_num = (char *)malloc(aux+1);
-	
-	for (i=0; aux >= 0; i++, aux--) {
-		aux_num[i] = num_char_[aux];
-	}
-
-	aux_num[i++] = '\0';
-	strcpy(num_char_, aux_num);
-	
-	return num_char_;
 }
 
 }

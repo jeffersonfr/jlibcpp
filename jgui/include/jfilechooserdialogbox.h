@@ -85,7 +85,7 @@ class FileChooserDialogBox : public jgui::Frame, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		std::vector<std::string> * ListFiles(std::string dirPath);
+		std::vector<std::string> ListFiles(std::string dirPath);
 
 		/**
 		 * \brief

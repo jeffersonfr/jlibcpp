@@ -98,7 +98,7 @@ void LocalDatagramSocket::CreateSocket()
 {
 #ifdef _WIN32
 #else
-	_fd = ::socket(AF_INET, SOCK_DGRAM, 0); // IPPROTO_UDP);
+	_fd = ::socket(PF_INET, SOCK_DGRAM, 0); // IPPROTO_UDP);
 	
 	if (_fd < 0) {
 		throw SocketException("Create datagram socket error");
@@ -112,7 +112,7 @@ void LocalDatagramSocket::BindSocket()
 #else
 	memset(&_server, 0, sizeof(_server));
 
-	_server.sun_family = PF_UNIX;
+	_server.sun_family = AF_UNIX;
 
 	strncpy(_server.sun_path, _client_file.c_str(), 255);
 
@@ -130,7 +130,7 @@ void LocalDatagramSocket::ConnectSocket()
 #else
 	memset(&_client, 0, sizeof(struct sockaddr_un));
 
-	_client.sun_family = PF_UNIX;
+	_client.sun_family = AF_UNIX;
 
 	strncpy(_client.sun_path, _client_file.c_str(), 255);
 
@@ -142,7 +142,7 @@ void LocalDatagramSocket::ConnectSocket()
 
 	memset(&_server, 0, sizeof(struct sockaddr_un));
 	
-	_server.sun_family = PF_UNIX;
+	_server.sun_family = AF_UNIX;
 	
 	strncpy(_server.sun_path, _server_file.c_str(), 255);
 #endif

@@ -78,7 +78,7 @@ class Policies : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		std::vector<std::string> * GetPolicies();
+		std::vector<std::string> GetPolicies();
 
 		/**
 		 * \brief

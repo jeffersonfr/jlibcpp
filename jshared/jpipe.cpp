@@ -27,19 +27,15 @@ Pipe::Pipe(int size_, int perms_):
 {
 	jcommon::Object::SetClassName("jshared::Pipe");
 		
-	int r;
-	
-#ifdef _WIN32
-	r = CreatePipe (&_fdr, &_fdw, 0, size_);
-#else
-    r = pipe (_pipe);
-#endif
-	
-	if (r <= 0) {
-		_is_open = false;
-	}
+	_is_closed = false;
 
-	_is_open = true;
+#ifdef _WIN32
+	if (CreatePipe(&_fdr, &_fdw, 0, size_)  <= 0) {
+#else
+	if (pipe(_pipe) < 0) {
+#endif
+		_is_closed = true;
+	}
 }
 
 Pipe::~Pipe()
@@ -49,45 +45,52 @@ Pipe::~Pipe()
 
 int Pipe::Receive(char *data_, int length_)
 {
-	if (_is_open == false) {
+	if (_is_closed == true) {
 		return 0;
 	}
-	
+
 	long r;
-	
+
 #ifdef _WIN32
-	    ReadFile(_fdr, data_, length_, (DWORD *)&r, 0);
+	ReadFile(_fdr, data_, length_, (DWORD *)&r, 0);
 #else
-		r = read(_pipe[0], data_, length_);
+	r = read(_pipe[0], data_, length_);
 #endif
-	
+
 	return r;
 }
 
 int Pipe::Send(const char *data_, int length_)
 {
 	long r;
-	
+
 #ifdef _WIN32
-	    WriteFile(_fdw, data_, length_, (DWORD *)&r, 0);
+	WriteFile(_fdw, data_, length_, (DWORD *)&r, 0);
 #else
-		r = write(_pipe[1], data_, length_);
+	r = write(_pipe[1], data_, length_);
 #endif
 
 	return r;
 }
 
+bool Pipe::IsClosed()
+{
+	return _is_closed;
+}
+
 void Pipe::Close()
 {
-#ifdef _WIN32
-	CloseHandle(_fdr);
-	CloseHandle(_fdw);
-#else
-	close(_pipe[0]);
-	close(_pipe[1]);
-#endif
+	if (_is_closed == false) {
+		_is_closed = true;
 
-	_is_open = false;
+#ifdef _WIN32
+		CloseHandle(_fdr);
+		CloseHandle(_fdw);
+#else
+		close(_pipe[0]);
+		close(_pipe[1]);
+#endif
+	}
 }
 
 }

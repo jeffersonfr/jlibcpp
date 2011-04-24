@@ -109,14 +109,14 @@ void Policies::AddPolice(std::string police)
 	_polices[police];
 }
 
-std::vector<std::string> * Policies::GetPolicies()
+std::vector<std::string> Policies::GetPolicies()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	std::vector<std::string> *polices = new std::vector<std::string>();
+	std::vector<std::string> polices;
 
 	for (std::map<std::string, std::string>::iterator i=_polices.begin(); i!=_polices.end(); i++) {
-		polices->push_back(i->first);
+		polices.push_back(i->first);
 	}
 
 	return polices;

@@ -17,10 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SERVERSOCKET_H
-#define J_SERVERSOCKET_H
+#ifndef J_SSLSERVERSOCKET6_H
+#define J_SSLSERVERSOCKET6_H
 
-#include "jinetaddress.h"
+#include "jsslsocket6.h"
+#include "jinetaddress6.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -33,14 +34,14 @@
 
 namespace jsocket {
 
-class Socket;
+class SSLSocket6;
 
 /**
  * \brief ServerSocket.
  *
  * \author Jeff Ferr
  */
-class ServerSocket : public virtual jcommon::Object{
+class SSLServerSocket6 : public virtual jcommon::Object{
 
 	private:
 #ifdef _WIN32
@@ -51,11 +52,11 @@ class ServerSocket : public virtual jcommon::Object{
 		int _fd;
 #endif
 		/** \brief Local socket. */
-		struct sockaddr_in _lsock;
+		sockaddr_in6 _lsock;
 		/** \brief Remote socket. */
-		struct sockaddr_in _rsock;
+		sockaddr_in6 _rsock;
 		/** \brief */
-		InetAddress *_local;
+		InetAddress6 *_local;
 		/** \brief */
 		bool _is_closed;
 
@@ -69,7 +70,7 @@ class ServerSocket : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void BindSocket(InetAddress *, int);
+		void BindSocket(InetAddress6 *, int);
 
 		/**
 		 * \brief
@@ -77,30 +78,77 @@ class ServerSocket : public virtual jcommon::Object{
 		 */
 		void ListenSocket(int);
 
+		/**
+		 * Create new CTX if none is available
+		 *
+		 */
+		virtual bool CheckContext();
+
+		/**
+		 *  Create temp cert if no other is loaded
+		 *
+		 */
+		virtual bool CheckCert();
+
+		/**
+		 *  Create temp cert if no other is loaded
+		 *
+		 */
+		RSA * GenerateRSAKey(int len, int exp = RSA_KEYEXP);
+
+		/**
+		 *  Create temp cert if no other is loaded
+		 *
+		 */
+		EVP_PKEY * GeneratePKey(RSA *rsakey);
+
+		/**
+		 *  Create temp cert if no other is loaded
+		 *
+		 */
+		X509 * BuildCertificate(const char *name, const char *organization, const char *country, EVP_PKEY *key);
+
+		/**
+		 *  Create temp cert if no other is loaded
+		 *
+		 */
+		bool UseCertCallback(const char *cert_file, const char *private_key_file, int passwd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata);
+
+		/** \brief SSL data */
+		SSL_CTX *ctx;
+		/** \brief SSL data */
+		SSL *ssl;
+		/** \brief Indicate CERT loaded or created */
+		bool have_cert; 
+		/** \brief keysize argument from constructor */
+		int rsa_keysize;
+		/** \brief userdata */
+		char *ud;
+
 	public:
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		ServerSocket(int port, int backlog = 5, InetAddress * = NULL);
+		SSLServerSocket6(int port, int backlog = 5, int keysize = RSA_KEYSIZE, InetAddress6 * = NULL);
 
 		/**
 		 * \brief Destructor virtual.
 		 *
 		 */
-		virtual ~ServerSocket();
+		virtual ~SSLServerSocket6();
 
 		/**
 		 * \brief Accept a new socket.
 		 *
 		 */
-		Socket * Accept();
+		SSLSocket6 * Accept();
 
 		/**
 		 * \brief
 		 *
 		 */
-		InetAddress * GetInetAddress();
+		InetAddress6 * GetInetAddress();
 
 		/**
 		 * \brief Get the local port.
@@ -114,8 +162,21 @@ class ServerSocket : public virtual jcommon::Object{
 		 */
 		void Close();
 
+		/**
+		 *  Create temp cert if no other is loaded
+		 *
+		 */
+		bool UseCertPassword(const char *cert_file, const char *private_key_file, std::string password);
+
+		/**
+		 *  Create temp cert if no other is loaded
+		 *
+		 */
+		bool UseDHFile(const char *dh_file);
+
 };
 
 }
 
 #endif
+

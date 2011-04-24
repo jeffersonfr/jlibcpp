@@ -137,7 +137,6 @@ void SocketOption::SetPassCredentials(bool b_)
 void SocketOption::GetPeerCredentials(void *v_)
 {
 #ifdef _WIN32
-
 #else
 	/*
 	if (getsockopt(_fd, SOL_SOCKET, SO_PEERCRED, &v_, sizeof(v_)) < 0) {
@@ -173,7 +172,6 @@ void SocketOption::SetReuseAddress(bool b_)
 void SocketOption::SetReusePort(bool b_)
 {
 #ifdef _WIN32
-
 #else
 	#ifndef SO_REUSEPORT
 		#define SO_REUSEPORT 15
@@ -244,7 +242,6 @@ void SocketOption::SetBroadcast(bool b_)
 void SocketOption::SetSendMaximumBuffer(int length_)
 {
 #ifdef _WIN32
-
 #else
 	length_ /= 2;
 #endif
@@ -257,7 +254,6 @@ void SocketOption::SetSendMaximumBuffer(int length_)
 void SocketOption::SetReceiveMaximumBuffer(int length_)
 {
 #ifdef _WIN32
-
 #else
 	length_ /= 2;
 #endif
@@ -328,7 +324,6 @@ void SocketOption::SetPriority(int p_)
 void SocketOption::ClearPendingSocketError()
 {
 #ifdef _WIN32
-
 #else
 	bool b = true;
 	
@@ -357,7 +352,6 @@ void SocketOption::SetBlocking(bool b)
 void SocketOption::SetTypeOfService(int t_)
 {
 #ifdef _WIN32
-
 #else
 	if (setsockopt(_fd, IPPROTO_IP, IP_TOS, (char *)&t_, sizeof(int)) < 0) {
 		throw SocketOptionException("Set type of service error");
@@ -368,7 +362,6 @@ void SocketOption::SetTypeOfService(int t_)
 void SocketOption::SetTimeToLive(int t_)
 {
 #ifdef _WIN32
-
 #else
 	if (setsockopt(_fd, IPPROTO_IP, IP_TTL, (char *)&t_, sizeof(int)) < 0) {
 		throw SocketOptionException("Set time to live error");
@@ -389,7 +382,7 @@ void SocketOption::SetHeaderInclude(bool b_)
 int64_t SocketOption::GetTimeStamp()
 {
 #ifdef _WIN32
-	return 0;
+	return 0LL;
 #else
 	struct timespec t;
 
@@ -426,7 +419,6 @@ int SocketOption::GetMaximunTransferUnit()
 void SocketOption::SetIOAsync(bool b_)
 {
 #ifdef _WIN32
-
 #else
 	if (ioctl(_fd, FIOASYNC, b_) < 0) {
 		throw SocketOptionException("Set io synchronized error");
@@ -437,7 +429,6 @@ void SocketOption::SetIOAsync(bool b_)
 void SocketOption::SetMulticastLoop(bool b_)
 {
 #ifdef _WIN32
-
 #else
 	if (_type != MCAST_SOCKET) {
 		return;
@@ -452,7 +443,6 @@ void SocketOption::SetMulticastLoop(bool b_)
 void SocketOption::SetRSVP(int t_)
 {
 #ifdef _WIN32
-
 #else
 	if (_type != MCAST_SOCKET) {
 		return;
@@ -480,6 +470,42 @@ void SocketOption::SetShutdown(socket_shutdown_t opt_)
 				throw SocketOptionException("Shutdown multicast socket error");
 			}
 		}
+	}
+#endif
+}
+
+void SocketOption::SetIPv6UnicastHops(int opt_)
+{
+#ifdef _WIN32
+#else
+	if (setsockopt(_fd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &opt_, sizeof(int)) < 0) {
+		throw SocketOptionException("Set ipv6 socket hops error");
+	}
+#endif
+}
+
+int SocketOption::GetIPv6UnicastHops()
+{
+#ifdef _WIN32
+	return -1;
+#else
+	socklen_t length = sizeof(int);
+	int opt;
+
+	if (getsockopt(_fd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &opt, &length) < 0) {
+		throw SocketOptionException("Set ipv6 socket hops error");
+	}
+	
+	return opt;
+#endif
+}
+
+void SocketOption::SetIPv6Only(bool opt_)
+{
+#ifdef _WIN32
+#else
+	if (setsockopt(_fd, IPPROTO_IPV6, IPV6_V6ONLY, &opt_, sizeof(bool)) < 0) {
+		throw SocketOptionException("Set ipv6 only error");
 	}
 #endif
 }

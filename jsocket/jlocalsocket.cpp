@@ -99,7 +99,7 @@ void LocalSocket::ConnectSocket()
 {
 #ifdef _WIN32
 #else
-	_address.sun_family = PF_UNIX;
+	_address.sun_family = AF_UNIX;
 	strncpy(_address.sun_path, _file.c_str(), 255);
 	
 	int r,

@@ -21,9 +21,8 @@
 #define J_LOGGERSOCKETHANDLER_H
 
 #include "jstreamhandler.h"
-#include "jserversocket.h"
-#include "jsocket.h"
 #include "jthread.h"
+#include "jserversocket.h"
 
 #include <deque>
 

@@ -17,17 +17,15 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SOCKET_H
-#define J_SOCKET_H
+#ifndef J_SOCKET6_H
+#define J_SOCKET6_H
 
 #include "jinetaddress6.h"
-#include "jserversocket.h"
+#include "jserversocket6.h"
 #include "jsocketoption.h"
 #include "jsocketinputstream.h"
 #include "jsocketoutputstream.h"
 #include "jconnection.h"
-
-#include "jobject.h"
 
 #include <iostream>
 
@@ -42,16 +40,16 @@
 
 namespace jsocket {
 
-class ServerSocket;
+class ServerSocket6;
 
 /**
  * \brief Socket.
  *
  * \author Jeff Ferr
  */
-class Socket : public jsocket::Connection{
+class Socket6 : public jsocket::Connection{
 
-	friend class ServerSocket; //Socket * ServerSocket::Accept();
+	friend class ServerSocket6; //Socket * ServerSocket6::Accept();
 
    private:
 #ifdef _WIN32
@@ -66,9 +64,9 @@ class Socket : public jsocket::Connection{
 		/** \brief */
 		SocketOutputStream *_os;
 		/** \brief */
-		struct sockaddr_in _lsock;
+		struct sockaddr_in6 _lsock;
 		/** \brief */
-		struct sockaddr_in _server_sock;
+		struct sockaddr_in6 _server_sock;
 		/** \brief */
 		InetAddress6 *_address;
 		/** \brief Bytes sent. */
@@ -108,9 +106,9 @@ class Socket : public jsocket::Connection{
 		 *
 		 */
 #ifdef _WIN32
-		Socket(SOCKET handler_, struct sockaddr_in server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket6(SOCKET handler_, struct sockaddr_in6 server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 #else
-		Socket(int handler_, struct sockaddr_in server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket6(int handler_, struct sockaddr_in6 server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 #endif
 	
 	 public:
@@ -118,31 +116,31 @@ class Socket : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-		Socket(InetAddress6 *addr_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket6(InetAddress6 *addr_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		Socket(InetAddress6 *addr_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket6(InetAddress6 *addr_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief
 		 *
 		 */
-		Socket(std::string host_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket6(std::string host_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		Socket(std::string host_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
+		Socket6(std::string host_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
 
 		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual ~Socket();
+		virtual ~Socket6();
 
 #ifdef _WIN32
 		virtual SOCKET GetHandler();

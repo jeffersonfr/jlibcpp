@@ -18,14 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsocket.h"
+#include "jsocket6.h"
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
 #include "jsocketstreamexception.h"
 
 namespace jsocket {
 
-Socket::Socket(InetAddress6 *addr_, int port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(InetAddress6 *addr_, int port_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
@@ -45,7 +45,7 @@ Socket::Socket(InetAddress6 *addr_, int port_, int timeout_, int rbuf_, int wbuf
 	_is_closed = false;
 }
 
-Socket::Socket(InetAddress6 *addr_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(InetAddress6 *addr_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
@@ -66,7 +66,7 @@ Socket::Socket(InetAddress6 *addr_, int port_, InetAddress6 *local_addr_, int lo
 	_is_closed = false;
 }
 
-Socket::Socket(std::string host_, int port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(std::string host_, int port_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
@@ -88,7 +88,7 @@ Socket::Socket(std::string host_, int port_, int timeout_, int rbuf_, int wbuf_)
 	_is_closed = false;
 }
 
-Socket::Socket(std::string host_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(std::string host_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
@@ -111,7 +111,7 @@ Socket::Socket(std::string host_, int port_, InetAddress6 *local_addr_, int loca
 	_is_closed = false;
 }
 
-Socket::~Socket()
+Socket6::~Socket6()
 {
 	try {
 		Close();
@@ -137,47 +137,35 @@ Socket::~Socket()
 /** Private */
 
 #ifdef _WIN32
-Socket::Socket(SOCKET handler_, struct sockaddr_in server_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(SOCKET handler_, struct sockaddr_in6 server_, int timeout_, int rbuf_, int wbuf_):
 #else
-Socket::Socket(int handler_, struct sockaddr_in server_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(int handler_, struct sockaddr_in6 server_, int timeout_, int rbuf_, int wbuf_):
 #endif
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 
-#ifdef _WIN32
-	// int len;
+	char straddr[INET6_ADDRSTRLEN];
 
-	_lsock.sin_family = AF_INET;
-#else
-	// socklen_t len;
-
-	_lsock.sin_family = AF_INET;
-#endif
-
-	/* CHANGE:: este codigo estah gerando erro no DEBIAN
-		 if (getpeername(handler_, (struct sockaddr *)&_lsock, &len) < 0) {
-		 throw SocketException("Connetion error");
-		 }
-
-		 if (getsockname(handler_, (struct sockaddr *)&_lsock, &len) < 0) {
-		 throw SocketException("Connection error");
-		 }
-		 */
-
+	_lsock.sin6_family = AF_INET6;
+	_lsock.sin6_flowinfo = 0;
+	_lsock.sin6_scope_id = 0;
+	_lsock.sin6_addr = in6addr_any;
+	_lsock.sin6_port = htons(0);
+	
 	_fd = handler_;
 	_server_sock = server_;
 
-	_address = InetAddress6::GetByName((std::string)inet_ntoa(server_.sin_addr));
+	_address = InetAddress6::GetByName(std::string(inet_ntop(AF_INET6, &(_lsock.sin6_addr), straddr, sizeof(straddr))));
 
 	InitStreams(rbuf_, wbuf_);
 
 	_is_closed = false;
 }
 
-void Socket::CreateSocket()
+void Socket6::CreateSocket()
 {
-	_fd = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
+	_fd = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
 
 #ifdef _WIN32
 	if (_fd == INVALID_SOCKET) {
@@ -188,34 +176,40 @@ void Socket::CreateSocket()
 	}
 }
 
-void Socket::BindSocket(InetAddress6 *local_addr_, int local_port_)
+void Socket6::BindSocket(InetAddress6 *local_addr_, int local_port_)
 {
 	memset(&_lsock, 0, sizeof(_lsock));
 
-	_lsock.sin_family = AF_INET;
+	_lsock.sin6_family = AF_INET6;
+	_lsock.sin6_flowinfo = 0;
+	_lsock.sin6_scope_id = 0;
 
 	if (local_addr_ == NULL) {
-		_lsock.sin_addr.s_addr = INADDR_ANY;
+		_lsock.sin6_addr = in6addr_any;
 	} else {
-		_lsock.sin_addr.s_addr = inet_addr(local_addr_->GetHostAddress().c_str());
+		inet_pton(AF_INET6, local_addr_->GetHostAddress().c_str(), &(_lsock.sin6_addr));
 	}
 
-	_lsock.sin_port = htons(local_port_);
+	_lsock.sin6_port = htons(local_port_);
 
 	if (bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
 		throw SocketException("Bind socket error");
 	}
 }
 
-void Socket::ConnectSocket(InetAddress6 *addr_, int port_)
+void Socket6::ConnectSocket(InetAddress6 *addr_, int port_)
 {
 	_address = addr_;
 
 	memset(&_server_sock, 0, sizeof(_server_sock));
 
-	_server_sock.sin_family = AF_INET;
-	_server_sock.sin_addr.s_addr  = inet_addr(addr_->GetHostAddress().c_str());
-	_server_sock.sin_port = htons(port_);
+	_lsock.sin6_family = AF_INET6;
+	_lsock.sin6_flowinfo = 0;
+	_lsock.sin6_scope_id = 0;
+
+	inet_pton(AF_INET6, _address->GetHostAddress().c_str(), &(_server_sock.sin6_addr));
+
+	_server_sock.sin6_port = htons(port_);
 
 	int r;
 
@@ -358,7 +352,7 @@ void Socket::ConnectSocket(InetAddress6 *addr_, int port_)
 	}
 }
 
-void Socket::InitStreams(int64_t rbuf_, int64_t wbuf_)
+void Socket6::InitStreams(int64_t rbuf_, int64_t wbuf_)
 {
 	_is = new SocketInputStream((Connection *)this, &_is_closed, rbuf_);
 	_os = new SocketOutputStream((Connection *)this, &_is_closed, wbuf_);
@@ -367,22 +361,22 @@ void Socket::InitStreams(int64_t rbuf_, int64_t wbuf_)
 /** End */
 
 #ifdef _WIN32
-SOCKET Socket::GetHandler()
+SOCKET Socket6::GetHandler()
 #else
-int Socket::GetHandler()
+int Socket6::GetHandler()
 #endif
 {
 	return _fd;
 }
 
-int Socket::Send(const char *data_, int size_, int time_)
+int Socket6::Send(const char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection was closed");
 	}
 
 #ifdef _WIN32
-	return Socket::Send(data_, size_);
+	return Socket6::Send(data_, size_);
 #else
 	struct pollfd ufds[1];
 
@@ -397,7 +391,7 @@ int Socket::Send(const char *data_, int size_, int time_)
 		throw SocketTimeoutException("Socket send timeout exception");
 	} else {
 		if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
-			return Socket::Send(data_, size_);
+			return Socket6::Send(data_, size_);
 		}
 	}
 #endif
@@ -405,7 +399,7 @@ int Socket::Send(const char *data_, int size_, int time_)
 	return -1;
 }
 
-int Socket::Send(const char *data_, int size_, bool block_)
+int Socket6::Send(const char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection was closed");
@@ -448,14 +442,14 @@ int Socket::Send(const char *data_, int size_, bool block_)
 	return n;
 }
 
-int Socket::Receive(char *data_, int size_, int time_)
+int Socket6::Receive(char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
 	}
 
 #ifdef _WIN32
-	return Socket::Receive(data_, size_);
+	return Socket6::Receive(data_, size_);
 #else
 	struct pollfd ufds[1];
 
@@ -470,7 +464,7 @@ int Socket::Receive(char *data_, int size_, int time_)
 		throw SocketTimeoutException("Socket receive timeout exception");
 	} else {
 		if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
-			return Socket::Receive(data_, size_);
+			return Socket6::Receive(data_, size_);
 		}
 	}
 #endif
@@ -478,7 +472,7 @@ int Socket::Receive(char *data_, int size_, int time_)
 	return -1;
 }
 
-int Socket::Receive(char *data_, int size_, bool block_)
+int Socket6::Receive(char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
@@ -524,7 +518,7 @@ int Socket::Receive(char *data_, int size_, bool block_)
 	return n;
 }
 
-void Socket::Close()
+void Socket6::Close()
 {
 #ifdef _WIN32
 	if (_is_closed == false) {
@@ -542,42 +536,42 @@ void Socket::Close()
 	}
 }
 
-jio::InputStream * Socket::GetInputStream()
+jio::InputStream * Socket6::GetInputStream()
 {
 	return (jio::InputStream *)_is;
 }
 
-jio::OutputStream * Socket::GetOutputStream()
+jio::OutputStream * Socket6::GetOutputStream()
 {
 	return (jio::OutputStream *)_os;
 }
 
-InetAddress6 * Socket::GetInetAddress()
+InetAddress6 * Socket6::GetInetAddress()
 {
 	return _address;
 }
 
-int Socket::GetLocalPort()
+int Socket6::GetLocalPort()
 {
-	return ntohs(_lsock.sin_port);
+	return ntohs(_lsock.sin6_port);
 }
 
-int Socket::GetPort()
+int Socket6::GetPort()
 {
-	return ntohs(_server_sock.sin_port);
+	return ntohs(_server_sock.sin6_port);
 }
 
-int64_t Socket::GetSentBytes()
+int64_t Socket6::GetSentBytes()
 {
 	return _sent_bytes + _os->GetSentBytes();
 }
 
-int64_t Socket::GetReadedBytes()
+int64_t Socket6::GetReadedBytes()
 {
 	return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOption * Socket::GetSocketOption()
+SocketOption * Socket6::GetSocketOption()
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
@@ -586,7 +580,7 @@ SocketOption * Socket::GetSocketOption()
 	return new SocketOption(_fd, TCP_SOCKET);
 }
 
-std::string Socket::what()
+std::string Socket6::what()
 {
 	char *port = (char *)malloc(10);
 

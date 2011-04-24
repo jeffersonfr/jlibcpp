@@ -1540,7 +1540,7 @@ rtp_source * RTPSocket::add_member(uint32_t src, uint16_t seq, struct in_addr *a
 	
 	memmove(&s -> address, addr, sizeof (struct in_addr));
 	
-	h = gethostbyaddr((char *) addr, sizeof (struct in_addr), AF_INET);
+	h = gethostbyaddr((char *) addr, sizeof (struct in_addr), PF_INET);
 	
 	if (h != NULL) {
 		s -> hostname = strdup(h -> h_name);

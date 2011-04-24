@@ -17,11 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SSLSOCKET_H
-#define J_SSLSOCKET_H
+#ifndef J_SSLSOCKET6_H
+#define J_SSLSOCKET6_H
 
-#include "jinetaddress.h"
-#include "jserversocket.h"
+#include "jinetaddress6.h"
+#include "jserversocket6.h"
 #include "jsocketoption.h"
 #include "jsslsocketinputstream.h"
 #include "jsslsocketoutputstream.h"
@@ -69,9 +69,9 @@ class ServerSocket;
  *
  * \author Jeff Ferr
  */
-class SSLSocket : public jsocket::Connection{
+class SSLSocket6 : public jsocket::Connection{
 
-	friend class SSLServerSocket; //Socket * ServerSocket::Accept();
+	friend class SSLServerSocket6; //Socket * ServerSocket::Accept();
 
 	private:
 #ifdef _WIN32
@@ -86,11 +86,11 @@ class SSLSocket : public jsocket::Connection{
 		/** \brief */
 		SSLSocketOutputStream *_os;
 		/** \brief */
-		sockaddr_in _lsock;
+		sockaddr_in6 _lsock;
 		/** \brief */
-		sockaddr_in _server_sock;
+		sockaddr_in6 _server_sock;
 		/** \brief */
-		InetAddress *_address;
+		InetAddress6 *_address;
 		/** \brief Bytes sent. */
 		int64_t _sent_bytes;
 		/** \brief Bytes received. */
@@ -108,13 +108,13 @@ class SSLSocket : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		void BindSocket(InetAddress *, int);
+		void BindSocket(InetAddress6 *, int);
 
 		/**
 		 * \brief Connect the socket.
 		 *
 		 */
-		void ConnectSocket(InetAddress *, int);
+		void ConnectSocket(InetAddress6 *, int);
 
 		/**
 		 * \brief
@@ -163,38 +163,38 @@ class SSLSocket : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket(int handler_, struct sockaddr_in server_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		SSLSocket6(int handler_, struct sockaddr_in6 server_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 	public:
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket(InetAddress *addr_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		SSLSocket6(InetAddress6 *addr_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		SSLSocket6(InetAddress6 *addr_, int port_, InetAddress6 *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief
 		 *
 		 */
-		SSLSocket(std::string host_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		SSLSocket6(std::string host_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
+		SSLSocket6(std::string host_, int port_, InetAddress6 *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
 
 		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual ~SSLSocket();
+		virtual ~SSLSocket6();
 
 #ifdef _WIN32
 		virtual SOCKET GetHandler();
@@ -252,7 +252,7 @@ class SSLSocket : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		InetAddress * GetInetAddress();
+		InetAddress6 * GetInetAddress();
 
 		/**
 		 * \brief Get the local port.

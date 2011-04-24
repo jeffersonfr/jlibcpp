@@ -45,9 +45,7 @@ class Properties : public virtual jcommon::Object{
 		/** \brief */
 		jthread::Mutex _mutex;
 		/** \brief */
-		std::map<std::string, std::string> _props;
-		/** \brief */
-		std::vector<struct jproperty_t> properties;
+		std::vector<struct jproperty_t> _properties;
 		/** \brief */
 		std::string _filename;
 		/** \brief */
@@ -136,7 +134,7 @@ class Properties : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		std::vector<std::string> * GetProperties();
+		std::vector<std::string> GetProperties();
 
 };
 

@@ -304,7 +304,7 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		std::vector<std::string> * ListFiles(std::string extension = std::string(""));
+		std::vector<std::string> ListFiles(std::string extension = std::string(""));
 		
 		/**
 		 * \brief
