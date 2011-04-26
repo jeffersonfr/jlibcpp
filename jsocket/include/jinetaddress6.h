@@ -20,7 +20,7 @@
 #ifndef J_INETADDRESS6_H
 #define J_INETADDRESS6_H
 
-#include "jobject.h"
+#include "jinetaddress.h"
 
 #include <string>
 #include <vector>
@@ -41,7 +41,7 @@ namespace jsocket {
  *
  * \author Jeff Ferr
  */
-class InetAddress6 : public virtual jcommon::Object{
+class InetAddress6 : public InetAddress{
 
 	private:
 		/** \brief Host name. */
@@ -66,19 +66,19 @@ class InetAddress6 : public virtual jcommon::Object{
 		 * \brief Get adresses by name.
 		 *
 		 */
-		static InetAddress6 * GetByName(std::string);
+		static InetAddress * GetByName(std::string);
 
 		/**
 		 * \brief Get all addresses from a host.
 		 *
 		 */
-		static std::vector<InetAddress6 *> GetAllByName(std::string);
+		static std::vector<InetAddress *> GetAllByName(std::string);
 
 		/**
 		 * \brief Get the local host.
 		 *
 		 */
-		static InetAddress6 * GetLocalHost();
+		static InetAddress * GetLocalHost();
 
 		/**
 		 * \brief

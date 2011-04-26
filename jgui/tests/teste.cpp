@@ -1056,6 +1056,8 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 				group->Add(item112);
 
 				menu->Show();
+				
+				menu->RemoveSelectListener(this);
 			}
 		}
 

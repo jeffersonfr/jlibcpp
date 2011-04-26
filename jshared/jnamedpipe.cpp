@@ -19,10 +19,16 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jnamedpipe.h"
+#include "jioexception.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#include <stdio.h>
+#else
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#endif
 
 namespace jshared {
 
@@ -34,14 +40,48 @@ NamedPipe::NamedPipe(std::string name, int mode):
 	_name = name;
 	
 #ifdef _WIN32
+	// server
+	while (true) {  
+		_fd = CreateNamedPipe(_name.c_str(),
+				PIPE_ACCESS_DUPLEX,
+				PIPE_TYPE_MESSAGE|PIPE_READMODE_MESSAGE,
+				PIPE_UNLIMITED_INSTANCES,
+				256,
+				256,
+				10000,
+				NULL
+		);
+
+		ConnectNamedPipe(_fd, NULL);
+	}
+
+	// client
+	while (true) {
+		_fd = CreateFile(_name.c_str(),
+				GENERIC_WRITE|GENERIC_READ,
+				FILE_SHARE_READ | FILE_SHARE_WRITE,
+				NULL,
+				OPEN_EXISTING,
+				FILE_ATTRIBUTE_NORMAL,
+				NULL
+		);
+
+		if (_fd != INVALID_HANDLE_VALUE) {
+			break;
+		}
+
+		if ((GetLastError() != ERROR_PIPE_BUSY) || !WaitNamedPipe(_name.c_str(), NMPWAIT_USE_DEFAULT_WAIT)) {
+			throw jio::IOException("Cannot create named pipe");
+		}
+	}
 #else
 	if ((_fd = open(_name.c_str(), O_RDWR)) < 0) {
 		if (mkfifo(name.c_str(), mode) != 0) {
-			// throw
+			throw jio::IOException("Cannot create named pipe");
 		}
 	
 		if ((_fd = open(_name.c_str(), O_RDWR)) < 0) {
-			// throw
+			throw jio::IOException("Cannot create named pipe");
 		}
 	}
 #endif
@@ -60,28 +100,28 @@ int NamedPipe::Receive(char *data_, int length_)
 		return 0;
 	}
 
-	long r;
-
 #ifdef _WIN32
+	DWORD r;
+
 	ReadFile(_fd, data_, length_, (DWORD *)&r, 0);
-#else
-	r = read(_fd, data_, length_);
-#endif
 
 	return r;
+#else
+	return read(_fd, data_, length_);
+#endif
 }
 
 int NamedPipe::Send(const char *data_, int length_)
 {
-	long r;
-
 #ifdef _WIN32
+	DWORD r;
+
 	WriteFile(_fd, data_, length_, (DWORD *)&r, 0);
-#else
-	r = write(_fd, data_, length_);
-#endif
 
 	return r;
+#else
+	return write(_fd, data_, length_);
+#endif
 }
 
 bool NamedPipe::IsClosed()

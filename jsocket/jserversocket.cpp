@@ -23,6 +23,7 @@
 #include "junknownhostexception.h"
 #include "jsocketexception.h"
 #include "jsocketstreamexception.h"
+#include "jinetaddress4.h"
 
 namespace jsocket {
 
@@ -36,7 +37,7 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
 
 	if (addr_ == NULL) {
 		try {
-			InetAddress *a = InetAddress::GetLocalHost();
+			InetAddress *a = InetAddress4::GetLocalHost();
         
 			addr_ = a;
 		} catch (UnknownHostException &) {

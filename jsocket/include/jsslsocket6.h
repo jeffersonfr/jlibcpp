@@ -20,7 +20,7 @@
 #ifndef J_SSLSOCKET6_H
 #define J_SSLSOCKET6_H
 
-#include "jinetaddress6.h"
+#include "jinetaddress.h"
 #include "jserversocket6.h"
 #include "jsocketoption.h"
 #include "jsslsocketinputstream.h"
@@ -90,7 +90,7 @@ class SSLSocket6 : public jsocket::Connection{
 		/** \brief */
 		sockaddr_in6 _server_sock;
 		/** \brief */
-		InetAddress6 *_address;
+		InetAddress *_address;
 		/** \brief Bytes sent. */
 		int64_t _sent_bytes;
 		/** \brief Bytes received. */
@@ -108,13 +108,13 @@ class SSLSocket6 : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		void BindSocket(InetAddress6 *, int);
+		void BindSocket(InetAddress *, int);
 
 		/**
 		 * \brief Connect the socket.
 		 *
 		 */
-		void ConnectSocket(InetAddress6 *, int);
+		void ConnectSocket(InetAddress *, int);
 
 		/**
 		 * \brief
@@ -170,13 +170,13 @@ class SSLSocket6 : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket6(InetAddress6 *addr_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		SSLSocket6(InetAddress *addr_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket6(InetAddress6 *addr_, int port_, InetAddress6 *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		SSLSocket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief
@@ -188,7 +188,7 @@ class SSLSocket6 : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket6(std::string host_, int port_, InetAddress6 *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
+		SSLSocket6(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
 
 		/**
 		 * \brief Destrutor virtual.
@@ -252,7 +252,7 @@ class SSLSocket6 : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		InetAddress6 * GetInetAddress();
+		InetAddress * GetInetAddress();
 
 		/**
 		 * \brief Get the local port.

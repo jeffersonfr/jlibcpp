@@ -23,6 +23,7 @@
 #include "jsockettimeoutexception.h"
 #include "jsocketstreamexception.h"
 #include "junknownhostexception.h"
+#include "jinetaddress4.h"
 
 namespace jsocket {
 
@@ -41,7 +42,7 @@ DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, int t
 	_timeout = timeout_;
 
 	CreateSocket();
-	ConnectSocket(InetAddress::GetByName(host_), port_);
+	ConnectSocket(InetAddress4::GetByName(host_), port_);
 	InitStream(rbuf_, wbuf_);
 
 	_sent_bytes = 0;
@@ -63,7 +64,7 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 	_timeout = timeout_;
 
 	try {
-		_address = InetAddress::GetByName("localhost");
+		_address = InetAddress4::GetByName("localhost");
 	} catch (UnknownHostException &) {
 		// WARN:: verify if GetInetAddress() == NULL
 		_address = NULL;

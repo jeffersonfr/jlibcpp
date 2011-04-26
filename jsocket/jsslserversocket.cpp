@@ -21,6 +21,7 @@
 #include "jsslserversocket.h"
 #include "jsocketexception.h"
 #include "jsocketstreamexception.h"
+#include "jinetaddress4.h"
 
 namespace jsocket {
 
@@ -33,7 +34,7 @@ SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddre
 	_is_closed = false;
 
 	if (addr_ == NULL) {
-		InetAddress *a = InetAddress::GetLocalHost();
+		InetAddress *a = InetAddress4::GetLocalHost();
         
 		addr_ = a;
 	}

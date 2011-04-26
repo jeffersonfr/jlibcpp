@@ -341,6 +341,7 @@ void LocalDatagramSocket::Close()
 	}
 
 	unlink(_client_file.c_str());
+	unlink(_server_file.c_str());
 #endif
 }
 

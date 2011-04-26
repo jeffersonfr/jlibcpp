@@ -45,7 +45,17 @@ class NetworkInterface : public virtual jcommon::Object{
 
 	private:
 		/** \brief */
+		std::vector<NetworkInterface *> _childs;
+		/** \brief */
+		std::vector <InetAddress *> _addresses;
+		/** \brief */
+		std::vector <InetAddress *> _broadcast_addresses;
+		/** \brief */
 		std::vector<uint8_t> _hwaddress;
+		/** \brief */
+		std::vector<uint8_t> _mask;
+		/** \brief */
+		NetworkInterface *_parent;
 		/** \brief */
 		std::string _name;
 		/** \brief */
@@ -68,7 +78,25 @@ class NetworkInterface : public virtual jcommon::Object{
 		 * \brief Constructor private.
 		 *
 		 */
-		NetworkInterface(std::string name, int index, bool is_virtual);
+		NetworkInterface(NetworkInterface *parent, std::string name, int index, bool is_virtual);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void AddInetAddress(InetAddress *addr);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void AddBroadcastAddress(InetAddress *addr);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void AddSubInterface(NetworkInterface *interface);
 
 	public:
 		/**
@@ -106,6 +134,12 @@ class NetworkInterface : public virtual jcommon::Object{
 		 *
 		 */
 		virtual std::vector<uint8_t> GetHardwareAddress();
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual std::vector<uint8_t> GetNetworkMask();
 
 		/**
 		 * \brief Convenience method to return an Enumeration with all or a subset of the InetAddresses bound to this network interface.

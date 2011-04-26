@@ -228,6 +228,7 @@ OBJS_jshared = \
 		 jsharedsemaphore.o\
 
 OBJS_jsocket = \
+		 jconnection.o\
 		 jconnectionpipe.o\
 		 jdatagramsocket.o\
 		 jdatagramsocket6.o\

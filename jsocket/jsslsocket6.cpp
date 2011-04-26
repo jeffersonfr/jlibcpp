@@ -22,10 +22,11 @@
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
 #include "jsocketstreamexception.h"
+#include "jinetaddress6.h"
 
 namespace jsocket {
 
-SSLSocket6::SSLSocket6(InetAddress6 *addr_, int port_, int keysize, int timeout_, int rbuf_, int wbuf_):
+SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, int keysize, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
@@ -63,7 +64,7 @@ SSLSocket6::SSLSocket6(InetAddress6 *addr_, int port_, int keysize, int timeout_
 	_is_closed = false;
 }
 
-SSLSocket6::SSLSocket6(InetAddress6 *addr_, int port_, InetAddress6 *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
+SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
@@ -115,7 +116,7 @@ SSLSocket6::SSLSocket6(std::string host_, int port_, int keysize, int timeout_, 
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	InetAddress6 *address = InetAddress6::GetByName(host_);
+	InetAddress *address = InetAddress6::GetByName(host_);
 
 	if (address == NULL) {
 		throw SocketException("Null pointer exception");
@@ -146,7 +147,7 @@ SSLSocket6::SSLSocket6(std::string host_, int port_, int keysize, int timeout_, 
 	_is_closed = false;
 }
 
-SSLSocket6::SSLSocket6(std::string host_, int port_, InetAddress6 *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
+SSLSocket6::SSLSocket6(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
@@ -159,7 +160,7 @@ SSLSocket6::SSLSocket6(std::string host_, int port_, InetAddress6 *local_addr_, 
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	InetAddress6 *address = InetAddress6::GetByName(host_);
+	InetAddress *address = InetAddress6::GetByName(host_);
 
 	if (address == NULL) {
 		// WARNNING:: throw
@@ -270,7 +271,7 @@ void SSLSocket6::CreateSocket()
 	}
 }
 
-void SSLSocket6::BindSocket(InetAddress6 *local_addr_, int local_port_)
+void SSLSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
 	memset(&_lsock, 0, sizeof(_lsock));
 
@@ -291,7 +292,7 @@ void SSLSocket6::BindSocket(InetAddress6 *local_addr_, int local_port_)
 	}
 }
 
-void SSLSocket6::ConnectSocket(InetAddress6 *addr_, int port_)
+void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 {
 	_address = addr_;
 
@@ -740,7 +741,7 @@ jio::OutputStream * SSLSocket6::GetOutputStream()
 	return (jio::OutputStream *)_os;
 }
 
-InetAddress6 * SSLSocket6::GetInetAddress()
+InetAddress * SSLSocket6::GetInetAddress()
 {
 	return _address;
 }

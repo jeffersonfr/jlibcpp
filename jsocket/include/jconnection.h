@@ -84,12 +84,6 @@ class Connection : public virtual jcommon::Object{
 	 * \brief Send bytes to a destination.
 	 *
 	 */
-	virtual bool IsClosed();
-
-	/**
-	 * \brief Send bytes to a destination.
-	 *
-	 */
 	virtual int Send(const char *b_, int size_, bool block_ = true) = 0;
 
 	/**
@@ -117,6 +111,12 @@ class Connection : public virtual jcommon::Object{
 	 *
 	 */
 	virtual int Receive(char *data_, int data_length_, int time_) = 0;
+
+	/**
+	 * \brief 
+	 *
+	 */
+	virtual bool IsClosed();
 
 	/**
 	 * \brief Close the socket.

@@ -41,6 +41,11 @@ void ReleaseWindowsSocket()
 #endif
 }
 
+bool RequestAddressInfo(jaddress_info_t *info)
+{
+	return false;
+}
+
 int main_socket(int argc, char *argv[])
 {
   return EXIT_SUCCESS;

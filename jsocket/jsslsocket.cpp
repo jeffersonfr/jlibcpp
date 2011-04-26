@@ -22,6 +22,7 @@
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
 #include "jsocketstreamexception.h"
+#include "jinetaddress4.h"
 
 namespace jsocket {
 
@@ -115,7 +116,7 @@ SSLSocket::SSLSocket(std::string host_, int port_, int keysize, int timeout_, in
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	InetAddress *address = InetAddress::GetByName(host_);
+	InetAddress *address = InetAddress4::GetByName(host_);
 
 	if (address == NULL) {
 		throw SocketException("Null pointer exception");
@@ -159,7 +160,7 @@ SSLSocket::SSLSocket(std::string host_, int port_, InetAddress *local_addr_, int
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	InetAddress *address = InetAddress::GetByName(host_);
+	InetAddress *address = InetAddress4::GetByName(host_);
 
 	if (address == NULL) {
 		// WARNNING:: throw
@@ -262,7 +263,7 @@ SSLSocket::SSLSocket(int handler_, sockaddr_in server_, int keysize, int timeout
 	have_cert = false;
 	rsa_keysize = keysize;
 
-	_address = InetAddress::GetByName((std::string)inet_ntoa(server_.sin_addr));
+	_address = InetAddress4::GetByName((std::string)inet_ntoa(server_.sin_addr));
 
 	InitStreams(rbuf_, wbuf_);
 

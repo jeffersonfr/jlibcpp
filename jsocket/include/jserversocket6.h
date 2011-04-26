@@ -20,7 +20,7 @@
 #ifndef J_SERVERSOCKET6_H
 #define J_SERVERSOCKET6_H
 
-#include "jinetaddress6.h"
+#include "jinetaddress.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -55,7 +55,7 @@ class ServerSocket6 : public virtual jcommon::Object{
 		/** \brief Remote socket. */
 		struct sockaddr_in6 _rsock;
 		/** \brief */
-		InetAddress6 *_local;
+		InetAddress *_local;
 		/** \brief */
 		bool _is_closed;
         
@@ -69,7 +69,7 @@ class ServerSocket6 : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void BindSocket(InetAddress6 *, int);
+		void BindSocket(InetAddress *, int);
 
 		/**
 		 * \brief
@@ -82,7 +82,7 @@ class ServerSocket6 : public virtual jcommon::Object{
 		 * \brief Constructor.
 		 *
 		 */
-		ServerSocket6(int port, int backlog = 5, InetAddress6 * = NULL);
+		ServerSocket6(int port, int backlog = 5, InetAddress * = NULL);
 
 		/**
 		 * \brief Destructor virtual.
@@ -100,7 +100,7 @@ class ServerSocket6 : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		InetAddress6 * GetInetAddress();
+		InetAddress * GetInetAddress();
 
 		/**
 		 * \brief Get the local port.

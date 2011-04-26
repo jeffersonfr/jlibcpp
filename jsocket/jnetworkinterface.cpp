@@ -20,18 +20,26 @@
 #include "Stdafx.h"
 #include "jnetworkinterface.h"
 #include "junknownhostexception.h"
+#include "jstringtokenizer.h"
+#include "jinetaddress4.h"
+#include "jinetaddress6.h"
+
+#include <map>
 
 namespace jsocket {
 
-NetworkInterface::NetworkInterface(std::string name, int index, bool is_virtual):
+NetworkInterface::NetworkInterface(NetworkInterface *parent, std::string name, int index, bool is_virtual):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jsocket::NetworkInterface");
 
+	_parent = parent;
 	_name = name;
 	_index = index;
 	_is_virtual = is_virtual;
 
+#ifdef _WIN32
+#else
 	struct ifreq req;
 	int sock;
 
@@ -40,9 +48,9 @@ NetworkInterface::NetworkInterface(std::string name, int index, bool is_virtual)
 	}
 	
 	req.ifr_ifindex = _index;
-	strncpy(req.ifr_name, _name.c_str(), 15);
 
 	// mac address
+	strncpy(req.ifr_name, _name.c_str(), 16);
 	if (ioctl(sock, SIOCGIFHWADDR, &req) >= 0) {
 		uint8_t *hwaddr = (uint8_t *)req.ifr_hwaddr.sa_data;
 
@@ -52,106 +60,79 @@ NetworkInterface::NetworkInterface(std::string name, int index, bool is_virtual)
 	}
 		
 	// set or get MTU	(usa ifr_name)
+	strncpy(req.ifr_name, _name.c_str(), 16);
 	if (ioctl(sock, SIOCGIFMTU, &req) >= 0) {
 		_mtu = req.ifr_mtu;
 	}
 
 	// CHANGE:: set or get queue (usa ifr_name)
+	strncpy(req.ifr_name, _name.c_str(), 16);
 	if (ioctl(sock, SIOCGIFTXQLEN, &req) >= 0) {
-		int queue_length = req.ifr_qlen;
+		// int queue_length = req.ifr_qlen;
 	}
 
 	// CHANGE:: set or get metric (usa ifr_name)
+	strncpy(req.ifr_name, _name.c_str(), 16);
 	if (ioctl(sock, SIOCGIFMETRIC, &req) >= 0) {
 		_metric = req.ifr_metric;
 	}
 
 	// CHANGE:: set or get map (usa ifr_name)
+	strncpy(req.ifr_name, _name.c_str(), 16);
 	if (ioctl(sock, SIOCGIFMAP, &req) >= 0) {
 		_dma = req.ifr_map.dma;
-		int port = req.ifr_map.port;
+		// int port = req.ifr_map.port;
 		_irq = req.ifr_map.irq;
-		int base_addr = req.ifr_map.base_addr;
-	}
-
-	if (ioctl(sock, SIOCGIFADDR, &req) >= 0) {
-		uint8_t ifaddr[4];
-
-#if BYTE_ORDER == LITTLE_ENDIAN
-		ifaddr[0] = (uint8_t)req.ifr_addr.sa_data[2];
-		ifaddr[1] = (uint8_t)req.ifr_addr.sa_data[3];
-		ifaddr[2] = (uint8_t)req.ifr_addr.sa_data[4];
-		ifaddr[3] = (uint8_t)req.ifr_addr.sa_data[5];
-#elif BYTE_ORDER == BIG_ENDIAN
-		ifaddr[3] = (uint8_t)req.ifr_addr.sa_data[2];
-		ifaddr[2] = (uint8_t)req.ifr_addr.sa_data[3];
-		ifaddr[1] = (uint8_t)req.ifr_addr.sa_data[4];
-		ifaddr[0] = (uint8_t)req.ifr_addr.sa_data[5];
-#endif
-	}
-
-	if (ioctl(sock, SIOCGIFNETMASK, &req) >= 0) {
-		uint8_t ifmask[4];
-
-#if BYTE_ORDER == LITTLE_ENDIAN
-		ifmask[0] = (uint8_t)req.ifr_netmask.sa_data[2];
-		ifmask[1] = (uint8_t)req.ifr_netmask.sa_data[3];
-		ifmask[2] = (uint8_t)req.ifr_netmask.sa_data[4];
-		ifmask[3] = (uint8_t)req.ifr_netmask.sa_data[5];
-#elif BYTE_ORDER == BIG_ENDIAN
-		ifmask[3] = (uint8_t)req.ifr_netmask.sa_data[2];
-		ifmask[2] = (uint8_t)req.ifr_netmask.sa_data[3];
-		ifmask[1] = (uint8_t)req.ifr_netmask.sa_data[4];
-		ifmask[0] = (uint8_t)req.ifr_netmask.sa_data[5];
-#endif
-	}
-
-	if (ioctl(sock, SIOCGIFBRDADDR, &req) >= 0) {
-		uint8_t ifbroadcast[4];
-
-#if BYTE_ORDER == LITTLE_ENDIAN
-		ifbroadcast[0] = (uint8_t)req.ifr_broadaddr.sa_data[2];
-		ifbroadcast[1] = (uint8_t)req.ifr_broadaddr.sa_data[3];
-		ifbroadcast[2] = (uint8_t)req.ifr_broadaddr.sa_data[4];
-		ifbroadcast[3] = (uint8_t)req.ifr_broadaddr.sa_data[5];
-#elif BYTE_ORDER == BIG_ENDIAN
-		ifbroadcast[3] = (uint8_t)req.ifr_broadaddr.sa_data[2];
-		ifbroadcast[2] = (uint8_t)req.ifr_broadaddr.sa_data[3];
-		ifbroadcast[1] = (uint8_t)req.ifr_broadaddr.sa_data[4];
-		ifbroadcast[0] = (uint8_t)req.ifr_broadaddr.sa_data[5];
-#endif
-	}
-
-	if (ioctl(sock, SIOCGIFDSTADDR, &req) < 0) {
-		uint8_t ifdstaddress[4];
-
-#if BYTE_ORDER == LITTLE_ENDIAN
-		ifdstaddress[0] = (uint8_t)req.ifr_dstaddr.sa_data[2];	
-		ifdstaddress[1] = (uint8_t)req.ifr_dstaddr.sa_data[3];	
-		ifdstaddress[2] = (uint8_t)req.ifr_dstaddr.sa_data[4];	
-		ifdstaddress[3] = (uint8_t)req.ifr_dstaddr.sa_data[5];	
-#elif BYTE_ORDER == BIG_ENDIAN
-		ifdstaddress[3] = (uint8_t)req.ifr_dstaddr.sa_data[2];	
-		ifdstaddress[2] = (uint8_t)req.ifr_dstaddr.sa_data[3];	
-		ifdstaddress[1] = (uint8_t)req.ifr_dstaddr.sa_data[4];	
-		ifdstaddress[0] = (uint8_t)req.ifr_dstaddr.sa_data[5];	
-#endif
+		// int base_addr = req.ifr_map.base_addr;
 	}
 
 	// CHANGE:: set or get Flags	(usa ifr_name)
+	strncpy(req.ifr_name, _name.c_str(), 16);
 	if (ioctl(sock, SIOCGIFFLAGS, &req) >= 0) {
 		_flags = req.ifr_flags;
 	}
 
 	close(sock);
+#endif
 }
 
 NetworkInterface::~NetworkInterface()
 {
+	while (_childs.size() > 0) {
+		NetworkInterface *interface = (*_childs.begin());
+
+		_childs.erase(_childs.begin());
+
+		delete interface;
+		interface = NULL;
+	}
+}
+
+void NetworkInterface::AddInetAddress(InetAddress *addr)
+{
+	if ((void *)addr != NULL) {
+		_addresses.push_back(addr);
+	}
+}
+
+void NetworkInterface::AddBroadcastAddress(InetAddress *addr)
+{
+	if ((void *)addr != NULL) {
+		_broadcast_addresses.push_back(addr);
+	}
+}
+
+void NetworkInterface::AddSubInterface(NetworkInterface *interface)
+{
+	if ((void *)interface != NULL) {
+		_childs.push_back(interface);
+	}
 }
 
 NetworkInterface * NetworkInterface::GetByInetAddress(InetAddress *addr)
 {
+	// TODO:: recuperar pelo ip ??
+	
 	return NULL;
 }
 
@@ -174,17 +155,105 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 
 #ifdef _WIN32
 #else
-	struct if_nameindex *ifs = if_nameindex();
-	
-	if (ifs == NULL) { 
-		return interfaces;
-	}
-	
-	for (int i=0; (ifs[i].if_index != 0) && (ifs[i].if_name != NULL); i++) {
-		interfaces.push_back(new NetworkInterface(ifs[i].if_name, ifs[i].if_index, false));
+	struct ifaddrs *ifa = NULL,
+								 *ifEntry = NULL;
+	char addrBuffer[INET6_ADDRSTRLEN],
+			 maskBuffer[INET6_ADDRSTRLEN],
+			 broadcastBuffer[INET6_ADDRSTRLEN],
+			 p2pBuffer[INET6_ADDRSTRLEN];
+
+	if (getifaddrs(&ifa) == 0) {
+		std::map<std::string, NetworkInterface *> interfaces;
+
+		int index = 0;
+
+		for(ifEntry=ifa; ifEntry!=NULL; ifEntry=ifEntry->ifa_next, index++) {
+			if(ifEntry->ifa_addr->sa_data == NULL) {
+				continue;
+			}
+
+			const char *addr = NULL,
+						*mask = NULL,
+						*broadcast = NULL,
+						*p2p = NULL;
+			void *addrPtr = NULL,
+					 *maskPtr = NULL,
+					 *broadcastPtr = NULL,
+					 *p2pPtr = NULL;
+
+			if (ifEntry->ifa_addr->sa_family == AF_INET || ifEntry->ifa_addr->sa_family == PF_INET) {
+				addrPtr = &((struct sockaddr_in *)ifEntry->ifa_addr)->sin_addr;
+				maskPtr = &((struct sockaddr_in *)ifEntry->ifa_netmask)->sin_addr;
+
+				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != NULL) {
+			 		broadcastPtr = &((struct sockaddr_in *)ifEntry->ifa_broadaddr)->sin_addr;
+				}
+
+				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
+					p2pPtr = &((struct sockaddr_in *)ifEntry->ifa_dstaddr)->sin_addr;
+				}
+			
+				addr = inet_ntop(ifEntry->ifa_addr->sa_family, addrPtr, addrBuffer, sizeof(addrBuffer));
+				mask = inet_ntop(ifEntry->ifa_addr->sa_family, maskPtr, maskBuffer, sizeof(maskBuffer));
+
+				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != NULL) {
+					broadcast = inet_ntop(ifEntry->ifa_addr->sa_family, broadcastPtr, broadcastBuffer, sizeof(broadcastBuffer));
+				}
+
+				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
+					p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
+				}
+			
+				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::SPLIT_FLAG, false);
+				NetworkInterface *parent = interfaces[ifEntry->ifa_name];
+
+				if (token.GetSize() == 1) {
+					parent->AddInetAddress(InetAddress4::GetByName(addr));
+					parent->AddBroadcastAddress(InetAddress4::GetByName(broadcast));
+				} else {
+					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, parent->GetNetworkInterfaces().size(), true));
+				}
+			} else if (ifEntry->ifa_addr->sa_family == AF_INET6 || ifEntry->ifa_addr->sa_family == PF_INET6) {
+				addrPtr = &((struct sockaddr_in6 *)ifEntry->ifa_addr)->sin6_addr;
+				maskPtr = &((struct sockaddr_in6 *)ifEntry->ifa_netmask)->sin6_addr;
+				
+				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != NULL) {
+					broadcastPtr = &((struct sockaddr_in6 *)ifEntry->ifa_broadaddr)->sin6_addr;
+				}
+				
+				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
+					p2pPtr = &((struct sockaddr_in6 *)ifEntry->ifa_dstaddr)->sin6_addr;
+				}
+				
+				addr = inet_ntop(ifEntry->ifa_addr->sa_family, addrPtr, addrBuffer, sizeof(addrBuffer));
+				mask = inet_ntop(ifEntry->ifa_addr->sa_family, maskPtr, maskBuffer, sizeof(maskBuffer));
+
+				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != NULL) {
+					broadcast = inet_ntop(ifEntry->ifa_addr->sa_family, broadcastPtr, broadcastBuffer, sizeof(broadcastBuffer));
+				}
+
+				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
+					p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
+				}
+				
+				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::SPLIT_FLAG, false);
+				NetworkInterface *parent = interfaces[ifEntry->ifa_name];
+
+				if (token.GetSize() == 1) {
+					parent->AddInetAddress(InetAddress6::GetByName(addr));
+					parent->AddBroadcastAddress(InetAddress6::GetByName(broadcast));
+				} else {
+					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, parent->GetNetworkInterfaces().size(), true));
+				}
+			} else if (ifEntry->ifa_addr->sa_family == AF_PACKET || ifEntry->ifa_addr->sa_family == PF_PACKET) {
+				interfaces[ifEntry->ifa_name] = new NetworkInterface(NULL, ifEntry->ifa_name, index, false);
+
+				continue;
+			}
+		}
 	}
 
-	if_freenameindex(ifs);
+	freeifaddrs(ifa);
 #endif
 
 	return interfaces;
@@ -200,18 +269,19 @@ std::vector<uint8_t> NetworkInterface::GetHardwareAddress()
 	return _hwaddress;
 }
 
+std::vector<uint8_t> NetworkInterface::GetNetworkMask()
+{
+	return _mask;
+}
+
 std::vector<InetAddress *> NetworkInterface::GetInetAddresses()
 {
-	std::vector<InetAddress *> addresses;
-
-	return addresses;
+	return _addresses;
 }
 
 std::vector<InetAddress *> NetworkInterface::GetBroadcastAddresses()
 {
-	std::vector<InetAddress *> addresses;
-
-	return addresses;
+	return _broadcast_addresses;
 }
 
 int NetworkInterface::GetDMA()
@@ -246,46 +316,92 @@ int NetworkInterface::GetIndex()
 
 NetworkInterface * NetworkInterface::GetParent()
 {
-	return NULL;
+	return _parent;
 }
 
 std::vector<NetworkInterface *> NetworkInterface::GetSubInterfaces()
 {
-	std::vector<NetworkInterface *> interfaces;
-
-	// TODO::
-	
-	return interfaces;
+	return _childs;
 }
 
 bool NetworkInterface::IsLoopback()
 {
-	return _flags & IFF_LOOPBACK;
+#ifdef _WIN32
+	return false;
+#else
+	return (_flags & IFF_LOOPBACK);
+#endif
 }
 
 bool NetworkInterface::IsPointToPoint()
 {
-	return _flags & IFF_POINTOPOINT;
+#ifdef _WIN32
+	return false;
+#else
+	return (_flags & IFF_POINTOPOINT);
+#endif
 }
 
 bool NetworkInterface::IsUp()
 {
-	return _flags & IFF_UP;
+#ifdef _WIN32
+	return false;
+#else
+	return (_flags & IFF_UP);
+#endif
 }
 
 bool NetworkInterface::IsVirtual()
 {
+#ifdef _WIN32
 	return false;
+#else
+	return _is_virtual;
+#endif
 }
 
 bool NetworkInterface::SupportsMulticast()
 {
-	return _flags & IFF_MULTICAST;
+#ifdef _WIN32
+	return false;
+#else
+	return (_flags & IFF_MULTICAST);
+#endif
 }
 
 std::string NetworkInterface::what()
-{
-	return "";
+{	
+	std::ostringstream o;
+	std::string flags, 
+		link = "Ethernet";
+	char mac[255];
+
+	sprintf(mac, "%02x:%02x:%02x:%02x:%02x:%02x", _hwaddress[0], _hwaddress[1], _hwaddress[2], _hwaddress[3], _hwaddress[4], _hwaddress[5]);
+
+	if (IsUp() == true) {
+		flags += "UP ";
+	}
+
+	if (IsLoopback() == true) {
+		flags += "LOOPBACK ";
+		link = "Local Loopback";
+	}
+
+	if (IsPointToPoint() == true) {
+		flags += "POINTOPOINT ";
+	}
+
+	if (IsVirtual() == true) {
+		flags += "VIRTUAL ";
+	}
+
+	if (SupportsMulticast() == true) {
+		flags += "MULTICAST ";
+	}
+
+	o << GetDisplayName() << "\tLink encap:" << link << " HWaddr " << mac<< std::endl;
+
+	return o.str();
 }
 
 }

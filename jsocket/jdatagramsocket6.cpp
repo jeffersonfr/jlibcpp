@@ -23,6 +23,7 @@
 #include "jsockettimeoutexception.h"
 #include "jsocketstreamexception.h"
 #include "junknownhostexception.h"
+#include "jinetaddress6.h"
 
 namespace jsocket {
 
@@ -128,7 +129,7 @@ void DatagramSocket6::CreateSocket()
 	}
 }
 
-void DatagramSocket6::BindSocket(InetAddress6 *addr_, int local_port_)
+void DatagramSocket6::BindSocket(InetAddress *addr_, int local_port_)
 {
 	int opt = 1;
 
@@ -160,7 +161,7 @@ void DatagramSocket6::BindSocket(InetAddress6 *addr_, int local_port_)
 	}
 }
 
-void DatagramSocket6::ConnectSocket(InetAddress6 *addr_, int port_)
+void DatagramSocket6::ConnectSocket(InetAddress *addr_, int port_)
 {
 	_address = addr_;
 	
@@ -544,7 +545,7 @@ void DatagramSocket6::Close()
 #endif
 }
 
-InetAddress6 * DatagramSocket6::GetInetAddress()
+InetAddress * DatagramSocket6::GetInetAddress()
 {
 	return _address;
 }

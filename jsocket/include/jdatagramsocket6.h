@@ -20,7 +20,7 @@
 #ifndef J_DATAGRAMSOCKET6_H
 #define J_DATAGRAMSOCKET6_H
 
-#include "jinetaddress6.h"
+#include "jinetaddress.h"
 #include "jsocketoption.h"
 #include "jsocketinputstream.h"
 #include "jsocketoutputstream.h"
@@ -61,9 +61,9 @@ class DatagramSocket6 : public jsocket::Connection{
 		/** \brief Server socket UDP. */
 		struct sockaddr_in6 _server_sock;
 		/** \brief Local inetaddress. */
-		InetAddress6 *_local;
+		InetAddress *_local;
 		/** \brief Remote inetaddress. */
-		InetAddress6 *_address;
+		InetAddress *_address;
 		/** \brief Input stream. */
 		SocketInputStream *_is;
 		/** \brief Output stream. */
@@ -87,13 +87,13 @@ class DatagramSocket6 : public jsocket::Connection{
 		 * \brief Bind socket.
 		 *
 		 */
-		void BindSocket(InetAddress6 *addr_, int local_port_);
+		void BindSocket(InetAddress *addr_, int local_port_);
 
 		/**
 		 * \brief Connect socket.
 		 *
 		 */
-		void ConnectSocket(InetAddress6 *addr_, int port_);
+		void ConnectSocket(InetAddress *addr_, int port_);
 
 		/**
 		 * \brief Init the stream.
@@ -172,7 +172,7 @@ class DatagramSocket6 : public jsocket::Connection{
 		 * \brief Get InetAddress.
 		 *
 		 */
-		InetAddress6 * GetInetAddress();
+		InetAddress * GetInetAddress();
 
 		/**
 		 * \brief Get the local port.

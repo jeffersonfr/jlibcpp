@@ -22,6 +22,7 @@
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
 #include "jsocketstreamexception.h"
+#include "jinetaddress4.h"
 
 namespace jsocket {
 
@@ -39,9 +40,9 @@ MulticastSocket::MulticastSocket(std::string host_, int port_, int rbuf_, int wb
 	_receive_bytes = 0;
 
 	CreateSocket();
-	ConnectSocket(InetAddress::GetByName(host_), port_);
-	BindSocket(InetAddress::GetByName(host_), port_);
-	Join(InetAddress::GetByName(host_));
+	ConnectSocket(InetAddress4::GetByName(host_), port_);
+	BindSocket(InetAddress4::GetByName(host_), port_);
+	Join(InetAddress4::GetByName(host_));
 	InitStream(rbuf_, wbuf_);
 
 	_is_closed = true;

@@ -43,17 +43,12 @@ namespace jsocket {
  */
 class InetAddress : public virtual jcommon::Object{
 
-	private:
-		/** \brief Host name. */
-		std::string _host;
-		/** \brief Host ip. */
-		struct in_addr _ip;
-
+	protected:
 		/**
 		 * \brief Constructor private.
 		 *
 		 */
-		InetAddress(std::string, struct in_addr);
+		InetAddress();
 
 	public:
 		/**
@@ -61,24 +56,6 @@ class InetAddress : public virtual jcommon::Object{
 		 *
 		 */
 		virtual ~InetAddress();
-
-		/**
-		 * \brief Get adresses by name.
-		 *
-		 */
-		static InetAddress * GetByName(std::string);
-
-		/**
-		 * \brief Get all addresses from a host.
-		 *
-		 */
-		static std::vector<InetAddress *> GetAllByName(std::string);
-
-		/**
-		 * \brief Get the local host.
-		 *
-		 */
-		static InetAddress * GetLocalHost();
 
 		/**
 		 * \brief

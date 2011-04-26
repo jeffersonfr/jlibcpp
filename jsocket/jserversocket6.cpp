@@ -23,10 +23,11 @@
 #include "junknownhostexception.h"
 #include "jsocketexception.h"
 #include "jsocketstreamexception.h"
+#include "jinetaddress6.h"
 
 namespace jsocket {
 
-ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress6 *addr_):
+ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress *addr_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jsocket::ServerSocket6");
@@ -36,7 +37,7 @@ ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress6 *addr_):
 
 	if (addr_ == NULL) {
 		try {
-			InetAddress6 *a = InetAddress6::GetLocalHost();
+			InetAddress *a = InetAddress6::GetLocalHost();
         
 			addr_ = a;
 		} catch (UnknownHostException &) {
@@ -85,7 +86,7 @@ void ServerSocket6::CreateSocket()
 	}
 }
 
-void ServerSocket6::BindSocket(InetAddress6 *local_addr_, int local_port_)
+void ServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
 	bool opt = 1;
     
@@ -144,7 +145,7 @@ Socket6 * ServerSocket6::Accept()
 	return s;
 }
 
-InetAddress6 * ServerSocket6::GetInetAddress()
+InetAddress * ServerSocket6::GetInetAddress()
 {
 	return _local;
 }

@@ -56,7 +56,7 @@ class SSLServerSocket6 : public virtual jcommon::Object{
 		/** \brief Remote socket. */
 		sockaddr_in6 _rsock;
 		/** \brief */
-		InetAddress6 *_local;
+		InetAddress *_local;
 		/** \brief */
 		bool _is_closed;
 
@@ -70,7 +70,7 @@ class SSLServerSocket6 : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void BindSocket(InetAddress6 *, int);
+		void BindSocket(InetAddress *, int);
 
 		/**
 		 * \brief
@@ -130,7 +130,7 @@ class SSLServerSocket6 : public virtual jcommon::Object{
 		 * \brief Constructor.
 		 *
 		 */
-		SSLServerSocket6(int port, int backlog = 5, int keysize = RSA_KEYSIZE, InetAddress6 * = NULL);
+		SSLServerSocket6(int port, int backlog = 5, int keysize = RSA_KEYSIZE, InetAddress * = NULL);
 
 		/**
 		 * \brief Destructor virtual.
@@ -148,7 +148,7 @@ class SSLServerSocket6 : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		InetAddress6 * GetInetAddress();
+		InetAddress * GetInetAddress();
 
 		/**
 		 * \brief Get the local port.

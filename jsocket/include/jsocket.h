@@ -20,7 +20,7 @@
 #ifndef J_SOCKET_H
 #define J_SOCKET_H
 
-#include "jinetaddress6.h"
+#include "jinetaddress.h"
 #include "jserversocket.h"
 #include "jsocketoption.h"
 #include "jsocketinputstream.h"
@@ -70,7 +70,7 @@ class Socket : public jsocket::Connection{
 		/** \brief */
 		struct sockaddr_in _server_sock;
 		/** \brief */
-		InetAddress6 *_address;
+		InetAddress *_address;
 		/** \brief Bytes sent. */
 		int64_t _sent_bytes;
 		/** \brief Bytes received. */
@@ -88,13 +88,13 @@ class Socket : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		void BindSocket(InetAddress6 *, int);
+		void BindSocket(InetAddress *, int);
 
 		/**
 		 * \brief Connect the socket.
 		 *
 		 */
-		void ConnectSocket(InetAddress6 *, int);
+		void ConnectSocket(InetAddress *, int);
 
 		/**
 		 * \brief
@@ -118,13 +118,13 @@ class Socket : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-		Socket(InetAddress6 *addr_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket(InetAddress *addr_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		Socket(InetAddress6 *addr_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief
@@ -136,7 +136,7 @@ class Socket : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-		Socket(std::string host_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
+		Socket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
 
 		/**
 		 * \brief Destrutor virtual.
@@ -200,7 +200,7 @@ class Socket : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		InetAddress6 * GetInetAddress();
+		InetAddress * GetInetAddress();
 
 		/**
 		 * \brief Get the local port.

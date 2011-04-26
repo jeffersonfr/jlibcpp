@@ -21,10 +21,11 @@
 #include "jsslserversocket6.h"
 #include "jsocketexception.h"
 #include "jsocketstreamexception.h"
+#include "jinetaddress6.h"
 
 namespace jsocket {
 
-SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAddress6 *addr_):
+SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAddress *addr_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jsocket::SSLServerSocket6");
@@ -33,9 +34,7 @@ SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAdd
 	_is_closed = false;
 
 	if (addr_ == NULL) {
-		InetAddress6 *a = InetAddress6::GetLocalHost();
-        
-		addr_ = a;
+		addr_ = InetAddress6::GetLocalHost();
 	}
 
 	// init ssl 
@@ -101,7 +100,7 @@ void SSLServerSocket6::CreateSocket()
 	}
 }
 
-void SSLServerSocket6::BindSocket(InetAddress6 *local_addr_, int local_port_)
+void SSLServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
 	int opt = 1;
     
@@ -174,7 +173,7 @@ SSLSocket6 * SSLServerSocket6::Accept()
 	return s;
 }
 
-InetAddress6 * SSLServerSocket6::GetInetAddress()
+InetAddress * SSLServerSocket6::GetInetAddress()
 {
 	return _local;
 }

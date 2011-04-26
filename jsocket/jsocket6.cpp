@@ -22,10 +22,11 @@
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
 #include "jsocketstreamexception.h"
+#include "jinetaddress6.h"
 
 namespace jsocket {
 
-Socket6::Socket6(InetAddress6 *addr_, int port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
@@ -45,7 +46,7 @@ Socket6::Socket6(InetAddress6 *addr_, int port_, int timeout_, int rbuf_, int wb
 	_is_closed = false;
 }
 
-Socket6::Socket6(InetAddress6 *addr_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
@@ -79,7 +80,7 @@ Socket6::Socket6(std::string host_, int port_, int timeout_, int rbuf_, int wbuf
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	InetAddress6 *address = InetAddress6::GetByName(host_);
+	InetAddress *address = InetAddress6::GetByName(host_);
 
 	CreateSocket();
 	ConnectSocket(address, port_);
@@ -88,7 +89,7 @@ Socket6::Socket6(std::string host_, int port_, int timeout_, int rbuf_, int wbuf
 	_is_closed = false;
 }
 
-Socket6::Socket6(std::string host_, int port_, InetAddress6 *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
+Socket6::Socket6(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
@@ -101,7 +102,7 @@ Socket6::Socket6(std::string host_, int port_, InetAddress6 *local_addr_, int lo
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	InetAddress6 *address = InetAddress6::GetByName(host_);
+	InetAddress *address = InetAddress6::GetByName(host_);
 
 	CreateSocket();
 	BindSocket(local_addr_, local_port_);
@@ -176,7 +177,7 @@ void Socket6::CreateSocket()
 	}
 }
 
-void Socket6::BindSocket(InetAddress6 *local_addr_, int local_port_)
+void Socket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
 	memset(&_lsock, 0, sizeof(_lsock));
 
@@ -197,7 +198,7 @@ void Socket6::BindSocket(InetAddress6 *local_addr_, int local_port_)
 	}
 }
 
-void Socket6::ConnectSocket(InetAddress6 *addr_, int port_)
+void Socket6::ConnectSocket(InetAddress *addr_, int port_)
 {
 	_address = addr_;
 
@@ -546,7 +547,7 @@ jio::OutputStream * Socket6::GetOutputStream()
 	return (jio::OutputStream *)_os;
 }
 
-InetAddress6 * Socket6::GetInetAddress()
+InetAddress * Socket6::GetInetAddress()
 {
 	return _address;
 }

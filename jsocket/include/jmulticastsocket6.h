@@ -87,13 +87,13 @@ class MulticastSocket6 : public jsocket::Connection{
 		 * \brief Bind socket
 		 *
 		 */
-		void BindSocket(InetAddress6 *addr_, int local_port_);
+		void BindSocket(InetAddress *addr_, int local_port_);
 
 		/**
 		 * \brief Connect socket
 		 *
 		 */
-		void ConnectSocket(InetAddress6 *addr_, int port_);
+		void ConnectSocket(InetAddress *addr_, int port_);
 
 		/**
 		 * \brief
@@ -166,7 +166,7 @@ class MulticastSocket6 : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		void Join(InetAddress6 *group_);
+		void Join(InetAddress *group_);
 
 		/**
 		 * \brief
@@ -178,7 +178,7 @@ class MulticastSocket6 : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		void Leave(InetAddress6 *group_);
+		void Leave(InetAddress *group_);
 
 		/**
 		 * \brief

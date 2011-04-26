@@ -17,15 +17,95 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SOCKLIB_H
-#define J_SOCKLIB_H
+#ifndef J_INETADDRESS4_H
+#define J_INETADDRESS4_H
 
-struct jaddress_info_t {
+#include "jinetaddress.h"
+
+#include <string>
+#include <vector>
+#include <cstring>
+#include <cstdlib>
+
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <netdb.h>
+#include <arpa/inet.h>
+#endif
+
+namespace jsocket {
+
+/**
+ * \brief InetAddress.
+ *
+ * \author Jeff Ferr
+ */
+class InetAddress4 : public InetAddress{
+
+	private:
+		/** \brief Host name. */
+		std::string _host;
+		/** \brief Host ip. */
+		struct in_addr _ip;
+
+		/**
+		 * \brief Constructor private.
+		 *
+		 */
+		InetAddress4(std::string, struct in_addr);
+
+	public:
+		/**
+		 * \brief Destructor virtual.
+		 *
+		 */
+		virtual ~InetAddress4();
+
+		/**
+		 * \brief Get adresses by name.
+		 *
+		 */
+		static InetAddress * GetByName(std::string);
+
+		/**
+		 * \brief Get all addresses from a host.
+		 *
+		 */
+		static std::vector<InetAddress *> GetAllByName(std::string);
+
+		/**
+		 * \brief Get the local host.
+		 *
+		 */
+		static InetAddress * GetLocalHost();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsReachable();
+
+		/**
+		 * \brief Get the host name.
+		 *
+		 */
+		virtual std::string GetHostName();
+
+		/**
+		 * \brief Get the host address.
+		 *
+		 */
+		virtual std::string GetHostAddress();
+
+		/**
+		 * \brief Get the address IPv4.
+		 *
+		 */
+		virtual std::vector<uint8_t> GetAddress();
+
 };
 
-void InitWindowsSocket();
-void ReleaseWindowsSocket();
-
-bool RequestAddressInfo(jaddress_info_t *info);
+}
 
 #endif

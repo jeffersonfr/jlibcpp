@@ -22,6 +22,7 @@
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
 #include "jsocketstreamexception.h"
+#include "jinetaddress6.h"
 
 namespace jsocket {
 
@@ -80,7 +81,7 @@ void MulticastSocket6::CreateSocket()
 	}
 }
 
-void MulticastSocket6::ConnectSocket(InetAddress6 *addr_, int port_)
+void MulticastSocket6::ConnectSocket(InetAddress *addr_, int port_)
 {
 	// Receive
 	memset(&_sock_r, 0, sizeof(_sock_r));
@@ -106,7 +107,7 @@ void MulticastSocket6::ConnectSocket(InetAddress6 *addr_, int port_)
 	_sock_s.sin6_addr = in6addr_any;
 }
 
-void MulticastSocket6::BindSocket(InetAddress6 *addr_, int local_port_)
+void MulticastSocket6::BindSocket(InetAddress *addr_, int local_port_)
 {
 	if (bind(_fdr, (struct sockaddr *)&_sock_r, sizeof(_sock_r)) < 0) {
 		throw SocketException("Bind multicast socket error");
@@ -307,7 +308,7 @@ void MulticastSocket6::Join(std::string group_)
 	_groups.push_back(group_);
 }
 
-void MulticastSocket6::Join(InetAddress6 *group_)
+void MulticastSocket6::Join(InetAddress *group_)
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
@@ -357,7 +358,7 @@ void MulticastSocket6::Leave(std::string group_)
 	}
 }
 
-void MulticastSocket6::Leave(InetAddress6 *group_)
+void MulticastSocket6::Leave(InetAddress *group_)
 {
 	if (_is_closed == true) {
 		throw SocketException("Connection is closed");
