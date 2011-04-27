@@ -43,7 +43,7 @@ InetAddress * InetAddress4::GetByName(std::string host_)
 	struct hostent *h = gethostbyname(host_.c_str());
     
 	if (h == NULL) {
-		throw UnknownHostException("Host not found");
+		throw UnknownHostException("Host not found exception");
   }
    
 	InetAddress *addr = new InetAddress4(host_, *(in_addr *)h->h_addr_list[0]);
@@ -70,7 +70,7 @@ std::vector<InetAddress *> InetAddress4::GetAllByName(std::string host_name_)
 	}
 
 	if (aux == NULL) {
-		throw UnknownHostException("IP group not found");
+		throw UnknownHostException("Host not found exception");
 	} else {
 		struct hostent *aux2;
 
@@ -91,20 +91,11 @@ std::vector<InetAddress *> InetAddress4::GetAllByName(std::string host_name_)
 
 InetAddress * InetAddress4::GetLocalHost()
 {
-	struct hostent  *aux;
-	char localName[260];
+	char localName[255+1];
 
-	gethostname(localName, sizeof(localName)-1);
+	gethostname(localName, 255);
 	
-	aux = gethostbyname(localName);
-
-	if (aux == NULL) {
-		throw UnknownHostException("Local IP not found");
-	} else {
-		InetAddress *lhost = new InetAddress4(aux->h_name, *(in_addr *) aux->h_addr_list[0]);
-
-		return lhost;
-	}
+	return GetByName(localName);
 }
 
 /** End */

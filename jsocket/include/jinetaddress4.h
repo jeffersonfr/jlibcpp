@@ -36,12 +36,16 @@
 
 namespace jsocket {
 
+class InetAddress6;
+
 /**
  * \brief InetAddress.
  *
  * \author Jeff Ferr
  */
 class InetAddress4 : public InetAddress{
+
+	friend class InetAddress6;
 
 	private:
 		/** \brief Host name. */

@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jinetaddress6.h"
+#include "jinetaddress4.h"
 #include "junknownhostexception.h"
 
 namespace jsocket {
@@ -38,73 +39,152 @@ InetAddress6::~InetAddress6()
 
 /** Static */
 
-InetAddress * InetAddress6::GetByName(std::string host_)
+InetAddress * InetAddress6::GetByName(std::string host_name_)
 {
-	struct hostent *h = gethostbyname(host_.c_str());
-    
-	if (h == NULL) {
-		throw UnknownHostException("Host not found");
-  }
-   
-	InetAddress6 *addr = new InetAddress6(host_, *(in6_addr *)h->h_addr_list[0]);
+	struct addrinfo *result = NULL;
+	struct addrinfo *ptr = NULL;
+	struct addrinfo hints;
 
-	// free(h);
+	// Setup the hints address info structure which is passed to the getaddrinfo() function
+#ifdef _WIN32
+	ZeroMemory(&hints, sizeof(hints));
+#else
+	bzero(&hints, sizeof(hints));
+#endif
 
-	return addr;
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_protocol = 0;
+	hints.ai_canonname = NULL;
+	hints.ai_addr = NULL;
+	hints.ai_next = NULL;
+
+	// Call getaddrinfo(). If the call succeeds, the result variable will hold a linked list 
+	// of addrinfo structures containing response information
+	if (getaddrinfo(host_name_.c_str(), "", &hints, &result) != 0) {
+		throw UnknownHostException("Host not found exception");
+	}
+
+	// Retrieve each address and print out the hex bytes
+	for (ptr=result; ptr!=NULL; ptr=ptr->ai_next) {
+		switch (ptr->ai_family) {
+			case AF_INET6: {
+#ifdef _WIN32
+				LPSOCKADDR sockaddr_ip;
+				DWORD ipbufferlength = 255;
+				char ipstringbuffer[255];
+
+				info.family = AIF_INET6;
+				
+				// the InetNtop function is available on Windows Vista and later
+				// sockaddr_ipv6 = (struct sockaddr_in6 *) ptr->ai_addr;
+				// info.address = InetNtop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255));
+
+				// We use WSAAddressToString since it is supported on Windows XP and later
+				sockaddr_ip = (LPSOCKADDR) ptr->ai_addr;
+				
+				// The buffer length is changed by each call to WSAAddresstoString
+				// So we need to set it for each iteration through the loop for safety
+				if (WSAAddressToString(sockaddr_ip, (DWORD) ptr->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength) == 0) {
+					return InetAddress6(ipstringbuffer, ((struct sockaddr_in6 *)ptr->ai_addr)->sin6_addr);
+				}
+#else
+				struct sockaddr_in6 *sockaddr_ipv6 = (struct sockaddr_in6 *)ptr->ai_addr;
+				char ipstringbuffer[255];
+
+				return new InetAddress6(inet_ntop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255), sockaddr_ipv6->sin6_addr);
+#endif
+				break;
+			}
+		}
+	}
+	
+	throw UnknownHostException("Cannot found IPv6 address");
 }
 
 std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_name_)
 {
 	std::vector<InetAddress *> vip;
 
-#ifdef _WIN32
-	return vip;
-#else
-	struct hostent *aux = NULL;
-	in6_addr ip;
+	struct addrinfo *result = NULL;
+	struct addrinfo *ptr = NULL;
+	struct addrinfo hints;
 
-	if (inet_pton(AF_INET6, host_name_.c_str(), &ip) == 0) {
-		aux = gethostbyname(host_name_.c_str());
-	} else {
-		aux = gethostbyaddr(&ip, sizeof(ip), PF_INET6);
+	// Setup the hints address info structure which is passed to the getaddrinfo() function
+#ifdef _WIN32
+	ZeroMemory(&hints, sizeof(hints));
+#else
+	bzero(&hints, sizeof(hints));
+#endif
+
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_protocol = 0;
+	hints.ai_canonname = NULL;
+	hints.ai_addr = NULL;
+	hints.ai_next = NULL;
+
+	// Call getaddrinfo(). If the call succeeds, the result variable will hold a linked list 
+	// of addrinfo structures containing response information
+	if (getaddrinfo(host_name_.c_str(), "", &hints, &result) != 0) {
+		throw UnknownHostException("Host not found exception");
 	}
 
-	if (aux == NULL) {
-		throw UnknownHostException("IP group not found");
-	} else {
-		struct hostent *aux2;
+	// Retrieve each address and print out the hex bytes
+	for (ptr=result; ptr!=NULL; ptr=ptr->ai_next) {
+		switch (ptr->ai_family) {
+			case AF_INET: {
+				struct sockaddr_in *sockaddr_ipv4 = (struct sockaddr_in *) ptr->ai_addr;
 
-		for(int i=0; aux->h_addr_list[i] != NULL; ++i) {
-			aux2 = gethostbyaddr(aux->h_addr_list[i], sizeof(aux->h_addr_list[i]), PF_INET6);
-			
-			if ((void *)aux2 != NULL) {
-				vip.push_back(new InetAddress6(aux2->h_name, *(in6_addr *)aux2->h_addr_list[0]));
+				vip.push_back(new InetAddress4(std::string(inet_ntoa(sockaddr_ipv4->sin_addr)), sockaddr_ipv4->sin_addr));
+
+				break;
+			}
+			case AF_INET6: {
+#ifdef _WIN32
+				LPSOCKADDR sockaddr_ip;
+				DWORD ipbufferlength = 255;
+				char ipstringbuffer[255];
+
+				info.family = AIF_INET6;
+				
+				// the InetNtop function is available on Windows Vista and later
+				// sockaddr_ipv6 = (struct sockaddr_in6 *) ptr->ai_addr;
+				// info.address = InetNtop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255));
+
+				// We use WSAAddressToString since it is supported on Windows XP and later
+				sockaddr_ip = (LPSOCKADDR) ptr->ai_addr;
+				
+				// The buffer length is changed by each call to WSAAddresstoString
+				// So we need to set it for each iteration through the loop for safety
+				if (WSAAddressToString(sockaddr_ip, (DWORD) ptr->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength) == 0) {
+					vip.push_back(InetAddress6(ipstringbuffer, NULL));
+				}
+#else
+				struct sockaddr_in6 *sockaddr_ipv6 = (struct sockaddr_in6 *)ptr->ai_addr;
+				char ipstringbuffer[255];
+
+				vip.push_back(new InetAddress6(inet_ntop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255), sockaddr_ipv6->sin6_addr));
+#endif
+				break;
 			}
 		}
-
-		return vip;
 	}
-#endif
 
 	return vip;
 }
 
 InetAddress * InetAddress6::GetLocalHost()
 {
-	struct hostent  *aux;
-	char localName[260];
+	char localName[255+1];
 
-	gethostname(localName, sizeof(localName)-1);
+	gethostname(localName, 255);
 	
-	aux = gethostbyname(localName);
-
-	if (aux == NULL) {
-		throw UnknownHostException("Local IP not found");
-	} else {
-		InetAddress6 *lhost = new InetAddress6(aux->h_name, *(in6_addr *) aux->h_addr_list[0]);
-
-		return lhost;
-	}
+	return GetByName(localName);
 }
 
 /** End */

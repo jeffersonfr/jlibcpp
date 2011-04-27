@@ -40,38 +40,45 @@ NamedPipe::NamedPipe(std::string name, int mode):
 	_name = name;
 	
 #ifdef _WIN32
-	// server
-	while (true) {  
+	_fd = CreateFile(_name.c_str(),
+			GENERIC_WRITE|GENERIC_READ,
+			FILE_SHARE_READ | FILE_SHARE_WRITE,
+			NULL,
+			OPEN_EXISTING,
+			FILE_ATTRIBUTE_NORMAL,
+			NULL
+			);
+	if (_fd == INVALID_HANDLE_VALUE) {
 		_fd = CreateNamedPipe(_name.c_str(),
 				PIPE_ACCESS_DUPLEX,
-				PIPE_TYPE_MESSAGE|PIPE_READMODE_MESSAGE,
+				// PIPE_TYPE_MESSAGE|PIPE_READMODE_MESSAGE,
+				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
 				PIPE_UNLIMITED_INSTANCES,
 				256,
 				256,
 				10000,
 				NULL
-		);
+				);
 
 		ConnectNamedPipe(_fd, NULL);
-	}
+	} else {
+		while (true) {
+			_fd = CreateFile(_name.c_str(),
+					GENERIC_WRITE|GENERIC_READ,
+					FILE_SHARE_READ | FILE_SHARE_WRITE,
+					NULL,
+					OPEN_EXISTING,
+					FILE_ATTRIBUTE_NORMAL,
+					NULL
+					);
 
-	// client
-	while (true) {
-		_fd = CreateFile(_name.c_str(),
-				GENERIC_WRITE|GENERIC_READ,
-				FILE_SHARE_READ | FILE_SHARE_WRITE,
-				NULL,
-				OPEN_EXISTING,
-				FILE_ATTRIBUTE_NORMAL,
-				NULL
-		);
+			if (_fd != INVALID_HANDLE_VALUE) {
+				break;
+			}
 
-		if (_fd != INVALID_HANDLE_VALUE) {
-			break;
-		}
-
-		if ((GetLastError() != ERROR_PIPE_BUSY) || !WaitNamedPipe(_name.c_str(), NMPWAIT_USE_DEFAULT_WAIT)) {
-			throw jio::IOException("Cannot create named pipe");
+			if ((GetLastError() != ERROR_PIPE_BUSY) || !WaitNamedPipe(_name.c_str(), NMPWAIT_USE_DEFAULT_WAIT)) {
+				throw jio::IOException("Cannot create named pipe");
+			}
 		}
 	}
 #else

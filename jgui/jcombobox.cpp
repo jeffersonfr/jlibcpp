@@ -47,6 +47,11 @@ ComboBox::~ComboBox()
 	jthread::AutoLock lock(&_component_mutex);
 
 	// WaitThread();
+	
+	_menu->RemoveSelectListener(this);
+
+	delete _menu;
+	_menu = NULL;
 }
 
 void ComboBox::SetVisibleItems(int max_items)
@@ -56,6 +61,7 @@ void ComboBox::SetVisibleItems(int max_items)
 
 bool ComboBox::ProcessEvent(MouseEvent *event)
 {
+	return true;
 	if (Component::ProcessEvent(event) == true) {
 		return true;
 	}
@@ -93,6 +99,7 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 
 bool ComboBox::ProcessEvent(KeyEvent *event)
 {
+	return true;
 	if (event->GetType() != JKEY_PRESSED) {
 		return true;
 	}

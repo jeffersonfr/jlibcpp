@@ -20,12 +20,39 @@
 #ifndef J_SOCKLIB_H
 #define J_SOCKLIB_H
 
+enum jaddress_family_t {
+	AIF_UNKNOWN,
+	AIF_INET,
+	AIF_INET6,
+	AIF_NETBIOS
+};
+
+enum jaddress_type_t {
+	AIT_UNKNOW,
+	AIT_STREAM,
+	AIT_DGRAM,
+	AIT_RAW,
+	AIT_RDM,
+	AIT_SEQPACKET
+};
+
+enum jaddress_protocol_t {
+	AIP_UNKNOWN,
+	AIP_TCP,
+	AIP_UDP
+};
+
 struct jaddress_info_t {
+	jaddress_family_t family;
+	jaddress_type_t type;
+	jaddress_protocol_t protocol;
+	std::string name;
+	std::string address;
 };
 
 void InitWindowsSocket();
 void ReleaseWindowsSocket();
 
-bool RequestAddressInfo(jaddress_info_t *info);
+std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::string service);
 
 #endif

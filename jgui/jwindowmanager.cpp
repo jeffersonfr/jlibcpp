@@ -75,7 +75,6 @@ void WindowManager::Remove(Window *w)
 
 void WindowManager::Restore()
 {
-#ifdef DIRECTFB_UI
 	for (std::vector<Window *>::const_iterator i=windows.begin(); i!=windows.end(); ++i) {
 		Window *w = (*i);
 
@@ -83,18 +82,15 @@ void WindowManager::Restore()
 			w->Show(false);
 		}
 	} 
-#endif
 }
 
 void WindowManager::Release()
 {
-#ifdef DIRECTFB_UI
 	for (std::vector<Window *>::const_iterator i=windows.begin(); i!=windows.end(); ++i) {
 		Window *w = (*i);
 
 		w->ReleaseWindow();
 	}
-#endif
 }
 
 void WindowManager::RaiseToTop(Window *c)

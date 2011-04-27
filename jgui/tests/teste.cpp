@@ -355,6 +355,22 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 	{
 		jthread::AutoLock lock(&teste_mutex);
 
+		// unregister listeners
+		button1->RemoveButtonListener(this);
+		button2->RemoveButtonListener(this);
+
+		spin->RemoveSelectListener(this);
+
+		check1->RemoveCheckButtonListener(this);
+		check2->RemoveCheckButtonListener(this);
+		check3->RemoveCheckButtonListener(this);
+
+		radio1->RemoveCheckButtonListener(this);
+		radio2->RemoveCheckButtonListener(this);
+		radio3->RemoveCheckButtonListener(this);
+
+		combo->RemoveSelectListener(this);
+
 		Hide();
 
 		delete animation;
@@ -375,8 +391,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		delete label1;
 		delete label2;
 
-		// INFO:: deletar o grupo antes dos componentes check/radio
+		// INFO:: delete group before the childs
 		delete group;
+
 		delete check1;
 		delete check2;
 		delete check3;
