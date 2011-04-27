@@ -67,7 +67,7 @@ std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::st
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
-	hints.ai_protocol = 0;          /* Any protocol */
+	hints.ai_protocol = 0;
 	hints.ai_canonname = NULL;
 	hints.ai_addr = NULL;
 	hints.ai_next = NULL;
@@ -95,24 +95,11 @@ std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::st
 				break;
 			case AF_INET6:
 #ifdef _WIN32
-				LPSOCKADDR sockaddr_ip;
-				DWORD ipbufferlength = 255;
-				char ipstringbuffer[255];
+				struct sockaddr_in6 *in = (struct sockaddr_in6 *)ptr->ai_addr;
 
 				info.family = AIF_INET6;
 				
-				// the InetNtop function is available on Windows Vista and later
-				// sockaddr_ipv6 = (struct sockaddr_in6 *) ptr->ai_addr;
-				// info.address = InetNtop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255));
-
-				// We use WSAAddressToString since it is supported on Windows XP and later
-				sockaddr_ip = (LPSOCKADDR) ptr->ai_addr;
-				
-				// The buffer length is changed by each call to WSAAddresstoString
-				// So we need to set it for each iteration through the loop for safety
-				if (WSAAddressToString(sockaddr_ip, (DWORD) ptr->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength) == 0) {
-					info.address = ipstringbuffer;
-				}
+				info.address = Win32HostAddress(in, ptr->ai_addrlen);
 #else
 				struct sockaddr_in6 *sockaddr_ipv6;
 				char ipstringbuffer[255];

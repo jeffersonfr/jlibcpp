@@ -100,11 +100,6 @@ InetAddress * InetAddress4::GetLocalHost()
 
 /** End */
 
-bool InetAddress4::IsReachable()
-{
-	return true;
-}
-
 std::string InetAddress4::GetHostName()
 {
 	return _host;

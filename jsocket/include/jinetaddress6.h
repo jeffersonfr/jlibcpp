@@ -81,30 +81,28 @@ class InetAddress6 : public InetAddress{
 		static InetAddress * GetLocalHost();
 
 		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsReachable();
-
-		/**
 		 * \brief Get the host name.
 		 *
 		 */
-		std::string GetHostName();
+		virtual std::string GetHostName();
 
 		/**
 		 * \brief Get the host address.
 		 *
 		 */
-		std::string GetHostAddress();
+		virtual std::string GetHostAddress();
 
 		/**
 		 * \brief Get the address IPv4.
 		 *
 		 */
-		std::vector<uint8_t> GetAddress();
+		virtual std::vector<uint8_t> GetAddress();
 
 };
+
+#ifdef _WIN32
+std::string Win32HostAddress(struct sockaddr_in6 *in, int sockaddr_length)
+#endif
 
 }
 

@@ -61,7 +61,7 @@ class InetAddress : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual bool IsReachable();
+		static bool IsReachable(std::string host);
 
 		/**
 		 * \brief Get the host name.

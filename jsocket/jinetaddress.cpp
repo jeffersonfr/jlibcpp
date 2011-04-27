@@ -33,9 +33,32 @@ InetAddress::~InetAddress()
 {
 }
 
-bool InetAddress::IsReachable()
+bool InetAddress::IsReachable(std::string host)
 {
-	return false;
+	struct addrinfo *result = NULL;
+	struct addrinfo *ptr = NULL;
+	struct addrinfo hints;
+
+#ifdef _WIN32
+	ZeroMemory(&hints, sizeof(hints));
+#else
+	bzero(&hints, sizeof(hints));
+#endif
+
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+	hints.ai_flags = AI_PASSIVE;
+	hints.ai_protocol = 0;
+	hints.ai_canonname = NULL;
+	hints.ai_addr = NULL;
+	hints.ai_next = NULL;
+
+	if (getaddrinfo(host.c_str(), "echo", &hints, &result) != 0) {
+		return false;
+	}
+
+	return true;
 }
 
 std::string InetAddress::GetHostName()

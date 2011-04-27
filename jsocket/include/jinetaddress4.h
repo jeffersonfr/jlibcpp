@@ -85,12 +85,6 @@ class InetAddress4 : public InetAddress{
 		static InetAddress * GetLocalHost();
 
 		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsReachable();
-
-		/**
 		 * \brief Get the host name.
 		 *
 		 */

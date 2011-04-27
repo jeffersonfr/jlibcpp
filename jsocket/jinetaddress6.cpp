@@ -72,24 +72,11 @@ InetAddress * InetAddress6::GetByName(std::string host_name_)
 		switch (ptr->ai_family) {
 			case AF_INET6: {
 #ifdef _WIN32
-				LPSOCKADDR sockaddr_ip;
-				DWORD ipbufferlength = 255;
-				char ipstringbuffer[255];
+				struct sockaddr_in6 *in = (struct sockaddr_in6 *)ptr->ai_addr;
 
 				info.family = AIF_INET6;
 				
-				// the InetNtop function is available on Windows Vista and later
-				// sockaddr_ipv6 = (struct sockaddr_in6 *) ptr->ai_addr;
-				// info.address = InetNtop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255));
-
-				// We use WSAAddressToString since it is supported on Windows XP and later
-				sockaddr_ip = (LPSOCKADDR) ptr->ai_addr;
-				
-				// The buffer length is changed by each call to WSAAddresstoString
-				// So we need to set it for each iteration through the loop for safety
-				if (WSAAddressToString(sockaddr_ip, (DWORD) ptr->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength) == 0) {
-					return InetAddress6(ipstringbuffer, ((struct sockaddr_in6 *)ptr->ai_addr)->sin6_addr);
-				}
+				return InetAddress6(Win32HostAddress(in, ptr->ai_addrlen), in->sin6_addr);
 #else
 				struct sockaddr_in6 *sockaddr_ipv6 = (struct sockaddr_in6 *)ptr->ai_addr;
 				char ipstringbuffer[255];
@@ -146,24 +133,11 @@ std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_name_)
 			}
 			case AF_INET6: {
 #ifdef _WIN32
-				LPSOCKADDR sockaddr_ip;
-				DWORD ipbufferlength = 255;
-				char ipstringbuffer[255];
+				struct sockaddr_in6 *in = (struct sockaddr_in6 *)ptr->ai_addr;
 
 				info.family = AIF_INET6;
 				
-				// the InetNtop function is available on Windows Vista and later
-				// sockaddr_ipv6 = (struct sockaddr_in6 *) ptr->ai_addr;
-				// info.address = InetNtop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255));
-
-				// We use WSAAddressToString since it is supported on Windows XP and later
-				sockaddr_ip = (LPSOCKADDR) ptr->ai_addr;
-				
-				// The buffer length is changed by each call to WSAAddresstoString
-				// So we need to set it for each iteration through the loop for safety
-				if (WSAAddressToString(sockaddr_ip, (DWORD) ptr->ai_addrlen, NULL, ipstringbuffer, &ipbufferlength) == 0) {
-					vip.push_back(InetAddress6(ipstringbuffer, NULL));
-				}
+				vip.push_back(InetAddress6(Win32HostAddress(in, ptr->ai_addrlen), in->sin6_addr));
 #else
 				struct sockaddr_in6 *sockaddr_ipv6 = (struct sockaddr_in6 *)ptr->ai_addr;
 				char ipstringbuffer[255];
@@ -188,11 +162,6 @@ InetAddress * InetAddress6::GetLocalHost()
 }
 
 /** End */
-
-bool InetAddress6::IsReachable()
-{
-	return true;
-}
 
 std::string InetAddress6::GetHostName()
 {
@@ -219,5 +188,25 @@ std::vector<uint8_t> InetAddress6::GetAddress()
 	
 	return addr;
 }
+
+#ifdef _WIN32
+std::string Win32HostAddress(struct sockaddr_in6 *in, int sockaddr_length)
+{
+	char ipstringbuffer[255+1];
+	DWORD ipbufferlength = 255;
+	
+	// the InetNtop function is available on Windows Vista and later
+	// info.address = InetNtop(AF_INET6, &in->sin6_addr, ipstringbuffer, 255));
+
+	// We use WSAAddressToString since it is supported on Windows XP and later
+	// The buffer length is changed by each call to WSAAddresstoString
+	// So we need to set it for each iteration through the loop for safety
+	if (WSAAddressToString(in, (DWORD)sockaddr_length, NULL, ipstringbuffer, &ipbufferlength) == 0) {
+		return ipstringbuffer;
+	}
+
+	return "";
+}
+#endif
 
 }
