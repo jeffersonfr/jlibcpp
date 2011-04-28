@@ -23,7 +23,9 @@
 #include "jstringtokenizer.h"
 #include "jinetaddress4.h"
 #include "jinetaddress6.h"
+#include "jsocketexception.h"
 
+#include <iomanip>
 #include <map>
 
 namespace jsocket {
@@ -39,12 +41,15 @@ NetworkInterface::NetworkInterface(NetworkInterface *parent, std::string name, i
 	_is_virtual = is_virtual;
 
 #ifdef _WIN32
+	for (int i=0; i<6; i++) {
+		_hwaddress.push_back(0);
+	}
 #else
 	struct ifreq req;
 	int sock;
 
 	if ((sock = socket(PF_INET, SOCK_RAW, IPPROTO_RAW)) < 0) {
-		// TODO:: throw
+		throw SocketException("Access network interface exception");
 	}
 	
 	req.ifr_ifindex = _index;
@@ -108,6 +113,13 @@ NetworkInterface::~NetworkInterface()
 	}
 }
 
+void NetworkInterface::AddNetworkMask(InetAddress *addr)
+{
+	if ((void *)addr != NULL) {
+		_masks.push_back(addr);
+	}
+}
+
 void NetworkInterface::AddInetAddress(InetAddress *addr)
 {
 	if ((void *)addr != NULL) {
@@ -163,7 +175,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 			 p2pBuffer[INET6_ADDRSTRLEN];
 
 	if (getifaddrs(&ifa) == 0) {
-		std::map<std::string, NetworkInterface *> interfaces;
+		std::map<std::string, NetworkInterface *> minterfaces;
 
 		int index = 0;
 
@@ -205,13 +217,32 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 				}
 			
 				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::SPLIT_FLAG, false);
-				NetworkInterface *parent = interfaces[ifEntry->ifa_name];
+
+				std::map<std::string, NetworkInterface *>::iterator it = minterfaces.find(token.GetToken(0));
+				NetworkInterface *parent = NULL;
+				
+				// TODO:: consertar... quando chegar um tipo eth0:1
+
+				if (it != minterfaces.end()) {
+					parent = it->second;
+				} else {
+					parent = new NetworkInterface(NULL, ifEntry->ifa_name, interfaces.size(), false);
+
+					interfaces.push_back(parent);
+					minterfaces[ifEntry->ifa_name] = parent;
+				}
 
 				if (token.GetSize() == 1) {
+					parent->AddNetworkMask(InetAddress4::GetByName(mask));
 					parent->AddInetAddress(InetAddress4::GetByName(addr));
+
+					if (broadcast == NULL) {
+						broadcast = addr;
+					}
+
 					parent->AddBroadcastAddress(InetAddress4::GetByName(broadcast));
 				} else {
-					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, parent->GetNetworkInterfaces().size(), true));
+					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, interfaces.size(), true));
 				}
 			} else if (ifEntry->ifa_addr->sa_family == AF_INET6 || ifEntry->ifa_addr->sa_family == PF_INET6) {
 				addrPtr = &((struct sockaddr_in6 *)ifEntry->ifa_addr)->sin6_addr;
@@ -237,18 +268,40 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 				}
 				
 				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::SPLIT_FLAG, false);
-				NetworkInterface *parent = interfaces[ifEntry->ifa_name];
+
+				std::map<std::string, NetworkInterface *>::iterator it = minterfaces.find(token.GetToken(0));
+				NetworkInterface *parent = NULL;
+				
+				if (it != minterfaces.end()) {
+					parent = it->second;
+				} else {
+					parent = new NetworkInterface(NULL, ifEntry->ifa_name, interfaces.size(), false);
+
+					interfaces.push_back(parent);
+					minterfaces[ifEntry->ifa_name] = parent;
+				}
 
 				if (token.GetSize() == 1) {
+					parent->AddNetworkMask(InetAddress6::GetByName(mask));
 					parent->AddInetAddress(InetAddress6::GetByName(addr));
+
+					if (broadcast == NULL) {
+						broadcast = addr;
+					}
+
 					parent->AddBroadcastAddress(InetAddress6::GetByName(broadcast));
 				} else {
-					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, parent->GetNetworkInterfaces().size(), true));
+					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, interfaces.size(), true));
 				}
 			} else if (ifEntry->ifa_addr->sa_family == AF_PACKET || ifEntry->ifa_addr->sa_family == PF_PACKET) {
-				interfaces[ifEntry->ifa_name] = new NetworkInterface(NULL, ifEntry->ifa_name, index, false);
+				NetworkInterface *parent = new NetworkInterface(NULL, ifEntry->ifa_name, index, false);
 
-				continue;
+				interfaces.push_back(parent);
+				minterfaces[ifEntry->ifa_name] = parent;
+
+				if ((ifEntry->ifa_flags & IFF_UP) == 0) {
+					parent->AddNetworkMask(InetAddress4::GetByName("0.0.0.0"));
+				}
 			}
 		}
 	}
@@ -269,9 +322,9 @@ std::vector<uint8_t> NetworkInterface::GetHardwareAddress()
 	return _hwaddress;
 }
 
-std::vector<uint8_t> NetworkInterface::GetNetworkMask()
+std::vector<InetAddress *> NetworkInterface::GetNetworkMasks()
 {
-	return _mask;
+	return _masks;
 }
 
 std::vector<InetAddress *> NetworkInterface::GetInetAddresses()
@@ -399,7 +452,14 @@ std::string NetworkInterface::what()
 		flags += "MULTICAST ";
 	}
 
-	o << GetDisplayName() << "\tLink encap:" << link << " HWaddr " << mac<< std::endl;
+	o << GetDisplayName() << "\tlink encap: " << link << " hardware address: " << mac << std::endl;
+
+	for (int i=0; i<(int)_addresses.size(); i++) {
+		o << "\tinet address: " << _addresses[i]->GetHostAddress() << " broadcast: " << _broadcast_addresses[i]->GetHostAddress() << " netmask: " << _masks[i]->GetHostAddress() << std::endl;
+	}
+
+	o << "\t" << flags << " mtu: " << _mtu << " metric: " << _metric << std::endl;
+	o << "\tirq: 0x" << std::hex << std::setw(2) << std::setfill('0') << _irq << " dma: 0x" << std::setw(8) << _dma << std::endl;
 
 	return o.str();
 }

@@ -36,7 +36,6 @@ InetAddress::~InetAddress()
 bool InetAddress::IsReachable(std::string host)
 {
 	struct addrinfo *result = NULL;
-	struct addrinfo *ptr = NULL;
 	struct addrinfo hints;
 
 #ifdef _WIN32
@@ -71,9 +70,9 @@ std::string InetAddress::GetHostAddress()
 	return "";
 }
 
-std::vector<uint8_t> InetAddress::GetAddress()
+std::vector<uint32_t> InetAddress::GetAddress()
 {
-	std::vector<uint8_t> addr;
+	std::vector<uint32_t> addr;
 
 	return addr;
 }

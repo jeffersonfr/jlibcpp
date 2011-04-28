@@ -96,7 +96,7 @@ class InetAddress6 : public InetAddress{
 		 * \brief Get the address IPv4.
 		 *
 		 */
-		virtual std::vector<uint8_t> GetAddress();
+		virtual std::vector<uint32_t> GetAddress();
 
 };
 

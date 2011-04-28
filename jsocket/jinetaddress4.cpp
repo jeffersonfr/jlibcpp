@@ -110,50 +110,17 @@ std::string InetAddress4::GetHostAddress()
 	return inet_ntoa(_ip);
 }
 
-std::vector<uint8_t> InetAddress4::GetAddress()
+std::vector<uint32_t> InetAddress4::GetAddress()
 {
-	uint8_t*ip = (uint8_t*)&_ip;
-	std::vector<uint8_t> addr;
-
-	int size = sizeof(in_addr);
+	std::vector<uint32_t> addr;
+	int size = sizeof(in_addr)/sizeof(uint8_t);
+	uint8_t *ip = (uint8_t *)&_ip;
 	
 	for (int i=0; i<size; ++i) {
 		addr.push_back(ip[i]);
 	}
 	
 	return addr;
-}
-
-char * itoa(int num_, char *num_char_)
-{
-	int aux, i=0;
-	char *aux_num;
-	
-	if (num_ == 0) {
-		num_char_[i] = 48; //Conversão ASCII
-		num_char_[i+1] = '\0';
-		return NULL;
-	} else {
-		for(i=0; num_ != 0; i++){
-			aux = num_ % 10;
-			num_char_[i] = aux + 48;
-			num_ = (int)num_ / 10;
-		}
-		
-		num_char_[i] = '\0';
-	}
-	
-	aux = strlen(num_char_)-1;
-	aux_num = (char *)malloc(aux+1);
-	
-	for (i=0; aux >= 0; i++, aux--) {
-		aux_num[i] = num_char_[aux];
-	}
-
-	aux_num[i++] = '\0';
-	strcpy(num_char_, aux_num);
-	
-	return num_char_;
 }
 
 }

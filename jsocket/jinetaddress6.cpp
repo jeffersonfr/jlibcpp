@@ -175,12 +175,11 @@ std::string InetAddress6::GetHostAddress()
 	return std::string(inet_ntop(PF_INET6, &_ip, addr, 255));
 }
 
-std::vector<uint8_t> InetAddress6::GetAddress()
+std::vector<uint32_t> InetAddress6::GetAddress()
 {
-	uint8_t*ip = (uint8_t*)&_ip;
-	std::vector<uint8_t> addr;
-
-	int size = sizeof(in6_addr);
+	std::vector<uint32_t> addr;
+	int size = sizeof(in6_addr)/sizeof(uint16_t);
+	uint16_t *ip = (uint16_t *)&_ip;
 	
 	for (int i=0; i<size; ++i) {
 		addr.push_back(ip[i]);

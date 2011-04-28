@@ -35,8 +35,8 @@ LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server,
 	throw jcommon::SocketException("Unamed socket unsupported.");
 #endif
 
-	_client_file = client;
-	_server_file = server;
+	_client_file = server;
+	_server_file = client;
 	_is = NULL;
 	_os = NULL;
 	_is_closed = true;
@@ -44,7 +44,6 @@ LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server,
 
 	CreateSocket();
 	ConnectSocket();
-	BindSocket();
 	InitStream(rbuf_, wbuf_);
 
 	_sent_bytes = 0;
@@ -61,7 +60,8 @@ LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int r
 	throw jcommon::SocketException("Unamed socket unsupported.");
 #endif
 
-	_client_file = server;
+	// _client_file = client;
+	_server_file = server;
 	_is = NULL;
 	_os = NULL;
 	_is_closed = true;
@@ -110,15 +110,12 @@ void LocalDatagramSocket::BindSocket()
 {
 #ifdef _WIN32
 #else
-	memset(&_server, 0, sizeof(_server));
+	memset(&_client, 0, sizeof(_client));
+	_client.sun_family = AF_UNIX;
+	strncpy(_client.sun_path, _server_file.c_str(), 255);
+	unlink(_server_file.c_str());
 
-	_server.sun_family = AF_UNIX;
-
-	strncpy(_server.sun_path, _client_file.c_str(), 255);
-
-	unlink(_client_file.c_str());
-
-	if (bind(_fd, (const struct sockaddr *)&_server, sizeof(_server)) < 0) {
+	if (bind(_fd, (const struct sockaddr *)&_client, sizeof(_client)) < 0) {
 		throw SocketException("Bind datagram socket error");
 	}
 #endif
@@ -128,23 +125,18 @@ void LocalDatagramSocket::ConnectSocket()
 {
 #ifdef _WIN32
 #else
-	memset(&_client, 0, sizeof(struct sockaddr_un));
-
+	memset(&_client, 0, sizeof(_client));
 	_client.sun_family = AF_UNIX;
-
 	strncpy(_client.sun_path, _client_file.c_str(), 255);
-
 	unlink(_client_file.c_str());
 
-	if (::bind(_fd, (const struct sockaddr *)&_client, sizeof(struct sockaddr_un)) < 0) {
-		throw SocketException("Bind datagram socket error");
+	if(bind(_fd, (const struct sockaddr *)&_client, sizeof(_client)) < 0) {
+		throw SocketException("Connect datagram socket error");
 	}
 
-	memset(&_server, 0, sizeof(struct sockaddr_un));
-	
+	memset(&_server, 0, sizeof(_server));
 	_server.sun_family = AF_UNIX;
-	
-	strncpy(_server.sun_path, _server_file.c_str(), 255);
+	strcpy(_server.sun_path, _server_file.c_str());
 #endif
 }
 
@@ -340,8 +332,11 @@ void LocalDatagramSocket::Close()
 		}
 	}
 
-	unlink(_client_file.c_str());
-	unlink(_server_file.c_str());
+	if (_client_file != "") {
+		unlink(_client_file.c_str());
+	} else {
+		unlink(_server_file.c_str());
+	}
 #endif
 }
 

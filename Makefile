@@ -234,6 +234,7 @@ OBJS_jsocket = \
 		 jdatagramsocket6.o\
 		 jhttprequester.o\
 		 jinetaddress.o\
+		 jinetaddress4.o\
 		 jinetaddress6.o\
 		 jlocaldatagramsocket.o\
 		 jlocalserversocket.o\
