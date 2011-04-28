@@ -100,12 +100,10 @@ void LocalSocket::ConnectSocket()
 #ifdef _WIN32
 #else
 	_address.sun_family = AF_UNIX;
-	strncpy(_address.sun_path, _file.c_str(), 255);
+	strncpy(_address.sun_path, _file.c_str(), 108);
 	
 	int r,
-			address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, 255);
-
-	unlink(_file.c_str());
+			address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, 108);
 
 	if (_timeout > 0) {
 		int opt = 1;

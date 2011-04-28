@@ -24,6 +24,11 @@
 #include "jsocketstreamexception.h"
 #include "junknownhostexception.h"
 
+#ifdef _WIN32
+#else
+#include <sys/un.h>
+#endif
+
 namespace jsocket {
 
 LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server, int timeout_, int rbuf_, int wbuf_):
@@ -35,8 +40,8 @@ LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server,
 	throw jcommon::SocketException("Unamed socket unsupported.");
 #endif
 
-	_client_file = server;
-	_server_file = client;
+	_client_file = client;
+	_server_file = server;
 	_is = NULL;
 	_os = NULL;
 	_is_closed = true;
@@ -98,7 +103,7 @@ void LocalDatagramSocket::CreateSocket()
 {
 #ifdef _WIN32
 #else
-	_fd = ::socket(PF_INET, SOCK_DGRAM, 0); // IPPROTO_UDP);
+	_fd = ::socket(PF_UNIX, SOCK_DGRAM, 0); // IPPROTO_UDP);
 	
 	if (_fd < 0) {
 		throw SocketException("Create datagram socket error");
@@ -111,13 +116,18 @@ void LocalDatagramSocket::BindSocket()
 #ifdef _WIN32
 #else
 	memset(&_client, 0, sizeof(_client));
+	
 	_client.sun_family = AF_UNIX;
-	strncpy(_client.sun_path, _server_file.c_str(), 255);
+	strncpy(_client.sun_path, _server_file.c_str(), 108);
 	unlink(_server_file.c_str());
 
 	if (bind(_fd, (const struct sockaddr *)&_client, sizeof(_client)) < 0) {
 		throw SocketException("Bind datagram socket error");
 	}
+
+	memset(&_server, 0, sizeof(_server));
+	_server.sun_family = AF_UNIX;
+	strcpy(_server.sun_path, _server_file.c_str());
 #endif
 }
 
@@ -126,11 +136,12 @@ void LocalDatagramSocket::ConnectSocket()
 #ifdef _WIN32
 #else
 	memset(&_client, 0, sizeof(_client));
+	
 	_client.sun_family = AF_UNIX;
-	strncpy(_client.sun_path, _client_file.c_str(), 255);
+	strncpy(_client.sun_path, _client_file.c_str(), 108);
 	unlink(_client_file.c_str());
 
-	if(bind(_fd, (const struct sockaddr *)&_client, sizeof(_client)) < 0) {
+	if (bind(_fd, (const struct sockaddr *)&_client, sizeof(_client)) < 0) {
 		throw SocketException("Connect datagram socket error");
 	}
 
@@ -303,7 +314,7 @@ int LocalDatagramSocket::Send(const char *data_, int size_, bool block_)
 	}
 
 	if (n < 0) {
-	    if (errno == EAGAIN) {
+		if (errno == EAGAIN) {
 			if (block_ == false) {
 				throw SocketStreamException("Socket buffer is empty");
 			} else {

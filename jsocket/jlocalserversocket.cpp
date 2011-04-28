@@ -68,9 +68,9 @@ void LocalServerSocket::BindSocket()
 	unlink(_file.c_str());
 
 	_address.sun_family = AF_UNIX;
-	strncpy(_address.sun_path, _file.c_str(), 255);
+	strncpy(_address.sun_path, _file.c_str(), 108);
 	
-	int address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, 255);
+	int address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, 108);
 
 	if (bind(_fd, (struct sockaddr *) &_address, address_length) != 0) {
 		throw SocketException("Bind socket error");
@@ -105,12 +105,15 @@ LocalSocket * LocalServerSocket::Accept()
 #ifdef _WIN32
 	return NULL;
 #else 
-	sockaddr_un address;
+	struct sockaddr_un address;
 	socklen_t address_length;
 	int handler;
 	
+	address.sun_family = AF_UNIX;
+	strncpy(address.sun_path, _file.c_str(), 108);
+	
 	if ((handler = ::accept(_fd, (struct sockaddr *)&address, &address_length)) < 0) {
-		throw SocketException("Accept failed");
+		throw SocketException("Server Accept() exception");
 	}
 
 	return new LocalSocket(handler, _file);

@@ -17,10 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jlocalsocket.h"
+#include "jdatagramsocket.h"
 #include "jlocalserversocket.h"
-#include "jsocketexception.h"
+#include "jlocalsocket.h"
+#include "jlocaldatagramsocket.h"
 #include "junknownhostexception.h"
+#include "jsocketexception.h"
 #include "jthread.h"
 #include "jdate.h"
 #include "jsocketlib.h"
@@ -75,7 +77,7 @@ class ConnectionTest : public Thread {
 
 			InitClient();
 			
-			std::cout << " [ " << (jcommon::Date::CurrentTimeMicros()-t1) << " us ]" << std::endl;
+			std::cout << " [ " << (jcommon::Date::CurrentTimeMicros()-t1) << " us ]\n" << std::endl;
 		}
 
 		virtual void Run()
@@ -101,10 +103,32 @@ class iTCPTest : public ConnectionTest {
 
 		virtual void InitServer()
 		{
+			jsocket::ServerSocket server(12345);
+			jsocket::Socket *socket = server.Accept();
+
+			char buffer[2048];
+
+			while (socket->Receive(buffer, 1500) > 0) {
+			}
+
+			socket->Close();
+			delete socket;
+
+			server.Close();
 		}
 
 		virtual void InitClient()
 		{
+			jsocket::Socket socket("localhost", 12345);
+
+			char buffer[2048];
+			int i = 0;
+
+			while (i++ < 100000) {
+				socket.Send(buffer, 1500);
+			}
+
+			socket.Close();
 		}
 
 };
@@ -119,7 +143,6 @@ class lTCPTest : public ConnectionTest {
 		lTCPTest():
 			ConnectionTest("lTCP")
 		{
-			server = new LocalServerSocket("/tmp/ltcp.server");
 		}
 
 		virtual ~lTCPTest()
@@ -128,14 +151,27 @@ class lTCPTest : public ConnectionTest {
 
 		virtual void InitServer()
 		{
-			client = server->Accept();
+			jsocket::LocalServerSocket server("/tmp/ltcp.server");
+			jsocket::LocalSocket *socket = server.Accept();
 
-			Start();
+			char buffer[2048];
+
+			while (socket->Receive(buffer, 1500) > 0) {
+			}
 		}
 
 		virtual void InitClient()
 		{
+			jsocket::LocalSocket socket("/tmp/ltcp.server");
 
+			char buffer[2048];
+			int i = 0;
+
+			while (i++ < 100000) {
+				socket.Send(buffer, 1500);
+			}
+
+			socket.Close();
 		}
 
 };
@@ -156,10 +192,28 @@ class iUDPTest : public ConnectionTest {
 
 		virtual void InitServer()
 		{
+			jsocket::DatagramSocket server(54321);
+
+			char buffer[2048];
+
+			while (server.Receive(buffer, 1500) > 0) {
+			}
+
+			server.Close();
 		}
 
 		virtual void InitClient()
 		{
+			jsocket::DatagramSocket socket("localhost", 54321);
+
+			char buffer[2048];
+			int i = 0;
+
+			while (i++ < 100000) {
+				socket.Send(buffer, 1500);
+			}
+
+			socket.Close();
 		}
 
 };
@@ -180,25 +234,38 @@ class lUDPTest : public ConnectionTest {
 
 		virtual void InitServer()
 		{
+			jsocket::LocalDatagramSocket server("/tmp/ludp.server");
+
+			char buffer[2048];
+
+			while (server.Receive(buffer, 1500) > 0) {
+			}
+
+			server.Close();
 		}
 
 		virtual void InitClient()
 		{
+			jsocket::LocalDatagramSocket socket("/tmp/ludp.client", "/tmp/ludp.server");
+
+			char buffer[2048];
+			int i = 0;
+
+			while (i++ < 100000) {
+				socket.Send(buffer, 1500);
+			}
+
+			socket.Close();
 		}
 
 };
 
 int main()
 {
-	ConnectionTest *itcp = new iTCPTest(),
-								 *ltcp = new lTCPTest(),
-								 *iudp = new iUDPTest(),
-								 *ludp = new lUDPTest();
-
-	itcp->Init();
-	ltcp->Init();
-	iudp->Init();
-	ludp->Init();
+	(new lUDPTest())->Init();
+	(new iTCPTest())->Init();
+	(new lTCPTest())->Init();
+	(new iUDPTest())->Init();
 
 	return 0;
 }

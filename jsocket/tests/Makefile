@@ -60,7 +60,10 @@ OBJS_ssltelnet = \
 OBJS_interfaces = \
 		interfaces.o\
 
-all: proxy_udp opt_teste http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request sslclient sslserver ssltelnet lookup interfaces
+OBJS_localsocket = \
+		localsocket.o\
+
+all: proxy_udp opt_teste http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request sslclient sslserver ssltelnet lookup interfaces localsocket
 	
 proxy_udp: $(OBJS_proxy_udp)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -101,6 +104,9 @@ sslserver: $(OBJS_sslserver)
 ssltelnet: $(OBJS_ssltelnet)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+localsocket: $(OBJS_localsocket)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 interfaces: $(OBJS_interfaces)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
@@ -110,4 +116,4 @@ interfaces: $(OBJS_interfaces)
 install:
 
 clean:
-	@rm -rvf *.o *.exe *.dll *.lib *.a *~ proxy_udp opt_teste http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request lookup sslserver sslclient ssltelnet interfaces
+	@rm -rvf *.o *.exe *.dll *.lib *.a *~ proxy_udp opt_teste http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request lookup sslserver sslclient ssltelnet interfaces localsocket
