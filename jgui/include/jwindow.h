@@ -196,7 +196,7 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(Component *c, int x, int y, int width, int height);
+		virtual void Repaint(Component *c);
 
 		/**
 		 * \brief

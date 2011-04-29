@@ -572,7 +572,7 @@ void Window::Repaint(int x, int y, int width, int height)
 	Repaint(true);
 }
 
-void Window::Repaint(Component *c, int x, int y, int width, int height)
+void Window::Repaint(Component *c)
 {
 	if (_ignore_repaint == true) {
 		return;

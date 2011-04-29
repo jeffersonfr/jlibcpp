@@ -413,7 +413,7 @@ void Component::Repaint(bool all)
 
 	if (_parent != NULL) {
 		if (all == false && IsOpaque() == true && _parent->IsValid() == true) {
-			_parent->Repaint(this, _location.x, _location.y, _size.width, _size.height);
+			_parent->Repaint(this);
 		} else {
 			_parent->Repaint(true);
 		}

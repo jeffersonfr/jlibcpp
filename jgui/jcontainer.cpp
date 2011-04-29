@@ -344,7 +344,7 @@ void Container::Repaint(bool all)
 
 	if (_parent != NULL) {
 		if (all == false && IsOpaque() == true && _parent->IsValid() == true) {
-			_parent->Repaint(this, _location.x-_scroll.x, _location.y-_scroll.y, _size.width, _size.height);
+			_parent->Repaint(this);
 		} else {
 			InvalidateAll();
 
@@ -360,7 +360,7 @@ void Container::Repaint(int x, int y, int width, int height)
 	Repaint();
 }
 
-void Container::Repaint(Component *c, int x, int y, int width, int height)
+void Container::Repaint(Component *c)
 {
 	Invalidate();
 
@@ -369,7 +369,7 @@ void Container::Repaint(Component *c, int x, int y, int width, int height)
 	}
 
 	if (_parent != NULL) {
-		_parent->Repaint(this, _location.x-_scroll.x, _location.y-_scroll.y, _size.width, _size.height);
+		_parent->Repaint(this);
 	}
 }
 

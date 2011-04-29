@@ -246,7 +246,7 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(Component *c, int x, int y, int width, int height);
+		virtual void Repaint(Component *c);
 
 		/**
 		 * \brief
