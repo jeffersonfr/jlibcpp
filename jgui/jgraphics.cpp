@@ -191,12 +191,42 @@ void Graphics::SetNativeSurface(void *addr)
 	Unlock();
 }
 
-void Graphics::SetClip(int x, int y, int width, int height)
+jregion_t Graphics::ClipRect(int xp, int yp, int wp, int hp)
 {
-	_clip.x = (x < 0)?0:x;
-	_clip.y = (y < 0)?0:y;
-	_clip.width = (width < 0)?0:width;
-	_clip.height = (height < 0)?0:height;
+	jregion_t clip = GetClip();
+
+	int cx = xp,
+			cy = yp,
+			cw = wp,
+			ch = hp;
+
+	if (cx > clip.width) {
+		cx = clip.width;
+	}
+
+	if (cy > clip.height) {
+		cy = clip.height;
+	}
+
+	if (cw > (clip.width-cx)) {
+		cw = clip.width-cx;
+	}
+
+	if (ch > (clip.height-cy)) {
+		ch = clip.height-cy;
+	}
+
+	SetClip(cx, cy, cw, ch);
+
+	return clip;
+}
+
+void Graphics::SetClip(int xp, int yp, int wp, int hp)
+{
+	_clip.x = (xp < 0)?0:xp;
+	_clip.y = (yp < 0)?0:yp;
+	_clip.width = (wp < 0)?0:wp;
+	_clip.height = (hp < 0)?0:hp;
 
 #ifdef DIRECTFB_UI
 	if (surface != NULL) {

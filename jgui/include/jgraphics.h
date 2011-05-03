@@ -330,7 +330,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetClip(int x, int y, int width, int height);
+		virtual jregion_t ClipRect(int xp, int yp, int wp, int hp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetClip(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief

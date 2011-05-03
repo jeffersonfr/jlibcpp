@@ -20,6 +20,9 @@
 #include "jframe.h"
 #include "jbutton.h"
 #include "jlabel.h"
+#include "jsemaphore.h"
+#include "jthread.h"
+#include "jobservable.h"
 
 class ScreenLayer : public jgui::Window{
 
@@ -204,7 +207,7 @@ class VideoLayer : public ScreenLayer{
 		}
 };
 
-class GraphicLayer : public ScreenLayer{
+class GraphicLayer : public ScreenLayer, public jthread::Thread{
 
 	private:
 
@@ -218,6 +221,7 @@ class GraphicLayer : public ScreenLayer{
 		virtual ~GraphicLayer()
 		{
 		}
+
 };
 
 class LayersManager{
@@ -235,6 +239,8 @@ class LayersManager{
 			_background_layer = new BackgroundLayer();
 			_video_layer = new VideoLayer();
 			_graphic_layer = new GraphicLayer();
+			
+			dynamic_cast<GraphicLayer *>(_graphic_layer)->Start();
 
 			GetBackgroundLayer()->SetImage("images/background.png");
 		}
@@ -274,15 +280,16 @@ class Scene : public jgui::Container, public jgui::KeyListener{
 
 	private:
 		jthread::Mutex _input;
+		GraphicLayer *_layer;
 
 	public:
 		Scene(int x, int y, int width, int height):
 			jgui::Container(x, y, width, height)
 		{
-			ScreenLayer *layer = LayersManager::GetInstance()->GetGraphicLayer();
+			_layer = LayersManager::GetInstance()->GetGraphicLayer();
 
-			layer->RemoveAll();
-			layer->Add(this);
+			_layer->RemoveAll();
+			_layer->Add(this);
 			
 			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
 			SetBackgroundVisible(true);
@@ -387,14 +394,12 @@ LayersManager *LayersManager::_instance = NULL;
 
 int main(int argc, char **argv)
 {
-	if (argc < 2) {
-		std::cout << "use: " << argv[0] << " <video>" << std::endl;
+	LayersManager *manager = LayersManager::GetInstance();
 
-		return -1;
+	if (argc > 1) {
+		manager->GetVideoLayer()->SetFile(argv[1]);
+		manager->GetVideoLayer()->Play();
 	}
-
-	LayersManager::GetInstance()->GetVideoLayer()->SetFile(argv[1]);
-	LayersManager::GetInstance()->GetVideoLayer()->Play();
 
 	TestScene test;
 

@@ -153,7 +153,7 @@ bool Options::ExistsArgument(std::string key)
 std::string Options::GetArgument(std::string key)
 {
 	if (key.empty() == true) {
-		return false;
+		return "";
 	}
 
 	return _tags[key[0]];

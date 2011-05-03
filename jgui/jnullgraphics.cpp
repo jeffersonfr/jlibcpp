@@ -69,7 +69,21 @@ Image * NullGraphics::Create()
 	return NULL;
 }
 
-void NullGraphics::SetClip(int x, int y, int width, int height)
+jregion_t NullGraphics::ClipRect(int xp, int yp, int wp, int hp)
+{
+	JDEBUG(JINFO, "called\n");
+
+	jregion_t t;
+
+	t.x = 0;
+	t.y = 0;
+	t.width = 0;
+	t.height = 0;
+
+	return t;
+}
+
+void NullGraphics::SetClip(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 }
