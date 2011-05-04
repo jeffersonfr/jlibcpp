@@ -20,9 +20,10 @@
 #include "jsocket.h"
 #include "jsocketexception.h"
 #include "junknownhostexception.h"
-#include "jthread.h"
 #include "jstringtokenizer.h"
+#include "jthread.h"
 #include "jsocketlib.h"
+#include "jurl.h"
 
 #include <sstream>
 #include <iostream>
@@ -236,12 +237,12 @@ class HTTPRequest : public jthread::Thread {
 		}
 
 	public:
-		HTTPRequest(std::string host, int port)
+		HTTPRequest(jcommon::URL *url)
 		{
-			_host = host;
-			_port = port;
-			_resource = "";
-			_timeout = 0;
+			_host = url->GetHost();
+			_port = url->GetPort();
+			_resource = url->GetQuery();
+			_timeout = -1;
 			_code = -1;
 			_resource_size = 0;
 			_resource_data = NULL;
@@ -252,9 +253,8 @@ class HTTPRequest : public jthread::Thread {
 		{
 		}
 
-		void Send(std::string resource, int timeout)
+		void Connect(int timeout = 1000)
 		{
-			_resource = resource;
 			_timeout = timeout;
 			
 			if (IsRunning() == true) {
@@ -293,33 +293,40 @@ class HTTPRequest : public jthread::Thread {
 
 int main(int argc, char **argv)
 {
-	InitWindowsSocket();
-	
-	HTTPRequest r("127.0.0.1", 80);
+	std::string resource = "http://127.0.0.1";
 
-	if (argc != 2) {
-		return 0;
+	if (argc > 1) {
+		resource = std::string(argv[1]);
 	}
 
-	r.Send(argv[1], 10);
-	r.Wait();
+	jcommon::URL url(resource);
+
+	InitWindowsSocket();
+	
+	HTTPRequest request(&url);
+
+	request.Connect();
+	request.Wait();
 
 	char *data = NULL;
 	int size;
 
-	r.GetData(&data, &size);
+	request.GetData(&data, &size);
 
 	// if (data != NULL && r.GetResponseCode() == 200) {
 		int fd;
 
-		fd = open("/tmp/t.png", (int)(O_CREAT | O_RDWR));
+		fd = open(url.GetFile().c_str(), (int)(O_CREAT | O_RDWR));
 
 		if (fd <= 0) {
-			fd = open("/tmp/t.png", (int)(O_TRUNC | O_RDWR));
+			fd = open(url.GetFile().c_str(), (int)(O_TRUNC | O_RDWR));
 		}
 
 		write(fd, data, size);
 	//}
 
 	ReleaseWindowsSocket();
+
+	return 0;
 }
+

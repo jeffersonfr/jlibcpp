@@ -442,23 +442,25 @@ void Frame::MousePressed(MouseEvent *event)
 
 		if ((event->GetY() > _location.y && event->GetY() < (_location.y+_insets.top))) {
 			if (event->GetX() > _location.x) {
-				if (event->GetX() < (lwidth-gap*btn) && _move_enabled == true && _is_maximized == false) {
-					_default_cursor = GetCursor();
-					SetCursor(MOVE_CURSOR);
+				if (event->GetX() < (lwidth-gap*btn)) {
+					if (_move_enabled == true && _is_maximized == false) {
+						_default_cursor = GetCursor();
+						SetCursor(MOVE_CURSOR);
 
-					_mouse_state = 1; // move
-					_relative_mouse_x = event->GetX()-GetX();
-					_relative_mouse_y = event->GetY()-GetY();
-				} else if (event->GetX() < (lwidth-1*btn) && gap == 2) {
-					if (_resize_enabled == true) {
+						_mouse_state = 1; // move
+						_relative_mouse_x = event->GetX()-GetX();
+						_relative_mouse_y = event->GetY()-GetY();
+					}
+				} else if (event->GetX() < (lwidth-1*btn)) {
+					if (_resize_enabled == true && gap == 2) {
 						if (_is_maximized == true) {
 							Restore();
 						} else {
 							Maximize();
 						}
 					}
-				} else if (event->GetX() < (lwidth-0*btn) && (_frame_buttons & FB_CLOSE) != 0) {
-					if (_release_enabled == true) {
+				} else if (event->GetX() < (lwidth-0*btn)) {
+					if ((_frame_buttons & FB_CLOSE) != 0 && _release_enabled == true) {
 						Release();
 					}
 				} else if (event->GetX() > lwidth) {

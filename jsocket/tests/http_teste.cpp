@@ -25,6 +25,7 @@
 #include "jinputstream.h"
 #include "joutputstream.h"
 #include "jstringtokenizer.h"
+#include "jurl.h"
 
 #include <sstream>
 #include <iostream>
@@ -35,13 +36,13 @@
 using namespace jsocket;
 using namespace jio;
 
-void http_stream() 
+void http_stream(jcommon::URL url) 
 {
 	std::string buffer = "GET / HTTP/1.0\r\n\r\n";
 	std::string receive;
 
 	try {
-		Socket c("127.0.0.1", 80);
+		Socket c(url.GetHost(), url.GetPort());
 
 		InputStream *i = c.GetInputStream();
 		OutputStream *o = c.GetOutputStream();
@@ -78,13 +79,14 @@ void http_stream()
 	}
 }
 
-void http_raw() {
+void http_raw(jcommon::URL url) {
 	std::string buffer = "GET / HTTP/1.0\r\n\r\n";
+
 	char receive[4098];
 	int length;
 
 	try {
-		Socket c("127.0.0.1", 80);
+		Socket c(url.GetHost(), url.GetPort());
 
 		c.Send((char *)buffer.c_str(), buffer.size());
 
@@ -108,12 +110,21 @@ void http_raw() {
 	}
 }
 
-int main()
+int main(int argc, char **argv)
 {
+	std::string url = "http://127.0.0.1";
+
+	if (argc > 1) {
+		url = std::string(argv[1]);
+	}
+
 	InitWindowsSocket();
 
-	http_stream();
-	// http_raw();
+	http_stream(jcommon::URL(url));
+	// http_raw(jcommon::URL(url));
 
 	ReleaseWindowsSocket();
+
+	return 0;
 }
+
