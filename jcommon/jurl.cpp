@@ -62,6 +62,8 @@ URL::URL(std::string url_):
 	uint32_t port_index = _host.find(":");
 
 	if (port_index != std::string::npos) {
+		_host = _host.substr(0, port_index);
+
 		if (slash_index != std::string::npos && port_index < slash_index) {
 			_port = atoi(_path.substr(port_index+1, slash_index).c_str());
 		} else {
