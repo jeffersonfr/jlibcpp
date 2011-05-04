@@ -31,40 +31,36 @@ using namespace jsocket;
 
 int main(void)
 {
-	SSLServerSocket listener(5555);
-	SSLSocket *s;
+	SSLServerSocket server(5555);
+	SSLSocket *socket;
 	
 	// Load our certificate
-	listener.UseCertPassword("cert.pem", "cert_key.pem", "qwerty");
-	listener.UseDHFile("dh1024.pem");
+	server.UseCertPassword("cert.pem", "cert_key.pem", "qwerty");
+	server.UseDHFile("dh1024.pem");
 
 	while(true){
-		s = (SSLSocket *)listener.Accept();
+		socket = (SSLSocket *)server.Accept();
 		
 		// Receive message
 		char msg[256];
 		int r;
 
-		r = s->Receive(msg, 255);
+		r = socket->Receive(msg, 255);
 
 		if (r > 0) {
 			msg[r] = 0;
 
 			std::cout << "Received [" << r << "]: " << msg << std::endl;
 
-			s->Send("Hello Client!", 13);
+			socket->Send("Hello Client!", 13);
 		} else {
 			std::cout << "Erro no receive" << std::endl;
 		}
 
-		s->Close();
+		socket->Close();
 
-		delete s;
-
-		return 0;
-
-		delete s;
-		s = NULL;
+		delete socket;
+		socket = NULL;
 	}
 	
 	return 0;
