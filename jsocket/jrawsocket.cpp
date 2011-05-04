@@ -131,11 +131,7 @@ void RawSocket::InitStream(int rbuf_, int wbuf_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET RawSocket::GetHandler()
-#else
-int RawSocket::GetHandler()
-#endif
+jsocket_t RawSocket::GetHandler()
 {
 	return _fd;
 }

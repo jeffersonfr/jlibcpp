@@ -54,13 +54,8 @@ class Socket : public jsocket::Connection{
 	friend class ServerSocket; //Socket * ServerSocket::Accept();
 
    private:
-#ifdef _WIN32
 		/** \brief Socket handler. */
-		SOCKET _fd;
-#else
-		/** \brief Socket handler. */
-		int _fd;
-#endif
+		jsocket_t _fd;
 		/** \brief */
 		SocketInputStream *_is;
 		/** \brief */
@@ -107,11 +102,7 @@ class Socket : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-#ifdef _WIN32
-		Socket(SOCKET handler_, struct sockaddr_in server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-#else
-		Socket(int handler_, struct sockaddr_in server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-#endif
+		Socket(jsocket_t handler_, struct sockaddr_in server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 	
 	 public:
 		/**
@@ -144,11 +135,11 @@ class Socket : public jsocket::Connection{
 		 */
 		virtual ~Socket();
 
-#ifdef _WIN32
-		virtual SOCKET GetHandler();
-#else
-		virtual int GetHandler();
-#endif
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsocket_t GetHandler();
 
 		/**
 		 * \brief Send bytes to a destination.

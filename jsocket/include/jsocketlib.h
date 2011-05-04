@@ -20,6 +20,9 @@
 #ifndef J_SOCKLIB_H
 #define J_SOCKLIB_H
 
+#include <string>
+#include <vector>
+
 enum jaddress_family_t {
 	AIF_UNKNOWN,
 	AIF_INET,

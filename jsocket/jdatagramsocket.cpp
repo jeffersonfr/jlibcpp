@@ -335,11 +335,7 @@ void DatagramSocket::InitStream(int rbuf_, int wbuf_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET DatagramSocket::GetHandler()
-#else
-int DatagramSocket::GetHandler()
-#endif
+jsocket_t DatagramSocket::GetHandler()
 {
 	return _fd;
 }

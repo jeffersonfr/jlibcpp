@@ -53,12 +53,14 @@ enum jthread_policy_t {
 	POLICY_ROUND_ROBIN	// Round robin thread round robin
 };
 
-struct jthread_map_t {
 #ifdef _WIN32
-	HANDLE thread;
+typedef HANDLE jthread_t;
 #else
-	pthread_t thread;
+typedef pthread_t jthread_t;
 #endif
+
+struct jthread_map_t {
+	jthread_t thread;
 	bool alive;
 };
 
@@ -73,8 +75,6 @@ class Thread : public virtual jcommon::Object{
 
 	private:
 #ifdef _WIN32
-		/** \brief */
-		HANDLE _thread;
 		/** \brief */
 		DWORD _thread_id;
 		/** \brief */
@@ -91,10 +91,10 @@ class Thread : public virtual jcommon::Object{
 		DWORD _exitCode;
 #else
 		/** \brief */
-		pthread_t _thread;
-		/** \brief */
 		Condition _condition;
 #endif
+		/** \brief */
+		jthread_t _thread;
 		/** \brief */
 		std::map<int, jthread_map_t *> _threads;
 		/** \brief */
@@ -106,7 +106,7 @@ class Thread : public virtual jcommon::Object{
 		/** \brief */
 		jthread_type_t _type;
 		/** \brief */
-		int _key;
+		int _id;
 		/** \brief */
 		bool _is_running;
 
@@ -124,7 +124,7 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Notify the end of thread.
 		 *
 		 */
-		jthread_map_t * GetMap(int key);
+		jthread_map_t * GetMap(int id);
 
 	protected:
 		/**
@@ -192,7 +192,13 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Get thread identifier
 		 *
 		 */
-		int GetKey();
+		jthread_t GetHandler();
+
+		/**
+		 * \brief Get thread identifier
+		 *
+		 */
+		int GetID();
 
 		/**
 		 * \brief 
@@ -204,31 +210,31 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Init the thread.
 		 *
 		 */
-		void Start(int key = 0);
+		void Start(int id = 0);
 
 		/**
 		 * \brief Interrupt the thread.
 		 *
 		 */
-		bool Interrupt(int key = 0);
+		bool Interrupt(int id = 0);
 
 		/**
 		 * \brief Suspend the thread.
 		 *
 		 */
-		void Suspend(int key = 0);
+		void Suspend(int id = 0);
 
 		/**
 		 * \brief Resume the thread.
 		 *
 		 */
-		void Resume(int key = 0);
+		void Resume(int id = 0);
 
 		/**
 		 * \brief Return true if thread is started, false if not.
 		 *
 		 */
-		bool IsRunning(int key = 0);
+		bool IsRunning(int id = 0);
 
 		/**
 		 * \bried
@@ -252,7 +258,7 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Wait for end of thread.
 		 *
 		 */
-		void WaitThread(int key = 0);
+		void WaitThread(int id = 0);
 
 		/**
 		 * \brief Wait for end of thread.

@@ -217,7 +217,7 @@ SSLSocket::~SSLSocket()
 
 /** Private */
 
-SSLSocket::SSLSocket(int handler_, sockaddr_in server_, int keysize, int timeout_, int rbuf_, int wbuf_):
+SSLSocket::SSLSocket(jsocket_t handler_, sockaddr_in server_, int keysize, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket");
@@ -541,11 +541,7 @@ void SSLSocket::InitStreams(int rbuf_, int wbuf_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET SSLSocket::GetHandler()
-#else
-int SSLSocket::GetHandler()
-#endif
+jsocket_t SSLSocket::GetHandler()
 {
 	return _fd;
 }

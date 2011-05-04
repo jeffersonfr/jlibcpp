@@ -20,6 +20,7 @@
 #ifndef J_SERVERSOCKET6_H
 #define J_SERVERSOCKET6_H
 
+#include "jconnection.h"
 #include "jinetaddress.h"
 
 #ifdef _WIN32
@@ -43,13 +44,8 @@ class Socket6;
 class ServerSocket6 : public virtual jcommon::Object{
 
 	private:
-#ifdef _WIN32
 		/** \brief Socket handler. */
-		SOCKET _fd;
-#else
-		/** \brief Socket handler. */
-		int _fd;
-#endif
+		jsocket_t _fd;
 		/** \brief Local socket. */
 		struct sockaddr_in6 _lsock;
 		/** \brief Remote socket. */

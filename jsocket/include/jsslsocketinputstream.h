@@ -51,14 +51,12 @@ class SSLSocketInputStream : public jio::InputStream{
 
     private:
 #ifdef _WIN32
-			/** \brief */
-			SOCKET _fd;
 #else
 			/** \brief */
 			SSL *_ssl;
-			/** \brief */
-			int _fd;
 #endif
+			/** \brief */
+			jsocket_t _fd;
 			/** \brief */
 			Connection *_connection;
 			/** \brief */

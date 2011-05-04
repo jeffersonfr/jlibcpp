@@ -108,7 +108,12 @@ void Thread::USleep(uint64_t time_)
 #endif
 }
 
-int Thread::GetKey()
+jthread_t Thread::GetHandler()
+{
+	return _thread;
+}
+
+int Thread::GetID()
 {
 	AutoLock lock(&jthread_mutex);
 
@@ -195,10 +200,10 @@ void * Thread::ThreadMain(void *owner_)
 	return 0;
 }
 
-jthread_map_t * Thread::GetMap(int key)
+jthread_map_t * Thread::GetMap(int id)
 {
 	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
-		if (key == i->first) {
+		if (id == i->first) {
 			return i->second;
 		}
 	}
@@ -231,16 +236,16 @@ int Thread::CleanUp()
 
 /** End */
 
-void Thread::Start(int key)
+void Thread::Start(int id)
 {
 	AutoLock lock(&jthread_mutex);
 
-	jthread_map_t *t = GetMap(key);
+	jthread_map_t *t = GetMap(id);
 
 	if ((void *)t == NULL) {
 		t = new jthread_map_t;
 	
-		_threads[key] = t;
+		_threads[id] = t;
 	}
 
 	t->thread = 0;
@@ -279,15 +284,15 @@ void Thread::Start(int key)
 #endif
 }
 
-bool Thread::Interrupt(int key)
+bool Thread::Interrupt(int id)
 {
 	AutoLock lock(&jthread_mutex);
 
-	if (IsRunning(key) == false) {
+	if (IsRunning(id) == false) {
 		return true;
 	}
 
-	jthread_map_t *t = GetMap(key);
+	jthread_map_t *t = GetMap(id);
 
 	t->alive = false;
 
@@ -334,15 +339,15 @@ bool Thread::Interrupt(int key)
 	return true;
 }
 
-void Thread::Suspend(int key) 
+void Thread::Suspend(int id) 
 {
 	AutoLock lock(&jthread_mutex);
 
-	if (IsRunning(key) == false) {
+	if (IsRunning(id) == false) {
 		return;
 	}
 
-	jthread_map_t *t = GetMap(key);
+	jthread_map_t *t = GetMap(id);
 
 	t->alive = false;
 
@@ -353,19 +358,19 @@ void Thread::Suspend(int key)
 		throw ThreadException("Suspend thead failed");
 	}
 #else
-	Interrupt(key);
+	Interrupt(id);
 #endif
 }
 
-void Thread::Resume(int key)
+void Thread::Resume(int id)
 {
 	AutoLock lock(&jthread_mutex);
 
-	if (IsRunning(key) == false) {
+	if (IsRunning(id) == false) {
 		return;
 	}
 
-	jthread_map_t *t = GetMap(key);
+	jthread_map_t *t = GetMap(id);
 
 #ifdef _WIN32
 	HANDLE thread = t->thread;
@@ -380,11 +385,11 @@ void Thread::Resume(int key)
 #endif
 }
 
-bool Thread::IsRunning(int key)
+bool Thread::IsRunning(int id)
 {
 	AutoLock lock(&jthread_mutex);
 
-	jthread_map_t *t = GetMap(key);
+	jthread_map_t *t = GetMap(id);
 
 	if (t != NULL) {
 		return t->alive;
@@ -558,9 +563,9 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 #endif
 }
 
-void Thread::WaitThread(int key)
+void Thread::WaitThread(int id)
 {
-	if (IsRunning(key) == false) {
+	if (IsRunning(id) == false) {
 		return;
 	}
 
@@ -568,7 +573,7 @@ void Thread::WaitThread(int key)
 		return;
 	}
 
-	jthread_map_t *t = GetMap(key);
+	jthread_map_t *t = GetMap(id);
 
 #ifdef _WIN32
 	HANDLE thread = t->thread;
@@ -578,7 +583,7 @@ void Thread::WaitThread(int key)
 	}
 #else
 	/*
-	while (IsRunning(key) == true) {
+	while (IsRunning(id) == true) {
 		_condition.Wait();
 	}
 	*/

@@ -122,11 +122,7 @@ void MulticastSocket6::InitStream(int rbuf_, int wbuf_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET MulticastSocket6::GetHandler()
-#else
-int MulticastSocket6::GetHandler()
-#endif
+jsocket_t MulticastSocket6::GetHandler()
 {
 	return _fdr;
 }

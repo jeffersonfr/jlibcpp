@@ -87,11 +87,7 @@ void LocalServerSocket::ListenSocket(int backlog_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET LocalServerSocket::GetHandler()
-#else
-int LocalServerSocket::GetHandler()
-#endif
+jsocket_t LocalServerSocket::GetHandler()
 {
 #ifdef _WIN32
 	return -1;

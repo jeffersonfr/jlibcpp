@@ -44,41 +44,36 @@ class SSLSocket;
  */
 class SSLServerSocket : public virtual jcommon::Object{
 
-    private:
-#ifdef _WIN32
-        /** \brief Socket handler. */
-		SOCKET _fd;
-#else
-        /** \brief Socket handler. */
-        int _fd;
-#endif
-        /** \brief Local socket. */
-        sockaddr_in _lsock;
-        /** \brief Remote socket. */
-        sockaddr_in _rsock;
-        /** \brief */
-        InetAddress *_local;
-        /** \brief */
+	private:
+		/** \brief Socket handler. */
+		jsocket_t _fd;
+		/** \brief Local socket. */
+		sockaddr_in _lsock;
+		/** \brief Remote socket. */
+		sockaddr_in _rsock;
+		/** \brief */
+		InetAddress *_local;
+		/** \brief */
 		bool _is_closed;
-        
-        /**
-        * \brief
-        *
-        */
-        void CreateSocket();
-        
-        /**
-        * \brief
-        *
-        */
-        void BindSocket(InetAddress *, int);
-        
-        /**
-        * \brief
-        *
-        */
-        void ListenSocket(int);
-        
+
+		/**
+		 * \brief
+		 *
+		 */
+		void CreateSocket();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void BindSocket(InetAddress *, int);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void ListenSocket(int);
+
 		/**
 		 * Create new CTX if none is available
 		 *
@@ -114,7 +109,7 @@ class SSLServerSocket : public virtual jcommon::Object{
 		 *
 		 */
 		bool UseCertCallback(const char *cert_file, const char *private_key_file, int passwd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata);
-		
+
 		/** \brief SSL data */
 		SSL_CTX *ctx;
 		/** \brief SSL data */
@@ -126,49 +121,49 @@ class SSLServerSocket : public virtual jcommon::Object{
 		/** \brief userdata */
 		char *ud;
 
-    public:
-        /**
-        * \brief Constructor.
-        *
-        */
-        SSLServerSocket(int port, int backlog = 5, int keysize = RSA_KEYSIZE, InetAddress * = NULL);
-        
-        /**
-        * \brief Destructor virtual.
-        *
-        */
-        virtual ~SSLServerSocket();
-        
-        /**
-        * \brief Accept a new socket.
-        *
-        */
-        SSLSocket * Accept();
-        
-        /**
-        * \brief
-        *
-        */
-        InetAddress * GetInetAddress();
-        
-        /**
-        * \brief Get the local port.
-        *
-        */
-        int GetLocalPort();
-        
-        /**
-        * \brief Close the server socket.
-        *
-        */
-        void Close();
-    
+	public:
+		/**
+		 * \brief Constructor.
+		 *
+		 */
+		SSLServerSocket(int port, int backlog = 5, int keysize = RSA_KEYSIZE, InetAddress * = NULL);
+
+		/**
+		 * \brief Destructor virtual.
+		 *
+		 */
+		virtual ~SSLServerSocket();
+
+		/**
+		 * \brief Accept a new socket.
+		 *
+		 */
+		SSLSocket * Accept();
+
+		/**
+		 * \brief
+		 *
+		 */
+		InetAddress * GetInetAddress();
+
+		/**
+		 * \brief Get the local port.
+		 *
+		 */
+		int GetLocalPort();
+
+		/**
+		 * \brief Close the server socket.
+		 *
+		 */
+		void Close();
+
 		/**
 		 *  Create temp cert if no other is loaded
 		 *
 		 */
 		bool UseCertPassword(const char *cert_file, const char *private_key_file, std::string password);
-		
+
 		/**
 		 *  Create temp cert if no other is loaded
 		 *

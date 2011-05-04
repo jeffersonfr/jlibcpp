@@ -137,11 +137,7 @@ Socket::~Socket()
 
 /** Private */
 
-#ifdef _WIN32
-Socket::Socket(SOCKET handler_, struct sockaddr_in server_, int timeout_, int rbuf_, int wbuf_):
-#else
-Socket::Socket(int handler_, struct sockaddr_in server_, int timeout_, int rbuf_, int wbuf_):
-#endif
+Socket::Socket(jsocket_t handler_, struct sockaddr_in server_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
@@ -367,11 +363,7 @@ void Socket::InitStreams(int64_t rbuf_, int64_t wbuf_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET Socket::GetHandler()
-#else
-int Socket::GetHandler()
-#endif
+jsocket_t Socket::GetHandler()
 {
 	return _fd;
 }

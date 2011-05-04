@@ -44,13 +44,8 @@ class SSLSocket6;
 class SSLServerSocket6 : public virtual jcommon::Object{
 
 	private:
-#ifdef _WIN32
 		/** \brief Socket handler. */
-		SOCKET _fd;
-#else
-		/** \brief Socket handler. */
-		int _fd;
-#endif
+		jsocket_t _fd;
 		/** \brief Local socket. */
 		sockaddr_in6 _lsock;
 		/** \brief Remote socket. */

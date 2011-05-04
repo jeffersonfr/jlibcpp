@@ -93,11 +93,7 @@ class LocalServerSocket : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-#ifdef _WIN32
-		virtual SOCKET GetHandler();
-#else
-		virtual int GetHandler();
-#endif
+		virtual jsocket_t GetHandler();
 
 		/**
 		 * \brief Get the local port.

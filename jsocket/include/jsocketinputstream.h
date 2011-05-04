@@ -45,13 +45,8 @@ namespace jsocket {
 class SocketInputStream : public jio::InputStream{
 
     private:
-#ifdef _WIN32
 			/** \brief */
-			SOCKET _fd;
-#else
-			/** \brief */
-			int _fd;
-#endif
+			jsocket_t _fd;
 			/** \brief */
 			Connection *_connection;
 			/** \brief */

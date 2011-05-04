@@ -217,7 +217,7 @@ SSLSocket6::~SSLSocket6()
 
 /** Private */
 
-SSLSocket6::SSLSocket6(int handler_, struct sockaddr_in6 server_, int keysize, int timeout_, int rbuf_, int wbuf_):
+SSLSocket6::SSLSocket6(jsocket_t handler_, struct sockaddr_in6 server_, int keysize, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
@@ -535,11 +535,7 @@ void SSLSocket6::InitStreams(int rbuf_, int wbuf_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET SSLSocket6::GetHandler()
-#else
-int SSLSocket6::GetHandler()
-#endif
+jsocket_t SSLSocket6::GetHandler()
 {
 	return _fd;
 }

@@ -201,11 +201,7 @@ void ConnectionPipe::Close()
 	_is_closed = true;
 }
 
-#ifdef _WIN32
-SOCKET ConnectionPipe::GetHandler()
-#else
-int ConnectionPipe::GetHandler()
-#endif
+jsocket_t ConnectionPipe::GetHandler()
 {
 	return _connection->GetHandler();
 }

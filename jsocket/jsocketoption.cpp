@@ -23,11 +23,7 @@
 
 namespace jsocket {
 
-#ifdef _WIN32
-SocketOption::SocketOption(SOCKET fd_, jconnection_type_t type_):
-#else
-SocketOption::SocketOption(int fd_, jconnection_type_t type_):
-#endif
+SocketOption::SocketOption(jsocket_t fd_, jconnection_type_t type_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jsocket::SocketOption");

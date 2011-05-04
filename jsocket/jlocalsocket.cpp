@@ -70,7 +70,7 @@ LocalSocket::~LocalSocket()
 
 /** Private */
 
-LocalSocket::LocalSocket(int handler_, std::string file_, int timeout_, int rbuf_, int wbuf_):
+LocalSocket::LocalSocket(jsocket_t handler_, std::string file_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
@@ -182,11 +182,7 @@ void LocalSocket::InitStreams(int64_t rbuf_, int64_t wbuf_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET LocalSocket::GetHandler()
-#else
-int LocalSocket::GetHandler()
-#endif
+jsocket_t LocalSocket::GetHandler()
 {
 #ifdef _WIN32
 	return -1;

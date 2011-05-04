@@ -82,13 +82,8 @@ class SocketOption : public virtual jcommon::Object{
 	friend class LocalDatagramSocket;
 
 	private:
-#ifdef _WIN32
 		/** \brief Socket handler. */
-		SOCKET _fd;
-#else
-		/** \brief Socket handler. */
-		int _fd;
-#endif
+		jsocket_t _fd;
 		/** \brief Type of socket */
 		jconnection_type_t _type;
 
@@ -96,11 +91,7 @@ class SocketOption : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-#ifdef _WIN32
-		SocketOption(SOCKET fd_, jconnection_type_t type_);
-#else
-		SocketOption(int fd_, jconnection_type_t type_);
-#endif
+		SocketOption(jsocket_t fd_, jconnection_type_t type_);
 
 	public:
 		/**

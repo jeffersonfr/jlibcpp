@@ -51,11 +51,7 @@ class DatagramSocket : public jsocket::Connection{
 		static int _used_port;
 
 		/** \brief Socket handler. */
-#ifdef _WIN32
-		SOCKET _fd;
-#else
-		int _fd;
-#endif
+		jsocket_t _fd;
 		/** \brief Local socket. */
 		struct sockaddr_in _lsock;
 		/** \brief Server socket UDP. */
@@ -120,11 +116,11 @@ class DatagramSocket : public jsocket::Connection{
 		 */
 		virtual ~DatagramSocket();
 
-#ifdef _WIN32
-		virtual SOCKET GetHandler();
-#else
-		virtual int GetHandler();
-#endif
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual jsocket_t GetHandler();
 
 		/**
 		 * \brief 

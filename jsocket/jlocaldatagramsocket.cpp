@@ -159,11 +159,7 @@ void LocalDatagramSocket::InitStream(int rbuf_, int wbuf_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET LocalDatagramSocket::GetHandler()
-#else
-int LocalDatagramSocket::GetHandler()
-#endif
+jsocket_t LocalDatagramSocket::GetHandler()
 {
 #ifdef _WIN32
 	return -1;

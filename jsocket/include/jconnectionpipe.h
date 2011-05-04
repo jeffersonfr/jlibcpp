@@ -54,146 +54,142 @@ enum jconnection_pipe_t {
  */
 class ConnectionPipe : public jsocket::Connection, public jthread::Thread{
 
-    private:
-        /** \brief Use to bind the socket in a free port. */
-        static int _used_port;
+	private:
+		/** \brief Use to bind the socket in a free port. */
+		static int _used_port;
 
 #ifdef _WIN32
-        /** \brief */
+		/** \brief */
 		HANDLE *_pipe;
-        /** \brief */
+		/** \brief */
 		HANDLE _thread;
-        /** \brief */
+		/** \brief */
 		DWORD _thread_id;
-        /** \brief */
+		/** \brief */
 		DWORD _stackSize;
-        /** \brief */
+		/** \brief */
 		DWORD _executeFlag;
-        /** \brief */
+		/** \brief */
 		LPTHREAD_START_ROUTINE _threadFunction;
-        /** \brief */
+		/** \brief */
 		LPVOID _threadArgument;
-        /** \brief */
+		/** \brief */
 		LPSECURITY_ATTRIBUTES _sa;
 #else
-        /** \brief */
+		/** \brief */
 		int _pipe[2];
-        /** \brief */
+		/** \brief */
 		pthread_t _thread;
 #endif
 		/** \brief */
 		Connection *_connection;
-        /** \brief */
+		/** \brief */
 		bool _stream;
-        /** \brief */
+		/** \brief */
 		int _timeout;
-        /** \brief */
-		jconnection_pipe_t _pipe_type;
-        /** \brief */
+		/** \brief */
 		bool _is_running;
-        /** \brief */
+		/** \brief */
 		int _current_send;
-        /** \brief */
+		/** \brief */
 		int _sent_bytes;
-        /** \brief */
+		/** \brief */
 		int _receive_bytes;
-        /** \brief */
+		/** \brief */
 		int _size_pipe;
+		/** \brief */
+		jconnection_pipe_t _pipe_type;
 
-        /**
-        * \brief Create a new socket.
-        *
-        */
+		/**
+		 * \brief Create a new socket.
+		 *
+		 */
 		void main_pipe_receiver();
 
-        /**
-        * \brief Create a new socket.
-        *
-        */
+		/**
+		 * \brief Create a new socket.
+		 *
+		 */
 		void main_pipe_sender();
-	
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        ConnectionPipe(Connection *conn, jconnection_pipe_t type_, int size_pipe_ = 4096, int timeout_ = 0, bool stream_ = false);
-        
-        /**
-        * \brief Destructor virtual.
-        *
-        */
-        virtual ~ConnectionPipe();
-		
+
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ConnectionPipe(Connection *conn, jconnection_pipe_t type_, int size_pipe_ = 4096, int timeout_ = 0, bool stream_ = false);
+
+		/**
+		 * \brief Destructor virtual.
+		 *
+		 */
+		virtual ~ConnectionPipe();
+
 		/**
 		 * \brief
 		 *
 		 */
 		bool IsRunning();
-		
-        /**
-        * \brief Read data from a source.
-        *
-        */
-        int Receive(char *data_, int size_, bool block_ = true);
-        
-        /**
-        * \brief Read data from a source.
-        *
-        */
-        int Receive(char *data_, int size_, int time_);
-        
+
 		/**
-        * \brief Write data to a source.
-        *
-        */
-        int Send(const char *data_, int size_, bool block_ = true);
-        
-        /**
-        * \brief Write data to a source.
-        *
-        */
-        int Send(const char *data_, int size_, int time_);
-        
-        /**
-        * \brief Close the socket. The pipe would be interrupted before closed.
-        *
-        */
-        void Close();
- 
- 		/**
+		 * \brief Read data from a source.
+		 *
+		 */
+		int Receive(char *data_, int size_, bool block_ = true);
+
+		/**
+		 * \brief Read data from a source.
+		 *
+		 */
+		int Receive(char *data_, int size_, int time_);
+
+		/**
+		 * \brief Write data to a source.
+		 *
+		 */
+		int Send(const char *data_, int size_, bool block_ = true);
+
+		/**
+		 * \brief Write data to a source.
+		 *
+		 */
+		int Send(const char *data_, int size_, int time_);
+
+		/**
+		 * \brief Close the socket. The pipe would be interrupted before closed.
+		 *
+		 */
+		void Close();
+
+		/**
 		 * \brief
 		 *
 		 */		
-#ifdef _WIN32
-		virtual SOCKET GetHandler();
-#else
-		virtual int GetHandler();
-#endif
-        
-        /**
-        * \brief
-        *
-        */
-        virtual jio::InputStream * GetInputStream();
-        
-        /**
-        * \brief
-        *
-        */
-        virtual jio::OutputStream * GetOutputStream();
-        
-        /**
-        * \brief Get sent bytes to destination.
-        *
-        */
-        int64_t GetSentBytes();
-        
-        /**
-        * \brief Get received bytes from a source.
-        *
-        */
-        int64_t GetReadedBytes();
+		virtual jsocket_t GetHandler();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jio::InputStream * GetInputStream();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jio::OutputStream * GetOutputStream();
+
+		/**
+		 * \brief Get sent bytes to destination.
+		 *
+		 */
+		int64_t GetSentBytes();
+
+		/**
+		 * \brief Get received bytes from a source.
+		 *
+		 */
+		int64_t GetReadedBytes();
 
 		/**
 		 * \brief

@@ -336,11 +336,7 @@ void DatagramSocket6::InitStream(int rbuf_, int wbuf_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET DatagramSocket6::GetHandler()
-#else
-int DatagramSocket6::GetHandler()
-#endif
+jsocket_t DatagramSocket6::GetHandler()
 {
 	return _fd;
 }

@@ -133,11 +133,7 @@ class RawSocket : public jsocket::Connection{
 		static int _used_port;
 
 		/** \brief Socket handler. */
-#ifdef _WIN32
-		SOCKET _fd;
-#else
-		int _fd;
-#endif
+		jsocket_t _fd;
 		/** \brief Local socket. */
 		sockaddr_in _lsock;
 		/** \brief Server socket UDP. */
@@ -212,11 +208,7 @@ class RawSocket : public jsocket::Connection{
 		 * \brief 
 		 *
 		 */
-#ifdef _WIN32
-		virtual SOCKET GetHandler();
-#else
-		virtual int GetHandler();
-#endif
+		virtual jsocket_t GetHandler();
 
 		/**
 		 * \brief Read data from a source.

@@ -57,13 +57,8 @@ class MulticastSocket : public jsocket::Connection{
 		/** \brief Use to bind the socket in a free port */
 		static int _used_port;
         
-#ifdef _WIN32
 		/** \brief Socket handler. */
-		SOCKET _fds, _fdr;
-#else
-		/** \brief Descriptor */
-		int _fds, _fdr;
-#endif
+		jsocket_t _fds, _fdr;
 		/** \brief Local socket */
 		struct sockaddr_in _sock_s, _sock_r;
 		/** \brief Input stream */
@@ -114,11 +109,11 @@ class MulticastSocket : public jsocket::Connection{
 		 */
 		virtual ~MulticastSocket();
 
-#ifdef _WIN32
-		virtual SOCKET GetHandler();
-#else
-		virtual int GetHandler();
-#endif
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsocket_t GetHandler();
  
 		/**
 		 * \brief

@@ -137,11 +137,7 @@ Socket6::~Socket6()
 
 /** Private */
 
-#ifdef _WIN32
-Socket6::Socket6(SOCKET handler_, struct sockaddr_in6 server_, int timeout_, int rbuf_, int wbuf_):
-#else
-Socket6::Socket6(int handler_, struct sockaddr_in6 server_, int timeout_, int rbuf_, int wbuf_):
-#endif
+Socket6::Socket6(jsocket_t handler_, struct sockaddr_in6 server_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(TCP_SOCKET)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
@@ -361,11 +357,7 @@ void Socket6::InitStreams(int64_t rbuf_, int64_t wbuf_)
 
 /** End */
 
-#ifdef _WIN32
-SOCKET Socket6::GetHandler()
-#else
-int Socket6::GetHandler()
-#endif
+jsocket_t Socket6::GetHandler()
 {
 	return _fd;
 }

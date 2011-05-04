@@ -117,11 +117,7 @@ class LocalDatagramSocket : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-#ifdef _WIN32
-		virtual SOCKET GetHandler();
-#else
-		virtual int GetHandler();
-#endif
+		virtual jsocket_t GetHandler();
 
 		/**
 		 * \brief 

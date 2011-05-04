@@ -50,11 +50,8 @@ namespace jsocket {
 class SSLSocketOutputStream : public jio::OutputStream{
 
     private:
-#ifdef _WIN32
-			SOCKET _fd;
-#else
-			int _fd;
-#endif
+			/** \brief */
+			jsocket_t _fd;
 			/** \brief */
 			Connection *_connection;
 			/** \brief */

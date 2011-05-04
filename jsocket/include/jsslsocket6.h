@@ -74,13 +74,8 @@ class SSLSocket6 : public jsocket::Connection{
 	friend class SSLServerSocket6; //Socket * ServerSocket::Accept();
 
 	private:
-#ifdef _WIN32
 		/** \brief Socket handler. */
-		SOCKET _fd;
-#else
-		/** \brief Socket handler. */
-		int _fd;
-#endif
+		jsocket_t _fd;
 		/** \brief */
 		SSLSocketInputStream *_is;
 		/** \brief */
@@ -196,11 +191,7 @@ class SSLSocket6 : public jsocket::Connection{
 		 */
 		virtual ~SSLSocket6();
 
-#ifdef _WIN32
-		virtual SOCKET GetHandler();
-#else
-		virtual int GetHandler();
-#endif
+		virtual jsocket_t GetHandler();
 
 		/**
 		 * \brief Send bytes to a destination.
