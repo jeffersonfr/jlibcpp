@@ -35,6 +35,9 @@ ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
 
 	_menu = new Menu(_location.x, _location.y+_size.height+4, _size.width, visible_items);
 
+	InputManager::GetInstance()->RemoveKeyListener(_menu);
+	InputManager::GetInstance()->RemoveMouseListener(_menu);
+	
 	_menu->SetLoop(false);
 	_menu->SetCurrentIndex(0);
 	_menu->RegisterSelectListener(this);
@@ -61,7 +64,6 @@ void ComboBox::SetVisibleItems(int max_items)
 
 bool ComboBox::ProcessEvent(MouseEvent *event)
 {
-	return true;
 	if (Component::ProcessEvent(event) == true) {
 		return true;
 	}
@@ -87,6 +89,9 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 
 		if (x1 > (_location.x+x+w-arrow_size-2) && x1 < (_location.x+x+w-2) && y1 > (_location.y+y) && y1 < (_location.y+y+h)) {
 			if (_parent != NULL) {
+				InputManager::GetInstance()->RegisterKeyListener(_menu);
+				InputManager::GetInstance()->RegisterMouseListener(_menu);
+
 				_menu->Show();
 			}
 		}
@@ -99,7 +104,6 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 
 bool ComboBox::ProcessEvent(KeyEvent *event)
 {
-	return true;
 	if (event->GetType() != JKEY_PRESSED) {
 		return true;
 	}
@@ -118,6 +122,9 @@ bool ComboBox::ProcessEvent(KeyEvent *event)
 
 	if (action == JKEY_ENTER) {
 		if (_parent != NULL) {
+			InputManager::GetInstance()->RegisterKeyListener(_menu);
+			InputManager::GetInstance()->RegisterMouseListener(_menu);
+
 			_menu->Show();
 		}
 	
