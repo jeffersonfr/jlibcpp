@@ -90,25 +90,25 @@ Color & Cell::GetCellForegroundColor()
 void Cell::SetCellBackgroundColor(const Color &color)
 {
 	_cell_bgcolor = color;
+	
+	_table->Repaint();
 }
 
 void Cell::SetCellForegroundColor(const Color &color)
 {
 	_cell_fgcolor = color;
+	
+	_table->Repaint();
 }
 
 void Cell::SetCellBackgroundColor(int red, int green, int blue, int alpha)
 {
-	_cell_bgcolor = Color(red, green, blue, alpha);
-	
-	_table->Repaint();
+	SetCellBackgroundColor(Color(red, green, blue, alpha));
 }
 
 void Cell::SetCellForegroundColor(int red, int green, int blue, int alpha)
 {
-	_cell_fgcolor = Color(red, green, blue, alpha);
-	
-	_table->Repaint();
+	SetCellForegroundColor(Color(red, green, blue, alpha));
 }
 
 Table::Table(int x, int y, int width, int height):

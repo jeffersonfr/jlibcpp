@@ -26,10 +26,25 @@
 
 class ColorChooser : public jgui::Component {
 
+	private:
+		jgui::Image *_image;
+
 	public:
 		ColorChooser(int x, int y, int width, int height):
 			jgui::Component(x, y, width, height)
 		{
+			int border = std::min(GetWidth(), GetHeight()),
+					cx = border / 2 + 1,
+					cy = border / 2 + 1;
+			double border2 = border / 2;
+
+			_image = jgui::Image::CreateImage(GetWidth(), GetHeight());
+
+			for (double i = 0; i<360.; i+=.15) {
+				for (double j = 0; j<border2; j++) {
+					_image->GetGraphics()->SetPixel((int)(cx - cos(M_PI * i / 180.0)*j), (int)(cy - sin(M_PI * i / 180.0)*j), HLS2RGB(i, 0.5, j/border2));
+				}
+			}
 		}
 
 		virtual ~ColorChooser()
@@ -96,36 +111,19 @@ class ColorChooser : public jgui::Component {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			int border = std::min(GetWidth(), GetHeight()),
-					cx = border / 2 + 1,
-					cy = border / 2 + 1,
-					dx = (GetWidth() - border) / 2,
-					dy = (GetHeight() - border) / 2;
-			double border2 = border / 2;
+			jgui::Component::Paint(g);
 
-			for (double i = 0; i<360.; i+=.15) {
-				for (double j = 0; j<border2; j++) {
-					g->SetPixel(dx + int(cx - cos(M_PI * i / 180.0)*j), dy + int(cy - sin(M_PI * i / 180.0)*j), HLS2RGB(i, 0.5, j/border2));
-				}
-			}
+			g->DrawImage(_image, 0, 0);
 		}
 		
 		virtual bool ProcessEvent(jgui::MouseEvent *event)
 		{
-			int raio = std::min(GetWidth(), GetHeight())/2,
-					raio_delta = raio*raio;
+			int x = (event->GetX()-_location.x),
+					y = (event->GetY()-_location.y);
 
-			if (event->GetType() == jgui::JMOUSE_PRESSED_EVENT && event->GetButton() == jgui::JMOUSE_BUTTON1) {
-				int x = event->GetX()-raio,
-						y = event->GetY()-raio,
-						delta = x*x + y*y;
-	
-				// TODO::
+			SetBackgroundColor(_image->GetGraphics()->GetPixel(x, y));
 
-				return true;
-			}
-
-			return false;
+			return true;
 		}
 
 };
@@ -139,8 +137,10 @@ class FrameTest : public jgui::Frame {
 
 	public:
 		FrameTest():
-			jgui::Frame("Color Chooser", 100, 100, 720, 820)
+			jgui::Frame("Color Chooser", 100, 100, 720, 720+30)
 		{
+			SetMoveEnabled(true);
+
 			int size = std::min(GetWidth()-_insets.left-_insets.right, GetHeight()-_insets.top-_insets.bottom);
 
 			_color_chooser = new ColorChooser(_insets.left, _insets.top, size, size);

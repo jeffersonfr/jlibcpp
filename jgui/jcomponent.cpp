@@ -789,74 +789,74 @@ int Component::GetGradientLevel()
 
 void Component::SetBackgroundColor(int red, int green, int blue, int alpha)
 {
-	_bgcolor = Color(red, green, blue, alpha);
-
-	Repaint();
+	SetBackgroundColor(Color(red, green, blue, alpha));
 }
 
 void Component::SetForegroundColor(int red, int green, int blue, int alpha)
 {
-	_fgcolor = Color(red, green, blue, alpha);
-
-	Repaint();
+	SetForegroundColor(Color(red, green, blue, alpha));
 }
 
 void Component::SetBackgroundFocusColor(int red, int green, int blue, int alpha)
 {
-	_focus_bgcolor = Color(red, green, blue, alpha);
-
-	Repaint();
+	SetBackgroundFocusColor(Color(red, green, blue, alpha));
 }
 
 void Component::SetForegroundFocusColor(int red, int green, int blue, int alpha)
 {
-	_focus_fgcolor = Color(red, green, blue, alpha);
-
-	Repaint();
+	SetForegroundFocusColor(Color(red, green, blue, alpha));
 }
 
 void Component::SetBorderColor(int red, int green, int blue, int alpha)
 {
-	_border_color = Color(red, green, blue, alpha);
-
-	Repaint();
+	SetBorderColor(Color(red, green, blue, alpha));
 }
 
 void Component::SetBorderFocusColor(int red, int green, int blue, int alpha)
 {
-	_focus_border_color = Color(red, green, blue, alpha);
-
-	Repaint();
+	SetBorderFocusColor(Color(red, green, blue, alpha));
 }
 
 void Component::SetBackgroundColor(const Color &color)
 {
 	_bgcolor = color;
+
+	Repaint();
 }
 
 void Component::SetForegroundColor(const Color &color)
 {
 	_fgcolor = color;
+
+	Repaint();
 }
 
 void Component::SetBackgroundFocusColor(const Color &color)
 {
 	_focus_bgcolor = color;
+
+	Repaint();
 }
 
 void Component::SetForegroundFocusColor(const Color &color)
 {
 	_focus_fgcolor = color;
+
+	Repaint();
 }
 
 void Component::SetBorderColor(const Color &color)
 {
 	_border_color = color;
+
+	Repaint();
 }
 
 void Component::SetBorderFocusColor(const Color &color)
 {
 	_focus_border_color = color;
+
+	Repaint();
 }
 
 Color & Component::GetBackgroundColor()
