@@ -422,7 +422,7 @@ class Test : public jgui::Window, public UserEventListener {
 
 		virtual void OnKeyLongPress(UserEvent *event)
 		{
-			std::cout << "OnMouseLongPress" << std::endl;
+			std::cout << "OnKeyLongPress" << std::endl;
 		}
 
 		virtual void OnMousePress(UserEvent *event)
