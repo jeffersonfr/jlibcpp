@@ -23,6 +23,7 @@
 #include "jsemaphore.h"
 #include "jthread.h"
 #include "jobservable.h"
+#include "jsemaphoretimeoutexception.h"
 
 class ScreenLayer : public jgui::Window{
 
@@ -210,16 +211,77 @@ class VideoLayer : public ScreenLayer{
 class GraphicLayer : public ScreenLayer, public jthread::Thread{
 
 	private:
+		jthread::Mutex _mutex;
+		jthread::Condition _sem;
+		jgui::Image *_buffer;
+		bool _refresh;
 
 	public:
 		GraphicLayer():
 			ScreenLayer()
 		{
+			_refresh = false;
+
+			_buffer = jgui::Image::CreateImage(GetWidth(), GetHeight());
+				
 			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
 		}
 
 		virtual ~GraphicLayer()
 		{
+		}
+
+		virtual void Refresh()
+		{
+			jthread::AutoLock lock(&_mutex);
+
+			if (_refresh == true) {
+				return;
+			}
+
+			_refresh = true;
+
+			_sem.Notify();
+		}
+
+		virtual void Repaint(bool all = true)
+		{
+			Refresh();
+		}
+		
+		virtual void Repaint(int x, int y, int width, int height)
+		{
+			Refresh();
+		}
+		
+		virtual void Repaint(Component *c)
+		{
+			Refresh();
+		}
+		
+		virtual void Run()
+		{
+			jgui::Graphics *gb = _buffer->GetGraphics();
+			jgui::Graphics *g = GetGraphics();
+
+			g->SetBlittingFlags(jgui::BF_NOFX);
+
+			while (true) {
+				{
+					jthread::AutoLock lock(&_mutex);
+
+					while (_refresh == false) {
+						_sem.Wait(&_mutex);
+					}
+
+					_refresh = false;
+				}
+
+				Paint(gb);
+
+				g->DrawImage(_buffer, 0, 0);
+				g->Flip();
+			}
 		}
 
 };
