@@ -25,13 +25,15 @@
 #include "jobservable.h"
 #include "jsemaphoretimeoutexception.h"
 
-class ScreenLayer : public jgui::Window{
+class ScreenLayer : public jgui::Container{
 
 	public:
 		ScreenLayer():
-			jgui::Window(0, 0, 1920, 1080)
+			jgui::Container(0, 0, 1920, 1080)
 		{
-			Show();
+			SetVisible(true);
+			
+			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
 		}
 
 		virtual ~ScreenLayer()
@@ -82,72 +84,16 @@ class BackgroundLayer : public ScreenLayer{
 
 class VideoLayer : public ScreenLayer{
 
-	class VideoLayerThread : public jthread::Thread{
-		private:
-			IDirectFBSurface *_surface;
-			jthread::Condition _semaphore;
-			bool _flipping,
-					 _is_running;
-
-		public:
-			VideoLayerThread(IDirectFBSurface *surface) 
-			{
-				_surface = surface;
-
-				_flipping = false;
-				_is_running = false;
-			}
-
-			virtual ~VideoLayerThread()
-			{
-			}
-
-			void Flip()
-			{
-				if (_flipping == false) {
-					_flipping = true;
-
-					_semaphore.Notify();
-				}
-			}
-
-			void Interrupt()
-			{
-				_is_running = false;
-
-				WaitThread();
-			}
-
-			virtual void Run()
-			{
-				_is_running = true;
-
-				while (_is_running) {
-					while (_flipping == false) {
-						_semaphore.Wait();
-					}
-
-					if (_is_running == false) {
-						break;
-					}
-
-					_surface->Flip(_surface, 0, DSFLIP_NONE);
-					
-					_flipping = false;
-				}
-			}
-	};
-
 	private:
 		IDirectFBVideoProvider *_provider;
 		jthread::Mutex _mutex;
+		jgui::Image *_buffer;
 		std::string _file;
-		VideoLayerThread *_thread;
 
 	private:
 		static void callback(void *ctx)
 		{
-			reinterpret_cast<VideoLayerThread *>(ctx)->Flip();
+			reinterpret_cast<VideoLayer *>(ctx)->Repaint();
 		}
 
 	public:
@@ -155,16 +101,12 @@ class VideoLayer : public ScreenLayer{
 			ScreenLayer()
 		{
 			_provider = NULL;
-			_thread = NULL;
+
+			_buffer = jgui::Image::CreateImage(GetWidth(), GetHeight());
 		}
 
 		virtual ~VideoLayer()
 		{
-			if ((void *)_thread != NULL) {
-				_thread->Interrupt();
-
-				delete _thread;
-			}
 		}
 
 		void SetFile(std::string file)
@@ -172,21 +114,10 @@ class VideoLayer : public ScreenLayer{
 			_file = file;
 
 			IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
-			IDirectFBSurface *surface = (IDirectFBSurface *)GetGraphics()->GetNativeSurface();
-
-			if ((void *)_thread != NULL) {
-				_thread->Interrupt();
-
-				delete _thread;
-			}
 
 			if (directfb->CreateVideoProvider(directfb, _file.c_str(), &_provider) != DFB_OK) {
 				return;
 			}
-			
-			_thread = new VideoLayerThread(surface);
-
-			_thread->Start();
 		}
 
 		void Play() 
@@ -194,7 +125,9 @@ class VideoLayer : public ScreenLayer{
 			jthread::AutoLock lock(&_mutex);
 
 			if (_provider != NULL) {
-				_provider->PlayTo(_provider, _surface, NULL, VideoLayer::callback, _thread);
+				IDirectFBSurface *surface = (IDirectFBSurface *)_buffer->GetGraphics()->GetNativeSurface();
+
+				_provider->PlayTo(_provider, surface, NULL, VideoLayer::callback, this);
 			}
 		}
 
@@ -206,29 +139,95 @@ class VideoLayer : public ScreenLayer{
 				_provider->Stop(_provider);
 			}
 		}
+
+		virtual void Paint(jgui::Graphics *g)
+		{
+			g->DrawImage(_buffer, _location.x, _location.y, _size.width, _size.height);
+		}
 };
 
-class GraphicLayer : public ScreenLayer, public jthread::Thread{
+class GraphicLayer : public ScreenLayer{
 
 	private:
-		jthread::Mutex _mutex;
-		jthread::Condition _sem;
-		jgui::Image *_buffer;
-		bool _refresh;
+		jgui::Container *_user_container,
+			*_system_container;
 
 	public:
 		GraphicLayer():
 			ScreenLayer()
 		{
-			_refresh = false;
-
-			_buffer = jgui::Image::CreateImage(GetWidth(), GetHeight());
-				
-			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
+			_user_container = new jgui::Container(GetX(), GetY(), GetWidth(), GetHeight());
+			_user_container->SetParent(this);
+			_user_container->SetBackgroundVisible(false);
+			
+			_system_container = new jgui::Container(GetX(), GetY(), GetWidth(), GetHeight());
+			_system_container->SetParent(this);
+			_system_container->SetBackgroundVisible(false);
 		}
 
 		virtual ~GraphicLayer()
 		{
+			delete _user_container;
+			_user_container = NULL;
+
+			delete _system_container;
+			_system_container = NULL;
+		}
+
+		jgui::Container * GetUserContainer()
+		{
+			return _user_container;
+		}
+
+		jgui::Container * GetSystemContainer()
+		{
+			return _system_container;
+		}
+
+		virtual void Paint(jgui::Graphics *g)
+		{
+			g->SetDrawingFlags(jgui::DF_BLEND);
+
+			_user_container->InvalidateAll();
+			_user_container->Paint(g);
+
+			_system_container->InvalidateAll();
+			_system_container->Paint(g);
+		}
+
+};
+
+class LayersManager : public jgui::Window, public jthread::Thread{
+
+	private:
+		static LayersManager *_instance;
+
+		ScreenLayer *_background_layer,
+								*_video_layer,
+								*_graphic_layer;
+		
+		jthread::Mutex _mutex;
+		jthread::Condition _sem;
+		jgui::Image *_buffer;
+		bool _refresh;
+
+	private:
+		LayersManager():
+			jgui::Window(0, 0, 1920, 1080)
+		{
+			_refresh = false;
+
+			_buffer = jgui::Image::CreateImage(GetWidth(), GetHeight());
+				
+			_background_layer = new BackgroundLayer();
+			_video_layer = new VideoLayer();
+			_graphic_layer = new GraphicLayer();
+			
+			_background_layer->SetParent(this);
+			_video_layer->SetParent(this);
+			_graphic_layer->SetParent(this);
+
+			GetBackgroundLayer()->SetImage("images/background.png");
 		}
 
 		virtual void Refresh()
@@ -244,23 +243,10 @@ class GraphicLayer : public ScreenLayer, public jthread::Thread{
 			_sem.Notify();
 		}
 
-		virtual void Repaint(bool all = true)
-		{
-			Refresh();
-		}
-		
-		virtual void Repaint(int x, int y, int width, int height)
-		{
-			Refresh();
-		}
-		
-		virtual void Repaint(Component *c)
-		{
-			Refresh();
-		}
-		
 		virtual void Run()
 		{
+			InnerCreateWindow();
+
 			jgui::Graphics *gb = _buffer->GetGraphics();
 			jgui::Graphics *g = GetGraphics();
 
@@ -284,29 +270,6 @@ class GraphicLayer : public ScreenLayer, public jthread::Thread{
 			}
 		}
 
-};
-
-class LayersManager{
-
-	private:
-		static LayersManager *_instance;
-
-		ScreenLayer *_background_layer,
-								*_video_layer,
-								*_graphic_layer;
-
-	private:
-		LayersManager()
-		{
-			_background_layer = new BackgroundLayer();
-			_video_layer = new VideoLayer();
-			_graphic_layer = new GraphicLayer();
-			
-			dynamic_cast<GraphicLayer *>(_graphic_layer)->Start();
-
-			GetBackgroundLayer()->SetImage("images/background.png");
-		}
-
 	public:
 		virtual ~LayersManager()
 		{
@@ -316,6 +279,8 @@ class LayersManager{
 		{
 			if (_instance == NULL) {
 				_instance = new LayersManager();
+
+				_instance->Start();
 			}
 
 			return _instance;
@@ -336,21 +301,51 @@ class LayersManager{
 			return (GraphicLayer *)_graphic_layer;
 		}
 
+		virtual void Repaint(bool all = true)
+		{
+			Refresh();
+		}
+		
+		virtual void Repaint(int x, int y, int width, int height)
+		{
+			Refresh();
+		}
+		
+		virtual void Repaint(jgui::Component *c)
+		{
+			Refresh();
+		}
+		
+		virtual void PaintInternal(jgui::Graphics *g, ScreenLayer *layer)
+		{
+			g->Reset();
+			g->SetDrawingFlags(jgui::DF_NOFX);
+			g->SetClip(GetX(), GetY(), GetWidth(), GetHeight());
+
+			layer->Paint(g);
+		}
+		
+		virtual void Paint(jgui::Graphics *g)
+		{
+			PaintInternal(g, _background_layer);
+			PaintInternal(g, _video_layer);
+			PaintInternal(g, _graphic_layer);
+		}
+
 };
 
 class Scene : public jgui::Container, public jgui::KeyListener{
 
 	private:
 		jthread::Mutex _input;
-		GraphicLayer *_layer;
+		jgui::Container *_layer;
 
 	public:
 		Scene(int x, int y, int width, int height):
 			jgui::Container(x, y, width, height)
 		{
-			_layer = LayersManager::GetInstance()->GetGraphicLayer();
+			_layer = LayersManager::GetInstance()->GetGraphicLayer()->GetUserContainer();
 
-			_layer->RemoveAll();
 			_layer->Add(this);
 			
 			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
@@ -367,9 +362,7 @@ class Scene : public jgui::Container, public jgui::KeyListener{
 
 			input->RemoveKeyListener(this);
 
-			ScreenLayer *layer = LayersManager::GetInstance()->GetGraphicLayer();
-
-			layer->RemoveAll();
+			_layer->Remove(this);
 
 			jthread::AutoLock lock(&_input);
 		}
@@ -409,7 +402,7 @@ class TestScene : public Scene{
 		TestScene():
 			Scene((1920-960)/2, (1080-540)/2, 960, 540)
 		{
-			Add(_label = new jgui::Label("Reposicionamento da Video", 10, 10, 960-2*10, 100));
+			Add(_label = new jgui::Label("Reposicionamento do Video", 10, 10, 960-2*10, 100));
 
 			_label->SetBackgroundVisible(false);
 
