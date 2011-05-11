@@ -80,6 +80,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			jgui::jinsets_t t = GetInsets();
 
 			container = new jgui::Container(t.left, t.top, 1920-t.left-t.right, 1080-t.top-t.bottom);
+
+			// INFO:: avoid flickering (can cause problems during the repaint of the components)
+			container->SetOpaque(true);
 		}
 
 		{

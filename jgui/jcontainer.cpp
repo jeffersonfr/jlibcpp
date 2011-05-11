@@ -238,10 +238,6 @@ void Container::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	if (_background_visible == true) {
-		InvalidateAll();
-	}
-
 	jthread::AutoLock lock(&_container_mutex);
 
 	jregion_t clip = g->GetClip();
@@ -343,7 +339,7 @@ void Container::Repaint(bool all)
 	}
 
 	if (_parent != NULL) {
-		if (all == false && IsOpaque() == true && _parent->IsValid() == true) {
+		if (all == false && IsOpaque() == true) { // && _parent->IsValid() == true) {
 			_parent->Repaint(this);
 		} else {
 			InvalidateAll();
@@ -369,7 +365,11 @@ void Container::Repaint(Component *c)
 	}
 
 	if (_parent != NULL) {
-		_parent->Repaint(this);
+		if (c->IsOpaque() == false || IsOpaque() == false) {
+			Repaint(true);
+		} else {
+			_parent->Repaint(this);
+		}
 	}
 }
 
