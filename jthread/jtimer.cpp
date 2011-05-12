@@ -153,24 +153,33 @@ void TaskQueue::RescheduleMin(uint64_t newTime)
 TimerThread::TimerThread(TaskQueue *queue) 
 {
 	_queue = queue;
+	_is_running = true;
 
-	newTasksMayBeScheduled = true;
+	_new_tasks_may_be_scheduled = true;
 }
 
 TimerThread::~TimerThread()
 {
+	_is_running = false;
+	_new_tasks_may_be_scheduled = false;
+
+	_queue->Clear();
+	
+	_queue->_sem.Notify(); // In case queue is empty.
+
+	WaitThread();
 }
 
 void TimerThread::MainLoop() 
 {
-	while (true) {
+	while (_is_running) {
 		TimerTask *task = NULL;
 		bool taskFired = false;
 
 		jthread::AutoLock lock(&_mutex);
 
 		// Wait for queue to become non-empty
-		while (_queue->IsEmpty() && newTasksMayBeScheduled) {
+		while (_queue->IsEmpty() && _new_tasks_may_be_scheduled) {
 			_queue->_sem.Wait();
 		}
 
@@ -235,7 +244,7 @@ void TimerThread::Run()
 	// Somone killed this Thread, behave as if Timer cancelled
 	jthread::AutoLock lock(&_mutex);
 
-	newTasksMayBeScheduled = false;
+	_new_tasks_may_be_scheduled = false;
 	
 	_queue->Clear();  // Eliminate obsolete references
 }
@@ -252,19 +261,18 @@ Timer::~Timer()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	_thread->newTasksMayBeScheduled = false;
-
-	_queue->_sem.Notify(); // In case queue is empty.
-
 	delete _thread;
+	_thread = NULL;
+
 	delete _queue;
+	_queue = NULL;
 }
 
 void Timer::schedule(TimerTask *task, uint64_t next_execution_time, uint64_t delay, bool push_time) 
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if (!_thread->newTasksMayBeScheduled) {
+	if (!_thread->_new_tasks_may_be_scheduled) {
 		throw jthread::IllegalStateException("Timer already cancelled.");
 	}
 
@@ -338,17 +346,6 @@ void Timer::RemoveSchedule(TimerTask *task)
 	jthread::AutoLock lock(&_mutex);
 
 	_queue->Remove(task);
-}
-
-void Timer::Cancel() 
-{
-	jthread::AutoLock lock(&_mutex);
-
-	_thread->newTasksMayBeScheduled = false;
-	
-	_queue->Clear();
-	
-	_queue->_sem.Notify();  // In case queue was already empty.
 }
 
 }

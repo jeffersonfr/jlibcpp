@@ -209,7 +209,8 @@ class TimerThread : public jthread::Thread {
 	private:
 		jthread::Mutex _mutex;
    	TaskQueue *_queue;
-    bool newTasksMayBeScheduled;
+    bool _is_running,
+				 _new_tasks_may_be_scheduled;
 
 	private:
 		/**
@@ -264,9 +265,15 @@ class Timer : public virtual jcommon::Object{
     Timer();
 
     /**
-     * \brief This object causes the timer's task execution thread to exit gracefully when there are no live references 
-		 * to the Timer object and no tasks in the timer queue.  It is used in preference to a finalizer on Timer as such a 
-		 * finalizer would be susceptible to a subclass's finalizer forgetting to call it.
+     * \brief Terminates this timer, discarding any currently scheduled tasks. Does not interfere with a currently 
+		 * executing task (if it exists).Once a timer has been terminated, its execution thread terminates gracefully, 
+		 * and no more tasks may be scheduled on it.
+     *
+     * <p>Note that calling this method from within the run method of a timer task that was invoked by this timer 
+		 * absolutely guarantees that the ongoing task execution is the last task execution that will ever be performed 
+		 * by this timer.
+     *
+     * <p>This method may be called repeatedly; the second and subsequent calls have no effect.
      */
     virtual ~Timer();
 
@@ -382,19 +389,6 @@ class Timer : public virtual jcommon::Object{
 		 *
 		 */
 		void RemoveSchedule(TimerTask *task);
-
-    /**
-     * \brief Terminates this timer, discarding any currently scheduled tasks. Does not interfere with a currently 
-		 * executing task (if it exists).Once a timer has been terminated, its execution thread terminates gracefully, 
-		 * and no more tasks may be scheduled on it.
-     *
-     * <p>Note that calling this method from within the run method of a timer task that was invoked by this timer 
-		 * absolutely guarantees that the ongoing task execution is the last task execution that will ever be performed 
-		 * by this timer.
-     *
-     * <p>This method may be called repeatedly; the second and subsequent calls have no effect.
-     */
-    void Cancel();
 
 };
 

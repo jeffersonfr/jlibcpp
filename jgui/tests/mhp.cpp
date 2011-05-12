@@ -376,6 +376,8 @@ class Scene : public jgui::Container, public jgui::KeyListener, public jthread::
 
 			_layer->Remove(this);
 
+			jthread::TimerTask::Cancel();
+
 			jthread::AutoLock lock(&_input);
 		}
 
@@ -519,6 +521,8 @@ class MenuTest : public Scene{
 				}
 	
 				SetLocation(GetX(), y);
+
+				return true;
 			} else if (_mstate == 2) {
 				int alpha = color.GetAlpha();
 
@@ -537,6 +541,8 @@ class MenuTest : public Scene{
 				color.SetAlpha(alpha);
 
 				SetBackgroundColor(color);
+
+				return true;
 			} else if (_mstate == 3) {
 				int y = GetY()-80;
 
@@ -545,9 +551,11 @@ class MenuTest : public Scene{
 				}
 	
 				SetLocation(GetX(), y);
+
+				return true;
 			}
 
-			return true;
+			return false;
 		}
 
 		virtual void InputReceived(jgui::KeyEvent *event)
