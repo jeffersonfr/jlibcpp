@@ -24,6 +24,7 @@
 #include "jthread.h"
 #include "jobservable.h"
 #include "jsemaphoretimeoutexception.h"
+#include "jtimer.h"
 
 class ScreenLayer : public jgui::Container{
 
@@ -334,11 +335,20 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 
 };
 
-class Scene : public jgui::Container, public jgui::KeyListener{
+class Scene : public jgui::Container, public jgui::KeyListener, public jthread::TimerTask{
 
 	private:
 		jthread::Mutex _input;
 		jgui::Container *_layer;
+		jthread::Timer _timer;
+
+	private:
+		void Run() 
+		{
+			if (Animated() == true) {
+				Repaint();
+			}
+		}
 
 	public:
 		Scene(int x, int y, int width, int height):
@@ -348,12 +358,14 @@ class Scene : public jgui::Container, public jgui::KeyListener{
 
 			_layer->Add(this);
 			
-			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
-			SetBackgroundVisible(true);
-
 			jgui::InputManager *input = jgui::InputManager::GetInstance();
 
 			input->RegisterKeyListener(this);
+
+			_timer.Schedule(this, (uint64_t)0LL, 100000LL, false);
+			
+			SetBackgroundVisible(true);
+			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
 		}
 
 		virtual ~Scene()
@@ -388,20 +400,83 @@ class Scene : public jgui::Container, public jgui::KeyListener{
 		{
 		}
 
+		virtual bool Animated()
+		{
+			return false;
+		}
+
 };
 
-class TestScene : public Scene{
+// samples of application
+
+class ApplicationTest : public Scene{
+
+	private:
+		jgui::Image *_image;
+		int _mstate,
+				_mindex;
+		int _dx,
+				_dy;
+
+	public:
+		ApplicationTest():
+			Scene(0, 0, 1920, 1080)
+		{
+			jgui::InputManager::GetInstance()->RemoveKeyListener(this);
+
+			_mstate = 0;
+			_mindex = 0;
+
+			_dx = 1920;
+			_dy = 128;
+
+			_image = jgui::Image::CreateImage("images/bird.png");
+		}
+
+		virtual ~ApplicationTest()
+		{
+		}
+
+		virtual bool Animated()
+		{
+			_dx = _dx - 32;
+
+			if (_dx < -128) {
+				_dx = 1920;
+			}
+			
+			_mindex = (_mindex + 1) % 6;
+
+			return true;
+		}
+
+		virtual void Paint(jgui::Graphics *g)
+		{
+			int sx = _mindex/3,
+					sy = _mindex%3;
+
+			g->DrawImage(_image, sx*169, sy*126, 169, 126, _dx, _dy, 128, 128);
+		}
+
+};
+
+class MenuTest : public Scene{
 
 	private:
 		jgui::Button *_button1,
 			*_button2,
 			*_button3;
 		jgui::Label *_label;
+		int _malpha,
+				_mstate;
 
 	public:
-		TestScene():
-			Scene((1920-960)/2, (1080-540)/2, 960, 540)
+		MenuTest():
+			Scene((1920-960)/2, -540, 960, 540)
 		{
+			_malpha = 1;
+			_mstate = 0;
+			
 			Add(_label = new jgui::Label("Reposicionamento do Video", 10, 10, 960-2*10, 100));
 
 			_label->SetBackgroundVisible(false);
@@ -414,12 +489,10 @@ class TestScene : public Scene{
 			_button2->SetNavigation(NULL, NULL, _button1, _button3);
 			_button3->SetNavigation(NULL, NULL, _button2, _button1);
 
-			_button1->RequestFocus();
-
 			SetBackgroundColor(0x00, 0x00, 0x00, 0xa0);
 		}
 
-		virtual ~TestScene()
+		virtual ~MenuTest()
 		{
 			Remove(_label);
 			Remove(_button1);
@@ -430,16 +503,77 @@ class TestScene : public Scene{
 			delete _button2;
 		}
 
+		virtual bool Animated()
+		{
+			jgui::Color color = GetBackgroundColor();
+
+			if (_mstate == 1) {
+				int y = GetY()+80;
+
+				if (y >= (1080-540)/2) {
+					y = (1080-540)/2;
+
+					_mstate = 2;
+			
+					_button1->RequestFocus();
+				}
+	
+				SetLocation(GetX(), y);
+			} else if (_mstate == 2) {
+				int alpha = color.GetAlpha();
+
+				alpha = alpha+0x10*_malpha;
+
+				if (alpha <= 0x10) {
+					alpha = 0x10;
+					_malpha = 1;
+				}
+
+				if (alpha > 0xa0) {
+					alpha = 0xa0;
+					_malpha = -1;
+				}
+
+				color.SetAlpha(alpha);
+
+				SetBackgroundColor(color);
+			} else if (_mstate == 3) {
+				int y = GetY()-80;
+
+				if (y < -540) {
+					y = -540;
+				}
+	
+				SetLocation(GetX(), y);
+			}
+
+			return true;
+		}
+
 		virtual void InputReceived(jgui::KeyEvent *event)
 		{
 			LayersManager *layers = LayersManager::GetInstance();
  
-			if (GetFocusOwner() == _button1) {
-				layers->GetVideoLayer()->SetBounds(0, 0, 1920, 1080);
-			} else if (GetFocusOwner() == _button2) {
-				layers->GetVideoLayer()->SetBounds(100, 100, 720, 480);
-			} else if (GetFocusOwner() == _button3) {
-				exit(0);
+			if (event->GetSymbol() == jgui::JKEY_F1) {
+				if (GetFocusOwner() != NULL) {
+					GetFocusOwner()->ReleaseFocus();
+				}
+
+				if (_mstate == 0) {
+					_mstate = 1;
+				} else if (_mstate == 1 || _mstate == 2) {
+					_mstate = 3;
+				} else if (_mstate == 3) {
+					_mstate = 1;
+				}
+			} else {
+				if (GetFocusOwner() == _button1) {
+					layers->GetVideoLayer()->SetBounds(0, 0, 1920, 1080);
+				} else if (GetFocusOwner() == _button2) {
+					layers->GetVideoLayer()->SetBounds(100, 100, 720, 480);
+				} else if (GetFocusOwner() == _button3) {
+					exit(0);
+				}
 			}
 		}
 
@@ -456,7 +590,9 @@ int main(int argc, char **argv)
 		manager->GetVideoLayer()->Play();
 	}
 
-	TestScene test;
+	MenuTest menu;
+
+	ApplicationTest application;
 
 	sleep(100000);
 

@@ -23,7 +23,7 @@
 
 static bool tasks_compare(jthread::TimerTask *a, jthread::TimerTask *b) 
 {
-	if (a->nextExecutionTime < b->nextExecutionTime) {
+	if (a->_next_execution_time < b->_next_execution_time) {
 		return true;
 	}
 
@@ -34,23 +34,33 @@ namespace jthread {
 
 TimerTask::TimerTask() 
 {
-	state = VIRGIN;
-	nextExecutionTime = 0LL;
-	period = 0LL;
-	delay = false;
+	_state = VIRGIN;
+	_next_execution_time = 0LL;
+	_delay = 0LL;
+	_push_time = false;
 }
 
 TimerTask::~TimerTask() 
 {
 }
 
+uint64_t TimerTask::GetDelay()
+{
+	return _delay;
+}
+
+void TimerTask::SetDelay(uint64_t delay)
+{
+	_delay = delay;
+}
+
 bool TimerTask::Cancel() 
 {
 	jthread::AutoLock lock(&_mutex);
 
-	bool result = (state == SCHEDULED);
+	bool result = (_state == SCHEDULED);
 
-	state = CANCELLED;
+	_state = CANCELLED;
 
 	return result;
 }
@@ -135,7 +145,7 @@ void TaskQueue::RescheduleMin(uint64_t newTime)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	_queue[0]->nextExecutionTime = newTime;
+	_queue[0]->_next_execution_time = newTime;
 
 	std::sort(_queue.begin(), _queue.end(), tasks_compare);
 }
@@ -177,25 +187,25 @@ void TimerThread::MainLoop()
 
 		{
 			// monitor enter
-			if (task->state == CANCELLED) {
+			if (task->_state == CANCELLED) {
 				_queue->RemoveMin();
 
 				continue;  // No action required, poll queue again
 			}
 
 			currentTime = (uint64_t)jcommon::Date::CurrentTimeMicros();
-			executionTime = (uint64_t)task->nextExecutionTime;
+			executionTime = (uint64_t)task->_next_execution_time;
 
 			taskFired = (executionTime <= currentTime);
 			
 			if (taskFired == true) {
-				if (task->period == 0LL) { 
+				if (task->_delay == 0LL) { 
 					// Non-repeating, remove
 					_queue->RemoveMin();
-					task->state = EXECUTED;
+					task->_state = EXECUTED;
 				} else {
 					// Repeating task, reschedule
-					_queue->RescheduleMin(task->delay == true ? currentTime + task->period : executionTime + task->period);
+					_queue->RescheduleMin(task->_push_time == true ? currentTime + task->_delay : executionTime + task->_delay);
 				}
 			}
 		}
@@ -230,30 +240,6 @@ void TimerThread::Run()
 	_queue->Clear();  // Eliminate obsolete references
 }
 
-void Timer::sched(TimerTask *task, uint64_t time, uint64_t period, bool delay) 
-{
-	jthread::AutoLock lock(&_mutex);
-
-	if (!_thread->newTasksMayBeScheduled) {
-		throw jthread::IllegalStateException("Timer already cancelled.");
-	}
-
-	if (task->state != VIRGIN) {
-		throw jthread::IllegalStateException("Task already scheduled or cancelled");
-	}
-
-	task->nextExecutionTime = time;
-	task->period = period;
-	task->state = SCHEDULED;
-	task->delay = false;
-
-	_queue->Add(task);
-
-	if (_queue->GetMin() == task) {
-		_queue->_sem.Notify();
-	}
-}
-
 Timer::Timer() 
 {
 	_queue = new TaskQueue();
@@ -274,54 +260,77 @@ Timer::~Timer()
 	delete _queue;
 }
 
-void Timer::Schedule(TimerTask *task, uint64_t time, bool delay) 
+void Timer::schedule(TimerTask *task, uint64_t next_execution_time, uint64_t delay, bool push_time) 
 {
 	jthread::AutoLock lock(&_mutex);
 
-	sched(task, jcommon::Date::CurrentTimeMicros()+time, 0LL, delay);
+	if (!_thread->newTasksMayBeScheduled) {
+		throw jthread::IllegalStateException("Timer already cancelled.");
+	}
+
+	if (task->_state != VIRGIN) {
+		throw jthread::IllegalStateException("Task already scheduled or cancelled");
+	}
+
+	task->_next_execution_time = next_execution_time;
+	task->_delay = delay;
+	task->_state = SCHEDULED;
+	task->_push_time = push_time;
+
+	_queue->Add(task);
+
+	if (_queue->GetMin() == task) {
+		_queue->_sem.Notify();
+	}
+}
+void Timer::Schedule(TimerTask *task, uint64_t next_execution_time, bool push_time) 
+{
+	jthread::AutoLock lock(&_mutex);
+
+	schedule(task, jcommon::Date::CurrentTimeMicros()+next_execution_time, 0LL, push_time);
 }
 
-void Timer::Schedule(TimerTask *task, jcommon::Date *time, bool delay) 
+void Timer::Schedule(TimerTask *task, jcommon::Date *next_execution_time, bool push_time) 
 {
 	jthread::AutoLock lock(&_mutex);
 
-	sched(task, time->GetTime(), 0LL, delay);
+	schedule(task, next_execution_time->GetTime(), 0LL, push_time);
 }
 
-void Timer::Schedule(TimerTask *task, uint64_t time, uint64_t period, bool delay) 
+void Timer::Schedule(TimerTask *task, uint64_t next_execution_time, uint64_t delay, bool push_time) 
 {
 	jthread::AutoLock lock(&_mutex);
 
-	sched(task, jcommon::Date::CurrentTimeMicros()+time, period, delay);
+	schedule(task, jcommon::Date::CurrentTimeMicros()+next_execution_time, delay, push_time);
 }
 
-void Timer::Schedule(TimerTask *task, jcommon::Date *time, uint64_t period, bool delay) 
+void Timer::Schedule(TimerTask *task, jcommon::Date *next_execution_time, uint64_t delay, bool push_time) 
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if (period <= 0LL) {
+	if (delay <= 0LL) {
 		throw jcommon::IllegalArgumentException("Non-positive period.");
 	}
 
-	sched(task, time->GetTime(), period, delay);
+	schedule(task, next_execution_time->GetTime(), delay, push_time);
 }
 
-void Timer::ScheduleAtFixedRate(TimerTask *task, uint64_t time, uint64_t period, bool delay) 
+void Timer::ScheduleAtFixedRate(TimerTask *task, uint64_t next_execution_time, uint64_t delay, bool push_time) 
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if (period <= 0LL) {
+	if (delay <= 0LL) {
 		throw jcommon::IllegalArgumentException("Non-positive period.");
 	}
 
-	sched(task, jcommon::Date::CurrentTimeMicros()+time, period, delay);
+	schedule(task, jcommon::Date::CurrentTimeMicros()+next_execution_time, delay, push_time);
 }
 
-void Timer::ScheduleAtFixedRate(TimerTask *task, jcommon::Date *time, uint64_t period, bool delay) 
+void Timer::ScheduleAtFixedRate(TimerTask *task, jcommon::Date *next_execution_time, uint64_t delay, bool push_time) 
 {
 	jthread::AutoLock lock(&_mutex);
 
-	sched(task, time->GetTime(), period, delay);
+	schedule(task, next_execution_time->GetTime(), delay, push_time);
 }
 
 void Timer::RemoveSchedule(TimerTask *task)

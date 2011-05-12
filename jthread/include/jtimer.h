@@ -54,7 +54,10 @@ class TimerTask : public jthread::Runnable {
 
 	private:
 		jthread::Mutex _mutex;
-    jtimertask_t state;
+    jtimertask_t _state;
+    
+		uint64_t _delay;
+		bool _push_time;
 
 	protected:
     /**
@@ -64,9 +67,7 @@ class TimerTask : public jthread::Runnable {
     TimerTask();
 
 	public:
-    uint64_t period,
-						 nextExecutionTime;
-		bool delay;
+		uint64_t _next_execution_time;
 
 	public:
     /**
@@ -74,6 +75,18 @@ class TimerTask : public jthread::Runnable {
 		 *
      */
     virtual ~TimerTask();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual uint64_t GetDelay();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetDelay(uint64_t delay);
 
     /**
      * Cancels this timer task.  If the task has been scheduled for one-time execution and has not yet run, or 
@@ -91,7 +104,7 @@ class TimerTask : public jthread::Runnable {
 		 * or if the task was never scheduled, or if the task was already cancelled.  (Loosely speaking, this method
 		 * returns <tt>true</tt> if it prevents one or more scheduled executions from taking place.)
      */
-    bool Cancel();
+    virtual bool Cancel();
 
 		/**
      * \brief The action to be performed by this timer task.
@@ -241,7 +254,7 @@ class Timer : public virtual jcommon::Object{
 		 * execution. Time is specified in Date.getTime() format.  This method checks timer state, task state, and initial execution 
 		 * time, but not period.
      */
-    void sched(TimerTask *task, uint64_t time, uint64_t period, bool delay);
+    void schedule(TimerTask *task, uint64_t next_execution_time, uint64_t delay, bool push_time);
 
 	public:
     /**
