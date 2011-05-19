@@ -58,7 +58,7 @@ class StringTokenizer : public virtual jcommon::Object{
 		 * completo, e naum como uma lista de tokens.
 		 *
 		 */
-		StringTokenizer(std::string string_, std::string token_, jtoken_flag_t flag_ = TOKEN_FLAG, bool return_token_ = false);
+		StringTokenizer(std::string string_, std::string token_, jtoken_flag_t flag_ = SPLIT_FLAG, bool return_token_ = false);
 		
 		/**
 		 * \brief
