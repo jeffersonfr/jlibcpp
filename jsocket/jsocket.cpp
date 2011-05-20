@@ -42,8 +42,6 @@ Socket::Socket(InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbuf_
 	CreateSocket();
 	ConnectSocket(addr_, port_);
 	InitStreams(rbuf_, wbuf_);
-
-	_is_closed = false;
 }
 
 Socket::Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
@@ -63,8 +61,6 @@ Socket::Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int loca
 	BindSocket(local_addr_, local_port_);
 	ConnectSocket(addr_, port_);
 	InitStreams(rbuf_, wbuf_);
-
-	_is_closed = false;
 }
 
 Socket::Socket(std::string host_, int port_, int timeout_, int rbuf_, int wbuf_):
@@ -85,8 +81,6 @@ Socket::Socket(std::string host_, int port_, int timeout_, int rbuf_, int wbuf_)
 	CreateSocket();
 	ConnectSocket(address, port_);
 	InitStreams(rbuf_, wbuf_);
-
-	_is_closed = false;
 }
 
 Socket::Socket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
@@ -108,8 +102,6 @@ Socket::Socket(std::string host_, int port_, InetAddress *local_addr_, int local
 	BindSocket(local_addr_, local_port_);
 	ConnectSocket(address, port_);
 	InitStreams(rbuf_, wbuf_);
-
-	_is_closed = false;
 }
 
 Socket::~Socket()
@@ -152,16 +144,6 @@ Socket::Socket(jsocket_t handler_, struct sockaddr_in server_, int timeout_, int
 	_lsock.sin_family = AF_INET;
 #endif
 
-	/* CHANGE:: este codigo estah gerando erro no DEBIAN
-		 if (getpeername(handler_, (struct sockaddr *)&_lsock, &len) < 0) {
-		 throw SocketException("Connetion error");
-		 }
-
-		 if (getsockname(handler_, (struct sockaddr *)&_lsock, &len) < 0) {
-		 throw SocketException("Connection error");
-		 }
-		 */
-
 	_fd = handler_;
 	_server_sock = server_;
 
@@ -174,15 +156,15 @@ Socket::Socket(jsocket_t handler_, struct sockaddr_in server_, int timeout_, int
 
 void Socket::CreateSocket()
 {
-	_fd = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
-
 #ifdef _WIN32
-	if (_fd == INVALID_SOCKET) {
+	if ((_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET) {
 #else
-	if (_fd < 0) {
+	if ((_fd = ::socket(PF_INET, SOCK_STREAM, IPPROTO_TCP)) < 0) {
 #endif
 		throw SocketException("Create socket error");
 	}
+
+	_is_closed = false;
 }
 
 void Socket::BindSocket(InetAddress *local_addr_, int local_port_)
@@ -519,20 +501,19 @@ int Socket::Receive(char *data_, int size_, bool block_)
 
 void Socket::Close()
 {
-#ifdef _WIN32
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (closesocket(_fd) < 0) {
-#else
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (close(_fd) != 0) {
-#endif
-			throw SocketException("Close socket error");
-		}
+	if (_is_closed == true) {
+		return;
 	}
+
+#ifdef _WIN32
+	if (closesocket(_fd) < 0) {
+#else
+	if (close(_fd) != 0) {
+#endif
+		throw SocketException("Close socket error");
+	}
+
+	_is_closed = true;
 }
 
 jio::InputStream * Socket::GetInputStream()

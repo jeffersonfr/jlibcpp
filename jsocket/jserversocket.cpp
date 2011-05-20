@@ -33,7 +33,7 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
 	jcommon::Object::SetClassName("jsocket::ServerSocket");
 	
   _local = NULL;
-	_is_closed = false;
+	_is_closed = true;
 
 	if (addr_ == NULL) {
 		try {
@@ -70,15 +70,11 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
 ServerSocket::~ServerSocket()
 {
 	try {
-		if (_is_closed == false) {
-			_is_closed = true;
-
-			Close();
-		}
+		Close();
 	} catch (...) {
 	}
 
-	if (_local) {
+	if (_local != NULL) {
 		delete _local;
 	}
 }
@@ -87,16 +83,20 @@ ServerSocket::~ServerSocket()
 
 void ServerSocket::CreateSocket()
 {
-	_fd = ::socket(PF_INET, SOCK_STREAM, 0);
-    
-	if (_fd < 0) {
+#ifdef _WIN32
+	if ((_fd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+#else
+	if ((_fd = ::socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+#endif
 		throw SocketException("Create socket error");
 	}
+
+	_is_closed = false;
 }
 
 void ServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 {
-	bool opt = 1;
+	bool opt = true;
     
 	_local = local_addr_;
    
@@ -109,6 +109,14 @@ void ServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 #ifdef _WIN32
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
 #else
+	/*
+	#ifndef SO_REUSEPORT
+		#define SO_REUSEPORT 15
+	#endif
+	
+	setsockopt(_fd, SOL_SOCKET, SO_REUSEPORT, (void *)&opt, sizeof(opt));
+	*/
+	
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
 #endif
     
@@ -163,23 +171,19 @@ int ServerSocket::GetLocalPort()
 
 void ServerSocket::Close()
 {
+	if (_is_closed == true) {
+		return;
+	}
+
 #ifdef _WIN32
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (closesocket(_fd) < 0) {
-			throw SocketException("Close socket error");
-		}
-	}
+	if (closesocket(_fd) < 0) {
 #else
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (close(_fd) != 0) {
-			throw SocketException("Close socket error");
-		}
-	}
+	if (close(_fd) != 0) {
 #endif
+		throw SocketException("Close socket error");
+	}
+
+	_is_closed = true;
 }
 
 }

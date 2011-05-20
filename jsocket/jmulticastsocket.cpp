@@ -44,8 +44,6 @@ MulticastSocket::MulticastSocket(std::string host_, int port_, int rbuf_, int wb
 	BindSocket(InetAddress4::GetByName(host_), port_);
 	Join(InetAddress4::GetByName(host_));
 	InitStream(rbuf_, wbuf_);
-
-	_is_closed = true;
 }
 
 MulticastSocket::~MulticastSocket()
@@ -68,17 +66,23 @@ MulticastSocket::~MulticastSocket()
 
 void MulticastSocket::CreateSocket()
 {
-	_fds = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_IP); // IPPROTO_MTP
-	
-	if (_fds < 0) {
+#ifdef _WIN32
+	if ((_fds = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) == INVALID_SOCKET) { // IPPROTO_MTP
+#else
+	if ((_fds = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) < 0) { // IPPROTO_MTP
+#endif
 		throw SocketException("Create multicast socket error");
 	}
 
-	_fdr = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_IP); // IPPROTO_MTP
-	
-	if (_fdr < 0) {
+#ifdef _WIN32
+	if ((_fdr = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) == INVALID_SOCKET) { // IPPROTO_MTP
+#else
+	if ((_fdr = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) < 0) { // IPPROTO_MTP
+#endif
 		throw SocketException("Create multicast socket error");
 	}
+
+	_is_closed = false;
 }
 
 void MulticastSocket::BindSocket(InetAddress *addr_, int local_port_)
@@ -390,25 +394,27 @@ std::vector<std::string> & MulticastSocket::GetGroupList()
 
 void MulticastSocket::Close()
 {
-	if (_is_closed == false) {
-		_is_closed = true;
+	if (_is_closed == true) {
+		return;
+	}
 
 #ifdef _WIN32
-		if (closesocket(_fdr) < 0) {
+	if (closesocket(_fdr) < 0) {
 #else
-		if (close(_fdr) != 0) {
+	if (close(_fdr) != 0) {
 #endif
-			throw SocketStreamException("Close multicast receiver descriptor error");
-		}
+		throw SocketStreamException("Close multicast receiver descriptor error");
+	}
 	
 #ifdef _WIN32
-		if (closesocket(_fds) < 0) {
+	if (closesocket(_fds) < 0) {
 #else
-		if (close(_fds) != 0) {
+	if (close(_fds) != 0) {
 #endif
-			throw SocketStreamException("Close multicast sender descriptor error");
-		}
+		throw SocketStreamException("Close multicast sender descriptor error");
 	}
+
+	_is_closed = true;
 }
 
 int MulticastSocket::GetLocalPort()

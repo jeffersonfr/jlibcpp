@@ -47,8 +47,6 @@ DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, int
 
 	_sent_bytes = 0;
 	_receive_bytes = 0;
-	
-	_is_closed = false;
 }
 
 DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
@@ -90,8 +88,6 @@ DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf
 
 	_sent_bytes = 0;
 	_receive_bytes = 0;
-	
-	_is_closed = false;
 }
 
 DatagramSocket6::~DatagramSocket6()
@@ -118,15 +114,15 @@ DatagramSocket6::~DatagramSocket6()
 
 void DatagramSocket6::CreateSocket()
 {
-	_fd = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP);
-	
 #ifdef _WIN32
-	if (_fd == INVALID_SOCKET) {
+	if ((_fd = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET) {
 #else
-	if (_fd < 0) {
+	if ((_fd = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
 #endif
 		throw SocketException("Create datagram socket error");
 	}
+
+	_is_closed = false;
 }
 
 void DatagramSocket6::BindSocket(InetAddress *addr_, int local_port_)
@@ -522,23 +518,19 @@ int DatagramSocket6::Send(const char *data_, int size_, bool block_)
 
 void DatagramSocket6::Close()
 {
+	if (_is_closed == true) {
+		return;
+	}
+
 #ifdef _WIN32
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (closesocket(_fd) < 0) {
-			throw SocketException("Close socket error");
-		}
-	}
+	if (closesocket(_fd) < 0) {
 #else
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (close(_fd) != 0) {
-			throw SocketException("Close socket error");
-		}
-	}
+	if (close(_fd) != 0) {
 #endif
+		throw SocketException("Close socket error");
+	}
+
+	_is_closed = true;
 }
 
 InetAddress * DatagramSocket6::GetInetAddress()

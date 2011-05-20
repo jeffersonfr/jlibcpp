@@ -147,9 +147,17 @@ jgui::Layout * Container::GetLayout()
 void Container::DoLayout()
 {
 	if (_layout != NULL) {
-		SetIgnoreRepaint(true);
+		_ignore_repaint = true;
+
 		_layout->DoLayout(this);
-		SetIgnoreRepaint(false);
+
+		for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+			if ((*i)->InstanceOf("jgui::Container") == true) {
+				dynamic_cast<jgui::Container *>(*i)->DoLayout();
+			}
+		}
+
+		_ignore_repaint = false;
 	}
 
 	Repaint();

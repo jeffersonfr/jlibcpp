@@ -28,6 +28,10 @@ CoordinateLayout::CoordinateLayout(int width, int height, jcoordinate_layout_t t
 {
 	jcommon::Object::SetClassName("jgui::CoordinateLayout");
 
+	if (width <=0 || height <= 0) {
+		// throw jcommon::InvalidArgumentException("CoordinateLayout cannot work with limits lower than zero");
+	}
+
 	_width = width;
 	_height = height;
 	_type = type;
@@ -126,12 +130,13 @@ void CoordinateLayout::DoLayout(Container *target)
 		Component *c = target->GetComponents()[i];
 
 		jpoint_t point = c->GetLocation();
+		jsize_t size = c->GetSize();
 
-		c->SetLocation((int)(point.x*sx), (int)(point.y*sy));
+		c->SetBounds((int)(point.x*sx), (int)(point.y*sy), (int)(size.width*sx), (int)(size.height*sy));
 	}
 
-	_width = target->GetSize().width;
-	_height = target->GetSize().height;
+	_width = tsize.width;
+	_height = tsize.height;
 }
 
 }

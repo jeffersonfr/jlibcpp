@@ -162,15 +162,15 @@ Socket6::Socket6(jsocket_t handler_, struct sockaddr_in6 server_, int timeout_, 
 
 void Socket6::CreateSocket()
 {
-	_fd = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP);
-
 #ifdef _WIN32
-	if (_fd == INVALID_SOCKET) {
+	if ((_fd = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET) {
 #else
-	if (_fd < 0) {
+	if ((_fd = ::socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP)) < 0) {
 #endif
 		throw SocketException("Create socket error");
 	}
+
+	_is_closed = false;
 }
 
 void Socket6::BindSocket(InetAddress *local_addr_, int local_port_)
@@ -513,20 +513,19 @@ int Socket6::Receive(char *data_, int size_, bool block_)
 
 void Socket6::Close()
 {
-#ifdef _WIN32
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (closesocket(_fd) < 0) {
-#else
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (close(_fd) != 0) {
-#endif
-			throw SocketException("Close socket error");
-		}
+	if (_is_closed == true) {
+		return;
 	}
+
+#ifdef _WIN32
+	if (closesocket(_fd) < 0) {
+#else
+	if (close(_fd) != 0) {
+#endif
+		throw SocketException("Close socket error");
+	}
+
+	_is_closed = true;
 }
 
 jio::InputStream * Socket6::GetInputStream()

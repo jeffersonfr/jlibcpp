@@ -546,7 +546,6 @@ void Window::Repaint(bool all)
 	InvalidateAll();
 
 	_graphics->Lock();
-		
 	_graphics->ReleaseClip();
 	
 	// CHANGE:: corrigir a limpeza da tela

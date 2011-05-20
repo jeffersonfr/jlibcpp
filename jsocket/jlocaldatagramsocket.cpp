@@ -53,7 +53,6 @@ LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server,
 
 	_sent_bytes = 0;
 	_receive_bytes = 0;
-	_is_closed = false;
 }
 
 LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int rbuf_, int wbuf_):
@@ -78,7 +77,6 @@ LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int r
 
 	_sent_bytes = 0;
 	_receive_bytes = 0;
-	_is_closed = false;
 }
 
 LocalDatagramSocket::~LocalDatagramSocket()
@@ -102,13 +100,14 @@ LocalDatagramSocket::~LocalDatagramSocket()
 void LocalDatagramSocket::CreateSocket()
 {
 #ifdef _WIN32
+	{
 #else
-	_fd = ::socket(PF_UNIX, SOCK_DGRAM, 0); // IPPROTO_UDP);
-	
-	if (_fd < 0) {
+	if ((_fd = ::socket(PF_UNIX, SOCK_DGRAM, 0)) < 0) { // IPPROTO_UDP);
+#endif
 		throw SocketException("Create datagram socket error");
 	}
-#endif
+
+	_is_closed = false;
 }
 
 void LocalDatagramSocket::BindSocket()
@@ -329,22 +328,24 @@ int LocalDatagramSocket::Send(const char *data_, int size_, bool block_)
 
 void LocalDatagramSocket::Close()
 {
-#ifdef _WIN32
-#else
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (close(_fd) != 0) {
-			throw SocketException("Close socket error");
-		}
+	if (_is_closed == true) {
+		return;
 	}
 
+#ifdef _WIN32
+#else
+	if (close(_fd) != 0) {
+		throw SocketException("Close socket error");
+	}
+	
 	if (_client_file != "") {
 		unlink(_client_file.c_str());
 	} else {
 		unlink(_server_file.c_str());
 	}
 #endif
+
+	_is_closed = true;
 }
 
 int64_t LocalDatagramSocket::GetSentBytes()

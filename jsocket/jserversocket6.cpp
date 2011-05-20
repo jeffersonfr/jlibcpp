@@ -33,7 +33,7 @@ ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress *addr_):
 	jcommon::Object::SetClassName("jsocket::ServerSocket6");
 	
   _local = NULL;
-	_is_closed = false;
+	_is_closed = true;
 
 	if (addr_ == NULL) {
 		try {
@@ -72,7 +72,7 @@ ServerSocket6::~ServerSocket6()
 	} catch (...) {
 	}
 
-	if (_local) {
+	if (_local != NULL) {
 		delete _local;
 	}
 }
@@ -81,9 +81,15 @@ ServerSocket6::~ServerSocket6()
 
 void ServerSocket6::CreateSocket()
 {
+#ifdef _WIN32
+	if ((_fd = socket(PF_INET6, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+#else
 	if ((_fd = ::socket(PF_INET6, SOCK_STREAM, 0)) < 0) {
+#endif
 		throw SocketException("Create socket error");
 	}
+
+	_is_closed = false;
 }
 
 void ServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
@@ -157,23 +163,19 @@ int ServerSocket6::GetLocalPort()
 
 void ServerSocket6::Close()
 {
+	if (_is_closed == true) {
+		return;
+	}
+
 #ifdef _WIN32
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (closesocket(_fd) < 0) {
-			throw SocketException("Close socket error");
-		}
-	}
+	if (closesocket(_fd) < 0) {
 #else
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (close(_fd) != 0) {
-			throw SocketException("Close socket error");
-		}
-	}
+	if (close(_fd) != 0) {
 #endif
+		throw SocketException("Close socket error");
+	}
+
+	_is_closed = true;
 }
 
 }

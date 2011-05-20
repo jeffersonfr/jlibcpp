@@ -46,8 +46,6 @@ RawSocket::RawSocket(std::string device_, bool promisc_, int timeout_, int rbuf_
 
 	_sent_bytes = 0;
 	_receive_bytes = 0;
-
-	_is_closed = false;
 }
 
 RawSocket::~RawSocket()
@@ -65,17 +63,15 @@ RawSocket::~RawSocket()
 void RawSocket::CreateSocket()
 {
 #ifdef _WIN32
-	_fd = socket(PF_INET, SOCK_RAW, IPPROTO_RAW);
-
-	if (_fd == INVALID_SOCKET) {
+	if ((_fd = socket(PF_INET, SOCK_RAW, IPPROTO_RAW)) == INVALID_SOCKET) {
 		throw SocketException("Create socket raw error");
 	}
 #else
-	_fd = ::socket(PF_PACKET, SOCK_RAW, (_promisc == true)?ETH_P_ALL:ETH_P_IP);
-
-	if (_fd < 0) {
+	if ((_fd = ::socket(PF_PACKET, SOCK_RAW, (_promisc == true)?ETH_P_ALL:ETH_P_IP)) < 0) {
 		throw SocketException("Create socket raw error");
 	}
+
+	_is_closed = false;
 
 	struct ifreq ifr;
 
@@ -285,23 +281,19 @@ int RawSocket::Send(const char *data_, int size_, bool block_)
 
 void RawSocket::Close()
 {
+	if (_is_closed == true) {
+		return;
+	}
+
 #ifdef _WIN32
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (closesocket(_fd) < 0) {
-			throw SocketException("Close socket error");
-		}
-	}
+	if (closesocket(_fd) < 0) {
 #else
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (close(_fd) != 0) {
-			throw SocketException("Close socket error");
-		}
-	}
+	if (close(_fd) != 0) {
 #endif
+		throw SocketException("Close socket error");
+	}
+
+	_is_closed = true;
 }
 
 InetAddress * RawSocket::GetInetAddress()

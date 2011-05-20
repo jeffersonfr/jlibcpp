@@ -29,9 +29,9 @@ SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddre
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jsocket::SSLServerSocket");
-	
-    _local = NULL;
-	_is_closed = false;
+
+	_local = NULL;
+	_is_closed = true;
 
 	if (addr_ == NULL) {
 		InetAddress *a = InetAddress4::GetLocalHost();
@@ -95,11 +95,15 @@ SSLServerSocket::~SSLServerSocket()
 
 void SSLServerSocket::CreateSocket()
 {
-	_fd = ::socket(PF_INET, SOCK_STREAM, 0);
-    
-	if (_fd < 0) {
+#ifdef _WIN32
+	{
+#else
+	if ((_fd = ::socket(PF_INET, SOCK_STREAM, 0)) < 0) {
+#endif
 		throw SocketException("Create socket error");
 	}
+
+	_is_closed = false;
 }
 
 void SSLServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
@@ -185,27 +189,23 @@ int SSLServerSocket::GetLocalPort()
 
 void SSLServerSocket::Close()
 {
+	if (_is_closed == true) {
+		return;
+	}
+
 #ifdef _WIN32
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (closesocket(_fd) < 0) {
-			throw SocketException("Close socket error");
-		}
-	}
+	if (closesocket(_fd) < 0) {
 #else
-	if (_is_closed == false) {
-		_is_closed = true;
+	SSL_shutdown(ssl);
+	SSL_free(ssl);
+	SSL_CTX_free(ctx);
 
-		SSL_shutdown(ssl);
-        SSL_free(ssl);
-	    SSL_CTX_free(ctx);
-
-		if (close(_fd) < 0) {
-			throw SocketException("Close socket error");
-		}
-	}
+	if (close(_fd) != 0) {
 #endif
+		throw SocketException("Close socket error");
+	}
+
+	_is_closed = true;
 }
 
 bool SSLServerSocket::CheckContext()
