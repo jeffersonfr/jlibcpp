@@ -28,7 +28,7 @@ CoordinateLayout::CoordinateLayout(int width, int height, jcoordinate_layout_t t
 {
 	jcommon::Object::SetClassName("jgui::CoordinateLayout");
 
-	if (width <=0 || height <= 0) {
+	if (width <= 0 || height <= 0) {
 		// throw jcommon::InvalidArgumentException("CoordinateLayout cannot work with limits lower than zero");
 	}
 
@@ -105,6 +105,10 @@ void CoordinateLayout::DoLayout(Container *target)
 
 	jsize_t tsize = target->GetSize();
 
+	if (tsize.width <= 0 || tsize.height <= 0) {
+		return;
+	}
+
 	int nmembers = target->GetComponentCount();
 
 	double sx = 1.0,
@@ -132,6 +136,7 @@ void CoordinateLayout::DoLayout(Container *target)
 		jpoint_t point = c->GetLocation();
 		jsize_t size = c->GetSize();
 
+		// c->SetLocation((int)(point.x*sx), (int)(point.y*sy));
 		c->SetBounds((int)(point.x*sx), (int)(point.y*sy), (int)(size.width*sx), (int)(size.height*sy));
 	}
 

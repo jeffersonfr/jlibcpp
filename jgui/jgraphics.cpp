@@ -25,6 +25,7 @@
 #include "jgfxhandler.h"
 #include "jfont.h"
 #include "jstringutils.h"
+#include "joutofboundsexception.h"
 
 namespace jgui {
 
@@ -223,10 +224,35 @@ jregion_t Graphics::ClipRect(int xp, int yp, int wp, int hp)
 
 void Graphics::SetClip(int xp, int yp, int wp, int hp)
 {
-	_clip.x = (xp < 0)?0:xp;
-	_clip.y = (yp < 0)?0:yp;
-	_clip.width = (wp < 0)?0:wp;
-	_clip.height = (hp < 0)?0:hp;
+	int max_wp = _scale.width-_translate.x,
+			max_hp = _scale.height-_translate.y;
+
+	if (xp < 0) {
+		wp = wp + xp;
+		xp = 0;
+	}
+
+	if (yp < 0) {
+		hp = hp + yp;
+		yp = 0;
+	}
+
+	if (xp > max_wp || yp > max_hp || xp < 0 || hp < 0) {
+		throw jcommon::OutOfBoundsException("The clip region does not match the visible screen area");
+	}
+
+	if ((xp + wp) > max_wp) {
+		wp = max_wp - xp;
+	}
+
+	if ((yp + hp) > max_hp) {
+		hp = max_hp - yp;
+	}
+
+	_clip.x = xp;
+	_clip.y = yp;
+	_clip.width = wp;
+	_clip.height = hp;
 
 #ifdef DIRECTFB_UI
 	if (surface != NULL) {

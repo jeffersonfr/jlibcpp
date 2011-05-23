@@ -203,13 +203,15 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 	private:
 		static LayersManager *_instance;
 
+		jthread::Mutex _mutex;
+		jthread::Condition _sem;
+
 		ScreenLayer *_background_layer,
 								*_video_layer,
 								*_graphic_layer;
 		
-		jthread::Mutex _mutex;
-		jthread::Condition _sem;
 		jgui::Image *_buffer;
+
 		bool _refresh;
 
 	private:
@@ -339,7 +341,6 @@ class Scene : public jgui::Container, public jgui::KeyListener, public jthread::
 
 	private:
 		jthread::Mutex _input;
-		jgui::Container *_layer;
 		jthread::Timer _timer;
 
 	private:
@@ -354,52 +355,36 @@ class Scene : public jgui::Container, public jgui::KeyListener, public jthread::
 		Scene(int x, int y, int width, int height):
 			jgui::Container(x, y, width, height)
 		{
-			_layer = LayersManager::GetInstance()->GetGraphicLayer()->GetUserContainer();
-
-			_layer->Add(this);
+			LayersManager::GetInstance()->GetGraphicLayer()->GetUserContainer()->Add(this);
 			
-			jgui::InputManager *input = jgui::InputManager::GetInstance();
-
-			input->RegisterKeyListener(this);
-
 			_timer.Schedule(this, (uint64_t)0LL, 100000LL, false);
 			
 			SetBackgroundVisible(true);
 			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
+
+			jgui::InputManager::GetInstance()->RegisterKeyListener(this);
 		}
 
 		virtual ~Scene()
 		{
-			jgui::InputManager *input = jgui::InputManager::GetInstance();
-
-			input->RemoveKeyListener(this);
-
-			_layer->Remove(this);
-
+			LayersManager::GetInstance()->GetGraphicLayer()->GetUserContainer()->Remove(this);
+			
 			jthread::TimerTask::Cancel();
 
 			jthread::AutoLock lock(&_input);
+			
+			jgui::InputManager::GetInstance()->RemoveKeyListener(this);
 		}
 
 		virtual void KeyPressed(jgui::KeyEvent *event)
 		{
 			jthread::AutoLock lock(&_input);
 
-			if (event->GetType() != jgui::JKEY_PRESSED) {
-				return;
-			}
-
 			jgui::Component *focus = GetFocusOwner();
 
 			if (focus != NULL) {
 				focus->ProcessEvent(event);
 			}
-
-			InputReceived(event);
-		}
-
-		virtual void InputReceived(jgui::KeyEvent *event)
-		{
 		}
 
 		virtual bool Animated()
@@ -424,8 +409,6 @@ class ApplicationTest : public Scene{
 		ApplicationTest():
 			Scene(0, 0, 1920, 1080)
 		{
-			jgui::InputManager::GetInstance()->RemoveKeyListener(this);
-
 			_mstate = 0;
 			_mindex = 0;
 
@@ -469,14 +452,14 @@ class MenuTest : public Scene{
 			*_button2,
 			*_button3;
 		jgui::Label *_label;
-		int _malpha,
-				_mstate;
+		double _malpha;
+		int _mstate;
 
 	public:
 		MenuTest():
 			Scene((1920-960)/2, -540, 960, 540)
 		{
-			_malpha = 1;
+			_malpha = 0.0;
 			_mstate = 0;
 			
 			Add(_label = new jgui::Label("Reposicionamento do Video", 10, 10, 960-2*10, 100));
@@ -524,21 +507,9 @@ class MenuTest : public Scene{
 
 				return true;
 			} else if (_mstate == 2) {
-				int alpha = color.GetAlpha();
+				_malpha = _malpha + M_PI/16;
 
-				alpha = alpha+0x10*_malpha;
-
-				if (alpha <= 0x10) {
-					alpha = 0x10;
-					_malpha = 1;
-				}
-
-				if (alpha > 0xa0) {
-					alpha = 0xa0;
-					_malpha = -1;
-				}
-
-				color.SetAlpha(alpha);
+				color.SetAlpha(0x80 + (int)(64.0*sin(_malpha)));
 
 				SetBackgroundColor(color);
 
@@ -548,6 +519,8 @@ class MenuTest : public Scene{
 
 				if (y < -540) {
 					y = -540;
+					
+					_malpha = 0.0;
 				}
 	
 				SetLocation(GetX(), y);
@@ -558,10 +531,14 @@ class MenuTest : public Scene{
 			return false;
 		}
 
-		virtual void InputReceived(jgui::KeyEvent *event)
+		virtual void KeyPressed(jgui::KeyEvent *event)
 		{
-			LayersManager *layers = LayersManager::GetInstance();
- 
+			Scene::KeyPressed(event);
+
+			if (event->GetType() != jgui::JKEY_PRESSED) {
+				return;
+			}
+
 			if (event->GetSymbol() == jgui::JKEY_F1) {
 				if (GetFocusOwner() != NULL) {
 					GetFocusOwner()->ReleaseFocus();
@@ -575,6 +552,8 @@ class MenuTest : public Scene{
 					_mstate = 1;
 				}
 			} else {
+				LayersManager *layers = LayersManager::GetInstance();
+
 				if (GetFocusOwner() == _button1) {
 					layers->GetVideoLayer()->SetBounds(0, 0, 1920, 1080);
 				} else if (GetFocusOwner() == _button2) {
@@ -598,9 +577,8 @@ int main(int argc, char **argv)
 		manager->GetVideoLayer()->Play();
 	}
 
-	MenuTest menu;
-
 	ApplicationTest application;
+	MenuTest menu;
 
 	sleep(100000);
 
