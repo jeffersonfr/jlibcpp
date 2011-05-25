@@ -275,11 +275,13 @@ void Container::Paint(Graphics *g)
 				ch = clip.height-cy;
 			}
 
-			g->Translate(cx, cy);
-			g->SetClip(0, 0, cw-1, ch-1);
-			c->Paint(g);
-			g->ReleaseClip();
-			g->Translate(-cx, -cy);
+			if (cw > 0 && ch > 0) {
+				g->Translate(cx, cy);
+				g->SetClip(0, 0, cw-1, ch-1);
+				c->Paint(g);
+				g->ReleaseClip();
+				g->Translate(-cx, -cy);
+			}
 
 			c->Revalidate();
 			
@@ -400,7 +402,17 @@ void Container::Add(Component *c, int index)
 	if (std::find(_components.begin(), _components.end(), c) == _components.end()) {
 		_components.insert(_components.begin()+index, c);
 
-		c->SetParent(this);
+		if (c->InstanceOf("jgui::Container") == true) {
+			jgui::Component *focus = dynamic_cast<jgui::Container *>(c)->GetFocusOwner();
+
+			c->SetParent(this);
+
+			if ((void *)focus != NULL) {
+				RequestComponentFocus(focus);
+			}
+		} else {
+			c->SetParent(this);
+		}
 
 		DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
 	}
@@ -492,35 +504,31 @@ std::vector<Component *> & Container::GetComponents()
 	return _components;
 }
 
-void Container::RequestComponentFocus(jgui::Component *c, bool has_parent)
+void Container::RequestComponentFocus(jgui::Component *c)
 {
 	if (c == NULL) {
 		return;
 	}
 
 	if (_parent != NULL) {
-		_parent->RequestComponentFocus(c, !IsOpaque());
+		_parent->RequestComponentFocus(c);
 	} else {
-		if (has_parent == true) {
-			SetIgnoreRepaint(true);
-		}
+		SetIgnoreRepaint(true);
 
 		if (_focus != NULL && _focus != c) {
 			_focus->ReleaseFocus();
 		}
 
 		_focus = c;
-
-		_focus->Invalidate();
-
-		dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, GAINED_FOCUS_EVENT));
-	
-		c->Repaint();
 		
-		if (has_parent == true) {
-			SetIgnoreRepaint(false);
-			Repaint();
-		}
+		_focus->Invalidate();
+		_focus->Repaint();
+
+		SetIgnoreRepaint(false);
+
+		Repaint();
+		
+		dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, GAINED_FOCUS_EVENT));
 	}
 }
 

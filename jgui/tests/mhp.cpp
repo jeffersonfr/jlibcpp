@@ -479,13 +479,12 @@ class MenuTest : public Scene{
 
 		virtual ~MenuTest()
 		{
-			Remove(_label);
-			Remove(_button1);
-			Remove(_button2);
+			RemoveAll();
 
 			delete _label;
 			delete _button1;
 			delete _button2;
+			delete _button3;
 		}
 
 		virtual bool Animated()

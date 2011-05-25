@@ -237,7 +237,7 @@ void Graphics::SetClip(int xp, int yp, int wp, int hp)
 		yp = 0;
 	}
 
-	if (xp > max_wp || yp > max_hp || xp < 0 || hp < 0) {
+	if (xp > max_wp || yp > max_hp || wp < 0 || hp < 0) {
 		throw jcommon::OutOfBoundsException("The clip region does not match the visible screen area");
 	}
 

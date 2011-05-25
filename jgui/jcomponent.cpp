@@ -972,7 +972,7 @@ void Component::RequestFocus()
 		if (_parent != NULL) {
 			_has_focus = true;
 
-			_parent->RequestComponentFocus(this, false);
+			_parent->RequestComponentFocus(this);
 		}
 	}
 }
