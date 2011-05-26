@@ -396,10 +396,6 @@ void Component::SetBorder(jcomponent_border_t t)
 
 void Component::SetIgnoreRepaint(bool b)
 {
-	if (_ignore_repaint == b) {
-		return;
-	}
-
 	_ignore_repaint = b;
 }
 

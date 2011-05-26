@@ -532,11 +532,11 @@ class MenuTest : public Scene{
 
 		virtual void KeyPressed(jgui::KeyEvent *event)
 		{
-			Scene::KeyPressed(event);
-
 			if (event->GetType() != jgui::JKEY_PRESSED) {
 				return;
 			}
+
+			Scene::KeyPressed(event);
 
 			if (event->GetSymbol() == jgui::JKEY_F1) {
 				if (GetFocusOwner() != NULL) {
