@@ -510,8 +510,23 @@ void Container::RemoveAll()
 	jgui::Component *focus = GetFocusOwner();
 
 	if ((void *)focus != NULL) {
-		focus->ReleaseFocus();
+		Container *parent = focus->GetParent();
+
+		while ((void *)parent != NULL) {
+			if (parent == this) {
+				focus->ReleaseFocus();
+
+				break;
+			}
+
+			if (parent->GetParent() == NULL) {
+				break;
+			}
+
+			parent = parent->GetParent();
+		}
 	}
+
 
 	{
 		jthread::AutoLock lock(&_container_mutex);
@@ -569,6 +584,8 @@ void Container::ReleaseComponentFocus(jgui::Component *c)
 	}
 
 	if (_parent != NULL) {
+		_focus = NULL;
+
 		_parent->ReleaseComponentFocus(c);
 	} else {
 		if (_focus != NULL && _focus == c) {
