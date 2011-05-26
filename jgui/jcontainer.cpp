@@ -460,7 +460,31 @@ void Container::Remove(jgui::Component *c)
 {
 	jthread::AutoLock lock(&_container_mutex);
 
-	c->ReleaseFocus();
+	// INFO:: se o componente em foco pertencer ao container remover o foco
+	if (c->InstanceOf("jgui::Container") == true) {
+		jgui::Container *container = dynamic_cast<jgui::Container *>(c);
+		jgui::Component *focus = GetFocusOwner();
+
+		if ((void *)focus != NULL) {
+			Container *parent = focus->GetParent();
+
+			while ((void *)parent != NULL) {
+				if (parent == container) {
+					focus->ReleaseFocus();
+
+					break;
+				}
+
+				if (parent->GetParent() == NULL) {
+					break;
+				}
+
+				parent = parent->GetParent();
+			}
+		}
+	} else {
+		c->ReleaseFocus();
+	}
 
 	if (_layout != NULL) {
 		if (_layout->InstanceOf("jgui::BorderLayout") == true) {
@@ -483,6 +507,12 @@ void Container::Remove(jgui::Component *c)
 
 void Container::RemoveAll()
 {
+	jgui::Component *focus = GetFocusOwner();
+
+	if ((void *)focus != NULL) {
+		focus->ReleaseFocus();
+	}
+
 	{
 		jthread::AutoLock lock(&_container_mutex);
 
