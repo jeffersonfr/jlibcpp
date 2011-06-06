@@ -33,8 +33,8 @@ Button::Button(std::string label, int x, int y, int width, int height):
 	_halign = CENTER_HALIGN;
 	_valign = CENTER_VALIGN;
 
-	_index = 0;
-	_name_list.push_back(label);
+	_name = label;
+	_label = label;
 
 	SetFocusable(true);
 }
@@ -43,61 +43,24 @@ Button::~Button()
 {
 }
 
-void Button::SetText(std::string name)
+void Button::SetName(std::string name)
 {
-	_name_list.clear();
-	_name_list.push_back(name);
+	_name = name;
 }
 
-void Button::AddName(std::string name)
+void Button::SetLabel(std::string label)
 {
-	_name_list.push_back(name);
+	_label = label;
 }
 
-void Button::RemoveName(int index)
+std::string Button::GetName()
 {
-	if (index >= (int)_name_list.size()) {
-		return;
-	}
-
-	_name_list.erase(_name_list.begin()+index);
+	return _name;
 }
 
-void Button::SetCurrentNameIndex(int index)
+std::string Button::GetLabel()
 {
-	int size = _name_list.size();
-
-	if (size == 0) {
-		_index = 0;
-
-		return;
-	}
-
-	_index = index;
-
-	if (_index < 0) {
-		_index = size-1;
-	}
-
-	if (_index > (int)(size-1)) {
-		_index = 0;
-	}
-
-	Repaint();
-}
-
-void Button::NextName()
-{
-	_index++;
-
-	SetCurrentNameIndex(_index);
-}
-
-void Button::PreviousName()
-{
-	_index--;
-
-	SetCurrentNameIndex(_index);
+	return _label;
 }
 
 void Button::SetHorizontalAlign(jhorizontal_align_t align)
@@ -144,7 +107,7 @@ bool Button::ProcessEvent(MouseEvent *event)
 		catched = true;
 
 		RequestFocus();
-		DispatchButtonEvent(new ButtonEvent(this, GetText()));
+		DispatchButtonEvent(new ButtonEvent(this));
 	}
 
 	return catched;
@@ -163,29 +126,12 @@ bool Button::ProcessEvent(KeyEvent *event)
 	bool catched = false;
 
 	if (event->GetSymbol() == JKEY_ENTER) {
-		DispatchButtonEvent(new ButtonEvent(this, GetText()));
+		DispatchButtonEvent(new ButtonEvent(this));
 
 		catched = true;
 	}
 
 	return catched;
-}
-
-std::string Button::GetText()
-{
-	if (_name_list.size() == 0) {
-		return "";
-	}
-
-	if (_index < 0) {
-		_index = 0;
-	}
-
-	if (_index >= (int)_name_list.size()) {
-		_index = _name_list.size()-1;
-	}
-
-	return _name_list[_index];
 }
 
 void Button::Paint(Graphics *g)
@@ -231,7 +177,7 @@ void Button::Paint(Graphics *g)
 		pw = (pw < 0)?0:pw;
 		ph = (ph < 0)?0:ph;
 
-		std::string text = GetText();
+		std::string text = GetLabel();
 
 		if (_wrap == false) {
 			text = _font->TruncateString(text, "...", pw);

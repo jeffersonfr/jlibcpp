@@ -96,9 +96,9 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 	std::string symbol;
 	bool any = false;
 
-	if (button->GetText() == "caps") {
+	if (button->GetLabel() == "caps") {
 		ProcessCaps(button);
-	} else if (button->GetText() == "shift") {
+	} else if (button->GetLabel() == "shift") {
 		if (_shift_pressed == true) {
 			_shift_pressed = false;
 		} else {
@@ -106,37 +106,37 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 		}
 
 		ProcessCaps(button);
-	} else if (button->GetText() == "back") {
+	} else if (button->GetLabel() == "back") {
 		if (_show_text == true) {
 			display->Backspace();
 		}
 
 		symbol = "\x8";
-	} else if (button->GetText() == "enter") {
+	} else if (button->GetLabel() == "enter") {
 		if (_show_text == true) {
 			display->Insert("\n");
 		}
 
 		symbol = "\n";
-	} else if (button->GetText() == "tab") {
+	} else if (button->GetLabel() == "tab") {
 		if (_show_text == true) {
 			display->Insert("    ");
 		}
 
 		symbol = "    ";
-	} else if (button->GetText() == "space") {
+	} else if (button->GetLabel() == "space") {
 		if (_show_text == true) {
 			display->Insert(" ");
 		}
 
 		symbol = " ";
-	} else if (button->GetText() == "e" && (_type == SMALL_NUMERIC_KEYBOARD || _type == FULL_NUMERIC_KEYBOARD)) {
+	} else if (button->GetLabel() == "e" && (_type == SMALL_NUMERIC_KEYBOARD || _type == FULL_NUMERIC_KEYBOARD)) {
 		if (_show_text == true) {
 			display->Insert("2.71828182845904523536");
 		}
 
 		symbol = "2.71828182845904523536";
-	} else if (button->GetText() == "pi" && (_type == SMALL_NUMERIC_KEYBOARD || _type == FULL_NUMERIC_KEYBOARD)) {
+	} else if (button->GetLabel() == "pi" && (_type == SMALL_NUMERIC_KEYBOARD || _type == FULL_NUMERIC_KEYBOARD)) {
 		if (_show_text == true) {
 			display->Insert("3.14159265358979323846");
 		}
@@ -144,11 +144,11 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 		symbol = "3.14159265358979323846";
 	} else {
 		if (_show_text == true) {
-			display->Insert(button->GetText());
+			display->Insert(button->GetLabel());
 		}
 
 		any = true;
-		symbol = button->GetText();
+		symbol = button->GetLabel();
 	}
 
 	if (_show_text == true) {
@@ -420,41 +420,41 @@ void Keyboard::BuildSmallAlphaNumericKeyboard()
 		display->SetNavigation(NULL, NULL, b[24], NULL);	
 	}
 
-	b[0]->SetNavigation(NULL, b[1], NULL, b[8]);	b[0]->AddName("A");
-	b[1]->SetNavigation(b[0], b[2], NULL, b[9]);	b[1]->AddName("B");
-	b[2]->SetNavigation(b[1], b[3], NULL, b[10]); b[2]->AddName("C");
-	b[3]->SetNavigation(b[2], b[4], NULL, b[11]); b[3]->AddName("D");
-	b[4]->SetNavigation(b[3], b[5], NULL, b[12]); b[4]->AddName("E");
-	b[5]->SetNavigation(b[4], b[6], NULL, b[13]); b[5]->AddName("F");
-	b[6]->SetNavigation(b[5], b[7], NULL, b[14]); b[6]->AddName("G");
-	b[7]->SetNavigation(b[6], NULL, NULL, b[15]); b[7]->AddName("H");
+	b[0]->SetNavigation(NULL, b[1], NULL, b[8]);	b[0]->SetName("A");
+	b[1]->SetNavigation(b[0], b[2], NULL, b[9]);	b[1]->SetName("B");
+	b[2]->SetNavigation(b[1], b[3], NULL, b[10]); b[2]->SetName("C");
+	b[3]->SetNavigation(b[2], b[4], NULL, b[11]); b[3]->SetName("D");
+	b[4]->SetNavigation(b[3], b[5], NULL, b[12]); b[4]->SetName("E");
+	b[5]->SetNavigation(b[4], b[6], NULL, b[13]); b[5]->SetName("F");
+	b[6]->SetNavigation(b[5], b[7], NULL, b[14]); b[6]->SetName("G");
+	b[7]->SetNavigation(b[6], NULL, NULL, b[15]); b[7]->SetName("H");
 
-	b[8]->SetNavigation(NULL, b[9], b[0], b[16]); b[8]->AddName("I");
-	b[9]->SetNavigation(b[8], b[10], b[1], b[17]); b[9]->AddName("J");
-	b[10]->SetNavigation(b[9], b[11], b[2], b[18]); b[10]->AddName("K");
-	b[11]->SetNavigation(b[10], b[12], b[3], b[19]); b[11]->AddName("L");
-	b[12]->SetNavigation(b[11], b[13], b[4], b[20]);	b[12]->AddName("M");
-	b[13]->SetNavigation(b[12], b[14], b[5], b[21]);	b[13]->AddName("N");
-	b[14]->SetNavigation(b[13], b[15], b[6], b[22]);	b[14]->AddName("O");
-	b[15]->SetNavigation(b[14], NULL, b[7], b[23]); b[15]->AddName("P");
+	b[8]->SetNavigation(NULL, b[9], b[0], b[16]); b[8]->SetName("I");
+	b[9]->SetNavigation(b[8], b[10], b[1], b[17]); b[9]->SetName("J");
+	b[10]->SetNavigation(b[9], b[11], b[2], b[18]); b[10]->SetName("K");
+	b[11]->SetNavigation(b[10], b[12], b[3], b[19]); b[11]->SetName("L");
+	b[12]->SetNavigation(b[11], b[13], b[4], b[20]);	b[12]->SetName("M");
+	b[13]->SetNavigation(b[12], b[14], b[5], b[21]);	b[13]->SetName("N");
+	b[14]->SetNavigation(b[13], b[15], b[6], b[22]);	b[14]->SetName("O");
+	b[15]->SetNavigation(b[14], NULL, b[7], b[23]); b[15]->SetName("P");
 
-	b[16]->SetNavigation(NULL, b[17], b[8], b[24]); b[16]->AddName("Q");
-	b[17]->SetNavigation(b[16], b[18], b[9], b[25]); b[17]->AddName("R");
-	b[18]->SetNavigation(b[17], b[19], b[10], b[26]); b[18]->AddName("S");
-	b[19]->SetNavigation(b[18], b[20], b[11], b[27]); b[19]->AddName("T");
-	b[20]->SetNavigation(b[19], b[21], b[12], b[28]); b[20]->AddName("U");
-	b[21]->SetNavigation(b[20], b[22], b[13], b[29]); b[21]->AddName("V");
-	b[22]->SetNavigation(b[21], b[23], b[14], b[30]); b[22]->AddName("X");
-	b[23]->SetNavigation(b[22], NULL, b[15], b[31]);	b[23]->AddName("W");
+	b[16]->SetNavigation(NULL, b[17], b[8], b[24]); b[16]->SetName("Q");
+	b[17]->SetNavigation(b[16], b[18], b[9], b[25]); b[17]->SetName("R");
+	b[18]->SetNavigation(b[17], b[19], b[10], b[26]); b[18]->SetName("S");
+	b[19]->SetNavigation(b[18], b[20], b[11], b[27]); b[19]->SetName("T");
+	b[20]->SetNavigation(b[19], b[21], b[12], b[28]); b[20]->SetName("U");
+	b[21]->SetNavigation(b[20], b[22], b[13], b[29]); b[21]->SetName("V");
+	b[22]->SetNavigation(b[21], b[23], b[14], b[30]); b[22]->SetName("X");
+	b[23]->SetNavigation(b[22], NULL, b[15], b[31]);	b[23]->SetName("W");
 
-	b[24]->SetNavigation(NULL, b[25], b[16], b[32]);	b[24]->AddName("Y");
-	b[25]->SetNavigation(b[24], b[26], b[17], b[32]); b[25]->AddName("Z");
-	b[26]->SetNavigation(b[25], b[27], b[18], b[33]); b[26]->AddName("#");
-	b[27]->SetNavigation(b[26], b[28], b[19], b[33]); b[27]->AddName("*");
-	b[28]->SetNavigation(b[27], b[29], b[20], b[34]); b[28]->AddName("-");
-	b[29]->SetNavigation(b[28], b[30], b[21], b[34]); b[29]->AddName(",");
-	b[30]->SetNavigation(b[29], b[31], b[22], b[35]); b[30]->AddName(":");
-	b[31]->SetNavigation(b[30], NULL, b[23], b[35]);	b[31]->AddName("?");
+	b[24]->SetNavigation(NULL, b[25], b[16], b[32]);	b[24]->SetName("Y");
+	b[25]->SetNavigation(b[24], b[26], b[17], b[32]); b[25]->SetName("Z");
+	b[26]->SetNavigation(b[25], b[27], b[18], b[33]); b[26]->SetName("#");
+	b[27]->SetNavigation(b[26], b[28], b[19], b[33]); b[27]->SetName("*");
+	b[28]->SetNavigation(b[27], b[29], b[20], b[34]); b[28]->SetName("-");
+	b[29]->SetNavigation(b[28], b[30], b[21], b[34]); b[29]->SetName(",");
+	b[30]->SetNavigation(b[29], b[31], b[22], b[35]); b[30]->SetName(":");
+	b[31]->SetNavigation(b[30], NULL, b[23], b[35]);	b[31]->SetName("?");
 
 	if (_show_text == true) {
 		b[32]->SetNavigation(NULL, b[33], b[24], display);;
@@ -563,61 +563,61 @@ void Keyboard::BuildFullAlphaNumericKeyboard()
 		display->SetNavigation(NULL, NULL, b[54], NULL);	
 	}
 
-	b[0]->SetNavigation(NULL, b[1], NULL, b[13]); b[0]->AddName("\"");
-	b[1]->SetNavigation(b[0], b[2], NULL, b[14]); b[1]->AddName("!");
-	b[2]->SetNavigation(b[1], b[3], NULL, b[15]); b[2]->AddName("@");
-	b[3]->SetNavigation(b[2], b[4], NULL, b[16]); b[3]->AddName("#");
-	b[4]->SetNavigation(b[3], b[5], NULL, b[17]); b[4]->AddName("$");
-	b[5]->SetNavigation(b[4], b[6], NULL, b[18]); b[5]->AddName("%");
-	b[6]->SetNavigation(b[5], b[7], NULL, b[19]); b[6]->AddName("^");
-	b[7]->SetNavigation(b[6], b[8], NULL, b[20]); b[7]->AddName("&");
-	b[8]->SetNavigation(b[7], b[9], NULL, b[21]); b[8]->AddName("*");
-	b[9]->SetNavigation(b[8], b[10], NULL, b[22]); b[9]->AddName("(");
-	b[10]->SetNavigation(b[9], b[11], NULL, b[23]); b[10]->AddName(")");
-	b[11]->SetNavigation(b[10], b[12], NULL, b[24]);	b[11]->AddName("_");
-	b[12]->SetNavigation(b[11], NULL, NULL, b[25]); b[12]->AddName("+");
+	b[0]->SetNavigation(NULL, b[1], NULL, b[13]); b[0]->SetName("\"");
+	b[1]->SetNavigation(b[0], b[2], NULL, b[14]); b[1]->SetName("!");
+	b[2]->SetNavigation(b[1], b[3], NULL, b[15]); b[2]->SetName("@");
+	b[3]->SetNavigation(b[2], b[4], NULL, b[16]); b[3]->SetName("#");
+	b[4]->SetNavigation(b[3], b[5], NULL, b[17]); b[4]->SetName("$");
+	b[5]->SetNavigation(b[4], b[6], NULL, b[18]); b[5]->SetName("%");
+	b[6]->SetNavigation(b[5], b[7], NULL, b[19]); b[6]->SetName("^");
+	b[7]->SetNavigation(b[6], b[8], NULL, b[20]); b[7]->SetName("&");
+	b[8]->SetNavigation(b[7], b[9], NULL, b[21]); b[8]->SetName("*");
+	b[9]->SetNavigation(b[8], b[10], NULL, b[22]); b[9]->SetName("(");
+	b[10]->SetNavigation(b[9], b[11], NULL, b[23]); b[10]->SetName(")");
+	b[11]->SetNavigation(b[10], b[12], NULL, b[24]);	b[11]->SetName("_");
+	b[12]->SetNavigation(b[11], NULL, NULL, b[25]); b[12]->SetName("+");
 
-	b[13]->SetNavigation(NULL, b[14], b[0], b[26]);	b[13]->AddName("tab");
-	b[14]->SetNavigation(b[13], b[15], b[1], b[27]);	b[14]->AddName("Q");
-	b[15]->SetNavigation(b[14], b[16], b[2], b[28]);	b[15]->AddName("W");
-	b[16]->SetNavigation(b[15], b[17], b[3], b[29]);	b[16]->AddName("E");
-	b[17]->SetNavigation(b[16], b[18], b[4], b[30]);	b[17]->AddName("R");
-	b[18]->SetNavigation(b[17], b[19], b[5], b[31]);	b[18]->AddName("T");
-	b[19]->SetNavigation(b[18], b[20], b[6], b[32]);	b[19]->AddName("Y");
-	b[20]->SetNavigation(b[19], b[21], b[7], b[33]);	b[20]->AddName("U");
-	b[21]->SetNavigation(b[20], b[22], b[8], b[34]);	b[21]->AddName("I");
-	b[22]->SetNavigation(b[21], b[23], b[9], b[35]); b[22]->AddName("O");
-	b[23]->SetNavigation(b[22], b[24], b[10], b[36]); b[23]->AddName("P");
-	b[24]->SetNavigation(b[23], b[25], b[11], b[37]); b[24]->AddName("`");
-	b[25]->SetNavigation(b[24], NULL, b[12], b[38]); b[25]->AddName("{");
+	b[13]->SetNavigation(NULL, b[14], b[0], b[26]);	b[13]->SetName("tab");
+	b[14]->SetNavigation(b[13], b[15], b[1], b[27]);	b[14]->SetName("Q");
+	b[15]->SetNavigation(b[14], b[16], b[2], b[28]);	b[15]->SetName("W");
+	b[16]->SetNavigation(b[15], b[17], b[3], b[29]);	b[16]->SetName("E");
+	b[17]->SetNavigation(b[16], b[18], b[4], b[30]);	b[17]->SetName("R");
+	b[18]->SetNavigation(b[17], b[19], b[5], b[31]);	b[18]->SetName("T");
+	b[19]->SetNavigation(b[18], b[20], b[6], b[32]);	b[19]->SetName("Y");
+	b[20]->SetNavigation(b[19], b[21], b[7], b[33]);	b[20]->SetName("U");
+	b[21]->SetNavigation(b[20], b[22], b[8], b[34]);	b[21]->SetName("I");
+	b[22]->SetNavigation(b[21], b[23], b[9], b[35]); b[22]->SetName("O");
+	b[23]->SetNavigation(b[22], b[24], b[10], b[36]); b[23]->SetName("P");
+	b[24]->SetNavigation(b[23], b[25], b[11], b[37]); b[24]->SetName("`");
+	b[25]->SetNavigation(b[24], NULL, b[12], b[38]); b[25]->SetName("{");
 
-	b[26]->SetNavigation(NULL, b[27], b[13], b[39]); b[26]->AddName("caps");
-	b[27]->SetNavigation(b[26], b[28], b[14], b[40]); b[27]->AddName("A");
-	b[28]->SetNavigation(b[27], b[29], b[15], b[41]); b[28]->AddName("S");
-	b[29]->SetNavigation(b[28], b[30], b[16], b[42]); b[29]->AddName("D");
-	b[30]->SetNavigation(b[29], b[31], b[17], b[43]); b[30]->AddName("F");
-	b[31]->SetNavigation(b[30], b[32], b[18], b[44]); b[31]->AddName("G");
-	b[32]->SetNavigation(b[31], b[33], b[19], b[45]); b[32]->AddName("H");
-	b[33]->SetNavigation(b[32], b[34], b[20], b[46]); b[33]->AddName("J");
-	b[34]->SetNavigation(b[33], b[35], b[21], b[47]); b[34]->AddName("K");
-	b[35]->SetNavigation(b[34], b[36], b[22], b[48]); b[35]->AddName("L");
-	b[36]->SetNavigation(b[35], b[37], b[23], b[49]); b[36]->AddName("C");
-	b[37]->SetNavigation(b[36], b[38], b[24], b[50]); b[37]->AddName("'");
-	b[38]->SetNavigation(b[37], NULL, b[25], b[51]); b[38]->AddName("}");
+	b[26]->SetNavigation(NULL, b[27], b[13], b[39]); b[26]->SetName("caps");
+	b[27]->SetNavigation(b[26], b[28], b[14], b[40]); b[27]->SetName("A");
+	b[28]->SetNavigation(b[27], b[29], b[15], b[41]); b[28]->SetName("S");
+	b[29]->SetNavigation(b[28], b[30], b[16], b[42]); b[29]->SetName("D");
+	b[30]->SetNavigation(b[29], b[31], b[17], b[43]); b[30]->SetName("F");
+	b[31]->SetNavigation(b[30], b[32], b[18], b[44]); b[31]->SetName("G");
+	b[32]->SetNavigation(b[31], b[33], b[19], b[45]); b[32]->SetName("H");
+	b[33]->SetNavigation(b[32], b[34], b[20], b[46]); b[33]->SetName("J");
+	b[34]->SetNavigation(b[33], b[35], b[21], b[47]); b[34]->SetName("K");
+	b[35]->SetNavigation(b[34], b[36], b[22], b[48]); b[35]->SetName("L");
+	b[36]->SetNavigation(b[35], b[37], b[23], b[49]); b[36]->SetName("C");
+	b[37]->SetNavigation(b[36], b[38], b[24], b[50]); b[37]->SetName("'");
+	b[38]->SetNavigation(b[37], NULL, b[25], b[51]); b[38]->SetName("}");
 
-	b[39]->SetNavigation(NULL, b[40], b[26], b[52]); b[39]->AddName("shift");
-	b[40]->SetNavigation(b[39], b[41], b[27], b[52]); b[40]->AddName("|");
-	b[41]->SetNavigation(b[40], b[42], b[28], b[52]); b[41]->AddName("Z");
-	b[42]->SetNavigation(b[41], b[43], b[29], b[53]); b[42]->AddName("X");
-	b[43]->SetNavigation(b[42], b[44], b[30], b[53]); b[43]->AddName("C");
-	b[44]->SetNavigation(b[43], b[45], b[31], b[53]); b[44]->AddName("V");
-	b[45]->SetNavigation(b[44], b[46], b[32], b[53]); b[45]->AddName("B");
-	b[46]->SetNavigation(b[45], b[47], b[33], b[53]); b[46]->AddName("N");
-	b[47]->SetNavigation(b[46], b[48], b[34], b[53]); b[47]->AddName("M");
-	b[48]->SetNavigation(b[47], b[49], b[35], b[54]); b[48]->AddName("<");
-	b[49]->SetNavigation(b[48], b[50], b[36], b[54]); b[49]->AddName(">");
-	b[50]->SetNavigation(b[49], b[51], b[37], b[54]); b[50]->AddName(":");
-	b[51]->SetNavigation(b[50], NULL, b[38], b[54]); b[51]->AddName("?");
+	b[39]->SetNavigation(NULL, b[40], b[26], b[52]); b[39]->SetName("shift");
+	b[40]->SetNavigation(b[39], b[41], b[27], b[52]); b[40]->SetName("|");
+	b[41]->SetNavigation(b[40], b[42], b[28], b[52]); b[41]->SetName("Z");
+	b[42]->SetNavigation(b[41], b[43], b[29], b[53]); b[42]->SetName("X");
+	b[43]->SetNavigation(b[42], b[44], b[30], b[53]); b[43]->SetName("C");
+	b[44]->SetNavigation(b[43], b[45], b[31], b[53]); b[44]->SetName("V");
+	b[45]->SetNavigation(b[44], b[46], b[32], b[53]); b[45]->SetName("B");
+	b[46]->SetNavigation(b[45], b[47], b[33], b[53]); b[46]->SetName("N");
+	b[47]->SetNavigation(b[46], b[48], b[34], b[53]); b[47]->SetName("M");
+	b[48]->SetNavigation(b[47], b[49], b[35], b[54]); b[48]->SetName("<");
+	b[49]->SetNavigation(b[48], b[50], b[36], b[54]); b[49]->SetName(">");
+	b[50]->SetNavigation(b[49], b[51], b[37], b[54]); b[50]->SetName(":");
+	b[51]->SetNavigation(b[50], NULL, b[38], b[54]); b[51]->SetName("?");
 
 	if (_show_text == true) {
 		b[52]->SetNavigation(NULL, b[53], b[39], display);
@@ -835,7 +835,12 @@ void Keyboard::ProcessCaps(Button *button)
 	SetIgnoreRepaint(true);
 
 	for (std::vector<Button *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
-		(*i)->NextName();
+		jgui::Button *button = (*i);
+
+		std::string name = button->GetName();
+
+		button->SetName(button->GetLabel());
+		button->SetLabel(name);
 	}
 	
 	SetIgnoreRepaint(false);
@@ -849,9 +854,9 @@ std::string Keyboard::GetText()
 {
 	if (_show_text == true) {
 		return display->GetText();
-	} else {
-		return std::string("");
 	}
+
+	return std::string("");
 }
 
 void Keyboard::RegisterKeyboardListener(KeyboardListener *listener)

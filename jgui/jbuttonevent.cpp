@@ -22,21 +22,14 @@
 
 namespace jgui {
 
-ButtonEvent::ButtonEvent(void *source, std::string symbol):
+ButtonEvent::ButtonEvent(void *source):
 	jcommon::EventObject(source)
 {	
 	jcommon::Object::SetClassName("jgui::ButtonEvent");
-
-	_symbol = symbol;
 }
 
 ButtonEvent::~ButtonEvent()
 {
-}
-
-std::string ButtonEvent::GetSymbol()
-{
-	return _symbol;
 }
 
 }

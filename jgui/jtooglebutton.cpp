@@ -87,7 +87,7 @@ bool ToogleButton::ProcessEvent(MouseEvent *event)
 
 		RequestFocus();
 		Repaint();
-		DispatchButtonEvent(new ButtonEvent(this, GetText()));
+		DispatchButtonEvent(new ButtonEvent(this));
 	}
 
 	return catched;
@@ -116,7 +116,7 @@ bool ToogleButton::ProcessEvent(KeyEvent *event)
 
 		Repaint();
 
-		DispatchButtonEvent(new ButtonEvent(this, GetText()));
+		DispatchButtonEvent(new ButtonEvent(this));
 
 		catched = true;
 	}
@@ -150,7 +150,7 @@ void ToogleButton::Paint(Graphics *g)
 			pw = w-gapx,
 			ph = h-gapy;
 
-	if (GetText() == "") {
+	if (GetLabel() == "") {
 		g->DrawImage((_has_focus == true && _image_focus_icon != NULL)?_image_focus_icon:_image_icon, px, py, pw, ph);
 	} else {
 		g->DrawImage((_has_focus == true && _image_focus_icon != NULL)?_image_focus_icon:_image_icon, px, py, ph, ph);
@@ -181,7 +181,7 @@ void ToogleButton::Paint(Graphics *g)
 			pw = (pw < 0)?0:pw;
 			ph = (ph < 0)?0:ph;
 
-			std::string text = GetText();
+			std::string text = GetLabel();
 
 			if (_wrap == false) {
 				text = _font->TruncateString(text, "...", pw);

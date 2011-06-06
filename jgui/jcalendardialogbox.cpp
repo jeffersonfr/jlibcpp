@@ -386,7 +386,7 @@ void CalendarDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 	b1->SetForegroundColor(0x60, 0x60, 0xc0, 0xff);
 	b1->SetForegroundFocusColor(0x60, 0x60, 0xc0, 0xff);
 
-	_select_day = atoi(b1->GetText().c_str());
+	_select_day = atoi(b1->GetLabel().c_str());
 	_select_month = (_month+1);
 	_select_year = (_year+1970);
 }

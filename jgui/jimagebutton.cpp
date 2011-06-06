@@ -96,7 +96,7 @@ void ImageButton::Paint(Graphics *g)
 			pw = w-gapx,
 			ph = h-gapy;
 
-	if (GetText() == "") {
+	if (GetLabel() == "") {
 		g->DrawImage((_has_focus == true && _image_focus_icon != NULL)?_image_focus_icon:_image_icon, px, py, pw, ph);
 	} else {
 		g->DrawImage((_has_focus == true && _image_focus_icon != NULL)?_image_focus_icon:_image_icon, px, py, ph, ph);
@@ -127,7 +127,7 @@ void ImageButton::Paint(Graphics *g)
 			pw = (pw < 0)?0:pw;
 			ph = (ph < 0)?0:ph;
 
-			std::string text = GetText();
+			std::string text = GetLabel();
 
 			if (_wrap == false) {
 				text = _font->TruncateString(text, "...", pw);

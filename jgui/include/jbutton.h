@@ -40,8 +40,8 @@ class Button : public Component{
 
 	private:
 		std::vector<ButtonListener *> _button_listeners;
-		std::vector<std::string> _name_list;
-		int _index;
+		std::string _name,
+			_label;
 
 	protected:
 		jhorizontal_align_t _halign;
@@ -65,38 +65,26 @@ class Button : public Component{
 		 * \brief
 		 *
 		 */
-		virtual void SetText(std::string text);
+		virtual void SetName(std::string name);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void AddName(std::string);
+		virtual void SetLabel(std::string label);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void RemoveName(int index);
-		
+		virtual std::string GetName();
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetCurrentNameIndex(int index);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void NextName();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PreviousName();
-		
+		virtual std::string GetLabel();
+
 		/**
 		 * \brief
 		 *
@@ -121,12 +109,6 @@ class Button : public Component{
 		 */
 		virtual jvertical_align_t GetVerticalAlign();
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetText();
-
 		/**
 		 * \brief
 		 *
