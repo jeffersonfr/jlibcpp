@@ -48,7 +48,7 @@ enum jkey_type_t {
  * \brief
  *
  */
-enum jinput_modifiers_t {
+enum jkey_modifiers_t {
 	JMOD_SHIFT				= 0x0001,
 	JMOD_CONTROL			= 0x0002,
 	JMOD_ALT					= 0x0004,
@@ -250,14 +250,14 @@ class KeyEvent : public jcommon::EventObject{
 		int _code;
 		jkey_symbol_t _symbol;
 		jkey_type_t _type;
-		jinput_modifiers_t _mod;
+		jkey_modifiers_t _mod;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		KeyEvent(void *source, jkey_type_t type, jinput_modifiers_t mod, int code, jkey_symbol_t symbol);
+		KeyEvent(void *source, jkey_type_t type, jkey_modifiers_t mod, int code, jkey_symbol_t symbol);
 		
 		/**
 		 * \brief
@@ -287,7 +287,7 @@ class KeyEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		virtual jinput_modifiers_t GetModifiers();
+		virtual jkey_modifiers_t GetModifiers();
 
 };
 

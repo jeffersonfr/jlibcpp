@@ -40,11 +40,11 @@
 namespace jgui {
 
 enum jcomponent_alignment_t {
-	TOP_ALIGNMENT = 0,
-	CENTER_ALIGNMENT = 1,
-	BOTTOM_ALIGNMENT = 2,
-	LEFT_ALIGNMENT = 0,
-	RIGHT_ALIGNMENT = 2
+	TOP_ALIGNMENT,
+	CENTER_ALIGNMENT,
+	BOTTOM_ALIGNMENT,
+	LEFT_ALIGNMENT,
+	RIGHT_ALIGNMENT
 };
 
 enum jcomponent_orientation_t {

@@ -35,6 +35,10 @@
 
 namespace jgui {
 
+enum jfont_attributes_t {
+	FA_NONE
+};
+
 /**
  * \brief
  *
@@ -58,13 +62,14 @@ class Font : public virtual jcommon::Object{
 			_max_advance,
 			_virtual_height;
 		std::string _name;
+		jfont_attributes_t _attributes;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		Font(std::string name, int attr, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Font(std::string name, jfont_attributes_t attributes, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 		
 		/**
 		 * \brief
@@ -84,6 +89,12 @@ class Font : public virtual jcommon::Object{
 		 */
 		virtual void * GetFont();
 
+		/**
+		 * \brief
+		 *
+		 */
+		jfont_attributes_t GetFontAttributes();
+		
 		/**
 		 * \brief
 		 *
