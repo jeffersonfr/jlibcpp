@@ -25,7 +25,7 @@ namespace jgui {
 
 Font *Font::_default_font = NULL;
 
-Font::Font(std::string name, int attr, int height, int scale_width, int scale_height):
+Font::Font(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jgui::Font");
@@ -34,6 +34,7 @@ Font::Font(std::string name, int attr, int height, int scale_width, int scale_he
 	_font = NULL;
 #endif
 
+	_attributes = attributes;
 	_name = name;
 	_height = 0;
 	_ascender = 0;
@@ -81,7 +82,7 @@ Font::~Font()
 Font * Font::GetDefaultFont()
 {
 	if (_default_font == NULL) {
-		_default_font = new jgui::Font(_DATA_PREFIX"/fonts/font.ttf", 0, DEFAULT_FONT_SIZE);
+		_default_font = new jgui::Font(_DATA_PREFIX"/fonts/font.ttf", FA_NONE, DEFAULT_FONT_SIZE);
 	}
 
 	return _default_font;
@@ -96,6 +97,11 @@ void Font::SetWorkingScreenSize(int width, int height)
 jsize_t Font::GetWorkingScreenSize()
 {
 	return _scale;
+}
+
+jfont_attributes_t Font::GetFontAttributes()
+{
+	return _attributes;
 }
 
 void * Font::GetFont()

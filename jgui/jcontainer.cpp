@@ -551,7 +551,7 @@ std::vector<Component *> & Container::GetComponents()
 
 void Container::RequestComponentFocus(jgui::Component *c)
 {
-	if (c == NULL) {
+	if (c == NULL || c->IsFocusable() == false) {
 		return;
 	}
 

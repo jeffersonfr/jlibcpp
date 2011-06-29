@@ -66,9 +66,9 @@ REQUIRES	= \
 ARFLAGS		+= \
 
 CCFLAGS		+= \
-						 $(DEFINES) \
-						 $(DEBUG) \
-						 $(INCLUDE) \
+						$(DEFINES) \
+						$(DEBUG) \
+						$(INCLUDE) \
 						-D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" \
 
 ECHO			= echo -e

@@ -813,25 +813,25 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 {
 	if (event.type == DIET_KEYPRESS || event.type == DIET_KEYRELEASE) {
 		jkey_type_t type;
-		jinput_modifiers_t mod;
+		jkey_modifiers_t mod;
 
-		mod = (jinput_modifiers_t)(0);
+		mod = (jkey_modifiers_t)(0);
 
 		if ((event.flags & DIEF_MODIFIERS) != 0) {
 			if ((event.modifiers & DIMM_SHIFT) != 0) {
-				mod = (jinput_modifiers_t)(mod | JMOD_SHIFT);
+				mod = (jkey_modifiers_t)(mod | JMOD_SHIFT);
 			} else if ((event.modifiers & DIMM_CONTROL) != 0) {
-				mod = (jinput_modifiers_t)(mod | JMOD_CONTROL);
+				mod = (jkey_modifiers_t)(mod | JMOD_CONTROL);
 			} else if ((event.modifiers & DIMM_ALT) != 0) {
-				mod = (jinput_modifiers_t)(mod | JMOD_ALT);
+				mod = (jkey_modifiers_t)(mod | JMOD_ALT);
 			} else if ((event.modifiers & DIMM_ALTGR) != 0) {
-				mod = (jinput_modifiers_t)(mod | JMOD_ALTGR);
+				mod = (jkey_modifiers_t)(mod | JMOD_ALTGR);
 			} else if ((event.modifiers & DIMM_META) != 0) {
-				mod = (jinput_modifiers_t)(mod | JMOD_META);
+				mod = (jkey_modifiers_t)(mod | JMOD_META);
 			} else if ((event.modifiers & DIMM_SUPER) != 0) {
-				mod = (jinput_modifiers_t)(mod | JMOD_SUPER);
+				mod = (jkey_modifiers_t)(mod | JMOD_SUPER);
 			} else if ((event.modifiers & DIMM_HYPER) != 0) {
-				mod = (jinput_modifiers_t)(mod | JMOD_HYPER);
+				mod = (jkey_modifiers_t)(mod | JMOD_HYPER);
 			}
 		}
 
@@ -957,24 +957,24 @@ void InputManager::ProcessWindowEvent(DFBWindowEvent event)
 {
 	if (event.type == DWET_KEYDOWN || event.type == DWET_KEYUP) {
 		jkey_type_t type;
-		jinput_modifiers_t mod;
+		jkey_modifiers_t mod;
 
-		mod = (jinput_modifiers_t)(0);
+		mod = (jkey_modifiers_t)(0);
 
 		if ((event.modifiers & DIMM_SHIFT) != 0) {
-			mod = (jinput_modifiers_t)(mod | JMOD_SHIFT);
+			mod = (jkey_modifiers_t)(mod | JMOD_SHIFT);
 		} else if ((event.modifiers & DIMM_CONTROL) != 0) {
-			mod = (jinput_modifiers_t)(mod | JMOD_CONTROL);
+			mod = (jkey_modifiers_t)(mod | JMOD_CONTROL);
 		} else if ((event.modifiers & DIMM_ALT) != 0) {
-			mod = (jinput_modifiers_t)(mod | JMOD_ALT);
+			mod = (jkey_modifiers_t)(mod | JMOD_ALT);
 		} else if ((event.modifiers & DIMM_ALTGR) != 0) {
-			mod = (jinput_modifiers_t)(mod | JMOD_ALTGR);
+			mod = (jkey_modifiers_t)(mod | JMOD_ALTGR);
 		} else if ((event.modifiers & DIMM_META) != 0) {
-			mod = (jinput_modifiers_t)(mod | JMOD_META);
+			mod = (jkey_modifiers_t)(mod | JMOD_META);
 		} else if ((event.modifiers & DIMM_SUPER) != 0) {
-			mod = (jinput_modifiers_t)(mod | JMOD_SUPER);
+			mod = (jkey_modifiers_t)(mod | JMOD_SUPER);
 		} else if ((event.modifiers & DIMM_HYPER) != 0) {
-			mod = (jinput_modifiers_t)(mod | JMOD_HYPER);
+			mod = (jkey_modifiers_t)(mod | JMOD_HYPER);
 		}
 
 		type = (jkey_type_t)(0);
