@@ -44,7 +44,7 @@ MemoryOutputStream::~MemoryOutputStream()
 
 bool MemoryOutputStream::IsEmpty()
 {
-	return Available() == 0;
+	return Available() == 0LL;
 }
 
 int64_t MemoryOutputStream::Available()
@@ -55,12 +55,12 @@ int64_t MemoryOutputStream::Available()
 int64_t MemoryOutputStream::Write(int64_t b)
 {
 	if (IsEmpty() == true) {
-		return 0;
+		return 0LL;
 	}
 
 	_buffer[_buffer_index++] = (uint8_t)b;
 
-	return 1;
+	return 1LL;
 }
 
 int64_t MemoryOutputStream::Write(char *data, int64_t size)
@@ -82,7 +82,7 @@ int64_t MemoryOutputStream::Write(char *data, int64_t size)
 
 int64_t MemoryOutputStream::Flush()
 {
-	return 0;
+	return 0LL;
 }
 
 void MemoryOutputStream::Close()

@@ -702,9 +702,9 @@ int64_t File::Read(char *data_, int64_t length_)
 	int64_t r;
 	
 #ifdef _WIN32
-	    ReadFile(_fd, data_, (DWORD)length_, (DWORD *)&r, 0);
+	ReadFile(_fd, data_, (DWORD)length_, (DWORD *)&r, 0);
 #else
-		r = read(_fd, data_, (size_t)length_);
+	r = (int64_t)read(_fd, data_, (size_t)length_);
 #endif
 	
 	if (r <= 0LL) {
@@ -719,10 +719,14 @@ int64_t File::Write(const char *data_, int64_t length_)
 	int64_t r;
 	
 #ifdef _WIN32
-	    WriteFile(_fd, data_, (DWORD)length_, (DWORD *)&r, 0);
+	  WriteFile(_fd, data_, (DWORD)length_, (DWORD *)&r, 0);
 #else
-		r = write(_fd, data_, (size_t)length_);
+		r = (int64_t)write(_fd, data_, (size_t)length_);
 #endif
+
+	if (r <= 0LL) {
+		return -1LL;
+	}
 
 	return r;
 }

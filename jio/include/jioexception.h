@@ -28,7 +28,7 @@
 namespace jio {
 
 /**
- * \brief SocketException.
+ * \brief IOException.
  *
  * \author Jeff Ferr
  */
@@ -37,17 +37,17 @@ class IOException : public jcommon::RuntimeException{
     private:
 
     public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        IOException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~IOException() throw();
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			IOException(std::string);
+
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~IOException() throw();
 
 };
 

@@ -134,10 +134,10 @@ void CoordinateLayout::DoLayout(Container *target)
 		Component *c = target->GetComponents()[i];
 
 		jpoint_t point = c->GetLocation();
-		jsize_t size = c->GetSize();
+		jsize_t size = c->GetPreferredSize();
 
 		// c->SetLocation((int)(point.x*sx), (int)(point.y*sy));
-		c->SetBounds((int)(point.x*sx), (int)(point.y*sy), (int)(size.width*sx), (int)(size.height*sy));
+		c->SetBounds((int)(point.x*sx), (int)(point.y*sy), size.width, size.height);
 	}
 
 	_width = tsize.width;
