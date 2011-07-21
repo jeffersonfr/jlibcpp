@@ -185,7 +185,7 @@ void Properties::Load(std::string filename_, std::string escape_)
 					
 				_properties.push_back(prop);
 		} else {
-			jcommon::StringTokenizer tokens(line, escape_, jcommon::SPLIT_FLAG, false);
+			jcommon::StringTokenizer tokens(line, escape_, jcommon::JTT_STRING, false);
 
 			if (tokens.GetSize() == 2) {
 					struct jproperty_t prop;
@@ -212,7 +212,7 @@ void Properties::Save(std::string escape_)
 	jthread::AutoLock lock(&_mutex);
 
 	try {
-		jio::File f(_filename, jio::F_WRITE_ONLY | jio::F_LARGEFILE | jio::F_TRUNCATE);
+		jio::File f(_filename, jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_TRUNCATE);
 	
 		for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
 			std::ostringstream o;

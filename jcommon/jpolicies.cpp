@@ -86,7 +86,7 @@ void Policies::Save(std::string escape)
 	jthread::AutoLock lock(&_mutex);
 
 	try {
-		jio::File f(_filename, jio::F_WRITE_ONLY | jio::F_LARGEFILE | jio::F_TRUNCATE);
+		jio::File f(_filename, jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_TRUNCATE);
 
 		for (std::map<std::string, std::string>::iterator i=_polices.begin(); i!=_polices.end(); i++) {
 			std::ostringstream o;

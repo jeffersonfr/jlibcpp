@@ -42,7 +42,7 @@ MenuGroup::~MenuGroup()
 
 void MenuGroup::Add(Item *item)
 {
-	if (item->GetType() != jgui::CHECK_MENU_ITEM) {
+	if (item->GetType() != JMT_CHECK) {
 		return;
 	}
 

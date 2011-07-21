@@ -29,8 +29,8 @@ Cell::Cell(Table *table)
 
 	_table = table;
 
-	_halign = CENTER_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_CENTER;
+	_valign = JVA_CENTER;
 }
 
 Cell::~Cell()
@@ -452,9 +452,9 @@ bool Table::ProcessEvent(KeyEvent *event)
 
 	bool catched = false;
 
-	jkey_symbol_t action = event->GetSymbol();
+	jkeyevent_symbol_t action = event->GetSymbol();
 
-	if (action == JKEY_CURSOR_UP) {
+	if (action == JKS_CURSOR_UP) {
 		if (_cells.size() > 0) {
 			int old_index = _row;
 
@@ -476,7 +476,7 @@ bool Table::ProcessEvent(KeyEvent *event)
 		}
 
 		catched = true;
-	} else if (action == JKEY_CURSOR_DOWN) {
+	} else if (action == JKS_CURSOR_DOWN) {
 		if (_cells.size() > 0) { 
 			int old_index = _row;
 
@@ -502,7 +502,7 @@ bool Table::ProcessEvent(KeyEvent *event)
 		}
 
 		catched = true;
-	} else if (action == JKEY_ENTER) {
+	} else if (action == JKS_ENTER) {
 		if (_cells.size() > 0) { 
 			// TODO:: DispatchSelectEvent(new SelectEvent(this, _items[_index].text, _index, ACTION_ITEM));
 		}

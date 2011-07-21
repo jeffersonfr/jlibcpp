@@ -36,7 +36,7 @@ Marquee::Marquee(std::string text, int x, int y, int width, int height):
 	_running = true;
 
 	SetInterval(100);
-	SetType(LOOP_TEXT);
+	SetType(JMM_LOOP);
 }
 
 Marquee::~Marquee()
@@ -84,7 +84,7 @@ void Marquee::SetInterval(int i)
 	_interval = i;
 }
 
-void Marquee::SetType(jmarquee_type_t type)
+void Marquee::SetType(jmarquee_mode_t type)
 {
 	jthread::AutoLock lock(&_component_mutex);
 
@@ -143,7 +143,7 @@ void Marquee::Paint(Graphics *g)
 
 		std::string text = _text;
 
-		if (_type == BOUNCE_TEXT && _size.width >= _font->GetStringWidth(_text.c_str())) {
+		if (_type == JMM_BOUNCE && _size.width >= _font->GetStringWidth(_text.c_str())) {
 			text = (char *)(_text.c_str());
 		}
 
@@ -202,7 +202,7 @@ void Marquee::Run()
 	while (_running == true) {
 		int string_width = _font->GetStringWidth(_text.c_str());
 
-		if (_type == BOUNCE_TEXT) {
+		if (_type == JMM_BOUNCE) {
 			if (w < string_width) {
 			} else {
 				if (_position <= _horizontal_gap) {

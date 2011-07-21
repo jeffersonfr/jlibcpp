@@ -38,7 +38,7 @@ Tag::Tag(std::string name, jtag_type_t type)
 	_name = name;
 	_type = type;
 
-	if (type == BODY_TAG) {
+	if (type == JTT_BODY) {
 		unsigned int pos = name.find(" ");
 		std::string attributes;
 
@@ -189,7 +189,7 @@ void HTMLParser::Parse(jio::InputStream *input)
 	bool escape_flag = false;
 	Tag *root = NULL;
 	
-	root = new Tag("page", BODY_TAG);
+	root = new Tag("page", JTT_BODY);
 
 	tags.push_back(root);
 
@@ -236,7 +236,7 @@ void HTMLParser::Parse(jio::InputStream *input)
 				}
 
 				// add text tag
-				Tag *t = new Tag(tag, TEXT_TAG);
+				Tag *t = new Tag(tag, JTT_TEXT);
 
 				t->SetParent(*tags.begin());
 				t->GetParent()->GetChilds().push_back(t);
@@ -310,9 +310,9 @@ void HTMLParser::Parse(jio::InputStream *input)
 						Tag *t = NULL;
 
 						if (tag.size() >= 1 && tag[tag.size()-1] != '/') {
-							t = new Tag(tag, BODY_TAG);
+							t = new Tag(tag, JTT_BODY);
 						} else {
-							t = new Tag(tag.substr(0, tag.size()-1), BODY_TAG);
+							t = new Tag(tag.substr(0, tag.size()-1), JTT_BODY);
 						}
 
 						t->SetParent(*tags.begin());
@@ -348,7 +348,7 @@ void HTMLParser::Parse(jio::InputStream *input)
 			tag = tag + "&" + escape;
 		}
 
-		Tag *t = new Tag(tag, TEXT_TAG);
+		Tag *t = new Tag(tag, JTT_TEXT);
 
 		t->SetParent(*tags.begin());
 		t->GetParent()->GetChilds().push_back(t);
@@ -732,7 +732,7 @@ void HTMLParser::InnerDump(Tag *t, std::string tab)
 		return;
 	}
 
-	if (t->GetType() == BODY_TAG) {
+	if (t->GetType() == JTT_BODY) {
 		std::string attr;
 
 		for (std::map<std::string, std::string>::iterator i=t->GetAttributes().begin(); i!=t->GetAttributes().end(); i++) {
@@ -756,7 +756,7 @@ void HTMLParser::InnerDump(Tag *t, std::string tab)
 		InnerDump((*i), tab+"  ");
 	}
 
-	if (t->GetType() == BODY_TAG) {
+	if (t->GetType() == JTT_BODY) {
 		if (t->GetChilds().size() > 0) {
 			printf("%s</%s>\n", tab.c_str(), t->GetName().c_str());
 		}

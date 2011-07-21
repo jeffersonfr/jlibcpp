@@ -86,7 +86,7 @@ MCalc::MCalc(int x, int y):
 
 	SetLayout(new jgui::BorderLayout());
 
-	Add(_display, jgui::BL_NORTH);
+	Add(_display, jgui::JBA_NORTH);
 
 	jgui::Container *container = new jgui::Container();
 
@@ -100,7 +100,7 @@ MCalc::MCalc(int x, int y):
 		container->Add(b[i]);
 	}
 
-	Add(container, jgui::BL_CENTER);
+	Add(container, jgui::JBA_CENTER);
 
 	b[10]->RequestFocus();
 }
@@ -409,25 +409,25 @@ void MCalc::InputReceived(jgui::KeyEvent *event)
 
 	std::string num = "";
 
-	if (event->GetSymbol() == jgui::JKEY_1) {
+	if (event->GetSymbol() == jgui::JKS_1) {
 		num = "1";
-	} else if (event->GetSymbol() == jgui::JKEY_2) {
+	} else if (event->GetSymbol() == jgui::JKS_2) {
 		num = "2";
-	} else if (event->GetSymbol() == jgui::JKEY_3) {
+	} else if (event->GetSymbol() == jgui::JKS_3) {
 		num = "3";
-	} else if (event->GetSymbol() == jgui::JKEY_4) {
+	} else if (event->GetSymbol() == jgui::JKS_4) {
 		num = "4";
-	} else if (event->GetSymbol() == jgui::JKEY_5) {
+	} else if (event->GetSymbol() == jgui::JKS_5) {
 		num = "5";
-	} else if (event->GetSymbol() == jgui::JKEY_6) {
+	} else if (event->GetSymbol() == jgui::JKS_6) {
 		num = "6";
-	} else if (event->GetSymbol() == jgui::JKEY_7) {
+	} else if (event->GetSymbol() == jgui::JKS_7) {
 		num = "7";
-	} else if (event->GetSymbol() == jgui::JKEY_8) {
+	} else if (event->GetSymbol() == jgui::JKS_8) {
 		num = "8";
-	} else if (event->GetSymbol() == jgui::JKEY_9) {
+	} else if (event->GetSymbol() == jgui::JKS_9) {
 		num = "9";
-	} else if (event->GetSymbol() == jgui::JKEY_0) {
+	} else if (event->GetSymbol() == jgui::JKS_0) {
 		num = "0";
 	}
 

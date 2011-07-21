@@ -2364,21 +2364,21 @@ class GraphicsTeste : public jgui::Frame{
 		{
 			jthread::AutoLock lock(&teste_mutex);
 
-			if (event->GetType() != jgui::JKEY_PRESSED) {
+			if (event->GetType() != jgui::JKT_PRESSED) {
 				return;
 			}
 
 			int step = 20;
 
-			if (event->GetSymbol() == jgui::JKEY_CURSOR_UP) {
+			if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
 				Rotate (step * 2, 'x');
-			} else if (event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
 				Rotate (-step * 2, 'x');
-			} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 				Rotate (step * 2, 'y');
-			} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
 				Rotate (-step * 2, 'y');
-			} else if (event->GetSymbol() == jgui::JKEY_L || event->GetSymbol() == jgui::JKEY_l) {
+			} else if (event->GetSymbol() == jgui::JKS_L || event->GetSymbol() == jgui::JKS_l) {
 				if (rand()%50 == 0)
 					dxL += rand()%5 - 2;
 				if (rand()%50 == 0)
@@ -2386,13 +2386,13 @@ class GraphicsTeste : public jgui::Frame{
 
 				if(dxL | dyL)
 					RotateLight(&Light1, dxL, dyL);
-			} else if (event->GetSymbol() == jgui::JKEY_W || event->GetSymbol() == jgui::JKEY_w) {
+			} else if (event->GetSymbol() == jgui::JKS_W || event->GetSymbol() == jgui::JKS_w) {
 				if (PrimitiveType == FLAT_SHADED) {
 					PrimitiveType = WIRE_FRAME;
 				} else {
 					PrimitiveType = FLAT_SHADED;
 				}
-			} else if (event->GetSymbol() == jgui::JKEY_SPACE) {
+			} else if (event->GetSymbol() == jgui::JKS_SPACE) {
 				for (int i=0; i<1000; i++) {
 					Rotate (step * 2, 'x');
 					Rotate (step * 2, 'y');

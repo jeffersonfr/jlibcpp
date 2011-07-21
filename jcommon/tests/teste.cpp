@@ -74,7 +74,7 @@ void testLink()
 {
 	jcommon::DynamicLink link;
 
-	link.Load("libm.so", jcommon::LAZY_LINK);
+	link.Load("libm.so", jcommon::JLF_LAZY);
 	
 	double (*cossine)(double);
 	*(void **)(&cossine) = link.FindSymbol("cos");
@@ -104,7 +104,7 @@ void testStringToken()
 {
 	std::string s = "O Playstation 3 eh o melhor video-game da atualidade.\nNele podemos encontrar os recursos mais avancados de memoria e processamento suficientes para executar os melhores e mais avancados jogos.\n\t\tMesmo assim, eu gostaria de ter um Wii aqui para a nossa empresa, desta maneira todos nos poderiamos dispersar a tensao apenas com alguns minutos de diversao interativa de qualidade. O       XBox       naum presta, eu soh estou citando ele para encher linguica e conseguir observar a justificacao do texto";
 
-	jcommon::StringTokenizer t(s, "\n", jcommon::SPLIT_FLAG, false);
+	jcommon::StringTokenizer t(s, "\n", jcommon::JTT_STRING, false);
 	std::vector<std::string> super_lines, 
 		lines,
 		texts;
@@ -120,7 +120,7 @@ void testStringToken()
 	}
 
 	for (int i=0; i<(int)super_lines.size(); i++) {
-		jcommon::StringTokenizer w(super_lines[i], " ", jcommon::SPLIT_FLAG, true);
+		jcommon::StringTokenizer w(super_lines[i], " ", jcommon::JTT_STRING, true);
 		std::vector<std::string> words;
 
 		for (int i=0; i<w.GetSize(); i++) {

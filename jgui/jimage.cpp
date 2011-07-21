@@ -126,7 +126,7 @@ Image::Image(int width, int height, int scale_width, int scale_height)
 
 	_graphics = NULL;
 	_buffer = NULL;
-	_pixelformat = SPF_UNKNOWN;
+	_pixelformat = JSP_UNKNOWN;
 
 	_size.width = width;
 	_size.height = height;
@@ -216,9 +216,9 @@ Image * Image::CreateImage(int width, int height, jsurface_pixelformat_t pixelfo
 
 Image * Image::CreateImage(uint32_t *data, int width, int height)
 {
-	Image *image = new Image(width, height, SPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+	Image *image = new Image(width, height, JSP_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 
-	image->GetGraphics()->SetDrawingFlags(DF_NOFX);
+	image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
 	image->GetGraphics()->SetRGB(data, 0, 0, width, height, width);
 
 	return image;
@@ -240,7 +240,7 @@ Image * Image::CreateImage(std::string file)
 	GetImageSize(file, &width, &height);
 
 	if (width > 0 && height > 0) {
-		image = new Image(width, height, SPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+		image = new Image(width, height, JSP_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 
 		if (image->GetGraphics()->DrawImage(file, 0, 0) == false) {
 			delete image;
@@ -295,7 +295,7 @@ Image * Image::CreateImage(jio::InputStream *stream)
 
 	loader.WaitThread();
 
-	Image *image = new Image(sdsc.width, sdsc.height, SPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+	Image *image = new Image(sdsc.width, sdsc.height, JSP_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 
 	IDirectFBSurface *image_surface = (IDirectFBSurface *)image->GetGraphics()->GetNativeSurface();
 

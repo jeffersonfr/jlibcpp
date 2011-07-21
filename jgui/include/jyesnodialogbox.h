@@ -36,9 +36,10 @@
 
 namespace jgui {
 
-enum jyesno_response_t {
-	YES_RESPONSE,
-	NO_RESPONSE
+enum jdialog_result_t {
+	JDR_YES,
+	JDR_NO,
+	JDR_CANCEL
 };
 
 /**
@@ -72,7 +73,7 @@ class YesNoDialogBox : public jgui::Frame, public jgui::ButtonListener{
 		 * \brief
 		 *
 		 */
-		virtual jyesno_response_t GetResponse();
+		virtual jdialog_result_t GetResponse();
 
 		/**
 		 * \brief

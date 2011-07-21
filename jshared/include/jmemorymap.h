@@ -35,17 +35,17 @@
 
 namespace jshared {
 
-enum jmemory_perms_t {
-	MEM_EXEC = 0x01,
-	MEM_READ = 0x02,
-	MEM_WRITE = 0x04,
-	MEM_READ_WRITE = 0x08,
-	MEM_NONE = 0x10
+enum jmemory_permission_t {
+	JMP_NONE 	= 0x00,
+	JMP_EXEC 	= 0x01,
+	JMP_READ 	= 0x02,
+	JMP_WRITE	= 0x04,
+	JMP_READ_WRITE	= 0x08,
 };
 	
 enum jmemory_flags_t {
-	MEM_OPEN = 0x01,
-	MEM_CREAT = 0x02
+	JMF_OPEN	= 0x01,
+	JMF_CREAT	= 0x02
 };
 
 /**
@@ -72,7 +72,7 @@ class MemoryMap : public virtual jcommon::Object{
 			/** \brief */
 			int _timeout;
 			/** \brief */
-			jmemory_perms_t _perms;
+			jmemory_permission_t _permission;
 			/** \brief */
 			bool _is_open;
 
@@ -81,7 +81,7 @@ class MemoryMap : public virtual jcommon::Object{
 			 * \brief Constructor.
 			 *
 			 */
-			MemoryMap(std::string sharedfile_, jmemory_flags_t flags_ = MEM_OPEN, jmemory_perms_t perms_ = MEM_READ_WRITE, bool private_ = true);
+			MemoryMap(std::string sharedfile_, jmemory_flags_t flags_ = JMF_OPEN, jmemory_permission_t perms_ = JMP_READ_WRITE, bool private_ = true);
 
 			/**
 			 * \brief Constructor.
@@ -111,7 +111,13 @@ class MemoryMap : public virtual jcommon::Object{
 			 * \brief
 			 *
 			 */
-			void SetPermission(jmemory_perms_t perms_);
+			jmemory_permission_t GetPermission();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void SetPermission(jmemory_permission_t perms_);
 
 			/**
 			 * \brief

@@ -39,6 +39,22 @@ ScrollBar::~ScrollBar()
 {
 }
 
+void ScrollBar::SetScrollOrientation(jscroll_orientation_t type)
+{
+	if (_type == type) {
+		return;
+	}
+
+	_type = type;
+
+	Repaint(true);
+}
+
+jscroll_orientation_t ScrollBar::GetScrollOrientation()
+{
+	return _type;
+}
+
 void ScrollBar::SetStoneSize(int size)
 {
 	int x = _vertical_gap-_border_size,
@@ -47,7 +63,7 @@ void ScrollBar::SetStoneSize(int size)
 			h = _size.height-2*y,
 			arrow_size;
 
-	if (_type == LEFT_RIGHT_SCROLL) {
+	if (_type == JSO_HORIZONTAL) {
 		arrow_size = h/2;
 	} else {
 		arrow_size = w/2;
@@ -55,11 +71,11 @@ void ScrollBar::SetStoneSize(int size)
 
 	_stone_size = size;
 
-	if (_type == LEFT_RIGHT_SCROLL) {
+	if (_type == JSO_HORIZONTAL) {
 		if (_stone_size > (_size.width-2*arrow_size)/2) {
 			_stone_size = (_size.width-2*arrow_size)/2;
 		}
-	} else if (_type == BOTTOM_UP_SCROLL) {
+	} else if (_type == JSO_VERTICAL) {
 		if (_stone_size > (_size.height-2*arrow_size)/2) {
 			_stone_size = (_size.height-2*arrow_size)/2;
 		}
@@ -85,40 +101,40 @@ bool ScrollBar::ProcessEvent(KeyEvent *event)
 
 	bool catched = false;
 
-	jkey_symbol_t action = event->GetSymbol();
+	jkeyevent_symbol_t action = event->GetSymbol();
 
-	if (_type == LEFT_RIGHT_SCROLL) {
-		if (action == JKEY_CURSOR_LEFT) {
+	if (_type == JSO_HORIZONTAL) {
+		if (action == JKS_CURSOR_LEFT) {
 			SetValue(_value-_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_CURSOR_RIGHT) {
+		} else if (action == JKS_CURSOR_RIGHT) {
 			SetValue(_value+_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_DOWN) {
+		} else if (action == JKS_PAGE_DOWN) {
 			SetValue(_value-_maximum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_UP) {
+		} else if (action == JKS_PAGE_UP) {
 			SetValue(_value+_maximum_tick);
 
 			catched = true;
 		}
-	} else if (_type == BOTTOM_UP_SCROLL) {
-		if (action == JKEY_CURSOR_UP) {
+	} else if (_type == JSO_VERTICAL) {
+		if (action == JKS_CURSOR_UP) {
 			SetValue(_value-_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_CURSOR_DOWN) {
+		} else if (action == JKS_CURSOR_DOWN) {
 			SetValue(_value+_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_DOWN) {
+		} else if (action == JKS_PAGE_DOWN) {
 			SetValue(_value-_maximum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_UP) {
+		} else if (action == JKS_PAGE_UP) {
 			SetValue(_value+_maximum_tick);
 
 			catched = true;
@@ -148,18 +164,18 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JMOUSE_PRESSED_EVENT && event->GetButton() == JMOUSE_BUTTON1) {
+	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		RequestFocus();
 
-		if (_type == LEFT_RIGHT_SCROLL) {
+		if (_type == JSO_HORIZONTAL) {
 			arrow_size = dh/2;
 		} else {
 			arrow_size = dw/2;
 		}
 
-		if (_type == LEFT_RIGHT_SCROLL) {
+		if (_type == JSO_HORIZONTAL) {
 			if (y1 > _location.y && y1 < (_location.y+_size.height)) {
 				int d = (int)((_value*(dw-2*arrow_size))/(GetMaximum()-GetMinimum()));
 
@@ -177,7 +193,7 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 					_pressed = true;
 				}
 			}
-		} else if (_type == BOTTOM_UP_SCROLL) {
+		} else if (_type == JSO_VERTICAL) {
 			if (x1 > _location.x && x1 < (_location.x+_size.width)) {
 				int d = (int)((_value*(dh-2*arrow_size))/(GetMaximum()-GetMinimum()));
 
@@ -196,11 +212,11 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 				}
 			}
 		}
-	} else if (event->GetType() == JMOUSE_MOVED_EVENT) {
+	} else if (event->GetType() == JME_MOVED) {
 		if (_pressed == true) {
-			if (_type == LEFT_RIGHT_SCROLL) {
+			if (_type == JSO_HORIZONTAL) {
 				SetValue((((GetMaximum()-GetMinimum())*(x1-_stone_size/2-GetX()))/dw));
-			} else if (_type == BOTTOM_UP_SCROLL) {
+			} else if (_type == JSO_VERTICAL) {
 				SetValue((((GetMaximum()-GetMinimum())*(y1-_stone_size/2-GetY()))/dh));
 			}
 		}
@@ -224,7 +240,7 @@ void ScrollBar::Paint(Graphics *g)
 			w = _size.width-2*x,
 			h = _size.height-2*y;
 
-	if (_type == LEFT_RIGHT_SCROLL) {
+	if (_type == JSO_HORIZONTAL) {
 		int arrow_size = h/2,
 				limit = w-_stone_size-2*arrow_size;
 
@@ -239,7 +255,7 @@ void ScrollBar::Paint(Graphics *g)
 
 		g->FillTriangle(x+w, y+arrow_size, x+w-arrow_size, y, x+w-arrow_size, y+2*arrow_size);
 		g->FillTriangle(x, y+arrow_size, x+arrow_size, y, x+arrow_size, y+2*arrow_size);
-	} else if (_type == BOTTOM_UP_SCROLL) {
+	} else if (_type == JSO_VERTICAL) {
 		int arrow_size = w/2,
 				limit = h-_stone_size-2*arrow_size;
 

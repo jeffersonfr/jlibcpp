@@ -45,19 +45,19 @@ namespace jio {
  *
  */
 enum jfile_type_t {
-	F_UNKNOWN,
-	F_REGULAR,
-	F_DIRECTORY,
-	F_CHAR_DEVICE,
-	F_COMPRESS,
-	F_ENCRYPTED,
-	F_HIDDEN,
-	F_OFFLINE,
-	F_SYSTEM,
-	F_BLOCK_DEVICE,
-	F_FIFO,
-	F_SYMBOLIC_LINK,
-	F_SOCKET,
+	JFT_UNKNOWN,
+	JFT_REGULAR,
+	JFT_DIRECTORY,
+	JFT_CHAR_DEVICE,
+	JFT_COMPRESS,
+	JFT_ENCRYPTED,
+	JFT_HIDDEN,
+	JFT_OFFLINE,
+	JFT_SYSTEM,
+	JFT_BLOCK_DEVICE,
+	JFT_FIFO,
+	JFT_SYMBOLIC_LINK,
+	JFT_SOCKET,
 };
 
 /**
@@ -65,19 +65,19 @@ enum jfile_type_t {
  * 
  */
 enum jfile_flags_t {
-	F_WRITE_ONLY	= 0x0001,
-	F_READ_ONLY 	= 0x0002,
-	F_READ_WRITE 	= 0x0004,
-	F_EXCLUSIVE		= 0x0008,
-	F_TRUNCATE 		= 0x0010,
-	F_APPEND 			= 0x0020,
-	F_NON_BLOCK 	= 0x0040,
-	F_SYNC 				= 0x0080,
-	F_NON_FOLLOW 	= 0x0100,
-	F_DIR		 			= 0x0200,
-	F_ASYNC 			= 0x0400,
-	F_LARGEFILE 	= 0x0800,
-	F_CREATE			= 0x1000,
+	JFF_WRITE_ONLY	= 0x0001,
+	JFF_READ_ONLY 	= 0x0002,
+	JFF_READ_WRITE 	= 0x0004,
+	JFF_EXCLUSIVE		= 0x0008,
+	JFF_TRUNCATE 		= 0x0010,
+	JFF_APPEND 			= 0x0020,
+	JFF_NON_BLOCK 	= 0x0040,
+	JFF_SYNC 				= 0x0080,
+	JFF_NON_FOLLOW 	= 0x0100,
+	JFF_DIR		 			= 0x0200,
+	JFF_ASYNC 			= 0x0400,
+	JFF_LARGEFILE 	= 0x0800,
+	JFF_CREATE			= 0x1000,
 };
 
 /**
@@ -120,7 +120,7 @@ class File : public virtual jcommon::Object{
 		 * \brief Create a new file.
 		 *
 		 */
-		File(std::string filename_, int = F_READ_ONLY | F_LARGEFILE);
+		File(std::string filename_, int = JFF_READ_ONLY | JFF_LARGEFILE);
 		
 		/**
 		 * \brief Create a new directory.

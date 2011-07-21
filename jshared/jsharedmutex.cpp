@@ -23,7 +23,7 @@
 
 namespace jshared {
 
-SharedMutex::SharedMutex(jmutex_flags_t flags_):
+SharedMutex::SharedMutex(jsharedmutex_flags_t flags_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::SharedMutex");
@@ -43,7 +43,7 @@ SharedMutex::SharedMutex(void *data_, int64_t size_):
 	
 #ifdef _WIN32
 #else	
-	_flags = (jmutex_flags_t)(MUTEX_CURRENT | MUTEX_FUTURE);
+	_flags = (jsharedmutex_flags_t)(JSF_CURRENT | JSF_FUTURE);
 	_shmp = (char *)data_;
 	_size = size_;
 
@@ -100,11 +100,11 @@ void SharedMutex::LockAll()
 	
 	int flags = 0;
 
-	if ((_flags & MUTEX_CURRENT) != 0) {
+	if ((_flags & JSF_CURRENT) != 0) {
 		flags = flags | MCL_CURRENT;
 	}
 
-	if ((_flags & MUTEX_FUTURE) != 0) {
+	if ((_flags & JSF_FUTURE) != 0) {
 		flags = flags | MCL_FUTURE;
 	}
 

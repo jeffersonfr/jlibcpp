@@ -63,11 +63,11 @@ void FlowLayout::SetAlign(jflowlayout_align_t align)
 	_newalign = align;
 
 	switch (align) {
-		case FL_LEADING:
-			_align = FL_LEFT;
+		case JFL_LEADING:
+			_align = JFL_LEFT;
 			break;
-		case FL_TRAILING:
-			_align = FL_RIGHT;
+		case JFL_TRAILING:
+			_align = JFL_RIGHT;
 			break;
 		default:
 			_align = align;
@@ -93,18 +93,18 @@ void FlowLayout::SetAlignOnBaseline(bool align_on_baseline)
 int FlowLayout::MoveComponents(Container *target, int x, int y, int width, int height, int rowStart, int rowEnd, bool ltr, bool useBaseline, int *ascent, int *descent)
 {
 	switch (_newalign) {
-		case FL_LEFT:
+		case JFL_LEFT:
 			x += ltr ? 0 : width;
 			break;
-		case FL_CENTER:
+		case JFL_CENTER:
 			x += width / 2;
 			break;
-		case FL_RIGHT:
+		case JFL_RIGHT:
 			x += ltr ? width : 0;
 			break;
-		case FL_LEADING:
+		case JFL_LEADING:
 			break;
-		case FL_TRAILING:
+		case JFL_TRAILING:
 			x += width;
 			break;
 	}
@@ -276,7 +276,7 @@ void FlowLayout::DoLayout(Container *target)
 			rowh = 0, 
 			start = 0;
 
-	bool ltr = (target->GetComponentOrientation() == LEFT_TO_RIGHT_ORIENTATION),
+	bool ltr = (target->GetComponentOrientation() == JCO_LEFT_TO_RIGHT),
 			 useBaseline = GetAlignOnBaseline();
 	int *ascent = NULL,
 			*descent = NULL;

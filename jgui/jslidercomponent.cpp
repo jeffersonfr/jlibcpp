@@ -34,20 +34,15 @@ SliderComponent::SliderComponent(int x, int y, int width, int height):
 	_maximum = 100;
 	_minimum_tick = 1;
 	_maximum_tick = 10;
-	_type = LEFT_RIGHT_SCROLL;
-	// _type = BOTTOM_UP_SCROLL;
+	_type = JSO_HORIZONTAL;
+	// _type = JSO_VERTICAL;
 }
 
 SliderComponent::~SliderComponent()
 {
 }
 
-jscroll_orientation_t SliderComponent::GetOrientation()
-{
-	return _type;
-}
-
-void SliderComponent::SetOrientation(jscroll_orientation_t type)
+void SliderComponent::SetScrollOrientation(jscroll_orientation_t type)
 {
 	if (_type == type) {
 		return;
@@ -56,6 +51,11 @@ void SliderComponent::SetOrientation(jscroll_orientation_t type)
 	_type = type;
 
 	Repaint(true);
+}
+
+jscroll_orientation_t SliderComponent::GetScrollOrientation()
+{
+	return _type;
 }
 
 int SliderComponent::GetValue()
@@ -85,13 +85,13 @@ void SliderComponent::SetValue(int i)
 		_value = i;
 
 		if (diff > _minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, BLOCK_INCREMENT, _value));
+			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAT_BLOCK_INCREMENT, _value));
 		} else if (diff < -_minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, BLOCK_DECREMENT, _value));
+			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAT_BLOCK_DECREMENT, _value));
 		} else if (diff > 0 && diff <= _minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, UNIT_INCREMENT, _value));
+			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAT_UNIT_INCREMENT, _value));
 		} else if (diff < 0 && diff >= -_minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, UNIT_DECREMENT, _value));
+			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAT_UNIT_DECREMENT, _value));
 		}
 	}
 

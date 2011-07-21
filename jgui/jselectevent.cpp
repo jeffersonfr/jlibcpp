@@ -22,7 +22,7 @@
 
 namespace jgui {
 
-SelectEvent::SelectEvent(void *source, jgui::Item *item, int index, jselect_type_t type):
+SelectEvent::SelectEvent(void *source, jgui::Item *item, int index, jselectevent_type_t type):
 	jcommon::EventObject(source)
 {
 	jcommon::Object::SetClassName("jgui::SelectEvent");
@@ -46,7 +46,7 @@ int SelectEvent::GetIndex()
 	return _index;
 }
 
-jselect_type_t SelectEvent::GetType()
+jselectevent_type_t SelectEvent::GetType()
 {
 	return _type;
 }

@@ -39,8 +39,8 @@ namespace jgui {
  *
  */
 enum jmenu_align_t {
-	MENU_ALIGN,
-	SUBMENU_ALIGN
+	JMA_TITLE,
+	JMA_ITEM,
 };
 
 /**

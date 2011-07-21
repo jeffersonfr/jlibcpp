@@ -43,11 +43,11 @@ namespace jgui {
  *
  */
 enum jkeyboard_type_t {
-	FULL_ALPHA_NUMERIC_KEYBOARD,
-	SMALL_ALPHA_NUMERIC_KEYBOARD,
-	FULL_NUMERIC_KEYBOARD,
-	SMALL_NUMERIC_KEYBOARD,
-	FULL_WEB_KEYBOARD
+	JKB_QWERTY,
+	JKB_ALPHA_NUMERIC,
+	JKB_NUMERIC,
+	JKB_PHONE,
+	JKB_INTERNET
 };
 
 /**
@@ -85,32 +85,32 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::T
 		 * \brief
 		 *
 		 */
-		void BuildWebKeyboard();
+		void BuildQWERTYKeyboard();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void BuildFullAlphaNumericKeyboard();
+		void BuildAlphaNumericKeyboard();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void BuildSmallAlphaNumericKeyboard();
+		void BuildNumericKeyboard();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void BuildFullNumericKeyboard();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void BuildSmallNumericKeyboard();
+		void BuildPhoneKeyboard();
 
+		/**
+		 * \brief
+		 *
+		 */
+		void BuildInternetKeyboard();
+		
 	public:
 		/**
 		 * \brief

@@ -65,8 +65,8 @@ class GraphicPanel : public jgui::Frame{
 
 		g->SetFont(_font);
 
-		g->SetDrawingFlags(jgui::DF_BLEND);
-		g->SetBlittingFlags(jgui::BF_ALPHACHANNEL);
+		g->SetDrawingFlags(jgui::JDF_BLEND);
+		g->SetBlittingFlags(jgui::JBF_ALPHACHANNEL);
 
 		Clear(g);
 
@@ -113,12 +113,12 @@ class GraphicPanel : public jgui::Frame{
 		// rotate string
 		DrawString(g, "Rotate String");
 
-		jgui::Font font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 72);
+		jgui::Font font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 72);
 
 		double angle = 0.1;
 		
 		g->SetFont(&font);
-		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
 		int sw = font.GetStringWidth("Rotate String")/2,
 				sh = 0;
@@ -524,7 +524,7 @@ class GraphicPanel : public jgui::Frame{
 		// Blit [offscreen]
 		DrawString(g, "Blit [offscreen]");
 
-		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
 		for (int i=0; i<iterations; i++) {
 			uint32_t color = (rand()%0xf0f0f0) | 0xff000000;
@@ -538,7 +538,7 @@ class GraphicPanel : public jgui::Frame{
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
 		}
 		
-		g->SetBlittingFlags(jgui::BF_ALPHACHANNEL);
+		g->SetBlittingFlags(jgui::JBF_ALPHACHANNEL);
 
 		Clear(g);
 
@@ -569,7 +569,7 @@ class GraphicPanel : public jgui::Frame{
 
 		size = 10;
 
-		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
 		uint32_t color = 0xffffffff;;
 
@@ -593,7 +593,7 @@ class GraphicPanel : public jgui::Frame{
 			}
 		}
 
-		g->SetBlittingFlags(jgui::BF_ALPHACHANNEL);
+		g->SetBlittingFlags(jgui::JBF_ALPHACHANNEL);
 
 		Clear(g);
 
@@ -604,7 +604,7 @@ class GraphicPanel : public jgui::Frame{
 		color = 0xffffffff;;
 		angle = 0.1;
 			
-		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
 		g->TranslateImage(0, 0);
 
@@ -647,7 +647,7 @@ class GraphicPanel : public jgui::Frame{
 
 		angle = 0.1;
 
-		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORIZE));
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
 		g->TranslateImage(0, 0);
 

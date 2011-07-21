@@ -22,7 +22,7 @@
 
 namespace jgui {
 
-WindowEvent::WindowEvent(void *source, jwindow_event_t type):
+WindowEvent::WindowEvent(void *source, jwindowevent_type_t type):
 	jcommon::EventObject(source)
 {
 	jcommon::Object::SetClassName("jgui::WindowEvent");
@@ -34,7 +34,7 @@ WindowEvent::~WindowEvent()
 {
 }
 
-jwindow_event_t WindowEvent::GetType()
+jwindowevent_type_t WindowEvent::GetType()
 {
 	return _type;
 }

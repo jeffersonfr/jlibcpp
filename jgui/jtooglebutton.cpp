@@ -29,7 +29,7 @@ ToogleButton::ToogleButton(std::string label, int x, int y, int width, int heigh
 {
 	jcommon::Object::SetClassName("jgui::ToogleButton");
 
-	_halign = CENTER_HALIGN;
+	_halign = JHA_CENTER;
 
 	_is_pressed = false;
 	
@@ -76,7 +76,7 @@ bool ToogleButton::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JMOUSE_PRESSED_EVENT && event->GetButton() == JMOUSE_BUTTON1) {
+	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		if (_is_pressed == true) {
@@ -105,9 +105,9 @@ bool ToogleButton::ProcessEvent(KeyEvent *event)
 
 	bool catched = false;
 
-	jkey_symbol_t action = event->GetSymbol();
+	jkeyevent_symbol_t action = event->GetSymbol();
 
-	if (action == JKEY_ENTER) {
+	if (action == JKS_ENTER) {
 		if (_is_pressed == true) {
 			_is_pressed = false;
 		} else {
@@ -196,7 +196,7 @@ void ToogleButton::Paint(Graphics *g)
 
 		color.SetAlpha(0x80);
 
-		g->SetDrawingFlags(DF_BLEND);
+		g->SetDrawingFlags(JDF_BLEND);
 		g->SetColor(color);
 		g->FillRectangle(0, 0, _size.width, _size.height);
 	}

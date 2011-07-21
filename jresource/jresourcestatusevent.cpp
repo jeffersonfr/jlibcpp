@@ -25,14 +25,14 @@ namespace jresource {
 ResourceStatusEvent::ResourceStatusEvent(void *source):
 	jcommon::EventObject(source)
 {
-	_type = UNKNOWN_RESOURCE_EVENT;
+	_type = JRT_UNKNOWN;
 }
 
 ResourceStatusEvent::~ResourceStatusEvent()
 {
 }
 
-jresource_event_type_t  ResourceStatusEvent::GetType()
+jresourceevent_type_t  ResourceStatusEvent::GetType()
 {
 	return _type;
 }

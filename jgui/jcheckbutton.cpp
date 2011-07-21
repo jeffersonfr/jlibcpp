@@ -29,8 +29,8 @@ CheckButton::CheckButton(jcheckbox_type_t type, std::string text, int x, int y, 
 {
 	jcommon::Object::SetClassName("jgui::CheckButton");
 
-	_halign = LEFT_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_LEFT;
+	_valign = JVA_CENTER;
 
 	_type = type;
 	_text = text;
@@ -122,7 +122,7 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JMOUSE_PRESSED_EVENT && event->GetButton() == JMOUSE_BUTTON1) {
+	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		int x1 = event->GetX(),
@@ -136,7 +136,7 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 		RequestFocus();
 
 		if ((x1 > _location.x && x1 < (_location.x+size)) && (y1 > _location.y && y1 < (_location.y+size))) {
-			if (_type == CHECK_TYPE) {
+			if (_type == JCT_CHECK) {
 				if (_checked == true) {
 					SetSelected(false);
 				} else {
@@ -163,10 +163,10 @@ bool CheckButton::ProcessEvent(KeyEvent *event)
 
 	bool catched = false;
 
-	jkey_symbol_t action = event->GetSymbol();
+	jkeyevent_symbol_t action = event->GetSymbol();
 
-	if (action == JKEY_ENTER) {
-		if (_type == CHECK_TYPE) {
+	if (action == JKS_ENTER) {
+		if (_type == JCT_CHECK) {
 			if (_checked == true) {
 				SetSelected(false);
 			} else {
@@ -218,7 +218,7 @@ void CheckButton::Paint(Graphics *g)
 
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
-	if (_type == CHECK_TYPE) {
+	if (_type == JCT_CHECK) {
 		g->FillRectangle(cx, cy, cw, ch);
 	} else {
 		g->FillCircle(cx+csize, cy+csize, csize);
@@ -227,7 +227,7 @@ void CheckButton::Paint(Graphics *g)
 	if (_checked == true) {
 		g->SetColor(0x00, 0x00, 0x00, 0xff);
 
-		if (_type == CHECK_TYPE) {
+		if (_type == JCT_CHECK) {
 			g->FillRectangle(cx+4, cy+4, cw-8, ch-8);
 		} else {
 			g->FillCircle(cx+csize, cy+csize, csize/2);

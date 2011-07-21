@@ -122,11 +122,11 @@ void CoordinateLayout::DoLayout(Container *target)
 		_height = tsize.height;
 	}
 
-	if ((_type & CL_HORIZONTAL) != 0) {
+	if ((_type & JCL_HORIZONTAL) != 0) {
 		sx = (double)tsize.width/_width;
 	}
 
-	if ((_type & CL_VERTICAL) != 0) {
+	if ((_type & JCL_VERTICAL) != 0) {
 		sy = (double)tsize.height/_height;
 	}
 

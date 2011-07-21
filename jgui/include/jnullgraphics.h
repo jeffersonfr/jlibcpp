@@ -218,7 +218,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual jporter_duff_flags_t GetPorterDuffFlags();
+		virtual jporterduff_flags_t GetPorterDuffFlags();
 		
 		/**
 		 * \brief
@@ -236,7 +236,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetPorterDuffFlags(jporter_duff_flags_t t);
+		virtual void SetPorterDuffFlags(jporterduff_flags_t t);
 		
 		/**
 		 * \brief
@@ -510,7 +510,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JUSTIFY_HALIGN);
+		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY);
 		
 		/**
 		 * \brief
@@ -522,7 +522,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
+		virtual void DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY, jvertical_align_t valign = JVA_CENTER, bool clipped = true);
 
 		/**
 		 * \brief

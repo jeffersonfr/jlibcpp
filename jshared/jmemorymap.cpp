@@ -23,10 +23,12 @@
 
 namespace jshared {
 
-MemoryMap::MemoryMap(std::string filename_, jmemory_flags_t flags_, jmemory_perms_t perms_, bool private_):
+MemoryMap::MemoryMap(std::string filename_, jmemory_flags_t flags_, jmemory_permission_t perms_, bool private_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::MemoryMap");
+
+	_permission = perms_;
 
 #ifdef _WIN32
 #else
@@ -34,25 +36,25 @@ MemoryMap::MemoryMap(std::string filename_, jmemory_flags_t flags_, jmemory_perm
 	
 	uint32_t f = 0;
 
-	if ((flags_ & MEM_OPEN) != 0) {
+	if ((flags_ & JMF_OPEN) != 0) {
 		f = (jmemory_flags_t)(f | 0);
 	}
 
-	if ((flags_ & MEM_CREAT) != 0) {
+	if ((flags_ & JMF_CREAT) != 0) {
 		f = (jmemory_flags_t)(f | O_CREAT | O_EXCL | O_TRUNC);
 	}
 
 	_fd = open(filename_.c_str(), f | O_RDWR | O_LARGEFILE, (mode_t)0600); 
 	
 	if (_fd < 0) {
-		if ((f | MEM_CREAT) != 0) {
+		if ((f | JMF_CREAT) != 0) {
 			throw MemoryException("Error creating a shared file");
 		} else {
 			throw MemoryException("Error opening a shared file");
 		}
 	}
 	
-	if ((flags_ & MEM_CREAT) != 0) {
+	if ((flags_ & JMF_CREAT) != 0) {
 		if (write(_fd, "", 1) < 0) {
 			throw MemoryException("Error creating shared memory");
 		}
@@ -64,24 +66,20 @@ MemoryMap::MemoryMap(std::string filename_, jmemory_flags_t flags_, jmemory_perm
 
 	uint32_t t = 0;
 
-	if ((perms_ & MEM_EXEC) != 0) {
-		t = (jmemory_perms_t)(t | PROT_EXEC);
+	if ((perms_ & JMP_EXEC) != 0) {
+		t = (jmemory_permission_t)(t | PROT_EXEC);
 	}
 
-	if ((perms_ & MEM_READ) != 0) {
-		t = (jmemory_perms_t)(t | PROT_READ);
+	if ((perms_ & JMP_READ) != 0) {
+		t = (jmemory_permission_t)(t | PROT_READ);
 	}
 
-	if ((perms_ & MEM_WRITE) != 0) {
-		t = (jmemory_perms_t)(t | PROT_WRITE);
+	if ((perms_ & JMP_WRITE) != 0) {
+		t = (jmemory_permission_t)(t | PROT_WRITE);
 	}
 
-	if ((perms_ & MEM_READ_WRITE) != 0) {
-		t = (jmemory_perms_t)(t | PROT_READ | PROT_WRITE);
-	}
-
-	if ((perms_ & MEM_NONE) != 0) {
-		t = (jmemory_perms_t)(t | PROT_NONE);
+	if ((perms_ & JMP_READ_WRITE) != 0) {
+		t = (jmemory_permission_t)(t | PROT_READ | PROT_WRITE);
 	}
 
 	if (private_ == true) {
@@ -94,8 +92,6 @@ MemoryMap::MemoryMap(std::string filename_, jmemory_flags_t flags_, jmemory_perm
 		throw MemoryException("Creating memory map failed");
 	}
 	
-	_perms = perms_;
-
 	_is_open = true;
 #endif
 }
@@ -113,7 +109,7 @@ int64_t MemoryMap::Get(char *data_, int64_t size_, int64_t offset_)
 	// TODO:: tratar mmap2 com offset
 	if (size_ > _stats.st_size) {
 		// throw MemoryException("Size cause overflow in memory");
-		//
+		
 		size_ = _stats.st_size;
 	}
 
@@ -135,34 +131,41 @@ int64_t MemoryMap::Put(const char *data_, int64_t size_, int64_t offset_)
 
 	memcpy(_start, data_, size_);
 	
-    return size_;
+	return size_;
 #endif
 }
 
-void MemoryMap::SetPermission(jmemory_perms_t perms_)
+jmemory_permission_t MemoryMap::GetPermission()
 {
+	return _permission;
+}
+	
+void MemoryMap::SetPermission(jmemory_permission_t perms_)
+{
+	_permission = perms_;
+
 #ifdef _WIN32
 #else
 	unsigned int t = 0;
 
-	if ((_perms & MEM_EXEC) != 0) {
-		t = (jmemory_perms_t)(t | PROT_EXEC);
+	if ((_permission & JMP_EXEC) != 0) {
+		t = (jmemory_permission_t)(t | PROT_EXEC);
 	}
 
-	if ((_perms & MEM_READ) != 0) {
-		t = (jmemory_perms_t)(t | PROT_READ);
+	if ((_permission & JMP_READ) != 0) {
+		t = (jmemory_permission_t)(t | PROT_READ);
 	}
 
-	if ((_perms & MEM_WRITE) != 0) {
-		t = (jmemory_perms_t)(t | PROT_WRITE);
+	if ((_permission & JMP_WRITE) != 0) {
+		t = (jmemory_permission_t)(t | PROT_WRITE);
 	}
 
-	if ((_perms & MEM_READ_WRITE) != 0) {
-		t = (jmemory_perms_t)(t | PROT_READ | PROT_WRITE);
+	if ((_permission & JMP_READ_WRITE) != 0) {
+		t = (jmemory_permission_t)(t | PROT_READ | PROT_WRITE);
 	}
 
-	if ((_perms & MEM_NONE) != 0) {
-		t = (jmemory_perms_t)(t | PROT_NONE);
+	if ((_permission & JMP_NONE) != 0) {
+		t = (jmemory_permission_t)(t | PROT_NONE);
 	}
 
 	if (mprotect(_start, _stats.st_size, t) < 0) {

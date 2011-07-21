@@ -27,7 +27,7 @@
 namespace jsocket {
 
 SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, int keysize, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
 	
@@ -65,7 +65,7 @@ SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, int keysize, int timeout_,
 }
 
 SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
 
@@ -104,7 +104,7 @@ SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, InetAddress *local_addr_, 
 }
 
 SSLSocket6::SSLSocket6(std::string host_, int port_, int keysize, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
 
@@ -148,7 +148,7 @@ SSLSocket6::SSLSocket6(std::string host_, int port_, int keysize, int timeout_, 
 }
 
 SSLSocket6::SSLSocket6(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
 
@@ -218,7 +218,7 @@ SSLSocket6::~SSLSocket6()
 /** Private */
 
 SSLSocket6::SSLSocket6(jsocket_t handler_, struct sockaddr_in6 server_, int keysize, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
 
@@ -768,7 +768,7 @@ SocketOption * SSLSocket6::GetSocketOption()
 		throw SocketException("Connection is closed");
 	}
 
-	return new SocketOption(_fd, TCP_SOCKET);
+	return new SocketOption(_fd, JCT_TCP);
 }
 
 std::string SSLSocket6::what()

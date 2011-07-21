@@ -52,15 +52,15 @@ void SimpleFormatter::Transform(LogRecord *log)
 		date << " [" << (loctime + 4) << "]  ";
 	}
 	
-	if (log->GetType() == INFO_LOGGER) {
+	if (log->GetType() == JRT_INFO) {
 		format << "LOG_INFO" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == WARNNING_LOGGER) {
+	} else if (log->GetType() == JRT_WARNNING) {
 		format << "LOG_WARNNING" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == ERROR_LOGGER) {
+	} else if (log->GetType() == JRT_ERROR) {
 		format << "LOG_ERROR" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == CRITICAL_LOGGER) {
+	} else if (log->GetType() == JRT_CRITICAL) {
 		format << "LOG_CRITICAL" << date.str() << log->GetRecord() << std::flush << std::endl;
-	} else if (log->GetType() == UNKNOWN_LOGGER) {
+	} else if (log->GetType() == JRT_UNKNOWN) {
 		format << "UNKNOWN" << date.str() << log->GetRecord() << std::flush << std::endl;
 	}
 

@@ -28,11 +28,11 @@ namespace jgui {
  * \brief
  *
  */
-enum jadjustment_type_t {
-	BLOCK_INCREMENT,
-	BLOCK_DECREMENT,
-	UNIT_INCREMENT,
-	UNIT_DECREMENT
+enum jadjustmentevent_type_t {
+	JAT_BLOCK_INCREMENT,
+	JAT_BLOCK_DECREMENT,
+	JAT_UNIT_INCREMENT,
+	JAT_UNIT_DECREMENT
 };
 
 /**
@@ -44,7 +44,7 @@ class AdjustmentEvent : public jcommon::EventObject{
 
 	private:
 		/** \brief */
-		jadjustment_type_t _type;
+		jadjustmentevent_type_t _type;
 		/** \brief */
 		double _value;
 
@@ -53,7 +53,7 @@ class AdjustmentEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		AdjustmentEvent(void *source, jadjustment_type_t type, double value);
+		AdjustmentEvent(void *source, jadjustmentevent_type_t type, double value);
 
 		/**
 		 * \brief
@@ -71,7 +71,7 @@ class AdjustmentEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		virtual jadjustment_type_t GetType();
+		virtual jadjustmentevent_type_t GetType();
 
 };
 

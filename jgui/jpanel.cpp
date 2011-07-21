@@ -33,7 +33,7 @@ Panel::Panel(int x, int y, int width, int height):
 	SetBackgroundColor(0x15-d, 0x35-d, 0x55-d, 0xff);
 	SetBorderColor(0x60-d, 0x60-d, 0x80-d, 0xff);
 	SetBackgroundVisible(true);
-	SetBorder(LINE_BORDER);
+	SetBorder(JCB_LINE);
 }
 
 Panel::~Panel()

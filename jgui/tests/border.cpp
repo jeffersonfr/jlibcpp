@@ -53,16 +53,16 @@ class BorderTest : public jgui::Frame {
 			_components.push_back(new jgui::Button("Raised Etched", dx+3*(w+gapx), dy+1*(h+gapy), w, h));
 			_components.push_back(new jgui::Button("Lowered Etched", dx+4*(w+gapx), dy+1*(h+gapy), w, h));
 
-			_components[0]->SetBorder(jgui::EMPTY_BORDER);
-			_components[1]->SetBorder(jgui::LINE_BORDER);
-			_components[2]->SetBorder(jgui::BEVEL_BORDER);
-			_components[3]->SetBorder(jgui::ROUND_BORDER);
-			_components[4]->SetBorder(jgui::RAISED_GRADIENT_BORDER);
-			_components[5]->SetBorder(jgui::LOWERED_GRADIENT_BORDER);
-			_components[6]->SetBorder(jgui::RAISED_BEVEL_BORDER);
-			_components[7]->SetBorder(jgui::LOWERED_BEVEL_BORDER);
-			_components[8]->SetBorder(jgui::RAISED_ETCHED_BORDER);
-			_components[9]->SetBorder(jgui::LOWERED_ETCHED_BORDER);
+			_components[0]->SetBorder(jgui::JCB_EMPTY);
+			_components[1]->SetBorder(jgui::JCB_LINE);
+			_components[2]->SetBorder(jgui::JCB_BEVEL);
+			_components[3]->SetBorder(jgui::JCB_ROUND);
+			_components[4]->SetBorder(jgui::JCB_RAISED_GRADIENT);
+			_components[5]->SetBorder(jgui::JCB_LOWERED_GRADIENT);
+			_components[6]->SetBorder(jgui::JCB_RAISED_BEVEL);
+			_components[7]->SetBorder(jgui::JCB_LOWERED_BEVEL);
+			_components[8]->SetBorder(jgui::JCB_RAISED_ETCHED);
+			_components[9]->SetBorder(jgui::JCB_LOWERED_ETCHED);
 
 			for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 				(*i)->SetBorderSize(8);

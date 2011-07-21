@@ -31,8 +31,8 @@ TextDialogBox::TextDialogBox(std::string msg, int x, int y, bool wrap):
 
 	_label->SetGap(10, 10);
 	_label->SetWrap(true);
-	_label->SetHorizontalAlign(JUSTIFY_HALIGN);
-	_label->SetVerticalAlign(TOP_VALIGN);
+	_label->SetHorizontalAlign(JHA_JUSTIFY);
+	_label->SetVerticalAlign(JVA_TOP);
 
 	_label->SetSize(_label->GetPreferredSize());
 

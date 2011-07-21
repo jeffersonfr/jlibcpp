@@ -40,7 +40,7 @@ FileOutputStream::FileOutputStream(std::string filename_):
 	}
 
 	try {
-		_file = new File(filename_, F_READ_WRITE | F_LARGEFILE | F_CREATE);
+		_file = new File(filename_, JFF_READ_WRITE | JFF_LARGEFILE | JFF_CREATE);
 	} catch (...) {
 		_file = NULL;
 

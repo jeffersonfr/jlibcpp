@@ -34,11 +34,11 @@ namespace jgui {
  * \brief
  *
  */
-enum jcursor_type_t {
-	NONE_CURSOR,
-	UNDERSCORE_CURSOR,
-	STICK_CURSOR,
-	BLOCK_CURSOR
+enum jcaret_type_t {
+	JCT_NONE,
+	JCT_UNDERSCORE,
+	JCT_STICK,
+	JCT_BLOCK
 };
 
 /**
@@ -52,7 +52,7 @@ class TextComponent : public jgui::Component{
 		std::vector<TextListener *> _text_listeners;
 		jhorizontal_align_t _halign;
 		jvertical_align_t _valign;
-		jcursor_type_t _caret_type;
+		jcaret_type_t _caret_type;
 		std::string _text;
 		int _caret_position,
 				_selection_start,
@@ -109,7 +109,7 @@ class TextComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void SetCaretType(jcursor_type_t t);
+		virtual void SetCaretType(jcaret_type_t t);
 		
 		/**
 		 * \brief

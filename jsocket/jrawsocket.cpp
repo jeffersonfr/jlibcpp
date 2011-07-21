@@ -28,7 +28,7 @@ namespace jsocket {
 int RawSocket::_used_port = 1024;
 
 RawSocket::RawSocket(std::string device_, bool promisc_, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(RAW_SOCKET)
+	jsocket::Connection(JCT_RAW)
 {
 	jcommon::Object::SetClassName("jsocket::RawSocket");
 	
@@ -327,7 +327,7 @@ SocketOption * RawSocket::GetSocketOption()
 		throw SocketException("Connection is closed");
 	}
 
-	return new SocketOption(_fd, RAW_SOCKET);
+	return new SocketOption(_fd, JCT_RAW);
 }
 
 unsigned short RawSocket::Checksum(unsigned short *addr, int len)

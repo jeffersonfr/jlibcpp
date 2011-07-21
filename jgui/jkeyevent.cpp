@@ -22,7 +22,7 @@
 
 namespace jgui {
 
-KeyEvent::KeyEvent(void *source, jkey_type_t type, jkey_modifiers_t mod, int code, jkey_symbol_t symbol):
+KeyEvent::KeyEvent(void *source, jkeyevent_type_t type, jkeyevent_modifiers_t mod, int code, jkeyevent_symbol_t symbol):
 	jcommon::EventObject(source)
 {
 	jcommon::Object::SetClassName("jgui::KeyEvent");
@@ -42,17 +42,17 @@ int KeyEvent::GetKeyCode()
 	return _code;
 }
 
-jkey_symbol_t KeyEvent::GetSymbol()
+jkeyevent_symbol_t KeyEvent::GetSymbol()
 {
 	return _symbol;
 }
 
-jkey_type_t KeyEvent::GetType()
+jkeyevent_type_t KeyEvent::GetType()
 {
 	return _type;
 }
 
-jkey_modifiers_t KeyEvent::GetModifiers()
+jkeyevent_modifiers_t KeyEvent::GetModifiers()
 {
 	return _mod;
 }

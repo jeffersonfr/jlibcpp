@@ -22,19 +22,11 @@
 
 #include "jselectlistener.h"
 #include "jitemcomponent.h"
+#include "jslidercomponent.h"
 
 #include <vector>
 
 namespace jgui {
-
-/**
- * \brief
- *
- */
-enum jspin_type_t {
-	HORIZONTAL_SPIN,
-	VERTICAL_SPIN
-};
 
 /**
  * \brief
@@ -45,7 +37,7 @@ class Spin : public jgui::ItemComponent{
 
 	private:
 		std::vector<SelectListener *> _select_listeners;
-		jspin_type_t _type;
+		jscroll_orientation_t _type;
 
 	private:
 		void NextItem();
@@ -68,14 +60,14 @@ class Spin : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		virtual void SetType(jspin_type_t type);
+		virtual jscroll_orientation_t GetScrollOrientation();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jspin_type_t GetType();
-		
+		virtual void SetScrollOrientation(jscroll_orientation_t type);
+
 		/**
 		 * \brief
 		 *

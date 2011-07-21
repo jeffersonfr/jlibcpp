@@ -37,20 +37,20 @@
 namespace jthread{
 
 enum jthread_type_t {
-	DETACH_THREAD,
-	JOINABLE_THREAD
+	JTT_DETACH,
+	JTT_JOINABLE
 };
 
 enum jthread_priority_t {
-	LOW_PRIORITY,
-	NORMAL_PRIORITY,
-	HIGH_PRIORITY
+	JTP_LOW,
+	JTP_NORMAL,
+	JTP_HIGH
 };
 
 enum jthread_policy_t {
-	POLICY_OTHER,				// Normal thread
-	POLICY_FIFO,				// Real-time thread fifo
-	POLICY_ROUND_ROBIN	// Round robin thread round robin
+	JTP_OTHER,			// Normal thread
+	JTP_FIFO,				// Real-time thread fifo
+	JTP_ROUND_ROBIN	// Round robin thread round robin
 };
 
 #ifdef _WIN32
@@ -150,13 +150,13 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Construtor.
 		 *
 		 */
-		Thread(jthread_type_t type = JOINABLE_THREAD, ThreadGroup *group = NULL);
+		Thread(jthread_type_t type = JTT_JOINABLE, ThreadGroup *group = NULL);
 
 		/**
 		 * \brief Construtor.
 		 *
 		 */
-		Thread(Runnable *runnable, jthread_type_t type = JOINABLE_THREAD, ThreadGroup *group = NULL);
+		Thread(Runnable *runnable, jthread_type_t type = JTT_JOINABLE, ThreadGroup *group = NULL);
 
 		/**
 		 * \brief Destrutor virtual.

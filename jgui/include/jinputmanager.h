@@ -35,9 +35,9 @@
 namespace jgui {
 
 enum jbroadcaster_event_t {
-	JBROADCAST_UNKNOWN		= 0x00,
-	JBROADCAST_KEYEVENT		= 0x01,
-	JBROADCAST_MOUSEEVENT	= 0x02
+	JBE_UNKNOWN			= 0x00,
+	JBE_KEYEVENT		= 0x01,
+	JBE_MOUSEEVENT	= 0x02
 };
 
 /**
@@ -142,7 +142,7 @@ class InputManager : public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		jkey_symbol_t TranslateToDFBKeySymbol(DFBInputDeviceKeySymbol symbol);
+		jkeyevent_symbol_t TranslateToDFBKeySymbol(DFBInputDeviceKeySymbol symbol);
 
 		/**
 		 * \brief

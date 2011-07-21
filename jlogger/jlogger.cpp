@@ -29,7 +29,7 @@ Logger::Logger(Handler *handler_, Formatter *format_):
 	
 	_handler = handler_;
 	_format = format_;
-	_mask = (jrecord_type_t)(INFO_LOGGER | WARNNING_LOGGER | ERROR_LOGGER | CRITICAL_LOGGER | UNKNOWN_LOGGER);
+	_mask = (jrecord_type_t)(JRT_INFO | JRT_WARNNING | JRT_ERROR | JRT_CRITICAL | JRT_UNKNOWN);
 }
 
 Logger::~Logger()

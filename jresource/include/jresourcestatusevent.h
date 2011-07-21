@@ -26,8 +26,8 @@
 
 namespace jresource {
 
-enum jresource_event_type_t {
-	UNKNOWN_RESOURCE_EVENT
+enum jresourceevent_type_t {
+	JRT_UNKNOWN
 };
 
 /**
@@ -38,7 +38,7 @@ enum jresource_event_type_t {
 class ResourceStatusEvent : public jcommon::EventObject{
 
 	private:
-		jresource_event_type_t _type;
+		jresourceevent_type_t _type;
 		
 	public:
 		/**
@@ -57,7 +57,7 @@ class ResourceStatusEvent : public jcommon::EventObject{
 		 * \brief
 		 * 
 		 */
-		jresource_event_type_t  GetType();
+		jresourceevent_type_t  GetType();
     
 };
 

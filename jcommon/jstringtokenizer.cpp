@@ -23,7 +23,7 @@
 
 namespace jcommon {
 
-StringTokenizer::StringTokenizer(std::string string_, std::string token_, jtoken_flag_t flag_, bool return_tokens_)
+StringTokenizer::StringTokenizer(std::string string_, std::string token_, jtoken_type_t flag_, bool return_tokens_)
 {
 	jcommon::Object::SetClassName("jcommon::StringTokenizer");
 	
@@ -34,7 +34,7 @@ StringTokenizer::~StringTokenizer()
 {
 }
 
-void StringTokenizer::BuildTokens(std::string string_, std::string token_, jtoken_flag_t flag_, bool return_tokens_)
+void StringTokenizer::BuildTokens(std::string string_, std::string token_, jtoken_type_t flag_, bool return_tokens_)
 {
 	/*
 	char *s = (char *)string_.c_str(),
@@ -48,7 +48,7 @@ void StringTokenizer::BuildTokens(std::string string_, std::string token_, jtoke
 	}
 	*/
 
-	if (flag_ == TOKEN_FLAG) {
+	if (flag_ == JTT_CHAR) {
 		std::string::size_type idx = 0; 
 		
 		while (true) {
@@ -74,7 +74,7 @@ void StringTokenizer::BuildTokens(std::string string_, std::string token_, jtoke
 				break;
 			}
 		}
-	} else if (flag_ == SPLIT_FLAG) {
+	} else if (flag_ == JTT_STRING) {
 		std::string::size_type pos = string_.find(token_);
 
 		/*

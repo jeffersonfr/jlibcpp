@@ -40,13 +40,13 @@ void DynamicLink::Load(std::string lib, jlink_flags_t mode)
 #else
 	int m = 0;
 
-	if (mode == NOW_LINK) {
+	if (mode == JLF_NOW) {
 		m = RTLD_NOW;
-	} else if (mode == LAZY_LINK) {
+	} else if (mode == JLF_LAZY) {
 		m = RTLD_LAZY;
-	} else if (mode == LOCAL_LINK) {
+	} else if (mode == JLF_LOCAL) {
 		m = RTLD_LOCAL;
-	} else if (mode == GLOBAL_LINK) {
+	} else if (mode == JLF_GLOBAL) {
 		m = RTLD_GLOBAL;
 	}
 

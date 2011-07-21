@@ -135,33 +135,33 @@ class Main : public jgui::Frame, public jthread::Thread{
 		{
 			double angle_step = 0.1;
 
-			if (event->GetSymbol() == jgui::JKEY_SPACE) {
+			if (event->GetSymbol() == jgui::JKS_SPACE) {
 				if (_has_bullet == false) {
 					_bullet_x = _tx+_tc;
 					_bullet_y = _ty+_tc;
 					_bullet_angle = _angle;//+M_PI_2;
 					_has_bullet = true;
 				}
-			} else if (event->GetSymbol() == jgui::JKEY_CURSOR_UP) {
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
 				_step = _step + 2;
 
 				if (_step > 8) {
 					_step = 8;
 				}
-			} else if (event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
 				_step = _step - 2;
 
 				if (_step < -8) {
 					_step = -8;
 				}
-			} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
 				_step = 0.0;
 				_angle = (_angle-angle_step);
 				
 				if (_angle < 0.0) {
 					_angle = 2*M_PI;
 				}
-			} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 				_step = 0.0;
 				_angle = fmod(_angle+angle_step, 2*M_PI);
 			}

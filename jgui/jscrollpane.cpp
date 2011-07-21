@@ -31,12 +31,12 @@ ScrollPane::ScrollPane(int x, int y, int width, int height, int scale_width, int
 	_horizontal_scroll = new ScrollBar(0, 0, 0, 0);
 	_vertical_scroll = new ScrollBar(0, 0, 0, 0);
 
-	_horizontal_scroll->SetOrientation(LEFT_RIGHT_SCROLL);
-	_vertical_scroll->SetOrientation(BOTTOM_UP_SCROLL);
+	_horizontal_scroll->SetScrollOrientation(JSO_HORIZONTAL);
+	_vertical_scroll->SetScrollOrientation(JSO_VERTICAL);
 
 	_scroll_x = 0;
 	_scroll_y = 0;
-	_scroll_type = BOTH_SCROLL;
+	_scroll_type = JST_BOTH;
 	_auto_scroll = true;
 }
 
@@ -68,7 +68,7 @@ void ScrollPane::Paint(Graphics *g)
 	//CHANGE:: permite alteracoes on-the-fly
 	g->SetWorkingScreenSize(_scale_width, _scale_height);
 
-	g->SetDrawingFlags(DF_NOFX);
+	g->SetDrawingFlags(JDF_NOFX);
 
 	if (_background_visible == true) {
 		g->SetColor(_bgcolor);
@@ -125,7 +125,7 @@ void ScrollPane::Paint(Graphics *g)
 	}
 
 	if (_auto_scroll == true) {
-		if (vscroll == true && (_scroll_type == VERTICAL_SCROLL || _scroll_type == BOTH_SCROLL)) {
+		if (vscroll == true && (_scroll_type == JST_VERTICAL_ONLY || _scroll_type == JST_BOTH)) {
 			offset = stone_size;
 
 			_vertical_scroll->SetBounds(_size.width-stone_size, 0, stone_size, _size.height);
@@ -134,7 +134,7 @@ void ScrollPane::Paint(Graphics *g)
 			g->ReleaseClip();
 		}
 		
-		if (hscroll == true && (_scroll_type == HORIZONTAL_SCROLL || _scroll_type == BOTH_SCROLL)) {
+		if (hscroll == true && (_scroll_type == JST_HORIZONTAL_ONLY || _scroll_type == JST_BOTH)) {
 			_horizontal_scroll->SetBounds(0, _size.height-stone_size, _size.width-offset, stone_size);
 			g->SetClip(0, _size.height-stone_size, _size.width-offset, stone_size);
 			_horizontal_scroll->Paint(g);

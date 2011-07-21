@@ -28,13 +28,13 @@ namespace jgui {
  * \brief
  *
  */
-enum jwindow_event_t {
-	WINDOW_CLOSING_EVENT,
-	WINDOW_CLOSED_EVENT,
-	WINDOW_OPENED_EVENT,
-	WINDOW_RESIZED_EVENT,
-	WINDOW_MOVED_EVENT,
-	WINDOW_PAINTED_EVENT
+enum jwindowevent_type_t {
+	JWT_CLOSING,
+	JWT_CLOSED,
+	JWT_OPENED,
+	JWT_RESIZED,
+	JWT_MOVED,
+	JWT_PAINTED
 };
 
 /**
@@ -45,14 +45,14 @@ enum jwindow_event_t {
 class WindowEvent : public jcommon::EventObject{
 
 	private:
-		jwindow_event_t _type;
+		jwindowevent_type_t _type;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		WindowEvent(void *source, jwindow_event_t type);
+		WindowEvent(void *source, jwindowevent_type_t type);
 		
 		/**
 		 * \brief
@@ -64,7 +64,7 @@ class WindowEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		virtual jwindow_event_t GetType();
+		virtual jwindowevent_type_t GetType();
 			
 };
 

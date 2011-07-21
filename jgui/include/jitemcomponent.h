@@ -37,10 +37,10 @@ namespace jgui {
  *
  */
 enum jmenuitem_type_t {
-	TEXT_MENU_ITEM,
-	IMAGE_MENU_ITEM,
-	CHECK_MENU_ITEM,
-	EMPTY_MENU_ITEM
+	JMT_EMPTY,
+	JMT_TEXT,
+	JMT_IMAGE,
+	JMT_CHECK
 };
 
 class SelectEvent;

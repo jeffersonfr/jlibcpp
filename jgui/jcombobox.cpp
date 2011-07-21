@@ -28,8 +28,8 @@ ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
 {
 	jcommon::Object::SetClassName("jgui::ComboBox");
 
-	_halign = CENTER_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_CENTER;
+	_valign = JVA_CENTER;
 
 	_old_index = 0;
 
@@ -74,7 +74,7 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JMOUSE_PRESSED_EVENT && event->GetButton() == JMOUSE_BUTTON1) {
+	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		RequestFocus();
@@ -104,11 +104,11 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 
 bool ComboBox::ProcessEvent(KeyEvent *event)
 {
-	if (event->GetType() != JKEY_PRESSED) {
+	if (event->GetType() != JKT_PRESSED) {
 		return true;
 	}
 
-	jkey_symbol_t action = event->GetSymbol();
+	jkeyevent_symbol_t action = event->GetSymbol();
 
 	if (Component::ProcessEvent(event) == true) {
 		return true;
@@ -120,7 +120,7 @@ bool ComboBox::ProcessEvent(KeyEvent *event)
 
 	bool catched = false;
 
-	if (action == JKEY_ENTER) {
+	if (action == JKS_ENTER) {
 		if (_parent != NULL) {
 			InputManager::GetInstance()->RegisterKeyListener(_menu);
 			InputManager::GetInstance()->RegisterMouseListener(_menu);
@@ -166,7 +166,7 @@ jvertical_align_t ComboBox::GetVerticalAlign()
 
 void ComboBox::ItemSelected(SelectEvent *event)
 {
-	DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), ACTION_ITEM));
+	DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), JST_ACTION));
 }
 
 void ComboBox::ItemChanged(SelectEvent *event)
@@ -176,9 +176,9 @@ void ComboBox::ItemChanged(SelectEvent *event)
 	Repaint();
 
 	if (GetCurrentIndex() > _old_index || (GetCurrentIndex() == 0 && _menu->GetItemsSize()-1)) {
-		DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), DOWN_ITEM));
+		DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), JST_DOWN));
 	} else {
-		DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), UP_ITEM));
+		DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), JST_UP));
 	}
 }
 

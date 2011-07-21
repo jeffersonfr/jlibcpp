@@ -157,8 +157,8 @@ class Stock : public jgui::Frame{
 
 			receive[count] = '\0';
 
-			jcommon::StringTokenizer lines(std::string(receive), "\r\n\r\n", jcommon::SPLIT_FLAG, false);
-			jcommon::StringTokenizer tokens(lines.GetToken(1), ",", jcommon::SPLIT_FLAG, false);
+			jcommon::StringTokenizer lines(std::string(receive), "\r\n\r\n", jcommon::JTT_STRING, false);
+			jcommon::StringTokenizer tokens(lines.GetToken(1), ",", jcommon::JTT_STRING, false);
 
 			quotes["nome"] = tokens.GetToken(1);
 			quotes["data"] = jcommon::StringUtils::ReplaceString(tokens.GetToken(2), "\"", "");
@@ -176,11 +176,11 @@ class Stock : public jgui::Frame{
 
 		virtual void InputReceived(jgui::KeyEvent *event)
 		{
-			if (event->GetType() != jgui::JKEY_PRESSED) {
+			if (event->GetType() != jgui::JKT_PRESSED) {
 				return;
 			}
 
-			if (event->GetSymbol() == jgui::JKEY_ENTER && GetFocusOwner() == acao) {
+			if (event->GetSymbol() == jgui::JKS_ENTER && GetFocusOwner() == acao) {
 				std::map<std::string, std::string> quotes = RequestQuotes(acao->GetText() + ".sa");
 			
 				vdata->SetText(quotes["data"]);

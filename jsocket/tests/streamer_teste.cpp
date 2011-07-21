@@ -472,13 +472,13 @@ class Streamer: public jthread::Thread{
 				videoPID = -1,
 				audioPID = -1;
 			jsocket::Connection *socket = new jsocket::DatagramSocket(remoteHost, port);
-			jsocket::ConnectionPipe *pipe_socket = new jsocket::ConnectionPipe(socket, jsocket::SENDER_PIPE, 7*188);
+			jsocket::ConnectionPipe *pipe_socket = new jsocket::ConnectionPipe(socket, jsocket::JCP_SENDER, 7*188);
 
 			pipe_socket->Start();
 
 			PmtInformation *pmtInfo = new PmtInformation();
 			// FDFile *f = new FDFile(fileName.c_str());
-			jio::File file(fileName, jio::F_READ_ONLY);
+			jio::File file(fileName, jio::JFF_READ_ONLY);
 			unsigned payloadLength;
 			int i;
 			uint8_t * payload = new uint8_t[188];

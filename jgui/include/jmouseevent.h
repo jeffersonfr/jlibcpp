@@ -39,11 +39,11 @@ namespace jgui {
  *
  */
 enum jmouse_event_t {
-	JMOUSE_UNKNOWN_EVENT,
-	JMOUSE_PRESSED_EVENT,
-	JMOUSE_RELEASED_EVENT,
-	JMOUSE_MOVED_EVENT,
-	JMOUSE_WHEEL_EVENT
+	JME_UNKNOWN,
+	JME_PRESSED,
+	JME_RELEASED,
+	JME_MOVED,
+	JME_WHEEL
 };
 
 /**
@@ -51,11 +51,11 @@ enum jmouse_event_t {
  *
  */
 enum jmouse_button_t {
-	JMOUSE_UNKNOWN = 0x0,
-	JMOUSE_BUTTON1 = 0x1,
-	JMOUSE_BUTTON2 = 0x2,
-	JMOUSE_BUTTON3 = 0x4,
-	JMOUSE_WHEEL = 0x08
+	JMB_UNKNOWN = 0x0,
+	JMB_BUTTON1 = 0x1,
+	JMB_BUTTON2 = 0x2,
+	JMB_BUTTON3 = 0x4,
+	JMB_WHEEL		= 0x08
 };
 
 /**

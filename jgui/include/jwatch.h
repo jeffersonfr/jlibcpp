@@ -37,9 +37,9 @@ namespace jgui {
  *
  */
 enum jwatch_type_t {
-	ANALOGIC_WATCH,
-	CRONOMETERUP_WATCH,
-	CRONOMETERDOWN_WATCH
+	JWT_CRONOMETERUP,
+	JWT_CRONOMETERDOWN,
+	JWT_ANALOGIC
 };
 
 class ButtonListener;
@@ -67,7 +67,7 @@ class Watch : public jgui::Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		Watch(jwatch_type_t type = ANALOGIC_WATCH, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+		Watch(jwatch_type_t type = JWT_ANALOGIC, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
 		
 		/**
 		 * \brief

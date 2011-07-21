@@ -48,19 +48,19 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 	_current_dir = directory;
 	_has_parent = false;
 	_type = type;
-	_filter = FILE_AND_DIRECTORY;
+	_filter = JFF_FILE_AND_DIRECTORY;
 	_extension_ignorecase = true;
 
 	_list = new jgui::ListBox(_insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
 
 	Add(_list);
 
-	if (_type == SAVE_FILE_DIALOG) {
+	if (_type == JFT_SAVE_FILE_DIALOG) {
 		_label = new jgui::Label("File name", _insets.left, _list->GetY()+_list->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
 		_file = new jgui::TextField(_insets.left, _label->GetY()+_label->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
 
 		_label->SetBackgroundVisible(false);
-		_label->SetBorder(EMPTY_BORDER);
+		_label->SetBorder(JCB_EMPTY);
 
 		Add(_label);
 		Add(_file);
@@ -74,7 +74,7 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 
 	ShowFiles(_current_dir);
 
-	if (_type == OPEN_FILE_DIALOG) {
+	if (_type == JFT_OPEN_FILE_DIALOG) {
 		AddSubtitle(_DATA_PREFIX"images/blue_icon.png", "Open");
 	} else {
 		AddSubtitle(_DATA_PREFIX"images/blue_icon.png", "Save");
@@ -111,7 +111,7 @@ std::string FileChooserDialogBox::GetFile()
 		selectedItem = "";
 	}
 
-	if (_type == OPEN_FILE_DIALOG) {
+	if (_type == JFT_OPEN_FILE_DIALOG) {
 	} else {
 		selectedItem = _file->GetText();
 	}
@@ -172,7 +172,7 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 
 	std::sort(files.begin(), files.end(), ascending_sort());
 
-	if (_filter == DIRECTORY_ONLY || _filter == FILE_AND_DIRECTORY) {
+	if (_filter == JFF_DIRECTORY_ONLY || _filter == JFF_FILE_AND_DIRECTORY) {
 		for (unsigned int i=0; i<files.size(); i++) {
 			if (files[i] == "." || files[i] == "..") {
 				continue;
@@ -185,7 +185,7 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 		}
 	}
 
-	if (_filter == FILE_ONLY || _filter == FILE_AND_DIRECTORY) {
+	if (_filter == JFF_FILE_ONLY || _filter == JFF_FILE_AND_DIRECTORY) {
 		for (unsigned int i=0; i<files.size(); i++) {
 			std::string ext,
 				file = files[i];
@@ -298,10 +298,10 @@ void FileChooserDialogBox::ItemSelected(jgui::SelectEvent *event)
 			}
 		} else { 
 			// INFO:: Selecionar um arquivo
-			if (_type == OPEN_FILE_DIALOG) {
+			if (_type == JFT_OPEN_FILE_DIALOG) {
 				Release();
 
-				_last_key_code = jgui::JKEY_BLUE; 
+				_last_key_code = jgui::JKS_BLUE; 
 			} else {
 				_file->SetText(selectedItem);
 			}
@@ -313,15 +313,15 @@ void FileChooserDialogBox::InputReceived(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if (event->GetSymbol() == jgui::JKEY_BLUE || event->GetSymbol() == jgui::JKEY_F4) {
-		if (_type == OPEN_FILE_DIALOG) {
+	if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
+		if (_type == JFT_OPEN_FILE_DIALOG) {
 			Release();
-			_last_key_code = jgui::JKEY_BLUE; 
+			_last_key_code = jgui::JKS_BLUE; 
 		} else {
 			if (_file->GetText() != "") {
 				Release();
 
-				_last_key_code = jgui::JKEY_BLUE; 
+				_last_key_code = jgui::JKS_BLUE; 
 			}
 		}
 	}

@@ -45,9 +45,9 @@ namespace jgui {
  *
  */
 enum jframe_button_t {
-	FB_MINIMIZE = 1,
-	FB_MAXIMIZE = 1,
-	FB_CLOSE = 2
+	JFB_MINIMIZE	= 1,
+	JFB_MAXIMIZE	= 1,
+	JFB_CLOSE 		= 2
 };
 
 /**
@@ -124,7 +124,7 @@ class Frame : public KeyListener, public MouseListener, public Window {
 				 _resize_enabled,
 				 _is_maximized;
 		jframe_button_t _frame_buttons;
-		jkey_symbol_t _last_key_code;
+		jkeyevent_symbol_t _last_key_code;
 		jcursor_style_t _default_cursor;
 
 	public:
@@ -270,13 +270,13 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 * \brief
 		 *
 		 */
-		virtual jkey_symbol_t GetLastKeyCode();
+		virtual jkeyevent_symbol_t GetLastKeyCode();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetLastKeyCode(jkey_symbol_t key);
+		virtual void SetLastKeyCode(jkeyevent_symbol_t key);
 
 		/**
 		 * \brief

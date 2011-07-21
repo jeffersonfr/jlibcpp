@@ -40,31 +40,31 @@
 namespace jgui {
 
 enum jcomponent_alignment_t {
-	TOP_ALIGNMENT,
-	CENTER_ALIGNMENT,
-	BOTTOM_ALIGNMENT,
-	LEFT_ALIGNMENT,
-	RIGHT_ALIGNMENT
+	JCA_TOP,
+	JCA_CENTER,
+	JCA_BOTTOM,
+	JCA_LEFT,
+	JCA_RIGHT
 };
 
 enum jcomponent_orientation_t {
-	LEFT_TO_RIGHT_ORIENTATION,
-	RIGHT_TO_LEFT_ORIENTATION,
-	TOP_TO_BOTTOM_ORIENTATION,
-	BOTTOM_TO_TOP_ORIENTATION,
+	JCO_LEFT_TO_RIGHT,
+	JCO_RIGHT_TO_LEFT,
+	JCO_UP_TO_BOTTOM,
+	JCO_BOTTOM_TO_UP,
 };
 
 enum jcomponent_border_t {
-	EMPTY_BORDER,
-	LINE_BORDER,
-	BEVEL_BORDER,
-	ROUND_BORDER,
-	RAISED_GRADIENT_BORDER,
-	LOWERED_GRADIENT_BORDER,
-	RAISED_BEVEL_BORDER,
-	LOWERED_BEVEL_BORDER,
-	RAISED_ETCHED_BORDER,
-	LOWERED_ETCHED_BORDER
+	JCB_EMPTY,
+	JCB_LINE,
+	JCB_BEVEL,
+	JCB_ROUND,
+	JCB_RAISED_GRADIENT,
+	JCB_LOWERED_GRADIENT,
+	JCB_RAISED_BEVEL,
+	JCB_LOWERED_BEVEL,
+	JCB_RAISED_ETCHED,
+	JCB_LOWERED_ETCHED
 };
 
 // component baseline resize behavior
@@ -72,12 +72,12 @@ enum jcomponent_behavior_t {
 	// Indicates the baseline remains fixed relative to the y-origin.  That is, <code>getBaseline</code> returns
 	// the same value regardless of the height or width.  For example, a <code>JLabel</code> containing non-empty 
 	// text with a vertical alignment of <code>TOP</code> should have a baseline type of <code>CONSTANT_ASCENT</code>.
-	CB_CONSTANT_ASCENT,
+	JCB_CONSTANT_ASCENT,
 	// Indicates the baseline remains fixed relative to the height and does not change as the width is varied.  That is, 
 	// for any height H the difference between H and <code>getBaseline(w, H)</code> is the same.  For example, a <code>
 	// JLabel</code> containing non-empty text with a vertical alignment of <code>BOTTOM</code> should have a baseline 
 	// type of <code>CONSTANT_DESCENT</code>.
-	CB_CONSTANT_DESCENT,
+	JCB_CONSTANT_DESCENT,
 	// Indicates the baseline remains a fixed distance from the center of the component.  That is, for any height H the
 	// difference between <code>getBaseline(w, H)</code> and <code>H / 2</code> is the same (plus or minus one depending 
 	// upon rounding error). <p> Because of possible rounding errors it is recommended you ask for the baseline with two 
@@ -100,11 +100,11 @@ enum jcomponent_behavior_t {
 	// 		// The following calculates where the baseline lands for the height z:
 	// 		int calculatedBaseline = (z + padding) / 2 + baselineOffset;
 	// 	</pre>
-	CB_CENTER_OFFSET,
+	JCB_CENTER_OFFSET,
 	// Indicates the baseline resize behavior can not be expressed using any of the other constants.  
 	// This may also indicate the baseline varies with the width of the component.  This is also returned
 	// by components that do not have a baseline.
-	CB_OTHER
+	JCB_OTHER
 };
 
 class FocusListener;

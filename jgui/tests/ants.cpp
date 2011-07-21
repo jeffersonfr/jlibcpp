@@ -80,7 +80,7 @@ class Main : public jgui::Frame{
 			_insets.right = 10;
 			_insets.top = 60;
 
-			fweights = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 12);
+			fweights = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 12);
 #endif
 
 			board = new path_t[MAX_COLS*MAX_ROWS];
@@ -165,7 +165,7 @@ class Main : public jgui::Frame{
 #if ENABLE_GUI == 0
 			for (int k=0; k<K_INTERACTIONS; k++) {
 #else
-			for (int k=0; k<K_INTERACTIONS && GetLastKeyCode()!=jgui::JKEY_ESCAPE; k++) {
+			for (int k=0; k<K_INTERACTIONS && GetLastKeyCode()!=jgui::JKS_ESCAPE; k++) {
 #endif
 				// k ants
 				for (int j=0; j<K_ANTS; j++) {

@@ -36,7 +36,7 @@
 namespace jgui {
 
 enum jfont_attributes_t {
-	FA_NONE
+	JFA_NONE
 };
 
 /**

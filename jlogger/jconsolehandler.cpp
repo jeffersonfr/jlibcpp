@@ -36,7 +36,7 @@ void ConsoleHandler::WriteRecord(LogRecord *log)
 {
 	_mutex.Lock();
 	
-	if (log->GetType() == INFO_LOGGER) {
+	if (log->GetType() == JRT_INFO) {
 		std::cout << log->GetRecord() << std::flush;
 	} else {
 		std::cerr << log->GetRecord() << std::flush;

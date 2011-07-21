@@ -426,7 +426,7 @@ void SocketOption::SetMulticastLoop(bool b_)
 {
 #ifdef _WIN32
 #else
-	if (_type != MCAST_SOCKET) {
+	if (_type != JCT_MCAST) {
 		return;
 	}
 	
@@ -440,7 +440,7 @@ void SocketOption::SetRSVP(int t_)
 {
 #ifdef _WIN32
 #else
-	if (_type != MCAST_SOCKET) {
+	if (_type != JCT_MCAST) {
 		return;
 	}
 
@@ -456,7 +456,7 @@ void SocketOption::SetShutdown(socket_shutdown_t opt_)
 {
 #ifdef _WIN32
 #else
-	if (_type != MCAST_SOCKET) {
+	if (_type != JCT_MCAST) {
 		if (shutdown(_fd, opt_) < 0) {
 			throw SocketOptionException("Shutdown socket error");
 		}

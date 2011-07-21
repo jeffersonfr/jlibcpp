@@ -48,11 +48,11 @@ void Slider::SetStoneSize(int size)
 {
 	_stone_size = size;
 
-	if (_type == LEFT_RIGHT_SCROLL) {
+	if (_type == JSO_HORIZONTAL) {
 		if (_stone_size > (_size.width-_horizontal_gap-_border_size)) {
 			_stone_size = (_size.width-_horizontal_gap-_border_size);
 		}
-	} else if (_type == BOTTOM_UP_SCROLL) {
+	} else if (_type == JSO_VERTICAL) {
 		if (_stone_size > (_size.height-_vertical_gap-_border_size)) {
 			_stone_size = (_size.height-_vertical_gap-_border_size);
 		}
@@ -91,12 +91,12 @@ bool Slider::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JMOUSE_PRESSED_EVENT && event->GetButton() == JMOUSE_BUTTON1) {
+	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		RequestFocus();
 
-		if (_type == LEFT_RIGHT_SCROLL) {
+		if (_type == JSO_HORIZONTAL) {
 			if (y1 > _location.y && y1 < (_location.y+_size.height)) {
 				int d = (int)((_value*dw)/(GetMaximum()-GetMinimum()));
 
@@ -110,7 +110,7 @@ bool Slider::ProcessEvent(MouseEvent *event)
 					_pressed = true;
 				}
 			}
-		} else if (_type == BOTTOM_UP_SCROLL) {
+		} else if (_type == JSO_VERTICAL) {
 			if (x1 > _location.x && x1 < (_location.x+_size.width)) {
 				int d = (int)((_value*dh)/(GetMaximum()-GetMinimum()));
 
@@ -123,11 +123,11 @@ bool Slider::ProcessEvent(MouseEvent *event)
 				}
 			}
 		}
-	} else if (event->GetType() == JMOUSE_MOVED_EVENT) {
+	} else if (event->GetType() == JME_MOVED) {
 		if (_pressed == true) {
-			if (_type == LEFT_RIGHT_SCROLL) {
+			if (_type == JSO_HORIZONTAL) {
 				SetValue((((GetMaximum()-GetMinimum())*(x1-_stone_size/2-GetX()))/dw));
-			} else if (_type == BOTTOM_UP_SCROLL) {
+			} else if (_type == JSO_VERTICAL) {
 				SetValue((((GetMaximum()-GetMinimum())*(y1-_stone_size/2-GetY()))/dh));
 			}
 		}
@@ -150,40 +150,40 @@ bool Slider::ProcessEvent(KeyEvent *event)
 
 	bool catched = false;
 
-	jkey_symbol_t action = event->GetSymbol();
+	jkeyevent_symbol_t action = event->GetSymbol();
 
-	if (_type == LEFT_RIGHT_SCROLL) {
-		if (action == JKEY_CURSOR_LEFT) {
+	if (_type == JSO_HORIZONTAL) {
+		if (action == JKS_CURSOR_LEFT) {
 			SetValue(_value-_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_CURSOR_RIGHT) {
+		} else if (action == JKS_CURSOR_RIGHT) {
 			SetValue(_value+_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_DOWN) {
+		} else if (action == JKS_PAGE_DOWN) {
 			SetValue(_value-_maximum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_UP) {
+		} else if (action == JKS_PAGE_UP) {
 			SetValue(_value+_maximum_tick);
 
 			catched = true;
 		}
-	} else if (_type == BOTTOM_UP_SCROLL) {
-		if (action == JKEY_CURSOR_UP) {
+	} else if (_type == JSO_VERTICAL) {
+		if (action == JKS_CURSOR_UP) {
 			SetValue(_value-_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_CURSOR_DOWN) {
+		} else if (action == JKS_CURSOR_DOWN) {
 			SetValue(_value+_minimum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_DOWN) {
+		} else if (action == JKS_PAGE_DOWN) {
 			SetValue(_value-_maximum_tick);
 
 			catched = true;
-		} else if (action == JKEY_PAGE_UP) {
+		} else if (action == JKS_PAGE_UP) {
 			SetValue(_value+_maximum_tick);
 
 			catched = true;
@@ -207,7 +207,7 @@ void Slider::Paint(Graphics *g)
 			w = _size.width-2*x,
 			h = _size.height-2*y;
 
-	if (_type == LEFT_RIGHT_SCROLL) {
+	if (_type == JSO_HORIZONTAL) {
 		int d = (int)((_value*(w-_stone_size))/(GetMaximum()-GetMinimum()));
 
 		if (d > (w-_stone_size)) {
@@ -239,7 +239,7 @@ void Slider::Paint(Graphics *g)
 
 			g->FillPolygon((int)d+x, y, p, 5);
 		}
-	} else if (_type == BOTTOM_UP_SCROLL) {
+	} else if (_type == JSO_VERTICAL) {
 		int d = (int)((_value*(h-_stone_size))/(GetMaximum()-GetMinimum()));
 
 		if (d > (h-_stone_size)) {

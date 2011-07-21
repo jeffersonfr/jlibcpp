@@ -130,27 +130,27 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 
 		virtual void InputReceived(jgui::KeyEvent *event)
 		{
-			if (event->GetType() == jgui::JKEY_RELEASED) {
+			if (event->GetType() == jgui::JKT_RELEASED) {
 				batdpos = 0;
 
 				return;
 			}
 
 			if (ingame) {
-				if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
+				if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 					batdpos = -3;
 				}
 
-				if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
+				if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
 					batdpos = 3;
 				}
 
-				if (event->GetSymbol() == jgui::JKEY_ESCAPE) {
+				if (event->GetSymbol() == jgui::JKS_ESCAPE) {
 					ingame = false;
 				}
 
 			} else {
-				if (event->GetSymbol() == jgui::JKEY_SPACE) {
+				if (event->GetSymbol() == jgui::JKS_SPACE) {
 					ingame = true;
 
 					GameInit();

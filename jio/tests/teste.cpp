@@ -33,7 +33,7 @@ int main()
 	BufferedReader reader(&is);
 
 	while (reader.IsEOF() == false) {
-		jcommon::StringTokenizer tokens(reader.ReadLine(), ":", jcommon::SPLIT_FLAG, false);
+		jcommon::StringTokenizer tokens(reader.ReadLine(), ":", jcommon::JTT_STRING, false);
 
 		for (int i=0; i<tokens.GetSize(); i++) {
 			std::cout << tokens.GetToken(i) << std::endl;

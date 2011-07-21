@@ -38,205 +38,205 @@ namespace jgui {
  * \brief
  *
  */
-enum jkey_type_t {
-	JKEY_PRESSED,
-	JKEY_RELEASED,
-	JKEY_TYPED
+enum jkeyevent_type_t {
+	JKT_PRESSED,
+	JKT_RELEASED,
+	JKT_TYPED
 };
 
 /**
  * \brief
  *
  */
-enum jkey_modifiers_t {
-	JMOD_SHIFT				= 0x0001,
-	JMOD_CONTROL			= 0x0002,
-	JMOD_ALT					= 0x0004,
-	JMOD_ALTGR				= 0x0008,
-	JMOD_META					= 0x0010,
-	JMOD_SUPER				= 0x0020,
-	JMOD_HYPER				= 0x0040,
-	JMOD_CAPS_LOCK		= 0x0080,
-	JMOD_NUM_LOCK			= 0x0100,
-	JMOD_SCROLL_LOCK	= 0x0200
+enum jkeyevent_modifiers_t {
+	JKM_SHIFT				= 0x0001,
+	JKM_CONTROL			= 0x0002,
+	JKM_ALT					= 0x0004,
+	JKM_ALTGR				= 0x0008,
+	JKM_META					= 0x0010,
+	JKM_SUPER				= 0x0020,
+	JKM_HYPER				= 0x0040,
+	JKM_CAPS_LOCK		= 0x0080,
+	JKM_NUM_LOCK			= 0x0100,
+	JKM_SCROLL_LOCK	= 0x0200
 };
 
 /**
  * \brief
  *
  */
-enum jkey_symbol_t {
-  JKEY_UNKNOWN,
-	JKEY_EXIT,
-	JKEY_BACKSPACE,
-	JKEY_TAB,
-	JKEY_ENTER,
-	JKEY_CANCEL,
-	JKEY_ESCAPE,
-	JKEY_SPACE,
-	JKEY_EXCLAMATION_MARK,
-	JKEY_QUOTATION,
-	JKEY_NUMBER_SIGN,
-	JKEY_DOLLAR_SIGN,
-	JKEY_PERCENT_SIGN,
-	JKEY_AMPERSAND,
-	JKEY_APOSTROPHE,
-	JKEY_PARENTHESIS_LEFT,
-	JKEY_PARENTHESIS_RIGHT,
-	JKEY_STAR,
-	JKEY_SHARP,
-	JKEY_PLUS_SIGN,
-	JKEY_COMMA,
-	JKEY_MINUS_SIGN,
-	JKEY_PERIOD,
-	JKEY_SLASH,
-	JKEY_0,
-	JKEY_1,
-	JKEY_2,
-	JKEY_3,   
-	JKEY_4,
-	JKEY_5,
-	JKEY_6,
-	JKEY_7,
-	JKEY_8,
-	JKEY_9,
+enum jkeyevent_symbol_t {
+  JKS_UNKNOWN,
+	JKS_EXIT,
+	JKS_BACKSPACE,
+	JKS_TAB,
+	JKS_ENTER,
+	JKS_CANCEL,
+	JKS_ESCAPE,
+	JKS_SPACE,
+	JKS_EXCLAMATION_MARK,
+	JKS_QUOTATION,
+	JKS_NUMBER_SIGN,
+	JKS_DOLLAR_SIGN,
+	JKS_PERCENT_SIGN,
+	JKS_AMPERSAND,
+	JKS_APOSTROPHE,
+	JKS_PARENTHESIS_LEFT,
+	JKS_PARENTHESIS_RIGHT,
+	JKS_STAR,
+	JKS_SHARP,
+	JKS_PLUS_SIGN,
+	JKS_COMMA,
+	JKS_MINUS_SIGN,
+	JKS_PERIOD,
+	JKS_SLASH,
+	JKS_0,
+	JKS_1,
+	JKS_2,
+	JKS_3,   
+	JKS_4,
+	JKS_5,
+	JKS_6,
+	JKS_7,
+	JKS_8,
+	JKS_9,
 
-	JKEY_COLON,
-	JKEY_SEMICOLON,
-	JKEY_LESS_THAN_SIGN,
-	JKEY_EQUALS_SIGN,
-	JKEY_GREATER_THAN_SIGN, 
-	JKEY_QUESTION_MARK,
-	JKEY_AT,
+	JKS_COLON,
+	JKS_SEMICOLON,
+	JKS_LESS_THAN_SIGN,
+	JKS_EQUALS_SIGN,
+	JKS_GREATER_THAN_SIGN, 
+	JKS_QUESTION_MARK,
+	JKS_AT,
 
-	JKEY_A,
-	JKEY_B,
-	JKEY_C,
-	JKEY_D,
-	JKEY_E,
-	JKEY_F,
-	JKEY_G,
-	JKEY_H,
-	JKEY_I,         
-	JKEY_J,       
-	JKEY_K,     
-	JKEY_L,   
-	JKEY_M, 
-	JKEY_N,
-	JKEY_O,
-	JKEY_P,
-	JKEY_Q,
-	JKEY_R,
-	JKEY_S,
-	JKEY_T,
-	JKEY_U,
-	JKEY_V,
-	JKEY_W,
-	JKEY_X,            
-	JKEY_Y,          
-	JKEY_Z,        
+	JKS_A,
+	JKS_B,
+	JKS_C,
+	JKS_D,
+	JKS_E,
+	JKS_F,
+	JKS_G,
+	JKS_H,
+	JKS_I,         
+	JKS_J,       
+	JKS_K,     
+	JKS_L,   
+	JKS_M, 
+	JKS_N,
+	JKS_O,
+	JKS_P,
+	JKS_Q,
+	JKS_R,
+	JKS_S,
+	JKS_T,
+	JKS_U,
+	JKS_V,
+	JKS_W,
+	JKS_X,            
+	JKS_Y,          
+	JKS_Z,        
 
-	JKEY_a,      
-	JKEY_b,    
-	JKEY_c,  
-	JKEY_d,
-	JKEY_e,
-	JKEY_f,
-	JKEY_g,
-	JKEY_h,
-	JKEY_i,
-	JKEY_j,
-	JKEY_k,              
-	JKEY_l,            
-	JKEY_m,          
-	JKEY_n,        
-	JKEY_o,      
-	JKEY_p,    
-	JKEY_q,  
-	JKEY_r,
-	JKEY_s,
-	JKEY_t,
-	JKEY_u,
-	JKEY_v,
-	JKEY_w,
-	JKEY_x,
-	JKEY_y,
-	JKEY_z,
+	JKS_a,      
+	JKS_b,    
+	JKS_c,  
+	JKS_d,
+	JKS_e,
+	JKS_f,
+	JKS_g,
+	JKS_h,
+	JKS_i,
+	JKS_j,
+	JKS_k,              
+	JKS_l,            
+	JKS_m,          
+	JKS_n,        
+	JKS_o,      
+	JKS_p,    
+	JKS_q,  
+	JKS_r,
+	JKS_s,
+	JKS_t,
+	JKS_u,
+	JKS_v,
+	JKS_w,
+	JKS_x,
+	JKS_y,
+	JKS_z,
 
-	JKEY_SQUARE_BRACKET_LEFT,
-	JKEY_BACKSLASH,
-	JKEY_SQUARE_BRACKET_RIGHT,
-	JKEY_CIRCUMFLEX_ACCENT,
-	JKEY_UNDERSCORE,
-	JKEY_GRAVE_ACCENT,
-	JKEY_CURLY_BRACKET_LEFT,    
-	JKEY_VERTICAL_BAR,  
-	JKEY_CURLY_BRACKET_RIGHT,
-	JKEY_TILDE,
+	JKS_SQUARE_BRACKET_LEFT,
+	JKS_BACKSLASH,
+	JKS_SQUARE_BRACKET_RIGHT,
+	JKS_CIRCUMFLEX_ACCENT,
+	JKS_UNDERSCORE,
+	JKS_GRAVE_ACCENT,
+	JKS_CURLY_BRACKET_LEFT,    
+	JKS_VERTICAL_BAR,  
+	JKS_CURLY_BRACKET_RIGHT,
+	JKS_TILDE,
 
-	JKEY_DELETE,
-	JKEY_INSERT,
-	JKEY_HOME,
-	JKEY_END,
-	JKEY_PAGE_UP,
-	JKEY_PAGE_DOWN,
-	JKEY_PRINT,
-	JKEY_PAUSE,
+	JKS_DELETE,
+	JKS_INSERT,
+	JKS_HOME,
+	JKS_END,
+	JKS_PAGE_UP,
+	JKS_PAGE_DOWN,
+	JKS_PRINT,
+	JKS_PAUSE,
 
-	JKEY_CURSOR_LEFT,
-	JKEY_CURSOR_RIGHT,
-	JKEY_CURSOR_UP,
-	JKEY_CURSOR_DOWN,
+	JKS_CURSOR_LEFT,
+	JKS_CURSOR_RIGHT,
+	JKS_CURSOR_UP,
+	JKS_CURSOR_DOWN,
 
-	JKEY_CURSOR_LEFT_UP,
-	JKEY_CURSOR_LEFT_DOWN,  
-	JKEY_CURSOR_UP_RIGHT,
-	JKEY_CURSOR_DOWN_RIGHT,
+	JKS_CURSOR_LEFT_UP,
+	JKS_CURSOR_LEFT_DOWN,  
+	JKS_CURSOR_UP_RIGHT,
+	JKS_CURSOR_DOWN_RIGHT,
 
-	JKEY_RED,
-	JKEY_GREEN,
-	JKEY_YELLOW,
-	JKEY_BLUE,
+	JKS_RED,
+	JKS_GREEN,
+	JKS_YELLOW,
+	JKS_BLUE,
 
-	JKEY_F1, 
-	JKEY_F2,
-	JKEY_F3,
-	JKEY_F4,
-	JKEY_F5,
-	JKEY_F6,          
-	JKEY_F7,        
-	JKEY_F8,      
-	JKEY_F9,    
-	JKEY_F10,  
-	JKEY_F11,
-	JKEY_F12,
+	JKS_F1, 
+	JKS_F2,
+	JKS_F3,
+	JKS_F4,
+	JKS_F5,
+	JKS_F6,          
+	JKS_F7,        
+	JKS_F8,      
+	JKS_F9,    
+	JKS_F10,  
+	JKS_F11,
+	JKS_F12,
 
-	JKEY_SHIFT,
-	JKEY_CONTROL,    
-	JKEY_ALT,  
-	JKEY_ALTGR,
-	JKEY_META,
-	JKEY_SUPER,
-	JKEY_HYPER,
+	JKS_SHIFT,
+	JKS_CONTROL,    
+	JKS_ALT,  
+	JKS_ALTGR,
+	JKS_META,
+	JKS_SUPER,
+	JKS_HYPER,
 
-	JKEY_POWER,
-	JKEY_MENU,
-	JKEY_FILE,
-	JKEY_INFO,
-	JKEY_BACK,
-	JKEY_GUIDE,
+	JKS_POWER,
+	JKS_MENU,
+	JKS_FILE,
+	JKS_INFO,
+	JKS_BACK,
+	JKS_GUIDE,
 
-	JKEY_CHANNEL_UP,
-	JKEY_CHANNEL_DOWN,
+	JKS_CHANNEL_UP,
+	JKS_CHANNEL_DOWN,
 
-	JKEY_VOLUME_UP,
-	JKEY_VOLUME_DOWN,
+	JKS_VOLUME_UP,
+	JKS_VOLUME_DOWN,
 
-	JKEY_PLAY,
-	JKEY_STOP,
-	JKEY_EJECT,
-	JKEY_REWIND,
-	JKEY_RECORD,
+	JKS_PLAY,
+	JKS_STOP,
+	JKS_EJECT,
+	JKS_REWIND,
+	JKS_RECORD,
 };
 
 /**
@@ -248,16 +248,16 @@ class KeyEvent : public jcommon::EventObject{
 
 	private:
 		int _code;
-		jkey_symbol_t _symbol;
-		jkey_type_t _type;
-		jkey_modifiers_t _mod;
+		jkeyevent_symbol_t _symbol;
+		jkeyevent_type_t _type;
+		jkeyevent_modifiers_t _mod;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		KeyEvent(void *source, jkey_type_t type, jkey_modifiers_t mod, int code, jkey_symbol_t symbol);
+		KeyEvent(void *source, jkeyevent_type_t type, jkeyevent_modifiers_t mod, int code, jkeyevent_symbol_t symbol);
 		
 		/**
 		 * \brief
@@ -275,19 +275,19 @@ class KeyEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		virtual jkey_symbol_t GetSymbol();
+		virtual jkeyevent_symbol_t GetSymbol();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jkey_type_t GetType();
+		virtual jkeyevent_type_t GetType();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jkey_modifiers_t GetModifiers();
+		virtual jkeyevent_modifiers_t GetModifiers();
 
 };
 

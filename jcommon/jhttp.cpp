@@ -101,7 +101,7 @@ int HTTPlexer::GetChar()
 	if (cur+1 > bufsize) {
 		cur++;
 
-		return EOB;
+		return JHT_EOB;
 	}
 	
 	return buffer[cur++];
@@ -118,49 +118,49 @@ int HTTPlexer::GetToken()
 {
 	int c;
 
-	pos=cur;
-	c=GetChar();
+	pos = cur;
+	c = GetChar();
 
-	if(c==EOB) {
-		return EOB;
+	if(c == JHT_EOB) {
+		return JHT_EOB;
 	}
 
-	if(c=='\r') {
-		c=GetChar();
+	if(c == '\r') {
+		c = GetChar();
 
-		if(c=='\n') {
-			return CRLF;
+		if(c == '\n') {
+			return JHT_CRLF;
 		}
 
 		Unget();
 
-		return CR;
+		return JHT_CR;
 	}
 
 	if(!is_ctl(c) && !is_separator(c)) {
 		do {
-			c=GetChar();
+			c = GetChar();
 		} while(!is_ctl(c) && !is_separator(c));
 
 		Unget();
 
-		return TOKEN;
+		return JHT_TOKEN;
 	}
 
-	if(c=='\"') {
+	if(c == '\"') {
 		do {
-			c=GetChar();
-		} while(c!='\"' && c!=EOB);
+			c = GetChar();
+		} while(c != '\"' && c!=JHT_EOB);
 
-		if(c=='\"') {
-			return STRING;
+		if(c == '\"') {
+			return JHT_STRING;
 		}
 
-		return ERROR;
+		return JHT_ERROR;
 	}
 
-	if(c==0) {
-		return EOB;
+	if(c == 0) {
+		return JHT_EOB;
 	}
 
 	return c;
@@ -169,25 +169,25 @@ int HTTPlexer::GetToken()
 
 char * HTTPlexer::GetToken(int &len) 
 {
-	if(cur<=pos) {
+	if(cur <= pos) {
 		return NULL;
 	}
 
-	len=cur-pos;
+	len = cur-pos;
 
 	return &buffer[pos];
 }
 
 char * HTTPlexer::GetNextToken(int &t, int &len) 
 {
-	t=GetToken();
+	t = GetToken();
 
 	return GetToken(len);
 }
 
 bool HTTPlexer::is_eob() 
 {
-	if(GetChar()==EOB) {
+	if(GetChar() == JHT_EOB) {
 		return true;
 	}
 
@@ -201,20 +201,20 @@ int HTTPlexer::GetQueryVal()
 	int inicio = cur,
 		t = GetToken();
 
-	if(t!='&' && t!=SP && t!=EOB && t!=CRLF && t!=LF && t!=STRING) {
+	if(t != '&' && t != JHT_SP && t != JHT_EOB && t != JHT_CRLF && t != JHT_LF && t != JHT_STRING) {
 		do {
-			t=GetToken(); 
-		} while(t!='&' && t!=SP && t!=EOB && t!=CRLF && t!=LF);
+			t = GetToken(); 
+		} while(t != '&' && t != JHT_SP && t != JHT_EOB && t != JHT_CRLF && t != JHT_LF);
 
-		if(t==CRLF) {
+		if(t == JHT_CRLF) {
 			Unget();
 		}
 
 		Unget();
 
-		pos=inicio;
+		pos = inicio;
 
-		return QUERYVAL;
+		return JHT_QUERYVAL;
 	}
 
 	return t;
@@ -224,56 +224,56 @@ int HTTPlexer::GetHeaderVal()
 {
 	int c;
 
-	pos=cur;
-	c=GetChar();
+	pos = cur;
+	c = GetChar();
 
-	if(c==EOB) {
-		return EOB;
+	if(c == JHT_EOB) {
+		return JHT_EOB;
 	}
 
-	if(c==LF) {
-		c=GetChar();
+	if(c == JHT_LF) {
+		c = GetChar();
 
-		if(c==' ' || c=='\t') {
+		if(c == ' ' || c == '\t') {
 		  	do {
 				c=GetChar();
-			} while(c==' ' || c=='\t');
+			} while(c == ' ' || c == '\t');
 		} else {
 			Unget();
 
-			return LF;
+			return JHT_LF;
 		}
-	} else if(c==CR) {
-		c=GetChar();
+	} else if(c == JHT_CR) {
+		c = GetChar();
 
-		if(c==LF) {
-			c=GetChar();
-			if(c==' ' || c=='\t') {
+		if(c == JHT_LF) {
+			c = GetChar();
+			if(c == ' ' || c == '\t') {
 				do {
 					c=GetChar();
-				} while(c==' ' || c=='\t');
+				} while(c == ' ' || c == '\t');
 			} else {
 				Unget();
 
-				return CRLF;
+				return JHT_CRLF;
 			}
 		} else {
 			Unget();
 
-			return CR;
+			return JHT_CR;
 		}
 	}
 
 	if(!is_ctl(c)) {
 		do {
-			if(c == CR) {
+			if(c == JHT_CR) {
 				c = GetChar();
-				if(c == LF) {
+				if(c == JHT_LF) {
 					c = GetChar();
 					if(c == ' ' || c == '\t') {
 						do {
 							c = GetChar();
-						} while((c == ' ' || c == '\t') && c != EOB);
+						} while((c == ' ' || c == '\t') && c != JHT_EOB);
 					} else {
 						Unget();
 						Unget();
@@ -284,12 +284,12 @@ int HTTPlexer::GetHeaderVal()
 				}
 			}
 
-			if(c == LF) {
+			if(c == JHT_LF) {
 	  			c = GetChar();
 				if(c == ' ' || c == '\t') {
 					do {
 					   c = GetChar();
-					} while((c == ' ' || c == '\t') && c != EOB);
+					} while((c == ' ' || c == '\t') && c != JHT_EOB);
 				} else {
 					Unget();
 					Unget();
@@ -299,10 +299,10 @@ int HTTPlexer::GetHeaderVal()
 			}
 
 			c = GetChar();			
-		} while((!is_ctl(c) || c == '\r' || c=='\n') && c != EOB);
-		return HEADERVAL;
+		} while((!is_ctl(c) || c == '\r' || c=='\n') && c != JHT_EOB);
+		return JHT_HEADERVAL;
 	}
-	return ERROR;
+	return JHT_ERROR;
 }
 
 HTTP::HTTP():
@@ -310,7 +310,7 @@ HTTP::HTTP():
 {
 	jcommon::Object::SetClassName("jcommon::HTTP");
 	
-	buflen=0;
+	buflen = 0;
 	fim = false;
 }
 
@@ -323,26 +323,26 @@ bool HTTP::Fim()
 {
 	char *end;
 
-	if(fim || r.codigo!=0) {
+	if(fim || r.codigo != 0) {
 		return true;
 	}
 	
 	end = strstr(buffer,"\r\n\r\n");
 	
-	if(end==NULL) {
+	if(end == NULL) {
 		end = strstr(buffer,"\n\n");
-		if(end==NULL) {
+		if(end == NULL) {
 			return false;
 		}
 	}
-	return (fim=Parsear());	
+	return (fim = Parsear());	
 }
 
 void HTTP::Add(char *add, int tam) 
 {
 	if(buflen+tam >= MAXBUFFER) {
-		fim=true;
-		r.codigo=413;
+		fim = true;
+		r.codigo = 413;
 	}
 
 	if(tam <= 0) {
@@ -350,8 +350,8 @@ void HTTP::Add(char *add, int tam)
 	}
 
 	memcpy(buffer+buflen,add,tam);	
-	buflen+=tam;
-	buffer[buflen]=0;
+	buflen += tam;
+	buffer[buflen] = 0;
 }
 
 bool HTTP::Parsear() 
@@ -361,8 +361,8 @@ bool HTTP::Parsear()
 	int lextam = 0;
 	char * lexeme;
 
-	if(t!=TOKEN) {
-		r.codigo=400;
+	if(t != JHT_TOKEN) {
+		r.codigo = 400;
 
 		return true;
 	}
@@ -370,99 +370,99 @@ bool HTTP::Parsear()
 	lexeme = lex.GetToken(lextam);
 	//verificacao do metodo
 	if(!strncmp("GET",lexeme,lextam)) {
-		r.metodo=GET;
+		r.metodo = JHM_GET;
 	} else if(!strncmp("POST",lexeme,lextam)) {
-		r.metodo=POST;
+		r.metodo = JHM_POST;
 	} else if(!strncmp("HEAD",lexeme,lextam)) {
-		r.metodo=HEAD;
+		r.metodo = JHM_HEAD;
 	} else if(!strncmp("OPTIONS",lexeme,lextam)) {
-		r.metodo=OPTIONS;
+		r.metodo = JHM_OPTIONS;
 	} else {
-		r.metodo=ERRO;
-		r.codigo=405; 
+		r.metodo = JHM_ERROR;
+		r.codigo = 405; 
 		return true;
 	}
 
-	if(lex.GetToken()!=SP) {
-		r.codigo=400;
+	if(lex.GetToken() != JHT_SP) {
+		r.codigo = 400;
 		return true;
 	}
 	
 	t=lex.GetToken();
-	if(t!=TOKEN) {
-		r.codigo=400;
+	if(t != JHT_TOKEN) {
+		r.codigo = 400;
 		return true;
 	}
+
 	lexeme = lex.GetToken(lextam);
-	
-	if(lexeme[0]!='/') {
-		r.codigo=400;
+	if(lexeme[0] != '/') {
+		r.codigo = 400;
 		return true;
 	}
-	if(lextam>1024) {
-		r.codigo=414;
+	if(lextam > 1024) {
+		r.codigo = 414;
 		return true;
 	}
 	char arquivo[1024];
 	memcpy(arquivo,lexeme,lextam);
-	int filetam=lextam;
-	arquivo[lextam]=0;
+	int filetam = lextam;
+	arquivo[lextam] = 0;
 	
-	t=lex.GetToken();
-	while(t==SP) {
-		lexeme=lex.GetNextToken(t,lextam);
-		if(t==TOKEN) {
+	t = lex.GetToken();
+	while(t == JHT_SP) {
+		lexeme = lex.GetNextToken(t,lextam);
+		if(t == JHT_TOKEN) {
 			if(!strncmp(lexeme,"HTTP/1.",lextam-1)){
 				break;
 			} else { //ainda eh nome do arquivo
-				if(filetam+lextam+1>1024) {
-					r.codigo=414;
+				if(filetam+lextam+1 > 1024) {
+					r.codigo = 414;
 					return true;
 				}
 				strncpy(&arquivo[filetam++]," ",1);
 				strncpy(&arquivo[filetam],lexeme,lextam);
-				filetam+=lextam;
-				arquivo[filetam]=0;
+				filetam += lextam;
+				arquivo[filetam] = 0;
 			}
 		}
-		lexeme=lex.GetNextToken(t,lextam);
+		lexeme = lex.GetNextToken(t,lextam);
 	}
 	filetam = HTTPlexer::decode(arquivo,r.arquivo);
-	if(t=='?') {
+	if(t == '?') {
 		do {
-			lexeme=lex.GetNextToken(t,lextam);
-			if(t==TOKEN) {
-				if(lextam>256) {
-					r.codigo=414;
+			lexeme = lex.GetNextToken(t,lextam);
+			if(t == JHT_TOKEN) {
+				if(lextam > 256) {
+					r.codigo = 414;
 					return true;
 				}
 				Header q;
 				memcpy(q.nome,lexeme,lextam);
-				q.nome[lextam]=0;
+				q.nome[lextam] = 0;
 				t=lex.GetToken();
-				if(t!='=') {
-					r.codigo=400;
+				if(t != '=') {
+					r.codigo = 400;
 					return true;
 				}
-				t=lex.GetQueryVal();
-				if(t==QUERYVAL) {
-					lexeme=lex.GetToken(lextam);
-					if(lextam>256) {
-						r.codigo=414;
+				t = lex.GetQueryVal();
+				if(t == JHT_QUERYVAL) {
+					lexeme = lex.GetToken(lextam);
+					if(lextam > 256) {
+						r.codigo = 414;
 						return true;
 					}
 					memcpy(q.valor,lexeme,lextam);
-					q.valor[lextam]=0;
-					t=lex.GetToken();
-				} else if(t==STRING) {
-					lexeme=lex.GetToken(lextam);
-					if(lextam>254) {
-						r.codigo=414;
+					q.valor[lextam] = 0;
+					t = lex.GetToken();
+				} else if(t == JHT_STRING) {
+					lexeme = lex.GetToken(lextam);
+					if(lextam > 254) {
+						r.codigo = 414;
 						return true;
 					}
 					memcpy(q.valor,lexeme+1,lextam-2);
-					q.valor[lextam-2]=0;
-					t=lex.GetToken();
+					q.valor[lextam-2] = 0;
+					t = lex.GetToken();
 				}
 				
 				Header decq;
@@ -470,84 +470,86 @@ bool HTTP::Parsear()
 				HTTPlexer::decode(q.valor,decq.valor);
 				r.query.push_back(decq);
 			} else {
-				r.codigo=400;
+				r.codigo = 400;
 				return true;
 			}
-		}while(t=='&');
-		if(t!=SP) {
-			r.codigo=400;
+		}while(t == '&');
+		if(t != JHT_SP) {
+			r.codigo = 400;
 			return true;
 		}
-		lexeme=lex.GetNextToken(t,lextam);
+		lexeme = lex.GetNextToken(t,lextam);
 	}
-	if(t!=TOKEN) {
-		r.codigo=400;
+	if(t != JHT_TOKEN) {
+		r.codigo = 400;
 		return true;
 	}
-	if(strncmp(lexeme,"HTTP/1.",lextam-1)||lextam!=8) {
-		r.codigo=400;
+	if(strncmp(lexeme,"HTTP/1.",lextam-1) || lextam!=8) {
+		r.codigo = 400;
 		return true;
 	}
-	if(lexeme[7]!='0' && lexeme[7]!='1') {
+	if(lexeme[7] != '0' && lexeme[7] != '1') {
 		r.codigo=505;
 		return true;
 	}
-	r.versao=lexeme[7];
-	t=lex.GetToken();
-	if(t!=CRLF && t!=LF) {
-		r.codigo=400;
+	r.versao = lexeme[7];
+	t = lex.GetToken();
+	if(t != JHT_CRLF && t != JHT_LF) {
+		r.codigo = 400;
 		return true;
 	}
-	lexeme=lex.GetNextToken(t,lextam);
-	while(t==TOKEN) {
+	lexeme = lex.GetNextToken(t,lextam);
+	while(t == JHT_TOKEN) {
 		Header *h = new Header();
 		
-		if(lextam>256) {
-			r.codigo=413;
+		if(lextam > 256) {
+			r.codigo = 413;
 			return true;
 		}
 		memcpy(h->nome,lexeme,lextam);
-		h->nome[lextam]=0;
-		t=lex.GetToken();
-		if(t!=':') {
-			r.codigo=400;
+		h->nome[lextam] = 0;
+		t = lex.GetToken();
+		if(t != ':') {
+			r.codigo = 400;
 			return true;
 		}
-		t=lex.GetToken();
-		if(t!=SP) {
-			r.codigo=400;
+		t = lex.GetToken();
+		if(t != JHT_SP) {
+			r.codigo = 400;
 			return true;
 		}
-		t=lex.GetHeaderVal();
-		if(t==HEADERVAL) {
-			lexeme=lex.GetToken(lextam);
-			if(lextam>256) {
-				r.codigo=413;
+		t = lex.GetHeaderVal();
+		if(t == JHT_HEADERVAL) {
+			lexeme = lex.GetToken(lextam);
+			if(lextam > 256) {
+				r.codigo = 413;
 				return true;
 			}
 			memcpy(h->valor,lexeme,lextam);
-	      h->valor[lextam]=0;
-			t=lex.GetToken();
+			h->valor[lextam] = 0;
+			t = lex.GetToken();
 		}
 		r.cabecalho.push_back(h);
-		if(t!=CRLF && t!=LF) {
-			r.codigo=400;
-  			return true;
+		if(t != JHT_CRLF && t != JHT_LF) {
+			r.codigo = 400;
+			return true;
 		}
-		lexeme=lex.GetNextToken(t,lextam);
+		lexeme = lex.GetNextToken(t,lextam);
 	}
-	if(t!=CRLF && t!=LF) {
-		r.codigo=400;
+	if(t != JHT_CRLF && t != JHT_LF) {
+		r.codigo = 400;
 		return true;
 	}
 	
 	//WARNNING:: teste pra saber se tem bytes a receber (POST)
 
 	if(!lex.is_eob()) {
-		r.codigo=400;
+		r.codigo = 400;
 		return true;
 	}
-	r.codigo=200;
+	
+	r.codigo = 200;
+
 	return true;
 }
 
@@ -671,16 +673,16 @@ void HTTP::Clear()
 {
 	r.query.clear();
 	r.cabecalho.clear();
-	r.codigo=0;
-	r.metodo=ERRO;
-	r.arquivo[0]=0;
-	r.body=NULL;
-	r.versao='1';
+	r.codigo = 0;
+	r.metodo = JHM_ERROR;
+	r.arquivo[0] = 0;
+	r.body = NULL;
+	r.versao = '1';
 
 	memset(buffer, 0, buflen);
 	
-	buflen=0;
-	fim=false;
+	buflen = 0;
+	fim = false;
 }
 
 std::string HTTP::Status(int cod) 

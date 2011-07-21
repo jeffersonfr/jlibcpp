@@ -278,7 +278,7 @@ void Thread::Start(int id)
 
 	t->thread = _thread;
 
-	if (_type == DETACH_THREAD) {
+	if (_type == JTT_DETACH) {
 		pthread_detach(_thread);
 	}
 #endif
@@ -321,7 +321,7 @@ bool Thread::Interrupt(int id)
 		return false; // CHANGE:: throw ThreadException("Thread cancel exception !");
 	}
 
-	if (_type == JOINABLE_THREAD) {
+	if (_type == JTT_JOINABLE) {
 		if (pthread_join(thread, NULL) != 0) {
 			return false; // CHANGE:: throw ThreadException("Wait thread failed");
 		}
@@ -414,19 +414,19 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 	int tpriority = 0;
 
 #ifdef _WIN32
-	if (priority == LOW_PRIORITY) {
+	if (priority == JTP_LOW) {
 		tpriority = THREAD_PRIORITY_BELOW_NORMAL;
-	} else if (priority == NORMAL_PRIORITY) {
+	} else if (priority == JTP_NORMAL) {
 		tpriority = THREAD_PRIORITY_NORMAL;
-	} else if (priority == HIGH_PRIORITY) {
+	} else if (priority == JTP_HIGH) {
 		tpriority = THREAD_PRIORITY_ABOVE_NORMAL;
 	}
 #else
-	if (priority == LOW_PRIORITY) {
+	if (priority == JTP_LOW) {
 		tpriority = 0;
-	} else if (priority == NORMAL_PRIORITY) {
+	} else if (priority == JTP_NORMAL) {
 		tpriority = 5;
-	} else if (priority == HIGH_PRIORITY) {
+	} else if (priority == JTP_HIGH) {
 		tpriority = 10;
 	}
 #endif
@@ -442,11 +442,11 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 		tpolicy = 3;
 	}
 #else
-	if (policy == POLICY_OTHER) {
+	if (policy == JTP_OTHER) {
 		tpolicy = SCHED_OTHER;
-	} else if (policy == POLICY_FIFO) {
+	} else if (policy == JTP_FIFO) {
 		tpolicy = SCHED_FIFO;
-	} else if (policy == POLICY_ROUND_ROBIN) {
+	} else if (policy == JTP_ROUND_ROBIN) {
 		tpolicy = SCHED_RR;
 	}
 #endif
@@ -528,36 +528,36 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 	// switch (param.sched_priority) {
 	switch (param.__sched_priority) {
 		case 0:
-			(*priority) = LOW_PRIORITY;
+			(*priority) = JTP_LOW;
 			break;
 		case 1:
 		case 2:
 		case 3:
 		case 4:
 		case 5:
-			(*priority) = NORMAL_PRIORITY;
+			(*priority) = JTP_NORMAL;
 			break;
 		case 6:
 		case 7:
 		case 8:
 		case 9:
 		case 10:
-			(*priority) = HIGH_PRIORITY;
+			(*priority) = JTP_HIGH;
 			break;
 		default:
-			(*priority) = NORMAL_PRIORITY;
+			(*priority) = JTP_NORMAL;
 			break;
 	}
 
 	switch (policy_int) {
 		case SCHED_OTHER:
-			(*policy) = POLICY_OTHER;
+			(*policy) = JTP_OTHER;
 			break;
 		case SCHED_FIFO:
-			(*policy) = POLICY_FIFO;
+			(*policy) = JTP_FIFO;
 			break;
 		case SCHED_RR:
-			(*policy) = POLICY_ROUND_ROBIN;
+			(*policy) = JTP_ROUND_ROBIN;
 			break;
 	}
 #endif
@@ -569,7 +569,7 @@ void Thread::WaitThread(int id)
 		return;
 	}
 
-	if (_type == DETACH_THREAD) {
+	if (_type == JTT_DETACH) {
 		return;
 	}
 

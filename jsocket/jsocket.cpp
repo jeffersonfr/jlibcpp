@@ -27,7 +27,7 @@
 namespace jsocket {
 
 Socket::Socket(InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 	
@@ -45,7 +45,7 @@ Socket::Socket(InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbuf_
 }
 
 Socket::Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 
@@ -64,7 +64,7 @@ Socket::Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int loca
 }
 
 Socket::Socket(std::string host_, int port_, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 
@@ -84,7 +84,7 @@ Socket::Socket(std::string host_, int port_, int timeout_, int rbuf_, int wbuf_)
 }
 
 Socket::Socket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 
@@ -130,7 +130,7 @@ Socket::~Socket()
 /** Private */
 
 Socket::Socket(jsocket_t handler_, struct sockaddr_in server_, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 
@@ -557,7 +557,7 @@ SocketOption * Socket::GetSocketOption()
 		throw SocketException("Connection is closed");
 	}
 
-	return new SocketOption(_fd, TCP_SOCKET);
+	return new SocketOption(_fd, JCT_TCP);
 }
 
 std::string Socket::what()

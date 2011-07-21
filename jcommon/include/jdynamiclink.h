@@ -32,10 +32,10 @@
 namespace jcommon {
 
 enum jlink_flags_t {
-	NOW_LINK,
-	LAZY_LINK,
-	LOCAL_LINK,
-	GLOBAL_LINK
+	JLF_NOW,
+	JLF_LAZY,
+	JLF_LOCAL,
+	JLF_GLOBAL
 };
 
 /**

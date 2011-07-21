@@ -87,7 +87,7 @@ void Phone::ItemSelected(jgui::SelectEvent *event)
 
 		dialog.Show();
 
-		if (dialog.GetLastKeyCode() != jgui::JKEY_EXIT && dialog.GetResponse() == 1) {
+		if (dialog.GetLastKeyCode() != jgui::JKS_EXIT && dialog.GetResponse() == 1) {
 			db->RemoveAll();
 		}
 	} else if (event->GetIndex() == 3) {
@@ -409,43 +409,43 @@ void AddContact::KeyboardUpdated(jgui::KeyboardEvent *event)
 
 void AddContact::InputReceived(jgui::KeyEvent *event)
 {
-	if (event->GetType() != jgui::JKEY_PRESSED) {
+	if (event->GetType() != jgui::JKT_PRESSED) {
 		return;
 	}
 
 	jthread::AutoLock lock(&add_mutex);
 
-	if (event->GetSymbol() == jgui::JKEY_1 ||
-			event->GetSymbol() == jgui::JKEY_2 ||
-			event->GetSymbol() == jgui::JKEY_3 ||
-			event->GetSymbol() == jgui::JKEY_4 ||
-			event->GetSymbol() == jgui::JKEY_5 ||
-			event->GetSymbol() == jgui::JKEY_6 ||
-			event->GetSymbol() == jgui::JKEY_7 ||
-			event->GetSymbol() == jgui::JKEY_8 ||
-			event->GetSymbol() == jgui::JKEY_9 ||
-			event->GetSymbol() == jgui::JKEY_0) {
+	if (event->GetSymbol() == jgui::JKS_1 ||
+			event->GetSymbol() == jgui::JKS_2 ||
+			event->GetSymbol() == jgui::JKS_3 ||
+			event->GetSymbol() == jgui::JKS_4 ||
+			event->GetSymbol() == jgui::JKS_5 ||
+			event->GetSymbol() == jgui::JKS_6 ||
+			event->GetSymbol() == jgui::JKS_7 ||
+			event->GetSymbol() == jgui::JKS_8 ||
+			event->GetSymbol() == jgui::JKS_9 ||
+			event->GetSymbol() == jgui::JKS_0) {
 		std::string num;
 
-		if (event->GetSymbol() == jgui::JKEY_1) {
+		if (event->GetSymbol() == jgui::JKS_1) {
 			num = "1";
-		} else if (event->GetSymbol() == jgui::JKEY_2) {
+		} else if (event->GetSymbol() == jgui::JKS_2) {
 			num = "2";
-		} else if (event->GetSymbol() == jgui::JKEY_3) {
+		} else if (event->GetSymbol() == jgui::JKS_3) {
 			num = "3";
-		} else if (event->GetSymbol() == jgui::JKEY_4) {
+		} else if (event->GetSymbol() == jgui::JKS_4) {
 			num = "4";
-		} else if (event->GetSymbol() == jgui::JKEY_5) {
+		} else if (event->GetSymbol() == jgui::JKS_5) {
 			num = "5";
-		} else if (event->GetSymbol() == jgui::JKEY_6) {
+		} else if (event->GetSymbol() == jgui::JKS_6) {
 			num = "6";
-		} else if (event->GetSymbol() == jgui::JKEY_7) {
+		} else if (event->GetSymbol() == jgui::JKS_7) {
 			num = "7";
-		} else if (event->GetSymbol() == jgui::JKEY_8) {
+		} else if (event->GetSymbol() == jgui::JKS_8) {
 			num = "8";
-		} else if (event->GetSymbol() == jgui::JKEY_9) {
+		} else if (event->GetSymbol() == jgui::JKS_9) {
 			num = "9";
-		} else if (event->GetSymbol() == jgui::JKEY_0) {
+		} else if (event->GetSymbol() == jgui::JKS_0) {
 			num = "0";
 		}
 
@@ -454,7 +454,7 @@ void AddContact::InputReceived(jgui::KeyEvent *event)
 		} else if (GetFocusOwner() == field3) {
 			field3->Insert(num);
 		}
-	} else if (event->GetSymbol() == jgui::JKEY_BLUE || event->GetSymbol() == jgui::JKEY_F4) {
+	} else if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
 		if (_state == 0) {
 			if (field1->GetText() != "" && (field2->GetText() != "" || field3->GetText() != "")) {
 				db->Add(field1->GetText(), field2->GetText(), field3->GetText());
@@ -466,13 +466,13 @@ void AddContact::InputReceived(jgui::KeyEvent *event)
 		}
 
 		Release();
-	} else if (event->GetSymbol() == jgui::JKEY_ENTER) {
+	} else if (event->GetSymbol() == jgui::JKS_ENTER) {
 		std::string tmp;
 
 		if (GetFocusOwner() == field1) {
 			tmp = field1->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_ALPHA_NUMERIC, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(field1->GetText());
@@ -480,15 +480,15 @@ void AddContact::InputReceived(jgui::KeyEvent *event)
 
 			keyboard.Show();
 
-			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE &&
-					keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
+			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE &&
+					keyboard.GetLastKeyCode() != jgui::JKS_F4) {
 				field1->SetText("");
 				field1->Insert(tmp);
 			}
 		} else if (GetFocusOwner() == field2) {
 			tmp = field2->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_PHONE, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(field2->GetText());
@@ -496,15 +496,15 @@ void AddContact::InputReceived(jgui::KeyEvent *event)
 
 			keyboard.Show();
 
-			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE &&
-					keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
+			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE &&
+					keyboard.GetLastKeyCode() != jgui::JKS_F4) {
 				field2->SetText("");
 				field2->Insert(tmp);
 			}
 		} else if (GetFocusOwner() == field3) {
 			tmp = field3->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_PHONE, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(field3->GetText());
@@ -512,8 +512,8 @@ void AddContact::InputReceived(jgui::KeyEvent *event)
 
 			keyboard.Show();
 
-			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE ||
-					keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
+			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE ||
+					keyboard.GetLastKeyCode() != jgui::JKS_F4) {
 				field3->SetText("");
 				field3->Insert(tmp);
 			}
@@ -644,11 +644,11 @@ void SearchContacts::InputReceived(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&search_mutex);
 
-	if (event->GetType() != jgui::JKEY_PRESSED) {
+	if (event->GetType() != jgui::JKT_PRESSED) {
 		return;
 	}
 
-	if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
+	if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 		_index--;
 
 		if (_index <= 0) {
@@ -656,7 +656,7 @@ void SearchContacts::InputReceived(jgui::KeyEvent *event)
 		}
 
 		Update();
-	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
+	} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
 		_index++;
 
 		if (_index >= db->GetSize()) {
@@ -664,22 +664,22 @@ void SearchContacts::InputReceived(jgui::KeyEvent *event)
 		}
 
 		Update();
-	} else if (event->GetSymbol() == jgui::JKEY_F2 || event->GetSymbol() == jgui::JKEY_GREEN) {
+	} else if (event->GetSymbol() == jgui::JKS_F2 || event->GetSymbol() == jgui::JKS_GREEN) {
 		int index = _index;
 
-		jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, true);
+		jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_ALPHA_NUMERIC, true);
 
 		keyboard.SetTextSize(20);
 		keyboard.RegisterKeyboardListener(this);
 
 		keyboard.Show();
 
-		if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE && keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
+		if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE && keyboard.GetLastKeyCode() != jgui::JKS_F4) {
 			_index = index;
 
 			Update();
 		}
-	} else if (event->GetSymbol() == jgui::JKEY_F3 || event->GetSymbol() == jgui::JKEY_YELLOW) {
+	} else if (event->GetSymbol() == jgui::JKS_F3 || event->GetSymbol() == jgui::JKS_YELLOW) {
 		if (db->GetSize() > 0) {
 			Hide();
 
@@ -690,13 +690,13 @@ void SearchContacts::InputReceived(jgui::KeyEvent *event)
 			Update();
 			Show(false);
 		}
-	} else if (event->GetSymbol() == jgui::JKEY_F4 || event->GetSymbol() == jgui::JKEY_BLUE) {
+	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (db->GetSize() > 0) {
 			jgui::YesNoDialogBox dialog("Aviso", "Remover o contato atual ?", (1920-1000)/2, 400);
 
 			dialog.Show();
 
-			if (dialog.GetLastKeyCode() != jgui::JKEY_EXIT && dialog.GetResponse() == 1) {
+			if (dialog.GetLastKeyCode() != jgui::JKS_EXIT && dialog.GetResponse() == 1) {
 				db->Remove(_index);
 
 				_index--;

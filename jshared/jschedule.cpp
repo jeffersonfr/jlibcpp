@@ -130,7 +130,7 @@ void Schedule::SetScheduler(jschedule_type_t type_, const jschedule_param_t *par
 jschedule_policy_t Schedule::GetScheduler()
 {
 #ifdef _WIN32
-	return SCHEDULE_FIFO;
+	return JSP_FIFO;
 #else	
 	int r = sched_getscheduler(_pid);
 
@@ -143,11 +143,11 @@ jschedule_policy_t Schedule::GetScheduler()
 	}
 
 	if (r == SCHED_FIFO) {
-		return SCHEDULE_FIFO;
+		return JSP_FIFO;
 	} else if (r == SCHED_RR) {
-		return SCHEDULE_ROUND_ROBIN;
+		return JSP_ROUND_ROBIN;
 	} else {
-		return SCHEDULE_OTHER;
+		return JSP_OTHER;
 	}
 #endif
 }

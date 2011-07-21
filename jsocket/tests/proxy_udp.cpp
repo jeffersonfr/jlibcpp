@@ -68,7 +68,7 @@ int init_args(int argc, char **argv)
 		try {
 			line = reader->ReadLine();
 			
-			jcommon::StringTokenizer token(line, ":", jcommon::SPLIT_FLAG, false);
+			jcommon::StringTokenizer token(line, ":", jcommon::JTT_STRING, false);
 			
 			if (token.GetSize() == 2) {
 				host = new DatagramSocket(token.GetToken(0), atoi(token.GetToken(1).c_str())); // host, port

@@ -29,14 +29,14 @@ TextComponent::TextComponent(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::TextComponent");
 
-	_halign = LEFT_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_LEFT;
+	_valign = JVA_CENTER;
 	
 	_caret_position = 0;
 	_echo_char = '\0';
 	_is_editable = true;
 	_caret_visible = true;
-	_caret_type = UNDERSCORE_CURSOR;
+	_caret_type = JCT_UNDERSCORE;
 	_selection_start = 0;
 	_selection_end = 0;
 	_max_text_length = -1;
@@ -73,7 +73,7 @@ bool TextComponent::EchoCharIsSet()
 	return (_echo_char != '\0');
 }
 
-void TextComponent::SetCaretType(jcursor_type_t t)
+void TextComponent::SetCaretType(jcaret_type_t t)
 {
 	_caret_type = t;
 }

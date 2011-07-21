@@ -22,7 +22,7 @@
 
 namespace jgui {
 
-AdjustmentEvent::AdjustmentEvent(void *source, jadjustment_type_t type, double value):
+AdjustmentEvent::AdjustmentEvent(void *source, jadjustmentevent_type_t type, double value):
 	jcommon::EventObject(source)
 {
 	jcommon::Object::SetClassName("jgui::AdjustmentEvent");
@@ -40,7 +40,7 @@ double AdjustmentEvent::GetValue()
 	return _value;
 }
 
-jadjustment_type_t AdjustmentEvent::GetType()
+jadjustmentevent_type_t AdjustmentEvent::GetType()
 {
 	return _type;
 }

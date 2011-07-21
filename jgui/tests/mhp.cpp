@@ -187,7 +187,7 @@ class GraphicLayer : public ScreenLayer{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			g->SetDrawingFlags(jgui::DF_BLEND);
+			g->SetDrawingFlags(jgui::JDF_BLEND);
 
 			_user_container->InvalidateAll();
 			_user_container->Paint(g);
@@ -253,7 +253,7 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 			jgui::Graphics *gb = _buffer->GetGraphics();
 			jgui::Graphics *g = GetGraphics();
 
-			g->SetBlittingFlags(jgui::BF_NOFX);
+			g->SetBlittingFlags(jgui::JBF_NOFX);
 
 			while (true) {
 				{
@@ -322,7 +322,7 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 		virtual void PaintInternal(jgui::Graphics *g, ScreenLayer *layer)
 		{
 			g->Reset();
-			g->SetDrawingFlags(jgui::DF_NOFX);
+			g->SetDrawingFlags(jgui::JDF_NOFX);
 			g->SetClip(GetX(), GetY(), GetWidth(), GetHeight());
 
 			layer->Paint(g);
@@ -532,13 +532,13 @@ class MenuTest : public Scene{
 
 		virtual void KeyPressed(jgui::KeyEvent *event)
 		{
-			if (event->GetType() != jgui::JKEY_PRESSED) {
+			if (event->GetType() != jgui::JKT_PRESSED) {
 				return;
 			}
 
 			Scene::KeyPressed(event);
 
-			if (event->GetSymbol() == jgui::JKEY_F1) {
+			if (event->GetSymbol() == jgui::JKS_F1) {
 				if (GetFocusOwner() != NULL) {
 					GetFocusOwner()->ReleaseFocus();
 				}

@@ -366,7 +366,7 @@ void CalendarDialogBox::BuildCalendar()
 
 void CalendarDialogBox::InputReceived(jgui::KeyEvent *event)
 {
-	if (event->GetSymbol() == JKEY_BLUE || event->GetSymbol() == JKEY_F4) {
+	if (event->GetSymbol() == JKS_BLUE || event->GetSymbol() == JKS_F4) {
 		Release();
 	}
 }
@@ -400,7 +400,7 @@ void CalendarDialogBox::ItemChanged(SelectEvent *event)
 		int m = (_month+1),
 			y = (_year+1970);
 
-		if (event->GetType() == jgui::LEFT_ITEM) {
+		if (event->GetType() == jgui::JST_LEFT) {
 			if (spin == year) {
 				y--;
 

@@ -47,34 +47,32 @@ void XMLFormatter::Transform(LogRecord *log)
 		_init = false;
 
 		// xml = "<" + _name + ">\n" + "\t<log type=info>" + log->GetRecord() + "<log>\n";
-		if (log->GetType() == INFO_LOGGER) {
+		if (log->GetType() == JRT_INFO) {
 			xml = "<log type=info>" + log->GetRecord() + "<log>\n";
-		} else if (log->GetType() == WARNNING_LOGGER) {
+		} else if (log->GetType() == JRT_WARNNING) {
 			xml = "<log type=warnning>" + log->GetRecord() + "<log>\n";
-		} else if (log->GetType() == ERROR_LOGGER) {
+		} else if (log->GetType() == JRT_ERROR) {
 			xml = "<log type=error>" + log->GetRecord() + "<log>\n";
-		} else if (log->GetType() == CRITICAL_LOGGER) {
+		} else if (log->GetType() == JRT_CRITICAL) {
 			xml = "<log type=critical>" + log->GetRecord() + "<log>\n";
-		} else if (log->GetType() == UNKNOWN_LOGGER) {
+		} else if (log->GetType() == JRT_UNKNOWN) {
 			xml = "<log type=unknown>" + log->GetRecord() + "<log>\n";
 		}
 
 		log->SetRecord(xml);
 	} else {
-		if (log->GetType() == INFO_LOGGER) {
-			if (log->GetType() == INFO_LOGGER) {
-				xml = "<log type=info>" + log->GetRecord() + "</log>\n";
-			} else if (log->GetType() == WARNNING_LOGGER) {
-				xml = "<log type=warnning>" + log->GetRecord() + "</log>\n";
-			} else if (log->GetType() == ERROR_LOGGER) {
-				xml = "<log type=error>" + log->GetRecord() + "</log>\n";
-			} else if (log->GetType() == CRITICAL_LOGGER) {
-				xml = "<log type=critical>" + log->GetRecord() + "</log>\n";
-			} else if (log->GetType() == UNKNOWN_LOGGER) {
-				xml = "<log type=unknown>" + log->GetRecord() + "</log>\n";
-			}
+		if (log->GetType() == JRT_INFO) {
+			xml = "<log type=info>" + log->GetRecord() + "</log>\n";
+		} else if (log->GetType() == JRT_WARNNING) {
+			xml = "<log type=warnning>" + log->GetRecord() + "</log>\n";
+		} else if (log->GetType() == JRT_ERROR) {
+			xml = "<log type=error>" + log->GetRecord() + "</log>\n";
+		} else if (log->GetType() == JRT_CRITICAL) {
+			xml = "<log type=critical>" + log->GetRecord() + "</log>\n";
+		} else if (log->GetType() == JRT_UNKNOWN) {
+			xml = "<log type=unknown>" + log->GetRecord() + "</log>\n";
 		}
-		
+
 		log->SetRecord(xml);
 	}
 }

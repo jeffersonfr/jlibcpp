@@ -35,10 +35,10 @@
 
 namespace jthread{
 
-enum jthread_pool_priority_t {
-	THREAD_GROUP_LOW,
-	THREAD_GROUP_MEDIUM,
-	THREAD_GROUP_HIGH
+enum jthreadpool_priority_t {
+	JTP_GROUP_LOW,
+	JTP_GROUP_MEDIUM,
+	JTP_GROUP_HIGH
 };
 
 class ThreadPool;
@@ -142,7 +142,7 @@ class ThreadPool : public virtual jcommon::Object{
 		 * \brief 
 		 *
 		 */
-		bool AttachThread(Runnable *r, jthread_pool_priority_t t = THREAD_GROUP_MEDIUM);
+		bool AttachThread(Runnable *r, jthreadpool_priority_t t = JTP_GROUP_MEDIUM);
 
 		/**
 		 * \brief 

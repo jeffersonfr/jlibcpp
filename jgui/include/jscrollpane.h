@@ -36,9 +36,9 @@ namespace jgui {
  *
  */
 enum jscrollpane_type_t {
-	HORIZONTAL_SCROLL,
-	VERTICAL_SCROLL,
-	BOTH_SCROLL
+	JST_HORIZONTAL_ONLY,
+	JST_VERTICAL_ONLY,
+	JST_BOTH
 };
 
 class Layout;

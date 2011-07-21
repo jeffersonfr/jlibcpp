@@ -230,9 +230,9 @@ int64_t ConnectionPipe::GetReadedBytes()
 
 void ConnectionPipe::Run()
 {
-	if (_pipe_type == RECEIVER_PIPE) {
+	if (_pipe_type == JCP_RECEIVER) {
 		main_pipe_receiver();
-	} else {
+	} else if (_pipe_type == JCP_SENDER) {
 		main_pipe_sender();
 	}
 }

@@ -42,7 +42,7 @@ Process::Process(std::string process):
 	_input = NULL;
 	_output = NULL;
 	_error = NULL;
-	_type = PARENT_PROCESS;
+	_type = JPT_PARENT;
 }
 
 Process::~Process()
@@ -82,7 +82,7 @@ void Process::ForkChild(const char *prog, char **args)
 	} 
 	
 	if (pid == 0) {
-		_type = CHILD_PROCESS;
+		_type = JPT_CHILD;
 
 		close(_pinput[1]);
 		close(_poutput[0]);
@@ -115,7 +115,7 @@ void Process::ForkChild(const char *prog, char **args)
 	_output = new ProcessOutputStream(_pinput[1]); 
 	_error = new ProcessInputStream(_perror[0]); 
 
-	_type = PARENT_PROCESS;
+	_type = JPT_PARENT;
 	_pid = pid;
 #endif
 }
@@ -277,7 +277,7 @@ void Process::Start()
 	}
 	return true;
 #else
-	jcommon::StringTokenizer tokens(_process, " ", jcommon::SPLIT_FLAG, false);
+	jcommon::StringTokenizer tokens(_process, " ", jcommon::JTT_STRING, false);
 
 	char **argv = new char*[tokens.GetSize()+1];
 

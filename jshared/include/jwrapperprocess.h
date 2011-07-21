@@ -37,18 +37,6 @@
 
 namespace jshared {
 
-enum jwprocess_mode_t {
-	FLUSH_WRITE_BUFFER, 
-	WAIT_ANY_INPUT, 
-	WAIT_ALL_INPUT, 
-	TRY_ONCE
-};
-  
-enum jwprocess_flag_t {
-	PROCESS_CREAT,	/** \brief Create a new process */
-	PROCESS_LOCK	/** \brief Create a new process and block parent */
-};
-
 /**
  * \brief Socket.
  *

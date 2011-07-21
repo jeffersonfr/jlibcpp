@@ -34,7 +34,7 @@ namespace jthread {
 
 TimerTask::TimerTask() 
 {
-	_state = VIRGIN;
+	_state = JTS_VIRGIN;
 	_next_execution_time = 0LL;
 	_delay = 0LL;
 	_push_time = false;
@@ -58,9 +58,9 @@ bool TimerTask::Cancel()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	bool result = (_state == SCHEDULED);
+	bool result = (_state == JTS_SCHEDULED);
 
-	_state = CANCELLED;
+	_state = JTS_CANCELLED;
 
 	return result;
 }
@@ -196,7 +196,7 @@ void TimerThread::MainLoop()
 
 		{
 			// monitor enter
-			if (task->_state == CANCELLED) {
+			if (task->_state == JTS_CANCELLED) {
 				_queue->RemoveMin();
 
 				continue;  // No action required, poll queue again
@@ -211,7 +211,7 @@ void TimerThread::MainLoop()
 				if (task->_delay == 0LL) { 
 					// Non-repeating, remove
 					_queue->RemoveMin();
-					task->_state = EXECUTED;
+					task->_state = JTS_EXECUTED;
 				} else {
 					// Repeating task, reschedule
 					_queue->RescheduleMin(task->_push_time == true ? currentTime + task->_delay : executionTime + task->_delay);
@@ -276,13 +276,13 @@ void Timer::schedule(TimerTask *task, uint64_t next_execution_time, uint64_t del
 		throw jthread::IllegalStateException("Timer already cancelled.");
 	}
 
-	if (task->_state != VIRGIN) {
+	if (task->_state != JTS_VIRGIN) {
 		throw jthread::IllegalStateException("Task already scheduled or cancelled");
 	}
 
 	task->_next_execution_time = next_execution_time;
 	task->_delay = delay;
-	task->_state = SCHEDULED;
+	task->_state = JTS_SCHEDULED;
 	task->_push_time = push_time;
 
 	_queue->Add(task);

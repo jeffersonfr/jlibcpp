@@ -40,20 +40,20 @@ namespace jgui {
  * \brief
  *
  */
-enum jlist_scroll_type_t {
-	NONE_SCROLL,
-	SCROLL_ARROW,
-	SCROLL_BAR
+enum jlistbox_scroll_t {
+	JLS_NONE,
+	JLS_ARROW,
+	JLS_BAR
 };
 
 /**
  * \brief
  *
  */
-enum jlist_selection_type_t {
-	NONE_SELECTION,
-	SINGLE_SELECTION,
-	MULTI_SELECTION
+enum jlistbox_mode_t {
+	JLM_NONE_SELECTION,
+	JLM_SINGLE_SELECTION,
+	JLM_MULTI_SELECTION
 };
 
 /**
@@ -64,8 +64,8 @@ enum jlist_selection_type_t {
 class ListBox : public jgui::ItemComponent{
 
 	private:
-		jlist_scroll_type_t _scroll;
-		jlist_selection_type_t _selection;
+		jlistbox_scroll_t _scroll;
+		jlistbox_mode_t _selection;
 		int _item_size,
 				_top_index,
 				_selected_index,
@@ -122,13 +122,13 @@ class ListBox : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		virtual void SetScrollType(jlist_scroll_type_t type);
+		virtual void SetScrollType(jlistbox_scroll_t type);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetSelectionType(jlist_selection_type_t type);
+		virtual void SetSelectionType(jlistbox_mode_t type);
 		
 		/**
 		 * \brief

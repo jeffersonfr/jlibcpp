@@ -43,7 +43,6 @@ INCLUDE		= \
 						-Ijlogger/include \
 						-Ijmath/include \
 						-Ijmpeg/include \
-						-Ijdevice/include \
 						-Ijresource/include \
 						-Ijsecurity/include \
 						-Ijshared/include \

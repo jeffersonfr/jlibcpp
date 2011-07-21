@@ -31,8 +31,8 @@ Label::Label(std::string text, int x, int y, int width, int height):
 	jcommon::Object::SetClassName("jgui::Label");
 
 	_wrap = false;
-	_halign = CENTER_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_CENTER;
+	_valign = JVA_CENTER;
 
 	_vertical_gap = 5;
 	_horizontal_gap = 5;
@@ -61,7 +61,7 @@ int Label::CountLines(std::string text)
 
 	default_space = _font->GetStringWidth(" ");
 
-	jcommon::StringTokenizer token(text, "\n", jcommon::SPLIT_FLAG, false);
+	jcommon::StringTokenizer token(text, "\n", jcommon::JTT_STRING, false);
 	std::vector<std::string> lines;
 
 	for (int i=0; i<token.GetSize(); i++) {
@@ -72,8 +72,8 @@ int Label::CountLines(std::string text)
 		line = jcommon::StringUtils::ReplaceString(line, "\n", "");
 		line = jcommon::StringUtils::ReplaceString(line, "\t", "    ");
 		
-		if (_halign == JUSTIFY_HALIGN) {
-			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, false);
+		if (_halign == JHA_JUSTIFY) {
+			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, false);
 
 			std::string temp,
 				previous;
@@ -117,7 +117,7 @@ int Label::CountLines(std::string text)
 
 			texts.push_back("\n" + temp);
 		} else {
-			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, true);
+			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, true);
 
 			std::string temp,
 				previous;

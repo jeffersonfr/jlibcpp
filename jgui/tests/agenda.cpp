@@ -100,7 +100,7 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 
 		dialog.Show();
 
-		if (dialog.GetLastKeyCode() != jgui::JKEY_EXIT && dialog.GetResponse() == 1) {
+		if (dialog.GetLastKeyCode() != jgui::JKS_EXIT && dialog.GetResponse() == 1) {
 			db->RemoveAll();
 		}
 	} else if (event->GetIndex() == 3) {
@@ -401,20 +401,20 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 	message = new jgui::TextArea(_insets.left, _insets.top+3*height, minute->GetX()+minute->GetWidth()-_insets.left, 400);
 
 	label2->SetBackgroundVisible(false);
-	label2->SetBorder(jgui::EMPTY_BORDER);
+	label2->SetBorder(jgui::JCB_EMPTY);
 
 	hour->Insert("12");
-	hour->SetCaretType(jgui::NONE_CURSOR);
+	hour->SetCaretType(jgui::JCT_NONE);
 	hour->SetTextSize(2);
-	hour->SetHorizontalAlign(jgui::CENTER_HALIGN);
+	hour->SetHorizontalAlign(jgui::JHA_CENTER);
 	
 	minute->Insert("00");
-	minute->SetCaretType(jgui::NONE_CURSOR);
+	minute->SetCaretType(jgui::JCT_NONE);
 	minute->SetTextSize(2);
-	minute->SetHorizontalAlign(jgui::CENTER_HALIGN);
+	minute->SetHorizontalAlign(jgui::JHA_CENTER);
 
-	date->SetCaretType(jgui::NONE_CURSOR);
-	date->SetHorizontalAlign(jgui::CENTER_HALIGN);
+	date->SetCaretType(jgui::JCT_NONE);
+	date->SetHorizontalAlign(jgui::JHA_CENTER);
 
 	hour->SetNavigation(NULL, minute, NULL, minute);
 	minute->SetNavigation(hour, date, hour, date);
@@ -557,41 +557,41 @@ void AddMessage::InputReceived(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&add_mutex);
 
-	if (event->GetType() != jgui::JKEY_PRESSED) {
+	if (event->GetType() != jgui::JKT_PRESSED) {
 		return;
 	}
 
-	if ((event->GetSymbol() == jgui::JKEY_1) |
-			(event->GetSymbol() == jgui::JKEY_2) |
-			(event->GetSymbol() == jgui::JKEY_3) |
-			(event->GetSymbol() == jgui::JKEY_4) |
-			(event->GetSymbol() == jgui::JKEY_5) |
-			(event->GetSymbol() == jgui::JKEY_6) |
-			(event->GetSymbol() == jgui::JKEY_7) |
-			(event->GetSymbol() == jgui::JKEY_8) |
-			(event->GetSymbol() == jgui::JKEY_9) |
-			(event->GetSymbol() == jgui::JKEY_0)) {
+	if ((event->GetSymbol() == jgui::JKS_1) |
+			(event->GetSymbol() == jgui::JKS_2) |
+			(event->GetSymbol() == jgui::JKS_3) |
+			(event->GetSymbol() == jgui::JKS_4) |
+			(event->GetSymbol() == jgui::JKS_5) |
+			(event->GetSymbol() == jgui::JKS_6) |
+			(event->GetSymbol() == jgui::JKS_7) |
+			(event->GetSymbol() == jgui::JKS_8) |
+			(event->GetSymbol() == jgui::JKS_9) |
+			(event->GetSymbol() == jgui::JKS_0)) {
 		std::string num;
 
-		if (event->GetSymbol() == jgui::JKEY_1) {
+		if (event->GetSymbol() == jgui::JKS_1) {
 			num = "1";
-		} else if (event->GetSymbol() == jgui::JKEY_2) {
+		} else if (event->GetSymbol() == jgui::JKS_2) {
 			num = "2";
-		} else if (event->GetSymbol() == jgui::JKEY_3) {
+		} else if (event->GetSymbol() == jgui::JKS_3) {
 			num = "3";
-		} else if (event->GetSymbol() == jgui::JKEY_4) {
+		} else if (event->GetSymbol() == jgui::JKS_4) {
 			num = "4";
-		} else if (event->GetSymbol() == jgui::JKEY_5) {
+		} else if (event->GetSymbol() == jgui::JKS_5) {
 			num = "5";
-		} else if (event->GetSymbol() == jgui::JKEY_6) {
+		} else if (event->GetSymbol() == jgui::JKS_6) {
 			num = "6";
-		} else if (event->GetSymbol() == jgui::JKEY_7) {
+		} else if (event->GetSymbol() == jgui::JKS_7) {
 			num = "7";
-		} else if (event->GetSymbol() == jgui::JKEY_8) {
+		} else if (event->GetSymbol() == jgui::JKS_8) {
 			num = "8";
-		} else if (event->GetSymbol() == jgui::JKEY_9) {
+		} else if (event->GetSymbol() == jgui::JKS_9) {
 			num = "9";
-		} else if (event->GetSymbol() == jgui::JKEY_0) {
+		} else if (event->GetSymbol() == jgui::JKS_0) {
 			num = "0";
 		}
 
@@ -638,13 +638,13 @@ void AddMessage::InputReceived(jgui::KeyEvent *event)
 
 			_minute = atoi(tmp);
 		}
-	} else if (event->GetSymbol() == jgui::JKEY_ENTER) {
+	} else if (event->GetSymbol() == jgui::JKS_ENTER) {
 		std::string tmp;
 
 		if (GetFocusOwner() == hour) {
 			tmp = hour->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_PHONE, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(hour->GetText());
@@ -652,14 +652,14 @@ void AddMessage::InputReceived(jgui::KeyEvent *event)
 
 			keyboard.Show();
 
-			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE && keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
+			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE && keyboard.GetLastKeyCode() != jgui::JKS_F4) {
 				hour->SetText("");
 				hour->Insert(tmp);
 			}
 		} else if (GetFocusOwner() == minute) {
 			tmp = minute->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_PHONE, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(minute->GetText());
@@ -667,7 +667,7 @@ void AddMessage::InputReceived(jgui::KeyEvent *event)
 
 			keyboard.Show();
 
-			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE && keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
+			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE && keyboard.GetLastKeyCode() != jgui::JKS_F4) {
 				minute->SetText("");
 				minute->Insert(tmp);
 			}
@@ -684,7 +684,7 @@ void AddMessage::InputReceived(jgui::KeyEvent *event)
 
 			calendar.Show();
 
-			if (calendar.GetLastKeyCode() == jgui::JKEY_BLUE || calendar.GetLastKeyCode() == jgui::JKEY_F4) {
+			if (calendar.GetLastKeyCode() == jgui::JKS_BLUE || calendar.GetLastKeyCode() == jgui::JKS_F4) {
 				char tmp[255];
 
 				sprintf(tmp, "%02d/%02d/%04d", calendar.GetDay(), calendar.GetMonth(), calendar.GetYear());
@@ -702,7 +702,7 @@ void AddMessage::InputReceived(jgui::KeyEvent *event)
 		} else if (GetFocusOwner() == message) {
 			tmp = message->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_ALPHA_NUMERIC, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(message->GetText());
@@ -710,12 +710,12 @@ void AddMessage::InputReceived(jgui::KeyEvent *event)
 
 			keyboard.Show();
 
-			if (keyboard.GetLastKeyCode() != jgui::JKEY_BLUE && keyboard.GetLastKeyCode() != jgui::JKEY_F4) {
+			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE && keyboard.GetLastKeyCode() != jgui::JKS_F4) {
 				message->SetText("");
 				message->Insert(tmp);
 			}
 		}
-	} else if (event->GetSymbol() == jgui::JKEY_F4 || event->GetSymbol() == jgui::JKEY_BLUE) {
+	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (_state == 0) {
 			db->Add(_day, _month, _year, _hour, _minute, message->GetText());
 		} else if (_state == 1) {
@@ -753,8 +753,8 @@ ViewMessages::ViewMessages(AgendaDB *base):
 	label_hour = new jgui::Label(tmp, _insets.left+400+10, _insets.top, GetWidth()-400-10-_insets.left-_insets.right, dheight);
 	message = new jgui::Label(t->event, _insets.left, _insets.top+sheight, max_width, GetHeight()-240);
 
-	message->SetHorizontalAlign(jgui::LEFT_HALIGN);
-	message->SetVerticalAlign(jgui::TOP_VALIGN);
+	message->SetHorizontalAlign(jgui::JHA_LEFT);
+	message->SetVerticalAlign(jgui::JVA_TOP);
 
 	Add(label_date);
 	Add(label_hour);
@@ -808,7 +808,7 @@ void ViewMessages::InputReceived(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&view_mutex);
 
-	if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
+	if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 		_index--;
 
 		if (_index <= 0) {
@@ -816,7 +816,7 @@ void ViewMessages::InputReceived(jgui::KeyEvent *event)
 		}
 
 		Update();
-	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
+	} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
 		_index++;
 
 		if (_index >= db->GetSize()) {
@@ -824,13 +824,13 @@ void ViewMessages::InputReceived(jgui::KeyEvent *event)
 		}
 
 		Update();
-	} else if (event->GetSymbol() == jgui::JKEY_F4 || event->GetSymbol() == jgui::JKEY_BLUE) {
+	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (db->GetSize() > 0) {
 			jgui::YesNoDialogBox dialog("Aviso", "Remover o compromisso atual ?", (1920-1080)/2, 400);
 
 			dialog.Show();
 
-			if (dialog.GetLastKeyCode() != jgui::JKEY_EXIT && dialog.GetResponse() == 1) {
+			if (dialog.GetLastKeyCode() != jgui::JKS_EXIT && dialog.GetResponse() == 1) {
 				db->Remove(_index);
 
 				_index--;
@@ -842,7 +842,7 @@ void ViewMessages::InputReceived(jgui::KeyEvent *event)
 				Update();
 			}
 		}
-	} else if (event->GetSymbol() == jgui::JKEY_F3 || event->GetSymbol() == jgui::JKEY_YELLOW) {
+	} else if (event->GetSymbol() == jgui::JKS_F3 || event->GetSymbol() == jgui::JKS_YELLOW) {
 		if (db->GetSize() > 0) {
 			Hide();
 

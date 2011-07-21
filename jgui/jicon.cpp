@@ -28,8 +28,8 @@ Icon::Icon(std::string file, int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Icon");
 
-	_halign = CENTER_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_CENTER;
+	_valign = JVA_CENTER;
 
 	_image = NULL;
 	_file = file;

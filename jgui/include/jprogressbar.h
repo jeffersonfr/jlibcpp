@@ -20,7 +20,7 @@
 #ifndef	J_PROGRESSBAR_H
 #define J_PROGRESSBAR_H
 
-#include "jcomponent.h"
+#include "jslidercomponent.h"
 #include "jthread.h"
 
 #include <string>
@@ -28,15 +28,6 @@
 #include <stdlib.h>
 
 namespace jgui {
-
-/**
- * \brief
- *
- */
-enum jprogress_type_t {
-	BOTTOM_UP_DIRECTION,
-	LEFT_RIGHT_DIRECTION
-};
 
 class ButtonListener;
 class ButtonEvent;
@@ -49,7 +40,7 @@ class ButtonEvent;
 class ProgressBar : public jgui::Component, public jthread::Thread{
 
 	private:
-		jprogress_type_t _type;
+		jscroll_orientation_t _type;
 		int _value,
 				_index,
 				_delta,
@@ -63,13 +54,25 @@ class ProgressBar : public jgui::Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		ProgressBar(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT, jprogress_type_t type = LEFT_RIGHT_DIRECTION);
+		ProgressBar(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT, jscroll_orientation_t type = JSO_HORIZONTAL);
 		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual ~ProgressBar();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jscroll_orientation_t GetScrollOrientation();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetScrollOrientation(jscroll_orientation_t type);
 
 		/**
 		 * \brief

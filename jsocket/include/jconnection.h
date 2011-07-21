@@ -46,12 +46,12 @@ typedef int jsocket_t;
  * 
  */
 enum jconnection_type_t {
-	TCP_SOCKET,
-	UDP_SOCKET,
-	MCAST_SOCKET,
-	RTP_SOCKET,
-	RAW_SOCKET,
-	UNKNOWN_SOCKET
+	JCT_UNKNOWN,
+	JCT_TCP,
+	JCT_UDP,
+	JCT_MCAST,
+	JCT_RTP,
+	JCT_RAW
 };
 
 /**

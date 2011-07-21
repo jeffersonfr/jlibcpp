@@ -145,8 +145,8 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 		Tetris():
 			jgui::Frame("Tetris", 0, 0, 1920, 1080)
 		{
-			smallfont = new jgui::Font("./fonts/font.ttf", 0, 20);
-			largefont = new jgui::Font("./fonts/font.ttf", 0, 28);
+			smallfont = new jgui::Font("./fonts/font.ttf", jgui::JFA_NONE, 20);
+			largefont = new jgui::Font("./fonts/font.ttf", jgui::JFA_NONE, 28);
 
 			goff = NULL;
 			ii = NULL;
@@ -274,26 +274,26 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 
 		virtual void InputReceived(jgui::KeyEvent *event)
 		{
-			if (event->GetType() == jgui::JKEY_PRESSED) {
+			if (event->GetType() == jgui::JKT_PRESSED) {
 				if (ingame) {
-					if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
+					if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 						objectdx = -1;
-					} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
+					} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
 						objectdx = +1;
-					} else if (event->GetSymbol() == jgui::JKEY_CURSOR_UP) {
+					} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
 						objectrotationd = +1;
-					} else if (event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
+					} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
 						fast = true;
-					} else if (event->GetSymbol() == jgui::JKEY_ESCAPE) {
+					} else if (event->GetSymbol() == jgui::JKS_ESCAPE) {
 						ingame = false;
 					}
 				} else {
-					if (event->GetSymbol() == jgui::JKEY_S) {
+					if (event->GetSymbol() == jgui::JKS_S) {
 						ingame=true;
 						gameInit();
 					}
 				}
-			} else if (event->GetType() == jgui::JKEY_RELEASED) {
+			} else if (event->GetType() == jgui::JKT_RELEASED) {
 				fast = false;
 			}
 		}

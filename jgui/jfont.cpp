@@ -82,7 +82,7 @@ Font::~Font()
 Font * Font::GetDefaultFont()
 {
 	if (_default_font == NULL) {
-		_default_font = new jgui::Font(_DATA_PREFIX"/fonts/font.ttf", FA_NONE, DEFAULT_FONT_SIZE);
+		_default_font = new jgui::Font(_DATA_PREFIX"/fonts/font.ttf", JFA_NONE, DEFAULT_FONT_SIZE);
 	}
 
 	return _default_font;

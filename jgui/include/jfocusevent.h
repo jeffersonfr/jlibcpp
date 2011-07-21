@@ -29,8 +29,8 @@ namespace jgui {
  *
  */
 enum jfocus_event_t {
-	GAINED_FOCUS_EVENT,
-	LOST_FOCUS_EVENT
+	JFE_LOST,
+	JFE_GAINED
 };
 
 /**

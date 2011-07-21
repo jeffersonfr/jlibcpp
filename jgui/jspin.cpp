@@ -28,8 +28,8 @@ Spin::Spin(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Spin");
 
-	_type = HORIZONTAL_SPIN;
-	// _type = VERTICAL_SPIN;
+	_type = JSO_HORIZONTAL;
+	// _type = JSO_VERTICAL;
 	
 	SetFocusable(true);
 }
@@ -38,7 +38,7 @@ Spin::~Spin()
 {
 }
 
-void Spin::SetType(jspin_type_t type)
+void Spin::SetScrollOrientation(jscroll_orientation_t type)
 {
 	if (_type == type) {
 		return;
@@ -46,10 +46,10 @@ void Spin::SetType(jspin_type_t type)
 
 	_type = type;
 
-	Repaint();
+	Repaint(true);
 }
 
-jspin_type_t Spin::GetType()
+jscroll_orientation_t Spin::GetScrollOrientation()
 {
 	return _type;
 }
@@ -68,7 +68,7 @@ void Spin::NextItem()
 
 	Repaint();
 
-	DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, RIGHT_ITEM));
+	DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_RIGHT));
 }
 
 void Spin::PreviousItem()
@@ -85,7 +85,7 @@ void Spin::PreviousItem()
 
 	Repaint();
 
-	DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, LEFT_ITEM));
+	DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_LEFT));
 }
 
 bool Spin::ProcessEvent(MouseEvent *event)
@@ -104,7 +104,7 @@ bool Spin::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JMOUSE_PRESSED_EVENT && event->GetButton() == JMOUSE_BUTTON1) {
+	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		int x1 = event->GetX(),
@@ -115,7 +115,7 @@ bool Spin::ProcessEvent(MouseEvent *event)
 				h = _size.height-2*y,
 				arrow_size;
 
-		if (_type == HORIZONTAL_SPIN) {
+		if (_type == JSO_HORIZONTAL) {
 			arrow_size = h/2;
 		} else {
 			arrow_size = (h-8)/2;
@@ -123,7 +123,7 @@ bool Spin::ProcessEvent(MouseEvent *event)
 
 		RequestFocus();
 
-		if (_type == HORIZONTAL_SPIN) {
+		if (_type == JSO_HORIZONTAL) {
 			if (y1 > (_location.y+y) && y1 < (_location.y+y+_size.height)) {
 				if (x1 > (_location.x+_size.width-arrow_size-x) && x1 < (_location.x+_size.width-x)) {
 					NextItem();
@@ -131,7 +131,7 @@ bool Spin::ProcessEvent(MouseEvent *event)
 					PreviousItem();
 				}
 			}
-		} else if (_type == VERTICAL_SPIN) {
+		} else if (_type == JSO_VERTICAL) {
 			if (x1 > (_location.x+_size.width-2*arrow_size-x) && x1 < (_location.x+_size.width-x)) {
 				if (y1 > (_location.y+y) && y1 < (_location.y+h/2)) {
 					PreviousItem();
@@ -161,34 +161,34 @@ bool Spin::ProcessEvent(KeyEvent *event)
 
 	bool catched = false;
 
-	jkey_symbol_t action = event->GetSymbol();
+	jkeyevent_symbol_t action = event->GetSymbol();
 
-	if (action == JKEY_CURSOR_LEFT) {
-		if (_type == HORIZONTAL_SPIN) {
+	if (action == JKS_CURSOR_LEFT) {
+		if (_type == JSO_HORIZONTAL) {
 			PreviousItem();
 
 			catched = true;
 		}
-	} else if (action == JKEY_CURSOR_RIGHT) {
-		if (_type == HORIZONTAL_SPIN) {
+	} else if (action == JKS_CURSOR_RIGHT) {
+		if (_type == JSO_HORIZONTAL) {
 			NextItem();
 
 			catched = true;
 		}
-	} else if (action == JKEY_CURSOR_UP) {
-		if (_type == VERTICAL_SPIN) {
+	} else if (action == JKS_CURSOR_UP) {
+		if (_type == JSO_VERTICAL) {
 			PreviousItem();
 
 			catched = true;
 		}
-	} else if (action == JKEY_CURSOR_DOWN) {
-		if (_type == VERTICAL_SPIN) {
+	} else if (action == JKS_CURSOR_DOWN) {
+		if (_type == JSO_VERTICAL) {
 			NextItem();
 
 			catched = true;
 		}
-	} else if (action == JKEY_ENTER) {
-		DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, ACTION_ITEM));
+	} else if (action == JKS_ENTER) {
+		DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_ACTION));
 
 		catched = true;
 	}
@@ -200,8 +200,8 @@ void Spin::AddEmptyItem()
 {
 	Item *item = new Item();
 
-	if (_type == HORIZONTAL_SPIN) {
-		item->SetHorizontalAlign(CENTER_HALIGN);
+	if (_type == JSO_HORIZONTAL) {
+		item->SetHorizontalAlign(JHA_CENTER);
 	}
 		
 	AddInternalItem(item);
@@ -212,8 +212,8 @@ void Spin::AddTextItem(std::string text)
 {
 	Item *item = new Item(text);
 
-	if (_type == HORIZONTAL_SPIN) {
-		item->SetHorizontalAlign(CENTER_HALIGN);
+	if (_type == JSO_HORIZONTAL) {
+		item->SetHorizontalAlign(JHA_CENTER);
 	}
 		
 	AddInternalItem(item);
@@ -224,8 +224,8 @@ void Spin::AddImageItem(std::string text, std::string image)
 {
 	Item *item = new Item(text, image);
 
-	if (_type == HORIZONTAL_SPIN) {
-		item->SetHorizontalAlign(CENTER_HALIGN);
+	if (_type == JSO_HORIZONTAL) {
+		item->SetHorizontalAlign(JHA_CENTER);
 	}
 		
 	AddInternalItem(item);
@@ -236,8 +236,8 @@ void Spin::AddCheckedItem(std::string text, bool checked)
 {
 	Item *item = new Item(text, checked);
 
-	if (_type == HORIZONTAL_SPIN) {
-		item->SetHorizontalAlign(CENTER_HALIGN);
+	if (_type == JSO_HORIZONTAL) {
+		item->SetHorizontalAlign(JHA_CENTER);
 	}
 		
 	AddInternalItem(item);
@@ -268,13 +268,13 @@ void Spin::Paint(Graphics *g)
 			h = _size.height-2*y,
 			arrow_size;
 
-	if (_type == HORIZONTAL_SPIN) {
+	if (_type == JSO_HORIZONTAL) {
 		arrow_size = h/2;
-	} else if (_type == VERTICAL_SPIN) {
+	} else if (_type == JSO_VERTICAL) {
 		arrow_size = (h-8)/2;
 	}
 
-	if (_type == HORIZONTAL_SPIN) {
+	if (_type == JSO_HORIZONTAL) {
 		if (_loop == true || (_index < ((int)_items.size()-1))) {
 			g->SetColor(color);
 		} else {
@@ -329,7 +329,7 @@ void Spin::Paint(Graphics *g)
 				g->DrawString(text, px, py, pw, ph, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
 			}
 		}
-	} else if (_type == VERTICAL_SPIN) {
+	} else if (_type == JSO_VERTICAL) {
 		if (_loop == true || (_index < ((int)_items.size()-1))) {
 			g->SetColor(color);
 		} else {

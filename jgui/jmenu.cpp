@@ -28,7 +28,7 @@ Menu::Menu(int x, int y, int width, int visible_items):
 {
 	jcommon::Object::SetClassName("jgui::Menu");
 
-	_menu_align = SUBMENU_ALIGN;
+	_menu_align = JMA_ITEM;
 	_visible_items = visible_items;
 	_centered_interaction = true;
 	_item_size = DEFAULT_ITEM_SIZE;
@@ -83,7 +83,7 @@ void Menu::KeyPressed(KeyEvent *event)
 {
 	jthread::AutoLock lock(&_menu_mutex);
 
-	if (event->GetType() != JKEY_PRESSED) {
+	if (event->GetType() != JKT_PRESSED) {
 		return;
 	}
 
@@ -95,7 +95,7 @@ void Menu::KeyPressed(KeyEvent *event)
 		last = (*_menus.rbegin());
 	}
 
-	if (event->GetSymbol() == jgui::JKEY_ESCAPE) {
+	if (event->GetSymbol() == jgui::JKS_ESCAPE) {
 		while (_menus.size() > 0) {
 			Menu *menu = (*_menus.begin());
 
@@ -107,12 +107,12 @@ void Menu::KeyPressed(KeyEvent *event)
 		}
 
 		Release();
-	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_UP || event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
+	} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP || event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
 		Menu *menu = last;
 
-		jkey_symbol_t action = event->GetSymbol();
+		jkeyevent_symbol_t action = event->GetSymbol();
 
-		if (action == JKEY_CURSOR_UP) {
+		if (action == JKS_CURSOR_UP) {
 			int old_index = menu->_index;
 
 			menu->_index--;
@@ -132,9 +132,9 @@ void Menu::KeyPressed(KeyEvent *event)
 			if (menu->_index != old_index) {
 				menu->Repaint();
 
-				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), UP_ITEM)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_UP)); 
 			}
-		} else if (action == JKEY_CURSOR_DOWN) {
+		} else if (action == JKS_CURSOR_DOWN) {
 			int old_index = menu->_index;
 
 			menu->_index++;
@@ -162,14 +162,14 @@ void Menu::KeyPressed(KeyEvent *event)
 			if (menu->_index != old_index) {
 				menu->Repaint();
 
-				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), DOWN_ITEM)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_DOWN)); 
 			}
-		} else if (action == JKEY_ENTER) {
+		} else if (action == JKS_ENTER) {
 			if (menu->_items[menu->_index]->GetEnabled() == true) {
-				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), ACTION_ITEM)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_ACTION)); 
 			}
 		}
-	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
+	} else if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 		if (last != this) {
 			_menus.erase(_menus.begin()+_menus.size()-1);
 
@@ -178,17 +178,17 @@ void Menu::KeyPressed(KeyEvent *event)
 			delete last;
 		}
 
-		DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), LEFT_ITEM));
-	} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT || event->GetSymbol() == jgui::JKEY_ENTER) {
+		DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_LEFT));
+	} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT || event->GetSymbol() == jgui::JKS_ENTER) {
 		Item *item = GetCurrentItem();
 
 		if (item != NULL && item->GetEnabled() == true) {
-			if (event->GetSymbol() == jgui::JKEY_ENTER && item->GetType() == jgui::CHECK_MENU_ITEM) {
+			if (event->GetSymbol() == jgui::JKS_ENTER && item->GetType() == JMT_CHECK) {
 				item->SetSelected(item->IsSelected()^true);
 
 				last->Repaint();
 
-				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), ACTION_ITEM)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_ACTION)); 
 			} else {
 				std::vector<Item *> items = item->GetChilds();
 
@@ -207,9 +207,9 @@ void Menu::KeyPressed(KeyEvent *event)
 
 					Menu *menu = NULL;
 					
-					if (_menu_align == MENU_ALIGN) {
+					if (_menu_align == JMA_TITLE) {
 						menu = new Menu(last->GetX()+last->GetWidth()+5, last->GetY(), last->GetWidth(), items.size());	
-					} else if (_menu_align == SUBMENU_ALIGN) {
+					} else if (_menu_align == JMA_ITEM) {
 						jinsets_t insets = _frame->GetInsets();
 						int x = last->GetX()+last->GetWidth()+5,
 								y = last->GetY()+position*((last->GetHeight()-_vertical_gap-_border_size)/last->GetVisibleItems());
@@ -234,9 +234,9 @@ void Menu::KeyPressed(KeyEvent *event)
 
 					menu->Show(false);
 
-					DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), RIGHT_ITEM));
+					DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_RIGHT));
 				} else {
-					if (event->GetSymbol() == jgui::JKEY_ENTER) {
+					if (event->GetSymbol() == jgui::JKS_ENTER) {
 						Item *item = GetCurrentItem();
 						int index = GetCurrentIndex();
 
@@ -252,7 +252,7 @@ void Menu::KeyPressed(KeyEvent *event)
 							delete menu;
 						}
 						
-						DispatchSelectEvent(new SelectEvent(this, item, index, ACTION_ITEM)); 
+						DispatchSelectEvent(new SelectEvent(this, item, index, JST_ACTION)); 
 
 						Release();
 					}
@@ -545,7 +545,7 @@ void Menu::Paint(Graphics *g)
 	}
 
 	for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-		if ((*i)->GetType() == IMAGE_MENU_ITEM || (*i)->GetType() == CHECK_MENU_ITEM) {
+		if ((*i)->GetType() == JMT_IMAGE || (*i)->GetType() == JMT_CHECK) {
 			space = _item_size+10;
 
 			break;
@@ -583,14 +583,14 @@ void Menu::Paint(Graphics *g)
 				g->SetColor(_item_fgcolor);
 			}
 
-			if (_items[i]->GetType() == EMPTY_MENU_ITEM) {
-			} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
-			} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
+			if (_items[i]->GetType() == JMT_EMPTY) {
+			} else if (_items[i]->GetType() == JMT_TEXT) {
+			} else if (_items[i]->GetType() == JMT_IMAGE) {
 				if (_items[i]->GetImage() == NULL) {
 				} else {
 					g->DrawImage(_items[i]->GetImage(), x, y+(_item_size+_vertical_gap)*count+2, _item_size, _item_size-4);
 				}
-			} else if (_items[i]->GetType() == CHECK_MENU_ITEM) {
+			} else if (_items[i]->GetType() == JMT_CHECK) {
 				if (_items[i]->IsSelected() == true) {
 					g->DrawImage(_check, x, y+(_item_size+_vertical_gap)*count+2, _item_size, _item_size-4);
 				}

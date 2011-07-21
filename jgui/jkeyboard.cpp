@@ -41,16 +41,16 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 	_type = type;
 	_is_password = is_password;
 
-	if (_type == FULL_WEB_KEYBOARD) {
-		BuildWebKeyboard();
-	} else if (_type == FULL_ALPHA_NUMERIC_KEYBOARD) {
-		BuildFullAlphaNumericKeyboard();
-	} else if (_type == SMALL_ALPHA_NUMERIC_KEYBOARD) {
-		BuildSmallAlphaNumericKeyboard();
-	} else if (_type == FULL_NUMERIC_KEYBOARD) {
-		BuildFullNumericKeyboard();
-	} else if (_type == SMALL_NUMERIC_KEYBOARD) {
-		BuildSmallNumericKeyboard();
+	if (_type == JKB_QWERTY) {
+		BuildQWERTYKeyboard();
+	} else if (_type == JKB_ALPHA_NUMERIC) {
+		BuildAlphaNumericKeyboard();
+	} else if (_type == JKB_NUMERIC) {
+		BuildNumericKeyboard();
+	} else if (_type == JKB_PHONE) {
+		BuildPhoneKeyboard();
+	} else if (_type == JKB_INTERNET) {
+		BuildInternetKeyboard();
 	}
 
 	SetOptimizedPaint(true);
@@ -81,7 +81,7 @@ Keyboard::~Keyboard()
 
 void Keyboard::InputReceived(jgui::KeyEvent *event)
 {
-	if (event->GetSymbol() == JKEY_BLUE || event->GetSymbol() == JKEY_F4) {
+	if (event->GetSymbol() == JKS_BLUE || event->GetSymbol() == JKS_F4) {
 		jgui::Frame::Hide();
 
 		_frame_sem.Notify();
@@ -130,13 +130,13 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 		}
 
 		symbol = " ";
-	} else if (button->GetLabel() == "e" && (_type == SMALL_NUMERIC_KEYBOARD || _type == FULL_NUMERIC_KEYBOARD)) {
+	} else if (button->GetLabel() == "e" && (_type == JKB_PHONE || _type == JKB_NUMERIC)) {
 		if (_show_text == true) {
 			display->Insert("2.71828182845904523536");
 		}
 
 		symbol = "2.71828182845904523536";
-	} else if (button->GetLabel() == "pi" && (_type == SMALL_NUMERIC_KEYBOARD || _type == FULL_NUMERIC_KEYBOARD)) {
+	} else if (button->GetLabel() == "pi" && (_type == JKB_PHONE || _type == JKB_NUMERIC)) {
 		if (_show_text == true) {
 			display->Insert("3.14159265358979323846");
 		}
@@ -209,7 +209,7 @@ void Keyboard::SetText(std::string text)
 	} 
 }
 
-void Keyboard::BuildWebKeyboard()
+void Keyboard::BuildInternetKeyboard()
 {
 	int xwidth = bwidth+delta,
 			xheight = bheight+delta;
@@ -355,7 +355,7 @@ void Keyboard::BuildWebKeyboard()
 	b[0]->RequestFocus();
 }
 
-void Keyboard::BuildSmallAlphaNumericKeyboard()
+void Keyboard::BuildAlphaNumericKeyboard()
 {
 	int xwidth = bwidth+delta,
 			xheight = bheight+delta;
@@ -479,7 +479,7 @@ void Keyboard::BuildSmallAlphaNumericKeyboard()
 	b[0]->RequestFocus();
 }
 
-void Keyboard::BuildFullAlphaNumericKeyboard()
+void Keyboard::BuildQWERTYKeyboard()
 {
 	int xwidth = bwidth+delta,
 			xheight = bheight+delta;
@@ -640,7 +640,7 @@ void Keyboard::BuildFullAlphaNumericKeyboard()
 	b[0]->RequestFocus();
 }
 
-void Keyboard::BuildFullNumericKeyboard()
+void Keyboard::BuildNumericKeyboard()
 {
 	int xwidth = bwidth+delta,
 			xheight = bheight+delta;
@@ -740,7 +740,7 @@ void Keyboard::BuildFullNumericKeyboard()
 	b[0]->RequestFocus();
 }
 
-void Keyboard::BuildSmallNumericKeyboard()
+void Keyboard::BuildPhoneKeyboard()
 {
 	int xwidth = bwidth+delta,
 			xheight = bheight+delta;

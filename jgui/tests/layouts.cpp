@@ -76,7 +76,7 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 		{
 			SetLayout(_main = new jgui::GridLayout(2, 3));
 
-			SetFrameButtons((jgui::jframe_button_t)(jgui::FB_CLOSE | jgui::FB_MAXIMIZE));
+			SetFrameButtons((jgui::jframe_button_t)(jgui::JFB_CLOSE | jgui::JFB_MAXIMIZE));
 			SetMoveEnabled(true);
 			SetResizeEnabled(true);
 		
@@ -94,7 +94,7 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 				_c.push_back(new jgui::Container(0, 0, 0, 0));
 
 				_b[i]->SetLayout(new jgui::BorderLayout());
-				_b[i]->Add(_c[i], jgui::BL_CENTER);
+				_b[i]->Add(_c[i], jgui::JBA_CENTER);
 
 				Add(_b[i]);
 			}
@@ -121,11 +121,11 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			_c[1]->Add(new jgui::Button("Button 5", 0, 0, 100, 100));
 
 			// gridlayout
-			_c[2]->Add(new jgui::Button("Button 1", 0, 0, 100, 100), jgui::BL_NORTH);
-			_c[2]->Add(new jgui::Button("Button 2", 0, 0, 100, 100), jgui::BL_SOUTH);
-			_c[2]->Add(new jgui::Button("Button 3", 0, 0, 100, 100), jgui::BL_WEST);
-			_c[2]->Add(new jgui::Button("Button 4", 0, 0, 100, 100), jgui::BL_EAST);
-			_c[2]->Add(new jgui::Button("Button 5", 0, 0, 100, 100), jgui::BL_CENTER);
+			_c[2]->Add(new jgui::Button("Button 1", 0, 0, 100, 100), jgui::JBA_NORTH);
+			_c[2]->Add(new jgui::Button("Button 2", 0, 0, 100, 100), jgui::JBA_SOUTH);
+			_c[2]->Add(new jgui::Button("Button 3", 0, 0, 100, 100), jgui::JBA_WEST);
+			_c[2]->Add(new jgui::Button("Button 4", 0, 0, 100, 100), jgui::JBA_EAST);
+			_c[2]->Add(new jgui::Button("Button 5", 0, 0, 100, 100), jgui::JBA_CENTER);
 
 			// cardlayout
 			_c.push_back(new jgui::Container(0, 0, 0, 0));
@@ -154,8 +154,8 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			_c[7]->Add(new jgui::Button("Third Screen", 0, 0, 100, 100), "03");
 			_c[7]->Add(new jgui::Button("Last Screen", 0, 0, 100, 100), "04");
 
-			_b[3]->Add(_c[6], jgui::BL_EAST);
-			_b[3]->Add(_c[7], jgui::BL_CENTER);
+			_b[3]->Add(_c[6], jgui::JBA_EAST);
+			_b[3]->Add(_c[7], jgui::JBA_CENTER);
 
 			// gridbaglayout
 			bool shouldFill = true,
@@ -164,31 +164,31 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			jgui::GridBagConstraints *c = new jgui::GridBagConstraints();
 
 			if (shouldFill) {
-				c->fill = jgui::GBLC_HORIZONTAL;
+				c->fill = jgui::JGC_HORIZONTAL;
 			}
 
 			if (shouldWeightX) {
 				c->weightx = 0.5;
 			}
 
-			c->fill = jgui::GBLC_HORIZONTAL;
+			c->fill = jgui::JGC_HORIZONTAL;
 			c->gridx = 0;
 			c->gridy = 0;
 			_c[4]->Add(new jgui::Button("Button 1"), c);
 
-			c->fill = jgui::GBLC_HORIZONTAL;
+			c->fill = jgui::JGC_HORIZONTAL;
 			c->weightx = 0.5;
 			c->gridx = 1;
 			c->gridy = 0;
 			_c[4]->Add(new jgui::Button("Button 2"), c);
 
-			c->fill = jgui::GBLC_HORIZONTAL;
+			c->fill = jgui::JGC_HORIZONTAL;
 			c->weightx = 0.5;
 			c->gridx = 2;
 			c->gridy = 0;
 			_c[4]->Add(new jgui::Button("Button 3"), c);
 
-			c->fill = jgui::GBLC_HORIZONTAL;
+			c->fill = jgui::JGC_HORIZONTAL;
 			c->ipady = 40;      // make this component tall
 			c->weightx = 0.0;
 			c->gridwidth = 3;
@@ -196,11 +196,11 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			c->gridy = 1;
 			_c[4]->Add(new jgui::Button("Button 4"), c);
 
-			c->fill = jgui::GBLC_HORIZONTAL;
+			c->fill = jgui::JGC_HORIZONTAL;
 			c->ipady = 0;       // reset to default
 			c->weighty = 1.0;   // request any extra vertical space
 			c->weightx = 0.0;   // request any extra vertical space
-			c->anchor = jgui::GBLC_LAST_LINE_START;//PAGE_END; //bottom of space
+			c->anchor = jgui::JGC_LAST_LINE_START;//PAGE_END; //bottom of space
 			c->insets.left = 0;
 			c->insets.right = 0;
 			c->insets.top = 0;
@@ -234,12 +234,12 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			l5->SetBackgroundColor(color);
 			l6->SetBackgroundColor(color);
 			
-			_b[0]->Add(l1, jgui::BL_NORTH);
-			_b[1]->Add(l2, jgui::BL_NORTH);
-			_b[2]->Add(l3, jgui::BL_NORTH);
-			_b[3]->Add(l4, jgui::BL_NORTH);
-			_b[4]->Add(l5, jgui::BL_NORTH);
-			_b[5]->Add(l6, jgui::BL_NORTH);
+			_b[0]->Add(l1, jgui::JBA_NORTH);
+			_b[1]->Add(l2, jgui::JBA_NORTH);
+			_b[2]->Add(l3, jgui::JBA_NORTH);
+			_b[3]->Add(l4, jgui::JBA_NORTH);
+			_b[4]->Add(l5, jgui::JBA_NORTH);
+			_b[5]->Add(l6, jgui::JBA_NORTH);
 		}
 
 		virtual ~Main()

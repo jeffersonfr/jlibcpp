@@ -34,11 +34,11 @@ namespace jgui {
  *
  */
 enum jflowlayout_align_t {
-	FL_LEFT,
-	FL_CENTER,
-	FL_RIGHT,
-	FL_LEADING,
-	FL_TRAILING
+	JFL_LEFT,
+	JFL_CENTER,
+	JFL_RIGHT,
+	JFL_LEADING,
+	JFL_TRAILING
 };
 
 /**
@@ -60,7 +60,7 @@ class FlowLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		FlowLayout(jflowlayout_align_t align = FL_CENTER, int hgap = 10, int vgap = 10);
+		FlowLayout(jflowlayout_align_t align = JFL_CENTER, int hgap = 10, int vgap = 10);
 		
 		/**
 		 * \brief

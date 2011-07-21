@@ -95,7 +95,7 @@ void Mines::Paint(jgui::Graphics *g)
 						char str[] = {block.value+'0', '\0'};
 
 						g->SetColor(0xff, 0x00, 0x00, 0xff);
-						g->DrawString(str, _insets.left+i*(size+delta), _insets.top+j*(size+delta), size, size, jgui::CENTER_HALIGN, jgui::CENTER_VALIGN);
+						g->DrawString(str, _insets.left+i*(size+delta), _insets.top+j*(size+delta), size, size, jgui::JHA_CENTER, jgui::JVA_CENTER);
 					}
 				}
 			} else if (block.state == MARKED_BLOCK) {
@@ -138,28 +138,28 @@ void Mines::InputReceived(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&mines_mutex);
 
-	if (event->GetType() != jgui::JKEY_PRESSED) {
+	if (event->GetType() != jgui::JKT_PRESSED) {
 		return;
 	}
 
 	if (GetResult() == NONE) {
-		if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
+		if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
 			if (current_col < max_cols-1) {
 				current_col++;
 			}
-		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
+		} else if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 			if (current_col > 0) {
 				current_col--;
 			}
-		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_UP) {
+		} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
 			if (current_row > 0) {
 				current_row--;
 			}
-		} else if (event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
+		} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
 			if (current_row < max_rows-1) {
 				current_row++;
 			}
-		} else if (event->GetSymbol() == jgui::JKEY_ENTER) {
+		} else if (event->GetSymbol() == jgui::JKS_ENTER) {
 			block_t *block = &board[current_row*max_cols+current_col];
 
 			// INFO:: just open a block
@@ -188,12 +188,12 @@ void Mines::InputReceived(jgui::KeyEvent *event)
 			if (count == max_bombs) {
 				game_state = WIN;
 			}
-		} else if (event->GetSymbol() == jgui::JKEY_RED || event->GetSymbol() == jgui::JKEY_F1) {
-		} else if (event->GetSymbol() == jgui::JKEY_GREEN || event->GetSymbol() == jgui::JKEY_F2) {
+		} else if (event->GetSymbol() == jgui::JKS_RED || event->GetSymbol() == jgui::JKS_F1) {
+		} else if (event->GetSymbol() == jgui::JKS_GREEN || event->GetSymbol() == jgui::JKS_F2) {
 			jgui::MessageDialogBox dialog("Ajuda", "O jogo termina quando todos os blocos que n\xe3o possuem minas s\xe3o revelados. Utilize as bandeirinhas para ajudar a identificar as minas escondidas.", GetX()+300, GetY()+200);
 
 			dialog.Show();
-		} else if (event->GetSymbol() == jgui::JKEY_YELLOW || event->GetSymbol() == jgui::JKEY_F3) {
+		} else if (event->GetSymbol() == jgui::JKS_YELLOW || event->GetSymbol() == jgui::JKS_F3) {
 			block_t *block = &board[current_row*max_cols+current_col];
 
 			if (block->state == CLOSED_BLOCK) {
@@ -205,7 +205,7 @@ void Mines::InputReceived(jgui::KeyEvent *event)
 
 				hide_bombs++;
 			}
-		} else if (event->GetSymbol() == jgui::JKEY_BLUE || event->GetSymbol() == jgui::JKEY_F4) {
+		} else if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
 			SetupBoard();
 		}
 
@@ -234,7 +234,7 @@ void Mines::InputReceived(jgui::KeyEvent *event)
 		}
 
 		Repaint();
-	} else if (event->GetSymbol() == jgui::JKEY_BLUE || event->GetSymbol() == jgui::JKEY_F4) {
+	} else if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
 		SetupBoard();
 	}
 }

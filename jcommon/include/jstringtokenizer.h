@@ -29,9 +29,9 @@
 
 namespace jcommon {
 
-enum jtoken_flag_t {
-	TOKEN_FLAG,
-	SPLIT_FLAG
+enum jtoken_type_t {
+	JTT_CHAR,
+	JTT_STRING,
 };
 	
 /**
@@ -49,7 +49,7 @@ class StringTokenizer : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void BuildTokens(std::string string_, std::string token_, jtoken_flag_t flag_, bool return_token_);
+		void BuildTokens(std::string string_, std::string token_, jtoken_type_t flag_, bool return_token_);
 		
 	public:
 		/**
@@ -58,7 +58,7 @@ class StringTokenizer : public virtual jcommon::Object{
 		 * completo, e naum como uma lista de tokens.
 		 *
 		 */
-		StringTokenizer(std::string string_, std::string token_, jtoken_flag_t flag_ = SPLIT_FLAG, bool return_token_ = false);
+		StringTokenizer(std::string string_, std::string token_, jtoken_type_t flag_ = JTT_STRING, bool return_token_ = false);
 		
 		/**
 		 * \brief

@@ -53,21 +53,21 @@ namespace jgui{
  * \brief
  *
  */
-enum jporter_duff_flags_t {
-	PDF_NONE			= 0x0001,	// fs: sa fd: 1.0-sa (defaults)
-	PDF_CLEAR			= 0x0002,	// fs: 0.0 fd: 0.0
-	PDF_SRC				= 0x0004,	// fs: 1.0 fd: 0.0
-	PDF_DST				= 0x0008,	// fs: 1.0 fd: 0.0
-	PDF_SRC_OVER	= 0x0010,	// fs: 1.0 fd: 1.0-sa
-	PDF_DST_OVER	= 0x0020,	// fs: 1.0-da fd: 1.0
-	PDF_SRC_IN		= 0x0040,	// fs: da fd: 0.0
-	PDF_DST_IN		= 0x0080,	// fs: 0.0 fd: sa
-	PDF_SRC_OUT		= 0x0100,	// fs: 1.0-da fd: 0.0
-	PDF_DST_OUT		= 0x0200,	// fs: 0.0 fd: 1.0-sa
-	PDF_SRC_ATOP	= 0x0400,	// fs: da fd: 1.0-sa
-	PDF_DST_ATOP	= 0x0800,	// fs: 1.0-da fd: sa
-	PDF_ADD				= 0x1000,	// fs: 1.0 fd: 1.0
-	PDF_XOR				= 0x2000	// fs: 1.0-da fd: 1.0-sa 
+enum jporterduff_flags_t {
+	JPF_NONE			= 0x0001,	// fs: sa fd: 1.0-sa (defaults)
+	JPF_CLEAR			= 0x0002,	// fs: 0.0 fd: 0.0
+	JPF_SRC				= 0x0004,	// fs: 1.0 fd: 0.0
+	JPF_DST				= 0x0008,	// fs: 1.0 fd: 0.0
+	JPF_SRC_OVER	= 0x0010,	// fs: 1.0 fd: 1.0-sa
+	JPF_DST_OVER	= 0x0020,	// fs: 1.0-da fd: 1.0
+	JPF_SRC_IN		= 0x0040,	// fs: da fd: 0.0
+	JPF_DST_IN		= 0x0080,	// fs: 0.0 fd: sa
+	JPF_SRC_OUT		= 0x0100,	// fs: 1.0-da fd: 0.0
+	JPF_DST_OUT		= 0x0200,	// fs: 0.0 fd: 1.0-sa
+	JPF_SRC_ATOP	= 0x0400,	// fs: da fd: 1.0-sa
+	JPF_DST_ATOP	= 0x0800,	// fs: 1.0-da fd: sa
+	JPF_ADD				= 0x1000,	// fs: 1.0 fd: 1.0
+	JPF_XOR				= 0x2000	// fs: 1.0-da fd: 1.0-sa 
 };
 
 /**
@@ -75,9 +75,9 @@ enum jporter_duff_flags_t {
  *
  */
 enum jdrawing_flags_t {
-	DF_NOFX			= 0x01,
-	DF_BLEND		= 0x02,
-	DF_XOR			= 0x04
+	JDF_NOFX			= 0x01,
+	JDF_BLEND		= 0x02,
+	JDF_XOR			= 0x04
 };
 
 /**
@@ -85,11 +85,11 @@ enum jdrawing_flags_t {
  *
  */
 enum jblitting_flags_t {
-	BF_NOFX					= 0x01,
-	BF_ALPHACHANNEL	= 0x02,
-	BF_COLORALPHA		= 0x04,
-	BF_COLORIZE			= 0x08,
-	BF_XOR					= 0x80
+	JBF_NOFX					= 0x01,
+	JBF_ALPHACHANNEL	= 0x02,
+	JBF_COLORALPHA		= 0x04,
+	JBF_COLORIZE			= 0x08,
+	JBF_XOR						= 0x80
 };
 
 /**
@@ -97,10 +97,10 @@ enum jblitting_flags_t {
  *
  */
 enum jhorizontal_align_t {
-	LEFT_HALIGN,
-	CENTER_HALIGN,
-	RIGHT_HALIGN,
-	JUSTIFY_HALIGN
+	JHA_LEFT,
+	JHA_CENTER,
+	JHA_RIGHT,
+	JHA_JUSTIFY
 };
 
 /**
@@ -108,10 +108,10 @@ enum jhorizontal_align_t {
  *
  */
 enum jvertical_align_t {
-	TOP_VALIGN,
-	CENTER_VALIGN,
-	BOTTOM_VALIGN,
-	JUSTIFY_VALIGN
+	JVA_TOP,
+	JVA_CENTER,
+	JVA_BOTTOM,
+	JVA_JUSTIFY
 };
 
 /**
@@ -119,9 +119,9 @@ enum jvertical_align_t {
  *
  */
 enum jline_join_t {
-	BEVEL_JOIN		= 0x01,
-	ROUND_JOIN		= 0x02,
-	MITER_JOIN		= 0x04,
+	JLJ_BEVEL = 0x01,
+	JLJ_ROUND = 0x02,
+	JLJ_MITER = 0x04,
 };
 
 /**
@@ -129,10 +129,10 @@ enum jline_join_t {
  *
  */
 enum jline_style_t {
-	SOLID_LINE		= 0x01,
-	DASH_LINE			= 0x02,
-	DASH_DOT_LINE	= 0x04,
-	DOT_LINE			= 0x08
+	JLS_SOLID			= 0x01,
+	JLS_DASH			= 0x02,
+	JLS_DASH_DOT	= 0x04,
+	JLS_DOT				= 0x08
 };
 
 /**
@@ -202,7 +202,7 @@ class Graphics : public virtual jcommon::Object{
 		jline_style_t _line_style;
 		jdrawing_flags_t _draw_flags;
 		jblitting_flags_t _blit_flags;
-		jporter_duff_flags_t _porter_duff_flags;
+		jporterduff_flags_t _porterduff_flags;
 		Font *_font;
 		Color _color;
 		double _radians;
@@ -426,7 +426,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jporter_duff_flags_t GetPorterDuffFlags();
+		virtual jporterduff_flags_t GetPorterDuffFlags();
 		
 		/**
 		 * \brief
@@ -444,7 +444,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetPorterDuffFlags(jporter_duff_flags_t t);
+		virtual void SetPorterDuffFlags(jporterduff_flags_t t);
 		
 		/**
 		 * \brief
@@ -718,7 +718,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JUSTIFY_HALIGN);
+		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY);
 		
 		/**
 		 * \brief
@@ -730,7 +730,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign = JUSTIFY_HALIGN, jvertical_align_t valign = CENTER_VALIGN, bool clipped = true);
+		virtual void DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY, jvertical_align_t valign = JVA_CENTER, bool clipped = true);
 
 		/**
 		 * \brief

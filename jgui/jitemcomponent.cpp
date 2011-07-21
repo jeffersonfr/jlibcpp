@@ -31,14 +31,14 @@ Item::Item():
 {
 	jcommon::Object::SetClassName("jgui::Item");
 
-	_halign = CENTER_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_CENTER;
+	_valign = JVA_CENTER;
 
 	_enabled = true;
 	_prefetch = NULL;
 	_is_checked = false;
 	_is_visible = true;
-	_type = EMPTY_MENU_ITEM;
+	_type = JMT_EMPTY;
 }
 
 Item::Item(std::string value):
@@ -46,15 +46,15 @@ Item::Item(std::string value):
 {
 	jcommon::Object::SetClassName("jgui::Item");
 
-	_halign = CENTER_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_CENTER;
+	_valign = JVA_CENTER;
 
 	_enabled = true;
 	_prefetch = NULL;
 	_value = value;
 	_is_checked = false;
 	_is_visible = true;
-	_type = TEXT_MENU_ITEM;
+	_type = JMT_TEXT;
 }
 
 Item::Item(std::string value, std::string image):
@@ -62,8 +62,8 @@ Item::Item(std::string value, std::string image):
 {
 	jcommon::Object::SetClassName("jgui::Item");
 
-	_halign = CENTER_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_CENTER;
+	_valign = JVA_CENTER;
 
 	_enabled = true;
 	_prefetch = NULL;
@@ -71,7 +71,7 @@ Item::Item(std::string value, std::string image):
 	_value = value;
 	_is_checked = false;
 	_is_visible = true;
-	_type = IMAGE_MENU_ITEM;
+	_type = JMT_IMAGE;
 	
 	_prefetch = Image::CreateImage(_image);
 }
@@ -81,15 +81,15 @@ Item::Item(std::string value, bool checked):
 {
 	jcommon::Object::SetClassName("jgui::Item");
 
-	_halign = CENTER_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_CENTER;
+	_valign = JVA_CENTER;
 
 	_enabled = true;
 	_prefetch = NULL;
 	_value = value;
 	_is_checked = checked;
 	_is_visible = true;
-	_type = CHECK_MENU_ITEM;
+	_type = JMT_CHECK;
 }
 
 Item::~Item()
@@ -161,7 +161,7 @@ void Item::SetSelected(bool b)
 
 void Item::AddChild(Item *item)
 {
-	if (_type == jgui::CHECK_MENU_ITEM) {
+	if (_type == jgui::JMT_CHECK) {
 		throw jcommon::RuntimeException("Item cannot accept childs");
 	}
 
@@ -516,7 +516,7 @@ void ItemComponent::DispatchSelectEvent(SelectEvent *event)
 	while (k++ < (int)_select_listeners.size()) {
 		SelectListener *listener = _select_listeners[k-1];
 
-		if (event->GetType() == ACTION_ITEM) {
+		if (event->GetType() == JST_ACTION) {
 			listener->ItemSelected(event);
 		} else {
 			listener->ItemChanged(event);

@@ -30,7 +30,7 @@ namespace jsocket {
 int DatagramSocket::_used_port = 1024;
 
 DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(UDP_SOCKET)
+	jsocket::Connection(JCT_UDP)
 {
 	jcommon::Object::SetClassName("jsocket::DatagramSocket");
 	
@@ -50,7 +50,7 @@ DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, int t
 }
 
 DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(UDP_SOCKET)
+	jsocket::Connection(JCT_UDP)
 {
 	jcommon::Object::SetClassName("jsocket::DatagramSocket");
 
@@ -563,7 +563,7 @@ SocketOption * DatagramSocket::GetSocketOption()
 		throw SocketException("Connection is closed");
 	}
 
-	return new SocketOption(_fd, UDP_SOCKET);
+	return new SocketOption(_fd, JCT_UDP);
 }
 
 std::string DatagramSocket::what()

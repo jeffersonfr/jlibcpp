@@ -43,9 +43,9 @@ namespace jshared {
  *
  */
 enum jschedule_policy_t {
-	SCHEDULE_FIFO,
-	SCHEDULE_ROUND_ROBIN,
-	SCHEDULE_OTHER
+	JSP_FIFO,
+	JSP_ROUND_ROBIN,
+	JSP_OTHER
 };
 
 /**
@@ -56,11 +56,11 @@ enum jschedule_type_t {
 #ifdef _WIN32
 	PRIORITY_PROCESS	= 0,
 	PRIORITY_GROUP		= 0,
-	PRIORITY_USER		= 0
+	PRIORITY_USER			= 0
 #else
 	PRIORITY_PROCESS	= PRIO_PROCESS,
 	PRIORITY_GROUP		= PRIO_PGRP,
-	PRIORITY_USER		= PRIO_USER
+	PRIORITY_USER			= PRIO_USER
 #endif
 };
 

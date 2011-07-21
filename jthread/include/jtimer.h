@@ -35,11 +35,11 @@ namespace jthread{
  *
  * @author Jeff Ferr
  */
-enum jtimertask_t {
-	VIRGIN,			// The state of this task, chosen from the constants below. This task has not yet been scheduled.
-	SCHEDULED,	// This task is scheduled for execution.  If it is a non-repeating task, it has not yet been executed.
-	EXECUTED,		// This non-repeating task has already executed (or is currently executing) and has not been cancelled.
-	CANCELLED		// This task has been cancelled (with a call to TimerTask.cancel).
+enum jtimertask_state_t {
+	JTS_VIRGIN,			// The state of this task, chosen from the constants below. This task has not yet been scheduled.
+	JTS_SCHEDULED,	// This task is scheduled for execution.  If it is a non-repeating task, it has not yet been executed.
+	JTS_EXECUTED,		// This non-repeating task has already executed (or is currently executing) and has not been cancelled.
+	JTS_CANCELLED		// This task has been cancelled (with a call to TimerTask.cancel).
 };
 
 class Timer;
@@ -54,7 +54,7 @@ class TimerTask : public jthread::Runnable {
 
 	private:
 		jthread::Mutex _mutex;
-    jtimertask_t _state;
+    jtimertask_state_t _state;
     
 		uint64_t _delay;
 		bool _push_time;

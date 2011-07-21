@@ -118,7 +118,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			marquee = new jgui::Marquee("Testando Marquee", 500, 110, 700);
 
-			marquee->SetType(jgui::LOOP_TEXT);
+			marquee->SetType(jgui::JMM_LOOP);
 
 			marquee->Start();
 		}
@@ -148,7 +148,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			watch = new jgui::Watch(jgui::CRONOMETERDOWN_WATCH, 150, 300, 300);
+			watch = new jgui::Watch(jgui::JWT_CRONOMETERDOWN, 150, 300, 300);
 
 			watch->SetSeconds(10);
 			watch->SetMinutes(0);
@@ -205,9 +205,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			check1 = new jgui::CheckButton(jgui::CHECK_TYPE, "wrap", 500, 740, 300);
-			check2 = new jgui::CheckButton(jgui::CHECK_TYPE, "password", 500, 795, 300);
-			check3 = new jgui::CheckButton(jgui::CHECK_TYPE, "hide", 500, 850, 300);
+			check1 = new jgui::CheckButton(jgui::JCT_CHECK, "wrap", 500, 740, 300);
+			check2 = new jgui::CheckButton(jgui::JCT_CHECK, "password", 500, 795, 300);
+			check3 = new jgui::CheckButton(jgui::JCT_CHECK, "hide", 500, 850, 300);
 
 			check1->SetSelected(true);
 
@@ -217,9 +217,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			radio1 = new jgui::CheckButton(jgui::RADIO_TYPE, "left", 860, 740, 300);
-			radio2 = new jgui::CheckButton(jgui::RADIO_TYPE, "center", 860, 795, 300);
-			radio3 = new jgui::CheckButton(jgui::RADIO_TYPE, "right", 860, 850, 300);
+			radio1 = new jgui::CheckButton(jgui::JCT_RADIO, "left", 860, 740, 300);
+			radio2 = new jgui::CheckButton(jgui::JCT_RADIO, "center", 860, 795, 300);
+			radio3 = new jgui::CheckButton(jgui::JCT_RADIO, "right", 860, 850, 300);
 
 			group = new jgui::CheckButtonGroup();
 
@@ -395,13 +395,13 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 	{
 		jthread::AutoLock lock(&teste_mutex);
 
-		if (event->GetType() != jgui::JKEY_PRESSED) {
+		if (event->GetType() != jgui::JKT_PRESSED) {
 			return;
 		}
 
-		if (event->GetSymbol() == jgui::JKEY_ENTER) {
+		if (event->GetSymbol() == jgui::JKS_ENTER) {
 			if (GetFocusOwner() == text_field) {
-				jgui::Keyboard keyboard(500, 400, jgui::FULL_ALPHA_NUMERIC_KEYBOARD, false);
+				jgui::Keyboard keyboard(500, 400, jgui::JKB_QWERTY, false);
 
 				keyboard.RegisterKeyboardListener(dynamic_cast<jgui::KeyboardListener *>(this));
 				keyboard.Show();
@@ -434,14 +434,14 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 				text_area->SetVisible(true);
 			}
 		} else if (event->GetSource() == radio1) {
-			label1->SetHorizontalAlign(jgui::LEFT_HALIGN);
-			label2->SetHorizontalAlign(jgui::LEFT_HALIGN);
+			label1->SetHorizontalAlign(jgui::JHA_LEFT);
+			label2->SetHorizontalAlign(jgui::JHA_LEFT);
 		} else if (event->GetSource() == radio2) {
-			label1->SetHorizontalAlign(jgui::CENTER_HALIGN);
-			label2->SetHorizontalAlign(jgui::CENTER_HALIGN);
+			label1->SetHorizontalAlign(jgui::JHA_CENTER);
+			label2->SetHorizontalAlign(jgui::JHA_CENTER);
 		} else if (event->GetSource() == radio3) {
-			label1->SetHorizontalAlign(jgui::RIGHT_HALIGN);
-			label2->SetHorizontalAlign(jgui::RIGHT_HALIGN);
+			label1->SetHorizontalAlign(jgui::JHA_RIGHT);
+			label2->SetHorizontalAlign(jgui::JHA_RIGHT);
 		}
 	}
 
@@ -450,9 +450,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		jthread::AutoLock lock(&teste_mutex);
 
 		if (spin->GetCurrentIndex() == 0) {
-			marquee->SetType(jgui::LOOP_TEXT);
+			marquee->SetType(jgui::JMM_LOOP);
 		} else if (spin->GetCurrentIndex() == 1) {
-			marquee->SetType(jgui::BOUNCE_TEXT);
+			marquee->SetType(jgui::JMM_BOUNCE);
 		}
 	}
 

@@ -208,7 +208,7 @@ class HTTPRequest : public jthread::Thread {
 
 		void ProcessHeader(std::string header)
 		{
-			jcommon::StringTokenizer token(header, "\r\n", jcommon::SPLIT_FLAG, false);
+			jcommon::StringTokenizer token(header, "\r\n", jcommon::JTT_STRING, false);
 			std::string s,
 				key,
 				value;
@@ -227,7 +227,7 @@ class HTTPRequest : public jthread::Thread {
 
 					std::cout << key << ": " << value << std::endl; 
 				} else {
-					jcommon::StringTokenizer t1(token.GetToken(0), " ", jcommon::SPLIT_FLAG, false);
+					jcommon::StringTokenizer t1(token.GetToken(0), " ", jcommon::JTT_STRING, false);
 
 					if (t1.GetSize() == 3) {
 						_code = atoi(t1.GetToken(1).c_str());

@@ -26,7 +26,7 @@
 namespace jsocket {
 
 LocalSocket::LocalSocket(std::string file, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 
@@ -71,7 +71,7 @@ LocalSocket::~LocalSocket()
 /** Private */
 
 LocalSocket::LocalSocket(jsocket_t handler_, std::string file_, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 
@@ -367,7 +367,7 @@ SocketOption * LocalSocket::GetSocketOption()
 		throw SocketException("Connection is closed");
 	}
 
-	return new SocketOption(_fd, TCP_SOCKET);
+	return new SocketOption(_fd, JCT_TCP);
 }
 
 }

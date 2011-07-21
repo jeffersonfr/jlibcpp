@@ -27,7 +27,7 @@
 namespace jsocket {
 
 SSLSocket::SSLSocket(InetAddress *addr_, int port_, int keysize, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket");
 	
@@ -65,7 +65,7 @@ SSLSocket::SSLSocket(InetAddress *addr_, int port_, int keysize, int timeout_, i
 }
 
 SSLSocket::SSLSocket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket");
 
@@ -104,7 +104,7 @@ SSLSocket::SSLSocket(InetAddress *addr_, int port_, InetAddress *local_addr_, in
 }
 
 SSLSocket::SSLSocket(std::string host_, int port_, int keysize, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket");
 
@@ -148,7 +148,7 @@ SSLSocket::SSLSocket(std::string host_, int port_, int keysize, int timeout_, in
 }
 
 SSLSocket::SSLSocket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket");
 
@@ -218,7 +218,7 @@ SSLSocket::~SSLSocket()
 /** Private */
 
 SSLSocket::SSLSocket(jsocket_t handler_, sockaddr_in server_, int keysize, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(TCP_SOCKET)
+	jsocket::Connection(JCT_TCP)
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket");
 
@@ -774,7 +774,7 @@ SocketOption * SSLSocket::GetSocketOption()
 		throw SocketException("Connection is closed");
 	}
 
-	return new SocketOption(_fd, TCP_SOCKET);
+	return new SocketOption(_fd, JCT_TCP);
 }
 
 std::string SSLSocket::what()

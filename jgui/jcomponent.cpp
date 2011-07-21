@@ -55,12 +55,12 @@ Component::Component(int x, int y, int width, int height):
 	_up = NULL;
 	_down = NULL;
 	_border_size = 1;
-	_border = LINE_BORDER;
+	_border = JCB_LINE;
 	_gradient_level = 0x40;
 	_vertical_gap = 4;
 	_horizontal_gap = 4;
-	_alignment_x = CENTER_ALIGNMENT;
-	_alignment_y = CENTER_ALIGNMENT;
+	_alignment_x = JCA_CENTER;
+	_alignment_y = JCA_CENTER;
 
 	_location.x = x;
 	_location.y = y;
@@ -121,7 +121,7 @@ int Component::GetBaseline(int width, int height)
 
 jcomponent_behavior_t Component::GetBaselineResizeBehavior() 
 {
-	return CB_OTHER;
+	return JCB_OTHER;
 }
 
 jcomponent_alignment_t Component::GetAlignmentX()
@@ -191,9 +191,9 @@ void Component::PaintBorderBackground(Graphics *g)
 
 	g->SetColor(_bgcolor);
 
-	if (_border == ROUND_BORDER) {
+	if (_border == JCB_ROUND) {
 		g->FillRoundRectangle(x, y, w, h);
-	} else if (_border == BEVEL_BORDER) {
+	} else if (_border == JCB_BEVEL) {
 		g->FillBevelRectangle(x, y, w, h);
 	} else {
 		g->FillRectangle(x, y, w, h);
@@ -202,7 +202,7 @@ void Component::PaintBorderBackground(Graphics *g)
 
 void Component::PaintBorderEdges(Graphics *g)
 {
-	if (_border == EMPTY_BORDER) {
+	if (_border == JCB_EMPTY) {
 		return;
 	}
 
@@ -228,19 +228,19 @@ void Component::PaintBorderEdges(Graphics *g)
 
 	g->SetLineWidth(1);
 
-	if (_border == LINE_BORDER) {
+	if (_border == JCB_LINE) {
 		g->SetColor(dr, dg, db, da);
 		g->SetLineWidth(-_border_size);
 		g->DrawRectangle(xp, yp, wp, hp);
-	} else if (_border == BEVEL_BORDER) {
+	} else if (_border == JCB_BEVEL) {
 		g->SetColor(dr, dg, db, da);
 		g->SetLineWidth(-_border_size);
 		g->DrawBevelRectangle(xp, yp, wp, hp);
-	} else if (_border == ROUND_BORDER) {
+	} else if (_border == JCB_ROUND) {
 		g->SetColor(dr, dg, db, da);
 		g->SetLineWidth(-_border_size);
 		g->DrawRoundRectangle(xp, yp, wp, hp);
-	} else if (_border == RAISED_GRADIENT_BORDER) {
+	} else if (_border == JCB_RAISED_GRADIENT) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
 			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
@@ -254,7 +254,7 @@ void Component::PaintBorderEdges(Graphics *g)
 			g->SetColor(dr-step*(size-i), dg-step*(size-i), db-step*(size-i));
 			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
-	} else if (_border == LOWERED_GRADIENT_BORDER) {
+	} else if (_border == JCB_LOWERED_GRADIENT) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr-step*(size-i), dg-step*(size-i), db-step*(size-i));
 			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
@@ -268,7 +268,7 @@ void Component::PaintBorderEdges(Graphics *g)
 			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
 			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
-	} else if (_border == RAISED_BEVEL_BORDER) {
+	} else if (_border == JCB_RAISED_BEVEL) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr+step, dg+step, db+step);
 			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
@@ -282,7 +282,7 @@ void Component::PaintBorderEdges(Graphics *g)
 			g->SetColor(dr-step, dg-step, db-step);
 			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
-	} else if (_border == LOWERED_BEVEL_BORDER) {
+	} else if (_border == JCB_LOWERED_BEVEL) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr-step, dg-step, db-step);
 			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
@@ -296,7 +296,7 @@ void Component::PaintBorderEdges(Graphics *g)
 			g->SetColor(dr+step, dg+step, db+step);
 			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
-	} else if (_border == RAISED_ETCHED_BORDER) {
+	} else if (_border == JCB_RAISED_ETCHED) {
 		g->SetColor(dr+step, dg+step, db+step, da);
 		g->SetLineWidth(-_border_size);
 		g->DrawRectangle(xp, yp, wp, hp);
@@ -304,7 +304,7 @@ void Component::PaintBorderEdges(Graphics *g)
 		g->SetColor(dr-step, dg-step, db-step, da);
 		g->SetLineWidth(-_border_size/2);
 		g->DrawRectangle(xp, yp, wp-_border_size/2, hp-_border_size/2);
-	} else if (_border == LOWERED_ETCHED_BORDER) {
+	} else if (_border == JCB_LOWERED_ETCHED) {
 		g->SetColor(dr-step, dg-step, db-step, da);
 		g->SetLineWidth(-_border_size);
 		g->DrawRectangle(xp, yp, wp, hp);
@@ -415,7 +415,7 @@ void Component::Repaint(bool all)
 		}
 	}
 
-	DispatchComponentEvent(new ComponentEvent(this, COMPONENT_PAINTED_EVENT));
+	DispatchComponentEvent(new ComponentEvent(this, JCE_PAINTED));
 }
 
 void Component::SetMinimumSize(jsize_t size)
@@ -931,21 +931,21 @@ bool Component::ProcessEvent(KeyEvent *event)
 {
 	Component *c = NULL;
 
-	jkey_symbol_t action = event->GetSymbol();
+	jkeyevent_symbol_t action = event->GetSymbol();
 	
-	if (action == JKEY_CURSOR_LEFT) {
+	if (action == JKS_CURSOR_LEFT) {
 		if (_left != NULL) {
 			c = _left;
 		}
-	} else if (action == JKEY_CURSOR_RIGHT) {
+	} else if (action == JKS_CURSOR_RIGHT) {
 		if (_right != NULL) {
 			c = _right;
 		}
-	} else if (action == JKEY_CURSOR_UP) {
+	} else if (action == JKS_CURSOR_UP) {
 		if (_up != NULL) {
 			c = _up;
 		}
-	} else if (action == JKEY_CURSOR_DOWN) {
+	} else if (action == JKS_CURSOR_DOWN) {
 		if (_down != NULL) {
 			c = _down;
 		}
@@ -1055,9 +1055,9 @@ void Component::DispatchFocusEvent(FocusEvent *event)
 	while (k++ < (int)_focus_listeners.size()) {
 		FocusListener *listener = _focus_listeners[k-1];
 
-		if (event->GetType() == GAINED_FOCUS_EVENT) {
+		if (event->GetType() == JFE_GAINED) {
 			listener->FocusGained(event);
-		} else if (event->GetType() == LOST_FOCUS_EVENT) {
+		} else if (event->GetType() == JFE_LOST) {
 			listener->FocusLost(event);
 		}
 
@@ -1070,9 +1070,9 @@ void Component::DispatchFocusEvent(FocusEvent *event)
 
 	/*
 	for (std::vector<FocusListener *>::iterator i=_focus_listeners.begin(); i!=_focus_listeners.end(); i++) {
-		if (event->GetType() == GAINED_FOCUS_EVENT) {
+		if (event->GetType() == JFE_GAINED) {
 			(*i)->FocusGained(event);
-		} else if (event->GetType() == LOST_FOCUS_EVENT) {
+		} else if (event->GetType() == JFE_LOST) {
 			(*i)->FocusLost(event);
 		}
 	}
@@ -1122,13 +1122,13 @@ void Component::DispatchComponentEvent(ComponentEvent *event)
 	while (k++ < (int)_component_listeners.size()) {
 		ComponentListener *listener = _component_listeners[k-1];
 
-		if (event->GetType() == COMPONENT_HIDDEN_EVENT) {
+		if (event->GetType() == JCE_HIDDEN) {
 			listener->ComponentHidden(event);
-		} else if (event->GetType() == COMPONENT_SHOWN_EVENT) {
+		} else if (event->GetType() == JCE_SHOWN) {
 			listener->ComponentShown(event);
-		} else if (event->GetType() == COMPONENT_MOVED_EVENT) {
+		} else if (event->GetType() == JCE_MOVED) {
 			listener->ComponentMoved(event);
-		} else if (event->GetType() == COMPONENT_PAINTED_EVENT) {
+		} else if (event->GetType() == JCE_PAINTED) {
 			listener->ComponentPainted(event);
 		}
 

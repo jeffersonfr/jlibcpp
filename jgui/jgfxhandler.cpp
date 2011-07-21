@@ -42,7 +42,7 @@ GFXHandler::GFXHandler():
 	_scale.height = DEFAULT_SCALE_HEIGHT;
 	
 #ifdef DIRECTFB_UI
-	_cursor = DEFAULT_CURSOR;
+	_cursor = JCS_DEFAULT;
 	_dfb = NULL;
 	_layer = NULL;
 #endif
@@ -166,73 +166,73 @@ int GFXHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 	desc.width = width;
 	desc.height = height;
 
-	if (pixelformat == SPF_UNKNOWN) {
+	if (pixelformat == JSP_UNKNOWN) {
 		desc.pixelformat = DSPF_UNKNOWN;
-	} else if (pixelformat == SPF_ARGB1555) {
+	} else if (pixelformat == JSP_ARGB1555) {
 		desc.pixelformat = DSPF_ARGB1555;
-	} else if (pixelformat == SPF_RGB16) {
+	} else if (pixelformat == JSP_RGB16) {
 		desc.pixelformat = DSPF_RGB16;
-	} else if (pixelformat == SPF_RGB24) {
+	} else if (pixelformat == JSP_RGB24) {
 		desc.pixelformat = DSPF_RGB24;
-	} else if (pixelformat == SPF_RGB32) {
+	} else if (pixelformat == JSP_RGB32) {
 		desc.pixelformat = DSPF_RGB32;
-	} else if (pixelformat == SPF_ARGB) {
+	} else if (pixelformat == JSP_ARGB) {
 		desc.pixelformat = DSPF_ARGB;
-	} else if (pixelformat == SPF_A8) {
+	} else if (pixelformat == JSP_A8) {
 		desc.pixelformat = DSPF_A8;
-	} else if (pixelformat == SPF_YUY2) {
+	} else if (pixelformat == JSP_YUY2) {
 		desc.pixelformat = DSPF_YUY2;
-	} else if (pixelformat == SPF_RGB332) {
+	} else if (pixelformat == JSP_RGB332) {
 		desc.pixelformat = DSPF_RGB332;
-	} else if (pixelformat == SPF_UYVY) {
+	} else if (pixelformat == JSP_UYVY) {
 		desc.pixelformat = DSPF_UYVY;
-	} else if (pixelformat == SPF_I420) {
+	} else if (pixelformat == JSP_I420) {
 		desc.pixelformat = DSPF_I420;
-	} else if (pixelformat == SPF_YV12) {
+	} else if (pixelformat == JSP_YV12) {
 		desc.pixelformat = DSPF_YV12;
-	} else if (pixelformat == SPF_LUT8) {
+	} else if (pixelformat == JSP_LUT8) {
 		desc.pixelformat = DSPF_LUT8;
-	} else if (pixelformat == SPF_ALUT44) {
+	} else if (pixelformat == JSP_ALUT44) {
 		desc.pixelformat = DSPF_ALUT44;
-	} else if (pixelformat == SPF_AiRGB) {
+	} else if (pixelformat == JSP_AiRGB) {
 		desc.pixelformat = DSPF_AiRGB;
-	} else if (pixelformat == SPF_A1) {
+	} else if (pixelformat == JSP_A1) {
 		desc.pixelformat = DSPF_A1;
-	} else if (pixelformat == SPF_NV12) {
+	} else if (pixelformat == JSP_NV12) {
 		desc.pixelformat = DSPF_NV12;
-	} else if (pixelformat == SPF_NV16) {
+	} else if (pixelformat == JSP_NV16) {
 		desc.pixelformat = DSPF_NV16;
-	} else if (pixelformat == SPF_ARGB2554) {
+	} else if (pixelformat == JSP_ARGB2554) {
 		desc.pixelformat = DSPF_ARGB2554;
-	} else if (pixelformat == SPF_ARGB4444) {
+	} else if (pixelformat == JSP_ARGB4444) {
 		desc.pixelformat = DSPF_ARGB4444;
-	} else if (pixelformat == SPF_RGBA4444) {
+	} else if (pixelformat == JSP_RGBA4444) {
 		desc.pixelformat = DSPF_RGBA4444;
-	} else if (pixelformat == SPF_NV21) {
+	} else if (pixelformat == JSP_NV21) {
 		desc.pixelformat = DSPF_NV21;
-	} else if (pixelformat == SPF_AYUV) {
+	} else if (pixelformat == JSP_AYUV) {
 		desc.pixelformat = DSPF_AYUV;
-	} else if (pixelformat == SPF_A4) {
+	} else if (pixelformat == JSP_A4) {
 		desc.pixelformat = DSPF_A4;
-	} else if (pixelformat == SPF_ARGB1666) {
+	} else if (pixelformat == JSP_ARGB1666) {
 		desc.pixelformat = DSPF_ARGB1666;
-	} else if (pixelformat == SPF_ARGB6666) {
+	} else if (pixelformat == JSP_ARGB6666) {
 		desc.pixelformat = DSPF_ARGB6666;
-	} else if (pixelformat == SPF_RGB18) {
+	} else if (pixelformat == JSP_RGB18) {
 		desc.pixelformat = DSPF_RGB18;
-	} else if (pixelformat == SPF_LUT2) {
+	} else if (pixelformat == JSP_LUT2) {
 		desc.pixelformat = DSPF_LUT2;
-	} else if (pixelformat == SPF_RGB444) {
+	} else if (pixelformat == JSP_RGB444) {
 		desc.pixelformat = DSPF_RGB444;
-	} else if (pixelformat == SPF_RGB555) {
+	} else if (pixelformat == JSP_RGB555) {
 		desc.pixelformat = DSPF_RGB555;
-	} else if (pixelformat == SPF_BGR555) {
+	} else if (pixelformat == JSP_BGR555) {
 		desc.pixelformat = DSPF_BGR555;
-	} else if (pixelformat == SPF_RGBA5551) {
+	} else if (pixelformat == JSP_RGBA5551) {
 		desc.pixelformat = DSPF_RGBA5551;
-	} else if (pixelformat == SPF_AVYU) {
+	} else if (pixelformat == JSP_AVYU) {
 		desc.pixelformat = DSPF_AVYU;
-	} else if (pixelformat == SPF_VYU) {
+	} else if (pixelformat == JSP_VYU) {
 		desc.pixelformat = DSPF_VYU;
 	}
 
@@ -573,7 +573,7 @@ void GFXHandler::InitCursors()
 #ifdef DIRECTFB_UI
 
 #define CURSOR_INIT(type, ix, iy, hotx, hoty) 																	\
-	t.cursor = Image::CreateImage(w, h, SPF_ARGB, _screen.width, _screen.height);	\
+	t.cursor = Image::CreateImage(w, h, JSP_ARGB, _screen.width, _screen.height);	\
 																																								\
 	t.hot_x = hotx;																																\
 	t.hot_y = hoty;																																\
@@ -588,24 +588,24 @@ void GFXHandler::InitCursors()
 
 	Image *cursors = Image::CreateImage(_DATA_PREFIX"/images/cursors.png");
 
-	CURSOR_INIT(DEFAULT_CURSOR, 0, 0, 8, 8);
-	CURSOR_INIT(CROSSHAIR_CURSOR, 4, 3, 15, 15);
-	CURSOR_INIT(EAST_CURSOR, 4, 4, 22, 15);
-	CURSOR_INIT(WEST_CURSOR, 5, 4, 9, 15);
-	CURSOR_INIT(NORTH_CURSOR, 6, 4, 15, 8);
-	CURSOR_INIT(SOUTH_CURSOR, 7, 4, 15, 22);
-	CURSOR_INIT(HAND_CURSOR, 1, 0, 15, 15);
-	CURSOR_INIT(MOVE_CURSOR, 8, 4, 15, 15);
-	CURSOR_INIT(NS_CURSOR, 2, 4, 15, 15);
-	CURSOR_INIT(WE_CURSOR, 3, 4, 15, 15);
-	CURSOR_INIT(NW_CORNER_CURSOR, 8, 1, 10, 10);
-	CURSOR_INIT(NE_CORNER_CURSOR, 9, 1, 20, 10);
-	CURSOR_INIT(SW_CORNER_CURSOR, 6, 1, 10, 20);
-	CURSOR_INIT(SE_CORNER_CURSOR, 7, 1, 20, 20);
-	CURSOR_INIT(TEXT_CURSOR, 7, 0, 15, 15);
-	CURSOR_INIT(WAIT_CURSOR, 8, 0, 15, 15);
+	CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
+	CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
+	CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
+	CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
+	CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
+	CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
+	CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
+	CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
+	CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
+	CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
+	CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
+	CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
+	CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
+	CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
+	CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
+	CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
 	
-	SetCursor(_cursors[DEFAULT_CURSOR].cursor, _cursors[DEFAULT_CURSOR].hot_x, _cursors[DEFAULT_CURSOR].hot_y);
+	SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
 #endif
 }
 

@@ -35,11 +35,9 @@
 
 namespace jshared {
 
-// MCL_CURRENT,
-// MCL_FUTURE
-enum jmutex_flags_t {
-	MUTEX_CURRENT = 1,
-	MUTEX_FUTURE = 2
+enum jsharedmutex_flags_t {
+	JSF_CURRENT	= 1,
+	JSF_FUTURE	= 2
 };
 
 /**
@@ -63,14 +61,14 @@ class SharedMutex : public virtual jcommon::Object{
 			/** \brief */
 			bool _is_open;
 			/** \brief */
-			jmutex_flags_t _flags;
+			jsharedmutex_flags_t _flags;
 
 		public:
 			/**
 			 * \brief Constructor.
 			 *
 			 */
-			SharedMutex(jmutex_flags_t flags_ = jmutex_flags_t(MUTEX_CURRENT | MUTEX_FUTURE));
+			SharedMutex(jsharedmutex_flags_t flags_ = jsharedmutex_flags_t(JSF_CURRENT | JSF_FUTURE));
 
 			/**
 			 * \brief Constructor.

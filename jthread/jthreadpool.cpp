@@ -125,7 +125,7 @@ ThreadPool::~ThreadPool()
 	Interrupt();
 }
 
-bool ThreadPool::AttachThread(Runnable *r, jthread_pool_priority_t p)
+bool ThreadPool::AttachThread(Runnable *r, jthreadpool_priority_t p)
 {
 	if ((void *)r == NULL) {
 		return false;
@@ -141,11 +141,11 @@ bool ThreadPool::AttachThread(Runnable *r, jthread_pool_priority_t p)
 		}
 	}
 
-	if (p == THREAD_GROUP_LOW) {
+	if (p == JTP_GROUP_LOW) {
 		_low_threads.push(r);
-	} else if (p == THREAD_GROUP_LOW) {
+	} else if (p == JTP_GROUP_LOW) {
 		_medium_threads.push(r);
-	} else if (p == THREAD_GROUP_LOW) {
+	} else if (p == JTP_GROUP_LOW) {
 		_high_threads.push(r);
 	}
 

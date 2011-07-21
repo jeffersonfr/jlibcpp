@@ -52,11 +52,11 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 	_graphics = NULL;
 
 	_opacity = 0xff;
-	_cursor = DEFAULT_CURSOR;
+	_cursor = JCS_DEFAULT;
 
 	SetBackgroundVisible(true);
 
-	DispatchWindowEvent(new WindowEvent(this, WINDOW_OPENED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, JWT_OPENED));
 
 	WindowManager::GetInstance()->Add(this);
 
@@ -67,7 +67,7 @@ Window::~Window()
 {
 	ThemeManager::GetInstance()->RemoveThemeListener(this);
 
-	DispatchWindowEvent(new WindowEvent(this, WINDOW_CLOSING_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, JWT_CLOSING));
 
 #ifdef DIRECTFB_UI
 	WindowManager::GetInstance()->Remove(this);
@@ -94,7 +94,7 @@ Window::~Window()
 	}
 #endif
 
-	DispatchWindowEvent(new WindowEvent(this, WINDOW_CLOSED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, JWT_CLOSED));
 }
 
 Graphics * Window::GetGraphics()
@@ -327,8 +327,8 @@ void Window::SetBounds(int x, int y, int w, int h)
 	
 	DoLayout();
 
-	DispatchWindowEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
-	DispatchWindowEvent(new WindowEvent(this, WINDOW_RESIZED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, JWT_MOVED));
+	DispatchWindowEvent(new WindowEvent(this, JWT_RESIZED));
 }
 
 void Window::SetLocation(int x, int y)
@@ -349,7 +349,7 @@ void Window::SetLocation(int x, int y)
 	}
 #endif
 	
-	DispatchWindowEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, JWT_MOVED));
 }
 
 void Window::SetMinimumSize(int w, int h)
@@ -466,7 +466,7 @@ void Window::SetSize(int width, int height)
 	
 	DoLayout();
 
-	DispatchWindowEvent(new WindowEvent(this, WINDOW_RESIZED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, JWT_RESIZED));
 }
 
 void Window::Move(int x, int y)
@@ -483,7 +483,7 @@ void Window::Move(int x, int y)
 	}
 #endif
 	
-	DispatchWindowEvent(new WindowEvent(this, WINDOW_MOVED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, JWT_MOVED));
 }
 
 void Window::SetOpacity(int i)
@@ -550,7 +550,7 @@ void Window::Repaint(bool all)
 	
 	// CHANGE:: corrigir a limpeza da tela
 	if (_background_visible == false) {
-		_graphics->SetDrawingFlags(DF_NOFX);
+		_graphics->SetDrawingFlags(JDF_NOFX);
 		_graphics->Clear();
 	}
 
@@ -563,7 +563,7 @@ void Window::Repaint(bool all)
 
 	Revalidate();
 
-	DispatchWindowEvent(new WindowEvent(this, WINDOW_PAINTED_EVENT));
+	DispatchWindowEvent(new WindowEvent(this, JWT_PAINTED));
 }
 
 void Window::Repaint(int x, int y, int width, int height)
@@ -701,7 +701,7 @@ void Window::Repaint(Component *c)
 
 void Window::Paint(Graphics *g)
 {
-	g->SetDrawingFlags(DF_NOFX);
+	g->SetDrawingFlags(JDF_NOFX);
 
 	Container::Paint(g);
 }
@@ -808,17 +808,17 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 	while (k++ < (int)_window_listeners.size()) {
 		WindowListener *listener = _window_listeners[k-1];
 
-		if (event->GetType() == WINDOW_CLOSING_EVENT) {
+		if (event->GetType() == JWT_CLOSING) {
 			listener->WindowClosing(event);
-		} else if (event->GetType() == WINDOW_CLOSED_EVENT) {
+		} else if (event->GetType() == JWT_CLOSED) {
 			listener->WindowClosed(event);
-		} else if (event->GetType() == WINDOW_OPENED_EVENT) {
+		} else if (event->GetType() == JWT_OPENED) {
 			listener->WindowOpened(event);
-		} else if (event->GetType() == WINDOW_RESIZED_EVENT) {
+		} else if (event->GetType() == JWT_RESIZED) {
 			listener->WindowResized(event);
-		} else if (event->GetType() == WINDOW_MOVED_EVENT) {
+		} else if (event->GetType() == JWT_MOVED) {
 			listener->WindowMoved(event);
-		} else if (event->GetType() == WINDOW_PAINTED_EVENT) {
+		} else if (event->GetType() == JWT_PAINTED) {
 			listener->WindowPainted(event);
 		}
 
@@ -831,15 +831,15 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 
 	/*
 	for (std::vector<WindowListener *>::iterator i=_window_listeners.begin(); i!=_window_listeners.end(); i++) {
-		if (event->GetType() == WINDOW_CLOSING_EVENT) {
+		if (event->GetType() == JWT_CLOSING) {
 			(*i)->WindowClosing(event);
-		} else if (event->GetType() == WINDOW_CLOSED_EVENT) {
+		} else if (event->GetType() == JWT_CLOSED) {
 			(*i)->WindowClosed(event);
-		} else if (event->GetType() == WINDOW_OPENED_EVENT) {
+		} else if (event->GetType() == JWT_OPENED) {
 			(*i)->WindowOpened(event);
-		} else if (event->GetType() == WINDOW_RESIZED_EVENT) {
+		} else if (event->GetType() == JWT_RESIZED) {
 			(*i)->WindowResized(event);
-		} else if (event->GetType() == WINDOW_MOVED_EVENT) {
+		} else if (event->GetType() == JWT_MOVED) {
 			(*i)->WindowMoved(event);
 		}
 	}

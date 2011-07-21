@@ -41,12 +41,12 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_title = title;
 	_is_visible = false;
 	_undecorated = false;
-	_last_key_code = JKEY_UNKNOWN;
+	_last_key_code = JKS_UNKNOWN;
 	_input_enabled = true;
 	_background_visible = true;
 	_move_enabled = false;
 	_resize_enabled = false;
-	_frame_buttons = (jframe_button_t)(FB_CLOSE);
+	_frame_buttons = (jframe_button_t)(JFB_CLOSE);
 	
 	_old_x = _location.x;
 	_old_y = _location.y;
@@ -228,12 +228,12 @@ bool Frame::Hide()
 	return true;
 }
 
-jkey_symbol_t Frame::GetLastKeyCode()
+jkeyevent_symbol_t Frame::GetLastKeyCode()
 {
 	return _last_key_code;
 }
 
-void Frame::SetLastKeyCode(jkey_symbol_t key)
+void Frame::SetLastKeyCode(jkeyevent_symbol_t key)
 {
 	_last_key_code = key;
 }
@@ -356,13 +356,13 @@ void Frame::Paint(Graphics *g)
 	int s = _insets.top-30;
 
 	if (s > 4) { 
-		g->SetBlittingFlags(BF_ALPHACHANNEL);
+		g->SetBlittingFlags(JBF_ALPHACHANNEL);
 
-		if (_release_enabled == true && (_frame_buttons & FB_CLOSE) != 0) {
+		if (_release_enabled == true && (_frame_buttons & JFB_CLOSE) != 0) {
 			g->DrawImage(_DATA_PREFIX"/images/close.png", _size.width-_insets.right-s, 15, s, s);
 		}
 
-		if ((_frame_buttons & FB_MAXIMIZE) != 0) { 
+		if ((_frame_buttons & JFB_MAXIMIZE) != 0) { 
 			if (_is_maximized == false) {
 				g->DrawImage(_DATA_PREFIX"/images/maximize.png", _size.width-_insets.right-2*s-10, 15, s, s);
 			} else {
@@ -393,7 +393,7 @@ void Frame::KeyPressed(KeyEvent *event)
 		return;
 	}
 
-	if (event->GetType() == JKEY_PRESSED) {
+	if (event->GetType() == JKT_PRESSED) {
 		jthread::AutoLock lock(&_input_mutex);
 
 		if (_is_visible == false) {
@@ -402,8 +402,8 @@ void Frame::KeyPressed(KeyEvent *event)
 
 		_last_key_code = event->GetSymbol();
 
-		if ((event->GetSymbol() == JKEY_ESCAPE || event->GetSymbol() == JKEY_EXIT) && _release_enabled == true) {
-			_last_key_code = JKEY_EXIT;
+		if ((event->GetSymbol() == JKS_ESCAPE || event->GetSymbol() == JKS_EXIT) && _release_enabled == true) {
+			_last_key_code = JKS_EXIT;
 
 			Release();
 
@@ -434,18 +434,18 @@ void Frame::MousePressed(MouseEvent *event)
 		_mouse_state = 0;
 	}
 
-	if (event->GetButton() == JMOUSE_BUTTON1) {
+	if (event->GetButton() == JMB_BUTTON1) {
 		int lwidth = _location.x + _size.width-_insets.right,
 				lheight = _location.y + _size.height-_insets.bottom;
 		int btn = (_insets.top-30)+10,
-				gap = ((_frame_buttons & FB_MAXIMIZE) != 0)? 2 : ((_frame_buttons & FB_CLOSE) != 0)? 1 : 0;
+				gap = ((_frame_buttons & JFB_MAXIMIZE) != 0)? 2 : ((_frame_buttons & JFB_CLOSE) != 0)? 1 : 0;
 
 		if ((event->GetY() > _location.y && event->GetY() < (_location.y+_insets.top))) {
 			if (event->GetX() > _location.x) {
 				if (event->GetX() < (lwidth-gap*btn)) {
 					if (_move_enabled == true && _is_maximized == false) {
 						_default_cursor = GetCursor();
-						SetCursor(MOVE_CURSOR);
+						SetCursor(JCS_MOVE);
 
 						_mouse_state = 1; // move
 						_relative_mouse_x = event->GetX()-GetX();
@@ -460,12 +460,12 @@ void Frame::MousePressed(MouseEvent *event)
 						}
 					}
 				} else if (event->GetX() < (lwidth-0*btn)) {
-					if ((_frame_buttons & FB_CLOSE) != 0 && _release_enabled == true) {
+					if ((_frame_buttons & JFB_CLOSE) != 0 && _release_enabled == true) {
 						Release();
 					}
 				} else if (event->GetX() > lwidth) {
 					_default_cursor = GetCursor();
-					SetCursor(WE_CURSOR);
+					SetCursor(JCS_WE);
 
 					_mouse_state = 3; // horizontal resize
 					_relative_mouse_x = event->GetX()-GetX();
@@ -479,7 +479,7 @@ void Frame::MousePressed(MouseEvent *event)
 				if (event->GetX() > lwidth) {
 					if (event->GetY() > lheight) {
 						_default_cursor = GetCursor();
-						SetCursor(SE_CORNER_CURSOR);
+						SetCursor(JCS_SE_CORNER);
 
 						_mouse_state = 2; // both resize
 						_relative_mouse_x = event->GetX()-GetX();
@@ -488,7 +488,7 @@ void Frame::MousePressed(MouseEvent *event)
 						_relative_mouse_h = _size.height;
 					} else {
 						_default_cursor = GetCursor();
-						SetCursor(WE_CURSOR);
+						SetCursor(JCS_WE);
 
 						_mouse_state = 3; // horizontal resize
 						_relative_mouse_x = event->GetX()-GetX();
@@ -499,7 +499,7 @@ void Frame::MousePressed(MouseEvent *event)
 				}
 			} else if (event->GetY() > lheight) {
 				_default_cursor = GetCursor();
-				SetCursor(NS_CURSOR);
+				SetCursor(JCS_NS);
 
 				_mouse_state = 4; // vertical resize
 				_relative_mouse_x = event->GetX()-GetX();
@@ -535,7 +535,7 @@ void Frame::MouseReleased(MouseEvent *event)
 	}
 	
 	if (_mouse_state != 0) {
-		if (event->GetButton() == JMOUSE_BUTTON1) {
+		if (event->GetButton() == JMB_BUTTON1) {
 			SetCursor(_default_cursor);
 
 			_relative_mouse_x = 0;

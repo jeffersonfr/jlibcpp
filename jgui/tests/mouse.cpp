@@ -107,7 +107,7 @@ class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			g->SetDrawingFlags(jgui::DF_BLEND);
+			g->SetDrawingFlags(jgui::JDF_BLEND);
 
 			g->Clear();
 			

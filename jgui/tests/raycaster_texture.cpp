@@ -759,7 +759,7 @@ class GraphicsTeste : public jgui::Frame{
 			int w = _size.width,
 					h = _size.height;
 
-			g->SetDrawingFlags(jgui::DF_NOFX);
+			g->SetDrawingFlags(jgui::JDF_NOFX);
 
 			//start the main loop
 			for(int x = 0; x < w; x++) {
@@ -999,7 +999,7 @@ class GraphicsTeste : public jgui::Frame{
 		{
 			jthread::AutoLock lock(&teste_mutex);
 
-			if (event->GetType() != jgui::JKEY_PRESSED) {
+			if (event->GetType() != jgui::JKT_PRESSED) {
 				return;
 			}
 
@@ -1008,21 +1008,21 @@ class GraphicsTeste : public jgui::Frame{
 			double moveSpeed = frameTime * 2.0;			//the constant value is in squares/second
 			double rotSpeed = frameTime * 1.0;			//the constant value is in radians/second
 
-			if (event->GetSymbol() == jgui::JKEY_CURSOR_UP) {
+			if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
 				if (worldMap[int(posX + dirX * moveSpeed)][int(posY)] == false) {
 					posX += dirX * moveSpeed;
 				}
 				if (worldMap[int(posX)][int(posY + dirY * moveSpeed)] == false) {
 					posY += dirY * moveSpeed;
 				}
-			} else if (event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
 				if (worldMap[int(posX - dirX * moveSpeed)][int(posY)] == false) {
 					posX -= dirX * moveSpeed;
 				}
 				if (worldMap[int(posX)][int(posY - dirY * moveSpeed)] == false) {
 					posY -= dirY * moveSpeed;
 				}
-			} else if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 				//both camera direction and camera plane must be rotated
 				double oldDirX = dirX;
 				dirX = dirX * cos(rotSpeed) - dirY * sin(rotSpeed);
@@ -1030,7 +1030,7 @@ class GraphicsTeste : public jgui::Frame{
 				double oldPlaneX = planeX;
 				planeX = planeX * cos(rotSpeed) - planeY * sin(rotSpeed);
 				planeY = oldPlaneX * sin(rotSpeed) + planeY * cos(rotSpeed);
-			} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
 				//both camera direction and camera plane must be rotated
 				double oldDirX = dirX;
 				dirX = dirX * cos(-rotSpeed) - dirY * sin(-rotSpeed);

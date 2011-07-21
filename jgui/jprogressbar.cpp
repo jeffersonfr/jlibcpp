@@ -23,7 +23,7 @@
 
 namespace jgui {
 
-ProgressBar::ProgressBar(int x, int y, int width, int height, jprogress_type_t type):
+ProgressBar::ProgressBar(int x, int y, int width, int height, jscroll_orientation_t type):
    	Component(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::ProgressBar");
@@ -41,6 +41,22 @@ ProgressBar::~ProgressBar()
 {
 	SetVisible(false);
 	WaitThread();
+}
+
+void ProgressBar::SetScrollOrientation(jscroll_orientation_t type)
+{
+	if (_type == type) {
+		return;
+	}
+
+	_type = type;
+
+	Repaint(true);
+}
+
+jscroll_orientation_t ProgressBar::GetScrollOrientation()
+{
+	return _type;
 }
 
 double ProgressBar::GetValue()
@@ -167,7 +183,7 @@ void ProgressBar::Paint(Graphics *g)
 	std::string text;
 
 	if (_indeterminate == false) {
-		if (_type == LEFT_RIGHT_DIRECTION) {
+		if (_type == JSO_HORIZONTAL) {
 			double d = (_value*w)/100.0;
 
 			if (d > w) {
@@ -186,7 +202,7 @@ void ProgressBar::Paint(Graphics *g)
 #endif
 
 			text = (char *)t;
-		} else if (_type == BOTTOM_UP_DIRECTION) {
+		} else if (_type == JSO_VERTICAL) {
 			double d = (_value*h)/100.0;
 
 			if (d > h) {
@@ -237,7 +253,7 @@ void ProgressBar::Paint(Graphics *g)
 			g->DrawString(text, px, py, pw, ph);
 		}
 	} else {
-		if (_type == LEFT_RIGHT_DIRECTION) {
+		if (_type == JSO_HORIZONTAL) {
 			_index = _index + _delta;
 
 			if (_index > (w-40)) {
@@ -252,8 +268,8 @@ void ProgressBar::Paint(Graphics *g)
 
 			g->SetColor(color);
 			g->FillRectangle(x+_index, y, 40, h);
-		} else if (_type == BOTTOM_UP_DIRECTION) {
-			if (_type == BOTTOM_UP_DIRECTION) {
+		} else if (_type == JSO_VERTICAL) {
+			if (_type == JSO_VERTICAL) {
 				_index = _index + _delta;
 
 				if (_index > (h-40)) {

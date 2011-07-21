@@ -223,7 +223,7 @@ int inpi_extract_process(std::string filename)
 				
 				while ((r = file.Read((char *)&c, 1)) != EOF && r != 0 && c != '\n');
 				
-				File temp(filename, F_WRITE_ONLY | F_CREATE);
+				File temp(filename, JFF_WRITE_ONLY | JFF_CREATE);
 				
 				do {
 					while ((r = file.Read((char *)&c, 1)) != EOF && r != 0 && c != '/') {

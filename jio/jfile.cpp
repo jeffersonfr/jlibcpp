@@ -31,7 +31,7 @@ File::File(std::string filename_, int flags_):
 {
 	jcommon::Object::SetClassName("jio::File");
 	
-	_type = F_UNKNOWN;
+	_type = JFT_UNKNOWN;
 	_is_closed = true;
 	_exists = false;
 	
@@ -108,55 +108,55 @@ File::File(std::string filename_, int flags_):
 
 	flags_ = 0;
 
-	if ((opt & F_WRITE_ONLY) != 0) {
+	if ((opt & JFF_WRITE_ONLY) != 0) {
 		flags_ |= O_WRONLY;
 	}
 
-	if ((opt & F_READ_ONLY) != 0) {
+	if ((opt & JFF_READ_ONLY) != 0) {
 		flags_ |= O_RDONLY;
 	}
 	
-	if ((opt & F_READ_WRITE) != 0) {
+	if ((opt & JFF_READ_WRITE) != 0) {
 		flags_ |= O_RDWR;
 	}
 	
-	if ((opt & F_EXCLUSIVE) != 0) {
+	if ((opt & JFF_EXCLUSIVE) != 0) {
 		flags_ |= O_EXCL;
 	}
 	
-	if ((opt & F_TRUNCATE) != 0) {
+	if ((opt & JFF_TRUNCATE) != 0) {
 		flags_ |= O_TRUNC;
 	}
 	
-	if ((opt & F_APPEND) != 0) {
+	if ((opt & JFF_APPEND) != 0) {
 		flags_ |= O_APPEND;
 	}
 	
-	if ((opt & F_NON_BLOCK) != 0) {
+	if ((opt & JFF_NON_BLOCK) != 0) {
 		flags_ |= O_NONBLOCK;
 	}
 	
-	if ((opt & F_SYNC) != 0) {
+	if ((opt & JFF_SYNC) != 0) {
 		flags_ |= O_SYNC;
 	}
 	
-	if ((opt & F_NON_FOLLOW) != 0) {
+	if ((opt & JFF_NON_FOLLOW) != 0) {
 		flags_ |= O_NOFOLLOW;
 	}
 	
-	if ((opt & F_DIR) != 0) {
+	if ((opt & JFF_DIR) != 0) {
 		flags_ |= O_DIRECTORY;
 	}
 	
-	if ((opt & F_ASYNC) != 0) {
+	if ((opt & JFF_ASYNC) != 0) {
 		flags_ |= O_ASYNC;
 	}
 	
-	if ((opt & F_LARGEFILE) != 0) {
+	if ((opt & JFF_LARGEFILE) != 0) {
 		flags_ |= O_LARGEFILE;
 	}
 	
-	if ((opt & F_CREATE) != 0) {
+	if ((opt & JFF_CREATE) != 0) {
 		flags_ |= O_CREAT;
 	}
 
@@ -178,23 +178,23 @@ File::File(std::string filename_, int flags_):
 	_exists = true;
 
 	if ((r & FILE_ATTRIBUTE_NORMAL) != 0) {
-		_type = F_REGULAR;
+		_type = JFT_REGULAR;
 	} else if ((r & FILE_ATTRIBUTE_DIRECTORY) != 0) {
-		_type = F_DIRECTORY;
+		_type = JFT_DIRECTORY;
 	} else if ((r & FILE_ATTRIBUTE_DEVICE) != 0) {
-		_type = F_CHAR_DEVICE;
+		_type = JFT_CHAR_DEVICE;
 	} else if ((r & FILE_ATTRIBUTE_COMPRESSED) != 0) {
-		_type = F_COMPRESS;
+		_type = JFT_COMPRESS;
 	} else if ((r & FILE_ATTRIBUTE_ENCRYPTED) != 0) {
-		_type = F_ENCRYPTED;
+		_type = JFT_ENCRYPTED;
 	} else if ((r & FILE_ATTRIBUTE_HIDDEN) != 0) {
-		_type = F_HIDDEN;
+		_type = JFT_HIDDEN;
 	} else if ((r & FILE_ATTRIBUTE_OFFLINE) != 0) {
-		_type = F_OFFLINE;
+		_type = JFT_OFFLINE;
 	} else if ((r & FILE_ATTRIBUTE_SYSTEM) != 0) {
-		_type = F_SYSTEM;
+		_type = JFT_SYSTEM;
 	} else {
-		_type = F_UNKNOWN;
+		_type = JFT_UNKNOWN;
 	}
 #else
 	if (stat(_filename.c_str(), &_stat) < 0) {
@@ -204,24 +204,24 @@ File::File(std::string filename_, int flags_):
 	_exists = true;
 
 	if (S_ISREG(_stat.st_mode)) {
-		_type = F_REGULAR;
+		_type = JFT_REGULAR;
 	} else if (S_ISDIR(_stat.st_mode)) {
-		_type = F_DIRECTORY;
+		_type = JFT_DIRECTORY;
 	} else if (S_ISCHR(_stat.st_mode)) {
-		_type = F_CHAR_DEVICE;
+		_type = JFT_CHAR_DEVICE;
 	} else if (S_ISBLK(_stat.st_mode)) {
-		_type = F_BLOCK_DEVICE;
+		_type = JFT_BLOCK_DEVICE;
 	} else if (S_ISFIFO(_stat.st_mode)) {
-		_type = F_FIFO;
+		_type = JFT_FIFO;
 	} else if (S_ISLNK(_stat.st_mode)) {
-		_type = F_SYMBOLIC_LINK;
+		_type = JFT_SYMBOLIC_LINK;
 	} else if (S_ISSOCK(_stat.st_mode)) {
-		_type = F_SOCKET;
+		_type = JFT_SOCKET;
 	} else {
-		_type = F_UNKNOWN;
+		_type = JFT_UNKNOWN;
 	}
 
-	if (_type == F_DIRECTORY) {
+	if (_type == JFT_DIRECTORY) {
 		close(_fd);
 
 		_dir = opendir(_filename.c_str());
@@ -239,7 +239,7 @@ File::File(std::string prefix, std::string sufix, bool is_directory):
 {
 	jcommon::Object::SetClassName("jio::File");
 	
-	_type = F_UNKNOWN;
+	_type = JFT_UNKNOWN;
 	_is_closed = true;
 	_exists = false;
 	
@@ -305,7 +305,7 @@ File::File(std::string prefix, std::string sufix, bool is_directory):
 			_exists = true;
 		}
 
-		_type = F_REGULAR;
+		_type = JFT_REGULAR;
 	} else {
 		_dir = opendir(_filename.c_str());
 
@@ -314,7 +314,7 @@ File::File(std::string prefix, std::string sufix, bool is_directory):
 			_exists = true;
 		}
 
-		_type = F_DIRECTORY;
+		_type = JFT_DIRECTORY;
 	}
 
 	delete tmp;
@@ -420,7 +420,7 @@ std::string File::NormalizePath(std::string pathname)
 
 std::string File::ProcessPath(std::string pathname)
 {
-	jcommon::StringTokenizer tokens(NormalizePath(pathname), GetDelimiter(), jcommon::SPLIT_FLAG, false);
+	jcommon::StringTokenizer tokens(NormalizePath(pathname), GetDelimiter(), jcommon::JTT_STRING, false);
 	std::vector<std::string> path;
 	std::vector<std::string>::iterator ipath;
 
@@ -560,7 +560,7 @@ bool File::IsDirectory()
 	return (stbuf.st_mode & _S_IFDIR) != 0;
 	*/
 #else
-	return (_type == F_DIRECTORY);
+	return (_type == JFT_DIRECTORY);
 #endif
 }
 
@@ -736,7 +736,7 @@ void File::Close()
 #ifdef _WIN32
 	CloseHandle(_fd);
 #else
-	if (_type == F_DIRECTORY) {
+	if (_type == JFT_DIRECTORY) {
 		if (_dir != NULL) {
 			closedir(_dir);
 			_dir = NULL;
@@ -884,7 +884,7 @@ void File::Rename(std::string newpath_)
 #ifdef _WIN32
 	MoveFile(o.c_str(), newpath_.c_str());
 #else
-	if (_type != F_DIRECTORY) {
+	if (_type != JFT_DIRECTORY) {
 		o += "/";
 	}
 

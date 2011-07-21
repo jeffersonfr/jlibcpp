@@ -221,22 +221,22 @@ class GraphicsTeste : public jgui::Frame{
 			}
 
 			/*
-			if (event->GetSymbol() == jgui::JKEY_ENTER) {
-			} else if (event->GetSymbol() == jgui::JKEY_a) {
+			if (event->GetSymbol() == jgui::JKS_ENTER) {
+			} else if (event->GetSymbol() == jgui::JKS_a) {
 					GiraCubo_z(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, -angulo);
-			} else if (event->GetSymbol() == jgui::JKEY_s) {
+			} else if (event->GetSymbol() == jgui::JKS_s) {
 					GiraCubo_z(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, angulo);
-			} else if (event->GetSymbol() == jgui::JKEY_d) {
+			} else if (event->GetSymbol() == jgui::JKS_d) {
 					GiraCubo_y(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, -angulo);
-			} else if (event->GetSymbol() == jgui::JKEY_f) {
+			} else if (event->GetSymbol() == jgui::JKS_f) {
 					GiraCubo_y(&p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4, angulo);
-			} else if (event->GetSymbol() == jgui::JKEY_g) {
+			} else if (event->GetSymbol() == jgui::JKS_g) {
 					TAM *= 1.25;
-			} else if (event->GetSymbol() == jgui::JKEY_h) {
+			} else if (event->GetSymbol() == jgui::JKS_h) {
 					TAM /= 1.25;
-			} else if (event->GetSymbol() == jgui::JKEY_j) {
+			} else if (event->GetSymbol() == jgui::JKS_j) {
 					teta *= 1.25;
-			} else if (event->GetSymbol() == jgui::JKEY_k) {
+			} else if (event->GetSymbol() == jgui::JKS_k) {
 					fi *= 1.25;
 			}
 

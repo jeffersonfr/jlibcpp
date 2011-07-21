@@ -34,7 +34,7 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 	SetWorkingScreenSize(scale_width, scale_height);
 
 	_focus = NULL;
-	_orientation = LEFT_TO_RIGHT_ORIENTATION;
+	_orientation = JCO_LEFT_TO_RIGHT;
 	_scroll.x = 0;
 	_scroll.y = 0;
 	_layout = NULL;
@@ -50,7 +50,7 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 	_insets.bottom = 0;
 
 	SetBackgroundVisible(false);
-	SetBorder(EMPTY_BORDER);
+	SetBorder(JCB_EMPTY);
 }
 
 Container::~Container()
@@ -358,7 +358,7 @@ void Container::Repaint(bool all)
 		}
 	}
 
-	Component::DispatchComponentEvent(new ComponentEvent(this, COMPONENT_PAINTED_EVENT));
+	Component::DispatchComponentEvent(new ComponentEvent(this, JCE_PAINTED));
 }
 
 void Container::Repaint(int x, int y, int width, int height)
@@ -414,7 +414,7 @@ void Container::Add(Component *c, int index)
 			c->SetParent(this);
 		}
 
-		DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_ADDED_EVENT));
+		DispatchContainerEvent(new ContainerEvent(this, c, JCT_COMPONENT_ADDED));
 	}
 }
 
@@ -498,7 +498,7 @@ void Container::Remove(jgui::Component *c)
 
 			_components.erase(i);
 
-			DispatchContainerEvent(new ContainerEvent(this, c, jgui::COMPONENT_REMOVED_EVENT));
+			DispatchContainerEvent(new ContainerEvent(this, c, JCT_COMPONENT_REMOVED));
 
 			return;
 		}
@@ -573,7 +573,7 @@ void Container::RequestComponentFocus(jgui::Component *c)
 
 		Repaint();
 		
-		dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, GAINED_FOCUS_EVENT));
+		dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, JFE_GAINED));
 	}
 }
 
@@ -591,7 +591,7 @@ void Container::ReleaseComponentFocus(jgui::Component *c)
 		if (_focus != NULL && _focus == c) {
 			_focus->Repaint();
 
-			dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, LOST_FOCUS_EVENT));
+			dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, JFE_LOST));
 		}
 
 		_focus = NULL;
@@ -715,9 +715,9 @@ void Container::DispatchContainerEvent(ContainerEvent *event)
 	while (k++ < (int)_container_listeners.size()) {
 		ContainerListener *listener = _container_listeners[k-1];
 
-		if (event->GetType() == COMPONENT_ADDED_EVENT) {
+		if (event->GetType() == JCT_COMPONENT_ADDED) {
 			listener->ComponentAdded(event);
-		} else if (event->GetType() == COMPONENT_ADDED_EVENT) {
+		} else if (event->GetType() == JCT_COMPONENT_ADDED) {
 			listener->ComponentRemoved(event);
 		}
 
@@ -730,9 +730,9 @@ void Container::DispatchContainerEvent(ContainerEvent *event)
 
 	/*
 	for (std::vector<ContainerListener *>::iterator i=_container_listeners.begin(); i!=_container_listeners.end(); i++) {
-		if (event->GetType() == COMPONENT_ADDED_EVENT) {
+		if (event->GetType() == JCT_COMPONENT_ADDED) {
 			(*i)->ComponentAdded(event);
-		} else if (event->GetType() == COMPONENT_ADDED_EVENT) {
+		} else if (event->GetType() == JCT_COMPONENT_ADDED) {
 			(*i)->ComponentRemoved(event);
 		}
 	}

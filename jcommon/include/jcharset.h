@@ -40,16 +40,16 @@ typedef uint32_t	Char; 		// 0 or 1
 #define UNI_MAX_LEGAL_UTF32 (UTF32)0x0010FFFF
 
 enum jcharset_result_t {
-	CS_OK, 					// conversion successful 
-	CS_SOURCE_EXHAUSTED,	// partial character in source, but hit end 
-	CS_TARGET_EXHAUSTED,	// insuff. room in target for conversion 
-	CS_SOURCE_ILLEGAL,		// source sequence is illegal/malformed 
-	CS_SOURCE_CORRUPT		// source was corrupted 
+	JCR_OK, 					// conversion successful 
+	JCR_SOURCE_EXHAUSTED,	// partial character in source, but hit end 
+	JCR_TARGET_EXHAUSTED,	// insuff. room in target for conversion 
+	JCR_SOURCE_ILLEGAL,		// source sequence is illegal/malformed 
+	JCR_SOURCE_CORRUPT		// source was corrupted 
 };
 
 enum jcharset_flags_t {
-	strictConversion = 0,
-	lenientConversion
+	JCF_STRICT_CONVERSION = 0,
+	JCF_LENIENT_CONVERSION,
 };
 
 enum {

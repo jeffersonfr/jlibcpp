@@ -39,20 +39,20 @@
 namespace jshared {
 
 enum jprocess_type_t {
-	CHILD_PROCESS,
-	PARENT_PROCESS
+	JPT_CHILD,
+	JPT_PARENT
 };
 
 enum jprocess_mode_t {
-	AUTO_FLUSH_MODE,
-	WAIT_ANY_INPUT_MODE, 
-	WAIT_ALL_INPUT_MODE, 
-	TRY_ONCE_MODE
+	JPM_AUTO_FLUSH,
+	JPM_WAIT_ANY_INPUT, 
+	JPM_WAIT_ALL_INPUT, 
+	JPM_TRY_ONCE
 };
   
 enum jprocess_flag_t {
-	CREATE_PROCESS,	// \brief Create a new process
-	LOCK_PROCESS		// \brief Create a new process and block parent
+	JPF_CREATE,	// \brief Create a new process
+	JPF_LOCK		// \brief Create a new process and block parent
 };
 
 /**

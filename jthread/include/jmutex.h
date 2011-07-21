@@ -34,15 +34,15 @@
 namespace jthread {
 
 enum jmutex_type_t {
-    FAST_MUTEX,
-    RECURSIVE_MUTEX,
-    ERROR_CHECK_MUTEX
+	JMT_FAST,
+	JMT_RECURSIVE,
+	JMT_ERROR_CHECK
 };
 
 enum jmutex_protocol_t {
-	NONE_PROT_MUTEX,
-	INHERIT_PROT_MUTEX,
-	PROTECT_PROT_MUTEX
+	JMP_NONE,
+	JMP_INHERIT,
+	JMP_PROTECT
 };
 
 /**
@@ -72,7 +72,7 @@ class Mutex : public virtual jcommon::Object{
 		 * \brief Construtor.
 		 *
 		 */
-		Mutex(jmutex_type_t = ERROR_CHECK_MUTEX, jmutex_protocol_t protocol_ = NONE_PROT_MUTEX, bool block_in_death = false);
+		Mutex(jmutex_type_t = JMT_ERROR_CHECK, jmutex_protocol_t protocol_ = JMP_NONE, bool block_in_death = false);
 
 		/**
 		 * \brief Destrutor virtual.

@@ -32,7 +32,7 @@
 namespace jsocket {
 
 LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(UDP_SOCKET)
+	jsocket::Connection(JCT_UDP)
 {
 	jcommon::Object::SetClassName("jsocket::DatagramSocket");
 	
@@ -56,7 +56,7 @@ LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server,
 }
 
 LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(UDP_SOCKET)
+	jsocket::Connection(JCT_UDP)
 {
 	jcommon::Object::SetClassName("jsocket::DatagramSocket");
 	
@@ -364,7 +364,7 @@ SocketOption * LocalDatagramSocket::GetSocketOption()
 		throw SocketException("Connection is closed");
 	}
 
-	return new SocketOption(_fd, UDP_SOCKET);
+	return new SocketOption(_fd, JCT_UDP);
 }
 
 }

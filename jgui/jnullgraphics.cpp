@@ -177,24 +177,24 @@ jdrawing_flags_t NullGraphics::GetDrawingFlags()
 {
 	JDEBUG(JINFO, "called\n");
 	
-	return DF_NOFX;
+	return JDF_NOFX;
 }
 
 jblitting_flags_t NullGraphics::GetBlittingFlags()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return BF_NOFX;
+	return JBF_NOFX;
 }
 
-jporter_duff_flags_t NullGraphics::GetPorterDuffFlags()
+jporterduff_flags_t NullGraphics::GetPorterDuffFlags()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return PDF_NONE;
+	return JPF_NONE;
 }
 
-void NullGraphics::SetPorterDuffFlags(jporter_duff_flags_t t)
+void NullGraphics::SetPorterDuffFlags(jporterduff_flags_t t)
 {
 	JDEBUG(JINFO, "called\n");
 }

@@ -303,8 +303,8 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 	virtual void InputReceived(jgui::KeyEvent *event)
 	{
-		if (event->GetType() == jgui::JKEY_PRESSED) {
-			if (event->GetSymbol() == jgui::JKEY_ESCAPE) {
+		if (event->GetType() == jgui::JKT_PRESSED) {
+			if (event->GetSymbol() == jgui::JKS_ESCAPE) {
 				flag = false;
 
 				jgui::Frame::Release();
@@ -313,32 +313,32 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 			}
 
 			if (ingame) {
-				if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT) {
+				if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 					reqdx=-1;
 					reqdy=0;
-				} else if (event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT) {
+				} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
 					reqdx=1;
 					reqdy=0;
-				} else if (event->GetSymbol() == jgui::JKEY_CURSOR_UP) {
+				} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
 					reqdx=0;
 					reqdy=-1;
-				} else if (event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
+				} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
 					reqdx=0;
 					reqdy=1;
-				} else if (event->GetSymbol() == jgui::JKEY_ESCAPE) {
+				} else if (event->GetSymbol() == jgui::JKS_ESCAPE) {
 					ingame=false;
 				}
 			} else {
-				if (event->GetSymbol() == jgui::JKEY_s) {
+				if (event->GetSymbol() == jgui::JKS_s) {
 					ingame=true;
 					GameInit();
 				}
 			}
-		} else if (event->GetType() == jgui::JKEY_RELEASED) {
-			if (event->GetSymbol() == jgui::JKEY_CURSOR_LEFT || 
-				event->GetSymbol() == jgui::JKEY_CURSOR_RIGHT || 
-				event->GetSymbol() == jgui::JKEY_CURSOR_UP || 
-				event->GetSymbol() == jgui::JKEY_CURSOR_DOWN) {
+		} else if (event->GetType() == jgui::JKT_RELEASED) {
+			if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT || 
+				event->GetSymbol() == jgui::JKS_CURSOR_RIGHT || 
+				event->GetSymbol() == jgui::JKS_CURSOR_UP || 
+				event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
 				/*
 				reqdx=0;
 				reqdy=0;
@@ -551,7 +551,7 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		x_index = x_index*blocksize;
 		y_index = y_index*blocksize;
 
-		goff->SetPorterDuffFlags(jgui::PDF_NONE);
+		goff->SetPorterDuffFlags(jgui::JPF_NONE);
 
 		goff->DrawImage(ghost_bmp, x_index, y_index, blocksize, blocksize, x, y, blocksize, blocksize);
 	}

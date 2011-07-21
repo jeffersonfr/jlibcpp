@@ -1393,18 +1393,18 @@ class SortComponent : public jgui::Component, public jthread::Thread, public jco
 
 			bool catched = false;
 
-			if (event->GetType() == jgui::JMOUSE_PRESSED_EVENT) {
+			if (event->GetType() == jgui::JME_PRESSED) {
 				catched = true;
 
 				RequestFocus();
 
-				if (event->GetButton() == jgui::JMOUSE_BUTTON1) {
+				if (event->GetButton() == jgui::JMB_BUTTON1) {
 					if (IsRunning() == false) {
 						Start();
 					} else {
 						Stop();
 					}
-				} else if (event->GetButton() == jgui::JMOUSE_BUTTON2) {
+				} else if (event->GetButton() == jgui::JMB_BUTTON2) {
 					Stop();
 					Reset();
 				}

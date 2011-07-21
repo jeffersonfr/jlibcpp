@@ -22,7 +22,7 @@
 
 namespace jgui {
 
-ContainerEvent::ContainerEvent(void *source, Component *component, jframe_event_t type):
+ContainerEvent::ContainerEvent(void *source, Component *component, jcontainerevent_type_t type):
 	jcommon::EventObject(source)
 {
 	jcommon::Object::SetClassName("jgui::ContainerEvent");
@@ -35,7 +35,7 @@ ContainerEvent::~ContainerEvent()
 {
 }
 
-jframe_event_t ContainerEvent::GetType()
+jcontainerevent_type_t ContainerEvent::GetType()
 {
 	return _type;
 }

@@ -30,8 +30,8 @@ Button::Button(std::string label, int x, int y, int width, int height):
 	jcommon::Object::SetClassName("jgui::Button");
 
 	_wrap = false;
-	_halign = CENTER_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_CENTER;
+	_valign = JVA_CENTER;
 
 	_name = label;
 	_label = label;
@@ -103,7 +103,7 @@ bool Button::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JMOUSE_PRESSED_EVENT && event->GetButton() == JMOUSE_BUTTON1) {
+	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		RequestFocus();
@@ -125,7 +125,7 @@ bool Button::ProcessEvent(KeyEvent *event)
 
 	bool catched = false;
 
-	if (event->GetSymbol() == JKEY_ENTER) {
+	if (event->GetSymbol() == JKS_ENTER) {
 		DispatchButtonEvent(new ButtonEvent(this));
 
 		catched = true;

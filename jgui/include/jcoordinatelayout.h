@@ -34,8 +34,8 @@ namespace jgui {
  *
  */
 enum jcoordinate_layout_t {
-	CL_HORIZONTAL	= 1,
-	CL_VERTICAL		= 2
+	JCL_HORIZONTAL	= 1,
+	JCL_VERTICAL		= 2
 };
 
 /**
@@ -55,7 +55,7 @@ class CoordinateLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		CoordinateLayout(int width = -1, int height = -1, jcoordinate_layout_t type = (jcoordinate_layout_t)(CL_HORIZONTAL | CL_VERTICAL));
+		CoordinateLayout(int width = -1, int height = -1, jcoordinate_layout_t type = (jcoordinate_layout_t)(JCL_HORIZONTAL | JCL_VERTICAL));
 		
 		/**
 		 * \brief

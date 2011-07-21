@@ -119,13 +119,13 @@ Graphics::Graphics():
 
 	_font = NULL;
 
-	_line_join = BEVEL_JOIN;
-	_line_style = SOLID_LINE;
+	_line_join = JLJ_BEVEL;
+	_line_style = JLS_SOLID;
 	_line_width = 1;
 
-	SetDrawingFlags(DF_BLEND);
-	SetBlittingFlags(BF_ALPHACHANNEL);
-	SetPorterDuffFlags(PDF_SRC_OVER);
+	SetDrawingFlags(JDF_BLEND);
+	SetBlittingFlags(JBF_ALPHACHANNEL);
+	SetPorterDuffFlags(JPF_SRC_OVER);
 }
 
 Graphics::Graphics(void *surface, bool premultiplied):
@@ -159,13 +159,13 @@ Graphics::Graphics(void *surface, bool premultiplied):
 
 	_font = NULL;
 
-	_line_join = BEVEL_JOIN;
-	_line_style = SOLID_LINE;
+	_line_join = JLJ_BEVEL;
+	_line_style = JLS_SOLID;
 	_line_width = 1;
 
-	SetDrawingFlags(DF_BLEND);
-	SetBlittingFlags(BF_ALPHACHANNEL);
-	SetPorterDuffFlags(PDF_SRC_OVER);
+	SetDrawingFlags(JDF_BLEND);
+	SetBlittingFlags(JBF_ALPHACHANNEL);
+	SetPorterDuffFlags(JPF_SRC_OVER);
 }
 
 Graphics::~Graphics()
@@ -296,37 +296,37 @@ void Graphics::ReleaseClip()
 #endif
 }
 
-void Graphics::SetPorterDuffFlags(jporter_duff_flags_t t)
+void Graphics::SetPorterDuffFlags(jporterduff_flags_t t)
 {
-	_porter_duff_flags = t;
+	_porterduff_flags = t;
 
 #ifdef DIRECTFB_UI
 	if (surface != NULL) {
-		if (_porter_duff_flags == PDF_NONE) {
+		if (_porterduff_flags == JPF_NONE) {
 			surface->SetPorterDuff(surface, DSPD_NONE);
-		} else if (_porter_duff_flags == PDF_CLEAR) {
+		} else if (_porterduff_flags == JPF_CLEAR) {
 			surface->SetPorterDuff(surface, DSPD_CLEAR);
-		} else if (_porter_duff_flags == PDF_SRC) {
+		} else if (_porterduff_flags == JPF_SRC) {
 			surface->SetPorterDuff(surface, DSPD_SRC);
-		} else if (_porter_duff_flags == PDF_SRC_OVER) {
+		} else if (_porterduff_flags == JPF_SRC_OVER) {
 			surface->SetPorterDuff(surface, DSPD_SRC_OVER);
-		} else if (_porter_duff_flags == PDF_DST_OVER) {
+		} else if (_porterduff_flags == JPF_DST_OVER) {
 			surface->SetPorterDuff(surface, DSPD_DST_OVER);
-		} else if (_porter_duff_flags == PDF_SRC_IN) {
+		} else if (_porterduff_flags == JPF_SRC_IN) {
 			surface->SetPorterDuff(surface, DSPD_SRC_IN);
-		} else if (_porter_duff_flags == PDF_DST_IN) {
+		} else if (_porterduff_flags == JPF_DST_IN) {
 			surface->SetPorterDuff(surface, DSPD_DST_IN);
-		} else if (_porter_duff_flags == PDF_SRC_OUT) {
+		} else if (_porterduff_flags == JPF_SRC_OUT) {
 			surface->SetPorterDuff(surface, DSPD_SRC_OUT);
-		} else if (_porter_duff_flags == PDF_DST_OUT) {
+		} else if (_porterduff_flags == JPF_DST_OUT) {
 			surface->SetPorterDuff(surface, DSPD_DST_OUT);
-		} else if (_porter_duff_flags == PDF_SRC_ATOP) {
+		} else if (_porterduff_flags == JPF_SRC_ATOP) {
 			surface->SetPorterDuff(surface, DSPD_SRC_ATOP);
-		} else if (_porter_duff_flags == PDF_DST_ATOP) {
+		} else if (_porterduff_flags == JPF_DST_ATOP) {
 			surface->SetPorterDuff(surface, DSPD_DST_ATOP);
-		} else if (_porter_duff_flags == PDF_ADD) {
+		} else if (_porterduff_flags == JPF_ADD) {
 			surface->SetPorterDuff(surface, DSPD_ADD);
-		} else if (_porter_duff_flags == PDF_XOR) {
+		} else if (_porterduff_flags == JPF_XOR) {
 			surface->SetPorterDuff(surface, DSPD_XOR);
 		}
 	}
@@ -341,9 +341,9 @@ void Graphics::SetDrawingFlags(jdrawing_flags_t t)
 	if (surface != NULL) {
 		DFBSurfaceDrawingFlags flags = (DFBSurfaceDrawingFlags)DSDRAW_NOFX;
 
-		if (_draw_flags == DF_BLEND) {
+		if (_draw_flags == JDF_BLEND) {
 			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_BLEND);
-		} else if (_draw_flags == DF_XOR) {
+		} else if (_draw_flags == JDF_XOR) {
 			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_XOR);
 		}
 		
@@ -364,19 +364,19 @@ void Graphics::SetBlittingFlags(jblitting_flags_t t)
 	if (surface != NULL) {
 		DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
 
-		if (_blit_flags & BF_ALPHACHANNEL) {
+		if (_blit_flags & JBF_ALPHACHANNEL) {
 			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_ALPHACHANNEL);
 		}
 
-		if (_blit_flags & BF_COLORALPHA) {
+		if (_blit_flags & JBF_COLORALPHA) {
 			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA);
 		} 
 
-		if (_blit_flags & BF_COLORIZE) {
+		if (_blit_flags & JBF_COLORIZE) {
 			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE);
 		}
 
-		if (_blit_flags & BF_XOR) {
+		if (_blit_flags & JBF_XOR) {
 			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
 		}
 
@@ -389,9 +389,9 @@ void Graphics::SetBlittingFlags(jblitting_flags_t t)
 #endif
 }
 
-jporter_duff_flags_t Graphics::GetPorterDuffFlags()
+jporterduff_flags_t Graphics::GetPorterDuffFlags()
 {
-	return _porter_duff_flags;
+	return _porterduff_flags;
 }
 
 jdrawing_flags_t Graphics::GetDrawingFlags()
@@ -708,9 +708,9 @@ void Graphics::DrawRectangle(int xp, int yp, int wp, int hp)
 {
 #ifdef DIRECTFB_UI
 	if (_line_width < 0) {
-		DrawRectangle0(xp, yp, wp, hp, 0, 0, MITER_JOIN, _line_width);
+		DrawRectangle0(xp, yp, wp, hp, 0, 0, JLJ_MITER, _line_width);
 	} else {
-		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*(_line_width-1), hp+2*(_line_width-1), 0, 0, MITER_JOIN, -_line_width);
+		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*(_line_width-1), hp+2*(_line_width-1), 0, 0, JLJ_MITER, -_line_width);
 	}
 #endif
 }
@@ -718,7 +718,7 @@ void Graphics::DrawRectangle(int xp, int yp, int wp, int hp)
 void Graphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
 {
 #ifdef DIRECTFB_UI
-	DrawRectangle0(xp, yp, wp, hp, dx, dy, BEVEL_JOIN, -std::max(wp, hp));
+	DrawRectangle0(xp, yp, wp, hp, dx, dy, JLJ_BEVEL, -std::max(wp, hp));
 #endif
 }
 
@@ -726,9 +726,9 @@ void Graphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 {
 #ifdef DIRECTFB_UI
 	if (_line_width < 0) {
-		DrawRectangle0(xp, yp, wp, hp, dx, dy, BEVEL_JOIN, _line_width);
+		DrawRectangle0(xp, yp, wp, hp, dx, dy, JLJ_BEVEL, _line_width);
 	} else {
-		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*(_line_width-1), hp+2*(_line_width-1), dx+_line_width, dy+_line_width, BEVEL_JOIN, -_line_width);
+		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*(_line_width-1), hp+2*(_line_width-1), dx+_line_width, dy+_line_width, JLJ_BEVEL, -_line_width);
 	}
 #endif
 }
@@ -736,7 +736,7 @@ void Graphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 void Graphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
 {
 #ifdef DIRECTFB_UI
-	DrawRectangle0(xp, yp, wp, hp, dx, dy, ROUND_JOIN, -std::max(wp, hp));
+	DrawRectangle0(xp, yp, wp, hp, dx, dy, JLJ_ROUND, -std::max(wp, hp));
 #endif
 }
 
@@ -744,9 +744,9 @@ void Graphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy
 {
 #ifdef DIRECTFB_UI
 	if (_line_width < 0) {
-		DrawRectangle0(xp, yp, wp, hp, dx, dy, ROUND_JOIN, _line_width);
+		DrawRectangle0(xp, yp, wp, hp, dx, dy, JLJ_ROUND, _line_width);
 	} else {
-		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*(_line_width-1), hp+2*(_line_width-1), dx+_line_width, dy+_line_width, ROUND_JOIN, -_line_width);
+		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*(_line_width-1), hp+2*(_line_width-1), dx+_line_width, dy+_line_width, JLJ_ROUND, -_line_width);
 	}
 #endif
 }
@@ -1117,7 +1117,7 @@ void Graphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double a
 
 	jline_join_t line_join = _line_join;
 
-	_line_join = BEVEL_JOIN;
+	_line_join = JLJ_BEVEL;
 
 	DrawPolygon(xcp, ycp, p, 3, false);
 
@@ -1219,12 +1219,12 @@ void Graphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
 		}
 
 		for (int i=0; i<npoints-opened; i++) {
-			if (_line_join == BEVEL_JOIN) {
+			if (_line_join == JLJ_BEVEL) {
 				FillTriangle(
 						xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
 						xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y, 
 						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
-			} else if (_line_join == ROUND_JOIN) {
+			} else if (_line_join == JLJ_ROUND) {
 				double dx0 = p[(i+1)%npoints].x-p[(i+0)%npoints].x,
 							 dy0 = p[(i+1)%npoints].y-p[(i+0)%npoints].y,
 							 dx1 = p[(i+2)%npoints].x-p[(i+1)%npoints].x,
@@ -1245,7 +1245,7 @@ void Graphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
 				}
 
 				FillArc(xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y+1, _line_width, _line_width-1, ang0, ang1);
-			} else if (_line_join == MITER_JOIN) {
+			} else if (_line_join == JLJ_MITER) {
 				int a1 = scaled[((i+0)%npoints)*2+0].y-scaled[((i+0)%npoints)*2+1].y,
 						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x,
 						c1 = scaled[((i+0)%npoints)*2+0].x*scaled[((i+0)%npoints)*2+1].y-scaled[((i+0)%npoints)*2+1].x*scaled[((i+0)%npoints)*2+0].y;
@@ -1393,7 +1393,7 @@ void Graphics::DrawString(std::string text, int xp, int yp)
 		return;
 	}
 
-	Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
+	Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), JSP_ARGB, _scale.width, _scale.height);
 
 	off->GetGraphics()->SetFont(_font);
 	off->GetGraphics()->SetColor(_color);
@@ -1444,7 +1444,7 @@ void Graphics::DrawGlyph(int symbol, int xp, int yp)
 
 	_font->_font->GetGlyphExtents(_font->_font, symbol, NULL, &advance);
 
-	Image *off = Image::CreateImage(advance, _font->GetAscender() + _font->GetDescender(), SPF_ARGB, _scale.width, _scale.height);
+	Image *off = Image::CreateImage(advance, _font->GetAscender() + _font->GetDescender(), JSP_ARGB, _scale.width, _scale.height);
 
 	off->GetGraphics()->SetFont(_font);
 	off->GetGraphics()->SetColor(_color);
@@ -1987,7 +1987,7 @@ void Graphics::GetStringBreak(std::vector<std::string> *lines, std::string text,
 		return;
 	}
 
-	jcommon::StringTokenizer token(text, "\n", jcommon::SPLIT_FLAG, false);
+	jcommon::StringTokenizer token(text, "\n", jcommon::JTT_STRING, false);
 
 	for (int i=0; i<token.GetSize(); i++) {
 		std::vector<std::string> words;
@@ -1997,8 +1997,8 @@ void Graphics::GetStringBreak(std::vector<std::string> *lines, std::string text,
 		line = jcommon::StringUtils::ReplaceString(line, "\n", "");
 		line = jcommon::StringUtils::ReplaceString(line, "\t", "    ");
 		
-		if (halign == JUSTIFY_HALIGN) {
-			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, false);
+		if (halign == JHA_JUSTIFY) {
+			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, false);
 
 			std::string temp,
 				previous;
@@ -2042,7 +2042,7 @@ void Graphics::GetStringBreak(std::vector<std::string> *lines, std::string text,
 
 			lines->push_back("\n" + temp);
 		} else {
-			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, true);
+			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, true);
 
 			std::string temp,
 				previous;
@@ -2128,19 +2128,19 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 	if (hp > (int)lines.size()*font_height) {
 		int nlines = (int)lines.size();
 
-		if (valign == TOP_VALIGN) {
+		if (valign == JVA_TOP) {
 			line_space = 0;
 			line_yinit = 0;
 			line_ydiff = 0;
-		} else if (valign == CENTER_VALIGN) {
+		} else if (valign == JVA_CENTER) {
 			line_space = 0;
 			line_yinit = (hp-nlines*font_height)/2;
 			line_ydiff = 0;
-		} else if (valign == BOTTOM_VALIGN) {
+		} else if (valign == JVA_BOTTOM) {
 			line_space = 0;
 			line_yinit = hp-nlines*font_height;
 			line_ydiff = 0;
-		} else if (valign == JUSTIFY_VALIGN) {
+		} else if (valign == JVA_JUSTIFY) {
 			if (nlines == 1) {
 				line_yinit = (hp-nlines*font_height)/2;
 			} else {
@@ -2178,13 +2178,13 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 		SetClip(cx, cy, cw, ch);
 	}
 	
-	if (halign == JUSTIFY_HALIGN) {
+	if (halign == JHA_JUSTIFY) {
 		std::string token_trim;
 			
 		dy = line_yinit;
 
 		for (int i=0; i<(int)lines.size() && i<max_lines; i++) {
-			jcommon::StringTokenizer token(lines[i], " ", jcommon::SPLIT_FLAG, false);
+			jcommon::StringTokenizer token(lines[i], " ", jcommon::JTT_STRING, false);
 
 
 			if (lines[i].find("\n") == 0) {
@@ -2233,11 +2233,11 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 			
 			int size = _font->GetStringWidth(text);
 
-			if (halign == LEFT_HALIGN) {
+			if (halign == JHA_LEFT) {
 				dx = 0;
-			} else if (halign == CENTER_HALIGN) {
+			} else if (halign == JHA_CENTER) {
 				dx = (wp-size)/2;
-			} else if (halign == RIGHT_HALIGN) {
+			} else if (halign == JHA_RIGHT) {
 				dx = wp-size;
 			}
 
@@ -2414,7 +2414,7 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 	double scale_x = (double)_scale.width/(double)_screen.width,
 				 scale_y = (double)_scale.height/(double)_screen.height;
 
-	if (_draw_flags == DF_NOFX) {
+	if (_draw_flags == JDF_NOFX) {
 		for (int j=0; j<h; j++) {
 			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
 			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
@@ -2423,7 +2423,7 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 				*(dst+x+i) = *(src+(int)(i*scale_x));
 			}
 		}
-	} else if (_draw_flags == DF_BLEND) {
+	} else if (_draw_flags == JDF_BLEND) {
 		for (int j=0; j<h; j++) {
 			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
 			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
@@ -2446,7 +2446,7 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 				*(dst+x+i) = 0xff000000 | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
 			}
 		}
-	} else if (_draw_flags == DF_XOR) {
+	} else if (_draw_flags == JDF_XOR) {
 		for (int j=0; j<h; j++) {
 			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
 			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
@@ -2473,12 +2473,12 @@ void Graphics::Reset()
 	_translate_image.y = 0;
 
 	_line_width = 1;
-	_line_join = BEVEL_JOIN;
-	_line_style = SOLID_LINE;
+	_line_join = JLJ_BEVEL;
+	_line_style = JLS_SOLID;
 
-	SetDrawingFlags(DF_BLEND);
-	SetBlittingFlags(BF_ALPHACHANNEL);
-	SetPorterDuffFlags(PDF_SRC_OVER);
+	SetDrawingFlags(JDF_BLEND);
+	SetBlittingFlags(JBF_ALPHACHANNEL);
+	SetPorterDuffFlags(JPF_SRC_OVER);
 }
 
 void Graphics::Lock()
@@ -2982,7 +2982,7 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 		close = true;
 	}
 
-	if (join == MITER_JOIN) {
+	if (join == JLJ_MITER) {
 		xp = xp + size;
 		yp = yp + size;
 		wp = wp - 2*size;
@@ -2996,7 +2996,7 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 		if (close == true) {
 			FillRectangle(xp, yp, wp, hp);
 		}
-	} else if (join == BEVEL_JOIN) {
+	} else if (join == JLJ_BEVEL) {
 		if (dx > wp/2) {
 			dx = wp/2;
 		}
@@ -3040,9 +3040,9 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 			FillRectangle(xp, yp+dy, dx, hp-2*dy);
 			FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
 
-			DrawRectangle0(xp+dx, yp+dy, wp-2*dx, hp-2*dy, 0, 0, MITER_JOIN, std::max(dx, dy)-size-1);
+			DrawRectangle0(xp+dx, yp+dy, wp-2*dx, hp-2*dy, 0, 0, JLJ_MITER, std::max(dx, dy)-size-1);
 		}
-	} else if (join == ROUND_JOIN) {
+	} else if (join == JLJ_ROUND) {
 		_line_width = size_param;
 
 		DrawArc(xp+dx, yp+dy, dx, dy, M_PI_2, M_PI);
@@ -3069,7 +3069,7 @@ void Graphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jl
 			FillRectangle(xp, yp+dy, dx, hp-2*dy);
 			FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
 
-			DrawRectangle0(xp+dx, yp+dy, wp-2*dx, hp-2*dy, 0, 0, MITER_JOIN, std::max(dx, dy)-size-1);
+			DrawRectangle0(xp+dx, yp+dy, wp-2*dx, hp-2*dy, 0, 0, JLJ_MITER, std::max(dx, dy)-size-1);
 		}
 	}
 
@@ -3647,61 +3647,61 @@ void Graphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int wp
 
 							ga = 0xff;
 
-							if (_blit_flags & BF_ALPHACHANNEL) {
-								if (_porter_duff_flags == PDF_NONE) {
+							if (_blit_flags & JBF_ALPHACHANNEL) {
+								if (_porterduff_flags == JPF_NONE) {
 									dr = (gr*ga + sr*sa);
 									dg = (gg*ga + sg*sa);
 									db = (gb*ga + sb*sa);
-								} else if (_porter_duff_flags == PDF_CLEAR) {
+								} else if (_porterduff_flags == JPF_CLEAR) {
 									dr = 0;
 									dg = 0;
 									db = 0;
-								} else if (_porter_duff_flags == PDF_SRC) {
+								} else if (_porterduff_flags == JPF_SRC) {
 									dr = gr*0xff;
 									dg = gg*0xff;
 									db = gb*0xff;
-								} else if (_porter_duff_flags == PDF_DST) {
+								} else if (_porterduff_flags == JPF_DST) {
 									dr = sr*0xff;
 									dg = sg*0xff;
 									db = sb*0xff;
-								} else if (_porter_duff_flags == PDF_SRC_OVER) {
+								} else if (_porterduff_flags == JPF_SRC_OVER) {
 									dr = (gr*0xff + sr*sa);
 									dg = (gg*0xff + sg*sa);
 									db = (gb*0xff + sb*sa);
-								} else if (_porter_duff_flags == PDF_DST_OVER) {
+								} else if (_porterduff_flags == JPF_DST_OVER) {
 									dr = (gr*ga + sr*0xff);
 									dg = (sg*ga + sg*0xff);
 									db = (sb*ga + sb*0xff);
-								} else if (_porter_duff_flags == PDF_SRC_IN) {
+								} else if (_porterduff_flags == JPF_SRC_IN) {
 									dr = gr*sa;
 									dg = gg*sa;
 									db = gb*sa;
-								} else if (_porter_duff_flags == PDF_DST_IN) {
+								} else if (_porterduff_flags == JPF_DST_IN) {
 									dr = sr*ga;
 									dg = sg*ga;
 									db = sb*ga;
-								} else if (_porter_duff_flags == PDF_SRC_OUT) {
+								} else if (_porterduff_flags == JPF_SRC_OUT) {
 									dr = gr*ga;
 									dg = gg*ga;
 									db = gb*ga;
-								} else if (_porter_duff_flags == PDF_DST_OUT) {
+								} else if (_porterduff_flags == JPF_DST_OUT) {
 									dr = sr*sa;
 									dg = sg*sa;
 									db = sb*sa;
-								} else if (_porter_duff_flags == PDF_SRC_ATOP) {
+								} else if (_porterduff_flags == JPF_SRC_ATOP) {
 									dr = (gr*sa + sr*sa);
 									dg = (sg*sa + sg*sa);
 									db = (sb*sa + sb*sa);
-								} else if (_porter_duff_flags == PDF_DST_ATOP) {
+								} else if (_porterduff_flags == JPF_DST_ATOP) {
 									dr = (gr*ga + sr*ga);
 									dg = (sg*ga + sg*ga);
 									db = (sb*ga + sb*ga);
-								} else if (_porter_duff_flags == PDF_ADD) {
+								} else if (_porterduff_flags == JPF_ADD) {
 									dr = sr*0xff + ga*0xff;
 									dg = sg*0xff + ga*0xff;
 									db = sb*0xff + ga*0xff;
 									da = 0xff;
-								} else if (_porter_duff_flags == PDF_XOR) {
+								} else if (_porterduff_flags == JPF_XOR) {
 									dr = (gr*ga + sr*sa);
 									dg = (gg*ga + sg*sa);
 									db = (gb*ga + sb*sa);

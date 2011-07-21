@@ -29,7 +29,7 @@ namespace jsocket {
 int MulticastSocket6::_used_port = 1024;
 
 MulticastSocket6::MulticastSocket6(std::string host_, int port_, int rbuf_, int wbuf_):
-	jsocket::Connection(MCAST_SOCKET)
+	jsocket::Connection(JCT_MCAST)
 {
 	jcommon::Object::SetClassName("jsocket::MulticastSocket6");
 	
@@ -449,7 +449,7 @@ SocketOption * MulticastSocket6::GetSocketOption()
 		throw SocketException("Connection is closed");
 	}
 	
-	return new SocketOption(_fdr, MCAST_SOCKET);
+	return new SocketOption(_fdr, JCT_MCAST);
 }
 
 }

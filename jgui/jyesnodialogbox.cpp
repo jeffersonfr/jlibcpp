@@ -34,8 +34,8 @@ YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg, int x, int y)
 
 	_label->SetGap(10, 10);
 	_label->SetWrap(true);
-	_label->SetHorizontalAlign(JUSTIFY_HALIGN);
-	_label->SetVerticalAlign(TOP_VALIGN);
+	_label->SetHorizontalAlign(JHA_JUSTIFY);
+	_label->SetVerticalAlign(JVA_TOP);
 
 	_label->SetSize(_label->GetPreferredSize());
 
@@ -66,13 +66,13 @@ YesNoDialogBox::~YesNoDialogBox()
 	delete _no;
 }
 
-jyesno_response_t YesNoDialogBox::GetResponse()
+jdialog_result_t YesNoDialogBox::GetResponse()
 {
 	if (GetFocusOwner() == _yes) {
-		return YES_RESPONSE;
+		return JDR_YES;
 	}
 
-	return NO_RESPONSE;
+	return JDR_NO;
 }
 
 void YesNoDialogBox::SetHorizontalAlign(jhorizontal_align_t align)

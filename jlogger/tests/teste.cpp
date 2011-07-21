@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
 			// g_default_logger->SetOutput(jlogger::INFO_LOGGER);
 
 			for (int i=0; i<100; i++) {
-				g_default_logger->SendLogger(jlogger::INFO_LOGGER, "Logger Tested: %s:%u:%2d", __FUNCTION__, __LINE__, i);
+				g_default_logger->SendLogger(jlogger::JRT_INFO, "Logger Tested: %s:%u:%2d", __FUNCTION__, __LINE__, i);
 				sleep(1);
 			}
 

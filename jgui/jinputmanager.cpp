@@ -31,10 +31,10 @@ namespace jgui {
 InputManager *InputManager::instance = NULL;
 
 EventBroadcaster::EventBroadcaster(jcommon::Listener *listener):
-	jthread::Thread(jthread::DETACH_THREAD)
+	jthread::Thread(jthread::JTT_DETACH)
 {
 	_listener = listener;
-	_type = JBROADCAST_UNKNOWN;
+	_type = JBE_UNKNOWN;
 	_running = true;
 
 }
@@ -122,22 +122,22 @@ void EventBroadcaster::Run()
 
 			_mutex.Unlock();
 
-			if (event->InstanceOf("jgui::KeyEvent") == true && (_type & JBROADCAST_KEYEVENT) != 0) {
+			if (event->InstanceOf("jgui::KeyEvent") == true && (_type & JBE_KEYEVENT) != 0) {
 				jgui::KeyListener *klistener = dynamic_cast<jgui::KeyListener *>(_listener);
 				jgui::KeyEvent *kevent = dynamic_cast<jgui::KeyEvent *>(event);
 
 				klistener->KeyPressed(kevent);
-			} else if (event->InstanceOf("jgui::MouseEvent") == true  && (_type & JBROADCAST_MOUSEEVENT) != 0) {
+			} else if (event->InstanceOf("jgui::MouseEvent") == true  && (_type & JBE_MOUSEEVENT) != 0) {
 				jgui::MouseListener *mlistener = dynamic_cast<jgui::MouseListener *>(_listener);
 				jgui::MouseEvent *mevent = dynamic_cast<jgui::MouseEvent *>(event);
 
-				if (mevent->GetType() == JMOUSE_PRESSED_EVENT) {
+				if (mevent->GetType() == JME_PRESSED) {
 					mlistener->MousePressed(mevent);
-				} else if (mevent->GetType() == JMOUSE_RELEASED_EVENT) {
+				} else if (mevent->GetType() == JME_RELEASED) {
 					mlistener->MouseReleased(mevent);
-				} else if (mevent->GetType() == JMOUSE_MOVED_EVENT) {
+				} else if (mevent->GetType() == JME_MOVED) {
 					mlistener->MouseMoved(mevent);
-				} else if (mevent->GetType() == JMOUSE_WHEEL_EVENT) {
+				} else if (mevent->GetType() == JME_WHEEL) {
 					mlistener->MouseWheel(mevent);
 				}
 			}
@@ -273,288 +273,288 @@ int InputManager::TranslateToDFBKeyID(DFBInputDeviceKeyIdentifier id)
 	return 0;
 }
 
-jkey_symbol_t InputManager::TranslateToDFBKeySymbol(DFBInputDeviceKeySymbol symbol)
+jkeyevent_symbol_t InputManager::TranslateToDFBKeySymbol(DFBInputDeviceKeySymbol symbol)
 {
 	switch (symbol) {
 		case DIKS_NULL:
-			return JKEY_UNKNOWN;
+			return JKS_UNKNOWN;
 		case DIKS_ENTER:
-			return JKEY_ENTER;
+			return JKS_ENTER;
 		case DIKS_BACKSPACE:
-			return JKEY_BACKSPACE;
+			return JKS_BACKSPACE;
 		case DIKS_TAB:
-			return JKEY_TAB;
+			return JKS_TAB;
 		//case DIKS_RETURN:
-		//	return JKEY_RETURN;
+		//	return JKS_RETURN;
 		case DIKS_CANCEL:
-			return JKEY_CANCEL;
+			return JKS_CANCEL;
 		case DIKS_ESCAPE:
-			return JKEY_ESCAPE;
+			return JKS_ESCAPE;
 		case DIKS_SPACE:
-			return JKEY_SPACE;
+			return JKS_SPACE;
 		case DIKS_EXCLAMATION_MARK:
-			return JKEY_EXCLAMATION_MARK;
+			return JKS_EXCLAMATION_MARK;
 		case DIKS_QUOTATION:
-			return JKEY_QUOTATION;
+			return JKS_QUOTATION;
 		case DIKS_NUMBER_SIGN:
-			return JKEY_NUMBER_SIGN;
+			return JKS_NUMBER_SIGN;
 		case DIKS_DOLLAR_SIGN:
-			return JKEY_DOLLAR_SIGN;
+			return JKS_DOLLAR_SIGN;
 		case DIKS_PERCENT_SIGN:
-			return JKEY_PERCENT_SIGN;
+			return JKS_PERCENT_SIGN;
 		case DIKS_AMPERSAND:   
-			return JKEY_AMPERSAND;
+			return JKS_AMPERSAND;
 		case DIKS_APOSTROPHE:
-			return JKEY_APOSTROPHE;
+			return JKS_APOSTROPHE;
 		case DIKS_PARENTHESIS_LEFT:
-			return JKEY_PARENTHESIS_LEFT;
+			return JKS_PARENTHESIS_LEFT;
 		case DIKS_PARENTHESIS_RIGHT:
-			return JKEY_PARENTHESIS_RIGHT;
+			return JKS_PARENTHESIS_RIGHT;
 		case DIKS_ASTERISK:
-			return JKEY_STAR;
+			return JKS_STAR;
 		case DIKS_PLUS_SIGN:
-			return JKEY_PLUS_SIGN;
+			return JKS_PLUS_SIGN;
 		case DIKS_COMMA:   
-			return JKEY_COMMA;
+			return JKS_COMMA;
 		case DIKS_MINUS_SIGN:
-			return JKEY_MINUS_SIGN;
+			return JKS_MINUS_SIGN;
 		case DIKS_PERIOD:  
-			return JKEY_PERIOD;
+			return JKS_PERIOD;
 		case DIKS_SLASH:
-			return JKEY_SLASH;
+			return JKS_SLASH;
 		case DIKS_0:     
-			return JKEY_0;
+			return JKS_0;
 		case DIKS_1:
-			return JKEY_1;
+			return JKS_1;
 		case DIKS_2:
-			return JKEY_2;
+			return JKS_2;
 		case DIKS_3:
-			return JKEY_3;
+			return JKS_3;
 		case DIKS_4:
-			return JKEY_4;
+			return JKS_4;
 		case DIKS_5:
-			return JKEY_5;
+			return JKS_5;
 		case DIKS_6:
-			return JKEY_6;
+			return JKS_6;
 		case DIKS_7:
-			return JKEY_7;
+			return JKS_7;
 		case DIKS_8:
-			return JKEY_8;
+			return JKS_8;
 		case DIKS_9:
-			return JKEY_9;
+			return JKS_9;
 		case DIKS_COLON:
-			return JKEY_COLON;
+			return JKS_COLON;
 		case DIKS_SEMICOLON:
-			return JKEY_SEMICOLON;
+			return JKS_SEMICOLON;
 		case DIKS_LESS_THAN_SIGN:
-			return JKEY_LESS_THAN_SIGN;
+			return JKS_LESS_THAN_SIGN;
 		case DIKS_EQUALS_SIGN: 
-			return JKEY_EQUALS_SIGN;
+			return JKS_EQUALS_SIGN;
 		case DIKS_GREATER_THAN_SIGN:
-			return JKEY_GREATER_THAN_SIGN;
+			return JKS_GREATER_THAN_SIGN;
 		case DIKS_QUESTION_MARK:   
-			return JKEY_QUESTION_MARK;
+			return JKS_QUESTION_MARK;
 		case DIKS_AT:      
-			return JKEY_AT;
+			return JKS_AT;
 		case DIKS_CAPITAL_A:
-			return JKEY_A;
+			return JKS_A;
 		case DIKS_CAPITAL_B:
-			return JKEY_B;
+			return JKS_B;
 		case DIKS_CAPITAL_C:
-			return JKEY_C;
+			return JKS_C;
 		case DIKS_CAPITAL_D:
-			return JKEY_D;
+			return JKS_D;
 		case DIKS_CAPITAL_E:
-			return JKEY_E;
+			return JKS_E;
 		case DIKS_CAPITAL_F:
-			return JKEY_F;
+			return JKS_F;
 		case DIKS_CAPITAL_G:
-			return JKEY_G;
+			return JKS_G;
 		case DIKS_CAPITAL_H:
-			return JKEY_H;
+			return JKS_H;
 		case DIKS_CAPITAL_I:
-			return JKEY_I;
+			return JKS_I;
 		case DIKS_CAPITAL_J:
-			return JKEY_J;
+			return JKS_J;
 		case DIKS_CAPITAL_K:
-			return JKEY_K;
+			return JKS_K;
 		case DIKS_CAPITAL_L:
-			return JKEY_L;
+			return JKS_L;
 		case DIKS_CAPITAL_M:
-			return JKEY_M;
+			return JKS_M;
 		case DIKS_CAPITAL_N:
-			return JKEY_N;
+			return JKS_N;
 		case DIKS_CAPITAL_O:
-			return JKEY_O;
+			return JKS_O;
 		case DIKS_CAPITAL_P:
-			return JKEY_P;
+			return JKS_P;
 		case DIKS_CAPITAL_Q:
-			return JKEY_Q;
+			return JKS_Q;
 		case DIKS_CAPITAL_R:
-			return JKEY_R;
+			return JKS_R;
 		case DIKS_CAPITAL_S:
-			return JKEY_S;
+			return JKS_S;
 		case DIKS_CAPITAL_T:
-			return JKEY_T;
+			return JKS_T;
 		case DIKS_CAPITAL_U:
-			return JKEY_U;
+			return JKS_U;
 		case DIKS_CAPITAL_V:
-			return JKEY_V;
+			return JKS_V;
 		case DIKS_CAPITAL_W:
-			return JKEY_W;
+			return JKS_W;
 		case DIKS_CAPITAL_X:
-			return JKEY_X;
+			return JKS_X;
 		case DIKS_CAPITAL_Y:
-			return JKEY_Y;
+			return JKS_Y;
 		case DIKS_CAPITAL_Z:
-			return JKEY_Z;
+			return JKS_Z;
 		case DIKS_SQUARE_BRACKET_LEFT:
-			return JKEY_SQUARE_BRACKET_LEFT;
+			return JKS_SQUARE_BRACKET_LEFT;
 		case DIKS_BACKSLASH:   
-			return JKEY_BACKSLASH;
+			return JKS_BACKSLASH;
 		case DIKS_SQUARE_BRACKET_RIGHT:
-			return JKEY_SQUARE_BRACKET_RIGHT;
+			return JKS_SQUARE_BRACKET_RIGHT;
 		case DIKS_CIRCUMFLEX_ACCENT:
-			return JKEY_CIRCUMFLEX_ACCENT;
+			return JKS_CIRCUMFLEX_ACCENT;
 		case DIKS_UNDERSCORE:    
-			return JKEY_UNDERSCORE;
+			return JKS_UNDERSCORE;
 		case DIKS_GRAVE_ACCENT:
-			return JKEY_GRAVE_ACCENT;
+			return JKS_GRAVE_ACCENT;
 		case DIKS_SMALL_A:       
-			return JKEY_a;
+			return JKS_a;
 		case DIKS_SMALL_B:
-			return JKEY_b;
+			return JKS_b;
 		case DIKS_SMALL_C:
-			return JKEY_c;
+			return JKS_c;
 		case DIKS_SMALL_D:
-			return JKEY_d;
+			return JKS_d;
 		case DIKS_SMALL_E:
-			return JKEY_e;
+			return JKS_e;
 		case DIKS_SMALL_F:
-			return JKEY_f;
+			return JKS_f;
 		case DIKS_SMALL_G:
-			return JKEY_g;
+			return JKS_g;
 		case DIKS_SMALL_H:
-			return JKEY_h;
+			return JKS_h;
 		case DIKS_SMALL_I:
-			return JKEY_i;
+			return JKS_i;
 		case DIKS_SMALL_J:
-			return JKEY_j;
+			return JKS_j;
 		case DIKS_SMALL_K:
-			return JKEY_k;
+			return JKS_k;
 		case DIKS_SMALL_L:
-			return JKEY_l;
+			return JKS_l;
 		case DIKS_SMALL_M:
-			return JKEY_m;
+			return JKS_m;
 		case DIKS_SMALL_N:
-			return JKEY_n;
+			return JKS_n;
 		case DIKS_SMALL_O:
-			return JKEY_o;
+			return JKS_o;
 		case DIKS_SMALL_P:
-			return JKEY_p;
+			return JKS_p;
 		case DIKS_SMALL_Q:
-			return JKEY_q;
+			return JKS_q;
 		case DIKS_SMALL_R:
-			return JKEY_r;
+			return JKS_r;
 		case DIKS_SMALL_S:
-			return JKEY_s;
+			return JKS_s;
 		case DIKS_SMALL_T:
-			return JKEY_t;
+			return JKS_t;
 		case DIKS_SMALL_U:
-			return JKEY_u;
+			return JKS_u;
 		case DIKS_SMALL_V:
-			return JKEY_v;
+			return JKS_v;
 		case DIKS_SMALL_W:
-			return JKEY_w;
+			return JKS_w;
 		case DIKS_SMALL_X:
-			return JKEY_x;
+			return JKS_x;
 		case DIKS_SMALL_Y:
-			return JKEY_y;
+			return JKS_y;
 		case DIKS_SMALL_Z:
-			return JKEY_z;
+			return JKS_z;
 		case DIKS_CURLY_BRACKET_LEFT:
-			return JKEY_CURLY_BRACKET_LEFT;
+			return JKS_CURLY_BRACKET_LEFT;
 		case DIKS_VERTICAL_BAR:  
-			return JKEY_VERTICAL_BAR;
+			return JKS_VERTICAL_BAR;
 		case DIKS_CURLY_BRACKET_RIGHT:
-			return JKEY_CURLY_BRACKET_RIGHT;
+			return JKS_CURLY_BRACKET_RIGHT;
 		case DIKS_TILDE:  
-			return JKEY_TILDE;
+			return JKS_TILDE;
 		case DIKS_DELETE:
-			return JKEY_DELETE;
+			return JKS_DELETE;
 		case DIKS_CURSOR_LEFT:
-			return JKEY_CURSOR_LEFT;
+			return JKS_CURSOR_LEFT;
 		case DIKS_CURSOR_RIGHT:
-			return JKEY_CURSOR_RIGHT;
+			return JKS_CURSOR_RIGHT;
 		case DIKS_CURSOR_UP:  
-			return JKEY_CURSOR_UP;
+			return JKS_CURSOR_UP;
 		case DIKS_CURSOR_DOWN:
-			return JKEY_CURSOR_DOWN;
+			return JKS_CURSOR_DOWN;
 		case DIKS_INSERT:  
-			return JKEY_INSERT;
+			return JKS_INSERT;
 		case DIKS_HOME:     
-			return JKEY_HOME;
+			return JKS_HOME;
 		case DIKS_END:
-			return JKEY_END;
+			return JKS_END;
 		case DIKS_PAGE_UP:
-			return JKEY_PAGE_UP;
+			return JKS_PAGE_UP;
 		case DIKS_PAGE_DOWN:
-			return JKEY_PAGE_DOWN;
+			return JKS_PAGE_DOWN;
 		case DIKS_PRINT:   
-			return JKEY_PRINT;
+			return JKS_PRINT;
 		case DIKS_PAUSE:
-			return JKEY_PAUSE;
+			return JKS_PAUSE;
 		case DIKS_RED:
-			return JKEY_RED;
+			return JKS_RED;
 		case DIKS_GREEN:
-			return JKEY_GREEN;
+			return JKS_GREEN;
 		case DIKS_YELLOW:
-			return JKEY_YELLOW;
+			return JKS_YELLOW;
 		case DIKS_BLUE:
-			return JKEY_BLUE;
+			return JKS_BLUE;
 		case DIKS_F1:
-			return JKEY_F1;
+			return JKS_F1;
 		case DIKS_F2:
-			return JKEY_F2;
+			return JKS_F2;
 		case DIKS_F3:
-			return JKEY_F3;
+			return JKS_F3;
 		case DIKS_F4:
-			return JKEY_F4;
+			return JKS_F4;
 		case DIKS_F5:
-			return JKEY_F5;
+			return JKS_F5;
 		case DIKS_F6:     
-			return JKEY_F6;
+			return JKS_F6;
 		case DIKS_F7:    
-			return JKEY_F7;
+			return JKS_F7;
 		case DIKS_F8:   
-			return JKEY_F8;
+			return JKS_F8;
 		case DIKS_F9:  
-			return JKEY_F9;
+			return JKS_F9;
 		case DIKS_F10: 
-			return JKEY_F10;
+			return JKS_F10;
 		case DIKS_F11:
-			return JKEY_F11;
+			return JKS_F11;
 		case DIKS_F12:
-			return JKEY_F12;
+			return JKS_F12;
 		case DIKS_SHIFT:
-			return JKEY_SHIFT;
+			return JKS_SHIFT;
 		case DIKS_CONTROL:
-			return JKEY_CONTROL;
+			return JKS_CONTROL;
 		case DIKS_ALT:
-			return JKEY_ALT;
+			return JKS_ALT;
 		case DIKS_ALTGR:
-			return JKEY_ALTGR;
+			return JKS_ALTGR;
 		case DIKS_META:
-			return JKEY_META;
+			return JKS_META;
 		case DIKS_SUPER:
-			return JKEY_SUPER;
+			return JKS_SUPER;
 		case DIKS_HYPER:
-			return JKEY_HYPER;
+			return JKS_HYPER;
 		default: 
 			break;
 	}
 
-	return JKEY_UNKNOWN;
+	return JKS_UNKNOWN;
 }
 #endif
 
@@ -658,7 +658,7 @@ void InputManager::RegisterKeyListener(KeyListener *listener)
 	for (std::vector<EventBroadcaster *>::iterator i=_broadcasters.begin(); i!=_broadcasters.end(); i++) {
 		if ((*i)->GetListener() == dynamic_cast<jgui::KeyListener *>(listener) || 
 				(*i)->GetListener() == dynamic_cast<jgui::MouseListener *>(listener)) {
-			(*i)->SetBroadcastEvent((jbroadcaster_event_t)((*i)->GetBroadcastEvent() | JBROADCAST_KEYEVENT));
+			(*i)->SetBroadcastEvent((jbroadcaster_event_t)((*i)->GetBroadcastEvent() | JBE_KEYEVENT));
 
 			return;
 		}
@@ -666,7 +666,7 @@ void InputManager::RegisterKeyListener(KeyListener *listener)
 
 	EventBroadcaster *broadcaster = new EventBroadcaster(listener);
 	
-	broadcaster->SetBroadcastEvent((jbroadcaster_event_t)(broadcaster->GetBroadcastEvent() | JBROADCAST_KEYEVENT));
+	broadcaster->SetBroadcastEvent((jbroadcaster_event_t)(broadcaster->GetBroadcastEvent() | JBE_KEYEVENT));
 	broadcaster->Start();
 
 	_broadcasters.push_back(broadcaster);
@@ -690,7 +690,7 @@ void InputManager::RemoveKeyListener(KeyListener *listener)
 	for (std::vector<EventBroadcaster *>::iterator i=_broadcasters.begin(); i!=_broadcasters.end(); i++) {
 		if ((*i)->GetListener() == dynamic_cast<jgui::KeyListener *>(listener) || 
 				(*i)->GetListener() == dynamic_cast<jgui::MouseListener *>(listener)) {
-			(*i)->SetBroadcastEvent((jbroadcaster_event_t)((*i)->GetBroadcastEvent() & ~JBROADCAST_KEYEVENT));
+			(*i)->SetBroadcastEvent((jbroadcaster_event_t)((*i)->GetBroadcastEvent() & ~JBE_KEYEVENT));
 
 #ifdef DIRECTFB_UI
 			if ((*i)->GetListener()->InstanceOf("jgui::Window") == true) {
@@ -702,7 +702,7 @@ void InputManager::RemoveKeyListener(KeyListener *listener)
 			}
 #endif
 
-			if ((*i)->GetBroadcastEvent() == JBROADCAST_UNKNOWN) {
+			if ((*i)->GetBroadcastEvent() == JBE_UNKNOWN) {
 				EventBroadcaster *broadcaster = (*i);
 
 				_broadcasters.erase(i);
@@ -751,7 +751,7 @@ void InputManager::RegisterMouseListener(MouseListener *listener)
 	for (std::vector<EventBroadcaster *>::iterator i=_broadcasters.begin(); i!=_broadcasters.end(); i++) {
 		if ((*i)->GetListener() == dynamic_cast<jgui::KeyListener *>(listener) || 
 				(*i)->GetListener() == dynamic_cast<jgui::MouseListener *>(listener)) {
-			(*i)->SetBroadcastEvent((jbroadcaster_event_t)((*i)->GetBroadcastEvent() | JBROADCAST_MOUSEEVENT));
+			(*i)->SetBroadcastEvent((jbroadcaster_event_t)((*i)->GetBroadcastEvent() | JBE_MOUSEEVENT));
 
 			return;
 		}
@@ -759,7 +759,7 @@ void InputManager::RegisterMouseListener(MouseListener *listener)
 
 	EventBroadcaster *broadcaster = new EventBroadcaster(listener);
 
-	broadcaster->SetBroadcastEvent((jbroadcaster_event_t)(broadcaster->GetBroadcastEvent() | JBROADCAST_MOUSEEVENT));
+	broadcaster->SetBroadcastEvent((jbroadcaster_event_t)(broadcaster->GetBroadcastEvent() | JBE_MOUSEEVENT));
 	broadcaster->Start();
 
 	_broadcasters.push_back(broadcaster);
@@ -783,7 +783,7 @@ void InputManager::RemoveMouseListener(MouseListener *listener)
 	for (std::vector<EventBroadcaster *>::iterator i=_broadcasters.begin(); i!=_broadcasters.end(); i++) {
 		if ((*i)->GetListener() == dynamic_cast<jgui::KeyListener *>(listener) || 
 				(*i)->GetListener() == dynamic_cast<jgui::MouseListener *>(listener)) {
-			(*i)->SetBroadcastEvent((jbroadcaster_event_t)((*i)->GetBroadcastEvent() & ~JBROADCAST_MOUSEEVENT));
+			(*i)->SetBroadcastEvent((jbroadcaster_event_t)((*i)->GetBroadcastEvent() & ~JBE_MOUSEEVENT));
 
 #ifdef DIRECTFB_UI
 			if ((*i)->GetListener()->InstanceOf("jgui::Window") == true) {
@@ -795,7 +795,7 @@ void InputManager::RemoveMouseListener(MouseListener *listener)
 			}
 #endif
 
-			if ((*i)->GetBroadcastEvent() == JBROADCAST_UNKNOWN) {
+			if ((*i)->GetBroadcastEvent() == JBE_UNKNOWN) {
 				EventBroadcaster *broadcaster = (*i);
 
 				_broadcasters.erase(i);
@@ -812,67 +812,67 @@ void InputManager::RemoveMouseListener(MouseListener *listener)
 void InputManager::ProcessInputEvent(DFBInputEvent event)
 {
 	if (event.type == DIET_KEYPRESS || event.type == DIET_KEYRELEASE) {
-		jkey_type_t type;
-		jkey_modifiers_t mod;
+		jkeyevent_type_t type;
+		jkeyevent_modifiers_t mod;
 
-		mod = (jkey_modifiers_t)(0);
+		mod = (jkeyevent_modifiers_t)(0);
 
 		if ((event.flags & DIEF_MODIFIERS) != 0) {
 			if ((event.modifiers & DIMM_SHIFT) != 0) {
-				mod = (jkey_modifiers_t)(mod | JMOD_SHIFT);
+				mod = (jkeyevent_modifiers_t)(mod | JKM_SHIFT);
 			} else if ((event.modifiers & DIMM_CONTROL) != 0) {
-				mod = (jkey_modifiers_t)(mod | JMOD_CONTROL);
+				mod = (jkeyevent_modifiers_t)(mod | JKM_CONTROL);
 			} else if ((event.modifiers & DIMM_ALT) != 0) {
-				mod = (jkey_modifiers_t)(mod | JMOD_ALT);
+				mod = (jkeyevent_modifiers_t)(mod | JKM_ALT);
 			} else if ((event.modifiers & DIMM_ALTGR) != 0) {
-				mod = (jkey_modifiers_t)(mod | JMOD_ALTGR);
+				mod = (jkeyevent_modifiers_t)(mod | JKM_ALTGR);
 			} else if ((event.modifiers & DIMM_META) != 0) {
-				mod = (jkey_modifiers_t)(mod | JMOD_META);
+				mod = (jkeyevent_modifiers_t)(mod | JKM_META);
 			} else if ((event.modifiers & DIMM_SUPER) != 0) {
-				mod = (jkey_modifiers_t)(mod | JMOD_SUPER);
+				mod = (jkeyevent_modifiers_t)(mod | JKM_SUPER);
 			} else if ((event.modifiers & DIMM_HYPER) != 0) {
-				mod = (jkey_modifiers_t)(mod | JMOD_HYPER);
+				mod = (jkeyevent_modifiers_t)(mod | JKM_HYPER);
 			}
 		}
 
-		type = (jkey_type_t)(0);
+		type = (jkeyevent_type_t)(0);
 
 		if (event.type == DIET_KEYPRESS) {
-			type = JKEY_PRESSED;
+			type = JKT_PRESSED;
 		} else if (event.type == DIET_KEYRELEASE) {
-			type = JKEY_RELEASED;
+			type = JKT_RELEASED;
 		}
 
 		DispatchEvent(new KeyEvent(NULL, type, mod, TranslateToDFBKeyCode(event.key_code), TranslateToDFBKeySymbol(event.key_symbol)));
 		// DispatchEvent(new KeyEvent(WindowManager::GetInstance()->GetFocusOwner(), type, mod, TranslateToDFBKeyCode(event.key_code), TranslateToDFBKeySymbol(event.key_symbol)));
 	} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE || event.type == DIET_AXISMOTION) {
 		int mouse_z = -1;
-		jmouse_button_t button = JMOUSE_UNKNOWN;
-		jmouse_event_t type = JMOUSE_UNKNOWN_EVENT;
+		jmouse_button_t button = JMB_UNKNOWN;
+		jmouse_event_t type = JME_UNKNOWN;
 
 		if (event.type == DIET_AXISMOTION) {
 			if (event.flags & DIEF_AXISABS) {
 				if (event.axis == DIAI_X) {
-					type = JMOUSE_MOVED_EVENT;
+					type = JME_MOVED;
 					_mouse_x = event.axisabs;
 				} else if (event.axis == DIAI_Y) {
-					type = JMOUSE_MOVED_EVENT;
+					type = JME_MOVED;
 					_mouse_y = event.axisabs;
 				} else if (event.axis == DIAI_Z) {
-					button = JMOUSE_WHEEL;
-					type = JMOUSE_WHEEL_EVENT;
+					button = JMB_WHEEL;
+					type = JME_WHEEL;
 					mouse_z = event.axisabs;
 				}
 			} else if (event.flags & DIEF_AXISREL) {
 				if (event.axis == DIAI_X) {
-					type = JMOUSE_MOVED_EVENT;
+					type = JME_MOVED;
 					_mouse_x += event.axisrel;
 				} else if (event.axis == DIAI_Y) {
-					type = JMOUSE_MOVED_EVENT;
+					type = JME_MOVED;
 					_mouse_y += event.axisrel;
 				} else if (event.axis == DIAI_Z) {
-					button = JMOUSE_WHEEL;
-					type = JMOUSE_WHEEL_EVENT;
+					button = JMB_WHEEL;
+					type = JME_WHEEL;
 					mouse_z += event.axisrel;
 				}
 			}
@@ -881,25 +881,25 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 			_mouse_y = CLAMP(_mouse_y, 0, _screen.height-1);
 			// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
 		
-			if (type == JMOUSE_WHEEL_EVENT) {
+			if (type == JME_WHEEL) {
 				mouse_z = mouse_z + 1;
 			}
 		} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE) {
 			if (event.type == DIET_BUTTONPRESS) {
-				type = JMOUSE_PRESSED_EVENT;
+				type = JME_PRESSED;
 			} else if (event.type == DIET_BUTTONRELEASE) {
-				type = JMOUSE_RELEASED_EVENT;
+				type = JME_RELEASED;
 			}
 
 			if (event.button == DIBI_LEFT) {
-				button = JMOUSE_BUTTON1;
+				button = JMB_BUTTON1;
 			} else if (event.button == DIBI_RIGHT) {
-				button = JMOUSE_BUTTON2;
+				button = JMB_BUTTON2;
 			} else if (event.button == DIBI_MIDDLE) {
-				button = JMOUSE_BUTTON3;
+				button = JMB_BUTTON3;
 			}
 
-			if (type == JMOUSE_PRESSED_EVENT) {
+			if (type == JME_PRESSED) {
 				if ((jcommon::Date::CurrentTimeMillis()-_last_keypress) < 200L) {
 					_click_count = _click_count + 1;
 				} else {
@@ -956,33 +956,33 @@ void InputManager::ProcessInputEvent(DFBInputEvent event)
 void InputManager::ProcessWindowEvent(DFBWindowEvent event)
 {
 	if (event.type == DWET_KEYDOWN || event.type == DWET_KEYUP) {
-		jkey_type_t type;
-		jkey_modifiers_t mod;
+		jkeyevent_type_t type;
+		jkeyevent_modifiers_t mod;
 
-		mod = (jkey_modifiers_t)(0);
+		mod = (jkeyevent_modifiers_t)(0);
 
 		if ((event.modifiers & DIMM_SHIFT) != 0) {
-			mod = (jkey_modifiers_t)(mod | JMOD_SHIFT);
+			mod = (jkeyevent_modifiers_t)(mod | JKM_SHIFT);
 		} else if ((event.modifiers & DIMM_CONTROL) != 0) {
-			mod = (jkey_modifiers_t)(mod | JMOD_CONTROL);
+			mod = (jkeyevent_modifiers_t)(mod | JKM_CONTROL);
 		} else if ((event.modifiers & DIMM_ALT) != 0) {
-			mod = (jkey_modifiers_t)(mod | JMOD_ALT);
+			mod = (jkeyevent_modifiers_t)(mod | JKM_ALT);
 		} else if ((event.modifiers & DIMM_ALTGR) != 0) {
-			mod = (jkey_modifiers_t)(mod | JMOD_ALTGR);
+			mod = (jkeyevent_modifiers_t)(mod | JKM_ALTGR);
 		} else if ((event.modifiers & DIMM_META) != 0) {
-			mod = (jkey_modifiers_t)(mod | JMOD_META);
+			mod = (jkeyevent_modifiers_t)(mod | JKM_META);
 		} else if ((event.modifiers & DIMM_SUPER) != 0) {
-			mod = (jkey_modifiers_t)(mod | JMOD_SUPER);
+			mod = (jkeyevent_modifiers_t)(mod | JKM_SUPER);
 		} else if ((event.modifiers & DIMM_HYPER) != 0) {
-			mod = (jkey_modifiers_t)(mod | JMOD_HYPER);
+			mod = (jkeyevent_modifiers_t)(mod | JKM_HYPER);
 		}
 
-		type = (jkey_type_t)(0);
+		type = (jkeyevent_type_t)(0);
 
 		if (event.type == DWET_KEYDOWN) {
-			type = JKEY_PRESSED;
+			type = JKT_PRESSED;
 		} else if (event.type == DWET_KEYUP) {
-			type = JKEY_RELEASED;
+			type = JKT_RELEASED;
 		}
 
 		DispatchEvent(new KeyEvent(WindowManager::GetInstance()->GetFocusOwner(), type, mod, TranslateToDFBKeyCode(event.key_code), TranslateToDFBKeySymbol(event.key_symbol)));
@@ -1017,46 +1017,46 @@ void InputManager::ProcessWindowEvent(DFBWindowEvent event)
 			} else if (event.type == DWET_LEAVE) {
 				// CHANGED:: GFXHandler::GetInstance()->SetCursor(DEFAULT_CURSOR);
 			} else if (event.type == DWET_BUTTONUP || event.type == DWET_BUTTONDOWN || event.type == DWET_MOTION || event.type == DWET_WHEEL) {
-				jmouse_button_t button = JMOUSE_UNKNOWN;
-				jmouse_event_t type = JMOUSE_UNKNOWN_EVENT;
+				jmouse_button_t button = JMB_UNKNOWN;
+				jmouse_event_t type = JME_UNKNOWN;
 
 				if (event.type == DWET_MOTION) {
-					type = JMOUSE_MOVED_EVENT;
+					type = JME_MOVED;
 					_mouse_x = event.cx;
 					_mouse_y = event.cy;
 				} else if (event.type == DWET_WHEEL) {
-					type = JMOUSE_WHEEL_EVENT;
-					button = JMOUSE_WHEEL;
+					type = JME_WHEEL;
+					button = JMB_WHEEL;
 					mouse_z = event.step;
 				} else if (event.type == DWET_BUTTONUP) {
-					type = JMOUSE_RELEASED_EVENT;
+					type = JME_RELEASED;
 
 					if (event.button == DIBI_LEFT) {
-						button = JMOUSE_BUTTON1;
+						button = JMB_BUTTON1;
 					} else if (event.button == DIBI_RIGHT) {
-						button = JMOUSE_BUTTON2;
+						button = JMB_BUTTON2;
 					} else if (event.button == DIBI_MIDDLE) {
-						button = JMOUSE_BUTTON3;
+						button = JMB_BUTTON3;
 					}
 				} else if (event.type == DWET_BUTTONDOWN) {
-					type = JMOUSE_PRESSED_EVENT;
+					type = JME_PRESSED;
 				}
 
 				if ((event.buttons & DIBM_LEFT) != 0) {
-					button = (jmouse_button_t)(button | JMOUSE_BUTTON1);
+					button = (jmouse_button_t)(button | JMB_BUTTON1);
 				} else if ((event.button & DIBM_RIGHT) != 0) {
-					button = (jmouse_button_t)(button | JMOUSE_BUTTON2);
+					button = (jmouse_button_t)(button | JMB_BUTTON2);
 				} else if ((event.button & DIBI_MIDDLE) != 0) {
-					button = (jmouse_button_t)(button | JMOUSE_BUTTON3);
+					button = (jmouse_button_t)(button | JMB_BUTTON3);
 				}
 
 				_mouse_x = CLAMP(_mouse_x, 0, _screen.width-1);
 				_mouse_y = CLAMP(_mouse_y, 0, _screen.height-1);
 				// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
 
-				if (type == JMOUSE_WHEEL_EVENT) {
+				if (type == JME_WHEEL) {
 					mouse_z = mouse_z + 1;
-				} else if (type == JMOUSE_PRESSED_EVENT) {
+				} else if (type == JME_PRESSED) {
 					if ((jcommon::Date::CurrentTimeMillis()-_last_keypress) < 200L) {
 						_click_count = _click_count + 1;
 					} else {

@@ -113,7 +113,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			marquee = new jgui::Marquee("Testando Marquee", 500, 110, 700);
 
-			marquee->SetType(jgui::LOOP_TEXT);
+			marquee->SetType(jgui::JMM_LOOP);
 
 			marquee->Start();
 		}
@@ -143,7 +143,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			watch = new jgui::Watch(jgui::CRONOMETERDOWN_WATCH, 150, 300, 300);
+			watch = new jgui::Watch(jgui::JWT_CRONOMETERDOWN, 150, 300, 300);
 
 			watch->SetSeconds(10);
 			watch->SetMinutes(0);
@@ -200,9 +200,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			check1 = new jgui::CheckButton(jgui::CHECK_TYPE, "wrap", 500, 740, 300);
-			check2 = new jgui::CheckButton(jgui::CHECK_TYPE, "password", 500, 795, 300);
-			check3 = new jgui::CheckButton(jgui::CHECK_TYPE, "hide", 500, 850, 300);
+			check1 = new jgui::CheckButton(jgui::JCT_CHECK, "wrap", 500, 740, 300);
+			check2 = new jgui::CheckButton(jgui::JCT_CHECK, "password", 500, 795, 300);
+			check3 = new jgui::CheckButton(jgui::JCT_CHECK, "hide", 500, 850, 300);
 
 			check1->SetSelected(true);
 
@@ -212,9 +212,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			radio1 = new jgui::CheckButton(jgui::RADIO_TYPE, "left", 860, 740, 300);
-			radio2 = new jgui::CheckButton(jgui::RADIO_TYPE, "center", 860, 795, 300);
-			radio3 = new jgui::CheckButton(jgui::RADIO_TYPE, "right", 860, 850, 300);
+			radio1 = new jgui::CheckButton(jgui::JCT_RADIO, "left", 860, 740, 300);
+			radio2 = new jgui::CheckButton(jgui::JCT_RADIO, "center", 860, 795, 300);
+			radio3 = new jgui::CheckButton(jgui::JCT_RADIO, "right", 860, 850, 300);
 
 			group = new jgui::CheckButtonGroup();
 
@@ -406,13 +406,13 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 	{
 		jthread::AutoLock lock(&teste_mutex);
 
-		if (event->GetType() != jgui::JKEY_PRESSED) {
+		if (event->GetType() != jgui::JKT_PRESSED) {
 			return;
 		}
 
-		if (event->GetSymbol() == jgui::JKEY_ENTER) {
+		if (event->GetSymbol() == jgui::JKS_ENTER) {
 			if (GetFocusOwner() == text_field) {
-				jgui::Keyboard keyboard(500, 400, jgui::FULL_ALPHA_NUMERIC_KEYBOARD, false);
+				jgui::Keyboard keyboard(500, 400, jgui::JKB_QWERTY, false);
 
 				keyboard.RegisterKeyboardListener(dynamic_cast<jgui::KeyboardListener *>(this));
 				keyboard.Show();
@@ -445,14 +445,14 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 				text_area->SetVisible(true);
 			}
 		} else if (event->GetSource() == radio1) {
-			label1->SetHorizontalAlign(jgui::LEFT_HALIGN);
-			label2->SetHorizontalAlign(jgui::LEFT_HALIGN);
+			label1->SetHorizontalAlign(jgui::JHA_LEFT);
+			label2->SetHorizontalAlign(jgui::JHA_LEFT);
 		} else if (event->GetSource() == radio2) {
-			label1->SetHorizontalAlign(jgui::CENTER_HALIGN);
-			label2->SetHorizontalAlign(jgui::CENTER_HALIGN);
+			label1->SetHorizontalAlign(jgui::JHA_CENTER);
+			label2->SetHorizontalAlign(jgui::JHA_CENTER);
 		} else if (event->GetSource() == radio3) {
-			label1->SetHorizontalAlign(jgui::RIGHT_HALIGN);
-			label2->SetHorizontalAlign(jgui::RIGHT_HALIGN);
+			label1->SetHorizontalAlign(jgui::JHA_RIGHT);
+			label2->SetHorizontalAlign(jgui::JHA_RIGHT);
 		}
 	}
 
@@ -461,9 +461,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		jthread::AutoLock lock(&teste_mutex);
 
 		if (spin->GetCurrentIndex() == 0) {
-			marquee->SetType(jgui::LOOP_TEXT);
+			marquee->SetType(jgui::JMM_LOOP);
 		} else if (spin->GetCurrentIndex() == 1) {
-			marquee->SetType(jgui::BOUNCE_TEXT);
+			marquee->SetType(jgui::JMM_BOUNCE);
 		}
 	}
 
@@ -575,7 +575,7 @@ class GraphicPanel : public jgui::Canvas{
 		}
 
 		// draw image
-		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL | jgui::BF_COLORALPHA));
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORALPHA));
 
 		g->SetColor(0x00, 0x00, 0x00, 0xf0);
 		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+20, 200, 100);
@@ -590,8 +590,8 @@ class GraphicPanel : public jgui::Canvas{
 			ccolor(0x20, 0xf0, 0x20, 0x80),
 			rcolor(0x00, 0x00, 0x00, 0x80);
 
-		g->SetPorterDuffFlags(jgui::PDF_SRC_OVER);
-		g->SetDrawingFlags(jgui::DF_BLEND);
+		g->SetPorterDuffFlags(jgui::JPF_SRC_OVER);
+		g->SetDrawingFlags(jgui::JDF_BLEND);
 
 		g->SetColor(rcolor);
 		g->SetLineWidth(1);
@@ -743,11 +743,11 @@ class GraphicPanel : public jgui::Canvas{
 		g->DrawTriangle(10+9*(120+10)+10, 2*(120+10)+100, 10+9*(120+10)+10+100, 2*(120+10)+100, 10+9*(120+10)+10+100/2, 2*(120+10));
 		g->SetColor(pcolor);
 		g->SetLineWidth(+10);
-		g->SetLineJoin(jgui::BEVEL_JOIN);
+		g->SetLineJoin(jgui::JLJ_BEVEL);
 		g->DrawTriangle(10+9*(120+10)+10, 3*(120+10)+100, 10+9*(120+10)+10+100, 3*(120+10)+100, 10+9*(120+10)+10+100/2, 3*(120+10));
-		g->SetLineJoin(jgui::ROUND_JOIN);
+		g->SetLineJoin(jgui::JLJ_ROUND);
 		g->DrawTriangle(10+9*(120+10)+10, 4*(120+10)+100, 10+9*(120+10)+10+100, 4*(120+10)+100, 10+9*(120+10)+10+100/2, 4*(120+10));
-		g->SetLineJoin(jgui::MITER_JOIN);
+		g->SetLineJoin(jgui::JLJ_MITER);
 		g->DrawTriangle(10+9*(120+10)+10, 5*(120+10)+100, 10+9*(120+10)+10+100, 5*(120+10)+100, 10+9*(120+10)+10+100/2, 5*(120+10));
 
 		// draw bezier curve
@@ -783,7 +783,7 @@ class GraphicPanel : public jgui::Canvas{
 			{0, 0}
 		};
 
-		g->SetLineJoin(jgui::BEVEL_JOIN);
+		g->SetLineJoin(jgui::JLJ_BEVEL);
 
 		g->SetLineWidth(1);
 		g->SetColor(pcolor);
@@ -811,12 +811,12 @@ class GraphicPanel : public jgui::Canvas{
 		g->DrawLine(x0, y0+(240-10)/2, x0+250, y0+(240-10)/2);
 
 		// draw string (disable COLORALPHA)
-		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::BF_ALPHACHANNEL));
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL));
 
-		jgui::Font *f1 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 50),
-			*f2 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 40),
-			*f3 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 30),
-			*f4 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", 0, 20);
+		jgui::Font *f1 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 50),
+			*f2 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 40),
+			*f3 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 30),
+			*f4 = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 20);
 		int shadow = 4;
 
 		std::string text = "DrawString";
@@ -968,28 +968,20 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 				bool visible = true;
 
 				{
-					jgui::Keyboard app(150, 150, jgui::FULL_ALPHA_NUMERIC_KEYBOARD, visible);
+					jgui::Keyboard app(150, 150, jgui::JKB_QWERTY, visible);
 
 					app.GetText();
 					app.Show();
 				}
 
 				{
-					jgui::Keyboard app(150, 150, jgui::SMALL_ALPHA_NUMERIC_KEYBOARD, visible);
+					jgui::Keyboard app(150, 150, jgui::JKB_ALPHA_NUMERIC, visible);
 
 					app.Show();
 				}
 
 				{
-					jgui::Keyboard app(150, 150, jgui::FULL_NUMERIC_KEYBOARD, visible);
-
-					app.GetText();
-					app.Show();
-					app.GetText();
-				}
-
-				{
-					jgui::Keyboard app(150, 150, jgui::SMALL_NUMERIC_KEYBOARD, visible);
+					jgui::Keyboard app(150, 150, jgui::JKB_NUMERIC, visible);
 
 					app.GetText();
 					app.Show();
@@ -997,7 +989,15 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 				}
 
 				{
-					jgui::Keyboard app(150, 150, jgui::FULL_WEB_KEYBOARD, visible);
+					jgui::Keyboard app(150, 150, jgui::JKB_PHONE, visible);
+
+					app.GetText();
+					app.Show();
+					app.GetText();
+				}
+
+				{
+					jgui::Keyboard app(150, 150, jgui::JKB_INTERNET, visible);
 
 					app.Show();
 				}
@@ -1040,8 +1040,8 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 					*item32 = new jgui::Item("item 3.2"),
 					*item33 = new jgui::Item("item 3.3");
 
-				item111->SetHorizontalAlign(jgui::LEFT_HALIGN);
-				item112->SetHorizontalAlign(jgui::LEFT_HALIGN);
+				item111->SetHorizontalAlign(jgui::JHA_LEFT);
+				item112->SetHorizontalAlign(jgui::JHA_LEFT);
 
 				item1->AddChild(item11);
 				item1->AddChild(item12);

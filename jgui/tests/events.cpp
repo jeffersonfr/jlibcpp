@@ -53,8 +53,8 @@ class UserEvent {
 
 		// \brief key event
 		int _code;
-		jgui::jkey_symbol_t _symbol;
-		jgui::jinput_modifiers_t _mod;
+		jgui::jkeyevent_symbol_t _symbol;
+		jgui::jkeyevent_modifiers_t _mod;
 		// \brief mouse events
 		double _vx,
 					 _vy;
@@ -64,7 +64,7 @@ class UserEvent {
 		jgui::jmouse_button_t _button;
 
 	public:
-		UserEvent(userevent_type_t type, jgui::jinput_modifiers_t mod, int code, jgui::jkey_symbol_t symbol)
+		UserEvent(userevent_type_t type, jgui::jkeyevent_modifiers_t mod, int code, jgui::jkeyevent_symbol_t symbol)
 		{
 			_type = type;
 
@@ -104,7 +104,7 @@ class UserEvent {
 			return _code;
 		}
 
-		jgui::jinput_modifiers_t GetModifiers()
+		jgui::jkeyevent_modifiers_t GetModifiers()
 		{
 			return _mod;
 		}
@@ -202,7 +202,7 @@ class UserEventManager : public jgui::KeyListener, public jgui::MouseListener {
 	private:
 		static UserEventManager *_instance;
 
-		std::map<jgui::jkey_symbol_t, event_t *> _events;
+		std::map<jgui::jkeyevent_symbol_t, event_t *> _events;
 		std::vector<UserEventListener *> _user_listeners;
 		jgui::jpoint_t _last_mouse_location;
 		uint64_t _last_mouse_move;
@@ -302,7 +302,7 @@ class UserEventManager : public jgui::KeyListener, public jgui::MouseListener {
 
 		virtual void KeyPressed(jgui::KeyEvent *event)
 		{
-			if (event->GetType() == jgui::JKEY_PRESSED) {
+			if (event->GetType() == jgui::JKT_PRESSED) {
 				struct event_t *t = _events[event->GetSymbol()];
 
 				if ((void *)t == NULL) {
@@ -330,7 +330,7 @@ class UserEventManager : public jgui::KeyListener, public jgui::MouseListener {
 				}
 
 				DispatchUserEvent(new UserEvent(ON_KEY_PRESS_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
-			} else if (event->GetType() == jgui::JKEY_RELEASED) {
+			} else if (event->GetType() == jgui::JKT_RELEASED) {
 				struct event_t *t = _events[event->GetSymbol()];
 
 				if ((void *)t != NULL) {

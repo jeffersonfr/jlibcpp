@@ -42,10 +42,10 @@ int main(int argc, char **argv)
 	}
 
 	try {
-		m = new MemoryMap(key, MEM_CREAT, jshared::MEM_WRITE, true);
+		m = new MemoryMap(key, JMF_CREAT, jshared::JMP_WRITE, true);
 	} catch (...) {
 		try {
-			m = new MemoryMap(key, MEM_OPEN, jshared::MEM_WRITE, true);
+			m = new MemoryMap(key, JMF_OPEN, jshared::JMP_WRITE, true);
 		} catch (...) {
 			std::cout << "Cannot create the memory map" << std::endl;
 

@@ -24,25 +24,25 @@
 #include <vector>
 
 enum jaddress_family_t {
-	AIF_UNKNOWN,
-	AIF_INET,
-	AIF_INET6,
-	AIF_NETBIOS
+	JAF_UNKNOWN,
+	JAF_INET,
+	JAF_INET6,
+	JAF_NETBIOS
 };
 
 enum jaddress_type_t {
-	AIT_UNKNOW,
-	AIT_STREAM,
-	AIT_DGRAM,
-	AIT_RAW,
-	AIT_RDM,
-	AIT_SEQPACKET
+	JAT_UNKNOW,
+	JAT_STREAM,
+	JAT_DGRAM,
+	JAT_RAW,
+	JAT_RDM,
+	JAT_SEQPACKET
 };
 
 enum jaddress_protocol_t {
-	AIP_UNKNOWN,
-	AIP_TCP,
-	AIP_UDP
+	JAP_UNKNOWN,
+	JAP_TCP,
+	JAP_UDP
 };
 
 struct jaddress_info_t {

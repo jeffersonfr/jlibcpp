@@ -35,11 +35,11 @@ Mutex::Mutex(jmutex_type_t type_, jmutex_protocol_t protocol_, bool block_in_dea
     
 	pthread_mutexattr_init(&attr);
     
-	if (type_ == FAST_MUTEX) {
+	if (type_ == JMT_FAST) {
 		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_FAST_NP);
-	} else if (type_ == RECURSIVE_MUTEX) {
+	} else if (type_ == JMT_RECURSIVE) {
 		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
-	} else if (type_ == ERROR_CHECK_MUTEX) {
+	} else if (type_ == JMT_ERROR_CHECK) {
 		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ERRORCHECK_NP);
 	}
 
@@ -120,7 +120,7 @@ void Mutex::Unlock()
 	}
 #endif
 
-	if (_type == FAST_MUTEX) {
+	if (_type == JMT_FAST) {
 		_lock_count = 0;
 	} else {
 		_lock_count--;

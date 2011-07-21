@@ -43,8 +43,8 @@ namespace jsocket {
  *
  */
 enum jconnection_pipe_t {
-	RECEIVER_PIPE,
-	SENDER_PIPE
+	JCP_RECEIVER,
+	JCP_SENDER
 };
 	
 /**

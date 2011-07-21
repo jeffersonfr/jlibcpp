@@ -48,7 +48,7 @@ Theme::Theme():
 	SetItemForegroundFocusColor(0xf0, 0xf0, 0xf0, 0xff);
 
 	_component_border_size = 1;
-	_component_border = LINE_BORDER;
+	_component_border = JCB_LINE;
 
 	_component_font = NULL;
 
@@ -59,7 +59,7 @@ Theme::Theme():
 	
 	_window_font = NULL;
 	_window_border_size = 4;
-	_window_border = RAISED_GRADIENT_BORDER;
+	_window_border = JCB_RAISED_GRADIENT;
 }
 
 Theme::~Theme()

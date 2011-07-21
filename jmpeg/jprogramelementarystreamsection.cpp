@@ -40,24 +40,24 @@ ProgramElementaryStreamSection::ProgramElementaryStreamSection(uint8_t *data, ui
 
 	_extension = 0;
 	
-	if (stream_id != PROGRAM_STREAM_MAP &&
-			stream_id != PADDING_STREAM &&
-			stream_id != PRIVATE_STREAM_2 &&
-			stream_id != ECM_STREAM &&
-			stream_id != EMM_STREAM &&
-			stream_id != PROGRAM_STREAM_DIRECTORY &&
-			stream_id != DSMCC_STREAM &&
-			stream_id != ITU_T_TYPE_E) {
+	if (stream_id != JSI_PROGRAM_STREAM_MAP &&
+			stream_id != JSI_PADDING_STREAM &&
+			stream_id != JSI_PRIVATE_STREAM_2 &&
+			stream_id != JSI_ECM_STREAM &&
+			stream_id != JSI_EMM_STREAM &&
+			stream_id != JSI_PROGRAM_STREAM_DIRECTORY &&
+			stream_id != JSI_DSMCC_STREAM &&
+			stream_id != JSI_ITU_T_TYPE_E) {
 		_extension = 1;
-	} else if (stream_id == PROGRAM_STREAM_MAP ||
-			stream_id == PRIVATE_STREAM_2 ||
-			stream_id == ECM_STREAM ||
-			stream_id == EMM_STREAM ||
-			stream_id == PROGRAM_STREAM_DIRECTORY ||
-			stream_id == DSMCC_STREAM ||
-			stream_id == ITU_T_TYPE_E) {
+	} else if (stream_id == JSI_PROGRAM_STREAM_MAP ||
+			stream_id == JSI_PRIVATE_STREAM_2 ||
+			stream_id == JSI_ECM_STREAM ||
+			stream_id == JSI_EMM_STREAM ||
+			stream_id == JSI_PROGRAM_STREAM_DIRECTORY ||
+			stream_id == JSI_DSMCC_STREAM ||
+			stream_id == JSI_ITU_T_TYPE_E) {
 		_extension = 2;
-	} else if (stream_id == PADDING_STREAM) {
+	} else if (stream_id == JSI_PADDING_STREAM) {
 		_extension = 3;
 	}
 }

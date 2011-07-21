@@ -29,12 +29,12 @@ namespace jgui {
  * \brief
  *
  */
-enum jselect_type_t {
-	LEFT_ITEM,
-	RIGHT_ITEM,
-	UP_ITEM,
-	DOWN_ITEM,
-	ACTION_ITEM
+enum jselectevent_type_t {
+	JST_LEFT,
+	JST_RIGHT,
+	JST_UP,
+	JST_DOWN,
+	JST_ACTION
 };
 
 /**
@@ -46,7 +46,7 @@ class SelectEvent : public jcommon::EventObject{
 
 	private:
 		jgui::Item *_item;
-		jselect_type_t _type;
+		jselectevent_type_t _type;
 		int _index;
 
 	public:
@@ -54,7 +54,7 @@ class SelectEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		SelectEvent(void *source, jgui::Item *item, int index, jselect_type_t type);
+		SelectEvent(void *source, jgui::Item *item, int index, jselectevent_type_t type);
 		
 		/**
 		 * \brief
@@ -78,7 +78,7 @@ class SelectEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		virtual jselect_type_t GetType();
+		virtual jselectevent_type_t GetType();
 
 };
 

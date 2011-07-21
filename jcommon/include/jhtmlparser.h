@@ -30,8 +30,8 @@
 namespace jcommon {
 
 enum jtag_type_t {
-	BODY_TAG,
-	TEXT_TAG
+	JTT_BODY,
+	JTT_TEXT
 };
 
 class Tag{

@@ -39,11 +39,11 @@ namespace jcommon {
  * 
  */
 enum jhttp_method_t {
-	GET,
-	POST,
-	HEAD,
-	OPTIONS,
-	ERRO
+	JHM_GET,
+	JHM_POST,
+	JHM_HEAD,
+	JHM_OPTIONS,
+	JHM_ERROR
 };
 
 /** \brief Enumeração de possíveis tokens que pode ser retornados 
@@ -51,18 +51,18 @@ enum jhttp_method_t {
  *
  */
 enum jhttp_token_t {
-	ERROR = -1,
-	CRLF = 256,
-	LWS,
-	TOKEN,
-	STRING,
-	QUERYVAL,
-	HEADERVAL,
-	EOB,
-	SP = ' ',
-	WT = '\t',
-	CR = '\r',
-	LF = '\n'
+	JHT_ERROR = -1,
+	JHT_CRLF = 256,
+	JHT_LWS,
+	JHT_TOKEN,
+	JHT_STRING,
+	JHT_QUERYVAL,
+	JHT_HEADERVAL,
+	JHT_EOB,
+	JHT_SP = ' ',
+	JHT_WT = '\t',
+	JHT_CR = '\r',
+	JHT_LF = '\n'
 };
 
 /** 
@@ -138,7 +138,7 @@ class Request {
 		{
 			codigo = 0; //se td OK retorna 200
 			versao = '1';
-			metodo = ERRO;
+			metodo = JHM_ERROR;
 			arquivo[0] = 0;
 			body = NULL;
 		}

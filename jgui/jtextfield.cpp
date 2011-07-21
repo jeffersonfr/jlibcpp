@@ -47,7 +47,7 @@ bool TextField::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JMOUSE_PRESSED_EVENT && event->GetButton() == JMOUSE_BUTTON1) {
+	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		RequestFocus();
@@ -68,125 +68,125 @@ bool TextField::ProcessEvent(KeyEvent *event)
 
 	bool catched = false;
 
-	jkey_symbol_t action = event->GetSymbol();
+	jkeyevent_symbol_t action = event->GetSymbol();
 
-	if (action == JKEY_CURSOR_LEFT) {
+	if (action == JKS_CURSOR_LEFT) {
 		DecrementCaretPosition(1);
-	} else if (action == JKEY_CURSOR_RIGHT) {
+	} else if (action == JKS_CURSOR_RIGHT) {
 		IncrementCaretPosition(1);
-	} else if (action == JKEY_HOME) {
+	} else if (action == JKS_HOME) {
 		_caret_position = 0;
 
 		Repaint();
-	} else if (action == JKEY_END) {
+	} else if (action == JKS_END) {
 		_caret_position = _text.size();
 
 		Repaint();
-	} else if (action == JKEY_BACKSPACE) {
+	} else if (action == JKS_BACKSPACE) {
 		Backspace();
-	} else if (action == JKEY_DELETE) {
+	} else if (action == JKS_DELETE) {
 		Delete();
 	} else {
 		std::string s;
 
 		switch (action) {
-			case JKEY_TAB: s = "\t"; break;
-			// case JKEY_ENTER: s = "\n"; break;
-			case JKEY_SPACE: s = " "; break;
-			case JKEY_EXCLAMATION_MARK: s = "!"; break;
-			case JKEY_QUOTATION: s = "\""; break;
-			case JKEY_NUMBER_SIGN: s = "#"; break;
-			case JKEY_DOLLAR_SIGN: s = "$"; break;
-			case JKEY_PERCENT_SIGN: s = "%"; break;
-			case JKEY_AMPERSAND: s = "&"; break;
-			case JKEY_APOSTROPHE: s = "'"; break;
-			case JKEY_PARENTHESIS_LEFT: s = "("; break;
-			case JKEY_PARENTHESIS_RIGHT: s = ")"; break;
-			case JKEY_STAR: s = "*"; break;
-			case JKEY_PLUS_SIGN: s = "+"; break;
-			case JKEY_COMMA: s = ","; break;
-			case JKEY_MINUS_SIGN: s = "-"; break;
-			case JKEY_PERIOD: s = "."; break;
-			case JKEY_SLASH: s = "/"; break;
-			case JKEY_0: s = "0"; break;
-			case JKEY_1: s = "1"; break;
-			case JKEY_2: s = "2"; break;
-			case JKEY_3: s = "3"; break;
-			case JKEY_4: s = "4"; break;
-			case JKEY_5: s = "5"; break;
-			case JKEY_6: s = "6"; break;
-			case JKEY_7: s = "7"; break;
-			case JKEY_8: s = "8"; break;
-			case JKEY_9: s = "9"; break;
-			case JKEY_COLON: s = ":"; break;
-			case JKEY_SEMICOLON: s = ";"; break;
-			case JKEY_LESS_THAN_SIGN: s = "<"; break;
-			case JKEY_EQUALS_SIGN: s = "="; break;
-			case JKEY_GREATER_THAN_SIGN: s = ">"; break;
-			case JKEY_QUESTION_MARK: s = "?"; break;
-			case JKEY_AT: s = "@"; break;
-			case JKEY_A: s = "A"; break;
-			case JKEY_B: s = "B"; break;
-			case JKEY_C: s = "C"; break;
-			case JKEY_D: s = "D"; break;
-			case JKEY_E: s = "E"; break;
-			case JKEY_F: s = "F"; break;
-			case JKEY_G: s = "G"; break;
-			case JKEY_H: s = "H"; break;
-			case JKEY_I: s = "I"; break;
-			case JKEY_J: s = "J"; break;
-			case JKEY_K: s = "K"; break;
-			case JKEY_L: s = "L"; break;
-			case JKEY_M: s = "M"; break;
-			case JKEY_N: s = "N"; break;
-			case JKEY_O: s = "O"; break;
-			case JKEY_P: s = "P"; break;
-			case JKEY_Q: s = "Q"; break;
-			case JKEY_R: s = "R"; break;
-			case JKEY_S: s = "S"; break;
-			case JKEY_T: s = "T"; break;
-			case JKEY_U: s = "U"; break;
-			case JKEY_V: s = "V"; break;
-			case JKEY_W: s = "W"; break;
-			case JKEY_X: s = "X"; break;
-			case JKEY_Y: s = "Y"; break;
-			case JKEY_Z: s = "Z"; break;
-			case JKEY_a: s = "a"; break;
-			case JKEY_b: s = "b"; break;
-			case JKEY_c: s = "c"; break;
-			case JKEY_d: s = "d"; break;
-			case JKEY_e: s = "e"; break;
-			case JKEY_f: s = "f"; break;
-			case JKEY_g: s = "g"; break;
-			case JKEY_h: s = "h"; break;
-			case JKEY_i: s = "i"; break;
-			case JKEY_j: s = "j"; break;
-			case JKEY_k: s = "k"; break;
-			case JKEY_l: s = "l"; break;
-			case JKEY_m: s = "m"; break;
-			case JKEY_n: s = "n"; break;
-			case JKEY_o: s = "o"; break;
-			case JKEY_p: s = "p"; break;
-			case JKEY_q: s = "q"; break;
-			case JKEY_r: s = "r"; break;
-			case JKEY_s: s = "s"; break;
-			case JKEY_t: s = "t"; break;
-			case JKEY_u: s = "u"; break;
-			case JKEY_v: s = "v"; break;
-			case JKEY_w: s = "w"; break;
-			case JKEY_x: s = "x"; break;
-			case JKEY_y: s = "y"; break;
-			case JKEY_z: s = "z"; break;
-			case JKEY_SQUARE_BRACKET_LEFT: s = "["; break;
-			case JKEY_BACKSLASH: s = "\\"; break;
-			case JKEY_SQUARE_BRACKET_RIGHT: s = "["; break;
-			case JKEY_CIRCUMFLEX_ACCENT: s = "^"; break;
-			case JKEY_UNDERSCORE: s = "_"; break;
-			case JKEY_GRAVE_ACCENT: s = "'"; break;
-			case JKEY_CURLY_BRACKET_LEFT: s = "{"; break;
-			case JKEY_VERTICAL_BAR: s = "|"; break;
-			case JKEY_CURLY_BRACKET_RIGHT: s = "}"; break;
-			case JKEY_TILDE: s = "~"; break;
+			case JKS_TAB: s = "\t"; break;
+			// case JKS_ENTER: s = "\n"; break;
+			case JKS_SPACE: s = " "; break;
+			case JKS_EXCLAMATION_MARK: s = "!"; break;
+			case JKS_QUOTATION: s = "\""; break;
+			case JKS_NUMBER_SIGN: s = "#"; break;
+			case JKS_DOLLAR_SIGN: s = "$"; break;
+			case JKS_PERCENT_SIGN: s = "%"; break;
+			case JKS_AMPERSAND: s = "&"; break;
+			case JKS_APOSTROPHE: s = "'"; break;
+			case JKS_PARENTHESIS_LEFT: s = "("; break;
+			case JKS_PARENTHESIS_RIGHT: s = ")"; break;
+			case JKS_STAR: s = "*"; break;
+			case JKS_PLUS_SIGN: s = "+"; break;
+			case JKS_COMMA: s = ","; break;
+			case JKS_MINUS_SIGN: s = "-"; break;
+			case JKS_PERIOD: s = "."; break;
+			case JKS_SLASH: s = "/"; break;
+			case JKS_0: s = "0"; break;
+			case JKS_1: s = "1"; break;
+			case JKS_2: s = "2"; break;
+			case JKS_3: s = "3"; break;
+			case JKS_4: s = "4"; break;
+			case JKS_5: s = "5"; break;
+			case JKS_6: s = "6"; break;
+			case JKS_7: s = "7"; break;
+			case JKS_8: s = "8"; break;
+			case JKS_9: s = "9"; break;
+			case JKS_COLON: s = ":"; break;
+			case JKS_SEMICOLON: s = ";"; break;
+			case JKS_LESS_THAN_SIGN: s = "<"; break;
+			case JKS_EQUALS_SIGN: s = "="; break;
+			case JKS_GREATER_THAN_SIGN: s = ">"; break;
+			case JKS_QUESTION_MARK: s = "?"; break;
+			case JKS_AT: s = "@"; break;
+			case JKS_A: s = "A"; break;
+			case JKS_B: s = "B"; break;
+			case JKS_C: s = "C"; break;
+			case JKS_D: s = "D"; break;
+			case JKS_E: s = "E"; break;
+			case JKS_F: s = "F"; break;
+			case JKS_G: s = "G"; break;
+			case JKS_H: s = "H"; break;
+			case JKS_I: s = "I"; break;
+			case JKS_J: s = "J"; break;
+			case JKS_K: s = "K"; break;
+			case JKS_L: s = "L"; break;
+			case JKS_M: s = "M"; break;
+			case JKS_N: s = "N"; break;
+			case JKS_O: s = "O"; break;
+			case JKS_P: s = "P"; break;
+			case JKS_Q: s = "Q"; break;
+			case JKS_R: s = "R"; break;
+			case JKS_S: s = "S"; break;
+			case JKS_T: s = "T"; break;
+			case JKS_U: s = "U"; break;
+			case JKS_V: s = "V"; break;
+			case JKS_W: s = "W"; break;
+			case JKS_X: s = "X"; break;
+			case JKS_Y: s = "Y"; break;
+			case JKS_Z: s = "Z"; break;
+			case JKS_a: s = "a"; break;
+			case JKS_b: s = "b"; break;
+			case JKS_c: s = "c"; break;
+			case JKS_d: s = "d"; break;
+			case JKS_e: s = "e"; break;
+			case JKS_f: s = "f"; break;
+			case JKS_g: s = "g"; break;
+			case JKS_h: s = "h"; break;
+			case JKS_i: s = "i"; break;
+			case JKS_j: s = "j"; break;
+			case JKS_k: s = "k"; break;
+			case JKS_l: s = "l"; break;
+			case JKS_m: s = "m"; break;
+			case JKS_n: s = "n"; break;
+			case JKS_o: s = "o"; break;
+			case JKS_p: s = "p"; break;
+			case JKS_q: s = "q"; break;
+			case JKS_r: s = "r"; break;
+			case JKS_s: s = "s"; break;
+			case JKS_t: s = "t"; break;
+			case JKS_u: s = "u"; break;
+			case JKS_v: s = "v"; break;
+			case JKS_w: s = "w"; break;
+			case JKS_x: s = "x"; break;
+			case JKS_y: s = "y"; break;
+			case JKS_z: s = "z"; break;
+			case JKS_SQUARE_BRACKET_LEFT: s = "["; break;
+			case JKS_BACKSLASH: s = "\\"; break;
+			case JKS_SQUARE_BRACKET_RIGHT: s = "["; break;
+			case JKS_CIRCUMFLEX_ACCENT: s = "^"; break;
+			case JKS_UNDERSCORE: s = "_"; break;
+			case JKS_GRAVE_ACCENT: s = "'"; break;
+			case JKS_CURLY_BRACKET_LEFT: s = "{"; break;
+			case JKS_VERTICAL_BAR: s = "|"; break;
+			case JKS_CURLY_BRACKET_RIGHT: s = "}"; break;
+			case JKS_TILDE: s = "~"; break;
 			default:
 				  break;
 		}
@@ -230,11 +230,11 @@ void TextField::Paint(Graphics *g)
 
 	if (_font != NULL) {
 		if (_caret_visible == true) {
-			if (_caret_type == UNDERSCORE_CURSOR) {
+			if (_caret_type == JCT_UNDERSCORE) {
 				cursor = "_";
-			} else if (_caret_type == STICK_CURSOR) {
+			} else if (_caret_type == JCT_STICK) {
 				cursor = "|";
-			} else if (_caret_type == BLOCK_CURSOR) {
+			} else if (_caret_type == JCT_BLOCK) {
 				cursor = "?";
 			}
 
@@ -283,25 +283,25 @@ void TextField::Paint(Graphics *g)
 
 			s = s.substr(0, count);
 
-			if (_halign == LEFT_HALIGN) {
+			if (_halign == JHA_LEFT) {
 				offset = 0;
-			} else if (_halign == CENTER_HALIGN) {
+			} else if (_halign == JHA_CENTER) {
 				offset = (w-current_text_size)/2;
-			} else if (_halign == RIGHT_HALIGN) {
+			} else if (_halign == JHA_RIGHT) {
 				offset = w-current_text_size;
-			} else if (_halign == JUSTIFY_HALIGN) {
+			} else if (_halign == JHA_JUSTIFY) {
 				offset = 0;
 			}
 
 			current_text_size = _font->GetStringWidth(s.substr(0, _caret_position));
 		}
 
-		g->DrawString(s, x+offset, y, w, h, LEFT_HALIGN, _valign);
+		g->DrawString(s, x+offset, y, w, h, JHA_LEFT, _valign);
 
 		if (_has_focus == true && _is_editable == true && _caret_visible == true) {
 			g->SetColor(0xff, 0x00, 0x00, 0xff);
 
-			g->DrawString(cursor, x+current_text_size+offset, y, w, h, LEFT_HALIGN, _valign);
+			g->DrawString(cursor, x+current_text_size+offset, y, w, h, JHA_LEFT, _valign);
 		}
 	}
 

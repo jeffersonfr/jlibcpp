@@ -84,12 +84,12 @@ std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::st
 
 		switch (ptr->ai_family) {
 			case AF_UNSPEC:
-				info.family = AIF_UNKNOWN;
+				info.family = JAF_UNKNOWN;
 				break;
 			case AF_INET:
 				struct sockaddr_in *sockaddr_ipv4;
 
-				info.family = AIF_INET;
+				info.family = JAF_INET;
 				sockaddr_ipv4 = (struct sockaddr_in *) ptr->ai_addr;
 				info.address = std::string(inet_ntoa(sockaddr_ipv4->sin_addr));
 				break;
@@ -97,64 +97,64 @@ std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::st
 #ifdef _WIN32
 				struct sockaddr_in6 *in = (struct sockaddr_in6 *)ptr->ai_addr;
 
-				info.family = AIF_INET6;
+				info.family = JAF_INET6;
 				
 				info.address = Win32HostAddress(in, ptr->ai_addrlen);
 #else
 				struct sockaddr_in6 *sockaddr_ipv6;
 				char ipstringbuffer[255];
 
-				info.family = AIF_INET6;
+				info.family = JAF_INET6;
 				sockaddr_ipv6 = (struct sockaddr_in6 *) ptr->ai_addr;
 				info.address = std::string(inet_ntop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255));
 #endif
 				break;
 #ifdef _WIN32
 			case AF_NETBIOS:
-				info.family = AIF_NETBIOS;
+				info.family = JAF_NETBIOS;
 				break;
 #endif
 			default:
-				info.family = AIF_UNKNOWN;
+				info.family = JAF_UNKNOWN;
 				break;
 		}
 
 		switch (ptr->ai_socktype) {
 			case 0:
-				info.type = AIT_UNKNOW;
+				info.type = JAT_UNKNOW;
 				break;
 			case SOCK_STREAM:
-				info.type = AIT_STREAM;
+				info.type = JAT_STREAM;
 				break;
 			case SOCK_DGRAM:
-				info.type = AIT_DGRAM;
+				info.type = JAT_DGRAM;
 				break;
 			case SOCK_RAW:
-				info.type = AIT_RAW;
+				info.type = JAT_RAW;
 				break;
 			case SOCK_RDM:
-				info.type = AIT_RDM;
+				info.type = JAT_RDM;
 				break;
 			case SOCK_SEQPACKET:
-				info.type = AIT_SEQPACKET;
+				info.type = JAT_SEQPACKET;
 				break;
 			default:
-				info.type = AIT_UNKNOW;
+				info.type = JAT_UNKNOW;
 				break;
 		}
 
 		switch (ptr->ai_protocol) {
 			case 0:
-				info.protocol = AIP_UNKNOWN;
+				info.protocol = JAP_UNKNOWN;
 				break;
 			case IPPROTO_TCP:
-				info.protocol = AIP_TCP;
+				info.protocol = JAP_TCP;
 				break;
 			case IPPROTO_UDP:
-				info.protocol = AIP_UDP;
+				info.protocol = JAP_UDP;
 				break;
 			default:
-				info.protocol = AIP_UNKNOWN;
+				info.protocol = JAP_UNKNOWN;
 				break;
 		}
 

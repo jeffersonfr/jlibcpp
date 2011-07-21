@@ -42,9 +42,9 @@ namespace jgui {
  * \brief
  *
  */
-enum jmarquee_type_t {
-	LOOP_TEXT,
-	BOUNCE_TEXT
+enum jmarquee_mode_t {
+	JMM_LOOP,
+	JMM_BOUNCE
 };
 
 /**
@@ -56,7 +56,7 @@ class Marquee : public Component, public jthread::Thread{
 
 	private:
 		std::string _text;
-		jmarquee_type_t _type;
+		jmarquee_mode_t _type;
 		int _position,
 				_interval,
 				_index,
@@ -86,7 +86,7 @@ class Marquee : public Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void SetType(jmarquee_type_t type);
+		virtual void SetType(jmarquee_mode_t type);
 		
 		/**
 		 * \brief

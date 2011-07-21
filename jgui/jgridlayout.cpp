@@ -192,7 +192,7 @@ void GridLayout::DoLayout(Container *parent)
 			nrows = _rows,
 			ncols = _cols;
 	// insets
-	bool ltr = (parent->GetComponentOrientation() == LEFT_TO_RIGHT_ORIENTATION);
+	bool ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
 
 	if (ncomponents == 0) {
 		return;

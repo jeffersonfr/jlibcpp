@@ -27,8 +27,8 @@ Watch::Watch(jwatch_type_t type, int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Watch");
 
-	_halign = CENTER_HALIGN;
-	_valign = CENTER_VALIGN;
+	_halign = JHA_CENTER;
+	_valign = JVA_CENTER;
 
 	_running = true;
 	_type = type;
@@ -102,8 +102,8 @@ void Watch::Run()
 			return;
 		}
 
-		if (_type == ANALOGIC_WATCH) {
-		} else if (_type == CRONOMETERUP_WATCH) {
+		if (_type == JWT_ANALOGIC) {
+		} else if (_type == JWT_CRONOMETERUP) {
 			if (_paused == false) {
 				_second++;
 
@@ -121,7 +121,7 @@ void Watch::Run()
 					}
 				}
 			}
-		} else if (_type == CRONOMETERDOWN_WATCH) {
+		} else if (_type == JWT_CRONOMETERDOWN) {
 			if (_paused == false) {
 				_second--;
 
@@ -255,7 +255,7 @@ void Watch::Paint(Graphics *g)
 
 		std::string text;
 
-		if (_type == ANALOGIC_WATCH) {
+		if (_type == JWT_ANALOGIC) {
 			time_t raw;
 			char *t;
 
@@ -265,7 +265,7 @@ void Watch::Paint(Graphics *g)
 			t[19] = '\0';
 
 			text = (char *)(t+10);
-		} else if (_type == CRONOMETERUP_WATCH || _type == CRONOMETERDOWN_WATCH) {
+		} else if (_type == JWT_CRONOMETERUP || _type == JWT_CRONOMETERDOWN) {
 			char tmp[256];
 
 			sprintf(tmp, "%02d:%02d:%02d", _hour, _minute, _second);

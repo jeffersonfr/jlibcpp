@@ -35,8 +35,8 @@ ListBox::ListBox(int x, int y, int width, int height):
 	_centered_interaction = true;
 	_top_index = 0;
 	_selected_index = -1;
-	_scroll = SCROLL_BAR;
-	_selection = NONE_SELECTION;
+	_scroll = JLS_BAR;
+	_selection = JLM_NONE_SELECTION;
 
 	SetFocusable(true);
 }
@@ -73,7 +73,7 @@ int ListBox::GetVisibleItems()
 	return visible_items;
 }
 
-void ListBox::SetSelectionType(jlist_selection_type_t type)
+void ListBox::SetSelectionType(jlistbox_mode_t type)
 {
 	if (_selection == type) {
 		return;
@@ -91,7 +91,7 @@ void ListBox::AddEmptyItem()
 {
 	Item *item = new Item();
 
-	item->SetHorizontalAlign(LEFT_HALIGN);
+	item->SetHorizontalAlign(JHA_LEFT);
 		
 	AddInternalItem(item);
 	AddItem(item);
@@ -101,7 +101,7 @@ void ListBox::AddTextItem(std::string text)
 {
 	Item *item = new Item(text);
 
-	item->SetHorizontalAlign(LEFT_HALIGN);
+	item->SetHorizontalAlign(JHA_LEFT);
 		
 	AddInternalItem(item);
 	AddItem(item);
@@ -111,7 +111,7 @@ void ListBox::AddImageItem(std::string text, std::string image)
 {
 	Item *item = new Item(text, image);
 
-	item->SetHorizontalAlign(LEFT_HALIGN);
+	item->SetHorizontalAlign(JHA_LEFT);
 		
 	AddInternalItem(item);
 	AddItem(item);
@@ -121,7 +121,7 @@ void ListBox::AddCheckedItem(std::string text, bool checked)
 {
 	Item *item = new Item(text, checked);
 
-	item->SetHorizontalAlign(LEFT_HALIGN);
+	item->SetHorizontalAlign(JHA_LEFT);
 		
 	AddInternalItem(item);
 	AddItem(item);
@@ -143,7 +143,7 @@ void ListBox::SetItemSize(int size)
 	Repaint();
 }
 
-void ListBox::SetScrollType(jlist_scroll_type_t type)
+void ListBox::SetScrollType(jlistbox_scroll_t type)
 {
 	jthread::AutoLock lock(&_component_mutex);
 
@@ -227,11 +227,11 @@ bool ListBox::IsSelected(int i)
 		return false;
 	}
 
-	if (_selection == SINGLE_SELECTION) {
+	if (_selection == JLM_SINGLE_SELECTION) {
 		if (_selected_index == i) {
 			return true;
 		}
-	} else if (_selection == MULTI_SELECTION) {
+	} else if (_selection == JLM_MULTI_SELECTION) {
 		return _items[i]->IsSelected();
 	}
 
@@ -244,7 +244,7 @@ void ListBox::SetSelected(int i)
 		return;
 	}
 
-	if (_selection == SINGLE_SELECTION) {
+	if (_selection == JLM_SINGLE_SELECTION) {
 		if (_selected_index == i) {
 			_selected_index = -1;
 		} else {
@@ -252,7 +252,7 @@ void ListBox::SetSelected(int i)
 		}
 
 		Repaint();
-	} else if (_selection == MULTI_SELECTION) {
+	} else if (_selection == JLM_MULTI_SELECTION) {
 		if (_items[i]->IsSelected()) {
 			_items[i]->SetSelected(false);
 		} else {
@@ -269,11 +269,11 @@ void ListBox::Select(int i)
 		return;
 	}
 
-	if (_selection == SINGLE_SELECTION) {
+	if (_selection == JLM_SINGLE_SELECTION) {
 		_selected_index = i;
 
 		Repaint();
-	} else if (_selection == MULTI_SELECTION) {
+	} else if (_selection == JLM_MULTI_SELECTION) {
 		_items[i]->SetSelected(true);
 
 		Repaint();
@@ -286,11 +286,11 @@ void ListBox::Deselect(int i)
 		return;
 	}
 
-	if (_selection == SINGLE_SELECTION) {
+	if (_selection == JLM_SINGLE_SELECTION) {
 		_selected_index = -1;
 
 		Repaint();
-	} else if (_selection == MULTI_SELECTION) {
+	} else if (_selection == JLM_MULTI_SELECTION) {
 		_items[i]->SetSelected(false);
 
 		Repaint();
@@ -329,12 +329,12 @@ bool ListBox::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JMOUSE_PRESSED_EVENT && event->GetButton() == JMOUSE_BUTTON1) {
+	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		RequestFocus();
 		
-		if (_scroll == SCROLL_BAR) {
+		if (_scroll == JLS_BAR) {
 			if (x1 > (_location.x+_size.width-_scroll_width-_horizontal_gap+_border_size) && x1 < (_location.x+_size.width-_horizontal_gap+_border_size)) {
 				_pressed = false;
 
@@ -355,7 +355,7 @@ bool ListBox::ProcessEvent(MouseEvent *event)
 				}
 			}
 		}
-	} else if (event->GetType() == JMOUSE_MOVED_EVENT) {
+	} else if (event->GetType() == JME_MOVED) {
 		if (_pressed == true) {
 			if (y1 < (_location.y+_item_size/2+diff*_index+_vertical_gap+_border_size)) {
 				PreviousItem();
@@ -382,21 +382,21 @@ bool ListBox::ProcessEvent(KeyEvent *event)
 
 	bool catched = false;
 
-	jkey_symbol_t action = event->GetSymbol();
+	jkeyevent_symbol_t action = event->GetSymbol();
 
-	if (action == JKEY_CURSOR_UP || action == JKEY_PAGE_UP) {
+	if (action == JKS_CURSOR_UP || action == JKS_PAGE_UP) {
 		PreviousItem();
 		
 		catched = true;
-	} else if (action == JKEY_CURSOR_DOWN || action == JKEY_PAGE_DOWN) {
+	} else if (action == JKS_CURSOR_DOWN || action == JKS_PAGE_DOWN) {
 		NextItem();
 
 		catched = true;
-	} else if (action == JKEY_ENTER) {
+	} else if (action == JKS_ENTER) {
 		SetSelected(_index);
 
 		if (_items.size() > 0) { 
-			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, ACTION_ITEM));
+			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_ACTION));
 		}
 
 		catched = true;
@@ -439,7 +439,7 @@ void ListBox::Paint(Graphics *g)
 			scroll_gap = 0;
 
 	for (std::vector<jgui::Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-		if ((*i)->GetType() == IMAGE_MENU_ITEM) {
+		if ((*i)->GetType() == JMT_IMAGE) {
 			space += _item_size + 8;
 
 			break;
@@ -450,7 +450,7 @@ void ListBox::Paint(Graphics *g)
 		position = 0;
 	}
 
-	if (_scroll == SCROLL_BAR) {
+	if (_scroll == JLS_BAR) {
 		scroll_width = _scroll_width;
 		scroll_gap = 5;
 	}
@@ -461,11 +461,11 @@ void ListBox::Paint(Graphics *g)
 		g->SetColor(_item_color);
 
 		if (_index != i) {
-			if (_selection == SINGLE_SELECTION) {	
+			if (_selection == JLM_SINGLE_SELECTION) {	
 				if (_selected_index == i) {	
 					g->SetColor(_selected_item_color);
 				}
-			} else if (_selection == MULTI_SELECTION) {	
+			} else if (_selection == JLM_MULTI_SELECTION) {	
 				if (_items[i]->IsSelected() == true) {	
 					g->SetColor(_selected_item_color);
 				}
@@ -496,19 +496,19 @@ void ListBox::Paint(Graphics *g)
 
 		g->SetColor(_item_color);
 
-		if (_selection == SINGLE_SELECTION) {
+		if (_selection == JLM_SINGLE_SELECTION) {
 			if (_selected_index == i) {
 				g->SetColor(_selected_item_color);
 			}
-		} else if (_selection == MULTI_SELECTION) {	
+		} else if (_selection == JLM_MULTI_SELECTION) {	
 			if (_items[i]->IsSelected() == true) {	
 				g->SetColor(_selected_item_color);
 			}
 		}
 
-		if (_items[i]->GetType() == EMPTY_MENU_ITEM) {
-		} else if (_items[i]->GetType() == TEXT_MENU_ITEM) {
-		} else if (_items[i]->GetType() == IMAGE_MENU_ITEM) {
+		if (_items[i]->GetType() == JMT_EMPTY) {
+		} else if (_items[i]->GetType() == JMT_TEXT) {
+		} else if (_items[i]->GetType() == JMT_IMAGE) {
 			if (_items[i]->GetImage() != NULL) {
 				if (count != visible_items) {
 					g->DrawImage(_items[i]->GetImage(), _horizontal_gap, y+(_item_size+_vertical_gap)*count, _item_size, _item_size);
@@ -623,7 +623,7 @@ void ListBox::Paint(Graphics *g)
 		}
 	}
 	
-	if (_scroll == SCROLL_BAR) {
+	if (_scroll == JLS_BAR) {
 		Color color(0x80, 0x80, 0xe0, 0xff),
 					disable = color.Darker(0.1);
 
@@ -683,7 +683,7 @@ void ListBox::PreviousItem()
 		if (_index != old_index) {
 			Repaint();
 
-			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, UP_ITEM)); 
+			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_UP)); 
 		}
 	}
 }
@@ -721,7 +721,7 @@ void ListBox::NextItem()
 		if (_index != old_index) {
 			Repaint();
 
-			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, DOWN_ITEM)); 
+			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_DOWN)); 
 		}
 	}
 }

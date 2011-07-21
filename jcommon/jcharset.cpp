@@ -101,7 +101,7 @@ Charset::~Charset()
 
 jcharset_result_t Charset::UnicodeToUTF8(const Char **src_start, const Char *src_end, char **dst_start, const char *dst_end)
 {
-	jcharset_result_t result = CS_OK;
+	jcharset_result_t result = JCR_OK;
 	register const Char * src = *src_start;
 	register char * dst = *dst_start;
 
@@ -132,7 +132,7 @@ jcharset_result_t Charset::UnicodeToUTF8(const Char **src_start, const Char *src
 		dst += bytes_to_write;
 		if (dst > dst_end) {
 			dst -= bytes_to_write;
-			result = CS_TARGET_EXHAUSTED;
+			result = JCR_TARGET_EXHAUSTED;
 			break;
 		}
 		extra_bytes = bytes_to_write;
@@ -151,7 +151,7 @@ jcharset_result_t Charset::UnicodeToUTF8(const Char **src_start, const Char *src
 
 jcharset_result_t Charset::UTF8ToUnicode(const char **src_start, const char *src_end, Char **dst_start, const Char *dst_end)
 {
-	jcharset_result_t result = CS_OK;
+	jcharset_result_t result = JCR_OK;
 	register const char * src = *src_start;
 	register Char * dst = *dst_start;
 
@@ -167,15 +167,15 @@ jcharset_result_t Charset::UTF8ToUnicode(const char **src_start, const char *src
 		}
 		*/
 		if (dst >= dst_end) {
-			result = (jcharset_result_t)(result | CS_TARGET_EXHAUSTED);
+			result = (jcharset_result_t)(result | JCR_TARGET_EXHAUSTED);
 			break;
 		}
 
 		ch = (uint8_t)*src++;
 		if (extra_bytes) {
 			if (src >= src_end) {
-				result = (jcharset_result_t)(result | CS_SOURCE_CORRUPT);
-				result = (jcharset_result_t)(result | CS_SOURCE_EXHAUSTED);
+				result = (jcharset_result_t)(result | JCR_SOURCE_CORRUPT);
+				result = (jcharset_result_t)(result | JCR_SOURCE_EXHAUSTED);
 			}
 			else if ((*src & High2Bits) == ContinueBits) {
 				ch &= FirstByteMask[extra_bytes];
@@ -185,17 +185,17 @@ jcharset_result_t Charset::UTF8ToUnicode(const char **src_start, const char *src
 					if (--extra_bytes == 0)
 						break;
 					if (src >= src_end) {
-						result = (jcharset_result_t)(result | CS_SOURCE_CORRUPT);
-						result = (jcharset_result_t)(result | CS_SOURCE_EXHAUSTED);
+						result = (jcharset_result_t)(result | JCR_SOURCE_CORRUPT);
+						result = (jcharset_result_t)(result | JCR_SOURCE_EXHAUSTED);
 						break;
 					}
 					if ((*src & High2Bits) != ContinueBits) {
-						result = (jcharset_result_t)(result | CS_SOURCE_CORRUPT);
+						result = (jcharset_result_t)(result | JCR_SOURCE_CORRUPT);
 						break;
 					}
 				} while (1);
 			} else {
-				result = (jcharset_result_t)(result | CS_SOURCE_CORRUPT);
+				result = (jcharset_result_t)(result | JCR_SOURCE_CORRUPT);
 			}
 		}
 
@@ -256,7 +256,7 @@ int Charset::UTF8Length(const char *utf8)
 
 int Charset::ReadUTF8(FILE *f, Char * dst)
 {
-	jcharset_result_t result = CS_OK;
+	jcharset_result_t result = JCR_OK;
 	Char ch;
 	unsigned short extra_bytes;
 	int c;
@@ -285,17 +285,17 @@ int Charset::ReadUTF8(FILE *f, Char * dst)
 					break;
 				c = getc(f);
 				if (c == EOF) {
-					result = CS_SOURCE_EXHAUSTED;
+					result = JCR_SOURCE_EXHAUSTED;
 					break;
 				}
 				if ((c & High2Bits) != ContinueBits) {
 					ungetc(c, f);
-					result = CS_SOURCE_CORRUPT;
+					result = JCR_SOURCE_CORRUPT;
 					break;
 				}
 			} while (1);
 		} else {
-			result = CS_SOURCE_CORRUPT;
+			result = JCR_SOURCE_CORRUPT;
 		}
 	}
 
@@ -629,7 +629,7 @@ int Charset::IsLatin1(const char *utf8, int nbytes)
 
 jcharset_result_t Charset::ConvertUTF32ToUTF16(const UTF32** sourceStart, const UTF32* sourceEnd, UTF16** targetStart, UTF16* targetEnd, jcharset_flags_t flags) 
 {
-	jcharset_result_t result = CS_OK;
+	jcharset_result_t result = JCR_OK;
 	const UTF32* source = *sourceStart;
 	UTF16* target = *targetStart;
 	
@@ -637,7 +637,7 @@ jcharset_result_t Charset::ConvertUTF32ToUTF16(const UTF32** sourceStart, const 
 		UTF32 ch;
 		
 		if (target >= targetEnd) {
-			result = CS_TARGET_EXHAUSTED; 
+			result = JCR_TARGET_EXHAUSTED; 
 			break;
 		}
 		
@@ -646,9 +646,9 @@ jcharset_result_t Charset::ConvertUTF32ToUTF16(const UTF32** sourceStart, const 
 		if (ch <= UNI_MAX_BMP) { /* Target is a character <= 0xFFFF */
 			/* UTF-16 surrogate values are illegal in UTF-32; 0xffff or 0xfffe are both reserved values */
 			if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_LOW_END) {
-				if (flags == strictConversion) {
+				if (flags == JCF_STRICT_CONVERSION) {
 					--source; /* return to the illegal value itself */
-					result = CS_SOURCE_ILLEGAL;
+					result = JCR_SOURCE_ILLEGAL;
 					break;
 				} else {
 					*target++ = UNI_REPLACEMENT_CHAR;
@@ -657,8 +657,8 @@ jcharset_result_t Charset::ConvertUTF32ToUTF16(const UTF32** sourceStart, const 
 				*target++ = (UTF16)ch; /* normal case */
 			}
 		} else if (ch > UNI_MAX_LEGAL_UTF32) {
-			if (flags == strictConversion) {
-				result = CS_SOURCE_ILLEGAL;
+			if (flags == JCF_STRICT_CONVERSION) {
+				result = JCR_SOURCE_ILLEGAL;
 			} else {
 				*target++ = UNI_REPLACEMENT_CHAR;
 			}
@@ -666,7 +666,7 @@ jcharset_result_t Charset::ConvertUTF32ToUTF16(const UTF32** sourceStart, const 
 			/* target is a character in range 0xFFFF - 0x10FFFF. */
 			if (target + 1 >= targetEnd) {
 				--source; /* Back up source pointer! */
-				result = CS_SOURCE_EXHAUSTED;
+				result = JCR_SOURCE_EXHAUSTED;
 			   	break;
 			}
 
@@ -684,7 +684,7 @@ jcharset_result_t Charset::ConvertUTF32ToUTF16(const UTF32** sourceStart, const 
 
 jcharset_result_t Charset::ConvertUTF16ToUTF32(const UTF16** sourceStart, const UTF16* sourceEnd, UTF32** targetStart, UTF32* targetEnd, jcharset_flags_t flags) 
 {
-	jcharset_result_t result = CS_OK;
+	jcharset_result_t result = JCR_OK;
 	const UTF16* source = *sourceStart;
 	UTF32* target = *targetStart;
 	UTF32 ch, ch2;
@@ -702,27 +702,27 @@ jcharset_result_t Charset::ConvertUTF16ToUTF32(const UTF16** sourceStart, const 
 					ch = ((ch - UNI_SUR_HIGH_START) << halfShift)
 					+ (ch2 - UNI_SUR_LOW_START) + halfBase;
 					++source;
-				} else if (flags == strictConversion) { /* it's an unpaired high surrogate */
+				} else if (flags == JCF_STRICT_CONVERSION) { /* it's an unpaired high surrogate */
 					--source; /* return to the illegal value itself */
-					result = CS_SOURCE_ILLEGAL;
+					result = JCR_SOURCE_ILLEGAL;
 					break;
 				}
 			} else { /* We don't have the 16 bits following the high surrogate. */
 				--source; /* return to the high surrogate */
-				result = CS_SOURCE_EXHAUSTED;
+				result = JCR_SOURCE_EXHAUSTED;
 				break;
 			}
-		} else if (flags == strictConversion) {
+		} else if (flags == JCF_STRICT_CONVERSION) {
 			/* UTF-16 surrogate values are illegal in UTF-32 */
 			if (ch >= UNI_SUR_LOW_START && ch <= UNI_SUR_LOW_END) {
 				--source; /* return to the illegal value itself */
-				result = CS_SOURCE_ILLEGAL;
+				result = JCR_SOURCE_ILLEGAL;
 				break;
 			}
 		}
 		if (target >= targetEnd) {
 			source = oldSource; /* Back up source pointer! */
-			result = CS_TARGET_EXHAUSTED; 
+			result = JCR_TARGET_EXHAUSTED; 
 			break;
 		}
 		*target++ = ch;
@@ -730,7 +730,7 @@ jcharset_result_t Charset::ConvertUTF16ToUTF32(const UTF16** sourceStart, const 
 	*sourceStart = source;
 	*targetStart = target;
 #ifdef CVTUTF_DEBUG
-	if (result == CS_SOURCE_ILLEGAL) {
+	if (result == JCR_SOURCE_ILLEGAL) {
 		fprintf(stderr, "ConvertUTF16toUTF32 illegal seq 0x%04x,%04x\n", ch, ch2);
 		fflush(stderr);
 	}
@@ -741,7 +741,7 @@ jcharset_result_t Charset::ConvertUTF16ToUTF32(const UTF16** sourceStart, const 
 
 jcharset_result_t Charset::ConvertUTF16ToUTF8(const UTF16 **sourceStart, const UTF16 *sourceEnd, UTF8 **targetStart, UTF8 *targetEnd, jcharset_flags_t flags) 
 {
-	jcharset_result_t result = CS_OK;
+	jcharset_result_t result = JCR_OK;
 	const UTF16* source = *sourceStart;
 	UTF8* target = *targetStart;
 	
@@ -762,23 +762,23 @@ jcharset_result_t Charset::ConvertUTF16ToUTF8(const UTF16 **sourceStart, const U
 					ch = ((ch - UNI_SUR_HIGH_START) << halfShift)
 					+ (ch2 - UNI_SUR_LOW_START) + halfBase;
 					++source;
-				} else if (flags == strictConversion) { 
+				} else if (flags == JCF_STRICT_CONVERSION) { 
 					// it's an unpaired high surrogate 
 					--source; // return to the illegal value itself 
-					result = CS_SOURCE_ILLEGAL;
+					result = JCR_SOURCE_ILLEGAL;
 					break;
 				}
 			} else { 
 				// We don't have the 16 bits following the high surrogate. 
 				--source; // return to the high surrogate 
-				result = CS_SOURCE_EXHAUSTED;
+				result = JCR_SOURCE_EXHAUSTED;
 				break;
 			}
-		} else if (flags == strictConversion) {
+		} else if (flags == JCF_STRICT_CONVERSION) {
 			// UTF-16 surrogate values are illegal in UTF-32 
 			if (ch >= UNI_SUR_LOW_START && ch <= UNI_SUR_LOW_END) {
 				--source; // return to the illegal value itself 
-				result = CS_SOURCE_ILLEGAL;
+				result = JCR_SOURCE_ILLEGAL;
 				break;
 			}
 		}
@@ -801,7 +801,7 @@ jcharset_result_t Charset::ConvertUTF16ToUTF8(const UTF16 **sourceStart, const U
 		if (target > targetEnd) {
 			source = oldSource; // Back up source pointer! 
 			target -= bytesToWrite; 
-			result = CS_TARGET_EXHAUSTED; 
+			result = JCR_TARGET_EXHAUSTED; 
 			break;
 		}
 
@@ -860,7 +860,7 @@ bool Charset::IsLegalUTF8Sequence(const UTF8 *source, const UTF8 *sourceEnd)
 
 jcharset_result_t Charset::ConvertUTF8ToUTF16(const UTF8** sourceStart, const UTF8* sourceEnd, UTF16** targetStart, UTF16* targetEnd, jcharset_flags_t flags) 
 {
-	jcharset_result_t result = CS_OK;
+	jcharset_result_t result = JCR_OK;
 	const UTF8* source = *sourceStart;
 	UTF16* target = *targetStart;
 	
@@ -868,13 +868,13 @@ jcharset_result_t Charset::ConvertUTF8ToUTF16(const UTF8** sourceStart, const UT
 		UTF32 ch = 0;
 		unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
 		if (source + extraBytesToRead >= sourceEnd) {
-			result = CS_SOURCE_EXHAUSTED;
+			result = JCR_SOURCE_EXHAUSTED;
 			break;
 		}
 	
 		// Do this check whether lenient or strict 
 		if (! IsLegalUTF8(source, extraBytesToRead+1)) {
-			result = CS_SOURCE_ILLEGAL;
+			result = JCR_SOURCE_ILLEGAL;
 			break;
 		}
 		
@@ -891,16 +891,16 @@ jcharset_result_t Charset::ConvertUTF8ToUTF16(const UTF8** sourceStart, const UT
 		
 		if (target >= targetEnd) {
 			source -= (extraBytesToRead+1); // Back up source pointer! 
-			result = CS_TARGET_EXHAUSTED; 
+			result = JCR_TARGET_EXHAUSTED; 
 			break;
 		}
 		if (ch <= UNI_MAX_BMP) { 
 			// Target is a character <= 0xFFFF 
 			// UTF-16 surrogate values are illegal in UTF-32 */
 			if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_LOW_END) {
-				if (flags == strictConversion) {
+				if (flags == JCF_STRICT_CONVERSION) {
 					source -= (extraBytesToRead+1); /* return to the illegal value itself */
-					result = CS_SOURCE_ILLEGAL;
+					result = JCR_SOURCE_ILLEGAL;
 					break;
 				} else {
 					*target++ = UNI_REPLACEMENT_CHAR;
@@ -909,8 +909,8 @@ jcharset_result_t Charset::ConvertUTF8ToUTF16(const UTF8** sourceStart, const UT
 				*target++ = (UTF16)ch; /* normal case */
 			}
 		} else if (ch > UNI_MAX_UTF16) {
-			if (flags == strictConversion) {
-				result = CS_SOURCE_ILLEGAL;
+			if (flags == JCF_STRICT_CONVERSION) {
+				result = JCR_SOURCE_ILLEGAL;
 				source -= (extraBytesToRead+1); /* return to the start */
 				break; /* Bail out; shouldn't continue */
 			} else {
@@ -920,7 +920,7 @@ jcharset_result_t Charset::ConvertUTF8ToUTF16(const UTF8** sourceStart, const UT
 			/* target is a character in range 0xFFFF - 0x10FFFF. */
 			if (target + 1 >= targetEnd) {
 				source -= (extraBytesToRead+1); /* Back up source pointer! */
-				result = CS_TARGET_EXHAUSTED; break;
+				result = JCR_TARGET_EXHAUSTED; break;
 			}
 			ch -= halfBase;
 			*target++ = (UTF16)((ch >> halfShift) + UNI_SUR_HIGH_START);
@@ -936,7 +936,7 @@ jcharset_result_t Charset::ConvertUTF8ToUTF16(const UTF8** sourceStart, const UT
 
 jcharset_result_t Charset::ConvertUTF32ToUTF8(const UTF32** sourceStart, const UTF32* sourceEnd, UTF8** targetStart, UTF8* targetEnd, jcharset_flags_t flags) 
 {
-	jcharset_result_t result = CS_OK;
+	jcharset_result_t result = JCR_OK;
 	const UTF32* source = *sourceStart;
 	UTF8* target = *targetStart;
 	
@@ -946,11 +946,11 @@ jcharset_result_t Charset::ConvertUTF32ToUTF8(const UTF32** sourceStart, const U
 		const UTF32 byteMask = 0xBF;
 		const UTF32 byteMark = 0x80; 
 		ch = *source++;
-		if (flags == strictConversion ) {
+		if (flags == JCF_STRICT_CONVERSION ) {
 			/* UTF-16 surrogate values are illegal in UTF-32 */
 			if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_LOW_END) {
 				--source; /* return to the illegal value itself */
-				result = CS_SOURCE_ILLEGAL;
+				result = JCR_SOURCE_ILLEGAL;
 				break;
 			}
 		}
@@ -963,14 +963,14 @@ jcharset_result_t Charset::ConvertUTF32ToUTF8(const UTF32** sourceStart, const U
 		} else if (ch <= UNI_MAX_LEGAL_UTF32) {  bytesToWrite = 4;
 		} else {			    bytesToWrite = 3;
 			ch = UNI_REPLACEMENT_CHAR;
-			result = CS_SOURCE_ILLEGAL;
+			result = JCR_SOURCE_ILLEGAL;
 		}
 		
 		target += bytesToWrite;
 		if (target > targetEnd) {
 			--source; // Back up source pointer! 
 			target -= bytesToWrite; 
-			result = CS_TARGET_EXHAUSTED; 
+			result = JCR_TARGET_EXHAUSTED; 
 			break;
 		}
 		switch (bytesToWrite) { 
@@ -991,7 +991,7 @@ jcharset_result_t Charset::ConvertUTF32ToUTF8(const UTF32** sourceStart, const U
 
 jcharset_result_t Charset::ConvertUTF8ToUTF32(const UTF8** sourceStart, const UTF8* sourceEnd, UTF32** targetStart, UTF32* targetEnd, jcharset_flags_t flags) 
 {
-	jcharset_result_t result = CS_OK;
+	jcharset_result_t result = JCR_OK;
 	const UTF8* source = *sourceStart;
 	UTF32* target = *targetStart;
 	
@@ -999,11 +999,11 @@ jcharset_result_t Charset::ConvertUTF8ToUTF32(const UTF8** sourceStart, const UT
 		UTF32 ch = 0;
 		unsigned short extraBytesToRead = trailingBytesForUTF8[*source];
 		if (source + extraBytesToRead >= sourceEnd) {
-			result = CS_SOURCE_EXHAUSTED; break;
+			result = JCR_SOURCE_EXHAUSTED; break;
 		}
 		// Do this check whether lenient or strict 
 		if (! IsLegalUTF8(source, extraBytesToRead+1)) {
-			result = CS_SOURCE_ILLEGAL;
+			result = JCR_SOURCE_ILLEGAL;
 			break;
 		}
 		// The cases all fall through. See "Note A" below.
@@ -1019,14 +1019,14 @@ jcharset_result_t Charset::ConvertUTF8ToUTF32(const UTF8** sourceStart, const UT
 		
 		if (target >= targetEnd) {
 			source -= (extraBytesToRead+1); /* Back up the source pointer! */
-			result = CS_TARGET_EXHAUSTED; break;
+			result = JCR_TARGET_EXHAUSTED; break;
 		}
 		if (ch <= UNI_MAX_LEGAL_UTF32) {
 			// UTF-16 surrogate values are illegal in UTF-32, and anything over Plane 17 (> 0x10FFFF) is illegal.
 			if (ch >= UNI_SUR_HIGH_START && ch <= UNI_SUR_LOW_END) {
-				if (flags == strictConversion) {
+				if (flags == JCF_STRICT_CONVERSION) {
 					source -= (extraBytesToRead+1); /* return to the illegal value itself */
-					result = CS_SOURCE_ILLEGAL;
+					result = JCR_SOURCE_ILLEGAL;
 					break;
 				} else {
 					*target++ = UNI_REPLACEMENT_CHAR;
@@ -1035,7 +1035,7 @@ jcharset_result_t Charset::ConvertUTF8ToUTF32(const UTF8** sourceStart, const UT
 				*target++ = ch;
 			}
 		} else { /* i.e., ch > UNI_MAX_LEGAL_UTF32 */
-			result = CS_SOURCE_ILLEGAL;
+			result = JCR_SOURCE_ILLEGAL;
 			*target++ = UNI_REPLACEMENT_CHAR;
 		}
 	}

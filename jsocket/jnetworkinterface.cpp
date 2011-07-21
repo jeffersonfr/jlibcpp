@@ -216,7 +216,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 					p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
 				}
 			
-				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::SPLIT_FLAG, false);
+				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::JTT_STRING, false);
 
 				std::map<std::string, NetworkInterface *>::iterator it = minterfaces.find(token.GetToken(0));
 				NetworkInterface *parent = NULL;
@@ -267,7 +267,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 					p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
 				}
 				
-				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::SPLIT_FLAG, false);
+				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::JTT_STRING, false);
 
 				std::map<std::string, NetworkInterface *>::iterator it = minterfaces.find(token.GetToken(0));
 				NetworkInterface *parent = NULL;

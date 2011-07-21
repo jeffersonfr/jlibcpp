@@ -20,8 +20,8 @@
 #ifndef	J_SLIDERCOMPONENT_H
 #define J_SLIDERCOMPONENT_H
 
-#include "jcomponent.h"
 #include "jadjustmentlistener.h"
+#include "jcomponent.h"
 
 #include <string>
 
@@ -29,13 +29,9 @@
 
 namespace jgui {
 
-/**
- * \brief
- *
- */
 enum jscroll_orientation_t {
-	LEFT_RIGHT_SCROLL,
-	BOTTOM_UP_SCROLL
+	JSO_HORIZONTAL,
+	JSO_VERTICAL
 };
 
 /**
@@ -72,13 +68,13 @@ class SliderComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual jscroll_orientation_t GetOrientation();
+		virtual jscroll_orientation_t GetScrollOrientation();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetOrientation(jscroll_orientation_t type);
+		virtual void SetScrollOrientation(jscroll_orientation_t type);
 		
 		/**
 		 * \brief
