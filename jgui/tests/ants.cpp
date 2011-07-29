@@ -80,7 +80,7 @@ class Main : public jgui::Frame{
 			_insets.right = 10;
 			_insets.top = 60;
 
-			fweights = new jgui::Font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 12);
+			fweights = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 12);
 #endif
 
 			board = new path_t[MAX_COLS*MAX_ROWS];

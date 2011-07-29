@@ -145,8 +145,8 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 		Tetris():
 			jgui::Frame("Tetris", 0, 0, 1920, 1080)
 		{
-			smallfont = new jgui::Font("./fonts/font.ttf", jgui::JFA_NONE, 20);
-			largefont = new jgui::Font("./fonts/font.ttf", jgui::JFA_NONE, 28);
+			smallfont = jgui::Font::CreateFont("./fonts/font.ttf", jgui::JFA_NONE, 20);
+			largefont = jgui::Font::CreateFont("./fonts/font.ttf", jgui::JFA_NONE, 28);
 
 			goff = NULL;
 			ii = NULL;

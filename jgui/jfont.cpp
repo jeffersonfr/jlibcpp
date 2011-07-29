@@ -82,10 +82,15 @@ Font::~Font()
 Font * Font::GetDefaultFont()
 {
 	if (_default_font == NULL) {
-		_default_font = new jgui::Font(_DATA_PREFIX"/fonts/font.ttf", JFA_NONE, DEFAULT_FONT_SIZE);
+		_default_font = Font::CreateFont(_DATA_PREFIX"/fonts/font.ttf", JFA_NONE, DEFAULT_FONT_SIZE);
 	}
 
 	return _default_font;
+}
+
+Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height)
+{
+	return new Font(name, attributes, height, scale_width, scale_height);
 }
 
 void Font::SetWorkingScreenSize(int width, int height)

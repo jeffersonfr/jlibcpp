@@ -113,14 +113,14 @@ class GraphicPanel : public jgui::Frame{
 		// rotate string
 		DrawString(g, "Rotate String");
 
-		jgui::Font font(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 72);
+		jgui::Font *font = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 72);
 
 		double angle = 0.1;
 		
-		g->SetFont(&font);
+		g->SetFont(font);
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
-		int sw = font.GetStringWidth("Rotate String")/2,
+		int sw = font->GetStringWidth("Rotate String")/2,
 				sh = 0;
 
 		x = (1920+sw)/2;
@@ -679,8 +679,10 @@ class GraphicPanel : public jgui::Frame{
 		}
 
 		g->Rotate(0.0);
+		g->SetFont(NULL);
 
 		delete off;
+		delete font;
 
 		sleep(2);
 

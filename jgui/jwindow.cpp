@@ -573,6 +573,8 @@ void Window::Repaint(int x, int y, int width, int height)
 
 void Window::Repaint(Component *c)
 {
+	jthread::AutoLock lock(&_inner_mutex);
+
 	if (_ignore_repaint == true) {
 		return;
 	}
@@ -591,11 +593,11 @@ void Window::Repaint(Component *c)
 	if (_optimized_paint == false) {
 		std::vector<jgui::Component *> collisions;
 
+		collisions.push_back(c);
+
 		{
 			jthread::AutoLock lock(&_container_mutex);
-
-			collisions.push_back(c);
-
+			
 			for (std::vector<jgui::Component *>::iterator i=std::find(_components.begin(), _components.end(), c); i!=_components.end(); i++) {
 				c1 = (*i);
 
@@ -655,13 +657,13 @@ void Window::Repaint(Component *c)
 			_graphics->ReleaseClip();
 			_graphics->Translate(-x, -y);
 			
-			// graphics->Flip(translate.x+x, translate.y+y, w, h);
+			_graphics->Flip(translate.x+x, translate.y+y, w, h);
 
 			_graphics->Unlock();
 
 			c1->Revalidate();
 			
-			_graphics->Flip(translate.x+x, translate.y+y, w, h);
+			// _graphics->Flip(translate.x+x, translate.y+y, w, h);
 		}
 	} else {
 		c1 = c;

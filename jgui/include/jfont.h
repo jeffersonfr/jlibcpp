@@ -64,13 +64,14 @@ class Font : public virtual jcommon::Object{
 		std::string _name;
 		jfont_attributes_t _attributes;
 
-	public:
+	private:
 		/**
 		 * \brief
 		 *
 		 */
-		Font(std::string name, jfont_attributes_t attributes, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Font(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height);
 		
+	public:
 		/**
 		 * \brief
 		 *
@@ -83,6 +84,12 @@ class Font : public virtual jcommon::Object{
 		 */
 		static Font * GetDefaultFont();
 		
+		/**
+		 * \brief
+		 *
+		 */
+		static Font * CreateFont(std::string name, jfont_attributes_t attributes, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+
 		/**
 		 * \brief
 		 *
