@@ -50,7 +50,7 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		IDirectFBSurface *_surface;
 #endif
 		std::vector<WindowListener *> _window_listeners;
-		jthread::Mutex _inner_mutex;
+		jthread::Mutex _window_mutex;
 		Graphics *_graphics;
 		int _opacity;
 		bool _undecorated;

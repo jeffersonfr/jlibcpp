@@ -99,7 +99,7 @@ Window::~Window()
 
 Graphics * Window::GetGraphics()
 {
-	jthread::AutoLock lock(&_inner_mutex);
+	jthread::AutoLock lock(&_window_mutex);
 
 	return _graphics;
 }
@@ -122,7 +122,7 @@ void Window::SetNativeWindow(void *native)
 	ReleaseWindow();
 
 #ifdef DIRECTFB_UI
-	jthread::AutoLock lock(&_inner_mutex);
+	jthread::AutoLock lock(&_window_mutex);
 
 	IDirectFBSurface *window_surface = NULL;
 
@@ -190,7 +190,7 @@ jcursor_style_t Window::GetCursor()
 void Window::InnerCreateWindow(void *params)
 {
 #ifdef DIRECTFB_UI
-	jthread::AutoLock lock(&_inner_mutex);
+	jthread::AutoLock lock(&_window_mutex);
 
 	GFXHandler *gfx = GFXHandler::GetInstance();
 
@@ -428,7 +428,7 @@ void Window::SetMaximumSize(int w, int h)
 
 void Window::SetSize(int width, int height)
 {
-	jthread::AutoLock lock(&_inner_mutex);
+	jthread::AutoLock lock(&_window_mutex);
 
 	if (_size.width == width && _size.height == height) {
 		return;
@@ -531,6 +531,8 @@ void Window::SetUndecorated(bool b)
 
 void Window::Repaint(bool all)
 {
+	jthread::AutoLock lock(&_window_mutex);
+
 	if (_ignore_repaint == true) {
 		return;
 	}
@@ -573,7 +575,7 @@ void Window::Repaint(int x, int y, int width, int height)
 
 void Window::Repaint(Component *c)
 {
-	jthread::AutoLock lock(&_inner_mutex);
+	jthread::AutoLock lock(&_window_mutex);
 
 	if (_ignore_repaint == true) {
 		return;
@@ -638,6 +640,8 @@ void Window::Repaint(Component *c)
 				w,
 				h;
 
+		_graphics->Lock();
+			
 		for (std::vector<jgui::Component *>::iterator i=collisions.begin(); i!=collisions.end(); i++) {
 			c1 = (*i);
 
@@ -646,8 +650,6 @@ void Window::Repaint(Component *c)
 			w = c1->GetWidth();
 			h = c1->GetHeight();
 
-			_graphics->Lock();
-			
 			translate = _graphics->Translate();
 			
 			_graphics->Reset();
@@ -657,14 +659,14 @@ void Window::Repaint(Component *c)
 			_graphics->ReleaseClip();
 			_graphics->Translate(-x, -y);
 			
-			_graphics->Flip(translate.x+x, translate.y+y, w, h);
-
-			_graphics->Unlock();
-
-			c1->Revalidate();
-			
 			// _graphics->Flip(translate.x+x, translate.y+y, w, h);
+			
+			c1->Revalidate();
 		}
+			
+		_graphics->Flip(c->GetX()-_scroll.x, c->GetY()-_scroll.y, c->GetWidth(), c->GetHeight());
+
+		_graphics->Unlock();
 	} else {
 		c1 = c;
 
@@ -691,11 +693,11 @@ void Window::Repaint(Component *c)
 				_graphics->ReleaseClip();
 				_graphics->Translate(-x, -y);
 				
+				_graphics->Flip(translate.x+x, translate.y+y, w, h);
+
 				_graphics->Unlock();
 				
 				c1->Revalidate();
-				
-				_graphics->Flip(translate.x+x, translate.y+y, w, h);
 			}
 		}
 	}
@@ -752,7 +754,7 @@ void Window::DumpScreen(std::string dir, std::string pre)
 void Window::ReleaseWindow()
 {
 #ifdef DIRECTFB_UI
-	jthread::AutoLock lock(&_inner_mutex);
+	jthread::AutoLock lock(&_window_mutex);
 
 	if (_graphics != NULL) {
 		_graphics->SetNativeSurface(NULL);
