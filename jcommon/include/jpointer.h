@@ -59,7 +59,7 @@ namespace jcommon {
  * 
  * Essa classe nao eh thread-safe.
  *
- * \aithor Tiago Dias Carvalho do Nascimento (tiagocomputacao@yahoo.com.br)
+ * \author Tiago Dias Carvalho do Nascimento (tiagocomputacao@yahoo.com.br)
  */
 class ReferenceCounter {
 
