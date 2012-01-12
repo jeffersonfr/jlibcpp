@@ -20,7 +20,7 @@
 #include "Stdafx.h"
 #include "jsslserversocket.h"
 #include "jsocketexception.h"
-#include "jsocketstreamexception.h"
+#include "jioexception.h"
 #include "jinetaddress4.h"
 
 namespace jsocket {
@@ -74,7 +74,7 @@ SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddre
 
 		if(getsockname(_fd, (struct sockaddr *)&_lsock, &len) < 0) {
 #endif
-			throw SocketStreamException("Connect error");
+			throw jio::IOException("ServerSocket constructor exception");
 		}
 	}
 }
@@ -100,7 +100,7 @@ void SSLServerSocket::CreateSocket()
 #else
 	if ((_fd = ::socket(PF_INET, SOCK_STREAM, 0)) < 0) {
 #endif
-		throw SocketException("Create socket error");
+		throw SocketException("ServerSocket creation exception");
 	}
 
 	_is_closed = false;
@@ -125,14 +125,14 @@ void SSLServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 #endif
     
 	if (::bind(_fd, (struct sockaddr *) &_lsock, sizeof(_lsock)) < 0) {
-		throw SocketException("Bind socket error");
+		throw SocketException("ServerSocket bind exception");
 	}
 }
 
 void SSLServerSocket::ListenSocket(int backlog_)
 {
 	if (::listen(_fd, backlog_) < 0) {
-		throw SocketException("Listen port error");
+		throw SocketException("ServerSocket listen exception");
 	}
 }
 
@@ -155,8 +155,8 @@ SSLSocket * SSLServerSocket::Accept()
 #endif
     
 	if (handler < 0) {
-		throw SocketException("Accept failed");
-    }
+		throw SocketException("ServerSocket accept exception");
+	}
     
 	/*
 	if (_blocked == false) {
@@ -202,7 +202,7 @@ void SSLServerSocket::Close()
 
 	if (close(_fd) != 0) {
 #endif
-		throw SocketException("Close socket error");
+		throw SocketException("Unknow close exception");
 	}
 
 	_is_closed = true;

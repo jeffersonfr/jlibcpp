@@ -116,7 +116,7 @@ int64_t SSLSocketOutputStream::GetSentBytes()
 int64_t SSLSocketOutputStream::Flush()
 {
 	if ((*_is_closed) == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	if (_current_index == 0) {

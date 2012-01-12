@@ -61,7 +61,6 @@ class Main : public jgui::Frame{
 		Main(std::string title, int x, int y, int w, int h):
 			jgui::Frame(title, x, y, w, h)
 		{
-			SetMoveEnabled(true);
 			SetResizeEnabled(true);
 
 			for (int i=0; i<4; i++) {

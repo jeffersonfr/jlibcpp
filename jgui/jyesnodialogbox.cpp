@@ -42,9 +42,6 @@ YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg, int x, int y)
 	_yes = new Button("Sim", _label->GetX()+_label->GetWidth()-2*cw-1*30, _label->GetY()+_label->GetHeight()+20, cw, ch);
 	_no = new Button("Nao", _label->GetX()+_label->GetWidth()-1*cw-0*30, _label->GetY()+_label->GetHeight()+20, cw, ch);
 	
-	_no->SetNavigation(_yes, NULL, _yes, NULL);
-	_yes->SetNavigation(NULL, _no, NULL, _no);
-
 	_no->RegisterButtonListener(this);
 	_yes->RegisterButtonListener(this);
 

@@ -59,7 +59,7 @@ SSLSocketInputStream::~SSLSocketInputStream()
 int64_t SSLSocketInputStream::Read()
 {
 	if ((*_is_closed) == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	int d = _end_index - _current_index;
@@ -78,7 +78,6 @@ int64_t SSLSocketInputStream::Read()
 #else 
 		if (n <= 0) {
 #endif
-			// throw SocketException("Read socket error !");
 			return -1LL;
 		}
 			
@@ -101,7 +100,7 @@ int64_t SSLSocketInputStream::Read()
 int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 {
 	if ((*_is_closed) == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	// retorna no maximo o tamanho do buffer em bytes
@@ -125,7 +124,6 @@ int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 #else 
 		if (n <= 0) {
 #endif
-			// throw SocketException("Read socket error !");
 			return -1LL;
 		}
 			

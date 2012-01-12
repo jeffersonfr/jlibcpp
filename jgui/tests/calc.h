@@ -48,7 +48,7 @@ class MCalc : public jgui::Frame, public jgui::ButtonListener{
 
 			void Process(std::string type);
 
-			virtual void InputReceived(jgui::KeyEvent *event);
+			virtual bool ProcessEvent(jgui::KeyEvent *event);
 			virtual void ActionPerformed(jgui::ButtonEvent *event);
 
 };

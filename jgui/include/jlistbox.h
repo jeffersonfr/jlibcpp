@@ -40,16 +40,6 @@ namespace jgui {
  * \brief
  *
  */
-enum jlistbox_scroll_t {
-	JLS_NONE,
-	JLS_ARROW,
-	JLS_BAR
-};
-
-/**
- * \brief
- *
- */
 enum jlistbox_mode_t {
 	JLM_NONE_SELECTION,
 	JLM_SINGLE_SELECTION,
@@ -64,28 +54,24 @@ enum jlistbox_mode_t {
 class ListBox : public jgui::ItemComponent{
 
 	private:
-		jlistbox_scroll_t _scroll;
 		jlistbox_mode_t _selection;
 		int _item_size,
-				_top_index,
-				_selected_index,
-				_stone_size,
-				_scroll_width;
-		bool _pressed,
-				 _centered_interaction;
+			_item_gap,
+			_selected_index;
+		bool _pressed;
 
 	private:
 		/**
 		 * \brief
 		 *
 		 */
-		void PreviousItem();
+		void IncrementLines(int lines);
 
 		/**
 		 * \brief
 		 *
 		 */
-		void NextItem();
+		void DecrementLines(int lines);
 
 	public:
 		/**
@@ -104,25 +90,13 @@ class ListBox : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		virtual int GetStoneSize();
+		virtual int GetItemGap();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetStoneSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCenteredInteraction(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScrollType(jlistbox_scroll_t type);
+		virtual void SetItemGap(int gap);
 		
 		/**
 		 * \brief
@@ -154,12 +128,6 @@ class ListBox : public jgui::ItemComponent{
 		 */
 		void AddCheckedItem(std::string text, bool checked);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetVisibleItems();
-		
 		/**
 		 * \brief
 		 *
@@ -226,6 +194,12 @@ class ListBox : public jgui::ItemComponent{
 		 *
 		 */
 		virtual jsize_t GetPreferredSize();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetScrollDimension();
 
 		/**
 		 * \brief

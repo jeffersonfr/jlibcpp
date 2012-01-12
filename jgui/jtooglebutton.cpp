@@ -70,7 +70,7 @@ bool ToogleButton::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
@@ -95,17 +95,13 @@ bool ToogleButton::ProcessEvent(MouseEvent *event)
 
 bool ToogleButton::ProcessEvent(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
-	bool catched = false;
-
 	jkeyevent_symbol_t action = event->GetSymbol();
+
+	bool catched = false;
 
 	if (action == JKS_ENTER) {
 		if (_is_pressed == true) {
@@ -121,7 +117,7 @@ bool ToogleButton::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
 void ToogleButton::Paint(Graphics *g)
@@ -191,7 +187,7 @@ void ToogleButton::Paint(Graphics *g)
 		}
 	}
 
-	if (_is_pressed == true && _enabled == true) {
+	if (_is_pressed == true && _is_enabled == true) {
 		Color color = GetBackgroundColor().Brighter(0.4);
 
 		color.SetAlpha(0x80);
@@ -200,8 +196,6 @@ void ToogleButton::Paint(Graphics *g)
 		g->SetColor(color);
 		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
-	
-	PaintBorderEdges(g);
 }
 
 }

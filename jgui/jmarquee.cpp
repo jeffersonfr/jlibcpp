@@ -30,7 +30,6 @@ Marquee::Marquee(std::string text, int x, int y, int width, int height):
 	jcommon::Object::SetClassName("jgui::Marquee");
 
 	_text = text;
-	_index = 0;
 	_step = 10;
 	_position = _horizontal_gap;
 	_running = true;
@@ -66,7 +65,7 @@ void Marquee::SetVisible(bool b)
 
 		Release();
 		WaitThread();
-		Repaint(true);
+		Repaint();
 	}
 }
 
@@ -89,6 +88,7 @@ void Marquee::SetType(jmarquee_mode_t type)
 	jthread::AutoLock lock(&_component_mutex);
 
 	_type = type;
+	_position = 0;
 }
 
 void Marquee::Release()
@@ -134,7 +134,7 @@ void Marquee::Paint(Graphics *g)
 				y = _vertical_gap+_border_size,
 				w = _size.width-2*x,
 				h = _size.height-2*y,
-				gapx = _position,
+				gapx = 0,
 				gapy = 0;
 		int px = x+gapx,
 				py = y+(h-_font->GetHeight())/2,
@@ -180,14 +180,9 @@ void Marquee::Paint(Graphics *g)
 			ch = clip.height-cy;
 		}
 
-		g->SetClip(cx, cy, cw, ch);
-
-		g->DrawString(text, px-_index, py);
-
-		g->SetClip(clip.x, clip.y, clip.width, clip.height);
+		g->ClipRect(cx, cy, cw-1, ch-1);
+		g->DrawString(text, px+_position, py);
 	}
-
-	PaintBorderEdges(g);
 }
 
 void Marquee::Run()
@@ -200,36 +195,34 @@ void Marquee::Run()
 	}
 
 	while (_running == true) {
-		int string_width = _font->GetStringWidth(_text.c_str());
-
 		if (_type == JMM_BOUNCE) {
-			if (w < string_width) {
-			} else {
-				if (_position <= _horizontal_gap) {
-					_step = -_step;
-					_position = 0;
-				} else if ((_position+string_width) >= w) {
-					_step = -_step;
-					_position = w-string_width;
-				}
+			int width = _font->GetStringWidth(_text.c_str()),
+					diff = (w-width);
 
-				_position -= _step;
+			if (diff > 0) {
+				diff = x;
+			} else {
+				diff = -diff+x;
+			}
+
+			_position = _position - _step;
+
+			if (_position < -diff) {
+				_step = -_step;
+			} else if (_position > (w-width+diff)) {
+				_step = -_step;
 			}
 		} else {
-			if (_position <= x) {
-				if (_index >= string_width) {
-					_index = 0;
-					_position = w-_step;
-				} else {
-					_position = 0;
-					_index = _index+_step;
-				}
-			} else {
-				_position -= _step;
+			int width = _font->GetStringWidth(_text.c_str());
 
-				if (_position < x) {
-					_position = 0;
-				}
+			if (_step < 0) {
+				_step = -_step;
+			}
+
+			_position = _position - _step;
+
+			if (_position <= -width) {
+				_position = w;
 			}
 		}
 

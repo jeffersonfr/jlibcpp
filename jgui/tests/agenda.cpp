@@ -416,11 +416,6 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 	date->SetCaretType(jgui::JCT_NONE);
 	date->SetHorizontalAlign(jgui::JHA_CENTER);
 
-	hour->SetNavigation(NULL, minute, NULL, minute);
-	minute->SetNavigation(hour, date, hour, date);
-	date->SetNavigation(minute, message, minute, message);
-	message->SetNavigation(date, NULL, date, NULL);
-
 	if (_index < 0) {
 		_state = 0;
 
@@ -553,12 +548,12 @@ void AddMessage::KeyboardUpdated(jgui::KeyboardEvent *event)
 	}
 }
 
-void AddMessage::InputReceived(jgui::KeyEvent *event)
+bool AddMessage::ProcessEvent(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&add_mutex);
 
 	if (event->GetType() != jgui::JKT_PRESSED) {
-		return;
+		return false;
 	}
 
 	if ((event->GetSymbol() == jgui::JKS_1) |
@@ -725,6 +720,7 @@ void AddMessage::InputReceived(jgui::KeyEvent *event)
 		Release();
 	}
 
+	return true;
 }
 
 ViewMessages::ViewMessages(AgendaDB *base):
@@ -804,7 +800,7 @@ void ViewMessages::Update()
 	}
 }
 
-void ViewMessages::InputReceived(jgui::KeyEvent *event)
+bool ViewMessages::ProcessEvent(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&view_mutex);
 
@@ -855,6 +851,8 @@ void ViewMessages::InputReceived(jgui::KeyEvent *event)
 			Show(false);
 		}
 	}
+		
+	return true;
 }
 
 }

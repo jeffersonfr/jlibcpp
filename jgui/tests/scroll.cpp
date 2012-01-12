@@ -20,51 +20,45 @@
 #include "jframe.h"
 #include "jbutton.h"
 
-class RectangleContainer : public jgui::Container {
-
-	public:
-		RectangleContainer(int x, int y, int w, int h):
-			jgui::Container(x, y, w, h)
-		{
-		}
-
-		virtual ~RectangleContainer()
-		{
-		}
-
-		virtual void Paint(jgui::Graphics *g) 
-		{
-			jgui::Container::Paint(g);
-
-			g->SetColor(random()%0xff, random()%0xff, random()%0xff, 0xff);
-			g->DrawRectangle(0, 0, GetWidth(), GetHeight());
-		}
-
-		virtual std::string what()
-		{
-			return "RC:: ";
-		}
-};
-
 class Main : public jgui::Frame{
 
 	private:
 		jgui::Container *_container1,
 			*_container2;
-		jgui::Button *_button1;
+		jgui::Button *_button1,
+			*_button2,
+			*_button3,
+			*_button4,
+			*_button5;
 
 	public:
 		Main(std::string title, int x, int y, int w, int h):
-			jgui::Frame(title, x, y, w, h)
+			jgui::Frame(title, 100, 100, 1280, 720)
 		{
 			SetResizeEnabled(true);
-	
-			_container1 = new RectangleContainer(100, 100, 400, 400);
-			_container2 = new RectangleContainer(100, 100, 400, 400);
-			_button1 = new jgui::Button("Testing Clipping", 200, 100, 300, 100);
 
-			_container2->Add(_button1);
+			int ws = 120,
+					hs = 60;
+
+			_container1 = new Container(100, 100, 960, 540);
+			_container2 = new Container(-200, 200, 960, 540);
+
+			_container1->SetBorder(jgui::JCB_LINE);
+			_container2->SetBorder(jgui::JCB_LINE);
+
+			_button1 = new jgui::Button("Button 1", 50, 100, ws, hs);
+			_button2 = new jgui::Button("Button 2", 100, 100, ws, hs);
+			_button3 = new jgui::Button("Button 3", 400, 100, ws, hs);
+			_button4 = new jgui::Button("Button 4", 800, 100, ws, hs);
+			_button5 = new jgui::Button("Button 5", 100, 800, ws, hs);
+
+			_container1->Add(_button1);
+			_container1->Add(_button5);
 			_container1->Add(_container2);
+
+			_container2->Add(_button2);
+			_container2->Add(_button3);
+			_container2->Add(_button4);
 
 			Add(_container1);
 			SetBorderSize(10);
@@ -73,6 +67,15 @@ class Main : public jgui::Frame{
 		virtual ~Main()
 		{
 			RemoveAll();
+
+			delete _container1;
+			delete _container2;
+
+			delete _button1;
+			delete _button2;
+			delete _button3;
+			delete _button4;
+			delete _button5;
 		}
 
 };

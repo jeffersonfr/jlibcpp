@@ -64,7 +64,7 @@ class Semaphore : public virtual jcommon::Object{
 			 * \brief Construtor.
 			 *
 			 */
-			Semaphore(int = 0);
+			Semaphore(int value_ = 0);
 
 			/**
 			 * \brief Destrutor virtual.

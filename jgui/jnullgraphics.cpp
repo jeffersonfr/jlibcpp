@@ -62,13 +62,6 @@ jsize_t NullGraphics::GetWorkingScreenSize()
 	return t;
 }
 
-Image * NullGraphics::Create()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return NULL;
-}
-
 jregion_t NullGraphics::ClipRect(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
@@ -525,16 +518,6 @@ void NullGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int sca
 }
 
 void NullGraphics::Reset()
-{
-	JDEBUG(JINFO, "called\n");
-}
-
-void NullGraphics::Lock()
-{
-	JDEBUG(JINFO, "called\n");
-}
-
-void NullGraphics::Unlock()
 {
 	JDEBUG(JINFO, "called\n");
 }

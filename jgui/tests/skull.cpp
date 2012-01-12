@@ -2360,12 +2360,12 @@ class GraphicsTeste : public jgui::Frame{
 			}
 		}
 
-		virtual void InputReceived(jgui::KeyEvent *event)
+		virtual bool ProcessEvent(jgui::KeyEvent *event)
 		{
 			jthread::AutoLock lock(&teste_mutex);
 
 			if (event->GetType() != jgui::JKT_PRESSED) {
-				return;
+				return false;
 			}
 
 			int step = 20;
@@ -2402,6 +2402,8 @@ class GraphicsTeste : public jgui::Frame{
 			}
 
 			Repaint();
+
+			return true;
 		}
 };
 

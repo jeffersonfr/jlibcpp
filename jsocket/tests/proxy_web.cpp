@@ -360,13 +360,13 @@ void sayerror(char *msg, jsocket::Socket *sockIn, jsocket::Socket *sockOut)
 {
 	sockIn->Send(msg, strlen(msg));
 	
-	jsocket::SocketOption *o = sockIn->GetSocketOption();
+	jsocket::SocketOptions *o = sockIn->GetSocketOptions();
 
 	o->SetLinger(1, 4);
 
 	delete o;
 
-	o = sockOut->GetSocketOption();
+	o = sockOut->GetSocketOptions();
 
 	o->SetLinger(1, 1);
 
@@ -384,7 +384,7 @@ int process_request(jsocket::Socket *sockIn)
 	jsocket::Socket *sockOut = NULL;
 	FILE *fsin;
 	
-	jsocket::SocketOption *o = sockIn->GetSocketOption();
+	jsocket::SocketOptions *o = sockIn->GetSocketOptions();
 
 	o->SetReuseAddress(true);
 	o->SetKeepAlive(true);

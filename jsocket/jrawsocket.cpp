@@ -21,7 +21,7 @@
 #include "jrawsocket.h"
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
-#include "jsocketstreamexception.h"
+#include "jioexception.h"
 
 namespace jsocket {
 
@@ -64,11 +64,11 @@ void RawSocket::CreateSocket()
 {
 #ifdef _WIN32
 	if ((_fd = socket(PF_INET, SOCK_RAW, IPPROTO_RAW)) == INVALID_SOCKET) {
-		throw SocketException("Create socket raw error");
+		throw SocketException("Socket creation exception");
 	}
 #else
 	if ((_fd = ::socket(PF_PACKET, SOCK_RAW, (_promisc == true)?ETH_P_ALL:ETH_P_IP)) < 0) {
-		throw SocketException("Create socket raw error");
+		throw SocketException("Socket creation exception");
 	}
 
 	_is_closed = false;
@@ -79,7 +79,7 @@ void RawSocket::CreateSocket()
 	strncpy(_ifr.ifr_name, _device.c_str(), sizeof(_ifr.ifr_name));
 
 	if (ioctl(_fd, SIOCGIFFLAGS, &_ifr)<0) {
-		throw SocketException("Net device failed");
+		throw SocketException("Cannot access network interface flags");
 	}
 
 	if (_promisc) {
@@ -89,17 +89,17 @@ void RawSocket::CreateSocket()
 	}
 
 	if (ioctl(_fd, SIOCSIFFLAGS, &_ifr) < 0) {
-		throw SocketException("Net device cannot suport promisc mode");
+		throw SocketException("Cannot put network interface in promiscuous mode");
 	}
 
 	if (ioctl(_fd, SIOCGIFINDEX, &_ifr) < 0) {
-		throw SocketException("Net device access failed");
+		throw SocketException("Cannot access network interface index");
 	}
 
 	_index_device = _ifr.ifr_ifindex;
 
 	if (_index_device < 0) {
-		throw SocketException("Net device doesn't exists");
+		throw SocketException("Network interface do not exists");
 	}
 #endif
 }
@@ -115,7 +115,7 @@ void RawSocket::BindSocket()
 	sock_ether.sll_pkttype = (_promisc == true)?PACKET_OTHERHOST:PACKET_HOST;
 
 	if (bind(_fd, (struct sockaddr *)(&sock_ether), sizeof(sock_ether)) < 0) {
-		throw SocketException("Bind raw socket error");
+		throw SocketException("Socket bind exception");
 	}
 }
 
@@ -145,7 +145,7 @@ jio::OutputStream * RawSocket::GetOutputStream()
 int RawSocket::Receive(char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 
 #ifdef _WIN32
@@ -159,9 +159,9 @@ int RawSocket::Receive(char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Receive timed exception");
+		throw SocketException("Invalid receive parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket receive timeout exception");
+		throw SocketTimeoutException("Socket read timeout exception");
 	} else {
 		if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return RawSocket::Receive(data_, size_);
@@ -175,35 +175,42 @@ int RawSocket::Receive(char *data_, int size_, int time_)
 int RawSocket::Receive(char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 
 	int n;
 
 #ifdef _WIN32
 	/*
-		 n = ::recvfrom(_fd, data_, size_, 0, (struct sockaddr *)&_server_sock, &length);
+	n = ::recvfrom(_fd, data_, size_, 0, (struct sockaddr *)&_server_sock, &length);
 
-		 if (n == SOCKET_ERROR) {
-		 if (WSAGetLastError() == WSAETIMEDOUT) {
-		 throw SocketTimeoutException("Socket receive timeout exception");
-		 } else {
-		 throw SocketStreamException("Read socket error");
-		 }
-		 } else if (n == 0) {
-		 throw SocketException("Connection closed");
-		 }
-		 */
+	if (n == SOCKET_ERROR) {
+		if (WSAGetLastError() == WSAETIMEDOUT) {
+			throw SocketTimeoutException("Socket receive timeout exception");
+		} else {
+			throw jio::IOException("Socket read exception");
+		}
+	} else if (n == 0) {
+		throw jio::IOException("Peer shutdown exception");
+	}
+	*/
 #else
 	// n = ::recvfrom(_fd, data_, size_, 0, (struct sockaddr *)&_lsock, (socklen_t *)&length);
 	n = ::read(_fd, data_, size_);
 
 	if (n < 0) {
 		if (errno == EAGAIN) {
-			throw SocketTimeoutException("Socket receive timeout exception");
+			if (block_ == true) {
+				throw SocketTimeoutException("Socket receive timeout exception");
+			} else {
+				// INFO:: non-blocking socket, no data read
+				n = 0;
+			}
 		} else {
-			throw SocketStreamException("Read socket error");
+			throw jio::IOException("Socket read exception");
 		}
+	} else if (n == 0) {
+		throw jio::IOException("Peer shutdown exception");
 	}
 #endif
 
@@ -215,7 +222,7 @@ int RawSocket::Receive(char *data_, int size_, bool block_)
 int RawSocket::Send(const char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 
 #ifdef _WIN32
@@ -229,7 +236,7 @@ int RawSocket::Send(const char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Send timeout exception");
+		throw SocketException("Invalid send parameters exception");
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket send timeout exception");
 	} else {
@@ -245,7 +252,7 @@ int RawSocket::Send(const char *data_, int size_, int time_)
 int RawSocket::Send(const char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 
 	int n;
@@ -261,15 +268,20 @@ int RawSocket::Send(const char *data_, int size_, bool block_)
 		if (WSAGetLastError() == WSAECONNABORTED) {
 			throw SocketTimeoutException("Socket send timeout exception");
 		} else {
-			throw SocketStreamException("Send udp data error");
+			throw SocketTimeoutException("Socket send exception");
 		}
 	}
 #else
 	if (n < 0) {
 		if (errno == EAGAIN) {
-			throw SocketTimeoutException("Socket send timeout exception");
+			if (block_ == true) {
+				throw SocketTimeoutException("Socket send timeout exception");
+			} else {
+				// INFO:: non-blocking socket, no data read
+				n = 0;
+			}
 		} else {
-			throw SocketStreamException("Send udp data error");
+			throw SocketTimeoutException("Socket send exception");
 		}
 	}
 #endif
@@ -290,7 +302,7 @@ void RawSocket::Close()
 #else
 	if (close(_fd) != 0) {
 #endif
-		throw SocketException("Close socket error");
+		throw SocketException("Unknown close exception");
 	}
 
 	_is_closed = true;
@@ -321,13 +333,9 @@ int64_t RawSocket::GetReadedBytes()
 	return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOption * RawSocket::GetSocketOption()
+SocketOptions * RawSocket::GetSocketOptions()
 {
-	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
-	}
-
-	return new SocketOption(_fd, JCT_RAW);
+	return new SocketOptions(_fd, JCT_RAW);
 }
 
 unsigned short RawSocket::Checksum(unsigned short *addr, int len)

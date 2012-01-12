@@ -21,7 +21,7 @@
 #define J_DATAGRAMSOCKET6_H
 
 #include "jinetaddress.h"
-#include "jsocketoption.h"
+#include "jsocketoptions.h"
 #include "jsocketinputstream.h"
 #include "jsocketoutputstream.h"
 #include "jconnection.h"
@@ -195,10 +195,10 @@ class DatagramSocket6 : public jsocket::Connection{
 		virtual int64_t GetReadedBytes();
 
 		/**
-		 * \brief Get a object SocketOption.
+		 * \brief Get a object SocketOptions.
 		 *
 		 */
-		SocketOption * GetSocketOption();
+		SocketOptions * GetSocketOptions();
 
 		/**
 		 * \brief

@@ -103,7 +103,7 @@ class AddContact : public jgui::Frame, public jgui::KeyboardListener{
 			virtual ~AddContact();
 
 			virtual void KeyboardUpdated(jgui::KeyboardEvent *event);
-			virtual void InputReceived(jgui::KeyEvent *event);
+			virtual bool ProcessEvent(jgui::KeyEvent *event);
 
 };
 
@@ -131,7 +131,7 @@ class SearchContacts : public jgui::Frame, public jgui::KeyboardListener{
 		virtual ~SearchContacts();
 
 		virtual void KeyboardUpdated(jgui::KeyboardEvent *event);
-		virtual void InputReceived(jgui::KeyEvent *event);
+		virtual bool ProcessEvent(jgui::KeyEvent *event);
 
 };
 

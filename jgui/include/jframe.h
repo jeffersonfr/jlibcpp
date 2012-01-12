@@ -107,12 +107,7 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		jthread::Condition _frame_sem;
 		std::string _title,
 			_icon;
-		int _init_type,
-			_relative_mouse_x,
-			_relative_mouse_y,
-			_relative_mouse_w,
-			_relative_mouse_h,
-			_mouse_state;
+		int _init_type;
 		int _old_x,
 				_old_y,
 				_old_width,
@@ -125,7 +120,6 @@ class Frame : public KeyListener, public MouseListener, public Window {
 				 _is_maximized;
 		jframe_button_t _frame_buttons;
 		jkeyevent_symbol_t _last_key_code;
-		jcursor_style_t _default_cursor;
 
 	public:
 		/**
@@ -288,13 +282,7 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 * \brief
 		 *
 		 */
-		virtual void InputReceived(KeyEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InputReceived(MouseEvent *event);
+		virtual void PaintGlassPane(Graphics *g);
 
 };
 

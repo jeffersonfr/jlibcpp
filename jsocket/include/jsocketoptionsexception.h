@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SOCKETSTREAMEXCEPTION_H
-#define J_SOCKETSTREAMEXCEPTION_H
+#ifndef J_SOCKETOPTIONEXCEPTION_H
+#define J_SOCKETOPTIONEXCEPTION_H
 
 #include "jruntimeexception.h"
 
@@ -28,26 +28,27 @@
 namespace jsocket {
 
 /**
- * \brief SocketStreamException.
+ * \brief SocketOptionsException.
  *
  * \author Jeff Ferr
  */
-class SocketStreamException : public jcommon::RuntimeException{
+class SocketOptionsException : public jcommon::RuntimeException{
 
     private:
+
 
     public:
         /**
         * \brief Construtor.
         *
         */
-        SocketStreamException(std::string);
+        SocketOptionsException(std::string);
         
         /**
         * \brief Destrutor virtual.
         *
         */
-        virtual ~SocketStreamException() throw();
+        virtual ~SocketOptionsException() throw();
 
 };
 

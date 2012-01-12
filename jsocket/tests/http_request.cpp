@@ -68,7 +68,7 @@ class HTTPRequest : public jthread::Thread {
 				c = new Socket(_host, _port, _timeout);
 
 				{
-					SocketOption *o = c->GetSocketOption(); 
+					SocketOptions *o = c->GetSocketOptions(); 
 
 					o->SetSendTimeout(_timeout);
 					o->SetReceiveTimeout(_timeout);

@@ -49,7 +49,7 @@ NetworkInterface::NetworkInterface(NetworkInterface *parent, std::string name, i
 	int sock;
 
 	if ((sock = socket(PF_INET, SOCK_RAW, IPPROTO_RAW)) < 0) {
-		throw SocketException("Access network interface exception");
+		throw SocketException("Cannot access network interface");
 	}
 	
 	req.ifr_ifindex = _index;

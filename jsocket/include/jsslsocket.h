@@ -22,7 +22,7 @@
 
 #include "jinetaddress.h"
 #include "jserversocket.h"
-#include "jsocketoption.h"
+#include "jsocketoptions.h"
 #include "jsslsocketinputstream.h"
 #include "jsslsocketoutputstream.h"
 #include "jconnection.h"
@@ -277,7 +277,7 @@ class SSLSocket : public jsocket::Connection{
 		 * \brief Get the socket options.
 		 *
 		 */
-		SocketOption * GetSocketOption();
+		SocketOptions * GetSocketOptions();
 
 		/** 
 		 * Cert files (if not set, a temporary RSA session cert will be created if needed)

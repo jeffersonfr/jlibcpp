@@ -53,7 +53,7 @@ class ToogleButton : public ImageButton{
 		 * \brief
 		 *
 		 */
-		ToogleButton(std::string label, std::string image, int x = 0, int y = 0, int width = 0, int height = 0);
+		ToogleButton(std::string label, std::string image, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
 		
 		/**
 		 * \brief

@@ -44,7 +44,7 @@ class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 			hsize = GetHeight()/(double)hblocks;
 
 			// INFO:: necessario para receber os eventos de mouse
-			InnerCreateWindow();
+			InternalCreateWindow();
 
 			jgui::InputManager::GetInstance()->SkipMouseEvents(true);
 			jgui::InputManager::GetInstance()->RegisterMouseListener(this);

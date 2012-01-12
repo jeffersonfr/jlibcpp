@@ -177,7 +177,7 @@ class LocalSocket : public jsocket::Connection{
 		 * \brief Get the socket options.
 		 *
 		 */
-		SocketOption * GetSocketOption();
+		SocketOptions * GetSocketOptions();
 
 };
 

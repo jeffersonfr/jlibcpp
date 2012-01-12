@@ -187,7 +187,7 @@ class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, publi
 		 * \brief
 		 *
 		 */
-		virtual void InputReceived(jgui::KeyEvent *event);
+		virtual bool ProcessEvent(jgui::KeyEvent *event);
 
 		/**
 		 * \brief

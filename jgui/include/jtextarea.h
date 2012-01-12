@@ -41,26 +41,28 @@ namespace jgui {
 class TextArea : public jgui::TextComponent{
 
 	private:
-		int _line_op; // 0-nop, 1-inc, 2-dec
+		std::vector<std::string> _lines;
+		int _rows_gap,
+			_current_row;
 		bool _is_wrap;
 
 		/**
 		 * \brief
 		 *
 		 */
-		void IncLine();
+		virtual void IncrementLines(int lines);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DecLine();
+		virtual void DecrementLines(int lines);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void GetLines(std::vector<std::string> &texts);
+		virtual void InitRowsString();
 
 	public:
 		/**
@@ -79,25 +81,97 @@ class TextArea : public jgui::TextComponent{
 		 * \brief
 		 *
 		 */
-		virtual void ScrollUp();
+		virtual int GetRowsGap();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void ScrollDown();
+		virtual void SetRowsGap(int gap);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetScrollDimension();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetLineAt(int row);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::vector<std::string> & GetLines();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetRows();
+
+		/*
+		 * \brief
+		 *
+		 */
+		virtual void SetCurrentRow(int line);
+
+		/*
+		 * \brief
+		 *
+		 */
+		virtual int GetCurrentRow();
 
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void SetWrap(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetEchoChar(char echo_char);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetText(std::string text);
 		
 		/**
 		 * \brief
 		 *
 		 */
+		virtual void Insert(std::string text);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Delete();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetBounds(int x, int y, int w, int h);
 		
 		/**
 		 * \brief

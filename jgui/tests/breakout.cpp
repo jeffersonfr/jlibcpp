@@ -70,8 +70,8 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 		Breakout():
 			jgui::Frame("BreakOut", 100, 100, 720, 480)
 		{
+			SetUndecorated(true);
 			SetDefaultExitEnabled(false);
-			SetMoveEnabled(true);
 
 			off = NULL;
 			goff = NULL;
@@ -128,12 +128,12 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 				showbrick[i] = true;
 		}
 
-		virtual void InputReceived(jgui::KeyEvent *event)
+		virtual bool ProcessEvent(jgui::KeyEvent *event)
 		{
 			if (event->GetType() == jgui::JKT_RELEASED) {
 				batdpos = 0;
 
-				return;
+				return false;
 			}
 
 			if (ingame) {
@@ -157,6 +157,7 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 				}
 			}
 
+			return true;
 		}
 
 		virtual void Paint(jgui::Graphics *g)

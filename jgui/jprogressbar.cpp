@@ -51,7 +51,7 @@ void ProgressBar::SetScrollOrientation(jscroll_orientation_t type)
 
 	_type = type;
 
-	Repaint(true);
+	Repaint();
 }
 
 jscroll_orientation_t ProgressBar::GetScrollOrientation()
@@ -135,7 +135,7 @@ void ProgressBar::SetVisible(bool b)
 	} else {
 		_running = false;
 
-		Repaint(true);
+		Repaint();
 	}
 }
 
@@ -286,8 +286,6 @@ void ProgressBar::Paint(Graphics *g)
 				g->FillRectangle(x, y+_index, w, 40);
 			}
 		}
-
-		PaintBorderEdges(g);
 	}
 }
 

@@ -352,10 +352,6 @@ AddContact::AddContact(PhoneDB *base, int index):
 		field3->Insert(t->phone2);
 	}
 
-	field1->SetNavigation(NULL, NULL, NULL, field2);
-	field2->SetNavigation(NULL, NULL, field1, field3);
-	field3->SetNavigation(NULL, NULL, field2, NULL);
-
 	Add(label1);
 	Add(label2);
 	Add(label3);
@@ -407,10 +403,10 @@ void AddContact::KeyboardUpdated(jgui::KeyboardEvent *event)
 	}
 }
 
-void AddContact::InputReceived(jgui::KeyEvent *event)
+bool AddContact::ProcessEvent(jgui::KeyEvent *event)
 {
 	if (event->GetType() != jgui::JKT_PRESSED) {
-		return;
+		return false;
 	}
 
 	jthread::AutoLock lock(&add_mutex);
@@ -519,6 +515,8 @@ void AddContact::InputReceived(jgui::KeyEvent *event)
 			}
 		}
 	}
+
+	return true;
 }
 
 SearchContacts::SearchContacts(PhoneDB *base):
@@ -640,12 +638,12 @@ void SearchContacts::KeyboardUpdated(jgui::KeyboardEvent *event)
 	}
 }
 
-void SearchContacts::InputReceived(jgui::KeyEvent *event)
+bool SearchContacts::ProcessEvent(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&search_mutex);
 
 	if (event->GetType() != jgui::JKT_PRESSED) {
-		return;
+		return false;
 	}
 
 	if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
@@ -713,6 +711,8 @@ void SearchContacts::InputReceived(jgui::KeyEvent *event)
 			}
 		}
 	}
+
+	return true;
 }
 
 }

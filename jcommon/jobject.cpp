@@ -116,7 +116,7 @@ Object * Object::Clone()
 
 uint64_t Object::Hash()
 {
-	return (uint64_t)(unsigned long)this;
+	return (uint64_t)((uintptr_t)this);
 }
 
 std::string Object::what()
@@ -124,9 +124,9 @@ std::string Object::what()
 	std::ostringstream o;
 
 	if (_namespace != "") {
-		o << _namespace << "::" << _classname << "@" << std::hex << (unsigned long)this;
+		o << _namespace << "::" << _classname << "@" << std::hex << (uintptr_t)this;
 	} else {
-		o << _classname << "@" << (unsigned long)this;
+		o << _classname << "@" << (uintptr_t)this;
 	}
 	
 	return o.str();

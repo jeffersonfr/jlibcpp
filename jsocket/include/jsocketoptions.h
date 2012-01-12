@@ -61,11 +61,11 @@ enum socket_shutdown_t {
 };
 
 /**
- * \brief SocketOptions.
+ * \brief SocketOptionss.
  * 
  * \author Jeff Ferr
  */
-class SocketOption : public virtual jcommon::Object{
+class SocketOptions : public virtual jcommon::Object{
 
 	friend class Socket;
 	friend class Socket6;
@@ -91,14 +91,14 @@ class SocketOption : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		SocketOption(jsocket_t fd_, jconnection_type_t type_);
+		SocketOptions(jsocket_t fd_, jconnection_type_t type_);
 
 	public:
 		/**
 		 * \brief Virtual destructor
 		 * 
 		 */
-		virtual ~SocketOption();
+		virtual ~SocketOptions();
 
 		/**
 		 * \brief Enable sending of keep-alive messages on connection-oriented sockets.

@@ -131,7 +131,7 @@ class Main : public jgui::Frame, public jthread::Thread{
 			}
 		}
 
-		virtual void InputReceived(jgui::KeyEvent *event)
+		virtual bool ProcessEvent(jgui::KeyEvent *event)
 		{
 			double angle_step = 0.1;
 
@@ -165,6 +165,8 @@ class Main : public jgui::Frame, public jthread::Thread{
 				_step = 0.0;
 				_angle = fmod(_angle+angle_step, 2*M_PI);
 			}
+
+			return true;
 		}
 
 };

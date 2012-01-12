@@ -34,7 +34,7 @@ Item::Item():
 	_halign = JHA_CENTER;
 	_valign = JVA_CENTER;
 
-	_enabled = true;
+	_is_enabled = true;
 	_prefetch = NULL;
 	_is_checked = false;
 	_is_visible = true;
@@ -49,7 +49,7 @@ Item::Item(std::string value):
 	_halign = JHA_CENTER;
 	_valign = JVA_CENTER;
 
-	_enabled = true;
+	_is_enabled = true;
 	_prefetch = NULL;
 	_value = value;
 	_is_checked = false;
@@ -65,7 +65,7 @@ Item::Item(std::string value, std::string image):
 	_halign = JHA_CENTER;
 	_valign = JVA_CENTER;
 
-	_enabled = true;
+	_is_enabled = true;
 	_prefetch = NULL;
 	_image = image;
 	_value = value;
@@ -84,7 +84,7 @@ Item::Item(std::string value, bool checked):
 	_halign = JHA_CENTER;
 	_valign = JVA_CENTER;
 
-	_enabled = true;
+	_is_enabled = true;
 	_prefetch = NULL;
 	_value = value;
 	_is_checked = checked;
@@ -127,12 +127,12 @@ jvertical_align_t Item::GetVerticalAlign()
 
 void Item::SetEnabled(bool b)
 {
-	_enabled = b;
+	_is_enabled = b;
 }
 
 bool Item::GetEnabled()
 {
-	return _enabled;
+	return _is_enabled;
 }
 
 void Item::SetVisible(bool b)

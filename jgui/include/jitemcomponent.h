@@ -58,7 +58,7 @@ class Item : public virtual jcommon::Object{
 		jvertical_align_t _valign;
 		bool _is_checked,
 				 _is_visible,
-				 _enabled;
+				 _is_enabled;
 
 	public:
 		/**

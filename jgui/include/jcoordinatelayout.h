@@ -103,6 +103,18 @@ class CoordinateLayout : public Layout{
 		 * \brief
 		 *
 		 */
+    virtual jsize_t GetMinimumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
+    virtual jsize_t GetMaximumLayoutSize(Container *parent);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jsize_t GetPreferredSize(Container *target);
 
 		/**

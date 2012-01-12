@@ -73,11 +73,11 @@ void testTrim()
 void testLink()
 {
 	jcommon::DynamicLink link;
+	double (**cossine)(double) = NULL;
 
 	link.Load("libm.so", jcommon::JLF_LAZY);
 	
-	double (*cossine)(double);
-	*(void **)(&cossine) = link.FindSymbol("cos");
+	*(void **)(cossine) = link.FindSymbol("cos");
 
 	std::cout << "Cos(0.0) = " << (*cossine)(0.0) << std::endl;
 	
@@ -245,36 +245,4 @@ int main(int argc, char *argv[])
 
 	return EXIT_SUCCESS;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

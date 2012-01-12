@@ -22,7 +22,7 @@
 #include "jsocket.h"
 #include "junknownhostexception.h"
 #include "jsocketexception.h"
-#include "jsocketstreamexception.h"
+#include "jioexception.h"
 #include "jinetaddress4.h"
 
 namespace jsocket {
@@ -62,7 +62,7 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
 
 		if(getsockname(_fd, (struct sockaddr *)&_lsock, &len) < 0) {
 #endif
-			throw SocketStreamException("Connect error");
+			throw jio::IOException("ServerSocket constructor exception");
 		}
 	}
 }
@@ -88,7 +88,7 @@ void ServerSocket::CreateSocket()
 #else
 	if ((_fd = ::socket(PF_INET, SOCK_STREAM, 0)) < 0) {
 #endif
-		throw SocketException("Create socket error");
+		throw SocketException("ServerSocket creation exception");
 	}
 
 	_is_closed = false;
@@ -121,14 +121,14 @@ void ServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 #endif
     
 	if (::bind(_fd, (struct sockaddr *) &_lsock, sizeof(_lsock)) < 0) {
-		throw SocketException("Bind socket error");
+		throw SocketException("ServerSocket bind exception");
 	}
 }
 
 void ServerSocket::ListenSocket(int backlog_)
 {
 	if (::listen(_fd, backlog_) < 0) {
-		throw SocketException("Listen port error");
+		throw SocketException("ServerSocket listen exception");
 	}
 }
 
@@ -151,7 +151,7 @@ Socket * ServerSocket::Accept()
 #endif
     
 	if (handler < 0) {
-		throw SocketException("Accept failed");
+		throw SocketException("Socket accept exception");
     }
     
 	Socket *s = new Socket(handler, _rsock);
@@ -180,7 +180,7 @@ void ServerSocket::Close()
 #else
 	if (close(_fd) != 0) {
 #endif
-		throw SocketException("Close socket error");
+		throw SocketException("Unknown close exception");
 	}
 
 	_is_closed = true;

@@ -39,8 +39,6 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 {
 	jcommon::Object::SetClassName("jgui::FileChooserDialogBox");
 
-	SetMoveEnabled(true);
-
 	_label = NULL;
 	_file = NULL;
 
@@ -64,9 +62,6 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 
 		Add(_label);
 		Add(_file);
-
-		_list->SetNavigation(_file, _file, NULL, NULL);
-		_file->SetNavigation(NULL, NULL, _list, _list);
 	}
 
 	_list->RequestFocus();
@@ -309,7 +304,7 @@ void FileChooserDialogBox::ItemSelected(jgui::SelectEvent *event)
 	}
 }
 
-void FileChooserDialogBox::InputReceived(jgui::KeyEvent *event)
+bool FileChooserDialogBox::ProcessEvent(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -325,6 +320,8 @@ void FileChooserDialogBox::InputReceived(jgui::KeyEvent *event)
 			}
 		}
 	}
+
+	return true;
 }
 
 }

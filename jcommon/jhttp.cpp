@@ -415,12 +415,12 @@ bool HTTP::Parsear()
 			if(!strncmp(lexeme,"HTTP/1.",lextam-1)){
 				break;
 			} else { //ainda eh nome do arquivo
-				if(filetam+lextam+1 > 1024) {
+				if(filetam + lextam + 1 > 1024) {
 					r.codigo = 414;
 					return true;
 				}
-				strncpy(&arquivo[filetam++]," ",1);
-				strncpy(&arquivo[filetam],lexeme,lextam);
+				strncpy(&arquivo[filetam++], " ", 1);
+				strncpy(&arquivo[filetam], lexeme, lextam);
 				filetam += lextam;
 				arquivo[filetam] = 0;
 			}

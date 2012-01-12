@@ -21,7 +21,7 @@
 #include "jlocaldatagramsocket.h"
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
-#include "jsocketstreamexception.h"
+#include "jioexception.h"
 #include "junknownhostexception.h"
 
 #ifdef _WIN32
@@ -37,7 +37,7 @@ LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server,
 	jcommon::Object::SetClassName("jsocket::DatagramSocket");
 	
 #ifdef _WIN32
-	throw jcommon::SocketException("Unamed socket unsupported.");
+	throw jcommon::SocketException("Named socket unsupported.");
 #endif
 
 	_client_file = client;
@@ -61,7 +61,7 @@ LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int r
 	jcommon::Object::SetClassName("jsocket::DatagramSocket");
 	
 #ifdef _WIN32
-	throw jcommon::SocketException("Unamed socket unsupported.");
+	throw jcommon::SocketException("Named socket unsupported.");
 #endif
 
 	// _client_file = client;
@@ -104,7 +104,7 @@ void LocalDatagramSocket::CreateSocket()
 #else
 	if ((_fd = ::socket(PF_UNIX, SOCK_DGRAM, 0)) < 0) { // IPPROTO_UDP);
 #endif
-		throw SocketException("Create datagram socket error");
+		throw SocketException("Socket creation exception");
 	}
 
 	_is_closed = false;
@@ -114,14 +114,16 @@ void LocalDatagramSocket::BindSocket()
 {
 #ifdef _WIN32
 #else
+	int length = sizeof(_client.sun_path)-1;
+
 	memset(&_client, 0, sizeof(_client));
 	
 	_client.sun_family = AF_UNIX;
-	strncpy(_client.sun_path, _server_file.c_str(), 108);
+	strncpy(_client.sun_path, _server_file.c_str(), length);
 	unlink(_server_file.c_str());
 
 	if (bind(_fd, (const struct sockaddr *)&_client, sizeof(_client)) < 0) {
-		throw SocketException("Bind datagram socket error");
+		throw SocketException("Socket bind exception");
 	}
 
 	memset(&_server, 0, sizeof(_server));
@@ -134,14 +136,16 @@ void LocalDatagramSocket::ConnectSocket()
 {
 #ifdef _WIN32
 #else
+	int length = sizeof(_client.sun_path)-1;
+
 	memset(&_client, 0, sizeof(_client));
 	
 	_client.sun_family = AF_UNIX;
-	strncpy(_client.sun_path, _client_file.c_str(), 108);
+	strncpy(_client.sun_path, _client_file.c_str(), length);
 	unlink(_client_file.c_str());
 
 	if (bind(_fd, (const struct sockaddr *)&_client, sizeof(_client)) < 0) {
-		throw SocketException("Connect datagram socket error");
+		throw SocketException("Socket connection exception");
 	}
 
 	memset(&_server, 0, sizeof(_server));
@@ -190,7 +194,7 @@ jio::OutputStream * LocalDatagramSocket::GetOutputStream()
 int LocalDatagramSocket::Receive(char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 #ifdef _WIN32
@@ -203,9 +207,9 @@ int LocalDatagramSocket::Receive(char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Receive timed exception");
+		throw SocketException("Invalid receive parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket receive timeout exception");
+		throw SocketTimeoutException("Socket read timeout exception");
 	} else {
 	    if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return LocalDatagramSocket::Receive(data_, size_, true);
@@ -219,18 +223,18 @@ int LocalDatagramSocket::Receive(char *data_, int size_, int time_)
 int LocalDatagramSocket::Receive(char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 #ifdef _WIN32
-	return -1;
+	throw jio::IOException("Read socket error");
 #else
 	int n,
 		flags,
 		length = sizeof(_server);
 
 	if (block_ == true) {
-		// CHANGE:: call SocketOptions
+		// CHANGE:: call SocketOptionss
 
 		flags = 0;
 	} else {
@@ -242,13 +246,15 @@ int LocalDatagramSocket::Receive(char *data_, int size_, bool block_)
 	if (n < 0) {
 	   if (errno == EAGAIN) {
 			if (block_ == false) {
-				throw SocketStreamException("Socket buffer is empty");
+				throw jio::IOException("Socket buffer is empty");
 			} else {
 				throw SocketTimeoutException("Socket receive timeout exception");
 			}
 		} else {
-			throw SocketStreamException("Read socket error");
+			throw jio::IOException("Read socket error");
 		}
+	} else if (n == 0) {
+		throw jio::IOException("Peer shutdown exception");
 	}
 
 	_receive_bytes += n;
@@ -260,7 +266,7 @@ int LocalDatagramSocket::Receive(char *data_, int size_, bool block_)
 int LocalDatagramSocket::Send(const char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 #ifdef _WIN32
@@ -273,7 +279,7 @@ int LocalDatagramSocket::Send(const char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Send timed exception");
+		throw SocketException("Invalid send parameters exception");
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket send timeout exception");
 	} else {
@@ -289,7 +295,7 @@ int LocalDatagramSocket::Send(const char *data_, int size_, int time_)
 int LocalDatagramSocket::Send(const char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 #ifdef _WIN32
@@ -310,13 +316,14 @@ int LocalDatagramSocket::Send(const char *data_, int size_, bool block_)
 
 	if (n < 0) {
 		if (errno == EAGAIN) {
-			if (block_ == false) {
-				throw SocketStreamException("Socket buffer is empty");
-			} else {
+			if (block_ == true) {
 				throw SocketTimeoutException("Socket send timeout exception");
+			} else {
+				// INFO:: non-blocking socket, no data read
+				n = 0;
 			}
 		} else {
-			throw SocketStreamException("Send udp data error");
+			throw SocketTimeoutException("Socket send exception");
 		}
 	}
 
@@ -335,7 +342,7 @@ void LocalDatagramSocket::Close()
 #ifdef _WIN32
 #else
 	if (close(_fd) != 0) {
-		throw SocketException("Close socket error");
+		throw SocketException("Unknown close exception");
 	}
 	
 	if (_client_file != "") {
@@ -358,13 +365,9 @@ int64_t LocalDatagramSocket::GetReadedBytes()
 	return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOption * LocalDatagramSocket::GetSocketOption()
+SocketOptions * LocalDatagramSocket::GetSocketOptions()
 {
-	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
-	}
-
-	return new SocketOption(_fd, JCT_UDP);
+	return new SocketOptions(_fd, JCT_UDP);
 }
 
 }

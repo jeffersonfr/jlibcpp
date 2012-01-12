@@ -26,7 +26,6 @@ MCalc::MCalc(int x, int y):
 	jgui::Frame("Calculadora", x, y, 500, 400)
 {
 	SetResizeEnabled(true);
-	SetMoveEnabled(true);
 
 	_number0 = "";
 	_number1 = "";
@@ -59,30 +58,6 @@ MCalc::MCalc(int x, int y):
 		new jgui::Button("+"),
 		new jgui::Button("=")
 	};
-
-	b[0]->SetNavigation(NULL, b[1], NULL, b[5]);	
-	b[1]->SetNavigation(b[0], b[2], NULL, b[6]);	
-	b[2]->SetNavigation(b[1], b[3], NULL, b[7]);	
-	b[3]->SetNavigation(b[2], b[4], NULL, b[8]);	
-	b[4]->SetNavigation(b[3], NULL, NULL, b[9]);	
-
-	b[5]->SetNavigation(NULL, b[6], b[0], b[10]);	
-	b[6]->SetNavigation(b[5], b[7], b[1], b[11]);	
-	b[7]->SetNavigation(b[6], b[8], b[2], b[12]);	
-	b[8]->SetNavigation(b[7], b[9], b[3], b[13]);	
-	b[9]->SetNavigation(b[8], NULL, b[4], b[14]);	
-
-	b[10]->SetNavigation(NULL, b[11], b[5], b[15]);	
-	b[11]->SetNavigation(b[10], b[12], b[6], b[16]);	
-	b[12]->SetNavigation(b[11], b[13], b[7], b[17]);	
-	b[13]->SetNavigation(b[12], b[14], b[8], b[18]);	
-	b[14]->SetNavigation(b[13], NULL, b[9], b[19]);
-
-	b[15]->SetNavigation(NULL, b[16], b[10], NULL);	
-	b[16]->SetNavigation(b[15], b[17], b[11], NULL);	
-	b[17]->SetNavigation(b[16], b[18], b[12], NULL);	
-	b[18]->SetNavigation(b[17], b[19], b[13], NULL);	
-	b[19]->SetNavigation(b[18], NULL, b[14], NULL);	
 
 	SetLayout(new jgui::BorderLayout());
 
@@ -403,7 +378,7 @@ void MCalc::Process(std::string type)
 	}
 }
 
-void MCalc::InputReceived(jgui::KeyEvent *event)
+bool MCalc::ProcessEvent(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&mcalc_mutex);
 
@@ -533,6 +508,8 @@ void MCalc::InputReceived(jgui::KeyEvent *event)
 
 		delete tmp;
 	}
+
+	return true;
 }
 
 void MCalc::ActionPerformed(jgui::ButtonEvent *event)

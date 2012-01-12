@@ -287,37 +287,40 @@ File::File(std::string prefix, std::string sufix, bool is_directory):
 
 	delete tmp;
 #else
-	char *tmp = new char[prefix.size()+6+1];
+	if (is_directory == false) {
+		std::string tmp = prefix + "XXXXXX" + sufix;
 
-	sprintf(tmp, "%sXXXXXX", prefix.c_str());
+		_fd = mkstemp((char *)tmp.c_str());
+			
+		/* TODO:: get filename by file descriptor
+		char path[PATH_MAX];
 
-	_filename = mktemp(tmp);
-
-	if (sufix != "") {
-		_filename = _filename + "." + sufix;
-	}
-
-	if (is_directory == true) {
-		_fd = open(_filename.c_str(), O_RDWR | O_LARGEFILE | O_CREAT, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH);
-
-		if (_fd > 0) {
-			_is_closed = false;
-			_exists = true;
+		if (fcntl(_fd, F_GETPATH, path) >= 0) {
+			_filename = path;
 		}
+		*/
 
 		_type = JFT_REGULAR;
 	} else {
-		_dir = opendir(_filename.c_str());
+		std::string tmp = prefix + "XXXXXX" + sufix;
 
-		if (_dir != NULL) {
-			_is_closed = false;
-			_exists = true;
+		_filename = mkdtemp((char *)tmp.c_str());
+
+		_filename = _filename + sufix;
+
+		if ((_fd = open(_filename.c_str(), O_RDWR | O_DIRECTORY | O_CREAT, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH)) > 0) {
+			close(_fd);
+
+			_dir = opendir(_filename.c_str());
+
+			if (_dir != NULL) {
+				_is_closed = false;
+				_exists = true;
+			}
+
+			_type = JFT_DIRECTORY;
 		}
-
-		_type = JFT_DIRECTORY;
 	}
-
-	delete tmp;
 #endif
 }
 

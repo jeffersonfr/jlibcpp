@@ -21,7 +21,7 @@
 #include "jmulticastsocket.h"
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
-#include "jsocketstreamexception.h"
+#include "jioexception.h"
 #include "jinetaddress4.h"
 
 namespace jsocket {
@@ -71,7 +71,7 @@ void MulticastSocket::CreateSocket()
 #else
 	if ((_fds = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) < 0) { // IPPROTO_MTP
 #endif
-		throw SocketException("Create multicast socket error");
+		throw SocketException("Socket create::sender exception");
 	}
 
 #ifdef _WIN32
@@ -79,7 +79,7 @@ void MulticastSocket::CreateSocket()
 #else
 	if ((_fdr = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_IP)) < 0) { // IPPROTO_MTP
 #endif
-		throw SocketException("Create multicast socket error");
+		throw SocketException("Socket create::receiver exception");
 	}
 
 	_is_closed = false;
@@ -88,7 +88,7 @@ void MulticastSocket::CreateSocket()
 void MulticastSocket::BindSocket(InetAddress *addr_, int local_port_)
 {
 	if (bind(_fdr, (struct sockaddr *)&_sock_r, sizeof(_sock_r)) < 0) {
-		throw SocketException("Bind multicast socket error");
+		throw SocketException("Socket bind exception");
 	}
 }
 
@@ -144,7 +144,7 @@ jio::OutputStream * MulticastSocket::GetOutputStream()
 int MulticastSocket::Receive(char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 #ifdef _WIN32
@@ -158,9 +158,9 @@ int MulticastSocket::Receive(char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Receive timed exception");
+		throw SocketException("Invalid receive parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket receive timeout exception");
+		throw SocketTimeoutException("Socket read timeout exception");
 	} else {
 		if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return MulticastSocket::Receive(data_, size_);
@@ -174,7 +174,7 @@ int MulticastSocket::Receive(char *data_, int size_, int time_)
 int MulticastSocket::Receive(char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 
 	int n,
@@ -189,21 +189,25 @@ int MulticastSocket::Receive(char *data_, int size_, bool block_)
 #endif
 	}
 
-
 #ifdef _WIN32
 	n = ::recvfrom(_fdr, data_, size_, flags, (struct sockaddr *)&_sock_r, &length);
 #else
 	n = ::recvfrom(_fdr, data_, size_, flags, (struct sockaddr *)&_sock_r, (socklen_t *)&length);
 #endif
 	
-	if (n < 0 && errno == EAGAIN) {
-		if (block_ == false) {
-			throw SocketStreamException("Socket buffer is empty");
+	if (n < 0) {
+		if (errno == EAGAIN) {
+			if (block_ == true) {
+				throw SocketTimeoutException("Socket receive timeout exception");
+			} else {
+				// INFO:: non-blocking socket, no data read
+				n = 0;
+			}
 		} else {
-			throw SocketTimeoutException("Socket receive timeout exception");
+			throw jio::IOException("Socket read exception");
 		}
-	} else if (n < 0) {
-		throw SocketStreamException("Read socket error");
+	} else if (n == 0) {
+		throw jio::IOException("Peer shutdown exception");
 	}
 
 	_receive_bytes += n;
@@ -214,7 +218,7 @@ int MulticastSocket::Receive(char *data_, int size_, bool block_)
 int MulticastSocket::Send(const char *data, int size, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 
 #ifdef _WIN32
@@ -228,7 +232,7 @@ int MulticastSocket::Send(const char *data, int size, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Send timeout exception");
+		throw SocketException("Invalid send parameters exception");
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket send timeout exception");
 	} else {
@@ -244,7 +248,7 @@ int MulticastSocket::Send(const char *data, int size, int time_)
 int MulticastSocket::Send(const char *data, int size, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 
 	int flags;
@@ -270,14 +274,17 @@ int MulticastSocket::Send(const char *data, int size, bool block_)
 		throw SocketException("Send udp data error");
 	}
 #else
-	if (n < 0 && errno == EAGAIN) {
-		if (block_ == false) {
-			throw SocketStreamException("Socket buffer is empty");
+	if (n < 0) {
+		if (errno == EAGAIN) {
+			if (block_ == true) {
+				throw SocketTimeoutException("Socket send timeout exception");
+			} else {
+				// INFO:: non-blocking socket, no data read
+				n = 0;
+			}
 		} else {
-			throw SocketTimeoutException("Socket send timeout exception");
+			throw SocketTimeoutException("Socket send exception");
 		}
-	} else if (n < 0) {
-		throw SocketException("Send udp data error");
 	}
 #endif
 
@@ -289,7 +296,7 @@ int MulticastSocket::Send(const char *data, int size, bool block_)
 void MulticastSocket::Join(std::string group_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	struct ip_mreq imr;
@@ -302,7 +309,7 @@ void MulticastSocket::Join(std::string group_)
 #else
 	if (setsockopt(_fdr, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr, sizeof(imr)) < 0) {
 #endif
-		throw SocketException("Join group error");
+		throw SocketException("MulticastSocket join exception");
 	}
 
 	_groups.push_back(group_);
@@ -311,7 +318,7 @@ void MulticastSocket::Join(std::string group_)
 void MulticastSocket::Join(InetAddress *group_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	struct ip_mreq imr;
@@ -324,7 +331,7 @@ void MulticastSocket::Join(InetAddress *group_)
 #else
 	if (setsockopt(_fdr, IPPROTO_IP, IP_ADD_MEMBERSHIP, &imr, sizeof(imr)) < 0) {
 #endif
-		throw SocketException("Join group error");
+		throw SocketException("MulticastSocket join exception");
 	}
 
 	_groups.push_back(group_->GetHostAddress());
@@ -333,7 +340,7 @@ void MulticastSocket::Join(InetAddress *group_)
 void MulticastSocket::Leave(std::string group_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	struct ip_mreq imr;
@@ -348,7 +355,7 @@ void MulticastSocket::Leave(std::string group_)
 #else
 			if (setsockopt(_fdr, IPPROTO_IP, IP_DROP_MEMBERSHIP, &imr, sizeof(imr)) < 0) {
 #endif
-				throw SocketException("Leave group error");
+				throw SocketException("MulticastSocket leave exception");
 			}
 
 			// _groups.remove(*i);
@@ -361,7 +368,7 @@ void MulticastSocket::Leave(std::string group_)
 void MulticastSocket::Leave(InetAddress *group_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	struct ip_mreq imr;
@@ -377,7 +384,7 @@ void MulticastSocket::Leave(InetAddress *group_)
 #else
 			if (setsockopt(_fdr, IPPROTO_IP, IP_DROP_MEMBERSHIP, &imr, sizeof(imr)) < 0) {
 #endif
-				throw SocketException("Leave group error");
+				throw SocketException("MulticastSocket leave exception");
 			}
 
 			// std::remove(i);
@@ -398,12 +405,14 @@ void MulticastSocket::Close()
 		return;
 	}
 
+	bool flag = false;
+
 #ifdef _WIN32
 	if (closesocket(_fdr) < 0) {
 #else
 	if (close(_fdr) != 0) {
 #endif
-		throw SocketStreamException("Close multicast receiver descriptor error");
+		flag = true;
 	}
 	
 #ifdef _WIN32
@@ -411,7 +420,11 @@ void MulticastSocket::Close()
 #else
 	if (close(_fds) != 0) {
 #endif
-		throw SocketStreamException("Close multicast sender descriptor error");
+		flag = true;
+	}
+	
+	if (flag == true) {
+		throw jio::IOException("Unknown close exception");
 	}
 
 	_is_closed = true;
@@ -443,13 +456,14 @@ void MulticastSocket::SetMulticastTTL(char ttl_)
 #endif
 }
 
-SocketOption * MulticastSocket::GetSocketOption()
+SocketOptions * MulticastSocket::GetSocketOptions()
 {
-	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
-	}
-	
-	return new SocketOption(_fdr, JCT_MCAST);
+	return new SocketOptions(_fdr, JCT_MCAST);
+}
+
+SocketOptions * MulticastSocket::GetSocketOptionsExtension()
+{
+	return new SocketOptions(_fds, JCT_MCAST);
 }
 
 }

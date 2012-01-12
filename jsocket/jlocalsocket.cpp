@@ -21,7 +21,7 @@
 #include "jlocalsocket.h"
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
-#include "jsocketstreamexception.h"
+#include "jioexception.h"
 
 namespace jsocket {
 
@@ -33,7 +33,7 @@ LocalSocket::LocalSocket(std::string file, int timeout_, int rbuf_, int wbuf_):
 	_file = file;
 
 #ifdef _WIN32
-	throw jcommon::SocketException("Unamed socket unsupported.");
+	throw jcommon::SocketException("Named socket unsupported.");
 #endif
 
 	_is = NULL;
@@ -90,7 +90,7 @@ void LocalSocket::CreateSocket()
 	_fd = socket (PF_UNIX, SOCK_STREAM, 0); // IPPROTO_TCP);
 
 	if (_fd < 0) {
-		throw SocketException("Create socket error");
+		throw SocketException("Socket creation exception");
 	}
 #endif
 }
@@ -99,11 +99,13 @@ void LocalSocket::ConnectSocket()
 {
 #ifdef _WIN32
 #else
+	int length = sizeof(_address.sun_path)-1;
+
 	_address.sun_family = AF_UNIX;
-	strncpy(_address.sun_path, _file.c_str(), 108);
+	strncpy(_address.sun_path, _file.c_str(), length);
 	
 	int r,
-			address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, 108);
+			address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, length);
 
 	if (_timeout > 0) {
 		int opt = 1;
@@ -113,13 +115,7 @@ void LocalSocket::ConnectSocket()
 		r = connect(_fd, (struct sockaddr *)&_address, address_length);
 
 		if (errno != EINPROGRESS) {
-			opt = 0;
-
-			if (ioctl(_fd, FIONBIO, &opt) < 0) {
-				throw SocketException("Socket non-blocking error");
-			}
-
-			throw SocketException("Connect socket error");
+			throw SocketException("Socket connection exception");
 		}
 
 		if (r != 0) {
@@ -138,15 +134,15 @@ void LocalSocket::ConnectSocket()
 				opt = 0;
 
 				if (ioctl(_fd, FIONBIO, &opt) < 0) {
-					throw SocketException("Socket non-blocking error");
+					throw SocketException("Socket connection exception");
 				}
 
 				shutdown(_fd, SHUT_RDWR);
 
 				if (r == 0) {
-					throw SocketException("Connect timeout error");
+					throw SocketException("Socket connection timeout exception");
 				} else if (r < 0) {
-					throw SocketException("Connect socket error");
+					throw SocketException("Socket connection exception");
 				}
 			}
 
@@ -155,21 +151,21 @@ void LocalSocket::ConnectSocket()
 			getsockopt(_fd, SOL_SOCKET, SO_ERROR, (void *)&r, (socklen_t *)&optlen);
 
 			if (r != 0) {
-				throw SocketException("Can't connect socket");
+				throw SocketException("Unknown socket exception");
 			}
 		}
 
 		opt = 0;
 
 		if (ioctl(_fd, FIONBIO, &opt) < 0) {
-			throw SocketException("Socket non-blocking error");
+			throw SocketException("Socket connection exception");
 		}
 	} else {
 		r = connect(_fd, (struct sockaddr *)&_address, sizeof(_address));
 	}
 
 	if (r < 0) {
-		throw SocketException("Connect socket error");
+		throw SocketException("Socket connection exception");
 	}
 #endif
 }
@@ -199,7 +195,7 @@ std::string LocalSocket::GetLocalFile()
 int LocalSocket::Send(const char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 
 #ifdef _WIN32
@@ -213,7 +209,7 @@ int LocalSocket::Send(const char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Send timeout exception");
+		throw SocketException("Invalid send parameters exception");
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket send timeout exception");
 	} else {
@@ -229,7 +225,7 @@ int LocalSocket::Send(const char *data_, int size_, int time_)
 int LocalSocket::Send(const char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 
 #ifdef _WIN32
@@ -246,13 +242,14 @@ int LocalSocket::Send(const char *data_, int size_, bool block_)
 	int n = ::send(_fd, data_, size_, flags);
 
 	if (n < 0 && errno == EAGAIN) {
-		if (block_ == false) {
-			throw SocketStreamException("Socket buffer is empty");
-		} else {
+		if (block_ == true) {
 			throw SocketTimeoutException("Socket send timeout exception");
+		} else {
+			// INFO:: non-blocking socket, no data read
+			n = 0;
 		}
 	} else if (n < 0) {
-		throw SocketStreamException("Send socket error");
+		throw SocketTimeoutException("Socket send exception");
 	}
 
 	_sent_bytes += n;
@@ -264,7 +261,7 @@ int LocalSocket::Send(const char *data_, int size_, bool block_)
 int LocalSocket::Receive(char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 
 #ifdef _WIN32
@@ -277,9 +274,9 @@ int LocalSocket::Receive(char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Receive timed exception");
+		throw SocketException("Invalid receive parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket receive timeout exception");
+		throw SocketTimeoutException("Socket read timeout exception");
 	} else {
 		if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return LocalSocket::Receive(data_, size_);
@@ -293,7 +290,7 @@ int LocalSocket::Receive(char *data_, int size_, int time_)
 int LocalSocket::Receive(char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 
 #ifdef _WIN32
@@ -306,17 +303,20 @@ int LocalSocket::Receive(char *data_, int size_, bool block_)
 
 	int n = ::recv(_fd, data_, size_, flags);
 
-	if (n < 0 && errno == EAGAIN) {
-		if (block_ == false) {
-			throw SocketStreamException("Socket buffer is empty");
+	if (n < 0) {
+		if (errno == EAGAIN) {
+			if (block_ == true) {
+				throw SocketTimeoutException("Socket receive timeout exception");
+			} else {
+				// INFO:: non-blocking socket, no data read
+				n = 0;
+			}
 		} else {
-			throw SocketTimeoutException("Socket receive timeout exception");
+			throw jio::IOException("Socket read exception");
 		}
-	} else if (n < 0) {
-		throw SocketStreamException("Read socket error");
 	} else if (n == 0) {
-		//throw SocketException("Peer has shutdown");
-		return -1;
+		// INFO:: peer has shutdown
+		throw SocketException("Broken pipe exception");
 	}
 
 	_receive_bytes += n;
@@ -327,18 +327,20 @@ int LocalSocket::Receive(char *data_, int size_, bool block_)
 
 void LocalSocket::Close()
 {
+	if (_is_closed == true) {
+		return;
+	}
+
 #ifdef _WIN32
 #else
-	if (_is_closed == false) {
-		_is_closed = true;
-
-		if (close(_fd) != 0) {
-			throw SocketException("Close socket error");
-		}
+	if (close(_fd) != 0) {
+		throw SocketException("Unknown close exception");
 	}
 	
 	unlink(_file.c_str());
 #endif
+		
+	_is_closed = true;
 }
 
 jio::InputStream * LocalSocket::GetInputStream()
@@ -361,13 +363,9 @@ int64_t LocalSocket::GetReadedBytes()
 	return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOption * LocalSocket::GetSocketOption()
+SocketOptions * LocalSocket::GetSocketOptions()
 {
-	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
-	}
-
-	return new SocketOption(_fd, JCT_TCP);
+	return new SocketOptions(_fd, JCT_TCP);
 }
 
 }

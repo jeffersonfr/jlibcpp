@@ -47,7 +47,7 @@ void ScrollBar::SetScrollOrientation(jscroll_orientation_t type)
 
 	_type = type;
 
-	Repaint(true);
+	Repaint();
 }
 
 jscroll_orientation_t ScrollBar::GetScrollOrientation()
@@ -91,17 +91,13 @@ int ScrollBar::GetStoneSize()
 
 bool ScrollBar::ProcessEvent(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
-	bool catched = false;
-
 	jkeyevent_symbol_t action = event->GetSymbol();
+
+	bool catched = false;
 
 	if (_type == JSO_HORIZONTAL) {
 		if (action == JKS_CURSOR_LEFT) {
@@ -141,7 +137,7 @@ bool ScrollBar::ProcessEvent(KeyEvent *event)
 		}
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
 bool ScrollBar::ProcessEvent(MouseEvent *event)
@@ -150,7 +146,7 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
@@ -176,38 +172,38 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 		}
 
 		if (_type == JSO_HORIZONTAL) {
-			if (y1 > _location.y && y1 < (_location.y+_size.height)) {
+			if (y1 > 0 && y1 < (_size.height)) {
 				int d = (int)((_value*(dw-2*arrow_size))/(GetMaximum()-GetMinimum()));
 
 				_pressed = false;
 
-				if (x1 > (_location.x+dx) && x1 < (_location.x+arrow_size+dx)) {
+				if (x1 > (dx) && x1 < (arrow_size+dx)) {
 					SetValue(_value-_minimum_tick);
-				} else if (x1 > (_location.x+_size.width-arrow_size-dx) && x1 < (_location.x+_size.width-dx)) {
+				} else if (x1 > (_size.width-arrow_size-dx) && x1 < (_size.width-dx)) {
 					SetValue(_value+_minimum_tick);
-				} else if (x1 > (_location.x+arrow_size+dx) && x1 < (_location.x+arrow_size+dx+d)) {
+				} else if (x1 > (arrow_size+dx) && x1 < (arrow_size+dx+d)) {
 					SetValue(_value-_maximum_tick);
-				} else if (x1 > (_location.x+arrow_size+dx+d+_stone_size) && x1 < (_location.x+_size.width-arrow_size)) {
+				} else if (x1 > (arrow_size+dx+d+_stone_size) && x1 < (_size.width-arrow_size)) {
 					SetValue(_value+_maximum_tick);
-				} else if (x1 > (_location.x+arrow_size+dx+d) && x1 < (_location.x+arrow_size+dx+d+_stone_size)) {
+				} else if (x1 > (arrow_size+dx+d) && x1 < (arrow_size+dx+d+_stone_size)) {
 					_pressed = true;
 				}
 			}
 		} else if (_type == JSO_VERTICAL) {
-			if (x1 > _location.x && x1 < (_location.x+_size.width)) {
+			if (x1 > 0 && x1 < (_size.width)) {
 				int d = (int)((_value*(dh-2*arrow_size))/(GetMaximum()-GetMinimum()));
 
 				_pressed = false;
 
-				if (y1 > (_location.y+dy) && y1 < (_location.y+arrow_size+dy)) {
+				if (y1 > (dy) && y1 < (arrow_size+dy)) {
 					SetValue(_value-_minimum_tick);
-				} else if (y1 > (_location.y+_size.height-arrow_size-dy) && y1 < (_location.y+_size.height-dy)) {
+				} else if (y1 > (_size.height-arrow_size-dy) && y1 < (_size.height-dy)) {
 					SetValue(_value+_minimum_tick);
-				} else if (y1 > (_location.y+arrow_size+dy) && y1 < (_location.y+arrow_size+dy+d)) {
+				} else if (y1 > (arrow_size+dy) && y1 < (arrow_size+dy+d)) {
 					SetValue(_value-_maximum_tick);
-				} else if (y1 > (_location.y+arrow_size+dy+d+_stone_size) && y1 < (_location.y+_size.height-arrow_size)) {
+				} else if (y1 > (arrow_size+dy+d+_stone_size) && y1 < (_size.height-arrow_size)) {
 					SetValue(_value+_maximum_tick);
-				} else if (y1 > (_location.y+arrow_size+dy+d) && y1 < (_location.y+arrow_size+dy+d+_stone_size)) {
+				} else if (y1 > (arrow_size+dy+d) && y1 < (arrow_size+dy+d+_stone_size)) {
 					_pressed = true;
 				}
 			}
@@ -233,7 +229,7 @@ void ScrollBar::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	Color color(0x80, 0x80, 0xe0, 0xff);
+	Color color = _scrollbar_color;
 	
 	int x = _vertical_gap-_border_size,
 			y = _horizontal_gap-_border_size,
@@ -271,8 +267,6 @@ void ScrollBar::Paint(Graphics *g)
 		g->FillTriangle(x, y+arrow_size, x+w/2, y,x+w, y+arrow_size);
 		g->FillTriangle(x, y+h-arrow_size, x+w/2, y+h,x+w, y+h-arrow_size);
 	}
-
-	PaintBorderEdges(g);
 }
 
 }

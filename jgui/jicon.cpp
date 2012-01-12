@@ -156,8 +156,6 @@ void Icon::Paint(Graphics *g)
 			g->DrawString(text, px, py, pw, ph, _halign, _valign);
 		}
 	}
-
-	PaintBorderEdges(g);
 }
 
 }

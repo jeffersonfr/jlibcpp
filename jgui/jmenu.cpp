@@ -477,10 +477,6 @@ int Menu::GetCurrentIndex()
 
 void Menu::Repaint()
 {
-	if (_ignore_repaint == true) {
-		return;
-	}
-
 	if (_frame->GetGraphics() != NULL) {
 		Paint(_frame->GetGraphics());
 	}
@@ -490,7 +486,7 @@ void Menu::Paint(Graphics *g)
 {
 	// JDEBUG(JINFO, "paint\n");
 
-	// Component::Paint(g);
+	_frame->Paint(g);
 
 	_size = _frame->GetSize();
 	_location = _frame->GetLocation();
@@ -511,8 +507,7 @@ void Menu::Paint(Graphics *g)
 	if (_title != "") {
 		jinsets_t insets = _frame->GetInsets();
 
-		g->SetColor(0xf0, 0xf0, 0xf0, 0x80);
-		g->FillRectangle(x, insets.top, w, 5);
+		g->FillVerticalGradient(_border_size, _border_size, _size.width-2*_border_size, insets.top-2*_border_size, _bgcolor, _scrollbar_color);
 
 		if (IsFontSet() == true) {
 			std::string text = _title;
@@ -522,10 +517,10 @@ void Menu::Paint(Graphics *g)
 			// }
 
 			g->SetColor(_fgcolor);
-			g->DrawString(text, x+(w-_font->GetStringWidth(text))/2, y+(insets.top-_font->GetHeight())/2);
+			g->DrawString(text, x+(w-_font->GetStringWidth(text))/2, (insets.top-_font->GetHeight())/2);
 		}
 		
-		y = y + insets.top;
+		y = y + insets.top - 2*_vertical_gap;
 	}
 
 	int count = 0,

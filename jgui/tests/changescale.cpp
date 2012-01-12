@@ -37,7 +37,6 @@ class Main : public jgui::Frame{
 			_grid_layout = new jgui::GridLayout(4, 4, 10, 10);
 
 			SetLayout(_grid_layout);
-			SetMoveEnabled(true);
 			SetResizeEnabled(true);
 
 			for (int i=0; i<5; i++) {

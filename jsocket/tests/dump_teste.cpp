@@ -60,7 +60,7 @@ void dump_raw()
 	try {
 		DatagramSocket s(4001);
 
-		jsocket::SocketOption *opt = s.GetSocketOption();
+		jsocket::SocketOptions *opt = s.GetSocketOptions();
 
 		// DO:: opt->SetSendTimeout(time);
 		opt->SetReceiveTimeout(6000000);

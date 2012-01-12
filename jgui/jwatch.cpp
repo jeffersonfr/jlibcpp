@@ -64,7 +64,7 @@ void Watch::SetVisible(bool b)
 
 		Release();
 		WaitThread();
-		Repaint(true);
+		Repaint();
 	}
 }
 
@@ -279,8 +279,6 @@ void Watch::Paint(Graphics *g)
 
 		g->DrawString(text, px, py, pw, ph, _halign, _valign);
 	}
-
-	PaintBorderEdges(g);
 }
 
 }

@@ -68,21 +68,97 @@ void BorderLayout::SetVgap(int vgap)
 
 jsize_t BorderLayout::GetMinimumLayoutSize(Container *parent)
 {
+	// WARN:: sync parent
+	Component *cmp = NULL;
 	jsize_t t = {0, 0};
+	bool ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
+      
+	if ((cmp = GetChild(JBA_EAST, ltr)) != NULL) {
+	    jsize_t d = cmp->GetMinimumSize();
+	    t.width += d.width + _hgap;
+	    t.height = std::max(d.height, t.height);
+	}
+	
+	if ((cmp = GetChild(JBA_WEST, ltr)) != NULL) {
+	    jsize_t d = cmp->GetMinimumSize();
+	    t.width += d.width + _hgap;
+	    t.height = std::max(d.height, t.height);
+	}
+	
+	if ((cmp = GetChild(JBA_CENTER, ltr)) != NULL) {
+	    jsize_t d = cmp->GetMinimumSize();
+	    t.width += d.width;
+	    t.height = std::max(d.height, t.height);
+	}
+	
+	if ((cmp = GetChild(JBA_NORTH, ltr)) != NULL) {
+	    jsize_t d = cmp->GetMinimumSize();
+	    t.width = std::max(d.width, t.width);
+	    t.height += d.height + _vgap;
+	}
+	
+	if ((cmp = GetChild(JBA_SOUTH, ltr)) != NULL) {
+	    jsize_t d = cmp->GetMinimumSize();
+	    t.width = std::max(d.width, t.width);
+	    t.height += d.height + _vgap;
+	}
+
+	jinsets_t insets = parent->GetInsets();
+
+	t.width += insets.left + insets.right;
+	t.height += insets.top + insets.bottom;
 
 	return t;
 }
 
 jsize_t BorderLayout::GetMaximumLayoutSize(Container *parent)
 {
-	jsize_t t = {0, 0};
+	jsize_t t = {INT_MAX, INT_MAX};
 
 	return t;
 }
 
 jsize_t BorderLayout::GetPreferredLayoutSize(Container *parent)
 {
+	// WARN:: sync parent
+	Component *cmp = NULL;
 	jsize_t t = {0, 0};
+	bool ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
+      
+	if ((cmp = GetChild(JBA_EAST, ltr)) != NULL) {
+	    jsize_t d = cmp->GetPreferredSize();
+	    t.width += d.width + _hgap;
+	    t.height = std::max(d.height, t.height);
+	}
+	
+	if ((cmp = GetChild(JBA_WEST, ltr)) != NULL) {
+	    jsize_t d = cmp->GetPreferredSize();
+	    t.width += d.width + _hgap;
+	    t.height = std::max(d.height, t.height);
+	}
+	
+	if ((cmp = GetChild(JBA_CENTER, ltr)) != NULL) {
+	    jsize_t d = cmp->GetPreferredSize();
+	    t.width += d.width;
+	    t.height = std::max(d.height, t.height);
+	}
+	
+	if ((cmp = GetChild(JBA_NORTH, ltr)) != NULL) {
+	    jsize_t d = cmp->GetPreferredSize();
+	    t.width = std::max(d.width, t.width);
+	    t.height += d.height + _vgap;
+	}
+	
+	if ((cmp = GetChild(JBA_SOUTH, ltr)) != NULL) {
+	    jsize_t d = cmp->GetPreferredSize();
+	    t.width = std::max(d.width, t.width);
+	    t.height += d.height + _vgap;
+	}
+
+	jinsets_t insets = parent->GetInsets();
+
+	t.width += insets.left + insets.right;
+	t.height += insets.top + insets.bottom;
 
 	return t;
 }

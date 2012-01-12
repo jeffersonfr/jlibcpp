@@ -68,7 +68,7 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
@@ -87,7 +87,7 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 				h = _size.height-2*y,
 				arrow_size = h;
 
-		if (x1 > (_location.x+x+w-arrow_size-2) && x1 < (_location.x+x+w-2) && y1 > (_location.y+y) && y1 < (_location.y+y+h)) {
+		if (x1 > (x+w-arrow_size-2) && x1 < (x+w-2) && y1 > (y) && y1 < (y+h)) {
 			if (_parent != NULL) {
 				InputManager::GetInstance()->RegisterKeyListener(_menu);
 				InputManager::GetInstance()->RegisterMouseListener(_menu);
@@ -104,23 +104,13 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 
 bool ComboBox::ProcessEvent(KeyEvent *event)
 {
-	if (event->GetType() != JKT_PRESSED) {
-		return true;
-	}
-
-	jkeyevent_symbol_t action = event->GetSymbol();
-
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
 	bool catched = false;
 
-	if (action == JKS_ENTER) {
+	if (event->GetSymbol() == JKS_ENTER) {
 		if (_parent != NULL) {
 			InputManager::GetInstance()->RegisterKeyListener(_menu);
 			InputManager::GetInstance()->RegisterMouseListener(_menu);
@@ -133,7 +123,7 @@ bool ComboBox::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
 void ComboBox::SetHorizontalAlign(jhorizontal_align_t align)
@@ -364,8 +354,6 @@ void ComboBox::Paint(Graphics *g)
 			g->DrawString(text, px, py, pw, ph, _halign, _valign);
 		}
 	}
-
-	PaintBorderEdges(g);
 }
 
 }

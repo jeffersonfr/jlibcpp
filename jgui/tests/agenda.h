@@ -112,7 +112,7 @@ class AddMessage : public jgui::Frame, public jgui::KeyboardListener{
 		virtual ~AddMessage();
 
 		virtual void KeyboardUpdated(jgui::KeyboardEvent *event);
-		virtual void InputReceived(jgui::KeyEvent *event);
+		virtual bool ProcessEvent(jgui::KeyEvent *event);
 
 };
 
@@ -134,7 +134,7 @@ class ViewMessages : public jgui::Frame{
 		ViewMessages(AgendaDB *db);
 		virtual ~ViewMessages();
 
-		virtual void InputReceived(jgui::KeyEvent *event);
+		virtual bool ProcessEvent(jgui::KeyEvent *event);
 
 };
 

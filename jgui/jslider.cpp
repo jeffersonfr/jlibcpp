@@ -78,7 +78,7 @@ bool Slider::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
@@ -97,28 +97,28 @@ bool Slider::ProcessEvent(MouseEvent *event)
 		RequestFocus();
 
 		if (_type == JSO_HORIZONTAL) {
-			if (y1 > _location.y && y1 < (_location.y+_size.height)) {
+			if (y1 > 0 && y1 < (_size.height)) {
 				int d = (int)((_value*dw)/(GetMaximum()-GetMinimum()));
 
 				_pressed = false;
 
-				if (x1 > (_location.x+dx) && x1 < (_location.x+dx+d)) {
+				if (x1 > (dx) && x1 < (dx+d)) {
 					SetValue(_value-_maximum_tick);
-				} else if (x1 > (_location.x+dx+d+_stone_size) && x1 < (_location.x+_size.width)) {
+				} else if (x1 > (dx+d+_stone_size) && x1 < (_size.width)) {
 					SetValue(_value+_maximum_tick);
-				} else if (x1 > (_location.x+dx+d) && x1 < (_location.x+dx+d+_stone_size)) {
+				} else if (x1 > (dx+d) && x1 < (dx+d+_stone_size)) {
 					_pressed = true;
 				}
 			}
 		} else if (_type == JSO_VERTICAL) {
-			if (x1 > _location.x && x1 < (_location.x+_size.width)) {
+			if (x1 > 0 && x1 < (_size.width)) {
 				int d = (int)((_value*dh)/(GetMaximum()-GetMinimum()));
 
 				_pressed = false;
 
-				if (y1 > (_location.y+dy) && y1 < (_location.y+dy+d)) {
+				if (y1 > (dy) && y1 < (dy+d)) {
 					SetValue(_value-_maximum_tick);
-				} else if (y1 > (_location.y+dy+d+_stone_size) && y1 < (_location.y+_size.height)) {
+				} else if (y1 > (dy+d+_stone_size) && y1 < (_size.height)) {
 					SetValue(_value+_maximum_tick);
 				}
 			}
@@ -140,17 +140,13 @@ bool Slider::ProcessEvent(MouseEvent *event)
 
 bool Slider::ProcessEvent(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
-	bool catched = false;
-
 	jkeyevent_symbol_t action = event->GetSymbol();
+
+	bool catched = false;
 
 	if (_type == JSO_HORIZONTAL) {
 		if (action == JKS_CURSOR_LEFT) {
@@ -190,7 +186,7 @@ bool Slider::ProcessEvent(KeyEvent *event)
 		}
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
 void Slider::Paint(Graphics *g)
@@ -199,7 +195,7 @@ void Slider::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	Color color(0x80, 0x80, 0xe0, 0xff),
+	Color color = _scrollbar_color,
 				bar = color.Darker(0.1);
 
 	int x = _vertical_gap-_border_size,
@@ -272,8 +268,6 @@ void Slider::Paint(Graphics *g)
 			g->FillPolygon(x, (int)d+y, p, 5);
 		}
 	}
-
-	PaintBorderEdges(g);
 }
 
 }

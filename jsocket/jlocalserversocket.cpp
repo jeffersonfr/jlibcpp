@@ -22,7 +22,6 @@
 #include "jsocket.h"
 #include "junknownhostexception.h"
 #include "jsocketexception.h"
-#include "jsocketstreamexception.h"
 
 namespace jsocket {
 
@@ -56,7 +55,7 @@ void LocalServerSocket::CreateSocket()
 	_fd = socket (PF_UNIX, SOCK_STREAM, 0); // IPPROTO_TCP);
 
 	if (_fd < 0) {
-		throw SocketException("Create socket error");
+		throw SocketException("ServerSocket creation exception");
 	}
 #endif
 }
@@ -65,15 +64,17 @@ void LocalServerSocket::BindSocket()
 {
 #ifdef _WIN32
 #else
+	int length = sizeof(_address.sun_path)-1;
+
 	unlink(_file.c_str());
 
 	_address.sun_family = AF_UNIX;
-	strncpy(_address.sun_path, _file.c_str(), 108);
+	strncpy(_address.sun_path, _file.c_str(), length);
 	
-	int address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, 108);
+	int address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, length);
 
 	if (bind(_fd, (struct sockaddr *) &_address, address_length) != 0) {
-		throw SocketException("Bind socket error");
+		throw SocketException("ServerSocket bind exception");
 	}
 #endif
 }
@@ -81,7 +82,7 @@ void LocalServerSocket::BindSocket()
 void LocalServerSocket::ListenSocket(int backlog_)
 {
 	if (::listen(_fd, backlog_) < 0) {
-		throw SocketException("Listen port error");
+		throw SocketException("ServerSocket listen exception");
 	}
 }
 
@@ -102,14 +103,15 @@ LocalSocket * LocalServerSocket::Accept()
 	return NULL;
 #else 
 	struct sockaddr_un address;
-	socklen_t address_length;
-	int handler;
+	int handler,
+			length = sizeof(_address.sun_path)-1;
+	socklen_t address_length = strnlen(_file.c_str(), length);
 	
 	address.sun_family = AF_UNIX;
-	strncpy(address.sun_path, _file.c_str(), 108);
+	strncpy(address.sun_path, _file.c_str(), length);
 	
 	if ((handler = ::accept(_fd, (struct sockaddr *)&address, &address_length)) < 0) {
-		throw SocketException("Server Accept() exception");
+		throw SocketException("ServerSocket accept exception");
 	}
 
 	return new LocalSocket(handler, _file);
@@ -129,7 +131,7 @@ void LocalServerSocket::Close()
 		_is_closed = true;
 
 		if (close(_fd) != 0) {
-			throw SocketException("Close socket error");
+			throw SocketException("Unknown close exception");
 		}
 	}
 	

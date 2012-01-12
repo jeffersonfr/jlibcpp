@@ -139,8 +139,6 @@ class FrameTest : public jgui::Frame {
 		FrameTest():
 			jgui::Frame("Color Chooser", 100, 100, 720, 720+30)
 		{
-			SetMoveEnabled(true);
-
 			int size = std::min(GetWidth()-_insets.left-_insets.right, GetHeight()-_insets.top-_insets.bottom);
 
 			_color_chooser = new ColorChooser(_insets.left, _insets.top, size, size);

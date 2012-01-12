@@ -74,7 +74,6 @@ MessageQueue::MessageQueue(key_t key_, int perms_, int size_, int maxmsgs_):
 
 MessageQueue::~MessageQueue()
 {
-	Release();
 }
 
 int MessageQueue::GetMessageIndex()

@@ -254,9 +254,7 @@ void CalendarDialogBox::BuildCalendar()
 {
 	jthread::AutoLock lock(&_cal_mutex);
 
-	Button *b;
-	Component *up,
-			  *down;
+	Button *button;
 	int mes = -1,
 		first_day = -1;
 	char tmp[255];
@@ -291,13 +289,13 @@ void CalendarDialogBox::BuildCalendar()
 	month->SetCurrentIndex(_month);
 
 	while (_buttons.size() > 0) {
-		b = (*_buttons.begin());
+		button = (*_buttons.begin());
 
 		_buttons.erase(_buttons.begin());
 
-		Remove(b);
+		Remove(button);
 
-		delete b;
+		delete button;
 	}
 
 	int k = 4;
@@ -305,7 +303,7 @@ void CalendarDialogBox::BuildCalendar()
 	for (int i=0; i<mes; i++) {
 		sprintf(tmp, "%d", (i+1));
 
-		b = new Button(tmp, bx+(bwidth+delta)*first_day, by+(bheight+delta)*k-30, bwidth, bheight);
+		button = new Button(tmp, bx+(bwidth+delta)*first_day, by+(bheight+delta)*k-30, bwidth, bheight);
 
 		first_day = ((first_day+1)%7);
 
@@ -313,49 +311,25 @@ void CalendarDialogBox::BuildCalendar()
 			k++;
 		}
 
-		_buttons.push_back(b);
+		_buttons.push_back(button);
 
 		if ((_month+1) == _current_month &&
 				(_year+1970) == _current_year) {
 			if (_current_day == (i+1)) {
-				b->SetBackgroundColor(0x40, 0x80, 0x40, 0xff);
+				button->SetBackgroundColor(0x40, 0x80, 0x40, 0xff);
 			}
 		}
 
 		for (std::vector<jcalendar_warnning_t>::iterator it=_warnning_days.begin(); it!=_warnning_days.end(); it++) {
 			if ((i+1) == (*it).day && (_month+1) == (*it).month && (_year+1970) == (*it).year) {
-				b->SetBackgroundColor((*it).red, (*it).green, (*it).blue, 0xff);
+				button->SetBackgroundColor((*it).red, (*it).green, (*it).blue, 0xff);
 			}
 		}
 
-		b->RegisterButtonListener(this);
+		button->RegisterButtonListener(this);
 
-		Add(b);
+		Add(button);
 	}
-
-	_buttons[0]->SetNavigation(NULL, _buttons[1], month, _buttons[0+7]);
-	_buttons[mes-1]->SetNavigation(_buttons[mes-2], NULL, _buttons[mes-1-7], NULL);
-
-	for (int i=1; i<mes-1; i++) {
-		up = NULL;
-		down = NULL;
-
-		if ((i+8) <= mes) {
-			down = _buttons[i+7];
-		} 
-
-		if (i > 6) {
-			up = _buttons[i-7];
-		} else {
-			up = month;
-		}
-
-		_buttons[i]->SetNavigation(_buttons[i-1], _buttons[i+1], up, down);
-	}
-
-
-	year->SetNavigation(NULL, NULL, NULL, month);	
-	month->SetNavigation(NULL, NULL, year, _buttons[0]);	
 
 	if (GetFocusOwner() == NULL) {
 		_buttons[_day]->RequestFocus();
@@ -364,11 +338,13 @@ void CalendarDialogBox::BuildCalendar()
 	Repaint();
 }
 
-void CalendarDialogBox::InputReceived(jgui::KeyEvent *event)
+bool CalendarDialogBox::ProcessEvent(jgui::KeyEvent *event)
 {
 	if (event->GetSymbol() == JKS_BLUE || event->GetSymbol() == JKS_F4) {
 		Release();
 	}
+
+	return true;
 }
 
 void CalendarDialogBox::ActionPerformed(jgui::ButtonEvent *event)

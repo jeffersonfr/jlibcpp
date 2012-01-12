@@ -52,8 +52,6 @@ class Stock : public jgui::Frame{
 		Stock(int x, int y):
 			jgui::Frame("Stock", x, y, 500, 400)
 		{
-			SetMoveEnabled(true);
-
 			int px = 0,
 					py = 0,
 					pw = DEFAULT_COMPONENT_WIDTH,
@@ -174,10 +172,10 @@ class Stock : public jgui::Frame{
 			return quotes;
 		}
 
-		virtual void InputReceived(jgui::KeyEvent *event)
+		virtual bool ProcessEvent(jgui::KeyEvent *event)
 		{
 			if (event->GetType() != jgui::JKT_PRESSED) {
-				return;
+				return false;
 			}
 
 			if (event->GetSymbol() == jgui::JKS_ENTER && GetFocusOwner() == acao) {
@@ -199,6 +197,8 @@ class Stock : public jgui::Frame{
 					vvariacao->SetForegroundColor(0x00, 0xf0, 0x00, 0xff);
 				}
 			}
+
+			return true;
 		}
 
 };

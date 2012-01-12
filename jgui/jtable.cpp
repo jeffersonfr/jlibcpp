@@ -442,17 +442,13 @@ int Table::GetRowSize(int index)
 
 bool Table::ProcessEvent(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
-	bool catched = false;
-
 	jkeyevent_symbol_t action = event->GetSymbol();
+
+	bool catched = false;
 
 	if (action == JKS_CURSOR_UP) {
 		if (_cells.size() > 0) {
@@ -510,7 +506,7 @@ bool Table::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
 void Table::Paint(Graphics *g)

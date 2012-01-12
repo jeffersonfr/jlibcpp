@@ -18,59 +18,70 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jmouseevent.h"
+#include "jrectangle.h"
 
 namespace jgui {
 
-MouseEvent::MouseEvent(void *source, jmouse_event_t type, jmouse_button_t button, int click_count, int x, int y):
-	jcommon::EventObject(source)
-{
-	jcommon::Object::SetClassName("jgui::MouseEvent");
-
-	_type = type;
-	_button = button;
-	_click_count = click_count;
-	_x = x;
-	_y = y;
-}
-
-MouseEvent::~MouseEvent()
+Rectangle::~Rectangle()
 {
 }
 
-jmouse_event_t MouseEvent::GetType()
+bool Rectangle::Contains(jregion_t region1, jregion_t region2)
 {
-	return _type;
+	return Contains(region1.x, region1.y, region1.width, region1.height, region2.x, region2.y, region2.width, region2.height);
 }
 
-int MouseEvent::GetClickCount()
+bool Rectangle::Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
-	return _click_count;
+	return (x2 >= x1) && (y2 >= y1) && ((x2+w2) <= w1) && ((y2+h2) <= h1);
 }
 
-jmouse_button_t MouseEvent::GetButton()
+bool Rectangle::Intersects(jregion_t region1, jregion_t region2)
 {
-	return _button;
+	return Intersects(region1.x, region1.y, region1.width, region1.height, region2.x, region2.y, region2.width, region2.height);
 }
 
-int MouseEvent::GetX()
+bool Rectangle::Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
-	return _x;
+	int ax = x1, 
+			ay = y1,
+			bx = ax+w1,
+			by = ay+h1;
+	int cx = x2, 
+			cy = y2,
+			dx = cx+w2, 
+			dy = cy+h2;
+
+	return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
 }
 
-int MouseEvent::GetY()
+jregion_t Rectangle::Intersection(jregion_t region1, jregion_t region2)
 {
-	return _y;
+	return Intersection(region1.x, region1.y, region1.width, region1.height, region2.x, region2.y, region2.width, region2.height);
 }
 
-void MouseEvent::SetX(int x)
+jregion_t Rectangle::Intersection(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
 {
-	_x = x;
-}
+	jregion_t region;
 
-void MouseEvent::SetY(int y)
-{
-	_y = y;
+	region.x = 0;
+	region.y = 0;
+	region.width = 0;
+	region.height = 0;
+
+	int left = std::max(x1, x2),
+		top = std::max(y1, y2),
+		right = std::min(x1+w1, x2+w2),
+		bottom = std::min(y1+h1, y2+h2);
+
+	if (right > left && bottom > top) {
+		region.x = left;
+		region.y = top;
+		region.width = right-left;
+		region.height = bottom-top;
+	}
+
+	return region;
 }
 
 }

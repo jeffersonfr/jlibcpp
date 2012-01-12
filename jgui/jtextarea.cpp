@@ -31,15 +31,27 @@ TextArea::TextArea(int x, int y, int width, int height):
 	jcommon::Object::SetClassName("jgui::TextArea");
 
 	_valign = JVA_TOP;
-	
+	_rows_gap = 0;
+	_current_row = 0;
 	_is_wrap = true;
-	_line_op = 0;
 
 	SetFocusable(true);
 }
 
 TextArea::~TextArea()
 {
+}
+
+int TextArea::GetRowsGap()
+{
+	return _rows_gap;
+}
+
+void TextArea::SetRowsGap(int gap)
+{
+	_rows_gap = gap;
+
+	Repaint();
 }
 
 void TextArea::SetWrap(bool b)
@@ -55,13 +67,55 @@ void TextArea::SetWrap(bool b)
 	}
 }
 
+void TextArea::SetEchoChar(char echo_char)
+{
+	TextComponent::SetEchoChar(echo_char);
+
+	InitRowsString();
+}
+
+void TextArea::SetText(std::string text)
+{
+	TextComponent::SetText(text);
+
+	InitRowsString();
+}
+	
+void TextArea::Insert(std::string text)
+{
+	TextComponent::Insert(text);
+
+	InitRowsString();
+}
+
+void TextArea::Delete()
+{
+	TextComponent::Delete();
+
+	InitRowsString();
+}
+
+void TextArea::SetSize(int width, int height)
+{
+	TextComponent::SetSize(width, height);
+
+	InitRowsString();
+}
+
+void TextArea::SetBounds(int x, int y, int w, int h)
+{
+	TextComponent::SetBounds(x, y, w, h);
+
+	InitRowsString();
+}
+
 bool TextArea::ProcessEvent(MouseEvent *event)
 {
 	if (Component::ProcessEvent(event) == true) {
 		return true;
 	}
 
-	if (_enabled == false || _is_editable == false) {
+	if (_is_enabled == false || _is_editable == false) {
 		return false;
 	}
 
@@ -78,11 +132,7 @@ bool TextArea::ProcessEvent(MouseEvent *event)
 
 bool TextArea::ProcessEvent(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false || _is_editable == false) {
+	if (_is_enabled == false || _is_editable == false) {
 		return false;
 	}
 
@@ -99,21 +149,33 @@ bool TextArea::ProcessEvent(KeyEvent *event)
 
 		catched = true;
 	} else if (action == JKS_CURSOR_UP) {
-		IncLine();
+		IncrementLines(1);
+
+		catched = true;
+	} else if (action == JKS_PAGE_UP) {
+		IncrementLines((_size.height-2*(_border_size+_vertical_gap))/(_font->GetAscender()+_font->GetDescender()+_rows_gap));
 
 		catched = true;
 	} else if (action == JKS_CURSOR_DOWN) {
-		DecLine();
+		DecrementLines(1);
+
+		catched = true;
+	} else if (action == JKS_PAGE_DOWN) {
+		DecrementLines((_size.height-2*(_border_size+_vertical_gap))/(_font->GetAscender()+_font->GetDescender()+_rows_gap));
 
 		catched = true;
 	} else if (action == JKS_HOME) {
 		_caret_position = 0;
 
-		Repaint();
+		IncrementLines(_lines.size());
+		
+		catched = true;
 	} else if (action == JKS_END) {
 		_caret_position = _text.size();
-
-		Repaint();
+		
+		DecrementLines(_lines.size());
+		
+		catched = true;
 	} else {
 		std::string s;
 
@@ -225,33 +287,115 @@ bool TextArea::ProcessEvent(KeyEvent *event)
 		}
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
-void TextArea::IncLine()
+void TextArea::IncrementLines(int lines)
 {
-	_line_op = 1;
+	if (_lines.size() == 0) {
+		return;
+	}
+
+	int current_length = 0;
+
+	_current_row = _current_row - lines;
+
+	if (_current_row < 0) {
+		_current_row = 0;
+	}
+
+	// INFO:: define a nova posicao do caret
+	if (_current_row > 0) {
+		current_length = 0;
+		
+		for (int i=0; i<_current_row; i++) {
+			current_length += _lines[i].size();
+		}
+
+		_caret_position = current_length;
+	} else if (_current_row == 0) {
+		for (int i=0; i<_current_row; i++) {
+			current_length += _lines[i].size();
+		}
+
+		_caret_position = current_length;
+	}
+
+	if (_font != NULL) {
+		jpoint_t scroll_location = GetScrollLocation();
+		int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+		int font_height = _font->GetAscender()+_font->GetDescender();
+
+		if (scrolly > 0) {
+			ScrollToVisibleArea(scrollx, std::max(0, (font_height+_rows_gap)*_current_row), _size.width, _size.height, this);
+		}
+	}
 
 	Repaint();
 }
 
-void TextArea::DecLine()
+void TextArea::DecrementLines(int lines)
 {
-	_line_op = 2;
+	if (_lines.size() == 0) {
+		return;
+	}
+
+	int current_length = 0;
+
+	_current_row = _current_row + lines;
+
+	if (_current_row >= (int)(_lines.size())) {
+		_current_row = _lines.size()-1;
+	}
+
+	// INFO:: define a nova posicao do caret
+	if (_current_row < (int)(_lines.size()-1)) {
+		current_length = 0;
+
+		for (int i=0; i<_current_row; i++) {
+			current_length += _lines[i].size();
+		}
+
+		_caret_position = current_length;
+	} else if (_current_row == (int)(_lines.size()-1)) {
+		for (int i=0; i<_current_row; i++) {
+			current_length += _lines[i].size();
+		}
+
+		_caret_position = current_length;
+	}
+
+	if (_font != NULL) {
+		jpoint_t scroll_location = GetScrollLocation();
+		int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+		int font_height = _font->GetAscender()+_font->GetDescender();
+
+		if ((scrolly+_size.height) < (_font->GetHeight()+_rows_gap)*GetRows()) {
+			ScrollToVisibleArea(scrollx, (font_height+_rows_gap)*_current_row, _size.width, _size.height, this);
+		}
+	}
 
 	Repaint();
 }
 
-void TextArea::GetLines(std::vector<std::string> &texts)
+void TextArea::InitRowsString()
 {
+	if (IsFontSet() == false) {
+		return;
+	}
+
 	std::string text = _text;
+
+	_lines.clear();
 
 	if (EchoCharIsSet() == true) {
 		text = text.replace(text.begin(), text.end(), text.size(), _echo_char);
 	}
 
 	if (_is_wrap == false) {
-		texts.push_back(jcommon::StringUtils::ReplaceString(text, "\n", " ") + " ");
+		_lines.push_back(jcommon::StringUtils::ReplaceString(text, "\n", " ") + " ");
 
 		return;
 	}
@@ -260,9 +404,13 @@ void TextArea::GetLines(std::vector<std::string> &texts)
 	int font_height,
 			default_space;
 
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			// scrolly = (IsScrollableY() == true)?scroll_location.y:0,
+			scrollw = (IsScrollableY() == true)?(_scroll_size+_scroll_gap):0;
 	int xp = _horizontal_gap+_border_size,
 			yp = _vertical_gap+_border_size,
-			wp = _size.width-2*xp,
+			wp = _size.width-scrollw-2*xp,
 			hp = _size.height-2*yp;
 
 		xp = (xp < 0)?0:xp;
@@ -282,101 +430,74 @@ void TextArea::GetLines(std::vector<std::string> &texts)
 
 	for (int i=0; i<token.GetSize(); i++) {
 		std::vector<std::string> words;
-		
 		std::string line = token.GetToken(i) + "\n";
+		jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, true);
 
-		/*
-		if (halign == JUSTIFY_HALIGN) {
-			jcommon::StringTokenizer line_token(line, " ", jcommon::SPLIT_FLAG, false);
+		std::string temp,
+			previous;
 
-			std::string temp,
-				previous;
+		for (int j=0; j<line_token.GetSize(); j++) {
+			temp = line_token.GetToken(j);
 
-			for (int j=0; j<line_token.GetSize(); j++) {
-				temp = jcommon::StringUtils::Trim(line_token.GetToken(j));
+			if (_font->GetStringWidth(temp) > wp) {
+				int p = 1;
 
-				if (_font->GetStringWidth(temp) > wp) {
-					int p = 1;
+				while (p < (int)temp.size()) {
+					if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
+						words.push_back(temp.substr(0, p-1));
 
-					while (p < (int)temp.size()) {
-						if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
-							words.push_back(temp.substr(0, p-1));
+						temp = temp.substr(p-1);
 
-							temp = temp.substr(p-1);
-
-							p = 1;
-						}
+						p = 1;
 					}
-
-					if (temp != "") {
-						words.push_back(temp.substr(0, p));
-					}
-				} else {
-					words.push_back(temp);
 				}
-			}
 
-			temp = words[0];
-
-			for (int j=1; j<(int)words.size(); j++) {
-				previous = temp;
-				temp += " " + words[j];
-
-				if (_font->GetStringWidth(temp) > wp) {
-					temp = words[j];
-
-					texts.push_back(previous);
+				if (temp != "") {
+					words.push_back(temp.substr(0, p));
 				}
+			} else {
+				words.push_back(temp);
 			}
+		}
 
-			texts.push_back("\n" + temp);
-		} else 
-		*/{
-			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, true);
+		temp = words[0];
 
-			std::string temp,
-				previous;
+		for (int j=1; j<(int)words.size(); j++) {
+			previous = temp;
+			temp += words[j];
 
-			for (int j=0; j<line_token.GetSize(); j++) {
-				temp = line_token.GetToken(j);
+			if (_font->GetStringWidth(temp.c_str()) > wp) {
+				temp = words[j];
 
-				if (_font->GetStringWidth(temp) > wp) {
-					int p = 1;
-
-					while (p < (int)temp.size()) {
-						if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
-							words.push_back(temp.substr(0, p-1));
-
-							temp = temp.substr(p-1);
-
-							p = 1;
-						}
-					}
-
-					if (temp != "") {
-						words.push_back(temp.substr(0, p));
-					}
-				} else {
-					words.push_back(temp);
-				}
+				_lines.push_back(previous);
 			}
+		}
 
-			temp = words[0];
+		_lines.push_back(temp);
+	}
+
+
+	int length = _caret_position;
+
+	for (int i=0; i<=(int)_lines.size()-1; i++) {
+		std::string line = _lines[i];
+		int size = (int)line.size();
+
+		if (length >= size) {
+			length -= size;
+		} else {
+			_current_row = i;
 			
-			for (int j=1; j<(int)words.size(); j++) {
-				previous = temp;
-				temp += words[j];
-
-				if (_font->GetStringWidth(temp.c_str()) > wp) {
-					temp = words[j];
-
-					texts.push_back(previous);
-				}
-			}
-
-			texts.push_back(temp);
+			break;
 		}
 	}
+		
+	ScrollToVisibleArea(scrollx, std::max(0, (font_height+_rows_gap)*_current_row), _size.width, _size.height, this);
+}
+
+std::vector<std::string> & TextArea::GetLines()
+{
+	return _lines;
 }
 
 void TextArea::Paint(Graphics *g)
@@ -385,116 +506,38 @@ void TextArea::Paint(Graphics *g)
 
 	Component::Paint(g);
 
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0,
+			scrollw = (IsScrollableY() == true)?(_scroll_size+_scroll_gap):0;
 	int x = _horizontal_gap+_border_size,
 			y = _vertical_gap+_border_size,
-			w = _size.width-2*x,
+			w = _size.width-scrollw-2*x,
 			h = _size.height-2*y;
 
 	if (IsFontSet() == true) {
-		int font_height = _font->GetAscender()+_font->GetDescender();
-
 		std::vector<std::string> super_lines, 
-			lines,
-			texts;
-		int i,
-				text_size;
-		int current_length = _caret_position,
-				current_text_size,
-				line_number = 0;
+			lines;
+		int text_size,
+			current_text_size,
+			current_length = _caret_position,
+			font_height = _font->GetAscender()+_font->GetDescender()+_rows_gap;
 
-		GetLines(texts);
-
-		// INFO:: line number
-		for (i=0; i<=(int)texts.size()-1; i++) {
-			std::string s = texts[i];
-
-			text_size = _font->GetStringWidth(s.c_str());
-
-			if (current_length >= (int)s.size()) {
-				current_length -= s.size();
-			} else {
-				line_number = i;
-
-				break;
-			}
-		}
-
-		if (_line_op == 1) { // inc
-			if (line_number > 0) {
-				line_number--;
-
-				current_length = 0;
-				for (i=0; i<line_number; i++) {
-					current_length += texts[i].size();
-				}
-				_caret_position = current_length;
-			} else if (line_number == 0) {
-				for (i=0; i<line_number; i++) {
-					current_length += texts[i].size();
-				}
-				_caret_position = current_length;
-			}
-		} else if (_line_op == 2) { // dec
-			if (line_number < (int)(texts.size()-1)) {
-				line_number++;
-
-				current_length = 0;
-				for (i=0; i<line_number; i++) {
-					current_length += texts[i].size();
-				}
-				_caret_position = current_length;
-			} else if (line_number == (int)(texts.size()-1)) {
-				for (i=0; i<line_number; i++) {
-					current_length += texts[i].size();
-				}
-				_caret_position = current_length;
-			}
-		} else {
-			current_length = _caret_position;
-		}
-
-		_line_op = 0;
-
-		int max_lines = h/font_height;
-
-		if (max_lines < 1) {
-			max_lines = 1;
-		}
-
-		// INFO:: paint lines
 		jregion_t clip = g->GetClip();
 
-		int cx = x,
-				cy = y,
-				cw = w,
-				ch = h;
+		g->ClipRect(x, y, w, h);
 
-		if (cx > clip.width) {
-			cx = clip.width;
-		}
-
-		if (cy > clip.height) {
-			cy = clip.height;
-		}
-
-		if (cw > (clip.width-cx)) {
-			cw = clip.width-cx;
-		}
-
-		if (ch > (clip.height-cy)) {
-			ch = clip.height-cy;
-		}
-
-		g->SetClip(cx, cy, cw, ch);
+		x = x - scrollx;
+		y = y - scrolly;
 
 		// INFO:: Draw text
-		for (int i=0, k=0; i<=(int)texts.size()-1; i++) {
-			std::string s = texts[i];
+		for (int i=0, k=0; i<=(int)_lines.size()-1; i++) {
+			std::string s = _lines[i];
 
-			text_size = _font->GetStringWidth(texts[i].c_str());
-			text_size = _font->GetStringWidth(texts[i].substr(0, _caret_position).c_str());
+			text_size = _font->GetStringWidth(_lines[i].c_str());
+			text_size = _font->GetStringWidth(_lines[i].substr(0, _caret_position).c_str());
 
-			if (line_number-- < max_lines) {
+			{
 				char *c = (char *)strchr(s.c_str(), '\n');
 
 				if (c != NULL) {
@@ -509,7 +552,7 @@ void TextArea::Paint(Graphics *g)
 
 				g->DrawString(s, x, y+k*font_height);
 
-				if (_has_focus && _is_editable == true && _caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
+				if (_caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
 					std::string cursor;
 
 					if (_caret_type == JCT_UNDERSCORE) {
@@ -520,9 +563,12 @@ void TextArea::Paint(Graphics *g)
 						cursor = "?";
 					}
 
-					current_text_size = _font->GetStringWidth(texts[i].substr(0, current_length).c_str());
+					current_text_size = _font->GetStringWidth(_lines[i].substr(0, current_length).c_str());
 
-					g->SetColor(0xff, 0x00, 0x00, 0xff);
+					if (_has_focus == true && _is_editable == true) {
+						g->SetColor(_caret_color);
+					}
+
 					g->DrawString(cursor, x+current_text_size, y+k*font_height);
 
 					current_length = -1;
@@ -534,26 +580,72 @@ void TextArea::Paint(Graphics *g)
 			if (current_length >= (int)s.size()) {
 				current_length -= s.size();
 			}
-
-			if (k >= max_lines) {
-				break;
-			}
 		}
 
 		g->SetClip(clip.x, clip.y, clip.width, clip.height);
 	}
-
-	PaintBorderEdges(g);
 }
 
-void TextArea::ScrollUp()
+std::string TextArea::GetLineAt(int row)
 {
-	IncLine();
+	if (row < 0) {
+		return "";
+	}
+
+	if (row >= (int)_lines.size()) {
+		return "";
+	}
+
+	return _lines[row];
 }
 
-void TextArea::ScrollDown()
+int TextArea::GetRows()
 {
-	DecLine();
+	return _lines.size();
+}
+
+void TextArea::SetCurrentRow(int row)
+{
+	int size = _lines.size();
+
+	if (size == 0) {
+		row = 0;
+	} else {
+
+		if (row < 0) {
+			row = 0;
+		}
+
+		if (row >= size) {
+			row = size-1;
+		}
+	}
+
+	_current_row = row;
+
+	Repaint();
+}
+
+int TextArea::GetCurrentRow()
+{
+	return _current_row;
+}
+
+jsize_t TextArea::GetScrollDimension()
+{
+	jsize_t size;
+
+	if (_font == NULL) {
+		size.width = _size.width;
+		size.height = _size.height;
+
+		return size;
+	}
+
+	size.width = _size.width;
+	size.height = GetRows()*(_font->GetAscender()+_font->GetDescender())+2*(_vertical_gap+_border_size);
+
+	return  size;
 }
 
 }

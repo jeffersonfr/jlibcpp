@@ -92,8 +92,8 @@ void AutoDeleteLocalVariableTest()
 	jcommon::ptr<C> c = new C();
 	jcommon::ptr<D> d = new D();
 
-	//delete d;		<--- nao eh mais necessario
-	//delete c;		<--- nao eh mais necessario
+	//delete d;		<--- not needed
+	//delete c;		<--- not needed
 
 	std::cout << "end" << std::endl;
 }
@@ -106,18 +106,16 @@ void AutoDeleteNonReferencedObjectTest()
 
 	std::cout << "same pointer referencing another object" << std::endl;
 
-	// a linha seguinte geraria um vazamento de memoria pois
-	// o objeto alocado na inicializacao nao foi liberado
+	// the next line do not generate leak memory
 	c = new C();
 
-	//delete c;		<--- nao eh mais necessario
+	// delete c;		<--- not needed
 	std::cout << "end" << std::endl;
 }
 
 void AutoDeleteNonReferencedObjectWithInheritance()
 {
-	// analogo ao teste anterior, mas, nesse caso, envolve heranca
-	// essa eh a vantagem da classe ptr sobre a counted_ptr (padrao)
+	// same as the previous test, but in this case use inhiretance
 	std::cout << "allocate C" << std::endl;
 
 	jcommon::ptr<C> c = new C();
@@ -130,7 +128,7 @@ void AutoDeleteNonReferencedObjectWithInheritance()
 
 	c = d;
 
-	//delete c;		<--- nao eh mais necessario
+	// delete c;		<--- not needed
 	std::cout << "end" << std::endl;
 }
 
@@ -160,13 +158,12 @@ void ThrowExceptionTest()
 
 		c = new C();
 		c->MaybeThrowException();
-		//delete c;		<--- nao eh mais necessario
+		// delete c;		<--- not needed
 		std::cout << "dont throw exception" << std::endl;
 
 	} catch (...) {
 
-		//delete c;		<--- nao eh mais necessario
-		// trata excecao
+		// delete c;		<--- not needed
 		std::cout << "throw exception" << std::endl;
 
 	}
@@ -213,32 +210,32 @@ int main()
 	srand(time(0));
 
 	std::cout << "------------------\n" << std::endl;
-	std::cout << "teste: delete automatico de variavel local\n" << std::endl;
+	std::cout << "teste: local variable\n" << std::endl;
 	AutoDeleteLocalVariableTest();
 	std::cout << std::endl;
 
 	std::cout << "------------------\n" << std::endl;
-	std::cout << "teste: delete automatico de objeto nao referenciado\n" << std::endl;
+	std::cout << "teste: object not referenced\n" << std::endl;
 	AutoDeleteNonReferencedObjectTest();
 	std::cout << std::endl;
 
 	std::cout << "------------------\n" << std::endl;
-	std::cout << "teste: delete automatico de objeto nao referenciado envolvendo heranca\n" << std::endl;
+	std::cout << "teste: object not referenced with inhiretance\n" << std::endl;
 	AutoDeleteNonReferencedObjectWithInheritance();
 	std::cout << std::endl;
 
 	std::cout << "------------------'n" << std::endl;
-	std::cout << "teste: objeto retornado por funcao\n" << std::endl;
+	std::cout << "teste: object returned by function\n" << std::endl;
 	ObjectReturnedByFunctionTest();
 	std::cout << std::endl;
 
 	std::cout << "------------------\n" << std::endl;
-	std::cout << "teste: tratamento de excecao\n" << std::endl;
+	std::cout << "teste: exception handling\n" << std::endl;
 	ThrowExceptionTest();
 	std::cout << std::endl;
 
 	std::cout << "------------------\n" << std::endl;
-	std::cout << "teste: referencia circular ---> nao funciona!\n" << std::endl;
+	std::cout << "teste: cyclic reference\n" << std::endl;
 	CyclicReferenceTest();
 	std::cout << std::endl;
 

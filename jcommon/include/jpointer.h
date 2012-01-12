@@ -151,7 +151,7 @@ class ReferenceCounter {
  * entao existe um ptr, de escopo nao menos amplo que o das threads,
  * referenciado o mesmo endereco.
  
- * \aithor Tiago Dias Carvalho do Nascimento (tiagocomputacao@yahoo.com.br)
+ * \author Tiago Dias Carvalho do Nascimento (tiagocomputacao@yahoo.com.br)
  */
 
 template <class X> class ptr {

@@ -1013,9 +1013,9 @@ void InputManager::ProcessWindowEvent(DFBWindowEvent event)
 			int mouse_z = -1;
 
 			if (event.type == DWET_ENTER) {
-				GFXHandler::GetInstance()->SetCursor(current->GetCursor());
+				// GFXHandler::GetInstance()->SetCursor(current->GetCursor());
 			} else if (event.type == DWET_LEAVE) {
-				// CHANGED:: GFXHandler::GetInstance()->SetCursor(DEFAULT_CURSOR);
+				// GFXHandler::GetInstance()->SetCursor(JCS_DEFAULT);
 			} else if (event.type == DWET_BUTTONUP || event.type == DWET_BUTTONDOWN || event.type == DWET_MOTION || event.type == DWET_WHEEL) {
 				jmouse_button_t button = JMB_UNKNOWN;
 				jmouse_event_t type = JME_UNKNOWN;

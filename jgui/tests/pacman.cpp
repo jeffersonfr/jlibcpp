@@ -301,7 +301,7 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		pacman_bmp = GetImage("images/pacman.png", 3*w, 5*h);
 	}
 
-	virtual void InputReceived(jgui::KeyEvent *event)
+	virtual bool ProcessEvent(jgui::KeyEvent *event)
 	{
 		if (event->GetType() == jgui::JKT_PRESSED) {
 			if (event->GetSymbol() == jgui::JKS_ESCAPE) {
@@ -309,7 +309,7 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 				jgui::Frame::Release();
 
-				return;
+				return false;
 			}
 
 			if (ingame) {
@@ -345,6 +345,8 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 				*/
 			}
 		}
+
+		return true;
 	}
 
 	virtual void Paint(jgui::Graphics *g)

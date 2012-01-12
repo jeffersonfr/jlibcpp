@@ -58,6 +58,7 @@ class Theme : public jcommon::Object{
 					_component_border_focus_color,
 					_component_focus_bgcolor,
 					_component_focus_fgcolor,
+					_component_scrollbar_color,
 					_item_color,
 					_item_focus_color,
 					_item_selected_color,
@@ -141,6 +142,12 @@ class Theme : public jcommon::Object{
 		 *
 		 */
 		virtual void SetComponentForegroundFocusColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetComponentScrollbarColor(int red, int green, int blue, int alpha);
 		
 		/**
 		 * \brief
@@ -273,6 +280,12 @@ class Theme : public jcommon::Object{
 		 *
 		 */
 		virtual Color & GetComponentForegroundFocusColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Color & GetComponentScrollbarColor();
 		
 		/**
 		 * \brief

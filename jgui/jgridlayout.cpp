@@ -167,6 +167,7 @@ jsize_t GridLayout::GetPreferredLayoutSize(Container *parent)
 
 	int w = 0;
 	int h = 0;
+
 	for (int i = 0 ; i < ncomponents ; i++) {
 		Component *comp = parent->GetComponents()[i];
 

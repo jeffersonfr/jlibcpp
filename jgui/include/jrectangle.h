@@ -17,72 +17,66 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
-#include "jbutton.h"
+#ifndef J_RECTANGLE_H
+#define J_RECTANGLE_H
 
-class RectangleContainer : public jgui::Container {
+#include "jcomponent.h"
 
-	public:
-		RectangleContainer(int x, int y, int w, int h):
-			jgui::Container(x, y, w, h)
-		{
-		}
+namespace jgui {
 
-		virtual ~RectangleContainer()
-		{
-		}
-
-		virtual void Paint(jgui::Graphics *g) 
-		{
-			jgui::Container::Paint(g);
-
-			g->SetColor(random()%0xff, random()%0xff, random()%0xff, 0xff);
-			g->DrawRectangle(0, 0, GetWidth(), GetHeight());
-		}
-
-		virtual std::string what()
-		{
-			return "RC:: ";
-		}
-};
-
-class Main : public jgui::Frame{
-
-	private:
-		jgui::Container *_container1,
-			*_container2;
-		jgui::Button *_button1;
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class Rectangle : public virtual jcommon::Object{
 
 	public:
-		Main(std::string title, int x, int y, int w, int h):
-			jgui::Frame(title, x, y, w, h)
-		{
-			SetResizeEnabled(true);
-	
-			_container1 = new RectangleContainer(100, 100, 400, 400);
-			_container2 = new RectangleContainer(100, 100, 400, 400);
-			_button1 = new jgui::Button("Testing Clipping", 200, 100, 300, 100);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~Rectangle();
 
-			_container2->Add(_button1);
-			_container1->Add(_container2);
+		/**
+		 * \brief
+		 *
+		 */
+		static bool Contains(jregion_t region1, jregion_t region2);
 
-			Add(_container1);
-			SetBorderSize(10);
-		}
+		/**
+		 * \brief
+		 *
+		 */
+		static bool Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
 
-		virtual ~Main()
-		{
-			RemoveAll();
-		}
+		/**
+		 * \brief
+		 *
+		 */
+		static bool Intersects(jregion_t region1, jregion_t region2);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static bool Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static jregion_t Intersection(jregion_t region1, jregion_t region2);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static jregion_t Intersection(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
 
 };
 
-int main(int argc, char **argv)
-{
-	Main main("Clip", 100, 100, 720, 480);
-
-	main.Show();
-
-	return 0;
 }
+
+#endif
 

@@ -54,10 +54,10 @@ class Container : public jgui::Component{
 		std::vector<ContainerListener *> _container_listeners;
 		std::vector<Component *> _components;
 		Component *_focus;
-		jgui::Layout *_layout;
+		Layout *_layout;
+		jsize_t _scroll_dimension;
 		jinsets_t _insets;
 		jsize_t _scale;
-		jpoint_t _scroll;
 		bool _optimized_paint;
 
 	protected:
@@ -71,7 +71,29 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
+		virtual Component * GetTargetComponent(Container *target, int x, int y, int *dx = NULL, int *dy = NULL);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void ReleaseComponentFocus(jgui::Component *c);
+
+		/**
+		 * \brief This method scrolls the Container if Scrollable towards the given Component based on the given direction.
+		 * 
+		 * \param direction is the direction of the navigation 
+		 * \param next the Component to move the scroll towards
+		 * 
+		 * \return true if next Component is now visible
+		 */    
+		virtual bool MoveScrollTowards(Component *next, jkeyevent_symbol_t symbol);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void UpdateScrollDimension();
 
 	public:
 		/**
@@ -132,12 +154,6 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void SetSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetInsets(jinsets_t insets);
 		
 		/**
@@ -192,6 +208,12 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
+		virtual bool Contains(Component *cmp);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetComponentCount();
 
 		/**
@@ -199,18 +221,6 @@ class Container : public jgui::Component{
 		 *
 		 */
 		virtual std::vector<Component *> & GetComponents();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Intersect(Component *c1, Component *c2);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Intersect(Component *c1, int x, int y, int w, int h);
 
 		/**
 		 * \brief
@@ -234,26 +244,26 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(bool all = true);
+		virtual void Repaint();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(int x, int y, int width, int height);
+		virtual jsize_t GetScrollDimension();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(Component *c);
-
+		virtual bool ProcessEvent(KeyEvent *event);
+		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual Component * GetTargetComponent(Container *target, int x, int y, int *dx = NULL, int *dy = NULL);
-
+		virtual bool ProcessEvent(MouseEvent *event);
+		
 		/**
 		 * \brief
 		 *

@@ -22,7 +22,7 @@
 
 #include "jinetaddress.h"
 #include "jserversocket6.h"
-#include "jsocketoption.h"
+#include "jsocketoptions.h"
 #include "jsocketinputstream.h"
 #include "jsocketoutputstream.h"
 #include "jconnection.h"
@@ -219,7 +219,7 @@ class Socket6 : public jsocket::Connection{
 		 * \brief Get the socket options.
 		 *
 		 */
-		SocketOption * GetSocketOption();
+		SocketOptions * GetSocketOptions();
 
 		/**
 		 * \brief

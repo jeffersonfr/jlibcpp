@@ -53,11 +53,11 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		jthread::Mutex _window_mutex;
 		Graphics *_graphics;
 		int _opacity;
-		bool _undecorated;
+		bool _is_undecorated;
 		jcursor_style_t _cursor;
 
 	protected:
-		void InnerCreateWindow(void *params = NULL);
+		void InternalCreateWindow(void *params = NULL);
 
 	public:
 		/**
@@ -184,19 +184,13 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(bool all = true);
+		virtual void Repaint();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(int x, int y, int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Repaint(Component *c);
+		virtual void PaintBackground(Graphics *g);
 
 		/**
 		 * \brief

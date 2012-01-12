@@ -1387,7 +1387,7 @@ class SortComponent : public jgui::Component, public jthread::Thread, public jco
 				return true;
 			}
 
-			if (_enabled == false) {
+			if (_is_enabled == false) {
 				return false;
 			}
 

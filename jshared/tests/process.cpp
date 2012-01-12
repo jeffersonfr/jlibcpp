@@ -36,6 +36,8 @@ void test1()
  
   Process ls("/bin/ls -l");
 
+	ls.Start();
+
 	while ((length = ls.GetInputStream()->Read(buf, 255)) > 0) {
 		if (::write(1, buf, length) < 0) {
 			break;
@@ -53,6 +55,8 @@ void test2()
   char buf[256];
   
  	Process grep("./multiply");
+
+	grep.Start();
 
   grep.GetOutputStream()->Write(s.c_str(), s.size());
 
@@ -72,6 +76,8 @@ void test3()
   char buf[256];
   
 	Process sort("sort -k 2");
+
+	sort.Start();
 
   sort.GetOutputStream()->Write(s.c_str(), s.size());
 

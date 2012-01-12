@@ -134,12 +134,12 @@ void Mines::Paint(jgui::Graphics *g)
 	g->FillRectangle(_insets.left+current_col*(size+delta), _insets.top+current_row*(size+delta), size, size);
 }
 
-void Mines::InputReceived(jgui::KeyEvent *event)
+bool Mines::ProcessEvent(jgui::KeyEvent *event)
 {
 	jthread::AutoLock lock(&mines_mutex);
 
 	if (event->GetType() != jgui::JKT_PRESSED) {
-		return;
+		return false;
 	}
 
 	if (GetResult() == NONE) {
@@ -237,6 +237,8 @@ void Mines::InputReceived(jgui::KeyEvent *event)
 	} else if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
 		SetupBoard();
 	}
+
+	return true;
 }
 
 void Mines::InitializeFlags()

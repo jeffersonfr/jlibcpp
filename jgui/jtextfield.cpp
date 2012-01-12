@@ -41,7 +41,7 @@ bool TextField::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_enabled == false || _is_editable == false) {
+	if (_is_enabled == false || _is_editable == false) {
 		return false;
 	}
 
@@ -58,34 +58,42 @@ bool TextField::ProcessEvent(MouseEvent *event)
 
 bool TextField::ProcessEvent(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false || _is_editable == false) {
+	if (_is_enabled == false || _is_editable == false) {
 		return false;
 	}
 
-	bool catched = false;
-
 	jkeyevent_symbol_t action = event->GetSymbol();
+
+	bool catched = false;
 
 	if (action == JKS_CURSOR_LEFT) {
 		DecrementCaretPosition(1);
+		
+		catched = true;
 	} else if (action == JKS_CURSOR_RIGHT) {
 		IncrementCaretPosition(1);
+		
+		catched = true;
 	} else if (action == JKS_HOME) {
 		_caret_position = 0;
 
 		Repaint();
+		
+		catched = true;
 	} else if (action == JKS_END) {
 		_caret_position = _text.size();
 
 		Repaint();
+		
+		catched = true;
 	} else if (action == JKS_BACKSPACE) {
 		Backspace();
+		
+		catched = true;
 	} else if (action == JKS_DELETE) {
 		Delete();
+		
+		catched = true;
 	} else {
 		std::string s;
 
@@ -187,19 +195,18 @@ bool TextField::ProcessEvent(KeyEvent *event)
 			case JKS_VERTICAL_BAR: s = "|"; break;
 			case JKS_CURLY_BRACKET_RIGHT: s = "}"; break;
 			case JKS_TILDE: s = "~"; break;
-			default:
-				  break;
+			default: break;
 		}
 
 		if (s != "") {
 			Insert(s);
 		
-			//_caret_position++;
+			// _caret_position++;
 		}
 
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
 void TextField::Paint(Graphics *g)
@@ -298,14 +305,14 @@ void TextField::Paint(Graphics *g)
 
 		g->DrawString(s, x+offset, y, w, h, JHA_LEFT, _valign);
 
-		if (_has_focus == true && _is_editable == true && _caret_visible == true) {
-			g->SetColor(0xff, 0x00, 0x00, 0xff);
+		if (_caret_visible == true) {
+			if (_has_focus == true && _is_editable == true) {
+				g->SetColor(_caret_color);
+			}
 
 			g->DrawString(cursor, x+current_text_size+offset, y, w, h, JHA_LEFT, _valign);
 		}
 	}
-
-	PaintBorderEdges(g);
 }
 
 }

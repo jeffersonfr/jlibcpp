@@ -182,6 +182,8 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 		BallDrop():
 			jgui::Frame("Ball Drop", 0, 0, 720, 480)
 		{
+			SetUndecorated(true);
+
 			int w = 16,
 					h = 16;
 

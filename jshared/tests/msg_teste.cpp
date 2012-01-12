@@ -62,6 +62,8 @@ void server()
 	}
 
 	msqid->Release();
+	
+	delete msqid;
 }
 
 void client(int argc, char **argv)
@@ -72,6 +74,8 @@ void client(int argc, char **argv)
 	strcpy(req.callbk, "Jeff Ferr Call Back");
 
 	msqid->Send(&req, sizeof(Page));
+
+	delete msqid;
 }
 
 int main(int argc, char **argv)

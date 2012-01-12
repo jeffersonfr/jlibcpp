@@ -128,42 +128,78 @@ class Component : public virtual jcommon::Object{
 
 		std::vector<FocusListener *> _focus_listeners;
 		std::vector<ComponentListener *> _component_listeners;
-		Component *_left, 
-							*_right,
-							*_up,
-							*_down;
 		jgui::Container *_parent;
+		Component *_left, 
+			*_right,
+			*_up,
+			*_down;
 		jgui::Font *_font;
-		jpoint_t _location;
+		std::string _name;
+		jpoint_t _location,
+			_scroll_location;
 		jsize_t _size,
-						_preferred_size,
-						_minimum_size,
-						_maximum_size;
+			_preferred_size,
+			_minimum_size,
+			_maximum_size;
 		Color _bgcolor,
-					_fgcolor,
-					_focus_bgcolor,
-					_focus_fgcolor,
-					_border_color,
-					_focus_border_color;
+			_fgcolor,
+			_focus_bgcolor,
+			_focus_fgcolor,
+			_border_color,
+			_focus_border_color,
+			_scrollbar_color;
 		jcomponent_alignment_t _alignment_x,
-													 _alignment_y;
+			_alignment_y;
 		jcomponent_orientation_t _orientation;
 		jcomponent_border_t _border;
 		int _gradient_level,
-				_vertical_gap,
-				_horizontal_gap,
-				_border_size;
+			_vertical_gap,
+			_horizontal_gap,
+			_border_size,
+			_scroll_size,
+			_scroll_gap,
+			_scroll_minor_increment,
+			_scroll_major_increment;
+		int _relative_mouse_x,
+			_relative_mouse_y,
+			_relative_mouse_w,
+			_relative_mouse_h,
+			_internal_state;
 		bool _has_focus,
-				 _is_visible,
-				 _ignore_repaint,
-				 _background_visible,
-				 _is_focusable,
-				 _enabled,
-				 _theme_enabled,
-				 _is_opaque,
-				 _is_valid;
+			_is_visible,
+			_is_navigation_enabled,
+			_is_ignore_repaint,
+			_is_background_visible,
+			_is_focusable,
+			_is_enabled,
+			_is_theme_enabled,
+			_is_opaque,
+			_is_valid,
+			_is_scrollable_x,
+			_is_scrollable_y,
+			_is_scroll_visible,
+			_is_component_loop,
+			_is_smooth_scroll;
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void GetInternalComponents(Container *parent, std::vector<Component *> *components);
+
+		/**
+		 * \brief Makes sure the component is visible in the scroll if this container is scrollable.
+		 * 
+		 * @param x
+		 * @param y
+		 * @param width
+		 * @param height
+		 * @param coordinateSpace the component according to whose coordinates rect is defined. Rect's 
+		 * 		x/y are relative to that component (they are not absolute).
+		 *
+		 */
+		virtual void ScrollToVisibleArea(int x, int y, int width, int height, Component *coordinateSpace);
 
 	public:
 		/**
@@ -177,6 +213,18 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual ~Component();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetName(std::string name);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetName();
 
 		/**
 		 * \brief
@@ -238,6 +286,144 @@ class Component : public virtual jcommon::Object{
 		 */
 		virtual jcomponent_orientation_t GetComponentOrientation();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsScrollableX();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsScrollableY();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetScrollableX(bool scrollable);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetScrollableY(bool scrollable);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetScrollable(bool scrollable);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSmoothScrolling(bool smooth);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsSmoothScrolling();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsScrollable();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsScrollVisible();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jpoint_t GetAbsoluteLocation();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jpoint_t GetScrollLocation();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetScrollDimension();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jregion_t GetVisibleBounds();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetScrollX(int x);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetScrollY(int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetScrollSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetScrollSize(int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetScrollGap();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetScrollGap(int gap);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetMinorScrollIncrement();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetMajorScrollIncrement();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetMinorScrollIncrement(int increment);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetMajorScrollIncrement(int increment);
+		
 		/**
 		 * \brief
 		 *
@@ -326,6 +512,12 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual bool IsBackgroundVisible();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBackgroundVisible(bool b);
 		
 		/**
@@ -344,8 +536,44 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetNavigation(Component *left, Component *right, Component *up, Component *down);
+		virtual void SetLeftComponent(Component *left);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetRightComponent(Component *right);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetUpComponent(Component *up);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetDownComponent(Component *down);
+		
+		/**
+		 * \brief
+		 *
+		 */
+
+		virtual void SetNavigationEnabled(bool b);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsNavigationEnabled();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetComponentNavigation(Component *left, Component *right, Component *up, Component *down);
+
 		/**
 		 * \brief
 		 *
@@ -370,6 +598,17 @@ class Component : public virtual jcommon::Object{
 		 */
 		virtual Component * GetDownComponent();
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetComponentLoop(bool loop);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsComponentLoop();
+
 		/**
 		 * \brief
 		 *
@@ -430,6 +669,42 @@ class Component : public virtual jcommon::Object{
 		 */
 		virtual int GetBorderSize();
 		
+		/**
+		 * \brief Verify if the second component contains the first one;
+		 *
+		 */
+		virtual bool Contains(Component *c1, Component *c2);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool Contains(Component *c, int x, int y, int w, int h);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
+
+		/**
+		 * \brief Verify if the second component intersects the first one;
+		 *
+		 */
+		virtual bool Intersects(Component *c1, Component *c2);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool Intersects(Component *c, int x, int y, int w, int h);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2);
+
 		/**
 		 * \brief
 		 *
@@ -531,18 +806,6 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual int GetY();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetAbsoluteX();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetAbsoluteY();
 		
 		/**
 		 * \brief
@@ -662,6 +925,12 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void SetScrollbarColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBackgroundColor(const Color &color);
 		
 		/**
@@ -693,6 +962,12 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetBorderFocusColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetScrollbarColor(const Color &color);
 
 		/**
 		 * \brief
@@ -734,6 +1009,12 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual Color & GetScrollbarColor();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetFocusable(bool b);
 		
 		/**
@@ -758,6 +1039,12 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void PaintBackground(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void PaintBorderBackground(Graphics *g);
 		/**
 		 * \brief
@@ -769,7 +1056,19 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(bool all = false);
+		virtual void PaintScrollbars(Graphics *g);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void PaintGlassPane(Graphics *g);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Repaint();
 
 		/**
 		 * \brief

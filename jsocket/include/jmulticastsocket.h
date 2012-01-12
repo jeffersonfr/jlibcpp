@@ -21,7 +21,7 @@
 #define J_MULTICASTSOCKET_H
 
 #include "jinetaddress.h"
-#include "jsocketoption.h"
+#include "jsocketoptions.h"
 #include "jsocketinputstream.h"
 #include "jsocketoutputstream.h"
 #include "jconnection.h"
@@ -215,7 +215,13 @@ class MulticastSocket : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		SocketOption * GetSocketOption();
+		SocketOptions * GetSocketOptions();
+
+		/**
+		 * \brief
+		 *
+		 */
+		SocketOptions * GetSocketOptionsExtension();
 
 };
 

@@ -135,8 +135,6 @@ class Plotter : public jgui::Frame, public jthread::Thread {
 
 			Add(_signal);
 
-			SetMoveEnabled(true);
-
 			Pack();
 		}
 

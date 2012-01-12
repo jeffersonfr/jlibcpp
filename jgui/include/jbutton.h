@@ -40,8 +40,7 @@ class Button : public Component{
 
 	private:
 		std::vector<ButtonListener *> _button_listeners;
-		std::string _name,
-			_label;
+		std::string _label;
 
 	protected:
 		jhorizontal_align_t _halign;
@@ -59,26 +58,20 @@ class Button : public Component{
 		 * \brief
 		 *
 		 */
+		Button(std::string label, std::string name, int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Button();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetName(std::string name);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetLabel(std::string label);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetName();
-
 		/**
 		 * \brief
 		 *

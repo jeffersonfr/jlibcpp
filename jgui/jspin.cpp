@@ -46,7 +46,7 @@ void Spin::SetScrollOrientation(jscroll_orientation_t type)
 
 	_type = type;
 
-	Repaint(true);
+	Repaint();
 }
 
 jscroll_orientation_t Spin::GetScrollOrientation()
@@ -94,7 +94,7 @@ bool Spin::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
@@ -111,7 +111,6 @@ bool Spin::ProcessEvent(MouseEvent *event)
 				y1 = event->GetY();
 		int x = _vertical_gap+_border_size,
 				y = _horizontal_gap+_border_size,
-				// w = _size.width-2*x,
 				h = _size.height-2*y,
 				arrow_size;
 
@@ -124,18 +123,18 @@ bool Spin::ProcessEvent(MouseEvent *event)
 		RequestFocus();
 
 		if (_type == JSO_HORIZONTAL) {
-			if (y1 > (_location.y+y) && y1 < (_location.y+y+_size.height)) {
-				if (x1 > (_location.x+_size.width-arrow_size-x) && x1 < (_location.x+_size.width-x)) {
+			if (y1 > (y) && y1 < (y+_size.height)) {
+				if (x1 > (_size.width-arrow_size-x) && x1 < (_size.width-x)) {
 					NextItem();
-				} else if (x1 > (_location.x+x) && x1 < (_location.x+x+arrow_size)) {
+				} else if (x1 > (x) && x1 < (x+arrow_size)) {
 					PreviousItem();
 				}
 			}
 		} else if (_type == JSO_VERTICAL) {
-			if (x1 > (_location.x+_size.width-2*arrow_size-x) && x1 < (_location.x+_size.width-x)) {
-				if (y1 > (_location.y+y) && y1 < (_location.y+h/2)) {
+			if (x1 > (_size.width-2*arrow_size-x) && x1 < (_size.width-x)) {
+				if (y1 > (y) && y1 < (h/2)) {
 					PreviousItem();
-				} else if (y1 > (_location.y+y+h/2) && y1 < (_location.y+y+h)) {
+				} else if (y1 > (y+h/2) && y1 < (y+h)) {
 					NextItem();
 				}
 			}
@@ -147,11 +146,7 @@ bool Spin::ProcessEvent(MouseEvent *event)
 
 bool Spin::ProcessEvent(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
@@ -159,9 +154,9 @@ bool Spin::ProcessEvent(KeyEvent *event)
 		return true;
 	}
 
-	bool catched = false;
-
 	jkeyevent_symbol_t action = event->GetSymbol();
+
+	bool catched = false;
 
 	if (action == JKS_CURSOR_LEFT) {
 		if (_type == JSO_HORIZONTAL) {
@@ -193,7 +188,7 @@ bool Spin::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
 void Spin::AddEmptyItem()
@@ -385,8 +380,6 @@ void Spin::Paint(Graphics *g)
 			}
 		}
 	}
-
-	PaintBorderEdges(g);
 }
 
 }

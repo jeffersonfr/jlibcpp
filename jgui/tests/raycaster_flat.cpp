@@ -180,12 +180,12 @@ class GraphicsTeste : public jgui::Frame{
 			}
 		}
 
-		virtual void InputReceived(jgui::KeyEvent *event)
+		virtual bool ProcessEvent(jgui::KeyEvent *event)
 		{
 			jthread::AutoLock lock(&teste_mutex);
 
 			if (event->GetType() != jgui::JKT_PRESSED) {
-				return;
+				return false;
 			}
 
 			double frameTime = 0.1;	//frameTime is the time this frame has taken, in seconds
@@ -226,6 +226,8 @@ class GraphicsTeste : public jgui::Frame{
 			}
 
 			Repaint();
+
+			return true;
 		}
 };
 

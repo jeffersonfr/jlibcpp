@@ -44,10 +44,6 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg, int x, int y)
 	_ok = new Button("Ok", _label->GetX()+_label->GetWidth()-2*cw-1*30, _field->GetY()+_field->GetHeight()+20, cw, ch);
 	_cancel = new Button("Cancel", _label->GetX()+_label->GetWidth()-1*cw-0*30, _field->GetY()+_field->GetHeight()+20, cw, ch);
 	
-	_field->SetNavigation(NULL, NULL, NULL, _ok);
-	_ok->SetNavigation(NULL, _cancel, _field, _cancel);
-	_cancel->SetNavigation(_ok, NULL, _field, NULL);
-
 	_ok->RegisterButtonListener(this);
 	_cancel->RegisterButtonListener(this);
 	

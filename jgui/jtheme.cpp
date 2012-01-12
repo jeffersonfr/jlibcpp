@@ -39,6 +39,7 @@ Theme::Theme():
 	SetComponentForegroundFocusColor(0xf0, 0xf0, 0xf0, 0xff);
 	SetComponentBorderColor(0x60, 0x60, 0x80, 0xff);
 	SetComponentBorderFocusColor(0xf0, 0xf0, 0xf0, 0xff);
+	SetComponentScrollbarColor(0x80, 0x80, 0xe0, 0xff);
 	
 	SetItemColor(0x17, 0x27, 0x3e, 0xff);
 	SetItemFocusColor(0x57, 0x67, 0x7e, 0xff);
@@ -116,6 +117,7 @@ void Theme::Update(Component *parent)
 			c->SetBorderFocusColor(_component_border_focus_color);
 			c->SetBackgroundFocusColor(_component_focus_bgcolor);
 			c->SetForegroundFocusColor(_component_focus_fgcolor);
+			c->SetScrollbarColor(_component_scrollbar_color);
 			c->SetBorderSize(_component_border_size);
 			c->SetBorder(_component_border);
 
@@ -182,6 +184,11 @@ void Theme::SetComponentBackgroundFocusColor(int red, int green, int blue, int a
 void Theme::SetComponentForegroundFocusColor(int red, int green, int blue, int alpha)
 {
 	_component_focus_fgcolor = Color(red, green, blue, alpha);
+}
+
+void Theme::SetComponentScrollbarColor(int red, int green, int blue, int alpha)
+{
+	_component_scrollbar_color = Color(red, green, blue, alpha);
 }
 
 void Theme::SetItemColor(int red, int green, int blue, int alpha)
@@ -295,6 +302,11 @@ Color & Theme::GetComponentBackgroundFocusColor()
 Color & Theme::GetComponentForegroundFocusColor()
 {
 	return _component_focus_fgcolor;
+}
+
+Color & Theme::GetComponentScrollbarColor()
+{
+	return _component_scrollbar_color;
 }
 
 Color & Theme::GetItemColor()

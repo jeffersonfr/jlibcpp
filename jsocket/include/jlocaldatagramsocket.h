@@ -186,10 +186,10 @@ class LocalDatagramSocket : public jsocket::Connection{
 		virtual int64_t GetReadedBytes();
 
 		/**
-		 * \brief Get a object SocketOption.
+		 * \brief Get a object SocketOptions.
 		 *
 		 */
-		SocketOption * GetSocketOption();
+		SocketOptions * GetSocketOptions();
 
 };
 

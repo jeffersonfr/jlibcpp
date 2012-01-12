@@ -248,7 +248,7 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 
 		virtual void Run()
 		{
-			InnerCreateWindow();
+			InternalCreateWindow();
 
 			jgui::Graphics *gb = _buffer->GetGraphics();
 			jgui::Graphics *g = GetGraphics();
@@ -469,10 +469,6 @@ class MenuTest : public Scene{
 			Add(_button1 = new jgui::Button("Full Screen", (960-400)/2, 0*(100+10)+180, 400, 100));
 			Add(_button2 = new jgui::Button("Streched Screen", (960-400)/2, 1*(100+10)+180, 400, 100));
 			Add(_button3 = new jgui::Button("Exit", (960-400)/2, 2*(100+10)+180, 400, 100));
-
-			_button1->SetNavigation(NULL, NULL, _button3, _button2);
-			_button2->SetNavigation(NULL, NULL, _button1, _button3);
-			_button3->SetNavigation(NULL, NULL, _button2, _button1);
 
 			SetBackgroundColor(0x00, 0x00, 0x00, 0xa0);
 		}

@@ -77,7 +77,6 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			SetLayout(_main = new jgui::GridLayout(2, 3));
 
 			SetFrameButtons((jgui::jframe_button_t)(jgui::JFB_CLOSE | jgui::JFB_MAXIMIZE));
-			SetMoveEnabled(true);
 			SetResizeEnabled(true);
 		
 			_flow = new jgui::FlowLayout();

@@ -304,28 +304,6 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			combo->RegisterSelectListener(this);
 		}
 
-
-		button1->SetNavigation(NULL, NULL, combo, button2);
-		button2->SetNavigation(NULL, NULL, button1, toogle);
-		toogle->SetNavigation(NULL, NULL, button2, button3);
-		button3->SetNavigation(NULL, NULL, toogle, image_button1);
-		image_button1->SetNavigation(NULL, NULL, button3, image_button2);
-		image_button2->SetNavigation(NULL, NULL, image_button1, image_button3);
-		image_button3->SetNavigation(NULL, NULL, image_button2, spin);
-		spin->SetNavigation(NULL, NULL, image_button3, slider);
-		slider->SetNavigation(NULL, NULL, spin, scroll);
-		scroll->SetNavigation(NULL, NULL, slider, text_field);
-		text_field->SetNavigation(NULL, NULL, scroll, text_area);
-		text_area->SetNavigation(NULL, NULL, text_field, check1);
-		check1->SetNavigation(NULL, NULL, text_area, check2);
-		check2->SetNavigation(NULL, NULL, check1, check3);
-		check3->SetNavigation(NULL, NULL, check2, radio1);
-		radio1->SetNavigation(NULL, NULL, check3, radio2);
-		radio2->SetNavigation(NULL, NULL, radio1, radio3);
-		radio3->SetNavigation(NULL, NULL, radio2, list);
-		list->SetNavigation(radio3, combo, NULL, NULL);
-		combo->SetNavigation(NULL, NULL, list, button1);
-
 		container->Add(text_field);
 		container->Add(text_area);
 		// container->Add(progress);
@@ -391,12 +369,12 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		delete list;
 	}
 
-	virtual void InputReceived(jgui::KeyEvent *event)
+	virtual bool ProcessEvent(jgui::KeyEvent *event)
 	{
 		jthread::AutoLock lock(&teste_mutex);
 
 		if (event->GetType() != jgui::JKT_PRESSED) {
-			return;
+			return false;;
 		}
 
 		if (event->GetSymbol() == jgui::JKS_ENTER) {
@@ -407,6 +385,8 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 				keyboard.Show();
 			}
 		}
+
+		return true;
 	}
 
 	virtual void ButtonSelected(jgui::CheckButtonEvent *event)

@@ -141,7 +141,7 @@ int64_t SocketOutputStream::GetSentBytes()
 int64_t SocketOutputStream::Flush()
 {
 	if ((*_is_closed) == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	if (_current_index == 0) {

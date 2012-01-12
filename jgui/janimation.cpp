@@ -79,7 +79,7 @@ void Animation::SetVisible(bool b)
 
 		Release();
 		WaitThread();
-		Repaint(true);
+		Repaint();
 	}
 }
 

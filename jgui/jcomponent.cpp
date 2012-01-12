@@ -39,15 +39,17 @@ Component::Component(int x, int y, int width, int height):
 	_maximum_size.width = 1920;
 	_maximum_size.height = 1080;
 
-	_background_visible = true;
-	_theme_enabled = true;
+	_is_navigation_enabled = true;
+	_is_background_visible = true;
+	_is_theme_enabled = true;
 	_is_valid = true;
 	_is_opaque = true;
 	_is_focusable = false;
-	_enabled = true;
+	_is_enabled = true;
 	_is_visible = true;
 	_has_focus = false;
-	_ignore_repaint = false;
+	_is_ignore_repaint = false;
+	_is_component_loop = true;
 	
 	_parent = NULL;
 	_left = NULL;
@@ -67,6 +69,25 @@ Component::Component(int x, int y, int width, int height):
 	_size.width = width;
 	_size.height = height;
 
+	_scroll_size = 20;
+	_scroll_gap = 2;
+	_scroll_minor_increment = 10;
+	_scroll_major_increment = 50;
+
+	_scroll_location.x = 0;
+	_scroll_location.y = 0;
+
+	_is_scrollable_x = true;
+	_is_scrollable_y = true;
+
+	_is_scroll_visible = true;
+
+	_relative_mouse_x = 0;
+	_relative_mouse_y = 0;
+	_relative_mouse_w = 0;
+	_relative_mouse_h = 0;
+	_internal_state = 0;
+
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();
 
 	theme->Update(this);
@@ -79,14 +100,132 @@ Component::~Component()
 	}
 }
 
+void Component::ScrollToVisibleArea(int x, int y, int width, int height, Component *coordinateSpace) 
+{
+	if (IsScrollable()) {
+		jregion_t view;
+		jsize_t scroll_dimension = GetScrollDimension();
+		jpoint_t scroll_location = GetScrollLocation();
+		// jinsets_t insets = GetInsets();
+		int scrollPosition = scroll_location.y,
+				w = GetWidth(), // - insets.left - insets.right,
+				h = GetHeight(); // - insets.top - insets.bottom;
+
+		if (IsSmoothScrolling()) {
+			view.x = scroll_location.x;
+			view.y = scroll_location.y;
+			// view.y = destScrollY;
+			view.width = w;
+			view.height = h;
+		} else {
+			view.x = scroll_location.x;
+			view.y = scroll_location.y;
+			view.width = w;
+			view.height = h;
+		}
+
+		int relativeX = x;
+		int relativeY = y;
+		
+		// component needs to be in absolute coordinates ...
+		Container *parent = NULL;
+		if (coordinateSpace != NULL) {
+			parent = coordinateSpace->GetParent();
+		}
+
+		if (parent == this) {
+			if (Contains(view.x, view.y, view.width, view.height, x, y, width, height) == true) {
+				return;
+			}
+		} else {
+			while (parent != this) {
+				// mostly a special case for list
+				if (parent == NULL) {
+					relativeX = x;
+					relativeY = y;
+					break;
+				}
+				
+				relativeX += parent->GetX();
+				relativeY += parent->GetY();
+				parent = parent->GetParent();
+			}
+
+			if (Contains(view.x, view.y, view.width, view.height, relativeX, relativeY, width, height) == true) {
+				return;
+			}
+		}
+
+		if (IsScrollableX()) {
+			if (scroll_location.x > relativeX) {
+				SetScrollX(relativeX);
+			}
+
+			int rightX = relativeX + width; // - s.getPadding(LEFT) - s.getPadding(RIGHT);
+
+			if (scroll_location.x + w < rightX) {
+				SetScrollX(scroll_location.x + (rightX - (scroll_location.x + w)));
+			} else {
+				if (scroll_location.x > relativeX) {
+					SetScrollX(relativeX);
+				}
+			}
+		}
+
+		if (IsScrollableY()) {
+			if (scroll_location.y > relativeY) {
+				scrollPosition = relativeY;
+			}
+
+			int bottomY = relativeY + height; // - s.getPadding(TOP) - s.getPadding(BOTTOM);
+
+			if (scroll_location.y + h < bottomY) {
+				scrollPosition = scroll_location.y + (bottomY - (scroll_location.y + h));
+			} else {
+				if (scroll_location.y > relativeY)
+					scrollPosition = relativeY;
+			}
+
+			if (IsSmoothScrolling()) {
+				// initialScrollY = scroll_location.y;
+				// destScrollY = scrollPosition;
+				// initScrollMotion();
+				SetScrollY(scrollPosition);
+			} else {
+				SetScrollY(scrollPosition);
+			}
+		}
+
+		Repaint();
+	} else {
+		// try to move parent scroll if you are not scrollable
+		Container *parent = GetParent();
+
+		if (parent != NULL) {
+			parent->ScrollToVisibleArea(
+					GetAbsoluteLocation().x-parent->GetAbsoluteLocation().x+x, GetAbsoluteLocation().y-parent->GetAbsoluteLocation().y+y, width, height, parent);
+		}
+	}
+}
+
+void Component::SetName(std::string name)
+{
+	_name = name;
+}
+
+std::string Component::GetName()
+{
+	return _name;
+}
+
 void Component::SetThemeEnabled(bool b)
 {
-	_theme_enabled = b;
+	_is_theme_enabled = b;
 }
 
 bool Component::IsThemeEnabled()
 {
-	return _theme_enabled;
+	return _is_theme_enabled;
 }
 
 bool Component::IsOpaque()
@@ -154,6 +293,204 @@ jcomponent_orientation_t Component::GetComponentOrientation()
 	return _orientation;
 }
 
+bool Component::IsScrollableX()
+{
+	return (_is_scrollable_x == true) && (GetScrollDimension().width > _size.width);
+}
+
+bool Component::IsScrollableY()
+{
+	return (_is_scrollable_y == true) && (GetScrollDimension().height > _size.height);
+}
+
+bool Component::IsScrollable()
+{
+	return (IsScrollableX() == true || IsScrollableY() == true);
+}
+
+bool Component::IsScrollVisible()
+{
+	return _is_scroll_visible;
+}
+
+void Component::SetScrollableX(bool scrollable)
+{
+	_is_scrollable_x = scrollable;
+}
+
+void Component::SetScrollableY(bool scrollable)
+{
+	_is_scrollable_y = scrollable;
+}
+
+void Component::SetScrollable(bool scrollable)
+{
+	_is_scrollable_x = scrollable;
+	_is_scrollable_y = scrollable;
+}
+
+void Component::SetSmoothScrolling(bool smooth)
+{
+	_is_smooth_scroll = smooth;
+}
+
+bool Component::IsSmoothScrolling()
+{
+	return _is_smooth_scroll;
+}
+
+jpoint_t Component::GetScrollLocation()
+{
+	return _scroll_location;
+}
+
+jsize_t Component::GetScrollDimension()
+{
+	return _size;
+}
+
+jregion_t Component::GetVisibleBounds()
+{
+	jpoint_t location = GetLocation();
+	jsize_t size = GetSize();
+
+	jregion_t bounds;
+
+	bounds.x = location.x;
+	bounds.y = location.y;
+	bounds.width = size.width;
+	bounds.height = size.height;
+
+	return bounds;
+}
+
+void Component::SetScrollX(int x)
+{
+	jsize_t scroll_dimension = GetScrollDimension();
+
+	_scroll_location.x = x;
+
+	if (_scroll_location.x < 0) {
+		_scroll_location.x = 0;
+	} else if (_scroll_location.x > (scroll_dimension.width-_size.width)) {
+		_scroll_location.x = scroll_dimension.width-_size.width;
+	}
+
+	Repaint();
+}
+
+void Component::SetScrollY(int y)
+{
+	jsize_t scroll_dimension = GetScrollDimension();
+
+	_scroll_location.y = y;
+
+	if (_scroll_location.y < 0) {
+		_scroll_location.y = 0;
+	} else if (_scroll_location.y > (scroll_dimension.height-_size.height)) {
+		_scroll_location.y = scroll_dimension.height-_size.height;
+	}
+
+	Repaint();
+}
+
+int Component::GetScrollSize()
+{
+	return _scroll_size;
+}
+
+void Component::SetScrollSize(int size)
+{
+	_scroll_size = size;
+}
+
+int Component::GetScrollGap()
+{
+	return _scroll_gap;
+}
+
+void Component::SetScrollGap(int gap)
+{
+	_scroll_gap = gap;
+}
+
+int Component::GetMinorScrollIncrement()
+{
+	return _scroll_minor_increment;
+}
+
+int Component::GetMajorScrollIncrement()
+{
+	return _scroll_major_increment;
+}
+
+void Component::SetMinorScrollIncrement(int increment)
+{
+	_scroll_minor_increment = increment;
+}
+
+void Component::SetMajorScrollIncrement(int increment)
+{
+	_scroll_major_increment = increment;
+}
+
+void Component::PaintScrollbars(Graphics *g)
+{
+	if (IsScrollable() == false) {
+		return;
+	}
+
+	Color bgcolor = GetBackgroundColor(),
+		fgcolor = GetScrollbarColor();
+
+	jsize_t scroll_dimension = GetScrollDimension();
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+
+	if (IsScrollableX() == true) {
+		double offset_ratio = (double)scrollx/(double)scroll_dimension.width,
+			block_size_ratio = (double)_size.width/(double)scroll_dimension.width;
+		int offset = (int)(_size.width*offset_ratio),
+			block_size = (int)(_size.width*block_size_ratio);
+
+		g->FillVerticalGradient(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size/2, fgcolor, bgcolor);
+		g->FillVerticalGradient(_border_size, _size.height-_scroll_size/2-_border_size, _size.width-2*_border_size, _scroll_size/2, bgcolor, fgcolor);
+		g->SetColor(fgcolor);
+		g->FillRectangle(offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size);
+	}
+	
+	if (IsScrollableY() == true) {
+		double offset_ratio = (double)scrolly/(double)scroll_dimension.height,
+			block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
+		int offset = (int)(_size.height*offset_ratio),
+			block_size = (int)(_size.height*block_size_ratio);
+
+		g->FillHorizontalGradient(_size.width-_scroll_size-_border_size, _border_size, _scroll_size/2, _size.height, fgcolor, bgcolor);
+		g->FillHorizontalGradient(_size.width-_scroll_size/2-_border_size, _border_size, _scroll_size/2, _size.height, bgcolor, fgcolor);
+		g->SetColor(fgcolor);
+		g->FillRectangle(_size.width-_scroll_size-_border_size, offset, _scroll_size, block_size);
+	}
+
+	if (IsScrollableX() == true && IsScrollableY() == true) {
+		int radius = _scroll_size,
+			radius2 = radius/2;
+
+		g->FillRadialGradient(_size.width-radius2, _size.height-radius2, radius, radius, bgcolor, fgcolor);
+	}
+
+	int line_width = g->GetLineWidth();
+
+	g->SetLineWidth(-_border_size);
+	g->DrawRectangle(0, 0, _size.width, _size.height);
+	g->SetLineWidth(line_width);
+}
+
+void Component::PaintGlassPane(Graphics *g)
+{
+	PaintBorderEdges(g);
+}
+
 void Component::SetGap(int hgap, int vgap)
 {
 	_horizontal_gap = hgap;
@@ -180,6 +517,13 @@ int Component::GetHorizontalGap()
 int Component::GetVerticalGap()
 {
 	return _vertical_gap;
+}
+
+void Component::PaintBackground(Graphics *g)
+{
+	if (_is_background_visible == true) {
+		PaintBorderBackground(g);
+	}
 }
 
 void Component::PaintBorderBackground(Graphics *g)
@@ -314,7 +658,7 @@ void Component::PaintBorderEdges(Graphics *g)
 		g->DrawRectangle(xp, yp, wp-_border_size/2, hp-_border_size/2);
 	}
 
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
 		g->FillRectangle(0, 0, _size.width, _size.height);
 	}
@@ -324,10 +668,6 @@ void Component::Paint(Graphics *g)
 {
 	if (_font != NULL) {
 		g->SetFont(_font);
-	}
-
-	if (_background_visible == true) {
-		PaintBorderBackground(g);
 	}
 }
 
@@ -353,18 +693,90 @@ Container * Component::GetTopLevelAncestor()
 
 bool Component::IsEnabled()
 {
-	return _enabled;
+	return _is_enabled;
 }
 
 void Component::SetEnabled(bool b)
 {
-	if (_enabled == b) {
-		return;
+	_is_enabled = b;
+
+	SetIgnoreRepaint(true);
+
+	if (HasFocus() == true) {
+		ReleaseFocus();
 	}
 
-	_enabled = b;
+	SetIgnoreRepaint(false);
 
 	Repaint();
+}
+
+void Component::SetLeftComponent(Component *left)
+{
+	_left = left;
+}
+
+void Component::SetRightComponent(Component *right)
+{
+	_right = right;
+}
+
+void Component::SetUpComponent(Component *up)
+{
+	_up = up;
+}
+
+void Component::SetDownComponent(Component *down)
+{
+	_down = down;
+}
+
+void Component::SetNavigationEnabled(bool b)
+{
+	_is_navigation_enabled = b;
+}
+
+bool Component::IsNavigationEnabled()
+{
+	return _is_navigation_enabled;
+}
+
+void Component::SetComponentNavigation(Component *left, Component *right, Component *up, Component *down)
+{
+	_left = left;
+	_right = right;
+	_up = up;
+	_down = down;
+}
+
+Component * Component::GetLeftComponent()
+{
+	return _left;
+}
+
+Component * Component::GetRightComponent()
+{
+	return _right;
+}
+
+Component * Component::GetUpComponent()
+{
+	return _up;
+}
+
+Component * Component::GetDownComponent()
+{
+	return _down;
+}
+
+void Component::SetComponentLoop(bool loop)
+{
+	_is_component_loop = loop;
+}
+
+bool Component::IsComponentLoop()
+{
+	return _is_component_loop;
 }
 
 void Component::SetParent(Container *parent)
@@ -372,13 +784,18 @@ void Component::SetParent(Container *parent)
 	_parent = parent;
 }
 
+bool Component::IsBackgroundVisible()
+{
+	return _is_background_visible;
+}
+
 void Component::SetBackgroundVisible(bool b)
 {
-	if (_background_visible == b) {
+	if (_is_background_visible == b) {
 		return;
 	}
 
-	_background_visible = b;
+	_is_background_visible = b;
 
 	Repaint();
 }
@@ -396,23 +813,19 @@ void Component::SetBorder(jcomponent_border_t t)
 
 void Component::SetIgnoreRepaint(bool b)
 {
-	_ignore_repaint = b;
+	_is_ignore_repaint = b;
 }
 
-void Component::Repaint(bool all)
+void Component::Repaint()
 {
 	Invalidate();
 
-	if (_ignore_repaint == true) {
+	if (_is_ignore_repaint == true) {
 		return;
 	}
 
 	if (_parent != NULL) {
-		if (all == false && IsOpaque() == true) { // && _parent->IsValid() == true) {
-			_parent->Repaint(this);
-		} else {
-			_parent->Repaint(true);
-		}
+		_parent->Repaint();
 	}
 
 	DispatchComponentEvent(new ComponentEvent(this, JCE_PAINTED));
@@ -534,7 +947,7 @@ void Component::Move(int x, int y)
 	_location.x = _location.x+x;
 	_location.y = _location.y+y;
 
-	Repaint(true);
+	Repaint();
 }
 
 void Component::Move(jpoint_t point)
@@ -544,8 +957,32 @@ void Component::Move(jpoint_t point)
 
 void Component::SetBounds(int x, int y, int w, int h)
 {
-	SetLocation(x, y);
-	SetSize(w, h);
+	if (_location.x == x && _location.y == y && _size.width == w && _size.height == h) {
+		return;
+	}
+
+	_location.x = x;
+	_location.y = y;
+	_size.width = w;
+	_size.height = h;
+
+	if (_size.width < _minimum_size.width) {
+		_size.width = _minimum_size.width;
+	}
+
+	if (_size.height < _minimum_size.height) {
+		_size.height = _minimum_size.height;
+	}
+
+	if (_size.width > _maximum_size.width) {
+		_size.width = _maximum_size.width;
+	}
+
+	if (_size.height > _maximum_size.height) {
+		_size.height = _maximum_size.height;
+	}
+
+	Repaint();
 }
 
 void Component::SetBounds(jpoint_t point, jsize_t size)
@@ -562,6 +999,8 @@ void Component::SetLocation(int x, int y)
 {
 	_location.x = x;
 	_location.y = y;
+
+	Repaint();
 }
 
 void Component::SetLocation(jpoint_t point)
@@ -594,7 +1033,7 @@ void Component::SetSize(int w, int h)
 		_size.height = _maximum_size.height;
 	}
 
-	Repaint(true);
+	Repaint();
 }
 
 void Component::SetSize(jsize_t size)
@@ -626,6 +1065,45 @@ int Component::GetBorderSize()
 	return _border_size;
 }
 
+bool Component::Contains(Component *c1, Component *c2)
+{
+	return Contains(c1->GetX(), c1->GetY(), c1->GetWidth(), c1->GetHeight(), c2->GetX(), c2->GetY(), c2->GetWidth(), c2->GetHeight());
+}
+
+bool Component::Contains(Component *c, int x, int y, int w, int h)
+{
+	return Contains(c->GetX(), c->GetY(), c->GetWidth(), c->GetHeight(), x, y, w, h);
+}
+
+bool Component::Contains(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+{
+	return (x2 >= x1) && (y2 >= y1) && ((x2+w2) <= w1) && ((y2+h2) <= h1);
+}
+
+bool Component::Intersects(Component *c1, Component *c2)
+{
+	return Intersects(c1->GetX(), c1->GetY(), c1->GetWidth(), c1->GetHeight(), c2->GetX(), c2->GetY(), c2->GetWidth(), c2->GetHeight());
+}
+
+bool Component::Intersects(Component *c, int x, int y, int w, int h)
+{
+	return Intersects(c->GetX(), c->GetY(), c->GetWidth(), c->GetHeight(), x, y, w, h);
+}
+
+bool Component::Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w2, int h2)
+{
+	int ax = x1, 
+			ay = y1,
+			bx = ax+w1,
+			by = ay+h1;
+	int cx = x2, 
+			cy = y2,
+			dx = cx+w2, 
+			dy = cy+h2;
+
+	return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
+}
+
 int Component::GetX()
 {
 	return _location.x;
@@ -636,44 +1114,35 @@ int Component::GetY()
 	return _location.y;
 }
 
-int Component::GetAbsoluteX()
+jpoint_t Component::GetAbsoluteLocation()
 {
 	Container *parent = GetParent();
+	jpoint_t location;
+
+	location.x = 0;
+	location.y = 0;
 
 	if ((void *)parent == NULL) {
-		return -1;
+		return location;
 	}
 
-	int location = _location.x;
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+
+	location.x = _location.x - ((IsScrollableX() == true)?scrollx:0);
+	location.y = _location.y - ((IsScrollableY() == true)?scrolly:0);
 
 	do {
-		if (parent->GetParent() != NULL) {
-			location = location + parent->GetX();	
-		}
-		
-		parent = parent->GetParent();
-	} while ((void *)parent != NULL);
+		// if (parent->GetParent() != NULL) {
+		scroll_location = parent->GetScrollLocation();
+		scrollx = (IsScrollableX() == true)?scroll_location.x:0;
+		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
-	return location;
-}
-
-int Component::GetAbsoluteY()
-{
-	Container *parent = GetParent();
-
-	if ((void *)parent == NULL) {
-		return -1;
-	}
-
-	int location = _location.y;
-
-	do {
-		if (parent->GetParent() != NULL) {
-			location = location + parent->GetY();	
-		}
-		
-		parent = parent->GetParent();
-	} while ((void *)parent != NULL);
+		location.x = location.x + parent->GetX() - ((parent->IsScrollableX() == true)?scrollx:0);	
+		location.y = location.y + parent->GetY() - ((parent->IsScrollableY() == true)?scrolly:0);	
+		// }
+	} while ((parent = parent->GetParent()) != NULL);
 
 	return location;
 }
@@ -716,7 +1185,7 @@ Font * Component::GetFont()
 void Component::RaiseToTop()
 {
 	// frame repaint is needed
-	
+
 	if (_parent == NULL) {
 		return;
 	}
@@ -727,7 +1196,7 @@ void Component::RaiseToTop()
 void Component::LowerToBottom()
 {
 	// frame repaint is needed
-	
+
 	if (_parent == NULL) {
 		return;
 	}
@@ -738,7 +1207,7 @@ void Component::LowerToBottom()
 void Component::PutAtop(Component *c)
 {
 	// frame repaint is needed
-	
+
 	if (_parent == NULL) {
 		return;
 	}
@@ -753,7 +1222,7 @@ void Component::PutAtop(Component *c)
 void Component::PutBelow(Component *c)
 {
 	// frame repaint is needed
-	
+
 	if (_parent == NULL) {
 		return;
 	}
@@ -813,6 +1282,11 @@ void Component::SetBorderFocusColor(int red, int green, int blue, int alpha)
 	SetBorderFocusColor(Color(red, green, blue, alpha));
 }
 
+void Component::SetScrollbarColor(int red, int green, int blue, int alpha)
+{
+	SetScrollbarColor(Color(red, green, blue, alpha));
+}
+
 void Component::SetBackgroundColor(const Color &color)
 {
 	_bgcolor = color;
@@ -855,6 +1329,13 @@ void Component::SetBorderFocusColor(const Color &color)
 	Repaint();
 }
 
+void Component::SetScrollbarColor(const Color &color)
+{
+	_scrollbar_color = color;
+
+	Repaint();
+}
+
 Color & Component::GetBackgroundColor()
 {
 	return _bgcolor;
@@ -885,32 +1366,9 @@ Color & Component::GetBorderFocusColor()
 	return _focus_border_color;
 }
 
-void Component::SetNavigation(Component *left, Component *right, Component *up, Component *down)
+Color & Component::GetScrollbarColor()
 {
-	_left = left;
-	_right = right;
-	_up = up;
-	_down = down;
-}
-
-Component * Component::GetLeftComponent()
-{
-	return _left;
-}
-
-Component * Component::GetRightComponent()
-{
-	return _right;
-}
-
-Component * Component::GetUpComponent()
-{
-	return _up;
-}
-
-Component * Component::GetDownComponent()
-{
-	return _down;
+	return _scrollbar_color;
 }
 
 bool Component::Intersect(int x, int y)
@@ -924,42 +1382,203 @@ bool Component::Intersect(int x, int y)
 
 bool Component::ProcessEvent(MouseEvent *event)
 {
+	if (_is_enabled == false) {
+		return false;
+	}
+	
+	jsize_t scroll_dimension = GetScrollDimension();
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	int mousex = event->GetX(),
+			mousey = event->GetY();
+
+	if (event->GetType() == JME_PRESSED) {
+		if (IsScrollableY() && mousex > (_size.width-GetScrollSize()-_border_size)) {
+			double offset_ratio = (double)scrolly/(double)scroll_dimension.height,
+						 block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
+			int offset = (int)(_size.height*offset_ratio),
+					block_size = (int)(_size.height*block_size_ratio);
+
+			if (mousey > offset && mousey < (offset+block_size)) {
+				_internal_state = 10;
+				_relative_mouse_x = mousex;
+				_relative_mouse_y = mousey;
+			} else if (mousey < offset) {
+				SetScrollY(scrolly-_scroll_major_increment);
+			} else if (mousey > (offset+block_size)) {
+				SetScrollY(scrolly+_scroll_major_increment);
+			}
+
+			return true;
+		} else if (IsScrollableX() && mousey > (_size.height-GetScrollSize()-_border_size)) {
+			double offset_ratio = (double)scrollx/(double)scroll_dimension.width,
+						 block_size_ratio = (double)_size.width/(double)scroll_dimension.width;
+			int offset = (int)(_size.width*offset_ratio),
+					block_size = (int)(_size.width*block_size_ratio);
+
+			if (mousex > offset && mousex < (offset+block_size)) {
+				_internal_state = 11;
+				_relative_mouse_x = mousex;
+				_relative_mouse_y = mousey;
+			} else if (mousex < offset) {
+				SetScrollX(scrollx-_scroll_major_increment);
+			} else if (mousex > (offset+block_size)) {
+				SetScrollX(scrollx+_scroll_major_increment);
+			}
+
+			return true;
+		} 
+	} else if (event->GetType() == JME_MOVED) {
+		if (_internal_state == 10) {
+			SetScrollY(scrolly+(int)((mousey-_relative_mouse_y)*((double)scroll_dimension.height/(double)GetHeight())));
+
+			_relative_mouse_y = mousey;
+
+			return true;
+		} else if (_internal_state == 11) {
+			SetScrollX(scrollx+(int)((mousex-_relative_mouse_x)*((double)scroll_dimension.width/(double)GetWidth())));
+
+			_relative_mouse_x = mousex;
+
+			return true;
+		}
+	} else if (event->GetType() == JME_RELEASED) {
+		if (_internal_state != 0) {
+			_internal_state = 0;
+
+			return true;
+		}
+	}
+
 	return false;
+}
+
+void Component::GetInternalComponents(Container *parent, std::vector<Component *> *components)
+{
+	if ((void *)parent == NULL) {
+		return;
+	}
+
+	std::vector<Component *> v = parent->GetComponents();
+
+	for (std::vector<Component *>::iterator i=v.begin(); i!=v.end(); i++) {
+		Component *c = (*i);
+
+		if (c->InstanceOf("jgui::Container") == true) {
+			GetInternalComponents((Container *)c, components);
+		}
+
+		components->push_back(c);
+	}
 }
 
 bool Component::ProcessEvent(KeyEvent *event)
 {
-	Component *c = NULL;
-
-	jkeyevent_symbol_t action = event->GetSymbol();
-	
-	if (action == JKS_CURSOR_LEFT) {
-		if (_left != NULL) {
-			c = _left;
-		}
-	} else if (action == JKS_CURSOR_RIGHT) {
-		if (_right != NULL) {
-			c = _right;
-		}
-	} else if (action == JKS_CURSOR_UP) {
-		if (_up != NULL) {
-			c = _up;
-		}
-	} else if (action == JKS_CURSOR_DOWN) {
-		if (_down != NULL) {
-			c = _down;
-		}
+	if (_is_navigation_enabled == false) {
+		return false;
 	}
 
-	if ((void *)c != NULL) {
-		if (_parent != NULL) {
-			c->RequestFocus();
-		}
+	std::vector<Component *> components;
 
+	// INFO:: search for internal components
+	GetInternalComponents(GetTopLevelAncestor(), &components);
+
+	if (components.size() == 0 || (components.size() == 1 && components[0] == this)) {
 		return true;
 	}
 
-	return false;
+	jkeyevent_symbol_t action = event->GetSymbol();
+
+	if (action != JKS_CURSOR_LEFT &&
+			action != JKS_CURSOR_RIGHT && 
+			action != JKS_CURSOR_UP && 
+			action != JKS_CURSOR_DOWN) {
+		return false;
+	}
+
+	Component *left = this,
+		*right = this,
+		*up = this,
+		*down = this,
+		*next = this;
+
+	jregion_t this_bounds = GetVisibleBounds();
+
+	if (action == JKS_CURSOR_LEFT && GetLeftComponent() != NULL) {
+		next = GetLeftComponent();
+	} else if (action == JKS_CURSOR_RIGHT && GetRightComponent() != NULL) {
+		next = GetRightComponent();
+	} else if (action == JKS_CURSOR_UP && GetUpComponent() != NULL) {
+		next = GetUpComponent();
+	} else if (action == JKS_CURSOR_DOWN && GetDownComponent() != NULL) {
+		next = GetDownComponent();
+	} else {
+		int distance = INT_MAX;
+
+		for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
+			Component *cmp = (*i);
+
+			if (cmp == this || cmp->IsFocusable() == false || cmp->IsEnabled() == false || cmp->IsVisible() == false) {
+				continue;
+			}
+
+			jregion_t cmp_bounds = cmp->GetVisibleBounds();
+			int dw = ::abs(this_bounds.width-cmp_bounds.width),
+					dh = ::abs(this_bounds.height-cmp_bounds.height),
+					dx = ::abs(this_bounds.x-cmp_bounds.x),
+					dy = ::abs(this_bounds.y-cmp_bounds.y);
+
+			if (action == JKS_CURSOR_LEFT && cmp_bounds.x < this_bounds.x) {
+				int value = (dx*dx*2+dy*dy*8);
+
+				if (value < distance) {
+					next = cmp;
+					distance = value;
+				}
+			} else if (action == JKS_CURSOR_RIGHT && cmp_bounds.x > this_bounds.x) {
+				int value = (dx*dx*2+dy*dy*8);
+
+				if (value < distance) {
+					next = cmp;
+					distance = value;
+				}
+			} else if (action == JKS_CURSOR_UP && cmp_bounds.y < this_bounds.y) {
+				int value = (dx*dx+dy*dy);
+
+				if (value < distance) {
+					next = cmp;
+					distance = value;
+				}
+			} else if (action == JKS_CURSOR_DOWN) {// && cmp_bounds.y > this_bounds.y) {
+				int value = (dx*dx+dy*dy);
+
+				printf("----> 01:: %d, %d\n", cmp_bounds.y, this_bounds.y);
+				if (value < distance) {
+					next = cmp;
+					distance = value;
+				}
+			}
+		}
+
+		if (next == this && _is_component_loop == true) {
+			if (action == JKS_CURSOR_LEFT) {
+				next = right;
+			} else if (action == JKS_CURSOR_RIGHT) {
+				next = left;
+			} else if (action == JKS_CURSOR_UP) {
+				next = down;
+			} else if (action == JKS_CURSOR_DOWN) {
+				next = up;
+			}
+		}
+	}
+
+	if (next != NULL) {
+		next->RequestFocus();
+	}
+
+	return true;
 }
 
 void Component::RequestFocus()
@@ -1006,17 +1625,19 @@ bool Component::IsVisible()
 
 void Component::SetVisible(bool b)
 {
-	if (_is_visible == b) {
-		return;
-	}
-
 	_is_visible = b;
 
-	if (_is_visible == true) {
-		Repaint(false);
-	} else {
-		Repaint(true);
+	if (_is_visible == false) {
+		SetIgnoreRepaint(true);
+
+		if (HasFocus() == true) {
+			ReleaseFocus();
+		}
+
+		SetIgnoreRepaint(false);
 	}
+		
+	Repaint();
 }
 
 void Component::RegisterFocusListener(FocusListener *listener)

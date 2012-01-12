@@ -23,6 +23,7 @@
 #include "jcardlayout.h"
 #include "joutofboundsexception.h"
 #include "jnullpointerexception.h"
+#include "jrectangle.h"
 
 namespace jgui {
 
@@ -33,16 +34,19 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 
 	SetWorkingScreenSize(scale_width, scale_height);
 
+	_layout = new BorderLayout();//NULL;
+
 	_focus = NULL;
 	_orientation = JCO_LEFT_TO_RIGHT;
-	_scroll.x = 0;
-	_scroll.y = 0;
-	_layout = NULL;
-	_enabled = true;
+	_is_enabled = true;
 	_is_visible = true;
 	_parent = NULL;
 	_optimized_paint = false;
 	_is_opaque = false;
+	_border = JCB_EMPTY;
+
+	_scroll_dimension.width = _size.width;
+	_scroll_dimension.height = _size.height;
 
 	_insets.left = 0;
 	_insets.right = 0;
@@ -50,7 +54,6 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 	_insets.bottom = 0;
 
 	SetBackgroundVisible(false);
-	SetBorder(JCB_EMPTY);
 }
 
 Container::~Container()
@@ -58,6 +61,155 @@ Container::~Container()
 	if (_layout != NULL) {
 		delete _layout;
 	}
+}
+
+void Container::UpdateScrollDimension()
+{
+	int p1x = 0,
+			p2x = 0;
+	int p1y = 0,
+			p2y = 0;
+	int gap = _scroll_size+_scroll_gap; //+_border_size;
+
+	for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+		Component *cmp = (*i);
+
+		if (p1x > cmp->GetX()) {
+			p1x = cmp->GetX();
+		}
+
+		if (p2x < (cmp->GetX()+cmp->GetWidth())) {
+			p2x = cmp->GetX()+cmp->GetWidth();
+		}
+		
+		if (p1y > cmp->GetY()) {
+			p1y = cmp->GetY();
+		}
+
+		if (p2y < (cmp->GetY()+cmp->GetHeight())) {
+			p2y = cmp->GetY()+cmp->GetHeight();
+		}
+	}
+	
+	if (p1x < 0) {
+		if (p2x < _size.width) {
+			p2x = _size.width;
+		}
+	}
+
+	if (p1y < 0) {
+		if (p2y < _size.height) {
+			p2y = _size.height;
+		}
+	}
+
+	_scroll_dimension.width = p2x-p1x+_border_size;
+	_scroll_dimension.height = p2y-p1y+_border_size;
+
+	if ((_scroll_dimension.width > _size.width)) {
+		_scroll_dimension.height = _scroll_dimension.height + gap;
+	}
+
+	if ((_scroll_dimension.height > _size.height)) {
+		_scroll_dimension.width = _scroll_dimension.width + gap;
+	}
+
+	/*
+	// TODO:: caso exista um elemento com deslocamento x/y menor que 0 inicial, atualizar a posicao do scroll
+	jsize_t t = GetScrollDimension();
+
+	if (_is_scrollable_x == true && t.width > _size.width) {
+		if (_scroll_location.x < (t.width-_size.width)) {
+			_scroll_location.x = t.width-_size.width;
+		}
+	}
+
+	if (_is_scrollable_y == true && t.height > _size.height) {
+		if (_scroll_location.y < (t.height-_size.height)) {
+			_scroll_location.y = t.height-_size.height;
+		}
+	}
+	*/
+}
+
+bool Container::MoveScrollTowards(Component *next, jkeyevent_symbol_t symbol)
+{
+	if (IsScrollable()) {
+		Component *current = GetFocusOwner();
+
+		jpoint_t scroll_location = GetScrollLocation();
+		jsize_t scroll_dimension = GetScrollDimension();
+		int x = scroll_location.x,
+			y = scroll_location.y,
+			w = _size.width,
+			h = _size.height;
+		bool edge = false,
+			currentLarge = false,
+			scrollOutOfBounds = false;
+
+		if (symbol == JKS_CURSOR_UP) {
+				y = scroll_location.y - _scroll_major_increment;
+				// edge = (position == 0);
+				currentLarge = (scroll_dimension.height > _size.height);
+				scrollOutOfBounds = y < 0;
+				if(scrollOutOfBounds){
+					y = 0;
+				}
+		} else if (symbol == JKS_CURSOR_DOWN) {
+				y = scroll_location.y + _scroll_major_increment;
+				// edge = (position == f.getFocusCount() - 1);
+				currentLarge = (scroll_dimension.height > _size.height);
+				scrollOutOfBounds = y > (scroll_dimension.height - _size.height);
+				if(scrollOutOfBounds){
+					y = scroll_dimension.height - _size.height;
+				}
+		} else if (symbol == JKS_CURSOR_RIGHT) {
+				x = scroll_location.x + _scroll_major_increment;
+				// edge = (position == f.getFocusCount() - 1);
+				currentLarge = (scroll_dimension.width > _size.width);
+				scrollOutOfBounds = x > (scroll_dimension.width - _size.width);
+				if(scrollOutOfBounds){
+					x = scroll_dimension.width - _size.width;
+				}
+		} else if (symbol == JKS_CURSOR_LEFT) {
+				x = scroll_location.x - _scroll_major_increment;
+				// edge = (position == 0);
+				currentLarge = (scroll_dimension.width > _size.width);
+				scrollOutOfBounds = x < 0;
+				if(scrollOutOfBounds){
+					x = 0;
+				}
+		}
+		
+		//if the Form doesn't contain a focusable Component simply move the viewport by pixels
+		if (next == NULL || next == this){
+			ScrollToVisibleArea(x, y, w, h, this);
+
+			return false;
+		}
+
+		bool nextIntersects = Contains(next) == true && 
+			Intersects(next->GetAbsoluteLocation().x, next->GetAbsoluteLocation().y, next->GetWidth(), next->GetHeight(), GetAbsoluteLocation().x + x, GetAbsoluteLocation().y + y, w, h);
+
+		if ((nextIntersects && !currentLarge && !edge) || 
+				Rectangle::Contains(GetAbsoluteLocation().x + scroll_location.x, GetAbsoluteLocation().y + scroll_location.y, w, h,
+					next->GetAbsoluteLocation().x, next->GetAbsoluteLocation().y, next->GetWidth(), next->GetHeight())) {
+			//scrollComponentToVisible(next);
+		} else {
+			if (!scrollOutOfBounds) {
+				ScrollToVisibleArea(x, y, w, h, this);
+				//if after moving the scroll the current focus is out of the view port and the next focus is in the view port move the focus
+				if (nextIntersects == false || 
+						Rectangle::Intersects(current->GetAbsoluteLocation().x, current->GetAbsoluteLocation().y, current->GetWidth(), current->GetHeight(), GetAbsoluteLocation().x + x, GetAbsoluteLocation().y + y, w, h) != 0) {
+					return false;
+				}
+			} else {
+				//scrollComponentToVisible(next);
+			}
+		}
+	}
+
+	return true;
 }
 
 void Container::SetWorkingScreenSize(int width, int height)
@@ -71,25 +223,27 @@ jsize_t Container::GetWorkingScreenSize()
 	return _scale;
 }
 
+jsize_t Container::GetScrollDimension()
+{
+	return _scroll_dimension;
+}
+
 Component * Container::GetTargetComponent(Container *target, int x, int y, int *dx, int *dy)
 {
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+
 	for (std::vector<jgui::Component *>::reverse_iterator i=target->GetComponents().rbegin(); i!=target->GetComponents().rend(); i++) {
 		Component *c = (*i);
 	
-		int x1 = c->GetX(),
-				y1 = c->GetY();
-
-		if (c->Intersect(x, y) == true) {
-			if (c->InstanceOf("jgui::Container") == true) {
-				return GetTargetComponent((Container *)c, x-x1, y-y1, dx, dy);
-			}
-
+		if (c->Intersect(x+scrollx, y+scrolly) == true) {
 			if ((void *)dx != NULL) {
-				*dx = x;
+				*dx = x-c->GetX();
 			}
 
 			if ((void *)dy != NULL) {
-				*dy = y;
+				*dy = y-c->GetY();
 			}
 
 			return c;
@@ -97,30 +251,6 @@ Component * Container::GetTargetComponent(Container *target, int x, int y, int *
 	}
 
 	return target;
-}
-
-void Container::SetSize(int w, int h)
-{
-	_size.width = w;
-	_size.height = h;
-
-	if (_size.width < _minimum_size.width) {
-		_size.width = _minimum_size.width;
-	}
-
-	if (_size.height < _minimum_size.height) {
-		_size.height = _minimum_size.height;
-	}
-
-	if (_size.width > _maximum_size.width) {
-		_size.width = _maximum_size.width;
-	}
-
-	if (_size.height > _maximum_size.height) {
-		_size.height = _maximum_size.height;
-	}
-
-	DoLayout();
 }
 
 void Container::SetOptimizedPaint(bool b)
@@ -147,8 +277,6 @@ jgui::Layout * Container::GetLayout()
 void Container::DoLayout()
 {
 	if (_layout != NULL) {
-		_ignore_repaint = true;
-
 		_layout->DoLayout(this);
 
 		for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
@@ -156,11 +284,9 @@ void Container::DoLayout()
 				dynamic_cast<jgui::Container *>(*i)->DoLayout();
 			}
 		}
-
-		_ignore_repaint = false;
 	}
-
-	Repaint();
+		
+	UpdateScrollDimension();
 }
 
 void Container::SetInsets(jinsets_t insets)
@@ -244,43 +370,53 @@ void Container::Paint(Graphics *g)
 
 	g->SetWorkingScreenSize(_scale.width, _scale.height);
 
-	Component::Paint(g);
-
 	jthread::AutoLock lock(&_container_mutex);
 
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 	jregion_t clip = g->GetClip();
+
+	if (IsBackgroundVisible() == true) {
+		g->Reset(); 
+		PaintBackground(g);
+	}
 
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		Component *c = (*i);
 
 		if (c->IsVisible() == true && c->IsValid() == false) {
-			int cx = c->GetX()-_scroll.x,
-					cy = c->GetY()-_scroll.y,
+			// TODO:: considerar o scroll de um component
+			int cx = c->GetX()-scrollx,
+					cy = c->GetY()-scrolly,
 					cw = c->GetWidth(),
 					ch = c->GetHeight();
-
-			if (cx > clip.width) {
-				cx = clip.width;
-			}
-
-			if (cy > clip.height) {
-				cy = clip.height;
-			}
-
-			if (cw > (clip.width-cx)) {
-				cw = clip.width-cx;
-			}
-
-			if (ch > (clip.height-cy)) {
-				ch = clip.height-cy;
-			}
+			bool flag = c->InstanceOf("jgui::Container");
 
 			if (cw > 0 && ch > 0) {
 				g->Translate(cx, cy);
-				g->SetClip(0, 0, cw-1, ch-1);
+				g->ClipRect(0, 0, cw-1, ch-1);
+	
+				if (flag == false && c->IsBackgroundVisible() == true) {
+					g->Reset(); 
+					c->PaintBackground(g);
+				}
+
+				g->Reset(); 
 				c->Paint(g);
-				g->ReleaseClip();
+				
+				if (flag == false && c->IsScrollVisible() == true) {
+					g->Reset(); 
+					c->PaintScrollbars(g);
+				}
+
+				if (flag == false) {
+					g->Reset(); 
+					c->PaintGlassPane(g);
+				}
+				
 				g->Translate(-cx, -cy);
+				g->SetClip(clip.x, clip.y, clip.width, clip.height);
 			}
 
 			c->Revalidate();
@@ -288,99 +424,33 @@ void Container::Paint(Graphics *g)
 			g->SetWorkingScreenSize(_scale.width, _scale.height);
 		}
 	}
-		
+				
 	g->SetClip(clip.x, clip.y, clip.width, clip.height);
 
-	PaintBorderEdges(g);
+	if (IsScrollVisible() == true) {
+		g->Reset(); 
+		PaintScrollbars(g);
+	}
 
-	// WARNNING:: estudar melhor o problema de validacao dos containers.
-	// Revalidar o container no metodo Paint() pode gerar problemas de
-	// sincronizacao com o Frame, por exemplo. Esse problema pode ocorrer
-	// na chamada do metodo 
-	//
-	// 		Frame::Paint() { 
-	// 			Container::Paint(); 
-	//
-	// 			... 
-	// 		}
-	//
-	// Apos chamar o metodo Container::Paint() o Frame jah estaria validado,
-	// quando na verdade deveria ser validado somente apos a chamada do
-	// metodo Repaint().
+	g->Reset(); 
+	PaintGlassPane(g);
+
 	Revalidate();
-
-	g->Reset();
 }
 
-bool Container::Intersect(Component *c1, Component *c2)
-{
-	int ax = c1->GetX(), 
-			ay = c1->GetY(),
-			bx = ax+c1->GetWidth(),
-			by = ay+c1->GetHeight();
-	int cx = c2->GetX(), 
-			cy = c2->GetY(),
-			dx = cx+c2->GetWidth(), 
-			dy = cy+c2->GetHeight();
-
-	return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
-}
-
-bool Container::Intersect(Component *c1, int x, int y, int w, int h)
-{
-	int ax = c1->GetX(), 
-			ay = c1->GetY(),
-			bx = ax+c1->GetWidth(),
-			by = ay+c1->GetHeight();
-	int cx = x, 
-			cy = y,
-			dx = cx+w, 
-			dy = cy+h;
-
-	return (((ax > dx)||(bx < cx)||(ay > dy)||(by < cy)) == 0);
-}
-
-void Container::Repaint(bool all)
+void Container::Repaint()
 {
 	Invalidate();
 
-	if (_ignore_repaint == true) {
+	if (_is_ignore_repaint == true) {
 		return;
 	}
 
 	if (_parent != NULL) {
-		if (all == false && IsOpaque() == true) { // && _parent->IsValid() == true) {
-			_parent->Repaint(this);
-		} else {
-			InvalidateAll();
-
-			_parent->Repaint(true);
-		}
+		_parent->Repaint();
 	}
 
 	Component::DispatchComponentEvent(new ComponentEvent(this, JCE_PAINTED));
-}
-
-void Container::Repaint(int x, int y, int width, int height)
-{
-	Repaint();
-}
-
-void Container::Repaint(Component *c)
-{
-	Invalidate();
-
-	if (_ignore_repaint == true) {
-		return;
-	}
-
-	if (_parent != NULL) {
-		if (c->IsOpaque() == false || IsOpaque() == false) {
-			Repaint(true);
-		} else {
-			_parent->Repaint(this);
-		}
-	}
 }
 
 void Container::Add(Component *c, int index)
@@ -537,6 +607,21 @@ void Container::RemoveAll()
 	Repaint();
 }
 
+bool Container::Contains(Component *cmp)
+{
+	std::vector<Component *> components;
+
+	GetInternalComponents(this, &components);
+
+	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
+		if (cmp == (*i)) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 int Container::GetComponentCount()
 {
 	jthread::AutoLock lock(&_container_mutex);
@@ -598,6 +683,42 @@ void Container::ReleaseComponentFocus(jgui::Component *c)
 	}
 }
 
+bool Container::ProcessEvent(KeyEvent *event)
+{
+	return false;
+}
+
+bool Container::ProcessEvent(MouseEvent *event)
+{
+	if (_is_enabled == false) {
+		return false;
+	}
+	
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	int mousex = event->GetX(),
+			mousey = event->GetY();
+
+	int dx,
+			dy;
+
+	Component *c = GetTargetComponent(this, mousex, mousey, &dx, &dy);
+
+	if (c != NULL && c != this) {
+		event->SetX(dx+scrollx);
+		event->SetY(dy+scrolly);
+
+		c->ProcessEvent(event);
+	}
+
+	return false;
+}
+		
 jgui::Component * Container::GetFocusOwner()
 {
 	if (_parent != NULL) {

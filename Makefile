@@ -68,7 +68,7 @@ CCFLAGS		+= \
 						$(DEFINES) \
 						$(DEBUG) \
 						$(INCLUDE) \
-						-D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" \
+						-D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
 
 ECHO			= echo -e
 
@@ -244,10 +244,9 @@ OBJS_jsocket = \
 		 jsocketexception.o\
 		 jsocketinputstream.o\
 		 jsocketlib.o\
-		 jsocketoption.o\
-		 jsocketoptionexception.o\
+		 jsocketoptions.o\
+		 jsocketoptionsexception.o\
 		 jsocketoutputstream.o\
-		 jsocketstreamexception.o\
 		 jsockettimeoutexception.o\
 		 jsslserversocket.o\
 		 jsslserversocket6.o\
@@ -256,7 +255,6 @@ OBJS_jsocket = \
 		 jsslsocketinputstream.o\
 		 jsslsocketoutputstream.o\
 		 junknownhostexception.o\
-		 #jrtpsocket.o\
 
 OBJS_jthread = \
 		 jbufferexception.o\

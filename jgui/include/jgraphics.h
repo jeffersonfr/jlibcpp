@@ -191,9 +191,10 @@ class Graphics : public virtual jcommon::Object{
 	friend class Image;
 
 	protected:
-		jthread::Mutex graphics_mutex;
+		jthread::Mutex _graphics_mutex;
 
-		struct jregion_t _clip;
+		struct jregion_t _clip,
+										 _internal_clip;
 		struct jpoint_t _translate,
 										_translate_image;
 		struct jsize_t _screen;
@@ -214,24 +215,10 @@ class Graphics : public virtual jcommon::Object{
 #ifdef DIRECTFB_UI
 		IDirectFBSurface *surface;
 		
-		struct edge_t {
-			struct edge_t *next;
-
-			int yUpper;
-			double xIntersect;
-			double dxPerScan;
-		};
-
 		int CalculateGradientChannel(int schannel, int dchannel, int distance, int offset); 
 		void UpdateGradientColor(Color &scolor, Color &dcolor, int distance, int offset);
 
-		void MakeEdgeRec(struct jpoint_t lower, struct jpoint_t upper, int yComp, edge_t *edge, edge_t *edges[]);
-		void FillScan(int scan, edge_t *active);
-		int YNext(int k, int cnt, jpoint_t pts[]);
-		void BuildEdgeList(int cnt, jpoint_t pts[], edge_t *edges[]);
-		void InsertEdge(edge_t *list, edge_t *edge);
-		void UpdateActiveList(int scan, edge_t *active);
-		void FillPolygon0(int n, int ppts[]);
+		void FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int y1p, int x2p, int y2p); 
 		
 		double EvaluateBezier0(double *data, int ndata, double t);
 
@@ -761,18 +748,6 @@ class Graphics : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void Reset();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Lock();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Unlock();
 
 };
 

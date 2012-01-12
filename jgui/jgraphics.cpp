@@ -26,67 +26,9 @@
 #include "jfont.h"
 #include "jstringutils.h"
 #include "joutofboundsexception.h"
+#include "jrectangle.h"
 
 namespace jgui {
-
-static const double EPSILON = 0.0000000001f;
-
-class Vector2d {
-
-	private:
-		double mX;
-		double mY;
-
-	public:
-		Vector2d(double x, double y);
-
-		double GetX() const;
-		double GetY() const;
-
-		void SetXY(double x, double y);
-
-};
-
-/**
- * \brief Vector of vertices which are used to represent a polygon/contour and a series of triangles
- *
- */
-typedef std::vector< Vector2d > Vector2dVector;
-
-class Triangulate {
-
-	private:
-		static bool Snip(const Vector2dVector &contour, int u, int v, int w, int n, int *V);
-
-	public:
-  	/**
-		 * \brief triangulate a contour/polygon, places results in STL vector as series of triangles
-		 *
-		 */
-		static bool Process(const Vector2dVector &contour, Vector2dVector &result);
-
-		/**
-		 * \brief compute area of a contour/polygon
-		 *
-		 */
-		static double Area(const Vector2dVector &contour);
-
-		/**
-		 * \brief decide if point Px/Py is inside triangle defined by (Ax,Ay) (Bx,By) (Cx,Cy)
-		 *
-		 */
-		static bool InsideTriangle(double p1x, double p1y, double p2x, double p2y, double p3x, double p3y, double px, double py);
-
-		/**
-		 * \brief decide if point Px/Py is inside triangle defined by (Ax,Ay) (Bx,By) (Cx,Cy)
-		 *
-		 */
-		static bool InsideTriangle(int p1x, int p1y, int p2x, int p2y, int p3x, int p3y, int px, int py);
-
-};
-
-// Vector of vertices which are used to represent a polygon/contour and a series of triangles
-typedef std::vector< Vector2d > Vector2dVector;
 
 Graphics::Graphics():
 	jcommon::Object()
@@ -183,85 +125,43 @@ void * Graphics::GetNativeSurface()
 
 void Graphics::SetNativeSurface(void *addr)
 {
-	Lock();
+	_graphics_mutex.Lock();
 
 #ifdef DIRECTFB_UI
 	surface = (IDirectFBSurface *)addr;
 #endif
 
-	Unlock();
+	_graphics_mutex.Unlock();
 }
 
 jregion_t Graphics::ClipRect(int xp, int yp, int wp, int hp)
 {
-	jregion_t clip = GetClip();
-
-	int cx = xp,
-			cy = yp,
-			cw = wp,
-			ch = hp;
-
-	if (cx > clip.width) {
-		cx = clip.width;
-	}
-
-	if (cy > clip.height) {
-		cy = clip.height;
-	}
-
-	if (cw > (clip.width-cx)) {
-		cw = clip.width-cx;
-	}
-
-	if (ch > (clip.height-cy)) {
-		ch = clip.height-cy;
-	}
-
-	SetClip(cx, cy, cw, ch);
+	jregion_t clip = Rectangle::Intersection(xp+_translate.x, yp+_translate.y, wp, hp, _internal_clip.x, _internal_clip.y, _internal_clip.width, _internal_clip.height);
+	
+	SetClip(clip.x-_translate.x, clip.y-_translate.y, clip.width, clip.height);
 
 	return clip;
 }
 
 void Graphics::SetClip(int xp, int yp, int wp, int hp)
 {
-	int max_wp = _scale.width-_translate.x,
-			max_hp = _scale.height-_translate.y;
-
-	if (xp < 0) {
-		wp = wp + xp;
-		xp = 0;
-	}
-
-	if (yp < 0) {
-		hp = hp + yp;
-		yp = 0;
-	}
-
-	if (xp > max_wp || yp > max_hp || wp < 0 || hp < 0) {
-		throw jcommon::OutOfBoundsException("The clip region does not match the visible screen area");
-	}
-
-	if ((xp + wp) > max_wp) {
-		wp = max_wp - xp;
-	}
-
-	if ((yp + hp) > max_hp) {
-		hp = max_hp - yp;
-	}
-
-	_clip.x = xp;
-	_clip.y = yp;
-	_clip.width = wp;
-	_clip.height = hp;
+	jregion_t clip = Rectangle::Intersection(xp+_translate.x, yp+_translate.y, wp, hp, 0, 0, _scale.width, _scale.height);
+	
+	_clip.x = clip.x - _translate.x;
+	_clip.y = clip.y - _translate.y;
+	_clip.width = clip.width;
+	_clip.height = clip.height;
+	
+	_internal_clip = clip;
 
 #ifdef DIRECTFB_UI
 	if (surface != NULL) {
 		DFBRegion rgn;
 
-		rgn.x1 = SCALE_TO_SCREEN((_translate.x+_clip.x), _screen.width, _scale.width);
-		rgn.y1 = SCALE_TO_SCREEN((_translate.y+_clip.y), _screen.height, _scale.height);
-		rgn.x2 = SCALE_TO_SCREEN((_translate.x+_clip.x+_clip.width), _screen.width, _scale.width);
-		rgn.y2 = SCALE_TO_SCREEN((_translate.y+_clip.y+_clip.height), _screen.height, _scale.height);
+		rgn.x1 = SCALE_TO_SCREEN((clip.x), _screen.width, _scale.width);
+		rgn.y1 = SCALE_TO_SCREEN((clip.y), _screen.height, _scale.height);
+		rgn.x2 = SCALE_TO_SCREEN((clip.x+clip.width), _screen.width, _scale.width);
+		rgn.y2 = SCALE_TO_SCREEN((clip.y+clip.height), _screen.height, _scale.height);
 
 		surface->SetClip(surface, NULL);
 		surface->SetClip(surface, &rgn);
@@ -280,6 +180,11 @@ void Graphics::ReleaseClip()
 	_clip.y = 0;
 	_clip.width = _scale.width;
 	_clip.height = _scale.height;
+
+	_internal_clip.x = _translate.x;
+	_internal_clip.y = _translate.y;
+	_internal_clip.width = _clip.width;
+	_internal_clip.height = _clip.height;
 
 #ifdef DIRECTFB_UI
 	DFBRegion rgn;
@@ -536,7 +441,7 @@ void Graphics::SetAntiAliasEnabled(bool b)
 
 void Graphics::SetPixel(int xp, int yp, uint32_t pixel)
 {
-	SetRGB(pixel, xp, yp);
+	SetRGB(pixel, xp+_translate.x, yp+_translate.y);
 }
 
 uint32_t Graphics::GetPixel(int xp, int yp)
@@ -1282,16 +1187,32 @@ void Graphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints)
 		return;
 	}
 
-	int points[2*npoints];
-	int i,
-			j=0;
+	int x1 = 0,
+			y1 = 0,
+			x2 = 0,
+			y2 = 0;
 
-	for (i=0; i<npoints; i++) {
-		points[j++] = SCALE_TO_SCREEN((_translate.x+p[i].x + xp), _screen.width, _scale.width);
-		points[j++] = SCALE_TO_SCREEN((_translate.y+p[i].y + yp), _screen.height, _scale.height);
+	for (int i=0; i<npoints; i++) {
+		if (p[i].x < x1) {
+			x1 = p[i].x;
+		}
+
+		if (p[i].x > x2) {
+			x2 = p[i].x;
+		}
+
+		if (p[i].y < y1) {
+			y1 = p[i].y;
+		}
+
+		if (p[i].y > y2) {
+			y2 = p[i].y;
+		}
 	}
 
-	FillPolygon0(npoints, points);
+	Translate(xp, yp);
+	FillPolygon0(p, npoints, x1, y1, x2, y2);
+	Translate(-xp, -yp);
 #endif
 }
 
@@ -1304,7 +1225,7 @@ void Graphics::FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor,
 
 	while (wp > 0 && hp > 0) {
 		UpdateGradientColor(scolor, dcolor, height, hp);
-		FillArc(xp, yp, wp, hp, 0, 360);
+		FillArc(xp, yp, wp, hp, 0, 2*M_PI);
 
 		xp += 1;
 		yp += 1;
@@ -1372,7 +1293,7 @@ void Graphics::FillVerticalGradient(int xp, int yp, int wp, int hp, Color &scolo
 	Color color = GetColor();
 
 	for (int i=0; i<h; i++) {
-		UpdateGradientColor(scolor, dcolor, w, i);
+		UpdateGradientColor(scolor, dcolor, h, i);
 		surface->DrawLine(surface, x, y+i, x+w-1, y+i);
 	}
 
@@ -2154,28 +2075,7 @@ void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhor
 	jregion_t clip = GetClip();
 
 	if (clipped == true) {
-		int cx = xp,
-				cy = yp,
-				cw = wp,
-				ch = hp;
-
-		if (cx > clip.width) {
-			cx = clip.width;
-		}
-
-		if (cy > clip.height) {
-			cy = clip.height;
-		}
-
-		if (cw > (clip.width-cx)) {
-			cw = clip.width-cx;
-		}
-
-		if (ch > (clip.height-cy)) {
-			ch = clip.height-cy;
-		}
-
-		SetClip(cx, cy, cw, ch);
+		ClipRect(xp, yp, wp, hp);
 	}
 	
 	if (halign == JHA_JUSTIFY) {
@@ -2360,8 +2260,8 @@ void Graphics::SetRGB(uint32_t argb, int xp, int yp)
 		return;
 	}
 
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int x = SCALE_TO_SCREEN((xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((yp), _screen.height, _scale.height);
 
 	int r = (argb >> 0x10) & 0xff,
 			g = (argb >> 0x08) & 0xff,
@@ -2481,43 +2381,7 @@ void Graphics::Reset()
 	SetPorterDuffFlags(JPF_SRC_OVER);
 }
 
-void Graphics::Lock()
-{
-	graphics_mutex.Lock();
-}
-
-void Graphics::Unlock()
-{
-	graphics_mutex.Unlock();
-}
-
 #ifdef DIRECTFB_UI
-void Graphics::InsertEdge(edge_t *list, edge_t *edge)
-{
-	jcommon::Object::SetClassName("jgui::Graphics");
-
-	if (list == NULL || edge == NULL) {
-		return;
-	}
-
-	edge_t *p;
-	edge_t *q = list;
-
-	p = q->next;
-
-	while (p != NULL) {
-		if (edge->xIntersect < p->xIntersect) {
-			p = NULL;
-		} else {
-			q = p;
-			p = p->next;
-		}
-	}
-
-	edge->next=q->next;
-	q->next=edge;
-}
-
 int Graphics::CalculateGradientChannel(int schannel, int dchannel, int distance, int offset) 
 {
 	if (schannel == dchannel) {
@@ -2537,366 +2401,61 @@ void Graphics::UpdateGradientColor(Color &scolor, Color &dcolor, int distance, i
 	SetColor((a << 24) | (r << 16) | (g << 8) | (b << 0));
 }
 
-void Graphics::MakeEdgeRec(struct jpoint_t lower, struct jpoint_t upper, int yComp, edge_t *edge, edge_t *edges[])
+void Graphics::FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int y1p, int x2p, int y2p)
 {
-	edge->dxPerScan = ((double)(upper.x-lower.x)/(double)(upper.y-lower.y));
-	edge->xIntersect = lower.x;
+	int xnew,
+			ynew,
+			xold,
+			yold,
+			x1,
+			y1,
+			x2,
+			y2,
+			inside;
 
-	if(upper.y<yComp) {
-		edge->yUpper = (upper.y-1);
-	} else {
-		edge->yUpper = upper.y;
-	}
-
-	InsertEdge(edges[(int)lower.y], edge);
-}
-
-void Graphics::FillScan(int scan, edge_t *active)
-{
-	if (active == NULL) {
+	if (npoints < 3) {
 		return;
 	}
 
-	edge_t *p1,
-				 *p2;
-	int count;
+	uint32_t color = _color.GetARGB();
 
-	p1 = active->next;
+	for (int x=x1p; x<x2p; x++) {
+		for (int y=y1p; y<y2p; y++) {
+			inside = 0;
 
-	while (p1 != NULL) {
-		p2 = p1->next;
+			xold = points[npoints-1].x;
+			yold = points[npoints-1].y;
 
-		for (count=(int)p1->xIntersect; p2!=NULL && count<=(int)p2->xIntersect; count++) {
-			surface->DrawLine(surface, count, scan, count, scan);
-		}
+			for (int i=0; i<npoints; i++) {
+				xnew = points[i].x;
+				ynew = points[i].y;
 
-		if (p2 != NULL) {
-			p1=p2->next;
-		} else {
-			break;
-		}
-	}
-}
+				if (xnew > xold) {
+					x1 = xold;
+					x2 = xnew;
+					y1 = yold;
+					y2 = ynew;
+				} else {
+					x1 = xnew;
+					x2 = xold;
+					y1 = ynew;
+					y2 = yold;
+				}
 
-int Graphics::YNext(int k, int cnt, jpoint_t pts[])
-{
-	int j;
+				// edge "open" at one end
+				if ((xnew < x) == (x <= xold) && ((long)y-(long)y1)*(long)(x2-x1) < ((long)y2-(long)y1)*(long)(x-x1)) {
+					inside = !inside;
+				}
 
-	if ((k+1) > (cnt-1)) {
-		j = 0;
-	} else {
-		j = (k+1);
-	}
-
-	while (pts[k].y == pts[j].y) {
-		if ((j+1) > (cnt-1)) {
-			j = 0;
-		} else {
-			j++;
-		}
-	}
-
-	return pts[j].y;
-}
-
-
-void Graphics::BuildEdgeList(int cnt, jpoint_t pts[], edge_t *edges[])
-{
-	edge_t *edge;
-	jpoint_t v1,
-					 v2;
-
-	int yPrev = (pts[cnt-2].y);
-	int count;
-
-	v1.x = pts[cnt-1].x;
-	v1.y = pts[cnt-1].y;
-
-	for (count=0; count<cnt; count++) {
-		v2 = pts[count];
-
-		if (v1.y != v2.y) {
-			edge = (edge_t *) malloc (sizeof(edge_t));
-
-			if (v1.y<v2.y) {
-				MakeEdgeRec(v1, v2, YNext(count,cnt,pts), edge,edges);
-			} else {
-				MakeEdgeRec(v2, v1, yPrev, edge, edges);
+				xold = xnew;
+				yold = ynew;
 			}
-		}
 
-		yPrev = v1.y;
-		v1 = v2;
-	}
-
-}
-
-void Graphics::UpdateActiveList(int scan, edge_t *active)
-{
-	edge_t *q = active,
-				 *p = active->next,
-				 *tmp;
-
-	while (p) {
-		if (scan >= p->yUpper) {
-			p = p->next;
-
-			tmp = q->next;
-			q->next = tmp->next;
-
-			free(tmp);
-		} else {
-			p->xIntersect = (p->xIntersect+p->dxPerScan);
-			q = p;
-			p = p->next;
-		}
-	}
-}
-
-void Graphics::FillPolygon0(int n, int ppts[])
-{
-	const int max_points = 10*1024;
-
-	struct edge_t *edges[max_points],
-								*active;
-	int count_1,
-			count_2,
-			count_3;
-
-	jpoint_t *pts = new jpoint_t[n];
-
-	for (count_1=0; count_1<n; count_1++) {
-		pts[count_1].x = (ppts[(count_1*2)]);
-		pts[count_1].y = (ppts[((count_1*2)+1)]);
-	}
-
-	for (count_2=0; count_2<max_points; count_2++) {
-		edges[count_2] = new edge_t;
-		edges[count_2]->next = NULL;
-	}
-
-	BuildEdgeList(n, pts, edges);
-
-	active = new edge_t;
-	active->next = NULL;
-
-	for (count_3=0; count_3<max_points; count_3++) {
-		// build active list
-		edge_t *p,
-					 *q;
-
-		p=edges[count_3]->next;
-
-		while(p) {
-			q = p->next;
-
-			InsertEdge(active, p);
-
-			p = q;
-		}
-
-		if (active->next) {
-			FillScan(count_3, active);
-			UpdateActiveList(count_3, active);
-
-			// resort active list
-			edge_t *q,
-						 *p = active->next;
-
-			active->next = NULL;
-
-			while (p) {
-				q = p->next;
-
-				InsertEdge(active, p);
-
-				p = q;
+			if (inside != 0) {
+				SetPixel(x, y, color);
 			}
 		}
 	}
-
-	// draw edges
-	/*
-	if (n >= 2) {
-		surface->DrawLine(surface, ppts[0], ppts[1], ppts[2], ppts[3]);
-
-		for (int count=1; count<(n-1); count++) {
-			surface->DrawLine(surface, ppts[(count*2)], ppts[((count*2)+1)], ppts[((count+1)*2)], ppts[(((count+1)*2)+1)]);
-		}
-	}
-	*/
-
-	for (count_2=0; count_2<max_points; count_2++) {
-		delete edges[count_2];
-	}
-
-	delete [] pts;
-}
-
-Vector2d::Vector2d(double x, double y)
-{
-	SetXY(x,y);
-}
-
-double Vector2d::GetX() const 
-{ 
-	return mX; 
-}
-
-double Vector2d::GetY() const 
-{
-	return mY; 
-}
-
-void  Vector2d::SetXY(double x, double y)
-{
-	mX = x;
-	mY = y;
-}
-
-bool Triangulate::Snip(const Vector2dVector &contour, int u, int v, int w, int n, int *V)
-{
-	double Ax, Ay, Bx, By, Cx, Cy, Px, Py;
-	int p;
-
-	Ax = contour[V[u]].GetX();
-	Ay = contour[V[u]].GetY();
-
-	Bx = contour[V[v]].GetX();
-	By = contour[V[v]].GetY();
-
-	Cx = contour[V[w]].GetX();
-	Cy = contour[V[w]].GetY();
-
-	if (EPSILON > (((Bx-Ax)*(Cy-Ay))-((By-Ay)*(Cx-Ax)))) {
-		return false;
-	}
-
-	for (p=0;p<n;p++)
-	{
-		if( (p == u) || (p == v) || (p == w) ) continue;
-		Px = contour[V[p]].GetX();
-		Py = contour[V[p]].GetY();
-		if (InsideTriangle(Ax,Ay,Bx,By,Cx,Cy,Px,Py)) return false;
-	}
-
-	return true;
-}
-
-bool Triangulate::Process(const Vector2dVector &contour, Vector2dVector &result)
-{
-	// allocate and initialize list of Vertices in polygon
-	int n = contour.size();
-
-	if (n < 3) {
-		return false;
-	}
-
-	int *V = new int[n];
-
-	// we want a counter-clockwise polygon in V 
-	if ( 0.0f < Area(contour) )
-		for (int v=0; v<n; v++) V[v] = v;
-	else
-		for(int v=0; v<n; v++) V[v] = (n-1)-v;
-
-	int nv = n;
-
-	//  remove nv-2 Vertices, creating 1 triangle every time 
-	int count = 2*nv;
-
-	for(int m=0, v=nv-1; nv>2; ) {
-		// if we loop, it is probably a non-simple polygon 
-		if (0 >= (count--)) {
-			// Triangulate: ERROR - probable bad polygon!
-			return false;
-		}
-
-		// three consecutive vertices in current polygon, <u,v,w> 
-		int u = v  ; if (nv <= u) u = 0;	// previous 
-		v = u+1; if (nv <= v) v = 0;		// new v    
-		int w = v+1; if (nv <= w) w = 0;	// next     
-
-		if ( Snip(contour,u,v,w,nv,V) ) {
-			int a,b,c,s,t;
-
-			// true names of the vertices 
-			a = V[u]; b = V[v]; c = V[w];
-
-			// output Triangle 
-			result.push_back( contour[a] );
-			result.push_back( contour[b] );
-			result.push_back( contour[c] );
-
-			m++;
-
-			// remove v from remaining polygon 
-			for(s=v,t=v+1;t<nv;s++,t++) V[s] = V[t]; nv--;
-
-			// resest error detection counter 
-			count = 2*nv;
-		}
-	}
-
-	delete V;
-
-	return true;
-}
-
-double Triangulate::Area(const Vector2dVector &contour)
-{
-	double A = 0.0f;
-	int n = contour.size();
-
-	for(int p=n-1,q=0; q<n; p=q++) {
-		A+= contour[p].GetX()*contour[q].GetY() - contour[q].GetX()*contour[p].GetY();
-	}
-
-	return A*0.5f;
-}
-
-bool Triangulate::InsideTriangle(double p1x, double p1y, double p2x, double p2y, double p3x, double p3y, double px, double py)
-{
-	double ax, 
-				 ay, 
-				 bx, 
-				 by, 
-				 cx, 
-				 cy, 
-				 apx, 
-				 apy, 
-				 bpx, 
-				 bpy, 
-				 cpx, 
-				 cpy,
-				 cCROSSap, 
-				 bCROSScp, 
-				 aCROSSbp;
-
-	ax = p3x - p2x; ay = p3y - p2y;
-	bx = p1x - p3x; by = p1y - p3y;
-	cx = p2x - p1x; cy = p2y - p1y;
-	apx = px - p1x; apy = py - p1y;
-	bpx = px - p2x; bpy = py - p2y;
-	cpx = px - p3x; cpy = py - p3y;
-
-	aCROSSbp = ax*bpy - ay*bpx;
-	cCROSSap = cx*apy - cy*apx;
-	bCROSScp = bx*cpy - by*cpx;
-
-	return ((aCROSSbp >= 0.0f) && (bCROSScp >= 0.0f) && (cCROSSap >= 0.0f));
-}
-
-bool Triangulate::InsideTriangle(int p1x, int p1y, int p2x, int p2y, int p3x, int p3y, int px, int py)
-{
-	// A(PP1P2) + A(PP2P3) + A(PP3P1) > A(P1P2P3) is out
-
-	int area1 = abs(px*p1y+p2x*py+p1x*p2y-p2x*p1y-px*p2y-p1x*py),
-			area2 = abs(px*p3y+p2x*py+p3x*p2y-p2x*p3y-px*p2y-p3x*py),
-			area3 = abs(px*p1y+p3x*py+p1x*p3y-p3x*p1y-px*p3y-p1x*py),
-			areat = abs(p3x*p1y+p2x*p3y+p1x*p2y-p2x*p1y-p3x*p2y-p1x*py);
-
-	return (area1+area2+area3) <= areat;
 }
 
 double Graphics::EvaluateBezier0(double *data, int ndata, double t) 

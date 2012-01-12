@@ -295,16 +295,14 @@ void FlowLayout::DoLayout(Container *target)
 			m->SetSize(psize.width, psize.height);
 
 			if (useBaseline) {
-				/* WARN:: implementar
-					 int baseline = m->GetBaseline(psize.width, psize.height);
+				int baseline = m->GetBaseline(psize.width, psize.height);
 
-					 if (baseline >= 0) {
-					 ascent[i] = baseline;
-					 descent[i] = d.height - baseline;
-					 } else {
-					 ascent[i] = -1;
-					 }
-					 */
+				if (baseline >= 0) {
+					ascent[i] = baseline;
+					descent[i] = psize.height - baseline;
+				} else {
+					ascent[i] = -1;
+				}
 			}
 
 			if ((x == 0) || ((x + psize.width) <= maxwidth)) {

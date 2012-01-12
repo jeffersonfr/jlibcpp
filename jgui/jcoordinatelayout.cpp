@@ -71,6 +71,20 @@ jcoordinate_layout_t CoordinateLayout::GetType()
 	return _type;
 }
 
+jsize_t CoordinateLayout::GetMinimumLayoutSize(Container *parent)
+{
+	jsize_t t = {0, 0};
+
+	return t;
+}
+
+jsize_t CoordinateLayout::GetMaximumLayoutSize(Container *parent)
+{
+	jsize_t t = {INT_MAX, INT_MAX};
+
+	return t;
+}
+
 jsize_t CoordinateLayout::GetPreferredSize(Container *target) 
 {
 	if ((void *)target == NULL) {

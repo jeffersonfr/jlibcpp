@@ -43,19 +43,9 @@ Button::~Button()
 {
 }
 
-void Button::SetName(std::string name)
-{
-	_name = name;
-}
-
 void Button::SetLabel(std::string label)
 {
 	_label = label;
-}
-
-std::string Button::GetName()
-{
-	return _name;
 }
 
 std::string Button::GetLabel()
@@ -97,7 +87,7 @@ bool Button::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
@@ -115,11 +105,7 @@ bool Button::ProcessEvent(MouseEvent *event)
 
 bool Button::ProcessEvent(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
@@ -131,7 +117,7 @@ bool Button::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
 void Button::Paint(Graphics *g)
@@ -185,8 +171,6 @@ void Button::Paint(Graphics *g)
 
 		g->DrawString(text, px, py, pw, ph, _halign, _valign);
 	}
-
-	PaintBorderEdges(g);
 }
 
 void Button::RegisterButtonListener(ButtonListener *listener)

@@ -21,6 +21,7 @@
 #include "jwindow.h"
 #include "jwindowmanager.h"
 #include "jthememanager.h"
+#include "jsemaphore.h"
 
 namespace jgui {
 
@@ -161,7 +162,7 @@ void Window::SetWorkingScreenSize(int width, int height)
 
 	Container::SetWorkingScreenSize(width, height);
 
-	InnerCreateWindow();
+	InternalCreateWindow();
 }
 
 void Window::SetVisible(bool b)
@@ -178,8 +179,6 @@ void Window::SetVisible(bool b)
 void Window::SetCursor(jcursor_style_t t)
 {
 	_cursor = t;
-
-	GFXHandler::GetInstance()->SetCursor(_cursor);
 }
 
 jcursor_style_t Window::GetCursor()
@@ -187,7 +186,7 @@ jcursor_style_t Window::GetCursor()
 	return _cursor;
 }
 
-void Window::InnerCreateWindow(void *params)
+void Window::InternalCreateWindow(void *params)
 {
 #ifdef DIRECTFB_UI
 	jthread::AutoLock lock(&_window_mutex);
@@ -289,6 +288,8 @@ void Window::PutBelow(Window *w)
 
 void Window::SetBounds(int x, int y, int w, int h)
 {
+	jthread::AutoLock lock(&_window_mutex);
+
 	if (_location.x == x && _location.y == y && _size.width == w && _size.height == h) {
 		return;
 	}
@@ -325,7 +326,7 @@ void Window::SetBounds(int x, int y, int w, int h)
 	}
 #endif
 	
-	DoLayout();
+	Repaint();
 
 	DispatchWindowEvent(new WindowEvent(this, JWT_MOVED));
 	DispatchWindowEvent(new WindowEvent(this, JWT_RESIZED));
@@ -464,7 +465,7 @@ void Window::SetSize(int width, int height)
 	}
 #endif
 	
-	DoLayout();
+	Repaint();
 
 	DispatchWindowEvent(new WindowEvent(this, JWT_RESIZED));
 }
@@ -524,189 +525,49 @@ int Window::GetOpacity()
 
 void Window::SetUndecorated(bool b)
 {
-	_undecorated = b;
+	_is_undecorated = b;
 
 	Repaint();
 }
 
-void Window::Repaint(bool all)
+void Window::Repaint()
 {
 	jthread::AutoLock lock(&_window_mutex);
-
-	if (_ignore_repaint == true) {
-		return;
-	}
-
-	if (_is_visible == false) {
-		return;
-	}
-
-	if (_graphics == NULL) {
+	
+	if (_graphics == NULL || _is_visible == false || _is_ignore_repaint == true) {
 		return;
 	}
 
 	InvalidateAll();
 
-	_graphics->Lock();
+	jpoint_t t = _graphics->Translate();
+
+	_graphics->Translate(-t.x, -t.y);
+
 	_graphics->ReleaseClip();
 	
-	// CHANGE:: corrigir a limpeza da tela
-	if (_background_visible == false) {
-		_graphics->SetDrawingFlags(JDF_NOFX);
-		_graphics->Clear();
-	}
-
-	_graphics->Reset();
+	// TODO:: DoLayout();
 
 	Paint(_graphics);
-
+	
 	_graphics->Flip();
-	_graphics->Unlock();
 
 	Revalidate();
 
 	DispatchWindowEvent(new WindowEvent(this, JWT_PAINTED));
 }
 
-void Window::Repaint(int x, int y, int width, int height)
+void Window::PaintBackground(Graphics *g)
 {
-	Repaint(true);
-}
+	g->SetDrawingFlags(JDF_NOFX);
+		
+	// g->Clear();
 
-void Window::Repaint(Component *c)
-{
-	jthread::AutoLock lock(&_window_mutex);
-
-	if (_ignore_repaint == true) {
-		return;
-	}
-
-	if (_graphics == NULL) {
-		return;
-	}
-
-	if (c == NULL) {
-		return;
-	}
-
-	Component *c1 = NULL,
-						*c2 = NULL;
-
-	if (_optimized_paint == false) {
-		std::vector<jgui::Component *> collisions;
-
-		collisions.push_back(c);
-
-		{
-			jthread::AutoLock lock(&_container_mutex);
-			
-			for (std::vector<jgui::Component *>::iterator i=std::find(_components.begin(), _components.end(), c); i!=_components.end(); i++) {
-				c1 = (*i);
-
-				if (c1->IsVisible() == true) {
-					int x1 = c1->GetX()-_scroll.x,
-							y1 = c1->GetY()-_scroll.y,
-							w1 = c1->GetWidth(),
-							h1 = c1->GetHeight();
-
-					if ((x1 < _size.width && (x1+w1) > 0) && (y1 < _size.height && (y1+h1) > 0)) {
-						for (std::vector<jgui::Component *>::iterator j=collisions.begin(); j!=collisions.end(); j++) {
-							c2 = (*j);
-
-							if (Intersect(c1, c2) == true) {
-								c1->Invalidate();
-
-								collisions.push_back(c1);
-
-								break;
-							}
-						}
-					}
-				}
-			}
-
-			collisions.clear();
-
-			for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-				if ((*i)->IsVisible() == true && (*i)->IsValid() == false) {
-					collisions.push_back((*i));
-				}
-			}
-		}
-
-		jpoint_t translate;
-		int x,
-				y,
-				w,
-				h;
-
-		_graphics->Lock();
-			
-		for (std::vector<jgui::Component *>::iterator i=collisions.begin(); i!=collisions.end(); i++) {
-			c1 = (*i);
-
-			x = c1->GetX()-_scroll.x;
-			y = c1->GetY()-_scroll.y;
-			w = c1->GetWidth();
-			h = c1->GetHeight();
-
-			translate = _graphics->Translate();
-			
-			_graphics->Reset();
-			_graphics->Translate(x, y);
-			_graphics->SetClip(0, 0, w, h);
-			c1->Paint(_graphics);
-			_graphics->ReleaseClip();
-			_graphics->Translate(-x, -y);
-			
-			// _graphics->Flip(translate.x+x, translate.y+y, w, h);
-			
-			c1->Revalidate();
-		}
-			
-		_graphics->Flip(c->GetX()-_scroll.x, c->GetY()-_scroll.y, c->GetWidth(), c->GetHeight());
-
-		_graphics->Unlock();
-	} else {
-		c1 = c;
-
-		if (c1->IsVisible() == true) {
-			jpoint_t translate;
-			int x = c1->GetX()-_scroll.x,
-					y = c1->GetY()-_scroll.y,
-					w = c1->GetWidth(),
-					h = c1->GetHeight();
-
-			if ((x < _size.width && (x+w) > 0) && (y < _size.height && (y+h) > 0)) {
-				_graphics->Lock();
-
-				translate = _graphics->Translate();
-
-				_graphics->Reset();
-				_graphics->Translate(x, y);
-				_graphics->SetClip(0, 0, w, h);
-
-				c1->Paint(_graphics);
-				
-				// _graphics->Flip(translate.x+x, translate.y+y, w, h);
-
-				_graphics->ReleaseClip();
-				_graphics->Translate(-x, -y);
-				
-				_graphics->Flip(translate.x+x, translate.y+y, w, h);
-
-				_graphics->Unlock();
-				
-				c1->Revalidate();
-			}
-		}
-	}
+	Container::PaintBackground(g);
 }
 
 void Window::Paint(Graphics *g)
 {
-	g->SetDrawingFlags(JDF_NOFX);
-
 	Container::Paint(g);
 }
 
@@ -716,7 +577,7 @@ bool Window::Show(bool modal)
 
 #ifdef DIRECTFB_UI
 	if (_window == NULL) {
-		InnerCreateWindow();
+		InternalCreateWindow();
 	}
 	
 	if (_window != NULL) {
@@ -859,6 +720,10 @@ std::vector<WindowListener *> & Window::GetWindowListeners()
 
 void Window::ThemeChanged(ThemeEvent *event)
 {
+	if (IsThemeEnabled() == false) {
+		return;
+	}
+
 	SetIgnoreRepaint(true);
 
 	Theme *theme = event->GetTheme();

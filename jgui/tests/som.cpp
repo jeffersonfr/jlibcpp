@@ -84,7 +84,6 @@ class som : public jgui::Frame, public jthread::Thread {
 		{
 			kohonenInit();
 
-			SetMoveEnabled(true);
 			SetResizeEnabled(true);
 		}
 

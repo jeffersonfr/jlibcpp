@@ -115,6 +115,18 @@ class MouseEvent : public jcommon::EventObject{
 		 */
 		virtual int GetY();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetX(int x);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetY(int y);
+
 };
 
 }

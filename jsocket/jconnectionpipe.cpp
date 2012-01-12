@@ -21,7 +21,7 @@
 #include "jconnectionpipe.h"
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
-#include "jsocketstreamexception.h"
+#include "jioexception.h"
 
 namespace jsocket {
 
@@ -73,7 +73,7 @@ ConnectionPipe::~ConnectionPipe()
 int ConnectionPipe::Receive(char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 #ifdef _WIN32
@@ -87,9 +87,9 @@ int ConnectionPipe::Receive(char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Send timeout exception");
+		throw SocketException("Connection parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket send timeout exception");
+		throw SocketTimeoutException("Socket read timeout exception");
 	} else {
 	    if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLOUT)) {
 			return ConnectionPipe::Receive(data_, size_);
@@ -103,7 +103,7 @@ int ConnectionPipe::Receive(char *data_, int size_, int time_)
 int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	int r = 0;
@@ -112,7 +112,7 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 	ReadFile(_pipe[0], data_, size_, (DWORD *)&r, 0);
 
 	if (r <= 0) {
-		throw SocketStreamException("Socket broken pipe");
+		throw jio::IOException("Broken pipe exception");
 	}
 #else
 	char *c = data_;
@@ -123,7 +123,7 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 		if (errno == EAGAIN) {
 			return -1;
 		} else {
-			throw SocketStreamException("Socket broken pipe");
+			throw jio::IOException("Broken pipe exception");
 		}
 	}
 #endif
@@ -136,7 +136,7 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 int ConnectionPipe::Send(const char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 
 #ifdef _WIN32
@@ -150,7 +150,7 @@ int ConnectionPipe::Send(const char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Send timeout exception");
+		throw SocketException("Connection parameters exception");
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket send timeout exception");
 	} else {
@@ -166,7 +166,7 @@ int ConnectionPipe::Send(const char *data_, int size_, int time_)
 int ConnectionPipe::Send(const char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	int n = 0;
@@ -178,7 +178,7 @@ int ConnectionPipe::Send(const char *data_, int size_, bool block_)
 #endif
 	
 	if (n < 0) {
-		throw SocketStreamException("Socket broken pipe");
+		throw jio::IOException("Broken pipe exception");
 	}
 	
 	return n;

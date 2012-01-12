@@ -272,7 +272,7 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 			}
 		}
 
-		virtual void InputReceived(jgui::KeyEvent *event)
+		virtual bool ProcessEvent(jgui::KeyEvent *event)
 		{
 			if (event->GetType() == jgui::JKT_PRESSED) {
 				if (ingame) {
@@ -296,6 +296,8 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 			} else if (event->GetType() == jgui::JKT_RELEASED) {
 				fast = false;
 			}
+
+			return true;
 		}
 
 		virtual void Paint(jgui::Graphics *g)

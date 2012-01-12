@@ -41,7 +41,6 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 			minutes = date.GetMinute();
 			seconds = date.GetSecond();
 
-			SetMoveEnabled(true);
 			SetResizeEnabled(true);
 
 			_flag = true;

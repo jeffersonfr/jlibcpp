@@ -61,9 +61,7 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::T
 		jthread::Mutex _key_mutex;
 
 		std::vector<KeyboardListener *> _keyboard_listeners;
-		std::vector<Button *> _buttons;
 		TextArea *display;
-		Component *_current_button;
 
 		jkeyboard_type_t _type;
 		std::string _text;
@@ -170,7 +168,7 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::T
 		 * \brief
 		 *
 		 */
-		virtual void InputReceived(jgui::KeyEvent *event);
+		virtual bool ProcessEvent(jgui::KeyEvent *event);
 		
 		/**
 		 * \brief

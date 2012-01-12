@@ -50,16 +50,17 @@ class TextComponent : public jgui::Component{
 
 	protected:
 		std::vector<TextListener *> _text_listeners;
+		Color _caret_color;
 		jhorizontal_align_t _halign;
 		jvertical_align_t _valign;
 		jcaret_type_t _caret_type;
 		std::string _text;
 		int _caret_position,
-				_selection_start,
-				_selection_end,
-				_max_text_length;
+			_selection_start,
+			_selection_end,
+			_max_text_length;
 		bool _is_editable,
-				 _caret_visible;
+			 _caret_visible;
 		char _echo_char;
 
 	public:
@@ -74,6 +75,24 @@ class TextComponent : public jgui::Component{
 		 *
 		 */
 		virtual ~TextComponent();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Color & GetCaretColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCaretColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCaretColor(const Color &color);
 		
 		/**
 		 * \brief

@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "jlistbox.h"
 #include "jdebug.h"
+#include "joutofboundsexception.h"
 
 namespace jgui {
 
@@ -28,14 +29,10 @@ ListBox::ListBox(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::ListBox");
 
+	_item_gap = 4;
 	_pressed = false;
-	_scroll_width = 30;
 	_item_size = DEFAULT_ITEM_SIZE;
-	_stone_size = _item_size;
-	_centered_interaction = true;
-	_top_index = 0;
 	_selected_index = -1;
-	_scroll = JLS_BAR;
 	_selection = JLM_NONE_SELECTION;
 
 	SetFocusable(true);
@@ -43,34 +40,6 @@ ListBox::ListBox(int x, int y, int width, int height):
 
 ListBox::~ListBox() 
 {
-}
-
-int ListBox::GetStoneSize()
-{
-	return _stone_size;
-}
-
-void ListBox::SetStoneSize(int size)
-{
-	_stone_size = size;
-
-	Repaint();
-}
-
-void ListBox::SetCenteredInteraction(bool b)
-{
-	_centered_interaction = b;
-}
-
-int ListBox::GetVisibleItems()
-{
-	int visible_items = (_size.height-2*(_vertical_gap+_border_size)+_vertical_gap)/(_item_size+_vertical_gap);
-
-	if (visible_items < 1) {
-		visible_items = 1;
-	}
-
-	return visible_items;
 }
 
 void ListBox::SetSelectionType(jlistbox_mode_t type)
@@ -143,15 +112,6 @@ void ListBox::SetItemSize(int size)
 	Repaint();
 }
 
-void ListBox::SetScrollType(jlistbox_scroll_t type)
-{
-	jthread::AutoLock lock(&_component_mutex);
-
-	_scroll = type;
-
-	Repaint();
-}
-
 void ListBox::SetForegroundColor(int red, int green, int blue, int alpha)
 {
 	SetItemForegroundColor(red, green, blue, alpha);
@@ -164,61 +124,15 @@ void ListBox::SetForegroundFocusColor(int red, int green, int blue, int alpha)
 
 void ListBox::SetCurrentIndex(int i)
 {
-	int visible_items = GetVisibleItems();
-
-	if (i < 0) {
-		i = 0;
+	if (i < 0 || i >= (int)_items.size()) {
+		throw jcommon::OutOfBoundsException("Index out of bounds exception");
 	}
 
-	if (_centered_interaction == true) {
-		if (i >= (int)_items.size()) {
-			if (_items.size() > 0) {
-				i = _items.size()-1;
-			} else {
-				i = 0;
-			}
-		}
+	jthread::AutoLock lock(&_component_mutex);
 
-		if (_index != i) {
-			{
-				jthread::AutoLock lock(&_component_mutex);
+	_index = i;
 
-				_index = i;
-			}
-
-			Repaint();
-		}
-	} else {
-		if (i >= (int)_items.size()) {
-			i = 0;
-		}
-
-		if (_index != i) {
-			{
-				jthread::AutoLock lock(&_component_mutex);
-
-				_index = i;
-
-				if (_index >= (int)_items.size()) {
-					_index = 0;
-				}
-
-				if (_index < _top_index) {
-					_top_index = _index;
-				}
-
-				if (_index >= (_top_index + visible_items)) {
-					_top_index = _index-visible_items+1;
-
-					if (_top_index < 0) {
-						_top_index = 0;
-					}
-				}
-			}
-
-			Repaint();
-		}
-	}
+	Repaint();
 }
 
 bool ListBox::IsSelected(int i)
@@ -297,6 +211,16 @@ void ListBox::Deselect(int i)
 	}
 }
 
+int ListBox::GetItemGap()
+{
+	return _item_gap;
+}
+
+void ListBox::SetItemGap(int gap)
+{
+	_item_gap = gap;
+}
+
 int ListBox::GetSelectedIndex()
 {
 	return _selected_index;
@@ -307,7 +231,7 @@ jsize_t ListBox::GetPreferredSize()
 	jsize_t t;
 
 	t.width = _size.width;
-	t.height = 2*(_vertical_gap+_border_size)+_items.size()*(_item_size+_vertical_gap)-_vertical_gap;
+	t.height = 2*(_vertical_gap+_border_size)+_items.size()*(_item_size+_item_gap)-_item_gap;
 
 	return t;
 }
@@ -318,53 +242,19 @@ bool ListBox::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
-	double diff = (_size.height-2*(_vertical_gap+_border_size)-4*(_scroll_width-2))/(double)(_items.size()-1);
-
-	int x1 = event->GetX(),
-			y1 = event->GetY();
+	// int x1 = event->GetX(),
+	//		y1 = event->GetY();
 
 	bool catched = false;
 
 	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
-		catched = true;
-
 		RequestFocus();
-		
-		if (_scroll == JLS_BAR) {
-			if (x1 > (_location.x+_size.width-_scroll_width-_horizontal_gap+_border_size) && x1 < (_location.x+_size.width-_horizontal_gap+_border_size)) {
-				_pressed = false;
 
-				if (y1 < (_location.y+_vertical_gap+_border_size+_scroll_width+diff*_index)) {
-					if (y1 < (_location.y+_vertical_gap+_border_size+_scroll_width)) {
-						PreviousItem();
-					} else {
-						PreviousItem();
-					}
-				} else if (y1 > (_location.y+_vertical_gap+_border_size+_scroll_width+diff*_index+_stone_size)) {
-					if (y1 > (_location.y+_size.height-_vertical_gap-_border_size-_scroll_width)) {
-						NextItem();
-					} else {
-						NextItem();
-					}
-				} else {
-					_pressed = true;
-				}
-			}
-		}
-	} else if (event->GetType() == JME_MOVED) {
-		if (_pressed == true) {
-			if (y1 < (_location.y+_item_size/2+diff*_index+_vertical_gap+_border_size)) {
-				PreviousItem();
-			} else if (y1 > (_location.y+_item_size/2+diff*_index+_vertical_gap+_border_size+_scroll_width)) {
-				NextItem();
-			}
-		}
-	} else {
-		_pressed = false;
+		catched = true;
 	}
 
 	return catched;
@@ -372,25 +262,37 @@ bool ListBox::ProcessEvent(MouseEvent *event)
 
 bool ListBox::ProcessEvent(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
-	bool catched = false;
-
 	jkeyevent_symbol_t action = event->GetSymbol();
 
-	if (action == JKS_CURSOR_UP || action == JKS_PAGE_UP) {
-		PreviousItem();
+	bool catched = false;
+
+	if (action == JKS_CURSOR_UP) {
+		IncrementLines(1);
 		
 		catched = true;
-	} else if (action == JKS_CURSOR_DOWN || action == JKS_PAGE_DOWN) {
-		NextItem();
+	} else if (action == JKS_PAGE_UP) {
+		IncrementLines((_size.height-2*(_border_size+_vertical_gap))/(_item_size+_item_gap));
+		
+		catched = true;
+	} else if (action == JKS_CURSOR_DOWN) {
+		DecrementLines(1);
 
+		catched = true;
+	} else if (action == JKS_PAGE_DOWN) {
+		DecrementLines((_size.height-2*(_border_size+_vertical_gap))/(_item_size+_item_gap));
+
+		catched = true;
+	} else if (action == JKS_HOME) {
+		IncrementLines(_items.size());
+		
+		catched = true;
+	} else if (action == JKS_END) {
+		DecrementLines(_items.size());
+		
 		catched = true;
 	} else if (action == JKS_ENTER) {
 		SetSelected(_index);
@@ -402,7 +304,7 @@ bool ListBox::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
 void ListBox::Paint(Graphics *g)
@@ -411,32 +313,16 @@ void ListBox::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int position,
-			visible_items = GetVisibleItems();
-
-	if (_centered_interaction == true) {
-		position = _index-visible_items/2;
-	} else {
-		position = _top_index;
-	}
-
-	if (position > (int)(_items.size()-visible_items)) {
-		position = (_items.size()-visible_items);
-	}
-
-	if (position < 0) {
-		position = 0;
-	}
-
+	jsize_t scroll_dimension = GetScrollDimension();
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0,
+			scrollw = (IsScrollableY() == true)?(_scroll_size+_scroll_gap):0;
 	int x = _horizontal_gap+_border_size,
 			y = _vertical_gap+_border_size,
-			w = _size.width-2*x,
-			h = _size.height-2*y;
-
-	int count = 0,
-			space = 4,
-			scroll_width = 0,
-			scroll_gap = 0;
+			w = _size.width-scrollw-2*x;
+			// h = _size.height-2*y;
+	int space = 4;
 
 	for (std::vector<jgui::Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
 		if ((*i)->GetType() == JMT_IMAGE) {
@@ -446,18 +332,11 @@ void ListBox::Paint(Graphics *g)
 		}
 	}
 
-	if ((int)_items.size() < visible_items) {
-		position = 0;
-	}
+	// TODO:: tentar ajeitar
+	x = x - scrollx;
+	y = y - scrolly;
 
-	if (_scroll == JLS_BAR) {
-		scroll_width = _scroll_width;
-		scroll_gap = 5;
-	}
-
-	int i;
-
-	for (i=position; count<visible_items+1 && i<(int)_items.size(); i++, count++) {
+	for (int i=0; i<(int)_items.size(); i++) {
 		g->SetColor(_item_color);
 
 		if (_index != i) {
@@ -474,27 +353,7 @@ void ListBox::Paint(Graphics *g)
 			g->SetColor(_focus_item_color);
 		}
 
-		if (count != visible_items) {
-			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, _item_size);
-		} else {
-			int ph = y+(_item_size+_vertical_gap)*count-y-h;
-
-			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, (ph>0)?ph-_vertical_gap:-ph);
-		} 
-
-		if (_index == i) {
-			g->SetColor(_focus_item_color);
-		
-			if (count != visible_items) {
-				g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, _item_size);
-			} else {
-				int ph = y+(_item_size+_vertical_gap)*count-y-h;
-
-				g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w-scroll_width-scroll_gap, (ph>0)?ph-_vertical_gap:-ph);
-			} 
-		}
-
-		g->SetColor(_item_color);
+		g->FillRectangle(x, y+(_item_size+_item_gap)*i, w, _item_size);
 
 		if (_selection == JLM_SINGLE_SELECTION) {
 			if (_selected_index == i) {
@@ -504,44 +363,15 @@ void ListBox::Paint(Graphics *g)
 			if (_items[i]->IsSelected() == true) {	
 				g->SetColor(_selected_item_color);
 			}
+		} else {
+			g->SetColor(_item_color);
 		}
 
 		if (_items[i]->GetType() == JMT_EMPTY) {
 		} else if (_items[i]->GetType() == JMT_TEXT) {
 		} else if (_items[i]->GetType() == JMT_IMAGE) {
 			if (_items[i]->GetImage() != NULL) {
-				if (count != visible_items) {
-					g->DrawImage(_items[i]->GetImage(), _horizontal_gap, y+(_item_size+_vertical_gap)*count, _item_size, _item_size);
-				} else {
-					jregion_t clip = g->GetClip();
-
-					int cx = x,
-							cy = y+(_item_size+_vertical_gap)*count,
-							cw = w-scroll_width-scroll_gap,
-							ch = ::abs(cy-y-h)-1;
-
-					if (cx > clip.width) {
-						cx = clip.width;
-					}
-
-					if (cy > clip.height) {
-						cy = clip.height;
-					}
-
-					if (cw > (clip.width-cx)) {
-						cw = clip.width-cx;
-					}
-
-					if (ch > (clip.height-cy)) {
-						ch = clip.height-cy;
-					}
-
-					g->SetClip(cx, cy, cw, ch);
-
-					g->DrawImage(_items[i]->GetImage(), _horizontal_gap, y+(_item_size+_vertical_gap)*count, _item_size, _item_size);
-		
-					g->SetClip(clip.x, clip.y, clip.width, clip.height);
-				}
+				g->DrawImage(_items[i]->GetImage(), _horizontal_gap, y+(_item_size+_item_gap)*i, _item_size, _item_size);
 			}
 		}
 
@@ -552,178 +382,95 @@ void ListBox::Paint(Graphics *g)
 				g->SetColor(_item_fgcolor);
 			}
 
-			int px = x+space,
-					py = y+(_item_size+_vertical_gap)*count,
-					pw = (w-space-4)-scroll_width-scroll_gap,
-					ph = _item_size-1;
-
-			x = (x < 0)?0:x;
-			y = (y < 0)?0:y;
-			w = (w < 0)?0:w;
-			h = (h < 0)?0:h;
-
-			px = (px < 0)?0:px;
-			py = (py < 0)?0:py;
-			pw = (pw < 0)?0:pw;
-			ph = (ph < 0)?0:ph;
-
 			std::string text = _items[i]->GetValue();
 
 			// if (_wrap == false) {
-				text = _font->TruncateString(text, "...", pw);
+				text = _font->TruncateString(text, "...", w-space);
 			// }
 
-			if (count != visible_items) {
-				g->DrawString(text, px, py, pw, ph, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
-			} else {
-				jregion_t clip = g->GetClip();
-
-				int cx = px,
-						cy = py,
-						cw = pw,
-						ch = ::abs(cy-y-h)-1;
-
-				if (cx > clip.width) {
-					cx = clip.width;
-				}
-
-				if (cy > clip.height) {
-					cy = clip.height;
-				}
-
-				if (cw > (clip.width-cx)) {
-					cw = clip.width-cx;
-				}
-
-				if (ch > (clip.height-cy)) {
-					ch = clip.height-cy;
-				}
-
-				// INFO:: weird clip
-				g->SetClip(cx, cy, cw, ch);
-				// g->SetClip(cx, cy, cw, cy+ch);
-
-				g->DrawString(text, px, py, pw, _item_size, _items[count]->GetHorizontalAlign(), _items[count]->GetVerticalAlign(), false);
-				// g->DrawString(text, px, py, pw, _item_size, _items[count]->GetHorizontalAlign(), _items[count]->GetVerticalAlign());
-
-				g->SetClip(clip.x, clip.y, clip.width, clip.height);
-			}
-		}
-	}
-
-	for (; count<visible_items+1; count++) {
-		int dy = y+(_item_size+_vertical_gap)*count;
-		
-		g->SetColor(_item_color);
-
-		if ((dy+_item_size) < (_size.height-dy)) {
-			g->FillRectangle(x, dy, w-scroll_width-scroll_gap, _item_size);
-		} else {
-			g->FillRectangle(x, dy, w-scroll_width-scroll_gap, ((dy-y-h)>0)?(dy-y-h)-_vertical_gap:-(dy-y-h));
-		}
-	}
-	
-	if (_scroll == JLS_BAR) {
-		Color color(0x80, 0x80, 0xe0, 0xff),
-					disable = color.Darker(0.1);
-
-		g->SetColor(_item_color);
-		g->FillRectangle(_size.width-x-scroll_width, y, scroll_width, h);
-
-		if ((_centered_interaction == true && _index > 0) | (_centered_interaction == false && _top_index > 0)) {
-			g->SetColor(color);
-		} else {
-			g->SetColor(disable);
-		}
-
-		x = _size.width-x-scroll_width,
-		
-		g->FillTriangle(x, y+scroll_width, x+scroll_width/2, y, x+scroll_width, y+scroll_width);
-
-		if ((_centered_interaction == true && (_index < (int)(_items.size()-1))) || (_centered_interaction == false && (_top_index+visible_items) < (int)(_items.size()))) {
-			g->SetColor(color);
-		} else {
-			g->SetColor(disable);
-		}
-
-		g->FillTriangle(x, y+h-scroll_width, x+scroll_width, y+h-scroll_width, x+scroll_width/2, y+h);
-		
-		g->SetColor(color);
-
-		if (visible_items <= (int)_items.size()) {
-			double diff = (h-4*(scroll_width-2))/(double)(_items.size()-1);
-			
-			g->FillRectangle(x, (int)(y+scroll_width+diff*_index+2), scroll_width, _stone_size);
-		}
-	}
-
-	PaintBorderEdges(g);
-}
-
-void ListBox::PreviousItem()
-{
-	if (_items.size() > 0) {
-		int old_index = _index;
-
-		_index--;
-		// _index = _index - visible_items;
-
-		if (_index < 0) {
-			if (_loop == false) {
-				_index = 0;
-			} else {
-				_index = (int)(_items.size()-1);
-			}
-		}
-
-		if (_index < _top_index) {
-			_top_index = _index;
-		}
-
-		if (_index != old_index) {
-			Repaint();
-
-			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_UP)); 
+			g->DrawString(text, x+space, y+(_item_size+_item_gap)*i, w-space, _item_size, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
 		}
 	}
 }
 
-void ListBox::NextItem()
+void ListBox::IncrementLines(int lines)
 {
-	int visible_items = GetVisibleItems();
+	if (_items.size() == 0) {
+		return;
+	}
 
-	if (_items.size() > 0) { 
-		int old_index = _index;
+	int old_index = _index;
 
-		_index++;
-		// _index = _index + visible_items;
+	_index = _index - lines;
 
-		if (_index >= (int)_items.size()) {
-			if (_loop == false) {
-				if (_items.size() > 0) {
-					_index = _items.size()-1;
-				} else {
-					_index = 0;
-				}
+	if (_index < 0) {
+		if (_loop == false) {
+			_index = 0;
+		} else {
+			_index = (int)(_items.size()-1);
+		}
+	}
+
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+
+	if (scrolly > 0) {
+		ScrollToVisibleArea(scrollx, std::max(0, (_item_size+_item_gap)*_index), _size.width, _size.height, this);
+	}
+
+	if (_index != old_index) {
+		Repaint();
+
+		DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_UP)); 
+	}
+}
+
+void ListBox::DecrementLines(int lines)
+{
+	if (_items.size() == 0) { 
+		return;
+	}
+
+	int old_index = _index;
+
+	_index = _index + lines;
+
+	if (_index >= (int)_items.size()) {
+		if (_loop == false) {
+			if (_items.size() > 0) {
+				_index = _items.size()-1;
 			} else {
 				_index = 0;
 			}
-		}
-
-		if (_index >= (_top_index + visible_items)) {
-			_top_index = _index-visible_items+1;
-
-			if (_top_index < 0) {
-				_top_index = 0;
-			}
-		}
-
-		if (_index != old_index) {
-			Repaint();
-
-			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_DOWN)); 
+		} else {
+			_index = 0;
 		}
 	}
+
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+
+	if ((scrolly+_size.height) < (_item_size+_item_gap)*_items.size()) {
+		ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*_index, _size.width, _size.height, this);
+	}
+
+	if (_index != old_index) {
+		Repaint();
+
+		DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_DOWN)); 
+	}
+}
+
+jsize_t ListBox::GetScrollDimension()
+{
+	jsize_t size;
+
+	size.width = _size.width;
+	size.height = _items.size()*(_item_size+_item_gap)+2*(_vertical_gap+_border_size);
+
+	return  size;
 }
 
 }

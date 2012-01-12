@@ -209,7 +209,7 @@ class GraphicsTeste : public jgui::Frame{
 
 		}
 
-		virtual void InputReceived(jgui::KeyEvent *event)
+		virtual bool ProcessEvent(jgui::KeyEvent *event)
 		{
 			jthread::AutoLock lock(&teste_mutex);
 
@@ -242,6 +242,8 @@ class GraphicsTeste : public jgui::Frame{
 
 			Repaint();
 			*/
+
+			return true;
 		}
 
 		virtual void Paint(jgui::Graphics *g)

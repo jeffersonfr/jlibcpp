@@ -50,7 +50,7 @@ void SliderComponent::SetScrollOrientation(jscroll_orientation_t type)
 
 	_type = type;
 
-	Repaint(true);
+	Repaint();
 }
 
 jscroll_orientation_t SliderComponent::GetScrollOrientation()

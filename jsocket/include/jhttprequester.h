@@ -22,7 +22,7 @@
 
 #include "jinetaddress.h"
 #include "jserversocket.h"
-#include "jsocketoption.h"
+#include "jsocketoptions.h"
 #include "jsocketinputstream.h"
 #include "jsocketoutputstream.h"
 #include "jconnection.h"

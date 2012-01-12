@@ -84,7 +84,7 @@ SocketInputStream::~SocketInputStream()
 int64_t SocketInputStream::Read()
 {
 	if ((*_is_closed) == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	int flags = 0,
@@ -109,7 +109,6 @@ int64_t SocketInputStream::Read()
 #else 
 		if (n <= 0) {
 #endif
-			// throw SocketException("Read socket error !");
 			return -1LL;
 		}
 			
@@ -132,7 +131,7 @@ int64_t SocketInputStream::Read()
 int64_t SocketInputStream::Read(char *data_, int64_t data_length_)
 {
 	if ((*_is_closed) == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	// retorna no maximo o tamanho do buffer em bytes
@@ -162,7 +161,6 @@ int64_t SocketInputStream::Read(char *data_, int64_t data_length_)
 #else 
 		if (n <= 0) {
 #endif
-			// throw SocketException("Read socket error !");
 			return -1LL;
 		}
 			

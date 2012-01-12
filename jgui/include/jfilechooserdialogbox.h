@@ -166,7 +166,7 @@ class FileChooserDialogBox : public jgui::Frame, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		virtual void InputReceived(jgui::KeyEvent *event);
+		virtual bool ProcessEvent(jgui::KeyEvent *event);
 
 };
 

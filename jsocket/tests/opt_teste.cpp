@@ -39,7 +39,7 @@ int main() {
 	try {
 		DatagramSocket s("127.0.0.1", 1234);
 
-		SocketOption *o = s.GetSocketOption(); 
+		SocketOptions *o = s.GetSocketOptions(); 
 	
 		o->SetReceiveTimeout(10*1000);
 		o->SetSendMaximumBuffer(10240);

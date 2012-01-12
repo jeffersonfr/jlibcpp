@@ -116,7 +116,7 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
@@ -135,7 +135,7 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 
 		RequestFocus();
 
-		if ((x1 > _location.x && x1 < (_location.x+size)) && (y1 > _location.y && y1 < (_location.y+size))) {
+		if ((x1 > 0 && x1 < (size)) && (y1 > 0 && y1 < (size))) {
 			if (_type == JCT_CHECK) {
 				if (_checked == true) {
 					SetSelected(false);
@@ -153,11 +153,7 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 
 bool CheckButton::ProcessEvent(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (_enabled == false) {
+	if (_is_enabled == false) {
 		return false;
 	}
 
@@ -179,7 +175,7 @@ bool CheckButton::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched;
+	return catched || Component::ProcessEvent(event);
 }
 
 jcheckbox_type_t CheckButton::GetType()
@@ -270,8 +266,6 @@ void CheckButton::Paint(Graphics *g)
 
 		g->DrawString(text, px, py, pw, ph, _halign, _valign);
 	}
-
-	PaintBorderEdges(g);
 }
 
 void CheckButton::RegisterCheckButtonListener(CheckButtonListener *listener)

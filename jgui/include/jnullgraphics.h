@@ -56,12 +56,6 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		static bool GetImageSize(std::string img, int *width, int *height);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetNativeSurface(void *surface);
 
 		/**
@@ -75,12 +69,6 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual jsize_t GetWorkingScreenSize();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Create();
 
 		/**
 		 * \brief
@@ -123,7 +111,7 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual jregion_t ClipRect(int xp, int yp, int wp, int hp);
-
+		
 		/**
 		 * \brief
 		 *
@@ -182,13 +170,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetColor(uint32_t c); 
+		virtual void SetColor(uint32_t color); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetColor(int r, int g, int b, int a = 0xff); 
+		virtual void SetColor(int red, int green, int blue, int alpha = 0xff); 
 		
 		/**
 		 * \brief
@@ -439,7 +427,7 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual void FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor);
-
+		
 		/**
 		 * \brief
 		 *
@@ -534,7 +522,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize);
+		virtual void GetRGB(uint32_t **rgb, int startxp, int startyp, int widthp, int heightp, int scansize);
 		
 		/**
 		 * \brief
@@ -553,18 +541,6 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual void Reset();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Lock();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Unlock();
 
 };
 

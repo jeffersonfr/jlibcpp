@@ -18,25 +18,25 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsocketoption.h"
-#include "jsocketoptionexception.h"
+#include "jsocketoptions.h"
+#include "jsocketoptionsexception.h"
 
 namespace jsocket {
 
-SocketOption::SocketOption(jsocket_t fd_, jconnection_type_t type_):
+SocketOptions::SocketOptions(jsocket_t fd_, jconnection_type_t type_):
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jsocket::SocketOption");
+	jcommon::Object::SetClassName("jsocket::SocketOptions");
 	
 	_fd = fd_;
 	_type = type_;
 }
 
-SocketOption::~SocketOption()
+SocketOptions::~SocketOptions()
 {
 }
 
-void SocketOption::SetKeepAlive(bool b_)
+void SocketOptions::SetKeepAlive(bool b_)
 {
 #ifdef _WIN32
 	BOOL b = (b_)?TRUE:FALSE;
@@ -45,11 +45,11 @@ void SocketOption::SetKeepAlive(bool b_)
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_KEEPALIVE, &b_, sizeof(bool)) < 0) {
 #endif
-		throw SocketOptionException("Set keep alive error");
+		throw SocketOptionsException("Set keep alive error");
 	}
 }
 
-void SocketOption::SetNoDelay(bool b_)
+void SocketOptions::SetNoDelay(bool b_)
 {
 #ifdef _WIN32
 #else
@@ -57,12 +57,12 @@ void SocketOption::SetNoDelay(bool b_)
 
 	// if (setsockopt(_fd, SOL_SOCKET, SO_OOBINLINE, &b_, sizeof(bool)) < 0) {
 	if (setsockopt(_fd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int)) < 0) {
-		throw SocketOptionException("Set out of band error");
+		throw SocketOptionsException("Set out of band error");
 	}
 #endif
 }
 
-void SocketOption::SetOutOfBandInLine(bool b_)
+void SocketOptions::SetOutOfBandInLine(bool b_)
 {
 #ifdef _WIN32
 	BOOL b = (b_)?TRUE:FALSE;
@@ -71,18 +71,18 @@ void SocketOption::SetOutOfBandInLine(bool b_)
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_OOBINLINE, &b_, sizeof(bool)) < 0) {
 #endif
-		throw SocketOptionException("Set out of band error");
+		throw SocketOptionsException("Set out of band error");
 	}
 }
 
-void SocketOption::SetSendTimeout(int time_)
+void SocketOptions::SetSendTimeout(int time_)
 {
 
 #ifdef _WIN32
 	time_ /= 1000;
 	
 	if (setsockopt(_fd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&time_, sizeof(int)) < 0) {
-		throw SocketOptionException("Set send timeout error");
+		throw SocketOptionsException("Set send timeout error");
 	}
 #else
 	struct timespec t;
@@ -93,18 +93,18 @@ void SocketOption::SetSendTimeout(int time_)
 	t.tv_nsec = (int64_t)(time%1000LL)*1000;
 	
 	if (setsockopt(_fd, SOL_SOCKET, SO_SNDTIMEO, &t, sizeof(struct timespec)) < 0) {
-		throw SocketOptionException("Set send timeout error");
+		throw SocketOptionsException("Set send timeout error");
 	}
 #endif
 }
 
-void SocketOption::SetReceiveTimeout(int time_)
+void SocketOptions::SetReceiveTimeout(int time_)
 {
 #ifdef _WIN32
 	time_ /= 1000;
 
 	if (setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&time_, sizeof(int)) < 0) {
-		throw SocketOptionException("Set send timeout error");
+		throw SocketOptionsException("Set send timeout error");
 	}
 #else
 	struct timespec t;
@@ -115,44 +115,44 @@ void SocketOption::SetReceiveTimeout(int time_)
 	t.tv_nsec = (int64_t)(time%1000LL)*1000;
 	
 	if (setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(struct timespec)) < 0) {
-		throw SocketOptionException("Set receive timeout error");
+		throw SocketOptionsException("Set receive timeout error");
 	}
 #endif
 }
 
-void SocketOption::SetPassCredentials(bool b_)
+void SocketOptions::SetPassCredentials(bool b_)
 {
 #ifdef _WIN32
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_PASSCRED, &b_, sizeof(bool)) < 0) {
-		throw SocketOptionException("Set pass credentials error");
+		throw SocketOptionsException("Set pass credentials error");
 	}
 #endif
 }
 
-void SocketOption::GetPeerCredentials(void *v_)
+void SocketOptions::GetPeerCredentials(void *v_)
 {
 #ifdef _WIN32
 #else
 	/*
 	if (getsockopt(_fd, SOL_SOCKET, SO_PEERCRED, &v_, sizeof(v_)) < 0) {
-		throw SocketOptionException("Set peer credentials error");
+		throw SocketOptionsException("Set peer credentials error");
 	}
 	*/
 #endif
 }
 
-void SocketOption::BindToDevice(std::string dev_)
+void SocketOptions::BindToDevice(std::string dev_)
 {
 #ifdef _WIN32
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_BINDTODEVICE, dev_.c_str(), dev_.size()+1) < 0) {
-		throw SocketOptionException("Bind to device error");
+		throw SocketOptionsException("Bind to device error");
 	}
 #endif
 }
 
-void SocketOption::SetReuseAddress(bool b_)
+void SocketOptions::SetReuseAddress(bool b_)
 {
 #ifdef _WIN32
 	BOOL b = (b_)?TRUE:FALSE;
@@ -161,11 +161,11 @@ void SocketOption::SetReuseAddress(bool b_)
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &b_, sizeof(bool)) < 0) {
 #endif
-		throw SocketOptionException("Set reuse address error");
+		throw SocketOptionsException("Set reuse address error");
 	}
 }
 
-void SocketOption::SetReusePort(bool b_)
+void SocketOptions::SetReusePort(bool b_)
 {
 #ifdef _WIN32
 #else
@@ -174,17 +174,17 @@ void SocketOption::SetReusePort(bool b_)
 	#endif
 	
 	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEPORT, &b_, sizeof(bool)) < 0) {
-		throw SocketOptionException("Set reuse port error");
+		throw SocketOptionsException("Set reuse port error");
 	}
 #endif
 }
 
-jconnection_type_t SocketOption::GetType()
+jconnection_type_t SocketOptions::GetType()
 {
 	return _type;
 }
 
-bool SocketOption::GetSocketAcceptConnection()
+bool SocketOptions::GetSocketAcceptConnection()
 {
 #ifdef _WIN32
 	int length = sizeof(BOOL);
@@ -197,7 +197,7 @@ bool SocketOption::GetSocketAcceptConnection()
 	
 	if (getsockopt(_fd, SOL_SOCKET, SO_ACCEPTCONN, (char *)&b, &length) < 0) {
 #endif
-		throw SocketOptionException("Get socket accept connection error");
+		throw SocketOptionsException("Get socket accept connection error");
 	}
 
 #ifdef _WIN32
@@ -207,7 +207,7 @@ bool SocketOption::GetSocketAcceptConnection()
 #endif
 }
 
-void SocketOption::SetRoute(bool b_)
+void SocketOptions::SetRoute(bool b_)
 {
 #ifdef _WIN32
 	BOOL b = (b_ == true)?TRUE:FALSE;
@@ -218,11 +218,11 @@ void SocketOption::SetRoute(bool b_)
 	
 	if (setsockopt(_fd, SOL_SOCKET, SO_DONTROUTE, &b_, sizeof(bool)) < 0) {
 #endif
-		throw SocketOptionException("Set route error");
+		throw SocketOptionsException("Set route error");
 	}
 }
 
-void SocketOption::SetBroadcast(bool b_)
+void SocketOptions::SetBroadcast(bool b_)
 {
 #ifdef _WIN32
 	BOOL b = (b_)?TRUE:FALSE;
@@ -231,11 +231,11 @@ void SocketOption::SetBroadcast(bool b_)
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_BROADCAST, &b_, sizeof(bool)) < 0) {
 #endif
-		throw SocketOptionException("Set broadcast error");
+		throw SocketOptionsException("Set broadcast error");
 	}
 }
 
-void SocketOption::SetSendMaximumBuffer(int length_)
+void SocketOptions::SetSendMaximumBuffer(int length_)
 {
 #ifdef _WIN32
 #else
@@ -243,11 +243,11 @@ void SocketOption::SetSendMaximumBuffer(int length_)
 #endif
 
 	if (setsockopt(_fd, SOL_SOCKET, SO_SNDBUF, (const char *)&length_, sizeof(int)) < 0) {
-		throw SocketOptionException("Set send maximum buffer error");
+		throw SocketOptionsException("Set send maximum buffer error");
 	}
 }
 
-void SocketOption::SetReceiveMaximumBuffer(int length_)
+void SocketOptions::SetReceiveMaximumBuffer(int length_)
 {
 #ifdef _WIN32
 #else
@@ -255,11 +255,11 @@ void SocketOption::SetReceiveMaximumBuffer(int length_)
 #endif
 	
 	if (setsockopt(_fd, SOL_SOCKET, SO_RCVBUF, (const char *)&length_, sizeof(int)) < 0) {
-		throw SocketOptionException("Set receive maximum buffer error");
+		throw SocketOptionsException("Set receive maximum buffer error");
 	}
 }
 
-int SocketOption::GetSendMaximumBuffer()
+int SocketOptions::GetSendMaximumBuffer()
 {
 	int l = 0,
 		length = sizeof(int);
@@ -269,13 +269,13 @@ int SocketOption::GetSendMaximumBuffer()
 #else
 	if (getsockopt(_fd, SOL_SOCKET, SO_SNDBUF, &l, (socklen_t *)&length) < 0) {
 #endif
-		throw SocketOptionException("Get send maximum buffer error");
+		throw SocketOptionsException("Get send maximum buffer error");
 	}
 
 	return l;
 }
 
-int SocketOption::GetReceiveMaximumBuffer()
+int SocketOptions::GetReceiveMaximumBuffer()
 {
 	int l = 0,
 		length = sizeof(int);
@@ -285,13 +285,13 @@ int SocketOption::GetReceiveMaximumBuffer()
 #else
 	if (getsockopt(_fd, SOL_SOCKET, SO_RCVBUF, &l, (socklen_t *)&length) < 0) {
 #endif
-		throw SocketOptionException("Get receive maximum buffer error");
+		throw SocketOptionsException("Get receive maximum buffer error");
 	}
 
 	return l;
 }
 
-void SocketOption::SetLinger(bool on, int linger_)
+void SocketOptions::SetLinger(bool on, int linger_)
 {
 	struct linger l;
 
@@ -303,79 +303,79 @@ void SocketOption::SetLinger(bool on, int linger_)
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_LINGER, &l, sizeof(l)) < 0) {
 #endif
-		throw SocketOptionException("Set linger error");
+		throw SocketOptionsException("Set linger error");
 	}
 }
 
-void SocketOption::SetPriority(int p_)
+void SocketOptions::SetPriority(int p_)
 {
 #ifdef _WIN32
 #else
 	if (setsockopt(_fd, SOL_SOCKET, SO_PRIORITY, &p_, sizeof(int)) < 0) {
-		throw SocketOptionException("Set priority error");
+		throw SocketOptionsException("Set priority error");
 	}
 #endif
 }
 
-void SocketOption::ClearPendingSocketError()
+void SocketOptions::ClearPendingSocketError()
 {
 #ifdef _WIN32
 #else
 	bool b = true;
 	
 	if (setsockopt(_fd, SOL_SOCKET, SO_ERROR, &b, sizeof(bool)) < 0) {
-		throw SocketOptionException("Clean pending socket errors error");
+		throw SocketOptionsException("Clean pending socket errors error");
 	}
 #endif
 }
 
-void SocketOption::SetBlocking(bool b)
+void SocketOptions::SetBlocking(bool b)
 {
 #ifdef _WIN32
 #else
 	if (b == true) {
 		if (fcntl(_fd, F_SETFL, O_SYNC) < 0) {
-			throw SocketOptionException("Set socket blocking error");
+			throw SocketOptionsException("Set socket blocking error");
 		}
 	} else {
 		if (fcntl(_fd, F_SETFL, O_NONBLOCK) < 0) {
-			throw SocketOptionException("Set socket blocking error");
+			throw SocketOptionsException("Set socket blocking error");
 		}
 	}
 #endif
 }
 
-void SocketOption::SetTypeOfService(int t_)
+void SocketOptions::SetTypeOfService(int t_)
 {
 #ifdef _WIN32
 #else
 	if (setsockopt(_fd, IPPROTO_IP, IP_TOS, (char *)&t_, sizeof(int)) < 0) {
-		throw SocketOptionException("Set type of service error");
+		throw SocketOptionsException("Set type of service error");
 	}
 #endif
 }
 
-void SocketOption::SetTimeToLive(int t_)
+void SocketOptions::SetTimeToLive(int t_)
 {
 #ifdef _WIN32
 #else
 	if (setsockopt(_fd, IPPROTO_IP, IP_TTL, (char *)&t_, sizeof(int)) < 0) {
-		throw SocketOptionException("Set time to live error");
+		throw SocketOptionsException("Set time to live error");
 	}
 #endif
 }
 
-void SocketOption::SetHeaderInclude(bool b_)
+void SocketOptions::SetHeaderInclude(bool b_)
 {
 #ifdef _WIN32
 #else
 	if (setsockopt(_fd, IPPROTO_IP, IP_HDRINCL, &b_, sizeof(bool)) < 0) {
-		throw SocketOptionException("Set header include error");
+		throw SocketOptionsException("Set header include error");
 	}
 #endif
 }
 
-int64_t SocketOption::GetTimeStamp()
+int64_t SocketOptions::GetTimeStamp()
 {
 #ifdef _WIN32
 	return 0LL;
@@ -383,14 +383,14 @@ int64_t SocketOption::GetTimeStamp()
 	struct timespec t;
 
 	if (ioctl(_fd, SIOCGSTAMP, &t) < 0) {
-		throw SocketOptionException("Get time stamp error");
+		throw SocketOptionsException("Get time stamp error");
 	}
 
 	return (t.tv_sec*1000000000LL + t.tv_nsec);
 #endif
 }
 
-int SocketOption::GetMaximunTransferUnit()
+int SocketOptions::GetMaximunTransferUnit()
 {
 #ifdef _WIN32
 	return 1500;
@@ -404,7 +404,7 @@ int SocketOption::GetMaximunTransferUnit()
 #endif
 	
 	if (getsockopt(_fd, IPPROTO_IP, IP_MTU, (void *)&mtu, (socklen_t *)length) < 0) {
-		throw SocketOptionException("Get MTU error");
+		throw SocketOptionsException("Get MTU error");
 	}
 	*/
 
@@ -412,17 +412,17 @@ int SocketOption::GetMaximunTransferUnit()
 #endif
 }
 
-void SocketOption::SetIOAsync(bool b_)
+void SocketOptions::SetIOAsync(bool b_)
 {
 #ifdef _WIN32
 #else
 	if (ioctl(_fd, FIOASYNC, b_) < 0) {
-		throw SocketOptionException("Set io synchronized error");
+		throw SocketOptionsException("Set io synchronized error");
 	}
 #endif
 }
 
-void SocketOption::SetMulticastLoop(bool b_)
+void SocketOptions::SetMulticastLoop(bool b_)
 {
 #ifdef _WIN32
 #else
@@ -431,12 +431,12 @@ void SocketOption::SetMulticastLoop(bool b_)
 	}
 	
 	if (setsockopt(_fd, IPPROTO_IP, IP_MULTICAST_LOOP, &b_, sizeof(bool)) < 0) {
-		throw SocketOptionException("Set multicast loop error");
+		throw SocketOptionsException("Set multicast loop error");
 	}
 #endif
 }
 
-void SocketOption::SetRSVP(int t_)
+void SocketOptions::SetRSVP(int t_)
 {
 #ifdef _WIN32
 #else
@@ -446,41 +446,41 @@ void SocketOption::SetRSVP(int t_)
 
 	/*
 	if (setsockopt(_fd, IPPROTO_IP, IP_MULTICAST_VIF, &t_, sizeof(int)) < 0) {
-		throw SocketOptionException("Set rsvp error");
+		throw SocketOptionsException("Set rsvp error");
 	}
 	*/
 #endif
 }
 
-void SocketOption::SetShutdown(socket_shutdown_t opt_)
+void SocketOptions::SetShutdown(socket_shutdown_t opt_)
 {
 #ifdef _WIN32
 #else
 	if (_type != JCT_MCAST) {
 		if (shutdown(_fd, opt_) < 0) {
-			throw SocketOptionException("Shutdown socket error");
+			throw SocketOptionsException("Shutdown socket error");
 		}
 	} else {
 		if ((opt_ & SHUTDOWN_READ) != 0 || (opt_ & SHUTDOWN_READ_WRITE) != 0) {
 			if (shutdown(_fd, opt_) < 0) {
-				throw SocketOptionException("Shutdown multicast socket error");
+				throw SocketOptionsException("Shutdown multicast socket error");
 			}
 		}
 	}
 #endif
 }
 
-void SocketOption::SetIPv6UnicastHops(int opt_)
+void SocketOptions::SetIPv6UnicastHops(int opt_)
 {
 #ifdef _WIN32
 #else
 	if (setsockopt(_fd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &opt_, sizeof(int)) < 0) {
-		throw SocketOptionException("Set ipv6 socket hops error");
+		throw SocketOptionsException("Set ipv6 socket hops error");
 	}
 #endif
 }
 
-int SocketOption::GetIPv6UnicastHops()
+int SocketOptions::GetIPv6UnicastHops()
 {
 #ifdef _WIN32
 	return -1;
@@ -489,19 +489,19 @@ int SocketOption::GetIPv6UnicastHops()
 	int opt;
 
 	if (getsockopt(_fd, IPPROTO_IPV6, IPV6_UNICAST_HOPS, &opt, &length) < 0) {
-		throw SocketOptionException("Set ipv6 socket hops error");
+		throw SocketOptionsException("Set ipv6 socket hops error");
 	}
 	
 	return opt;
 #endif
 }
 
-void SocketOption::SetIPv6Only(bool opt_)
+void SocketOptions::SetIPv6Only(bool opt_)
 {
 #ifdef _WIN32
 #else
 	if (setsockopt(_fd, IPPROTO_IPV6, IPV6_V6ONLY, &opt_, sizeof(bool)) < 0) {
-		throw SocketOptionException("Set ipv6 only error");
+		throw SocketOptionsException("Set ipv6 only error");
 	}
 #endif
 }

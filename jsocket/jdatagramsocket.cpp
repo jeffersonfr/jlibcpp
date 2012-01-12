@@ -21,7 +21,7 @@
 #include "jdatagramsocket.h"
 #include "jsocketexception.h"
 #include "jsockettimeoutexception.h"
-#include "jsocketstreamexception.h"
+#include "jioexception.h"
 #include "junknownhostexception.h"
 #include "jinetaddress4.h"
 
@@ -117,9 +117,9 @@ void DatagramSocket::CreateSocket()
 #ifdef _WIN32
 	if ((_fd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET) {
 #else
-	if ((_fd = ::socket(PF_INET, SOCK_DGRAM,IPPROTO_UDP)) < 0) {
+	if ((_fd = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
 #endif
-		throw SocketException("Create datagram socket error");
+		throw SocketException("Socket creation exception");
 	}
 
 	_is_closed = false;
@@ -151,7 +151,7 @@ void DatagramSocket::BindSocket(InetAddress *addr_, int local_port_)
 #else
 	if (::bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
 #endif
-		throw SocketException("Bind datagram socket error");
+		throw SocketException("Socket bind exception");
 	}
 }
 
@@ -179,7 +179,7 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 			u_long opt = 1;
 			
 			if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-				throw SocketException("Socket non-blocking error");
+				throw SocketException("Invalid connection parameters exception");
 			}
 			
 			r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
@@ -188,10 +188,8 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 				opt = 0;
 				
 				if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-					throw SocketException("Socket non-blocking error");
+					throw SocketException("Socket connection exception");
 				}
-				
-				throw SocketException("Connect socket error");
 			}
 			
 			if (r != 0) {
@@ -210,15 +208,15 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 					opt = 0;
 					
 					if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-						throw SocketException("Socket non-blocking error");
+						throw SocketException("Invalid connection parameters exception");
 					}
 					
 					shutdown(_fd, 2);
 					
 					if (r == 0) {
-						throw SocketException("Connect timeout error");
-					} else if (r < 0) {
-						throw SocketException("Connect socket error");
+						throw SocketException("Socket connection timeout exception");
+					} else {
+						throw SocketException("Socket connection exception");
 					}
 				}
 				
@@ -227,14 +225,14 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 				getsockopt(_fd, SOL_SOCKET, SO_ERROR, (char *)&r, &optlen);
 				
 				if (r != 0) {
-					throw SocketException("Can't connect socket");
+					throw SocketException("Unknown socket exception");
 				}
 			}
 			
 			opt = 0;
 			
 			if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-				throw SocketException("Socket non-blocking error");
+				throw SocketException("Socket connection exception");
 			}
 		} else {
 			r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
@@ -244,19 +242,13 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 			int opt = 1;
 			
 			if (ioctl(_fd, FIONBIO, &opt) < 0) {
-				throw SocketException("Socket non-blocking error");
+				throw SocketException("Socket connection exception");
 			}
 			
 			r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 			
 			if (errno != EINPROGRESS) {
-				opt = 0;
-				
-				if (ioctl(_fd, FIONBIO, &opt) < 0) {
-					throw SocketException("Socket non-blocking error");
-				}
-				
-				throw SocketException("Connect socket error");
+				throw SocketException("Socket connection exception");
 			}
 			
 			if (r != 0) {
@@ -275,15 +267,15 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 					opt = 0;
 					
 					if (ioctl(_fd, FIONBIO, &opt) < 0) {
-						throw SocketException("Socket non-blocking error");
+						throw SocketException("Socket connection exception");
 					}
 					
 					shutdown(_fd, SHUT_RDWR);
 					
 					if (r == 0) {
-						throw SocketException("Connect timeout error");
+						throw SocketException("Socket connection timeout exception");
 					} else if (r < 0) {
-						throw SocketException("Connect socket error");
+						throw SocketException("Socket connection exception");
 					}
 				}
 				
@@ -292,14 +284,14 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 				getsockopt(_fd, SOL_SOCKET, SO_ERROR, (void *)&r, (socklen_t *)&optlen);
 				
 				if (r != 0) {
-					throw SocketException("Can't connect socket");
+					throw SocketException("Unknown socket exception");
 				}
 			}
 			
 			opt = 0;
 			
 			if (ioctl(_fd, FIONBIO, &opt) < 0) {
-				throw SocketException("Socket non-blocking error");
+				throw SocketException("Socket connection exception");
 			}
 		} else {
 			r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
@@ -311,7 +303,7 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 #else
 		if (r < 0) {
 #endif
-			throw SocketException("Connect udp socket error");
+			throw SocketException("Socket connection exception");
 		}
 	}
 }
@@ -347,7 +339,7 @@ jio::OutputStream * DatagramSocket::GetOutputStream()
 int DatagramSocket::Receive(char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 #ifdef _WIN32
@@ -361,13 +353,13 @@ int DatagramSocket::Receive(char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Receive timed exception");
+		throw SocketException("Invalid receive parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket receive timeout exception");
+		throw SocketTimeoutException("Socket read timeout exception");
 	} else {
-	    if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
+    if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return DatagramSocket::Receive(data_, size_, true);
-	    }
+    }
 	}
 #endif
 
@@ -377,7 +369,7 @@ int DatagramSocket::Receive(char *data_, int size_, int time_)
 int DatagramSocket::Receive(char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	int n,
@@ -385,7 +377,7 @@ int DatagramSocket::Receive(char *data_, int size_, bool block_)
 		length = sizeof(_server_sock);
 
 	if (block_ == true) {
-		// CHANGE:: call SocketOptions
+		// CHANGE:: call SocketOptionss
 
 #ifdef _WIN32
 		flags = 0;
@@ -407,36 +399,39 @@ int DatagramSocket::Receive(char *data_, int size_, bool block_)
 		if (WSAGetLastError() == WSAETIMEDOUT) {
 			throw SocketTimeoutException("Socket receive timeout exception");
 		} else {
-			throw SocketStreamException("Read socket error");
+			throw jio::IOException("Socket read exception");
 		}
 	} else if (n == 0) {
-		throw SocketException("Connection closed");
+		throw jio::IOException("Peer shutdown exception");
 	}
 #else
 	n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
 	
 	if (n < 0) {
-	   if (errno == EAGAIN) {
-			if (block_ == false) {
-				throw SocketStreamException("Socket buffer is empty");
-			} else {
+		if (errno == EAGAIN) {
+			if (block_ == true) {
 				throw SocketTimeoutException("Socket receive timeout exception");
+			} else {
+				// INFO:: non-blocking socket, no data read
+				n = 0;
 			}
 		} else {
-			throw SocketStreamException("Read socket error");
+			throw jio::IOException("Socket read exception");
 		}
+	} else if (n == 0) {
+		throw jio::IOException("Peer shutdown exception");
 	}
 #endif
 
 	_receive_bytes += n;
 
-    return n;
+	return n;
 }
 
 int DatagramSocket::Send(const char *data_, int size_, int time_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 #ifdef _WIN32
@@ -450,7 +445,7 @@ int DatagramSocket::Send(const char *data_, int size_, int time_)
 	int rv = poll(ufds, 1, time_);
 
 	if (rv == -1) {
-		throw SocketException("Send timed exception");
+		throw SocketException("Invalid send parameters exception");
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket send timeout exception");
 	} else {
@@ -466,7 +461,7 @@ int DatagramSocket::Send(const char *data_, int size_, int time_)
 int DatagramSocket::Send(const char *data_, int size_, bool block_)
 {
 	if (_is_closed == true) {
-		throw SocketException("Connection was closed");
+		throw SocketException("Connection closed exception");
 	}
 	
 	int n,
@@ -491,19 +486,20 @@ int DatagramSocket::Send(const char *data_, int size_, bool block_)
 		if (WSAGetLastError() == WSAECONNABORTED) {
 			throw SocketTimeoutException("Socket send timeout exception");
 		} else {
-			throw SocketStreamException("Send udp data error");
+			throw SocketTimeoutException("Socket send exception");
 		}
 	}
 #else
 	if (n < 0) {
-	    if (errno == EAGAIN) {
-			if (block_ == false) {
-				throw SocketStreamException("Socket buffer is empty");
-			} else {
+		if (errno == EAGAIN) {
+			if (block_ == true) {
 				throw SocketTimeoutException("Socket send timeout exception");
+			} else {
+				// INFO:: non-blocking socket, no data read
+				n = 0;
 			}
 		} else {
-			throw SocketStreamException("Send udp data error");
+			throw SocketTimeoutException("Socket send exception");
 		}
 	}
 #endif
@@ -524,7 +520,7 @@ void DatagramSocket::Close()
 #else
 	if (close(_fd) != 0) {
 #endif
-		throw SocketException("Close socket error");
+		throw SocketException("Unknown close exception");
 	}
 
 	_is_closed = true;
@@ -557,13 +553,9 @@ int64_t DatagramSocket::GetReadedBytes()
 	return _receive_bytes + _is->GetReadedBytes();
 }
 
-SocketOption * DatagramSocket::GetSocketOption()
+SocketOptions * DatagramSocket::GetSocketOptions()
 {
-	if (_is_closed == true) {
-		throw SocketException("Connection is closed");
-	}
-
-	return new SocketOption(_fd, JCT_UDP);
+	return new SocketOptions(_fd, JCT_UDP);
 }
 
 std::string DatagramSocket::what()
