@@ -55,13 +55,13 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
 		
 #ifdef _WIN32
 		int len;
-
-		if(getsockname(_fd, (struct sockaddr *)&_lsock, &len) < 0) {
 #else
 		socklen_t len;
+#endif
+
+		len = sizeof(_lsock);
 
 		if(getsockname(_fd, (struct sockaddr *)&_lsock, &len) < 0) {
-#endif
 			throw jio::IOException("ServerSocket constructor exception");
 		}
 	}
@@ -139,24 +139,20 @@ Socket * ServerSocket::Accept()
 #ifdef _WIN32
 	int sock_size;
 	int handler;
-	
-	sock_size = sizeof(_rsock);
-	handler = ::accept(_fd, (struct sockaddr *) &_rsock, &sock_size);
 #else 
 	socklen_t sock_size;
 	int handler;
+#endif
 	
 	sock_size = sizeof(_rsock);
+
 	handler = ::accept(_fd, (struct sockaddr *) &_rsock, &sock_size);
-#endif
     
 	if (handler < 0) {
 		throw SocketException("Socket accept exception");
-    }
+	}
     
-	Socket *s = new Socket(handler, _rsock);
-    
-	return s;
+	return new Socket(handler, _rsock);
 }
 
 InetAddress * ServerSocket::GetInetAddress()

@@ -70,7 +70,7 @@ void ScrollPane::Paint(Graphics *g)
 
 	g->SetDrawingFlags(JDF_NOFX);
 
-	if (_background_visible == true) {
+	if (_is_background_visible == true) {
 		g->SetColor(_bgcolor);
 
 		g->FillRectangle(0, 0, _size.width, _size.height);

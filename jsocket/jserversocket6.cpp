@@ -51,13 +51,15 @@ ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress *addr_):
 		BindSocket(addr_, port_);
 		ListenSocket(backlog_);
 	} else {
+		ListenSocket(backlog_);
+
 #ifdef _WIN32
 		int len;
 #else
 		socklen_t len;
 #endif
 		
-		ListenSocket(backlog_);
+		len = sizeof(_lsock);
 		
 		if(getsockname(_fd, (struct sockaddr *)&_lsock, &len) < 0) {
 			throw jio::IOException("ServerSocket constructor exception");
@@ -131,16 +133,14 @@ Socket6 * ServerSocket6::Accept()
 #ifdef _WIN32
 	int sock_size;
 	int handler;
-	
-	sock_size = sizeof(_rsock);
-	handler = ::accept(_fd, (struct sockaddr *) &_rsock, &sock_size);
 #else 
 	socklen_t sock_size;
 	int handler;
+#endif
 	
 	sock_size = sizeof(_rsock);
+
 	handler = ::accept(_fd, (struct sockaddr *) &_rsock, &sock_size);
-#endif
     
 	if (handler < 0) {
 		throw SocketException("Socket accept exception");

@@ -49,7 +49,6 @@ Component::Component(int x, int y, int width, int height):
 	_is_visible = true;
 	_has_focus = false;
 	_is_ignore_repaint = false;
-	_is_component_loop = true;
 	
 	_parent = NULL;
 	_left = NULL;
@@ -486,11 +485,6 @@ void Component::PaintScrollbars(Graphics *g)
 	g->SetLineWidth(line_width);
 }
 
-void Component::PaintGlassPane(Graphics *g)
-{
-	PaintBorderEdges(g);
-}
-
 void Component::SetGap(int hgap, int vgap)
 {
 	_horizontal_gap = hgap;
@@ -521,13 +515,10 @@ int Component::GetVerticalGap()
 
 void Component::PaintBackground(Graphics *g)
 {
-	if (_is_background_visible == true) {
-		PaintBorderBackground(g);
+	if (_is_background_visible == false) {
+		return;
 	}
-}
-
-void Component::PaintBorderBackground(Graphics *g)
-{
+	
 	int x = 0,
 			y = 0,
 			w = _size.width,
@@ -544,13 +535,11 @@ void Component::PaintBorderBackground(Graphics *g)
 	}
 }
 
-void Component::PaintBorderEdges(Graphics *g)
+void Component::PaintBorders(Graphics *g)
 {
 	if (_border == JCB_EMPTY) {
 		return;
 	}
-
-	g->Reset();
 
 	int xp = 0, 
 			yp = 0,
@@ -767,16 +756,6 @@ Component * Component::GetUpComponent()
 Component * Component::GetDownComponent()
 {
 	return _down;
-}
-
-void Component::SetComponentLoop(bool loop)
-{
-	_is_component_loop = loop;
-}
-
-bool Component::IsComponentLoop()
-{
-	return _is_component_loop;
 }
 
 void Component::SetParent(Container *parent)
@@ -1497,13 +1476,10 @@ bool Component::ProcessEvent(KeyEvent *event)
 		return false;
 	}
 
-	Component *left = this,
-		*right = this,
-		*up = this,
-		*down = this,
-		*next = this;
+	Component *next = this;
 
-	jregion_t this_bounds = GetVisibleBounds();
+	jsize_t this_size = GetSize();
+	jpoint_t this_location = GetAbsoluteLocation();
 
 	if (action == JKS_CURSOR_LEFT && GetLeftComponent() != NULL) {
 		next = GetLeftComponent();
@@ -1523,53 +1499,41 @@ bool Component::ProcessEvent(KeyEvent *event)
 				continue;
 			}
 
-			jregion_t cmp_bounds = cmp->GetVisibleBounds();
-			int dw = ::abs(this_bounds.width-cmp_bounds.width),
-					dh = ::abs(this_bounds.height-cmp_bounds.height),
-					dx = ::abs(this_bounds.x-cmp_bounds.x),
-					dy = ::abs(this_bounds.y-cmp_bounds.y);
+			jsize_t cmp_size = cmp->GetSize();
+			jpoint_t cmp_location = cmp->GetAbsoluteLocation();
+			int c1x = this_location.x + this_size.width/2,
+					c1y = this_location.y + this_size.height/2,
+					c2x = cmp_location.x + cmp_size.width/2,
+					c2y = cmp_location.y + cmp_size.height/2;
 
-			if (action == JKS_CURSOR_LEFT && cmp_bounds.x < this_bounds.x) {
-				int value = (dx*dx*2+dy*dy*8);
-
-				if (value < distance) {
-					next = cmp;
-					distance = value;
-				}
-			} else if (action == JKS_CURSOR_RIGHT && cmp_bounds.x > this_bounds.x) {
-				int value = (dx*dx*2+dy*dy*8);
+			if (action == JKS_CURSOR_LEFT && cmp_location.x < this_location.x) {
+				int value = ::abs(c1y-c2y)*(this_size.width+cmp_size.width) + (this_location.x+this_size.width-cmp_location.x-cmp_size.width);
 
 				if (value < distance) {
 					next = cmp;
 					distance = value;
 				}
-			} else if (action == JKS_CURSOR_UP && cmp_bounds.y < this_bounds.y) {
-				int value = (dx*dx+dy*dy);
+			} else if (action == JKS_CURSOR_RIGHT && cmp_location.x > this_location.x) {
+				int value = ::abs(c1y-c2y)*(this_size.width+cmp_size.width) + (cmp_location.x+cmp_size.width-this_location.x-this_size.width);
 
 				if (value < distance) {
 					next = cmp;
 					distance = value;
 				}
-			} else if (action == JKS_CURSOR_DOWN) {// && cmp_bounds.y > this_bounds.y) {
-				int value = (dx*dx+dy*dy);
+			} else if (action == JKS_CURSOR_UP && cmp_location.y < this_location.y) {
+				int value = ::abs(c1x-c2x)*(this_size.height+cmp_size.height) + (this_location.y+this_size.height-cmp_location.y-cmp_size.height);
 
-				printf("----> 01:: %d, %d\n", cmp_bounds.y, this_bounds.y);
 				if (value < distance) {
 					next = cmp;
 					distance = value;
 				}
-			}
-		}
+			} else if (action == JKS_CURSOR_DOWN && cmp_location.y > this_location.y) {
+				int value = ::abs(c1x-c2x)*(this_size.height+cmp_size.height) + (cmp_location.y+cmp_size.height-this_location.y-this_size.height);
 
-		if (next == this && _is_component_loop == true) {
-			if (action == JKS_CURSOR_LEFT) {
-				next = right;
-			} else if (action == JKS_CURSOR_RIGHT) {
-				next = left;
-			} else if (action == JKS_CURSOR_UP) {
-				next = down;
-			} else if (action == JKS_CURSOR_DOWN) {
-				next = up;
+				if (value < distance) {
+					next = cmp;
+					distance = value;
+				}
 			}
 		}
 	}

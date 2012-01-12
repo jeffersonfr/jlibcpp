@@ -238,6 +238,12 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
+		virtual void PaintGlassPane(Graphics *g);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Paint(Graphics *g);
 		
 		/**

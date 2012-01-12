@@ -593,8 +593,6 @@ void Frame::PaintGlassPane(Graphics *g)
 			}
 		}
 	}
-
-	PaintBorderEdges(g);
 }
 
 }

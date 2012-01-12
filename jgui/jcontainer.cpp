@@ -364,6 +364,10 @@ void Container::RevalidateAll()
 	} while (containers.size() > 0);
 }
 
+void Container::PaintGlassPane(Graphics *g)
+{
+}
+
 void Container::Paint(Graphics *g)
 {
 	// JDEBUG(JINFO, "paint\n");
@@ -376,6 +380,8 @@ void Container::Paint(Graphics *g)
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 	jregion_t clip = g->GetClip();
+
+	Component::Paint(g);
 
 	if (IsBackgroundVisible() == true) {
 		g->Reset(); 
@@ -412,7 +418,7 @@ void Container::Paint(Graphics *g)
 
 				if (flag == false) {
 					g->Reset(); 
-					c->PaintGlassPane(g);
+					c->PaintBorders(g);
 				}
 				
 				g->Translate(-cx, -cy);
@@ -431,6 +437,9 @@ void Container::Paint(Graphics *g)
 		g->Reset(); 
 		PaintScrollbars(g);
 	}
+
+	g->Reset(); 
+	PaintBorders(g);
 
 	g->Reset(); 
 	PaintGlassPane(g);

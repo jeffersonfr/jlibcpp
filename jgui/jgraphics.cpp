@@ -1193,6 +1193,9 @@ void Graphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints)
 			y2 = 0;
 
 	for (int i=0; i<npoints; i++) {
+		p[i].x = SCALE_TO_SCREEN((xp+p[i].x+_translate.x), _screen.width, _scale.width); 
+		p[i].y = SCALE_TO_SCREEN((yp+p[i].y+_translate.y), _screen.height, _scale.height);
+
 		if (p[i].x < x1) {
 			x1 = p[i].x;
 		}
@@ -1210,9 +1213,7 @@ void Graphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints)
 		}
 	}
 
-	Translate(xp, yp);
 	FillPolygon0(p, npoints, x1, y1, x2, y2);
-	Translate(-xp, -yp);
 #endif
 }
 
@@ -2403,6 +2404,10 @@ void Graphics::UpdateGradientColor(Color &scolor, Color &dcolor, int distance, i
 
 void Graphics::FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int y1p, int x2p, int y2p)
 {
+	if (npoints < 3) {
+		return;
+	}
+
 	int xnew,
 			ynew,
 			xold,
@@ -2413,11 +2418,7 @@ void Graphics::FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int y1
 			y2,
 			inside;
 
-	if (npoints < 3) {
-		return;
-	}
-
-	uint32_t color = _color.GetARGB();
+	surface->SetColor(surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
 
 	for (int x=x1p; x<x2p; x++) {
 		for (int y=y1p; y<y2p; y++) {
@@ -2452,7 +2453,7 @@ void Graphics::FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int y1
 			}
 
 			if (inside != 0) {
-				SetPixel(x, y, color);
+				surface->DrawLine(surface, x, y, x, y);
 			}
 		}
 	}

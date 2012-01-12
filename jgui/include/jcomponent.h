@@ -178,7 +178,6 @@ class Component : public virtual jcommon::Object{
 			_is_scrollable_x,
 			_is_scrollable_y,
 			_is_scroll_visible,
-			_is_component_loop,
 			_is_smooth_scroll;
 
 	protected:
@@ -598,17 +597,6 @@ class Component : public virtual jcommon::Object{
 		 */
 		virtual Component * GetDownComponent();
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetComponentLoop(bool loop);
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsComponentLoop();
-
 		/**
 		 * \brief
 		 *
@@ -1040,29 +1028,17 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void PaintBackground(Graphics *g);
-		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void PaintBorderBackground(Graphics *g);
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PaintBorderEdges(Graphics *g);
+		virtual void PaintBorders(Graphics *g);
 		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void PaintScrollbars(Graphics *g);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PaintGlassPane(Graphics *g);
 
 		/**
 		 * \brief

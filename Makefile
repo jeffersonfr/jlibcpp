@@ -340,6 +340,7 @@ OBJS_jgui = \
 		jnulllayout.o\
 		jpanel.o\
 		jprogressbar.o\
+		jrectangle.o\
 		jscrollbar.o\
 		jscrollpane.o\
 		jselectevent.o\

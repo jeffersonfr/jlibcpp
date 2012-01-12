@@ -24,7 +24,11 @@
 #include "jflowlayout.h"
 
 #define KEYBOARD_LAYOUT 																		\
-	SetLayout(new GridLayout(2, 1)); 													\
+	if (_show_text == false) {																\
+		SetLayout(new GridLayout(1, 1)); 												\
+	} else {																									\
+		SetLayout(new GridLayout(2, 1)); 												\
+	}																													\
 																														\
 	if (_show_text == true) { 																\
 		display = new TextArea(); 															\
@@ -118,7 +122,9 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 		BuildInternetKeyboard();
 	}
 
-	SetOptimizedPaint(true);
+	if (_show_text == false) {
+		SetSize(GetWidth(), GetHeight()/2+_insets.top+_insets.bottom);
+	}
 
 	AddSubtitle(_DATA_PREFIX"images/blue_icon.png", "Confirmar");
 }

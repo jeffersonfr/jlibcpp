@@ -65,13 +65,13 @@ SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAdd
 		
 #ifdef _WIN32
 		int len;
-
-		if(getsockname(_fd, (struct sockaddr *)&_lsock, &len) < 0) {
 #else
 		socklen_t len;
+#endif
+
+		len = sizeof(_lsock);
 
 		if(getsockname(_fd, (struct sockaddr *)&_lsock, &len) < 0) {
-#endif
 			throw jio::IOException("ServerSocket constructor exception");
 		}
 	}
@@ -139,16 +139,14 @@ SSLSocket6 * SSLServerSocket6::Accept()
 #ifdef _WIN32
 	int sock_size;
 	int handler;
-	
-	sock_size = sizeof(_rsock);
-	handler = ::accept(_fd, (struct sockaddr *) &_rsock, &sock_size);
 #else 
 	socklen_t sock_size;
 	int handler;
+#endif
 	
 	sock_size = sizeof(_rsock);
+
 	handler = ::accept(_fd, (struct sockaddr *) &_rsock, &sock_size);
-#endif
     
 	if (handler < 0) {
 		throw SocketException("ServerSocket accept exception");
