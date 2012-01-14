@@ -250,7 +250,7 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void Repaint();
+		virtual void Repaint(Component *cmp = NULL);
 		
 		/**
 		 * \brief

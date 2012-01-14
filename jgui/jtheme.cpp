@@ -40,13 +40,18 @@ Theme::Theme():
 	SetComponentBorderColor(0x60, 0x60, 0x80, 0xff);
 	SetComponentBorderFocusColor(0xf0, 0xf0, 0xf0, 0xff);
 	SetComponentScrollbarColor(0x80, 0x80, 0xe0, 0xff);
+	SetComponentDisabledBackgroundColor(0x05, 0x25, 0x35, 0xff);
+	SetComponentDisabledForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
+	SetComponentDisabledBorderColor(0x06, 0x65, 0xaa, 0xff);
 	
 	SetItemColor(0x17, 0x27, 0x3e, 0xff);
+	SetItemForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
 	SetItemFocusColor(0x57, 0x67, 0x7e, 0xff);
+	SetItemForegroundFocusColor(0xf0, 0xf0, 0xf0, 0xff);
 	SetSelectedItemColor(0x80, 0x80, 0x80, 0xff);
 	SetSelectedItemForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
-	SetItemForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
-	SetItemForegroundFocusColor(0xf0, 0xf0, 0xf0, 0xff);
+	SetDisabledItemColor(0x60, 0x60, 0x60, 0xff);
+	SetDisabledItemForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
 
 	_component_border_size = 1;
 	_component_border = JCB_LINE;
@@ -118,6 +123,10 @@ void Theme::Update(Component *parent)
 			c->SetBackgroundFocusColor(_component_focus_bgcolor);
 			c->SetForegroundFocusColor(_component_focus_fgcolor);
 			c->SetScrollbarColor(_component_scrollbar_color);
+			c->SetDisabledBackgroundColor(_component_disabled_bgcolor);
+			c->SetDisabledForegroundColor(_component_disabled_fgcolor);
+			c->SetDisabledBorderColor(_component_disabled_border_color);
+	
 			c->SetBorderSize(_component_border_size);
 			c->SetBorder(_component_border);
 
@@ -129,11 +138,13 @@ void Theme::Update(Component *parent)
 				ItemComponent *ic = (ItemComponent *)c;
 
 				ic->SetItemColor(_item_color);
+				ic->SetItemForegroundColor(_item_fgcolor);
 				ic->SetItemFocusColor(_item_focus_color);
+				ic->SetItemForegroundFocusColor(_item_focus_fgcolor);
 				ic->SetSelectedItemColor(_item_selected_color);
 				ic->SetSelectedItemForegroundColor(_item_selected_fgcolor);
-				ic->SetItemForegroundColor(_item_fgcolor);
-				ic->SetItemForegroundFocusColor(_item_focus_fgcolor);
+				ic->SetDisabledItemColor(_item_disabled_color);
+				ic->SetDisabledItemForegroundColor(_item_disabled_fgcolor);
 			}
 		}
 
@@ -191,14 +202,39 @@ void Theme::SetComponentScrollbarColor(int red, int green, int blue, int alpha)
 	_component_scrollbar_color = Color(red, green, blue, alpha);
 }
 
+void Theme::SetComponentDisabledBackgroundColor(int red, int green, int blue, int alpha)
+{
+	_component_disabled_bgcolor = Color(red, green, blue, alpha);
+}
+
+void Theme::SetComponentDisabledForegroundColor(int red, int green, int blue, int alpha)
+{
+	_component_disabled_fgcolor = Color(red, green, blue, alpha);
+}
+
+void Theme::SetComponentDisabledBorderColor(int red, int green, int blue, int alpha)
+{
+	_component_disabled_border_color = Color(red, green, blue, alpha);
+}
+
 void Theme::SetItemColor(int red, int green, int blue, int alpha)
 {
 	_item_color = Color(red, green, blue, alpha);
 }
 
+void Theme::SetItemForegroundColor(int red, int green, int blue, int alpha)
+{
+	_item_fgcolor = Color(red, green, blue, alpha);
+}
+
 void Theme::SetItemFocusColor(int red, int green, int blue, int alpha)
 {
 	_item_focus_color = Color(red, green, blue, alpha);
+}
+
+void Theme::SetItemForegroundFocusColor(int red, int green, int blue, int alpha)
+{
+	_item_focus_fgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetSelectedItemColor(int red, int green, int blue, int alpha)
@@ -211,14 +247,14 @@ void Theme::SetSelectedItemForegroundColor(int red, int green, int blue, int alp
 	_item_selected_fgcolor = Color(red, green, blue, alpha);
 }
 
-void Theme::SetItemForegroundColor(int red, int green, int blue, int alpha)
+void Theme::SetDisabledItemColor(int red, int green, int blue, int alpha)
 {
-	_item_fgcolor = Color(red, green, blue, alpha);
+	_item_disabled_color = Color(red, green, blue, alpha);
 }
 
-void Theme::SetItemForegroundFocusColor(int red, int green, int blue, int alpha)
+void Theme::SetDisabledItemForegroundColor(int red, int green, int blue, int alpha)
 {
-	_item_focus_fgcolor = Color(red, green, blue, alpha);
+	_item_disabled_fgcolor = Color(red, green, blue, alpha);
 }
 
 void Theme::SetComponentBorder(jcomponent_border_t border)
@@ -309,14 +345,39 @@ Color & Theme::GetComponentScrollbarColor()
 	return _component_scrollbar_color;
 }
 
+Color & Theme::GetComponentDisabledBackgroundColor()
+{
+	return _component_disabled_bgcolor;
+}
+
+Color & Theme::GetComponentDisabledForegroundColor()
+{
+	return _component_disabled_fgcolor;
+}
+
+Color & Theme::GetComponentDisabledBorderColor()
+{
+	return _component_disabled_border_color;
+}
+
 Color & Theme::GetItemColor()
 {
 	return _item_color;
 }
 
+Color & Theme::GetItemForegroundColor()
+{
+	return _item_fgcolor;
+}
+
 Color & Theme::GetItemFocusColor()
 {
 	return _item_focus_color;
+}
+
+Color & Theme::GetItemForegroundFocusColor()
+{
+	return _item_focus_fgcolor;
 }
 
 Color & Theme::GetSelectedItemColor()
@@ -329,14 +390,14 @@ Color & Theme::GetSelectedItemForegroundColor()
 	return _item_selected_fgcolor;
 }
 
-Color & Theme::GetItemForegroundColor()
+Color & Theme::GetDisabledItemColor()
 {
-	return _item_fgcolor;
+	return _item_disabled_color;
 }
 
-Color & Theme::GetItemForegroundFocusColor()
+Color & Theme::GetDisabledItemForegroundColor()
 {
-	return _item_focus_fgcolor;
+	return _item_disabled_fgcolor;
 }
 
 jcomponent_border_t Theme::GetComponentBorder()

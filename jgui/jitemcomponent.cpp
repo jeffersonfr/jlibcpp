@@ -130,7 +130,7 @@ void Item::SetEnabled(bool b)
 	_is_enabled = b;
 }
 
-bool Item::GetEnabled()
+bool Item::IsEnabled()
 {
 	return _is_enabled;
 }
@@ -254,14 +254,19 @@ Color & ItemComponent::GetItemColor()
 	return _item_color;
 }
 
+Color & ItemComponent::GetItemForegroundColor()
+{
+	return _item_fgcolor;
+}
+
 Color & ItemComponent::GetItemFocusColor()
 {
 	return _focus_item_color;
 }
 
-Color & ItemComponent::GetItemForegroundColor()
+Color & ItemComponent::GetItemForegroundFocusColor()
 {
-	return _item_fgcolor;
+	return _focus_item_fgcolor;
 }
 
 Color & ItemComponent::GetSelectedItemColor()
@@ -274,9 +279,14 @@ Color & ItemComponent::GetSelectedItemForegroundColor()
 	return _selected_item_fgcolor;
 }
 
-Color & ItemComponent::GetItemForegroundFocusColor()
+Color & ItemComponent::GetDisabledItemColor()
 {
-	return _focus_item_fgcolor;
+	return _disabled_item_color;
+}
+
+Color & ItemComponent::GetDisabledItemForegroundColor()
+{
+	return _disabled_item_fgcolor;
 }
 
 void ItemComponent::SetItemColor(int red, int green, int blue, int alpha)
@@ -284,9 +294,19 @@ void ItemComponent::SetItemColor(int red, int green, int blue, int alpha)
 	_item_color = Color(red, green, blue, alpha);
 }
 
+void ItemComponent::SetItemForegroundColor(int red, int green, int blue, int alpha)
+{
+	_item_fgcolor = Color(red, green, blue, alpha);
+}
+
 void ItemComponent::SetItemFocusColor(int red, int green, int blue, int alpha)
 {
 	_focus_item_color = Color(red, green, blue, alpha);
+}
+
+void ItemComponent::SetItemForegroundFocusColor(int red, int green, int blue, int alpha)
+{
+	_focus_item_fgcolor = Color(red, green, blue, alpha);
 }
 
 void ItemComponent::SetSelectedItemColor(int red, int green, int blue, int alpha)
@@ -299,14 +319,14 @@ void ItemComponent::SetSelectedItemForegroundColor(int red, int green, int blue,
 	_selected_item_fgcolor = Color(red, green, blue, alpha);
 }
 
-void ItemComponent::SetItemForegroundColor(int red, int green, int blue, int alpha)
+void ItemComponent::SetDisabledItemColor(int red, int green, int blue, int alpha)
 {
-	_item_fgcolor = Color(red, green, blue, alpha);
+	_disabled_item_color = Color(red, green, blue, alpha);
 }
 
-void ItemComponent::SetItemForegroundFocusColor(int red, int green, int blue, int alpha)
+void ItemComponent::SetDisabledItemForegroundColor(int red, int green, int blue, int alpha)
 {
-	_focus_item_fgcolor = Color(red, green, blue, alpha);
+	_disabled_item_fgcolor = Color(red, green, blue, alpha);
 }
 
 void ItemComponent::SetItemColor(const Color &color)
@@ -314,9 +334,19 @@ void ItemComponent::SetItemColor(const Color &color)
 	_item_color = color;
 }
 
+void ItemComponent::SetItemForegroundColor(const Color &color)
+{
+	_item_fgcolor = color;
+}
+
 void ItemComponent::SetItemFocusColor(const Color &color)
 {
 	_focus_item_color = color;
+}
+
+void ItemComponent::SetItemForegroundFocusColor(const Color &color)
+{
+	_focus_item_fgcolor = color;
 }
 
 void ItemComponent::SetSelectedItemColor(const Color &color)
@@ -329,14 +359,14 @@ void ItemComponent::SetSelectedItemForegroundColor(const Color &color)
 	_selected_item_fgcolor = color;
 }
 
-void ItemComponent::SetItemForegroundColor(const Color &color)
+void ItemComponent::SetDisabledItemColor(const Color &color)
 {
-	_item_fgcolor = color;
+	_disabled_item_color = color;
 }
 
-void ItemComponent::SetItemForegroundFocusColor(const Color &color)
+void ItemComponent::SetDisabledItemForegroundColor(const Color &color)
 {
-	_focus_item_fgcolor = color;
+	_disabled_item_fgcolor = color;
 }
 
 int ItemComponent::GetItemsSize()

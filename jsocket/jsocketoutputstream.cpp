@@ -169,6 +169,10 @@ int64_t SocketOutputStream::Flush()
 	if (n == SOCKET_ERROR) {
 #else
 	if (n < 0) {
+		if (errno == EPIPE || errno == ECONNRESET) {
+			Close();
+		}
+
 #endif
 		return -1LL;
 	}

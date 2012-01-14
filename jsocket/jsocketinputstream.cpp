@@ -105,9 +105,13 @@ int64_t SocketInputStream::Read()
 		}
 		
 #ifdef _WIN32
-		if (n == SOCKET_ERROR || n == 0) {
+		if (n == SOCKET_ERROR) {
 #else 
 		if (n <= 0) {
+			if (n == 0) {
+				Close();
+			}
+
 #endif
 			return -1LL;
 		}
@@ -155,11 +159,15 @@ int64_t SocketInputStream::Read(char *data_, int64_t data_length_)
 			n = ::recvfrom(_fd, _buffer, (size_t)_buffer_length, flags, _address, (socklen_t *)&length);
 #endif
 		}
-		
+	
 #ifdef _WIN32
 		if (n == SOCKET_ERROR) {
 #else 
 		if (n <= 0) {
+			if (n == 0) {
+				Close();
+			}
+
 #endif
 			return -1LL;
 		}

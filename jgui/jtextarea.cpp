@@ -544,10 +544,14 @@ void TextArea::Paint(Graphics *g)
 					c[0] = ' ';
 				}
 
-				if (_has_focus == true) {
-					g->SetColor(_focus_fgcolor);
+				if (_is_enabled == true) {
+					if (_has_focus == true) {
+						g->SetColor(_focus_fgcolor);
+					} else {
+						g->SetColor(_fgcolor);
+					}
 				} else {
-					g->SetColor(_fgcolor);
+					g->SetColor(_disabled_fgcolor);
 				}
 
 				g->DrawString(s, x, y+k*font_height);

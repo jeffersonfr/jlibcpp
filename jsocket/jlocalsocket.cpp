@@ -241,15 +241,21 @@ int LocalSocket::Send(const char *data_, int size_, bool block_)
 
 	int n = ::send(_fd, data_, size_, flags);
 
-	if (n < 0 && errno == EAGAIN) {
-		if (block_ == true) {
-			throw SocketTimeoutException("Socket send timeout exception");
+	if (n < 0) {
+		if (errno == EAGAIN) {
+			if (block_ == true) {
+				throw SocketTimeoutException("Socket send timeout exception");
+			} else {
+				// INFO:: non-blocking socket, no data read
+				n = 0;
+			}
+		} else if (errno == EPIPE || errno == ECONNRESET) {
+			Close();
+
+			throw SocketException("Broken pipe exception");
 		} else {
-			// INFO:: non-blocking socket, no data read
-			n = 0;
+			throw SocketTimeoutException("Socket send exception");
 		}
-	} else if (n < 0) {
-		throw SocketTimeoutException("Socket send exception");
 	}
 
 	_sent_bytes += n;
@@ -315,7 +321,8 @@ int LocalSocket::Receive(char *data_, int size_, bool block_)
 			throw jio::IOException("Socket read exception");
 		}
 	} else if (n == 0) {
-		// INFO:: peer has shutdown
+		Close(); 
+		
 		throw SocketException("Broken pipe exception");
 	}
 

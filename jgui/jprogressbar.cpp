@@ -224,10 +224,14 @@ void ProgressBar::Paint(Graphics *g)
 		}
 
 		if (_label_visible == true) {
-			if (_has_focus == true) {
-				g->SetColor(_focus_fgcolor);
+			if (_is_enabled == true) {
+				if (_has_focus == true) {
+					g->SetColor(_focus_fgcolor);
+				} else {
+					g->SetColor(_fgcolor);
+				}
 			} else {
-				g->SetColor(_fgcolor);
+				g->SetColor(_disabled_fgcolor);
 			}
 
 			int px = x+gapx,

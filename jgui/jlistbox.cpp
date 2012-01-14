@@ -158,6 +158,12 @@ void ListBox::SetSelected(int i)
 		return;
 	}
 
+	Item *item = _items[i];
+
+	if (item->IsEnabled() == false) {
+		return;
+	}
+
 	if (_selection == JLM_SINGLE_SELECTION) {
 		if (_selected_index == i) {
 			_selected_index = -1;
@@ -167,10 +173,10 @@ void ListBox::SetSelected(int i)
 
 		Repaint();
 	} else if (_selection == JLM_MULTI_SELECTION) {
-		if (_items[i]->IsSelected()) {
-			_items[i]->SetSelected(false);
+		if (item->IsSelected()) {
+			item->SetSelected(false);
 		} else {
-			_items[i]->SetSelected(true);
+			item->SetSelected(true);
 		}
 
 		Repaint();
@@ -183,12 +189,18 @@ void ListBox::Select(int i)
 		return;
 	}
 
+	Item *item = _items[i];
+
+	if (item->IsEnabled() == false) {
+		return;
+	}
+
 	if (_selection == JLM_SINGLE_SELECTION) {
 		_selected_index = i;
 
 		Repaint();
 	} else if (_selection == JLM_MULTI_SELECTION) {
-		_items[i]->SetSelected(true);
+		item->SetSelected(true);
 
 		Repaint();
 	}
@@ -200,12 +212,18 @@ void ListBox::Deselect(int i)
 		return;
 	}
 
+	Item *item = _items[i];
+
+	if (item->IsEnabled() == false) {
+		return;
+	}
+
 	if (_selection == JLM_SINGLE_SELECTION) {
 		_selected_index = -1;
 
 		Repaint();
 	} else if (_selection == JLM_MULTI_SELECTION) {
-		_items[i]->SetSelected(false);
+		item->SetSelected(false);
 
 		Repaint();
 	}
@@ -337,7 +355,13 @@ void ListBox::Paint(Graphics *g)
 	y = y - scrolly;
 
 	for (int i=0; i<(int)_items.size(); i++) {
-		g->SetColor(_item_color);
+		Item *item = _items[i];
+
+		if (item->IsEnabled() == true) {
+			g->SetColor(GetItemColor());
+		} else {
+			g->SetColor(GetDisabledItemColor());
+		}
 
 		if (_index != i) {
 			if (_selection == JLM_SINGLE_SELECTION) {	
@@ -345,7 +369,7 @@ void ListBox::Paint(Graphics *g)
 					g->SetColor(_selected_item_color);
 				}
 			} else if (_selection == JLM_MULTI_SELECTION) {	
-				if (_items[i]->IsSelected() == true) {	
+				if (item->IsSelected() == true) {	
 					g->SetColor(_selected_item_color);
 				}
 			}
@@ -376,10 +400,14 @@ void ListBox::Paint(Graphics *g)
 		}
 
 		if (IsFontSet() == true) {
-			if (_has_focus == true) {
-				g->SetColor(_focus_item_fgcolor);
+			if (_is_enabled == true) {
+				if (_has_focus == true) {
+					g->SetColor(_focus_fgcolor);
+				} else {
+					g->SetColor(_fgcolor);
+				}
 			} else {
-				g->SetColor(_item_fgcolor);
+				g->SetColor(_disabled_fgcolor);
 			}
 
 			std::string text = _items[i]->GetValue();

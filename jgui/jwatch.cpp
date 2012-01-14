@@ -226,10 +226,14 @@ void Watch::Paint(Graphics *g)
 	*/
 
 	if (IsFontSet() == true) {
-		if (_has_focus == true) {
-			g->SetColor(_focus_fgcolor);
+		if (_is_enabled == true) {
+			if (_has_focus == true) {
+				g->SetColor(_focus_fgcolor);
+			} else {
+				g->SetColor(_fgcolor);
+			}
 		} else {
-			g->SetColor(_fgcolor);
+			g->SetColor(_disabled_fgcolor);
 		}
 
 		int x = _horizontal_gap+_border_size,

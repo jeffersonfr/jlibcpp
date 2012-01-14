@@ -57,8 +57,8 @@ class Item : public virtual jcommon::Object{
 		jhorizontal_align_t _halign;
 		jvertical_align_t _valign;
 		bool _is_checked,
-				 _is_visible,
-				 _is_enabled;
+		 	_is_visible,
+		 	_is_enabled;
 
 	public:
 		/**
@@ -131,7 +131,7 @@ class Item : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual bool GetEnabled();
+		virtual bool IsEnabled();
 
 		/**
 		 * \brief
@@ -225,11 +225,13 @@ class ItemComponent : public jgui::Component{
 		std::vector<Item *> _items,
 			_internal;
 		Color _item_color,
-					_focus_item_color,
-					_selected_item_color,
-					_selected_item_fgcolor,
-					_item_fgcolor,
-					_focus_item_fgcolor;
+			_item_fgcolor,
+			_selected_item_color,
+			_selected_item_fgcolor,
+			_focus_item_color,
+			_focus_item_fgcolor,
+			_disabled_item_color,
+			_disabled_item_fgcolor;
 		std::string _text;
 		int _index;
 		bool _loop;
@@ -260,7 +262,7 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual Color & GetItemFocusColor();
+		virtual Color & GetItemForegroundColor();
 
 		/**
 		 * \brief
@@ -278,7 +280,7 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual Color & GetItemForegroundColor();
+		virtual Color & GetItemFocusColor();
 
 		/**
 		 * \brief
@@ -290,13 +292,37 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
+		virtual Color & GetDisabledItemColor();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Color & GetDisabledItemForegroundColor();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetItemColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
 		 *
 		 */
+		virtual void SetItemForegroundColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetItemFocusColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundFocusColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
@@ -314,13 +340,13 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void SetItemForegroundColor(int red, int green, int blue, int alpha);
+		virtual void SetDisabledItemColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetItemForegroundFocusColor(int red, int green, int blue, int alpha);
+		virtual void SetDisabledItemForegroundColor(int red, int green, int blue, int alpha);
 
 		/**
 		 * \brief
@@ -332,7 +358,19 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
+		virtual void SetItemForegroundColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetItemFocusColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundFocusColor(const Color &color);
 
 		/**
 		 * \brief
@@ -350,13 +388,13 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual void SetItemForegroundColor(const Color &color);
+		virtual void SetDisabledItemColor(const Color &color);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetItemForegroundFocusColor(const Color &color);
+		virtual void SetDisabledItemForegroundColor(const Color &color);
 
 		/**
 		 * \brief

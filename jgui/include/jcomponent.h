@@ -147,7 +147,10 @@ class Component : public virtual jcommon::Object{
 			_focus_fgcolor,
 			_border_color,
 			_focus_border_color,
-			_scrollbar_color;
+			_scrollbar_color,
+			_disabled_bgcolor,
+			_disabled_fgcolor,
+			_disabled_border_color;
 		jcomponent_alignment_t _alignment_x,
 			_alignment_y;
 		jcomponent_orientation_t _orientation;
@@ -919,6 +922,24 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void SetDisabledBackgroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetDisabledForegroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetDisabledBorderColor(int red, int green, int blue, int alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetBackgroundColor(const Color &color);
 		
 		/**
@@ -961,6 +982,24 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void SetDisabledBackgroundColor(const Color &color);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetDisabledForegroundColor(const Color &color);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetDisabledBorderColor(const Color &color);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Color & GetBackgroundColor();
 		
 		/**
@@ -998,6 +1037,24 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual Color & GetScrollbarColor();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Color & GetDisabledBackgroundColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Color & GetDisabledForegroundColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Color & GetDisabledBorderColor();
 
 		/**
 		 * \brief

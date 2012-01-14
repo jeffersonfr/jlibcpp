@@ -83,6 +83,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 			// INFO:: avoid flickering (can cause problems during the repaint of the components)
 			container->SetOpaque(true);
+			// container->SetOptimizedPaint(true);
 		}
 
 		{

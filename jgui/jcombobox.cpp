@@ -324,10 +324,14 @@ void ComboBox::Paint(Graphics *g)
 		Item *item = GetCurrentItem();
 
 		if (item != NULL && _font != NULL) {
-			if (_has_focus == true) {
-				g->SetColor(_focus_fgcolor);
+			if (_is_enabled == true) {
+				if (_has_focus == true) {
+					g->SetColor(_focus_fgcolor);
+				} else {
+					g->SetColor(_fgcolor);
+				}
 			} else {
-				g->SetColor(_fgcolor);
+				g->SetColor(_disabled_fgcolor);
 			}
 
 			int px = x+gapx,

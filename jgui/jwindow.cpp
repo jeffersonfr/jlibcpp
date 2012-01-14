@@ -530,7 +530,7 @@ void Window::SetUndecorated(bool b)
 	Repaint();
 }
 
-void Window::Repaint()
+void Window::Repaint(Component *cmp)
 {
 	jthread::AutoLock lock(&_window_mutex);
 	
@@ -542,15 +542,50 @@ void Window::Repaint()
 
 	jpoint_t t = _graphics->Translate();
 
+	_graphics->Reset();
 	_graphics->Translate(-t.x, -t.y);
-
 	_graphics->ReleaseClip();
-	
-	// TODO:: DoLayout();
 
-	Paint(_graphics);
-	
-	_graphics->Flip();
+	DoLayout();
+
+	if (_optimized_paint == false) {
+		Paint(_graphics);
+		
+		_graphics->Flip();
+	} else {
+		if (cmp == NULL || cmp->IsBackgroundVisible() == false) {
+			cmp = this;
+		}
+
+		jpoint_t location = cmp->GetAbsoluteLocation();
+		jsize_t size = cmp->GetSize();
+
+		_graphics->Translate(location.x, location.y);
+		_graphics->SetClip(0, 0, size.width, size.height);
+
+		if (cmp->InstanceOf("jgui::Container") == true) {
+			cmp->Paint(_graphics);
+		} else {
+			if (cmp->IsBackgroundVisible() == true) {
+				_graphics->Reset(); 
+				cmp->PaintBackground(_graphics);
+			}
+
+			_graphics->Reset(); 
+			cmp->Paint(_graphics);
+
+			if (cmp->IsScrollVisible() == true) {
+				_graphics->Reset(); 
+				cmp->PaintScrollbars(_graphics);
+			}
+
+			_graphics->Reset(); 
+			cmp->PaintBorders(_graphics);
+		}
+
+		_graphics->Flip(location.x, location.y, size.width, size.height);
+		_graphics->Translate(-location.x, -location.y);
+	}
 
 	Revalidate();
 

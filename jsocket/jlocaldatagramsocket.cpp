@@ -254,6 +254,8 @@ int LocalDatagramSocket::Receive(char *data_, int size_, bool block_)
 			throw jio::IOException("Read socket error");
 		}
 	} else if (n == 0) {
+		Close();
+
 		throw jio::IOException("Peer shutdown exception");
 	}
 
@@ -322,6 +324,10 @@ int LocalDatagramSocket::Send(const char *data_, int size_, bool block_)
 				// INFO:: non-blocking socket, no data read
 				n = 0;
 			}
+		} else if (errno == EPIPE || errno == ECONNRESET) {
+			Close();
+
+			throw SocketException("Broken pipe exception");
 		} else {
 			throw SocketTimeoutException("Socket send exception");
 		}

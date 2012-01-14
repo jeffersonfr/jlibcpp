@@ -409,7 +409,9 @@ int DatagramSocket6::Receive(char *data_, int size_, bool block_)
 			throw jio::IOException("Socket read exception");
 		}
 	} else if (n == 0) {
-		throw jio::IOException("Peer shutdown exception");
+		Close();
+
+		throw jio::IOException("Broken pipe exception");
 	}
 #else
 	n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
@@ -426,7 +428,9 @@ int DatagramSocket6::Receive(char *data_, int size_, bool block_)
 			throw jio::IOException("Socket read exception");
 		}
 	} else if (n == 0) {
-		throw jio::IOException("Peer shutdown exception");
+		Close();
+
+		throw jio::IOException("Broken pipe exception");
 	}
 #endif
 
@@ -505,6 +509,10 @@ int DatagramSocket6::Send(const char *data_, int size_, bool block_)
 				// INFO:: non-blocking socket, no data read
 				n = 0;
 			}
+		} else if (errno == EPIPE || errno == ECONNRESET) {
+			Close();
+
+			throw SocketException("Broken pipe exception");
 		} else {
 			throw SocketTimeoutException("Socket send exception");
 		}

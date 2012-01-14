@@ -524,7 +524,11 @@ void Component::PaintBackground(Graphics *g)
 			w = _size.width,
 			h = _size.height;
 
-	g->SetColor(_bgcolor);
+	if (_is_enabled == true) {
+		g->SetColor(_bgcolor);
+	} else {
+		g->SetColor(_disabled_bgcolor);
+	}
 
 	if (_border == JCB_ROUND) {
 		g->FillRoundRectangle(x, y, w, h);
@@ -541,23 +545,28 @@ void Component::PaintBorders(Graphics *g)
 		return;
 	}
 
+	Color color;
 	int xp = 0, 
 			yp = 0,
 			wp = _size.width,
 			hp = _size.height,
 			size = _border_size;
-	int dr = _border_color.GetRed(),
-			dg = _border_color.GetGreen(),
-			db = _border_color.GetBlue(),
-			da = _border_color.GetAlpha();
 	int step = 0x20;
 
-	if (HasFocus() == true) {
-		dr = _focus_border_color.GetRed();
-		dg = _focus_border_color.GetGreen();
-		db = _focus_border_color.GetBlue();
-		da = _focus_border_color.GetAlpha();
+	if (_is_enabled == true) {
+		if (_has_focus == true) {
+			color = _focus_border_color;
+		} else {
+			color = _border_color;
+		}
+	} else {
+		color = _disabled_border_color;
 	}
+
+	int dr = color.GetRed(),
+			dg = color.GetGreen(),
+			db = color.GetBlue(),
+			da = color.GetAlpha();
 
 	g->SetLineWidth(1);
 
@@ -804,7 +813,7 @@ void Component::Repaint()
 	}
 
 	if (_parent != NULL) {
-		_parent->Repaint();
+		_parent->Repaint(this);
 	}
 
 	DispatchComponentEvent(new ComponentEvent(this, JCE_PAINTED));
@@ -1266,6 +1275,21 @@ void Component::SetScrollbarColor(int red, int green, int blue, int alpha)
 	SetScrollbarColor(Color(red, green, blue, alpha));
 }
 
+void Component::SetDisabledBackgroundColor(int red, int green, int blue, int alpha)
+{
+	SetDisabledBackgroundColor(Color(red, green, blue, alpha));
+}
+
+void Component::SetDisabledForegroundColor(int red, int green, int blue, int alpha)
+{
+	SetDisabledForegroundColor(Color(red, green, blue, alpha));
+}
+
+void Component::SetDisabledBorderColor(int red, int green, int blue, int alpha)
+{
+	SetDisabledBorderColor(Color(red, green, blue, alpha));
+}
+
 void Component::SetBackgroundColor(const Color &color)
 {
 	_bgcolor = color;
@@ -1315,6 +1339,27 @@ void Component::SetScrollbarColor(const Color &color)
 	Repaint();
 }
 
+void Component::SetDisabledBackgroundColor(const Color &color)
+{
+	_disabled_bgcolor = color;
+
+	Repaint();
+}
+
+void Component::SetDisabledForegroundColor(const Color &color)
+{
+	_disabled_fgcolor = color;
+
+	Repaint();
+}
+
+void Component::SetDisabledBorderColor(const Color &color)
+{
+	_disabled_border_color = color;
+
+	Repaint();
+}
+
 Color & Component::GetBackgroundColor()
 {
 	return _bgcolor;
@@ -1348,6 +1393,21 @@ Color & Component::GetBorderFocusColor()
 Color & Component::GetScrollbarColor()
 {
 	return _scrollbar_color;
+}
+
+Color & Component::GetDisabledBackgroundColor()
+{
+	return _disabled_bgcolor;
+}
+
+Color & Component::GetDisabledForegroundColor()
+{
+	return _disabled_fgcolor;
+}
+
+Color & Component::GetDisabledBorderColor()
+{
+	return _disabled_border_color;
 }
 
 bool Component::Intersect(int x, int y)

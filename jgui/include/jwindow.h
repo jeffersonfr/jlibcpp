@@ -184,7 +184,7 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
-		virtual void Repaint();
+		virtual void Repaint(Component *cmp = NULL);
 		
 		/**
 		 * \brief

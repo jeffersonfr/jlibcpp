@@ -47,28 +47,33 @@ class Theme : public jcommon::Object{
 
 	private:
 		Font *_window_font,
-				 *_component_font;
+		 	*_component_font;
 		jinsets_t _insets;
 		Color _window_bgcolor,
-					_window_fgcolor,
-					_window_border_color,
-					_component_bgcolor,
-					_component_fgcolor,
-					_component_border_color,
-					_component_border_focus_color,
-					_component_focus_bgcolor,
-					_component_focus_fgcolor,
-					_component_scrollbar_color,
-					_item_color,
-					_item_focus_color,
-					_item_selected_color,
-					_item_selected_fgcolor,
-					_item_fgcolor,
-					_item_focus_fgcolor;
+			_window_fgcolor,
+			_window_border_color,
+			_component_bgcolor,
+			_component_fgcolor,
+			_component_border_color,
+			_component_border_focus_color,
+			_component_focus_bgcolor,
+			_component_focus_fgcolor,
+			_component_scrollbar_color,
+			_component_disabled_bgcolor,
+			_component_disabled_fgcolor,
+			_component_disabled_border_color,
+			_item_color,
+			_item_fgcolor,
+			_item_focus_color,
+			_item_focus_fgcolor,
+			_item_selected_color,
+			_item_selected_fgcolor,
+			_item_disabled_color,
+			_item_disabled_fgcolor;
 		jcomponent_border_t _component_border,
-												_window_border;
+			_window_border;
 		int _window_border_size,
-				_component_border_size;
+			_component_border_size;
 
 	public:
 		/**
@@ -153,7 +158,31 @@ class Theme : public jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void SetComponentDisabledBackgroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetComponentDisabledForegroundColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetComponentDisabledBorderColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetItemColor(int red, int green, int blue, int alpha);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundColor(int red, int green, int blue, int alpha);
 		
 		/**
 		 * \brief
@@ -161,6 +190,12 @@ class Theme : public jcommon::Object{
 		 */
 		virtual void SetItemFocusColor(int red, int green, int blue, int alpha);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemForegroundFocusColor(int red, int green, int blue, int alpha);
+
 		/**
 		 * \brief
 		 *
@@ -177,14 +212,14 @@ class Theme : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetItemForegroundColor(int red, int green, int blue, int alpha);
+		virtual void SetDisabledItemColor(int red, int green, int blue, int alpha);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetItemForegroundFocusColor(int red, int green, int blue, int alpha);
-
+		virtual void SetDisabledItemForegroundColor(int red, int green, int blue, int alpha);
+		
 		/**
 		 * \brief
 		 *
@@ -291,13 +326,43 @@ class Theme : public jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual Color & GetComponentDisabledBackgroundColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Color & GetComponentDisabledForegroundColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Color & GetComponentDisabledBorderColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Color & GetItemColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
+		virtual Color & GetItemForegroundColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Color & GetItemFocusColor();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Color & GetItemForegroundFocusColor();
 		
 		/**
 		 * \brief
@@ -315,13 +380,13 @@ class Theme : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual Color & GetItemForegroundColor();
+		virtual Color & GetDisabledItemColor();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual Color & GetItemForegroundFocusColor();
+		virtual Color & GetDisabledItemForegroundColor();
 		
 		/**
 		 * \brief

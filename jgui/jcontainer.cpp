@@ -24,6 +24,7 @@
 #include "joutofboundsexception.h"
 #include "jnullpointerexception.h"
 #include "jrectangle.h"
+#include "jwindow.h"
 
 namespace jgui {
 
@@ -265,8 +266,6 @@ void Container::SetLayout(jgui::Layout *layout)
 	}
 
 	_layout = layout;
-
-	DoLayout();
 }
 
 jgui::Layout * Container::GetLayout()
@@ -277,6 +276,8 @@ jgui::Layout * Container::GetLayout()
 void Container::DoLayout()
 {
 	if (_layout != NULL) {
+		SetIgnoreRepaint(true);
+
 		_layout->DoLayout(this);
 
 		for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
@@ -284,6 +285,8 @@ void Container::DoLayout()
 				dynamic_cast<jgui::Container *>(*i)->DoLayout();
 			}
 		}
+		
+		SetIgnoreRepaint(false);
 	}
 		
 	UpdateScrollDimension();
@@ -447,7 +450,7 @@ void Container::Paint(Graphics *g)
 	Revalidate();
 }
 
-void Container::Repaint()
+void Container::Repaint(Component *cmp)
 {
 	Invalidate();
 
@@ -456,7 +459,7 @@ void Container::Repaint()
 	}
 
 	if (_parent != NULL) {
-		_parent->Repaint();
+		_parent->Repaint((cmp == NULL)?this:cmp);
 	}
 
 	Component::DispatchComponentEvent(new ComponentEvent(this, JCE_PAINTED));
@@ -665,7 +668,7 @@ void Container::RequestComponentFocus(jgui::Component *c)
 
 		SetIgnoreRepaint(false);
 
-		Repaint();
+		Repaint(this);
 		
 		dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, JFE_GAINED));
 	}

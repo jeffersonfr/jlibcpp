@@ -152,10 +152,14 @@ void ToogleButton::Paint(Graphics *g)
 		g->DrawImage((_has_focus == true && _image_focus_icon != NULL)?_image_focus_icon:_image_icon, px, py, ph, ph);
 
 		if (_font != NULL) {
-			if (_has_focus == true) {
-				g->SetColor(_focus_fgcolor);
+			if (_is_enabled == true) {
+				if (_has_focus == true) {
+					g->SetColor(_focus_fgcolor);
+				} else {
+					g->SetColor(_fgcolor);
+				}
 			} else {
-				g->SetColor(_fgcolor);
+				g->SetColor(_disabled_fgcolor);
 			}
 
 			if (_image != "") {

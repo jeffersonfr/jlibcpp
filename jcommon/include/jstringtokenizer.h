@@ -31,7 +31,7 @@ namespace jcommon {
 
 enum jtoken_type_t {
 	JTT_CHAR,
-	JTT_STRING,
+	JTT_STRING
 };
 	
 /**

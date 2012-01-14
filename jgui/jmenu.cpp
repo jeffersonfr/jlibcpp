@@ -165,7 +165,7 @@ void Menu::KeyPressed(KeyEvent *event)
 				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_DOWN)); 
 			}
 		} else if (action == JKS_ENTER) {
-			if (menu->_items[menu->_index]->GetEnabled() == true) {
+			if (menu->_items[menu->_index]->IsEnabled() == true) {
 				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_ACTION)); 
 			}
 		}
@@ -182,7 +182,7 @@ void Menu::KeyPressed(KeyEvent *event)
 	} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT || event->GetSymbol() == jgui::JKS_ENTER) {
 		Item *item = GetCurrentItem();
 
-		if (item != NULL && item->GetEnabled() == true) {
+		if (item != NULL && item->IsEnabled() == true) {
 			if (event->GetSymbol() == jgui::JKS_ENTER && item->GetType() == JMT_CHECK) {
 				item->SetSelected(item->IsSelected()^true);
 
@@ -598,7 +598,7 @@ void Menu::Paint(Graphics *g)
 			g->DrawString(text, px, py, pw, ph, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
 		}
 
-		if (_items[i]->GetEnabled() == false) {
+		if (_items[i]->IsEnabled() == false) {
 			g->SetColor(0x00, 0x00, 0x00, 0x80);
 			g->FillRectangle(x, y+(_item_size+_vertical_gap)*count, w, _item_size+10);
 		}

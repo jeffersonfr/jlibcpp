@@ -231,7 +231,15 @@ void TextField::Paint(Graphics *g)
 		paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
 	}
 
-	g->SetColor(_fgcolor);
+	if (_is_enabled == true) {
+		if (_has_focus == true) {
+			g->SetColor(_focus_fgcolor);
+		} else {
+			g->SetColor(_fgcolor);
+		}
+	} else {
+		g->SetColor(_disabled_fgcolor);
+	}
 
 	current_text_size = 0;
 
