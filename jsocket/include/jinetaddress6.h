@@ -36,12 +36,20 @@
 
 namespace jsocket {
 
+class ServerSocket6;
+class DatagramSocket6;
+class SSLServerSocket6;
+
 /**
  * \brief InetAddress.
  *
  * \author Jeff Ferr
  */
 class InetAddress6 : public InetAddress{
+
+	friend class ServerSocket6;
+	friend class DatagramSocket6;
+	friend class SSLServerSocket6;
 
 	private:
 		/** \brief Host name. */

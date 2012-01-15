@@ -70,7 +70,7 @@ void Container::UpdateScrollDimension()
 			p2x = 0;
 	int p1y = 0,
 			p2y = 0;
-	int gap = _scroll_size+_scroll_gap; //+_border_size;
+	int gap = _scroll_size+_scroll_gap;
 
 	for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		Component *cmp = (*i);
@@ -104,30 +104,34 @@ void Container::UpdateScrollDimension()
 		}
 	}
 
-	_scroll_dimension.width = p2x-p1x+_border_size;
-	_scroll_dimension.height = p2y-p1y+_border_size;
+	_scroll_dimension.width = p2x-p1x;
+	_scroll_dimension.height = p2y-p1y;
 
 	if ((_scroll_dimension.width > _size.width)) {
 		_scroll_dimension.height = _scroll_dimension.height + gap;
-	}
 
-	if ((_scroll_dimension.height > _size.height)) {
+		if ((_scroll_dimension.height > _size.height)) {
+			_scroll_dimension.width = _scroll_dimension.width + gap;
+		}
+	} else if ((_scroll_dimension.height > _size.height)) {
 		_scroll_dimension.width = _scroll_dimension.width + gap;
+	
+		if ((_scroll_dimension.width > _size.width)) {
+			_scroll_dimension.height = _scroll_dimension.height + gap;
+		}
 	}
 
 	/*
 	// TODO:: caso exista um elemento com deslocamento x/y menor que 0 inicial, atualizar a posicao do scroll
-	jsize_t t = GetScrollDimension();
-
-	if (_is_scrollable_x == true && t.width > _size.width) {
-		if (_scroll_location.x < (t.width-_size.width)) {
-			_scroll_location.x = t.width-_size.width;
+	if (_is_scrollable_x == true && _scroll_dimension.width > _size.width) {
+		if (_scroll_location.x < (_scroll_dimension.width-_size.width)) {
+			_scroll_location.x = _scroll_dimension.width-_size.width;
 		}
 	}
 
-	if (_is_scrollable_y == true && t.height > _size.height) {
-		if (_scroll_location.y < (t.height-_size.height)) {
-			_scroll_location.y = t.height-_size.height;
+	if (_is_scrollable_y == true && _scroll_dimension.height > _size.height) {
+		if (_scroll_location.y < (_scroll_dimension.height-_size.height)) {
+			_scroll_location.y = _scroll_dimension.height-_size.height;
 		}
 	}
 	*/

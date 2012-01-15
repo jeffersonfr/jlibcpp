@@ -69,7 +69,7 @@ Component::Component(int x, int y, int width, int height):
 	_size.height = height;
 
 	_scroll_size = 20;
-	_scroll_gap = 2;
+	_scroll_gap = 4;
 	_scroll_minor_increment = 10;
 	_scroll_major_increment = 50;
 

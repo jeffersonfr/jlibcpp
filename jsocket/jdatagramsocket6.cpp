@@ -125,7 +125,7 @@ void DatagramSocket6::CreateSocket()
 	_is_closed = false;
 }
 
-void DatagramSocket6::BindSocket(InetAddress *addr_, int local_port_)
+void DatagramSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
 	int opt = 1;
 
@@ -133,7 +133,15 @@ void DatagramSocket6::BindSocket(InetAddress *addr_, int local_port_)
    
 	_lsock.sin6_family = AF_INET6;
 	_lsock.sin6_flowinfo = 0;
-	_lsock.sin6_addr = in6addr_any;
+	
+	if (local_addr_ == NULL) {
+		_lsock.sin6_addr = in6addr_any;
+	} else {
+		_local = dynamic_cast<InetAddress6 *>(local_addr_);
+
+		memcpy(&(_lsock.sin6_addr), &(_local->_ip), sizeof(_local->_ip));
+	}
+
 	_lsock.sin6_scope_id = 0;
    
 	if(local_port_ > 0) {
@@ -436,7 +444,7 @@ int DatagramSocket6::Receive(char *data_, int size_, bool block_)
 
 	_receive_bytes += n;
 
-    return n;
+	return n;
 }
 
 int DatagramSocket6::Send(const char *data_, int size_, int time_)

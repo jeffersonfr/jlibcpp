@@ -85,6 +85,8 @@ class SSLSocket : public jsocket::Connection{
 		/** \brief */
 		sockaddr_in _server_sock;
 		/** \brief */
+		InetAddress *_local;
+		/** \brief */
 		InetAddress *_address;
 		/** \brief Bytes sent. */
 		int64_t _sent_bytes;

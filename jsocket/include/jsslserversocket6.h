@@ -51,7 +51,7 @@ class SSLServerSocket6 : public virtual jcommon::Object{
 		/** \brief Remote socket. */
 		sockaddr_in6 _rsock;
 		/** \brief */
-		InetAddress *_local;
+		InetAddress6 *_local;
 		/** \brief */
 		bool _is_closed;
 

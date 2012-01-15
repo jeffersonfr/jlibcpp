@@ -125,15 +125,23 @@ void DatagramSocket::CreateSocket()
 	_is_closed = false;
 }
 
-void DatagramSocket::BindSocket(InetAddress *addr_, int local_port_)
+void DatagramSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 {
 	int opt = 1;
 
 	memset(&_lsock, 0, sizeof(_lsock));
    
 	_lsock.sin_family = AF_INET;
-	_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
    
+	if (local_addr_ == NULL) {
+		_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
+	} else {
+		_local = dynamic_cast<InetAddress4 *>(local_addr_);
+
+		_lsock.sin_addr.s_addr = inet_addr(_local->GetHostAddress().c_str());
+		// memcpy(&(_lsock.sin_addr.s_addr), &(_local->_ip), sizeof(_local->_ip));
+	}
+
 	if(local_port_ > 0) {
 		_lsock.sin_port = htons(local_port_);
 	} else {
@@ -167,6 +175,7 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 		_server_sock.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
 		_server_sock.sin_addr.s_addr = ::inet_addr(_address->GetHostAddress().c_str());
+		// memcpy(&(_server_sock.sin_addr.s_addr), &(addr_->_ip), sizeof(addr_->_ip));
 	}
 	
 	_server_sock.sin_port = htons(port_);

@@ -98,14 +98,20 @@ void ServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
 	bool opt = 1;
     
-	_local = local_addr_;
-   
 	memset(&_lsock, 0, sizeof(_lsock));
     
 	_lsock.sin6_family = AF_INET6;
 	_lsock.sin6_flowinfo = 0;
 	_lsock.sin6_scope_id = 0;
-	_lsock.sin6_addr = in6addr_any;
+
+	if (local_addr_ == NULL) {
+		_lsock.sin6_addr = in6addr_any;
+	} else {
+		_local = dynamic_cast<InetAddress6 *>(local_addr_);
+
+		memcpy(&(_lsock.sin6_addr), &(_local->_ip), sizeof(_local->_ip));
+	}
+
 	_lsock.sin6_port = htons(local_port_);
 
 #ifdef _WIN32

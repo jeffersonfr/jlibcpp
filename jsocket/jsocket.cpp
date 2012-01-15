@@ -174,9 +174,12 @@ void Socket::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin_family = AF_INET;
 
 	if (local_addr_ == NULL) {
-		_lsock.sin_addr.s_addr = INADDR_ANY;
+		_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
+		_local = local_addr_;
+
 		_lsock.sin_addr.s_addr = inet_addr(local_addr_->GetHostAddress().c_str());
+		// memcpy(&(_lsock.sin_addr.s_addr), &(_local->_ip), sizeof(_local->_ip));
 	}
 
 	_lsock.sin_port = htons(local_port_);

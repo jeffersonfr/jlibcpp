@@ -92,7 +92,7 @@ void MulticastSocket::BindSocket(InetAddress *addr_, int local_port_)
 	}
 }
 
-void MulticastSocket::ConnectSocket(InetAddress *addr_, int port_)
+void MulticastSocket::ConnectSocket(InetAddress *local_addr_, int port_)
 {
 	// Receive
 	memset(&_sock_r, 0, sizeof(_sock_r));
@@ -103,10 +103,10 @@ void MulticastSocket::ConnectSocket(InetAddress *addr_, int port_)
 #ifdef SOLARIS
 	_sock_r.sin_addr.s_addr = htonl(INADDR_ANY);
 #else
-	if (addr_ == NULL) {
-		_sock_r.sin_addr.s_addr = inet_addr(INADDR_ANY);
+	if (local_addr_ == NULL) {
+		_sock_r.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
-		_sock_r.sin_addr.s_addr = inet_addr(addr_->GetHostAddress().c_str());
+		_sock_r.sin_addr.s_addr = inet_addr(local_addr_->GetHostAddress().c_str());
 	}
 #endif
 

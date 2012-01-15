@@ -110,12 +110,19 @@ void SSLServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 {
 	int opt = 1;
     
-	_local = local_addr_;
-   
 	memset(&_lsock, 0, sizeof(_lsock));
     
 	_lsock.sin_family = AF_INET;
-	_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
+	
+	if (local_addr_ == NULL) {
+		_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
+	} else {
+		// _local = dynamic_cast<InetAddress4 *>(local_addr_);
+
+		_lsock.sin_addr.s_addr = inet_addr(_local->GetHostAddress().c_str());
+		// memcpy(&(_lsock.sin_addr.s_addr), &(_local->_ip), sizeof(_local->_ip));
+	}
+
 	_lsock.sin_port = htons(local_port_);
 
 #ifdef _WIN32

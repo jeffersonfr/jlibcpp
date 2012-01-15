@@ -21,7 +21,7 @@
 #define J_SERVERSOCKET6_H
 
 #include "jconnection.h"
-#include "jinetaddress.h"
+#include "jinetaddress6.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -51,7 +51,7 @@ class ServerSocket6 : public virtual jcommon::Object{
 		/** \brief Remote socket. */
 		struct sockaddr_in6 _rsock;
 		/** \brief */
-		InetAddress *_local;
+		InetAddress6 *_local;
 		/** \brief */
 		bool _is_closed;
         
