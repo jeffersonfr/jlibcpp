@@ -53,11 +53,11 @@ enum jkeyevent_modifiers_t {
 	JKM_CONTROL			= 0x0002,
 	JKM_ALT					= 0x0004,
 	JKM_ALTGR				= 0x0008,
-	JKM_META					= 0x0010,
+	JKM_META				= 0x0010,
 	JKM_SUPER				= 0x0020,
 	JKM_HYPER				= 0x0040,
 	JKM_CAPS_LOCK		= 0x0080,
-	JKM_NUM_LOCK			= 0x0100,
+	JKM_NUM_LOCK		= 0x0100,
 	JKM_SCROLL_LOCK	= 0x0200
 };
 

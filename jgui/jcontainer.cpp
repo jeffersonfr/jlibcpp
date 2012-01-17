@@ -242,16 +242,18 @@ Component * Container::GetTargetComponent(Container *target, int x, int y, int *
 	for (std::vector<jgui::Component *>::reverse_iterator i=target->GetComponents().rbegin(); i!=target->GetComponents().rend(); i++) {
 		Component *c = (*i);
 	
-		if (c->Intersect(x+scrollx, y+scrolly) == true) {
-			if ((void *)dx != NULL) {
-				*dx = x-c->GetX();
-			}
+		if (c->IsVisible() == true) {
+			if (c->Intersect(x+scrollx, y+scrolly) == true) {
+				if ((void *)dx != NULL) {
+					*dx = x-c->GetX();
+				}
 
-			if ((void *)dy != NULL) {
-				*dy = y-c->GetY();
-			}
+				if ((void *)dy != NULL) {
+					*dy = y-c->GetY();
+				}
 
-			return c;
+				return c;
+			}
 		}
 	}
 
@@ -706,10 +708,6 @@ bool Container::ProcessEvent(KeyEvent *event)
 
 bool Container::ProcessEvent(MouseEvent *event)
 {
-	if (_is_enabled == false) {
-		return false;
-	}
-	
 	if (Component::ProcessEvent(event) == true) {
 		return true;
 	}

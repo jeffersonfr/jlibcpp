@@ -70,10 +70,6 @@ bool ToogleButton::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_is_enabled == false) {
-		return false;
-	}
-
 	bool catched = false;
 
 	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
@@ -85,9 +81,9 @@ bool ToogleButton::ProcessEvent(MouseEvent *event)
 			_is_pressed = true;
 		}
 
-		RequestFocus();
-		Repaint();
 		DispatchButtonEvent(new ButtonEvent(this));
+		
+		Repaint();
 	}
 
 	return catched;
@@ -95,7 +91,7 @@ bool ToogleButton::ProcessEvent(MouseEvent *event)
 
 bool ToogleButton::ProcessEvent(KeyEvent *event)
 {
-	if (_is_enabled == false) {
+	if (IsEnabled() == false) {
 		return false;
 	}
 

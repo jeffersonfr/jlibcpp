@@ -476,65 +476,52 @@ AddMessage::~AddMessage()
 	delete date;
 }
 
-void AddMessage::KeyboardUpdated(jgui::KeyboardEvent *event)
+void AddMessage::KeyboardPressed(jgui::KeyEvent *event)
 {
-	if (event->GetSymbol() == "back") {
-		if (GetFocusOwner() == date) {
-			date->Backspace();
-		} else if (GetFocusOwner() == message) {
-			message->Delete();
-		}
-	} else {
-		if (GetFocusOwner() == hour || GetFocusOwner() == minute) {
-			if (event->GetSymbol() == "1" ||
-					event->GetSymbol() == "2" ||
-					event->GetSymbol() == "3" ||
-					event->GetSymbol() == "4" ||
-					event->GetSymbol() == "5" ||
-					event->GetSymbol() == "6" ||
-					event->GetSymbol() == "7" ||
-					event->GetSymbol() == "8" ||
-					event->GetSymbol() == "9" ||
-					event->GetSymbol() == "0") {
-				std::string num = event->GetSymbol();
+	jgui::Component *owner = GetFocusOwner();
 
-				if (GetFocusOwner() == hour) {
-					int h = atoi(hour->GetText().c_str()),
-					    delta = atoi(num.c_str());
+	if (owner == date || owner == message) {
+		owner->ProcessEvent(event);
+	} else {
+		if (owner == hour || owner == minute) {
+			int code = event->GetKeyCode();
+
+			if (code >= '0' && code <= '9') {
+				if (owner == hour) {
+					int h = atoi(hour->GetText().c_str());
 					char tmp[255];
 
 					hour->SetText("");
 
 					if (h == 0) {
-						sprintf(tmp, "0%d", delta);
+						sprintf(tmp, "0%d", code);
 					} else if (h == 1) {
-						sprintf(tmp, "1%d", delta);
+						sprintf(tmp, "1%d", code);
 					} else if (h == 2) {
-						if (delta <= 3) {
-							sprintf(tmp, "2%d", delta);
+						if (code <= 3) {
+							sprintf(tmp, "2%d", code);
 						} else {
-							sprintf(tmp, "0%d", delta);
+							sprintf(tmp, "0%d", code);
 						}
 					} else {
-						sprintf(tmp, "0%d", delta);
+						sprintf(tmp, "0%d", code);
 					}
 
 					hour->Insert(tmp);
 
 					_hour = atoi(tmp);
-				} else if (GetFocusOwner() == minute) {
-					int h = atoi(minute->GetText().c_str()),
-					    delta = atoi(num.c_str());
+				} else if (owner == minute) {
+					int h = atoi(minute->GetText().c_str());
 					char tmp[255];
 
 					minute->SetText("");
 
 					if (h == 0) {
-						sprintf(tmp, "0%d", delta);
+						sprintf(tmp, "0%d", code);
 					} else if (h <= 5) {
-						sprintf(tmp, "%d%d", h, delta);
+						sprintf(tmp, "%d%d", h, code);
 					} else {
-						sprintf(tmp, "0%d", delta);
+						sprintf(tmp, "0%d", code);
 					}
 
 					minute->Insert(tmp);
@@ -542,8 +529,6 @@ void AddMessage::KeyboardUpdated(jgui::KeyboardEvent *event)
 					_minute = atoi(tmp);
 				}
 			}
-		} else if (GetFocusOwner() == message) {
-			((jgui::TextArea *)(GetFocusOwner()))->Insert(event->GetSymbol());
 		}
 	}
 }

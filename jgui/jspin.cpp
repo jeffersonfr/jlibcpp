@@ -94,10 +94,6 @@ bool Spin::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_is_enabled == false) {
-		return false;
-	}
-
 	if (_items.size() == 0) {
 		return true;
 	}
@@ -146,7 +142,7 @@ bool Spin::ProcessEvent(MouseEvent *event)
 
 bool Spin::ProcessEvent(KeyEvent *event)
 {
-	if (_is_enabled == false) {
+	if (IsEnabled() == false) {
 		return false;
 	}
 

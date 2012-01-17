@@ -87,16 +87,11 @@ bool Button::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_is_enabled == false) {
-		return false;
-	}
-
 	bool catched = false;
 
 	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
-		RequestFocus();
 		DispatchButtonEvent(new ButtonEvent(this));
 	}
 
@@ -105,7 +100,7 @@ bool Button::ProcessEvent(MouseEvent *event)
 
 bool Button::ProcessEvent(KeyEvent *event)
 {
-	if (_is_enabled == false) {
+	if (IsEnabled() == false) {
 		return false;
 	}
 

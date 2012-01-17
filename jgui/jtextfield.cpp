@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jtextfield.h"
+#include "jstringutils.h"
 #include "jdebug.h"
 
 namespace jgui {
@@ -41,24 +42,12 @@ bool TextField::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_is_enabled == false || _is_editable == false) {
-		return false;
-	}
-
-	bool catched = false;
-
-	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
-		catched = true;
-
-		RequestFocus();
-	}
-
-	return catched;
+	return false;
 }
 
 bool TextField::ProcessEvent(KeyEvent *event)
 {
-	if (_is_enabled == false || _is_editable == false) {
+	if (IsEnabled() == false || IsEditable() == false) {
 		return false;
 	}
 
@@ -220,12 +209,16 @@ void TextField::Paint(Graphics *g)
 	}
 
 	std::string paint_text = _text,
+		text = paint_text,
 		cursor,
-		temp, 
 		previous,
-		s = paint_text;
+		temp;
 	int caret_size = 0,
-			current_text_size;
+		current_text_size;
+
+	text = jcommon::StringUtils::ReplaceString(text, "\t", "    ");
+	text = jcommon::StringUtils::ReplaceString(text, "\n", "");
+	text = jcommon::StringUtils::ReplaceString(text, "\x8", "");
 
 	if (EchoCharIsSet() == true) {
 		paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
@@ -256,7 +249,7 @@ void TextField::Paint(Graphics *g)
 			caret_size = _font->GetStringWidth(cursor);
 		}
 
-		current_text_size = _font->GetStringWidth(s.substr(0, _caret_position));
+		current_text_size = _font->GetStringWidth(text.substr(0, _caret_position));
 	}
 
 	int x = _horizontal_gap+_border_size,
@@ -272,22 +265,22 @@ void TextField::Paint(Graphics *g)
 			do {
 				count++;
 
-				current_text_size = _font->GetStringWidth(s.substr(_caret_position-count, count));
+				current_text_size = _font->GetStringWidth(text.substr(_caret_position-count, count));
 			} while (current_text_size < (w-caret_size));
 
 			count = count-1;
-			s = s.substr(_caret_position-count, count);
-			current_text_size = _font->GetStringWidth(s);
+			text = text.substr(_caret_position-count, count);
+			current_text_size = _font->GetStringWidth(text);
 			offset = (w-current_text_size-caret_size)-caret_size;
 
 			if (_caret_position < (int)paint_text.size()) {
-				s = s + paint_text[_caret_position];
+				text = text + paint_text[_caret_position];
 			}
 		} else {
 			int count = 1;
 
 			do {
-				current_text_size = _font->GetStringWidth(s.substr(0, count));
+				current_text_size = _font->GetStringWidth(text.substr(0, count));
 
 				if (count++ > (int)paint_text.size()) {
 					break;
@@ -296,7 +289,7 @@ void TextField::Paint(Graphics *g)
 
 			count = count-1;
 
-			s = s.substr(0, count);
+			text = text.substr(0, count);
 
 			if (_halign == JHA_LEFT) {
 				offset = 0;
@@ -308,10 +301,10 @@ void TextField::Paint(Graphics *g)
 				offset = 0;
 			}
 
-			current_text_size = _font->GetStringWidth(s.substr(0, _caret_position));
+			current_text_size = _font->GetStringWidth(text.substr(0, _caret_position));
 		}
 
-		g->DrawString(s, x+offset, y, w, h, JHA_LEFT, _valign);
+		g->DrawString(text, x+offset, y, w, h, JHA_LEFT, _valign);
 
 		if (_caret_visible == true) {
 			if (_has_focus == true && _is_editable == true) {

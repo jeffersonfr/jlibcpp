@@ -120,6 +120,12 @@ class Tree : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
+		virtual bool ProcessEvent(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool ProcessEvent(KeyEvent *event);
 
 };

@@ -39,6 +39,7 @@ Component::Component(int x, int y, int width, int height):
 	_maximum_size.width = 1920;
 	_maximum_size.height = 1080;
 
+	_is_cyclic_focus = false;
 	_is_navigation_enabled = true;
 	_is_background_visible = true;
 	_is_theme_enabled = true;
@@ -222,6 +223,16 @@ void Component::SetThemeEnabled(bool b)
 	_is_theme_enabled = b;
 }
 
+void Component::SetCyclicFocus(bool b)
+{
+	_is_cyclic_focus = b;
+}
+
+bool Component::IsCyclicFocus()
+{
+	return _is_cyclic_focus;
+}
+
 bool Component::IsThemeEnabled()
 {
 	return _is_theme_enabled;
@@ -383,6 +394,29 @@ void Component::SetScrollY(int y)
 	jsize_t scroll_dimension = GetScrollDimension();
 
 	_scroll_location.y = y;
+
+	if (_scroll_location.y < 0) {
+		_scroll_location.y = 0;
+	} else if (_scroll_location.y > (scroll_dimension.height-_size.height)) {
+		_scroll_location.y = scroll_dimension.height-_size.height;
+	}
+
+	Repaint();
+}
+
+void Component::SetScrollLocation(jpoint_t t)
+{
+	jsize_t scroll_dimension = GetScrollDimension();
+
+	_scroll_location.x = t.x;
+
+	if (_scroll_location.x < 0) {
+		_scroll_location.x = 0;
+	} else if (_scroll_location.x > (scroll_dimension.width-_size.width)) {
+		_scroll_location.x = scroll_dimension.width-_size.width;
+	}
+
+	_scroll_location.y = t.y;
 
 	if (_scroll_location.y < 0) {
 		_scroll_location.y = 0;
@@ -739,7 +773,7 @@ bool Component::IsNavigationEnabled()
 	return _is_navigation_enabled;
 }
 
-void Component::SetComponentNavigation(Component *left, Component *right, Component *up, Component *down)
+void Component::SetNextComponentFocus(Component *left, Component *right, Component *up, Component *down)
 {
 	_left = left;
 	_right = right;
@@ -747,22 +781,22 @@ void Component::SetComponentNavigation(Component *left, Component *right, Compon
 	_down = down;
 }
 
-Component * Component::GetLeftComponent()
+Component * Component::GetNextFocusLeft()
 {
 	return _left;
 }
 
-Component * Component::GetRightComponent()
+Component * Component::GetNextFocusRight()
 {
 	return _right;
 }
 
-Component * Component::GetUpComponent()
+Component * Component::GetNextFocusUp()
 {
 	return _up;
 }
 
-Component * Component::GetDownComponent()
+Component * Component::GetNextFocusDown()
 {
 	return _down;
 }
@@ -804,7 +838,7 @@ void Component::SetIgnoreRepaint(bool b)
 	_is_ignore_repaint = b;
 }
 
-void Component::Repaint()
+void Component::Repaint(Component *cmp)
 {
 	Invalidate();
 
@@ -1421,8 +1455,8 @@ bool Component::Intersect(int x, int y)
 
 bool Component::ProcessEvent(MouseEvent *event)
 {
-	if (_is_enabled == false) {
-		return false;
+	if (IsEnabled() == false || IsVisible() == false) {
+		return true;
 	}
 	
 	jsize_t scroll_dimension = GetScrollDimension();
@@ -1433,6 +1467,10 @@ bool Component::ProcessEvent(MouseEvent *event)
 			mousey = event->GetY();
 
 	if (event->GetType() == JME_PRESSED) {
+		if (IsFocusable() == true) {
+			RequestFocus();
+		}
+
 		if (IsScrollableY() && mousex > (_size.width-GetScrollSize()-_border_size)) {
 			double offset_ratio = (double)scrolly/(double)scroll_dimension.height,
 						 block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
@@ -1518,15 +1556,6 @@ bool Component::ProcessEvent(KeyEvent *event)
 		return false;
 	}
 
-	std::vector<Component *> components;
-
-	// INFO:: search for internal components
-	GetInternalComponents(GetTopLevelAncestor(), &components);
-
-	if (components.size() == 0 || (components.size() == 1 && components[0] == this)) {
-		return true;
-	}
-
 	jkeyevent_symbol_t action = event->GetSymbol();
 
 	if (action != JKS_CURSOR_LEFT &&
@@ -1536,64 +1565,97 @@ bool Component::ProcessEvent(KeyEvent *event)
 		return false;
 	}
 
+	jpoint_t location = GetAbsoluteLocation();
+	jregion_t rect = {
+		location.x, 
+		location.y, 
+		GetWidth(), 
+		GetHeight()
+	};
+
 	Component *next = this;
 
-	jsize_t this_size = GetSize();
-	jpoint_t this_location = GetAbsoluteLocation();
-
-	if (action == JKS_CURSOR_LEFT && GetLeftComponent() != NULL) {
-		next = GetLeftComponent();
-	} else if (action == JKS_CURSOR_RIGHT && GetRightComponent() != NULL) {
-		next = GetRightComponent();
-	} else if (action == JKS_CURSOR_UP && GetUpComponent() != NULL) {
-		next = GetUpComponent();
-	} else if (action == JKS_CURSOR_DOWN && GetDownComponent() != NULL) {
-		next = GetDownComponent();
+	if (action == JKS_CURSOR_LEFT && GetNextFocusLeft() != NULL) {
+		next = GetNextFocusLeft();
+	} else if (action == JKS_CURSOR_RIGHT && GetNextFocusRight() != NULL) {
+		next = GetNextFocusRight();
+	} else if (action == JKS_CURSOR_UP && GetNextFocusUp() != NULL) {
+		next = GetNextFocusUp();
+	} else if (action == JKS_CURSOR_DOWN && GetNextFocusDown() != NULL) {
+		next = GetNextFocusDown();
 	} else {
-		int distance = INT_MAX;
+		Component *left = this,
+			*right = this,
+			*up = this,
+			*down = this;
 
-		for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
-			Component *cmp = (*i);
+		FindNextComponentFocus(rect, &left, &right, &up, &down);
+	
+		if (action == JKS_CURSOR_LEFT) {
+			next = left;
+		} else if (action == JKS_CURSOR_RIGHT) {
+			next = right;
+		} else if (action == JKS_CURSOR_UP) {
+			next = up;
+		} else if (action == JKS_CURSOR_DOWN) {
+			next = down;
+		}
 
-			if (cmp == this || cmp->IsFocusable() == false || cmp->IsEnabled() == false || cmp->IsVisible() == false) {
-				continue;
+		if (_is_cyclic_focus == true && next == this) {
+			std::vector<Component *> components;
+			int x1 = 0,
+				y1 = 0,
+				x2 = 0,
+				y2 = 0;
+
+			GetInternalComponents(GetTopLevelAncestor(), &components);
+
+			for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
+				Component *cmp = (*i);
+
+				if (cmp->IsFocusable() == false || cmp->IsEnabled() == false || cmp->IsVisible() == false) {
+					continue;
+				}
+
+				jpoint_t t = cmp->GetAbsoluteLocation();
+
+				if (x1 > t.x) {
+					x1 = t.x;
+				}
+
+				if (x2 < (t.x + cmp->GetWidth())) {
+					x2 = t.x + cmp->GetWidth();
+				}
+
+				if (y1 > t.y) {
+					y1 = t.y;
+				}
+
+				if (y2 < (t.y + cmp->GetHeight())) {
+					y2 = t.y + cmp->GetHeight();
+				}
 			}
 
-			jsize_t cmp_size = cmp->GetSize();
-			jpoint_t cmp_location = cmp->GetAbsoluteLocation();
-			int c1x = this_location.x + this_size.width/2,
-					c1y = this_location.y + this_size.height/2,
-					c2x = cmp_location.x + cmp_size.width/2,
-					c2y = cmp_location.y + cmp_size.height/2;
+			if (action == JKS_CURSOR_LEFT) {
+				rect.x = x2;
+			} else if (action == JKS_CURSOR_RIGHT) {
+				rect.x = x1 - rect.width;
+			} else if (action == JKS_CURSOR_UP) {
+				rect.y = y2;
+			} else if (action == JKS_CURSOR_DOWN) {
+				rect.y = y1 - rect.height;
+			}
 
-			if (action == JKS_CURSOR_LEFT && cmp_location.x < this_location.x) {
-				int value = ::abs(c1y-c2y)*(this_size.width+cmp_size.width) + (this_location.x+this_size.width-cmp_location.x-cmp_size.width);
-
-				if (value < distance) {
-					next = cmp;
-					distance = value;
-				}
-			} else if (action == JKS_CURSOR_RIGHT && cmp_location.x > this_location.x) {
-				int value = ::abs(c1y-c2y)*(this_size.width+cmp_size.width) + (cmp_location.x+cmp_size.width-this_location.x-this_size.width);
-
-				if (value < distance) {
-					next = cmp;
-					distance = value;
-				}
-			} else if (action == JKS_CURSOR_UP && cmp_location.y < this_location.y) {
-				int value = ::abs(c1x-c2x)*(this_size.height+cmp_size.height) + (this_location.y+this_size.height-cmp_location.y-cmp_size.height);
-
-				if (value < distance) {
-					next = cmp;
-					distance = value;
-				}
-			} else if (action == JKS_CURSOR_DOWN && cmp_location.y > this_location.y) {
-				int value = ::abs(c1x-c2x)*(this_size.height+cmp_size.height) + (cmp_location.y+cmp_size.height-this_location.y-this_size.height);
-
-				if (value < distance) {
-					next = cmp;
-					distance = value;
-				}
+			FindNextComponentFocus(rect, &left, &right, &up, &down);
+		
+			if (action == JKS_CURSOR_LEFT) {
+				next = left;
+			} else if (action == JKS_CURSOR_RIGHT) {
+				next = right;
+			} else if (action == JKS_CURSOR_UP) {
+				next = up;
+			} else if (action == JKS_CURSOR_DOWN) {
+				next = down;
 			}
 		}
 	}
@@ -1603,6 +1665,73 @@ bool Component::ProcessEvent(KeyEvent *event)
 	}
 
 	return true;
+}
+
+void Component::FindNextComponentFocus(jregion_t rect, Component **left, Component **right, Component **up, Component **down)
+{
+	std::vector<Component *> components;
+
+	GetInternalComponents(GetTopLevelAncestor(), &components);
+
+	if (components.size() == 0 || (components.size() == 1 && components[0] == this)) {
+		return;
+	}
+
+	int d_left = INT_MAX,
+			d_right = INT_MAX,
+			d_up = INT_MAX,
+			d_down = INT_MAX;
+
+	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
+		Component *cmp = (*i);
+
+		if (cmp == this || cmp->IsFocusable() == false || cmp->IsEnabled() == false || cmp->IsVisible() == false) {
+			continue;
+		}
+
+		jsize_t cmp_size = cmp->GetSize();
+		jpoint_t cmp_location = cmp->GetAbsoluteLocation();
+		int c1x = rect.x + rect.width/2,
+				c1y = rect.y + rect.height/2,
+				c2x = cmp_location.x + cmp_size.width/2,
+				c2y = cmp_location.y + cmp_size.height/2;
+
+		if (cmp_location.x < rect.x) {
+			int value = ::abs(c1y-c2y)*(rect.width+cmp_size.width) + (rect.x+rect.width-cmp_location.x-cmp_size.width);
+
+			if (value < d_left) {
+				(*left) = cmp;
+				d_left = value;
+			}
+		} 
+		
+		if (cmp_location.x > rect.x) {
+			int value = ::abs(c1y-c2y)*(rect.width+cmp_size.width) + (cmp_location.x+cmp_size.width-rect.x-rect.width);
+
+			if (value < d_right) {
+				(*right) = cmp;
+				d_right = value;
+			}
+		}
+		
+		if (cmp_location.y < rect.y) {
+			int value = ::abs(c1x-c2x)*(rect.height+cmp_size.height) + (rect.y+rect.height-cmp_location.y-cmp_size.height);
+
+			if (value < d_up) {
+				(*up) = cmp;
+				d_up = value;
+			}
+		}
+		
+		if (cmp_location.y > rect.y) {
+			int value = ::abs(c1x-c2x)*(rect.height+cmp_size.height) + (cmp_location.y+cmp_size.height-rect.y-rect.height);
+
+			if (value < d_down) {
+				(*down) = cmp;
+				d_down = value;
+			}
+		}
+	}
 }
 
 void Component::RequestFocus()

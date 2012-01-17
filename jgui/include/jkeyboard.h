@@ -22,10 +22,11 @@
 
 #include "jbutton.h"
 #include "jtextarea.h"
-#include "jkeyboardlistener.h"
-#include "jbuttonlistener.h"
-#include "jtextlistener.h"
+#include "jkeyevent.h"
 #include "jframe.h"
+#include "jbuttonlistener.h"
+#include "jkeyboardlistener.h"
+#include "jtextlistener.h"
 
 #include "jthread.h"
 #include "jmutex.h"
@@ -55,7 +56,7 @@ enum jkeyboard_type_t {
  *
  * \author Jeff Ferr
  */
-class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::TextListener {
+class Keyboard : public jgui::Frame, public jgui::ButtonListener{
 
 	private:
 		jthread::Mutex _key_mutex;
@@ -174,12 +175,6 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::T
 		 * \brief
 		 *
 		 */
-		virtual void TextChanged(TextEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual std::vector<KeyboardListener *> & GetKeyboardListeners();
 
 		/**
@@ -198,7 +193,7 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener, public jgui::T
 		 * \brief
 		 *
 		 */
-		virtual void DispatchKeyboardEvent(KeyboardEvent *event);
+		virtual void DispatchKeyboardEvent(KeyEvent *event);
 
 };
 

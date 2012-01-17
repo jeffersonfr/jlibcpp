@@ -379,27 +379,18 @@ AddContact::~AddContact()
 	delete field3;
 }
 
-void AddContact::KeyboardUpdated(jgui::KeyboardEvent *event)
+void AddContact::KeyboardPressed(jgui::KeyEvent *event)
 {
-	if (event->GetSymbol() == "back") {
-		((jgui::TextField *)(GetFocusOwner()))->Backspace();
-	} else {
-		if (GetFocusOwner() == field2 || GetFocusOwner() == field3) {
-			if (event->GetSymbol() == "1" ||
-					event->GetSymbol() == "2" ||
-					event->GetSymbol() == "3" ||
-					event->GetSymbol() == "4" ||
-					event->GetSymbol() == "5" ||
-					event->GetSymbol() == "6" ||
-					event->GetSymbol() == "7" ||
-					event->GetSymbol() == "8" ||
-					event->GetSymbol() == "9" ||
-					event->GetSymbol() == "0") {
-				((jgui::TextField *)(GetFocusOwner()))->Insert(event->GetSymbol());
-			}
-		} else {
-			((jgui::TextField *)(GetFocusOwner()))->Insert(event->GetSymbol());
+	jgui::Component *owner = GetFocusOwner();
+
+	if (owner == field2 || owner == field3) {
+		int code = event->GetKeyCode();
+
+		if (code >= '0' && code <= '9') {
+			owner->ProcessEvent(event);
 		}
+	} else {
+		owner->ProcessEvent(event);
 	}
 }
 
@@ -627,9 +618,11 @@ void SearchContacts::Update()
 	}
 }
 
-void SearchContacts::KeyboardUpdated(jgui::KeyboardEvent *event)
+void SearchContacts::KeyboardPressed(jgui::KeyEvent *event)
 {
-	int i = db->Search(event->GetText());
+	jgui::Keyboard *kb = (jgui::Keyboard *)event->GetSource();
+
+	int i = db->Search(kb->GetText());
 
 	if (i >= 0) {
 		_index = i;

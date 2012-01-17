@@ -260,27 +260,12 @@ bool ListBox::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_is_enabled == false) {
-		return false;
-	}
-
-	// int x1 = event->GetX(),
-	//		y1 = event->GetY();
-
-	bool catched = false;
-
-	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
-		RequestFocus();
-
-		catched = true;
-	}
-
-	return catched;
+	return false;
 }
 
 bool ListBox::ProcessEvent(KeyEvent *event)
 {
-	if (_is_enabled == false) {
+	if (IsEnabled() == false) {
 		return false;
 	}
 

@@ -20,7 +20,7 @@
 #ifndef J_KEYBOARDLISTENER_H
 #define J_KEYBOARDLISTENER_H
 
-#include "jkeyboardevent.h"
+#include "jkeyevent.h"
 #include "jlistener.h"
 
 namespace jgui {
@@ -50,7 +50,7 @@ class KeyboardListener : public jcommon::Listener{
 		 * \brief
 		 *
 		 */
-		virtual void KeyboardUpdated(KeyboardEvent *event);
+		virtual void KeyboardPressed(KeyEvent *event);
 
 };
 

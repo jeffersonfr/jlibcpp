@@ -78,10 +78,6 @@ bool Slider::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_is_enabled == false) {
-		return false;
-	}
-
 	int x1 = event->GetX(),
 			y1 = event->GetY(),
 			dx = _horizontal_gap+_border_size,
@@ -93,8 +89,6 @@ bool Slider::ProcessEvent(MouseEvent *event)
 
 	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
-
-		RequestFocus();
 
 		if (_type == JSO_HORIZONTAL) {
 			if (y1 > 0 && y1 < (_size.height)) {
@@ -140,7 +134,7 @@ bool Slider::ProcessEvent(MouseEvent *event)
 
 bool Slider::ProcessEvent(KeyEvent *event)
 {
-	if (_is_enabled == false) {
+	if (IsEnabled() == false) {
 		return false;
 	}
 

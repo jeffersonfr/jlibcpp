@@ -111,7 +111,7 @@ class AddMessage : public jgui::Frame, public jgui::KeyboardListener{
 		AddMessage(AgendaDB *db, int index);
 		virtual ~AddMessage();
 
-		virtual void KeyboardUpdated(jgui::KeyboardEvent *event);
+		virtual void KeyboardPressed(jgui::KeyEvent *event);
 		virtual bool ProcessEvent(jgui::KeyEvent *event);
 
 };

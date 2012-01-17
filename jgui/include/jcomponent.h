@@ -170,6 +170,7 @@ class Component : public virtual jcommon::Object{
 			_internal_state;
 		bool _has_focus,
 			_is_visible,
+			_is_cyclic_focus,
 			_is_navigation_enabled,
 			_is_ignore_repaint,
 			_is_background_visible,
@@ -189,6 +190,12 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void GetInternalComponents(Container *parent, std::vector<Component *> *components);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void FindNextComponentFocus(jregion_t rect, Component **left, Component **right, Component **up, Component **down);
 
 		/**
 		 * \brief Makes sure the component is visible in the scroll if this container is scrollable.
@@ -328,6 +335,18 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual bool IsCyclicFocus();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCyclicFocus(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool IsSmoothScrolling();
 
 		/**
@@ -377,6 +396,12 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetScrollY(int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetScrollLocation(jpoint_t t);
 		
 		/**
 		 * \brief
@@ -562,8 +587,8 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-
 		virtual void SetNavigationEnabled(bool b);
+
 		/**
 		 * \brief
 		 *
@@ -574,31 +599,31 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetComponentNavigation(Component *left, Component *right, Component *up, Component *down);
+		virtual void SetNextComponentFocus(Component *left, Component *right, Component *up, Component *down);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual Component * GetLeftComponent();
+		virtual Component * GetNextFocusLeft();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual Component * GetRightComponent();
+		virtual Component * GetNextFocusRight();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual Component * GetUpComponent();
+		virtual Component * GetNextFocusUp();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual Component * GetDownComponent();
+		virtual Component * GetNextFocusDown();
 		
 		/**
 		 * \brief
@@ -1101,7 +1126,7 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void Repaint();
+		virtual void Repaint(Component *cmp = NULL);
 
 		/**
 		 * \brief

@@ -39,7 +39,6 @@
 																														\
 		display->SetFocusable(false); 													\
 		display->Insert(_text); 																\
-		display->RegisterTextListener(this); 										\
 																														\
 		Add(display); 																					\
 	} 																												\
@@ -156,12 +155,19 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 	jthread::AutoLock lock(&_key_mutex);
 
 	Button *button = (Button *)event->GetSource();
-	std::string symbol;
-	bool any = false;
+	std::string label = button->GetLabel();
+	jkeyevent_modifiers_t modifiers = (jkeyevent_modifiers_t)0;
+	jkeyevent_symbol_t symbol = JKS_UNKNOWN;
+	int code = -1;
+	bool any = true;
 
-	if (button->GetLabel() == "caps") {
+	if (label == "caps") {
 		ProcessCaps(button);
-	} else if (button->GetLabel() == "shift") {
+		
+		modifiers = JKM_CAPS_LOCK;
+		code = 20;
+		any = false;
+	} else if (label == "shift") {
 		if (_shift_pressed == true) {
 			_shift_pressed = false;
 		} else {
@@ -169,55 +175,378 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 		}
 
 		ProcessCaps(button);
-	} else if (button->GetLabel() == "back") {
+
+		modifiers = JKM_SHIFT;
+		code = 16;
+		any = false;
+	} else if (label == "enter") {
+		symbol = JKS_ENTER;
+		code = '\n';
+		any = false;
+	} else if (label == "space") {
+		symbol = JKS_SPACE;
+		code = ' ';
+		any = false;
+	} else if (label == "tab") {
+		symbol = JKS_TAB;
+		code = '\t';
+		any = false;
+	} else if (label == "left") {
+		symbol = JKS_CURSOR_LEFT;
+		code = 37;
+	} else if (label == "right") {
+		symbol = JKS_CURSOR_RIGHT;
+		code = 39;
+		any = false;
+	} else if (label == "up") {
+		symbol = JKS_CURSOR_UP;
+		code = 38;
+		any = false;
+	} else if (label == "down") {
+		symbol = JKS_CURSOR_DOWN;
+		code = 40;
+		any = false;
+	} else if (label == "del") {
+		symbol = JKS_DELETE;
+		code = 46;
+		any = false;
+	} else if (label == "ins") {
+		symbol = JKS_INSERT;
+		code = 45;
+		any = false;
+	} else if (label == "esc") {
+		symbol = JKS_ESCAPE;
+		code = 27;
+		any = false;
+	} else if (label == "back") {
 		if (_show_text == true) {
 			display->Backspace();
 		}
 
-		symbol = "\x8";
-	} else if (button->GetLabel() == "enter") {
-		if (_show_text == true) {
-			display->Insert("\n");
-		}
-
-		symbol = "\n";
-	} else if (button->GetLabel() == "tab") {
-		if (_show_text == true) {
-			display->Insert("    ");
-		}
-
-		symbol = "    ";
-	} else if (button->GetLabel() == "space") {
-		if (_show_text == true) {
-			display->Insert(" ");
-		}
-
-		symbol = " ";
-	} else if (button->GetLabel() == "e" && (_type == JKB_PHONE || _type == JKB_NUMERIC)) {
-		if (_show_text == true) {
-			display->Insert("2.71828182845904523536");
-		}
-
-		symbol = "2.71828182845904523536";
-	} else if (button->GetLabel() == "pi" && (_type == JKB_PHONE || _type == JKB_NUMERIC)) {
-		if (_show_text == true) {
-			display->Insert("3.14159265358979323846");
-		}
-
-		symbol = "3.14159265358979323846";
-	} else {
-		if (_show_text == true) {
-			display->Insert(button->GetLabel());
-		}
-
-		any = true;
-		symbol = button->GetLabel();
-	}
-
-	if (_show_text == true) {
-		DispatchKeyboardEvent(new KeyboardEvent(this, symbol, display->GetText()));
-	} else {
-		DispatchKeyboardEvent(new KeyboardEvent(this, symbol, ""));
+		symbol = JKS_BACKSPACE;
+		code = '\b';
+		any = false;
+	} else if (label == "0") {
+		symbol = JKS_0;
+		code = '0';
+	} else if (label == "1") {
+		symbol = JKS_1;
+		code = '1';
+	} else if (label == "2") {
+		symbol = JKS_2;
+		code = '2';
+	} else if (label == "3") {
+		symbol = JKS_3;
+		code = '3';
+	} else if (label == "4") {
+		symbol = JKS_4;
+		code = '4';
+	} else if (label == "5") {
+		symbol = JKS_5;
+		code = '5';
+	} else if (label == "6") {
+		symbol = JKS_6;
+		code = '6';
+	} else if (label == "7") {
+		symbol = JKS_7;
+		code = '7';
+	} else if (label == "8") {
+		symbol = JKS_8;
+		code = '8';
+	} else if (label == "9") {
+		symbol = JKS_9;
+		code = '9';
+	} else if (label == "A") {
+		symbol = JKS_A;
+		code = 'A';
+	} else if (label == "B") {
+		symbol = JKS_B;
+		code = 'B';
+	} else if (label == "C") {
+		symbol = JKS_C;
+		code = 'C';
+	} else if (label == "D") {
+		symbol = JKS_D;
+		code = 'D';
+	} else if (label == "E") {
+		symbol = JKS_E;
+		code = 'E';
+	} else if (label == "F") {
+		symbol = JKS_F;
+		code = 'F';
+	} else if (label == "G") {
+		symbol = JKS_G;
+		code = 'G';
+	} else if (label == "H") {
+		symbol = JKS_H;
+		code = 'H';
+	} else if (label == "I") {
+		symbol = JKS_I;
+		code = 'I';
+	} else if (label == "J") {
+		symbol = JKS_J;
+		code = 'J';
+	} else if (label == "K") {
+		symbol = JKS_K;
+		code = 'K';
+	} else if (label == "L") {
+		symbol = JKS_L;
+		code = 'L';
+	} else if (label == "M") {
+		symbol = JKS_M;
+		code = 'M';
+	} else if (label == "N") {
+		symbol = JKS_N;
+		code = 'N';
+	} else if (label == "O") {
+		symbol = JKS_O;
+		code = 'O';
+	} else if (label == "P") {
+		symbol = JKS_P;
+		code = 'P';
+	} else if (label == "Q") {
+		symbol = JKS_Q;
+		code = 'Q';
+	} else if (label == "R") {
+		symbol = JKS_R;
+		code = 'R';
+	} else if (label == "S") {
+		symbol = JKS_S;
+		code = 'S';
+	} else if (label == "T") {
+		symbol = JKS_T;
+		code = 'T';
+	} else if (label == "U") {
+		symbol = JKS_U;
+		code = 'U';
+	} else if (label == "V") {
+		symbol = JKS_V;
+		code = 'V';
+	} else if (label == "W") {
+		symbol = JKS_W;
+		code = 'W';
+	} else if (label == "X") {
+		symbol = JKS_X;
+		code = 'X';
+	} else if (label == "Y") {
+		symbol = JKS_Y;
+		code = 'Y';
+	} else if (label == "Z") {
+		symbol = JKS_Z;
+		code = 'Z';
+	} else if (label == "a") {
+		symbol = JKS_a;
+		code = 'a';
+	} else if (label == "b") {
+		symbol = JKS_b;
+		code = 'b';
+	} else if (label == "c") {
+		symbol = JKS_c;
+		code = 'c';
+	} else if (label == "d") {
+		symbol = JKS_d;
+		code = 'd';
+	} else if (label == "e") {
+		symbol = JKS_e;
+		code = 'e';
+	} else if (label == "f") {
+		symbol = JKS_f;
+		code = 'f';
+	} else if (label == "g") {
+		symbol = JKS_g;
+		code = 'g';
+	} else if (label == "h") {
+		symbol = JKS_h;
+		code = 'h';
+	} else if (label == "i") {
+		symbol = JKS_i;
+		code = 'i';
+	} else if (label == "j") {
+		symbol = JKS_j;
+		code = 'j';
+	} else if (label == "k") {
+		symbol = JKS_k;
+		code = 'k';
+	} else if (label == "l") {
+		symbol = JKS_l;
+		code = 'l';
+	} else if (label == "m") {
+		symbol = JKS_m;
+		code = 'm';
+	} else if (label == "n") {
+		symbol = JKS_n;
+		code = 'n';
+	} else if (label == "o") {
+		symbol = JKS_o;
+		code = 'o';
+	} else if (label == "p") {
+		symbol = JKS_p;
+		code = 'p';
+	} else if (label == "q") {
+		symbol = JKS_q;
+		code = 'q';
+	} else if (label == "r") {
+		symbol = JKS_r;
+		code = 'r';
+	} else if (label == "s") {
+		symbol = JKS_s;
+		code = 's';
+	} else if (label == "t") {
+		symbol = JKS_t;
+		code = 't';
+	} else if (label == "u") {
+		symbol = JKS_u;
+		code = 'u';
+	} else if (label == "v") {
+		symbol = JKS_v;
+		code = 'v';
+	} else if (label == "w") {
+		symbol = JKS_w;
+		code = 'w';
+	} else if (label == "x") {
+		symbol = JKS_x;
+		code = 'x';
+	} else if (label == "y") {
+		symbol = JKS_y;
+		code = 'y';
+	} else if (label == "z") {
+		symbol = JKS_z;
+		code = 'z';
+	} else if (label == "!") {
+		symbol = JKS_EXCLAMATION_MARK;
+		code = '!';
+	} else if (label == "\"") {
+		symbol = JKS_QUOTATION;
+		code = '\"';
+	} else if (label == "$") {
+		symbol = JKS_DOLLAR_SIGN;
+		code = '$';
+	} else if (label == "%") {
+		symbol = JKS_PERCENT_SIGN;
+		code = '%';
+	} else if (label == "&") {
+		symbol = JKS_AMPERSAND;
+		code = '&';
+	} else if (label == "'") {
+		symbol = JKS_APOSTROPHE;
+		code = '\'';
+	} else if (label == "(") {
+		symbol = JKS_PARENTHESIS_LEFT;
+		code = '(';
+	} else if (label == ")") {
+		symbol = JKS_PARENTHESIS_RIGHT;
+		code = ')';
+	} else if (label == "*") {
+		symbol = JKS_STAR;
+		code = '*';
+	} else if (label == "#") {
+		symbol = JKS_SHARP;
+		code = '#';
+	} else if (label == "#") {
+		symbol = JKS_NUMBER_SIGN;
+		code = '#';
+	} else if (label == "+") {
+		symbol = JKS_PLUS_SIGN;
+		code = '+';
+	} else if (label == ",") {
+		symbol = JKS_COMMA;
+		code = ',';
+	} else if (label == "-") {
+		symbol = JKS_MINUS_SIGN;
+		code = '-';
+	} else if (label == ".") {
+		symbol = JKS_PERIOD;
+		code = '.';
+	} else if (label == "/") {
+		symbol = JKS_SLASH;
+		code = '/';
+	} else if (label == ":") {
+		symbol = JKS_COLON;
+		code = ':';
+	} else if (label == ";") {
+		symbol = JKS_SEMICOLON;
+		code = ';';
+	} else if (label == "<") {
+		symbol = JKS_LESS_THAN_SIGN;
+		code = '<';
+	} else if (label == "=") {
+		symbol = JKS_EQUALS_SIGN;
+		code = '=';
+	} else if (label == ">") {
+		symbol = JKS_GREATER_THAN_SIGN;
+		code = '>';
+	} else if (label == "?") {
+		symbol = JKS_QUESTION_MARK;
+		code = '?';
+	} else if (label == "@") {
+		symbol = JKS_AT;
+		code = '@';
+	} else if (label == "[") {
+		symbol = JKS_SQUARE_BRACKET_LEFT;
+		code = '[';
+	} else if (label == "\\") {
+		symbol = JKS_BACKSLASH;
+		code = '\\';
+	} else if (label == "]") {
+		symbol = JKS_SQUARE_BRACKET_RIGHT;
+		code = ']';
+	} else if (label == "^") {
+		symbol = JKS_CIRCUMFLEX_ACCENT;
+		code = '^';
+	} else if (label == "_") {
+		symbol = JKS_UNDERSCORE;
+		code = '_';
+	} else if (label == "`") {
+		symbol = JKS_GRAVE_ACCENT;
+		code = '`';
+	} else if (label == "{") {
+		symbol = JKS_CURLY_BRACKET_LEFT;
+		code = '{';
+	} else if (label == "|") {
+		symbol = JKS_VERTICAL_BAR;
+		code = '|';
+	} else if (label == "}") {
+		symbol = JKS_CURLY_BRACKET_RIGHT;
+		code = '}';
+	} else if (label == "~") {
+		symbol = JKS_TILDE;
+		code = '~';
+	} else if (label == "F1") {
+		symbol = JKS_F1;
+		code = 112;
+	} else if (label == "F2") {
+		symbol = JKS_F2;
+		code = 113;
+	} else if (label == "F3") {
+		symbol = JKS_F3;
+		code = 114;
+	} else if (label == "F4") {
+		symbol = JKS_F4;
+		code = 115;
+	} else if (label == "F5") {
+		symbol = JKS_F5;
+		code = 116;
+	} else if (label == "F6") {
+		symbol = JKS_F6;
+		code = 117;
+	} else if (label == "F7") {
+		symbol = JKS_F7;
+		code = 118;
+	} else if (label == "F8") {
+		symbol = JKS_F8;
+		code = 119;
+	} else if (label == "F9") {
+		symbol = JKS_F9;
+		code = 120;
+	} else if (label == "F10") {
+		symbol = JKS_F10;
+		code = 121;
+	} else if (label == "F11") {
+		symbol = JKS_F11;
+		code = 122;
+	} else if (label == "F12") {
+		symbol = JKS_F12;
+		code = 123;
 	}
 
 	if (_shift_pressed == true) {
@@ -227,18 +556,14 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 			_shift_pressed = false;
 		}
 	}
-}
 
-void Keyboard::TextChanged(TextEvent *event)
-{
-	std::string symbol,
-		text = event->GetText();
+	KeyEvent *kevent = new KeyEvent(this, JKT_PRESSED, modifiers, code, symbol);
 
-	if (text.size() > 0) {
-		symbol = text[text.size()-1];
+	if (_show_text == true) {
+		display->ProcessEvent(kevent);
 	}
 
-	DispatchKeyboardEvent(new KeyboardEvent(this, symbol, text));
+	DispatchKeyboardEvent(kevent);
 }
 
 void Keyboard::SetTextSize(int max)
@@ -581,7 +906,7 @@ void Keyboard::RemoveKeyboardListener(KeyboardListener *listener)
 	}
 }
 
-void Keyboard::DispatchKeyboardEvent(KeyboardEvent *event)
+void Keyboard::DispatchKeyboardEvent(KeyEvent *event)
 {
 	if (event == NULL) {
 		return;
@@ -591,7 +916,7 @@ void Keyboard::DispatchKeyboardEvent(KeyboardEvent *event)
 			size = (int)_keyboard_listeners.size();
 
 	while (k++ < (int)_keyboard_listeners.size()) {
-		_keyboard_listeners[k-1]->KeyboardUpdated(event);
+		_keyboard_listeners[k-1]->KeyboardPressed(event);
 
 		if (size != (int)_keyboard_listeners.size()) {
 			size = (int)_keyboard_listeners.size();
@@ -601,10 +926,10 @@ void Keyboard::DispatchKeyboardEvent(KeyboardEvent *event)
 	}
 
 	/*
-		 for (std::vector<KeyboardListener *>::iterator i=_keyboard_listeners.begin(); i!=_keyboard_listeners.end(); i++) {
-		 (*i)->KeyboardUpdated(event);
-		 }
-		 */
+	 for (std::vector<KeyboardListener *>::iterator i=_keyboard_listeners.begin(); i!=_keyboard_listeners.end(); i++) {
+		 (*i)->KeyboardPressed(event);
+	 }
+	 */
 
 	delete event;
 }

@@ -115,24 +115,12 @@ bool TextArea::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_is_enabled == false || _is_editable == false) {
-		return false;
-	}
-
-	bool catched = false;
-
-	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
-		catched = true;
-
-		RequestFocus();
-	}
-
-	return catched;
+	return false;
 }
 
 bool TextArea::ProcessEvent(KeyEvent *event)
 {
-	if (_is_enabled == false || _is_editable == false) {
+	if (IsEnabled() == false || IsEditable() == false) {
 		return false;
 	}
 

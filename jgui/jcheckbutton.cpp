@@ -116,10 +116,6 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_is_enabled == false) {
-		return false;
-	}
-
 	bool catched = false;
 
 	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
@@ -132,8 +128,6 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 		if (_size.height > _size.width) {
 			size = _size.width;
 		}
-
-		RequestFocus();
 
 		if ((x1 > 0 && x1 < (size)) && (y1 > 0 && y1 < (size))) {
 			if (_type == JCT_CHECK) {
@@ -153,7 +147,7 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 
 bool CheckButton::ProcessEvent(KeyEvent *event)
 {
-	if (_is_enabled == false) {
+	if (IsEnabled() == false) {
 		return false;
 	}
 

@@ -68,16 +68,10 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_is_enabled == false) {
-		return false;
-	}
-
 	bool catched = false;
 
 	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
-
-		RequestFocus();
 
 		int x1 = event->GetX(),
 				y1 = event->GetY();
@@ -104,7 +98,7 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 
 bool ComboBox::ProcessEvent(KeyEvent *event)
 {
-	if (_is_enabled == false) {
+	if (IsEnabled() == false) {
 		return false;
 	}
 

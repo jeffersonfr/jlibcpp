@@ -32,7 +32,7 @@ KeyboardListener::~KeyboardListener()
 {
 }
 
-void KeyboardListener::KeyboardUpdated(KeyboardEvent *event)
+void KeyboardListener::KeyboardPressed(KeyEvent *event)
 {
 }
 

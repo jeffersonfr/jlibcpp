@@ -91,7 +91,7 @@ int ScrollBar::GetStoneSize()
 
 bool ScrollBar::ProcessEvent(KeyEvent *event)
 {
-	if (_is_enabled == false) {
+	if (IsEnabled() == false) {
 		return false;
 	}
 
@@ -146,10 +146,6 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
-	if (_is_enabled == false) {
-		return false;
-	}
-
 	int arrow_size,
 			x1 = event->GetX(),
 			y1 = event->GetY(),
@@ -162,8 +158,6 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 
 	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
-
-		RequestFocus();
 
 		if (_type == JSO_HORIZONTAL) {
 			arrow_size = dh/2;

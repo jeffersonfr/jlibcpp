@@ -82,6 +82,11 @@ void Tree::Paint(Graphics *g)
 	Component::Paint(g);
 }
 
+bool Tree::ProcessEvent(MouseEvent *event)
+{
+	return false;
+}
+
 bool Tree::ProcessEvent(KeyEvent *event)
 {
 	return false;
