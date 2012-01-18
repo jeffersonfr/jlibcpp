@@ -44,7 +44,8 @@ class TextArea : public jgui::TextComponent{
 		std::vector<std::string> _lines;
 		int _rows_gap,
 			_current_row;
-		bool _is_wrap;
+		bool _is_wrap,
+				 _rows_string;
 
 		/**
 		 * \brief

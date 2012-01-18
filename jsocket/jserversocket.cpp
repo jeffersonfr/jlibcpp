@@ -35,16 +35,6 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
   _local = NULL;
 	_is_closed = true;
 
-	if (addr_ == NULL) {
-		try {
-			InetAddress *a = InetAddress4::GetLocalHost();
-        
-			addr_ = a;
-		} catch (UnknownHostException &) {
-			addr_ = NULL;
-		}
-	}
-
 	CreateSocket();
 
 	if (port_ != 0) {
@@ -103,6 +93,8 @@ void ServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin_family = AF_INET;
 
 	if (local_addr_ == NULL) {
+		_local = InetAddress4::GetLocalHost();
+
 		_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
 		_local = dynamic_cast<InetAddress4 *>(local_addr_);

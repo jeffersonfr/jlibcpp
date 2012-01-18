@@ -108,7 +108,10 @@ class iTCPTest : public ConnectionTest {
 
 			char buffer[2048];
 
-			while (socket->Receive(buffer, 1500) > 0) {
+			try {
+				while (socket->Receive(buffer, 1500) > 0) {
+				}
+			} catch (jcommon::Exception &e) {
 			}
 
 			socket->Close();
@@ -156,7 +159,10 @@ class lTCPTest : public ConnectionTest {
 
 			char buffer[2048];
 
-			while (socket->Receive(buffer, 1500) > 0) {
+			try {
+				while (socket->Receive(buffer, 1500) > 0) {
+				}
+			} catch (jcommon::Exception &e) {
 			}
 		}
 
@@ -196,7 +202,10 @@ class iUDPTest : public ConnectionTest {
 
 			char buffer[2048];
 
-			while (server.Receive(buffer, 1500) > 0) {
+			try {
+				while (server.Receive(buffer, 1500) > 0) {
+				}
+			} catch (jcommon::Exception &e) {
 			}
 
 			server.Close();
@@ -238,7 +247,10 @@ class lUDPTest : public ConnectionTest {
 
 			char buffer[2048];
 
-			while (server.Receive(buffer, 1500) > 0) {
+			try {
+				while (server.Receive(buffer, 1500) > 0) {
+				}
+			} catch (jcommon::Exception &e) {
 			}
 
 			server.Close();
@@ -262,10 +274,10 @@ class lUDPTest : public ConnectionTest {
 
 int main()
 {
+	(new iUDPTest())->Init();
 	(new lUDPTest())->Init();
 	(new iTCPTest())->Init();
 	(new lTCPTest())->Init();
-	(new iUDPTest())->Init();
 
 	return 0;
 }

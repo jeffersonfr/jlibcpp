@@ -33,12 +33,6 @@ SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddre
 	_local = NULL;
 	_is_closed = true;
 
-	if (addr_ == NULL) {
-		InetAddress *a = InetAddress4::GetLocalHost();
-        
-		addr_ = a;
-	}
-
 	// init ssl 
 	SSL_library_init();
 
@@ -115,9 +109,11 @@ void SSLServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin_family = AF_INET;
 	
 	if (local_addr_ == NULL) {
+		_local = InetAddress4::GetLocalHost();
+
 		_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
-		// _local = dynamic_cast<InetAddress4 *>(local_addr_);
+		_local = dynamic_cast<InetAddress4 *>(local_addr_);
 
 		_lsock.sin_addr.s_addr = inet_addr(_local->GetHostAddress().c_str());
 		// memcpy(&(_lsock.sin_addr.s_addr), &(_local->_ip), sizeof(_local->_ip));

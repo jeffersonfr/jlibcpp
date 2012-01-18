@@ -30,6 +30,8 @@ YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg, int x, int y)
 	int cw = DEFAULT_COMPONENT_WIDTH,
 			ch = DEFAULT_COMPONENT_HEIGHT;
 
+	_response = JDR_CANCEL;
+
 	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
 
 	_label->SetGap(10, 10);
@@ -65,11 +67,11 @@ YesNoDialogBox::~YesNoDialogBox()
 
 jdialog_result_t YesNoDialogBox::GetResponse()
 {
-	if (GetFocusOwner() == _yes) {
+	if (_response != JDR_CANCEL && GetFocusOwner() == _yes) {
 		return JDR_YES;
 	}
 
-	return JDR_NO;
+	return _response;
 }
 
 void YesNoDialogBox::SetHorizontalAlign(jhorizontal_align_t align)
@@ -95,6 +97,12 @@ jvertical_align_t YesNoDialogBox::GetVerticalAlign()
 void YesNoDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 {
 		jthread::AutoLock lock(&_yesno_mutex);
+
+		if (GetFocusOwner() == _yes) {
+			_response = JDR_YES;
+		} else {
+			_response = JDR_NO;
+		}
 
 		Release();
 }

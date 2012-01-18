@@ -87,7 +87,7 @@ void Phone::ItemSelected(jgui::SelectEvent *event)
 
 		dialog.Show();
 
-		if (dialog.GetLastKeyCode() != jgui::JKS_EXIT && dialog.GetResponse() == 1) {
+		if (dialog.GetResponse() == jgui::JDR_YES) {
 			db->RemoveAll();
 		}
 	} else if (event->GetIndex() == 3) {
@@ -687,7 +687,7 @@ bool SearchContacts::ProcessEvent(jgui::KeyEvent *event)
 
 			dialog.Show();
 
-			if (dialog.GetLastKeyCode() != jgui::JKS_EXIT && dialog.GetResponse() == 1) {
+			if (dialog.GetResponse() == jgui::JDR_YES) {
 				db->Remove(_index);
 
 				_index--;

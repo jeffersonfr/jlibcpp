@@ -128,8 +128,7 @@ class Stock : public jgui::Frame{
 			std::ostringstream o;
 
 			char receive[4098];
-			int length,
-					count = 0;
+			int count = 0;
 
 			o << "GET /d/quotes.csv?s=" << acao->GetText() << "&f=snd1t1l1c1p2poghvt HTTP/1.0\r\n\r\n";
 
@@ -139,18 +138,10 @@ class Stock : public jgui::Frame{
 				c.Send((char *)o.str().c_str(), o.str().size());
 
 				do {
-					length = (int)c.Receive((receive+count), 4096);
-
-					if (length <= 0) {
-						break;
-					}
-
-					count = count + length;
+					count = count + (int)c.Receive((receive+count), 4096);
 				} while (true);
 					
-				c.Close();
-			} catch (jsocket::SocketException &e) {
-				std::cerr << "Cannot receive stock quote data" << std::endl;
+			} catch (...) {
 			}
 
 			receive[count] = '\0';

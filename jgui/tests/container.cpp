@@ -459,24 +459,10 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 	}
 
-	virtual void KeyboardUpdated(jgui::KeyboardEvent *event)
+	virtual void KeyboardPressed(jgui::KeyEvent *event)
 	{
 		if (GetFocusOwner() == text_field) {
-			if (event->GetSymbol() == "back") {
-				text_field->Delete();
-			} else if (event->GetSymbol() == "enter") {
-				text_field->Insert("\n");
-			} else {
-				text_field->Insert(event->GetSymbol());
-			}
-		} else if (GetFocusOwner() == text_area) {
-			if (event->GetSymbol() == "back") {
-				text_area->Delete();
-			} else if (event->GetSymbol() == "enter") {
-				text_area->Insert("\n");
-			} else {
-				text_area->Insert(event->GetSymbol());
-			}
+			text_field->ProcessEvent(event);
 		}
 	}
 

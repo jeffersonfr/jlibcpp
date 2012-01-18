@@ -30,6 +30,7 @@ TextArea::TextArea(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::TextArea");
 
+	_rows_string = true;
 	_valign = JVA_TOP;
 	_rows_gap = 0;
 	_current_row = 0;
@@ -69,44 +70,44 @@ void TextArea::SetWrap(bool b)
 
 void TextArea::SetEchoChar(char echo_char)
 {
-	TextComponent::SetEchoChar(echo_char);
+	_rows_string = true;
 
-	InitRowsString();
+	TextComponent::SetEchoChar(echo_char);
 }
 
 void TextArea::SetText(std::string text)
 {
-	TextComponent::SetText(text);
+	_rows_string = true;
 
-	InitRowsString();
+	TextComponent::SetText(text);
 }
 	
 void TextArea::Insert(std::string text)
 {
-	TextComponent::Insert(text);
+	_rows_string = true;
 
-	InitRowsString();
+	TextComponent::Insert(text);
 }
 
 void TextArea::Delete()
 {
-	TextComponent::Delete();
+	_rows_string = true;
 
-	InitRowsString();
+	TextComponent::Delete();
 }
 
 void TextArea::SetSize(int width, int height)
 {
-	TextComponent::SetSize(width, height);
+	_rows_string = true;
 
-	InitRowsString();
+	TextComponent::SetSize(width, height);
 }
 
 void TextArea::SetBounds(int x, int y, int w, int h)
 {
-	TextComponent::SetBounds(x, y, w, h);
+	_rows_string = true;
 
-	InitRowsString();
+	TextComponent::SetBounds(x, y, w, h);
 }
 
 bool TextArea::ProcessEvent(MouseEvent *event)
@@ -370,6 +371,12 @@ void TextArea::DecrementLines(int lines)
 
 void TextArea::InitRowsString()
 {
+	if (_rows_string == false) {
+		return;
+	}
+
+	_rows_string = false;
+
 	if (IsFontSet() == false) {
 		return;
 	}
@@ -464,7 +471,6 @@ void TextArea::InitRowsString()
 		_lines.push_back(temp);
 	}
 
-
 	int length = _caret_position;
 
 	for (int i=0; i<=(int)_lines.size()-1; i++) {
@@ -496,24 +502,17 @@ void TextArea::Paint(Graphics *g)
 
 	jpoint_t scroll_location = GetScrollLocation();
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0,
-			scrollw = (IsScrollableY() == true)?(_scroll_size+_scroll_gap):0;
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
-			w = _size.width-scrollw-2*x,
-			h = _size.height-2*y;
+			y = _vertical_gap+_border_size;
+
+	InitRowsString();
 
 	if (IsFontSet() == true) {
-		std::vector<std::string> super_lines, 
-			lines;
 		int text_size,
 			current_text_size,
 			current_length = _caret_position,
 			font_height = _font->GetAscender()+_font->GetDescender()+_rows_gap;
-
-		jregion_t clip = g->GetClip();
-
-		g->ClipRect(x, y, w, h);
 
 		x = x - scrollx;
 		y = y - scrolly;
@@ -573,8 +572,6 @@ void TextArea::Paint(Graphics *g)
 				current_length -= s.size();
 			}
 		}
-
-		g->SetClip(clip.x, clip.y, clip.width, clip.height);
 	}
 }
 

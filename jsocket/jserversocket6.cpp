@@ -35,16 +35,6 @@ ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress *addr_):
   _local = NULL;
 	_is_closed = true;
 
-	if (addr_ == NULL) {
-		try {
-			InetAddress *a = InetAddress6::GetLocalHost();
-        
-			addr_ = a;
-		} catch (UnknownHostException &) {
-			addr_ = NULL;
-		}
-	}
-
 	CreateSocket();
 
 	if (port_ != 0) {
@@ -105,6 +95,8 @@ void ServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin6_scope_id = 0;
 
 	if (local_addr_ == NULL) {
+		_local = dynamic_cast<InetAddress6 *>(InetAddress6::GetLocalHost());
+
 		_lsock.sin6_addr = in6addr_any;
 	} else {
 		_local = dynamic_cast<InetAddress6 *>(local_addr_);

@@ -33,10 +33,6 @@ SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAdd
     _local = NULL;
 	_is_closed = false;
 
-	if (addr_ == NULL) {
-		addr_ = InetAddress6::GetLocalHost();
-	}
-
 	// init ssl 
 	SSL_library_init();
 
@@ -111,6 +107,8 @@ void SSLServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin6_scope_id = 0;
 	
 	if (local_addr_ == NULL) {
+		_local = dynamic_cast<InetAddress6 *>(InetAddress6::GetLocalHost());
+
 		_lsock.sin6_addr = in6addr_any;
 	} else {
 		_local = dynamic_cast<InetAddress6 *>(local_addr_);

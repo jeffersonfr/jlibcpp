@@ -55,6 +55,7 @@ class YesNoDialogBox : public jgui::Frame, public jgui::ButtonListener{
 		Label *_label;
 		Button *_yes,
 					 *_no;
+		jdialog_result_t _response;
 
 	public:
 		/**

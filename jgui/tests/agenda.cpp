@@ -100,7 +100,7 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 
 		dialog.Show();
 
-		if (dialog.GetLastKeyCode() != jgui::JKS_EXIT && dialog.GetResponse() == 1) {
+		if (dialog.GetResponse() == jgui::JDR_YES) {
 			db->RemoveAll();
 		}
 	} else if (event->GetIndex() == 3) {
@@ -679,6 +679,7 @@ bool AddMessage::ProcessEvent(jgui::KeyEvent *event)
 				date->SetText("");
 				date->Insert(tmp);
 			}
+		/*
 		} else if (GetFocusOwner() == message) {
 			tmp = message->GetText();
 
@@ -694,6 +695,7 @@ bool AddMessage::ProcessEvent(jgui::KeyEvent *event)
 				message->SetText("");
 				message->Insert(tmp);
 			}
+		*/
 		}
 	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (_state == 0) {
@@ -811,7 +813,7 @@ bool ViewMessages::ProcessEvent(jgui::KeyEvent *event)
 
 			dialog.Show();
 
-			if (dialog.GetLastKeyCode() != jgui::JKS_EXIT && dialog.GetResponse() == 1) {
+			if (dialog.GetResponse() == jgui::JDR_YES) {
 				db->Remove(_index);
 
 				_index--;

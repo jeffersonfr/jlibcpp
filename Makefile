@@ -323,7 +323,6 @@ OBJS_jgui = \
 		jinputmanager.o\
 		jitemcomponent.o\
 		jkeyboard.o\
-		jkeyboardevent.o\
 		jkeyboardlistener.o\
 		jkeyevent.o\
 		jkeylistener.o\
