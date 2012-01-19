@@ -349,7 +349,7 @@ void server(int port)
 			th_proxy->mu.Unlock();
 
 			th_proxy->cond.Notify();
-		} catch (jsocket::SocketException &e) {
+		} catch (jcommon::Exception &e) {
 			perror("Broken connection");
 		}
 	}

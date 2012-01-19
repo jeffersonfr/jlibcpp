@@ -183,17 +183,7 @@ class HTTPRequest : public jthread::Thread {
 				}
 
 				c->Close();
-			} catch (SocketException &e) {
-				if (_resource_data != NULL) {
-					delete [] _resource_data;
-					_resource_data = NULL;
-					_resource_size = 0;
-				}
-
-				c->Close();
-
-				std::cerr << "error [" << strerror(errno) << "]: " << e.what() << std::endl;
-			} catch (UnknownHostException &e) {
+			} catch (jcommon::Exception &e) {
 				if (_resource_data != NULL) {
 					delete [] _resource_data;
 					_resource_data = NULL;

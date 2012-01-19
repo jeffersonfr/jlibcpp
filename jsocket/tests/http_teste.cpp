@@ -74,7 +74,7 @@ void http_stream(jcommon::URL url)
 		} while (ch != 0);
 
 		c.Close();
-	} catch (SocketException &e) {
+	} catch (jcommon::Exception &e) {
 		std::cerr << "error: " << e.what() << std::endl;
 	}
 }
@@ -105,7 +105,7 @@ void http_raw(jcommon::URL url) {
 		} while (true);
 
 		c.Close();
-	} catch (SocketException &e) {
+	} catch (jcommon::Exception &e) {
 		std::cerr << "error: " << e.what() << std::endl;
 	}
 }

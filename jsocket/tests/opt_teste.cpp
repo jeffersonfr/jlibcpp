@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "jdatagramsocket.h"
 #include "jsocketexception.h"
+#include "jioexception.h"
 #include "jsockettimeoutexception.h"
 #include "jsocketlib.h"
 
@@ -62,7 +63,9 @@ int main() {
 		std::cout << e.what() << std::endl;
 	} catch (SocketTimeoutException &e) {
 		std::cout << "Socket timeout" << std::endl;
-	} catch (jcommon::RuntimeException &e) {
+	} catch (jio::IOException &e) {
+		std::cout << "IO exception" << std::endl;
+	} catch (jcommon::Exception &e) {
 		std::cout << "Unknown error" << std::endl;
 	}
 

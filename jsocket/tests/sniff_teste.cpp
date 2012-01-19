@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jrawsocket.h"
+#include "jioexception.h"
 #include "jsocketexception.h"
 #include "jsocketlib.h"
 
@@ -223,6 +224,8 @@ void sniffer()
 		} while (true);
 		sniff.Close();
 	} catch (SocketException &e) {
+		std::cout << e.what() << std::endl;
+	} catch (jio::IOException &e) {
 		std::cout << e.what() << std::endl;
 	}
 }
