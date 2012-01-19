@@ -340,6 +340,12 @@ void ListBox::Paint(Graphics *g)
 	y = y - scrolly;
 
 	for (int i=0; i<(int)_items.size(); i++) {
+		int dy = y+(_item_size+_item_gap)*i;
+
+		if ((dy+_item_size) < 0 || dy > _size.height) {
+			continue;
+		}
+
 		Item *item = _items[i];
 
 		if (item->IsEnabled() == true) {

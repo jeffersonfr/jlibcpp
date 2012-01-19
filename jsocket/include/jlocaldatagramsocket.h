@@ -50,23 +50,23 @@ class LocalDatagramSocket : public jsocket::Connection{
 		int _fd;
 #endif
 		/** \brief */
+		struct sockaddr_un _server;
+		/** \brief */
 		struct sockaddr_un _client;
 		/** \brief */
-		struct sockaddr_un _server;
+		struct sockaddr_un _from;
 		/** \brief Input stream. */
 		SocketInputStream *_is;
 		/** \brief Output stream. */
 		SocketOutputStream *_os;
 		/** \brief */
-		std::string _client_file;
-		/** \brief */
 		std::string _server_file;
+		/** \brief */
+		std::string _client_file;
 		/** \brief Bytes sent. */
 		int64_t _sent_bytes;
 		/** \brief Bytes received. */
 		int64_t _receive_bytes;
-		/** \brief Connect or not ? */
-		bool _stream;
 		/** \brief */
 		int _timeout;
 
@@ -96,16 +96,16 @@ class LocalDatagramSocket : public jsocket::Connection{
 
 	public:
 		/**
-		 * \brief Construtor UDP client.
-		 *
-		 */
-		LocalDatagramSocket(std::string client, std::string server, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
-
-		/**
-		 * \brief Construtor UDP server.
+		 * \brief Construtor UDP Server.
 		 *
 		 */
 		LocalDatagramSocket(std::string server, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+
+		/**
+		 * \brief Construtor UDP Client.
+		 *
+		 */
+		LocalDatagramSocket(std::string client, std::string server, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
 		 * \brief Destructor virtual.

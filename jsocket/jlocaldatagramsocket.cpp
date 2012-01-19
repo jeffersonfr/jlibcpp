@@ -31,30 +31,6 @@
 
 namespace jsocket {
 
-LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server, int timeout_, int rbuf_, int wbuf_):
-	jsocket::Connection(JCT_UDP)
-{
-	jcommon::Object::SetClassName("jsocket::DatagramSocket");
-	
-#ifdef _WIN32
-	throw jcommon::SocketException("Named socket unsupported.");
-#endif
-
-	_client_file = client;
-	_server_file = server;
-	_is = NULL;
-	_os = NULL;
-	_is_closed = true;
-	_timeout = timeout_;
-
-	CreateSocket();
-	ConnectSocket();
-	InitStream(rbuf_, wbuf_);
-
-	_sent_bytes = 0;
-	_receive_bytes = 0;
-}
-
 LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(JCT_UDP)
 {
@@ -64,7 +40,6 @@ LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int r
 	throw jcommon::SocketException("Named socket unsupported.");
 #endif
 
-	// _client_file = client;
 	_server_file = server;
 	_is = NULL;
 	_os = NULL;
@@ -73,6 +48,30 @@ LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int r
 
 	CreateSocket();
 	BindSocket();
+	InitStream(rbuf_, wbuf_);
+
+	_sent_bytes = 0;
+	_receive_bytes = 0;
+}
+
+LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server, int timeout_, int rbuf_, int wbuf_):
+	jsocket::Connection(JCT_UDP)
+{
+	jcommon::Object::SetClassName("jsocket::DatagramSocket");
+	
+#ifdef _WIN32
+	throw jcommon::SocketException("Named socket unsupported.");
+#endif
+
+	_server_file = server;
+	_client_file = client;
+	_is = NULL;
+	_os = NULL;
+	_is_closed = true;
+	_timeout = timeout_;
+
+	CreateSocket();
+	ConnectSocket();
 	InitStream(rbuf_, wbuf_);
 
 	_sent_bytes = 0;
@@ -100,12 +99,12 @@ LocalDatagramSocket::~LocalDatagramSocket()
 void LocalDatagramSocket::CreateSocket()
 {
 #ifdef _WIN32
-	{
+	throw SocketException("Socket creation exception");
 #else
-	if ((_fd = ::socket(PF_UNIX, SOCK_DGRAM, 0)) < 0) { // IPPROTO_UDP);
-#endif
+	if ((_fd = ::socket(AF_UNIX, SOCK_DGRAM, PF_UNSPEC)) < 0) {
 		throw SocketException("Socket creation exception");
 	}
+#endif
 
 	_is_closed = false;
 }
@@ -114,21 +113,22 @@ void LocalDatagramSocket::BindSocket()
 {
 #ifdef _WIN32
 #else
-	int length = sizeof(_client.sun_path)-1;
-
-	memset(&_client, 0, sizeof(_client));
-	
-	_client.sun_family = AF_UNIX;
-	strncpy(_client.sun_path, _server_file.c_str(), length);
-	unlink(_server_file.c_str());
-
-	if (bind(_fd, (const struct sockaddr *)&_client, sizeof(_client)) < 0) {
-		throw SocketException("Socket bind exception");
-	}
+	int length = sizeof(_server.sun_path)-1;
 
 	memset(&_server, 0, sizeof(_server));
+	memset(&_client, 0, sizeof(_client));
+	
 	_server.sun_family = AF_UNIX;
-	strcpy(_server.sun_path, _server_file.c_str());
+
+	strncpy(_server.sun_path, _server_file.c_str(), length);
+	
+	unlink(_server_file.c_str());
+
+	if (bind(_fd, (const struct sockaddr *)&_server, sizeof(_server)) < 0) {
+		Close();
+
+		throw SocketException("Socket bind exception");
+	}
 #endif
 }
 
@@ -136,21 +136,27 @@ void LocalDatagramSocket::ConnectSocket()
 {
 #ifdef _WIN32
 #else
-	int length = sizeof(_client.sun_path)-1;
+	int clength = sizeof(_client.sun_path)-1;
 
+	memset(&_server, 0, sizeof(_server));
 	memset(&_client, 0, sizeof(_client));
 	
 	_client.sun_family = AF_UNIX;
-	strncpy(_client.sun_path, _client_file.c_str(), length);
+
+	strncpy(_client.sun_path, _client_file.c_str(), clength);
+	
 	unlink(_client_file.c_str());
 
 	if (bind(_fd, (const struct sockaddr *)&_client, sizeof(_client)) < 0) {
-		throw SocketException("Socket connection exception");
+		Close();
+
+		throw SocketException("Socket bind exception");
 	}
 
-	memset(&_server, 0, sizeof(_server));
+	int slength = sizeof(_server.sun_path)-1;
+
 	_server.sun_family = AF_UNIX;
-	strcpy(_server.sun_path, _server_file.c_str());
+	strncpy(_server.sun_path, _server_file.c_str(), slength);
 #endif
 }
 
@@ -231,7 +237,7 @@ int LocalDatagramSocket::Receive(char *data_, int size_, bool block_)
 #else
 	int n,
 		flags,
-		length = sizeof(_server);
+		length = sizeof(_from);
 
 	if (block_ == true) {
 		// CHANGE:: call SocketOptionss
@@ -241,7 +247,7 @@ int LocalDatagramSocket::Receive(char *data_, int size_, bool block_)
 		flags = MSG_DONTWAIT;
 	}
 
-	n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_server, (socklen_t *)&length);
+	n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_from, (socklen_t *)&length);
 	
 	if (n < 0) {
 	   if (errno == EAGAIN) {
@@ -310,11 +316,7 @@ int LocalDatagramSocket::Send(const char *data_, int size_, bool block_)
 		flags = MSG_NOSIGNAL | MSG_DONTWAIT;
 	}
 
-	if (_stream == true) {	
-		n = ::send(_fd, data_, size_, flags);
-	} else {
-		n = ::sendto(_fd, data_, size_, flags, (struct sockaddr *)&_server, sizeof(_server));
-	}
+	n = ::sendto(_fd, data_, size_, flags, (struct sockaddr *)&_server, sizeof(_server));
 
 	if (n < 0) {
 		if (errno == EAGAIN) {
@@ -351,10 +353,12 @@ void LocalDatagramSocket::Close()
 		throw SocketException("Unknown close exception");
 	}
 	
+	if (_server_file != "") {
+		unlink(_server_file.c_str());
+	}
+
 	if (_client_file != "") {
 		unlink(_client_file.c_str());
-	} else {
-		unlink(_server_file.c_str());
 	}
 #endif
 

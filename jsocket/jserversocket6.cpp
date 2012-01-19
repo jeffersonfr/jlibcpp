@@ -113,6 +113,8 @@ void ServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 #endif
     
 	if (::bind(_fd, (struct sockaddr *) &_lsock, sizeof(_lsock)) < 0) {
+		Close();
+
 		throw SocketException("ServerSocket bind exception");
 	}
 }
@@ -120,6 +122,8 @@ void ServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 void ServerSocket6::ListenSocket(int backlog_)
 {
 	if (::listen(_fd, backlog_) < 0) {
+		Close();
+
 		throw SocketException("ServerSocket listen exception");
 	}
 }

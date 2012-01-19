@@ -150,15 +150,15 @@ void DatagramSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 
 #ifdef _WIN32
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
-#else
-	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
-#endif
-    
-#ifdef _WIN32
+
    if (::bind (_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) == SOCKET_ERROR) {
 #else
+	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
+
 	if (::bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
 #endif
+		Close();
+
 		throw SocketException("Socket bind exception");
 	}
 }

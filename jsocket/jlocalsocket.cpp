@@ -87,7 +87,7 @@ void LocalSocket::CreateSocket()
 {
 #ifdef _WIN32
 #else
-	_fd = socket (PF_UNIX, SOCK_STREAM, 0); // IPPROTO_TCP);
+	_fd = socket (PF_UNIX, SOCK_STREAM, PF_UNSPEC);
 
 	if (_fd < 0) {
 		throw SocketException("Socket creation exception");
