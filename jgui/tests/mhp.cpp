@@ -33,7 +33,7 @@ class ScreenLayer : public jgui::Container{
 			jgui::Container(0, 0, 1920, 1080)
 		{
 			SetVisible(true);
-			
+	
 			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
 		}
 
@@ -360,6 +360,7 @@ class Scene : public jgui::Container, public jgui::KeyListener, public jthread::
 			_timer.Schedule(this, (uint64_t)0LL, 100000LL, false);
 			
 			SetBackgroundVisible(true);
+			SetFocusCycleRoot(true);
 			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
 
 			jgui::InputManager::GetInstance()->RegisterKeyListener(this);

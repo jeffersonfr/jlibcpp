@@ -170,6 +170,12 @@ class SSLServerSocket : public virtual jcommon::Object{
 		 */
 		bool UseDHFile(const char *dh_file);
 
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual bool IsClosed();
+
 };
 
 }

@@ -110,6 +110,12 @@ class ServerSocket6 : public virtual jcommon::Object{
 		 */
 		void Close();
 
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual bool IsClosed();
+
 };
 
 }

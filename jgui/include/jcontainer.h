@@ -226,6 +226,12 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
+		virtual Component * GetComponentAt(int x, int y);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void InvalidateAll();
 		
 		/**

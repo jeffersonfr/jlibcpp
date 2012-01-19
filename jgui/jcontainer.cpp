@@ -37,6 +37,7 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 
 	_layout = new BorderLayout();//NULL;
 
+	_is_focus_cycle_root = false;
 	_focus = NULL;
 	_orientation = JCO_LEFT_TO_RIGHT;
 	_is_enabled = true;
@@ -650,6 +651,11 @@ int Container::GetComponentCount()
 std::vector<Component *> & Container::GetComponents()
 {
 	return _components;
+}
+
+Component * Container::GetComponentAt(int x, int y)
+{
+	return GetTargetComponent(this, x, y, NULL, NULL);
 }
 
 void Container::RequestComponentFocus(jgui::Component *c)

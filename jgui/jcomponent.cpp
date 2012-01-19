@@ -710,14 +710,10 @@ Container * Component::GetParent()
 
 Container * Component::GetTopLevelAncestor()
 {
-	Container *parent = GetParent();
-
-	while ((void *)parent != NULL) {
-		if (parent->GetParent() == NULL) {
-			return parent;
+	for (Component *cmp = this; cmp != NULL; cmp = cmp->GetParent()) {
+		if (cmp->InstanceOf("jgui::Window") == true) {
+			return dynamic_cast<Container *>(cmp);
 		}
-		
-		parent = parent->GetParent();
 	}
 
 	return NULL;
@@ -799,6 +795,26 @@ Component * Component::GetNextFocusUp()
 Component * Component::GetNextFocusDown()
 {
 	return _down;
+}
+
+void Component::SetNextFocusLeft(Component *cmp)
+{
+	_left = cmp;
+}
+
+void Component::SetNextFocusRight(Component *cmp)
+{
+	_right = cmp;
+}
+
+void Component::SetNextFocusUp(Component *cmp)
+{
+	_up = cmp;
+}
+
+void Component::SetNextFocusDown(Component *cmp)
+{
+	_down = cmp;
 }
 
 void Component::SetParent(Container *parent)
@@ -1608,7 +1624,7 @@ bool Component::ProcessEvent(KeyEvent *event)
 				x2 = 0,
 				y2 = 0;
 
-			GetInternalComponents(GetTopLevelAncestor(), &components);
+			GetInternalComponents(GetFocusCycleRootAncestor(), &components);
 
 			for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
 				Component *cmp = (*i);
@@ -1671,7 +1687,7 @@ void Component::FindNextComponentFocus(jregion_t rect, Component **left, Compone
 {
 	std::vector<Component *> components;
 
-	GetInternalComponents(GetTopLevelAncestor(), &components);
+	GetInternalComponents(GetFocusCycleRootAncestor(), &components);
 
 	if (components.size() == 0 || (components.size() == 1 && components[0] == this)) {
 		return;
@@ -1769,6 +1785,27 @@ bool Component::IsFocusable()
 void Component::SetFocusable(bool b)
 {
 	_is_focusable = b;
+}
+
+bool Component::IsFocusCycleRoot()
+{
+	return _is_focus_cycle_root;
+}
+
+void Component::SetFocusCycleRoot(bool b)
+{
+	_is_focus_cycle_root = b;
+}
+
+Container * Component::GetFocusCycleRootAncestor()
+{
+	Container *cmp = GetParent();
+	
+	while (cmp != NULL && cmp->IsFocusCycleRoot() == false) {
+		cmp = cmp->GetParent();
+	}
+
+	return cmp;
 }
 
 bool Component::IsVisible()

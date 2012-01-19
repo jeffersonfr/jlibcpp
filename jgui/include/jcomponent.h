@@ -176,6 +176,7 @@ class Component : public virtual jcommon::Object{
 			_is_background_visible,
 			_is_focusable,
 			_is_enabled,
+			_is_focus_cycle_root,
 			_is_theme_enabled,
 			_is_opaque,
 			_is_valid,
@@ -599,12 +600,6 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetNextComponentFocus(Component *left, Component *right, Component *up, Component *down);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual Component * GetNextFocusLeft();
 		
 		/**
@@ -625,6 +620,36 @@ class Component : public virtual jcommon::Object{
 		 */
 		virtual Component * GetNextFocusDown();
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetNextFocusLeft(Component *cmp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetNextFocusRight(Component *cmp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetNextFocusUp(Component *cmp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetNextFocusDown(Component *cmp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetNextComponentFocus(Component *left, Component *right, Component *up, Component *down);
+
 		/**
 		 * \brief
 		 *
@@ -1092,6 +1117,24 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual bool IsFocusable();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsFocusCycleRoot();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetFocusCycleRoot(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Container * GetFocusCycleRootAncestor();
 
 		/**
 		 * \brief
