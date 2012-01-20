@@ -161,7 +161,11 @@ InetAddress * InetAddress6::GetLocalHost()
 	try {	
 		return GetByName(localName);
 	} catch (UnknownHostException &e) {
-		return GetByName("::1");
+		try {
+			return GetByName("::1");
+		} catch (UnknownHostException &e2) {
+			throw e;
+		}
 	}
 }
 
