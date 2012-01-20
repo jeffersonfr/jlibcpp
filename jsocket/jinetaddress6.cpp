@@ -39,7 +39,7 @@ InetAddress6::~InetAddress6()
 
 /** Static */
 
-InetAddress * InetAddress6::GetByName(std::string host_name_)
+InetAddress * InetAddress6::GetByName(std::string host_)
 {
 	struct addrinfo *result = NULL;
 	struct addrinfo *ptr = NULL;
@@ -63,8 +63,8 @@ InetAddress * InetAddress6::GetByName(std::string host_name_)
 
 	// Call getaddrinfo(). If the call succeeds, the result variable will hold a linked list 
 	// of addrinfo structures containing response information
-	if (getaddrinfo(host_name_.c_str(), "", &hints, &result) != 0) {
-		throw UnknownHostException("Host not found exception");
+	if (getaddrinfo(host_.c_str(), "", &hints, &result) != 0) {
+		throw UnknownHostException("Host \"" + host_ + "\" not found exception");
 	}
 
 	// Retrieve each address and print out the hex bytes
@@ -91,7 +91,7 @@ InetAddress * InetAddress6::GetByName(std::string host_name_)
 	throw UnknownHostException("Cannot found IPv6 address");
 }
 
-std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_name_)
+std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_)
 {
 	std::vector<InetAddress *> vip;
 
@@ -117,8 +117,8 @@ std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_name_)
 
 	// Call getaddrinfo(). If the call succeeds, the result variable will hold a linked list 
 	// of addrinfo structures containing response information
-	if (getaddrinfo(host_name_.c_str(), "", &hints, &result) != 0) {
-		throw UnknownHostException("Host not found exception");
+	if (getaddrinfo(host_.c_str(), "", &hints, &result) != 0) {
+		throw UnknownHostException("Host \"" + host_ + "\" not found exception");
 	}
 
 	// Retrieve each address and print out the hex bytes
@@ -158,7 +158,11 @@ InetAddress * InetAddress6::GetLocalHost()
 
 	gethostname(localName, 255);
 	
-	return GetByName(localName);
+	try {	
+		return GetByName(localName);
+	} catch (UnknownHostException &e) {
+		return GetByName("::1");
+	}
 }
 
 /** End */

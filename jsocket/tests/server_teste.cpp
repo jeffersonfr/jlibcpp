@@ -32,7 +32,7 @@ int main() {
 	char *receive = new char[100+1];
 	
 	try {
-		ServerSocket server(0, 1);
+		ServerSocket server(3200, 1);
 
 		Socket *client;
 
