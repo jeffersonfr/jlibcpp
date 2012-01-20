@@ -90,7 +90,7 @@ void LocalSocket::CreateSocket()
 	_fd = socket (PF_UNIX, SOCK_STREAM, PF_UNSPEC);
 
 	if (_fd < 0) {
-		throw SocketException("Socket creation exception");
+		throw SocketException("Socket handling error");
 	}
 #endif
 }
@@ -115,7 +115,7 @@ void LocalSocket::ConnectSocket()
 		r = connect(_fd, (struct sockaddr *)&_address, address_length);
 
 		if (errno != EINPROGRESS) {
-			throw SocketException("Socket connection exception");
+			throw SocketException("Connection error");
 		}
 
 		if (r != 0) {
@@ -134,7 +134,7 @@ void LocalSocket::ConnectSocket()
 				opt = 0;
 
 				if (ioctl(_fd, FIONBIO, &opt) < 0) {
-					throw SocketException("Socket connection exception");
+					throw SocketException("Connection error");
 				}
 
 				shutdown(_fd, SHUT_RDWR);
@@ -142,7 +142,7 @@ void LocalSocket::ConnectSocket()
 				if (r == 0) {
 					throw SocketException("Socket connection timeout exception");
 				} else if (r < 0) {
-					throw SocketException("Socket connection exception");
+					throw SocketException("Connection error");
 				}
 			}
 
@@ -151,21 +151,21 @@ void LocalSocket::ConnectSocket()
 			getsockopt(_fd, SOL_SOCKET, SO_ERROR, (void *)&r, (socklen_t *)&optlen);
 
 			if (r != 0) {
-				throw SocketException("Unknown socket exception");
+				throw SocketException("Unknown error");
 			}
 		}
 
 		opt = 0;
 
 		if (ioctl(_fd, FIONBIO, &opt) < 0) {
-			throw SocketException("Socket connection exception");
+			throw SocketException("Connection error");
 		}
 	} else {
 		r = connect(_fd, (struct sockaddr *)&_address, sizeof(_address));
 	}
 
 	if (r < 0) {
-		throw SocketException("Socket connection exception");
+		throw SocketException("Connection error");
 	}
 #endif
 }
@@ -211,7 +211,7 @@ int LocalSocket::Send(const char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Invalid send parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket send timeout exception");
+		throw SocketTimeoutException("Socket output timeout error");
 	} else {
 		if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
 			return LocalSocket::Send(data_, size_);
@@ -244,7 +244,7 @@ int LocalSocket::Send(const char *data_, int size_, bool block_)
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
-				throw SocketTimeoutException("Socket send timeout exception");
+				throw SocketTimeoutException("Socket output timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
@@ -254,7 +254,7 @@ int LocalSocket::Send(const char *data_, int size_, bool block_)
 
 			throw SocketException("Broken pipe exception");
 		} else {
-			throw SocketTimeoutException("Socket send exception");
+			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
 
@@ -282,7 +282,7 @@ int LocalSocket::Receive(char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Invalid receive parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket read timeout exception");
+		throw SocketTimeoutException("Socket input timeout error");
 	} else {
 		if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return LocalSocket::Receive(data_, size_);
@@ -312,13 +312,13 @@ int LocalSocket::Receive(char *data_, int size_, bool block_)
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
-				throw SocketTimeoutException("Socket receive timeout exception");
+				throw SocketTimeoutException("Socket input timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
 			}
 		} else {
-			throw jio::IOException("Socket read exception");
+			throw jio::IOException("Socket input error");
 		}
 	} else if (n == 0) {
 		Close(); 

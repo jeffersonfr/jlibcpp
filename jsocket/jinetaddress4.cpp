@@ -43,7 +43,7 @@ InetAddress * InetAddress4::GetByName(std::string host_)
 	struct hostent *h = gethostbyname(host_.c_str());
     
 	if (h == NULL) {
-		throw UnknownHostException("Host \"" + host_ + "\" not found exception");
+		throw UnknownHostException("Host \"" + host_ + "\" not found");
   }
    
 	InetAddress *addr = new InetAddress4(host_, *(in_addr *)h->h_addr_list[0]);
@@ -70,7 +70,7 @@ std::vector<InetAddress *> InetAddress4::GetAllByName(std::string host_)
 	}
 
 	if (aux == NULL) {
-		throw UnknownHostException("Host \"" + host_ + "\" not found exception");
+		throw UnknownHostException("Host \"" + host_ + "\" not found");
 	} else {
 		struct hostent *aux2;
 

@@ -258,7 +258,7 @@ void SSLSocket::CreateSocket()
 #else
 	if (_fd < 0) {
 #endif
-		throw SocketException("Socket creation exception");
+		throw SocketException("Socket handling error");
 	}
 }
 
@@ -280,7 +280,7 @@ void SSLSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin_port = htons(local_port_);
 
 	if (bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
-		throw SocketException("Socket bind exception");
+		throw SocketException("Binding error");
 	}
 }
 
@@ -307,7 +307,7 @@ void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 
 		if (WSAGetLastError() != WSAEWOULDBLOCK) {
-			throw SocketException("Socket connection exception");
+			throw SocketException("Connection error");
 		}
 
 		if (r != 0) {
@@ -343,14 +343,14 @@ void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 			getsockopt(_fd, SOL_SOCKET, SO_ERROR, (char *)&r, &optlen);
 
 			if (r != 0) {
-				throw SocketException("Unknown socket exception");
+				throw SocketException("Unknown error");
 			}
 		}
 
 		opt = 0;
 
 		if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-			throw SocketException("Socket connection exception");
+			throw SocketException("Connection error");
 		}
 	} else {
 		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
@@ -364,7 +364,7 @@ void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 
 		if (errno != EINPROGRESS) {
-			throw SocketException("Socket connection exception");
+			throw SocketException("Connection error");
 		}
 
 		if (r != 0) {
@@ -383,7 +383,7 @@ void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 				opt = 0;
 
 				if (ioctl(_fd, FIONBIO, &opt) < 0) {
-					throw SocketException("Socket connection exception");
+					throw SocketException("Connection error");
 				}
 
 				shutdown(_fd, SHUT_RDWR);
@@ -391,7 +391,7 @@ void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 				if (r == 0) {
 					throw SocketException("Socket connection timeout exception");
 				} else if (r < 0) {
-					throw SocketException("Socket connection exception");
+					throw SocketException("Connection error");
 				}
 			}
 
@@ -400,14 +400,14 @@ void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 			getsockopt(_fd, SOL_SOCKET, SO_ERROR, (void *)&r, (socklen_t *)&optlen);
 
 			if (r != 0) {
-				throw SocketException("Unknown socket exception");
+				throw SocketException("Unknown error");
 			}
 		}
 
 		opt = 0;
 
 		if (ioctl(_fd, FIONBIO, &opt) < 0) {
-			throw SocketException("Socket connection exception");
+			throw SocketException("Connection error");
 		}
 	} else {
 		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
@@ -446,7 +446,7 @@ void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 #else
 	if (r < 0) {
 #endif
-		throw SocketException("Socket connection exception");
+		throw SocketException("Connection error");
 	}
 }
 
@@ -536,7 +536,7 @@ int SSLSocket::Send(const char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Invalid send parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket send timeout exception");
+		throw SocketTimeoutException("Socket output timeout error");
 	} else {
 		if (ufds[0].revents | POLLIN) {
 			return SSLSocket::Send(data_, size_);
@@ -562,16 +562,16 @@ int SSLSocket::Send(const char *data_, int size_, bool block_)
 #ifdef _WIN32
 	if (n == SOCKET_ERROR) {
 		if (WSAGetLastError() == WSAECONNABORTED) {
-			throw SocketTimeoutException("Socket send timeout exception");
+			throw SocketTimeoutException("Socket output timeout error");
 		} else {
-			throw SocketTimeoutException("Socket send exception");
+			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
 #else
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
-				throw SocketTimeoutException("Socket send timeout exception");
+				throw SocketTimeoutException("Socket output timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
@@ -581,7 +581,7 @@ int SSLSocket::Send(const char *data_, int size_, bool block_)
 
 			throw SocketException("Broken pipe exception");
 		} else {
-			throw SocketTimeoutException("Socket send exception");
+			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
 #endif
@@ -610,7 +610,7 @@ int SSLSocket::Receive(char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Invalid receive parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket read timeout exception");
+		throw SocketTimeoutException("Socket input timeout error");
 	} else {
 		if (ufds[0].revents | POLLIN) {
 			return SSLSocket::Receive(data_, size_);
@@ -656,9 +656,9 @@ int SSLSocket::Receive(char *data_, int size_, bool block_)
 #ifdef _WIN32
 	if (n == SOCKET_ERROR) {
 		if (WSAGetLastError() == WSAETIMEDOUT) {
-			throw SocketTimeoutException("Socket receive timeout exception");
+			throw SocketTimeoutException("Socket input timeout error");
 		} else {
-			throw jio::jio::IOException("Socket read exception");
+			throw jio::jio::IOException("Socket input error");
 		}
 	} else if (n == 0) {
 		Close();
@@ -669,13 +669,13 @@ int SSLSocket::Receive(char *data_, int size_, bool block_)
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
-				throw SocketTimeoutException("Socket receive timeout exception");
+				throw SocketTimeoutException("Socket input timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
 			}
 		} else {
-			throw jio::IOException("Socket read exception");
+			throw jio::IOException("Socket input error");
 		}
 	} else if (n == 0) {
 		Close();

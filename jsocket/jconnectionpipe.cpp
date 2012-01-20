@@ -89,7 +89,7 @@ int ConnectionPipe::Receive(char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Connection parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket read timeout exception");
+		throw SocketTimeoutException("Socket input timeout error");
 	} else {
 	    if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLOUT)) {
 			return ConnectionPipe::Receive(data_, size_);
@@ -152,7 +152,7 @@ int ConnectionPipe::Send(const char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Connection parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket send timeout exception");
+		throw SocketTimeoutException("Socket output timeout error");
 	} else {
 	    if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLOUT)) {
 			return ConnectionPipe::Send(data_, size_);

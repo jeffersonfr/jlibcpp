@@ -88,7 +88,7 @@ void MulticastSocket::CreateSocket()
 void MulticastSocket::BindSocket(InetAddress *addr_, int local_port_)
 {
 	if (bind(_fdr, (struct sockaddr *)&_sock_r, sizeof(_sock_r)) < 0) {
-		throw SocketException("Socket bind exception");
+		throw SocketException("Binding error");
 	}
 }
 
@@ -160,7 +160,7 @@ int MulticastSocket::Receive(char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Invalid receive parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket read timeout exception");
+		throw SocketTimeoutException("Socket input timeout error");
 	} else {
 		if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return MulticastSocket::Receive(data_, size_);
@@ -198,13 +198,13 @@ int MulticastSocket::Receive(char *data_, int size_, bool block_)
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
-				throw SocketTimeoutException("Socket receive timeout exception");
+				throw SocketTimeoutException("Socket input timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
 			}
 		} else {
-			throw jio::IOException("Socket read exception");
+			throw jio::IOException("Socket input error");
 		}
 	} else if (n == 0) {
 		Close();
@@ -236,7 +236,7 @@ int MulticastSocket::Send(const char *data, int size, int time_)
 	if (rv == -1) {
 		throw SocketException("Invalid send parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket send timeout exception");
+		throw SocketTimeoutException("Socket output timeout error");
 	} else {
 		if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
 			return MulticastSocket::Send(data, size);
@@ -279,7 +279,7 @@ int MulticastSocket::Send(const char *data, int size, bool block_)
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
-				throw SocketTimeoutException("Socket send timeout exception");
+				throw SocketTimeoutException("Socket output timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
@@ -289,7 +289,7 @@ int MulticastSocket::Send(const char *data, int size, bool block_)
 
 			throw SocketException("Broken pipe exception");
 		} else {
-			throw SocketTimeoutException("Socket send exception");
+			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
 #endif

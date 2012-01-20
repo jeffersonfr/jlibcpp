@@ -99,10 +99,10 @@ LocalDatagramSocket::~LocalDatagramSocket()
 void LocalDatagramSocket::CreateSocket()
 {
 #ifdef _WIN32
-	throw SocketException("Socket creation exception");
+	throw SocketException("Socket handling error");
 #else
 	if ((_fd = ::socket(AF_UNIX, SOCK_DGRAM, PF_UNSPEC)) < 0) {
-		throw SocketException("Socket creation exception");
+		throw SocketException("Socket handling error");
 	}
 #endif
 
@@ -127,7 +127,7 @@ void LocalDatagramSocket::BindSocket()
 	if (bind(_fd, (const struct sockaddr *)&_server, sizeof(_server)) < 0) {
 		Close();
 
-		throw SocketException("Socket bind exception");
+		throw SocketException("Binding error");
 	}
 #endif
 }
@@ -150,7 +150,7 @@ void LocalDatagramSocket::ConnectSocket()
 	if (bind(_fd, (const struct sockaddr *)&_client, sizeof(_client)) < 0) {
 		Close();
 
-		throw SocketException("Socket bind exception");
+		throw SocketException("Binding error");
 	}
 
 	int slength = sizeof(_server.sun_path)-1;
@@ -215,7 +215,7 @@ int LocalDatagramSocket::Receive(char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Invalid receive parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket read timeout exception");
+		throw SocketTimeoutException("Socket input timeout error");
 	} else {
 	    if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return LocalDatagramSocket::Receive(data_, size_, true);
@@ -254,7 +254,7 @@ int LocalDatagramSocket::Receive(char *data_, int size_, bool block_)
 			if (block_ == false) {
 				throw jio::IOException("Socket buffer is empty");
 			} else {
-				throw SocketTimeoutException("Socket receive timeout exception");
+				throw SocketTimeoutException("Socket input timeout error");
 			}
 		} else {
 			throw jio::IOException("Read socket error");
@@ -289,7 +289,7 @@ int LocalDatagramSocket::Send(const char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Invalid send parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket send timeout exception");
+		throw SocketTimeoutException("Socket output timeout error");
 	} else {
 		if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
 			return LocalDatagramSocket::Send(data_, size_);
@@ -321,7 +321,7 @@ int LocalDatagramSocket::Send(const char *data_, int size_, bool block_)
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
-				throw SocketTimeoutException("Socket send timeout exception");
+				throw SocketTimeoutException("Socket output timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
@@ -331,7 +331,7 @@ int LocalDatagramSocket::Send(const char *data_, int size_, bool block_)
 
 			throw SocketException("Broken pipe exception");
 		} else {
-			throw SocketTimeoutException("Socket send exception");
+			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
 

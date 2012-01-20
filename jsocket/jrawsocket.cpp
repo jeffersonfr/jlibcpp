@@ -64,11 +64,11 @@ void RawSocket::CreateSocket()
 {
 #ifdef _WIN32
 	if ((_fd = socket(PF_INET, SOCK_RAW, IPPROTO_RAW)) == INVALID_SOCKET) {
-		throw SocketException("Socket creation exception");
+		throw SocketException("Socket handling error");
 	}
 #else
 	if ((_fd = ::socket(PF_PACKET, SOCK_RAW, (_promisc == true)?ETH_P_ALL:ETH_P_IP)) < 0) {
-		throw SocketException("Socket creation exception");
+		throw SocketException("Socket handling error");
 	}
 
 	_is_closed = false;
@@ -115,7 +115,7 @@ void RawSocket::BindSocket()
 	sock_ether.sll_pkttype = (_promisc == true)?PACKET_OTHERHOST:PACKET_HOST;
 
 	if (bind(_fd, (struct sockaddr *)(&sock_ether), sizeof(sock_ether)) < 0) {
-		throw SocketException("Socket bind exception");
+		throw SocketException("Binding error");
 	}
 }
 
@@ -161,7 +161,7 @@ int RawSocket::Receive(char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Invalid receive parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket read timeout exception");
+		throw SocketTimeoutException("Socket input timeout error");
 	} else {
 		if ((ufds[0].revents & POLLIN) || (ufds[0].revents & POLLRDBAND)) {
 			return RawSocket::Receive(data_, size_);
@@ -186,9 +186,9 @@ int RawSocket::Receive(char *data_, int size_, bool block_)
 
 	if (n == SOCKET_ERROR) {
 		if (WSAGetLastError() == WSAETIMEDOUT) {
-			throw SocketTimeoutException("Socket receive timeout exception");
+			throw SocketTimeoutException("Socket input timeout error");
 		} else {
-			throw jio::IOException("Socket read exception");
+			throw jio::IOException("Socket input error");
 		}
 	} else if (n == 0) {
 		throw jio::IOException("Peer shutdown exception");
@@ -201,13 +201,13 @@ int RawSocket::Receive(char *data_, int size_, bool block_)
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
-				throw SocketTimeoutException("Socket receive timeout exception");
+				throw SocketTimeoutException("Socket input timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
 			}
 		} else {
-			throw jio::IOException("Socket read exception");
+			throw jio::IOException("Socket input error");
 		}
 	} else if (n == 0) {
 		Close();
@@ -240,7 +240,7 @@ int RawSocket::Send(const char *data_, int size_, int time_)
 	if (rv == -1) {
 		throw SocketException("Invalid send parameters exception");
 	} else if (rv == 0) {
-		throw SocketTimeoutException("Socket send timeout exception");
+		throw SocketTimeoutException("Socket output timeout error");
 	} else {
 		if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLWRBAND)) {
 			return RawSocket::Send(data_, size_);
@@ -268,16 +268,16 @@ int RawSocket::Send(const char *data_, int size_, bool block_)
 #ifdef _WIN32
 	if (n == SOCKET_ERROR) {
 		if (WSAGetLastError() == WSAECONNABORTED) {
-			throw SocketTimeoutException("Socket send timeout exception");
+			throw SocketTimeoutException("Socket output timeout error");
 		} else {
-			throw SocketTimeoutException("Socket send exception");
+			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
 #else
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
-				throw SocketTimeoutException("Socket send timeout exception");
+				throw SocketTimeoutException("Socket output timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
@@ -287,7 +287,7 @@ int RawSocket::Send(const char *data_, int size_, bool block_)
 
 			throw SocketException("Broken pipe exception");
 		} else {
-			throw SocketTimeoutException("Socket send exception");
+			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
 #endif

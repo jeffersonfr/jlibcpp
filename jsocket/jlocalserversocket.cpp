@@ -55,7 +55,7 @@ void LocalServerSocket::CreateSocket()
 	_fd = socket (PF_UNIX, SOCK_STREAM, PF_UNSPEC);
 
 	if (_fd < 0) {
-		throw SocketException("ServerSocket creation exception");
+		throw SocketException("ServerSocket handling error");
 	}
 #endif
 }
@@ -74,7 +74,7 @@ void LocalServerSocket::BindSocket()
 	int address_length = sizeof(_address.sun_family) + strnlen(_address.sun_path, length);
 
 	if (bind(_fd, (struct sockaddr *) &_address, address_length) != 0) {
-		throw SocketException("ServerSocket bind exception");
+		throw SocketException("ServerBinding error");
 	}
 #endif
 }
@@ -82,7 +82,7 @@ void LocalServerSocket::BindSocket()
 void LocalServerSocket::ListenSocket(int backlog_)
 {
 	if (::listen(_fd, backlog_) < 0) {
-		throw SocketException("ServerSocket listen exception");
+		throw SocketException("ServerListen error");
 	}
 }
 

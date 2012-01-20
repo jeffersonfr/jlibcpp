@@ -64,7 +64,7 @@ InetAddress * InetAddress6::GetByName(std::string host_)
 	// Call getaddrinfo(). If the call succeeds, the result variable will hold a linked list 
 	// of addrinfo structures containing response information
 	if (getaddrinfo(host_.c_str(), "", &hints, &result) != 0) {
-		throw UnknownHostException("Host \"" + host_ + "\" not found exception");
+		throw UnknownHostException("Host \"" + host_ + "\" not found");
 	}
 
 	// Retrieve each address and print out the hex bytes
@@ -118,7 +118,7 @@ std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_)
 	// Call getaddrinfo(). If the call succeeds, the result variable will hold a linked list 
 	// of addrinfo structures containing response information
 	if (getaddrinfo(host_.c_str(), "", &hints, &result) != 0) {
-		throw UnknownHostException("Host \"" + host_ + "\" not found exception");
+		throw UnknownHostException("Host \"" + host_ + "\" not found");
 	}
 
 	// Retrieve each address and print out the hex bytes

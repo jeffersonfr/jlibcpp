@@ -56,7 +56,7 @@ int main() {
 		
 		client->Close();
 	} catch (std::runtime_error &e) {
-		std::cout << "error " << e.what() << std::endl;
+		std::cout << "Exception:: " << e.what() << std::endl;
 	}
 
 	ReleaseWindowsSocket();

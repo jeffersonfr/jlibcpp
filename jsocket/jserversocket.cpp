@@ -78,7 +78,7 @@ void ServerSocket::CreateSocket()
 #else
 	if ((_fd = ::socket(PF_INET, SOCK_STREAM, 0)) < 0) {
 #endif
-		throw SocketException("ServerSocket creation exception");
+		throw SocketException("ServerSocket handling error");
 	}
 
 	_is_closed = false;
@@ -120,14 +120,14 @@ void ServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 #endif
     
 	if (::bind(_fd, (struct sockaddr *) &_lsock, sizeof(_lsock)) < 0) {
-		throw SocketException("ServerSocket bind exception");
+		throw SocketException("ServerBinding error");
 	}
 }
 
 void ServerSocket::ListenSocket(int backlog_)
 {
 	if (::listen(_fd, backlog_) < 0) {
-		throw SocketException("ServerSocket listen exception");
+		throw SocketException("ServerListen error");
 	}
 }
 
