@@ -33,7 +33,14 @@
 #include <math.h>
 #include <list>
 
+#ifdef DIRECTFB_UI
+#include <directfb.h>
+#endif
+
 namespace jgui {
+
+class DFBGraphics;
+class CairoGraphics;
 
 enum jfont_attributes_t {
 	JFA_NONE
@@ -46,7 +53,8 @@ enum jfont_attributes_t {
  */
 class Font : public virtual jcommon::Object{
 
-	friend class Graphics;
+	friend class DFBGraphics;
+	friend class CairoGraphics;
 
 	private:
 		static Font *_default_font;
@@ -180,6 +188,12 @@ class Font : public virtual jcommon::Object{
 		 */
 		jregion_t GetGlyphExtends(int symbol);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY);
+		
 		/**
 		 * \brief
 		 *

@@ -185,10 +185,10 @@ void CheckButton::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int cx = _horizontal_gap+_border_size,
-			cy = _vertical_gap+_border_size,
-			cw = _size.width-2*cx,
-			ch = _size.height-2*cy,
+	int cw = _size.height/2,
+			ch = _size.height/2,
+			cx = 2*_horizontal_gap+_border_size,
+			cy = (_size.height-ch)/2,
 			csize = ch/2;
 
 	if (csize < 0) {
@@ -211,7 +211,7 @@ void CheckButton::Paint(Graphics *g)
 	if (_type == JCT_CHECK) {
 		g->FillRectangle(cx, cy, cw, ch);
 	} else {
-		g->FillCircle(cx+csize, cy+csize, csize);
+		g->FillCircle(cx+csize, _size.height/2, csize);
 	}
 
 	if (_checked == true) {
@@ -220,7 +220,7 @@ void CheckButton::Paint(Graphics *g)
 		if (_type == JCT_CHECK) {
 			g->FillRectangle(cx+4, cy+4, cw-8, ch-8);
 		} else {
-			g->FillCircle(cx+csize, cy+csize, csize/2);
+			g->FillCircle(cx+csize, _size.height/2, csize/2);
 		}
 	}
 

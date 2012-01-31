@@ -250,6 +250,8 @@ class GraphicsTeste : public jgui::Frame{
 		{
 			jgui::Frame::Paint(g);
 
+			g->SetAntialias(false);
+
 			DesenhaCubo(g, &p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4);
 		}
 };

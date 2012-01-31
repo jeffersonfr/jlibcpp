@@ -20,8 +20,9 @@
 #include "Stdafx.h"
 #include "jimage.h"
 #include "jgfxhandler.h"
-#include "jmemoryinputstream.h"
+#include "jdfbgraphics.h"
 #include "jthread.h"
+#include "jmemoryinputstream.h"
 
 namespace jgui {
 
@@ -112,7 +113,7 @@ Image::Image(int width, int height, jsurface_pixelformat_t pixelformat, int scal
 
 	GFXHandler::GetInstance()->CreateSurface(_size.width, _size.height, &surface, pixelformat, _scale.width, _scale.height);
 
-	_graphics = new Graphics(surface, true);
+	_graphics = new DFBGraphics(surface, true);
 
 	_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
 #endif
@@ -436,7 +437,7 @@ void Image::Restore()
 
 		GFXHandler::GetInstance()->CreateSurface(_size.width, _size.height, &surface, _pixelformat, _scale.width, _scale.height);
 
-		_graphics = new Graphics(surface, true);
+		_graphics = new DFBGraphics(surface, true);
 
 		_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
 

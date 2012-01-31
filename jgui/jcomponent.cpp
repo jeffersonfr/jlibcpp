@@ -739,26 +739,6 @@ void Component::SetEnabled(bool b)
 	Repaint();
 }
 
-void Component::SetLeftComponent(Component *left)
-{
-	_left = left;
-}
-
-void Component::SetRightComponent(Component *right)
-{
-	_right = right;
-}
-
-void Component::SetUpComponent(Component *up)
-{
-	_up = up;
-}
-
-void Component::SetDownComponent(Component *down)
-{
-	_down = down;
-}
-
 void Component::SetNavigationEnabled(bool b)
 {
 	_is_navigation_enabled = b;
@@ -1801,7 +1781,7 @@ Container * Component::GetFocusCycleRootAncestor()
 {
 	Container *cmp = GetParent();
 	
-	while (cmp != NULL && cmp->IsFocusCycleRoot() == false) {
+	while (cmp != NULL && cmp->GetParent() != NULL && cmp->IsFocusCycleRoot() == false) {
 		cmp = cmp->GetParent();
 	}
 

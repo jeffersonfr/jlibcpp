@@ -43,129 +43,6 @@ Label::~Label()
 {
 }
 
-int Label::CountLines(std::string text)
-{
-	if (_font == NULL) {
-		return 0;
-	}
-
-	int wp = _size.width-2*(_horizontal_gap-_border_size);
-
-	if (wp < 0) {
-		return 0;
-	}
-
-	std::vector<std::string> words,
-		texts;
-	int default_space;
-
-	default_space = _font->GetStringWidth(" ");
-
-	jcommon::StringTokenizer token(text, "\n", jcommon::JTT_STRING, false);
-	std::vector<std::string> lines;
-
-	for (int i=0; i<token.GetSize(); i++) {
-		std::vector<std::string> words;
-		
-		std::string line = token.GetToken(i);
-
-		line = jcommon::StringUtils::ReplaceString(line, "\n", "");
-		line = jcommon::StringUtils::ReplaceString(line, "\t", "    ");
-		
-		if (_halign == JHA_JUSTIFY) {
-			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, false);
-
-			std::string temp,
-				previous;
-
-			for (int j=0; j<line_token.GetSize(); j++) {
-				temp = jcommon::StringUtils::Trim(line_token.GetToken(j));
-
-				if (_font->GetStringWidth(temp) > wp) {
-					int p = 1;
-
-					while (p < (int)temp.size()) {
-						if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
-							words.push_back(temp.substr(0, p-1));
-
-							temp = temp.substr(p-1);
-
-							p = 1;
-						}
-					}
-
-					if (temp != "") {
-						words.push_back(temp.substr(0, p));
-					}
-				} else {
-					words.push_back(temp);
-				}
-			}
-
-			temp = words[0];
-
-			for (int j=1; j<(int)words.size(); j++) {
-				previous = temp;
-				temp += " " + words[j];
-
-				if (_font->GetStringWidth(temp) > wp) {
-					temp = words[j];
-
-					texts.push_back(previous);
-				}
-			}
-
-			texts.push_back("\n" + temp);
-		} else {
-			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, true);
-
-			std::string temp,
-				previous;
-
-			for (int j=0; j<line_token.GetSize(); j++) {
-				temp = line_token.GetToken(j);
-
-				if (_font->GetStringWidth(temp) > wp) {
-					int p = 1;
-
-					while (p < (int)temp.size()) {
-						if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
-							words.push_back(temp.substr(0, p-1));
-
-							temp = temp.substr(p-1);
-
-							p = 1;
-						}
-					}
-
-					if (temp != "") {
-						words.push_back(temp.substr(0, p));
-					}
-				} else {
-					words.push_back(temp);
-				}
-			}
-
-			temp = words[0];
-
-			for (int j=1; j<(int)words.size(); j++) {
-				previous = temp;
-				temp += " " + words[j];
-
-				if (_font->GetStringWidth(temp.c_str()) > wp) {
-					temp = words[j];
-
-					texts.push_back(previous);
-				}
-			}
-
-			texts.push_back(temp);
-		}
-	}
-
-	return texts.size();
-}
-
 void Label::SetWrap(bool b)
 {
 	if (_wrap == b) {
@@ -219,10 +96,20 @@ jvertical_align_t Label::GetVerticalAlign()
 
 jsize_t Label::GetPreferredSize()
 {
-	jsize_t t;
+	jsize_t t = _size;
 
-	t.width = _size.width;
-	t.height = CountLines(_text)*(_font->GetAscender()+_font->GetDescender())+2*(_vertical_gap+_border_size);
+	if (IsFontSet() == true) {
+		int wp = _size.width-2*(_horizontal_gap-_border_size),
+				hp = _font->GetAscender()+_font->GetDescender();
+
+		if (wp > 0) {
+			std::vector<std::string> lines;
+
+			_font->GetStringBreak(&lines, _text, wp, INT_MAX, _halign);
+
+			t.height = lines.size()*hp+2*(_vertical_gap+_border_size);
+		}
+	}
 
 	return t;
 }

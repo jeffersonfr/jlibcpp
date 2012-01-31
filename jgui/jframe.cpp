@@ -380,7 +380,7 @@ void Frame::MousePressed(MouseEvent *event)
 				}
 			} else {
 				if (_resize_enabled == true && _is_maximized == false) {
-					if (mousex > _size.width && mousey > _size.height) {
+					if (mousex > _size.width || mousey > _size.height) {
 						return;
 					}
 
@@ -455,6 +455,10 @@ void Frame::MouseMoved(MouseEvent *event)
 			mousey = event->GetY()-_location.y;
 
 	if (_internal_state == 0 && _resize_enabled == true) {
+		if (mousex > _size.width || mousey > _size.height) {
+			return;
+		}
+
 		int lwidth = _size.width - SIZE_TO_RESIZE,
 				lheight = _size.height - SIZE_TO_RESIZE; 
 

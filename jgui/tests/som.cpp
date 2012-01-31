@@ -234,7 +234,7 @@ class som : public jgui::Frame, public jthread::Thread {
 			double dx = toXReal(0.0),
 						 dy = toYReal(0.0);
 
-			g->DrawArc(dx, dy, _size.width-2*dx, _size.height-2*dy, 3*M_PI_2, 4*M_PI_2);
+			g->DrawArc(dx, dy, _size.width-2*dx, _size.height-2*dy, 3*M_PI_2,  2*M_PI);
 			
 			g->DrawCircle( toXReal(px)-3, toYReal(py)-3, 6);
 		}    

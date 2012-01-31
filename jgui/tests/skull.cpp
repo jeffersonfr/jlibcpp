@@ -2254,6 +2254,8 @@ class GraphicsTeste : public jgui::Frame{
 		{
 			jgui::Frame::Paint(g);
 
+			g->SetAntialias(false);
+
 			int count, NumUsed = 0;
 			Tri3D *current = Triangles;
 			Tri3D *first = Triangles;

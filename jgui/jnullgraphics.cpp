@@ -180,6 +180,13 @@ jblitting_flags_t NullGraphics::GetBlittingFlags()
 	return JBF_NOFX;
 }
 
+jdrawing_mode_t NullGraphics::GetDrawingMode()
+{
+	JDEBUG(JINFO, "called\n");
+
+	return JDM_STROKE;
+}
+
 jporterduff_flags_t NullGraphics::GetPorterDuffFlags()
 {
 	JDEBUG(JINFO, "called\n");
@@ -198,6 +205,11 @@ void NullGraphics::SetDrawingFlags(jdrawing_flags_t t)
 }
 
 void NullGraphics::SetBlittingFlags(jblitting_flags_t t)
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+void NullGraphics::SetDrawingMode(jdrawing_mode_t t)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -268,22 +280,22 @@ void NullGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
+void NullGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
+void NullGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
+void NullGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy)
+void NullGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
 	JDEBUG(JINFO, "called\n");
 }
@@ -348,7 +360,7 @@ void NullGraphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints)
+void NullGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd)
 {
 	JDEBUG(JINFO, "called\n");
 }

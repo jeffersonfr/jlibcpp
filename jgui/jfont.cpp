@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jfont.h"
+#include "jstringutils.h"
+#include "jstringtokenizer.h"
 #include "jgfxhandler.h"
 
 namespace jgui {
@@ -245,6 +247,114 @@ jregion_t Font::GetGlyphExtends(int symbol)
 #endif
 	
 	return region;
+}
+
+void Font::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign)
+{
+	if (wp < 0 || hp < 0) {
+		return;
+	}
+
+	jcommon::StringTokenizer token(text, "\n", jcommon::JTT_STRING, false);
+
+	for (int i=0; i<token.GetSize(); i++) {
+		std::vector<std::string> words;
+		
+		std::string line = token.GetToken(i);
+
+		line = jcommon::StringUtils::ReplaceString(line, "\n", "");
+		line = jcommon::StringUtils::ReplaceString(line, "\t", "    ");
+		
+		if (halign == JHA_JUSTIFY) {
+			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, false);
+
+			std::string temp,
+				previous;
+
+			for (int j=0; j<line_token.GetSize(); j++) {
+				temp = jcommon::StringUtils::Trim(line_token.GetToken(j));
+
+				if (GetStringWidth(temp) > wp) {
+					int p = 1;
+
+					while (p < (int)temp.size()) {
+						if (GetStringWidth(temp.substr(0, ++p)) > wp) {
+							words.push_back(temp.substr(0, p-1));
+
+							temp = temp.substr(p-1);
+
+							p = 1;
+						}
+					}
+
+					if (temp != "") {
+						words.push_back(temp.substr(0, p));
+					}
+				} else {
+					words.push_back(temp);
+				}
+			}
+
+			temp = words[0];
+
+			for (int j=1; j<(int)words.size(); j++) {
+				previous = temp;
+				temp += " " + words[j];
+
+				if (GetStringWidth(temp) > wp) {
+					temp = words[j];
+
+					lines->push_back(previous);
+				}
+			}
+
+			lines->push_back("\n" + temp);
+		} else {
+			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, true);
+
+			std::string temp,
+				previous;
+
+			for (int j=0; j<line_token.GetSize(); j++) {
+				temp = line_token.GetToken(j);
+
+				if (GetStringWidth(temp) > wp) {
+					int p = 1;
+
+					while (p < (int)temp.size()) {
+						if (GetStringWidth(temp.substr(0, ++p)) > wp) {
+							words.push_back(temp.substr(0, p-1));
+
+							temp = temp.substr(p-1);
+
+							p = 1;
+						}
+					}
+
+					if (temp != "") {
+						words.push_back(temp.substr(0, p));
+					}
+				} else {
+					words.push_back(temp);
+				}
+			}
+
+			temp = words[0];
+			
+			for (int j=1; j<(int)words.size(); j++) {
+				previous = temp;
+				temp += words[j];
+
+				if (GetStringWidth(temp.c_str()) > wp) {
+					temp = words[j];
+
+					lines->push_back(previous);
+				}
+			}
+
+			lines->push_back(temp);
+		}
+	}
 }
 
 std::string Font::TruncateString(std::string text, std::string extension, int width)

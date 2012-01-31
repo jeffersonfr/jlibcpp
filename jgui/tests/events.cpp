@@ -497,7 +497,7 @@ class Test : public jgui::Window, public UserEventListener {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			g->Clear();
+			jgui::Window::Paint(g);
 
 			if (_color == 0) {
 				g->SetColor(jgui::Color::Red);

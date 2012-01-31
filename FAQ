@@ -1,2 +1,5 @@
 1. How can I get take the applications more faster ?
 R. In Makefile, set ENABLE_DEBUG to "no"
+
+2. How can I disable graphics ?
+R. In Makefile, set ENABLE_GRAPHICS to "no"

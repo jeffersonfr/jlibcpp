@@ -44,13 +44,6 @@ class Label : public jgui::Component{
 		jvertical_align_t _valign;
 		bool _wrap;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		int CountLines(std::string text);
-
 	public:
 		/**
 		 * \brief

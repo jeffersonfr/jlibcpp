@@ -784,28 +784,24 @@ void Keyboard::BuildNumericKeyboard()
 	KEYBOARD_LAYOUT
 
 	lines[0]->Add(new KeyButton("(", "(", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton(")", ")", this, KEY_WIDTH_1));
 	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1));
 	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1));
 	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1));
 	lines[0]->Add(new KeyButton("+", "+", this, KEY_WIDTH_1));
 
-	lines[1]->Add(new KeyButton("%", "%", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("$", "$", this, KEY_WIDTH_1));
+	lines[1]->Add(new KeyButton(")", ")", this, KEY_WIDTH_1));
 	lines[1]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1));
 	lines[1]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1));
 	lines[1]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1));
 	lines[1]->Add(new KeyButton("-", "-", this, KEY_WIDTH_1));
 
-	lines[2]->Add(new KeyButton("e", "e", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("pi", "pi", this, KEY_WIDTH_1));
+	lines[2]->Add(new KeyButton("%", "%", this, KEY_WIDTH_1));
 	lines[2]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1));
 	lines[2]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1));
 	lines[2]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1));
 	lines[2]->Add(new KeyButton("*", "*", this, KEY_WIDTH_1));
 
 	lines[3]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2));
-	lines[3]->Add(new KeyButton("#", "#", this, KEY_WIDTH_1));
 	lines[3]->Add(new KeyButton(".", ".", this, KEY_WIDTH_1));
 	lines[3]->Add(new KeyButton("=", "=", this, KEY_WIDTH_1));
 	lines[3]->Add(new KeyButton("/", "/", this, KEY_WIDTH_1));

@@ -28,7 +28,7 @@ PREFIX		= /usr/local
 DEBUG  		= -g -ggdb 
 
 ENABLE_DEBUG		?= yes
-ENABLE_DIRECTFB	?= yes
+ENABLE_GRAPHICS ?= "dfb"
 
 ARFLAGS		= -rc
 # -ansi: problemas com va_copy()
@@ -82,15 +82,17 @@ ifeq ($(ENABLE_DEBUG),yes)
 
 endif
 
-ifeq ($(ENABLE_DIRECTFB),yes)
+ifeq ($(ENABLE_GRAPHICS),"dfb")
 	INCLUDE 	+= \
 							 `pkg-config --cflags directfb` \
+							 `pkg-config --cflags cairo` \
 
 	DEFINES		+= \
 							 -DDIRECTFB_UI \
 
 	REQUIRES += \
 							directfb \
+							cairo \
 
 endif
 
@@ -312,6 +314,7 @@ OBJS_jgui = \
 		jframe.o\
 		jgfxhandler.o\
 		jgraphics.o\
+		jdfbgraphics.o\
 		jgridbaglayout.o\
 		jgridlayout.o\
 		jicon.o\

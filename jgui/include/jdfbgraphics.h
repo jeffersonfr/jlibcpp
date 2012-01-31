@@ -17,173 +17,26 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_GRAPHICS_H
-#define J_GRAPHICS_H
+#ifndef J_DFBGRAPHICS_H
+#define J_DFBGRAPHICS_H
 
-#include "jcolor.h"
-#include "jmutex.h"
+#include "jgraphics.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <vector>
+#include <ctype.h>
+#include <string>
 #include <math.h>
+#include <list>
 
-#define DEFAULT_SCALE_WIDTH		1920
-#define DEFAULT_SCALE_HEIGHT	1080
-
-#define DEFAULT_FONT_SIZE			20
-
-#define SCALE_TO_SCREEN(x, y, z) \
-	(int)round(((double)x*(double)y)/(double)z) 
-
-#define SCREEN_TO_SCALE(x, z, y) \
-	(int)round(((double)x*(double)y)/(double)z) 
+#ifdef DIRECTFB_UI
+#include <directfb.h>
+#include <cairo-directfb.h>
+#endif
 
 namespace jgui{
-
-/**
- * \brief
- *
- */
-enum jporterduff_flags_t {
-	JPF_NONE			= 0x0001,	// fs: sa fd: 1.0-sa (defaults)
-	JPF_CLEAR			= 0x0002,	// fs: 0.0 fd: 0.0
-	JPF_SRC				= 0x0004,	// fs: 1.0 fd: 0.0
-	JPF_DST				= 0x0008,	// fs: 1.0 fd: 0.0
-	JPF_SRC_OVER	= 0x0010,	// fs: 1.0 fd: 1.0-sa
-	JPF_DST_OVER	= 0x0020,	// fs: 1.0-da fd: 1.0
-	JPF_SRC_IN		= 0x0040,	// fs: da fd: 0.0
-	JPF_DST_IN		= 0x0080,	// fs: 0.0 fd: sa
-	JPF_SRC_OUT		= 0x0100,	// fs: 1.0-da fd: 0.0
-	JPF_DST_OUT		= 0x0200,	// fs: 0.0 fd: 1.0-sa
-	JPF_SRC_ATOP	= 0x0400,	// fs: da fd: 1.0-sa
-	JPF_DST_ATOP	= 0x0800,	// fs: 1.0-da fd: sa
-	JPF_ADD				= 0x1000,	// fs: 1.0 fd: 1.0
-	JPF_XOR				= 0x2000	// fs: 1.0-da fd: 1.0-sa 
-};
-
-/**
- * \brief
- *
- */
-enum jdrawing_flags_t {
-	JDF_NOFX		= 0x01,
-	JDF_BLEND		= 0x02,
-	JDF_XOR			= 0x04
-};
-
-/**
- * \brief
- *
- */
-enum jblitting_flags_t {
-	JBF_NOFX					= 0x01,
-	JBF_ALPHACHANNEL	= 0x02,
-	JBF_COLORALPHA		= 0x04,
-	JBF_COLORIZE			= 0x08,
-	JBF_XOR						= 0x80
-};
-
-/**
- * \brief
- *
- */
-enum jdrawing_mode_t {
-	JDM_PATH,
-	JDM_STROKE,
-	JDM_FILL,
-	JDM_CLIP
-};
-
-/**
- * \brief
- *
- */
-enum jhorizontal_align_t {
-	JHA_LEFT,
-	JHA_CENTER,
-	JHA_RIGHT,
-	JHA_JUSTIFY
-};
-
-/**
- * \brief
- *
- */
-enum jvertical_align_t {
-	JVA_TOP,
-	JVA_CENTER,
-	JVA_BOTTOM,
-	JVA_JUSTIFY
-};
-
-/**
- * \brief
- *
- */
-enum jline_join_t {
-	JLJ_BEVEL,
-	JLJ_ROUND,
-	JLJ_MITER,
-};
-
-/**
- * \brief
- *
- */
-enum jline_style_t {
-	JLS_ROUND,
-	JLS_BUTT,
-	JLS_SQUARE
-};
-
-/**
- * \brief
- *
- */
-enum jrect_corner_t {
-	JRC_TOP_LEFT			= 0x01,
-	JRC_TOP_RIGHT			= 0x02,
-	JRC_BOTTOM_RIGHT	= 0x04,
-	JRC_BOTTOM_LEFT		= 0x08
-};
-
-/**
- * \brief
- *
- */
-struct jpoint_t {
-	int x;
-	int y;
-};
-
-/**
- * \brief
- *
- */
-struct jsize_t {
-	int width;
-	int height;
-};
-
-/**
- * \brief
- *
- */
-struct jregion_t {
-	int x;
-	int y;
-	int width;
-	int height;
-};
-
-/**
- * \brief
- *
- */
-struct jinsets_t {
-	int left;
-	int top;
-	int right;
-	int bottom;
-};
 
 class Window;
 class Image;
@@ -195,32 +48,62 @@ class Image;
  *
  * \author Jeff Ferr
  */
-class Graphics : public virtual jcommon::Object{
+class DFBGraphics : public virtual jgui::Graphics{
 	
+	friend class Window;
+	friend class Image;
+
 	protected:
 		jthread::Mutex _graphics_mutex;
 
-		Font *_font;
-		Color _color;
+		struct jregion_t _clip,
+										 _internal_clip;
 		struct jpoint_t _translate,
-			_translate_image;
+										_translate_image;
 		struct jsize_t _screen;
 		struct jsize_t _scale;
+		jline_join_t _line_join;
+		jline_style_t _line_style;
+		jdrawing_flags_t _draw_flags;
+		jblitting_flags_t _blit_flags;
+		jporterduff_flags_t _porterduff_flags;
+		jdrawing_mode_t _drawing_mode;
+		Font *_font;
+		Color _color;
 		double _radians;
+		int _line_width;
+		bool _is_premultiply;
+
+	private:
+#ifdef DIRECTFB_UI
+		IDirectFBSurface *surface;
+		
+		cairo_surface_t *_cairo_surface;
+		cairo_t *_cairo_context;
+		
+		void ApplyDrawing();
+
+		int CalculateGradientChannel(int schannel, int dchannel, int distance, int offset); 
+		void UpdateGradientColor(Color &scolor, Color &dcolor, int distance, int offset);
+		
+		double EvaluateBezier0(double *data, int ndata, double t);
+
+		void RotateImage0(Image *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
+#endif
 
 	protected:
 		/**
 		 * \brief
 		 *
 		 */
-		Graphics();
+		DFBGraphics(void *surface, bool premultiplied);
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~Graphics();
+		virtual ~DFBGraphics();
 
 		/**
 		 * \brief
@@ -400,13 +283,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jdrawing_mode_t GetDrawingMode();
+		virtual void SetPorterDuffFlags(jporterduff_flags_t t);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetPorterDuffFlags(jporterduff_flags_t t);
+		virtual jdrawing_mode_t GetDrawingMode();
 		
 		/**
 		 * \brief
@@ -425,7 +308,7 @@ class Graphics : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetDrawingMode(jdrawing_mode_t t);
-		
+
 		/**
 		 * \brief
 		 *
@@ -542,13 +425,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void FillEllipse(int xcp, int ycp, int rxp, int ryp);
+		void FillEllipse(int xcp, int ycp, int rxp, int ryp);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawEllipse(int xcp, int ycp, int rxp, int ryp);
+		void DrawEllipse(int xcp, int ycp, int rxp, int ryp);
 		
 		/**
 		 * \brief
@@ -681,6 +564,12 @@ class Graphics : public virtual jcommon::Object{
 		 *
 		 */
 		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY);
 		
 		/**
 		 * \brief

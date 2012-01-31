@@ -524,6 +524,8 @@ class GraphicPanel : public jgui::Canvas{
 			}
 		}
 
+		g->SetAntialias(false);
+
 		for (int i=0; i<num_colors; i++) {
 			red = array[(i+4*sixth)%num_colors];
 			green = array[(i+2*sixth)%num_colors];
@@ -532,14 +534,16 @@ class GraphicPanel : public jgui::Canvas{
 			dx = (bar_width*i)/num_colors;
 
 			g->SetColor(red, green, blue, 0xff);
-			g->DrawLine(10+dx, 10, 10+dx, 10+100);
+			g->DrawLine(10+dx, 20, 10+dx, 10+100);
 		}
 
 		// gray bar
 		for (int i=0; i<400; i++) {
 			g->SetColor(i/2, i/2, i/2, 0xff);
-			g->DrawLine(i+10, 1*(100+10)+10, i+10, 1*(100+10)+100+10);
+			g->DrawLine(i+10, 1*(100+10)+20, i+10, 1*(100+10)+100+10);
 		}
+
+		g->SetAntialias(true);
 
 		// draw image
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORALPHA));
@@ -647,7 +651,6 @@ class GraphicPanel : public jgui::Canvas{
 		// draw pie
 		arc0 = M_PI/6.0;
 		arc1 = -arc0;
-		//arc1 = M_PI-arc0;
 
 		g->SetColor(pcolor);
 		g->SetLineWidth(-10);
@@ -717,47 +720,37 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetLineJoin(jgui::JLJ_MITER);
 		g->DrawTriangle(10+9*(120+10)+10, 5*(120+10)+100, 10+9*(120+10)+10+100, 5*(120+10)+100, 10+9*(120+10)+10+100/2, 5*(120+10));
 
-		// draw bezier curve
-		int x0 = 10+10*(120+10)+10,
-				y0 = 2*(120+10),
-				w0 = 240+10,
-				h0 = 100;
-
-		jgui::jpoint_t pb1[] = {
-			{x0, y0},
-			{x0, y0+h0},
-			{x0+w0, y0+h0}
-		};
-		jgui::jpoint_t pb2[] = {
-			{x0, y0},
-			{x0+w0, y0},
-			{x0+w0, y0+h0}
-		};
-
-		g->SetColor(rcolor);
-		g->SetLineWidth(1);
-		g->DrawRectangle(x0, y0, w0, h0);
-		g->SetColor(ccolor);
-		g->DrawBezierCurve(pb1, 3, 100);
-		g->DrawBezierCurve(pb2, 3, 100);
-
 		// draw polygon
-		jgui::jpoint_t p[] = {
+		jgui::jpoint_t hourglass[] = {
 			{0, 0},
 			{100, 0},
 			{0, 100},
-			{100, 100},
-			{0, 0}
+			{100, 100}
+		};
+	
+		jgui::jpoint_t star[] = {
+			{50, 0},
+			{85, 100},
+			{0, 40},
+			{100, 40},
+			{15, 100}
 		};
 
 		g->SetLineJoin(jgui::JLJ_BEVEL);
 
 		g->SetLineWidth(1);
 		g->SetColor(pcolor);
-		g->DrawPolygon(10+10*(120+10)+10, 3*(120+10), p, 5, false);
-		g->FillPolygon(10+11*(120+10)+10+20, 3*(120+10), p, 5);
+		g->DrawPolygon(10+10*(120+10)+10, 2*(120+10), hourglass, 4, true);
+		g->FillPolygon(10+11*(120+10)+30, 2*(120+10), hourglass, 4);
+		g->FillPolygon(10+10*(120+10)+30, 3*(120+10), star, 5, false);
+		g->FillPolygon(10+11*(120+10)+30, 3*(120+10), star, 5, true);
 		
 		// draw lines
+		int x0 = 10+10*(120+10)+10,
+				y0 = 5*(120+10),
+				w0 = 240+10,
+				h0 = 100;
+
 		x0 = 10+10*(120+10)+10;
 		y0 = 4*(120+10);
 
@@ -776,6 +769,30 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetColor(rcolor);
 		g->DrawRectangle(x0, y0, 250, (240-10));
 		g->DrawLine(x0, y0+(240-10)/2, x0+250, y0+(240-10)/2);
+
+		// draw bezier curve
+		x0 = 10+10*(120+10)+10;
+		y0 = 6*(120+10);
+		w0 = 240+10;
+		h0 = 100;
+
+		jgui::jpoint_t pb1[] = {
+			{x0, y0},
+			{x0, y0+h0},
+			{x0+w0, y0+h0}
+		};
+		jgui::jpoint_t pb2[] = {
+			{x0, y0},
+			{x0+w0, y0},
+			{x0+w0, y0+h0}
+		};
+
+		g->SetColor(rcolor);
+		g->SetLineWidth(1);
+		g->DrawRectangle(x0, y0, w0, h0);
+		g->SetColor(ccolor);
+		g->DrawBezierCurve(pb1, 3, 100);
+		g->DrawBezierCurve(pb2, 3, 100);
 
 		// draw string (disable COLORALPHA)
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL));
@@ -842,7 +859,7 @@ class GraphicsTeste : public jgui::Frame{
 		GraphicsTeste():
 			jgui::Frame("Graphics Teste", 0, 0, 1920, 1080)
 	{
-		panel = new GraphicPanel((1920-1600)/2, 100, 1600, 800);
+		panel = new GraphicPanel((1920-1600)/2, 100, 1600, 900);
 
 		Add(panel);
 	}

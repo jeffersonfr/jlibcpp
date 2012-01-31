@@ -224,6 +224,12 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual jdrawing_mode_t GetDrawingMode();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetPorterDuffFlags(jporterduff_flags_t t);
 		
 		/**
@@ -237,6 +243,12 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual void SetBlittingFlags(jblitting_flags_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetDrawingMode(jdrawing_mode_t t);
 		
 		/**
 		 * \brief
@@ -318,25 +330,25 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillBevelRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
+		virtual void FillBevelRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
+		virtual void DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillRoundRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
+		virtual void FillRoundRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10);
+		virtual void DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx = 10, int dy = 10, jrect_corner_t corners = (jrect_corner_t)0xff);
 		
 		/**
 		 * \brief
@@ -414,7 +426,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillPolygon(int xp, int yp, jpoint_t *p, int num);
+		virtual void FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd);
 		
 		/**
 		 * \brief

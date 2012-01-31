@@ -23,6 +23,10 @@
 #include "jthememanager.h"
 #include "jsemaphore.h"
 
+#ifdef DIRECTFB_UI
+#include "jdfbgraphics.h"
+#endif
+
 namespace jgui {
 
 Window::Window(int x, int y, int width, int height, int scale_width, int scale_height):
@@ -139,7 +143,7 @@ void Window::SetNativeWindow(void *native)
 	}
 
 	if (_graphics == NULL) {
-		_graphics = new Graphics(window_surface, false);
+		_graphics = new DFBGraphics(window_surface, false);
 	} else {
 		_graphics->SetNativeSurface(window_surface);
 	}
@@ -208,7 +212,7 @@ void Window::InternalCreateWindow(void *params)
 		// _graphics = new NullGraphics();
 
 		if (_graphics == NULL) {
-			_graphics = new Graphics(s, false);
+		_graphics = new DFBGraphics(s, false);
 		} else {
 			_graphics->SetNativeSurface(s);
 		}
@@ -642,7 +646,9 @@ void Window::DumpScreen(std::string dir, std::string pre)
 {
 #ifdef DIRECTFB_UI
 	if (_graphics != NULL) {
-		_graphics->surface->Dump(_graphics->surface, dir.c_str(), pre.c_str());
+		IDirectFBSurface *surface = dynamic_cast<DFBGraphics *>(_graphics)->surface;
+
+		surface->Dump(surface, dir.c_str(), pre.c_str());
 	}
 #endif
 }

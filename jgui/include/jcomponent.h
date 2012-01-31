@@ -564,30 +564,6 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetLeftComponent(Component *left);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetRightComponent(Component *right);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetUpComponent(Component *up);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDownComponent(Component *down);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetNavigationEnabled(bool b);
 
 		/**
