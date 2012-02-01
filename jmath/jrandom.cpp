@@ -496,12 +496,11 @@ void Random::RandomArray(long long n, float *array)
    // Return an array of n random numbers uniformly distributed in ]0,1]
 
    const double kCONS = 4.6566128730774E-10; // (1/pow(2,31))
-   const long long  kMASK24 = 0x7fffff00;
-   long long jy;
+   // long long jy;
    long long i=0;
    while (i<n) {
       seed = (1103515245 * seed + 12345) & 0x7fffffffUL;
-      jy = (seed&kMASK24);  // Set lower 8 bits to zero to assure exact float
+      // jy = (seed & 0x7fffff00);  // Set lower 8 bits to zero to assure exact float
       if (seed) {array[i] = float(kCONS*seed); i++;}
    }
 }

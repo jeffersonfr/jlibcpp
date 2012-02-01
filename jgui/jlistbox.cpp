@@ -316,7 +316,7 @@ void ListBox::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	jsize_t scroll_dimension = GetScrollDimension();
+	// jsize_t scroll_dimension = GetScrollDimension();
 	jpoint_t scroll_location = GetScrollLocation();
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0,
@@ -471,7 +471,7 @@ void ListBox::DecrementLines(int lines)
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
-	if ((scrolly+_size.height) < (_item_size+_item_gap)*_items.size()) {
+	if ((scrolly+_size.height) < (_item_size+_item_gap)*(int)_items.size()) {
 		ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*_index, _size.width, _size.height, this);
 	}
 

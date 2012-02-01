@@ -2271,8 +2271,6 @@ void DFBGraphics::ApplyDrawing()
 		// applyBrush();
 		
 		cairo_fill(_cairo_context);
-	} else if (_drawing_mode == JDM_CLIP) {
-		cairo_clip(_cairo_context);
 	}
 }
 

@@ -115,7 +115,7 @@ void Schedule::SetScheduler(jschedule_type_t type_, const jschedule_param_t *par
 		type = PRIO_USER;
 	}
 
-	int r = sched_setscheduler(_pid, type_, &param);
+	int r = sched_setscheduler(_pid, type, &param);
 
 	if (r < 0) {
 		if (errno == EPERM) {

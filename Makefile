@@ -28,7 +28,7 @@ PREFIX		= /usr/local
 DEBUG  		= -g -ggdb 
 
 ENABLE_DEBUG		?= yes
-ENABLE_GRAPHICS ?= "dfb"
+ENABLE_GRAPHICS ?= dfb
 
 ARFLAGS		= -rc
 # -ansi: problemas com va_copy()
@@ -82,7 +82,7 @@ ifeq ($(ENABLE_DEBUG),yes)
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),"dfb")
+ifeq ($(ENABLE_GRAPHICS),dfb)
 	INCLUDE 	+= \
 			-Ijgui/binds/directfb/include \
 			`pkg-config --cflags directfb` \

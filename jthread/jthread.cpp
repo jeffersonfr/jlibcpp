@@ -463,7 +463,7 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 
 	int result;
 
-	result = pthread_setschedparam(_thread, policy, &param);
+	result = pthread_setschedparam(_thread, tpolicy, &param);
 
 	if (result == EINVAL) {
 		throw ThreadException("Policy is not defined !");

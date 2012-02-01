@@ -396,8 +396,7 @@ void TextArea::InitRowsString()
 	}
 
 	std::vector<std::string> words;
-	int font_height,
-			default_space;
+	int font_height;
 
 	jpoint_t scroll_location = GetScrollLocation();
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
@@ -413,7 +412,8 @@ void TextArea::InitRowsString()
 		wp = (wp < 0)?0:wp;
 		hp = (hp < 0)?0:hp;
 
-	default_space = _font->GetStringWidth(" ");
+	// int default_space = _font->GetStringWidth(" ");
+
 	font_height = _font->GetAscender() + _font->GetDescender();
 
 	if (font_height < 1) {
@@ -509,8 +509,7 @@ void TextArea::Paint(Graphics *g)
 	InitRowsString();
 
 	if (IsFontSet() == true) {
-		int text_size,
-			current_text_size,
+		int current_text_size,
 			current_length = _caret_position,
 			font_height = _font->GetAscender()+_font->GetDescender()+_rows_gap;
 
@@ -520,9 +519,6 @@ void TextArea::Paint(Graphics *g)
 		// INFO:: Draw text
 		for (int i=0, k=0; i<=(int)_lines.size()-1; i++) {
 			std::string s = _lines[i];
-
-			text_size = _font->GetStringWidth(_lines[i].c_str());
-			text_size = _font->GetStringWidth(_lines[i].substr(0, _caret_position).c_str());
 
 			{
 				char *c = (char *)strchr(s.c_str(), '\n');

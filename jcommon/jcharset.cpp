@@ -228,11 +228,11 @@ Char Charset::UTF8ToUnicode(const char *utf8)
 	const char *bp;
 	Char ch;
 	Char *cp;
-	int result;
 
 	cp = &ch;
 	bp = utf8;
-	result = UTF8ToUnicode(&bp, bp+7, &cp, cp+1);
+	
+	UTF8ToUnicode(&bp, bp+7, &cp, cp+1);
 	
 	return ch;
 }

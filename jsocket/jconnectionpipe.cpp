@@ -252,7 +252,7 @@ void ConnectionPipe::main_pipe_receiver()
 	int n,
 		pipe = _pipe[1],
 		size_buffer = PIPE_BUF;
-	char *c,
+	char // *c,
 		 buffer[size_buffer];
 
 	_current_send = 0;
@@ -261,7 +261,7 @@ void ConnectionPipe::main_pipe_receiver()
 	// receive pipe
 	
 	while (true) {
-		c = buffer;
+		// c = buffer;
 		
 		try {
 			n = _connection->Receive(buffer, size_buffer);

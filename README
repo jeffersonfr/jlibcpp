@@ -1,8 +1,19 @@
 [Installing jlibcpp]
 
-Type:
+:Dependencies
 
-"sudo make all install"
+- openssl (http://www.openssl.org)
+- directfb (http://directfb.org)
+	- cairo (--enable-directfb=yes) (http://cairographics.org)
+
+:Makefile defines
+
+ENABLE_DEBUG=<no,yes>
+ENABLE_GRAPHICS=<none,dfb>
+
+:Compiling
+
+$sudo make all install
 
 [Compilling tests]
 

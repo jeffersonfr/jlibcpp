@@ -293,6 +293,8 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 				} else {
 					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, interfaces.size(), true));
 				}
+				
+				p2p = NULL;
 			} else if (ifEntry->ifa_addr->sa_family == AF_PACKET || ifEntry->ifa_addr->sa_family == PF_PACKET) {
 				NetworkInterface *parent = new NetworkInterface(NULL, ifEntry->ifa_name, index, false);
 

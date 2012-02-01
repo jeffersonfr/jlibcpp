@@ -58,14 +58,12 @@ GFXHandler * GFXHandler::GetInstance()
 		DFBHandler *handler = NULL;
 		
 		try {
-			handler = new DFBHandler();
+			_instance = handler = new DFBHandler();
 
 			handler->InitEngine();
-			// TODO:: loop com jimage;
-			// handler->InitCursors();
 			handler->InitResources();
+			handler->InitCursors();
 
-			_instance = handler;
 		} catch (...) {
 			_instance = NULL;
 		}

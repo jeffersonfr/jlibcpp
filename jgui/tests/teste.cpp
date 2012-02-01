@@ -534,13 +534,13 @@ class GraphicPanel : public jgui::Canvas{
 			dx = (bar_width*i)/num_colors;
 
 			g->SetColor(red, green, blue, 0xff);
-			g->DrawLine(10+dx, 20, 10+dx, 10+100);
+			g->DrawLine(10+dx, 20, 10+dx, 20+100);
 		}
 
 		// gray bar
 		for (int i=0; i<400; i++) {
 			g->SetColor(i/2, i/2, i/2, 0xff);
-			g->DrawLine(i+10, 1*(100+10)+20, i+10, 1*(100+10)+100+10);
+			g->DrawLine(i+10, 1*(100+10)+20, i+10, 1*(100+10)+100+20);
 		}
 
 		g->SetAntialias(true);

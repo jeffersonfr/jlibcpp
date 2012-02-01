@@ -62,6 +62,7 @@
 #include <string.h>
 #include <assert.h>
 #include <stdint.h>
+#include <stddef.h>
 
 /**
  * \brief The support for explicit isn't that universal, and it isn't really

@@ -104,7 +104,7 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
 {
 	if (IsScrollable()) {
 		jregion_t view;
-		jsize_t scroll_dimension = GetScrollDimension();
+		//  jsize_t scroll_dimension = GetScrollDimension();
 		jpoint_t scroll_location = GetScrollLocation();
 		// jinsets_t insets = GetInsets();
 		int scrollPosition = scroll_location.y,

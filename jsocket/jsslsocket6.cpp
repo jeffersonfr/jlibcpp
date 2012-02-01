@@ -626,24 +626,8 @@ int SSLSocket6::Receive(char *data_, int size_, bool block_)
 		throw SocketException("Connection closed exception");
 	}
 
-	int flags;
-
-	if (block_ == true) {
 #ifdef _WIN32
-		flags = 0;
-#else
-		flags = 0;
-#endif
-	} else {
-#ifdef _WIN32
-		flags = 0;
-#else
-		flags = MSG_DONTWAIT;
-#endif
-	}
-
-#ifdef _WIN32
-	int n = ::recv(_fd, data_, size_, flags);
+	int n = ::recv(_fd, data_, size_, 0);
 #else
 	if (ssl == NULL) {
 		return -1;

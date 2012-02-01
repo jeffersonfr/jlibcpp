@@ -58,7 +58,7 @@ char * Base64::Encode(uint8_t *src, int length, int *ret_length) {
 	int dstpos;
 	char input[3];
 	char output[4];
-	int ocnt;
+	// int ocnt = 0;
 	int i;
 
 	if (length == 0) 
@@ -77,7 +77,6 @@ char * Base64::Encode(uint8_t *src, int length, int *ret_length) {
 
 	/* bulk encoding */
 	dstpos = 0;
-	ocnt = 0;
 	while (length >= 3) 
 	{
 		/*
