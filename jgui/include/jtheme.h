@@ -37,7 +37,7 @@ class ItemComponent;
  *
  * \author Jeff Ferr
  */
-class Theme : public jcommon::Object{
+class Theme : public virtual jcommon::Object{
 
 	friend class ThemeManager;
 	friend class Component;

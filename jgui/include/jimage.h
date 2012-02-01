@@ -75,29 +75,19 @@ class Graphics;
  */
 class Image : public virtual jcommon::Object{
 
-	private:
-		uint8_t *_buffer;
-
 	protected:
 		Graphics *_graphics;
-		struct jsize_t _size;
-		struct jsize_t _screen;
-		struct jsize_t _scale;
+		struct jsize_t _size,
+			_screen,
+			_scale;
 		jsurface_pixelformat_t _pixelformat;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		Image(int width, int height, jsurface_pixelformat_t pixelformat = JSP_ARGB, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
-		
 	protected:
 		/**
 		 * \brief
 		 *
 		 */
-		Image(int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Image(int width, int height, jsurface_pixelformat_t pixelformat = JSP_UNKNOWN, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 		
 	public:
 		/**
@@ -154,6 +144,12 @@ class Image : public virtual jcommon::Object{
 		 */
 		static Image * CreateImage(Image *image);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetWorkingScreenSize(int width, int height);
+		
 		/**
 		 * \brief
 		 *

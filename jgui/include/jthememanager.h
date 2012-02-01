@@ -34,7 +34,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class ThemeManager : public jcommon::Object{
+class ThemeManager : public virtual jcommon::Object{
 
 	private:
 		static ThemeManager *_instance;

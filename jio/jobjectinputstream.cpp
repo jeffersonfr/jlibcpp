@@ -98,7 +98,7 @@ jcommon::Object * ObjectInputStream::Read()
 
 	if (object != NULL) {
 		if (object->InstanceOf("jio::Serializable") == true) {
-			((jio::Serializable *)object)->AssemblyObject(description);
+			dynamic_cast<jio::Serializable *>(object)->AssemblyObject(description);
 		} else {
 			delete object;
 			object = NULL;

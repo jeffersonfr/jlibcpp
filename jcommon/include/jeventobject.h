@@ -29,7 +29,7 @@ namespace jcommon {
  * 
  * \author Jeff Ferr
  */
-class EventObject : public jcommon::Object{
+class EventObject : public virtual jcommon::Object{
 
 	private:
 		/** \brief */

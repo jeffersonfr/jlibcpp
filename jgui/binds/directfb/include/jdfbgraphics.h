@@ -31,15 +31,11 @@
 #include <math.h>
 #include <list>
 
-#ifdef DIRECTFB_UI
 #include <directfb.h>
 #include <cairo-directfb.h>
-#endif
 
 namespace jgui{
 
-class Window;
-class Image;
 class Font;
 class Image;
 
@@ -50,32 +46,24 @@ class Image;
  */
 class DFBGraphics : public virtual jgui::Graphics{
 	
+	friend class DFBImage;
 	friend class Window;
-	friend class Image;
 
 	protected:
 		jthread::Mutex _graphics_mutex;
 
 		struct jregion_t _clip,
-										 _internal_clip;
-		struct jpoint_t _translate,
-										_translate_image;
-		struct jsize_t _screen;
-		struct jsize_t _scale;
+			_internal_clip;
 		jline_join_t _line_join;
 		jline_style_t _line_style;
 		jdrawing_flags_t _draw_flags;
 		jblitting_flags_t _blit_flags;
 		jporterduff_flags_t _porterduff_flags;
 		jdrawing_mode_t _drawing_mode;
-		Font *_font;
-		Color _color;
-		double _radians;
 		int _line_width;
 		bool _is_premultiply;
 
 	private:
-#ifdef DIRECTFB_UI
 		IDirectFBSurface *surface;
 		
 		cairo_surface_t *_cairo_surface;
@@ -89,7 +77,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		double EvaluateBezier0(double *data, int ndata, double t);
 
 		void RotateImage0(Image *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
-#endif
 
 	protected:
 		/**

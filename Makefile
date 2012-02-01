@@ -1,8 +1,8 @@
 MODULE		= jlibcpp
 
-VERSION		= 1.5.0
+VERSION		= 1.6.0
 
-EXE			= lib$(MODULE)-$(VERSION).so
+EXE				= lib$(MODULE)-$(VERSION).so
 
 HOST			= 
 
@@ -13,7 +13,7 @@ JAVA			= $(HOST)javac
 
 STRIP			= $(HOST)strip
 
-DOXYGEN	= doxygen
+DOXYGEN		= doxygen
 
 INCDIR		= ./include
 LIBDIR		= ./lib
@@ -35,40 +35,40 @@ ARFLAGS		= -rc
 CCFLAGS		= -Wall -shared -rdynamic -fpic -funroll-loops -O2
 
 INCLUDE		= \
-						-I. \
-						-Iwin32/win32 \
-						-Ijcommon/include \
-						-Ijgui/include \
-						-Ijio/include \
-						-Ijlogger/include \
-						-Ijmath/include \
-						-Ijmpeg/include \
-						-Ijresource/include \
-						-Ijsecurity/include \
-						-Ijshared/include \
-						-Ijsocket/include \
-						-Ijthread/include \
+			-Iwin32/win32 \
+			-Ijcommon/include \
+			-Ijgui/include \
+			-Ijio/include \
+			-Ijlogger/include \
+			-Ijmath/include \
+			-Ijmpeg/include \
+			-Ijresource/include \
+			-Ijsecurity/include \
+			-Ijshared/include \
+			-Ijsocket/include \
+			-Ijthread/include \
 
 LIBRARY 	= \
-						-lpthread \
-						-ldl \
-						-lrt \
+			-lpthread \
+			-ldl \
+			-lrt \
 
-DEFINES		= -D_GNU_SOURCE \
-						-D_REENTRANT \
-						-D_FILE_OFFSET_BITS=64 \
-						-D_LARGEFILE_SOURCE \
+DEFINES		= \
+			-D_GNU_SOURCE \
+			-D_REENTRANT \
+			-D_FILE_OFFSET_BITS=64 \
+			-D_LARGEFILE_SOURCE \
 
 REQUIRES	= \
-						libssl \
+			libssl \
 
 ARFLAGS		+= \
 
 CCFLAGS		+= \
-						$(DEFINES) \
-						$(DEBUG) \
-						$(INCLUDE) \
-						-D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
+			$(DEFINES) \
+			$(DEBUG) \
+			$(INCLUDE) \
+			-D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
 
 ECHO			= echo -e
 
@@ -78,25 +78,35 @@ ifeq ($(ENABLE_DEBUG),yes)
 	INCLUDE 	+= \
 
 	DEFINES		+= \
-							 -DJDEBUG_ENABLED \
+			-DJDEBUG_ENABLED \
 
 endif
 
 ifeq ($(ENABLE_GRAPHICS),"dfb")
 	INCLUDE 	+= \
-							 `pkg-config --cflags directfb` \
-							 `pkg-config --cflags cairo` \
+			-Ijgui/binds/directfb/include \
+			`pkg-config --cflags directfb` \
+		  `pkg-config --cflags cairo` \
 
 	DEFINES		+= \
-							 -DDIRECTFB_UI \
+			-DDIRECTFB_UI \
 
-	REQUIRES += \
-							directfb \
-							cairo \
+	REQUIRES	+= \
+			directfb \
+			cairo \
+
+	OBJS_gfx	+= \
+		 jdfbhandler.o\
+		 jdfbfont.o\
+		 jdfbgraphics.o\
+		 jdfbimage.o\
+		 jdfbinputmanager.o\
+
+OBJS_jgui	= $(addprefix binds/directfb/,$(OBJS_gfx))
 
 endif
 
-OBJS_jcommon = \
+OBJS_jcommon += \
 	   jbitstream.o\
 	   jcalendar.o\
 	   jcharset.o\
@@ -131,7 +141,7 @@ OBJS_jcommon = \
 	   junit.o\
 	   jcommonlib.o\
 	   
-OBJS_jmath = \
+OBJS_jmath += \
 		 jbase64.o\
 		 jcomplex.o\
 		 jcrc32.o\
@@ -143,7 +153,7 @@ OBJS_jmath = \
 		 jsha1.o\
 		 juuid.o\
 
-OBJS_jmpeg = \
+OBJS_jmpeg += \
 	   jadaptationfield.o\
      jmpegexception.o\
 	   jmpeglib.o\
@@ -155,7 +165,7 @@ OBJS_jmpeg = \
 	   # jprogramassociationtable.o\
 	   jprogramsysteminformationtable.o\
 
-OBJS_jresource = \
+OBJS_jresource += \
 	   jresourceclient.o\
 	   jresourceexception.o\
 	   jresourcelib.o\
@@ -164,7 +174,7 @@ OBJS_jresource = \
 	   jresourcestatusevent.o\
 	   jresourcestatuslistener.o\
 	   
-OBJS_jio = \
+OBJS_jio += \
 	   jbitinputstream.o\
 	   jbitoutputstream.o\
 	   jfile.o\
@@ -188,7 +198,7 @@ OBJS_jio = \
 	   jprintstream.o\
 	   jiolib.o\
 
-OBJS_jlogger = \
+OBJS_jlogger += \
 	   jhandler.o\
 	   jsockethandler.o\
 	   jstreamhandler.o\
@@ -204,7 +214,7 @@ OBJS_jlogger = \
 	   jlogrecord.o\
 	   jloggerlib.o
 
-OBJS_jshared = \
+OBJS_jshared += \
 		 jfifoexception.o\
 		 jmemoryexception.o\
 		 jmemorymap.o\
@@ -223,7 +233,7 @@ OBJS_jshared = \
 		 jsharedmutex.o\
 		 jsharedsemaphore.o\
 
-OBJS_jsocket = \
+OBJS_jsocket += \
 		 jconnection.o\
 		 jconnectionpipe.o\
 		 jdatagramsocket.o\
@@ -258,7 +268,7 @@ OBJS_jsocket = \
 		 jsslsocketoutputstream.o\
 		 junknownhostexception.o\
 
-OBJS_jthread = \
+OBJS_jthread += \
 		 jbufferexception.o\
 	   jcondition.o\
 		 jevent.o\
@@ -280,7 +290,7 @@ OBJS_jthread = \
 		 jtimer.o\
 	   jrunnable.o\
 
-OBJS_jgui = \
+OBJS_jgui += \
 		jadjustmentevent.o\
 		jadjustmentlistener.o\
 		janimation.o\
@@ -314,7 +324,6 @@ OBJS_jgui = \
 		jframe.o\
 		jgfxhandler.o\
 		jgraphics.o\
-		jdfbgraphics.o\
 		jgridbaglayout.o\
 		jgridlayout.o\
 		jicon.o\
@@ -370,20 +379,43 @@ OBJS_jgui = \
 		jtable.o\
 		jguilib.o\
 
-SRCS_jcommon	= $(addprefix jcommon/,$(OBJS_jcommon))
-SRCS_jgui			= $(addprefix jgui/,$(OBJS_jgui))
-SRCS_jio			= $(addprefix jio/,$(OBJS_jio))
-SRCS_jlogger	= $(addprefix jlogger/,$(OBJS_jlogger))
-SRCS_jmath		= $(addprefix jmath/,$(OBJS_jmath))
-SRCS_jmpeg		= $(addprefix jmpeg/,$(OBJS_jmpeg))
-SRCS_jresource	= $(addprefix jresource/,$(OBJS_jresource))
-SRCS_jsecurity	= $(addprefix jsecurity/,$(OBJS_jsecurity))
-SRCS_jshared	= $(addprefix jshared/,$(OBJS_jshared))
-SRCS_jsocket	= $(addprefix jsocket/,$(OBJS_jsocket))
-SRCS_jthread	= $(addprefix jthread/,$(OBJS_jthread))
+SRCS_jcommon	+= $(addprefix jcommon/,$(OBJS_jcommon))
+SRCS_jgui			+= $(addprefix jgui/,$(OBJS_jgui))
+SRCS_jio			+= $(addprefix jio/,$(OBJS_jio))
+SRCS_jlogger	+= $(addprefix jlogger/,$(OBJS_jlogger))
+SRCS_jmath		+= $(addprefix jmath/,$(OBJS_jmath))
+SRCS_jmpeg		+= $(addprefix jmpeg/,$(OBJS_jmpeg))
+SRCS_jresource	+= $(addprefix jresource/,$(OBJS_jresource))
+SRCS_jsecurity	+= $(addprefix jsecurity/,$(OBJS_jsecurity))
+SRCS_jshared	+= $(addprefix jshared/,$(OBJS_jshared))
+SRCS_jsocket	+= $(addprefix jsocket/,$(OBJS_jsocket))
+SRCS_jthread	+= $(addprefix jthread/,$(OBJS_jthread))
 
-OBJS	= $(OBJS_jcommon) $(OBJS_jmath) $(OBJS_jmpeg) $(OBJS_jresource) $(OBJS_jsecurity) $(OBJS_jio) $(OBJS_jlogger) $(OBJS_jshared) $(OBJS_jsocket) $(OBJS_jthread) $(OBJS_jgui)
-SRCS	= $(SRCS_jcommon) $(SRCS_jmath) $(SRCS_jmpeg) $(SRCS_jresource) $(SRCS_jsecurity) $(SRCS_jio) $(SRCS_jlogger) $(SRCS_jshared) $(SRCS_jsocket) $(SRCS_jthread) $(SRCS_jgui)
+OBJS	= \
+		$(OBJS_jcommon) \
+		$(OBJS_jmath) \
+		$(OBJS_jmpeg) \
+		$(OBJS_jresource) \
+		$(OBJS_jsecurity) \
+		$(OBJS_jio) \
+		$(OBJS_jlogger) \
+		$(OBJS_jshared) \
+		$(OBJS_jsocket) \
+		$(OBJS_jthread) \
+		$(OBJS_jgui) \
+
+SRCS	= \
+		$(SRCS_jcommon) \
+		$(SRCS_jmath) \
+		$(SRCS_jmpeg) \
+		$(SRCS_jresource) \
+		$(SRCS_jsecurity) \
+		$(SRCS_jio) \
+		$(SRCS_jlogger) \
+		$(SRCS_jshared) \
+		$(SRCS_jsocket) \
+		$(SRCS_jthread) \
+		$(SRCS_jgui) \
 
 all: $(EXE)
 

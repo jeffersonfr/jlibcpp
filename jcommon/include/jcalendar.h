@@ -33,7 +33,7 @@ namespace jcommon {
  * 
  * \author Jeff Ferr
  */
-class Calendar : public jcommon::Object{
+class Calendar : public virtual jcommon::Object{
 
 	private:
 		/** \brief Days */

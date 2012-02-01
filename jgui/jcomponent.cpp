@@ -602,8 +602,6 @@ void Component::PaintBorders(Graphics *g)
 			db = color.GetBlue(),
 			da = color.GetAlpha();
 
-	g->SetLineWidth(1);
-
 	if (_border == JCB_LINE) {
 		g->SetColor(dr, dg, db, da);
 		g->SetLineWidth(-_border_size);

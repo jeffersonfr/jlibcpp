@@ -33,17 +33,12 @@
 #include <math.h>
 #include <list>
 
-#ifdef DIRECTFB_UI
-#include <directfb.h>
-#endif
-
 namespace jgui {
 
-class DFBGraphics;
-class CairoGraphics;
-
 enum jfont_attributes_t {
-	JFA_NONE
+	JFA_NORMAL	= 0x00,
+	JFA_BOLD		= 0x01,
+	JFA_ITALIC	= 0x02
 };
 
 /**
@@ -53,26 +48,16 @@ enum jfont_attributes_t {
  */
 class Font : public virtual jcommon::Object{
 
-	friend class DFBGraphics;
-	friend class CairoGraphics;
-
 	private:
 		static Font *_default_font;
 
-#ifdef DIRECTFB_UI
-		IDirectFBFont *_font;
-#endif
+	protected:
 		struct jsize_t _screen;
 		struct jsize_t _scale;
-		int _height,
-			_ascender,
-			_descender,
-			_max_advance,
-			_virtual_height;
 		std::string _name;
 		jfont_attributes_t _attributes;
 
-	private:
+	protected:
 		/**
 		 * \brief
 		 *
@@ -102,13 +87,13 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void * GetFont();
+		virtual void * GetNativeFont();
 
 		/**
 		 * \brief
 		 *
 		 */
-		jfont_attributes_t GetFontAttributes();
+		virtual jfont_attributes_t GetFontAttributes();
 		
 		/**
 		 * \brief
@@ -180,19 +165,25 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		jregion_t GetStringExtends(std::string text);
+		virtual jregion_t GetStringExtends(std::string text);
 
 		/**
 		 * \brief
 		 *
 		 */
-		jregion_t GetGlyphExtends(int symbol);
+		virtual jregion_t GetGlyphExtends(int symbol);
 
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string TruncateString(std::string text, std::string extension, int width);
 		
 		/**
 		 * \brief
@@ -206,12 +197,6 @@ class Font : public virtual jcommon::Object{
 		 */
 		virtual void Restore();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string TruncateString(std::string text, std::string extension, int width);
-		
 };
 
 }

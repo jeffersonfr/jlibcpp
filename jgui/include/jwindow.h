@@ -29,10 +29,13 @@
 #include <stdint.h>
 #include <string.h>
 
+#ifdef DIRECTFB_UI
+#include <directfb.h>
+#endif
+
 namespace jgui{
 
 class Graphics;
-class InputManager;
 
 /**
  * \brief
@@ -41,7 +44,7 @@ class InputManager;
  */
 class Window : public jgui::Container, public jgui::ThemeListener{
 
-	friend class InputManager;
+	friend class DFBInputManager;
 	friend class WindowManager;
 
 	protected:

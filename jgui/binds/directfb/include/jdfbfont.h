@@ -17,177 +17,139 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_INPUTMANAGER_H
-#define J_INPUTMANAGER_H
+#ifndef J_DFBFONT_H
+#define J_DFBFONT_H
 
-#include "jcomponent.h"
-#include "jkeylistener.h"
-#include "jmouselistener.h"
-#include "jthread.h"
-#include "jmutex.h"
-#include "jautolock.h"
-#include "jcondition.h"
+#include "jfont.h"
 
-#include <vector>
-#include <map>
-#include <list>
-
-#ifdef DIRECTFB_UI
 #include <directfb.h>
-#endif
 
 namespace jgui {
 
-enum jbroadcaster_event_t {
-	JBE_UNKNOWN			= 0x00,
-	JBE_KEYEVENT		= 0x01,
-	JBE_MOUSEEVENT	= 0x02
-};
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class DFBFont : public virtual jgui::Font{
 
-class InputManager : public virtual jcommon::Object{
+	friend class DFBGraphics;
 
 	private:
-		static InputManager *_instance;
-		
-	protected:
-		jsize_t _screen,
-			_scale;
+		static Font *_default_font;
 
-		/**
-		 * \brief
-		 *
-		 */
-		InputManager();
+		IDirectFBFont *_font;
+		int _height,
+			_ascender,
+			_descender,
+			_max_advance,
+			_virtual_height;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~InputManager();
+		DFBFont(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~DFBFont();
 
 		/**
 		 * \brief
 		 *
 		 */
-		static InputManager * GetInstance();
+		virtual void * GetNativeFont();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetWorkingScreenSize(int width, int height);
+		virtual jfont_attributes_t GetFontAttributes();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool SetEncoding(std::string code);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetName();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetVirtualHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetAscender();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetDescender();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetMaxAdvanced();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetLeading();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetStringWidth(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jregion_t GetStringExtends(std::string text);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jsize_t GetWorkingScreenSize();
+		virtual jregion_t GetGlyphExtends(int symbol);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SkipKeyEvents(bool b);
+		virtual void Release();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SkipMouseEvents(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetKeyEventsEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMouseEventsEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsKeyEventsEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsMouseEventsEnabled();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetClickDelay(int ms);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetClickDelay();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PostEvent(KeyEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PostEvent(MouseEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void Release();
-
-		/**
-		 * \brief
-		 *
-		 */
-		void Restore();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterKeyListener(KeyListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveKeyListener(KeyListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterMouseListener(MouseListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveMouseListener(MouseListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchEvent(jcommon::EventObject *event);
+		virtual void Restore();
 
 };
 
 }
 
-#endif
+#endif /*DFBFONT_H*/

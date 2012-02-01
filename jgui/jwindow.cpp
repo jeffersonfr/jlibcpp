@@ -24,6 +24,7 @@
 #include "jsemaphore.h"
 
 #ifdef DIRECTFB_UI
+#include "jdfbhandler.h"
 #include "jdfbgraphics.h"
 #endif
 
@@ -195,7 +196,7 @@ void Window::InternalCreateWindow(void *params)
 #ifdef DIRECTFB_UI
 	jthread::AutoLock lock(&_window_mutex);
 
-	GFXHandler *gfx = GFXHandler::GetInstance();
+	DFBHandler *gfx = dynamic_cast<DFBHandler *>(GFXHandler::GetInstance());
 
 	IDirectFBWindow *w = NULL;
 	IDirectFBSurface *s = NULL;
@@ -212,7 +213,7 @@ void Window::InternalCreateWindow(void *params)
 		// _graphics = new NullGraphics();
 
 		if (_graphics == NULL) {
-		_graphics = new DFBGraphics(s, false);
+			_graphics = new DFBGraphics(s, false);
 		} else {
 			_graphics->SetNativeSurface(s);
 		}

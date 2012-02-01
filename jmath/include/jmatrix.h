@@ -122,13 +122,13 @@ template<class T> bool operator>=(const T &e1, const std::complex<T> &e2) {
 		return false;
 }
 
-template<class T> class Vector : public jcommon::Object{
+template<class T> class Vector : public virtual jcommon::Object{
 
 	public:
 		T *v;
 		int vlo, 
-				vhi, 
-				nelem;
+			vhi, 
+			nelem;
 
 		/** 
 		 * \brief Construct new Vector of dimension 0 
@@ -1394,18 +1394,18 @@ template<class T> T Norm2(const Vector< std::complex<T> > &V)
 	return ::sqrt(val);
 }
 
-template<class T> class Matrix : public jcommon::Object{
+template<class T> class Matrix : public virtual jcommon::Object{
 
 	public:
 		T *m, 
 			**v;
 		int clo, 
-				chi, 
-				ncol, 
-				rlo, 
-				rhi, 
-				nrow, 
-				nelem;
+			chi, 
+			ncol, 
+			rlo, 
+			rhi, 
+			nrow, 
+			nelem;
 
 		/** 
 		 * \brief Construct new  Matrix of dimension 0 

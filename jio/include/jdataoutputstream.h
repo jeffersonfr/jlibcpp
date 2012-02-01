@@ -29,7 +29,7 @@ namespace jio {
  * 
  * \author Jeff Ferr
  */
-class DataOutputStream : public jcommon::Object{
+class DataOutputStream : public virtual jcommon::Object{
 
 	private:
 		jio::OutputStream *stream;

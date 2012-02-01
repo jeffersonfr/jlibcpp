@@ -17,82 +17,134 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_GFXHANDLER_H
-#define J_GFXHANDLER_H
+#ifndef J_DFBHANDLER_H
+#define J_DFBHANDLER_H
 
-#include "jobject.h"
-#include "jmutex.h"
-#include "jgraphics.h"
-#include "jimage.h"
+#include "jgfxhandler.h"
 
-#include <vector>
-#include <map>
-
-#define JGUI_MAX_FONTS	30
+#include <directfb.h>
 
 namespace jgui{
 
 /**
  * \brief
  *
- */
-enum jcursor_style_t {
-	JCS_DEFAULT,
-	JCS_CROSSHAIR,
-	JCS_EAST,
-	JCS_WEST,
-	JCS_NORTH,
-	JCS_SOUTH,
-	JCS_HAND,
-	JCS_MOVE,
-	JCS_NS,
-	JCS_WE,
-	JCS_NW_CORNER,
-	JCS_NE_CORNER,
-	JCS_SW_CORNER,
-	JCS_SE_CORNER,
-	JCS_TEXT,
-	JCS_WAIT
-};
-
-class Window;
-class WindowManager;
-class Font;
-class Image;
-class InputManager;
-
-/**
- * \brief
- *
  * \author Jeff Ferr
  */
-class GFXHandler : public virtual jcommon::Object{
+class DFBHandler : public virtual jgui::GFXHandler{
 
-	friend class Image;
+	friend class DFBImage;
+	friend class DFBFont;
+	friend class Window;
 
-	protected:
-		static GFXHandler * _instance;
+	private:
+		IDirectFB *_dfb;
+		IDirectFBDisplayLayer *_layer;
 		
-		std::vector<Image *> _images;
-		std::vector<Font *> _fonts;
-		jthread::Mutex _mutex;
-		jsize_t _screen,
-			_scale;
-		jcursor_style_t _cursor;
+		struct cursor_params_t {
+			Image *cursor;
+			int hot_x;
+			int hot_y;
+		};
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		GFXHandler();
-		
+		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
+
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~GFXHandler();
+		DFBHandler();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~DFBHandler();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitEngine();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitCursors();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitResources();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Add(Font *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Remove(Font *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Add(Image *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Remove(Image *);
+
+		/**
+		 * \brief
+		 *
+		 */
+		IDirectFBDisplayLayer * GetDisplayLayer();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT, double radians = 0.0);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int CreateFont(std::string name, int height, IDirectFBFont **font, DFBFontDescription font_desc, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, DFBSurfaceDescription surface_desc, int scale_width, int scale_height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, DFBWindowDescription window_desc, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 
 		/**
 		 * \brief
@@ -104,44 +156,8 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static GFXHandler * GetInstance();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void * GetGraphicEngine();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScreenWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScreenHeight();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetScreenSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetWorkingScreenSize();
-		
 		/**
 		 * \brief
 		 *
@@ -206,4 +222,4 @@ class GFXHandler : public virtual jcommon::Object{
 
 }
 
-#endif /*GFXHANDLER_H_*/
+#endif /*DFBHANDLER_H_*/

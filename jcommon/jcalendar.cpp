@@ -225,7 +225,7 @@ bool Calendar::Equals(Object *o)
 		return false;
 	}
 
-	Calendar *date = (Calendar *)o;
+	Calendar *date = dynamic_cast<Calendar *>(o);
 	
 	return ((GetDay() == date->GetDay()) && (GetMonth() == date->GetMonth()) && (GetYear() == date->GetYear()))?true:false;
 }
@@ -236,7 +236,7 @@ int Calendar::Compare(Object *o)
 		throw IllegalArgumentException("Compare with Incompatible types");
 	}
 
-	Calendar *date = (Calendar *)o;
+	Calendar *date = dynamic_cast<Calendar *>(o);
 	
 	if (GetYear() < date->GetYear()) {
 		return -1;

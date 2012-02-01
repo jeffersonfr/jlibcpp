@@ -35,7 +35,7 @@ namespace jmath {
  * 
  * \author Jeff Ferr
  */
-class Complex : public jcommon::Object{
+class Complex : public virtual jcommon::Object{
 
 	private:
 		/** \brief Real */

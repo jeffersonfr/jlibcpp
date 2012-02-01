@@ -64,7 +64,7 @@ int64_t ObjectOutputStream::Write(jcommon::Object *object)
 		return -1;
 	}
 
-	jio::Serializable *obj = (jio::Serializable *)object;
+	jio::Serializable *obj = dynamic_cast<jio::Serializable *>(object);
 
 	std::string name = obj->GetNameSpace();
 

@@ -30,7 +30,7 @@ namespace jio {
  * 
  * \author Jeff Ferr
  */
-class ObjectInputStream : public jcommon::Object{
+class ObjectInputStream : public virtual jcommon::Object{
 
 	private:
 		InputStream *stream;

@@ -29,7 +29,7 @@ namespace jgui{
  *
  * \author Jeff Ferr
  */
-class Color : public jcommon::Object{
+class Color : public virtual jcommon::Object{
 	
 	public:
 		const static uint32_t AliceBlue;

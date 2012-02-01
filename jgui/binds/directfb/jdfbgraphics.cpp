@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jdfbgraphics.h"
 #include "jmath.h"
 #include "jstringtokenizer.h"
 #include "jimage.h"
@@ -27,23 +26,19 @@
 #include "jstringutils.h"
 #include "joutofboundsexception.h"
 #include "jrectangle.h"
+#include "jdfbfont.h"
+#include "jdfbgraphics.h"
 
 #define M_2PI	(2*M_PI)
 
 namespace jgui {
 
 DFBGraphics::DFBGraphics(void *surface, bool premultiplied):
-	jcommon::Object()
+	jgui::Graphics()
 {
 	jcommon::Object::SetClassName("jgui::DFBGraphics");
 
 	_is_premultiply = premultiplied;
-
-	_radians = 0.0;
-	_translate.x = 0;
-	_translate.y = 0;
-	_translate_image.x = 0;
-	_translate_image.y = 0;
 
 	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
@@ -51,21 +46,17 @@ DFBGraphics::DFBGraphics(void *surface, bool premultiplied):
 	_scale.width = DEFAULT_SCALE_WIDTH;
 	_scale.height = DEFAULT_SCALE_HEIGHT;
 
-#ifdef DIRECTFB_UI
 	IDirectFB *dfb = (IDirectFB *)GFXHandler::GetInstance()->GetGraphicEngine();
 
 	this->surface = (IDirectFBSurface *)surface;
 
 	_cairo_surface = cairo_directfb_surface_create(dfb, this->surface);
 	_cairo_context = cairo_create(_cairo_surface);
-#endif
 
 	_clip.x = 0;
 	_clip.y = 0;
 	_clip.width = DEFAULT_SCALE_WIDTH;
 	_clip.height = DEFAULT_SCALE_HEIGHT;
-
-	_font = NULL;
 
 	_line_join = JLJ_BEVEL;
 	_line_style = JLS_BUTT;
@@ -82,20 +73,14 @@ DFBGraphics::~DFBGraphics()
 
 void * DFBGraphics::GetNativeSurface()
 {
-#ifdef DIRECTFB_UI
 	return surface;
-#endif
-
-	return NULL;
 }
 
 void DFBGraphics::SetNativeSurface(void *addr)
 {
 	_graphics_mutex.Lock();
 
-#ifdef DIRECTFB_UI
 	surface = (IDirectFBSurface *)addr;
-#endif
 
 	_graphics_mutex.Unlock();
 }
@@ -120,7 +105,6 @@ void DFBGraphics::SetClip(int xp, int yp, int wp, int hp)
 	
 	_internal_clip = clip;
 
-#ifdef DIRECTFB_UI
 	if (surface != NULL) {
 		DFBRegion rgn;
 
@@ -131,8 +115,12 @@ void DFBGraphics::SetClip(int xp, int yp, int wp, int hp)
 
 		surface->SetClip(surface, NULL);
 		surface->SetClip(surface, &rgn);
+	
+		// TODO:: descobrir como corrigir melhor esse clip
+		cairo_reset_clip(_cairo_context);
+		cairo_rectangle(_cairo_context, rgn.x1-1, rgn.y1-1, rgn.x2-rgn.x1+2, rgn.y2-rgn.y1+2);
+		cairo_clip(_cairo_context);
 	}
-#endif
 }
 
 jregion_t DFBGraphics::GetClip()
@@ -152,7 +140,6 @@ void DFBGraphics::ReleaseClip()
 	_internal_clip.width = _clip.width;
 	_internal_clip.height = _clip.height;
 
-#ifdef DIRECTFB_UI
 	DFBRegion rgn;
 
 	if (surface != NULL) {
@@ -164,14 +151,12 @@ void DFBGraphics::ReleaseClip()
 		_clip.width = SCREEN_TO_SCALE(rgn.x2, _screen.width, _scale.width);
 		_clip.height = SCREEN_TO_SCALE(rgn.y2, _screen.height, _scale.height);
 	}
-#endif
 }
 
 void DFBGraphics::SetPorterDuffFlags(jporterduff_flags_t t)
 {
 	_porterduff_flags = t;
 
-#ifdef DIRECTFB_UI
 	if (surface != NULL) {
 		if (_porterduff_flags == JPF_NONE) {
 			surface->SetPorterDuff(surface, DSPD_NONE);
@@ -201,14 +186,12 @@ void DFBGraphics::SetPorterDuffFlags(jporterduff_flags_t t)
 			surface->SetPorterDuff(surface, DSPD_XOR);
 		}
 	}
-#endif
 }
 
 void DFBGraphics::SetDrawingFlags(jdrawing_flags_t t)
 {
 	_draw_flags = t;
 
-#ifdef DIRECTFB_UI
 	if (surface != NULL) {
 		DFBSurfaceDrawingFlags flags = (DFBSurfaceDrawingFlags)DSDRAW_NOFX;
 
@@ -224,14 +207,12 @@ void DFBGraphics::SetDrawingFlags(jdrawing_flags_t t)
 
 		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)flags);
 	}
-#endif
 }
 
 void DFBGraphics::SetBlittingFlags(jblitting_flags_t t)
 {
 	_blit_flags = t;
 
-#ifdef DIRECTFB_UI
 	if (surface != NULL) {
 		DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
 
@@ -257,7 +238,6 @@ void DFBGraphics::SetBlittingFlags(jblitting_flags_t t)
 
 		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)flags);
 	}
-#endif
 }
 
 jporterduff_flags_t DFBGraphics::GetPorterDuffFlags()
@@ -296,40 +276,33 @@ jsize_t DFBGraphics::GetWorkingScreenSize()
 
 void DFBGraphics::Clear(int red, int green, int blue, int alpha)
 {
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
 	surface->Clear(surface, red, green, blue, alpha);
-#endif
 }
 
 void DFBGraphics::Idle()
 {
-#ifdef DIRECTFB_UI
 	IDirectFB *engine = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
 
 	engine->WaitIdle(engine);
 	engine->WaitForSync(engine);
-#endif
 }
 
 void DFBGraphics::Flip()
 {
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
 
 	surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
 	// surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
-#endif
 }
 
 void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
 {
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -348,7 +321,6 @@ void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
 
 	surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
 	// surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
-#endif
 }
 
 Color & DFBGraphics::GetColor()
@@ -360,7 +332,6 @@ void DFBGraphics::SetColor(const Color &color)
 {
 	_color = color;
 
-#ifdef DIRECTFB_UI
 	int r = _color.GetRed(),
 			g = _color.GetGreen(),
 			b = _color.GetBlue(),
@@ -369,7 +340,6 @@ void DFBGraphics::SetColor(const Color &color)
 	cairo_set_source_rgba(_cairo_context, r/255.0, g/255.0, b/255.0, a/255.0);
 	
 	surface->SetColor(surface, r, g, b, a);
-#endif
 } 
 
 void DFBGraphics::SetColor(uint32_t color)
@@ -391,11 +361,9 @@ void DFBGraphics::SetFont(Font *font)
 {
 	_font = font;
 
-#ifdef DIRECTFB_UI
 	if (_font != NULL) {
-		surface->SetFont(surface, font->_font);
+		surface->SetFont(surface, dynamic_cast<DFBFont *>(font)->_font);
 	}
-#endif
 }
 
 Font * DFBGraphics::GetFont()
@@ -405,13 +373,11 @@ Font * DFBGraphics::GetFont()
 
 void DFBGraphics::SetAntialias(bool b)
 {
-#ifdef DIRECTFB_UI
 	if (b == false) {
 		cairo_set_antialias(_cairo_context, CAIRO_ANTIALIAS_NONE);
 	} else {
 		cairo_set_antialias(_cairo_context, CAIRO_ANTIALIAS_DEFAULT);
 	}
-#endif
 }
 
 void DFBGraphics::SetPixel(int xp, int yp, uint32_t pixel)
@@ -428,7 +394,6 @@ void DFBGraphics::SetLineJoin(jline_join_t t)
 {
 	_line_join = t;
 
-#ifdef DIRECTFB_UI
 	if (_line_join == JLJ_BEVEL) {
 		cairo_set_line_join(_cairo_context, CAIRO_LINE_JOIN_BEVEL);
 	} else if (_line_join == JLJ_ROUND) {
@@ -436,14 +401,12 @@ void DFBGraphics::SetLineJoin(jline_join_t t)
 	} else if (_line_join == JLJ_MITER) {
 		cairo_set_line_join(_cairo_context, CAIRO_LINE_JOIN_MITER);
 	}
-#endif
 }
 
 void DFBGraphics::SetLineStyle(jline_style_t t)
 {
 	_line_style = t;
 
-#ifdef DIRECTFB_UI
 	if (_line_style == JLS_ROUND) {
 		cairo_set_line_cap(_cairo_context, CAIRO_LINE_CAP_ROUND);
 	} else if (_line_style == JLS_BUTT) {
@@ -451,7 +414,6 @@ void DFBGraphics::SetLineStyle(jline_style_t t)
 	} else if (_line_style == JLS_SQUARE) {
 		cairo_set_line_cap(_cairo_context, CAIRO_LINE_CAP_SQUARE);
 	}
-#endif
 }
 
 void DFBGraphics::SetLineWidth(int size)
@@ -476,7 +438,6 @@ int DFBGraphics::GetLineWidth()
 
 void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 {
-#ifdef DIRECTFB_UI
 	int x0 = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y0 = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int x1 = SCALE_TO_SCREEN((_translate.x+xf), _screen.width, _scale.width); 
@@ -502,7 +463,6 @@ void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 		// applyDrawingMode(mode);
 		ApplyDrawing();
 	}
-#endif
 }
 
 void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
@@ -511,7 +471,6 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	if (npoints < 3) {
 		return;
 	}
@@ -576,7 +535,6 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 
 	delete [] x;
 	delete [] y;
-#endif
 }
 
 void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
@@ -585,7 +543,6 @@ void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -604,7 +561,6 @@ void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
 	}
 
 	surface->FillRectangle(surface, x, y ,w, h);
-#endif
 }
 
 void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
@@ -613,7 +569,6 @@ void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -642,12 +597,10 @@ void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 	cairo_set_line_width(_cairo_context, line_width);
 
 	ApplyDrawing();
-#endif
 }
 
 void DFBGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
-#ifdef DIRECTFB_UI
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -702,12 +655,10 @@ void DFBGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
   cairo_close_path(_cairo_context);
   cairo_restore(_cairo_context);
 	cairo_fill(_cairo_context);
-#endif
 }
 
 void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
-#ifdef DIRECTFB_UI
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -781,12 +732,10 @@ void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
 	cairo_set_line_width(_cairo_context, line_width);
 
 	ApplyDrawing();
-#endif
 }
 
 void DFBGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
-#ifdef DIRECTFB_UI
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -853,12 +802,10 @@ void DFBGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
   cairo_close_path(_cairo_context);
   cairo_restore(_cairo_context);
 	cairo_fill(_cairo_context);
-#endif
 }
 
 void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
-#ifdef DIRECTFB_UI
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -944,7 +891,6 @@ void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
 	cairo_set_line_width(_cairo_context, line_width);
 
 	ApplyDrawing();
-#endif
 }
 
 void DFBGraphics::FillCircle(int xcp, int ycp, int rp)
@@ -969,7 +915,6 @@ void DFBGraphics::DrawEllipse(int xcp, int ycp, int rxp, int ryp)
 
 void DFBGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-#ifdef DIRECTFB_UI
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
@@ -985,12 +930,10 @@ void DFBGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 	cairo_close_path(_cairo_context);
 	cairo_restore(_cairo_context);
 	cairo_fill(_cairo_context);
-#endif
 }
 
 void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-#ifdef DIRECTFB_UI
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
@@ -1021,12 +964,10 @@ void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 	cairo_set_line_width(_cairo_context, line_width);
 	
 	ApplyDrawing();
-#endif
 }
 
 void DFBGraphics::FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-#ifdef DIRECTFB_UI
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
@@ -1043,12 +984,10 @@ void DFBGraphics::FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	cairo_close_path(_cairo_context);
 	cairo_restore(_cairo_context);
 	cairo_fill(_cairo_context);
-#endif
 }
 
 void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-#ifdef DIRECTFB_UI
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
@@ -1079,7 +1018,6 @@ void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	
 	// applyPen();
 	ApplyDrawing();
-#endif
 }
 
 void DFBGraphics::FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
@@ -1099,7 +1037,6 @@ jdrawing_mode_t DFBGraphics::GetDrawingMode()
 
 void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-#ifdef DIRECTFB_UI
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
@@ -1131,12 +1068,10 @@ void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	cairo_set_line_width(_cairo_context, line_width);
 
 	ApplyDrawing();
-#endif
 }
 		
 void DFBGraphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -1149,12 +1084,10 @@ void DFBGraphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int 
 	int y3 = SCALE_TO_SCREEN((_translate.y+y3p), _screen.height, _scale.height);
 
 	surface->FillTriangle(surface, x1, y1, x2, y2, x3, y3);
-#endif
 }
 
 void DFBGraphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
-#ifdef DIRECTFB_UI
 	jpoint_t p[3];
 
 	p[0].x = x1p;
@@ -1165,7 +1098,6 @@ void DFBGraphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int 
 	p[2].y = y3p;
 
 	DrawPolygon(0, 0, p, 3, true);
-#endif
 }
 
 void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
@@ -1174,7 +1106,6 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	int line_width = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
 
 	if (line_width < 0) {
@@ -1204,7 +1135,6 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 	cairo_set_line_width(_cairo_context, line_width);
 
   ApplyDrawing();
-#endif
 }
 
 void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd)
@@ -1213,7 +1143,6 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	int line_width = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
 
 	if (line_width < 0) {
@@ -1247,12 +1176,10 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 	if (even_odd == true) {
 		cairo_set_fill_rule(_cairo_context, CAIRO_FILL_RULE_WINDING);
 	}
-#endif
 }
 
 void DFBGraphics::FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
 {
-#ifdef DIRECTFB_UI
 	Color color = GetColor();
 
 	int height = hp;
@@ -1268,7 +1195,6 @@ void DFBGraphics::FillRadialGradient(int xp, int yp, int wp, int hp, Color &scol
 	}
 
 	SetColor(color);
-#endif
 }
 
 void DFBGraphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
@@ -1277,7 +1203,6 @@ void DFBGraphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -1301,7 +1226,6 @@ void DFBGraphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &
 	SetColor(color);
 
 	_line_width = line_width;
-#endif
 }
 
 void DFBGraphics::FillVerticalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
@@ -1310,7 +1234,6 @@ void DFBGraphics::FillVerticalGradient(int xp, int yp, int wp, int hp, Color &sc
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -1334,12 +1257,10 @@ void DFBGraphics::FillVerticalGradient(int xp, int yp, int wp, int hp, Color &sc
 	SetColor(color);
 
 	_line_width = line_width;
-#endif
 }
 
 void DFBGraphics::DrawString(std::string text, int xp, int yp)
 {
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -1361,12 +1282,10 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 	DrawImage(off, xp, yp);
 
 	delete off;
-#endif
 }
 
 void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
 {
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -1375,9 +1294,12 @@ void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
 		return;
 	}
 
+	IDirectFBFont *font = dynamic_cast<DFBFont *>(_font)->_font;
 	int advance;
 
-	_font->_font->GetGlyphExtents(_font->_font, symbol, NULL, &advance);
+	if (font != NULL) {
+		font->GetGlyphExtents(font, symbol, NULL, &advance);
+	}
 
 	Image *off = Image::CreateImage(advance, _font->GetAscender() + _font->GetDescender(), JSP_ARGB, _scale.width, _scale.height);
 
@@ -1392,7 +1314,6 @@ void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
 	DrawImage(off, xp, yp);
 
 	delete off;
-#endif
 }
 
 bool DFBGraphics::DrawImage(std::string img, int xp, int yp)
@@ -1420,7 +1341,6 @@ bool DFBGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 		return false;
 	}
 
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return false;
 	}
@@ -1487,7 +1407,6 @@ bool DFBGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 
 	imgProvider->Release(imgProvider);
 	imgSurface->Release(imgSurface);
-#endif
 
 	return true;
 }
@@ -1498,7 +1417,6 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 		return false;
 	}
 
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return false;
 	}
@@ -1570,7 +1488,6 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 
 	imgProvider->Release(imgProvider);
 	imgSurface->Release(imgSurface);
-#endif
 
 	return true;
 }
@@ -1585,7 +1502,6 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 		return false;
 	}
 
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return false;
 	}
@@ -1673,7 +1589,6 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 
 	imgProvider->Release(imgProvider);
 	imgSurface->Release(imgSurface);
-#endif
 
 	return true;
 }
@@ -1698,7 +1613,6 @@ bool DFBGraphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 
 bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
-#ifdef DIRECTFB_UI
 	if ((void *)surface == NULL) {
 		return false;
 	}
@@ -1753,14 +1667,12 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 			delete [] rgb;
 		}
 	}
-#endif
 
 	return true;
 }
 
 bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
-#ifdef DIRECTFB_UI
 	if ((void *)surface == NULL) {
 		return false;
 	}
@@ -1832,7 +1744,6 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 
 		delete image;
 	}
-#endif
 
 	return true;
 }
@@ -1983,7 +1894,6 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 		return;
 	}
 
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -2121,14 +2031,12 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 	if (clipped == true) {
 		SetClip(clip.x, clip.y, clip.width, clip.height);
 	}
-#endif
 }
 
 uint32_t DFBGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 {
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
-		return 0x00000000;
+		return pixel;
 	}
 
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
@@ -2156,14 +2064,10 @@ uint32_t DFBGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 	surface->Unlock(surface);
 
 	return rgb;
-#endif
-
-	return pixel;
 }
 
 void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize)
 {
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -2217,12 +2121,10 @@ void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int sca
 	surface->Unlock(surface);
 
 	(*rgb) = array;
-#endif
 }
 
 void DFBGraphics::SetRGB(uint32_t argb, int xp, int yp) 
 {
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -2237,12 +2139,10 @@ void DFBGraphics::SetRGB(uint32_t argb, int xp, int yp)
 
 	surface->SetColor(surface, r, g, b, a);
 	surface->DrawLine(surface, x, y, x, y);
-#endif
 }
 
 void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline) 
 {
-#ifdef DIRECTFB_UI
 	if (surface == NULL) {
 		return;
 	}
@@ -2325,7 +2225,6 @@ void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scan
 	}
 
 	surface->Unlock(surface);
-#endif
 }
 
 void DFBGraphics::Reset()
@@ -2349,7 +2248,6 @@ void DFBGraphics::Reset()
 	SetDrawingMode(JDM_STROKE);
 }
 
-#ifdef DIRECTFB_UI
 void DFBGraphics::ApplyDrawing()
 {
 	/* TODO::
@@ -2667,6 +2565,5 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 	simg->Unlock(simg);
 	surface->Unlock(surface);
 }
-#endif
 
 }

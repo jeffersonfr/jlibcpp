@@ -17,77 +17,71 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "Stdafx.h"
-#include "jcomplex.h"
-#include "jmath.h"
+#ifndef J_DFBIMAGE_H
+#define J_DFBIMAGE_H
 
-namespace jmath {
+#include "jdfbimage.h"
 
-Complex::Complex(double real_, double imaginary_)
-{
-	_real = real_;
-	_imaginary = imaginary_;
-}
+#include <stdint.h>
+#include <string.h>
 
-Complex::~Complex()
-{
-}
+namespace jgui{
 
-double Complex::GetReal()
-{
-	return _real;
-}
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class DFBImage : public jgui::Image{
 
-double Complex::GetImaginary()
-{
-	return _imaginary;
-}
+	private:
+		uint8_t *_buffer;
 
-double Complex::GetModule()
-{
-	return Math<double>::Sqrt(_real*_real + _imaginary*_imaginary);
-}
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		DFBImage(int width, int height, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~DFBImage();
 
-bool Complex::Equals(Object *o)
-{
-	Complex *c = dynamic_cast<Complex *>(o);
+		/**
+		 * \brief
+		 *
+		 */
+		static bool GetImageSize(std::string img, int *width, int *height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		static Image * CreateImageStream(jio::InputStream *stream);
 
-	return (_real == c->GetReal() && _imaginary == c->GetImaginary());
-}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Release();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Restore();
 
-int Complex::Compare(Object *o)
-{
-	Complex *c = dynamic_cast<Complex *>(o);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcommon::Object * Clone();
 
-	if (GetModule() < c->GetModule()) {
-		return -1;
-	} else if (GetModule() > c->GetModule()) {
-		return 1;
-	}
-
-	return 0;
-}
-
-const Complex & Complex::operator=(Complex &c)
-{
-	_real = c.GetReal();
-	_imaginary = c.GetImaginary();
-
-	return *this;
-}
-
-const Complex Complex::operator+(Complex &c)
-{
-	return Complex(_real+c.GetReal(), _imaginary+c.GetImaginary());
-}
-
-std::string Complex::what()
-{
-	std::ostringstream o;
-
-	o << _real << " + " << _imaginary << "i";
-
-	return o.str();
-}
+};
 
 }
+
+#endif 

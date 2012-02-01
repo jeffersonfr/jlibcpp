@@ -17,72 +17,124 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_INPUTMANAGER_H
-#define J_INPUTMANAGER_H
+#ifndef J_DFBINPUTMANAGER_H
+#define J_DFBINPUTMANAGER_H
 
-#include "jcomponent.h"
-#include "jkeylistener.h"
-#include "jmouselistener.h"
-#include "jthread.h"
-#include "jmutex.h"
-#include "jautolock.h"
-#include "jcondition.h"
+#include "jinputmanager.h"
 
 #include <vector>
 #include <map>
 #include <list>
 
-#ifdef DIRECTFB_UI
 #include <directfb.h>
-#endif
 
 namespace jgui {
 
-enum jbroadcaster_event_t {
-	JBE_UNKNOWN			= 0x00,
-	JBE_KEYEVENT		= 0x01,
-	JBE_MOUSEEVENT	= 0x02
-};
-
-class InputManager : public virtual jcommon::Object{
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class EventBroadcaster : public jthread::Thread {
 
 	private:
-		static InputManager *_instance;
-		
-	protected:
-		jsize_t _screen,
-			_scale;
+		std::vector<jcommon::EventObject *> _events;
+		jcommon::Listener *_listener;
+		jthread::Condition _sem;
+		jthread::Mutex _mutex;
+		jbroadcaster_event_t _type;
+		bool _running;
 
-		/**
-		 * \brief
-		 *
-		 */
-		InputManager();
+	public:
+		EventBroadcaster(jcommon::Listener *listener);
+
+		virtual ~EventBroadcaster();
+
+		jcommon::Listener * GetListener();
+
+		void SetBroadcastEvent(jbroadcaster_event_t t);
+		jbroadcaster_event_t GetBroadcastEvent();
+
+		void Add(jcommon::EventObject *event, int limit = 0);
+
+		void Reset();
+		void Release();
+
+		virtual void Run();
+
+};
+
+class DFBInputManager : public jgui::InputManager, public jthread::Thread{
+
+	friend class DFBHandler;
+
+	private:
+		jthread::Mutex _mutex;
+
+#ifdef DIRECTFB_UI
+		IDirectFBEventBuffer *events;
+#endif
+
+		std::vector<EventBroadcaster *> _broadcasters;
+		uint64_t _last_keypress;
+		int _mouse_x,
+			_mouse_y,
+			_click_delay,
+			_click_count;
+		bool _initialized,
+			 _is_key_enabled,
+			 _is_mouse_enabled,
+			 _skip_key_events,
+			 _skip_mouse_events;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~InputManager();
+		DFBInputManager();
 
 		/**
 		 * \brief
 		 *
 		 */
-		static InputManager * GetInstance();
+		virtual ~DFBInputManager();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetWorkingScreenSize(int width, int height);
+		virtual void Initialize();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jsize_t GetWorkingScreenSize();
+		virtual int TranslateToDFBKeyCode(int code);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int TranslateToDFBKeyID(DFBInputDeviceKeyIdentifier id);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jkeyevent_symbol_t TranslateToDFBKeySymbol(DFBInputDeviceKeySymbol symbol);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ProcessInputEvent(DFBInputEvent event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ProcessWindowEvent(DFBWindowEvent event);
 
 		/**
 		 * \brief
@@ -155,6 +207,12 @@ class InputManager : public virtual jcommon::Object{
 		 *
 		 */
 		void Restore();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Run();
 
 		/**
 		 * \brief

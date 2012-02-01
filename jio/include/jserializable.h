@@ -29,7 +29,7 @@ namespace jio {
  * 
  * \author Jeff Ferr
  */
-class Serializable : public jcommon::Object{
+class Serializable : public virtual jcommon::Object{
 
 	private:
 

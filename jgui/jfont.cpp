@@ -19,9 +19,13 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jfont.h"
+#include "jgfxhandler.h"
 #include "jstringutils.h"
 #include "jstringtokenizer.h"
-#include "jgfxhandler.h"
+
+#ifdef DIRECTFB_UI
+#include "jdfbfont.h"
+#endif
 
 namespace jgui {
 
@@ -32,16 +36,8 @@ Font::Font(std::string name, jfont_attributes_t attributes, int height, int scal
 {
 	jcommon::Object::SetClassName("jgui::Font");
 
-#ifdef DIRECTFB_UI
-	_font = NULL;
-#endif
-
 	_attributes = attributes;
 	_name = name;
-	_height = 0;
-	_ascender = 0;
-	_descender = 0;
-	_virtual_height = height;
 	
 	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
@@ -56,35 +52,16 @@ Font::Font(std::string name, jfont_attributes_t attributes, int height, int scal
 	if (_scale.height <= 0) {
 		_scale.height = DEFAULT_SCALE_HEIGHT;
 	}
-
-#ifdef DIRECTFB_UI
-	((GFXHandler *)GFXHandler::GetInstance())->CreateFont(name, height, &_font, _scale.width, _scale.height);
-
-	if (_font != NULL) {
-		_font->GetHeight(_font, &_height);
-		_font->GetAscender(_font, &_ascender);
-		_font->GetDescender(_font, &_descender);
-	}
-#endif
-
-	GFXHandler::GetInstance()->Add(this);
 }
 
 Font::~Font()
 {
-	GFXHandler::GetInstance()->Add(this);
-
-#ifdef DIRECTFB_UI
-	if (_font != NULL) {
-		_font->Release(_font);
-	}
-#endif
 }
 
 Font * Font::GetDefaultFont()
 {
 	if (_default_font == NULL) {
-		_default_font = Font::CreateFont(_DATA_PREFIX"/fonts/font.ttf", JFA_NONE, DEFAULT_FONT_SIZE);
+		_default_font = Font::CreateFont(_DATA_PREFIX"/fonts/font.ttf", JFA_NORMAL, DEFAULT_FONT_SIZE);
 	}
 
 	return _default_font;
@@ -92,7 +69,11 @@ Font * Font::GetDefaultFont()
 
 Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height)
 {
-	return new Font(name, attributes, height, scale_width, scale_height);
+#ifdef DIRECTFB_UI
+	return new DFBFont(name, attributes, height, scale_width, scale_height);
+#endif
+
+	return NULL;
 }
 
 void Font::SetWorkingScreenSize(int width, int height)
@@ -111,35 +92,13 @@ jfont_attributes_t Font::GetFontAttributes()
 	return _attributes;
 }
 
-void * Font::GetFont()
+void * Font::GetNativeFont()
 {
-#ifdef DIRECTFB_UI
-	return _font;
-#endif
-
 	return NULL;
 }
 
 bool Font::SetEncoding(std::string code)
 {
-#ifdef DIRECTFB_UI
-	DFBTextEncodingID enc_id;
-	
-	if (_font == NULL) {
-		return false;
-	}
-
-	if (_font->FindEncoding(_font, code.c_str(), &enc_id) != DFB_OK) {
-		return false;
-	}
-
-	if (_font->SetEncoding(_font, enc_id) != DFB_OK) {
-		return false;
-	}
-
-	return true;
-#endif
-
 	return false;
 }
 
@@ -150,103 +109,61 @@ std::string Font::GetName()
 
 int Font::GetVirtualHeight()
 {
-	return _virtual_height;
+	return -1;
 }
 
 int Font::GetHeight()
 {
-	return SCREEN_TO_SCALE(_height, _screen.width, _scale.width);
+	return -1;
 }
 
 int Font::GetAscender()
 {
-	return SCREEN_TO_SCALE(_ascender, _screen.width, _scale.width);
+	return -1;
 }
 
 int Font::GetDescender()
 {
-	return SCREEN_TO_SCALE(abs(_descender), _screen.width, _scale.width);
+	return -1;
 }
 
 int Font::GetMaxAdvanced()
 {
-	return SCREEN_TO_SCALE(_max_advance, _screen.width, _scale.width);
+	return -1;
 }
 
 int Font::GetLeading()
 {
-	return SCREEN_TO_SCALE(_height/2.0, _screen.width, _scale.width);
+	return -1;
 }
 
 int Font::GetStringWidth(std::string text)
 {
-	int size = 0;
-
-#ifdef DIRECTFB_UI
-	if (_font == NULL) {
-		return 0;
-	}
-
-	_font->GetStringWidth(_font, text.c_str(), -1, &size);
-#endif
-	
-	return SCREEN_TO_SCALE(size, _screen.width, _scale.width);
+	return -1;
 }
 
 jregion_t Font::GetStringExtends(std::string text)
 {
-	jregion_t region;
+	jregion_t t;
 
-	region.x = 0;
-	region.y = 0;
-	region.width = 0;
-	region.height = 0;
+	t.x = 0;
+	t.y = 0;
+	t.width = 0;
+	t.height = 0;
 
-#ifdef DIRECTFB_UI
-	if (_font == NULL) {
-		return region;
-	}
-
-	DFBRectangle lrect;
-							 // irect;
-
-	_font->GetStringExtents(_font, text.c_str(), -1, &lrect, NULL); // &irect);
-
-	region.x = SCREEN_TO_SCALE(lrect.x, _screen.width, _scale.width);
-	region.y = SCREEN_TO_SCALE(lrect.y, _screen.width, _scale.width);
-	region.width = SCREEN_TO_SCALE(lrect.w, _screen.width, _scale.width);
-	region.height = SCREEN_TO_SCALE(lrect.h, _screen.width, _scale.width);
-#endif
-	
-	return region;
+	return t;
 }
 
 jregion_t Font::GetGlyphExtends(int symbol)
 {
-	jregion_t region;
+	jregion_t t;
 
-	region.x = 0;
-	region.y = 0;
-	region.width = 0;
-	region.height = 0;
+	t.x = 0;
+	t.y = 0;
+	t.width = 0;
+	t.height = 0;
 
-#ifdef DIRECTFB_UI
-	if (_font == NULL) {
-		return region;
-	}
-
-	DFBRectangle lrect;
-	int advance;
-
-	_font->GetGlyphExtents(_font, symbol, &lrect, &advance);
-
-	region.x = SCREEN_TO_SCALE(lrect.x, _screen.width, _scale.width);
-	region.y = SCREEN_TO_SCALE(lrect.y, _screen.width, _scale.width);
-	region.width = SCREEN_TO_SCALE(lrect.w, _screen.width, _scale.width);
-	region.height = SCREEN_TO_SCALE(lrect.h, _screen.width, _scale.width);
-#endif
-	
-	return region;
+	return t;
 }
 
 void Font::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign)
@@ -388,25 +305,12 @@ std::string Font::TruncateString(std::string text, std::string extension, int wi
 
 void Font::Release()
 {
-#ifdef DIRECTFB_UI
-	if (_font != NULL) {
-		_font->Dispose(_font);
-		_font->Release(_font);
-		_font = NULL;
-	}
-#endif
 }
 
 void Font::Restore()
 {
 	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
-
-#ifdef DIRECTFB_UI
-	if (_font == NULL) {
-		((GFXHandler *)GFXHandler::GetInstance())->CreateFont(_name, _virtual_height, &_font, _scale.width, _scale.height);
-	}
-#endif
 }
 
 }
