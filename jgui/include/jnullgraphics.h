@@ -284,6 +284,12 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual void SetLineDash(double *dashes, int ndashes);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jline_join_t GetLineJoin();
 		
 		/**

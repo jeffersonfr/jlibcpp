@@ -211,6 +211,10 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 			}
 		}
 	} else {
+		if (event->GetType() == JME_ROTATED) {
+			SetValue(GetValue()+_minimum_tick*event->GetClickCount());
+		}
+
 		_pressed = false;
 	}
 

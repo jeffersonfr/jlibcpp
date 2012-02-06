@@ -349,6 +349,16 @@ bool Component::IsSmoothScrolling()
 	return _is_smooth_scroll;
 }
 
+int Component::GetScrollX()
+{
+	return _scroll_location.x;
+}
+
+int Component::GetScrollY()
+{
+	return _scroll_location.y;
+}
+
 jpoint_t Component::GetScrollLocation()
 {
 	return _scroll_location;

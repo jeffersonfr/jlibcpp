@@ -459,6 +459,12 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void SetLineDash(double *dashes, int ndashes);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jline_join_t GetLineJoin();
 		
 		/**

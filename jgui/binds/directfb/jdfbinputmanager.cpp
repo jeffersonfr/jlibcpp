@@ -135,7 +135,7 @@ void EventBroadcaster::Run()
 					mlistener->MouseReleased(mevent);
 				} else if (mevent->GetType() == JME_MOVED) {
 					mlistener->MouseMoved(mevent);
-				} else if (mevent->GetType() == JME_WHEEL) {
+				} else if (mevent->GetType() == JME_ROTATED) {
 					mlistener->MouseWheel(mevent);
 				}
 			}
@@ -793,7 +793,7 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 		DispatchEvent(new KeyEvent(NULL, type, mod, TranslateToDFBKeyCode(event.key_code), TranslateToDFBKeySymbol(event.key_symbol)));
 		// DispatchEvent(new KeyEvent(WindowManager::GetInstance()->GetFocusOwner(), type, mod, TranslateToDFBKeyCode(event.key_code), TranslateToDFBKeySymbol(event.key_symbol)));
 	} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE || event.type == DIET_AXISMOTION) {
-		int mouse_z = -1;
+		int mouse_z = 0;
 		jmouse_button_t button = JMB_UNKNOWN;
 		jmouse_event_t type = JME_UNKNOWN;
 
@@ -807,7 +807,7 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 					_mouse_y = event.axisabs;
 				} else if (event.axis == DIAI_Z) {
 					button = JMB_WHEEL;
-					type = JME_WHEEL;
+					type = JME_ROTATED;
 					mouse_z = event.axisabs;
 				}
 			} else if (event.flags & DIEF_AXISREL) {
@@ -819,7 +819,7 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 					_mouse_y += event.axisrel;
 				} else if (event.axis == DIAI_Z) {
 					button = JMB_WHEEL;
-					type = JME_WHEEL;
+					type = JME_ROTATED;
 					mouse_z += event.axisrel;
 				}
 			}
@@ -827,10 +827,6 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 			_mouse_x = CLAMP(_mouse_x, 0, _screen.width-1);
 			_mouse_y = CLAMP(_mouse_y, 0, _screen.height-1);
 			// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
-		
-			if (type == JME_WHEEL) {
-				mouse_z = mouse_z + 1;
-			}
 		} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE) {
 			if (event.type == DIET_BUTTONPRESS) {
 				type = JME_PRESSED;
@@ -957,7 +953,7 @@ void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 		}
 		
 		if (current != NULL) {
-			int mouse_z = -1;
+			int mouse_z = 0;
 
 			if (event.type == DWET_ENTER) {
 				// GFXHandler::GetInstance()->SetCursor(current->GetCursor());
@@ -972,7 +968,7 @@ void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 					_mouse_x = event.cx;
 					_mouse_y = event.cy;
 				} else if (event.type == DWET_WHEEL) {
-					type = JME_WHEEL;
+					type = JME_ROTATED;
 					button = JMB_WHEEL;
 					mouse_z = event.step;
 				} else if (event.type == DWET_BUTTONUP) {
@@ -1001,9 +997,7 @@ void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 				_mouse_y = CLAMP(_mouse_y, 0, _screen.height-1);
 				// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
 
-				if (type == JME_WHEEL) {
-					mouse_z = mouse_z + 1;
-				} else if (type == JME_PRESSED) {
+				if (type == JME_PRESSED) {
 					if ((jcommon::Date::CurrentTimeMillis()-_last_keypress) < 200L) {
 						_click_count = _click_count + 1;
 					} else {

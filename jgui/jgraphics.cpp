@@ -222,6 +222,10 @@ void Graphics::SetLineWidth(int size)
 {
 }
 
+void Graphics::SetLineDash(double *dashes, int ndashes)
+{
+}
+
 jline_join_t Graphics::GetLineJoin()
 {
 	return JLJ_MITER;

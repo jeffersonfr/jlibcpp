@@ -241,6 +241,10 @@ void NullGraphics::SetLineWidth(int size)
 	JDEBUG(JINFO, "called\n");
 }
 
+void NullGraphics::SetLineDash(double *dashes, int ndashes)
+{
+}
+
 jline_join_t NullGraphics::GetLineJoin()
 {
 	JDEBUG(JINFO, "called\n");

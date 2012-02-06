@@ -330,6 +330,12 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
+		virtual void SetLineDash(double *dashes, int ndashes);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jline_join_t GetLineJoin();
 		
 		/**

@@ -739,6 +739,8 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetLineJoin(jgui::JLJ_BEVEL);
 
 		g->SetLineWidth(1);
+		g->SetColor(ccolor);
+		g->DrawPolygon(10+11*(120+10)+30, 2*(120+10), hourglass, 4, true);
 		g->SetColor(pcolor);
 		g->DrawPolygon(10+10*(120+10)+10, 2*(120+10), hourglass, 4, true);
 		g->FillPolygon(10+11*(120+10)+30, 2*(120+10), hourglass, 4);
@@ -769,6 +771,24 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetColor(rcolor);
 		g->DrawRectangle(x0, y0, 250, (240-10));
 		g->DrawLine(x0, y0+(240-10)/2, x0+250, y0+(240-10)/2);
+
+		// draw line dashes
+		double dashes[] = {
+			50.0,  // ink
+			10.0,  // skip
+			10.0,  // ink
+			10.0   // skip
+		};
+
+		g->SetColor(pcolor);
+		g->SetLineDash(dashes, 4);
+		g->SetLineWidth(5);
+		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+10, 10+9*(120+10)+10, 6*(120+10));
+		g->SetLineWidth(10);
+		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+40, 10+9*(120+10)+10, 6*(120+10)+40);
+		g->SetLineWidth(20);
+		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+80, 10+9*(120+10)+10, 6*(120+10)+80);
+		g->SetLineDash(NULL, 0);
 
 		// draw bezier curve
 		x0 = 10+10*(120+10)+10;

@@ -116,9 +116,8 @@ void DFBGraphics::SetClip(int xp, int yp, int wp, int hp)
 		surface->SetClip(surface, NULL);
 		surface->SetClip(surface, &rgn);
 	
-		// TODO:: descobrir como corrigir melhor esse clip
 		cairo_reset_clip(_cairo_context);
-		cairo_rectangle(_cairo_context, rgn.x1-1, rgn.y1-1, rgn.x2-rgn.x1+2, rgn.y2-rgn.y1+2);
+		cairo_rectangle(_cairo_context, rgn.x1, rgn.y1, rgn.x2-rgn.x1+1, rgn.y2-rgn.y1+1);
 		cairo_clip(_cairo_context);
 	}
 }
@@ -421,6 +420,11 @@ void DFBGraphics::SetLineWidth(int size)
 	_line_width = size;
 }
 
+void DFBGraphics::SetLineDash(double *dashes, int ndashes)
+{
+	cairo_set_dash(_cairo_context, dashes, ndashes, 0.0);
+}
+
 jline_join_t DFBGraphics::GetLineJoin()
 {
 	return _line_join;
@@ -560,7 +564,7 @@ void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
 		h = 1;
 	}
 
-	surface->FillRectangle(surface, x, y ,w, h);
+	surface->FillRectangle(surface, x, y, w, h);
 }
 
 void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
@@ -578,17 +582,20 @@ void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 	int line_width = lw;
 	
 	if (line_width > 0) {
-		x = x - line_width / 2;
-		y = y - line_width / 2;
-		w = w + line_width;
-		h = h + line_width;
+		lw = line_width/2;
+
+		x = x - lw;
+		y = y - lw;
+		w = w + 2*lw;
+		h = h + 2*lw;
 	} else {
 		line_width = -line_width;
+		lw = line_width/2;
 
-		x = x + line_width / 2;
-		y = y + line_width / 2;
-		w = w - line_width;
-		h = h - line_width;
+		x = x + lw;
+		y = y + lw;
+		w = w - 2*lw;
+		h = h - 2*lw;
 	}
 
 	cairo_save(_cairo_context);
@@ -2241,6 +2248,7 @@ void DFBGraphics::Reset()
 	SetLineWidth(1);
 	SetLineJoin(JLJ_MITER);
 	SetLineStyle(JLS_BUTT);
+	SetLineDash(NULL, 0);
 
 	SetDrawingFlags(JDF_BLEND);
 	SetBlittingFlags(JBF_ALPHACHANNEL);

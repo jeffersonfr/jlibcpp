@@ -50,10 +50,10 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 	_scroll_dimension.width = _size.width;
 	_scroll_dimension.height = _size.height;
 
-	_insets.left = 0;
-	_insets.right = 0;
-	_insets.top = 0;
-	_insets.bottom = 0;
+	_insets.left = 2;
+	_insets.right = 2;
+	_insets.top = 2;
+	_insets.bottom = 2;
 
 	SetBackgroundVisible(false);
 }

@@ -372,6 +372,18 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual int GetScrollX();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetScrollY();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jpoint_t GetScrollLocation();
 		
 		/**

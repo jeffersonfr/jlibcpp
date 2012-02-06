@@ -43,7 +43,7 @@ enum jmouse_event_t {
 	JME_PRESSED,
 	JME_RELEASED,
 	JME_MOVED,
-	JME_WHEEL
+	JME_ROTATED
 };
 
 /**
@@ -51,10 +51,10 @@ enum jmouse_event_t {
  *
  */
 enum jmouse_button_t {
-	JMB_UNKNOWN = 0x0,
-	JMB_BUTTON1 = 0x1,
-	JMB_BUTTON2 = 0x2,
-	JMB_BUTTON3 = 0x4,
+	JMB_UNKNOWN = 0x00,
+	JMB_BUTTON1 = 0x01,
+	JMB_BUTTON2 = 0x02,
+	JMB_BUTTON3 = 0x04,
 	JMB_WHEEL		= 0x08
 };
 

@@ -276,6 +276,14 @@ bool TextArea::ProcessEvent(KeyEvent *event)
 		}
 	}
 
+	if (IsFontSet()) {
+		int w = _font->GetStringWidth(GetText().substr(0, _caret_position));
+
+		if ((w-_size.width) > 0) {
+			SetScrollX(w-_size.width);
+		}
+	}
+
 	return catched || Component::ProcessEvent(event);
 }
 
@@ -294,21 +302,11 @@ void TextArea::IncrementLines(int lines)
 	}
 
 	// INFO:: define a nova posicao do caret
-	if (_current_row > 0) {
-		current_length = 0;
-		
-		for (int i=0; i<_current_row; i++) {
-			current_length += _lines[i].size();
-		}
-
-		_caret_position = current_length;
-	} else if (_current_row == 0) {
-		for (int i=0; i<_current_row; i++) {
-			current_length += _lines[i].size();
-		}
-
-		_caret_position = current_length;
+	for (int i=0; i<_current_row; i++) {
+		current_length += _lines[i].size();
 	}
+
+	_caret_position = current_length;
 
 	if (_font != NULL) {
 		jpoint_t scroll_location = GetScrollLocation();
@@ -335,25 +333,15 @@ void TextArea::DecrementLines(int lines)
 	_current_row = _current_row + lines;
 
 	if (_current_row >= (int)(_lines.size())) {
-		_current_row = _lines.size()-1;
+		_current_row = _lines.size();
 	}
 
 	// INFO:: define a nova posicao do caret
-	if (_current_row < (int)(_lines.size()-1)) {
-		current_length = 0;
-
-		for (int i=0; i<_current_row; i++) {
-			current_length += _lines[i].size();
-		}
-
-		_caret_position = current_length;
-	} else if (_current_row == (int)(_lines.size()-1)) {
-		for (int i=0; i<_current_row; i++) {
-			current_length += _lines[i].size();
-		}
-
-		_caret_position = current_length;
+	for (int i=0; i<_current_row; i++) {
+		current_length += _lines[i].size();
 	}
+
+	_caret_position = current_length-1;
 
 	if (_font != NULL) {
 		jpoint_t scroll_location = GetScrollLocation();
@@ -627,8 +615,13 @@ jsize_t TextArea::GetScrollDimension()
 		return size;
 	}
 
-	size.width = _size.width;
-	size.height = GetRows()*(_font->GetAscender()+_font->GetDescender())+2*(_vertical_gap+_border_size);
+	if (_is_wrap == false) {
+		size.width = _font->GetStringWidth(GetText());
+		size.height = _size.height;
+	} else {
+		size.width = _size.width;
+		size.height = GetRows()*(_font->GetAscender()+_font->GetDescender())+2*(_vertical_gap+_border_size);
+	}
 
 	return  size;
 }
