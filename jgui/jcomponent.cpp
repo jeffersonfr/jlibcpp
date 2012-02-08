@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "jcomponent.h"
 #include "jcontainer.h"
+#include "jwindow.h"
 #include "jfocuslistener.h"
 #include "jthememanager.h"
 
@@ -44,7 +45,6 @@ Component::Component(int x, int y, int width, int height):
 	_is_background_visible = true;
 	_is_theme_enabled = true;
 	_is_valid = true;
-	_is_opaque = true;
 	_is_focusable = false;
 	_is_enabled = true;
 	_is_visible = true;
@@ -240,12 +240,7 @@ bool Component::IsThemeEnabled()
 
 bool Component::IsOpaque()
 {
-	return _is_opaque;
-}
-
-void Component::SetOpaque(bool opaque)
-{
-	_is_opaque = opaque;
+	return (IsBackgroundVisible() == true) && (GetBackgroundColor().GetAlpha() == 0xff);
 }
 
 void Component::Invalidate()
@@ -719,8 +714,10 @@ Container * Component::GetParent()
 Container * Component::GetTopLevelAncestor()
 {
 	for (Component *cmp = this; cmp != NULL; cmp = cmp->GetParent()) {
-		if (cmp->InstanceOf("jgui::Window") == true) {
-			return dynamic_cast<Container *>(cmp);
+		Container *container = dynamic_cast<jgui::Window *>(cmp);
+		
+		if (container != NULL) {
+			return container;
 		}
 	}
 
@@ -840,6 +837,11 @@ void Component::SetBorder(jcomponent_border_t t)
 void Component::SetIgnoreRepaint(bool b)
 {
 	_is_ignore_repaint = b;
+}
+
+bool Component::GetIgnoreRepaint()
+{
+	return _is_ignore_repaint;
 }
 
 void Component::Repaint(Component *cmp)
@@ -1156,8 +1158,9 @@ jpoint_t Component::GetAbsoluteLocation()
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
-	location.x = _location.x - ((IsScrollableX() == true)?scrollx:0);
-	location.y = _location.y - ((IsScrollableY() == true)?scrolly:0);
+	// INFO:: a posicao absoluta naum considera o deslocamento interno do componente
+	location.x = _location.x; // - ((IsScrollableX() == true)?scrollx:0);
+	location.y = _location.y; // - ((IsScrollableY() == true)?scrolly:0);
 
 	do {
 		// if (parent->GetParent() != NULL) {
@@ -1527,7 +1530,7 @@ bool Component::ProcessEvent(MouseEvent *event)
 	} else if (event->GetType() == JME_RELEASED) {
 		if (_internal_state != 0) {
 			_internal_state = 0;
-
+			
 			return true;
 		}
 	}
@@ -1544,13 +1547,13 @@ void Component::GetInternalComponents(Container *parent, std::vector<Component *
 	std::vector<Component *> v = parent->GetComponents();
 
 	for (std::vector<Component *>::iterator i=v.begin(); i!=v.end(); i++) {
-		Component *c = (*i);
+		Container *container = dynamic_cast<jgui::Container *>(*i);
 
-		if (c->InstanceOf("jgui::Container") == true) {
-			GetInternalComponents((Container *)c, components);
+		if (container != NULL) {
+			GetInternalComponents(container, components);
 		}
 
-		components->push_back(c);
+		components->push_back(*i);
 	}
 }
 

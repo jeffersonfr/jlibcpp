@@ -146,6 +146,10 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 
+	int x = _horizontal_gap-_border_size,
+			y = _vertical_gap-_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y;
 	int arrow_size,
 			x1 = event->GetX(),
 			y1 = event->GetY(),
@@ -153,17 +157,20 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 			dy = _horizontal_gap-_border_size,
 			dw = _size.width-2*dx-_stone_size,
 			dh = _size.height-2*dy-_stone_size;
-
 	bool catched = false;
 
-	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
-		catched = true;
+	if (_type == JSO_HORIZONTAL) {
+		arrow_size = h/2;
+	} else {
+		arrow_size = w/2;
+	}
 
-		if (_type == JSO_HORIZONTAL) {
-			arrow_size = dh/2;
-		} else {
-			arrow_size = dw/2;
+	if (event->GetType() == JME_PRESSED) {
+		if (event->GetButton() != JMB_BUTTON1) {
+			return false;
 		}
+
+		catched = true;
 
 		if (_type == JSO_HORIZONTAL) {
 			if (y1 > 0 && y1 < (_size.height)) {
@@ -204,18 +211,20 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 		}
 	} else if (event->GetType() == JME_MOVED) {
 		if (_pressed == true) {
+			int diff = GetMaximum()-GetMinimum();
+
 			if (_type == JSO_HORIZONTAL) {
-				SetValue((((GetMaximum()-GetMinimum())*(x1-_stone_size/2-GetX()))/dw));
+				SetValue(diff*(x1-_stone_size/2-arrow_size)/(dw-2*arrow_size));
 			} else if (_type == JSO_VERTICAL) {
-				SetValue((((GetMaximum()-GetMinimum())*(y1-_stone_size/2-GetY()))/dh));
+				SetValue(diff*(y1-_stone_size/2-arrow_size)/(dh-2*arrow_size));
 			}
 		}
 	} else {
+		_pressed = false;
+
 		if (event->GetType() == JME_ROTATED) {
 			SetValue(GetValue()+_minimum_tick*event->GetClickCount());
 		}
-
-		_pressed = false;
 	}
 
 	return catched;
@@ -229,8 +238,8 @@ void ScrollBar::Paint(Graphics *g)
 
 	Color color = _scrollbar_color;
 	
-	int x = _vertical_gap-_border_size,
-			y = _horizontal_gap-_border_size,
+	int x = _horizontal_gap-_border_size,
+			y = _vertical_gap-_border_size,
 			w = _size.width-2*x,
 			h = _size.height-2*y;
 

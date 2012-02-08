@@ -113,7 +113,7 @@ class GraphicPanel : public jgui::Frame{
 		// rotate string
 		DrawString(g, "Rotate String");
 
-		jgui::Font *font = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NONE, 72);
+		jgui::Font *font = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NORMAL, 72);
 
 		double angle = 0.1;
 		

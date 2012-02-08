@@ -84,9 +84,9 @@ void Theme::Update(Component *parent)
 
 	// WARN:: esse metodo pode causar problemas pela falta de sincronizacao com a Window (em caso de remocao ou adicao de componentes)
 	
-	if (parent->InstanceOf("jgui::Window") == true) {
-		Window *w = (Window *)parent;
+	Window *w = dynamic_cast<Window *>(parent);
 
+	if (w != NULL) {
 		w->SetBackgroundColor(_window_bgcolor);
 		w->SetForegroundColor(_window_fgcolor);
 		w->SetBorderColor(_window_border_color);
@@ -105,17 +105,19 @@ void Theme::Update(Component *parent)
 	stack.push_back(parent);
 
 	while (stack.size() > 0) {
-		Component *c = *stack.begin();
+		Container *container = dynamic_cast<jgui::Container *>(*stack.begin());
 
-		if (c->InstanceOf("jgui::Container") == true) {
-			for (std::vector<Component *>::iterator i=((Container *)c)->GetComponents().begin(); i!=((Container *)c)->GetComponents().end(); i++) {
-				Component *component = (*i);
+		if (container != NULL) {
+			for (std::vector<Component *>::iterator i=container->GetComponents().begin(); i!=container->GetComponents().end(); i++) {
+				Container *internal_container = dynamic_cast<jgui::Container *>(*i);
 
-				if (((Container *)c)->InstanceOf("jgui::Container") == true) {
-					stack.push_back(component);
+				if (internal_container != NULL) {
+					stack.push_back(internal_container);
 				}
 			}
 		} else {
+			Component *c = *stack.begin();
+
 			c->SetBackgroundColor(_component_bgcolor);
 			c->SetForegroundColor(_component_fgcolor);
 			c->SetBorderColor(_component_border_color);
@@ -134,9 +136,9 @@ void Theme::Update(Component *parent)
 				c->SetFont(_component_font);
 			}
 		
-			if (c->InstanceOf("jgui::ItemComponent") == true) {
-				ItemComponent *ic = (ItemComponent *)c;
+			ItemComponent *ic = dynamic_cast<ItemComponent *>(c);
 
+			if (ic != NULL) {
 				ic->SetItemColor(_item_color);
 				ic->SetItemForegroundColor(_item_fgcolor);
 				ic->SetItemFocusColor(_item_focus_color);

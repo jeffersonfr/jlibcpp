@@ -679,17 +679,20 @@ void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
 	int line_width = lw;
 	
 	if (line_width > 0) {
-		x = x - line_width / 2;
-		y = y - line_width / 2;
-		w = w + line_width;
-		h = h + line_width;
+		lw = line_width/2;
+
+		x = x - lw;
+		y = y - lw;
+		w = w + 2*lw;
+		h = h + 2*lw;
 	} else {
 		line_width = -line_width;
+		lw = line_width/2;
 
-		x = x + line_width / 2;
-		y = y + line_width / 2;
-		w = w - line_width;
-		h = h - line_width;
+		x = x + lw;
+		y = y + lw;
+		w = w - 2*lw;
+		h = h - 2*lw;
 	}
 
 	dx = SCALE_TO_SCREEN((dx), _screen.width, _scale.width); 
@@ -826,17 +829,20 @@ void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
 	int line_width = lw;
 	
 	if (line_width > 0) {
-		x = x - line_width / 2;
-		y = y - line_width / 2;
-		w = w + line_width;
-		h = h + line_width;
+		lw = line_width/2;
+
+		x = x - lw;
+		y = y - lw;
+		w = w + 2*lw;
+		h = h + 2*lw;
 	} else {
 		line_width = -line_width;
+		lw = line_width/2;
 
-		x = x + line_width / 2;
-		y = y + line_width / 2;
-		w = w - line_width;
-		h = h - line_width;
+		x = x + lw;
+		y = y + lw;
+		w = w - 2*lw;
+		h = h - 2*lw;
 	}
 
 	dx = SCALE_TO_SCREEN((dx), _screen.width, _scale.width); 

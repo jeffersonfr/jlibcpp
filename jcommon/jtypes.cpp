@@ -23,6 +23,45 @@
 
 namespace jcommon {
 
+/**
+ * C++ version 0.4 char* style "itoa":
+ * Written by Lukás Chmela
+ * Released under GPLv3.
+ */
+char * IntToStr(int64_t value, char *result, int radix) 
+{
+	if (radix < 2 || radix > 36) { 
+		*result = '\0'; 
+		
+		return result; 
+	}
+
+	int64_t tmp_value;
+	char *ptr = result, 
+		*ptr1 = result, 
+		tmp_char;
+
+	do {
+		tmp_value = value;
+		value /= radix;
+		*ptr++ = "zyxwvutsrqponmlkjihgfedcba9876543210123456789abcdefghijklmnopqrstuvwxyz" [35 + (tmp_value - value * radix)];
+	} while ( value );
+
+	if (tmp_value < 0) {
+		*ptr++ = '-';
+	}
+
+	*ptr-- = '\0';
+
+	while(ptr1 < ptr) {
+		tmp_char = *ptr;
+		*ptr--= *ptr1;
+		*ptr1++ = tmp_char;
+	}
+
+	return result;
+}
+
 Types::Types():
 	jcommon::Object()
 {
@@ -44,7 +83,13 @@ int Types::StringToInteger(std::string s, int radix)
 
 std::string Types::IntegerToString(int i, int radix)
 {
-	return "";
+	if (radix < 2 || radix > 32) {
+		throw OutOfBoundsException("Bounds of radix exception");
+	}
+	
+	char tmp[32];
+
+	return std::string(IntToStr((int64_t)i, tmp, radix));
 }
 
 int64_t Types::StringToLong(std::string s, int radix)
@@ -62,7 +107,13 @@ int64_t Types::StringToLong(std::string s, int radix)
 
 std::string Types::LongToString(int64_t i, int radix)
 {
-	return "";
+	if (radix < 2 || radix > 32) {
+		throw OutOfBoundsException("Bounds of radix exception");
+	}
+	
+	char tmp[32];
+
+	return std::string(IntToStr((int64_t)i, tmp, radix));
 }
 
 float Types::StringToFloat(std::string s)
@@ -76,7 +127,21 @@ float Types::StringToFloat(std::string s)
 
 std::string Types::FloatToString(float i, int radix)
 {
-	return "";
+	if (radix != 8 && radix != 10 && radix != 16) {
+		throw OutOfBoundsException("Bounds of radix exception");
+	}
+	
+	std::ostringstream o;
+
+	if (radix == 8) {
+		o << std::oct << i << std::flush;
+	} else if (radix == 10) {
+		o << std::dec << i << std::flush;
+	} else if (radix == 16) {
+		o << std::hex << i << std::flush;
+	}
+
+	return o.str();
 }
 
 double Types::StringToDouble(std::string s)
@@ -86,12 +151,21 @@ double Types::StringToDouble(std::string s)
 
 std::string Types::DoubleToString(double i, int radix)
 {
-	return "";
-}
+	if (radix != 8 && radix != 10 && radix != 16) {
+		throw OutOfBoundsException("Bounds of radix exception");
+	}
+	
+	std::ostringstream o;
 
-std::string Types::LongToRadix(int64_t i, int radix)
-{
-	return "";
+	if (radix == 8) {
+		o << std::oct << i << std::flush;
+	} else if (radix == 10) {
+		o << std::dec << i << std::flush;
+	} else if (radix == 16) {
+		o << std::hex << i << std::flush;
+	}
+
+	return o.str();
 }
 
 }

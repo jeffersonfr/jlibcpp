@@ -44,7 +44,6 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 	_is_visible = true;
 	_parent = NULL;
 	_optimized_paint = false;
-	_is_opaque = false;
 	_border = JCB_EMPTY;
 
 	_scroll_dimension.width = _size.width;
@@ -288,8 +287,10 @@ void Container::DoLayout()
 		_layout->DoLayout(this);
 
 		for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-			if ((*i)->InstanceOf("jgui::Container") == true) {
-				dynamic_cast<jgui::Container *>(*i)->DoLayout();
+			Container *container = dynamic_cast<jgui::Container *>(*i);
+			
+			if (container != NULL) {
+				container->DoLayout();
 			}
 		}
 		
@@ -336,9 +337,9 @@ void Container::InvalidateAll()
 
 			component->Invalidate();
 
-			if (component->InstanceOf("jgui::Container") == true) {
-				jgui::Container *container = (jgui::Container *)component;
+			Container *container = dynamic_cast<jgui::Container *>(component);
 
+			if (container != NULL) {
 				containers.push_back(&(container->GetComponents()));
 			}
 		}
@@ -363,9 +364,9 @@ void Container::RevalidateAll()
 
 			component->Revalidate();
 
-			if (component->InstanceOf("jgui::Container") == true) {
-				jgui::Container *container = (jgui::Container *)component;
-
+			Container *container = dynamic_cast<jgui::Container *>(component);
+		
+			if (container != NULL) {
 				containers.push_back(&(container->GetComponents()));
 			}
 		}
@@ -407,7 +408,7 @@ void Container::Paint(Graphics *g)
 					cy = c->GetY()-scrolly,
 					cw = c->GetWidth(),
 					ch = c->GetHeight();
-			bool flag = c->InstanceOf("jgui::Container");
+			bool flag = (dynamic_cast<jgui::Container *>(c) != NULL);
 
 			if (cw > 0 && ch > 0) {
 				g->Translate(cx, cy);
@@ -491,8 +492,10 @@ void Container::Add(Component *c, int index)
 	if (std::find(_components.begin(), _components.end(), c) == _components.end()) {
 		_components.insert(_components.begin()+index, c);
 
-		if (c->InstanceOf("jgui::Container") == true) {
-			jgui::Component *focus = dynamic_cast<jgui::Container *>(c)->GetFocusOwner();
+		Container *container = dynamic_cast<jgui::Container *>(c);
+		
+		if (container != NULL) {
+			jgui::Component *focus = container->GetFocusOwner();
 
 			c->SetParent(this);
 
@@ -517,8 +520,10 @@ void Container::Add(Component *c, GridBagConstraints *constraints)
 	Add(c, GetComponentCount());
 	
 	if (_layout != NULL) {
-		if (_layout->InstanceOf("jgui::GridBagLayout") == true) {
-			((GridBagLayout *)_layout)->AddLayoutComponent(c, constraints);
+		GridBagLayout *layout = dynamic_cast<jgui::GridBagLayout *>(_layout);
+
+		if (layout != NULL) {
+			layout->AddLayoutComponent(c, constraints);
 		}
 	}
 }
@@ -528,8 +533,10 @@ void Container::Add(jgui::Component *c, std::string id)
 	Add(c, GetComponentCount());
 
 	if (_layout != NULL) {
-		if (_layout->InstanceOf("jgui::CardLayout") == true) {
-			((CardLayout *)_layout)->AddLayoutComponent(id, c);
+		CardLayout *layout = dynamic_cast<jgui::CardLayout *>(_layout);
+
+		if (layout != NULL) {
+			layout->AddLayoutComponent(id, c);
 		}
 	}
 }
@@ -539,8 +546,10 @@ void Container::Add(jgui::Component *c, jborderlayout_align_t align)
 	Add(c, GetComponentCount());
 	
 	if (_layout != NULL) {
-		if (_layout->InstanceOf("jgui::BorderLayout") == true) {
-			((BorderLayout *)_layout)->AddLayoutComponent(c, align);
+		BorderLayout *layout = dynamic_cast<jgui::BorderLayout *>(_layout);
+
+		if (layout != NULL) {
+			layout->AddLayoutComponent(c, align);
 		}
 	}
 }
@@ -550,8 +559,9 @@ void Container::Remove(jgui::Component *c)
 	jthread::AutoLock lock(&_container_mutex);
 
 	// INFO:: se o componente em foco pertencer ao container remover o foco
-	if (c->InstanceOf("jgui::Container") == true) {
-		jgui::Container *container = dynamic_cast<jgui::Container *>(c);
+	jgui::Container *container = dynamic_cast<jgui::Container *>(c);
+
+	if (container != NULL) {
 		jgui::Component *focus = GetFocusOwner();
 
 		if ((void *)focus != NULL) {
@@ -576,8 +586,10 @@ void Container::Remove(jgui::Component *c)
 	}
 
 	if (_layout != NULL) {
-		if (_layout->InstanceOf("jgui::BorderLayout") == true) {
-			((BorderLayout *)_layout)->RemoveLayoutComponent(c);
+		jgui::BorderLayout *layout = dynamic_cast<jgui::BorderLayout *>(_layout);
+		
+		if (layout != NULL) {
+			layout->RemoveLayoutComponent(c);
 		}
 	}
 

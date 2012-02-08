@@ -178,7 +178,6 @@ class Component : public virtual jcommon::Object{
 			_is_enabled,
 			_is_focus_cycle_root,
 			_is_theme_enabled,
-			_is_opaque,
 			_is_valid,
 			_is_scrollable_x,
 			_is_scrollable_y,
@@ -480,13 +479,13 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetIgnoreRepaint(bool b);
+		virtual bool GetIgnoreRepaint();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetOpaque(bool opaque);
+		virtual void SetIgnoreRepaint(bool b);
 		
 		/**
 		 * \brief

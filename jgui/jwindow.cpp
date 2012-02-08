@@ -543,8 +543,6 @@ void Window::Repaint(Component *cmp)
 		return;
 	}
 
-	InvalidateAll();
-
 	jpoint_t t = _graphics->Translate();
 
 	_graphics->Reset();
@@ -552,23 +550,41 @@ void Window::Repaint(Component *cmp)
 	_graphics->ReleaseClip();
 
 	DoLayout();
+	InvalidateAll();
 
+	if (cmp == NULL || cmp->IsBackgroundVisible() == false) {
+		cmp = this;
+	}
+ 
 	if (_optimized_paint == false) {
-		Paint(_graphics);
-		
-		_graphics->Flip();
-	} else {
-		if (cmp == NULL || cmp->IsBackgroundVisible() == false) {
-			cmp = this;
+		int x = 0,
+				y = 0,
+				w = GetWidth(),
+				h = GetHeight();
+
+		if (cmp != this) {
+			jpoint_t location = cmp->GetAbsoluteLocation();
+			jsize_t size = cmp->GetSize();
+
+			x = location.x;
+			y = location.y;
+			w = size.width;
+			h = size.height;
 		}
 
+		_graphics->SetClip(x, y, w, h);
+
+		Paint(_graphics);
+		
+		_graphics->Flip(x, y, w, h);
+	} else {
 		jpoint_t location = cmp->GetAbsoluteLocation();
 		jsize_t size = cmp->GetSize();
 
 		_graphics->Translate(location.x, location.y);
-		_graphics->SetClip(0, 0, size.width, size.height);
+		_graphics->SetClip(0, 0, size.width-1, size.height-1);
 
-		if (cmp->InstanceOf("jgui::Container") == true) {
+		if (dynamic_cast<jgui::Container *>(cmp) != NULL) {
 			cmp->Paint(_graphics);
 		} else {
 			if (cmp->IsBackgroundVisible() == true) {
@@ -588,8 +604,45 @@ void Window::Repaint(Component *cmp)
 			cmp->PaintBorders(_graphics);
 		}
 
-		_graphics->Flip(location.x, location.y, size.width, size.height);
+		// INFO:: desenha todos os componentes que intersectam "cmp"
+		{
+			/* TODO:: descobrir como recuperar apenas os componentes e containers que se localizam acima de "cmp"
+			jthread::AutoLock lock(&_container_mutex);
+
+			for (std::vector<jgui::Component *>::iterator i=std::find(_components.begin(), _components.end(), cmp); i!=_components.end(); i++) {
+				jpoint_t location = cmp->GetAbsoluteLocation();
+				jsize_t size = cmp->GetSize();
+
+				_graphics->Translate(location.x, location.y);
+				_graphics->SetClip(0, 0, size.width, size.height);
+
+				if (dynamic_cast<jgui::Container *>(cmp) != NULL) {
+					cmp->Paint(_graphics);
+				} else {
+					if (cmp->IsBackgroundVisible() == true) {
+						_graphics->Reset(); 
+						cmp->PaintBackground(_graphics);
+					}
+
+					_graphics->Reset(); 
+					cmp->Paint(_graphics);
+
+					if (cmp->IsScrollVisible() == true) {
+						_graphics->Reset(); 
+						cmp->PaintScrollbars(_graphics);
+					}
+
+					_graphics->Reset(); 
+					cmp->PaintBorders(_graphics);
+				}
+
+				_graphics->Translate(-location.x, -location.y);
+			}
+			*/
+		}
+
 		_graphics->Translate(-location.x, -location.y);
+		_graphics->Flip(location.x, location.y, size.width, size.height);
 	}
 
 	Revalidate();

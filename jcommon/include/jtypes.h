@@ -37,73 +37,67 @@ class Types : public virtual jcommon::Object{
 
 	private:
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		Types();
-		
-		
+
+
 	public:
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		virtual ~Types();
 
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static int StringToInteger(std::string s, int radix = 10);
 
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static std::string IntegerToString(int i, int radix = 10);
 
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static int64_t StringToLong(std::string s, int radix = 10);
 
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static std::string LongToString(int64_t i, int radix = 10);
 
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static float StringToFloat(std::string s);
 
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static std::string FloatToString(float i, int radix = 10);
 
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static double StringToDouble(std::string s);
 
 		/**
-		* \brief
-		*
-		*/
+		 * \brief
+		 *
+		 */
 		static std::string DoubleToString(double i, int radix = 10);
 
-		/**
-		* \brief
-		*
-		*/
-		static std::string LongToRadix(int64_t i, int radix);
-		
 };
 
 }
