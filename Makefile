@@ -215,7 +215,7 @@ OBJS_jlogger += \
 	   jloggerlib.o
 
 OBJS_jshared += \
-		 jfifoexception.o\
+		 jqueueexception.o\
 		 jmemoryexception.o\
 		 jmemorymap.o\
 		 jmessageexception.o\
@@ -227,7 +227,7 @@ OBJS_jshared += \
 		 jprocessinputstream.o\
 		 jprocessoutputstream.o\
 		 jschedule.o\
-		 jsharedfifo.o\
+		 jsharedqueue.o\
 		 jsharedlib.o\
 		 jsharedmemory.o\
 		 jsharedmutex.o\

@@ -17,10 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SHAREDFIFO_H
-#define J_SHAREDFIFO_H
+#ifndef J_SHAREDQUEUE_H
+#define J_SHAREDQUEUE_H
 
-#include "jobject.h"
+#include "jsharedsemaphore.h"
 
 #include <iostream>
 
@@ -54,7 +54,7 @@ struct jshmbh_t {
  *
  * \author Jeff Ferr
  */
-class SharedFifo : public virtual jcommon::Object{
+class SharedQueue : public virtual jcommon::Object{
 
 	private:
 		struct jshmhandle_t *_shm;
@@ -106,17 +106,13 @@ class SharedFifo : public virtual jcommon::Object{
 		 * \brief Constructor. 
 		 *
 		 */
-#ifdef _WIN32
-		SharedFifo(int key_, int npages_, int struct_size_);
-#else
-		SharedFifo(key_t key_, int npages_, int struct_size_);
-#endif
+		SharedQueue(jkey_t key_, int npages_, int struct_size_);
 	
 		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual ~SharedFifo();
+		virtual ~SharedQueue();
 		
 		/**
 		 * \brief

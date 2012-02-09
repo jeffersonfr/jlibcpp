@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsharedfifo.h"
-#include "jfifoexception.h"
+#include "jsharedqueue.h"
+#include "jqueueexception.h"
 
 namespace jshared {
 
@@ -35,14 +35,10 @@ union semun {
 };
 #endif
 	
-#ifdef _WIN32
-SharedFifo::SharedFifo(int key_, int npages_, int struct_size_):
-#else
-SharedFifo::SharedFifo(key_t key_, int npages_, int struct_size_):
-#endif
+SharedQueue::SharedQueue(jkey_t key_, int npages_, int struct_size_):
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jshared::SharedFifo");
+	jcommon::Object::SetClassName("jshared::SharedQueue");
 
 #ifdef _WIN32
 #else
@@ -55,7 +51,7 @@ SharedFifo::SharedFifo(key_t key_, int npages_, int struct_size_):
 	semid = shmget(key_, npages_*getpagesize(), IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR);
 	
 	if(semid < 0) {
-		throw FifoException("Cannot create a fifo");
+		throw QueueException("Cannot create a fifo");
 	}
 	
 	_shm = (struct jshmhandle_t *)malloc(sizeof(struct jshmhandle_t));
@@ -75,19 +71,19 @@ SharedFifo::SharedFifo(key_t key_, int npages_, int struct_size_):
 	_shm->semid = semget(key_, 1, (IPC_CREAT | IPC_EXCL) + 0600);
 	
 	if(_shm->semid < 0) {
-		throw FifoException("Failed to create a semaphore");
+		throw QueueException("Failed to create a semaphore");
 	}
 	
 	values[0] = 1;
 	arg.array = values;
 	
 	if (semctl(_shm->semid, 0, SETALL, arg) < 0) {
-		throw FifoException("Failed to init a semaphore");
+		throw QueueException("Failed to init a semaphore");
 	}
 #endif
 }
 
-SharedFifo::~SharedFifo()
+SharedQueue::~SharedQueue()
 {
 #ifdef _WIN32
 #else
@@ -101,7 +97,7 @@ SharedFifo::~SharedFifo()
 
 /** Private Functions */
 
-int SharedFifo::LLMemFree()
+int SharedQueue::LLMemFree()
 {
 #ifdef _WIN32
 	return 0;
@@ -122,7 +118,7 @@ int SharedFifo::LLMemFree()
 #endif
 }
 
-int SharedFifo::LLMemUsed()
+int SharedQueue::LLMemUsed()
 {
 #ifdef _WIN32
 	return 0;
@@ -141,7 +137,7 @@ int SharedFifo::LLMemUsed()
 #endif
 }
 
-int SharedFifo::LLPut(void *data, int sz)
+int SharedQueue::LLPut(void *data, int sz)
 {
 #ifdef _WIN32
 	return 0;
@@ -177,7 +173,7 @@ int SharedFifo::LLPut(void *data, int sz)
 #endif
 }
 
-int SharedFifo::LLGet(void *data, int sz)
+int SharedQueue::LLGet(void *data, int sz)
 {
 #ifdef _WIN32
 	return 0;
@@ -190,7 +186,7 @@ int SharedFifo::LLGet(void *data, int sz)
 	
 	if (sz <= 0) {
 		Unlock();
-		throw FifoException("Parameter of ll_get failed");
+		throw QueueException("Parameter of ll_get failed");
 	}
 	
 	if (LLMemUsed() < sz) {
@@ -226,7 +222,7 @@ int SharedFifo::LLGet(void *data, int sz)
 #endif
 }
 
-void SharedFifo::LLHRewind()
+void SharedQueue::LLHRewind()
 {
 #ifdef _WIN32
 #else
@@ -240,18 +236,18 @@ void SharedFifo::LLHRewind()
 #endif
 }
 
-void SharedFifo::Lock()
+void SharedQueue::Lock()
 {
 #ifdef _WIN32
 #else
 	struct sembuf op[1];
 	
 	if (!_shm) {
-		throw FifoException("Memory handler uninitialized");
+		throw QueueException("Memory handler uninitialized");
 	}
 	
 	if (!_shm->semid) {
-		throw FifoException("Semaphore handler uninitialized");
+		throw QueueException("Semaphore handler uninitialized");
 	}
 	
 	op[0].sem_num = 0;
@@ -259,23 +255,23 @@ void SharedFifo::Lock()
 	op[0].sem_flg = 0;
 	
 	if (semop(_shm->semid, op, 1) == -1) {
-		throw FifoException("Semaphore lock failed");
+		throw QueueException("Semaphore lock failed");
 	}
 #endif
 }
 
-void SharedFifo::Unlock()
+void SharedQueue::Unlock()
 {
 #ifdef _WIN32
 #else
 	struct sembuf op[1];
 	
 	if (!_shm) {
-		throw FifoException("Memory handler uninitialized");
+		throw QueueException("Memory handler uninitialized");
 	}
 	
 	if(!_shm->semid) {
-		throw FifoException("Semaphore handler uninitialized");
+		throw QueueException("Semaphore handler uninitialized");
 	}
 	
 	op[0].sem_num = 0;
@@ -283,30 +279,30 @@ void SharedFifo::Unlock()
 	op[0].sem_flg = SEM_UNDO;
 	
 	if (semop(_shm->semid, op, 1) == -1) {
-		throw FifoException("Semaphore unlock failed");
+		throw QueueException("Semaphore unlock failed");
 	}
 #endif
 }
 
 /** End */
 
-void SharedFifo::Attach()
+void SharedQueue::Attach()
 {
 #ifdef _WIN32
 #else
  	if (_shm->mem) {
- 		throw FifoException("Attempt to attach already attached");
+ 		throw QueueException("Attempt to attach already attached");
   	}
    	
 	_shm->mem = shmat(_shm->sid, 0, 0);
 	
 	if (_shm->mem < 0) {
-	  	throw FifoException("Attach memory failed");
+	  	throw QueueException("Attach memory failed");
 	}
 #endif
 }
 
-void SharedFifo::Dealloc()
+void SharedQueue::Dealloc()
 {
 #ifdef _WIN32
 #else
@@ -317,19 +313,19 @@ void SharedFifo::Dealloc()
 #endif
 }
 
-void SharedFifo::Detach()
+void SharedQueue::Detach()
 {
 #ifdef _WIN32
 #else
 	if (!_shm->mem) {
-	   throw FifoException("Attempt to attach already deatached");
+	   throw QueueException("Attempt to attach already deatached");
 	}
 	
 	if (shmdt(_shm->mem) < 0) {
 		if (errno == EACCES) {
-	   		throw FifoException("no access permissions for the requested dettach");
+	   		throw QueueException("no access permissions for the requested dettach");
 		} else {
-	   		throw FifoException("Detach exception");
+	   		throw QueueException("Detach exception");
 		}
 	}
 
@@ -337,37 +333,37 @@ void SharedFifo::Detach()
 #endif
 }
 
-void SharedFifo::Setpriv(void *priv)
+void SharedQueue::Setpriv(void *priv)
 {
 #ifdef _WIN32
 #else
  	Lock();
-  	memcpy((char *)((char *)_shm->mem + sizeof(struct jshmprefix_t)), priv, _shm->privsz);
-   	Unlock();
+ 	memcpy((char *)((char *)_shm->mem + sizeof(struct jshmprefix_t)), priv, _shm->privsz);
+ 	Unlock();
 #endif
 }
 
-void SharedFifo::Getpriv(void *priv)
+void SharedQueue::Getpriv(void *priv)
 {
 #ifdef _WIN32
 #else
  	Lock();
-  	memcpy(priv, (char *)((char *)_shm->mem + sizeof(struct jshmprefix_t)), _shm->privsz);
-   	Unlock();
+ 	memcpy(priv, (char *)((char *)_shm->mem + sizeof(struct jshmprefix_t)), _shm->privsz);
+ 	Unlock();
 #endif
 }
 
-int SharedFifo::Get(void *data,int sz)
+int SharedQueue::Get(void *data,int sz)
 {
 #ifdef _WIN32
 	return 0;
 #else
 	if ((void *)data == NULL) {
-		throw FifoException("Null pointer in data parameter");
+		throw QueueException("Null pointer in data parameter");
 	}
 	
 	if (sz <= 0) {
-		throw FifoException("Invalid value for sz parameter");
+		throw QueueException("Invalid value for sz parameter");
 	}
 	
  	struct jshmbh_t h;
@@ -382,17 +378,17 @@ int SharedFifo::Get(void *data,int sz)
 	
 	if (LLMemUsed() < (int)sizeof(h)) {
 		Unlock();
-		throw FifoException("Used mem less the header sz");
+		throw QueueException("Used mem less the header sz");
 	}
 	
 	LLGet(&h, sizeof(h));
 	
 	if (h.canary != 0xDEADBEEF) {
-		throw FifoException("Unexpected error in fifo");
+		throw QueueException("Unexpected error in fifo");
 	}
 	
 	if (LLMemUsed() < h.sz) {
-		throw FifoException("Shared memory is corrupted");
+		throw QueueException("Shared memory is corrupted");
 	}
 	
 	if (h.sz > sz) {
@@ -410,13 +406,13 @@ int SharedFifo::Get(void *data,int sz)
 #endif
 }
 
-int SharedFifo::Put(void *data, int sz)
+int SharedQueue::Put(void *data, int sz)
 {
 #ifdef _WIN32
 	return 0;
 #else
 	if ((void *)data == NULL) {
-		throw FifoException("Null pointer in data parameter");
+		throw QueueException("Null pointer in data parameter");
 	}
 	
  	struct jshmbh_t h;
@@ -440,13 +436,13 @@ int SharedFifo::Put(void *data, int sz)
 #endif
 }
 
-bool SharedFifo::IsEmpty()
+bool SharedQueue::IsEmpty()
 {
 #ifdef _WIN32
 	return true;
 #else
-  	if ((void *)_shm == NULL) {
-		throw FifoException("Parameter shm is null");
+ 	if ((void *)_shm == NULL) {
+		throw QueueException("Parameter shm is null");
 	}
 	
 	struct jshmprefix_t *p = (struct jshmprefix_t *)_shm->mem;
@@ -463,7 +459,7 @@ bool SharedFifo::IsEmpty()
 #endif
 }
 
-void SharedFifo::Close()
+void SharedQueue::Close()
 {
 }
 

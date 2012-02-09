@@ -556,7 +556,7 @@ void Window::Repaint(Component *cmp)
 		cmp = this;
 	}
  
-	if (_optimized_paint == false) {
+	if (_optimized_paint == false || cmp->IsOpaque() == false) {
 		int x = 0,
 				y = 0,
 				w = GetWidth(),

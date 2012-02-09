@@ -17,116 +17,122 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SHAREDSEMAPHORE_H
-#define J_SHAREDSEMAPHORE_H
+#ifndef J_TABBEDPANE_H
+#define J_TABBEDPANE_H
 
-#include "jobject.h"
+#include "jcontainer.h"
+#include "jselectlistener.h"
 
+#include <string>
 #include <iostream>
+#include <vector>
 
-#ifdef _WIN32
-#include <windows.h>
-#include <winsock.h>
-#else
-#include <sys/socket.h>
-#include <sys/ipc.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <stdint.h>
-#endif
+#include <stdlib.h>
 
-namespace jshared {
-
-struct jsem_op_t {
-	int *id;
-	int length;
-};
-
-#ifdef _WIN32
-typedef int jkey_t;
-#else
-typedef key_t jkey_t;
-#endif
+namespace jgui {
 
 /**
- * \brief Socket.
+ * \brief
  *
  * \author Jeff Ferr
  */
-class SharedSemaphore : public virtual jcommon::Object{
+class TabbedPane : public jgui::Container{
 
-    private:
-		/** \brief */
-		int _id;
-		/** \brief */
-		int _nsem;
-		/** \brief Valor inicial de cada semaphoro */
-		int _value;
-		/** \brief */
-		int _flag;
+	private:
+		std::vector<SelectListener *> _select_listeners;
 
-    public:
-		/**
-		 * \brief Open a semaphore. IPC_PRIVATE parameter create a new semaphore for
-		 * only one process.
-		 *
-		 */
-		SharedSemaphore(jkey_t key_ = 0);
+		jthread::Mutex _pane_mutex;
 
-		/**
-		 * \brief Create a new semaphore.
-		 *
-		 */
-		// SharedSemaphore(key_t key_ = IPC_PRIVATE, int nsem_ = 1, int value_ = 1, int perms_ = 0600);
-		SharedSemaphore(jkey_t key_ = 0, int nsem_ = 1, int value_ = 1, int perms_ = 0600);
-
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~SharedSemaphore();
-
+	public:
 		/**
 		 * \brief
 		 *
 		 */
-		void InitializeSemaphore();
-
-		/**
-		 * \brief
-		 *
-		 */
-		void SetBlocking(bool b);
+		TabbedPane(int x = 0, int y = 0, int width = 0, int height = 0);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsBlocking();
-		
+		virtual ~TabbedPane();
+
 		/**
-		 * \brief Wait milliseconds.
+		 * \brief
 		 *
 		 */
-		void SetTimeout(int millis_, jsem_op_t *op = NULL);
+		virtual int GetCurrentTab();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Wait(jsem_op_t *op = NULL);
+		virtual void AddTab(std::string title, jgui::Image *image, jgui::Component *component, int index = -1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Notify(jsem_op_t *op = NULL);
+		virtual void RemoveTab(int index);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jgui::Component * GetTabComponentAt(int index);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetTabTitle(int index, std::string title);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetTabTitle(int index);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetTabCount();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetPaddind(int left, int top, int right, int bottom);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int IndexOfComponent(jgui::Component *cmp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RegisterTabsListener(SelectListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void RemoveTabsListener(SelectListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DispatchTabsEvent(SelectEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::vector<SelectListener *> & GetTabsListeners();
 
 };
 

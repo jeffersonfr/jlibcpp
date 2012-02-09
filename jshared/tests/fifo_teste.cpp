@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jsharedfifo.h"
+#include "jsharedqueue.h"
 
 #include <iostream>
 
@@ -32,14 +32,14 @@ struct priv {
    int counter;
 };
 
-jshared::SharedFifo *fifo = NULL;
+jshared::SharedQueue *fifo = NULL;
 
 void fifo_teste() 
 {
   	int child;
    	int status;
 	
-	fifo = new jshared::SharedFifo(0, 100, sizeof(struct priv));
+	fifo = new jshared::SharedQueue(0, 100, sizeof(struct priv));
 	
 	if ((child=fork()) != 0) {
 		int i;

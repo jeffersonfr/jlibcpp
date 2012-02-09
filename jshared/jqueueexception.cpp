@@ -18,17 +18,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jfifoexception.h"
+#include "jqueueexception.h"
 
 namespace jshared {
 
-FifoException::FifoException(std::string reason_):
+QueueException::QueueException(std::string reason_):
     jcommon::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jshared::FifoException");
+	jcommon::Object::SetClassName("jshared::QueueException");
 }
 
-FifoException::~FifoException() throw()
+QueueException::~QueueException() throw()
 {
 }
 

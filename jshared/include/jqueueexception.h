@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_FIFOEXCEPTION_H
-#define J_FIFOEXCEPTION_H
+#ifndef J_QUEUEEXCEPTION_H
+#define J_QUEUEEXCEPTION_H
 
 #include "jruntimeexception.h"
 
@@ -32,7 +32,7 @@ namespace jshared {
  *
  * \author Jeff Ferr
  */
-class FifoException : public jcommon::RuntimeException{
+class QueueException : public jcommon::RuntimeException{
 
     private:
 
@@ -41,13 +41,13 @@ class FifoException : public jcommon::RuntimeException{
         * \brief Construtor.
         *
         */
-        FifoException(std::string);
+        QueueException(std::string);
         
         /**
         * \brief Destrutor virtual.
         *
         */
-        virtual ~FifoException() throw();
+        virtual ~QueueException() throw();
 
 };
 

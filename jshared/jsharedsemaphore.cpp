@@ -35,11 +35,7 @@ union semun {
 };
 #endif
 	
-#ifdef _WIN32
-SharedSemaphore::SharedSemaphore(int key_):
-#else 
-SharedSemaphore::SharedSemaphore(key_t key_):
-#endif
+SharedSemaphore::SharedSemaphore(jkey_t key_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::SharedSemaphore");
@@ -54,11 +50,7 @@ SharedSemaphore::SharedSemaphore(key_t key_):
 #endif
 }
 
-#ifdef _WIN32
-SharedSemaphore::SharedSemaphore(int key_, int nsem_, int value_, int perms_):
-#else 
-SharedSemaphore::SharedSemaphore(key_t key_, int nsem_, int value_, int perms_):
-#endif
+SharedSemaphore::SharedSemaphore(jkey_t key_, int nsem_, int value_, int perms_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::SharedSemaphore");
