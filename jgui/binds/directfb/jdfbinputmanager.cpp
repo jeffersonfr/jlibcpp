@@ -61,7 +61,7 @@ void EventBroadcaster::Add(jcommon::EventObject *event, int limit)
 {
 	_mutex.Lock();
 
-	if (limit <= 0 || limit > (int)_events.size()) {
+	if (limit > (int)_events.size()) {
 		_events.push_back(event);
 
 		_sem.Notify();
@@ -683,14 +683,17 @@ void DFBInputManager::DispatchEvent(jcommon::EventObject *event)
 		return;
 	}
 
-	int limit = 0;
+	jgui::KeyEvent *ke = dynamic_cast<jgui::KeyEvent *>(event);
+	jgui::MouseEvent *me = dynamic_cast<jgui::MouseEvent *>(event);
 
-	if (event->InstanceOf("jgui::KeyEvent") == true && _skip_key_events == true) {
-		limit = 2;
-	}
+	int limit = 9999;
 
-	if (event->InstanceOf("jgui::MouseEvent") == true && _skip_mouse_events == true) {
+	if (ke != NULL && _skip_key_events == true) {
 		limit = 2;
+	} else if (me != NULL && _skip_mouse_events == true) {
+		if (me->GetType() == JME_MOVED) {
+			limit = 2;
+		}
 	}
 
 	(*_broadcasters.rbegin())->Add(event, limit);
@@ -987,9 +990,9 @@ void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 
 				if ((event.buttons & DIBM_LEFT) != 0) {
 					button = (jmouse_button_t)(button | JMB_BUTTON1);
-				} else if ((event.button & DIBM_RIGHT) != 0) {
+				} else if ((event.buttons & DIBM_RIGHT) != 0) {
 					button = (jmouse_button_t)(button | JMB_BUTTON2);
-				} else if ((event.button & DIBI_MIDDLE) != 0) {
+				} else if ((event.buttons & DIBI_MIDDLE) != 0) {
 					button = (jmouse_button_t)(button | JMB_BUTTON3);
 				}
 

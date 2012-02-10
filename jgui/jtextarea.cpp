@@ -310,12 +310,12 @@ void TextArea::IncrementLines(int lines)
 
 	if (_font != NULL) {
 		jpoint_t scroll_location = GetScrollLocation();
-		int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+		int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 		int font_height = _font->GetAscender()+_font->GetDescender();
 
 		if (scrolly > 0) {
-			ScrollToVisibleArea(scrollx, std::max(0, (font_height+_rows_gap)*_current_row), _size.width, _size.height, this);
+			SetScrollY(std::max(0, (font_height+_rows_gap)*_current_row));
 		}
 	}
 
@@ -345,12 +345,12 @@ void TextArea::DecrementLines(int lines)
 
 	if (_font != NULL) {
 		jpoint_t scroll_location = GetScrollLocation();
-		int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+		int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 		int font_height = _font->GetAscender()+_font->GetDescender();
 
 		if ((scrolly+_size.height) < (_font->GetHeight()+_rows_gap)*GetRows()) {
-			ScrollToVisibleArea(scrollx, (font_height+_rows_gap)*_current_row, _size.width, _size.height, this);
+			SetScrollY(std::max(0, (font_height+_rows_gap)*_current_row));
 		}
 	}
 
@@ -359,12 +359,6 @@ void TextArea::DecrementLines(int lines)
 
 void TextArea::InitRowsString()
 {
-	if (_rows_string == false) {
-		return;
-	}
-
-	_rows_string = false;
-
 	if (IsFontSet() == false) {
 		return;
 	}
@@ -387,7 +381,7 @@ void TextArea::InitRowsString()
 	int font_height;
 
 	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+	int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			// scrolly = (IsScrollableY() == true)?scroll_location.y:0,
 			scrollw = (IsScrollableY() == true)?(_scroll_size+_scroll_gap):0;
 	int xp = _horizontal_gap+_border_size,
@@ -473,8 +467,10 @@ void TextArea::InitRowsString()
 			break;
 		}
 	}
-		
-	ScrollToVisibleArea(scrollx, std::max(0, (font_height+_rows_gap)*_current_row), _size.width, _size.height, this);
+
+	_rows_string = false;
+	
+	SetScrollY(std::max(0, (font_height+_rows_gap)*_current_row));
 }
 
 std::vector<std::string> & TextArea::GetLines()

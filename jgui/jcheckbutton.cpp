@@ -35,6 +35,7 @@ CheckButton::CheckButton(jcheckbox_type_t type, std::string text, int x, int y, 
 	_type = type;
 	_text = text;
 	_checked = false;
+	_wrap = false;
 
 	SetFocusable(true);
 }

@@ -262,6 +262,8 @@ bool ListBox::ProcessEvent(MouseEvent *event)
 	
 	if (event->GetType() == JME_ROTATED) {
 		SetScrollY(GetScrollY()+_item_size*event->GetClickCount());
+
+		Repaint();
 	}
 
 	return false;

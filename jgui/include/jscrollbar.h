@@ -37,7 +37,6 @@ class ScrollBar : public jgui::SliderComponent{
 
 	private:
 		std::vector<AdjustmentListener *> _adjust_listeners;
-		jscroll_orientation_t _type;
 		int _index,
 			_stone_size,
 			_count_paint;

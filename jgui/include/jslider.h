@@ -38,7 +38,7 @@ class Slider : public jgui::SliderComponent{
 	private:
 		int _stone_size;
 		bool _pressed,
-				 _inverted;
+			_inverted;
 
 	public:
 		/**

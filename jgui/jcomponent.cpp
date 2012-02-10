@@ -390,8 +390,6 @@ void Component::SetScrollX(int x)
 	} else if (_scroll_location.x > (scroll_dimension.width-_size.width)) {
 		_scroll_location.x = scroll_dimension.width-_size.width;
 	}
-
-	Repaint();
 }
 
 void Component::SetScrollY(int y)
@@ -405,8 +403,6 @@ void Component::SetScrollY(int y)
 	} else if (_scroll_location.y > (scroll_dimension.height-_size.height)) {
 		_scroll_location.y = scroll_dimension.height-_size.height;
 	}
-
-	Repaint();
 }
 
 void Component::SetScrollLocation(jpoint_t t)
@@ -428,8 +424,6 @@ void Component::SetScrollLocation(jpoint_t t)
 	} else if (_scroll_location.y > (scroll_dimension.height-_size.height)) {
 		_scroll_location.y = scroll_dimension.height-_size.height;
 	}
-
-	Repaint();
 }
 
 int Component::GetScrollSize()
@@ -1490,8 +1484,12 @@ bool Component::ProcessEvent(MouseEvent *event)
 				_relative_mouse_y = mousey;
 			} else if (mousey < offset) {
 				SetScrollY(scrolly-_scroll_major_increment);
+			
+				Repaint();
 			} else if (mousey > (offset+block_size)) {
 				SetScrollY(scrolly+_scroll_major_increment);
+			
+				Repaint();
 			}
 
 			return true;
@@ -1507,8 +1505,12 @@ bool Component::ProcessEvent(MouseEvent *event)
 				_relative_mouse_y = mousey;
 			} else if (mousex < offset) {
 				SetScrollX(scrollx-_scroll_major_increment);
+
+				Repaint();
 			} else if (mousex > (offset+block_size)) {
 				SetScrollX(scrollx+_scroll_major_increment);
+
+				Repaint();
 			}
 
 			return true;
@@ -1516,12 +1518,16 @@ bool Component::ProcessEvent(MouseEvent *event)
 	} else if (event->GetType() == JME_MOVED) {
 		if (_internal_state == 10) {
 			SetScrollY(scrolly+(int)((mousey-_relative_mouse_y)*((double)scroll_dimension.height/(double)GetHeight())));
+			
+			Repaint();
 
 			_relative_mouse_y = mousey;
 
 			return true;
 		} else if (_internal_state == 11) {
 			SetScrollX(scrollx+(int)((mousex-_relative_mouse_x)*((double)scroll_dimension.width/(double)GetWidth())));
+
+			Repaint();
 
 			_relative_mouse_x = mousex;
 

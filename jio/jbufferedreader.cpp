@@ -115,7 +115,8 @@ std::string BufferedReader::ReadLine(std::string delim)
 			_is_eof = true;
 
 			if (i == 0) {
-				delete lineptr;
+				delete [] lineptr;
+
 				return ""; 
 			}
 
