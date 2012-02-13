@@ -1152,19 +1152,21 @@ jpoint_t Component::GetAbsoluteLocation()
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
-	// INFO:: a posicao absoluta naum considera o deslocamento interno do componente
-	location.x = _location.x; // - ((IsScrollableX() == true)?scrollx:0);
-	location.y = _location.y; // - ((IsScrollableY() == true)?scrolly:0);
+	location.x = _location.x;
+	location.y = _location.y;
 
 	do {
-		// if (parent->GetParent() != NULL) {
 		scroll_location = parent->GetScrollLocation();
 		scrollx = (IsScrollableX() == true)?scroll_location.x:0;
 		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
-		location.x = location.x + parent->GetX() - ((parent->IsScrollableX() == true)?scrollx:0);	
-		location.y = location.y + parent->GetY() - ((parent->IsScrollableY() == true)?scrolly:0);	
-		// }
+		location.x = location.x + ((parent->IsScrollableX() == true)?scrollx:0);	
+		location.y = location.y + ((parent->IsScrollableY() == true)?scrolly:0);	
+	
+		if (parent->GetParent() != NULL) {
+			location.x = location.x + parent->GetX();
+			location.y = location.y + parent->GetY();
+		}
 	} while ((parent = parent->GetParent()) != NULL);
 
 	return location;

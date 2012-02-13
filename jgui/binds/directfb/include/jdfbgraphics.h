@@ -71,9 +71,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		
 		void ApplyDrawing();
 
-		int CalculateGradientChannel(int schannel, int dchannel, int distance, int offset); 
-		void UpdateGradientColor(Color &scolor, Color &dcolor, int distance, int offset);
-		
 		double EvaluateBezier0(double *data, int ndata, double t);
 
 		void RotateImage0(Image *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);

@@ -186,6 +186,7 @@ void Marquee::Paint(Graphics *g)
 
 		g->ClipRect(cx, cy, cw-1, ch-1);
 		g->DrawString(text, px+_position, py);
+		g->SetClip(clip.x, clip.y, clip.width, clip.height);
 	}
 }
 

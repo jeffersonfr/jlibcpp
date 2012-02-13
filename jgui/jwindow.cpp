@@ -571,7 +571,7 @@ void Window::Repaint(Component *cmp)
 			w = size.width;
 			h = size.height;
 		}
-
+		
 		_graphics->SetClip(x, y, w, h);
 
 		Paint(_graphics);

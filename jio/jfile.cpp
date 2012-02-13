@@ -197,6 +197,8 @@ File::File(std::string filename_, int flags_):
 		_type = JFT_UNKNOWN;
 	}
 #else
+	memset(&_stat, 0, sizeof(struct stat));
+
 	if (stat(_filename.c_str(), &_stat) < 0) {
 		return;
 	}
