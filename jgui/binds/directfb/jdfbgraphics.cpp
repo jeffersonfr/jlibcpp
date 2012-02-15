@@ -58,17 +58,13 @@ DFBGraphics::DFBGraphics(void *surface, bool premultiplied):
 	_clip.width = DEFAULT_SCALE_WIDTH;
 	_clip.height = DEFAULT_SCALE_HEIGHT;
 
-	_line_join = JLJ_BEVEL;
-	_line_style = JLS_BUTT;
-	_line_width = 1;
-
-	SetDrawingFlags(JDF_BLEND);
-	SetBlittingFlags(JBF_ALPHACHANNEL);
-	SetPorterDuffFlags(JPF_SRC_OVER);
+	Reset();
 }
 
 DFBGraphics::~DFBGraphics()
 {
+	cairo_destroy(_cairo_context);
+	cairo_surface_destroy(_cairo_surface);
 }
 
 void * DFBGraphics::GetNativeSurface()
@@ -110,14 +106,14 @@ void DFBGraphics::SetClip(int xp, int yp, int wp, int hp)
 
 		rgn.x1 = SCALE_TO_SCREEN((clip.x), _screen.width, _scale.width);
 		rgn.y1 = SCALE_TO_SCREEN((clip.y), _screen.height, _scale.height);
-		rgn.x2 = SCALE_TO_SCREEN((clip.x+clip.width), _screen.width, _scale.width);
-		rgn.y2 = SCALE_TO_SCREEN((clip.y+clip.height), _screen.height, _scale.height);
+		rgn.x2 = SCALE_TO_SCREEN((clip.x+clip.width+1), _screen.width, _scale.width);
+		rgn.y2 = SCALE_TO_SCREEN((clip.y+clip.height+1), _screen.height, _scale.height);
 
 		surface->SetClip(surface, NULL);
 		surface->SetClip(surface, &rgn);
 	
 		cairo_reset_clip(_cairo_context);
-		cairo_rectangle(_cairo_context, rgn.x1, rgn.y1, rgn.x2-rgn.x1+1, rgn.y2-rgn.y1+1);
+		cairo_rectangle(_cairo_context, rgn.x1, rgn.y1, rgn.x2-rgn.x1, rgn.y2-rgn.y1);
 		cairo_clip(_cairo_context);
 	}
 }
@@ -454,19 +450,14 @@ void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 		line_width = -line_width;
 	}
 
-	// CHANGE:: comment the first 'if' for increase speed
-	if (line_width == 1 && cairo_get_antialias(_cairo_context) == CAIRO_ANTIALIAS_NONE) {
-		surface->DrawLine(surface, x0, y0, x1, y1);
-	} else {
-		cairo_save(_cairo_context);
-		cairo_move_to(_cairo_context, x0, y0);
-		cairo_line_to(_cairo_context, x1, y1);
-		cairo_restore(_cairo_context);
-		cairo_set_line_width(_cairo_context, line_width);
+	cairo_save(_cairo_context);
+	cairo_move_to(_cairo_context, x0, y0);
+	cairo_line_to(_cairo_context, x1, y1);
+	cairo_set_line_width(_cairo_context, line_width);
+	cairo_stroke(_cairo_context);
+	cairo_restore(_cairo_context);
 
-		// applyDrawingMode(mode);
-		ApplyDrawing();
-	}
+	ApplyDrawing();
 }
 
 void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
@@ -550,8 +541,8 @@ void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
 
 	cairo_save(_cairo_context);
 	cairo_rectangle(_cairo_context, x, y, w, h);
-  cairo_restore(_cairo_context);
   cairo_fill(_cairo_context);
+  cairo_restore(_cairo_context);
 }
 
 void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
@@ -1012,7 +1003,6 @@ void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, line_width);
 	
-	// applyPen();
 	ApplyDrawing();
 }
 
@@ -1174,12 +1164,12 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 	}
 }
 
-void DFBGraphics::FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
+void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, Color &scolor, Color &dcolor)
 {
-	int xc = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int yc = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int rx = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-xc;
-	int ry = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-yc;
+	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
+	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
+	int rx = SCALE_TO_SCREEN((_translate.x+xcp+wp), _screen.width, _scale.width)-xc;
+	int ry = SCALE_TO_SCREEN((_translate.y+ycp+hp), _screen.height, _scale.height)-yc;
 
 	int sr = scolor.GetRed(),
 			sg = scolor.GetGreen(),
@@ -1205,12 +1195,17 @@ void DFBGraphics::FillRadialGradient(int xp, int yp, int wp, int hp, Color &scol
 	cairo_pattern_destroy(pattern);
 }
 
-void DFBGraphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
+void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p, Color &scolor, Color &dcolor)
 {
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
+	
+	int x1 = SCALE_TO_SCREEN((x1p), _screen.width, _scale.width); 
+	int y1 = SCALE_TO_SCREEN((y1p), _screen.height, _scale.height);
+	int x2 = SCALE_TO_SCREEN((x2p), _screen.width, _scale.width);
+	int y2 = SCALE_TO_SCREEN((y2p), _screen.height, _scale.height);
 
 	int sr = scolor.GetRed(),
 			sg = scolor.GetGreen(),
@@ -1221,7 +1216,9 @@ void DFBGraphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &
 			db = dcolor.GetBlue(),
 			da = dcolor.GetAlpha();
 
-	cairo_pattern_t *pattern = cairo_pattern_create_linear(0.0, 0.0, w, 0.0);
+	jregion_t clip = GetClip();
+
+	cairo_pattern_t *pattern = cairo_pattern_create_linear(x1, y1, x2, y2);
 	
 	cairo_pattern_add_color_stop_rgba(pattern, 0.0, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
 	cairo_pattern_add_color_stop_rgba(pattern, 1.0, dr/255.0, dg/255.0, db/255.0, da/255.0);
@@ -1234,37 +1231,8 @@ void DFBGraphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &
 	cairo_restore(_cairo_context);
 	
 	cairo_pattern_destroy(pattern);
-}
-
-void DFBGraphics::FillVerticalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
-{
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-
-	int sr = scolor.GetRed(),
-			sg = scolor.GetGreen(),
-			sb = scolor.GetBlue(),
-			sa = scolor.GetAlpha();
-	int dr = dcolor.GetRed(),
-			dg = dcolor.GetGreen(),
-			db = dcolor.GetBlue(),
-			da = dcolor.GetAlpha();
-
-	cairo_pattern_t *pattern = cairo_pattern_create_linear(0.0, 0.0, 0.0, h);
 	
-	cairo_pattern_add_color_stop_rgba(pattern, 0.0, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
-	cairo_pattern_add_color_stop_rgba(pattern, 1.0, dr/255.0, dg/255.0, db/255.0, da/255.0);
-	
-	cairo_save(_cairo_context);
-	cairo_translate(_cairo_context, x, y);
-	cairo_rectangle(_cairo_context, 0, 0, w, h);
-	cairo_set_source(_cairo_context, pattern);
-	cairo_fill(_cairo_context);
-	cairo_restore(_cairo_context);
-	
-	cairo_pattern_destroy(pattern);
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::DrawString(std::string text, int xp, int yp)

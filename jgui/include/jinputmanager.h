@@ -38,12 +38,6 @@
 
 namespace jgui {
 
-enum jbroadcaster_event_t {
-	JBE_UNKNOWN			= 0x00,
-	JBE_KEYEVENT		= 0x01,
-	JBE_MOUSEEVENT	= 0x02
-};
-
 class InputManager : public virtual jcommon::Object{
 
 	private:
@@ -148,13 +142,13 @@ class InputManager : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Restore();
+		virtual void Restore();
 
 		/**
 		 * \brief

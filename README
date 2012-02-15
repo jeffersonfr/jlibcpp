@@ -4,7 +4,7 @@
 
 - openssl (http://www.openssl.org)
 - directfb (http://directfb.org)
-	- cairo (--enable-directfb=yes) (http://cairographics.org)
+	- cairo v1.11.2 (--enable-directfb=yes) (http://cairographics.org)
 
 :Makefile defines
 

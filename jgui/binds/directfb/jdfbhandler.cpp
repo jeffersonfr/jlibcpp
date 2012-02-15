@@ -671,6 +671,8 @@ void DFBHandler::Release()
 
 	_cursors.clear();
 
+	InputManager::GetInstance()->Release();
+
 	// INFO:: release windows
 	WindowManager::GetInstance()->Release();
 	
@@ -684,8 +686,6 @@ void DFBHandler::Release()
 		(*i)->Release();
 	}
 	
-	InputManager::GetInstance()->Release();
-
 	// INFO:: release layers
 	if (_layer != NULL) {
 		_layer->Release(_layer);

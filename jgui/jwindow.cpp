@@ -543,6 +543,8 @@ void Window::Repaint(Component *cmp)
 		return;
 	}
 
+	_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
+
 	jpoint_t t = _graphics->Translate();
 
 	_graphics->Reset();
@@ -572,8 +574,6 @@ void Window::Repaint(Component *cmp)
 			h = size.height;
 		}
 		
-		_graphics->SetClip(x, y, w, h);
-
 		Paint(_graphics);
 		
 		_graphics->Flip(x, y, w, h);

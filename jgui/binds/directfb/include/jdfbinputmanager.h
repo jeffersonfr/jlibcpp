@@ -30,39 +30,7 @@
 
 namespace jgui {
 
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class EventBroadcaster : public jthread::Thread {
-
-	private:
-		std::vector<jcommon::EventObject *> _events;
-		jcommon::Listener *_listener;
-		jthread::Condition _sem;
-		jthread::Mutex _mutex;
-		jbroadcaster_event_t _type;
-		bool _running;
-
-	public:
-		EventBroadcaster(jcommon::Listener *listener);
-
-		virtual ~EventBroadcaster();
-
-		jcommon::Listener * GetListener();
-
-		void SetBroadcastEvent(jbroadcaster_event_t t);
-		jbroadcaster_event_t GetBroadcastEvent();
-
-		void Add(jcommon::EventObject *event, int limit = 0);
-
-		void Reset();
-		void Release();
-
-		virtual void Run();
-
-};
+class EventBroadcaster;
 
 class DFBInputManager : public jgui::InputManager, public jthread::Thread{
 
@@ -200,13 +168,13 @@ class DFBInputManager : public jgui::InputManager, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Restore();
+		virtual void Restore();
 
 		/**
 		 * \brief

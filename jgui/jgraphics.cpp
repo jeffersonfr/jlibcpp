@@ -330,15 +330,11 @@ void Graphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_o
 {
 }
 
-void Graphics::FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
+void Graphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, Color &scolor, Color &dcolor)
 {
 }
 
-void Graphics::FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
-{
-}
-
-void Graphics::FillVerticalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor)
+void Graphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p, Color &scolor, Color &dcolor)
 {
 }
 

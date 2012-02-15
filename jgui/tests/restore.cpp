@@ -34,10 +34,12 @@ class ImageTest : public jgui::Component{
 
 			jgui::Graphics *g = _image->GetGraphics();
 
-			g->SetColor(0xf0, 0x00, 0x00, 0xff);
+			g->SetColor(jgui::Color::Blue);
 			g->FillRectangle(0, 0, 100, 100);
-			g->SetColor(0x00, 0x00, 0xf0, 0xff);
-			g->FillRectangle(10, 10, 80, 80);
+			g->SetColor(jgui::Color::Black);
+			g->SetLineWidth(10);
+			g->DrawLine(0, 0, 100, 100);
+			g->DrawLine(0, 100, 100, 0);
 		}
 
 		virtual ~ImageTest()

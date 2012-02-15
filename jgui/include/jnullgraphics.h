@@ -444,19 +444,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillRadialGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor);
+		virtual void FillRadialGradient(int xcp, int ycp, int wp, int hp, Color &scolor, Color &dcolor);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FillHorizontalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void FillVerticalGradient(int xp, int yp, int wp, int hp, Color &scolor, Color &dcolor);
+		virtual void FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p, Color &scolor, Color &dcolor);
 		
 		/**
 		 * \brief

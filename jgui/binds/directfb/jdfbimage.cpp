@@ -106,14 +106,13 @@ DFBImage::~DFBImage()
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Remove(this);
 
 	if (_graphics != NULL) {
-		IDirectFBSurface *surface = (IDirectFBSurface *)_graphics->GetNativeSurface();
-
-		if (surface != NULL) {
-			// CHANGE:: ReleaseSource()->Release()
-			surface->Release(surface);
-		}
-		
 		delete _graphics;
+	}
+
+	IDirectFBSurface *surface = (IDirectFBSurface *)_graphics->GetNativeSurface();
+
+	if (surface != NULL) {
+		surface->Release(surface);
 	}
 }
 

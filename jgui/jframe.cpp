@@ -528,7 +528,7 @@ void Frame::PaintGlassPane(Graphics *g)
 	}
 
 	if (_title != "") {
-		g->FillVerticalGradient(_border_size, _border_size, _size.width-2*_border_size, _insets.top-2*_border_size, _bgcolor, _scrollbar_color);
+		g->FillLinearGradient(_border_size, _border_size, _size.width-2*_border_size, _insets.top-2*_border_size, 0, 0, 0, _insets.top-2*_border_size, _bgcolor, _scrollbar_color);
 
 		if (IsFontSet() == true) {
 			int y = _insets.top-_font->GetHeight()-15;
@@ -558,7 +558,7 @@ void Frame::PaintGlassPane(Graphics *g)
 	}
 
 	if (_subtitles.size() > 0) {
-		int count = 35;
+		int count = _insets.right;
 
 		for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
 			if (IsFontSet() == true) {
@@ -582,9 +582,7 @@ void Frame::PaintGlassPane(Graphics *g)
 
 	int s = _insets.top-30;
 
-	if (s > 4) { 
-		g->SetBlittingFlags(JBF_ALPHACHANNEL);
-
+	if (s > 4) {
 		if (_release_enabled == true && (_frame_buttons & JFB_CLOSE) != 0) {
 			g->DrawImage(_DATA_PREFIX"/images/close.png", _size.width-_insets.right-s, 15, s, s);
 		}

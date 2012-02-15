@@ -486,8 +486,7 @@ void Component::PaintScrollbars(Graphics *g)
 		int offset = (int)(_size.width*offset_ratio),
 			block_size = (int)(_size.width*block_size_ratio);
 
-		g->FillVerticalGradient(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size/2, fgcolor, bgcolor);
-		g->FillVerticalGradient(_border_size, _size.height-_scroll_size/2-_border_size, _size.width-2*_border_size, _scroll_size/2, bgcolor, fgcolor);
+		g->FillLinearGradient(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size, 0, 0, 0, _scroll_size, fgcolor, bgcolor);
 		g->SetColor(fgcolor);
 		g->FillRectangle(offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size);
 	}
@@ -498,8 +497,7 @@ void Component::PaintScrollbars(Graphics *g)
 		int offset = (int)(_size.height*offset_ratio),
 			block_size = (int)(_size.height*block_size_ratio);
 
-		g->FillHorizontalGradient(_size.width-_scroll_size-_border_size, _border_size, _scroll_size/2, _size.height, fgcolor, bgcolor);
-		g->FillHorizontalGradient(_size.width-_scroll_size/2-_border_size, _border_size, _scroll_size/2, _size.height, bgcolor, fgcolor);
+		g->FillLinearGradient(_size.width-_scroll_size-_border_size, _border_size, _scroll_size, _size.height, 0, 0, _scroll_size, 0, fgcolor, bgcolor);
 		g->SetColor(fgcolor);
 		g->FillRectangle(_size.width-_scroll_size-_border_size, offset, _scroll_size, block_size);
 	}
