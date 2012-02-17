@@ -34,18 +34,16 @@ class Buffer {
 		jthread::Mutex _lock;
 		jthread::Condition _empty,
 			_full;
-		char **_buffer;
+		std::string *_buffer;
 		int _index,
-				_buffer_size,
-				*_buffer_index;
+				_buffer_size;
 
 	public:
 		Buffer(int size = BUFFER_SIZE)
 		{
 			_buffer_size = size;
 
-			_buffer = new char*[size];
-			_buffer_index = new int[size];
+			_buffer = new std::string[size];
 
 			Reset();
 		}
@@ -59,7 +57,7 @@ class Buffer {
 			_index = -1;
 		}
 
-		void Put(char *buffer, int size)
+		void Put(std::string data)
 		{
 			jthread::AutoLock l(&_lock);
 
@@ -67,15 +65,14 @@ class Buffer {
 				_full.Wait(&_lock);
 			}
 
-			_index++;
+			_index = (_index+1)%_buffer_size;
 
-			_buffer[_index] = buffer;
-			_buffer_index[_index] = size;
+			_buffer[_index] = data;
 
 			_empty.Notify();
 		}
 
-		void Get(char **buffer, int *size)
+		void Get(std::string *data)
 		{
 			jthread::AutoLock l(&_lock);
 
@@ -83,9 +80,7 @@ class Buffer {
 				_empty.Wait(&_lock);
 			}
 
-			memcpy(*buffer, _buffer[_index], _buffer_index[_index]);
-
-			*size = _buffer_index[_index];
+			(*data) = _buffer[_index];
 
 			_index--;
 
@@ -112,10 +107,10 @@ class Producer : public jthread::Thread {
 			std::string s = "Jeff";
 
 			for (int n = 0; n < 1000000; n++) {
-		  		buffer.Put((char *)s.c_str(), s.size());
+		  		buffer.Put(s);
 			}
 
-			buffer.Put(NULL, 0);
+			buffer.Put("0");
 		}
 
 };
@@ -133,16 +128,13 @@ class Consumer : public jthread::Thread {
 
 		virtual void Run()
 		{
-			char *ptr = new char[BUFFER_SIZE];
-			int size = 0;
+			std::string ptr;
 			
 			do {
-				buffer.Get(&ptr, &size);
+				buffer.Get(&ptr);
 			
 				std::cout << ptr << std::flush;
-			} while (ptr != NULL);
-
-			delete ptr;
+			} while (ptr != "0");
 
 			std::cout << "[over]" << std::endl;
 		}

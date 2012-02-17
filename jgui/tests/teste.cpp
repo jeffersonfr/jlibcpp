@@ -783,12 +783,15 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetColor(pcolor);
 		g->SetLineDash(dashes, 4);
 		g->SetLineWidth(5);
-		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+10, 10+9*(120+10)+10, 6*(120+10));
+		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+10, 10+10*(120+10)-20, 6*(120+10));
 		g->SetLineWidth(10);
-		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+40, 10+9*(120+10)+10, 6*(120+10)+40);
+		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+40, 10+10*(120+10)-20, 6*(120+10)+40);
 		g->SetLineWidth(20);
-		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+80, 10+9*(120+10)+10, 6*(120+10)+80);
+		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+80, 10+10*(120+10)-20, 6*(120+10)+80);
 		g->SetLineDash(NULL, 0);
+
+		// draw line dashes
+		// TODO:: criar algum teste com PATH e FILL
 
 		// draw bezier curve
 		x0 = 10+10*(120+10)+10;

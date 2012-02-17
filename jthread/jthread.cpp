@@ -198,6 +198,7 @@ void * Thread::ThreadMain(void *owner_)
 	delete arg;
 
 	return 0;
+	pthread_exit(NULL);
 }
 
 jthread_map_t * Thread::GetMap(int id)
@@ -269,18 +270,28 @@ void Thread::Start(int id)
 
 	t->thread = _thread;
 #else
+	pthread_attr_t attr;
+
+	pthread_attr_init(&attr);
+
+	if (_type == JTT_DETACH) {
+		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
+	} else {
+		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+	}
+
 	// pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 	if (pthread_create(&_thread, NULL, &(Thread::ThreadMain), arg)) {
 		t->alive = false;
+
+		pthread_attr_destroy(&attr);
 
 		throw ThreadException("Thread create failed");
 	}
 
 	t->thread = _thread;
 
-	if (_type == JTT_DETACH) {
-		pthread_detach(_thread);
-	}
+	pthread_attr_destroy(&attr);
 #endif
 }
 
@@ -322,16 +333,9 @@ bool Thread::Interrupt(int id)
 	}
 
 	if (_type == JTT_JOINABLE) {
-		if (pthread_join(thread, NULL) != 0) {
-			return false; // CHANGE:: throw ThreadException("Wait thread failed");
-		}
-
-		if (pthread_detach(thread) != 0) {
-			return false; // CHANGE:: throw ThreadException("Thread cancel exception !");
-		}
+		pthread_join(thread, NULL);
+		pthread_detach(thread);
 	}
-
-	// memset(&thread, 0, sizeof(pthread_t));
 #endif
 
 	CleanUp();
