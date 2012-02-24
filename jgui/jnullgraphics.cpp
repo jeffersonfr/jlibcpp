@@ -187,14 +187,14 @@ jdrawing_mode_t NullGraphics::GetDrawingMode()
 	return JDM_STROKE;
 }
 
-jporterduff_flags_t NullGraphics::GetPorterDuffFlags()
+jcomposite_flags_t NullGraphics::GetCompositeFlags()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return JPF_NONE;
+	return JCF_NONE;
 }
 
-void NullGraphics::SetPorterDuffFlags(jporterduff_flags_t t)
+void NullGraphics::SetCompositeFlags(jcomposite_flags_t t)
 {
 	JDEBUG(JINFO, "called\n");
 }

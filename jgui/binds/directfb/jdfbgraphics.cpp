@@ -148,36 +148,36 @@ void DFBGraphics::ReleaseClip()
 	}
 }
 
-void DFBGraphics::SetPorterDuffFlags(jporterduff_flags_t t)
+void DFBGraphics::SetCompositeFlags(jcomposite_flags_t t)
 {
-	_porterduff_flags = t;
+	_composite_flags = t;
 
 	if (surface != NULL) {
-		if (_porterduff_flags == JPF_NONE) {
+		if (_composite_flags == JCF_NONE) {
 			surface->SetPorterDuff(surface, DSPD_NONE);
-		} else if (_porterduff_flags == JPF_CLEAR) {
+		} else if (_composite_flags == JCF_CLEAR) {
 			surface->SetPorterDuff(surface, DSPD_CLEAR);
-		} else if (_porterduff_flags == JPF_SRC) {
+		} else if (_composite_flags == JCF_SRC) {
 			surface->SetPorterDuff(surface, DSPD_SRC);
-		} else if (_porterduff_flags == JPF_SRC_OVER) {
+		} else if (_composite_flags == JCF_SRC_OVER) {
 			surface->SetPorterDuff(surface, DSPD_SRC_OVER);
-		} else if (_porterduff_flags == JPF_DST_OVER) {
+		} else if (_composite_flags == JCF_DST_OVER) {
 			surface->SetPorterDuff(surface, DSPD_DST_OVER);
-		} else if (_porterduff_flags == JPF_SRC_IN) {
+		} else if (_composite_flags == JCF_SRC_IN) {
 			surface->SetPorterDuff(surface, DSPD_SRC_IN);
-		} else if (_porterduff_flags == JPF_DST_IN) {
+		} else if (_composite_flags == JCF_DST_IN) {
 			surface->SetPorterDuff(surface, DSPD_DST_IN);
-		} else if (_porterduff_flags == JPF_SRC_OUT) {
+		} else if (_composite_flags == JCF_SRC_OUT) {
 			surface->SetPorterDuff(surface, DSPD_SRC_OUT);
-		} else if (_porterduff_flags == JPF_DST_OUT) {
+		} else if (_composite_flags == JCF_DST_OUT) {
 			surface->SetPorterDuff(surface, DSPD_DST_OUT);
-		} else if (_porterduff_flags == JPF_SRC_ATOP) {
+		} else if (_composite_flags == JCF_SRC_ATOP) {
 			surface->SetPorterDuff(surface, DSPD_SRC_ATOP);
-		} else if (_porterduff_flags == JPF_DST_ATOP) {
+		} else if (_composite_flags == JCF_DST_ATOP) {
 			surface->SetPorterDuff(surface, DSPD_DST_ATOP);
-		} else if (_porterduff_flags == JPF_ADD) {
+		} else if (_composite_flags == JCF_ADD) {
 			surface->SetPorterDuff(surface, DSPD_ADD);
-		} else if (_porterduff_flags == JPF_XOR) {
+		} else if (_composite_flags == JCF_XOR) {
 			surface->SetPorterDuff(surface, DSPD_XOR);
 		}
 	}
@@ -235,9 +235,9 @@ void DFBGraphics::SetBlittingFlags(jblitting_flags_t t)
 	}
 }
 
-jporterduff_flags_t DFBGraphics::GetPorterDuffFlags()
+jcomposite_flags_t DFBGraphics::GetCompositeFlags()
 {
-	return _porterduff_flags;
+	return _composite_flags;
 }
 
 jdrawing_flags_t DFBGraphics::GetDrawingFlags()
@@ -2221,7 +2221,7 @@ void DFBGraphics::Reset()
 
 	SetDrawingFlags(JDF_BLEND);
 	SetBlittingFlags(JBF_ALPHACHANNEL);
-	SetPorterDuffFlags(JPF_SRC_OVER);
+	SetCompositeFlags(JCF_SRC_OVER);
 	SetDrawingMode(JDM_STROKE);
 }
 
@@ -2432,60 +2432,60 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 							ga = 0xff;
 
 							if (_blit_flags & JBF_ALPHACHANNEL) {
-								if (_porterduff_flags == JPF_NONE) {
+								if (_composite_flags == JCF_NONE) {
 									dr = (gr*ga + sr*sa);
 									dg = (gg*ga + sg*sa);
 									db = (gb*ga + sb*sa);
-								} else if (_porterduff_flags == JPF_CLEAR) {
+								} else if (_composite_flags == JCF_CLEAR) {
 									dr = 0;
 									dg = 0;
 									db = 0;
-								} else if (_porterduff_flags == JPF_SRC) {
+								} else if (_composite_flags == JCF_SRC) {
 									dr = gr*0xff;
 									dg = gg*0xff;
 									db = gb*0xff;
-								} else if (_porterduff_flags == JPF_DST) {
+								} else if (_composite_flags == JCF_DST) {
 									dr = sr*0xff;
 									dg = sg*0xff;
 									db = sb*0xff;
-								} else if (_porterduff_flags == JPF_SRC_OVER) {
+								} else if (_composite_flags == JCF_SRC_OVER) {
 									dr = (gr*0xff + sr*sa);
 									dg = (gg*0xff + sg*sa);
 									db = (gb*0xff + sb*sa);
-								} else if (_porterduff_flags == JPF_DST_OVER) {
+								} else if (_composite_flags == JCF_DST_OVER) {
 									dr = (gr*ga + sr*0xff);
 									dg = (sg*ga + sg*0xff);
 									db = (sb*ga + sb*0xff);
-								} else if (_porterduff_flags == JPF_SRC_IN) {
+								} else if (_composite_flags == JCF_SRC_IN) {
 									dr = gr*sa;
 									dg = gg*sa;
 									db = gb*sa;
-								} else if (_porterduff_flags == JPF_DST_IN) {
+								} else if (_composite_flags == JCF_DST_IN) {
 									dr = sr*ga;
 									dg = sg*ga;
 									db = sb*ga;
-								} else if (_porterduff_flags == JPF_SRC_OUT) {
+								} else if (_composite_flags == JCF_SRC_OUT) {
 									dr = gr*ga;
 									dg = gg*ga;
 									db = gb*ga;
-								} else if (_porterduff_flags == JPF_DST_OUT) {
+								} else if (_composite_flags == JCF_DST_OUT) {
 									dr = sr*sa;
 									dg = sg*sa;
 									db = sb*sa;
-								} else if (_porterduff_flags == JPF_SRC_ATOP) {
+								} else if (_composite_flags == JCF_SRC_ATOP) {
 									dr = (gr*sa + sr*sa);
 									dg = (sg*sa + sg*sa);
 									db = (sb*sa + sb*sa);
-								} else if (_porterduff_flags == JPF_DST_ATOP) {
+								} else if (_composite_flags == JCF_DST_ATOP) {
 									dr = (gr*ga + sr*ga);
 									dg = (sg*ga + sg*ga);
 									db = (sb*ga + sb*ga);
-								} else if (_porterduff_flags == JPF_ADD) {
+								} else if (_composite_flags == JCF_ADD) {
 									dr = sr*0xff + ga*0xff;
 									dg = sg*0xff + ga*0xff;
 									db = sb*0xff + ga*0xff;
 									da = 0xff;
-								} else if (_porterduff_flags == JPF_XOR) {
+								} else if (_composite_flags == JCF_XOR) {
 									dr = (gr*ga + sr*sa);
 									dg = (gg*ga + sg*sa);
 									db = (gb*ga + sb*sa);

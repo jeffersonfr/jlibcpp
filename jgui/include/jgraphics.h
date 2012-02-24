@@ -42,21 +42,21 @@ namespace jgui{
  * \brief
  *
  */
-enum jporterduff_flags_t {
-	JPF_NONE			= 0x0001,	// fs: sa fd: 1.0-sa (defaults)
-	JPF_CLEAR			= 0x0002,	// fs: 0.0 fd: 0.0
-	JPF_SRC				= 0x0004,	// fs: 1.0 fd: 0.0
-	JPF_DST				= 0x0008,	// fs: 1.0 fd: 0.0
-	JPF_SRC_OVER	= 0x0010,	// fs: 1.0 fd: 1.0-sa
-	JPF_DST_OVER	= 0x0020,	// fs: 1.0-da fd: 1.0
-	JPF_SRC_IN		= 0x0040,	// fs: da fd: 0.0
-	JPF_DST_IN		= 0x0080,	// fs: 0.0 fd: sa
-	JPF_SRC_OUT		= 0x0100,	// fs: 1.0-da fd: 0.0
-	JPF_DST_OUT		= 0x0200,	// fs: 0.0 fd: 1.0-sa
-	JPF_SRC_ATOP	= 0x0400,	// fs: da fd: 1.0-sa
-	JPF_DST_ATOP	= 0x0800,	// fs: 1.0-da fd: sa
-	JPF_ADD				= 0x1000,	// fs: 1.0 fd: 1.0
-	JPF_XOR				= 0x2000	// fs: 1.0-da fd: 1.0-sa 
+enum jcomposite_flags_t {
+	JCF_NONE			= 0x0000,	// fs: sa fd: 1.0-sa (defaults)
+	JCF_CLEAR			= 0x0001,	// fs: 0.0 fd: 0.0
+	JCF_SRC				= 0x0002,	// fs: 1.0 fd: 0.0
+	JCF_DST				= 0x0004,	// fs: 1.0 fd: 0.0
+	JCF_SRC_OVER	= 0x0008,	// fs: 1.0 fd: 1.0-sa
+	JCF_DST_OVER	= 0x0010,	// fs: 1.0-da fd: 1.0
+	JCF_SRC_IN		= 0x0020,	// fs: da fd: 0.0
+	JCF_DST_IN		= 0x0040,	// fs: 0.0 fd: sa
+	JCF_SRC_OUT		= 0x0080,	// fs: 1.0-da fd: 0.0
+	JCF_DST_OUT		= 0x0100,	// fs: 0.0 fd: 1.0-sa
+	JCF_SRC_ATOP	= 0x0200,	// fs: da fd: 1.0-sa
+	JCF_DST_ATOP	= 0x0400,	// fs: 1.0-da fd: sa
+	JCF_ADD				= 0x0800,	// fs: 1.0 fd: 1.0
+	JCF_XOR				= 0x1000	// fs: 1.0-da fd: 1.0-sa 
 };
 
 /**
@@ -381,7 +381,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jporterduff_flags_t GetPorterDuffFlags();
+		virtual jcomposite_flags_t GetCompositeFlags();
 		
 		/**
 		 * \brief
@@ -405,7 +405,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetPorterDuffFlags(jporterduff_flags_t t);
+		virtual void SetCompositeFlags(jcomposite_flags_t t);
 		
 		/**
 		 * \brief

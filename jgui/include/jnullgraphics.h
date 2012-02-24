@@ -206,7 +206,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual jporterduff_flags_t GetPorterDuffFlags();
+		virtual jcomposite_flags_t GetCompositeFlags();
 		
 		/**
 		 * \brief
@@ -230,7 +230,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetPorterDuffFlags(jporterduff_flags_t t);
+		virtual void SetCompositeFlags(jcomposite_flags_t t);
 		
 		/**
 		 * \brief

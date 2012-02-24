@@ -90,7 +90,7 @@ void Graphics::ReleaseClip()
 {
 }
 
-void Graphics::SetPorterDuffFlags(jporterduff_flags_t t)
+void Graphics::SetCompositeFlags(jcomposite_flags_t t)
 {
 }
 
@@ -106,9 +106,9 @@ void Graphics::SetDrawingMode(jdrawing_mode_t t)
 {
 }
 
-jporterduff_flags_t Graphics::GetPorterDuffFlags()
+jcomposite_flags_t Graphics::GetCompositeFlags()
 {
-	return JPF_NONE;
+	return JCF_NONE;
 }
 
 jdrawing_flags_t Graphics::GetDrawingFlags()

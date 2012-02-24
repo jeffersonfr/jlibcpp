@@ -58,7 +58,7 @@ class DFBGraphics : public virtual jgui::Graphics{
 		jline_style_t _line_style;
 		jdrawing_flags_t _draw_flags;
 		jblitting_flags_t _blit_flags;
-		jporterduff_flags_t _porterduff_flags;
+		jcomposite_flags_t _composite_flags;
 		jdrawing_mode_t _drawing_mode;
 		int _line_width;
 		bool _is_premultiply;
@@ -249,7 +249,7 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual jporterduff_flags_t GetPorterDuffFlags();
+		virtual jcomposite_flags_t GetCompositeFlags();
 		
 		/**
 		 * \brief
@@ -267,7 +267,7 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetPorterDuffFlags(jporterduff_flags_t t);
+		virtual void SetCompositeFlags(jcomposite_flags_t t);
 		
 		/**
 		 * \brief
