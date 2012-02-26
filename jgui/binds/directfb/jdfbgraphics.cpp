@@ -1164,26 +1164,28 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 	}
 }
 
-void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, Color &scolor, Color &dcolor)
+void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, int y0p, int r0p)
 {
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+wp), _screen.width, _scale.width)-xc;
 	int ry = SCALE_TO_SCREEN((_translate.y+ycp+hp), _screen.height, _scale.height)-yc;
+	int x0 = SCALE_TO_SCREEN((_translate.x+xcp+x0p), _screen.width, _scale.width); 
+	int y0 = SCALE_TO_SCREEN((_translate.y+ycp+y0p), _screen.height, _scale.height);
+	int r0 = SCALE_TO_SCREEN((r0p), _screen.width, _scale.width);
 
-	int sr = scolor.GetRed(),
-			sg = scolor.GetGreen(),
-			sb = scolor.GetBlue(),
-			sa = scolor.GetAlpha();
-	int dr = dcolor.GetRed(),
-			dg = dcolor.GetGreen(),
-			db = dcolor.GetBlue(),
-			da = dcolor.GetAlpha();
+	cairo_pattern_t *pattern = cairo_pattern_create_radial(xc, yc, std::max(rx, ry), x0, y0, r0);
 
-	cairo_pattern_t *pattern = cairo_pattern_create_radial(xc, yc, std::max(rx, ry), xc, yc, 0.0);
+	for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
+		jgradient_t gradient = (*i);
 
-	cairo_pattern_add_color_stop_rgba(pattern, 0.0, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
-	cairo_pattern_add_color_stop_rgba(pattern, 1.0, dr/255.0, dg/255.0, db/255.0, da/255.0);
+		int sr = gradient.color.GetRed(),
+				sg = gradient.color.GetGreen(),
+				sb = gradient.color.GetBlue(),
+				sa = gradient.color.GetAlpha();
+
+		cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
+	}
 	
 	cairo_set_source(_cairo_context, pattern);
 	cairo_save(_cairo_context);
@@ -1195,7 +1197,7 @@ void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, Color &sc
 	cairo_pattern_destroy(pattern);
 }
 
-void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p, Color &scolor, Color &dcolor)
+void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p)
 {
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
@@ -1207,21 +1209,20 @@ void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, in
 	int x2 = SCALE_TO_SCREEN((x2p), _screen.width, _scale.width);
 	int y2 = SCALE_TO_SCREEN((y2p), _screen.height, _scale.height);
 
-	int sr = scolor.GetRed(),
-			sg = scolor.GetGreen(),
-			sb = scolor.GetBlue(),
-			sa = scolor.GetAlpha();
-	int dr = dcolor.GetRed(),
-			dg = dcolor.GetGreen(),
-			db = dcolor.GetBlue(),
-			da = dcolor.GetAlpha();
-
 	jregion_t clip = GetClip();
 
 	cairo_pattern_t *pattern = cairo_pattern_create_linear(x1, y1, x2, y2);
 	
-	cairo_pattern_add_color_stop_rgba(pattern, 0.0, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
-	cairo_pattern_add_color_stop_rgba(pattern, 1.0, dr/255.0, dg/255.0, db/255.0, da/255.0);
+	for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
+		jgradient_t gradient = (*i);
+
+		int sr = gradient.color.GetRed(),
+				sg = gradient.color.GetGreen(),
+				sb = gradient.color.GetBlue(),
+				sa = gradient.color.GetAlpha();
+
+		cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
+	}
 	
 	cairo_save(_cairo_context);
 	cairo_translate(_cairo_context, x, y);
@@ -2219,6 +2220,7 @@ void DFBGraphics::Reset()
 	SetLineStyle(JLS_BUTT);
 	SetLineDash(NULL, 0);
 
+	ResetGradientStop();
 	SetDrawingFlags(JDF_BLEND);
 	SetBlittingFlags(JBF_ALPHACHANNEL);
 	SetCompositeFlags(JCF_SRC_OVER);

@@ -867,6 +867,14 @@ class GraphicPanel : public jgui::Canvas{
 		delete f2;
 		delete f3;
 		delete f4;
+
+		jgui::Color c1 = jgui::Color(jgui::Color::Black),
+								c2 = jgui::Color(jgui::Color::White);
+
+		g->SetGradientStop(0.0, c1);
+		g->SetGradientStop(1.0, c2);
+		g->FillRadialGradient(300, 300, 300, 300, 0, 0, 0);
+		g->ResetGradientStop();
 	}
 
 };

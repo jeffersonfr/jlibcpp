@@ -507,7 +507,10 @@ void Menu::Paint(Graphics *g)
 	if (_title != "") {
 		jinsets_t insets = _frame->GetInsets();
 
-		g->FillLinearGradient(_border_size, _border_size, _size.width-2*_border_size, insets.top-2*_border_size, 0, 0, _size.width-2*_border_size, insets.top-2*_border_size, _bgcolor, _scrollbar_color);
+		g->SetGradientStop(0.0, _bgcolor);
+		g->SetGradientStop(1.0, _scrollbar_color);
+		g->FillLinearGradient(_border_size, _border_size, _size.width-2*_border_size, insets.top-2*_border_size, 0, 0, _size.width-2*_border_size, insets.top-2*_border_size);
+		g->ResetGradientStop();
 
 		if (IsFontSet() == true) {
 			std::string text = _title;

@@ -486,7 +486,10 @@ void Component::PaintScrollbars(Graphics *g)
 		int offset = (int)(_size.width*offset_ratio),
 			block_size = (int)(_size.width*block_size_ratio);
 
-		g->FillLinearGradient(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size, 0, 0, 0, _scroll_size, fgcolor, bgcolor);
+		g->SetGradientStop(0.0, _fgcolor);
+		g->SetGradientStop(1.0, bgcolor);
+		g->FillLinearGradient(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size, 0, 0, 0, _scroll_size);
+		g->ResetGradientStop();
 		g->SetColor(fgcolor);
 		g->FillRectangle(offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size);
 	}
@@ -497,7 +500,10 @@ void Component::PaintScrollbars(Graphics *g)
 		int offset = (int)(_size.height*offset_ratio),
 			block_size = (int)(_size.height*block_size_ratio);
 
-		g->FillLinearGradient(_size.width-_scroll_size-_border_size, _border_size, _scroll_size, _size.height, 0, 0, _scroll_size, 0, fgcolor, bgcolor);
+		g->SetGradientStop(0.0, fgcolor);
+		g->SetGradientStop(1.0, bgcolor);
+		g->FillLinearGradient(_size.width-_scroll_size-_border_size, _border_size, _scroll_size, _size.height, 0, 0, _scroll_size, 0);
+		g->ResetGradientStop();
 		g->SetColor(fgcolor);
 		g->FillRectangle(_size.width-_scroll_size-_border_size, offset, _scroll_size, block_size);
 	}
@@ -506,7 +512,10 @@ void Component::PaintScrollbars(Graphics *g)
 		int radius = _scroll_size,
 			radius2 = radius/2;
 
-		g->FillRadialGradient(_size.width-radius2, _size.height-radius2, radius, radius, bgcolor, fgcolor);
+		g->SetGradientStop(0.0, bgcolor);
+		g->SetGradientStop(1.0, fgcolor);
+		g->FillRadialGradient(_size.width-radius2, _size.height-radius2, radius, radius, 0, 0, 0);
+		g->ResetGradientStop();
 	}
 
 	int line_width = g->GetLineWidth();

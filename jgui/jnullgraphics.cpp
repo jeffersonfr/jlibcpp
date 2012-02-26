@@ -374,12 +374,22 @@ void NullGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool cl
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, Color &scolor, Color &dcolor)
+void NullGraphics::SetGradientStop(double stop, const Color &color)
 {
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p, Color &scolor, Color &dcolor)
+void NullGraphics::ResetGradientStop()
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+void NullGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, int y0p, int r0p)
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+void NullGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p)
 {
 	JDEBUG(JINFO, "called\n");
 }

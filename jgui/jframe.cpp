@@ -528,7 +528,10 @@ void Frame::PaintGlassPane(Graphics *g)
 	}
 
 	if (_title != "") {
-		g->FillLinearGradient(_border_size, _border_size, _size.width-2*_border_size, _insets.top-2*_border_size, 0, 0, 0, _insets.top-2*_border_size, _bgcolor, _scrollbar_color);
+		g->SetGradientStop(0.0, _bgcolor);
+		g->SetGradientStop(1.0, _scrollbar_color);
+		g->FillLinearGradient(_border_size, _border_size, _size.width-2*_border_size, _insets.top-2*_border_size, 0, 0, 0, _insets.top-2*_border_size);
+		g->ResetGradientStop();
 
 		if (IsFontSet() == true) {
 			int y = _insets.top-_font->GetHeight()-15;
