@@ -344,7 +344,7 @@ void LocalSocket::Close()
 		throw SocketException("Unknown close exception");
 	}
 	
-	unlink(_file.c_str());
+	// unlink(_file.c_str());
 #endif
 		
 	_is_closed = true;

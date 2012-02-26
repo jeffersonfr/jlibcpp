@@ -561,7 +561,7 @@ class GraphicPanel : public jgui::Canvas{
 			ccolor(0x20, 0xf0, 0x20, 0x80),
 			rcolor(0x00, 0x00, 0x00, 0x80);
 
-		g->SetPorterDuffFlags(jgui::JPF_SRC_OVER);
+		g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 		g->SetDrawingFlags(jgui::JDF_BLEND);
 
 		g->SetColor(rcolor);

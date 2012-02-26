@@ -353,11 +353,11 @@ void LocalDatagramSocket::Close()
 		throw SocketException("Unknown close exception");
 	}
 	
-	if (_server_file != "") {
-		unlink(_server_file.c_str());
-	}
-
-	if (_client_file != "") {
+	if (_client_file == "") {
+		if (_server_file != "") {
+			unlink(_server_file.c_str());
+		}
+	} else {
 		unlink(_client_file.c_str());
 	}
 #endif

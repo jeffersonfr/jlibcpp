@@ -264,9 +264,12 @@ class lUDPTest : public ConnectionTest {
 			int i = 0;
 
 			while (i++ < 100000) {
+				try {
 				socket.Send(buffer, 1500);
+				} catch (...) {
+				}
 			}
-
+			
 			socket.Close();
 		}
 

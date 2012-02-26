@@ -441,7 +441,7 @@ class ApplicationTest : public Scene{
 			int sx = _mindex/3,
 					sy = _mindex%3;
 
-			g->SetPorterDuffFlags(jgui::JPF_NONE);
+			g->SetCompositeFlags(jgui::JCF_NONE);
 			g->DrawImage(_image, sx*169, sy*126, 169, 126, _dx, _dy, 128, 128);
 		}
 
