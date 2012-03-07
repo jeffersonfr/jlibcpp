@@ -300,6 +300,7 @@ int LocalSocket::Receive(char *data_, int size_, bool block_)
 	}
 
 #ifdef _WIN32
+	return -1;
 #else
 	int flags = 0;
 

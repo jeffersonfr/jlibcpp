@@ -54,7 +54,7 @@
 	for (int i=0; i<5; i++) { 																\
 		lines[i] = new Container(); 														\
 																														\
-		lines[i]->SetLayout(new FlowLayout(JFL_CENTER, 4, 0));	\
+		lines[i]->SetLayout(new FlowLayout(JFLA_CENTER, 4, 0));	\
 																														\
 		lines[i]->SetScrollableX(false);												\
 		lines[i]->SetScrollableY(false);												\
@@ -109,15 +109,15 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 	_type = type;
 	_is_password = is_password;
 
-	if (_type == JKB_QWERTY) {
+	if (_type == JKT_QWERTY) {
 		BuildQWERTYKeyboard();
-	} else if (_type == JKB_ALPHA_NUMERIC) {
+	} else if (_type == JKT_ALPHA_NUMERIC) {
 		BuildAlphaNumericKeyboard();
-	} else if (_type == JKB_NUMERIC) {
+	} else if (_type == JKT_NUMERIC) {
 		BuildNumericKeyboard();
-	} else if (_type == JKB_PHONE) {
+	} else if (_type == JKT_PHONE) {
 		BuildPhoneKeyboard();
-	} else if (_type == JKB_INTERNET) {
+	} else if (_type == JKT_INTERNET) {
 		BuildInternetKeyboard();
 	}
 

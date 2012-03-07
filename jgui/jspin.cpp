@@ -68,7 +68,7 @@ void Spin::NextItem()
 
 	Repaint();
 
-	DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_RIGHT));
+	DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JSET_RIGHT));
 }
 
 void Spin::PreviousItem()
@@ -85,7 +85,7 @@ void Spin::PreviousItem()
 
 	Repaint();
 
-	DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_LEFT));
+	DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JSET_LEFT));
 }
 
 bool Spin::ProcessEvent(MouseEvent *event)
@@ -100,7 +100,7 @@ bool Spin::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
+	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		int x1 = event->GetX(),
@@ -179,7 +179,7 @@ bool Spin::ProcessEvent(KeyEvent *event)
 			catched = true;
 		}
 	} else if (action == JKS_ENTER) {
-		DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_ACTION));
+		DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JSET_ACTION));
 
 		catched = true;
 	}

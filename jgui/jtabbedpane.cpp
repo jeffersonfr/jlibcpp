@@ -89,6 +89,7 @@ void TabbedPane::DispatchTabsEvent(SelectEvent *event)
 
 std::vector<SelectListener *> & TabbedPane::GetTabsListeners()
 {
+	return _select_listeners;
 }
 
 

@@ -470,7 +470,7 @@ void Container::Repaint(Component *cmp)
 		_parent->Repaint((cmp == NULL)?this:cmp);
 	}
 
-	Component::DispatchComponentEvent(new ComponentEvent(this, JCE_PAINTED));
+	Component::DispatchComponentEvent(new ComponentEvent(this, JCET_ONPAINT));
 }
 
 void Container::Add(Component *c, int index)
@@ -506,7 +506,7 @@ void Container::Add(Component *c, int index)
 			c->SetParent(this);
 		}
 
-		DispatchContainerEvent(new ContainerEvent(this, c, JCT_COMPONENT_ADDED));
+		DispatchContainerEvent(new ContainerEvent(this, c, JCET_COMPONENT_ADDED));
 	}
 }
 
@@ -599,7 +599,7 @@ void Container::Remove(jgui::Component *c)
 
 			_components.erase(i);
 
-			DispatchContainerEvent(new ContainerEvent(this, c, JCT_COMPONENT_REMOVED));
+			DispatchContainerEvent(new ContainerEvent(this, c, JCET_COMPONENT_REMOVED));
 
 			return;
 		}
@@ -694,7 +694,7 @@ void Container::RequestComponentFocus(jgui::Component *c)
 
 		Repaint(this);
 		
-		dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, JFE_GAINED));
+		dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, JFET_GAINED));
 	}
 }
 
@@ -712,7 +712,7 @@ void Container::ReleaseComponentFocus(jgui::Component *c)
 		if (_focus != NULL && _focus == c) {
 			_focus->Repaint();
 
-			dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, JFE_LOST));
+			dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new FocusEvent(_focus, JFET_LOST));
 		}
 
 		_focus = NULL;
@@ -868,9 +868,9 @@ void Container::DispatchContainerEvent(ContainerEvent *event)
 	while (k++ < (int)_container_listeners.size()) {
 		ContainerListener *listener = _container_listeners[k-1];
 
-		if (event->GetType() == JCT_COMPONENT_ADDED) {
+		if (event->GetType() == JCET_COMPONENT_ADDED) {
 			listener->ComponentAdded(event);
-		} else if (event->GetType() == JCT_COMPONENT_ADDED) {
+		} else if (event->GetType() == JCET_COMPONENT_ADDED) {
 			listener->ComponentRemoved(event);
 		}
 
@@ -883,9 +883,9 @@ void Container::DispatchContainerEvent(ContainerEvent *event)
 
 	/*
 	for (std::vector<ContainerListener *>::iterator i=_container_listeners.begin(); i!=_container_listeners.end(); i++) {
-		if (event->GetType() == JCT_COMPONENT_ADDED) {
+		if (event->GetType() == JCET_COMPONENT_ADDED) {
 			(*i)->ComponentAdded(event);
-		} else if (event->GetType() == JCT_COMPONENT_ADDED) {
+		} else if (event->GetType() == JCET_COMPONENT_ADDED) {
 			(*i)->ComponentRemoved(event);
 		}
 	}

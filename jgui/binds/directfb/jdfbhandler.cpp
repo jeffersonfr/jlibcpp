@@ -165,7 +165,7 @@ int DFBHandler::CreateFont(std::string name, int height, IDirectFBFont **font, D
 	return 0;
 }
 
-int DFBHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height)
+int DFBHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, jpixelformat_t pixelformat, int scale_width, int scale_height)
 {
 	if (scale_width <= 0) {
 		scale_width = _scale.width; // DEFAULT_SCALE_WIDTH;
@@ -194,73 +194,73 @@ int DFBHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 	desc.width = width;
 	desc.height = height;
 
-	if (pixelformat == JSP_UNKNOWN) {
+	if (pixelformat == JPF_UNKNOWN) {
 		desc.pixelformat = DSPF_UNKNOWN;
-	} else if (pixelformat == JSP_ARGB1555) {
+	} else if (pixelformat == JPF_ARGB1555) {
 		desc.pixelformat = DSPF_ARGB1555;
-	} else if (pixelformat == JSP_RGB16) {
+	} else if (pixelformat == JPF_RGB16) {
 		desc.pixelformat = DSPF_RGB16;
-	} else if (pixelformat == JSP_RGB24) {
+	} else if (pixelformat == JPF_RGB24) {
 		desc.pixelformat = DSPF_RGB24;
-	} else if (pixelformat == JSP_RGB32) {
+	} else if (pixelformat == JPF_RGB32) {
 		desc.pixelformat = DSPF_RGB32;
-	} else if (pixelformat == JSP_ARGB) {
+	} else if (pixelformat == JPF_ARGB) {
 		desc.pixelformat = DSPF_ARGB;
-	} else if (pixelformat == JSP_A8) {
+	} else if (pixelformat == JPF_A8) {
 		desc.pixelformat = DSPF_A8;
-	} else if (pixelformat == JSP_YUY2) {
+	} else if (pixelformat == JPF_YUY2) {
 		desc.pixelformat = DSPF_YUY2;
-	} else if (pixelformat == JSP_RGB332) {
+	} else if (pixelformat == JPF_RGB332) {
 		desc.pixelformat = DSPF_RGB332;
-	} else if (pixelformat == JSP_UYVY) {
+	} else if (pixelformat == JPF_UYVY) {
 		desc.pixelformat = DSPF_UYVY;
-	} else if (pixelformat == JSP_I420) {
+	} else if (pixelformat == JPF_I420) {
 		desc.pixelformat = DSPF_I420;
-	} else if (pixelformat == JSP_YV12) {
+	} else if (pixelformat == JPF_YV12) {
 		desc.pixelformat = DSPF_YV12;
-	} else if (pixelformat == JSP_LUT8) {
+	} else if (pixelformat == JPF_LUT8) {
 		desc.pixelformat = DSPF_LUT8;
-	} else if (pixelformat == JSP_ALUT44) {
+	} else if (pixelformat == JPF_ALUT44) {
 		desc.pixelformat = DSPF_ALUT44;
-	} else if (pixelformat == JSP_AiRGB) {
+	} else if (pixelformat == JPF_AiRGB) {
 		desc.pixelformat = DSPF_AiRGB;
-	} else if (pixelformat == JSP_A1) {
+	} else if (pixelformat == JPF_A1) {
 		desc.pixelformat = DSPF_A1;
-	} else if (pixelformat == JSP_NV12) {
+	} else if (pixelformat == JPF_NV12) {
 		desc.pixelformat = DSPF_NV12;
-	} else if (pixelformat == JSP_NV16) {
+	} else if (pixelformat == JPF_NV16) {
 		desc.pixelformat = DSPF_NV16;
-	} else if (pixelformat == JSP_ARGB2554) {
+	} else if (pixelformat == JPF_ARGB2554) {
 		desc.pixelformat = DSPF_ARGB2554;
-	} else if (pixelformat == JSP_ARGB4444) {
+	} else if (pixelformat == JPF_ARGB4444) {
 		desc.pixelformat = DSPF_ARGB4444;
-	} else if (pixelformat == JSP_RGBA4444) {
+	} else if (pixelformat == JPF_RGBA4444) {
 		desc.pixelformat = DSPF_RGBA4444;
-	} else if (pixelformat == JSP_NV21) {
+	} else if (pixelformat == JPF_NV21) {
 		desc.pixelformat = DSPF_NV21;
-	} else if (pixelformat == JSP_AYUV) {
+	} else if (pixelformat == JPF_AYUV) {
 		desc.pixelformat = DSPF_AYUV;
-	} else if (pixelformat == JSP_A4) {
+	} else if (pixelformat == JPF_A4) {
 		desc.pixelformat = DSPF_A4;
-	} else if (pixelformat == JSP_ARGB1666) {
+	} else if (pixelformat == JPF_ARGB1666) {
 		desc.pixelformat = DSPF_ARGB1666;
-	} else if (pixelformat == JSP_ARGB6666) {
+	} else if (pixelformat == JPF_ARGB6666) {
 		desc.pixelformat = DSPF_ARGB6666;
-	} else if (pixelformat == JSP_RGB18) {
+	} else if (pixelformat == JPF_RGB18) {
 		desc.pixelformat = DSPF_RGB18;
-	} else if (pixelformat == JSP_LUT2) {
+	} else if (pixelformat == JPF_LUT2) {
 		desc.pixelformat = DSPF_LUT2;
-	} else if (pixelformat == JSP_RGB444) {
+	} else if (pixelformat == JPF_RGB444) {
 		desc.pixelformat = DSPF_RGB444;
-	} else if (pixelformat == JSP_RGB555) {
+	} else if (pixelformat == JPF_RGB555) {
 		desc.pixelformat = DSPF_RGB555;
-	} else if (pixelformat == JSP_BGR555) {
+	} else if (pixelformat == JPF_BGR555) {
 		desc.pixelformat = DSPF_BGR555;
-	} else if (pixelformat == JSP_RGBA5551) {
+	} else if (pixelformat == JPF_RGBA5551) {
 		desc.pixelformat = DSPF_RGBA5551;
-	} else if (pixelformat == JSP_AVYU) {
+	} else if (pixelformat == JPF_AVYU) {
 		desc.pixelformat = DSPF_AVYU;
-	} else if (pixelformat == JSP_VYU) {
+	} else if (pixelformat == JPF_VYU) {
 		desc.pixelformat = DSPF_VYU;
 	}
 
@@ -573,7 +573,7 @@ void DFBHandler::InitResources()
 void DFBHandler::InitCursors()
 {
 #define CURSOR_INIT(type, ix, iy, hotx, hoty) 																	\
-	t.cursor = Image::CreateImage(w, h, JSP_ARGB, _screen.width, _screen.height);	\
+	t.cursor = Image::CreateImage(w, h, JPF_ARGB, _screen.width, _screen.height);	\
 																																								\
 	t.hot_x = hotx;																																\
 	t.hot_y = hoty;																																\

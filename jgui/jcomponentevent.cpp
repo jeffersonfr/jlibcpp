@@ -22,7 +22,7 @@
 
 namespace jgui {
 
-ComponentEvent::ComponentEvent(void *source, jcomponent_event_t type):
+ComponentEvent::ComponentEvent(void *source, jcomponentevent_type_t type):
 	jcommon::EventObject(source)
 {
 	jcommon::Object::SetClassName("jgui::ComponentEvent");
@@ -34,7 +34,7 @@ ComponentEvent::~ComponentEvent()
 {
 }
 
-jcomponent_event_t ComponentEvent::GetType()
+jcomponentevent_type_t ComponentEvent::GetType()
 {
 	return _type;
 }

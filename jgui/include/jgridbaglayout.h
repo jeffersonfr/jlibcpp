@@ -34,89 +34,89 @@ enum jgridbaglayout_constraints_t {
 	// column or row (<code>gridwidth</code>, <code>gridheight</code>), 
 	// or that this component be placed next to the previously added 
 	// component (<code>gridx</code>, <code>gridy</code>). 
-	JGC_RELATIVE = -1,
+	JGBLC_RELATIVE = -1,
 	// Specifies that this component is the 
 	// last component in its column or row. 
-	JGC_REMAINDER = 0,
+	JGBLC_REMAINDER = 0,
 	// Do not resize the component. 
-	JGC_NONE = 0,
+	JGBLC_NONE = 0,
 	// Resize the component both horizontally and vertically. 
-	JGC_BOTH = 1,
+	JGBLC_BOTH = 1,
 	// Resize the component horizontally but not vertically. 
-	JGC_HORIZONTAL = 2,
+	JGBLC_HORIZONTAL = 2,
 	// Resize the component vertically but not horizontally. 
-	JGC_VERTICAL = 3,
+	JGBLC_VERTICAL = 3,
 	// Put the component in the center of its display area.
-	JGC_CENTER = 10,
+	JGBLC_CENTER = 10,
 	// Put the component at the top of its display area, centered horizontally. 
-	JGC_NORTH = 11,
+	JGBLC_NORTH = 11,
 	// Put the component at the top-right corner of its display area. 
-	JGC_NORTHEAST = 12,
+	JGBLC_NORTHEAST = 12,
 	// Put the component on the right side of its display area, centered vertically.
-	JGC_EAST = 13,
+	JGBLC_EAST = 13,
 	// Put the component at the bottom-right corner of its display area. 
-	JGC_SOUTHEAST = 14,
+	JGBLC_SOUTHEAST = 14,
 	// Put the component at the bottom of its display area, centered horizontally. 
-	JGC_SOUTH = 15,
+	JGBLC_SOUTH = 15,
 	// Put the component at the bottom-left corner of its display area. 
-	JGC_SOUTHWEST = 16,
+	JGBLC_SOUTHWEST = 16,
 	// Put the component on the left side of its display area, centered vertically.
-	JGC_WEST = 17,
+	JGBLC_WEST = 17,
 	// Put the component at the top-left corner of its display area. 
-	JGC_NORTHWEST = 18,
+	JGBLC_NORTHWEST = 18,
 	// Place the component centered aint64_t the edge of its display area
 	// associated with the start of a page for the current
 	// <code>ComponentOrienation</code>.  Equal to NORTH for horizontal orientations. 
-	JGC_PAGE_START = 19,
+	JGBLC_PAGE_START = 19,
 	// Place the component centered aint64_t the edge of its display area  
 	// associated with the end of a page for the current
 	// <code>ComponentOrienation</code>.  Equal to SOUTH for horizontal orientations.
-	JGC_PAGE_END = 20,
+	JGBLC_PAGE_END = 20,
 	// Place the component centered aint64_t the edge of its display area where 
 	// lines of text would normally begin for the current 
 	// <code>ComponentOrienation</code>.  Equal to WEST for horizontal,
 	// left-to-right orientations and EAST for horizontal, right-to-left orientations.
-	JGC_LINE_START = 21,
+	JGBLC_LINE_START = 21,
 	// Place the component centered aint64_t the edge of its display area where 
 	// lines of text would normally end for the current 
 	// <code>ComponentOrienation</code>.  Equal to EAST for horizontal,
 	// left-to-right orientations and WEST for horizontal, right-to-left orientations.
-	JGC_LINE_END = 22,
+	JGBLC_LINE_END = 22,
 	// Place the component in the corner of its display area where 
 	// the first line of text on a page would normally begin for the current 
 	// <code>ComponentOrienation</code>.  Equal to NORTHWEST for horizontal,
 	// left-to-right orientations and NORTHEAST for horizontal, right-to-left orientations.
-	JGC_FIRST_LINE_START = 23,
+	JGBLC_FIRST_LINE_START = 23,
 	// Place the component in the corner of its display area where 
 	// the first line of text on a page would normally end for the current 
 	// <code>ComponentOrienation</code>.  Equal to NORTHEAST for horizontal,
 	// left-to-right orientations and NORTHWEST for horizontal, right-to-left 
 	// orientations.
-	JGC_FIRST_LINE_END = 24,
+	JGBLC_FIRST_LINE_END = 24,
 	// Place the component in the corner of its display area where 
 	// the last line of text on a page would normally start for the current 
 	// <code>ComponentOrienation</code>.  Equal to SOUTHWEST for horizontal,
 	// left-to-right orientations and SOUTHEAST for horizontal, right-to-left 
 	// orientations.
-	JGC_LAST_LINE_START = 25,
+	JGBLC_LAST_LINE_START = 25,
 	// Place the component in the corner of its display area where 
 	// the last line of text on a page would normally end for the current 
 	// <code>ComponentOrienation</code>.  Equal to SOUTHEAST for horizontal,
 	// left-to-right orientations and SOUTHWEST for horizontal, right-to-left 
 	// orientations.
-	JGC_LAST_LINE_END = 26,
+	JGBLC_LAST_LINE_END = 26,
 	// Possible value for the <code>anchor</code> field.  Specifies
 	// that the component should be horizontally centered and
 	// vertically aligned aint64_t the baseline of the prevailing row.
 	// If the component does not have a baseline it will be vertically centered.
-	JGC_BASELINE = 0x100,
+	JGBLC_BASELINE = 0x100,
 	// Possible value for the <code>anchor</code> field.  Specifies
 	// that the component should be horizontally placed aint64_t the
 	// leading edge.  For components with a left-to-right orientation,
 	// the leading edge is the left edge.  Vertically the component is
 	// aligned aint64_t the baseline of the prevailing row.  If the
 	// component does not have a baseline it will be vertically centered.
-	JGC_BASELINE_LEADING = 0x200,
+	JGBLC_BASELINE_LEADING = 0x200,
 	// Possible value for the <code>anchor</code> field.  Specifies
 	// that the component should be horizontally placed aint64_t the
 	// trailing edge.  For components with a left-to-right
@@ -124,13 +124,13 @@ enum jgridbaglayout_constraints_t {
 	// the component is aligned aint64_t the baseline of the prevailing
 	// row.  If the component does not have a baseline it will be
 	// vertically centered.
-	JGC_BASELINE_TRAILING = 0x300,
+	JGBLC_BASELINE_TRAILING = 0x300,
 	// Possible value for the <code>anchor</code> field.  Specifies
 	// that the component should be horizontally centered.  Vertically
 	// the component is positioned so that its bottom edge touches
 	// the baseline of the starting row.  If the starting row does not
 	// have a baseline it will be vertically centered.
-	JGC_ABOVE_BASELINE = 0x400,
+	JGBLC_ABOVE_BASELINE = 0x400,
 	// Possible value for the <code>anchor</code> field.  Specifies
 	// that the component should be horizontally placed aint64_t the
 	// leading edge.  For components with a left-to-right orientation,
@@ -138,7 +138,7 @@ enum jgridbaglayout_constraints_t {
 	// positioned so that its bottom edge touches the baseline of the
 	// starting row.  If the starting row does not have a baseline it
 	// will be vertically centered.
-	JGC_ABOVE_BASELINE_LEADING = 0x500,
+	JGBLC_ABOVE_BASELINE_LEADING = 0x500,
 	// Possible value for the <code>anchor</code> field.  Specifies
 	// that the component should be horizontally placed aint64_t the
 	// trailing edge.  For components with a left-to-right
@@ -146,13 +146,13 @@ enum jgridbaglayout_constraints_t {
 	// the component is positioned so that its bottom edge touches
 	// the baseline of the starting row.  If the starting row does not
 	// have a baseline it will be vertically centered.
-	JGC_ABOVE_BASELINE_TRAILING = 0x600,
+	JGBLC_ABOVE_BASELINE_TRAILING = 0x600,
 	// Possible value for the <code>anchor</code> field.  Specifies
 	// that the component should be horizontally centered.  Vertically
 	// the component is positioned so that its top edge touches the
 	// baseline of the starting row.  If the starting row does not
 	// have a baseline it will be vertically centered.
-	JGC_BELOW_BASELINE = 0x700,
+	JGBLC_BELOW_BASELINE = 0x700,
 	// Possible value for the <code>anchor</code> field.  Specifies
 	// that the component should be horizontally placed aint64_t the
 	// leading edge.  For components with a left-to-right orientation,
@@ -160,7 +160,7 @@ enum jgridbaglayout_constraints_t {
 	// positioned so that its top edge touches the baseline of the
 	// starting row.  If the starting row does not have a baseline it
 	// will be vertically centered.
-	JGC_BELOW_BASELINE_LEADING = 0x800,
+	JGBLC_BELOW_BASELINE_LEADING = 0x800,
 	// Possible value for the <code>anchor</code> field.  Specifies
 	// that the component should be horizontally placed aint64_t the
 	// trailing edge.  For components with a left-to-right
@@ -168,21 +168,20 @@ enum jgridbaglayout_constraints_t {
 	// the component is positioned so that its top edge touches the
 	// baseline of the starting row.  If the starting row does not
 	// have a baseline it will be vertically centered.
-	JGC_BELOW_BASELINE_TRAILING = 0x900
+	JGBLC_BELOW_BASELINE_TRAILING = 0x900
 };
 
 enum jgridbaglayout_style_t {
-	JGS_EMPIRICMULTIPLIER = 2,
+  // The smallest grid that can be laid out by the grid bag layout.
+	JGBLS_MIN_SIZE	= 1,
+  // The preferred grid size that can be laid out by the grid bag layout.
+	JGBLS_PREFERRED_SIZE	= 2,
   // This field is no int64_ter used to reserve arrays and keeped for backward
   // compatibility. Previously, this was
   // the maximum number of grid positions (both horizontal and 
   // vertical) that could be laid out by the grid bag layout.
   // Current implementation doesn't impose any limits on the size of a grid. 
-	JGS_MAXGRIDSIZE	= 512,
-  // The smallest grid that can be laid out by the grid bag layout.
-	JGS_MINSIZE	= 1,
-  // The preferred grid size that can be laid out by the grid bag layout.
-	JGS_PREFERREDSIZE	= 2
+	JGBLS_MAX_GRID_SIZE	= 512
 };
 
 class Container;
@@ -222,15 +221,15 @@ class GridBagConstraints{
 
 		GridBagConstraints() 
 		{
-			this->gridx = JGC_RELATIVE;
-			this->gridy = JGC_RELATIVE;
+			this->gridx = JGBLC_RELATIVE;
+			this->gridy = JGBLC_RELATIVE;
 			this->gridwidth = 1;
 			this->gridheight = 1;
 
 			this->weightx = 0;
 			this->weighty = 0;
-			this->anchor = JGC_CENTER;
-			this->fill = JGC_NONE;
+			this->anchor = JGBLC_CENTER;
+			this->fill = JGBLC_NONE;
 
 			this->ipadx = 0;
 			this->ipady = 0;
@@ -286,7 +285,7 @@ class GridBagConstraints{
 
 		virtual bool IsVerticallyResizable() 
 		{
-			return (fill == JGC_BOTH || fill == JGC_VERTICAL);
+			return (fill == JGBLC_BOTH || fill == JGBLC_VERTICAL);
 		}
 };
 

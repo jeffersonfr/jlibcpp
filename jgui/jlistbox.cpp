@@ -33,7 +33,7 @@ ListBox::ListBox(int x, int y, int width, int height):
 	_pressed = false;
 	_item_size = DEFAULT_ITEM_SIZE;
 	_selected_index = -1;
-	_selection = JLM_NONE_SELECTION;
+	_selection = JLBM_NONE_SELECTION;
 
 	SetFocusable(true);
 }
@@ -141,11 +141,11 @@ bool ListBox::IsSelected(int i)
 		return false;
 	}
 
-	if (_selection == JLM_SINGLE_SELECTION) {
+	if (_selection == JLBM_SINGLE_SELECTION) {
 		if (_selected_index == i) {
 			return true;
 		}
-	} else if (_selection == JLM_MULTI_SELECTION) {
+	} else if (_selection == JLBM_MULTI_SELECTION) {
 		return _items[i]->IsSelected();
 	}
 
@@ -164,7 +164,7 @@ void ListBox::SetSelected(int i)
 		return;
 	}
 
-	if (_selection == JLM_SINGLE_SELECTION) {
+	if (_selection == JLBM_SINGLE_SELECTION) {
 		if (_selected_index == i) {
 			_selected_index = -1;
 		} else {
@@ -172,7 +172,7 @@ void ListBox::SetSelected(int i)
 		}
 
 		Repaint();
-	} else if (_selection == JLM_MULTI_SELECTION) {
+	} else if (_selection == JLBM_MULTI_SELECTION) {
 		if (item->IsSelected()) {
 			item->SetSelected(false);
 		} else {
@@ -195,11 +195,11 @@ void ListBox::Select(int i)
 		return;
 	}
 
-	if (_selection == JLM_SINGLE_SELECTION) {
+	if (_selection == JLBM_SINGLE_SELECTION) {
 		_selected_index = i;
 
 		Repaint();
-	} else if (_selection == JLM_MULTI_SELECTION) {
+	} else if (_selection == JLBM_MULTI_SELECTION) {
 		item->SetSelected(true);
 
 		Repaint();
@@ -218,11 +218,11 @@ void ListBox::Deselect(int i)
 		return;
 	}
 
-	if (_selection == JLM_SINGLE_SELECTION) {
+	if (_selection == JLBM_SINGLE_SELECTION) {
 		_selected_index = -1;
 
 		Repaint();
-	} else if (_selection == JLM_MULTI_SELECTION) {
+	} else if (_selection == JLBM_MULTI_SELECTION) {
 		item->SetSelected(false);
 
 		Repaint();
@@ -260,7 +260,7 @@ bool ListBox::ProcessEvent(MouseEvent *event)
 		return true;
 	}
 	
-	if (event->GetType() == JME_ROTATED) {
+	if (event->GetType() == JMT_ROTATED) {
 		SetScrollY(GetScrollY()+_item_size*event->GetClickCount());
 
 		Repaint();
@@ -307,7 +307,7 @@ bool ListBox::ProcessEvent(KeyEvent *event)
 		SetSelected(_index);
 
 		if (_items.size() > 0) { 
-			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_ACTION));
+			DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JSET_ACTION));
 		}
 
 		catched = true;
@@ -334,7 +334,7 @@ void ListBox::Paint(Graphics *g)
 	int space = 4;
 
 	for (std::vector<jgui::Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-		if ((*i)->GetType() == JMT_IMAGE) {
+		if ((*i)->GetType() == JIT_IMAGE) {
 			space += _item_size + 8;
 
 			break;
@@ -361,11 +361,11 @@ void ListBox::Paint(Graphics *g)
 		}
 
 		if (_index != i) {
-			if (_selection == JLM_SINGLE_SELECTION) {	
+			if (_selection == JLBM_SINGLE_SELECTION) {	
 				if (_selected_index == i) {	
 					g->SetColor(_selected_item_color);
 				}
-			} else if (_selection == JLM_MULTI_SELECTION) {	
+			} else if (_selection == JLBM_MULTI_SELECTION) {	
 				if (item->IsSelected() == true) {	
 					g->SetColor(_selected_item_color);
 				}
@@ -376,11 +376,11 @@ void ListBox::Paint(Graphics *g)
 
 		g->FillRectangle(x, y+(_item_size+_item_gap)*i, w, _item_size);
 
-		if (_selection == JLM_SINGLE_SELECTION) {
+		if (_selection == JLBM_SINGLE_SELECTION) {
 			if (_selected_index == i) {
 				g->SetColor(_selected_item_color);
 			}
-		} else if (_selection == JLM_MULTI_SELECTION) {	
+		} else if (_selection == JLBM_MULTI_SELECTION) {	
 			if (_items[i]->IsSelected() == true) {	
 				g->SetColor(_selected_item_color);
 			}
@@ -388,9 +388,9 @@ void ListBox::Paint(Graphics *g)
 			g->SetColor(_item_color);
 		}
 
-		if (_items[i]->GetType() == JMT_EMPTY) {
-		} else if (_items[i]->GetType() == JMT_TEXT) {
-		} else if (_items[i]->GetType() == JMT_IMAGE) {
+		if (_items[i]->GetType() == JIT_EMPTY) {
+		} else if (_items[i]->GetType() == JIT_TEXT) {
+		} else if (_items[i]->GetType() == JIT_IMAGE) {
 			if (_items[i]->GetImage() != NULL) {
 				g->DrawImage(_items[i]->GetImage(), _horizontal_gap, y+(_item_size+_item_gap)*i, _item_size, _item_size);
 			}
@@ -447,7 +447,7 @@ void ListBox::IncrementLines(int lines)
 	if (_index != old_index) {
 		Repaint();
 
-		DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_UP)); 
+		DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JSET_UP)); 
 	}
 }
 
@@ -484,7 +484,7 @@ void ListBox::DecrementLines(int lines)
 	if (_index != old_index) {
 		Repaint();
 
-		DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JST_DOWN)); 
+		DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JSET_DOWN)); 
 	}
 }
 

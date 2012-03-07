@@ -50,25 +50,37 @@ class ComponentListener : public jcommon::Listener{
 		 * \brief
 		 *
 		 */
-		virtual void ComponentHidden(ComponentEvent *event);
+		virtual void OnHide(ComponentEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void ComponentShown(ComponentEvent *event);
+		virtual void OnShow(ComponentEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void ComponentMoved(ComponentEvent *event);
+		virtual void OnMove(ComponentEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void ComponentPainted(ComponentEvent *event);
+		virtual void OnPaint(ComponentEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void OnEnter(ComponentEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void OnLeave(ComponentEvent *event);
 
 };
 

@@ -22,6 +22,8 @@
 #include "jmath.h"
 #include "jcontainer.h"
 
+#define EMPIRIC_MULTIPLIER 2
+
 namespace jgui {
 
 GridBagLayout::GridBagLayout():
@@ -54,7 +56,7 @@ GridBagLayout::~GridBagLayout()
 
 jsize_t GridBagLayout::GetMinimumLayoutSize(Container *parent)
 {
-	GridBagLayoutInfo *info = GetLayoutInfo(parent, JGS_MINSIZE);
+	GridBagLayoutInfo *info = GetLayoutInfo(parent, JGBLS_MIN_SIZE);
 
 	return GetMinSize(parent, info);
 }
@@ -68,7 +70,7 @@ jsize_t GridBagLayout::GetMaximumLayoutSize(Container *parent)
 
 jsize_t GridBagLayout::GetPreferredLayoutSize(Container *parent)
 {
-	GridBagLayoutInfo *info = GetLayoutInfo(parent, JGS_PREFERREDSIZE);
+	GridBagLayoutInfo *info = GetLayoutInfo(parent, JGBLS_PREFERRED_SIZE);
 
 	return GetMinSize(parent, info);
 }
@@ -256,8 +258,8 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 	 * We need to detect this situation and try to create a
 	 * grid with INT_MAX size instead.
 	 */
-	maximumArrayXIndex = (JGS_EMPIRICMULTIPLIER * arraySizes[0] > INT_MAX )? INT_MAX : JGS_EMPIRICMULTIPLIER*(int)arraySizes[0];
-	maximumArrayYIndex = (JGS_EMPIRICMULTIPLIER * arraySizes[1] > INT_MAX )? INT_MAX : JGS_EMPIRICMULTIPLIER*(int)arraySizes[1];
+	maximumArrayXIndex = (EMPIRIC_MULTIPLIER * arraySizes[0] > INT_MAX )? INT_MAX : EMPIRIC_MULTIPLIER*(int)arraySizes[0];
+	maximumArrayYIndex = (EMPIRIC_MULTIPLIER * arraySizes[1] > INT_MAX )? INT_MAX : EMPIRIC_MULTIPLIER*(int)arraySizes[1];
 
 	delete arraySizes;
 
@@ -313,7 +315,7 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 		}
 
 		/* Cache the current slave's size. */
-		if (sizeflag == JGS_PREFERREDSIZE) {
+		if (sizeflag == JGBLS_PREFERRED_SIZE) {
 			d = comp->GetPreferredSize();
 		} else {
 			d = comp->GetMinimumSize();
@@ -448,9 +450,9 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 		anchor = constraints->anchor;
 		if (hasBaseline) {
 			switch(anchor) {
-				case JGC_BASELINE:
-				case JGC_BASELINE_LEADING:
-				case JGC_BASELINE_TRAILING:
+				case JGBLC_BASELINE:
+				case JGBLC_BASELINE_LEADING:
+				case JGBLC_BASELINE_TRAILING:
 					if (constraints->ascent >= 0) {
 						if (curHeight == 1) {
 							maxAscent[curY] = jmath::Math<int>::Max(maxAscent[curY], constraints->ascent);
@@ -475,9 +477,9 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 						}
 					}
 					break;
-				case JGC_ABOVE_BASELINE:
-				case JGC_ABOVE_BASELINE_LEADING:
-				case JGC_ABOVE_BASELINE_TRAILING:
+				case JGBLC_ABOVE_BASELINE:
+				case JGBLC_ABOVE_BASELINE_LEADING:
+				case JGBLC_ABOVE_BASELINE_TRAILING:
 					// Component positioned above the baseline.
 					// To make the bottom edge of the component aligned
 					// with the baseline the bottom inset is
@@ -486,9 +488,9 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 					maxAscent[curY] = jmath::Math<int>::Max(maxAscent[curY], pixels_diff);
 					maxDescent[curY] = jmath::Math<int>::Max(maxDescent[curY], constraints->insets.bottom);
 					break;
-				case JGC_BELOW_BASELINE:
-				case JGC_BELOW_BASELINE_LEADING:
-				case JGC_BELOW_BASELINE_TRAILING:
+				case JGBLC_BELOW_BASELINE:
+				case JGBLC_BELOW_BASELINE_LEADING:
+				case JGBLC_BELOW_BASELINE_TRAILING:
 					// Component positioned below the baseline. 
 					// To make the top edge of the component aligned
 					// with the baseline the top inset is
@@ -654,9 +656,9 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 				pixels_diff = -1;
 				if (hasBaseline) {
 					switch(constraints->anchor) {
-						case JGC_BASELINE:
-						case JGC_BASELINE_LEADING:
-						case JGC_BASELINE_TRAILING:
+						case JGBLC_BASELINE:
+						case JGBLC_BASELINE_LEADING:
+						case JGBLC_BASELINE_TRAILING:
 							if (constraints->ascent >= 0) {
 								if (constraints->tempHeight == 1) {
 									pixels_diff =
@@ -675,17 +677,17 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 								}
 							}
 							break;
-						case JGC_ABOVE_BASELINE:
-						case JGC_ABOVE_BASELINE_LEADING:
-						case JGC_ABOVE_BASELINE_TRAILING:
+						case JGBLC_ABOVE_BASELINE:
+						case JGBLC_ABOVE_BASELINE_LEADING:
+						case JGBLC_ABOVE_BASELINE_TRAILING:
 							pixels_diff = constraints->insets.top +
 								constraints->minHeight +
 								constraints->ipady +
 								maxDescent[constraints->tempY];
 							break;
-						case JGC_BELOW_BASELINE:
-						case JGC_BELOW_BASELINE_LEADING:
-						case JGC_BELOW_BASELINE_TRAILING:
+						case JGBLC_BELOW_BASELINE:
+						case JGBLC_BELOW_BASELINE_LEADING:
+						case JGBLC_BELOW_BASELINE_TRAILING:
 							pixels_diff = maxAscent[constraints->tempY] +
 								constraints->minHeight +
 								constraints->insets.bottom +
@@ -728,9 +730,9 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 bool GridBagLayout::CalculateBaseline(Component *c, GridBagConstraints *constraints, jsize_t size) 
 {
 	int anchor = constraints->anchor;
-	if (anchor == JGC_BASELINE ||
-			anchor == JGC_BASELINE_LEADING ||
-			anchor == JGC_BASELINE_TRAILING) {
+	if (anchor == JGBLC_BASELINE ||
+			anchor == JGBLC_BASELINE_LEADING ||
+			anchor == JGBLC_BASELINE_TRAILING) {
 		// Apply the padding to the component, then ask for the baseline.
 		int w = size.width + constraints->ipadx;
 		int h = size.height + constraints->ipady;
@@ -789,129 +791,129 @@ void GridBagLayout::AdjustForGravity(GridBagConstraints *constraints, jregion_t 
 	r->height -= (-constraints->insets.top + constraints->insets.bottom);
 
 	diffx = 0;
-	if ((constraints->fill != JGC_HORIZONTAL &&
-				constraints->fill != JGC_BOTH)
+	if ((constraints->fill != JGBLC_HORIZONTAL &&
+				constraints->fill != JGBLC_BOTH)
 			&& (r->width > (constraints->minWidth + constraints->ipadx))) {
 		diffx = r->width - (constraints->minWidth + constraints->ipadx);
 		r->width = constraints->minWidth + constraints->ipadx;
 	}
 
 	diffy = 0;
-	if ((constraints->fill != JGC_VERTICAL && constraints->fill != JGC_BOTH) && (r->height > (constraints->minHeight + constraints->ipady))) {
+	if ((constraints->fill != JGBLC_VERTICAL && constraints->fill != JGBLC_BOTH) && (r->height > (constraints->minHeight + constraints->ipady))) {
 		diffy = r->height - (constraints->minHeight + constraints->ipady);
 		r->height = constraints->minHeight + constraints->ipady;
 	}
 
 	switch (constraints->anchor) {
-		case JGC_BASELINE:
+		case JGBLC_BASELINE:
 			r->x += diffx/2;
 			AlignOnBaseline(constraints, r, cellY, cellHeight);
 			break;
-		case JGC_BASELINE_LEADING:
+		case JGBLC_BASELINE_LEADING:
 			if (rightToLeft) {
 				r->x += diffx;
 			}
 			AlignOnBaseline(constraints, r, cellY, cellHeight);
 			break;
-		case JGC_BASELINE_TRAILING:
+		case JGBLC_BASELINE_TRAILING:
 			if (!rightToLeft) {
 				r->x += diffx;
 			}
 			AlignOnBaseline(constraints, r, cellY, cellHeight);
 			break;
-		case JGC_ABOVE_BASELINE:
+		case JGBLC_ABOVE_BASELINE:
 			r->x += diffx/2;
 			AlignAboveBaseline(constraints, r, cellY, cellHeight);
 			break;
-		case JGC_ABOVE_BASELINE_LEADING:
+		case JGBLC_ABOVE_BASELINE_LEADING:
 			if (rightToLeft) {
 				r->x += diffx;
 			}
 			AlignAboveBaseline(constraints, r, cellY, cellHeight);
 			break;
-		case JGC_ABOVE_BASELINE_TRAILING:
+		case JGBLC_ABOVE_BASELINE_TRAILING:
 			if (!rightToLeft) {
 				r->x += diffx;
 			}
 			AlignAboveBaseline(constraints, r, cellY, cellHeight);
 			break;
-		case JGC_BELOW_BASELINE:
+		case JGBLC_BELOW_BASELINE:
 			r->x += diffx/2;
 			AlignBelowBaseline(constraints, r, cellY, cellHeight);
 			break;
-		case JGC_BELOW_BASELINE_LEADING:
+		case JGBLC_BELOW_BASELINE_LEADING:
 			if (rightToLeft) {
 				r->x += diffx;
 			}
 			AlignBelowBaseline(constraints, r, cellY, cellHeight);
 			break;
-		case JGC_BELOW_BASELINE_TRAILING:
+		case JGBLC_BELOW_BASELINE_TRAILING:
 			if (!rightToLeft) {
 				r->x += diffx;
 			}
 			AlignBelowBaseline(constraints, r, cellY, cellHeight);
 			break;
-		case JGC_CENTER:
+		case JGBLC_CENTER:
 			r->x += diffx/2;
 			r->y += diffy/2;
 			break;
-		case JGC_PAGE_START:
-		case JGC_NORTH:
+		case JGBLC_PAGE_START:
+		case JGBLC_NORTH:
 			r->x += diffx/2;
 			break;
-		case JGC_NORTHEAST:
+		case JGBLC_NORTHEAST:
 			r->x += diffx;
 			break;
-		case JGC_EAST:
+		case JGBLC_EAST:
 			r->x += diffx;
 			r->y += diffy/2;
 			break;
-		case JGC_SOUTHEAST:
+		case JGBLC_SOUTHEAST:
 			r->x += diffx;
 			r->y += diffy;
 			break;
-		case JGC_PAGE_END:
-		case JGC_SOUTH:
+		case JGBLC_PAGE_END:
+		case JGBLC_SOUTH:
 			r->x += diffx/2;
 			r->y = diffy;
 			break;
-		case JGC_SOUTHWEST:
+		case JGBLC_SOUTHWEST:
 			r->y += diffy;
 			break;
-		case JGC_WEST:
+		case JGBLC_WEST:
 			r->y += diffy/2;
 			break;
-		case JGC_NORTHWEST:
+		case JGBLC_NORTHWEST:
 			break;
-		case JGC_LINE_START:
+		case JGBLC_LINE_START:
 			if (rightToLeft) {
 				r->x += diffx;
 			}
 			r->y += diffy/2;
 			break;
-		case JGC_LINE_END:
+		case JGBLC_LINE_END:
 			if (!rightToLeft) {
 				r->x += diffx;
 			}
 			r->y += diffy/2;
 			break;
-		case JGC_FIRST_LINE_START:
+		case JGBLC_FIRST_LINE_START:
 			if (rightToLeft) {
 				r->x += diffx;
 			}	
 			break;
-		case JGC_FIRST_LINE_END:
+		case JGBLC_FIRST_LINE_END:
 			if (!rightToLeft) {
 				r->x += diffx;
 			}	
 			break;
-		case JGC_LAST_LINE_START:
+		case JGBLC_LAST_LINE_START:
 			if (rightToLeft) {
 				r->x += diffx;
 			}
 			r->y += diffy;
 			break;
-		case JGC_LAST_LINE_END:
+		case JGBLC_LAST_LINE_END:
 			if (!rightToLeft) {
 				r->x += diffx;
 			}
@@ -1156,11 +1158,11 @@ void GridBagLayout::ArrangeGrid(Container *parent)
 	 * of space needed.
 	 */
 
-	info = GetLayoutInfo(parent, JGS_PREFERREDSIZE);
+	info = GetLayoutInfo(parent, JGBLS_PREFERRED_SIZE);
 	d = GetMinSize(parent, info);
 
 	if (parent->GetWidth() < d.width || parent->GetHeight() < d.height) {
-		info = GetLayoutInfo(parent, JGS_MINSIZE);
+		info = GetLayoutInfo(parent, JGBLS_MIN_SIZE);
 		d = GetMinSize(parent, info);
 	}
 

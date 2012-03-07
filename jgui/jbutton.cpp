@@ -89,7 +89,7 @@ bool Button::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
+	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		DispatchButtonEvent(new ButtonEvent(this));

@@ -85,13 +85,13 @@ void SliderComponent::SetValue(int i)
 		_value = i;
 
 		if (diff > _minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAT_BLOCK_INCREMENT, _value));
+			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_BLOCK_INCREMENT, _value));
 		} else if (diff < -_minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAT_BLOCK_DECREMENT, _value));
+			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_BLOCK_DECREMENT, _value));
 		} else if (diff > 0 && diff <= _minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAT_UNIT_INCREMENT, _value));
+			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_UNIT_INCREMENT, _value));
 		} else if (diff < 0 && diff >= -_minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAT_UNIT_DECREMENT, _value));
+			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_UNIT_DECREMENT, _value));
 		}
 	}
 

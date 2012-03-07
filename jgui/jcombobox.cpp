@@ -70,7 +70,7 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
+	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		int x1 = event->GetX(),
@@ -150,7 +150,7 @@ jvertical_align_t ComboBox::GetVerticalAlign()
 
 void ComboBox::ItemSelected(SelectEvent *event)
 {
-	DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), JST_ACTION));
+	DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), JSET_ACTION));
 }
 
 void ComboBox::ItemChanged(SelectEvent *event)
@@ -160,9 +160,9 @@ void ComboBox::ItemChanged(SelectEvent *event)
 	Repaint();
 
 	if (GetCurrentIndex() > _old_index || (GetCurrentIndex() == 0 && _menu->GetItemsSize()-1)) {
-		DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), JST_DOWN));
+		DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), JSET_DOWN));
 	} else {
-		DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), JST_UP));
+		DispatchSelectEvent(new SelectEvent(this, event->GetItem(), event->GetIndex(), JSET_UP));
 	}
 }
 

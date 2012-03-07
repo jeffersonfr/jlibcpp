@@ -624,7 +624,7 @@ bool AddMessage::ProcessEvent(jgui::KeyEvent *event)
 		if (GetFocusOwner() == hour) {
 			tmp = hour->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_PHONE, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_PHONE, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(hour->GetText());
@@ -639,7 +639,7 @@ bool AddMessage::ProcessEvent(jgui::KeyEvent *event)
 		} else if (GetFocusOwner() == minute) {
 			tmp = minute->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_PHONE, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_PHONE, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(minute->GetText());
@@ -683,7 +683,7 @@ bool AddMessage::ProcessEvent(jgui::KeyEvent *event)
 		} else if (GetFocusOwner() == message) {
 			tmp = message->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_ALPHA_NUMERIC, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_ALPHA_NUMERIC, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(message->GetText());

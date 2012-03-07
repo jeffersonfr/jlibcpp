@@ -202,9 +202,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			check1 = new jgui::CheckButton(jgui::JCT_CHECK, "wrap", 500, 740, 300);
-			check2 = new jgui::CheckButton(jgui::JCT_CHECK, "password", 500, 795, 300);
-			check3 = new jgui::CheckButton(jgui::JCT_CHECK, "hide", 500, 850, 300);
+			check1 = new jgui::CheckButton(jgui::JCBT_CHECK, "wrap", 500, 740, 300);
+			check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "password", 500, 795, 300);
+			check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "hide", 500, 850, 300);
 
 			check1->SetSelected(true);
 
@@ -214,9 +214,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			radio1 = new jgui::CheckButton(jgui::JCT_RADIO, "left", 860, 740, 300);
-			radio2 = new jgui::CheckButton(jgui::JCT_RADIO, "center", 860, 795, 300);
-			radio3 = new jgui::CheckButton(jgui::JCT_RADIO, "right", 860, 850, 300);
+			radio1 = new jgui::CheckButton(jgui::JCBT_RADIO, "left", 860, 740, 300);
+			radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "center", 860, 795, 300);
+			radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "right", 860, 850, 300);
 
 			group = new jgui::CheckButtonGroup();
 
@@ -376,7 +376,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 		if (event->GetSymbol() == jgui::JKS_ENTER) {
 			if (GetFocusOwner() == text_field) {
-				jgui::Keyboard keyboard(500, 400, jgui::JKB_QWERTY, false);
+				jgui::Keyboard keyboard(500, 400, jgui::JKT_QWERTY, false);
 
 				keyboard.RegisterKeyboardListener(dynamic_cast<jgui::KeyboardListener *>(this));
 				keyboard.Show();

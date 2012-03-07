@@ -30,11 +30,11 @@ namespace jgui {
  *
  */
 enum jselectevent_type_t {
-	JST_LEFT,
-	JST_RIGHT,
-	JST_UP,
-	JST_DOWN,
-	JST_ACTION
+	JSET_LEFT,
+	JSET_RIGHT,
+	JSET_UP,
+	JSET_DOWN,
+	JSET_ACTION
 };
 
 /**

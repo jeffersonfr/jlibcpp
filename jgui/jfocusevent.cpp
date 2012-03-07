@@ -22,7 +22,7 @@
 
 namespace jgui {
 
-FocusEvent::FocusEvent(void *source, jfocus_event_t type):
+FocusEvent::FocusEvent(void *source, jfocusevent_type_t type):
 	jcommon::EventObject(source)
 {
 	jcommon::Object::SetClassName("jgui::FocusEvent");
@@ -32,7 +32,7 @@ FocusEvent::~FocusEvent()
 {
 }
 
-jfocus_event_t FocusEvent::GetType()
+jfocusevent_type_t FocusEvent::GetType()
 {
 	return _type;
 }

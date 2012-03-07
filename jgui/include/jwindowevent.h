@@ -29,12 +29,12 @@ namespace jgui {
  *
  */
 enum jwindowevent_type_t {
-	JWT_CLOSING,
-	JWT_CLOSED,
-	JWT_OPENED,
-	JWT_RESIZED,
-	JWT_MOVED,
-	JWT_PAINTED
+	JWET_CLOSING,
+	JWET_CLOSED,
+	JWET_OPENED,
+	JWET_RESIZED,
+	JWET_MOVED,
+	JWET_PAINTED
 };
 
 /**

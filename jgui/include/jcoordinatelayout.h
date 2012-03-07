@@ -33,9 +33,9 @@ namespace jgui {
  * \brief
  *
  */
-enum jcoordinate_layout_t {
-	JCL_HORIZONTAL	= 1,
-	JCL_VERTICAL		= 2
+enum jcoordinatelayout_orientation_t {
+	JCLO_HORIZONTAL	= 0x01,
+	JCLO_VERTICAL		= 0x02
 };
 
 /**
@@ -46,7 +46,7 @@ enum jcoordinate_layout_t {
 class CoordinateLayout : public Layout{
 
 	private:
-		jcoordinate_layout_t _type;
+		jcoordinatelayout_orientation_t _type;
 		int _width,
 				_height;
 
@@ -55,7 +55,7 @@ class CoordinateLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		CoordinateLayout(int width = -1, int height = -1, jcoordinate_layout_t type = (jcoordinate_layout_t)(JCL_HORIZONTAL | JCL_VERTICAL));
+		CoordinateLayout(int width = -1, int height = -1, jcoordinatelayout_orientation_t type = (jcoordinatelayout_orientation_t)(JCLO_HORIZONTAL | JCLO_VERTICAL));
 		
 		/**
 		 * \brief
@@ -79,7 +79,7 @@ class CoordinateLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		virtual void SetType(jcoordinate_layout_t type);
+		virtual void SetType(jcoordinatelayout_orientation_t type);
 
 		/**
 		 * \brief
@@ -97,7 +97,7 @@ class CoordinateLayout : public Layout{
 		 * \brief
 		 *
 		 */
-		virtual jcoordinate_layout_t GetType();
+		virtual jcoordinatelayout_orientation_t GetType();
 
 		/**
 		 * \brief

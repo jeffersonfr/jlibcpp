@@ -38,7 +38,7 @@ Item::Item():
 	_prefetch = NULL;
 	_is_checked = false;
 	_is_visible = true;
-	_type = JMT_EMPTY;
+	_type = JIT_EMPTY;
 }
 
 Item::Item(std::string value):
@@ -54,7 +54,7 @@ Item::Item(std::string value):
 	_value = value;
 	_is_checked = false;
 	_is_visible = true;
-	_type = JMT_TEXT;
+	_type = JIT_TEXT;
 }
 
 Item::Item(std::string value, std::string image):
@@ -71,7 +71,7 @@ Item::Item(std::string value, std::string image):
 	_value = value;
 	_is_checked = false;
 	_is_visible = true;
-	_type = JMT_IMAGE;
+	_type = JIT_IMAGE;
 	
 	_prefetch = Image::CreateImage(_image);
 }
@@ -89,7 +89,7 @@ Item::Item(std::string value, bool checked):
 	_value = value;
 	_is_checked = checked;
 	_is_visible = true;
-	_type = JMT_CHECK;
+	_type = JIT_CHECK;
 }
 
 Item::~Item()
@@ -161,7 +161,7 @@ void Item::SetSelected(bool b)
 
 void Item::AddChild(Item *item)
 {
-	if (_type == jgui::JMT_CHECK) {
+	if (_type == jgui::JIT_CHECK) {
 		throw jcommon::RuntimeException("Item cannot accept childs");
 	}
 
@@ -215,7 +215,7 @@ jgui::Image * Item::GetImage()
 	return _prefetch;
 }
 
-jmenuitem_type_t Item::GetType()
+jitem_type_t Item::GetType()
 {
 	return _type;
 }
@@ -546,7 +546,7 @@ void ItemComponent::DispatchSelectEvent(SelectEvent *event)
 	while (k++ < (int)_select_listeners.size()) {
 		SelectListener *listener = _select_listeners[k-1];
 
-		if (event->GetType() == JST_ACTION) {
+		if (event->GetType() == JSET_ACTION) {
 			listener->ItemSelected(event);
 		} else {
 			listener->ItemChanged(event);

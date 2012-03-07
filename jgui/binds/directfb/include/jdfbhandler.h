@@ -126,7 +126,7 @@ class DFBHandler : public virtual jgui::GFXHandler{
 		 * \brief
 		 *
 		 */
-		int CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height);
+		int CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, jpixelformat_t pixelformat, int scale_width, int scale_height);
 		
 		/**
 		 * \brief

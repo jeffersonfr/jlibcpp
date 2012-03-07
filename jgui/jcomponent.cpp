@@ -857,7 +857,7 @@ void Component::Repaint(Component *cmp)
 		_parent->Repaint(this);
 	}
 
-	DispatchComponentEvent(new ComponentEvent(this, JCE_PAINTED));
+	DispatchComponentEvent(new ComponentEvent(this, JCET_ONPAINT));
 }
 
 void Component::SetMinimumSize(jsize_t size)
@@ -1476,7 +1476,7 @@ bool Component::ProcessEvent(MouseEvent *event)
 	int mousex = event->GetX(),
 			mousey = event->GetY();
 
-	if (event->GetType() == JME_PRESSED) {
+	if (event->GetType() == JMT_PRESSED) {
 		if (IsFocusable() == true) {
 			RequestFocus();
 		}
@@ -1524,7 +1524,7 @@ bool Component::ProcessEvent(MouseEvent *event)
 
 			return true;
 		} 
-	} else if (event->GetType() == JME_MOVED) {
+	} else if (event->GetType() == JMT_MOVED) {
 		if (_internal_state == 10) {
 			SetScrollY(scrolly+(int)((mousey-_relative_mouse_y)*((double)scroll_dimension.height/(double)GetHeight())));
 			
@@ -1542,7 +1542,7 @@ bool Component::ProcessEvent(MouseEvent *event)
 
 			return true;
 		}
-	} else if (event->GetType() == JME_RELEASED) {
+	} else if (event->GetType() == JMT_RELEASED) {
 		if (_internal_state != 0) {
 			_internal_state = 0;
 			
@@ -1872,9 +1872,9 @@ void Component::DispatchFocusEvent(FocusEvent *event)
 	while (k++ < (int)_focus_listeners.size()) {
 		FocusListener *listener = _focus_listeners[k-1];
 
-		if (event->GetType() == JFE_GAINED) {
+		if (event->GetType() == JFET_GAINED) {
 			listener->FocusGained(event);
-		} else if (event->GetType() == JFE_LOST) {
+		} else if (event->GetType() == JFET_LOST) {
 			listener->FocusLost(event);
 		}
 
@@ -1887,9 +1887,9 @@ void Component::DispatchFocusEvent(FocusEvent *event)
 
 	/*
 	for (std::vector<FocusListener *>::iterator i=_focus_listeners.begin(); i!=_focus_listeners.end(); i++) {
-		if (event->GetType() == JFE_GAINED) {
+		if (event->GetType() == JFET_GAINED) {
 			(*i)->FocusGained(event);
-		} else if (event->GetType() == JFE_LOST) {
+		} else if (event->GetType() == JFET_LOST) {
 			(*i)->FocusLost(event);
 		}
 	}
@@ -1939,14 +1939,18 @@ void Component::DispatchComponentEvent(ComponentEvent *event)
 	while (k++ < (int)_component_listeners.size()) {
 		ComponentListener *listener = _component_listeners[k-1];
 
-		if (event->GetType() == JCE_HIDDEN) {
-			listener->ComponentHidden(event);
-		} else if (event->GetType() == JCE_SHOWN) {
-			listener->ComponentShown(event);
-		} else if (event->GetType() == JCE_MOVED) {
-			listener->ComponentMoved(event);
-		} else if (event->GetType() == JCE_PAINTED) {
-			listener->ComponentPainted(event);
+		if (event->GetType() == JCET_ONHIDE) {
+			listener->OnHide(event);
+		} else if (event->GetType() == JCET_ONSHOW) {
+			listener->OnShow(event);
+		} else if (event->GetType() == JCET_ONMOVE) {
+			listener->OnMove(event);
+		} else if (event->GetType() == JCET_ONPAINT) {
+			listener->OnPaint(event);
+		} else if (event->GetType() == JCET_ONENTER) {
+			listener->OnEnter(event);
+		} else if (event->GetType() == JCET_ONLEAVE) {
+			listener->OnLeave(event);
 		}
 
 		if (size != (int)_component_listeners.size()) {

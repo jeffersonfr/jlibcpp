@@ -36,11 +36,11 @@ namespace jgui {
  * \brief
  *
  */
-enum jmenuitem_type_t {
-	JMT_EMPTY,
-	JMT_TEXT,
-	JMT_IMAGE,
-	JMT_CHECK
+enum jitem_type_t {
+	JIT_EMPTY,
+	JIT_TEXT,
+	JIT_IMAGE,
+	JIT_CHECK
 };
 
 class SelectEvent;
@@ -53,7 +53,7 @@ class Item : public virtual jcommon::Object{
 		Image *_prefetch;
 		std::string _value,
 			_image;
-		jmenuitem_type_t _type;
+		jitem_type_t _type;
 		jhorizontal_align_t _halign;
 		jvertical_align_t _valign;
 		bool _is_checked,
@@ -209,7 +209,7 @@ class Item : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jmenuitem_type_t GetType();
+		virtual jitem_type_t GetType();
 
 };
 

@@ -26,7 +26,7 @@
 namespace jgui {
 
 IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int width, int height):
-	Image(width, height, JSP_UNKNOWN, 0, 0)
+	Image(width, height, JPF_UNKNOWN, 0, 0)
 {
 	jcommon::Object::SetClassName("jgui::IndexedImage");
 	
@@ -46,7 +46,7 @@ IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, i
 }
 
 IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int width, int height):
-	Image(width, height, JSP_UNKNOWN, 0, 0)
+	Image(width, height, JPF_UNKNOWN, 0, 0)
 {
 	jcommon::Object::SetClassName("jgui::IndexedImage");
 

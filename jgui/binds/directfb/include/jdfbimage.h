@@ -42,7 +42,7 @@ class DFBImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
-		DFBImage(int width, int height, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height);
+		DFBImage(int width, int height, jpixelformat_t pixelformat, int scale_width, int scale_height);
 		
 		/**
 		 * \brief

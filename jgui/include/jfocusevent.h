@@ -28,9 +28,9 @@ namespace jgui {
  * \brief
  *
  */
-enum jfocus_event_t {
-	JFE_LOST,
-	JFE_GAINED
+enum jfocusevent_type_t {
+	JFET_LOST,
+	JFET_GAINED
 };
 
 /**
@@ -41,14 +41,14 @@ enum jfocus_event_t {
 class FocusEvent : public jcommon::EventObject{
 
 	private:
-		jfocus_event_t _type;
+		jfocusevent_type_t _type;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		FocusEvent(void *source, jfocus_event_t type);
+		FocusEvent(void *source, jfocusevent_type_t type);
 		
 		/**
 		 * \brief
@@ -60,7 +60,7 @@ class FocusEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		virtual jfocus_event_t GetType();
+		virtual jfocusevent_type_t GetType();
 
 };
 

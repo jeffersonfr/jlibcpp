@@ -44,11 +44,11 @@ namespace jgui {
  *
  */
 enum jkeyboard_type_t {
-	JKB_QWERTY,
-	JKB_ALPHA_NUMERIC,
-	JKB_NUMERIC,
-	JKB_PHONE,
-	JKB_INTERNET
+	JKT_QWERTY,
+	JKT_ALPHA_NUMERIC,
+	JKT_NUMERIC,
+	JKT_PHONE,
+	JKT_INTERNET
 };
 
 /**

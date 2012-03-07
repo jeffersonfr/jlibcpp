@@ -31,7 +31,7 @@
 
 namespace jgui {
 
-Image::Image(int width, int height, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height)
+Image::Image(int width, int height, jpixelformat_t pixelformat, int scale_width, int scale_height)
 {
 	jcommon::Object::SetClassName("jgui::Image");
 
@@ -71,7 +71,7 @@ bool Image::GetImageSize(std::string img, int *width, int *height)
 	return b;
 }
 
-Image * Image::CreateImage(int width, int height, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height)
+Image * Image::CreateImage(int width, int height, jpixelformat_t pixelformat, int scale_width, int scale_height)
 {
 	Image *image = NULL;
 
@@ -87,7 +87,7 @@ Image * Image::CreateImage(uint32_t *data, int width, int height)
 	Image *image = NULL;
 
 #ifdef DIRECTFB_UI
-	image = new DFBImage(width, height, JSP_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+	image = new DFBImage(width, height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 
 	image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
 	image->GetGraphics()->SetRGB(data, 0, 0, width, height, width);
@@ -114,7 +114,7 @@ Image * Image::CreateImage(std::string file)
 	GetImageSize(file, &width, &height);
 
 	if (width > 0 && height > 0) {
-		image = new DFBImage(width, height, JSP_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+		image = new DFBImage(width, height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 
 		if (image->GetGraphics()->DrawImage(file, 0, 0) == false) {
 			delete image;
@@ -224,7 +224,7 @@ void Image::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
 	*rgb = NULL;
 }
 		
-jsurface_pixelformat_t Image::GetPixelFormat()
+jpixelformat_t Image::GetPixelFormat()
 {
 	return _pixelformat;
 }

@@ -119,7 +119,7 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
+	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		int x1 = event->GetX(),
@@ -131,7 +131,7 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 		}
 
 		if ((x1 > 0 && x1 < (size)) && (y1 > 0 && y1 < (size))) {
-			if (_type == JCT_CHECK) {
+			if (_type == JCBT_CHECK) {
 				if (_checked == true) {
 					SetSelected(false);
 				} else {
@@ -157,7 +157,7 @@ bool CheckButton::ProcessEvent(KeyEvent *event)
 	jkeyevent_symbol_t action = event->GetSymbol();
 
 	if (action == JKS_ENTER) {
-		if (_type == JCT_CHECK) {
+		if (_type == JCBT_CHECK) {
 			if (_checked == true) {
 				SetSelected(false);
 			} else {
@@ -209,7 +209,7 @@ void CheckButton::Paint(Graphics *g)
 
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
-	if (_type == JCT_CHECK) {
+	if (_type == JCBT_CHECK) {
 		g->FillRectangle(cx, cy, cw, ch);
 	} else {
 		g->FillCircle(cx+csize, _size.height/2, csize);
@@ -218,7 +218,7 @@ void CheckButton::Paint(Graphics *g)
 	if (_checked == true) {
 		g->SetColor(0x00, 0x00, 0x00, 0xff);
 
-		if (_type == JCT_CHECK) {
+		if (_type == JCBT_CHECK) {
 			g->FillRectangle(cx+4, cy+4, cw-8, ch-8);
 		} else {
 			g->FillCircle(cx+csize, _size.height/2, csize/2);

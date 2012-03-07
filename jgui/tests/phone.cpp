@@ -459,7 +459,7 @@ bool AddContact::ProcessEvent(jgui::KeyEvent *event)
 		if (GetFocusOwner() == field1) {
 			tmp = field1->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_ALPHA_NUMERIC, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_ALPHA_NUMERIC, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(field1->GetText());
@@ -475,7 +475,7 @@ bool AddContact::ProcessEvent(jgui::KeyEvent *event)
 		} else if (GetFocusOwner() == field2) {
 			tmp = field2->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_PHONE, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_PHONE, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(field2->GetText());
@@ -491,7 +491,7 @@ bool AddContact::ProcessEvent(jgui::KeyEvent *event)
 		} else if (GetFocusOwner() == field3) {
 			tmp = field3->GetText();
 
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_PHONE, false);
+			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_PHONE, false);
 
 			keyboard.SetTextSize(20);
 			keyboard.SetText(field3->GetText());
@@ -658,7 +658,7 @@ bool SearchContacts::ProcessEvent(jgui::KeyEvent *event)
 	} else if (event->GetSymbol() == jgui::JKS_F2 || event->GetSymbol() == jgui::JKS_GREEN) {
 		int index = _index;
 
-		jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKB_ALPHA_NUMERIC, true);
+		jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_ALPHA_NUMERIC, true);
 
 		keyboard.SetTextSize(20);
 		keyboard.RegisterKeyboardListener(this);

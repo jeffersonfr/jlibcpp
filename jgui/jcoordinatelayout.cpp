@@ -23,7 +23,7 @@
 
 namespace jgui {
 
-CoordinateLayout::CoordinateLayout(int width, int height, jcoordinate_layout_t type):
+CoordinateLayout::CoordinateLayout(int width, int height, jcoordinatelayout_orientation_t type):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jgui::CoordinateLayout");
@@ -51,7 +51,7 @@ void CoordinateLayout::SetHeight(int height)
 	_height = height;
 }
 
-void CoordinateLayout::SetType(jcoordinate_layout_t type)
+void CoordinateLayout::SetType(jcoordinatelayout_orientation_t type)
 {
 	_type = type;
 }
@@ -66,7 +66,7 @@ int CoordinateLayout::GetHeight()
 	return _height;
 }
 
-jcoordinate_layout_t CoordinateLayout::GetType()
+jcoordinatelayout_orientation_t CoordinateLayout::GetType()
 {
 	return _type;
 }
@@ -136,11 +136,11 @@ void CoordinateLayout::DoLayout(Container *target)
 		_height = tsize.height;
 	}
 
-	if ((_type & JCL_HORIZONTAL) != 0) {
+	if ((_type & JCLO_HORIZONTAL) != 0) {
 		sx = (double)tsize.width/_width;
 	}
 
-	if ((_type & JCL_VERTICAL) != 0) {
+	if ((_type & JCLO_VERTICAL) != 0) {
 		sy = (double)tsize.height/_height;
 	}
 

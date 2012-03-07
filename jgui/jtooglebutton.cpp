@@ -72,7 +72,7 @@ bool ToogleButton::ProcessEvent(MouseEvent *event)
 
 	bool catched = false;
 
-	if (event->GetType() == JME_PRESSED && event->GetButton() == JMB_BUTTON1) {
+	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		if (_is_pressed == true) {

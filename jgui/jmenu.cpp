@@ -132,7 +132,7 @@ void Menu::KeyPressed(KeyEvent *event)
 			if (menu->_index != old_index) {
 				menu->Repaint();
 
-				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_UP)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_UP)); 
 			}
 		} else if (action == JKS_CURSOR_DOWN) {
 			int old_index = menu->_index;
@@ -162,11 +162,11 @@ void Menu::KeyPressed(KeyEvent *event)
 			if (menu->_index != old_index) {
 				menu->Repaint();
 
-				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_DOWN)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_DOWN)); 
 			}
 		} else if (action == JKS_ENTER) {
 			if (menu->_items[menu->_index]->IsEnabled() == true) {
-				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_ACTION)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_ACTION)); 
 			}
 		}
 	} else if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
@@ -178,17 +178,17 @@ void Menu::KeyPressed(KeyEvent *event)
 			delete last;
 		}
 
-		DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_LEFT));
+		DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_LEFT));
 	} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT || event->GetSymbol() == jgui::JKS_ENTER) {
 		Item *item = GetCurrentItem();
 
 		if (item != NULL && item->IsEnabled() == true) {
-			if (event->GetSymbol() == jgui::JKS_ENTER && item->GetType() == JMT_CHECK) {
+			if (event->GetSymbol() == jgui::JKS_ENTER && item->GetType() == JIT_CHECK) {
 				item->SetSelected(item->IsSelected()^true);
 
 				last->Repaint();
 
-				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_ACTION)); 
+				DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_ACTION)); 
 			} else {
 				std::vector<Item *> items = item->GetChilds();
 
@@ -234,7 +234,7 @@ void Menu::KeyPressed(KeyEvent *event)
 
 					menu->Show(false);
 
-					DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JST_RIGHT));
+					DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_RIGHT));
 				} else {
 					if (event->GetSymbol() == jgui::JKS_ENTER) {
 						Item *item = GetCurrentItem();
@@ -252,7 +252,7 @@ void Menu::KeyPressed(KeyEvent *event)
 							delete menu;
 						}
 						
-						DispatchSelectEvent(new SelectEvent(this, item, index, JST_ACTION)); 
+						DispatchSelectEvent(new SelectEvent(this, item, index, JSET_ACTION)); 
 
 						Release();
 					}
@@ -543,7 +543,7 @@ void Menu::Paint(Graphics *g)
 	}
 
 	for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-		if ((*i)->GetType() == JMT_IMAGE || (*i)->GetType() == JMT_CHECK) {
+		if ((*i)->GetType() == JIT_IMAGE || (*i)->GetType() == JIT_CHECK) {
 			space = _item_size+10;
 
 			break;
@@ -581,14 +581,14 @@ void Menu::Paint(Graphics *g)
 				g->SetColor(_item_fgcolor);
 			}
 
-			if (_items[i]->GetType() == JMT_EMPTY) {
-			} else if (_items[i]->GetType() == JMT_TEXT) {
-			} else if (_items[i]->GetType() == JMT_IMAGE) {
+			if (_items[i]->GetType() == JIT_EMPTY) {
+			} else if (_items[i]->GetType() == JIT_TEXT) {
+			} else if (_items[i]->GetType() == JIT_IMAGE) {
 				if (_items[i]->GetImage() == NULL) {
 				} else {
 					g->DrawImage(_items[i]->GetImage(), x, y+(_item_size+_vertical_gap)*count+2, _item_size, _item_size-4);
 				}
-			} else if (_items[i]->GetType() == JMT_CHECK) {
+			} else if (_items[i]->GetType() == JIT_CHECK) {
 				if (_items[i]->IsSelected() == true) {
 					g->DrawImage(_check, x, y+(_item_size+_vertical_gap)*count+2, _item_size, _item_size-4);
 				}

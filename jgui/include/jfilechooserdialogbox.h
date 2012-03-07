@@ -41,8 +41,8 @@ namespace jgui {
  *
  */
 enum jfilechooser_type_t {
-	JFT_OPEN_FILE_DIALOG,
-	JFT_SAVE_FILE_DIALOG
+	JFCT_OPEN_FILE_DIALOG,
+	JFCT_SAVE_FILE_DIALOG
 };
 
 /**
@@ -50,9 +50,9 @@ enum jfilechooser_type_t {
  *
  */
 enum jfilechooser_filter_t {
-	JFF_FILE_ONLY,
-	JFF_DIRECTORY_ONLY,
-	JFF_FILE_AND_DIRECTORY
+	JFCF_FILE_ONLY,
+	JFCF_DIRECTORY_ONLY,
+	JFCF_FILE_AND_DIRECTORY
 };
 
 /**
@@ -105,7 +105,7 @@ class FileChooserDialogBox : public jgui::Frame, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		FileChooserDialogBox(std::string title, std::string directory, int x, int y, jfilechooser_type_t type = JFT_OPEN_FILE_DIALOG);
+		FileChooserDialogBox(std::string title, std::string directory, int x, int y, jfilechooser_type_t type = JFCT_OPEN_FILE_DIALOG);
 
 		/**
 		 * \brief

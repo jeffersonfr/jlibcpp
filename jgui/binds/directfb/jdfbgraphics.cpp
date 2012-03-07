@@ -1246,7 +1246,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 		return;
 	}
 
-	Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), JSP_ARGB, _scale.width, _scale.height);
+	Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), JPF_ARGB, _scale.width, _scale.height);
 
 	off->GetGraphics()->SetFont(_font);
 	off->GetGraphics()->SetColor(_color);
@@ -1278,7 +1278,7 @@ void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
 		font->GetGlyphExtents(font, symbol, NULL, &advance);
 	}
 
-	Image *off = Image::CreateImage(advance, _font->GetAscender() + _font->GetDescender(), JSP_ARGB, _scale.width, _scale.height);
+	Image *off = Image::CreateImage(advance, _font->GetAscender() + _font->GetDescender(), JPF_ARGB, _scale.width, _scale.height);
 
 	off->GetGraphics()->SetFont(_font);
 	off->GetGraphics()->SetColor(_color);

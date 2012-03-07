@@ -32,19 +32,27 @@ ComponentListener::~ComponentListener()
 {
 }
 
-void ComponentListener::ComponentHidden(ComponentEvent *event)
+void ComponentListener::OnHide(ComponentEvent *event)
 {
 }
 
-void ComponentListener::ComponentShown(ComponentEvent *event)
+void ComponentListener::OnShow(ComponentEvent *event)
 {
 }
 
-void ComponentListener::ComponentMoved(ComponentEvent *event)
+void ComponentListener::OnMove(ComponentEvent *event)
 {
 }
 
-void ComponentListener::ComponentPainted(ComponentEvent *event)
+void ComponentListener::OnPaint(ComponentEvent *event)
+{
+}
+
+void ComponentListener::OnEnter(ComponentEvent *event)
+{
+}
+
+void ComponentListener::OnLeave(ComponentEvent *event)
 {
 }
 

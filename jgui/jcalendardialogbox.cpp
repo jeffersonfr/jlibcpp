@@ -376,7 +376,7 @@ void CalendarDialogBox::ItemChanged(SelectEvent *event)
 		int m = (_month+1),
 			y = (_year+1970);
 
-		if (event->GetType() == jgui::JST_LEFT) {
+		if (event->GetType() == jgui::JSET_LEFT) {
 			if (spin == year) {
 				y--;
 

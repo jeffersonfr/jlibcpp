@@ -38,19 +38,19 @@ namespace jgui {
  * \brief
  *
  */
-enum jmouse_event_t {
-	JME_UNKNOWN,
-	JME_PRESSED,
-	JME_RELEASED,
-	JME_MOVED,
-	JME_ROTATED
+enum jmouseevent_type_t {
+	JMT_UNKNOWN,
+	JMT_PRESSED,
+	JMT_RELEASED,
+	JMT_MOVED,
+	JMT_ROTATED
 };
 
 /**
  * \brief
  *
  */
-enum jmouse_button_t {
+enum jmouseevent_button_t {
 	JMB_UNKNOWN = 0x00,
 	JMB_BUTTON1 = 0x01,
 	JMB_BUTTON2 = 0x02,
@@ -69,15 +69,15 @@ class MouseEvent : public jcommon::EventObject{
 		int _x,
 				_y,
 				_click_count;
-		jmouse_event_t _type;
-		jmouse_button_t _button;
+		jmouseevent_type_t _type;
+		jmouseevent_button_t _button;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		MouseEvent(void *source, jmouse_event_t type, jmouse_button_t button, int click_count, int x, int y);
+		MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, int click_count, int x, int y);
 		
 		/**
 		 * \brief
@@ -89,7 +89,7 @@ class MouseEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		virtual jmouse_event_t GetType();
+		virtual jmouseevent_type_t GetType();
 
 		/**
 		 * \brief
@@ -101,7 +101,7 @@ class MouseEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		virtual jmouse_button_t GetButton();
+		virtual jmouseevent_button_t GetButton();
 
 		/**
 		 * \brief

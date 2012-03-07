@@ -62,7 +62,7 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 
 	SetBackgroundVisible(true);
 
-	DispatchWindowEvent(new WindowEvent(this, JWT_OPENED));
+	DispatchWindowEvent(new WindowEvent(this, JWET_OPENED));
 
 	WindowManager::GetInstance()->Add(this);
 
@@ -73,7 +73,7 @@ Window::~Window()
 {
 	ThemeManager::GetInstance()->RemoveThemeListener(this);
 
-	DispatchWindowEvent(new WindowEvent(this, JWT_CLOSING));
+	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSING));
 
 #ifdef DIRECTFB_UI
 	WindowManager::GetInstance()->Remove(this);
@@ -100,7 +100,7 @@ Window::~Window()
 	}
 #endif
 
-	DispatchWindowEvent(new WindowEvent(this, JWT_CLOSED));
+	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSED));
 }
 
 Graphics * Window::GetGraphics()
@@ -333,8 +333,8 @@ void Window::SetBounds(int x, int y, int w, int h)
 	
 	Repaint();
 
-	DispatchWindowEvent(new WindowEvent(this, JWT_MOVED));
-	DispatchWindowEvent(new WindowEvent(this, JWT_RESIZED));
+	DispatchWindowEvent(new WindowEvent(this, JWET_MOVED));
+	DispatchWindowEvent(new WindowEvent(this, JWET_RESIZED));
 }
 
 void Window::SetLocation(int x, int y)
@@ -355,7 +355,7 @@ void Window::SetLocation(int x, int y)
 	}
 #endif
 	
-	DispatchWindowEvent(new WindowEvent(this, JWT_MOVED));
+	DispatchWindowEvent(new WindowEvent(this, JWET_MOVED));
 }
 
 void Window::SetMinimumSize(int w, int h)
@@ -472,7 +472,7 @@ void Window::SetSize(int width, int height)
 	
 	Repaint();
 
-	DispatchWindowEvent(new WindowEvent(this, JWT_RESIZED));
+	DispatchWindowEvent(new WindowEvent(this, JWET_RESIZED));
 }
 
 void Window::Move(int x, int y)
@@ -489,7 +489,7 @@ void Window::Move(int x, int y)
 	}
 #endif
 	
-	DispatchWindowEvent(new WindowEvent(this, JWT_MOVED));
+	DispatchWindowEvent(new WindowEvent(this, JWET_MOVED));
 }
 
 void Window::SetOpacity(int i)
@@ -647,7 +647,7 @@ void Window::Repaint(Component *cmp)
 
 	Revalidate();
 
-	DispatchWindowEvent(new WindowEvent(this, JWT_PAINTED));
+	DispatchWindowEvent(new WindowEvent(this, JWET_PAINTED));
 }
 
 void Window::PaintBackground(Graphics *g)
@@ -768,17 +768,17 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 	while (k++ < (int)_window_listeners.size()) {
 		WindowListener *listener = _window_listeners[k-1];
 
-		if (event->GetType() == JWT_CLOSING) {
+		if (event->GetType() == JWET_CLOSING) {
 			listener->WindowClosing(event);
-		} else if (event->GetType() == JWT_CLOSED) {
+		} else if (event->GetType() == JWET_CLOSED) {
 			listener->WindowClosed(event);
-		} else if (event->GetType() == JWT_OPENED) {
+		} else if (event->GetType() == JWET_OPENED) {
 			listener->WindowOpened(event);
-		} else if (event->GetType() == JWT_RESIZED) {
+		} else if (event->GetType() == JWET_RESIZED) {
 			listener->WindowResized(event);
-		} else if (event->GetType() == JWT_MOVED) {
+		} else if (event->GetType() == JWET_MOVED) {
 			listener->WindowMoved(event);
-		} else if (event->GetType() == JWT_PAINTED) {
+		} else if (event->GetType() == JWET_PAINTED) {
 			listener->WindowPainted(event);
 		}
 
@@ -791,15 +791,15 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 
 	/*
 	for (std::vector<WindowListener *>::iterator i=_window_listeners.begin(); i!=_window_listeners.end(); i++) {
-		if (event->GetType() == JWT_CLOSING) {
+		if (event->GetType() == JWET_CLOSING) {
 			(*i)->WindowClosing(event);
-		} else if (event->GetType() == JWT_CLOSED) {
+		} else if (event->GetType() == JWET_CLOSED) {
 			(*i)->WindowClosed(event);
-		} else if (event->GetType() == JWT_OPENED) {
+		} else if (event->GetType() == JWET_OPENED) {
 			(*i)->WindowOpened(event);
-		} else if (event->GetType() == JWT_RESIZED) {
+		} else if (event->GetType() == JWET_RESIZED) {
 			(*i)->WindowResized(event);
-		} else if (event->GetType() == JWT_MOVED) {
+		} else if (event->GetType() == JWET_MOVED) {
 			(*i)->WindowMoved(event);
 		}
 	}

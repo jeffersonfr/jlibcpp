@@ -29,8 +29,8 @@
 namespace jgui {
 
 enum jcheckbox_type_t {
-	JCT_CHECK,
-	JCT_RADIO
+	JCBT_CHECK,
+	JCBT_RADIO
 };
 
 class CheckButtonListener;

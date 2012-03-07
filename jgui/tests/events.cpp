@@ -61,7 +61,7 @@ class UserEvent {
 		int _x,
 				_y,
 				_click_count;
-		jgui::jmouse_button_t _button;
+		jgui::jmouseevent_button_t _button;
 
 	public:
 		UserEvent(userevent_type_t type, jgui::jkeyevent_modifiers_t mod, int code, jgui::jkeyevent_symbol_t symbol)
@@ -73,7 +73,7 @@ class UserEvent {
 			_mod = mod;
 		}
 
-		UserEvent(userevent_type_t type, jgui::jmouse_button_t button, int click_count, int x, int y, double vx, double vy)
+		UserEvent(userevent_type_t type, jgui::jmouseevent_button_t button, int click_count, int x, int y, double vx, double vy)
 		{
 			_type = type;
 
@@ -109,7 +109,7 @@ class UserEvent {
 			return _mod;
 		}
 
-		jgui::jmouse_button_t GetButton()
+		jgui::jmouseevent_button_t GetButton()
 		{
 			return _button;
 		}

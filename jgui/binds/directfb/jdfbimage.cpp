@@ -81,7 +81,7 @@ class MediaLoaderThread : public jthread::Thread {
 
 };
 
-DFBImage::DFBImage(int width, int height, jsurface_pixelformat_t pixelformat, int scale_width, int scale_height):
+DFBImage::DFBImage(int width, int height, jpixelformat_t pixelformat, int scale_width, int scale_height):
 	jgui::Image(width, height, pixelformat, scale_width, scale_height)
 {
 	jcommon::Object::SetClassName("jgui::DFBImage");
@@ -191,7 +191,7 @@ Image * DFBImage::CreateImageStream(jio::InputStream *stream)
 
 	loader.WaitThread();
 
-	image = new DFBImage(sdsc.width, sdsc.height, JSP_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+	image = new DFBImage(sdsc.width, sdsc.height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 
 	IDirectFBSurface *image_surface = (IDirectFBSurface *)image->GetGraphics()->GetNativeSurface();
 

@@ -61,7 +61,7 @@ MCalc::MCalc(int x, int y):
 
 	SetLayout(new jgui::BorderLayout());
 
-	Add(_display, jgui::JBA_NORTH);
+	Add(_display, jgui::JBLA_NORTH);
 
 	jgui::Container *container = new jgui::Container();
 
@@ -75,7 +75,7 @@ MCalc::MCalc(int x, int y):
 		container->Add(b[i]);
 	}
 
-	Add(container, jgui::JBA_CENTER);
+	Add(container, jgui::JBLA_CENTER);
 
 	b[10]->RequestFocus();
 }

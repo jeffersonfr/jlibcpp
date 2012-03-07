@@ -200,9 +200,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			check1 = new jgui::CheckButton(jgui::JCT_CHECK, "wrap", 500, 740, 300);
-			check2 = new jgui::CheckButton(jgui::JCT_CHECK, "password", 500, 795, 300);
-			check3 = new jgui::CheckButton(jgui::JCT_CHECK, "hide", 500, 850, 300);
+			check1 = new jgui::CheckButton(jgui::JCBT_CHECK, "wrap", 500, 740, 300);
+			check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "password", 500, 795, 300);
+			check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "hide", 500, 850, 300);
 
 			check1->SetSelected(true);
 
@@ -212,9 +212,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			radio1 = new jgui::CheckButton(jgui::JCT_RADIO, "left", 860, 740, 300);
-			radio2 = new jgui::CheckButton(jgui::JCT_RADIO, "center", 860, 795, 300);
-			radio3 = new jgui::CheckButton(jgui::JCT_RADIO, "right", 860, 850, 300);
+			radio1 = new jgui::CheckButton(jgui::JCBT_RADIO, "left", 860, 740, 300);
+			radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "center", 860, 795, 300);
+			radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "right", 860, 850, 300);
 
 			group = new jgui::CheckButtonGroup();
 
@@ -391,7 +391,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 		if (event->GetSymbol() == jgui::JKS_ENTER) {
 			if (GetFocusOwner() == text_field) {
-				jgui::Keyboard keyboard(500, 400, jgui::JKB_QWERTY, false);
+				jgui::Keyboard keyboard(500, 400, jgui::JKT_QWERTY, false);
 
 				keyboard.RegisterKeyboardListener(dynamic_cast<jgui::KeyboardListener *>(this));
 				keyboard.Show();
@@ -867,14 +867,6 @@ class GraphicPanel : public jgui::Canvas{
 		delete f2;
 		delete f3;
 		delete f4;
-
-		jgui::Color c1 = jgui::Color(jgui::Color::Black),
-								c2 = jgui::Color(jgui::Color::White);
-
-		g->SetGradientStop(0.0, c1);
-		g->SetGradientStop(1.0, c2);
-		g->FillRadialGradient(300, 300, 300, 300, 0, 0, 0);
-		g->ResetGradientStop();
 	}
 
 };
@@ -975,28 +967,20 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 				bool visible = true;
 
 				{
-					jgui::Keyboard app(150, 150, jgui::JKB_QWERTY, visible);
+					jgui::Keyboard app(150, 150, jgui::JKT_QWERTY, visible);
 
 					app.GetText();
 					app.Show();
 				}
 
 				{
-					jgui::Keyboard app(150, 150, jgui::JKB_ALPHA_NUMERIC, visible);
+					jgui::Keyboard app(150, 150, jgui::JKT_ALPHA_NUMERIC, visible);
 
 					app.Show();
 				}
 
 				{
-					jgui::Keyboard app(150, 150, jgui::JKB_NUMERIC, visible);
-
-					app.GetText();
-					app.Show();
-					app.GetText();
-				}
-
-				{
-					jgui::Keyboard app(150, 150, jgui::JKB_PHONE, visible);
+					jgui::Keyboard app(150, 150, jgui::JKT_NUMERIC, visible);
 
 					app.GetText();
 					app.Show();
@@ -1004,7 +988,15 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 				}
 
 				{
-					jgui::Keyboard app(150, 150, jgui::JKB_INTERNET, visible);
+					jgui::Keyboard app(150, 150, jgui::JKT_PHONE, visible);
+
+					app.GetText();
+					app.Show();
+					app.GetText();
+				}
+
+				{
+					jgui::Keyboard app(150, 150, jgui::JKT_INTERNET, visible);
 
 					app.Show();
 				}

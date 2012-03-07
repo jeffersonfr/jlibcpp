@@ -38,11 +38,13 @@ namespace jgui {
  * \brief
  *
  */
-enum jcomponent_event_t {
-	JCE_HIDDEN,
-	JCE_SHOWN,
-	JCE_MOVED,
-	JCE_PAINTED
+enum jcomponentevent_type_t {
+	JCET_ONHIDE,
+	JCET_ONSHOW,
+	JCET_ONMOVE,
+	JCET_ONPAINT,
+	JCET_ONENTER,
+	JCET_ONLEAVE
 };
 
 /**
@@ -53,14 +55,14 @@ enum jcomponent_event_t {
 class ComponentEvent : public jcommon::EventObject{
 
 	private:
-		jcomponent_event_t _type;
+		jcomponentevent_type_t _type;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		ComponentEvent(void *source, jcomponent_event_t type);
+		ComponentEvent(void *source, jcomponentevent_type_t type);
 		
 		/**
 		 * \brief
@@ -72,7 +74,7 @@ class ComponentEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
-		virtual jcomponent_event_t GetType();
+		virtual jcomponentevent_type_t GetType();
 
 };
 

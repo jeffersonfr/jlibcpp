@@ -34,8 +34,8 @@ namespace jgui {
  *
  */
 enum jcontainerevent_type_t {
-	JCT_COMPONENT_ADDED,
-	JCT_COMPONENT_REMOVED
+	JCET_COMPONENT_ADDED,
+	JCET_COMPONENT_REMOVED
 };
 
 /**

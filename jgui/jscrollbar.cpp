@@ -165,7 +165,7 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 		arrow_size = w/2;
 	}
 
-	if (event->GetType() == JME_PRESSED) {
+	if (event->GetType() == JMT_PRESSED) {
 		if (event->GetButton() != JMB_BUTTON1) {
 			return false;
 		}
@@ -209,7 +209,7 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 				}
 			}
 		}
-	} else if (event->GetType() == JME_MOVED) {
+	} else if (event->GetType() == JMT_MOVED) {
 		if (_pressed == true) {
 			int diff = GetMaximum()-GetMinimum();
 
@@ -222,7 +222,7 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 	} else {
 		_pressed = false;
 
-		if (event->GetType() == JME_ROTATED) {
+		if (event->GetType() == JMT_ROTATED) {
 			SetValue(GetValue()+_minimum_tick*event->GetClickCount());
 		}
 	}

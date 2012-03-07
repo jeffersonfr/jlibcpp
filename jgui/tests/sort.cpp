@@ -1393,7 +1393,7 @@ class SortComponent : public jgui::Component, public jthread::Thread, public jco
 
 			bool catched = false;
 
-			if (event->GetType() == jgui::JME_PRESSED) {
+			if (event->GetType() == jgui::JMT_PRESSED) {
 				catched = true;
 
 				RequestFocus();

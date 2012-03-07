@@ -73,31 +73,31 @@ jsize_t BorderLayout::GetMinimumLayoutSize(Container *parent)
 	jsize_t t = {0, 0};
 	bool ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
       
-	if ((cmp = GetChild(JBA_EAST, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_EAST, ltr)) != NULL) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width += d.width + _hgap;
 	    t.height = std::max(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBA_WEST, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_WEST, ltr)) != NULL) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width += d.width + _hgap;
 	    t.height = std::max(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBA_CENTER, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_CENTER, ltr)) != NULL) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width += d.width;
 	    t.height = std::max(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBA_NORTH, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_NORTH, ltr)) != NULL) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width = std::max(d.width, t.width);
 	    t.height += d.height + _vgap;
 	}
 	
-	if ((cmp = GetChild(JBA_SOUTH, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_SOUTH, ltr)) != NULL) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width = std::max(d.width, t.width);
 	    t.height += d.height + _vgap;
@@ -125,31 +125,31 @@ jsize_t BorderLayout::GetPreferredLayoutSize(Container *parent)
 	jsize_t t = {0, 0};
 	bool ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
       
-	if ((cmp = GetChild(JBA_EAST, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_EAST, ltr)) != NULL) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width += d.width + _hgap;
 	    t.height = std::max(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBA_WEST, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_WEST, ltr)) != NULL) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width += d.width + _hgap;
 	    t.height = std::max(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBA_CENTER, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_CENTER, ltr)) != NULL) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width += d.width;
 	    t.height = std::max(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBA_NORTH, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_NORTH, ltr)) != NULL) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width = std::max(d.width, t.width);
 	    t.height += d.height + _vgap;
 	}
 	
-	if ((cmp = GetChild(JBA_SOUTH, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_SOUTH, ltr)) != NULL) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width = std::max(d.width, t.width);
 	    t.height += d.height + _vgap;
@@ -175,7 +175,7 @@ void BorderLayout::DoLayout(Container *target)
 	bool ltr = (target->GetComponentOrientation() == JCO_LEFT_TO_RIGHT || target->GetComponentOrientation() == JCO_RIGHT_TO_LEFT);
 	Component *c = NULL;
 
-	if ((c = GetChild(JBA_NORTH, ltr)) != NULL) {
+	if ((c = GetChild(JBLA_NORTH, ltr)) != NULL) {
 		c->SetSize(right - left, c->GetHeight());
 
 		psize = c->GetPreferredSize();
@@ -184,7 +184,7 @@ void BorderLayout::DoLayout(Container *target)
 		top += psize.height + _vgap;
 	}
 
-	if ((c = GetChild(JBA_SOUTH, ltr)) != NULL) {
+	if ((c = GetChild(JBLA_SOUTH, ltr)) != NULL) {
 		c->SetSize(right - left, c->GetHeight());
 
 		psize = c->GetPreferredSize();
@@ -193,7 +193,7 @@ void BorderLayout::DoLayout(Container *target)
 		bottom -= psize.height + _vgap;
 	}
 
-	if ((c = GetChild(JBA_EAST, ltr)) != NULL) {
+	if ((c = GetChild(JBLA_EAST, ltr)) != NULL) {
 		c->SetSize(c->GetWidth(), bottom - top);
 
 		psize = c->GetPreferredSize();
@@ -202,7 +202,7 @@ void BorderLayout::DoLayout(Container *target)
 		right -= psize.width + _hgap;
 	}
 
-	if ((c = GetChild(JBA_WEST, ltr)) != NULL) {
+	if ((c = GetChild(JBLA_WEST, ltr)) != NULL) {
 		c->SetSize(c->GetWidth(), bottom - top);
 
 		psize = c->GetPreferredSize();
@@ -211,7 +211,7 @@ void BorderLayout::DoLayout(Container *target)
 		left += psize.width + _hgap;
 	}
 
-	if ((c = GetChild(JBA_CENTER, ltr)) != NULL) {
+	if ((c = GetChild(JBLA_CENTER, ltr)) != NULL) {
 		c->SetBounds(left, top, right - left, bottom - top);
 	}
 }
@@ -219,23 +219,23 @@ void BorderLayout::DoLayout(Container *target)
 void BorderLayout::AddLayoutComponent(Component *c, jborderlayout_align_t align) 
 {
 	// WARN:: sync with jframe
-	if (align == JBA_CENTER) {
+	if (align == JBLA_CENTER) {
 		center = c;
-	} else if (align == JBA_NORTH) {
+	} else if (align == JBLA_NORTH) {
 		north = c;
-	} else if (align == JBA_SOUTH) {
+	} else if (align == JBLA_SOUTH) {
 		south = c;
-	} else if (align == JBA_EAST) {
+	} else if (align == JBLA_EAST) {
 		east = c;
-	} else if (align == JBA_WEST) {
+	} else if (align == JBLA_WEST) {
 		west = c;
-	} else if (align == JBA_BEFORE_FIRST_LINE) {
+	} else if (align == JBLA_BEFORE_FIRST_LINE) {
 		firstLine = c;
-	} else if (align == JBA_AFTER_LAST_LINE) {
+	} else if (align == JBLA_AFTER_LAST_LINE) {
 		lastLine = c;
-	} else if (align == JBA_BEFORE_LINE_BEGINS) {
+	} else if (align == JBLA_BEFORE_LINE_BEGINS) {
 		firstItem = c;
-	} else if (align == JBA_AFTER_LINE_ENDS) {
+	} else if (align == JBLA_AFTER_LINE_ENDS) {
 		lastItem = c;
 	}
 }
@@ -282,23 +282,23 @@ void BorderLayout::RemoveLayoutComponents()
 
 Component * BorderLayout::GetLayoutComponent(jborderlayout_align_t align) 
 {
-	if (align == JBA_CENTER) {
+	if (align == JBLA_CENTER) {
 		return center;
-	} else if (align == JBA_NORTH) {
+	} else if (align == JBLA_NORTH) {
 		return north;
-	} else if (align == JBA_SOUTH) {
+	} else if (align == JBLA_SOUTH) {
 		return south;
-	} else if (align == JBA_WEST) {
+	} else if (align == JBLA_WEST) {
 		return west;
-	} else if (align == JBA_EAST) {
+	} else if (align == JBLA_EAST) {
 		return east;
-	} else if (align == JBA_PAGE_START) {
+	} else if (align == JBLA_PAGE_START) {
 		return firstLine;
-	} else if (align == JBA_PAGE_END) {
+	} else if (align == JBLA_PAGE_END) {
 		return lastLine;
-	} else if (align == JBA_LINE_START) {
+	} else if (align == JBLA_LINE_START) {
 		return firstItem;
-	} else if (align == JBA_LINE_END) {
+	} else if (align == JBLA_LINE_END) {
 		return lastItem;
 	}
 
@@ -310,23 +310,23 @@ Component * BorderLayout::GetLayoutComponent(Container *target, jborderlayout_al
 	Component *result = NULL;
 	bool ltr = (target->GetComponentOrientation() == JCO_LEFT_TO_RIGHT || target->GetComponentOrientation() == JCO_RIGHT_TO_LEFT);
 
-	if (align == JBA_NORTH) {
+	if (align == JBLA_NORTH) {
 		result = (firstLine != NULL) ? firstLine : north;
-	} else if (align == JBA_SOUTH) {
+	} else if (align == JBLA_SOUTH) {
 		result = (lastLine != NULL) ? lastLine : south;
-	} else if (align == JBA_WEST) {
+	} else if (align == JBLA_WEST) {
 		result = ltr ? firstItem : lastItem;
 		
 		if (result == NULL) {
 			result = west;
 		}
-	} else if (align == JBA_EAST) {
+	} else if (align == JBLA_EAST) {
 		result = ltr ? lastItem : firstItem;
 		
 		if (result == NULL) {
 			result = east;
 		}
-	} else if (align == JBA_CENTER) {
+	} else if (align == JBLA_CENTER) {
 		result = center;
 	}
 
@@ -336,51 +336,51 @@ Component * BorderLayout::GetLayoutComponent(Container *target, jborderlayout_al
 jborderlayout_align_t BorderLayout::GetConstraints(Component *c) 
 {
 	if (c == NULL){
-		return JBA_UNKNOWN;
+		return JBLA_UNKNOWN;
 	}
 
 	if (c == center) {
-		return JBA_CENTER;
+		return JBLA_CENTER;
 	} else if (c == north) {
-		return JBA_NORTH;
+		return JBLA_NORTH;
 	} else if (c == south) {
-		return JBA_SOUTH;
+		return JBLA_SOUTH;
 	} else if (c == west) {
-		return JBA_WEST;
+		return JBLA_WEST;
 	} else if (c == east) {
-		return JBA_EAST;
+		return JBLA_EAST;
 	} else if (c == firstLine) {
-		return JBA_PAGE_START;
+		return JBLA_PAGE_START;
 	} else if (c == lastLine) {
-		return JBA_PAGE_END;
+		return JBLA_PAGE_END;
 	} else if (c == firstItem) {
-		return JBA_LINE_START;
+		return JBLA_LINE_START;
 	} else if (c == lastItem) {
-		return JBA_LINE_END;
+		return JBLA_LINE_END;
 	}
 
-	return JBA_UNKNOWN;
+	return JBLA_UNKNOWN;
 }
 
 Component * BorderLayout::GetChild(jborderlayout_align_t key, bool ltr) 
 {
 	Component *result = NULL;
 
-	if (key == JBA_NORTH) {
+	if (key == JBLA_NORTH) {
 		result = (firstLine != NULL) ? firstLine : north;
-	} else if (key == JBA_SOUTH) {
+	} else if (key == JBLA_SOUTH) {
 		result = (lastLine != NULL) ? lastLine : south;
-	} else if (key == JBA_WEST) {
+	} else if (key == JBLA_WEST) {
 		result = ltr ? firstItem : lastItem;
 		if (result == NULL) {
 			result = west;
 		}
-	} else if (key == JBA_EAST) {
+	} else if (key == JBLA_EAST) {
 		result = ltr ? lastItem : firstItem;
 		if (result == NULL) {
 			result = east;
 		}
-	} else if (key == JBA_CENTER) {
+	} else if (key == JBLA_CENTER) {
 		result = center;
 	}
 
