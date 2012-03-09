@@ -977,6 +977,8 @@ void Component::Move(int x, int y)
 	_location.y = _location.y+y;
 
 	Repaint();
+	
+	DispatchComponentEvent(new ComponentEvent(this, JCET_ONMOVE));
 }
 
 void Component::Move(jpoint_t point)
@@ -989,6 +991,8 @@ void Component::SetBounds(int x, int y, int w, int h)
 	if (_location.x == x && _location.y == y && _size.width == w && _size.height == h) {
 		return;
 	}
+
+	bool moved = (_location.x != x) || (_location.y != y);
 
 	_location.x = x;
 	_location.y = y;
@@ -1012,6 +1016,10 @@ void Component::SetBounds(int x, int y, int w, int h)
 	}
 
 	Repaint();
+
+	if (moved == true) {
+		DispatchComponentEvent(new ComponentEvent(this, JCET_ONMOVE));
+	}
 }
 
 void Component::SetBounds(jpoint_t point, jsize_t size)
@@ -1030,6 +1038,8 @@ void Component::SetLocation(int x, int y)
 	_location.y = y;
 
 	Repaint();
+		
+	DispatchComponentEvent(new ComponentEvent(this, JCET_ONMOVE));
 }
 
 void Component::SetLocation(jpoint_t point)
@@ -1824,16 +1834,16 @@ void Component::SetVisible(bool b)
 	_is_visible = b;
 
 	if (_is_visible == false) {
-		SetIgnoreRepaint(true);
-
 		if (HasFocus() == true) {
 			ReleaseFocus();
 		}
+	
+		DispatchComponentEvent(new ComponentEvent(this, JCET_ONHIDE));
+	} else {
+		Repaint();
 
-		SetIgnoreRepaint(false);
+		DispatchComponentEvent(new ComponentEvent(this, JCET_ONSHOW));
 	}
-		
-	Repaint();
 }
 
 void Component::RegisterFocusListener(FocusListener *listener)

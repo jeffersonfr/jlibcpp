@@ -519,6 +519,8 @@ void Container::Add(Component *c, GridBagConstraints *constraints)
 {
 	Add(c, GetComponentCount());
 	
+	DispatchContainerEvent(new ContainerEvent(this, c, JCET_COMPONENT_ADDED));
+
 	if (_layout != NULL) {
 		GridBagLayout *layout = dynamic_cast<jgui::GridBagLayout *>(_layout);
 
@@ -531,6 +533,8 @@ void Container::Add(Component *c, GridBagConstraints *constraints)
 void Container::Add(jgui::Component *c, std::string id)
 {
 	Add(c, GetComponentCount());
+
+	DispatchContainerEvent(new ContainerEvent(this, c, JCET_COMPONENT_ADDED));
 
 	if (_layout != NULL) {
 		CardLayout *layout = dynamic_cast<jgui::CardLayout *>(_layout);
@@ -545,6 +549,8 @@ void Container::Add(jgui::Component *c, jborderlayout_align_t align)
 {
 	Add(c, GetComponentCount());
 	
+	DispatchContainerEvent(new ContainerEvent(this, c, JCET_COMPONENT_ADDED));
+
 	if (_layout != NULL) {
 		BorderLayout *layout = dynamic_cast<jgui::BorderLayout *>(_layout);
 
@@ -601,7 +607,7 @@ void Container::Remove(jgui::Component *c)
 
 			DispatchContainerEvent(new ContainerEvent(this, c, JCET_COMPONENT_REMOVED));
 
-			return;
+			break;
 		}
 	}
 }
@@ -631,6 +637,10 @@ void Container::RemoveAll()
 
 	{
 		jthread::AutoLock lock(&_container_mutex);
+
+		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+			DispatchContainerEvent(new ContainerEvent(this, (*i), JCET_COMPONENT_REMOVED));
+		}
 
 		_components.clear();
 	}

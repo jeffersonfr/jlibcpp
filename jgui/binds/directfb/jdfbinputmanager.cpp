@@ -119,46 +119,34 @@ class EventBroadcaster : public jthread::Thread {
 					}
 				}
 
+				jcommon::EventObject *event = *_events.begin();
+
+				_events.erase(_events.begin());
+
 				_mutex.Unlock();
 
-				while (_is_running == true) {
-					_mutex.Lock();
+				jgui::KeyEvent *ke = dynamic_cast<jgui::KeyEvent *>(event);
+				jgui::MouseEvent *me = dynamic_cast<jgui::MouseEvent *>(event);
 
-					if (_events.size() == 0) {
-						_mutex.Unlock();
+				if (ke != NULL && IsKeyEventEnabled() == true) {
+					jgui::KeyListener *listener = dynamic_cast<jgui::KeyListener *>(_listener);
 
-						break;
+					listener->KeyPressed(ke);
+				} else if (me != NULL && IsMouseEventEnabled() == true) {
+					jgui::MouseListener *listener = dynamic_cast<jgui::MouseListener *>(_listener);
+
+					if (me->GetType() == JMT_PRESSED) {
+						listener->MousePressed(me);
+					} else if (me->GetType() == JMT_RELEASED) {
+						listener->MouseReleased(me);
+					} else if (me->GetType() == JMT_MOVED) {
+						listener->MouseMoved(me);
+					} else if (me->GetType() == JMT_ROTATED) {
+						listener->MouseWheel(me);
 					}
-
-					jcommon::EventObject *event = *_events.begin();
-
-					_events.erase(_events.begin());
-
-					_mutex.Unlock();
-
-					jgui::KeyEvent *ke = dynamic_cast<jgui::KeyEvent *>(event);
-					jgui::MouseEvent *me = dynamic_cast<jgui::MouseEvent *>(event);
-
-					if (ke != NULL && IsKeyEventEnabled() == true) {
-						jgui::KeyListener *listener = dynamic_cast<jgui::KeyListener *>(_listener);
-
-						listener->KeyPressed(ke);
-					} else if (me != NULL && IsMouseEventEnabled() == true) {
-						jgui::MouseListener *listener = dynamic_cast<jgui::MouseListener *>(_listener);
-
-						if (me->GetType() == JMT_PRESSED) {
-							listener->MousePressed(me);
-						} else if (me->GetType() == JMT_RELEASED) {
-							listener->MouseReleased(me);
-						} else if (me->GetType() == JMT_MOVED) {
-							listener->MouseMoved(me);
-						} else if (me->GetType() == JMT_ROTATED) {
-							listener->MouseWheel(me);
-						}
-					}
-
-					delete event;
 				}
+
+				delete event;
 			}
 		}
 
@@ -630,8 +618,7 @@ void DFBInputManager::RegisterKeyListener(KeyListener *listener)
 	jthread::AutoLock lock(&_mutex);
 
 	for (std::vector<EventBroadcaster *>::iterator i=_broadcasters.begin(); i!=_broadcasters.end(); i++) {
-		if ((*i)->GetListener() == dynamic_cast<jgui::KeyListener *>(listener) || 
-				(*i)->GetListener() == dynamic_cast<jgui::MouseListener *>(listener)) {
+		if (dynamic_cast<jgui::KeyListener *>((*i)->GetListener()) == listener) {
 			(*i)->SetKeyEventEnabled(true);
 
 			return;
@@ -722,8 +709,7 @@ void DFBInputManager::RegisterMouseListener(MouseListener *listener)
 	jthread::AutoLock lock(&_mutex);
 
 	for (std::vector<EventBroadcaster *>::iterator i=_broadcasters.begin(); i!=_broadcasters.end(); i++) {
-		if ((*i)->GetListener() == dynamic_cast<jgui::KeyListener *>(listener) || 
-				(*i)->GetListener() == dynamic_cast<jgui::MouseListener *>(listener)) {
+		if (dynamic_cast<jgui::MouseListener *>((*i)->GetListener()) == listener) {
 			(*i)->SetMouseEventEnabled(true);
 
 			return;
@@ -1042,6 +1028,8 @@ void DFBInputManager::Run()
 		return;
 	}
 
+	bool fired = false;
+
 	while (_initialized == true) {
 		events->WaitForEventWithTimeout(events, 0, 100);
 
@@ -1055,13 +1043,19 @@ void DFBInputManager::Run()
 
 				events->GetEvent(events, DFB_EVENT(&event));
 
-				ProcessInputEvent(event);
+				if (fired == false) {
+					ProcessInputEvent(event);
+				}
+
+				fired = false;
 			} else if (ievent.clazz == DFEC_WINDOW) {
 				DFBWindowEvent event;
 
 				events->GetEvent(events, DFB_EVENT(&event));
 
 				ProcessWindowEvent(event);
+
+				fired = true;
 			}
 		}
 	}
