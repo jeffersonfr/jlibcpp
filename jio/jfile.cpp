@@ -508,6 +508,16 @@ std::string File::GetDirectoryDelimiter()
 #endif
 }
 
+bool File::IsSymbolicLink()
+{
+	return false;
+}
+
+bool File::IsDevice()
+{
+	return false;
+}
+
 bool File::IsFile()
 {
 #ifdef _WIN32

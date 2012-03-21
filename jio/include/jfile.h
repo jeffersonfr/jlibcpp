@@ -304,18 +304,6 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetCurrentDirectory(std::string dir_);
-			
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetCurrentDirectory();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Close();
 
 		/**
