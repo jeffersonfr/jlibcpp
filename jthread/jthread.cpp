@@ -108,9 +108,19 @@ void Thread::USleep(uint64_t time_)
 #endif
 }
 
-jthread_t Thread::GetHandler()
+jthread_t Thread::GetHandler(int id)
 {
-	return _thread;
+	AutoLock lock(&jthread_mutex);
+
+	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
+		jthread_map_t *t = i->second;
+
+		if (i->first == id) {
+			return t->thread;
+		}
+	}
+
+	return 0;
 }
 
 int Thread::GetID()

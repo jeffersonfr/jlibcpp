@@ -966,6 +966,14 @@ int64_t File::Seek(int64_t n)
 #endif
 }
 
+void File::Truncate(int64_t n) 
+{
+#ifdef _WIN32
+#else
+	ftruncate(_fd, (off_t)n);
+#endif
+}
+
 std::string File::what()
 {
 	return "file:" + GetAbsolutePath();

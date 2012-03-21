@@ -82,6 +82,16 @@ enum jfile_flags_t {
 
 /**
  * \brief
+ *
+ */
+#ifdef _WIN32
+typedef HANDLE jfile_t;
+#else
+typedef int jfile_t;
+#endif
+
+/**
+ * \brief
  * 
  * \author Jeff Ferr
  */
@@ -165,201 +175,197 @@ class File : public virtual jcommon::Object{
 		static File * CreateTemporaryDirectory(std::string prefix, std::string sufix = std::string(""));
 
 		/**
+		 * \brief
+		 *
+		 */
+		virtual std::vector<std::string> ListFiles(std::string extension = std::string(""));
+		
+		/**
 		 * \brief Retorna o descritor para o arquivo.
 		 *
 		 */
-#ifdef _WIN32
-		HANDLE GetFileDescriptor();
-#else
-		int GetFileDescriptor();
-#endif
+		virtual jfile_t GetFileDescriptor();
 	
 		/**
 		 * \brief Retorna o tipo do arquivo.
 		 *
 		 */
-		bool Exists();
+		virtual bool Exists();
 		
 		/**
 		 * \brief Retorna o tipo do arquivo.
 		 *
 		 */
-		jfile_type_t GetType();
+		virtual jfile_type_t GetType();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetDirectoryDelimiter();
+		virtual std::string GetDirectoryDelimiter();
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsExecutable();
+		virtual bool IsExecutable();
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsSymbolicLink();
+		virtual bool IsSymbolicLink();
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsDevice();
+		virtual bool IsDevice();
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsFile();
+		virtual bool IsFile();
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsDirectory();
+		virtual bool IsDirectory();
 		
 		/**
 		 * \brief Retorna o tamanho, em bytes, do aquivo.
 		 *
 		 */
-		int64_t GetSize();
+		virtual int64_t GetSize();
    
 		/**
 		 * \brief Retorna o nome do arquivo/diretorio.
 		 *
 		 */
-		std::string GetName();
+		virtual std::string GetName();
 
 		/**
 		 * \brief Retorna caminho do arquivo/diretorio.
 		 *
 		 */
-		std::string GetPath();
+		virtual std::string GetPath();
 
 		/**
 		 * \brief Retorna o caminho absoluto do arquivo/diretorio.
 		 *
 		 */
-		std::string GetCanonicalPath();
+		virtual std::string GetCanonicalPath();
 		
 		/**
 		 * \brief Retorna o caminho absoluto do arquivo/diretorio.
 		 *
 		 */
-		std::string GetAbsolutePath();
+		virtual std::string GetAbsolutePath();
 		
 		/**
 		 * \brief Retorna a data do ultimo acesso do arquivo.
 		 *
 		 */
-		time_t GetLastAccessTime();
+		virtual time_t GetLastAccessTime();
 		
 		/**
 		 * \brief Retorna a data da ultima modificacao do arquivo.
 		 *
 		 */
-		time_t GetLastModificationTime();
+		virtual time_t GetLastModificationTime();
 		
 		/**
 		 * \brief Retorna a data da ultima modificacao do status do arquivo.
 		 *
 		 */
-		time_t GetLastStatusChangeTime();
+		virtual time_t GetLastStatusChangeTime();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int64_t Read(char *data_, int64_t length_);
+		virtual int64_t Read(char *data_, int64_t length_);
 
 		/**
 		 * \brief
 		 *
 		 */
-		int64_t Write(const char *data_, int64_t length_);
+		virtual int64_t Write(const char *data_, int64_t length_);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Flush();
+		virtual void Flush();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetCurrentDirectory(std::string dir_);
+		virtual void SetCurrentDirectory(std::string dir_);
 			
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetCurrentDirectory();
+		virtual std::string GetCurrentDirectory();
 
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<std::string> ListFiles(std::string extension = std::string(""));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Close();
+		virtual void Close();
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsClosed();
+		virtual bool IsClosed();
 	
 		/**
 		 * \brief
 		 *
 		 */
-		void Move(std::string newpath_);
+		virtual void Move(std::string newpath_);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Rename(std::string newpath_);
+		virtual void Rename(std::string newpath_);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Remove();
+		virtual void Remove();
 	
 		/**
 		 * \brief
 		 *
 		 */
-		void Reset();
+		virtual void Reset();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int64_t Tell();
+		virtual int64_t Tell();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int64_t Seek(int64_t n);
+		virtual int64_t Seek(int64_t n);
 
 		/**
-		 * \brief Find a file in the directory opened.
+		 * \brief
 		 *
 		 */
-		bool ExistsFile(std::string file_);
-		
+		virtual void Truncate(int64_t n);
+
 		/**
 		 * \brief
 		 *

@@ -574,6 +574,8 @@ void Window::Repaint(Component *cmp)
 			h = size.height;
 		}
 		
+		// CHANGE:: clip ?
+		
 		Paint(_graphics);
 		
 		_graphics->Flip(x, y, w, h);

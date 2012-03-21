@@ -168,7 +168,7 @@ class Thread : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		ThreadGroup * GetThreadGroup();
+		virtual ThreadGroup * GetThreadGroup();
 
 		/**
 		 * \brief
@@ -192,25 +192,25 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Get thread identifier
 		 *
 		 */
-		jthread_t GetHandler();
+		virtual jthread_t GetHandler(int id = 0);
 
 		/**
 		 * \brief Get thread identifier
 		 *
 		 */
-		int GetID();
+		virtual int GetID();
 
 		/**
 		 * \brief 
 		 *
 		 */
-		void KillAllThreads();
+		virtual void KillAllThreads();
 
 		/**
 		 * \brief Init the thread.
 		 *
 		 */
-		void Start(int id = 0);
+		virtual void Start(int id = 0);
 
 		/**
 		 * \brief Interrupt the thread.
@@ -228,43 +228,43 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Resume the thread.
 		 *
 		 */
-		void Resume(int id = 0);
+		virtual void Resume(int id = 0);
 
 		/**
 		 * \brief Return true if thread is started, false if not.
 		 *
 		 */
-		bool IsRunning(int id = 0);
+		virtual bool IsRunning(int id = 0);
 
 		/**
 		 * \bried
 		 *
 		 */
-		void Yield();
+		virtual void Yield();
 
 		/**
 		 * \bried
 		 *
 		 */
-		void SetPolicy(jthread_policy_t policy, jthread_priority_t priority);
+		virtual void SetPolicy(jthread_policy_t policy, jthread_priority_t priority);
 
 		/**
 		 * \bried
 		 *
 		 */
-		void GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority);
+		virtual void GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority);
 
 		/**
 		 * \brief Wait for end of thread.
 		 *
 		 */
-		void WaitThread(int id = 0);
+		virtual void WaitThread(int id = 0);
 
 		/**
 		 * \brief Wait for end of thread.
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 };
 

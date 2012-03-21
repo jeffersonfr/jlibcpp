@@ -88,7 +88,8 @@ enum jblitting_flags_t {
 enum jdrawing_mode_t {
 	JDM_PATH,
 	JDM_STROKE,
-	JDM_FILL
+	JDM_FILL,
+	JDM_CLIP
 };
 
 /**
