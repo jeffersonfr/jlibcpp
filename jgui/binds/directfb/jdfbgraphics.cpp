@@ -269,13 +269,30 @@ jsize_t DFBGraphics::GetWorkingScreenSize()
 	return _scale;
 }
 
-void DFBGraphics::Clear(int red, int green, int blue, int alpha)
+void DFBGraphics::Clear()
 {
 	if (surface == NULL) {
 		return;
 	}
 
-	surface->Clear(surface, red, green, blue, alpha);
+	surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
+}
+
+void DFBGraphics::Clear(int xp, int yp, int wp, int hp)
+{
+	if (surface == NULL) {
+		return;
+	}
+
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
+
+	surface->SetPorterDuff(surface, DSPD_CLEAR);
+	surface->FillRectangle(surface, x, y, w, h);
+
+	SetCompositeFlags(GetCompositeFlags());
 }
 
 void DFBGraphics::Idle()

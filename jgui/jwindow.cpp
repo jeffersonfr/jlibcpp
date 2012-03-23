@@ -94,7 +94,8 @@ Window::~Window()
 	}
 
 	if (_window != NULL) {
-		_window->SetOpacity(_window, 0x00);
+		//_window->Close(_window);
+		//_window->Destroy(_window);
 		_window->Release(_window);
 		_window = NULL;
 	}
@@ -574,8 +575,8 @@ void Window::Repaint(Component *cmp)
 			h = size.height;
 		}
 		
-		// CHANGE:: clip ?
-		
+		_graphics->SetClip(x, y, w, h);
+
 		Paint(_graphics);
 		
 		_graphics->Flip(x, y, w, h);

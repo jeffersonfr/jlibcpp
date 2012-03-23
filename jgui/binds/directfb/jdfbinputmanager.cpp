@@ -1043,9 +1043,9 @@ void DFBInputManager::Run()
 
 				events->GetEvent(events, DFB_EVENT(&event));
 
-				if (fired == false) {
+				// if (fired == false) {
 					ProcessInputEvent(event);
-				}
+				// }
 
 				fired = false;
 			} else if (ievent.clazz == DFEC_WINDOW) {

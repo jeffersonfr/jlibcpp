@@ -100,7 +100,12 @@ void NullGraphics::ReleaseClip()
 	JDEBUG(JINFO, "called\n");
 }
 
-void NullGraphics::Clear(int red, int green, int blue, int alpha)
+void NullGraphics::Clear()
+{
+	JDEBUG(JINFO, "called\n");
+}
+
+void NullGraphics::Clear(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 }

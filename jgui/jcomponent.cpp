@@ -1831,6 +1831,10 @@ bool Component::IsVisible()
 
 void Component::SetVisible(bool b)
 {
+	if (_is_visible == b) {
+		return;
+	}
+
 	_is_visible = b;
 
 	if (_is_visible == false) {
@@ -1840,10 +1844,10 @@ void Component::SetVisible(bool b)
 	
 		DispatchComponentEvent(new ComponentEvent(this, JCET_ONHIDE));
 	} else {
-		Repaint();
-
 		DispatchComponentEvent(new ComponentEvent(this, JCET_ONSHOW));
 	}
+		
+	Repaint();
 }
 
 void Component::RegisterFocusListener(FocusListener *listener)

@@ -145,7 +145,11 @@ jsize_t Graphics::GetWorkingScreenSize()
 	return _scale;
 }
 
-void Graphics::Clear(int red, int green, int blue, int alpha)
+void Graphics::Clear()
+{
+}
+
+void Graphics::Clear(int xp, int yp, int wp, int hp)
 {
 }
 

@@ -177,7 +177,13 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void Clear(int r = 0xff, int g = 0xff, int b = 0xff, int a = 0x00);
+		virtual void Clear();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Clear(int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief

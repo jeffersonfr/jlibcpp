@@ -36,7 +36,8 @@ class GraphicPanel : public jgui::Frame{
 	}
 
 	void Clear(jgui::Graphics *g) {
-		g->Clear(0x00, 0x00, 0x00, 0xff);
+		g->SetColor(jgui::Color::Black);
+		g->FillRectangle(0, 0, GetWidth(), GetHeight());
 		g->Flip();
 	}
 
