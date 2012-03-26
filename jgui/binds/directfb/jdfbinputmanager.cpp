@@ -1304,8 +1304,6 @@ void DFBInputManager::Run()
 		return;
 	}
 
-	bool fired = false;
-
 	while (_initialized == true) {
 		events->WaitForEventWithTimeout(events, 0, 100);
 
@@ -1319,19 +1317,16 @@ void DFBInputManager::Run()
 
 				events->GetEvent(events, DFB_EVENT(&event));
 
-				// if (fired == false) {
-					ProcessInputEvent(event);
-				// }
-
-				fired = false;
+				ProcessInputEvent(event);
 			} else if (ievent.clazz == DFEC_WINDOW) {
 				DFBWindowEvent event;
 
 				events->GetEvent(events, DFB_EVENT(&event));
 
-				ProcessWindowEvent(event);
-
-				fired = true;
+				// INFO:: discards mouse events from windows (problem with tests/sort.cpp)
+				if (event.type == DWET_KEYDOWN || event.type == DWET_KEYUP) {
+					ProcessWindowEvent(event);
+				}
 			}
 		}
 	}

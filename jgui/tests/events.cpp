@@ -32,7 +32,7 @@
 
 #include <stdlib.h>
 
-#define LONG_PRESS_TIME	2
+#define LONG_PRESS_TIME	2000
 
 enum userevent_type_t {
 	ON_KEY_DOWN_EVENT,
@@ -302,9 +302,9 @@ class UserEventManager : public jgui::KeyListener, public jgui::MouseListener {
 
 		virtual void KeyPressed(jgui::KeyEvent *event)
 		{
-			if (event->GetType() == jgui::JKT_PRESSED) {
-				struct event_t *t = _events[event->GetSymbol()];
+			struct event_t *t = _events[event->GetSymbol()];
 
+			if (event->GetType() == jgui::JKT_PRESSED) {
 				if ((void *)t == NULL) {
 					t = new struct event_t;
 
@@ -316,23 +316,21 @@ class UserEventManager : public jgui::KeyListener, public jgui::MouseListener {
 					_events[event->GetSymbol()] = t;
 
 					t->key_down = true;
-					t->start_time = time(NULL);
+					t->start_time = jcommon::Date::CurrentTimeMillis();
 
 					DispatchUserEvent(new UserEvent(ON_KEY_DOWN_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
 				}
 
-				long current_time = time(NULL);
+				long current_time = jcommon::Date::CurrentTimeMillis();
 
 				if ((current_time-t->start_time) >= LONG_PRESS_TIME) {
-					t->start_time = time(NULL);
+					t->start_time = jcommon::Date::CurrentTimeMillis();
 
 					DispatchUserEvent(new UserEvent(ON_KEY_LONGPRESS_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
 				}
 
 				DispatchUserEvent(new UserEvent(ON_KEY_PRESS_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
 			} else if (event->GetType() == jgui::JKT_RELEASED) {
-				struct event_t *t = _events[event->GetSymbol()];
-
 				if ((void *)t != NULL) {
 					t->key_down = false;
 
