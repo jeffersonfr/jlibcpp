@@ -126,6 +126,11 @@ jdrawing_mode_t Graphics::GetDrawingMode()
 	return JDM_STROKE;
 }
 
+void Graphics::SetWorkingScreenSize(jsize_t size)
+{
+	SetWorkingScreenSize(size.width, size.height);
+}
+
 void Graphics::SetWorkingScreenSize(int width, int height)
 {
 	_scale.width = width;
