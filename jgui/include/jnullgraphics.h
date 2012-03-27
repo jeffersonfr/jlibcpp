@@ -62,6 +62,12 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual void SetWorkingScreenSize(jsize_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWorkingScreenSize(int width, int height);
 
 		/**

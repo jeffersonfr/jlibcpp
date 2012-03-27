@@ -61,6 +61,11 @@ InputManager * InputManager::GetInstance()
 	return _instance;
 }
 
+void InputManager::SetWorkingScreenSize(jsize_t size)
+{
+	SetWorkingScreenSize(size.width, size.height);
+}
+
 void InputManager::SetWorkingScreenSize(int width, int height)
 {
 	_scale.width = width;

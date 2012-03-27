@@ -148,6 +148,12 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void SetWorkingScreenSize(jsize_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWorkingScreenSize(int width, int height);
 		
 		/**

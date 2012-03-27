@@ -115,10 +115,23 @@ jsize_t GFXHandler::GetScreenSize()
 	return _screen;
 }
 
+void GFXHandler::SetWorkingScreenSize(jsize_t size)
+{
+	SetWorkingScreenSize(size.width, size.height);
+}
+
 void GFXHandler::SetWorkingScreenSize(int width, int height)
 {
 	_scale.width = width;
 	_scale.height = height;
+
+	if (_scale.width <= 0) {
+		_scale.width = DEFAULT_SCALE_WIDTH;
+	}
+
+	if (_scale.height <= 0) {
+		_scale.height = DEFAULT_SCALE_HEIGHT;
+	}
 }
 
 jsize_t GFXHandler::GetWorkingScreenSize()

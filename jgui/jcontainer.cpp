@@ -217,10 +217,23 @@ bool Container::MoveScrollTowards(Component *next, jkeyevent_symbol_t symbol)
 	return true;
 }
 
+void Container::SetWorkingScreenSize(jsize_t size)
+{
+	SetWorkingScreenSize(size.width, size.height);
+}
+
 void Container::SetWorkingScreenSize(int width, int height)
 {
 	_scale.width = width;
 	_scale.height = height;
+
+	if (_scale.width <= 0) {
+		_scale.width = DEFAULT_SCALE_WIDTH;
+	}
+
+	if (_scale.height <= 0) {
+		_scale.height = DEFAULT_SCALE_HEIGHT;
+	}
 }
 
 jsize_t Container::GetWorkingScreenSize()

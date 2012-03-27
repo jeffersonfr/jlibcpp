@@ -160,6 +160,11 @@ void Window::SetNativeWindow(void *native)
 #endif
 }
 
+void Window::SetWorkingScreenSize(jsize_t size)
+{
+	SetWorkingScreenSize(size.width, size.height);
+}
+
 void Window::SetWorkingScreenSize(int width, int height)
 {
 	if (_scale.width == width || _scale.height == height) {

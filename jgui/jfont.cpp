@@ -76,10 +76,23 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int hei
 	return NULL;
 }
 
+void Font::SetWorkingScreenSize(jsize_t size)
+{
+	SetWorkingScreenSize(size.width, size.height);
+}
+
 void Font::SetWorkingScreenSize(int width, int height)
 {
 	_scale.width = width;
 	_scale.height = height;
+
+	if (_scale.width <= 0) {
+		_scale.width = DEFAULT_SCALE_WIDTH;
+	}
+
+	if (_scale.height <= 0) {
+		_scale.height = DEFAULT_SCALE_HEIGHT;
+	}
 }
 
 jsize_t Font::GetWorkingScreenSize()
