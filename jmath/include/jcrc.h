@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  a***************************************************************************/
-#ifndef J_CRC32_H
-#define J_CRC32_H
+#ifndef J_CRC_H
+#define J_CRC_H
 
 #include "jobject.h"
 
@@ -33,35 +33,46 @@ namespace jmath {
  * 
  * \author Jeff Ferr
  */
-class CRC32 : public virtual jcommon::Object{
+class CRC : public virtual jcommon::Object{
 
 	private:
+		/**
+		 * \brief
+		 *
+		 */
+		CRC();
 		
 	public:
 		/**
-		* \brief
-		*
-		*/
-		CRC32();
-		
-		/**
-		* \brief
-		*
-		*/
-		virtual ~CRC32();
+		 * \brief
+		 *
+		 */
+		virtual ~CRC();
 
 		/**
 		 * \brief
 		 *
 		 */
-		unsigned int Calculate16(uint8_t *begin, unsigned int count);
+		static uint8_t Calculate8(uint8_t *begin, int count);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		unsigned int Calculate32(uint8_t *begin, unsigned int count);
-
+		static uint16_t Calculate16(uint16_t *begin, int count);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		static uint32_t Calculate32(uint32_t *begin, int count);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		static uint64_t Calculate64(uint64_t *begin, int count);
+		
 };
 
 }
