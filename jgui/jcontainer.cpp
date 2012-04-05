@@ -768,7 +768,7 @@ bool Container::ProcessEvent(MouseEvent *event)
 		event->SetX(dx+scrollx);
 		event->SetY(dy+scrolly);
 
-		c->ProcessEvent(event);
+		return c->ProcessEvent(event);
 	}
 
 	return false;
