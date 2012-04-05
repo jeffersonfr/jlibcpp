@@ -144,7 +144,7 @@ OBJS_jcommon += \
 OBJS_jmath += \
 		 jbase64.o\
 		 jcomplex.o\
-		 jcrc32.o\
+		 jcrc.o\
 		 jmath.o\
 		 jmathlib.o\
 		 jmatrix.o\
