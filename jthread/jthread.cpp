@@ -177,8 +177,8 @@ void * Thread::ThreadMain(void *owner_)
 		// throw ThreadException("Interrupt is not allowed");
 	}
 
-	// if (pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) == EINVAL) {
-	if (pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) == EINVAL) {
+	if (pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) == EINVAL) {
+	// if (pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) == EINVAL) {
 		// throw ThreadException("Thread is not asynchronous");
 	}
 #endif
@@ -186,11 +186,6 @@ void * Thread::ThreadMain(void *owner_)
 	jthread_arg_t *arg = (jthread_arg_t *)owner_;
 
 	if (arg->thread->SetUp() == 0) {
-#ifdef _WIN32
-#else
-		pthread_testcancel();
-#endif
-	
 		arg->thread->Run();
 
 #ifdef _WIN32
@@ -207,7 +202,6 @@ void * Thread::ThreadMain(void *owner_)
 
 	delete arg;
 
-	return 0;
 	pthread_exit(NULL);
 }
 
@@ -579,6 +573,8 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 
 void Thread::WaitThread(int id)
 {
+	AutoLock lock(&jthread_mutex);
+
 	if (IsRunning(id) == false) {
 		return;
 	}
@@ -588,6 +584,8 @@ void Thread::WaitThread(int id)
 	}
 
 	jthread_map_t *t = GetMap(id);
+
+	t->alive = false;
 
 #ifdef _WIN32
 	HANDLE thread = t->thread;
@@ -603,15 +601,9 @@ void Thread::WaitThread(int id)
 	*/
 
 	pthread_t thread = t->thread;
-	void *result;
 
-	if (pthread_join(thread, &result) != 0) {
-		throw ThreadException("Wait thread failed");
-	}
-
-	if (result != NULL) {
-		free(result);
-	}
+	pthread_join(thread, NULL);
+	pthread_detach(thread);
 #endif
 }
 

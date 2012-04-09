@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jtimer.h"
-#include "jsemaphoretimeoutexception.h"
+#include "jruntimeexception.h"
 
 static bool tasks_compare(jthread::TimerTask *a, jthread::TimerTask *b) 
 {
@@ -82,12 +82,20 @@ TimerTask * TaskQueue::GetMin()
 {
 	jthread::AutoLock lock(&_mutex);
 
+	if (_queue.size() == 0) {
+		return NULL;
+	}
+
 	return _queue[0];
 }
 
 void TaskQueue::RemoveMin() 
 {
 	jthread::AutoLock lock(&_mutex);
+
+	if (_queue.size() == 0) {
+		return;
+	}
 
 	_queue.erase(_queue.begin());
 
@@ -123,7 +131,7 @@ void TaskQueue::Remove(TimerTask *task)
 bool TaskQueue::IsEmpty() 
 {
 	jthread::AutoLock lock(&_mutex);
-
+	
 	return _queue.empty();
 }
 
@@ -145,6 +153,10 @@ void TaskQueue::RescheduleMin(uint64_t newTime)
 {
 	jthread::AutoLock lock(&_mutex);
 
+	if (_queue.size() == 0) {
+		return;
+	}
+
 	_queue[0]->_next_execution_time = newTime;
 
 	std::sort(_queue.begin(), _queue.end(), tasks_compare);
@@ -154,18 +166,19 @@ TimerThread::TimerThread(TaskQueue *queue)
 {
 	_queue = queue;
 	_is_running = true;
-
 	_new_tasks_may_be_scheduled = true;
 }
 
 TimerThread::~TimerThread()
 {
+}
+
+void TimerThread::Release()
+{
 	_is_running = false;
 	_new_tasks_may_be_scheduled = false;
-
-	_queue->Clear();
 	
-	_queue->_sem.Notify(); // In case queue is empty.
+	_queue->_sem.Notify();
 
 	WaitThread();
 }
@@ -184,38 +197,33 @@ void TimerThread::MainLoop()
 		}
 
 		// Queue is empty and will forever remain; die
-		if (_queue->IsEmpty()) {
+		if (_is_running == false || _queue->IsEmpty()) {
 			break; 
 		}
 
 		// Queue nonempty; look at first evt and do the right thing
-		uint64_t currentTime, 
-						 executionTime;
-
 		task = _queue->GetMin();
 
-		{
-			// monitor enter
-			if (task->_state == JTS_CANCELLED) {
+		// monitor enter
+		if (task->_state == JTS_CANCELLED) {
+			_queue->RemoveMin();
+
+			continue;  // No action required, poll queue again
+		}
+
+		uint64_t currentTime = (uint64_t)jcommon::Date::CurrentTimeMicros(),
+						 executionTime = (uint64_t)task->_next_execution_time;
+
+		taskFired = (executionTime <= currentTime);
+
+		if (taskFired == true) {
+			if (task->_delay == 0LL) { 
+				// Non-repeating, remove
 				_queue->RemoveMin();
-
-				continue;  // No action required, poll queue again
-			}
-
-			currentTime = (uint64_t)jcommon::Date::CurrentTimeMicros();
-			executionTime = (uint64_t)task->_next_execution_time;
-
-			taskFired = (executionTime <= currentTime);
-			
-			if (taskFired == true) {
-				if (task->_delay == 0LL) { 
-					// Non-repeating, remove
-					_queue->RemoveMin();
-					task->_state = JTS_EXECUTED;
-				} else {
-					// Repeating task, reschedule
-					_queue->RescheduleMin(task->_push_time == true ? currentTime + task->_delay : executionTime + task->_delay);
-				}
+				task->_state = JTS_EXECUTED;
+			} else {
+				// Repeating task, reschedule
+				_queue->RescheduleMin(task->_push_time == true ? currentTime + task->_delay : executionTime + task->_delay);
 			}
 		}
 
@@ -223,12 +231,12 @@ void TimerThread::MainLoop()
 		if (!taskFired) {
 			try {
 				_queue->_sem.Wait(executionTime - currentTime);
-			} catch (SemaphoreTimeoutException &e) {
+			} catch (jcommon::RuntimeException &e) {
 			}
 		}
 
 		// Task fired; run it, holding no locks
-		if (taskFired) {
+		if (_is_running == true && taskFired) {
 			task->Run();
 		}
 	}
@@ -260,6 +268,8 @@ Timer::Timer()
 Timer::~Timer() 
 {
 	jthread::AutoLock lock(&_mutex);
+
+	_thread->Release();
 
 	delete _thread;
 	_thread = NULL;

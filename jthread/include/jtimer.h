@@ -21,6 +21,7 @@
 #define J_TIMER_H
 
 #include "jthread.h"
+#include "jsemaphore.h"
 #include "jautolock.h"
 #include "jdate.h"
 #include "jillegalargumentexception.h"
@@ -128,7 +129,7 @@ class TaskQueue {
 	private:
 		std::vector<TimerTask *> _queue;
 		jthread::Mutex _mutex;
-		jthread::Condition _sem;
+		jthread::Semaphore _sem;
 
 	private:
 		/**
@@ -232,6 +233,12 @@ class TimerThread : public jthread::Thread {
 		 *
 		 */
     virtual ~TimerThread();
+
+		/**
+		 * \brief
+		 *
+		 */
+    virtual void Release();
 
 		/**
 		 * \brief
