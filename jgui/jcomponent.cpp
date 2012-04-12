@@ -486,7 +486,7 @@ void Component::PaintScrollbars(Graphics *g)
 		int offset = (int)(_size.width*offset_ratio),
 			block_size = (int)(_size.width*block_size_ratio);
 
-		g->SetGradientStop(0.0, _fgcolor);
+		g->SetGradientStop(0.0, fgcolor);
 		g->SetGradientStop(1.0, bgcolor);
 		g->FillLinearGradient(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size, 0, 0, 0, _scroll_size);
 		g->ResetGradientStop();
