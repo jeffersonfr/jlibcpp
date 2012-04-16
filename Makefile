@@ -15,13 +15,13 @@ STRIP			= $(HOST)strip
 
 DOXYGEN		= doxygen
 
-INCDIR		= ./include
-LIBDIR		= ./lib
-SRCDIR 		= ./src
-BINDIR 		= ./bin
-OBJDIR		= ./objs
-TESTDIR		= ./tests
-DOCDIR		= ./doc/
+INCDIR		= include
+LIBDIR		= lib
+SRCDIR 		= src
+BINDIR 		= bin
+OBJDIR		= objs
+TESTDIR		= tests
+DOCDIR		= doc
 
 PREFIX		= /usr/local
 
@@ -31,7 +31,7 @@ ENABLE_DEBUG		?= yes
 ENABLE_GRAPHICS ?= dfb
 
 ARFLAGS		= -rc
-# -ansi: problemas com va_copy()
+# -ansi: problem with va_copy()
 CCFLAGS		= -Wall -shared -rdynamic -fpic -funroll-loops -O2
 
 INCLUDE		= \

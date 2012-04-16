@@ -94,8 +94,8 @@ Window::~Window()
 	}
 
 	if (_window != NULL) {
-		//_window->Close(_window);
-		//_window->Destroy(_window);
+		_window->Close(_window);
+		_window->Destroy(_window);
 		_window->Release(_window);
 		_window = NULL;
 	}

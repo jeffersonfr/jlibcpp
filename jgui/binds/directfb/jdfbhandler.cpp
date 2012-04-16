@@ -384,6 +384,9 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	(*window)->RaiseToTop(*window);
 	(*window)->SetOpacity(*window, opacity);
 	// (*surface)->SetRenderOptions(*surface, DSRO_ALL);
+	
+	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
+	(*surface)->Flip(*surface, NULL, (DFBSurfaceFlipFlags)DSFLIP_FLUSH);
 	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
 
 	return 0;
@@ -450,6 +453,9 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	(*window)->RaiseToTop(*window);
 	(*window)->SetOpacity(*window, opacity);
 	// (*surface)->SetRenderOptions(*surface, DSRO_ALL);
+	
+	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
+	(*surface)->Flip(*surface, NULL, (DFBSurfaceFlipFlags)DSFLIP_FLUSH);
 	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
 
 	return 0;
