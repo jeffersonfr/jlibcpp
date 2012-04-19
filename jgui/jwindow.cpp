@@ -53,9 +53,9 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 #ifdef DIRECTFB_UI
 	_surface = NULL;
 	_window = NULL;
+	
+	_graphics = new DFBGraphics(NULL, true);
 #endif
-
-	_graphics = NULL;
 
 	_opacity = 0xff;
 	_cursor = JCS_DEFAULT;
@@ -82,18 +82,17 @@ Window::~Window()
 		_window->SetOpacity(_window, 0x00);
 	}
 
-	if (_graphics != NULL) {
-		_graphics->Clear();
+	_graphics->Clear();
 
-		delete _graphics;
-		_graphics = NULL;
-	}
+	delete _graphics;
+	_graphics = NULL;
 
 	if (_surface != NULL) {
 		_surface->Release(_surface);
 	}
 
 	if (_window != NULL) {
+		_window->SetOpacity(_window, 0x00);
 		_window->Close(_window);
 		_window->Destroy(_window);
 		_window->Release(_window);
@@ -106,8 +105,6 @@ Window::~Window()
 
 Graphics * Window::GetGraphics()
 {
-	jthread::AutoLock lock(&_window_mutex);
-
 	return _graphics;
 }
 
@@ -129,34 +126,29 @@ void Window::SetNativeWindow(void *native)
 	ReleaseWindow();
 
 #ifdef DIRECTFB_UI
-	jthread::AutoLock lock(&_window_mutex);
-
 	IDirectFBSurface *window_surface = NULL;
+
+	_graphics->Lock();
 
 	_window = (IDirectFBWindow *)native;
 	
-	if (_window->GetSurface(_window, &window_surface) != DFB_OK) {
-		_window->Release(_window);
-
-		_window = NULL;
-		_surface = NULL;
-
-		return;
-	}
-
-	if (_graphics == NULL) {
-		_graphics = new DFBGraphics(window_surface, false);
-	} else {
-		_graphics->SetNativeSurface(window_surface);
-	}
-
 	if (_surface != NULL) {
 		_surface->Release(_surface);
-
-		_surface = NULL;
 	}
 
-	_surface = window_surface;
+	if (_window->GetSurface(_window, &_surface) != DFB_OK) {
+		_window->SetOpacity(_window, 0x00);
+		_window->Close(_window);
+		_window->Destroy(_window);
+		_window->Release(_window);
+
+		_surface = NULL;
+		_window = NULL;
+	}
+
+	_graphics->SetNativeSurface(window_surface);
+	
+	_graphics->Unlock();
 #endif
 }
 
@@ -200,46 +192,34 @@ jcursor_style_t Window::GetCursor()
 void Window::InternalCreateWindow(void *params)
 {
 #ifdef DIRECTFB_UI
-	jthread::AutoLock lock(&_window_mutex);
+	_graphics->Lock();
 
 	DFBHandler *gfx = dynamic_cast<DFBHandler *>(GFXHandler::GetInstance());
 
-	IDirectFBWindow *w = NULL;
-	IDirectFBSurface *s = NULL;
-	
-	if (params == NULL) {
-		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &w, &s, _opacity, _scale.width, _scale.height);
-	} else {
-		DFBWindowDescription desc = *(DFBWindowDescription *)params;
-
-		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &w, &s, desc, _opacity, _scale.width, _scale.height);
-	}
-
-	if (s != NULL) {
-		// _graphics = new NullGraphics();
-
-		if (_graphics == NULL) {
-			_graphics = new DFBGraphics(s, false);
-		} else {
-			_graphics->SetNativeSurface(s);
-		}
-	}
-
 	if (_surface != NULL) {
 		_surface->Release(_surface);
-
 		_surface = NULL;
 	}
 
-	_surface = s;
-
 	if (_window != NULL) {
 		_window->SetOpacity(_window, 0x00);
+		_window->Close(_window);
+		_window->Destroy(_window);
 		_window->Release(_window);
 		_window = NULL;
 	}
 
-	_window = w;
+	if (params == NULL) {
+		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &_window, &_surface, _opacity, _scale.width, _scale.height);
+	} else {
+		DFBWindowDescription desc = *(DFBWindowDescription *)params;
+
+		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &_window, &_surface, desc, _opacity, _scale.width, _scale.height);
+	}
+
+	_graphics->SetNativeSurface(_surface);
+
+	_graphics->Unlock();
 #endif
 }
 
@@ -297,45 +277,54 @@ void Window::PutBelow(Window *w)
 #endif
 }
 
-void Window::SetBounds(int x, int y, int w, int h)
+void Window::SetBounds(int x, int y, int width, int height)
 {
-	jthread::AutoLock lock(&_window_mutex);
+	{
+		jthread::AutoLock lock(&_window_mutex);
 
-	if (_location.x == x && _location.y == y && _size.width == w && _size.height == h) {
-		return;
-	}
+		if (_location.x == x && _location.y == y && _size.width == width && _size.height == height) {
+			return;
+		}
 
-	_location.x = x;
-	_location.y = y;
-	_size.width = w;
-	_size.height = h;
+		_location.x = x;
+		_location.y = y;
+		_size.width = width;
+		_size.height = height;
 
-	if (_size.width < _minimum_size.width) {
-		_size.width = _minimum_size.width;
-	}
+		if (_size.width < _minimum_size.width) {
+			_size.width = _minimum_size.width;
+		}
 
-	if (_size.height < _minimum_size.height) {
-		_size.height = _minimum_size.height;
-	}
+		if (_size.height < _minimum_size.height) {
+			_size.height = _minimum_size.height;
+		}
 
-	if (_size.width > _maximum_size.width) {
-		_size.width = _maximum_size.width;
-	}
+		if (_size.width > _maximum_size.width) {
+			_size.width = _maximum_size.width;
+		}
 
-	if (_size.height > _maximum_size.height) {
-		_size.height = _maximum_size.height;
-	}
+		if (_size.height > _maximum_size.height) {
+			_size.height = _maximum_size.height;
+		}
 
 #ifdef DIRECTFB_UI
-	if (_window != NULL) {
-		x = SCALE_TO_SCREEN(_location.x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
-		y = SCALE_TO_SCREEN(_location.y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height),
-		w = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
-		h = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+		_graphics->Lock();
 
-		while (_window->SetBounds(_window, x, y, w, h) == DFB_LOCKED);
-	}
+		if (_window != NULL) {
+			x = SCALE_TO_SCREEN(_location.x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
+			y = SCALE_TO_SCREEN(_location.y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height),
+			width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
+			height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+
+			_window->SetBounds(_window, x, y, width, height);
+			_window->ResizeSurface(_window, width, height);
+			_window->GetSurface(_window, &_surface);
+			_graphics->SetNativeSurface(_surface);
+		}
+	
+		_graphics->Unlock();
 #endif
+	}
 	
 	Repaint();
 
@@ -345,29 +334,35 @@ void Window::SetBounds(int x, int y, int w, int h)
 
 void Window::SetLocation(int x, int y)
 {
-	if (_location.x == x && _location.y == y) {
-		return;
-	}
+	{
+		jthread::AutoLock lock(&_window_mutex);
+	
+		if (_location.x == x && _location.y == y) {
+			return;
+		}
 
-	_location.x = x;
-	_location.y = y;
+		_location.x = x;
+		_location.y = y;
 
 #ifdef DIRECTFB_UI
-	int dx = SCALE_TO_SCREEN(x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
-			dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+		_graphics->Lock();
+	
+		int dx = SCALE_TO_SCREEN(x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
+				dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
 
-	if (_window != NULL) {
-		while (_window->MoveTo(_window, dx, dy) == DFB_LOCKED);
-	}
+		if (_window != NULL) {
+			while (_window->MoveTo(_window, dx, dy) == DFB_LOCKED);
+		}
 #endif
+	}
 	
 	DispatchWindowEvent(new WindowEvent(this, JWET_MOVED));
 }
 
-void Window::SetMinimumSize(int w, int h)
+void Window::SetMinimumSize(int width, int height)
 {
-	_minimum_size.width = w;
-	_minimum_size.height = h;
+	_minimum_size.width = width;
+	_minimum_size.height = height;
 
 	if (_minimum_size.width < 16) {
 		_minimum_size.width = 16;
@@ -401,10 +396,10 @@ void Window::SetMinimumSize(int w, int h)
 	}
 }
 
-void Window::SetMaximumSize(int w, int h)
+void Window::SetMaximumSize(int width, int height)
 {
-	_maximum_size.width = w;
-	_maximum_size.height = h;
+	_maximum_size.width = width;
+	_maximum_size.height = height;
 
 	if (_maximum_size.width > 65535) {
 		_maximum_size.width = 65535;
@@ -440,41 +435,50 @@ void Window::SetMaximumSize(int w, int h)
 
 void Window::SetSize(int width, int height)
 {
-	jthread::AutoLock lock(&_window_mutex);
+	{
+		jthread::AutoLock lock(&_window_mutex);
+	
+		if (_size.width == width && _size.height == height) {
+			return;
+		}	
 
-	if (_size.width == width && _size.height == height) {
-		return;
-	}	
+		_size.width = width;
+		_size.height = height;
 
-	_size.width = width;
-	_size.height = height;
+		if (_size.width < _minimum_size.width) {
+			_size.width = _minimum_size.width;
+		}
 
-	if (_size.width < _minimum_size.width) {
-		_size.width = _minimum_size.width;
-	}
+		if (_size.height < _minimum_size.height) {
+			_size.height = _minimum_size.height;
+		}
 
-	if (_size.height < _minimum_size.height) {
-		_size.height = _minimum_size.height;
-	}
+		if (_size.width > _maximum_size.width) {
+			_size.width = _maximum_size.width;
+		}
 
-	if (_size.width > _maximum_size.width) {
-		_size.width = _maximum_size.width;
-	}
-
-	if (_size.height > _maximum_size.height) {
-		_size.height = _maximum_size.height;
-	}
+		if (_size.height > _maximum_size.height) {
+			_size.height = _maximum_size.height;
+		}
 
 #ifdef DIRECTFB_UI
-	if (_window != NULL) {
-		jregion_t t = _graphics->GetClip();
+		_graphics->Lock();
 
-		width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
-		height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+		if (_window != NULL) {
+			jregion_t t = _graphics->GetClip();
 
-		while (_window->Resize(_window, width, height) == DFB_LOCKED);
-	}
+			width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
+			height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+	
+			_window->Resize(_window, width, height);
+			_window->ResizeSurface(_window, width, height);
+			_window->GetSurface(_window, &_surface);
+			_graphics->SetNativeSurface(_surface);
+		}
+	
+		_graphics->Unlock();
 #endif
+	}
 	
 	Repaint();
 
@@ -483,17 +487,21 @@ void Window::SetSize(int width, int height)
 
 void Window::Move(int x, int y)
 {
-	_location.x = _location.x+x;
-	_location.y = _location.y+y;
+	{
+		jthread::AutoLock lock(&_window_mutex);
+	
+		_location.x = _location.x+x;
+		_location.y = _location.y+y;
 
 #ifdef DIRECTFB_UI
-	int dx = SCALE_TO_SCREEN(x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
-			dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+		int dx = SCALE_TO_SCREEN(x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
+				dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
 
-	if (_window != NULL) {
-		while (_window->Move(_window, dx, dy) == DFB_LOCKED);
-	}
+		if (_window != NULL) {
+			while (_window->Move(_window, dx, dy) == DFB_LOCKED);
+		}
 #endif
+	}
 	
 	DispatchWindowEvent(new WindowEvent(this, JWET_MOVED));
 }
@@ -543,11 +551,11 @@ void Window::SetUndecorated(bool b)
 
 void Window::Repaint(Component *cmp)
 {
-	jthread::AutoLock lock(&_window_mutex);
-	
-	if (_graphics == NULL || _is_visible == false || _is_ignore_repaint == true) {
+	if (_is_visible == false || _is_ignore_repaint == true) {
 		return;
 	}
+
+	_graphics->Lock();
 
 	_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
 
@@ -612,46 +620,11 @@ void Window::Repaint(Component *cmp)
 			cmp->PaintBorders(_graphics);
 		}
 
-		// INFO:: desenha todos os componentes que intersectam "cmp"
-		{
-			/* TODO:: descobrir como recuperar apenas os componentes e containers que se localizam acima de "cmp"
-			jthread::AutoLock lock(&_container_mutex);
-
-			for (std::vector<jgui::Component *>::iterator i=std::find(_components.begin(), _components.end(), cmp); i!=_components.end(); i++) {
-				jpoint_t location = cmp->GetAbsoluteLocation();
-				jsize_t size = cmp->GetSize();
-
-				_graphics->Translate(location.x, location.y);
-				_graphics->SetClip(0, 0, size.width, size.height);
-
-				if (dynamic_cast<jgui::Container *>(cmp) != NULL) {
-					cmp->Paint(_graphics);
-				} else {
-					if (cmp->IsBackgroundVisible() == true) {
-						_graphics->Reset(); 
-						cmp->PaintBackground(_graphics);
-					}
-
-					_graphics->Reset(); 
-					cmp->Paint(_graphics);
-
-					if (cmp->IsScrollVisible() == true) {
-						_graphics->Reset(); 
-						cmp->PaintScrollbars(_graphics);
-					}
-
-					_graphics->Reset(); 
-					cmp->PaintBorders(_graphics);
-				}
-
-				_graphics->Translate(-location.x, -location.y);
-			}
-			*/
-		}
-
 		_graphics->Translate(-location.x, -location.y);
 		_graphics->Flip(location.x, location.y, size.width, size.height);
 	}
+
+	_graphics->Unlock();
 
 	Revalidate();
 
@@ -708,7 +681,7 @@ void Window::DumpScreen(std::string dir, std::string pre)
 {
 #ifdef DIRECTFB_UI
 	if (_graphics != NULL) {
-		IDirectFBSurface *surface = dynamic_cast<DFBGraphics *>(_graphics)->surface;
+		IDirectFBSurface *surface = dynamic_cast<DFBGraphics *>(_graphics)->_surface;
 
 		surface->Dump(surface, dir.c_str(), pre.c_str());
 	}
@@ -718,14 +691,13 @@ void Window::DumpScreen(std::string dir, std::string pre)
 void Window::ReleaseWindow()
 {
 #ifdef DIRECTFB_UI
-	jthread::AutoLock lock(&_window_mutex);
-
+	_graphics->Lock();
+	
 	if (_graphics != NULL) {
 		_graphics->SetNativeSurface(NULL);
-
-		delete _graphics;
-		_graphics = NULL;
 	}
+
+	_graphics->Unlock();
 
 	if (_window != NULL) {
 		_window->Release(_window);

@@ -546,16 +546,18 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetAntialias(true);
 
 		// draw image
+		std::string path = jcommon::System::GetResourceDirectory() + "/images/blue_icon.png";
+
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORALPHA));
 
 		g->SetColor(0x00, 0x00, 0x00, 0xf0);
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 0*(100+10)+20, 200, 100);
+		g->DrawImage(path, 400+40+0*(200+10), 0*(100+10)+20, 200, 100);
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 0*(100+10)+20, 200, 100);
+		g->DrawImage(path, 400+40+1*(200+10), 0*(100+10)+20, 200, 100);
 		g->SetColor(0x00, 0x00, 0x00, 0x40);
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+0*(200+10), 1*(100+10)+20, 200, 100);
+		g->DrawImage(path, 400+40+0*(200+10), 1*(100+10)+20, 200, 100);
 		g->SetColor(0x00, 0x00, 0x00, 0x10);
-		g->DrawImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", 400+40+1*(200+10), 1*(100+10)+20, 200, 100);
+		g->DrawImage(path, 400+40+1*(200+10), 1*(100+10)+20, 200, 100);
 
 		jgui::Color pcolor(0xf0, 0xf0, 0xf0, 0x80),
 			ccolor(0x20, 0xf0, 0x20, 0x80),

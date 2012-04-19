@@ -138,7 +138,7 @@ void Label::Paint(Graphics *g)
 				gapx = 0,
 				gapy = 0;
 		int px = x+gapx,
-				py = y+gapy,//(h-_font->GetHeight())/2+gapy,
+				py = y+gapy,//(h-_font->GetSize())/2+gapy,
 				pw = w-gapx,
 				ph = h-gapy;
 

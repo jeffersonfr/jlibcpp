@@ -491,4 +491,14 @@ void Graphics::Reset()
 	_translate_image.y = 0;
 }
 
+void Graphics::Lock()
+{
+	_graphics_mutex.Lock();
+}
+
+void Graphics::Unlock()
+{
+	_graphics_mutex.Unlock();
+}
+
 }

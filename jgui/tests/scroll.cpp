@@ -68,14 +68,14 @@ class Main : public jgui::Frame{
 		{
 			RemoveAll();
 
-			delete _container1;
-			delete _container2;
-
 			delete _button1;
 			delete _button2;
 			delete _button3;
 			delete _button4;
 			delete _button5;
+
+			delete _container2;
+			delete _container1;
 		}
 
 };

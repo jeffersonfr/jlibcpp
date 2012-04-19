@@ -354,13 +354,13 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		delete image_button3;
 		delete spin;
 		delete combo;
+		delete group;
 		delete check1;
 		delete check2;
 		delete check3;
 		delete radio1;
 		delete radio2;
 		delete radio3;
-		delete group;
 		delete label1;
 		delete label2;
 		delete list;

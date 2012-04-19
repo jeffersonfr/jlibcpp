@@ -46,12 +46,17 @@ DFBGraphics::DFBGraphics(void *surface, bool premultiplied):
 	_scale.width = DEFAULT_SCALE_WIDTH;
 	_scale.height = DEFAULT_SCALE_HEIGHT;
 
-	IDirectFB *dfb = (IDirectFB *)GFXHandler::GetInstance()->GetGraphicEngine();
+	_surface = (IDirectFBSurface *)surface;
 
-	this->surface = (IDirectFBSurface *)surface;
+	_cairo_surface = NULL;
+	_cairo_context = NULL;
 
-	_cairo_surface = cairo_directfb_surface_create(dfb, this->surface);
-	_cairo_context = cairo_create(_cairo_surface);
+	if (_surface != NULL) {
+		IDirectFB *dfb = (IDirectFB *)GFXHandler::GetInstance()->GetGraphicEngine();
+
+		_cairo_surface = cairo_directfb_surface_create(dfb, _surface);
+		_cairo_context = cairo_create(_cairo_surface);
+	}
 
 	_clip.x = 0;
 	_clip.y = 0;
@@ -69,16 +74,25 @@ DFBGraphics::~DFBGraphics()
 
 void * DFBGraphics::GetNativeSurface()
 {
-	return surface;
+	return _surface;
 }
 
-void DFBGraphics::SetNativeSurface(void *addr)
+void DFBGraphics::SetNativeSurface(void *surface)
 {
-	_graphics_mutex.Lock();
+	_surface = (IDirectFBSurface *)surface;
 
-	surface = (IDirectFBSurface *)addr;
+	cairo_destroy(_cairo_context);
+	cairo_surface_destroy(_cairo_surface);
 
-	_graphics_mutex.Unlock();
+	_cairo_context = NULL;
+	_cairo_surface = NULL;
+
+	if (_surface != NULL) {
+		IDirectFB *dfb = (IDirectFB *)GFXHandler::GetInstance()->GetGraphicEngine();
+
+		_cairo_surface = cairo_directfb_surface_create(dfb, _surface);
+		_cairo_context = cairo_create(_cairo_surface);
+	}
 }
 
 jregion_t DFBGraphics::ClipRect(int xp, int yp, int wp, int hp)
@@ -101,7 +115,7 @@ void DFBGraphics::SetClip(int xp, int yp, int wp, int hp)
 	
 	_internal_clip = clip;
 
-	if (surface != NULL) {
+	if (_surface != NULL) {
 		DFBRegion rgn;
 
 		rgn.x1 = SCALE_TO_SCREEN((clip.x), _screen.width, _scale.width);
@@ -109,8 +123,8 @@ void DFBGraphics::SetClip(int xp, int yp, int wp, int hp)
 		rgn.x2 = SCALE_TO_SCREEN((clip.x+clip.width+1), _screen.width, _scale.width);
 		rgn.y2 = SCALE_TO_SCREEN((clip.y+clip.height+1), _screen.height, _scale.height);
 
-		surface->SetClip(surface, NULL);
-		surface->SetClip(surface, &rgn);
+		_surface->SetClip(_surface, NULL);
+		_surface->SetClip(_surface, &rgn);
 	
 		cairo_reset_clip(_cairo_context);
 		cairo_rectangle(_cairo_context, rgn.x1, rgn.y1, rgn.x2-rgn.x1, rgn.y2-rgn.y1);
@@ -137,9 +151,9 @@ void DFBGraphics::ReleaseClip()
 
 	DFBRegion rgn;
 
-	if (surface != NULL) {
-		surface->SetClip(surface, NULL);
-		surface->GetClip(surface, &rgn);
+	if (_surface != NULL) {
+		_surface->SetClip(_surface, NULL);
+		_surface->GetClip(_surface, &rgn);
 
 		_clip.x = 0;
 		_clip.y = 0;
@@ -152,33 +166,33 @@ void DFBGraphics::SetCompositeFlags(jcomposite_flags_t t)
 {
 	_composite_flags = t;
 
-	if (surface != NULL) {
+	if (_surface != NULL) {
 		if (_composite_flags == JCF_NONE) {
-			surface->SetPorterDuff(surface, DSPD_NONE);
+			_surface->SetPorterDuff(_surface, DSPD_NONE);
 		} else if (_composite_flags == JCF_CLEAR) {
-			surface->SetPorterDuff(surface, DSPD_CLEAR);
+			_surface->SetPorterDuff(_surface, DSPD_CLEAR);
 		} else if (_composite_flags == JCF_SRC) {
-			surface->SetPorterDuff(surface, DSPD_SRC);
+			_surface->SetPorterDuff(_surface, DSPD_SRC);
 		} else if (_composite_flags == JCF_SRC_OVER) {
-			surface->SetPorterDuff(surface, DSPD_SRC_OVER);
+			_surface->SetPorterDuff(_surface, DSPD_SRC_OVER);
 		} else if (_composite_flags == JCF_DST_OVER) {
-			surface->SetPorterDuff(surface, DSPD_DST_OVER);
+			_surface->SetPorterDuff(_surface, DSPD_DST_OVER);
 		} else if (_composite_flags == JCF_SRC_IN) {
-			surface->SetPorterDuff(surface, DSPD_SRC_IN);
+			_surface->SetPorterDuff(_surface, DSPD_SRC_IN);
 		} else if (_composite_flags == JCF_DST_IN) {
-			surface->SetPorterDuff(surface, DSPD_DST_IN);
+			_surface->SetPorterDuff(_surface, DSPD_DST_IN);
 		} else if (_composite_flags == JCF_SRC_OUT) {
-			surface->SetPorterDuff(surface, DSPD_SRC_OUT);
+			_surface->SetPorterDuff(_surface, DSPD_SRC_OUT);
 		} else if (_composite_flags == JCF_DST_OUT) {
-			surface->SetPorterDuff(surface, DSPD_DST_OUT);
+			_surface->SetPorterDuff(_surface, DSPD_DST_OUT);
 		} else if (_composite_flags == JCF_SRC_ATOP) {
-			surface->SetPorterDuff(surface, DSPD_SRC_ATOP);
+			_surface->SetPorterDuff(_surface, DSPD_SRC_ATOP);
 		} else if (_composite_flags == JCF_DST_ATOP) {
-			surface->SetPorterDuff(surface, DSPD_DST_ATOP);
+			_surface->SetPorterDuff(_surface, DSPD_DST_ATOP);
 		} else if (_composite_flags == JCF_ADD) {
-			surface->SetPorterDuff(surface, DSPD_ADD);
+			_surface->SetPorterDuff(_surface, DSPD_ADD);
 		} else if (_composite_flags == JCF_XOR) {
-			surface->SetPorterDuff(surface, DSPD_XOR);
+			_surface->SetPorterDuff(_surface, DSPD_XOR);
 		}
 	}
 }
@@ -187,7 +201,7 @@ void DFBGraphics::SetDrawingFlags(jdrawing_flags_t t)
 {
 	_draw_flags = t;
 
-	if (surface != NULL) {
+	if (_surface != NULL) {
 		DFBSurfaceDrawingFlags flags = (DFBSurfaceDrawingFlags)DSDRAW_NOFX;
 
 		if (_draw_flags == JDF_BLEND) {
@@ -196,11 +210,11 @@ void DFBGraphics::SetDrawingFlags(jdrawing_flags_t t)
 			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_XOR);
 		}
 		
-		if (_is_premultiply == false) {
+		if (_is_premultiply == true) {
 			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_SRC_PREMULTIPLY);
 		}
 
-		surface->SetDrawingFlags(surface, (DFBSurfaceDrawingFlags)flags);
+		_surface->SetDrawingFlags(_surface, (DFBSurfaceDrawingFlags)flags);
 	}
 }
 
@@ -208,7 +222,7 @@ void DFBGraphics::SetBlittingFlags(jblitting_flags_t t)
 {
 	_blit_flags = t;
 
-	if (surface != NULL) {
+	if (_surface != NULL) {
 		DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
 
 		if (_blit_flags & JBF_ALPHACHANNEL) {
@@ -227,11 +241,11 @@ void DFBGraphics::SetBlittingFlags(jblitting_flags_t t)
 			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
 		}
 
-		if (_is_premultiply == false) {
+		if (_is_premultiply == true) {
 			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_SRC_PREMULTIPLY);
 		}
 
-		surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)flags);
+		_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)flags);
 	}
 }
 
@@ -271,16 +285,16 @@ jsize_t DFBGraphics::GetWorkingScreenSize()
 
 void DFBGraphics::Clear()
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return;
 	}
 
-	surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
+	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 }
 
 void DFBGraphics::Clear(int xp, int yp, int wp, int hp)
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return;
 	}
 
@@ -289,8 +303,8 @@ void DFBGraphics::Clear(int xp, int yp, int wp, int hp)
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	surface->SetPorterDuff(surface, DSPD_CLEAR);
-	surface->FillRectangle(surface, x, y, w, h);
+	_surface->SetPorterDuff(_surface, DSPD_CLEAR);
+	_surface->FillRectangle(_surface, x, y, w, h);
 
 	SetCompositeFlags(GetCompositeFlags());
 }
@@ -305,17 +319,18 @@ void DFBGraphics::Idle()
 
 void DFBGraphics::Flip()
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return;
 	}
 
-	surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
-	// surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
+	// _surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_BLIT));
+	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+	// _surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
 }
 
 void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return;
 	}
 
@@ -331,8 +346,9 @@ void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
 	rgn.x2 = x+w;
 	rgn.y2 = y+h;
 
-	surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
-	// surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
+	// _surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_BLIT));
+	_surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+	// _surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
 }
 
 Color & DFBGraphics::GetColor()
@@ -342,6 +358,10 @@ Color & DFBGraphics::GetColor()
 
 void DFBGraphics::SetColor(const Color &color)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	_color = color;
 
 	int r = _color.GetRed(),
@@ -351,7 +371,7 @@ void DFBGraphics::SetColor(const Color &color)
 
 	cairo_set_source_rgba(_cairo_context, r/255.0, g/255.0, b/255.0, a/255.0);
 	
-	surface->SetColor(surface, r, g, b, a);
+	_surface->SetColor(_surface, r, g, b, a);
 } 
 
 void DFBGraphics::SetColor(uint32_t color)
@@ -371,10 +391,14 @@ bool DFBGraphics::HasFont()
 
 void DFBGraphics::SetFont(Font *font)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	_font = font;
 
 	if (_font != NULL) {
-		surface->SetFont(surface, dynamic_cast<DFBFont *>(font)->_font);
+		_surface->SetFont(_surface, dynamic_cast<DFBFont *>(font)->_font);
 	}
 }
 
@@ -385,6 +409,10 @@ Font * DFBGraphics::GetFont()
 
 void DFBGraphics::SetAntialias(bool b)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	if (b == false) {
 		cairo_set_antialias(_cairo_context, CAIRO_ANTIALIAS_NONE);
 	} else {
@@ -404,6 +432,10 @@ uint32_t DFBGraphics::GetPixel(int xp, int yp)
 
 void DFBGraphics::SetLineJoin(jline_join_t t)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	_line_join = t;
 
 	if (_line_join == JLJ_BEVEL) {
@@ -417,6 +449,10 @@ void DFBGraphics::SetLineJoin(jline_join_t t)
 
 void DFBGraphics::SetLineStyle(jline_style_t t)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	_line_style = t;
 
 	if (_line_style == JLS_ROUND) {
@@ -435,6 +471,10 @@ void DFBGraphics::SetLineWidth(int size)
 
 void DFBGraphics::SetLineDash(double *dashes, int ndashes)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	cairo_set_dash(_cairo_context, dashes, ndashes, 0.0);
 }
 
@@ -455,6 +495,10 @@ int DFBGraphics::GetLineWidth()
 
 void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int x0 = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y0 = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int x1 = SCALE_TO_SCREEN((_translate.x+xf), _screen.width, _scale.width); 
@@ -479,6 +523,10 @@ void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 
 void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	if (_line_width == 0) {
 		return;
 	}
@@ -551,6 +599,10 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 
 void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -564,6 +616,10 @@ void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
 
 void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -599,6 +655,10 @@ void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 
 void DFBGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -657,6 +717,10 @@ void DFBGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
 
 void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -737,6 +801,10 @@ void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
 
 void DFBGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -807,6 +875,10 @@ void DFBGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
 
 void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -919,6 +991,10 @@ void DFBGraphics::DrawEllipse(int xcp, int ycp, int rxp, int ryp)
 
 void DFBGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
@@ -938,6 +1014,10 @@ void DFBGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 
 void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
@@ -972,6 +1052,10 @@ void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 
 void DFBGraphics::FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
@@ -992,6 +1076,10 @@ void DFBGraphics::FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 
 void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
@@ -1040,6 +1128,10 @@ jdrawing_mode_t DFBGraphics::GetDrawingMode()
 
 void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
@@ -1075,7 +1167,7 @@ void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 		
 void DFBGraphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return;
 	}
 
@@ -1086,7 +1178,7 @@ void DFBGraphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int 
 	int x3 = SCALE_TO_SCREEN((_translate.x+x3p), _screen.width, _scale.width); 
 	int y3 = SCALE_TO_SCREEN((_translate.y+y3p), _screen.height, _scale.height);
 
-	surface->FillTriangle(surface, x1, y1, x2, y2, x3, y3);
+	_surface->FillTriangle(_surface, x1, y1, x2, y2, x3, y3);
 }
 
 void DFBGraphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
@@ -1105,6 +1197,10 @@ void DFBGraphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int 
 
 void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	if (npoints < 1) {
 		return;
 	}
@@ -1142,6 +1238,10 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 
 void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	if (npoints < 1) {
 		return;
 	}
@@ -1183,6 +1283,10 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 
 void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, int y0p, int r0p)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
 	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
 	int rx = SCALE_TO_SCREEN((_translate.x+xcp+wp), _screen.width, _scale.width)-xc;
@@ -1216,6 +1320,11 @@ void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, 
 
 void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p)
 {
+	return;
+	if (_surface == NULL) {
+		return;
+	}
+
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
@@ -1255,7 +1364,7 @@ void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, in
 
 void DFBGraphics::DrawString(std::string text, int xp, int yp)
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return;
 	}
 
@@ -1280,7 +1389,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 
 void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return;
 	}
 
@@ -1327,15 +1436,15 @@ bool DFBGraphics::DrawImage(std::string img, int xp, int yp)
 
 bool DFBGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 {
+	if (_surface == NULL) {
+		return false;
+	}
+
 	if (xp < 0 || yp < 0) {
 		return false;
 	}
 
 	if (wp < 0 || hp < 0) {
-		return false;
-	}
-
-	if (surface == NULL) {
 		return false;
 	}
 
@@ -1397,7 +1506,7 @@ bool DFBGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 		return false;
 	}
 
-	surface->Blit(surface, imgSurface, NULL, x, y);
+	_surface->Blit(_surface, imgSurface, NULL, x, y);
 
 	imgProvider->Release(imgProvider);
 	imgSurface->Release(imgSurface);
@@ -1407,11 +1516,11 @@ bool DFBGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 
 bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
-	if (sxp < 0 || syp < 0 || swp < 0 || shp < 0) {
+	if (_surface == NULL) {
 		return false;
 	}
 
-	if (surface == NULL) {
+	if (sxp < 0 || syp < 0 || swp < 0 || shp < 0) {
 		return false;
 	}
 
@@ -1478,7 +1587,7 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 	srect.w = swp;
 	srect.h = shp;
 
-	surface->Blit(surface, imgSurface, &srect, x, y);
+	_surface->Blit(_surface, imgSurface, &srect, x, y);
 
 	imgProvider->Release(imgProvider);
 	imgSurface->Release(imgSurface);
@@ -1488,15 +1597,15 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 
 bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
+	if (_surface == NULL) {
+		return false;
+	}
+
 	if (sxp < 0 || syp < 0 || xp < 0 || yp < 0) {
 		return false;
 	}
 
 	if (swp < 0 || shp < 0 || wp < 0 || hp < 0) {
-		return false;
-	}
-
-	if (surface == NULL) {
 		return false;
 	}
 
@@ -1579,7 +1688,7 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 	drect.w = w;
 	drect.h = h;
 
-	surface->StretchBlit(surface, imgSurface, &srect, &drect);
+	_surface->StretchBlit(_surface, imgSurface, &srect, &drect);
 
 	imgProvider->Release(imgProvider);
 	imgSurface->Release(imgSurface);
@@ -1607,7 +1716,7 @@ bool DFBGraphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 
 bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
-	if ((void *)surface == NULL) {
+	if (_surface == NULL) {
 		return false;
 	}
 
@@ -1649,7 +1758,7 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		drect.w = sw;
 		drect.h = sh;
 
-		surface->Blit(surface, dynamic_cast<jgui::DFBGraphics *>(g)->surface, &drect, x, y);
+		_surface->Blit(_surface, dynamic_cast<jgui::DFBGraphics *>(g)->_surface, &drect, x, y);
 	} else {
 		uint32_t *rgb = NULL;
 
@@ -1667,7 +1776,7 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 
 bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
-	if ((void *)surface == NULL) {
+	if (_surface == NULL) {
 		return false;
 	}
 
@@ -1717,7 +1826,7 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		drect.w = w;
 		drect.h = h;
 
-		surface->StretchBlit(surface, dynamic_cast<jgui::DFBGraphics *>(g)->surface, &srect, &drect);
+		_surface->StretchBlit(_surface, dynamic_cast<jgui::DFBGraphics *>(g)->_surface, &srect, &drect);
 	} else {
 		jsize_t scale = img->GetWorkingScreenSize();
 
@@ -1884,11 +1993,11 @@ void DFBGraphics::GetStringBreak(std::vector<std::string> *lines, std::string te
 
 void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
 {
-	if (wp < 0 || hp < 0) {
+	if (_surface == NULL) {
 		return;
 	}
 
-	if (surface == NULL) {
+	if (wp < 0 || hp < 0) {
 		return;
 	}
 
@@ -2029,7 +2138,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 
 uint32_t DFBGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return pixel;
 	}
 
@@ -2039,7 +2148,7 @@ uint32_t DFBGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 	int swmax,
 			shmax;
 
-	surface->GetSize(surface, &swmax, &shmax);
+	_surface->GetSize(_surface, &swmax, &shmax);
 
 	if ((x < 0 || x >= swmax) || (y < 0 || y >= shmax)) {
 		return pixel;
@@ -2050,19 +2159,19 @@ uint32_t DFBGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 					 rgb;
 	int pitch;
 
-	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
+	_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
 
 	dst = (uint32_t *)((uint8_t *)ptr + y * pitch);
 	rgb = *(dst + x);
 
-	surface->Unlock(surface);
+	_surface->Unlock(_surface);
 
 	return rgb;
 }
 
 void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize)
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return;
 	}
 
@@ -2090,7 +2199,7 @@ void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int sca
 	int max_w = startx+w,
 			max_h = starty+h;
 
-	surface->GetSize(surface, &img_w, &img_h);
+	_surface->GetSize(_surface, &img_w, &img_h);
 
 	if (max_w > img_w || max_h > img_h) {
 		(*rgb) = NULL;
@@ -2098,7 +2207,7 @@ void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int sca
 		return;
 	}
 
-	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
+	_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
 
 	double scale_x = (double)_screen.width/(double)_scale.width,
 				 scale_y = (double)_screen.height/(double)_scale.height;
@@ -2112,14 +2221,14 @@ void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int sca
 		}
 	}
 
-	surface->Unlock(surface);
+	_surface->Unlock(_surface);
 
 	(*rgb) = array;
 }
 
 void DFBGraphics::SetRGB(uint32_t argb, int xp, int yp) 
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return;
 	}
 
@@ -2131,13 +2240,13 @@ void DFBGraphics::SetRGB(uint32_t argb, int xp, int yp)
 			b = (argb >> 0x00) & 0xff,
 			a = (argb >> 0x18) & 0xff;
 
-	surface->SetColor(surface, r, g, b, a);
-	surface->DrawLine(surface, x, y, x, y);
+	_surface->SetColor(_surface, r, g, b, a);
+	_surface->DrawLine(_surface, x, y, x, y);
 }
 
 void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline) 
 {
-	if (surface == NULL) {
+	if (_surface == NULL) {
 		return;
 	}
 
@@ -2153,7 +2262,7 @@ void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scan
 			w = SCALE_TO_SCREEN((xp+wp), _screen.width, _scale.width)-x,
 			h = SCALE_TO_SCREEN((yp+hp), _screen.height, _scale.height)-y;
 
-	surface->GetSize(surface, &wmax, &hmax);
+	_surface->GetSize(_surface, &wmax, &hmax);
 
 	if (x > wmax || y > hmax) {
 		return;
@@ -2170,7 +2279,7 @@ void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scan
 	wmax = x+w;
 	hmax = y+h;
 
-	surface->Lock(surface, DSLF_WRITE, &ptr, &pitch);
+	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
 
 	double scale_x = (double)_scale.width/(double)_screen.width,
 				 scale_y = (double)_scale.height/(double)_screen.height;
@@ -2218,7 +2327,7 @@ void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scan
 		}
 	}
 
-	surface->Unlock(surface);
+	_surface->Unlock(_surface);
 }
 
 void DFBGraphics::Reset()
@@ -2388,10 +2497,10 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 	int iwmax,
 			ihmax;
 
-	surface->GetSize(surface, &swmax, &shmax);
+	_surface->GetSize(_surface, &swmax, &shmax);
 	simg->GetSize(simg, &iwmax, &ihmax);
 
-	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &sptr, &spitch);
+	_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &sptr, &spitch);
 	simg->Lock(simg, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &gptr, &gpitch);
 
 	int old_x = -1,
@@ -2536,7 +2645,7 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 	}
 	
 	simg->Unlock(simg);
-	surface->Unlock(surface);
+	_surface->Unlock(_surface);
 }
 
 }

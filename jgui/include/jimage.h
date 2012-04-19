@@ -87,7 +87,7 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		Image(int width, int height, jpixelformat_t pixelformat = JPF_UNKNOWN, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Image(int wp, int hp, jpixelformat_t pixelformat = JPF_UNKNOWN, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 		
 	public:
 		/**
@@ -106,13 +106,13 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static Image * CreateImage(int width, int height, jpixelformat_t pixelformat = JPF_ARGB, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		static Image * CreateImage(int wp, int hp, jpixelformat_t pixelformat = JPF_ARGB, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		static Image * CreateImage(uint32_t *data, int width, int height);
+		static Image * CreateImage(uint32_t *data, int wp, int hp);
 
 		/**
 		 * \brief
@@ -172,13 +172,13 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual Image * Scaled(int width, int height);
+		virtual Image * Scaled(int wp, int hp);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual Image * SubImage(int x, int y, int width, int height);
+		virtual Image * SubImage(int xp, int yp, int wp, int hp);
 
 		/**
 		 * \brief

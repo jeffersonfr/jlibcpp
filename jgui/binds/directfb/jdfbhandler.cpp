@@ -349,9 +349,9 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	DFBWindowDescription desc;
 
 	/* Fill the window description. */
-	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_SURFACE_CAPS | DWDESC_PIXELFORMAT);
-	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION); // | DWCAPS_DOUBLEBUFFER);
-	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_DOUBLE);
+	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS |  DWDESC_PIXELFORMAT);
+	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION | DWCAPS_DOUBLEBUFFER);
+	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_FLIPPING);
 	desc.pixelformat = DSPF_ARGB;
 	desc.posx   = x;
 	desc.posy   = y;
@@ -377,13 +377,14 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	}
 
 	// Add ghost option (behave like an overlay)
-	(*window)->SetOptions( (*window), (DFBWindowOptions)(DWOP_ALPHACHANNEL));// | DWOP_GHOST));
+	(*window)->SetOptions( (*window), (DFBWindowOptions)(DWOP_ALPHACHANNEL | DWOP_SCALE)); // | DWOP_GHOST));
 	// Move window to upper stacking class
 	// (*window)->SetStackingClass(*window, DWSC_UPPER);
 	// Make it the top most window
 	(*window)->RaiseToTop(*window);
 	(*window)->SetOpacity(*window, opacity);
 	// (*surface)->SetRenderOptions(*surface, DSRO_ALL);
+	(*window)->DisableEvents(*window, (DFBWindowEventType)(DWET_BUTTONDOWN | 	DWET_BUTTONUP | DWET_MOTION));
 	
 	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
 	(*surface)->Flip(*surface, NULL, (DFBSurfaceFlipFlags)DSFLIP_FLUSH);
@@ -446,13 +447,14 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	}
 
 	// Add ghost option (behave like an overlay)
-	(*window)->SetOptions( (*window), (DFBWindowOptions)(DWOP_ALPHACHANNEL));// | DWOP_GHOST));
+	(*window)->SetOptions( (*window), (DFBWindowOptions)(DWOP_ALPHACHANNEL | DWOP_SCALE)); // | DWOP_GHOST));
 	// Move window to upper stacking class
 	// (*window)->SetStackingClass(*window, DWSC_UPPER);
 	// Make it the top most window
 	(*window)->RaiseToTop(*window);
 	(*window)->SetOpacity(*window, opacity);
 	// (*surface)->SetRenderOptions(*surface, DSRO_ALL);
+	(*window)->DisableEvents(*window, (DFBWindowEventType)(DWET_BUTTONDOWN | 	DWET_BUTTONUP | DWET_MOTION));
 	
 	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
 	(*surface)->Flip(*surface, NULL, (DFBSurfaceFlipFlags)DSFLIP_FLUSH);

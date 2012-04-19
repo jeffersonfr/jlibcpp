@@ -145,19 +145,19 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
-		virtual void SetMinimumSize(int w, int h);
+		virtual void SetMinimumSize(int width, int height);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetMaximumSize(int w, int h);
+		virtual void SetMaximumSize(int width, int height);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetBounds(int x, int y, int w, int h);
+		virtual void SetBounds(int x, int y, int width, int height);
 		
 		/**
 		 * \brief

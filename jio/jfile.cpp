@@ -51,11 +51,11 @@ File::File(std::string filename_, int flags_):
 
 	_fd = INVALID_HANDLE_VALUE;
 
-	if ((flags_ & F_READ_ONLY) != 0) {
+	if ((flags_ & JFF_READ_ONLY) != 0) {
 		opt |= GENERIC_READ;
 	}
 	
-	if ((flags_ & F_READ_WRITE) != 0) {
+	if ((flags_ & JFF_READ_WRITE) != 0) {
 		opt |= GENERIC_READ | GENERIC_WRITE;
 	}
 
@@ -76,7 +76,7 @@ File::File(std::string filename_, int flags_):
 	}
 	*/
 	
-	if ((flags_ & F_CREATE) == 0) {
+	if ((flags_ & JFF_CREATE) == 0) {
 		_fd = CreateFile (filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	} else {
 		_fd = CreateFile (filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
@@ -282,9 +282,9 @@ File::File(std::string prefix, std::string sufix, bool is_directory):
 	}
 
 	if (is_directory == true) {
-		_type = F_REGULAR;
+		_type = JFF_REGULAR;
 	} else {
-		_type = F_DIRECTORY;
+		_type = JFF_DIRECTORY;
 	}
 
 	delete tmp;

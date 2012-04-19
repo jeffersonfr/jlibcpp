@@ -738,7 +738,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void GetRGB(uint32_t **rgb, int startxp, int startyp, int widthp, int heightp, int scansize);
+		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize);
 		
 		/**
 		 * \brief
@@ -757,6 +757,18 @@ class Graphics : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void Reset();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Lock();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Unlock();
 
 };
 

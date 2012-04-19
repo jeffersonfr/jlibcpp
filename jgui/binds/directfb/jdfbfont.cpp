@@ -23,22 +23,22 @@
 
 namespace jgui {
 
-DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height):
-	jgui::Font(name, attributes, height, scale_width, scale_height)
+DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size, int scale_width, int scale_height):
+	jgui::Font(name, attributes, size, scale_width, scale_height)
 {
 	jcommon::Object::SetClassName("jgui::DFBFont");
 
 	_font = NULL;
 
-	_height = 0;
+	_size = 0;
 	_ascender = 0;
 	_descender = 0;
-	_virtual_height = height;
+	_virtual_size = size;
 	
-	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(name, height, &_font, _scale.width, _scale.height);
+	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(name, size, &_font, _scale.width, _scale.height);
 
 	if (_font != NULL) {
-		_font->GetHeight(_font, &_height);
+		_font->GetHeight(_font, &_size);
 		_font->GetAscender(_font, &_ascender);
 		_font->GetDescender(_font, &_descender);
 	}
@@ -89,14 +89,14 @@ std::string DFBFont::GetName()
 	return _name;
 }
 
-int DFBFont::GetVirtualHeight()
+int DFBFont::GetVirtualSize()
 {
-	return _virtual_height;
+	return _virtual_size;
 }
 
-int DFBFont::GetHeight()
+int DFBFont::GetSize()
 {
-	return SCREEN_TO_SCALE(_height, _screen.width, _scale.width);
+	return SCREEN_TO_SCALE(_size, _screen.width, _scale.width);
 }
 
 int DFBFont::GetAscender()
@@ -116,7 +116,7 @@ int DFBFont::GetMaxAdvanced()
 
 int DFBFont::GetLeading()
 {
-	return SCREEN_TO_SCALE(_height/2.0, _screen.width, _scale.width);
+	return SCREEN_TO_SCALE(_size/2.0, _screen.width, _scale.width);
 }
 
 int DFBFont::GetStringWidth(std::string text)
@@ -199,7 +199,7 @@ void DFBFont::Restore()
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
 
 	if (_font == NULL) {
-		dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(_name, _virtual_height, &_font, _scale.width, _scale.height);
+		dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(_name, _virtual_size, &_font, _scale.width, _scale.height);
 	}
 }
 

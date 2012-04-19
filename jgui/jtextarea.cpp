@@ -349,7 +349,7 @@ void TextArea::DecrementLines(int lines)
 				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 		int font_height = _font->GetAscender()+_font->GetDescender();
 
-		if ((scrolly+_size.height) < (_font->GetHeight()+_rows_gap)*GetRows()) {
+		if ((scrolly+_size.height) < (_font->GetSize()+_rows_gap)*GetRows()) {
 			SetScrollY(std::max(0, (font_height+_rows_gap)*_current_row));
 		}
 	}

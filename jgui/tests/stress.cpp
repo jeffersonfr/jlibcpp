@@ -75,7 +75,7 @@ class GraphicPanel : public jgui::Frame{
 		DrawString(g, "DrawString");
 
 		int wfont = _font->GetStringWidth("Font Testing"),
-				hfont = _font->GetHeight();
+				hfont = _font->GetSize();
 
 		for (int i=0; i<iterations; i++) {
 			x = rand()%(1920-wfont-_insets.left-_insets.right);

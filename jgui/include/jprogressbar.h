@@ -41,8 +41,8 @@ class ProgressBar : public jgui::Component, public jthread::Thread{
 
 	private:
 		jscroll_orientation_t _type;
-		int _value,
-				_index,
+		int _value;
+		int _index,
 				_delta,
 				_fixe_delta;
 		bool _label_visible,

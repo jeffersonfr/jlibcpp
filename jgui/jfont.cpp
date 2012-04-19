@@ -120,12 +120,12 @@ std::string Font::GetName()
 	return _name;
 }
 
-int Font::GetVirtualHeight()
+int Font::GetVirtualSize()
 {
 	return -1;
 }
 
-int Font::GetHeight()
+int Font::GetSize()
 {
 	return -1;
 }
@@ -293,7 +293,7 @@ std::string Font::TruncateString(std::string text, std::string extension, int wi
 		return text;
 	}
 
-	if (GetStringWidth(text) < width) {
+	if (GetStringWidth(text) <= width) {
 		return text;
 	}
 

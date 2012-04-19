@@ -64,16 +64,28 @@ class DFBGraphics : public virtual jgui::Graphics{
 		bool _is_premultiply;
 
 	private:
-		IDirectFBSurface *surface;
+		IDirectFBSurface *_surface;
 		
 		cairo_surface_t *_cairo_surface;
 		cairo_t *_cairo_context;
 		
-		void ApplyDrawing();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ApplyDrawing();
 
-		double EvaluateBezier0(double *data, int ndata, double t);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual double EvaluateBezier0(double *data, int ndata, double t);
 
-		void RotateImage0(Image *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RotateImage0(Image *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
 
 	protected:
 		/**

@@ -39,18 +39,18 @@ class DFBFont : public virtual jgui::Font{
 		static Font *_default_font;
 
 		IDirectFBFont *_font;
-		int _height,
+		int _size,
 			_ascender,
 			_descender,
 			_max_advance,
-			_virtual_height;
+			_virtual_size;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		DFBFont(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height);
+		DFBFont(std::string name, jfont_attributes_t attributes, int size, int scale_width, int scale_height);
 		
 		/**
 		 * \brief
@@ -86,13 +86,13 @@ class DFBFont : public virtual jgui::Font{
 		 * \brief
 		 *
 		 */
-		virtual int GetVirtualHeight();
+		virtual int GetVirtualSize();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetHeight();
+		virtual int GetSize();
 		
 		/**
 		 * \brief

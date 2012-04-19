@@ -126,7 +126,7 @@ void Mines::Paint(jgui::Graphics *g)
 	g->DrawImage(huge_bomb, x, y, w, h);
 
 	g->SetColor(0x00, 0x00, 0x00, 0xff);
-	g->FillRectangle(x, y+h+10, w, _font->GetHeight());
+	g->FillRectangle(x, y+h+10, w, _font->GetSize());
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 	g->DrawString(tmp, x+10, y+h+10);
 				

@@ -87,14 +87,13 @@ DFBImage::DFBImage(int width, int height, jpixelformat_t pixelformat, int scale_
 	jcommon::Object::SetClassName("jgui::DFBImage");
 
 	_buffer = NULL;
-	_graphics = NULL;
 	
 	IDirectFBSurface *surface = NULL;
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->
 		CreateSurface(_size.width, _size.height, &surface, pixelformat, _scale.width, _scale.height);
 
-	_graphics = new DFBGraphics(surface, true);
+	_graphics = new DFBGraphics(surface, false);
 
 	_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
 
@@ -105,14 +104,15 @@ DFBImage::~DFBImage()
 {
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Remove(this);
 
-	if (_graphics != NULL) {
-		delete _graphics;
-	}
-
 	IDirectFBSurface *surface = (IDirectFBSurface *)_graphics->GetNativeSurface();
 
 	if (surface != NULL) {
 		surface->Release(surface);
+	}
+
+	if (_graphics != NULL) {
+		delete _graphics;
+		_graphics = NULL;
 	}
 }
 
@@ -206,35 +206,37 @@ Image * DFBImage::CreateImageStream(jio::InputStream *stream)
 
 void DFBImage::Release()
 {
+	_graphics->Lock();
+	
 	if (_graphics != NULL) {
-		IDirectFBSurface *surface = (IDirectFBSurface *)_graphics->GetNativeSurface();
-		
-		void *ptr;
-		int pitch,
-				width,
-				height;
+		_graphics->SetNativeSurface(NULL);
+	}
 
-		surface->GetSize(surface, &width, &height);
-		surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
+	_graphics->Unlock();
 
-		if (_buffer != NULL) {
-			delete [] _buffer;
-			_buffer = NULL;
-		}
+	IDirectFBSurface *surface = (IDirectFBSurface *)_graphics->GetNativeSurface();
 
-		_buffer = new uint8_t[pitch*height];
+	void *ptr;
+	int pitch,
+			width,
+			height;
 
-		memcpy(_buffer, ptr, pitch*height);
+	surface->GetSize(surface, &width, &height);
+	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
 
-		surface->Unlock(surface);
+	if (_buffer != NULL) {
+		delete [] _buffer;
+		_buffer = NULL;
+	}
 
-		if (surface != NULL) {
-			// CHANGE:: ReleaseSource()->Release()
-			surface->Release(surface);
-		}
-		
-		delete _graphics;
-		_graphics = NULL;
+	_buffer = new uint8_t[pitch*height];
+
+	memcpy(_buffer, ptr, pitch*height);
+
+	surface->Unlock(surface);
+
+	if (surface != NULL) {
+		surface->Release(surface);
 	}
 }
 
@@ -243,33 +245,34 @@ void DFBImage::Restore()
 	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
 
-	if (_graphics == NULL) {
-		IDirectFBSurface *surface = NULL;
+	IDirectFBSurface *surface = NULL;
 
-		dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->
-			CreateSurface(_size.width, _size.height, &surface, _pixelformat, _scale.width, _scale.height);
+	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->
+		CreateSurface(_size.width, _size.height, &surface, _pixelformat, _scale.width, _scale.height);
 
-		_graphics = new DFBGraphics(surface, true);
+	void *ptr;
+	int pitch,
+			width,
+			height;
 
-		_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
+	surface->GetSize(surface, &width, &height);
+	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_WRITE), &ptr, &pitch);
 
-		void *ptr;
-		int pitch,
-				width,
-				height;
+	memcpy(ptr, _buffer, pitch*height);
 
-		surface->GetSize(surface, &width, &height);
-		surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_WRITE), &ptr, &pitch);
+	surface->Unlock(surface);
 
-		memcpy(ptr, _buffer, pitch*height);
-
-		surface->Unlock(surface);
-		
-		if (_buffer != NULL) {
-			delete [] _buffer;
-			_buffer = NULL;
-		}
+	if (_buffer != NULL) {
+		delete [] _buffer;
+		_buffer = NULL;
 	}
+	
+	_graphics->Lock();
+
+	_graphics->SetNativeSurface(surface);
+	_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
+
+	_graphics->Unlock();
 }
 
 jcommon::Object * DFBImage::Clone()

@@ -141,7 +141,7 @@ void Marquee::Paint(Graphics *g)
 				gapx = 0,
 				gapy = 0;
 		int px = x+gapx,
-				py = y+(h-_font->GetHeight())/2,
+				py = y+(h-_font->GetSize())/2,
 				pw = w-gapx,
 				ph = h-gapy;
 

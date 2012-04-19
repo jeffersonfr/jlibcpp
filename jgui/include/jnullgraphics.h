@@ -558,7 +558,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void GetRGB(uint32_t **rgb, int startxp, int startyp, int widthp, int heightp, int scansize);
+		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize);
 		
 		/**
 		 * \brief

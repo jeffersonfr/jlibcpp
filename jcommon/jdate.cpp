@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "jdate.h"
 #include "jruntimeexception.h"
+#include "jcalendar.h"
 
 namespace jcommon {
 
@@ -225,7 +226,7 @@ Date::Date(double julian)
 {
 	jcommon::Object::SetClassName("jcommon::Date");
 
-	_time = ((julian-2299160.5)*864000000000.0);
+	_time = (time_t)((julian-2299160.5)*864000000000.0);
 	
 #ifdef _WIN32
 	int Y2, 

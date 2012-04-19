@@ -105,7 +105,7 @@ std::string System::GetCurrentUserName()
     char name[256];
     DWORD r = 256;
     
-    GetUserName(name , &r);
+    GetUserNameW(name , &r);
 
 	return name;
 #else
@@ -162,7 +162,7 @@ std::string System::GetHomeDirectory()
 	char name[256];
 	DWORD r = 256;
 
-	GetWindowsDirectory( name , r);
+	GetWindowsDirectory((LPTSTR)name , r);
 
 	return name;
 #else
@@ -184,10 +184,10 @@ std::string System::GetCurrentDirectory()
 	char buffer[_MAX_PATH];
 	DWORD n;
 	
-	n = ::GetCurrentDirectory((DWORD)sizeof(buffer), (LPSTR)buffer);
+	n = ::GetCurrentDirectory((DWORD)sizeof(buffer), (LPTSTR)buffer);
 
 	if (n < 0 || n > sizeof(buffer)) {
-		throw FileException("Cannot return the path");
+		throw RuntimeException("Cannot return the path");
 	}
 
 	std::string result(buffer, n);
@@ -213,7 +213,7 @@ std::string System::GetEnviromentVariable(std::string key_, std::string default_
 #ifdef _WIN32
 	char name[4096];
 
-	GetEnvironmentVariable(key_.c_str(), name, 4096); 
+	GetEnvironmentVariable((LPCTSTR)key_.c_str(), (LPTSTR)name, 4096); 
 
 	if (name == NULL) {
 		return default_;
@@ -236,7 +236,7 @@ std::string System::GetEnviromentVariable(std::string key_, std::string default_
 void System::UnsetEnviromentVariable(std::string key_)
 {
 #ifdef _WIN32
-	SetEnvironmentVariable(key_.c_str(), "");
+	SetEnvironmentVariable((LPCTSTR)key_.c_str(), (LPTSTR)"");
 #else
 	unsetenv(key_.c_str());
 #endif
@@ -421,7 +421,7 @@ std::string System::GetUserName()
 
 	DWORD size = (DWORD)sizeof(buf);
 
-	if (::GetUserName(ubuf, &size) != TRUE) {
+	if (::GetUserName(buf, &size) != TRUE) {
 		throw new Exception("Cannot retrieve user name");
 	}
 
@@ -493,7 +493,8 @@ std::string System::GetOSName()
 {
 #ifdef _WIN32
 	return "Windows";
-#else
+#else
+
 	struct utsname uts;
 
 	uname(&uts);
@@ -590,7 +591,7 @@ uint64_t System::GetDiskFreeSpace()
 #ifdef _WIN32
 	ULARGE_INTEGER x, avail;
 
-	if(::GetDiskFreeSpaceEx("\\", &x, &x,	&avail) == FALSE) {
+	if(::GetDiskFreeSpaceEx((LPCTSTR)"\\", &x, &x,	&avail) == FALSE) {
 		return 0LL;
 	}
 

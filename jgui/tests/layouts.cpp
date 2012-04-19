@@ -249,30 +249,20 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 				jgui::Container *bcontainer = _b[i];
 				jgui::Container *ccontainer = _c[i];
 
+				ccontainer->RemoveAll();
+				bcontainer->RemoveAll();
+
 				for (std::vector<Component *>::iterator iccomponent=ccontainer->GetComponents().begin(); iccomponent!=ccontainer->GetComponents().end(); iccomponent++) {
 					delete (*iccomponent);
 				}
-
-				ccontainer->RemoveAll();
 
 				for (std::vector<Component *>::iterator ibcomponent=bcontainer->GetComponents().begin(); ibcomponent!=bcontainer->GetComponents().end(); ibcomponent++) {
 					delete (*ibcomponent);
 				}
 
-				delete bcontainer->GetLayout();
-
-				bcontainer->RemoveAll();
-
 				delete ccontainer;
 				delete bcontainer;
 			}
-
-			delete _flow;
-			delete _grid;
-			delete _border;
-			delete _card;
-			delete _gridbag;
-			delete _null;
 		}
 
 		virtual void ActionPerformed(jgui::ButtonEvent *event)
