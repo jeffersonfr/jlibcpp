@@ -1320,7 +1320,6 @@ void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, 
 
 void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p)
 {
-	return;
 	if (_surface == NULL) {
 		return;
 	}
@@ -1359,6 +1358,10 @@ void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, in
 	
 	cairo_pattern_destroy(pattern);
 	
+	SetDrawingFlags(_draw_flags);
+	SetCompositeFlags(_composite_flags);
+	SetBlittingFlags(_blit_flags);
+
 	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
