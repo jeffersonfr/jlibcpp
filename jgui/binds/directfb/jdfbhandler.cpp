@@ -384,7 +384,7 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	(*window)->RaiseToTop(*window);
 	(*window)->SetOpacity(*window, opacity);
 	// (*surface)->SetRenderOptions(*surface, DSRO_ALL);
-	(*window)->DisableEvents(*window, (DFBWindowEventType)(DWET_BUTTONDOWN | 	DWET_BUTTONUP | DWET_MOTION));
+	// (*window)->DisableEvents(*window, (DFBWindowEventType)(DWET_BUTTONDOWN | DWET_BUTTONUP | DWET_MOTION));
 	
 	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
 	(*surface)->Flip(*surface, NULL, (DFBSurfaceFlipFlags)DSFLIP_FLUSH);
@@ -454,7 +454,7 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	(*window)->RaiseToTop(*window);
 	(*window)->SetOpacity(*window, opacity);
 	// (*surface)->SetRenderOptions(*surface, DSRO_ALL);
-	(*window)->DisableEvents(*window, (DFBWindowEventType)(DWET_BUTTONDOWN | 	DWET_BUTTONUP | DWET_MOTION));
+	// (*window)->DisableEvents(*window, (DFBWindowEventType)(DWET_BUTTONDOWN | DWET_BUTTONUP | DWET_MOTION));
 	
 	(*surface)->Clear(*surface, 0x00, 0x00, 0x00, 0x00);
 	(*surface)->Flip(*surface, NULL, (DFBSurfaceFlipFlags)DSFLIP_FLUSH);
