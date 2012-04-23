@@ -172,6 +172,13 @@ void Image::SetWorkingScreenSize(jsize_t size)
 
 void Image::SetWorkingScreenSize(int width, int height)
 {
+	if (_scale.width == width && _scale.height == height) {
+		return;
+	}
+
+	_size.width = (_size.width*width)/_scale.width;
+	_size.height = (_size.height*height)/_scale.height;
+
 	_scale.width = width;
 	_scale.height = height;
 
@@ -181,6 +188,10 @@ void Image::SetWorkingScreenSize(int width, int height)
 
 	if (_scale.height <= 0) {
 		_scale.height = DEFAULT_SCALE_HEIGHT;
+	}
+
+	if (_graphics != NULL) {
+		_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
 	}
 }
 

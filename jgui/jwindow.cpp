@@ -126,8 +126,6 @@ void Window::SetNativeWindow(void *native)
 	ReleaseWindow();
 
 #ifdef DIRECTFB_UI
-	IDirectFBSurface *window_surface = NULL;
-
 	_graphics->Lock();
 
 	_window = (IDirectFBWindow *)native;
@@ -146,7 +144,7 @@ void Window::SetNativeWindow(void *native)
 		_window = NULL;
 	}
 
-	_graphics->SetNativeSurface(window_surface);
+	_graphics->SetNativeSurface(_surface);
 	
 	_graphics->Unlock();
 #endif

@@ -2205,6 +2205,10 @@ void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int sca
 	_surface->GetSize(_surface, &img_w, &img_h);
 
 	if (max_w > img_w || max_h > img_h) {
+		if ((*rgb) == NULL) {
+			delete [] array;
+		}
+
 		(*rgb) = NULL;
 
 		return;
