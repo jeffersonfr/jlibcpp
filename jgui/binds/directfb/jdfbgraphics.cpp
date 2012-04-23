@@ -2543,9 +2543,11 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 											 salpha = (spixel >> 0x18) + 1;
 							uint32_t dpixel = *(sdst+offset);
 
-							spixel = ((((spixel & 0x00ff00ff) * salpha) >> 8) & 0x00ff00ff) |
-								       ((((spixel & 0x0000ff00) * salpha) >> 8) & 0x0000ff00) |
-								       ((((spixel & 0xff000000))));
+							if (_is_premultiply == true) {
+								spixel = ((((spixel & 0x00ff00ff) * salpha) >> 8) & 0x00ff00ff) |
+									((((spixel & 0x0000ff00) * salpha) >> 8) & 0x0000ff00) |
+									((((spixel & 0xff000000))));
+							}
 
 							int32_t gr = (spixel >> 0x10) & 0xff,
 											gg = (spixel >> 0x08) & 0xff,
