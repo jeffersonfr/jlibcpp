@@ -19,7 +19,7 @@ INCDIR		= include
 LIBDIR		= lib
 SRCDIR 		= src
 BINDIR 		= bin
-OBJDIR		= objs
+OBJDIR		= obj
 TESTDIR		= tests
 DOCDIR		= doc
 
@@ -27,48 +27,52 @@ PREFIX		= /usr/local
 
 DEBUG  		= -g -ggdb 
 
-ENABLE_DEBUG		?= yes
+ENABLE_DEBUG		?= no
 ENABLE_GRAPHICS ?= dfb
 
 ARFLAGS		= -rc
-# -ansi: problem with va_copy()
+# -ansi: problemas com va_copy()
 CCFLAGS		= -Wall -shared -rdynamic -fpic -funroll-loops -O2
 
 INCLUDE		= \
-			-Iwin32/win32 \
-			-Ijcommon/include \
-			-Ijgui/include \
-			-Ijio/include \
-			-Ijlogger/include \
-			-Ijmath/include \
-			-Ijmpeg/include \
-			-Ijresource/include \
-			-Ijsecurity/include \
-			-Ijshared/include \
-			-Ijsocket/include \
-			-Ijthread/include \
+		 -I$(INCDIR) \
+		 -Iwin32/win32 \
+		 -Ijcommon/include \
+		 -Ijgui/include \
+		 -Ijio/include \
+		 -Ijlogger/include \
+		 -Ijmath/include \
+		 -Ijmpeg/include \
+		 -Ijresource/include \
+		 -Ijsecurity/include \
+		 -Ijshared/include \
+		 -Ijsocket/include \
+		 -Ijthread/include \
+		 `pkg-config --cflags libssl` \
 
 LIBRARY 	= \
-			-lpthread \
-			-ldl \
-			-lrt \
+		 -L$(LIBDIR) \
+		 -lpthread \
+		 -ldl \
+		 -lrt \
 
 DEFINES		= \
-			-D_GNU_SOURCE \
-			-D_REENTRANT \
-			-D_FILE_OFFSET_BITS=64 \
-			-D_LARGEFILE_SOURCE \
+		 -D_GNU_SOURCE \
+		 -D_REENTRANT \
+		 -D_FILE_OFFSET_BITS=64 \
+		 -D_LARGEFILE_SOURCE \
 
 REQUIRES	= \
-			libssl \
+		 libssl \
 
 ARFLAGS		+= \
 
 CCFLAGS		+= \
-			$(DEFINES) \
-			$(DEBUG) \
-			$(INCLUDE) \
-			-D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
+		 $(LDFLAGS) \
+		 $(DEFINES) \
+		 $(DEBUG) \
+		 $(INCLUDE) \
+		 -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
 
 ECHO			= echo -e
 
@@ -78,22 +82,22 @@ ifeq ($(ENABLE_DEBUG),yes)
 	INCLUDE 	+= \
 
 	DEFINES		+= \
-			-DJDEBUG_ENABLED \
+		 -DJDEBUG_ENABLED \
 
 endif
 
 ifeq ($(ENABLE_GRAPHICS),dfb)
 	INCLUDE 	+= \
-			-Ijgui/binds/directfb/include \
-			`pkg-config --cflags directfb` \
-		  `pkg-config --cflags cairo` \
+		 -Ijgui/binds/directfb/include \
+		 `pkg-config --cflags directfb` \
+		 `pkg-config --cflags cairo` \
 
 	DEFINES		+= \
-			-DDIRECTFB_UI \
+		 -DDIRECTFB_UI \
 
 	REQUIRES	+= \
-			directfb \
-			cairo \
+		 directfb \
+		 cairo \
 
 	OBJS_gfx	+= \
 		 jdfbhandler.o\
@@ -112,10 +116,12 @@ OBJS_jcommon += \
 	   jcharset.o\
 	   jsystem.o\
 	   jdate.o\
+		 jdebug.o\
 	   jdynamiclink.o\
 	   jexception.o\
 	   jjson.o\
 	   jgc.o\
+	   jhttp.o\
 	   jhtmlparser.o\
 		 jinvalidargumentexception.o\
 		 jillegalargumentexception.o\
@@ -133,7 +139,6 @@ OBJS_jcommon += \
 	   jstringtokenizer.o\
 	   jtypes.o\
 	   jurl.o\
-	   jhttp.o\
 	   jstringutils.o\
 	   jxmlparser.o\
 	   joptions.o\
@@ -215,23 +220,23 @@ OBJS_jlogger += \
 	   jloggerlib.o
 
 OBJS_jshared += \
-		 jqueueexception.o\
-		 jmemoryexception.o\
-		 jmemorymap.o\
-		 jmessageexception.o\
-		 jmessagequeue.o\
-		 jnamedpipe.o\
-		 jpipe.o\
-		 jprocess.o\
-		 jprocessexception.o\
-		 jprocessinputstream.o\
-		 jprocessoutputstream.o\
-		 jschedule.o\
-		 jsharedqueue.o\
-		 jsharedlib.o\
-		 jsharedmemory.o\
-		 jsharedmutex.o\
-		 jsharedsemaphore.o\
+	   jqueueexception.o\
+	   jpipe.o\
+	   jmemorymap.o\
+	   jmemoryexception.o\
+	   jmessagequeue.o\
+	   jmessageexception.o\
+	   jnamedpipe.o\
+	   jprocessexception.o\
+	   jprocessinputstream.o\
+	   jprocessoutputstream.o\
+	   jprocess.o\
+	   jsharedmemory.o\
+	   jsharedsemaphore.o\
+	   jsharedqueue.o\
+	   jsharedlib.o\
+	   jschedule.o\
+	   jsharedmutex.o\
 
 OBJS_jsocket += \
 		 jconnection.o\
@@ -261,34 +266,36 @@ OBJS_jsocket += \
 		 jsocketoutputstream.o\
 		 jsockettimeoutexception.o\
 		 jsslserversocket.o\
-		 jsslserversocket6.o\
 		 jsslsocket.o\
 		 jsslsocket6.o\
+		 jsslserversocket6.o\
 		 jsslsocketinputstream.o\
 		 jsslsocketoutputstream.o\
 		 junknownhostexception.o\
+		 #jrtpsocket.o\
 
 OBJS_jthread += \
-		 jbufferexception.o\
+	   jautolock.o\
+	   jbufferexception.o\
 	   jcondition.o\
 		 jevent.o\
 		 jillegalstateexception.o\
-	   jmutex.o\
 		 jmonitor.o\
+	   jmutex.o\
+	   jrwlock.o\
+	   jrunnable.o\
 	   jsemaphore.o\
 	   jthread.o\
 	   jthreadexception.o\
 	   jsemaphoreexception.o\
 	   jsemaphoretimeoutexception.o\
 	   jmutexexception.o\
-	   jautolock.o\
 	   jspinlock.o\
 	   jthreadlib.o\
 	   jindexedbuffer.o\
 	   jthreadgroup.o\
 	   jthreadpool.o\
 		 jtimer.o\
-	   jrunnable.o\
 
 OBJS_jgui += \
 		jadjustmentevent.o\
@@ -376,6 +383,7 @@ OBJS_jgui += \
 		jwindowmanager.o\
 		jyesnodialogbox.o\
 		jtree.o\
+		jtabbedpane.o\
 		jtable.o\
 		jguilib.o\
 
@@ -418,8 +426,9 @@ SRCS	= \
 		$(SRCS_jgui) \
 
 all: $(EXE)
-
+	
 $(EXE): $(SRCS)
+	@#$(AR) $(ARFLAGS) $(EXE) $(OBJS) 
 	@$(CC) $(CCFLAGS) -o $(EXE) $(SRCS) $(LIBRARY)
 	@mkdir -p $(BINDIR) $(LIBDIR) && mv $(EXE) $(LIBDIR)
 
@@ -485,5 +494,5 @@ ultraclean: clean uninstall
 	@cd jshared/tests && make clean && cd -
 	@cd jsocket/tests && make clean && cd -
 	@cd jthread/tests && make clean && cd -
-	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(PREFIX)/$(MODULE) $(PREFIX)/lib/$(EXE) $(PREFIX)/include/$(MODULE) 2> /dev/null && $(ECHO) "$(MODULE) ultraclean $(OK)" 
+	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(PREFIX)/lib/$(EXE) $(PREFIX)/$(MODULE) $(PREFIX)/include/$(MODULE) 2> /dev/null && $(ECHO) "$(MODULE) ultraclean $(OK)" 
 
