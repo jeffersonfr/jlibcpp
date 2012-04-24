@@ -54,7 +54,7 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 	_surface = NULL;
 	_window = NULL;
 	
-	_graphics = new DFBGraphics(NULL, true);
+	_graphics = new DFBGraphics(NULL, NULL, true);
 #endif
 
 	_opacity = 0xff;

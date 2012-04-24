@@ -80,6 +80,12 @@ class DFBImage : public jgui::Image{
 		 */
 		virtual jcommon::Object * Clone();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSize(int width, int height);
+
 };
 
 }

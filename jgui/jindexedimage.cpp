@@ -22,6 +22,7 @@
 #include "jimageexception.h"
 #include "jgfxhandler.h"
 #include "jruntimeexception.h"
+#include "jnullgraphics.h"
 
 namespace jgui {
 
@@ -30,8 +31,11 @@ IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, i
 {
 	jcommon::Object::SetClassName("jgui::IndexedImage");
 	
-	_scale.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_scale.height = GFXHandler::GetInstance()->GetScreenHeight();
+	GFXHandler *handler = GFXHandler::GetInstance();
+
+	_graphics = new NullGraphics();
+
+	_graphics->SetWorkingScreenSize(handler->GetScreenWidth(), handler->GetScreenHeight());
 
 	_palette = new uint32_t[palette_size];
 	_palette_size = palette_size;
@@ -50,8 +54,11 @@ IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, 
 {
 	jcommon::Object::SetClassName("jgui::IndexedImage");
 
-	_scale.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_scale.height = GFXHandler::GetInstance()->GetScreenHeight();
+	GFXHandler *handler = GFXHandler::GetInstance();
+
+	_graphics = new NullGraphics();
+
+	_graphics->SetWorkingScreenSize(handler->GetScreenWidth(), handler->GetScreenHeight());
 
 	_palette = new uint32_t[palette_size];
 	_palette_size = palette_size;
@@ -95,7 +102,7 @@ IndexedImage * IndexedImage::Pack(Image *image)
 	if ((void *)image != NULL) {
 		if (image->GetGraphics() != NULL) {
 			GFXHandler *handler = GFXHandler::GetInstance();
-			jsize_t scale = image->GetWorkingScreenSize();
+			jsize_t scale = image->GetGraphics()->GetWorkingScreenSize();
 			int size_w = image->GetWidth(),
 					size_h = image->GetHeight();
 			uint32_t *rgb = NULL;
@@ -260,9 +267,6 @@ void IndexedImage::Release()
 
 void IndexedImage::Restore()
 {
-	_scale.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_scale.height = GFXHandler::GetInstance()->GetScreenHeight();
-
 	// do nothing
 }
 

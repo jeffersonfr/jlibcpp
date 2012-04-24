@@ -28,23 +28,26 @@
 #include "jrectangle.h"
 #include "jdfbfont.h"
 #include "jdfbgraphics.h"
+#include "jdfbimage.h"
 
 #define M_2PI	(2*M_PI)
 
 namespace jgui {
 
-DFBGraphics::DFBGraphics(void *surface, bool premultiplied):
+DFBGraphics::DFBGraphics(DFBImage *image, void *surface, bool premultiplied, int scale_width, int scale_height):
 	jgui::Graphics()
 {
 	jcommon::Object::SetClassName("jgui::DFBGraphics");
+
+	_image = image;
 
 	_is_premultiply = premultiplied;
 
 	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
 
-	_scale.width = DEFAULT_SCALE_WIDTH;
-	_scale.height = DEFAULT_SCALE_HEIGHT;
+	_scale.width = scale_width;
+	_scale.height = scale_height;
 
 	_surface = (IDirectFBSurface *)surface;
 
@@ -60,8 +63,8 @@ DFBGraphics::DFBGraphics(void *surface, bool premultiplied):
 
 	_clip.x = 0;
 	_clip.y = 0;
-	_clip.width = DEFAULT_SCALE_WIDTH;
-	_clip.height = DEFAULT_SCALE_HEIGHT;
+	_clip.width = _scale.width;
+	_clip.height = _scale.height;
 
 	Reset();
 }
@@ -266,6 +269,15 @@ jblitting_flags_t DFBGraphics::GetBlittingFlags()
 
 void DFBGraphics::SetWorkingScreenSize(int width, int height)
 {
+	if (_image != NULL) {
+		jsize_t size = _image->GetSize();
+
+		size.width = (size.width*width)/_scale.width;
+		size.height = (size.height*height)/_scale.height;
+
+		_image->SetSize(size.width, size.height);
+	}
+
 	_scale.width = width;
 	_scale.height = height;
 
@@ -1727,7 +1739,7 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		return false;
 	}
 
-	jsize_t scale = img->GetWorkingScreenSize();
+	jsize_t scale = img->GetGraphics()->GetWorkingScreenSize();
 
 	int sx = SCALE_TO_SCREEN(sxp, _screen.width, scale.width),
 			sy = SCALE_TO_SCREEN(syp, _screen.height, scale.height),
@@ -1751,9 +1763,9 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		return true;
 	}
 
-	Graphics *g = img->GetGraphics();
+	DFBGraphics *g = dynamic_cast<DFBGraphics *>(img->GetGraphics());
 
-	if ((void *)g != NULL) {
+	if (g != NULL) {
 		DFBRectangle drect;
 
 		drect.x = sx;
@@ -1761,7 +1773,7 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		drect.w = sw;
 		drect.h = sh;
 
-		_surface->Blit(_surface, dynamic_cast<jgui::DFBGraphics *>(g)->_surface, &drect, x, y);
+		_surface->Blit(_surface, g->_surface, &drect, x, y);
 	} else {
 		uint32_t *rgb = NULL;
 
@@ -1787,7 +1799,7 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		return false;
 	}
 
-	jsize_t scale = img->GetWorkingScreenSize();
+	jsize_t scale = img->GetGraphics()->GetWorkingScreenSize();
 
 	int sx = SCALE_TO_SCREEN(sxp, _screen.width, scale.width),
 			sy = SCALE_TO_SCREEN(syp, _screen.height, scale.height),
@@ -1813,9 +1825,9 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		return true;
 	}
 
-	Graphics *g = img->GetGraphics();
+	DFBGraphics *g = dynamic_cast<DFBGraphics *>(img->GetGraphics());
 
-	if ((void *)g != NULL) {
+	if (g != NULL) {
 		DFBRectangle srect,
 								 drect;
 
@@ -1829,26 +1841,28 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		drect.w = w;
 		drect.h = h;
 
-		_surface->StretchBlit(_surface, dynamic_cast<jgui::DFBGraphics *>(g)->_surface, &srect, &drect);
+		_surface->StretchBlit(_surface, g->_surface, &srect, &drect);
 	} else {
-		jsize_t scale = img->GetWorkingScreenSize();
+		jsize_t scale = img->GetGraphics()->GetWorkingScreenSize();
 
 		int iwp = (wp*scale.width)/_screen.width;
 		int ihp = (hp*scale.height)/_screen.height;
 
 		Image *image = img->Scaled(iwp, ihp);
 
-		uint32_t *rgb = NULL;
+		if (image != NULL) {
+			uint32_t *rgb = NULL;
 
-		image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
-		
-		if (rgb != NULL) {
-			SetRGB(rgb, _translate.x+xp, _translate.y+yp, wp, hp, wp);
+			image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
 
-			delete [] rgb;
+			if (rgb != NULL) {
+				SetRGB(rgb, _translate.x+xp, _translate.y+yp, wp, hp, wp);
+
+				delete [] rgb;
+			}
+
+			delete image;
 		}
-
-		delete image;
 	}
 
 	return true;

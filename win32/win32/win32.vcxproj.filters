@@ -38,6 +38,9 @@
     <ClCompile Include="..\..\jcommon\jdate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jcommon\jdebug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jcommon\jdynamiclink.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -53,7 +56,13 @@
     <ClCompile Include="..\..\jcommon\jhtmlparser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jcommon\jhttp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jcommon\jillegalargumentexception.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jcommon\jinvalidargumentexception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jcommon\jjson.cpp">
@@ -164,6 +173,9 @@
     <ClCompile Include="..\..\jgui\jcheckbuttonlistener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jgui\jcolor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jgui\jcombobox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -206,9 +218,6 @@
     <ClCompile Include="..\..\jgui\jframe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jgui\jframeinputlistener.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\jgui\jgfxhandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -227,7 +236,16 @@
     <ClCompile Include="..\..\jgui\jicon.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jgui\jimage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jgui\jimagebutton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jgui\jimageexception.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jgui\jindexedimage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jgui\jinputdialogbox.cpp">
@@ -240,9 +258,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jgui\jkeyboard.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\jgui\jkeyboardevent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jgui\jkeyboardlistener.cpp">
@@ -287,19 +302,16 @@
     <ClCompile Include="..\..\jgui\jnulllayout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jgui\jimage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\jgui\jpanel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jgui\jprogressbar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jgui\jscrollbar.cpp">
+    <ClCompile Include="..\..\jgui\jrectangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jgui\jscrollpane.cpp">
+    <ClCompile Include="..\..\jgui\jscrollbar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jgui\jselectevent.cpp">
@@ -311,7 +323,13 @@
     <ClCompile Include="..\..\jgui\jslider.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jgui\jslidercomponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jgui\jspin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jgui\jtabbedpane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jgui\jtable.cpp">
@@ -369,15 +387,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jgui\jyesnodialogbox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\jimage\jbitmap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\jimage\jimage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\jimage\jimageexception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jio\jbitinputstream.cpp">
@@ -443,6 +452,9 @@
     <ClCompile Include="..\..\jio\jprintstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jio\jserializable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jlogger\jconsolehandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -491,7 +503,10 @@
     <ClCompile Include="..\..\jmath\jcomplex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jmath\jcrc32.cpp">
+    <ClCompile Include="..\..\jmath\jcrc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jmath\jmath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jmath\jmathlib.cpp">
@@ -512,31 +527,46 @@
     <ClCompile Include="..\..\jmath\juuid.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jmpeg\jadaptationfield.cpp">
+    <ClCompile Include="..\..\jresource\jresourceclient.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jmpeg\jmpegexception.cpp">
+    <ClCompile Include="..\..\jresource\jresourceexception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jmpeg\jmpeglib.cpp">
+    <ClCompile Include="..\..\jresource\jresourcelib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jmpeg\jprogramassociationsection.cpp">
+    <ClCompile Include="..\..\jresource\jresourceproxy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jmpeg\jprogramelementarystreamsection.cpp">
+    <ClCompile Include="..\..\jresource\jresourceserver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jmpeg\jprogrammapsection.cpp">
+    <ClCompile Include="..\..\jresource\jresourcestatusevent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jmpeg\jprogramsysteminformationsection.cpp">
+    <ClCompile Include="..\..\jresource\jresourcestatuslistener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jmpeg\jtransportstreampacket.cpp">
+    <ClCompile Include="..\..\jsecurity\jaccesscontroller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jshared\jfifoexception.cpp">
+    <ClCompile Include="..\..\jsecurity\jfileaccesscontroller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsecurity\jgroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsecurity\jsecurityexception.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsecurity\jsecuritylib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsecurity\jsecuritymanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsecurity\juser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jshared\jmemoryexception.cpp">
@@ -551,19 +581,28 @@
     <ClCompile Include="..\..\jshared\jmessagequeue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jshared\jnamedpipe.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jshared\jpipe.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jshared\jprivateprocess.cpp">
+    <ClCompile Include="..\..\jshared\jprocess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jshared\jprocessexception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jshared\jschedule.cpp">
+    <ClCompile Include="..\..\jshared\jprocessinputstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jshared\jsharedfifo.cpp">
+    <ClCompile Include="..\..\jshared\jprocessoutputstream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jshared\jqueueexception.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jshared\jschedule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jshared\jsharedlib.cpp">
@@ -575,10 +614,10 @@
     <ClCompile Include="..\..\jshared\jsharedmutex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jshared\jsharedsemaphore.cpp">
+    <ClCompile Include="..\..\jshared\jsharedqueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jshared\jwrapperprocess.cpp">
+    <ClCompile Include="..\..\jshared\jsharedsemaphore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jsocket\jconnection.cpp">
@@ -590,19 +629,52 @@
     <ClCompile Include="..\..\jsocket\jdatagramsocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jsocket\jdatagramsocket6.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jsocket\jhttprequester.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jsocket\jinetaddress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jsocket\jinetaddress4.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jinetaddress6.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jlocaldatagramsocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jlocalserversocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jlocalsocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jsocket\jmulticastsocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jmulticastsocket6.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jnetworkinterface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jrawsocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jsocket\jserversocket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jsocket\jserversocket6.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jsocket\jsocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jsocket6.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jsocket\jsocketexception.cpp">
@@ -614,19 +686,34 @@
     <ClCompile Include="..\..\jsocket\jsocketlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jsocket\jsocketoption.cpp">
+    <ClCompile Include="..\..\jsocket\jsocketoptions.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jsocket\jsocketoptionexception.cpp">
+    <ClCompile Include="..\..\jsocket\jsocketoptionsexception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jsocket\jsocketoutputstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jsocket\jsocketstreamexception.cpp">
+    <ClCompile Include="..\..\jsocket\jsockettimeoutexception.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jsocket\jsockettimeoutexception.cpp">
+    <ClCompile Include="..\..\jsocket\jsslserversocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jsslserversocket6.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jsslsocket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jsslsocket6.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jsslsocketinputstream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\jsocket\jsslsocketoutputstream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\jsocket\junknownhostexception.cpp">
@@ -662,6 +749,9 @@
     <ClCompile Include="..\..\jthread\jrunnable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\jthread\jrwlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\jthread\jsemaphore.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -686,10 +776,10 @@
     <ClCompile Include="..\..\jthread\jthreadlib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jmath\jmath.cpp">
+    <ClCompile Include="..\..\jthread\jthreadpool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\jio\jserializable.cpp">
+    <ClCompile Include="..\..\jthread\jtimer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

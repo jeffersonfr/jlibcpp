@@ -39,19 +39,6 @@
 #include <conio.h>
 #include <sys/stat.h>
 
-#elif __CYGWIN32__
-
-#include <termios.h>
-#include <pwd.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
-#include <sys/socket.h>
-#include <sys/ioctl.h>
-#include <net/if.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <w32api/winsock2.h>
-
 #else
 
 #include <pthread.h>
@@ -97,3 +84,8 @@
 #define FALSE	0
 #define TRUE	!FALSE
 #endif
+
+#ifdef _WIN32
+#define _DATA_PREFIX	"c:\temp\jlib\resources"
+#endif
+

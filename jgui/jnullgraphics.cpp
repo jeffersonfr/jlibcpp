@@ -38,519 +38,603 @@ NullGraphics::~NullGraphics()
 
 void * NullGraphics::GetNativeSurface()
 {
-	return NULL;
+	return Graphics::GetNativeSurface();
 }
 
 void NullGraphics::SetNativeSurface(void *surface)
 {
+	Graphics::SetNativeSurface(surface);
 }
 
 void NullGraphics::SetWorkingScreenSize(jsize_t size)
 {
-	SetWorkingScreenSize(size.width, size.height);
+	Graphics::SetWorkingScreenSize(size.width, size.height);
 }
 
 void NullGraphics::SetWorkingScreenSize(int width, int height)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetWorkingScreenSize(width, height);
 }
 
 jsize_t NullGraphics::GetWorkingScreenSize()
 {
 	JDEBUG(JINFO, "called\n");
 
-	jsize_t t;
-
-	t.width = 0;
-	t.height = 0;
-
-	return t;
+	return Graphics::GetWorkingScreenSize();
 }
 
 jregion_t NullGraphics::ClipRect(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	jregion_t t;
-
-	t.x = 0;
-	t.y = 0;
-	t.width = 0;
-	t.height = 0;
-
-	return t;
+	return Graphics::ClipRect(xp, yp, wp, hp);
 }
 
 void NullGraphics::SetClip(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetClip(xp, yp, wp, hp);
 }
 
 jregion_t NullGraphics::GetClip()
 {
 	JDEBUG(JINFO, "called\n");
 
-	jregion_t t;
-
-	t.x = 0;
-	t.y = 0;
-	t.width = 0;
-	t.height = 0;
-
-	return t;
+	return Graphics::GetClip();
 }
 
 void NullGraphics::ReleaseClip()
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::ReleaseClip();
 }
 
 void NullGraphics::Clear()
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::Clear();
 }
 
 void NullGraphics::Clear(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::Clear(xp, yp, wp, hp);
 }
 
 void NullGraphics::Idle()
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::Idle();
 }
 
 void NullGraphics::Flip()
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::Flip();
 }
 
 void NullGraphics::Flip(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::Flip(xp, yp, wp, hp);
 }
 
 Color & NullGraphics::GetColor()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return _color;
+	return Graphics::GetColor();
 }
 
 void NullGraphics::SetColor(const Color &color)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetColor(color);
 }
 
 void NullGraphics::SetColor(uint32_t color)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetColor(color);
 }
 
 void NullGraphics::SetColor(int red, int green, int blue, int alpha)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetColor(red, green, blue, alpha);
 } 
 
 bool NullGraphics::HasFont()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return false;
+	return Graphics::HasFont();
 }
 
 void NullGraphics::SetFont(Font *font)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetFont(font);
 }
 
 Font * NullGraphics::GetFont()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return NULL;
+	return Graphics::GetFont();
 }
 
-void NullGraphics::SetAntiAliasEnabled(bool b)
+void NullGraphics::SetAntialias(bool b)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetAntialias(b);
 }
 
 jdrawing_flags_t NullGraphics::GetDrawingFlags()
 {
 	JDEBUG(JINFO, "called\n");
 	
-	return JDF_NOFX;
+	return Graphics::GetDrawingFlags();
 }
 
 jblitting_flags_t NullGraphics::GetBlittingFlags()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return JBF_NOFX;
+	return Graphics::GetBlittingFlags();
 }
 
 jdrawing_mode_t NullGraphics::GetDrawingMode()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return JDM_STROKE;
+	return Graphics::GetDrawingMode();
 }
 
 jcomposite_flags_t NullGraphics::GetCompositeFlags()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return JCF_NONE;
+	return Graphics::GetCompositeFlags();
 }
 
 void NullGraphics::SetCompositeFlags(jcomposite_flags_t t)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetCompositeFlags(t);
 }
 
 void NullGraphics::SetDrawingFlags(jdrawing_flags_t t)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetDrawingFlags(t);
 }
 
 void NullGraphics::SetBlittingFlags(jblitting_flags_t t)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetBlittingFlags(t);
 }
 
 void NullGraphics::SetDrawingMode(jdrawing_mode_t t)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetDrawingMode(t);
 }
 
 void NullGraphics::SetPixel(int xp, int yp, uint32_t pixel)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetPixel(xp, yp, pixel);
 }
 
 unsigned int NullGraphics::GetPixel(int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return 0;
+	return Graphics::GetPixel(xp, yp);
 }
 
 void NullGraphics::SetLineJoin(jline_join_t t)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetLineJoin(t);
 }
 
 void NullGraphics::SetLineStyle(jline_style_t t)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetLineStyle(t);
 }
 
 void NullGraphics::SetLineWidth(int size)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetLineWidth(size);
 }
 
 void NullGraphics::SetLineDash(double *dashes, int ndashes)
 {
+	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetLineDash(dashes, ndashes);
 }
 
 jline_join_t NullGraphics::GetLineJoin()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return (jline_join_t)0;
+	return Graphics::GetLineJoin();
 }
 
 jline_style_t NullGraphics::GetLineStyle()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return (jline_style_t)0;
+	return Graphics::GetLineStyle();
 }
 
 int NullGraphics::GetLineWidth()
 {
-	return 0;
+	return Graphics::GetLineWidth();
 }
 
 void NullGraphics::DrawLine(int xp, int yp, int xf, int yf)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::DrawLine(xp, yp, xf, yf);
 }
 
 void NullGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::DrawBezierCurve(p, npoints, interpolation);
 }
 
 void NullGraphics::FillRectangle(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::FillRectangle(xp, yp, wp, hp);
 }
 
 void NullGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::DrawRectangle(xp, yp, wp, hp);
 }
 
 void NullGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::FillBevelRectangle(xp, yp, wp, hp, dx, dy, corners);
 }
 
 void NullGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::DrawBevelRectangle(xp, yp, wp, hp, dx, dy, corners);
 }
 
 void NullGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::FillRoundRectangle(xp, yp, wp, hp, dx, dy, corners);
 }
 
 void NullGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::DrawRoundRectangle(xp, yp, wp, hp, dx, dy, corners);
 }
 
 void NullGraphics::FillCircle(int xp, int yp, int raio)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::FillCircle(xp, yp, raio);
 }
 
 void NullGraphics::DrawCircle(int xp, int yp, int raio)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::DrawCircle(xp, yp, raio);
 }
 
 void NullGraphics::FillEllipse(int xcp, int ycp, int rxp, int ryp)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::FillEllipse(xcp, ycp, rxp, ryp);
 }
 		
 void NullGraphics::DrawEllipse(int xcp, int ycp, int rxp, int ryp)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::DrawEllipse(xcp, ycp, rxp, ryp);
 }
 		
 void NullGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::FillChord(xcp, ycp, rxp, ryp, arc0, arc1);
 }
 		
 void NullGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::DrawChord(xcp, ycp, rxp, ryp, arc0, arc1);
 }
 		
 void NullGraphics::FillArc(int xc, int yc, int rx, int ry, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::FillArc(xc, yc, rx, ry, arc0, arc1);
 }
 
 void NullGraphics::DrawArc(int xc, int yc, int rx, int ry, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::DrawArc(xc, yc, rx, ry, arc0, arc1);
 }
 
 void NullGraphics::FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::FillPie(xcp, ycp, rxp, ryp, arc0, arc1);
 }
 
 void NullGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::DrawPie(xcp, ycp, rxp, ryp, arc0, arc1);
 }
 		
 void NullGraphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::FillTriangle(x1p, y1p, x2p, y2p, x3p, y3p);
 }
 
 void NullGraphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::DrawTriangle(x1p, y1p, x2p, y2p, x3p, y3p);
 }
 
 void NullGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::FillPolygon(xp, yp, p, npoints, even_odd);
 }
 
-void NullGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
+void NullGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool closed)
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::FillPolygon(xp, yp, p, npoints, closed);
 }
 
 void NullGraphics::SetGradientStop(double stop, const Color &color)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetGradientStop(stop, color);
 }
 
 void NullGraphics::ResetGradientStop()
 {
 	JDEBUG(JINFO, "called\n");
+	
+	Graphics::ResetGradientStop();
 }
 
 void NullGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, int y0p, int r0p)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::FillRadialGradient(xcp, ycp, wp, hp, x0p, y0p, r0p);
 }
 
 void NullGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p)
 {
 	JDEBUG(JINFO, "called\n");
-}
 
-void NullGraphics::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign)
-{
-	JDEBUG(JINFO, "called\n");
+	Graphics::FillLinearGradient(xp, yp, wp, hp, x1p, y1p, x2p, y2p);
 }
 
 void NullGraphics::DrawString(std::string s, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::DrawString(s, xp, yp);
 }
 
-void NullGraphics::DrawString(std::string full_text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
+void NullGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::DrawString(text, xp, yp, wp, hp, halign, valign, clipped);
 }
 
 void NullGraphics::DrawGlyph(int symbol, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::DrawGlyph(symbol, xp, yp);
 }
 
 bool NullGraphics::DrawImage(std::string img, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return false;
+	return Graphics::DrawImage(img, xp, yp);
 }
 
 bool NullGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return false;
+	return Graphics::DrawImage(img, xp, yp, wp, hp);
 }
 
 bool NullGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return false;
+	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp);
 }
 
 bool NullGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return false;
+	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, wp, hp);
 }
 
 bool NullGraphics::DrawImage(Image *img, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return false;
+	return Graphics::DrawImage(img, xp, yp);
 }
 
 bool NullGraphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return false;
+	return Graphics::DrawImage(img, xp, yp, wp, hp);
 }
 
 bool NullGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return false;
+	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp);
 }
 
 bool NullGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return false;
+	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, wp, hp);
 }
 
 void NullGraphics::Rotate(double radians)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::Rotate(radians);
 }
 
 void NullGraphics::Translate(int x, int y)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::Translate(x, y);
 }
 
 void NullGraphics::TranslateImage(int x, int y)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::TranslateImage(x, y);
 }
 
 double NullGraphics::Rotate()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return 0.0;
+	return Graphics::Rotate();
 }
 
 jpoint_t NullGraphics::Translate()
 {
 	JDEBUG(JINFO, "called\n");
 
-	jpoint_t t;
-
-	t.x = 0;
-	t.y = 0;
-
-	return t;
+	return Graphics::Translate();
 }
 
 jpoint_t NullGraphics::TranslateImage()
 {
 	JDEBUG(JINFO, "called\n");
 
-	jpoint_t t;
-
-	t.x = 0;
-	t.y = 0;
-
-	return t;
+	return Graphics::TranslateImage();
 }
 
 uint32_t NullGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 {
 	JDEBUG(JINFO, "called\n");
 
-	return pixel;
+	return Graphics::GetRGB(xp, yp, pixel);
 }
 
 void NullGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::GetRGB(rgb, xp, yp, wp, hp, scansize);
 }
 
-void NullGraphics::SetRGB(uint32_t rgb, int xp, int yp) 
+void NullGraphics::SetRGB(uint32_t rgb, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetRGB(rgb, xp, yp);
 }
 
-void NullGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline) 
+void NullGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline)
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::SetRGB(rgb, xp, yp, wp, hp, scanline);
 }
 
 void NullGraphics::Reset()
 {
 	JDEBUG(JINFO, "called\n");
+
+	Graphics::Reset();
 }
 
 }

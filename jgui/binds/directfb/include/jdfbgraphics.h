@@ -38,6 +38,7 @@ namespace jgui{
 
 class Font;
 class Image;
+class DFBImage;
 
 /**
  * \brief
@@ -52,8 +53,9 @@ class DFBGraphics : public virtual jgui::Graphics{
 	protected:
 		jthread::Mutex _graphics_mutex;
 
-		struct jregion_t _clip,
-			_internal_clip;
+		DFBImage *_image;
+		struct jregion_t _clip;
+		struct jregion_t _internal_clip;
 		jline_join_t _line_join;
 		jline_style_t _line_style;
 		jdrawing_flags_t _draw_flags;
@@ -92,7 +94,7 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		DFBGraphics(void *surface, bool premultiplied);
+		DFBGraphics(DFBImage *image, void *surface, bool premultiplied, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 
 	public:
 		/**

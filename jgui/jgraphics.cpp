@@ -331,7 +331,7 @@ void Graphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p
 {
 }
 
-void Graphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool close)
+void Graphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool closed)
 {
 }
 
@@ -471,6 +471,7 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 
 void Graphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize)
 {
+	(*rgb) = NULL;
 }
 
 void Graphics::SetRGB(uint32_t argb, int xp, int yp) 

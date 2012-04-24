@@ -769,12 +769,13 @@ class RGBImageTest : public Picture {
 			Picture(x, y, w, h)
 		{
 			jgui::Image *image = jgui::Image::CreateImage(FILENAME);
+			jgui::jsize_t scale = image->GetGraphics()->GetWorkingScreenSize();;
 
 			uint32_t *rgb = NULL;
 
 			image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
 
-			_image = jgui::Image::CreateImage(rgb, image->GetWidth(), image->GetHeight());
+			_image = jgui::Image::CreateImage(rgb, image->GetWidth(), image->GetHeight(), scale.width, scale.height);
 
 			_title = "RGB Image";
 		}

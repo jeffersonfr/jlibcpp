@@ -91,11 +91,9 @@ DFBImage::DFBImage(int width, int height, jpixelformat_t pixelformat, int scale_
 	IDirectFBSurface *surface = NULL;
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->
-		CreateSurface(_size.width, _size.height, &surface, pixelformat, _scale.width, _scale.height);
+		CreateSurface(_size.width, _size.height, &surface, pixelformat, scale_width, scale_height);
 
-	_graphics = new DFBGraphics(surface, false);
-
-	_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
+	_graphics = new DFBGraphics(this, surface, false, scale_width, scale_height);
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
 }
@@ -208,13 +206,13 @@ void DFBImage::Release()
 {
 	_graphics->Lock();
 	
+	IDirectFBSurface *surface = (IDirectFBSurface *)_graphics->GetNativeSurface();
+
 	if (_graphics != NULL) {
 		_graphics->SetNativeSurface(NULL);
 	}
 
 	_graphics->Unlock();
-
-	IDirectFBSurface *surface = (IDirectFBSurface *)_graphics->GetNativeSurface();
 
 	void *ptr;
 	int pitch,
@@ -242,13 +240,12 @@ void DFBImage::Release()
 
 void DFBImage::Restore()
 {
-	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
+	jsize_t scale = _graphics->GetWorkingScreenSize();
 
 	IDirectFBSurface *surface = NULL;
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->
-		CreateSurface(_size.width, _size.height, &surface, _pixelformat, _scale.width, _scale.height);
+		CreateSurface(_size.width, _size.height, &surface, _pixelformat, scale.width, scale.height);
 
 	void *ptr;
 	int pitch,
@@ -268,16 +265,13 @@ void DFBImage::Restore()
 	}
 	
 	_graphics->Lock();
-
 	_graphics->SetNativeSurface(surface);
-	_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
-
 	_graphics->Unlock();
 }
 
 jcommon::Object * DFBImage::Clone()
 {
-	jsize_t scale = GetWorkingScreenSize();
+	jsize_t scale = _graphics->GetWorkingScreenSize();
 	
 	Image *clone = new DFBImage(GetWidth(), GetHeight(), GetPixelFormat(), scale.width, scale.height);
 
@@ -287,6 +281,12 @@ jcommon::Object * DFBImage::Clone()
 	}
 
 	return clone;
+}
+
+void DFBImage::SetSize(int width, int height)
+{
+	_size.width = width;
+	_size.height = height;
 }
 
 }

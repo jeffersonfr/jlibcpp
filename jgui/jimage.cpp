@@ -40,20 +40,6 @@ Image::Image(int width, int height, jpixelformat_t pixelformat, int scale_width,
 
 	_size.width = width;
 	_size.height = height;
-
-	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
-
-	_scale.width = scale_width;
-	_scale.height = scale_height;
-
-	if (_scale.width <= 0) {
-		_scale.width = DEFAULT_SCALE_WIDTH;
-	}
-
-	if (_scale.height <= 0) {
-		_scale.height = DEFAULT_SCALE_HEIGHT;
-	}
 }
 
 Image::~Image()
@@ -82,12 +68,12 @@ Image * Image::CreateImage(int width, int height, jpixelformat_t pixelformat, in
 	return image;
 }
 
-Image * Image::CreateImage(uint32_t *data, int width, int height)
+Image * Image::CreateImage(uint32_t *data, int width, int height, int scale_width, int scale_height)
 {
 	Image *image = NULL;
 
 #ifdef DIRECTFB_UI
-	image = new DFBImage(width, height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+	image = new DFBImage(width, height, JPF_ARGB, scale_width, scale_height); // GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 
 	image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
 	image->GetGraphics()->SetRGB(data, 0, 0, width, height, width);
@@ -165,41 +151,6 @@ Image * Image::CreateImage(Image *image)
 	return clone;
 }
 
-void Image::SetWorkingScreenSize(jsize_t size)
-{
-	SetWorkingScreenSize(size.width, size.height);
-}
-
-void Image::SetWorkingScreenSize(int width, int height)
-{
-	if (_scale.width == width && _scale.height == height) {
-		return;
-	}
-
-	_size.width = (_size.width*width)/_scale.width;
-	_size.height = (_size.height*height)/_scale.height;
-
-	_scale.width = width;
-	_scale.height = height;
-
-	if (_scale.width <= 0) {
-		_scale.width = DEFAULT_SCALE_WIDTH;
-	}
-
-	if (_scale.height <= 0) {
-		_scale.height = DEFAULT_SCALE_HEIGHT;
-	}
-
-	if (_graphics != NULL) {
-		_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
-	}
-}
-
-jsize_t Image::GetWorkingScreenSize()
-{
-	return _scale;
-}
-
 Graphics * Image::GetGraphics()
 {
 	return _graphics;
@@ -210,7 +161,9 @@ Image * Image::Scaled(int width, int height)
 	Image *image = NULL;
 
 #ifdef DIRECTFB_UI
-	image = new DFBImage(width, height, GetPixelFormat(), _scale.width, _scale.height);
+	jsize_t scale = _graphics->GetWorkingScreenSize();
+
+	image = new DFBImage(width, height, GetPixelFormat(), scale.width, scale.height);
 
 	if (image->GetGraphics()->DrawImage(this, 0, 0, width, height) == false) {
 		delete image;
@@ -226,7 +179,9 @@ Image * Image::SubImage(int x, int y, int width, int height)
 	Image *image = NULL;
 
 #ifdef DIRECTFB_UI
-	image = new DFBImage(width, height, GetPixelFormat(), _scale.width, _scale.height);
+	jsize_t scale = _graphics->GetWorkingScreenSize();
+
+	image = new DFBImage(width, height, GetPixelFormat(), scale.width, scale.height);
 
 	if (image->GetGraphics()->DrawImage(this, x, y, width, height, 0, 0) == false) {
 		delete image;
@@ -245,7 +200,7 @@ void Image::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	*rgb = NULL;
+	(*rgb) = NULL;
 }
 		
 jpixelformat_t Image::GetPixelFormat()
@@ -261,6 +216,11 @@ int Image::GetWidth()
 int Image::GetHeight()
 {
 	return _size.height;
+}
+
+jsize_t Image::GetSize()
+{
+	return _size;
 }
 
 void Image::Release()

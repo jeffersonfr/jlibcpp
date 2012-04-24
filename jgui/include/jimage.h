@@ -77,9 +77,7 @@ class Image : public virtual jcommon::Object{
 
 	protected:
 		Graphics *_graphics;
-		struct jsize_t _size,
-			_screen,
-			_scale;
+		struct jsize_t _size;
 		jpixelformat_t _pixelformat;
 
 	protected:
@@ -112,7 +110,7 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static Image * CreateImage(uint32_t *data, int wp, int hp);
+		static Image * CreateImage(uint32_t *data, int wp, int hp, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 
 		/**
 		 * \brief
@@ -143,24 +141,6 @@ class Image : public virtual jcommon::Object{
 		 *
 		 */
 		static Image * CreateImage(Image *image);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetWorkingScreenSize();
 
 		/**
 		 * \brief
@@ -204,6 +184,12 @@ class Image : public virtual jcommon::Object{
 		 */
 		virtual int GetHeight();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetSize();
+		
 		/**
 		 * \brief
 		 *

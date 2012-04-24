@@ -41,7 +41,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\jlib\jthread\include;C:\jlib\jsocket\include;C:\jlib\jshared\include;C:\jlib\jsecurity\include;C:\jlib\jresource\include;C:\jlib\jphysic\include;C:\jlib\jp2p\include;C:\jlib\jmpeg\include;C:\jlib\jmath\include;C:\jlib\jlogger\include;C:\jlib\jio\include;C:\jlib\jimage\include;C:\jlib\jgui\include;C:\jlib\jcommon\include;$(IncludePath)</IncludePath>
+    <IncludePath>..\..\jthread\include;..\..\jsocket\include;..\..\jshared\include;..\..\jsecurity\include;..\..\jresource\include;..\..\jmpeg\include;..\..\jmath\include;..\..\jlogger\include;..\..\jio\include;..\..\jgui\include;..\..\jcommon\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -91,6 +91,7 @@
     <ClCompile Include="..\..\jcommon\jexception.cpp" />
     <ClCompile Include="..\..\jcommon\jgc.cpp" />
     <ClCompile Include="..\..\jcommon\jhtmlparser.cpp" />
+    <ClCompile Include="..\..\jcommon\jhttp.cpp" />
     <ClCompile Include="..\..\jcommon\jillegalargumentexception.cpp" />
     <ClCompile Include="..\..\jcommon\jinvalidargumentexception.cpp" />
     <ClCompile Include="..\..\jcommon\jjson.cpp" />
@@ -144,19 +145,20 @@
     <ClCompile Include="..\..\jgui\jfocuslistener.cpp" />
     <ClCompile Include="..\..\jgui\jfont.cpp" />
     <ClCompile Include="..\..\jgui\jframe.cpp" />
-    <ClCompile Include="..\..\jgui\jframeinputlistener.cpp" />
     <ClCompile Include="..\..\jgui\jgfxhandler.cpp" />
     <ClCompile Include="..\..\jgui\jgraphics.cpp" />
     <ClCompile Include="..\..\jgui\jgridbaglayout.cpp" />
     <ClCompile Include="..\..\jgui\jgridlayout.cpp" />
     <ClCompile Include="..\..\jgui\jguilib.cpp" />
     <ClCompile Include="..\..\jgui\jicon.cpp" />
+    <ClCompile Include="..\..\jgui\jimage.cpp" />
     <ClCompile Include="..\..\jgui\jimagebutton.cpp" />
+    <ClCompile Include="..\..\jgui\jimageexception.cpp" />
+    <ClCompile Include="..\..\jgui\jindexedimage.cpp" />
     <ClCompile Include="..\..\jgui\jinputdialogbox.cpp" />
     <ClCompile Include="..\..\jgui\jinputmanager.cpp" />
     <ClCompile Include="..\..\jgui\jitemcomponent.cpp" />
     <ClCompile Include="..\..\jgui\jkeyboard.cpp" />
-    <ClCompile Include="..\..\jgui\jkeyboardevent.cpp" />
     <ClCompile Include="..\..\jgui\jkeyboardlistener.cpp" />
     <ClCompile Include="..\..\jgui\jkeyevent.cpp" />
     <ClCompile Include="..\..\jgui\jkeylistener.cpp" />
@@ -171,15 +173,16 @@
     <ClCompile Include="..\..\jgui\jmouselistener.cpp" />
     <ClCompile Include="..\..\jgui\jnullgraphics.cpp" />
     <ClCompile Include="..\..\jgui\jnulllayout.cpp" />
-    <ClCompile Include="..\..\jgui\jimage.cpp" />
     <ClCompile Include="..\..\jgui\jpanel.cpp" />
     <ClCompile Include="..\..\jgui\jprogressbar.cpp" />
+    <ClCompile Include="..\..\jgui\jrectangle.cpp" />
     <ClCompile Include="..\..\jgui\jscrollbar.cpp" />
-    <ClCompile Include="..\..\jgui\jscrollpane.cpp" />
     <ClCompile Include="..\..\jgui\jselectevent.cpp" />
     <ClCompile Include="..\..\jgui\jselectlistener.cpp" />
     <ClCompile Include="..\..\jgui\jslider.cpp" />
+    <ClCompile Include="..\..\jgui\jslidercomponent.cpp" />
     <ClCompile Include="..\..\jgui\jspin.cpp" />
+    <ClCompile Include="..\..\jgui\jtabbedpane.cpp" />
     <ClCompile Include="..\..\jgui\jtable.cpp" />
     <ClCompile Include="..\..\jgui\jtextarea.cpp" />
     <ClCompile Include="..\..\jgui\jtextcomponent.cpp" />
@@ -199,9 +202,6 @@
     <ClCompile Include="..\..\jgui\jwindowlistener.cpp" />
     <ClCompile Include="..\..\jgui\jwindowmanager.cpp" />
     <ClCompile Include="..\..\jgui\jyesnodialogbox.cpp" />
-    <ClCompile Include="..\..\jimage\jbitmap.cpp" />
-    <ClCompile Include="..\..\jimage\jimage.cpp" />
-    <ClCompile Include="..\..\jimage\jimageexception.cpp" />
     <ClCompile Include="..\..\jio\jbitinputstream.cpp" />
     <ClCompile Include="..\..\jio\jbitoutputstream.cpp" />
     <ClCompile Include="..\..\jio\jbufferedreader.cpp" />
@@ -240,7 +240,7 @@
     <ClCompile Include="..\..\jlogger\jxmlformatter.cpp" />
     <ClCompile Include="..\..\jmath\jbase64.cpp" />
     <ClCompile Include="..\..\jmath\jcomplex.cpp" />
-    <ClCompile Include="..\..\jmath\jcrc32.cpp" />
+    <ClCompile Include="..\..\jmath\jcrc.cpp" />
     <ClCompile Include="..\..\jmath\jmath.cpp" />
     <ClCompile Include="..\..\jmath\jmathlib.cpp" />
     <ClCompile Include="..\..\jmath\jmatrix.cpp" />
@@ -248,45 +248,69 @@
     <ClCompile Include="..\..\jmath\jrandom.cpp" />
     <ClCompile Include="..\..\jmath\jsha1.cpp" />
     <ClCompile Include="..\..\jmath\juuid.cpp" />
-    <ClCompile Include="..\..\jmpeg\jadaptationfield.cpp" />
-    <ClCompile Include="..\..\jmpeg\jmpegexception.cpp" />
-    <ClCompile Include="..\..\jmpeg\jmpeglib.cpp" />
-    <ClCompile Include="..\..\jmpeg\jprogramassociationsection.cpp" />
-    <ClCompile Include="..\..\jmpeg\jprogramelementarystreamsection.cpp" />
-    <ClCompile Include="..\..\jmpeg\jprogrammapsection.cpp" />
-    <ClCompile Include="..\..\jmpeg\jprogramsysteminformationsection.cpp" />
-    <ClCompile Include="..\..\jmpeg\jtransportstreampacket.cpp" />
-    <ClCompile Include="..\..\jshared\jfifoexception.cpp" />
+    <ClCompile Include="..\..\jresource\jresourceclient.cpp" />
+    <ClCompile Include="..\..\jresource\jresourceexception.cpp" />
+    <ClCompile Include="..\..\jresource\jresourcelib.cpp" />
+    <ClCompile Include="..\..\jresource\jresourceproxy.cpp" />
+    <ClCompile Include="..\..\jresource\jresourceserver.cpp" />
+    <ClCompile Include="..\..\jresource\jresourcestatusevent.cpp" />
+    <ClCompile Include="..\..\jresource\jresourcestatuslistener.cpp" />
+    <ClCompile Include="..\..\jsecurity\jaccesscontroller.cpp" />
+    <ClCompile Include="..\..\jsecurity\jfileaccesscontroller.cpp" />
+    <ClCompile Include="..\..\jsecurity\jgroup.cpp" />
+    <ClCompile Include="..\..\jsecurity\jsecurityexception.cpp" />
+    <ClCompile Include="..\..\jsecurity\jsecuritylib.cpp" />
+    <ClCompile Include="..\..\jsecurity\jsecuritymanager.cpp" />
+    <ClCompile Include="..\..\jsecurity\juser.cpp" />
     <ClCompile Include="..\..\jshared\jmemoryexception.cpp" />
     <ClCompile Include="..\..\jshared\jmemorymap.cpp" />
     <ClCompile Include="..\..\jshared\jmessageexception.cpp" />
     <ClCompile Include="..\..\jshared\jmessagequeue.cpp" />
+    <ClCompile Include="..\..\jshared\jnamedpipe.cpp" />
     <ClCompile Include="..\..\jshared\jpipe.cpp" />
-    <ClCompile Include="..\..\jshared\jprivateprocess.cpp" />
+    <ClCompile Include="..\..\jshared\jprocess.cpp" />
     <ClCompile Include="..\..\jshared\jprocessexception.cpp" />
+    <ClCompile Include="..\..\jshared\jprocessinputstream.cpp" />
+    <ClCompile Include="..\..\jshared\jprocessoutputstream.cpp" />
+    <ClCompile Include="..\..\jshared\jqueueexception.cpp" />
     <ClCompile Include="..\..\jshared\jschedule.cpp" />
-    <ClCompile Include="..\..\jshared\jsharedfifo.cpp" />
     <ClCompile Include="..\..\jshared\jsharedlib.cpp" />
     <ClCompile Include="..\..\jshared\jsharedmemory.cpp" />
     <ClCompile Include="..\..\jshared\jsharedmutex.cpp" />
+    <ClCompile Include="..\..\jshared\jsharedqueue.cpp" />
     <ClCompile Include="..\..\jshared\jsharedsemaphore.cpp" />
-    <ClCompile Include="..\..\jshared\jwrapperprocess.cpp" />
     <ClCompile Include="..\..\jsocket\jconnection.cpp" />
     <ClCompile Include="..\..\jsocket\jconnectionpipe.cpp" />
     <ClCompile Include="..\..\jsocket\jdatagramsocket.cpp" />
+    <ClCompile Include="..\..\jsocket\jdatagramsocket6.cpp" />
     <ClCompile Include="..\..\jsocket\jhttprequester.cpp" />
     <ClCompile Include="..\..\jsocket\jinetaddress.cpp" />
+    <ClCompile Include="..\..\jsocket\jinetaddress4.cpp" />
+    <ClCompile Include="..\..\jsocket\jinetaddress6.cpp" />
+    <ClCompile Include="..\..\jsocket\jlocaldatagramsocket.cpp" />
+    <ClCompile Include="..\..\jsocket\jlocalserversocket.cpp" />
+    <ClCompile Include="..\..\jsocket\jlocalsocket.cpp" />
     <ClCompile Include="..\..\jsocket\jmulticastsocket.cpp" />
+    <ClCompile Include="..\..\jsocket\jmulticastsocket6.cpp" />
+    <ClCompile Include="..\..\jsocket\jnetworkinterface.cpp" />
+    <ClCompile Include="..\..\jsocket\jrawsocket.cpp" />
     <ClCompile Include="..\..\jsocket\jserversocket.cpp" />
+    <ClCompile Include="..\..\jsocket\jserversocket6.cpp" />
     <ClCompile Include="..\..\jsocket\jsocket.cpp" />
+    <ClCompile Include="..\..\jsocket\jsocket6.cpp" />
     <ClCompile Include="..\..\jsocket\jsocketexception.cpp" />
     <ClCompile Include="..\..\jsocket\jsocketinputstream.cpp" />
     <ClCompile Include="..\..\jsocket\jsocketlib.cpp" />
-    <ClCompile Include="..\..\jsocket\jsocketoption.cpp" />
-    <ClCompile Include="..\..\jsocket\jsocketoptionexception.cpp" />
+    <ClCompile Include="..\..\jsocket\jsocketoptions.cpp" />
+    <ClCompile Include="..\..\jsocket\jsocketoptionsexception.cpp" />
     <ClCompile Include="..\..\jsocket\jsocketoutputstream.cpp" />
-    <ClCompile Include="..\..\jsocket\jsocketstreamexception.cpp" />
     <ClCompile Include="..\..\jsocket\jsockettimeoutexception.cpp" />
+    <ClCompile Include="..\..\jsocket\jsslserversocket.cpp" />
+    <ClCompile Include="..\..\jsocket\jsslserversocket6.cpp" />
+    <ClCompile Include="..\..\jsocket\jsslsocket.cpp" />
+    <ClCompile Include="..\..\jsocket\jsslsocket6.cpp" />
+    <ClCompile Include="..\..\jsocket\jsslsocketinputstream.cpp" />
+    <ClCompile Include="..\..\jsocket\jsslsocketoutputstream.cpp" />
     <ClCompile Include="..\..\jsocket\junknownhostexception.cpp" />
     <ClCompile Include="..\..\jthread\jautolock.cpp" />
     <ClCompile Include="..\..\jthread\jbufferexception.cpp" />
@@ -297,8 +321,8 @@
     <ClCompile Include="..\..\jthread\jmonitor.cpp" />
     <ClCompile Include="..\..\jthread\jmutex.cpp" />
     <ClCompile Include="..\..\jthread\jmutexexception.cpp" />
-    <ClCompile Include="..\..\jthread\jrwlock.cpp" />
     <ClCompile Include="..\..\jthread\jrunnable.cpp" />
+    <ClCompile Include="..\..\jthread\jrwlock.cpp" />
     <ClCompile Include="..\..\jthread\jsemaphore.cpp" />
     <ClCompile Include="..\..\jthread\jsemaphoreexception.cpp" />
     <ClCompile Include="..\..\jthread\jsemaphoretimeoutexception.cpp" />
@@ -306,8 +330,9 @@
     <ClCompile Include="..\..\jthread\jthread.cpp" />
     <ClCompile Include="..\..\jthread\jthreadexception.cpp" />
     <ClCompile Include="..\..\jthread\jthreadgroup.cpp" />
-    <ClCompile Include="..\..\jthread\jthreadpool.cpp" />
     <ClCompile Include="..\..\jthread\jthreadlib.cpp" />
+    <ClCompile Include="..\..\jthread\jthreadpool.cpp" />
+    <ClCompile Include="..\..\jthread\jtimer.cpp" />
     <ClCompile Include="Stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>

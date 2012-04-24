@@ -212,7 +212,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetAntiAliasEnabled(bool b);
+		virtual void SetAntialias(bool b);
 
 		/**
 		 * \brief
@@ -450,7 +450,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void DrawPolygon(int xp, int yp, jpoint_t *p, int num, bool close);
+		virtual void DrawPolygon(int xp, int yp, jpoint_t *p, int num, bool closed);
 		
 		/**
 		 * \brief
@@ -529,12 +529,6 @@ class NullGraphics : public Graphics{
 		 *
 		 */
 		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY);
 		
 		/**
 		 * \brief
