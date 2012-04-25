@@ -523,6 +523,8 @@ void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 		line_width = -line_width;
 	}
 
+	jregion_t clip = GetClip();
+	
 	cairo_save(_cairo_context);
 	cairo_move_to(_cairo_context, x0, y0);
 	cairo_line_to(_cairo_context, x1, y1);
@@ -531,6 +533,8 @@ void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 	cairo_restore(_cairo_context);
 
 	ApplyDrawing();
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
@@ -585,6 +589,8 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 	x1 = lrint(EvaluateBezier0(x, npoints+1, t));
 	y1 = lrint(EvaluateBezier0(y, npoints+1, t));
 	
+	jregion_t clip = GetClip();
+	
 	cairo_save(_cairo_context);
   cairo_new_sub_path(_cairo_context);
 
@@ -600,13 +606,15 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 		y1 = y2;
 	}
     
+	delete [] x;
+	delete [] y;
+
   cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, line_width);
 
 	ApplyDrawing();
-
-	delete [] x;
-	delete [] y;
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
@@ -620,10 +628,14 @@ void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
+	jregion_t clip = GetClip();
+	
 	cairo_save(_cairo_context);
 	cairo_rectangle(_cairo_context, x, y, w, h);
   cairo_fill(_cairo_context);
   cairo_restore(_cairo_context);
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
@@ -657,12 +669,16 @@ void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 		h = h - 2*lw;
 	}
 
+	jregion_t clip = GetClip();
+	
 	cairo_save(_cairo_context);
 	cairo_rectangle(_cairo_context, x, y, w, h);
   cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, line_width);
 
 	ApplyDrawing();
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
@@ -690,6 +706,8 @@ void DFBGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
 	if (dy > hp/2) {
 		dy = hp/2;
 	}
+
+	jregion_t clip = GetClip();
 
 	cairo_save(_cairo_context);
   cairo_new_sub_path(_cairo_context);
@@ -725,6 +743,8 @@ void DFBGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
   cairo_close_path(_cairo_context);
 	cairo_fill(_cairo_context);
   cairo_restore(_cairo_context);
+
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
@@ -773,6 +793,8 @@ void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
 		dy = hp/2;
 	}
 
+	jregion_t clip = GetClip();
+	
 	cairo_save(_cairo_context);
   cairo_new_sub_path(_cairo_context);
 
@@ -809,6 +831,8 @@ void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
 	cairo_set_line_width(_cairo_context, line_width);
 
 	ApplyDrawing();
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
@@ -837,6 +861,8 @@ void DFBGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
 		dy = hp/2;
 	}
 
+	jregion_t clip = GetClip();
+	
 	cairo_save(_cairo_context);
   cairo_new_sub_path(_cairo_context);
 
@@ -883,6 +909,8 @@ void DFBGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
   cairo_close_path(_cairo_context);
 	cairo_fill(_cairo_context);
   cairo_restore(_cairo_context);
+
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
@@ -931,6 +959,8 @@ void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
 		dy = hp/2;
 	}
 
+	jregion_t clip = GetClip();
+	
 	cairo_save(_cairo_context);
   cairo_new_sub_path(_cairo_context);
 
@@ -979,6 +1009,8 @@ void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
 	cairo_set_line_width(_cairo_context, line_width);
 
 	ApplyDrawing();
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::FillCircle(int xcp, int ycp, int rp)
@@ -1015,6 +1047,8 @@ void DFBGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 	arc0 = M_2PI - arc0;
 	arc1 = M_2PI - arc1;
 
+	jregion_t clip = GetClip();
+
 	cairo_save(_cairo_context);
 	cairo_translate(_cairo_context, xc, yc);
 	cairo_scale(_cairo_context, rx, ry);
@@ -1022,6 +1056,8 @@ void DFBGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 	cairo_close_path(_cairo_context);
 	cairo_fill(_cairo_context);
 	cairo_restore(_cairo_context);
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
@@ -1051,6 +1087,8 @@ void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 	arc0 = M_2PI - arc0;
 	arc1 = M_2PI - arc1;
 
+	jregion_t clip = GetClip();
+
 	cairo_save(_cairo_context);
 	cairo_translate(_cairo_context, xc, yc);
 	cairo_scale(_cairo_context, rx, ry);
@@ -1060,6 +1098,8 @@ void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 	cairo_set_line_width(_cairo_context, line_width);
 	
 	ApplyDrawing();
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
@@ -1076,6 +1116,8 @@ void DFBGraphics::FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	arc0 = M_2PI - arc0;
 	arc1 = M_2PI - arc1;
 
+	jregion_t clip = GetClip();
+
 	cairo_save(_cairo_context);
 	cairo_translate(_cairo_context, xc, yc);
 	cairo_scale(_cairo_context, rx, ry);
@@ -1084,6 +1126,8 @@ void DFBGraphics::FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	cairo_close_path(_cairo_context);
 	cairo_fill(_cairo_context);
 	cairo_restore(_cairo_context);
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
@@ -1113,6 +1157,8 @@ void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	arc0 = M_2PI - arc0;
 	arc1 = M_2PI - arc1;
 
+	jregion_t clip = GetClip();
+
 	cairo_save(_cairo_context);
 	cairo_translate(_cairo_context, xc, yc);
 	cairo_scale(_cairo_context, rx, ry);
@@ -1121,6 +1167,8 @@ void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	cairo_set_line_width(_cairo_context, line_width);
 	
 	ApplyDrawing();
+
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
@@ -1165,6 +1213,8 @@ void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	arc0 = M_2PI - arc0;
 	arc1 = M_2PI - arc1;
 
+	jregion_t clip = GetClip();
+
 	cairo_save(_cairo_context);
 	cairo_translate(_cairo_context, xc, yc);
 	cairo_scale(_cairo_context, rx, ry);
@@ -1175,6 +1225,8 @@ void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	cairo_set_line_width(_cairo_context, line_width);
 
 	ApplyDrawing();
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 		
 void DFBGraphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
@@ -1230,6 +1282,8 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 		t[i].y = SCALE_TO_SCREEN((yp+p[i].y+_translate.y), _screen.height, _scale.height);
 	}
 	
+	jregion_t clip = GetClip();
+
 	cairo_save(_cairo_context);
   cairo_new_sub_path(_cairo_context);
   cairo_move_to(_cairo_context, t[0].x, t[0].y);
@@ -1246,6 +1300,8 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 	cairo_set_line_width(_cairo_context, line_width);
 
   ApplyDrawing();
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd)
@@ -1271,6 +1327,8 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 		t[i].y = SCALE_TO_SCREEN((yp+p[i].y+_translate.y), _screen.height, _scale.height);
 	}
 	
+	jregion_t clip = GetClip();
+
 	cairo_save(_cairo_context);
   cairo_new_sub_path(_cairo_context);
   cairo_move_to(_cairo_context, t[0].x, t[0].y);
@@ -1291,6 +1349,8 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 	if (even_odd == true) {
 		cairo_set_fill_rule(_cairo_context, CAIRO_FILL_RULE_WINDING);
 	}
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, int y0p, int r0p)
@@ -1307,6 +1367,8 @@ void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, 
 	int y0 = SCALE_TO_SCREEN((_translate.y+ycp+y0p), _screen.height, _scale.height);
 	int r0 = SCALE_TO_SCREEN((r0p), _screen.width, _scale.width);
 
+	jregion_t clip = GetClip();
+
 	cairo_pattern_t *pattern = cairo_pattern_create_radial(xc, yc, std::max(rx, ry), x0, y0, r0);
 
 	for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
@@ -1319,7 +1381,7 @@ void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, 
 
 		cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
 	}
-	
+
 	cairo_set_source(_cairo_context, pattern);
 	cairo_save(_cairo_context);
 	cairo_translate(_cairo_context, xc, yc);
@@ -1328,6 +1390,8 @@ void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, 
 	cairo_fill(_cairo_context);
 	cairo_restore(_cairo_context);
 	cairo_pattern_destroy(pattern);
+	
+	SetClip(clip.x, clip.y, clip.width, clip.height);
 }
 
 void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p)
@@ -1510,7 +1574,7 @@ bool DFBGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 	}
 
 	imgSurface->SetPorterDuff(imgSurface, DSPD_NONE);
-	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL | DSBLIT_COLORIZE));
 
 	imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
 	
@@ -2504,9 +2568,6 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 	xc = xc + width/2;
 	yc = yc + height/2;
 
-	x = x;
-	y = y;
-
 	IDirectFBSurface *simg = (IDirectFBSurface *)gimg->GetNativeSurface();
 	void *sptr;
 	uint32_t *sdst;
@@ -2524,20 +2585,20 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 	_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &sptr, &spitch);
 	simg->Lock(simg, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &gptr, &gpitch);
 
+	int init_x = width+2*dw-1,
+			init_y = height+2*dh-1;
 	int old_x = -1,
 			old_y = -1;
 
-	for (j=height+2*dh-1; j>0; j--) {
+	for (j=init_y; j>0; j--) {
 		int sy = y+j-dh;
-
-		old_y = sy;
 
 		jPrime = j - height - dh;
 
 		if (sy >=0 && sy < shmax) {
 			sdst = (uint32_t *)((uint8_t *)sptr + sy * spitch);
 
-			for (i=width+2*dw-1; i>0; i--) {
+			for (i=init_x; i>0; i--) {
 				iPrime = i - width - dw;
 			
 				iOriginal = width + ((iPrime+xc)*cosTheta - (jPrime+yc)*sinTheta)/precision;
@@ -2549,8 +2610,6 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 
 					if ((gx >= 0 && gx < iwmax) && (gy >= 0 && gy < ihmax)) {
 						int offset = x+i-dw;
-
-						old_x = offset;
 
 						if (offset >= 0 && offset < swmax) {
 							uint32_t spixel = *((uint32_t *)((uint8_t *)gptr + gy * gpitch) + gx),
@@ -2661,10 +2720,14 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 							
 							*(sdst+offset) = 0xff000000 | (dr << 0x10) | (dg << 0x08) | (db << 0x00);
 						}
+						
+						old_x = offset;
 					}
 				}
 			}
 		}
+		
+		old_y = sy;
 	}
 	
 	simg->Unlock(simg);

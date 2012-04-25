@@ -349,9 +349,9 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	DFBWindowDescription desc;
 
 	/* Fill the window description. */
-	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_SURFACE_CAPS);
-	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION | DWCAPS_DOUBLEBUFFER);
-	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_FLIPPING);
+	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS |  DWDESC_PIXELFORMAT);
+	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION);// | DWCAPS_DOUBLEBUFFER);
+	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_FLIPPING | DSCAPS_DOUBLE);
 	desc.pixelformat = DSPF_ARGB;
 	desc.posx   = x;
 	desc.posy   = y;

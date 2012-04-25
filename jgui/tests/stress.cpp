@@ -511,10 +511,15 @@ class GraphicPanel : public jgui::Frame{
 		// Blit [file]
 		DrawString(g, "Blit [file]");
 
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
+
 		for (int i=0; i<iterations; i++) {
+			uint32_t color = (rand()%0xf0f0f0) | 0xff000000;
+
 			x = rand()%(1920-w-_insets.left-_insets.right);
 			y = rand()%(1080-h-_insets.top-_insets.bottom);
 
+			g->SetColor(color);
 			g->DrawImage("images/tux-zombie.png", x+_insets.left, y+_insets.top, w, h);
 
 			g->Flip(x+_insets.left, y+_insets.top, w, h);
@@ -524,8 +529,6 @@ class GraphicPanel : public jgui::Frame{
 
 		// Blit [offscreen]
 		DrawString(g, "Blit [offscreen]");
-
-		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
 		for (int i=0; i<iterations; i++) {
 			uint32_t color = (rand()%0xf0f0f0) | 0xff000000;
@@ -546,16 +549,24 @@ class GraphicPanel : public jgui::Frame{
 		// StretchBlit [file]
 		DrawString(g, "StretchBlit [file]");
 
+		uint32_t color = 0xffffffff;;
+
 		size = 10;
 
+		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
+
 		for (int i=0; i<iterations; i++) {
-			size = size + 4;
+			size = size + 5;
+
+			 if ((size%20) == 0) {
+				color = (rand()%0xf0f0f0) | 0xff000000;
+			}
 
 			x = (1920-size)/2;
 			y = (1080-size)/2;
 
+			g->SetColor(color);
 			g->DrawImage("images/tux-zombie.png", x, y, size, size);
-
 			g->Flip(x, y, size, size);
 			
 			if (size > 900) {
@@ -572,8 +583,6 @@ class GraphicPanel : public jgui::Frame{
 
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
-		uint32_t color = 0xffffffff;;
-
 		for (int i=0; i<iterations; i++) {
 			size = size + 5;
 
@@ -586,7 +595,6 @@ class GraphicPanel : public jgui::Frame{
 
 			g->SetColor(color);
 			g->DrawImage(off, x, y, size, size);
-
 			g->Flip(x, y, size, size);
 			
 			if (size > 900) {
