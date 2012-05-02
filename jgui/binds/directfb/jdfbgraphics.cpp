@@ -149,8 +149,8 @@ void DFBGraphics::ReleaseClip()
 
 	_internal_clip.x = _translate.x;
 	_internal_clip.y = _translate.y;
-	_internal_clip.width = _clip.width;
-	_internal_clip.height = _clip.height;
+	_internal_clip.width = _clip.width-_translate.x;
+	_internal_clip.height = _clip.height-_translate.y;
 
 	DFBRegion rgn;
 
@@ -636,6 +636,30 @@ void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
   cairo_restore(_cairo_context);
 	
 	SetClip(clip.x, clip.y, clip.width, clip.height);
+
+	/*
+	jregion_t clip = GetClip();
+
+	cairo_move_to (_cairo_context, 128.0, 25.6);
+	cairo_line_to (_cairo_context, 230.4, 230.4);
+	cairo_rel_line_to (_cairo_context, -102.4, 0.0);
+	cairo_curve_to (_cairo_context, 51.2, 230.4, 51.2, 128.0, 128.0, 128.0);
+	cairo_close_path (_cairo_context);
+
+	cairo_move_to (_cairo_context, 64.0, 25.6);
+	cairo_rel_line_to (_cairo_context, 51.2, 51.2);
+	cairo_rel_line_to (_cairo_context, -51.2, 51.2);
+	cairo_rel_line_to (_cairo_context, -51.2, -51.2);
+	cairo_close_path (_cairo_context);
+
+	cairo_set_line_width (_cairo_context, 10.0);
+	cairo_set_source_rgb (_cairo_context, 0, 0, 1);
+	cairo_fill_preserve (_cairo_context);
+	cairo_set_source_rgb (_cairo_context, 0, 0, 0);
+	cairo_stroke (_cairo_context);
+
+	SetClip(clip.x, clip.y, clip.width, clip.height);
+	*/
 }
 
 void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)

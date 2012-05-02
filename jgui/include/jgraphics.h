@@ -31,10 +31,10 @@
 #define DEFAULT_FONT_SIZE			20
 
 #define SCALE_TO_SCREEN(x, y, z) \
-	(int)round(((double)x*(double)y)/(double)z) 
+	(int)round(((double)(x)*(double)(y))/(double)(z)) 
 
 #define SCREEN_TO_SCALE(x, z, y) \
-	(int)round(((double)x*(double)y)/(double)z) 
+	(int)round(((double)(x)*(double)(y))/(double)(z)) 
 
 namespace jgui{
 
