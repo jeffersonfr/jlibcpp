@@ -142,6 +142,17 @@ void Window::SetNativeWindow(void *native)
 
 		_surface = NULL;
 		_window = NULL;
+		
+		_size.width = 0;
+		_size.height = 0;
+	} else {
+		int w,
+				h;
+
+		_window->GetSize(_window, &w, &h);
+
+		_size.width = SCREEN_TO_SCALE(w, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
+		_size.height = SCREEN_TO_SCALE(h, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
 	}
 
 	_graphics->SetNativeSurface(_surface);
@@ -204,6 +215,7 @@ void Window::InternalCreateWindow(void *params)
 		_window->Close(_window);
 		_window->Destroy(_window);
 		_window->Release(_window);
+		
 		_window = NULL;
 	}
 
