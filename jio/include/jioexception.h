@@ -34,20 +34,20 @@ namespace jio {
  */
 class IOException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			IOException(std::string);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		IOException(std::string);
 
-			/**
-			 * \brief Destrutor virtual.
-			 *
-			 */
-			virtual ~IOException() throw();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~IOException() throw();
 
 };
 

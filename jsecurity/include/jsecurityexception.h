@@ -31,20 +31,20 @@ namespace jsecurity {
  */
 class SecurityException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			SecurityException(std::string);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SecurityException(std::string);
 
-			/**
-			 * \brief Destrutor virtual.
-			 *
-			 */
-			virtual ~SecurityException() throw();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~SecurityException() throw();
 
 };
 

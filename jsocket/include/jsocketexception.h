@@ -34,20 +34,20 @@ namespace jsocket {
  */
 class SocketException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        SocketException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~SocketException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SocketException(std::string);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~SocketException() throw();
 
 };
 

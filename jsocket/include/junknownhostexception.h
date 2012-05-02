@@ -34,22 +34,21 @@ namespace jsocket {
  */
 class UnknownHostException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		UnknownHostException(std::string);
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        UnknownHostException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~UnknownHostException() throw();
-	
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~UnknownHostException() throw();
+
 };
 
 }

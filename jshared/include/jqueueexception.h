@@ -34,20 +34,20 @@ namespace jshared {
  */
 class QueueException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        QueueException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~QueueException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		QueueException(std::string);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~QueueException() throw();
 
 };
 

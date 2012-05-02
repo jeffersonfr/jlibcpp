@@ -17,44 +17,38 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_EXCEPTION_H
-#define J_EXCEPTION_H
+#ifndef J_INTERRUPTEDIOEXCEPTION_H
+#define J_INTERRUPTEDIOEXCEPTION_H
 
-#include "jobject.h"
+#include "jinterruptedexception.h"
 
-#include <exception>
 #include <stdexcept>
 #include <string>
 
-namespace jcommon {
+namespace jio {
 
 /**
- * \brief Exception.
+ * \brief InterruptedIOException.
  *
  * \author Jeff Ferr
  */
-class Exception : public virtual jcommon::Object, std::exception{
+class InterruptedIOException : public jthread::InterruptedException{
 
-	private:
+    private:
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		Exception(std::string reason);
+    public:
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			InterruptedIOException(std::string);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~Exception() throw();
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~InterruptedIOException() throw();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string what();
 };
 
 }

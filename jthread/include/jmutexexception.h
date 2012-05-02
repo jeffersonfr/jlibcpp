@@ -34,20 +34,20 @@ namespace jthread{
  */
 class MutexException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-         * \brief Construtor.
-         *
-         */
-        MutexException(std::string);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		MutexException(std::string);
 
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~MutexException() throw();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~MutexException() throw();
 
 };
 

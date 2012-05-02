@@ -34,20 +34,20 @@ namespace jthread{
  */
 class ThreadException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-         * \brief Construtor.
-         *
-         */
-        ThreadException(std::string);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ThreadException(std::string);
 
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~ThreadException() throw();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~ThreadException() throw();
 
 };
 

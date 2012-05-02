@@ -18,17 +18,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jnullpointerexception.h"
+#include "jnotownerexception.h"
 
 namespace jcommon {
 
-NullPointerException::NullPointerException(std::string reason_):
-	jcommon::RuntimeException(reason_)
+NotOwnerException::NotOwnerException(std::string reason_):
+	RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jcommon::NullPointerException");
+	jcommon::Object::SetClassName("jcommon::NotOwnerException");
 }
 
-NullPointerException::~NullPointerException() throw()
+NotOwnerException::~NotOwnerException() throw()
 {
 }
 

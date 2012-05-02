@@ -32,20 +32,20 @@ namespace jresource {
  */
 class ResourceException : public std::runtime_error{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        ResourceException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~ResourceException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ResourceException(std::string);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~ResourceException() throw();
 
 };
 

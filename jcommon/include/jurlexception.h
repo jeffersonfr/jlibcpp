@@ -17,14 +17,14 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_EXCEPTION_H
-#define J_EXCEPTION_H
+#ifndef J_URLEXCEPTION_H
+#define J_URLEXCEPTION_H
 
-#include "jobject.h"
+#include "jruntimeexception.h"
 
-#include <exception>
 #include <stdexcept>
 #include <string>
+#include <cstring>
 
 namespace jcommon {
 
@@ -33,7 +33,7 @@ namespace jcommon {
  *
  * \author Jeff Ferr
  */
-class Exception : public virtual jcommon::Object, std::exception{
+class URLException : public jcommon::RuntimeException{
 
 	private:
 
@@ -42,19 +42,14 @@ class Exception : public virtual jcommon::Object, std::exception{
 		 * \brief Construtor.
 		 *
 		 */
-		Exception(std::string reason);
+		URLException(std::string);
 
 		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual ~Exception() throw();
+		virtual ~URLException() throw();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string what();
 };
 
 }

@@ -34,20 +34,20 @@ namespace jio {
  */
 class PipeException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        PipeException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~PipeException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		PipeException(std::string);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~PipeException() throw();
 
 };
 

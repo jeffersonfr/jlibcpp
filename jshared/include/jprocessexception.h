@@ -34,20 +34,20 @@ namespace jshared {
  */
 class ProcessException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        ProcessException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~ProcessException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ProcessException(std::string);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~ProcessException() throw();
 
 };
 

@@ -34,20 +34,20 @@ namespace jshared {
  */
 class MessageException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        MessageException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~MessageException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		MessageException(std::string);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~MessageException() throw();
 
 };
 

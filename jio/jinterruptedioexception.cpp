@@ -18,17 +18,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jnullpointerexception.h"
+#include "jinterruptedioexception.h"
 
-namespace jcommon {
+namespace jio {
 
-NullPointerException::NullPointerException(std::string reason_):
-	jcommon::RuntimeException(reason_)
+InterruptedIOException::InterruptedIOException(std::string reason_):
+   jthread::InterruptedException(reason_)
 {
-	jcommon::Object::SetClassName("jcommon::NullPointerException");
+	jcommon::Object::SetClassName("jio::InterruptedIOException");
 }
 
-NullPointerException::~NullPointerException() throw()
+InterruptedIOException::~InterruptedIOException() throw()
 {
 }
 

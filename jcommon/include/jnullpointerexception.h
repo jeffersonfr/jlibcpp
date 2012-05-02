@@ -20,7 +20,7 @@
 #ifndef J_NULLPOINTEREXCEPTION_H
 #define J_NULLPOINTEREXCEPTION_H
 
-#include "jexception.h"
+#include "jruntimeexception.h"
 
 #include <stdexcept>
 #include <string>
@@ -32,28 +32,22 @@ namespace jcommon {
  *
  * \author Jeff Ferr
  */
-class NullPointerException : public jcommon::Exception, std::runtime_error{
+class NullPointerException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        NullPointerException(std::string reason);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~NullPointerException() throw();
-
+	public:
 		/**
-		 * \brief
+		 * \brief Construtor.
 		 *
 		 */
-		virtual std::string what();
+		NullPointerException(std::string reason);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~NullPointerException() throw();
 
 };
 

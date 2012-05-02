@@ -34,20 +34,20 @@ namespace jlogger {
  */
 class LoggerException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        LoggerException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~LoggerException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		LoggerException(std::string);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~LoggerException() throw();
 
 };
 

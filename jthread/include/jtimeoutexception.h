@@ -17,23 +17,22 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_EXCEPTION_H
-#define J_EXCEPTION_H
+#ifndef J_TIMEOUTEXCEPTION_H
+#define J_TIMEOUTEXCEPTION_H
 
-#include "jobject.h"
+#include "jruntimeexception.h"
 
-#include <exception>
 #include <stdexcept>
 #include <string>
 
-namespace jcommon {
+namespace jthread {
 
 /**
  * \brief Exception.
  *
- * \author Jeff Ferr
+ * @author Jeff Ferr
  */
-class Exception : public virtual jcommon::Object, std::exception{
+class TimeoutException : public jcommon::RuntimeException{
 
 	private:
 
@@ -42,19 +41,14 @@ class Exception : public virtual jcommon::Object, std::exception{
 		 * \brief Construtor.
 		 *
 		 */
-		Exception(std::string reason);
+		TimeoutException(std::string);
 
 		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual ~Exception() throw();
+		virtual ~TimeoutException() throw();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string what();
 };
 
 }

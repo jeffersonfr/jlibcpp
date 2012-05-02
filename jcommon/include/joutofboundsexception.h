@@ -35,20 +35,20 @@ namespace jcommon {
  */
 class OutOfBoundsException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        OutOfBoundsException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~OutOfBoundsException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		OutOfBoundsException(std::string);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~OutOfBoundsException() throw();
 
 };
 

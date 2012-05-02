@@ -112,39 +112,42 @@ endif
 
 OBJS_jcommon += \
 	   jbitstream.o\
+	   jcommonlib.o\
 	   jcalendar.o\
 	   jcharset.o\
-	   jsystem.o\
 	   jdate.o\
 		 jdebug.o\
 	   jdynamiclink.o\
+	   jeventobject.o\
 	   jexception.o\
-	   jjson.o\
 	   jgc.o\
 	   jhttp.o\
 	   jhtmlparser.o\
 		 jinvalidargumentexception.o\
 		 jillegalargumentexception.o\
+	   jjson.o\
 	   jlistener.o\
-	   jeventobject.o\
+	   jnotownerexception.o\
+	   jnullpointerexception.o\
 	   jobject.o\
 	   jobservable.o\
 	   jobserver.o\
 	   joutofboundsexception.o\
+	   joptions.o\
+		 jparserexception.o\
 	   jproperties.o\
 	   jpointer.o\
 	   jpolicies.o\
+	   jregexp.o\
 	   jruntimeexception.o\
-	   jnullpointerexception.o\
 	   jstringtokenizer.o\
+	   jsystem.o\
+	   jstringutils.o\
 	   jtypes.o\
 	   jurl.o\
-	   jstringutils.o\
-	   jxmlparser.o\
-	   joptions.o\
-	   jregexp.o\
+	   jurlexception.o\
 	   junit.o\
-	   jcommonlib.o\
+	   jxmlparser.o\
 	   
 OBJS_jmath += \
 		 jbase64.o\
@@ -188,6 +191,7 @@ OBJS_jio += \
 	   jfileoutputstream.o\
 	   jinputstream.o\
 	   jioexception.o\
+	   jinterruptedioexception.o\
 	   jserializable.o\
 	   joutputstream.o\
 	   jobjectinputstream.o\
@@ -280,6 +284,7 @@ OBJS_jthread += \
 	   jcondition.o\
 		 jevent.o\
 		 jillegalstateexception.o\
+		 jinterruptedexception.o\
 		 jmonitor.o\
 	   jmutex.o\
 	   jrwlock.o\
@@ -289,6 +294,7 @@ OBJS_jthread += \
 	   jthreadexception.o\
 	   jsemaphoreexception.o\
 	   jsemaphoretimeoutexception.o\
+	   jtimeoutexception.o\
 	   jmutexexception.o\
 	   jspinlock.o\
 	   jthreadlib.o\

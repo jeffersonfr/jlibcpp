@@ -20,8 +20,7 @@
 #ifndef J_SEMAPHORETIMEOUTEXCEPTION_H
 #define J_SEMAPHORETIMEOUTEXCEPTION_H
 
-#include "jobject.h"
-#include "jruntimeexception.h"
+#include "jtimeoutexception.h"
 
 #include <stdexcept>
 #include <string>
@@ -29,26 +28,26 @@
 namespace jthread {
 
 /**
- * \brief SemaphoreException.
+ * \brief SemaphoreTimeoutException.
  *
  * @author Jeff Ferr
  */
-class SemaphoreTimeoutException : public jcommon::RuntimeException{
+class SemaphoreTimeoutException : public jthread::TimeoutException{
 
-    private:
+	private:
 
-    public:
-        /**
-         * \brief Construtor.
-         *
-         */
-        SemaphoreTimeoutException(std::string);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SemaphoreTimeoutException(std::string);
 
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~SemaphoreTimeoutException() throw();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~SemaphoreTimeoutException() throw();
 
 };
 

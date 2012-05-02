@@ -18,17 +18,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jnullpointerexception.h"
+#include "jurlexception.h"
 
 namespace jcommon {
 
-NullPointerException::NullPointerException(std::string reason_):
-	jcommon::RuntimeException(reason_)
+URLException::URLException(std::string reason_):
+	RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jcommon::NullPointerException");
+	jcommon::Object::SetClassName("jcommon::URLException");
 }
 
-NullPointerException::~NullPointerException() throw()
+URLException::~URLException() throw()
 {
 }
 

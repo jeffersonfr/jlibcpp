@@ -35,20 +35,20 @@ namespace jthread {
  */
 class SemaphoreException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-         * \brief Construtor.
-         *
-         */
-        SemaphoreException(std::string);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SemaphoreException(std::string);
 
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~SemaphoreException() throw();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~SemaphoreException() throw();
 
 };
 

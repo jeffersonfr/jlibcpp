@@ -31,20 +31,20 @@ namespace jcommon {
  */
 class MpegException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			MpegException(std::string reason);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		MpegException(std::string reason);
 
-			/**
-			 * \brief Destrutor virtual.
-			 *
-			 */
-			virtual ~MpegException() throw();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~MpegException() throw();
 
 };
 

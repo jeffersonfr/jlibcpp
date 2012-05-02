@@ -34,20 +34,20 @@ namespace jgui {
  */
 class ImageException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        ImageException(std::string);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~ImageException() throw();
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ImageException(std::string);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~ImageException() throw();
 
 };
 

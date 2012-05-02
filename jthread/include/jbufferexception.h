@@ -35,20 +35,20 @@ namespace jthread{
  */
 class BufferException : public jcommon::RuntimeException{
 
-    private:
+	private:
 
-    public:
-        /**
-         * \brief Construtor.
-         *
-         */
-        BufferException(std::string);
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		BufferException(std::string);
 
-        /**
-         * \brief Destrutor virtual.
-         *
-         */
-        virtual ~BufferException() throw();
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~BufferException() throw();
 
 };
 
