@@ -80,6 +80,7 @@ void test3()
 	sort.Start();
 
   sort.GetOutputStream()->Write(s.c_str(), s.size());
+  sort.GetOutputStream()->Close();
 
 	while ((length = sort.GetInputStream()->Read(buf, 255)) > 0) {
 		if (::write(1, buf, length) < 0) {
