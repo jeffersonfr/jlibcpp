@@ -109,7 +109,17 @@ jregion_t DFBGraphics::ClipRect(int xp, int yp, int wp, int hp)
 
 void DFBGraphics::SetClip(int xp, int yp, int wp, int hp)
 {
-	jregion_t clip = Rectangle::Intersection(xp+_translate.x, yp+_translate.y, wp, hp, 0, 0, _scale.width, _scale.height);
+	int w = _scale.width,
+			h = _scale.height;
+
+	if (_surface != NULL) {
+		_surface->GetSize(_surface, &w, &h);
+
+		w = SCREEN_TO_SCALE(w, _screen.width, _scale.width);
+		h = SCREEN_TO_SCALE(h, _screen.height, _scale.height);
+	}
+
+	jregion_t clip = Rectangle::Intersection(xp+_translate.x, yp+_translate.y, wp, hp, 0, 0, w, h);
 	
 	_clip.x = clip.x - _translate.x;
 	_clip.y = clip.y - _translate.y;
