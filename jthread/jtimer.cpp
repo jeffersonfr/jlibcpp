@@ -132,7 +132,8 @@ bool TaskQueue::IsEmpty()
 {
 	jthread::AutoLock lock(&_mutex);
 	
-	return _queue.empty();
+	// return _queue.empty();
+	return (_queue.size() == 0);
 }
 
 void TaskQueue::Clear() 
@@ -205,8 +206,10 @@ void TimerThread::MainLoop()
 		task = _queue->GetMin();
 
 		// monitor enter
-		if (task->_state == JTS_CANCELLED) {
-			_queue->RemoveMin();
+		if (task == NULL || task->_state == JTS_CANCELLED) {
+			if (task != NULL) {
+				_queue->RemoveMin();
+			}
 
 			continue;  // No action required, poll queue again
 		}
