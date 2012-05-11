@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jthreadpool.h"
+#include "jautolock.h"
 #include "jsemaphoreexception.h"
 
 namespace jthread {

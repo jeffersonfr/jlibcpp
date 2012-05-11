@@ -20,10 +20,7 @@
 #ifndef J_SEMAPHORE_H
 #define J_SEMAPHORE_H
 
-#include "jthread.h"
-
-#include "jobject.h"
-#include "jautolock.h"
+#include "jmutex.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -49,15 +46,15 @@ class Semaphore : public virtual jcommon::Object{
     private:
 #ifdef _WIN32
 			/** \brief */
-			HANDLE _semaphore;
+			HANDLE _handler;
 			/** \brief */
 			LPSECURITY_ATTRIBUTES _sa;
 #else
 			/** \brief Semaphore handler. */
-			sem_t _semaphore;
+			sem_t _handler;
 #endif
 			/** \brief */
-			Mutex mutex;
+			Mutex _mutex;
 
     public:
 			/**

@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jindexedbuffer.h"
+#include "jautolock.h"
 #include "jbufferexception.h"
 #include "jsemaphoreexception.h"
 

@@ -21,10 +21,9 @@
 #define J_THREAD_H
 
 #include "jmutex.h"
-#include "jcondition.h"
-#include "jthreadexception.h"
-#include "jobject.h"
+#include "jsemaphore.h"
 #include "jrunnable.h"
+#include "jthreadexception.h"
 
 #include <map>
 #include <cstdlib>
@@ -59,14 +58,16 @@ typedef HANDLE jthread_t;
 typedef pthread_t jthread_t;
 #endif
 
+class Thread;
+class ThreadGroup;
+
 struct jthread_map_t {
+	Thread *thiz;
 	jthread_t thread;
 	bool joined;
 	bool detached;
 	bool alive;
 };
-
-class ThreadGroup;
 
 /**
  * \brief Thread.
@@ -92,9 +93,9 @@ class Thread : public virtual jcommon::Object{
 		/** \brief */
 		DWORD _exitCode;
 #else
-		/** \brief */
-		Condition _condition;
 #endif
+		/** \brief */
+		Semaphore _semaphore;
 		/** \brief */
 		jthread_t _thread;
 		/** \brief */
@@ -139,7 +140,7 @@ class Thread : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual int SetUp();
+		virtual void Setup();
 
 		/**
 		 * \brief Dont use try-catch (...)
@@ -151,7 +152,7 @@ class Thread : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual int CleanUp();
+		virtual void Cleanup();
 
 	public:
 		/**
@@ -207,12 +208,6 @@ class Thread : public virtual jcommon::Object{
 		 *
 		 */
 		virtual int GetID();
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void KillAllThreads();
 
 		/**
 		 * \brief 

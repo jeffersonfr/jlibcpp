@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jsemaphore.h"
+#include "jautolock.h"
 #include "jsemaphoreexception.h"
 #include "jsemaphoretimeoutexception.h"
 
@@ -33,7 +34,7 @@ Semaphore::Semaphore(int value_):
 	BOOL inherit = TRUE;
 
 	_sa = NULL;
-	_semaphore = NULL;
+	_handler = NULL;
 
 	_sa = (LPSECURITY_ATTRIBUTES)HeapAlloc(GetProcessHeap(), 0, sizeof(SECURITY_ATTRIBUTES));
 	
@@ -45,9 +46,9 @@ Semaphore::Semaphore(int value_):
 		value_ = 0;
 	}
 
-	// if ((_semaphore = CreateSemaphore(_sa, _count, _max_count, "NTcourse.semaphore.empty")) == NULL) {
-	if ((_semaphore = CreateSemaphore(_sa, value_, 65535, NULL)) == NULL) {
-		// if ((_semaphore = OpenSemaphore(SEMAPHORE_ALL_ACCESS, inherit, "NTcourse.semaphore.empty")) == NULL) {
+	// if ((_handler = CreateSemaphore(_sa, _count, _max_count, "NTcourse.semaphore.empty")) == NULL) {
+	if ((_handler = CreateSemaphore(_sa, value_, 65535, NULL)) == NULL) {
+		// if ((_handler = OpenSemaphore(SEMAPHORE_ALL_ACCESS, inherit, "NTcourse.semaphore.empty")) == NULL) {
 		DWORD code = GetLastError();
 		char *msg = NULL;
 
@@ -65,7 +66,7 @@ Semaphore::Semaphore(int value_):
 		// }
 	}
 #else
-	if (sem_init(&_semaphore, 0, value_) < 0) {
+	if (sem_init(&_handler, 0, value_) < 0) {
 		if (errno == EINVAL) {
 			throw SemaphoreException("Operation would increase the semaphore count !");
 		} else {
@@ -83,14 +84,14 @@ Semaphore::~Semaphore()
 void Semaphore::Wait()
 {
 #ifdef _WIN32
-	switch (WaitForSingleObject(_semaphore, INFINITE)) {
+	switch (WaitForSingleObject(_handler, INFINITE)) {
 		case WAIT_OBJECT_0:
 			break;
 		default:
 			throw SemaphoreException("Waiting semaphore failed"); 
 	}
 #else
-	if (sem_wait(&_semaphore) != 0) {
+	if (sem_wait(&_handler) != 0) {
 		throw SemaphoreException("Semaphore waiting failed");
 	}
 #endif
@@ -101,7 +102,7 @@ void Semaphore::Wait(uint64_t time_)
 #ifdef _WIN32
 	time_ /= 100000L;
 	
-	switch (WaitForSingleObject(_semaphore, (unsigned int)time_)) {
+	switch (WaitForSingleObject(_handler, (unsigned int)time_)) {
 		case WAIT_OBJECT_0:
 			break;
 		case WAIT_TIMEOUT:
@@ -118,7 +119,7 @@ void Semaphore::Wait(uint64_t time_)
 	t.tv_sec += (int64_t)(time_/1000000LL);
 	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
 
-	while ((result = sem_timedwait(&_semaphore, &t)) == -1 && errno == EINTR) {
+	while ((result = sem_timedwait(&_handler, &t)) == -1 && errno == EINTR) {
 		continue; 
 	}
 
@@ -134,14 +135,14 @@ void Semaphore::Wait(uint64_t time_)
 
 void Semaphore::Notify()
 {
-	AutoLock lock(&mutex);
+	AutoLock lock(&_mutex);
 
 #ifdef _WIN32
-		if (ReleaseSemaphore(_semaphore, 1, NULL) == 0) {
+		if (ReleaseSemaphore(_handler, 1, NULL) == 0) {
 			throw SemaphoreException("Notify semaphore failed");
 		}
 #else
-	if (sem_post(&_semaphore) < 0) {
+	if (sem_post(&_handler) < 0) {
 		if (errno == ERANGE) {
 			throw SemaphoreException("Operation would increase the semaphore count !");
 		} else {
@@ -153,33 +154,33 @@ void Semaphore::Notify()
 
 void Semaphore::NotifyAll()
 {
-	AutoLock lock(&mutex);
+	AutoLock lock(&_mutex);
 
 #ifdef _WIN32
 	LONG value;
 
-	ReleaseSemaphore(_semaphore, 0, &value);
+	ReleaseSemaphore(_handler, 0, &value);
 
 	if (value > 0) {
-		ReleaseSemaphore(_semaphore, value, NULL);
+		ReleaseSemaphore(_handler, value, NULL);
 	}
 #else
 	int r;
     
-	sem_getvalue(&_semaphore, &r);
+	sem_getvalue(&_handler, &r);
 
 	while (r-- > 0) {
-		sem_post(&_semaphore);
+		sem_post(&_handler);
 	}
 #endif
 }
 
 bool Semaphore::TryWait()
 {
-	AutoLock lock(&mutex);
+	AutoLock lock(&_mutex);
 
 #ifdef _WIN32
-	switch (WaitForSingleObject(_semaphore, 0L)) {
+	switch (WaitForSingleObject(_handler, 0L)) {
 		case WAIT_OBJECT_0:
 			return true;
 		default:
@@ -188,7 +189,7 @@ bool Semaphore::TryWait()
 
 	return true;
 #else
-	if (sem_trywait(&_semaphore) < 0) {
+	if (sem_trywait(&_handler) < 0) {
 		if (errno == EAGAIN) {
 			return false;
 		}
@@ -205,13 +206,13 @@ int Semaphore::GetValue()
 #ifdef _WIN32
 	LONG value;
 
-	ReleaseSemaphore(_semaphore, 0, &value);
+	ReleaseSemaphore(_handler, 0, &value);
 	
 	return value;
 #else
 	int r;
     
-	sem_getvalue(&_semaphore, &r);
+	sem_getvalue(&_handler, &r);
     
 	return r;
 #endif
@@ -229,15 +230,15 @@ void Semaphore::Release()
 		HeapFree(GetProcessHeap(), 0, _sa);
 	}
 
-	if ((void *)_semaphore != NULL) {
-		if (CloseHandle(_semaphore) == 0) {
+	if ((void *)_handler != NULL) {
+		if (CloseHandle(_handler) == 0) {
 			throw SemaphoreException("Close semaphore failed");
 		}
 
-		_semaphore = NULL;
+		_handler = NULL;
 	}
 #else
-	sem_destroy(&_semaphore);
+	sem_destroy(&_handler);
 #endif
 }
 

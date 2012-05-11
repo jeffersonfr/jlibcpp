@@ -25,11 +25,6 @@
 
 namespace jthread {
 
-struct jthread_arg_t {
-	Thread *thread;
-	jthread_map_t *map;
-};
-
 Thread::Thread(jthread_type_t type, ThreadGroup *group):
 	jcommon::Object()
 {
@@ -73,6 +68,7 @@ Thread::Thread(Runnable *runnable, jthread_type_t type, ThreadGroup *group):
 
 Thread::~Thread()
 {
+	Release();
 }
 
 ThreadGroup * Thread::GetThreadGroup()
@@ -149,20 +145,6 @@ void Thread::SetStackSize(int size)
 	_stack_size = size;
 }
 
-void Thread::KillAllThreads()
-{
-	AutoLock lock(&jthread_mutex);
-
-	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i != _threads.end(); i++) {
-		Interrupt(i->first);
-		WaitThread(i->first);
-
-		delete i->second;
-	}
-
-	_threads.clear();
-}
-
 /** Private */
 
 #ifdef _WIN32
@@ -172,19 +154,16 @@ DWORD WINAPI Thread::ThreadMain(LPVOID owner_)
 		return 0;
 	}
 
-	jthread_arg_t *arg = (jthread_arg_t *)owner_;
+	jthread_map_t *t = (jthread_map_t *)owner_;
 
-	delete arg;
-
-	Thread *thiz = arg->thread;
-	jthread_map_t *t = arg->map;
-
-	if (thiz->SetUp() == 0) {
-		thiz->Run();
+	if (t->thiz->SetUp() == 0) {
+		t->thiz->Run();
 	}
 
-	thiz->CleanUp();
-	
+	if (t->thiz->_type == JTT_DETACH) {
+		t->thiz->CleanUp();
+	}
+
 	t->alive = false;
 
 	return 0;
@@ -192,28 +171,16 @@ DWORD WINAPI Thread::ThreadMain(LPVOID owner_)
 #else
 void * Thread::ThreadMain(void *owner_)
 {
-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+	jthread_map_t *t = (jthread_map_t *)owner_;
 
-	jthread_arg_t *arg = (jthread_arg_t *)owner_;
-
-	Thread *thiz = arg->thread;
-	jthread_map_t *t = arg->map;
-
-	delete arg;
-
-	if (thiz->_type == JTT_JOINABLE) {
+	if (t->thiz->_type == JTT_JOINABLE) {
 		pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
-	} else if (thiz->_type == JTT_DETACH) {
+	} else if (t->thiz->_type == JTT_DETACH) {
 		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 	}
 
-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-
-	thiz->Run();
-
+	t->thiz->Run();
 	t->alive = false;
-
-	thiz->CleanUp();
 
 	pthread_exit(NULL);
 }
@@ -234,9 +201,8 @@ jthread_map_t * Thread::GetMap(int id)
 
 /** Protected */
 
-int Thread::SetUp()
+void Thread::Setup()
 {
-	return 0;
 }
 
 void Thread::Run() 
@@ -248,9 +214,8 @@ void Thread::Run()
 	return;
 }
 
-int Thread::CleanUp()
+void Thread::Cleanup()
 {
-	return 0;
 }
 
 /** End */
@@ -258,6 +223,8 @@ int Thread::CleanUp()
 void Thread::Start(int id)
 {
 	AutoLock lock(&jthread_mutex);
+
+	Setup();
 
 	jthread_map_t *t = GetMap(id);
 
@@ -267,15 +234,11 @@ void Thread::Start(int id)
 		_threads[id] = t;
 	}
 
+	t->thiz = this;
 	t->thread = 0;
 	t->joined = false;
 	t->detached = false;
 	t->alive = true;
-
-	jthread_arg_t *arg = new jthread_arg_t;
-
-	arg->thread = this;
-	arg->map = t;
 
 #ifdef _WIN32
 	if (SetUp() != 0 || 
@@ -283,7 +246,7 @@ void Thread::Start(int id)
 				_sa,				// security attributes
 				0,					// stack size
 				Thread::ThreadMain,	// function thread
-				arg,				// thread arguments
+				t,					// thread arguments
 				0,					// flag
 				&_thread_id)) == NULL) {
 		throw ThreadException("Create thread failed");
@@ -308,7 +271,7 @@ void Thread::Start(int id)
 	}
 			
 	// pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
-	if (SetUp() != 0 || pthread_create(&_thread, NULL, &(Thread::ThreadMain), arg)) {
+	if (pthread_create(&_thread, NULL, &(Thread::ThreadMain), t)) {
 		t->joined = true;
 		t->detached = true;
 		t->alive = false;
@@ -594,9 +557,7 @@ void Thread::WaitThread(int id)
 	jthread_map_t *t = GetMap(id);
 
 #ifdef _WIN32
-	HANDLE thread = t->thread;
-
-	if (WaitForSingleObject(thread, INFINITE) == WAIT_FAILED) {
+	if (WaitForSingleObject(t->thread, INFINITE) == WAIT_FAILED) {
 		throw ThreadException("Wait thread failed");
 	}
 #else
@@ -604,8 +565,11 @@ void Thread::WaitThread(int id)
 		if (t->joined == false) {
 			pthread_join(t->thread, NULL);
 			pthread_detach(t->thread);
-			
+	
+			Cleanup();
+
 			t->joined = true;
+			t->alive = false;
 		}
 	} else if (_type == JTT_DETACH) {
 		if (t->detached == false) {
@@ -623,7 +587,13 @@ void Thread::Release()
 		_group->UnregisterThread(this);
 	}
 
-	KillAllThreads();
+	AutoLock lock(&jthread_mutex);
+
+	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i != _threads.end(); i++) {
+		delete i->second;
+	}
+
+	_threads.clear();
 
 #ifdef _WIN32
 	if ((void *)_sa != NULL) {

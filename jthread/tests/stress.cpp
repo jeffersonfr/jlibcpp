@@ -76,11 +76,9 @@ int main() {
 		printf("Thread count:: %d, error:: %s\n", i, strerror(errno));
 	}
 
-	t.Release();
-	
 	finish = get_current_time();
 	
-	std::cout << "Thread loop: " << (finish - start)/1000.0 << " ms" << std::endl;
+	printf("Thread loop: %lld us\n", (finish - start));
 	
 	/*
 	// Semaphore loop
