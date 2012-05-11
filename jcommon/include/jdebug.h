@@ -24,7 +24,7 @@
 #define JWARN	2
 #define JERRO	3
 
-#define JDEBUG_ON(t, args...) {																																		\
+#define JDEBUG_ON(t, ...) {																																				\
 	if (t == JINFO) {																																								\
 		printf ("\033[37;40mINFO:: %s:%d [%s] \033[37;40m", __FILE__, __LINE__, __PRETTY_FUNCTION__);	\
 	} else if (t == JWARN) {																																				\
@@ -32,8 +32,8 @@
 	} else if (t == JERRO) {																																				\
 		printf ("\033[31;40mERRO:: %s:%d [%s] \033[37;40m", __FILE__, __LINE__, __PRETTY_FUNCTION__);	\
 	}																																																\
-	printf(args);																																										\
-	fflush(stdin);																																									\
+	printf(__VA_ARGS__);																																						\
+	fflush(stdout);																																									\
 }
 
 #define JDEBUG_OFF(...) {																																					\
