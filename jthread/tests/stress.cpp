@@ -25,8 +25,10 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/time.h>
+#include <string.h>
+#include <errno.h>
 
-#define MAX_LOOP_THREAD		300
+#define MAX_LOOP_THREAD		1000
 #define MAX_LOOP_SEMAPHORE	100000
 #define MAX_LOOP_MUTEX		1000000
 
@@ -44,9 +46,9 @@ class T : public jthread::Thread{
 		{
 		}
 
-		virtual void Start()
+		virtual void Run()
 		{
-			std::cout << "Hello, world %d" << std::endl;
+			std::cout << "Hello, world !" << std::endl;
 		}
 
 };
@@ -63,7 +65,7 @@ int main() {
 	// Thread loop
 	start = get_current_time();
 	
-	jthread::Thread t;
+	T t;
 
 	try {
 		for (i=0; i<MAX_LOOP_THREAD; i++) {
@@ -71,8 +73,10 @@ int main() {
 			t.WaitThread();
 		}
 	} catch (...) {
-		perror("Error:: ");
+		printf("Thread count:: %d, error:: %s\n", i, strerror(errno));
 	}
+
+	t.Release();
 	
 	finish = get_current_time();
 	

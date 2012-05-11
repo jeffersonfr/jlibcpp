@@ -38,6 +38,7 @@ Thread::Thread(jthread_type_t type, ThreadGroup *group):
 	_runnable = NULL;
 	_type = type;
 	_group = group;
+	_stack_size = -1;
 
 #ifdef _WIN32
 	_sa = (LPSECURITY_ATTRIBUTES)HeapAlloc(GetProcessHeap(), 0, sizeof(SECURITY_ATTRIBUTES));
@@ -72,7 +73,6 @@ Thread::Thread(Runnable *runnable, jthread_type_t type, ThreadGroup *group):
 
 Thread::~Thread()
 {
-	Release();
 }
 
 ThreadGroup * Thread::GetThreadGroup()
@@ -144,14 +144,18 @@ int Thread::GetID()
 	return -1;
 }
 
+void Thread::SetStackSize(int size)
+{
+	_stack_size = size;
+}
+
 void Thread::KillAllThreads()
 {
 	AutoLock lock(&jthread_mutex);
 
-	std::map<int, jthread_map_t *>::iterator i;
-
-	for (i = _threads.begin(); i != _threads.end(); i++) {
+	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i != _threads.end(); i++) {
 		Interrupt(i->first);
+		WaitThread(i->first);
 
 		delete i->second;
 	}
@@ -163,47 +167,57 @@ void Thread::KillAllThreads()
 
 #ifdef _WIN32
 DWORD WINAPI Thread::ThreadMain(LPVOID owner_)
-#else
-void * Thread::ThreadMain(void *owner_)
-#endif
 {
 	if (owner_ == NULL) {
 		return 0;
 	}
 
-#ifdef _WIN32
-#else
-	if (pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL) == EINVAL) {
-		// throw ThreadException("Interrupt is not allowed");
-	}
-
-	if (pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL) == EINVAL) {
-	// if (pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL) == EINVAL) {
-		// throw ThreadException("Thread is not asynchronous");
-	}
-#endif
-
 	jthread_arg_t *arg = (jthread_arg_t *)owner_;
-
-	if (arg->thread->SetUp() == 0) {
-		arg->thread->Run();
-
-#ifdef _WIN32
-#else
-		if (pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL) == EINVAL) {
-			// throw ThreadException("Interrupt is not allowed");
-		}
-#endif
-	}
-
-	arg->thread->CleanUp();
-
-	arg->map->alive = false;
 
 	delete arg;
 
+	Thread *thiz = arg->thread;
+	jthread_map_t *t = arg->map;
+
+	if (thiz->SetUp() == 0) {
+		thiz->Run();
+	}
+
+	thiz->CleanUp();
+	
+	t->alive = false;
+
+	return 0;
+}
+#else
+void * Thread::ThreadMain(void *owner_)
+{
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+
+	jthread_arg_t *arg = (jthread_arg_t *)owner_;
+
+	Thread *thiz = arg->thread;
+	jthread_map_t *t = arg->map;
+
+	delete arg;
+
+	if (thiz->_type == JTT_JOINABLE) {
+		pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
+	} else if (thiz->_type == JTT_DETACH) {
+		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+	}
+
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+
+	thiz->Run();
+
+	t->alive = false;
+
+	thiz->CleanUp();
+
 	pthread_exit(NULL);
 }
+#endif
 
 jthread_map_t * Thread::GetMap(int id)
 {
@@ -254,6 +268,8 @@ void Thread::Start(int id)
 	}
 
 	t->thread = 0;
+	t->joined = false;
+	t->detached = false;
 	t->alive = true;
 
 	jthread_arg_t *arg = new jthread_arg_t;
@@ -262,13 +278,14 @@ void Thread::Start(int id)
 	arg->map = t;
 
 #ifdef _WIN32
-	if ((_thread = CreateThread(
-					_sa,				// security attributes
-					0,					// stack size
-					Thread::ThreadMain,	// function thread
-					arg,				// thread arguments
-					0,					// flag
-					&_thread_id)) == NULL) {
+	if (SetUp() != 0 || 
+			(_thread = CreateThread(
+				_sa,				// security attributes
+				0,					// stack size
+				Thread::ThreadMain,	// function thread
+				arg,				// thread arguments
+				0,					// flag
+				&_thread_id)) == NULL) {
 		throw ThreadException("Create thread failed");
 	}
 
@@ -284,8 +301,16 @@ void Thread::Start(int id)
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	}
 
+	if (_stack_size > 0) {
+		if (pthread_attr_setstacksize(&attr, _stack_size) != 0) {
+			throw ThreadException("Thread stack exception");
+		}
+	}
+			
 	// pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
-	if (pthread_create(&_thread, NULL, &(Thread::ThreadMain), arg)) {
+	if (SetUp() != 0 || pthread_create(&_thread, NULL, &(Thread::ThreadMain), arg)) {
+		t->joined = true;
+		t->detached = true;
 		t->alive = false;
 
 		pthread_attr_destroy(&attr);
@@ -303,11 +328,11 @@ bool Thread::Interrupt(int id)
 {
 	AutoLock lock(&jthread_mutex);
 
-	if (IsRunning(id) == false) {
+	jthread_map_t *t = GetMap(id);
+
+	if (t->alive == false) {
 		return true;
 	}
-
-	jthread_map_t *t = GetMap(id);
 
 	t->alive = false;
 
@@ -317,32 +342,25 @@ bool Thread::Interrupt(int id)
 	}
 
 	/*
-		 if ((void *)_sa != NULL) {
+	if ((void *)_sa != NULL) {
 		 HeapFree(GetProcessHeap(), 0, _sa); 
 
 		 _sa = NULL;
-		 }
-		 */
+	}
+	*/
 
 	/* CHANGE::
-		 if (WaitForSingleObject(thread, INFINITE) == WAIT_FAILED) {
+	if (WaitForSingleObject(thread, INFINITE) == WAIT_FAILED) {
 		 return false; // CHANGE:: throw ThreadException("Wait thread failed");
-		 }
-		 */
-#else
-	pthread_t thread = t->thread;
-
-	if (pthread_cancel(thread) != 0) {
-		return false; // CHANGE:: throw ThreadException("Thread cancel exception !");
 	}
-
+	*/
+#else
 	if (_type == JTT_JOINABLE) {
-		pthread_join(thread, NULL);
-		pthread_detach(thread);
+		pthread_cancel(t->thread);
+	} else if (_type == JTT_DETACH) {
+		pthread_cancel(t->thread);
 	}
 #endif
-
-	CleanUp();
 
 	return true;
 }
@@ -378,18 +396,16 @@ void Thread::Resume(int id)
 		return;
 	}
 
+#ifdef _WIN32
 	jthread_map_t *t = GetMap(id);
 
-#ifdef _WIN32
-	HANDLE thread = t->thread;
-
-	if (ResumeThread(thread) == 0xFFFFFFFF) {
+	if (ResumeThread(t->thread) == 0xFFFFFFFF) {
 		throw ThreadException("Resume thread failed");
 	}
 
 	t->alive = true;
 #else
-	t->alive = false;
+	throw ThreadException("Thread resume not implemented");
 #endif
 }
 
@@ -575,17 +591,7 @@ void Thread::WaitThread(int id)
 {
 	AutoLock lock(&jthread_mutex);
 
-	if (IsRunning(id) == false) {
-		return;
-	}
-
-	if (_type == JTT_DETACH) {
-		return;
-	}
-
 	jthread_map_t *t = GetMap(id);
-
-	t->alive = false;
 
 #ifdef _WIN32
 	HANDLE thread = t->thread;
@@ -594,16 +600,20 @@ void Thread::WaitThread(int id)
 		throw ThreadException("Wait thread failed");
 	}
 #else
-	/*
-	while (IsRunning(id) == true) {
-		_condition.Wait();
+	if (_type == JTT_JOINABLE) {
+		if (t->joined == false) {
+			pthread_join(t->thread, NULL);
+			pthread_detach(t->thread);
+			
+			t->joined = true;
+		}
+	} else if (_type == JTT_DETACH) {
+		if (t->detached == false) {
+			pthread_detach(t->thread);
+
+			t->detached = true;
+		}
 	}
-	*/
-
-	pthread_t thread = t->thread;
-
-	pthread_join(thread, NULL);
-	pthread_detach(thread);
 #endif
 }
 

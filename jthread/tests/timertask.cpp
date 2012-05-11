@@ -47,10 +47,14 @@ int main()
 	jthread::Timer timer;
 	TaskTest task;
 	
+	timer.Start();
+
 	// wait 500000us to start task
 	timer.Schedule(&task, 500000LL, 1000000LL, false);
 
 	jthread::Thread::Sleep(5);
+
+	timer.Stop();
 
 	return 0;
 }

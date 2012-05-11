@@ -61,6 +61,8 @@ typedef pthread_t jthread_t;
 
 struct jthread_map_t {
 	jthread_t thread;
+	bool joined;
+	bool detached;
 	bool alive;
 };
 
@@ -108,15 +110,21 @@ class Thread : public virtual jcommon::Object{
 		/** \brief */
 		int _id;
 		/** \brief */
+		int _stack_size;
+		/** \brief */
 		bool _is_running;
 
+#ifdef _WIN32
 		/**
 		 * \brief
 		 *
 		 */
-#ifdef _WIN32
 		static DWORD WINAPI ThreadMain(void *owner_);
 #else
+		/**
+		 * \brief
+		 *
+		 */
 		static void * ThreadMain(void *owner_);
 #endif
 
@@ -134,7 +142,7 @@ class Thread : public virtual jcommon::Object{
 		virtual int SetUp();
 
 		/**
-		 * \brief Dont use try-catch(...)
+		 * \brief Dont use try-catch (...)
 		 *
 		 */
 		virtual void Run();
@@ -205,6 +213,12 @@ class Thread : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void KillAllThreads();
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual void SetStackSize(int size);
 
 		/**
 		 * \brief Init the thread.

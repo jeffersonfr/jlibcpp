@@ -54,11 +54,14 @@ class TimerTask : public jthread::Runnable {
 	friend class TaskQueue;
 
 	private:
-		jthread::Mutex _mutex;
-    jtimertask_state_t _state;
-    
-		uint64_t _delay;
-		bool _push_time;
+		/** \brief */
+		jthread::Mutex _timertask_mutex;
+		/** \brief */
+    jtimertask_state_t _timertask_state;
+		/** \brief */
+		uint64_t _timertask_delay;
+		/** \brief */
+		bool _timertask_push_time;
 
 	protected:
     /**
@@ -68,6 +71,7 @@ class TimerTask : public jthread::Runnable {
     TimerTask();
 
 	public:
+		/** \brief */
 		uint64_t _next_execution_time;
 
 	public:
@@ -284,13 +288,25 @@ class Timer : public virtual jcommon::Object{
      */
     virtual ~Timer();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Start();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Stop();
+
     /**
      * \brief Schedules the specified task for execution after the specified delay.
      *
      * @param task  task to be scheduled.
      * @param delay delay in microseconds before task is to be executed.
      */
-    void Schedule(TimerTask *task, uint64_t time, bool delay);
+    virtual void Schedule(TimerTask *task, uint64_t time, bool delay);
 
     /**
      * \brief Schedules the specified task for execution at the specified time.  If the time is in the past, 
@@ -299,7 +315,7 @@ class Timer : public virtual jcommon::Object{
      * @param task task to be scheduled.
      * @param time time at which task is to be executed.
      */
-    void Schedule(TimerTask *task, jcommon::Date *time, bool delay);
+    virtual void Schedule(TimerTask *task, jcommon::Date *time, bool delay);
 
     /**
      * \brief Schedules the specified task for repeated <i>fixed-delay execution</i>, beginning after the 
@@ -322,7 +338,7 @@ class Timer : public virtual jcommon::Object{
      * @param delay  delay in microseconds before task is to be executed.
      * @param period time in microseconds between successive task executions.
      */
-    void Schedule(TimerTask *task, uint64_t time, uint64_t period, bool delay);
+    virtual void Schedule(TimerTask *task, uint64_t time, uint64_t period, bool delay);
 
     /**
      * \brief Schedules the specified task for repeated <i>fixed-delay execution</i>, beginning at the specified 
@@ -344,7 +360,7 @@ class Timer : public virtual jcommon::Object{
      * @param firstTime First time at which task is to be executed.
      * @param period time in microseconds between successive task executions.
      */
-    void Schedule(TimerTask *task, jcommon::Date *time, uint64_t period, bool delay);
+    virtual void Schedule(TimerTask *task, jcommon::Date *time, uint64_t period, bool delay);
 
     /**
      * \brief Schedules the specified task for repeated <i>fixed-rate execution</i>, beginning after the specified 
@@ -367,7 +383,7 @@ class Timer : public virtual jcommon::Object{
      * @param delay  delay in microseconds before task is to be executed.
      * @param period time in microseconds between successive task executions.
      */
-    void ScheduleAtFixedRate(TimerTask *task, uint64_t time, uint64_t period, bool delay);
+    virtual void ScheduleAtFixedRate(TimerTask *task, uint64_t time, uint64_t period, bool delay);
 
     /**
      * Schedules the specified task for repeated <i>fixed-rate execution</i>, beginning at the specified time. Subsequent 
@@ -389,13 +405,13 @@ class Timer : public virtual jcommon::Object{
      * @param firstTime First time at which task is to be executed.
      * @param period time in microseconds between successive task executions.
      */
-    void ScheduleAtFixedRate(TimerTask *task, jcommon::Date *time, uint64_t period, bool delay);
+    virtual void ScheduleAtFixedRate(TimerTask *task, jcommon::Date *time, uint64_t period, bool delay);
 
 		/**
 		 * \brief Remove a schedule reference from timer.
 		 *
 		 */
-		void RemoveSchedule(TimerTask *task);
+		virtual void RemoveSchedule(TimerTask *task);
 
 };
 
