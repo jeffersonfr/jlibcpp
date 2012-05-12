@@ -32,7 +32,7 @@ ProgressBar::ProgressBar(int x, int y, int width, int height, jscroll_orientatio
 	_running = false;
 	_type = type;
 	_indeterminate = true;
-	_value = 0.0;
+	_value = 0;
 	_fixe_delta = 10;
 	_delta = _fixe_delta;
 }
@@ -89,11 +89,11 @@ void ProgressBar::SetValue(double i)
 		_value = i;
 
 		if (_value < 0.0) {
-			_value = 0.0;
+			_value = 0;
 		}
 
-		if (_value > 100.0) {
-			_value = 100.0;
+		if (_value > 100) {
+			_value = 100;
 		}
 	}
 

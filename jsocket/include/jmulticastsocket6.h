@@ -57,10 +57,10 @@ class MulticastSocket6 : public jsocket::Connection{
 		/** \brief Use to bind the socket in a free port */
 		static int _used_port;
         
+		/** \brief */
+		std::vector<std::string> _groups;
 		/** \brief Socket handler. */
 		jsocket_t _fds, _fdr;
-		/** \brief Local socket */
-		struct sockaddr_in6 _sock_s, _sock_r;
 		/** \brief Input stream */
 		SocketInputStream *_is;
 		/** \brief Output stream */
@@ -69,8 +69,13 @@ class MulticastSocket6 : public jsocket::Connection{
 		int64_t _sent_bytes;
 		/** \brief */
 		int64_t _receive_bytes;
-		/** \brief */
-		std::vector<std::string> _groups;
+#ifdef _WIN32
+#else
+		/** \brief Local socket */
+		struct sockaddr_in6 _sock_s;
+		/** \brief Local socket */
+		struct sockaddr_in6 _sock_r;
+#endif
 
 		/**
 		 * \brief Create a new socket

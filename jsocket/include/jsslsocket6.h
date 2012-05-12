@@ -62,6 +62,39 @@ COMPILE_TIME_ASSERT(sint32, sizeof(int32_t) == 4);
 
 namespace jsocket {
 
+/**
+ *  Get information about peer certificate. Should be called after connect() or accept() when 
+ *  using verification
+ *
+ */
+struct peer_cert_info_t {
+	// Issuer name
+	std::string commonName;             // CN
+	std::string countryName;            // C
+	std::string localityName;           // L
+	std::string stateOrProvinceName;    // ST
+	std::string organizationName;       // O
+	std::string organizationalUnitName; // OU
+	std::string title;                  // T
+	std::string initials;               // I
+	std::string givenName;              // G
+	std::string surname;                // S
+	std::string description;            // D
+	std::string uniqueIdentifier;       // UID
+	std::string emailAddress;           // Email
+
+	// Expire dates
+	std::string notBefore;
+	std::string notAfter;
+
+	// Misc. data
+	long serialNumber;
+	long version;
+	std::string sgnAlgorithm;
+	std::string keyAlgorithm;
+	int keySize;
+};
+
 class ServerSocket;
 
 /**
@@ -81,10 +114,6 @@ class SSLSocket6 : public jsocket::Connection{
 		/** \brief */
 		SSLSocketOutputStream *_os;
 		/** \brief */
-		sockaddr_in6 _lsock;
-		/** \brief */
-		sockaddr_in6 _server_sock;
-		/** \brief */
 		InetAddress *_address;
 		/** \brief Bytes sent. */
 		int64_t _sent_bytes;
@@ -92,6 +121,23 @@ class SSLSocket6 : public jsocket::Connection{
 		int64_t _receive_bytes;
 		/** \brief */
 		int _timeout;
+#ifdef _WIN32
+#else
+		/** \brief */
+		sockaddr_in6 _lsock;
+		/** \brief */
+		sockaddr_in6 _server_sock;
+		/** \brief SSL data */
+		SSL_CTX *ctx;
+		/** \brief SSL data */
+		SSL *ssl;
+		/** \brief Indicate CERT loaded or created */
+		bool have_cert; 
+		/** \brief keysize argument from constructor */
+		int rsa_keysize;
+		/** \brief userdata */
+		char *ud;
+#endif
 
 		/**
 		 * \brief Create a new socket.
@@ -118,6 +164,14 @@ class SSLSocket6 : public jsocket::Connection{
 		void InitStreams(int rbuf, int wbuf);
 
 		/**
+		 * \brief
+		 *
+		 */
+		bool Accept();
+
+#ifdef _WIN32
+#else
+		/**
 		 * Create new CTX if none is available
 		 *
 		 */
@@ -134,24 +188,7 @@ class SSLSocket6 : public jsocket::Connection{
 		 *
 		 */
 		int GetCertPEM(X509 *cert, std::string *pem);
-
-		/**
-		 * \brief
-		 *
-		 */
-		bool Accept();
-
-		/** \brief SSL data */
-		SSL_CTX *ctx;
-		/** \brief SSL data */
-		SSL *ssl;
-
-		/** \brief Indicate CERT loaded or created */
-		bool have_cert; 
-		/** \brief keysize argument from constructor */
-		int rsa_keysize;
-		/** \brief userdata */
-		char *ud;
+#endif
 
 	private:
 		/**
@@ -243,19 +280,19 @@ class SSLSocket6 : public jsocket::Connection{
 		 * \brief
 		 *
 		 */
-		InetAddress * GetInetAddress();
+		virtual InetAddress * GetInetAddress();
 
 		/**
 		 * \brief Get the local port.
 		 *
 		 */
-		int GetLocalPort();
+		virtual int GetLocalPort();
 
 		/**
 		 * \brief Get the port.
 		 *
 		 */
-		int GetPort();
+		virtual int GetPort();
 
 		/**
 		 * \brief Get the bytes sent to a destination.
@@ -273,7 +310,7 @@ class SSLSocket6 : public jsocket::Connection{
 		 * \brief Get the socket options.
 		 *
 		 */
-		SocketOptions * GetSocketOptions();
+		virtual SocketOptions * GetSocketOptions();
 
 		/** 
 		 * Cert files (if not set, a temporary RSA session cert will be created if needed)
@@ -317,38 +354,9 @@ class SSLSocket6 : public jsocket::Connection{
 		bool UseVerification(const char *ca_file, const char *ca_dir);
 
 		/**
-		 *  Get information about peer certificate. Should be called after connect() or accept() when 
-		 *  using verification
+		 * \brief
 		 *
 		 */
-		struct peer_cert_info_t {
-			// Issuer name
-			std::string commonName;             // CN
-			std::string countryName;            // C
-			std::string localityName;           // L
-			std::string stateOrProvinceName;    // ST
-			std::string organizationName;       // O
-			std::string organizationalUnitName; // OU
-			std::string title;                  // T
-			std::string initials;               // I
-			std::string givenName;              // G
-			std::string surname;                // S
-			std::string description;            // D
-			std::string uniqueIdentifier;       // UID
-			std::string emailAddress;           // Email
-
-			// Expire dates
-			std::string notBefore;
-			std::string notAfter;
-
-			// Misc. data
-			long serialNumber;
-			long version;
-			std::string sgnAlgorithm;
-			std::string keyAlgorithm;
-			int keySize;
-		};
-
 		bool GetPeerCertInfo(peer_cert_info_t *info);
 
 		/**

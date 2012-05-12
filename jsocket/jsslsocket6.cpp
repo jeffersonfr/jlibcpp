@@ -31,6 +31,8 @@ SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, int keysize, int timeout_,
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
 	
+#ifdef _WIN32
+#else
 	_is = NULL;
 	_os = NULL;
 	_address = NULL;
@@ -62,6 +64,7 @@ SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, int keysize, int timeout_,
 	InitStreams(rbuf_, wbuf_);
 
 	_is_closed = false;
+#endif
 }
 
 SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
@@ -69,6 +72,8 @@ SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, InetAddress *local_addr_, 
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
 
+#ifdef _WIN32
+#else
 	_is = NULL;
 	_os = NULL;
 	_address = NULL;
@@ -101,6 +106,7 @@ SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, InetAddress *local_addr_, 
 	BindSocket(local_addr_, local_port_);
 	ConnectSocket(addr_, port_);
 	InitStreams(rbuf_, wbuf_);
+#endif
 }
 
 SSLSocket6::SSLSocket6(std::string host_, int port_, int keysize, int timeout_, int rbuf_, int wbuf_):
@@ -108,6 +114,8 @@ SSLSocket6::SSLSocket6(std::string host_, int port_, int keysize, int timeout_, 
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
 
+#ifdef _WIN32
+#else
 	_is = NULL;
 	_os = NULL;
 	_address = NULL;
@@ -139,6 +147,7 @@ SSLSocket6::SSLSocket6(std::string host_, int port_, int keysize, int timeout_, 
 	InitStreams(rbuf_, wbuf_);
 
 	_is_closed = false;
+#endif
 }
 
 SSLSocket6::SSLSocket6(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int keysize, int timeout_, int rbuf_, int wbuf_):
@@ -146,6 +155,8 @@ SSLSocket6::SSLSocket6(std::string host_, int port_, InetAddress *local_addr_, i
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
 
+#ifdef _WIN32
+#else
 	_is = NULL;
 	_os = NULL;
 	_address = NULL;
@@ -177,10 +188,13 @@ SSLSocket6::SSLSocket6(std::string host_, int port_, InetAddress *local_addr_, i
 	BindSocket(local_addr_, local_port_);
 	ConnectSocket(_address, port_);
 	InitStreams(rbuf_, wbuf_);
+#endif
 }
 
 SSLSocket6::~SSLSocket6()
 {
+#ifdef _WIN32
+#else
 	try {
 		Close();
 	} catch (...) {
@@ -200,6 +214,7 @@ SSLSocket6::~SSLSocket6()
 		delete _address;
 		_address = NULL;
 	}
+#endif
 }
 
 /** Private */
@@ -209,6 +224,8 @@ SSLSocket6::SSLSocket6(jsocket_t handler_, struct sockaddr_in6 server_, int keys
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocket6");
 
+#ifdef _WIN32
+#else
 	char straddr[INET6_ADDRSTRLEN];
 
 	_lsock.sin6_family = AF_INET6;
@@ -243,23 +260,25 @@ SSLSocket6::SSLSocket6(jsocket_t handler_, struct sockaddr_in6 server_, int keys
 	InitStreams(rbuf_, wbuf_);
 
 	_is_closed = false;
+#endif
 }
 
 void SSLSocket6::CreateSocket()
 {
+#ifdef _WIN32
+#else
 	_fd = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
 
-#ifdef _WIN32
-	if (_fd == INVALID_SOCKET) {
-#else
 	if (_fd < 0) {
-#endif
 		throw SocketException("Socket handling error");
 	}
+#endif
 }
 
 void SSLSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
+#ifdef _WIN32
+#else
 	memset(&_lsock, 0, sizeof(_lsock));
 
 	_lsock.sin6_family = AF_INET6;
@@ -277,10 +296,13 @@ void SSLSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 	if (bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
 		throw SocketException("Binding error");
 	}
+#endif
 }
 
 void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 {
+#ifdef _WIN32
+#else
 	_address = addr_;
 
 	memset(&_server_sock, 0, sizeof(_server_sock));
@@ -295,66 +317,6 @@ void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 
 	int r;
 
-#ifdef _WIN32
-	if (_timeout > 0) {
-		u_long opt = 1;
-
-		if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-			throw SocketException("Invalid connection parameters exception");
-		}
-
-		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
-
-		if (WSAGetLastError() != WSAEWOULDBLOCK) {
-			throw SocketException("Connection error");
-		}
-
-		if (r != 0) {
-			fd_set wset;
-			struct timeval t;
-
-			t.tv_sec = _timeout/1000;
-			t.tv_usec = (_timeout%1000)*1000;
-
-			FD_ZERO(&wset);
-			FD_SET(_fd, &wset);
-
-			r = select(_fd + 1, &wset, &wset, &wset, &t);
-
-			if (r <= 0) {
-				opt = 0;
-
-				if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-					throw SocketException("Invalid connection parameters exception");
-				}
-
-				shutdown(_fd, 2);
-
-				if (r == 0) {
-					throw SocketException("Socket connection timeout exception");
-				} else if (r < 0) {
-					throw SocketException("Connect socket error");
-				}
-			}
-
-			int optlen = sizeof(r);
-
-			getsockopt(_fd, SOL_SOCKET, SO_ERROR, (char *)&r, &optlen);
-
-			if (r != 0) {
-				throw SocketException("Unknown error");
-			}
-		}
-
-		opt = 0;
-
-		if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-			throw SocketException("Connection error");
-		}
-	} else {
-		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
-	}
-#else
 	if (_timeout > 0) {
 		int opt = 1;
 
@@ -438,19 +400,18 @@ void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 	if ((tmp = SSL_connect(ssl)) < 1) {
 		return;
 	}
-#endif
 
-#ifdef _WIN32
-	if (r == SOCKET_ERROR) {
-#else
 	if (r < 0) {
-#endif
 		throw SocketException("Connection error");
 	}
+#endif
 }
 
 bool SSLSocket6::Accept()
 {
+#ifdef _WIN32
+	return false;
+#else
 	if (_fd < 0) {
 		throw SocketException("SSLSocket accept exception");
 	}
@@ -499,13 +460,17 @@ X509_free(client_cert);
 }
 */
 
-return true;
+	return true;
+#endif
 }
 
 void SSLSocket6::InitStreams(int rbuf_, int wbuf_)
 {
+#ifdef _WIN32
+#else
 	_is = new SSLSocketInputStream((Connection *)this, &_is_closed, ssl, rbuf_);
 	_os = new SSLSocketOutputStream((Connection *)this, &_is_closed, ssl, wbuf_);
+#endif
 }
 
 /** End */
@@ -517,13 +482,13 @@ jsocket_t SSLSocket6::GetHandler()
 
 int SSLSocket6::Send(const char *data_, int size_, int time_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 
-#ifdef _WIN32
-	return SSLSocket6::Send(data_, size_);
-#else
 	struct pollfd ufds[1];
 
 	ufds[0].fd = _fd;
@@ -541,32 +506,22 @@ int SSLSocket6::Send(const char *data_, int size_, int time_)
 			return SSLSocket6::Send(data_, size_);
 		}
 	}
-#endif
 
 	return -1;
+#endif
 }
 
 int SSLSocket6::Send(const char *data_, int size_, bool block_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 
-#ifdef _WIN32
-	int n = ::send(_fd, data_, size_, 0);
-#else
 	int n = SSL_write(ssl, data_, size_);
-#endif
 
-#ifdef _WIN32
-	if (n == SOCKET_ERROR) {
-		if (WSAGetLastError() == WSAECONNABORTED) {
-			throw SocketTimeoutException("Socket output timeout error");
-		} else {
-			throw SocketTimeoutException("Socket output timeout error");
-		}
-	}
-#else
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
@@ -583,22 +538,22 @@ int SSLSocket6::Send(const char *data_, int size_, bool block_)
 			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
-#endif
 
 	_sent_bytes += n;
 
 	return n;
+#endif
 }
 
 int SSLSocket6::Receive(char *data_, int size_, int time_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 
-#ifdef _WIN32
-	return SSLSocket6::Receive(data_, size_);
-#else
 	struct pollfd ufds[1];
 
 	ufds[0].fd = _fd;
@@ -615,40 +570,26 @@ int SSLSocket6::Receive(char *data_, int size_, int time_)
 			return SSLSocket6::Receive(data_, size_);
 		}
 	}
-#endif
 
 	return -1;
+#endif
 }
 
 int SSLSocket6::Receive(char *data_, int size_, bool block_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 
-#ifdef _WIN32
-	int n = ::recv(_fd, data_, size_, 0);
-#else
 	if (ssl == NULL) {
 		return -1;
 	}
 
 	int n = SSL_read(ssl, data_, size_);
-#endif
 
-#ifdef _WIN32
-	if (n == SOCKET_ERROR) {
-		if (WSAGetLastError() == WSAETIMEDOUT) {
-			throw SocketTimeoutException("Socket input timeout error");
-		} else {
-			throw jio::jio::IOException("Socket input error");
-		}
-	} else if (n == 0) {
-		Close();
-
-		throw SocketException("Broken pipe exception");
-	}
-#else 
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
@@ -665,22 +606,21 @@ int SSLSocket6::Receive(char *data_, int size_, bool block_)
 
 		throw jio::IOException("Peer has shutdown");
 	}
-#endif
 
 	_receive_bytes += n;
 
 	return n;
+#endif
 }
 
 void SSLSocket6::Close()
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		return;
 	}
 
-#ifdef _WIN32
-	if (closesocket(_fd) < 0) {
-#else
 	if (ssl) {
 		SSL_shutdown(ssl);
 		SSL_free(ssl);
@@ -698,51 +638,83 @@ void SSLSocket6::Close()
 	}
 
 	if (close(_fd) < 0) {
-#endif
 		throw SocketException("Close socket error");
 	}
+#endif
 		
 	_is_closed = true;
 }
 
 jio::InputStream * SSLSocket6::GetInputStream()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return (jio::InputStream *)_is;
+#endif
 }
 
 jio::OutputStream * SSLSocket6::GetOutputStream()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return (jio::OutputStream *)_os;
+#endif
 }
 
 InetAddress * SSLSocket6::GetInetAddress()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return _address;
+#endif
 }
 
 int SSLSocket6::GetLocalPort()
 {
+#ifdef _WIN32
+	return 0;
+#else
 	return ntohs(_lsock.sin6_port);
+#endif
 }
 
 int SSLSocket6::GetPort()
 {
+#ifdef _WIN32
+	return 0;
+#else
 	return ntohs(_server_sock.sin6_port);
+#endif
 }
 
 int64_t SSLSocket6::GetSentBytes()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return _sent_bytes + _os->GetSentBytes();
+#endif
 }
 
 int64_t SSLSocket6::GetReadedBytes()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return _receive_bytes + _is->GetReadedBytes();
+#endif
 }
 
 SocketOptions * SSLSocket6::GetSocketOptions()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return new SocketOptions(_fd, JCT_TCP);
+#endif
 }
 
 std::string SSLSocket6::what()
@@ -754,6 +726,8 @@ std::string SSLSocket6::what()
 	return GetInetAddress()->GetHostName() + ":" + port;
 }
 
+#ifdef _WIN32
+#else
 // why is NID_uniqueIdentifier undefined?
 #ifndef NID_uniqueIdentifier
 #define NID_uniqueIdentifier 102
@@ -1243,12 +1217,12 @@ int SSLSocket6::GetPeerCertPEM(std::string *pem)
 
 	X509_free(peer);
 
-	if (ret < 0){
+	if (ret < 0) {
 		return -1;
 	}
 
 	return ret;
 }
+#endif
 
 }
-

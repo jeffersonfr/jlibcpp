@@ -54,7 +54,6 @@ class SSLSocketInputStream : public jio::InputStream{
 #else
 			/** \brief */
 			SSL *_ssl;
-#endif
 			/** \brief */
 			jsocket_t _fd;
 			/** \brief */
@@ -73,13 +72,14 @@ class SSLSocketInputStream : public jio::InputStream{
 			bool _stream;
 			/** \brief */
 			bool *_is_closed;
+#endif
 
 		public:
 			/**
 			 * \brief Construtor.
 			 *
 			 */
-			SSLSocketInputStream(Connection *conn_, bool *is_closed_, SSL *ssl, int64_t size_ = 65535LL);
+			SSLSocketInputStream(Connection *conn_, bool *is_closed_, void *ssl, int64_t size_ = 65535LL);
 
 			/**
 			 * \brief Destrutor virtual.

@@ -249,7 +249,7 @@ class Thread : public virtual jcommon::Object{
 		 * \bried
 		 *
 		 */
-		virtual void Yield();
+		virtual void ThreadYield();
 
 		/**
 		 * \bried

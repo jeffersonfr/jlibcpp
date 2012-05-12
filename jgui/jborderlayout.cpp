@@ -21,6 +21,8 @@
 #include "jborderlayout.h"
 #include "jcontainer.h"
 
+#include <algorithm>
+
 namespace jgui {
 
 BorderLayout::BorderLayout(int hgap, int vgap):

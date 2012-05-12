@@ -233,7 +233,7 @@ void TimerThread::MainLoop()
 		if (!taskFired) {
 			try {
 				_queue->_sem.Wait(executionTime - currentTime);
-			} catch (jcommon::RuntimeException &e) {
+			} catch (jcommon::RuntimeException &) {
 			}
 		}
 

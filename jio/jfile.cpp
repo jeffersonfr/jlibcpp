@@ -282,9 +282,9 @@ File::File(std::string prefix, std::string sufix, bool is_directory):
 	}
 
 	if (is_directory == true) {
-		_type = JFF_REGULAR;
+		_type = JFT_REGULAR;
 	} else {
-		_type = JFF_DIRECTORY;
+		_type = JFT_DIRECTORY;
 	}
 
 	delete tmp;

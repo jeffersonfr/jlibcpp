@@ -22,6 +22,8 @@
 #include "jfont.h"
 #include "jgfxhandler.h"
 
+#include <math.h>
+
 namespace jgui {
 
 Graphics::Graphics():

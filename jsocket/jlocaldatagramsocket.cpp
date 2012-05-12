@@ -37,7 +37,7 @@ LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int r
 	jcommon::Object::SetClassName("jsocket::DatagramSocket");
 	
 #ifdef _WIN32
-	throw jcommon::SocketException("Named socket unsupported.");
+	throw jsocket::SocketException("Named socket unsupported.");
 #endif
 
 	_server_file = server;
@@ -60,7 +60,7 @@ LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server,
 	jcommon::Object::SetClassName("jsocket::DatagramSocket");
 	
 #ifdef _WIN32
-	throw jcommon::SocketException("Named socket unsupported.");
+	throw jsocket::SocketException("Named socket unsupported.");
 #endif
 
 	_server_file = server;
@@ -377,7 +377,11 @@ int64_t LocalDatagramSocket::GetReadedBytes()
 
 SocketOptions * LocalDatagramSocket::GetSocketOptions()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return new SocketOptions(_fd, JCT_UDP);
+#endif
 }
 
 }

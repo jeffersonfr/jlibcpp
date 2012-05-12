@@ -44,12 +44,15 @@ class Socket6;
 class ServerSocket6 : public virtual jcommon::Object{
 
 	private:
-		/** \brief Socket handler. */
-		jsocket_t _fd;
-		/** \brief Local socket. */
-		struct sockaddr_in6 _lsock;
+#ifdef _WIN32
+#else
 		/** \brief Remote socket. */
 		struct sockaddr_in6 _rsock;
+		/** \brief Local socket. */
+		struct sockaddr_in6 _lsock;
+#endif
+		/** \brief Socket handler. */
+		jsocket_t _fd;
 		/** \brief */
 		InetAddress6 *_local;
 		/** \brief */

@@ -50,7 +50,10 @@ RawSocket::RawSocket(std::string device_, bool promisc_, int timeout_, int rbuf_
 
 RawSocket::~RawSocket()
 {
+#ifdef _WIN32
+#else
 	ioctl(_fd, SIOCSIFFLAGS, &(_ifr));
+#endif
 
 	try {
 		Close();

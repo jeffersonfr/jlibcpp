@@ -32,6 +32,8 @@ int DatagramSocket6::_used_port = 1024;
 DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(JCT_UDP)
 {
+#ifdef _WIN32
+#else
 	jcommon::Object::SetClassName("jsocket::DatagramSocket6");
 	
 	_stream = stream_;
@@ -47,6 +49,7 @@ DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, int
 
 	_sent_bytes = 0;
 	_receive_bytes = 0;
+#endif
 }
 
 DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
@@ -54,6 +57,8 @@ DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf
 {
 	jcommon::Object::SetClassName("jsocket::DatagramSocket6");
 
+#ifdef _WIN32
+#else
 	_address = NULL;
 	_is = NULL;
 	_os = NULL;
@@ -88,10 +93,13 @@ DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf
 
 	_sent_bytes = 0;
 	_receive_bytes = 0;
+#endif
 }
 
 DatagramSocket6::~DatagramSocket6()
 {
+#ifdef _WIN32
+#else
 	try {
 		Close();
 	} catch (...) {
@@ -108,6 +116,7 @@ DatagramSocket6::~DatagramSocket6()
 	if ((void *)_os != NULL) {
 		delete _os;
 	}
+#endif
 }
 
 /** Private */
@@ -115,18 +124,19 @@ DatagramSocket6::~DatagramSocket6()
 void DatagramSocket6::CreateSocket()
 {
 #ifdef _WIN32
-	if ((_fd = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) == INVALID_SOCKET) {
 #else
 	if ((_fd = ::socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0) {
-#endif
 		throw SocketException("Socket handling error");
 	}
 
 	_is_closed = false;
+#endif
 }
 
 void DatagramSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
+#ifdef _WIN32
+#else
 	int opt = 1;
 
 	memset(&_lsock, 0, sizeof(_lsock));
@@ -150,23 +160,20 @@ void DatagramSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 		_lsock.sin6_port = htons(-1);
 	}
 
-#ifdef _WIN32
-	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
-   
-	if (::bind (_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) == SOCKET_ERROR) {
-#else
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
 
 	if (::bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
-#endif
 		Close();
 
 		throw SocketException("Binding error");
 	}
+#endif
 }
 
 void DatagramSocket6::ConnectSocket(InetAddress *addr_, int port_)
 {
+#ifdef _WIN32
+#else
 	_address = addr_;
 	
 	memset(&_server_sock, 0, sizeof(_server_sock));
@@ -185,70 +192,6 @@ void DatagramSocket6::ConnectSocket(InetAddress *addr_, int port_)
 	int r;
 	
 	if (_stream == true) {
-#ifdef _WIN32
-	if (_timeout > 0) {
-		u_long opt = 1;
-
-		if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-			throw SocketException("Invalid connection parameters exception");
-		}
-
-		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
-
-		if (WSAGetLastError() != WSAEWOULDBLOCK) {
-			opt = 0;
-
-			if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-				throw SocketException("Connection error");
-			}
-		}
-
-		if (r != 0) {
-			fd_set wset;
-			struct timeval t;
-
-			t.tv_sec = _timeout/1000;
-			t.tv_usec = (_timeout%1000)*1000;
-
-			FD_ZERO(&wset);
-			FD_SET(_fd, &wset);
-
-			r = select(_fd + 1, &wset, &wset, &wset, &t);
-
-			if (r <= 0) {
-				opt = 0;
-
-				if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-					throw SocketException("Invalid connection parameters exception");
-				}
-
-				shutdown(_fd, 2);
-
-				if (r == 0) {
-					throw SocketException("Socket connection timeout exception");
-				} else if (r < 0) {
-					throw SocketException("Connection error");
-				}
-			}
-
-			int optlen = sizeof(r);
-
-			getsockopt(_fd, SOL_SOCKET, SO_ERROR, (char *)&r, &optlen);
-
-			if (r != 0) {
-				throw SocketException("Unknown error");
-			}
-		}
-
-		opt = 0;
-
-		if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-			throw SocketException("Connection error");
-		}
-	} else {
-		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
-	}
-#else
 	if (_timeout > 0) {
 		int opt = 1;
 
@@ -311,20 +254,17 @@ void DatagramSocket6::ConnectSocket(InetAddress *addr_, int port_)
 	} else {
 		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 	}
-#endif
-
-#ifdef _WIN32
-	if (r == SOCKET_ERROR) {
-#else
 		if (r < 0) {
-#endif
 			throw SocketException("Connection error");
 		}
 	}
+#endif
 }
 
 void DatagramSocket6::InitStream(int rbuf_, int wbuf_)
 {
+#ifdef _WIN32
+#else
 	if (_stream == false) {
 		_is = new SocketInputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_server_sock, rbuf_);
 		_os = new SocketOutputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_server_sock, wbuf_);
@@ -332,6 +272,7 @@ void DatagramSocket6::InitStream(int rbuf_, int wbuf_)
 		_is = new SocketInputStream((Connection *)this, &_is_closed, rbuf_);
 		_os = new SocketOutputStream((Connection *)this, &_is_closed, wbuf_);
 	}
+#endif
 }
 
 /** End */
@@ -343,23 +284,31 @@ jsocket_t DatagramSocket6::GetHandler()
 
 jio::InputStream * DatagramSocket6::GetInputStream()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return (jio::InputStream *)_is;
+#endif
 }
 
 jio::OutputStream * DatagramSocket6::GetOutputStream()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return (jio::OutputStream *)_os;
+#endif
 }
 
 int DatagramSocket6::Receive(char *data_, int size_, int time_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 	
-#ifdef _WIN32
-	return DatagramSocket6::Receive(data_, size_);
-#else
 	struct pollfd ufds[1];
 
 	ufds[0].fd = _fd;
@@ -376,52 +325,28 @@ int DatagramSocket6::Receive(char *data_, int size_, int time_)
 			return DatagramSocket6::Receive(data_, size_, true);
 	    }
 	}
-#endif
 
 	return -1;
+#endif
 }
 
 int DatagramSocket6::Receive(char *data_, int size_, bool block_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 	
 	int n,
-		flags,
+		flags = 0,
 		length = sizeof(_server_sock);
 
-	if (block_ == true) {
-		// CHANGE:: call SocketOptionss
-
-#ifdef _WIN32
-		flags = 0;
-#else
-		flags = 0;
-#endif
-	} else {
-#ifdef _WIN32
-		flags = 0;
-#else
+	if (block_ == false) {
 		flags = MSG_DONTWAIT;
-#endif
 	}
 
-#ifdef _WIN32
-	n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_server_sock, &length);
-
-	if (n == SOCKET_ERROR) {
-		if (WSAGetLastError() == WSAETIMEDOUT) {
-			throw SocketTimeoutException("Socket input timeout error");
-		} else {
-			throw jio::IOException("Socket input error");
-		}
-	} else if (n == 0) {
-		Close();
-
-		throw jio::IOException("Broken pipe exception");
-	}
-#else
 	n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_server_sock, (socklen_t *)&length);
 	
 	if (n < 0) {
@@ -440,22 +365,22 @@ int DatagramSocket6::Receive(char *data_, int size_, bool block_)
 
 		throw jio::IOException("Broken pipe exception");
 	}
-#endif
 
 	_receive_bytes += n;
 
 	return n;
+#endif
 }
 
 int DatagramSocket6::Send(const char *data_, int size_, int time_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 	
-#ifdef _WIN32
-	return DatagramSocket6::Send(data_, size_);
-#else
 	struct pollfd ufds[1];
 
 	ufds[0].fd = _fd;
@@ -472,13 +397,16 @@ int DatagramSocket6::Send(const char *data_, int size_, int time_)
 			return DatagramSocket6::Send(data_, size_);
 	    }
 	}
-#endif
 
 	return -1;
+#endif
 }
 
 int DatagramSocket6::Send(const char *data_, int size_, bool block_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -487,11 +415,7 @@ int DatagramSocket6::Send(const char *data_, int size_, bool block_)
 	   	flags = 0;
 
 	if (block_ == false) {
-#ifdef _WIN32
-		flags = 0;
-#else
 		flags = MSG_NOSIGNAL | MSG_DONTWAIT;
-#endif
 	}
 
 	if (_stream == true) {	
@@ -500,15 +424,6 @@ int DatagramSocket6::Send(const char *data_, int size_, bool block_)
 		n = ::sendto(_fd, data_, size_, flags, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 	}
 
-#ifdef _WIN32
-	if (n == SOCKET_ERROR) {
-		if (WSAGetLastError() == WSAECONNABORTED) {
-			throw SocketTimeoutException("Socket output timeout error");
-		} else {
-			throw SocketTimeoutException("Socket output timeout error");
-		}
-	}
-#else
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
@@ -525,58 +440,81 @@ int DatagramSocket6::Send(const char *data_, int size_, bool block_)
 			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
-#endif
 
 	_sent_bytes += n;
 	
 	return n;
+#endif
 }
 
 void DatagramSocket6::Close()
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		return;
 	}
 
-#ifdef _WIN32
-	if (closesocket(_fd) < 0) {
-#else
 	if (close(_fd) != 0) {
-#endif
 		throw SocketException("Unknown close exception");
 	}
 	
 	_is_closed = true;
+#endif
 }
 
 InetAddress * DatagramSocket6::GetInetAddress()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return _address;
+#endif
 }
 
 int DatagramSocket6::GetLocalPort()
 {
+#ifdef _WIN32
+	return 0;
+#else
 	return ntohs(_lsock.sin6_port);
+#endif
 }
 
 int DatagramSocket6::GetPort()
 {
+#ifdef _WIN32
+	return 0;
+#else
 	return ntohs(_server_sock.sin6_port);
+#endif
 }
 
 int64_t DatagramSocket6::GetSentBytes()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return _sent_bytes + _os->GetSentBytes();
+#endif
 }
 
 int64_t DatagramSocket6::GetReadedBytes()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return _receive_bytes + _is->GetReadedBytes();
+#endif
 }
 
 SocketOptions * DatagramSocket6::GetSocketOptions()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return new SocketOptions(_fd, JCT_UDP);
+#endif
 }
 
 std::string DatagramSocket6::what()

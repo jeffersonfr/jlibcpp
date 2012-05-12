@@ -33,7 +33,7 @@
 		printf ("\033[31;40mERRO:: %s:%d [%s] \033[37;40m", __FILE__, __LINE__, __PRETTY_FUNCTION__);	\
 	}																																																\
 	printf(__VA_ARGS__);																																						\
-	fflush(stdout);																																									\
+	fflush(stdin);																																									\
 }
 
 #define JDEBUG_OFF(...) {																																					\

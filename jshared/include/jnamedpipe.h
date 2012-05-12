@@ -40,7 +40,7 @@ class NamedPipe : public virtual jcommon::Object{
 		std::string _name;
 #ifdef _WIN32
 		/** \brief Socket handler. */
-		HANDLE _fd, 
+		HANDLE _fd;
 #else
 		/** \brief */
 		int _fd;

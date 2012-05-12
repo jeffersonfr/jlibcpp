@@ -23,12 +23,14 @@
 
 namespace jsocket {
 
-SSLSocketInputStream::SSLSocketInputStream(Connection *conn_, bool *is_closed_, SSL *ssl, int64_t size_):
+SSLSocketInputStream::SSLSocketInputStream(Connection *conn_, bool *is_closed_, void *ssl, int64_t size_):
 	jio::InputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocketInputStream");
 	
-	_ssl = ssl;
+#ifdef _WIN32
+#else
+	_ssl = (SSL *)ssl;
 	_connection = conn_;
 	_fd = conn_->GetHandler();
 	_is_closed = is_closed_;
@@ -40,44 +42,43 @@ SSLSocketInputStream::SSLSocketInputStream(Connection *conn_, bool *is_closed_, 
 	_blocked = true;
 	
 	try {
-		_buffer = new char[_buffer_length];
+		_buffer = new char[(uint32_t)_buffer_length];
 	} catch (std::bad_alloc &e) {
 		_buffer = NULL;
 
 		_buffer_length = 0;
 		_current_index = 0;
 	}
+#endif
 }
 
 SSLSocketInputStream::~SSLSocketInputStream()
 {
+#ifdef _WIN32
+#else
 	if (_buffer != NULL) {
 		delete [] _buffer;
 	}
+#endif
 }
 
 int64_t SSLSocketInputStream::Read()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	if ((*_is_closed) == true) {
 		throw SocketException("Connection closed exception");
 	}
 	
-	int d = _end_index - _current_index;
+	int d = (int)(_end_index - _current_index);
 
 	if (d == 0) {
 		int n;
 
-#ifdef _WIN32
-		n = ::recv(_fd, _buffer, _buffer_length, flags);
-#else
 		n = SSL_read(_ssl, _buffer, _buffer_length);
-#endif
 		
-#ifdef _WIN32
-		if (n == SOCKET_ERROR || n == 0) {
-#else 
 		if (n <= 0) {
-#endif
 			return -1LL;
 		}
 			
@@ -95,10 +96,14 @@ int64_t SSLSocketInputStream::Read()
 	}
 	
 	return (int64_t)c;
+#endif
 }
 
 int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	if ((*_is_closed) == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -113,17 +118,9 @@ int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 	if (d == 0LL) {
 		int n;
 
-#ifdef _WIN32
-		n = ::recv(_fd, _buffer, _buffer_length, flags);
-#else 
 		n = SSL_read(_ssl, data_, _buffer_length);
-#endif
 		
-#ifdef _WIN32
-		if (n == SOCKET_ERROR) {
-#else 
 		if (n <= 0) {
-#endif
 			return -1LL;
 		}
 			
@@ -135,11 +132,11 @@ int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 	}
 	
 	if (data_length_ <= d) {
-		memcpy(data_, (_buffer + _current_index), data_length_);
+		memcpy(data_, (_buffer + _current_index), (size_t)data_length_);
 		_current_index += data_length_;
 		r = data_length_;
 	} else {
-		memcpy(data_, (_buffer + _current_index), d);
+		memcpy(data_, (_buffer + _current_index), (size_t)d);
 		_current_index += d;
 		r = d;
 	}
@@ -149,31 +146,50 @@ int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 	}
 
 	return (int64_t)r;
+#endif
 }
 
 bool SSLSocketInputStream::IsEmpty()
 {
+#ifdef _WIN32
+	return false;
+#else
 	return (_current_index == _end_index);
+#endif
 }
 
 int64_t SSLSocketInputStream::Available()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return (int64_t)_current_index;
+#endif
 }
 
 int64_t SSLSocketInputStream::GetReadedBytes()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return (int64_t)_receive_bytes;
+#endif
 }
 
 void SSLSocketInputStream::Close()
 {
+#ifdef _WIN32
+#else
 	_connection->Close();
+#endif
 }
 
 void SSLSocketInputStream::Reset()
 {
+#ifdef _WIN32
+#else
 	_current_index = _end_index = 0;
+#endif
 }
 
 int64_t SSLSocketInputStream::GetSize()

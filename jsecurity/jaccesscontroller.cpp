@@ -18,39 +18,42 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jsecuritylib.h"
+#include "jaccesscontroller.h"
 
 namespace jsecurity {
 
-AccessController::AccessController()
+AccessControl::AccessControl()
 {
 }
 
-AccessController::~AccessController()
+AccessControl::~AccessControl()
 {
 }
 
-User * AccessController::GetUser()
+User * AccessControl::GetUser()
+{
+	return NULL;
+}
+
+Group * AccessControl::GetGroup()
+{
+	return NULL;
+}
+
+User * AccessControl::GetOther()
+{
+	return NULL;
+}
+
+void AccessControl::SetUser(User *id)
 {
 }
 
-Group * AccessController::GetGroup()
+void AccessControl::SetGroup(Group *id)
 {
 }
 
-User * AccessController::GetOther()
-{
-}
-
-void AccessController::SetUser(User *id)
-{
-}
-
-void AccessController::SetGroup(Group *id)
-{
-}
-
-void AccessController::SetOther(User *id)
+void AccessControl::SetOther(User *id)
 {
 }
 

@@ -30,6 +30,8 @@ SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddre
 {
 	jcommon::Object::SetClassName("jsocket::SSLServerSocket");
 
+#ifdef _WIN32
+#else
 	_local = NULL;
 	_is_closed = true;
 
@@ -59,11 +61,7 @@ SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddre
 	} else {
 		ListenSocket(backlog_);
 		
-#ifdef _WIN32
-		int len;
-#else
 		socklen_t len;
-#endif
 
 		len = sizeof(_lsock);
 
@@ -71,18 +69,22 @@ SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddre
 			throw jio::IOException("ServerSocket constructor exception");
 		}
 	}
+#endif
 }
 
 SSLServerSocket::~SSLServerSocket()
 {
+#ifdef _WIN32
+#else
 	try {
-  	Close();
+	  	Close();
 	} catch (...) {
 	}
 
 	if (_local) {
 		delete _local;
 	}
+#endif
 }
 
 /** Private */
@@ -90,18 +92,19 @@ SSLServerSocket::~SSLServerSocket()
 void SSLServerSocket::CreateSocket()
 {
 #ifdef _WIN32
-	{
 #else
 	if ((_fd = ::socket(PF_INET, SOCK_STREAM, 0)) < 0) {
-#endif
 		throw SocketException("ServerSocket handling error");
 	}
 
 	_is_closed = false;
+#endif
 }
 
 void SSLServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 {
+#ifdef _WIN32
+#else
 	int opt = 1;
     
 	memset(&_lsock, 0, sizeof(_lsock));
@@ -121,22 +124,22 @@ void SSLServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 
 	_lsock.sin_port = htons(local_port_);
 
-#ifdef _WIN32
-	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
-#else
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
-#endif
     
 	if (::bind(_fd, (struct sockaddr *) &_lsock, sizeof(_lsock)) < 0) {
 		throw SocketException("ServerBinding error");
 	}
+#endif
 }
 
 void SSLServerSocket::ListenSocket(int backlog_)
 {
+#ifdef _WIN32
+#else
 	if (::listen(_fd, backlog_) < 0) {
 		throw SocketException("ServerListen error");
 	}
+#endif
 }
 
 /** End */
@@ -144,12 +147,10 @@ void SSLServerSocket::ListenSocket(int backlog_)
 SSLSocket * SSLServerSocket::Accept()
 {
 #ifdef _WIN32
-	int sock_size;
-	int handler;
-#else 
+	return NULL;
+#else
 	socklen_t sock_size;
 	int handler;
-#endif
 	
 	sock_size = sizeof(_rsock);
 
@@ -176,39 +177,49 @@ SSLSocket * SSLServerSocket::Accept()
 	}
 
 	return s;
+#endif
 }
 
 InetAddress * SSLServerSocket::GetInetAddress()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return _local;
+#endif
 }
 
 int SSLServerSocket::GetLocalPort()
 {
+#ifdef _WIN32
+	return 0;
+#else
 	return ntohs(_lsock.sin_port);
+#endif
 }
 
 void SSLServerSocket::Close()
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		return;
 	}
 
-#ifdef _WIN32
-	if (closesocket(_fd) < 0) {
-#else
 	SSL_shutdown(ssl);
 	SSL_free(ssl);
 	SSL_CTX_free(ctx);
 
 	if (close(_fd) != 0) {
-#endif
 		throw SocketException("Unknow close exception");
 	}
 
 	_is_closed = true;
+#endif
 }
 
+#ifdef _WIN32
+#else
 bool SSLServerSocket::CheckContext()
 {
 	if (ctx == NULL) {
@@ -467,6 +478,7 @@ bool SSLServerSocket::UseDHFile(const char *dh_file)
 
 	return true;
 }
+#endif
 
 bool SSLServerSocket::IsClosed()
 {

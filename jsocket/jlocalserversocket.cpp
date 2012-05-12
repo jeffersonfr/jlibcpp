@@ -81,9 +81,12 @@ void LocalServerSocket::BindSocket()
 
 void LocalServerSocket::ListenSocket(int backlog_)
 {
+#ifdef _WIN32
+#else
 	if (::listen(_fd, backlog_) < 0) {
 		throw SocketException("ServerListen error");
 	}
+#endif
 }
 
 /** End */

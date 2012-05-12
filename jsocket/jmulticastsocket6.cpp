@@ -67,26 +67,23 @@ MulticastSocket6::~MulticastSocket6()
 void MulticastSocket6::CreateSocket()
 {
 #ifdef _WIN32
-	if ((_fds = ::socket(PF_INET6, SOCK_DGRAM, IPPROTO_IPV6)) == INVALID_SOCKET) { // IPPROTO_MTP
 #else
 	if ((_fds = ::socket(PF_INET6, SOCK_DGRAM, IPPROTO_IPV6)) < 0) { // IPPROTO_MTP
-#endif
 		throw SocketException("Socket create::sender exception");
 	}
 
-#ifdef _WIN32
-	if ((_fdr = ::socket(PF_INET6, SOCK_DGRAM, IPPROTO_IPV6)) == INVALID_SOCKET) { // IPPROTO_MTP
-#else
 	if ((_fdr = ::socket(PF_INET6, SOCK_DGRAM, IPPROTO_IPV6)) < 0) { // IPPROTO_MTP
-#endif
 		throw SocketException("Socket create::receiver exception");
 	}
 
 	_is_closed = false;
+#endif
 }
 
 void MulticastSocket6::ConnectSocket(InetAddress *addr_, int port_)
 {
+#ifdef _WIN32
+#else
 	// Receive
 	memset(&_sock_r, 0, sizeof(_sock_r));
 
@@ -109,19 +106,26 @@ void MulticastSocket6::ConnectSocket(InetAddress *addr_, int port_)
 	_sock_s.sin6_flowinfo = 0;
 	_sock_s.sin6_scope_id = 0;
 	_sock_s.sin6_addr = in6addr_any;
+#endif
 }
 
 void MulticastSocket6::BindSocket(InetAddress *addr_, int local_port_)
 {
+#ifdef _WIN32
+#else
 	if (bind(_fdr, (struct sockaddr *)&_sock_r, sizeof(_sock_r)) < 0) {
 		throw SocketException("Binding error");
 	}
+#endif
 }
 
 void MulticastSocket6::InitStream(int rbuf_, int wbuf_)
 {
+#ifdef _WIN32
+#else
 	_is = new SocketInputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_sock_r, rbuf_);
 	_os = new SocketOutputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_sock_s, wbuf_);
+#endif
 }
 
 /** End */
@@ -143,13 +147,13 @@ jio::OutputStream * MulticastSocket6::GetOutputStream()
 
 int MulticastSocket6::Receive(char *data_, int size_, int time_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 	
-#ifdef _WIN32
-	return MulticastSocket6::Receive(data_, size_);
-#else
 	struct pollfd ufds[1];
 
 	ufds[0].fd = _fdr;
@@ -166,13 +170,16 @@ int MulticastSocket6::Receive(char *data_, int size_, int time_)
 			return MulticastSocket6::Receive(data_, size_);
 		}
 	}
-#endif
 
 	return -1;
+#endif
 }
 
 int MulticastSocket6::Receive(char *data_, int size_, bool block_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -182,19 +189,10 @@ int MulticastSocket6::Receive(char *data_, int size_, bool block_)
 			length = sizeof(_sock_r);
 
 	if (block_ == false) {
-#ifdef _WIN32
-		flags = 0;
-#else
 		flags = MSG_DONTWAIT;
-#endif
 	}
 
-
-#ifdef _WIN32
-	n = ::recvfrom(_fdr, data_, size_, flags, (struct sockaddr *)&_sock_r, &length);
-#else
 	n = ::recvfrom(_fdr, data_, size_, flags, (struct sockaddr *)&_sock_r, (socklen_t *)&length);
-#endif
 	
 	if (n < 0) {
 		if (errno == EAGAIN) {
@@ -216,17 +214,18 @@ int MulticastSocket6::Receive(char *data_, int size_, bool block_)
 	_receive_bytes += n;
 
 	return n;
+#endif
 }
 
 int MulticastSocket6::Send(const char *data, int size, int time_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 
-#ifdef _WIN32
-	return MulticastSocket6::Send(data, size);
-#else
 	struct pollfd ufds[1];
 
 	ufds[0].fd = _fds;
@@ -243,13 +242,16 @@ int MulticastSocket6::Send(const char *data, int size, int time_)
 			return MulticastSocket6::Send(data, size);
 		}
 	}
-#endif
 
 	return -1;
+#endif
 }
 
 int MulticastSocket6::Send(const char *data, int size, bool block_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -257,26 +259,13 @@ int MulticastSocket6::Send(const char *data, int size, bool block_)
 	int flags;
 
 	if (block_ == true) {
-#ifdef _WIN32
-		flags = 0;
-#else
 		flags = MSG_NOSIGNAL;
-#endif
 	} else {
-#ifdef _WIN32
-		flags = 0;
-#else
 		flags = MSG_NOSIGNAL | MSG_DONTWAIT;
-#endif
 	}
 
 	int n = ::sendto(_fds, data, size, flags, (struct sockaddr *)&_sock_s, sizeof(_sock_s));
 
-#ifdef _WIN32
-	if (n == SOCKET_ERROR) {
-		throw SocketException("Send udp data error");
-	}
-#else
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
@@ -293,15 +282,17 @@ int MulticastSocket6::Send(const char *data, int size, bool block_)
 			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
-#endif
 
 	_sent_bytes += n;
 	
 	return n;
+#endif
 }
 
 void MulticastSocket6::Join(std::string group_)
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -311,19 +302,18 @@ void MulticastSocket6::Join(std::string group_)
 	imr.imr_multiaddr.s_addr = inet_addr(group_.c_str());
 	imr.imr_interface.s_addr = htonl(INADDR_ANY);
 
-#ifdef _WIN32
-	if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_JOIN_GROUP, (const char *)&imr, sizeof(imr)) < 0) {
-#else
 	if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_JOIN_GROUP, &imr, sizeof(imr)) < 0) {
-#endif
 		throw SocketException("MulticastSocket join exception");
 	}
 
 	_groups.push_back(group_);
+#endif
 }
 
 void MulticastSocket6::Join(InetAddress *group_)
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -333,19 +323,18 @@ void MulticastSocket6::Join(InetAddress *group_)
 	imr.imr_multiaddr.s_addr = inet_addr(group_->GetHostAddress().c_str());
 	imr.imr_interface.s_addr = htonl(INADDR_ANY);
 
-#ifdef _WIN32
-	if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_JOIN_GROUP, (const char *)&imr, sizeof(imr)) < 0) {
-#else
 	if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_JOIN_GROUP, &imr, sizeof(imr)) < 0) {
-#endif
 		throw SocketException("MulticastSocket join exception");
 	}
 
 	_groups.push_back(group_->GetHostAddress());
+#endif
 }
 
 void MulticastSocket6::Leave(std::string group_)
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -357,11 +346,7 @@ void MulticastSocket6::Leave(std::string group_)
 			imr.imr_multiaddr.s_addr = inet_addr(group_.c_str());
 			imr.imr_interface.s_addr = htonl(INADDR_ANY);
 
-#ifdef _WIN32
-			if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_LEAVE_GROUP, (const char *)&imr, sizeof(imr)) < 0) {
-#else
 			if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &imr, sizeof(imr)) < 0) {
-#endif
 				throw SocketException("MulticastSocket leave exception");
 			}
 
@@ -370,10 +355,13 @@ void MulticastSocket6::Leave(std::string group_)
 			break;
 		}
 	}
+#endif
 }
 
 void MulticastSocket6::Leave(InetAddress *group_)
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -386,11 +374,7 @@ void MulticastSocket6::Leave(InetAddress *group_)
 			imr.imr_multiaddr.s_addr = inet_addr(s.c_str());
 			imr.imr_interface.s_addr = htonl(INADDR_ANY);
 
-#ifdef _WIN32
-			if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_LEAVE_GROUP, (const char *)&imr, sizeof(imr)) < 0) {
-#else
 			if (setsockopt(_fdr, IPPROTO_IPV6, IPV6_LEAVE_GROUP, &imr, sizeof(imr)) < 0) {
-#endif
 				throw SocketException("MulticastSocket leave exception");
 			}
 
@@ -399,6 +383,7 @@ void MulticastSocket6::Leave(InetAddress *group_)
 			break;
 		}
 	}
+#endif
 }
 
 std::vector<std::string> & MulticastSocket6::GetGroupList()
@@ -408,25 +393,19 @@ std::vector<std::string> & MulticastSocket6::GetGroupList()
 
 void MulticastSocket6::Close()
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		return;
 	}
 
 	bool flag = false;
 
-#ifdef _WIN32
-	if (closesocket(_fdr) < 0) {
-#else
 	if (close(_fdr) != 0) {
-#endif
 		flag = true;
 	}
 	
-#ifdef _WIN32
-	if (closesocket(_fds) < 0) {
-#else
 	if (close(_fds) != 0) {
-#endif
 		flag = true;
 	}
 	
@@ -435,21 +414,34 @@ void MulticastSocket6::Close()
 	}
 
 	_is_closed = true;
+#endif
 }
 
 int MulticastSocket6::GetLocalPort()
 {
+#ifdef _WIN32
+	return 0;
+#else
 	return ntohs(_sock_r.sin6_port);
+#endif
 }
 
 int64_t MulticastSocket6::GetSentBytes()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return _sent_bytes + _os->GetSentBytes();
+#endif
 }
 
 int64_t MulticastSocket6::GetReadedBytes()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return _receive_bytes + _is->GetReadedBytes();
+#endif
 }
 
 void MulticastSocket6::SetMulticastTTL(char ttl_)
@@ -464,12 +456,20 @@ void MulticastSocket6::SetMulticastTTL(char ttl_)
 
 SocketOptions * MulticastSocket6::GetSocketOptions()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return new SocketOptions(_fdr, JCT_MCAST);
+#endif
 }
 
 SocketOptions * MulticastSocket6::GetSocketOptionsExtension()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return new SocketOptions(_fds, JCT_MCAST);
+#endif
 }
 
 }

@@ -191,7 +191,7 @@ int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 		while (*rindex == _write_index) {
 			try {
 				_semaphore.Wait(&_mutex);
-			} catch (jthread::SemaphoreException &e) {
+			} catch (jthread::SemaphoreException &) {
 				// WARN:: return -1; ?
 			}
 		}
@@ -250,7 +250,7 @@ int IndexedBuffer::Read(uint8_t *data, int size, int *rindex, int *pindex)
 		while (*rindex == _write_index) {
 			try {
 				_semaphore.Wait(&_mutex);
-			} catch (jthread::SemaphoreException &e) {
+			} catch (jthread::SemaphoreException &) {
 				// WARN:: return -1; ?
 			}
 		}

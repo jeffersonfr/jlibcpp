@@ -25,7 +25,8 @@
 #include <string>
 
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
+#include <WinBase.h>
 #else
 #include <pthread.h>
 #include <semaphore.h>

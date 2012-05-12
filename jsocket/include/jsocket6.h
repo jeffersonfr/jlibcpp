@@ -59,10 +59,6 @@ class Socket6 : public jsocket::Connection{
 		/** \brief */
 		SocketOutputStream *_os;
 		/** \brief */
-		struct sockaddr_in6 _lsock;
-		/** \brief */
-		struct sockaddr_in6 _server_sock;
-		/** \brief */
 		InetAddress *_address;
 		/** \brief Bytes sent. */
 		int64_t _sent_bytes;
@@ -70,6 +66,13 @@ class Socket6 : public jsocket::Connection{
 		int64_t _receive_bytes;
 		/** \brief */
 		int _timeout;
+#ifdef _WIN32
+#else
+		/** \brief */
+		struct sockaddr_in6 _lsock;
+		/** \brief */
+		struct sockaddr_in6 _server_sock;
+#endif
 
 		/**
 		 * \brief Create a new socket.

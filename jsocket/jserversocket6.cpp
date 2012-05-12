@@ -32,7 +32,9 @@ ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress *addr_):
 {
 	jcommon::Object::SetClassName("jsocket::ServerSocket6");
 	
-  _local = NULL;
+#ifdef _WIN32
+#else
+	_local = NULL;
 	_is_closed = true;
 
 	CreateSocket();
@@ -41,24 +43,21 @@ ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress *addr_):
 		BindSocket(addr_, port_);
 		ListenSocket(backlog_);
 	} else {
+		socklen_t len = sizeof(_lsock);
+		
 		ListenSocket(backlog_);
 
-#ifdef _WIN32
-		int len;
-#else
-		socklen_t len;
-#endif
-		
-		len = sizeof(_lsock);
-		
 		if(getsockname(_fd, (struct sockaddr *)&_lsock, &len) < 0) {
 			throw jio::IOException("ServerSocket constructor exception");
 		}
 	}
+#endif
 }
 
 ServerSocket6::~ServerSocket6()
 {
+#ifdef _WIN32
+#else
 	try {
 		Close();
 	} catch (...) {
@@ -67,6 +66,7 @@ ServerSocket6::~ServerSocket6()
 	if (_local != NULL) {
 		delete _local;
 	}
+#endif
 }
 
 /** Private */
@@ -74,18 +74,19 @@ ServerSocket6::~ServerSocket6()
 void ServerSocket6::CreateSocket()
 {
 #ifdef _WIN32
-	if ((_fd = socket(PF_INET6, SOCK_STREAM, 0)) == INVALID_SOCKET) {
 #else
 	if ((_fd = ::socket(PF_INET6, SOCK_STREAM, 0)) < 0) {
-#endif
 		throw SocketException("ServerSocket Creation exception");
 	}
 
 	_is_closed = false;
+#endif
 }
 
 void ServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
+#ifdef _WIN32
+#else
 	bool opt = 1;
     
 	memset(&_lsock, 0, sizeof(_lsock));
@@ -106,22 +107,22 @@ void ServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 
 	_lsock.sin6_port = htons(local_port_);
 
-#ifdef _WIN32
-	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
-#else
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
-#endif
     
 	if (::bind(_fd, (struct sockaddr *) &_lsock, sizeof(_lsock)) < 0) {
 		throw SocketException("ServerBinding error");
 	}
+#endif
 }
 
 void ServerSocket6::ListenSocket(int backlog_)
 {
+#ifdef _WIN32
+#else
 	if (::listen(_fd, backlog_) < 0) {
 		throw SocketException("ServerListen error");
 	}
+#endif
 }
 
 /** End */
@@ -129,12 +130,10 @@ void ServerSocket6::ListenSocket(int backlog_)
 Socket6 * ServerSocket6::Accept()
 {
 #ifdef _WIN32
-	int sock_size;
-	int handler;
-#else 
+	return NULL;
+#else
 	socklen_t sock_size;
 	int handler;
-#endif
 	
 	sock_size = sizeof(_rsock);
 
@@ -144,9 +143,8 @@ Socket6 * ServerSocket6::Accept()
 		throw SocketException("Socket accept exception");
 	}
 
-	Socket6 *s = new Socket6(handler, _rsock);
-    
-	return s;
+	return new Socket6(handler, _rsock);
+#endif
 }
 
 InetAddress * ServerSocket6::GetInetAddress()
@@ -156,24 +154,27 @@ InetAddress * ServerSocket6::GetInetAddress()
 
 int ServerSocket6::GetLocalPort()
 {
+#ifdef _WIN32
+	return 0;
+#else
 	return ntohs(_lsock.sin6_port);
+#endif
 }
 
 void ServerSocket6::Close()
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		return;
 	}
 
-#ifdef _WIN32
-	if (closesocket(_fd) < 0) {
-#else
 	if (close(_fd) != 0) {
-#endif
 		throw SocketException("Unknow Close exception");
 	}
 
 	_is_closed = true;
+#endif
 }
 
 bool ServerSocket6::IsClosed()

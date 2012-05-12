@@ -54,8 +54,11 @@ class InetAddress6 : public InetAddress{
 	private:
 		/** \brief Host name. */
 		std::string _host;
+#ifdef _WIN32
+#else
 		/** \brief Host ip. */
 		struct in6_addr _ip;
+#endif
 
 		/**
 		 * \brief Constructor private.
@@ -107,10 +110,6 @@ class InetAddress6 : public InetAddress{
 		virtual std::vector<uint32_t> GetAddress();
 
 };
-
-#ifdef _WIN32
-std::string Win32HostAddress(struct sockaddr_in6 *in, int sockaddr_length)
-#endif
 
 }
 

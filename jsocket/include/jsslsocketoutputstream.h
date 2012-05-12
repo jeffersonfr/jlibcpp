@@ -50,6 +50,8 @@ namespace jsocket {
 class SSLSocketOutputStream : public jio::OutputStream{
 
     private:
+#ifdef _WIN32
+#else
 			/** \brief */
 			jsocket_t _fd;
 			/** \brief */
@@ -68,13 +70,14 @@ class SSLSocketOutputStream : public jio::OutputStream{
 			bool *_is_closed;
 			/** \brief */
 			SSL *_ssl;
+#endif
 
 		public:
 			/**
 			 * \brief Construtor.
 			 *
 			 */
-			SSLSocketOutputStream(Connection *conn_, bool *is_closed, SSL *ssl, int64_t size_ = 4096LL);
+			SSLSocketOutputStream(Connection *conn_, bool *is_closed, void *ssl, int64_t size_ = 4096LL);
 
 			/**
 			 * \brief Destrutor virtual.

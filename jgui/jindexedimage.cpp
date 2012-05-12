@@ -24,6 +24,8 @@
 #include "jruntimeexception.h"
 #include "jnullgraphics.h"
 
+#include <math.h>
+
 namespace jgui {
 
 IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int width, int height):

@@ -67,7 +67,7 @@ int64_t ProcessOutputStream::Write(const char *data, int64_t size)
 #ifdef _WIN32
 	DWORD n;
 	
-	if (WriteFile(_fd, data, size, &n, NULL) == TRUE) {
+	if (WriteFile(_fd, data, (DWORD)size, &n, NULL) == TRUE) {
 		return (int64_t)n;
 	}
 

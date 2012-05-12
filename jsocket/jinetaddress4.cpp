@@ -97,10 +97,10 @@ InetAddress * InetAddress4::GetLocalHost()
 	
 	try {
 		return GetByName(localName);
-	} catch (UnknownHostException &e) {
+	} catch (UnknownHostException &) {
 		try {
 			return GetByName("127.0.0.1");
-		} catch (UnknownHostException &e2) {
+		} catch (UnknownHostException &e) {
 			throw e;
 		}
 	}

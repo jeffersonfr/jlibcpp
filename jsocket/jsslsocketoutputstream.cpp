@@ -23,12 +23,14 @@
 
 namespace jsocket {
 
-SSLSocketOutputStream::SSLSocketOutputStream(Connection *conn_, bool *is_closed_, SSL *ssl, int64_t size_):
+SSLSocketOutputStream::SSLSocketOutputStream(Connection *conn_, bool *is_closed_, void *ssl, int64_t size_):
 	jio::OutputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocketOutputStream");
 	
-	_ssl = ssl;
+#ifdef _WIN32
+#else
+	_ssl = (SSL *)ssl;
 	_connection = conn_;
 	_fd = conn_->GetHandler();
 	_is_closed = is_closed_;
@@ -39,20 +41,24 @@ SSLSocketOutputStream::SSLSocketOutputStream(Connection *conn_, bool *is_closed_
 	_blocked = true;
 	
 	try {
-		_buffer = new char[_buffer_length];
+		_buffer = new char[(uint32_t)_buffer_length];
 	} catch (std::bad_alloc &e) {
 		_buffer = NULL;
 
 		_buffer_length = 0;
 		_current_index = 0;
 	}
+#endif
 }
 
 SSLSocketOutputStream::~SSLSocketOutputStream()
 {
+#ifdef _WIN32
+#else
 	if (_buffer != NULL) {
 		delete [] _buffer;
 	}
+#endif
 }
 
 int64_t SSLSocketOutputStream::Available()
@@ -62,29 +68,35 @@ int64_t SSLSocketOutputStream::Available()
 
 int64_t SSLSocketOutputStream::Write(int64_t c_)
 {
-	_buffer[_current_index++] = c_;
+#ifdef _WIN32
+#else
+	_buffer[_current_index++] = (char)c_;
 
 	if (_current_index == _buffer_length) {
 		return Flush();
 	}
+#endif
 
 	return 0;
 }
 
 int64_t SSLSocketOutputStream::Write(const char *data_, int64_t data_length_)
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	int64_t l = data_length_, size; 
 	
 	while (l > 0LL) {
 		size = (_buffer_length - _current_index);
 		
 		if (l < size) {
-			memcpy((_buffer + _current_index), (data_ + data_length_ - l), l);
+			memcpy((_buffer + _current_index), (data_ + data_length_ - l), (size_t)l);
 			_current_index += l;
 			
 			break;
 		} else {
-			memcpy((_buffer + _current_index), (data_ + data_length_ - l), size);
+			memcpy((_buffer + _current_index), (data_ + data_length_ - l), (size_t)size);
 
 			l = l - size;
 			_current_index = _buffer_length;
@@ -96,25 +108,41 @@ int64_t SSLSocketOutputStream::Write(const char *data_, int64_t data_length_)
 	}
 
 	return (int64_t)(data_length_ - l);
+#endif
 }
 
 bool SSLSocketOutputStream::IsEmpty()
 {
+#ifdef _WIN32
+	return false;
+#else
 	return (_current_index == 0);
+#endif
 }
 
 int64_t SSLSocketOutputStream::GetAvailable()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return _current_index;
+#endif
 }
 
 int64_t SSLSocketOutputStream::GetSentBytes()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return _sent_bytes;
+#endif
 }
 
 int64_t SSLSocketOutputStream::Flush()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	if ((*_is_closed) == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -125,25 +153,18 @@ int64_t SSLSocketOutputStream::Flush()
 
 	int n;
 
-#ifdef _WIN32
-	n = ::send(_fd, _buffer, _current_index, flags);
-#else
 	n = SSL_write(_ssl, _buffer, _current_index);
-#endif
 
 	_current_index = 0;
 
-#ifdef _WIN32
-	if (n == SOCKET_ERROR) {
-#else
 	if (n < 0) {
-#endif
 		return -1LL;
 	}
 
 	_sent_bytes += n;
 
 	return (int64_t)n;
+#endif
 }
 
 int64_t SSLSocketOutputStream::GetSize()
@@ -158,7 +179,10 @@ void SSLSocketOutputStream::Seek(int64_t index)
 
 void SSLSocketOutputStream::Close()
 {
+#ifdef _WIN32
+#else
 	_connection->Close();
+#endif
 }
 
 }

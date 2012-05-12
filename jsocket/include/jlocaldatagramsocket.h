@@ -47,14 +47,15 @@ class LocalDatagramSocket : public jsocket::Connection{
 		/** \brief Socket handler. */
 #ifdef _WIN32
 #else
-		int _fd;
-#endif
 		/** \brief */
 		struct sockaddr_un _server;
 		/** \brief */
 		struct sockaddr_un _client;
 		/** \brief */
 		struct sockaddr_un _from;
+		/** \brief */
+		int _fd;
+#endif
 		/** \brief Input stream. */
 		SocketInputStream *_is;
 		/** \brief Output stream. */

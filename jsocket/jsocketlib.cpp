@@ -22,8 +22,9 @@
 #include "jsocketexception.h"
 
 #ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
+#include <windows.h>
+#include <winsock.h>
+//#include <ws2tcpip.h>
 #include <stdio.h>
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -52,16 +53,14 @@ std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::st
 {
 	std::vector<struct jaddress_info_t> address_info;
 
+#ifdef _WIN32
+#else
 	struct addrinfo *result = NULL;
 	struct addrinfo *ptr = NULL;
 	struct addrinfo hints;
 
 	// Setup the hints address info structure which is passed to the getaddrinfo() function
-#ifdef _WIN32
-	ZeroMemory(&hints, sizeof(hints));
-#else
 	bzero(&hints, sizeof(hints));
-#endif
 
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -94,26 +93,13 @@ std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::st
 				info.address = std::string(inet_ntoa(sockaddr_ipv4->sin_addr));
 				break;
 			case AF_INET6:
-#ifdef _WIN32
-				struct sockaddr_in6 *in = (struct sockaddr_in6 *)ptr->ai_addr;
-
-				info.family = JAF_INET6;
-				
-				info.address = Win32HostAddress(in, ptr->ai_addrlen);
-#else
 				struct sockaddr_in6 *sockaddr_ipv6;
 				char ipstringbuffer[255];
 
 				info.family = JAF_INET6;
 				sockaddr_ipv6 = (struct sockaddr_in6 *) ptr->ai_addr;
 				info.address = std::string(inet_ntop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255));
-#endif
 				break;
-#ifdef _WIN32
-			case AF_NETBIOS:
-				info.family = JAF_NETBIOS;
-				break;
-#endif
 			default:
 				info.family = JAF_UNKNOWN;
 				break;
@@ -164,6 +150,7 @@ std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::st
 	}
 
 	freeaddrinfo(result);
+#endif
 
 	return address_info;
 }

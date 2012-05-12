@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_FILEACCESSCONTROLLER_H
-#define J_FILEACCESSCONTROLLER_H
+#ifndef J_FILEACCESSCONTROL_H
+#define J_FILEACCESSCONTROL_H
 
 #include "jaccesscontroller.h"
 
@@ -29,7 +29,7 @@ namespace jsecurity {
  * 
  * \author Jeff Ferr
  */
-class FileAccessController : public AccessController{
+class FileAccessControl : public AccessControl{
 
 	private:
 
@@ -39,13 +39,13 @@ class FileAccessController : public AccessController{
 		 * \brief
 		 * 
 		 */
-		FileAccessController();
+		FileAccessControl();
 		
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual ~FileAccessController();
+		virtual ~FileAccessControl();
 
 };
 

@@ -196,7 +196,7 @@ jio::InputStream * Process::GetErrorStream()
 void Process::WaitProcess()
 {
 #ifdef _WIN32
-	 if (WaitForSingleObject(hProcess, INFINITE) == WAIT_FAILED) {
+	 if (WaitForSingleObject(_pid, INFINITE) == WAIT_FAILED) {
 		 throw ProcessException("Waiting process failed");
 	 }
 #else
@@ -268,14 +268,12 @@ void Process::Start()
 	CloseHandle(hInputRead);
 	CloseHandle(hOutputWrite);
 	if(h) {
-		hProcess = pi.hProcess;
+		_pid = pi.hProcess;
 		CloseHandle(pi.hThread);
 	}	else {
+		// throw Exc(NFormat("Error running process: %s\nCommand: %s", GetErrorMessage(GetLastError()), command));
 		Free();
-		return false;
-		//		throw Exc(NFormat("Error running process: %s\nCommand: %s", GetErrorMessage(GetLastError()), command));
 	}
-	return true;
 #else
 	jcommon::StringTokenizer tokens(_process, " ", jcommon::JTT_STRING, false);
 

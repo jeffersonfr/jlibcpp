@@ -50,12 +50,15 @@ class DatagramSocket6 : public jsocket::Connection{
 		/** \brief Use to bind the socket in a free port. */
 		static int _used_port;
 
-		/** \brief Socket handler. */
-		jsocket_t _fd;
+#ifdef _WIN32
+#else
 		/** \brief Local socket. */
 		struct sockaddr_in6 _lsock;
 		/** \brief Server socket UDP. */
 		struct sockaddr_in6 _server_sock;
+#endif
+		/** \brief Socket handler. */
+		jsocket_t _fd;
 		/** \brief Local inetaddress. */
 		InetAddress6 *_local;
 		/** \brief Remote inetaddress. */

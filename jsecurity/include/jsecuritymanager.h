@@ -89,7 +89,7 @@ class SecurityManager{
 		 * \brief
 		 * 
 		 */
-		AccessController * GetDefaultAccessController();
+		AccessControl * GetDefaultAccessControl();
 
 		/**
 		 * \brief

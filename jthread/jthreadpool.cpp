@@ -95,7 +95,7 @@ void WorkerThread::Run()
 			_is_locked = false;
 
 			_group->ReleaseWorkerThread(this);
-		} catch (SemaphoreException &e) {
+		} catch (SemaphoreException &) {
 			if (_is_locked == true) {
 				_is_locked = false;
 

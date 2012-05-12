@@ -244,7 +244,7 @@ void ConnectionPipe::main_pipe_receiver()
 		length = 0,
 		size_buffer = _size_pipe;
 	HANDLE pipe = _pipe[0];
-	char *c,
+	char // *c,
 		 *buffer = new char[size_buffer];
 
 	_current_send = 0;

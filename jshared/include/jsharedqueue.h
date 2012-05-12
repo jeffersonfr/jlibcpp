@@ -24,9 +24,13 @@
 
 #include <iostream>
 
-#include <sys/ipc.h>
-#include <sys/shm.h>
 #include <stdint.h>
+
+#ifdef _WIN32
+#else
+#include <sys/shm.h>
+#include <sys/ipc.h>
+#endif
 
 namespace jshared {
 

@@ -142,6 +142,8 @@ Socket6::Socket6(jsocket_t handler_, struct sockaddr_in6 server_, int timeout_, 
 {
 	jcommon::Object::SetClassName("jsocket::Socket");
 
+#ifdef _WIN32
+#else
 	char straddr[INET6_ADDRSTRLEN];
 
 	_lsock.sin6_family = AF_INET6;
@@ -156,6 +158,7 @@ Socket6::Socket6(jsocket_t handler_, struct sockaddr_in6 server_, int timeout_, 
 	_address = InetAddress6::GetByName(std::string(inet_ntop(AF_INET6, &(_lsock.sin6_addr), straddr, sizeof(straddr))));
 
 	InitStreams(rbuf_, wbuf_);
+#endif
 
 	_is_closed = false;
 }
@@ -163,18 +166,19 @@ Socket6::Socket6(jsocket_t handler_, struct sockaddr_in6 server_, int timeout_, 
 void Socket6::CreateSocket()
 {
 #ifdef _WIN32
-	if ((_fd = socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP)) == INVALID_SOCKET) {
 #else
 	if ((_fd = ::socket(PF_INET6, SOCK_STREAM, IPPROTO_TCP)) < 0) {
-#endif
 		throw SocketException("Socket handling error");
 	}
 
 	_is_closed = false;
+#endif
 }
 
 void Socket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
+#ifdef _WIN32
+#else
 	memset(&_lsock, 0, sizeof(_lsock));
 
 	_lsock.sin6_family = AF_INET6;
@@ -192,10 +196,13 @@ void Socket6::BindSocket(InetAddress *local_addr_, int local_port_)
 	if (bind(_fd, (struct sockaddr *)&_lsock, sizeof(_lsock)) < 0) {
 		throw SocketException("Binding error");
 	}
+#endif
 }
 
 void Socket6::ConnectSocket(InetAddress *addr_, int port_)
 {
+#ifdef _WIN32
+#else
 	_address = addr_;
 
 	memset(&_server_sock, 0, sizeof(_server_sock));
@@ -210,66 +217,6 @@ void Socket6::ConnectSocket(InetAddress *addr_, int port_)
 
 	int r;
 
-#ifdef _WIN32
-	if (_timeout > 0) {
-		u_long opt = 1;
-
-		if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-			throw SocketException("Invalid connection parameters exception");
-		}
-
-		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
-
-		if (WSAGetLastError() != WSAEWOULDBLOCK) {
-			throw SocketException("Connection error");
-		}
-
-		if (r != 0) {
-			fd_set wset;
-			struct timeval t;
-
-			t.tv_sec = _timeout/1000;
-			t.tv_usec = (_timeout%1000)*1000;
-
-			FD_ZERO(&wset);
-			FD_SET(_fd, &wset);
-
-			r = select(_fd + 1, &wset, &wset, &wset, &t);
-
-			if (r <= 0) {
-				opt = 0;
-
-				if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-					throw SocketException("Invalid connection parameters exception");
-				}
-
-				shutdown(_fd, 2);
-
-				if (r == 0) {
-					throw SocketException("Socket connection timeout exception");
-				} else if (r < 0) {
-					throw SocketException("Connection error");
-				}
-			}
-
-			int optlen = sizeof(r);
-
-			getsockopt(_fd, SOL_SOCKET, SO_ERROR, (char *)&r, &optlen);
-
-			if (r != 0) {
-				throw SocketException("Unknown error");
-			}
-		}
-
-		opt = 0;
-
-		if (ioctlsocket(_fd, FIONBIO, &opt) == SOCKET_ERROR) {
-			throw SocketException("Connection error");
-		}
-	} else {
-		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
-	}
-#else
 	if (_timeout > 0) {
 		int opt = 1;
 
@@ -326,21 +273,20 @@ void Socket6::ConnectSocket(InetAddress *addr_, int port_)
 	} else {
 		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 	}
-#endif
 
-#ifdef _WIN32
-	if (r == SOCKET_ERROR) {
-#else
 	if (r < 0) {
-#endif
 		throw SocketException("Connection error");
 	}
+#endif
 }
 
 void Socket6::InitStreams(int64_t rbuf_, int64_t wbuf_)
 {
+#ifdef _WIN32
+#else
 	_is = new SocketInputStream((Connection *)this, &_is_closed, rbuf_);
 	_os = new SocketOutputStream((Connection *)this, &_is_closed, wbuf_);
+#endif
 }
 
 /** End */
@@ -352,13 +298,13 @@ jsocket_t Socket6::GetHandler()
 
 int Socket6::Send(const char *data_, int size_, int time_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 
-#ifdef _WIN32
-	return Socket6::Send(data_, size_);
-#else
 	struct pollfd ufds[1];
 
 	ufds[0].fd = _fd;
@@ -375,13 +321,16 @@ int Socket6::Send(const char *data_, int size_, int time_)
 			return Socket6::Send(data_, size_);
 		}
 	}
-#endif
 
 	return -1;
+#endif
 }
 
 int Socket6::Send(const char *data_, int size_, bool block_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -389,30 +338,13 @@ int Socket6::Send(const char *data_, int size_, bool block_)
 	int flags;
 
 	if (block_ == true) {
-#ifdef _WIN32
-		flags = 0;
-#else
 		flags = MSG_NOSIGNAL;
-#endif
 	} else {
-#ifdef _WIN32
-		flags = 0;
-#else
 		flags = MSG_NOSIGNAL | MSG_DONTWAIT;
-#endif
 	}
 
 	int n = ::send(_fd, data_, size_, flags);
 
-#ifdef _WIN32
-	if (n == SOCKET_ERROR) {
-		if (WSAGetLastError() == WSAECONNABORTED) {
-			throw SocketTimeoutException("Socket output timeout error");
-		} else {
-			throw SocketTimeoutException("Socket output timeout error");
-		}
-	}
-#else
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
@@ -429,22 +361,22 @@ int Socket6::Send(const char *data_, int size_, bool block_)
 			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}
-#endif
 
 	_sent_bytes += n;
 
 	return n;
+#endif
 }
 
 int Socket6::Receive(char *data_, int size_, int time_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
 
-#ifdef _WIN32
-	return Socket6::Receive(data_, size_);
-#else
 	struct pollfd ufds[1];
 
 	ufds[0].fd = _fd;
@@ -461,13 +393,16 @@ int Socket6::Receive(char *data_, int size_, int time_)
 			return Socket6::Receive(data_, size_);
 		}
 	}
-#endif
 
 	return -1;
+#endif
 }
 
 int Socket6::Receive(char *data_, int size_, bool block_)
 {
+#ifdef _WIN32
+	return 0;
+#else
 	if (_is_closed == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -475,28 +410,11 @@ int Socket6::Receive(char *data_, int size_, bool block_)
 	int flags = 0;
 
 	if (block_ == false) {
-#ifdef _WIN32
-		flags = 0;
-#else
 		flags = MSG_DONTWAIT;
-#endif
 	}
 
 	int n = ::recv(_fd, data_, size_, flags);
 
-#ifdef _WIN32
-	if (n == SOCKET_ERROR) {
-		if (WSAGetLastError() == WSAETIMEDOUT) {
-			throw SocketTimeoutException("Socket input timeout error");
-		} else {
-			throw jio::IOException("Socket input error");
-		}
-	} else if (n == 0) {
-		Close();
-
-		throw SocketException("Broken pipe exception");
-	}
-#else 
 	if (n < 0) {
 		if (errno == EAGAIN) {
 			if (block_ == true) {
@@ -513,68 +431,99 @@ int Socket6::Receive(char *data_, int size_, bool block_)
 
 		throw jio::IOException("Peer has shutdown");
 	}
-#endif
 
 	_receive_bytes += n;
 
 	return n;
+#endif
 }
 
 void Socket6::Close()
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		return;
 	}
 
-#ifdef _WIN32
-	if (closesocket(_fd) < 0) {
-#else
 	if (close(_fd) != 0) {
-#endif
 		throw SocketException("Unknown close exception");
 	}
 
 	_is_closed = true;
+#endif
 }
 
 jio::InputStream * Socket6::GetInputStream()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return (jio::InputStream *)_is;
+#endif
 }
 
 jio::OutputStream * Socket6::GetOutputStream()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return (jio::OutputStream *)_os;
+#endif
 }
 
 InetAddress * Socket6::GetInetAddress()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return _address;
+#endif
 }
 
 int Socket6::GetLocalPort()
 {
+#ifdef _WIN32
+	return 0;
+#else
 	return ntohs(_lsock.sin6_port);
+#endif
 }
 
 int Socket6::GetPort()
 {
+#ifdef _WIN32
+	return 0;
+#else
 	return ntohs(_server_sock.sin6_port);
+#endif
 }
 
 int64_t Socket6::GetSentBytes()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return _sent_bytes + _os->GetSentBytes();
+#endif
 }
 
 int64_t Socket6::GetReadedBytes()
 {
+#ifdef _WIN32
+	return 0LL;
+#else
 	return _receive_bytes + _is->GetReadedBytes();
+#endif
 }
 
 SocketOptions * Socket6::GetSocketOptions()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return new SocketOptions(_fd, JCT_TCP);
+#endif
 }
 
 std::string Socket6::what()

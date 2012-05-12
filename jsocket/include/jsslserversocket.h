@@ -47,14 +47,27 @@ class SSLServerSocket : public virtual jcommon::Object{
 	private:
 		/** \brief Socket handler. */
 		jsocket_t _fd;
+		/** \brief */
+		bool _is_closed;
+#ifdef _WIN32
+#else
 		/** \brief Local socket. */
 		sockaddr_in _lsock;
 		/** \brief Remote socket. */
 		sockaddr_in _rsock;
 		/** \brief */
 		InetAddress *_local;
-		/** \brief */
-		bool _is_closed;
+		/** \brief SSL data */
+		SSL_CTX *ctx;
+		/** \brief SSL data */
+		SSL *ssl;
+		/** \brief Indicate CERT loaded or created */
+		bool have_cert; 
+		/** \brief keysize argument from constructor */
+		int rsa_keysize;
+		/** \brief userdata */
+		char *ud;
+#endif
 
 		/**
 		 * \brief
@@ -74,6 +87,8 @@ class SSLServerSocket : public virtual jcommon::Object{
 		 */
 		void ListenSocket(int);
 
+#ifdef _WIN32
+#else
 		/**
 		 * Create new CTX if none is available
 		 *
@@ -109,17 +124,7 @@ class SSLServerSocket : public virtual jcommon::Object{
 		 *
 		 */
 		bool UseCertCallback(const char *cert_file, const char *private_key_file, int passwd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata);
-
-		/** \brief SSL data */
-		SSL_CTX *ctx;
-		/** \brief SSL data */
-		SSL *ssl;
-		/** \brief Indicate CERT loaded or created */
-		bool have_cert; 
-		/** \brief keysize argument from constructor */
-		int rsa_keysize;
-		/** \brief userdata */
-		char *ud;
+#endif
 
 	public:
 		/**

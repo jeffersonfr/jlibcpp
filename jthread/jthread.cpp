@@ -149,27 +149,9 @@ void Thread::SetStackSize(int size)
 
 #ifdef _WIN32
 DWORD WINAPI Thread::ThreadMain(LPVOID owner_)
-{
-	if (owner_ == NULL) {
-		return 0;
-	}
-
-	jthread_map_t *t = (jthread_map_t *)owner_;
-
-	if (t->thiz->SetUp() == 0) {
-		t->thiz->Run();
-	}
-
-	if (t->thiz->_type == JTT_DETACH) {
-		t->thiz->CleanUp();
-	}
-
-	t->alive = false;
-
-	return 0;
-}
 #else
 void * Thread::ThreadMain(void *owner_)
+#endif
 {
 	jthread_map_t *t = (jthread_map_t *)owner_;
 
@@ -180,11 +162,11 @@ void * Thread::ThreadMain(void *owner_)
 	}
 
 	t->thiz->Run();
+
 	t->alive = false;
 
 	pthread_exit(NULL);
 }
-#endif
 
 jthread_map_t * Thread::GetMap(int id)
 {
@@ -241,7 +223,7 @@ void Thread::Start(int id)
 	t->alive = true;
 
 #ifdef _WIN32
-	if (SetUp() != 0 || 
+	if (Setup() != 0 || 
 			(_thread = CreateThread(
 				_sa,				// security attributes
 				0,					// stack size
@@ -385,7 +367,7 @@ bool Thread::IsRunning(int id)
 	return false;
 }
 
-void Thread::Yield()
+void Thread::ThreadYield()
 {
 #ifdef _WIN32
 	Thread::MSleep(1);
@@ -421,11 +403,11 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 	int tpolicy = 0;
 
 #ifdef _WIN32
-	if (policy == POLICY_OTHER) {
+	if (policy == JTP_OTHER) {
 		tpolicy = 1;
-	} else if (policy == POLICY_FIFO) {
+	} else if (policy == JTP_FIFO) {
 		tpolicy = 2;
-	} else if (policy == POLICY_ROUND_ROBIN) {
+	} else if (policy == JTP_ROUND_ROBIN) {
 		tpolicy = 3;
 	}
 #else
@@ -477,28 +459,28 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 
 	switch (r) {
 		case 0:
-			(*priority) = LOW_PRIORITY;
+			(*priority) = JTP_LOW;
 			break;
 		case 1:
 		case 2:
 		case 3:
 		case 4:
 		case 5:
-			(*priority) = NORMAL_PRIORITY;
+			(*priority) = JTP_NORMAL;
 			break;
 		case 6:
 		case 7:
 		case 8:
 		case 9:
 		case 10:
-			(*priority) = HIGH_PRIORITY;
+			(*priority) = JTP_HIGH;
 			break;
 		default:
-			(*priority) = NORMAL_PRIORITY;
+			(*priority) = JTP_NORMAL;
 			break;
 	}
 
-	(*policy) = POLICY_OTHER;
+	(*policy) = JTP_OTHER;
 #else
 	struct sched_param param;
 

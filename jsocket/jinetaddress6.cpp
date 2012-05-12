@@ -29,8 +29,11 @@ InetAddress6::InetAddress6(std::string name_, struct in6_addr ip_):
 {
 	jcommon::Object::SetClassName("jsocket::InetAddress6");
 	
+#ifdef _WIN32
+#else
 	_host = name_;
 	_ip = ip_;
+#endif
 }
 
 InetAddress6::~InetAddress6()
@@ -41,16 +44,14 @@ InetAddress6::~InetAddress6()
 
 InetAddress * InetAddress6::GetByName(std::string host_)
 {
+#ifdef _WIN32
+#else
 	struct addrinfo *result = NULL;
 	struct addrinfo *ptr = NULL;
 	struct addrinfo hints;
 
 	// Setup the hints address info structure which is passed to the getaddrinfo() function
-#ifdef _WIN32
-	ZeroMemory(&hints, sizeof(hints));
-#else
 	bzero(&hints, sizeof(hints));
-#endif
 
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -71,40 +72,30 @@ InetAddress * InetAddress6::GetByName(std::string host_)
 	for (ptr=result; ptr!=NULL; ptr=ptr->ai_next) {
 		switch (ptr->ai_family) {
 			case AF_INET6: {
-#ifdef _WIN32
-				struct sockaddr_in6 *in = (struct sockaddr_in6 *)ptr->ai_addr;
-
-				info.family = AIF_INET6;
-				
-				return InetAddress6(Win32HostAddress(in, ptr->ai_addrlen), in->sin6_addr);
-#else
 				struct sockaddr_in6 *sockaddr_ipv6 = (struct sockaddr_in6 *)ptr->ai_addr;
 				char ipstringbuffer[255];
 
 				return new InetAddress6(inet_ntop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255), sockaddr_ipv6->sin6_addr);
-#endif
-				break;
 			}
 		}
 	}
 	
 	throw UnknownHostException("Cannot found IPv6 address");
+#endif
 }
 
 std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_)
 {
 	std::vector<InetAddress *> vip;
 
+#ifdef _WIN32
+#else
 	struct addrinfo *result = NULL;
 	struct addrinfo *ptr = NULL;
 	struct addrinfo hints;
 
 	// Setup the hints address info structure which is passed to the getaddrinfo() function
-#ifdef _WIN32
-	ZeroMemory(&hints, sizeof(hints));
-#else
 	bzero(&hints, sizeof(hints));
-#endif
 
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -132,28 +123,24 @@ std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_)
 				break;
 			}
 			case AF_INET6: {
-#ifdef _WIN32
-				struct sockaddr_in6 *in = (struct sockaddr_in6 *)ptr->ai_addr;
-
-				info.family = AIF_INET6;
-				
-				vip.push_back(InetAddress6(Win32HostAddress(in, ptr->ai_addrlen), in->sin6_addr));
-#else
 				struct sockaddr_in6 *sockaddr_ipv6 = (struct sockaddr_in6 *)ptr->ai_addr;
 				char ipstringbuffer[255];
 
 				vip.push_back(new InetAddress6(inet_ntop(AF_INET6, &sockaddr_ipv6->sin6_addr, ipstringbuffer, 255), sockaddr_ipv6->sin6_addr));
-#endif
 				break;
 			}
 		}
 	}
+#endif
 
 	return vip;
 }
 
 InetAddress * InetAddress6::GetLocalHost()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	char localName[255+1];
 
 	gethostname(localName, 255);
@@ -167,6 +154,7 @@ InetAddress * InetAddress6::GetLocalHost()
 			throw e;
 		}
 	}
+#endif
 }
 
 /** End */
@@ -178,20 +166,28 @@ std::string InetAddress6::GetHostName()
 
 std::string InetAddress6::GetHostAddress()
 {
+#ifdef _WIN32
+	return "unknown";
+#else
 	char addr[256];
 
 	return std::string(inet_ntop(PF_INET6, &_ip, addr, 255));
+#endif
 }
 
 std::vector<uint32_t> InetAddress6::GetAddress()
 {
 	std::vector<uint32_t> addr;
+
+#ifdef _WIN32
+#else
 	int size = sizeof(in6_addr)/sizeof(uint16_t);
 	uint16_t *ip = (uint16_t *)&_ip;
 	
 	for (int i=0; i<size; ++i) {
 		addr.push_back(ip[i]);
 	}
+#endif
 	
 	return addr;
 }

@@ -30,13 +30,15 @@ SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAdd
 {
 	jcommon::Object::SetClassName("jsocket::SSLServerSocket6");
 	
-    _local = NULL;
+#ifdef _WIN32
+#else
+	_local = NULL;
 	_is_closed = false;
 
 	// init ssl 
 	SSL_library_init();
 
-	srand(time(NULL));
+	srand((uint32_t)time(NULL));
 
 	int tmp;
 
@@ -59,11 +61,7 @@ SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAdd
 	} else {
 		ListenSocket(backlog_);
 		
-#ifdef _WIN32
-		int len;
-#else
 		socklen_t len;
-#endif
 
 		len = sizeof(_lsock);
 
@@ -71,33 +69,42 @@ SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAdd
 			throw jio::IOException("ServerSocket constructor exception");
 		}
 	}
+#endif
 }
 
 SSLServerSocket6::~SSLServerSocket6()
 {
+#ifdef _WIN32
+#else
 	try {
-  	Close();
+	  	Close();
 	} catch (...) {
 	}
 
 	if (_local) {
 		delete _local;
 	}
+#endif
 }
 
 /** Private */
 
 void SSLServerSocket6::CreateSocket()
 {
+#ifdef _WIN32
+#else
 	_fd = ::socket(PF_INET, SOCK_STREAM, 0);
     
 	if (_fd < 0) {
 		throw SocketException("ServerSocket handling error");
 	}
+#endif
 }
 
 void SSLServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
+#ifdef _WIN32
+#else
 	int opt = 1;
     
 	memset(&_lsock, 0, sizeof(_lsock));
@@ -118,22 +125,22 @@ void SSLServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 
 	_lsock.sin6_port = htons(local_port_);
 
-#ifdef _WIN32
-	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&opt, sizeof(opt));
-#else
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
-#endif
     
 	if (::bind(_fd, (struct sockaddr *) &_lsock, sizeof(_lsock)) < 0) {
 		throw SocketException("ServerBinding error");
 	}
+#endif
 }
 
 void SSLServerSocket6::ListenSocket(int backlog_)
 {
+#ifdef _WIN32
+#else
 	if (::listen(_fd, backlog_) < 0) {
 		throw SocketException("ServerListen error");
 	}
+#endif
 }
 
 /** End */
@@ -141,12 +148,10 @@ void SSLServerSocket6::ListenSocket(int backlog_)
 SSLSocket6 * SSLServerSocket6::Accept()
 {
 #ifdef _WIN32
-	int sock_size;
-	int handler;
-#else 
+	return NULL;
+#else
 	socklen_t sock_size;
 	int handler;
-#endif
 	
 	sock_size = sizeof(_rsock);
 
@@ -173,39 +178,49 @@ SSLSocket6 * SSLServerSocket6::Accept()
 	}
 
 	return s;
+#endif
 }
 
 InetAddress * SSLServerSocket6::GetInetAddress()
 {
+#ifdef _WIN32
+	return NULL;
+#else
 	return _local;
+#endif
 }
 
 int SSLServerSocket6::GetLocalPort()
 {
+#ifdef _WIN32
+	return 0;
+#else
 	return ntohs(_lsock.sin6_port);
+#endif
 }
 
 void SSLServerSocket6::Close()
 {
+#ifdef _WIN32
+#else
 	if (_is_closed == true) {
 		return;
 	}
 
-#ifdef _WIN32
-	if (closesocket(_fd) < 0) {
-#else
 	SSL_shutdown(ssl);
 	SSL_free(ssl);
 	SSL_CTX_free(ctx);
 
 	if (close(_fd) != 0) {
-#endif
 		throw SocketException("Unknow close exception");
 	}
 
 	_is_closed = true;
+#endif
 }
 
+#ifdef _WIN32
+#else
 bool SSLServerSocket6::CheckContext()
 {
 	if (ctx == NULL) {
@@ -464,6 +479,7 @@ bool SSLServerSocket6::UseDHFile(const char *dh_file)
 
 	return true;
 }
+#endif
 
 bool SSLServerSocket6::IsClosed()
 {

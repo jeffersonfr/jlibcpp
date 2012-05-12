@@ -35,14 +35,13 @@ InetAddress::~InetAddress()
 
 bool InetAddress::IsReachable(std::string host)
 {
+#ifdef _WIN32
+	return false;
+#else
 	struct addrinfo *result = NULL;
 	struct addrinfo hints;
 
-#ifdef _WIN32
-	ZeroMemory(&hints, sizeof(hints));
-#else
 	bzero(&hints, sizeof(hints));
-#endif
 
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
@@ -58,6 +57,7 @@ bool InetAddress::IsReachable(std::string host)
 	}
 
 	return true;
+#endif
 }
 
 std::string InetAddress::GetHostName()
