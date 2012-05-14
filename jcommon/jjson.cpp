@@ -1,5 +1,5 @@
 /***************************************************************************
- *   Copyright (C) 2005 by <still unknown> <modified version>              *
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
  *   root@sat                                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -19,1854 +19,528 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jjson.h"
+#include "jparserexception.h"
+
+#include <memory.h>
+#include <algorithm>
+
+#define ERROR(it, desc)											\
+	std::ostringstream o;											\
+	delete [] dup;														\
+	o << "Parse exception at line " 					\
+		<< lines << ": " << desc;								\
+	throw jcommon::ParserException(o.str());	\
+
+#define CHECK_TOP() 												\
+	if (!top) {																\
+		ERROR(it, "Unexpected character");			\
+	}																					\
+
+#define IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
 
 namespace jcommon {
 
-JSONIterator :: JSONIterator( const JSONNode * node )
+JSONValue::JSONValue():
+	jcommon::Object()
 {
-	mRoot = node;
-	mCurrent = node;
+	jcommon::Object::SetClassName("jcommon::JSONValue");
+
+	_type = JSON_NULL;
+	_name = NULL;
+	_parent = NULL;
+
+	_next_sibling = NULL;
+	_first_child = NULL;
+	_last_child = NULL;
+	
+	_string_value = NULL;
+	_int_value = 0;
+	_double_value = 0.0;
 }
 
-JSONIterator :: ~JSONIterator()
+JSONValue::~JSONValue()
 {
+	std::vector<JSONValue *> values;
+
+	for (JSONValue *value=_first_child; value!=NULL;) {
+		JSONValue *next = value->_next_sibling;
+
+		delete value;
+
+		value = next;
+	}
+
+	if (_name != NULL) {
+		delete [] _name;
+	}
+
+	if (_string_value != NULL) {
+		delete [] _string_value;
+	}
 }
 
-const JSONNode * JSONIterator :: getNext()
+void JSONValue::Append(JSONValue *rhs)
 {
-	if( NULL == mCurrent ) return NULL;
+	rhs->_parent = this;
 
-	const JSONNode * retNode = mCurrent;
-
-	// find first left child
-	if( JSONNode::eObject == mCurrent->getType() ) {
-		JSONObjectNode * object = static_cast<JSONObjectNode*>((JSONNode*)mCurrent);
-
-		mCurrent = object->getValue(0);
-	} else if( JSONNode::eArray == mCurrent->getType() ) {
-		JSONArrayNode * array = static_cast<JSONArrayNode*>((JSONNode*)mCurrent);
-
-		mCurrent = array->getValue( 0 );
-	} else if( JSONNode::ePair == mCurrent->getType() ) {
-		JSONPairNode * pair = static_cast<JSONPairNode*>((JSONNode*)mCurrent);
-		mCurrent = pair->getValue();
+	if (_last_child) {
+		_last_child = _last_child->_next_sibling = rhs;
 	} else {
-		mCurrent = NULL;
+		_first_child = _last_child = rhs;
 	}
+}
 
-	// find next sibling
-	if( NULL == mCurrent ) {
-		const JSONNode * parent = NULL;
-		
-		mCurrent = retNode;
-		
-		if( NULL != mCurrent ) {
-			parent = mCurrent->getParent();
+json_type_t JSONValue::GetType()
+{
+	return _type;
+}
+
+char * JSONValue::GetName()
+{
+	return _name;
+}
+
+char * JSONValue::GetString()
+{
+	return _string_value;
+}
+
+bool JSONValue::GetBoolean()
+{
+	return (bool)_int_value;
+}
+
+int JSONValue::GetInteger()
+{
+	return _int_value;
+}
+
+double JSONValue::GetFloat()
+{
+	return _double_value;
+}
+
+JSONValue * JSONValue::GetParent()
+{
+	return _parent;
+}
+
+JSONValue * JSONValue::NextSibling()
+{
+	return _next_sibling;
+}
+
+JSONValue * JSONValue::GetFirstChild()
+{
+	return _first_child;
+}
+
+JSONValue * JSONValue::GetLastChild()
+{
+	return _last_child;
+}
+
+// convert string to integer
+char * atoi(char *first, char *last, int *out)
+{
+	int sign = 1;
+	int result = 0;
+
+	if (first != last) {
+		if (*first == '-') {
+			sign = -1;
+			++first;
+		} else if (*first == '+') {
+			++first;
 		}
-
-		// WARN:: adicionado para resolver um loop infinito
-		if (parent == NULL) {
-			return NULL;
-		}
-
-		for( ; NULL != parent; ) {
-			if( JSONNode::eObject == parent->getType() ) {
-				JSONObjectNode * object = static_cast<JSONObjectNode*>((JSONNode*)parent);
-
-				int index = -1;
-				for( int i = 0; i < object->getCount(); i++ ) {
-					if( mCurrent == object->getValue( i ) ) {
-						index = i;
-						break;
-					}
-				}
-
-				if( index >= 0 && index < ( object->getCount() - 1 ) ) {
-					mCurrent = object->getValue( index + 1 );
-				} else {
-					mCurrent = NULL;
-				}
-			} else if( JSONNode::eArray == parent->getType() ) {
-				JSONArrayNode * array = static_cast<JSONArrayNode*>((JSONNode*)parent);
-
-				int index = -1;
-				for( int i = 0; i < array->getCount(); i++ ) {
-					if( mCurrent == array->getValue( i ) ) {
-						index = i;
-						break;
-					}
-				}
-
-				if( index >= 0 && index < ( array->getCount() - 1 ) ) {
-					mCurrent = array->getValue( index + 1 );
-				} else {
-					mCurrent = NULL;
-				}
-			} else if( JSONNode::ePair == parent->getType() ) {
-				mCurrent = NULL;
-			} else {
-				mCurrent = NULL;
-				assert( 0 ); // should not occur
-			}
-
-			if( NULL == mCurrent ) {
-				mCurrent = parent;
-				parent = mCurrent->getParent();
-				if( NULL == parent ) mCurrent = NULL;
-				if( mRoot == mCurrent ) mCurrent = NULL;
-			} else {
-				break;
-			}
-		}
 	}
 
-	return retNode;
-}
-
-JSONNode :: JSONNode( int type )
-	: mType( type )
-{
-	mParent = NULL;
-}
-
-JSONNode :: ~JSONNode()
-{
-}
-
-int JSONNode :: getType() const
-{
-	return mType;
-}
-
-JSONNode * JSONNode :: getParent() const
-{
-	return mParent;
-}
-
-void JSONNode :: setParent( JSONNode * parent )
-{
-	mParent = parent;
-}
-
-int JSONNode :: isLastChild() const
-{
-	if( NULL == mParent ) return 0;
-
-	if( JSONNode::eObject == mParent->getType() ) {
-		return ((JSONObjectNode*)mParent)->isLastChild( this );
-	} else if( JSONNode::eArray == mParent->getType() ) {
-		return ((JSONArrayNode*)mParent)->isLastChild( this );
-	} else if( JSONNode::ePair == mParent->getType() ) {
-		JSONObjectNode * object = (JSONObjectNode*)mParent->getParent();
-		return object->isLastChild( mParent );
+	for (; first != last && IS_DIGIT(*first); ++first) {
+		result = 10 * result + (*first - '0');
 	}
 
-	return 0;
+	*out = result * sign;
+
+	return first;
 }
 
-JSONStringNode :: JSONStringNode( const char * value )
-	: JSONNode( eString )
+// convert hexadecimal string to uint32_teger
+char * hatoui(char *first, char *last, uint32_t *out)
 {
-#ifdef _WIN32
-	mValue = _strdup( value );
-#else
-	mValue = strdup( value );
-#endif
-}
+	uint32_t result = 0;
 
-JSONStringNode :: ~JSONStringNode()
-{
-	if( NULL != mValue ) 
-		free( mValue );
-
-	mValue = NULL;
-}
-
-const char * JSONStringNode :: getValue()
-{
-	return mValue;
-}
-
-JSONDoubleNode :: JSONDoubleNode( double value )
-	: JSONNode( eDouble )
-{
-	mValue = value;
-}
-
-JSONDoubleNode :: ~JSONDoubleNode()
-{
-}
-
-double JSONDoubleNode :: getValue()
-{
-	return mValue;
-}
-
-JSONIntNode :: JSONIntNode( int value )
-	: JSONNode( eInt )
-{
-	mValue = value;
-}
-
-JSONIntNode :: ~JSONIntNode()
-{
-}
-
-int JSONIntNode :: getValue()
-{
-	return mValue;
-}
-
-JSONNullNode :: JSONNullNode()
-	: JSONNode( eNull )
-{
-}
-
-JSONNullNode :: ~JSONNullNode()
-{
-}
-
-JSONBooleanNode :: JSONBooleanNode( bool value )
-	: JSONNode( eBoolean )
-{
-	mValue = value;
-}
-
-JSONBooleanNode :: ~JSONBooleanNode()
-{
-}
-
-bool JSONBooleanNode :: getValue()
-{
-	return mValue;
-}
-
-JSONCommentNode :: JSONCommentNode( const char * comment )
-	: JSONNode( eComment )
-{
-#ifdef _WIN32
-	mValue = _strdup( comment );
-#else
-	mValue = strdup( comment );
-#endif
-}
-
-JSONCommentNode :: ~JSONCommentNode()
-{
-	free( mValue );
-}
-
-const char * JSONCommentNode :: getValue()
-{
-	return mValue;
-}
-
-JSONPairNode :: JSONPairNode()
-	: JSONNode( ePair )
-{
-	mName = NULL;
-	mValue = NULL;
-}
-
-JSONPairNode :: ~JSONPairNode()
-{
-	if( NULL != mName ) free( mName );
-	mName = NULL;
-
-	if( NULL != mValue ) delete mValue;
-	mValue = NULL;
-}
-
-void JSONPairNode :: setName( const char * name )
-{
-	if( name != mName ) {
-		if( NULL != mName ) 
-			free( mName );
-
-#ifdef _WIN32
-		mName = _strdup( name );
-#else
-		mName = strdup( name );
-#endif
-	}
-}
-
-const char * JSONPairNode :: getName()
-{
-	return mName;
-}
-
-void JSONPairNode :: setValue( JSONNode * value )
-{
-	value->setParent( this );
-	mValue = value;
-}
-
-JSONNode * JSONPairNode :: getValue()
-{
-	return mValue;
-}
-
-JSONObjectNode :: JSONObjectNode()
-	: JSONNode( eObject )
-{
-	mValueList = new JSONArrayList();
-}
-
-JSONObjectNode :: ~JSONObjectNode()
-{
-	for( int i = 0; i < mValueList->getCount(); i++ ) {
-		delete (JSONNode*)mValueList->getItem(i);
-	}
-	delete mValueList;
-	mValueList = NULL;
-}
-
-int JSONObjectNode :: getCount()
-{
-	return mValueList->getCount();
-}
-
-int JSONObjectNode :: addValue( JSONPairNode * value )
-{
-	value->setParent( this );
-
-	mValueList->append( value );
-
-	return 0;
-}
-
-JSONPairNode * JSONObjectNode :: getValue( int index )
-{
-	return (JSONPairNode*)mValueList->getItem( index );
-}
-
-JSONPairNode * JSONObjectNode :: takeValue( int index )
-{
-	JSONPairNode * ret = (JSONPairNode*)mValueList->takeItem( index );
-	if( NULL != ret ) ret->setParent( NULL );
-
-	return ret;
-}
-
-int JSONObjectNode :: isLastChild( const JSONNode * value ) const
-{
-	const void * lastChild = mValueList->getItem( JSONArrayList::LAST_INDEX );
-
-	return NULL == value ? 0 : ( lastChild == value ? 1 : 0 );
-}
-
-int JSONObjectNode :: Find( const char * name )
-{
-	int ret = -1;
-	for( int i = 0; i < mValueList->getCount(); i++ ) {
-		JSONPairNode * iter = (JSONPairNode*)mValueList->getItem(i);
-		if( 0 == strcmp( iter->getName(), name ) ) {
-			ret = i;
+	for (; first != last; ++first) {
+		int digit;
+		if (IS_DIGIT(*first)) {
+			digit = *first - '0';
+		} else if (*first >= 'a' && *first <= 'f') {
+			digit = *first - 'a' + 10;
+		} else if (*first >= 'A' && *first <= 'F') {
+			digit = *first - 'A' + 10;
+		} else {
 			break;
 		}
+
+		result = 16 * result + digit;
 	}
 
-	return ret;
+	*out = result;
+
+	return first;
 }
 
-JSONArrayNode :: JSONArrayNode()
-	: JSONNode( eArray )
+// convert string to floating point
+char * atof(char *first, char *last, double *out)
 {
-	mValueList = new JSONArrayList();
-}
+	// sign
+	double sign = 1;
 
-JSONArrayNode :: ~JSONArrayNode()
-{
-	for( int i = 0; i < mValueList->getCount(); i++ ) {
-		delete (JSONNode*)mValueList->getItem(i);
-	}
-	delete mValueList;
-	mValueList = NULL;
-}
-
-int JSONArrayNode :: getCount()
-{
-	return mValueList->getCount();
-}
-
-int JSONArrayNode :: addValue( JSONNode * value )
-{
-	value->setParent( this );
-	return mValueList->append( value );
-}
-
-JSONNode * JSONArrayNode :: getValue( int index )
-{
-	return (JSONNode*)mValueList->getItem( index );
-}
-
-JSONNode * JSONArrayNode :: takeValue( int index )
-{
-	JSONNode * ret = (JSONNode*)mValueList->takeItem( index );
-	if( NULL != ret ) ret->setParent( NULL );
-
-	return ret;
-}
-
-int JSONArrayNode :: isLastChild( const JSONNode * value ) const
-{
-	const void * lastChild = mValueList->getItem( JSONArrayList::LAST_INDEX );
-
-	return NULL == value ? 0 : ( lastChild == value ? 1 : 0 );
-}
-
-JSONDomParser :: JSONDomParser()
-{
-	mParser = new JSONPullParser();	
-	mContainer = new JSONArrayNode();
-	mCurrent = mContainer;
-}
-
-JSONDomParser :: ~JSONDomParser()
-{
-	if( NULL != mParser ) delete mParser;
-	mParser = NULL;
-
-	if( NULL != mContainer ) delete mContainer;
-	mContainer = NULL;
-}
-
-int JSONDomParser :: append( const char * source, int len )
-{
-	int ret = 0;
-
-	for( int pos = 0; pos < len && NULL == mParser->getError(); pos += 64 ) {
-		int realLen = ( len - pos ) > 64 ? 64 : ( len - pos );
-		ret += mParser->append( source + pos, realLen );
-		buildTree();
+	if (first != last) {
+		if (*first == '-') {
+			sign = -1;
+			++first;
+		} else if (*first == '+') {
+			++first;
+		}
 	}
 
-	return ret;
-}
+	// integer part
+	double result = 0;
 
-void JSONDomParser :: addNode( JSONNode * node )
-{
-	if( JSONNode::eObject == mCurrent->getType() ) {
-		assert( JSONNode::ePair == node->getType() );
-		((JSONObjectNode*)mCurrent)->addValue( (JSONPairNode*)node );
-	} else if( JSONNode::ePair == mCurrent->getType() ) {
-		((JSONPairNode*)mCurrent)->setValue( node );
-		mCurrent = mCurrent->getParent();
-	} else {
-		assert( JSONNode::eArray == mCurrent->getType() );
-		((JSONArrayNode*)mCurrent)->addValue( node );
-
-		if( mCurrent == mContainer ) node->setParent( NULL );
+	for (; first != last && IS_DIGIT(*first); ++first) {
+		result = 10 * result + (*first - '0');
 	}
-}
 
-void JSONDomParser :: buildTree()
-{
-	for( JSONPullEvent * event = mParser->getNext();
-			NULL != event;
-			event = mParser->getNext() ) {
+	// fraction part
+	if (first != last && *first == '.') {
+		++first;
 
-		switch( event->getEventType() ) {
-			case JSONPullEvent::eStartObject:
-			{
-				JSONObjectNode * newObject = new JSONObjectNode();
-				addNode( newObject );
-				mCurrent = newObject;
-				break;
-			}
-			case JSONPullEvent::eEndObject:
-			{
-				mCurrent = mCurrent->getParent();
-				if( mCurrent && JSONNode::ePair == mCurrent->getType() ) {
-					mCurrent = mCurrent->getParent();
-					assert( JSONNode::eObject == mCurrent->getType() );
-				}
-				break;
-			}
-			case JSONPullEvent::eStartArray:
-			{
-				JSONArrayNode * newArray = new JSONArrayNode();
-				addNode( newArray );
-				mCurrent = newArray;
-				break;
-			}
-			case JSONPullEvent::eEndArray:
-			{
-				mCurrent = mCurrent->getParent();
-				if( mCurrent && JSONNode::ePair == mCurrent->getType() ) {
-					mCurrent = mCurrent->getParent();
-					assert( JSONNode::eObject == mCurrent->getType() );
-				}
-				break;
-			}
-			case JSONPullEvent::eName:
-			{
-				JSONPairNode * newPair = new JSONPairNode();
-				newPair->setName( ((JSONTextEvent*)event)->getText() );
-				addNode( newPair );
-				mCurrent = newPair;
-				break;
-			}
-			case JSONPullEvent::eNull:
-			{
-				JSONNullNode * newNull = new JSONNullNode();
-				addNode( newNull );
-				break;
-			}
-			case JSONPullEvent::eString:
-			{
-				JSONStringNode * newString = new JSONStringNode( ((JSONTextEvent*)event)->getText() );
-				addNode( newString );
-				break;
-			}
-			case JSONPullEvent::eNumber:
-			{
-				JSONNode * newNode = NULL;
+		double inv_base = 0.1f;
+		for (; first != last && IS_DIGIT(*first); ++first) {
+			result += (*first - '0') * inv_base;
+			inv_base *= 0.1f;
+		}
+	}
 
-				const char * text = ((JSONTextEvent*)event)->getText();
-				if( NULL != strchr( text, '.' ) ) {
-					newNode = new JSONDoubleNode( strtod( text, NULL ) );
-				} else {
-					newNode = new JSONIntNode( atoi( text ) );
-				}
-				addNode( newNode );
-				break;
-			}
-			case JSONPullEvent::eBoolean:
-			{
-				const char * text = ((JSONTextEvent*)event)->getText();
-				
-#ifdef _WIN32
-				JSONBooleanNode * newBoolean = new JSONBooleanNode( 0 == _stricmp( text, "true" ) );
-#else
-				JSONBooleanNode * newBoolean = new JSONBooleanNode( 0 == strcasecmp( text, "true" ) );
-#endif
+	// result w\o exponent
+	result *= sign;
 
-				addNode( newBoolean );
-				break;
-			}
-			case JSONPullEvent::eComment:
-			{
-				const char * text = ((JSONTextEvent*)event)->getText();
-				
-				JSONCommentNode * newComment = new JSONCommentNode( text );
-				addNode( newComment );
-				break;
-			}
-			case JSONPullEvent::ePadding:
-				// ignore
-				break;
+	// exponent
+	bool exponent_negative = false;
+	int exponent = 0;
+	if (first != last && (*first == 'e' || *first == 'E')) {
+		++first;
+
+		if (*first == '-') {
+			exponent_negative = true;
+			++first;
+		} else if (*first == '+') {
+			++first;
 		}
 
-		delete event;
+		for (; first != last && IS_DIGIT(*first); ++first) {
+			exponent = 10 * exponent + (*first - '0');
+		}
 	}
-}
 
-const char * JSONDomParser :: getError() const
-{
-	return mParser->getError();
-}
+	if (exponent) {
+		double power_of_ten = 10;
 
-const JSONNode * JSONDomParser :: getValue() const
-{
-	return mContainer->getValue( 0 );
-}
+		for (; exponent > 1; exponent--) {
+			power_of_ten *= 10;
+		}
 
-JSONDomBuffer :: JSONDomBuffer( const JSONNode * node, int indent )
-{
-	mBuffer = new JSONStringBuffer();
-	dump( node, mBuffer, indent ? 0 : -1 );
-}
-
-JSONDomBuffer :: ~JSONDomBuffer()
-{
-	delete mBuffer;
-	mBuffer = NULL;
-}
-
-const char * JSONDomBuffer :: getBuffer() const
-{
-	return mBuffer->getBuffer();
-}
-
-int JSONDomBuffer :: getSize() const
-{
-	return mBuffer->getSize();
-}
-
-void JSONDomBuffer :: dump( const JSONNode * node, JSONStringBuffer * buffer, int level )
-{
-	if( JSONNode::eObject == node->getType() ) {
-		dumpObject( node, buffer, level );
-	} else if( JSONNode::eArray == node->getType() ) {
-		dumpArray( node, buffer, level );
-	} else {
-		if( JSONNode::eString == node->getType() ) {
-			buffer->append( '"' );
-			JSONCodec::encode( ((JSONStringNode*)node)->getValue(), buffer );
-			buffer->append( '"' );
-		} else if( JSONNode::eDouble == node->getType() ) {
-			JSONCodec::encode( ((JSONDoubleNode*)node)->getValue(), buffer );
-		} else if( JSONNode::eInt == node->getType() ) {
-			std::ostringstream o;
-
-			o << ((JSONIntNode*)node)->getValue();
-
-			buffer->append( o.str().c_str() );
-		} else if( JSONNode::eBoolean == node->getType() ) {
-			buffer->append( ((JSONBooleanNode*)node)->getValue() ? "true" : "false" );
-		} else if( JSONNode::eNull == node->getType() ) {
-			buffer->append( "null" );
+		if (exponent_negative) {
+			result /= power_of_ten;
 		} else {
-			assert( JSONNode::eComment == node->getType() );
-
-			buffer->append( "//" );
-			buffer->append( ((JSONCommentNode*)node)->getValue() );
-			buffer->append( "\r\n" );
-		}
-	}
-}
-
-void JSONDomBuffer :: dumpObject( const JSONNode * node,
-		JSONStringBuffer * buffer, int level )
-{
-	JSONObjectNode * objectNode = (JSONObjectNode*)node;
-
-	buffer->append( '{' );
-
-	for( int i = 0; i < objectNode->getCount(); i++ ) {
-		if( level >= 0 ) {
-			buffer->append( "\n" );
-			for( int i = 0; i <= level; i++ ) buffer->append( "\t" );
-		}
-
-		JSONPairNode * pairNode = objectNode->getValue( i );
-		const char * name = pairNode->getName();
-		const JSONNode * iter = pairNode->getValue();
-
-		buffer->append( '"' );
-
-		JSONCodec::encode( name, buffer );
-
-		buffer->append( "\" : " );
-
-		dump( iter, buffer, level >= 0 ? level + 1 : -1 );
-
-		if( ( i + 1 ) != objectNode->getCount()
-				&& JSONNode::eComment != iter->getType() ) buffer->append( ',' );
-	}
-
-	if( level >= 0 ) {
-		buffer->append( "\n" );
-		for( int i = 0; i < level; i++ ) buffer->append( "\t" );
-	}
-
-	buffer->append( '}' );
-}
-
-void JSONDomBuffer :: dumpArray( const JSONNode * node,
-		JSONStringBuffer * buffer, int level )
-{
-	JSONArrayNode * arrayNode = (JSONArrayNode*)node;
-
-	buffer->append( '[' );
-
-	for( int i = 0; i < arrayNode->getCount(); i++ ) {
-		if( level >= 0 ) {
-			buffer->append( "\n" );
-			for( int i = 0; i <= level; i++ ) buffer->append( "\t" );
-		}
-
-		const JSONNode * iter = arrayNode->getValue( i );
-
-		dump( iter, buffer, level >= 0 ? level + 1 : -1 );
-
-		if( ( i + 1 ) != arrayNode->getCount()
-				&& JSONNode::eComment != iter->getType() ) buffer->append( ',' );
-	}
-
-	if( level >= 0 ) {
-		buffer->append( "\n" );
-		for( int i = 0; i < level; i++ ) buffer->append( "\t" );
-	}
-
-	buffer->append( ']' );
-}
-
-JSONPullParser :: JSONPullParser()
-{
-	mEventQueue = new JSONPullEventQueue();
-	mReader = new JSONSpaceReader( 1 );
-	mStack = new JSONArrayList();
-	mNameList = new JSONArrayList();
-
-	mLevel = 0;
-
-	mError = NULL;
-	memset( mErrorSegment, 0, sizeof( mErrorSegment ) );
-	mErrorIndex = mColIndex = mRowIndex = 0;
-
-	mObjectCount = 0;
-}
-
-JSONPullParser :: ~JSONPullParser()
-{
-	delete mEventQueue;
-	mEventQueue = NULL;
-
-	delete mReader;
-	mReader = NULL;
-
-	delete mStack;
-	mStack = NULL;
-
-	for( int i = 0; i < mNameList->getCount(); i++ ) {
-		free( (char*)mNameList->getItem( i ) );
-	}
-	delete mNameList;
-	mNameList = NULL;
-}
-
-int JSONPullParser :: append( const char * source, int len )
-{
-	if( NULL != mError ) return 0;
-
-	int consumed = 0;
-
-	for( int i = 0; i < len && NULL == mError; i++ ) {
-
-		consumed++;
-
-		char c = source[ i ];
-
-		mErrorSegment[ mErrorIndex++ % sizeof( mErrorSegment ) ] = c;
-		mReader->read( this, c );
-		if( '\n' == c ) {
-			mRowIndex++;
-			mColIndex = 0;
-		} else {
-			mColIndex++;
+			result *= power_of_ten;
 		}
 	}
 
-	return consumed;
+	*out = result;
+
+	return first;
 }
 
-JSONPullEvent * JSONPullParser :: getNext()
+JSONValue * JSON::Parse(const char *source)
 {
-	JSONPullEvent * event = mEventQueue->dequeue();
-
-	if( NULL != event ) {
-		if( JSONPullEvent::eStartObject == event->getEventType() ) mLevel++;
-		if( JSONPullEvent::eEndObject == event->getEventType() ) mLevel--;
+	if (source == NULL) {
+		return NULL;
 	}
 
-	return event;
-}
+	JSONValue *root = NULL;
+	JSONValue *top = NULL;
 
-const char * JSONPullParser :: getError()
-{
-	return mError;
-}
+	int escaped_newlines = 0;
+	int lines = 0;
+	char *dup = strdup(source);
+	char *it = dup;
+	char *name = NULL;
 
-int JSONPullParser :: getLevel()
-{
-	return mLevel;
-}
+	while (*it) {
+		if ((*it) == '\n') {
+			lines++;
+		}
 
-void JSONPullParser :: changeReader( JSONReader * reader )
-{
-	JSONPullEvent * event = mReader->getEvent( this );
+		switch (*it) {
+			case '{':
+			case '[': {
+					// create new value
+					JSONValue *object = new JSONValue();
 
-	if( NULL != event ) {
-		const int eventType = event->getEventType();
+					// name
+					object->_name = NULL;
 
-		std::ostringstream errmsg;
-
-		if( JSONPullEvent::eStartObject == eventType ) {
-			mStack->append( (void*)"o" );
-
-			++mObjectCount;
-		} else if( JSONPullEvent::eEndObject == eventType ) {
-			if( mObjectCount <= mNameList->getCount() ) {
-				errmsg << "miss value for name \"" << (char*)mNameList->getItem( JSONArrayList::LAST_INDEX ) << "\"";
-			} else {
-				char * last = (char*)mStack->takeItem( JSONArrayList::LAST_INDEX );
-				if( NULL != last ) {
-					if( 'o' != *last ) {
-						errmsg << "mismatched object, start-with<" << last << ">";
+					if (name != NULL) {
+						object->_name = strdup(name);
 					}
-				} else {
-					errmsg << "mismatched object, start-with<NULL>";
+					
+					name = NULL;
+
+					// type
+					object->_type = (*it == '{')?JSON_OBJECT:JSON_ARRAY;
+
+					// skip open character
+					++it;
+
+					// set top and root
+					if (top) {
+						top->Append(object);
+					} else if (!root) {
+						root = object;
+					} else {
+						ERROR(it, "Second root. Only one root allowed");
+					}
+
+					top = object;
 				}
+				break;
+			case '}':
+			case ']': {
+					if (!top || top->_type != ((*it == '}')?JSON_OBJECT:JSON_ARRAY)) {
+						ERROR(it, "Mismatch closing brace/bracket");
+					}
 
-				--mObjectCount;
-				if( isObjectParent() ) free( mNameList->takeItem( JSONArrayList::LAST_INDEX ) );
-			}
-		} else if( JSONPullEvent::eStartArray == eventType ) {
-			mStack->append( (void*)"a" );
-		} else if( JSONPullEvent::eEndArray == eventType ) {
-			char * last = (char*)mStack->takeItem( JSONArrayList::LAST_INDEX );
-			if( NULL != last ) {
-				if( 'a' != *last ) {
-					errmsg << "mismatched array, start-with<" << last << ">";
+					// skip close character
+					++it;
+
+					// set top
+					top = top->_parent;
 				}
-			} else {
-				errmsg << "mismatched array, start-with<NULL>";
-			}
-
-			if( isObjectParent() ) free( mNameList->takeItem( JSONArrayList::LAST_INDEX ) );
-		} else if( JSONPullEvent::eName == eventType ) {
-#ifdef _WIN32
-			mNameList->append( _strdup( ((JSONNameEvent*)event)->getText() ) );
-#else
-			mNameList->append( strdup( ((JSONNameEvent*)event)->getText() ) );
-#endif
-		} else if( JSONPullEvent::eString == eventType
-				|| JSONPullEvent::eNumber == eventType
-				|| JSONPullEvent::eBoolean == eventType
-				|| JSONPullEvent::eNull == eventType ) {
-			if( isObjectParent() ) free( mNameList->takeItem( JSONArrayList::LAST_INDEX ) );
-		}
-
-		if( errmsg.str().size() > 0 ) {
-			mEventQueue->enqueue( event );
-		} else {
-			delete event;
-			setError( errmsg.str().c_str() );
-		}
-	}
-
-	delete mReader;
-	mReader = reader;
-}
-
-void JSONPullParser :: setError( const char * error )
-{
-	if( NULL != error ) {
-		if( NULL != mError ) free( mError );
-
-		char segment[ 2 * sizeof( mErrorSegment ) + 1 ];
-		{
-			memset( segment, 0, sizeof( segment ) );
-
-			char temp[ sizeof( mErrorSegment ) + 1 ];
-			memset( temp, 0, sizeof( temp ) );
-			if( mErrorIndex < (int)sizeof( mErrorSegment ) ) {
-#ifdef _WIN32
-				strncpy_s( temp, mErrorSegment, mErrorIndex );
-#else
-				strncpy( temp, mErrorSegment, mErrorIndex );
-#endif
-			} else {
-				int offset = mErrorIndex % sizeof( mErrorSegment );
-
-#ifdef _WIN32
-				strncpy_s( temp, mErrorSegment + offset, sizeof( mErrorSegment ) - offset );
-				// TODO:: naum consigo compilar essa linha no VC2010
-				// strncpy_s( temp + sizeof( mErrorSegment ) - offse), mErrorSegment, offset );
-#else
-				strncpy( temp, mErrorSegment + offset, sizeof( mErrorSegment ) - offset );
-				strncpy( temp + sizeof( mErrorSegment ) - offset, mErrorSegment, offset );
-#endif
-			}
-
-			for( char * pos = temp, * dest = segment; '\0' != *pos; pos++ ) {
-				if( '\r' == *pos ) {
-					*dest++ = '\\';
-					*dest++ = 'r';
-				} else if( '\n' == *pos ) {
-					*dest++ = '\\';
-					*dest++ = 'n';
-				} else if( '\t' == *pos ) {
-					*dest++ = '\\';
-					*dest++ = 't';
-				} else {
-					*dest++ = *pos;
+				break;
+			case ':':
+				if (!top || top->_type != JSON_OBJECT) {
+					ERROR(it, "Unexpected character");
 				}
-			}
-		}
+				++it;
+				break;
+			case ',':
+				CHECK_TOP();
+				++it;
+				break;
+			case '"': {
+					CHECK_TOP();
+					// skip '"' character
+					++it;
 
-		char msg[ 512 ];
+					char *first = it;
+					char *last = it;
 
-#ifdef _WIN32
-		sprintf_s( msg, sizeof( msg), "%s ( occured at row(%d), col(%d) : %s )", error, mRowIndex + 1, mColIndex + 1, segment );
-		mError = _strdup( msg );
-#else
-		snprintf( msg, sizeof( msg), "%s ( occured at row(%d), col(%d) : %s )", error, mRowIndex + 1, mColIndex + 1, segment );
-		mError = strdup( msg );
-#endif
-	}
-}
+					while (*it) {
+						if ((uint8_t)*it < '\x20') {
+							ERROR(first, "Control characters not allowed in strings");
+						} else if (*it == '\\') {
+							switch (it[1]) {
+								case '"':
+									*last = '"';
+									break;
+								case '\\':
+									*last = '\\';
+									break;
+								case '/':
+									*last = '/';
+									break;
+								case 'b':
+									*last = '\b';
+									break;
+								case 'f':
+									*last = '\f';
+									break;
+								case 'n':
+									*last = '\n';
+									++escaped_newlines;
+									break;
+								case 'r':
+									*last = '\r';
+									break;
+								case 't':
+									*last = '\t';
+									break;
+								case 'u': {
+										uint32_t codepoint;
 
-int JSONPullParser :: isWait4Name()
-{
-	int ret = 0;
+										if (hatoui(it + 2, it + 6, &codepoint) != it + 6) {
+											ERROR(it, "Bad unicode codepoint");
+										}
 
-	if( isObjectParent() && mObjectCount > mNameList->getCount() ) ret = 1;
+										if (codepoint <= 0x7F) {
+											*last = (char)codepoint;
+										} else if (codepoint <= 0x7FF) {
+											*last++ = (char)(0xC0 | (codepoint >> 6));
+											*last = (char)(0x80 | (codepoint & 0x3F));
+										} else if (codepoint <= 0xFFFF) {
+											*last++ = (char)(0xE0 | (codepoint >> 12));
+											*last++ = (char)(0x80 | ((codepoint >> 6) & 0x3F));
+											*last = (char)(0x80 | (codepoint & 0x3F));
+										}
+									}
+									it += 4;
+									break;
+								default:
+									ERROR(first, "Unrecognized escape sequence");
+							}
 
-	return ret;
-}
+							++last;
+							it += 2;
+						} else if (*it == '"') {
+							*last = 0;
+							++it;
+							break;
+						} else {
+							*last++ = *it++;
+						}
+					}
 
-int JSONPullParser :: isObjectParent()
-{
-	int ret = 0;
-	if( mStack->getCount() > 0 ) {
-		char * last = (char*)mStack->getItem( JSONArrayList::LAST_INDEX );
-		if( 'o' == *last ) ret = 1;		
-	}
+					if (!name && top->_type == JSON_OBJECT) {
+						// field name in object
+						name = first;
+					} else {
+						// new string value
+						JSONValue *object = new JSONValue();
 
-	return ret;
-}
+						object->_name = NULL;
 
-const char JSONCodec :: ESCAPE_CHARS [] =
-		{ '"', '\\', '\b', '\f', '\n', '\r', '\t' };
-const char JSONCodec :: UNESCAPED_CHARS [] =
-		{ '"', '\\', 'b',  'f',  'n',  'r',  't' };
+						if (name != NULL) {
+							object->_name = strdup(name);
+						}
 
-int JSONCodec :: decode( const char * encodeValue,
-		JSONStringBuffer * outBuffer )
-{
-	int isEscape = 0;
+						name = NULL;
 
-	const char * pos = encodeValue;
-	for( ; '\0' != *pos; pos++ ) {
-		if( '\\' == *pos && 0 == isEscape ) {
-			isEscape = 1;
-		} else {
-			if( 1 == isEscape ) {
-				isEscape = 0;
-				int index = -1;
-				for( int i = 0; i < (int)sizeof( UNESCAPED_CHARS ); i++ ) {
-					if( UNESCAPED_CHARS[i] == *pos ) {
-						index = i;
-						break;
+						object->_type = JSON_STRING;
+						object->_string_value = NULL;
+
+						if (first != NULL) {
+							object->_string_value = strdup(first);
+						}
+
+						top->Append(object);
 					}
 				}
-				if( index >= 0 ) {
-					outBuffer->append( ESCAPE_CHARS[ index ] );
-				} else {
-					// unknown escape, keep it not change
-					outBuffer->append( '\\' );
-					outBuffer->append( *pos );
-				}
-			} else {
-				outBuffer->append( *pos );
-			}
-		}
-	}
-
-	return 0;
-}
-
-int JSONCodec :: encode( const char * decodeValue,
-		JSONStringBuffer * outBuffer )
-{
-	const char * pos = decodeValue;
-	for( ; '\0' != *pos; pos++ ) {
-		int index = -1;
-		for( int i = 0; i < (int)sizeof( ESCAPE_CHARS ); i++ ) {
-			if( ESCAPE_CHARS[i] == *pos ) {
-				index = i;
 				break;
-			}
-		}
-		if( index >= 0 ) {
-			outBuffer->append( '\\' );
-			outBuffer->append( UNESCAPED_CHARS[index] );
-		} else {
-			outBuffer->append( *pos );
-		}	
-	}
+			case 'n':
+			case 't':
+			case 'f': {
+					CHECK_TOP();
 
-	return 0;
-}
+					// new null/bool value
+					JSONValue *object = new JSONValue();
 
-int JSONCodec :: encode( double value, JSONStringBuffer * outBuffer )
-{
-	std::ostringstream o;
+					object->_name = NULL;
 
-	if( ((double)ceil( value )) == value ) {
-		o << (int64_t)value;
-	} else {
-		o << value;
-	}
+					if (name != NULL) {
+						object->_name = strdup(name);
+					}
 
-	return outBuffer->append( o.str().c_str() );
-}
+					name = NULL;
 
-JSONReader :: JSONReader()
-{
-	mBuffer = new JSONStringBuffer();
-}
+					if (strncasecmp(it, "null", 4) == 0) {
+						// null
+						object->_type = JSON_NULL;
+						it += 4;
+					} else if (strncasecmp(it, "true", 4) == 0) {
+						// true
+						object->_type = JSON_BOOL;
+						object->_string_value = strdup("true");
+						object->_int_value = 1;
+						it += 4;
+					} else if (strncasecmp(it, "false", 5) == 0) {
+						// false
+						object->_type = JSON_BOOL;
+						object->_string_value = strdup("false");
+						object->_int_value = 0;
+						it += 5;
+					} else {
+						ERROR(it, "Unknown identifier");
+					}
 
-JSONReader :: ~JSONReader()
-{
-	delete mBuffer;
-}
-
-void JSONReader :: changeReader( JSONPullParser * parser, JSONReader * reader )
-{
-	parser->changeReader( reader );
-}
-
-void JSONReader :: setError( JSONPullParser * parser, const char * error )
-{
-	parser->setError( error );
-}
-
-int JSONReader :: isWait4Name( JSONPullParser * parser )
-{
-	return parser->isWait4Name();
-}
-
-int JSONReader :: isObjectParent( JSONPullParser * parser )
-{
-	return parser->isObjectParent();
-}
-
-JSONSpaceReader :: JSONSpaceReader( int hasReadComma )
-{
-	mHasReadComma = hasReadComma;
-}
-
-JSONSpaceReader :: ~JSONSpaceReader()
-{
-}
-
-void JSONSpaceReader :: read( JSONPullParser * parser, char c )
-{
-	if( isspace( c ) ) {
-		//skip
-	} else if( ',' == c && 0 == mHasReadComma ) {
-		mHasReadComma = 1;
-	} else if( '/' == c ) {
-		JSONReader * reader = new JSONCommentReader(
-				new JSONSpaceReader( mHasReadComma ) );
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else if( '}' == c ) {
-		JSONReader * reader = new JSONEndObjectReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else if( ']' == c ) {
-		JSONReader * reader = new JSONEndArrayReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else {
-		if( 0 == mHasReadComma ) {
-			setError( parser, "miss ',' between values" );
-		} else if( isWait4Name( parser ) ) {
-			JSONReader * reader = new JSONNameReader();
-			changeReader( parser, reader );
-			reader->read( parser, c );
-		} else {
-			if( isObjectParent( parser ) ) {
-				if( ':' == c ) {
-					changeReader( parser, new JSONValueReader() );
-				} else {
-					setError( parser, "miss ':' between name & value" );
+					top->Append(object);
 				}
-			} else {
-				if( '{' == c ) {
-					JSONReader * reader = new JSONStartObjectReader();
-					changeReader( parser, reader );
-					reader->read( parser, c );
-				} else if( '[' == c ) {
-					JSONReader * reader = new JSONStartArrayReader();
-					changeReader( parser, reader );	
-					reader->read( parser, c );
-				} else {
-					JSONReader * reader = new JSONValueReader();
-					changeReader( parser, reader );
-					reader->read( parser, c );
+				break;
+			case '-':
+			case '0':
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9': {
+					CHECK_TOP();
+
+					// new number value
+					JSONValue *object = new JSONValue();
+
+					object->_name = NULL;
+
+					if (name != NULL) {
+						object->_name = strdup(name);
+					}
+
+					name = NULL;
+
+					object->_type = JSON_INT;
+
+					char *first = it;
+
+					while (*it != '\x20' && *it != '\x09' && *it != '\x0d' && *it != '\x0a' && *it != ',' && *it != ']' && *it != '}') {
+						if (*it == '.' || *it == 'e' || *it == 'E') {
+							object->_type = JSON_FLOAT;
+						}
+						++it;
+					}
+
+					if (object->_type == JSON_INT && atoi(first, it, &object->_int_value) != it) {
+						ERROR(first, "Bad integer number");
+					}
+
+					if (object->_type == JSON_FLOAT && atof(first, it, &object->_double_value) != it) {
+						ERROR(first, "Bad float number");
+					}
+
+					object->_string_value = strndup(first, it-first);
+
+					top->Append(object);
 				}
-			}
-		}
-	}
-}
-
-JSONPullEvent * JSONSpaceReader :: getEvent( JSONPullParser * parser )
-{
-	return NULL;
-}
-
-JSONStartObjectReader :: JSONStartObjectReader( int hasReadLeftBrace )
-{
-	mHasReadLeftBrace = 0 == hasReadLeftBrace ? 0 : 2;
-}
-
-JSONStartObjectReader :: ~JSONStartObjectReader()
-{
-}
-
-void JSONStartObjectReader :: read( JSONPullParser * parser, char c )
-{
-	if( isspace( c ) ) {
-		//skip
-	} else if( 0 == mHasReadLeftBrace && '{' == c ) {
-		mHasReadLeftBrace = 1;
-	} else if( '}' == c ) {
-		JSONReader * reader = new JSONEndObjectReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else if( '"' == c ) {
-		JSONReader * reader = new JSONNameReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else if( '/' == c ) {
-		JSONReader * reader = new JSONCommentReader(
-				new JSONStartObjectReader( mHasReadLeftBrace ) );
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else {
-		setError( parser, "unknown name" );
-	}
-}
-
-JSONPullEvent * JSONStartObjectReader :: getEvent( JSONPullParser * parser )
-{
-	return new JSONStartObjectEvent();
-}
-
-JSONEndObjectReader :: JSONEndObjectReader()
-{
-}
-
-JSONEndObjectReader :: ~JSONEndObjectReader()
-{
-}
-
-void JSONEndObjectReader :: read( JSONPullParser * parser, char c )
-{
-	if( '}' == c ) {
-		changeReader( parser, new JSONSpaceReader() );
-	} else {
-		setError( parser, "unknown object end" );
-	}
-}
-
-JSONPullEvent * JSONEndObjectReader :: getEvent( JSONPullParser * parser )
-{
-	return new JSONEndObjectEvent();
-}
-
-JSONStartArrayReader :: JSONStartArrayReader()
-{
-	mHasReadLeftBracket = 0;
-}
-
-JSONStartArrayReader :: ~JSONStartArrayReader()
-{
-}
-
-void JSONStartArrayReader :: read( JSONPullParser * parser, char c )
-{
-	if( 0 == mHasReadLeftBracket && '[' == c ) {
-		mHasReadLeftBracket = 1;
-	} else if( ']' == c ) {
-		JSONReader * reader = new JSONEndArrayReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else {
-		JSONReader * reader = new JSONSpaceReader( 1 );
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	}
-}
-
-JSONPullEvent * JSONStartArrayReader :: getEvent( JSONPullParser * parser )
-{
-	return new JSONStartArrayEvent();
-}
-
-JSONEndArrayReader :: JSONEndArrayReader()
-{
-}
-
-JSONEndArrayReader :: ~JSONEndArrayReader()
-{
-}
-
-void JSONEndArrayReader :: read( JSONPullParser * parser, char c )
-{
-	if( ']' == c ) {
-		changeReader( parser, new JSONSpaceReader() );
-	} else {
-		setError( parser, "unknown array end" );
-	}
-}
-
-JSONPullEvent * JSONEndArrayReader :: getEvent( JSONPullParser * parser )
-{
-	return new JSONEndArrayEvent();
-}
-
-JSONNameReader :: JSONNameReader()
-{
-	mLastChar = '\0';
-	mHasReadStartQuot = 0;
-}
-
-JSONNameReader :: ~JSONNameReader()
-{
-}
-
-void JSONNameReader :: read( JSONPullParser * parser, char c )
-{
-	if( 0 == mHasReadStartQuot ) {
-		if( isspace( c ) ) {
-			//skip
-		} else if( '"' == c ) {
-			mHasReadStartQuot = 1;
-		} else {
-			setError( parser, "unknown name" );
-		}
-	} else {
-		if( '"' == c && '\\' != mLastChar ) {
-			changeReader( parser, new JSONSpaceReader( 1 ) );
-		} else {
-			mLastChar = c;
-			mBuffer->append( c );
-		}
-	}
-}
-
-JSONPullEvent * JSONNameReader :: getEvent( JSONPullParser * parser )
-{
-	JSONStringBuffer outBuffer;
-
-	JSONCodec::decode( mBuffer->getBuffer(), &outBuffer );
-
-	JSONNameEvent * event = new JSONNameEvent();
-	event->setText( outBuffer.getBuffer(), outBuffer.getSize() );
-
-	return event;
-}
-
-JSONValueReader :: JSONValueReader()
-{
-}
-
-JSONValueReader :: ~JSONValueReader()
-{
-}
-
-void JSONValueReader :: read( JSONPullParser * parser, char c )
-{
-	if( isspace( c ) ) {
-		//skip
-	} else if( '"' == c ) {
-		JSONReader * reader = new JSONStringReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else if( '-' == c || isdigit( c ) ) {
-		JSONReader * reader = new JSONNumberReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else if( 't' == c || 'T' == c || 'f' == c || 'F' == c ) {
-		JSONReader * reader = new JSONBooleanReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else if( 'n' == c || 'N' == c ) {
-		JSONReader * reader = new JSONNullReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else if( '/' == c ) {
-		JSONReader * reader = new JSONCommentReader(
-				new JSONValueReader() );
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else if( '{' == c ) {
-		JSONReader * reader = new JSONStartObjectReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else if( '[' == c ) {
-		JSONReader * reader = new JSONStartArrayReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else {
-		setError( parser, "unknown value" );
-	}
-}
-
-JSONPullEvent * JSONValueReader :: getEvent( JSONPullParser * parser )
-{
-	return NULL;
-}
-
-JSONStringReader :: JSONStringReader()
-{
-	mLastChar = '\0';
-	mHasReadStartQuot = 0;
-}
-
-JSONStringReader :: ~JSONStringReader()
-{
-}
-
-void JSONStringReader :: read( JSONPullParser * parser, char c )
-{
-	if( 0 == mHasReadStartQuot ) {
-		if( isspace( c ) ) {
-			//skip
-		} else if( '"' == c ) {
-			mHasReadStartQuot = 1;
-		} else {
-			setError( parser, "unknown string" );
-		}
-	} else {
-		if( '"' == c && '\\' != mLastChar ) {
-			changeReader( parser, new JSONSpaceReader() );
-		} else {
-			mLastChar = c;
-			mBuffer->append( c );
-		}
-	}
-}
-
-JSONPullEvent * JSONStringReader :: getEvent( JSONPullParser * parser )
-{
-	JSONStringBuffer outBuffer;
-
-	JSONCodec::decode( mBuffer->getBuffer(), &outBuffer );
-
-	JSONStringEvent * event = new JSONStringEvent();
-	event->setText( outBuffer.getBuffer(), outBuffer.getSize() );
-
-	return event;
-}
-
-JSONNumberReader :: JSONNumberReader()
-{
-}
-
-JSONNumberReader :: ~JSONNumberReader()
-{
-}
-
-void JSONNumberReader :: read( JSONPullParser * parser, char c )
-{
-	if( isdigit( c ) || '-' == c || '+' == c
-			|| 'e' == c || 'E' == c || '.' == c ) {
-		mBuffer->append( c );
-	} else {
-		JSONReader * reader = new JSONSpaceReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	}
-}
-
-JSONPullEvent * JSONNumberReader :: getEvent( JSONPullParser * parser )
-{
-	JSONNumberEvent * event = new JSONNumberEvent();
-	event->setText( mBuffer->getBuffer(), mBuffer->getSize() );
-
-	return event;
-}
-
-JSONBooleanReader :: JSONBooleanReader()
-{
-}
-
-JSONBooleanReader :: ~JSONBooleanReader()
-{
-}
-
-void JSONBooleanReader :: read( JSONPullParser * parser, char c )
-{
-	if( !isalpha( c ) ) {
-		JSONReader * reader = new JSONSpaceReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else {
-		mBuffer->append( c );
-	}
-}
-
-JSONPullEvent * JSONBooleanReader :: getEvent( JSONPullParser * parser )
-{
-	JSONBooleanEvent * event = new JSONBooleanEvent();
-	event->setText( mBuffer->getBuffer(), mBuffer->getSize() );
-
-	return event;
-}
-
-JSONNullReader :: JSONNullReader()
-{
-}
-
-JSONNullReader :: ~JSONNullReader()
-{
-}
-
-void JSONNullReader :: read( JSONPullParser * parser, char c )
-{
-	if( !isalpha( c ) ) {
-		JSONReader * reader = new JSONSpaceReader();
-		changeReader( parser, reader );
-		reader->read( parser, c );
-	} else {
-		mBuffer->append( c );
-	}
-}
-
-JSONPullEvent * JSONNullReader :: getEvent( JSONPullParser * parser )
-{
-	JSONNullEvent * event = new JSONNullEvent();
-	event->setText( mBuffer->getBuffer(), mBuffer->getSize() );
-
-	return event;
-}
-
-JSONCommentReader :: JSONCommentReader( JSONReader * savedReader )
-{
-	mHasReadStartSolidus = 0;
-	mSavedReader = savedReader;
-}
-
-JSONCommentReader :: ~JSONCommentReader()
-{
-}
-
-void JSONCommentReader :: read( JSONPullParser * parser, char c )
-{
-	if( mHasReadStartSolidus < 2 ) {
-		if( '/' == c ) {
-			mHasReadStartSolidus++;
-		} else {
-			setError( parser, "unknown comment" );
-		}
-	} else if( '\n' == c ) {
-		changeReader( parser, mSavedReader );
-	} else {
-		if( '\r' != c ) mBuffer->append( c );
-	}
-}
-
-JSONPullEvent * JSONCommentReader :: getEvent( JSONPullParser * parser )
-{
-	JSONCommentEvent * event = new JSONCommentEvent();
-	event->setText( mBuffer->getBuffer(), mBuffer->getSize() );
-
-	return event;
-}
-
-JSONPaddingReader :: JSONPaddingReader()
-{
-}
-
-JSONPaddingReader :: ~JSONPaddingReader()
-{
-}
-
-void JSONPaddingReader :: read( JSONPullParser * parser, char c )
-{
-	if( !isspace( c ) ) {
-		setError( parser, "unexpected padding" );
-	}
-}
-
-JSONPullEvent * JSONPaddingReader :: getEvent( JSONPullParser * parser )
-{
-	JSONPaddingEvent * event = new JSONPaddingEvent();
-	event->setText( mBuffer->getBuffer(), mBuffer->getSize() );
-
-	return event;
-}
-
-const int JSONArrayList::LAST_INDEX = -1;
-
-JSONArrayList :: JSONArrayList( int initCount )
-{
-	mMaxCount = initCount <= 0 ? 2 : initCount;
-	mCount = 0;
-	mFirst = (void**)malloc( sizeof( void * ) * mMaxCount );
-}
-
-JSONArrayList :: ~JSONArrayList()
-{
-	free( mFirst );
-	mFirst = NULL;
-}
-
-int JSONArrayList :: getCount() const
-{
-	return mCount;
-}
-
-int JSONArrayList :: append( void * value )
-{
-	if( NULL == value ) return -1;
-
-	if( mCount >= mMaxCount ) {
-		mMaxCount = ( mMaxCount * 3 ) / 2 + 1;
-		mFirst = (void**)realloc( mFirst, sizeof( void * ) * mMaxCount );
-		assert( NULL != mFirst );
-		memset( mFirst + mCount, 0, ( mMaxCount - mCount ) * sizeof( void * ) );
-	}
-
-	mFirst[ mCount++ ] = value;
-
-	return 0;
-}
-
-void * JSONArrayList :: takeItem( int index )
-{
-	void * ret = NULL;
-
-	if( LAST_INDEX == index ) index = mCount -1;
-	if( index < 0 || index >= mCount ) return ret;
-
-	ret = mFirst[ index ];
-
-	mCount--;
-
-	if( ( index + 1 ) < mMaxCount ) {
-		memmove( mFirst + index, mFirst + index + 1,
-			( mMaxCount - index - 1 ) * sizeof( void * ) );
-	} else {
-		mFirst[ index ] = NULL;
-	}
-
-	return ret;
-}
-
-const void * JSONArrayList :: getItem( int index ) const
-{
-	const void * ret = NULL;
-
-	if( LAST_INDEX == index ) index = mCount - 1;
-	if( index < 0 || index >= mCount ) return ret;
-
-	ret = mFirst[ index ];
-
-	return ret;
-}
-
-void JSONArrayList :: sort( int ( * cmpFunc )( const void *, const void * ) )
-{
-	for( int i = 0; i < mCount - 1; i++ ) {
-		int min = i;
-		for( int j = i + 1; j < mCount; j++ ) {
-			if( cmpFunc( mFirst[ min ], mFirst[ j ] ) > 0 ) {
-				min = j;
-			}
+				break;
+			default:
+				ERROR(it, "Unexpected character");
 		}
 
-		if( min != i ) {
-			void * temp = mFirst[ i ];
-			mFirst[ i ] = mFirst[ min ];
-			mFirst[ min ] = temp;
+		// skip white space
+		while (*it == '\x20' || *it == '\x9' || *it == '\xD' || *it == '\xA') {
+			++it;
 		}
 	}
-}
 
-JSONQueue :: JSONQueue()
-{
-	mMaxCount = 8;
-	mEntries = (void**)malloc( sizeof( void * ) * mMaxCount );
-
-	mHead = mTail = mCount = 0;
-}
-
-JSONQueue :: ~JSONQueue()
-{
-	free( mEntries );
-	mEntries = NULL;
-}
-
-void JSONQueue :: push( void * item )
-{
-	if( mCount >= mMaxCount ) {
-		mMaxCount = ( mMaxCount * 3 ) / 2 + 1;
-		void ** newEntries = (void**)malloc( sizeof( void * ) * mMaxCount );
-
-		unsigned int headLen = 0, tailLen = 0;
-		if( mHead < mTail ) {
-			headLen = mTail - mHead;
-		} else {
-			headLen = mCount - mTail;
-			tailLen = mTail;
-		}
-
-		memcpy( newEntries, &( mEntries[ mHead ] ), sizeof( void * ) * headLen );
-		if( tailLen ) {
-			memcpy( &( newEntries[ headLen ] ), mEntries, sizeof( void * ) * tailLen );
-		}
-
-		mHead = 0;
-		mTail = headLen + tailLen;
-
-		free( mEntries );
-		mEntries = newEntries;
+	if (top) {
+		ERROR(it, "Not all objects/arrays have been properly closed");
 	}
 
-	mEntries[ mTail++ ] = item;
-	mTail = mTail % mMaxCount;
-	mCount++;
-}
+	delete [] dup;
 
-void * JSONQueue :: pop()
-{
-	void * ret = NULL;
-
-	if( mCount > 0 ) {
-		ret = mEntries[ mHead++ ];
-		mHead = mHead % mMaxCount;
-		mCount--;
-	}
-
-	return ret;
-}
-
-void * JSONQueue :: top()
-{
-	return mCount > 0 ? mEntries[ mHead ] : NULL;
-}
-
-JSONStringBuffer :: JSONStringBuffer()
-{
-	init();
-}
-
-void JSONStringBuffer :: init()
-{
-	mSize = 0;
-	mMaxSize = 8;
-	mBuffer = (char*)malloc( mMaxSize );
-	memset( mBuffer, 0, mMaxSize );
-}
-
-JSONStringBuffer :: ~JSONStringBuffer()
-{
-	free( mBuffer );
-}
-
-int JSONStringBuffer :: append( char c )
-{
-	if( mSize >= ( mMaxSize - 1 ) ) {
-		mMaxSize += ( mMaxSize * 3 ) / 2 + 1;
-		mBuffer = (char*)realloc( mBuffer, mMaxSize );
-		assert( NULL != mBuffer );
-		memset( mBuffer + mSize, 0, mMaxSize - mSize );
-	}
-	mBuffer[ mSize++ ] = c;
-
-	return 0;
-}
-
-int JSONStringBuffer :: append( const char * value, int size )
-{
-	if( NULL == value ) return -1;
-
-	size = ( size <= 0 ? strlen( value ) : size );
-	if( size <= 0 ) return -1;
-
-	if( ( size + mSize ) > ( mMaxSize - 1 ) ) {
-		mMaxSize += size;
-		mBuffer = (char*)realloc( mBuffer, mMaxSize );
-		assert( NULL != mBuffer );
-		memset( mBuffer + mSize, 0, mMaxSize - mSize );
-	}
-
-	memcpy( mBuffer + mSize, value, size );
-	mSize += size;
-
-	return 0;
-}
-
-int JSONStringBuffer :: getSize() const
-{
-	return mSize;
-}
-
-const char * JSONStringBuffer :: getBuffer() const
-{
-	return mBuffer;
-}
-
-char * JSONStringBuffer :: takeBuffer()
-{
-	char * ret = mBuffer;
-
-	mBuffer = NULL;
-	init();
-
-	return ret;
-}
-
-void JSONStringBuffer :: clean()
-{
-	memset( mBuffer, 0, mMaxSize );
-	mSize = 0;
-}
-
-JSONPullEvent :: JSONPullEvent( int eventType )
-	: mEventType( eventType )
-{
-}
-
-JSONPullEvent :: ~JSONPullEvent()
-{
-}
-
-int JSONPullEvent :: getEventType()
-{
-	return mEventType;
-}
-
-JSONPullEventQueue :: JSONPullEventQueue()
-{
-	mQueue = new JSONQueue();
-}
-
-JSONPullEventQueue :: ~JSONPullEventQueue()
-{
-	for( ; NULL != mQueue->top(); ) {
-		JSONPullEvent * event = (JSONPullEvent*)mQueue->pop();
-		delete event;
-	}
-
-	delete mQueue;
-}
-
-void JSONPullEventQueue :: enqueue( JSONPullEvent * event )
-{
-	mQueue->push( event );
-}
-
-JSONPullEvent * JSONPullEventQueue :: dequeue()
-{
-	return (JSONPullEvent*)mQueue->pop();
-}
-
-JSONStartObjectEvent :: JSONStartObjectEvent()
-	: JSONPullEvent( eStartObject )
-{
-}
-
-JSONStartObjectEvent :: ~JSONStartObjectEvent()
-{
-}
-
-JSONEndObjectEvent :: JSONEndObjectEvent()
-	: JSONPullEvent( eEndObject )
-{
-}
-
-JSONEndObjectEvent :: ~JSONEndObjectEvent()
-{
-}
-
-JSONStartArrayEvent :: JSONStartArrayEvent()
-	: JSONPullEvent( eStartArray )
-{
-}
-
-JSONStartArrayEvent :: ~JSONStartArrayEvent()
-{
-}
-
-JSONEndArrayEvent :: JSONEndArrayEvent()
-	: JSONPullEvent( eEndArray )
-{
-}
-
-JSONEndArrayEvent :: ~JSONEndArrayEvent()
-{
-}
-
-JSONTextEvent :: JSONTextEvent( int eventType )
-	: JSONPullEvent( eventType )
-{
-	mText = NULL;
-}
-
-JSONTextEvent :: ~JSONTextEvent()
-{
-	if( NULL != mText ) free( mText );
-	mText = NULL;
-}
-
-void JSONTextEvent :: setText( const char * text, int len )
-{
-	if( NULL != text ) {
-		if( NULL != mText ) free( mText );
-		mText = (char*)malloc( len + 1 );
-		memcpy( mText, text, len );
-		mText[ len ] = '\0';
-	}
-}
-
-const char * JSONTextEvent :: getText() const
-{
-	return mText;
-}
-
-JSONNullEvent :: JSONNullEvent()
-	: JSONTextEvent( eNull )
-{
-}
-
-JSONNullEvent :: ~JSONNullEvent()
-{
-}
-
-JSONNameEvent :: JSONNameEvent()
-	: JSONTextEvent( eName )
-{
-}
-
-JSONNameEvent :: ~JSONNameEvent()
-{
-}
-
-JSONStringEvent :: JSONStringEvent()
-	: JSONTextEvent( eString )
-{
-}
-
-JSONStringEvent :: ~JSONStringEvent()
-{
-}
-
-JSONNumberEvent :: JSONNumberEvent()
-	: JSONTextEvent( eNumber )
-{
-}
-
-JSONNumberEvent :: ~JSONNumberEvent()
-{
-}
-
-JSONBooleanEvent :: JSONBooleanEvent()
-	: JSONTextEvent( eBoolean )
-{
-}
-
-JSONBooleanEvent :: ~JSONBooleanEvent()
-{
-}
-
-JSONCommentEvent :: JSONCommentEvent()
-	: JSONTextEvent( eComment )
-{
-}
-
-JSONCommentEvent :: ~JSONCommentEvent()
-{
-}
-
-JSONPaddingEvent :: JSONPaddingEvent()
-	: JSONTextEvent( ePadding )
-{
-}
-
-JSONPaddingEvent :: ~JSONPaddingEvent()
-{
+	return root;
 }
 
 }
-

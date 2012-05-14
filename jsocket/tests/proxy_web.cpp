@@ -45,6 +45,7 @@
 #include "jthread.h"
 #include "jsemaphoretimeoutexception.h"
 #include "jautolock.h"
+#include "jcondition.h"
 
 #include <iostream>
 

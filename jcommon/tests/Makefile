@@ -30,17 +30,14 @@ OBJS_xml_agenda = \
 OBJS_regexp = \
 	   regexp.o\
 
-OBJS_jsondom = \
-	   jsondom.o\
+OBJS_jsondump = \
+	   jsondump.o\
 
 OBJS_gcteste = \
 	   gcteste.o\
 
 OBJS_pointer = \
 	   pointer.o\
-
-OBJS_jsonpull = \
-	   jsonpull.o\
 
 OBJS_unit = \
 	   unit.o\
@@ -51,7 +48,7 @@ OBJS_calc_unit = \
 OBJS_access = \
 	   access.o\
 
-all: teste xml_teste xml_agenda regexp jsondom jsonpull gcteste unit calc_unit access
+all: teste xml_teste xml_agenda regexp jsondump gcteste unit calc_unit access
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -65,10 +62,7 @@ xml_agenda: $(OBJS_xml_agenda)
 regexp: $(OBJS_regexp)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
-jsondom: $(OBJS_jsondom)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
-
-jsonpull: $(OBJS_jsonpull)
+jsondump: $(OBJS_jsondump)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 gcteste: $(OBJS_gcteste)
@@ -93,4 +87,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste xml_teste xml_agenda myfile_teste.xml regexp jsondom jsonpull gcteste pointer unit calc_unit access
+	@rm -rvf *.o *.xml *~ teste xml_teste xml_agenda myfile_teste.xml regexp jsondump gcteste pointer unit calc_unit access

@@ -90,7 +90,6 @@ struct peer_cert_info_t {
 	int keySize;
 };
 
-
 class ServerSocket;
 
 /**

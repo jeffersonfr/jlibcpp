@@ -25,7 +25,7 @@ namespace jio {
 Serializable::Serializable():
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jcommon::Serializable");
+	jcommon::Object::SetClassName("jio::Serializable");
 }
 
 Serializable::~Serializable()

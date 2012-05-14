@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "jindexedbuffer.h"
 #include "jsocket.h"
+#include "jthread.h"
 
 #define MAX_CLIENTS		1000
 

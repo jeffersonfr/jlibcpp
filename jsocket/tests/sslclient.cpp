@@ -35,7 +35,7 @@ int main(void)
 	mySocket.UseVerification("cert.pem", NULL);
 	
 	// Print server information
-	SSLSocket::peer_cert_info_t info;
+	struct peer_cert_info_t info;
 	
 	mySocket.GetPeerCertInfo(&info);
 

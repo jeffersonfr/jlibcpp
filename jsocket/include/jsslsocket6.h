@@ -25,7 +25,7 @@
 #include "jsocketoptions.h"
 #include "jsslsocketinputstream.h"
 #include "jsslsocketoutputstream.h"
-#include "jconnection.h"
+#include "jsslsocket.h"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -61,39 +61,6 @@ COMPILE_TIME_ASSERT(sint32, sizeof(int32_t) == 4);
 #define RSA_KEYEXP RSA_F4 /* 65537 */
 
 namespace jsocket {
-
-/**
- *  Get information about peer certificate. Should be called after connect() or accept() when 
- *  using verification
- *
- */
-struct peer_cert_info_t {
-	// Issuer name
-	std::string commonName;             // CN
-	std::string countryName;            // C
-	std::string localityName;           // L
-	std::string stateOrProvinceName;    // ST
-	std::string organizationName;       // O
-	std::string organizationalUnitName; // OU
-	std::string title;                  // T
-	std::string initials;               // I
-	std::string givenName;              // G
-	std::string surname;                // S
-	std::string description;            // D
-	std::string uniqueIdentifier;       // UID
-	std::string emailAddress;           // Email
-
-	// Expire dates
-	std::string notBefore;
-	std::string notAfter;
-
-	// Misc. data
-	long serialNumber;
-	long version;
-	std::string sgnAlgorithm;
-	std::string keyAlgorithm;
-	int keySize;
-};
 
 class ServerSocket;
 

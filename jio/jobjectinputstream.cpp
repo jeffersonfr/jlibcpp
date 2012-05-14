@@ -70,6 +70,8 @@ int64_t ObjectInputStream::GetPosition()
 
 jcommon::Object * ObjectInputStream::Read()
 {
+	// TODO::
+	// - read all bytes from file (currently is limited in 65536)
 	if (stream == NULL) {
 		return NULL;
 	}
@@ -103,7 +105,6 @@ jcommon::Object * ObjectInputStream::Read()
 			delete object;
 			object = NULL;
 		}
-
 	}
 
 	return object;

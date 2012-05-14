@@ -47,25 +47,21 @@ const char* VALUE_PARSER = "ValueParser";
  *
  */
 template< typename A >
-class default_factory
-{
-public:
-	A* create() 
-	{
+class default_factory {
+	public:
+		A* create() 
+		{
 	   	return new A();
    	}
 
 };
-
-// template< typename E > class basic_parser;
 
 /*
  * \brief The base class for all parsers, declares base methods for
  * parsing and formatting. The list of objects of this class is used in compound
  * parsers (like \ref basic_non_terminal or \ref basic_choice)
  */
-template< typename E >class basic_parser
-{
+template< typename E >class basic_parser {
 	public:
 		typedef std::list< basic_parser<E> * > parser_list;
 		typedef typename parser_list::iterator parser_list_iterator;
@@ -314,13 +310,13 @@ template< typename E >class basic_parser
 
 };
 
-	template< typename E >
+template< typename E >
 std::basic_ostream<E>& operator <<( std::basic_ostream<E>& os, basic_parser<E>& parser )
 {
 	return parser.format(os);
 }
 
-	template< typename E >
+template< typename E >
 inline std::basic_istream<E>& operator >>( std::basic_istream<E>& is, basic_parser<E>& parser )
 {
 	return parser.parse( is );
@@ -328,9 +324,6 @@ inline std::basic_istream<E>& operator >>( std::basic_istream<E>& is, basic_pars
 
 typedef basic_parser<char>::parser_list parsers;
 typedef basic_parser<wchar_t>::parser_list wparsers;
-
-//template< typename E, typename A, typename F=default_factory<A> >
-//class basic_object_parser;
 
 /*
  * 	The object parser, parsed data are saved in objects of type given by 
@@ -341,8 +334,7 @@ typedef basic_parser<wchar_t>::parser_list wparsers;
  * 	factory or the factory method can be given as third template parameter.
  */
 template< typename E, typename A, typename F=default_factory<A> >
-class basic_object_parser : public basic_parser<E>
-{
+class basic_object_parser : public basic_parser<E> {
 	public:
 		typedef typename basic_parser<E>::symbol_type symbol_type;
 
@@ -386,10 +378,10 @@ class basic_object_parser : public basic_parser<E>
 		 */
 		virtual A& get_valid()
 		{
-			if( !this->is_valid() ) 
-			{
+			if (!this->is_valid()) {
 				this->m_parsed_object = F().create();
 			}
+
 			return *this->m_parsed_object;
 		}
 
@@ -399,10 +391,11 @@ class basic_object_parser : public basic_parser<E>
 		 */
 		virtual const A& get_valid(A& v) const
 		{
-			if( m_parsed_object )
+			if( m_parsed_object ) {
 				return v = *m_parsed_object;
-			else
-				return v;
+			}
+
+			return v;
 		}
 
 		/*
@@ -411,10 +404,10 @@ class basic_object_parser : public basic_parser<E>
 		 */
 		virtual void invalidate() 
 		{ 
-			if( this->is_valid() )
-			{
+			if (this->is_valid()) {
 				delete this->m_parsed_object;
 			}
+
 			this->m_parsed_object = NULL;
 		}
 
@@ -425,7 +418,7 @@ class basic_object_parser : public basic_parser<E>
 		A* release() { A* tmp = this->m_parsed_object; this->m_parsed_object = NULL; return tmp; }
 
 	protected:
-		A*				m_parsed_object;
+		A* m_parsed_object;
 
 		/*
 		 * \brief The method additionally validates the instance of A
@@ -448,15 +441,15 @@ class basic_object_parser : public basic_parser<E>
 		};
 };
 
-	template< typename E, typename A, typename F >
-	basic_object_parser<E,A,F>::basic_object_parser( const char* name, symbol_type type ) 
-: basic_parser<E>(name,type), m_parsed_object(NULL) 
+template< typename E, typename A, typename F >
+basic_object_parser<E,A,F>::basic_object_parser( const char* name, symbol_type type ) : 
+	basic_parser<E>(name,type), m_parsed_object(NULL) 
 {
 }
 
-	template< typename E, typename A, typename F >
-	basic_object_parser<E,A,F>::basic_object_parser( const char* name, const A &rhs, symbol_type type )
-: basic_parser<E>(name,type), m_parsed_object( new A(rhs) ) 
+template< typename E, typename A, typename F >
+basic_object_parser<E,A,F>::basic_object_parser( const char* name, const A &rhs, symbol_type type ) : 
+	basic_parser<E>(name,type), m_parsed_object( new A(rhs) ) 
 {
 }
 
@@ -464,13 +457,13 @@ class basic_object_parser : public basic_parser<E>
  * \brief the conversion from const to non const - if someone wants a copy of A object, should use previous constructor
  *
  */
-	template< typename E, typename A, typename F >
-	basic_object_parser<E,A,F>::basic_object_parser(const basic_object_parser& rhs )
-: basic_parser<E>(rhs), m_parsed_object(const_cast<basic_object_parser*>(&rhs)->release())
+template< typename E, typename A, typename F >
+basic_object_parser<E,A,F>::basic_object_parser(const basic_object_parser& rhs ) : 
+	basic_parser<E>(rhs), m_parsed_object(const_cast<basic_object_parser*>(&rhs)->release())
 {
 }
 
-	template< typename E, typename A, typename F >
+template< typename E, typename A, typename F >
 basic_object_parser<E,A,F>::~basic_object_parser() 
 {
 	if( this->is_valid() ) delete this->m_parsed_object;
@@ -484,8 +477,7 @@ basic_object_parser<E,A,F>::~basic_object_parser()
  *
  */
 template<typename E, typename A, typename F=default_factory<A> >
-class basic_non_terminal : public basic_object_parser<E,A,F>
-{
+class basic_non_terminal : public basic_object_parser<E,A,F> {
 	public:	
 		typedef typename basic_parser<E>::parser_list parser_list;
 		typedef typename basic_parser<E>::parser_list_iterator parser_list_iterator;
@@ -600,18 +592,18 @@ class basic_subset : public basic_non_terminal<E, A>
 		virtual std::basic_istream<E>& parse( std::basic_istream<E>& is );
 };
 
-	template< typename E, typename A >
-	basic_subset<E,A>::basic_subset()
-: basic_non_terminal<E,A>()
+template< typename E, typename A >
+basic_subset<E,A>::basic_subset() : 
+	basic_non_terminal<E,A>()
 {
 }
 
-	template< typename E, typename A >
+template< typename E, typename A >
 basic_subset<E,A>::~basic_subset()
 {
 }
 
-	template< typename E, typename A >
+template< typename E, typename A >
 uint64_t basic_subset<E,A>::parse( const E *buf, const uint64_t buf_length )
 {
 	this->prepare_for_parsing();
@@ -621,30 +613,27 @@ uint64_t basic_subset<E,A>::parse( const E *buf, const uint64_t buf_length )
 	parser_list_iterator parse_iterator = this->m_symbols.begin();
 
 	// copy symbols to temporary list seems to be best to me
-	while( parse_iterator != this->m_symbols.end() ) 
+	while( parse_iterator != this->m_symbols.end() ) {
 		symbols.push_back( *(parse_iterator++) );
-	while( !symbols.empty() && is_parsed )
-	{
+	}
+
+	while( !symbols.empty() && is_parsed ) {
 		parse_iterator = symbols.begin();
 		is_parsed = false;
-		while( parse_iterator != symbols.end() && !is_parsed )
-		{
+		while( parse_iterator != symbols.end() && !is_parsed ) {
 			(*parse_iterator)->change_strategy( this->m_strategy );
 			(*parse_iterator)->parse( buf+this->m_parsed_size, 
 					buf_length-this->m_parsed_size );
-			if( is_parsed = (*parse_iterator)->is_parsed() ) 
-			{
+			if( is_parsed = (*parse_iterator)->is_parsed() ) {
 				this->m_parsed_size += (*parse_iterator)->parsed_size();
 				// exclude from parsing
 				parse_iterator = symbols.erase(parse_iterator);
+			} else {
+				parse_iterator++; // continue with next
 			}
-			else parse_iterator++; // continue with next
 		}
 	}
-	for( parse_iterator = symbols.begin(); 
-			parse_iterator != symbols.end(); 
-			parse_iterator++ )
-	{
+	for( parse_iterator = symbols.begin(); parse_iterator != symbols.end(); parse_iterator++ ) {
 		(*parse_iterator)->change_parsed_flag(false);
 	}
 
@@ -653,7 +642,7 @@ uint64_t basic_subset<E,A>::parse( const E *buf, const uint64_t buf_length )
 	return this->m_parsed_size;
 }
 
-	template <typename E, typename A >
+template <typename E, typename A >
 std::basic_istream<E>& basic_subset<E,A>::parse( std::basic_istream<E>& is )
 {
 	this->prepare_for_parsing();
@@ -663,29 +652,27 @@ std::basic_istream<E>& basic_subset<E,A>::parse( std::basic_istream<E>& is )
 	parser_list_iterator parse_iterator = this->m_symbols.begin();
 
 	// copy symbols to temporary list seems to be best to me
-	while( parse_iterator != this->m_symbols.end() ) 
+	while( parse_iterator != this->m_symbols.end() ) {
 		symbols.push_back( *(parse_iterator++) );
-	while( !symbols.empty() && is_parsed )
-	{
+	}
+
+	while( !symbols.empty() && is_parsed ) {
 		parse_iterator = symbols.begin();
 		is_parsed = false;
-		while( parse_iterator != symbols.end() && !is_parsed && is.good() )
-		{
+		while( parse_iterator != symbols.end() && !is_parsed && is.good() ) {
 			(*parse_iterator)->change_strategy( this->m_strategy );
 			(*parse_iterator)->parse( is );
-			if( is_parsed = (*parse_iterator)->is_parsed() ) 
-			{
+			if( is_parsed = (*parse_iterator)->is_parsed() ) {
 				this->m_parsed_size += (*parse_iterator)->parsed_size();
 				// exclude from parsing
 				parse_iterator = symbols.erase(parse_iterator);
+			} else {
+				parse_iterator++; // continue with next
 			}
-			else parse_iterator++; // continue with next
 		}
 	}
-	for( parse_iterator = symbols.begin(); 
-			parse_iterator != symbols.end(); 
-			parse_iterator++ )
-	{
+
+	for( parse_iterator = symbols.begin(); parse_iterator != symbols.end(); parse_iterator++ ) {
 		(*parse_iterator)->change_parsed_flag(false);
 	}
 
@@ -802,29 +789,24 @@ template< typename TracedObject > class tracer
 {	
 
 	public:
-		tracer(const TracedObject& traced_object,
-				const char* method,
-				const char* source_file, 
-				long source_line = 0 ) : 
+		tracer(const TracedObject& traced_object, const char* method, const char* source_file, long source_line = 0 ) : 
 			m_traced_object(traced_object),
 			m_method(method), 
 			m_source_file(source_file), 
 			m_source_line(source_line),
 			m_trace_level((int)trace_context::info),
 			m_is_intended(false)
-	{
-		if( is_trace_on() )
 		{
-			int scope = trace_context::get().inc_scope();
-			if( to_trace() )
-			{
-				intend( scope );
-				std::cout << ">> " << traced_object.get_name() << "::";
-				std::cout << m_method << "()  " << m_source_file << "(" << m_source_line << ")" << std::endl;
-				m_is_intended = false;
+			if( is_trace_on() ) {
+				int scope = trace_context::get().inc_scope();
+				if( to_trace() ) {
+					intend( scope );
+					std::cout << ">> " << traced_object.get_name() << "::";
+					std::cout << m_method << "()  " << m_source_file << "(" << m_source_line << ")" << std::endl;
+					m_is_intended = false;
+				}
 			}
 		}
-	}
 
 		bool is_trace_on() 
 		{
@@ -841,8 +823,7 @@ template< typename TracedObject > class tracer
 
 		friend inline tracer& operator << (tracer& a_tracer, const char* str)
 		{	
-			if( a_tracer.to_trace() )
-			{ 
+			if( a_tracer.to_trace() ) { 
 				a_tracer.intend( trace_context::get().get_scope() );
 				std::cout << str;	
 			}
@@ -857,8 +838,7 @@ template< typename TracedObject > class tracer
 
 		friend inline tracer& operator << (tracer& a_tracer, int i)
 		{	
-			if( a_tracer.to_trace() )
-			{ 
+			if( a_tracer.to_trace() ) { 
 				a_tracer.intend( trace_context::get().get_scope() );
 				std::cout << i;	
 			}
@@ -867,8 +847,7 @@ template< typename TracedObject > class tracer
 
 		friend inline tracer& operator << (tracer& a_tracer, unsigned int i)
 		{	
-			if( a_tracer.to_trace() )
-			{ 
+			if( a_tracer.to_trace() ) { 
 				a_tracer.intend( trace_context::get().get_scope() );
 				std::cout << i;	
 			}
@@ -877,8 +856,7 @@ template< typename TracedObject > class tracer
 
 		friend inline tracer& operator << (tracer& a_tracer, uint64_t i)
 		{	
-			if( a_tracer.to_trace() )
-			{ 
+			if( a_tracer.to_trace() ) { 
 				a_tracer.intend( trace_context::get().get_scope() );
 				std::cout << i;	
 			}
@@ -887,8 +865,7 @@ template< typename TracedObject > class tracer
 
 		friend inline tracer& operator << (tracer& a_tracer, long i)
 		{	
-			if( a_tracer.to_trace() )
-			{ 
+			if( a_tracer.to_trace() ) { 
 				a_tracer.intend( trace_context::get().get_scope() );
 				std::cout << i;	
 			}
@@ -897,8 +874,7 @@ template< typename TracedObject > class tracer
 
 		friend inline tracer& operator << (tracer& a_tracer, char c )
 		{
-			if( a_tracer.to_trace() )
-			{ 
+			if( a_tracer.to_trace() ) { 
 				a_tracer.intend( trace_context::get().get_scope() );
 				std::cout << c;	
 			}
@@ -907,8 +883,7 @@ template< typename TracedObject > class tracer
 
 		friend inline tracer& operator << (tracer& a_tracer, wchar_t c )
 		{
-			if( a_tracer.to_trace() )
-			{ 
+			if( a_tracer.to_trace() ) { 
 				a_tracer.intend( trace_context::get().get_scope() );
 				std::cout << c;	
 			}
@@ -922,8 +897,7 @@ template< typename TracedObject > class tracer
 
 		tracer<TracedObject>& endl(tracer<TracedObject>& a_tracer)
 		{
-			if( a_tracer.to_trace() ) 
-			{
+			if( a_tracer.to_trace() ) {
 				std::cout << std::endl;
 				a_tracer.set_trace_level( (int)trace_context::info );
 				a_tracer.reset_intendation();
@@ -946,11 +920,9 @@ template< typename TracedObject > class tracer
 
 		virtual ~tracer()
 		{
-			if( is_trace_on() )
-			{
+			if( is_trace_on() ) {
 				int scope = trace_context::get().dec_scope();
-				if( to_trace() )
-				{
+				if( to_trace() ) {
 					intend( scope );
 					std::cout << "<< " << m_traced_object.get_name();
 					std::cout << "::" << m_method << "()" << std::endl;
@@ -971,20 +943,18 @@ template< typename TracedObject > class tracer
 		}
 
 	private:
-		const TracedObject& 		m_traced_object;
-		const char* 				m_method;
-		const char* 				m_source_file;
-		const int					m_source_line;
-		int							m_trace_level;
-		bool						m_is_intended;
+		const TracedObject& m_traced_object;
+		const char* m_method;
+		const char* m_source_file;
+		const int m_source_line;
+		int m_trace_level;
+		bool m_is_intended;
 
 		void intend( int scope )
 		{
-			if( !m_is_intended )
-			{
+			if( !m_is_intended ) {
 				std::cout << scope;
-				for( int i = 0; i < scope; i++ ) 
-				{
+				for( int i = 0; i < scope; i++ ) {
 					std::cout << "    "; 
 				}
 				m_is_intended = true;
@@ -998,8 +968,7 @@ template<typename TracedObject> tracer<TracedObject>& endl(tracer<TracedObject>&
 	return a_tracer.endl(a_tracer);
 }
 
-
-	template< typename E, E A, E B, typename F >
+template< typename E, E A, E B, typename F >
 uint64_t basic_ascii_range_terminal<E,A,B,F>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
@@ -1012,17 +981,14 @@ uint64_t basic_ascii_range_terminal<E,A,B,F>::parse( const E *buf, const uint64_
 #endif
 	this->prepare_for_parsing();
 
-	if( (*buf) >= A && (*buf) <= B )
-	{
+	if( (*buf) >= A && (*buf) <= B ) {
 #ifdef TRACE
 		t << "----parse succeeded" << endl;
 #endif
 		this->get_valid() = (*buf);
 		this->m_parsed_size = 1;
 		this->m_is_parsed = true;
-	}
-	else
-	{
+	} else {
 #ifdef TRACE
 		t << "parse failed" << endl;
 #endif
@@ -1030,15 +996,14 @@ uint64_t basic_ascii_range_terminal<E,A,B,F>::parse( const E *buf, const uint64_
 	return this->m_parsed_size;
 }
 
-	template< typename E, E A, E B, typename F >
+template< typename E, E A, E B, typename F >
 std::basic_istream<E>& basic_ascii_range_terminal<E,A,B,F>::parse( std::basic_istream<E>& is )
 {
 #ifdef TRACE
 	tracer<basic_ascii_range_terminal<E,A,B,F> > t(*this, "parse", __FILE__, __LINE__);
 #endif	
 	this->prepare_for_parsing();
-	if( !is.good() )
-	{
+	if( !is.good() ) {
 		return is;
 	}
 	E input = A;
@@ -1050,17 +1015,14 @@ std::basic_istream<E>& basic_ascii_range_terminal<E,A,B,F>::parse( std::basic_is
 	t << "input=" << input << endl;
 #endif
 
-	if( is.good() && input >= A && input <= B )
-	{
+	if( is.good() && input >= A && input <= B ) {
 #ifdef TRACE
 		t << "----parser succeeded" << endl;
 #endif
 		this->m_parsed_size = 1;
 		this->m_is_parsed = true;
 		this->get_valid() = input;
-	}
-	else 
-	{
+	} else {
 #ifdef TRACE
 		t << "parser failed" << endl;
 #endif
@@ -1070,7 +1032,7 @@ std::basic_istream<E>& basic_ascii_range_terminal<E,A,B,F>::parse( std::basic_is
 	return is;
 }
 
-	template< typename E, E A, E B, typename F >
+template< typename E, E A, E B, typename F >
 std::basic_ostream<E>& basic_ascii_range_terminal<E,A,B,F>::format( std::basic_ostream<E>& os )
 {
 	this->prepare_for_formatting();
@@ -1079,14 +1041,11 @@ std::basic_ostream<E>& basic_ascii_range_terminal<E,A,B,F>::format( std::basic_o
 	if( (std::streamoff)strPos < 0 ) strPos = 0;
 
 	int out = this->get_valid();
-	if( os.good() ) 
-	{
+	if( os.good() ) {
 		os.write( (const E*)&out,sizeof(E) );
 		this->m_formatted_size = sizeof(E);
 		this->m_is_formatted = true;
-	}
-	else 
-	{
+	} else {
 		os.clear();
 		os.seekp( strPos );
 	}
@@ -1102,8 +1061,8 @@ class ascii_range_terminal : public basic_ascii_range_terminal<char,A,B,F>
 {
 	public:
 		ascii_range_terminal() : basic_ascii_range_terminal<char,A,B,F>() 
-	{
-	}
+		{
+		}
 
 		virtual ~ascii_range_terminal() 
 		{
@@ -1119,8 +1078,8 @@ class wascii_range_terminal : public basic_ascii_range_terminal<wchar_t,A,B,F>
 {
 	public:
 		wascii_range_terminal() : basic_ascii_range_terminal<wchar_t,A,B,F>() 
-	{
-	}
+		{
+		}
 
 		virtual ~wascii_range_terminal() 
 		{
@@ -1288,7 +1247,6 @@ class wexcept_terminal : public basic_except_terminal<wchar_t,except_choice>
 {
 };
 
-
 /*
  * \brief Accepts defined terms in random order.
  *
@@ -1305,13 +1263,12 @@ class basic_set : public basic_non_terminal<E, A>
 		virtual std::basic_istream<E>& parse( std::basic_istream<E>& is );
 };
 
-	template< typename E, typename A >
+template< typename E, typename A >
 basic_set<E,A>::basic_set() : basic_non_terminal<E,A>()
 {
 }
 
-
-	template< typename E, typename A >
+template< typename E, typename A >
 uint64_t basic_set<E,A>::parse( const E *buf, const uint64_t buf_length )
 {
 	this->prepare_for_parsing();
@@ -1321,30 +1278,35 @@ uint64_t basic_set<E,A>::parse( const E *buf, const uint64_t buf_length )
 	bool is_parsed = true;
 
 	// copy symbols to temporary list seems to be best to me
-	while( parse_iterator != this->m_symbols.end() ) symbols.push_back( *(parse_iterator++) );
-	while( !symbols.empty() && is_parsed )
-	{
+	while( parse_iterator != this->m_symbols.end() ) {
+		symbols.push_back( *(parse_iterator++) );
+	}
+
+	while( !symbols.empty() && is_parsed ) {
 		parse_iterator = symbols.begin();
 		is_parsed = false;
-		while( parse_iterator != symbols.end() && !is_parsed && this->m_parsed_size <= buf_length )
-		{
+		while( parse_iterator != symbols.end() && !is_parsed && this->m_parsed_size <= buf_length ) {
 			(*parse_iterator)->parse( buf+this->m_parsed_size, buf_length-this->m_parsed_size );
-			if( is_parsed = (*parse_iterator)->is_parsed() )
-			{
+			if( is_parsed = (*parse_iterator)->is_parsed() ) {
 				this->m_parsed_size += (*parse_iterator)->parsed_size();
 				parse_iterator = symbols.erase(parse_iterator); // exclude from parsing
+			} else {
+				parse_iterator++; // continue with next
 			}
-			else parse_iterator++; // continue with next
 		}
 	}
-	if( !symbols.empty() ) this->m_parsed_size = 0;
-	else this->m_is_parsed = true;
+
+	if( !symbols.empty() ) {
+		this->m_parsed_size = 0;
+	} else {
+		this->m_is_parsed = true;
+	}
 
 	return this->m_parsed_size;
 }
 
 
-	template <typename E, typename A >
+template <typename E, typename A >
 std::basic_istream<E>& basic_set<E,A>::parse( std::basic_istream<E>& is )
 {
 	this->prepare_for_parsing();
@@ -1356,33 +1318,31 @@ std::basic_istream<E>& basic_set<E,A>::parse( std::basic_istream<E>& is )
 
 	// copy symbols to temporary list seems to be best to me
 	while( parse_iterator != this->m_symbols.end() ) symbols.push_back( *(parse_iterator++) );
-	while( !symbols.empty() && is_parsed )
-	{
+	while( !symbols.empty() && is_parsed ) {
 		parse_iterator = symbols.begin();
 		is_parsed = false;
-		while( parse_iterator != symbols.end() && !is_parsed && is.good() )
-		{
+		while( parse_iterator != symbols.end() && !is_parsed && is.good() ) {
 			(*parse_iterator)->parse( is );
-			if( is_parsed = (*parse_iterator)->is_parsed() )
-			{
+			if( is_parsed = (*parse_iterator)->is_parsed() ) {
 				this->m_parsed_size += (*parse_iterator)->parsed_size();
 				parse_iterator = symbols.erase(parse_iterator); // exclude from parsing
+			} else {
+				parse_iterator++; // continue with next
 			}
-			else parse_iterator++; // continue with next
 		}
 	}
-	if( !symbols.empty() )
-	{
+	if( !symbols.empty() ) {
 		this->m_parsed_size = 0;
 		is.clear();
 		is.seekg( str_pos );
+	} else {
+		this->m_is_parsed = true;
 	}
-	else this->m_is_parsed = true;
 
 	return is;
 }
 
-	template <typename E, typename A >
+template <typename E, typename A >
 basic_set<E,A>::~basic_set()
 {
 }
@@ -1419,11 +1379,8 @@ const char *REPEATED_SEQUENCE = "repeated-sequence";
  * TODO - provide example
  *
  */
-template<typename E, 
-	typename P, 
-	typename F=default_factory<std::list<P> > >
-	class basic_repeated_sequence : public basic_object_parser<E,std::list<P>, F >
-{
+template<typename E, typename P, typename F=default_factory<std::list<P> > >
+class basic_repeated_sequence : public basic_object_parser<E,std::list<P>, F > {
 	public:
 		typedef std::list<P> list_P;
 		typedef typename list_P::iterator list_P_iterator;
@@ -1432,14 +1389,14 @@ template<typename E,
 
 		//! Default constructor
 		basic_repeated_sequence() :	basic_object_parser<E,list_P,F> ( REPEATED_SEQUENCE, basic_parser<E>::non_terminal_type ) 
-	{
-	}
+		{
+		}
 
 		//! Copy constructor
 		basic_repeated_sequence(const basic_repeated_sequence& rhs ) :
 			basic_object_parser<E,list_P,F>(rhs)
-	{
-	}
+		{
+		}
 
 		~basic_repeated_sequence() 
 		{
@@ -1502,9 +1459,8 @@ template<typename E,
  * \brief The class is a specialization of \ref basic_repeated_sequence for char input
  *
  */
-template<typename P,
-	typename F=default_factory< std::list<P> > >
-	class repeated_sequence : public basic_repeated_sequence<char,P,F>
+template<typename P, typename F=default_factory< std::list<P> > >
+class repeated_sequence : public basic_repeated_sequence<char,P,F>
 {
 	public:
 		repeated_sequence() : basic_repeated_sequence<char,P,F>() {};
@@ -1516,9 +1472,8 @@ template<typename P,
  * \brief The class is a specialization of \ref basic_repeated_sequence for wchar_t input
  *
  */
-template<typename P, 
-	typename F=default_factory< std::list<P> > >
-	class wrepeated_sequence : public basic_repeated_sequence<wchar_t,P,F>
+template<typename P, typename F=default_factory< std::list<P> > >
+class wrepeated_sequence : public basic_repeated_sequence<wchar_t,P,F>
 {
 	public:
 		wrepeated_sequence() : basic_repeated_sequence<wchar_t,P,F>() {};
@@ -1526,7 +1481,7 @@ template<typename P,
 			basic_repeated_sequence<char,P,F>(rhs) {};
 };
 
-	template< typename E, typename P, typename F >
+template< typename E, typename P, typename F >
 std::basic_istream<E>& basic_repeated_sequence<E,P,F>::parse( std::basic_istream<E>& is )
 {
 #ifdef TRACE
@@ -1540,13 +1495,11 @@ std::basic_istream<E>& basic_repeated_sequence<E,P,F>::parse( std::basic_istream
 
 	this->m_is_parsed = true;
 	P p;
-	while( this->m_is_parsed )
-	{
+	while( this->m_is_parsed ) {
 		std::streampos stream_pos = is.tellg();
 		if( (std::streamoff)stream_pos < 0 ) stream_pos = 0;
 		p.parse(is);
-		if( !p.is_parsed() ) 
-		{
+		if( !p.is_parsed() ) {
 			is.clear();
 			is.seekg( stream_pos );
 			break;
@@ -1562,7 +1515,7 @@ std::basic_istream<E>& basic_repeated_sequence<E,P,F>::parse( std::basic_istream
 	return is;
 }
 
-	template<typename E, typename P, typename F >
+template<typename E, typename P, typename F >
 uint64_t basic_repeated_sequence<E,P,F>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
@@ -1591,7 +1544,7 @@ uint64_t basic_repeated_sequence<E,P,F>::parse( const E *buf, const uint64_t buf
 	return this->m_parsed_size;
 }
 
-	template<typename E, typename P, typename F >
+template<typename E, typename P, typename F >
 std::basic_ostream<E>& basic_repeated_sequence<E,P,F>::format( std::basic_ostream<E>& os )
 {
 	this->prepare_for_formatting();
@@ -1648,18 +1601,18 @@ class wnon_terminal : public basic_non_terminal<wchar_t,A,F>
 {
 	public:
 		wnon_terminal() : basic_non_terminal<wchar_t,A,F>() 
-	{
-	}
+		{
+		}
 
 		wnon_terminal( const A& obj ) :
 			basic_non_terminal<wchar_t,A,F>(obj) 
-	{
-	}
+		{
+		}
 
 		wnon_terminal( const wnon_terminal& rhs ) : 
 			basic_non_terminal<wchar_t,A,F>(rhs) 
-	{
-	}
+		{
+		}
 
 		virtual ~wnon_terminal() 
 		{
@@ -1668,36 +1621,34 @@ class wnon_terminal : public basic_non_terminal<wchar_t,A,F>
 };
 
 
-	template< typename E, typename A, typename F >
-	basic_non_terminal<E,A,F>::basic_non_terminal()
-: basic_object_parser<E,A,F>(NONTERMINAL,basic_parser<E>::non_terminal_type),
+template< typename E, typename A, typename F >
+basic_non_terminal<E,A,F>::basic_non_terminal() : 
+	basic_object_parser<E,A,F>(NONTERMINAL,basic_parser<E>::non_terminal_type),
 	m_symbols_valid(false)
 {
 }
 
-	template< typename E, typename A, typename F >
-	basic_non_terminal<E,A,F>::basic_non_terminal( const A& obj  )
-:	basic_object_parser<E,A,F>(NONTERMINAL,obj, basic_parser<E>::non_terminal_type ), 
+template< typename E, typename A, typename F >
+basic_non_terminal<E,A,F>::basic_non_terminal( const A& obj  ) :	
+	basic_object_parser<E,A,F>(NONTERMINAL,obj, basic_parser<E>::non_terminal_type ), 
 	m_symbols_valid(false)
 {
 };
 
 template< typename E, typename A, typename F >
-basic_non_terminal<E,A,F>::basic_non_terminal(
-		const basic_non_terminal& rhs )
-:	basic_object_parser<E,A,F>(rhs),
+basic_non_terminal<E,A,F>::basic_non_terminal( const basic_non_terminal& rhs ) :	
+	basic_object_parser<E,A,F>(rhs),
 	m_symbols_valid(false)
 {
 };
 
-	template< typename E, typename A, typename F >
+template< typename E, typename A, typename F >
 basic_non_terminal<E,A,F>::~basic_non_terminal()
 {
 }
 
 template< typename E, typename A, typename F >
-	std::basic_istream<E>& basic_non_terminal<E,A,F>
-::parse( std::basic_istream<E>& is )
+std::basic_istream<E>& basic_non_terminal<E,A,F>::parse( std::basic_istream<E>& is )
 {
 #ifdef TRACE
 	tracer<basic_non_terminal<E,A,F> > t(*this, "parse", __FILE__, __LINE__);
@@ -1709,27 +1660,21 @@ template< typename E, typename A, typename F >
 	std::streampos stream_pos = is.tellg();
 	if( (std::streamoff)stream_pos < 0 ) stream_pos = 0;
 
-	while(	parse_iterator != this->m_symbols.end() &&
-			!is.bad() && 
-			is_parsed )
-	{
+	while(	parse_iterator != this->m_symbols.end() && !is.bad() && is_parsed ) {
 		(*parse_iterator)->parse( is );
 		this->m_parsed_size += (*parse_iterator)->parsed_size();
 		is_parsed = (*parse_iterator)->is_parsed();
 		parse_iterator++;
 	}
 	// reset the starting os buf possition in case of error
-	if( parse_iterator != this->m_symbols.end() || !is_parsed)
-	{
+	if( parse_iterator != this->m_symbols.end() || !is_parsed) {
 		is.clear();
 		is.seekg( stream_pos );
 		this->m_parsed_size = 0;
 #ifdef TRACE
 		t << "parser failed" << endl;
 #endif
-	}
-	else 
-	{
+	} else {
 		this->m_is_parsed = true;
 #ifdef TRACE
 		t << "---parser succeeded" << endl;
@@ -1749,12 +1694,8 @@ template< typename E, typename A, typename F >
 	std::streampos streamPos = os.tellp();
 	if( (std::streamoff)streamPos < 0 ) streamPos = 0;
 
-	while(	format_iterator != this->m_symbols.end() &&
-			!os.bad() && 
-			is_formatted )
-	{
-		if( (*format_iterator)->is_valid() )
-		{
+	while(	format_iterator != this->m_symbols.end() && !os.bad() && is_formatted ) {
+		if( (*format_iterator)->is_valid() ) {
 			(*format_iterator)->format( os );
 			this->m_formatted_size += (*format_iterator)->formatted_size();
 			is_formatted = (*format_iterator)->is_formatted();
@@ -1762,19 +1703,18 @@ template< typename E, typename A, typename F >
 		format_iterator++;
 	}
 	// reset the starting os buf possition in case of error
-	if( format_iterator != this->m_symbols.end() || !is_formatted)
-	{
+	if( format_iterator != this->m_symbols.end() || !is_formatted) {
 		os.clear();
 		os.seekp( streamPos );
 		this->m_formatted_size = 0;
+	} else {
+		this->m_is_formatted = true;
 	}
-	else this->m_is_formatted = true;
 	return os;
 }
 
 template< typename E, typename A, typename F >
-	uint64_t basic_non_terminal<E,A,F>
-::parse( const E *buf, const uint64_t buf_length )
+uint64_t basic_non_terminal<E,A,F>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_non_terminal<E,A,F> > t(*this, "parse", __FILE__, __LINE__);
@@ -1792,15 +1732,12 @@ template< typename E, typename A, typename F >
 		parse_iterator++;
 	}
 	// reset the starting os buf possition in case of error
-	if( !is_parsed )
-	{
+	if( !is_parsed ) {
 #ifdef TRACE
 		t << "parser failed" << endl;
 #endif
 		this->m_parsed_size = 0;
-	}
-	else
-	{
+	} else {
 #ifdef TRACE
 		t << "----parser succeeded" << endl;
 #endif
@@ -1854,15 +1791,15 @@ class basic_pattern_parser :
 				int comparison_type = IGNORE_CASE | IGNORE_SPACE ) :
 			basic_default_type_parser< E, string_type >(pattern,PATTERN_PARSER),
 			comparison_type_(comparison_type) 
-	{
-	}
+		{
+		}
 
 		basic_pattern_parser( const char *pattern, 
 				int comparison_type = IGNORE_CASE | IGNORE_SPACE ) :
 			basic_default_type_parser< E, string_type >(widen(pattern),PATTERN_PARSER),
 			comparison_type_(comparison_type) 
-	{
-	}
+		{
+		}
 
 		//! Destructor
 		virtual ~basic_pattern_parser() 
@@ -1934,28 +1871,19 @@ class basic_pattern_parser :
 
 		bool compare( typename string_type::iterator& it, const E cr )
 		{
-			if( (*it) == cr || 
-					( (comparison_type_ & IGNORE_CASE ) &&
-					  ( is_capital(cr) && (cr-'A') == ((*it)-'a') ||
-						is_capital(*it) && ((*it)-'A') == (cr-'a') ) ) )
-			{
+			if (((*it) == cr) || ((comparison_type_ & IGNORE_CASE) && ((is_capital(cr) && (cr-'A') == ((*it)-'a')) || (is_capital(*it) && ((*it)-'A') == (cr-'a'))))) {
 				it++;
 				return true;
-			}
-			else if( is_space(cr) && ( comparison_type_ & IGNORE_SPACE ) ) 
-			{
+			} else if( is_space(cr) && ( comparison_type_ & IGNORE_SPACE ) ) {
 				return true;
 			}
-			else 
-			{
-				return false;
-			}
+			
+			return false;
 		}
 
 };
 
-
-	template< typename E >
+template< typename E >
 uint64_t basic_pattern_parser<E>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
@@ -1966,10 +1894,7 @@ uint64_t basic_pattern_parser<E>::parse( const E *buf, const uint64_t buf_length
 	this->prepare_for_parsing();
 	typename string_type::iterator it = this->get_valid().begin();
 
-	while( this->m_parsed_size < buf_length && 
-			it != this->get_valid().end() && 
-			compare( it, buf[this->m_parsed_size] ) )
-	{
+	while( this->m_parsed_size < buf_length && it != this->get_valid().end() && compare( it, buf[this->m_parsed_size] ) ) {
 #ifdef TRACE
 		t << buf[this->m_parsed_size];
 #endif
@@ -1979,15 +1904,12 @@ uint64_t basic_pattern_parser<E>::parse( const E *buf, const uint64_t buf_length
 	t << endl;
 #endif
 
-	if( it == this->get_valid().end() )
-	{
+	if( it == this->get_valid().end() ) {
 #ifdef TRACE
 		t << "----parse succeeded" << endl;
 #endif
 		this->m_is_parsed = true;
-	}
-	else 
-	{
+	} else {
 #ifdef TRACE
 		t << "parse failed" << endl;
 #endif
@@ -1997,7 +1919,7 @@ uint64_t basic_pattern_parser<E>::parse( const E *buf, const uint64_t buf_length
 	return this->m_parsed_size;
 }
 
-	template< typename E >
+template< typename E >
 std::basic_istream<E>& basic_pattern_parser<E>::parse( std::basic_istream<E>& is )
 {
 #ifdef TRACE
@@ -2012,8 +1934,7 @@ std::basic_istream<E>& basic_pattern_parser<E>::parse( std::basic_istream<E>& is
 	E input = 0;
 	bool match = true;
 
-	while( is.good()  &&  it != this->get_valid().end()  &&  match )
-	{
+	while( is.good()  &&  it != this->get_valid().end()  &&  match ) {
 		this->m_parsed_size++;
 		is.read( &input, 1 );
 #ifdef TRACE
@@ -2025,15 +1946,12 @@ std::basic_istream<E>& basic_pattern_parser<E>::parse( std::basic_istream<E>& is
 #ifdef TRACE
 	t << endl;
 #endif
-	if( it == this->get_valid().end() )
-	{
+	if( it == this->get_valid().end() ) {
 		this->m_is_parsed = true;
 #ifdef TRACE
 		t << "----parse succeeded" << endl;
 #endif
-	}
-	else 
-	{
+	} else {
 		this->m_parsed_size = 0;
 		is.clear();
 		is.seekg( str_pos );
@@ -2071,35 +1989,32 @@ class wdefault_type_parser :
 			basic_default_type_parser<wchar_t,A>( obj ) {};
 };
 
-	template< typename E, typename A >
-	basic_default_type_parser<E,A>::basic_default_type_parser(const char* name)
-: basic_object_parser<E,A>(name,basic_parser<E>::terminal_type)
+template< typename E, typename A >
+basic_default_type_parser<E,A>::basic_default_type_parser(const char* name) : 
+	basic_object_parser<E,A>(name,basic_parser<E>::terminal_type)
 {
 }
 
 
-	template< typename E, typename A >
+template< typename E, typename A >
 basic_default_type_parser<E,A>::~basic_default_type_parser()
 {
 }
 
 template< typename E, typename A >
-basic_default_type_parser<E,A>::basic_default_type_parser( 
-		const basic_default_type_parser& rhs )
-: basic_object_parser<E,A>(rhs)
+basic_default_type_parser<E,A>::basic_default_type_parser( const basic_default_type_parser& rhs ) : 
+	basic_object_parser<E,A>(rhs)
 {
 }
 
 template< typename E, typename A >
-basic_default_type_parser<E,A>::basic_default_type_parser( 
-		const A& obj, const char* name )
-: basic_object_parser<E,A>(name, obj, basic_parser<E>::terminal_type)
+basic_default_type_parser<E,A>::basic_default_type_parser( const A& obj, const char* name ) : 
+	basic_object_parser<E,A>(name, obj, basic_parser<E>::terminal_type)
 {
 }
 
 template< typename E, typename A >
-std::basic_ostream<E>& basic_default_type_parser<E,A>::format( 
-		std::basic_ostream<E>& os )
+std::basic_ostream<E>& basic_default_type_parser<E,A>::format( std::basic_ostream<E>& os )
 {
 	this->prepare_for_formatting();
 
@@ -2143,17 +2058,13 @@ class basic_terminal : public basic_object_parser< E, E, F >
 #endif
 			basic_object_parser< E, E, F >::prepare_for_parsing();
 
-			if( buf_length > 0 && 
-					(E)buf[0] == this->get_valid() )
-			{
+			if( buf_length > 0 && (E)buf[0] == this->get_valid() ) {
 #ifdef TRACE
 				t << "----parse succeeded" << endl;
 #endif
 				this->m_is_parsed = true;
 				this->m_parsed_size = 1;//sizeof(value);#include "tracer.h"
-			}
-			else
-			{
+			} else {
 #ifdef TRACE
 				t << "parse failed" << endl;
 #endif
@@ -2168,8 +2079,7 @@ class basic_terminal : public basic_object_parser< E, E, F >
 		// comparison during parsing
 		E& get_valid()
 		{
-			if( !this->is_valid() ) 
-			{
+			if( !this->is_valid() ) {
 				this->m_parsed_object = F().create();
 				*(this->m_parsed_object) = value;
 			}
@@ -2185,12 +2095,12 @@ class basic_terminal : public basic_object_parser< E, E, F >
 
 };
 
-	template< class E, E value, typename F >
+template< class E, E value, typename F >
 basic_terminal<E,value,F>::basic_terminal() : basic_object_parser<E,E,F>(TERMINAL) 
 {
 }
 
-	template< typename E, E value, typename F >
+template< typename E, E value, typename F >
 basic_terminal<E,value,F>::~basic_terminal()
 {
 }
@@ -2199,7 +2109,7 @@ basic_terminal<E,value,F>::~basic_terminal()
  * \brief basic_terminal::format( str::ostream& os )
  *
  */
-	template< typename E, E value, typename F >
+template< typename E, E value, typename F >
 std::basic_ostream<E>& basic_terminal<E,value,F>::format( std::basic_ostream<E>& os )
 {
 	this->prepare_for_formatting();
@@ -2208,21 +2118,18 @@ std::basic_ostream<E>& basic_terminal<E,value,F>::format( std::basic_ostream<E>&
 	if( (std::streamoff)strPos < 0 ) strPos = 0;
 
 	E out = this->get_valid();
-	if( os.good() ) 
-	{
+	if( os.good() ) {
 		os.write( (E*)&out,sizeof(E) );
 		this->m_formatted_size = sizeof(E);
 		this->m_is_formatted = true;
-	}
-	else 
-	{
+	} else {
 		os.clear();
 		os.seekp( strPos );
 	}
 	return os;
 }
 
-	template< typename E, E value, typename F >
+template< typename E, E value, typename F >
 std::basic_istream<E>& basic_terminal<E,value,F>::parse( std::basic_istream<E>& is )
 {
 	typedef std::basic_istream<E> std_is;
@@ -2231,8 +2138,7 @@ std::basic_istream<E>& basic_terminal<E,value,F>::parse( std::basic_istream<E>& 
 	tracer<basic_terminal<E,value> > t(*this, "parse", __FILE__, __LINE__);
 #endif
 	this->prepare_for_parsing();
-	if( !is.good() )
-	{
+	if( !is.good() ) {
 		return is;
 	}
 	E input = this->get_valid();
@@ -2244,16 +2150,13 @@ std::basic_istream<E>& basic_terminal<E,value,F>::parse( std::basic_istream<E>& 
 	t << "input=" << input << endl;
 #endif
 
-	if( is.good() && this->get_valid() == input )
-	{
+	if( is.good() && this->get_valid() == input ) {
 #ifdef TRACE
 		t << "----parser succeeded" << endl;
 #endif
 		this->m_parsed_size = 1;
 		this->m_is_parsed = true;
-	}
-	else 
-	{
+	} else {
 #ifdef TRACE
 		t << "parser failed" << endl;
 #endif
@@ -2272,8 +2175,8 @@ class terminal : public basic_terminal<char,value,F>
 {
 	public:
 		terminal() : basic_terminal<char,value>() 
-	{
-	}
+		{
+		}
 
 		virtual ~terminal() 
 		{
@@ -2289,8 +2192,8 @@ class wterminal : public basic_terminal<wchar_t,value,F>
 {
 	public:
 		wterminal() : basic_terminal<wchar_t,value> () 
-	{
-	}
+		{
+		}
 
 		virtual ~wterminal() 
 		{
@@ -2320,12 +2223,12 @@ class basic_option : public basic_non_terminal<E, A>
 		}
 };
 
-	template< typename E, typename A >
+template< typename E, typename A >
 basic_option<E,A>::basic_option() : basic_non_terminal<E,A>()
 {
 }
 
-	template< typename E, typename A >
+template< typename E, typename A >
 uint64_t basic_option<E,A>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
@@ -2341,13 +2244,10 @@ uint64_t basic_option<E,A>::parse( const E *buf, const uint64_t buf_length )
 	while( parse_iterator != this->m_symbols.end() )
 	{
 		(*parse_iterator)->parse( buf+this->m_parsed_size, buf_length-this->m_parsed_size );
-		if( (*parse_iterator)->is_parsed() )
-		{
+		if( (*parse_iterator)->is_parsed() ) {
 			this->m_parsed_size += (*parse_iterator)->parsed_size();
 			parse_iterator++; // exclude from parsing
-		}
-		else 
-		{
+		} else {
 			this->m_parsed_size = 0;
 			break;
 		}
@@ -2358,7 +2258,7 @@ uint64_t basic_option<E,A>::parse( const E *buf, const uint64_t buf_length )
 	return this->m_parsed_size;
 }
 
-	template <typename E, typename A >
+template <typename E, typename A >
 std::basic_istream<E>& basic_option<E,A>::parse( std::basic_istream<E>& is )
 {
 #ifdef TRACE
@@ -2372,17 +2272,12 @@ std::basic_istream<E>& basic_option<E,A>::parse( std::basic_istream<E>& is )
 	if( (std::streamoff)stream_pos < 0 ) stream_pos = 0;
 	this->m_is_parsed = true;
 
-	while(	parse_iterator != this->m_symbols.end() &&
-			!is.bad() )
-	{
+	while(	parse_iterator != this->m_symbols.end() && !is.bad() ) {
 		(*parse_iterator)->parse( is );
-		if( (*parse_iterator)->is_parsed() )
-		{
+		if( (*parse_iterator)->is_parsed() ) {
 			this->m_parsed_size += (*parse_iterator)->parsed_size();
 			parse_iterator++;
-		}
-		else
-		{
+		} else {
 			// reset the starting os buf possition in case the option is not recognized
 			is.clear();
 			is.seekg( stream_pos );
@@ -2396,7 +2291,7 @@ std::basic_istream<E>& basic_option<E,A>::parse( std::basic_istream<E>& is )
 	return is;
 }
 
-	template <typename E, typename A >
+template <typename E, typename A >
 basic_option<E,A>::~basic_option()
 {
 }
@@ -2410,8 +2305,8 @@ class option : public basic_option<char, A>
 {
 	public:
 		option() : basic_option<char,A>() 
-	{
-	}
+		{
+		}
 
 		virtual ~option() 
 		{
@@ -2428,8 +2323,8 @@ class woption : public basic_option<wchar_t, A>
 {
 	public:
 		woption() : basic_option<wchar_t,A>() 
-	{
-	}
+		{
+		}
 
 		virtual ~woption() 
 		{
@@ -2447,18 +2342,18 @@ class choice : public basic_choice<char,A,F>
 	public:
 
 		choice() : basic_choice<char,A,F>() 
-	{
-	}
+		{
+		}
 
 		choice(const choice& rhs) : 
 			basic_choice<char,A,F>( rhs ) 
-	{
-	}
+		{
+		}
 
 		choice(const A& obj) : 
 			basic_choice<char,A,F>(obj) 
-	{
-	}
+		{
+		}
 
 		virtual ~choice() 
 		{
@@ -2476,18 +2371,18 @@ class wchoice : public basic_choice<wchar_t,A,F>
 	public:	
 
 		wchoice() : basic_choice<wchar_t,A,F>() 
-	{
-	}
+		{
+		}
 
 		wchoice(const wchoice& rhs) : 
 			basic_choice<wchar_t,A,F>( rhs ) 
-	{
-	}
+		{
+		}
 
 		wchoice(const A& obj) : 
 			basic_choice<wchar_t,A,F>(obj) 
-	{
-	}
+		{
+		}
 
 		virtual ~wchoice() 
 		{
@@ -2496,36 +2391,35 @@ class wchoice : public basic_choice<wchar_t,A,F>
 };
 
 // IMPLEMENTATION
-	template< typename E, typename A, typename F >
-	basic_choice<E,A,F>::basic_choice()
-: basic_non_terminal<E,A,F>()
+template< typename E, typename A, typename F >
+basic_choice<E,A,F>::basic_choice() : 
+	basic_non_terminal<E,A,F>()
 {
 	this->set_name( CHOICE );
 }
 
-	template< typename E, typename A, typename F >
-	basic_choice<E,A,F>::basic_choice( const basic_choice& rhs )
-: basic_non_terminal<E,A,F>(rhs)
+template< typename E, typename A, typename F >
+basic_choice<E,A,F>::basic_choice( const basic_choice& rhs ) : 
+	basic_non_terminal<E,A,F>(rhs)
 {
 	this->set_name( CHOICE );
 };
 
-	template< typename E, typename A, typename F >
-	basic_choice<E,A,F>::basic_choice( const A& obj )
-: basic_non_terminal<E,A,F>(obj)
+template< typename E, typename A, typename F >
+basic_choice<E,A,F>::basic_choice( const A& obj ) : 
+	basic_non_terminal<E,A,F>(obj)
 {
 	this->set_name( CHOICE );
 };
 
-	template< typename E, typename A, typename F >
+template< typename E, typename A, typename F >
 basic_choice<E,A,F>::~basic_choice()
 {
 	this->set_name( CHOICE );
 }
 
-	template< typename E, typename A, typename F >
-uint64_t basic_choice<E,A,F>::parse( const E *buf, 
-		const uint64_t buf_length )
+template< typename E, typename A, typename F >
+uint64_t basic_choice<E,A,F>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_choice<E,A,F> > t(*this, "parse", __FILE__, __LINE__);
@@ -2533,27 +2427,26 @@ uint64_t basic_choice<E,A,F>::parse( const E *buf,
 	this->prepare_for_parsing();
 
 	parser_list_iterator parse_iterator = this->m_symbols.begin();
-	while( parse_iterator != this->m_symbols.end() && !this->m_is_parsed )
-	{
-		// try to parse any of the symbols, stop when
-		// found the first successive parser
+	while( parse_iterator != this->m_symbols.end() && !this->m_is_parsed ) {
+		// try to parse any of the symbols, stop when found the first successive parser
 		this->m_parsed_size = (*parse_iterator)->parse(buf, buf_length);
 		this->m_is_parsed = (*parse_iterator)->is_parsed();
-		if( !this->m_is_parsed )  
-		{
+		if( !this->m_is_parsed )  {
 			(*parse_iterator)->invalidate();
 		}
 
 		parse_iterator++;
 	}
 	// unset 'parsed' flag for rest (for parser reuse)
-	while( parse_iterator != this->m_symbols.end() )
-	{
+	while( parse_iterator != this->m_symbols.end() ) {
 		(*parse_iterator++)->invalidate();
 	}
 #ifdef TRACE
-	if( this->m_is_parsed ) t << "----parser succeeded";
-	else t << "parser failed";
+	if( this->m_is_parsed ) {
+		t << "----parser succeeded";
+	} else {
+		t << "parser failed";
+	}
 	t << endl;
 #endif
 
@@ -2572,36 +2465,33 @@ std::basic_istream<E>& basic_choice<E,A,F>::parse( std::basic_istream<E>& is )
 	std::streampos stream_pos = is.tellg();
 	if( (std::streamoff)stream_pos < 0 ) stream_pos = 0;
 
-	while(	parse_iterator != this->m_symbols.end() &&
-			!is.bad() && 
-			!this->m_is_parsed )
-	{
+	while(	parse_iterator != this->m_symbols.end() && !is.bad() && !this->m_is_parsed ) {
 		(*parse_iterator)->parse( is );
 		this->m_parsed_size = (*parse_iterator)->parsed_size();
 		this->m_is_parsed = (*parse_iterator)->is_parsed();
-		if( !this->m_is_parsed )  
-		{
+		if( !this->m_is_parsed )  {
 			(*parse_iterator)->invalidate();
 		}
 		parse_iterator++;
 	}
 
 	// unset 'parsed' flag for rest (for parser reuse)
-	while( parse_iterator != this->m_symbols.end() )
-	{
+	while( parse_iterator != this->m_symbols.end() ) {
 		(*parse_iterator++)->invalidate();
 	}
 
 	// reset the starting os buf possition in case of error
-	if( parse_iterator != this->m_symbols.end() )
-	{
+	if( parse_iterator != this->m_symbols.end() ) {
 		is.clear();
 		is.seekg( stream_pos );
 		this->m_parsed_size = 0;
 	}
 #ifdef TRACE
-	if( this->m_is_parsed ) t << "----parser succeeded";
-	else t << "parser failed";
+	if( this->m_is_parsed ) {
+		t << "----parser succeeded";
+	} else {
+		t << "parser failed";
+	}
 	t << endl;
 #endif
 	return is;
@@ -2692,36 +2582,33 @@ basic_string_parser<E>::~basic_string_parser()
 {
 }
 
-	template< typename E >
+template< typename E >
 uint64_t basic_string_parser<E>::parse( const E* buf, const uint64_t buf_length )
 {
 	this->prepare_for_parsing();
 
 	this->m_is_parsed = true;
 	int i = 0;
-	for( i=0; i<(int)buf_length && buf[i] != this->m_separator; i++ )
-	{
+	for( i=0; i<(int)buf_length && buf[i] != this->m_separator; i++ ) {
 		if( ((this->m_directives & NO_NEW_LINES) && (buf[i] == NEW_LINE)) ||
 				((this->m_directives & NO_SPACES) && (buf[i] == SPACE)) ||
 				((this->m_directives & NO_TABS) && (buf[i] == TAB)) ||
 				((this->m_directives & NO_CARRIAGE_RETURNS) && (buf[i] == CARRIAGE_RETURN)) ||
-				((this->m_directives & NO_LINE_FEEDS) && (buf[i] == LINE_FEED)) )
-		{
+				((this->m_directives & NO_LINE_FEEDS) && (buf[i] == LINE_FEED)) ) {
 			this->m_is_parsed = false;
 			break;
 		}
 
 	};
 
-	if( this->m_is_parsed )
-	{
+	if( this->m_is_parsed ) {
 		this->get_valid() = std::basic_string<E>( buf, i );
 		this->m_parsed_size = this->get_valid().length();
 	}
 	return this->m_parsed_size;
 }
 
-	template< typename E >
+template< typename E >
 std::basic_istream<E>& basic_string_parser<E>::parse( std::basic_istream<E>& is )
 {
 	this->prepare_for_parsing();
@@ -2733,29 +2620,24 @@ std::basic_istream<E>& basic_string_parser<E>::parse( std::basic_istream<E>& is 
 
 	this->m_is_parsed = true;
 	E input = 0;
-	while( it != buf.str().end() )
-	{
+	while( it != buf.str().end() ) {
 		input = (*it);
 		// WARN:: para remover os warnnings foram adicionados parenteses no 'if' abaixo
 		if( ((this->m_directives & NO_NEW_LINES) && (input == NEW_LINE)) ||
 				((this->m_directives & NO_SPACES) && (input == SPACE)) ||
 				((this->m_directives & NO_TABS) && (input == TAB)) ||
 				((this->m_directives & NO_CARRIAGE_RETURNS) && (input == CARRIAGE_RETURN)) ||
-				((this->m_directives & NO_LINE_FEEDS) && (input == LINE_FEED)) )
-		{
+				((this->m_directives & NO_LINE_FEEDS) && (input == LINE_FEED)) ) {
 			this->m_is_parsed = false;
 			break;
 		}
 		it++;
 	};
 
-	if( this->m_is_parsed )
-	{	
+	if( this->m_is_parsed ) {	
 		this->get_valid() = buf.str();
 		this->m_parsed_size = this->get_valid().length();
-	}
-	else
-	{
+	} else {
 		is.clear();
 		is.seekg(str_pos);
 	}	
@@ -2774,12 +2656,8 @@ const char* FACTOR_WITH_REPETITION = "factor-with-repetition";
  * TODO - provide example
  *
  */
-template<typename E, 
-	unsigned int N, 
-	typename P, 
-	typename F=default_factory<std::vector<P> > >
-	class basic_factor_with_repetition : 
-		public basic_object_parser<E,std::vector<P>, F >
+template<typename E, unsigned int N, typename P, typename F=default_factory<std::vector<P> > >
+class basic_factor_with_repetition : public basic_object_parser<E,std::vector<P>, F >
 {
 	public:	
 		typedef std::vector<P> vector_P;
@@ -2789,9 +2667,7 @@ template<typename E,
 
 		//! Default constructor
 		basic_factor_with_repetition() :
-			basic_object_parser<E,vector_P,F>(
-					FACTOR_WITH_REPETITION,
-					basic_parser<E>::non_terminal_type ) 
+			basic_object_parser<E,vector_P,F>( FACTOR_WITH_REPETITION, basic_parser<E>::non_terminal_type ) 
 	{
 	}
 
@@ -2838,8 +2714,7 @@ template<typename E,
 			void get_list( std::list<R>& l )
 			{
 				vector_P_iterator it = this->get_valid().begin();
-				while( it != this->get_valid().end() )
-				{
+				while( it != this->get_valid().end() ) {
 					l.push_back( (*it).get_valid() );
 					it++;
 				}
@@ -2853,8 +2728,7 @@ template<typename E,
 		virtual void prepare_for_parsing()
 		{
 			basic_object_parser<E,vector_P,F>::prepare_for_parsing();
-			for( int i=0; i<N; i++ )
-			{
+			for( int i=0; i<N; i++ ) {
 				// uses copy constr of parser
 				// TODO - use factory
 				this->get_valid().push_back( P() );
@@ -2866,10 +2740,8 @@ template<typename E,
  * \brief The class is a specialization of \ref basic_factor_with_repetition for char input
  *
  */
-template<unsigned int N, 
-	typename P, 
-	typename F=default_factory< std::vector<P> > >
-	class factor_with_repetition : public basic_factor_with_repetition<char,N,P,F>
+template<unsigned int N, typename P, typename F=default_factory< std::vector<P> > >
+class factor_with_repetition : public basic_factor_with_repetition<char,N,P,F>
 {
 	public:
 		factor_with_repetition() : basic_factor_with_repetition<char,N,P,F>() {};
@@ -2881,10 +2753,8 @@ template<unsigned int N,
  * \brief The class is a specialization of \ref basic_factor_with_repetition for wchar_t input
  *
  */
-template<unsigned int N, 
-	typename P, 
-	typename F=default_factory< std::vector<P> > >
-	class wfactor_with_repetition : public basic_factor_with_repetition<wchar_t,N,P,F>
+template<unsigned int N, typename P, typename F=default_factory< std::vector<P> > >
+class wfactor_with_repetition : public basic_factor_with_repetition<wchar_t,N,P,F>
 {
 	public:
 		wfactor_with_repetition() : basic_factor_with_repetition<wchar_t,N,P,F>() {};
@@ -2907,16 +2777,14 @@ template< typename E, unsigned int N, typename P, typename F >
 	if( (std::streamoff)stream_pos < 0 ) stream_pos = 0;
 
 	vector_P_iterator it = this->get_valid().begin();
-	while( it != this->get_valid().end() )
-	{
+	while( it != this->get_valid().end() ) {
 		(*it).parse(is);
 		if( !(*it).is_parsed() ) break;
 		this->m_parsed_size += (*it).parsed_size();
 		it++;
 	}
 
-	if( it != this->get_valid().end() )
-	{
+	if( it != this->get_valid().end() ) {
 		// means it is not parsed required number of times
 		is.clear();
 		is.seekg( stream_pos );
@@ -2924,9 +2792,7 @@ template< typename E, unsigned int N, typename P, typename F >
 #ifdef TRACE
 		t << "parser failed " << endl;
 #endif
-	}
-	else
-	{
+	} else {
 #ifdef TRACE
 		this->m_is_parsed = true;
 		t << "parser succeeded " << endl;
@@ -2936,9 +2802,7 @@ template< typename E, unsigned int N, typename P, typename F >
 }
 
 template<typename E, unsigned int N, typename P, typename F >
-uint64_t basic_factor_with_repetition<E,N,P,F>::parse( 
-		const E *buf, 
-		const uint64_t buf_length )
+uint64_t basic_factor_with_repetition<E,N,P,F>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
 	tracer<basic_factor_with_repetition<E,N,P,F> >
@@ -2946,25 +2810,21 @@ uint64_t basic_factor_with_repetition<E,N,P,F>::parse(
 #endif
 	prepare_for_parsing();
 	vector_P_iterator it = this->get_valid().begin();
-	while( it != this->get_valid().end() )
-	{
+	while( it != this->get_valid().end() ) {
 		(*it).parse(buf+this->m_parsed_size,buf_length-this->m_parsed_size);
 		if( !(*it).is_parsed() ) break;
 		this->m_parsed_size += (*it).parsed_size();
 		it++;
 	}
 
-	if( it != this->get_valid().end() )
-	{
+	if( it != this->get_valid().end() ) {
 		// means it is not parsed required number of times
 		this->m_parsed_size = 0;
 
 #ifdef TRACE
 		t << "parser failed " << endl;
 #endif
-	}
-	else
-	{
+	} else {
 		this->m_is_parsed = true;
 #ifdef TRACE
 		t << "parser succeeded " << endl;
@@ -2973,19 +2833,18 @@ uint64_t basic_factor_with_repetition<E,N,P,F>::parse(
 	return this->m_parsed_size;
 }
 
-	template<typename E, unsigned int N, typename P, typename F >
+template<typename E, unsigned int N, typename P, typename F >
 std::basic_ostream<E>& basic_factor_with_repetition<E,N,P,F>::format( std::basic_ostream<E>& os )
 {
 	this->prepare_for_formatting();
 	vector_P_iterator format_iterator = this->get_valid().begin();
 	bool is_formatted = true;
 	std::streampos streamPos = os.tellp();
-	if( (std::streamoff)streamPos < 0 ) streamPos = 0;
+	if( (std::streamoff)streamPos < 0 ) {
+		streamPos = 0;
+	}
 
-	while(	format_iterator != this->get_valid().end() &&
-			!os.bad() && 
-			is_formatted )
-	{
+	while(	format_iterator != this->get_valid().end() && !os.bad() && is_formatted ) {
 		(*format_iterator).format(os);
 		this->m_formatted_size += (*format_iterator).formatted_size();
 		is_formatted = (*format_iterator).is_formatted();
@@ -3012,17 +2871,15 @@ class basic_term_with_exception : public basic_object_parser<E,A,F>
 
 		//! Default constructor
 		basic_term_with_exception() :
-			basic_object_parser<E,A,F>(
-					TERM_WITH_EXCEPTION,
-					basic_parser<E>::non_terminal_type ) 
-	{
-	}
+			basic_object_parser<E,A,F>( TERM_WITH_EXCEPTION, basic_parser<E>::non_terminal_type ) 
+		{
+		}
 
 		//! Copy constructor
 		basic_term_with_exception(const basic_term_with_exception& rhs ) :
 			basic_object_parser<E,A,F>(rhs) 
-	{
-	}
+		{
+		}
 
 		/*
 		 * \brief The parse method tries to parse exception at first - if exception is found 
@@ -3068,13 +2925,13 @@ class term_with_exception : public basic_term_with_exception<char,A,B,F>
 {
 	public:
 		term_with_exception() : basic_term_with_exception<char,A,B,F>() 
-	{
-	}
+		{
+		}
 
 		term_with_exception( const term_with_exception& rhs) :
 			basic_term_with_exception<char,A,B,F>(rhs) 
-	{
-	}
+		{
+		}
 
 };
 
@@ -3087,17 +2944,17 @@ class wterm_with_exception : public basic_term_with_exception<wchar_t,A,B,F>
 {
 	public:
 		wterm_with_exception() : basic_term_with_exception<wchar_t,A,B>() 
-	{
-	}
+		{
+		}
 
 		wterm_with_exception( const wterm_with_exception& rhs) :
 			basic_term_with_exception<char,A,B,F>(rhs) 
-	{
-	}
+		{
+		}
 
 };
 
-	template< typename E, typename A, typename B, typename F>
+template< typename E, typename A, typename B, typename F>
 std::basic_istream<E>& basic_term_with_exception<E,A,B,F>::parse( std::basic_istream<E>& is )
 {
 #ifdef TRACE
@@ -3111,8 +2968,7 @@ std::basic_istream<E>& basic_term_with_exception<E,A,B,F>::parse( std::basic_ist
 
 	B exception;
 	exception.parse(is);
-	if( exception.is_parsed() )
-	{
+	if( exception.is_parsed() ) {
 		is.clear();
 		is.seekg( stream_pos );
 		this->m_parsed_size = 0;
@@ -3123,15 +2979,14 @@ std::basic_istream<E>& basic_term_with_exception<E,A,B,F>::parse( std::basic_ist
 	}
 
 	this->get_valid().parse( is );
-	if( this->get_valid().is_parsed() )
-	{
+	if( this->get_valid().is_parsed() ) {
 		this->m_is_parsed = true;
 		this->m_parsed_size = this->get_valid().parsed_size();
 	}
 	return is;
 }
 
-	template< typename E, typename A, typename B, typename F >
+template< typename E, typename A, typename B, typename F >
 uint64_t basic_term_with_exception<E,A,B,F>::parse( const E *buf, const uint64_t buf_length )
 {
 #ifdef TRACE
@@ -3141,8 +2996,7 @@ uint64_t basic_term_with_exception<E,A,B,F>::parse( const E *buf, const uint64_t
 
 	B exception;
 	exception.parse( buf, buf_length );
-	if( exception.is_parsed() )
-	{
+	if( exception.is_parsed() ) {
 		this->m_parsed_size = 0;
 #ifdef TRACE
 		t << "parser failed - exception is parsed" << endl;
@@ -3150,8 +3004,7 @@ uint64_t basic_term_with_exception<E,A,B,F>::parse( const E *buf, const uint64_t
 		return 0;
 	}
 	this->get_valid().parse( buf, buf_length);
-	if( this->get_valid().is_parsed() )
-	{
+	if( this->get_valid().is_parsed() ) {
 		this->m_is_parsed = true;
 		this->m_parsed_size = this->get_valid().parsed_size();
 	}
@@ -3164,14 +3017,13 @@ basic_value_parser<E,A>::basic_value_parser() :
 {
 }
 
-	template< typename E, typename A >
+template< typename E, typename A >
 basic_value_parser<E,A>::~basic_value_parser()
 {
 }
 
-	template< typename E, typename A >
-uint64_t basic_value_parser<E,A>::parse( const E* buf, 
-		const uint64_t buf_length )
+template< typename E, typename A >
+uint64_t basic_value_parser<E,A>::parse( const E* buf, const uint64_t buf_length )
 {
 	this->prepare_for_parsing();
 
@@ -3181,15 +3033,13 @@ uint64_t basic_value_parser<E,A>::parse( const E* buf,
 
 	std::streampos begin = is.tellg();
 	is >> this->get_valid();
-	if( !(this->m_is_parsed = ( !is.fail() && 
-					( this->m_parsed_size = is.tellg() - begin ) > 0 ) ) )
-	{
+	if( !(this->m_is_parsed = ( !is.fail() && ( this->m_parsed_size = is.tellg() - begin ) > 0 ) ) ) {
 		this->m_parsed_size = 0;
 	}
 	return this->m_parsed_size;
 }
 
-	template< typename E, typename A >
+template< typename E, typename A >
 std::basic_istream<E>& basic_value_parser<E,A>::parse( std::basic_istream<E>& is )
 {
 	this->prepare_for_parsing();
@@ -3200,14 +3050,12 @@ std::basic_istream<E>& basic_value_parser<E,A>::parse( std::basic_istream<E>& is
 	this->m_parsed_size = (std::streamoff)is.tellg() - (std::streamoff)strPos;
 	this->m_is_parsed = !is.fail() && this->m_parsed_size > 0; 
 
-	if( !this->m_is_parsed )
-	{
+	if( !this->m_is_parsed ) {
 		is.clear();
 		is.seekg( strPos );
 		this->m_parsed_size = 0;
 	}
 	return is;
-
 }
 
 /*
@@ -3236,67 +3084,69 @@ class wvalue_parser : public basic_value_parser<wchar_t,A>
 
 class match
 {
-	uint64_t 	m_pos;
-	uint64_t 	m_size;
-	bool			m_is_valid;
+	uint64_t m_pos;
+	uint64_t m_size;
+	bool m_is_valid;
+
 	public:
-	match() : m_pos(0), m_size(0), m_is_valid(false) {};
-	match( uint64_t pos, uint64_t size ) :
-		m_pos(pos), 
-		m_size(size), 
-		m_is_valid(true) 
-	{
-	}
+		match() : 
+			m_pos(0), m_size(0), m_is_valid(false) 
+		{
+		}
 
-	virtual ~match() 
-	{
-	}
+		match( uint64_t pos, uint64_t size ) :
+			m_pos(pos), m_size(size), m_is_valid(true) 
+		{
+		}
 
-	uint64_t get_pos() const
-	{
-		return this->m_pos;
-	}
+		virtual ~match() 
+		{
+		}
 
-	uint64_t get_size() const
-	{
-		return this->m_size;
-	}
+		uint64_t get_pos() const
+		{
+			return this->m_pos;
+		}
 
-	void set_pos( uint64_t pos )
-	{
-		this->m_pos = pos;
-	}
+		uint64_t get_size() const
+		{
+			return this->m_size;
+		}
 
-	void set_size( uint64_t size )
-	{
-		this->m_size = size;
-	}
+		void set_pos( uint64_t pos )
+		{
+			this->m_pos = pos;
+		}
 
-	const match& operator = ( const match& m )
-	{
-		this->m_pos = m.get_pos();
-		this->m_size = m.get_size();
+		void set_size( uint64_t size )
+		{
+			this->m_size = size;
+		}
 
-		return m;
-	}
+		const match& operator = ( const match& m )
+		{
+			this->m_pos = m.get_pos();
+			this->m_size = m.get_size();
 
-	bool is_valid()
-	{
-		return this->m_is_valid;
-	}
+			return m;
+		}
+
+		bool is_valid()
+		{
+			return this->m_is_valid;
+		}
 };
 
 class matches
 {
 	public:
-
-		typedef std::map<std::string, match>			matches_coll;
-		typedef matches_coll::key_type					match_key;
-		typedef matches_coll::value_type				match_value;
-		typedef std::list<match>						matches_ret_coll;
+		typedef std::map<std::string, match> matches_coll;
+		typedef matches_coll::key_type match_key;
+		typedef matches_coll::value_type match_value;
+		typedef std::list<match> matches_ret_coll;
 
 	protected:
-		matches_coll								m_matches;
+		matches_coll m_matches;
 
 	public:	
 		void insert( match_key key, match value )
@@ -3308,12 +3158,9 @@ class matches
 		match get( match_key key )
 		{
 			matches_coll::iterator it = this->m_matches.find( key );
-			if( it != this->m_matches.end() )
-			{
+			if( it != this->m_matches.end() ) {
 				return (*it).second;
-			}
-			else
-			{
+			} else {
 				return match(); // with return match, which is not valid (its 
 				// is_valid() returns false)
 			}
@@ -3322,8 +3169,7 @@ class matches
 		void get_all(matches_ret_coll& l)
 		{
 			matches_coll::iterator it = this->m_matches.begin();
-			while( it != this->m_matches.end() )
-			{
+			while( it != this->m_matches.end() ) {
 				l.push_back( (*it).second );
 				it++;
 			}
@@ -3346,8 +3192,7 @@ class matches
 			sub_matches.get_all( ret_coll );
 
 			matches_coll::iterator it = ret_coll.begin();
-			while( it != ret_coll.end() )
-			{
+			while( it != ret_coll.end() ) {
 				matches::match_key new_key = parent_key;
 				new_key += (*it).first; // the key if (*it).first must begin with dot
 				insert( new_key, (*it).second );
@@ -3371,66 +3216,67 @@ class ere_base
 	typedef typename basic_parser<E>::parser_list parser_list;
 
 	protected:
-	uint64_t	m_rec_size;
-	uint64_t	m_rec_pos;
-	bool			m_is_rec;
+		uint64_t	m_rec_size;
+		uint64_t	m_rec_pos;
+		bool			m_is_rec;
+	
 	public:
-	ere_base()
+		ere_base()
 		// CHANGE:: m_is_rec(false), 
 		// CHANGE:: m_rec_pos(0), 
 		// CHANGE:: m_rec_size(0) 
-	{
-		m_is_rec = false;
-		m_rec_pos = 0;
-		m_rec_size = 0;
-	}
+		{
+			m_is_rec = false;
+			m_rec_pos = 0;
+			m_rec_size = 0;
+		}
 
-	virtual ~ere_base()
-	{
-	}
+		virtual ~ere_base()
+		{
+		}
 
-	bool is_recognized()
-	{
-		return this->m_is_rec;
-	}
+		bool is_recognized()
+		{
+			return this->m_is_rec;
+		}
 
-	void unset()
-	{
-		this->m_is_rec = false;
-	}
+		void unset()
+		{
+			this->m_is_rec = false;
+		}
 
-	void set( const uint64_t pos, const uint64_t size )
-	{
-		this->m_is_rec = true;
-		this->m_rec_pos = pos;
-		this->m_rec_size = size;
-	}
+		void set( const uint64_t pos, const uint64_t size )
+		{
+			this->m_is_rec = true;
+			this->m_rec_pos = pos;
+			this->m_rec_size = size;
+		}
 
-	uint64_t recognized_size() 
-	{
-		return this->m_rec_size;
-	}
+		uint64_t recognized_size() 
+		{
+			return this->m_rec_size;
+		}
 
-	uint64_t recognized_position() 
-	{
-		return this->m_rec_pos;
-	}
+		uint64_t recognized_position() 
+		{
+			return this->m_rec_pos;
+		}
 
-	const match& get_match()
-	{
-		return this->m_match( this->m_rec_pos, this->m_rec_size );
-	}
+		const match& get_match()
+		{
+			return this->m_match( this->m_rec_pos, this->m_rec_size );
+		}
 
-	virtual void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m ) = 0;
-	virtual uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true ) = 0;
-	virtual void push_parsers( parser_list& l ) = 0;
+		virtual void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m ) = 0;
+		virtual uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true ) = 0;
+		virtual void push_parsers( parser_list& l ) = 0;
 
-	std::string to_str( const uint64_t i )
-	{
-		std::stringstream ss;
-		ss << i;
-		return ss.str();
-	}
+		std::string to_str( const uint64_t i )
+		{
+			std::stringstream ss;
+			ss << i;
+			return ss.str();
+		}
 
 };
 
@@ -3455,12 +3301,10 @@ special_chars		=> '.' | '[' | '\' | '(' | ')' | '*' | '+' | '?' | '{'
 | '}' | '|' | '^' | '$' \n
 */
 template<typename E>
-class ere_dupl_symbol
-{
+class ere_dupl_symbol {
 	typedef typename basic_parser<E>::parser_list parser_list;
 
-	class dup_count
-	{
+	class dup_count {
 		protected:
 			basic_terminal<E,'{'>				m_left_bracket;
 			basic_value_parser<E,uint64_t>	m_repeat_min;
@@ -3551,13 +3395,14 @@ class ere_dupl_symbol
 	{
 		basic_terminal<E, '+'>		m_plus;
 		basic_terminal<E, '?'>		m_lazy;
+
 		public:
-		void push_parsers( parser_list& l )
-		{
-			l.push_back( &this->m_plus );
-			l.push_back( &this->m_lazy );
-		}
-		const char* get_name() const { return "+?"; }
+			void push_parsers( parser_list& l )
+			{
+				l.push_back( &this->m_plus );
+				l.push_back( &this->m_lazy );
+			}
+			const char* get_name() const { return "+?"; }
 	};	
 
 	basic_non_terminal<E, lazy_star>	m_lazy_star;
@@ -3566,82 +3411,79 @@ class ere_dupl_symbol
 	basic_terminal<E,'+'>			m_plus;
 	basic_terminal<E,'?'>			m_question_mark;
 	basic_non_terminal<E,dup_count>	m_dup;
-	basic_non_terminal<E,dup_count_unbound>
-		m_dup_unbound;
-	basic_non_terminal<E,dup_count_max>
-		m_dup_max;
+	basic_non_terminal<E,dup_count_unbound> m_dup_unbound;
+	basic_non_terminal<E,dup_count_max> m_dup_max;
+	uint64_t m_rep;
 
-	uint64_t								m_rep;
 	public:
+		ere_dupl_symbol() : 
+			m_lazy_star(),
+			m_lazy_plus(),
+			m_dup(),
+			m_dup_unbound(),
+			m_dup_max() 
+		{
+		}
 
-	ere_dupl_symbol() : 
-		m_lazy_star(),
-		m_lazy_plus(),
-		m_dup(),
-		m_dup_unbound(),
-		m_dup_max() 
-	{
-	}
+		virtual ~ere_dupl_symbol() 
+		{
+		}
 
-	virtual ~ere_dupl_symbol() 
-	{
-	}
+		bool is_lazy()
+		{
+			return this->m_lazy_star.is_parsed() || this->m_lazy_plus.is_parsed();
+		}
 
-	bool is_lazy()
-	{
-		return this->m_lazy_star.is_parsed() || this->m_lazy_plus.is_parsed();
-	}
+		uint64_t get_min()
+		{
+			if( this->m_star.is_parsed() ) return 0;
+			else if( this->m_plus.is_parsed() ) return 1;
+			else if( this->m_lazy_star.is_parsed() ) return 0;
+			else if( this->m_lazy_plus.is_parsed() ) return 1;
+			else if( this->m_question_mark.is_parsed() ) return 0;
+			else if( this->m_dup.is_parsed() ) return this->m_dup->get_min();
+			else if( this->m_dup_unbound.is_parsed() ) return this->m_dup_unbound->get_min();
+			else return this->m_dup_max->get_min();
+		}
 
-	uint64_t get_min()
-	{
-		if( this->m_star.is_parsed() ) return 0;
-		else if( this->m_plus.is_parsed() ) return 1;
-		else if( this->m_lazy_star.is_parsed() ) return 0;
-		else if( this->m_lazy_plus.is_parsed() ) return 1;
-		else if( this->m_question_mark.is_parsed() ) return 0;
-		else if( this->m_dup.is_parsed() ) return this->m_dup->get_min();
-		else if( this->m_dup_unbound.is_parsed() ) return this->m_dup_unbound->get_min();
-		else return this->m_dup_max->get_min();
-	}
+		uint64_t get_max()
+		{
+			if( this->m_star.is_parsed() ) return INT_MAX;
+			else if( this->m_plus.is_parsed() ) return INT_MAX;
+			else if( this->m_lazy_star.is_parsed() ) return INT_MAX;
+			else if( this->m_lazy_plus.is_parsed() ) return INT_MAX;
+			else if( this->m_question_mark.is_parsed() ) return 1;
+			else if( this->m_dup.is_parsed() ) return this->m_dup->get_max();
+			else if( this->m_dup_unbound.is_parsed() ) return this->m_dup_unbound->get_max();
+			else return this->m_dup_max->get_max();
+		}
 
-	uint64_t get_max()
-	{
-		if( this->m_star.is_parsed() ) return INT_MAX;
-		else if( this->m_plus.is_parsed() ) return INT_MAX;
-		else if( this->m_lazy_star.is_parsed() ) return INT_MAX;
-		else if( this->m_lazy_plus.is_parsed() ) return INT_MAX;
-		else if( this->m_question_mark.is_parsed() ) return 1;
-		else if( this->m_dup.is_parsed() ) return this->m_dup->get_max();
-		else if( this->m_dup_unbound.is_parsed() ) return this->m_dup_unbound->get_max();
-		else return this->m_dup_max->get_max();
-	}
+		void set_recognized_dup( uint64_t rec_dup )
+		{
+			this->m_rep = rec_dup;
+		}
 
-	void set_recognized_dup( uint64_t rec_dup )
-	{
-		this->m_rep = rec_dup;
-	}
+		uint64_t get_recognized_dup()
+		{
+			return this->m_rep;
+		}
 
-	uint64_t get_recognized_dup()
-	{
-		return this->m_rep;
-	}
+		void push_parsers( parser_list &l )
+		{
+			l.push_back(&this->m_lazy_star);
+			l.push_back(&this->m_lazy_plus);
+			l.push_back(&this->m_star);
+			l.push_back(&this->m_plus);
+			l.push_back(&this->m_question_mark);
+			l.push_back(&this->m_dup);
+			l.push_back(&this->m_dup_unbound);
+			l.push_back(&this->m_dup_max);
+		}
 
-	void push_parsers( parser_list &l )
-	{
-		l.push_back(&this->m_lazy_star);
-		l.push_back(&this->m_lazy_plus);
-		l.push_back(&this->m_star);
-		l.push_back(&this->m_plus);
-		l.push_back(&this->m_question_mark);
-		l.push_back(&this->m_dup);
-		l.push_back(&this->m_dup_unbound);
-		l.push_back(&this->m_dup_max);
-	}
-
-	const char* get_name() const 
-	{
-		return "ere_dupl"; 
-	}
+		const char* get_name() const 
+		{
+			return "ere_dupl"; 
+		}
 
 };
 
@@ -3664,110 +3506,109 @@ special_chars		=> '.' | '[' | '\' | '(' | ')' | '*' | '+' | '?' | '{'
 | '}' | '|' | '^' | '$' \n
 */
 template< typename E >
-class ere_dups
-{
-	typedef typename basic_parser<E>::parser_list 
-		parser_list;
+class ere_dups {
+	typedef typename basic_parser<E>::parser_list parser_list;
 
 	uint64_t m_rep;
-	class dup_and_dup_branch
-	{
-		basic_choice<E,ere_dupl_symbol<E> > 
-			m_dup;
+
+	class dup_and_dup_branch {
+		basic_choice<E,ere_dupl_symbol<E> > m_dup;
 		basic_choice<E,ere_dups<E> >	m_dups;
 
 		public:
-		void push_parsers( parser_list& l )
-		{
-			l.push_back( &this->m_dup );
-			l.push_back( &this->m_dups );
-		}
-		const char* get_name() const { return "ere_dup,ere_dups"; }
+			void push_parsers( parser_list& l )
+			{
+				l.push_back( &this->m_dup );
+				l.push_back( &this->m_dups );
+			}
+		
+			const char* get_name() const 
+			{
+				return "ere_dup,ere_dups"; 
+			}
 
+			uint64_t get_max()
+			{
+				double max = this->m_dup->get_max();
+				if( max == INT_MAX )
+					return INT_MAX;
 
-		uint64_t get_max()
-		{
-			double max = this->m_dup->get_max();
-			if( max == INT_MAX )
-				return INT_MAX;
+				double max_from_branch = this->m_dups->get_max();
+				if( max_from_branch == INT_MAX )
+					return INT_MAX;
 
-			double max_from_branch = this->m_dups->get_max();
-			if( max_from_branch == INT_MAX )
-				return INT_MAX;
+				max = max * max_from_branch;
+				if( max >= INT_MAX )
+					return INT_MAX;
 
-			max = max * max_from_branch;
-			if( max >= INT_MAX )
-				return INT_MAX;
+				return (uint64_t)max;
+			}
 
-			return (uint64_t)max;
-		}
+			bool is_lazy()
+			{
+				return (this->m_dup.is_parsed() && this->m_dup->is_lazy()) || (this->m_dups.is_parsed() && this->m_dups->is_lazy());
+			}
 
-		bool is_lazy()
-		{
-			return (this->m_dup.is_parsed() && this->m_dup->is_lazy()) ||
-				(this->m_dups.is_parsed() && this->m_dups->is_lazy());
-		}
-
-		uint64_t get_min()
-		{
-			return this->m_dup->get_min() * this->m_dups->get_min();
-		}
+			uint64_t get_min()
+			{
+				return this->m_dup->get_min() * this->m_dups->get_min();
+			}
 	};
 
 	basic_non_terminal<E, dup_and_dup_branch > m_dup_and_dups;
 	basic_choice<E,ere_dupl_symbol<E> > m_dup;
 
 	public:
+		bool is_lazy()
+		{
+			return (this->m_dup_and_dups.is_parsed() && this->m_dup_and_dups->is_lazy()) || (this->m_dup.is_parsed() && this->m_dup->is_lazy());
+		}
 
-	bool is_lazy()
-	{
-		return (this->m_dup_and_dups.is_parsed() && this->m_dup_and_dups->is_lazy()) || (this->m_dup.is_parsed() && this->m_dup->is_lazy());
-	}
+		void push_parsers( parser_list& l )
+		{
+			l.push_back( &this->m_dup_and_dups );
+			l.push_back( &this->m_dup );
+		}
 
-	void push_parsers( parser_list& l )
-	{
-		l.push_back( &this->m_dup_and_dups );
-		l.push_back( &this->m_dup );
-	}
+		const char* get_name() const 
+		{
+			return "ere_dups"; 
+		}
 
-	const char* get_name() const 
-	{
-		return "ere_dups"; 
-	}
+		void set_recognized_dup( uint64_t rec_dup )
+		{
+			this->m_rep = rec_dup;
+		}
 
-	void set_recognized_dup( uint64_t rec_dup )
-	{
-		this->m_rep = rec_dup;
-	}
+		uint64_t get_recognized_dup()
+		{
+			return this->m_rep;
+		}
 
-	uint64_t get_recognized_dup()
-	{
-		return this->m_rep;
-	}
+		uint64_t get_max()
+		{
+			if( this->m_dup_and_dups.is_parsed() )
+				return this->m_dup_and_dups->get_max();
+			else
+				return this->m_dup->get_max();
+		}
 
-	uint64_t get_max()
-	{
-		if( this->m_dup_and_dups.is_parsed() )
-			return this->m_dup_and_dups->get_max();
-		else
-			return this->m_dup->get_max();
-	}
+		uint64_t get_min()
+		{
+			if( this->m_dup_and_dups.is_parsed() )
+				return this->m_dup_and_dups->get_min();
+			else
+				return this->m_dup->get_min();
+		}
 
-	uint64_t get_min()
-	{
-		if( this->m_dup_and_dups.is_parsed() )
-			return this->m_dup_and_dups->get_min();
-		else
-			return this->m_dup->get_min();
-	}
+		ere_dups() : 
+			m_rep(0) 
+		{
+		}
 
-	ere_dups() : m_rep(0) 
-	{
-	}
-
-	virtual ~ere_dups() 
-	{
-	}
+		virtual ~ere_dups() 
+		{
+		}
 
 };
 
@@ -3781,53 +3622,48 @@ class meta_char_choice
 	basic_terminal<E,']'>			m_right_bracket;
 
 	public:
-	meta_char_choice() {};
+		meta_char_choice() 
+		{
+		}
 
-	~meta_char_choice() {};
-	void push_parsers( parser_list &l )
-	{
-		l.push_back( &this->m_circumflex );
-		l.push_back( &this->m_hyphen );
-		l.push_back( &this->m_right_bracket );
-	}	
-	const char* get_name() const { return "^|-|]"; }
+		~meta_char_choice() 
+		{
+		}
 
-	int compare( const E* buf, const uint64_t buf_length )
-	{
-		if( this->m_hyphen.is_parsed() )
+		void push_parsers( parser_list &l )
 		{
-			if( std::use_facet< std::collate<E> >(std::locale()).compare(buf, buf+1, this->m_hyphen.get(), this->m_hyphen.get()+1 ) == 0 )
-			{
-				return 1;
-			}
-			else
-			{
-				return 0;
+			l.push_back( &this->m_circumflex );
+			l.push_back( &this->m_hyphen );
+			l.push_back( &this->m_right_bracket );
+		}	
+
+		const char* get_name() const 
+		{
+			return "^|-|]"; 
+		}
+
+		int compare( const E* buf, const uint64_t buf_length )
+		{
+			if( this->m_hyphen.is_parsed() ) {
+				if( std::use_facet< std::collate<E> >(std::locale()).compare(buf, buf+1, this->m_hyphen.get(), this->m_hyphen.get()+1 ) == 0 ) {
+					return 1;
+				} else {
+					return 0;
+				}
+			} else if( this->m_right_bracket.is_parsed() ) {
+				if( std::use_facet< std::collate<E> >(std::locale()).compare( buf, buf+1, this->m_right_bracket.get(), this->m_right_bracket.get()+1) == 0 ) {
+					return 1;
+				} else {
+					return 0;
+				}
+			} else {
+				if( std::use_facet< std::collate<E> >(std::locale()).compare( buf, buf+1, this->m_circumflex.get(), this->m_circumflex.get()+1) == 0 ) {
+					return 1;
+				} else {
+					return 0;
+				}
 			}
 		}
-		else if( this->m_right_bracket.is_parsed() )
-		{
-			if( std::use_facet< std::collate<E> >(std::locale()).compare( buf, buf+1, this->m_right_bracket.get(), this->m_right_bracket.get()+1) == 0 )
-			{
-				return 1;
-			}
-			else
-			{
-				return 0;
-			}
-		}
-		else
-		{
-			if( std::use_facet< std::collate<E> >(std::locale()).compare( buf, buf+1, this->m_circumflex.get(), this->m_circumflex.get()+1) == 0 )
-			{
-				return 1;
-			}
-			else
-			{
-				return 0;
-			}
-		}
-	}
 };
 
 template< typename E >
@@ -3835,201 +3671,220 @@ class collating_symbol
 {
 	typedef typename basic_parser<E>::parser_list parser_list;
 
-	class collating_base
-	{
+	class collating_base {
 		protected:
 			int m_size;
+
 		public:
 			int matched_size() { return this->m_size; }
 			collating_base() : m_size(0) {};
 	};
 
-	class opendot_coll_elem_single_dotclose : public collating_base
-	{
+	class opendot_coll_elem_single_dotclose : public collating_base {
 		basic_terminal<E, '['>	m_open;
 		basic_terminal<E, '.'>	m_left_dot;
-		basic_except_terminal<E,meta_char_choice<E> >	
-			m_coll_elem_single;
+		basic_except_terminal<E,meta_char_choice<E> >	m_coll_elem_single;
 		basic_terminal<E, '.'>	m_right_dot;
 		basic_terminal<E, ']'>	m_close;
+	
 		public:
+			void push_parsers( parser_list &l )
+			{
+				l.push_back(&this->m_open);
+				l.push_back(&this->m_left_dot);
+				l.push_back(&this->m_coll_elem_single);
+				l.push_back(&this->m_right_dot);
+				l.push_back(&this->m_close);
+			}
 
-		void push_parsers( parser_list &l )
-		{
-			l.push_back(&this->m_open);
-			l.push_back(&this->m_left_dot);
-			l.push_back(&this->m_coll_elem_single);
-			l.push_back(&this->m_right_dot);
-			l.push_back(&this->m_close);
-		}
-		const char* get_name() const { return "'[','.',collating_element_single,'.',']'"; }
+			const char* get_name() const 
+			{
+				return "'[','.',collating_element_single,'.',']'"; 
+			}
 
-		int compare( const E* buf, const uint64_t buf_length )
-		{
-			int ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf, buf, this->m_coll_elem_single.get(), this->m_coll_elem_single.get() );
-			if( ret == 0 ) 
-				this->m_size =1;
-			else
-				this->m_size = 0;
-			return ret;
-		}	
+			int compare( const E* buf, const uint64_t buf_length )
+			{
+				int ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf, buf, this->m_coll_elem_single.get(), this->m_coll_elem_single.get() );
+				if( ret == 0 ) 
+					this->m_size =1;
+				else
+					this->m_size = 0;
+				return ret;
+			}	
 	};
 
-	class opendot_coll_elem_multi_dotclose : public collating_base
-	{
+	class opendot_coll_elem_multi_dotclose : public collating_base {
 		typedef std::ctype_base ctypebase;
+
 		basic_terminal<E, '['>	m_open;
 		basic_terminal<E, '.'>	m_left_dot;
 		basic_string_parser<E>	m_coll_elem_multi;
 		// right dot is also used as separator in string parser - see constructor
 		basic_terminal<E, '.'>	m_right_dot;
 		basic_terminal<E, ']'>	m_close;
+
 		public:
-		opendot_coll_elem_multi_dotclose() : 
-			collating_base(),
-			m_coll_elem_multi('.', basic_string_parser<E>::NONE) {};
+			opendot_coll_elem_multi_dotclose() : 
+				collating_base(),
+				m_coll_elem_multi('.', basic_string_parser<E>::NONE) 
+			{
+			}
 
-		void push_parsers( parser_list &l )
-		{
-			l.push_back(&this->m_open);
-			l.push_back(&this->m_left_dot);
-			l.push_back(&this->m_coll_elem_multi);
-			l.push_back(&this->m_right_dot);
-			l.push_back(&this->m_close);
-		}
+			void push_parsers( parser_list &l )
+			{
+				l.push_back(&this->m_open);
+				l.push_back(&this->m_left_dot);
+				l.push_back(&this->m_coll_elem_multi);
+				l.push_back(&this->m_right_dot);
+				l.push_back(&this->m_close);
+			}
 
-		const char* get_name() const 
-		{
-			return "'[','.',collating_element_multi,'.',']'"; 
-		}
+			const char* get_name() const 
+			{
+				return "'[','.',collating_element_multi,'.',']'"; 
+			}
 
-		int compare( const E* buf, const uint64_t buf_length )
-		{			
-			uint64_t to_compare_length =
-				collating_symbol<E>::get_symbol_len(buf,buf_length);
-			std::basic_string<E> multichar = *(m_coll_elem_multi.get());
-			// check the size of element in buf  - try the longest
-			int ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf, buf+to_compare_length, multichar.c_str(), multichar.c_str() + multichar.length() );
-			this->m_size = to_compare_length;
-			return ret;
-		}	
+			int compare( const E* buf, const uint64_t buf_length )
+			{			
+				uint64_t to_compare_length = collating_symbol<E>::get_symbol_len(buf,buf_length);
+				std::basic_string<E> multichar = *(m_coll_elem_multi.get());
+				// check the size of element in buf  - try the longest
+				int ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf, buf+to_compare_length, multichar.c_str(), multichar.c_str() + multichar.length() );
+				this->m_size = to_compare_length;
+				return ret;
+			}	
 	};
 
-	class opendot_metachar_dotclose : public collating_base
-	{
+	class opendot_metachar_dotclose : public collating_base {
 		basic_terminal<E, '['>	m_open;
 		basic_terminal<E, '.'>	m_left_dot;
-		basic_choice<E,meta_char_choice<E> >	
-			m_meta_char;
+		basic_choice<E,meta_char_choice<E> >	m_meta_char;
 		basic_terminal<E, '.'>	m_right_dot;
 		basic_terminal<E, ']'>	m_close;
-		public:
-		void push_parsers( parser_list &l )
-		{
-			l.push_back(&this->m_open);
-			l.push_back(&this->m_left_dot);
-			l.push_back(&this->m_meta_char);
-			l.push_back(&this->m_right_dot);
-			l.push_back(&this->m_close);
-		}	
-		const char* get_name() const { return "'[','.',meta_char,'.',']'"; }
 
-		int compare( const E* buf, const uint64_t buf_length )
-		{
-			int ret = this->m_meta_char->compare(buf,buf_length);
-			this->m_size = 1; //this->m_meta_char->matched_size();
-			return ret;
-		}	
+		public:
+			void push_parsers( parser_list &l )
+			{
+				l.push_back(&this->m_open);
+				l.push_back(&this->m_left_dot);
+				l.push_back(&this->m_meta_char);
+				l.push_back(&this->m_right_dot);
+				l.push_back(&this->m_close);
+			}	
+			const char* get_name() const { return "'[','.',meta_char,'.',']'"; }
+
+			int compare( const E* buf, const uint64_t buf_length )
+			{
+				int ret = this->m_meta_char->compare(buf,buf_length);
+				this->m_size = 1; //this->m_meta_char->matched_size();
+				return ret;
+			}	
 	};
 
 	basic_non_terminal<E, opendot_coll_elem_single_dotclose> m_coll_elem_single;
 	basic_non_terminal<E, opendot_coll_elem_multi_dotclose> m_multichar;
 	basic_non_terminal<E, opendot_metachar_dotclose>  m_metachar;
 	int m_size;
+
 	public:
-	collating_symbol() : 
-		m_coll_elem_single(),
-		// CHANGE:: m_metachar(),
-		// CHANGE:: m_multichar(),
-		m_size(0) {};
+		collating_symbol() : 
+			m_coll_elem_single(),
+			// CHANGE:: m_metachar(),
+			// CHANGE:: m_multichar(),
+			m_size(0) 
+		{
+		}
 
-	void push_parsers( parser_list &l )
-	{
-		l.push_back(&this->m_multichar);
-		l.push_back(&this->m_metachar);
-		l.push_back(&this->m_coll_elem_single);
-	}	
-	const char* get_name() const { return "collating_symbol"; }
+		void push_parsers( parser_list &l )
+		{
+			l.push_back(&this->m_multichar);
+			l.push_back(&this->m_metachar);
+			l.push_back(&this->m_coll_elem_single);
+		}	
+		
+		const char* get_name() const 
+		{
+			return "collating_symbol"; 
+		}
 
-	int matched_size() { return this->m_size; }
-	int compare( const E* buf, const uint64_t buf_length )
-	{
-		int ret = 0;
-		if( this->m_coll_elem_single.is_parsed() )
+		int matched_size() 
 		{
-			ret = this->m_coll_elem_single->compare( buf, buf_length );
-			this->m_size = this->m_coll_elem_single->matched_size();
+			return this->m_size; 
 		}
-		else if( this->m_multichar.is_parsed() )
+		
+		int compare( const E* buf, const uint64_t buf_length )
 		{
-			ret = this->m_multichar->compare( buf, buf_length );
-			this->m_size = this->m_multichar->matched_size();
+			int ret = 0;
+			if( this->m_coll_elem_single.is_parsed() ) {
+				ret = this->m_coll_elem_single->compare( buf, buf_length );
+				this->m_size = this->m_coll_elem_single->matched_size();
+			} else if( this->m_multichar.is_parsed() ) {
+				ret = this->m_multichar->compare( buf, buf_length );
+				this->m_size = this->m_multichar->matched_size();
+			} else {
+				ret = this->m_metachar->compare( buf, buf_length );
+				this->m_size = this->m_metachar->matched_size();
+			}
+			return ret;
 		}
-		else
+
+		static uint64_t get_symbol_len( const E* buf, const uint64_t buf_length )
 		{
-			ret = this->m_metachar->compare( buf, buf_length );
-			this->m_size = this->m_metachar->matched_size();
+			return 1; // TODO - see below commented out methods for the problem
 		}
-		return ret;
-	}
-	static uint64_t get_symbol_len( const E* buf, const uint64_t buf_length )
-	{
-		return 1; // TODO - see below commented out methods for the problem
-	}
 };
 
 template<typename E>
-class collating_choice
-{
+class collating_choice {
 	typedef typename basic_parser<E>::parser_list parser_list;
 	typedef std::ctype_base ctypebase;
 
 	// bug XXXXX correction  - define parser of escaped special chars
-	class escaped_right_bracket
-	{
-		basic_terminal<E,'\\'>				m_esc;
-		basic_terminal<E,']'>					m_right_bracket;
+	class escaped_right_bracket {
+		basic_terminal<E,'\\'> m_esc;
+		basic_terminal<E,']'> m_right_bracket;
+
 		public:
-		void push_parsers( parser_list &l )
-		{
-			l.push_back( &this->m_esc );
-			l.push_back( &this->m_right_bracket );
-		}	
-		const char* get_name() const { return "escaped_right_bracket"; }
+			void push_parsers( parser_list &l )
+			{
+				l.push_back( &this->m_esc );
+				l.push_back( &this->m_right_bracket );
+			}	
+		
+			const char* get_name() const 
+			{
+				return "escaped_right_bracket"; 
+			}
 	};
-	class escaped_hyphen
-	{
-		basic_terminal<E,'\\'>				m_esc;
-		basic_terminal<E,'-'>					m_hyphen;
+
+	class escaped_hyphen {
+		basic_terminal<E,'\\'> m_esc;
+		basic_terminal<E,'-'> m_hyphen;
+
 		public:
-		void push_parsers( parser_list &l )
-		{
-			l.push_back( &this->m_esc );
-			l.push_back( &this->m_hyphen );
-		}	
-		const char* get_name() const { return "escaped_hyphen"; }
+			void push_parsers( parser_list &l )
+			{
+				l.push_back( &this->m_esc );
+				l.push_back( &this->m_hyphen );
+			}	
+			const char* get_name() const { return "escaped_hyphen"; }
 	};
-	class escaped_circumflex
-	{
-		basic_terminal<E,'\\'>				m_esc;
-		basic_terminal<E,'^'>					m_circumflex;
+
+	class escaped_circumflex {
+		basic_terminal<E,'\\'> m_esc;
+		basic_terminal<E,'^'> m_circumflex;
+
 		public:
-		void push_parsers( parser_list &l )
-		{
-			l.push_back( &this->m_esc );
-			l.push_back( &this->m_circumflex );
-		}	
-		const char* get_name() const { return "escaped_circumflex"; }
+			void push_parsers( parser_list &l )
+			{
+				l.push_back( &this->m_esc );
+				l.push_back( &this->m_circumflex );
+			}	
+	
+			const char* get_name() const 
+			{
+				return "escaped_circumflex"; 
+			}
 	};
 
 	basic_non_terminal<E,escaped_right_bracket>	m_escaped_right_bracket;
@@ -4041,73 +3896,68 @@ class collating_choice
 	uint64_t m_size;
 
 	public:
-	collating_choice() : m_size(0) 
-	{
-	}
-
-	virtual ~collating_choice() 
-	{
-	}
-
-	int matched_size() 
-	{
-		return this->m_size; 
-	}
-
-	int compare( const E* buf, const uint64_t buf_length )
-	{
-		int ret = -1;
-		this->m_size = 0;
-		if( this->m_non_metas.is_parsed() )
+		collating_choice() : m_size(0) 
 		{
-			uint64_t to_compare_length = 
-				collating_symbol<E>::get_symbol_len(buf,buf_length);
+		}
 
-			ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf, buf+to_compare_length, this->m_non_metas.get(),	this->m_non_metas.get()+1 );
-			this->m_size = to_compare_length;
-		}
-		else if( this->m_escaped_right_bracket.is_parsed() )
+		virtual ~collating_choice() 
 		{
-			uint64_t to_compare_length = 
-				collating_symbol<E>::get_symbol_len(buf,buf_length);
-			const E i(']');
-			ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf,buf+to_compare_length,&i, &i+1 );
-			this->m_size = 1;
-			this->m_size = 1;
 		}
-		else if( this->m_escaped_hyphen.is_parsed() )
-		{
-			uint64_t to_compare_length = 
-				collating_symbol<E>::get_symbol_len(buf,buf_length);
-			const E i('-');
-			ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf,buf+to_compare_length,&i,&i+1 );
-			this->m_size = 1;
-		}
-		else if( this->m_escaped_circumflex.is_parsed() )
-		{
-			uint64_t to_compare_length = 
-				collating_symbol<E>::get_symbol_len(buf,buf_length);
-			const E i('^');
-			ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf,buf+to_compare_length,&i,&i+1 );
-			this->m_size = 1;
-		}
-		else
-		{
-			ret = this->m_collating_symbol->compare(buf,buf_length); 
-			this->m_size = this->m_collating_symbol->matched_size();
-		}
-		return ret;
-	}
 
-	void push_parsers( parser_list &l )
-	{
-		l.push_back( &this->m_escaped_right_bracket );
-		l.push_back( &this->m_escaped_hyphen );
-		l.push_back( &this->m_escaped_circumflex );
-		l.push_back( &this->m_collating_symbol );
-		l.push_back( &this->m_non_metas );
-	}	
-	const char* get_name() const { return "collating_choice"; }
+		int matched_size() 
+		{
+			return this->m_size; 
+		}
+
+		int compare( const E* buf, const uint64_t buf_length )
+		{
+			int ret = -1;
+			this->m_size = 0;
+			if( this->m_non_metas.is_parsed() ) {
+				uint64_t to_compare_length = 
+					collating_symbol<E>::get_symbol_len(buf,buf_length);
+
+				ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf, buf+to_compare_length, this->m_non_metas.get(),	this->m_non_metas.get()+1 );
+				this->m_size = to_compare_length;
+			} else if( this->m_escaped_right_bracket.is_parsed() ) {
+				uint64_t to_compare_length = 
+					collating_symbol<E>::get_symbol_len(buf,buf_length);
+				const E i(']');
+				ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf,buf+to_compare_length,&i, &i+1 );
+				this->m_size = 1;
+				this->m_size = 1;
+			} else if( this->m_escaped_hyphen.is_parsed() ) {
+				uint64_t to_compare_length = 
+					collating_symbol<E>::get_symbol_len(buf,buf_length);
+				const E i('-');
+				ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf,buf+to_compare_length,&i,&i+1 );
+				this->m_size = 1;
+			} else if( this->m_escaped_circumflex.is_parsed() ) {
+				uint64_t to_compare_length = 
+					collating_symbol<E>::get_symbol_len(buf,buf_length);
+				const E i('^');
+				ret = std::use_facet< std::collate<E> >(std::locale()).compare(buf,buf+to_compare_length,&i,&i+1 );
+				this->m_size = 1;
+			} else {
+				ret = this->m_collating_symbol->compare(buf,buf_length); 
+				this->m_size = this->m_collating_symbol->matched_size();
+			}
+			return ret;
+		}
+
+		void push_parsers( parser_list &l )
+		{
+			l.push_back( &this->m_escaped_right_bracket );
+			l.push_back( &this->m_escaped_hyphen );
+			l.push_back( &this->m_escaped_circumflex );
+			l.push_back( &this->m_collating_symbol );
+			l.push_back( &this->m_non_metas );
+		}	
+
+		const char* get_name() const 
+		{
+			return "collating_choice"; 
+		}
 };
 
 template<typename E>
@@ -4130,94 +3980,95 @@ class class_name
 	basic_pattern_parser<E>		m_xdigit;
 
 	int m_size;	
+	
 	public:
-	class_name() : 
-		m_alnum( "alnum" ),
-		m_cntrl( "cntrl" ),
-		m_lower( "lower" ),
-		m_space( "space" ),
-		m_alpha( "alpha" ),
-		m_digit( "digit" ),
-		m_print( "print" ),
-		m_upper( "upper" ),
-		m_blank( "blank" ),
-		m_graph( "graph" ),
-		m_punct( "punct" ),
-		m_xdigit( "xdigit" ),
-		m_size(0) {};
-
-	int matched_size() 
-	{
-		return this->m_size; 
-	}
-
-	void push_parsers( parser_list &l )
-	{
-		l.push_back(&this->m_alnum);
-		l.push_back(&this->m_cntrl);
-		l.push_back(&this->m_lower);
-		l.push_back(&this->m_space);
-		l.push_back(&this->m_alpha);
-		l.push_back(&this->m_digit);
-		l.push_back(&this->m_print);
-		l.push_back(&this->m_upper);
-		l.push_back(&this->m_blank);
-		l.push_back(&this->m_graph);
-		l.push_back(&this->m_punct);
-		l.push_back(&this->m_xdigit);
-	}
-
-	const char * get_name() const 
-	{
-		return "class_name"; 
-	}
-
-	uint64_t compare( const E* buf, const uint64_t buf_length )
-	{
-		// CHANGE:: std::ctype_base t;
-		// CHANGE:: int ret = 0;
-		ctypebase::mask m;
-
-
-		if( this->m_alnum.is_parsed() ) m=ctypebase::alnum;
-		if( this->m_cntrl.is_parsed() ) m=ctypebase::cntrl;
-		if( this->m_lower.is_parsed() ) m=ctypebase::lower;
-		if( this->m_space.is_parsed() ) m=ctypebase::space;
-		if( this->m_alpha.is_parsed() ) m=ctypebase::alpha;
-		if( this->m_digit.is_parsed() ) m=ctypebase::digit;
-		if( this->m_print.is_parsed() ) m=ctypebase::print;
-		if( this->m_upper.is_parsed() ) m=ctypebase::upper;
-		// if( this->m_blank.is_parsed() ) m=ctypebase::blank;
-		if( this->m_graph.is_parsed() ) m=ctypebase::graph;
-		if( this->m_punct.is_parsed() ) m=ctypebase::punct;
-		if( this->m_xdigit.is_parsed() ) m=ctypebase::xdigit;
-
-		while( this->m_size < (int)buf_length )
+		class_name() : 
+			m_alnum( "alnum" ),
+			m_cntrl( "cntrl" ),
+			m_lower( "lower" ),
+			m_space( "space" ),
+			m_alpha( "alpha" ),
+			m_digit( "digit" ),
+			m_print( "print" ),
+			m_upper( "upper" ),
+			m_blank( "blank" ),
+			m_graph( "graph" ),
+			m_punct( "punct" ),
+			m_xdigit( "xdigit" ),
+			m_size(0) 
 		{
-			if( !std::use_facet< std::ctype<E> >(std::locale()).is( buf, 
-						buf+this->m_size+1, &m ) )
-			{
-				break;
-			}
-			this->m_size++;
 		}
 
-		if( this->m_size > 0 )
-			return 0;
-		else
-			return 1;
-	}
+		int matched_size() 
+		{
+			return this->m_size; 
+		}
 
-	virtual ~class_name()
-	{
-	}
+		void push_parsers( parser_list &l )
+		{
+			l.push_back(&this->m_alnum);
+			l.push_back(&this->m_cntrl);
+			l.push_back(&this->m_lower);
+			l.push_back(&this->m_space);
+			l.push_back(&this->m_alpha);
+			l.push_back(&this->m_digit);
+			l.push_back(&this->m_print);
+			l.push_back(&this->m_upper);
+			l.push_back(&this->m_blank);
+			l.push_back(&this->m_graph);
+			l.push_back(&this->m_punct);
+			l.push_back(&this->m_xdigit);
+		}
+
+		const char * get_name() const 
+		{
+			return "class_name"; 
+		}
+
+		uint64_t compare( const E* buf, const uint64_t buf_length )
+		{
+			// CHANGE:: std::ctype_base t;
+			// CHANGE:: int ret = 0;
+			ctypebase::mask m;
+
+
+			if( this->m_alnum.is_parsed() ) m=ctypebase::alnum;
+			if( this->m_cntrl.is_parsed() ) m=ctypebase::cntrl;
+			if( this->m_lower.is_parsed() ) m=ctypebase::lower;
+			if( this->m_space.is_parsed() ) m=ctypebase::space;
+			if( this->m_alpha.is_parsed() ) m=ctypebase::alpha;
+			if( this->m_digit.is_parsed() ) m=ctypebase::digit;
+			if( this->m_print.is_parsed() ) m=ctypebase::print;
+			if( this->m_upper.is_parsed() ) m=ctypebase::upper;
+			// if( this->m_blank.is_parsed() ) m=ctypebase::blank;
+			if( this->m_graph.is_parsed() ) m=ctypebase::graph;
+			if( this->m_punct.is_parsed() ) m=ctypebase::punct;
+			if( this->m_xdigit.is_parsed() ) m=ctypebase::xdigit;
+
+			while( this->m_size < (int)buf_length ) {
+				if( !std::use_facet< std::ctype<E> >(std::locale()).is( buf, buf+this->m_size+1, &m ) ) {
+					break;
+				}
+				this->m_size++;
+			}
+
+			if( this->m_size > 0 ) {
+				return 0;
+			} else {
+				return 1;
+			}
+		}
+
+		virtual ~class_name()
+		{
+		}
 
 };
 
 template<typename E>
-class character_class
-{
+class character_class {
 	typedef typename basic_parser<E>::parser_list parser_list;
+
 	basic_terminal<E,'['>			m_open;
 	basic_terminal<E,':'>			m_open_colon;
 	basic_choice<E,class_name<E> >	m_class_name;
@@ -4225,168 +4076,185 @@ class character_class
 	basic_terminal<E,']'>			m_close;
 
 	public:
-	void push_parsers( parser_list &l )
-	{
-		l.push_back(&this->m_open);
-		l.push_back(&this->m_open_colon);
-		l.push_back(&this->m_class_name);
-		l.push_back(&this->m_close_colon);
-		l.push_back(&this->m_close);
-	}
-	const char* get_name() const { return "'[',':',class_name,':',']'"; }
+		void push_parsers( parser_list &l )
+		{
+			l.push_back(&this->m_open);
+			l.push_back(&this->m_open_colon);
+			l.push_back(&this->m_class_name);
+			l.push_back(&this->m_close_colon);
+			l.push_back(&this->m_close);
+		}
 
-	int compare( const E* buf, const uint64_t buf_length )
-	{
-		return this->m_class_name->compare(buf,buf_length);
-	}
+		const char* get_name() const 
+		{
+			return "'[',':',class_name,':',']'"; 
+		}
 
-	uint64_t matched_size() { return this->m_class_name->matched_size(); }
+		int compare( const E* buf, const uint64_t buf_length )
+		{
+			return this->m_class_name->compare(buf,buf_length);
+		}
+
+		uint64_t matched_size() 
+		{
+			return this->m_class_name->matched_size(); 
+		}
 
 };
 
 template<typename E>
-class equivalence_class
-{
+class equivalence_class {
 	typedef typename basic_parser<E>::parser_list parser_list;
 
-	class equivalence_base
-	{
+	class equivalence_base {
 		protected:
 			int m_size;
+
 		public:
-			equivalence_base() : m_size(0) {};
-			int matched_size() { return m_size; }
+			equivalence_base() : 
+				m_size(0) 
+			{
+			}
+
+			int matched_size() 
+			{
+				return m_size; 
+			}
 	};
 
-	class openequal_coll_elem_single_equalclose : public equivalence_base
-	{
+	class openequal_coll_elem_single_equalclose : public equivalence_base {
 		basic_terminal<E, '['>	m_open;
 		basic_terminal<E, '='>	m_left_equal;
-		basic_except_terminal<E,meta_char_choice<E> >	
-			m_coll_elem_single;
+		basic_except_terminal<E,meta_char_choice<E> >	m_coll_elem_single;
 		basic_terminal<E, '='>	m_right_equal;
 		basic_terminal<E, ']'>	m_close;
+
 		public:
+			void push_parsers( parser_list &l )
+			{
+				l.push_back(&this->m_open);
+				l.push_back(&this->m_left_equal);
+				l.push_back(&this->m_coll_elem_single);
+				l.push_back(&this->m_right_equal);
+				l.push_back(&this->m_close);
+			}
+			
+			const char* get_name() const 
+			{
+				return "'[','=',collating_elem_single,'=',']'"; 
+			}
 
-		void push_parsers( parser_list &l )
-		{
-			l.push_back(&this->m_open);
-			l.push_back(&this->m_left_equal);
-			l.push_back(&this->m_coll_elem_single);
-			l.push_back(&this->m_right_equal);
-			l.push_back(&this->m_close);
-		}
-		const char* get_name() const { return "'[','=',collating_elem_single,'=',']'"; }
-
-		int compare( const E* buf, const uint64_t buf_length )
-		{
-			int ret = std::use_facet< std::collate<E> >(std::locale()).compare(
-					buf,
-					buf,
-					m_coll_elem_single.get(),
-					m_coll_elem_single.get() );
-			if( ret == 0 )
-				this->m_size = 1;
-			else
-				this->m_size = 0;
-			return ret;
-		}	
+			int compare( const E* buf, const uint64_t buf_length )
+			{
+				int ret = std::use_facet< std::collate<E> >(std::locale()).compare( buf, buf, m_coll_elem_single.get(), m_coll_elem_single.get() );
+				if( ret == 0 )
+					this->m_size = 1;
+				else
+					this->m_size = 0;
+				return ret;
+			}	
 	};
 
-	class openequal_coll_elem_multi_equalclose : public equivalence_base
-	{
+	class openequal_coll_elem_multi_equalclose : public equivalence_base {
 		typedef std::ctype_base ctypebase;
 		basic_terminal<E, '['>	m_open;
 		basic_terminal<E, '.'>	m_left_equal;
 		basic_string_parser<E>	m_coll_elem_multi;
 		basic_terminal<E, '.'>	m_right_equal;
 		basic_terminal<E, ']'>	m_close;
+
 		public:
-		openequal_coll_elem_multi_equalclose() : 
-			m_coll_elem_multi('.', basic_string_parser<E>::NONE) {};
-		void push_parsers( parser_list &l )
-		{
-			l.push_back(&this->m_open);
-			l.push_back(&this->m_left_equal);
-			l.push_back(&this->m_coll_elem_multi);
-			l.push_back(&this->m_right_equal);
-			l.push_back(&this->m_close);
-		}
-		const char* get_name() const { return "'[','.',collating_elem_multi,'.',']'"; }
-
-		int compare( const E* buf, const uint64_t buf_length )
-		{
-			uint64_t to_compare_length = 0;
-			// check the size of element in buf  - try the longest
-			while( to_compare_length < buf_length )
+			openequal_coll_elem_multi_equalclose() : 
+				m_coll_elem_multi('.', basic_string_parser<E>::NONE) 
 			{
-				to_compare_length++;
-				ctypebase::mask m = ctypebase::print;
-				if( !std::use_facet< std::ctype<E> >(std::locale()).is( buf, 
-							buf+to_compare_length, &m ) )
-				{
-					break;
-				}
-
 			}
-			std::basic_string<E> multichar = *(m_coll_elem_multi.get());
-			int ret = std::use_facet< std::collate<E> >(std::locale()).compare(
-					buf,
-					buf+to_compare_length,
-					multichar.c_str(),
-					multichar.c_str() + multichar.length() );
-			this->m_size = to_compare_length;
-			return ret;
-		}	
+
+			void push_parsers( parser_list &l )
+			{
+				l.push_back(&this->m_open);
+				l.push_back(&this->m_left_equal);
+				l.push_back(&this->m_coll_elem_multi);
+				l.push_back(&this->m_right_equal);
+				l.push_back(&this->m_close);
+			}
+
+			const char* get_name() const 
+			{
+				return "'[','.',collating_elem_multi,'.',']'"; 
+			}
+
+			int compare( const E* buf, const uint64_t buf_length )
+			{
+				uint64_t to_compare_length = 0;
+				// check the size of element in buf  - try the longest
+				while( to_compare_length < buf_length )
+				{
+					to_compare_length++;
+					ctypebase::mask m = ctypebase::print;
+					if( !std::use_facet< std::ctype<E> >(std::locale()).is( buf, 
+								buf+to_compare_length, &m ) )
+					{
+						break;
+					}
+
+				}
+				std::basic_string<E> multichar = *(m_coll_elem_multi.get());
+				int ret = std::use_facet< std::collate<E> >(std::locale()).compare(
+						buf,
+						buf+to_compare_length,
+						multichar.c_str(),
+						multichar.c_str() + multichar.length() );
+				this->m_size = to_compare_length;
+				return ret;
+			}	
 	};
+
 	int m_size;
+	
 	public:
 	basic_non_terminal<E, openequal_coll_elem_single_equalclose> m_coll_elem_single;
 	basic_non_terminal<E, openequal_coll_elem_multi_equalclose> m_multichar;
+	
 	public:
-	equivalence_class() : 
-		// CHANGE:: m_coll_elem_single(),
-		// CHANGE:: m_multichar(),
-		m_size(0) 
-	{
-	}
-
-	int matched_size() 
-	{
-		return this->m_size; 
-	}
-
-	void push_parsers( parser_list &l )
-	{
-		l.push_back(&this->m_coll_elem_single);
-		l.push_back(&this->m_multichar);
-	}
-
-	const char * get_name() const 
-	{
-		return "equivalence_class"; 
-	}
-
-	int compare( const E* buf, const uint64_t buf_length )
-	{
-		int ret = 0;
-		if( this->m_coll_elem_single.is_parsed() )
+		equivalence_class() : 
+			// CHANGE:: m_coll_elem_single(),
+			// CHANGE:: m_multichar(),
+			m_size(0) 
 		{
-			ret = this->m_coll_elem_single->compare( buf, buf_length );
-			this->m_size = this->m_coll_elem_single->matched_size();
 		}
-		else
+
+		int matched_size() 
 		{
-			ret = this->m_multichar->compare( buf, buf_length );
-			this->m_size = this->m_multichar->matched_size();
+			return this->m_size; 
 		}
-		return ret;
-	}
+
+		void push_parsers( parser_list &l )
+		{
+			l.push_back(&this->m_coll_elem_single);
+			l.push_back(&this->m_multichar);
+		}
+
+		const char * get_name() const 
+		{
+			return "equivalence_class"; 
+		}
+
+		int compare( const E* buf, const uint64_t buf_length )
+		{
+			int ret = 0;
+			if( this->m_coll_elem_single.is_parsed() ) {
+				ret = this->m_coll_elem_single->compare( buf, buf_length );
+				this->m_size = this->m_coll_elem_single->matched_size();
+			} else {
+				ret = this->m_multichar->compare( buf, buf_length );
+				this->m_size = this->m_multichar->matched_size();
+			}
+			return ret;
+		}
 };
 
 template<typename E>
-class single_expression
-{
+class single_expression {
 	typedef typename basic_parser<E>::parser_list parser_list;
 
 	basic_choice<E,collating_choice<E> > m_collating_choice;
@@ -4394,210 +4262,204 @@ class single_expression
 	basic_choice<E,equivalence_class<E> > m_equivalence_class;
 
 	public:
-	uint64_t recognize( const E* buf, const uint64_t buf_length )
-	{
-		int ret = 0;
-		int size = 0;
-		if( this->m_collating_choice.is_parsed() )
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
-			ret = this->m_collating_choice->compare(buf,buf_length);
-			size = this->m_collating_choice->matched_size();
+			int ret = 0;
+			int size = 0;
+			if( this->m_collating_choice.is_parsed() ) {
+				ret = this->m_collating_choice->compare(buf,buf_length);
+				size = this->m_collating_choice->matched_size();
+			} else if( this->m_character_class.is_parsed() ) {
+				ret = this->m_character_class->compare(buf,buf_length);
+				size = this->m_character_class->matched_size();
+			} else {
+				ret = this->m_equivalence_class->compare(buf,buf_length);
+				size = this->m_equivalence_class->matched_size();
+			}
+			if( ret == 0 )
+				return size;
+			else
+				return 0;
 		}
-		else if( this->m_character_class.is_parsed() )
-		{
-			ret = this->m_character_class->compare(buf,buf_length);
-			size = this->m_character_class->matched_size();
-		}
-		else
-		{
-			ret = this->m_equivalence_class->compare(buf,buf_length);
-			size = this->m_equivalence_class->matched_size();
-		}
-		if( ret == 0 )
-			return size;
-		else
-			return 0;
-	}
 	public:
-	single_expression() 
-	{
-	}
+		single_expression() 
+		{
+		}
 
-	virtual ~single_expression() 
-	{
-	}
+		virtual ~single_expression() 
+		{
+		}
 
-	void push_parsers( parser_list &l )
-	{
-		l.push_back( &this->m_equivalence_class );
-		l.push_back( &this->m_character_class );
-		l.push_back( &this->m_collating_choice );
-	}
+		void push_parsers( parser_list &l )
+		{
+			l.push_back( &this->m_equivalence_class );
+			l.push_back( &this->m_character_class );
+			l.push_back( &this->m_collating_choice );
+		}
 
-	const char* get_name() const 
-	{
-		return "single_expression"; 
-	}
+		const char* get_name() const 
+		{
+			return "single_expression"; 
+		}
 
 };
 
 template<typename E>
-class start_range
-{
+class start_range {
 	typedef typename basic_parser<E>::parser_list parser_list;
 
 	basic_choice<E,collating_choice<E> >	m_collating_choice;
 	basic_terminal<E,'-'>				m_hyphen;
 	int m_size;
+
 	public:
-	int compare(const E* buf, const uint64_t buf_length)
-	{
-		// CHANGE:: int ret = this->m_collating_choice->compare(buf, buf_length);
-
-		this->m_size = this->m_collating_choice->matched_size();
-
-		// CHANGE:: 
-		return 0;
-	}
-
-	int matched_size() 
-	{
-		return this->m_size; 
-	}
-
-	start_range() : m_size(0) 
-	{
-	}
-
-	virtual ~start_range() 
-	{
-	}
-
-	void push_parsers( parser_list &l )
-	{
-		l.push_back( &this->m_collating_choice );
-		l.push_back( &this->m_hyphen );
-	}
-
-	const char* get_name() const 
-	{
-		return "collating_choice,-"; 
-	}
-
-};
-
-template<typename E>
-class range_expression
-{
-	typedef typename basic_parser<E>::parser_list parser_list;
-
-	class start_range_and_end_range
-	{
-		basic_non_terminal<E,start_range<E> >	m_start_range;
-		basic_choice<E,collating_choice<E> > m_end_range;
-
-		public:
-		uint64_t recognize( const E* buf, const uint64_t buf_length )
+		int compare(const E* buf, const uint64_t buf_length)
 		{
-			int start_ret = this->m_start_range->compare(buf,buf_length);
-			int size = this->m_start_range->matched_size();
-			while( start_ret < 0 && size > 1) 
-			{
-				size--;
-				// while the buf is not higher as start range, try smaller -
-				// collating symbol in buffer
-				start_ret = this->m_start_range->compare(buf,size);
-			}
-			int end_ret = 0;
-			if( start_ret > 0 )
-			{
-				end_ret = this->m_end_range->compare(buf,size);
-				while( end_ret > 0 && 
-						size > 1 && 
-						this->m_start_range->compare(buf,size-1) >= 0 )
-				{
-					size--;
-					end_ret = this->m_end_range->compare(buf,size);
-				}
-			}
-			if( start_ret >=0 && end_ret <= 0 )
-				return size;
-			else
-				return 0;
+			// CHANGE:: int ret = this->m_collating_choice->compare(buf, buf_length);
+
+			this->m_size = this->m_collating_choice->matched_size();
+
+			// CHANGE:: 
+			return 0;
 		}
 
-		start_range_and_end_range() : m_start_range() {};
-		~start_range_and_end_range() {};
-		void push_parsers( parser_list &l )
+		int matched_size() 
 		{
-			l.push_back( &this->m_start_range );
-			l.push_back( &this->m_end_range );
-		}	
-		const char* get_name() const { return "start_range,end_range"; }
+			return this->m_size; 
+		}
 
-	};
-
-	class start_range_and_hyphen
+		start_range() : m_size(0) 
 	{
-		basic_non_terminal<E,start_range<E> >	m_start_range;
-		basic_terminal<E,'-'>	m_hyphen;
+	}
 
-		public:
-		uint64_t recognize( const E* buf, const uint64_t buf_length )
-		{
-			int start_ret = this->m_start_range->compare(buf,buf_length);
-			int size = this->m_start_range->matched_size();
-			while( start_ret < 0 && size > 1) 
-			{
-				size--;
-				// while the buf is not higher as start range, try smaller -
-				// collating symbol in buffer
-				start_ret = this->m_start_range->compare(buf,size);
-			}
-			int end_ret = 0;
-			if( start_ret > 0 )
-			{
-				end_ret = std::use_facet< std::collate<E> >(std::locale()).compare(
-						buf,
-						buf+size,
-						this->m_hyphen.get(),
-						this->m_hyphen.get()+1 );
-				while( end_ret > 0 && 
-						size > 1 && 
-						this->m_start_range->compare(buf,size-1) >= 0 )
-				{
-					size--;
-					end_ret = std::use_facet< std::collate<E> >(std::locale()).compare(
-							buf,
-							buf+size,
-							this->m_hyphen.get(),
-							this->m_hyphen.get()+1 );
-				}
-			}
-			if( start_ret >=0 && end_ret <= 0 )
-				return size;
-			else
-				return 0;
-		}
-
-		start_range_and_hyphen() : m_start_range() 
-		{
-		}
-
-		virtual ~start_range_and_hyphen() 
+		virtual ~start_range() 
 		{
 		}
 
 		void push_parsers( parser_list &l )
 		{
-			l.push_back( &this->m_start_range );
+			l.push_back( &this->m_collating_choice );
 			l.push_back( &this->m_hyphen );
 		}
 
 		const char* get_name() const 
 		{
-			return "start_range,-"; 
+			return "collating_choice,-"; 
 		}
+
+};
+
+template<typename E>
+class range_expression {
+	typedef typename basic_parser<E>::parser_list parser_list;
+
+	class start_range_and_end_range {
+		basic_non_terminal<E,start_range<E> >	m_start_range;
+		basic_choice<E,collating_choice<E> > m_end_range;
+
+		public:
+			uint64_t recognize( const E* buf, const uint64_t buf_length )
+			{
+				int start_ret = this->m_start_range->compare(buf,buf_length);
+				int size = this->m_start_range->matched_size();
+				while( start_ret < 0 && size > 1) {
+					size--;
+					// while the buf is not higher as start range, try smaller -
+					// collating symbol in buffer
+					start_ret = this->m_start_range->compare(buf,size);
+				}
+				int end_ret = 0;
+				if( start_ret > 0 ) {
+					end_ret = this->m_end_range->compare(buf,size);
+					while( end_ret > 0 && size > 1 && this->m_start_range->compare(buf,size-1) >= 0 ) {
+						size--;
+						end_ret = this->m_end_range->compare(buf,size);
+					}
+				}
+				if( start_ret >=0 && end_ret <= 0 )
+					return size;
+				else
+					return 0;
+			}
+
+			start_range_and_end_range() : 
+				m_start_range() 
+			{
+			}
+
+			~start_range_and_end_range() 
+			{
+			}
+
+			void push_parsers( parser_list &l )
+			{
+				l.push_back( &this->m_start_range );
+				l.push_back( &this->m_end_range );
+			}	
+			
+			const char* get_name() const 
+			{
+				return "start_range,end_range"; 
+			}
+
+	};
+
+	class start_range_and_hyphen {
+		basic_non_terminal<E,start_range<E> >	m_start_range;
+		basic_terminal<E,'-'>	m_hyphen;
+
+		public:
+			uint64_t recognize( const E* buf, const uint64_t buf_length )
+			{
+				int start_ret = this->m_start_range->compare(buf,buf_length);
+				int size = this->m_start_range->matched_size();
+				while( start_ret < 0 && size > 1) {
+					size--;
+					// while the buf is not higher as start range, try smaller -
+					// collating symbol in buffer
+					start_ret = this->m_start_range->compare(buf,size);
+				}
+				int end_ret = 0;
+				if( start_ret > 0 ) {
+					end_ret = std::use_facet< std::collate<E> >(std::locale()).compare(
+							buf,
+							buf+size,
+							this->m_hyphen.get(),
+							this->m_hyphen.get()+1 );
+					while( end_ret > 0 && size > 1 && this->m_start_range->compare(buf,size-1) >= 0 ) {
+						size--;
+						end_ret = std::use_facet< std::collate<E> >(std::locale()).compare(
+								buf,
+								buf+size,
+								this->m_hyphen.get(),
+								this->m_hyphen.get()+1 );
+					}
+				}
+				if( start_ret >=0 && end_ret <= 0 )
+					return size;
+				else
+					return 0;
+			}
+
+			start_range_and_hyphen() : 
+				m_start_range() 
+			{
+			}
+
+			virtual ~start_range_and_hyphen() 
+			{
+			}
+
+			void push_parsers( parser_list &l )
+			{
+				l.push_back( &this->m_start_range );
+				l.push_back( &this->m_hyphen );
+			}
+
+			const char* get_name() const 
+			{
+				return "start_range,-"; 
+			}
 
 	};	
 
@@ -4605,217 +4467,224 @@ class range_expression
 	basic_non_terminal<E,start_range_and_hyphen >	m_start_and_hyphen;
 
 	public:
-	uint64_t recognize( const E* buf, const uint64_t buf_length )
-	{
-		if( this->m_start_end_range.is_parsed() )
-		{
-			return this->m_start_end_range->recognize(buf,buf_length);
-		}
-		else
-		{
-			return this->m_start_and_hyphen->recognize(buf,buf_length);
-		}
-	}
-	range_expression() : m_start_end_range(), m_start_and_hyphen() {};
-
-	~range_expression() {};
-	void push_parsers( parser_list &l )
-	{
-		l.push_back( &this->m_start_end_range );
-		l.push_back( &this->m_start_and_hyphen );
-	}	
-	const char* get_name() const { return "range_expression"; }
-
-};
-
-template<typename E>
-class expression_term
-{
-	typedef typename basic_parser<E>::parser_list parser_list;
-	basic_choice<E,single_expression<E> >	
-		m_single_expression;
-	basic_choice<E,range_expression<E> >		
-		m_range_expression;
-
-	public:
-	uint64_t recognize( const E* buf, const uint64_t buf_length )
-	{
-		if( this->m_single_expression.is_parsed() )
-		{
-			return this->m_single_expression->recognize(buf,buf_length);
-		}
-		else
-		{
-			return this->m_range_expression->recognize(buf,buf_length);
-		}
-	}
-	public:
-	expression_term() 
-	{
-	}
-
-	virtual ~expression_term() 
-	{
-	}
-
-	void push_parsers( parser_list &l )
-	{
-		l.push_back( &this->m_range_expression );
-		l.push_back( &this->m_single_expression );
-	}
-
-	const char* get_name() const 
-	{
-		return "expression_term"; 
-	}
-
-};
-
-template<typename E>
-class follow_list
-{
-	typedef typename basic_parser<E>::parser_list parser_list;
-	public:
-	class follow_list_and_expression_term
-	{
-		basic_choice<E,follow_list<E> >			m_follow_list;
-		basic_choice<E,expression_term<E> >		m_expression_term;
-
-		public:
 		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
-			uint64_t size = this->m_follow_list->recognize(buf,buf_length);
-			if( size == 0 )
-			{
-				size = this->m_expression_term->recognize(buf,buf_length);
+			if( this->m_start_end_range.is_parsed() ) {
+				return this->m_start_end_range->recognize(buf,buf_length);
+			} else {
+				return this->m_start_and_hyphen->recognize(buf,buf_length);
 			}
-			return size;
 		}
 
-		follow_list_and_expression_term() 
+		range_expression() : 
+			m_start_end_range(), m_start_and_hyphen() 
 		{
 		}
 
-		virtual ~follow_list_and_expression_term() 
+		~range_expression() 
 		{
 		}
 
 		void push_parsers( parser_list &l )
 		{
-			l.push_back( &this->m_expression_term );
-			l.push_back( &this->m_follow_list );
+			l.push_back( &this->m_start_end_range );
+			l.push_back( &this->m_start_and_hyphen );
 		}
 
 		const char* get_name() const 
 		{
-			return "follow_list,expression_term"; 
+			return "range_expression"; 
 		}
-
-	};
-
-	basic_choice<E,expression_term<E> > m_expression_term;
-	basic_non_terminal<E,follow_list_and_expression_term > m_follow_and_expression;
-
-	public:
-	uint64_t recognize( const E* buf, const uint64_t buf_length )
-	{
-		if( this->m_expression_term.is_parsed() )
-		{
-			return this->m_expression_term->recognize(buf,buf_length);
-		}
-		else
-		{
-			return this->m_follow_and_expression->recognize(buf,buf_length);
-		}
-	}
-
-	public:
-	follow_list() : m_follow_and_expression() 
-	{
-	}
-
-	virtual ~follow_list() 
-	{
-	}
-
-	void push_parsers( parser_list &l )
-	{
-		l.push_back( &this->m_follow_and_expression );
-		l.push_back( &this->m_expression_term );
-	}
-
-	const char* get_name() const 
-	{
-		return "follow_list"; 
-	}
 
 };
 
 template<typename E>
-class bracket_list
-{
+class expression_term {
+	typedef typename basic_parser<E>::parser_list parser_list;
+	basic_choice<E,single_expression<E> >	m_single_expression;
+	basic_choice<E,range_expression<E> >	m_range_expression;
+
+	public:
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
+		{
+			if( this->m_single_expression.is_parsed() ) {
+				return this->m_single_expression->recognize(buf,buf_length);
+			} else {
+				return this->m_range_expression->recognize(buf,buf_length);
+			}
+		}
+
+	public:
+		expression_term() 
+		{
+		}
+
+		virtual ~expression_term() 
+		{
+		}
+
+		void push_parsers( parser_list &l )
+		{
+			l.push_back( &this->m_range_expression );
+			l.push_back( &this->m_single_expression );
+		}
+
+		const char* get_name() const 
+		{
+			return "expression_term"; 
+		}
+
+};
+
+template<typename E>
+class follow_list {
 	typedef typename basic_parser<E>::parser_list parser_list;
 
-	class follow_list_and_hyphen
-	{
+	public:
+		class follow_list_and_expression_term {
+			basic_choice<E,follow_list<E> >			m_follow_list;
+			basic_choice<E,expression_term<E> >		m_expression_term;
+
+			public:
+				uint64_t recognize( const E* buf, const uint64_t buf_length )
+				{
+					uint64_t size = this->m_follow_list->recognize(buf,buf_length);
+					if( size == 0 ) {
+						size = this->m_expression_term->recognize(buf,buf_length);
+					}
+					return size;
+				}
+
+				follow_list_and_expression_term() 
+				{
+				}
+
+				virtual ~follow_list_and_expression_term() 
+				{
+				}
+
+				void push_parsers( parser_list &l )
+				{
+					l.push_back( &this->m_expression_term );
+					l.push_back( &this->m_follow_list );
+				}
+
+				const char* get_name() const 
+				{
+					return "follow_list,expression_term"; 
+				}
+
+		};
+
+		basic_choice<E,expression_term<E> > m_expression_term;
+		basic_non_terminal<E,follow_list_and_expression_term > m_follow_and_expression;
+
+	public:
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
+		{
+			if( this->m_expression_term.is_parsed() ) {
+				return this->m_expression_term->recognize(buf,buf_length);
+			} else {
+				return this->m_follow_and_expression->recognize(buf,buf_length);
+			}
+		}
+
+	public:
+		follow_list() : 
+			m_follow_and_expression() 
+		{
+		}
+
+		virtual ~follow_list() 
+		{
+		}
+
+		void push_parsers( parser_list &l )
+		{
+			l.push_back( &this->m_follow_and_expression );
+			l.push_back( &this->m_expression_term );
+		}
+
+		const char* get_name() const 
+		{
+			return "follow_list"; 
+		}
+
+};
+
+template<typename E>
+class bracket_list {
+	typedef typename basic_parser<E>::parser_list parser_list;
+
+	class follow_list_and_hyphen {
 		basic_choice<E,follow_list<E> >	m_follow_list;
 		basic_terminal<E,'-'>		m_hyphen;
 
 		public:
-		uint64_t recognize( const E* buf, const uint64_t buf_length )
-		{
-			uint64_t size = this->m_follow_list->recognize(buf,buf_length);
-			if( size == 0 )
+			uint64_t recognize( const E* buf, const uint64_t buf_length )
 			{
-				if( buf[0] == this->m_hyphen.get_valid() )
-				{
-					size = 1;
+				uint64_t size = this->m_follow_list->recognize(buf,buf_length);
+				if( size == 0 ) {
+					if( buf[0] == this->m_hyphen.get_valid() ) {
+						size = 1;
+					}
+				}
+				return size;
+			}
+
+			follow_list_and_hyphen()
+			{
+			}
+
+			~follow_list_and_hyphen() 
+			{
+			}
+
+			void push_parsers( parser_list &l )
+			{
+				l.push_back( &this->m_follow_list );
+				l.push_back( &this->m_hyphen );
+			}
+
+			const char* get_name() const 
+			{
+				return "follow_list,'-'"; 
+			}
+
+	};
+
+	class hyphen_and_follow_list {
+		basic_terminal<E,'-'> m_hyphen;
+		basic_choice<E,follow_list<E> > m_follow_list;
+
+		public:
+			uint64_t recognize( const E* buf, const uint64_t buf_length )
+			{
+				if( buf[0] == this->m_hyphen.get_valid() ) {
+					return 1;
+				} else {
+					return this->m_follow_list->recognize(buf,buf_length);
 				}
 			}
-			return size;
-		}
-		follow_list_and_hyphen() {};
 
-		~follow_list_and_hyphen() {};
-		void push_parsers( parser_list &l )
-		{
-			l.push_back( &this->m_follow_list );
-			l.push_back( &this->m_hyphen );
-		}	
-		const char* get_name() const { return "follow_list,'-'"; }
-
-	};
-
-	class hyphen_and_follow_list
-	{
-		basic_terminal<E,'-'>					m_hyphen;
-		basic_choice<E,follow_list<E> >			m_follow_list;
-		public:
-		uint64_t recognize( const E* buf, const uint64_t buf_length )
-		{
-			if( buf[0] == this->m_hyphen.get_valid() )
+			void push_parsers( parser_list &l )
 			{
-				return 1;
-			} 
-			else
-			{
-				return this->m_follow_list->recognize(buf,buf_length);
+				l.push_back( &this->m_hyphen );
+				l.push_back( &this->m_follow_list );
 			}
-		}
-		void push_parsers( parser_list &l )
-		{
-			l.push_back( &this->m_hyphen );
-			l.push_back( &this->m_follow_list );
-		}	
-		const char* get_name() const { return "'-',follow_list,-"; }
+
+			const char* get_name() const 
+			{
+				return "'-',follow_list,-"; 
+			}
 	};
 
-	class hyphen_hyphen_end_range
-	{
+	class hyphen_hyphen_end_range {
 		protected:
-			basic_terminal<E,'-'>					m_hyphen;
-			basic_terminal<E,'-'>					m_sep;
-			basic_choice<E,collating_choice<E> >		m_end_range;
+			basic_terminal<E,'-'> m_hyphen;
+			basic_terminal<E,'-'> m_sep;
+			basic_choice<E,collating_choice<E> > m_end_range;
+
 		public:
 			virtual ~hyphen_hyphen_end_range()
 			{
@@ -4827,21 +4696,16 @@ class bracket_list
 
 				int end_ret = this->m_end_range->compare(buf,buf_length);
 				int size = this->m_end_range->matched_size();
-				while( end_ret > 0 && size > 1) 
-				{
+				while( end_ret > 0 && size > 1) {
 					size--;
 					// while the buf is not higher as start range, try smaller -
 					// collating symbol in buffer
 					end_ret = this->m_end_range->compare(buf,size);
 				}
 				int start_ret = 0;
-				if( end_ret < 0 )
-				{
+				if( end_ret < 0 ) {
 					start_ret = std::use_facet<std::collate<E> >(l).compare(buf, buf+size, this->m_hyphen.get(), this->m_hyphen.get()+1);
-					while( start_ret < 0 && 
-							size > 1 && 
-							this->m_end_range->compare(buf,size-1) <= 0 )
-					{
+					while( start_ret < 0 && size > 1 && this->m_end_range->compare(buf,size-1) <= 0 ) {
 						size--;
 						start_ret = std::use_facet<std::collate<E> >(l).compare(buf, buf+size, this->m_hyphen.get(), this->m_hyphen.get()+1);
 					}
@@ -4851,19 +4715,24 @@ class bracket_list
 				else
 					return 0;
 			}
+
 			virtual void push_parsers( parser_list &l )
 			{
 				l.push_back( &this->m_hyphen );
 				l.push_back( &this->m_sep );
 				l.push_back( &this->m_end_range );
-			}	
-			const char* get_name() const { return "'-','-',collating_choice"; }
+			}
+
+			const char* get_name() const 
+			{
+				return "'-','-',collating_choice"; 
+			}
 	};
 
-	class hyphen_hyphen_endrange_follow_list : public hyphen_hyphen_end_range 
-	{
+	class hyphen_hyphen_endrange_follow_list : public hyphen_hyphen_end_range {
 		protected:
 			basic_choice<E,follow_list<E> >	m_follow_list;
+
 		public:
 			virtual ~hyphen_hyphen_endrange_follow_list()
 			{
@@ -4872,12 +4741,9 @@ class bracket_list
 			virtual uint64_t recognize( const E* buf, const uint64_t buf_length )
 			{
 				int ret = hyphen_hyphen_end_range::recognize(buf,buf_length);
-				if( ret == 0 )
-				{
+				if( ret == 0 ) {
 					return this->m_follow_list->recognize(buf,buf_length);
-				} 
-				else
-				{
+				} else {
 					return ret;
 				}
 			}
@@ -4894,11 +4760,11 @@ class bracket_list
 			}
 	};
 
-	class right_bracket_follow_list
-	{
+	class right_bracket_follow_list {
 		protected:
-			basic_terminal<E,']'>						m_right_bracket;
-			basic_choice<E,follow_list<E> >			m_follow_list;
+			basic_terminal<E,']'> m_right_bracket;
+			basic_choice<E,follow_list<E> > m_follow_list;
+
 		public:
 			virtual ~right_bracket_follow_list()
 			{
@@ -4906,22 +4772,25 @@ class bracket_list
 
 			virtual uint64_t recognize( const E* buf, const uint64_t buf_length )
 			{
-				if( buf_length > 0 && buf[0] == ']' )
-				{
+				if( buf_length > 0 && buf[0] == ']' ) {
 					return this->m_follow_list->recognize(buf+1,buf_length-1);
-				}
-				else
-				{
+				} else {
 					return 0;
 				}
 			}
+
 			void push_parsers( parser_list &l )
 			{
 				l.push_back( &this->m_right_bracket );
 				l.push_back( &this->m_follow_list );
-			}	
-			const char* get_name() const { return "']',follow_list"; }
+			}
+
+			const char* get_name() const 
+			{
+				return "']',follow_list"; 
+			}
 	};
+
 	basic_choice<E,follow_list<E> > m_follow_list;
 	basic_non_terminal<E,follow_list_and_hyphen >	m_follow_list_hyphen;
 	basic_non_terminal<E,hyphen_and_follow_list >	m_hyphen_follow_list;
@@ -4932,213 +4801,204 @@ class bracket_list
 	basic_terminal<E,']'>	m_right_bracket;
 
 	public:
-	uint64_t recognize( const E* buf, const uint64_t buf_length )
-	{
-		if( this->m_follow_list.is_parsed() )
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
-			return this->m_follow_list->recognize(buf,buf_length);
-		}
-		else if( this->m_follow_list_hyphen.is_parsed() )
-		{
-			return this->m_follow_list_hyphen->recognize(buf,buf_length);
-		} 
-		else if( this->m_hyphen_follow_list.is_parsed() )
-		{
-			return this->m_hyphen_follow_list->recognize(buf,buf_length);
-		}
-		else if( this->m_hyphen_hyphen_end_range.is_parsed() )
-		{
-			return this->m_hyphen_hyphen_end_range->recognize(buf,buf_length);
-		}
-		else if( this->m_hyphen_hyphen_endrange_follow.is_parsed() )
-		{
-			return this->m_hyphen_hyphen_endrange_follow->recognize(buf,buf_length);
-		}
-		else if( this->m_right_bracket_follow_list.is_parsed() )
-		{
-			return this->m_right_bracket_follow_list->recognize(buf,buf_length);
-		}
-		else
-		{
+			if( this->m_follow_list.is_parsed() ) {
+				return this->m_follow_list->recognize(buf,buf_length);
+			} else if( this->m_follow_list_hyphen.is_parsed() ) {
+				return this->m_follow_list_hyphen->recognize(buf,buf_length);
+			} else if( this->m_hyphen_follow_list.is_parsed() ) {
+				return this->m_hyphen_follow_list->recognize(buf,buf_length);
+			} else if( this->m_hyphen_hyphen_end_range.is_parsed() ) {
+				return this->m_hyphen_hyphen_end_range->recognize(buf,buf_length);
+			} else if( this->m_hyphen_hyphen_endrange_follow.is_parsed() ) {
+				return this->m_hyphen_hyphen_endrange_follow->recognize(buf,buf_length);
+			} else if( this->m_right_bracket_follow_list.is_parsed() ) {
+				return this->m_right_bracket_follow_list->recognize(buf,buf_length);
+			}
+			
 			return buf_length > 0 && buf[0] == ']';
 		}
-	}
 
-	bracket_list() : 
-		m_follow_list_hyphen(),
-		m_hyphen_follow_list(),
-		m_hyphen_hyphen_end_range(),
-		m_hyphen_hyphen_endrange_follow(),
-		m_right_bracket_follow_list() {}; 
-
-	virtual ~bracket_list() 
-	{
-	}
-
-	void push_parsers( parser_list &l )
-	{
-		/*
-		   l.push_back( &m_follow_list );
-		   l.push_back( &this->m_follow_list_hyphen );
-		   l.push_back( &this->m_hyphen_follow_list );
-		   l.push_back( &this->m_hyphen_hyphen_end_range );
-		   l.push_back( &this->m_hyphen_hyphen_endrange_follow );
-		   */
-		l.push_back( &this->m_hyphen_hyphen_endrange_follow );
-		l.push_back( &this->m_hyphen_hyphen_end_range );
-		l.push_back( &this->m_hyphen_follow_list );
-		l.push_back( &this->m_follow_list_hyphen );
-		l.push_back( &this->m_follow_list );
-		l.push_back( &this->m_right_bracket_follow_list );
-		l.push_back( &this->m_right_bracket );
-	}	
-
-	const char* get_name() const 
-	{ 
-		return "bracket_list"; //"follow_list|follow_list,'-'|'-',follow_list|'-','-',end_range|'-','-',collating_choice,follow_list"; 
-	}
-
-};
-
-template<typename E>
-class nonmatching_list
-{
-	typedef typename basic_parser<E>::parser_list parser_list;
-	basic_terminal<E, '^'>				m_circumflex;
-	basic_choice<E, bracket_list<E> >	m_bracket_list;
-	public:
-	uint64_t recognize( const E* buf, const uint64_t buf_length )
-	{
-		// not recognized
-		if( this->m_bracket_list->recognize(buf,buf_length) == 0 )
+		bracket_list() : 
+			m_follow_list_hyphen(),
+			m_hyphen_follow_list(),
+			m_hyphen_hyphen_end_range(),
+			m_hyphen_hyphen_endrange_follow(),
+			m_right_bracket_follow_list() 
 		{
-			return 1; // TODO - if collating element size is more then 1?
+		} 
+
+		virtual ~bracket_list() 
+		{
 		}
 
-		return 0;
-	}
+		void push_parsers( parser_list &l )
+		{
+			/*
+				 l.push_back( &m_follow_list );
+				 l.push_back( &this->m_follow_list_hyphen );
+				 l.push_back( &this->m_hyphen_follow_list );
+				 l.push_back( &this->m_hyphen_hyphen_end_range );
+				 l.push_back( &this->m_hyphen_hyphen_endrange_follow );
+				 */
+			l.push_back( &this->m_hyphen_hyphen_endrange_follow );
+			l.push_back( &this->m_hyphen_hyphen_end_range );
+			l.push_back( &this->m_hyphen_follow_list );
+			l.push_back( &this->m_follow_list_hyphen );
+			l.push_back( &this->m_follow_list );
+			l.push_back( &this->m_right_bracket_follow_list );
+			l.push_back( &this->m_right_bracket );
+		}	
 
-	nonmatching_list() 
-	{
-	}
-
-	virtual ~nonmatching_list() 
-	{
-	}
-
-	void push_parsers( parser_list &l )
-	{
-		l.push_back( &this->m_circumflex );
-		l.push_back( &this->m_bracket_list );
-	}	
-
-	const char* get_name() const 
-	{
-		return "nonmatching_list"; 
-	}
-
+		const char* get_name() const 
+		{ 
+			return "bracket_list"; //"follow_list|follow_list,'-'|'-',follow_list|'-','-',end_range|'-','-',collating_choice,follow_list"; 
+		}
 
 };
 
 template<typename E>
-class matching_list
-{
+class nonmatching_list {
 	typedef typename basic_parser<E>::parser_list parser_list;
-	basic_choice<E,bracket_list<E> >	m_bracket_list;
+
+	basic_terminal<E, '^'>				m_circumflex;
+	basic_choice<E, bracket_list<E> >	m_bracket_list;
+
 	public:
-	uint64_t recognize( const E* buf, const uint64_t buf_length )
-	{
-		return this->m_bracket_list->recognize(buf,buf_length);
-	}
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
+		{
+			// not recognized
+			if( this->m_bracket_list->recognize(buf,buf_length) == 0 ) {
+				return 1; // TODO - if collating element size is more then 1?
+			}
 
-	matching_list() 
-	{
-	}
+			return 0;
+		}
 
-	virtual ~matching_list() 
-	{
-	}
+		nonmatching_list() 
+		{
+		}
 
-	void push_parsers( parser_list &l )
-	{
-		l.push_back( &this->m_bracket_list );
-	}
+		virtual ~nonmatching_list() 
+		{
+		}
 
-	const char* get_name() const 
-	{
-		return "matching_list"; 
-	}
+		void push_parsers( parser_list &l )
+		{
+			l.push_back( &this->m_circumflex );
+			l.push_back( &this->m_bracket_list );
+		}	
+
+		const char* get_name() const 
+		{
+			return "nonmatching_list"; 
+		}
+
 
 };
 
 template<typename E>
-class bracket_expr
-{
+class matching_list {
 	typedef typename basic_parser<E>::parser_list parser_list;
 
-	class left_bracket_nonmatching_list_right_bracket{
+	basic_choice<E,bracket_list<E> >	m_bracket_list;
+
+	public:
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
+		{
+			return this->m_bracket_list->recognize(buf,buf_length);
+		}
+
+		matching_list() 
+		{
+		}
+
+		virtual ~matching_list() 
+		{
+		}
+
+		void push_parsers( parser_list &l )
+		{
+			l.push_back( &this->m_bracket_list );
+		}
+
+		const char* get_name() const 
+		{
+			return "matching_list"; 
+		}
+
+};
+
+template<typename E>
+class bracket_expr {
+	typedef typename basic_parser<E>::parser_list parser_list;
+
+	class left_bracket_nonmatching_list_right_bracket {
 		basic_terminal<E,'['>	m_left_bracket;
 		basic_non_terminal<E,nonmatching_list<E> > m_nonmatching_list;
 		basic_terminal<E,']'> m_right_bracket;
+
 		public:
-		uint64_t recognize( const E* buf, const uint64_t buf_length )
-		{
-			return this->m_nonmatching_list->recognize(buf,buf_length);
-		}
+			uint64_t recognize( const E* buf, const uint64_t buf_length )
+			{
+				return this->m_nonmatching_list->recognize(buf,buf_length);
+			}
 
-		left_bracket_nonmatching_list_right_bracket() :
-			m_nonmatching_list() 
-		{
-		}
+			left_bracket_nonmatching_list_right_bracket() :
+				m_nonmatching_list() 
+			{
+			}
 
-		virtual ~left_bracket_nonmatching_list_right_bracket() 
-		{
-		}
+			virtual ~left_bracket_nonmatching_list_right_bracket() 
+			{
+			}
 
-		void push_parsers( parser_list &l )
-		{
-			l.push_back( &this->m_left_bracket );
-			l.push_back( &this->m_nonmatching_list );
-			l.push_back( &this->m_right_bracket );
-		}
+			void push_parsers( parser_list &l )
+			{
+				l.push_back( &this->m_left_bracket );
+				l.push_back( &this->m_nonmatching_list );
+				l.push_back( &this->m_right_bracket );
+			}
 
-		const char* get_name() const 
-		{
-			return "[nonmatching_list]"; 
-		}
+			const char* get_name() const 
+			{
+				return "[nonmatching_list]"; 
+			}
 	};
 
-	class left_bracket_matching_list_rigth_bracket
-	{
-		basic_terminal<E,'['>					m_left_bracket;
+	class left_bracket_matching_list_rigth_bracket {
+		basic_terminal<E,'['> m_left_bracket;
 		basic_non_terminal<E,matching_list<E> >	m_matching_list;
-		basic_terminal<E,']'>					m_right_bracket;
+		basic_terminal<E,']'> m_right_bracket;
+
 		public:
-		uint64_t recognize( const E* buf, const uint64_t buf_length )
-		{
-			return this->m_matching_list->recognize(buf,buf_length);
-		}
+			uint64_t recognize( const E* buf, const uint64_t buf_length )
+			{
+				return this->m_matching_list->recognize(buf,buf_length);
+			}
+
 		public:
-		left_bracket_matching_list_rigth_bracket() :
-			m_matching_list() 
-		{
-		}
+			left_bracket_matching_list_rigth_bracket() :
+				m_matching_list() 
+			{
+			}
 
-		virtual ~left_bracket_matching_list_rigth_bracket() 
-		{
-		}
+			virtual ~left_bracket_matching_list_rigth_bracket() 
+			{
+			}
 
-		void push_parsers( parser_list &l )
-		{
-			l.push_back( &this->m_left_bracket );
-			l.push_back( &this->m_matching_list );
-			l.push_back( &this->m_right_bracket );
-		}
+			void push_parsers( parser_list &l )
+			{
+				l.push_back( &this->m_left_bracket );
+				l.push_back( &this->m_matching_list );
+				l.push_back( &this->m_right_bracket );
+			}
 
-		const char* get_name() const 
-		{
-			return "[matching_list]"; 
-		}
+			const char* get_name() const 
+			{
+				return "[matching_list]"; 
+			}
 
 	};	
 
@@ -5146,46 +5006,42 @@ class bracket_expr
 	basic_non_terminal<E,left_bracket_nonmatching_list_right_bracket > m_nonmatching;
 
 	public:
-	uint64_t recognize( const E* buf, const uint64_t buf_length )
-	{
-		if( this->m_matching.is_parsed() )
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
 		{
-			return this->m_matching->recognize(buf,buf_length);
+			if( this->m_matching.is_parsed() ) {
+				return this->m_matching->recognize(buf,buf_length);
+			} else {
+				return this->m_nonmatching->recognize(buf,buf_length);
+			}
 		}
-		else
+
+		bracket_expr() :
+			m_matching(),
+			m_nonmatching() 
 		{
-			return this->m_nonmatching->recognize(buf,buf_length);
 		}
-	}
 
-	bracket_expr() :
-		m_matching(),
-		m_nonmatching() 
-	{
-	}
+		virtual ~bracket_expr() 
+		{
+		}
 
-	virtual ~bracket_expr() 
-	{
-	}
+		void push_parsers( parser_list &l )
+		{
+			// l.push_back( &m_matching );
+			// l.push_back( &m_nonmatching );
+			l.push_back( &this->m_nonmatching );
+			l.push_back( &this->m_matching );
+		}	
 
-	void push_parsers( parser_list &l )
-	{
-		// l.push_back( &m_matching );
-		// l.push_back( &m_nonmatching );
-		l.push_back( &this->m_nonmatching );
-		l.push_back( &this->m_matching );
-	}	
-
-	const char* get_name() const 
-	{
-		return "[matching_list]|[nonmatching_list]"; 
-	}
+		const char* get_name() const 
+		{
+			return "[matching_list]|[nonmatching_list]"; 
+		}
 
 };
 
 template<typename E>
-class special_chars
-{
+class special_chars {
 	typedef typename basic_parser<E>::parser_list parser_list;
 
 	basic_terminal<E,'.'>	m_period;
@@ -5203,57 +5059,56 @@ class special_chars
 	basic_terminal<E,'$'>	m_dollar;
 
 	public:
-	special_chars() 
-	{
-	}
+		special_chars() 
+		{
+		}
 
-	virtual ~special_chars() 
-	{
-	}
+		virtual ~special_chars() 
+		{
+		}
 
-	void push_parsers( parser_list &l )
-	{    
-		l.push_back(&this->m_period);
-		l.push_back(&this->m_left_bracket);
-		l.push_back(&this->m_backslash);
-		l.push_back(&this->m_left_parenthesis);
-		l.push_back(&this->m_right_parenthesis);
-		l.push_back(&this->m_asterix);
-		l.push_back(&this->m_plus);
-		l.push_back(&this->m_question_mark);
-		l.push_back(&this->m_left_brace);
-		l.push_back(&this->m_right_brace);
-		l.push_back(&this->m_vertical_line);
-		l.push_back(&this->m_circumflex);
-		l.push_back(&this->m_dollar);
-	}
+		void push_parsers( parser_list &l )
+		{    
+			l.push_back(&this->m_period);
+			l.push_back(&this->m_left_bracket);
+			l.push_back(&this->m_backslash);
+			l.push_back(&this->m_left_parenthesis);
+			l.push_back(&this->m_right_parenthesis);
+			l.push_back(&this->m_asterix);
+			l.push_back(&this->m_plus);
+			l.push_back(&this->m_question_mark);
+			l.push_back(&this->m_left_brace);
+			l.push_back(&this->m_right_brace);
+			l.push_back(&this->m_vertical_line);
+			l.push_back(&this->m_circumflex);
+			l.push_back(&this->m_dollar);
+		}
 
-	const char * get_name() const 
-	{
-		return "special_chars"; 
-	}
+		const char * get_name() const 
+		{
+			return "special_chars"; 
+		}
 
+		uint64_t recognize( const E* buf, const uint64_t buf_length )
+		{
+			E c=0;
+			if( this->m_period.is_parsed() ) c = this->m_period.get_valid();
+			else if( this->m_left_bracket.is_parsed() ) c = this->m_left_bracket.get_valid();
+			else if( this->m_backslash.is_parsed() ) c = this->m_backslash.get_valid();
+			else if( this->m_left_parenthesis.is_parsed() ) c = this->m_left_parenthesis.get_valid();
+			else if( this->m_right_parenthesis.is_parsed() ) c = this->m_right_parenthesis.get_valid();
+			else if( this->m_asterix.is_parsed() ) c = this->m_asterix.get_valid();
+			else if( this->m_plus.is_parsed() ) c = this->m_plus.get_valid();
+			else if( this->m_question_mark.is_parsed() ) c = this->m_question_mark.get_valid();
+			else if( this->m_left_brace.is_parsed() ) c = this->m_left_brace.get_valid();
+			else if( this->m_right_brace.is_parsed() ) c = this->m_right_brace.get_valid();
+			else if( this->m_vertical_line.is_parsed() ) c = this->m_vertical_line.get_valid();
+			else if( this->m_circumflex.is_parsed() ) c = this->m_circumflex.get_valid();
+			else if( this->m_dollar.is_parsed()) c = this->m_dollar.get_valid();
 
-	uint64_t recognize( const E* buf, const uint64_t buf_length )
-	{
-		E c=0;
-		if( this->m_period.is_parsed() ) c = this->m_period.get_valid();
-		else if( this->m_left_bracket.is_parsed() ) c = this->m_left_bracket.get_valid();
-		else if( this->m_backslash.is_parsed() ) c = this->m_backslash.get_valid();
-		else if( this->m_left_parenthesis.is_parsed() ) c = this->m_left_parenthesis.get_valid();
-		else if( this->m_right_parenthesis.is_parsed() ) c = this->m_right_parenthesis.get_valid();
-		else if( this->m_asterix.is_parsed() ) c = this->m_asterix.get_valid();
-		else if( this->m_plus.is_parsed() ) c = this->m_plus.get_valid();
-		else if( this->m_question_mark.is_parsed() ) c = this->m_question_mark.get_valid();
-		else if( this->m_left_brace.is_parsed() ) c = this->m_left_brace.get_valid();
-		else if( this->m_right_brace.is_parsed() ) c = this->m_right_brace.get_valid();
-		else if( this->m_vertical_line.is_parsed() ) c = this->m_vertical_line.get_valid();
-		else if( this->m_circumflex.is_parsed() ) c = this->m_circumflex.get_valid();
-		else if( this->m_dollar.is_parsed()) c = this->m_dollar.get_valid();
-
-		if( c == buf[0] ) return 1;
-		else return 0;
-	}
+			if( c == buf[0] ) return 1;
+			else return 0;
+		}
 
 };
 
@@ -5276,92 +5131,85 @@ special_chars		=> '.' | '[' | '\' | '(' | ')' | '*' | '+' | '?' | '{'
 | '}' | '|' | '^' | '$' \n
 */
 template<typename E>
-class one_char_or_coll_elem_ere
-{
+class one_char_or_coll_elem_ere {
 	typedef typename basic_parser<E>::parser_list parser_list;
 	typedef bracket_expr<E>	bracket_expr_type;
 	typedef collating_symbol<E>	collating_symbol_type;
 
-	class quoted_char
-	{
-		basic_terminal<E,'\\'>			m_backslash;
-		basic_choice<E, special_chars<E> >
-			m_spec_chars;
+	class quoted_char {
+		basic_terminal<E,'\\'> m_backslash;
+		basic_choice<E, special_chars<E> > m_spec_chars;
+
 		public:
-		quoted_char() 
+			quoted_char() 
+			{
+			}
+
+			virtual ~quoted_char() 
+			{
+			}
+
+			void push_parsers( parser_list &l )
+			{
+				l.push_back(&this->m_backslash);
+				l.push_back(&this->m_spec_chars);
+			}
+
+			const char* get_name() const 
+			{
+				return "\\special_chars"; 
+			}
+
+			uint64_t recognize( const E* buf, const uint64_t buf_length )
+			{
+				return this->m_spec_chars->recognize(buf,buf_length);
+			}
+
+	};
+
+	basic_except_terminal<E,special_chars<E> > m_ord_char;
+	basic_non_terminal<E,quoted_char>	m_quoted_char;
+	basic_terminal<E,'.'>				m_dot;
+	basic_choice<E, bracket_expr_type >	m_bracket_expr;
+
+	public:
+		one_char_or_coll_elem_ere() 
 		{
 		}
 
-		virtual ~quoted_char() 
+		~one_char_or_coll_elem_ere() 
 		{
 		}
 
 		void push_parsers( parser_list &l )
 		{
-			l.push_back(&this->m_backslash);
-			l.push_back(&this->m_spec_chars);
+			l.push_back(&this->m_ord_char);
+			l.push_back(&this->m_quoted_char);
+			l.push_back(&this->m_dot);
+			l.push_back(&this->m_bracket_expr);
 		}
-		const char* get_name() const { return "\\special_chars"; }
 
-		uint64_t recognize( const E* buf, 
-				const uint64_t buf_length )
+		const char* get_name() const 
 		{
-			return this->m_spec_chars->recognize(buf,buf_length);
+			return "one_char|collating_element"; 
 		}
-	};
-	basic_except_terminal<E,special_chars<E> >
-		m_ord_char;
-	basic_non_terminal<E,quoted_char>	m_quoted_char;
-	basic_terminal<E,'.'>				m_dot;
-	basic_choice<E, bracket_expr_type >	m_bracket_expr;
-	public:
-	one_char_or_coll_elem_ere() 
-	{
-	}
 
-	~one_char_or_coll_elem_ere() 
-	{
-	}
-
-	void push_parsers( parser_list &l )
-	{
-		l.push_back(&this->m_ord_char);
-		l.push_back(&this->m_quoted_char);
-		l.push_back(&this->m_dot);
-		l.push_back(&this->m_bracket_expr);
-	}
-
-	const char* get_name() const 
-	{
-		return "one_char|collating_element"; 
-	}
-
-	uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset )
-	{
-		if( this->m_ord_char.is_parsed() )
+		uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset )
 		{
-			if( this->m_ord_char.get_valid() == buf[buf_offset] )
-			{
-				return collating_symbol_type::get_symbol_len(buf+buf_offset, buf_length-buf_offset);
-			}
-			else
-			{
-				return 0;
-			}
-		} 
-		else if( this->m_quoted_char.is_parsed() )
-		{      
-			return this->m_quoted_char->recognize( buf+buf_offset, buf_length-buf_offset );
-		}
-		else if( this->m_dot.is_parsed() )
-		{
-			return collating_symbol_type::get_symbol_len( buf+buf_offset, buf_length-buf_offset );
-		}
-		else
-		{
+			if( this->m_ord_char.is_parsed() ) {
+				if( this->m_ord_char.get_valid() == buf[buf_offset] ) {
+					return collating_symbol_type::get_symbol_len(buf+buf_offset, buf_length-buf_offset);
+				} else {
+					return 0;
+				}
+			} else if( this->m_quoted_char.is_parsed() ) {      
+				return this->m_quoted_char->recognize( buf+buf_offset, buf_length-buf_offset );
+			} else if( this->m_dot.is_parsed() ) {
+				return collating_symbol_type::get_symbol_len( buf+buf_offset, buf_length-buf_offset );
+			} 
+				
 			return this->m_bracket_expr->recognize( buf+buf_offset, buf_length-buf_offset );
 		}
-	}
 };
 
 /*
@@ -5383,36 +5231,38 @@ special_chars		=> '.' | '[' | '\' | '(' | ')' | '*' | '+' | '?' | '{'
 | '}' | '|' | '^' | '$' \n
 */
 template<typename E>
-class ere_expression : public ere_base<E>
-{
+class ere_expression : public ere_base<E> {
 	typedef typename basic_parser<E>::parser_list parser_list;
-	class subexpression : public ere_base<E>
-	{
-		basic_terminal<E,'('>				m_left_paren;
+
+	class subexpression : public ere_base<E> {
+		basic_terminal<E,'('> m_left_paren;
 		basic_choice<E,extended_reg_exp<E> >	m_extened_regexp;
-		basic_terminal<E,')'>				m_right_paren;
+		basic_terminal<E,')'> m_right_paren;
+
 		public:
-		subexpression() : ere_base<E>() 
-		{
-		}
+			subexpression() : 
+				ere_base<E>() 
+			{
+			}
 
-		virtual ~subexpression() 
-		{
-		}
+			virtual ~subexpression() 
+			{
+			}
 
-		uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
-		void assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m );
+			uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
 
-		void push_parsers( parser_list& l );
-		const char* get_name() const 
-		{
-			return "(subexpression)"; 
-		}
+			void assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m );
+
+			void push_parsers( parser_list& l );
+
+			const char* get_name() const 
+			{
+				return "(subexpression)"; 
+			}
 
 	};
 
-	class ere_expression_no_dup : public ere_expression<E>
-	{
+	class ere_expression_no_dup : public ere_expression<E> {
 		public:
 
 			void push_parsers( parser_list& l )
@@ -5425,34 +5275,38 @@ class ere_expression : public ere_base<E>
 			const char* get_name() const { return "one_char_or_coll_elem_ere | '^' | '$' | (subexpression)"; }
 	};
 
-	class ere_expression_and_dupl : public ere_base<E>
-	{
+	class ere_expression_and_dupl : public ere_base<E> {
 		basic_choice<E,ere_expression_no_dup > m_ere;
 		basic_choice<E, ere_dups<E> > m_dup;
 		matches	m_matches;
 
 		uint64_t divide_and_recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, uint64_t rep, bool assign_matches );
+
 		public: 
-		ere_expression_and_dupl() : ere_base<E>() 
-		{
-		}
+			ere_expression_and_dupl() : 
+				ere_base<E>() 
+			{
+			}
 
-		virtual ~ere_expression_and_dupl() 
-		{
-		}
+			virtual ~ere_expression_and_dupl() 
+			{
+			}
 
-		uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
-		void assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m );
-		void push_parsers( parser_list& l );
-		const char* get_name() const 
-		{
-			return "ere_expression,dupl"; 
-		}
+			uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
+		
+			void assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m );
+			
+			void push_parsers( parser_list& l );
+			
+			const char* get_name() const 
+			{
+				return "ere_expression,dupl"; 
+			}
 
-		bool is_lazy() 
-		{
-			return this->m_dup.is_parsed() && this->m_dup->is_lazy(); 
-		}
+			bool is_lazy() 
+			{
+				return this->m_dup.is_parsed() && this->m_dup->is_lazy(); 
+			}
 
 	};
 
@@ -5461,47 +5315,50 @@ class ere_expression : public ere_base<E>
 	basic_terminal<E,'$'> m_right_anchor;
 	basic_non_terminal<E,subexpression> m_subexpression;
 	basic_non_terminal<E,ere_expression_and_dupl> m_ere_expr_and_dup;
+
 	public:
 
-	ere_expression() : 
-		ere_base<E>(),
-		m_subexpression(),
-		m_ere_expr_and_dup()
-	{
-	}
+		ere_expression() : 
+			ere_base<E>(),
+			m_subexpression(),
+			m_ere_expr_and_dup()
+		{
+		}
 
-	virtual ~ere_expression() 
-	{
-	}
+		virtual ~ere_expression() 
+		{
+		}
 
-	bool is_right_anchor() 
-	{
-		return this->m_right_anchor.is_parsed(); 
-	}
+		bool is_right_anchor() 
+		{
+			return this->m_right_anchor.is_parsed(); 
+		}
 
-	bool is_left_anchor() 
-	{
-		return this->m_left_anchor.is_parsed(); 
-	}
+		bool is_left_anchor() 
+		{
+			return this->m_left_anchor.is_parsed(); 
+		}
 
-	bool is_subexpression() 
-	{
-		return this->m_subexpression.is_parsed(); 
-	}
+		bool is_subexpression() 
+		{
+			return this->m_subexpression.is_parsed(); 
+		}
 
-	bool is_lazy()
-	{ 
-		return this->m_ere_expr_and_dup.is_parsed() && this->m_ere_expr_and_dup->is_lazy(); 
-	}
+		bool is_lazy()
+		{ 
+			return this->m_ere_expr_and_dup.is_parsed() && this->m_ere_expr_and_dup->is_lazy(); 
+		}
 
-	uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
-	void assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m );
-	void push_parsers( parser_list& l );
-	const char* get_name() const 
-	{ 
-		return "ere_expression"; 
-	}
-
+		uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
+		
+		void assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m );
+		
+		void push_parsers( parser_list& l );
+		
+		const char* get_name() const 
+		{ 
+			return "ere_expression"; 
+		}
 
 };
 
@@ -5526,59 +5383,60 @@ bracket_expr		=> '[' matching_list ']' | '[' non_matching_list ']'
 \n
 */
 template<typename E>
-class ere_branch : public ere_base<E>
-{
-	typedef typename basic_parser<E>::parser_list 
-		parser_list;
+class ere_branch : public ere_base<E> {
+	typedef typename basic_parser<E>::parser_list parser_list;
 
-	class ere_expression_ere_branch : public ere_base<E>
-	{
+	class ere_expression_ere_branch : public ere_base<E> {
 		basic_choice<E, ere_expression<E> >	m_ere_expression;	
 		basic_choice<E, ere_branch<E> >		m_ere_branch;
+
 		public:	
-		ere_expression_ere_branch() : ere_base<E>() {};
-		~ere_expression_ere_branch() {};
+			ere_expression_ere_branch() : 
+				ere_base<E>() 
+			{
+			}
 
-		uint64_t recognize( const E* buf, 
-				const uint64_t buf_length, 
-				const uint64_t buf_offset,
-				bool try_positions = true );
-		void push_parsers( parser_list& l );
-		const char* get_name() const { return "ere_expression,ere_branch"; }
+			~ere_expression_ere_branch() 
+			{
+			}
 
-		void assign_matches( matches::match_key parent_address, 
-				uint64_t& branch_pos, 
-				matches& m );
+			uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
+
+			void push_parsers( parser_list& l );
+
+			const char* get_name() const { return "ere_expression,ere_branch"; }
+
+			void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m );
 	};
 
 	basic_choice<E, ere_expression<E> >	m_ere;
 	basic_non_terminal<E,ere_expression_ere_branch> m_ere_expression_ere_branch;
 
 	public:
-	ere_branch() :
-		ere_base<E>(), 
-		m_ere_expression_ere_branch() 
-	{
-	}
+		ere_branch() :
+			ere_base<E>(), 
+			m_ere_expression_ere_branch() 
+		{
+		}
 
-	virtual ~ere_branch() 
-	{
-	}
+		virtual ~ere_branch() 
+		{
+		}
 
-	uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
+		uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
 
-	void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m );
+		void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m );
 
-	bool is_right_anchor()
-	{
-		return this->m_ere.is_parsed() && this->m_ere->is_right_anchor();
-	}
+		bool is_right_anchor()
+		{
+			return this->m_ere.is_parsed() && this->m_ere->is_right_anchor();
+		}
 
-	void push_parsers( parser_list& l );
-	const char* get_name() const 
-	{
-		return "ere_branch"; 
-	}
+		void push_parsers( parser_list& l );
+		const char* get_name() const 
+		{
+			return "ere_branch"; 
+		}
 
 };
 
@@ -5629,31 +5487,33 @@ special_chars		=> '.' | '[' | '\' | '(' | ')' | '*' | '+' | '?' | '{'
 | '}' | '|' | '^' | '$' \n
 */
 template<typename E>
-class extended_reg_exp : public ere_base<E>
-{
+class extended_reg_exp : public ere_base<E> {
 	typedef typename basic_parser<E>::parser_list parser_list;
 
-	class ere_branch_or_extended_reg_exp : public ere_base<E>
-	{
+	class ere_branch_or_extended_reg_exp : public ere_base<E> {
 		basic_choice<E, ere_branch<E> >	m_branch;
 		basic_terminal<E,'|'>			m_or;
 		basic_choice<E, extended_reg_exp<E> >	m_ext_regexp;
+
 		public:
-		ere_branch_or_extended_reg_exp() : ere_base<E>() 
-		{
-		}
+			ere_branch_or_extended_reg_exp() : ere_base<E>() 
+			{
+			}
 
-		~ere_branch_or_extended_reg_exp() 
-		{
-		}
+			~ere_branch_or_extended_reg_exp() 
+			{
+			}
 
-		uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
-		void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m );
-		void push_parsers( parser_list& l );
-		const char* get_name() const 
-		{
-			return "ere_branch|ere"; 
-		}
+			uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true );
+
+			void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m );
+
+			void push_parsers( parser_list& l );
+
+			const char* get_name() const 
+			{
+				return "ere_branch|ere"; 
+			}
 
 	};
 
@@ -5662,41 +5522,42 @@ class extended_reg_exp : public ere_base<E>
 
 	public:
 
-	extended_reg_exp() : 
-		ere_base<E>(), 
-		m_branch_or_ext_regexp() 
-	{
-	}
+		extended_reg_exp() : 
+			ere_base<E>(), 
+			m_branch_or_ext_regexp() 
+		{
+		}
 
-	virtual ~extended_reg_exp() 
-	{
-	}
+		virtual ~extended_reg_exp() 
+		{
+		}
 
-	uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true  );
-	void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m );
+		uint64_t recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions = true  );
 
-	void push_parsers( parser_list& l );
-	const char* get_name() const 
-	{
-		return "ere"; 
-	}
+		void assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m );
+
+		void push_parsers( parser_list& l );
+
+		const char* get_name() const 
+		{
+			return "ere"; 
+		}
 
 };
 
-	template< typename E > 
+template< typename E > 
 uint64_t ere_expression<E>::subexpression::recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions )
 {
 	this->m_extened_regexp->recognize( buf, buf_length, buf_offset );
 	this->m_is_rec = this->m_extened_regexp->is_recognized();
-	if( this->m_is_rec )
-	{
+	if( this->m_is_rec ) {
 		this->m_rec_size = this->m_extened_regexp->recognize( buf, buf_length, buf_offset );
 		this->m_rec_pos = this->m_extened_regexp->recognized_position();
 	}
 	return this->m_rec_size;
 }
 
-	template< typename E > 
+template< typename E > 
 void ere_expression<E>::subexpression::assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m )
 {
 	key += '.';
@@ -5704,8 +5565,7 @@ void ere_expression<E>::subexpression::assign_matches( matches::match_key key, u
 	this->m_extened_regexp->assign_matches( key, branch_pos, m );
 }
 
-
-	template< typename E > 
+template< typename E > 
 void ere_expression<E>::subexpression::push_parsers( parser_list& l )
 {
 	l.push_back( &this->m_left_paren );
@@ -5713,12 +5573,11 @@ void ere_expression<E>::subexpression::push_parsers( parser_list& l )
 	l.push_back( &this->m_right_paren );
 }
 
-	template< typename E > 
+template< typename E > 
 uint64_t ere_expression<E>::ere_expression_and_dupl::divide_and_recognize(	const E* buf, const uint64_t buf_length, const uint64_t buf_offset, uint64_t rep, bool assign_matches )
 {
 	this->m_is_rec = true;
-	if( rep == this->m_dup->get_max() )
-	{
+	if( rep == this->m_dup->get_max() ) {
 		this->m_dup->set_recognized_dup(rep);
 		return 0;
 	}
@@ -5726,41 +5585,28 @@ uint64_t ere_expression<E>::ere_expression_and_dupl::divide_and_recognize(	const
 	uint64_t best_rec_size = 0;
 	uint64_t left_side_buf_len = buf_length;
 	uint64_t left_rec_size = 0;
-	while( this->m_is_rec )
-	{
+	while( this->m_is_rec ) {
 		this->m_ere->recognize( buf, left_side_buf_len, buf_offset, true );
-		if( this->m_ere->is_recognized() )
-		{
+		if( this->m_ere->is_recognized() ) {
 			left_rec_size = this->m_ere->recognized_size();
 			// m_ere->recognized_position() is always same as buf_offset
-			this->m_rec_size = divide_and_recognize( 
-					buf, 
-					buf_length, 
-					buf_offset + left_rec_size,
-					rep+1,
-					false );
-			if( this->m_is_rec )
-			{
+			this->m_rec_size = divide_and_recognize( buf, buf_length, buf_offset + left_rec_size, rep+1, false );
+			if( this->m_is_rec ) {
 				// previous method succeeded
-				if( best_rec_size < this->m_rec_size + left_rec_size )
-				{
+				if( best_rec_size < this->m_rec_size + left_rec_size ) {
 					best_rec_size = this->m_rec_size + left_rec_size;
 					best_left_side_buf_len = left_side_buf_len;
 				}	
 			}
 			left_side_buf_len = buf_offset + left_rec_size - 1;
 			this->m_is_rec = true;
-		}
-		else
-		{
+		} else {
 			this->m_is_rec = false;
 		}
 	}
 
-	if( best_rec_size > 0 )
-	{
-		if( assign_matches )
-		{
+	if( best_rec_size > 0 ) {
+		if( assign_matches ) {
 			this->m_ere->recognize( buf, best_left_side_buf_len, buf_offset, true );
 			uint64_t branch_pos = rep;
 			this->m_ere->assign_matches( "", branch_pos, this->m_matches );
@@ -5774,33 +5620,25 @@ uint64_t ere_expression<E>::ere_expression_and_dupl::divide_and_recognize(	const
 					rep+1,
 					true );
 			this->m_rec_size += left_rec_size;
-		}
-		else
-		{
+		} else {
 			this->m_is_rec = true;
 			this->m_rec_size = best_rec_size;
 		}
-	}
-	else if( rep >= this->m_dup->get_min() ) // the ere was recognized for no buf_length
-	{
+	} else if( rep >= this->m_dup->get_min() ) { // the ere was recognized for no buf_length
 		this->m_rec_size = 0;
 		this->m_is_rec = true;
-	}
-	else
-	{
+	} else {
 		this->m_is_rec = false;
 	}
 	return this->m_rec_size;	
 }
 
-
-	template< typename E > 
+template< typename E > 
 uint64_t ere_expression<E>::ere_expression_and_dupl::recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions )
 {
 	uint64_t rep = 1;
 
-	if( this->m_ere->is_subexpression() )
-	{
+	if( this->m_ere->is_subexpression() ) {
 		this->m_matches.clear();
 		// different handling for subexpressions - need to try different 
 		// splits on buffer, so expressions like ((ab){1,3}){5} match the 
@@ -5821,32 +5659,22 @@ uint64_t ere_expression<E>::ere_expression_and_dupl::recognize( const E* buf, co
 	this->m_rec_pos = this->m_ere->recognized_position();
 	this->m_rec_size = this->m_ere->recognized_size();
 
-	if( this->m_ere->is_recognized() && this->m_ere->is_subexpression() )
-	{
+	if( this->m_ere->is_recognized() && this->m_ere->is_subexpression() ) {
 		uint64_t branch_pos = 0;
 		this->m_ere->assign_matches( "", branch_pos, this->m_matches );
 	}
 
-	while( this->m_is_rec && rep < this->m_dup->get_max() )
-	{
-		this->m_ere->recognize( buf, 
-				buf_length,
-				this->m_rec_pos+this->m_rec_size,
-				false ); // don't try next positions
-		if( this->m_ere->is_recognized() )
-		{
+	while( this->m_is_rec && rep < this->m_dup->get_max() ) {
+		this->m_ere->recognize( buf, buf_length, this->m_rec_pos+this->m_rec_size, false ); // don't try next positions
+		if( this->m_ere->is_recognized() ) {
 			this->m_rec_size += this->m_ere->recognized_size();
 			rep++;
-		}
-		else if( rep < this->m_dup->get_min() )
-		{
+		} else if( rep < this->m_dup->get_min() ) {
 			this->m_is_rec = false;
 			this->m_rec_pos = 0;
 			this->m_rec_size = 0;
 			this->m_matches.clear(); // negative return
-		}
-		else
-		{
+		} else {
 			break; // positive return
 		}
 	}
@@ -5854,64 +5682,49 @@ uint64_t ere_expression<E>::ere_expression_and_dupl::recognize( const E* buf, co
 	return this->m_rec_size;	
 }
 
-	template< typename E > 
+template< typename E > 
 void ere_expression<E>::ere_expression_and_dupl::assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m )
 {
-	if( this->m_ere->is_subexpression() )
-	{
+	if( this->m_ere->is_subexpression() ) {
 		// in this case matches are in private collection, don't need 
 		// to assign in loop
 		m.extend( key, this->m_matches );
-	}
-	else 
-	{
-		for( int i = 0; i < (int)this->m_dup->get_recognized_dup(); i++ )
-		{
+	} else {
+		for( int i = 0; i < (int)this->m_dup->get_recognized_dup(); i++ ) {
 			this->m_ere->assign_matches( key, branch_pos, m );
 		}
 	}
 }
 
-	template< typename E > 
+template< typename E > 
 void ere_expression<E>::ere_expression_and_dupl::push_parsers( parser_list& l )
 {
 	l.push_back( &this->m_ere );
 	l.push_back( &this->m_dup );
 }
 
-	template<typename E>
+template<typename E>
 uint64_t ere_expression<E>::recognize(const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions)	
 {
 	this->m_is_rec = false;
 	this->m_rec_pos = buf_offset;
 	this->m_rec_size = 0;
 
-	if( this->m_one_elem.is_parsed() )
-	{
-		while( !this->m_is_rec && this->m_rec_pos < buf_length )
-		{
+	if( this->m_one_elem.is_parsed() ) {
+		while( !this->m_is_rec && this->m_rec_pos < buf_length ) {
 			this->m_rec_size = this->m_one_elem->recognize( buf, buf_length, this->m_rec_pos );
 			this->m_is_rec = this->m_rec_size > 0;
-			if( this->m_is_rec )
-			{
+			if( this->m_is_rec ) {
 				// this->m_rec_size = this->m_one_elem->recognized_size();
-			}
-			else if( try_positions )
-			{
+			} else if( try_positions ) {
 				this->m_rec_pos++;
-			}
-			else
-			{
+			} else {
 				break;
 			}
 		}
-	}
-	else if( this->m_left_anchor.is_parsed() || this->m_right_anchor.is_parsed() )
-	{
+	} else if( this->m_left_anchor.is_parsed() || this->m_right_anchor.is_parsed() ) {
 		this->m_is_rec = true;
-	} 
-	else if( this->m_ere_expr_and_dup.is_parsed() )
-	{
+	} else if( this->m_ere_expr_and_dup.is_parsed() ) {
 		this->m_ere_expr_and_dup->recognize( buf, buf_length, buf_offset, try_positions );
 		this->m_is_rec = this->m_ere_expr_and_dup->is_recognized() ;
 		if( this->m_is_rec )
@@ -5919,9 +5732,7 @@ uint64_t ere_expression<E>::recognize(const E* buf, const uint64_t buf_length, c
 			this->m_rec_pos = this->m_ere_expr_and_dup->recognized_position();
 			this->m_rec_size = this->m_ere_expr_and_dup->recognized_size();
 		}
-	}
-	else
-	{
+	} else {
 		this->m_subexpression->recognize( buf, buf_length, buf_offset );
 		this->m_is_rec = this->m_subexpression->is_recognized();
 		// Dont check in
@@ -5941,21 +5752,18 @@ uint64_t ere_expression<E>::recognize(const E* buf, const uint64_t buf_length, c
 	return this->m_rec_size;
 }
 
-	template<typename E>
+template<typename E>
 void ere_expression<E>::assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m )
 {
-	if( this->m_subexpression.is_parsed() )
-	{
+	if( this->m_subexpression.is_parsed() ) {
 		branch_pos++;
 		this->m_subexpression->assign_matches( key, branch_pos, m );
-	} 
-	else if( this->m_ere_expr_and_dup.is_parsed() )
-	{
+	} else if( this->m_ere_expr_and_dup.is_parsed() ) {
 		this->m_ere_expr_and_dup->assign_matches( key, branch_pos, m );
 	}
 }
 
-	template<typename E>
+template<typename E>
 void ere_expression<E>::push_parsers( parser_list& l )
 {
 	l.push_back( &this->m_ere_expr_and_dup );
@@ -5965,23 +5773,20 @@ void ere_expression<E>::push_parsers( parser_list& l )
 	l.push_back( &this->m_subexpression );
 }
 
-	template<typename E>
+template<typename E>
 uint64_t ere_branch<E>::ere_expression_ere_branch::recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions )
 {
 	this->m_is_rec = false;
 	this->m_rec_pos = 0;
 	this->m_rec_size = 0;
-	if( this->m_ere_branch->is_right_anchor() )
-	{
+	if( this->m_ere_branch->is_right_anchor() ) {
 		// different processing for this kind of expression - no splitting retries
 		this->m_ere_expression->recognize( buf, buf_length, buf_offset );
-		if( this->m_ere_expression->is_recognized() )
-		{
+		if( this->m_ere_expression->is_recognized() ) {
 			this->m_rec_size = this->m_ere_expression->recognized_size();
 			this->m_rec_pos = this->m_ere_expression->recognized_position();
 			this->m_is_rec = ((this->m_rec_pos + this->m_rec_size) == buf_length);
-			if( !this->m_is_rec )
-			{
+			if( !this->m_is_rec ) {
 				this->m_rec_pos = 0;
 				this->m_rec_size = 0;
 			}
@@ -5989,19 +5794,15 @@ uint64_t ere_branch<E>::ere_expression_ere_branch::recognize( const E* buf, cons
 		return this->m_rec_size;
 	}
 
-	if( this->m_ere_expression->is_left_anchor() )
-	{
+	if( this->m_ere_expression->is_left_anchor() ) {
 		this->m_ere_branch->recognize( buf, buf_length, buf_offset, true );
-		this->m_is_rec = this->m_ere_branch->is_recognized() &&
-			(this->m_ere_branch->recognized_position() == buf_offset);
-		if( this->m_is_rec )
-		{
+		this->m_is_rec = this->m_ere_branch->is_recognized() && (this->m_ere_branch->recognized_position() == buf_offset);
+		if( this->m_is_rec ) {
 			this->m_rec_pos = buf_offset;
 			this->m_rec_size = this->m_ere_branch->recognized_size();
 		}
 		return this->m_rec_size;
 	}
-
 
 	uint64_t buf_split = 0;
 	uint64_t longest_recognized_size = 0;
@@ -6014,28 +5815,20 @@ uint64_t ere_branch<E>::ere_expression_ere_branch::recognize( const E* buf, cons
 	// try all possible splits - this downsizes performance, but is necessary to 
 	// recognize expressions like (wee|week)(knights|night)  - for input 
 	// 'weeknights' must recognize all 10 characters
-	while( left_side_recognized && buf_split < buf_length - buf_offset )
-	{
+	while( left_side_recognized && buf_split < buf_length - buf_offset ) {
 		this->m_ere_expression->recognize( buf, buf_length-buf_split, buf_offset );
 		left_side_recognized = this->m_ere_expression->is_recognized();
-		if( left_side_recognized )
-		{
+		if( left_side_recognized ) {
 			this->m_rec_size = this->m_ere_expression->recognized_size();
 			this->m_rec_pos = this->m_ere_expression->recognized_position();
 
 			// try the right side
-			this->m_ere_branch->recognize( 
-					buf,
-					buf_length,
-					this->m_rec_pos + this->m_rec_size,
-					false ); // the 'false' says that trying next 
+			this->m_ere_branch->recognize( buf, buf_length, this->m_rec_pos + this->m_rec_size, false ); // the 'false' says that trying next 
 			// positions is not required
 			this->m_is_rec = this->m_ere_branch->is_recognized();
-			if( this->m_is_rec )
-			{
+			if( this->m_is_rec ) {
 				buf_split = buf_length - this->m_rec_pos - this->m_rec_size;
-				if( shortest_left_recognized_size > this->m_rec_size )
-					// compared with ere_expression->recognized_size()
+				if( shortest_left_recognized_size > this->m_rec_size ) // compared with ere_expression->recognized_size()
 				{
 					// use if ereexpressino is 'lazy' (which seems strange in this alg.)
 					shortest_left_recognized_size = this->m_rec_size;
@@ -6043,8 +5836,7 @@ uint64_t ere_branch<E>::ere_expression_ere_branch::recognize( const E* buf, cons
 				}
 
 				this->m_rec_size += this->m_ere_branch->recognized_size();
-				if( longest_recognized_size < this->m_rec_size )
-				{
+				if( longest_recognized_size < this->m_rec_size ) {
 					buf_split_for_longest_size = buf_split;
 					longest_recognized_size = this->m_rec_size;
 				}
@@ -6056,43 +5848,30 @@ uint64_t ere_branch<E>::ere_expression_ere_branch::recognize( const E* buf, cons
 	// now once again for found best split - here I feel possible 
 	// performance improvement - TODO if there were no recognitions after the 
 	// best one, don't need to recognize again
-	if( longest_recognized_size > 0 || shortest_left_recognized_size < INT_MAX )
-	{
-		if( this->m_ere_expression->is_lazy() )
-		{
+	if( longest_recognized_size > 0 || shortest_left_recognized_size < INT_MAX ) {
+		if( this->m_ere_expression->is_lazy() ) {
 			this->m_ere_expression->recognize( buf, 
 					buf_length-buf_split_for_shortest_size, 
 					buf_offset );
-		}
-		else
-		{
+		} else {
 			// greedy
-			this->m_ere_expression->recognize( buf, 
-					buf_length-buf_split_for_longest_size, 
-					buf_offset );
+			this->m_ere_expression->recognize( buf, buf_length-buf_split_for_longest_size, buf_offset );
 		}
 		this->m_rec_size = this->m_ere_expression->recognized_size();
 		this->m_rec_pos = this->m_ere_expression->recognized_position();
 
 		// try the right side
-		this->m_ere_branch->recognize( 
-				buf,
-				buf_length,
-				this->m_rec_pos + this->m_rec_size,
-				false ); // the 'false' says that trying next 
+		this->m_ere_branch->recognize( buf, buf_length, this->m_rec_pos + this->m_rec_size, false ); // the 'false' says that trying next 
 		// positions is not required
 		this->m_rec_size += this->m_ere_branch->recognized_size();
 		this->m_is_rec = true;
-
-	}
-	else
-	{
+	} else {
 		this->m_is_rec = false;
 	}
 	return this->m_rec_size;
 }	
 
-	template<typename E>
+template<typename E>
 void ere_branch<E>::ere_expression_ere_branch::assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m )
 {
 	if( this->m_ere_branch.is_parsed() && this->m_ere_expression.is_parsed() )
@@ -6102,25 +5881,22 @@ void ere_branch<E>::ere_expression_ere_branch::assign_matches( matches::match_ke
 	}
 }
 
-	template<typename E>
+template<typename E>
 void ere_branch<E>::ere_expression_ere_branch::push_parsers( parser_list& l )
 {
 	l.push_back( &this->m_ere_expression );
 	l.push_back( &this->m_ere_branch );
 }
 
-	template<typename E>
+template<typename E>
 uint64_t ere_branch<E>::recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset, bool try_positions )
 {
-	if( this->m_ere.is_parsed() )
-	{
+	if( this->m_ere.is_parsed() ) {
 		this->m_ere->recognize( buf, buf_length, buf_offset, try_positions );
 		this->m_is_rec = this->m_ere->is_recognized();
 		this->m_rec_pos = this->m_ere->recognized_position();
 		this->m_rec_size = this->m_ere->recognized_size();
-	}
-	else
-	{
+	} else {
 		this->m_ere_expression_ere_branch->recognize( buf, buf_length, buf_offset, try_positions );
 		this->m_is_rec = this->m_ere_expression_ere_branch->is_recognized();
 		this->m_rec_pos = this->m_ere_expression_ere_branch->recognized_position();
@@ -6129,27 +5905,24 @@ uint64_t ere_branch<E>::recognize( const E* buf, const uint64_t buf_length, cons
 	return this->m_rec_size;
 }
 
-	template<typename E>
+template<typename E>
 void ere_branch<E>::assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m )
 {
-	if( this->m_ere.is_parsed() )
-	{
+	if( this->m_ere.is_parsed() ) {
 		this->m_ere->assign_matches( parent_address, branch_pos, m );
-	}
-	else
-	{
+	} else {
 		this->m_ere_expression_ere_branch->assign_matches( parent_address, branch_pos, m );
 	}
 }
 
-	template<typename E>
+template<typename E>
 void ere_branch<E>::push_parsers( parser_list& l )
 {
 	l.push_back( &this->m_ere_expression_ere_branch );
 	l.push_back( &this->m_ere );
 }
 
-	template<typename E>
+template<typename E>
 uint64_t extended_reg_exp<E>::ere_branch_or_extended_reg_exp::recognize( const E* buf, const uint64_t buf_length,	const uint64_t buf_offset, bool try_positions )
 {
 	this->m_rec_size = 0;
@@ -6157,50 +5930,38 @@ uint64_t extended_reg_exp<E>::ere_branch_or_extended_reg_exp::recognize( const E
 	this->m_ext_regexp->recognize( buf, buf_length, buf_offset );
 	this->m_branch->recognize( buf, buf_length, buf_offset );
 	// check whichone is better match
-	if( this->m_ext_regexp->is_recognized() && this->m_branch->is_recognized() )
-	{
-		if( this->m_branch->recognized_size() > this->m_ext_regexp->recognized_size() )
-		{
+	if( this->m_ext_regexp->is_recognized() && this->m_branch->is_recognized() ) {
+		if( this->m_branch->recognized_size() > this->m_ext_regexp->recognized_size() ) {
 			this->m_ext_regexp->unset();
-		}
-		else
-		{
+		} else {
 			this->m_branch->unset();
 		}
 	}
 
 	this->m_is_rec = true;
-	if( this->m_ext_regexp->is_recognized() )
-	{
+	if( this->m_ext_regexp->is_recognized() ) {
 		this->m_rec_pos = this->m_ext_regexp->recognized_position();
 		this->m_rec_size = this->m_ext_regexp->recognized_size();
-	}
-	else if( this->m_branch->is_recognized() )
-	{
+	} else if( this->m_branch->is_recognized() ) {
 		this->m_rec_pos = this->m_branch->recognized_position();
 		this->m_rec_size = this->m_branch->recognized_size();
-	}
-	else
-	{
+	} else {
 		this->m_is_rec = false;
 	}
 	return this->m_rec_size;
 }
 
-	template<typename E>
+template<typename E>
 void extended_reg_exp<E>::ere_branch_or_extended_reg_exp::assign_matches( matches::match_key parent_address, uint64_t& branch_pos, matches& m )
 {
-	if( this->m_branch->is_recognized() )
-	{
+	if( this->m_branch->is_recognized() ) {
 		this->m_branch->assign_matches( parent_address, branch_pos, m );
-	}
-	else
-	{
+	} else {
 		this->m_ext_regexp->assign_matches( parent_address, branch_pos, m );
 	}
 }
 
-	template<typename E>
+template<typename E>
 void extended_reg_exp<E>::ere_branch_or_extended_reg_exp::push_parsers( parser_list& l )
 {
 	l.push_back( &this->m_branch );
@@ -6208,27 +5969,22 @@ void extended_reg_exp<E>::ere_branch_or_extended_reg_exp::push_parsers( parser_l
 	l.push_back( &this->m_ext_regexp );
 }
 
-	template<typename E>
+template<typename E>
 uint64_t extended_reg_exp<E>::recognize( const E* buf, const uint64_t buf_length, const uint64_t buf_offset,	bool try_positions )
 {
 	this->m_rec_pos = 0;
 	this->m_rec_size = 0;
-	if( this->m_branch.is_parsed() )
-	{
+	if( this->m_branch.is_parsed() ) {
 		this->m_branch->recognize( buf, buf_length, buf_offset );
 		this->m_is_rec = this->m_branch->is_recognized();
-		if( this->m_is_rec )
-		{
+		if( this->m_is_rec ) {
 			this->m_rec_pos = this->m_branch->recognized_position();
 			this->m_rec_size = this->m_branch->recognized_size();
 		}
-	}
-	else
-	{
+	} else {
 		this->m_branch_or_ext_regexp->recognize( buf, buf_length, buf_offset );
 		this->m_is_rec = this->m_branch_or_ext_regexp->is_recognized();
-		if( this->m_is_rec )
-		{
+		if( this->m_is_rec ) {
 			this->m_rec_pos = this->m_branch_or_ext_regexp->recognized_position();
 			this->m_rec_size = this->m_branch_or_ext_regexp->recognized_size();
 		}
@@ -6236,22 +5992,19 @@ uint64_t extended_reg_exp<E>::recognize( const E* buf, const uint64_t buf_length
 	return this->m_rec_size;
 }
 
-	template<typename E>
+template<typename E>
 void extended_reg_exp<E>::assign_matches( matches::match_key key, uint64_t& branch_pos, matches& m )
 {
 	m.insert( key, match( this->m_rec_pos, this->m_rec_size ) );
 	uint64_t new_branch_pos = 0;
-	if( this->m_branch.is_parsed() )
-	{
+	if( this->m_branch.is_parsed() ) {
 		this->m_branch->assign_matches( key, new_branch_pos, m );
-	}
-	else
-	{
+	} else {
 		this->m_branch_or_ext_regexp->assign_matches( key, new_branch_pos, m );
 	}
 }
 
-	template<typename E>
+template<typename E>
 void extended_reg_exp<E>::push_parsers( parser_list& l )
 {
 	l.push_back( &this->m_branch_or_ext_regexp );
@@ -6259,8 +6012,7 @@ void extended_reg_exp<E>::push_parsers( parser_list& l )
 }
 
 template< typename E >
-class ere
-{
+class ere {
 	typedef typename basic_parser<E>::parser_list parser_list;
 
 	basic_choice< E, extended_reg_exp<E> >	m_ext_reg_exp;
@@ -6269,54 +6021,54 @@ class ere
 	bool			m_is_rec;
 
 	public:
-	ere() : m_rec_size(0), m_rec_pos(0), m_is_rec(false)  
-	{
-	}
+		ere() : m_rec_size(0), m_rec_pos(0), m_is_rec(false)  
+		{
+		}
 
-	virtual ~ere() 
-	{
-	}
+		virtual ~ere() 
+		{
+		}
 
-	uint64_t recognize( const E* buf, const uint64_t buf_length, bool try_positions = true )
-	{
-		this->m_ext_reg_exp->recognize( buf, buf_length, 0, try_positions );
-		this->m_is_rec = this->m_ext_reg_exp->is_recognized();
-		this->m_rec_pos = this->m_ext_reg_exp->recognized_position();
-		this->m_rec_size = this->m_ext_reg_exp->recognized_size();
-		return this->m_rec_size;
-	}
+		uint64_t recognize( const E* buf, const uint64_t buf_length, bool try_positions = true )
+		{
+			this->m_ext_reg_exp->recognize( buf, buf_length, 0, try_positions );
+			this->m_is_rec = this->m_ext_reg_exp->is_recognized();
+			this->m_rec_pos = this->m_ext_reg_exp->recognized_position();
+			this->m_rec_size = this->m_ext_reg_exp->recognized_size();
+			return this->m_rec_size;
+		}
 
-	void assign_matches( matches& m )
-	{
-		uint64_t branch_pos = 0;
-		matches::match_key key = "1";
-		if( this->m_ext_reg_exp.is_parsed() ) this->m_ext_reg_exp->assign_matches( key, branch_pos, m );
-	}
+		void assign_matches( matches& m )
+		{
+			uint64_t branch_pos = 0;
+			matches::match_key key = "1";
+			if( this->m_ext_reg_exp.is_parsed() ) this->m_ext_reg_exp->assign_matches( key, branch_pos, m );
+		}
 
-	void push_parsers( parser_list& l )
-	{
-		l.push_back( &this->m_ext_reg_exp );
-	}
+		void push_parsers( parser_list& l )
+		{
+			l.push_back( &this->m_ext_reg_exp );
+		}
 
-	const char* get_name() const 
-	{
-		return "ere"; 
-	}
+		const char* get_name() const 
+		{
+			return "ere"; 
+		}
 
-	bool is_recognized()
-	{
-		return this->m_is_rec;
-	}
+		bool is_recognized()
+		{
+			return this->m_is_rec;
+		}
 
-	const uint64_t recognized_size() const
-	{
-		return this->m_rec_size;
-	}
+		const uint64_t recognized_size() const
+		{
+			return this->m_rec_size;
+		}
 
-	const uint64_t recognized_position() const
-	{
-		return this->m_rec_pos;
-	}
+		const uint64_t recognized_position() const
+		{
+			return this->m_rec_pos;
+		}
 };
 
 /*
@@ -6883,22 +6635,23 @@ const char* REGEXP_PARSER = "regexpParser";
   possible to manipulate the input string	
   */
 template< typename E >
-class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> >
-{
+class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> > {
 	public:
 		basic_regexp_parser( std::basic_string<E> regular_expression ) : 
 			basic_object_parser< E, std::basic_string<E> >(REGEXP_PARSER),
-			m_regular_expression( regular_expression ) {};
+			m_regular_expression( regular_expression )
+		{
+		}
 
-		~basic_regexp_parser() {};
+		~basic_regexp_parser() 
+		{
+		}
 
 		//! Returns 'true', if regexp pattern passed into constructor is valid
 		bool is_pattern_valid()
 		{
-			if( !this->m_regexp.is_parsed() )
-			{
-				this->m_regexp.parse( this->m_regular_expression.c_str(), 
-						this->m_regular_expression.length() );
+			if( !this->m_regexp.is_parsed() ) {
+				this->m_regexp.parse( this->m_regular_expression.c_str(), this->m_regular_expression.length() );
 			}
 			return this->m_regexp.is_parsed();
 		}
@@ -6914,18 +6667,13 @@ class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> 
 		{
 			this->prepare_for_parsing();
 
-			if( this->is_valid() )
-			{
+			if( this->is_valid() ) {
 				this->m_parsed_size = this->m_regexp->recognize( buf, buf_length );
-			}
-			else
-			{
+			} else {
 				return 0;
 			}
-			if( this->m_regexp->is_recognized() )
-			{
-				this->m_parsed_object = 
-					new std::basic_string<E>( buf, this->m_parsed_size );
+			if( this->m_regexp->is_recognized() ) {
+				this->m_parsed_object = new std::basic_string<E>( buf, this->m_parsed_size );
 				this->m_is_parsed = true;
 			}
 			return this->m_parsed_size;
@@ -6944,30 +6692,22 @@ class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> 
 			// TODO - implement to pass istream to regexp - now limited to input in one line
 			std::basic_stringbuf<E> buf;
 			std::streampos pos = is.tellg();
-			if( is.good() )
-			{
+			if( is.good() ) {
 				is.get( buf );
 				uint64_t length = buf.str().length();
-				if( this->is_valid() )
-				{
+				if( this->is_valid() ) {
 					this->m_regexp->recognize( buf.str().c_str(), length );
-				}
-				else
-				{
+				} else {
 					return is;
 				}
-				if( this->m_regexp->is_recognized() )
-				{
+				if( this->m_regexp->is_recognized() ) {
 					this->m_parsed_size = this->m_regexp->recognized_position() + this->m_regexp->recognized_size();
-					this->m_parsed_object = 
-						new std::basic_string<E>( buf.str().c_str(), this->m_parsed_size );
+					this->m_parsed_object = new std::basic_string<E>( buf.str().c_str(), this->m_parsed_size );
 					this->m_is_parsed = true;
 					pos += this->m_parsed_size;
 					is.clear();
 					is.seekg(pos);
-				}
-				else
-				{
+				} else {
 					is.clear();
 					is.seekg(pos);
 				}
@@ -6978,12 +6718,9 @@ class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> 
 		//! Returns the match position in the input
 		uint64_t recognized_position()
 		{
-			if( is_pattern_valid() && this->m_regexp->is_recognized() )
-			{
+			if( is_pattern_valid() && this->m_regexp->is_recognized() ) {
 				return this->m_regexp->recognized_position();
-			}
-			else
-			{
+			} else {
 				return 0;
 			}
 		}
@@ -6991,12 +6728,9 @@ class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> 
 		//! Returns the match size in the input
 		uint64_t recognized_size()
 		{
-			if( is_pattern_valid() && this->m_regexp->is_recognized() )
-			{
+			if( is_pattern_valid() && this->m_regexp->is_recognized() ) {
 				return this->m_regexp->recognized_size();
-			}
-			else
-			{
+			} else {
 				return 0;
 			}
 		}
@@ -7027,8 +6761,7 @@ class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> 
 		*/
 		void assign_matches( matches& m )
 		{
-			if( is_pattern_valid() && this->m_regexp->is_recognized() )
-			{
+			if( is_pattern_valid() && this->m_regexp->is_recognized() ) {
 				this->m_regexp->assign_matches(m);
 			}
 		}
@@ -7047,17 +6780,15 @@ class basic_regexp_parser : public basic_object_parser< E, std::basic_string<E> 
 		}	
 
 	protected:
-		std::basic_string<E>								m_regular_expression;
+		std::basic_string<E> m_regular_expression;
 		basic_non_terminal< E, ere<E> >	m_regexp;
 
 	protected:
 		void prepare_for_parsing()
 		{
 			basic_object_parser< E,std::basic_string<E> >::prepare_for_parsing();
-			if( !this->m_regexp.is_parsed() )
-			{
-				this->m_regexp.parse( this->m_regular_expression.c_str(), 
-						this->m_regular_expression.length() );
+			if( !this->m_regexp.is_parsed() ) {
+				this->m_regexp.parse( this->m_regular_expression.c_str(), this->m_regular_expression.length() );
 			}
 		}
 

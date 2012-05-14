@@ -21,8 +21,10 @@
 #include "jfileoutputstream.h"
 #include "jobjectinputstream.h"
 #include "jobjectoutputstream.h"
-#include "jserializable.h"
 #include "jjson.h"
+#include "jserializable.h"
+#include "jruntimeexception.h"
+#include "jparserexception.h"
 
 #include <iostream>
 #include <sstream>
@@ -70,27 +72,25 @@ class Complex : public Serializable {
 
 		virtual void AssemblyObject(std::string object)
 		{
-			jcommon::JSONDomParser parser;
+			try {
+				jcommon::JSONValue *root = jcommon::JSON::Parse(object.c_str()),
+					*psd = root->GetFirstChild();
 
-			parser.append(object.c_str(), object.size());
-
-			if (NULL != parser.getError()) {
-				return;
-			}
-
-			jcommon::JSONIterator iterator(parser.getValue());
-
-			for (const jcommon::JSONNode *node=iterator.getNext(); node!=NULL; node=iterator.getNext()) {
-				if (node->getType() == jcommon::JSONNode::ePair) {
-					jcommon::JSONPairNode *pnode = ((jcommon::JSONPairNode*)node);
-					jcommon::JSONIntNode *inode = ((jcommon::JSONIntNode*)pnode->getValue());
-
-					if (strcmp(pnode->getName(), "real") == 0) {
-						real = inode->getValue();
-					} else if (strcmp(pnode->getName(), "imaginary") == 0) {
-						imaginary = inode->getValue();
+				while (psd != NULL) {
+					if (strcasecmp(psd->GetName(), "real") == 0) {
+						real = psd->GetInteger();
 					}
+
+					if (strcasecmp(psd->GetName(), "imaginary") == 0) {
+						imaginary = psd->GetInteger();
+					}
+
+					psd = psd->NextSibling();
 				}
+
+				delete root;
+			} catch (jcommon::ParserException &e) {
+				throw jcommon::RuntimeException("Object assembly exception");
 			}
 		}
 
