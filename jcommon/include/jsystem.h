@@ -155,61 +155,61 @@ class System{
 		 * \brief
 		 *
 		 */
-		void ChangeWorkingDirectory(std::string dir);
+		static void ChangeWorkingDirectory(std::string dir);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetProcessName();
+		static std::string GetProcessName();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetUserName();
+		static std::string GetUserName();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetHostName();
+		static std::string GetHostName();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetHostArchitecture();
+		static std::string GetHostArchitecture();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetOSName();
+		static std::string GetOSName();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetOSVersion();
+		static std::string GetOSVersion();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetTempDirectory();
+		static std::string GetTempDirectory();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		uint64_t GetDiskFreeSpace();
+		static uint64_t GetDiskFreeSpace();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetProcessorCount();
+		static int GetProcessorCount();
 		
 		/**
 		 * \brief Reset the system.
