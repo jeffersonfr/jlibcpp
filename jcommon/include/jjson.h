@@ -45,7 +45,11 @@ enum json_type_t {
 };
 
 /**
- * \brief Library VJSON modified.
+ * \brief Library VJSON modified. 
+ *
+ * Copyright by J. Random Hacker, 2009
+ *
+ * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
  *
  */
 class JSONValue : public jcommon::Object{

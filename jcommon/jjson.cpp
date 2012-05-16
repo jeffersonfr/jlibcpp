@@ -24,6 +24,14 @@
 #include <memory.h>
 #include <algorithm>
 
+/**
+ * \brief Library VJSON modified. 
+ *
+ * Copyright by J. Random Hacker, 2009
+ *
+ * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
+ *
+ */
 #define ERROR(it, desc)											\
 	std::ostringstream o;											\
 	delete [] dup;														\
