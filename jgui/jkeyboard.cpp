@@ -911,7 +911,7 @@ void Keyboard::DispatchKeyboardEvent(KeyEvent *event)
 	int k = 0,
 			size = (int)_keyboard_listeners.size();
 
-	while (k++ < (int)_keyboard_listeners.size()) {
+	while (k++ < (int)_keyboard_listeners.size() && event->IsConsumed() == false) {
 		_keyboard_listeners[k-1]->KeyboardPressed(event);
 
 		if (size != (int)_keyboard_listeners.size()) {

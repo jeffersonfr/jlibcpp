@@ -755,7 +755,7 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 	int k = 0,
 			size = (int)_window_listeners.size();
 
-	while (k++ < (int)_window_listeners.size()) {
+	while (k++ < (int)_window_listeners.size() && event->IsConsumed() == false) {
 		WindowListener *listener = _window_listeners[k-1];
 
 		if (event->GetType() == JWET_CLOSING) {

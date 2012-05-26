@@ -34,6 +34,8 @@ class EventObject : public virtual jcommon::Object{
 	private:
 		/** \brief */
 		void *_source;
+		/** \brief */
+		bool _is_consumed;
 
 	public:
 		/**
@@ -52,7 +54,19 @@ class EventObject : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		void * GetSource();
+		virtual void * GetSource();
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void Consume();
+		
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual bool IsConsumed();
 
 };
 

@@ -101,8 +101,6 @@ void SocketOptions::SetSendTimeout(int time_)
 void SocketOptions::SetReceiveTimeout(int time_)
 {
 #ifdef _WIN32
-	time_ /= 1000;
-
 	if (setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&time_, sizeof(int)) < 0) {
 		throw SocketOptionsException("Set send timeout error");
 	}
@@ -112,7 +110,7 @@ void SocketOptions::SetReceiveTimeout(int time_)
 	int time = time_;
 		
 	t.tv_sec = (int64_t)(time/1000LL);
-	t.tv_nsec = (int64_t)(time%1000LL)*1000;
+	t.tv_nsec = (int64_t)(time%1000LL)*1000000LL;
 	
 	if (setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, &t, sizeof(struct timespec)) < 0) {
 		throw SocketOptionsException("Set receive timeout error");

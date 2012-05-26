@@ -28,6 +28,7 @@ EventObject::EventObject(void *source):
 	jcommon::Object::SetClassName("jcommon::EventObject");
 
 	_source = source;
+	_is_consumed = false;
 }
 
 EventObject::~EventObject()
@@ -37,6 +38,16 @@ EventObject::~EventObject()
 void * EventObject::GetSource()
 {
 	return _source;
+}
+
+void EventObject::Consume()
+{
+	_is_consumed = true;
+}
+
+bool EventObject::IsConsumed()
+{
+	return _is_consumed;
 }
 
 }

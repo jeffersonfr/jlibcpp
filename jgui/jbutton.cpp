@@ -205,7 +205,7 @@ void Button::DispatchButtonEvent(ButtonEvent *event)
 	int k = 0,
 			size = (int)_button_listeners.size();
 
-	while (k++ < (int)_button_listeners.size()) {
+	while (k++ < (int)_button_listeners.size() && event->IsConsumed() == false) {
 		_button_listeners[k-1]->ActionPerformed(event);
 
 		if (size != (int)_button_listeners.size()) {

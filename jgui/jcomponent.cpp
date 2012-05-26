@@ -1883,7 +1883,7 @@ void Component::DispatchFocusEvent(FocusEvent *event)
 	int k = 0,
 			size = (int)_focus_listeners.size();
 
-	while (k++ < (int)_focus_listeners.size()) {
+	while (k++ < (int)_focus_listeners.size() && event->IsConsumed() == false) {
 		FocusListener *listener = _focus_listeners[k-1];
 
 		if (event->GetType() == JFET_GAINED) {
@@ -1950,7 +1950,7 @@ void Component::DispatchComponentEvent(ComponentEvent *event)
 	int k = 0,
 			size = (int)_component_listeners.size();
 
-	while (k++ < (int)_component_listeners.size()) {
+	while (k++ < (int)_component_listeners.size() && event->IsConsumed() == false) {
 		ComponentListener *listener = _component_listeners[k-1];
 
 		if (event->GetType() == JCET_ONHIDE) {

@@ -120,7 +120,7 @@ void ThemeManager::DispatchThemeEvent(ThemeEvent *event)
 	int k = 0,
 			size = (int)_theme_listeners.size();
 
-	while (k++ < (int)_theme_listeners.size()) {
+	while (k++ < (int)_theme_listeners.size() && event->IsConsumed() == false) {
 		ThemeListener *listener = _theme_listeners[k-1];
 
 		listener->ThemeChanged(event);

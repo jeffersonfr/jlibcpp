@@ -155,11 +155,16 @@ void * Thread::ThreadMain(void *owner_)
 {
 	jthread_map_t *t = (jthread_map_t *)owner_;
 
+#ifdef _WIN32
+#else
 	if (t->thiz->_type == JTT_JOINABLE) {
 		pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 	} else if (t->thiz->_type == JTT_DETACH) {
 		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
 	}
+
+	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+#endif
 
 	t->thiz->Run();
 

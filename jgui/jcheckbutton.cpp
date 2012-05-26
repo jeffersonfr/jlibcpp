@@ -300,7 +300,7 @@ void CheckButton::DispatchCheckButtonEvent(CheckButtonEvent *event)
 	int k = 0,
 			size = (int)_check_listeners.size();
 
-	while (k++ < (int)_check_listeners.size()) {
+	while (k++ < (int)_check_listeners.size() && event->IsConsumed() == false) {
 		_check_listeners[k-1]->ButtonSelected(event);
 
 		if (size != (int)_check_listeners.size()) {

@@ -178,7 +178,7 @@ void SliderComponent::DispatchAdjustmentEvent(AdjustmentEvent *event)
 	int k = 0,
 			size = (int)_adjust_listeners.size();
 
-	while (k++ < (int)_adjust_listeners.size()) {
+	while (k++ < (int)_adjust_listeners.size() && event->IsConsumed() == false) {
 		_adjust_listeners[k-1]->AdjustmentValueChanged(event);
 
 		if (size != (int)_adjust_listeners.size()) {

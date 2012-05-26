@@ -63,7 +63,7 @@ void ResourceServer::DispatchResourceStatusEvent(ResourceStatusEvent *event)
 	int k = 0,
 			size = (int)_status_listeners.size();
 
-	while (k++ < (int)_status_listeners.size()) {
+	while (k++ < (int)_status_listeners.size() && event->IsConsumed() == false) {
 		ResourceStatusListener *listener = _status_listeners[k-1];
 
 		listener->StatusChanged(event);

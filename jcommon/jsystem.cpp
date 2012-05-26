@@ -418,8 +418,7 @@ std::string System::GetUserName()
 {
 #ifdef _WIN32
 	char buf[256];
-
-	DWORD size = (DWORD)sizeof(buf);
+	DWORD size = 256;
 
 	if (::GetUserName(buf, &size) != TRUE) {
 		throw new Exception("Cannot retrieve user name");
@@ -440,15 +439,14 @@ std::string System::GetUserName()
 std::string System::GetHostName()
 {
 #ifdef _WIN32
-	char hbuf[512];
+	char buf[512];
+	DWORD size = 512;
 
-	DWORD size = (DWORD)sizeof(hbuf);
-
-	if(::GetComputerName(hbuf, &size) != TRUE) {
+	if(::GetComputerName(buf, &size) != TRUE) {
 		throw new Exception("Cannot retrieve the computer name");
 	}
 
-	return hbuf;
+	return std::string(buf);
 #else
     struct utsname uts;
 
@@ -562,11 +560,11 @@ std::string System::GetTempDirectory()
 #ifdef _WIN32
 	// DWORD length = ::GetTempPath(0, NULL);
 	
-	char buf = char[512];
+	char buf[512];
 	
 	::GetTempPath(0, buf);
 	
-	return buf;
+	return std::string(buf);
 #else
 	std::string buf;
 	

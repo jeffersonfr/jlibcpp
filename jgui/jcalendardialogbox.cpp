@@ -460,7 +460,7 @@ void CalendarDialogBox::DispatchCalendarEvent(CalendarEvent *event)
 	int k = 0,
 			size = (int)_calendar_listeners.size();
 
-	while (k++ < (int)_calendar_listeners.size()) {
+	while (k++ < (int)_calendar_listeners.size() && event->IsConsumed() == false) {
 		_calendar_listeners[k-1]->DateChanged(event);
 
 		if (size != (int)_calendar_listeners.size()) {

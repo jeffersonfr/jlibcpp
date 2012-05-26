@@ -888,7 +888,7 @@ void Container::DispatchContainerEvent(ContainerEvent *event)
 	int k = 0,
 			size = (int)_container_listeners.size();
 
-	while (k++ < (int)_container_listeners.size()) {
+	while (k++ < (int)_container_listeners.size() && event->IsConsumed() == false) {
 		ContainerListener *listener = _container_listeners[k-1];
 
 		if (event->GetType() == JCET_COMPONENT_ADDED) {

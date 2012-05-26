@@ -373,7 +373,7 @@ void TextComponent::DispatchTextEvent(TextEvent *event)
 	int k = 0,
 			size = (int)_text_listeners.size();
 
-	while (k++ < (int)_text_listeners.size()) {
+	while (k++ < (int)_text_listeners.size() && event->IsConsumed() == false) {
 		_text_listeners[k-1]->TextChanged(event);
 
 		if (size != (int)_text_listeners.size()) {
