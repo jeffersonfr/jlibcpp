@@ -105,7 +105,17 @@ int64_t SocketInputStream::Read()
 		}
 		
 #ifdef _WIN32
-		if (n == SOCKET_ERROR) {
+		if (n == SOCKET_ERROR || n == 0) {
+			switch (WSAGetLastError()) {
+				case WSAENOTCONN:
+				case WSAENETRESET:
+				case WSAECONNABORTED:
+				case WSAECONNRESET: Close();
+			}
+			
+			if (n == 0) {
+				Close();
+			}
 #else 
 		if (n <= 0) {
 			if (n == 0) {
@@ -161,7 +171,18 @@ int64_t SocketInputStream::Read(char *data_, int64_t data_length_)
 		}
 	
 #ifdef _WIN32
-		if (n == SOCKET_ERROR) {
+		if (n == SOCKET_ERROR || n == 0) {
+			switch (WSAGetLastError()) {
+				case WSAENOTCONN:
+				case WSAENETRESET:
+				case WSAECONNABORTED:
+				case WSAECONNRESET: 
+					Close();
+			}
+			
+			if (n == 0) {
+				Close();
+			}
 #else 
 		if (n <= 0) {
 			if (n == 0) {

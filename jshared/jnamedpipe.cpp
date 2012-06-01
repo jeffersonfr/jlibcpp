@@ -40,16 +40,19 @@ NamedPipe::NamedPipe(std::string name, int mode):
 	_name = name;
 	
 #ifdef _WIN32
-	_fd = CreateFile(_name.c_str(),
+	_fd = CreateFileA(
+			_name.c_str(),
 			GENERIC_WRITE|GENERIC_READ,
 			FILE_SHARE_READ | FILE_SHARE_WRITE,
 			NULL,
 			OPEN_EXISTING,
 			FILE_ATTRIBUTE_NORMAL,
 			NULL
-			);
+	);
+
 	if (_fd == INVALID_HANDLE_VALUE) {
-		_fd = CreateNamedPipe(_name.c_str(),
+		_fd = CreateNamedPipeA(
+				_name.c_str(),
 				PIPE_ACCESS_DUPLEX,
 				// PIPE_TYPE_MESSAGE|PIPE_READMODE_MESSAGE,
 				PIPE_TYPE_BYTE | PIPE_READMODE_BYTE | PIPE_WAIT,
@@ -58,27 +61,14 @@ NamedPipe::NamedPipe(std::string name, int mode):
 				256,
 				10000,
 				NULL
-				);
+		);
 
-		ConnectNamedPipe(_fd, NULL);
+		BOOL ok = ConnectNamedPipe(_fd, NULL);
 	} else {
-		while (true) {
-			_fd = CreateFile(_name.c_str(),
-					GENERIC_WRITE|GENERIC_READ,
-					FILE_SHARE_READ | FILE_SHARE_WRITE,
-					NULL,
-					OPEN_EXISTING,
-					FILE_ATTRIBUTE_NORMAL,
-					NULL
-					);
+		DWORD err = (_fd == INVALID_HANDLE_VALUE || GetLastError());
 
-			if (_fd != INVALID_HANDLE_VALUE) {
-				break;
-			}
-
-			if ((GetLastError() != ERROR_PIPE_BUSY) || !WaitNamedPipe(_name.c_str(), NMPWAIT_USE_DEFAULT_WAIT)) {
-				throw jio::IOException("Cannot create named pipe");
-			}
+		if (err && ((err != ERROR_PIPE_BUSY) || !WaitNamedPipeA(_name.c_str(), NMPWAIT_USE_DEFAULT_WAIT))) {
+			throw jio::IOException("Cannot create named pipe");
 		}
 	}
 #else
@@ -108,9 +98,9 @@ int NamedPipe::Receive(char *data_, int length_)
 	}
 
 #ifdef _WIN32
-	DWORD r;
-
-	ReadFile(_fd, data_, length_, (DWORD *)&r, 0);
+ 	if (ReadFile(_fd, data_, length_, (DWORD *)&r, 0) == FALSE) {
+		return -1;
+	}
 
 	return r;
 #else
@@ -123,7 +113,11 @@ int NamedPipe::Send(const char *data_, int length_)
 #ifdef _WIN32
 	DWORD r;
 
-	WriteFile(_fd, data_, length_, (DWORD *)&r, 0);
+	if (WriteFile(_fd, data_, length_, (DWORD *)&r, 0) == FALSE) {
+		return -1;
+	}
+
+ 	FlushFileBuffers(_fd);
 
 	return r;
 #else

@@ -41,6 +41,9 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
 		BindSocket(addr_, port_);
 		ListenSocket(backlog_);
 	} else {
+#ifdef _WIN32
+ 		BindSocket(addr_, port_);
+#endif
 		ListenSocket(backlog_);
 		
 #ifdef _WIN32
@@ -74,7 +77,7 @@ ServerSocket::~ServerSocket()
 void ServerSocket::CreateSocket()
 {
 #ifdef _WIN32
-	if ((_fd = socket(PF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
+	if ((_fd = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET) {
 #else
 	if ((_fd = ::socket(PF_INET, SOCK_STREAM, 0)) < 0) {
 #endif

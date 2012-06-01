@@ -401,10 +401,17 @@ int Socket::Send(const char *data_, int size_, bool block_)
 
 #ifdef _WIN32
 	if (n == SOCKET_ERROR) {
-		if (WSAGetLastError() == WSAECONNABORTED) {
+		switch (WSAGetLastError()) {
+			case WSAENETRESET:
+			case WSAECONNABORTED:
+			case WSAECONNRESET: 
+				Close();
+		}
+
+		if (WSAGetLastError() == WSAETIMEDOUT) {
 			throw SocketTimeoutException("Socket output timeout error");
 		} else {
-			throw SocketTimeoutException("Socket output timeout error");
+			throw SocketTimeoutException("Socket output error");
 		}
 	}
 #else
@@ -481,6 +488,14 @@ int Socket::Receive(char *data_, int size_, bool block_)
 
 #ifdef _WIN32
 	if (n == SOCKET_ERROR) {
+		switch (WSAGetLastError()) {
+			case WSAENOTCONN:
+			case WSAENETRESET:
+			case WSAECONNABORTED:
+			case WSAECONNRESET: 
+				Close();
+		}
+
 		if (WSAGetLastError() == WSAETIMEDOUT) {
 			throw SocketTimeoutException("Socket input timeout error");
 		} else {

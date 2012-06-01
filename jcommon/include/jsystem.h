@@ -113,7 +113,7 @@ class System{
 		 * \brief
 		 *
 		 */
-		static int SetEnviromentVariable(std::string key_, std::string value_, bool overwrite_ = true);
+		static bool SetEnviromentVariable(std::string key_, std::string value_, bool overwrite_ = true);
 
 		/**
 		 * \brief

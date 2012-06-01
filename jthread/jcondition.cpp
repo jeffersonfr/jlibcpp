@@ -68,7 +68,7 @@ void Condition::Wait(Mutex *mutex)
 			throw SemaphoreException("Condition wait error !");
 		}
 	} else {
-		if (SleepConditionVariableCS(&_condition, &_monitor._mutex, INFINITE) == 0) {
+		if (SleepConditionVariableCS(&_condition, &mutex->_mutex, INFINITE) == 0) {
 			throw SemaphoreException("Condition wait error !");
 		}
 	}
@@ -98,7 +98,7 @@ void Condition::Wait(uint64_t time_, Mutex *mutex)
 
 		result = SleepConditionVariableCS(&_condition, &_monitor._mutex, d);
 	} else {
-		result = SleepConditionVariableCS(&_condition, &_monitor._mutex, d);
+		result = SleepConditionVariableCS(&_condition, &mutex->_mutex, d);
 	}
 
 	if (result == 0) {

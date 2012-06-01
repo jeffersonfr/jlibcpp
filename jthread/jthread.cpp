@@ -228,14 +228,13 @@ void Thread::Start(int id)
 	t->alive = true;
 
 #ifdef _WIN32
-	if (Setup() != 0 || 
-			(_thread = CreateThread(
+	if (_thread = CreateThread(
 				_sa,				// security attributes
 				0,					// stack size
 				Thread::ThreadMain,	// function thread
 				t,					// thread arguments
 				0,					// flag
-				&_thread_id)) == NULL) {
+				&_thread_id) == NULL) {
 		throw ThreadException("Create thread failed");
 	}
 

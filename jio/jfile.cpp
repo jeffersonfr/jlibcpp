@@ -77,9 +77,9 @@ File::File(std::string filename_, int flags_):
 	*/
 	
 	if ((flags_ & JFF_CREATE) == 0) {
-		_fd = CreateFile (filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+		_fd = CreateFileA(filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	} else {
-		_fd = CreateFile (filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+		_fd = CreateFileA(filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	}
 	
 	if (_fd != INVALID_HANDLE_VALUE) {
@@ -169,7 +169,7 @@ File::File(std::string filename_, int flags_):
 #endif
 
 #ifdef _WIN32
-	DWORD r = GetFileAttributes(filename_.c_str()); 
+	DWORD r = GetFileAttributesA(filename_.c_str()); 
 
 	if (r == INVALID_FILE_ATTRIBUTES) {
 		return;
@@ -256,7 +256,7 @@ File::File(std::string prefix, std::string sufix, bool is_directory):
 		_filename = _filename + "." + sufix;
 	}
 
-	_fd = CreateFile (_filename.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	_fd = CreateFileA(_filename.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	
 	if (_fd != INVALID_HANDLE_VALUE) {
 		/*
@@ -585,7 +585,7 @@ bool File::IsExecutable()
 	std::string s = GetAbsolutePath();
 	DWORD d;
 
-	return (bool)GetBinaryType(s.c_str(), &d);
+	return (bool)GetBinaryTypeA(s.c_str(), &d);
 #else
 	if (S_ISDIR(_stat.st_mode)) {
 		return false;
@@ -798,7 +798,7 @@ std::vector<std::string> File::ListFiles(std::string extension)
 
 	// Check that the input path plus 3 is not longer than MAX_PATH (three characters are for the "\*" plus NULL).
 	if (path.size() > (MAX_PATH - 3)) {
-		return NULL;
+		return files;
 	}
 
 	// First, copy the string to a buffer, then append '\*' to the directory name.
@@ -808,7 +808,7 @@ std::vector<std::string> File::ListFiles(std::string extension)
 	hFind = FindFirstFile(szDir, &ffd);
 
 	if (INVALID_HANDLE_VALUE == hFind) {
-		return NULL;
+		return files;
 	}
 
 	// List all the files in the directory with some info about them.
@@ -878,7 +878,7 @@ void File::Move(std::string newpath_)
 	std::string o = GetAbsolutePath();
 	
 #ifdef _WIN32
-	MoveFile(o.c_str(), newpath_.c_str());
+	MoveFileA(o.c_str(), newpath_.c_str());
 #else
 	if (::link(o.c_str(), newpath_.c_str()) != 0) {
 		throw FileException(strerror(errno));
@@ -897,7 +897,7 @@ void File::Rename(std::string newpath_)
 	std::string o = GetAbsolutePath();
 	
 #ifdef _WIN32
-	MoveFile(o.c_str(), newpath_.c_str());
+	MoveFileA(o.c_str(), newpath_.c_str());
 #else
 	if (_type != JFT_DIRECTORY) {
 		o += "/";
@@ -922,11 +922,11 @@ void File::Remove()
 
 #ifdef _WIN32
 	if (IsDirectory() == false) {
-		if (DeleteFile(s.c_str()) == 0) {
+		if (DeleteFileA(s.c_str()) == 0) {
 			throw FileException("Delete file exception");
 		}
 	} else {
-		if (RemoveDirectory(s.c_str()) == 0) {
+		if (RemoveDirectoryA(s.c_str()) == 0) {
 			throw FileException("Delete directory exception");
 		}
 	}
@@ -949,7 +949,7 @@ int64_t File::Tell()
 #ifdef _WIN32
 	DWORD d;
 
-	if ((d = SetFilePointer((HANDLE)fd, 0, 0, FILE_CURRENT)) != -1) {
+	if ((d = SetFilePointer((HANDLE)_fd, 0, 0, FILE_CURRENT)) != -1) {
 		return (int64_t)d;
 	}
 #else

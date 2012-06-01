@@ -77,10 +77,7 @@ void SocketOptions::SetOutOfBandInLine(bool b_)
 
 void SocketOptions::SetSendTimeout(int time_)
 {
-
 #ifdef _WIN32
-	time_ /= 1000;
-	
 	if (setsockopt(_fd, SOL_SOCKET, SO_SNDTIMEO, (const char *)&time_, sizeof(int)) < 0) {
 		throw SocketOptionsException("Set send timeout error");
 	}
@@ -101,7 +98,7 @@ void SocketOptions::SetSendTimeout(int time_)
 void SocketOptions::SetReceiveTimeout(int time_)
 {
 #ifdef _WIN32
-	if (setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&time_, sizeof(int)) < 0) {
+	if (setsockopt(_fd, SOL_SOCKET, SO_RCVTIMEO, (const char *)&time_, sizeof(time_)) < 0) {
 		throw SocketOptionsException("Set send timeout error");
 	}
 #else

@@ -25,6 +25,7 @@
 #include <sstream>
 
 #ifdef _WIN32
+#include <direct.h>
 #else
 #include <sys/vfs.h>
 #endif
@@ -68,7 +69,7 @@ System::~System()
 void System::Beep(int freq, int delay)
 {
 #ifdef _WIN32
-	Beep(freq, delay);
+	::Beep(freq, delay);
 #else
 	if (freq < 0) {
 		freq = DEFAULT_FREQ;
@@ -105,7 +106,7 @@ std::string System::GetCurrentUserName()
     char name[256];
     DWORD r = 256;
     
-    GetUserNameW(name , &r);
+    ::GetUserNameW(name , &r);
 
 	return name;
 #else
@@ -242,12 +243,12 @@ void System::UnsetEnviromentVariable(std::string key_)
 #endif
 }
 
-int System::SetEnviromentVariable(std::string key_, std::string value_, bool overwrite_)
+bool System::SetEnviromentVariable(std::string key_, std::string value_, bool overwrite_)
 {
 #ifdef _WIN32
-	SetEnvironmentVariable(key_.c_str(), value_.c_str());
+	return !SetEnvironmentVariable(key_.c_str(), value_.c_str());
 #else
-	return setenv(key_.c_str(), value_.c_str(), overwrite_);
+	return !setenv(key_.c_str(), value_.c_str(), overwrite_);
 #endif
 }
 
@@ -399,7 +400,7 @@ std::string System::GetProcessName()
 #ifdef _WIN32
 	char path[512];
 
-	if (!GetModuleFileName(NULL, path, sizeof(path)) || !path[0]) {
+	if (!GetModuleFileNameA(NULL, path, sizeof(path)) || !path[0]) {
 		return "unknown";
 	}
 
@@ -420,7 +421,7 @@ std::string System::GetUserName()
 	char buf[256];
 	DWORD size = 256;
 
-	if (::GetUserName(buf, &size) != TRUE) {
+	if (::GetUserNameA(buf, &size) != TRUE) {
 		throw new Exception("Cannot retrieve user name");
 	}
 
@@ -442,11 +443,11 @@ std::string System::GetHostName()
 	char buf[512];
 	DWORD size = 512;
 
-	if(::GetComputerName(buf, &size) != TRUE) {
+	if (::GetComputerNameA(buf, &size) != TRUE) {
 		throw new Exception("Cannot retrieve the computer name");
 	}
 
-	return std::string(buf);
+	return buf;
 #else
     struct utsname uts;
 
@@ -562,9 +563,9 @@ std::string System::GetTempDirectory()
 	
 	char buf[512];
 	
-	::GetTempPath(0, buf);
+	::GetTempPathA(0, buf);
 	
-	return std::string(buf);
+	return buf;
 #else
 	std::string buf;
 	
@@ -644,6 +645,8 @@ int System::ResetSystem()
 		TRUE,
 		TRUE
 	);
+
+	return 0;
 #else
 	return kill(1, SIGINT);
 #endif
