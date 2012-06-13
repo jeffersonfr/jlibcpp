@@ -74,6 +74,12 @@ class ProgramSystemInformationSection{
 		 * \brief
 		 *
 		 */
+		int GetSectionSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		void Push(uint8_t *buffer, uint32_t size);
 		
 		/**

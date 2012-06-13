@@ -198,27 +198,31 @@ class Controller {
 			
 			if (find_pmt == true) {
 				if (jmpeg::TransportStreamPacket::GetProgramID(buffer) == pmt_pid) {
-					if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
-						pmt.Clear();
-					}
+					std::cout << "Process PMT" << std::endl;
 
-					std::cout << "Processing PMT::" << std::endl;
-
-					uint8_t pointer,
+					uint8_t pointer = 0,
 									payload[188];
 					uint32_t size;
 
 					jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &size);
 
-					pointer = jmpeg::TransportStreamPacket::GetPointerField(buffer);
+					if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
+						if (pmt.GetSectionSize() > 0) {
+							pmt.Clear();
+						}
 
-					pmt.Push((payload + pointer + 1), size - pointer - 1);
+						pointer = 1;
+					
+						if (jmpeg::TransportStreamPacket::HasAdaptationField(buffer) == true) {
+							pointer = payload[0] + 1;
+						}
+					}
+
+					pmt.Push((payload + pointer), size - pointer);
 
 					if (pmt.HasFailed() == true) {
 						pmt.Clear();
-					}
-
-					if (pmt.IsComplete() == true) {
+					} else if (pmt.IsComplete() == true) {
 						std::vector<jmpeg::ProgramMapSection::Program *> program_map;
 
 						pmt.GetPrograms(program_map);
@@ -232,27 +236,35 @@ class Controller {
 				}
 			} else {
 				if (jmpeg::TransportStreamPacket::GetProgramID(buffer) == pat_pid) {
-					if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
-						pat.Clear();
-					}
-
 					std::cout << "Process PAT" << std::endl;
 
-					uint8_t pointer,
+					uint8_t pointer = 0,
 									payload[188];
 					uint32_t size;
 
 					jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &size);
 
-					pointer = jmpeg::TransportStreamPacket::GetPointerField(buffer);
+					if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
+						if (payload[0] != 0x00) { // table_id = 0x00 (program association section)
+							continue;
+						}
 
-					pat.Push((payload + pointer + 1), size - pointer - 1);
+						if (pat.GetSectionSize() > 0) {
+							pat.Clear();
+						}
+
+						pointer = 1;
+					
+						if (jmpeg::TransportStreamPacket::HasAdaptationField(buffer) == true) {
+							pointer = payload[0] + 1;
+						}
+					}
+
+					pat.Push((payload + pointer), size - pointer);
 
 					if (pat.HasFailed() == true) {
 						pat.Clear();
-					}
-
-					if (pat.IsComplete() == true) {
+					} else if (pat.IsComplete() == true) {
 						find_pmt = true;
 
 						// get pmt pid

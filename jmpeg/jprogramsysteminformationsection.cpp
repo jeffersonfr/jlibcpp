@@ -56,6 +56,11 @@ void ProgramSystemInformationSection::Clear()
 	memset(_data, 0, _data_size);
 }
 
+int ProgramSystemInformationSection::GetSectionSize()
+{
+	return _data_index;
+}
+
 void ProgramSystemInformationSection::Push(uint8_t *buffer, uint32_t size)
 {
 	if (buffer == NULL) {
@@ -66,6 +71,8 @@ void ProgramSystemInformationSection::Push(uint8_t *buffer, uint32_t size)
 		_has_failed = true;
 
 		// throw jcommon::OutOfBoundsException("Overflow index of section");
+		
+		return;
 	}
 
 	memcpy((_data + _data_index), buffer, size);

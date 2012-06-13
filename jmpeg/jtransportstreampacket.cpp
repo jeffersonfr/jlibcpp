@@ -110,13 +110,13 @@ AdaptationField * TransportStreamPacket::GetAdaptationField(uint8_t *packet)
 
 	uint32_t adaptation_field_length = packet[4];
 	
-	return new AdaptationField(packet+4, adaptation_field_length+1);
+	return new AdaptationField(packet+4, adaptation_field_length);
 }
 
 void TransportStreamPacket::GetPayload(uint8_t *packet, uint8_t *data, uint32_t *size)
 {
 	uint32_t header_size = 4,
-			 control = TransportStreamPacket::GetAdaptationFieldControl(packet);
+					 control = TransportStreamPacket::GetAdaptationFieldControl(packet);
 	
 	if (control == 0x00) {					// jump the packet, is invalid
 		header_size = 188;
@@ -125,30 +125,15 @@ void TransportStreamPacket::GetPayload(uint8_t *packet, uint8_t *data, uint32_t 
 	} else if (control == 0x02) {		// only adaptation field
 		header_size = 188;
 	} else if (control == 0x03) {		// jmp the adaptation field
-		header_size += packet[4] + 1;
+		header_size += packet[4]+1;
 	}
 
 	if (header_size == 188) {
 		data = NULL;
-		size = 0;
+		(*size) = 0;
 	} else {
 		memcpy(data, packet + header_size, 188 - header_size);
-
-		*size = 188 - header_size;
-	}
-}
-
-uint8_t TransportStreamPacket::GetPointerField(uint8_t *packet)
-{
-	uint8_t payload[188];
-	uint32_t size;
-	
-	TransportStreamPacket::GetPayload(packet, payload, &size);
-	
-	if (size != 0) {
-		return (uint8_t)payload[0];
-	} else {
-		return (uint8_t)0xff;
+		(*size) = 188 - header_size; // 188 - header(ts+adaptation_field)
 	}
 }
 

@@ -44,7 +44,7 @@ int ProgramMapSection::GetPrograms(std::vector<ProgramMapSection::Program *> &pr
 
 	int number_of_programs = GetSectionLength() - 9 - program_info_length - 4; // section_length - previous_bytes - program_info_length - crc32
 
-	if ((number_of_programs <= 0) | ((number_of_programs % 5) != 0)) {
+	if ((number_of_programs <= 0)) {
 		return -1;
 	}
 
@@ -53,19 +53,15 @@ int ProgramMapSection::GetPrograms(std::vector<ProgramMapSection::Program *> &pr
 		elementary_pid,
 		reserved2,
 		es_info_length,
-		k, count = 0;
+		count;
+	uint8_t *data = (_data + 12 + program_info_length);
 
-	number_of_programs /= 5;
-	for (int i=0; i<number_of_programs; i++) {
-		k = i * 5 + count;
-
-		stream_type = (uint16_t)((*(_data + 12 + program_info_length + k))) & 0x000000ff;
-		reserved1 = (uint16_t)(((*(_data + 13 + program_info_length + k)) >> 5)) & 0x00000007;
-		elementary_pid = (uint16_t)(((*(_data + 13 + program_info_length + k)) << 8) | (*(_data + 14 + program_info_length + k))) & 0x00001fff;
-		reserved2 = (uint16_t)(((*(_data + 15 + program_info_length + k)) >> 4)) & 0x0000000f;
-		es_info_length = (uint16_t)(((*(_data + 15 + program_info_length + k)) << 8) | (*(_data + 16 + program_info_length + k))) & 0x00000fff;
-
-		count += es_info_length;
+	for (int i=0; number_of_programs>5; i++) {
+		stream_type = (uint16_t)((*(data))) & 0x000000ff;
+		reserved1 = (uint16_t)(((*(data + 1)) >> 5)) & 0x00000007;
+		elementary_pid = (uint16_t)(((*(data + 1)) << 8) | (*(data + 2))) & 0x00001fff;
+		reserved2 = (uint16_t)(((*(data + 3)) >> 4)) & 0x0000000f;
+		es_info_length = (uint16_t)(((*(data + 3)) << 8) | (*(data + 4))) & 0x00000fff;
 
 		ProgramMapSection::Program *p = new ProgramMapSection::Program();
 
@@ -79,12 +75,16 @@ int ProgramMapSection::GetPrograms(std::vector<ProgramMapSection::Program *> &pr
 		if (es_info_length > 0) {
 			es_info = new char[es_info_length];
 
-			memcpy(es_info, (_data + 17), es_info_length);
+			memcpy(es_info, (data + 5), es_info_length);
 		}
 
 		p->AppendElementaryStreamInfo(es_info, es_info_length);
 
 		program_map.push_back(p);
+
+		count = 5 + es_info_length;
+		data = (data + count);
+		number_of_programs = number_of_programs - count;
 	}
 
 	return 0;

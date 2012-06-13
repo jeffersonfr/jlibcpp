@@ -50,6 +50,7 @@ int ProgramAssociationSection::GetPrograms(std::vector<ProgramAssociationSection
 		k;
 
 	number_of_programs /= 4;
+
 	for (int i=0; i<number_of_programs; i++) {
 		k = i * 4;
 
