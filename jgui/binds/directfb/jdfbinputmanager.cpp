@@ -1078,6 +1078,7 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 	} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE || event.type == DIET_AXISMOTION) {
 		int mouse_z = 0;
 		jmouseevent_button_t button = JMB_UNKNOWN;
+		jmouseevent_button_t buttons = JMB_UNKNOWN;
 		jmouseevent_type_t type = JMT_UNKNOWN;
 
 		if (event.type == DIET_AXISMOTION) {
@@ -1138,6 +1139,14 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 			}
 		}
 
+		if ((event.buttons & DIBM_LEFT) != 0) {
+			buttons = (jmouseevent_button_t)(button | JMB_BUTTON1);
+		} else if ((event.buttons & DIBM_RIGHT) != 0) {
+			buttons = (jmouseevent_button_t)(button | JMB_BUTTON2);
+		} else if ((event.buttons & DIBI_MIDDLE) != 0) {
+			buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
+		}
+
 		Window *current = WindowManager::GetInstance()->GetFocusOwner();
 
 		int cx,
@@ -1175,7 +1184,7 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 		DispatchEvent(new MouseEvent(current, type, button, mouse_z, cx, cy));
 		*/
 		
-		DispatchEvent(new MouseEvent(NULL, type, button, mouse_z, cx, cy));
+		DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, cx, cy));
 	}
 }
 
@@ -1244,6 +1253,7 @@ void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 				// GFXHandler::GetInstance()->SetCursor(JCS_DEFAULT);
 			} else if (event.type == DWET_BUTTONUP || event.type == DWET_BUTTONDOWN || event.type == DWET_MOTION || event.type == DWET_WHEEL) {
 				jmouseevent_button_t button = JMB_UNKNOWN;
+				jmouseevent_button_t buttons = JMB_UNKNOWN;
 				jmouseevent_type_t type = JMT_UNKNOWN;
 
 				if (event.type == DWET_MOTION) {
@@ -1269,11 +1279,11 @@ void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 				}
 
 				if ((event.buttons & DIBM_LEFT) != 0) {
-					button = (jmouseevent_button_t)(button | JMB_BUTTON1);
+					buttons = (jmouseevent_button_t)(button | JMB_BUTTON1);
 				} else if ((event.buttons & DIBM_RIGHT) != 0) {
-					button = (jmouseevent_button_t)(button | JMB_BUTTON2);
+					buttons = (jmouseevent_button_t)(button | JMB_BUTTON2);
 				} else if ((event.buttons & DIBI_MIDDLE) != 0) {
-					button = (jmouseevent_button_t)(button | JMB_BUTTON3);
+					buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
 				}
 
 				_mouse_x = CLAMP(_mouse_x, 0, _screen.width-1);
@@ -1292,7 +1302,7 @@ void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 					mouse_z = _click_count;
 				}
 
-				DispatchEvent(new MouseEvent(current, type, button, mouse_z, cx, cy));
+				DispatchEvent(new MouseEvent(current, type, button, buttons, mouse_z, cx, cy));
 			} 
 		}
 	}

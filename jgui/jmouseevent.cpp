@@ -22,16 +22,17 @@
 
 namespace jgui {
 
-MouseEvent::MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, int click_count, int x, int y):
+MouseEvent::MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, int click_count, int x, int y):
 	jcommon::EventObject(source)
 {
 	jcommon::Object::SetClassName("jgui::MouseEvent");
 
-	_type = type;
-	_button = button;
-	_click_count = click_count;
 	_x = x;
 	_y = y;
+	_click_count = click_count;
+	_button = button;
+	_buttons = buttons;
+	_type = type;
 }
 
 MouseEvent::~MouseEvent()
@@ -51,6 +52,11 @@ int MouseEvent::GetClickCount()
 jmouseevent_button_t MouseEvent::GetButton()
 {
 	return _button;
+}
+
+jmouseevent_button_t MouseEvent::GetButtons()
+{
+	return _buttons;
 }
 
 int MouseEvent::GetX()

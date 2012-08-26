@@ -69,15 +69,16 @@ class MouseEvent : public jcommon::EventObject{
 		int _x,
 				_y,
 				_click_count;
-		jmouseevent_type_t _type;
 		jmouseevent_button_t _button;
+		jmouseevent_button_t _buttons;
+		jmouseevent_type_t _type;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, int click_count, int x, int y);
+		MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, int click_count, int x, int y);
 		
 		/**
 		 * \brief
@@ -102,6 +103,12 @@ class MouseEvent : public jcommon::EventObject{
 		 *
 		 */
 		virtual jmouseevent_button_t GetButton();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jmouseevent_button_t GetButtons();
 
 		/**
 		 * \brief
