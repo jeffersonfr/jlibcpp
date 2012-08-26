@@ -110,7 +110,7 @@ class DFBFont : public virtual jgui::Font{
 		 * \brief
 		 *
 		 */
-		virtual int GetMaxAdvanced();
+		virtual int GetMaxAdvance();
 		
 		/**
 		 * \brief

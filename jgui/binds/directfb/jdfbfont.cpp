@@ -109,7 +109,7 @@ int DFBFont::GetDescender()
 	return SCREEN_TO_SCALE(abs(_descender), _screen.width, _scale.width);
 }
 
-int DFBFont::GetMaxAdvanced()
+int DFBFont::GetMaxAdvance()
 {
 	return SCREEN_TO_SCALE(_max_advance, _screen.width, _scale.width);
 }

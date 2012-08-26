@@ -83,7 +83,7 @@ class ProgramMapSection : public ProgramSystemInformationSection{
 		 * \brief
 		 *
 		 */
-		void GetProgramInformation(char *data, int *size);;
+		void GetProgramInformation(char *data, int *size);
 
 };
 

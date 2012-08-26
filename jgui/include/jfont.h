@@ -153,7 +153,7 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual int GetMaxAdvanced();
+		virtual int GetMaxAdvance();
 		
 		/**
 		 * \brief

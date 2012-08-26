@@ -140,7 +140,7 @@ int Font::GetDescender()
 	return -1;
 }
 
-int Font::GetMaxAdvanced()
+int Font::GetMaxAdvance()
 {
 	return -1;
 }
