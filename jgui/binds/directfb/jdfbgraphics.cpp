@@ -326,9 +326,11 @@ void DFBGraphics::Clear(int xp, int yp, int wp, int hp)
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
 	_surface->SetPorterDuff(_surface, DSPD_CLEAR);
+	_surface->SetDrawingFlags(_surface, DSDRAW_NOFX);
 	_surface->FillRectangle(_surface, x, y, w, h);
 
 	SetCompositeFlags(GetCompositeFlags());
+	SetDrawingFlags(GetDrawingFlags());
 }
 
 void DFBGraphics::Idle()

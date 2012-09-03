@@ -487,7 +487,7 @@ void DFBHandler::InitEngine()
 	/*
 	DirectFBSetOption("system", "sdl");
 	DirectFBSetOption("mode", "960x540");
-	DirectFBSetOption("pixelformat", "RGB32");
+	DirectFBSetOption("pixelformat", "ARGB");
 	DirectFBSetOption("linux-input-devices", "keyboard");
 	*/
 
