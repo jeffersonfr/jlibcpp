@@ -26,7 +26,7 @@
 #include "jwindowmanager.h"
 #include "jinputmanager.h"
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbhandler.h"
 #endif
 
@@ -54,7 +54,7 @@ GFXHandler::~GFXHandler()
 GFXHandler * GFXHandler::GetInstance()
 {
 	if (_instance == NULL) {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		DFBHandler *handler = NULL;
 		
 		try {

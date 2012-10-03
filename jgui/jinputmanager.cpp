@@ -20,7 +20,7 @@
 #include "Stdafx.h"
 #include "jinputmanager.h"
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbinputmanager.h"
 #endif
 
@@ -48,7 +48,7 @@ InputManager::~InputManager()
 InputManager * InputManager::GetInstance()
 {
 	if (_instance == NULL){
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		DFBInputManager *manager = new DFBInputManager();
 
 		manager->Initialize();

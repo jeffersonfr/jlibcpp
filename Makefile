@@ -27,8 +27,10 @@ PREFIX		= /usr/local
 
 DEBUG  		= -g -ggdb 
 
+# {yes, no}
 ENABLE_DEBUG		?= no
-ENABLE_GRAPHICS ?= dfb
+# {directfb, directfb-cairo}
+ENABLE_GRAPHICS ?= directfb
 
 ARFLAGS		= -rc
 # -ansi: problemas com va_copy()
@@ -74,7 +76,7 @@ CCFLAGS		+= \
 		 $(INCLUDE) \
 		 -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
 
-ECHO			= echo -e
+ECHO			= echo
 
 OK 				= \033[30;32mOK\033[m
 
@@ -86,14 +88,36 @@ ifeq ($(ENABLE_DEBUG),yes)
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),dfb)
+ifeq ($(ENABLE_GRAPHICS),directfb)
 	INCLUDE 	+= \
-		 -Ijgui/binds/directfb/include \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
+		 `pkg-config --cflags directfb` \
+
+	DEFINES		+= \
+		 -DDIRECTFB_UI \
+
+	REQUIRES	+= \
+		 directfb \
+
+	OBJS_gfx	+= \
+		 jdfbhandler.o\
+		 jdfbfont.o\
+		 jdfbgraphics.o\
+		 jdfbimage.o\
+		 jdfbinputmanager.o\
+
+OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),directfb-cairo)
+	INCLUDE 	+= \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
 		 `pkg-config --cflags directfb` \
 		 `pkg-config --cflags cairo` \
 
 	DEFINES		+= \
-		 -DDIRECTFB_UI \
+		 -DDIRECTFB_CAIRO_UI \
 
 	REQUIRES	+= \
 		 directfb \
@@ -106,7 +130,7 @@ ifeq ($(ENABLE_GRAPHICS),dfb)
 		 jdfbimage.o\
 		 jdfbinputmanager.o\
 
-OBJS_jgui	= $(addprefix binds/directfb/,$(OBJS_gfx))
+OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 

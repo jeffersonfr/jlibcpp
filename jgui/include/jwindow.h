@@ -29,7 +29,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include <directfb.h>
 #endif
 
@@ -48,7 +48,7 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 	friend class WindowManager;
 
 	protected:
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		IDirectFBWindow *_window;
 		IDirectFBSurface *_surface;
 #endif

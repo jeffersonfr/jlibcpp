@@ -23,7 +23,7 @@
 #include "jstringutils.h"
 #include "jstringtokenizer.h"
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbfont.h"
 #endif
 
@@ -69,7 +69,7 @@ Font * Font::GetDefaultFont()
 
 Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height)
 {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	return new DFBFont(name, attributes, height, scale_width, scale_height);
 #endif
 

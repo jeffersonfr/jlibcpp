@@ -23,7 +23,7 @@
 #include "jmemoryinputstream.h"
 #include "jthread.h"
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbimage.h"
 #include "jdfbgraphics.h"
 #include "jdfbhandler.h"
@@ -50,7 +50,7 @@ bool Image::GetImageSize(std::string img, int *width, int *height)
 {
 	bool b = false;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	b = DFBImage::GetImageSize(img, width, height);
 #endif
 
@@ -61,7 +61,7 @@ Image * Image::CreateImage(int width, int height, jpixelformat_t pixelformat, in
 {
 	Image *image = NULL;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	image = new DFBImage(width, height, pixelformat, scale_width, scale_height);
 #endif
 
@@ -72,7 +72,7 @@ Image * Image::CreateImage(uint32_t *data, int width, int height, int scale_widt
 {
 	Image *image = NULL;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	image = new DFBImage(width, height, JPF_ARGB, scale_width, scale_height); // GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 
 	image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
@@ -93,7 +93,7 @@ Image * Image::CreateImage(std::string file)
 {
 	Image *image = NULL;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	int width,
 			height;
 
@@ -129,7 +129,7 @@ Image * Image::CreateImage(jio::InputStream *stream)
 
 	Image *image = NULL;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	image = DFBImage::CreateImageStream(stream);
 #endif
 
@@ -144,7 +144,7 @@ Image * Image::CreateImage(Image *image)
 
 	Image *clone = NULL;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	clone = dynamic_cast<Image *>(image->Clone());
 #endif
 
@@ -160,7 +160,7 @@ Image * Image::Scaled(int width, int height)
 {
 	Image *image = NULL;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	jsize_t scale = _graphics->GetWorkingScreenSize();
 
 	image = new DFBImage(width, height, GetPixelFormat(), scale.width, scale.height);
@@ -178,7 +178,7 @@ Image * Image::SubImage(int x, int y, int width, int height)
 {
 	Image *image = NULL;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	jsize_t scale = _graphics->GetWorkingScreenSize();
 
 	image = new DFBImage(width, height, GetPixelFormat(), scale.width, scale.height);

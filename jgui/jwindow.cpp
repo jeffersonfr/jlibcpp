@@ -23,7 +23,7 @@
 #include "jthememanager.h"
 #include "jsemaphore.h"
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbhandler.h"
 #include "jdfbgraphics.h"
 #endif
@@ -50,7 +50,7 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 	_size.width = width;
 	_size.height = height;
 	
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	_surface = NULL;
 	_window = NULL;
 	
@@ -75,7 +75,7 @@ Window::~Window()
 
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSING));
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	WindowManager::GetInstance()->Remove(this);
 
 	if (_window) {
@@ -110,7 +110,7 @@ Graphics * Window::GetGraphics()
 
 void * Window::GetNativeWindow()
 {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	return _window;
 #endif
 
@@ -125,7 +125,7 @@ void Window::SetNativeWindow(void *native)
 
 	ReleaseWindow();
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	_graphics->Lock();
 
 	_window = (IDirectFBWindow *)native;
@@ -200,7 +200,7 @@ jcursor_style_t Window::GetCursor()
 
 void Window::InternalCreateWindow(void *params)
 {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	_graphics->Lock();
 
 	DFBHandler *gfx = dynamic_cast<DFBHandler *>(GFXHandler::GetInstance());
@@ -235,7 +235,7 @@ void Window::InternalCreateWindow(void *params)
 
 void Window::RaiseToTop()
 {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->RaiseToTop(_window);
 		_window->SetStackingClass(_window, DWSC_UPPER);
@@ -247,7 +247,7 @@ void Window::RaiseToTop()
 
 void Window::LowerToBottom()
 {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->LowerToBottom(_window);
 		_window->SetStackingClass(_window, DWSC_LOWER);
@@ -259,7 +259,7 @@ void Window::LowerToBottom()
 
 void Window::PutAtop(Window *w)
 {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	if (w == NULL) {
 		return;
 	}
@@ -274,7 +274,7 @@ void Window::PutAtop(Window *w)
 
 void Window::PutBelow(Window *w)
 {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	if (w == NULL) {
 		return;
 	}
@@ -317,7 +317,7 @@ void Window::SetBounds(int x, int y, int width, int height)
 			_size.height = _maximum_size.height;
 		}
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		_graphics->Lock();
 
 		if (_window != NULL) {
@@ -354,7 +354,7 @@ void Window::SetLocation(int x, int y)
 		_location.x = x;
 		_location.y = y;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		_graphics->Lock();
 	
 		int dx = SCALE_TO_SCREEN(x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
@@ -471,7 +471,7 @@ void Window::SetSize(int width, int height)
 			_size.height = _maximum_size.height;
 		}
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		_graphics->Lock();
 
 		if (_window != NULL) {
@@ -503,7 +503,7 @@ void Window::Move(int x, int y)
 		_location.x = _location.x+x;
 		_location.y = _location.y+y;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		int dx = SCALE_TO_SCREEN(x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
 				dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
 
@@ -528,7 +528,7 @@ void Window::SetOpacity(int i)
 		_opacity = 0xff;
 	}
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, _opacity);
 	}
@@ -537,7 +537,7 @@ void Window::SetOpacity(int i)
 
 int Window::GetOpacity()
 {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	/*
 	uint8_t o;
 
@@ -659,7 +659,7 @@ bool Window::Show(bool modal)
 {
 	_is_visible = true;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	if (_window == NULL) {
 		InternalCreateWindow();
 	}
@@ -678,7 +678,7 @@ bool Window::Hide()
 {
 	_is_visible = false;
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, 0x00);
 	}
@@ -689,7 +689,7 @@ bool Window::Hide()
 
 void Window::DumpScreen(std::string dir, std::string pre)
 {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	if (_graphics != NULL) {
 		IDirectFBSurface *surface = dynamic_cast<DFBGraphics *>(_graphics)->_surface;
 
@@ -700,7 +700,7 @@ void Window::DumpScreen(std::string dir, std::string pre)
 
 void Window::ReleaseWindow()
 {
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	_graphics->Lock();
 	
 	if (_graphics != NULL) {

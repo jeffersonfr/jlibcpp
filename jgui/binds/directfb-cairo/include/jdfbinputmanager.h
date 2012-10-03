@@ -38,11 +38,7 @@ class DFBInputManager : public jgui::InputManager, public jthread::Thread{
 
 	private:
 		jthread::Mutex _mutex;
-
-#ifdef DIRECTFB_UI
 		IDirectFBEventBuffer *events;
-#endif
-
 		std::vector<EventBroadcaster *> _broadcasters;
 		uint64_t _last_keypress;
 		int _mouse_x,

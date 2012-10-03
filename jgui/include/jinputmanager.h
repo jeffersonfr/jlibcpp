@@ -32,7 +32,7 @@
 #include <map>
 #include <list>
 
-#ifdef DIRECTFB_UI
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include <directfb.h>
 #endif
 
