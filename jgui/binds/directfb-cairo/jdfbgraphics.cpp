@@ -1487,7 +1487,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 		return;
 	}
 
-	Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), JPF_ARGB, _scale.width, _scale.height);
+	Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), JPF_A8, _scale.width, _scale.height);
 
 	off->GetGraphics()->SetFont(_font);
 	off->GetGraphics()->SetColor(_color);
@@ -1495,11 +1495,47 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 	IDirectFBSurface *fsurface = (IDirectFBSurface *)(off->GetGraphics()->GetNativeSurface());
 
 	fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
-	fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+
+	jblitting_flags_t bf = GetBlittingFlags();
+	jcomposite_flags_t cf = GetCompositeFlags();
+
+	SetCompositeFlags(JCF_NONE);
+	SetBlittingFlags((jblitting_flags_t)(bf | JBF_ALPHACHANNEL | JBF_COLORIZE));
 
 	DrawImage(off, xp, yp);
 
+	SetBlittingFlags(bf);
+	SetCompositeFlags(cf);
+
 	delete off;
+
+	/*
+	if (_radians == 0.0) {
+		int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
+				y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+
+		_surface->DrawString(_surface, text.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+	} else {
+		Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), JPF_A8, _scale.width, _scale.height);
+
+		off->GetGraphics()->SetFont(_font);
+		off->GetGraphics()->SetColor(_color);
+
+		IDirectFBSurface *fsurface = (IDirectFBSurface *)(off->GetGraphics()->GetNativeSurface());
+
+		fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+
+		jblitting_flags_t t = GetBlittingFlags();
+
+		SetBlittingFlags((jblitting_flags_t)(t | JBF_COLORIZE));
+
+		DrawImage(off, xp, yp);
+
+		SetBlittingFlags(t);
+
+		delete off;
+	}
+	*/
 }
 
 void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
