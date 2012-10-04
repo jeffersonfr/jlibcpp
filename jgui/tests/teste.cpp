@@ -785,7 +785,7 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetColor(pcolor);
 		g->SetLineDash(dashes, 4);
 		g->SetLineWidth(5);
-		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+10, 10+10*(120+10)-20, 6*(120+10));
+		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+10, 10+10*(120+10)-20, 6*(120+10)+10);
 		g->SetLineWidth(10);
 		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+40, 10+10*(120+10)-20, 6*(120+10)+40);
 		g->SetLineWidth(20);
@@ -830,10 +830,11 @@ class GraphicPanel : public jgui::Canvas{
 
 		std::string text = "DrawString";
 
-		rcolor.SetAlpha(0xa0);
-		pcolor.SetAlpha(0xa0);
-
 		g->Rotate(0.0);
+
+		rcolor.SetAlpha(0x80);
+		pcolor.SetAlpha(0x80);
+
 		g->SetColor(rcolor);
 		g->SetFont(f1); g->DrawString(text, 10+7*(120+10)+10+shadow, 0*(45+10)+20+shadow);
 		g->SetFont(f2); g->DrawString(text, 10+7*(120+10)+10+shadow, 1*(45+10)+20+shadow);

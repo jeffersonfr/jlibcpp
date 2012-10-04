@@ -125,6 +125,12 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
+		void DrawArcHelper(int xc, int yc, int rx, int ry, double arc0, double arc1, int size);
+
+		/**
+		 * \brief
+		 *
+		 */
 		void DrawPie0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size);
 
 		/**

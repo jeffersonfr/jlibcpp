@@ -589,54 +589,84 @@ void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
 
 void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 {
-	if (_surface == NULL) {
-		return;
-	}
-
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
 
 	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
 
 	if (line_width < 0) {
-		DrawRectangle0(xp, yp, wp, hp, 0, 0, JLJ_MITER, _line_width);
+		DrawRectangle0(x, y, w, h, 0, 0, JLJ_MITER, line_width);
 	} else {
-		DrawRectangle0(xp-_line_width+1, yp-_line_width+1, wp+2*(_line_width-1), hp+2*(_line_width-1), 0, 0, JLJ_MITER, -_line_width);
+		DrawRectangle0(x-line_width+1, y-line_width+1, w+2*(line_width-1), h+2*(line_width-1), 0, 0, JLJ_MITER, -line_width);
 	}
 }
 
 void DFBGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
-	DrawRectangle0(xp, yp, wp, hp, dx, dy, JLJ_BEVEL, -std::max(wp, hp));
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
+	
+	dx = SCALE_TO_SCREEN((dx), _screen.width, _scale.width);
+	dy = SCALE_TO_SCREEN((dy), _screen.height, _scale.height);
+
+	DrawRectangle0(x, y, w, h, dx, dy, JLJ_BEVEL, -std::max(w, h));
 }
 
 void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
 
 	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
 
+	dx = SCALE_TO_SCREEN((dx), _screen.width, _scale.width);
+	dy = SCALE_TO_SCREEN((dy), _screen.height, _scale.height);
+
 	if (line_width < 0) {
-		DrawRectangle0(xp, yp, wp, hp, dx, dy, JLJ_BEVEL, line_width);
+		DrawRectangle0(x, y, w, h, dx, dy, JLJ_BEVEL, line_width);
 	} else {
-		DrawRectangle0(xp-line_width+1, yp-line_width+1, wp+2*(line_width-1), hp+2*(line_width-1), dx+line_width, dy+line_width, JLJ_BEVEL, -line_width);
+		DrawRectangle0(x-line_width+1, y-line_width+1, w+2*(line_width-1), h+2*(line_width-1), dx+line_width, dy+line_width, JLJ_BEVEL, -line_width);
 	}
 }
 
 void DFBGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
-	DrawRectangle0(xp, yp, wp, hp, dx, dy, JLJ_ROUND, -std::max(wp, hp));
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
+	
+	dx = SCALE_TO_SCREEN((dx), _screen.width, _scale.width);
+	dy = SCALE_TO_SCREEN((dy), _screen.height, _scale.height);
+
+	DrawRectangle0(x, y, w, h, dx, dy, JLJ_ROUND, -std::max(w, h));
 }
 
 void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
+	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
+	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
 
 	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
 
+	dx = SCALE_TO_SCREEN((dx), _screen.width, _scale.width);
+	dy = SCALE_TO_SCREEN((dy), _screen.height, _scale.height);
+
 	if (line_width < 0) {
-		DrawRectangle0(xp, yp, wp, hp, dx, dy, JLJ_ROUND, line_width);
+		DrawRectangle0(x, y, w, h, dx, dy, JLJ_ROUND, line_width);
 	} else {
-		DrawRectangle0(xp-line_width+1, yp-line_width+1, wp+2*(line_width-1), hp+2*(line_width-1), dx+line_width, dy+line_width, JLJ_ROUND, -line_width);
+		DrawRectangle0(x-line_width+1, y-line_width+1, w+2*(line_width-1), h+2*(line_width-1), dx+line_width, dy+line_width, JLJ_ROUND, -line_width);
 	}
 }
 
@@ -832,70 +862,7 @@ void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 
 	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
 
-	arc0 = fmod(arc0, 2*M_PI);
-	arc1 = fmod(arc1, 2*M_PI);
-
-	if (arc1 == 0.0) {
-		arc1 = 2*M_PI;
-	}
-
-	if (arc0 < 0.0) {
-		arc0 = 2*M_PI + arc0;
-	}
-
-	if (arc1 < 0.0) {
-		arc1 = 2*M_PI + arc1;
-	}
-
-	int quadrant = -1;
-
-	if (arc0 >= 0.0 && arc0 < M_PI_2) {
-		quadrant = 0;
-	} else if (arc0 >= M_PI_2 && arc0 < M_PI) {
-		quadrant = 1;
-	} else if (arc0 >= M_PI && arc0 < (M_PI+M_PI_2)) {
-		quadrant = 2;
-	} else if (arc0 >= (M_PI+M_PI_2) && arc0 < 2*M_PI) {
-		quadrant = 3;
-	}
-
-	if (arc1 < arc0) {
-		arc1 = arc1 + 2*M_PI;
-	}
-
-	while (arc0 < arc1) {
-		double b = arc1,
-					 q = quadrant;
-
-		if (quadrant == 0) {
-			if (arc1 > M_PI_2) {
-				b = M_PI_2;
-			}
-		} else if (quadrant == 1) {
-			if (arc1 > M_PI) {
-				b = M_PI;
-			}
-		} else if (quadrant == 2) {
-			if (arc1 > (M_PI+M_PI_2)) {
-				b = (M_PI+M_PI_2);
-			}
-		} else if (quadrant == 3) {
-			if (arc1 > 2*M_PI) {
-				b = 0.0;
-
-				arc1 = arc1-2*M_PI;
-			}
-		}
-
-		if (line_width < 0) {
-			DrawArc0(xc, yc, rx-1, ry-1, arc0, b, -line_width, q);
-		} else {
-			DrawArc0(xc, yc, rx+lw-1, ry+lw-1, arc0, b, line_width, q);
-		}
-
-		arc0 = b;
-		quadrant = (quadrant+1)%4;
-	}
+	DrawArcHelper(xc, yc, rx, ry, arc0, arc1, line_width);
 }
 
 void DFBGraphics::FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
@@ -922,7 +889,7 @@ void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	if (line_width < 0) {
 		line_width = -line_width;
 
-		DrawPie(xcp, ycp, rxp-line_width, ryp-line_width, arc0, arc1);
+		// TODO:: recursive DrawPie(xcp, ycp, rxp-line_width, ryp-line_width, arc0, arc1);
 		
 		return;
 	}
@@ -1132,33 +1099,34 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 		return;
 	}
 
+	jpoint_t points[npoints];
 	int x1 = 0,
 			y1 = 0,
 			x2 = 0,
 			y2 = 0;
 
 	for (int i=0; i<npoints; i++) {
-		p[i].x = SCALE_TO_SCREEN((xp+p[i].x+_translate.x), _screen.width, _scale.width); 
-		p[i].y = SCALE_TO_SCREEN((yp+p[i].y+_translate.y), _screen.height, _scale.height);
+		points[i].x = SCALE_TO_SCREEN((xp+p[i].x+_translate.x), _screen.width, _scale.width); 
+		points[i].y = SCALE_TO_SCREEN((yp+p[i].y+_translate.y), _screen.height, _scale.height);
 
-		if (p[i].x < x1) {
-			x1 = p[i].x;
+		if (points[i].x < x1) {
+			x1 = points[i].x;
 		}
 
-		if (p[i].x > x2) {
-			x2 = p[i].x;
+		if (points[i].x > x2) {
+			x2 = points[i].x;
 		}
 
-		if (p[i].y < y1) {
-			y1 = p[i].y;
+		if (points[i].y < y1) {
+			y1 = points[i].y;
 		}
 
-		if (p[i].y > y2) {
-			y2 = p[i].y;
+		if (points[i].y > y2) {
+			y2 = points[i].y;
 		}
 	}
 
-	FillPolygon0(p, npoints, x1, y1, x2, y2);
+	FillPolygon0(points, npoints, x1, y1, x2, y2);
 }
 
 void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, int y0p, int r0p)
@@ -1235,7 +1203,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 		return;
 	}
 
-	Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), JPF_ARGB, _scale.width, _scale.height);
+	Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), JPF_A8, _scale.width, _scale.height);
 
 	off->GetGraphics()->SetFont(_font);
 	off->GetGraphics()->SetColor(_color);
@@ -1243,11 +1211,47 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 	IDirectFBSurface *fsurface = (IDirectFBSurface *)(off->GetGraphics()->GetNativeSurface());
 
 	fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
-	fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+
+	jblitting_flags_t bf = GetBlittingFlags();
+	jcomposite_flags_t cf = GetCompositeFlags();
+
+	SetCompositeFlags(JCF_NONE);
+	SetBlittingFlags((jblitting_flags_t)(bf | JBF_ALPHACHANNEL | JBF_COLORIZE));
 
 	DrawImage(off, xp, yp);
 
+	SetBlittingFlags(bf);
+	SetCompositeFlags(cf);
+
 	delete off;
+
+	/*
+	if (_radians == 0.0) {
+		int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
+				y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+
+		_surface->DrawString(_surface, text.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+	} else {
+		Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), JPF_A8, _scale.width, _scale.height);
+
+		off->GetGraphics()->SetFont(_font);
+		off->GetGraphics()->SetColor(_color);
+
+		IDirectFBSurface *fsurface = (IDirectFBSurface *)(off->GetGraphics()->GetNativeSurface());
+
+		fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+
+		jblitting_flags_t t = GetBlittingFlags();
+
+		SetBlittingFlags((jblitting_flags_t)(t | JBF_COLORIZE));
+
+		DrawImage(off, xp, yp);
+
+		SetBlittingFlags(t);
+
+		delete off;
+	}
+	*/
 }
 
 void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
@@ -2532,8 +2536,6 @@ void DFBGraphics::FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int
 			y2,
 			inside;
 
-	_surface->SetColor(_surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
-
 	for (int x=x1p; x<x2p; x++) {
 		for (int y=y1p; y<y2p; y++) {
 			inside = 0;
@@ -2573,120 +2575,110 @@ void DFBGraphics::FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int
 	}
 }
 
-void DFBGraphics::DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jline_join_t join, int size)
+void DFBGraphics::DrawRectangle0(int x, int y, int w, int h, int dx, int dy, jline_join_t join, int size)
 { 
-	if (_surface == NULL) {
+	if (_surface == NULL || size >= 0 || w <= 0 || h <= 0) {
 		return;
 	}
 
-	if (size >= 0 || wp <= 0 || hp <= 0) {
-		return;
-	}
-
-	int line_width = _line_width,
-			size_param = size;
 	bool close = false;
 
 	size = -size;
 
-	if (size > (std::min(wp, hp)/2)) {
-		size = std::min(wp, hp)/2;
+	if (size > (std::min(w, h)/2)) {
+		size = std::min(w, h)/2;
 
 		close = true;
 	}
 
 	if (join == JLJ_MITER) {
-		xp = xp + size;
-		yp = yp + size;
-		wp = wp - 2*size;
-		hp = hp - 2*size;
+		x = x + size;
+		y = y + size;
+		w = w - 2*size;
+		h = h - 2*size;
 
-		FillRectangle(xp-size, yp-size, wp+2*size, size);
-		FillRectangle(xp-size, yp+hp, wp+2*size, size);
-		FillRectangle(xp-size, yp, size, hp);
-		FillRectangle(xp+wp, yp, size, hp);
+		_surface->FillRectangle(_surface, x-size, y-size, w+2*size, size);
+		_surface->FillRectangle(_surface, x-size, y+h, w+2*size, size); // _
+		_surface->FillRectangle(_surface, x-size, y, size, h); // |<- 
+		_surface->FillRectangle(_surface, x+w, y, size, h); // ->|
 
 		if (close == true) {
-			FillRectangle(xp, yp, wp, hp);
+			_surface->FillRectangle(_surface, x, y, w, h);
 		}
 	} else if (join == JLJ_BEVEL) {
-		if (dx > wp/2) {
-			dx = wp/2;
+		if (dx > w/2) {
+			dx = w/2;
 		}
 
-		if (dy > hp/2) {
-			dy = hp/2;
+		if (dy > h/2) {
+			dy = h/2;
 		}
 
 		if (size <= (std::max(dx, dy))) {
 			if (size == 1) {
-				DrawLine(xp+dx, yp, xp, yp+dy);
-				DrawLine(xp+wp-dx-1, yp, xp+wp-1, yp+dy);
-				DrawLine(xp+wp-1, yp+hp-dy, xp+wp-dx-1, yp+hp);
-				DrawLine(xp, yp+hp-dy, xp+dx, yp+hp);
+				_surface->DrawLine(_surface, x+dx, y, x, y+dy);
+				_surface->DrawLine(_surface, x+w-dx-1, y, x+w-1, y+dy);
+				_surface->DrawLine(_surface, x+w-1, y+h-dy, x+w-dx-1, y+h);
+				_surface->DrawLine(_surface, x, y+h-dy, x+dx, y+h);
 			} else {
-				FillTriangle(xp+dx, yp, xp, yp+dy, xp+size, yp+dy);
-				FillTriangle(xp+size, yp+dy, xp+dx, yp, xp+dx, yp+size);
+				_surface->FillTriangle(_surface, x+dx, y, x, y+dy, x+size, y+dy);
+				_surface->FillTriangle(_surface, x+size, y+dy, x+dx, y, x+dx, y+size);
 
-				FillTriangle(xp+wp-dx, yp, xp+wp-dx, yp+size, xp+wp, yp+dy);
-				FillTriangle(xp+wp-dx, yp+size, xp+wp-size, yp+dy,  xp+wp, yp+dy);
+				_surface->FillTriangle(_surface, x+w-dx, y, x+w-dx, y+size, x+w, y+dy);
+				_surface->FillTriangle(_surface, x+w-dx, y+size, x+w-size, y+dy,  x+w, y+dy);
 
-				FillTriangle(xp+wp-size, yp+hp-dy, xp+wp, yp+hp-dy, xp+wp-dx, yp+hp);
-				FillTriangle(xp+wp-size, yp+hp-dy, xp+wp-dx, yp+hp, xp+wp-dx, yp+hp-size);
+				_surface->FillTriangle(_surface, x+w-size, y+h-dy, x+w, y+h-dy, x+w-dx, y+h);
+				_surface->FillTriangle(_surface, x+w-size, y+h-dy, x+w-dx, y+h, x+w-dx, y+h-size);
 
-				FillTriangle(xp, yp+hp-dy, xp+size, yp+hp-dy, xp+dx, yp+hp);
-				FillTriangle(xp+size, yp+hp-dy, xp+dx, yp+hp-size, xp+dx, yp+hp);
+				_surface->FillTriangle(_surface, x, y+h-dy, x+size, y+h-dy, x+dx, y+h);
+				_surface->FillTriangle(_surface, x+size, y+h-dy, x+dx, y+h-size, x+dx, y+h);
 			} 
 
-			FillRectangle(xp+dx, yp, wp-2*dx, size);
-			FillRectangle(xp+dx, yp+hp-size, wp-2*dx, size);
-			FillRectangle(xp, yp+dy, size, hp-2*dy);
-			FillRectangle(xp+wp-size, yp+dy, size, hp-2*dy);
+			_surface->FillRectangle(_surface, x+dx, y, w-2*dx, size);
+			_surface->FillRectangle(_surface, x+dx, y+h-size, w-2*dx, size);
+			_surface->FillRectangle(_surface, x, y+dy, size, h-2*dy);
+			_surface->FillRectangle(_surface, x+w-size, y+dy, size, h-2*dy);
 		} else {
-			FillTriangle(xp+dx, yp, xp, yp+dy, xp+dx, yp+dy);
-			FillTriangle(xp+wp-dx, yp, xp+wp, yp+dy, xp+wp-dx, yp+dy);
-			FillTriangle(xp, yp+hp-dy, xp+dx, yp+hp-dy, xp+dx, yp+hp);
-			FillTriangle(xp+wp-dx, yp+hp-dy, xp+wp, yp+hp-dy, xp+wp-dx, yp+hp);
+			_surface->FillTriangle(_surface, x+dx, y, x, y+dy, x+dx, y+dy);
+			_surface->FillTriangle(_surface, x+w-dx, y, x+w, y+dy, x+w-dx, y+dy);
+			_surface->FillTriangle(_surface, x, y+h-dy, x+dx, y+h-dy, x+dx, y+h);
+			_surface->FillTriangle(_surface, x+w-dx, y+h-dy, x+w, y+h-dy, x+w-dx, y+h);
 
-			FillRectangle(xp+dx, yp, wp-2*dx, dy);
-			FillRectangle(xp+dx, yp+hp-dy, wp-2*dx, dy);
-			FillRectangle(xp, yp+dy, dx, hp-2*dy);
-			FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
+			_surface->FillRectangle(_surface, x+dx, y, w-2*dx, dy);
+			_surface->FillRectangle(_surface, x+dx, y+h-dy, w-2*dx, dy);
+			_surface->FillRectangle(_surface, x, y+dy, dx, h-2*dy);
+			_surface->FillRectangle(_surface, x+w-dx, y+dy, dx, h-2*dy);
 
-			DrawRectangle0(xp+dx, yp+dy, wp-2*dx, hp-2*dy, 0, 0, JLJ_MITER, std::max(dx, dy)-size-1);
+			DrawRectangle0(x+dx, y+dy, w-2*dx, h-2*dy, 0, 0, JLJ_MITER, std::max(dx, dy)-size-1);
 		}
 	} else if (join == JLJ_ROUND) {
-		_line_width = size_param;
+		DrawArcHelper(x+dx-1, y+dy-1, dx, dy, M_PI_2, M_PI, -size);
+		DrawArcHelper(x+dx-1, y+h-dy-1, dx, dy, M_PI, M_PI+M_PI_2, -size);
+		DrawArcHelper(x+w-dx-1, y+h-dy-1, dx, dy, M_PI+M_PI_2, 2*M_PI, -size);
+		DrawArcHelper(x+w-dx-1, y+dy-1, dx, dy, 0.0, M_PI_2, -size);
 
-		DrawArc(xp+dx, yp+dy, dx, dy, M_PI_2, M_PI);
-		DrawArc(xp+dx, yp+hp-dy, dx, dy, M_PI, M_PI+M_PI_2);
-		DrawArc(xp+wp-dx, yp+hp-dy, dx, dy, M_PI+M_PI_2, 2*M_PI);
-		DrawArc(xp+wp-dx, yp+dy, dx, dy, 0.0, M_PI_2);
-
-		if (dx > wp/2) {
-			dx = wp/2;
+		if (dx > w/2) {
+			dx = w/2;
 		}
 
-		if (dy > hp/2) {
-			dy = hp/2;
+		if (dy > h/2) {
+			dy = h/2;
 		}
 
 		if (size <= (std::max(dx, dy))) {
-			FillRectangle(xp+dx, yp, wp-2*dx, size);
-			FillRectangle(xp+dx, yp+hp-size, wp-2*dx, size);
-			FillRectangle(xp, yp+dy, size, hp-2*dy);
-			FillRectangle(xp+wp-size, yp+dy, size, hp-2*dy);
+			_surface->FillRectangle(_surface, x+dx, y, w-2*dx, size);
+			_surface->FillRectangle(_surface, x+dx, y+h-size, w-2*dx, size);
+			_surface->FillRectangle(_surface, x, y+dy, size, h-2*dy);
+			_surface->FillRectangle(_surface, x+w-size, y+dy, size, h-2*dy);
 		} else {
-			FillRectangle(xp+dx, yp, wp-2*dx, dy);
-			FillRectangle(xp+dx, yp+hp-dy, wp-2*dx, dy);
-			FillRectangle(xp, yp+dy, dx, hp-2*dy);
-			FillRectangle(xp+wp-dx, yp+dy, dx, hp-2*dy);
+			_surface->FillRectangle(_surface, x+dx, y, w-2*dx, dy);
+			_surface->FillRectangle(_surface, x+dx, y+h-dy, w-2*dx, dy);
+			_surface->FillRectangle(_surface, x, y+dy, dx, h-2*dy);
+			_surface->FillRectangle(_surface, x+w-dx, y+dy, dx, h-2*dy);
 
-			DrawRectangle0(xp+dx, yp+dy, wp-2*dx, hp-2*dy, 0, 0, JLJ_MITER, std::max(dx, dy)-size-1);
+			DrawRectangle0(x+dx, y+dy, w-2*dx, h-2*dy, 0, 0, JLJ_MITER, std::max(dx, dy)-size-1);
 		}
 	}
-
-	_line_width = line_width;
 }
 
 void DFBGraphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double arc1, int size, int quadrant)
@@ -2845,6 +2837,74 @@ void DFBGraphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double a
 	}
 	
 	_surface->DrawLines(_surface, lines, k);
+}
+
+void DFBGraphics::DrawArcHelper(int xc, int yc, int rx, int ry, double arc0, double arc1, int size)
+{
+	arc0 = fmod(arc0, 2*M_PI);
+	arc1 = fmod(arc1, 2*M_PI);
+
+	if (arc1 == 0.0) {
+		arc1 = 2*M_PI;
+	}
+
+	if (arc0 < 0.0) {
+		arc0 = 2*M_PI + arc0;
+	}
+
+	if (arc1 < 0.0) {
+		arc1 = 2*M_PI + arc1;
+	}
+
+	int quadrant = -1;
+
+	if (arc0 >= 0.0 && arc0 < M_PI_2) {
+		quadrant = 0;
+	} else if (arc0 >= M_PI_2 && arc0 < M_PI) {
+		quadrant = 1;
+	} else if (arc0 >= M_PI && arc0 < (M_PI+M_PI_2)) {
+		quadrant = 2;
+	} else if (arc0 >= (M_PI+M_PI_2) && arc0 < 2*M_PI) {
+		quadrant = 3;
+	}
+
+	if (arc1 < arc0) {
+		arc1 = arc1 + 2*M_PI;
+	}
+
+	while (arc0 < arc1) {
+		double b = arc1,
+					 q = quadrant;
+
+		if (quadrant == 0) {
+			if (arc1 > M_PI_2) {
+				b = M_PI_2;
+			}
+		} else if (quadrant == 1) {
+			if (arc1 > M_PI) {
+				b = M_PI;
+			}
+		} else if (quadrant == 2) {
+			if (arc1 > (M_PI+M_PI_2)) {
+				b = (M_PI+M_PI_2);
+			}
+		} else if (quadrant == 3) {
+			if (arc1 > 2*M_PI) {
+				b = 0.0;
+
+				arc1 = arc1-2*M_PI;
+			}
+		}
+
+		if (size < 0) {
+			DrawArc0(xc, yc, rx-1, ry-1, arc0, b, -size, q);
+		} else {
+			DrawArc0(xc, yc, rx+size-1, ry+size-1, arc0, b, size, q);
+		}
+
+		arc0 = b;
+		quadrant = (quadrant+1)%4;
+	}
 }
 
 void DFBGraphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)

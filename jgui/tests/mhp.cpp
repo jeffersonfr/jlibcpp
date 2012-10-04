@@ -187,8 +187,6 @@ class GraphicLayer : public ScreenLayer{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			g->SetDrawingFlags(jgui::JDF_BLEND);
-
 			_user_container->InvalidateAll();
 			_user_container->Paint(g);
 
@@ -322,8 +320,6 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 		virtual void PaintInternal(jgui::Graphics *g, ScreenLayer *layer)
 		{
 			g->Reset();
-			g->SetDrawingFlags(jgui::JDF_NOFX);
-			g->SetClip(GetX(), GetY(), GetWidth(), GetHeight());
 
 			layer->Paint(g);
 		}
@@ -344,7 +340,7 @@ class Scene : public jgui::Container, public jgui::KeyListener, public jthread::
 		jthread::Timer _timer;
 
 	private:
-		void Run() 
+		virtual void Run() 
 		{
 			if (Animated() == true) {
 				Repaint();
@@ -391,6 +387,16 @@ class Scene : public jgui::Container, public jgui::KeyListener, public jthread::
 		virtual bool Animated()
 		{
 			return false;
+		}
+
+		virtual void Show()
+		{
+			_timer.Start();
+		}
+
+		virtual void Hide()
+		{
+			_timer.Stop();
 		}
 
 };
@@ -574,8 +580,13 @@ int main(int argc, char **argv)
 		manager->GetVideoLayer()->Play();
 	}
 
-	ApplicationTest application;
+	ApplicationTest app;
+	
+	app.Show();
+
 	MenuTest menu;
+
+	menu.Show();
 
 	sleep(100000);
 

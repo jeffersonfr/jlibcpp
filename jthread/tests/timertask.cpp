@@ -35,7 +35,7 @@ class TaskTest : public jthread::TimerTask {
 			std::cout << "Task Destructor" << std::endl;
 		}
 
-		void Run() 
+		virtual void Run() 
 		{
 			std::cout << "Task running ..." << std::endl;
 		}
