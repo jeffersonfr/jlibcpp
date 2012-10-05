@@ -1131,66 +1131,87 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 
 void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, int y0p, int r0p)
 {
-	/*
-	Color color = GetColor();
-
+	std::vector<jgradient_t>::iterator i=_gradient_stops.begin();
+	Color color0 = i->color;
+	Color color1 = color0;
+	int start = 0;
+	int end = start;
 	int height = hp;
 
-	while (wp > 0 && hp > 0) {
-		UpdateGradientColor(scolor, dcolor, height, hp);
-		FillArc(xp, yp, wp, hp, 0, 2*M_PI);
+	Color color = GetColor();
 
-		xp += 1;
-		yp += 1;
-		wp -= 2;
-		hp -= 2;
+	for (; i!=_gradient_stops.end(); i++) {
+		jgradient_t t = (*i);
+
+		color1 = t.color;
+		end = (int)(height*t.stop);
+
+		for (int i=start; i<end; i++) {
+			UpdateGradientColor(color0, color1, abs(end-start), height-i);
+			FillArc(xcp, ycp, wp, hp, 0, 2*M_PI);
+
+			xcp += 1;
+			ycp += 1;
+			wp -= 2;
+			hp -= 2;
+
+			if (wp < 0 || hp < 0) {
+				break;
+			}
+		}
+
+		color0 = color1;
+		start = end;
 	}
 
 	SetColor(color);
-	*/
 }
 
 void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p)
 {
-	/*
+	if (_gradient_stops.size() == 0) {
+		return;
+	}
+
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
 	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	int line_width = _line_width;
-
-	_line_width = 1;
-
-	for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
-		jgradient_t gradient = (*i);
-
-		int sr = gradient.color.GetRed(),
-				sg = gradient.color.GetGreen(),
-				sb = gradient.color.GetBlue(),
-				sa = gradient.color.GetAlpha();
-
-		// cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
-	}
+	std::vector<jgradient_t>::iterator i=_gradient_stops.begin();
+	Color color0 = i->color;
+	Color color1 = color0;
+	int start = 0;
+	int end = start;
 
 	Color color = GetColor();
 
-	if (x1p != x2p) {
-		for (int i=0; i<w; i++) {
-			UpdateGradientColor(scolor, dcolor, w, i);
-			surface->DrawLine(surface, x+i, y, x+i, y+h-1);
+	for (; i!=_gradient_stops.end(); i++) {
+		jgradient_t t = (*i);
+
+		color1 = t.color;
+
+		if (x1p != x2p) {
+			end = (int)(w*t.stop);
+
+			for (int i=start; i<end; i++) {
+				UpdateGradientColor(color0, color1, abs(end-start), i);
+				_surface->DrawLine(_surface, x+i, y, x+i, y+h-1);
+			}
+		} else {
+			end = (int)(h*t.stop);
+
+			for (int i=start; i<end; i++) {
+				UpdateGradientColor(color0, color1, abs(end-start), i);
+				_surface->DrawLine(_surface, x, y+i, x+w-1, y+i);
+			}
 		}
-	} else {
-		for (int i=0; i<h; i++) {
-			UpdateGradientColor(scolor, dcolor, h, i);
-			surface->DrawLine(surface, x, y+i, x+w-1, y+i);
-		}
+
+		color0 = color1;
+		start = end;
 	}
 
 	SetColor(color);
-
-	_line_width = line_width;
-	*/
 }
 
 void DFBGraphics::DrawString(std::string text, int xp, int yp)
