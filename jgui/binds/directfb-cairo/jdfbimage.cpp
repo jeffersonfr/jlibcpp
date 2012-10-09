@@ -112,6 +112,11 @@ DFBImage::~DFBImage()
 		delete _graphics;
 		_graphics = NULL;
 	}
+	
+	if (_buffer != NULL) {
+		delete [] _buffer;
+		_buffer = NULL;
+	}
 }
 
 bool DFBImage::GetImageSize(std::string img, int *width, int *height)
