@@ -1502,11 +1502,14 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 		IDirectFBSurface *fsurface = (IDirectFBSurface *)(off->GetGraphics()->GetNativeSurface());
 
 		fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+		fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
 
 		jblitting_flags_t bf = GetBlittingFlags();
-		jcomposite_flags_t cf = GetCompositeFlags();
+		// jcomposite_flags_t cf = GetCompositeFlags();
 
+		SetBlittingFlags((jblitting_flags_t)(bf | JBF_COLORALPHA));
 		DrawImage(off, xp, yp);
+		SetBlittingFlags(bf);
 
 		delete off;
 	}

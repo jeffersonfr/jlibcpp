@@ -113,12 +113,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		void DrawEllipse0(int xcp, int ycp, int rxp, int ryp, int size);
-
-		/**
-		 * \brief
-		 *
-		 */
 		void DrawArc0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size, int quadrant);
 
 		/**

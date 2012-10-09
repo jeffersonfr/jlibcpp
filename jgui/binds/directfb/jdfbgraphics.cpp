@@ -672,56 +672,22 @@ void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
 
 void DFBGraphics::FillCircle(int xcp, int ycp, int rp)
 {
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
-	int r = SCALE_TO_SCREEN((_translate.x+xcp+rp), _screen.width, _scale.width)-xc;
-
-	DrawEllipse0(xc, yc, r, r, r);
+	FillArc(xcp, ycp, rp, rp, 0.0, 2*M_PI);
 }
 
 void DFBGraphics::DrawCircle(int xcp, int ycp, int rp)
 {
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
-
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
-
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
-	int r = SCALE_TO_SCREEN((_translate.x+xcp+rp), _screen.width, _scale.width)-xc;
-
-	if (line_width < 0) {
-		DrawEllipse0(xc, yc, r, r, -line_width);
-	} else {
-		DrawEllipse0(xc, yc, r+lw, r+lw, line_width);
-	}
+	DrawArc(xcp, ycp, rp, rp, 0.0, 2*M_PI);
 }
 
 void DFBGraphics::FillEllipse(int xcp, int ycp, int rxp, int ryp)
 {
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
-	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
-	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
-
-	DrawEllipse0(xc, yc, rx, ry, std::max(rx, ry));
+	FillArc(xcp, ycp, rxp, ryp, 0.0, 2*M_PI);
 }
 
 void DFBGraphics::DrawEllipse(int xcp, int ycp, int rxp, int ryp)
 {
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
-
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
-
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width); 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height);
-	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
-	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
-
-	if (line_width < 0) {
-		DrawEllipse0(xc, yc, rx, ry, -line_width);
-	} else {
-		DrawEllipse0(xc, yc, rx+lw, ry+lw, line_width);
-	}
+	DrawArc(xcp, ycp, rxp, ryp, 0.0, 2*M_PI);
 }
 
 void DFBGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
@@ -1239,11 +1205,14 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 		IDirectFBSurface *fsurface = (IDirectFBSurface *)(off->GetGraphics()->GetNativeSurface());
 
 		fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+		fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
 
 		jblitting_flags_t bf = GetBlittingFlags();
-		jcomposite_flags_t cf = GetCompositeFlags();
+		// jcomposite_flags_t cf = GetCompositeFlags();
 
+		SetBlittingFlags((jblitting_flags_t)(bf | JBF_COLORALPHA));
 		DrawImage(off, xp, yp);
+		SetBlittingFlags(bf);
 
 		delete off;
 	}
@@ -2900,98 +2869,6 @@ void DFBGraphics::DrawArcHelper(int xc, int yc, int rx, int ry, double arc0, dou
 		arc0 = b;
 		quadrant = (quadrant+1)%4;
 	}
-}
-
-void DFBGraphics::DrawEllipse0(int xc, int yc, int rx, int ry, int size)
-{
-	if (_surface == NULL) {
-		return;
-	}
-
-	if (size == 0) {
-		return;
-	}
-
-	double line_width = (double)size;
-	
-	if (line_width > std::max(rx, ry)) {
-		line_width = std::max(rx, ry);
-	}
-	
-	double min_rx = rx-line_width,
-				 min_ry = ry-line_width,
-				 max_rx = rx,
-				 max_ry = ry;
-	DFBRegion lines[4*(int)(max_rx+max_ry)];
-	int k = 0;
-
-	double angle = _radians;
-
-	if (max_rx < max_ry) {
-		angle = M_PI_2 - angle;
-	}
-
-	double amax = std::max(max_rx, max_ry),
-				 bmax = std::min(max_rx, max_ry),
-				 cmax = sqrt(amax*amax-bmax*bmax),
-				 xc_max = cmax*cos(angle),
-				 yc_max = cmax*sin(angle),
-				 A_max = amax*amax-xc_max*xc_max,
-				 B_max = amax*amax-yc_max*yc_max,
-				 C_max = -xc_max*yc_max,
-				 F_max = -amax*amax*bmax*bmax;
-	double amin = std::max(min_rx, min_ry),
-				 bmin = std::min(min_rx, min_ry),
-				 cmin = sqrt(amin*amin-bmin*bmin),
-				 xc_min = cmin*cos(angle),
-				 yc_min = cmin*sin(angle),
-				 A_min = amin*amin-xc_min*xc_min,
-				 B_min = amin*amin-yc_min*yc_min,
-				 C_min = -xc_min*yc_min,
-				 F_min = -amin*amin*bmin*bmin;
-
-	for (double y=-amax; y<=amax; y+=1.0) {
-		double xi = -1.0,
-					 xf = -1.0;
-		bool flag = false;
-
-		for (double x=-amax; x<=amax; x+=1.0) {
-			double min_ellipse = A_min*x*x + B_min*y*y + 2*C_min*x*y + F_min,
-						 max_ellipse = A_max*x*x + B_max*y*y + 2*C_max*x*y + F_max;
-
-			if (min_ellipse >= 0.0 && max_ellipse <= 0.0) {
-				if (flag == false) {
-					xi = x;
-				
-					flag = true;
-				}
-
-				xf = x;
-			} else if (min_ellipse < 1.0) {
-				if (flag == true) {
-					lines[k].x1 = (int)(xc+xi);
-					lines[k].y1 = (int)(yc+y);
-					lines[k].x2 = (int)(xc+x);
-					lines[k].y2 = (int)(yc+y);
-
-					k++;
-				
-					flag = false;
-				}
-			}
-		}
-
-		if (flag == true) {
-			lines[k].x1 = (int)(xc+xi);
-			lines[k].y1 = (int)(yc+y);
-			lines[k].x2 = (int)(xc+xf);
-			lines[k].y2 = (int)(yc+y);
-
-			k++;
-		}
-	}
-	
-	_surface->DrawLines(_surface, lines, k);
 }
 
 void DFBGraphics::DrawChord0(int xc, int yc, int rx, int ry, double arc0, double arc1, int size)
