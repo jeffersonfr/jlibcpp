@@ -325,12 +325,17 @@ void DFBGraphics::Clear(int xp, int yp, int wp, int hp)
 	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
 	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	_surface->SetPorterDuff(_surface, DSPD_CLEAR);
-	_surface->SetDrawingFlags(_surface, DSDRAW_NOFX);
-	_surface->FillRectangle(_surface, x, y, w, h);
+	IDirectFBSurface *sub;
+	DFBRectangle rect;
 
-	SetCompositeFlags(GetCompositeFlags());
-	SetDrawingFlags(GetDrawingFlags());
+	rect.x = x;
+	rect.y = y;
+	rect.w = w;
+	rect.h = h;
+
+	_surface->GetSubSurface(_surface, &rect, &sub);
+
+	sub->Clear(sub, 0x00, 0x00, 0x00, 0x00);
 }
 
 void DFBGraphics::Idle()
