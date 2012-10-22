@@ -9,10 +9,15 @@ STRIP			= $(HOST)strip
 
 DEBUG  		= -g -ggdb 
 
-INCLUDE		= -I. `pkg-config --cflags jlibcpp`
-LIBRARY 	= -L. `pkg-config --libs jlibcpp`
+CCFLAGS		= \
+						-Wall -funroll-loops -O2 \
+						$(DEBUG) \
+						-I. \
+						`pkg-config --cflags jlibcpp` \
 
-CCFLAGS		= -Wall -funroll-loops -O2 $(LDFLAGS) $(INCLUDE) $(DEBUG)
+LDFLAGS		+= \
+						 -L. \
+						 `pkg-config --libs jlibcpp` \
 
 ECHO			= echo -e
 
@@ -24,7 +29,7 @@ OBJS_teste = \
 all: teste
 	
 teste: $(OBJS_teste)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
