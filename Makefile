@@ -25,35 +25,37 @@ DOCDIR		= doc
 
 PREFIX		= /usr/local
 
-DEBUG  		= -g -ggdb 
-
 # {yes, no}
 ENABLE_DEBUG		?= no
-# {directfb, directfb-cairo}
-ENABLE_GRAPHICS ?= directfb
+# {directfb, directfb-cairo, x11}
+ENABLE_GRAPHICS ?= directfb-cairo
 
-ARFLAGS		= -rc
+DEBUG  		= \
+			-g -ggdb \
+
+ARFLAGS		= \
+			-rc \
+
 # -ansi: problemas com va_copy()
-CCFLAGS		= -Wall -shared -rdynamic -fpic -funroll-loops -O2
+CCFLAGS		= \
+			-Wall -shared -rdynamic -fpic -funroll-loops -O2 \
+		 	-D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
+			-I$(INCDIR) \
+			-Iwin32/win32 \
+			-Ijcommon/include \
+			-Ijgui/include \
+			-Ijio/include \
+			-Ijlogger/include \
+			-Ijmath/include \
+			-Ijmpeg/include \
+			-Ijresource/include \
+			-Ijsecurity/include \
+			-Ijshared/include \
+			-Ijsocket/include \
+			-Ijthread/include \
+			`pkg-config --cflags libssl` \
 
-INCLUDE		= \
-		 -I$(INCDIR) \
-		 -Iwin32/win32 \
-		 -Ijcommon/include \
-		 -Ijgui/include \
-		 -Ijio/include \
-		 -Ijlogger/include \
-		 -Ijmath/include \
-		 -Ijmpeg/include \
-		 -Ijresource/include \
-		 -Ijsecurity/include \
-		 -Ijshared/include \
-		 -Ijsocket/include \
-		 -Ijthread/include \
-		 `pkg-config --cflags libssl` \
-
-LIBRARY 	= \
-		 -L$(LIBDIR) \
+LDFLAGS		= \
 		 -lpthread \
 		 -ldl \
 		 -lrt \
@@ -64,75 +66,20 @@ DEFINES		= \
 		 -D_FILE_OFFSET_BITS=64 \
 		 -D_LARGEFILE_SOURCE \
 
-REQUIRES	= \
-		 libssl \
-
-ARFLAGS		+= \
-
-CCFLAGS		+= \
-		 $(LDFLAGS) \
-		 $(DEFINES) \
-		 $(DEBUG) \
-		 $(INCLUDE) \
-		 -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
-
-ECHO			= echo
-
-OK 				= \033[30;32mOK\033[m
-
 ifeq ($(ENABLE_DEBUG),yes)
-	INCLUDE 	+= \
-
 	DEFINES		+= \
 		 -DJDEBUG_ENABLED \
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),directfb)
-	INCLUDE 	+= \
-		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
-		 `pkg-config --cflags directfb` \
+REQUIRES	= \
+		 libssl \
 
-	DEFINES		+= \
-		 -DDIRECTFB_UI \
+ECHO			= echo
 
-	REQUIRES	+= \
-		 directfb \
+OK 				= \033[30;32mOK\033[m
 
-	OBJS_gfx	+= \
-		 jdfbhandler.o\
-		 jdfbfont.o\
-		 jdfbgraphics.o\
-		 jdfbimage.o\
-		 jdfbinputmanager.o\
-
-OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
-
-endif
-
-ifeq ($(ENABLE_GRAPHICS),directfb-cairo)
-	INCLUDE 	+= \
-		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
-		 `pkg-config --cflags directfb` \
-		 `pkg-config --cflags cairo` \
-
-	DEFINES		+= \
-		 -DDIRECTFB_CAIRO_UI \
-
-	REQUIRES	+= \
-		 directfb \
-		 cairo \
-
-	OBJS_gfx	+= \
-		 jdfbhandler.o\
-		 jdfbfont.o\
-		 jdfbgraphics.o\
-		 jdfbimage.o\
-		 jdfbinputmanager.o\
-
-OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
-
-endif
+include Makefile.gfx
 
 OBJS_jcommon += \
 	   jbitstream.o\
@@ -459,11 +406,11 @@ all: $(EXE)
 	
 $(EXE): $(SRCS)
 	@#$(AR) $(ARFLAGS) $(EXE) $(OBJS) 
-	@$(CC) $(CCFLAGS) -o $(EXE) $(SRCS) $(LIBRARY)
+	@$(CC) $(CCFLAGS) $(DEFINES) -o $(EXE) $(SRCS) $(LDFLAGS)
 	@mkdir -p $(BINDIR) $(LIBDIR) && mv $(EXE) $(LIBDIR)
 
 .cpp.o: $<  
-	@$(CC) $(CCFLAGS) -c $< -o $@ && $(ECHO) "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $(DEFINES) -c $< -o $@ && $(ECHO) "Compiling $< ...  $(OK)" 
 
 strip:
 	@$(ECHO) "Strip $(EXE)...  $(OK)"
@@ -498,7 +445,7 @@ install: uninstall
 		sed -e 's/@version@/$(VERSION)/g' | \
 		sed -e 's/@cflags@/$(DEFINES)/g' | \
 		sed -e 's/@requires@/$(REQUIRES)/g' | \
-		sed -e 's/@libs@/$(subst /,\/,$(LIBRARY))/g' > $(PREFIX)/lib/pkgconfig/$(MODULE).pc
+		sed -e 's/@libs@/$(subst /,\/,)/g' > $(PREFIX)/lib/pkgconfig/$(MODULE).pc
 
 uninstall:
 	@rm -rf $(PREFIX)/lib/pkgconfig/$(MODULE).pc $(PREFIX)/lib/lib$(MODULE).so $(PREFIX)/lib/$(EXE) 
