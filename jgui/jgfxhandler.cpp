@@ -28,6 +28,8 @@
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbhandler.h"
+#elif defined(X11_UI)
+#include "jsdlhandler.h"
 #endif
 
 namespace jgui {
@@ -63,7 +65,18 @@ GFXHandler * GFXHandler::GetInstance()
 			handler->InitEngine();
 			handler->InitResources();
 			handler->InitCursors();
+		} catch (...) {
+			_instance = NULL;
+		}
+#elif defined(X11_UI)
+		X11Handler *handler = NULL;
+		
+		try {
+			_instance = handler = new X11Handler();
 
+			handler->InitEngine();
+			handler->InitResources();
+			handler->InitCursors();
 		} catch (...) {
 			_instance = NULL;
 		}

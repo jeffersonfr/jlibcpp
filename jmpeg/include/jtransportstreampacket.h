@@ -120,12 +120,6 @@ class TransportStreamPacket
 		 */
 		static void GetPayload(uint8_t *packet, uint8_t *data, uint32_t *data_size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		static uint8_t GetPointerField(uint8_t *packet);
-
 };
 
 }

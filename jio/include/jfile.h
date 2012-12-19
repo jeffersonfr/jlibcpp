@@ -178,7 +178,7 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual std::vector<std::string> ListFiles(std::string extension = std::string(""));
+		virtual bool ListFiles(std::vector<std::string> *files, std::string extension = std::string(""));
 		
 		/**
 		 * \brief Retorna o descritor para o arquivo.

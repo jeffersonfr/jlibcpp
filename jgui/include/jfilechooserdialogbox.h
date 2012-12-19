@@ -79,25 +79,25 @@ class FileChooserDialogBox : public jgui::Frame, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		bool ShowFiles(std::string current_dir);
+		virtual bool ShowFiles(std::string current_dir);
 
 		/**
 		 * \brief
 		 *
 		 */
-		std::vector<std::string> ListFiles(std::string dirPath);
+		virtual bool ListFiles(std::string dirPath, std::vector<std::string> *files);
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsDirectory(std::string path);
+		virtual bool IsDirectory(std::string path);
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsFile(std::string path);
+		virtual bool IsFile(std::string path);
 
 	public:
 

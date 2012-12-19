@@ -56,7 +56,7 @@ int ProgramMapSection::GetPrograms(std::vector<ProgramMapSection::Program *> &pr
 		count;
 	uint8_t *data = (_data + 12 + program_info_length);
 
-	for (int i=0; number_of_programs>5; i++) {
+	for (int i=0; number_of_programs>=5; i++) {
 		stream_type = (uint16_t)((*(data))) & 0x000000ff;
 		reserved1 = (uint16_t)(((*(data + 1)) >> 5)) & 0x00000007;
 		elementary_pid = (uint16_t)(((*(data + 1)) << 8) | (*(data + 2))) & 0x00001fff;

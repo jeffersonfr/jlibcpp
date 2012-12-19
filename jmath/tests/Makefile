@@ -9,10 +9,15 @@ STRIP			= $(HOST)strip
 
 DEBUG  		= -g -ggdb 
 
-INCLUDE		= -I. `pkg-config --cflags jlibcpp`
-LIBRARY 	= -L. `pkg-config --libs jlibcpp`
+CCFLAGS		= \
+						-Wall -funroll-loops -O2 \
+						$(DEBUG) \
+						-I. \
+						`pkg-config --cflags jlibcpp` \
 
-CCFLAGS		= -Wall -funroll-loops -O2 $(LDFLAGS) $(INCLUDE) $(DEBUG)
+LDFLAGS		+= \
+						 -L. \
+						 `pkg-config --libs jlibcpp` \
 
 ECHO			= echo -e
 
@@ -30,13 +35,13 @@ OBJS_matrix = \
 all: complex_test uuid matrix
 	
 complex_test: $(OBJS_complex_test)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 uuid: $(OBJS_uuid)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 matrix: $(OBJS_matrix)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LIBRARY) ; $(ECHO) "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< && $(ECHO) "Compiling $< ...  $(OK)" 

@@ -2128,6 +2128,18 @@ void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scan
 
 	if (_draw_flags == JDF_NOFX) {
 		for (int j=0; j<h; j++) {
+			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch)+x;
+			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
+
+			double k = 0;
+			for (int i=0; i<w; i++) {
+				*dst++ = *(src+(int)k);
+
+				k = k + scale_x;
+			}
+		}
+		/*	
+		for (int j=0; j<h; j++) {
 			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
 			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
 
@@ -2135,6 +2147,7 @@ void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scan
 				*(dst+x+i) = *(src+(int)(i*scale_x));
 			}
 		}
+		*/
 	} else if (_draw_flags == JDF_BLEND) {
 		for (int j=0; j<h; j++) {
 			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);

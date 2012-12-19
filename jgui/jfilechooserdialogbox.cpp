@@ -156,7 +156,9 @@ void FileChooserDialogBox::SetExtensionIgnoreCase(bool b)
 
 bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 {
-	std::vector<std::string> files = ListFiles(current_dir);
+	std::vector<std::string> files;
+	
+	ListFiles(current_dir, &files);
 
 	if (files.size() == 0) {
 		return false;
@@ -224,11 +226,11 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 	return true;
 }
 
-std::vector<std::string> FileChooserDialogBox::ListFiles(std::string dirPath)
+bool FileChooserDialogBox::ListFiles(std::string dirPath, std::vector<std::string> *files)
 {
 	jio::File file(dirPath);
 
-	return file.ListFiles();
+	return file.ListFiles(files);
 }
 
 bool FileChooserDialogBox::IsDirectory(std::string path)

@@ -25,6 +25,8 @@
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbfont.h"
+#elif defined(X11_UI)
+#include "jsdlfont.h"
 #endif
 
 namespace jgui {
@@ -71,6 +73,8 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int hei
 {
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	return new DFBFont(name, attributes, height, scale_width, scale_height);
+#elif defined(X11_UI)
+	return new X11Font(name, attributes, height, scale_width, scale_height);
 #endif
 
 	return NULL;

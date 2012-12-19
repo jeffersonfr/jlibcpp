@@ -27,6 +27,10 @@
 #include "jdfbimage.h"
 #include "jdfbgraphics.h"
 #include "jdfbhandler.h"
+#elif defined(X11_UI)
+#include "jsdlimage.h"
+#include "jsdlgraphics.h"
+#include "jsdlhandler.h"
 #endif
 
 namespace jgui {
@@ -52,6 +56,8 @@ bool Image::GetImageSize(std::string img, int *width, int *height)
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	b = DFBImage::GetImageSize(img, width, height);
+#elif defined(X11_UI)
+	b = X11Image::GetImageSize(img, width, height);
 #endif
 
 	return b;
@@ -63,6 +69,8 @@ Image * Image::CreateImage(int width, int height, jpixelformat_t pixelformat, in
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	image = new DFBImage(width, height, pixelformat, scale_width, scale_height);
+#elif defined(X11_UI)
+	image = new X11Image(width, height, pixelformat, scale_width, scale_height);
 #endif
 
 	return image;
@@ -75,6 +83,11 @@ Image * Image::CreateImage(uint32_t *data, int width, int height, int scale_widt
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	image = new DFBImage(width, height, JPF_ARGB, scale_width, scale_height); // GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 
+	image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
+	image->GetGraphics()->SetRGB(data, 0, 0, width, height, width);
+#elif defined(X11_UI)
+	image = new X11Image(width, height, JPF_ARGB, scale_width, scale_height);
+	
 	image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
 	image->GetGraphics()->SetRGB(data, 0, 0, width, height, width);
 #endif
@@ -93,21 +106,23 @@ Image * Image::CreateImage(std::string file)
 {
 	Image *image = NULL;
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	int width,
 			height;
 
 	GetImageSize(file, &width, &height);
 
 	if (width > 0 && height > 0) {
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		image = new DFBImage(width, height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+#elif defined(X11_UI)
+		image = new X11Image(width, height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+#endif
 
 		if (image->GetGraphics()->DrawImage(file, 0, 0) == false) {
 			delete image;
 			image = NULL;
 		}
 	}
-#endif
 
 	return image;
 }
@@ -131,6 +146,8 @@ Image * Image::CreateImage(jio::InputStream *stream)
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	image = DFBImage::CreateImageStream(stream);
+#elif defined(X11_UI)
+	image = X11Image::CreateImageStream(stream);
 #endif
 
 	return image;
@@ -142,13 +159,7 @@ Image * Image::CreateImage(Image *image)
 		return NULL;
 	}
 
-	Image *clone = NULL;
-
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	clone = dynamic_cast<Image *>(image->Clone());
-#endif
-
-	return clone;
+	return dynamic_cast<Image *>(image->Clone());
 }
 
 Graphics * Image::GetGraphics()
@@ -160,16 +171,18 @@ Image * Image::Scaled(int width, int height)
 {
 	Image *image = NULL;
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	jsize_t scale = _graphics->GetWorkingScreenSize();
 
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	image = new DFBImage(width, height, GetPixelFormat(), scale.width, scale.height);
+#elif defined(X11_UI)
+	image = new X11Image(width, height, GetPixelFormat(), scale.width, scale.height);
+#endif
 
 	if (image->GetGraphics()->DrawImage(this, 0, 0, width, height) == false) {
 		delete image;
 		image = NULL;
 	}
-#endif
 
 	return image;
 }
@@ -178,16 +191,18 @@ Image * Image::SubImage(int x, int y, int width, int height)
 {
 	Image *image = NULL;
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	jsize_t scale = _graphics->GetWorkingScreenSize();
 
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	image = new DFBImage(width, height, GetPixelFormat(), scale.width, scale.height);
+#elif defined(X11_UI)
+	image = new X11Image(width, height, GetPixelFormat(), scale.width, scale.height);
+#endif
 
 	if (image->GetGraphics()->DrawImage(this, x, y, width, height, 0, 0) == false) {
 		delete image;
 		image = NULL;
 	}
-#endif
 
 	return image;
 }

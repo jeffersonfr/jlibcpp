@@ -306,13 +306,16 @@ int main(int argc, char **argv)
 	// if (data != NULL && r.GetResponseCode() == 200) {
 		int fd;
 
-		fd = open(url.GetFile().c_str(), (int)(O_CREAT | O_RDWR));
+		fd = open(url.GetFile().c_str(), (int)(O_CREAT | O_RDWR), 0644);
 
 		if (fd <= 0) {
 			fd = open(url.GetFile().c_str(), (int)(O_TRUNC | O_RDWR));
 		}
 
-		write(fd, data, size);
+		if (write(fd, data, size) < 0) {
+			perror("write error: ");
+		}
+
 	//}
 
 	ReleaseWindowsSocket();

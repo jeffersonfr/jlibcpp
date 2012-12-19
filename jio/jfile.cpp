@@ -780,12 +780,10 @@ void File::Flush()
 #endif
 }
 
-std::vector<std::string> File::ListFiles(std::string extension)
+bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 {
-	std::vector<std::string> files;
-
 	if (IsDirectory() == false) {
-		return files;
+		return false;
 	}
 
 #ifdef _WIN32
@@ -798,7 +796,7 @@ std::vector<std::string> File::ListFiles(std::string extension)
 
 	// Check that the input path plus 3 is not longer than MAX_PATH (three characters are for the "\*" plus NULL).
 	if (path.size() > (MAX_PATH - 3)) {
-		return files;
+		return false;
 	}
 
 	// First, copy the string to a buffer, then append '\*' to the directory name.
@@ -808,20 +806,20 @@ std::vector<std::string> File::ListFiles(std::string extension)
 	hFind = FindFirstFile(szDir, &ffd);
 
 	if (INVALID_HANDLE_VALUE == hFind) {
-		return files;
+		return false;
 	}
 
 	// List all the files in the directory with some info about them.
 
 	do {
 		if (extension == "") {
-			files.push_back(std::string(ffd.cFileName));
+			files->push_back(std::string(ffd.cFileName));
 		} else {
 			std::string file = std::string(ffd.cFileName);
 
 			if (file.size() > extension.size()) {
 				if (strcmp((const char *)(file.c_str()-extension.size()), extension.c_str()) == 0) {
-					files.push_back(file);
+					files->push_back(file);
 				}
 			}
 		}
@@ -840,7 +838,7 @@ std::vector<std::string> File::ListFiles(std::string extension)
 	FindClose(hFind);
 #else
 	if (_dir == NULL) {
-		return files;
+		return false;
 	}
 
 	struct dirent *namelist;
@@ -849,7 +847,7 @@ std::vector<std::string> File::ListFiles(std::string extension)
 
 	if (extension == "") {
 		while ((namelist = readdir(_dir)) != NULL) {
-			files.push_back(namelist->d_name);
+			files->push_back(namelist->d_name);
 
 			// WARN:: delete ??
 		}
@@ -861,7 +859,7 @@ std::vector<std::string> File::ListFiles(std::string extension)
 
 			if (file.size() > extension.size()) {
 				if (strcmp((const char *)(file.c_str()-extension.size()), extension.c_str()) == 0) {
-					files.push_back(file);
+					files->push_back(file);
 				}
 			}
 
@@ -870,7 +868,7 @@ std::vector<std::string> File::ListFiles(std::string extension)
 	}
 #endif
 	
-	return files;
+	return true;
 }
 
 void File::Move(std::string newpath_)
@@ -980,7 +978,11 @@ void File::Truncate(int64_t n)
 {
 #ifdef _WIN32
 #else
-	ftruncate(_fd, (off_t)n);
+	int r = ftruncate(_fd, (off_t)n);
+
+	if (r < 0) {
+		;
+	}
 #endif
 }
 

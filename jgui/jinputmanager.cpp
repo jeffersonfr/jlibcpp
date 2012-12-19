@@ -22,6 +22,8 @@
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbinputmanager.h"
+#elif defined(X11_UI)
+#include "jsdlinputmanager.h"
 #endif
 
 namespace jgui {
@@ -50,6 +52,13 @@ InputManager * InputManager::GetInstance()
 	if (_instance == NULL){
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		DFBInputManager *manager = new DFBInputManager();
+
+		manager->Initialize();
+		manager->Start();
+
+		_instance = manager;
+#elif defined(X11_UI)
+		X11InputManager *manager = new X11InputManager();
 
 		manager->Initialize();
 		manager->Start();

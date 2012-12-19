@@ -31,6 +31,8 @@
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include <directfb.h>
+#elif defined(X11_UI)
+#include <SDL2/SDL.h>
 #endif
 
 namespace jgui{
@@ -51,6 +53,7 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		IDirectFBWindow *_window;
 		IDirectFBSurface *_surface;
+#elif defined(X11_UI)
 #endif
 		std::vector<WindowListener *> _window_listeners;
 		jthread::Mutex _window_mutex;

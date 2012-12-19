@@ -26,6 +26,9 @@
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbhandler.h"
 #include "jdfbgraphics.h"
+#elif defined(X11_UI)
+#include "jsdlhandler.h"
+#include "jsdlgraphics.h"
 #endif
 
 namespace jgui {
@@ -55,6 +58,8 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 	_window = NULL;
 	
 	_graphics = new DFBGraphics(NULL, NULL, true);
+#elif defined(X11_UI)
+	_graphics = new X11Graphics(NULL, NULL, true);
 #endif
 
 	_opacity = 0xff;
@@ -75,9 +80,9 @@ Window::~Window()
 
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSING));
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	WindowManager::GetInstance()->Remove(this);
 
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	if (_window) {
 		_window->SetOpacity(_window, 0x00);
 	}
@@ -98,6 +103,13 @@ Window::~Window()
 		_window->Release(_window);
 		_window = NULL;
 	}
+#elif defined(X11_UI)
+	_graphics->Clear();
+
+	delete _graphics;
+	_graphics = NULL;
+
+	// TODO::
 #endif
 
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSED));
@@ -112,6 +124,8 @@ void * Window::GetNativeWindow()
 {
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	return _window;
+#elif defined(X11_UI)
+	return NULL;
 #endif
 
 	return NULL;
@@ -119,7 +133,7 @@ void * Window::GetNativeWindow()
 
 void Window::SetNativeWindow(void *native)
 {
-	if (native == NULL) {
+	if ((void *)native == NULL) {
 		return;
 	}
 
@@ -158,6 +172,8 @@ void Window::SetNativeWindow(void *native)
 	_graphics->SetNativeSurface(_surface);
 	
 	_graphics->Unlock();
+#elif defined(X11_UI)
+	// TODO::
 #endif
 }
 
@@ -230,6 +246,8 @@ void Window::InternalCreateWindow(void *params)
 	_graphics->SetNativeSurface(_surface);
 
 	_graphics->Unlock();
+#elif defined(X11_UI)
+	// TODO::
 #endif
 }
 
@@ -242,6 +260,7 @@ void Window::RaiseToTop()
 
 		WindowManager::GetInstance()->RaiseToTop(this);
 	}
+#elif defined(X11_UI)
 #endif
 }
 
@@ -254,6 +273,7 @@ void Window::LowerToBottom()
 
 		WindowManager::GetInstance()->LowerToBottom(this);
 	}
+#elif defined(X11_UI)
 #endif
 }
 
@@ -269,6 +289,7 @@ void Window::PutAtop(Window *w)
 
 		WindowManager::GetInstance()->PutWindowATop(this, w);
 	}
+#elif defined(X11_UI)
 #endif
 }
 
@@ -284,6 +305,7 @@ void Window::PutBelow(Window *w)
 
 		WindowManager::GetInstance()->PutWindowBelow(this, w);
 	}
+#elif defined(X11_UI)
 #endif
 }
 
@@ -333,6 +355,7 @@ void Window::SetBounds(int x, int y, int width, int height)
 		}
 	
 		_graphics->Unlock();
+#elif defined(X11_UI)
 #endif
 	}
 	
@@ -363,6 +386,7 @@ void Window::SetLocation(int x, int y)
 		if (_window != NULL) {
 			while (_window->MoveTo(_window, dx, dy) == DFB_LOCKED);
 		}
+#elif defined(X11_UI)
 #endif
 	}
 	
@@ -487,6 +511,7 @@ void Window::SetSize(int width, int height)
 		}
 	
 		_graphics->Unlock();
+#elif defined(X11_UI)
 #endif
 	}
 	
@@ -510,6 +535,7 @@ void Window::Move(int x, int y)
 		if (_window != NULL) {
 			while (_window->Move(_window, dx, dy) == DFB_LOCKED);
 		}
+#elif defined(X11_UI)
 #endif
 	}
 	
@@ -532,23 +558,12 @@ void Window::SetOpacity(int i)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, _opacity);
 	}
+#elif defined(X11_UI)
 #endif
 }
 
 int Window::GetOpacity()
 {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	/*
-	uint8_t o;
-
-	if (_window != NULL) {
-		_window->GetOpacity(_window, &o);
-
-		_opacity = o;
-	}
-	*/
-#endif
-
 	return _opacity;
 }
 
@@ -667,6 +682,8 @@ bool Window::Show(bool modal)
 	if (_window != NULL) {
 		SetOpacity(_opacity);
 	}
+#elif defined(X11_UI)
+	GFXHandler::GetInstance();
 #endif
 
 	Repaint();
@@ -682,6 +699,7 @@ bool Window::Hide()
 	if (_window != NULL) {
 		_window->SetOpacity(_window, 0x00);
 	}
+#elif defined(X11_UI)
 #endif
 
 	return true;
@@ -695,6 +713,7 @@ void Window::DumpScreen(std::string dir, std::string pre)
 
 		surface->Dump(surface, dir.c_str(), pre.c_str());
 	}
+#elif defined(X11_UI)
 #endif
 }
 
@@ -719,6 +738,7 @@ void Window::ReleaseWindow()
 
 	_window = NULL;
 	_surface = NULL;
+#elif defined(X11_UI)
 #endif
 }
 

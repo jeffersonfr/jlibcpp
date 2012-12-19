@@ -32,10 +32,6 @@
 #include <map>
 #include <list>
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-#include <directfb.h>
-#endif
-
 namespace jgui {
 
 class InputManager : public virtual jcommon::Object{
