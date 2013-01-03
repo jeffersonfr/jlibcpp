@@ -26,8 +26,9 @@
 
 #define MAX_SEMAPHORES	10
 
-// jthread::Semaphore sem;
-jthread::Condition sem;
+jthread::Mutex mutex;
+jthread::Semaphore sem;
+// jthread::Condition sem;
 int sem_value = 10;
 
 class NotifyAllSemaphore : public jthread::Thread {
@@ -50,8 +51,12 @@ class NotifyAllSemaphore : public jthread::Thread {
 			while (sem_value > 0) {
 				sem.Wait();
 			}
-					
+			
+			mutex.Lock();
+
 			std::cout << "Thread " << _id << " released." << std::endl;
+
+			mutex.Unlock();
 		}
 
 };
@@ -68,12 +73,14 @@ int main()
 		semaphores.push_back(nas);
 	}
 
-	while (sem_value > 0) {
-		sem_value = sem_value - 1;
-
+	while (sem_value-- > 0) {
 		sem.NotifyAll();
 
+		mutex.Lock();
+
 		std::cout << "NotifyAll:: " << sem_value << std::endl;
+
+		mutex.Unlock();
 
 		sleep(1);
 	}

@@ -55,13 +55,15 @@ class Semaphore : public virtual jcommon::Object{
 #endif
 			/** \brief */
 			Mutex _mutex;
+			/** \brief */
+			int _counter;
 
     public:
 			/**
 			 * \brief Construtor.
 			 *
 			 */
-			Semaphore(int value_ = 0);
+			Semaphore(int key = 0, int value = 0);
 
 			/**
 			 * \brief Destrutor virtual.

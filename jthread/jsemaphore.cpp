@@ -25,11 +25,13 @@
 
 namespace jthread {
 
-Semaphore::Semaphore(int value_):
+Semaphore::Semaphore(int key, int value):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jthread::Semaphore");
 	
+	_counter = 0;
+
 #ifdef _WIN32
 	BOOL inherit = TRUE;
 
@@ -42,12 +44,12 @@ Semaphore::Semaphore(int value_):
 	_sa->lpSecurityDescriptor = NULL;
 	_sa->bInheritHandle = TRUE;
 
-	if (value_ < 0) {
-		value_ = 0;
+	if (value < 0) {
+		value = 0;
 	}
 
 	// if ((_handler = CreateSemaphore(_sa, _count, _max_count, "NTcourse.semaphore.empty")) == NULL) {
-	if ((_handler = CreateSemaphore(_sa, value_, 65535, NULL)) == NULL) {
+	if ((_handler = CreateSemaphore(_sa, value, 65535, NULL)) == NULL) {
 		// if ((_handler = OpenSemaphore(SEMAPHORE_ALL_ACCESS, inherit, "NTcourse.semaphore.empty")) == NULL) {
 		DWORD code = GetLastError();
 		char *msg = NULL;
@@ -66,7 +68,7 @@ Semaphore::Semaphore(int value_):
 		// }
 	}
 #else
-	if (sem_init(&_handler, 0, value_) < 0) {
+	if (sem_init(&_handler, key, value) < 0) {
 		if (errno == EINVAL) {
 			throw SemaphoreException("Operation would increase the semaphore count !");
 		} else {
@@ -91,7 +93,17 @@ void Semaphore::Wait()
 			throw SemaphoreException("Waiting semaphore failed"); 
 	}
 #else
+	{
+		AutoLock lock(&_mutex);
+
+		_counter = _counter + 1;
+	}
+
 	if (sem_wait(&_handler) != 0) {
+		AutoLock lock(&_mutex);
+
+		_counter = _counter - 1;
+
 		throw SemaphoreException("Semaphore waiting failed");
 	}
 #endif
@@ -119,11 +131,21 @@ void Semaphore::Wait(uint64_t time_)
 	t.tv_sec += (int64_t)(time_/1000000LL);
 	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
 
+	{
+		AutoLock lock(&_mutex);
+
+		_counter = _counter + 1;
+	}
+
 	while ((result = sem_timedwait(&_handler, &t)) == -1 && errno == EINTR) {
 		continue; 
 	}
 
+	AutoLock lock(&_mutex);
+
 	if (result == -1) {
+		_counter = _counter - 1;
+
 		if (errno == ETIMEDOUT) {
 			throw SemaphoreTimeoutException("Semaphore wait timeout");
 		} else {
@@ -150,11 +172,15 @@ void Semaphore::Notify()
 		}
 	}
 #endif
+
+	_counter = _counter - 1;
 }
 
 void Semaphore::NotifyAll()
 {
 	AutoLock lock(&_mutex);
+
+	int r = _counter;
 
 #ifdef _WIN32
 	LONG value;
@@ -165,20 +191,16 @@ void Semaphore::NotifyAll()
 		ReleaseSemaphore(_handler, value, NULL);
 	}
 #else
-	int r;
-    
-	sem_getvalue(&_handler, &r);
-
-	while (r-- > 0) {
+	for (int i=0; i<r; i++) {
 		sem_post(&_handler);
 	}
 #endif
+	
+	_counter = _counter - r;
 }
 
 bool Semaphore::TryWait()
 {
-	AutoLock lock(&_mutex);
-
 #ifdef _WIN32
 	switch (WaitForSingleObject(_handler, 0L)) {
 		case WAIT_OBJECT_0:
@@ -190,11 +212,9 @@ bool Semaphore::TryWait()
 	return true;
 #else
 	if (sem_trywait(&_handler) < 0) {
-		if (errno == EAGAIN) {
-			return false;
+		if (errno != EAGAIN) {
+			throw SemaphoreException("Unknown semaphore error !");
 		}
-
-		throw SemaphoreException("Unknown semaphore error !");
 	}
 
 	return true;
