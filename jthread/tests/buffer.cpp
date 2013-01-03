@@ -27,8 +27,6 @@ class Source {
 
 	private:
 		jthread::IndexedBuffer *_buffer;
-		int _read_index;
-		int _pass_index;
 		int _packet_index;
 		int _packet_max;
 		char *_packet;
@@ -39,8 +37,6 @@ class Source {
 		{
 			_buffer = b;
 
-			_read_index = 0;
-			_pass_index = 0;
 			_flag = true;
 			_packet_index = 0;
 			_packet_max = 0;
@@ -54,7 +50,7 @@ class Source {
 
 		int read(char *data, int size)
 		{
-			jthread::jringbuffer_t t;
+			jthread::jbuffer_chunk_t t;
 			int r, 
 					d = _packet_max - _packet_index;
 
@@ -73,10 +69,10 @@ class Source {
 			_packet_index = 0;
 			_packet_max = 0;
 
-			r = _buffer->Read(&t, &_read_index, &_pass_index);
+			r = _buffer->Read(&t);
 
 			if (r < 0) {
-				_buffer->GetIndex(&_read_index, &_pass_index);
+				_buffer->GetIndex(&t);
 			} else {
 				memcpy(_packet, t.data, t.size);
 

@@ -39,7 +39,7 @@ ARFLAGS		= \
 # -ansi: problemas com va_copy()
 CCFLAGS		= \
 			-Wall -shared -rdynamic -fpic -funroll-loops -O2 \
-		 	-D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
+		 	$(DEBUG) -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
 			-I$(INCDIR) \
 			-Iwin32/win32 \
 			-Ijcommon/include \
@@ -67,7 +67,8 @@ DEFINES		= \
 		 -D_LARGEFILE_SOURCE \
 
 ifeq ($(ENABLE_DEBUG),yes)
-	DEFINES		+= \
+	
+DEFINES		+= \
 		 -DJDEBUG_ENABLED \
 
 endif

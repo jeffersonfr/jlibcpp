@@ -133,17 +133,22 @@ class PatInformation{
 		{
 			if (jmpeg::TransportStreamPacket::GetProgramID(packet) == 0) {
 				if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(packet) == 1) {
-					jmpeg::ProgramAssociationSection *psi = new jmpeg::ProgramAssociationSection();
+					if (packet[0] != 0x00) { // table_id = 0x00 (program association section)
+						return NULL;
+					}
 
+					jmpeg::ProgramAssociationSection *psi = new jmpeg::ProgramAssociationSection();
 					uint8_t pointer,
 							payload[188];
 					uint32_t size;
 
-					jmpeg::TransportStreamPacket::GetPayload(packet, payload, &size);
+					pointer = 1;
 
-					pointer = jmpeg::TransportStreamPacket::GetPointerField(packet);
-
-					psi->Push((payload + pointer + 1), size - pointer - 1);
+					if (jmpeg::TransportStreamPacket::HasAdaptationField(packet) == true) {
+						pointer = packet[0] + 1;
+					}
+					
+					psi->Push((payload + pointer), size - pointer);
 
 					return psi;
 				}
@@ -332,17 +337,22 @@ class PmtInformation{
 		static jmpeg::ProgramMapSection * GetPmtSection(uint8_t *packet)
 		{
 			if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(packet) == 1) {
-				jmpeg::ProgramMapSection *psi = new jmpeg::ProgramMapSection();
+				if (packet[0] != 0x00) { // table_id = 0x00 (program association section)
+					return NULL;
+				}
 
+				jmpeg::ProgramMapSection *psi = new jmpeg::ProgramMapSection();
 				uint8_t pointer,
-						payload[188];
+								payload[188];
 				uint32_t size;
 
-				jmpeg::TransportStreamPacket::GetPayload(packet, payload, &size);
+				pointer = 1;
 
-				pointer = jmpeg::TransportStreamPacket::GetPointerField(packet);
+				if (jmpeg::TransportStreamPacket::HasAdaptationField(packet) == true) {
+					pointer = packet[0] + 1;
+				}
 
-				psi->Push((payload + pointer + 1), size - pointer - 1);
+				psi->Push((payload + pointer), size - pointer);
 
 				return psi;
 			}

@@ -45,11 +45,13 @@ IndexedBuffer::IndexedBuffer(int size, int chunk, jbuffer_type_t type_):
 		throw BufferException("Range of chunk size error");
 	}
 
-	_buffer = new jringbuffer_t[_buffer_size];
+	_buffer = new jbuffer_chunk_t[_buffer_size];
 
 	for (int i=0; i<_buffer_size; i++) {
 		_buffer[i].data = new uint8_t[chunk];
 		_buffer[i].size = chunk;
+		_buffer[i].rindex = -1;
+		_buffer[i].pindex = -1;
 	}
 }
 
@@ -114,11 +116,13 @@ void IndexedBuffer::SetNodesSize(int size)
 
 	_buffer_size = size;
 
-	_buffer = new jringbuffer_t[_buffer_size];
+	_buffer = new jbuffer_chunk_t[_buffer_size];
 
 	for (int i=0; i<_buffer_size; i++) {
 		_buffer[i].data = new uint8_t[_chunk_size];
 		_buffer[i].size = _chunk_size;
+		_buffer[i].rindex = -1;
+		_buffer[i].pindex = -1;
 	}
 }
 
@@ -132,19 +136,20 @@ int IndexedBuffer::GetNodesSize()
 	return _buffer_size;
 }
 
-int IndexedBuffer::GetIndex(int *rindex, int *pindex)
+int IndexedBuffer::GetIndex(jbuffer_chunk_t *chunk)
 {
 	AutoLock lock(&_mutex);
 
-	(*rindex) = _write_index;
-	(*pindex) = _pass_index;
+	chunk->size = 0;
+	chunk->rindex = _write_index;
+	chunk->pindex = _pass_index;
 
 	return 0;
 }
 
-int IndexedBuffer::GetAvailable(int *rindex, int *pindex)
+int IndexedBuffer::GetAvailable(jbuffer_chunk_t *chunk)
 {
-	if ((*rindex < 0 || *rindex >= _buffer_size) || *pindex < 0) {
+	if ((chunk->rindex < 0 || chunk->rindex >= _buffer_size) || chunk->pindex < 0) {
 		return -1;
 	}
 
@@ -153,15 +158,15 @@ int IndexedBuffer::GetAvailable(int *rindex, int *pindex)
 	int i,
 		amount = 0;
 	
-	if (*pindex == _pass_index) {
-		if (*rindex < _write_index) {
-			for (i=*rindex; i<_write_index; i++) {
+	if (chunk->pindex == _pass_index) {
+		if (chunk->rindex < _write_index) {
+			for (i=chunk->rindex; i<_write_index; i++) {
 				amount = amount + _buffer[i].size;
 			}
 		}
-	} else if (*pindex == (_pass_index-1)) {
-		if (*rindex > _write_index) {
-			for (i=*rindex; i<_buffer_size; i++) {
+	} else if (chunk->pindex == (_pass_index-1)) {
+		if (chunk->rindex > _write_index) {
+			for (i=chunk->rindex; i<_buffer_size; i++) {
 				amount = amount + _buffer[i].size;
 			}
 			for (i=0; i<_write_index; i++) {
@@ -173,22 +178,22 @@ int IndexedBuffer::GetAvailable(int *rindex, int *pindex)
 	return amount;
 }
 
-int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
+int IndexedBuffer::Read(jbuffer_chunk_t *chunk)
 {
 	/*
-	if ((*rindex < 0 || *rindex >= _buffer_size) || *pindex < 0) {
+	if ((chunk->rindex < 0 || chunk->rindex >= _buffer_size) || chunk->pindex < 0) {
 		return -1;
 	}
 	*/
 
 	AutoLock lock(&_mutex);
 
-	if (*pindex == _pass_index) {
-		if (*rindex > _write_index) {
+	if (chunk->pindex == _pass_index) {
+		if (chunk->rindex > _write_index) {
 			return -1;
 		}
 
-		while (*rindex == _write_index) {
+		while (chunk->rindex == _write_index) {
 			try {
 				_semaphore.Wait(&_mutex);
 			} catch (jthread::SemaphoreException &) {
@@ -196,33 +201,33 @@ int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 			}
 		}
 
-		struct jringbuffer_t *t = &_buffer[*rindex];
+		struct jbuffer_chunk_t *t = &_buffer[chunk->rindex];
 
 		// memcpy(data->data, t->data, t->size);
 
-		data->data = t->data;
-		data->size = t->size;
+		chunk->data = t->data;
+		chunk->size = t->size;
 
-		if (++(*rindex) >= _buffer_size) {
-			(*rindex) = 0;
-			(*pindex)++;
+		if (++chunk->rindex >= _buffer_size) {
+			chunk->rindex = 0;
+			chunk->pindex++;
 		}
 
 		return t->size;
-	} else if (*pindex == (_pass_index-1)) {
+	} else if (chunk->pindex == (_pass_index-1)) {
 		AutoLock lock(&_mutex);
 
-		if (*rindex > _write_index) {
-			struct jringbuffer_t *t = &_buffer[*rindex];
+		if (chunk->rindex > _write_index) {
+			struct jbuffer_chunk_t *t = &_buffer[chunk->rindex];
 
 			// memcpy(data->data, t->data, t->size);
 
-			data->data = t->data;
-			data->size = t->size;
+			chunk->data = t->data;
+			chunk->size = t->size;
 
-			if (++(*rindex) >= _buffer_size) {
-				(*rindex) = 0;
-				(*pindex)++;
+			if (++chunk->rindex >= _buffer_size) {
+				chunk->rindex = 0;
+				chunk->pindex++;
 			}
 
 			return t->size;
@@ -232,22 +237,22 @@ int IndexedBuffer::Read(jringbuffer_t *data, int *rindex, int *pindex)
 	return -1;
 }
 
-int IndexedBuffer::Read(uint8_t *data, int size, int *rindex, int *pindex)
+int IndexedBuffer::Read(jbuffer_chunk_t *chunk, int size)
 {
 	/*
-	if ((*rindex < 0 || *rindex >= _buffer_size) || *pindex < 0) {
+	if ((chunk->rindex < 0 || chunk->rindex >= _buffer_size) || chunk->pindex < 0) {
 		return -1;
 	}
 	*/
 
 	AutoLock lock(&_mutex);
 
-	if (*pindex == _pass_index) {
-		if (*rindex > _write_index) {
+	if (chunk->pindex == _pass_index) {
+		if (chunk->rindex > _write_index) {
 			return -1;
 		}
 
-		while (*rindex == _write_index) {
+		while (chunk->rindex == _write_index) {
 			try {
 				_semaphore.Wait(&_mutex);
 			} catch (jthread::SemaphoreException &) {
@@ -255,59 +260,67 @@ int IndexedBuffer::Read(uint8_t *data, int size, int *rindex, int *pindex)
 			}
 		}
 
-		struct jringbuffer_t *t = &_buffer[*rindex];
+		struct jbuffer_chunk_t *t = &_buffer[chunk->rindex];
 
-		if (size <= (t->size-t->index)) {
-			memcpy(data, t->data+t->index, size);
+		int diff = t->size-chunk->size;
+
+		if (size <= diff) {
+			memcpy(chunk->data, t->data+chunk->size, size);
 			
-			t->index = t->index + size;
+			chunk->size = chunk->size + size;
 
-			if (t->index == t->size) {
-				if (++(*rindex) >= _buffer_size) {
-					(*rindex) = 0;
-					(*pindex)++;
+			if (chunk->size >= t->size) {
+				if (++chunk->rindex >= _buffer_size) {
+					chunk->size = 0;
+					chunk->rindex = 0;
+					chunk->pindex++;
 				}
 			}
 
 			return size;
 		} else {
-			memcpy(data, t->data+t->index, t->size-t->index);
+			memcpy(chunk->data, t->data+chunk->size, diff);
 
-			if (++(*rindex) >= _buffer_size) {
-				(*rindex) = 0;
-				(*pindex)++;
+			if (++chunk->rindex >= _buffer_size) {
+				chunk->size = 0;
+				chunk->rindex = 0;
+				chunk->pindex++;
 			}
 
-			return t->size-t->index;
+			return diff;
 		}
-	} else if (*pindex == (_pass_index-1)) {
+	} else if (chunk->pindex == (_pass_index-1)) {
 		AutoLock lock(&_mutex);
 
-		if (*rindex > _write_index) {
-			struct jringbuffer_t *t = &_buffer[*rindex];
+		if (chunk->rindex > _write_index) {
+			struct jbuffer_chunk_t *t = &_buffer[chunk->rindex];
 
-			if (size <= (t->size-t->index)) {
-				memcpy(data, t->data+t->index, size);
+			int diff = t->size-chunk->size;
 
-				t->index = t->index + size;
+			if (size <= diff) {
+				memcpy(chunk->data, t->data+chunk->size, size);
 
-				if (t->index == t->size) {
-					if (++(*rindex) >= _buffer_size) {
-						(*rindex) = 0;
-						(*pindex)++;
+				chunk->size = chunk->size + size;
+
+				if (chunk->size == t->size) {
+					if (++chunk->rindex >= _buffer_size) {
+						chunk->size = 0;
+						chunk->rindex = 0;
+						chunk->pindex++;
 					}
 				}
 
 				return size;
 			} else {
-				memcpy(data, t->data+t->index, t->size-t->index);
+				memcpy(chunk->data, t->data+chunk->size, diff);
 
-				if (++(*rindex) >= _buffer_size) {
-					(*rindex) = 0;
-					(*pindex)++;
+				if (++chunk->rindex >= _buffer_size) {
+					chunk->size = 0;
+					chunk->rindex = 0;
+					chunk->pindex++;
 				}
 
-				return t->size-t->index;
+				return diff;
 			}
 		}
 	}
@@ -334,12 +347,11 @@ int IndexedBuffer::Write(uint8_t*data, int size)
 	{
 		AutoLock lock(&_mutex);
 		
-		jringbuffer_t *t = &_buffer[_write_index++];
+		jbuffer_chunk_t *t = &_buffer[_write_index++];
 	
 		memcpy(t->data, data, length);
 		
 		t->size = length;
-		t->index = 0;
 
 		if (_write_index >= _buffer_size) {
 			_write_index = 0;
@@ -354,15 +366,6 @@ int IndexedBuffer::Write(uint8_t*data, int size)
 	}
 	
 	return size;
-}
-
-int IndexedBuffer::Write(jringbuffer_t *data)
-{
-	if ((void *)data == NULL) {
-		return -1;
-	}
-
-	return Write(data->data, data->size);
 }
 
 }

@@ -55,10 +55,11 @@ enum jbuffer_type_t {
  * \brief Buffer node.
  *
  */
-struct jringbuffer_t {
+struct jbuffer_chunk_t {
 	uint8_t *data;	// buffer
-	int size,				// size of buffer
-			index;			// read index
+	int size;				// size of buffer
+	int rindex;
+	int pindex;
 };
 
 /**
@@ -70,7 +71,7 @@ class IndexedBuffer : public virtual jcommon::Object{
 
     private:
 		/** \brief */
-		jringbuffer_t *_buffer;
+		jbuffer_chunk_t *_buffer;
 		/** \brief */
 		int _buffer_size;
 		/** \brief */
@@ -139,7 +140,7 @@ class IndexedBuffer : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		int GetIndex(int *rindex, int *pindex);
+		int GetIndex(jbuffer_chunk_t *chunk);
 
 		/**
 		 * \brief Returns the current size of buffer.
@@ -148,7 +149,7 @@ class IndexedBuffer : public virtual jcommon::Object{
 		 * retorna o tamanho atual do buffer.
 		 *
 		 */
-		int GetAvailable(int *rindex, int *pindex);
+		int GetAvailable(jbuffer_chunk_t *chunk);
 
 		/**
 		 * \brief Read a chunk.
@@ -156,7 +157,7 @@ class IndexedBuffer : public virtual jcommon::Object{
 		 * \param data Data deve conter no minimo o tamanho de chunk. A funcao retorna o tamanho lido em size.
 		 *
 		 */
-		int Read(jringbuffer_t *data, int *rindex, int *pindex);
+		int Read(jbuffer_chunk_t *chunk);
 
 		/**
 		 * \brief Read a chunk.
@@ -164,19 +165,13 @@ class IndexedBuffer : public virtual jcommon::Object{
 		 * \param data Data deve conter no minimo o tamanho de chunk. A funcao retorna o tamanho lido em size.
 		 *
 		 */
-		int Read(uint8_t *data, int size, int *rindex, int *pindex);
+		int Read(jbuffer_chunk_t *chunk, int size);
 
 		/**
 		 * \brief 
 		 *
 		 */
 		int Write(uint8_t *data, int size);
-
-		/**
-		 * \brief 
-		 *
-		 */
-		int Write(jringbuffer_t *data);
 
 };
 

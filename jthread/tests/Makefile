@@ -62,7 +62,10 @@ OBJS_timertask = \
 OBJS_spin = \
 		spin.o\
 
-all: counter buffer stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin
+OBJS_notifyall = \
+		notifyall.o\
+
+all: counter buffer stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin notifyall
 
 counter: $(OBJS_counter)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -103,6 +106,9 @@ timertask: $(OBJS_timertask)
 spin: $(OBJS_spin)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+notifyall: $(OBJS_notifyall)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -110,4 +116,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ counter buffer stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin
+	@rm -rvf *.o *~ counter buffer stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin notifyall
