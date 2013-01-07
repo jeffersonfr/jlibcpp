@@ -17,22 +17,23 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SHAREDMEMORYEXCEPTION_H
-#define J_SHAREDMEMORYEXCEPTION_H
+#ifndef J_OUTOFMEMORYEXCEPTION_H
+#define J_OUTOFMEMORYSEXCEPTION_H
 
 #include "jruntimeexception.h"
 
 #include <stdexcept>
 #include <string>
+#include <cstring>
 
-namespace jshared {
+namespace jcommon {
 
 /**
- * \brief SocketException.
+ * \brief Exception.
  *
  * \author Jeff Ferr
  */
-class SharedMemoryException : public jcommon::RuntimeException{
+class OutOfMemoryException : public jcommon::RuntimeException{
 
 	private:
 
@@ -41,13 +42,13 @@ class SharedMemoryException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		SharedMemoryException(std::string);
+		OutOfMemoryException(std::string);
 
 		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual ~SharedMemoryException() throw();
+		virtual ~OutOfMemoryException() throw();
 
 };
 

@@ -215,6 +215,8 @@ bool Semaphore::TryWait()
 		if (errno != EAGAIN) {
 			throw SemaphoreException("Unknown semaphore error !");
 		}
+
+		return false;
 	}
 
 	return true;
@@ -230,18 +232,14 @@ int Semaphore::GetValue()
 	
 	return value;
 #else
-	int r;
-    
-	sem_getvalue(&_handler, &r);
-    
-	return r;
+	return _counter;
 #endif
 }
 
 void Semaphore::Release()
 {
 	try {
-		NotifyAll();
+		// NotifyAll();
 	} catch (SemaphoreException &) {
 	}
 

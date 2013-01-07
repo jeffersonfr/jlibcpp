@@ -105,6 +105,7 @@ OBJS_jcommon += \
 	   jobservable.o\
 	   jobserver.o\
 	   joutofboundsexception.o\
+	   joutofmemoryexception.o\
 	   joptions.o\
 		 jparserexception.o\
 	   jproperties.o\
@@ -262,6 +263,7 @@ OBJS_jthread += \
 	   jrwlock.o\
 	   jrunnable.o\
 	   jsemaphore.o\
+	   jnamedsemaphore.o\
 	   jthread.o\
 	   jthreadexception.o\
 	   jsemaphoreexception.o\

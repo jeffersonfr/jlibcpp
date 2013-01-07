@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jinetaddress4.h"
+#include "jinetaddress6.h"
 #include "jsocketlib.h"
 
 #include <iostream>
@@ -35,6 +36,7 @@ int main(int argc, char **argv)
 	InitWindowsSocket();
 
 	InetAddress *inet = InetAddress4::GetByName(argv[1]);
+	// InetAddress *inet = InetAddress6::GetByName(argv[1]);
 
 	std::cout << "by name:: [" << inet->GetHostName() << ", " << inet->GetHostAddress() << "]" << std::endl;
 

@@ -18,17 +18,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jmemoryexception.h"
+#include "joutofmemoryexception.h"
 
-namespace jshared {
+namespace jcommon {
 
-SharedMemoryException::SharedMemoryException(std::string reason_):
-    jcommon::RuntimeException(reason_)
+OutOfMemoryException::OutOfMemoryException(std::string reason_):
+    RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jshared::SharedMemoryException");
+	jcommon::Object::SetClassName("jcommon::OutOfMemoryException");
 }
 
-SharedMemoryException::~SharedMemoryException() throw()
+OutOfMemoryException::~OutOfMemoryException() throw()
 {
 }
 

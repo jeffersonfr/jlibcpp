@@ -17,37 +17,103 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SHAREDMEMORYEXCEPTION_H
-#define J_SHAREDMEMORYEXCEPTION_H
+#ifndef J_NAMEDSEMAPHORE_H
+#define J_NAMEDSEMAPHORE_H
 
-#include "jruntimeexception.h"
+#include "jmutex.h"
 
-#include <stdexcept>
+#ifdef _WIN32
+#include <windows.h>
+#include <winuser.h>
+#include <winbase.h>
 #include <string>
+#else
+#include <sys/types.h>
+#include <semaphore.h>
+#endif
 
-namespace jshared {
+#include <stdint.h>
+
+namespace jthread {
 
 /**
- * \brief SocketException.
+ * \brief NamedSemaphore.
  *
- * \author Jeff Ferr
+ * @author Jeff Ferr
  */
-class SharedMemoryException : public jcommon::RuntimeException{
+class NamedSemaphore : public virtual jcommon::Object{
 
-	private:
+    private:
+#ifdef _WIN32
+#else
+			/** \brief NamedSemaphore handler. */
+			sem_t *_handler;
+#endif
+			/** \brief */
+			Mutex _mutex;
+			/** \brief */
+			int _counter;
 
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		SharedMemoryException(std::string);
+    public:
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			NamedSemaphore(std::string file, int mode, int value = 0);
 
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~SharedMemoryException() throw();
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			NamedSemaphore(std::string file);
+
+			/**
+			 * \brief Destrutor virtual.
+			 *
+			 */
+			virtual ~NamedSemaphore();
+
+			/**
+			 * \brief Lock the semaphore.
+			 *
+			 */
+			void Wait();
+
+			/**
+			 * \brief Lock semaphore.
+			 *
+			 */
+			void Wait(uint64_t time_);
+
+			/**
+			 * \brief Notify the locked semaphore.
+			 *
+			 */
+			void Notify();
+
+			/**
+			 * \brief Notify all locked semaphores.
+			 *
+			 */
+			void NotifyAll();
+
+			/**
+			 * \brief Try lock the semaphore.
+			 *
+			 */
+			bool TryWait();
+
+			/**
+			 * \brief
+			 *
+			 */
+			int GetValue();
+
+			/**
+			 * \brief
+			 *
+			 */
+			void Release();
 
 };
 

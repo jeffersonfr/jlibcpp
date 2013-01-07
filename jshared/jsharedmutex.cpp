@@ -48,11 +48,11 @@ SharedMutex::SharedMutex(void *data_, int64_t size_):
 	_size = size_;
 
 	if ((void *)data_ == NULL) {
-		throw MemoryException("Data parameter was NULL");
+		throw SharedMemoryException("Data parameter was NULL");
 	}
 	
 	if (_size <= 0LL) {
-		throw MemoryException("Size parameter was 0");
+		throw SharedMemoryException("Size parameter was 0");
 	}
 #endif
 }
@@ -67,11 +67,11 @@ void SharedMutex::Lock()
 #ifdef _WIN32
 #else	
 	if ((void *)_shmp == NULL) {
-		throw MemoryException("Null pointer exception");
+		throw SharedMemoryException("Null pointer exception");
 	}
 	
 	if (mlock(_shmp, (size_t)_size) < 0) {
-		throw MemoryException("Lock memory error");
+		throw SharedMemoryException("Lock memory error");
 	}
 #endif
 }
@@ -81,11 +81,11 @@ void SharedMutex::Unlock()
 #ifdef _WIN32
 #else	
 	if ((void *)_shmp == NULL) {
-		throw MemoryException("Null pointer exception");
+		throw SharedMemoryException("Null pointer exception");
 	}
 	
 	if (munlock(_shmp, (size_t)_size) < 0) {
-		throw MemoryException("Unlock memory error");
+		throw SharedMemoryException("Unlock memory error");
 	}
 #endif
 }
@@ -95,7 +95,7 @@ void SharedMutex::LockAll()
 #ifdef _WIN32
 #else	
 	if ((void *)_shmp != NULL) {
-		throw MemoryException("Null pointer exception");
+		throw SharedMemoryException("Null pointer exception");
 	}
 	
 	int flags = 0;
@@ -109,7 +109,7 @@ void SharedMutex::LockAll()
 	}
 
 	if (mlockall(flags) < 0) {
-		throw MemoryException("Lock error");
+		throw SharedMemoryException("Lock error");
 	}
 #endif
 }
@@ -119,11 +119,11 @@ void SharedMutex::UnlockAll()
 #ifdef _WIN32
 #else	
 	if ((void *)_shmp == NULL) {
-		throw MemoryException("Null pointer exception");
+		throw SharedMemoryException("Null pointer exception");
 	}
 	
 	if (munlockall() < 0) {
-		throw MemoryException("Unlock error");
+		throw SharedMemoryException("Unlock error");
 	}
 #endif
 }

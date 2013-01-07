@@ -48,20 +48,20 @@ MemoryMap::MemoryMap(std::string filename_, jmemory_flags_t flags_, jmemory_perm
 	
 	if (_fd < 0) {
 		if ((f | JMF_CREAT) != 0) {
-			throw MemoryException("Error creating a shared file");
+			throw SharedMemoryException("Error creating a shared file");
 		} else {
-			throw MemoryException("Error opening a shared file");
+			throw SharedMemoryException("Error opening a shared file");
 		}
 	}
 	
 	if ((flags_ & JMF_CREAT) != 0) {
 		if (write(_fd, "", 1) < 0) {
-			throw MemoryException("Error creating shared memory");
+			throw SharedMemoryException("Error creating shared memory");
 		}
 	}
 
 	if (fstat(_fd, &_stats) < 0) {
-		throw MemoryException("Error getting stats of shared file");
+		throw SharedMemoryException("Error getting stats of shared file");
 	}
 
 	uint32_t t = 0;
@@ -89,7 +89,7 @@ MemoryMap::MemoryMap(std::string filename_, jmemory_flags_t flags_, jmemory_perm
 	}
 
 	if (_start == MAP_FAILED) {
-		throw MemoryException("Creating memory map failed");
+		throw SharedMemoryException("Creating memory map failed");
 	}
 	
 	_is_open = true;
@@ -108,7 +108,7 @@ int64_t MemoryMap::Get(char *data_, int64_t size_, int64_t offset_)
 #else
 	// TODO:: tratar mmap2 com offset
 	if (size_ > _stats.st_size) {
-		// throw MemoryException("Size cause overflow in memory");
+		// throw SharedMemoryException("Size cause overflow in memory");
 		
 		size_ = _stats.st_size;
 	}
@@ -126,7 +126,7 @@ int64_t MemoryMap::Put(const char *data_, int64_t size_, int64_t offset_)
 #else
 	// TODO:: tratar mmap2 com offset
 	if (size_ > _stats.st_size) {
-		throw MemoryException("Size cause overflow in memory");
+		throw SharedMemoryException("Size cause overflow in memory");
 	}
 
 	memcpy(_start, data_, size_);
@@ -169,7 +169,7 @@ void MemoryMap::SetPermission(jmemory_permission_t perms_)
 	}
 
 	if (mprotect(_start, _stats.st_size, t) < 0) {
-		throw MemoryException("Set permission failed");
+		throw SharedMemoryException("Set permission failed");
 	}
 #endif
 }
@@ -195,15 +195,15 @@ void MemoryMap::Release()
 	
 	if (r < 0) {
 		if (errno == EINVAL) {
-			throw MemoryException("We don't like start or length or offset");
+			throw SharedMemoryException("We don't like start or length or offset");
 		} else if (errno == EAGAIN) {
-			throw MemoryException("The file has been locked, or too much memory has been locked");
+			throw SharedMemoryException("The file has been locked, or too much memory has been locked");
 		} else if (errno == ENOMEM) {
-			throw MemoryException("No memory is available, or the process's maximum number of mappings would have been exceeded");
+			throw SharedMemoryException("No memory is available, or the process's maximum number of mappings would have been exceeded");
 		// } else if (errno == SIGSEGV) {
-		// 	throw MemoryException("Attempted write into a region specified to mmap as read-only");
+		// 	throw SharedMemoryException("Attempted write into a region specified to mmap as read-only");
 		} else {
-			throw MemoryException("Release failed");
+			throw SharedMemoryException("Release failed");
 		}
 	}
 

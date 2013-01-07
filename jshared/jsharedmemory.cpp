@@ -41,13 +41,13 @@ SharedMemory::SharedMemory(key_t key_, int memsize_, int perms_):
 	if (_id < 0) {
 		/*
 		if (errno == EINVAL) {
-			throw MemoryException("Mem size < SHMMIN or > SHMMAXError opening a shared memory");
+			throw SharedMemoryException("Mem size < SHMMIN or > SHMMAXError opening a shared memory");
 		} else if (errno == EEXIST) {
-			throw MemoryException("Shared memory key already created");
+			throw SharedMemoryException("Shared memory key already created");
 		} else if (errno == ENOMEM) {
-			throw MemoryException("No memory could be allocated for segment overhead");
+			throw SharedMemoryException("No memory could be allocated for segment overhead");
 		} else {
-			throw MemoryException("Cannot create a new shared memory");
+			throw SharedMemoryException("Cannot create a new shared memory");
 		}
 		*/
 	
@@ -55,11 +55,11 @@ SharedMemory::SharedMemory(key_t key_, int memsize_, int perms_):
 
 		if (_id < 0) {
 			if (errno == ENOSPC) {
-				throw MemoryException("No segment exists for the given key");
+				throw SharedMemoryException("No segment exists for the given key");
 			} else if (errno == EACCES) {
-				throw MemoryException("user does not have permission to access the shared memory");
+				throw SharedMemoryException("user does not have permission to access the shared memory");
 			} else {
-				throw MemoryException("Cannot open a shared memory");
+				throw SharedMemoryException("Cannot open a shared memory");
 			}
 		}
 	}
@@ -79,11 +79,11 @@ void SharedMemory::Attach()
 
 	if (_shmp == (char *)(-1)) {
 		if (errno == EACCES) {
-			throw MemoryException("No permission to access the shared memory");
+			throw SharedMemoryException("No permission to access the shared memory");
 		} else if (errno == ENOMEM) {
-			throw MemoryException("Could not allocate memory");
+			throw SharedMemoryException("Could not allocate memory");
 		} else {
-			throw MemoryException("Attach memory exception");
+			throw SharedMemoryException("Attach memory exception");
 		}
 	}
 
@@ -99,9 +99,9 @@ void SharedMemory::Deatach()
 
 	if (r < 0) {
 		if (errno == EACCES) {
-			throw MemoryException("No permission to access the shared memory");
+			throw SharedMemoryException("No permission to access the shared memory");
 		} else {
-			throw MemoryException("Deatach memory exception");
+			throw SharedMemoryException("Deatach memory exception");
 		}
 	}
 #endif
@@ -115,9 +115,9 @@ void SharedMemory::Dealloc()
 
 	if (r < 0) {
 		if (errno == EACCES) {
-			throw MemoryException("No permission to access the shared memory");
+			throw SharedMemoryException("No permission to access the shared memory");
 		} else {
-			throw MemoryException("Exception at dealloc shared memory");
+			throw SharedMemoryException("Exception at dealloc shared memory");
 		}
 	}
 #endif
@@ -129,11 +129,11 @@ int SharedMemory::Get(char *data_, int size_)
 	return 0;
 #else	
 	if ((void *)data_ == NULL) {
-		throw MemoryException("Null pointer in data parameter");
+		throw SharedMemoryException("Null pointer in data parameter");
 	}
 	
 	if (size_ <= 0) {
-		throw MemoryException("Invalid value for size parameter");
+		throw SharedMemoryException("Invalid value for size parameter");
 	}
 
 	memcpy(data_, (char *)_shmp, size_);
@@ -148,7 +148,7 @@ int SharedMemory::Put(const char *data_, int size_)
 	return 0;
 #else	
 	if ((void *)data_ == NULL) {
-		throw MemoryException("Null pointer in data parameter");
+		throw SharedMemoryException("Null pointer in data parameter");
 	}
 	
 	memcpy((char *)_shmp, data_, size_);
