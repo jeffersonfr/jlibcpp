@@ -42,7 +42,7 @@ BitStream::BitStream(char *stream, int size):
 	if (stream == NULL || size == 0) {
 		_stream = NULL;
 		
-		throw RuntimeException("Null pointer reference !");
+		throw RuntimeException("Null pointer reference");
 	}
 
 	_stream = stream;

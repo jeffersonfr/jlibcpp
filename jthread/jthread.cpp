@@ -287,7 +287,7 @@ bool Thread::Interrupt(int id)
 
 #ifdef _WIN32
 	if (TerminateThread(_thread, 0) == FALSE) {
-		return false; // CHANGE:: throw ThreadException("Thread cancel exception !");
+		return false; // CHANGE:: throw ThreadException("Thread cancel exception");
 	}
 
 	/*
@@ -426,7 +426,7 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 
 #ifdef _WIN32
 	if (SetThreadPriority(_thread, tpriority) == 0) {
-		throw ThreadException("Unknown exception in set policy !");
+		throw ThreadException("Unknown exception in set policy");
 	}
 #else
 	struct sched_param param;
@@ -439,13 +439,13 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 	result = pthread_setschedparam(_thread, tpolicy, &param);
 
 	if (result == EINVAL) {
-		throw ThreadException("Policy is not defined !");
+		throw ThreadException("Policy is not defined");
 	} else if (result == EPERM) {
-		throw ThreadException("The process does not have superuser permission !");
+		throw ThreadException("The process does not have superuser permission");
 	} else if (result == ESRCH) {
-		throw ThreadException("This thread has already terminated !");
+		throw ThreadException("This thread has already terminated");
 	} else if (result < 0) {
-		throw ThreadException("Unknown exception in set policy !");
+		throw ThreadException("Unknown exception in set policy");
 	}
 #endif
 }
@@ -458,7 +458,7 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 	int r;
 
 	if ((r = GetThreadPriority(_thread)) == THREAD_PRIORITY_ERROR_RETURN) {
-		throw ThreadException("Unknown exception in get policy !");
+		throw ThreadException("Unknown exception in get policy");
 	}
 
 	switch (r) {
@@ -493,9 +493,9 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 	result = pthread_getschedparam(_thread, &policy_int, &param);
 
 	if (result == ESRCH) {
-		throw ThreadException("This thread has already terminated !");
+		throw ThreadException("This thread has already terminated");
 	} else if (result < 0) {
-		throw ThreadException("Unknown exception in get policy !");
+		throw ThreadException("Unknown exception in get policy");
 	}
 
 	// switch (param.sched_priority) {

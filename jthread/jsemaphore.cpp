@@ -70,9 +70,9 @@ Semaphore::Semaphore(int key, int value):
 #else
 	if (sem_init(&_handler, key, value) < 0) {
 		if (errno == EINVAL) {
-			throw SemaphoreException("Operation would increase the semaphore count !");
+			throw SemaphoreException("Operation would increase the semaphore count");
 		} else {
-			throw SemaphoreException("Unknown semaphore error !");
+			throw SemaphoreException("Unknown semaphore error");
 		}
 	}
 #endif
@@ -166,7 +166,7 @@ void Semaphore::Notify()
 #else
 	if (sem_post(&_handler) < 0) {
 		if (errno == ERANGE) {
-			throw SemaphoreException("Operation would increase the semaphore count !");
+			throw SemaphoreException("Operation would increase the semaphore count");
 		} else {
 			throw SemaphoreException("Notify semaphore failed");
 		}
@@ -213,7 +213,7 @@ bool Semaphore::TryWait()
 #else
 	if (sem_trywait(&_handler) < 0) {
 		if (errno != EAGAIN) {
-			throw SemaphoreException("Unknown semaphore error !");
+			throw SemaphoreException("Unknown semaphore error");
 		}
 
 		return false;

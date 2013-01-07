@@ -34,7 +34,7 @@ Condition::Condition(int nblock):
 	InitializeConditionVariable(&_condition);
 #else
 	if (pthread_cond_init(&_condition, NULL) != 0) { //&cond) != 0) {
-		throw SemaphoreException("Init condition error !");
+		throw SemaphoreException("Init condition error");
 	}
 #endif
 }
@@ -65,11 +65,11 @@ void Condition::Wait(Mutex *mutex)
 		jthread::AutoLock lock(&_monitor);
 
 		if (SleepConditionVariableCS(&_condition, &_monitor._mutex, INFINITE) == 0) {
-			throw SemaphoreException("Condition wait error !");
+			throw SemaphoreException("Condition wait error");
 		}
 	} else {
 		if (SleepConditionVariableCS(&_condition, &mutex->_mutex, INFINITE) == 0) {
-			throw SemaphoreException("Condition wait error !");
+			throw SemaphoreException("Condition wait error");
 		}
 	}
 #else
@@ -77,11 +77,11 @@ void Condition::Wait(Mutex *mutex)
 		jthread::AutoLock lock(&_monitor);
 
 		if (pthread_cond_wait(&_condition, &_monitor._mutex) != 0) {
-			throw SemaphoreException("Condition wait error !");
+			throw SemaphoreException("Condition wait error");
 		}
 	} else {
 		if (pthread_cond_wait(&_condition, &mutex->_mutex) != 0) {
-			throw SemaphoreException("Condition wait error !");
+			throw SemaphoreException("Condition wait error");
 		}
 	}
 #endif
@@ -139,7 +139,7 @@ void Condition::Notify()
 	WakeConditionVariable(&_condition);
 #else
 	if (pthread_cond_signal(&_condition) != 0) {
-		throw SemaphoreException("Condition notify error !");
+		throw SemaphoreException("Condition notify error");
 	}
 #endif
 }
@@ -150,7 +150,7 @@ void Condition::NotifyAll()
 	WakeAllConditionVariable(&_condition);
 #else
 	if (pthread_cond_broadcast(&_condition) != 0) {
-		throw SemaphoreException("Condition notify all error !");
+		throw SemaphoreException("Condition notify all error");
 	}
 #endif
 }

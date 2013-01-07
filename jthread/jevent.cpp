@@ -33,14 +33,14 @@ Event::Event()
 	_event = CreateEvent(NULL, TRUE, FALSE, NULL);
 
 	if (_event == INVALID_HANDLE_VALUE) {
-		throw SemaphoreException("Init semaphore error !");
+		throw SemaphoreException("Init semaphore error");
 	}
 #else
 	_signaled = false;
 	_count = 0;
 
 	if (pthread_cond_init(&_condition, NULL) != 0) {
-		throw SemaphoreException("Init semaphore error !");
+		throw SemaphoreException("Init semaphore error");
 	}
 #endif
 }
@@ -67,7 +67,7 @@ void Event::Wait()
 {
 #ifdef _WIN32
 	if (WaitForSingleObject(_event, INFINITE) == WAIT_FAILED) {
-		throw SemaphoreException("Condition wait error !");
+		throw SemaphoreException("Condition wait error");
 	}
 #else
 	int rc = 0;
@@ -85,7 +85,7 @@ void Event::Wait()
 	_mutex.Unlock();
 	
 	if (rc != 0) {
-		throw SemaphoreException("Condition wait error !");
+		throw SemaphoreException("Condition wait error");
 	}
 #endif
 }
@@ -144,7 +144,7 @@ void Event::Notify()
 	success = SetEvent(_event);
 
 	if (!success) {
-		throw SemaphoreException("Semaphore notify error !");
+		throw SemaphoreException("Semaphore notify error");
 	}
 #else
 	int rc = 0;
@@ -160,7 +160,7 @@ void Event::Notify()
 	_mutex.Unlock();
 
 	if (rc != 0) {
-		throw SemaphoreException("Semaphore notify error !");
+		throw SemaphoreException("Semaphore notify error");
 	}
 #endif
 }
@@ -174,7 +174,7 @@ void Event::NotifyAll()
 	success = PulseEvent(_event);
 
 	if (!success) {
-		throw SemaphoreException("Semaphore notify error !");
+		throw SemaphoreException("Semaphore notify error");
 	}
 #else
 	int rc = 0;
@@ -189,7 +189,7 @@ void Event::NotifyAll()
 	_mutex.Unlock();
 
 	if (rc != 0) {
-		throw SemaphoreException("Semaphore notify all error !");
+		throw SemaphoreException("Semaphore notify all error");
 	}
 #endif
 }

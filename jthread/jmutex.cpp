@@ -96,9 +96,9 @@ void Mutex::Lock()
 #else 
 	if (pthread_mutex_lock(&_mutex) != 0) {
 		if (errno == EDEADLK) {
-			throw MutexException("Error check monitor, dead lock ... !");
+			throw MutexException("Error check monitor, dead lock");
 		} else {
-			throw MutexException("Mutex lock failed !");
+			throw MutexException("Mutex lock failed");
 		}
 	}
 #endif
@@ -113,9 +113,9 @@ void Mutex::Unlock()
 #else 
 	if (pthread_mutex_unlock(&_mutex) != 0) {
 		if (errno == EINVAL || errno == EFAULT || errno == EPERM) {
-			throw MutexException("Error check monitor, calling thread does ... !");
+			throw MutexException("Error check monitor, calling thread does");
 		} else {
-			// throw MutexException("Mutex unlock failed !");
+			// throw MutexException("Mutex unlock failed");
 		}
 	}
 #endif

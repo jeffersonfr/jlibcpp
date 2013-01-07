@@ -50,7 +50,7 @@ void RWLock::ReadLock()
 #else 
 	if (pthread_rwlock_rdlock(&_rwlock) != 0) {
 		if (errno == EDEADLK) {
-			throw MutexException("Error check monitor, dead lock ... !");
+			throw MutexException("Error check monitor, dead lock");
 		}
 	}
 #endif
@@ -63,7 +63,7 @@ void RWLock::WriteLock()
 #else 
 	if (pthread_rwlock_wrlock(&_rwlock) != 0) {
 		if (errno == EDEADLK) {
-			throw MutexException("Error check monitor, dead lock ... !");
+			throw MutexException("Error check monitor, dead lock");
 		}
 	}
 #endif
@@ -76,7 +76,7 @@ void RWLock::ReadUnlock()
 #else 
 	if (pthread_rwlock_unlock(&_rwlock) != 0) {
 		if (errno == EINVAL || errno == EFAULT || errno == EPERM) {
-			throw MutexException("Error check monitor, calling thread does ... !");
+			throw MutexException("Error check monitor, calling thread");
 		}
 	}
 #endif
@@ -89,7 +89,7 @@ void RWLock::WriteUnlock()
 #else 
 	if (pthread_rwlock_unlock(&_rwlock) != 0) {
 		if (errno == EINVAL || errno == EFAULT || errno == EPERM) {
-			throw MutexException("Error check monitor, calling thread does ... !");
+			throw MutexException("Error check monitor, calling thread");
 		}
 	}
 #endif

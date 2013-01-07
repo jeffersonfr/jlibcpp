@@ -98,7 +98,7 @@ void Policies::Save(std::string escape)
 
 		f.Flush();
 	} catch (...) {
-		throw jcommon::RuntimeException("File not found !");
+		throw jcommon::RuntimeException("File not found");
 	}
 }
 

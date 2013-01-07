@@ -231,7 +231,7 @@ void Properties::Save(std::string escape_)
 		f.Flush();
 		f.Close();
 	} catch (...) {
-		throw RuntimeException("File not found !");
+		throw RuntimeException("File not found");
 	}
 }
 

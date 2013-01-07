@@ -167,7 +167,7 @@ void NamedSemaphore::Notify()
 #else
 	if (sem_post(_handler) < 0) {
 		if (errno == ERANGE) {
-			throw SemaphoreException("Operation would increase the semaphore count !");
+			throw SemaphoreException("Operation would increase the semaphore count");
 		} else {
 			throw SemaphoreException("Notify semaphore failed");
 		}
@@ -200,7 +200,7 @@ bool NamedSemaphore::TryWait()
 #else
 	if (sem_trywait(_handler) < 0) {
 		if (errno != EAGAIN) {
-			throw SemaphoreException("Unknown semaphore error !");
+			throw SemaphoreException("Unknown semaphore error");
 		}
 
 		return false;
