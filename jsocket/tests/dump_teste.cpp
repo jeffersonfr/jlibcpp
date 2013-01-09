@@ -62,17 +62,16 @@ void dump_raw()
 
 		jsocket::SocketOptions *opt = s.GetSocketOptions();
 
-		// DO:: opt->SetSendTimeout(time);
-		opt->SetReceiveTimeout(6000000);
+		opt->SetSendTimeout(2000000);
+		opt->SetReceiveTimeout(2000000);
 		opt->SetReceiveMaximumBuffer(0x0200000);
 
 		delete opt;
 
 		do {
-			r = s.Receive(receive, 4096);//1500);
+			r = s.Receive(receive, 1500);
 
-			// std::cout << "UDP Read:: " << r << std::endl;
-			putchar('+'); fflush(stdout);
+			putchar('.'); fflush(stdout);
 		} while (r >= 0);
 
 		s.Close();

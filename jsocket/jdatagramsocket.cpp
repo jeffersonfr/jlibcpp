@@ -81,7 +81,7 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 			break;
 		}
 	} else {
-		BindSocket(_address, port_);
+		BindSocket(NULL, port_);
 	}
 
 	InitStream(rbuf_, wbuf_);
