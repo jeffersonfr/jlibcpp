@@ -106,8 +106,6 @@ void Thread::USleep(uint64_t time_)
 
 jthread_t Thread::GetHandler(int id)
 {
-	AutoLock lock(&jthread_mutex);
-
 	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
 		jthread_map_t *t = i->second;
 
@@ -121,8 +119,6 @@ jthread_t Thread::GetHandler(int id)
 
 int Thread::GetID()
 {
-	AutoLock lock(&jthread_mutex);
-
 	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
 		jthread_map_t *t = i->second;
 
@@ -275,8 +271,6 @@ void Thread::Start(int id)
 
 bool Thread::Interrupt(int id)
 {
-	AutoLock lock(&jthread_mutex);
-
 	jthread_map_t *t = GetMap(id);
 
 	if (t->alive == false) {
@@ -316,8 +310,6 @@ bool Thread::Interrupt(int id)
 
 void Thread::Suspend(int id) 
 {
-	AutoLock lock(&jthread_mutex);
-
 	if (IsRunning(id) == false) {
 		return;
 	}
@@ -339,8 +331,6 @@ void Thread::Suspend(int id)
 
 void Thread::Resume(int id)
 {
-	AutoLock lock(&jthread_mutex);
-
 	if (IsRunning(id) == false) {
 		return;
 	}
@@ -360,8 +350,6 @@ void Thread::Resume(int id)
 
 bool Thread::IsRunning(int id)
 {
-	AutoLock lock(&jthread_mutex);
-
 	jthread_map_t *t = GetMap(id);
 
 	if (t != NULL) {
@@ -382,8 +370,6 @@ void Thread::ThreadYield()
 
 void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 {
-	AutoLock lock(&jthread_mutex);
-
 	int tpriority = 0;
 
 #ifdef _WIN32
@@ -452,8 +438,6 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 
 void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority) 
 {
-	AutoLock lock(&jthread_mutex);
-
 #ifdef _WIN32
 	int r;
 
@@ -538,8 +522,6 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 
 void Thread::WaitThread(int id)
 {
-	AutoLock lock(&jthread_mutex);
-
 	jthread_map_t *t = GetMap(id);
 
 #ifdef _WIN32
@@ -572,8 +554,6 @@ void Thread::Release()
 	if (_group != NULL) {
 		_group->UnregisterThread(this);
 	}
-
-	AutoLock lock(&jthread_mutex);
 
 	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i != _threads.end(); i++) {
 		delete i->second;
