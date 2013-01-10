@@ -114,6 +114,12 @@ class DatagramSocket6 : public jsocket::Connection{
 		DatagramSocket6(int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
 
 		/**
+		 * \brief Construtor UDP server.
+		 *
+		 */
+		DatagramSocket6(InetAddress *addr_,int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+ 
+		/**
 		 * \brief Destructor virtual.
 		 *
 		 */

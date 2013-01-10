@@ -66,28 +66,60 @@ DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf
 	_stream = stream_;
 	_timeout = timeout_;
 
-	try {
-		_address = InetAddress6::GetByName("localhost");
-	} catch (UnknownHostException &) {
-		// WARN:: verify if GetInetAddress6() == NULL
-		_address = NULL;
-	}
+	CreateSocket();
+
+#ifdef _WIN32
+	if (port_ == 0) {
+		for (int i=1024; i<65535; i++) {
+			try {
+				BindSocket(_address, i);
+			
+				break;
+			} catch(SocketException &) {
+			}
+		}
+	} else
+#else
+		BindSocket(_address, port_);
+#endif
+
+	InitStream(rbuf_, wbuf_);
+
+	_sent_bytes = 0;
+	_receive_bytes = 0;
+#endif
+}
+
+DatagramSocket6::DatagramSocket6(InetAddress *addr_, int port_, bool stream_, int timeout_, int rbuf_, int wbuf_):
+	jsocket::Connection(JCT_UDP)
+{
+	jcommon::Object::SetClassName("jsocket::DatagramSocket6");
+
+#ifdef _WIN32
+#else
+	_address = addr_;
+	_is = NULL;
+	_os = NULL;
+	_is_closed = true;
+	_stream = stream_;
+	_timeout = timeout_;
 
 	CreateSocket();
 
+#ifdef _WIN32
 	if (port_ == 0) {
-		while(true) {
+		for (int i=1024; i<65535; i++) {
 			try {
-				BindSocket(_address, ++_used_port);
+				BindSocket(_address, i);
+			
+				break;
 			} catch(SocketException &) {
-				continue;
 			}
-
-			break;
 		}
-	} else {
-		BindSocket(NULL, port_);
-	}
+	} else
+#else
+		BindSocket(_address, port_);
+#endif
 
 	InitStream(rbuf_, wbuf_);
 
