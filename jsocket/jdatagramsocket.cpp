@@ -41,6 +41,8 @@ DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, int t
 	_is_closed = true;
 	_timeout = timeout_;
 
+	_address = InetAddress4::GetByName(host_);
+
 	CreateSocket();
 	ConnectSocket(InetAddress4::GetByName(host_), port_);
 	InitStream(rbuf_, wbuf_);
@@ -61,13 +63,15 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 	_stream = stream_;
 	_timeout = timeout_;
 
+	_address = InetAddress4::GetByName("127.0.0.1");
+
 	CreateSocket();
 
 #ifdef _WIN32
 	if (port_ == 0) {
 		for (int i=1024; i<65535; i++) {
 			try {
-				BindSocket(_address, i);
+				BindSocket(NULL, i);
 			
 				break;
 			} catch(SocketException &) {
@@ -75,7 +79,7 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 		}
 	} else
 #else
-		BindSocket(_address, port_);
+		BindSocket(NULL, port_);
 #endif
 
 	InitStream(rbuf_, wbuf_);
