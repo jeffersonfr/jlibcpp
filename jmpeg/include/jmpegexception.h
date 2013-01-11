@@ -22,7 +22,7 @@
 
 #include "jruntimeexception.h"
 
-namespace jcommon {
+namespace jmpeg {
 
 /**
  * \brief Exception.

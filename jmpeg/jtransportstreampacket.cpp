@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jtransportstreampacket.h"
+#include "jmpegexception.h"
 
 namespace jmpeg {
 
@@ -126,6 +127,10 @@ void TransportStreamPacket::GetPayload(uint8_t *packet, uint8_t *data, uint32_t 
 		header_size = 188;
 	} else if (control == 0x03) {		// jmp the adaptation field
 		header_size += packet[4]+1;
+	}
+
+	if (header_size > 188) {
+		throw MpegException("Invalid transport stream packet");
 	}
 
 	if (header_size == 188) {
