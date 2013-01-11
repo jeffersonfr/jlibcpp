@@ -20,12 +20,12 @@
 #include "Stdafx.h"
 #include "jmpegexception.h"
 
-namespace jcommon {
+namespace jmpeg {
 
 MpegException::MpegException(std::string reason_):
 	jcommon::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jcommon::MpegException");
+	jcommon::Object::SetClassName("jmpeg::MpegException");
 }
 
 MpegException::~MpegException() throw()
