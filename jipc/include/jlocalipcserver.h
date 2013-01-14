@@ -17,106 +17,43 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PROPERTIES_H
-#define J_PROPERTIES_H
+#ifndef J_LOCALIPCSERVER_H
+#define J_LOCALIPCSERVER_H
 
-#include "jmutex.h"
+#include "jipcserver.h"
+#include "jlocalserversocket.h"
 
-#include <string>
-#include <cstring>
-#include <map>
-
-namespace jcommon {
-
-struct jproperty_t {
-	std::string key;
-	std::string value;
-	bool comment;
-};
+namespace jipc {
 
 /**
  * \brief
- * 
+ *
  * \author Jeff Ferr
  */
-class Properties : public virtual jcommon::Object{
+class LocalIPCServer : public IPCServer {
 
 	private:
 		/** \brief */
-		jthread::Mutex _mutex;
-		/** \brief */
-		std::vector<struct jproperty_t> _properties;
-		/** \brief */
-		std::string _filename;
-		/** \brief */
-		std::string _escape;
-		
+		jsocket::LocalServerSocket *_server;
+
 	public:
 		/**
-		 * \brief Construtor default.
+		 * \Constructor.
 		 *
 		 */
-		Properties();
+		LocalIPCServer(std::string id);
 
 		/**
-		 * \brief Destrutor virtual.
+		 * \brief Destructor.
 		 *
 		 */
-		virtual ~Properties();
+		virtual ~LocalIPCServer();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Load(std::string filename, std::string escape = "=");
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Save(std::string escape = "=");
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPropertyByName(std::string key, std::string value);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPropertyByIndex(int index, std::string value);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPropertyByName(std::string key, std::string reserv = std::string(""));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPropertyByIndex(int index, std::string reserv = std::string(""));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePropertyByName(std::string key);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePropertyByIndex(int index);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<std::string> GetProperties();
+		virtual void WaitCall(RemoteCallListener *listener);
 
 };
 

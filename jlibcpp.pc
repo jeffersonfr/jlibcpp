@@ -9,4 +9,4 @@ Version: @version@
 Requires: @requires@
 URL: http://sourceforge.net/projects/jlibcpp
 Libs: -L${libdir} @libs@ -ljlibcpp 
-Cflags: @cflags@ -I${includedir}/jlibcpp/jcommon -I${includedir}/jlibcpp/jgui -I${includedir}/jlibcpp/jio -I${includedir}/jlibcpp/jlogger -I${includedir}/jlibcpp/jphysic -I${includedir}/jlibcpp/jmath -I${includedir}/jlibcpp/jmpeg -I${includedir}/jlibcpp/jshared -I${includedir}/jlibcpp/jsocket -I${includedir}/jlibcpp/jthread
+Cflags: @cflags@ -I${includedir}/jlibcpp/jcommon -I${includedir}/jlibcpp/jgui -I${includedir}/jlibcpp/jio -I${includedir}/jlibcpp/jlogger -I${includedir}/jlibcpp/jphysic -I${includedir}/jlibcpp/jmath -I${includedir}/jlibcpp/jmpeg -I${includedir}/jlibcpp/jshared -I${includedir}/jlibcpp/jipc -I${includedir}/jlibcpp/jsocket -I${includedir}/jlibcpp/jthread

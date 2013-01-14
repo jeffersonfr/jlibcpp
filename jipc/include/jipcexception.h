@@ -17,133 +17,39 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_OBJECT_H
-#define J_OBJECT_H
+#ifndef J_IPCEXCEPTION_H
+#define J_IPCEXCEPTION_H
 
+#include "jruntimeexception.h"
+
+#include <stdexcept>
 #include <string>
-#include <vector>
+#include <cstring>
 
-#include <stdint.h>
-
-namespace jcommon {
+namespace jipc {
 
 /**
- * \brief
- * 
+ * \brief Exception.
+ *
  * \author Jeff Ferr
  */
-class Object{
+class IPCException : public jcommon::RuntimeException{
 
 	private:
-		/** \brief */
-		std::string _classname;
-		/** \brief */
-		std::string _namespace;
-		/** \brief */
-		std::vector<std::string> _parents;
-		
+
 	public:
 		/**
-		 * \brief
-		 * 
-		 */
-		Object();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual ~Object();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual void AddParent(std::string parent);
-		
-		/**
-		 * \brief
+		 * \brief Construtor.
 		 *
 		 */
-		virtual std::vector<std::string> & GetParents();
+		IPCException(std::string);
 
 		/**
-		 * \brief
+		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual void SetClassName(std::string name);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetNameSpace(std::string name);
+		virtual ~IPCException() throw();
 
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string GetNameSpace();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string GetClassName();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string GetFullClassName();
-
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual bool InstanceOf(std::string);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool InstanceOf(Object *o);
-		
-		/**
-		 * \brief Clone object.
-		 *
-		 */
-		virtual Object * Clone();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Equals(Object *);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Copy(Object *o);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int Compare(Object *);
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual uint64_t Hash();
-		
-		/**
-		 * \brief
-		 * 
-		 */
-		virtual std::string what();
 };
 
 }

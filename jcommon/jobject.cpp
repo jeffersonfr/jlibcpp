@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jobject.h"
+#include "jnullpointerexception.h"
 
 namespace jcommon {
 
@@ -64,6 +65,15 @@ std::string Object::GetClassName()
 	return _classname;
 }
 
+std::string Object::GetFullClassName()
+{
+	if (_namespace != "") {
+		return _namespace + "::" + _classname;
+	}
+
+	return _classname;
+}
+
 void Object::SetClassName(std::string name)
 {
 	int r = name.rfind("::");
@@ -79,6 +89,17 @@ void Object::SetClassName(std::string name)
 	AddParent(name);
 }
 
+void Object::SetNameSpace(std::string name)
+{
+	int r = name.rfind("::");
+
+	if (r != (int)std::string::npos) {
+		_namespace = name.substr(0, r);
+	} else {
+		_namespace = name;
+	}
+}
+
 bool Object::InstanceOf(std::string parent)
 {
 	for (std::vector<std::string>::iterator i = _parents.begin(); i!=_parents.end(); i++) {
@@ -88,6 +109,15 @@ bool Object::InstanceOf(std::string parent)
 	}
 	
 	return false;
+}
+
+bool Object::InstanceOf(Object *o)
+{
+	if ((void *)o == NULL) {
+		throw NullPointerException("Instance of object is null");
+	}
+
+	return InstanceOf(o->GetFullClassName());
 }
 
 bool Object::Equals(Object *o)

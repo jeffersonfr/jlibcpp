@@ -17,106 +17,44 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PROPERTIES_H
-#define J_PROPERTIES_H
+#ifndef J_REMOTEIPCCLIENT_H
+#define J_REMOTEIPCCLIENT_H
 
-#include "jmutex.h"
+#include "jipcclient.h"
 
-#include <string>
-#include <cstring>
-#include <map>
-
-namespace jcommon {
-
-struct jproperty_t {
-	std::string key;
-	std::string value;
-	bool comment;
-};
+namespace jipc {
 
 /**
  * \brief
- * 
+ *
  * \author Jeff Ferr
  */
-class Properties : public virtual jcommon::Object{
+class RemoteIPCClient : public IPCClient {
 
 	private:
 		/** \brief */
-		jthread::Mutex _mutex;
+		std::string _host;
 		/** \brief */
-		std::vector<struct jproperty_t> _properties;
-		/** \brief */
-		std::string _filename;
-		/** \brief */
-		std::string _escape;
-		
+		int _port;
+
 	public:
 		/**
-		 * \brief Construtor default.
+		 * \Constructor.
 		 *
 		 */
-		Properties();
+		RemoteIPCClient(std::string host, int port);
 
 		/**
-		 * \brief Destrutor virtual.
+		 * \brief Destructor.
 		 *
 		 */
-		virtual ~Properties();
+		virtual ~RemoteIPCClient();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Load(std::string filename, std::string escape = "=");
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Save(std::string escape = "=");
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPropertyByName(std::string key, std::string value);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPropertyByIndex(int index, std::string value);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPropertyByName(std::string key, std::string reserv = std::string(""));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPropertyByIndex(int index, std::string reserv = std::string(""));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePropertyByName(std::string key);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePropertyByIndex(int index);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<std::string> GetProperties();
+		virtual Response * CallMethod(Method *method);
 
 };
 

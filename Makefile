@@ -51,6 +51,7 @@ CCFLAGS		= \
 			-Ijresource/include \
 			-Ijsecurity/include \
 			-Ijshared/include \
+			-Ijipc/include \
 			-Ijsocket/include \
 			-Ijthread/include \
 			`pkg-config --cflags libssl` \
@@ -107,6 +108,7 @@ OBJS_jcommon += \
 	   joutofboundsexception.o\
 	   joutofmemoryexception.o\
 	   joptions.o\
+		 jparammapper.o\
 		 jparserexception.o\
 	   jproperties.o\
 	   jpointer.o\
@@ -214,6 +216,19 @@ OBJS_jshared += \
 	   jsharedlib.o\
 	   jschedule.o\
 	   jsharedmutex.o\
+
+OBJS_jipc += \
+		 jipcclient.o\
+		 jipcexception.o\
+		 jipchelper.o\
+		 jipcserver.o\
+		 jlocalipcclient.o\
+		 jlocalipcserver.o\
+		 jmethod.o\
+		 jremotecalllistener.o\
+		 jremoteipcclient.o\
+		 jremoteipcserver.o\
+		 jresponse.o\
 
 OBJS_jsocket += \
 		 jconnection.o\
@@ -367,17 +382,18 @@ OBJS_jgui += \
 		jtable.o\
 		jguilib.o\
 
-SRCS_jcommon	+= $(addprefix jcommon/,$(OBJS_jcommon))
-SRCS_jgui			+= $(addprefix jgui/,$(OBJS_jgui))
-SRCS_jio			+= $(addprefix jio/,$(OBJS_jio))
-SRCS_jlogger	+= $(addprefix jlogger/,$(OBJS_jlogger))
-SRCS_jmath		+= $(addprefix jmath/,$(OBJS_jmath))
-SRCS_jmpeg		+= $(addprefix jmpeg/,$(OBJS_jmpeg))
+SRCS_jcommon		+= $(addprefix jcommon/,$(OBJS_jcommon))
+SRCS_jgui				+= $(addprefix jgui/,$(OBJS_jgui))
+SRCS_jio				+= $(addprefix jio/,$(OBJS_jio))
+SRCS_jlogger		+= $(addprefix jlogger/,$(OBJS_jlogger))
+SRCS_jmath			+= $(addprefix jmath/,$(OBJS_jmath))
+SRCS_jmpeg			+= $(addprefix jmpeg/,$(OBJS_jmpeg))
 SRCS_jresource	+= $(addprefix jresource/,$(OBJS_jresource))
 SRCS_jsecurity	+= $(addprefix jsecurity/,$(OBJS_jsecurity))
-SRCS_jshared	+= $(addprefix jshared/,$(OBJS_jshared))
-SRCS_jsocket	+= $(addprefix jsocket/,$(OBJS_jsocket))
-SRCS_jthread	+= $(addprefix jthread/,$(OBJS_jthread))
+SRCS_jshared		+= $(addprefix jshared/,$(OBJS_jshared))
+SRCS_jipc				+= $(addprefix jipc/,$(OBJS_jipc))
+SRCS_jsocket		+= $(addprefix jsocket/,$(OBJS_jsocket))
+SRCS_jthread		+= $(addprefix jthread/,$(OBJS_jthread))
 
 OBJS	= \
 		$(OBJS_jcommon) \
@@ -388,6 +404,7 @@ OBJS	= \
 		$(OBJS_jio) \
 		$(OBJS_jlogger) \
 		$(OBJS_jshared) \
+		$(OBJS_jipc) \
 		$(OBJS_jsocket) \
 		$(OBJS_jthread) \
 		$(OBJS_jgui) \
@@ -401,6 +418,7 @@ SRCS	= \
 		$(SRCS_jio) \
 		$(SRCS_jlogger) \
 		$(SRCS_jshared) \
+		$(SRCS_jipc) \
 		$(SRCS_jsocket) \
 		$(SRCS_jthread) \
 		$(SRCS_jgui) \
@@ -434,6 +452,7 @@ install: uninstall
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jlogger && install -o nobody -m 644 jlogger/include/* $(PREFIX)/include/$(MODULE)/jlogger
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmpeg && install -o nobody -m 644 jmpeg/include/* $(PREFIX)/include/$(MODULE)/jmpeg
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jshared && install -o nobody -m 644 jshared/include/* $(PREFIX)/include/$(MODULE)/jshared
+	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jipc && install -o nobody -m 644 jipc/include/* $(PREFIX)/include/$(MODULE)/jipc
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsocket && install -o nobody -m 644 jsocket/include/* $(PREFIX)/include/$(MODULE)/jsocket
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jthread && install -o nobody -m 644 jthread/include/* $(PREFIX)/include/$(MODULE)/jthread
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmath && install -o nobody -m 644 jmath/include/* $(PREFIX)/include/$(MODULE)/jmath
@@ -472,6 +491,7 @@ ultraclean: clean uninstall
 	@cd jresource/tests && make clean && cd -
 	@cd jsecurity/tests && make clean && cd -
 	@cd jshared/tests && make clean && cd -
+	@cd jipc/tests && make clean && cd -
 	@cd jsocket/tests && make clean && cd -
 	@cd jthread/tests && make clean && cd -
 	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(PREFIX)/lib/$(EXE) $(PREFIX)/$(MODULE) $(PREFIX)/include/$(MODULE) 2> /dev/null && $(ECHO) "$(MODULE) ultraclean $(OK)" 

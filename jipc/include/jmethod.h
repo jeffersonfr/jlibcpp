@@ -17,107 +17,64 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PROPERTIES_H
-#define J_PROPERTIES_H
+#ifndef J_METHOD_H
+#define J_METHOD_H
 
-#include "jmutex.h"
+#include "jparammapper.h"
 
 #include <string>
-#include <cstring>
 #include <map>
 
-namespace jcommon {
-
-struct jproperty_t {
-	std::string key;
-	std::string value;
-	bool comment;
-};
+namespace jipc {
 
 /**
  * \brief
- * 
+ *
  * \author Jeff Ferr
  */
-class Properties : public virtual jcommon::Object{
+class Method : public jcommon::ParamMapper {
 
 	private:
 		/** \brief */
-		jthread::Mutex _mutex;
-		/** \brief */
-		std::vector<struct jproperty_t> _properties;
-		/** \brief */
-		std::string _filename;
-		/** \brief */
-		std::string _escape;
-		
+		std::string _name;
+
 	public:
 		/**
-		 * \brief Construtor default.
+		 * \Constructor.
 		 *
 		 */
-		Properties();
+		Method(std::string name);
 
 		/**
-		 * \brief Destrutor virtual.
+		 * \brief Destructor.
 		 *
 		 */
-		virtual ~Properties();
+		virtual ~Method();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Load(std::string filename, std::string escape = "=");
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void Save(std::string escape = "=");
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPropertyByName(std::string key, std::string value);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPropertyByIndex(int index, std::string value);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPropertyByName(std::string key, std::string reserv = std::string(""));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPropertyByIndex(int index, std::string reserv = std::string(""));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePropertyByName(std::string key);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePropertyByIndex(int index);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<std::string> GetProperties();
+		virtual void Initialize(std::string str);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetName();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetName(std::string name);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string what();
+		
 };
 
 }

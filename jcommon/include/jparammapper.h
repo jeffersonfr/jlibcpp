@@ -17,106 +17,124 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PROPERTIES_H
-#define J_PROPERTIES_H
+#ifndef J_PARAMMAPPER_H
+#define J_PARAMMAPPER_H
 
-#include "jmutex.h"
+#include "jobject.h"
 
 #include <string>
-#include <cstring>
 #include <map>
+
+#include <stdint.h>
 
 namespace jcommon {
 
-struct jproperty_t {
-	std::string key;
-	std::string value;
-	bool comment;
-};
-
 /**
  * \brief
- * 
+ *
  * \author Jeff Ferr
  */
-class Properties : public virtual jcommon::Object{
+class ParamMapper : public virtual jcommon::Object{
 
 	private:
-		/** \brief */
-		jthread::Mutex _mutex;
-		/** \brief */
-		std::vector<struct jproperty_t> _properties;
-		/** \brief */
-		std::string _filename;
-		/** \brief */
-		std::string _escape;
-		
+		std::map<std::string, std::string> _params;
+
 	public:
 		/**
-		 * \brief Construtor default.
+		 * \Constructor.
 		 *
 		 */
-		Properties();
+		ParamMapper();
 
 		/**
-		 * \brief Destrutor virtual.
+		 * \brief Destructor.
 		 *
 		 */
-		virtual ~Properties();
+		virtual ~ParamMapper();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Load(std::string filename, std::string escape = "=");
+		virtual std::map<std::string, std::string> & GetParameters();
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual std::string GetTextParam(std::string key, std::string value = "");
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual bool GetBooleanParam(std::string key, bool value = false);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual int64_t GetIntegerParam(std::string key, int64_t value = 0LL);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual double GetDecimalParam(std::string key, double value = 0.0);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual void SetTextParam(std::string key, std::string value);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual void SetBooleanParam(std::string key, bool value);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual void SetIntegerParam(std::string key, int64_t value);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual void SetDecimalParam(std::string key, double value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveParamByID(std::string id);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveParamByIndex(int index);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Object * Clone();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Save(std::string escape = "=");
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPropertyByName(std::string key, std::string value);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPropertyByIndex(int index, std::string value);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPropertyByName(std::string key, std::string reserv = std::string(""));
+		virtual bool Equals(Object *);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		std::string GetPropertyByIndex(int index, std::string reserv = std::string(""));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePropertyByName(std::string key);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePropertyByIndex(int index);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<std::string> GetProperties();
+		virtual void Copy(Object *o);
 
 };
 
