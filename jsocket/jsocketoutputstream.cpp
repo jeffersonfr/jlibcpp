@@ -114,13 +114,11 @@ int64_t SocketOutputStream::Write(const char *data_, int64_t data_length_)
 			l = l - size;
 			_current_index = _buffer_length;
 
-			if (Flush() == -1LL) {
-				return -1LL;
-			}
+			return Flush();
 		}
 	}
 
-	return (int64_t)(data_length_ - l);
+	return 0LL;
 }
 
 bool SocketOutputStream::IsEmpty()
