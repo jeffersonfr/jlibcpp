@@ -518,7 +518,7 @@ int SSLSocket::Send(const char *data_, int size_, bool block_)
 	int n = SSL_write(ssl, data_, size_);
 
 	if (n < 0) {
-		if (errno == EAGAIN) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			if (block_ == true) {
 				throw SocketTimeoutException("Socket output timeout error");
 			} else {
@@ -586,7 +586,7 @@ int SSLSocket::Receive(char *data_, int size_, bool block_)
 	int n = SSL_read(ssl, data_, size_);
 
 	if (n < 0) {
-		if (errno == EAGAIN) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			if (block_ == true) {
 				throw SocketTimeoutException("Socket input timeout error");
 			} else {

@@ -195,7 +195,7 @@ int MulticastSocket6::Receive(char *data_, int size_, bool block_)
 	n = ::recvfrom(_fdr, data_, size_, flags, (struct sockaddr *)&_sock_r, (socklen_t *)&length);
 	
 	if (n < 0) {
-		if (errno == EAGAIN) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			if (block_ == true) {
 				throw SocketTimeoutException("Socket input timeout error");
 			} else {
@@ -267,7 +267,7 @@ int MulticastSocket6::Send(const char *data, int size, bool block_)
 	int n = ::sendto(_fds, data, size, flags, (struct sockaddr *)&_sock_s, sizeof(_sock_s));
 
 	if (n < 0) {
-		if (errno == EAGAIN) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			if (block_ == true) {
 				throw SocketTimeoutException("Socket output timeout error");
 			} else {

@@ -242,7 +242,7 @@ int LocalSocket::Send(const char *data_, int size_, bool block_)
 	int n = ::send(_fd, data_, size_, flags);
 
 	if (n < 0) {
-		if (errno == EAGAIN) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			if (block_ == true) {
 				throw SocketTimeoutException("Socket output timeout error");
 			} else {
@@ -311,7 +311,7 @@ int LocalSocket::Receive(char *data_, int size_, bool block_)
 	int n = ::recv(_fd, data_, size_, flags);
 
 	if (n < 0) {
-		if (errno == EAGAIN) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			if (block_ == true) {
 				throw SocketTimeoutException("Socket input timeout error");
 			} else {

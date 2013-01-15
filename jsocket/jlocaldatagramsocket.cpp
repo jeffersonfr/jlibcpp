@@ -250,11 +250,11 @@ int LocalDatagramSocket::Receive(char *data_, int size_, bool block_)
 	n = ::recvfrom(_fd, data_, size_, flags, (struct sockaddr *)&_from, (socklen_t *)&length);
 	
 	if (n < 0) {
-	   if (errno == EAGAIN) {
-			if (block_ == false) {
-				throw jio::IOException("Socket buffer is empty");
-			} else {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
+			if (block_ == true) {
 				throw SocketTimeoutException("Socket input timeout error");
+			} else {
+				throw jio::IOException("Socket buffer is empty");
 			}
 		} else {
 			throw jio::IOException("Read socket error");
@@ -319,7 +319,7 @@ int LocalDatagramSocket::Send(const char *data_, int size_, bool block_)
 	n = ::sendto(_fd, data_, size_, flags, (struct sockaddr *)&_server, sizeof(_server));
 
 	if (n < 0) {
-		if (errno == EAGAIN) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			if (block_ == true) {
 				throw SocketTimeoutException("Socket output timeout error");
 			} else {

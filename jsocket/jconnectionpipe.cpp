@@ -121,7 +121,7 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 	
 	if (r < 0) {
 		if (errno == EAGAIN) {
-			return -1;
+			throw SocketTimeoutException("Socket input timeout error");
 		} else {
 			throw jio::IOException("Broken pipe exception");
 		}
@@ -154,9 +154,9 @@ int ConnectionPipe::Send(const char *data_, int size_, int time_)
 	} else if (rv == 0) {
 		throw SocketTimeoutException("Socket output timeout error");
 	} else {
-	    if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLOUT)) {
+	  if ((ufds[0].revents & POLLOUT) || (ufds[0].revents & POLLOUT)) {
 			return ConnectionPipe::Send(data_, size_);
-	    }
+	  }
 	}
 #endif
 
