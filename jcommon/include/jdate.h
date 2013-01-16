@@ -116,6 +116,24 @@ class Date : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		static uint64_t GetMonotonicTime();
+
+		/**
+		 * \brief Return the CPU's time spent by the thread.
+		 *
+		 */
+		static uint64_t GetThreadTime();
+
+		/**
+		 * \brief Return the CPU's time spent by the process.
+		 *
+		 */
+		static uint64_t GetProcessTime();
+
+		/**
+		 * \brief
+		 *
+		 */
 		uint64_t GetTime();
 
 		/**

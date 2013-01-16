@@ -321,13 +321,55 @@ uint64_t Date::CurrentTimeMicros()
 	GetSystemTimeAsFileTime(&nt_time.ft_struct);
 
 	return (uint64_t)((__time64_t)((nt_time.ft_scalar - EPOCH_BIAS) / 10000000i64));
-
 #else
 	timeval t;
 
 	gettimeofday(&t, NULL);
 
 	return (uint64_t)t.tv_sec*1000000LL + (uint64_t)t.tv_usec;
+#endif
+}
+
+uint64_t Date::GetMonotonicTime()
+{
+#ifdef _WIN32
+	FT nt_time;
+
+	GetSystemTimeAsFileTime(&nt_time.ft_struct);
+
+	return (uint64_t)((__time64_t)((nt_time.ft_scalar - EPOCH_BIAS) / 10000000i64));
+#else
+	struct timespec t;
+
+	clock_gettime(CLOCK_MONOTONIC_RAW, &t);
+
+	return (uint64_t)t.tv_sec*1000000000LL + (uint64_t)t.tv_nsec;
+#endif
+}
+
+uint64_t Date::GetThreadTime()
+{
+#ifdef _WIN32
+	return 0LL;
+#else
+	struct timespec t;
+
+	clock_gettime(CLOCK_THREAD_CPUTIME_ID, &t);
+
+	return (uint64_t)t.tv_sec*1000000000LL + (uint64_t)t.tv_nsec;
+#endif
+}
+
+uint64_t Date::GetProcessTime()
+{
+#ifdef _WIN32
+	return 0LL;
+#else
+	struct timespec t;
+
+	clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &t);
+
+	return (uint64_t)t.tv_sec*1000000000LL + (uint64_t)t.tv_nsec;
 #endif
 }
 

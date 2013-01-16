@@ -119,7 +119,7 @@ int main(int argc, char **argv)
 	}
 
 	InitWindowsSocket();
-
+		
 	http_stream(jcommon::URL(url));
 	// http_raw(jcommon::URL(url));
 
