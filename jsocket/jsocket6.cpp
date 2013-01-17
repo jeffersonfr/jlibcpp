@@ -284,8 +284,8 @@ void Socket6::InitStreams(int64_t rbuf_, int64_t wbuf_)
 {
 #ifdef _WIN32
 #else
-	_is = new SocketInputStream((Connection *)this, &_is_closed, rbuf_);
-	_os = new SocketOutputStream((Connection *)this, &_is_closed, wbuf_);
+	_is = new SocketInputStream((Connection *)this, rbuf_);
+	_os = new SocketOutputStream((Connection *)this, wbuf_);
 #endif
 }
 

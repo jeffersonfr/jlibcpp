@@ -123,8 +123,8 @@ void MulticastSocket6::InitStream(int rbuf_, int wbuf_)
 {
 #ifdef _WIN32
 #else
-	_is = new SocketInputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_sock_r, rbuf_);
-	_os = new SocketOutputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_sock_s, wbuf_);
+	_is = new SocketInputStream((Connection *)this, (struct sockaddr *)&_sock_r, rbuf_);
+	_os = new SocketOutputStream((Connection *)this, (struct sockaddr *)&_sock_s, wbuf_);
 #endif
 }
 

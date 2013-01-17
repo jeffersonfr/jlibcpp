@@ -33,6 +33,7 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <unistd.h>
 
 using namespace jsocket;
 using namespace jio;

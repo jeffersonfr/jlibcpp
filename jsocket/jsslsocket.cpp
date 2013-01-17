@@ -463,8 +463,8 @@ void SSLSocket::InitStreams(int rbuf_, int wbuf_)
 {
 #ifdef _WIN32
 #else
-	_is = new SSLSocketInputStream((Connection *)this, &_is_closed, ssl, rbuf_);
-	_os = new SSLSocketOutputStream((Connection *)this, &_is_closed, ssl, wbuf_);
+	_is = new SSLSocketInputStream((Connection *)this, ssl, rbuf_);
+	_os = new SSLSocketOutputStream((Connection *)this, ssl, wbuf_);
 #endif
 }
 

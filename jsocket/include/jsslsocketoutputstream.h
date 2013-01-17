@@ -67,8 +67,6 @@ class SSLSocketOutputStream : public jio::OutputStream{
 			/** \brief */
 			bool _stream;
 			/** \brief */
-			bool *_is_closed;
-			/** \brief */
 			SSL *_ssl;
 #endif
 
@@ -77,7 +75,7 @@ class SSLSocketOutputStream : public jio::OutputStream{
 			 * \brief Construtor.
 			 *
 			 */
-			SSLSocketOutputStream(Connection *conn_, bool *is_closed, void *ssl, int64_t size_ = 4096LL);
+			SSLSocketOutputStream(Connection *conn_, void *ssl, int64_t size_ = 4096LL);
 
 			/**
 			 * \brief Destrutor virtual.
@@ -114,6 +112,12 @@ class SSLSocketOutputStream : public jio::OutputStream{
 			 *
 			 */
 			virtual void Close();
+
+			/**
+			 * \brief jio::InputStream
+			 *
+			 */
+			virtual bool IsClosed();
 
 			/**
 			 * \brief

@@ -124,8 +124,8 @@ void RawSocket::BindSocket()
 
 void RawSocket::InitStream(int rbuf_, int wbuf_)
 {
-	_is = new SocketInputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_server_sock, rbuf_);
-	_os = new SocketOutputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_server_sock, wbuf_);
+	_is = new SocketInputStream((Connection *)this, (struct sockaddr *)&_server_sock, rbuf_);
+	_os = new SocketOutputStream((Connection *)this, (struct sockaddr *)&_server_sock, wbuf_);
 }
 
 /** End */

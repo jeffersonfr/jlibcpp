@@ -162,8 +162,8 @@ void LocalDatagramSocket::ConnectSocket()
 
 void LocalDatagramSocket::InitStream(int rbuf_, int wbuf_)
 {
-	_is = new SocketInputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_server, rbuf_);
-	_os = new SocketOutputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_server, wbuf_);
+	_is = new SocketInputStream((Connection *)this, (struct sockaddr *)&_server, rbuf_);
+	_os = new SocketOutputStream((Connection *)this, (struct sockaddr *)&_server, wbuf_);
 }
 
 /** End */

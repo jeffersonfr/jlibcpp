@@ -23,14 +23,13 @@
 
 namespace jsocket {
 
-SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, int64_t size_):
+SocketInputStream::SocketInputStream(Connection *conn_, int64_t size_):
 	jio::InputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SocketInputStream");
 	
 	_connection = conn_;
 	_fd = conn_->GetHandler();
-	_is_closed = is_closed_;
 	_stream = true;
 	_buffer_length = size_;
 	_current_index = 0LL;
@@ -48,14 +47,13 @@ SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, int64_
 	}
 }
 
-SocketInputStream::SocketInputStream(Connection *conn_, bool *is_closed_, struct sockaddr *address, int64_t size_):
+SocketInputStream::SocketInputStream(Connection *conn_, struct sockaddr *address, int64_t size_):
 	jio::InputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SocketInputStream");
 	
 	_connection = conn_;
 	_fd = conn_->GetHandler();
-	_is_closed = is_closed_;
 	_stream = false;
 	_buffer_length = size_;
 	_current_index = 0LL;
@@ -83,7 +81,7 @@ SocketInputStream::~SocketInputStream()
 
 int64_t SocketInputStream::Read()
 {
-	if ((*_is_closed) == true) {
+	if (_connection->IsClosed() == true) {
 		throw SocketException("Connection closed exception");
 	}
 	
@@ -144,7 +142,7 @@ int64_t SocketInputStream::Read()
 
 int64_t SocketInputStream::Read(char *data_, int64_t data_length_)
 {
-	if ((*_is_closed) == true) {
+	if (_connection->IsClosed() == true) {
 		throw SocketException("Connection closed exception");
 	}
 	
@@ -235,6 +233,11 @@ int64_t SocketInputStream::GetReadedBytes()
 void SocketInputStream::Close()
 {
 	_connection->Close();
+}
+
+bool SocketInputStream::IsClosed()
+{
+	return _connection->IsClosed();
 }
 
 void SocketInputStream::Reset()

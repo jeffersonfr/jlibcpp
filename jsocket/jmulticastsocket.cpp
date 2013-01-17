@@ -120,8 +120,8 @@ void MulticastSocket::ConnectSocket(InetAddress *local_addr_, int port_)
 
 void MulticastSocket::InitStream(int rbuf_, int wbuf_)
 {
-	_is = new SocketInputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_sock_r, rbuf_);
-	_os = new SocketOutputStream((Connection *)this, &_is_closed, (struct sockaddr *)&_sock_s, wbuf_);
+	_is = new SocketInputStream((Connection *)this, (struct sockaddr *)&_sock_r, rbuf_);
+	_os = new SocketOutputStream((Connection *)this, (struct sockaddr *)&_sock_s, wbuf_);
 }
 
 /** End */

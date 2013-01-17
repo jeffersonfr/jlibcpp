@@ -70,8 +70,6 @@ class SSLSocketInputStream : public jio::InputStream{
 			int64_t _receive_bytes;
 			/** \brief */
 			bool _stream;
-			/** \brief */
-			bool *_is_closed;
 #endif
 
 		public:
@@ -79,7 +77,7 @@ class SSLSocketInputStream : public jio::InputStream{
 			 * \brief Construtor.
 			 *
 			 */
-			SSLSocketInputStream(Connection *conn_, bool *is_closed_, void *ssl, int64_t size_ = 65535LL);
+			SSLSocketInputStream(Connection *conn_, void *ssl, int64_t size_ = 65535LL);
 
 			/**
 			 * \brief Destrutor virtual.
@@ -128,6 +126,12 @@ class SSLSocketInputStream : public jio::InputStream{
 			 *
 			 */
 			virtual void Close();
+
+			/**
+			 * \brief jio::InputStream
+			 *
+			 */
+			virtual bool IsClosed();
 
 			/**
 			 * \brief

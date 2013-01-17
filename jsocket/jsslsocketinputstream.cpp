@@ -23,7 +23,7 @@
 
 namespace jsocket {
 
-SSLSocketInputStream::SSLSocketInputStream(Connection *conn_, bool *is_closed_, void *ssl, int64_t size_):
+SSLSocketInputStream::SSLSocketInputStream(Connection *conn_, void *ssl, int64_t size_):
 	jio::InputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocketInputStream");
@@ -33,7 +33,6 @@ SSLSocketInputStream::SSLSocketInputStream(Connection *conn_, bool *is_closed_, 
 	_ssl = (SSL *)ssl;
 	_connection = conn_;
 	_fd = conn_->GetHandler();
-	_is_closed = is_closed_;
 	_stream = true;
 	_buffer_length = size_;
 	_current_index = 0;
@@ -67,7 +66,7 @@ int64_t SSLSocketInputStream::Read()
 #ifdef _WIN32
 	return 0LL;
 #else
-	if ((*_is_closed) == true) {
+	if (_connection->IsClosed() == true) {
 		throw SocketException("Connection closed exception");
 	}
 	
@@ -104,7 +103,7 @@ int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 #ifdef _WIN32
 	return 0LL;
 #else
-	if ((*_is_closed) == true) {
+	if (_connection->IsClosed() == true) {
 		throw SocketException("Connection closed exception");
 	}
 	
@@ -181,6 +180,14 @@ void SSLSocketInputStream::Close()
 #ifdef _WIN32
 #else
 	_connection->Close();
+#endif
+}
+
+bool SSLSocketInputStream::IsClosed()
+{
+#ifdef _WIN32
+#else
+	return _connection->IsClosed();
 #endif
 }
 

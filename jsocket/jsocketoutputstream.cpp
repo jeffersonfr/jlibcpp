@@ -23,14 +23,13 @@
 
 namespace jsocket {
 
-SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, int64_t size_):
+SocketOutputStream::SocketOutputStream(Connection *conn_, int64_t size_):
 	jio::OutputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SocketOutputStream");
 	
 	_connection = conn_;
 	_fd = conn_->GetHandler();
-	_is_closed = is_closed_;
 	_buffer_length = size_;
 	_current_index = 0;
 	_sent_bytes = 0;
@@ -47,14 +46,13 @@ SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, int6
 	}
 }
 
-SocketOutputStream::SocketOutputStream(Connection *conn_, bool *is_closed_, struct sockaddr *address, int64_t size_):
+SocketOutputStream::SocketOutputStream(Connection *conn_, struct sockaddr *address, int64_t size_):
 	jio::OutputStream()
 {
 	jcommon::Object::SetClassName("jsocket::SocketOutputStream");
 	
 	_connection = conn_;
 	_fd = conn_->GetHandler();
-	_is_closed = is_closed_;
 	_buffer_length = size_;
 	_current_index = 0LL;
 	_sent_bytes = 0;
@@ -138,7 +136,7 @@ int64_t SocketOutputStream::GetSentBytes()
 
 int64_t SocketOutputStream::Flush()
 {
-	if ((*_is_closed) == true) {
+	if (_connection->IsClosed() == true) {
 		throw SocketException("Connection closed exception");
 	}
 	
@@ -193,6 +191,11 @@ void SocketOutputStream::Seek(int64_t index)
 void SocketOutputStream::Close()
 {
 	_connection->Close();
+}
+
+bool SocketOutputStream::IsClosed()
+{
+	return _connection->IsClosed();
 }
 
 }

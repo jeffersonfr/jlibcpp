@@ -74,7 +74,7 @@ OBJS_ping = \
 OBJS_broadcast = \
 		broadcast.o\
 
-all: proxy_udp options http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request sslclient sslserver ssltelnet lookup interfaces sockspeed ping broacast
+all: proxy_udp options http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request sslclient sslserver ssltelnet lookup interfaces sockspeed ping broadcast
 	
 proxy_udp: $(OBJS_proxy_udp)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 

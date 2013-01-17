@@ -60,8 +60,6 @@ class SocketOutputStream : public jio::OutputStream{
 		/** \brief */
 		bool _stream;
 		/** \brief */
-		bool *_is_closed;
-		/** \brief */
 		Connection *_connection;
 
 	public:
@@ -69,13 +67,13 @@ class SocketOutputStream : public jio::OutputStream{
 		 * \brief Construtor.
 		 *
 		 */
-		SocketOutputStream(Connection *conn_, bool *is_closed, int64_t size_ = 4096LL);
+		SocketOutputStream(Connection *conn_, int64_t size_ = 4096LL);
 
 		/**
 		 * \brief Construtor.
 		 *
 		 */
-		SocketOutputStream(Connection *conn_, bool *is_closed, struct sockaddr *address_, int64_t size_ = 65535LL);
+		SocketOutputStream(Connection *conn_, struct sockaddr *address_, int64_t size_ = 65535LL);
 
 		/**
 		 * \brief Destrutor virtual.
@@ -112,6 +110,12 @@ class SocketOutputStream : public jio::OutputStream{
 		 *
 		 */
 		virtual void Close();
+
+		/**
+		 * \brief jio::OutputStream
+		 *
+		 */
+		virtual bool IsClosed();
 
 		/**
 		 * \brief
