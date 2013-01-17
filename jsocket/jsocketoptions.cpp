@@ -39,11 +39,13 @@ SocketOptions::~SocketOptions()
 void SocketOptions::SetKeepAlive(bool b_)
 {
 #ifdef _WIN32
-	BOOL b = (b_)?TRUE:FALSE;
+	BOOL b = (b_ == true)?TRUE:FALSE;
 
-	if (setsockopt(_fd, SOL_SOCKET, SO_KEEPALIVE, (const char *)&b, sizeof(BOOL)) < 0) {
+	if (setsockopt(_fd, SOL_SOCKET, SO_KEEPALIVE, (const char *)&b, sizeof(b)) < 0) {
 #else
-	if (setsockopt(_fd, SOL_SOCKET, SO_KEEPALIVE, &b_, sizeof(bool)) < 0) {
+	int b = (b_ == true)?1:0;
+
+	if (setsockopt(_fd, SOL_SOCKET, SO_KEEPALIVE, &b, sizeof(b)) < 0) {
 #endif
 		throw SocketOptionsException("Set keep alive error");
 	}
@@ -53,10 +55,10 @@ void SocketOptions::SetNoDelay(bool b_)
 {
 #ifdef _WIN32
 #else
-	int flag = (b_ == false)?0:1;
+	int b = (b_ == true)?1:0;
 
 	// if (setsockopt(_fd, SOL_SOCKET, SO_OOBINLINE, &b_, sizeof(bool)) < 0) {
-	if (setsockopt(_fd, IPPROTO_TCP, TCP_NODELAY, (char *)&flag, sizeof(int)) < 0) {
+	if (setsockopt(_fd, IPPROTO_TCP, TCP_NODELAY, (char *)&b, sizeof(b)) < 0) {
 		throw SocketOptionsException("Set out of band error");
 	}
 #endif
@@ -65,11 +67,13 @@ void SocketOptions::SetNoDelay(bool b_)
 void SocketOptions::SetOutOfBandInLine(bool b_)
 {
 #ifdef _WIN32
-	BOOL b = (b_)?TRUE:FALSE;
+	BOOL b = (b_ == true)?TRUE:FALSE;
 
-	if (setsockopt(_fd, SOL_SOCKET, SO_OOBINLINE, (const char *)&b, sizeof(BOOL)) < 0) {
+	if (setsockopt(_fd, SOL_SOCKET, SO_OOBINLINE, (const char *)&b, sizeof(b)) < 0) {
 #else
-	if (setsockopt(_fd, SOL_SOCKET, SO_OOBINLINE, &b_, sizeof(bool)) < 0) {
+	int b = (b_ == true)?1:0;
+
+	if (setsockopt(_fd, SOL_SOCKET, SO_OOBINLINE, &b, sizeof(b)) < 0) {
 #endif
 		throw SocketOptionsException("Set out of band error");
 	}
@@ -119,7 +123,9 @@ void SocketOptions::SetPassCredentials(bool b_)
 {
 #ifdef _WIN32
 #else
-	if (setsockopt(_fd, SOL_SOCKET, SO_PASSCRED, &b_, sizeof(bool)) < 0) {
+	int b = (b_ == true)?1:0;
+
+	if (setsockopt(_fd, SOL_SOCKET, SO_PASSCRED, &b, sizeof(b)) < 0) {
 		throw SocketOptionsException("Set pass credentials error");
 	}
 #endif
@@ -150,11 +156,13 @@ void SocketOptions::BindToDevice(std::string dev_)
 void SocketOptions::SetReuseAddress(bool b_)
 {
 #ifdef _WIN32
-	BOOL b = (b_)?TRUE:FALSE;
+	BOOL b = (b_ == true)?TRUE:FALSE;
 
-	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&b, sizeof(BOOL)) < 0) {
+	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (const char *)&b, sizeof(b)) < 0) {
 #else
-	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &b_, sizeof(bool)) < 0) {
+	int b = (b_ == true)?1:0;
+
+	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, &b, sizeof(b)) < 0) {
 #endif
 		throw SocketOptionsException("Set reuse address error");
 	}
@@ -168,7 +176,9 @@ void SocketOptions::SetReusePort(bool b_)
 		#define SO_REUSEPORT 15
 	#endif
 	
-	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEPORT, &b_, sizeof(bool)) < 0) {
+	int b = (b_ == true)?1:0;
+	
+	if (setsockopt(_fd, SOL_SOCKET, SO_REUSEPORT, &b, sizeof(b)) < 0) {
 		throw SocketOptionsException("Set reuse port error");
 	}
 #endif
@@ -207,11 +217,11 @@ void SocketOptions::SetRoute(bool b_)
 #ifdef _WIN32
 	BOOL b = (b_ == true)?TRUE:FALSE;
 	
-	if (setsockopt(_fd, SOL_SOCKET, SO_DONTROUTE, (const char *)&b, sizeof(BOOL)) < 0) {
+	if (setsockopt(_fd, SOL_SOCKET, SO_DONTROUTE, (const char *)&b, sizeof(b)) < 0) {
 #else
-	b_ = (b_ == true)?false:true;
+	int b = (b_ == true)?1:0;
 	
-	if (setsockopt(_fd, SOL_SOCKET, SO_DONTROUTE, &b_, sizeof(bool)) < 0) {
+	if (setsockopt(_fd, SOL_SOCKET, SO_DONTROUTE, &b, sizeof(b)) < 0) {
 #endif
 		throw SocketOptionsException("Set route error");
 	}
@@ -220,11 +230,13 @@ void SocketOptions::SetRoute(bool b_)
 void SocketOptions::SetBroadcast(bool b_)
 {
 #ifdef _WIN32
-	BOOL b = (b_)?TRUE:FALSE;
+	BOOL b = (b_ == true)?TRUE:FALSE;
 
-	if (setsockopt(_fd, SOL_SOCKET, SO_BROADCAST, (const char *)&b, sizeof(BOOL)) < 0) {
+	if (setsockopt(_fd, SOL_SOCKET, SO_BROADCAST, (const char *)&b, sizeof(b)) < 0) {
 #else
-	if (setsockopt(_fd, SOL_SOCKET, SO_BROADCAST, &b_, sizeof(bool)) < 0) {
+	int b = (b_ == true)?1:0;
+
+	if (setsockopt(_fd, SOL_SOCKET, SO_BROADCAST, &b, sizeof(b)) < 0) {
 #endif
 		throw SocketOptionsException("Set broadcast error");
 	}
@@ -324,11 +336,11 @@ void SocketOptions::ClearPendingSocketError()
 #endif
 }
 
-void SocketOptions::SetBlocking(bool b)
+void SocketOptions::SetBlocking(bool b_)
 {
 #ifdef _WIN32
 #else
-	if (b == true) {
+	if (b_ == true) {
 		if (fcntl(_fd, F_SETFL, O_SYNC) < 0) {
 			throw SocketOptionsException("Set socket blocking error");
 		}
@@ -364,7 +376,9 @@ void SocketOptions::SetHeaderInclude(bool b_)
 {
 #ifdef _WIN32
 #else
-	if (setsockopt(_fd, IPPROTO_IP, IP_HDRINCL, &b_, sizeof(bool)) < 0) {
+	int b = (b_ == true)?1:0;
+
+	if (setsockopt(_fd, IPPROTO_IP, IP_HDRINCL, &b, sizeof(b)) < 0) {
 		throw SocketOptionsException("Set header include error");
 	}
 #endif
@@ -411,7 +425,9 @@ void SocketOptions::SetIOAsync(bool b_)
 {
 #ifdef _WIN32
 #else
-	if (ioctl(_fd, FIOASYNC, b_) < 0) {
+	int b = (b_ == true)?1:0;
+
+	if (ioctl(_fd, FIOASYNC, b) < 0) {
 		throw SocketOptionsException("Set io synchronized error");
 	}
 #endif
@@ -425,7 +441,9 @@ void SocketOptions::SetMulticastLoop(bool b_)
 		return;
 	}
 	
-	if (setsockopt(_fd, IPPROTO_IP, IP_MULTICAST_LOOP, &b_, sizeof(bool)) < 0) {
+	int b = (b_ == true)?1:0;
+
+	if (setsockopt(_fd, IPPROTO_IP, IP_MULTICAST_LOOP, &b, sizeof(b)) < 0) {
 		throw SocketOptionsException("Set multicast loop error");
 	}
 #endif
@@ -491,11 +509,13 @@ int SocketOptions::GetIPv6UnicastHops()
 #endif
 }
 
-void SocketOptions::SetIPv6Only(bool opt_)
+void SocketOptions::SetIPv6Only(bool b_)
 {
 #ifdef _WIN32
 #else
-	if (setsockopt(_fd, IPPROTO_IPV6, IPV6_V6ONLY, &opt_, sizeof(bool)) < 0) {
+	int b = (b_ == true)?1:0;
+
+	if (setsockopt(_fd, IPPROTO_IPV6, IPV6_V6ONLY, &b, sizeof(b)) < 0) {
 		throw SocketOptionsException("Set ipv6 only error");
 	}
 #endif
