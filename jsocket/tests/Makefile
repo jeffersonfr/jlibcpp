@@ -133,4 +133,4 @@ broadcast: $(OBJS_broadcast)
 install:
 
 clean:
-	@rm -rvf *.o *.exe *.dll *.lib *.a *~ proxy_udp options http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request lookup sslserver sslclient ssltelnet interfaces sockspeed ping broacast
+	@rm -rvf *.o *.exe *.dll *.lib *.a *~ proxy_udp options http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request lookup sslserver sslclient ssltelnet interfaces sockspeed ping broadcast
