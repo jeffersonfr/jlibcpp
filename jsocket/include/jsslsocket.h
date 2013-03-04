@@ -226,6 +226,18 @@ class SSLSocket : public jsocket::Connection{
 		virtual ~SSLSocket();
 
 		/**
+		 * \brief Accept a new socket.
+		 *
+		 */
+		static void InitializeSSL();
+
+		/**
+		 * \brief Accept a new socket.
+		 *
+		 */
+		static void ReleaseSSL();
+
+		/**
 		 * \brief
 		 *
 		 */

@@ -52,6 +52,8 @@ void sighandler(int signum)
 
 int main(void)
 {
+	SSLSocket::InitializeSSL();
+
 	string host = "localhost";
 	int port    = 5555;
 
@@ -134,6 +136,8 @@ int main(void)
 				
 		write(1, buf, size);  // write to stdout
 	}
+	
+	SSLSocket::ReleaseSSL();
 	
 	return 0;
 }

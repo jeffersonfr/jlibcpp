@@ -35,9 +35,6 @@ SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddre
 	_local = NULL;
 	_is_closed = true;
 
-	// init ssl 
-	SSL_library_init();
-
 	srand(time(NULL));
 
 	int tmp;

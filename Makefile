@@ -31,32 +31,33 @@ ENABLE_DEBUG		?= no
 ENABLE_GRAPHICS ?= directfb
 
 DEBUG  		= \
-			-g -ggdb \
+		 -g -ggdb \
 
 ARFLAGS		= \
-			-rc \
+		 -rc \
 
 # -ansi: problemas com va_copy()
 CCFLAGS		= \
-			-Wall -shared -rdynamic -fpic -funroll-loops -O2 \
-		 	$(DEBUG) -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
-			-I$(INCDIR) \
-			-Iwin32/win32 \
-			-Ijcommon/include \
-			-Ijgui/include \
-			-Ijio/include \
-			-Ijlogger/include \
-			-Ijmath/include \
-			-Ijmpeg/include \
-			-Ijresource/include \
-			-Ijsecurity/include \
-			-Ijshared/include \
-			-Ijipc/include \
-			-Ijsocket/include \
-			-Ijthread/include \
-			`pkg-config --cflags libssl` \
+		 -Wall -shared -rdynamic -fpic -funroll-loops -O2 \
+	 	 $(DEBUG) -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
+		 -I$(INCDIR) \
+		 -Iwin32/win32 \
+		 -Ijcommon/include \
+		 -Ijgui/include \
+		 -Ijio/include \
+		 -Ijlogger/include \
+		 -Ijmath/include \
+		 -Ijmpeg/include \
+		 -Ijresource/include \
+		 -Ijsecurity/include \
+		 -Ijshared/include \
+		 -Ijipc/include \
+		 -Ijsocket/include \
+		 -Ijthread/include \
+	 	 `pkg-config --cflags libssl` \
 
 LDFLAGS		= \
+	 	 `pkg-config --libs libssl` \
 		 -lpthread \
 		 -ldl \
 		 -lrt \

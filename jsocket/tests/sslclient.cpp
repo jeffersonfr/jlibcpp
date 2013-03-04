@@ -29,6 +29,8 @@ using namespace jsocket;
 
 int main(void)
 {
+	SSLSocket::InitializeSSL();
+
 	SSLSocket mySocket("localhost", 5555);
 	
 	// Check server certificates agains our known trusted certificate
@@ -77,6 +79,8 @@ int main(void)
 	std::cout << "Received: " << receive << std::endl;
 	
 	mySocket.Close();
+	
+	SSLSocket::ReleaseSSL();
 	
 	return 0;
 }

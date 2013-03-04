@@ -29,8 +29,14 @@
 using namespace std;
 using namespace jsocket;
 
+/*
+ * openssl dhparam -check -text -5 1024 -out dh1024.pem
+ *
+ */
 int main(void)
 {
+	SSLSocket::InitializeSSL();
+
 	SSLServerSocket server(5555);
 	SSLSocket *socket;
 	
@@ -62,6 +68,8 @@ int main(void)
 		delete socket;
 		socket = NULL;
 	}
+	
+	SSLSocket::ReleaseSSL();
 	
 	return 0;
 }
