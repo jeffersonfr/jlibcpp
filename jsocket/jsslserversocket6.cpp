@@ -207,9 +207,15 @@ void SSLServerSocket6::Close()
 		return;
 	}
 
-	SSL_shutdown(ssl);
-	SSL_free(ssl);
-	SSL_CTX_free(ctx);
+	if (ssl) {
+		// SSL_shutdown(ssl);
+		SSL_free(ssl);
+	}
+
+	if (ctx) {
+		// SSL_CTX_free(ctx);
+	}
+
 
 	if (close(_fd) != 0) {
 		throw SocketException("Unknow close exception");

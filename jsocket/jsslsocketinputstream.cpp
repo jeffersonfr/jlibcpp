@@ -78,6 +78,10 @@ int64_t SSLSocketInputStream::Read()
 		n = SSL_read(_ssl, _buffer, _buffer_length);
 		
 		if (n <= 0) {
+			if (n == 0) {
+				Close();
+			}
+
 			return -1LL;
 		}
 			
@@ -117,9 +121,13 @@ int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 	if (d == 0LL) {
 		int n;
 
-		n = SSL_read(_ssl, data_, _buffer_length);
+		n = SSL_read(_ssl, _buffer, _buffer_length);
 		
 		if (n <= 0) {
+			if (n == 0) {
+				Close();
+			}
+
 			return -1LL;
 		}
 			

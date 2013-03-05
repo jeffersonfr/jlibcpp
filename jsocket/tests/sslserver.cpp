@@ -67,6 +67,8 @@ int main(void)
 
 		delete socket;
 		socket = NULL;
+
+		break;
 	}
 	
 	SSLSocket::ReleaseSSL();
