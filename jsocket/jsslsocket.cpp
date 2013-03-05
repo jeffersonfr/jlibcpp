@@ -472,12 +472,18 @@ void SSLSocket::InitStreams(int rbuf_, int wbuf_)
 
 void SSLSocket::InitializeSSL()
 {
-	// TODO:: put this on a static method
-	CRYPTO_malloc_init(); // Initialize malloc, free, etc for OpenSSL's use
-	SSL_library_init(); // Initialize OpenSSL's SSL libraries
-	SSL_load_error_strings(); // Load SSL error strings
-	ERR_load_BIO_strings(); // Load BIO error strings
-	OpenSSL_add_all_algorithms(); // Load all available encryption algorithms
+	static bool initialized = false;
+
+	if (initialized == false) {
+		initialized = true;
+
+		// TODO:: put this on a static method
+		CRYPTO_malloc_init(); // Initialize malloc, free, etc for OpenSSL's use
+		SSL_library_init(); // Initialize OpenSSL's SSL libraries
+		SSL_load_error_strings(); // Load SSL error strings
+		ERR_load_BIO_strings(); // Load BIO error strings
+		OpenSSL_add_all_algorithms(); // Load all available encryption algorithms
+	}
 }
 
 void SSLSocket::ReleaseSSL()
