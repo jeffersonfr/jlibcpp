@@ -88,14 +88,14 @@ class LocalSocket : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-		LocalSocket(int handler_, std::string file_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		LocalSocket(int handler_, std::string file_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 	 public:
 		/**
 		 * \brief
 		 *
 		 */
-		LocalSocket(std::string file, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		LocalSocket(std::string file, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Destrutor virtual.

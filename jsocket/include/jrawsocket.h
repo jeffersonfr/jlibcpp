@@ -184,7 +184,7 @@ class RawSocket : public jsocket::Connection{
 		 * \brief Construtor UDP client.
 		 *
 		 */
-		RawSocket(std::string device_ = "lo", bool promisc_ = true, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		RawSocket(std::string device_ = "lo", bool promisc_ = true, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Destructor virtual.

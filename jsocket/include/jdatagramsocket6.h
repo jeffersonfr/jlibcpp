@@ -105,19 +105,19 @@ class DatagramSocket6 : public jsocket::Connection{
 		 * \brief Construtor UDP client.
 		 *
 		 */
-		DatagramSocket6(std::string addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		DatagramSocket6(std::string addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Construtor UDP server.
 		 *
 		 */
-		DatagramSocket6(int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		DatagramSocket6(int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Construtor UDP server.
 		 *
 		 */
-		DatagramSocket6(InetAddress *addr_,int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		DatagramSocket6(InetAddress *addr_,int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
  
 		/**
 		 * \brief Destructor virtual.

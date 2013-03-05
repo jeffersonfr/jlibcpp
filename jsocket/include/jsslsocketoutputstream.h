@@ -75,7 +75,7 @@ class SSLSocketOutputStream : public jio::OutputStream{
 			 * \brief Construtor.
 			 *
 			 */
-			SSLSocketOutputStream(Connection *conn_, void *ssl, int64_t size_ = 4096LL);
+			SSLSocketOutputStream(Connection *conn_, void *ssl, int64_t size_ = SOCK_WR_BUFFER_SIZE);
 
 			/**
 			 * \brief Destrutor virtual.

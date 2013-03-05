@@ -192,32 +192,32 @@ class SSLSocket : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket(int handler_, struct sockaddr_in server_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		SSLSocket(int handler_, struct sockaddr_in server_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 	public:
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket(InetAddress *addr_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		SSLSocket(InetAddress *addr_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		SSLSocket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief
 		 *
 		 */
-		SSLSocket(std::string host_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		SSLSocket(std::string host_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
+		SSLSocket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = SOCK_WR_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Destrutor virtual.

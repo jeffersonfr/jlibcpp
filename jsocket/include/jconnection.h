@@ -33,6 +33,9 @@
 #include <sys/socket.h>
 #endif
 
+#define SOCK_RD_BUFFER_SIZE	65535
+#define SOCK_WR_BUFFER_SIZE	4096
+
 namespace jsocket {
 
 #ifdef _WIN32

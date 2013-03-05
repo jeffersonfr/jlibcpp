@@ -102,19 +102,19 @@ class DatagramSocket : public jsocket::Connection{
 		 * \brief Construtor UDP client.
 		 *
 		 */
-		DatagramSocket(std::string addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		DatagramSocket(std::string addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Construtor UDP server.
 		 *
 		 */
-		DatagramSocket(int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		DatagramSocket(int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Construtor UDP server.
 		 *
 		 */
-		DatagramSocket(InetAddress *addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		DatagramSocket(InetAddress *addr_, int port_, bool stream_ = false, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Destructor virtual.

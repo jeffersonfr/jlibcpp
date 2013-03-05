@@ -67,13 +67,13 @@ class SocketOutputStream : public jio::OutputStream{
 		 * \brief Construtor.
 		 *
 		 */
-		SocketOutputStream(Connection *conn_, int64_t size_ = 4096LL);
+		SocketOutputStream(Connection *conn_, int64_t size_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Construtor.
 		 *
 		 */
-		SocketOutputStream(Connection *conn_, struct sockaddr *address_, int64_t size_ = 65535LL);
+		SocketOutputStream(Connection *conn_, struct sockaddr *address_, int64_t size_ = SOCK_RD_BUFFER_SIZE);
 
 		/**
 		 * \brief Destrutor virtual.

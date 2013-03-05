@@ -101,7 +101,7 @@ class MulticastSocket : public jsocket::Connection{
 		 * \brief 
 		 *
 		 */
-		MulticastSocket(std::string addr_, int port_, int rbuf_ = 65535, int wbuf_ = 4096);
+		MulticastSocket(std::string addr_, int port_, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Destrutor virtual.

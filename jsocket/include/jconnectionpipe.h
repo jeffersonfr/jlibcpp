@@ -117,7 +117,7 @@ class ConnectionPipe : public jsocket::Connection, public jthread::Thread{
 		 * \brief Construtor.
 		 *
 		 */
-		ConnectionPipe(Connection *conn, jconnection_pipe_t type_, int size_pipe_ = 4096, int timeout_ = 0, bool stream_ = false);
+		ConnectionPipe(Connection *conn, jconnection_pipe_t type_, int size_pipe_ = SOCK_WR_BUFFER_SIZE, int timeout_ = 0, bool stream_ = false);
 
 		/**
 		 * \brief Destructor virtual.

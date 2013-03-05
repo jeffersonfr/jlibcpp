@@ -77,7 +77,7 @@ class SSLSocketInputStream : public jio::InputStream{
 			 * \brief Construtor.
 			 *
 			 */
-			SSLSocketInputStream(Connection *conn_, void *ssl, int64_t size_ = 65535LL);
+			SSLSocketInputStream(Connection *conn_, void *ssl, int64_t size_ = SOCK_RD_BUFFER_SIZE);
 
 			/**
 			 * \brief Destrutor virtual.

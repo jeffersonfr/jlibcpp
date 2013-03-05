@@ -104,32 +104,32 @@ class Socket : public jsocket::Connection{
 		 * \brief Constructor.
 		 *
 		 */
-		Socket(jsocket_t handler_, struct sockaddr_in server_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket(jsocket_t handler_, struct sockaddr_in server_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 	
 	 public:
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		Socket(InetAddress *addr_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket(InetAddress *addr_, int port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief
 		 *
 		 */
-		Socket(std::string host_, int port_, int timeout_ = 0, int rbuf_ = 65535, int wbuf_ = 4096);
+		Socket(std::string host_, int port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		Socket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = 4096, int wbuf_ = 4096);
+		Socket(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = SOCK_WR_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Destrutor virtual.
