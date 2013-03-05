@@ -41,18 +41,6 @@ SSLSocket::SSLSocket(InetAddress *addr_, int port_, int keysize, int timeout_, i
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	// init ssl 
-	SSL_library_init();
-
-	srand(time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
-
 	ud = NULL;
 	ctx = NULL;
 	ssl = NULL;
@@ -84,18 +72,6 @@ SSLSocket::SSLSocket(InetAddress *addr_, int port_, InetAddress *local_addr_, in
 
 	_is_closed = false;
 
-	// init ssl 
-	SSL_library_init();
-
-	srand(time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
-
 	ud = NULL;
 	ctx = NULL;
 	ssl = NULL;
@@ -126,18 +102,6 @@ SSLSocket::SSLSocket(std::string host_, int port_, int keysize, int timeout_, in
 
 	InetAddress *address = InetAddress4::GetByName(host_);
 
-	// init ssl 
-	SSL_library_init();
-
-	srand(time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
-
 	ud = NULL;
 	ctx = NULL;
 	ssl = NULL;
@@ -167,18 +131,6 @@ SSLSocket::SSLSocket(std::string host_, int port_, InetAddress *local_addr_, int
 	_receive_bytes = 0;
 	_timeout = timeout_;
 	_is_closed = false;
-
-	// init ssl 
-	SSL_library_init();
-
-	srand(time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
 
 	ud = NULL;
 	ctx = NULL;
@@ -234,18 +186,6 @@ SSLSocket::SSLSocket(jsocket_t handler_, sockaddr_in server_, int keysize, int t
 
 	_fd = handler_;
 	_server_sock = server_;
-
-	// init ssl 
-	// SSL_library_init();
-
-	srand(time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
 
 	ud = NULL;
 	ctx = NULL;
@@ -483,6 +423,15 @@ void SSLSocket::InitializeSSL()
 		SSL_load_error_strings(); // Load SSL error strings
 		ERR_load_BIO_strings(); // Load BIO error strings
 		OpenSSL_add_all_algorithms(); // Load all available encryption algorithms
+
+		srand(time(NULL));
+
+		int tmp;
+
+		while (RAND_status() == 0) {
+			tmp = rand();
+			RAND_seed(&tmp, sizeof(int));
+		}
 	}
 }
 

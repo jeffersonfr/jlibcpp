@@ -41,18 +41,6 @@ SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, int keysize, int timeout_,
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
-	// init ssl 
-	SSL_library_init();
-
-	srand(time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
-
 	ud = NULL;
 	ctx = NULL;
 	ssl = NULL;
@@ -84,18 +72,6 @@ SSLSocket6::SSLSocket6(InetAddress *addr_, int port_, InetAddress *local_addr_, 
 
 	_is_closed = false;
 
-	// init ssl 
-	SSL_library_init();
-
-	srand(time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
-
 	ud = NULL;
 	ctx = NULL;
 	ssl = NULL;
@@ -123,18 +99,6 @@ SSLSocket6::SSLSocket6(std::string host_, int port_, int keysize, int timeout_, 
 	_sent_bytes = 0;
 	_receive_bytes = 0;
 	_timeout = timeout_;
-
-	// init ssl 
-	SSL_library_init();
-
-	srand(time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
 
 	ud = NULL;
 	ctx = NULL;
@@ -165,18 +129,6 @@ SSLSocket6::SSLSocket6(std::string host_, int port_, InetAddress *local_addr_, i
 	_receive_bytes = 0;
 	_timeout = timeout_;
 	_is_closed = false;
-
-	// init ssl 
-	SSL_library_init();
-
-	srand(time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
 
 	ud = NULL;
 	ctx = NULL;
@@ -236,18 +188,6 @@ SSLSocket6::SSLSocket6(jsocket_t handler_, struct sockaddr_in6 server_, int keys
 
 	_fd = handler_;
 	_server_sock = server_;
-
-	// init ssl 
-	// SSL_library_init();
-
-	srand(time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
 
 	ud = NULL;
 	ctx = NULL;
