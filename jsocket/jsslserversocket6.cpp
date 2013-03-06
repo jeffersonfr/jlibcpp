@@ -175,10 +175,11 @@ SSLSocket6 * SSLServerSocket6::Accept()
 	if (s->Accept() == false) {
 		delete s;
 		s = NULL;
-	} else {
-		s->InitStreams(SOCK_RD_BUFFER_SIZE, SOCK_WR_BUFFER_SIZE);
+		
+		throw SocketException("Socket accept exception");
 	}
 
+	s->InitStreams(SOCK_RD_BUFFER_SIZE, SOCK_WR_BUFFER_SIZE);
 
 	return s;
 #endif
