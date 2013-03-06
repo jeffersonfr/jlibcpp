@@ -587,7 +587,7 @@ void SSLSocket::Close()
 
 	if (ssl) {
 		SSL_shutdown(ssl);
-		SSL_free(ssl);
+		// SSL_free(ssl);
 		ssl = NULL;
 	}
 
