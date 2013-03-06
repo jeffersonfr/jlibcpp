@@ -499,6 +499,8 @@ int SSLSocket::Send(const char *data_, int size_, bool block_)
 
 			throw SocketException("Broken pipe exception");
 		} else {
+			Close();
+
 			throw SocketTimeoutException("Socket output timeout error");
 		}
 	}

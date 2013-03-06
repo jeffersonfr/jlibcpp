@@ -47,6 +47,10 @@ int main(void)
 	while(true){
 		socket = (SSLSocket *)server.Accept();
 		
+		if (socket == NULL) {
+			break;
+		}
+
 		// Receive message
 		char msg[256];
 		int r;
