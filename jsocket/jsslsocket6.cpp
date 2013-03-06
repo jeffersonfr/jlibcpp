@@ -255,7 +255,7 @@ void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 
 	_server_sock.sin6_port = htons(port_);
 
-	int r;
+	int r = 0;
 
 	if (_timeout > 0) {
 		int opt = 1;
@@ -314,9 +314,13 @@ void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 	}
 
+	if (r < 0) {
+		throw SocketException("Connection error");
+	}
+
 	// ssl connect
 	if (!CheckContext()) {
-		return;
+		throw SocketException("Secure connection context error");
 	}
 
 	if( ssl == NULL ) {
@@ -326,23 +330,19 @@ void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 	}
 
 	if (ssl == NULL) {
-		return;
+		throw SocketException("Secure connection error");
 	}
 
 	SSL_set_connect_state(ssl);
 
 	if (SSL_set_fd(ssl, _fd) < 1) {
-		return;
+		throw SocketException("Secure connection handle error");
 	}
 
 	int tmp;
 
 	if ((tmp = SSL_connect(ssl)) < 1) {
-		return;
-	}
-
-	if (r < 0) {
-		throw SocketException("Connection error");
+		throw SocketException("Secure connection error");
 	}
 #endif
 }
