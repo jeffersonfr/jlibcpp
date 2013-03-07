@@ -34,7 +34,7 @@ int main(void)
 	SSLSocket mySocket("localhost", 5555);
 	
 	// Check server certificates agains our known trusted certificate
-	mySocket.UseVerification("cert.pem", NULL);
+	mySocket.UseVerification("certs/cert.pem", NULL);
 	
 	// Print server information
 	struct peer_cert_info_t info;

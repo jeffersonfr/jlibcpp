@@ -30,6 +30,8 @@ using namespace std;
 using namespace jsocket;
 
 /*
+ * Certificate PEM Format (coded)
+ *
  * openssl dhparam -check -text -5 1024 -out dh1024.pem
  *
  */
@@ -41,8 +43,8 @@ int main(void)
 	SSLSocket *socket;
 	
 	// Load our certificate
-	server.UseCertPassword("cert.pem", "cert_key.pem", "qwerty");
-	server.UseDHFile("dh1024.pem");
+	server.UseCertPassword("certs/cert.pem", "certs/cert_key.pem", "qwerty");
+	server.UseDHFile("certs/dh1024.pem");
 
 	while(true){
 		socket = (SSLSocket *)server.Accept();
