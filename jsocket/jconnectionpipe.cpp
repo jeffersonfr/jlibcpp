@@ -119,6 +119,23 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 	
 	r = read(_pipe[0], c, size_);
 	
+	if (n < 0) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
+			if (block_ == true) {
+				throw SocketTimeoutException("Socket input timeout error");
+			}
+		}
+			
+		throw jio::IOException("Socket input error");
+	} else if (n == 0) {
+		if (block_ == true) {
+			Close();
+
+			throw jio::IOException("Peer has shutdown");
+		}
+	}
+
+	/*
 	if (r < 0) {
 		if (errno == EAGAIN) {
 			throw SocketTimeoutException("Socket input timeout error");
@@ -126,6 +143,7 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 			throw jio::IOException("Broken pipe exception");
 		}
 	}
+	*/
 #endif
 	
 	_current_send -= r;
@@ -178,9 +196,13 @@ int ConnectionPipe::Send(const char *data_, int size_, bool block_)
 #endif
 	
 	if (n < 0) {
+		if (block_ == true) {
+			throw SocketTimeoutException("Socket output timeout error");
+		}
+				
 		throw jio::IOException("Broken pipe exception");
 	}
-	
+			
 	return n;
 }
 

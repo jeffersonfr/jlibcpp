@@ -490,10 +490,18 @@ int SSLSocket::Send(const char *data_, int size_, bool block_)
 		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			if (block_ == true) {
 				throw SocketTimeoutException("Socket output timeout error");
+			}
+				
+			throw SocketException("Socket output exception");
+			
+			/*
+			if (block_ == true) {
+				throw SocketTimeoutException("Socket output timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
 			}
+			*/
 		} else if (errno == EPIPE || errno == ECONNRESET) {
 			Close();
 
@@ -560,6 +568,23 @@ int SSLSocket::Receive(char *data_, int size_, bool block_)
 		if (errno == EAGAIN || errno == EWOULDBLOCK) {
 			if (block_ == true) {
 				throw SocketTimeoutException("Socket input timeout error");
+			}
+		}
+			
+		throw jio::IOException("Socket input error");
+	} else if (n == 0) {
+		if (block_ == true) {
+			Close();
+
+			throw jio::IOException("Peer has shutdown");
+		}
+	}
+
+	/*
+	if (n < 0) {
+		if (errno == EAGAIN || errno == EWOULDBLOCK) {
+			if (block_ == true) {
+				throw SocketTimeoutException("Socket input timeout error");
 			} else {
 				// INFO:: non-blocking socket, no data read
 				n = 0;
@@ -572,6 +597,7 @@ int SSLSocket::Receive(char *data_, int size_, bool block_)
 
 		throw jio::IOException("Peer has shutdown");
 	}
+	*/
 
 	_receive_bytes += n;
 

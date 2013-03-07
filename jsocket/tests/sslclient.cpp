@@ -34,7 +34,11 @@ int main(void)
 	SSLSocket mySocket("localhost", 5555);
 	
 	// Check server certificates agains our known trusted certificate
-	mySocket.UseVerification("certs/cert.pem", NULL);
+	if (mySocket.UseVerification("certs/cert.pem", NULL) == true) {
+		std::cout << "Certificado Verificado com Sucesso !" << std::endl;
+	} else {
+		std::cout << "Certificado Invalido !" << std::endl;
+	}
 	
 	// Print server information
 	struct peer_cert_info_t info;
