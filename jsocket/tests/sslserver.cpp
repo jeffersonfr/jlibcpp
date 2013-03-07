@@ -30,9 +30,14 @@ using namespace std;
 using namespace jsocket;
 
 /*
- * Certificate PEM Format (coded)
- *
+ * DH File 1024
  * openssl dhparam -check -text -5 1024 -out dh1024.pem
+ *
+ * Certificate Self-Sined (PEM Format)
+ * openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout cert_key.pem -out cert.pem
+ *
+ * Dump Certificate (Text Format)
+ * openssl x509 -text -in cert.pem
  *
  */
 int main(void)
