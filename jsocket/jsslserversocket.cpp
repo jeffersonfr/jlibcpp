@@ -349,6 +349,11 @@ static int pem_passwd_cb_server(char *buf, int size, int rwflag, void *password)
 	return(strlen(buf));
 }
 
+bool SSLServerSocket::UseCert(const char *cert_file, const char *private_key_file)
+{
+	return UseCertCallback(cert_file, private_key_file, NULL, NULL);
+}
+
 bool SSLServerSocket::UseCertPassword(const char *cert_file, const char *private_key_file, std::string password)
 {
 	if (ud) {
@@ -389,21 +394,13 @@ bool SSLServerSocket::UseCertCallback(const char *cert_file, const char *private
 		SSL_CTX_set_default_passwd_cb_userdata(ctx, (void *)userdata);
 		
 	for (int i=0; i<3; i++) {
-		if (SSL_CTX_use_PrivateKey_file(ctx, private_key_file, SSL_FILETYPE_PEM))
+		if (SSL_CTX_use_PrivateKey_file(ctx, private_key_file, SSL_FILETYPE_PEM)) {
 			break;
+		}
 	
-		/*		
-		if (ERR_GET_REASON(ERR_peek_error())==EVP_R_BAD_DECRYPT) {
-			// Give the user two tries 
-			if (i < 2) {
-               	continue;
-            }
-				
+		if (i == 2) {
 			return false;
 		}
-		*/
-			
-		return false;
 	}
 	
 	// Check private key

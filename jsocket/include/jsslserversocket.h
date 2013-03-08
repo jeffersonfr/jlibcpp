@@ -145,37 +145,43 @@ class SSLServerSocket : public virtual jcommon::Object{
 		 * \brief Accept a new socket.
 		 *
 		 */
-		SSLSocket * Accept();
+		virtual SSLSocket * Accept();
 
 		/**
 		 * \brief
 		 *
 		 */
-		InetAddress * GetInetAddress();
+		virtual InetAddress * GetInetAddress();
 
 		/**
 		 * \brief Get the local port.
 		 *
 		 */
-		int GetLocalPort();
+		virtual int GetLocalPort();
 
 		/**
 		 * \brief Close the server socket.
 		 *
 		 */
-		void Close();
+		virtual void Close();
 
 		/**
 		 *  Create temp cert if no other is loaded
 		 *
 		 */
-		bool UseCertPassword(const char *cert_file, const char *private_key_file, std::string password);
+		virtual bool UseCert(const char *cert_file, const char *private_key_file);
 
 		/**
 		 *  Create temp cert if no other is loaded
 		 *
 		 */
-		bool UseDHFile(const char *dh_file);
+		virtual bool UseCertPassword(const char *cert_file, const char *private_key_file, std::string password);
+
+		/**
+		 *  Create temp cert if no other is loaded
+		 *
+		 */
+		virtual bool UseDHFile(const char *dh_file);
 
 		/**
 		 * \brief 
