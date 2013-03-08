@@ -284,32 +284,32 @@ class SSLSocket6 : public jsocket::Connection{
 		 * 
 		 * PEM format
 		 */
-		bool UseCert(const char *cert_file, const char *private_key_file);
+		virtual bool UseCert(const char *cert_file, const char *private_key_file);
 
 		/**
-		 * As use_cert() but also give pasord for private_key_file (or get OpenSSL's standard prompt each time)
+		 * As use_cert() but also give password for private_key_file (or get OpenSSL's standard prompt each time)
 		 *
 		 */
-		bool UseCertPassword(const char *cert_file, const char *private_key_file, std::string pasd);
+		virtual bool UseCertPassword(const char *cert_file, const char *private_key_file, std::string pasd);
 
 		/**
-		 * Or specify a pasord callback given to OpenSSL that hands back the pasord to be used 
+		 * Or specify a password callback given to OpenSSL that hands back the password to be used 
 		 * during decryption. On invocation a pointer to userdata is provided. The pem_pasd_cb 
-		 * must write the pasord into the provided buffer buf which is of size size. The actual 
-		 * length of the pasord must be returned to the calling function. rwflag indicates
+		 * must write the password into the provided buffer buf which is of size size. The actual 
+		 * length of the password must be returned to the calling function. rwflag indicates
 		 * whether the callback is used for reading/decryption (rwflag=0) or writing/encryption 
 		 * (rwflag=1).
 		 *
 		 * See man SSL_CTX_set_default_pasd_cb(3) for more information.
 		 */
-		bool UseCertCallback(const char *cert_file, const char *private_key_file, int pasd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata = NULL);
+		virtual bool UseCertCallback(const char *cert_file, const char *private_key_file, int pasd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata = NULL);
 
 		/**
 		 *  Use Diffie-Hellman key exchange?
 		 *
 		 *  See man SSL_CTX_set_tmp_dh_callback(3) for more information.
 		 */
-		bool UseDHFile(const char *dh_file);
+		virtual bool UseDHFile(const char *dh_file);
 
 		/**
 		 *  Should the peer certificate be verified ? The arguments specifies the locations at which CA
@@ -318,13 +318,13 @@ class SSLSocket6 : public jsocket::Connection{
 		 *
 		 *   See man SSL_CTX_load_verify_locations(3) for format information.
 		 */
-		bool UseVerification(const char *ca_file, const char *ca_dir);
+		virtual bool UseVerification(const char *ca_file, const char *ca_dir);
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool GetPeerCertInfo(peer_cert_info_t *info);
+		virtual bool GetPeerCertInfo(peer_cert_info_t *info);
 
 		/**
 		 *  Get peer certificate in PEM (ASCII) format. Should be called after connect() or accept() 
@@ -332,7 +332,7 @@ class SSLSocket6 : public jsocket::Connection{
 		 *
 		 *  Returns the length of pem or -1 on errors
 		 */
-		int GetPeerCertPEM(std::string *pem);
+		virtual int GetPeerCertPEM(std::string *pem);
 
 		/**
 		 * \brief

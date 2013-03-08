@@ -384,22 +384,6 @@ bool SSLSocket6::Accept()
 		return false;
 	}
 
-	/*
-		 if (_verify_client == true) {
-// Get the client's certificate (optional)
-client_cert = SSL_get_peer_certificate(ssl);
-if (client_cert != NULL) {
-str = X509_NAME_oneline(X509_get_subject_name(client_cert), 0, 0);
-RETURN_NULL(str);
-free (str);
-str = X509_NAME_oneline(X509_get_issuer_name(client_cert), 0, 0);
-RETURN_NULL(str);
-free (str);
-X509_free(client_cert);
-} 
-}
-*/
-
 	return true;
 #endif
 }
@@ -798,7 +782,25 @@ static int pem_passwd_cb(char *buf, int size, int rwflag, void *password)
 
 static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
 {
-	// We don't care. Continue with handshake
+	/*
+	char    buf[256];
+	X509   *err_cert;
+	int     err, depth;
+	SSL    *ssl;
+	mydata_t *mydata;
+
+	err_cert = X509_STORE_CTX_get_current_cert(ctx);
+	err = X509_STORE_CTX_get_error(ctx);
+	depth = X509_STORE_CTX_get_error_depth(ctx);
+
+
+	// Retrieve the pointer to the SSL of the connection currently treated
+	// and the application specific data stored into the SSL object.
+	ssl = X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
+	mydata = SSL_get_ex_data(ssl, mydata_index);
+
+	X509_NAME_oneline(X509_get_subject_name(err_cert), buf, 256);
+	*/
 
 	// accept connection
 	return 1;
@@ -1025,8 +1027,8 @@ bool SSLSocket6::UseVerification(const char *ca_file, const char *ca_dir)
 		}
 	}
 
-	SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER|SSL_VERIFY_CLIENT_ONCE, verify_callback);
-
+	SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, verify_callback);
+	
 	return true;
 }
 

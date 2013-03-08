@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "jsslserversocket.h"
 #include "jsslsocket.h"
+#include "jsocketexception.h"
 
 #include <iostream>
 
@@ -44,43 +45,53 @@ int main(void)
 {
 	SSLSocket::InitializeSSL();
 
-	SSLServerSocket server(5555);
+	SSLServerSocket server(5555, jsocket::JCA_REQUEST);
 	SSLSocket *socket;
 	
 	// Load our certificate
 	server.UseCertPassword("certs/cert.pem", "certs/cert_key.pem", "qwerty");
 	server.UseDHFile("certs/dh1024.pem");
 
-	while(true){
-		socket = (SSLSocket *)server.Accept();
-		
-		if (socket == NULL) {
-			break;
+	while(true) {
+		try {
+			std::cout << "Waiting sockets ..." << std::endl;
+
+			socket = (SSLSocket *)server.Accept();
+
+			std::cout << "Certificado Verificado com Sucesso !" << std::endl;
+
+			// Receive message
+			char msg[256];
+			int r;
+
+			r = socket->Receive(msg, 255);
+
+			if (r > 0) {
+				msg[r] = 0;
+
+				std::cout << "Received [" << r << "]: " << msg << std::endl;
+
+				socket->Send("Hello Client!", 13);
+
+				std::cout << "Close socket" << std::endl;
+
+				socket->Close();
+
+				delete socket;
+				socket = NULL;
+
+				if (strncmp(msg, "quit", 4) == 0) {
+					break;
+				}
+			} else {
+				std::cout << "Erro no receive" << std::endl;
+			}
+		} catch (jsocket::SocketException &e) {
+			std::cout << "Socket exception: " << e.what() << std::endl;
 		}
-
-		// Receive message
-		char msg[256];
-		int r;
-
-		r = socket->Receive(msg, 255);
-
-		if (r > 0) {
-			msg[r] = 0;
-
-			std::cout << "Received [" << r << "]: " << msg << std::endl;
-
-			socket->Send("Hello Client!", 13);
-		} else {
-			std::cout << "Erro no receive" << std::endl;
-		}
-
-		socket->Close();
-
-		delete socket;
-		socket = NULL;
-
-		break;
 	}
+			
+	std::cout << "Finish" << std::endl;
 	
 	SSLSocket::ReleaseSSL();
 	

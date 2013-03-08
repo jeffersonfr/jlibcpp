@@ -35,6 +35,12 @@
 
 namespace jsocket {
 
+enum jssl_client_auth {
+	JCA_REQUEST,
+	JCA_REQUIRE,
+	JCA_HANDSHAKE,
+};
+
 class SSLSocket;
 
 /**
@@ -49,6 +55,8 @@ class SSLServerSocket : public virtual jcommon::Object{
 		jsocket_t _fd;
 		/** \brief */
 		bool _is_closed;
+		/** \brief */
+		jssl_client_auth _client_auth;
 #ifdef _WIN32
 #else
 		/** \brief Local socket. */
@@ -99,12 +107,6 @@ class SSLServerSocket : public virtual jcommon::Object{
 		 *  Create temp cert if no other is loaded
 		 *
 		 */
-		virtual bool CheckCert();
-
-		/**
-		 *  Create temp cert if no other is loaded
-		 *
-		 */
 		RSA * GenerateRSAKey(int len, int exp = RSA_KEYEXP);
 
 		/**
@@ -131,7 +133,7 @@ class SSLServerSocket : public virtual jcommon::Object{
 		 * \brief Constructor.
 		 *
 		 */
-		SSLServerSocket(int port, int backlog = 5, int keysize = RSA_KEYSIZE, InetAddress * = NULL);
+		SSLServerSocket(int port, jssl_client_auth client_auth = JCA_HANDSHAKE, int backlog = 5, int keysize = RSA_KEYSIZE, InetAddress * = NULL);
 
 		/**
 		 * \brief Destructor virtual.

@@ -106,18 +106,18 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 		throw SocketException("Connection closed exception");
 	}
 	
-	int r = 0;
+	int n = 0;
 
 #ifdef _WIN32
 	ReadFile(_pipe[0], data_, size_, (DWORD *)&r, 0);
 
-	if (r <= 0) {
+	if (n <= 0) {
 		throw jio::IOException("Broken pipe exception");
 	}
 #else
 	char *c = data_;
 	
-	r = read(_pipe[0], c, size_);
+	n = read(_pipe[0], c, size_);
 	
 	if (n < 0) {
 		if (errno == EAGAIN || errno == EWOULDBLOCK) {
@@ -146,9 +146,9 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 	*/
 #endif
 	
-	_current_send -= r;
+	_current_send -= n;
 	
-	return r;
+	return n;
 }
 
 int ConnectionPipe::Send(const char *data_, int size_, int time_)

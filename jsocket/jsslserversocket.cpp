@@ -25,10 +25,12 @@
 
 namespace jsocket {
 
-SSLServerSocket::SSLServerSocket(int port_, int backlog_, int keysize, InetAddress *addr_):
+SSLServerSocket::SSLServerSocket(int port_, jssl_client_auth client_auth, int backlog_, int keysize, InetAddress *addr_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jsocket::SSLServerSocket");
+
+	_client_auth = client_auth;
 
 #ifdef _WIN32
 #else
@@ -149,6 +151,13 @@ SSLSocket * SSLServerSocket::Accept()
 	socklen_t sock_size;
 	int handler;
 	
+	if (_client_auth == JCA_REQUEST) {
+		SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, 0);
+	} else if (_client_auth == JCA_REQUIRE) {
+		SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, 0);
+	} else {
+	}
+
 	sock_size = sizeof(_rsock);
 
 	handler = ::accept(_fd, (struct sockaddr *) &_rsock, &sock_size);
@@ -329,50 +338,6 @@ X509 * SSLServerSocket::BuildCertificate(const char *name, const char *organizat
 	X509_sign(c, key, EVP_sha1());
 
 	return c;
-}
-
-bool SSLServerSocket::CheckCert()
-{
-	// FIXME: rsa_key, evp_pkey and cert are never deleted. However, they are only created once so there is no memory leak.
-	
-	if (have_cert) {
-		// No need to create a new temp cert
-		return true;  
-	}
-	
-	static bool created_session_data = false;
-	static RSA *rsa_key = NULL;
-	static EVP_PKEY *evp_pkey = NULL;
-	static X509 *cert = NULL;
-	
-	// Create a session certificate (gloabal for all instances of this class) if no other certificate was provided
-	if (created_session_data == false) {	
-		if (rsa_key == NULL) {
-			if((rsa_key = GenerateRSAKey(rsa_keysize)) == NULL){
-				return false;	
-			}
-		}
-		
-		if (evp_pkey == NULL) {
-			if ((evp_pkey = GeneratePKey(rsa_key)) == NULL){
-				return false;
-			}
-		}
-		
-		if ((cert = BuildCertificate("SocketW session cert", NULL, NULL, evp_pkey)) == NULL){
-			return false;
-		}
-		
-		created_session_data = true;
-	}
-	
-	// Use our session certificate
-	SSL_CTX_use_RSAPrivateKey(ctx, rsa_key);
-	SSL_CTX_use_certificate(ctx, cert);
-
-	have_cert = true;
-	
-	return true;
 }
 
 static int pem_passwd_cb_server(char *buf, int size, int rwflag, void *password)
