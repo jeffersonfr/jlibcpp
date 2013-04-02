@@ -73,9 +73,7 @@ NamedPipe::NamedPipe(std::string name, int mode):
 	}
 #else
 	if ((_fd = open(_name.c_str(), O_RDWR)) < 0) {
-		if (mkfifo(name.c_str(), mode) != 0) {
-			throw jio::IOException("Cannot create named pipe");
-		}
+		mkfifo(name.c_str(), mode);
 	
 		if ((_fd = open(_name.c_str(), O_RDWR)) < 0) {
 			throw jio::IOException("Cannot create named pipe");
