@@ -41,7 +41,19 @@ class SocketException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		SocketException(std::string);
+		SocketException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SocketException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SocketException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

@@ -38,7 +38,19 @@ class SecurityException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		SecurityException(std::string);
+		SecurityException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SecurityException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SecurityException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

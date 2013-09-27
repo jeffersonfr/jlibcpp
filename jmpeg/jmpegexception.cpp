@@ -22,8 +22,20 @@
 
 namespace jmpeg {
 
+MpegException::MpegException():
+	jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jmpeg::MpegException");
+}
+
 MpegException::MpegException(std::string reason_):
 	jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jmpeg::MpegException");
+}
+
+MpegException::MpegException(jcommon::Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jmpeg::MpegException");
 }

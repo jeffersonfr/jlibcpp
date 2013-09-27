@@ -17,52 +17,47 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_QUEUEEXCEPTION_H
-#define J_QUEUEEXCEPTION_H
-
+#include "jioexception.h"
 #include "jruntimeexception.h"
+#include "jnullpointerexception.h"
 
-#include <stdexcept>
-#include <string>
+#include <iostream>
 
-namespace jshared {
+#include <stdlib.h>
 
-/**
- * \brief SocketException.
- *
- * \author Jeff Ferr
- */
-class QueueException : public jcommon::RuntimeException{
-
-	private:
-
-	public:
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		QueueException();
-
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		QueueException(std::string reason);
-
-		/**
-		 * \brief Construtor.
-		 *
-		 */
-		QueueException(jcommon::Exception *exception, std::string reason);
-
-		/**
-		 * \brief Destrutor virtual.
-		 *
-		 */
-		virtual ~QueueException() throw();
-
-};
-
+void f() 
+{
+	throw jio::IOException("f() file not found");
 }
 
-#endif
+void g()
+{
+	try {
+		f();
+	} catch (jcommon::Exception &e) {
+		throw jcommon::RuntimeException(&e, "g() invalid reference");
+	}
+}
+
+void h()
+{
+	try {
+		g();
+	} catch (jcommon::Exception &e) {
+		throw jcommon::RuntimeException(&e, "h() unknown error");
+	}
+}
+
+int main(int argc, char *argv[])
+{
+	std::cout << "Print Stack Trace" << std::endl;
+
+	try {
+		h();
+	} catch (jcommon::Exception &e) {
+		e.PrintStackTrace();
+	}
+
+	return EXIT_SUCCESS;
+}
+

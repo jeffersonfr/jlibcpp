@@ -26,6 +26,9 @@ OK 				= \033[30;32mOK!\033[m
 OBJS_teste = \
 	   teste.o\
 
+OBJS_exceptions = \
+	   exceptions.o\
+
 OBJS_xml_teste = \
 	   xml_teste.o\
 
@@ -53,9 +56,12 @@ OBJS_calc_unit = \
 OBJS_access = \
 	   access.o\
 
-all: teste xml_teste xml_agenda regexp jsondump gcteste unit calc_unit access
+all: teste exceptions xml_teste xml_agenda regexp jsondump gcteste unit calc_unit access
 	
 teste: $(OBJS_teste)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+exceptions: $(OBJS_exceptions)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 xml_teste: $(OBJS_xml_teste)
@@ -92,4 +98,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste xml_teste xml_agenda myfile_teste.xml regexp jsondump gcteste pointer unit calc_unit access
+	@rm -rvf *.o *.xml *~ teste exceptions xml_teste xml_agenda myfile_teste.xml regexp jsondump gcteste pointer unit calc_unit access

@@ -22,8 +22,20 @@
 
 namespace jio {
 
+IOException::IOException():
+    jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jio::IOException");
+}
+
 IOException::IOException(std::string reason_):
     jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jio::IOException");
+}
+
+IOException::IOException(Exception *exception, std::string reason_):
+    jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jio::IOException");
 }

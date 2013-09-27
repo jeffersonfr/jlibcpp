@@ -22,8 +22,20 @@
 
 namespace jthread {
 
+SemaphoreTimeoutException::SemaphoreTimeoutException():
+	jthread::TimeoutException()
+{
+	jcommon::Object::SetClassName("jthread::SemaphoreTimeoutException");
+}
+
 SemaphoreTimeoutException::SemaphoreTimeoutException(std::string reason_):
 	jthread::TimeoutException(reason_)
+{
+	jcommon::Object::SetClassName("jthread::SemaphoreTimeoutException");
+}
+
+SemaphoreTimeoutException::SemaphoreTimeoutException(jcommon::Exception *exception, std::string reason_):
+	jthread::TimeoutException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jthread::SemaphoreTimeoutException");
 }

@@ -22,8 +22,20 @@
 
 namespace jsocket {
 
+SocketTimeoutException::SocketTimeoutException():
+    jcommon::RuntimeException()
+{
+    jcommon::Object::SetClassName("jsocket::SocketTimeoutException");
+}
+
 SocketTimeoutException::SocketTimeoutException(std::string reason_):
     jcommon::RuntimeException(reason_)
+{
+    jcommon::Object::SetClassName("jsocket::SocketTimeoutException");
+}
+
+SocketTimeoutException::SocketTimeoutException(jcommon::Exception *exception, std::string reason_):
+    jcommon::RuntimeException(exception, reason_)
 {
     jcommon::Object::SetClassName("jsocket::SocketTimeoutException");
 }

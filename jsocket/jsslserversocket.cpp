@@ -151,6 +151,10 @@ SSLSocket * SSLServerSocket::Accept()
 	socklen_t sock_size;
 	int handler;
 	
+	// Verifica toda a cadeia de certificados
+	//
+	// X509_verify_cert
+	//
 	if (_client_auth == JCA_REQUEST) {
 		SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, 0);
 	} else if (_client_auth == JCA_REQUIRE) {

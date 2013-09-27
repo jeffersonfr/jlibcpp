@@ -41,7 +41,19 @@ class IllegalStateException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
+		IllegalStateException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		IllegalStateException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		IllegalStateException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

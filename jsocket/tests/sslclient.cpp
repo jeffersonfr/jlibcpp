@@ -33,7 +33,7 @@ int main(void)
 {
 	SSLSocket::InitializeSSL();
 
-	try {
+	// try {
 		SSLSocket mySocket("localhost", 5555);
 
 		// Check server certificates agains our known trusted certificate
@@ -91,9 +91,9 @@ int main(void)
 		std::cout << "Received: " << receive << std::endl;
 
 		mySocket.Close();
-	} catch (jsocket::SocketException &e) {
-		std::cout << "Socket Exception: " << e.what() << std::endl;
-	}
+	//} catch (jsocket::SocketException &e) {
+		//std::cout << "Socket Exception: " << e.what() << std::endl;
+	//}
 	
 	SSLSocket::ReleaseSSL();
 	

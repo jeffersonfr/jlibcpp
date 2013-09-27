@@ -41,7 +41,19 @@ class PipeException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		PipeException(std::string);
+		PipeException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		PipeException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		PipeException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

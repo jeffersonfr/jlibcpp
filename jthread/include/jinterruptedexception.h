@@ -42,7 +42,19 @@ class InterruptedException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		InterruptedException(std::string);
+		InterruptedException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		InterruptedException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		InterruptedException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

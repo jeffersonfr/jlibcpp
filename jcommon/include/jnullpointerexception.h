@@ -41,7 +41,19 @@ class NullPointerException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
+		NullPointerException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		NullPointerException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		NullPointerException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

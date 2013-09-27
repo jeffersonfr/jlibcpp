@@ -22,8 +22,20 @@
 
 namespace jthread {
 
+ThreadException::ThreadException():
+	jcommon::RuntimeException()
+{
+    jcommon::Object::SetClassName("jthread::ThreadException");
+}
+
 ThreadException::ThreadException(std::string reason_):
 	jcommon::RuntimeException(reason_)
+{
+    jcommon::Object::SetClassName("jthread::ThreadException");
+}
+
+ThreadException::ThreadException(Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
 {
     jcommon::Object::SetClassName("jthread::ThreadException");
 }

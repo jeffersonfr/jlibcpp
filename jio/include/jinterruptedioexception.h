@@ -41,7 +41,19 @@ class InterruptedIOException : public jthread::InterruptedException{
 			 * \brief Construtor.
 			 *
 			 */
-			InterruptedIOException(std::string);
+			InterruptedIOException();
+
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			InterruptedIOException(std::string reason);
+
+			/**
+			 * \brief Construtor.
+			 *
+			 */
+			InterruptedIOException(jcommon::Exception *exception, std::string reason);
 
 			/**
 			 * \brief Destrutor virtual.

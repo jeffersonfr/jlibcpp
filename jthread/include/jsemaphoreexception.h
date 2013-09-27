@@ -42,7 +42,19 @@ class SemaphoreException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		SemaphoreException(std::string);
+		SemaphoreException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SemaphoreException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SemaphoreException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

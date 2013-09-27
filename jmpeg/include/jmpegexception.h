@@ -38,7 +38,19 @@ class MpegException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
+		MpegException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		MpegException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		MpegException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

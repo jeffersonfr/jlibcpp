@@ -41,7 +41,19 @@ class ThreadException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		ThreadException(std::string);
+		ThreadException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ThreadException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ThreadException(Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

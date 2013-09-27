@@ -41,7 +41,19 @@ class SemaphoreTimeoutException : public jthread::TimeoutException{
 		 * \brief Construtor.
 		 *
 		 */
-		SemaphoreTimeoutException(std::string);
+		SemaphoreTimeoutException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SemaphoreTimeoutException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SemaphoreTimeoutException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

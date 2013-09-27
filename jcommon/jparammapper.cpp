@@ -121,18 +121,18 @@ void ParamMapper::SetBooleanParam(std::string key, bool value)
 
 void ParamMapper::SetIntegerParam(std::string key, int64_t value)
 {
-	char str[32];
+	char str[64];
 	
-	snprintf(str, 30, "%ld", value);
+	snprintf(str, 32, "%ld", value);
 
 	_params[key] = str;
 }
 
 void ParamMapper::SetDecimalParam(std::string key, double value)
 {
-	char str[32];
+	char str[64];
 	
-	snprintf(str, 30, "%.2f", value);
+	snprintf(str, 32, "%.2f", value);
 
 	_params[key] = str;
 }

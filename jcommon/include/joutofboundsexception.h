@@ -42,7 +42,19 @@ class OutOfBoundsException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		OutOfBoundsException(std::string);
+		OutOfBoundsException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		OutOfBoundsException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		OutOfBoundsException(Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

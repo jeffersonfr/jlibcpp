@@ -22,8 +22,20 @@
 
 namespace jcommon {
 
+NotOwnerException::NotOwnerException():
+	RuntimeException()
+{
+	jcommon::Object::SetClassName("jcommon::NotOwnerException");
+}
+
 NotOwnerException::NotOwnerException(std::string reason_):
 	RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jcommon::NotOwnerException");
+}
+
+NotOwnerException::NotOwnerException(jcommon::Exception *exception, std::string reason_):
+	RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jcommon::NotOwnerException");
 }

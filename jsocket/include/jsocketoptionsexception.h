@@ -41,7 +41,19 @@ class SocketOptionsException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		SocketOptionsException(std::string);
+		SocketOptionsException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SocketOptionsException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SocketOptionsException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

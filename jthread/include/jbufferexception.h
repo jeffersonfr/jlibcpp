@@ -42,7 +42,19 @@ class BufferException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		BufferException(std::string);
+		BufferException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		BufferException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		BufferException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

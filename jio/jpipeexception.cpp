@@ -22,8 +22,20 @@
 
 namespace jio {
 
+PipeException::PipeException():
+    jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jio::PipeException");
+}
+
 PipeException::PipeException(std::string reason_):
     jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jio::PipeException");
+}
+
+PipeException::PipeException(jcommon::Exception *exception, std::string reason_):
+    jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jio::PipeException");
 }

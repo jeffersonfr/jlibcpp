@@ -42,7 +42,19 @@ class ParserException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
+		ParserException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		ParserException(std::string);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ParserException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

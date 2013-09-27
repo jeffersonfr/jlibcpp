@@ -238,6 +238,32 @@ void SSLSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 #endif
 }
 
+static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
+{
+	X509 *peer_cert = NULL;
+	SSL *ssl;
+
+	peer_cert = X509_STORE_CTX_get_current_cert(ctx);
+	ssl = (SSL *)X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
+
+	// INFO:: get the peer certificate to verification
+	char *str;
+
+	str = X509_NAME_oneline(X509_get_subject_name(peer_cert), 0, 0);
+	free (str);
+
+	str = X509_NAME_oneline(X509_get_issuer_name(peer_cert), 0, 0);
+	free (str);
+
+	X509_free(peer_cert);
+
+	if (SSL_get_verify_result(ssl) == X509_V_OK) {
+		return X509_V_OK;
+	} 
+
+	return -1;
+}
+
 void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 {
 #ifdef _WIN32
@@ -804,52 +830,6 @@ static int pem_passwd_cb(char *buf, int size, int rwflag, void *password)
 	return(strlen(buf));
 }
 
-static int verify_callback(int preverify_ok, X509_STORE_CTX *ctx)
-{
-	/*
-	X509   *err_cert;
-	SSL    *ssl;
-	char    buf[256];
-	int     err;
-
-	err_cert = X509_STORE_CTX_get_current_cert(ctx);
-	err = X509_STORE_CTX_get_error(ctx);
-	depth = X509_STORE_CTX_get_error_depth(ctx);
-
-	// Retrieve the pointer to the SSL of the connection currently treated
-	// and the application specific data stored into the SSL object.
-	ssl = X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
-	mydata = SSL_get_ex_data(ssl, mydata_index);
-
-	X509_NAME_oneline(X509_get_subject_name(err_cert), buf, 256);
-
-	X509 *peer = NULL;
-
-	puts("## Init verification");
-
-	// INFO:: get the peer certificate to verification
-	if ((peer = SSL_get_peer_certificate(ssl))) {
-		// INFO:: the certificate verification was verified OK
-			
-		str = X509_NAME_oneline(X509_get_subject_name(client_cert), 0, 0);
-		free (str);
-		str = X509_NAME_oneline(X509_get_issuer_name(client_cert), 0, 0);
-		free (str);
-
-		X509_free(client_cert);
-
-		puts("## Certificado recebido");
-		if (SSL_get_verify_result(ssl) == X509_V_OK) {
-			puts("## Certificado verificado ok");
-
-			return true;
-		}
-	}
-	*/
-
-	return X509_V_OK;
-}
-
 bool SSLSocket::CheckContext()
 {
 	if (ctx == NULL) {
@@ -1073,28 +1053,6 @@ bool SSLSocket::UseVerification(const char *ca_file, const char *ca_dir)
 	}
 
 	SSL_CTX_set_verify(ctx, SSL_VERIFY_PEER | SSL_VERIFY_CLIENT_ONCE, verify_callback);
-	
-	/*
-	X509 *peer_cert = NULL;
-
-	// INFO:: get the peer certificate to verification
-	if ((peer_cert = SSL_get_peer_certificate(ssl))) {
-		char *str;
-
-		str = X509_NAME_oneline(X509_get_subject_name(peer_cert), 0, 0);
-		free (str);
-
-		str = X509_NAME_oneline(X509_get_issuer_name(peer_cert), 0, 0);
-		free (str);
-
-		X509_free(peer_cert);
-
-		puts("## Certificado recebido");
-		if (SSL_get_verify_result(ssl) == X509_V_OK) {
-			return true;
-		} 
-	}
-	*/
 	
 	return true;
 }

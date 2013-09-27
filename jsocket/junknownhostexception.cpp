@@ -22,12 +22,23 @@
 
 namespace jsocket {
 
+UnknownHostException::UnknownHostException():
+	jcommon::RuntimeException()
+{
+    jcommon::Object::SetClassName("jsocket::UnknownException");
+}
+
 UnknownHostException::UnknownHostException(std::string reason_):
 	jcommon::RuntimeException(reason_)
 {
     jcommon::Object::SetClassName("jsocket::UnknownException");
 }
 
+UnknownHostException::UnknownHostException(jcommon::Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
+{
+    jcommon::Object::SetClassName("jsocket::UnknownException");
+}
 
 UnknownHostException::~UnknownHostException() throw()
 {

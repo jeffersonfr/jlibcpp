@@ -42,7 +42,19 @@ class IPCException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		IPCException(std::string);
+		IPCException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		IPCException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		IPCException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

@@ -41,7 +41,19 @@ class LoggerException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		LoggerException(std::string);
+		LoggerException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		LoggerException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		LoggerException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

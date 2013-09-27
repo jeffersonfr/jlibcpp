@@ -22,8 +22,20 @@
 
 namespace jshared {
 
+ProcessException::ProcessException():
+    jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jshared::ProcessException");
+}
+
 ProcessException::ProcessException(std::string reason_):
     jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jshared::ProcessException");
+}
+
+ProcessException::ProcessException(jcommon::Exception *exception, std::string reason_):
+    jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jshared::ProcessException");
 }

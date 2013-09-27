@@ -41,7 +41,19 @@ class SharedMemoryException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		SharedMemoryException(std::string);
+		SharedMemoryException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SharedMemoryException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		SharedMemoryException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

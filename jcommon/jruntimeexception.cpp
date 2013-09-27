@@ -22,8 +22,20 @@
 
 namespace jcommon {
 
+RuntimeException::RuntimeException():
+	jcommon::Exception(), std::runtime_error("runtime error")
+{
+	jcommon::Object::SetClassName("jcommon::RuntimeException");
+}
+
 RuntimeException::RuntimeException(std::string reason_):
 	jcommon::Exception(reason_), std::runtime_error(reason_)
+{
+	jcommon::Object::SetClassName("jcommon::RuntimeException");
+}
+
+RuntimeException::RuntimeException(jcommon::Exception *exception, std::string reason_):
+	jcommon::Exception(exception, reason_), std::runtime_error(reason_)
 {
 	jcommon::Object::SetClassName("jcommon::RuntimeException");
 }

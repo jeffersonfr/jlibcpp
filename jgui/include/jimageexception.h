@@ -41,7 +41,19 @@ class ImageException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		ImageException(std::string);
+		ImageException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ImageException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ImageException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

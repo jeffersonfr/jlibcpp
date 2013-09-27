@@ -41,7 +41,19 @@ class RuntimeException : public jcommon::Exception, public std::runtime_error{
 		 * \brief Construtor.
 		 *
 		 */
+		RuntimeException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		RuntimeException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		RuntimeException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

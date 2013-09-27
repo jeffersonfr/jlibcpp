@@ -22,8 +22,20 @@
 
 namespace jcommon {
 
+ParserException::ParserException():
+	RuntimeException()
+{
+	jcommon::Object::SetClassName("jcommon::ParserException");
+}
+
 ParserException::ParserException(std::string reason_):
 	RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jcommon::ParserException");
+}
+
+ParserException::ParserException(jcommon::Exception *exception, std::string reason_):
+	RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jcommon::ParserException");
 }

@@ -41,7 +41,19 @@ class IOException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		IOException(std::string);
+		IOException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		IOException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		IOException(Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

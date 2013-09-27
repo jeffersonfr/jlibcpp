@@ -22,8 +22,20 @@
 
 namespace jlogger {
 
+LoggerException::LoggerException():
+    jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jlogger::LoggerException");
+}
+
 LoggerException::LoggerException(std::string reason_):
     jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jlogger::LoggerException");
+}
+
+LoggerException::LoggerException(jcommon::Exception *exception, std::string reason_):
+    jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jlogger::LoggerException");
 }

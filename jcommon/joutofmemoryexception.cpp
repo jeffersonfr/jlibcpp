@@ -22,8 +22,20 @@
 
 namespace jcommon {
 
+OutOfMemoryException::OutOfMemoryException():
+    RuntimeException()
+{
+	jcommon::Object::SetClassName("jcommon::OutOfMemoryException");
+}
+
 OutOfMemoryException::OutOfMemoryException(std::string reason_):
     RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jcommon::OutOfMemoryException");
+}
+
+OutOfMemoryException::OutOfMemoryException(Exception *exception, std::string reason_):
+    RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jcommon::OutOfMemoryException");
 }

@@ -22,8 +22,20 @@
 
 namespace jcommon {
 
+URLException::URLException():
+	RuntimeException()
+{
+	jcommon::Object::SetClassName("jcommon::URLException");
+}
+
 URLException::URLException(std::string reason_):
 	RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jcommon::URLException");
+}
+
+URLException::URLException(Exception *exception, std::string reason_):
+	RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jcommon::URLException");
 }

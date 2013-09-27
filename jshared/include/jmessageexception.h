@@ -41,7 +41,19 @@ class MessageException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		MessageException(std::string);
+		MessageException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		MessageException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		MessageException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

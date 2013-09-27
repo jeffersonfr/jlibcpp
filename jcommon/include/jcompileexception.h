@@ -41,7 +41,19 @@ class CompileException : public jcommon::RuntimeException{
         * \brief Construtor.
         *
         */
-        CompileException(std::string);
+        CompileException();
+        
+        /**
+        * \brief Construtor.
+        *
+        */
+        CompileException(std::string reason);
+        
+        /**
+        * \brief Construtor.
+        *
+        */
+        CompileException(Exception *exception, std::string reason);
         
         /**
         * \brief Destrutor virtual.

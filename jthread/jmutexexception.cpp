@@ -22,8 +22,20 @@
 
 namespace jthread {
 
+MutexException::MutexException():
+	jcommon::RuntimeException()
+{
+    jcommon::Object::SetClassName("jthread::MutexException");
+}
+
 MutexException::MutexException(std::string reason_):
 	jcommon::RuntimeException(reason_)
+{
+    jcommon::Object::SetClassName("jthread::MutexException");
+}
+
+MutexException::MutexException(jcommon::Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
 {
     jcommon::Object::SetClassName("jthread::MutexException");
 }

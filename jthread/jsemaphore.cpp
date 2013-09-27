@@ -137,13 +137,13 @@ void Semaphore::Wait(uint64_t time_)
 		_counter = _counter + 1;
 	}
 
-	while ((result = sem_timedwait(&_handler, &t)) == -1 && errno == EINTR) {
+	while ((result = sem_timedwait(&_handler, &t)) != 0 && errno == EINTR) {
 		continue; 
 	}
 
 	AutoLock lock(&_mutex);
 
-	if (result == -1) {
+	if (result != 0) {
 		_counter = _counter - 1;
 
 		if (errno == ETIMEDOUT) {

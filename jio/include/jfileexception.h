@@ -41,7 +41,19 @@ class FileException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		FileException(std::string);
+		FileException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		FileException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		FileException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

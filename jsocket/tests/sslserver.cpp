@@ -49,7 +49,12 @@ int main(void)
 	SSLSocket *socket;
 	
 	// Load our certificate
-	server.UseCertPassword("certs/cert.pem", "certs/cert_key.pem", "qwerty");
+	if (server.UseCertPassword("certs/cert.pem", "certs/cert_key.pem", "DynaCinema") == false) {
+		puts("Chain failed...");
+		exit(1);
+	}
+
+	// server.UseCertPassword("certs/cert.pem", "certs/cert_key.pem", "qwerty");
 	server.UseDHFile("certs/dh1024.pem");
 
 	while(true) {

@@ -22,8 +22,20 @@
 
 namespace jcommon {
 
+NullPointerException::NullPointerException():
+	jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jcommon::NullPointerException");
+}
+
 NullPointerException::NullPointerException(std::string reason_):
 	jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jcommon::NullPointerException");
+}
+
+NullPointerException::NullPointerException(jcommon::Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jcommon::NullPointerException");
 }

@@ -22,8 +22,20 @@
 
 namespace jshared {
 
+MessageException::MessageException():
+    jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jshared::MessageException");
+}
+
 MessageException::MessageException(std::string reason_):
     jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jshared::MessageException");
+}
+
+MessageException::MessageException(jcommon::Exception *exception, std::string reason_):
+    jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jshared::MessageException");
 }

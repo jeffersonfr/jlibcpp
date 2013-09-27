@@ -22,8 +22,20 @@
 
 namespace jshared {
 
+SharedMemoryException::SharedMemoryException():
+    jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jshared::SharedMemoryException");
+}
+
 SharedMemoryException::SharedMemoryException(std::string reason_):
     jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jshared::SharedMemoryException");
+}
+
+SharedMemoryException::SharedMemoryException(jcommon::Exception *exception, std::string reason_):
+    jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jshared::SharedMemoryException");
 }

@@ -42,7 +42,19 @@ class OutOfMemoryException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
+		OutOfMemoryException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		OutOfMemoryException(std::string);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		OutOfMemoryException(Exception *exception, std::string);
 
 		/**
 		 * \brief Destrutor virtual.

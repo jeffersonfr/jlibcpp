@@ -41,7 +41,19 @@ class UnknownHostException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		UnknownHostException(std::string);
+		UnknownHostException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		UnknownHostException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		UnknownHostException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

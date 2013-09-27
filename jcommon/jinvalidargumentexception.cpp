@@ -22,8 +22,20 @@
 
 namespace jcommon {
 
+InvalidArgumentException::InvalidArgumentException():
+	jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jcommon::InvalidArgumentException");
+}
+
 InvalidArgumentException::InvalidArgumentException(std::string reason_):
 	jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jcommon::InvalidArgumentException");
+}
+
+InvalidArgumentException::InvalidArgumentException(jcommon::Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jcommon::InvalidArgumentException");
 }

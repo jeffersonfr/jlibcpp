@@ -22,8 +22,20 @@
 
 namespace jthread {
 
+InterruptedException::InterruptedException():
+	jcommon::RuntimeException()
+{
+    jcommon::Object::SetClassName("jthread::InterruptedException");
+}
+
 InterruptedException::InterruptedException(std::string reason_):
 	jcommon::RuntimeException(reason_)
+{
+    jcommon::Object::SetClassName("jthread::InterruptedException");
+}
+
+InterruptedException::InterruptedException(jcommon::Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
 {
     jcommon::Object::SetClassName("jthread::InterruptedException");
 }

@@ -166,6 +166,12 @@ class SSLServerSocket6 : public virtual jcommon::Object{
 		 *  Create temp cert if no other is loaded
 		 *
 		 */
+		virtual bool UseCert(const char *cert_file, const char *private_key_file);
+
+		/**
+		 *  Create temp cert if no other is loaded
+		 *
+		 */
 		bool UseCertPassword(const char *cert_file, const char *private_key_file, std::string password);
 
 		/**

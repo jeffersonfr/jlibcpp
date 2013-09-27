@@ -22,8 +22,20 @@
 
 namespace jthread {
 
+IllegalStateException::IllegalStateException():
+	jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jcommon::IllegalStateException");
+}
+
 IllegalStateException::IllegalStateException(std::string reason_):
 	jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jcommon::IllegalStateException");
+}
+
+IllegalStateException::IllegalStateException(jcommon::Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jcommon::IllegalStateException");
 }

@@ -22,9 +22,22 @@
 
 namespace jresource {
 
-ResourceException::ResourceException(std::string reason_):
-    std::runtime_error(reason_)
+ResourceException::ResourceException():
+	jcommon::RuntimeException()
 {
+	jcommon::Object::SetClassName("jresource::ResourceException");
+}
+
+ResourceException::ResourceException(std::string reason_):
+	jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jresource::ResourceException");
+}
+
+ResourceException::ResourceException(jcommon::Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
+{
+	jcommon::Object::SetClassName("jresource::ResourceException");
 }
 
 ResourceException::~ResourceException() throw()

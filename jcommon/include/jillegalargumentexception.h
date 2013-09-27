@@ -41,7 +41,19 @@ class IllegalArgumentException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
+		IllegalArgumentException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		IllegalArgumentException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		IllegalArgumentException(Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

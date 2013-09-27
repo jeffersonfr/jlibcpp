@@ -20,17 +20,19 @@
 #ifndef J_RESOURCEEXCEPTION_H
 #define J_RESOURCEEXCEPTION_H
 
+#include "jruntimeexception.h"
+
 #include <stdexcept>
 #include <string>
 
 namespace jresource {
 
 /**
- * \brief SocketException.
+ * \brief ResourceException.
  *
  * \author Jeff Ferr
  */
-class ResourceException : public std::runtime_error{
+class ResourceException : public jcommon::RuntimeException{
 
 	private:
 
@@ -39,7 +41,19 @@ class ResourceException : public std::runtime_error{
 		 * \brief Construtor.
 		 *
 		 */
-		ResourceException(std::string);
+		ResourceException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ResourceException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ResourceException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

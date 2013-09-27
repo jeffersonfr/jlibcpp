@@ -41,7 +41,19 @@ class MutexException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		MutexException(std::string);
+		MutexException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		MutexException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		MutexException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

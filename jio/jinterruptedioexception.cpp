@@ -22,8 +22,20 @@
 
 namespace jio {
 
+InterruptedIOException::InterruptedIOException():
+   jthread::InterruptedException()
+{
+	jcommon::Object::SetClassName("jio::InterruptedIOException");
+}
+
 InterruptedIOException::InterruptedIOException(std::string reason_):
    jthread::InterruptedException(reason_)
+{
+	jcommon::Object::SetClassName("jio::InterruptedIOException");
+}
+
+InterruptedIOException::InterruptedIOException(jcommon::Exception *exception, std::string reason_):
+   jthread::InterruptedException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jio::InterruptedIOException");
 }

@@ -22,8 +22,20 @@
 
 namespace jshared {
 
+QueueException::QueueException():
+    jcommon::RuntimeException()
+{
+	jcommon::Object::SetClassName("jshared::QueueException");
+}
+
 QueueException::QueueException(std::string reason_):
     jcommon::RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jshared::QueueException");
+}
+
+QueueException::QueueException(jcommon::Exception *exception, std::string reason_):
+    jcommon::RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jshared::QueueException");
 }

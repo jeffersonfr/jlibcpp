@@ -42,7 +42,19 @@ class NotOwnerException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
+		NotOwnerException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		NotOwnerException(std::string);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		NotOwnerException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

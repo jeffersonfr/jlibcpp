@@ -22,8 +22,20 @@
 
 namespace jipc {
 
+IPCException::IPCException():
+    RuntimeException()
+{
+	jcommon::Object::SetClassName("jcommon::IPCException");
+}
+
 IPCException::IPCException(std::string reason_):
     RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jcommon::IPCException");
+}
+
+IPCException::IPCException(jcommon::Exception *exception, std::string reason_):
+    RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jcommon::IPCException");
 }

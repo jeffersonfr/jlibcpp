@@ -41,7 +41,19 @@ class ProcessException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		ProcessException(std::string);
+		ProcessException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ProcessException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		ProcessException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

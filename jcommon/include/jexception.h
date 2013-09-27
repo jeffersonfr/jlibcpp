@@ -25,6 +25,7 @@
 #include <exception>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace jcommon {
 
@@ -36,8 +37,18 @@ namespace jcommon {
 class Exception : public virtual jcommon::Object, std::exception{
 
 	private:
+		/** \brief */
+		std::vector<Exception *> _exceptions;
+		/** \brief */
+		std::string _reason;
 
 	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		Exception();
+
 		/**
 		 * \brief Construtor.
 		 *
@@ -45,10 +56,52 @@ class Exception : public virtual jcommon::Object, std::exception{
 		Exception(std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+		Exception(Exception *exception, std::string reason);
+
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
 		virtual ~Exception() throw();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetMessage();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Exception * GetCause();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual const std::vector<Exception *> & GetStackTrace();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetStackTrace(const std::vector<Exception *> *stack);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void PrintStackTrace();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcommon::Object * Clone();
 
 		/**
 		 * \brief

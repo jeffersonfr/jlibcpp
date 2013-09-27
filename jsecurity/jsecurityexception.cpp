@@ -22,8 +22,18 @@
 
 namespace jsecurity {
 
+SecurityException::SecurityException():
+	jcommon::RuntimeException()
+{
+}
+
 SecurityException::SecurityException(std::string reason_):
 	jcommon::RuntimeException(reason_)
+{
+}
+
+SecurityException::SecurityException(jcommon::Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
 {
 }
 

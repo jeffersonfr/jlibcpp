@@ -41,7 +41,19 @@ class TimeoutException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		TimeoutException(std::string);
+		TimeoutException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		TimeoutException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		TimeoutException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

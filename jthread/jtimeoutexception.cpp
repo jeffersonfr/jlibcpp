@@ -22,8 +22,20 @@
 
 namespace jthread {
 
+TimeoutException::TimeoutException():
+	jcommon::RuntimeException()
+{
+    jcommon::Object::SetClassName("jthread::TimeoutException");
+}
+
 TimeoutException::TimeoutException(std::string reason_):
 	jcommon::RuntimeException(reason_)
+{
+    jcommon::Object::SetClassName("jthread::TimeoutException");
+}
+
+TimeoutException::TimeoutException(jcommon::Exception *exception, std::string reason_):
+	jcommon::RuntimeException(exception, reason_)
 {
     jcommon::Object::SetClassName("jthread::TimeoutException");
 }

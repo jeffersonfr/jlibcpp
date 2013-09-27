@@ -42,7 +42,19 @@ class URLException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		URLException(std::string);
+		URLException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		URLException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		URLException(Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

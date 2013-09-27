@@ -41,7 +41,19 @@ class InvalidArgumentException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
+		InvalidArgumentException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		InvalidArgumentException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		InvalidArgumentException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.

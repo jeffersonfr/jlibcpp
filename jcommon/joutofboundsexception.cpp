@@ -22,8 +22,20 @@
 
 namespace jcommon {
 
+OutOfBoundsException::OutOfBoundsException():
+    RuntimeException()
+{
+	jcommon::Object::SetClassName("jcommon::OutOfBoundsException");
+}
+
 OutOfBoundsException::OutOfBoundsException(std::string reason_):
     RuntimeException(reason_)
+{
+	jcommon::Object::SetClassName("jcommon::OutOfBoundsException");
+}
+
+OutOfBoundsException::OutOfBoundsException(Exception *exception, std::string reason_):
+    RuntimeException(exception, reason_)
 {
 	jcommon::Object::SetClassName("jcommon::OutOfBoundsException");
 }
