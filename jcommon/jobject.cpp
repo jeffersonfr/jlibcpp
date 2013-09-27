@@ -141,7 +141,7 @@ int Object::Compare(Object *o)
 
 Object * Object::Clone()
 {
-	return this;
+	return new Object(*this);
 }
 
 uint64_t Object::Hash()

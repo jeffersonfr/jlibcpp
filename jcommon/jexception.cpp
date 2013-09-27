@@ -104,13 +104,13 @@ void Exception::PrintStackTrace()
 
 jcommon::Object * Exception::Clone()
 {
-	Exception *e = new Exception(_reason);
+	Exception *o = new Exception(*this);
 
 	if (_exceptions.empty() == false) {
-		e->SetStackTrace(&_exceptions);
+		o->SetStackTrace(&_exceptions);
 	}
 
-	return (jcommon::Object *)e;
+	return (jcommon::Object *)o;
 }
 
 std::string Exception::what()

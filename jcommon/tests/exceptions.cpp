@@ -48,12 +48,21 @@ void h()
 	}
 }
 
+void i()
+{
+	try {
+		h();
+	} catch (jcommon::Exception &e) {
+		throw jcommon::NullPointerException(&e, "i() null pointer");
+	}
+}
+
 int main(int argc, char *argv[])
 {
 	std::cout << "Print Stack Trace" << std::endl;
 
 	try {
-		h();
+		i();
 	} catch (jcommon::Exception &e) {
 		e.PrintStackTrace();
 	}
