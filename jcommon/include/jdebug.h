@@ -20,31 +20,33 @@
 #ifndef J_DEBUG_H
 #define J_DEBUG_H
 
+#include <stdio.h>
+
 #define JINFO		1
 #define JWARN		2
 #define JERROR	3
 
-#define JDEBUG_ACTIVE(t, ...) {																																				\
+#define _JDEBUG_(t, ...) {																																				\
 	if (t == JINFO) {																																								\
-		printf ("\033[37;40mINFO:: %s:%d [%s] \033[0m", __FILE__, __LINE__, __PRETTY_FUNCTIACTIVE__);	\
+		printf ("\033[37;40mINFO:: <%s> [%s:%d] \033[0m", __FILE__, __PRETTY_FUNCTION__, __LINE__);		\
 	} else if (t == JWARN) {																																				\
-		printf ("\033[33;40mWARN:: %s:%d [%s] \033[0m", __FILE__, __LINE__, __PRETTY_FUNCTIACTIVE__);	\
-	} else if (t == JERRO) {																																				\
-		printf ("\033[31;40mERRO:: %s:%d [%s] \033[0m", __FILE__, __LINE__, __PRETTY_FUNCTIACTIVE__);	\
+		printf ("\033[33;40mWARN:: <%s> [%s:%d] \033[0m", __FILE__, __PRETTY_FUNCTION__, __LINE__);		\
+	} else if (t == JERROR) {																																				\
+		printf ("\033[31;40mERROR:: <%s> [%s:%d] \033[0m", __FILE__, __PRETTY_FUNCTION__, __LINE__);	\
 	}																																																\
 	printf(__VA_ARGS__);																																						\
-	fflush(stdin);																																									\
+	fflush(stdout);																																									\
 }
 
-#define JDEBUG_INACTIVE(...) {																																					\
+#define _JDEBUG_DUMMY_(...) {																																			\
 	while (0) {																																											\
 	}																																																\
 }																																																	\
 
 #ifdef JDEBUG_ENABLED
-#define JDEBUG	JDEBUG_ACTIVE
+#define JDEBUG	_JDEBUG_
 #else
-#define JDEBUG	JDEBUG_INACTIVE
+#define JDEBUG	_JDEBUG_DUMMY_
 #endif
 
 #endif
