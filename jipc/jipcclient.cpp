@@ -24,6 +24,7 @@ namespace jipc {
 
 IPCClient::IPCClient()
 {
+	_call_timeout = 0;
 }
 
 IPCClient::~IPCClient()
@@ -33,6 +34,11 @@ IPCClient::~IPCClient()
 Response * IPCClient::CallMethod(Method *method)
 {
 	return NULL;
+}
+
+void IPCClient::SetCallTimeout(int timeout)
+{
+	_call_timeout = timeout;
 }
 
 }

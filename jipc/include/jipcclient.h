@@ -32,7 +32,9 @@ namespace jipc {
  */
 class IPCClient {
 
-	private:
+	protected:
+		/** \brief */
+		int _call_timeout;
 
 	public:
 		/**
@@ -52,6 +54,12 @@ class IPCClient {
 		 *
 		 */
 		virtual Response * CallMethod(Method *method);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCallTimeout(int timeout);
 
 };
 

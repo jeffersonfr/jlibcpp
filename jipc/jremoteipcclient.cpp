@@ -50,7 +50,7 @@ Response * RemoteIPCClient::CallMethod(Method *method)
 		std::string encoded = IPCHelper::Encode(method->what());
 		const char *buffer = encoded.c_str();
 		int length = encoded.size();
-		int r,
+		int r = 0,
 				index = 0,
 				size = 1500;
 
@@ -71,14 +71,16 @@ Response * RemoteIPCClient::CallMethod(Method *method)
 
 		char rbuffer[65535];
 
-		index = 0;
-
 		try {
-			while ((r = client.Receive(rbuffer+index, 1500)) > 0) {
-				index = index + r;
-			}
+			r = client.Receive(rbuffer+index, 65535, _call_timeout);
 		} catch (jcommon::Exception &e) {
 		}
+
+		if (r < 0) {
+			r = 0;
+		}
+
+		rbuffer[r] = 0;
 
 		client.Close();
 
@@ -88,7 +90,7 @@ Response * RemoteIPCClient::CallMethod(Method *method)
 
 		return response;
 	} catch (jcommon::Exception &e) {
-		throw IPCException("Send call exception: " + e.what());
+		throw IPCException(&e, "Send call exception: " + e.what());
 	}
 }
 

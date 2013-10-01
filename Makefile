@@ -27,8 +27,8 @@ PREFIX		= /usr/local
 
 # {yes, no}
 ENABLE_DEBUG		?= no
-# {none, directfb, directfb-cairo, x11}
-ENABLE_GRAPHICS ?= none#directfb-cairo
+# {none, dummy, directfb, directfb-cairo, x11}
+ENABLE_GRAPHICS ?= none
 
 DEBUG  		= \
 		 -g -ggdb \
@@ -81,8 +81,6 @@ REQUIRES	= \
 ECHO			= echo
 
 OK 				= \033[30;32mOK\033[m
-
-include Makefile.gfx
 
 OBJS_jcommon += \
 	   jbitstream.o\
@@ -293,6 +291,10 @@ OBJS_jthread += \
 	   jthreadpool.o\
 		 jtimer.o\
 
+ifneq ($(ENABLE_GRAPHICS),none)
+
+include Makefile.gfx
+
 OBJS_jgui += \
 		jadjustmentevent.o\
 		jadjustmentlistener.o\
@@ -383,6 +385,8 @@ OBJS_jgui += \
 		jtable.o\
 		jguilib.o\
 
+endif
+
 SRCS_jcommon		+= $(addprefix jcommon/,$(OBJS_jcommon))
 SRCS_jgui				+= $(addprefix jgui/,$(OBJS_jgui))
 SRCS_jio				+= $(addprefix jio/,$(OBJS_jio))
@@ -448,7 +452,6 @@ install: uninstall
 	@install -d -o nobody -m 755 $(PREFIX)/$(MODULE)/sounds && install -o nobody -m 644 resources/sounds/* $(PREFIX)/$(MODULE)/sounds
 	@$(ECHO) "Installing include files in $(PREFIX)/include/$(MODULE) $(OK)" && mkdir -p $(PREFIX)/include/$(MODULE)
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jcommon && install -o nobody -m 644 jcommon/include/* $(PREFIX)/include/$(MODULE)/jcommon
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jgui && install -o nobody -m 644 jgui/include/* $(PREFIX)/include/$(MODULE)/jgui
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jio && install -o nobody -m 644 jio/include/* $(PREFIX)/include/$(MODULE)/jio
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jlogger && install -o nobody -m 644 jlogger/include/* $(PREFIX)/include/$(MODULE)/jlogger
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmpeg && install -o nobody -m 644 jmpeg/include/* $(PREFIX)/include/$(MODULE)/jmpeg
@@ -459,6 +462,9 @@ install: uninstall
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmath && install -o nobody -m 644 jmath/include/* $(PREFIX)/include/$(MODULE)/jmath
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jresource && install -o nobody -m 644 jresource/include/* $(PREFIX)/include/$(MODULE)/jresource
 	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsecurity && install -o nobody -m 644 jsecurity/include/* $(PREFIX)/include/$(MODULE)/jsecurity
+	@if [ $(ENABLE_GRAPHICS) != "none" ]; then \
+		install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jgui && install -o nobody -m 644 jgui/include/* $(PREFIX)/include/$(MODULE)/jgui; \
+	fi;
 	@$(ECHO) "Installing $(EXE) in $(PREFIX)/lib/lib$(MODULE).so $(OK)"
 	@install -d -o nobody -m 755 $(PREFIX)/lib && install -o nobody -m 644 $(LIBDIR)/$(EXE) $(PREFIX)/lib && ln -s $(PREFIX)/lib/$(EXE) $(PREFIX)/lib/lib$(MODULE).so
 	@$(ECHO) "Installing $(MODULE).pc in $(PREFIX)/lib/pkgconfig $(OK)"
