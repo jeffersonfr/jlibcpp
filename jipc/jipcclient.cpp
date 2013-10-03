@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jipcclient.h"
+#include "jipcexception.h"
 
 namespace jipc {
 
@@ -33,6 +34,7 @@ IPCClient::~IPCClient()
 
 void IPCClient::CallMethod(Method *method, Response **response)
 {
+	throw IPCException("IPCClient:: CallMethod wasn't implemented");
 }
 
 void IPCClient::SetCallTimeout(int timeout)

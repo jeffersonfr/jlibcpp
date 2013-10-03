@@ -73,7 +73,7 @@ void LocalIPCClient::CallMethod(Method *method, Response **response)
 		index = 0;
 
 		try {
-			while ((r = client.Receive((char *)buffer+index, size, _call_timeout)) > 0) {
+			while ((r = client.Receive((char *)rbuffer+index, size, _call_timeout)) > 0) {
 				index = index + r;
 
 				if (r < size) {
@@ -85,11 +85,15 @@ void LocalIPCClient::CallMethod(Method *method, Response **response)
 
 		client.Close();
 
-		if ((*response) == NULL) {
-			(*response) = new Response();
+		Response *local = (*response);
+
+		if (local == NULL) {
+			local = new Response();
 		}
 
-		(*response)->Initialize((uint8_t *)rbuffer, index);
+		local->Initialize((uint8_t *)rbuffer, index);
+
+		(*response) = local;
 	} catch (jcommon::Exception &e) {
 		throw IPCException(&e, "Send call exception");
 	}

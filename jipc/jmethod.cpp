@@ -36,8 +36,14 @@ Method::~Method()
 {
 }
 
-void Method::Initialize(std::string str)
+void Method::Initialize(uint8_t *buffer, int size)
 {
+	if (size <= 0) {
+		return;
+	}
+
+	std::string str = (const char *)buffer;
+
 	// INFO:: <method>:[<id=value>[;<id=param>]*
 	jcommon::StringTokenizer tokens(IPCHelper::Decode(str), ":", jcommon::JTT_STRING);
 

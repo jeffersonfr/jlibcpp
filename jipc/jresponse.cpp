@@ -36,7 +36,7 @@ Response::~Response()
 
 void Response::Initialize(uint8_t *buffer, int size)
 {
-	if (size < 0) {
+	if (size <= 0) {
 		return;
 	}
 

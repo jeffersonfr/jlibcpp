@@ -50,15 +50,16 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 
 	jsocket::LocalSocket *client = _server->Accept();
 
-	char buffer[65535];
+	char rbuffer[65535];
 	int r,
-			index = 0;
+			index = 0,
+			size = 1500;
 
 	try {
-		while ((r = client->Receive(buffer+index, 1500, _response_timeout)) > 0) {
+		while ((r = client->Receive(rbuffer+index, size, _response_timeout)) > 0) {
 			index = index + r;
 
-			if (r < 1500) {
+			if (r < size) {
 				break;
 			}
 		}
@@ -67,17 +68,17 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 
 	Method *method = new Method("null");
 	
-	method->Initialize(buffer);
+	method->Initialize((uint8_t *)rbuffer, index);
 
 	Response *response = listener->ProcessCall(method);
 	
 	if (response != NULL) {
 		std::string encoded = IPCHelper::Encode(response->what());
+
 		const char *buffer = encoded.c_str();
 		int length = encoded.size();
-		int r,
-				index = 0,
-				size = 1500;
+			
+		index = 0;
 
 		try {
 			while (length > 0) {
@@ -96,14 +97,10 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 			}
 		} catch (jcommon::Exception &e) {
 		}
-	} else {
-		response = new Response();
-
-		response->SetIntegerParam("self", 0);
+	
+		delete response;
+		response = NULL;
 	}
-
-	delete response;
-	response = NULL;
 
 	delete method;
 	method = NULL;
@@ -111,7 +108,6 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 	client->Close();
 	delete client;
 	client = NULL;
-
 }
 
 }

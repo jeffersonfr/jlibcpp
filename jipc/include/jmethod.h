@@ -55,7 +55,7 @@ class Method : public jcommon::ParamMapper {
 		 * \brief
 		 *
 		 */
-		virtual void Initialize(std::string str);
+		virtual void Initialize(uint8_t *buffer, int size);
 
 		/**
 		 * \brief

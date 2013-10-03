@@ -34,7 +34,7 @@ IPCServer::~IPCServer()
 
 void IPCServer::WaitCall(RemoteCallListener *listener)
 {
-	throw IPCException("IPCServer::WaitCall wasn't implemented");
+	throw IPCException("IPCServer:: WaitCall wasn't implemented");
 }
 
 void IPCServer::SetResponseTimeout(int timeout)
