@@ -52,7 +52,7 @@ class LocalIPCClient : public IPCClient {
 		 * \brief
 		 *
 		 */
-		virtual Response * CallMethod(Method *method);
+		virtual void CallMethod(Method *method, Response **response);
 
 };
 

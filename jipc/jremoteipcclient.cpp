@@ -38,7 +38,7 @@ RemoteIPCClient::~RemoteIPCClient()
 {
 }
 
-Response * RemoteIPCClient::CallMethod(Method *method)
+void RemoteIPCClient::CallMethod(Method *method, Response **response)
 {
 	if (method == NULL) {
 		throw jcommon::NullPointerException("Method cannot be null");
@@ -69,26 +69,28 @@ Response * RemoteIPCClient::CallMethod(Method *method)
 			}
 		}
 
-		char rbuffer[65535];
+		uint8_t rbuffer[65535];
+
+		index = 0;
 
 		try {
-			r = client.Receive(rbuffer+index, 65535, _call_timeout);
+			while ((r = client.Receive((char *)buffer+index, size, _call_timeout)) > 0) {
+				index = index + r;
+
+				if (r < size || index ) {
+					break;
+				}
+			}
 		} catch (jcommon::Exception &e) {
 		}
 
-		if (r < 0) {
-			r = 0;
-		}
-
-		rbuffer[r] = 0;
-
 		client.Close();
 
-		Response *response = new Response();
+		if ((*response) == NULL) {
+			(*response) = new Response();
+		}
 
-		response->Initialize(rbuffer);
-
-		return response;
+		(*response)->Initialize(rbuffer, index);
 	} catch (jcommon::Exception &e) {
 		throw IPCException(&e, "Send call exception: " + e.what());
 	}

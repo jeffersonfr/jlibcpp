@@ -32,7 +32,9 @@ namespace jipc {
  */
 class IPCServer {
 
-	private:
+	protected:
+		/** \brief */
+		int _response_timeout;
 
 	public:
 		/**
@@ -52,6 +54,12 @@ class IPCServer {
 		 *
 		 */
 		virtual void WaitCall(RemoteCallListener *listener);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetResponseTimeout(int timeout);
 
 };
 

@@ -25,6 +25,7 @@ namespace jipc {
 
 IPCServer::IPCServer()
 {
+	_response_timeout = 0;
 }
 
 IPCServer::~IPCServer()
@@ -34,6 +35,11 @@ IPCServer::~IPCServer()
 void IPCServer::WaitCall(RemoteCallListener *listener)
 {
 	throw IPCException("IPCServer::WaitCall wasn't implemented");
+}
+
+void IPCServer::SetResponseTimeout(int timeout)
+{
+	_response_timeout = timeout;
 }
 
 }

@@ -34,8 +34,14 @@ Response::~Response()
 {
 }
 
-void Response::Initialize(std::string str)
+void Response::Initialize(uint8_t *buffer, int size)
 {
+	if (size < 0) {
+		return;
+	}
+
+	std::string str = (const char *)buffer;
+
 	// INFO:: <id=value>[,<id=param>]*
 	jcommon::StringTokenizer params(str, ";", jcommon::JTT_STRING);
 

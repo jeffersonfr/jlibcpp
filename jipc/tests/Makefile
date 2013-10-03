@@ -26,8 +26,15 @@ OK 				= \033[30;32mOK!\033[m
 OBJS_teste = \
 	   teste.o\
 
-all: teste
+OBJS_vlc = \
+	   vlc.o\
+
+all: teste vlc
 	
+vlc: cvlc.o svlc.o
+	@$(CC) $(CCFLAGS) cvlc.o -o cvlc $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+	@$(CC) $(CCFLAGS) svlc.o -o svlc $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -37,4 +44,4 @@ teste: $(OBJS_teste)
 install:
 
 clean:
-	@rm -rvf *.o *~ teste
+	@rm -rvf *.o *~ teste cvlc svlc

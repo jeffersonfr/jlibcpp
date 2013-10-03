@@ -31,9 +31,8 @@ IPCClient::~IPCClient()
 {
 }
 
-Response * IPCClient::CallMethod(Method *method)
+void IPCClient::CallMethod(Method *method, Response **response)
 {
-	return NULL;
 }
 
 void IPCClient::SetCallTimeout(int timeout)

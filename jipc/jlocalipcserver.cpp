@@ -55,7 +55,7 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 			index = 0;
 
 	try {
-		while ((r = client->Receive(buffer+index, 1500, 100)) > 0) {
+		while ((r = client->Receive(buffer+index, 1500, _response_timeout)) > 0) {
 			index = index + r;
 
 			if (r < 1500) {
