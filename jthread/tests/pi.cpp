@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jthreadpool.h"
+#include "jbarrier.h"
 #include "jrunnable.h"
 
 #include <iostream>
@@ -32,62 +33,28 @@
 
 #define MAX_THREAD	10000
 
-typedef struct {
-	int id;
-	int noproc;
-	int dim;
-} parm;
-
-typedef struct {
-	int cur_count;
-	pthread_mutex_t barrier_mutex;
-	pthread_cond_t barrier_cond;
-} barrier_t;
-
-barrier_t barrier1;
+#define ROOTN				10000000
 
 double *finals;
-int rootn;
-
-void barrier_init(barrier_t * mybarrier)
-{
-	/* must run before spawning the thread */
-	pthread_mutexattr_t attr;
-
-	pthread_mutexattr_setprotocol(&attr, PTHREAD_PRIO_INHERIT);
-	pthread_mutexattr_setprioceiling(&attr, 0); 
-
-	pthread_mutex_init(&(mybarrier->barrier_mutex), &attr);
-	pthread_cond_init(&(mybarrier->barrier_cond), NULL);
-	mybarrier->cur_count = 0;
-}
-
-void barrier(int numproc, barrier_t * mybarrier)
-{
-	pthread_mutex_lock(&(mybarrier->barrier_mutex));
-	mybarrier->cur_count++;
-	if (mybarrier->cur_count!=numproc) {
-		pthread_cond_wait(&(mybarrier->barrier_cond), &(mybarrier->barrier_mutex));
-	} else {
-		mybarrier->cur_count=0;
-		pthread_cond_broadcast(&(mybarrier->barrier_cond));
-	}
-	pthread_mutex_unlock(&(mybarrier->barrier_mutex));
-}
 
 double f(double a)
 {
 	return (4.0 / (1.0 + a * a));
 }
 
-class CPI : public jthread::Runnable{
+class CPI : public jthread::Thread {
+
 	private:
-		parm *p;
+		jthread::Barrier *_barrier;
+		int _id;
+		int _nprocess;
 
 	public:
-		CPI(parm *arg)
+		CPI(jthread::Barrier *barrier, int id, int nprocess)
 		{
-			p = arg;
+			_barrier = barrier;
+			_id = id;
+			_nprocess = nprocess;
 		}
 
 		virtual ~CPI()
@@ -96,8 +63,8 @@ class CPI : public jthread::Runnable{
 
 		virtual void Run()
 		{
-			int myid = p->id;
-			int numprocs = p->noproc;
+			int myid = _id;
+			int numprocs = _nprocess;
 			int i;
 			double PI25DT = 3.141592653589793238462643;
 			double mypi = 0.0, pi, h, sum, x;
@@ -106,13 +73,15 @@ class CPI : public jthread::Runnable{
 			if (myid == 0) {
 				startwtime = clock();
 			}
-			barrier(numprocs, &barrier1);
-			if (rootn==0) {
+
+			_barrier->Wait();
+
+			if (ROOTN == 0) {
 				finals[myid]=0;
 			} else {
-				h = 1.0 / (double) rootn;
+				h = 1.0 / (double)ROOTN;
 				sum = 0.0;
-				for (i = myid + 1; i <=rootn; i += numprocs) {
+				for (i = myid + 1; i <= ROOTN; i += numprocs) {
 					x = h * ((double) i - 0.5);
 					sum += f(x);
 				}
@@ -120,7 +89,7 @@ class CPI : public jthread::Runnable{
 			}
 			finals[myid] = mypi;
 
-			barrier(numprocs, &barrier1);
+			_barrier->Wait();
 
 			if (myid == 0) {
 				pi = 0.0;
@@ -136,7 +105,6 @@ class CPI : public jthread::Runnable{
 
 int main(int argc, char **argv)
 {
-	parm *arg;
 	int n, 
 			i;
 
@@ -144,37 +112,32 @@ int main(int argc, char **argv)
 		std::cout << "usage: " << argv[0] << " n [where n is no. of thread]" << std::endl;
 		exit(1);
 	}
+
 	n = atoi(argv[1]);
+
 	if ((n < 1) || (n > MAX_THREAD)) {
 		std::cout << "The no of thread should between 1 and " << MAX_THREAD << std::endl;
 		exit(1);
 	}
 
-	/* setup barrier */
-	barrier_init(&barrier1);
-
-	/* allocate space for final result */
+	// allocate space for final result
 	finals = (double *) malloc(n * sizeof(double));
 
-	rootn = 10000000;
+	std::vector<jthread::Thread *> threads;
+	jthread::Barrier barrier(n);
 
-	arg=(parm *)malloc(sizeof(parm)*n);
+	for (i = 0; i < n; i++) {
+		CPI *cpi = new CPI(&barrier, i, n);
 
-	try {
-		jthread::ThreadPool group1(n);
+		cpi->Start();
 
-		for (i = 0; i < n; i++) {
-			arg[i].id = i;
-			arg[i].noproc = n;
-
-			group1.AttachThread(new CPI(&arg[i]));
-		}
-
-		group1.WaitForAll();
-	} catch (jcommon::RuntimeException &e) {
-		perror("Error:: ");
+		threads.push_back(cpi);
 	}
-	
-	free(arg);
+
+	for (i = 0; i < n; i++) {
+		threads[i]->WaitThread();
+	}
+
+	return 0;
 }
 
