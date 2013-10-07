@@ -22,17 +22,17 @@
 
 namespace jresource {
 
-ResourceStatusEvent::ResourceStatusEvent(void *source):
+ResourceStatusEvent::ResourceStatusEvent(void *source, jresourceevent_status_t type):
 	jcommon::EventObject(source)
 {
-	_type = JRT_UNKNOWN;
+	_type = type;
 }
 
 ResourceStatusEvent::~ResourceStatusEvent()
 {
 }
 
-jresourceevent_type_t  ResourceStatusEvent::GetType()
+jresourceevent_status_t  ResourceStatusEvent::GetType()
 {
 	return _type;
 }

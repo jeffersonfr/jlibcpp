@@ -17,17 +17,54 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "Stdafx.h"
-#include "jresourceproxy.h"
+#ifndef J_RESOURCETYPELISTENER_H
+#define J_RESOURCETYPELISTENER_H
+
+#include "jlistener.h"
+#include "jresourcetypeevent.h"
+
+#include <string>
 
 namespace jresource {
 
-ResourceProxy::ResourceProxy()
-{
+/**
+ * \brief
+ * 
+ * \author Jeff Ferr
+ */
+class ResourceTypeListener : public jcommon::Listener{
+
+	private:
+
+		
+	public:
+		/**
+		 * \brief
+		 * 
+		 */
+		ResourceTypeListener();
+		
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual ~ResourceTypeListener();
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void Reserved(ResourceTypeEvent *event);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void Released(ResourceTypeEvent *event);
+
+};
+
 }
 
-ResourceProxy::~ResourceProxy()
-{
-}
+#endif
 
-}

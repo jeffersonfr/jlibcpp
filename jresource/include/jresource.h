@@ -17,56 +17,100 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_RESOURCECLIENT_H
-#define J_RESOURCECLIENT_H
+#ifndef J_RESOURCE_H
+#define J_RESOURCE_H
+
+#include "jresourcestatuslistener.h"
+#include "jresourcetypelistener.h"
 
 #include <string>
 
 namespace jresource {
-
-class ResourceProxy;
 
 /**
  * \brief
  * 
  * \author Jeff Ferr
  */
-class ResourceClient{
+class Resource{
 
 	private:
-
+		/** \brief */
+		std::vector<ResourceTypeListener *> _type_listeners;
+		/** \brief */
+		std::vector<ResourceStatusListener *> _status_listeners;
+		/** \brief */
+		ResourceStatusListener *_listener;
+		/** \brief */
+		bool _is_available;
 		
 	public:
 		/**
 		 * \brief
 		 * 
 		 */
-		ResourceClient();
+		Resource();
 		
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual ~ResourceClient();
+		virtual ~Resource();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual bool RequestRelease(ResourceProxy *proxy, void *data) = 0;
+		virtual bool IsAvailable();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual void Release(ResourceProxy *proxy) = 0;
+		virtual void Reserve(ResourceStatusListener *listener, bool force = false, int timeout = 0);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void Release();
     
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual void NotifyRelease(ResourceProxy *proxy) = 0;
-    
+		virtual void RegisterResourceTypeListener(ResourceTypeListener *listener);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void RemoveResourceTypeListener(ResourceTypeListener *listener);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void DispatchResourceTypeEvent(ResourceTypeEvent *event);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void RegisterResourceStatusListener(ResourceStatusListener *listener);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void RemoveResourceStatusListener(ResourceStatusListener *listener);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void DispatchResourceStatusEvent(ResourceStatusEvent *event);
+
 };
 
 }

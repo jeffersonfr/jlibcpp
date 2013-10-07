@@ -54,7 +54,19 @@ class ResourceStatusListener : public jcommon::Listener{
 		 * \brief
 		 * 
 		 */
-		virtual void StatusChanged(ResourceStatusEvent *event);
+		virtual void Released(ResourceStatusEvent *event);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void ReleaseForced(ResourceStatusEvent *event);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual bool ReleaseRequested(ResourceStatusEvent *event);
 
 };
 

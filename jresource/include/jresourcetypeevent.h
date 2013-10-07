@@ -17,57 +17,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_GROUP_H
-#define J_GROUP_H
+#ifndef J_RESOURCETYPEEVENT_H
+#define J_RESOURCETYPEEVENT_H
 
-#include "jresourcestatuslistener.h"
-#include "jresourcestatusevent.h"
+#include "jeventobject.h"
 
-#include <vector>
 #include <string>
 
 namespace jresource {
+
+enum jresourceevent_type_t {
+	JRT_RESERVED,
+	JRT_RELEASED
+};
 
 /**
  * \brief
  * 
  * \author Jeff Ferr
  */
-class ResourceServer{
+class ResourceTypeEvent : public jcommon::EventObject{
 
 	private:
-		std::vector<ResourceStatusListener *> _status_listeners;
+		/** \brief */
+		jresourceevent_type_t _type;
 		
 	public:
 		/**
 		 * \brief
 		 * 
 		 */
-		ResourceServer();
+		ResourceTypeEvent(void *source, jresourceevent_type_t type);
 		
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual ~ResourceServer();
+		virtual ~ResourceTypeEvent();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void RegisterResourceStatusListener(ResourceStatusListener *listener);
-
-		/**
-		 * \brief
-		 * 
-		 */
-		void RemoveResourceStatusListener(ResourceStatusListener *listener);
-    
-		/**
-		 * \brief
-		 * 
-		 */
-		void DispatchResourceStatusEvent(ResourceStatusEvent *event);
+		jresourceevent_type_t  GetType();
     
 };
 

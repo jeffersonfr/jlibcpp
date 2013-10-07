@@ -26,8 +26,10 @@
 
 namespace jresource {
 
-enum jresourceevent_type_t {
-	JRT_UNKNOWN
+enum jresourceevent_status_t {
+	JRS_RELEASED,
+	JRS_RELEASE_FORCED,
+	JRS_RELEASE_REQUESTED
 };
 
 /**
@@ -38,14 +40,15 @@ enum jresourceevent_type_t {
 class ResourceStatusEvent : public jcommon::EventObject{
 
 	private:
-		jresourceevent_type_t _type;
+		/** \brief */
+		jresourceevent_status_t _type;
 		
 	public:
 		/**
 		 * \brief
 		 * 
 		 */
-		ResourceStatusEvent(void *source);
+		ResourceStatusEvent(void *source, jresourceevent_status_t type);
 		
 		/**
 		 * \brief
@@ -57,7 +60,7 @@ class ResourceStatusEvent : public jcommon::EventObject{
 		 * \brief
 		 * 
 		 */
-		jresourceevent_type_t  GetType();
+		jresourceevent_status_t  GetType();
     
 };
 

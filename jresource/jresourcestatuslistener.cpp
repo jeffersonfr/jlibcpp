@@ -31,8 +31,17 @@ ResourceStatusListener::~ResourceStatusListener()
 {
 }
 
-void ResourceStatusListener::StatusChanged(ResourceStatusEvent *event)
+void ResourceStatusListener::Released(ResourceStatusEvent *event)
 {
+}
+
+void ResourceStatusListener::ReleaseForced(ResourceStatusEvent *event)
+{
+}
+
+bool ResourceStatusListener::ReleaseRequested(ResourceStatusEvent *event)
+{
+	return false;
 }
 
 }

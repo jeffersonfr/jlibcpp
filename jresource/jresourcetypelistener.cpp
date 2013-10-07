@@ -18,65 +18,25 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jresourceserver.h"
+#include "jresourcetypelistener.h"
 
 namespace jresource {
 
-ResourceServer::ResourceServer()
+ResourceTypeListener::ResourceTypeListener():
+	jcommon::Listener()
 {
 }
 
-ResourceServer::~ResourceServer()
+ResourceTypeListener::~ResourceTypeListener()
 {
 }
 
-void ResourceServer::RegisterResourceStatusListener(ResourceStatusListener *listener)
+void ResourceTypeListener::Reserved(ResourceTypeEvent *event)
 {
-	if (listener == NULL) {
-		return;
-	}
-
-	if (std::find(_status_listeners.begin(), _status_listeners.end(), listener) == _status_listeners.end()) {
-		_status_listeners.push_back(listener);
-	}
 }
 
-void ResourceServer::RemoveResourceStatusListener(ResourceStatusListener *listener)
+void ResourceTypeListener::Released(ResourceTypeEvent *event)
 {
-	if (listener == NULL) {
-		return;
-	}
-
-	std::vector<ResourceStatusListener *>::iterator i = std::find(_status_listeners.begin(), _status_listeners.end(), listener);
-	
-	if (i != _status_listeners.end()) {
-		_status_listeners.erase(i);
-	}
-}
-
-void ResourceServer::DispatchResourceStatusEvent(ResourceStatusEvent *event)
-{
-	if (event == NULL) {
-		return;
-	}
-
-	int k = 0,
-			size = (int)_status_listeners.size();
-
-	while (k++ < (int)_status_listeners.size() && event->IsConsumed() == false) {
-		ResourceStatusListener *listener = _status_listeners[k-1];
-
-		listener->StatusChanged(event);
-
-		if (size != (int)_status_listeners.size()) {
-			size = (int)_status_listeners.size();
-
-			k--;
-		}
-	}
-
-	delete event;
 }
 
 }
-
