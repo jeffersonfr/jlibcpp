@@ -23,6 +23,8 @@
 #include "jresourcestatuslistener.h"
 #include "jresourcetypelistener.h"
 
+#include "jautolock.h"
+
 #include <string>
 
 namespace jresource {
@@ -42,6 +44,10 @@ class Resource{
 		/** \brief */
 		ResourceStatusListener *_listener;
 		/** \brief */
+		jthread::Mutex _mutex;
+		/** \brief */
+		int _refresh_time;
+		/** \brief */
 		bool _is_available;
 		
 	public:
@@ -49,7 +55,7 @@ class Resource{
 		 * \brief
 		 * 
 		 */
-		Resource();
+		Resource(int refresh_time = 1000);
 		
 		/**
 		 * \brief

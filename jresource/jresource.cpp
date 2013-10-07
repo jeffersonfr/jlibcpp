@@ -25,10 +25,12 @@
 
 namespace jresource {
 
-Resource::Resource()
+Resource::Resource(int refresh_time):
+	_mutex(jthread::JMT_RECURSIVE)
 {
 	_listener = NULL;
-	_is_available = false;
+	_is_available = true;
+	_refresh_time = refresh_time;
 }
 
 Resource::~Resource()
@@ -37,11 +39,15 @@ Resource::~Resource()
 
 bool Resource::IsAvailable()
 {
+	jthread::AutoLock lock(&_mutex);
+
 	return _is_available;
 }
 
 void Resource::Reserve(ResourceStatusListener *listener, bool force, int timeout)
 {
+	jthread::AutoLock lock(&_mutex);
+
 	if (listener == NULL) {
 		throw jcommon::IllegalArgumentException("Resource listener cannot be null");
 	}
@@ -67,7 +73,7 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int timeout
 					while (_listener->ReleaseRequested((event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED))) != true) {
 						DispatchResourceStatusEvent(event);
 
-						jthread::Thread::MSleep(1000);
+						jthread::Thread::MSleep(_refresh_time);
 					}
 				} else {
 					ResourceStatusEvent *event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED);
@@ -104,9 +110,9 @@ void Resource::Release()
 		ResourceTypeEvent *type_event = new ResourceTypeEvent(this, JRT_RELEASED);
 		ResourceStatusEvent *status_event = new ResourceStatusEvent(this, JRS_RELEASED);
 
-		_listener->Released(status_event);
-
 		_is_available = true;
+
+		_listener->Released(status_event);
 
 		DispatchResourceTypeEvent(type_event);
 		DispatchResourceStatusEvent(status_event);
