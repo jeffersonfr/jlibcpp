@@ -24,6 +24,7 @@
 #include "jresourcetypelistener.h"
 
 #include "jautolock.h"
+#include "jcondition.h"
 
 #include <string>
 
@@ -46,7 +47,7 @@ class Resource{
 		/** \brief */
 		jthread::Mutex _mutex;
 		/** \brief */
-		int _refresh_time;
+		jthread::Condition _sem;
 		/** \brief */
 		bool _is_available;
 		
@@ -55,7 +56,7 @@ class Resource{
 		 * \brief
 		 * 
 		 */
-		Resource(int refresh_time = 1000);
+		Resource();
 		
 		/**
 		 * \brief

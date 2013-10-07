@@ -25,12 +25,11 @@
 
 namespace jresource {
 
-Resource::Resource(int refresh_time):
+Resource::Resource():
 	_mutex(jthread::JMT_RECURSIVE)
 {
 	_listener = NULL;
 	_is_available = true;
-	_refresh_time = refresh_time;
 }
 
 Resource::~Resource()
@@ -73,7 +72,7 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int timeout
 					while (_listener->ReleaseRequested((event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED))) != true) {
 						DispatchResourceStatusEvent(event);
 
-						jthread::Thread::MSleep(_refresh_time);
+						_sem.Wait(&_mutex);
 					}
 				} else {
 					ResourceStatusEvent *event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED);
@@ -106,6 +105,8 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int timeout
 
 void Resource::Release()
 {
+	jthread::AutoLock lock(&_mutex);
+
 	if (_is_available == false) {
 		ResourceTypeEvent *type_event = new ResourceTypeEvent(this, JRT_RELEASED);
 		ResourceStatusEvent *status_event = new ResourceStatusEvent(this, JRS_RELEASED);
@@ -117,6 +118,8 @@ void Resource::Release()
 		DispatchResourceTypeEvent(type_event);
 		DispatchResourceStatusEvent(status_event);
 	}
+		
+	_sem.NotifyAll();
 }
 
 void Resource::RegisterResourceTypeListener(ResourceTypeListener *listener)
