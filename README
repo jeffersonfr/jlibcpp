@@ -9,7 +9,7 @@
 :Makefile defines
 
 ENABLE_DEBUG=<no,yes>
-ENABLE_GRAPHICS=<none,dfb>
+ENABLE_GRAPHICS=<none,directfb,directfb-cairo>
 
 :Compiling
 

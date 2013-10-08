@@ -61,7 +61,7 @@ int main()
 	ois->Read(&ul);
 
 	printf("char[%d], short[%d], int[%d], long[%lld]\n", c, s, i, l);
-	printf("uchar[%u], ushort[%u], uint[%u], ulong[%llu]\n", uc, us, ui, ul);
+	printf("uchar[%u], ushort[%u], uint[%u], ulong[%lu]\n", uc, us, ui, ul);
 
 	delete oos;
 	delete ois;

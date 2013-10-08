@@ -28,6 +28,8 @@
 #include <fstream>
 #include <complex>
 
+#include <stdlib.h>
+
 namespace jmath {
 }
 

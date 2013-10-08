@@ -48,6 +48,7 @@
 
 #include "juuid.h"
 
+#include <unistd.h>
 #include <errno.h>
 
 using namespace jmath;

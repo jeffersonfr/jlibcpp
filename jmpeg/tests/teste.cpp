@@ -26,6 +26,7 @@
 #include <map>
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <fcntl.h>
 
 #define TS_PACKET_SIZE				0xbc

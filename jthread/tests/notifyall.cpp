@@ -24,6 +24,8 @@
 
 #include <iostream>
 
+#include <unistd.h>
+
 #define MAX_SEMAPHORES	10
 
 jthread::Mutex mutex;

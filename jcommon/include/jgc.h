@@ -585,7 +585,7 @@ template<typename T>class gc_ptr: public const_gc_ptr<T> {
 		void reset(T* p=0)
 		{
 			ASSERT_SUPER_VALID;
-			reset_node(p);
+			this->reset_node(p);
 			super::ptr = p;
 		}
 
@@ -1017,7 +1017,7 @@ template<typename T>class gc_arr: public const_gc_arr<T>
 
 		void reset(T* p=0)
 		{
-			reset_node(p);
+			this->reset_node(p);
 			super::ptr = /*const_cast<T*>*/(p);
 		}
 
