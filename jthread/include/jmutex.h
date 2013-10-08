@@ -93,6 +93,12 @@ class Mutex : public virtual jcommon::Object{
 		void Lock();
 
 		/**
+		 * \brief Lock the critial section.
+		 *
+		 */
+		void Lock(int time_);
+
+		/**
 		 * \brief Unlock the critical section.
 		 *
 		 */

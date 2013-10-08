@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "jmutex.h"
 #include "jmutexexception.h"
+#include "jtimeoutexception.h"
 
 namespace jthread {
 
@@ -30,6 +31,8 @@ Mutex::Mutex(jmutex_type_t type_, jmutex_protocol_t protocol_, bool block_in_dea
 	
 #ifdef _WIN32
 	InitializeCriticalSection(&_mutex);
+	
+	_lock_count = 0;
 #else 
 	pthread_mutexattr_t attr;
     
@@ -65,7 +68,6 @@ Mutex::Mutex(jmutex_type_t type_, jmutex_protocol_t protocol_, bool block_in_dea
 #endif
 
 	_type = type_;
-	_lock_count = 0;
 }
 
 Mutex::~Mutex()
@@ -86,13 +88,25 @@ Mutex::~Mutex()
 
 bool Mutex::IsLocked()
 {
+#ifdef _WIN32
 	return (_lock_count != 0);
+#else 
+	bool locked;
+
+	if ((locked = pthread_mutex_trylock(&_mutex)) == 0) {
+		pthread_mutex_unlock(&_mutex);
+	}
+
+	return !locked;
+#endif
 }
 
 void Mutex::Lock()
 {
 #ifdef _WIN32
 	EnterCriticalSection(&_mutex);
+	
+	_lock_count++;
 #else 
 	if (pthread_mutex_lock(&_mutex) != 0) {
 		if (errno == EDEADLK) {
@@ -102,13 +116,45 @@ void Mutex::Lock()
 		}
 	}
 #endif
+}
+
+void Mutex::Lock(int time_)
+{
+#ifdef _WIN32
+	EnterCriticalSection(&_mutex);
 
 	_lock_count++;
+#else 
+	struct timespec t;
+
+	clock_gettime(CLOCK_REALTIME, &t);
+
+	clock_gettime(CLOCK_REALTIME, &t);
+
+	t.tv_sec += (int64_t)(time_/1000000LL);
+	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
+
+	if (pthread_mutex_timedlock(&_mutex, &t) != 0) {
+		if (errno == EDEADLK) {
+			throw MutexException("Error check monitor, dead lock");
+		} else if (errno == ETIMEDOUT) {
+			throw TimeoutException("Mutex lock timeout");
+		} else {
+			throw MutexException("Mutex lock failed");
+		}
+	}
+#endif
 }
 
 void Mutex::Unlock()
 {
 #ifdef _WIN32
+	if (_type == JMT_FAST) {
+		_lock_count = 0;
+	} else {
+		_lock_count--;
+	}
+
 	LeaveCriticalSection(&_mutex);
 #else 
 	if (pthread_mutex_unlock(&_mutex) != 0) {
@@ -119,18 +165,14 @@ void Mutex::Unlock()
 		}
 	}
 #endif
-
-	if (_type == JMT_FAST) {
-		_lock_count = 0;
-	} else {
-		_lock_count--;
-	}
 }
 
 bool Mutex::TryLock()
 {
 #ifdef _WIN32
 	if (TryEnterCriticalSection(&_mutex) == 0) {
+		_lock_count++;
+
 		return false;
 	}
 #else 
@@ -138,8 +180,6 @@ bool Mutex::TryLock()
 		return false;
 	}
 #endif 
-    
-	_lock_count++;
 
 	return true;
 }

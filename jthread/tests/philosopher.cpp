@@ -40,7 +40,6 @@ class Dining{
 		int nr();
 		void open();
 		void finished(int);
-		bool isLocked(int);
 		virtual bool get_forks(int);
 		virtual void put_forks(int);
 };
@@ -136,17 +135,6 @@ Dining::~Dining()
 int Dining::nr()
 {
   	return philosophers;
-}
-
-bool Dining::isLocked(int p_no)
-{
-  	bool locked;
-
-	if ((locked = (p_fork[p_no].TryLock()) == false)) {
-		p_fork[p_no].Unlock();
-	}
-
-	return !locked;
 }
 
 void Dining::finished(int)

@@ -38,6 +38,9 @@ OBJS_quicksort = \
 OBJS_philosopher = \
 		philosopher.o\
 
+OBJS_philosopher_fast = \
+		philosopher_fast.o\
+
 OBJS_producer_consumer = \
 		producer_consumer.o\
 
@@ -65,7 +68,7 @@ OBJS_spin = \
 OBJS_notifyall = \
 		notifyall.o\
 
-all: counter buffer stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin notifyall
+all: counter buffer stress quicksort philosopher philosopher_fast producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin notifyall
 
 counter: $(OBJS_counter)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -80,6 +83,9 @@ quicksort: $(OBJS_quicksort)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 philosopher: $(OBJS_philosopher)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+philosopher_fast: $(OBJS_philosopher_fast)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 producer_consumer: $(OBJS_producer_consumer)
@@ -116,4 +122,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ counter buffer stress quicksort philosopher producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin notifyall
+	@rm -rvf *.o *~ counter buffer stress quicksort philosopher philosopher_fast producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin notifyall
