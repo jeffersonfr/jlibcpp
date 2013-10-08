@@ -148,14 +148,14 @@ OBJS_jmpeg += \
 	   jprogramsysteminformationtable.o\
 
 OBJS_jresource += \
-	   jresourceclient.o\
-	   jresourceexception.o\
-	   jresourcelib.o\
-	   jresourceproxy.o\
-	   jresourceserver.o\
-	   jresourcestatusevent.o\
-	   jresourcestatuslistener.o\
-	   
+		 jresource.o\
+		 jresourceexception.o\
+		 jresourcelib.o\
+		 jresourcestatusevent.o\
+		 jresourcestatuslistener.o\
+		 jresourcetypeevent.o\
+		 jresourcetypelistener.o\
+
 OBJS_jio += \
 	   jbitinputstream.o\
 	   jbitoutputstream.o\
@@ -267,6 +267,7 @@ OBJS_jsocket += \
 
 OBJS_jthread += \
 	   jautolock.o\
+	   jbarrier.o\
 	   jbufferexception.o\
 	   jcondition.o\
 		 jevent.o\
