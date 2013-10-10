@@ -455,7 +455,7 @@ void SharedSemaphore::Notify(int *array, int array_size, int n)
 			sops[i].sem_num = array[i];
 		}
 
-		sops[i].sem_op = -1;
+		sops[i].sem_op = n;
 		sops[i].sem_flg = SEM_UNDO;
 
 		if (_is_blocking == false) {
