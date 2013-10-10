@@ -20,6 +20,7 @@
 #ifndef J_SHAREDSEMAPHORE_H
 #define J_SHAREDSEMAPHORE_H
 
+#include "jsharedlib.h"
 #include "jobject.h"
 
 #include <iostream>
@@ -37,17 +38,6 @@
 
 namespace jshared {
 
-struct jsem_op_t {
-	int *id;
-	int length;
-};
-
-#ifdef _WIN32
-typedef int jkey_t;
-#else
-typedef key_t jkey_t;
-#endif
-
 /**
  * \brief Socket.
  *
@@ -55,30 +45,102 @@ typedef key_t jkey_t;
  */
 class SharedSemaphore : public virtual jcommon::Object{
 
-    private:
+	class SharedSemaphoreOp {
+
+		private:
+			/** \brief */
+			int _id;
+			/** \brief */
+			int _index;
+			/** \brief */
+			bool _is_blocking;
+
+		public:
+			/**
+			 * \brief
+			 *
+			 */
+			SharedSemaphoreOp(int id, int index);
+
+			/**
+			 * \brief
+			 *
+			 */
+			virtual ~SharedSemaphoreOp();
+
+			/**
+			 * \brief
+			 *
+			 */
+			virtual void SetBlocking(bool b);
+
+			/**
+			 * \brief
+			 *
+			 */
+			virtual bool IsBlocking();
+
+			/**
+			 * \brief
+			 *
+			 */
+			virtual int GetLocked();
+
+			/**
+			 * \brief
+			 *
+			 */
+			virtual int GetUnlocked();
+
+			/**
+			 * \brief
+			 *
+			 */
+			virtual void Wait();
+
+			/**
+			 * \brief Wait milliseconds.
+			 *
+			 */
+			virtual void Wait(int ms);
+
+			/**
+			 * \brief
+			 *
+			 */
+			virtual void Notify(int n);
+
+			/**
+			 * \brief
+			 *
+			 */
+			virtual void NotifyAll();
+
+	};
+
+	private:
+		/** \brief */
+		jkey_t _key;
 		/** \brief */
 		int _id;
 		/** \brief */
 		int _nsem;
-		/** \brief Valor inicial de cada semaphoro */
-		int _value;
 		/** \brief */
-		int _flag;
+		bool _is_blocking;
 
-    public:
+	public:
 		/**
 		 * \brief Open a semaphore. IPC_PRIVATE parameter create a new semaphore for
 		 * only one process.
 		 *
 		 */
-		SharedSemaphore(jkey_t key_ = 0);
+		SharedSemaphore(jkey_t key_);
 
 		/**
 		 * \brief Create a new semaphore.
 		 *
 		 */
-		// SharedSemaphore(key_t key_ = IPC_PRIVATE, int nsem_ = 1, int value_ = 1, int perms_ = 0600);
-		SharedSemaphore(jkey_t key_ = 0, int nsem_ = 1, int value_ = 1, int perms_ = 0600);
+		SharedSemaphore(jkey_t key_, int nsem_, int value_ = 1, jshared_permissions_t = JSP_URWX);
 
 		/**
 		 * \brief Destrutor virtual.
@@ -90,43 +152,55 @@ class SharedSemaphore : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void InitializeSemaphore();
+		virtual jkey_t GetKey();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void SetBlocking(bool b);
-		
+		virtual SharedSemaphoreOp At(int index);
+
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsBlocking();
-		
+		virtual void SetBlocking(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsBlocking();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Wait(int *array, int array_size);
+
 		/**
 		 * \brief Wait milliseconds.
 		 *
 		 */
-		void SetTimeout(int millis_, jsem_op_t *op = NULL);
-		
+		virtual void Wait(int *array, int array_size, int ms);
+
 		/**
 		 * \brief
 		 *
 		 */
-		void Wait(jsem_op_t *op = NULL);
-		
+		virtual void Notify(int *array, int array_size, int n);
+
 		/**
 		 * \brief
 		 *
 		 */
-		void Notify(jsem_op_t *op = NULL);
-		
+		virtual void NotifyAll(int *array, int array_size);
+
 		/**
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 };
 

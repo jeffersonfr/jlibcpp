@@ -20,6 +20,7 @@
 #ifndef J_MESSAGEQUEUE_H
 #define J_MESSAGEQUEUE_H
 
+#include "jsharedlib.h"
 #include "jobject.h"
 
 #ifdef _WIN32
@@ -78,10 +79,9 @@ class MessageQueue : public virtual jcommon::Object{
 		 *
 		 */
 #ifdef _WIN32
-		MessageQueue(int key_ = 0, int perms_ = 0600, int maxsize_ = MAX_PACKET_SIZE, int maxmsgs_ = 0);
+		MessageQueue(int key_ = JIPC_PRIVATE, int perms_ = 0600, int maxsize_ = MAX_PACKET_SIZE, int maxmsgs_ = 0);
 #else
-		// MessageQueue(key_t key_ = IPC_PRIVATE, int perms_ = 0600, int size_ = MAX_PACKET_SIZE, int maxmsgs_ = 0);
-		MessageQueue(key_t key_ = 0, int perms_ = 0600, int size_ = MAX_PACKET_SIZE, int maxmsgs_ = 0);
+		MessageQueue(key_t key_ = JIPC_PRIVATE, int perms_ = 0600, int size_ = MAX_PACKET_SIZE, int maxmsgs_ = 0);
 #endif
 	
 		/**

@@ -20,294 +20,473 @@
 #include "Stdafx.h"
 #include "jsharedsemaphore.h"
 #include "jsemaphoreexception.h"
+#include "joutofboundsexception.h"
+#include "jsemaphoretimeoutexception.h"
 
 namespace jshared {
 
 #if defined(__GNU_LIBRARY__) && !defined(_SEM_SEMUN_UNDEFINED)
-	/* union semun is defined by including <sys/sem.h> */
+	// union semun is defined by including <sys/sem.h>
 #else
-	/* according to X/OPEN we have to define it ourselves */
+	// according to X/OPEN we have to define it ourselves
 union semun {
-	int val;                  /* value for SETVAL */
-	struct semid_ds *buf;     /* buffer for IPC_STAT, IPC_SET */
-	unsigned short *array;    /* array for GETALL, SETALL */
-	struct seminfo *__buf;    /* buffer for IPC_INFO */
+	int val;                  // value for SETVAL
+	struct semid_ds *buf;     // buffer for IPC_STAT, IPC_SET
+	unsigned short *array;    // array for GETALL, SETALL
+	struct seminfo *__buf;    // buffer for IPC_INFO
 };
 #endif
-	
 SharedSemaphore::SharedSemaphore(jkey_t key_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::SharedSemaphore");
 	
+	_key = key_;
+	_nsem = 0;
+	_is_blocking = true;
+
 #ifdef _WIN32
 #else	
 	_id = semget(key_, 0, 0);
 
 	if (_id < 0) {
-		throw jthread::SemaphoreException("Opening shared semaphore error");
+		throw jthread::SemaphoreException("Open shared semaphore error");
 	}
+
+	// TODO:: initialize _nsem
 #endif
 }
 
-SharedSemaphore::SharedSemaphore(jkey_t key_, int nsem_, int value_, int perms_):
+SharedSemaphore::SharedSemaphore(jkey_t key_, int nsem_, int value_, jshared_permissions_t perms_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::SharedSemaphore");
 
-#ifdef _WIN32
-#else	
-	_nsem = nsem_;
-	_value = value_;
-	_flag = 0;
-	
-	_id = semget(key_, nsem_, perms_ | IPC_CREAT | IPC_EXCL);
-
-	if (_id < 0) {
-		/*
-		if (errno == EEXIST) {
-			throw jthread::SemaphoreException("Opening shared semaphore error");
-		}
-		
-		throw jthread::SemaphoreException("Creating shared semaphore error");
-		*/
-	
-		_id = semget(key_, nsem_, perms_);
-	
-		if (_id < 0) {
-			throw jthread::SemaphoreException("Creating shared semaphore error");
-		}
+	if (nsem_ <= 0) {
+		throw jthread::SemaphoreException("Number of semaphores must be greater than 0");
 	}
 
-	InitializeSemaphore();
-#endif
-}
-
-void SharedSemaphore::InitializeSemaphore() 
-{
+	_key = key_;
+	_nsem = nsem_;
+	_is_blocking = true;
+	
 #ifdef _WIN32
 #else	
+	int flags = 0;
+
+	if ((perms_ & JSP_UR) != 0) {
+		flags = flags | S_IRUSR;
+	}
+	
+	if ((perms_ & JSP_UW) != 0) {
+		flags = flags | S_IWUSR;
+	}
+	
+	if ((perms_ & JSP_UX) != 0) {
+		flags = flags | S_IXUSR;
+	}
+	
+	if ((perms_ & JSP_GR) != 0) {
+		flags = flags | S_IRGRP;
+	}
+	
+	if ((perms_ & JSP_GW) != 0) {
+		flags = flags | S_IWGRP;
+	}
+	
+	if ((perms_ & JSP_GX) != 0) {
+		flags = flags | S_IXGRP;
+	}
+	
+	if ((perms_ & JSP_OR) != 0) {
+		flags = flags | S_IROTH;
+	}
+	
+	if ((perms_ & JSP_OW) != 0) {
+		flags = flags | S_IWOTH;
+	}
+	
+	if ((perms_ & JSP_OX) != 0) {
+		flags = flags | S_IXOTH;
+	}
+	
+	if ((perms_ & JSP_UID) != 0) {
+		flags = flags | S_ISUID;
+	}
+	
+	if ((perms_ & JSP_GID) != 0) {
+		flags = flags | S_ISGID;
+	}
+
+	_id = semget(key_, _nsem, (int)(IPC_CREAT | IPC_EXCL | flags));
+
+	if (_id < 0) {
+		if (errno == EEXIST) {
+			throw jthread::SemaphoreException("Shared semaphore already created");
+		}
+
+		throw jthread::SemaphoreException("Shared semaphore create failed");
+	}
+
+	/*
+	// INFO:: initialize semaphore
 	uint16_t *initv = new uint16_t[_nsem];
+	int r;
 
 	for (int i=0; i<_nsem; i++) {
-		initv[i] = _value;
+		initv[i] = value_;
 	}
 	
 	union semun arg;
 
 	arg.array = initv;
 
-	int r;
-
 	r = semctl(_id, _nsem, SETALL, arg);
 
 	delete [] initv;
 	
 	if (r < 0) {
-		throw jthread::SemaphoreException("Initializing semaphore error");
+		throw jthread::SemaphoreException(strerror(errno));
 	}
+	*/
 #endif
 }
 
 SharedSemaphore::~SharedSemaphore()
 {
+	Release();
 }
 
-void SharedSemaphore::SetBlocking(bool b)
+jkey_t SharedSemaphore::GetKey()
+{
+	return _key;
+}
+
+SharedSemaphore::SharedSemaphoreOp SharedSemaphore::At(int index)
+{
+	if (index < 0 || index >= _nsem) {
+		throw jcommon::OutOfBoundsException("Index of shared semaphore out of bounds");
+	}
+
+	return SharedSemaphoreOp(_id, index);
+}
+
+SharedSemaphore::SharedSemaphoreOp::SharedSemaphoreOp(int id, int index)
+{
+	_id = id;
+	_index = index;
+	_is_blocking = true;
+}
+
+SharedSemaphore::SharedSemaphoreOp::~SharedSemaphoreOp()
+{
+}
+
+void SharedSemaphore::SharedSemaphoreOp::SetBlocking(bool b)
+{
+	_is_blocking = b;
+}
+
+bool SharedSemaphore::SharedSemaphoreOp::IsBlocking()
+{
+	return _is_blocking;
+}
+
+void SharedSemaphore::SharedSemaphoreOp::Wait()
 {
 #ifdef _WIN32
 #else	
-	if (b == true) {
-		_flag = 0;
-	} else {
-		_flag = IPC_NOWAIT;
+	struct sembuf sops;
+
+	sops.sem_num = _index;
+	sops.sem_op = -1;
+	sops.sem_flg = SEM_UNDO;
+
+	if (_is_blocking == false) {
+		sops.sem_flg |= IPC_NOWAIT;
 	}
+	
+	if (semop(_id, &sops, 1) != 0) {
+		if (errno == EAGAIN) {
+			if (_is_blocking == false) {
+				throw jthread::SemaphoreException("Shared semaphore no wait exception");
+			} else {
+				throw jthread::SemaphoreTimeoutException("Shared semaphore timeout exception");
+			}
+		} else {
+			throw jthread::SemaphoreException("Shared semaphore wait failed");
+		}
+	}
+	
+	semctl(_id, _index, SETVAL, semctl(_id, _index, GETVAL, 0));
 #endif
 }
 
-bool SharedSemaphore::IsBlocking()
+void SharedSemaphore::SharedSemaphoreOp::Wait(int time_)
 {
-	return (_flag == 0);
-}
-
-void SharedSemaphore::SetTimeout(int millis_, jsem_op_t *op)
-{
-	if (millis_ <= 0) {
+	if (time_ < 0) {
 		return;
 	}
 
 #ifdef _WIN32
 #else	
-	struct sembuf *sops;
-	jsem_op_t *p = op;
-	
-	p->id = new int[_nsem];
-	
-	if (p == NULL) {
-		sops = new struct sembuf[_nsem];
-		p = new jsem_op_t;
-		
-		int k;
-		for (k=0; k<_nsem; k++) {
-			p->id[k] = k;
-		}
+	struct sembuf sops;
 
-		p->length = k;
-	} else {
-		sops = new struct sembuf[p->length];
-	}
-	
-	for (int i=0; i<op->length; i++) {
-		if (p->id[i] < _nsem) {
-			if (op == NULL) {
-				delete p;
-			}
-			delete sops;
-			
-			throw jthread::SemaphoreException("Invalid semaphore id error");
-		}
-		
-		sops[i].sem_num = p->id[i];
-		sops[i].sem_op = +1;
-		sops[i].sem_flg = _flag;
+	sops.sem_num = _index;
+	sops.sem_op = -1;
+	sops.sem_flg = SEM_UNDO;
+
+	if (_is_blocking == false) {
+		sops.sem_flg |= IPC_NOWAIT;
 	}
 	
 	struct timespec t;
 
-	t.tv_sec = millis_/1000;
-	t.tv_nsec = 0;
+	clock_gettime(CLOCK_REALTIME, &t);
 
-	int r = semtimedop(_id, sops, p->length, &t);
+	t.tv_sec += (int64_t)(time_/1000000LL);
+	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
 
-	if (op == NULL) {
-		delete p;
+	if (semtimedop(_id, &sops, 1, &t) != 0) {
+		if (errno == EAGAIN) {
+			if (_is_blocking == false) {
+				throw jthread::SemaphoreException("Shared semaphore no wait exception");
+			} else {
+				throw jthread::SemaphoreTimeoutException("Shared semaphore timeout exception");
+			}
+		} else {
+			throw jthread::SemaphoreException("Shared semaphore wait failed");
+		}
 	}
-	delete sops;
+	
+	semctl(_id, _index, SETVAL, semctl(_id, _index, GETVAL, 0));
+#endif
+}
+
+void SharedSemaphore::SharedSemaphoreOp::Notify(int n)
+{
+	if (n < 0) {
+		throw jcommon::OutOfBoundsException("Notify's parameter is out of bounds");
+	}
+
+#ifdef _WIN32
+#else	
+	struct sembuf sops;
+	
+	sops.sem_num = _index;
+	sops.sem_op = n;
+	sops.sem_flg = SEM_UNDO;
+	
+	if (_is_blocking == false) {
+		sops.sem_flg |= IPC_NOWAIT;
+	}
+	
+	if (semop(_id, &sops, 1) != 0) {
+		if (errno == EAGAIN) {
+			if (_is_blocking == false) {
+				throw jthread::SemaphoreException("Shared semaphore no wait exception");
+			} else {
+				throw jthread::SemaphoreTimeoutException("Shared semaphore timeout exception");
+			}
+		} else {
+			throw jthread::SemaphoreException("Shared semaphore notify failed");
+		}
+	}
 			
-	if (r < 0) {
-		throw jthread::SemaphoreException("Setting timeout exception");
+	semctl(_id, _index, SETVAL, semctl(_id, _index, GETVAL, 0));			
+#endif
+}
+
+void SharedSemaphore::SharedSemaphoreOp::NotifyAll()
+{
+#ifdef _WIN32
+#else	
+	int count = semctl(_id, _index, GETNCNT, 0);
+
+	if(count > 0) {
+		Notify(count);
 	}
 #endif
 }
 
-void SharedSemaphore::Wait(jsem_op_t *op)
+int SharedSemaphore::SharedSemaphoreOp::GetLocked()
+{
+	return semctl(_id, _index, GETNCNT, 0);
+}
+
+int SharedSemaphore::SharedSemaphoreOp::GetUnlocked()
+{
+	return semctl(_id, _index, GETZCNT, 0);
+}
+
+void SharedSemaphore::SetBlocking(bool b)
+{
+	_is_blocking = b;
+}
+
+bool SharedSemaphore::IsBlocking()
+{
+	return _is_blocking;
+}
+
+void SharedSemaphore::Wait(int *array, int array_size)
 {
 #ifdef _WIN32
 #else	
-	// SEE:: semop, SEM_UNDO
-	
-	struct sembuf *sops;
-	jsem_op_t *p = op;
-	
-	p->id = new int[_nsem];
-	
-	if (p == NULL) {
-		sops = new struct sembuf[_nsem];
-		p = new jsem_op_t;
+	int sz = _nsem;
+	bool param = false;
 
-		int k;
-		for (k=0; k<_nsem; k++) {
-			p->id[k] = k;
-		}
-
-		p->length = k;
-	} else {
-		sops = new struct sembuf[p->length];
+	if (array != NULL && array_size > 0) {
+		sz = array_size;
+		param = true;
 	}
-	
-	for (int i=0; i<op->length; i++) {
-		if (p->id[i] < _nsem) {
-			if (op == NULL) {
-				delete p;
-			}
-			delete sops;
-			
-			throw jthread::SemaphoreException("Invalid semaphore id error");
-		}
 		
-		sops[i].sem_num = p->id[i];
+	struct sembuf sops[sz];
+
+	for (int i=0; i<sz; i++) {
+		if (param == false) {
+			sops[i].sem_num = i;
+		} else {
+			sops[i].sem_num = array[i];
+		}
+
 		sops[i].sem_op = -1;
-		sops[i].sem_flg = _flag;
-	}
-	
-	int r = semop(_id, sops, p->length);
+		sops[i].sem_flg = SEM_UNDO;
 
-	if (op == NULL) {
-		delete p;
-	}
-	delete sops;
-			
-	if (r < 0) {
-		if (errno == EAGAIN) {
-			if (_flag == IPC_NOWAIT) {
-				throw jthread::SemaphoreException("Initializing semaphore error");
-			} else {
-				throw jthread::SemaphoreException("Timeout expired exception");
-			}
-		} else {
-				throw jthread::SemaphoreException("Waiting semaphore error");
+		if (_is_blocking == false) {
+			sops[i].sem_flg |= IPC_NOWAIT;
 		}
 	}
+
+	if (semop(_id, sops, _nsem) != 0) {
+		if (errno == EAGAIN) {
+			if (_is_blocking == false) {
+				throw jthread::SemaphoreException("Shared semaphore no wait exception");
+			} else {
+				throw jthread::SemaphoreTimeoutException("Shared semaphore timeout exception");
+			}
+		} else {
+			throw jthread::SemaphoreException("Shared semaphore wait failed");
+		}
+	}
+	
+	semctl(_id, 0, SETALL, semctl(_id, 0, GETALL, 0));			
 #endif
 }
 
-void SharedSemaphore::Notify(jsem_op_t *op)
+void SharedSemaphore::Wait(int *array, int array_size, int time_)
+{
+	if (time_ < 0) {
+		return;
+	}
+
+#ifdef _WIN32
+#else	
+	int sz = _nsem;
+	bool param = false;
+
+	if (array != NULL && array_size > 0) {
+		sz = array_size;
+		param = true;
+	}
+		
+	struct sembuf sops[sz];
+
+	for (int i=0; i<sz; i++) {
+		if (param == false) {
+			sops[i].sem_num = i;
+		} else {
+			sops[i].sem_num = array[i];
+		}
+
+		sops[i].sem_op = -1;
+		sops[i].sem_flg = SEM_UNDO;
+
+		if (_is_blocking == false) {
+			sops[i].sem_flg |= IPC_NOWAIT;
+		}
+	}
+
+	struct timespec t;
+
+	clock_gettime(CLOCK_REALTIME, &t);
+
+	t.tv_sec += (int64_t)(time_/1000000LL);
+	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
+
+	if (semtimedop(_id, sops, _nsem, &t) != 0) {
+		if (errno == EAGAIN) {
+			if (_is_blocking == false) {
+				throw jthread::SemaphoreException("Shared semaphore no wait exception");
+			} else {
+				throw jthread::SemaphoreTimeoutException("Shared semaphore timeout exception");
+			}
+		} else {
+			throw jthread::SemaphoreException("Shared semaphore wait failed");
+		}
+	}
+	
+	semctl(_id, 0, SETALL, semctl(_id, 0, GETALL, 0));			
+#endif
+}
+
+void SharedSemaphore::Notify(int *array, int array_size, int n)
+{
+	if (n < 0) {
+		throw jcommon::OutOfBoundsException("Notify's parameter is out of bounds");
+	}
+
+#ifdef _WIN32
+#else	
+	int sz = _nsem;
+	bool param = false;
+
+	if (array != NULL && array_size > 0) {
+		sz = array_size;
+		param = true;
+	}
+		
+	struct sembuf sops[sz];
+
+	for (int i=0; i<sz; i++) {
+		if (param == false) {
+			sops[i].sem_num = i;
+		} else {
+			sops[i].sem_num = array[i];
+		}
+
+		sops[i].sem_op = -1;
+		sops[i].sem_flg = SEM_UNDO;
+
+		if (_is_blocking == false) {
+			sops[i].sem_flg |= IPC_NOWAIT;
+		}
+	}
+	
+	if (semop(_id, sops, _nsem) != 0) {
+		if (errno == EAGAIN) {
+			if (_is_blocking == false) {
+				throw jthread::SemaphoreException("Shared semaphore no wait exception");
+			} else {
+				throw jthread::SemaphoreTimeoutException("Shared semaphore timeout exception");
+			}
+		} else {
+			throw jthread::SemaphoreException("Shared semaphore notify failed");
+		}
+	}
+			
+	semctl(_id, 0, SETALL, semctl(_id, 0, GETALL, 0));			
+#endif
+}
+
+void SharedSemaphore::NotifyAll(int *array, int array_size)
 {
 #ifdef _WIN32
 #else	
-	// SEE:: semop, SEM_UNDO
-	
-	struct sembuf *sops;
-	jsem_op_t *p = op;
-	
-	p->id = new int[_nsem];
-	
-	if (p == NULL) {
-		sops = new struct sembuf[_nsem];
-		p = new jsem_op_t;
-		
-		int k;
-		for (k=0; k<_nsem; k++) {
-			p->id[k] = k;
-		}
+	int count = semctl(_id, 0, GETNCNT, 0);
 
-		p->length = k;
-	} else {
-		sops = new struct sembuf[p->length];
-	}
-	
-	for (int i=0; i<op->length; i++) {
-		if (p->id[i] < _nsem) {
-			if (op == NULL) {
-				delete p;
-			}
-			delete sops;
-			
-			throw jthread::SemaphoreException("Invalid semaphore id error");
-		}
-		
-		sops[i].sem_num = p->id[i];
-		sops[i].sem_op = +1;
-		sops[i].sem_flg = _flag;
-	}
-	
-	int r = semop(_id, sops, p->length);
-
-	if (op == NULL) {
-		delete p;
-	}
-	delete sops;
-			
-	if (r < 0) {
-		if (errno == EAGAIN) {
-			if (_flag == IPC_NOWAIT) {
-				throw jthread::SemaphoreException("Initializing semaphore error");
-			} else {
-				throw jthread::SemaphoreException("Timeout expired exception");
-			}
-		} else {
-				throw jthread::SemaphoreException("Waiting semaphore error");
-		}
+	if(count > 0) {
+		Notify(array, array_size, count);
 	}
 #endif
 }
@@ -317,14 +496,12 @@ void SharedSemaphore::Release()
 #ifdef _WIN32
 #else	
 	union semun arg;
-	int r;
 	
-	r = semctl(_id, 0, IPC_RMID, arg);
-
-	if (r < 0) {
-		throw jthread::SemaphoreException("Release semaphores error");
+	if (semctl(_id, 0, IPC_RMID, arg) < 0) {
+		throw jthread::SemaphoreException("Release shared semaphore error");
 	}
 #endif
 }
 
 }
+
