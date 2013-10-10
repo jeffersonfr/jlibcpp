@@ -104,6 +104,15 @@ void Thread::USleep(uint64_t time_)
 #endif
 }
 
+void Thread::Yield()
+{
+#ifdef _WIN32
+	sched_yield();
+#else
+	pthread_yield();
+#endif
+}
+
 jthread_t Thread::GetHandler(int id)
 {
 	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
@@ -357,15 +366,6 @@ bool Thread::IsRunning(int id)
 	}
 
 	return false;
-}
-
-void Thread::ThreadYield()
-{
-#ifdef _WIN32
-	Thread::MSleep(1);
-#else
-	pthread_yield();
-#endif
 }
 
 void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)

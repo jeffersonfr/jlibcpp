@@ -198,6 +198,12 @@ class Thread : public virtual jcommon::Object{
 		static void USleep(uint64_t time_);
 
 		/**
+		 * \bried
+		 *
+		 */
+		virtual void Yield();
+
+		/**
 		 * \brief Get thread identifier
 		 *
 		 */
@@ -244,12 +250,6 @@ class Thread : public virtual jcommon::Object{
 		 *
 		 */
 		virtual bool IsRunning(int id = 0);
-
-		/**
-		 * \bried
-		 *
-		 */
-		virtual void ThreadYield();
 
 		/**
 		 * \bried
