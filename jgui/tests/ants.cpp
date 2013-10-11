@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jframe.h"
+#include "jimage.h"
 #include "jsystem.h"
 
 #define ENABLE_GUI	1
@@ -56,7 +57,10 @@ class Main : public jgui::Frame{
 		
 		static const int TRY_BETTER = 5;
 
+#if ENABLE_GUI == 1
+		jgui::Image *foffscreen;
 		jgui::Font *fweights;
+#endif
 		path_t *board,
 			   *solution[MAX_COLS],
 			   *try_solutions;
@@ -79,6 +83,8 @@ class Main : public jgui::Frame{
 			_insets.left = 10;
 			_insets.right = 10;
 			_insets.top = 60;
+
+			foffscreen = NULL;
 
 			fweights = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NORMAL, 12);
 #endif
@@ -262,29 +268,44 @@ class Main : public jgui::Frame{
 #if ENABLE_GUI == 1
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
-
 			int dx = _insets.left,
 					dy = _insets.top;
 			char tmp[255];
 
-			sprintf(tmp, "Current Solution [%d]", best);
-
-			g->SetFont(jgui::Font::GetDefaultFont());
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
-			g->DrawString(tmp, _insets.left, GetHeight()-50);
+			if (foffscreen == NULL) {
+				foffscreen = jgui::Image::CreateImage(GetWidth(), GetHeight());
 			
-			g->SetFont(fweights);
+				jgui::Graphics *goff = foffscreen->GetGraphics();
+
+				sprintf(tmp, "Current Solution [%d]", best);
+
+				jgui::Frame::Paint(goff);
+
+				goff->SetFont(jgui::Font::GetDefaultFont());
+				goff->SetColor(0x00, 0x00, 0x00, 0xff);
+				goff->DrawString(tmp, _insets.left, GetHeight()-50);
+
+				goff->SetFont(fweights);
+
+				for (int i=0; i<MAX_COLS*MAX_ROWS; i++) {
+					sprintf(tmp, "%d", board[i].value);
+
+					goff->SetColor(0x00, 0x00, 0x00, 0xff);
+					goff->FillRectangle(dx+board[i].x*(BLOCK_WIDTH+BLOCK_GAP), dy+board[i].y*(BLOCK_HEIGHT+BLOCK_GAP), BLOCK_WIDTH, BLOCK_HEIGHT);
+					goff->SetColor(0xf0, 0xf0, 0xf0, 0xff);
+					goff->DrawString(tmp, dx+board[i].x*(BLOCK_WIDTH+BLOCK_GAP), dy+board[i].y*(BLOCK_HEIGHT+BLOCK_GAP));
+				}
+			}
+
+			g->DrawImage(foffscreen, 0, 0);
 
 			for (int i=0; i<MAX_COLS*MAX_ROWS; i++) {
 				sprintf(tmp, "%d", board[i].value);
 
-				g->SetColor(board[i].phr, 0x00, 0x00, 0xff);
+				g->SetColor(board[i].phr, 0x00, 0x00, 0x80);
 				g->FillRectangle(dx+board[i].x*(BLOCK_WIDTH+BLOCK_GAP), dy+board[i].y*(BLOCK_HEIGHT+BLOCK_GAP), BLOCK_WIDTH, BLOCK_HEIGHT);
-				g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-				g->DrawString(tmp, dx+board[i].x*(BLOCK_WIDTH+BLOCK_GAP), dy+board[i].y*(BLOCK_HEIGHT+BLOCK_GAP));
 			}
-			
+
 #if DRAW_ANTS == 1
 			g->SetColor(0x00, 0xf0, 0x00);
 
