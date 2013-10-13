@@ -126,9 +126,10 @@ int removeWhiteSpace(File *file, File *temp, std::string filename)
 {
 	FileInputStream is(temp);
 	BufferedReader reader(&is);
-	bool previous_empty;
+
+	std::string::size_type n = filename.rfind("/");
 	std::string line;
-	unsigned int n = filename.rfind("/");
+	bool previous_empty;
 
 	if (n != std::string::npos) {
 		filename = filename.substr(n + 1);

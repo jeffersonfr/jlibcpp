@@ -39,7 +39,7 @@ StringUtils::~StringUtils()
 
 std::string StringUtils::LeftTrim(std::string str)
 {
-	int index;
+	std::string::size_type index;
 
 _loop:
 	index = str.find_first_not_of(" ");
@@ -61,7 +61,7 @@ _loop:
 
 std::string StringUtils::RightTrim(std::string str)
 {
-	int index;
+	std::string::size_type index;
 
 _loop:
 	index = str.find_last_not_of(" ");
@@ -109,7 +109,7 @@ std::string StringUtils::ToUpper(std::string str)
 
 std::string StringUtils::ReplaceString(std::string s, std::string old, std::string brand)
 {
-	unsigned long x = s.find(old);
+	std::string::size_type x = s.find(old);
 
 	while (x != std::string::npos) {
 		s.erase(x, old.size());

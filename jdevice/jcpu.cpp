@@ -52,7 +52,7 @@ void CPU::Builder()
 	}
 	
 	std::string line;
-	unsigned long pos;
+	std::string::size_type pos;
 
 	while (reader->IsEOF() == false) {
 		line = reader->ReadLine();

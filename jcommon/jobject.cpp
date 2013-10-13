@@ -76,9 +76,9 @@ std::string Object::GetFullClassName()
 
 void Object::SetClassName(std::string name)
 {
-	int r = name.rfind("::");
+	std::string::size_type r = name.rfind("::");
 
-	if (r != (int)std::string::npos) {
+	if (r != std::string::npos) {
 		_namespace = name.substr(0, r);
 		_classname = name.substr(r + 2, name.size());
 	} else {
@@ -91,9 +91,9 @@ void Object::SetClassName(std::string name)
 
 void Object::SetNameSpace(std::string name)
 {
-	int r = name.rfind("::");
+	std::string::size_type r = name.rfind("::");
 
-	if (r != (int)std::string::npos) {
+	if (r != std::string::npos) {
 		_namespace = name.substr(0, r);
 	} else {
 		_namespace = name;

@@ -28,7 +28,7 @@ PREFIX		= /usr/local
 # {yes, no}
 ENABLE_DEBUG		?= no
 # {none, dummy, directfb, directfb-cairo, x11}
-ENABLE_GRAPHICS ?= none
+ENABLE_GRAPHICS ?= directfb-cairo
 
 DEBUG  		= \
 		 -g -ggdb \

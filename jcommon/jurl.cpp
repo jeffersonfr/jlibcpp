@@ -32,7 +32,7 @@ URL::URL(std::string url_):
 
 	_url = StringUtils::Trim(url_);
 
-	std::size_t proto_index = _url.find("://"),
+	std::string::size_type proto_index = _url.find("://"),
 		file_proto = _url.find(":/"),
 		slash_index = _url.find("/");
 
@@ -61,7 +61,7 @@ URL::URL(std::string url_):
 		_query = "/";
 	}
 
-	std::size_t port_index = _host.find(":");
+	std::string::size_type port_index = _host.find(":");
 
 	if (port_index != std::string::npos) {
 		_host = _host.substr(0, port_index);
@@ -85,7 +85,7 @@ URL::URL(std::string url_):
 		}
 	}
 
-	std::size_t file_slash = _path.rfind("/");
+	std::string::size_type file_slash = _path.rfind("/");
 
 	if (file_slash != std::string::npos) {
 		_file = _path.substr(file_slash+1);
@@ -95,7 +95,7 @@ URL::URL(std::string url_):
 	
 	file_proto = _query.find(":/");
 
-	std::size_t param_index = _query.find("?");
+	std::string::size_type param_index = _query.find("?");
 
 	if (param_index != std::string::npos) {
 		if (file_proto == std::string::npos || (file_proto != std::string::npos && file_proto > param_index)) {
@@ -103,7 +103,7 @@ URL::URL(std::string url_):
 		}
 	}
 
-	std::size_t ref_index = _file.find("#");
+	std::string::size_type ref_index = _file.find("#");
 
 	if (ref_index != std::string::npos) {
 		_reference = _file.substr(ref_index+1);

@@ -629,7 +629,7 @@ std::string File::GetName()
 {
 	std::string name = NormalizePath(_filename);
 
-	size_t i = name.rfind(GetDelimiter());
+	std::string::size_type i = name.rfind(GetDelimiter());
 
 	if (i != std::string::npos) {
 		name = name.substr(i+1);

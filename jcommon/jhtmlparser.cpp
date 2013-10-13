@@ -39,7 +39,7 @@ Tag::Tag(std::string name, jtag_type_t type)
 	_type = type;
 
 	if (type == JTT_BODY) {
-		unsigned int pos = name.find(" ");
+		std::string::size_type pos = name.find(" ");
 		std::string attributes;
 
 		if (pos != std::string::npos) {

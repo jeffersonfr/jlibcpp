@@ -203,7 +203,7 @@ class HTTPRequest : public jthread::Thread {
 			std::string s,
 				key,
 				value;
-			unsigned int p;
+			std::string::size_type p;
 
 			for (int i=0; i<token.GetSize(); i++) {
 				s = token.GetToken(i);
