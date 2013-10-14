@@ -280,6 +280,8 @@ void Thread::Start(int id)
 
 bool Thread::Interrupt(int id)
 {
+	AutoLock lock(&jthread_mutex);
+
 	jthread_map_t *t = GetMap(id);
 
 	if (t->alive == false) {
@@ -319,11 +321,13 @@ bool Thread::Interrupt(int id)
 
 void Thread::Suspend(int id) 
 {
-	if (IsRunning(id) == false) {
-		return;
-	}
+	AutoLock lock(&jthread_mutex);
 
 	jthread_map_t *t = GetMap(id);
+
+	if (t == NULL || t->alive == false) {
+		return;
+	}
 
 	t->alive = false;
 
@@ -340,12 +344,15 @@ void Thread::Suspend(int id)
 
 void Thread::Resume(int id)
 {
-	if (IsRunning(id) == false) {
+	AutoLock lock(&jthread_mutex);
+
+	jthread_map_t *t = GetMap(id);
+
+	if (t == NULL || t->alive == false) {
 		return;
 	}
 
 #ifdef _WIN32
-	jthread_map_t *t = GetMap(id);
 
 	if (ResumeThread(t->thread) == 0xFFFFFFFF) {
 		throw ThreadException("Resume thread failed");
@@ -359,6 +366,8 @@ void Thread::Resume(int id)
 
 bool Thread::IsRunning(int id)
 {
+	AutoLock lock(&jthread_mutex);
+
 	jthread_map_t *t = GetMap(id);
 
 	if (t != NULL) {
@@ -370,6 +379,8 @@ bool Thread::IsRunning(int id)
 
 void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 {
+	AutoLock lock(&jthread_mutex);
+
 	int tpriority = 0;
 
 #ifdef _WIN32
@@ -438,6 +449,8 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 
 void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority) 
 {
+	AutoLock lock(&jthread_mutex);
+
 #ifdef _WIN32
 	int r;
 
@@ -522,6 +535,8 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 
 void Thread::WaitThread(int id)
 {
+	AutoLock lock(&jthread_mutex);
+
 	jthread_map_t *t = GetMap(id);
 
 #ifdef _WIN32
@@ -531,7 +546,10 @@ void Thread::WaitThread(int id)
 #else
 	if (_type == JTT_JOINABLE) {
 		if (t->joined == false) {
+			jthread_mutex.Unlock();
 			pthread_join(t->thread, NULL);
+			jthread_mutex.Lock();
+
 			pthread_detach(t->thread);
 	
 			Cleanup();
@@ -551,6 +569,8 @@ void Thread::WaitThread(int id)
 
 void Thread::Release()
 {
+	AutoLock lock(&jthread_mutex);
+
 	if (_group != NULL) {
 		_group->UnregisterThread(this);
 	}
