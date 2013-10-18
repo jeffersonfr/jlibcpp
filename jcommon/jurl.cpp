@@ -42,7 +42,7 @@ URL::URL(std::string url_):
 	} else {
 		if (file_proto != std::string::npos && file_proto == (slash_index-1)) {
 			_protocol = _url.substr(0, file_proto);
-			_path = _url.substr(file_proto+2, _url.size());
+			_path = _url.substr(file_proto+1, _url.size());
 		} else {
 			_protocol = "file";
 			_path = _url;
