@@ -64,7 +64,6 @@ class ThreadGroup;
 struct jthread_map_t {
 	Thread *thiz;
 	jthread_t thread;
-	bool joined;
 	bool detached;
 	bool alive;
 };

@@ -228,7 +228,6 @@ void Thread::Start(int id)
 
 	t->thiz = this;
 	t->thread = 0;
-	t->joined = false;
 	t->detached = false;
 	t->alive = true;
 
@@ -263,7 +262,6 @@ void Thread::Start(int id)
 			
 	// pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 	if (pthread_create(&_thread, NULL, &(Thread::ThreadMain), t)) {
-		t->joined = true;
 		t->detached = true;
 		t->alive = false;
 
@@ -545,23 +543,16 @@ void Thread::WaitThread(int id)
 	}
 #else
 	if (_type == JTT_JOINABLE) {
-		if (t->joined == false) {
+		if (t->detached == false) {
 			jthread_mutex.Unlock();
 			pthread_join(t->thread, NULL);
 			jthread_mutex.Lock();
-
 			pthread_detach(t->thread);
 	
 			Cleanup();
 
-			t->joined = true;
-			t->alive = false;
-		}
-	} else if (_type == JTT_DETACH) {
-		if (t->detached == false) {
-			pthread_detach(t->thread);
-
 			t->detached = true;
+			t->alive = false;
 		}
 	}
 #endif
