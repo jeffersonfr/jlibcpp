@@ -33,6 +33,8 @@
 #include <sys/wait.h>
 #include <signal.h>
 
+#define RESOURCE_FILE	"/tmp/vlc.sock"
+
 class Callback : public jipc::RemoteCallListener {
 
 	private:
@@ -92,7 +94,7 @@ class Callback : public jipc::RemoteCallListener {
 		{
 				std::ostringstream o;
 
-				o << "/bin/echo -n  '" << command << " " << onoff << "' | nc -U /tmp/vlc.sock" << std::endl;
+				o << "/bin/echo -n '" << command << " " << onoff << "' | nc -U " << RESOURCE_FILE << std::endl;
 
 				if (system(o.str().c_str()) == 0) {
 					return true;
@@ -106,7 +108,7 @@ class Callback : public jipc::RemoteCallListener {
 			if (path.empty() == false) {
 				std::ostringstream o;
 
-				o << "/bin/echo -n  'enqueue \"" << path << "\"' | nc -U /tmp/vlc.sock" << std::endl;
+				o << "/bin/echo -n 'enqueue \"" << path << "\"' | nc -U " << RESOURCE_FILE << std::endl;
 
 				if (system(o.str().c_str()) == 0) {
 					return true;
@@ -133,7 +135,7 @@ class Callback : public jipc::RemoteCallListener {
 
 				std::ostringstream o;
 
-				o << "/bin/echo -n  'play' | nc -U /tmp/vlc.sock" << std::endl;
+				o << "/bin/echo -n 'play' | nc -U " << RESOURCE_FILE << std::endl;
 				
 				if (system(o.str().c_str()) == 0) {
 					localFullScreen();
@@ -148,7 +150,7 @@ class Callback : public jipc::RemoteCallListener {
 		{
 				std::ostringstream o;
 
-				o << "/bin/echo -n  'pause' | nc -U /tmp/vlc.sock" << std::endl;
+				o << "/bin/echo -n 'pause' | nc -U " << RESOURCE_FILE << std::endl;
 
 				if (system(o.str().c_str()) == 0) {
 					localFullScreen();
@@ -169,7 +171,7 @@ class Callback : public jipc::RemoteCallListener {
 		{
 				std::ostringstream o;
 
-				o << "/bin/echo -n  'clear' | nc -U /tmp/vlc.sock" << std::endl;
+				o << "/bin/echo -n 'clear' | nc -U " << RESOURCE_FILE << std::endl;
 
 				if (system(o.str().c_str()) == 0) {
 					return true;
@@ -182,7 +184,7 @@ class Callback : public jipc::RemoteCallListener {
 		{
 				std::ostringstream o;
 
-				o << "/bin/echo -n  'stop' | nc -U /tmp/vlc.sock" << std::endl;
+				o << "/bin/echo -n 'stop' | nc -U " << RESOURCE_FILE << std::endl;
 
 				localClear();
 
@@ -197,7 +199,7 @@ class Callback : public jipc::RemoteCallListener {
 		{
 				std::ostringstream o;
 
-				o << "/bin/echo -n 'quit' | nc -U /tmp/vlc.sock" << std::endl;
+				o << "/bin/echo -n 'quit' | nc -U " << RESOURCE_FILE << std::endl;
 
 				if (system(o.str().c_str()) == 0) {
 					return true;
@@ -212,7 +214,7 @@ class Callback : public jipc::RemoteCallListener {
 			FILE *fp;
 			char tmp[255];
 
-			o << " printf \"get_time\n\" | nc -U /tmp/vlc.sock | grep '^[\\d]*'";
+			o << " printf \"get_time\n\" | nc -U " << RESOURCE_FILE << " | grep '^[\\d]*'";
 
 			if ((fp = popen(o.str().c_str(), "r")) != NULL) {
 				if (fgets(tmp, 12, fp) == NULL) {
@@ -241,7 +243,7 @@ class Callback : public jipc::RemoteCallListener {
 			FILE *fp;
 			char tmp[255];
 
-			o << "/bin/echo -n 'seek " << t << "' | nc -U /tmp/vlc.sock" << std::endl;
+			o << "/bin/echo -n 'seek " << t << "' | nc -U " << RESOURCE_FILE << std::endl;
 
 			if (system(o.str().c_str()) == 0) {
 				return true;
@@ -256,7 +258,7 @@ class Callback : public jipc::RemoteCallListener {
 			FILE *fp;
 			char tmp[255];
 
-			o << "printf \"is_playing\n\" | nc -U /tmp/vlc.sock | grep '^[01]'";
+			o << "printf \"is_playing\n\" | nc -U " << RESOURCE_FILE << " | grep '^[01]'";
 
 			if ((fp = popen(o.str().c_str(), "r")) != NULL) {
 				if (fgets(tmp, 2, fp) == NULL) {

@@ -380,7 +380,7 @@ void TextArea::InitRowsString()
 	std::vector<std::string> words;
 	int font_height;
 
-	jpoint_t scroll_location = GetScrollLocation();
+	// jpoint_t scroll_location = GetScrollLocation();
 	int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			// scrolly = (IsScrollableY() == true)?scroll_location.y:0,
 			scrollw = (IsScrollableY() == true)?(_scroll_size+_scroll_gap):0;

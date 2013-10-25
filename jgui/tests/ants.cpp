@@ -73,9 +73,9 @@ class Main : public jgui::Frame{
 
 	public:
 #if ENABLE_GUI == 0
-		Main(int x, int y)
+		Main(int x, int y, int r)
 #else
-		Main(int x, int y):
+		Main(int x, int y, int r):
 			jgui::Frame("Ant Colony", x, y, MAX_COLS*(BLOCK_WIDTH+BLOCK_GAP)+20, MAX_ROWS*(BLOCK_HEIGHT+BLOCK_GAP)+60+50)
 #endif
 		{
@@ -93,6 +93,8 @@ class Main : public jgui::Frame{
 
 			try_solutions = new path_t[K_ANTS*MAX_COLS];
 			
+			std::cout << "random seed:: " << r << std::endl;
+
 			srand(time(NULL));
 
 			max_value = 0;
@@ -334,7 +336,7 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main(10, 10);
+	Main main(10, 10, time(NULL));
 
 #if ENABLE_GUI == 1
 	main.Show(false);

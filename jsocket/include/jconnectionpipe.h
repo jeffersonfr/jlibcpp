@@ -60,7 +60,7 @@ class ConnectionPipe : public jsocket::Connection, public jthread::Thread{
 
 #ifdef _WIN32
 		/** \brief */
-		HANDLE *_pipe;
+		HANDLE _pipe[2];
 		/** \brief */
 		HANDLE _thread;
 		/** \brief */

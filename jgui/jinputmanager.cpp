@@ -34,7 +34,7 @@ InputManager::InputManager()
 {
 	jcommon::Object::SetClassName("jgui::InputManager");
 
-	jpoint_t p = GFXHandler::GetInstance()->GetMousePosition();
+	// jpoint_t p = GFXHandler::GetInstance()->GetMousePosition();
 
 	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();

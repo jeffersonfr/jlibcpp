@@ -44,8 +44,6 @@ ConnectionPipe::ConnectionPipe(Connection *conn, jconnection_pipe_t type_, int s
 	int r;
 	
 #ifdef _WIN32
-	_pipe = new HANDLE[2];
-
 	r = CreatePipe(&_pipe[0], &_pipe[1], 0, size_pipe_);
 #else
 	r = pipe(_pipe);
@@ -63,10 +61,6 @@ ConnectionPipe::~ConnectionPipe()
 	try {
 		Close();
 	} catch (...) {
-	}
-
-	if ((void *)_pipe != NULL) {
-		delete _pipe;
 	}
 }
 

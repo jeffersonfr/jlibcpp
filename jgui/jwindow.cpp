@@ -499,7 +499,7 @@ void Window::SetSize(int width, int height)
 		_graphics->Lock();
 
 		if (_window != NULL) {
-			jregion_t t = _graphics->GetClip();
+			// jregion_t t = _graphics->GetClip();
 
 			width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
 			height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);

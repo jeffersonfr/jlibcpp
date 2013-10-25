@@ -583,8 +583,8 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 	double *x, 
 				 *y, 
 				 stepsize;
-	int x1, 
-			y1, 
+	int // x1, 
+			// y1, 
 			x2, 
 			y2;
 
@@ -603,9 +603,6 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 
 	double t = 0.0;
 	
-	x1 = lrint(EvaluateBezier0(x, npoints+1, t));
-	y1 = lrint(EvaluateBezier0(y, npoints+1, t));
-	
 	jregion_t clip = GetClip();
 	
 	cairo_save(_cairo_context);
@@ -618,9 +615,6 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 		y2 = EvaluateBezier0(y, npoints, t);
 	
 		cairo_line_to(_cairo_context, x2, y2);
-		
-		x1 = x2;
-		y1 = y2;
 	}
     
 	delete [] x;
@@ -2641,8 +2635,6 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 
 	int init_x = width+2*dw-1,
 			init_y = height+2*dh-1;
-	int old_x = -1,
-			old_y = -1;
 
 	for (j=init_y; j>0; j--) {
 		int sy = y+j-dh;
@@ -2686,8 +2678,8 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 											sa = (0xff - ga);
 							int32_t dr = sr,
 											dg = sg,
-											db = sb,
-											da = ga;
+											db = sb;//,
+											// da = ga;
 
 							if (ga == 0x00) {
 								continue;
@@ -2748,7 +2740,7 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 									dr = sr*0xff + ga*0xff;
 									dg = sg*0xff + ga*0xff;
 									db = sb*0xff + ga*0xff;
-									da = 0xff;
+									// da = 0xff;
 								} else if (_composite_flags == JCF_XOR) {
 									dr = (gr*ga + sr*sa);
 									dg = (gg*ga + sg*sa);
@@ -2774,14 +2766,10 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 							
 							*(sdst+offset) = 0xff000000 | (dr << 0x10) | (dg << 0x08) | (db << 0x00);
 						}
-						
-						old_x = offset;
 					}
 				}
 			}
 		}
-		
-		old_y = sy;
 	}
 	
 	simg->Unlock(simg);
