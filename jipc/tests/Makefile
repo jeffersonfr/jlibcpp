@@ -26,16 +26,8 @@ OK 				= \033[30;32mOK!\033[m
 OBJS_teste = \
 	   teste.o\
 
-OBJS_player = \
-	   player.o\
-
-all: teste player
+all: teste 
 	
-player: cvlc.o svlc.o smplayer.o
-	@$(CC) $(CCFLAGS) cvlc.o -o cvlc $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-	@$(CC) $(CCFLAGS) svlc.o -o svlc $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-	@$(CC) $(CCFLAGS) smplayer.o -o smplayer $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -45,4 +37,4 @@ teste: $(OBJS_teste)
 install:
 
 clean:
-	@rm -rvf *.o *~ teste cvlc svlc smplayer
+	@rm -rvf *.o *~ teste
