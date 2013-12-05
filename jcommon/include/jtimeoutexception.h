@@ -17,31 +17,52 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "Stdafx.h"
-#include "jtimeoutexception.h"
+#ifndef J_TIMEOUTEXCEPTION_H
+#define J_TIMEOUTEXCEPTION_H
 
-namespace jthread {
+#include "jruntimeexception.h"
 
-TimeoutException::TimeoutException():
-	jcommon::RuntimeException()
-{
-    jcommon::Object::SetClassName("jthread::TimeoutException");
+#include <stdexcept>
+#include <string>
+
+namespace jcommon {
+
+/**
+ * \brief Exception.
+ *
+ * @author Jeff Ferr
+ */
+class TimeoutException : public jcommon::RuntimeException{
+
+	private:
+
+	public:
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		TimeoutException();
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		TimeoutException(std::string reason);
+
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		TimeoutException(jcommon::Exception *exception, std::string reason);
+
+		/**
+		 * \brief Destrutor virtual.
+		 *
+		 */
+		virtual ~TimeoutException() throw();
+
+};
+
 }
 
-TimeoutException::TimeoutException(std::string reason_):
-	jcommon::RuntimeException(reason_)
-{
-    jcommon::Object::SetClassName("jthread::TimeoutException");
-}
-
-TimeoutException::TimeoutException(jcommon::Exception *exception, std::string reason_):
-	jcommon::RuntimeException(exception, reason_)
-{
-    jcommon::Object::SetClassName("jthread::TimeoutException");
-}
-
-TimeoutException::~TimeoutException() throw()
-{
-}
-
-}
+#endif

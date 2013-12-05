@@ -24,6 +24,7 @@
 #include "jipcexception.h"
 #include "jresponse.h"
 #include "jnullpointerexception.h"
+#include "jsockettimeoutexception.h"
 
 namespace jipc {
 
@@ -94,6 +95,8 @@ void LocalIPCClient::CallMethod(Method *method, Response **response)
 		local->Initialize((uint8_t *)rbuffer, index);
 
 		(*response) = local;
+	} catch (jsocket::SocketTimeoutException &e) {
+		throw jcommon::TimeoutException(&e, "Request timeout exception");
 	} catch (jcommon::Exception &e) {
 		throw IPCException(&e, "Send call exception");
 	}

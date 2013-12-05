@@ -138,7 +138,7 @@ void Mutex::Lock(int time_)
 		if (errno == EDEADLK) {
 			throw MutexException("Error check monitor, dead lock");
 		} else if (errno == ETIMEDOUT) {
-			throw TimeoutException("Mutex lock timeout");
+			throw jcommon::TimeoutException("Mutex lock timeout");
 		} else {
 			throw MutexException("Mutex lock failed");
 		}

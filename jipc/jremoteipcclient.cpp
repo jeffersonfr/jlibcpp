@@ -24,6 +24,7 @@
 #include "jipcexception.h"
 #include "jresponse.h"
 #include "jnullpointerexception.h"
+#include "jsockettimeoutexception.h"
 
 namespace jipc {
 
@@ -55,7 +56,7 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 				size = 1500;
 
 		while (length > 0) {
-			r = client.Send(buffer+index, size);
+			r = client.Send(buffer+index, size, _call_timeout);
 
 			if (r <= 0) {
 				break;
@@ -95,6 +96,8 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 		local->Initialize((uint8_t *)rbuffer, index);
 
 		(*response) = local;
+	} catch (jsocket::SocketTimeoutException &e) {
+		throw jcommon::TimeoutException(&e, "Request timeout exception");
 	} catch (jcommon::Exception &e) {
 		throw IPCException(&e, "Send call exception: " + e.what());
 	}

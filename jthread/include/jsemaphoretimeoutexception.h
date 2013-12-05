@@ -32,7 +32,7 @@ namespace jthread {
  *
  * @author Jeff Ferr
  */
-class SemaphoreTimeoutException : public jthread::TimeoutException{
+class SemaphoreTimeoutException : public jcommon::TimeoutException{
 
 	private:
 

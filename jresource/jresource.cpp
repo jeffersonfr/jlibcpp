@@ -84,7 +84,7 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int timeout
 					DispatchResourceStatusEvent(event);
 
 					if (request == false) {
-						throw jthread::TimeoutException("Resource time is expired");
+						throw jcommon::TimeoutException("Resource time is expired");
 					}
 				}
 			}

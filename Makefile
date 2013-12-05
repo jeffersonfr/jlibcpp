@@ -117,6 +117,7 @@ OBJS_jcommon += \
 	   jstringtokenizer.o\
 	   jsystem.o\
 	   jstringutils.o\
+	   jtimeoutexception.o\
 	   jtypes.o\
 	   jurl.o\
 	   jurlexception.o\
@@ -283,7 +284,6 @@ OBJS_jthread += \
 	   jthreadexception.o\
 	   jsemaphoreexception.o\
 	   jsemaphoretimeoutexception.o\
-	   jtimeoutexception.o\
 	   jmutexexception.o\
 	   jspinlock.o\
 	   jthreadlib.o\

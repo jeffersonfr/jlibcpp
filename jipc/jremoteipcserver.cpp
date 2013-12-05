@@ -83,7 +83,7 @@ void RemoteIPCServer::WaitCall(RemoteCallListener *listener)
 
 		try {
 			while (length > 0) {
-				r = client->Send(buffer+index, size);
+				r = client->Send(buffer+index, size, _response_timeout);
 
 				if (r <= 0) {
 					break;

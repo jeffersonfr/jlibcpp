@@ -59,7 +59,7 @@ class IPCClient {
 		 * \brief
 		 *
 		 */
-		virtual void SetCallTimeout(int timeout);
+		virtual void SetRequestTimeout(int timeout);
 
 };
 

@@ -37,7 +37,7 @@ void IPCClient::CallMethod(Method *method, Response **response)
 	throw IPCException("IPCClient:: CallMethod wasn't implemented");
 }
 
-void IPCClient::SetCallTimeout(int timeout)
+void IPCClient::SetRequestTimeout(int timeout)
 {
 	_call_timeout = timeout;
 }

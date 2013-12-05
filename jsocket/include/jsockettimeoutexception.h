@@ -20,7 +20,7 @@
 #ifndef J_SOCKETTIMEOUTEXCEPTION_H
 #define J_SOCKETTIMEOUTEXCEPTION_H
 
-#include "jruntimeexception.h"
+#include "jtimeoutexception.h"
 
 #include <stdexcept>
 #include <string>
@@ -32,7 +32,7 @@ namespace jsocket {
  *
  * \author Jeff Ferr
  */
-class SocketTimeoutException : public jcommon::RuntimeException{
+class SocketTimeoutException : public jcommon::TimeoutException{
 
 	private:
 
