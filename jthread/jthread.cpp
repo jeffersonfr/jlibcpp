@@ -282,7 +282,7 @@ bool Thread::Interrupt(int id)
 
 	jthread_map_t *t = GetMap(id);
 
-	if (t->alive == false) {
+	if ((void *)t == NULL || t->alive == false) {
 		return true;
 	}
 
@@ -323,7 +323,7 @@ void Thread::Suspend(int id)
 
 	jthread_map_t *t = GetMap(id);
 
-	if (t == NULL || t->alive == false) {
+	if ((void *)t == NULL || t->alive == false) {
 		return;
 	}
 
@@ -346,7 +346,7 @@ void Thread::Resume(int id)
 
 	jthread_map_t *t = GetMap(id);
 
-	if (t == NULL || t->alive == false) {
+	if ((void *)t == NULL || t->alive == false) {
 		return;
 	}
 
@@ -368,7 +368,7 @@ bool Thread::IsRunning(int id)
 
 	jthread_map_t *t = GetMap(id);
 
-	if (t != NULL) {
+	if ((void *)t != NULL) {
 		return t->alive;
 	}
 
@@ -536,6 +536,10 @@ void Thread::WaitThread(int id)
 	AutoLock lock(&jthread_mutex);
 
 	jthread_map_t *t = GetMap(id);
+
+	if ((void *)t == NULL || t->alive == false) {
+		return;
+	}
 
 #ifdef _WIN32
 	if (WaitForSingleObject(t->thread, INFINITE) == WAIT_FAILED) {
