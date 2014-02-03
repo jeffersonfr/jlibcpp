@@ -22,10 +22,6 @@
 
 namespace jmath {
 
-static int8_t jBase64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-
-#define jPad64	'='
-
 static uint8_t jBase64_rank[256] = {
 	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255, /*	0x00-0x0f	*/
 	255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255, /*	0x10-0x1f	*/
@@ -47,47 +43,47 @@ static uint8_t jBase64_rank[256] = {
 
 Base64::Base64()
 {
+	jBase64_code = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+	jBase64_pad	= '=';
 }
 
 Base64::~Base64()
 {
 }
 
-char * Base64::Encode(uint8_t *src, int length, int *ret_length) {
+void Base64::SetCode(std::string code)
+{
+	jBase64_code = code;
+}
+
+void Base64::SetPad(char pad)
+{
+	jBase64_pad = pad;
+}
+
+char * Base64::Encode(uint8_t *src, int length) 
+{
 	char* dst;
 	int dstpos;
 	char input[3];
 	char output[4];
 	// int ocnt = 0;
+	int ret_length;
 	int i;
 
-	if (length == 0) 
+	if (length == 0) {
 		return NULL;	/* FIX: Or return ""? */
+	}
 
 	/* Calculate required length of dst.  4 bytes of dst are needed for
 	   every 3 bytes of src. */
-	*ret_length = (((length + 2) / 3) * 4)+5;
+	ret_length = (((length+2)/3)*4)+5+1;
 	
-	/* CHANGE::
-	if (strict)
-		*ret_length += (*ret_length / 72);	// Handle trailing \n 
-	*/
-
-	dst = new char[*ret_length];
+	dst = new char[ret_length];
 
 	/* bulk encoding */
 	dstpos = 0;
-	while (length >= 3) 
-	{
-		/*
-		   Convert 3 bytes of src to 4 bytes of output
-
-		   output[0] = input[0] 7:2
-		   output[1] = input[0] 1:0 input[1] 7:4
-		   output[2] = input[1] 3:0 input[2] 7:6
-		   output[3] = input[1] 5:0
-
-*/
+	while (length >= 3) {
 		input[0] = *src++;
 		input[1] = *src++;
 		input[2] = *src++;
@@ -99,28 +95,21 @@ char * Base64::Encode(uint8_t *src, int length, int *ret_length) {
 		output[3] = (input[2] & 0x3f);
 
 		// CHANGE:: g_assert ((dstpos + 4) < *ret_length);
-		if ((dstpos + 4) >= *ret_length) {
+		if ((dstpos + 4) >= ret_length) {
 			delete dst;
+
 			return NULL;
 		}
 
 		/* Map output to the Base64 alphabet */
-		dst[dstpos++] = jBase64[(uint32_t) output[0]];
-		dst[dstpos++] = jBase64[(uint32_t) output[1]];
-		dst[dstpos++] = jBase64[(uint32_t) output[2]];
-		dst[dstpos++] = jBase64[(uint32_t) output[3]];
-
-		/* Add a newline if strict and  */
-		/* CHANGE::
-		if (strict)
-			if ((++ocnt % (72/4)) == 0) 
-				dst[dstpos++] = '\n';
-		*/
+		dst[dstpos++] = jBase64_code[(uint32_t) output[0]];
+		dst[dstpos++] = jBase64_code[(uint32_t) output[1]];
+		dst[dstpos++] = jBase64_code[(uint32_t) output[2]];
+		dst[dstpos++] = jBase64_code[(uint32_t) output[3]];
 	}
 
 	/* Now worry about padding with remaining 1 or 2 bytes */
-	if (length != 0) 
-	{
+	if (length != 0) {
 		input[0] = input[1] = input[2] = '\0';
 		for (i = 0; i < length; i++) 
 			input[i] = *src++;
@@ -130,72 +119,71 @@ char * Base64::Encode(uint8_t *src, int length, int *ret_length) {
 		output[2] = ((input[1] & 0x0f) << 2) + (input[2] >> 6);
 
 		// CHANGE::: g_assert ((dstpos + 4) < *ret_length);
-		if ((dstpos + 4) >= *ret_length) {
+		if ((dstpos + 4) >= ret_length) {
 			delete dst;
+
 			return NULL;
 		}
 
-		dst[dstpos++] = jBase64[(uint32_t) output[0]];
-		dst[dstpos++] = jBase64[(uint32_t) output[1]];
+		dst[dstpos++] = jBase64_code[(uint32_t) output[0]];
+		dst[dstpos++] = jBase64_code[(uint32_t) output[1]];
 
-		if (length == 1)
-			dst[dstpos++] = jPad64;
-		else
-			dst[dstpos++] = jBase64[(uint32_t) output[2]];
+		if (length == 1) {
+			dst[dstpos++] = jBase64_pad;
+		} else {
+			dst[dstpos++] = jBase64_code[(uint32_t) output[2]];
+		}
 
-		dst[dstpos++] = jPad64;
+		dst[dstpos++] = jBase64_pad;
 	}
 
 	// CHANGE:: g_assert (dstpos <= *ret_length);
-	if ((dstpos) > *ret_length) {
+	if ((dstpos) > ret_length) {
 		delete dst;
+
 		return NULL;
 	}
 
 	dst[dstpos] = '\0';
 
-	*ret_length = dstpos + 1;
-
 	return dst;
 }
 
-char * Base64::Decode(uint8_t *src, int length, int *ret_length) {
+char * Base64::Decode(uint8_t *src, int length) 
+{
+	int dstidx, state, ch = 0;
 	char* dst;
-	int   dstidx, state, ch = 0;
-	char  res;
+	char res;
 	uint8_t pos;
 
-	if (length == 0) 
+	if (length == 0) {
 		length = strlen((const char *)src);
+	}
+
 	state = 0;
 	dstidx = 0;
 	res = 0;
 
 	dst = new char[length+1];
-	*ret_length = length+1;
 
-	while (length-- > 0) 
-	{
+	while (length-- > 0) {
 		ch = *src++;
 		if (jBase64_rank[ch]==255) /* Skip any non-base64 anywhere */
 			continue;
-		if (ch == jPad64) 
+		if (ch == jBase64_pad) 
 			break;
 
 		pos = jBase64_rank[ch];
 
-		switch (state) 
-		{
+		switch (state) {
 			case 0:
-				if (dst != NULL) 
-				{
+				if (dst != NULL) {
 					dst[dstidx] = (pos << 2);
 				}
 				state = 1;
 				break;
 			case 1:
-				if (dst != NULL) 
-				{
+				if (dst != NULL) {
 					dst[dstidx] |= (pos >> 4);
 					res = ((pos & 0x0f) << 4);
 				}
@@ -203,8 +191,7 @@ char * Base64::Decode(uint8_t *src, int length, int *ret_length) {
 				state = 2;
 				break;
 			case 2:
-				if (dst != NULL) 
-				{
+				if (dst != NULL) {
 					dst[dstidx] = res | (pos >> 2);
 					res = (pos & 0x03) << 6;
 				}
@@ -212,8 +199,7 @@ char * Base64::Decode(uint8_t *src, int length, int *ret_length) {
 				state = 3;
 				break;
 			case 3:
-				if (dst != NULL) 
-				{
+				if (dst != NULL) {
 					dst[dstidx] = res | pos;
 				}
 				dstidx++;
@@ -223,29 +209,25 @@ char * Base64::Decode(uint8_t *src, int length, int *ret_length) {
 				break;
 		}
 	}
+
 	/*
 	 * We are done decoding Base-64 chars.  Let's see if we ended
 	 * on a byte boundary, and/or with erroneous trailing characters.
 	 */
-	if (ch == jPad64)           /* We got a pad char. */
-	{
-		switch (state) 
-		{
+	if (ch == jBase64_pad) {          /* We got a pad char. */
+		switch (state) {
 			case 0:             /* Invalid = in first position */
 			case 1:             /* Invalid = in second position */
 				return NULL;
 			case 2:             /* Valid, means one byte of info */
 				/* Skip any number of spaces. */
-				while (length-- > 0) 
-				{
+				while (length-- > 0) {
 					ch = *src++;
 					if (jBase64_rank[ch] != 255) break;
 				}
 				/* Make sure there is another trailing = sign. */
-				if (ch != jPad64) 
-				{
+				if (ch != jBase64_pad) {
 					free(dst);
-					*ret_length = 0;
 					return NULL;
 				}
 				/* FALLTHROUGH */
@@ -254,13 +236,10 @@ char * Base64::Decode(uint8_t *src, int length, int *ret_length) {
 				 * We know this char is an =.  Is there anything but
 				 * whitespace after it?
 				 */
-				while (length-- > 0) 
-				{
+				while (length-- > 0) {
 					ch = *src++;
-					if (jBase64_rank[ch] != 255) 
-					{
+					if (jBase64_rank[ch] != 255) {
 						free(dst);
-						*ret_length = 0;
 						return NULL;
 					}
 				}
@@ -270,46 +249,28 @@ char * Base64::Decode(uint8_t *src, int length, int *ret_length) {
 				 * zeros.  If we don't check them, they become a
 				 * subliminal channel.
 				 */
-				if (dst != NULL && res != 0) 
-				{
+				if (dst != NULL && res != 0) {
 					free(dst);
-					*ret_length = 0;
 					return NULL;
 				}
 			default:
 				break;
 		}
-	} else 
-	{
+	} else {
 		/*
 		 * We ended by seeing the end of the string.  Make sure we
 		 * have no partial bytes lying around.
 		 */
-		if (state != 0) 
-		{
+		if (state != 0) {
 			free(dst);
-			*ret_length = 0;
 			return NULL;
 		}
 	}
+
 	dst[dstidx]=0;
-	*ret_length = dstidx;
+	
 	return dst;
 }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
