@@ -25,7 +25,7 @@ namespace jipc {
 
 IPCServer::IPCServer()
 {
-	_response_timeout = 0;
+	_response_timeout = -1;
 }
 
 IPCServer::~IPCServer()

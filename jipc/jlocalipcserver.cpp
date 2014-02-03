@@ -59,7 +59,7 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 		while ((r = client->Receive(rbuffer+index, size, _response_timeout)) > 0) {
 			index = index + r;
 
-			if (r < size) {
+			if (r < size || strchr(rbuffer, '\0') != NULL) {
 				break;
 			}
 		}
@@ -73,8 +73,7 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 	Response *response = listener->ProcessCall(method);
 	
 	if (response != NULL) {
-		std::string encoded = IPCHelper::Encode(response->what());
-
+		std::string encoded = response->Encode();
 		const char *buffer = encoded.c_str();
 		int length = encoded.size();
 			

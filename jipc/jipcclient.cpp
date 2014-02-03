@@ -25,7 +25,7 @@ namespace jipc {
 
 IPCClient::IPCClient()
 {
-	_call_timeout = 0;
+	_call_timeout = -1;
 }
 
 IPCClient::~IPCClient()

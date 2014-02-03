@@ -57,6 +57,12 @@ class Response : public jcommon::ParamMapper {
 		 * \brief
 		 *
 		 */
+		virtual std::string Encode();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual std::string what();
 		
 };

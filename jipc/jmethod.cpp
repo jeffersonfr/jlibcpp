@@ -22,6 +22,8 @@
 #include "jipchelper.h"
 #include "jstringtokenizer.h"
 #include "joutofboundsexception.h"
+#include "jipcexception.h"
+#include "jbase64.h"
 
 #include <sstream>
 
@@ -45,21 +47,19 @@ void Method::Initialize(uint8_t *buffer, int size)
 	std::string str = (const char *)buffer;
 
 	// INFO:: <method>:[<id=value>[;<id=param>]*
-	jcommon::StringTokenizer tokens(IPCHelper::Decode(str), ":", jcommon::JTT_STRING);
+	jcommon::StringTokenizer tokens(str, ";", jcommon::JTT_STRING);
 
-	if (tokens.GetSize() == 1) {
-		_name = str;
-	} else {
-		jcommon::StringTokenizer params(tokens.GetToken(1), ";", jcommon::JTT_STRING);
-
+	if (tokens.GetSize() > 0) {
 		_name = tokens.GetToken(0);
+	}
 
-		for (int i=0; i<params.GetSize(); i++) {
-			jcommon::StringTokenizer param(params.GetToken(i), "=", jcommon::JTT_STRING);
+	jmath::Base64 base64;
 
-			if (param.GetSize() > 1) {
-				SetTextParam(param.GetToken(0), param.GetToken(1));
-			}
+	for (int i=1; i<tokens.GetSize(); i++) {
+		jcommon::StringTokenizer param(tokens.GetToken(i), ":", jcommon::JTT_STRING);
+
+		if (param.GetSize() > 1) {
+			SetTextParam(param.GetToken(0), base64.Decode((uint8_t *)param.GetToken(1).c_str(), param.GetToken(1).size()));
 		}
 	}
 }
@@ -74,14 +74,28 @@ void Method::SetName(std::string name)
 	_name = name;
 }
 
+std::string Method::Encode()
+{
+	jmath::Base64 base64;
+	std::ostringstream o;
+
+	o << _name << ";";
+
+	for (std::map<std::string, std::string>::iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
+		o << i->first << ":" << base64.Encode((uint8_t *)i->second.c_str(), i->second.size()) << ";";
+	}
+
+	return o.str();
+}
+
 std::string Method::what()
 {
 	std::ostringstream o;
 
-	o << _name << ":";
+	o << _name << ";";
 
 	for (std::map<std::string, std::string>::iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
-		o << i->first << "=" << i->second << ";";
+		o << i->first << ":" << i->second << ";";
 	}
 
 	return o.str();

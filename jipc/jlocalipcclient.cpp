@@ -47,7 +47,7 @@ void LocalIPCClient::CallMethod(Method *method, Response **response)
 	try {
 		jsocket::LocalSocket client(std::string("/tmp/") + _id + ".socket");
 
-		std::string encoded = IPCHelper::Encode(method->what());
+		std::string encoded = method->Encode();
 		const char *buffer = encoded.c_str();
 		int length = encoded.size();
 		int r = 0,
@@ -77,7 +77,7 @@ void LocalIPCClient::CallMethod(Method *method, Response **response)
 			while ((r = client.Receive((char *)rbuffer+index, size, _call_timeout)) > 0) {
 				index = index + r;
 
-				if (r < size) {
+				if (r < size || strchr(rbuffer, '\0') != NULL) {
 					break;
 				}
 			}

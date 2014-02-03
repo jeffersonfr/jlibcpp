@@ -21,6 +21,7 @@
 #include "jresponse.h"
 #include "joutofboundsexception.h"
 #include "jstringtokenizer.h"
+#include "jbase64.h"
 
 #include <sstream>
 
@@ -43,15 +44,29 @@ void Response::Initialize(uint8_t *buffer, int size)
 	std::string str = (const char *)buffer;
 
 	// INFO:: <id=value>[,<id=param>]*
-	jcommon::StringTokenizer params(str, ";", jcommon::JTT_STRING);
+	jcommon::StringTokenizer tokens(str, ";", jcommon::JTT_STRING);
 
-	for (int i=0; i<params.GetSize(); i++) {
-		jcommon::StringTokenizer param(params.GetToken(i), "=", jcommon::JTT_STRING);
+	jmath::Base64 base64;
+
+	for (int i=0; i<tokens.GetSize(); i++) {
+		jcommon::StringTokenizer param(tokens.GetToken(i), ":", jcommon::JTT_STRING);
 
 		if (param.GetSize() > 1) {
-			SetTextParam(param.GetToken(0), param.GetToken(1));
+			SetTextParam(param.GetToken(0), base64.Decode((uint8_t *)param.GetToken(1).c_str(), param.GetToken(1).size()));
 		}
 	}
+}
+
+std::string Response::Encode()
+{
+	jmath::Base64 base64;
+	std::ostringstream o;
+
+	for (std::map<std::string, std::string>::iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
+		o << i->first << ":" << base64.Encode((uint8_t *)i->second.c_str(), i->second.size()) << ";";
+	}
+
+	return o.str();
 }
 
 std::string Response::what()
@@ -59,7 +74,7 @@ std::string Response::what()
 	std::ostringstream o;
 
 	for (std::map<std::string, std::string>::iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
-		o << i->first << "=" << i->second << ";";
+		o << i->first << ":" << i->second << ";";
 	}
 
 	return o.str();

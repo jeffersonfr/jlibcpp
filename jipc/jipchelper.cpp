@@ -19,17 +19,9 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jipchelper.h"
+#include "jipcexception.h"
+#include "jbase64.h"
 
 namespace jipc {
-
-std::string IPCHelper::Encode(std::string str)
-{
-	return str;
-}
-
-std::string IPCHelper::Decode(std::string str)
-{
-	return str;
-}
 
 }

@@ -74,7 +74,7 @@ void RemoteIPCServer::WaitCall(RemoteCallListener *listener)
 	Response *response = listener->ProcessCall(method);
 	
 	if (response != NULL) {
-		std::string encoded = IPCHelper::Encode(response->what());
+		std::string encoded = response->Encode();
 
 		const char *buffer = encoded.c_str();
 		int length = encoded.size();

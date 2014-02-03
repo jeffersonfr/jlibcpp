@@ -84,9 +84,11 @@ void client(std::string id, jipc::Method *method)
 	jipc::LocalIPCClient client(id);
 	jipc::Response *response = NULL;
 
+	std::cout << "Client request [" << method->what() << "]" << std::endl;
+
 	client.CallMethod(method, &response);
-	
-	std::cout << response->what() << std::endl;
+
+	std::cout << "Server response [" << response->what() << "]" << std::endl;
 }
 
 int main(int argc, char **argv)

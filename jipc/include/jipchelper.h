@@ -20,6 +20,8 @@
 #ifndef J_IPCHELPER_H
 #define J_IPCHELPER_H
 
+#include "jmethod.h"
+
 #include <string>
 
 namespace jipc {
@@ -31,18 +33,9 @@ namespace jipc {
  */
 class IPCHelper {
 
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string Encode(std::string);
+	private:
 
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string Decode(std::string);
+	public:
 
 };
 
