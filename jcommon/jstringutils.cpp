@@ -20,6 +20,8 @@
 #include "Stdafx.h"
 #include "jstringutils.h"
 
+#define STRING_EMPTY_CHARS " \n\r\t"
+
 namespace jcommon {
 
 struct property_t {
@@ -39,54 +41,17 @@ StringUtils::~StringUtils()
 
 std::string StringUtils::LeftTrim(std::string str)
 {
-	std::string::size_type index;
-
-_loop:
-	index = str.find_first_not_of(" ");
-
-	if (index != (int)std::string::npos && index > 0) {
-		str.erase(0, index);
-	}
-
-	index = str.find_first_not_of("\t");
-
-	if (index != (int)std::string::npos && index > 0) {
-		str.erase(0, index);
-
-		goto _loop;
-	}
-
-	return str;
+	return str.erase(0, str.find_first_not_of(STRING_EMPTY_CHARS));
 }
 
 std::string StringUtils::RightTrim(std::string str)
 {
-	std::string::size_type index;
-
-_loop:
-	index = str.find_last_not_of(" ");
-
-	if (index != (int)std::string::npos && index < (int)str.size()-1) {
-		str.erase(index+1, str.size());
-	}
-
-	index = str.find_last_not_of("\t");
-
-	if (index != (int)std::string::npos && index < (int)str.size()-1) {
-		str.erase(index+1, str.size());
-
-		goto _loop;
-	}
-
-	return str;
+	return str.erase(str.find_last_not_of(STRING_EMPTY_CHARS)+1);
 }
 
 std::string StringUtils::Trim(std::string str)
 {
-	str = LeftTrim(str);
-	str = RightTrim(str);
-
-	return str;
+	return str.erase(0, str.find_first_not_of(STRING_EMPTY_CHARS)).erase(str.find_last_not_of(STRING_EMPTY_CHARS)+1);
 }
 
 std::string StringUtils::ToLower(std::string str)
