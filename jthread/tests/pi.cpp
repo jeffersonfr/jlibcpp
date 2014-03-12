@@ -22,6 +22,7 @@
 #include "jrunnable.h"
 
 #include <iostream>
+#include <iomanip>
 
 #include <stdio.h>
 #include <math.h>
@@ -31,7 +32,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#define MAX_THREAD	10000
+#define MAX_THREAD	100000
 
 #define ROOTN				10000000
 
@@ -97,7 +98,7 @@ class CPI : public jthread::Thread {
 					pi += finals[i];
 				}
 				endwtime = clock();
-				std::cout << "pi is approximately " << pi << ", Error is " << fabs(pi - PI25DT) << std::endl;
+				std::cout << "pi is approximately " << std::setprecision(24) << pi << ", Error is " << fabs(pi - PI25DT) << std::endl;
 				std::cout << "wall clock time = " << (endwtime-startwtime)/CLOCKS_PER_SEC << std::endl;
 			}
 		}

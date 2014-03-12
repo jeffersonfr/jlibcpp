@@ -23,6 +23,7 @@
 #include "jipcexception.h"
 #include "jresponse.h"
 #include "jsocketexception.h"
+#include "jsockettimeoutexception.h"
 
 namespace jipc {
 
@@ -48,65 +49,73 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 		return;
 	}
 
-	jsocket::LocalSocket *client = _server->Accept();
-
-	char rbuffer[65535];
-	int r,
-			index = 0,
-			size = 1500;
+	jsocket::LocalSocket *client = NULL;
 
 	try {
-		while ((r = client->Receive(rbuffer+index, size, _response_timeout)) > 0) {
-			index = index + r;
+		client = _server->Accept();
 
-			if (r < size || strchr(rbuffer, '\0') != NULL) {
-				break;
+		char rbuffer[65535];
+		int r,
+				index = 0,
+				size = 1500;
+
+		try {
+			while ((r = client->Receive(rbuffer+index, size, _response_timeout)) > 0) {
+				index = index + r;
+
+				if (r < size || strchr(rbuffer, '\0') != NULL) {
+					break;
+				}
+			}
+		} catch (jsocket::SocketTimeoutException &e) {
+			throw jcommon::TimeoutException(&e, "Method receive timeout exception");
+		}
+
+		Method method("null");
+
+		method.Initialize((uint8_t *)rbuffer, index);
+
+		Response *response = listener->ProcessCall(&method);
+
+		if (response != NULL) {
+			std::string encoded = response->Encode();
+			const char *buffer = encoded.c_str();
+			int length = encoded.size();
+
+			index = 0;
+
+			try {
+				while (length > 0) {
+					r = client->Send(buffer+index, size, _response_timeout);
+
+					if (r <= 0) {
+						break;
+					}
+
+					length = length - r;
+					index = index + r;
+
+					if (length < size) {
+						size = length;
+					}
+				}
+			} catch (jsocket::SocketTimeoutException &e) {
+				delete response;
+
+				throw jcommon::TimeoutException(&e, "Method response timeout exception");
+			} catch (jcommon::Exception &e) {
+				delete response;
+
+				throw e;
 			}
 		}
 	} catch (jcommon::Exception &e) {
+		client->Close();
+
+		delete client;
+
+		throw IPCException(&e, "IPC server exception: " + e.what());
 	}
-
-	Method *method = new Method("null");
-	
-	method->Initialize((uint8_t *)rbuffer, index);
-
-	Response *response = listener->ProcessCall(method);
-	
-	if (response != NULL) {
-		std::string encoded = response->Encode();
-		const char *buffer = encoded.c_str();
-		int length = encoded.size();
-			
-		index = 0;
-
-		try {
-			while (length > 0) {
-				r = client->Send(buffer+index, size, _response_timeout);
-
-				if (r <= 0) {
-					break;
-				}
-
-				length = length - r;
-				index = index + r;
-
-				if (length < size) {
-					size = length;
-				}
-			}
-		} catch (jcommon::Exception &e) {
-		}
-	
-		delete response;
-		response = NULL;
-	}
-
-	delete method;
-	method = NULL;
-
-	client->Close();
-	delete client;
-	client = NULL;
 }
 
 }

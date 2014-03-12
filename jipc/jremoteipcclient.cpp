@@ -55,19 +55,23 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 				index = 0,
 				size = 1500;
 
-		while (length > 0) {
-			r = client.Send(buffer+index, size, _call_timeout);
+		try {
+			while (length > 0) {
+				r = client.Send(buffer+index, size, _call_timeout);
 
-			if (r <= 0) {
-				break;
+				if (r <= 0) {
+					break;
+				}
+
+				length = length - r;
+				index = index + r;
+
+				if (length < size) {
+					size = length;
+				}
 			}
-
-			length = length - r;
-			index = index + r;
-
-			if (length < size) {
-				size = length;
-			}
+		} catch (jsocket::SocketTimeoutException &e) {
+			throw jcommon::TimeoutException(&e, "Method request timeout exception");
 		}
 
 		uint8_t rbuffer[65535];
@@ -82,10 +86,9 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 					break;
 				}
 			}
-		} catch (jcommon::Exception &e) {
+		} catch (jsocket::SocketTimeoutException &e) {
+			throw jcommon::TimeoutException(&e, "Response request timeout exception");
 		}
-
-		client.Close();
 
 		Response *local = (*response);
 
@@ -96,10 +99,8 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 		local->Initialize((uint8_t *)rbuffer, index);
 
 		(*response) = local;
-	} catch (jsocket::SocketTimeoutException &e) {
-		throw jcommon::TimeoutException(&e, "Request timeout exception");
 	} catch (jcommon::Exception &e) {
-		throw IPCException(&e, "Send call exception: " + e.what());
+		throw IPCException(&e, "IPC client exception: " + e.what());
 	}
 }
 
