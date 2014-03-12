@@ -96,9 +96,21 @@ class Process : public virtual jcommon::Object{
 			 * \brief 
 			 *
 			 */
+			void ForkChild();
+
+			/**
+			 * \brief 
+			 *
+			 */
 			void ForkChild(const char *prog, char **args);
 
 		public:
+			/**
+			 * \brief Constructor.
+			 *
+			 */
+			Process();
+
 			/**
 			 * \brief Constructor.
 			 *

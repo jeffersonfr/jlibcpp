@@ -25,6 +25,8 @@
 #include "jstringtokenizer.h"
 #include "jdebug.h"
 
+#include <sstream>
+
 #define MAX_BUFFER_SIZE	4096
 
 #define MAX_FILEDESC	256
@@ -32,6 +34,18 @@
 using namespace std;
 
 namespace jshared {
+
+Process::Process():
+	jcommon::Object()
+{
+	jcommon::Object::SetClassName("jshared::Process");
+	
+	// _process = process;
+	_input = NULL;
+	_output = NULL;
+	_error = NULL;
+	_type = JPT_PARENT;
+}
 
 Process::Process(std::string process):
 	jcommon::Object()
@@ -51,6 +65,72 @@ Process::~Process()
 }
 
 /** Private Functions */
+
+void Process::ForkChild()
+{
+#ifdef _WIN32
+#else
+	if (pipe(_pinput) < 0) {
+		throw ProcessException("Could not create input pipe");
+	}
+
+	if (pipe(_poutput) < 0) {
+		throw ProcessException("Could not create output pipe");
+	}
+
+	if (pipe(_perror) < 0) {
+		throw ProcessException("Could not create error pipe");
+	}
+
+	pid_t pid = fork();
+	
+	if (pid < 0) {
+		close(_pinput[0]);
+		close(_pinput[1]);
+		close(_poutput[0]);
+		close(_poutput[1]);
+		close(_perror[0]);
+		close(_perror[1]);
+		
+		throw ProcessException("Fork child failed");
+	} 
+	
+	if (pid == 0) {
+		_type = JPT_CHILD;
+
+		close(_pinput[1]);
+		close(_poutput[0]);
+		close(_perror[0]);
+
+		if (dup2(_pinput[0], fileno(stdin)) < 0) {
+			JDEBUG(JINFO, "unable to dup2() stdin\n");
+		}
+	
+		if (dup2(_poutput[1], fileno(stdout)) < 0) {
+			JDEBUG(JINFO, "unable to dup2() stdout\n");
+		}
+
+		if (dup2(_perror[1], fileno(stderr)) < 0) {
+			JDEBUG(JINFO, "unable to dup2() stderr\n");
+		}
+
+		close(_pinput[0]);
+		close(_poutput[1]);
+		close(_perror[1]);
+	}
+
+	close(_pinput[0]);
+	close(_poutput[1]);
+	close(_perror[1]);
+
+	_input = new ProcessInputStream(_poutput[0]); 
+	_output = new ProcessOutputStream(_pinput[1]); 
+	_error = new ProcessInputStream(_perror[0]); 
+
+	_type = JPT_PARENT;
+	_pid = pid;
+#endif
+}
 
 void Process::ForkChild(const char *prog, char **args)
 {
@@ -212,15 +292,13 @@ void Process::WaitProcess()
 			if (WEXITSTATUS(status) == true) {
 				// status da saida
 			}
-			
-			return;
-		}
-		
-		if (WIFSIGNALED(status) == true) {
-			// throw ProcessException("Signal was not caught");
-		
-			if (WTERMSIG(status) == true) {
-				// retorna o sinal nao capturado
+		} else {
+			if (WIFSIGNALED(status) == true) {
+				std::ostringstream o;
+
+				o << "Signal " << WTERMSIG(status) << " was caught" << std::flush;
+
+				throw ProcessException(o.str());
 			}
 		}
 	}
@@ -275,19 +353,23 @@ void Process::Start()
 		Free();
 	}
 #else
-	jcommon::StringTokenizer tokens(_process, " ", jcommon::JTT_STRING, false);
+	if (_process.empty() == true) {
+		ForkChild();
+	} else {
+		jcommon::StringTokenizer tokens(_process, " ", jcommon::JTT_STRING, false);
 
-	char **argv = new char*[tokens.GetSize()+1];
+		char **argv = new char*[tokens.GetSize()+1];
 
-	for (int i=0; i!=tokens.GetSize(); i++) {
-		argv[i] = (char *)tokens.GetToken(i).c_str();
+		for (int i=0; i!=tokens.GetSize(); i++) {
+			argv[i] = (char *)tokens.GetToken(i).c_str();
+		}
+
+		argv[tokens.GetSize()] = NULL;
+
+		ForkChild(argv[0], argv);
+
+		delete [] argv;
 	}
-	
-	argv[tokens.GetSize()] = NULL;
-
-	ForkChild(argv[0], argv);
-	
-	delete [] argv;
 #endif
 }
 

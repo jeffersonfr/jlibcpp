@@ -37,6 +37,7 @@ class Process;
 class ProcessInputStream : public jio::InputStream {
 
 	friend class Process;
+	friend class UnamedPipe;
 
 	private:
 #ifdef _WIN32
