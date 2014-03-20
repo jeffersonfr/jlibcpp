@@ -86,6 +86,10 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 
 			try {
 				while (length > 0) {
+					if (size > length) {
+						size = length;
+					}
+
 					r = client->Send(buffer+index, size, _response_timeout);
 
 					if (r <= 0) {
@@ -94,10 +98,6 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 
 					length = length - r;
 					index = index + r;
-
-					if (length < size) {
-						size = length;
-					}
 				}
 			} catch (jsocket::SocketTimeoutException &e) {
 				delete response;

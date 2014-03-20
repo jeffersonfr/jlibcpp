@@ -57,6 +57,10 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 
 		try {
 			while (length > 0) {
+				if (size > length) {
+					size = length;
+				}
+
 				r = client.Send(buffer+index, size, _call_timeout);
 
 				if (r <= 0) {
@@ -65,10 +69,6 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 
 				length = length - r;
 				index = index + r;
-
-				if (length < size) {
-					size = length;
-				}
 			}
 		} catch (jsocket::SocketTimeoutException &e) {
 			throw jcommon::TimeoutException(&e, "Method request timeout exception");
@@ -82,7 +82,7 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 			while ((r = client.Receive((char *)rbuffer+index, size, _call_timeout)) > 0) {
 				index = index + r;
 
-				if (r < size || index ) {
+				if (r < size) {
 					break;
 				}
 			}

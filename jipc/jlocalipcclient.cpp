@@ -56,6 +56,10 @@ void LocalIPCClient::CallMethod(Method *method, Response **response)
 
 		try {
 			while (length > 0) {
+				if (size > length) {
+					size = length;
+				}
+
 				r = client.Send(buffer+index, size);
 
 				if (r <= 0) {
@@ -64,10 +68,6 @@ void LocalIPCClient::CallMethod(Method *method, Response **response)
 
 				length = length - r;
 				index = index + r;
-
-				if (length < size) {
-					size = length;
-				}
 			}
 		} catch (jsocket::SocketTimeoutException &e) {
 			throw jcommon::TimeoutException(&e, "Method request timeout exception");

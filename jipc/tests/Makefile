@@ -26,9 +26,15 @@ OK 				= \033[30;32mOK!\033[m
 OBJS_teste = \
 	   teste.o\
 
-all: teste 
+OBJS_remote = \
+	   remote.o\
+
+all: teste remote
 	
 teste: $(OBJS_teste)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+
+remote: $(OBJS_remote)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 .cpp.o: $<  
@@ -37,4 +43,4 @@ teste: $(OBJS_teste)
 install:
 
 clean:
-	@rm -rvf *.o *~ teste
+	@rm -rvf *.o *~ teste remote
