@@ -23,15 +23,15 @@ ECHO			= echo -e
 
 OK 				= \033[30;32mOK!\033[m
 
-OBJS_teste = \
-	   teste.o\
+OBJS_local = \
+	   local.o\
 
 OBJS_remote = \
 	   remote.o\
 
-all: teste remote
+all: local remote
 	
-teste: $(OBJS_teste)
+local: $(OBJS_local)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 remote: $(OBJS_remote)
@@ -43,4 +43,4 @@ remote: $(OBJS_remote)
 install:
 
 clean:
-	@rm -rvf *.o *~ teste remote
+	@rm -rvf *.o *~ local remote
