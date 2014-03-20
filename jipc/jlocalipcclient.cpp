@@ -81,7 +81,7 @@ void LocalIPCClient::CallMethod(Method *method, Response **response)
 			while ((r = client.Receive((char *)rbuffer+index, size, _call_timeout)) > 0) {
 				index = index + r;
 
-				if (r < size || strchr(rbuffer, '\0') != NULL) {
+				if (r < size) {
 					break;
 				}
 			}
