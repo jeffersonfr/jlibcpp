@@ -63,11 +63,11 @@ void testObject()
 
 void testTrim()
 {
-	std::string text = " Testando a chamada de funcao Trim\t\t\t\t  ";
+	std::string text = " \t \tTestando a chamada de funcao Trim\t\t\t\t  ";
 
-	text = jcommon::StringUtils::Trim(text);
-
-	std::cout << ":: Trim :: [" << text << "]" << std::endl << std::endl;
+	std::cout << ":: LTrim :: [" << jcommon::StringUtils::LeftTrim(text) << "]" << std::endl;
+	std::cout << ":: RTrim :: [" << jcommon::StringUtils::RightTrim(text) << "]" << std::endl;
+	std::cout << ":: Trim :: [" << jcommon::StringUtils::Trim(text) << "]" << std::endl;
 }
 
 void testLink()

@@ -51,7 +51,7 @@ std::string StringUtils::RightTrim(std::string str)
 
 std::string StringUtils::Trim(std::string str)
 {
-	return str.erase(0, str.find_first_not_of(STRING_EMPTY_CHARS)).erase(str.find_last_not_of(STRING_EMPTY_CHARS)+1);
+	return LeftTrim(RightTrim(str));
 }
 
 std::string StringUtils::ToLower(std::string str)
