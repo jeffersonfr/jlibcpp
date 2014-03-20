@@ -52,7 +52,13 @@ void Response::Initialize(uint8_t *buffer, int size)
 		jcommon::StringTokenizer param(tokens.GetToken(i), ":", jcommon::JTT_STRING);
 
 		if (param.GetSize() > 1) {
-			SetTextParam(param.GetToken(0), base64.Decode((uint8_t *)param.GetToken(1).c_str(), param.GetToken(1).size()));
+			char *value = base64.Decode((uint8_t *)param.GetToken(1).c_str(), param.GetToken(1).size());
+
+			if (value == NULL) {
+				value = (char *)"";
+			}
+
+			SetTextParam(param.GetToken(0), value);
 		}
 	}
 }
