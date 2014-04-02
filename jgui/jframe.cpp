@@ -56,6 +56,37 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_old_height = _size.height;
 }
 
+Frame::Frame(int x, int y, int width, int height, int scale_width, int scale_height):
+	Window(x, y, width, height, scale_width, scale_height)
+{
+	jcommon::Object::SetClassName("jgui::Frame");
+
+	_icon = _DATA_PREFIX"/images/small-gnu.png";
+
+	_relative_mouse_x = 0;
+	_relative_mouse_y = 0;
+	_relative_mouse_w = 0;
+	_relative_mouse_h = 0;
+	
+	_internal_state = 0;
+	_release_enabled = true;
+	_is_maximized = false;
+	_title = "";
+	_is_visible = false;
+	_is_undecorated = true;
+	_last_key_code = JKS_UNKNOWN;
+	_input_enabled = true;
+	_background_visible = true;
+	_move_enabled = true;
+	_resize_enabled = false;
+	_frame_buttons = (jframe_button_t)(0);
+	
+	_old_x = _location.x;
+	_old_y = _location.y;
+	_old_width = _size.width;
+	_old_height = _size.height;
+}
+
 Frame::~Frame() 
 {
 	InputManager::GetInstance()->RemoveKeyListener(this);

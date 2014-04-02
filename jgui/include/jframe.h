@@ -46,8 +46,8 @@ namespace jgui {
  */
 enum jframe_button_t {
 	JFB_MINIMIZE	= 1,
-	JFB_MAXIMIZE	= 1,
-	JFB_CLOSE 		= 2
+	JFB_MAXIMIZE	= 2,
+	JFB_CLOSE 		= 4
 };
 
 /**
@@ -128,6 +128,12 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 */
 		Frame(std::string title, int x, int y, int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		Frame(int x, int y, int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+
 		/**
 		 * \brief
 		 *
