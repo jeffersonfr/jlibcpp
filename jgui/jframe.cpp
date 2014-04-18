@@ -21,9 +21,11 @@
 #include "jframe.h"
 #include "jwindowmanager.h"
 
-#define SIZE_TO_RESIZE	8
+#define SIZE_TO_RESIZE	16
 
 namespace jgui {
+
+Image *_icon_image = NULL;
 
 Frame::Frame(std::string title, int x, int y, int width, int height, int scale_width, int scale_height):
 	Window(x, y, width, height, scale_width, scale_height)
@@ -31,6 +33,7 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	jcommon::Object::SetClassName("jgui::Frame");
 
 	_icon = _DATA_PREFIX"/images/small-gnu.png";
+	_icon_image = jgui::Image::CreateImage(_DATA_PREFIX"/images/small-gnu.png");
 
 	_relative_mouse_x = 0;
 	_relative_mouse_y = 0;
@@ -62,6 +65,7 @@ Frame::Frame(int x, int y, int width, int height, int scale_width, int scale_hei
 	jcommon::Object::SetClassName("jgui::Frame");
 
 	_icon = _DATA_PREFIX"/images/small-gnu.png";
+	_icon_image = jgui::Image::CreateImage(_DATA_PREFIX"/images/small-gnu.png");
 
 	_relative_mouse_x = 0;
 	_relative_mouse_y = 0;
@@ -99,6 +103,9 @@ Frame::~Frame()
 	while (_input_mutex.TryLock() == false) {
 		jthread::Thread::MSleep(100);
 	}
+
+	delete _icon_image;
+	_icon_image = NULL;
 }
 
 std::string Frame::GetIcon()
@@ -109,6 +116,7 @@ std::string Frame::GetIcon()
 void Frame::SetIcon(std::string icon)
 {
 	_icon = icon;
+	_icon_image = jgui::Image::CreateImage(icon);
 
 	Repaint();
 }
@@ -583,11 +591,11 @@ void Frame::PaintGlassPane(Graphics *g)
 		}
 	}
 
-	if (_icon != "") {
+	if (_icon_image != NULL) {
 		int h = (_insets.top-20);
 
 		if (h > 0) {
-			g->DrawImage(_icon, _insets.left, 10, h, h);
+			g->DrawImage(_icon_image, _insets.left, 10, h, h);
 		}
 	}
 
