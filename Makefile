@@ -257,6 +257,7 @@ OBJS_jsocket += \
 		 jsocketoptionsexception.o\
 		 jsocketoutputstream.o\
 		 jsockettimeoutexception.o\
+		 jsslcontext.o\
 		 jsslserversocket.o\
 		 jsslsocket.o\
 		 jsslsocket6.o\
