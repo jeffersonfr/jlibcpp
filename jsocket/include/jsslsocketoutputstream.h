@@ -27,10 +27,6 @@
 #include <stdexcept>
 #include <string>
 
-#ifdef _WIN32
-#include <windows.h>
-#include <winsock.h>
-#else
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <openssl/ssl.h>
@@ -38,7 +34,6 @@
 #include <openssl/rsa.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
-#endif
 
 namespace jsocket {
 
@@ -50,8 +45,6 @@ namespace jsocket {
 class SSLSocketOutputStream : public jio::OutputStream{
 
     private:
-#ifdef _WIN32
-#else
 			/** \brief */
 			jsocket_t _fd;
 			/** \brief */
@@ -68,7 +61,6 @@ class SSLSocketOutputStream : public jio::OutputStream{
 			bool _stream;
 			/** \brief */
 			SSL *_ssl;
-#endif
 
 		public:
 			/**

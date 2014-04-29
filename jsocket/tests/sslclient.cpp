@@ -20,6 +20,7 @@
 #include "jsslsocket.h"
 #include "jsocketexception.h"
 #include "jnullpointerexception.h"
+#include "jsocketlib.h"
 
 #include <iostream>
 
@@ -29,13 +30,23 @@
 using namespace std;
 using namespace jsocket;
 
+/**
+ * \brief SSL Client
+ *
+ * CRT -> PEM
+ *   openssl x509 -in certs/ca.crt -out certs/cacert.pem -outform PEM
+ *
+ */
 int main(void)
 {
-	SSLSocket::InitializeSSL();
+	InitWindowsSocket();
 
+	SSLContext *context = SSLContext::CreateClientContext("certs/cert.pem");
+	
 	// try {
-		SSLSocket mySocket("localhost", 5555);
+		SSLSocket mySocket(context, "localhost", 5555);
 
+		/*
 		// Check server certificates agains our known trusted certificate
 		if (mySocket.UseVerification("certs/cert.pem", NULL) == true) {
 			std::cout << "Certificado Verificado com Sucesso !" << std::endl;
@@ -46,6 +57,7 @@ int main(void)
 
 			throw jsocket::SocketException("Peer certificate invalid");
 		}
+		*/
 
 		// Print server information
 		struct peer_cert_info_t info;
@@ -95,7 +107,9 @@ int main(void)
 		//std::cout << "Socket Exception: " << e.what() << std::endl;
 	//}
 	
-	SSLSocket::ReleaseSSL();
+	delete context;
+
+	ReleaseWindowsSocket();
 	
 	return 0;
 }

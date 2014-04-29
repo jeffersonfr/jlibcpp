@@ -20,6 +20,7 @@
 #include "jsslserversocket.h"
 #include "jsslsocket.h"
 #include "jsocketexception.h"
+#include "jsocketlib.h"
 
 #include <iostream>
 
@@ -34,7 +35,7 @@ using namespace jsocket;
  * DH File 1024
  * openssl dhparam -check -text -5 1024 -out dh1024.pem
  *
- * Certificate Self-Sined (PEM Format)
+ * Certificate Self-Signed (PEM Format)
  * openssl req -x509 -nodes -days 365 -newkey rsa:1024 -keyout cert_key.pem -out cert.pem
  *
  * Dump Certificate (Text Format)
@@ -43,20 +44,24 @@ using namespace jsocket;
  */
 int main(void)
 {
-	SSLSocket::InitializeSSL();
+	InitWindowsSocket();
 
-	SSLServerSocket server(5555, jsocket::JCA_REQUEST);
-	SSLSocket *socket;
+	SSLContext *context = SSLContext::CreateServerContext();
 	
 	// Load our certificate
-	if (server.UseCertPassword("certs/cert.pem", "certs/cert_key.pem", "DynaCinema") == false) {
-		puts("Chain failed...");
-		exit(1);
+	if (context->SetCertificate("certs/cert.pem", "certs/cert_key.pem", "qwerty") == false) {
+		std::cout << "Load certificates failed ..." << std::endl;
+
+		delete context;
+
+		return 1;
 	}
 
-	// server.UseCertPassword("certs/cert.pem", "certs/cert_key.pem", "qwerty");
-	server.UseDHFile("certs/dh1024.pem");
+	context->SetDHFile("certs/dh1024.pem");
 
+	SSLServerSocket server(context, 5555);
+	SSLSocket *socket = NULL;
+	
 	while(true) {
 		try {
 			std::cout << "Waiting sockets ..." << std::endl;
@@ -95,10 +100,12 @@ int main(void)
 			std::cout << "Socket exception: " << e.what() << std::endl;
 		}
 	}
-			
+	
+	delete context;
+
 	std::cout << "Finish" << std::endl;
 	
-	SSLSocket::ReleaseSSL();
+	ReleaseWindowsSocket();
 	
 	return 0;
 }

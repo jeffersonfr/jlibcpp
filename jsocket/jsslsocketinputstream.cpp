@@ -28,8 +28,6 @@ SSLSocketInputStream::SSLSocketInputStream(Connection *conn_, void *ssl, int64_t
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocketInputStream");
 	
-#ifdef _WIN32
-#else
 	_ssl = (SSL *)ssl;
 	_connection = conn_;
 	_fd = conn_->GetHandler();
@@ -48,24 +46,17 @@ SSLSocketInputStream::SSLSocketInputStream(Connection *conn_, void *ssl, int64_t
 		_buffer_length = 0;
 		_current_index = 0;
 	}
-#endif
 }
 
 SSLSocketInputStream::~SSLSocketInputStream()
 {
-#ifdef _WIN32
-#else
 	if (_buffer != NULL) {
 		delete [] _buffer;
 	}
-#endif
 }
 
 int64_t SSLSocketInputStream::Read()
 {
-#ifdef _WIN32
-	return 0LL;
-#else
 	if (_connection->IsClosed() == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -99,14 +90,10 @@ int64_t SSLSocketInputStream::Read()
 	}
 	
 	return (int64_t)c;
-#endif
 }
 
 int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 {
-#ifdef _WIN32
-	return 0LL;
-#else
 	if (_connection->IsClosed() == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -153,58 +140,36 @@ int64_t SSLSocketInputStream::Read(char *data_, int64_t data_length_)
 	}
 
 	return (int64_t)r;
-#endif
 }
 
 bool SSLSocketInputStream::IsEmpty()
 {
-#ifdef _WIN32
-	return false;
-#else
 	return (_current_index == _end_index);
-#endif
 }
 
 int64_t SSLSocketInputStream::Available()
 {
-#ifdef _WIN32
-	return 0LL;
-#else
 	return (int64_t)_current_index;
-#endif
 }
 
 int64_t SSLSocketInputStream::GetReadedBytes()
 {
-#ifdef _WIN32
-	return 0LL;
-#else
 	return (int64_t)_receive_bytes;
-#endif
 }
 
 void SSLSocketInputStream::Close()
 {
-#ifdef _WIN32
-#else
 	_connection->Close();
-#endif
 }
 
 bool SSLSocketInputStream::IsClosed()
 {
-#ifdef _WIN32
-#else
 	return _connection->IsClosed();
-#endif
 }
 
 void SSLSocketInputStream::Reset()
 {
-#ifdef _WIN32
-#else
 	_current_index = _end_index = 0;
-#endif
 }
 
 int64_t SSLSocketInputStream::GetSize()

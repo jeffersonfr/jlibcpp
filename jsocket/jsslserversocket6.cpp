@@ -25,33 +25,15 @@
 
 namespace jsocket {
 
-SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAddress *addr_):
+SSLServerSocket6::SSLServerSocket6(SSLContext *ctx, int port_, int backlog_, InetAddress *addr_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jsocket::SSLServerSocket6");
-	
-#ifdef _WIN32
-#else
+
 	_local = NULL;
-	_is_closed = false;
+	_is_closed = true;
 
-	// init ssl 
-	SSL_library_init();
-
-	srand((uint32_t)time(NULL));
-
-	int tmp;
-
-	while (RAND_status() == 0) {
-		tmp = rand();
-		RAND_seed(&tmp, sizeof(int));
-	}
-
-	ud = NULL;
-	ctx = NULL;
-	ssl = NULL;
-	have_cert = false;
-	rsa_keysize = keysize;
+	_ctx = ctx;
 
 	CreateSocket();
 
@@ -69,13 +51,10 @@ SSLServerSocket6::SSLServerSocket6(int port_, int backlog_, int keysize, InetAdd
 			throw jio::IOException("ServerSocket constructor exception");
 		}
 	}
-#endif
 }
 
 SSLServerSocket6::~SSLServerSocket6()
 {
-#ifdef _WIN32
-#else
 	try {
 	  	Close();
 	} catch (...) {
@@ -84,27 +63,21 @@ SSLServerSocket6::~SSLServerSocket6()
 	if (_local) {
 		delete _local;
 	}
-#endif
 }
 
 /** Private */
 
 void SSLServerSocket6::CreateSocket()
 {
-#ifdef _WIN32
-#else
-	_fd = ::socket(PF_INET, SOCK_STREAM, 0);
-    
-	if (_fd < 0) {
+	if ((_fd = ::socket(PF_INET, SOCK_STREAM, 0)) < 0) {
 		throw SocketException("ServerSocket handling error");
 	}
-#endif
+
+	_is_closed = false;
 }
 
 void SSLServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 {
-#ifdef _WIN32
-#else
 	int opt = 1;
     
 	memset(&_lsock, 0, sizeof(_lsock));
@@ -126,30 +99,23 @@ void SSLServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin6_port = htons(local_port_);
 
 	setsockopt(_fd, SOL_SOCKET, SO_REUSEADDR, (void *)&opt, sizeof(opt));
-    
+
 	if (::bind(_fd, (struct sockaddr *) &_lsock, sizeof(_lsock)) < 0) {
 		throw SocketException("ServerBinding error");
 	}
-#endif
 }
 
 void SSLServerSocket6::ListenSocket(int backlog_)
 {
-#ifdef _WIN32
-#else
 	if (::listen(_fd, backlog_) < 0) {
 		throw SocketException("ServerListen error");
 	}
-#endif
 }
 
 /** End */
 
 SSLSocket6 * SSLServerSocket6::Accept()
 {
-#ifdef _WIN32
-	return NULL;
-#else
 	socklen_t sock_size;
 	int handler;
 	
@@ -167,326 +133,62 @@ SSLSocket6 * SSLServerSocket6::Accept()
 	}
 	*/
 
-	SSLSocket6 *s = new SSLSocket6(handler, _rsock, rsa_keysize);
-	
-	s->ctx = ctx;
-	s->have_cert = have_cert;
+	SSL *ssl = SSL_new(_ctx->GetSSLContext());
 
-	if (s->Accept() == false) {
-		delete s;
-		s = NULL;
-		
-		throw SocketException("Socket accept exception");
+	if (!ssl) {
+		throw SocketException("ServerSocket cannot create secure handler exception");
 	}
 
-	s->InitStreams(SOCK_RD_BUFFER_SIZE, SOCK_WR_BUFFER_SIZE);
+	if (SSL_set_fd(ssl, handler) < 1) {
+		SSL_shutdown(ssl);
+		SSL_free(ssl);
 
-	return s;
-#endif
+		throw SocketException("ServerSocket cannot set secure handler exception");
+	}
+
+	SSL_set_accept_state(ssl);
+
+	if (SSL_accept(ssl) < 1) {
+		SSL_shutdown(ssl);
+		SSL_free(ssl);
+
+		throw SocketException("ServerSocket accept secure handshake exception");
+	}
+
+	if (SSL_get_verify_result(ssl) != X509_V_OK) {
+		throw SocketException("ServerSocket certificate failed verification");
+	} 
+
+	return new SSLSocket6(_ctx, handler, ssl, _rsock);
+}
+
+SSLContext * SSLServerSocket6::GetContext()
+{
+	return _ctx;
 }
 
 InetAddress * SSLServerSocket6::GetInetAddress()
 {
-#ifdef _WIN32
-	return NULL;
-#else
 	return _local;
-#endif
 }
 
 int SSLServerSocket6::GetLocalPort()
 {
-#ifdef _WIN32
-	return 0;
-#else
 	return ntohs(_lsock.sin6_port);
-#endif
 }
 
 void SSLServerSocket6::Close()
 {
-#ifdef _WIN32
-#else
 	if (_is_closed == true) {
 		return;
 	}
-
-	if (ssl) {
-		// SSL_shutdown(ssl);
-		SSL_free(ssl);
-	}
-
-	if (ctx) {
-		// SSL_CTX_free(ctx);
-	}
-
 
 	if (close(_fd) != 0) {
 		throw SocketException("Unknow close exception");
 	}
 
 	_is_closed = true;
-#endif
 }
-
-#ifdef _WIN32
-#else
-bool SSLServerSocket6::CheckContext()
-{
-	if (ctx == NULL) {
-		//init new generic CTX object
-		ctx = SSL_CTX_new(SSLv23_method());
-		
-		if (ctx == NULL) {
-			return false;
-		}
-		
-		//SSL_CTX_set_options(ctx, SSL_OP_ALL);
-		SSL_CTX_set_mode(ctx, SSL_MODE_AUTO_RETRY);
-	}
-	
-	return true;
-}
-
-RSA * SSLServerSocket6::GenerateRSAKey(int len, int exp) 
-{
-	return RSA_generate_key(len,exp,NULL,NULL);
-}
-
-EVP_PKEY * SSLServerSocket6::GeneratePKey(RSA *rsakey) 
-{
-	EVP_PKEY *pkey=NULL;
-
-	if( !(pkey=EVP_PKEY_new()) )
-		return NULL;
-	
-	if (!EVP_PKEY_assign_RSA(pkey, rsakey)){
-		EVP_PKEY_free(pkey);
-		return NULL;
-	}
-	
-	return(pkey);
-}
-
-X509 * SSLServerSocket6::BuildCertificate(const char *name, const char *organization, const char *country, EVP_PKEY *key) 
-{
-	// Atleast a name should be provided
-	if( !name )
-		return NULL;
-	
-	// Create an X509_NAME structure to hold the distinguished name 
-	X509_NAME *n = X509_NAME_new();
-	if( !n )
-		return NULL;
-	
-	// Add fields
-	if ( !X509_NAME_add_entry_by_NID(n, NID_commonName, MBSTRING_ASC, (uint8_t*)name, -1, -1, 0) ){
-		X509_NAME_free(n);
-		return NULL;
-	}
-
-	if( organization ){
-		if ( !X509_NAME_add_entry_by_NID(n, NID_organizationName, MBSTRING_ASC, (uint8_t*)organization, -1, -1, 0) ){
-			X509_NAME_free(n);
-			return NULL;
-		}
-	}
-
-	if( country ){
-		if ( !X509_NAME_add_entry_by_NID(n, NID_countryName, MBSTRING_ASC, (uint8_t*)country, -1, -1, 0) ){
-			X509_NAME_free(n);
-			return NULL;
-		}
-	}
-	
-	X509 *c = X509_new();
-	if( !c ){
-		X509_NAME_free(n);
-		return NULL;
-	}
-
-	// Set subject and issuer names to the X509_NAME we made 
-	X509_set_issuer_name(c, n);
-	X509_set_subject_name(c, n);
-	X509_NAME_free(n);
-
-	// Set serial number to zero 
-	ASN1_INTEGER_set(X509_get_serialNumber(c), 0);
-
-	// Set the valid/expiration times 
-	ASN1_UTCTIME *s = ASN1_UTCTIME_new();
-	if( !s ){
-		X509_free(c);
-		return NULL;
-	}
-	
-	X509_gmtime_adj(s, -60*60*24);
-	X509_set_notBefore(c, s);
-	X509_gmtime_adj(s, 60*60*24*364);
-	X509_set_notAfter(c, s);
-	
-	ASN1_UTCTIME_free(s);
-
-	// Set the public key 
-	X509_set_pubkey(c, key);
-
-	// Self-sign it 
-	X509_sign(c, key, EVP_sha1());
-
-	return c;
-}
-
-bool SSLServerSocket6::CheckCert()
-{
-	// FIXME: rsa_key, evp_pkey and cert are never deleted. However, they are only created once so there is no memory leak.
-	
-	if (have_cert) {
-		// No need to create a new temp cert
-		return true;  
-	}
-	
-	static bool created_session_data = false;
-	static RSA *rsa_key = NULL;
-	static EVP_PKEY *evp_pkey = NULL;
-	static X509 *cert = NULL;
-	
-	// Create a session certificate (gloabal for all instances of this class) if no other certificate was provided
-	if (created_session_data == false) {	
-		if (rsa_key == NULL) {
-			if((rsa_key = GenerateRSAKey(rsa_keysize)) == NULL){
-				return false;	
-			}
-		}
-		
-		if (evp_pkey == NULL) {
-			if ((evp_pkey = GeneratePKey(rsa_key)) == NULL){
-				return false;
-			}
-		}
-		
-		if ((cert = BuildCertificate("SocketW session cert", NULL, NULL, evp_pkey)) == NULL){
-			return false;
-		}
-		
-		created_session_data = true;
-	}
-	
-	// Use our session certificate
-	SSL_CTX_use_RSAPrivateKey(ctx, rsa_key);
-	SSL_CTX_use_certificate(ctx, cert);
-
-	have_cert = true;
-	
-	return true;
-}
-
-static int pem_passwd_cb_server(char *buf, int size, int rwflag, void *password)
-{
-	strncpy(buf, (char *)(password), size);
-	
-	buf[size - 1] = '\0';
-	
-	return(strlen(buf));
-}
-
-bool SSLServerSocket6::UseCert(const char *cert_file, const char *private_key_file)
-{
-	return UseCertCallback(cert_file, private_key_file, NULL, NULL);
-}
-
-bool SSLServerSocket6::UseCertPassword(const char *cert_file, const char *private_key_file, std::string password)
-{
-	if (ud) {
-		delete[] ud;
-		ud = NULL;
-	}
-	
-	ud = new char[password.size() + 1];
-	
-	strncpy(ud, password.c_str(), password.size() + 1);
-	
-	return UseCertCallback(cert_file, private_key_file, &pem_passwd_cb_server, ud);
-}
-
-bool SSLServerSocket6::UseCertCallback(const char *cert_file, const char *private_key_file, int passwd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata)
-{
-	if (cert_file == NULL || private_key_file == NULL) {
-		// invalid argument
-		return false;
-	}
-	
-	if (!CheckContext())
-		return false;
-		
-	have_cert = false;
-	
-	// Load CERT PEM file
-	if (!SSL_CTX_use_certificate_chain_file(ctx, cert_file)) {
-		return false;	
-	}
-	
-	// Load private key PEM file
-	// Give passwd callback if any
-	if (passwd_cb)
-		SSL_CTX_set_default_passwd_cb(ctx, passwd_cb);
-
-	if (userdata)
-		SSL_CTX_set_default_passwd_cb_userdata(ctx, (void *)userdata);
-		
-	for (int i=0; i<3; i++) {
-		if (SSL_CTX_use_PrivateKey_file(ctx, private_key_file, SSL_FILETYPE_PEM)) {
-			break;
-		}
-	
-		if (i == 2) {
-			return false;
-		}
-	}
-	
-	// Check private key
-	if (!SSL_CTX_check_private_key(ctx)) {
-		return false;	
-	}
-	
-	have_cert = true;
-	
-	return true;
-}
-
-bool SSLServerSocket6::UseDHFile(const char *dh_file)
-{
-	if (!dh_file) {
-		return false;
-	}
-	
-	if (!CheckContext())
-		return false;
-	
-	// Set up DH stuff
-	FILE *paramfile;
-	DH *dh;
-
-	paramfile = fopen(dh_file, "r");
-
-	if (paramfile) {
-		dh = PEM_read_DHparams(paramfile, NULL, NULL, NULL);
-
-		fclose(paramfile);
-		
-		if (!dh){
-			return false;
-		}
-	} else {
-		return false;
-	}
-	
-	SSL_CTX_set_tmp_dh(ctx, dh);
-	
-	DH_free(dh);
-
-	return true;
-}
-#endif
 
 bool SSLServerSocket6::IsClosed()
 {

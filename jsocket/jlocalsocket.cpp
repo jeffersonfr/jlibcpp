@@ -114,11 +114,11 @@ void LocalSocket::ConnectSocket()
 
 		r = connect(_fd, (struct sockaddr *)&_address, address_length);
 
-		if (errno != EINPROGRESS) {
-			throw SocketException("Connection error");
-		}
-
 		if (r != 0) {
+			if (errno != EINPROGRESS) {
+				throw SocketException("Connection error");
+			}
+
 			fd_set wset;
 			struct timeval t;
 

@@ -30,6 +30,14 @@
 #pragma comment(lib, "Ws2_32.lib")
 
 WSADATA wsaData;
+#else
+#include <sys/socket.h>
+#include <openssl/ssl.h>
+#include <openssl/x509.h>
+#include <openssl/rsa.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
+#include <openssl/err.h>
 #endif
 
 void InitWindowsSocket()
@@ -39,6 +47,21 @@ void InitWindowsSocket()
     if (WSAStartup (MAKEWORD (2, 2), &wsaData) != 0) {
 	   throw jsocket::SocketException("Error initializing WinSock");
    }
+#else
+	srand(time(NULL));
+
+	int tmp;
+
+	while (RAND_status() == 0) {
+		tmp = rand();
+		RAND_seed(&tmp, sizeof(int));
+	}
+		
+	CRYPTO_malloc_init(); // Initialize malloc, free, etc for OpenSSL's use
+	SSL_library_init(); // Initialize OpenSSL's SSL libraries
+	SSL_load_error_strings(); // Load SSL error strings
+	ERR_load_BIO_strings(); // Load BIO error strings
+	OpenSSL_add_all_algorithms(); // Load all available encryption algorithms
 #endif
 }
 
@@ -46,6 +69,10 @@ void ReleaseWindowsSocket()
 {
 #ifdef _WIN32
 	WSACleanup();
+#else
+	// Destroy SSL
+	ERR_free_strings();
+	EVP_cleanup();
 #endif
 }
 

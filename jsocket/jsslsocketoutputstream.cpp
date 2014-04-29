@@ -28,8 +28,6 @@ SSLSocketOutputStream::SSLSocketOutputStream(Connection *conn_, void *ssl, int64
 {
 	jcommon::Object::SetClassName("jsocket::SSLSocketOutputStream");
 	
-#ifdef _WIN32
-#else
 	_ssl = (SSL *)ssl;
 	_connection = conn_;
 	_fd = conn_->GetHandler();
@@ -47,17 +45,13 @@ SSLSocketOutputStream::SSLSocketOutputStream(Connection *conn_, void *ssl, int64
 		_buffer_length = 0;
 		_current_index = 0;
 	}
-#endif
 }
 
 SSLSocketOutputStream::~SSLSocketOutputStream()
 {
-#ifdef _WIN32
-#else
 	if (_buffer != NULL) {
 		delete [] _buffer;
 	}
-#endif
 }
 
 int64_t SSLSocketOutputStream::Available()
@@ -67,23 +61,17 @@ int64_t SSLSocketOutputStream::Available()
 
 int64_t SSLSocketOutputStream::Write(int64_t c_)
 {
-#ifdef _WIN32
-#else
 	_buffer[_current_index++] = (char)c_;
 
 	if (_current_index == _buffer_length) {
 		return Flush();
 	}
-#endif
 
 	return 0;
 }
 
 int64_t SSLSocketOutputStream::Write(const char *data_, int64_t data_length_)
 {
-#ifdef _WIN32
-	return 0LL;
-#else
 	int64_t l = data_length_, size; 
 	
 	while (l > 0LL) {
@@ -107,41 +95,25 @@ int64_t SSLSocketOutputStream::Write(const char *data_, int64_t data_length_)
 	}
 
 	return (int64_t)(data_length_ - l);
-#endif
 }
 
 bool SSLSocketOutputStream::IsEmpty()
 {
-#ifdef _WIN32
-	return false;
-#else
 	return (_current_index == 0);
-#endif
 }
 
 int64_t SSLSocketOutputStream::GetAvailable()
 {
-#ifdef _WIN32
-	return 0LL;
-#else
 	return _current_index;
-#endif
 }
 
 int64_t SSLSocketOutputStream::GetSentBytes()
 {
-#ifdef _WIN32
-	return 0LL;
-#else
 	return _sent_bytes;
-#endif
 }
 
 int64_t SSLSocketOutputStream::Flush()
 {
-#ifdef _WIN32
-	return 0LL;
-#else
 	if (_connection->IsClosed() == true) {
 		throw SocketException("Connection closed exception");
 	}
@@ -163,7 +135,6 @@ int64_t SSLSocketOutputStream::Flush()
 	_sent_bytes += n;
 
 	return (int64_t)n;
-#endif
 }
 
 int64_t SSLSocketOutputStream::GetSize()
@@ -178,18 +149,12 @@ void SSLSocketOutputStream::Seek(int64_t index)
 
 void SSLSocketOutputStream::Close()
 {
-#ifdef _WIN32
-#else
 	_connection->Close();
-#endif
 }
 
 bool SSLSocketOutputStream::IsClosed()
 {
-#ifdef _WIN32
-#else
 	return _connection->IsClosed();
-#endif
 }
 
 }

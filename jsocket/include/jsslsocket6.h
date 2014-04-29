@@ -21,48 +21,50 @@
 #define J_SSLSOCKET6_H
 
 #include "jinetaddress.h"
-#include "jserversocket6.h"
-#include "jsocketoptions.h"
 #include "jsslsocketinputstream.h"
 #include "jsslsocketoutputstream.h"
-#include "jsslsocket.h"
+#include "jsslcontext.h"
+#include "jsocketoptions.h"
+#include "jconnection.h"
 
-#ifdef _WIN32
-#include <windows.h>
-#else
 #include <sys/socket.h>
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 #include <openssl/rsa.h>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
-#endif
 
 #include <stdint.h>
 
-/**
- *  It's VERY important that these types really have the right sizes!
- *
- */
-#define COMPILE_TIME_ASSERT(name, x)	typedef int _dummy_ ## name[(x) * 2 - 1]
-COMPILE_TIME_ASSERT(uint8, sizeof(uint8_t) == 1);
-COMPILE_TIME_ASSERT(sint8, sizeof(int8_t) == 1);
-COMPILE_TIME_ASSERT(uint16, sizeof(uint16_t) == 2);
-COMPILE_TIME_ASSERT(sint16, sizeof(int16_t) == 2);
-COMPILE_TIME_ASSERT(uint32, sizeof(uint32_t) == 4);
-COMPILE_TIME_ASSERT(sint32, sizeof(int32_t) == 4);
-#undef COMPILE_TIME_ASSERT
-
-/**
- * Default values for RSA key generation
- *
- */
-#define RSA_KEYSIZE 512
-#define RSA_KEYEXP RSA_F4 /* 65537 */
-
 namespace jsocket {
 
-class ServerSocket;
+struct peer_cert_info_t {
+	// Issuer name
+	std::string commonName;             // CN
+	std::string countryName;            // C
+	std::string localityName;           // L
+	std::string stateOrProvinceName;    // ST
+	std::string organizationName;       // O
+	std::string organizationalUnitName; // OU
+	std::string title;                  // T
+	std::string initials;               // I
+	std::string givenName;              // G
+	std::string surname;                // S
+	std::string description;            // D
+	std::string uniqueIdentifier;       // UID
+	std::string emailAddress;           // Email
+
+	// Expire dates
+	std::string notBefore;
+	std::string notAfter;
+
+	// Misc. data
+	long serialNumber;
+	long version;
+	std::string sgnAlgorithm;
+	std::string keyAlgorithm;
+	int keySize;
+};
 
 /**
  * \brief Socket.
@@ -88,24 +90,20 @@ class SSLSocket6 : public jsocket::Connection{
 		int64_t _receive_bytes;
 		/** \brief */
 		int _timeout;
-#ifdef _WIN32
-#else
+		/** \brief */
+		bool _server_side;
 		/** \brief */
 		sockaddr_in6 _lsock;
 		/** \brief */
 		sockaddr_in6 _server_sock;
+		/** \brief */
+		InetAddress *_local;
 		/** \brief SSL data */
-		SSL_CTX *ctx;
+		SSLContext *_ctx;
 		/** \brief SSL data */
-		SSL *ssl;
-		/** \brief Indicate CERT loaded or created */
-		bool have_cert; 
-		/** \brief keysize argument from constructor */
-		int rsa_keysize;
-		/** \brief userdata */
-		char *ud;
-#endif
+		SSL *_ssl;
 
+	private:
 		/**
 		 * \brief Create a new socket.
 		 *
@@ -130,64 +128,37 @@ class SSLSocket6 : public jsocket::Connection{
 		 */
 		void InitStreams(int rbuf, int wbuf);
 
-		/**
-		 * \brief
-		 *
-		 */
-		bool Accept();
-
-#ifdef _WIN32
-#else
-		/**
-		 * Create new CTX if none is available
-		 *
-		 */
-		virtual bool CheckContext();
-
-		/**
-		 *  Create temp cert if no other is loaded
-		 *
-		 */
-		virtual bool CheckCert();
-
-		/**
-		 * Helper function: converts from X509 format to ASCII PEM format
-		 *
-		 */
-		int GetCertPEM(X509 *cert, std::string *pem);
-#endif
-
 	private:
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket6(int handler_, struct sockaddr_in6 server_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+		SSLSocket6(SSLContext *ctx, int handler_, SSL *ssl_, struct sockaddr_in6 server_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 	public:
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket6(InetAddress *addr_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+		SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+		SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief
 		 *
 		 */
-		SSLSocket6(std::string host_, int port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+		SSLSocket6(SSLContext *ctx, std::string host_, int port_, int timeout_ = 0, int rbuf_ = SOCK_RD_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLSocket6(std::string host_, int port_, InetAddress *local_addr_, int local_port_, int keysize = RSA_KEYSIZE, int timeout_ = 0, int rbuf_ = SOCK_WR_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
+		SSLSocket6(SSLContext *ctx, std::string host_, int port_, InetAddress *local_addr_, int local_port_, int timeout_ = 0, int rbuf_ = SOCK_WR_BUFFER_SIZE, int wbuf_ = SOCK_WR_BUFFER_SIZE);
 
 		/**
 		 * \brief Destrutor virtual.
@@ -195,7 +166,17 @@ class SSLSocket6 : public jsocket::Connection{
 		 */
 		virtual ~SSLSocket6();
 
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jsocket_t GetHandler();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual SSLContext * GetContext();
 
 		/**
 		 * \brief Send bytes to a destination.
@@ -279,49 +260,12 @@ class SSLSocket6 : public jsocket::Connection{
 		 */
 		virtual SocketOptions * GetSocketOptions();
 
-		/** 
-		 * Cert files (if not set, a temporary RSA session cert will be created if needed)
-		 * 
-		 * PEM format
-		 */
-		virtual bool UseCert(const char *cert_file, const char *private_key_file);
-
 		/**
-		 * As use_cert() but also give password for private_key_file (or get OpenSSL's standard prompt each time)
+		 *  Get information about peer certificate. Should be called after connect() or accept() when 
+		 *  using verification
 		 *
-		 */
-		virtual bool UseCertPassword(const char *cert_file, const char *private_key_file, std::string pasd);
-
-		/**
-		 * Or specify a password callback given to OpenSSL that hands back the password to be used 
-		 * during decryption. On invocation a pointer to userdata is provided. The pem_pasd_cb 
-		 * must write the password into the provided buffer buf which is of size size. The actual 
-		 * length of the password must be returned to the calling function. rwflag indicates
-		 * whether the callback is used for reading/decryption (rwflag=0) or writing/encryption 
-		 * (rwflag=1).
-		 *
-		 * See man SSL_CTX_set_default_pasd_cb(3) for more information.
-		 */
-		virtual bool UseCertCallback(const char *cert_file, const char *private_key_file, int pasd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata = NULL);
-
-		/**
-		 *  Use Diffie-Hellman key exchange?
-		 *
-		 *  See man SSL_CTX_set_tmp_dh_callback(3) for more information.
-		 */
-		virtual bool UseDHFile(const char *dh_file);
-
-		/**
-		 *  Should the peer certificate be verified ? The arguments specifies the locations at which CA
-		 *  certificates for verification purposes are located. The certificates available via ca_file 
-		 *  and ca_dir are trusted.
-		 *
-		 *   See man SSL_CTX_load_verify_locations(3) for format information.
-		 */
-		virtual bool UseVerification(const char *ca_file, const char *ca_dir);
-
-		/**
-		 * \brief
+		 *  X509 *SSL_get_certificate(const SSL *ssl);
+		 *  struct evp_pkey_st *SSL_get_privatekey(SSL *ssl);
 		 *
 		 */
 		virtual bool GetPeerCertInfo(peer_cert_info_t *info);
@@ -332,7 +276,13 @@ class SSLSocket6 : public jsocket::Connection{
 		 *
 		 *  Returns the length of pem or -1 on errors
 		 */
-		virtual int GetPeerCertPEM(std::string *pem);
+		virtual bool GetPeerCertPEM(std::string *pem);
+
+		/**
+		 * \brief 
+		 *
+		 */
+		virtual X509 * GetPeerCert();
 
 		/**
 		 * \brief

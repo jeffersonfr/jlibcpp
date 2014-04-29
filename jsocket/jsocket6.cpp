@@ -224,11 +224,11 @@ void Socket6::ConnectSocket(InetAddress *addr_, int port_)
 
 		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 
-		if (errno != EINPROGRESS) {
-			throw SocketException("Connection error");
-		}
-
 		if (r != 0) {
+			if (errno != EINPROGRESS) {
+				throw SocketException("Connection error");
+			}
+
 			fd_set wset;
 			struct timeval t;
 

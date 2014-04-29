@@ -21,25 +21,15 @@
 #define J_SSLSERVERSOCKET_H
 
 #include "jsslsocket.h"
+#include "jsslcontext.h"
 #include "jinetaddress.h"
 #include "jobject.h"
 
-#ifdef _WIN32
-#include <windows.h>
-#include <winsock.h>
-#else
 #include <sys/socket.h>
-#endif
 
 #include <stdint.h>
 
 namespace jsocket {
-
-enum jssl_client_auth {
-	JCA_REQUEST,
-	JCA_REQUIRE,
-	JCA_HANDSHAKE,
-};
 
 class SSLSocket;
 
@@ -55,27 +45,14 @@ class SSLServerSocket : public virtual jcommon::Object{
 		jsocket_t _fd;
 		/** \brief */
 		bool _is_closed;
-		/** \brief */
-		jssl_client_auth _client_auth;
-#ifdef _WIN32
-#else
 		/** \brief Local socket. */
 		sockaddr_in _lsock;
 		/** \brief Remote socket. */
 		sockaddr_in _rsock;
 		/** \brief */
 		InetAddress *_local;
-		/** \brief SSL data */
-		SSL_CTX *ctx;
-		/** \brief SSL data */
-		SSL *ssl;
-		/** \brief Indicate CERT loaded or created */
-		bool have_cert; 
-		/** \brief keysize argument from constructor */
-		int rsa_keysize;
-		/** \brief userdata */
-		char *ud;
-#endif
+		/** \brief */
+		SSLContext *_ctx;
 
 		/**
 		 * \brief
@@ -95,45 +72,12 @@ class SSLServerSocket : public virtual jcommon::Object{
 		 */
 		void ListenSocket(int);
 
-#ifdef _WIN32
-#else
-		/**
-		 * Create new CTX if none is available
-		 *
-		 */
-		virtual bool CheckContext();
-
-		/**
-		 *  Create temp cert if no other is loaded
-		 *
-		 */
-		RSA * GenerateRSAKey(int len, int exp = RSA_KEYEXP);
-
-		/**
-		 *  Create temp cert if no other is loaded
-		 *
-		 */
-		EVP_PKEY * GeneratePKey(RSA *rsakey);
-
-		/**
-		 *  Create temp cert if no other is loaded
-		 *
-		 */
-		X509 * BuildCertificate(const char *name, const char *organization, const char *country, EVP_PKEY *key);
-
-		/**
-		 *  Create temp cert if no other is loaded
-		 *
-		 */
-		bool UseCertCallback(const char *cert_file, const char *private_key_file, int passwd_cb(char *buf, int size, int rwflag, void *userdata), char *userdata);
-#endif
-
 	public:
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-		SSLServerSocket(int port, jssl_client_auth client_auth = JCA_HANDSHAKE, int backlog = 5, int keysize = RSA_KEYSIZE, InetAddress * = NULL);
+		SSLServerSocket(SSLContext *ctx, int port, int backlog = 5, InetAddress * = NULL);
 
 		/**
 		 * \brief Destructor virtual.
@@ -146,6 +90,12 @@ class SSLServerSocket : public virtual jcommon::Object{
 		 *
 		 */
 		virtual SSLSocket * Accept();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual SSLContext * GetContext();
 
 		/**
 		 * \brief
@@ -164,24 +114,6 @@ class SSLServerSocket : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void Close();
-
-		/**
-		 *  Create temp cert if no other is loaded
-		 *
-		 */
-		virtual bool UseCert(const char *cert_file, const char *private_key_file);
-
-		/**
-		 *  Create temp cert if no other is loaded
-		 *
-		 */
-		virtual bool UseCertPassword(const char *cert_file, const char *private_key_file, std::string password);
-
-		/**
-		 *  Create temp cert if no other is loaded
-		 *
-		 */
-		virtual bool UseDHFile(const char *dh_file);
 
 		/**
 		 * \brief 
