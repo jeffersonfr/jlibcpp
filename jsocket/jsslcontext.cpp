@@ -23,45 +23,6 @@
 
 namespace jsocket {
 
-static int VerifyClient(int ok, X509_STORE_CTX* store) 
-{
-	if (!ok) {
-		X509* cert = X509_STORE_CTX_get_current_cert(store);
-		int depth = X509_STORE_CTX_get_error_depth(store);
-		int err = X509_STORE_CTX_get_error(store);
-		char issuer[1024];
-		char subject[1024];
-		char tmp[4096];
-
-		X509_NAME_oneline(X509_get_issuer_name(cert), issuer, 1024);
-		X509_NAME_oneline(X509_get_subject_name(cert), subject, 1024);
-
-		sprintf(tmp, "Error with certificate:[issuer: %s, subject: %s] at depth:[%d]. %s", issuer, subject, depth, X509_verify_cert_error_string(err));
-	}
-
-	return ok;
-	
-	/*
-	X509 *peer_cert = X509_STORE_CTX_get_current_cert(ctx);
-	SSL *ssl = (SSL *)X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
-	char *str;
-
-	str = X509_NAME_oneline(X509_get_subject_name(peer_cert), 0, 0);
-	free(str);
-
-	str = X509_NAME_oneline(X509_get_issuer_name(peer_cert), 0, 0);
-	free(str);
-
-	X509_free(peer_cert);
-
-	if (SSL_get_verify_result(ssl) == X509_V_OK) {
-		return X509_V_OK;
-	} 
-
-	return -1;
-	*/
-}
-
 static int PasswordCallback(char *buf, int size, int rwflag, void *ud)
 {
 	strncpy(buf, (char *)(ud), size);
@@ -279,9 +240,6 @@ void SSLContext::SetRootAuthorities(std::string file, int depth)
 	// Set the maximum depth to be used verifying certificates
 	// Due to a bug, this is not enforced. The verify callback must enforce it.
 	SSL_CTX_set_verify_depth(_ctx, depth);
-
-	// Set the certificate verification callback.
-	SSL_CTX_set_verify(_ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, VerifyClient);
 }
 
 void SSLContext::SetDHFile(std::string file)

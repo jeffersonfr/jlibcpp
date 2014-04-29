@@ -263,6 +263,12 @@ class SSLSocket : public jsocket::Connection{
 		virtual SocketOptions * GetSocketOptions();
 
 		/**
+		 * \brief
+		 *
+		 */
+		virtual bool VerifyCertificate();
+
+		/**
 		 *  Get information about peer certificate. Should be called after connect() or accept() when 
 		 *  using verification
 		 *

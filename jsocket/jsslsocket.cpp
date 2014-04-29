@@ -26,6 +26,45 @@
 
 namespace jsocket {
 
+static int VerifyClient(int ok, X509_STORE_CTX* store) 
+{
+	if (!ok) {
+		X509* cert = X509_STORE_CTX_get_current_cert(store);
+		int depth = X509_STORE_CTX_get_error_depth(store);
+		int err = X509_STORE_CTX_get_error(store);
+		char issuer[1024];
+		char subject[1024];
+		char tmp[4096];
+
+		X509_NAME_oneline(X509_get_issuer_name(cert), issuer, 1024);
+		X509_NAME_oneline(X509_get_subject_name(cert), subject, 1024);
+
+		sprintf(tmp, "Error with certificate:[issuer: %s, subject: %s] at depth:[%d]. %s", issuer, subject, depth, X509_verify_cert_error_string(err));
+	}
+
+	return ok;
+	
+	/*
+	X509 *peer_cert = X509_STORE_CTX_get_current_cert(ctx);
+	SSL *ssl = (SSL *)X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
+	char *str;
+
+	str = X509_NAME_oneline(X509_get_subject_name(peer_cert), 0, 0);
+	free(str);
+
+	str = X509_NAME_oneline(X509_get_issuer_name(peer_cert), 0, 0);
+	free(str);
+
+	X509_free(peer_cert);
+
+	if (SSL_get_verify_result(ssl) == X509_V_OK) {
+		return X509_V_OK;
+	} 
+
+	return -1;
+	*/
+}
+
 SSLSocket::SSLSocket(SSLContext *ctx, InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbuf_):
 	jsocket::Connection(JCT_TCP)
 {
@@ -580,6 +619,24 @@ bool SSLSocket::GetPeerCertPEM(std::string *pem)
 X509 * SSLSocket::GetPeerCert()
 {
 	return SSL_get_peer_certificate(_ssl);
+}
+
+bool SSLSocket::VerifyCertificate()
+{
+	X509 *x509 = GetPeerCert();
+
+	if (x509 != NULL) {
+		// SSL_CTX_set_verify(_ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, VerifyClient);
+		SSL_CTX_set_verify(_ctx->GetSSLContext(), SSL_VERIFY_PEER, NULL);
+
+		if (SSL_get_verify_result(_ssl) == X509_V_OK) {
+			return true;
+		}
+			
+		free(x509);
+	}
+
+	return false;
 }
 
 bool SSLSocket::GetPeerCertInfo(peer_cert_info_t *info)

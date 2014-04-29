@@ -94,6 +94,12 @@ int main(void)
 		// Send message to server
 		std::cout << "Client running on " << mySocket.GetInetAddress()->GetHostName() << ":" << mySocket.GetPort() << "(" << mySocket.GetInetAddress()->GetHostAddress() << ")" << " sent " << mySocket.Send("Hello Server!", 13) << " bytes" << std::endl;
 
+		if (mySocket.VerifyCertificate() == true) {
+			std::cout << "Validation succeded !" << std::endl;
+		} else {
+			std::cout << "Validation failed !" << std::endl;
+		}
+
 		// Receive message from server
 		//r = mySocket.Receive(receive, 255);
 		r = mySocket.GetInputStream()->Read(receive, 255);
