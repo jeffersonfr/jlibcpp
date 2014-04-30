@@ -53,8 +53,8 @@ struct jaddress_info_t {
 	std::string address;
 };
 
-void InitWindowsSocket();
-void ReleaseWindowsSocket();
+void InitializeSocketLibrary();
+void ReleaseSocketLibrary();
 
 std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::string service);
 

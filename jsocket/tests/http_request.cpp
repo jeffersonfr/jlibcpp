@@ -292,7 +292,7 @@ int main(int argc, char **argv)
 
 	jcommon::URL url(resource);
 
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 	
 	HTTPRequest request(&url);
 
@@ -319,7 +319,7 @@ int main(int argc, char **argv)
 
 	//}
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 
 	return 0;
 }

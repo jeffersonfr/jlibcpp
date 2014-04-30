@@ -44,7 +44,7 @@ using namespace jsocket;
  */
 int main(void)
 {
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	SSLContext *context = SSLContext::CreateServerContext();
 	
@@ -105,7 +105,7 @@ int main(void)
 
 	std::cout << "Finish" << std::endl;
 	
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 	
 	return 0;
 }

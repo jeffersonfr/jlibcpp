@@ -32,10 +32,10 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	std::cout << "IsReachable:: " << jsocket::InetAddress::IsReachable(argv[1]) << std::endl;
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 }
 

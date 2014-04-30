@@ -39,7 +39,7 @@ using namespace jsocket;
  */
 int main(void)
 {
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	SSLContext *context = SSLContext::CreateClientContext("certs/cert.pem");
 	
@@ -115,7 +115,7 @@ int main(void)
 	
 	delete context;
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 	
 	return 0;
 }

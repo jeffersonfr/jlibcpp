@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	char buf[4096];
 
@@ -50,6 +50,6 @@ int main(int argc, char **argv)
 
 		s.Close();
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 }
 

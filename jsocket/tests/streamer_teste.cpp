@@ -722,7 +722,7 @@ void fixed_rate(std::string filename, std::string host, int port, uint32_t taxa)
 
 int main(int argc, char **argv)
 {
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	if (argc < 2) {
 		goto error;
@@ -754,7 +754,7 @@ int main(int argc, char **argv)
 		goto error;
 	}
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 
  	return EXIT_SUCCESS;
 

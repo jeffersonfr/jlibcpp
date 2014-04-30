@@ -33,7 +33,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	InetAddress *inet = InetAddress4::GetByName(argv[1]);
 	// InetAddress *inet = InetAddress6::GetByName(argv[1]);
@@ -46,6 +46,6 @@ int main(int argc, char **argv)
 		std::cout << "all by name:: [" << (*i)->GetHostName() << ", " << (*i)->GetHostAddress() << "]" << std::endl;
 	}
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 }
 

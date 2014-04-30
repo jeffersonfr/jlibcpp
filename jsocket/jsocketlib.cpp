@@ -40,7 +40,7 @@ WSADATA wsaData;
 #include <openssl/err.h>
 #endif
 
-void InitWindowsSocket()
+void InitializeSocketLibrary()
 {
 #ifdef _WIN32
     // if (WSAStartup (MAKEWORD (2, 0), &wsaData) != 0) {
@@ -65,7 +65,7 @@ void InitWindowsSocket()
 #endif
 }
 
-void ReleaseWindowsSocket()
+void ReleaseSocketLibrary()
 {
 #ifdef _WIN32
 	WSACleanup();

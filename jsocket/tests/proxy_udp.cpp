@@ -131,7 +131,7 @@ void help(char *p)
 
 int main(int argc, char **argv)
 {
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	if (init_args(argc, argv) == -1) {
 		help(argv[0]);
@@ -141,7 +141,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 
 	return 0;
 }

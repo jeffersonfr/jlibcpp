@@ -232,10 +232,10 @@ void sniffer()
 
 int main()
 {
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	sniffer();
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 }
 

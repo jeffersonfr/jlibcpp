@@ -118,12 +118,12 @@ int main(int argc, char **argv)
 		url = std::string(argv[1]);
 	}
 
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 		
 	http_stream(jcommon::URL(url));
 	// http_raw(jcommon::URL(url));
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 
 	return 0;
 }

@@ -82,10 +82,10 @@ void dump_raw()
 
 int main()
 {
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	dump_raw();
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 }
 

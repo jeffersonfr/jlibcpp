@@ -28,7 +28,7 @@
 using namespace jsocket;
 
 int main() {
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	char *buffer = new char[1024];
 	char *receive = new char[1024];
@@ -72,7 +72,7 @@ int main() {
 	delete [] buffer;
 	delete [] receive;
 	
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 
 	return 0;
 }

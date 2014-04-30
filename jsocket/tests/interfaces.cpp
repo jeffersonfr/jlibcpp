@@ -26,7 +26,7 @@ using namespace jsocket;
 
 int main(int argc, char **argv)
 {
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	std::vector<NetworkInterface *> interfaces = NetworkInterface::GetNetworkInterfaces();
 
@@ -40,6 +40,6 @@ int main(int argc, char **argv)
 		}
 	}
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 }
 

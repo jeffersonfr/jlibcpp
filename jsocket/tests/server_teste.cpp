@@ -27,7 +27,7 @@
 using namespace jsocket;
 
 int main() {
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	char *receive = new char[100+1];
 	
@@ -59,7 +59,7 @@ int main() {
 		std::cout << "Exception:: " << e.what() << std::endl;
 	}
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 
 	return 0;
 }
