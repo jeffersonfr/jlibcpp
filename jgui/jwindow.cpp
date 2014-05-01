@@ -84,6 +84,9 @@ Window::~Window()
 
 	ReleaseWindow();
 
+	delete _graphics;
+	_graphics = NULL;
+
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSED));
 }
 
@@ -731,8 +734,8 @@ void Window::ReleaseWindow()
 		_graphics->Unlock();
 	}
 
-	delete _graphics;
-	_graphics = NULL;
+	// delete _graphics;
+	// _graphics = NULL;
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	if (_window) {
