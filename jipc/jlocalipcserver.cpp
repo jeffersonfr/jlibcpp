@@ -23,6 +23,7 @@
 #include "jipcexception.h"
 #include "jresponse.h"
 #include "jsocketexception.h"
+#include "jioexception.h"
 #include "jsockettimeoutexception.h"
 
 namespace jipc {
@@ -50,6 +51,7 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 	}
 
 	jsocket::LocalSocket *client = NULL;
+	Response *response = NULL;
 
 	try {
 		client = _server->Accept();
@@ -67,15 +69,20 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 					break;
 				}
 			}
-		} catch (jsocket::SocketTimeoutException &e) {
-			throw jcommon::TimeoutException(&e, "Method receive timeout exception");
+
+			rbuffer[index] = 0;
+		} catch (jio::IOException &e) {
+			client->Close();
+			delete client;
+
+			throw IPCException(&e, "Connection broken");
 		}
 
 		Method method("null");
 
 		method.Initialize((uint8_t *)rbuffer, index);
 
-		Response *response = listener->ProcessCall(&method);
+		response = listener->ProcessCall(&method);
 
 		if (response != NULL) {
 			std::string encoded = response->Encode();
@@ -99,22 +106,35 @@ void LocalIPCServer::WaitCall(RemoteCallListener *listener)
 					length = length - r;
 					index = index + r;
 				}
-			} catch (jsocket::SocketTimeoutException &e) {
-				delete response;
-
-				throw jcommon::TimeoutException(&e, "Method response timeout exception");
-			} catch (jcommon::Exception &e) {
-				delete response;
-
-				throw e;
+			} catch (jio::IOException &e) {
 			}
+
+			delete response;
+			client->Close();
+			delete client;
 		}
+	} catch (jsocket::SocketTimeoutException &e) {
+		if (response != NULL) {
+			delete response;
+		}
+
+		if (client != NULL) {
+			client->Close();
+			delete client;
+		}
+
+		throw jcommon::TimeoutException(&e, "Connection timeout exception");
 	} catch (jcommon::Exception &e) {
-		client->Close();
+		if (response != NULL) {
+			delete response;
+		}
 
-		delete client;
+		if (client != NULL) {
+			client->Close();
+			delete client;
+		}
 
-		throw IPCException(&e, "IPC server exception: " + e.what());
+		throw IPCException(&e, "Connection error");
 	}
 }
 

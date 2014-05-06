@@ -24,6 +24,7 @@
 #include "jipcexception.h"
 #include "jresponse.h"
 #include "jnullpointerexception.h"
+#include "jioexception.h"
 #include "jsockettimeoutexception.h"
 
 namespace jipc {
@@ -70,8 +71,8 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 				length = length - r;
 				index = index + r;
 			}
-		} catch (jsocket::SocketTimeoutException &e) {
-			throw jcommon::TimeoutException(&e, "Method request timeout exception");
+		} catch (jio::IOException &e) {
+			throw IPCException(&e, "Connection broken");
 		}
 
 		uint8_t rbuffer[65535];
@@ -86,8 +87,9 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 					break;
 				}
 			}
-		} catch (jsocket::SocketTimeoutException &e) {
-			throw jcommon::TimeoutException(&e, "Response request timeout exception");
+
+			rbuffer[index] = 0;
+		} catch (jio::IOException &e) {
 		}
 
 		Response *local = (*response);
@@ -99,8 +101,10 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 		local->Initialize((uint8_t *)rbuffer, index);
 
 		(*response) = local;
+	} catch (jsocket::SocketTimeoutException &e) {
+		throw jcommon::TimeoutException(&e, "Connection timeout exception");
 	} catch (jcommon::Exception &e) {
-		throw IPCException(&e, "IPC client exception: " + e.what());
+		throw IPCException(&e, "Connection error");
 	}
 }
 

@@ -13,7 +13,8 @@ ENABLE_GRAPHICS=<none,directfb,directfb-cairo>
 
 :Compiling
 
-$sudo make all install
+$ export PKG_CONFIG_PATH=<pkg-path>
+$ sudo make all install
 
 [Compilling tests]
 

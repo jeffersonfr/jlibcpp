@@ -83,7 +83,7 @@ void server(int port)
 
 void client(std::string ip, int port, jipc::Method *method)
 {
-	jipc::RemoteIPCClient client("127.0.0.1", 1234);
+	jipc::RemoteIPCClient client(ip, port);
 	jipc::Response *response = NULL;
 
 	std::cout << "Client request [" << method->what() << "]" << std::endl;
