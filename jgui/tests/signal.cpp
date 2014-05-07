@@ -170,7 +170,7 @@ class Plotter : public jgui::Frame, public jthread::Thread {
 
 int main()
 {
-	InitWindowsSocket();
+	InitializeSocketLibrary();
 
 	Plotter plotter(100, 100);
 
@@ -178,6 +178,6 @@ int main()
 	plotter.Start();
 	plotter.WaitThread();
 
-	ReleaseWindowsSocket();
+	ReleaseSocketLibrary();
 }
 
