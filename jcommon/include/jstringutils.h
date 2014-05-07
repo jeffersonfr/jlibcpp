@@ -25,6 +25,8 @@
 #include <string>
 #include <map>
 
+#define STRING_EMPTY_CHARS " \n\r\t"
+
 namespace jcommon {
 
 /**
@@ -53,23 +55,20 @@ class StringUtils : public virtual jcommon::Object{
 		 * \brief 
 		 *
 		 */
-		// static int LeftTrim(char **str, int length);
-		static std::string LeftTrim(std::string str);
+		static std::string LeftTrim(std::string str, std::string chars = std::string(STRING_EMPTY_CHARS));
 		
 		/**
 		 * \brief 
 		 *
 		 */
-		// static int RightTrim(char **str, int length);
-		static std::string RightTrim(std::string str);
+		static std::string RightTrim(std::string str, std::string chars = std::string(STRING_EMPTY_CHARS));
 
 		
 		/**
 		 * \brief 
 		 *
 		 */
-		// static int Trim(char **str, int limit = 8096);
-		static std::string Trim(std::string str);
+		static std::string Trim(std::string str, std::string chars = std::string(STRING_EMPTY_CHARS));
 
 		/**
 		 * \brief 

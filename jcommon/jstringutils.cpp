@@ -20,8 +20,6 @@
 #include "Stdafx.h"
 #include "jstringutils.h"
 
-#define STRING_EMPTY_CHARS " \n\r\t"
-
 namespace jcommon {
 
 struct property_t {
@@ -39,19 +37,19 @@ StringUtils::~StringUtils()
 {
 }
 
-std::string StringUtils::LeftTrim(std::string str)
+std::string StringUtils::LeftTrim(std::string str, std::string chars)
 {
 	return str.erase(0, str.find_first_not_of(STRING_EMPTY_CHARS));
 }
 
-std::string StringUtils::RightTrim(std::string str)
+std::string StringUtils::RightTrim(std::string str, std::string chars)
 {
 	return str.erase(str.find_last_not_of(STRING_EMPTY_CHARS)+1);
 }
 
-std::string StringUtils::Trim(std::string str)
+std::string StringUtils::Trim(std::string str, std::string chars)
 {
-	return LeftTrim(RightTrim(str));
+	return LeftTrim(RightTrim(str, chars), chars);
 }
 
 std::string StringUtils::ToLower(std::string str)
