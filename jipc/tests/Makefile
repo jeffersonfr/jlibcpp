@@ -29,12 +29,18 @@ OBJS_local = \
 OBJS_remote = \
 	   remote.o\
 
-all: local remote
+OBJS_secure = \
+	   secure.o\
+
+all: local remote secure
 	
 local: $(OBJS_local)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 remote: $(OBJS_remote)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+
+secure: $(OBJS_secure)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 .cpp.o: $<  
@@ -43,4 +49,4 @@ remote: $(OBJS_remote)
 install:
 
 clean:
-	@rm -rvf *.o *~ local remote
+	@rm -rvf *.o *~ local remote secure

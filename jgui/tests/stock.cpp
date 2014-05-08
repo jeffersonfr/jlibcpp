@@ -149,6 +149,12 @@ class Stock : public jgui::Frame{
 			jcommon::StringTokenizer lines(std::string(receive), "\r\n\r\n", jcommon::JTT_STRING, false);
 			jcommon::StringTokenizer tokens(lines.GetToken(1), ",", jcommon::JTT_STRING, false);
 
+			if (tokens.GetSize() != 11) {
+				std::cout << "Error:: \n\n" << lines.GetToken(1) << std::endl;
+
+				exit(1);
+			}
+
 			quotes["nome"] = tokens.GetToken(1);
 			quotes["data"] = jcommon::StringUtils::ReplaceString(tokens.GetToken(2), "\"", "");
 			quotes["hora"] = tokens.GetToken(3);

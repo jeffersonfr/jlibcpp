@@ -18,69 +18,54 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jremoteipcclient.h"
+#include "jsecureipcserver.h"
 #include "jipchelper.h"
-#include "jsocket.h"
 #include "jipcexception.h"
 #include "jresponse.h"
-#include "jnullpointerexception.h"
+#include "jsocketexception.h"
 #include "jioexception.h"
 #include "jsockettimeoutexception.h"
+#include "jsslsocket.h"
 
 namespace jipc {
 
-RemoteIPCClient::RemoteIPCClient(std::string host, int port):
-	IPCClient()
+SecureIPCServer::SecureIPCServer(jsocket::SSLContext *ctx, int port):
+	IPCServer()
 {
-	_host = host;
-	_port = port;
-}
-
-RemoteIPCClient::~RemoteIPCClient()
-{
-}
-
-void RemoteIPCClient::CallMethod(Method *method, Response **response)
-{
-	if (method == NULL) {
-		throw jcommon::NullPointerException("Method cannot be null");
-	}
+	_ctx = ctx;
 
 	try {
-		jsocket::Socket client(_host, _port);
+		_server = new jsocket::SSLServerSocket(_ctx, port);
+	} catch (jsocket::SocketException &e) {
+		throw IPCException("Cannot create ipc server.");
+	}
+}
 
-		std::string encoded = method->Encode();
-		const char *buffer = encoded.c_str();
-		int length = encoded.size();
-		int r = 0,
+SecureIPCServer::~SecureIPCServer()
+{
+	_server->Close();
+	delete _server;
+}
+
+void SecureIPCServer::WaitCall(RemoteCallListener *listener)
+{
+	if (listener == NULL) {
+		return;
+	}
+
+	jsocket::SSLSocket *client = NULL;
+	Response *response = NULL;
+
+	try {
+		client = (jsocket::SSLSocket *)_server->Accept();
+
+		char rbuffer[65535];
+		int r,
 				index = 0,
 				size = 1500;
 
 		try {
-			while (length > 0) {
-				if (size > length) {
-					size = length;
-				}
-
-				r = client.Send(buffer+index, size, _call_timeout);
-
-				if (r <= 0) {
-					break;
-				}
-
-				length = length - r;
-				index = index + r;
-			}
-		} catch (jio::IOException &e) {
-			throw IPCException(&e, "Connection broken");
-		}
-
-		uint8_t rbuffer[65535];
-
-		index = 0;
-
-		try {
-			while ((r = client.Receive((char *)rbuffer+index, size, _call_timeout)) > 0) {
+			while ((r = client->Receive(rbuffer+index, size, _response_timeout)) > 0) {
 				index = index + r;
 
 				if (r < size) {
@@ -90,20 +75,69 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 
 			rbuffer[index] = 0;
 		} catch (jio::IOException &e) {
+			client->Close();
+			delete client;
+
+			throw IPCException(&e, "Connection broken");
 		}
 
-		Response *local = (*response);
+		Method method("null");
 
-		if (local == NULL) {
-			local = new Response();
+		method.Initialize((uint8_t *)rbuffer, index);
+
+		response = listener->ProcessCall(&method);
+
+		if (response != NULL) {
+			std::string encoded = response->Encode();
+
+			const char *buffer = encoded.c_str();
+			int length = encoded.size();
+
+			index = 0;
+
+			try {
+				while (length > 0) {
+					if (size > length) {
+						size = length;
+					}
+
+					r = client->Send(buffer+index, size, _response_timeout);
+
+					if (r <= 0) {
+						break;
+					}
+
+					length = length - r;
+					index = index + r;
+				}
+			} catch (jio::IOException &e) {
+			}
+
+			delete response;
+			client->Close();
+			delete client;
 		}
-
-		local->Initialize((uint8_t *)rbuffer, index);
-
-		(*response) = local;
 	} catch (jsocket::SocketTimeoutException &e) {
+		if (response != NULL) {
+			delete response;
+		}
+
+		if (client != NULL) {
+			client->Close();
+			delete client;
+		}
+
 		throw jcommon::TimeoutException(&e, "Connection timeout exception");
 	} catch (jcommon::Exception &e) {
+		if (response != NULL) {
+			delete response;
+		}
+
+		if (client != NULL) {
+			client->Close();
+			delete client;
+		}
+
 		throw IPCException(&e, "Connection error");
 	}
 }

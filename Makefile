@@ -229,6 +229,8 @@ OBJS_jipc += \
 		 jremoteipcclient.o\
 		 jremoteipcserver.o\
 		 jresponse.o\
+		 jsecureipcclient.o\
+		 jsecureipcserver.o\
 
 OBJS_jsocket += \
 		 jconnection.o\

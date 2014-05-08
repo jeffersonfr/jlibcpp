@@ -18,9 +18,9 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jremoteipcclient.h"
+#include "jsecureipcclient.h"
 #include "jipchelper.h"
-#include "jsocket.h"
+#include "jsslsocket.h"
 #include "jipcexception.h"
 #include "jresponse.h"
 #include "jnullpointerexception.h"
@@ -29,25 +29,30 @@
 
 namespace jipc {
 
-RemoteIPCClient::RemoteIPCClient(std::string host, int port):
+SecureIPCClient::SecureIPCClient(jsocket::SSLContext *ctx, std::string host, int port):
 	IPCClient()
 {
+	_ctx = ctx;
 	_host = host;
 	_port = port;
 }
 
-RemoteIPCClient::~RemoteIPCClient()
+SecureIPCClient::~SecureIPCClient()
 {
 }
 
-void RemoteIPCClient::CallMethod(Method *method, Response **response)
+void SecureIPCClient::CallMethod(Method *method, Response **response)
 {
 	if (method == NULL) {
 		throw jcommon::NullPointerException("Method cannot be null");
 	}
 
 	try {
-		jsocket::Socket client(_host, _port);
+		jsocket::SSLSocket client(_ctx, _host, _port);
+
+		if (client.VerifyCertificate() == false) {
+			throw IPCException("Validation failed");
+		}
 
 		std::string encoded = method->Encode();
 		const char *buffer = encoded.c_str();
