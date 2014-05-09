@@ -103,10 +103,11 @@ int main(int argc, char **argv)
 		jipc::Method method(argv[3]);
 
 		for (int i=4; i<argc; i++) {
-			jcommon::StringTokenizer tokens(std::string(argv[i]), "=", jcommon::JTT_STRING);
+			std::string param = std::string(argv[i]);
+			std::string::size_type r = param.find("=");
 
-			if (tokens.GetSize() > 1) {
-				method.SetTextParam(tokens.GetToken(0), tokens.GetToken(1));
+			if (r != std::string::npos) {
+				method.SetTextParam(param.substr(0, r), param.substr(r+1));
 			}
 		}
 
