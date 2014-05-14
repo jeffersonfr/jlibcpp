@@ -572,6 +572,8 @@ void Frame::PaintGlassPane(Graphics *g)
 		g->FillLinearGradient(_border_size, _border_size, _size.width-2*_border_size, _insets.top-2*_border_size, 0, 0, 0, _insets.top-2*_border_size);
 		g->ResetGradientStop();
 
+		g->SetFont(_font);
+
 		if (IsFontSet() == true) {
 			int y = _insets.top-_font->GetSize()-15;
 
