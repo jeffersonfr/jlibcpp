@@ -54,6 +54,7 @@ class Container : public jgui::Component{
 		std::vector<ContainerListener *> _container_listeners;
 		std::vector<Component *> _components;
 		Component *_focus;
+		Layout *_default_layout;
 		Layout *_layout;
 		jsize_t _scroll_dimension;
 		jinsets_t _insets;
@@ -137,6 +138,12 @@ class Container : public jgui::Component{
 		 *
 		 */
 		virtual jgui::Layout * GetLayout();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual const jgui::Layout * GetDefaultLayout();
 
 		/**
 		 * \brief

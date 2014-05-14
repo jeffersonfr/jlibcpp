@@ -35,7 +35,8 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 
 	SetWorkingScreenSize(scale_width, scale_height);
 
-	_layout = new BorderLayout();//NULL;
+	_default_layout = new BorderLayout();
+	_layout = _default_layout;
 
 	_is_focus_cycle_root = false;
 	_focus = NULL;
@@ -59,8 +60,8 @@ Container::Container(int x, int y, int width, int height, int scale_width, int s
 
 Container::~Container()
 {
-	if (_layout != NULL) {
-		delete _layout;
+	if (_default_layout != NULL) {
+		delete _default_layout;
 	}
 }
 
@@ -285,6 +286,11 @@ void Container::SetLayout(jgui::Layout *layout)
 	}
 
 	_layout = layout;
+}
+
+const jgui::Layout * Container::GetDefaultLayout()
+{
+	return _default_layout;
 }
 
 jgui::Layout * Container::GetLayout()
