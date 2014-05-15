@@ -39,7 +39,7 @@ ARFLAGS		= \
 # -ansi: problemas com va_copy()
 CCFLAGS		= \
 		 -Wall -shared -rdynamic -fPIC -funroll-loops -O2 \
-	 	 $(DEBUG) -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)/\" \
+	 	 $(DEBUG) -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" \
 		 -I$(INCDIR) \
 		 -Iwin32/win32 \
 		 -Ijcommon/include \
