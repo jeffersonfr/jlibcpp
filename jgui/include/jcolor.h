@@ -192,6 +192,12 @@ class Color : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		Color(std::string name);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		Color(uint32_t color = 0xff000000);
 		
 		/**
