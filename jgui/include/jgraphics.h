@@ -217,6 +217,7 @@ class Graphics : public virtual jcommon::Object{
 		struct jsize_t _screen;
 		struct jsize_t _scale;
 		double _radians;
+		bool _vertical_sync;
 
 	protected:
 		/**
@@ -261,6 +262,12 @@ class Graphics : public virtual jcommon::Object{
 		 *
 		 */
 		virtual jsize_t GetWorkingScreenSize();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetVerticalSyncEnabled(bool b);
 
 		/**
 		 * \brief

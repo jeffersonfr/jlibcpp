@@ -45,6 +45,8 @@ Graphics::Graphics():
 	_translate.y = 0;
 	_translate_image.x = 0;
 	_translate_image.y = 0;
+
+	_vertical_sync = false;
 }
 
 Graphics::~Graphics()
@@ -58,6 +60,11 @@ void * Graphics::GetNativeSurface()
 
 void Graphics::SetNativeSurface(void *addr)
 {
+}
+
+void Graphics::SetVerticalSyncEnabled(bool b)
+{
+	_vertical_sync = b;
 }
 
 jregion_t Graphics::ClipRect(int xp, int yp, int wp, int hp)

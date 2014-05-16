@@ -352,9 +352,11 @@ void DFBGraphics::Flip()
 		return;
 	}
 
-	// _surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_BLIT));
-	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
-	// _surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
+	if (_vertical_sync == false) {
+		_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+	} else {
+		_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
+	}
 }
 
 void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
@@ -375,9 +377,11 @@ void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
 	rgn.x2 = x+w;
 	rgn.y2 = y+h;
 
-	// _surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_BLIT));
-	_surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
-	// _surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
+	if (_vertical_sync == false) {
+		_surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+	} else {
+		_surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
+	}
 }
 
 Color & DFBGraphics::GetColor()
