@@ -20,7 +20,6 @@
 #include "Stdafx.h"
 #include "jproperties.h"
 #include "jstringutils.h"
-#include "jstringtokenizer.h"
 #include "jautolock.h"
 #include "jfileinputstream.h"
 #include "jbufferedreader.h"
@@ -117,16 +116,17 @@ void Properties::Load(std::string filename_, std::string escape_)
 					
 				_properties.push_back(prop);
 		} else {
-			jcommon::StringTokenizer tokens(line, escape_, jcommon::JTT_STRING, false);
+			std::string::size_type r1 = line.find(escape_);
+			std::string::size_type r2 = line.find("#");
 
-			if (tokens.GetSize() == 2) {
-					struct jproperty_t prop;
+			if (line.size() > 0 && r1 != std::string::npos && (r2 == std::string::npos || (r2 != std::string::npos && r1 < r2))) {
+				struct jproperty_t prop;
 
-					prop.key = jcommon::StringUtils::Trim(tokens.GetToken(0));
-					prop.value = jcommon::StringUtils::Trim(tokens.GetToken(1));
-					prop.comment = false;
+				prop.key = jcommon::StringUtils::Trim(line.substr(0, r1));
+				prop.value = jcommon::StringUtils::Trim(line.substr(r1+1));
+				prop.comment = false;
 
-					_properties.push_back(prop);
+				_properties.push_back(prop);
 			} else {
 				struct jproperty_t prop;
 	
