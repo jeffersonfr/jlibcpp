@@ -120,7 +120,7 @@ int DFBHandler::CreateFont(std::string name, int height, IDirectFBFont **font, i
 		return -1;
 	}
 
-	(*font)->FindEncoding(*font, "Latin1", &enc_id);
+	(*font)->FindEncoding(*font, "UTF8", &enc_id);
 	(*font)->SetEncoding(*font, enc_id);
 
 	return 0;
