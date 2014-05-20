@@ -58,7 +58,7 @@ class InputDialogBox : public jgui::Frame, public jgui::ButtonListener{
 		 * \brief
 		 *
 		 */
-		InputDialogBox(std::string title, std::string warn, int x, int y);
+		InputDialogBox(std::string title, std::string warn);
 		
 		/**
 		 * \brief

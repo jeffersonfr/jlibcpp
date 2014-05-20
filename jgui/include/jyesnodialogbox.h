@@ -62,7 +62,7 @@ class YesNoDialogBox : public jgui::Frame, public jgui::ButtonListener{
 		 * \brief
 		 *
 		 */
-		YesNoDialogBox(std::string title, std::string msg, int x, int y);
+		YesNoDialogBox(std::string title, std::string msg);
 		
 		/**
 		 * \brief

@@ -105,7 +105,7 @@ class FileChooserDialogBox : public jgui::Frame, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		FileChooserDialogBox(std::string title, std::string directory, int x, int y, jfilechooser_type_t type = JFCT_OPEN_FILE_DIALOG);
+		FileChooserDialogBox(std::string title, std::string directory, jfilechooser_type_t type = JFCT_OPEN_FILE_DIALOG);
 
 		/**
 		 * \brief

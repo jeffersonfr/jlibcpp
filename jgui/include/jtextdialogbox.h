@@ -46,7 +46,7 @@ class TextDialogBox : public jgui::Frame{
 		 * \brief
 		 *
 		 */
-		TextDialogBox(std::string msg, int x, int y, bool wrap = false);
+		TextDialogBox(std::string msg, bool wrap = false);
 		
 		/**
 		 * \brief

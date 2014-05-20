@@ -22,10 +22,12 @@
 
 namespace jgui {
 
-TextDialogBox::TextDialogBox(std::string msg, int x, int y, bool wrap):
-   	jgui::Frame("", x, y, 1000, 1)
+TextDialogBox::TextDialogBox(std::string msg, bool wrap):
+   	jgui::Frame("", 0, 0, 1000, 600)
 {
 	jcommon::Object::SetClassName("jgui::TextDialogBox");
+
+	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 
 	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
 

@@ -109,7 +109,7 @@ class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, publi
 		 * \brief
 		 *
 		 */
-		CalendarDialogBox(int x, int y);
+		CalendarDialogBox();
 		
 		/**
 		 * \brief

@@ -190,7 +190,7 @@ bool Mines::ProcessEvent(jgui::KeyEvent *event)
 			}
 		} else if (event->GetSymbol() == jgui::JKS_RED || event->GetSymbol() == jgui::JKS_F1) {
 		} else if (event->GetSymbol() == jgui::JKS_GREEN || event->GetSymbol() == jgui::JKS_F2) {
-			jgui::MessageDialogBox dialog("Ajuda", "O jogo termina quando todos os blocos que n\xe3o possuem minas s\xe3o revelados. Utilize as bandeirinhas para ajudar a identificar as minas escondidas.", GetX()+300, GetY()+200);
+			jgui::MessageDialogBox dialog("Ajuda", "O jogo termina quando todos os blocos que n\xe3o possuem minas s\xe3o revelados. Utilize as bandeirinhas para ajudar a identificar as minas escondidas.");
 
 			dialog.Show();
 		} else if (event->GetSymbol() == jgui::JKS_YELLOW || event->GetSymbol() == jgui::JKS_F3) {

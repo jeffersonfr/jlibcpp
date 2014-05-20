@@ -81,7 +81,7 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 
 		view.Show();
 		} else {
-			jgui::MessageDialogBox dialog("Aviso", "Nao existem compromissos cadastrados !", (1920-1000)/2, 400);
+			jgui::MessageDialogBox dialog("Aviso", "Nao existem compromissos cadastrados !");
 
 			dialog.Show();
 		}
@@ -91,12 +91,12 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 
 			add.Show();
 		} else {
-			jgui::MessageDialogBox dialog("Aviso", "A agenda está cheia !", (1920-1000)/2, 400);
+			jgui::MessageDialogBox dialog("Aviso", "A agenda está cheia !");
 
 			dialog.Show();
 		}
 	} else if (event->GetIndex() == 2) {
-		jgui::YesNoDialogBox dialog("Aviso", "Remover todos os registros ?", (1920-1000)/2, 400);
+		jgui::YesNoDialogBox dialog("Aviso", "Remover todos os registros ?");
 
 		dialog.Show();
 
@@ -108,7 +108,7 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 
 		sprintf(tmp, "Contatos usados : %d/%d", db->GetSize(), db->GetCapacity());
 
-		jgui::MessageDialogBox dialog("Estado da mem\xf3ria", tmp, (1920-1000)/2, 400);
+		jgui::MessageDialogBox dialog("Estado da mem\xf3ria", tmp);
 
 		dialog.Show();
 	}
@@ -654,7 +654,7 @@ bool AddMessage::ProcessEvent(jgui::KeyEvent *event)
 		} else if (GetFocusOwner() == date) {
 			tmp = date->GetText();
 
-			jgui::CalendarDialogBox calendar(GetX()+GetWidth()+20, GetY());
+			jgui::CalendarDialogBox calendar;
 
 			for (int i=0; i<db->GetSize(); i++) {
 				AgendaDB::agenda_t *t = db->Get(i);
@@ -809,7 +809,7 @@ bool ViewMessages::ProcessEvent(jgui::KeyEvent *event)
 		Update();
 	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialogBox dialog("Aviso", "Remover o compromisso atual ?", (1920-1080)/2, 400);
+			jgui::YesNoDialogBox dialog("Aviso", "Remover o compromisso atual ?");
 
 			dialog.Show();
 

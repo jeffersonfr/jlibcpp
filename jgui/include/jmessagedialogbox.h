@@ -54,7 +54,7 @@ class MessageDialogBox : public jgui::Frame, public jgui::ButtonListener{
 		 * \brief
 		 *
 		 */
-		MessageDialogBox(std::string title, std::string msg, int x, int y);
+		MessageDialogBox(std::string title, std::string msg);
 		
 		/**
 		 * \brief

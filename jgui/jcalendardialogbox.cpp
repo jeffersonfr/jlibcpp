@@ -23,8 +23,8 @@
 
 namespace jgui {
 
-CalendarDialogBox::CalendarDialogBox(int x, int y):
-	jgui::Frame("Calendar", x, y, 1, 1)
+CalendarDialogBox::CalendarDialogBox():
+	jgui::Frame("Calendar", 0, 0, 0, 0)
 {
 	jcommon::Object::SetClassName("jgui::CalendarDialogBox");
 
@@ -37,6 +37,7 @@ CalendarDialogBox::CalendarDialogBox(int x, int y):
 	delta = 2;
 
 	SetSize(8*(bwidth+delta)-30, 11*(bheight+delta)+10);
+	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 
 	jcommon::Date date;
 

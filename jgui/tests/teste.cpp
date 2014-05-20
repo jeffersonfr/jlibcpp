@@ -1004,7 +1004,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 					app.Show();
 				}
 			} else if (event->GetSource() == button2) {
-				jgui::CalendarDialogBox app(150, 100);
+				jgui::CalendarDialogBox app;
 
 				app.AddWarnning(2, 11, 2007);
 				app.Show();
@@ -1013,14 +1013,14 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 
 				teste.Show();
 			} else if (event->GetSource() == button4) {
-				jgui::MessageDialogBox app("Aviso", "Testando o componente MessageBox com todos os recursos de alinhamento. Pulando linha, \n testando new line em DrawJustified para quebrar linhas.\nTestando multiplas linhas de mensagem em um unico componentes. Finalizando, estou apenas aumentando o tamanho do texto para verificar inconsistencias.", 150, 250);
-				jgui::MessageDialogBox app1("Aviso", "JeffersonFerreiradeAraujoAdrianaAraujoLimaMariadeLourdesAraujoLimaAmancioFerreiraLima", 150, 250);
+				jgui::MessageDialogBox app("Aviso", "Testando o componente MessageBox com todos os recursos de alinhamento. Pulando linha, \n testando new line em DrawJustified para quebrar linhas.\nTestando multiplas linhas de mensagem em um unico componentes. Finalizando, estou apenas aumentando o tamanho do texto para verificar inconsistencias.");
+				jgui::MessageDialogBox app1("Aviso", "JeffersonFerreiradeAraujoAdrianaAraujoLimaMariadeLourdesAraujoLimaAmancioFerreiraLima");
 
 				app.Show();
 				app1.Show();
 			} else if (event->GetSource() == button5) {
-				jgui::YesNoDialogBox app("Pergunta", "Testando o componentes YesNoDialog. Voce deseja clicar na opcao Sim ou na opcao Nao ?", 150, 250);
-				// jgui::InputDialogBox app("Pergunta", "Quantos anos de experiencia ?", 150, 250);
+				jgui::YesNoDialogBox app("Pergunta", "Testando o componentes YesNoDialog. Voce deseja clicar na opcao Sim ou na opcao Nao ?");
+				// jgui::InputDialogBox app("Pergunta", "Quantos anos de experiencia ?");
 
 				app.Show();
 			} else if (event->GetSource() == button6) {

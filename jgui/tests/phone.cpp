@@ -83,7 +83,7 @@ void Phone::ItemSelected(jgui::SelectEvent *event)
 
 		app.Show();
 	} else if (event->GetIndex() == 2) {
-		jgui::YesNoDialogBox dialog("Aviso", "Remover todos os registros ?", (1920-1000)/2, 400);
+		jgui::YesNoDialogBox dialog("Aviso", "Remover todos os registros ?");
 
 		dialog.Show();
 
@@ -95,7 +95,7 @@ void Phone::ItemSelected(jgui::SelectEvent *event)
 
 		sprintf(tmp, "Contatos usados : %d/%d", db->GetSize(), db->GetCapacity());
 
-		jgui::MessageDialogBox dialog("Estado da mem\xf3ria", tmp, (1920-1000)/2, 400);
+		jgui::MessageDialogBox dialog("Estado da mem\xf3ria", tmp);
 
 		dialog.Show();
 	}
@@ -683,7 +683,7 @@ bool SearchContacts::ProcessEvent(jgui::KeyEvent *event)
 		}
 	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialogBox dialog("Aviso", "Remover o contato atual ?", (1920-1000)/2, 400);
+			jgui::YesNoDialogBox dialog("Aviso", "Remover o contato atual ?");
 
 			dialog.Show();
 
@@ -696,7 +696,7 @@ bool SearchContacts::ProcessEvent(jgui::KeyEvent *event)
 					_index = 0;
 				}
 
-				jgui::MessageDialogBox dialog("Aviso", "Contato removido com sucesso", (1920-1000)/2, 400);
+				jgui::MessageDialogBox dialog("Aviso", "Contato removido com sucesso");
 
 				dialog.Show();
 

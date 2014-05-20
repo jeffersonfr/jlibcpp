@@ -22,10 +22,12 @@
 
 namespace jgui {
 
-MessageDialogBox::MessageDialogBox(std::string title, std::string msg, int x, int y):
-   	jgui::Frame(title, x, y, 1000, 1)
+MessageDialogBox::MessageDialogBox(std::string title, std::string msg):
+   	jgui::Frame(title, 0, 0, 1000, 600)
 {
 	jcommon::Object::SetClassName("jgui::MessageDialogBox");
+
+	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 
 	int cw = DEFAULT_COMPONENT_WIDTH,
 			ch = DEFAULT_COMPONENT_HEIGHT;

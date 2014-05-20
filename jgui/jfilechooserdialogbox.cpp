@@ -34,10 +34,12 @@ struct ascending_sort {
 	}
 };
 
-FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string directory, int x, int y, jfilechooser_type_t type):
-	jgui::Frame(title, x, y, 1000, 600)
+FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string directory, jfilechooser_type_t type):
+	jgui::Frame(title, 0, 0, 1000, 600)
 {
 	jcommon::Object::SetClassName("jgui::FileChooserDialogBox");
+
+	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 
 	_label = NULL;
 	_file = NULL;
@@ -70,9 +72,9 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 	ShowFiles(_current_dir);
 
 	if (_type == JFCT_OPEN_FILE_DIALOG) {
-		AddSubtitle(_DATA_PREFIX"images/blue_icon.png", "Open");
+		AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Open");
 	} else {
-		AddSubtitle(_DATA_PREFIX"images/blue_icon.png", "Save");
+		AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Save");
 	}
 
 	Pack();
