@@ -105,6 +105,10 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		jthread::Mutex _input_mutex,
 			_paint_mutex;
 		jthread::Condition _frame_sem;
+		Image *_icon_image;
+		Image *_icon_close;
+		Image *_icon_maximize;
+		Image *_icon_restore;
 		std::string _title,
 			_icon;
 		int _init_type;

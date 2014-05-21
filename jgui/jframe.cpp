@@ -25,15 +25,17 @@
 
 namespace jgui {
 
-Image *_icon_image = NULL;
-
 Frame::Frame(std::string title, int x, int y, int width, int height, int scale_width, int scale_height):
 	Window(x, y, width, height, scale_width, scale_height)
 {
 	jcommon::Object::SetClassName("jgui::Frame");
 
 	_icon = _DATA_PREFIX"/images/small-gnu.png";
+	
 	_icon_image = jgui::Image::CreateImage(_DATA_PREFIX"/images/small-gnu.png");
+	_icon_close = jgui::Image::CreateImage(_DATA_PREFIX"/images/close.png");
+	_icon_maximize = jgui::Image::CreateImage(_DATA_PREFIX"/images/maximize.png");
+	_icon_restore = jgui::Image::CreateImage(_DATA_PREFIX"/images/restore.png");
 
 	_relative_mouse_x = 0;
 	_relative_mouse_y = 0;
@@ -65,7 +67,11 @@ Frame::Frame(int x, int y, int width, int height, int scale_width, int scale_hei
 	jcommon::Object::SetClassName("jgui::Frame");
 
 	_icon = _DATA_PREFIX"/images/small-gnu.png";
+
 	_icon_image = jgui::Image::CreateImage(_DATA_PREFIX"/images/small-gnu.png");
+	_icon_close = jgui::Image::CreateImage(_DATA_PREFIX"/images/close.png");
+	_icon_maximize = jgui::Image::CreateImage(_DATA_PREFIX"/images/maximize.png");
+	_icon_restore = jgui::Image::CreateImage(_DATA_PREFIX"/images/restore.png");
 
 	_relative_mouse_x = 0;
 	_relative_mouse_y = 0;
@@ -106,6 +112,15 @@ Frame::~Frame()
 
 	delete _icon_image;
 	_icon_image = NULL;
+
+	delete _icon_close;
+	_icon_close = NULL;
+
+	delete _icon_maximize;
+	_icon_maximize = NULL;
+
+	delete _icon_restore;
+	_icon_restore = NULL;
 }
 
 std::string Frame::GetIcon()
@@ -628,14 +643,14 @@ void Frame::PaintGlassPane(Graphics *g)
 
 	if (s > 4) {
 		if (_release_enabled == true && (_frame_buttons & JFB_CLOSE) != 0) {
-			g->DrawImage(_DATA_PREFIX"/images/close.png", _size.width-_insets.right-s, 15, s, s);
+			g->DrawImage(_icon_close, _size.width-_insets.right-s, 15, s, s);
 		}
 
 		if ((_frame_buttons & JFB_MAXIMIZE) != 0) { 
 			if (_is_maximized == false) {
-				g->DrawImage(_DATA_PREFIX"/images/maximize.png", _size.width-_insets.right-2*s-10, 15, s, s);
+				g->DrawImage(_icon_maximize, _size.width-_insets.right-2*s-10, 15, s, s);
 			} else {
-				g->DrawImage(_DATA_PREFIX"/images/restore.png", _size.width-_insets.right-2*s-10, 15, s, s);
+				g->DrawImage(_icon_restore, _size.width-_insets.right-2*s-10, 15, s, s);
 			}
 		}
 	}
