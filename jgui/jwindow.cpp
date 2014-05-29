@@ -321,9 +321,11 @@ void Window::SetBounds(int x, int y, int width, int height)
 		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
 		bool update = false;
 
+#if defined(DIRECTFB_CAIRO_UI)
 		if (_size.width < old_size.width || _size.height < old_size.height) {
 			update = true;
 		}
+#endif
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		_graphics->Lock();
@@ -331,17 +333,17 @@ void Window::SetBounds(int x, int y, int width, int height)
 		if (update == true) {
 			InternalCreateWindow();
 		} else {
-		if (_window != NULL) {
-			x = SCALE_TO_SCREEN(_location.x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
-			y = SCALE_TO_SCREEN(_location.y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
-			width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
-			height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+			if (_window != NULL) {
+				x = SCALE_TO_SCREEN(_location.x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
+				y = SCALE_TO_SCREEN(_location.y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+				width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
+				height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
 
-			_window->SetBounds(_window, x, y, width, height);
-			_window->ResizeSurface(_window, width, height);
-			_window->GetSurface(_window, &_surface);
-			_graphics->SetNativeSurface(_surface);
-		}
+				_window->SetBounds(_window, x, y, width, height);
+				_window->ResizeSurface(_window, width, height);
+				_window->GetSurface(_window, &_surface);
+				_graphics->SetNativeSurface(_surface);
+			}
 		}
 	
 		_graphics->Unlock();
@@ -492,9 +494,11 @@ void Window::SetSize(int width, int height)
 		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
 		bool update = false;
 
+#if defined(DIRECTFB_CAIRO_UI)
 		if (_size.width < old.width || _size.height < old.height) {
 			update = true;
 		}
+#endif
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 		_graphics->Lock();

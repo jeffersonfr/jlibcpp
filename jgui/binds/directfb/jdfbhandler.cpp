@@ -114,6 +114,8 @@ int DFBHandler::CreateFont(std::string name, int height, IDirectFBFont **font, i
 		fname = "./fonts/font.ttf";
 	}
 
+	jthread::AutoLock lock(&_mutex);
+
 	if (_dfb->CreateFont(_dfb, fname.c_str(), &font_dsc, font) != DFB_OK) {
 		(*font) = NULL;
 
@@ -152,6 +154,8 @@ int DFBHandler::CreateFont(std::string name, int height, IDirectFBFont **font, D
 	if (fname == "") {
 		fname = "./fonts/font.ttf";
 	}
+
+	jthread::AutoLock lock(&_mutex);
 
 	if (_dfb->CreateFont(_dfb, fname.c_str(), &font_dsc, font) != DFB_OK) {
 		(*font) = NULL;
@@ -264,6 +268,8 @@ int DFBHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 		desc.pixelformat = DSPF_VYU;
 	}
 
+	jthread::AutoLock lock(&_mutex);
+
 	if (_dfb->CreateSurface(_dfb, &desc, surface) != DFB_OK) {
 		(*surface) = NULL;
 
@@ -307,6 +313,8 @@ int DFBHandler::CreateSurface(int widthp, int heightp, IDirectFBSurface **surfac
 	desc.width = width;
 	desc.height = height;
 
+	jthread::AutoLock lock(&_mutex);
+
 	if (_dfb->CreateSurface(_dfb, &desc, surface) != DFB_OK) {
 		(*surface) = NULL;
 
@@ -348,7 +356,7 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 
 	DFBWindowDescription desc;
 
-	/* Fill the window description. */
+	// Fill the window description
 	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_STACKING);
 	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION);
 	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_FLIPPING | DSCAPS_DOUBLE);
@@ -360,7 +368,9 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	desc.width  = width;
 	desc.height = height;
 
-	/* Create the window. */
+	jthread::AutoLock lock(&_mutex);
+
+	// Create the window
 	if (_layer->CreateWindow(_layer, &desc, window) != DFB_OK) {
 		(*window) = NULL;
 		(*surface) = NULL;
@@ -368,7 +378,7 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 		return -1;
 	}
 
-	/* Get the window's surface. */
+	// Get the window's surface
 	if ((*window)->GetSurface(*window, surface) != DFB_OK) {
 		(*window)->Release(*window);
 
@@ -420,7 +430,7 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 
 	DFBWindowDescription desc;
 
-	/* Fill the window description. */
+	// Fill the window description
 	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | window_desc.flags);
 	desc.caps   = (DFBWindowCapabilities)(window_desc.caps);
 	desc.surface_caps = (DFBSurfaceCapabilities)(window_desc.surface_caps);
@@ -430,7 +440,9 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 	desc.width  = width;
 	desc.height = height;
 
-	/* Create the window. */
+	jthread::AutoLock lock(&_mutex);
+
+	// Create the window
 	if (_layer->CreateWindow(_layer, &desc, window) != DFB_OK) {
 		(*window) = NULL;
 		(*surface) = NULL;
@@ -438,7 +450,7 @@ int DFBHandler::CreateWindow(int xp, int yp, int widthp, int heightp, IDirectFBW
 		return -1;
 	}
 
-	/* Get the window's surface. */
+	// Get the window's surface
 	if ((*window)->GetSurface(*window, surface) != DFB_OK) {
 		(*window)->Release(*window);
 
@@ -537,7 +549,9 @@ void DFBHandler::InitEngine()
 		config.flags = DLCONF_BUFFERMODE;
 		// config.buffermode = DLBM_WINDOWS;
 		config.buffermode = DLBM_BACKSYSTEM;
-		_layer->SetConfiguration(_layer, &config);
+
+		// INFO:: layer configuration commented, let directfbrc decide about that
+		// _layer->SetConfiguration(_layer, &config);
 	}
 }
 

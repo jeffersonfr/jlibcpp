@@ -69,7 +69,13 @@ std::string Response::Encode()
 	std::ostringstream o;
 
 	for (std::map<std::string, std::string>::iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
-		o << i->first << ":" << base64.Encode((uint8_t *)i->second.c_str(), i->second.size()) << ";";
+		char *value = base64.Encode((uint8_t *)i->second.c_str(), i->second.size());
+
+		if (value == NULL) {
+			value = (char *)"";
+		}
+
+		o << i->first << ":" << value << ";";
 	}
 
 	return o.str();

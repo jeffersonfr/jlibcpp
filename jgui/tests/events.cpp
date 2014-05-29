@@ -50,18 +50,17 @@ class UserEvent {
 
 	private:
 		userevent_type_t _type;
-
 		// \brief key event
-		int _code;
 		jgui::jkeyevent_symbol_t _symbol;
 		jgui::jkeyevent_modifiers_t _mod;
+		int _code;
 		// \brief mouse events
-		double _vx,
-					 _vy;
-		int _x,
-				_y,
-				_click_count;
 		jgui::jmouseevent_button_t _button;
+		double _vx,
+			_vy;
+		int _click_count,
+			_x,
+			_y;
 
 	public:
 		UserEvent(userevent_type_t type, jgui::jkeyevent_modifiers_t mod, int code, jgui::jkeyevent_symbol_t symbol)
@@ -425,7 +424,7 @@ class Test : public jgui::Window, public UserEventListener {
 
 		virtual void OnMousePress(UserEvent *event)
 		{
-			std::cout << "OnMousePress: "  << event->GetClickCount() << std::endl;
+			std::cout << "OnMousePress: "  << event->GetClickCount() << ", Button: " << event->GetButton() << std::endl;
 
 			int x = event->GetX()-_ball.x,
 					y = event->GetY()-_ball.y;
@@ -450,14 +449,14 @@ class Test : public jgui::Window, public UserEventListener {
 
 		virtual void OnMouseRelease(UserEvent *event)
 		{
-			std::cout << "OnMouseRelease" << std::endl;
+			std::cout << "OnMouseRelease" << ", Button: " << event->GetButton() << std::endl;
 
 			_pressed = false;
 		}
 
 		virtual void OnMouseClick(UserEvent *event)
 		{
-			std::cout << "OnMouseClick" << std::endl;
+			std::cout << "OnMouseClick" << ", Button: " << event->GetButton() << std::endl;
 		}
 
 		virtual void OnMouseMove(UserEvent *event)

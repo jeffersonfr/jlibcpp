@@ -306,7 +306,7 @@ void DFBGraphics::Clear(int xp, int yp, int wp, int hp)
 
 	_surface->GetSubSurface(_surface, &rect, &sub);
 
-	sub->Clear(sub, 0x00, 0x00, 0x00, 0x00);
+	sub->Clear(sub, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
 }
 
 void DFBGraphics::Idle()
