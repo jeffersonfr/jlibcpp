@@ -162,12 +162,15 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 	
 	ListFiles(current_dir, &files);
 
-	if (files.size() == 0) {
-		return false;
-	}
-
 	_list->RemoveItems();
 	_list->AddImageItem("..", _DATA_PREFIX"/images/folder.png");
+	_list->SetCurrentIndex(0);
+
+	if (files.size() == 0) {
+		_list->Repaint();
+
+		return false;
+	}
 
 	std::sort(files.begin(), files.end(), ascending_sort());
 
@@ -222,7 +225,6 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 		}
 	}
 
-	_list->SetCurrentIndex(0);
 	_list->Repaint();
 
 	return true;

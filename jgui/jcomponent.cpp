@@ -382,47 +382,59 @@ jregion_t Component::GetVisibleBounds()
 void Component::SetScrollX(int x)
 {
 	jsize_t scroll_dimension = GetScrollDimension();
+	int diff = scroll_dimension.width -_size.width;
 
 	_scroll_location.x = x;
 
-	if (_scroll_location.x < 0) {
+	if (x < 0 || diff < 0) {
 		_scroll_location.x = 0;
-	} else if (_scroll_location.x > (scroll_dimension.width-_size.width)) {
-		_scroll_location.x = scroll_dimension.width-_size.width;
+	} else {
+		if (_scroll_location.x > diff) {
+			_scroll_location.x = diff;
+		}
 	}
 }
 
 void Component::SetScrollY(int y)
 {
 	jsize_t scroll_dimension = GetScrollDimension();
+	int diff = scroll_dimension.height-_size.height;
 
 	_scroll_location.y = y;
 
-	if (_scroll_location.y < 0) {
+	if (y < 0 || diff < 0) {
 		_scroll_location.y = 0;
-	} else if (_scroll_location.y > (scroll_dimension.height-_size.height)) {
-		_scroll_location.y = scroll_dimension.height-_size.height;
+	} else {
+		if (_scroll_location.y > diff) {
+			_scroll_location.y = diff;
+		}
 	}
 }
 
 void Component::SetScrollLocation(jpoint_t t)
 {
 	jsize_t scroll_dimension = GetScrollDimension();
+	int diffx = scroll_dimension.width -_size.width;
+	int diffy = scroll_dimension.height-_size.height;
 
 	_scroll_location.x = t.x;
 
-	if (_scroll_location.x < 0) {
+	if (t.x < 0 || diffx < 0) {
 		_scroll_location.x = 0;
-	} else if (_scroll_location.x > (scroll_dimension.width-_size.width)) {
-		_scroll_location.x = scroll_dimension.width-_size.width;
+	} else {
+		if (_scroll_location.x > diffx) {
+			_scroll_location.x = diffx;
+		}
 	}
 
 	_scroll_location.y = t.y;
 
-	if (_scroll_location.y < 0) {
+	if (t.y < 0 || diffy < 0) {
 		_scroll_location.y = 0;
-	} else if (_scroll_location.y > (scroll_dimension.height-_size.height)) {
-		_scroll_location.y = scroll_dimension.height-_size.height;
+	} else {
+		if (_scroll_location.y > diffy) {
+			_scroll_location.y = diffy;
+		}
 	}
 }
 
