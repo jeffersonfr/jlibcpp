@@ -2132,22 +2132,26 @@ void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scan
 			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
 
 			double k = 0;
-			for (int i=0; i<w; i++) {
-				*dst++ = *(src+(int)k);
+			int last = -1;
 
+			for (int i=0; i<w; i++) {
+				if (last != (int)k) {
+					uint32_t pixel = *(src+(int)k);
+
+					if (_is_premultiply == true) {
+						uint32_t pa = (pixel >> 0x18) + 1;
+
+						pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
+					}
+					
+					*dst++ = pixel;
+					
+					last = (int)k;
+				}
+				
 				k = k + scale_x;
 			}
 		}
-		/*	
-		for (int j=0; j<h; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
-			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
-
-			for (int i=0; i<w; i++) {
-				*(dst+x+i) = *(src+(int)(i*scale_x));
-			}
-		}
-		*/
 	} else if (_draw_flags == JDF_BLEND) {
 		for (int j=0; j<h; j++) {
 			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
@@ -2173,16 +2177,102 @@ void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scan
 		}
 	} else if (_draw_flags == JDF_XOR) {
 		for (int j=0; j<h; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
+			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch)+x;
 			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
 
+			double k = 0;
+			int last = -1;
+
 			for (int i=0; i<w; i++) {
-				*(dst+x+i) ^= *(src+(int)(i*scale_x));
+				if (last != (int)k) {
+					uint32_t pixel = *(src+(int)k);
+
+					if (_is_premultiply == true) {
+						uint32_t pa = (pixel >> 0x18) + 1;
+
+						pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
+					}
+					
+					*dst++ ^= pixel;
+					
+					last = (int)k;
+				}
+
+				k = k + scale_x;
 			}
 		}
 	}
 
 	_surface->Unlock(_surface);
+
+
+	/* INFO:: uses DrawLine
+	if (_surface == NULL) {
+		return;
+	}
+
+	double 
+		scale_x = (double)_scale.width/(double)_screen.width,
+		scale_y = (double)_scale.height/(double)_screen.height;
+	double step;
+	int 
+		x = SCALE_TO_SCREEN((xp), _screen.width, _scale.width),
+		y = SCALE_TO_SCREEN((yp), _screen.height, _scale.height),
+		w = SCALE_TO_SCREEN((xp+wp), _screen.width, _scale.width)-x,
+		h = SCALE_TO_SCREEN((yp+hp), _screen.height, _scale.height)-y;
+	int 
+		wmax,
+		hmax;
+	int
+		i,
+		j,
+		index,
+		pixel,
+		lastp;
+
+	_surface->GetSize(_surface, &wmax, &hmax);
+
+	if (x > wmax || y > hmax) {
+		return;
+	}
+
+	if (x+w > wmax) {
+		w = wmax-x;
+	}
+	
+	if (y+h > hmax) {
+		h = hmax-y;
+	}
+
+	wmax = x+w;
+	hmax = y+h;
+
+	uint8_t *ptr = (uint8_t *)rgb;
+
+	lastp = pixel = *rgb;
+	
+	_surface->SetColor(_surface, ptr[0], ptr[1], ptr[2], ptr[3]);
+
+	for (j=y; j<h; j++) {
+		index = (int)(j*scale_y)*scanline;
+		step = 0.0;
+
+		for (i=x; i<w; i++) {
+			step = step + scale_x;
+			pixel = *(rgb+index+(int)step);
+
+			if (pixel != lastp) {
+				uint8_t *ptr = (uint8_t *)&pixel;
+
+				_surface->SetColor(_surface, ptr[2], ptr[1], ptr[0], ptr[3]);
+			}
+
+			lastp = pixel;
+
+			_surface->DrawLine(_surface, i, j, i, j);
+		}
+	}
+	*/
 }
 
 void DFBGraphics::Reset()
@@ -2367,9 +2457,7 @@ void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int
 							uint32_t dpixel = *(sdst+offset);
 
 							if (_is_premultiply == true) {
-								spixel = ((((spixel & 0x00ff00ff) * salpha) >> 8) & 0x00ff00ff) |
-									((((spixel & 0x0000ff00) * salpha) >> 8) & 0x0000ff00) |
-									((((spixel & 0xff000000))));
+								spixel = ((((spixel & 0x00ff00ff) * salpha) >> 8) & 0x00ff00ff) | ((((spixel & 0x0000ff00) * salpha) >> 8) & 0x0000ff00) | ((((spixel & 0xff000000))));
 							}
 
 							int32_t gr = (spixel >> 0x10) & 0xff,
