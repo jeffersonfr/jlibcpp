@@ -107,9 +107,13 @@ class Main : public jgui::Frame{
 				}
 			}
 
-			jgui::Image *off = jgui::Image::CreateImage(image_width, image_height);
+			static jgui::Image *off = NULL;
+			
+			if (off == NULL) {
+				off = jgui::Image::CreateImage(image_width, image_height);
 
-		 	off->GetGraphics()->DrawImage("images/square.png", 0, 0, image_width, image_height);
+		 		off->GetGraphics()->DrawImage("images/square.png", 0, 0, image_width, image_height);
+			}
 		 
 			for (int k=0,j=-1; j<=1; k++,j++) {
 				g->Translate(j*translate_x, j*translate_y);
@@ -131,7 +135,6 @@ class Main : public jgui::Frame{
 				g->Translate(-j*translate_x, -j*translate_y);
 			}
 
-			delete off;
 		}
 
 };

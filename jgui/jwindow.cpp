@@ -757,12 +757,12 @@ void Window::ReleaseWindow()
 		_window->Release(_window);
 		_window = NULL;
 	}
-#elif defined(X11_UI)
-	// TODO::
-#endif
 
 	_window = NULL;
 	_surface = NULL;
+#elif defined(X11_UI)
+	// TODO::
+#endif
 }
 
 void Window::RegisterWindowListener(WindowListener *listener)

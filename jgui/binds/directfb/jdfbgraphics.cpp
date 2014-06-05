@@ -1321,8 +1321,10 @@ bool DFBGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 		return false;
 	}
 
+	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
 	desc.width = w;
 	desc.height = h;
+	desc.pixelformat = DSPF_ARGB;
 
 	if (engine->CreateSurface(engine, &desc, &imgSurface) != DFB_OK) {
 		imgProvider->Release(imgProvider);
@@ -1397,6 +1399,9 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 
 		return false;
 	}
+
+	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_PIXELFORMAT);
+	desc.pixelformat = DSPF_ARGB;
 
 	if (engine->CreateSurface(engine, &desc, &imgSurface) != DFB_OK) {
 		imgProvider->Release(imgProvider);
@@ -1490,8 +1495,10 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 	int dw = desc.width,
 			dh = desc.height;
 
+	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
 	desc.width = (w*dw)/sw;
 	desc.height = (h*dh)/sh;
+	desc.pixelformat = DSPF_ARGB;
 
 	if (engine->CreateSurface(engine, &desc, &imgSurface) != DFB_OK) {
 		imgProvider->Release(imgProvider);
