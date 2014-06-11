@@ -5,13 +5,14 @@ VERSION		= 1.6.0
 EXE				= lib$(MODULE)-$(VERSION).so
 
 HOST			= 
+BUILD			= 
 
 AR				= $(HOST)ar
 CC				= $(HOST)g++
 RANLIB		= $(HOST)ranlib
-JAVA			= $(HOST)javac
-
 STRIP			= $(HOST)strip
+
+JAVA			= javac
 
 DOXYGEN		= doxygen
 
@@ -24,6 +25,8 @@ TESTDIR		= tests
 DOCDIR		= doc
 
 PREFIX		= /usr/local
+
+TARGET		= $(BUILD)/$(PREFIX)
 
 # {yes, no}
 ENABLE_DEBUG		?= no
@@ -436,11 +439,11 @@ all: $(EXE)
 	
 $(EXE): $(SRCS)
 	@#$(AR) $(ARFLAGS) $(EXE) $(OBJS) 
-	@$(CC) $(CCFLAGS) $(DEFINES) -o $(EXE) $(SRCS) $(LDFLAGS)
+	@$(CC) --sysroot=$(BUILD) $(CCFLAGS) $(DEFINES) -o $(EXE) $(SRCS) $(LDFLAGS)
 	@mkdir -p $(BINDIR) $(LIBDIR) && mv $(EXE) $(LIBDIR)
 
 .cpp.o: $<  
-	@$(CC) $(CCFLAGS) $(DEFINES) -c $< -o $@ && $(ECHO) "Compiling $< ...  $(OK)" 
+	@$(CC) --sysroot=$(BUILD) $(CCFLAGS) $(DEFINES) -c $< -o $@ && $(ECHO) "Compiling $< ...  $(OK)" 
 
 strip:
 	@$(ECHO) "Strip $(EXE)...  $(OK)"
@@ -450,38 +453,39 @@ doc:
 	@mkdir -p $(DOCDIR) 
 
 install: uninstall
-	@$(ECHO) "Installing resources files in $(PREFIX)/$(MODULE) $(OK)" && mkdir -p $(PREFIX)/$(MODULE)
-	@install -d -o nobody -m 755 $(PREFIX)/$(MODULE)/fonts && install -o nobody -m 644 resources/fonts/* $(PREFIX)/$(MODULE)/fonts
-	@install -d -o nobody -m 755 $(PREFIX)/$(MODULE)/images && install -o nobody -m 644 resources/images/* $(PREFIX)/$(MODULE)/images
-	@install -d -o nobody -m 755 $(PREFIX)/$(MODULE)/sounds && install -o nobody -m 644 resources/sounds/* $(PREFIX)/$(MODULE)/sounds
-	@$(ECHO) "Installing include files in $(PREFIX)/include/$(MODULE) $(OK)" && mkdir -p $(PREFIX)/include/$(MODULE)
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jcommon && install -o nobody -m 644 jcommon/include/* $(PREFIX)/include/$(MODULE)/jcommon
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jio && install -o nobody -m 644 jio/include/* $(PREFIX)/include/$(MODULE)/jio
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jlogger && install -o nobody -m 644 jlogger/include/* $(PREFIX)/include/$(MODULE)/jlogger
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmpeg && install -o nobody -m 644 jmpeg/include/* $(PREFIX)/include/$(MODULE)/jmpeg
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jshared && install -o nobody -m 644 jshared/include/* $(PREFIX)/include/$(MODULE)/jshared
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jipc && install -o nobody -m 644 jipc/include/* $(PREFIX)/include/$(MODULE)/jipc
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsocket && install -o nobody -m 644 jsocket/include/* $(PREFIX)/include/$(MODULE)/jsocket
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jthread && install -o nobody -m 644 jthread/include/* $(PREFIX)/include/$(MODULE)/jthread
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jmath && install -o nobody -m 644 jmath/include/* $(PREFIX)/include/$(MODULE)/jmath
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jresource && install -o nobody -m 644 jresource/include/* $(PREFIX)/include/$(MODULE)/jresource
-	@install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jsecurity && install -o nobody -m 644 jsecurity/include/* $(PREFIX)/include/$(MODULE)/jsecurity
+	@$(ECHO) "Installing resources files in $(TARGET)/$(MODULE) $(OK)" && mkdir -p $(TARGET)/$(MODULE)
+	@install -d -o nobody -m 755 $(TARGET)/$(MODULE)/fonts && install -o nobody -m 644 resources/fonts/* $(TARGET)/$(MODULE)/fonts
+	@install -d -o nobody -m 755 $(TARGET)/$(MODULE)/images && install -o nobody -m 644 resources/images/* $(TARGET)/$(MODULE)/images
+	@install -d -o nobody -m 755 $(TARGET)/$(MODULE)/sounds && install -o nobody -m 644 resources/sounds/* $(TARGET)/$(MODULE)/sounds
+	@$(ECHO) "Installing include files in $(TARGET)/include/$(MODULE) $(OK)" && mkdir -p $(TARGET)/include/$(MODULE)
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jcommon && install -o nobody -m 644 jcommon/include/* $(TARGET)/include/$(MODULE)/jcommon
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jio && install -o nobody -m 644 jio/include/* $(TARGET)/include/$(MODULE)/jio
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jlogger && install -o nobody -m 644 jlogger/include/* $(TARGET)/include/$(MODULE)/jlogger
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jmpeg && install -o nobody -m 644 jmpeg/include/* $(TARGET)/include/$(MODULE)/jmpeg
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jshared && install -o nobody -m 644 jshared/include/* $(TARGET)/include/$(MODULE)/jshared
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jipc && install -o nobody -m 644 jipc/include/* $(TARGET)/include/$(MODULE)/jipc
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jsocket && install -o nobody -m 644 jsocket/include/* $(TARGET)/include/$(MODULE)/jsocket
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jthread && install -o nobody -m 644 jthread/include/* $(TARGET)/include/$(MODULE)/jthread
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jmath && install -o nobody -m 644 jmath/include/* $(TARGET)/include/$(MODULE)/jmath
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jresource && install -o nobody -m 644 jresource/include/* $(TARGET)/include/$(MODULE)/jresource
+	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jsecurity && install -o nobody -m 644 jsecurity/include/* $(TARGET)/include/$(MODULE)/jsecurity
 	@if [ $(ENABLE_GRAPHICS) != "none" ]; then \
-		install -d -o nobody -m 755 $(PREFIX)/include/$(MODULE)/jgui && install -o nobody -m 644 jgui/include/* $(PREFIX)/include/$(MODULE)/jgui; \
+		install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jgui && install -o nobody -m 644 jgui/include/* $(TARGET)/include/$(MODULE)/jgui; \
 	fi;
-	@$(ECHO) "Installing $(EXE) in $(PREFIX)/lib/lib$(MODULE).so $(OK)"
-	@install -d -o nobody -m 755 $(PREFIX)/lib && install -o nobody -m 644 $(LIBDIR)/$(EXE) $(PREFIX)/lib && ln -s $(PREFIX)/lib/$(EXE) $(PREFIX)/lib/lib$(MODULE).so
-	@$(ECHO) "Installing $(MODULE).pc in $(PREFIX)/lib/pkgconfig $(OK)"
-	@mkdir -p $(PREFIX)/lib/pkgconfig && \
+	@$(ECHO) "Installing $(EXE) in $(TARGET)/lib/lib$(MODULE).so $(OK)"
+	@install -d -o nobody -m 755 $(TARGET)/lib && install -o nobody -m 644 $(LIBDIR)/$(EXE) $(TARGET)/lib && cd $(TARGET)/lib; ln -s $(EXE) lib$(MODULE).so; cd -
+	@$(ECHO) "Installing $(MODULE).pc in $(TARGET)/lib/pkgconfig $(OK)"
+	@mkdir -p $(TARGET)/lib/pkgconfig && \
 		sed -e 's/@module@/$(MODULE)/g' jlibcpp.pc | \
-		sed -e 's/@prefix@/$(subst /,\/,$(PREFIX))/g' | \
+		sed -e 's/@prefix@/$(subst /,\/,$(TARGET))/g' | \
 		sed -e 's/@version@/$(VERSION)/g' | \
 		sed -e 's/@cflags@/$(DEFINES)/g' | \
 		sed -e 's/@requires@/$(REQUIRES)/g' | \
-		sed -e 's/@libs@/$(subst /,\/,)/g' > $(PREFIX)/lib/pkgconfig/$(MODULE).pc
+		sed -e 's/@libs@/$(subst /,\/,)/g' > $(TARGET)/lib/pkgconfig/$(MODULE).pc
 
 uninstall:
-	@rm -rf $(PREFIX)/lib/pkgconfig/$(MODULE).pc $(PREFIX)/lib/lib$(MODULE).so $(PREFIX)/lib/$(EXE) 
+	@$(ECHO) "Uninstalling $(MODULE) from $(TARGET) $(OK)"
+	@rm -rf $(TARGET)/lib/pkgconfig/$(MODULE).pc $(TARGET)/lib/lib$(MODULE).so $(TARGET)/lib/$(EXE) 
 
 clean:
 	@rm -rf $(SRCS) *~ 2> /dev/null && $(ECHO) "$(MODULE) clean $(OK)" 
@@ -505,5 +509,5 @@ ultraclean: clean uninstall
 	@cd jipc/tests && make clean && cd -
 	@cd jsocket/tests && make clean && cd -
 	@cd jthread/tests && make clean && cd -
-	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(PREFIX)/lib/$(EXE) $(PREFIX)/$(MODULE) $(PREFIX)/include/$(MODULE) 2> /dev/null && $(ECHO) "$(MODULE) ultraclean $(OK)" 
+	@rm -rf $(EXE) $(BINDIR) $(LIBDIR) $(DOCDIR) $(TARGET)/lib/$(EXE) $(TARGET)/$(MODULE) $(TARGET)/include/$(MODULE) 2> /dev/null && $(ECHO) "$(MODULE) ultraclean $(OK)" 
 
