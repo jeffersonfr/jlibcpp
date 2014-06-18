@@ -44,6 +44,8 @@ Image::Image(int width, int height, jpixelformat_t pixelformat, int scale_width,
 
 	_size.width = width;
 	_size.height = height;
+	
+	SetWorkingScreenSize(scale_width, scale_height);
 }
 
 Image::~Image()
@@ -165,6 +167,30 @@ Image * Image::CreateImage(Image *image)
 Graphics * Image::GetGraphics()
 {
 	return _graphics;
+}
+
+void Image::SetWorkingScreenSize(jsize_t size)
+{
+	SetWorkingScreenSize(size.width, size.height);
+}
+
+void Image::SetWorkingScreenSize(int width, int height)
+{
+	_scale.width = width;
+	_scale.height = height;
+
+	if (_scale.width <= 0) {
+		_scale.width = jgui::GFXHandler::GetInstance()->GetScreenWidth();
+	}
+
+	if (_scale.height <= 0) {
+		_scale.height = jgui::GFXHandler::GetInstance()->GetScreenHeight();
+	}
+}
+
+jsize_t Image::GetWorkingScreenSize()
+{
+	return _scale;
 }
 
 Image * Image::Scaled(int width, int height)

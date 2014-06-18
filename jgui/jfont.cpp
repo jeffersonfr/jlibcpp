@@ -44,16 +44,7 @@ Font::Font(std::string name, jfont_attributes_t attributes, int height, int scal
 	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
 
-	_scale.width = scale_width;
-	_scale.height = scale_height;
-
-	if (_scale.width <= 0) {
-		_scale.width = DEFAULT_SCALE_WIDTH;
-	}
-
-	if (_scale.height <= 0) {
-		_scale.height = DEFAULT_SCALE_HEIGHT;
-	}
+	SetWorkingScreenSize(scale_width, scale_height);
 }
 
 Font::~Font()
@@ -91,11 +82,11 @@ void Font::SetWorkingScreenSize(int width, int height)
 	_scale.height = height;
 
 	if (_scale.width <= 0) {
-		_scale.width = DEFAULT_SCALE_WIDTH;
+		_scale.width = jgui::GFXHandler::GetInstance()->GetScreenWidth();
 	}
 
 	if (_scale.height <= 0) {
-		_scale.height = DEFAULT_SCALE_HEIGHT;
+		_scale.height = jgui::GFXHandler::GetInstance()->GetScreenHeight();
 	}
 }
 

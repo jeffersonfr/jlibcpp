@@ -78,6 +78,7 @@ class Image : public virtual jcommon::Object{
 	protected:
 		Graphics *_graphics;
 		struct jsize_t _size;
+		struct jsize_t _scale;
 		jpixelformat_t _pixelformat;
 
 	protected:
@@ -148,6 +149,24 @@ class Image : public virtual jcommon::Object{
 		 */
 		virtual Graphics * GetGraphics();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetWorkingScreenSize(jsize_t size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetWorkingScreenSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetWorkingScreenSize();
+		
 		/**
 		 * \brief
 		 *

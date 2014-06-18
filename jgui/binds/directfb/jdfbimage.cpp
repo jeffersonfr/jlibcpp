@@ -91,9 +91,9 @@ DFBImage::DFBImage(int width, int height, jpixelformat_t pixelformat, int scale_
 	IDirectFBSurface *surface = NULL;
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->
-		CreateSurface(_size.width, _size.height, &surface, pixelformat, scale_width, scale_height);
+		CreateSurface(_size.width, _size.height, &surface, pixelformat, _scale.width, _scale.height);
 
-	_graphics = new DFBGraphics(this, surface, false, scale_width, scale_height);
+	_graphics = new DFBGraphics(this, surface, false, _scale.width, _scale.height);
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
 }

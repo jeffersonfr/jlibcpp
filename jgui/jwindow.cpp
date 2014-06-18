@@ -48,6 +48,14 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 	_maximum_size.width = scale_width;
 	_maximum_size.height = scale_height;
 	
+	if (scale_width <= 0) {
+		_maximum_size.width = jgui::GFXHandler::GetInstance()->GetScreenWidth();
+	}
+
+	if (scale_height <= 0) {
+		_maximum_size.height = jgui::GFXHandler::GetInstance()->GetScreenHeight();
+	}
+
 	_location.x = x;
 	_location.y = y;
 	_size.width = width;

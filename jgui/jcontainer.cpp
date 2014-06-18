@@ -229,11 +229,11 @@ void Container::SetWorkingScreenSize(int width, int height)
 	_scale.height = height;
 
 	if (_scale.width <= 0) {
-		_scale.width = DEFAULT_SCALE_WIDTH;
+		_scale.width = jgui::GFXHandler::GetInstance()->GetScreenWidth();
 	}
 
 	if (_scale.height <= 0) {
-		_scale.height = DEFAULT_SCALE_HEIGHT;
+		_scale.height = jgui::GFXHandler::GetInstance()->GetScreenHeight();
 	}
 }
 
