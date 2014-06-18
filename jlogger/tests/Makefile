@@ -1,11 +1,4 @@
-HOST			= 
-
-AR				= $(HOST)ar
-CC				= $(HOST)g++
-RANLIB		= $(HOST)ranlib
-JAVA			= $(HOST)javac
-
-STRIP			= $(HOST)strip
+include ../../Makefile.defs
 
 DEBUG  		= -g -ggdb 
 
@@ -18,10 +11,6 @@ CCFLAGS		= \
 LDFLAGS		+= \
 						 -L. \
 						 `pkg-config --libs jlibcpp` \
-
-ECHO			= echo -e
-
-OK 				= \033[30;32mOK!\033[m
 
 OBJS_teste = \
 	   teste.o\

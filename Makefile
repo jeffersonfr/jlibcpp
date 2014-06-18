@@ -4,29 +4,7 @@ VERSION		= 1.6.0
 
 EXE				= lib$(MODULE)-$(VERSION).so
 
-HOST			= 
-BUILD			= 
-
-AR				= $(HOST)ar
-CC				= $(HOST)g++
-RANLIB		= $(HOST)ranlib
-STRIP			= $(HOST)strip
-
-JAVA			= javac
-
-DOXYGEN		= doxygen
-
-INCDIR		= include
-LIBDIR		= lib
-SRCDIR 		= src
-BINDIR 		= bin
-OBJDIR		= obj
-TESTDIR		= tests
-DOCDIR		= doc
-
-PREFIX		= /usr/local
-
-TARGET		= $(BUILD)/$(PREFIX)
+include Makefile.defs
 
 # {yes, no}
 ENABLE_DEBUG		?= no
@@ -80,10 +58,6 @@ endif
 
 REQUIRES	= \
 		 libssl \
-
-ECHO			= echo
-
-OK 				= \033[30;32mOK\033[m
 
 OBJS_jcommon += \
 	   jbitstream.o\

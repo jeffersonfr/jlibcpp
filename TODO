@@ -1,0 +1,3 @@
+gethostbyaddr is obsolescent, use getaddrinfo() instead.
+gethostbyname is obsolescent, use getnameinfo() instead.
+

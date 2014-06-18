@@ -485,13 +485,6 @@ void DFBHandler::InitEngine()
 		return;
 	}
 
-	// Initialize DirectFB including command line parsing
-	if ((IDirectFB **)_dfb != NULL) {
-		Release();
-
-		_dfb = NULL;
-	}
-
 	if (DirectFBInit(NULL, 0) != DFB_OK) {
 		throw jcommon::RuntimeException("Problem to init directfb");
 	}
