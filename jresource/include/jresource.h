@@ -74,7 +74,7 @@ class Resource{
 		 * \brief
 		 * 
 		 */
-		virtual void Reserve(ResourceStatusListener *listener, bool force = false, int timeout = 0);
+		virtual void Reserve(ResourceStatusListener *listener, bool force = false, int64_t timeout = -1LL);
 
 		/**
 		 * \brief

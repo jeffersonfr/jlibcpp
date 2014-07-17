@@ -43,13 +43,13 @@ bool Resource::IsAvailable()
 	return _is_available;
 }
 
-void Resource::Reserve(ResourceStatusListener *listener, bool force, int timeout)
+void Resource::Reserve(ResourceStatusListener *listener, bool force, int64_t timeout)
 {
-	jthread::AutoLock lock(&_mutex);
-
 	if (listener == NULL) {
 		throw jcommon::IllegalArgumentException("Resource listener cannot be null");
 	}
+
+	jthread::AutoLock lock(&_mutex);
 
 	if (_is_available == false) {
 		if (force == true) {
@@ -66,7 +66,7 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int timeout
 			DispatchResourceStatusEvent(event);
 
 			if (request == false) {
-				if (timeout < 0) {
+				if (timeout <= 0LL) {
 					ResourceStatusEvent *event;
 
 					while (_listener->ReleaseRequested((event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED))) != true) {
@@ -75,14 +75,28 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int timeout
 						_sem.Wait(&_mutex);
 					}
 				} else {
-					ResourceStatusEvent *event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED);
+					ResourceStatusEvent *event;
+					int64_t fixed = 100*1000LL;
+					int64_t count = fixed;
 
-					jthread::Thread::MSleep(timeout);
+					while ((request = _listener->ReleaseRequested((event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED)))) != true) {
+						DispatchResourceStatusEvent(event);
 
-					request = _listener->ReleaseRequested(event);
+						_mutex.Unlock();
 
-					DispatchResourceStatusEvent(event);
+						jthread::Thread::USleep(fixed);
 
+						_mutex.Lock();
+
+						count = count + fixed;
+
+						if (count > timeout) {
+							request = _listener->ReleaseRequested((event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED)));
+
+							break;
+						}
+					}
+					
 					if (request == false) {
 						throw jcommon::TimeoutException("Resource time is expired");
 					}

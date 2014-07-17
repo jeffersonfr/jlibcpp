@@ -29,11 +29,17 @@
 #include <stdio.h>
 #include <unistd.h>
 
-class LogDevice : public jresource::Resource, public jresource::ResourceStatusListener {
+#define MAX_THREADS	10
+
+class LogDevice : public jresource::Resource {
 
 	private:
 		static LogDevice *_instance;
 
+	private:
+		jthread::Mutex _mutex;
+
+	private:
 		LogDevice()
 		{
 		}
@@ -52,23 +58,6 @@ class LogDevice : public jresource::Resource, public jresource::ResourceStatusLi
 			return resources;
 		}
 
-		virtual void Released(jresource::ResourceStatusEvent *event)
-		{
-			// std::cout << "Released" << std::flush << std::endl;
-		}
-
-		virtual void ReleaseForced(jresource::ResourceStatusEvent *event)
-		{
-			// std::cout << "Release Forced" << std::flush << std::endl;
-		}
-
-		virtual bool ReleaseRequested(jresource::ResourceStatusEvent *event)
-		{
-			// std::cout << "Release Requested" << std::flush << std::endl;
-
-			return IsAvailable();
-		}
-
 		virtual void Print(char c)
 		{
 			putchar(c);
@@ -76,23 +65,56 @@ class LogDevice : public jresource::Resource, public jresource::ResourceStatusLi
 			usleep(10000);
 		}
 
+		virtual void Lock()
+		{
+			_mutex.Lock();
+		}
+
+		virtual void Unlock()
+		{
+			_mutex.Unlock();
+		}
+
 };
 
 LogDevice *LogDevice::_instance = new LogDevice();
 
-class TestThread : public jthread::Thread {
+class TestThread : public jthread::Thread, public jresource::ResourceStatusListener {
 
 	private:
 		int _id;
+		bool _released;
 
 	public:
 		TestThread(int id)
 		{
 			_id = id;
+			_released = false;
 		}
 
 		virtual ~TestThread()
 		{
+		}
+
+		virtual void Released(jresource::ResourceStatusEvent *event)
+		{
+			std::cout << "Released" << std::flush << std::endl;
+		}
+
+		virtual void ReleaseForced(jresource::ResourceStatusEvent *event)
+		{
+			std::cout << "Release Forced" << std::flush << std::endl;
+
+			_released = true;
+		}
+
+		virtual bool ReleaseRequested(jresource::ResourceStatusEvent *event)
+		{
+			std::cout << "Release Requested" << std::flush << std::endl;
+
+			jresource::Resource *resource = (jresource::Resource *)event->GetSource();
+
+			return resource->IsAvailable();
 		}
 
 		virtual void Run()
@@ -100,14 +122,22 @@ class TestThread : public jthread::Thread {
 			LogDevice *resource = LogDevice::GetResources()[0];
 
 			try {
-				resource->Reserve(resource, false, -1);
-				resource->Print(':');
-				for (int i=0; i<100; i++) {
+				resource->Reserve(this, false, -1);
+
+				resource->Lock();
+				resource->Print('[');
+				resource->Print(_id+48);
+				resource->Print(']');
+				for (int i=0; i<100 && _released == false; i++) {
 					resource->Print(_id + 48);
 				}
-				resource->Print(':');
+				resource->Print('[');
+				resource->Print(_id+48);
+				resource->Print(']');
+				resource->Unlock();
+
 				resource->Release();
-			} catch (jthread::TimeoutException &e) {
+			} catch (jcommon::TimeoutException &e) {
 				std::cout << "Resource timeout reached" << std::endl;
 			} catch (jresource::ResourceException &e) {
 				std::cout << "Cannot allocate resource" << std::endl;
@@ -120,7 +150,7 @@ int main(int argc, char *argv[])
 {
 	std::vector<TestThread *> threads;
 
-	for (int i=0; i<10; i++) {
+	for (int i=0; i<MAX_THREADS; i++) {
 		TestThread *thread = new TestThread(i);
 
 		thread->Start();
@@ -128,13 +158,19 @@ int main(int argc, char *argv[])
 		threads.push_back(thread);
 	}
 
-	for (int i=0; i<10; i++) {
+	for (int i=0; i<MAX_THREADS; i++) {
 		TestThread *thread = threads[i];
 
 		thread->WaitThread();
+	}
+
+	for (int i=0; i<MAX_THREADS; i++) {
+		TestThread *thread = threads[i];
 
 		delete thread;
 	}
+
+	threads.clear();
 
 	return 0;
 }
