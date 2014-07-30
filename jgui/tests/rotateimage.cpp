@@ -81,60 +81,66 @@ class Main : public jgui::Frame{
 					y = _insets.top,
 					w = _size.width-_insets.left-_insets.right,
 					h = _size.height-_insets.top-_insets.bottom;
-			int translate_x = 40,
-					translate_y = 20;
-			double box_width = w/9.0,
-						 box_height = h/8.0;
-			int image_width = (int)(box_width-2*translate_x),
-					image_height = (int)(box_height-2*translate_y);
+			int gapx = 40,
+					gapy = 20;
+			double boxw = w/9.0,
+						 boxh = h/8.0;
+			int iw = (int)(boxw-2*gapx),
+					ih = (int)(boxh-2*gapy);
 			double radians[3] = {-_angle, 0, _angle};
 
 			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
 			for (int i=0; i<=9; i++) {
-				g->DrawLine((int)(x+i*box_width), y, (int)(x+i*box_width), y+h);
+				g->DrawLine((int)(x+i*boxw), y, (int)(x+i*boxw), y+h);
 			}
 
 			for (int i=0; i<=8; i++) {
-				g->DrawLine(x, (int)(y+i*box_height), x+w, (int)(y+i*box_height));
+				g->DrawLine(x, (int)(y+i*boxh), x+w, (int)(y+i*boxh));
 			}
 
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
 
 			for (int i=0; i<9; i++) {
 				for (int j=0; j<8; j++) {
-					g->FillRectangle((int)(x+translate_x+i*box_width), (int)(y+translate_y+j*box_height), image_width, image_height);
+					g->FillRectangle((int)(x+gapx+i*boxw), (int)(y+gapy+j*boxh), iw, ih);
 				}
 			}
 
 			static jgui::Image *off = NULL;
+			static jgui::Image *offsub = NULL;
 			
 			if (off == NULL) {
-				off = jgui::Image::CreateImage(image_width, image_height);
+				off = jgui::Image::CreateImage(iw, ih);
+				offsub = jgui::Image::CreateImage(iw/2, ih/2);
 
-		 		off->GetGraphics()->DrawImage("images/square.png", 0, 0, image_width, image_height);
+		 		off->GetGraphics()->DrawImage("images/square.png", 0, 0, iw, ih);
+		 		offsub->GetGraphics()->DrawImage(off, 0, 0, iw/2, ih/2, 0, 0);
 			}
 		 
 			for (int k=0,j=-1; j<=1; k++,j++) {
-				g->Translate(j*translate_x, j*translate_y);
+				g->Translate(j*gapx, j*gapy);
 
 				for (int i=0; i<3; i++) {
-					g->Rotate(radians[i]);
+					jgui::Image *image = off->Rotate(radians[i], false);
+					jgui::Image *simage = offsub->Rotate(radians[i], false);
 
-					g->DrawImage("images/square.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+0*box_height);
-					g->DrawImage("images/square.png", (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+1*box_height, image_width, image_height);
-					g->DrawImage("images/square.png", 32, 32, 32, 32, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+2*box_height);
-					g->DrawImage("images/square.png", 32, 32, 32, 32, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+3*box_height, image_width, image_height);
-				
-					g->DrawImage(off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+4*box_height);
-					g->DrawImage(off, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+5*box_height, image_width, image_height);
-					g->DrawImage(off, off->GetWidth()/2, off->GetHeight()/2, off->GetWidth()/2, off->GetHeight()/2, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+6*box_height);
-					g->DrawImage(off, off->GetWidth()/2, off->GetHeight()/2, off->GetWidth()/2, off->GetHeight()/2, (int)(x+translate_x+(i+k*3)*box_width), y+translate_y+7*box_height, image_width, image_height);
+					g->DrawImage(image, (int)(x+gapx+(i+k*3)*boxw), y+gapy+0*boxh);
+					g->DrawImage(image, (int)(x+gapx+(i+k*3)*boxw), y+gapy+1*boxh, iw, ih);
+					g->DrawImage(simage, (int)(x+gapx+(i+k*3)*boxw), y+gapy+2*boxh);
+					g->DrawImage(simage, (int)(x+gapx+(i+k*3)*boxw), y+gapy+3*boxh, iw, ih);
+
+					g->DrawImage(image, (int)(x+gapx+(i+k*3)*boxw), y+gapy+4*boxh);
+					g->DrawImage(image, (int)(x+gapx+(i+k*3)*boxw), y+gapy+5*boxh, iw, ih);
+					g->DrawImage(simage, (int)(x+gapx+(i+k*3)*boxw), y+gapy+6*boxh);
+					g->DrawImage(simage, (int)(x+gapx+(i+k*3)*boxw), y+gapy+7*boxh, iw, ih);
+
+					delete image;
+					delete simage;
 				}
 
-				g->Translate(-j*translate_x, -j*translate_y);
+				g->Translate(-j*gapx, -j*gapy);
 			}
-
 		}
 
 };

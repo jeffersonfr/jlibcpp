@@ -89,6 +89,14 @@ bool Tree::ProcessEvent(MouseEvent *event)
 
 bool Tree::ProcessEvent(KeyEvent *event)
 {
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	return false;
 }
 

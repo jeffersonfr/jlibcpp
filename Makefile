@@ -324,6 +324,7 @@ OBJS_jgui += \
 		jkeyboardlistener.o\
 		jkeyevent.o\
 		jkeylistener.o\
+		jkeymap.o\
 		jlabel.o\
 		jlayout.o\
 		jlistbox.o\
@@ -354,7 +355,7 @@ OBJS_jgui += \
 		jthemeevent.o\
 		jthemelistener.o\
 		jthememanager.o\
-		jtooglebutton.o\
+		jtogglebutton.o\
 		jwatch.o\
 		jwindow.o\
 		jwindowevent.o\

@@ -39,12 +39,8 @@ Graphics::Graphics():
 	_scale.width = DEFAULT_SCALE_WIDTH;
 	_scale.height = DEFAULT_SCALE_HEIGHT;
 	
-	_radians = 0.0;
-
 	_translate.x = 0;
 	_translate.y = 0;
-	_translate_image.x = 0;
-	_translate_image.y = 0;
 
 	_vertical_sync = false;
 }
@@ -437,36 +433,15 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 	return false;
 }
 
-void Graphics::Rotate(double radians)
-{
-	_radians = fmod(radians, 2*M_PI);
-}
-
 void Graphics::Translate(int x, int y)
 {
 	_translate.x += x;
 	_translate.y += y;
 }
 
-void Graphics::TranslateImage(int x, int y)
-{
-	_translate_image.x = x;
-	_translate_image.y = y;
-}
-
-double Graphics::Rotate()
-{
-	return _radians;
-}
-
 jpoint_t Graphics::Translate()
 {
 	return _translate;
-}
-
-jpoint_t Graphics::TranslateImage()
-{
-	return _translate_image;
 }
 
 void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
@@ -494,11 +469,6 @@ void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanlin
 void Graphics::Reset()
 {
 	_color = Color(0x00, 0x00, 0x00, 0x00);
-
-	_radians = 0.0;
-
-	_translate_image.x = 0;
-	_translate_image.y = 0;
 }
 
 void Graphics::Lock()

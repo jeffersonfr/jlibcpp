@@ -92,8 +92,11 @@ class Main : public jgui::Frame, public jthread::Thread{
 				g->FillCircle((int)_bullet_x, (int)_bullet_y, 3);
 			}
 			
-			g->Rotate(_angle);
-			g->DrawImage(_image, (int)_tx, (int)_ty);
+			jgui::Image *image = _image->Rotate(_angle, false);
+
+			g->DrawImage(image, (int)_tx, (int)_ty);
+
+			delete image;
 		}
 
 		virtual void Run() 

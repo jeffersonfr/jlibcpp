@@ -294,5 +294,74 @@ void DFBImage::SetSize(int width, int height)
 	_size.height = height;
 }
 
+Image * DFBImage::Rotate(Image *img, double radians, bool resize)
+{
+	jsize_t isize = img->GetSize();
+	jsize_t iscale = img->GetWorkingScreenSize();
+	jpixelformat_t ipixel = img->GetPixelFormat();
+	int precision = 1024;
+
+	double angle = fmod(radians, 2*M_PI);
+
+	int sinTheta = precision*sin(angle);
+	int cosTheta = precision*cos(angle);
+
+	int iw = isize.width;
+	int ih = isize.height;
+
+	if (resize == true) {
+		iw = (abs(isize.width*cosTheta)+abs(isize.height*sinTheta))/precision;
+		ih = (abs(isize.width*sinTheta)+abs(isize.height*cosTheta))/precision;
+	}
+
+	DFBImage *rimg = new DFBImage(iw, ih, ipixel, iscale.width, iscale.height);
+
+	IDirectFBSurface *isrc = (IDirectFBSurface *)img->GetGraphics()->GetNativeSurface();
+	IDirectFBSurface *idst = (IDirectFBSurface *)rimg->GetGraphics()->GetNativeSurface();
+	void *sptr;
+	uint32_t *sptr32;
+	void *dptr;
+	uint32_t *dptr32;
+	int spitch;
+	int dpitch;
+	int sw,
+			sh;
+	int dw,
+			dh;
+
+	isrc->GetSize(isrc, &sw, &sh);
+	idst->GetSize(idst, &dw, &dh);
+
+	isrc->Lock(isrc, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &sptr, &spitch);
+	idst->Lock(idst, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &dptr, &dpitch);
+
+	int sxc = sw/2;
+	int syc = sh/2;
+	int dxc = dw/2;
+	int dyc = dh/2;
+	int xo;
+	int yo;
+
+	sptr32 = (uint32_t *)sptr;
+
+	for (int j=0; j<dh; j++) {
+		dptr32 = (uint32_t *)((uint8_t *)dptr + j*dpitch);
+
+		for (int i=0; i<dw; i++) {
+			xo = ((i-dxc)*cosTheta - (j-dyc)*sinTheta)/precision;
+			yo = ((i-dxc)*sinTheta + (j-dyc)*cosTheta)/precision;
+
+			if (xo >= -sxc && xo < sxc && yo >= -syc && yo < syc) {
+				*(dptr32+i) = *((uint32_t *)((uint8_t *)sptr + (yo+syc)*spitch) + (xo+sxc));
+			}
+		}
+	}
+
+	isrc->Unlock(isrc);
+	idst->Unlock(idst);
+
+	return rimg;
+}
+
 }
 

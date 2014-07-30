@@ -442,6 +442,14 @@ int Table::GetRowSize(int index)
 
 bool Table::ProcessEvent(KeyEvent *event)
 {
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (_is_enabled == false) {
 		return false;
 	}
@@ -506,7 +514,7 @@ bool Table::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched || Component::ProcessEvent(event);
+	return catched;
 }
 
 void Table::Paint(Graphics *g)

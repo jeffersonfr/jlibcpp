@@ -121,6 +121,14 @@ bool TextArea::ProcessEvent(MouseEvent *event)
 
 bool TextArea::ProcessEvent(KeyEvent *event)
 {
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (IsEnabled() == false || IsEditable() == false) {
 		return false;
 	}
@@ -128,6 +136,10 @@ bool TextArea::ProcessEvent(KeyEvent *event)
 	bool catched = false;
 
 	jkeyevent_symbol_t action = event->GetSymbol();
+
+	if (_keymap != NULL && _keymap->HasKey(action) == false) {
+		return true;
+	}
 
 	if (action == JKS_CURSOR_LEFT) {
 		DecrementCaretPosition(1);
@@ -284,7 +296,7 @@ bool TextArea::ProcessEvent(KeyEvent *event)
 		}
 	}
 
-	return catched || Component::ProcessEvent(event);
+	return catched;
 }
 
 void TextArea::IncrementLines(int lines)

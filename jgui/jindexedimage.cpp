@@ -158,7 +158,7 @@ IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
 	return new IndexedImage(palette, palette_location, rgb, width, height);
 }
 
-Image * IndexedImage::Scaled(int width, int height)
+Image * IndexedImage::Scale(int width, int height)
 {
 	if (width <= 0 || height <= 0) {
 		return NULL;

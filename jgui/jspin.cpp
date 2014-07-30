@@ -142,6 +142,14 @@ bool Spin::ProcessEvent(MouseEvent *event)
 
 bool Spin::ProcessEvent(KeyEvent *event)
 {
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (IsEnabled() == false) {
 		return false;
 	}
@@ -184,7 +192,7 @@ bool Spin::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched || Component::ProcessEvent(event);
+	return catched;
 }
 
 void Spin::AddEmptyItem()

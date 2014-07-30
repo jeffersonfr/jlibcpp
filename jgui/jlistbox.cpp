@@ -275,6 +275,14 @@ bool ListBox::ProcessEvent(MouseEvent *event)
 
 bool ListBox::ProcessEvent(KeyEvent *event)
 {
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (IsEnabled() == false) {
 		return false;
 	}
@@ -317,7 +325,7 @@ bool ListBox::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched || Component::ProcessEvent(event);
+	return catched;
 }
 
 void ListBox::Paint(Graphics *g)

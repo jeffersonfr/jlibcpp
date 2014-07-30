@@ -353,13 +353,13 @@ void Frame::KeyPressed(KeyEvent *event)
 		return;
 	}
 
+	if (_is_visible == false) {
+		return;
+	}
+
+	jthread::AutoLock lock(&_input_mutex);
+	
 	if (event->GetType() == JKT_PRESSED) {
-		jthread::AutoLock lock(&_input_mutex);
-
-		if (_is_visible == false) {
-			return;
-		}
-
 		_last_key_code = event->GetSymbol();
 
 		if ((event->GetSymbol() == JKS_ESCAPE || event->GetSymbol() == JKS_EXIT) && _release_enabled == true) {
@@ -369,15 +369,15 @@ void Frame::KeyPressed(KeyEvent *event)
 
 			return;
 		}
-
-		Component *current = _focus;
-
-		if (current != NULL) {
-			current->ProcessEvent(event);
-		}
 	}
 
-	jthread::AutoLock lock(&_input_mutex);
+	Component *current = GetFocusOwner();
+
+	if (current != NULL) {
+		if (current->ProcessEvent(event) == true) {
+			return;
+		}
+	}
 	
 	ProcessEvent(event);
 }
@@ -388,6 +388,10 @@ void Frame::MousePressed(MouseEvent *event)
 		return;
 	}
 	
+	if (_is_visible == false) {
+		return;
+	}
+
 	if (_internal_state != 0) {
 		GFXHandler::GetInstance()->SetCursor(GetCursor());
 
@@ -481,6 +485,10 @@ void Frame::MouseReleased(MouseEvent *event)
 		return;
 	}
 
+	if (_is_visible == false) {
+		return;
+	}
+
 	if (_internal_state > 0) {
 		if (event->GetButton() == JMB_BUTTON1) {
 			GFXHandler::GetInstance()->SetCursor(GetCursor());
@@ -505,6 +513,10 @@ void Frame::MouseMoved(MouseEvent *event)
 		return;
 	}
 	
+	if (_is_visible == false) {
+		return;
+	}
+
 	int mousex = event->GetX()-_location.x,
 			mousey = event->GetY()-_location.y;
 
@@ -547,6 +559,10 @@ void Frame::MouseWheel(MouseEvent *event)
 		return;
 	}
 	
+	if (_is_visible == false) {
+		return;
+	}
+
 	event->SetX(event->GetX()-_location.x);
 	event->SetY(event->GetY()-_location.y);
 

@@ -30,6 +30,7 @@
 #include "jgfxhandler.h"
 #include "jkeyevent.h"
 #include "jmouseevent.h"
+#include "jkeymap.h"
 
 #include <string>
 #include <vector>
@@ -134,6 +135,7 @@ class Component : public virtual jcommon::Object{
 			*_up,
 			*_down;
 		jgui::Font *_font;
+		jgui::KeyMap *_keymap;
 		std::string _name;
 		jpoint_t _location,
 			_scroll_location;
@@ -190,6 +192,12 @@ class Component : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void GetInternalComponents(Container *parent, std::vector<Component *> *components);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool ProcessNavigation(KeyEvent *event);
 
 		/**
 		 * \brief
@@ -463,6 +471,18 @@ class Component : public virtual jcommon::Object{
 		 */
 		virtual void SetMajorScrollIncrement(int increment);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetKeyMap(KeyMap *keymap);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual KeyMap * GetKeyMap();
+
 		/**
 		 * \brief
 		 *

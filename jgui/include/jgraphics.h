@@ -212,11 +212,9 @@ class Graphics : public virtual jcommon::Object{
 		std::vector<struct jgradient_t> _gradient_stops;
 		Font *_font;
 		Color _color;
-		struct jpoint_t _translate,
-			_translate_image;
+		struct jpoint_t _translate;
 		struct jsize_t _screen;
 		struct jsize_t _scale;
-		double _radians;
 		bool _vertical_sync;
 
 	protected:
@@ -273,37 +271,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void Rotate(double radians);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Translate(int x, int y);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void TranslateImage(int x, int y);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double Rotate();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual jpoint_t Translate();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t TranslateImage();
 
 		/**
 		 * \brief

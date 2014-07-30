@@ -83,12 +83,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 */
 		virtual double EvaluateBezier0(double *data, int ndata, double t);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RotateImage0(Image *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
-
 	protected:
 		/**
 		 * \brief
@@ -131,37 +125,13 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void Rotate(double radians);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Translate(int x, int y);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void TranslateImage(int x, int y);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double Rotate();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual jpoint_t Translate();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t TranslateImage();
 
 		/**
 		 * \brief

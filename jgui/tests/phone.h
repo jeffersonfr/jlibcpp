@@ -102,7 +102,6 @@ class AddContact : public jgui::Frame, public jgui::KeyboardListener{
 			AddContact(PhoneDB *db, int index);
 			virtual ~AddContact();
 
-			virtual void KeyboardPressed(jgui::KeyEvent *event);
 			virtual bool ProcessEvent(jgui::KeyEvent *event);
 
 };

@@ -91,6 +91,14 @@ bool ToogleButton::ProcessEvent(MouseEvent *event)
 
 bool ToogleButton::ProcessEvent(KeyEvent *event)
 {
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (IsEnabled() == false) {
 		return false;
 	}
@@ -113,7 +121,7 @@ bool ToogleButton::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched || Component::ProcessEvent(event);
+	return catched;
 }
 
 void ToogleButton::Paint(Graphics *g)

@@ -1490,32 +1490,10 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 		return;
 	}
 
-	/*
-	if (_radians == 0.0) {
-		int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
-				y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
+			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
-		_surface->DrawString(_surface, text.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
-	} else */ {
-		Image *off = Image::CreateImage(_font->GetStringWidth(text), _font->GetAscender() + _font->GetDescender(), JPF_ARGB, _scale.width, _scale.height);
-
-		off->GetGraphics()->SetFont(_font);
-		off->GetGraphics()->SetColor(_color);
-
-		IDirectFBSurface *fsurface = (IDirectFBSurface *)(off->GetGraphics()->GetNativeSurface());
-
-		fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
-		fsurface->DrawString(fsurface, text.c_str(), -1, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
-
-		jblitting_flags_t bf = GetBlittingFlags();
-		// jcomposite_flags_t cf = GetCompositeFlags();
-
-		SetBlittingFlags((jblitting_flags_t)(bf | JBF_COLORALPHA));
-		DrawImage(off, xp, yp);
-		SetBlittingFlags(bf);
-
-		delete off;
-	}
+	_surface->DrawString(_surface, text.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
 }
 
 void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
@@ -1584,21 +1562,6 @@ bool DFBGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
 			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	if (_radians != 0.0) {
-		Image *off = Image::CreateImage(wp, hp);
-		Graphics *g = off->GetGraphics();
-
-		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_color);
-		g->DrawImage(img, 0, 0, wp, hp);
-		
-		RotateImage0(off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
-
-		delete off;
-
-		return true;
-	}
-
 	IDirectFBSurface *imgSurface = NULL;
 	IDirectFBImageProvider *imgProvider = NULL;
 	DFBSurfaceDescription desc;
@@ -1657,24 +1620,6 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
 			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-
-	if (_radians != 0.0) {
-		int wp = SCREEN_TO_SCALE((swp), _screen.width, _scale.width),
-				hp = SCREEN_TO_SCALE((shp), _screen.height, _scale.height);
-
-		Image *off = Image::CreateImage(wp, hp);
-		Graphics *g = off->GetGraphics();
-
-		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_color);
-		g->DrawImage(img, sxp, syp, swp, shp, 0, 0);
-		
-		RotateImage0(off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
-
-		delete off;
-
-		return true;
-	}
 
 	IDirectFBSurface *imgSurface = NULL;
 	IDirectFBImageProvider *imgProvider = NULL;
@@ -1748,21 +1693,6 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
 			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
 			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-
-	if (_radians != 0.0) {
-		Image *off = Image::CreateImage(wp, hp);
-		Graphics *g = off->GetGraphics();
-
-		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_color);
-		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
-		
-		RotateImage0(off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
-
-		delete off;
-
-		return true;
-	}
 
 	IDirectFBSurface *imgSurface = NULL;
 	IDirectFBImageProvider *imgProvider = NULL;
@@ -1864,21 +1794,6 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
 			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
 
-	if (_radians != 0.0) {
-		Image *off = Image::CreateImage(img->GetWidth(), img->GetHeight());
-		Graphics *g = off->GetGraphics();
-
-		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_color);
-		g->DrawImage(img, sxp, syp, swp, shp, 0, 0);
-
-		RotateImage0(off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, img->GetWidth(), img->GetHeight(), _radians, _color.GetAlpha());
-
-		delete off;
-
-		return true;
-	}
-
 	DFBGraphics *g = dynamic_cast<DFBGraphics *>(img->GetGraphics());
 
 	if (g != NULL) {
@@ -1926,21 +1841,6 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
 			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
 
-	if (_radians != 0.0) {
-		Image *off = Image::CreateImage(wp, hp);
-		Graphics *g = off->GetGraphics();
-
-		g->SetBlittingFlags(_blit_flags);
-		g->SetColor(_color);
-		g->DrawImage(img, sxp, syp, swp, shp, 0, 0, wp, hp);
-
-		RotateImage0(off, -_translate_image.x, -_translate_image.y, xp+_translate.x, yp+_translate.y, wp, hp, _radians, _color.GetAlpha());
-
-		delete off;
-
-		return true;
-	}
-
 	DFBGraphics *g = dynamic_cast<DFBGraphics *>(img->GetGraphics());
 
 	if (g != NULL) {
@@ -1964,7 +1864,7 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		int iwp = (wp*scale.width)/_screen.width;
 		int ihp = (hp*scale.height)/_screen.height;
 
-		Image *image = img->Scaled(iwp, ihp);
+		Image *image = img->Scale(iwp, ihp);
 
 		if (image != NULL) {
 			uint32_t *rgb = NULL;
@@ -1984,36 +1884,15 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 	return true;
 }
 
-void DFBGraphics::Rotate(double radians)
-{
-	_radians = fmod(radians, 2*M_PI);
-}
-
 void DFBGraphics::Translate(int x, int y)
 {
 	_translate.x += x;
 	_translate.y += y;
 }
 
-void DFBGraphics::TranslateImage(int x, int y)
-{
-	_translate_image.x = x;
-	_translate_image.y = y;
-}
-
-double DFBGraphics::Rotate()
-{
-	return _radians;
-}
-
 jpoint_t DFBGraphics::Translate()
 {
 	return _translate;
-}
-
-jpoint_t DFBGraphics::TranslateImage()
-{
-	return _translate_image;
 }
 
 void DFBGraphics::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign)
@@ -2572,11 +2451,6 @@ void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scan
 
 void DFBGraphics::Reset()
 {
-	_radians = 0.0;
-
-	_translate_image.x = 0;
-	_translate_image.y = 0;
-
 	SetAntialias(true);
 
 	SetColor(0x00000000);
@@ -2672,215 +2546,6 @@ double DFBGraphics::EvaluateBezier0(double *data, int ndata, double t)
 	}
 
 	return result;
-}
-
-void DFBGraphics::RotateImage0(Image *img, int xcp, int ycp, int xp, int yp, int wp, int hp, double angle, uint8_t alpha)
-{
-	int xc = SCALE_TO_SCREEN((xcp), _screen.width, _scale.width),
-			yc = SCALE_TO_SCREEN((ycp), _screen.height, _scale.height);
-	int x = SCALE_TO_SCREEN((xp), _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN((yp), _screen.height, _scale.height),
-			width = SCALE_TO_SCREEN((xp+wp), _screen.width, _scale.width)-x,
-			height = SCALE_TO_SCREEN((yp+hp), _screen.height, _scale.height)-y;
-
-	Graphics *gimg = img->GetGraphics();
-	int cosTheta,
-			sinTheta,
-			i,
-			j,
-			iOriginal,
-			iPrime,
-			jPrime,
-			jOriginal;
-	int precision = 1024;
-
-	angle = angle;
-
-	sinTheta = precision*sin(angle);
-	cosTheta = precision*cos(angle);
-
-	int dw = width,
-			dh = height,
-			size = width;
-
-	if (xc == 0 && yc == 0) {
-		if (height > width) {
-			dw = height;
-			dh = width;
-		}
-
-		dw = dw+width/2-width+jmath::Math<int>::Abs(xc);
-		dh = dh+height/2-height+jmath::Math<int>::Abs(yc);
-	} else {
-		if (height > width) {
-			size = height;
-		}
-
-		dw = 2*(size+jmath::Math<int>::Abs(xc)+jmath::Math<int>::Abs(yc));
-		dh = 2*(size+jmath::Math<int>::Abs(xc)+jmath::Math<int>::Abs(yc));
-	}
-
-	xc = xc + width/2;
-	yc = yc + height/2;
-
-	IDirectFBSurface *simg = (IDirectFBSurface *)gimg->GetNativeSurface();
-	void *sptr;
-	uint32_t *sdst;
-	int spitch;
-	void *gptr;
-	int gpitch;
-	int swmax,
-			shmax;
-	int iwmax,
-			ihmax;
-
-	_surface->GetSize(_surface, &swmax, &shmax);
-	simg->GetSize(simg, &iwmax, &ihmax);
-
-	_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &sptr, &spitch);
-	simg->Lock(simg, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &gptr, &gpitch);
-
-	int init_x = width+2*dw-1,
-			init_y = height+2*dh-1;
-
-	for (j=init_y; j>0; j--) {
-		int sy = y+j-dh;
-
-		jPrime = j - height - dh;
-
-		if (sy >=0 && sy < shmax) {
-			sdst = (uint32_t *)((uint8_t *)sptr + sy * spitch);
-
-			for (i=init_x; i>0; i--) {
-				iPrime = i - width - dw;
-			
-				iOriginal = width + ((iPrime+xc)*cosTheta - (jPrime+yc)*sinTheta)/precision;
-				jOriginal = height + ((iPrime+xc)*sinTheta + (jPrime+yc)*cosTheta)/precision;
-
-				if ((iOriginal >= xc) && ((iOriginal-xc) < width) && (jOriginal >= yc) && ((jOriginal-yc) < height)) {
-					int gx = iOriginal-xc;
-					int gy = jOriginal-yc;
-
-					if ((gx >= 0 && gx < iwmax) && (gy >= 0 && gy < ihmax)) {
-						int offset = x+i-dw;
-
-						if (offset >= 0 && offset < swmax) {
-							uint32_t spixel = *((uint32_t *)((uint8_t *)gptr + gy * gpitch) + gx),
-											 salpha = (spixel >> 0x18) + 1;
-							uint32_t dpixel = *(sdst+offset);
-
-							if (_is_premultiply == true) {
-								spixel = ((((spixel & 0x00ff00ff) * salpha) >> 8) & 0x00ff00ff) |
-									((((spixel & 0x0000ff00) * salpha) >> 8) & 0x0000ff00) |
-									((((spixel & 0xff000000))));
-							}
-
-							int32_t gr = (spixel >> 0x10) & 0xff,
-											gg = (spixel >> 0x08) & 0xff,
-											gb = (spixel >> 0x00) & 0xff,
-											ga = (spixel >> 0x18) & 0xff;
-							int32_t sr = (dpixel >> 0x10) & 0xff,
-											sg = (dpixel >> 0x08) & 0xff,
-											sb = (dpixel >> 0x00) & 0xff,
-											sa = (0xff - ga);
-							int32_t dr = sr,
-											dg = sg,
-											db = sb;//,
-											// da = ga;
-
-							if (ga == 0x00) {
-								continue;
-							}
-
-							ga = 0xff;
-
-							if (_blit_flags & JBF_ALPHACHANNEL) {
-								if (_composite_flags == JCF_NONE) {
-									dr = (gr*ga + sr*sa);
-									dg = (gg*ga + sg*sa);
-									db = (gb*ga + sb*sa);
-								} else if (_composite_flags == JCF_CLEAR) {
-									dr = 0;
-									dg = 0;
-									db = 0;
-								} else if (_composite_flags == JCF_SRC) {
-									dr = gr*0xff;
-									dg = gg*0xff;
-									db = gb*0xff;
-								} else if (_composite_flags == JCF_DST) {
-									dr = sr*0xff;
-									dg = sg*0xff;
-									db = sb*0xff;
-								} else if (_composite_flags == JCF_SRC_OVER) {
-									dr = (gr*0xff + sr*sa);
-									dg = (gg*0xff + sg*sa);
-									db = (gb*0xff + sb*sa);
-								} else if (_composite_flags == JCF_DST_OVER) {
-									dr = (gr*ga + sr*0xff);
-									dg = (sg*ga + sg*0xff);
-									db = (sb*ga + sb*0xff);
-								} else if (_composite_flags == JCF_SRC_IN) {
-									dr = gr*sa;
-									dg = gg*sa;
-									db = gb*sa;
-								} else if (_composite_flags == JCF_DST_IN) {
-									dr = sr*ga;
-									dg = sg*ga;
-									db = sb*ga;
-								} else if (_composite_flags == JCF_SRC_OUT) {
-									dr = gr*ga;
-									dg = gg*ga;
-									db = gb*ga;
-								} else if (_composite_flags == JCF_DST_OUT) {
-									dr = sr*sa;
-									dg = sg*sa;
-									db = sb*sa;
-								} else if (_composite_flags == JCF_SRC_ATOP) {
-									dr = (gr*sa + sr*sa);
-									dg = (sg*sa + sg*sa);
-									db = (sb*sa + sb*sa);
-								} else if (_composite_flags == JCF_DST_ATOP) {
-									dr = (gr*ga + sr*ga);
-									dg = (sg*ga + sg*ga);
-									db = (sb*ga + sb*ga);
-								} else if (_composite_flags == JCF_ADD) {
-									dr = sr*0xff + ga*0xff;
-									dg = sg*0xff + ga*0xff;
-									db = sb*0xff + ga*0xff;
-									// da = 0xff;
-								} else if (_composite_flags == JCF_XOR) {
-									dr = (gr*ga + sr*sa);
-									dg = (gg*ga + sg*sa);
-									db = (gb*ga + sb*sa);
-								}
-							}
-
-							dr = dr >> 8;
-							dg = dg >> 8;
-							db = db >> 8;
-
-							if (dr > 0xff) {
-								dr = 0xff;
-							}
-
-							if (dg > 0xff) {
-								dg = 0xff;
-							}
-
-							if (db > 0xff) {
-								db = 0xff;
-							}
-							
-							*(sdst+offset) = 0xff000000 | (dr << 0x10) | (dg << 0x08) | (db << 0x00);
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	simg->Unlock(simg);
-	_surface->Unlock(_surface);
 }
 
 }

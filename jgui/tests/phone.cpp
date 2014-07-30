@@ -27,7 +27,7 @@
 namespace phone {
 
 Phone::Phone():
- 	jgui::Frame("Agenda de Telefones", (1920-600)/2, 300, 0, 0)
+ 	jgui::Frame("Phone Book", (1920-600)/2, 300, 0, 0)
 {
 	db = new PhoneDB("./config/phone.xml");
 
@@ -36,10 +36,10 @@ Phone::Phone():
 	_list = new jgui::ListBox(0, 0, 600);
 
 	_list->SetBackgroundVisible(false);
-	_list->AddTextItem("Buscar telefone");
-	_list->AddTextItem("Adicionar contato");
-	_list->AddTextItem("Limpar todos os contatos");
-	_list->AddTextItem("Estado da mem\xf3ria");
+	_list->AddTextItem("Search Contacts");
+	_list->AddTextItem("Add a Contact");
+	_list->AddTextItem("Clear All Records");
+	_list->AddTextItem("Memory Status");
 	_list->RegisterSelectListener(this);
 
 	_list->SetSize(_list->GetPreferredSize());
@@ -83,7 +83,7 @@ void Phone::ItemSelected(jgui::SelectEvent *event)
 
 		app.Show();
 	} else if (event->GetIndex() == 2) {
-		jgui::YesNoDialogBox dialog("Aviso", "Remover todos os registros ?");
+		jgui::YesNoDialogBox dialog("Aviso", "Clear all contacts ?");
 
 		dialog.Show();
 
@@ -93,9 +93,9 @@ void Phone::ItemSelected(jgui::SelectEvent *event)
 	} else if (event->GetIndex() == 3) {
 		char tmp[255];
 
-		sprintf(tmp, "Contatos usados : %d/%d", db->GetSize(), db->GetCapacity());
+		sprintf(tmp, "Used Contacts: %d/%d", db->GetSize(), db->GetCapacity());
 
-		jgui::MessageDialogBox dialog("Estado da mem\xf3ria", tmp);
+		jgui::MessageDialogBox dialog("Memory Status", tmp);
 
 		dialog.Show();
 	}
@@ -315,8 +315,54 @@ void PhoneDB::RemoveAll()
 	events.clear();
 }
 
+class NumericTextField : public jgui::KeyMap {
+
+	public:
+		NumericTextField()
+		{
+		}
+
+		~NumericTextField()
+		{
+		}
+
+		virtual bool HasKey(jgui::jkeyevent_symbol_t key)
+		{
+			switch (key) {
+				case jgui::JKS_CURSOR_LEFT:
+				case jgui::JKS_CURSOR_RIGHT:
+				case jgui::JKS_HOME:
+				case jgui::JKS_END:
+				case jgui::JKS_BACKSPACE:
+				case jgui::JKS_DELETE:
+				case jgui::JKS_PARENTHESIS_LEFT:
+				case jgui::JKS_PARENTHESIS_RIGHT:
+				case jgui::JKS_STAR:
+				case jgui::JKS_PLUS_SIGN:
+				case jgui::JKS_MINUS_SIGN:
+				case jgui::JKS_0:
+				case jgui::JKS_1:
+				case jgui::JKS_2:
+				case jgui::JKS_3:
+				case jgui::JKS_4:
+				case jgui::JKS_5:
+				case jgui::JKS_6:
+				case jgui::JKS_7:
+				case jgui::JKS_8:
+				case jgui::JKS_9:
+					return true;
+				default: break;
+			}
+
+			return false;
+		}
+
+};
+
+NumericTextField ntf;
+
 AddContact::AddContact(PhoneDB *base, int index):
-	jgui::Frame("Adicionar contato", (1920-600)/2, 300, 600, 400)
+	jgui::Frame("Add a Contact", (1920-600)/2, 300, 600, 400)
 {
 	int max_width = GetWidth()-_insets.left-_insets.right,
 			height = DEFAULT_COMPONENT_HEIGHT+4;
@@ -325,9 +371,9 @@ AddContact::AddContact(PhoneDB *base, int index):
 
 	_index = index;
 
-	label1 = new jgui::Label("Nome", _insets.left, _insets.top+0*height, max_width);
-	label2 = new jgui::Label("Telefone 1", _insets.left, _insets.top+2*height, max_width);
-	label3 = new jgui::Label("Telefone 2", _insets.left, _insets.top+4*height, max_width);
+	label1 = new jgui::Label("Name", _insets.left, _insets.top+0*height, max_width);
+	label2 = new jgui::Label("Number 1", _insets.left, _insets.top+2*height, max_width);
+	label3 = new jgui::Label("Number 2", _insets.left, _insets.top+4*height, max_width);
 
 	field1 = new jgui::TextField(_insets.left, _insets.top+1*height, max_width);
 	field2 = new jgui::TextField(_insets.left, _insets.top+3*height, max_width);
@@ -337,8 +383,8 @@ AddContact::AddContact(PhoneDB *base, int index):
 	field2->SetTextSize(20);
 	field3->SetTextSize(20);
 
-	field2->SetEditable(false);
-	field3->SetEditable(false);
+	field2->SetKeyMap(&ntf);
+	field3->SetKeyMap(&ntf);
 
 	if (_index < 0) {
 		_state = 0;
@@ -379,21 +425,6 @@ AddContact::~AddContact()
 	delete field3;
 }
 
-void AddContact::KeyboardPressed(jgui::KeyEvent *event)
-{
-	jgui::Component *owner = GetFocusOwner();
-
-	if (owner == field2 || owner == field3) {
-		int code = event->GetKeyCode();
-
-		if (code >= '0' && code <= '9') {
-			owner->ProcessEvent(event);
-		}
-	} else {
-		owner->ProcessEvent(event);
-	}
-}
-
 bool AddContact::ProcessEvent(jgui::KeyEvent *event)
 {
 	if (event->GetType() != jgui::JKT_PRESSED) {
@@ -402,46 +433,7 @@ bool AddContact::ProcessEvent(jgui::KeyEvent *event)
 
 	jthread::AutoLock lock(&add_mutex);
 
-	if (event->GetSymbol() == jgui::JKS_1 ||
-			event->GetSymbol() == jgui::JKS_2 ||
-			event->GetSymbol() == jgui::JKS_3 ||
-			event->GetSymbol() == jgui::JKS_4 ||
-			event->GetSymbol() == jgui::JKS_5 ||
-			event->GetSymbol() == jgui::JKS_6 ||
-			event->GetSymbol() == jgui::JKS_7 ||
-			event->GetSymbol() == jgui::JKS_8 ||
-			event->GetSymbol() == jgui::JKS_9 ||
-			event->GetSymbol() == jgui::JKS_0) {
-		std::string num;
-
-		if (event->GetSymbol() == jgui::JKS_1) {
-			num = "1";
-		} else if (event->GetSymbol() == jgui::JKS_2) {
-			num = "2";
-		} else if (event->GetSymbol() == jgui::JKS_3) {
-			num = "3";
-		} else if (event->GetSymbol() == jgui::JKS_4) {
-			num = "4";
-		} else if (event->GetSymbol() == jgui::JKS_5) {
-			num = "5";
-		} else if (event->GetSymbol() == jgui::JKS_6) {
-			num = "6";
-		} else if (event->GetSymbol() == jgui::JKS_7) {
-			num = "7";
-		} else if (event->GetSymbol() == jgui::JKS_8) {
-			num = "8";
-		} else if (event->GetSymbol() == jgui::JKS_9) {
-			num = "9";
-		} else if (event->GetSymbol() == jgui::JKS_0) {
-			num = "0";
-		}
-
-		if (GetFocusOwner() == field2) {
-			field2->Insert(num);
-		} else if (GetFocusOwner() == field3) {
-			field3->Insert(num);
-		}
-	} else if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
+	if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
 		if (_state == 0) {
 			if (field1->GetText() != "" && (field2->GetText() != "" || field3->GetText() != "")) {
 				db->Add(field1->GetText(), field2->GetText(), field3->GetText());
@@ -511,7 +503,7 @@ bool AddContact::ProcessEvent(jgui::KeyEvent *event)
 }
 
 SearchContacts::SearchContacts(PhoneDB *base):
-	jgui::Frame("Busca de contatos", (1920-600)/2, 300, 600, 400)
+	jgui::Frame("Search Contacts", (1920-600)/2, 300, 600, 400)
 {
 
 	char tmp[255];
@@ -528,7 +520,7 @@ SearchContacts::SearchContacts(PhoneDB *base):
 		label_tel2 = NULL;
 		tel2 = NULL;
 
-		label_name = new jgui::Label("Sem telefones", _insets.left, _insets.top, max_width);
+		label_name = new jgui::Label("No contacts found !", _insets.left, _insets.top, max_width);
 
 		Add(label_name);
 	} else {
@@ -537,9 +529,9 @@ SearchContacts::SearchContacts(PhoneDB *base):
 		sprintf(tmp, "%s [%d/%d]", t->name.c_str(), _index+1, db->GetSize());
 
 		label_name = new jgui::Label(tmp, _insets.left+height+10, _insets.top+0*height, max_width-2*(height+10));
-		label_tel1 = new jgui::Label("Telefone 1", _insets.left, _insets.top+2*height, max_width);
+		label_tel1 = new jgui::Label("Number 1", _insets.left, _insets.top+2*height, max_width);
 		tel1 = new jgui::Label(t->phone1, _insets.left, _insets.top+3*height, max_width);
-		label_tel2 = new jgui::Label("Telefone 2", _insets.left, _insets.top+4*height, max_width);
+		label_tel2 = new jgui::Label("Number 2", _insets.left, _insets.top+4*height, max_width);
 		tel2 = new jgui::Label(t->phone2, _insets.left, _insets.top+5*height, max_width);
 		left_arrow = new jgui::Icon(jcommon::System::GetResourceDirectory() + "/images/left_horizontal_arrow.png", _insets.left, _insets.top+0*height, height);
 		right_arrow = new jgui::Icon(jcommon::System::GetResourceDirectory() + "/images/right_horizontal_arrow.png", GetWidth()-_insets.right-height, _insets.top+0*height, height);
@@ -586,7 +578,7 @@ SearchContacts::~SearchContacts()
 void SearchContacts::Update()
 {
 	if (db->IsEmpty() == true) {
-		label_name->SetText("Sem telefones");
+		label_name->SetText("No contacts found !");
 
 		if (label_tel1 != NULL) {
 			label_tel1->SetText("");
@@ -611,9 +603,9 @@ void SearchContacts::Update()
 		sprintf(tmp, "%s [%d/%d]", t->name.c_str(), _index+1, db->GetSize());
 
 		label_name->SetText(tmp);
-		label_tel1->SetText("Telefone 1");
+		label_tel1->SetText("Number 1");
 		tel1->SetText(t->phone1);
-		label_tel2->SetText("Telefone 2");
+		label_tel2->SetText("Number 2");
 		tel2->SetText(t->phone2);
 	}
 }
@@ -683,7 +675,7 @@ bool SearchContacts::ProcessEvent(jgui::KeyEvent *event)
 		}
 	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialogBox dialog("Aviso", "Remover o contato atual ?");
+			jgui::YesNoDialogBox dialog("Warning", "Remove this contact ?");
 
 			dialog.Show();
 
@@ -696,7 +688,7 @@ bool SearchContacts::ProcessEvent(jgui::KeyEvent *event)
 					_index = 0;
 				}
 
-				jgui::MessageDialogBox dialog("Aviso", "Contato removido com sucesso");
+				jgui::MessageDialogBox dialog("Information", "Contat removed !");
 
 				dialog.Show();
 

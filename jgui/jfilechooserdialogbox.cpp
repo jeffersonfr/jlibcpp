@@ -310,8 +310,12 @@ void FileChooserDialogBox::ItemSelected(jgui::SelectEvent *event)
 	}
 }
 
-bool FileChooserDialogBox::ProcessEvent(jgui::KeyEvent *event)
+bool FileChooserDialogBox::ProcessEvent(KeyEvent *event)
 {
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	jthread::AutoLock lock(&_mutex);
 
 	if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {

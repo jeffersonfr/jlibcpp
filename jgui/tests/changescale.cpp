@@ -42,7 +42,7 @@ class Main : public jgui::Frame{
 			for (int i=0; i<5; i++) {
 				char tmp[255];
 
-				sprintf(tmp, "Teste %d", i+1);
+				sprintf(tmp, "Button %d", i+1);
 
 				b[i] = new jgui::Button(tmp, 10, 10, 200, 200);
 

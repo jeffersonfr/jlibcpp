@@ -111,7 +111,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			marquee = new jgui::Marquee("Testando Marquee", 500, 110, 700);
+			marquee = new jgui::Marquee("Marquee Test", 500, 110, 700);
 
 			marquee->SetType(jgui::JMM_LOOP);
 
@@ -133,13 +133,13 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			text_field = new jgui::TextField(500, 290, 700);
 
-			text_field->Insert("TextField");
+			text_field->Insert("Text Field");
 		}
 
 		{
 			text_area = new jgui::TextArea(500, 350, 700, 300);
 
-			text_area->Insert("Testando\n o\n componenente\n TextArea");
+			text_area->Insert("Text Area\nwriting some text ...\nbye bye");
 		}
 
 		{
@@ -153,9 +153,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			button1 = new jgui::Button("inc prog", 150, 380, 300);
-			button2 = new jgui::Button("dec prog", 150, 450, 300);
-			button3 = new jgui::Button("testando o componente jgui::Button com um texto longo", 150, 590, 300, 150);
+			button1 = new jgui::Button("Increase", 150, 380, 300);
+			button2 = new jgui::Button("Decrease", 150, 450, 300);
+			button3 = new jgui::Button("Testing a long text in a buttom component", 150, 590, 300, 150);
 
 			button1->SetBackgroundFocusColor(0x40, 0xf0, 0x40, 0xff);
 			button2->SetBackgroundFocusColor(0xf0, 0x20, 0x20, 0xff);
@@ -176,7 +176,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			toogle = new jgui::ToogleButton("toogle button", 150, 520, 300);
+			toogle = new jgui::ToogleButton("Toggle Button", 150, 520, 300);
 		}
 
 		{
@@ -195,14 +195,14 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			label1 = new jgui::Label("Label teste 1", 500, 680, 300);
-			label2 = new jgui::Label("Label teste 2", 860, 680, 300);
+			label1 = new jgui::Label("Label Test 1", 500, 680, 300);
+			label2 = new jgui::Label("Label Test 2", 860, 680, 300);
 		}
 
 		{
-			check1 = new jgui::CheckButton(jgui::JCBT_CHECK, "wrap", 500, 740, 300);
-			check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "password", 500, 795, 300);
-			check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "hide", 500, 850, 300);
+			check1 = new jgui::CheckButton(jgui::JCBT_CHECK, "Wrap Text", 500, 740, 300);
+			check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "Password", 500, 795, 300);
+			check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "Hide", 500, 850, 300);
 
 			check1->SetSelected(true);
 
@@ -212,9 +212,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			radio1 = new jgui::CheckButton(jgui::JCBT_RADIO, "left", 860, 740, 300);
-			radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "center", 860, 795, 300);
-			radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "right", 860, 850, 300);
+			radio1 = new jgui::CheckButton(jgui::JCBT_RADIO, "Left", 860, 740, 300);
+			radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "Center", 860, 795, 300);
+			radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "Right", 860, 850, 300);
 
 			group = new jgui::CheckButtonGroup();
 
@@ -238,63 +238,63 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			list = new jgui::ListBox(1250, 450, 400, 300);
 
-			list->AddImageItem("opcao 01", std::string("images/tux-alien.png"));
-			list->AddTextItem("opcao 02");
-			list->AddImageItem("opcao 03", std::string("images/tux-bart.png"));
-			list->AddTextItem("opcao 04");
-			list->AddImageItem("opcao 05", std::string("images/tux-batman.png"));
-			list->AddTextItem("opcao 06");
-			list->AddImageItem("opcao 07", std::string("images/tux-freddy.png"));
-			list->AddTextItem("opcao 08");
-			list->AddImageItem("opcao 09", std::string("images/tux-homer.png"));
-			list->AddTextItem("opcao 10");
-			list->AddImageItem("opcao 11", std::string("images/tux-indiana.png"));
-			list->AddTextItem("opcao 12");
-			list->AddImageItem("opcao 13", std::string("images/tux-ipod.png"));
-			list->AddTextItem("opcao 14");
-			list->AddImageItem("opcao 15", std::string("images/tux-jamaican.png"));
-			list->AddTextItem("opcao 16");
-			list->AddImageItem("opcao 17", std::string("images/tux-jason.png"));
-			list->AddTextItem("opcao 18");
-			list->AddImageItem("opcao 19", std::string("images/tux-kenny.png"));
-			list->AddTextItem("opcao 20");
-			list->AddImageItem("opcao 21", std::string("images/tux-mario.png"));
-			list->AddTextItem("opcao 22");
-			list->AddImageItem("opcao 23", std::string("images/tux-neo.png"));
-			list->AddTextItem("opcao 24");
-			list->AddImageItem("opcao 25", std::string("images/tux-potter.png"));
-			list->AddTextItem("opcao 26");
-			list->AddImageItem("opcao 27", std::string("images/tux-raider.png"));
-			list->AddTextItem("opcao 28");
-			list->AddImageItem("opcao 29", std::string("images/tux-rambo.png"));
-			list->AddTextItem("opcao 30");
-			list->AddImageItem("opcao 31", std::string("images/tux-rapper.png"));
-			list->AddTextItem("opcao 32");
-			list->AddImageItem("opcao 33", std::string("images/tux-shrek.png"));
-			list->AddTextItem("opcao 34");
-			list->AddImageItem("opcao 35", std::string("images/tux-spiderman.png"));
-			list->AddTextItem("opcao 36");
-			list->AddImageItem("opcao 37", std::string("images/tux-turtle.png"));
-			list->AddTextItem("opcao 38");
-			list->AddImageItem("opcao 39", std::string("images/tux-wolverine.png"));
-			list->AddTextItem("opcao 40");
-			list->AddImageItem("opcao 41", std::string("images/tux-zombie.png"));
-			list->AddTextItem("opcao 42");
+			list->AddImageItem("Item 01", std::string("images/tux-alien.png"));
+			list->AddTextItem("Item 02");
+			list->AddImageItem("Item 03", std::string("images/tux-bart.png"));
+			list->AddTextItem("Item 04");
+			list->AddImageItem("Item 05", std::string("images/tux-batman.png"));
+			list->AddTextItem("Item 06");
+			list->AddImageItem("Item 07", std::string("images/tux-freddy.png"));
+			list->AddTextItem("Item 08");
+			list->AddImageItem("Item 09", std::string("images/tux-homer.png"));
+			list->AddTextItem("Item 10");
+			list->AddImageItem("Item 11", std::string("images/tux-indiana.png"));
+			list->AddTextItem("Item 12");
+			list->AddImageItem("Item 13", std::string("images/tux-ipod.png"));
+			list->AddTextItem("Item 14");
+			list->AddImageItem("Item 15", std::string("images/tux-jamaican.png"));
+			list->AddTextItem("Item 16");
+			list->AddImageItem("Item 17", std::string("images/tux-jason.png"));
+			list->AddTextItem("Item 18");
+			list->AddImageItem("Item 19", std::string("images/tux-kenny.png"));
+			list->AddTextItem("Item 20");
+			list->AddImageItem("Item 21", std::string("images/tux-mario.png"));
+			list->AddTextItem("Item 22");
+			list->AddImageItem("Item 23", std::string("images/tux-neo.png"));
+			list->AddTextItem("Item 24");
+			list->AddImageItem("Item 25", std::string("images/tux-potter.png"));
+			list->AddTextItem("Item 26");
+			list->AddImageItem("Item 27", std::string("images/tux-raider.png"));
+			list->AddTextItem("Item 28");
+			list->AddImageItem("Item 29", std::string("images/tux-rambo.png"));
+			list->AddTextItem("Item 30");
+			list->AddImageItem("Item 31", std::string("images/tux-rapper.png"));
+			list->AddTextItem("Item 32");
+			list->AddImageItem("Item 33", std::string("images/tux-shrek.png"));
+			list->AddTextItem("Item 34");
+			list->AddImageItem("Item 35", std::string("images/tux-spiderman.png"));
+			list->AddTextItem("Item 36");
+			list->AddImageItem("Item 37", std::string("images/tux-turtle.png"));
+			list->AddTextItem("Item 38");
+			list->AddImageItem("Item 39", std::string("images/tux-wolverine.png"));
+			list->AddTextItem("Item 40");
+			list->AddImageItem("Item 41", std::string("images/tux-zombie.png"));
+			list->AddTextItem("Item 42");
 		}
 
 		{
 			combo = new jgui::ComboBox(1250, 800, 400, DEFAULT_COMPONENT_HEIGHT, 3);
 
-			combo->AddTextItem("opcao 1");
-			combo->AddTextItem("opcao 2");
-			combo->AddTextItem("opcao 3");
-			combo->AddTextItem("opcao 4");
-			combo->AddTextItem("opcao 5");
-			combo->AddTextItem("opcao 6");
-			combo->AddTextItem("opcao 7");
-			combo->AddTextItem("opcao 8");
-			combo->AddTextItem("opcao 9");
-			combo->AddTextItem("opcao 0");
+			combo->AddTextItem("Item 1");
+			combo->AddTextItem("Item 2");
+			combo->AddTextItem("Item 3");
+			combo->AddTextItem("Item 4");
+			combo->AddTextItem("Item 5");
+			combo->AddTextItem("Item 6");
+			combo->AddTextItem("Item 7");
+			combo->AddTextItem("Item 8");
+			combo->AddTextItem("Item 9");
+			combo->AddTextItem("Item 0");
 
 			combo->RegisterSelectListener(this);
 		}
@@ -383,6 +383,10 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 	virtual bool ProcessEvent(jgui::KeyEvent *event)
 	{
+		if (Frame::ProcessEvent(event) == true) {
+			return true;
+		}
+
 		jthread::AutoLock lock(&teste_mutex);
 
 		if (event->GetType() != jgui::JKT_PRESSED) {
@@ -830,8 +834,6 @@ class GraphicPanel : public jgui::Canvas{
 
 		std::string text = "DrawString";
 
-		g->Rotate(0.0);
-
 		rcolor.SetAlpha(0x80);
 		pcolor.SetAlpha(0x80);
 
@@ -849,18 +851,28 @@ class GraphicPanel : public jgui::Canvas{
 
 		g->Translate(320, 0);
 
-		g->Rotate(M_PI);
-		g->SetColor(rcolor);
-		g->SetFont(f1); g->DrawString(text, 10+7*(120+10)+10+shadow, 0*(45+10)+20+shadow);
-		g->SetFont(f2); g->DrawString(text, 10+7*(120+10)+10+shadow, 1*(45+10)+20+shadow);
-		g->SetFont(f3); g->DrawString(text, 10+7*(120+10)+10+shadow, 2*(45+10)+20+shadow);
-		g->SetFont(f4); g->DrawString(text, 10+7*(120+10)+10+shadow, 3*(45+10)+20+shadow);
+		int sw = f1->GetStringWidth(text),
+				sh = (3*(45+10)+20+shadow)+f4->GetSize()-(0*(45+10)+20+shadow);
+		jgui::Image *timage = jgui::Image::CreateImage(sw, sh);
+		jgui::Graphics *gt = timage->GetGraphics();
 
-		g->SetColor(pcolor);
-		g->SetFont(f1); g->DrawString(text, 10+7*(120+10)+10, 0*(45+10)+20);
-		g->SetFont(f2); g->DrawString(text, 10+7*(120+10)+10, 1*(45+10)+20);
-		g->SetFont(f3); g->DrawString(text, 10+7*(120+10)+10, 2*(45+10)+20);
-		g->SetFont(f4); g->DrawString(text, 10+7*(120+10)+10, 3*(45+10)+20);
+		gt->SetColor(rcolor);
+		gt->SetFont(f1); gt->DrawString(text, shadow, 0*(45+10)+shadow);
+		gt->SetFont(f2); gt->DrawString(text, shadow, 1*(45+10)+shadow);
+		gt->SetFont(f3); gt->DrawString(text, shadow, 2*(45+10)+shadow);
+		gt->SetFont(f4); gt->DrawString(text, shadow, 3*(45+10)+shadow);
+
+		gt->SetColor(pcolor);
+		gt->SetFont(f1); gt->DrawString(text, 0, 0*(45+10));
+		gt->SetFont(f2); gt->DrawString(text, 0, 1*(45+10));
+		gt->SetFont(f3); gt->DrawString(text, 0, 2*(45+10));
+		gt->SetFont(f4); gt->DrawString(text, 0, 3*(45+10));
+
+		jgui::Image *rotate = timage->Rotate(M_PI);
+
+		g->DrawImage(rotate, 10+7*(120+10)+10, 1*(45+10));
+
+		delete rotate;
 		
 		g->Translate(-320, 0);
 
@@ -883,7 +895,7 @@ class GraphicsTeste : public jgui::Frame{
 
 	public:
 		GraphicsTeste():
-			jgui::Frame("Graphics Teste", 0, 0, 1920, 1080)
+			jgui::Frame("Graphics Test", 0, 0, 1920, 1080)
 	{
 		panel = new GraphicPanel((1920-1600)/2, 100, 1600, 900);
 
@@ -916,7 +928,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 
 	public:
 		ModulesTeste():
-			jgui::Frame("Teste dos Componentes Graficos", 0, 0, 1920, 1080)
+			jgui::Frame("Graphics Test", 0, 0, 1920, 1080)
 	{
 		int h = 100;
 
@@ -1013,14 +1025,13 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 
 				teste.Show();
 			} else if (event->GetSource() == button4) {
-				jgui::MessageDialogBox app("Aviso", "Testando o componente MessageBox com todos os recursos de alinhamento. Pulando linha, \n testando new line em DrawJustified para quebrar linhas.\nTestando multiplas linhas de mensagem em um unico componentes. Finalizando, estou apenas aumentando o tamanho do texto para verificar inconsistencias.");
-				jgui::MessageDialogBox app1("Aviso", "JeffersonFerreiradeAraujoAdrianaAraujoLimaMariadeLourdesAraujoLimaAmancioFerreiraLima");
+				jgui::MessageDialogBox app1("Warning", "Testing the component of message with some text and breaks of line.\nThis is a new line using manual break-line character. The lines also can break in case of the width of this component be minor than the width of the current text line.");
+				jgui::MessageDialogBox app2("Warning ", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
 
-				app.Show();
 				app1.Show();
+				app2.Show();
 			} else if (event->GetSource() == button5) {
-				jgui::YesNoDialogBox app("Pergunta", "Testando o componentes YesNoDialog. Voce deseja clicar na opcao Sim ou na opcao Nao ?");
-				// jgui::InputDialogBox app("Pergunta", "Quantos anos de experiencia ?");
+				jgui::YesNoDialogBox app("Question", "This is the best of all the graphic engines of the world ?");
 
 				app.Show();
 			} else if (event->GetSource() == button6) {

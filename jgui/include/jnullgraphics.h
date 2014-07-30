@@ -80,37 +80,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void Rotate(double radians);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Translate(int x, int y);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void TranslateImage(int x, int y);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double Rotate();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual jpoint_t Translate();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t TranslateImage();
 
 		/**
 		 * \brief

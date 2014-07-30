@@ -51,6 +51,7 @@ Component::Component(int x, int y, int width, int height):
 	_has_focus = false;
 	_is_ignore_repaint = false;
 	
+	_keymap = NULL;
 	_parent = NULL;
 	_left = NULL;
 	_right = NULL;
@@ -216,6 +217,16 @@ void Component::SetName(std::string name)
 std::string Component::GetName()
 {
 	return _name;
+}
+
+void Component::SetKeyMap(KeyMap *keymap)
+{
+	_keymap = keymap;
+}
+
+KeyMap * Component::GetKeyMap()
+{
+	return _keymap;
 }
 
 void Component::SetThemeEnabled(bool b)
@@ -1596,6 +1607,19 @@ void Component::GetInternalComponents(Container *parent, std::vector<Component *
 
 bool Component::ProcessEvent(KeyEvent *event)
 {
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
+	return false;
+}
+
+bool Component::ProcessNavigation(KeyEvent *event)
+{
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (_is_navigation_enabled == false) {
 		return false;
 	}
@@ -1706,9 +1730,11 @@ bool Component::ProcessEvent(KeyEvent *event)
 
 	if (next != NULL) {
 		next->RequestFocus();
+	
+		return true;
 	}
 
-	return true;
+	return false;
 }
 
 void Component::FindNextComponentFocus(jregion_t rect, Component **left, Component **right, Component **up, Component **down)

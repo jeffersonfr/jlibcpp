@@ -750,6 +750,16 @@ void Container::ReleaseComponentFocus(jgui::Component *c)
 
 bool Container::ProcessEvent(KeyEvent *event)
 {
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
+	Component *current = GetFocusOwner();
+
+	if (current != NULL) {
+		return current->ProcessNavigation(event);
+	}
+
 	return false;
 }
 

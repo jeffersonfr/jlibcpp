@@ -91,6 +91,14 @@ int ScrollBar::GetStoneSize()
 
 bool ScrollBar::ProcessEvent(KeyEvent *event)
 {
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (IsEnabled() == false) {
 		return false;
 	}
@@ -137,7 +145,7 @@ bool ScrollBar::ProcessEvent(KeyEvent *event)
 		}
 	}
 
-	return catched || Component::ProcessEvent(event);
+	return catched;
 }
 
 bool ScrollBar::ProcessEvent(MouseEvent *event)

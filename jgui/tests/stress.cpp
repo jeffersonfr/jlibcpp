@@ -121,24 +121,29 @@ class GraphicPanel : public jgui::Frame{
 		g->SetFont(font);
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
-		int sw = font->GetStringWidth("Rotate String")/2,
-				sh = 0;
+		int sw = font->GetStringWidth("Rotate String"),
+				sh = font->GetSize();
 
-		x = (1920+sw)/2;
+		x = (1920-sw)/2;
 		y = (1080+sh)/2;
 
-		g->TranslateImage(-sw, 0);
+		jgui::Image *fimage = jgui::Image::CreateImage(2*sw, sh);
+		jgui::Graphics *gf = fimage->GetGraphics();
+
+		gf->SetFont(font);
+		gf->SetColor(0xff, 0xff, 0xff, 0xff);
+		gf->DrawString("Font Testing", 0, 0);
 
 		for (int i=0; i<iterations; i++) {
+			jgui::Image *rotate = fimage->Rotate(angle, true);
+
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
 			g->SetColor(r1, g1, b1, a1+0x80);
-			g->Rotate(angle);
-			g->DrawString("Font Testing", x, y);
-
+			g->DrawImage(rotate, x-(rotate->GetWidth())/2, y-(rotate->GetHeight())/2);
 			g->Flip();
 
 			angle = angle + 0.1;
@@ -146,10 +151,13 @@ class GraphicPanel : public jgui::Frame{
 			if (angle > 2*M_PI) {
 				angle = 0.1;
 			}
+
+			delete rotate;
 		}
 
+		delete fimage;
+
 		g->SetFont(_font);
-		g->Rotate(0.0);
 
 		Clear(g);
 
@@ -615,19 +623,24 @@ class GraphicPanel : public jgui::Frame{
 			
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
-		g->TranslateImage(0, 0);
+		g->Translate(0, 0);
 
 		for (int i=0; i<iterations; i++) {
-			x = (1920-size)/2;
-			y = (1080-size)/2;
+			jgui::Image *image = jgui::Image::CreateImage(size, size);
+
+			image->GetGraphics()->DrawImage("images/tux-zombie.png", 0, 0, size, size);
+
+			jgui::Image *rotate = image->Rotate(angle, true);
 
 			if (fmod(angle, 0.1) == 0) {
 				color = (rand()%0xf0f0f0) | 0xff000000;
 			}
 
+			x = (1920-size)/2;
+			y = (1080-size)/2;
+
 			g->SetColor(color);
-			g->Rotate(angle);
-			g->DrawImage("images/tux-zombie.png", x, y, size, size);
+			g->DrawImage(rotate, x-(rotate->GetWidth()-size)/2, y-(rotate->GetHeight()-size)/2);
 
 			g->Flip();
 
@@ -642,9 +655,10 @@ class GraphicPanel : public jgui::Frame{
 			if (angle > 2*M_PI) {
 				angle = 0.1;
 			}
-		}
 
-		g->Rotate(0.0);
+			delete rotate;
+			delete image;
+		}
 
 		Clear(g);
 
@@ -658,19 +672,26 @@ class GraphicPanel : public jgui::Frame{
 
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORIZE));
 
-		g->TranslateImage(0, 0);
+		g->Translate(0, 0);
+			
+		jgui::Image *pimage = jgui::Image::CreateImage("images/tux-zombie.png");
 
 		for (int i=0; i<iterations; i++) {
-			x = (1920-size)/2;
-			y = (1080-size)/2;
+			jgui::Image *image = jgui::Image::CreateImage(size, size);
+
+			image->GetGraphics()->DrawImage(pimage, 0, 0, size, size);
+
+			jgui::Image *rotate = image->Rotate(angle, true);
 
 			if (fmod(angle, 0.1) == 0) {
 				color = (rand()%0xf0f0f0) | 0xff000000;
 			}
 
+			x = (1920-size)/2;
+			y = (1080-size)/2;
+
 			g->SetColor(color);
-			g->Rotate(angle);
-			g->DrawImage(off, x, y, size, size);
+			g->DrawImage(rotate, x-(rotate->GetWidth()-size)/2, y-(rotate->GetHeight()-size)/2);
 
 			g->Flip();
 
@@ -685,9 +706,13 @@ class GraphicPanel : public jgui::Frame{
 			if (angle > 2*M_PI) {
 				angle = 0.1;
 			}
+
+			delete rotate;
+			delete image;
 		}
 
-		g->Rotate(0.0);
+		delete pimage;
+
 		g->SetFont(NULL);
 
 		delete off;

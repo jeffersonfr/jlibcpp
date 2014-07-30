@@ -79,11 +79,11 @@ void Logger::SendLogger(jrecord_type_t type_, const char *fmt, ...)
 		return;
 	}
 
-	char tmp[256];
+	char tmp[4096];
 	va_list va;
 
 	va_start(va, fmt);
-	vsnprintf(tmp, 256, fmt, va); tmp[255] = 0;
+	vsnprintf(tmp, 4096, fmt, va); tmp[4096-1] = 0;
 	va_end(va);
 
 	LogRecord *record = NULL;

@@ -83,12 +83,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void RotateImage0(Image *img, int xc, int yc, int x, int y, int width, int height, double angle, uint8_t alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
 		int CalculateGradientChannel(int schannel, int dchannel, int distance, int offset); 
 
 		/**
@@ -133,12 +127,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 */
 		void DrawChord0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size);
 
-		/**
-		 * \brief
-		 *
-		 */
-		void AntiAlias0(DFBRegion *lines, int size);
-
 	protected:
 		/**
 		 * \brief
@@ -181,37 +169,13 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void Rotate(double radians);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Translate(int x, int y);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void TranslateImage(int x, int y);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double Rotate();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual jpoint_t Translate();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t TranslateImage();
 
 		/**
 		 * \brief

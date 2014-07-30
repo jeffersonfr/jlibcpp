@@ -73,7 +73,7 @@ class IndexedImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
-		virtual Image * Scaled(int wp, int hp);
+		virtual Image * Scale(int wp, int hp);
 
 		/**
 		 * \brief

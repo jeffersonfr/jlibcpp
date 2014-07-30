@@ -560,13 +560,6 @@ bool NullGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int
 	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, wp, hp);
 }
 
-void NullGraphics::Rotate(double radians)
-{
-	JDEBUG(JINFO, "called\n");
-
-	Graphics::Rotate(radians);
-}
-
 void NullGraphics::Translate(int x, int y)
 {
 	JDEBUG(JINFO, "called\n");
@@ -574,32 +567,11 @@ void NullGraphics::Translate(int x, int y)
 	Graphics::Translate(x, y);
 }
 
-void NullGraphics::TranslateImage(int x, int y)
-{
-	JDEBUG(JINFO, "called\n");
-
-	Graphics::TranslateImage(x, y);
-}
-
-double NullGraphics::Rotate()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return Graphics::Rotate();
-}
-
 jpoint_t NullGraphics::Translate()
 {
 	JDEBUG(JINFO, "called\n");
 
 	return Graphics::Translate();
-}
-
-jpoint_t NullGraphics::TranslateImage()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return Graphics::TranslateImage();
 }
 
 uint32_t NullGraphics::GetRGB(int xp, int yp, uint32_t pixel)

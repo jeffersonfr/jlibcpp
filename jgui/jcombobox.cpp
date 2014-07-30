@@ -98,6 +98,14 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 
 bool ComboBox::ProcessEvent(KeyEvent *event)
 {
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (IsEnabled() == false) {
 		return false;
 	}
@@ -117,7 +125,7 @@ bool ComboBox::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched || Component::ProcessEvent(event);
+	return catched;
 }
 
 void ComboBox::SetHorizontalAlign(jhorizontal_align_t align)

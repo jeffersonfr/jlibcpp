@@ -339,8 +339,12 @@ void CalendarDialogBox::BuildCalendar()
 	Repaint();
 }
 
-bool CalendarDialogBox::ProcessEvent(jgui::KeyEvent *event)
+bool CalendarDialogBox::ProcessEvent(KeyEvent *event)
 {
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (event->GetSymbol() == JKS_BLUE || event->GetSymbol() == JKS_F4) {
 		Release();
 	}

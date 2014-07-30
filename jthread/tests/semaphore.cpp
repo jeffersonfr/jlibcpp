@@ -26,6 +26,8 @@
 
 #include <unistd.h>
 
+#define INTERACTIONS	1000
+
 class LocalSemaphore {
 
 	private:
@@ -151,9 +153,8 @@ class Test : public jthread::Thread {
 int main() 
 {
 	LocalSemaphore s;
-	int n = 1000;
 
-	for (int i=0; i<n; i++) {
+	for (int i=0; i<INTERACTIONS; i++) {
 		s.Notify();
 
 		std::cout << "+" << std::flush;
@@ -162,7 +163,7 @@ int main()
 
 	std::cout << std::endl;
 
-	for (int i=0; i<n; i++) {
+	for (int i=0; i<INTERACTIONS; i++) {
 		s.Wait();
 
 		std::cout << "-" << std::flush;
@@ -173,7 +174,7 @@ int main()
 
 	std::vector<Test *> semaphores;
 
-	for (int i=0; i<n; i++) {
+	for (int i=0; i<INTERACTIONS; i++) {
 		Test *test = new Test(&s);
 
 		test->Start();
@@ -186,13 +187,13 @@ int main()
 
 	s.NotifyAll();
 
-	for (int i=0; i<n; i++) {
+	for (int i=0; i<INTERACTIONS; i++) {
 		Test *test = *semaphores.begin();
 
 		test->WaitThread();
 	}
 
-	for (int i=0; i<n; i++) {
+	for (int i=0; i<INTERACTIONS; i++) {
 		Test *test = *semaphores.begin();
 
 		semaphores.erase(semaphores.begin());

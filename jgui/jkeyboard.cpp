@@ -141,6 +141,14 @@ Keyboard::~Keyboard()
 
 bool Keyboard::ProcessEvent(jgui::KeyEvent *event)
 {
+	if (Frame::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (event->GetSymbol() == JKS_BLUE || event->GetSymbol() == JKS_F4) {
 		jgui::Frame::Hide();
 

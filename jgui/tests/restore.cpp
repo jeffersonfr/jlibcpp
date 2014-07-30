@@ -68,7 +68,7 @@ class Main : public jgui::Frame{
 			for (int i=0; i<4; i++) {
 				char tmp[255];
 
-				sprintf(tmp, "Teste %d", i+1);
+				sprintf(tmp, "Test %d", i+1);
 
 				_buttons[i] = new jgui::Button(tmp, 100+i*100, 100+i*100, 200, 200);
 
@@ -95,7 +95,7 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main("Reconfiguracao da Engine Grafica Em Tempo Real", 100, 100, 900, 800);
+	Main main("Reseting graphic engine on the fly", 100, 100, 900, 800);
 
 	main.Show(false);
 

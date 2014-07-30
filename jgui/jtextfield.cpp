@@ -47,11 +47,23 @@ bool TextField::ProcessEvent(MouseEvent *event)
 
 bool TextField::ProcessEvent(KeyEvent *event)
 {
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (IsEnabled() == false || IsEditable() == false) {
 		return false;
 	}
 
 	jkeyevent_symbol_t action = event->GetSymbol();
+
+	if (_keymap != NULL && _keymap->HasKey(action) == false) {
+		return true;
+	}
 
 	bool catched = false;
 
@@ -195,7 +207,7 @@ bool TextField::ProcessEvent(KeyEvent *event)
 
 	}
 
-	return catched || Component::ProcessEvent(event);
+	return catched;
 }
 
 void TextField::Paint(Graphics *g)

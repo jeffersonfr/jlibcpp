@@ -171,7 +171,13 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual Image * Scaled(int wp, int hp);
+		virtual Image * Rotate(double radians, bool resize = true);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * Scale(int wp, int hp);
 
 		/**
 		 * \brief

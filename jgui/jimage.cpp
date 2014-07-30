@@ -193,7 +193,20 @@ jsize_t Image::GetWorkingScreenSize()
 	return _scale;
 }
 
-Image * Image::Scaled(int width, int height)
+Image * Image::Rotate(double radians, bool resize)
+{
+	Image *image = NULL;
+
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+	image = DFBImage::Rotate(this, radians, resize);
+#elif defined(X11_UI)
+	image = X11Image::Rotate(this, radians, resize);
+#endif
+
+	return image;
+}
+
+Image * Image::Scale(int width, int height)
 {
 	Image *image = NULL;
 

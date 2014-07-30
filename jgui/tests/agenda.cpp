@@ -28,7 +28,7 @@
 namespace magenda {
 
 Agenda::Agenda():
-	jgui::Frame("Tarefas", (1920-600)/2, 300, 0, 0)
+	jgui::Frame("Tasks", (1920-600)/2, 300, 0, 0)
 {
 	started = true;
 
@@ -39,10 +39,10 @@ Agenda::Agenda():
 	// _list = new jgui::ListBox(_insets.left, _insets.top, 600);
 	_list = new jgui::ListBox(0, 0, 600);
 
-	_list->AddTextItem("Verificar compromissos");
-	_list->AddTextItem("Adicionar compromisso");
-	_list->AddTextItem("Limpar todos os registros");
-	_list->AddTextItem("Estado da mem\xf3ria");
+	_list->AddTextItem("Check Appointments");
+	_list->AddTextItem("Add Appointments");
+	_list->AddTextItem("Clear All Records");
+	_list->AddTextItem("Memory Status");
 	_list->RegisterSelectListener(this);
 
 	_list->SetSize(_list->GetPreferredSize());
@@ -81,7 +81,7 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 
 		view.Show();
 		} else {
-			jgui::MessageDialogBox dialog("Aviso", "Nao existem compromissos cadastrados !");
+			jgui::MessageDialogBox dialog("Warning", "There are no appointments registered !");
 
 			dialog.Show();
 		}
@@ -91,12 +91,12 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 
 			add.Show();
 		} else {
-			jgui::MessageDialogBox dialog("Aviso", "A agenda está cheia !");
+			jgui::MessageDialogBox dialog("Warning", "There are no space left !");
 
 			dialog.Show();
 		}
 	} else if (event->GetIndex() == 2) {
-		jgui::YesNoDialogBox dialog("Aviso", "Remover todos os registros ?");
+		jgui::YesNoDialogBox dialog("Warning", "Remove all records ?");
 
 		dialog.Show();
 
@@ -106,9 +106,9 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 	} else if (event->GetIndex() == 3) {
 		char tmp[255];
 
-		sprintf(tmp, "Contatos usados : %d/%d", db->GetSize(), db->GetCapacity());
+		sprintf(tmp, "Used records: %d/%d", db->GetSize(), db->GetCapacity());
 
-		jgui::MessageDialogBox dialog("Estado da mem\xf3ria", tmp);
+		jgui::MessageDialogBox dialog("Memory status", tmp);
 
 		dialog.Show();
 	}
@@ -375,7 +375,7 @@ void AgendaDB::RemoveAll()
 }
 
 AddMessage::AddMessage(AgendaDB *base, int index):
-	jgui::Frame("Adicionar Compromisso", (1920-600)/2, 200, 600, 800)
+	jgui::Frame("Add Appointment", (1920-600)/2, 200, 600, 800)
 {
 	int height = DEFAULT_COMPONENT_HEIGHT+4;
 
@@ -388,8 +388,8 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 
 	db = base;
 
-	label1 = new jgui::Label("Hora", _insets.left, _insets.top+0*height, 350);
-	label3 = new jgui::Label("Data", _insets.left, _insets.top+1*height, 350);
+	label1 = new jgui::Label("Hour", _insets.left, _insets.top+0*height, 350);
+	label3 = new jgui::Label("Date", _insets.left, _insets.top+1*height, 350);
 
 	hour = new jgui::TextField(label1->GetX()+label1->GetWidth()+10, _insets.top+0*height, 80);
 	label2 = new jgui::Label(":", hour->GetX()+hour->GetWidth(), _insets.top+0*height, 20);
@@ -397,7 +397,7 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 
 	date = new jgui::TextField(label3->GetX()+label3->GetWidth()+10, _insets.top+1*height, 180);
 
-	label4 = new jgui::Label("Mensagem", _insets.left, _insets.top+2*height, minute->GetX()+minute->GetWidth()-_insets.left);
+	label4 = new jgui::Label("Message", _insets.left, _insets.top+2*height, minute->GetX()+minute->GetWidth()-_insets.left);
 	message = new jgui::TextArea(_insets.left, _insets.top+3*height, minute->GetX()+minute->GetWidth()-_insets.left, 400);
 
 	label2->SetBackgroundVisible(false);
@@ -458,8 +458,8 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 
 	hour->RequestFocus();
 
-	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Adicionar");
-	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/vertical_arrows.png", "Selecionar");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Add");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/vertical_arrows.png", "Select");
 
 	Pack();
 }
@@ -711,7 +711,7 @@ bool AddMessage::ProcessEvent(jgui::KeyEvent *event)
 }
 
 ViewMessages::ViewMessages(AgendaDB *base):
-		jgui::Frame("Compromissos", (1920-600)/2, 200, 600, 800)
+		jgui::Frame("Appointments", (1920-600)/2, 200, 600, 800)
 {
 	int max_width = GetWidth()-_insets.left-_insets.right,
 			dheight = 40,
@@ -743,9 +743,9 @@ ViewMessages::ViewMessages(AgendaDB *base):
 	Add(label_hour);
 	Add(message);
 
-	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Apagar");
-	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png", "Editar");
-	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/horizontal_arrows.png", "Listar");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Remove");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png", "Edit");
+	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/horizontal_arrows.png", "List");
 
 	Pack();
 }
@@ -762,7 +762,7 @@ ViewMessages::~ViewMessages()
 void ViewMessages::Update()
 {
 	if (db->IsEmpty() == true) {
-		label_date->SetText("Sem Compromissos");
+		label_date->SetText("There are no appointments registered !");
 
 		if (label_hour != NULL) {
 			label_hour->SetText("00:00");
@@ -809,7 +809,7 @@ bool ViewMessages::ProcessEvent(jgui::KeyEvent *event)
 		Update();
 	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialogBox dialog("Aviso", "Remover o compromisso atual ?");
+			jgui::YesNoDialogBox dialog("Warning", "Remove this record ?");
 
 			dialog.Show();
 

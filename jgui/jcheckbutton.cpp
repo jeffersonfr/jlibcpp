@@ -148,6 +148,14 @@ bool CheckButton::ProcessEvent(MouseEvent *event)
 
 bool CheckButton::ProcessEvent(KeyEvent *event)
 {
+	if (Component::ProcessEvent(event) == true) {
+		return true;
+	}
+
+	if (event->GetType() != jgui::JKT_PRESSED) {
+		return false;
+	}
+
 	if (IsEnabled() == false) {
 		return false;
 	}
@@ -170,7 +178,7 @@ bool CheckButton::ProcessEvent(KeyEvent *event)
 		catched = true;
 	}
 
-	return catched || Component::ProcessEvent(event);
+	return catched;
 }
 
 jcheckbox_type_t CheckButton::GetType()

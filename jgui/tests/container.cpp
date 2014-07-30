@@ -74,7 +74,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 
 	public:
 		WindowTeste():
-			jgui::Frame("Cassino Royale", 0, 0, 1920, 1080)
+			jgui::Frame("Widgets", 0, 0, 1920, 1080)
 	{
 		{
 			jgui::jinsets_t t = GetInsets();
@@ -113,7 +113,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			marquee = new jgui::Marquee("Testando Marquee", 500, 110, 700);
+			marquee = new jgui::Marquee("Marquee Test", 500, 110, 700);
 
 			marquee->SetType(jgui::JMM_LOOP);
 
@@ -135,13 +135,13 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			text_field = new jgui::TextField(500, 290, 700);
 
-			text_field->Insert("TextField");
+			text_field->Insert("Text Field");
 		}
 
 		{
 			text_area = new jgui::TextArea(500, 350, 700, 300);
 
-			text_area->Insert("Testando\n o\n componenente\n TextArea");
+			text_area->Insert("Text Area\nwriting some text ...\nbye bye");
 		}
 
 		{
@@ -155,9 +155,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			button1 = new jgui::Button("inc prog", 150, 380, 300);
-			button2 = new jgui::Button("dec prog", 150, 450, 300);
-			button3 = new jgui::Button("testando o componente jgui::Button com um texto longo", 150, 590, 300, 150);
+			button1 = new jgui::Button("Increase", 150, 380, 300);
+			button2 = new jgui::Button("Decrease", 150, 450, 300);
+			button3 = new jgui::Button("Testing a long text in a buttom component", 150, 590, 300, 150);
 
 			button1->SetBackgroundFocusColor(0x40, 0xf0, 0x40, 0xff);
 			button2->SetBackgroundFocusColor(0xf0, 0x20, 0x20, 0xff);
@@ -178,7 +178,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			toogle = new jgui::ToogleButton("toogle button", 150, 520, 300);
+			toogle = new jgui::ToogleButton("Toggle Button", 150, 520, 300);
 		}
 
 		{
@@ -197,14 +197,14 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			label1 = new jgui::Label("Label teste 1", 500, 680, 300);
-			label2 = new jgui::Label("Label teste 2", 860, 680, 300);
+			label1 = new jgui::Label("Label Test 1", 500, 680, 300);
+			label2 = new jgui::Label("Label Test 2", 860, 680, 300);
 		}
 
 		{
-			check1 = new jgui::CheckButton(jgui::JCBT_CHECK, "wrap", 500, 740, 300);
-			check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "password", 500, 795, 300);
-			check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "hide", 500, 850, 300);
+			check1 = new jgui::CheckButton(jgui::JCBT_CHECK, "Wrap Text", 500, 740, 300);
+			check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "Password", 500, 795, 300);
+			check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "Hide", 500, 850, 300);
 
 			check1->SetSelected(true);
 
@@ -214,9 +214,9 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 
 		{
-			radio1 = new jgui::CheckButton(jgui::JCBT_RADIO, "left", 860, 740, 300);
-			radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "center", 860, 795, 300);
-			radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "right", 860, 850, 300);
+			radio1 = new jgui::CheckButton(jgui::JCBT_RADIO, "Left", 860, 740, 300);
+			radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "Center", 860, 795, 300);
+			radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "Right", 860, 850, 300);
 
 			group = new jgui::CheckButtonGroup();
 
@@ -240,63 +240,63 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		{
 			list = new jgui::ListBox(1250, 450, 400, 280);
 
-			list->AddImageItem("opcao 01", std::string("images/tux-alien.png"));
-			list->AddTextItem("opcao 02");
-			list->AddImageItem("opcao 03", std::string("images/tux-bart.png"));
-			list->AddTextItem("opcao 04");
-			list->AddImageItem("opcao 05", std::string("images/tux-batman.png"));
-			list->AddTextItem("opcao 06");
-			list->AddImageItem("opcao 07", std::string("images/tux-freddy.png"));
-			list->AddTextItem("opcao 08");
-			list->AddImageItem("opcao 09", std::string("images/tux-homer.png"));
-			list->AddTextItem("opcao 10");
-			list->AddImageItem("opcao 11", std::string("images/tux-indiana.png"));
-			list->AddTextItem("opcao 12");
-			list->AddImageItem("opcao 13", std::string("images/tux-ipod.png"));
-			list->AddTextItem("opcao 14");
-			list->AddImageItem("opcao 15", std::string("images/tux-jamaican.png"));
-			list->AddTextItem("opcao 16");
-			list->AddImageItem("opcao 17", std::string("images/tux-jason.png"));
-			list->AddTextItem("opcao 18");
-			list->AddImageItem("opcao 19", std::string("images/tux-kenny.png"));
-			list->AddTextItem("opcao 20");
-			list->AddImageItem("opcao 21", std::string("images/tux-mario.png"));
-			list->AddTextItem("opcao 22");
-			list->AddImageItem("opcao 23", std::string("images/tux-neo.png"));
-			list->AddTextItem("opcao 24");
-			list->AddImageItem("opcao 25", std::string("images/tux-potter.png"));
-			list->AddTextItem("opcao 26");
-			list->AddImageItem("opcao 27", std::string("images/tux-raider.png"));
-			list->AddTextItem("opcao 28");
-			list->AddImageItem("opcao 29", std::string("images/tux-rambo.png"));
-			list->AddTextItem("opcao 30");
-			list->AddImageItem("opcao 31", std::string("images/tux-rapper.png"));
-			list->AddTextItem("opcao 32");
-			list->AddImageItem("opcao 33", std::string("images/tux-shrek.png"));
-			list->AddTextItem("opcao 34");
-			list->AddImageItem("opcao 35", std::string("images/tux-spiderman.png"));
-			list->AddTextItem("opcao 36");
-			list->AddImageItem("opcao 37", std::string("images/tux-turtle.png"));
-			list->AddTextItem("opcao 38");
-			list->AddImageItem("opcao 39", std::string("images/tux-wolverine.png"));
-			list->AddTextItem("opcao 40");
-			list->AddImageItem("opcao 41", std::string("images/tux-zombie.png"));
-			list->AddTextItem("opcao 42");
+			list->AddImageItem("Item 01", std::string("images/tux-alien.png"));
+			list->AddTextItem("Item 02");
+			list->AddImageItem("Item 03", std::string("images/tux-bart.png"));
+			list->AddTextItem("Item 04");
+			list->AddImageItem("Item 05", std::string("images/tux-batman.png"));
+			list->AddTextItem("Item 06");
+			list->AddImageItem("Item 07", std::string("images/tux-freddy.png"));
+			list->AddTextItem("Item 08");
+			list->AddImageItem("Item 09", std::string("images/tux-homer.png"));
+			list->AddTextItem("Item 10");
+			list->AddImageItem("Item 11", std::string("images/tux-indiana.png"));
+			list->AddTextItem("Item 12");
+			list->AddImageItem("Item 13", std::string("images/tux-ipod.png"));
+			list->AddTextItem("Item 14");
+			list->AddImageItem("Item 15", std::string("images/tux-jamaican.png"));
+			list->AddTextItem("Item 16");
+			list->AddImageItem("Item 17", std::string("images/tux-jason.png"));
+			list->AddTextItem("Item 18");
+			list->AddImageItem("Item 19", std::string("images/tux-kenny.png"));
+			list->AddTextItem("Item 20");
+			list->AddImageItem("Item 21", std::string("images/tux-mario.png"));
+			list->AddTextItem("Item 22");
+			list->AddImageItem("Item 23", std::string("images/tux-neo.png"));
+			list->AddTextItem("Item 24");
+			list->AddImageItem("Item 25", std::string("images/tux-potter.png"));
+			list->AddTextItem("Item 26");
+			list->AddImageItem("Item 27", std::string("images/tux-raider.png"));
+			list->AddTextItem("Item 28");
+			list->AddImageItem("Item 29", std::string("images/tux-rambo.png"));
+			list->AddTextItem("Item 30");
+			list->AddImageItem("Item 31", std::string("images/tux-rapper.png"));
+			list->AddTextItem("Item 32");
+			list->AddImageItem("Item 33", std::string("images/tux-shrek.png"));
+			list->AddTextItem("Item 34");
+			list->AddImageItem("Item 35", std::string("images/tux-spiderman.png"));
+			list->AddTextItem("Item 36");
+			list->AddImageItem("Item 37", std::string("images/tux-turtle.png"));
+			list->AddTextItem("Item 38");
+			list->AddImageItem("Item 39", std::string("images/tux-wolverine.png"));
+			list->AddTextItem("Item 40");
+			list->AddImageItem("Item 41", std::string("images/tux-zombie.png"));
+			list->AddTextItem("Item 42");
 		}
 
 		{
 			combo = new jgui::ComboBox(1250, 800, 400, DEFAULT_COMPONENT_HEIGHT, 3);
 
-			combo->AddTextItem("opcao 1");
-			combo->AddTextItem("opcao 2");
-			combo->AddTextItem("opcao 3");
-			combo->AddTextItem("opcao 4");
-			combo->AddTextItem("opcao 5");
-			combo->AddTextItem("opcao 6");
-			combo->AddTextItem("opcao 7");
-			combo->AddTextItem("opcao 8");
-			combo->AddTextItem("opcao 9");
-			combo->AddTextItem("opcao 0");
+			combo->AddTextItem("Item 1");
+			combo->AddTextItem("Item 2");
+			combo->AddTextItem("Item 3");
+			combo->AddTextItem("Item 4");
+			combo->AddTextItem("Item 5");
+			combo->AddTextItem("Item 6");
+			combo->AddTextItem("Item 7");
+			combo->AddTextItem("Item 8");
+			combo->AddTextItem("Item 9");
+			combo->AddTextItem("Item 0");
 
 			combo->RegisterSelectListener(this);
 		}
