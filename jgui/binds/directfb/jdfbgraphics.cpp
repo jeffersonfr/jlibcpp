@@ -979,7 +979,7 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 			DrawLine(ox, oy, p[0].x + xp, p[0].y + yp);
 		}
 	} else {
-		jgui::jpoint_t scaled[6];
+		jgui::jpoint_t scaled[npoints+1];
 		int opened = (close == true)?0:1;
 
 		for (int i=0; i<npoints-opened; i++) {
@@ -1054,10 +1054,12 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 					int x0 = (b1*c2-b2*c1)/(a1*b2-a2*b1),
 							y0 = (a1*c2-a2*c1)/(a1*b2-a2*b1);
 
+					/*
 					FillTriangle(
 							xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
 							xp+x0, yp+y0,
 							xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
+							*/
 				}
 			}
 		}

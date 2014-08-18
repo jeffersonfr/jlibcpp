@@ -617,7 +617,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void DrawPolygon(int xp, int yp, jpoint_t *p, int num, bool closed);
+		virtual void DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool closed);
 		
 		/**
 		 * \brief
