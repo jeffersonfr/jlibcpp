@@ -380,6 +380,10 @@ void MCalc::Process(std::string type)
 
 bool MCalc::ProcessEvent(jgui::KeyEvent *event)
 {
+	if (Frame::ProcessEvent(event) == true) {
+		return true;
+	}
+
 	jthread::AutoLock lock(&mcalc_mutex);
 
 	std::string num = "";
