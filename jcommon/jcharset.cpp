@@ -493,6 +493,34 @@ int Charset::WriteUTF8(FILE *f, const char *utf8, int nbytes)
 	return total;
 }
 
+char * Charset::Latin1ToUTF8(const char *latin1, int *bytes)
+{
+	const char *str_c_str = latin1;
+	int length = *bytes;
+	char utf8[2*length];
+	int k = 0;
+
+	for (int i=0; i<length; i++) {
+		uint8_t c = str_c_str[i];
+
+		if (c >= 0x80 && c <= 0xbf) {
+			utf8[k++] = 0xc2;
+			utf8[k++] = c;
+		} else if (c >= 0xc0 && c <= 0xff) {
+			utf8[k++] = 0xc3;
+			utf8[k++] = c-0x40;
+		} else {
+			utf8[k++] = c;
+		}
+	}
+
+	*bytes = k;
+	utf8[k] = 0;
+
+	return strdup(utf8);
+}
+
+
 char * Charset::UTF8ToLatin1(const char *utf8, int *bytes)
 {
 	Char buf[1];

@@ -222,6 +222,12 @@ class Charset : public virtual jcommon::Object{
 		 */
 		int WriteUTF8(FILE *f, const char *utf8, int nbytes);
 
+		/**
+		 * Convert Latin 1 to UTF-8 charset;
+		 *
+		 */
+		char * Latin1ToUTF8(const char *latin1, int *bytes);
+
 		/*
 		 *  Convert a UTF-8 char array to an ISO Latin 1 char array (non ISO Latin 1 characters 
 		 *  will be distorted by this process). Assume the UTF-8 char array is correct.
