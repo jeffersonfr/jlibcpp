@@ -154,7 +154,7 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static std::string ProcessPath(std::string pathname);
+		static std::string GetFixedPath(std::string pathname);
 		
 		/**
 		 * \brief

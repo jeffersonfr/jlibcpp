@@ -353,12 +353,12 @@ std::string Normalize(std::string pathname, char delimiter, int len, int off)
 
 	int n = len;
 
-	while ((n > 0) && (pathname[n - 1] == '/')) {
+	while ((n > 0) && (pathname[n - 1] == delimiter)) {
 		n--;
 	}
 
 	if (n == 0) {
-		return "/";
+		return std::string("") + delimiter;
 	}
 
 	std::ostringstream o;
@@ -423,7 +423,7 @@ std::string File::NormalizePath(std::string pathname)
 	return pathname;
 }
 
-std::string File::ProcessPath(std::string pathname)
+std::string File::GetFixedPath(std::string pathname)
 {
 	jcommon::StringTokenizer tokens(NormalizePath(pathname), GetDelimiter(), jcommon::JTT_STRING, false);
 	std::vector<std::string> path;
@@ -438,7 +438,7 @@ std::string File::ProcessPath(std::string pathname)
 			if (path.size() > 1) {
 				path.erase(path.begin()+path.size()-1);
 			} else {
-				path.push_back(token);
+				// path.push_back(token);
 			}
 		}
 	}
@@ -649,7 +649,7 @@ std::string File::GetPath()
 
 std::string File::GetCanonicalPath()
 {
-	return ProcessPath(GetAbsolutePath());
+	return GetFixedPath(GetAbsolutePath());
 }
 
 std::string File::GetAbsolutePath()
