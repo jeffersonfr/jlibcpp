@@ -22,6 +22,7 @@
 #include "jgfxhandler.h"
 #include "jmemoryinputstream.h"
 #include "jthread.h"
+#include "jnullpointerexception.h"
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbimage.h"
@@ -69,11 +70,14 @@ Image * Image::CreateImage(int width, int height, jpixelformat_t pixelformat, in
 {
 	Image *image = NULL;
 
+	try {
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	image = new DFBImage(width, height, pixelformat, scale_width, scale_height);
+		image = new DFBImage(width, height, pixelformat, scale_width, scale_height);
 #elif defined(X11_UI)
-	image = new X11Image(width, height, pixelformat, scale_width, scale_height);
+		image = new X11Image(width, height, pixelformat, scale_width, scale_height);
 #endif
+	} catch (jcommon::NullPointerException &e) {
+	}
 
 	return image;
 }
@@ -82,17 +86,20 @@ Image * Image::CreateImage(uint32_t *data, int width, int height, int scale_widt
 {
 	Image *image = NULL;
 
+	try {
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	image = new DFBImage(width, height, JPF_ARGB, scale_width, scale_height); // GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+		image = new DFBImage(width, height, JPF_ARGB, scale_width, scale_height); // GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 
-	image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
-	image->GetGraphics()->SetRGB(data, 0, 0, width, height, width);
+		image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
+		image->GetGraphics()->SetRGB(data, 0, 0, width, height, width);
 #elif defined(X11_UI)
-	image = new X11Image(width, height, JPF_ARGB, scale_width, scale_height);
+		image = new X11Image(width, height, JPF_ARGB, scale_width, scale_height);
 	
-	image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
-	image->GetGraphics()->SetRGB(data, 0, 0, width, height, width);
+		image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
+		image->GetGraphics()->SetRGB(data, 0, 0, width, height, width);
 #endif
+	} catch (jcommon::NullPointerException &e) {
+	}
 
 	return image;
 }
@@ -113,17 +120,20 @@ Image * Image::CreateImage(std::string file)
 
 	GetImageSize(file, &width, &height);
 
-	if (width > 0 && height > 0) {
+	try {
+		if (width > 0 && height > 0) {
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-		image = new DFBImage(width, height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+			image = new DFBImage(width, height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 #elif defined(X11_UI)
-		image = new X11Image(width, height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+			image = new X11Image(width, height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
 #endif
 
-		if (image->GetGraphics()->DrawImage(file, 0, 0) == false) {
-			delete image;
-			image = NULL;
+			if (image->GetGraphics()->DrawImage(file, 0, 0) == false) {
+				delete image;
+				image = NULL;
+			}
 		}
+	} catch (jcommon::NullPointerException &e) {
 	}
 
 	return image;
@@ -146,11 +156,14 @@ Image * Image::CreateImage(jio::InputStream *stream)
 
 	Image *image = NULL;
 
+	try {
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	image = DFBImage::CreateImageStream(stream);
+		image = DFBImage::CreateImageStream(stream);
 #elif defined(X11_UI)
-	image = X11Image::CreateImageStream(stream);
+		image = X11Image::CreateImageStream(stream);
 #endif
+	} catch (jcommon::NullPointerException &e) {
+	}
 
 	return image;
 }
@@ -197,11 +210,14 @@ Image * Image::Rotate(double radians, bool resize)
 {
 	Image *image = NULL;
 
+	try {
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	image = DFBImage::Rotate(this, radians, resize);
+		image = DFBImage::Rotate(this, radians, resize);
 #elif defined(X11_UI)
-	image = X11Image::Rotate(this, radians, resize);
+		image = X11Image::Rotate(this, radians, resize);
 #endif
+	} catch (jcommon::NullPointerException &e) {
+	}
 
 	return image;
 }
@@ -212,15 +228,18 @@ Image * Image::Scale(int width, int height)
 
 	jsize_t scale = _graphics->GetWorkingScreenSize();
 
+	try {
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	image = new DFBImage(width, height, GetPixelFormat(), scale.width, scale.height);
+		image = new DFBImage(width, height, GetPixelFormat(), scale.width, scale.height);
 #elif defined(X11_UI)
-	image = new X11Image(width, height, GetPixelFormat(), scale.width, scale.height);
+		image = new X11Image(width, height, GetPixelFormat(), scale.width, scale.height);
 #endif
 
-	if (image->GetGraphics()->DrawImage(this, 0, 0, width, height) == false) {
-		delete image;
-		image = NULL;
+		if (image->GetGraphics()->DrawImage(this, 0, 0, width, height) == false) {
+			delete image;
+			image = NULL;
+		}
+	} catch (jcommon::NullPointerException &e) {
 	}
 
 	return image;
@@ -232,15 +251,18 @@ Image * Image::SubImage(int x, int y, int width, int height)
 
 	jsize_t scale = _graphics->GetWorkingScreenSize();
 
+	try {
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	image = new DFBImage(width, height, GetPixelFormat(), scale.width, scale.height);
+		image = new DFBImage(width, height, GetPixelFormat(), scale.width, scale.height);
 #elif defined(X11_UI)
-	image = new X11Image(width, height, GetPixelFormat(), scale.width, scale.height);
+		image = new X11Image(width, height, GetPixelFormat(), scale.width, scale.height);
 #endif
 
-	if (image->GetGraphics()->DrawImage(this, x, y, width, height, 0, 0) == false) {
-		delete image;
-		image = NULL;
+		if (image->GetGraphics()->DrawImage(this, x, y, width, height, 0, 0) == false) {
+			delete image;
+			image = NULL;
+		}
+	} catch (jcommon::NullPointerException &e) {
 	}
 
 	return image;

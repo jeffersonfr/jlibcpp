@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "jdfbfont.h"
 #include "jdfbhandler.h"
+#include "jnullpointerexception.h"
 
 namespace jgui {
 
@@ -37,11 +38,13 @@ DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size, int 
 	
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(name, size, &_font, _scale.width, _scale.height);
 
-	if (_font != NULL) {
-		_font->GetHeight(_font, &_size);
-		_font->GetAscender(_font, &_ascender);
-		_font->GetDescender(_font, &_descender);
+	if (_font == NULL) {
+		throw jcommon::NullPointerException("Cannot create a native font");
 	}
+
+	_font->GetHeight(_font, &_size);
+	_font->GetAscender(_font, &_ascender);
+	_font->GetDescender(_font, &_descender);
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
 }

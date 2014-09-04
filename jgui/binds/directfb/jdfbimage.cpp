@@ -23,6 +23,7 @@
 #include "jdfbgraphics.h"
 #include "jdfbhandler.h"
 #include "jthread.h"
+#include "jnullpointerexception.h"
 
 namespace jgui {
 
@@ -92,6 +93,10 @@ DFBImage::DFBImage(int width, int height, jpixelformat_t pixelformat, int scale_
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->
 		CreateSurface(_size.width, _size.height, &surface, pixelformat, _scale.width, _scale.height);
+
+	if (surface == NULL) {
+		throw jcommon::NullPointerException("Cannot create a native surface");
+	}
 
 	_graphics = new DFBGraphics(this, surface, false, _scale.width, _scale.height);
 

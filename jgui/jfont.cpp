@@ -22,6 +22,7 @@
 #include "jgfxhandler.h"
 #include "jstringutils.h"
 #include "jstringtokenizer.h"
+#include "jnullpointerexception.h"
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbfont.h"
@@ -62,13 +63,18 @@ Font * Font::GetDefaultFont()
 
 Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height)
 {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	return new DFBFont(name, attributes, height, scale_width, scale_height);
-#elif defined(X11_UI)
-	return new X11Font(name, attributes, height, scale_width, scale_height);
-#endif
+	Font *font = NULL;
 
-	return NULL;
+	try {
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+		font = new DFBFont(name, attributes, height, scale_width, scale_height);
+#elif defined(X11_UI)
+		font = new X11Font(name, attributes, height, scale_width, scale_height);
+#endif
+	} catch (jcommon::NullPointerException &e) {
+	}
+
+	return font;
 }
 
 void Font::SetWorkingScreenSize(jsize_t size)
