@@ -2020,13 +2020,13 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 			max_lines,
 			font_height;
 	
-	font_height = _font->GetSize();
+	font_height = _font->GetSize() + _font->GetLeading();
 
 	if (font_height <= 0) {
 		return;
 	}
 
-	max_lines = hp/(font_height+_font->GetLeading());
+	max_lines = hp/font_height;
 
 	if (max_lines <= 0) {
 		max_lines = 1;
@@ -2045,7 +2045,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 			line_yinit = 0;
 			line_ydiff = 0;
 		} else if (valign == JVA_CENTER) {
-			line_yinit = (hp-nlines*font_height)/2;
+			line_yinit = (hp-nlines*font_height+line_space)/2;
 			line_ydiff = 0;
 		} else if (valign == JVA_BOTTOM) {
 			line_yinit = hp-nlines*font_height;
@@ -2060,6 +2060,8 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 			}
 		}
 	}
+
+	font_height = font_height - _font->GetLeading();
 
 	jregion_t clip = GetClip();
 
