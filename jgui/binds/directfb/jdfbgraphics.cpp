@@ -1848,7 +1848,6 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 
 			DrawString(text, xp+dx, yp+dy);
 
-			printf("print::::: %d, %d\n", line_space, font_height);
 			dy = dy+line_space+font_height;
 
 			if (line_ydiff-- > 0) {
