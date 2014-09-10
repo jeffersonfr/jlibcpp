@@ -99,17 +99,17 @@ int DFBFont::GetVirtualSize()
 
 int DFBFont::GetSize()
 {
-	return SCREEN_TO_SCALE(_size, _screen.width, _scale.width);
+	return SCREEN_TO_SCALE(_ascender-_descender, _screen.height, _scale.height);
 }
 
 int DFBFont::GetAscender()
 {
-	return SCREEN_TO_SCALE(_ascender, _screen.width, _scale.width);
+	return SCREEN_TO_SCALE(_ascender, _screen.height, _scale.height);
 }
 
 int DFBFont::GetDescender()
 {
-	return SCREEN_TO_SCALE(abs(_descender), _screen.width, _scale.width);
+	return SCREEN_TO_SCALE(abs(_descender), _screen.height, _scale.height);
 }
 
 int DFBFont::GetMaxAdvance()
@@ -119,7 +119,7 @@ int DFBFont::GetMaxAdvance()
 
 int DFBFont::GetLeading()
 {
-	return SCREEN_TO_SCALE(_size/2.0, _screen.width, _scale.width);
+	return SCREEN_TO_SCALE(_size-_ascender+_descender, _screen.height, _scale.height);
 }
 
 int DFBFont::GetStringWidth(std::string text)
@@ -154,9 +154,9 @@ jregion_t DFBFont::GetStringExtends(std::string text)
 	_font->GetStringExtents(_font, text.c_str(), -1, &lrect, NULL); // &irect);
 
 	region.x = SCREEN_TO_SCALE(lrect.x, _screen.width, _scale.width);
-	region.y = SCREEN_TO_SCALE(lrect.y, _screen.width, _scale.width);
+	region.y = SCREEN_TO_SCALE(lrect.y, _screen.height, _scale.height);
 	region.width = SCREEN_TO_SCALE(lrect.w, _screen.width, _scale.width);
-	region.height = SCREEN_TO_SCALE(lrect.h, _screen.width, _scale.width);
+	region.height = SCREEN_TO_SCALE(lrect.h, _screen.height, _scale.height);
 	
 	return region;
 }
@@ -180,9 +180,9 @@ jregion_t DFBFont::GetGlyphExtends(int symbol)
 	_font->GetGlyphExtents(_font, symbol, &lrect, &advance);
 
 	region.x = SCREEN_TO_SCALE(lrect.x, _screen.width, _scale.width);
-	region.y = SCREEN_TO_SCALE(lrect.y, _screen.width, _scale.width);
+	region.y = SCREEN_TO_SCALE(lrect.y, _screen.height, _scale.height);
 	region.width = SCREEN_TO_SCALE(lrect.w, _screen.width, _scale.width);
-	region.height = SCREEN_TO_SCALE(lrect.h, _screen.width, _scale.width);
+	region.height = SCREEN_TO_SCALE(lrect.h, _screen.height, _scale.height);
 	
 	return region;
 }
