@@ -345,7 +345,7 @@ void TextArea::DecrementLines(int lines)
 	_current_row = _current_row + lines;
 
 	if (_current_row >= (int)(_lines.size())) {
-		_current_row = _lines.size();
+		_current_row = _lines.size()-1;
 	}
 
 	// INFO:: define a nova posicao do caret
@@ -353,7 +353,7 @@ void TextArea::DecrementLines(int lines)
 		current_length += _lines[i].size();
 	}
 
-	_caret_position = current_length-1;
+	_caret_position = current_length;
 
 	if (_font != NULL) {
 		jpoint_t scroll_location = GetScrollLocation();
