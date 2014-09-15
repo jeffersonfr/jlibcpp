@@ -452,7 +452,9 @@ void ListBox::IncrementLines(int lines)
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
-	if (scrolly > 0) {
+	lines = _index;
+
+	if ((_item_size+_item_gap)*lines < scrolly) {
 		ScrollToVisibleArea(scrollx, std::max(0, (_item_size+_item_gap)*_index), _size.width, _size.height, this);
 	}
 
@@ -489,8 +491,10 @@ void ListBox::DecrementLines(int lines)
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
-	if ((scrolly+_size.height) < (_item_size+_item_gap)*(int)_items.size()) {
-		ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*_index, _size.width, _size.height, this);
+	lines = _index+1;
+
+	if ((scrolly+_size.height) < (_item_size+_item_gap)*(int)lines) {
+		ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*lines-_size.height+2*_item_gap, _size.width, _size.height, this);
 	}
 
 	if (_index != old_index) {
