@@ -100,7 +100,7 @@ jsize_t Label::GetPreferredSize()
 
 	if (IsFontSet() == true) {
 		int wp = _size.width-2*(_horizontal_gap-_border_size),
-				hp = _font->GetAscender()+_font->GetDescender();
+				hp = _font->GetLineSize();
 
 		if (wp > 0) {
 			std::vector<std::string> lines;

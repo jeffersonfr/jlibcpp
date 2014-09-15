@@ -1734,7 +1734,8 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 			max_lines,
 			font_height;
 	
-	font_height = _font->GetSize() + _font->GetLeading();
+	font_height = _font->GetLineSize();
+	printf("::::::::::::::::: %d, %d\n", _font->GetSize(), _font->GetLineSize());
 
 	if (font_height <= 0) {
 		return;

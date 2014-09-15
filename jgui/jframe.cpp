@@ -302,7 +302,7 @@ jinsets_t Frame::GetInsets()
 
 	jinsets_t t = _insets;
 
-	t.bottom += _font->GetSize()+10;
+	t.bottom += _font->GetLineSize()+8;
 
 	return t;
 }
@@ -606,7 +606,7 @@ void Frame::PaintGlassPane(Graphics *g)
 		g->SetFont(_font);
 
 		if (IsFontSet() == true) {
-			int y = _insets.top-_font->GetSize()-15;
+			int y = _insets.top-_font->GetLineSize()-16;
 
 			if (y < 0) {
 				y = 0;
@@ -640,7 +640,7 @@ void Frame::PaintGlassPane(Graphics *g)
 				count += _font->GetStringWidth((*i).subtitle.c_str());
 
 				g->SetColor(_fgcolor);
-				g->DrawString((*i).subtitle, _size.width-count, _size.height-_insets.bottom-_border_size-_font->GetSize()/2);
+				g->DrawString((*i).subtitle, _size.width-count, _size.height-_insets.bottom-_border_size-(_font->GetLineSize()-_font->GetLeading())/2);
 			}
 
 			count += 10;

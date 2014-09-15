@@ -31,18 +31,15 @@ DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size, int 
 
 	_font = NULL;
 
-	_size = 0;
-	_ascender = 0;
-	_descender = 0;
-	_virtual_size = size;
-	
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(name, size, &_font, _scale.width, _scale.height);
 
 	if (_font == NULL) {
 		throw jcommon::NullPointerException("Cannot create a native font");
 	}
 
-	_font->GetHeight(_font, &_size);
+	_size = size;
+
+	_font->GetHeight(_font, &_line_size);
 	_font->GetAscender(_font, &_ascender);
 	_font->GetDescender(_font, &_descender);
 
@@ -92,19 +89,14 @@ std::string DFBFont::GetName()
 	return _name;
 }
 
-int DFBFont::GetVirtualSize()
-{
-	return _virtual_size;
-}
-
 int DFBFont::GetSize()
 {
-	return SCREEN_TO_SCALE(_ascender-_descender, _screen.height, _scale.height);
+	return _size;
 }
 
 int DFBFont::GetAscender()
 {
-	return SCREEN_TO_SCALE(_ascender, _screen.height, _scale.height);
+	return SCREEN_TO_SCALE(_ascender, _screen.height, _scale.height)-_size;
 }
 
 int DFBFont::GetDescender()
@@ -119,7 +111,7 @@ int DFBFont::GetMaxAdvance()
 
 int DFBFont::GetLeading()
 {
-	return SCREEN_TO_SCALE(_size-_ascender+_descender, _screen.height, _scale.height);
+	return SCREEN_TO_SCALE(_line_size-_ascender+_descender, _screen.height, _scale.height);
 }
 
 int DFBFont::GetStringWidth(std::string text)
@@ -202,7 +194,7 @@ void DFBFont::Restore()
 	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
 
 	if (_font == NULL) {
-		dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(_name, _virtual_size, &_font, _scale.width, _scale.height);
+		dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(_name, GetSize(), &_font, _scale.width, _scale.height);
 	}
 }
 

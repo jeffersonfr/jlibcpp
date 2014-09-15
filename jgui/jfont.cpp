@@ -121,9 +121,9 @@ std::string Font::GetName()
 	return _name;
 }
 
-int Font::GetVirtualSize()
+int Font::GetLineSize()
 {
-	return -1;
+	return GetSize() + GetAscender() + GetDescender() + GetLeading();
 }
 
 int Font::GetSize()

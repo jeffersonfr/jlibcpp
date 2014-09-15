@@ -129,7 +129,7 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual int GetVirtualSize();
+		virtual int GetLineSize();
 		
 		/**
 		 * \brief

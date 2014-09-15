@@ -43,7 +43,7 @@ class DFBFont : public virtual jgui::Font{
 			_ascender,
 			_descender,
 			_max_advance,
-			_virtual_size;
+			_line_size;
 
 	public:
 		/**
@@ -81,12 +81,6 @@ class DFBFont : public virtual jgui::Font{
 		 *
 		 */
 		virtual std::string GetName();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetVirtualSize();
 		
 		/**
 		 * \brief

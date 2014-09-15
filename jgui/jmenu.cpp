@@ -520,7 +520,7 @@ void Menu::Paint(Graphics *g)
 			// }
 
 			g->SetColor(_fgcolor);
-			g->DrawString(text, x+(w-_font->GetStringWidth(text))/2, (insets.top-_font->GetSize())/2);
+			g->DrawString(text, x+(w-_font->GetStringWidth(text))/2, (insets.top-_font->GetLineSize()+_font->GetLeading())/2);
 		}
 		
 		y = y + insets.top - 2*_vertical_gap;
