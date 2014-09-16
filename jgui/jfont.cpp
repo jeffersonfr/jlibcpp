@@ -55,7 +55,7 @@ Font::~Font()
 Font * Font::GetDefaultFont()
 {
 	if (_default_font == NULL) {
-		_default_font = Font::CreateFont(_DATA_PREFIX"/fonts/font.ttf", JFA_NORMAL, DEFAULT_FONT_SIZE);
+		_default_font = Font::CreateFont(_DATA_PREFIX"/fonts/default.ttf", JFA_NORMAL, DEFAULT_FONT_SIZE);
 	}
 
 	return _default_font;
@@ -64,6 +64,28 @@ Font * Font::GetDefaultFont()
 Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height)
 {
 	Font *font = NULL;
+
+	jio::File file(name);
+
+	if (file.Exists() == false) {
+		// name = std::string(_DATA_PREFIX"/fonts/");
+
+		if (attributes & JFA_BOLD) {
+			name = name + "-bold";
+		}
+		
+		if (attributes & JFA_ITALIC) {
+			name = name + "-italic";
+		}
+
+		name = std::string(_DATA_PREFIX"/fonts/") + name + ".ttf";
+
+		jio::File file(name);
+
+		if (file.Exists() == false) {
+			return NULL;
+		}
+	}
 
 	try {
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)

@@ -826,10 +826,11 @@ class GraphicPanel : public jgui::Canvas{
 		// draw string (disable COLORALPHA)
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL));
 
-		jgui::Font *f1 = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NORMAL, 50),
-			*f2 = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NORMAL, 40),
-			*f3 = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NORMAL, 30),
-			*f4 = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NORMAL, 20);
+		jgui::Font 
+			*f1 = jgui::Font::CreateFont("default.tff", jgui::JFA_NORMAL, 50),
+			*f2 = jgui::Font::CreateFont("default.tff", jgui::JFA_NORMAL, 40),
+			*f3 = jgui::Font::CreateFont("default.tff", jgui::JFA_NORMAL, 30),
+			*f4 = jgui::Font::CreateFont("default.tff", jgui::JFA_NORMAL, 20);
 		int shadow = 4;
 
 		std::string text = "DrawString";

@@ -108,15 +108,15 @@ int DFBHandler::CreateFont(std::string name, int height, IDirectFBFont **font, i
 		font_dsc.height = 1;
 	}
 
-	std::string fname = name;
+	if (name == "") {
+		(*font) = NULL;
 
-	if (fname == "") {
-		fname = "./fonts/font.ttf";
+		return -1;
 	}
 
 	jthread::AutoLock lock(&_mutex);
 
-	if (_dfb->CreateFont(_dfb, fname.c_str(), &font_dsc, font) != DFB_OK) {
+	if (_dfb->CreateFont(_dfb, name.c_str(), &font_dsc, font) != DFB_OK) {
 		(*font) = NULL;
 
 		return -1;
@@ -149,15 +149,15 @@ int DFBHandler::CreateFont(std::string name, int height, IDirectFBFont **font, D
 		font_dsc.height = 1;
 	}
 
-	std::string fname = name;
+	if (name == "") {
+		(*font) = NULL;
 
-	if (fname == "") {
-		fname = "./fonts/font.ttf";
+		return -1;
 	}
 
 	jthread::AutoLock lock(&_mutex);
 
-	if (_dfb->CreateFont(_dfb, fname.c_str(), &font_dsc, font) != DFB_OK) {
+	if (_dfb->CreateFont(_dfb, name.c_str(), &font_dsc, font) != DFB_OK) {
 		(*font) = NULL;
 
 		return -1;

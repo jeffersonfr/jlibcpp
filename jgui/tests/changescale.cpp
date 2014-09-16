@@ -32,7 +32,7 @@ class Main : public jgui::Frame{
 		Main(std::string title, int x, int y, int w, int h, int sw, int sh):
 			jgui::Frame(title, x, y, w, h, sw, sh)
 		{
-			SetFont(jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/font.ttf", jgui::JFA_NORMAL, 24, sw, sh));
+			SetFont(jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 24, sw, sh));
 
 			_grid_layout = new jgui::GridLayout(4, 4, 10, 10);
 

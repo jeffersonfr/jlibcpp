@@ -606,7 +606,7 @@ void Frame::PaintGlassPane(Graphics *g)
 		g->SetFont(_font);
 
 		if (IsFontSet() == true) {
-			int y = _insets.top-_font->GetLineSize()-16;
+			int y = (_insets.top-_font->GetLineSize())/2;
 
 			if (y < 0) {
 				y = 0;
@@ -619,7 +619,6 @@ void Frame::PaintGlassPane(Graphics *g)
 			// }
 
 			g->SetColor(_fgcolor);
-		
 			g->DrawString(text, _insets.left+(_size.width-_insets.left-_insets.right-_font->GetStringWidth(text))/2, y);
 		}
 	}
