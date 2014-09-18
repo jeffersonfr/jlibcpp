@@ -117,8 +117,6 @@ std::string StringUtils::ReplaceString(std::string s, std::string old, std::stri
 		// s.insert(x, brand);
 
 		x = s.find(old, x+brand.size()+1);
-
-		sleep(1);
 	}
 
 	return s;
