@@ -39,17 +39,53 @@ StringUtils::~StringUtils()
 
 std::string StringUtils::LeftTrim(std::string str, std::string chars)
 {
-	return str.erase(0, str.find_first_not_of(STRING_EMPTY_CHARS));
+	if (str.size() > 0) {
+		std::string::size_type idx = str.find_first_not_of(chars);
+
+		if (idx != std::string::npos) {
+			str = str.substr(idx);
+		}
+	}
+
+	return str;
+	
+	// return str.erase(0, str.find_first_not_of(STRING_EMPTY_CHARS));
 }
 
 std::string StringUtils::RightTrim(std::string str, std::string chars)
 {
-	return str.erase(str.find_last_not_of(STRING_EMPTY_CHARS)+1);
+	if (str.size() > 0) {
+		std::string::size_type idx = str.find_last_not_of(chars);
+
+		if (idx != std::string::npos) {
+			str = str.substr(0, idx+1);
+		}
+	}
+
+	return str;
+	
+	// return str.erase(str.find_last_not_of(STRING_EMPTY_CHARS)+1);
 }
 
 std::string StringUtils::Trim(std::string str, std::string chars)
 {
-	return LeftTrim(RightTrim(str, chars), chars);
+	if (str.size() > 0) {
+		std::string::size_type idx = str.find_first_not_of(chars);
+
+		if (idx != std::string::npos) {
+			str = str.substr(idx);
+		}
+
+		idx = str.find_last_not_of(chars);
+
+		if (idx != std::string::npos) {
+			str = str.substr(0, idx+1);
+		}
+	}
+
+	return str;
+	
+	// return LeftTrim(RightTrim(str, chars), chars);
 }
 
 std::string StringUtils::ToLower(std::string str)
@@ -75,10 +111,14 @@ std::string StringUtils::ReplaceString(std::string s, std::string old, std::stri
 	std::string::size_type x = s.find(old);
 
 	while (x != std::string::npos) {
-		s.erase(x, old.size());
-		s.insert(x, brand);
+		s = s.substr(0, x) + brand + s.substr(x+1);
 
-		x = s.find(old, x+1);
+		// s.erase(x, old.size());
+		// s.insert(x, brand);
+
+		x = s.find(old, x+brand.size()+1);
+
+		sleep(1);
 	}
 
 	return s;
