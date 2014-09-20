@@ -32,6 +32,7 @@ Thread::Thread(jthread_type_t type, ThreadGroup *group):
 
 	_runnable = NULL;
 	_type = type;
+	_cancel = JTC_DEFERRED;
 	_group = group;
 	_stack_size = -1;
 
@@ -71,11 +72,6 @@ Thread::~Thread()
 	Release();
 }
 
-ThreadGroup * Thread::GetThreadGroup()
-{
-	return _group;
-}
-
 void Thread::Sleep(uint64_t time_)
 {
 #ifdef _WIN32
@@ -102,6 +98,21 @@ void Thread::USleep(uint64_t time_)
 #else
 	usleep((useconds_t)time_);
 #endif
+}
+
+void Thread::SetCancelType(jthread_cancel_t type)
+{
+	_cancel = type;
+}
+
+jthread_cancel_t Thread::GetCancelType()
+{
+	return _cancel;
+}
+
+ThreadGroup * Thread::GetThreadGroup()
+{
+	return _group;
 }
 
 void Thread::Yield()
@@ -161,21 +172,47 @@ void * Thread::ThreadMain(void *owner_)
 	jthread_map_t *t = (jthread_map_t *)owner_;
 
 #ifdef _WIN32
-#else
-	if (t->thiz->_type == JTT_JOINABLE) {
-		pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
-	} else if (t->thiz->_type == JTT_DETACH) {
-		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
-	}
-
-	pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-#endif
+	t->thiz->_thread_semaphore.Notify();
 
 	t->thiz->Run();
 
 	t->alive = false;
+#else
+	if (t->thiz->_cancel == JTC_DISABLED) {
+		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+	} else if (t->thiz->_cancel == JTC_DEFERRED) {
+		pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
+		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+	} else if (t->thiz->_cancel == JTC_ASYNCHRONOUS) {
+		pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
+	}
+
+	pthread_cleanup_push((Thread::ThreadCleanup), owner_); 
+
+	t->thiz->_thread_semaphore.Notify();
+
+	t->thiz->Run();
+
+	pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
+
+	t->alive = false;
 
 	pthread_exit(NULL);
+	
+	pthread_cleanup_pop(0);
+#endif
+}
+
+#ifdef _WIN32
+void WINAPI Thread::ThreadCleanup(LPVOID owner_)
+#else
+void Thread::ThreadCleanup(void *owner_)
+#endif
+{
+	jthread_map_t *t = (jthread_map_t *)owner_;
+
+	t->thiz->Cleanup();
 }
 
 jthread_map_t * Thread::GetMap(int id)
@@ -210,11 +247,19 @@ void Thread::Cleanup()
 {
 }
 
+void Thread::CancelHook()
+{
+#ifdef _WIN32
+#else
+	pthread_testcancel();
+#endif
+}
+
 /** End */
 
 void Thread::Start(int id)
 {
-	AutoLock lock(&jthread_mutex);
+	AutoLock lock(&_thread_mutex);
 
 	Setup();
 
@@ -239,6 +284,8 @@ void Thread::Start(int id)
 				t,					// thread arguments
 				0,					// flag
 				&_thread_id) == NULL) {
+		_thread_mutex.Unlock();
+
 		throw ThreadException("Create thread failed");
 	}
 
@@ -274,11 +321,13 @@ void Thread::Start(int id)
 
 	pthread_attr_destroy(&attr);
 #endif
+
+	_thread_semaphore.Wait();
 }
 
 bool Thread::Interrupt(int id)
 {
-	AutoLock lock(&jthread_mutex);
+	AutoLock lock(&_thread_mutex);
 
 	jthread_map_t *t = GetMap(id);
 
@@ -286,12 +335,12 @@ bool Thread::Interrupt(int id)
 		return true;
 	}
 
-	t->alive = false;
-
 #ifdef _WIN32
 	if (TerminateThread(_thread, 0) == FALSE) {
 		return false; // CHANGE:: throw ThreadException("Thread cancel exception");
 	}
+
+	t->alive = false;
 
 	/*
 	if ((void *)_sa != NULL) {
@@ -307,10 +356,8 @@ bool Thread::Interrupt(int id)
 	}
 	*/
 #else
-	if (_type == JTT_JOINABLE) {
-		pthread_cancel(t->thread);
-	} else if (_type == JTT_DETACH) {
-		pthread_cancel(t->thread);
+	if (pthread_cancel(t->thread) == 0) {
+		t->alive = false;
 	}
 #endif
 
@@ -319,7 +366,7 @@ bool Thread::Interrupt(int id)
 
 void Thread::Suspend(int id) 
 {
-	AutoLock lock(&jthread_mutex);
+	AutoLock lock(&_thread_mutex);
 
 	jthread_map_t *t = GetMap(id);
 
@@ -342,7 +389,7 @@ void Thread::Suspend(int id)
 
 void Thread::Resume(int id)
 {
-	AutoLock lock(&jthread_mutex);
+	AutoLock lock(&_thread_mutex);
 
 	jthread_map_t *t = GetMap(id);
 
@@ -364,7 +411,7 @@ void Thread::Resume(int id)
 
 bool Thread::IsRunning(int id)
 {
-	AutoLock lock(&jthread_mutex);
+	AutoLock lock(&_thread_mutex);
 
 	jthread_map_t *t = GetMap(id);
 
@@ -377,7 +424,7 @@ bool Thread::IsRunning(int id)
 
 void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 {
-	AutoLock lock(&jthread_mutex);
+	AutoLock lock(&_thread_mutex);
 
 	int tpriority = 0;
 
@@ -447,7 +494,7 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 
 void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority) 
 {
-	AutoLock lock(&jthread_mutex);
+	AutoLock lock(&_thread_mutex);
 
 #ifdef _WIN32
 	int r;
@@ -533,7 +580,7 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 
 void Thread::WaitThread(int id)
 {
-	AutoLock lock(&jthread_mutex);
+	AutoLock lock(&_thread_mutex);
 
 	jthread_map_t *t = GetMap(id);
 
@@ -548,12 +595,12 @@ void Thread::WaitThread(int id)
 #else
 	if (_type == JTT_JOINABLE) {
 		if (t->detached == false) {
-			jthread_mutex.Unlock();
+			_thread_mutex.Unlock();
 			pthread_join(t->thread, NULL);
-			jthread_mutex.Lock();
+			_thread_mutex.Lock();
 			pthread_detach(t->thread);
 	
-			Cleanup();
+			// Cleanup();
 
 			t->detached = true;
 			t->alive = false;
@@ -564,7 +611,7 @@ void Thread::WaitThread(int id)
 
 void Thread::Release()
 {
-	AutoLock lock(&jthread_mutex);
+	AutoLock lock(&_thread_mutex);
 
 	if (_group != NULL) {
 		_group->UnregisterThread(this);

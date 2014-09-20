@@ -40,6 +40,12 @@ enum jthread_type_t {
 	JTT_JOINABLE
 };
 
+enum jthread_cancel_t {
+	JTC_DISABLED,
+	JTC_DEFERRED,
+	JTC_ASYNCHRONOUS
+};
+
 enum jthread_priority_t {
 	JTP_LOW,
 	JTP_NORMAL,
@@ -94,17 +100,19 @@ class Thread : public virtual jcommon::Object{
 #else
 #endif
 		/** \brief */
-		Semaphore _semaphore;
-		/** \brief */
 		jthread_t _thread;
 		/** \brief */
 		std::map<int, jthread_map_t *> _threads;
 		/** \brief */
-		Mutex jthread_mutex;
+		Mutex _thread_mutex;
+		/** \brief */
+		Semaphore _thread_semaphore;
 		/** \brief */
 		Runnable *_runnable;
 		/** \brief */
 		ThreadGroup *_group;
+		/** \brief */
+		jthread_cancel_t _cancel;
 		/** \brief */
 		jthread_type_t _type;
 		/** \brief */
@@ -120,12 +128,24 @@ class Thread : public virtual jcommon::Object{
 		 *
 		 */
 		static DWORD WINAPI ThreadMain(void *owner_);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		static void WINAPI ThreadCleanup(void *owner_);
 #else
 		/**
 		 * \brief
 		 *
 		 */
 		static void * ThreadMain(void *owner_);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		static void ThreadCleanup(void *owner_);
 #endif
 
 		/**
@@ -153,6 +173,12 @@ class Thread : public virtual jcommon::Object{
 		 */
 		virtual void Cleanup();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void CancelHook();
+
 	public:
 		/**
 		 * \brief Construtor.
@@ -176,12 +202,6 @@ class Thread : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual ThreadGroup * GetThreadGroup();
-
-		/**
-		 * \brief
-		 *
-		 */
 		static void Sleep(uint64_t time_);
 
 		/**
@@ -195,6 +215,24 @@ class Thread : public virtual jcommon::Object{
 		 *
 		 */
 		static void USleep(uint64_t time_);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCancelType(jthread_cancel_t type);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jthread_cancel_t GetCancelType();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ThreadGroup * GetThreadGroup();
 
 		/**
 		 * \bried
@@ -230,13 +268,13 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Interrupt the thread.
 		 *
 		 */
-		bool Interrupt(int id = 0);
+		virtual bool Interrupt(int id = 0);
 
 		/**
 		 * \brief Suspend the thread.
 		 *
 		 */
-		void Suspend(int id = 0);
+		virtual void Suspend(int id = 0);
 
 		/**
 		 * \brief Resume the thread.
