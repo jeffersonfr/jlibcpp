@@ -51,6 +51,11 @@ class T : public jthread::Thread{
 			std::cout << "Hello, world !" << std::endl;
 		}
 
+		virtual void Cleanup()
+		{
+			std::cout << "Cleanup" << std::endl;
+		}
+
 };
 
 long long get_current_time()
@@ -70,6 +75,7 @@ int main() {
 	try {
 		for (i=0; i<MAX_LOOP_THREAD; i++) {
 			t.Start();
+			// t.Interrupt();
 			t.WaitThread();
 		}
 	} catch (...) {
