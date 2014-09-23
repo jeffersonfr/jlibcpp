@@ -286,7 +286,28 @@ Date::~Date()
 #endif
 }
 
-double Date::ToJulian()
+uint32_t Date::ToJulian()
+{
+	int d, m, y;
+
+#ifdef _WIN32
+	d = _zone.wDay;
+	m = _zone.wMonth;
+	y = _zone.wYear;
+#else
+	d = _zone->tm_mday;
+	m = _zone->tm_mon+1;
+	y = 1900 + _zone->tm_year;
+#endif
+
+	int a1 = (14 - m) / 12;
+	int y1 = y + 4800 - a1;
+	int m1 = m + 12 * a1 - 3;
+
+	return d + (153*m1 + 2) / 5 + y1*365 + y1/4 - y1/100 + y1/400 - 32045; // 1, 1, 1970
+}
+
+double Date::ToGregorian()
 {
 	return double(_time)/864000000000.0+2299160.5; // first day of Gregorian reform (Oct 15 1582)
 }

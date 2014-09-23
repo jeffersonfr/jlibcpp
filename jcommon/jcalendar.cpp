@@ -187,7 +187,7 @@ void Calendar::DecrementDay()
 	SetTime(dia, mes, ano);
 }
 
-bool Calendar::IsValidated()
+bool Calendar::IsValid()
 {
 	return true;
 }

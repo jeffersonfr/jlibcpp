@@ -122,7 +122,7 @@ class Calendar : public virtual jcommon::Object{
 		* \brief
 		*
 		*/
-		bool IsValidated();
+		bool IsValid();
 		
 		/**
 		* \brief Conta os dias desta data ateh date2

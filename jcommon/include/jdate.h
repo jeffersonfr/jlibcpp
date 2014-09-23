@@ -92,7 +92,13 @@ class Date : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		double ToJulian();
+		uint32_t ToJulian();
+
+		/**
+		 * \brief
+		 *
+		 */
+		double ToGregorian();
 
 		/**
 		 * \brief

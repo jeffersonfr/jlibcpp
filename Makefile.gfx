@@ -26,12 +26,12 @@ endif
 ifeq ($(ENABLE_GRAPHICS),directfb-cairo)
 	CCFLAGS 	+= \
 		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
-		 `pkg-config --cflags directfb` \
 		 `pkg-config --cflags cairo` \
+		 `pkg-config --cflags directfb` \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs directfb` \
 		 `pkg-config --libs cairo` \
+		 `pkg-config --libs directfb` \
 
 	DEFINES		+= \
 		 -DDIRECTFB_CAIRO_UI \

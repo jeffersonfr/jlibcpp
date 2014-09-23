@@ -68,8 +68,6 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int hei
 	jio::File file(name);
 
 	if (file.Exists() == false) {
-		// name = std::string(_DATA_PREFIX"/fonts/");
-
 		if (attributes & JFA_BOLD) {
 			name = name + "-bold";
 		}
