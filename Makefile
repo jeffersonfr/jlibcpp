@@ -263,7 +263,6 @@ OBJS_jthread += \
 	   jrwlock.o\
 	   jrunnable.o\
 	   jsemaphore.o\
-	   jnamedsemaphore.o\
 	   jthread.o\
 	   jthreadexception.o\
 	   jsemaphoreexception.o\
