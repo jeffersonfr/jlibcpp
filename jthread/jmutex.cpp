@@ -88,17 +88,13 @@ Mutex::~Mutex()
 
 bool Mutex::IsLocked()
 {
-#ifdef _WIN32
-	return (_lock_count != 0);
-#else 
-	bool locked;
+	if (TryLock() == true) {
+		Unlock();
 
-	if ((locked = pthread_mutex_trylock(&_mutex)) == 0) {
-		pthread_mutex_unlock(&_mutex);
+		return true;
 	}
 
-	return !locked;
-#endif
+	return false;
 }
 
 void Mutex::Lock()
@@ -108,8 +104,10 @@ void Mutex::Lock()
 	
 	_lock_count++;
 #else 
-	if (pthread_mutex_lock(&_mutex) != 0) {
-		if (errno == EDEADLK) {
+	int r;
+
+	if ((r = pthread_mutex_lock(&_mutex)) != 0) {
+		if (r == EDEADLK) {
 			throw MutexException("Error check monitor, dead lock");
 		} else {
 			throw MutexException("Mutex lock failed");
@@ -134,10 +132,12 @@ void Mutex::Lock(int time_)
 	t.tv_sec += (int64_t)(time_/1000000LL);
 	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
 
-	if (pthread_mutex_timedlock(&_mutex, &t) != 0) {
-		if (errno == EDEADLK) {
+	int r;
+
+	if ((r = pthread_mutex_timedlock(&_mutex, &t)) != 0) {
+		if (r == EDEADLK) {
 			throw MutexException("Error check monitor, dead lock");
-		} else if (errno == ETIMEDOUT) {
+		} else if (r == ETIMEDOUT) {
 			throw jcommon::TimeoutException("Mutex lock timeout");
 		} else {
 			throw MutexException("Mutex lock failed");
@@ -157,11 +157,13 @@ void Mutex::Unlock()
 
 	LeaveCriticalSection(&_mutex);
 #else 
-	if (pthread_mutex_unlock(&_mutex) != 0) {
-		if (errno == EINVAL || errno == EFAULT || errno == EPERM) {
-			throw MutexException("Error check monitor, calling thread does");
+	int r;
+
+	if ((r = pthread_mutex_unlock(&_mutex)) != 0) {
+		if (r == EPERM) {
+			// throw MutexException("Current thread does not own the mutex");
 		} else {
-			// throw MutexException("Mutex unlock failed");
+			throw MutexException("Mutex unlock failed");
 		}
 	}
 #endif
@@ -176,8 +178,18 @@ bool Mutex::TryLock()
 		return false;
 	}
 #else 
-	if (pthread_mutex_trylock(&_mutex) != 0) {
-		return false;
+	int r;
+
+	if ((r = pthread_mutex_trylock(&_mutex)) != 0) {
+		if (r == EBUSY) {
+			return false;
+		} else if (r == EDEADLK) {
+			return false;
+
+			// throw MutexException("Dead lock in try lock");
+		} else {
+			throw MutexException("Mutex trylock failed");
+		}
 	}
 #endif 
 
