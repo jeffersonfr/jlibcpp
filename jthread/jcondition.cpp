@@ -73,16 +73,16 @@ void Condition::Wait(Mutex *mutex)
 		}
 	}
 #else
-	if ((void *)mutex == NULL) {
-		jthread::AutoLock lock(&_monitor);
+	jthread::Mutex *m = mutex;
 
-		if (pthread_cond_wait(&_condition, &_monitor._mutex) != 0) {
-			throw SemaphoreException("Condition wait error");
-		}
-	} else {
-		if (pthread_cond_wait(&_condition, &mutex->_mutex) != 0) {
-			throw SemaphoreException("Condition wait error");
-		}
+	if ((void *)mutex == NULL) {
+		m = &_monitor;
+	}
+
+	jthread::AutoLock lock(m);
+
+	if (pthread_cond_wait(&_condition, &m->_mutex) != 0) {
+		throw SemaphoreException("Condition wait error");
 	}
 #endif
 }
@@ -117,13 +117,15 @@ void Condition::Wait(uint64_t time_, Mutex *mutex)
 	t.tv_sec += (int64_t)(time_/1000000LL);
 	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
 
-	if ((void *)mutex == NULL) {
-		jthread::AutoLock lock(&_monitor);
+	jthread::Mutex *m = mutex;
 
-		result = pthread_cond_timedwait(&_condition, &_monitor._mutex, &t);
-	} else {
-		result = pthread_cond_timedwait(&_condition, &mutex->_mutex, &t);
+	if ((void *)mutex == NULL) {
+		m = &_monitor;
 	}
+
+	jthread::AutoLock lock(m);
+
+	result = pthread_cond_timedwait(&_condition, &m->_mutex, &t);
 
 	if (result == ETIMEDOUT) {
 		throw SemaphoreTimeoutException("Semaphore wait timeout");
@@ -138,6 +140,8 @@ void Condition::Notify()
 #ifdef _WIN32
 	WakeConditionVariable(&_condition);
 #else
+	jthread::AutoLock lock(&_monitor);
+
 	if (pthread_cond_signal(&_condition) != 0) {
 		throw SemaphoreException("Condition notify error");
 	}
@@ -149,6 +153,8 @@ void Condition::NotifyAll()
 #ifdef _WIN32
 	WakeAllConditionVariable(&_condition);
 #else
+	jthread::AutoLock lock(&_monitor);
+
 	if (pthread_cond_broadcast(&_condition) != 0) {
 		throw SemaphoreException("Condition notify all error");
 	}

@@ -36,6 +36,7 @@ union semun {
 	struct seminfo *__buf;    // buffer for IPC_INFO
 };
 #endif
+
 SharedSemaphore::SharedSemaphore(jkey_t key_):
 	jcommon::Object()
 {

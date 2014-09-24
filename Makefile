@@ -19,7 +19,7 @@ ARFLAGS		= \
 
 # -ansi: problemas com va_copy()
 CCFLAGS		= \
-		 -Wall -shared -rdynamic -fPIC -funroll-loops -O2 \
+		 -Wall -shared -rdynamic -fPIC -funroll-loops -O2 -pthread \
 		 $(DEBUG) -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" \
 		 -I$(INCDIR) \
 		 -Iwin32/win32 \
@@ -183,6 +183,7 @@ OBJS_jshared += \
 	   jmessagequeue.o\
 	   jmessageexception.o\
 	   jnamedpipe.o\
+	   jnamedsemaphore.o\
 	   jprocessexception.o\
 	   jprocessinputstream.o\
 	   jprocessoutputstream.o\
@@ -254,6 +255,7 @@ OBJS_jthread += \
 	   jcondition.o\
 		 jcountdownlatch.o\
 		 jevent.o\
+		 jfifomutex.o\
 		 jillegalstateexception.o\
 		 jinterruptedexception.o\
 		 jmonitor.o\

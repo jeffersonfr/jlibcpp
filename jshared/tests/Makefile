@@ -30,7 +30,10 @@ OBJS_ipcshared = \
 OBJS_semaphore = \
 	   semaphore.o\
 
-all: fifo_teste msg_teste process ipcmap ipcshared semaphore
+OBJS_namedsem = \
+	   namedsem.o\
+
+all: fifo_teste msg_teste process ipcmap ipcshared semaphore namedsem
 	
 fifo_teste: $(OBJS_fifo_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -51,10 +54,13 @@ ipcshared: $(OBJS_ipcshared)
 semaphore: $(OBJS_semaphore)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
+namedsem: $(OBJS_namedsem)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< && $(ECHO) "Compiling $< ...  $(OK)" 
 
 install:
 
 clean:
-	@rm -rvf *.o *~ fifo_teste msg_teste process ipcmap ipcshared multiply semaphore
+	@rm -rvf *.o *~ fifo_teste msg_teste process ipcmap ipcshared multiply semaphore namedsem
