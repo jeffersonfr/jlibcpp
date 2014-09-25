@@ -60,10 +60,10 @@ OBJS_notifyall = \
 OBJS_semaphore = \
 		semaphore.o\
 
-OBJS_binsem = \
-		binsem.o\
+OBJS_counter_semaphore = \
+		counter_semaphore.o\
 
-all: counter buffer stress quicksort philosopher philosopher_fast producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin notifyall semaphore binsem
+all: counter buffer stress quicksort philosopher philosopher_fast producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin notifyall semaphore counter_semaphore
 
 counter: $(OBJS_counter)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -113,7 +113,7 @@ notifyall: $(OBJS_notifyall)
 semaphore: $(OBJS_semaphore)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-binsem: $(OBJS_binsem)
+counter_semaphore: $(OBJS_counter_semaphore)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
@@ -123,4 +123,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ counter buffer stress quicksort philosopher philosopher_fast producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin notifyall semaphore binsem
+	@rm -rvf *.o *~ counter buffer stress quicksort philosopher philosopher_fast producer_consumer pi monitor1 monitor2 monitor3 monitor4 timertask spin notifyall semaphore counter_semaphore

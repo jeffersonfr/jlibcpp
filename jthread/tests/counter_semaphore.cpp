@@ -17,11 +17,14 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "jthread.h"
 #include "jcondition.h"
 
 #include <iostream>
 
-class BSemaphore {
+#include <stdlib.h>
+
+class CounterSemaphore {
 
 	private:
 		jthread::Mutex _mutex;
@@ -29,12 +32,12 @@ class BSemaphore {
 		int _value;
 
 	public:
-		BSemaphore(int value = 1)
+		CounterSemaphore(int value = 0)
 		{
-			_value = value;
+			_value = value+1;
 		}
 		
-		virtual ~BSemaphore()
+		virtual ~CounterSemaphore()
 		{
 		}
 
@@ -42,11 +45,11 @@ class BSemaphore {
 		{
 			_mutex.Lock();
 
-			_value = _value - 1;
-
 			while (_value <= 0) {
 				_condition.Wait(&_mutex);
 			}
+
+			_value = _value - 1;
 
 			_mutex.Unlock();
 		}
@@ -59,10 +62,45 @@ class BSemaphore {
 
 			count = _value++;
 
-			_mutex.Unlock();
-
 			if (count > 0) {
 				_condition.Notify();
+			}
+
+			_mutex.Unlock();
+		}
+
+};
+
+CounterSemaphore s;
+int n = 1000;
+int nl = n/2;
+int nu = n/2;
+
+class TestClass : public jthread::Thread {
+
+	private:
+		bool lock;
+
+	public:
+		TestClass(bool lock) 
+		{
+			this->lock = lock;
+		}
+
+		virtual ~TestClass()
+		{
+		}
+
+		virtual void Run()
+		{
+			if (lock == true) {
+				s.Wait();
+
+				std::cout << "Wait:: " << ++nl << std::endl;
+			} else {
+				s.Notify();
+
+				std::cout << "Notify:: " << ++nu << std::endl;
 			}
 		}
 
@@ -70,12 +108,38 @@ class BSemaphore {
 
 int main() 
 {
-	BSemaphore s;
+	int k = 0;
+	TestClass *tests[n];
 
-	s.Notify();
-	s.Notify();
-	s.Wait();
-	s.Wait();
+	do {
+		int r = random()%2;
+
+		if (r == 0) {
+			if (nl > 0) {
+				nl = nl - 1;
+
+				tests[k++] = new TestClass(true);
+			}
+		} else {
+			if (nu > 0) {
+				nu = nu - 1;
+
+				tests[k++] = new TestClass(false);
+			}
+		}
+	} while (nl != 0 || nu != 0);
+
+	for (int i=0; i<k; i++) {
+		tests[i]->Start();
+	}
+
+	for (int i=0; i<k; i++) {
+		tests[i]->WaitThread();
+	}
+
+	for (int i=0; i<k; i++) {
+		delete tests[i];
+	}
 
 	return 0;
 }
