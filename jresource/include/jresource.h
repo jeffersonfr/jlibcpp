@@ -45,7 +45,7 @@ class Resource{
 		/** \brief */
 		ResourceStatusListener *_listener;
 		/** \brief */
-		jthread::Mutex _mutex;
+		jthread::Mutex _resource_mutex;
 		/** \brief */
 		jthread::Condition _sem;
 		/** \brief */

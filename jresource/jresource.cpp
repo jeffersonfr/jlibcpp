@@ -25,8 +25,7 @@
 
 namespace jresource {
 
-Resource::Resource():
-	_mutex(jthread::JMT_RECURSIVE)
+Resource::Resource()
 {
 	_listener = NULL;
 	_is_available = true;
@@ -38,7 +37,7 @@ Resource::~Resource()
 
 bool Resource::IsAvailable()
 {
-	jthread::AutoLock lock(&_mutex);
+	// jthread::AutoLock lock(&_resource_mutex);
 
 	return _is_available;
 }
@@ -49,7 +48,7 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int64_t tim
 		throw jcommon::IllegalArgumentException("Resource listener cannot be null");
 	}
 
-	jthread::AutoLock lock(&_mutex);
+	// jthread::AutoLock lock(&_resource_mutex);
 
 	if (_is_available == false) {
 		if (force == true) {
@@ -72,7 +71,9 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int64_t tim
 					while (_listener->ReleaseRequested((event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED))) != true) {
 						DispatchResourceStatusEvent(event);
 
-						_sem.Wait(&_mutex);
+						// _sem.Wait(&_resource_mutex);
+
+						jthread::Thread::Sleep(1);
 					}
 				} else {
 					ResourceStatusEvent *event;
@@ -82,11 +83,11 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int64_t tim
 					while ((request = _listener->ReleaseRequested((event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED)))) != true) {
 						DispatchResourceStatusEvent(event);
 
-						_mutex.Unlock();
+						// _resource_mutex.Unlock();
 
 						jthread::Thread::USleep(fixed);
 
-						_mutex.Lock();
+						// _resource_mutex.Lock();
 
 						count = count + fixed;
 
@@ -119,9 +120,9 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int64_t tim
 
 void Resource::Release()
 {
-	jthread::AutoLock lock(&_mutex);
+	// jthread::AutoLock lock(&_resource_mutex);
 
-	if (_is_available == false) {
+	if (IsAvailable() == false) {
 		ResourceTypeEvent *type_event = new ResourceTypeEvent(this, JRT_RELEASED);
 		ResourceStatusEvent *status_event = new ResourceStatusEvent(this, JRS_RELEASED);
 

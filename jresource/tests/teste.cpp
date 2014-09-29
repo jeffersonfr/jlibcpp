@@ -37,7 +37,7 @@ class LogDevice : public jresource::Resource {
 		static LogDevice *_instance;
 
 	private:
-		jthread::Mutex _mutex;
+		jthread::Mutex _log_mutex;
 
 	private:
 		LogDevice()
@@ -67,12 +67,12 @@ class LogDevice : public jresource::Resource {
 
 		virtual void Lock()
 		{
-			_mutex.Lock();
+			_log_mutex.Lock();
 		}
 
 		virtual void Unlock()
 		{
-			_mutex.Unlock();
+			_log_mutex.Unlock();
 		}
 
 };
