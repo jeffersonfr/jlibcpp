@@ -341,6 +341,10 @@ void CalendarDialogBox::BuildCalendar()
 
 bool CalendarDialogBox::ProcessEvent(KeyEvent *event)
 {
+	if (Frame::ProcessEvent(event) == true) {
+		return true;
+	}
+
 	if (event->GetType() != jgui::JKT_PRESSED) {
 		return false;
 	}

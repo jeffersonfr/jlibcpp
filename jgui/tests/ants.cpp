@@ -86,7 +86,7 @@ class Main : public jgui::Frame{
 
 			foffscreen = NULL;
 
-			fweights = jgui::Font::CreateFont("default.tff", jgui::JFA_NORMAL, 12);
+			fweights = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 12);
 #endif
 
 			board = new path_t[MAX_COLS*MAX_ROWS];

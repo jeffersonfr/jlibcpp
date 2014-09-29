@@ -827,10 +827,10 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL));
 
 		jgui::Font 
-			*f1 = jgui::Font::CreateFont("default.tff", jgui::JFA_NORMAL, 50),
-			*f2 = jgui::Font::CreateFont("default.tff", jgui::JFA_NORMAL, 40),
-			*f3 = jgui::Font::CreateFont("default.tff", jgui::JFA_NORMAL, 30),
-			*f4 = jgui::Font::CreateFont("default.tff", jgui::JFA_NORMAL, 20);
+			*f1 = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 50),
+			*f2 = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 40),
+			*f3 = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 30),
+			*f4 = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 20);
 		int shadow = 4;
 
 		std::string text = "DrawString";
