@@ -27,8 +27,6 @@ MessageDialogBox::MessageDialogBox(std::string title, std::string msg):
 {
 	jcommon::Object::SetClassName("jgui::MessageDialogBox");
 
-	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
-
 	int cw = DEFAULT_COMPONENT_WIDTH,
 			ch = DEFAULT_COMPONENT_HEIGHT;
 
@@ -51,6 +49,8 @@ MessageDialogBox::MessageDialogBox(std::string title, std::string msg):
 	_ok->RequestFocus();
 
 	Pack();
+
+	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 }
 
 MessageDialogBox::~MessageDialogBox() 

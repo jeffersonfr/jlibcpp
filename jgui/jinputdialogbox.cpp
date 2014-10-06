@@ -27,8 +27,6 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg):
 {
 	jcommon::Object::SetClassName("jgui::InputDialogBox");
 
-	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
-
 	int cw = DEFAULT_COMPONENT_WIDTH,
 			ch = DEFAULT_COMPONENT_HEIGHT;
 
@@ -57,6 +55,8 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg):
 	_field->RequestFocus();
 
 	Pack();
+
+	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 }
 
 InputDialogBox::~InputDialogBox() 

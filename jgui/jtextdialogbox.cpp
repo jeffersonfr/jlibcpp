@@ -27,8 +27,6 @@ TextDialogBox::TextDialogBox(std::string msg, bool wrap):
 {
 	jcommon::Object::SetClassName("jgui::TextDialogBox");
 
-	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
-
 	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
 
 	_label->SetGap(10, 10);
@@ -41,6 +39,8 @@ TextDialogBox::TextDialogBox(std::string msg, bool wrap):
 	Add(_label);
 
 	Pack();
+
+	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 }
 
 TextDialogBox::~TextDialogBox() 

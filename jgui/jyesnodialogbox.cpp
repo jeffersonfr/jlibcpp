@@ -27,8 +27,6 @@ YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg):
 {
 	jcommon::Object::SetClassName("jgui::YesNoDialogBox");
 
-	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
-
 	int cw = DEFAULT_COMPONENT_WIDTH,
 			ch = DEFAULT_COMPONENT_HEIGHT;
 
@@ -56,6 +54,8 @@ YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg):
 	_no->RequestFocus();
 
 	Pack();
+
+	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 }
 
 YesNoDialogBox::~YesNoDialogBox() 
