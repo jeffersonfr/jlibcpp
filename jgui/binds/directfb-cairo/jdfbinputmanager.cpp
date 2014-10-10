@@ -51,7 +51,6 @@ class EventBroadcaster : public jthread::Thread {
 
 		virtual ~EventBroadcaster()
 		{
-			Release();
 		}
 
 		virtual jcommon::Listener * GetListener()
@@ -115,7 +114,7 @@ class EventBroadcaster : public jthread::Thread {
 					_sem.Wait(&_mutex);
 
 					if (_is_running == false) {
-						break;
+						return;
 					}
 				}
 
@@ -941,7 +940,9 @@ void DFBInputManager::RemoveKeyListener(KeyListener *listener)
 
 				_broadcasters.erase(i);
 
-				// delete broadcaster;
+				broadcaster->Release();
+
+				// TODO:: delete broadcaster;
 			}
 
 			break;
@@ -1032,7 +1033,9 @@ void DFBInputManager::RemoveMouseListener(MouseListener *listener)
 
 				_broadcasters.erase(i);
 
-				// delete broadcaster;
+				broadcaster->Release();
+
+				// TODO:: delete broadcaster;
 			}
 
 			break;
