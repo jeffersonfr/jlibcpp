@@ -58,6 +58,10 @@ void Graphics::SetNativeSurface(void *addr)
 {
 }
 
+void Graphics::Dump(std::string dir, std::string pre)
+{
+}
+
 void Graphics::SetVerticalSyncEnabled(bool b)
 {
 	_vertical_sync = b;

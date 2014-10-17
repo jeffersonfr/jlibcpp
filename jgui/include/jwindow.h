@@ -244,12 +244,6 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
-		virtual void DumpScreen(std::string dir, std::string pre);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void RegisterWindowListener(WindowListener *listener);
 		
 		/**

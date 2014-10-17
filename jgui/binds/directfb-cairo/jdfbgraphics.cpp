@@ -98,6 +98,16 @@ void DFBGraphics::SetNativeSurface(void *surface)
 	}
 }
 
+void DFBGraphics::Dump(std::string dir, std::string pre)
+{
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+	if (_surface != NULL) {
+		_surface->Dump(_surface, dir.c_str(), pre.c_str());
+	}
+#elif defined(X11_UI)
+#endif
+}
+
 jregion_t DFBGraphics::ClipRect(int xp, int yp, int wp, int hp)
 {
 	jregion_t clip = Rectangle::Intersection(xp+_translate.x, yp+_translate.y, wp, hp, _internal_clip.x, _internal_clip.y, _internal_clip.width, _internal_clip.height);

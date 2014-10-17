@@ -205,6 +205,8 @@ void Window::InternalCreateWindow(void *params)
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	DFBHandler *gfx = dynamic_cast<DFBHandler *>(GFXHandler::GetInstance());
 
+	_graphics->SetNativeSurface(NULL);
+
 	if (_surface != NULL) {
 		_surface->Release(_surface);
 		_surface = NULL;
@@ -331,7 +333,8 @@ void Window::SetBounds(int x, int y, int width, int height)
 
 #if defined(DIRECTFB_CAIRO_UI)
 		if (_size.width < old_size.width || _size.height < old_size.height) {
-			update = true;
+			// CHANGE:: causes segfault with media resizes
+			// update = true;
 		}
 #endif
 
@@ -504,7 +507,8 @@ void Window::SetSize(int width, int height)
 
 #if defined(DIRECTFB_CAIRO_UI)
 		if (_size.width < old.width || _size.height < old.height) {
-			update = true;
+			// CHANGE:: causes segfault with media resizes
+			// update = true;
 		}
 #endif
 
@@ -723,18 +727,6 @@ bool Window::Hide()
 #endif
 
 	return true;
-}
-
-void Window::DumpScreen(std::string dir, std::string pre)
-{
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	if (_graphics != NULL) {
-		IDirectFBSurface *surface = dynamic_cast<DFBGraphics *>(_graphics)->_surface;
-
-		surface->Dump(surface, dir.c_str(), pre.c_str());
-	}
-#elif defined(X11_UI)
-#endif
 }
 
 void Window::ReleaseWindow()

@@ -247,6 +247,12 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void Dump(std::string dir, std::string pre);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetWorkingScreenSize(jsize_t size);
 		
 		/**
