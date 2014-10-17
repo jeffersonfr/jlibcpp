@@ -285,6 +285,8 @@ jcommon::Object * DFBImage::Clone()
 	
 	Image *clone = new DFBImage(GetWidth(), GetHeight(), GetPixelFormat(), scale.width, scale.height);
 
+	clone->GetGraphics()->SetCompositeFlags(JCF_NONE);
+
 	if (clone->GetGraphics()->DrawImage(this, 0, 0) == false) {
 		delete clone;
 		clone = NULL;

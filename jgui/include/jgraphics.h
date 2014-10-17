@@ -194,6 +194,17 @@ struct jinsets_t {
 	int bottom;
 };
 
+/**
+ * \brief
+ *
+ */
+struct jrect_t {
+	int x0;
+	int y0;
+	int x1;
+	int y1;
+};
+
 class Window;
 class Image;
 class Font;
