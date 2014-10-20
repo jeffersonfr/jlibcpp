@@ -259,6 +259,12 @@ class Thread : public virtual jcommon::Object{
 		virtual void SetStackSize(int size);
 
 		/**
+		 * \brief 
+		 *
+		 */
+		virtual int GetStackSize();
+
+		/**
 		 * \brief Init the thread.
 		 *
 		 */

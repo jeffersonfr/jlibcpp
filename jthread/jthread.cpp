@@ -34,14 +34,16 @@ Thread::Thread(jthread_type_t type, ThreadGroup *group):
 	_type = type;
 	_cancel = JTC_DEFERRED;
 	_group = group;
-	_stack_size = -1;
 
 #ifdef _WIN32
 	_sa = (LPSECURITY_ATTRIBUTES)HeapAlloc(GetProcessHeap(), 0, sizeof(SECURITY_ATTRIBUTES));
 	_sa->nLength = sizeof(SECURITY_ATTRIBUTES);
 	_sa->lpSecurityDescriptor = NULL;
 	_sa->bInheritHandle = FALSE;
+	
+	_stack_size = 16384;
 #else
+	_stack_size = PTHREAD_STACK_MIN;
 #endif
 }
 
@@ -159,6 +161,11 @@ int Thread::GetID()
 void Thread::SetStackSize(int size)
 {
 	_stack_size = size;
+}
+
+int Thread::GetStackSize()
+{
+	return _stack_size;
 }
 
 /** Private */
@@ -292,6 +299,7 @@ void Thread::Start(int id)
 	t->thread = _thread;
 #else
 	pthread_attr_t attr;
+	size_t size;
 
 	pthread_attr_init(&attr);
 
@@ -301,14 +309,16 @@ void Thread::Start(int id)
 		pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
 	}
 
-	if (_stack_size > 0) {
-		if (pthread_attr_setstacksize(&attr, _stack_size) != 0) {
-			throw ThreadException("Thread stack exception");
-		}
+	if (pthread_attr_setstacksize(&attr, _stack_size) != 0) {
+		throw ThreadException("Thread stack exception");
 	}
+	
+	pthread_attr_getstacksize(&attr, &size);
+
+	_stack_size = size;
 			
 	// pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
-	if (pthread_create(&_thread, NULL, &(Thread::ThreadMain), t)) {
+	if (pthread_create(&_thread, &attr, &(Thread::ThreadMain), t)) {
 		t->detached = true;
 		t->alive = false;
 
