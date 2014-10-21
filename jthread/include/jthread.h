@@ -116,9 +116,9 @@ class Thread : public virtual jcommon::Object{
 		/** \brief */
 		jthread_type_t _type;
 		/** \brief */
-		int _id;
+		size_t _stack_size;
 		/** \brief */
-		int _stack_size;
+		int _id;
 		/** \brief */
 		bool _is_running;
 

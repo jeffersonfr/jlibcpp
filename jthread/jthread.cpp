@@ -41,9 +41,12 @@ Thread::Thread(jthread_type_t type, ThreadGroup *group):
 	_sa->lpSecurityDescriptor = NULL;
 	_sa->bInheritHandle = FALSE;
 	
-	_stack_size = 16384;
+	_stack_size = 1024*1024;
 #else
-	_stack_size = PTHREAD_STACK_MIN;
+	pthread_attr_t attr;
+
+	pthread_attr_init(&attr);
+	pthread_attr_getstacksize(&attr, &_stack_size);
 #endif
 }
 
@@ -61,7 +64,13 @@ Thread::Thread(Runnable *runnable, jthread_type_t type, ThreadGroup *group):
 	_sa->nLength = sizeof(SECURITY_ATTRIBUTES);
 	_sa->lpSecurityDescriptor = NULL;
 	_sa->bInheritHandle = FALSE;
+
+	_stack_size = 1024*1024;
 #else
+	pthread_attr_t attr;
+
+	pthread_attr_init(&attr);
+	pthread_attr_getstacksize(&attr, &_stack_size);
 #endif
 
 	if (_group != NULL) {
