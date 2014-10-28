@@ -73,6 +73,18 @@ class IndexedImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
+		virtual Image * Flip(jflip_flags_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * Rotate(double radians, bool resize = true);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Image * Scale(int wp, int hp);
 
 		/**

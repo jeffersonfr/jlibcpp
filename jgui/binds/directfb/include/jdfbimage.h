@@ -66,6 +66,12 @@ class DFBImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
+		static Image * Flip(Image *img, jflip_flags_t t);
+
+		/**
+		 * \brief
+		 *
+		 */
 		static Image * Rotate(Image *img, double radians, bool resize);
 
 		/**

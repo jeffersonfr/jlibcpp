@@ -206,6 +206,22 @@ jsize_t Image::GetWorkingScreenSize()
 	return _scale;
 }
 
+Image * Image::Flip(jflip_flags_t t)
+{
+	Image *image = NULL;
+
+	try {
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+		image = DFBImage::Flip(this, t);
+#elif defined(X11_UI)
+		image = X11Image::Rotate(this, t);
+#endif
+	} catch (jcommon::NullPointerException &e) {
+	}
+
+	return image;
+}
+
 Image * Image::Rotate(double radians, bool resize)
 {
 	Image *image = NULL;

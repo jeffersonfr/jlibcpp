@@ -66,6 +66,11 @@ enum jpixelformat_t {
 	JPF_VYU,			// SURFACE_PIXELFORMAT(32, 24, 0, 0, 0, 3, 0, 0, 0, 0, 0)
 };
 
+enum jflip_flags_t {
+	JFF_HORIZONTAL = 0x01,
+	JFF_VERTICAL = 0x02
+};
+
 class Graphics;
 
 /**
@@ -166,6 +171,12 @@ class Image : public virtual jcommon::Object{
 		 *
 		 */
 		virtual jsize_t GetWorkingScreenSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * Flip(jflip_flags_t t);
 		
 		/**
 		 * \brief

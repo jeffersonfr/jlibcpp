@@ -158,6 +158,88 @@ IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
 	return new IndexedImage(palette, palette_location, rgb, width, height);
 }
 
+Image * IndexedImage::Flip(jflip_flags_t t)
+{
+	jsize_t size = GetSize();
+	uint8_t data[size.width*size.height];
+	
+	if ((t & JFF_HORIZONTAL) != 0) {
+		for (int j=0; j<size.height; j++) {
+			for (int i=0; i<size.width; i++) {
+				int index = j*size.width;
+				int pixel = data[index+i];
+
+				data[index+i] = _data[index+size.width-i-1];
+				_data[index+size.width-i-1] = pixel;
+			}
+		}
+	}
+
+	if ((t & JFF_VERTICAL) != 0) {
+		int offset = (size.height-1)*size.width;
+
+		for (int i=0; i<size.width; i++) {
+			for (int j=0; j<size.height; j++) {
+				int index = j*size.width+i;
+				int pixel = data[index];
+
+				data[index] = _data[offset-index];
+				_data[offset-index] = pixel;
+			}
+		}
+	}
+
+	return new IndexedImage(_palette, _palette_size, data, size.width, size.height);
+}
+
+Image * IndexedImage::Rotate(double radians, bool resize)
+{
+	jsize_t isize = GetSize();
+
+	double angle = fmod(radians, 2*M_PI);
+
+	int precision = 1024;
+	int sinTheta = precision*sin(angle);
+	int cosTheta = precision*cos(angle);
+
+	int iw = isize.width;
+	int ih = isize.height;
+
+	if (resize == true) {
+		iw = (abs(isize.width*cosTheta)+abs(isize.height*sinTheta))/precision;
+		ih = (abs(isize.width*sinTheta)+abs(isize.height*cosTheta))/precision;
+	}
+
+	uint8_t data[iw*ih];
+
+	int sxc = isize.width/2;
+	int syc = isize.height/2;
+	int dxc = iw/2;
+	int dyc = ih/2;
+	int xo;
+	int yo;
+	int t1;
+	int t2;
+
+	for (int j=0; j<ih; j++) {
+		t1 = (j-dyc)*sinTheta;
+		t2 = (j-dyc)*cosTheta;
+
+		for (int i=0; i<iw; i++) {
+			xo = ((i-dxc)*cosTheta - t1)/precision;
+			yo = ((i-dxc)*sinTheta + t2)/precision;
+
+			if (xo >= -sxc && xo < sxc && yo >= -syc && yo < syc) {
+				data[j*iw+i] = _data[(yo+syc)*isize.width + (xo+sxc)];
+			} else {
+				data[j*iw+i] = 0;
+			}
+		}
+	}
+
+	return new IndexedImage(_palette, _palette_size, data, iw, ih);
+}
+
 Image * IndexedImage::Scale(int width, int height)
 {
 	if (width <= 0 || height <= 0) {

@@ -1319,7 +1319,9 @@ bool DFBGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
 		return false;
 	}
 
+	_surface->SetRenderOptions(_surface, (DFBSurfaceRenderOptions)(DSRO_SMOOTH_DOWNSCALE | DSRO_ANTIALIAS | DSRO_SMOOTH_UPSCALE));
 	_surface->Blit(_surface, imgSurface, NULL, x, y);
+	_surface->SetRenderOptions(_surface, (DFBSurfaceRenderOptions)(DSRO_NONE));
 
 	imgProvider->Release(imgProvider);
 	imgSurface->Release(imgSurface);
@@ -1385,7 +1387,9 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 	srect.w = swp;
 	srect.h = shp;
 
+	_surface->SetRenderOptions(_surface, (DFBSurfaceRenderOptions)(DSRO_SMOOTH_DOWNSCALE | DSRO_ANTIALIAS | DSRO_SMOOTH_UPSCALE));
 	_surface->Blit(_surface, imgSurface, &srect, x, y);
+	_surface->SetRenderOptions(_surface, (DFBSurfaceRenderOptions)(DSRO_NONE));
 
 	imgProvider->Release(imgProvider);
 	imgSurface->Release(imgSurface);
@@ -1473,7 +1477,9 @@ bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp,
 	drect.w = w;
 	drect.h = h;
 
+	_surface->SetRenderOptions(_surface, (DFBSurfaceRenderOptions)(DSRO_SMOOTH_DOWNSCALE | DSRO_ANTIALIAS | DSRO_SMOOTH_UPSCALE));
 	_surface->StretchBlit(_surface, imgSurface, &srect, &drect);
+	_surface->SetRenderOptions(_surface, (DFBSurfaceRenderOptions)(DSRO_NONE));
 
 	imgProvider->Release(imgProvider);
 	imgSurface->Release(imgSurface);
@@ -1528,7 +1534,9 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		drect.w = sw;
 		drect.h = sh;
 
+		_surface->SetRenderOptions(_surface, (DFBSurfaceRenderOptions)(DSRO_SMOOTH_DOWNSCALE | DSRO_ANTIALIAS | DSRO_SMOOTH_UPSCALE));
 		_surface->Blit(_surface, g->_surface, &drect, x, y);
+		_surface->SetRenderOptions(_surface, (DFBSurfaceRenderOptions)(DSRO_NONE));
 	} else {
 		uint32_t *rgb = NULL;
 
@@ -1581,7 +1589,9 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		drect.w = w;
 		drect.h = h;
 
+		_surface->SetRenderOptions(_surface, (DFBSurfaceRenderOptions)(DSRO_SMOOTH_DOWNSCALE | DSRO_ANTIALIAS | DSRO_SMOOTH_UPSCALE));
 		_surface->StretchBlit(_surface, g->_surface, &srect, &drect);
+		_surface->SetRenderOptions(_surface, (DFBSurfaceRenderOptions)(DSRO_NONE));
 	} else {
 		int iwp = wp; // SCALE_TO_SCREEN(wp, _screen.width, _scale.width); 
 		int ihp = hp; // SCALE_TO_SCREEN(hp, _screen.height, _scale.height);

@@ -25,6 +25,8 @@
 #include "jthread.h"
 #include "jnullpointerexception.h"
 
+#define DFB_FIXED_POINT	(1 << 16)
+
 namespace jgui {
 
 class MediaLoaderThread : public jthread::Thread {
@@ -301,6 +303,70 @@ void DFBImage::SetSize(int width, int height)
 	_size.height = height;
 }
 
+Image * DFBImage::Flip(Image *img, jflip_flags_t t)
+{
+	jsize_t size = img->GetSize();
+	jsize_t scale = img->GetWorkingScreenSize();
+	jpixelformat_t pixel = img->GetPixelFormat();
+
+	DFBImage *image = new DFBImage(size.width, size.height, pixel, scale.width, scale.height);
+
+	image->GetGraphics()->SetCompositeFlags(JCF_NONE);
+
+	IDirectFBSurface *isrc = (IDirectFBSurface *)img->GetGraphics()->GetNativeSurface();
+	IDirectFBSurface *idst = (IDirectFBSurface *)image->GetGraphics()->GetNativeSurface();
+
+	/*
+	// INFO:: use matrix
+	static const s32 x_mat[9] = {
+		-DFB_FIXED_POINT, 0, (size.width-1) << 16,
+		0, DFB_FIXED_POINT, 0,
+		0, 0, DFB_FIXED_POINT
+	};
+
+	static const s32 y_mat[9] = {
+		DFB_FIXED_POINT, 0, 0,
+		0, -DFB_FIXED_POINT, (size.height-1) << 16,
+		0, 0, DFB_FIXED_POINT
+	};
+
+	static const s32 xy_mat[9] = {
+		-DFB_FIXED_POINT, 0, (size.width-1) << 16,
+		0, -DFB_FIXED_POINT, (size.height-1) << 16,
+		0, 0, DFB_FIXED_POINT
+	};
+
+	idst->SetRenderOptions(idst, (DFBSurfaceRenderOptions)(DSRO_MATRIX | DSRO_ANTIALIAS));
+
+	if (t == JFF_HORIZONTAL) {
+		idst->SetMatrix(idst, x_mat);
+	} else if (t == JFF_VERTICAL) {
+		idst->SetMatrix(idst, y_mat);
+	} else {
+		idst->SetMatrix(idst, xy_mat);
+	}
+
+	idst->Blit(idst, isrc, NULL, 0, 0);
+	
+	idst->SetRenderOptions(idst, (DFBSurfaceRenderOptions)(DSRO_NONE));
+	*/
+
+	// INFO:: use blitting flags
+	if (t == JFF_HORIZONTAL) {
+		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_HORIZONTAL));
+	} else if (t == JFF_VERTICAL) {
+		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_VERTICAL));
+	} else {
+		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_HORIZONTAL | DSBLIT_FLIP_VERTICAL));
+	}
+
+	idst->Blit(idst, isrc, NULL, 0, 0);
+
+	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+
+	return image;
+}
+
 Image * DFBImage::Rotate(Image *img, double radians, bool resize)
 {
 	jsize_t isize = img->GetSize();
@@ -321,10 +387,36 @@ Image * DFBImage::Rotate(Image *img, double radians, bool resize)
 		ih = (abs(isize.width*sinTheta)+abs(isize.height*cosTheta))/precision;
 	}
 
-	DFBImage *rimg = new DFBImage(iw, ih, ipixel, iscale.width, iscale.height);
+	DFBImage *rotate = new DFBImage(iw, ih, ipixel, iscale.width, iscale.height);
+
+	rotate->GetGraphics()->SetCompositeFlags(JCF_NONE);
 
 	IDirectFBSurface *isrc = (IDirectFBSurface *)img->GetGraphics()->GetNativeSurface();
-	IDirectFBSurface *idst = (IDirectFBSurface *)rimg->GetGraphics()->GetNativeSurface();
+	IDirectFBSurface *idst = (IDirectFBSurface *)rotate->GetGraphics()->GetNativeSurface();
+
+	/*
+	// INFO:: use matrix
+	int sw, sh;
+	int dw, dh;
+
+	isrc->GetSize(isrc, &sw, &sh);
+	idst->GetSize(idst, &dw, &dh);
+
+	static const s32 r_mat[9] = {
+		(s32)(DFB_FIXED_POINT*cos(angle)), (s32)(DFB_FIXED_POINT*sin(angle)), (s32)(DFB_FIXED_POINT*(dw/2)),
+		(s32)(-DFB_FIXED_POINT*sin(angle)), (s32)(DFB_FIXED_POINT*cos(angle)), (s32)(DFB_FIXED_POINT*(dh/2)),
+		0, 0, DFB_FIXED_POINT
+	};
+
+	idst->SetRenderOptions(idst, (DFBSurfaceRenderOptions)(DSRO_MATRIX | DSRO_ANTIALIAS));
+	idst->SetMatrix(idst, r_mat);
+
+	idst->Blit(idst, isrc, NULL, -sw/2, -sh/2);
+	
+	idst->SetRenderOptions(idst, (DFBSurfaceRenderOptions)(DSRO_NONE));
+	*/
+
+	// INFO:: use algebra
 	void *sptr;
 	uint32_t *sptr32;
 	void *dptr;
@@ -339,7 +431,7 @@ Image * DFBImage::Rotate(Image *img, double radians, bool resize)
 	isrc->GetSize(isrc, &sw, &sh);
 	idst->GetSize(idst, &dw, &dh);
 
-	isrc->Lock(isrc, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &sptr, &spitch);
+	isrc->Lock(isrc, (DFBSurfaceLockFlags)(DSLF_READ), &sptr, &spitch);
 	idst->Lock(idst, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &dptr, &dpitch);
 
 	int sxc = sw/2;
@@ -348,15 +440,19 @@ Image * DFBImage::Rotate(Image *img, double radians, bool resize)
 	int dyc = dh/2;
 	int xo;
 	int yo;
+	int t1;
+	int t2;
 
 	sptr32 = (uint32_t *)sptr;
 
 	for (int j=0; j<dh; j++) {
 		dptr32 = (uint32_t *)((uint8_t *)dptr + j*dpitch);
+		t1 = (j-dyc)*sinTheta;
+		t2 = (j-dyc)*cosTheta;
 
 		for (int i=0; i<dw; i++) {
-			xo = ((i-dxc)*cosTheta - (j-dyc)*sinTheta)/precision;
-			yo = ((i-dxc)*sinTheta + (j-dyc)*cosTheta)/precision;
+			xo = ((i-dxc)*cosTheta - t1)/precision;
+			yo = ((i-dxc)*sinTheta + t2)/precision;
 
 			if (xo >= -sxc && xo < sxc && yo >= -syc && yo < syc) {
 				*(dptr32+i) = *((uint32_t *)((uint8_t *)sptr + (yo+syc)*spitch) + (xo+sxc));
@@ -367,7 +463,7 @@ Image * DFBImage::Rotate(Image *img, double radians, bool resize)
 	isrc->Unlock(isrc);
 	idst->Unlock(idst);
 
-	return rimg;
+	return rotate;
 }
 
 }
