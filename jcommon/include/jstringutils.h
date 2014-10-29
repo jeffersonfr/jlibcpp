@@ -55,6 +55,12 @@ class StringUtils : public virtual jcommon::Object{
 		 * \brief 
 		 *
 		 */
+		static std::string Format(const char *format, ...);
+		
+		/**
+		 * \brief 
+		 *
+		 */
 		static std::string LeftTrim(std::string str, std::string chars = std::string(STRING_EMPTY_CHARS));
 		
 		/**

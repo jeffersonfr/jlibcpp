@@ -37,6 +37,32 @@ StringUtils::~StringUtils()
 {
 }
 
+std::string StringUtils::Format(const char *format, ...)
+{
+	std::string str;
+	va_list ap, cp;
+	int format_length;
+	char *dst = NULL;
+
+	va_start(ap, format);
+	va_copy(cp, ap);
+
+	format_length = vsnprintf(NULL, 0, format, cp);
+
+	if ((dst = (char *)malloc((format_length + 1) * sizeof(char))) != NULL) {
+		vsprintf(dst, format, ap);
+		
+		str = std::string(dst);
+
+		free(dst);
+	}
+
+	va_end(ap);
+	va_end(cp);
+
+	return str;
+}
+
 std::string StringUtils::LeftTrim(std::string str, std::string chars)
 {
 	if (str.size() > 0) {
