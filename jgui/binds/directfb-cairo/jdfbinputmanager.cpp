@@ -1045,6 +1045,8 @@ void DFBInputManager::RemoveMouseListener(MouseListener *listener)
 
 void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 {
+	jthread::AutoLock lock(&_mutex);
+
 	if (event.type == DIET_KEYPRESS || event.type == DIET_KEYRELEASE) {
 		jkeyevent_type_t type;
 		jkeyevent_modifiers_t mod;
@@ -1193,6 +1195,8 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 
 void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 {
+	jthread::AutoLock lock(&_mutex);
+
 	if (event.type == DWET_KEYDOWN || event.type == DWET_KEYUP) {
 		jkeyevent_type_t type;
 		jkeyevent_modifiers_t mod;
@@ -1345,6 +1349,8 @@ void DFBInputManager::Run()
 				}
 
 				fired = false;
+			} else {
+				events->GetEvent(events, DFB_EVENT(&ievent));
 			}
 		}
 	}
