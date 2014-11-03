@@ -540,7 +540,9 @@ class MenuTest : public Scene{
 				return;
 			}
 
-			Scene::KeyPressed(event);
+			if (Scene::ProcessEvent(event) == true) {
+				return;
+			}
 
 			if (event->GetSymbol() == jgui::JKS_F1) {
 				if (GetFocusOwner() != NULL) {
@@ -554,7 +556,7 @@ class MenuTest : public Scene{
 				} else if (_mstate == 3) {
 					_mstate = 1;
 				}
-			} else {
+			} else if (event->GetSymbol() == jgui::JKS_ENTER) {
 				LayersManager *layers = LayersManager::GetInstance();
 
 				if (GetFocusOwner() == _button1) {
