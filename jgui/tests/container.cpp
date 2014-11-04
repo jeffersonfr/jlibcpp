@@ -374,6 +374,10 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			return false;;
 		}
 
+		if (Frame::ProcessEvent(event) == true) {
+			return true;
+		}
+
 		if (event->GetSymbol() == jgui::JKS_ENTER) {
 			if (GetFocusOwner() == text_field) {
 				jgui::Keyboard keyboard(500, 400, jgui::JKT_QWERTY, false);

@@ -89,13 +89,6 @@ class EventBroadcaster : public jthread::Thread {
 			}
 		}
 
-		virtual void Reset()
-		{
-			jthread::AutoLock lock(&_mutex);
-
-			_events.clear();
-		}
-
 		virtual void Release()
 		{
 			_is_running = false;
@@ -108,15 +101,17 @@ class EventBroadcaster : public jthread::Thread {
 		virtual void Run()
 		{
 			while (_is_running == true) {
-				_mutex.Lock();
-
 				while (_events.size() == 0) {
 					_sem.Wait(&_mutex);
 
 					if (_is_running == false) {
+						_mutex.Unlock();
+
 						return;
 					}
 				}
+
+				_mutex.Lock();
 
 				jcommon::EventObject *event = *_events.begin();
 
