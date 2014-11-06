@@ -240,18 +240,14 @@ void NullGraphics::SetDrawingMode(jdrawing_mode_t t)
 	Graphics::SetDrawingMode(t);
 }
 
-void NullGraphics::SetPixel(int xp, int yp, uint32_t pixel)
+void NullGraphics::SetPixels(uint8_t *pixels)
 {
 	JDEBUG(JINFO, "called\n");
-
-	Graphics::SetPixel(xp, yp, pixel);
 }
 
-unsigned int NullGraphics::GetPixel(int xp, int yp)
+void NullGraphics::GetPixels(uint8_t **pixels)
 {
 	JDEBUG(JINFO, "called\n");
-
-	return Graphics::GetPixel(xp, yp);
 }
 
 void NullGraphics::SetLineJoin(jline_join_t t)

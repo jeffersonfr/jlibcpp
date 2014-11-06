@@ -218,14 +218,12 @@ void Graphics::SetAntialias(bool b)
 {
 }
 
-void Graphics::SetPixel(int xp, int yp, uint32_t pixel)
+void Graphics::SetPixels(uint8_t *pixels)
 {
-	SetRGB(pixel, xp+_translate.x, yp+_translate.y);
 }
 
-uint32_t Graphics::GetPixel(int xp, int yp)
+void Graphics::GetPixels(uint8_t **pixels)
 {
-	return GetRGB(xp, yp);
 }
 
 void Graphics::SetLineJoin(jline_join_t t)

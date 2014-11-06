@@ -337,13 +337,13 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetPixel(int xp, int yp, uint32_t pixel);
+		virtual void SetPixels(uint8_t *pixels);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual uint32_t GetPixel(int xp, int yp);
+		virtual void GetPixels(uint8_t **pixels);
 		
 		/**
 		 * \brief

@@ -417,14 +417,47 @@ void DFBGraphics::SetAntialias(bool b)
 	}
 }
 
-void DFBGraphics::SetPixel(int xp, int yp, uint32_t pixel)
+void DFBGraphics::SetPixels(uint8_t *pixels)
 {
-	SetRGB(pixel, xp+_translate.x, yp+_translate.y);
+	if (_surface == NULL) {
+		return;
+	}
+
+	void *ptr;
+	int width,
+			height,
+			pitch;
+
+	_surface->GetSize(_surface, &width, &height);
+	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
+
+	memcpy(ptr, pixels, pitch*height);
+
+	_surface->Unlock(_surface);
 }
 
-uint32_t DFBGraphics::GetPixel(int xp, int yp)
+void DFBGraphics::GetPixels(uint8_t **pixels)
 {
-	return GetRGB(xp, yp);
+	if (_surface == NULL) {
+		return;
+	}
+
+	void *ptr;
+	int width,
+			height,
+			pitch;
+
+	_surface->GetSize(_surface, &width, &height);
+	
+	if (*pixels == NULL) {
+		(*pixels) = new uint8_t[pitch*height];
+	}
+
+	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
+
+	memcpy((*pixels), ptr, pitch*height);
+
+	_surface->Unlock(_surface);
 }
 
 void DFBGraphics::SetLineJoin(jline_join_t t)
