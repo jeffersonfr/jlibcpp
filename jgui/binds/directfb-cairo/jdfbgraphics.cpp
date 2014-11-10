@@ -2063,7 +2063,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 			max_lines,
 			font_height;
 	
-	font_height = _font->GetSize() + _font->GetLeading();
+	font_height = _font->GetLineSize();
 
 	if (font_height <= 0) {
 		return;
@@ -2077,7 +2077,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 
 	GetStringBreak(&lines, text, wp, hp, halign);
 
-	int line_space = _font->GetLeading(),
+	int line_space = 0,
 			line_yinit = 0,
 			line_ydiff = 0;
 
@@ -2088,7 +2088,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 			line_yinit = 0;
 			line_ydiff = 0;
 		} else if (valign == JVA_CENTER) {
-			line_yinit = (hp-nlines*font_height+line_space)/2;
+			line_yinit = (hp-nlines*font_height)/2;
 			line_ydiff = 0;
 		} else if (valign == JVA_BOTTOM) {
 			line_yinit = hp-nlines*font_height;

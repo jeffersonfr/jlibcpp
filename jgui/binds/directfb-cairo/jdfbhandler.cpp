@@ -716,5 +716,10 @@ void DFBHandler::WaitIdle()
 	_dfb->WaitIdle(_dfb);
 }
 
+void DFBHandler::WaitSync()
+{
+	_dfb->WaitForSync(_dfb);
+}
+
 }
 

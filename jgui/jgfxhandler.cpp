@@ -186,5 +186,9 @@ void GFXHandler::WaitIdle()
 {
 }
 
+void GFXHandler::WaitSync()
+{
+}
+
 }
 

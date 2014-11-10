@@ -218,6 +218,12 @@ class DFBHandler : public virtual jgui::GFXHandler{
 		 */
 		virtual void WaitIdle();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void WaitSync();
+
 };
 
 }

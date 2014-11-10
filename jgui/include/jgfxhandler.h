@@ -208,6 +208,12 @@ class GFXHandler : public virtual jcommon::Object{
 		 */
 		virtual void WaitIdle();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void WaitSync();
+
 };
 
 }
