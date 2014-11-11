@@ -86,6 +86,10 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 				InputManager::GetInstance()->RegisterKeyListener(_menu);
 				InputManager::GetInstance()->RegisterMouseListener(_menu);
 
+				Container *root = GetTopLevelAncestor();
+				jpoint_t p = GetAbsoluteLocation();
+
+				_menu->SetBounds(root->GetX()+p.x, root->GetY()+p.y+GetHeight(), GetWidth(), _menu->GetHeight());
 				_menu->Show();
 			}
 		}
@@ -298,10 +302,6 @@ void ComboBox::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	jpoint_t t = g->Translate();
-
-	_menu->SetLocation(t.x, t.y+_size.height+4);
-
 	{
 		/*
 		if (_has_focus == true) {
@@ -316,9 +316,16 @@ void ComboBox::Paint(Graphics *g)
 				h = _size.height-2*y,
 				gapx = 0,
 				gapy = 0;
-		int arrow_size = h,
+		int arrow_size = 32,
 				dx = x+w-arrow_size-2,
 				dy = y+(h-arrow_size/2)/2;
+
+		// INFO:: ajusta o tamanho do triangulo baseado no tamanho da fonte
+		if (_font != NULL) {
+			if (_font->GetSize() > arrow_size) {
+				arrow_size = _font->GetSize();
+			}
+		}
 
 		g->SetColor(0x80, 0x80, 0xe0, 0xff);
 		g->FillTriangle(dx, dy, dx+arrow_size, dy, dx+arrow_size/2, dy+arrow_size/2);
