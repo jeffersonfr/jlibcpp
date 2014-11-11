@@ -121,6 +121,10 @@ bool ComboBox::ProcessEvent(KeyEvent *event)
 			InputManager::GetInstance()->RegisterKeyListener(_menu);
 			InputManager::GetInstance()->RegisterMouseListener(_menu);
 
+			Container *root = GetTopLevelAncestor();
+			jpoint_t p = GetAbsoluteLocation();
+
+			_menu->SetBounds(root->GetX()+p.x, root->GetY()+p.y+GetHeight(), GetWidth(), _menu->GetHeight());
 			_menu->Show();
 		}
 	
