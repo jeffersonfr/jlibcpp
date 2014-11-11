@@ -33,15 +33,7 @@ ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
 
 	_old_index = 0;
 
-	_menu = new Menu(_location.x, _location.y+_size.height+4, _size.width, visible_items);
-
-	InputManager::GetInstance()->RemoveKeyListener(_menu);
-	InputManager::GetInstance()->RemoveMouseListener(_menu);
-	
-	_menu->SetLoop(false);
-	_menu->SetCurrentIndex(0);
-	_menu->RegisterSelectListener(this);
-
+	SetVisibleItems(visible_items);
 	SetFocusable(true);
 }
 
@@ -59,7 +51,28 @@ ComboBox::~ComboBox()
 
 void ComboBox::SetVisibleItems(int max_items)
 {
-	_menu->GetVisibleItems();
+	Menu *menu = new Menu(0, 0, 0, max_items);
+
+	menu->SetLoop(false);
+	menu->SetCurrentIndex(0);
+	menu->RegisterSelectListener(this);
+
+	if (_menu != NULL) {
+		std::vector<Item *> items = _menu->GetItems();
+
+		for (std::vector<Item *>::iterator i=items.begin(); i!=items.end(); i++) {
+			menu->AddItem(dynamic_cast<Item *>((*i)->Clone()));
+		}
+
+		_menu->RemoveSelectListener(this);
+
+		delete _menu;
+	}
+
+	_menu = menu;
+	
+	InputManager::GetInstance()->RemoveKeyListener(_menu);
+	InputManager::GetInstance()->RemoveMouseListener(_menu);
 }
 
 bool ComboBox::ProcessEvent(MouseEvent *event)

@@ -92,6 +92,12 @@ class Item : public virtual jcommon::Object{
 		virtual ~Item();
 
 		/**
+		 * \brief Clone object.
+		 *
+		 */
+		virtual jcommon::Object * Clone();
+		
+		/**
 		 * \brief
 		 *
 		 */

@@ -100,6 +100,21 @@ Item::~Item()
 	}
 }
 
+jcommon::Object * Item::Clone()
+{
+	Item *item = new Item(*this);
+
+	if (_prefetch != NULL) {
+		item->_prefetch = jgui::Image::CreateImage(item->_prefetch);
+	}
+
+	for (std::vector<Item *>::iterator i=_childs.begin(); i!=_childs.end(); i++) {
+		item->_childs.push_back(dynamic_cast<Item *>((*i)->Clone()));
+	}
+
+	return (jcommon::Object *)item;
+}
+
 std::vector<Item *> & Item::GetChilds()
 {
 	return _childs;
