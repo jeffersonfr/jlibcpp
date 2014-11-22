@@ -91,7 +91,7 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int hei
 #elif defined(X11_UI)
 		font = new X11Font(name, attributes, height, scale_width, scale_height);
 #endif
-	} catch (jcommon::NullPointerException &e) {
+	} catch (jcommon::NullPointerException &) {
 	}
 
 	return font;

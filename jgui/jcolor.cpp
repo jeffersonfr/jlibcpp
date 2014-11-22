@@ -182,13 +182,23 @@ const uint32_t Color::Transparent = 0x00000000;
 
 Color::Color(std::string name):
 	jcommon::Object()
-	{
-		jcommon::Object::SetClassName("jgui::Color");
+{
+	jcommon::Object::SetClassName("jgui::Color");
 
-		uint32_t color = 0xff000000;
+	uint32_t color = 0xff000000;
 
-		name = jcommon::StringUtils::ToLower(name);
+	if (name.empty() == true) {
+		_red = (color >> 0x10) & 0xff;
+		_green = (color >> 0x08) & 0xff;
+		_blue = (color >> 0x00) & 0xff;
+		_alpha = (color >> 0x18) & 0xff;
 
+		return;
+	}
+
+	name = jcommon::StringUtils::ToLower(name);
+
+	if (name[0] >= 'a' && name[0] <= 'j') {
 		if (name == jcommon::StringUtils::ToLower("AliceBlue")) {
 			color = Color::AliceBlue;
 		} else if (name == jcommon::StringUtils::ToLower("AntiqueWhite")) {
@@ -313,7 +323,9 @@ Color::Color(std::string name):
 			color = Color::Indigo;
 		} else if (name == jcommon::StringUtils::ToLower("Ivory")) {
 			color = Color::Ivory;
-		} else if (name == jcommon::StringUtils::ToLower("Khaki")) {
+		}
+	} else if (name[0] > 'j' && name[0] <= 'p') {
+		if (name == jcommon::StringUtils::ToLower("Khaki")) {
 			color = Color::Khaki;
 		} else if (name == jcommon::StringUtils::ToLower("Lavender")) {
 			color = Color::Lavender;
@@ -427,7 +439,9 @@ Color::Color(std::string name):
 			color = Color::Plum;
 		} else if (name == jcommon::StringUtils::ToLower("Purple")) {
 			color = Color::Purple;
-		} else if (name == jcommon::StringUtils::ToLower("Red")) {
+		}
+	} else if (name[0] > 'p' && name[0] <= 'z') {
+		if (name == jcommon::StringUtils::ToLower("Red")) {
 			color = Color::Red;
 		} else if (name == jcommon::StringUtils::ToLower("RosyBrown")) {
 			color = Color::RosyBrown;
@@ -485,6 +499,7 @@ Color::Color(std::string name):
 			color = Color::Yellowgreen;
 		} else if (name == jcommon::StringUtils::ToLower("Transparent")) {
 			color = Color::Transparent;
+		}
 	}
 
 	_red = (color >> 0x10) & 0xff;

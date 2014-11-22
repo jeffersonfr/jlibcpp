@@ -20,8 +20,6 @@
 #ifndef J_SHAREDLIB_H
 #define J_SHAREDLIB_H
 
-#include <sys/ipc.h>
-
 #define JIPC_PRIVATE	0
 
 enum jshared_permissions_t {
@@ -44,6 +42,8 @@ enum jshared_permissions_t {
 #ifdef _WIN32
 typedef int jkey_t;
 #else
+#include <sys/ipc.h>
+
 typedef key_t jkey_t;
 #endif
 

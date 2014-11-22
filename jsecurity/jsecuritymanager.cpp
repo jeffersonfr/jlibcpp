@@ -58,7 +58,7 @@ void SecurityManager::GetGoupsFromUser(std::string id)
 {
 }
 
-AccessController * SecurityManager::GetDefaultAccessController()
+AccessControl * SecurityManager::GetDefaultAccessControl()
 {
 	return NULL;
 }

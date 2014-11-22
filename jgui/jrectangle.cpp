@@ -69,10 +69,10 @@ jregion_t Rectangle::Intersection(int x1, int y1, int w1, int h1, int x2, int y2
 	region.width = 0;
 	region.height = 0;
 
-	int left = std::max(x1, x2),
-		top = std::max(y1, y2),
-		right = std::min(x1+w1, x2+w2),
-		bottom = std::min(y1+h1, y2+h2);
+	int left = (std::max)(x1, x2),
+		top = (std::max)(y1, y2),
+		right = (std::min)(x1+w1, x2+w2),
+		bottom = (std::min)(y1+h1, y2+h2);
 
 	if (right > left && bottom > top) {
 		region.x = left;

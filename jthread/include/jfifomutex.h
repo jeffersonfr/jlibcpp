@@ -21,6 +21,7 @@
 #define J_FIFOMUTEX_H
 
 #include "jmutex.h"
+#include "jthread.h"
 
 #include <string>
 
@@ -42,7 +43,7 @@ struct jfifo_mutex_t {
 	// Lock protecting all fields
 	Mutex control;
 	// Owner identity
-	pthread_t owner;
+	jthread_t owner;
 	// List of unused locks (allocation cache)
 	struct jfifo_mutex_list_t *unused;
 	// Mutex list

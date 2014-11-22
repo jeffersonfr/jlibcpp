@@ -117,7 +117,8 @@ uint8_t ProgramSystemInformationSection::GetReserved1()
 
 uint16_t ProgramSystemInformationSection::GetSectionLength()
 {
-	return (uint16_t)(((*(_data + 1) << 8) | (*(_data + 2))) & 0x00000fff);
+	return (uint16_t)(((*(_data + 1) << 8) | (*(_data + 2))) & 0x000003ff);
+	// return (uint16_t)(((*(_data + 1) << 8) | (*(_data + 2))) & 0x00000fff);
 }
 
 uint16_t ProgramSystemInformationSection::GetTansportStreamID()

@@ -86,7 +86,7 @@ void ProgressBar::SetValue(double i)
 	{
 		jthread::AutoLock lock(&_component_mutex);
 
-		_value = i;
+		_value = (int)i;
 
 		if (_value < 0.0) {
 			_value = 0;

@@ -32,7 +32,7 @@ FifoMutex::FifoMutex():
 	_fifo_mutex.unused = NULL;
 	_fifo_mutex.list = NULL;
 	_fifo_mutex.active = NULL;	
-	_fifo_mutex.owner = (pthread_t)-1;
+	_fifo_mutex.owner = (jthread_t)-1;
 }
 
 FifoMutex::~FifoMutex()
@@ -111,6 +111,8 @@ void FifoMutex::Unlock()
 {
 	_fifo_mutex.control.Lock();
 
+#ifdef _WIN32
+#else
 	// Verify this thread is the owner, and that the fifo mutex is locked.
 	if (!_fifo_mutex.active || _fifo_mutex.owner != pthread_self()) {
 		_fifo_mutex.control.Unlock();
@@ -127,6 +129,7 @@ void FifoMutex::Unlock()
 
 	_fifo_mutex.active = NULL;
 	_fifo_mutex.owner  = (pthread_t)-1;
+#endif
 
 	// Cleanup is done by the next thread locking the mutex.
 	_fifo_mutex.control.Unlock();
@@ -167,6 +170,8 @@ bool FifoMutex::TryLock()
 		}
 	}
 
+#ifdef _WIN32
+#else
 	// No previous owners?
 	if (!_fifo_mutex.list) {
 		// We own the fifo mutex now.
@@ -188,6 +193,7 @@ bool FifoMutex::TryLock()
 
 		return true;
 	}
+#endif
 
 	// There are previous owners. Add self to the list.
 	next = _fifo_mutex.list;
@@ -213,7 +219,7 @@ bool FifoMutex::TryLock()
 
 		try {
 			_fifo_mutex.control.Lock();
-		} catch (jthread::MutexException *e) {
+		} catch (jthread::MutexException *) {
 			// We failed to obtain the mutex protecting the structure, so we're essentially screwed. 
 			// This should never happen, fortunately. Release our own mutex, and let a future thread 
 			// worry about the cleanup.
@@ -225,9 +231,12 @@ bool FifoMutex::TryLock()
 		// Okay, we're the owner.
 	}
 
+#ifdef _WIN32
+#else
 	// Mark self as the owner.
 	_fifo_mutex.owner = pthread_self();
 	_fifo_mutex.active = curr;
+#endif
 
 	// Release the predecessor lock; there is no-one else blocking on it.
 	next->lock.Unlock();

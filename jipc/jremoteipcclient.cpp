@@ -89,7 +89,7 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 			}
 
 			rbuffer[index] = 0;
-		} catch (jio::IOException &e) {
+		} catch (jio::IOException &) {
 		}
 
 		Response *local = (*response);

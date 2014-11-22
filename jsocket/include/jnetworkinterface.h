@@ -102,7 +102,7 @@ class NetworkInterface : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void AddSubInterface(NetworkInterface *interface);
+		void AddSubInterface(NetworkInterface *i);
 
 	public:
 		/**

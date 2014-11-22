@@ -585,7 +585,7 @@ bool File::IsExecutable()
 	std::string s = GetAbsolutePath();
 	DWORD d;
 
-	return (bool)GetBinaryTypeA(s.c_str(), &d);
+	return (GetBinaryType(s.c_str(), &d) == TRUE);
 #else
 	if (S_ISDIR(_stat.st_mode)) {
 		return false;
@@ -791,7 +791,7 @@ bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 
 	TCHAR szDir[MAX_PATH];
 	WIN32_FIND_DATA ffd;
-	LARGE_INTEGER filesize;
+	// LARGE_INTEGER filesize;
 	HANDLE hFind = INVALID_HANDLE_VALUE;
 
 	// Check that the input path plus 3 is not longer than MAX_PATH (three characters are for the "\*" plus NULL).

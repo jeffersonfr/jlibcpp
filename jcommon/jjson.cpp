@@ -32,19 +32,18 @@
  * Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
  *
  */
-#define ERROR(it, desc)											\
-	std::ostringstream o;											\
-	delete [] dup;														\
-	o << "Parse exception at line " 					\
-		<< lines << ": " << desc;								\
+#define __ERROR(it, desc)	\
+	std::ostringstream o;	\
+	delete [] dup;	\
+	o << "Parse exception at line " << lines << ": " << desc;	\
 	throw jcommon::ParserException(o.str());	\
 
-#define CHECK_TOP() 												\
-	if (!top) {																\
-		ERROR(it, "Unexpected character");			\
-	}																					\
+#define __CHECK_TOP()	\
+	if (!top) {	\
+		ERROR(it, "Unexpected character");	\
+	}	\
 
-#define IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
+#define __IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
 
 namespace jcommon {
 
@@ -115,7 +114,7 @@ char * JSONValue::GetString()
 
 bool JSONValue::GetBoolean()
 {
-	return (bool)_int_value;
+	return (_int_value == 0)?false:true;
 }
 
 int JSONValue::GetInteger()
@@ -163,7 +162,7 @@ char * atoi(char *first, char *last, int *out)
 		}
 	}
 
-	for (; first != last && IS_DIGIT(*first); ++first) {
+	for (; first != last && __IS_DIGIT(*first); ++first) {
 		result = 10 * result + (*first - '0');
 	}
 
@@ -179,7 +178,7 @@ char * hatoui(char *first, char *last, uint32_t *out)
 
 	for (; first != last; ++first) {
 		int digit;
-		if (IS_DIGIT(*first)) {
+		if (__IS_DIGIT(*first)) {
 			digit = *first - '0';
 		} else if (*first >= 'a' && *first <= 'f') {
 			digit = *first - 'a' + 10;
@@ -215,7 +214,7 @@ char * atof(char *first, char *last, double *out)
 	// integer part
 	double result = 0;
 
-	for (; first != last && IS_DIGIT(*first); ++first) {
+	for (; first != last && __IS_DIGIT(*first); ++first) {
 		result = 10 * result + (*first - '0');
 	}
 
@@ -224,7 +223,7 @@ char * atof(char *first, char *last, double *out)
 		++first;
 
 		double inv_base = 0.1f;
-		for (; first != last && IS_DIGIT(*first); ++first) {
+		for (; first != last && __IS_DIGIT(*first); ++first) {
 			result += (*first - '0') * inv_base;
 			inv_base *= 0.1f;
 		}
@@ -246,7 +245,7 @@ char * atof(char *first, char *last, double *out)
 			++first;
 		}
 
-		for (; first != last && IS_DIGIT(*first); ++first) {
+		for (; first != last && __IS_DIGIT(*first); ++first) {
 			exponent = 10 * exponent + (*first - '0');
 		}
 	}
@@ -317,7 +316,7 @@ JSONValue * JSON::Parse(const char *source)
 					} else if (!root) {
 						root = object;
 					} else {
-						ERROR(it, "Second root. Only one root allowed");
+						__ERROR(it, "Second root. Only one root allowed");
 					}
 
 					top = object;
@@ -326,7 +325,7 @@ JSONValue * JSON::Parse(const char *source)
 			case '}':
 			case ']': {
 					if (!top || top->_type != ((*it == '}')?JSON_OBJECT:JSON_ARRAY)) {
-						ERROR(it, "Mismatch closing brace/bracket");
+						__ERROR(it, "Mismatch closing brace/bracket");
 					}
 
 					// skip close character
@@ -338,16 +337,16 @@ JSONValue * JSON::Parse(const char *source)
 				break;
 			case ':':
 				if (!top || top->_type != JSON_OBJECT) {
-					ERROR(it, "Unexpected character");
+					__ERROR(it, "Unexpected character");
 				}
 				++it;
 				break;
 			case ',':
-				CHECK_TOP();
+				__CHECK_TOP();
 				++it;
 				break;
 			case '"': {
-					CHECK_TOP();
+					__CHECK_TOP();
 					// skip '"' character
 					++it;
 
@@ -356,7 +355,7 @@ JSONValue * JSON::Parse(const char *source)
 
 					while (*it) {
 						if ((uint8_t)*it < '\x20') {
-							ERROR(first, "Control characters not allowed in strings");
+							__ERROR(first, "Control characters not allowed in strings");
 						} else if (*it == '\\') {
 							switch (it[1]) {
 								case '"':
@@ -388,7 +387,7 @@ JSONValue * JSON::Parse(const char *source)
 										uint32_t codepoint;
 
 										if (hatoui(it + 2, it + 6, &codepoint) != it + 6) {
-											ERROR(it, "Bad unicode codepoint");
+											__ERROR(it, "Bad unicode codepoint");
 										}
 
 										if (codepoint <= 0x7F) {
@@ -405,7 +404,7 @@ JSONValue * JSON::Parse(const char *source)
 									it += 4;
 									break;
 								default:
-									ERROR(first, "Unrecognized escape sequence");
+									__ERROR(first, "Unrecognized escape sequence");
 							}
 
 							++last;
@@ -448,7 +447,7 @@ JSONValue * JSON::Parse(const char *source)
 			case 'n':
 			case 't':
 			case 'f': {
-					CHECK_TOP();
+					__CHECK_TOP();
 
 					// new null/bool value
 					JSONValue *object = new JSONValue();
@@ -478,7 +477,7 @@ JSONValue * JSON::Parse(const char *source)
 						object->_int_value = 0;
 						it += 5;
 					} else {
-						ERROR(it, "Unknown identifier");
+						__ERROR(it, "Unknown identifier");
 					}
 
 					top->Append(object);
@@ -495,7 +494,7 @@ JSONValue * JSON::Parse(const char *source)
 			case '7':
 			case '8':
 			case '9': {
-					CHECK_TOP();
+					__CHECK_TOP();
 
 					// new number value
 					JSONValue *object = new JSONValue();
@@ -520,11 +519,11 @@ JSONValue * JSON::Parse(const char *source)
 					}
 
 					if (object->_type == JSON_INT && atoi(first, it, &object->_int_value) != it) {
-						ERROR(first, "Bad integer number");
+						__ERROR(first, "Bad integer number");
 					}
 
 					if (object->_type == JSON_FLOAT && atof(first, it, &object->_double_value) != it) {
-						ERROR(first, "Bad float number");
+						__ERROR(first, "Bad float number");
 					}
 
 					object->_string_value = strndup(first, it-first);
@@ -533,7 +532,7 @@ JSONValue * JSON::Parse(const char *source)
 				}
 				break;
 			default:
-				ERROR(it, "Unexpected character");
+				__ERROR(it, "Unexpected character");
 		}
 
 		// skip white space
@@ -543,7 +542,7 @@ JSONValue * JSON::Parse(const char *source)
 	}
 
 	if (top) {
-		ERROR(it, "Not all objects/arrays have been properly closed");
+		__ERROR(it, "Not all objects/arrays have been properly closed");
 	}
 
 	delete [] dup;

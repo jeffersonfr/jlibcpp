@@ -84,8 +84,6 @@ class Thread : public virtual jcommon::Object{
 	private:
 #ifdef _WIN32
 		/** \brief */
-		DWORD _thread_id;
-		/** \brief */
 		DWORD _stackSize;
 		/** \brief */
 		DWORD _executeFlag;
@@ -99,8 +97,6 @@ class Thread : public virtual jcommon::Object{
 		DWORD _exitCode;
 #else
 #endif
-		/** \brief */
-		jthread_t _thread;
 		/** \brief */
 		std::map<int, jthread_map_t *> _threads;
 		/** \brief */
@@ -238,7 +234,7 @@ class Thread : public virtual jcommon::Object{
 		 * \bried
 		 *
 		 */
-		virtual void Yield();
+		virtual void YieldThread();
 
 		/**
 		 * \brief Get thread identifier
@@ -298,13 +294,13 @@ class Thread : public virtual jcommon::Object{
 		 * \bried
 		 *
 		 */
-		virtual void SetPolicy(jthread_policy_t policy, jthread_priority_t priority);
+		virtual void SetPolicy(int id, jthread_policy_t policy, jthread_priority_t priority);
 
 		/**
 		 * \bried
 		 *
 		 */
-		virtual void GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority);
+		virtual void GetPolicy(int id, jthread_policy_t *policy, jthread_priority_t *priority);
 
 		/**
 		 * \brief Wait for end of thread.

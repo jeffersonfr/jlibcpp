@@ -103,11 +103,13 @@ int ConnectionPipe::Receive(char *data_, int size_, bool block_)
 	int n = 0;
 
 #ifdef _WIN32
-	ReadFile(_pipe[0], data_, size_, (DWORD *)&r, 0);
+	DWORD r;
 
-	if (n <= 0) {
+	if (ReadFile(_pipe[0], data_, size_, (DWORD *)&r, 0) == FALSE) {
 		throw jio::IOException("Broken pipe exception");
 	}
+
+	n = (int)r;
 #else
 	char *c = data_;
 	

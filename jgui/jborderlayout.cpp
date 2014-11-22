@@ -78,30 +78,30 @@ jsize_t BorderLayout::GetMinimumLayoutSize(Container *parent)
 	if ((cmp = GetChild(JBLA_EAST, ltr)) != NULL) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width += d.width + _hgap;
-	    t.height = std::max(d.height, t.height);
+	    t.height = (std::max)(d.height, t.height);
 	}
 	
 	if ((cmp = GetChild(JBLA_WEST, ltr)) != NULL) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width += d.width + _hgap;
-	    t.height = std::max(d.height, t.height);
+	    t.height = (std::max)(d.height, t.height);
 	}
 	
 	if ((cmp = GetChild(JBLA_CENTER, ltr)) != NULL) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width += d.width;
-	    t.height = std::max(d.height, t.height);
+	    t.height = (std::max)(d.height, t.height);
 	}
 	
 	if ((cmp = GetChild(JBLA_NORTH, ltr)) != NULL) {
 	    jsize_t d = cmp->GetMinimumSize();
-	    t.width = std::max(d.width, t.width);
+	    t.width = (std::max)(d.width, t.width);
 	    t.height += d.height + _vgap;
 	}
 	
 	if ((cmp = GetChild(JBLA_SOUTH, ltr)) != NULL) {
 	    jsize_t d = cmp->GetMinimumSize();
-	    t.width = std::max(d.width, t.width);
+	    t.width = (std::max)(d.width, t.width);
 	    t.height += d.height + _vgap;
 	}
 
@@ -130,30 +130,30 @@ jsize_t BorderLayout::GetPreferredLayoutSize(Container *parent)
 	if ((cmp = GetChild(JBLA_EAST, ltr)) != NULL) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width += d.width + _hgap;
-	    t.height = std::max(d.height, t.height);
+	    t.height = (std::max)(d.height, t.height);
 	}
 	
 	if ((cmp = GetChild(JBLA_WEST, ltr)) != NULL) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width += d.width + _hgap;
-	    t.height = std::max(d.height, t.height);
+	    t.height = (std::max)(d.height, t.height);
 	}
 	
 	if ((cmp = GetChild(JBLA_CENTER, ltr)) != NULL) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width += d.width;
-	    t.height = std::max(d.height, t.height);
+	    t.height = (std::max)(d.height, t.height);
 	}
 	
 	if ((cmp = GetChild(JBLA_NORTH, ltr)) != NULL) {
 	    jsize_t d = cmp->GetPreferredSize();
-	    t.width = std::max(d.width, t.width);
+	    t.width = (std::max)(d.width, t.width);
 	    t.height += d.height + _vgap;
 	}
 	
 	if ((cmp = GetChild(JBLA_SOUTH, ltr)) != NULL) {
 	    jsize_t d = cmp->GetPreferredSize();
-	    t.width = std::max(d.width, t.width);
+	    t.width = (std::max)(d.width, t.width);
 	    t.height += d.height + _vgap;
 	}
 

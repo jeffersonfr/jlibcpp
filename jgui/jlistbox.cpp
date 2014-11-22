@@ -453,7 +453,7 @@ void ListBox::IncrementLines(int lines)
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
 	if ((_item_size+_item_gap)*_index < scrolly) {
-		ScrollToVisibleArea(scrollx, std::max(0, (_item_size+_item_gap)*_index), _size.width, _size.height, this);
+		ScrollToVisibleArea(scrollx, (std::max)(0, (_item_size+_item_gap)*_index), _size.width, _size.height, this);
 	} else if ((scrolly+_size.height) < (_item_size+_item_gap)*(int)_index) {
 		ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*(_index+1)-_size.height+2*_item_gap, _size.width, _size.height, this);
 	}
@@ -494,7 +494,7 @@ void ListBox::DecrementLines(int lines)
 	if ((scrolly+_size.height) < (_item_size+_item_gap)*(int)(_index+1)) {
 		ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*(_index+1)-_size.height+2*_item_gap, _size.width, _size.height, this);
 	} else if ((_item_size+_item_gap)*_index < scrolly) {
-		ScrollToVisibleArea(scrollx, std::max(0, (_item_size+_item_gap)*_index), _size.width, _size.height, this);
+		ScrollToVisibleArea(scrollx, (std::max)(0, (_item_size+_item_gap)*_index), _size.width, _size.height, this);
 	}
 
 	if (_index != old_index) {

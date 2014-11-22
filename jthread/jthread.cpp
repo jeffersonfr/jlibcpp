@@ -126,12 +126,13 @@ ThreadGroup * Thread::GetThreadGroup()
 	return _group;
 }
 
-void Thread::Yield()
+void Thread::YieldThread()
 {
 #ifdef _WIN32
-	sched_yield();
+	SwitchToThread();
 #else
 	pthread_yield();
+	// sched_yield();
 #endif
 }
 
@@ -193,6 +194,8 @@ void * Thread::ThreadMain(void *owner_)
 	t->thiz->Run();
 
 	t->alive = false;
+
+	return 0;
 #else
 	if (t->thiz->_cancel == JTC_DISABLED) {
 		pthread_setcancelstate(PTHREAD_CANCEL_DISABLE, NULL);
@@ -293,19 +296,21 @@ void Thread::Start(int id)
 	t->alive = true;
 
 #ifdef _WIN32
-	if (_thread = CreateThread(
+	HANDLE handle;
+
+	if ((handle = CreateThread(
 				_sa,				// security attributes
 				0,					// stack size
 				Thread::ThreadMain,	// function thread
 				t,					// thread arguments
 				0,					// flag
-				&_thread_id) == NULL) {
+				NULL)) == NULL) {
 		_thread_mutex.Unlock();
 
 		throw ThreadException("Create thread failed");
 	}
 
-	t->thread = _thread;
+	t->thread = handle;
 #else
 	pthread_attr_t attr;
 	size_t size;
@@ -326,8 +331,10 @@ void Thread::Start(int id)
 
 	_stack_size = size;
 			
+	pthread_t handle;
+
 	// pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
-	if (pthread_create(&_thread, &attr, &(Thread::ThreadMain), t)) {
+	if (pthread_create(&handle, &attr, &(Thread::ThreadMain), t)) {
 		t->detached = true;
 		t->alive = false;
 
@@ -336,7 +343,7 @@ void Thread::Start(int id)
 		throw ThreadException("Thread create failed");
 	}
 
-	t->thread = _thread;
+	t->thread = handle;
 
 	pthread_attr_destroy(&attr);
 #endif
@@ -355,7 +362,7 @@ bool Thread::Interrupt(int id)
 	}
 
 #ifdef _WIN32
-	if (TerminateThread(_thread, 0) == FALSE) {
+	if (TerminateThread(t->thread, 0) == FALSE) {
 		return false; // CHANGE:: throw ThreadException("Thread cancel exception");
 	}
 
@@ -441,9 +448,11 @@ bool Thread::IsRunning(int id)
 	return false;
 }
 
-void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
+void Thread::SetPolicy(int id, jthread_policy_t policy, jthread_priority_t priority)
 {
 	AutoLock lock(&_thread_mutex);
+
+	jthread_map_t *t = GetMap(id);
 
 	int tpriority = 0;
 
@@ -486,7 +495,7 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 #endif
 
 #ifdef _WIN32
-	if (SetThreadPriority(_thread, tpriority) == 0) {
+	if (SetThreadPriority(t->thread, tpriority) == 0) {
 		throw ThreadException("Unknown exception in set policy");
 	}
 #else
@@ -497,7 +506,7 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 
 	int result;
 
-	result = pthread_setschedparam(_thread, tpolicy, &param);
+	result = pthread_setschedparam(t->thread, tpolicy, &param);
 
 	if (result == EINVAL) {
 		throw ThreadException("Policy is not defined");
@@ -511,14 +520,16 @@ void Thread::SetPolicy(jthread_policy_t policy, jthread_priority_t priority)
 #endif
 }
 
-void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority) 
+void Thread::GetPolicy(int id, jthread_policy_t *policy, jthread_priority_t *priority) 
 {
 	AutoLock lock(&_thread_mutex);
+
+	jthread_map_t *t = GetMap(id);
 
 #ifdef _WIN32
 	int r;
 
-	if ((r = GetThreadPriority(_thread)) == THREAD_PRIORITY_ERROR_RETURN) {
+	if ((r = GetThreadPriority(t->thread)) == THREAD_PRIORITY_ERROR_RETURN) {
 		throw ThreadException("Unknown exception in get policy");
 	}
 
@@ -551,7 +562,7 @@ void Thread::GetPolicy(jthread_policy_t *policy, jthread_priority_t *priority)
 
 	int policy_int, result;
 
-	result = pthread_getschedparam(_thread, &policy_int, &param);
+	result = pthread_getschedparam(t->thread, &policy_int, &param);
 
 	if (result == ESRCH) {
 		throw ThreadException("This thread has already terminated");

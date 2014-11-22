@@ -76,7 +76,7 @@ Image * Image::CreateImage(int width, int height, jpixelformat_t pixelformat, in
 #elif defined(X11_UI)
 		image = new X11Image(width, height, pixelformat, scale_width, scale_height);
 #endif
-	} catch (jcommon::NullPointerException &e) {
+	} catch (jcommon::NullPointerException &) {
 	}
 
 	return image;
@@ -98,7 +98,7 @@ Image * Image::CreateImage(uint32_t *data, int width, int height, int scale_widt
 		image->GetGraphics()->SetDrawingFlags(JDF_NOFX);
 		image->GetGraphics()->SetRGB(data, 0, 0, width, height, width);
 #endif
-	} catch (jcommon::NullPointerException &e) {
+	} catch (jcommon::NullPointerException &) {
 	}
 
 	return image;
@@ -133,7 +133,7 @@ Image * Image::CreateImage(std::string file)
 				image = NULL;
 			}
 		}
-	} catch (jcommon::NullPointerException &e) {
+	} catch (jcommon::NullPointerException &) {
 	}
 
 	return image;
@@ -162,7 +162,7 @@ Image * Image::CreateImage(jio::InputStream *stream)
 #elif defined(X11_UI)
 		image = X11Image::CreateImageStream(stream);
 #endif
-	} catch (jcommon::NullPointerException &e) {
+	} catch (jcommon::NullPointerException &) {
 	}
 
 	return image;
@@ -216,7 +216,7 @@ Image * Image::Flip(jflip_flags_t t)
 #elif defined(X11_UI)
 		image = X11Image::Rotate(this, t);
 #endif
-	} catch (jcommon::NullPointerException &e) {
+	} catch (jcommon::NullPointerException &) {
 	}
 
 	return image;
@@ -232,7 +232,7 @@ Image * Image::Rotate(double radians, bool resize)
 #elif defined(X11_UI)
 		image = X11Image::Rotate(this, radians, resize);
 #endif
-	} catch (jcommon::NullPointerException &e) {
+	} catch (jcommon::NullPointerException &) {
 	}
 
 	return image;
@@ -255,7 +255,7 @@ Image * Image::Scale(int width, int height)
 			delete image;
 			image = NULL;
 		}
-	} catch (jcommon::NullPointerException &e) {
+	} catch (jcommon::NullPointerException &) {
 	}
 
 	return image;
@@ -278,7 +278,7 @@ Image * Image::SubImage(int x, int y, int width, int height)
 			delete image;
 			image = NULL;
 		}
-	} catch (jcommon::NullPointerException &e) {
+	} catch (jcommon::NullPointerException &) {
 	}
 
 	return image;

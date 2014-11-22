@@ -160,8 +160,10 @@ IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
 
 Image * IndexedImage::Flip(jflip_flags_t t)
 {
+	IndexedImage *image = NULL;
+
 	jsize_t size = GetSize();
-	uint8_t data[size.width*size.height];
+	uint8_t *data = new uint8_t[size.width*size.height];
 	
 	if ((t & JFF_HORIZONTAL) != 0) {
 		for (int j=0; j<size.height; j++) {
@@ -189,18 +191,24 @@ Image * IndexedImage::Flip(jflip_flags_t t)
 		}
 	}
 
-	return new IndexedImage(_palette, _palette_size, data, size.width, size.height);
+	image = new IndexedImage(_palette, _palette_size, data, size.width, size.height);
+
+	delete [] data;
+
+	return image;
 }
 
 Image * IndexedImage::Rotate(double radians, bool resize)
 {
+	IndexedImage *image = NULL;
+
 	jsize_t isize = GetSize();
 
 	double angle = fmod(radians, 2*M_PI);
 
 	int precision = 1024;
-	int sinTheta = precision*sin(angle);
-	int cosTheta = precision*cos(angle);
+	int sinTheta = (int)(precision*sin(angle));
+	int cosTheta = (int)(precision*cos(angle));
 
 	int iw = isize.width;
 	int ih = isize.height;
@@ -210,7 +218,7 @@ Image * IndexedImage::Rotate(double radians, bool resize)
 		ih = (abs(isize.width*sinTheta)+abs(isize.height*cosTheta))/precision;
 	}
 
-	uint8_t data[iw*ih];
+	uint8_t *data = new uint8_t[iw*ih];
 
 	int sxc = isize.width/2;
 	int syc = isize.height/2;
@@ -237,7 +245,11 @@ Image * IndexedImage::Rotate(double radians, bool resize)
 		}
 	}
 
-	return new IndexedImage(_palette, _palette_size, data, iw, ih);
+	image = new IndexedImage(_palette, _palette_size, data, iw, ih);
+
+	delete[] data;
+
+	return image;
 }
 
 Image * IndexedImage::Scale(int width, int height)
@@ -245,6 +257,8 @@ Image * IndexedImage::Scale(int width, int height)
 	if (width <= 0 || height <= 0) {
 		return NULL;
 	}
+
+	IndexedImage *image = NULL;
 
 	int size = width*height,
 			srcWidth = GetWidth(),
@@ -254,7 +268,7 @@ Image * IndexedImage::Scale(int width, int height)
 			xRatio = (srcWidth << 16) / width,
 			xPos = xRatio / 2,
 			yPos = yRatio / 2;
-	uint8_t data[size];
+	uint8_t *data = new uint8_t[size];
 
 	for (int x = 0; x < width; x++) {
 		int srcX = xPos >> 16;
@@ -274,7 +288,11 @@ Image * IndexedImage::Scale(int width, int height)
 		xPos = xPos + xRatio;
 	}
 
-	return new IndexedImage(_palette, _palette_size, data, width, height);
+	image = new IndexedImage(_palette, _palette_size, data, width, height);
+
+	delete [] data;
+
+	return image;
 }
 
 Image * IndexedImage::SubImage(int x, int y, int width, int height)
@@ -283,14 +301,20 @@ Image * IndexedImage::SubImage(int x, int y, int width, int height)
 		return NULL;
 	}
 
+	IndexedImage *image = NULL;
+
 	int size = width*height;
-	uint8_t data[size];
+	uint8_t *data = new uint8_t[size];
 
 	for (int i=0; i<size; i++) {
 		data[i] = _data[x + i%width + ((y + i/width) * _size.width)];
 	}
 
-	return new IndexedImage(_palette, _palette_size, data, width, height);
+	image = new IndexedImage(_palette, _palette_size, data, width, height);
+
+	delete [] data;
+
+	return image;
 }
 
 void IndexedImage::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)

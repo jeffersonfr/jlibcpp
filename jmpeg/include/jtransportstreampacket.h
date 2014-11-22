@@ -46,55 +46,55 @@ class TransportStreamPacket
 		 * \brief
 		 *
 		 */
-		static bool Check(uint8_t *packet, uint32_t size);
+		static bool Check(uint8_t *packet, int size);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static uint32_t GetSyncByte(uint8_t *packet);
+		static int GetSyncByte(uint8_t *packet);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static uint32_t GetTransportErrorIndicator(uint8_t *packet);
+		static int GetTransportErrorIndicator(uint8_t *packet);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static uint32_t GetPayloadUnitStartIndicator(uint8_t *packet);
+		static int GetPayloadUnitStartIndicator(uint8_t *packet);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static uint32_t GetTransportPriority(uint8_t *packet);
+		static int GetTransportPriority(uint8_t *packet);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static uint32_t GetProgramID(uint8_t *packet);
+		static int GetProgramID(uint8_t *packet);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static uint32_t GetTransportScramblingControl(uint8_t *packet);
+		static int GetTransportScramblingControl(uint8_t *packet);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static uint32_t GetAdaptationFieldControl(uint8_t *packet);
+		static int GetAdaptationFieldControl(uint8_t *packet);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static uint32_t GetContinuityCounter(uint8_t *packet);
+		static int GetContinuityCounter(uint8_t *packet);
 
 		/**
 		 * \brief
@@ -106,7 +106,7 @@ class TransportStreamPacket
 		 * \brief
 		 *
 		 */
-		static uint8_t GetAdaptationFieldLength(uint8_t *packet);
+		static int GetAdaptationFieldLength(uint8_t *packet);
 
 		/**
 		 * \brief
@@ -118,7 +118,7 @@ class TransportStreamPacket
 		 * \brief
 		 *
 		 */
-		static void GetPayload(uint8_t *packet, uint8_t *data, uint32_t *data_size);
+		static void GetPayload(uint8_t *packet, uint8_t *data, int *data_size);
 
 };
 

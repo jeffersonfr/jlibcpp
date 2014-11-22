@@ -34,7 +34,7 @@ RemoteIPCServer::RemoteIPCServer(int port):
 {
 	try {
 		_server = new jsocket::ServerSocket(port);
-	} catch (jsocket::SocketException &e) {
+	} catch (jsocket::SocketException &) {
 		throw IPCException("Cannot create ipc server.");
 	}
 }
@@ -108,7 +108,7 @@ void RemoteIPCServer::WaitCall(RemoteCallListener *listener)
 					length = length - r;
 					index = index + r;
 				}
-			} catch (jio::IOException &e) {
+			} catch (jio::IOException &) {
 			}
 
 			delete response;

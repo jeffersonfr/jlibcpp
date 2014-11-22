@@ -22,12 +22,6 @@
 
 #include "jobject.h"
 
-#ifdef WIN32
-#define snprintf _snprintf
-#define strncasecmp strnicmp
-#define strcasecmp  stricmp
-#endif
-
 namespace jcommon {
 
 /**

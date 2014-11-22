@@ -20,7 +20,7 @@
 #ifndef J_SECURITYMANAGER_H
 #define J_SECURITYMANAGER_H
 
-#include "jaccesscontroller.h"
+#include "jaccesscontrol.h"
 #include "juser.h"
 #include "jgroup.h"
 

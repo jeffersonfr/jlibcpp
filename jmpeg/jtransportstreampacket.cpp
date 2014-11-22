@@ -31,15 +31,19 @@ TransportStreamPacket::~TransportStreamPacket()
 {
 }
 
-bool TransportStreamPacket::Check(uint8_t *data, uint32_t size)
+bool TransportStreamPacket::Check(uint8_t *data, int size)
 {
 	if (data == NULL) {
 		// throw jcommon::NullPointerException("Packet is null");
 		return false;
 	}
 	
-	if (size < 188 || size > 188) {	// default size of packet from mpeg transport
+	if (size != 188) {
 		// throw MpegException("Invalid size of packet");
+		// return false;
+	}
+
+	if (data[0] != 0x47) {
 		return false;
 	}
 
@@ -48,42 +52,42 @@ bool TransportStreamPacket::Check(uint8_t *data, uint32_t size)
 	return true;
 }
 
-uint32_t TransportStreamPacket::GetSyncByte(uint8_t *packet)
+int TransportStreamPacket::GetSyncByte(uint8_t *packet)
 {
 	return packet[0];
 }
 
-uint32_t TransportStreamPacket::GetTransportErrorIndicator(uint8_t *packet)
+int TransportStreamPacket::GetTransportErrorIndicator(uint8_t *packet)
 {
 	return (packet[1] & 0x80) >> 7;
 }
 
-uint32_t TransportStreamPacket::GetPayloadUnitStartIndicator(uint8_t *packet)
+int TransportStreamPacket::GetPayloadUnitStartIndicator(uint8_t *packet)
 {
 	return (packet[1] & 0x40) >> 6;
 }
 
-uint32_t TransportStreamPacket::GetTransportPriority(uint8_t *packet)
+int TransportStreamPacket::GetTransportPriority(uint8_t *packet)
 {
 	return (packet[1] & 0x20) >> 5;
 }
 
-uint32_t TransportStreamPacket::GetProgramID(uint8_t *packet)
+int TransportStreamPacket::GetProgramID(uint8_t *packet)
 {
 	return (packet[1] << 8 | packet[2]) & 0x1fff;
 }
 
-uint32_t TransportStreamPacket::GetTransportScramblingControl(uint8_t *packet)
+int TransportStreamPacket::GetTransportScramblingControl(uint8_t *packet)
 {
 	return (packet[3] & 0xc0) >> 6;
 }
 
-uint32_t TransportStreamPacket::GetAdaptationFieldControl(uint8_t *packet)
+int TransportStreamPacket::GetAdaptationFieldControl(uint8_t *packet)
 {
 	return (packet[3] & 0x30) >> 4;
 }
 
-uint32_t TransportStreamPacket::GetContinuityCounter(uint8_t *packet)
+int TransportStreamPacket::GetContinuityCounter(uint8_t *packet)
 {
 	return packet[3] & 0x0f;
 }
@@ -94,7 +98,7 @@ bool TransportStreamPacket::HasAdaptationField(uint8_t *packet)
 			TransportStreamPacket::GetAdaptationFieldControl(packet) == 0x03);
 }
 
-uint8_t TransportStreamPacket::GetAdaptationFieldLength(uint8_t *packet)
+int TransportStreamPacket::GetAdaptationFieldLength(uint8_t *packet)
 {
 	if (TransportStreamPacket::HasAdaptationField(packet) == false) {
 		return 0;
@@ -109,14 +113,14 @@ AdaptationField * TransportStreamPacket::GetAdaptationField(uint8_t *packet)
 		return NULL;
 	}
 
-	uint32_t adaptation_field_length = packet[4];
+	int adaptation_field_length = packet[4];
 	
 	return new AdaptationField(packet+4, adaptation_field_length);
 }
 
-void TransportStreamPacket::GetPayload(uint8_t *packet, uint8_t *data, uint32_t *size)
+void TransportStreamPacket::GetPayload(uint8_t *packet, uint8_t *data, int *size)
 {
-	uint32_t header_size = 4,
+	int header_size = 4,
 					 control = TransportStreamPacket::GetAdaptationFieldControl(packet);
 	
 	if (control == 0x00) {					// jump the packet, is invalid

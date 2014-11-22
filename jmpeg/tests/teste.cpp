@@ -23,13 +23,16 @@
 #include "jruntimeexception.h"
 
 #include <iostream>
+#include <vector>
 #include <map>
+#include <algorithm>
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
 
-#define TS_PACKET_SIZE				0xbc
+#define TS_PACKET_SIZE				0xbc // 188 bytes
 #define TS_HEADER_SYNC_BYTE		0x47
 
 #define NUMBER_OF_TRYS				0x03
@@ -74,215 +77,268 @@ class DataSource {
 		
 };
 
-class Controller {
-	private:
-		DataSource *_source;
-	
+class DataListener {
+
 	public:
-	Controller(DataSource *source)
-	{
-		_source = source;
-		
-		if (_source == NULL) {
-			throw jcommon::RuntimeException("Data source null pointer !");
+		enum data_type_t {
+			RAW_DATA,
+			PSI_DATA,
+			PES_DATA
+		};
+
+	private:
+		data_type_t _type;
+		int _pid;
+		int _table_id;
+
+	public:
+		DataListener()
+		{
+			_type = DataListener::RAW_DATA;
+			_pid = -1;
+			_table_id = -1;
 		}
-	}
-	
-	~Controller()
-	{
-		if (_source != NULL) {
-			delete _source;
+
+		virtual ~DataListener()
+		{
 		}
-	}
-	
-	int Sync(uint8_t *buffer, uint32_t size)
-	{
-		uint32_t length, sync, i;
-		
-		length = sync = i = 0;
-		
-		while (++i < size) {
-			length++;
-			
-			if (buffer[i-1] == TS_HEADER_SYNC_BYTE) {
-				if (length == TS_PACKET_SIZE) {
-					sync++;
-				} else {
-					sync=0;
+
+		virtual int GetPID()
+		{
+			return _pid;
+		}
+
+		virtual int GetTableID()
+		{
+			return _table_id;
+		}
+
+		virtual DataListener::data_type_t GetType()
+		{
+			return _type;
+		}
+
+		virtual void SetPID(int pid)
+		{
+			_pid = pid;
+		}
+
+		virtual void SetTableID(int table_id)
+		{
+			_table_id = table_id;
+		}
+
+		virtual void SetType(DataListener::data_type_t type)
+		{
+			_type = type;
+		}
+
+		virtual void DataArrived(uint8_t *data, int length)
+		{
+		}
+
+};
+
+class Demux {
+
+	private:
+		std::vector<DataListener *> _data_listeners;
+		DataSource *_source;
+
+	public:
+		Demux(DataSource *source)
+		{
+			_source = source;
+
+			if (_source == NULL) {
+				throw jcommon::RuntimeException("Data source null pointer !");
+			}
+		}
+
+		~Demux()
+		{
+			if (_source != NULL) {
+				delete _source;
+			}
+		}
+
+		int Sync(uint8_t *buffer, uint32_t size)
+		{
+			uint32_t length, sync, i;
+
+			length = sync = i = 0;
+
+			while (++i < size) {
+				length++;
+
+				if (buffer[i-1] == TS_HEADER_SYNC_BYTE) {
+					if (length == TS_PACKET_SIZE) {
+						sync++;
+					} else {
+						sync=0;
+					}
+
+					length = 0;
 				}
-				
-				length = 0;
-			}
-			
-			if (sync == NUMBER_OF_TRYS) {
-				break;
-			}
-		}	
-		
-		if (i >= size) {
-			return TS_SYNC_NOT_FOUND;
-		}
-		
-		return (i-1)-(NUMBER_OF_TRYS*188);
-	}
-	
-	void Find()
-	{
-		std::map<int, int> pids;
-		uint32_t size_buffer, 
-				 count;
-		uint8_t buffer[188];
-		
-		count = 0;
-		
-		while ((size_buffer = _source->Read((char *)buffer, 188)) == 188) {
-			if (size_buffer != 188) {
-				break;
-			}
-			
-			// TODO:: definir metodos como static para evitar milhares de allocs
-			// criar um metodo Check() para verificar se os 188 bytes sao validos
-			if (jmpeg::TransportStreamPacket::Check(buffer, 188) == false) {
-				std::cout << "Invalid Packet" << std::endl;
 
-				continue;
-			}
-			
-			count++;
-			
-			pids[jmpeg::TransportStreamPacket::GetProgramID(buffer)] += 1;
-			
-			if (count >= 100000) {
-				break;
-			}
-		}
-
-		for (std::map<int, int>::iterator i=pids.begin(); i!=pids.end(); i++) {
-			std::cout << "PID::" << std::hex << "0x" << i->first << ", count:: " << std::dec << i->second << std::endl;
-		}
-	}
-
-	void Process()
-	{
-		jmpeg::ProgramAssociationSection pat;
-		jmpeg::ProgramMapSection pmt;
-		std::map<int, int> pids;
-		uint32_t size_buffer, 
-				 count,
-				 pat_pid = 0,
-				 pmt_pid = -1;
-		uint8_t buffer[188];
-		bool find_pmt = false;
-		
-		count = 0;
-		
-		while ((size_buffer = _source->Read((char *)buffer, 188)) == 188) {
-			if (size_buffer != 188) {
-				break;
-			}
-			
-			// TODO:: definir metodos como static para evitar milhares de allocs
-			// criar um metodo Check() para verificar se os 188 bytes sao validos
-			if (jmpeg::TransportStreamPacket::Check(buffer, 188) == false) {
-				std::cout << "Invalid Packet" << std::endl;
-
-				continue;
-			}
-			
-			count++;
-			
-			pids[jmpeg::TransportStreamPacket::GetProgramID(buffer)] += 1;
-			
-			if (count >= 100000) {
-				break;
-			}
-			
-			if (find_pmt == true) {
-				if (jmpeg::TransportStreamPacket::GetProgramID(buffer) == pmt_pid) {
-					std::cout << "Process PMT" << std::endl;
-
-					uint8_t pointer = 0,
-									payload[188];
-					uint32_t size;
-
-					jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &size);
-
-					if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
-						if (pmt.GetSectionSize() > 0) {
-							pmt.Clear();
-						}
-
-						pointer = 1;
-					
-						if (jmpeg::TransportStreamPacket::HasAdaptationField(buffer) == true) {
-							pointer = payload[0] + 1;
-						}
-					}
-
-					pmt.Push((payload + pointer), size - pointer);
-
-					if (pmt.HasFailed() == true) {
-						pmt.Clear();
-					} else if (pmt.IsComplete() == true) {
-						std::vector<jmpeg::ProgramMapSection::Program *> program_map;
-
-						pmt.GetPrograms(program_map);
-
-						for (std::vector<jmpeg::ProgramMapSection::Program *>::iterator i=program_map.begin(); i!=program_map.end(); i++) {
-							std::cout << "Find PMT Items:: pid::" << std::hex << "0x" << (*i)->GetElementaryPID() << ", type:: " << (*i)->GetStreamType() << std::endl;
-						}
-
-						return;
-					}
+				if (sync == NUMBER_OF_TRYS) {
+					break;
 				}
-			} else {
-				if (jmpeg::TransportStreamPacket::GetProgramID(buffer) == pat_pid) {
-					std::cout << "Process PAT" << std::endl;
+			}	
 
-					uint8_t pointer = 0,
-									payload[188];
-					uint32_t size;
+			if (i >= size) {
+				return TS_SYNC_NOT_FOUND;
+			}
 
-					jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &size);
+			return (i-1)-(NUMBER_OF_TRYS*TS_PACKET_SIZE);
+		}
 
-					if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
-						if (payload[0] != 0x00) { // table_id = 0x00 (program association section)
-							continue;
-						}
+		virtual void RegisterDataListener(DataListener *listener)
+		{
+			if (listener == NULL) {
+				return;
+			}
 
-						if (pat.GetSectionSize() > 0) {
-							pat.Clear();
-						}
+			if (std::find(_data_listeners.begin(), _data_listeners.end(), listener) == _data_listeners.end()) {
+				_data_listeners.push_back(listener);
+			}
+		}
 
-						pointer = 1;
-					
-						if (jmpeg::TransportStreamPacket::HasAdaptationField(buffer) == true) {
-							pointer = payload[0] + 1;
-						}
-					}
+		virtual void RemoveDataListener(DataListener *listener)
+		{
+			if (listener == NULL) {
+				return;
+			}
 
-					pat.Push((payload + pointer), size - pointer);
+			std::vector<DataListener *>::iterator i = std::find(_data_listeners.begin(), _data_listeners.end(), listener);
 
-					if (pat.HasFailed() == true) {
-						pat.Clear();
-					} else if (pat.IsComplete() == true) {
-						find_pmt = true;
+			if (i != _data_listeners.end()) {
+				_data_listeners.erase(i);
+			}
+		}
 
-						// get pmt pid
-						std::vector<jmpeg::ProgramAssociationSection::Program *> program_map;
+		virtual void DispatchDataEvent(uint8_t *data, int length)
+		{
+			if (data == NULL || length == 0) {
+				return;
+			}
 
-						pat.GetPrograms(program_map);
+			int k = 0,
+					size = (int)_data_listeners.size();
 
-						for (std::vector<jmpeg::ProgramAssociationSection::Program *>::iterator i=program_map.begin(); i!=program_map.end(); i++) {
-							pmt_pid = (*i)->GetProgramID();
+			while (k++ < (int)_data_listeners.size()) {
+				DataListener *listener = _data_listeners[k-1];
 
-							std::cout << "Find PMT:: program number::" << std::hex << "0x" << (*i)->GetProgramNumber() << ", pid:: " << "0x" << (*i)->GetProgramID() << std::endl;
-						}
-					}
+				listener->DataArrived(data, length);
+
+				if (size != (int)_data_listeners.size()) {
+					size = (int)_data_listeners.size();
+
+					k--;
 				}
 			}
 		}
-	}
+
+		void Process()
+		{
+			uint8_t buffer[TS_PACKET_SIZE];
+			int buffer_length;
+
+			while ((buffer_length = _source->Read((char *)buffer, TS_PACKET_SIZE)) == TS_PACKET_SIZE) {
+				if (buffer_length != TS_PACKET_SIZE) {
+					break;
+				}
+
+				// TODO:: definir metodos como static para evitar milhares de allocs
+				// criar um metodo Check() para verificar se os bytes sao validos
+				if (jmpeg::TransportStreamPacket::Check(buffer, buffer_length) == false) {
+					std::cout << "Invalid Packet" << std::endl;
+
+					continue;
+				}
+
+				for (std::vector<DataListener *>::iterator i=_data_listeners.begin(); i!=_data_listeners.end(); i++) {
+					DataListener *listener = (*i);
+
+					if (listener->GetType() == DataListener::RAW_DATA) {
+						listener->DataArrived(buffer, buffer_length);
+					} else {
+						if (jmpeg::TransportStreamPacket::GetProgramID(buffer) == listener->GetPID()) {
+							jmpeg::ProgramSystemInformationSection psi;
+							uint8_t payload[TS_PACKET_SIZE];
+							int size, pointer = 0;
+
+							jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &size);
+
+							if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
+								if (listener->GetTableID() >= 0 && payload[0] != listener->GetTableID()) { // table_id
+									continue;
+								}
+
+								if (psi.GetSectionSize() > 0) {
+									psi.Clear();
+								}
+
+								pointer = 1;
+
+								if (jmpeg::TransportStreamPacket::HasAdaptationField(buffer) == true) {
+									pointer = payload[0];
+								}
+							}
+
+							psi.Push((payload + pointer), size - pointer);
+							printf(":::::::::: %d\n", size);
+
+							if (psi.HasFailed() == true) {
+								psi.Clear();
+							} else if (psi.IsComplete() == true) {
+								uint8_t buffer[4096];
+								uint32_t length;
+
+								psi.GetPayload(buffer, &length);
+								listener->DataArrived(buffer, length);
+							}
+						}
+					}
+				}
+			}
+		}
+};
+
+class PATListener : public DataListener {
+
+	private:
+
+	public:
+		PATListener()
+		{
+			SetType(PSI_DATA);
+			SetPID(0);
+			SetTableID(0);
+		}
+
+		virtual ~PATListener()
+		{
+		}
+
+		virtual void DataArrived(uint8_t *data, int length)
+		{
+			printf("PAT\n");
+
+			jmpeg::ProgramAssociationSection pat;
+
+			pat.Push(data, length);
+
+			if (pat.HasFailed() == false && pat.IsComplete() == true) {
+				std::vector<jmpeg::ProgramAssociationSection::Program *> program_map;
+
+				pat.GetPrograms(program_map);
+
+				for (std::vector<jmpeg::ProgramAssociationSection::Program *>::iterator i=program_map.begin(); i!=program_map.end(); i++) {
+					std::cout << "Find PMT:: program number::" << std::hex << "0x" << (*i)->GetProgramNumber() << ", pid:: " << "0x" << (*i)->GetProgramID() << std::endl;
+				}
+			}
+		}
 };
 
 int main(int argc, char **argv)
@@ -293,9 +349,9 @@ int main(int argc, char **argv)
 		exit(0);
 	}
 
-	Controller *c = new Controller(new DataSource(argv[1]));
+	Demux *c = new Demux(new DataSource(argv[1]));
 
-	// c->Find();
+	c->RegisterDataListener(new PATListener());
 	c->Process();
 
 	return 0;

@@ -2,8 +2,12 @@
 // or project specific include files that are used frequently,
 // but are changed infrequently
 
+#ifdef _WIN32
 // INFO:: desabilita warnnings de funcoes depreciadas
 #define _CRT_SECURE_NO_WARNINGS
+
+#define _USE_MATH_DEFINES
+#endif
 
 #include <iostream>
 #include <string>
@@ -86,6 +90,15 @@
 #endif
 
 #ifdef _WIN32
-#define _DATA_PREFIX	"c:\temp\jlib\resources"
-#endif
 
+#define _DATA_PREFIX	"c:\\jlibcpp"
+
+#define strdup	_strdup
+#define strnicmp	_strnicmp
+#define strcasecmp _strnicmp
+#define strncasecmp _strnicmp
+#define snprintf	_snprintf
+#define getch	_getch
+
+char *strndup(const char *s, size_t size);
+#endif

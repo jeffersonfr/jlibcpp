@@ -78,7 +78,7 @@ int64_t ProcessInputStream::Read(char *data, int64_t size)
 	DWORD n;
 
 	if (IsBlocking() == true) {
-		if (ReadFile(_fd, data, sizeof(buffer), &n, NULL) == TRUE) {
+		if (ReadFile(_fd, data, (DWORD)size, &n, NULL) == TRUE) {
 			return (int64_t)n;
 		}
 	} else {
@@ -86,7 +86,7 @@ int64_t ProcessInputStream::Read(char *data, int64_t size)
 			return 0LL;
 		}
 
-		if (ReadFile(_fd, data, sizeof(buffer), &n, NULL) == TRUE) {
+		if (ReadFile(_fd, data, (DWORD)size, &n, NULL) == TRUE) {
 			return (int64_t)n;
 		}
 	}

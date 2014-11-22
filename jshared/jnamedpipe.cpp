@@ -96,6 +96,8 @@ int NamedPipe::Receive(char *data_, int length_)
 	}
 
 #ifdef _WIN32
+	DWORD r;
+
  	if (ReadFile(_fd, data_, length_, (DWORD *)&r, 0) == FALSE) {
 		return -1;
 	}

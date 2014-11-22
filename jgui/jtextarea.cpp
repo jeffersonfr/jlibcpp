@@ -327,7 +327,7 @@ void TextArea::IncrementLines(int lines)
 		int font_height = _font->GetLineSize();
 
 		if (scrolly > 0) {
-			SetScrollY(std::max(0, (font_height+_rows_gap)*_current_row));
+			SetScrollY((std::max)(0, (font_height+_rows_gap)*_current_row));
 		}
 	}
 
@@ -362,7 +362,7 @@ void TextArea::DecrementLines(int lines)
 		int font_height = _font->GetLineSize();
 
 		if ((scrolly+_size.height) < (_font->GetLineSize()+_rows_gap)*GetRows()) {
-			SetScrollY(std::max(0, (font_height+_rows_gap)*_current_row));
+			SetScrollY((std::max)(0, (font_height+_rows_gap)*_current_row));
 		}
 	}
 
@@ -482,7 +482,7 @@ void TextArea::InitRowsString()
 
 	_rows_string = false;
 	
-	SetScrollY(std::max(0, (font_height+_rows_gap)*_current_row));
+	SetScrollY((std::max)(0, (font_height+_rows_gap)*_current_row));
 }
 
 std::vector<std::string> & TextArea::GetLines()

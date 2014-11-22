@@ -104,12 +104,12 @@ NetworkInterface::NetworkInterface(NetworkInterface *parent, std::string name, i
 NetworkInterface::~NetworkInterface()
 {
 	while (_childs.size() > 0) {
-		NetworkInterface *interface = (*_childs.begin());
+		NetworkInterface *i = (*_childs.begin());
 
 		_childs.erase(_childs.begin());
 
-		delete interface;
-		interface = NULL;
+		delete i;
+		i = NULL;
 	}
 }
 
@@ -134,10 +134,10 @@ void NetworkInterface::AddBroadcastAddress(InetAddress *addr)
 	}
 }
 
-void NetworkInterface::AddSubInterface(NetworkInterface *interface)
+void NetworkInterface::AddSubInterface(NetworkInterface *i)
 {
-	if ((void *)interface != NULL) {
-		_childs.push_back(interface);
+	if ((void *)i != NULL) {
+		_childs.push_back(i);
 	}
 }
 
