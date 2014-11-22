@@ -37,7 +37,7 @@ OBJDIR		= obj
 TESTDIR		= tests
 DOCDIR		= doc
 
-PREFIX		= /jeff/local
+PREFIX		= /usr/local
 
 TARGET		= $(BUILD)$(PREFIX)
 

@@ -40,7 +40,7 @@
 
 #define __CHECK_TOP()	\
 	if (!top) {	\
-		ERROR(it, "Unexpected character");	\
+		__ERROR(it, "Unexpected character");	\
 	}	\
 
 #define __IS_DIGIT(c) ((c) >= '0' && (c) <= '9')
