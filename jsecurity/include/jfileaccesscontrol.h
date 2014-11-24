@@ -20,7 +20,7 @@
 #ifndef J_FILEACCESSCONTROL_H
 #define J_FILEACCESSCONTROL_H
 
-#include "jaccesscontroller.h"
+#include "jaccesscontrol.h"
 
 namespace jsecurity {
 

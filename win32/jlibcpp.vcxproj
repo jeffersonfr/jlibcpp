@@ -1,0 +1,701 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A1D3BAAD-F955-4751-BDFD-7188957BE808}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>..\jgui\binds\directfb\include;..\jthread\include;..\jsocket\include;..\jshared\include;..\jsecurity\include;..\jresource\include;..\jmath\include;..\jlogger\include;..\jipc\include;..\jio\include;..\jgui\include;..\jdevice\include;..\jcommon\include;..\win32;$(IncludePath)</IncludePath>
+    <OutDir>$(SolutionDir)$(Configuration)\lib</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <ShowIncludes>false</ShowIncludes>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+    </Link>
+    <Lib />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <TargetMachine>MachineX86</TargetMachine>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="addons\jnamedsemaphore.h" />
+    <ClInclude Include="jcommon\include\jbitstream.h" />
+    <ClInclude Include="jcommon\include\jcalendar.h" />
+    <ClInclude Include="jcommon\include\jcharset.h" />
+    <ClInclude Include="jcommon\include\jcommonlib.h" />
+    <ClInclude Include="jcommon\include\jcompileexception.h" />
+    <ClInclude Include="jcommon\include\jdate.h" />
+    <ClInclude Include="jcommon\include\jdebug.h" />
+    <ClInclude Include="jcommon\include\jdynamiclink.h" />
+    <ClInclude Include="jcommon\include\jeventobject.h" />
+    <ClInclude Include="jcommon\include\jexception.h" />
+    <ClInclude Include="jcommon\include\jgc.h" />
+    <ClInclude Include="jcommon\include\jhtmlparser.h" />
+    <ClInclude Include="jcommon\include\jhttp.h" />
+    <ClInclude Include="jcommon\include\jillegalargumentexception.h" />
+    <ClInclude Include="jcommon\include\jinvalidargumentexception.h" />
+    <ClInclude Include="jcommon\include\jjson.h" />
+    <ClInclude Include="jcommon\include\jlistener.h" />
+    <ClInclude Include="jcommon\include\jnotownerexception.h" />
+    <ClInclude Include="jcommon\include\jnullpointerexception.h" />
+    <ClInclude Include="jcommon\include\jobject.h" />
+    <ClInclude Include="jcommon\include\jobservable.h" />
+    <ClInclude Include="jcommon\include\jobserver.h" />
+    <ClInclude Include="jcommon\include\joptions.h" />
+    <ClInclude Include="jcommon\include\joutofboundsexception.h" />
+    <ClInclude Include="jcommon\include\joutofmemoryexception.h" />
+    <ClInclude Include="jcommon\include\jparammapper.h" />
+    <ClInclude Include="jcommon\include\jparserexception.h" />
+    <ClInclude Include="jcommon\include\jpointer.h" />
+    <ClInclude Include="jcommon\include\jpolicies.h" />
+    <ClInclude Include="jcommon\include\jproperties.h" />
+    <ClInclude Include="jcommon\include\jregexp.h" />
+    <ClInclude Include="jcommon\include\jruntimeexception.h" />
+    <ClInclude Include="jcommon\include\jstringtokenizer.h" />
+    <ClInclude Include="jcommon\include\jstringutils.h" />
+    <ClInclude Include="jcommon\include\jsystem.h" />
+    <ClInclude Include="jcommon\include\jtimeoutexception.h" />
+    <ClInclude Include="jcommon\include\jtypes.h" />
+    <ClInclude Include="jcommon\include\junit.h" />
+    <ClInclude Include="jcommon\include\jurl.h" />
+    <ClInclude Include="jcommon\include\jurlexception.h" />
+    <ClInclude Include="jcommon\include\jxmlparser.h" />
+    <ClInclude Include="jdevice\include\jaudio.h" />
+    <ClInclude Include="jdevice\include\jcpu.h" />
+    <ClInclude Include="jdevice\include\jdevice.h" />
+    <ClInclude Include="jdevice\include\jdevicebuilder.h" />
+    <ClInclude Include="jdevice\include\jdisplay.h" />
+    <ClInclude Include="jdevice\include\jharddisk.h" />
+    <ClInclude Include="jdevice\include\jmedia.h" />
+    <ClInclude Include="jdevice\include\jmemory.h" />
+    <ClInclude Include="jdevice\include\jmotherboard.h" />
+    <ClInclude Include="jdevice\include\jnetwork.h" />
+    <ClInclude Include="jdevice\include\jphysiclib.h" />
+    <ClInclude Include="jdevice\include\jsystemexception.h" />
+    <ClInclude Include="jdevice\include\jvideo.h" />
+    <ClInclude Include="jgui\binds\directfb-cairo\include\jdfbfont.h" />
+    <ClInclude Include="jgui\binds\directfb-cairo\include\jdfbgraphics.h" />
+    <ClInclude Include="jgui\binds\directfb-cairo\include\jdfbhandler.h" />
+    <ClInclude Include="jgui\binds\directfb-cairo\include\jdfbimage.h" />
+    <ClInclude Include="jgui\binds\directfb-cairo\include\jdfbinputmanager.h" />
+    <ClInclude Include="jgui\binds\directfb\include\jdfbfont.h" />
+    <ClInclude Include="jgui\binds\directfb\include\jdfbgraphics.h" />
+    <ClInclude Include="jgui\binds\directfb\include\jdfbhandler.h" />
+    <ClInclude Include="jgui\binds\directfb\include\jdfbimage.h" />
+    <ClInclude Include="jgui\binds\directfb\include\jdfbinputmanager.h" />
+    <ClInclude Include="jgui\binds\x11\include\jx11font.h" />
+    <ClInclude Include="jgui\binds\x11\include\jx11graphics.h" />
+    <ClInclude Include="jgui\binds\x11\include\jx11handler.h" />
+    <ClInclude Include="jgui\binds\x11\include\jx11image.h" />
+    <ClInclude Include="jgui\binds\x11\include\jx11inputmanager.h" />
+    <ClInclude Include="jgui\include\jadjustmentevent.h" />
+    <ClInclude Include="jgui\include\jadjustmentlistener.h" />
+    <ClInclude Include="jgui\include\janimation.h" />
+    <ClInclude Include="jgui\include\jborderlayout.h" />
+    <ClInclude Include="jgui\include\jbutton.h" />
+    <ClInclude Include="jgui\include\jbuttonevent.h" />
+    <ClInclude Include="jgui\include\jbuttonlistener.h" />
+    <ClInclude Include="jgui\include\jcalendardialogbox.h" />
+    <ClInclude Include="jgui\include\jcalendarevent.h" />
+    <ClInclude Include="jgui\include\jcalendarlistener.h" />
+    <ClInclude Include="jgui\include\jcanvas.h" />
+    <ClInclude Include="jgui\include\jcardlayout.h" />
+    <ClInclude Include="jgui\include\jcheckbutton.h" />
+    <ClInclude Include="jgui\include\jcheckbuttonevent.h" />
+    <ClInclude Include="jgui\include\jcheckbuttongroup.h" />
+    <ClInclude Include="jgui\include\jcheckbuttonlistener.h" />
+    <ClInclude Include="jgui\include\jcolor.h" />
+    <ClInclude Include="jgui\include\jcombobox.h" />
+    <ClInclude Include="jgui\include\jcomponent.h" />
+    <ClInclude Include="jgui\include\jcomponentevent.h" />
+    <ClInclude Include="jgui\include\jcomponentlistener.h" />
+    <ClInclude Include="jgui\include\jcontainer.h" />
+    <ClInclude Include="jgui\include\jcontainerevent.h" />
+    <ClInclude Include="jgui\include\jcontainerlistener.h" />
+    <ClInclude Include="jgui\include\jcoordinatelayout.h" />
+    <ClInclude Include="jgui\include\jfilechooserdialogbox.h" />
+    <ClInclude Include="jgui\include\jflowlayout.h" />
+    <ClInclude Include="jgui\include\jfocusevent.h" />
+    <ClInclude Include="jgui\include\jfocuslistener.h" />
+    <ClInclude Include="jgui\include\jfont.h" />
+    <ClInclude Include="jgui\include\jframe.h" />
+    <ClInclude Include="jgui\include\jgfxhandler.h" />
+    <ClInclude Include="jgui\include\jgraphics.h" />
+    <ClInclude Include="jgui\include\jgridbaglayout.h" />
+    <ClInclude Include="jgui\include\jgridlayout.h" />
+    <ClInclude Include="jgui\include\jguilib.h" />
+    <ClInclude Include="jgui\include\jicon.h" />
+    <ClInclude Include="jgui\include\jimage.h" />
+    <ClInclude Include="jgui\include\jimagebutton.h" />
+    <ClInclude Include="jgui\include\jimageexception.h" />
+    <ClInclude Include="jgui\include\jindexedimage.h" />
+    <ClInclude Include="jgui\include\jinputdialogbox.h" />
+    <ClInclude Include="jgui\include\jinputmanager.h" />
+    <ClInclude Include="jgui\include\jitemcomponent.h" />
+    <ClInclude Include="jgui\include\jkeyboard.h" />
+    <ClInclude Include="jgui\include\jkeyboardlistener.h" />
+    <ClInclude Include="jgui\include\jkeyevent.h" />
+    <ClInclude Include="jgui\include\jkeylistener.h" />
+    <ClInclude Include="jgui\include\jkeymap.h" />
+    <ClInclude Include="jgui\include\jlabel.h" />
+    <ClInclude Include="jgui\include\jlayout.h" />
+    <ClInclude Include="jgui\include\jlistbox.h" />
+    <ClInclude Include="jgui\include\jmarquee.h" />
+    <ClInclude Include="jgui\include\jmenu.h" />
+    <ClInclude Include="jgui\include\jmenugroup.h" />
+    <ClInclude Include="jgui\include\jmessagedialogbox.h" />
+    <ClInclude Include="jgui\include\jmouseevent.h" />
+    <ClInclude Include="jgui\include\jmouselistener.h" />
+    <ClInclude Include="jgui\include\jnullgraphics.h" />
+    <ClInclude Include="jgui\include\jnulllayout.h" />
+    <ClInclude Include="jgui\include\jpanel.h" />
+    <ClInclude Include="jgui\include\jprogressbar.h" />
+    <ClInclude Include="jgui\include\jrectangle.h" />
+    <ClInclude Include="jgui\include\jscrollbar.h" />
+    <ClInclude Include="jgui\include\jselectevent.h" />
+    <ClInclude Include="jgui\include\jselectlistener.h" />
+    <ClInclude Include="jgui\include\jslider.h" />
+    <ClInclude Include="jgui\include\jslidercomponent.h" />
+    <ClInclude Include="jgui\include\jspin.h" />
+    <ClInclude Include="jgui\include\jtabbedpane.h" />
+    <ClInclude Include="jgui\include\jtable.h" />
+    <ClInclude Include="jgui\include\jtextarea.h" />
+    <ClInclude Include="jgui\include\jtextcomponent.h" />
+    <ClInclude Include="jgui\include\jtextdialogbox.h" />
+    <ClInclude Include="jgui\include\jtextevent.h" />
+    <ClInclude Include="jgui\include\jtextfield.h" />
+    <ClInclude Include="jgui\include\jtextlistener.h" />
+    <ClInclude Include="jgui\include\jtheme.h" />
+    <ClInclude Include="jgui\include\jthemeevent.h" />
+    <ClInclude Include="jgui\include\jthemelistener.h" />
+    <ClInclude Include="jgui\include\jthememanager.h" />
+    <ClInclude Include="jgui\include\jtooglebutton.h" />
+    <ClInclude Include="jgui\include\jtree.h" />
+    <ClInclude Include="jgui\include\jwatch.h" />
+    <ClInclude Include="jgui\include\jwindow.h" />
+    <ClInclude Include="jgui\include\jwindowevent.h" />
+    <ClInclude Include="jgui\include\jwindowlistener.h" />
+    <ClInclude Include="jgui\include\jwindowmanager.h" />
+    <ClInclude Include="jgui\include\jyesnodialogbox.h" />
+    <ClInclude Include="jgui\tests\agenda.h" />
+    <ClInclude Include="jgui\tests\agendadb.h" />
+    <ClInclude Include="jgui\tests\calc.h" />
+    <ClInclude Include="jgui\tests\display.h" />
+    <ClInclude Include="jgui\tests\mines.h" />
+    <ClInclude Include="jgui\tests\phone.h" />
+    <ClInclude Include="jgui\tests\phonedb.h" />
+    <ClInclude Include="jimage\include\jbitmap.h" />
+    <ClInclude Include="jimage\include\jbufferedimage.h" />
+    <ClInclude Include="jimage\include\jgif.h" />
+    <ClInclude Include="jimage\include\jimage.h" />
+    <ClInclude Include="jimage\include\jimagelib.h" />
+    <ClInclude Include="jimage\include\jjpg.h" />
+    <ClInclude Include="jimage\include\jpng.h" />
+    <ClInclude Include="jimage\include\jppm.h" />
+    <ClInclude Include="jio\include\jbitinputstream.h" />
+    <ClInclude Include="jio\include\jbitoutputstream.h" />
+    <ClInclude Include="jio\include\jbufferedreader.h" />
+    <ClInclude Include="jio\include\jchannel.h" />
+    <ClInclude Include="jio\include\jdatainputstream.h" />
+    <ClInclude Include="jio\include\jdataoutputstream.h" />
+    <ClInclude Include="jio\include\jfile.h" />
+    <ClInclude Include="jio\include\jfileexception.h" />
+    <ClInclude Include="jio\include\jfileinputstream.h" />
+    <ClInclude Include="jio\include\jfileoutputstream.h" />
+    <ClInclude Include="jio\include\jinputstream.h" />
+    <ClInclude Include="jio\include\jinterruptedioexception.h" />
+    <ClInclude Include="jio\include\jioexception.h" />
+    <ClInclude Include="jio\include\jiolib.h" />
+    <ClInclude Include="jio\include\jmemoryinputstream.h" />
+    <ClInclude Include="jio\include\jmemoryoutputstream.h" />
+    <ClInclude Include="jio\include\jobjectinputstream.h" />
+    <ClInclude Include="jio\include\jobjectoutputstream.h" />
+    <ClInclude Include="jio\include\joutputstream.h" />
+    <ClInclude Include="jio\include\jpipeexception.h" />
+    <ClInclude Include="jio\include\jpipestream.h" />
+    <ClInclude Include="jio\include\jprintstream.h" />
+    <ClInclude Include="jio\include\jserializable.h" />
+    <ClInclude Include="jipc\include\jipcclient.h" />
+    <ClInclude Include="jipc\include\jipcexception.h" />
+    <ClInclude Include="jipc\include\jipchelper.h" />
+    <ClInclude Include="jipc\include\jipcserver.h" />
+    <ClInclude Include="jipc\include\jlocalipcclient.h" />
+    <ClInclude Include="jipc\include\jlocalipcserver.h" />
+    <ClInclude Include="jipc\include\jmethod.h" />
+    <ClInclude Include="jipc\include\jremotecalllistener.h" />
+    <ClInclude Include="jipc\include\jremoteipcclient.h" />
+    <ClInclude Include="jipc\include\jremoteipcserver.h" />
+    <ClInclude Include="jipc\include\jresponse.h" />
+    <ClInclude Include="jipc\include\jsecureipcclient.h" />
+    <ClInclude Include="jipc\include\jsecureipcserver.h" />
+    <ClInclude Include="jlogger\include\jconsolehandler.h" />
+    <ClInclude Include="jlogger\include\jfilehandler.h" />
+    <ClInclude Include="jlogger\include\jformatter.h" />
+    <ClInclude Include="jlogger\include\jhandler.h" />
+    <ClInclude Include="jlogger\include\jlogger.h" />
+    <ClInclude Include="jlogger\include\jloggerexception.h" />
+    <ClInclude Include="jlogger\include\jloggerlib.h" />
+    <ClInclude Include="jlogger\include\jloggermanager.h" />
+    <ClInclude Include="jlogger\include\jlogrecord.h" />
+    <ClInclude Include="jlogger\include\jmemoryhandler.h" />
+    <ClInclude Include="jlogger\include\jsimpleformatter.h" />
+    <ClInclude Include="jlogger\include\jsockethandler.h" />
+    <ClInclude Include="jlogger\include\jstreamhandler.h" />
+    <ClInclude Include="jlogger\include\jxmlformatter.h" />
+    <ClInclude Include="jmath\include\jbase64.h" />
+    <ClInclude Include="jmath\include\jbigdecimal.h" />
+    <ClInclude Include="jmath\include\jbiginteger.h" />
+    <ClInclude Include="jmath\include\jcomplex.h" />
+    <ClInclude Include="jmath\include\jcrc.h" />
+    <ClInclude Include="jmath\include\jmath.h" />
+    <ClInclude Include="jmath\include\jmathlib.h" />
+    <ClInclude Include="jmath\include\jmatrix.h" />
+    <ClInclude Include="jmath\include\jmd5.h" />
+    <ClInclude Include="jmath\include\jrandom.h" />
+    <ClInclude Include="jmath\include\jsha1.h" />
+    <ClInclude Include="jmath\include\juuid.h" />
+    <ClInclude Include="jmpeg.original\include\jadaptationfield.h" />
+    <ClInclude Include="jmpeg.original\include\jmpegexception.h" />
+    <ClInclude Include="jmpeg.original\include\jmpeglib.h" />
+    <ClInclude Include="jmpeg.original\include\jprogramassociationsection.h" />
+    <ClInclude Include="jmpeg.original\include\jprogramassociationtable.h" />
+    <ClInclude Include="jmpeg.original\include\jprogramelementarystreamsection.h" />
+    <ClInclude Include="jmpeg.original\include\jprogrammapsection.h" />
+    <ClInclude Include="jmpeg.original\include\jprogramsysteminformationsection.h" />
+    <ClInclude Include="jmpeg.original\include\jprogramsysteminformationtable.h" />
+    <ClInclude Include="jmpeg.original\include\jsection.h" />
+    <ClInclude Include="jmpeg.original\include\jtransportstreampacket.h" />
+    <ClInclude Include="jmpeg\include\jadaptationfield.h" />
+    <ClInclude Include="jmpeg\include\jmpegexception.h" />
+    <ClInclude Include="jmpeg\include\jmpeglib.h" />
+    <ClInclude Include="jmpeg\include\jprogramassociationsection.h" />
+    <ClInclude Include="jmpeg\include\jprogramassociationtable.h" />
+    <ClInclude Include="jmpeg\include\jprogramelementarystreamsection.h" />
+    <ClInclude Include="jmpeg\include\jprogrammapsection.h" />
+    <ClInclude Include="jmpeg\include\jprogramsysteminformationsection.h" />
+    <ClInclude Include="jmpeg\include\jprogramsysteminformationtable.h" />
+    <ClInclude Include="jmpeg\include\jsection.h" />
+    <ClInclude Include="jmpeg\include\jtransportstreampacket.h" />
+    <ClInclude Include="jresource\include\jresource.h" />
+    <ClInclude Include="jresource\include\jresourceexception.h" />
+    <ClInclude Include="jresource\include\jresourcelib.h" />
+    <ClInclude Include="jresource\include\jresourcestatusevent.h" />
+    <ClInclude Include="jresource\include\jresourcestatuslistener.h" />
+    <ClInclude Include="jresource\include\jresourcetypeevent.h" />
+    <ClInclude Include="jresource\include\jresourcetypelistener.h" />
+    <ClInclude Include="jsecurity\include\jaccesscontrol.h" />
+    <ClInclude Include="jsecurity\include\jaccesscontroller.h" />
+    <ClInclude Include="jsecurity\include\jfileaccesscontrol.h" />
+    <ClInclude Include="jsecurity\include\jfileaccesscontroller.h" />
+    <ClInclude Include="jsecurity\include\jgroup.h" />
+    <ClInclude Include="jsecurity\include\jsecurityexception.h" />
+    <ClInclude Include="jsecurity\include\jsecuritylib.h" />
+    <ClInclude Include="jsecurity\include\jsecuritymanager.h" />
+    <ClInclude Include="jsecurity\include\juser.h" />
+    <ClInclude Include="jshared\include\jmemoryexception.h" />
+    <ClInclude Include="jshared\include\jmemorymap.h" />
+    <ClInclude Include="jshared\include\jmessageexception.h" />
+    <ClInclude Include="jshared\include\jmessagequeue.h" />
+    <ClInclude Include="jshared\include\jnamedpipe.h" />
+    <ClInclude Include="jshared\include\jnamedsemaphore.h" />
+    <ClInclude Include="jshared\include\jpipe.h" />
+    <ClInclude Include="jshared\include\jprocess.h" />
+    <ClInclude Include="jshared\include\jprocessexception.h" />
+    <ClInclude Include="jshared\include\jprocessinputstream.h" />
+    <ClInclude Include="jshared\include\jprocessoutputstream.h" />
+    <ClInclude Include="jshared\include\jqueueexception.h" />
+    <ClInclude Include="jshared\include\jschedule.h" />
+    <ClInclude Include="jshared\include\jsharedlib.h" />
+    <ClInclude Include="jshared\include\jsharedmemory.h" />
+    <ClInclude Include="jshared\include\jsharedmutex.h" />
+    <ClInclude Include="jshared\include\jsharedqueue.h" />
+    <ClInclude Include="jshared\include\jsharedsemaphore.h" />
+    <ClInclude Include="jshared\include\jwrapperprocess.h" />
+    <ClInclude Include="jsocket\include\jconnection.h" />
+    <ClInclude Include="jsocket\include\jconnectionpipe.h" />
+    <ClInclude Include="jsocket\include\jdatagramsocket.h" />
+    <ClInclude Include="jsocket\include\jdatagramsocket6.h" />
+    <ClInclude Include="jsocket\include\jendian.h" />
+    <ClInclude Include="jsocket\include\jhttprequester.h" />
+    <ClInclude Include="jsocket\include\jinetaddress.h" />
+    <ClInclude Include="jsocket\include\jinetaddress4.h" />
+    <ClInclude Include="jsocket\include\jinetaddress6.h" />
+    <ClInclude Include="jsocket\include\jlocaldatagramsocket.h" />
+    <ClInclude Include="jsocket\include\jlocalserversocket.h" />
+    <ClInclude Include="jsocket\include\jlocalsocket.h" />
+    <ClInclude Include="jsocket\include\jmulticastsocket.h" />
+    <ClInclude Include="jsocket\include\jmulticastsocket6.h" />
+    <ClInclude Include="jsocket\include\jnetworkinterface.h" />
+    <ClInclude Include="jsocket\include\jrawsocket.h" />
+    <ClInclude Include="jsocket\include\jserversocket.h" />
+    <ClInclude Include="jsocket\include\jserversocket6.h" />
+    <ClInclude Include="jsocket\include\jsocket.h" />
+    <ClInclude Include="jsocket\include\jsocket6.h" />
+    <ClInclude Include="jsocket\include\jsocketexception.h" />
+    <ClInclude Include="jsocket\include\jsocketinputstream.h" />
+    <ClInclude Include="jsocket\include\jsocketlib.h" />
+    <ClInclude Include="jsocket\include\jsocketoptions.h" />
+    <ClInclude Include="jsocket\include\jsocketoptionsexception.h" />
+    <ClInclude Include="jsocket\include\jsocketoutputstream.h" />
+    <ClInclude Include="jsocket\include\jsockettimeoutexception.h" />
+    <ClInclude Include="jsocket\include\jsslcontext.h" />
+    <ClInclude Include="jsocket\include\jsslserversocket.h" />
+    <ClInclude Include="jsocket\include\jsslserversocket6.h" />
+    <ClInclude Include="jsocket\include\jsslsocket.h" />
+    <ClInclude Include="jsocket\include\jsslsocket6.h" />
+    <ClInclude Include="jsocket\include\jsslsocketinputstream.h" />
+    <ClInclude Include="jsocket\include\jsslsocketoutputstream.h" />
+    <ClInclude Include="jsocket\include\junknownhostexception.h" />
+    <ClInclude Include="jthread\include\jautolock.h" />
+    <ClInclude Include="jthread\include\jbarrier.h" />
+    <ClInclude Include="jthread\include\jbufferexception.h" />
+    <ClInclude Include="jthread\include\jcondition.h" />
+    <ClInclude Include="jthread\include\jcountdownlatch.h" />
+    <ClInclude Include="jthread\include\jevent.h" />
+    <ClInclude Include="jthread\include\jfifomutex.h" />
+    <ClInclude Include="jthread\include\jillegalstateexception.h" />
+    <ClInclude Include="jthread\include\jindexedbuffer.h" />
+    <ClInclude Include="jthread\include\jinterruptedexception.h" />
+    <ClInclude Include="jthread\include\jmonitor.h" />
+    <ClInclude Include="jthread\include\jmutex.h" />
+    <ClInclude Include="jthread\include\jmutexexception.h" />
+    <ClInclude Include="jthread\include\jrunnable.h" />
+    <ClInclude Include="jthread\include\jrwlock.h" />
+    <ClInclude Include="jthread\include\jsemaphore.h" />
+    <ClInclude Include="jthread\include\jsemaphoreexception.h" />
+    <ClInclude Include="jthread\include\jsemaphoretimeoutexception.h" />
+    <ClInclude Include="jthread\include\jspinlock.h" />
+    <ClInclude Include="jthread\include\jthread.h" />
+    <ClInclude Include="jthread\include\jthreadexception.h" />
+    <ClInclude Include="jthread\include\jthreadgroup.h" />
+    <ClInclude Include="jthread\include\jthreadlib.h" />
+    <ClInclude Include="jthread\include\jthreadpool.h" />
+    <ClInclude Include="jthread\include\jtimer.h" />
+    <ClInclude Include="Stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="addons\C++ Latches and Barriers.html" />
+    <None Include="jcommon\tests\index.html" />
+    <None Include="Makefile.defs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\jcommon\jbitstream.cpp" />
+    <ClCompile Include="..\jcommon\jcalendar.cpp" />
+    <ClCompile Include="..\jcommon\jcharset.cpp" />
+    <ClCompile Include="..\jcommon\jcommonlib.cpp" />
+    <ClCompile Include="..\jcommon\jcompileexception.cpp" />
+    <ClCompile Include="..\jcommon\jdate.cpp" />
+    <ClCompile Include="..\jcommon\jdebug.cpp" />
+    <ClCompile Include="..\jcommon\jdynamiclink.cpp" />
+    <ClCompile Include="..\jcommon\jeventobject.cpp" />
+    <ClCompile Include="..\jcommon\jexception.cpp" />
+    <ClCompile Include="..\jcommon\jgc.cpp" />
+    <ClCompile Include="..\jcommon\jhtmlparser.cpp" />
+    <ClCompile Include="..\jcommon\jhttp.cpp" />
+    <ClCompile Include="..\jcommon\jillegalargumentexception.cpp" />
+    <ClCompile Include="..\jcommon\jinvalidargumentexception.cpp" />
+    <ClCompile Include="..\jcommon\jjson.cpp" />
+    <ClCompile Include="..\jcommon\jlistener.cpp" />
+    <ClCompile Include="..\jcommon\jnotownerexception.cpp" />
+    <ClCompile Include="..\jcommon\jnullpointerexception.cpp" />
+    <ClCompile Include="..\jcommon\jobject.cpp" />
+    <ClCompile Include="..\jcommon\jobservable.cpp" />
+    <ClCompile Include="..\jcommon\jobserver.cpp" />
+    <ClCompile Include="..\jcommon\joptions.cpp" />
+    <ClCompile Include="..\jcommon\joutofboundsexception.cpp" />
+    <ClCompile Include="..\jcommon\joutofmemoryexception.cpp" />
+    <ClCompile Include="..\jcommon\jparammapper.cpp" />
+    <ClCompile Include="..\jcommon\jparserexception.cpp" />
+    <ClCompile Include="..\jcommon\jpointer.cpp" />
+    <ClCompile Include="..\jcommon\jpolicies.cpp" />
+    <ClCompile Include="..\jcommon\jproperties.cpp" />
+    <ClCompile Include="..\jcommon\jregexp.cpp" />
+    <ClCompile Include="..\jcommon\jruntimeexception.cpp" />
+    <ClCompile Include="..\jcommon\jstringtokenizer.cpp" />
+    <ClCompile Include="..\jcommon\jstringutils.cpp" />
+    <ClCompile Include="..\jcommon\jsystem.cpp" />
+    <ClCompile Include="..\jcommon\jtimeoutexception.cpp" />
+    <ClCompile Include="..\jcommon\jtypes.cpp" />
+    <ClCompile Include="..\jcommon\junit.cpp" />
+    <ClCompile Include="..\jcommon\jurl.cpp" />
+    <ClCompile Include="..\jcommon\jurlexception.cpp" />
+    <ClCompile Include="..\jcommon\jxmlparser.cpp" />
+    <ClCompile Include="..\jgui\jadjustmentevent.cpp" />
+    <ClCompile Include="..\jgui\jadjustmentlistener.cpp" />
+    <ClCompile Include="..\jgui\janimation.cpp" />
+    <ClCompile Include="..\jgui\jborderlayout.cpp" />
+    <ClCompile Include="..\jgui\jbutton.cpp" />
+    <ClCompile Include="..\jgui\jbuttonevent.cpp" />
+    <ClCompile Include="..\jgui\jbuttonlistener.cpp" />
+    <ClCompile Include="..\jgui\jcalendardialogbox.cpp" />
+    <ClCompile Include="..\jgui\jcalendarevent.cpp" />
+    <ClCompile Include="..\jgui\jcalendarlistener.cpp" />
+    <ClCompile Include="..\jgui\jcanvas.cpp" />
+    <ClCompile Include="..\jgui\jcardlayout.cpp" />
+    <ClCompile Include="..\jgui\jcheckbutton.cpp" />
+    <ClCompile Include="..\jgui\jcheckbuttonevent.cpp" />
+    <ClCompile Include="..\jgui\jcheckbuttongroup.cpp" />
+    <ClCompile Include="..\jgui\jcheckbuttonlistener.cpp" />
+    <ClCompile Include="..\jgui\jcolor.cpp" />
+    <ClCompile Include="..\jgui\jcombobox.cpp" />
+    <ClCompile Include="..\jgui\jcomponent.cpp" />
+    <ClCompile Include="..\jgui\jcomponentevent.cpp" />
+    <ClCompile Include="..\jgui\jcomponentlistener.cpp" />
+    <ClCompile Include="..\jgui\jcontainer.cpp" />
+    <ClCompile Include="..\jgui\jcontainerevent.cpp" />
+    <ClCompile Include="..\jgui\jcontainerlistener.cpp" />
+    <ClCompile Include="..\jgui\jcoordinatelayout.cpp" />
+    <ClCompile Include="..\jgui\jfilechooserdialogbox.cpp" />
+    <ClCompile Include="..\jgui\jflowlayout.cpp" />
+    <ClCompile Include="..\jgui\jfocusevent.cpp" />
+    <ClCompile Include="..\jgui\jfocuslistener.cpp" />
+    <ClCompile Include="..\jgui\jfont.cpp" />
+    <ClCompile Include="..\jgui\jframe.cpp" />
+    <ClCompile Include="..\jgui\jgfxhandler.cpp" />
+    <ClCompile Include="..\jgui\jgraphics.cpp" />
+    <ClCompile Include="..\jgui\jgridbaglayout.cpp" />
+    <ClCompile Include="..\jgui\jgridlayout.cpp" />
+    <ClCompile Include="..\jgui\jguilib.cpp" />
+    <ClCompile Include="..\jgui\jicon.cpp" />
+    <ClCompile Include="..\jgui\jimage.cpp" />
+    <ClCompile Include="..\jgui\jimagebutton.cpp" />
+    <ClCompile Include="..\jgui\jimageexception.cpp" />
+    <ClCompile Include="..\jgui\jindexedimage.cpp" />
+    <ClCompile Include="..\jgui\jinputdialogbox.cpp" />
+    <ClCompile Include="..\jgui\jinputmanager.cpp" />
+    <ClCompile Include="..\jgui\jitemcomponent.cpp" />
+    <ClCompile Include="..\jgui\jkeyboard.cpp" />
+    <ClCompile Include="..\jgui\jkeyboardlistener.cpp" />
+    <ClCompile Include="..\jgui\jkeyevent.cpp" />
+    <ClCompile Include="..\jgui\jkeylistener.cpp" />
+    <ClCompile Include="..\jgui\jkeymap.cpp" />
+    <ClCompile Include="..\jgui\jlabel.cpp" />
+    <ClCompile Include="..\jgui\jlayout.cpp" />
+    <ClCompile Include="..\jgui\jlistbox.cpp" />
+    <ClCompile Include="..\jgui\jmarquee.cpp" />
+    <ClCompile Include="..\jgui\jmenu.cpp" />
+    <ClCompile Include="..\jgui\jmenugroup.cpp" />
+    <ClCompile Include="..\jgui\jmessagedialogbox.cpp" />
+    <ClCompile Include="..\jgui\jmouseevent.cpp" />
+    <ClCompile Include="..\jgui\jmouselistener.cpp" />
+    <ClCompile Include="..\jgui\jnullgraphics.cpp" />
+    <ClCompile Include="..\jgui\jnulllayout.cpp" />
+    <ClCompile Include="..\jgui\jpanel.cpp" />
+    <ClCompile Include="..\jgui\jprogressbar.cpp" />
+    <ClCompile Include="..\jgui\jrectangle.cpp" />
+    <ClCompile Include="..\jgui\jscrollbar.cpp" />
+    <ClCompile Include="..\jgui\jselectevent.cpp" />
+    <ClCompile Include="..\jgui\jselectlistener.cpp" />
+    <ClCompile Include="..\jgui\jslider.cpp" />
+    <ClCompile Include="..\jgui\jslidercomponent.cpp" />
+    <ClCompile Include="..\jgui\jspin.cpp" />
+    <ClCompile Include="..\jgui\jtabbedpane.cpp" />
+    <ClCompile Include="..\jgui\jtable.cpp" />
+    <ClCompile Include="..\jgui\jtextarea.cpp" />
+    <ClCompile Include="..\jgui\jtextcomponent.cpp" />
+    <ClCompile Include="..\jgui\jtextdialogbox.cpp" />
+    <ClCompile Include="..\jgui\jtextevent.cpp" />
+    <ClCompile Include="..\jgui\jtextfield.cpp" />
+    <ClCompile Include="..\jgui\jtextlistener.cpp" />
+    <ClCompile Include="..\jgui\jtheme.cpp" />
+    <ClCompile Include="..\jgui\jthemeevent.cpp" />
+    <ClCompile Include="..\jgui\jthemelistener.cpp" />
+    <ClCompile Include="..\jgui\jthememanager.cpp" />
+    <ClCompile Include="..\jgui\jtogglebutton.cpp" />
+    <ClCompile Include="..\jgui\jtree.cpp" />
+    <ClCompile Include="..\jgui\jwatch.cpp" />
+    <ClCompile Include="..\jgui\jwindow.cpp" />
+    <ClCompile Include="..\jgui\jwindowevent.cpp" />
+    <ClCompile Include="..\jgui\jwindowlistener.cpp" />
+    <ClCompile Include="..\jgui\jwindowmanager.cpp" />
+    <ClCompile Include="..\jgui\jyesnodialogbox.cpp" />
+    <ClCompile Include="..\jio\jbitinputstream.cpp" />
+    <ClCompile Include="..\jio\jbitoutputstream.cpp" />
+    <ClCompile Include="..\jio\jbufferedreader.cpp" />
+    <ClCompile Include="..\jio\jchannel.cpp" />
+    <ClCompile Include="..\jio\jdatainputstream.cpp" />
+    <ClCompile Include="..\jio\jdataoutputstream.cpp" />
+    <ClCompile Include="..\jio\jfile.cpp" />
+    <ClCompile Include="..\jio\jfileexception.cpp" />
+    <ClCompile Include="..\jio\jfileinputstream.cpp" />
+    <ClCompile Include="..\jio\jfileoutputstream.cpp" />
+    <ClCompile Include="..\jio\jinputstream.cpp" />
+    <ClCompile Include="..\jio\jinterruptedioexception.cpp" />
+    <ClCompile Include="..\jio\jioexception.cpp" />
+    <ClCompile Include="..\jio\jiolib.cpp" />
+    <ClCompile Include="..\jio\jmemoryinputstream.cpp" />
+    <ClCompile Include="..\jio\jmemoryoutputstream.cpp" />
+    <ClCompile Include="..\jio\jobjectinputstream.cpp" />
+    <ClCompile Include="..\jio\jobjectoutputstream.cpp" />
+    <ClCompile Include="..\jio\joutputstream.cpp" />
+    <ClCompile Include="..\jio\jpipeexception.cpp" />
+    <ClCompile Include="..\jio\jpipestream.cpp" />
+    <ClCompile Include="..\jio\jprintstream.cpp" />
+    <ClCompile Include="..\jio\jserializable.cpp" />
+    <ClCompile Include="..\jipc\jipcclient.cpp" />
+    <ClCompile Include="..\jipc\jipcexception.cpp" />
+    <ClCompile Include="..\jipc\jipchelper.cpp" />
+    <ClCompile Include="..\jipc\jipcserver.cpp" />
+    <ClCompile Include="..\jipc\jmethod.cpp" />
+    <ClCompile Include="..\jipc\jremotecalllistener.cpp" />
+    <ClCompile Include="..\jipc\jremoteipcclient.cpp" />
+    <ClCompile Include="..\jipc\jremoteipcserver.cpp" />
+    <ClCompile Include="..\jipc\jresponse.cpp" />
+    <ClCompile Include="..\jlogger\jconsolehandler.cpp" />
+    <ClCompile Include="..\jlogger\jfilehandler.cpp" />
+    <ClCompile Include="..\jlogger\jformatter.cpp" />
+    <ClCompile Include="..\jlogger\jhandler.cpp" />
+    <ClCompile Include="..\jlogger\jlogger.cpp" />
+    <ClCompile Include="..\jlogger\jloggerexception.cpp" />
+    <ClCompile Include="..\jlogger\jloggerlib.cpp" />
+    <ClCompile Include="..\jlogger\jloggermanager.cpp" />
+    <ClCompile Include="..\jlogger\jlogrecord.cpp" />
+    <ClCompile Include="..\jlogger\jmemoryhandler.cpp" />
+    <ClCompile Include="..\jlogger\jsimpleformatter.cpp" />
+    <ClCompile Include="..\jlogger\jsockethandler.cpp" />
+    <ClCompile Include="..\jlogger\jstreamhandler.cpp" />
+    <ClCompile Include="..\jlogger\jxmlformatter.cpp" />
+    <ClCompile Include="..\jmath\jbase64.cpp" />
+    <ClCompile Include="..\jmath\jcomplex.cpp" />
+    <ClCompile Include="..\jmath\jcrc.cpp" />
+    <ClCompile Include="..\jmath\jmath.cpp" />
+    <ClCompile Include="..\jmath\jmathlib.cpp" />
+    <ClCompile Include="..\jmath\jmatrix.cpp" />
+    <ClCompile Include="..\jmath\jmd5.cpp" />
+    <ClCompile Include="..\jmath\jrandom.cpp" />
+    <ClCompile Include="..\jmath\jsha1.cpp" />
+    <ClCompile Include="..\jresource\jresource.cpp" />
+    <ClCompile Include="..\jresource\jresourceexception.cpp" />
+    <ClCompile Include="..\jresource\jresourcelib.cpp" />
+    <ClCompile Include="..\jresource\jresourcestatusevent.cpp" />
+    <ClCompile Include="..\jresource\jresourcestatuslistener.cpp" />
+    <ClCompile Include="..\jresource\jresourcetypeevent.cpp" />
+    <ClCompile Include="..\jresource\jresourcetypelistener.cpp" />
+    <ClCompile Include="..\jsecurity\jaccesscontrol.cpp" />
+    <ClCompile Include="..\jsecurity\jfileaccesscontrol.cpp" />
+    <ClCompile Include="..\jsecurity\jgroup.cpp" />
+    <ClCompile Include="..\jsecurity\jsecurityexception.cpp" />
+    <ClCompile Include="..\jsecurity\jsecuritylib.cpp" />
+    <ClCompile Include="..\jsecurity\jsecuritymanager.cpp" />
+    <ClCompile Include="..\jsecurity\juser.cpp" />
+    <ClCompile Include="..\jshared\jmemoryexception.cpp" />
+    <ClCompile Include="..\jshared\jmemorymap.cpp" />
+    <ClCompile Include="..\jshared\jmessageexception.cpp" />
+    <ClCompile Include="..\jshared\jmessagequeue.cpp" />
+    <ClCompile Include="..\jshared\jnamedpipe.cpp" />
+    <ClCompile Include="..\jshared\jpipe.cpp" />
+    <ClCompile Include="..\jshared\jprocess.cpp" />
+    <ClCompile Include="..\jshared\jprocessexception.cpp" />
+    <ClCompile Include="..\jshared\jprocessinputstream.cpp" />
+    <ClCompile Include="..\jshared\jprocessoutputstream.cpp" />
+    <ClCompile Include="..\jshared\jqueueexception.cpp" />
+    <ClCompile Include="..\jshared\jschedule.cpp" />
+    <ClCompile Include="..\jshared\jsharedlib.cpp" />
+    <ClCompile Include="..\jshared\jsharedmemory.cpp" />
+    <ClCompile Include="..\jshared\jsharedmutex.cpp" />
+    <ClCompile Include="..\jshared\jsharedqueue.cpp" />
+    <ClCompile Include="..\jsocket\jconnection.cpp" />
+    <ClCompile Include="..\jsocket\jconnectionpipe.cpp" />
+    <ClCompile Include="..\jsocket\jdatagramsocket.cpp" />
+    <ClCompile Include="..\jsocket\jdatagramsocket6.cpp" />
+    <ClCompile Include="..\jsocket\jhttprequester.cpp" />
+    <ClCompile Include="..\jsocket\jinetaddress.cpp" />
+    <ClCompile Include="..\jsocket\jinetaddress4.cpp" />
+    <ClCompile Include="..\jsocket\jmulticastsocket.cpp" />
+    <ClCompile Include="..\jsocket\jnetworkinterface.cpp" />
+    <ClCompile Include="..\jsocket\jserversocket.cpp" />
+    <ClCompile Include="..\jsocket\jsocket.cpp" />
+    <ClCompile Include="..\jsocket\jsocketexception.cpp" />
+    <ClCompile Include="..\jsocket\jsocketinputstream.cpp" />
+    <ClCompile Include="..\jsocket\jsocketlib.cpp" />
+    <ClCompile Include="..\jsocket\jsocketoptions.cpp" />
+    <ClCompile Include="..\jsocket\jsocketoptionsexception.cpp" />
+    <ClCompile Include="..\jsocket\jsocketoutputstream.cpp" />
+    <ClCompile Include="..\jsocket\jsockettimeoutexception.cpp" />
+    <ClCompile Include="..\jsocket\junknownhostexception.cpp" />
+    <ClCompile Include="..\jthread\jautolock.cpp" />
+    <ClCompile Include="..\jthread\jbufferexception.cpp" />
+    <ClCompile Include="..\jthread\jcondition.cpp" />
+    <ClCompile Include="..\jthread\jcountdownlatch.cpp" />
+    <ClCompile Include="..\jthread\jevent.cpp" />
+    <ClCompile Include="..\jthread\jfifomutex.cpp" />
+    <ClCompile Include="..\jthread\jillegalstateexception.cpp" />
+    <ClCompile Include="..\jthread\jindexedbuffer.cpp" />
+    <ClCompile Include="..\jthread\jinterruptedexception.cpp" />
+    <ClCompile Include="..\jthread\jmonitor.cpp" />
+    <ClCompile Include="..\jthread\jmutex.cpp" />
+    <ClCompile Include="..\jthread\jmutexexception.cpp" />
+    <ClCompile Include="..\jthread\jrunnable.cpp" />
+    <ClCompile Include="..\jthread\jsemaphore.cpp" />
+    <ClCompile Include="..\jthread\jsemaphoreexception.cpp" />
+    <ClCompile Include="..\jthread\jsemaphoretimeoutexception.cpp" />
+    <ClCompile Include="..\jthread\jspinlock.cpp" />
+    <ClCompile Include="..\jthread\jthread.cpp" />
+    <ClCompile Include="..\jthread\jthreadexception.cpp" />
+    <ClCompile Include="..\jthread\jthreadgroup.cpp" />
+    <ClCompile Include="..\jthread\jthreadlib.cpp" />
+    <ClCompile Include="..\jthread\jthreadpool.cpp" />
+    <ClCompile Include="..\jthread\jtimer.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

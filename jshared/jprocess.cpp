@@ -61,7 +61,7 @@ Process::Process(std::string process):
 
 Process::~Process()
 {
-	Interrupt();
+	Release();
 }
 
 /** Private Functions */
@@ -203,6 +203,7 @@ void Process::ForkChild(const char *prog, char **args)
 int Process::MakeHandleGreaterThan2(int fd)
 {
 #ifdef _WIN32
+	return fd + 1;
 #else
 	int t;
 	
@@ -308,8 +309,8 @@ void Process::WaitProcess()
 void Process::Start()
 {
 #ifdef _WIN32
-	HANDLE hOutputReadTmp, hInputRead;
-	HANDLE hInputWriteTmp, hOutputWrite;
+	HANDLE _output_readTmp,hOutputWrite;
+	HANDLE _input_writeTmp,hInputRead;
 	HANDLE hErrorWrite;
 	SECURITY_ATTRIBUTES sa;
 
@@ -319,57 +320,76 @@ void Process::Start()
 
 	HANDLE hp = GetCurrentProcess();
 
-	CreatePipe(&hOutputReadTmp, &hOutputWrite, &sa, 0);
-	DuplicateHandle(hp, hOutputWrite, hp, &hErrorWrite, 0, TRUE, DUPLICATE_SAME_ACCESS);
-	CreatePipe(&hInputRead, &hInputWriteTmp, &sa, 0);
-	DuplicateHandle(hp, hOutputReadTmp, hp, &hOutputRead, 0, FALSE, DUPLICATE_SAME_ACCESS);
-	DuplicateHandle(hp, hInputWriteTmp, hp, &hInputWrite, 0, FALSE, DUPLICATE_SAME_ACCESS);
-	CloseHandle(hOutputReadTmp);
-	CloseHandle(hInputWriteTmp);
+	// Create the child output pipe.
+	if (!CreatePipe(&_output_readTmp,&hOutputWrite,&sa,0)) {
+		// DisplayError("CreatePipe");
+	}
+
+	// Create a duplicate of the output write handle for the std error write handle. This is 
+	// necessary in case the child application closes one of its std output handles.
+	if (!DuplicateHandle(hp, hOutputWrite, hp, &hErrorWrite, 0, TRUE,DUPLICATE_SAME_ACCESS)) {
+		// DisplayError("DuplicateHandle");
+	}
+
+	// Create the child input pipe.
+	if (!CreatePipe(&hInputRead, &_input_writeTmp, &sa, 0)) {
+		// DisplayError("CreatePipe");
+	}
+
+	// Create new output read handle and the input write handles. Set the Properties to FALSE. 
+	// Otherwise, the child inherits the properties and, as a result, non-closeable handles to 
+	// the pipes are created.
+	if (!DuplicateHandle(hp, _output_readTmp, hp, &_output_read, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+		// DisplayError("DupliateHandle");
+	}
+
+	if (!DuplicateHandle(hp, _input_writeTmp, hp, &_input_write, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
+		// DisplayError("DupliateHandle");
+	}
+
+	// Close inheritable copies of the handles you do not want to be inherited.
+	if (!CloseHandle(_output_readTmp)) {
+		// DisplayError("CloseHandle");
+	}
+
+	if (!CloseHandle(_input_writeTmp)) {
+		// DisplayError("CloseHandle");
+	}
 
 	PROCESS_INFORMATION pi;
 	STARTUPINFO si;
+
 	ZeroMemory(&si, sizeof(STARTUPINFO));
+
 	si.cb = sizeof(STARTUPINFO);
 	si.dwFlags = STARTF_USESTDHANDLES | STARTF_USESHOWWINDOW;
 	si.wShowWindow = SW_HIDE;
-	si.hStdInput  = hInputRead;
+	si.hStdInput = hInputRead;
 	si.hStdOutput = hOutputWrite;
-	si.hStdError  = hErrorWrite;
-	int n = (int)strlen(command) + 1;
-	Buffer<char> cmd(n);
-	memcpy(cmd, command, n);
-	bool h = CreateProcess(NULL, cmd, &sa, &sa, TRUE,
-			NORMAL_PRIORITY_CLASS, (void *)envptr, NULL, &si, &pi);
-	LLOG("CreateProcess " << (h ? "succeeded" : "failed"));
-	CloseHandle(hErrorWrite);
-	CloseHandle(hInputRead);
-	CloseHandle(hOutputWrite);
-	if(h) {
-		_pid = pi.hProcess;
-		CloseHandle(pi.hThread);
-	}	else {
-		// throw Exc(NFormat("Error running process: %s\nCommand: %s", GetErrorMessage(GetLastError()), command));
-		Free();
+	si.hStdError = hErrorWrite;
+	
+	BOOL h = CreateProcess(NULL, (char *)_process.c_str(), &sa, &sa, TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
+	// bool h = CreateProcess(NULL, _process.c_str(), &sa, &sa, TRUE, NORMAL_PRIORITY_CLASS, (void *)envptr, NULL, &si, &pi);
+
+	// LLOG("CreateProcess " << (h ? "succeeded" : "failed"));
+	
+	// Close pipe handles (do not continue to modify the parent). You need to make sure that no 
+	// handles to the write end of the output pipe are maintained in this process or else the pipe 
+	// will not close when the child process exits and the ReadFile will hang.
+	if (!CloseHandle(hOutputWrite)) {
+		// DisplayError("CloseHandle");
 	}
-#else
-	if (_process.empty() == true) {
-		ForkChild();
-	} else {
-		jcommon::StringTokenizer tokens(_process, " ", jcommon::JTT_STRING, false);
-
-		char **argv = new char*[tokens.GetSize()+1];
-
-		for (int i=0; i!=tokens.GetSize(); i++) {
-			argv[i] = (char *)tokens.GetToken(i).c_str();
-		}
-
-		argv[tokens.GetSize()] = NULL;
-
-		ForkChild(argv[0], argv);
-
-		delete [] argv;
+	
+	if (!CloseHandle(hInputRead)) {
+		// DisplayError("CloseHandle");
 	}
+	
+	if (!CloseHandle(hErrorWrite)) {
+		// DisplayError("CloseHandle");
+	}
+
+	_pid = GetCurrentProcess();
+	// _pid = GetProcessId(GetCurrentProcess());
 #endif
 }
 
@@ -396,11 +416,14 @@ bool Process::IsRunning()
 #endif
 }
 
-void Process::Interrupt()
+void Process::Release()
 {
 	if (IsRunning() == true) {
 #ifdef _WIN32
 		TerminateProcess(_pid, (DWORD)-1);
+
+		CloseHandle(_output_read);
+		CloseHandle(_input_write);
 		CloseHandle(_pid);
 #else
 		kill(_pid, SIGKILL);

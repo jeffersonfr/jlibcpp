@@ -73,6 +73,6 @@ class User{
     
 };
 
-};
+}
 
 #endif

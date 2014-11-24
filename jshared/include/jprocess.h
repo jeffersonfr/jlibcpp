@@ -74,6 +74,8 @@ class Process : public virtual jcommon::Object{
 #ifdef _WIN32
 			/** \brief */
 			HANDLE _pid;
+			HANDLE _output_read;
+			HANDLE _input_write;
 #else
 			/** \brief */
 			pid_t _pid;
@@ -183,7 +185,7 @@ class Process : public virtual jcommon::Object{
 			 * \brief
 			 *
 			 */
-			void Interrupt();
+			void Release();
 
 			/**
 			 * \brief

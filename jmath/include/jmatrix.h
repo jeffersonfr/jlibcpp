@@ -31,7 +31,6 @@
 #include <stdlib.h>
 
 namespace jmath {
-}
 
 /**
  * \brief
@@ -3255,6 +3254,6 @@ template<class T> std::istream& operator>>(std::istream& os, Matrix<T> &M)
 	return os;
 }
 
-// }
+}
 
 #endif
