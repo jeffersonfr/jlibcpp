@@ -31,7 +31,7 @@ namespace jsecurity {
  * 
  * \author Jeff Ferr
  */
-class SecurityManager{
+class SecurityManager : public virtual jcommon::Object{
 
 	private:
 

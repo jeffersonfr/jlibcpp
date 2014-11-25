@@ -20,6 +20,8 @@
 #ifndef J_USER_H
 #define J_USER_H
 
+#include "jobject.h"
+
 #include <string>
 
 namespace jsecurity {
@@ -29,7 +31,7 @@ namespace jsecurity {
  * 
  * \author Jeff Ferr
  */
-class User{
+class User : public virtual jcommon::Object{
 
 	private:
 

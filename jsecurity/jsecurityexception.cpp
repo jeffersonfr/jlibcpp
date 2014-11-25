@@ -25,6 +25,7 @@ namespace jsecurity {
 SecurityException::SecurityException():
 	jcommon::RuntimeException()
 {
+	jcommon::Object::SetClassName("jsecurity::SecurityException");
 }
 
 SecurityException::SecurityException(std::string reason_):

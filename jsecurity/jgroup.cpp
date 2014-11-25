@@ -22,8 +22,10 @@
 
 namespace jsecurity {
 
-Group::Group()
+Group::Group():
+	jcommon::Object()
 {
+	jcommon::Object::SetClassName("jsecurity::Group");
 }
 
 Group::~Group()

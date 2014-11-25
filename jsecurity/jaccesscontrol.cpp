@@ -22,8 +22,10 @@
 
 namespace jsecurity {
 
-AccessControl::AccessControl()
+AccessControl::AccessControl():
+	jcommon::Object()
 {
+	jcommon::Object::SetClassName("jsecurity::AccessControl");
 }
 
 AccessControl::~AccessControl()

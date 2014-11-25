@@ -22,8 +22,10 @@
 
 namespace jsecurity {
 
-User::User()
+User::User():
+	jcommon::Object()
 {
+	jcommon::Object::SetClassName("jsecurity::User");
 }
 
 User::~User()

@@ -30,7 +30,7 @@ namespace jsecurity {
  * 
  * \author Jeff Ferr
  */
-class AccessControl{
+class AccessControl : public virtual jcommon::Object{
 
 	private:
 

@@ -20,6 +20,8 @@
 #ifndef J_GROUP_H
 #define J_GROUP_H
 
+#include "jobject.h"
+
 #include <string>
 
 namespace jsecurity {
@@ -29,7 +31,7 @@ namespace jsecurity {
  * 
  * \author Jeff Ferr
  */
-class Group{
+class Group : public virtual jcommon::Object{
 
 	private:
 

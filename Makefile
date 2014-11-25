@@ -22,7 +22,7 @@ CCFLAGS		= \
 		 -Wall -shared -rdynamic -fPIC -funroll-loops -O2 -pthread \
 		 $(DEBUG) -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" \
 		 -I$(INCDIR) \
-		 -Iwin32/win32 \
+		 -Iwin32\
 		 -Ijcommon/include \
 		 -Ijgui/include \
 		 -Ijio/include \
@@ -209,6 +209,15 @@ OBJS_jipc += \
 		 jresponse.o\
 		 jsecureipcclient.o\
 		 jsecureipcserver.o\
+
+OBJS_jsecurity += \
+		 jaccesscontrol.o\
+		 jfileaccesscontrol.o\
+		 jgroup.o\
+		 jsecurityexception.o\
+		 jsecuritylib.o\
+		 jsecuritymanager.o\
+		 juser.o\
 
 OBJS_jsocket += \
 		 jconnection.o\

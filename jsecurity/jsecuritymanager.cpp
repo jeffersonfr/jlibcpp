@@ -22,8 +22,10 @@
 
 namespace jsecurity {
 
-SecurityManager::SecurityManager()
+SecurityManager::SecurityManager():
+	jcommon::Object()
 {
+	jcommon::Object::SetClassName("jsecurity::SecurityManager");
 }
 
 SecurityManager::~SecurityManager()
