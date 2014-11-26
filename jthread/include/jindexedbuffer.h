@@ -69,7 +69,7 @@ struct jbuffer_chunk_t {
  */
 class IndexedBuffer : public virtual jcommon::Object{
 
-    private:
+	private:
 		/** \brief */
 		jbuffer_chunk_t *_buffer;
 		/** \brief */
@@ -104,43 +104,43 @@ class IndexedBuffer : public virtual jcommon::Object{
 		 * \brief 
 		 *
 		 */
-		void Reset();
+		virtual void Reset();
 
 		/**
 		 * \brief 
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 		/**
 		 * \brief 
 		 *
 		 */
-		void SetChunkSize(int size);
+		virtual void SetChunkSize(int size);
 
 		/**
 		 * \brief 
 		 *
 		 */
-		void SetNodesSize(int size);
+		virtual void SetNodesSize(int size);
 
 		/**
 		 * \brief 
 		 *
 		 */
-		int GetChunkSize();
+		virtual int GetChunkSize();
 
 		/**
 		 * \brief 
 		 *
 		 */
-		int GetNodesSize();
+		virtual int GetNodesSize();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetIndex(jbuffer_chunk_t *chunk);
+		virtual int GetIndex(jbuffer_chunk_t *chunk);
 
 		/**
 		 * \brief Returns the current size of buffer.
@@ -149,7 +149,7 @@ class IndexedBuffer : public virtual jcommon::Object{
 		 * retorna o tamanho atual do buffer.
 		 *
 		 */
-		int GetAvailable(jbuffer_chunk_t *chunk);
+		virtual int GetAvailable(jbuffer_chunk_t *chunk);
 
 		/**
 		 * \brief Read a chunk.
@@ -157,7 +157,7 @@ class IndexedBuffer : public virtual jcommon::Object{
 		 * \param data Data deve conter no minimo o tamanho de chunk. A funcao retorna o tamanho lido em size.
 		 *
 		 */
-		int Read(jbuffer_chunk_t *chunk);
+		virtual int Read(jbuffer_chunk_t *chunk);
 
 		/**
 		 * \brief Read a chunk.
@@ -165,13 +165,13 @@ class IndexedBuffer : public virtual jcommon::Object{
 		 * \param data Data deve conter no minimo o tamanho de chunk. A funcao retorna o tamanho lido em size.
 		 *
 		 */
-		int Read(jbuffer_chunk_t *chunk, int size);
+		virtual int Read(jbuffer_chunk_t *chunk, int size);
 
 		/**
 		 * \brief 
 		 *
 		 */
-		int Write(uint8_t *data, int size);
+		virtual int Write(uint8_t *data, int size);
 
 };
 

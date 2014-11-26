@@ -75,43 +75,43 @@ class Semaphore : public virtual jcommon::Object{
 			 * \brief Lock the semaphore.
 			 *
 			 */
-			void Wait();
+			virtual void Wait();
 
 			/**
 			 * \brief Lock semaphore.
 			 *
 			 */
-			void Wait(uint64_t time_);
+			virtual void Wait(uint64_t time_);
 
 			/**
 			 * \brief Notify the locked semaphore.
 			 *
 			 */
-			void Notify();
+			virtual void Notify();
 
 			/**
 			 * \brief Notify all locked semaphores.
 			 *
 			 */
-			void NotifyAll();
+			virtual void NotifyAll();
 
 			/**
 			 * \brief Try lock the semaphore.
 			 *
 			 */
-			bool TryWait();
+			virtual bool TryWait();
 
 			/**
 			 * \brief
 			 *
 			 */
-			int GetValue();
+			virtual int GetValue();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void Release();
+			virtual void Release();
 
 };
 

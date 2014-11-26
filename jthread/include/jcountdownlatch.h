@@ -96,31 +96,31 @@ class CountDownLatch : public virtual jcommon::Object{
 			 * \brief
 			 *
 			 */
-			void Wait();
+			virtual void Wait();
 
 			/**
 			 * \brief
 			 *
 			 */
-			bool TryWait();
+			virtual bool TryWait();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void CountDown();
+			virtual void CountDown();
 
 			/**
 			 * \brief
 			 *
 			 */
-			int GetCount();
+			virtual int GetCount();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void Reset();
+			virtual void Reset();
 
 };
 

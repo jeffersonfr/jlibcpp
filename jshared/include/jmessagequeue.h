@@ -94,31 +94,31 @@ class MessageQueue : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		int GetMessageIndex();
+		virtual int GetMessageIndex();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Send(const void *data_, int size_, long type_ = 1);
+		virtual void Send(const void *data_, int size_, long type_ = 1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Receive(void *data_, int size_, long mtype_ = 0, int flag_ = 0);
+		virtual void Receive(void *data_, int size_, long mtype_ = 0, int flag_ = 0);
 		
 		/**
 		 * \brief
 		 * 
 		 */
-		void SetBlocking(bool b_);
+		virtual void SetBlocking(bool b_);
 		
 		/**
 		 * \brief Close.
 		 *
 		 */
-		void Release();
+		virtual void Release();
 		
 };
 

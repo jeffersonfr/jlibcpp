@@ -30,7 +30,7 @@ SpinLock::SpinLock():
 #ifdef _WIN32
 	_lock.lock = 1;
 #else
-	pthread_spin_init(&_lock.lock, 0);
+	pthread_spin_init(&_lock, 0);
 #endif
 }
 
@@ -38,7 +38,7 @@ SpinLock::~SpinLock()
 {
 #ifdef _WIN32
 #else
-	pthread_spin_destroy(&_lock.lock);
+	pthread_spin_destroy(&_lock);
 #endif
 }
 
@@ -50,29 +50,29 @@ void SpinLock::Lock()
 	do {
 		int k = a;
 
-		a = _lock.lock;
-		_lock.lock = k;
+		a = _lock;
+		_lock = k;
 	} while(a != 0);
 #else
-	pthread_spin_lock(&_lock.lock);
+	pthread_spin_lock(&_lock);
 #endif
 }
 
 void SpinLock::Unlock()
 {
 #ifdef _WIN32
-	_lock.lock = 0;
+	_lock = 0;
 #else
-	pthread_spin_unlock(&_lock.lock);
+	pthread_spin_unlock(&_lock);
 #endif
 }
 
 bool SpinLock::TryLock()
 {
 #ifdef _WIN32
-	return (_lock.lock == 0);
+	return (_lock == 0);
 #else
-	return pthread_spin_trylock(&_lock.lock);
+	return pthread_spin_trylock(&_lock);
 #endif
 }
 

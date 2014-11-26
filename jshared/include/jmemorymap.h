@@ -99,37 +99,37 @@ class MemoryMap : public virtual jcommon::Object{
 			 * \brief
 			 *
 			 */
-			int64_t Get(char *data_, int64_t size_, int64_t offset_);
+			virtual int64_t Get(char *data_, int64_t size_, int64_t offset_);
 
 			/**
 			 * \brief
 			 *
 			 */
-			int64_t Put(const char *data_, int64_t size_, int64_t offset_);
+			virtual int64_t Put(const char *data_, int64_t size_, int64_t offset_);
 
 			/**
 			 * \brief
 			 *
 			 */
-			jmemory_permission_t GetPermission();
+			virtual jmemory_permission_t GetPermission();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void SetPermission(jmemory_permission_t perms_);
+			virtual void SetPermission(jmemory_permission_t perms_);
 
 			/**
 			 * \brief
 			 *
 			 */
-			int64_t GetSize();
+			virtual int64_t GetSize();
 
 			/**
 			 * \brief 
 			 *
 			 */
-			void Release();
+			virtual void Release();
 
 };
 

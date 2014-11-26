@@ -63,6 +63,7 @@ class SharedQueue : public virtual jcommon::Object{
 	private:
 		struct jshmhandle_t *_shm;
 
+	private:
 		/**
 		 * \brief
 		 *
@@ -122,55 +123,55 @@ class SharedQueue : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void Attach();
+		virtual void Attach();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Dealloc();
+		virtual void Deallocate();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Detach();
+		virtual void Detach();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Setpriv(void *priv);
+		virtual void Setpriv(void *priv);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Getpriv(void *priv);
+		virtual void Getpriv(void *priv);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int Get(void *data,int sz);
+		virtual int Get(void *data,int sz);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int Put(void *data, int sz);
+		virtual int Put(void *data, int sz);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsEmpty();
+		virtual bool IsEmpty();
 		
 		/**
 		 * \brief Close.
 		 *
 		 */
-		void Close();
+		virtual void Close();
 		
 };
 

@@ -66,37 +66,37 @@ class RWLock : public virtual jcommon::Object{
 		 * \brief Lock the critial section.
 		 *
 		 */
-		void ReadLock();
+		virtual void ReadLock();
 
 		/**
 		 * \brief Lock the critial section.
 		 *
 		 */
-		void WriteLock();
+		virtual void WriteLock();
 
 		/**
 		 * \brief Unlock the critical section.
 		 *
 		 */
-		void ReadUnlock();
+		virtual void ReadUnlock();
 
 		/**
 		 * \brief Unlock the critical section.
 		 *
 		 */
-		void WriteUnlock();
+		virtual void WriteUnlock();
 
 		/**
 		 * \brief Try lock the critical section.
 		 *
 		 */
-		bool TryReadLock();
+		virtual bool TryReadLock();
 
 		/**
 		 * \brief Try lock the critical section.
 		 *
 		 */
-		bool TryWriteLock();
+		virtual bool TryWriteLock();
 
 };
 

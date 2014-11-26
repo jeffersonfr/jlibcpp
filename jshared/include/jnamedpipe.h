@@ -69,25 +69,25 @@ class NamedPipe : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		int Send(const char *data_, int data_length);
+		virtual int Send(const char *data_, int data_length);
 
 		/**
 		 * \brief
 		 *
 		 */
-		int Receive(char *data_, int data_length_);
+		virtual int Receive(char *data_, int data_length_);
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsClosed();
+		virtual bool IsClosed();
 
 		/**
 		 * \brief Close.
 		 *
 		 */
-		void Close();
+		virtual void Close();
 
 };
 

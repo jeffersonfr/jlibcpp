@@ -60,7 +60,7 @@ class ResourceStatusEvent : public jcommon::EventObject{
 		 * \brief
 		 * 
 		 */
-		jresourceevent_status_t  GetType();
+		virtual jresourceevent_status_t  GetType();
     
 };
 

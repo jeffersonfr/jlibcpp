@@ -51,14 +51,14 @@ class Event {
 		/**
 		 * \brief Sets the Event to Non-Signalled state.
 		 */
-		void Reset();
+		virtual void Reset();
 
 		/**
 		 * \brief Unconditional wait. Waits for the Event to become Signalled. Wait returns immediately if 
 		 * Event is already in Signalled state; the Event is automatically reset to Not-Signalled state.
 		 *
 		 */
-		void Wait();
+		virtual void Wait();
 
 		/**
 		 * \brief Conditional wait. Waits for upto “secs” seconds for the Event to be signalled. Wait 
@@ -66,25 +66,25 @@ class Event {
 		 * Non-Signalled state.
 		 *
 		 */
-		void Wait(uint64_t secs);
+		virtual void Wait(uint64_t secs);
 
 		/**
 		 * \brief Sets an Event to Signalled state, and wakes up one waiting thread.
 		 *
 		 */
-		void Notify();
+		virtual void Notify();
 
 		/**
 		 * \brief Sets an Event to Signalled state, and wakes up one waiting thread.
 		 *
 		 */
-		void NotifyAll();
+		virtual void NotifyAll();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 };
 

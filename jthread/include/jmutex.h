@@ -84,31 +84,31 @@ class Mutex : public virtual jcommon::Object{
 		 * \brief Verify if a section is locked.
 		 *
 		 */
-		bool IsLocked();
+		virtual bool IsLocked();
 
 		/**
 		 * \brief Lock the critial section.
 		 *
 		 */
-		void Lock();
+		virtual void Lock();
 
 		/**
 		 * \brief Lock the critial section.
 		 *
 		 */
-		void Lock(int time_);
+		virtual void Lock(int time_);
 
 		/**
 		 * \brief Unlock the critical section.
 		 *
 		 */
-		void Unlock();
+		virtual void Unlock();
 
 		/**
 		 * \brief Try lock the critical section.
 		 *
 		 */
-		bool TryLock();
+		virtual bool TryLock();
 
 };
 

@@ -52,37 +52,37 @@ class AccessControl : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		User * GetUser();
+		virtual User * GetUser();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		Group * GetGroup();
+		virtual Group * GetGroup();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		User * GetOther();
+		virtual User * GetOther();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void SetUser(User *id);
+		virtual void SetUser(User *id);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void SetGroup(Group *id);
+		virtual void SetGroup(Group *id);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void SetOther(User *id);
+		virtual void SetOther(User *id);
     
 };
 

@@ -20,7 +20,7 @@
 #ifndef J_SHAREDMUTEX_H
 #define J_SHAREDMUTEX_H
 
-#include "jobject.h"
+#include "jsharedsemaphore.h"
 
 #include <iostream>
 
@@ -48,12 +48,8 @@ enum jsharedmutex_flags_t {
 class SharedMutex : public virtual jcommon::Object{
 
     private:
-			/** \brief Socket handler. */
-#ifdef _WIN32
-			int _id;
-#else
-			key_t _id;
-#endif
+			/** \brief . */
+			jkey_t _id;
 			/** \brief */
 			int64_t _size;
 			/** \brief */
@@ -86,31 +82,31 @@ class SharedMutex : public virtual jcommon::Object{
 			 * \brief
 			 *
 			 */
-			void Lock();
+			virtual void Lock();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void Unlock();
+			virtual void Unlock();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void LockAll();
+			virtual void LockAll();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void UnlockAll();
+			virtual void UnlockAll();
 
 			/**
 			 * \brief 
 			 *
 			 */
-			void Release();
+			virtual void Release();
 
 };
 

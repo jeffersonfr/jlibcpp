@@ -59,7 +59,7 @@ class ResourceTypeEvent : public jcommon::EventObject{
 		 * \brief
 		 * 
 		 */
-		jresourceevent_type_t  GetType();
+		virtual jresourceevent_type_t  GetType();
     
 };
 

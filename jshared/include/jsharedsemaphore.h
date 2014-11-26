@@ -38,6 +38,12 @@
 
 namespace jshared {
 
+#ifdef _WIN32
+typedef DWORD jkey_t;
+#else
+typedef key_t jkey_t;
+#endif
+
 /**
  * \brief Socket.
  *

@@ -90,47 +90,47 @@ class Monitor {
 		 * \brief Requests a lock on the Monitor object. Will block if Lock is not available.
 		 *
 		 */
-		void Enter();
+		virtual void Enter();
 
 		/**
 		 * \brief Requests a lock on the Monitor object.  Will return false if Lock is not 
 		 * available. Returns true if lock was acquired.
 		 *
 		 */
-		bool TryEnter();
+		virtual bool TryEnter();
 
 		/** 
 		 * \brief Requester must be a holder of the lock. If the Unlock succeeds, the lock is 
 		 * granted to the oldest waiting thread on the ReadyQ.
 		 *
 		 */
-		void Exit();
+		virtual void Exit();
 
 		/**
 		 * \brief Requester must be a holder of the lock. The lock is released and requester put 
 		 * to sleep until the Monitor is signalled. Lock is re-acquired before control returns to 
 		 * the caller.
 		 */
-		void Wait();
+		virtual void Wait();
 
 		/**
 		 * \brief Requester must be a holder of the lock. The lock is released and requester put 
 		 * to sleep until the Monitor is signalled or the timeout expires. Lock is re-acquired 
 		 * before control returns to the caller. 
 		 */
-		bool Wait(uint64_t secs);
+		virtual bool Wait(uint64_t secs);
 
 		/**
 		 * \brief Signals and wakes up one thread waiting on the Monitor object. The thread woken 
 		 * up may not be the one signalled.
 		 *
 		 */
-		void Notify();
+		virtual void Notify();
 
 		/**
 		 * \brief Signalls all waiting threads and wakes up one thread.
 		 */
-		void NotifyAll();
+		virtual void NotifyAll();
 
 };
 

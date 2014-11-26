@@ -74,25 +74,25 @@ class WorkerThread : public jthread::Thread{
 		 * \brief 
 		 *
 		 */
-		bool IsRunning();
+		virtual bool IsRunning();
 
 		/**
 		 * \brief 
 		 *
 		 */
-		void WaitThread();
+		virtual void WaitThread();
 
 		/**
 		 * \brief 
 		 *
 		 */
-		void AttachThread(Runnable *r);
+		virtual void AttachThread(Runnable *r);
 
 		/**
 		 * \brief 
 		 *
 		 */
-		void DetachThread(Runnable *r);
+		virtual void DetachThread(Runnable *r);
 
 		/**
 		 * \brief
@@ -142,37 +142,37 @@ class ThreadPool : public virtual jcommon::Object{
 		 * \brief 
 		 *
 		 */
-		bool AttachThread(Runnable *r, jthreadpool_priority_t t = JTP_GROUP_MEDIUM);
+		virtual bool AttachThread(Runnable *r, jthreadpool_priority_t t = JTP_GROUP_MEDIUM);
 
 		/**
 		 * \brief 
 		 *
 		 */
-		bool DetachThread(Runnable *r);
+		virtual bool DetachThread(Runnable *r);
 
 		/**
 		 * \brief 
 		 *
 		 */
-		void Interrupt();
+		virtual void Interrupt();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void WaitForAll();
+		virtual void WaitForAll();
 
 		/**
 		 * \brief Return true if thread is started, false if not.
 		 *
 		 */
-		int CountActiveThreads();
+		virtual int CountActiveThreads();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void ReleaseWorkerThread(WorkerThread *t);
+		virtual void ReleaseWorkerThread(WorkerThread *t);
 
 };
 

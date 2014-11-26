@@ -59,49 +59,50 @@ class SecurityManager : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		void GetAllUsers();
+		virtual void GetAllUsers();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		User * GetUser(std::string id);
+		virtual User * GetUser(std::string id);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void GetAllGroups();
+		virtual void GetAllGroups();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void GetGoupsFromUser(int id);
+		virtual void GetGoupsFromUser(int id);
 		
 		/**
 		 * \brief
 		 * 
 		 */
-		void GetGoupsFromUser(std::string id);
+		virtual void GetGoupsFromUser(std::string id);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		AccessControl * GetDefaultAccessControl();
+		virtual AccessControl * GetDefaultAccessControl();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void Update(User id);
+		virtual void Update(User id);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void Update(Group id);
+		virtual void Update(Group id);
+
 };
 
 };

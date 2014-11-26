@@ -64,25 +64,25 @@ class LogRecord : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		std::string GetRecord();
+		virtual std::string GetRecord();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		jrecord_type_t GetType();
+		virtual jrecord_type_t GetType();
 		
 		/**
 		 * \brief
 		 * 
 		 */
-		void SetRecord(std::string log);
+		virtual void SetRecord(std::string log);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void SetType(jrecord_type_t t);
+		virtual void SetType(jrecord_type_t t);
 		
 };
 

@@ -302,12 +302,12 @@ void SharedQueue::Attach()
 #endif
 }
 
-void SharedQueue::Dealloc()
+void SharedQueue::Deallocate()
 {
 #ifdef _WIN32
 #else
-  	union semun ignored;
-	
+	union semun ignored;
+
 	semctl(_shm->semid, 1, IPC_RMID, ignored);
 	shmctl(_shm->sid, IPC_RMID, 0);
 #endif

@@ -91,7 +91,7 @@ void SharedMemory::Attach()
 #endif
 }
 
-void SharedMemory::Deatach()
+void SharedMemory::Detach()
 {
 #ifdef _WIN32
 #else	
@@ -107,7 +107,7 @@ void SharedMemory::Deatach()
 #endif
 }
 
-void SharedMemory::Dealloc()
+void SharedMemory::Deallocate()
 {
 #ifdef _WIN32
 #else	
@@ -161,8 +161,8 @@ void SharedMemory::Release()
 {
 #ifdef _WIN32
 #else	
-	Deatach();
-	Dealloc();
+	Detach();
+	Deallocate();
 #endif
 }
 

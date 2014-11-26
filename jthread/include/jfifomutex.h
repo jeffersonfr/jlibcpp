@@ -83,31 +83,31 @@ class FifoMutex : public virtual jcommon::Object{
 		 * \brief Verify if a section is locked.
 		 *
 		 */
-		bool IsLocked();
+		virtual bool IsLocked();
 
 		/**
 		 * \brief Lock the critial section.
 		 *
 		 */
-		void Lock();
+		virtual void Lock();
 
 		/**
 		 * \brief Lock the critial section.
 		 *
 		 */
-		void Lock(int time_);
+		virtual void Lock(int time_);
 
 		/**
 		 * \brief Unlock the critical section.
 		 *
 		 */
-		void Unlock();
+		virtual void Unlock();
 
 		/**
 		 * \brief Try lock the critical section.
 		 *
 		 */
-		bool TryLock();
+		virtual bool TryLock();
 
 		/*
 		 * \brief Remove cached entries from the FIFO mutex. When contended, 
@@ -117,12 +117,12 @@ class FifoMutex : public virtual jcommon::Object{
 		 * be no need to call this function during normal program operation, 
 		 * but it can be called at any time.
 		 */
-		void Trim();
+		virtual void Trim();
 
 		/*
 		 * \brief Return the number of unused entries cached in the FIFO mutex.
 		 */
-		int CountUnused();
+		virtual int CountUnused();
 
 		/* 
 		 * \brief Return the number of entries in the FIFO mutex list.
@@ -132,7 +132,7 @@ class FifoMutex : public virtual jcommon::Object{
 		 * If the current thread holds the FIFO mutex, then the count
 		 * is 1 + the number of other threads blocking on the mutex.
 		 */
-		int CountList();
+		virtual int CountList();
 
 };
 

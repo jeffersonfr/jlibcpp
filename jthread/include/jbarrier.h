@@ -67,13 +67,13 @@ class Barrier : public virtual jcommon::Object{
 			 * \brief Lock barrier.
 			 *
 			 */
-			void Wait();
+			virtual void Wait();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void Release();
+			virtual void Release();
 
 };
 

@@ -76,13 +76,13 @@ class ThreadGroup : public virtual jcommon::Object{
 		 * \brief 
 		 *
 		 */
-		void InterruptAll();
+		virtual void InterruptAll();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void WaitForAll();
+		virtual void WaitForAll();
 
 };
 

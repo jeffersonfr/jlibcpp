@@ -65,13 +65,13 @@ class LoggerManager : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		Logger * CreateLogger(Handler *handler_ = NULL, Formatter *format_ = NULL, Logger *group_ = NULL);
+		virtual Logger * CreateLogger(Handler *handler_ = NULL, Formatter *format_ = NULL, Logger *group_ = NULL);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void SetOutput(int mask_);
+		virtual void SetOutput(int mask_);
     
 };
 

@@ -45,6 +45,13 @@ Process::Process():
 	_output = NULL;
 	_error = NULL;
 	_type = JPT_PARENT;
+
+#ifdef _WIN32
+	_pid = GetCurrentProcess();
+	_handle = GetCurrentProcess();
+#else
+	_pid = getpid();
+#endif
 }
 
 Process::Process(std::string process):
@@ -57,6 +64,13 @@ Process::Process(std::string process):
 	_output = NULL;
 	_error = NULL;
 	_type = JPT_PARENT;
+
+#ifdef _WIN32
+	_pid = GetCurrentProcess();
+	_handle = GetCurrentProcess();
+#else
+	_pid = getpid();
+#endif
 }
 
 Process::~Process()
@@ -97,6 +111,7 @@ void Process::ForkChild()
 	
 	if (pid == 0) {
 		_type = JPT_CHILD;
+		_pid = getpid();
 
 		close(_pinput[1]);
 		close(_poutput[0]);
@@ -117,6 +132,8 @@ void Process::ForkChild()
 		close(_pinput[0]);
 		close(_poutput[1]);
 		close(_perror[1]);
+
+		return;
 	}
 
 	close(_pinput[0]);
@@ -163,6 +180,7 @@ void Process::ForkChild(const char *prog, char **args)
 	
 	if (pid == 0) {
 		_type = JPT_CHILD;
+		_pid = getpid();
 
 		close(_pinput[1]);
 		close(_poutput[0]);
@@ -185,6 +203,8 @@ void Process::ForkChild(const char *prog, char **args)
 		close(_perror[1]);
 
 		exit(execvp(prog, args));
+
+		return;
 	}
 
 	close(_pinput[0]);
@@ -224,37 +244,17 @@ jprocess_type_t Process::GetType()
 	return _type;
 }
 
-#ifdef _WIN32
-HANDLE Process::GetPID()
-#else
-pid_t Process::GetPID()
-#endif
+jpid_t Process::GetPID()
 {
-#ifdef _WIN32
 	return _pid;
-#else
-	if (_pid == 0) {
-		return getpid();
-	}
-
-	return _pid;
-#endif
 }
 
-#ifdef _WIN32
-HANDLE Process::GetParentPID()
-#else
-pid_t Process::GetParentPID()
-#endif
+jpid_t Process::GetParentPID()
 {
 #ifdef _WIN32
 	return _pid;
 #else
-	if (_pid == 0) {
-		return getppid();
-	}
-
-	return getpid();
+	return getppid();
 #endif
 }
 
@@ -277,7 +277,7 @@ jio::InputStream * Process::GetErrorStream()
 void Process::WaitProcess()
 {
 #ifdef _WIN32
-	 if (WaitForSingleObject(_pid, INFINITE) == WAIT_FAILED) {
+	 if (WaitForSingleObject(_handle, INFINITE) == WAIT_FAILED) {
 		 throw ProcessException("Waiting process failed");
 	 }
 #else
@@ -368,8 +368,10 @@ void Process::Start()
 	si.hStdOutput = hOutputWrite;
 	si.hStdError = hErrorWrite;
 	
-	BOOL h = CreateProcess(NULL, (char *)_process.c_str(), &sa, &sa, TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi);
 	// bool h = CreateProcess(NULL, _process.c_str(), &sa, &sa, TRUE, NORMAL_PRIORITY_CLASS, (void *)envptr, NULL, &si, &pi);
+	if (CreateProcess(NULL, (char *)_process.c_str(), &sa, &sa, TRUE, NORMAL_PRIORITY_CLASS, NULL, NULL, &si, &pi)) {
+		CloseHandle(pi.hThread);
+	}
 
 	// LLOG("CreateProcess " << (h ? "succeeded" : "failed"));
 	
@@ -388,8 +390,8 @@ void Process::Start()
 		// DisplayError("CloseHandle");
 	}
 
-	_pid = GetCurrentProcess();
-	// _pid = GetProcessId(GetCurrentProcess());
+	_handle = pi.hProcess;
+	_pid = GetProcessId(_handle);
 #endif
 }
 
@@ -398,7 +400,7 @@ bool Process::IsRunning()
 #ifdef _WIN32
 	DWORD exitcode;
 
-	if (GetExitCodeProcess(_pid, &exitcode) && exitcode == STILL_ACTIVE) {
+	if (GetExitCodeProcess(_handle, &exitcode) && exitcode == STILL_ACTIVE) {
 		return true;
 	}
 
@@ -420,11 +422,11 @@ void Process::Release()
 {
 	if (IsRunning() == true) {
 #ifdef _WIN32
-		TerminateProcess(_pid, (DWORD)-1);
+		TerminateProcess(_handle, (DWORD)-1);
 
 		CloseHandle(_output_read);
 		CloseHandle(_input_write);
-		CloseHandle(_pid);
+		CloseHandle(_handle);
 #else
 		kill(_pid, SIGKILL);
 #endif
@@ -448,7 +450,7 @@ void Process::Release()
 		_error = NULL;
 	}
 
-	_pid = 0;
+	_pid = -1;
 }
 
 }

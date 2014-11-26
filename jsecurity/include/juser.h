@@ -53,25 +53,25 @@ class User : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		int GetID();
+		virtual int GetID();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void GetGroups();
+		virtual void GetGroups();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		std::string GetName();
+		virtual std::string GetName();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		std::string GetAddress();
+		virtual std::string GetAddress();
     
 };
 

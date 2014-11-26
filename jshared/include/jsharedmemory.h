@@ -79,37 +79,37 @@ class SharedMemory : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void Attach();
+		virtual void Attach();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Deatach();
+		virtual void Detach();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Dealloc();
+		virtual void Deallocate();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int Get(char *data_, int size_);
+		virtual int Get(char *data_, int size_);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int Put(const char *data_, int size_);
+		virtual int Put(const char *data_, int size_);
 		
 		/**
 		 * \brief Close.
 		 *
 		 */
-		void Release();
+		virtual void Release();
         
 };
 

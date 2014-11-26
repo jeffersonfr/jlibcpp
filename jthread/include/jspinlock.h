@@ -30,14 +30,6 @@
 #else
 #endif
 
-struct jspinlock_t {
-#ifdef _WIN32
-	volatile unsigned long lock;
-#else
-	pthread_spinlock_t lock;
-#endif
-};
-
 namespace jthread {
 
 /**
@@ -48,7 +40,11 @@ namespace jthread {
 class SpinLock : public virtual jcommon::Object{
 
 	private:
-		jspinlock_t _lock;
+#ifdef _WIN32
+		volatile unsigned long _lock;
+#else
+		pthread_spinlock_t _lock;
+#endif
 
 	public:
 		/**
@@ -67,25 +63,25 @@ class SpinLock : public virtual jcommon::Object{
 		 * \brief Lock the semaphore.
 		 *
 		 */
-		void Lock();
+		virtual void Lock();
 
 		/**
 		 * \brief Notify the locked semaphore.
 		 *
 		 */
-		void Unlock();
+		virtual void Unlock();
 
 		/**
 		 * \brief Try lock the semaphore.
 		 *
 		 */
-		bool TryLock();
+		virtual bool TryLock();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void Release();
+		virtual void Release();
 
 };
 

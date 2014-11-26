@@ -20,7 +20,7 @@
 #ifndef J_PRIORITYSCHEDULE_H
 #define J_PRIORITYSCHEDULE_H
 
-#include "jobject.h"
+#include "jprocess.h"
 
 #include <iostream>
 
@@ -80,24 +80,15 @@ struct jschedule_param_t {
 class Schedule : public virtual jcommon::Object{
 
     private:
-#ifdef _WIN32
-        /** \brief */
-		HANDLE _pid;
-#else
-        /** \brief */
-		pid_t _pid;
-#endif
+       /** \brief */
+			jpid_t _pid;
 
 	public:
 		/**
 		 * \brief Constructor.
 		 *
 		 */
-#ifdef _WIN32
-		Schedule(HANDLE pid_ = 0);
-#else
-		Schedule(pid_t pid_ = 0);
-#endif
+		Schedule(jpid_t pid_ = 0);
 	
 		/**
 		 * \brief Destrutor virtual.
@@ -109,101 +100,97 @@ class Schedule : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-#ifdef _WIN32
-		HANDLE GetPID();
-#else
-		pid_t GetPID();
-#endif
+		virtual jpid_t GetPID();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetPriority(int n);
+		virtual void SetPriority(int n);
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetCurrentPriority();
+		virtual int GetCurrentPriority();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetSchedulerParameter(const jschedule_param_t *param_);
+		virtual void SetSchedulerParameter(const jschedule_param_t *param_);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void GetSchedulerParameter(jschedule_param_t *param_);
+		virtual void GetSchedulerParameter(jschedule_param_t *param_);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetScheduler(jschedule_type_t policy_, const jschedule_param_t *param_);
+		virtual void SetScheduler(jschedule_type_t policy_, const jschedule_param_t *param_);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		jschedule_policy_t GetScheduler();
+		virtual jschedule_policy_t GetScheduler();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetMaximumPriority();
+		virtual int GetMaximumPriority();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetMinimumPriority();
+		virtual int GetMinimumPriority();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetScheduleAffinity(unsigned long mask_);
+		virtual void SetScheduleAffinity(unsigned long mask_);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		unsigned long GetScheduleAffinity();
+		virtual uint64_t GetScheduleAffinity();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void YieldProcess();
+		virtual void YieldProcess();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void IncreaseNice();
+		virtual void IncreaseNice();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void DecreaseNice();
+		virtual void DecreaseNice();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetPriority(int n, jschedule_type_t type_);
+		virtual void SetPriority(int n, jschedule_type_t type_);
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetPriority(jschedule_type_t type_);
+		virtual int GetPriority(jschedule_type_t type_);
 		
 };
 

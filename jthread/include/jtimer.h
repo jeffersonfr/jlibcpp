@@ -166,38 +166,38 @@ class TaskQueue {
 		 * \brief Adds a new task to the priority queue.
 		 *
 		 */
-		void Add(TimerTask *task);
+		virtual void Add(TimerTask *task);
 
 		/**
 		 * \brief Adds a new task to the priority queue.
 		 *
 		 */
-		void Remove(TimerTask *task);
+		virtual void Remove(TimerTask *task);
 
 		/**
 		 * \brief Returns true if the priority queue contains no elements.
 		 *
 		 */
-		bool IsEmpty();
+		virtual bool IsEmpty();
 
 		/**
 		 * \brief Removes all elements from the priority queue.
 		 *
 		 */
-		void Clear();
+		virtual void Clear();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetSize();
+		virtual int GetSize();
 
 		/**
 		 * \brief Sets the nextExecutionTime associated with the head task to the specified value, and adjusts priority 
 		 * queue accordingly.
 		 *
 		 */
-		void RescheduleMin(uint64_t newTime);
+		virtual void RescheduleMin(uint64_t newTime);
 
 };
 

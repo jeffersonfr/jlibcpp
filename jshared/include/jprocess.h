@@ -55,6 +55,12 @@ enum jprocess_flag_t {
 	JPF_LOCK		// \brief Create a new process and block parent
 };
 
+#ifdef _WIN32
+typedef DWORD jpid_t;
+#else
+typedef pid_t jpid_t;
+#endif
+
 /**
  * \brief Socket.
  *
@@ -73,13 +79,13 @@ class Process : public virtual jcommon::Object{
 			std::string _process;
 #ifdef _WIN32
 			/** \brief */
-			HANDLE _pid;
+			HANDLE _handle;
 			HANDLE _output_read;
 			HANDLE _input_write;
 #else
-			/** \brief */
-			pid_t _pid;
 #endif
+			/** \brief */
+			jpid_t _pid;
 			/** \brief */
 			int _pinput[2],
 					_poutput[2],
@@ -129,69 +135,61 @@ class Process : public virtual jcommon::Object{
 			 * \brief
 			 *
 			 */
-			jprocess_type_t GetType();
+			virtual jprocess_type_t GetType();
 
 			/**
 			 * \brief
 			 *
 			 */
-#ifdef _WIN32
-			HANDLE GetPID();
-#else
-			pid_t GetPID();
-#endif
+			virtual jpid_t GetPID();
 
 			/**
 			 * \brief
 			 *
 			 */
-#ifdef _WIN32
-			HANDLE GetParentPID();
-#else
-			pid_t GetParentPID();
-#endif
+			virtual jpid_t GetParentPID();
 
 			/**
 			 * \brief 
 			 *
 			 */
-			jio::InputStream * GetInputStream();
+			virtual jio::InputStream * GetInputStream();
 			
 			/**
 			 * \brief 
 			 *
 			 */
-			jio::OutputStream * GetOutputStream();
+			virtual jio::OutputStream * GetOutputStream();
 			
 			/**
 			 * \brief 
 			 *
 			 */
-			jio::InputStream * GetErrorStream();
+			virtual jio::InputStream * GetErrorStream();
 			
 			/**
 			 * \brief
 			 *
 			 */
-			void Start();
+			virtual void Start();
 		
 			/**
 			 * \brief
 			 *
 			 */
-			bool IsRunning();
+			virtual bool IsRunning();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void Release();
+			virtual void Release();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void WaitProcess();
+			virtual void WaitProcess();
 
 };
 

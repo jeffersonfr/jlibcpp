@@ -75,43 +75,43 @@ class Logger : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		void SendLogger(jrecord_type_t type_, std::string record_);
+		virtual void SendLogger(jrecord_type_t type_, std::string record_);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void SendLogger(jrecord_type_t type_, const char *fmt, ...);
+		virtual void SendLogger(jrecord_type_t type_, const char *fmt, ...);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void SendLogger(LogRecord *record_);
+		virtual void SendLogger(LogRecord *record_);
     
 		/**
 		 * \brief
 		 * 
 		 */
-		void SetOutput(int mask_);
+		virtual void SetOutput(int mask_);
     
 		/**
 		 * \brief
 		 * 
 		 */
-		void SetHandler(Handler *handler_);
+		virtual void SetHandler(Handler *handler_);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void SetFormatter(Formatter *format_);
+		virtual void SetFormatter(Formatter *format_);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		void Release();
+		virtual void Release();
 		
 };
 

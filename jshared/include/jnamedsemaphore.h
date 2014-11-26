@@ -89,7 +89,7 @@ class NamedSemaphore : public virtual jcommon::Object{
 		 * \brief Wait milliseconds.
 		 *
 		 */
-		void Wait(uint64_t time_);
+		virtual void Wait(uint64_t time_);
 
 		/**
 		 * \brief .

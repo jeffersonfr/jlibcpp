@@ -65,7 +65,7 @@ class Condition : public virtual jcommon::Object{
 			 * \brief Lock semaphore.
 			 *
 			 */
-			void Wait(Mutex *mutex = NULL);
+			virtual void Wait(Mutex *mutex = NULL);
 
 			/**
 			 * \brief Lock semaphore.
@@ -74,25 +74,25 @@ class Condition : public virtual jcommon::Object{
 			 * the epoch (00:00:00 GMT, January 1, 1970).
 			 *
 			 */
-			void Wait(uint64_t time_, Mutex *mutex = NULL);
+			virtual void Wait(uint64_t time_, Mutex *mutex = NULL);
 
 			/**
 			 * \brief Notify the locked semaphore.
 			 *
 			 */
-			void Notify();
+			virtual void Notify();
 
 			/**
 			 * \brief Notify all the locked semaphores.
 			 *
 			 */
-			void NotifyAll();
+			virtual void NotifyAll();
 
 			/**
 			 * \brief
 			 *
 			 */
-			void Release();
+			virtual void Release();
 
 };
 

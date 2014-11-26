@@ -53,13 +53,13 @@ class Group : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		int GetID();
+		virtual int GetID();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		std::string GetName();
+		virtual std::string GetName();
     
 };
 

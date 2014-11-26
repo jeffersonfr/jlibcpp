@@ -39,12 +39,4 @@ enum jshared_permissions_t {
 	JSP_ORWX = (JSP_OR | JSP_OW | JSP_OX), // read, write, execute/search by others 
 };
 
-#ifdef _WIN32
-typedef int jkey_t;
-#else
-#include <sys/ipc.h>
-
-typedef key_t jkey_t;
-#endif
-
 #endif
