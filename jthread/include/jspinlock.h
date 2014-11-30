@@ -77,12 +77,6 @@ class SpinLock : public virtual jcommon::Object{
 		 */
 		virtual bool TryLock();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Release();
-
 };
 
 }

@@ -28,7 +28,7 @@ SpinLock::SpinLock():
 	jcommon::Object::SetClassName("jthread::SpinLock");
 	
 #ifdef _WIN32
-	_lock.lock = 1;
+	_lock = 1;
 #else
 	pthread_spin_init(&_lock, 0);
 #endif

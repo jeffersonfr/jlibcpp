@@ -26,6 +26,8 @@
 
 namespace jsecurity {
 
+class Group;
+
 /**
  * \brief
  * 
@@ -34,14 +36,17 @@ namespace jsecurity {
 class User : public virtual jcommon::Object{
 
 	private:
-
+		/** \brief */
+		std::string _name;
+		/** \brief */
+		std::vector<Group *> _groups;
 		
 	public:
 		/**
 		 * \brief
 		 * 
 		 */
-		User();
+		User(std::string name);
 		
 		/**
 		 * \brief
@@ -59,7 +64,19 @@ class User : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual void GetGroups();
+		virtual void AddGroup(Group *group);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual void RemoveGroup(Group *group);
+
+		/**
+		 * \brief
+		 * 
+		 */
+		virtual std::vector<Group *> & GetGroups();
 
 		/**
 		 * \brief

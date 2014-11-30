@@ -23,20 +23,16 @@
 
 namespace jshared {
 
-#ifdef _WIN32
-Schedule::Schedule(HANDLE pid_):
-#else	
-Schedule::Schedule(pid_t pid_):
-#endif
+Schedule::Schedule(jpid_t pid_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jshared::Schedule");
 	
+	_pid = pid_;
+
 #ifdef _WIN32
 #else	
 	if (pid_ < 1) {
-		_pid = pid_;
-	} else {
 		_pid = getpid();
 	}
 #endif
@@ -46,11 +42,7 @@ Schedule::~Schedule()
 {
 }
 
-#ifdef _WIN32
-HANDLE Schedule::GetPID()
-#else
-pid_t Schedule::GetPID()
-#endif
+jpid_t Schedule::GetPID()
 {
 	return _pid;
 }
@@ -182,7 +174,7 @@ int Schedule::GetMinimumPriority()
 #endif
 }
 
-void Schedule::SetScheduleAffinity(unsigned long mask)
+void Schedule::SetScheduleAffinity(uint64_t mask)
 {
 #ifdef _WIN32
 #else
@@ -200,12 +192,12 @@ void Schedule::SetScheduleAffinity(unsigned long mask)
 #endif
 }
 
-unsigned long Schedule::GetScheduleAffinity()
+uint64_t Schedule::GetScheduleAffinity()
 {
 #ifdef _WIN32
-	return 0;
+	return 0LL;
 #else	
-	unsigned long mask;
+	uint64_t mask;
 	
 	int r = sched_setaffinity(_pid, 1, (cpu_set_t *)&mask);
 
@@ -219,7 +211,7 @@ unsigned long Schedule::GetScheduleAffinity()
 		}
 	}
 
-	return mask;
+	return (uint64_t)mask;
 #endif
 }
 

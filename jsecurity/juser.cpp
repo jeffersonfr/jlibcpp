@@ -19,17 +19,60 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "juser.h"
+#include "jgroup.h"
 
 namespace jsecurity {
 
-User::User():
+User::User(std::string name):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jsecurity::User");
+
+	_name = name;
 }
 
 User::~User()
 {
+}
+
+int User::GetID()
+{
+	return -1;
+}
+
+void User::AddGroup(Group *group)
+{
+	std::vector<Group *>::iterator i = std::find(_groups.begin(), _groups.end(), group);
+
+	if (i != _groups.end()) {
+		return;
+	}
+	
+	_groups.push_back(group);
+}
+
+void User::RemoveGroup(Group *group)
+{
+	std::vector<Group *>::iterator i = std::find(_groups.begin(), _groups.end(), group);
+
+	if (i != _groups.end()) {
+		_groups.erase(i);
+	}
+}
+
+std::vector<Group *> & User::GetGroups()
+{
+	return _groups;
+}
+
+std::string User::GetName()
+{
+	return _name;
+}
+
+std::string User::GetAddress()
+{
+	return "";
 }
 
 };

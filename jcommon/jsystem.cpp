@@ -513,42 +513,63 @@ std::string System::GetOSVersion()
 	
 	::GetVersionEx(&os_info);
 
-	switch(os_info.dwMajorVersion) {
-		case 4:
-			switch(os_info.dwMinorVersion) {
-				case 0:
-					if(os_info.dwPlatformId == VER_PLATFORM_WIN32_NT)
-						return "NT 4.0";
-					else
-						return "95";
-					break;
-				case 10:
-					return "98";
-				case 90:
-					return "ME";
-				default:
-					return "unknown";
+	if (os_info.dwMajorVersion == 4) {
+		if (os_info.dwMinorVersion == 0) {
+			if (os_info.dwPlatformId == VER_PLATFORM_WIN32_NT) {
+				return "Windows NT 4.0";
+			} else {
+				return "Windows 95";
 			}
-			break;
-		case 5:
-			switch(os_info.dwMinorVersion) {
-				case 0:
-					return "2000";
-				case 1:
-					return "XP";
-				case 2:
-					return "Server 2003";
-				default:
-					return "unknown";
+		} else if (os_info.dwMinorVersion == 10) {
+			return "Windows 98";
+		} else if (os_info.dwMinorVersion == 10) {
+			return "Windows ME";
+		}
+	} else if (os_info.dwMajorVersion == 5) {
+		if (os_info.dwMinorVersion == 0) {
+			return "Windows 2000";
+		} else if (os_info.dwMinorVersion == 1) {
+			if (os_info.dwPlatformId == 0) {
+				return "Windows XP";
+			} else if (os_info.dwPlatformId == 1) {
+				return "Windows XP SP1";
+			} else if (os_info.dwPlatformId == 2) {
+				return "Windows XP SP2";
+			} else if (os_info.dwPlatformId == 3) {
+				return "Windows XP SP3";
 			}
-			break;
-		case 6:
-			return "Vista";
-		case 7:
-			return "7";
-		default:
-			return "unknown";
+		} else if (os_info.dwMinorVersion == 2) {
+			if (os_info.dwPlatformId == 0) {
+				return "Windows Server 2003";
+			} else if (os_info.dwPlatformId == 1) {
+				return "Windows Server 2003 SP1";
+			} else if (os_info.dwPlatformId == 2) {
+				return "Windows Server 2003 SP2";
+			}
+		}
+	} else if (os_info.dwMajorVersion == 6) {
+		if (os_info.dwMinorVersion == 0) {
+			if (os_info.dwPlatformId == 0) {
+				return "Windows Vista";
+			} else if (os_info.dwPlatformId == 1) {
+				return "Windows Vista SP1";
+			} else if (os_info.dwPlatformId == 2) {
+				return "Windows Vista SP2";
+			}
+		} else if (os_info.dwMinorVersion == 1) {
+			if (os_info.dwPlatformId == 0) {
+				return "Windows &";
+			} else if (os_info.dwPlatformId == 1) {
+				return "Windows 7 SP1";
+			}
+		} else if (os_info.dwMinorVersion == 2) {
+			return "Windows 8";
+		} else if (os_info.dwMinorVersion == 3) {
+			return "Windows 8.1";
+		}
 	}
+
+	return "Unknown Version";
 #else
 	struct utsname uts;
 

@@ -106,18 +106,6 @@ class Schedule : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetPriority(int n);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetCurrentPriority();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetSchedulerParameter(const jschedule_param_t *param_);
 		
 		/**
@@ -154,7 +142,7 @@ class Schedule : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetScheduleAffinity(unsigned long mask_);
+		virtual void SetScheduleAffinity(uint64_t mask_);
 		
 		/**
 		 * \brief

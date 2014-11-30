@@ -47,8 +47,8 @@ Process::Process():
 	_type = JPT_PARENT;
 
 #ifdef _WIN32
-	_pid = GetCurrentProcess();
 	_handle = GetCurrentProcess();
+	_pid = GetProcessId(_handle);
 #else
 	_pid = getpid();
 #endif
@@ -66,8 +66,8 @@ Process::Process(std::string process):
 	_type = JPT_PARENT;
 
 #ifdef _WIN32
-	_pid = GetCurrentProcess();
 	_handle = GetCurrentProcess();
+	_pid = GetProcessId(_handle);
 #else
 	_pid = getpid();
 #endif
