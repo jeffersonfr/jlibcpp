@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jmonitor.h"
+#include "jthread.h"
 #include "jthreadexception.h"
 #include "jsemaphoretimeoutexception.h"
 
@@ -32,9 +33,14 @@ Monitor::Monitor()
 
 Monitor::~Monitor()
 {
+	Release();
+}
+
+void Monitor::Release()
+{
 	_mutex.Lock();
 
-	if (readyQ.empty() == false || waitQ.empty() == false || _holder != NULL) {
+	while (readyQ.empty() == false || waitQ.empty() == false || _holder != NULL) {
 		throw ThreadException("Monitor busy exception");
 	}
 	

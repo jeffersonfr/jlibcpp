@@ -41,7 +41,7 @@ AutoLock::AutoLock(Mutex *mutex, bool rethrow):
 	}
 }
 
-AutoLock::~AutoLock() throw (MutexException)
+AutoLock::~AutoLock()
 {
 	if (_mutex != NULL) {
 		try {

@@ -196,8 +196,8 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 			if (_extensions.size() == 0) {
 				b = true;
 			} else {
-				for (std::vector<std::string>::iterator i=_extensions.begin(); i!=_extensions.end(); i++) {
-					ext = (*i);
+				for (std::vector<std::string>::iterator j=_extensions.begin(); j!=_extensions.end(); j++) {
+					ext = (*j);
 
 					if (file.size() > ext.size()) {
 						if (_extension_ignorecase == true) {

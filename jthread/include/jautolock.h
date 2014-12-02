@@ -49,7 +49,7 @@ class AutoLock : public virtual jcommon::Object{
 		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual ~AutoLock() throw (MutexException);
+		virtual ~AutoLock();
 
 };
 

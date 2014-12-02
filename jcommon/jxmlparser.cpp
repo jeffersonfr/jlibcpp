@@ -89,7 +89,7 @@ bool XmlBase::IsWhiteSpace( int c )
 	return false;	// Again, only truly correct for English/Latin...but usually works.
 }
 
-const char * XmlBase::GetChar(const char* p, char* _value, int* length, XmlEncoding encoding)
+const char * XmlBase::GetChar(const char* p, char* value, int* length, XmlEncoding encoding)
 {
 	assert( p );
 	if ( encoding == TIXML_ENCODING_UTF8 ) {
@@ -100,16 +100,20 @@ const char * XmlBase::GetChar(const char* p, char* _value, int* length, XmlEncod
 	}
 	
 	if ( *length == 1 ) {
-		if ( *p == '&' )
-			return GetEntity( p, _value, length, encoding );
-		*_value = *p;
+		if ( *p == '&' ) {
+			return GetEntity( p, value, length, encoding );
+		}
+
+		*value = *p;
+
 		return p+1;
 	} else if ( *length ) {
-		//strncpy( _value, p, *length );	// lots of compilers don't like this function (unsafe),
+		//strncpy( value, p, *length );	// lots of compilers don't like this function (unsafe),
 		// and the null terminator isn't needed
 		for( int i=0; p[i] && i<*length; ++i ) {
-			_value[i] = p[i];
+			value[i] = p[i];
 		}
+		
 		return p + (*length);
 	} else {
 		// Not valid text.
@@ -192,22 +196,22 @@ void XmlNode::SetValue( const std::string& value )
 
 XmlNode* XmlNode::Parent()
 {
-	return parent; 
+	return _parent; 
 }
 
 const XmlNode* XmlNode::Parent() const
 { 
-	return parent;
+	return _parent;
 }
 
 const XmlNode* XmlNode::FirstChild() const 
 {
-	return firstChild; 
+	return _firstChild; 
 }		///< The first child of this node. Will be null if there are no children.
 
 XmlNode* XmlNode::FirstChild()
 {
-	return firstChild; 
+	return _firstChild; 
 }
 
 XmlNode* XmlNode::FirstChild( const char * value )  
@@ -220,38 +224,38 @@ XmlNode* XmlNode::FirstChild( const char * value )
 
 const XmlNode* XmlNode::LastChild() const	
 {
-	return lastChild;
+	return _lastChild;
 }		/// The last child of this node. Will be null if there are no children.
 
 
 XmlNode* XmlNode::LastChild()	
 {
-	return lastChild; 
+	return _lastChild; 
 }
 
-XmlNode* XmlNode::LastChild( const char * _value ) 
+XmlNode* XmlNode::LastChild( const char * value ) 
 {
-	return const_cast< XmlNode* > ((const_cast< const XmlNode* >(this))->LastChild( _value ));
+	return const_cast< XmlNode* > ((const_cast< const XmlNode* >(this))->LastChild( value ));
 }
 
-const XmlNode* XmlNode::FirstChild( const std::string& _value ) const	
+const XmlNode* XmlNode::FirstChild( const std::string& value ) const	
 {
-	return FirstChild (_value.c_str ());	
+	return FirstChild (value.c_str ());	
 }	///< STL std::string form.
 
-XmlNode* XmlNode::FirstChild( const std::string& _value )
+XmlNode* XmlNode::FirstChild( const std::string& value )
 {
-	return FirstChild (_value.c_str ());
+	return FirstChild (value.c_str ());
 }	///< STL std::string form.
 
-const XmlNode* XmlNode::LastChild( const std::string& _value ) const	
+const XmlNode* XmlNode::LastChild( const std::string& value ) const	
 {
-	return LastChild (_value.c_str ());
+	return LastChild (value.c_str ());
 }	///< STL std::string form.
 
-XmlNode* XmlNode::LastChild( const std::string& _value )
+XmlNode* XmlNode::LastChild( const std::string& value )
 {
-	return LastChild (_value.c_str ());
+	return LastChild (value.c_str ());
 }	///< STL std::string form.
 
 XmlNode* XmlNode::IterateChildren( XmlNode* previous ) 
@@ -259,70 +263,70 @@ XmlNode* XmlNode::IterateChildren( XmlNode* previous )
 	return const_cast< XmlNode* >( (const_cast< const XmlNode* >(this))->IterateChildren( previous ) );
 }
 
-XmlNode* XmlNode::IterateChildren( const char * _value, XmlNode* previous ) 
+XmlNode* XmlNode::IterateChildren( const char * value, XmlNode* previous ) 
 {
-	return const_cast< XmlNode* >( const_cast< const XmlNode* >(this)->IterateChildren( _value, previous ) );
+	return const_cast< XmlNode* >( const_cast< const XmlNode* >(this)->IterateChildren( value, previous ) );
 }
 
-const XmlNode* XmlNode::IterateChildren( const std::string& _value, const XmlNode* previous ) const
+const XmlNode* XmlNode::IterateChildren( const std::string& value, const XmlNode* previous ) const
 {	
-	return IterateChildren (_value.c_str (), previous);
+	return IterateChildren (value.c_str (), previous);
 }	///< STL std::string form.
 
-XmlNode* XmlNode::IterateChildren( const std::string& _value, XmlNode* previous )
+XmlNode* XmlNode::IterateChildren( const std::string& value, XmlNode* previous )
 {
-	return IterateChildren (_value.c_str (), previous);
+	return IterateChildren (value.c_str (), previous);
 }
 
 // Navigate to a sibling node.
 const XmlNode* XmlNode::PreviousSibling() const
 {
-	return prev;
+	return _prev;
 }
 
 XmlNode* XmlNode::PreviousSibling()	
 { 
-	return prev;
+	return _prev;
 }
 
-XmlNode* XmlNode::PreviousSibling( const char *_prev ) 
+XmlNode* XmlNode::PreviousSibling( const char *prev ) 
 {
-	return const_cast< XmlNode* >( const_cast< const XmlNode* >(this)->PreviousSibling( _prev ) );
+	return const_cast< XmlNode* >( const_cast< const XmlNode* >(this)->PreviousSibling( prev ) );
 }
 
-const XmlNode* XmlNode::PreviousSibling( const std::string& _value ) const
+const XmlNode* XmlNode::PreviousSibling( const std::string& value ) const
 {
-	return PreviousSibling (_value.c_str ());
+	return PreviousSibling (value.c_str ());
 }
 
-XmlNode* XmlNode::PreviousSibling( const std::string& _value )
+XmlNode* XmlNode::PreviousSibling( const std::string& value )
 {
-	return PreviousSibling (_value.c_str ());
+	return PreviousSibling (value.c_str ());
 }
 
-const XmlNode* XmlNode::NextSibling( const std::string& _value) const
+const XmlNode* XmlNode::NextSibling( const std::string& value) const
 {
-	return NextSibling (_value.c_str ());	
+	return NextSibling (value.c_str ());	
 }
 	
-XmlNode* XmlNode::NextSibling( const std::string& _value) 
+XmlNode* XmlNode::NextSibling( const std::string& value) 
 {
-	return NextSibling (_value.c_str ());
+	return NextSibling (value.c_str ());
 }
 
 const XmlNode* XmlNode::NextSibling() const	
 {
-	return next;
+	return _next;
 }
 
 XmlNode* XmlNode::NextSibling()	
 { 
-	return next;
+	return _next;
 }
 
-XmlNode* XmlNode::NextSibling( const char* _next ) 
+XmlNode* XmlNode::NextSibling( const char* next ) 
 {
-	return const_cast< XmlNode* >( const_cast< const XmlNode* >(this)->NextSibling( _next ) );
+	return const_cast< XmlNode* >( const_cast< const XmlNode* >(this)->NextSibling( next ) );
 }
 
 XmlElement* XmlNode::NextSiblingElement() 
@@ -330,19 +334,19 @@ XmlElement* XmlNode::NextSiblingElement()
 	return const_cast< XmlElement* >( const_cast< const XmlNode* >(this)->NextSiblingElement() );
 }
 
-XmlElement* XmlNode::NextSiblingElement( const char *_next )
+XmlElement* XmlNode::NextSiblingElement( const char *next )
 {
-	return const_cast< XmlElement* >( const_cast< const XmlNode* >(this)->NextSiblingElement( _next ) );
+	return const_cast< XmlElement* >( const_cast< const XmlNode* >(this)->NextSiblingElement( next ) );
 }
 
-const XmlElement* XmlNode::NextSiblingElement( const std::string& _value) const	
+const XmlElement* XmlNode::NextSiblingElement( const std::string& value) const	
 {
-	return NextSiblingElement (_value.c_str ());
+	return NextSiblingElement (value.c_str ());
 }	///< STL std::string form.
 
-XmlElement* XmlNode::NextSiblingElement( const std::string& _value)
+XmlElement* XmlNode::NextSiblingElement( const std::string& value)
 {	
-	return NextSiblingElement (_value.c_str ());
+	return NextSiblingElement (value.c_str ());
 }	///< STL std::string form.
 
 XmlElement* XmlNode::FirstChildElement() 
@@ -350,24 +354,24 @@ XmlElement* XmlNode::FirstChildElement()
 	return const_cast< XmlElement* >( const_cast< const XmlNode* >(this)->FirstChildElement() );
 }
 
-XmlElement* XmlNode::FirstChildElement( const char * _value )
+XmlElement* XmlNode::FirstChildElement( const char * value )
 {
-	return const_cast< XmlElement* >( const_cast< const XmlNode* >(this)->FirstChildElement( _value ) );
+	return const_cast< XmlElement* >( const_cast< const XmlNode* >(this)->FirstChildElement( value ) );
 }
 
-const XmlElement* XmlNode::FirstChildElement( const std::string& _value ) const	
+const XmlElement* XmlNode::FirstChildElement( const std::string& value ) const	
 {
-	return FirstChildElement (_value.c_str ());
+	return FirstChildElement (value.c_str ());
 }	///< STL std::string form.
 
-XmlElement* XmlNode::FirstChildElement( const std::string& _value )
+XmlElement* XmlNode::FirstChildElement( const std::string& value )
 {
-	return FirstChildElement (_value.c_str ());
+	return FirstChildElement (value.c_str ());
 }	///< STL std::string form.
 
 int XmlNode::Type() const
 { 
-	return type; 
+	return _type; 
 }
 
 XmlDocument* XmlNode::GetDocument()
@@ -377,7 +381,7 @@ XmlDocument* XmlNode::GetDocument()
 
 bool XmlNode::HasChildren() const
 {
-	return firstChild != NULL;
+	return _firstChild != NULL;
 }
 
 const XmlDocument * XmlNode::ToDocument() const
@@ -442,64 +446,67 @@ XmlDeclaration * XmlNode::ToDeclaration()
 
 XmlAttribute::XmlAttribute() : XmlBase()
 {
-	document = 0;
-	prev = next = 0;
+	_document = 0;
+	_prev = 0;
+	_next = 0;
 }
 
-XmlAttribute::XmlAttribute( const std::string& _name, const std::string& _value )
+XmlAttribute::XmlAttribute( const std::string& name, const std::string& value )
 {
-	name = _name;
-	value = _value;
-	document = 0;
-	prev = next = 0;
+	_name = name;
+	_value = value;
+	_document = 0;
+	_prev = 0;
+	_next = 0;
 }
 
-XmlAttribute::XmlAttribute( const char * _name, const char * _value )
+XmlAttribute::XmlAttribute( const char * name, const char * value )
 {
-	name = _name;
-	value = _value;
-	document = 0;
-	prev = next = 0;
+	_name = name;
+	_value = value;
+	_document = 0;
+	_prev = 0;
+	_next = 0;
 }
 
 const char * XmlAttribute::Name()  const
 { 
-	return name.c_str(); 
-}		///< Return the name of this attribute.
+	return _name.c_str(); 
+}
 
 const char * XmlAttribute::Value() const
 {
-	return value.c_str();
-}		///< Return the value of this attribute.
+	return _value.c_str();
+}
 
 const std::string& XmlAttribute::ValueStr() const	
 {
-	return value; 
-}				///< Return the value of this attribute.
+	return _value; 
+}	
 
 const std::string& XmlAttribute::NameTStr() const 
 {
-	return name; 
+	return _name; 
 }
 
-void XmlAttribute::SetName( const char* _name )	
+void XmlAttribute::SetName( const char* name )	
 {
-	name = _name; 
+	_name = name; 
 }
 
-void XmlAttribute::SetValue( const char* _value )	
+void XmlAttribute::SetValue( const char* value )	
 {
-	value = _value;
+	_value = value;
 }
 
-void XmlAttribute::SetName( const std::string& _name )
+void XmlAttribute::SetName( const std::string& name )
 {
-	name = _name; 
+	_name = name; 
 }
 
-void XmlAttribute::SetValue( const std::string& _value )
+void XmlAttribute::SetValue( const std::string& value )
 { 
-	value = _value;
+	_value = value;
 }
 
 XmlAttribute* XmlAttribute::Next() 
@@ -514,17 +521,17 @@ XmlAttribute* XmlAttribute::Previous()
 
 bool XmlAttribute::operator==( const XmlAttribute& rhs ) const 
 {
-	return rhs.name == name; 
+	return rhs._name == _name; 
 }
 
 bool XmlAttribute::operator<( const XmlAttribute& rhs )	 const
 {
-	return name < rhs.name; 
+	return _name < rhs._name; 
 }
 
 bool XmlAttribute::operator>( const XmlAttribute& rhs )  const 
 {
-	return name > rhs.name; 
+	return _name > rhs._name; 
 }
 
 void XmlAttribute::Print( FILE* cfile, int depth ) const 
@@ -534,45 +541,45 @@ void XmlAttribute::Print( FILE* cfile, int depth ) const
 
 void XmlAttribute::SetDocument( XmlDocument* doc )	
 {
-	document = doc; 
+	_document = doc; 
 }
 
 const XmlAttribute* XmlAttributeSet::First()	const	
 {
-	return ( sentinel.next == &sentinel ) ? 0 : sentinel.next; 
+	return ( sentinel._next == &sentinel ) ? 0 : sentinel._next; 
 }
 
 XmlAttribute* XmlAttributeSet::First()					
 {
-	return ( sentinel.next == &sentinel ) ? 0 : sentinel.next; 
+	return ( sentinel._next == &sentinel ) ? 0 : sentinel._next; 
 }
 
 const XmlAttribute* XmlAttributeSet::Last() const
 {
-	return ( sentinel.prev == &sentinel ) ? 0 : sentinel.prev; 
+	return ( sentinel._prev == &sentinel ) ? 0 : sentinel._prev; 
 }
 
 XmlAttribute* XmlAttributeSet::Last()
 {
-	return ( sentinel.prev == &sentinel ) ? 0 : sentinel.prev; 
+	return ( sentinel._prev == &sentinel ) ? 0 : sentinel._prev; 
 }
 
-XmlAttribute*	XmlAttributeSet::Find( const char* _name ) 
+XmlAttribute*	XmlAttributeSet::Find( const char* name ) 
 {
-	return const_cast< XmlAttribute* >( const_cast< const XmlAttributeSet* >(this)->Find( _name ) );
+	return const_cast< XmlAttribute* >( const_cast< const XmlAttributeSet* >(this)->Find( name ) );
 }
 
-XmlAttribute*	XmlAttributeSet::Find( const std::string& _name ) 
+XmlAttribute*	XmlAttributeSet::Find( const std::string& name ) 
 {
-	return const_cast< XmlAttribute* >( const_cast< const XmlAttributeSet* >(this)->Find( _name ) );
+	return const_cast< XmlAttribute* >( const_cast< const XmlAttributeSet* >(this)->Find( name ) );
 }
 
-int XmlElement::QueryFloatAttribute( const char* name, float* _value ) const 
+int XmlElement::QueryFloatAttribute( const char* name, float* value ) const 
 {
 	double d;
 	int result = QueryDoubleAttribute( name, &d );
 	if ( result == TIXML_SUCCESS ) {
-		*_value = (float)d;
+		*value = (float)d;
 	}
 	return result;
 }
@@ -616,9 +623,9 @@ XmlComment::XmlComment() : XmlNode( XmlNode::COMMENT )
 {
 }
 
-XmlComment::XmlComment( const char* _value ) : XmlNode( XmlNode::COMMENT ) 
+XmlComment::XmlComment( const char* value ) : XmlNode( XmlNode::COMMENT ) 
 {
-	SetValue( _value );
+	SetValue( value );
 }
 
 XmlComment::~XmlComment()	
@@ -638,7 +645,7 @@ XmlComment*  XmlComment::ToComment()
 XmlText::XmlText (const char * initValue ) : XmlNode (XmlNode::TEXT)
 {
 	SetValue( initValue );
-	cdata = false;
+	_cdata = false;
 }
 
 XmlText::~XmlText() 
@@ -648,7 +655,7 @@ XmlText::~XmlText()
 XmlText::XmlText( const std::string& initValue ) : XmlNode (XmlNode::TEXT)
 {
 	SetValue( initValue );
-	cdata = false;
+	_cdata = false;
 }
 
 XmlText::XmlText( const XmlText& copy ) : XmlNode( XmlNode::TEXT )
@@ -681,19 +688,19 @@ XmlDeclaration::~XmlDeclaration()
 
 const char *XmlDeclaration::Version() const	
 {
-	return version.c_str (); 
+	return _version.c_str (); 
 }
 
 /// Encoding. Will return an empty string if none was found.
 const char *XmlDeclaration::Encoding() const		
 {
-	return encoding.c_str (); 
+	return _encoding.c_str (); 
 }
 
 /// Is this a standalone document?
 const char *XmlDeclaration::Standalone() const
 { 
-	return standalone.c_str (); 
+	return _standalone.c_str (); 
 }
 
 void XmlDeclaration::Print( FILE* cfile, int depth ) const 
@@ -794,14 +801,14 @@ int XmlDocument::ErrorCol()
 	return errorLocation.col+1;
 }	///< The column where the error occured. See ErrorRow()
 
-void XmlDocument::SetTabSize( int _tabsize )	
+void XmlDocument::SetTabSize( int tabsize )	
 {
-	tabsize = _tabsize;
+	_tabsize = tabsize;
 }
 
 int XmlDocument::TabSize() const
 {
-	return tabsize; 
+	return _tabsize; 
 }
 
 void XmlDocument::ClearError()
@@ -828,9 +835,9 @@ XmlDocument*          XmlDocument::ToDocument()
 	return this;
 } ///< Cast to a more defined type. Will return null not of the requested type.
 
-XmlHandle::XmlHandle( XmlNode* _node )		
+XmlHandle::XmlHandle( XmlNode* node )		
 { 
-	this->node = _node; 
+	this->node = node; 
 }
 
 /// Copy constructor
@@ -844,24 +851,24 @@ XmlHandle XmlHandle::operator=( const XmlHandle& ref )
 	this->node = ref.node; return *this; 
 }
 
-XmlHandle XmlHandle::FirstChild( const std::string& _value ) const
+XmlHandle XmlHandle::FirstChild( const std::string& value ) const
 { 
-	return FirstChild( _value.c_str() );
+	return FirstChild( value.c_str() );
 }
 
-XmlHandle XmlHandle::FirstChildElement( const std::string& _value ) const
+XmlHandle XmlHandle::FirstChildElement( const std::string& value ) const
 {
-	return FirstChildElement( _value.c_str() );
+	return FirstChildElement( value.c_str() );
 }
 
-XmlHandle XmlHandle::Child( const std::string& _value, int index ) const		
+XmlHandle XmlHandle::Child( const std::string& value, int index ) const		
 { 
-	return Child( _value.c_str(), index ); 
+	return Child( value.c_str(), index ); 
 }
 
-XmlHandle XmlHandle::ChildElement( const std::string& _value, int index ) const	
+XmlHandle XmlHandle::ChildElement( const std::string& value, int index ) const	
 {
-	return ChildElement( _value.c_str(), index );
+	return ChildElement( value.c_str(), index );
 }
 
 XmlNode* XmlHandle::ToNode() const	
@@ -905,60 +912,65 @@ XmlUnknown* XmlHandle::Unknown() const
 }
 
 XmlPrinter::XmlPrinter():
-	depth( 0 ), simpleTextPrint( false ), buffer(), indent( "    " ), lineBreak( "\n" ) 
+	_depth( 0 ), 
+	_simpleTextPrint( false ), 
+	_buffer(), 
+	_indent( "    " ), 
+	_lineBreak( "\n" ) 
 {
 }
 
-void XmlPrinter::SetIndent( const char* _indent )
+void XmlPrinter::SetIndent( const char* indent )
 {
-	indent = _indent ? _indent : "" ;
+	_indent = indent ? indent : "" ;
 }
 
 const char* XmlPrinter::Indent()
 {
-	return indent.c_str();
+	return _indent.c_str();
 }
 
-void XmlPrinter::SetLineBreak( const char* _lineBreak )
+void XmlPrinter::SetLineBreak( const char* lineBreak )
 { 
-	lineBreak = _lineBreak ? _lineBreak : "";
+	_lineBreak = lineBreak ? lineBreak : "";
 }
 
 const char* XmlPrinter::LineBreak()
 { 
-	return lineBreak.c_str();
+	return _lineBreak.c_str();
 }
 
 void XmlPrinter::SetStreamPrinting()
 { 
-	indent = "";
-	lineBreak = "";
+	_indent = "";
+	_lineBreak = "";
 }
 
 const char* XmlPrinter::CStr()
 {
-	return buffer.c_str(); 
+	return _buffer.c_str(); 
 }
 
 size_t XmlPrinter::Size()
 {
-	return buffer.size(); 
+	return _buffer.size(); 
 }
 
 const std::string& XmlPrinter::Str()
 {
-	return buffer; 
+	return _buffer; 
 }
 
 void XmlPrinter::DoIndent()	
 {
-	for( int i=0; i<depth; ++i )
-		buffer += indent;
+	for( int i=0; i<_depth; ++i ) {
+		_buffer += _indent;
+	}
 }
 
 void XmlPrinter::DoLineBreak() 
 {
-	buffer += lineBreak;
+	_buffer += _lineBreak;
 }
 
 // INIT XML PARSER ERROR
@@ -1132,11 +1144,11 @@ class XmlParsingData
 
   private:
 	// Only used by the document!
-	XmlParsingData( const char* start, int _tabsize, int row, int col )
+	XmlParsingData( const char* start, int tabsize, int row, int col )
 	{
 		assert( start );
 		stamp = start;
-		tabsize = _tabsize;
+		this->tabsize = tabsize;
 		cursor.row = row;
 		cursor.col = col;
 	}
@@ -1725,7 +1737,7 @@ const char* XmlDocument::Parse( const char* p, XmlParsingData* prevData, XmlEnco
 	}
 
 	// Was this empty?
-	if ( !firstChild ) {
+	if ( !_firstChild ) {
 		SetError( TIXML_ERROR_DOCUMENT_EMPTY, 0, 0, encoding );
 		return 0;
 	}
@@ -1805,7 +1817,7 @@ XmlNode * XmlNode::Identify( const char* p, XmlEncoding encoding )
 
 	if ( returnNode ) {
 		// Set the parent, so it can report errors
-		returnNode->parent = this;
+		returnNode->_parent = this;
 	} else {
 		if ( doc )
 			doc->SetError( TIXML_ERROR_OUT_OF_MEMORY, 0, 0, TIXML_ENCODING_UNKNOWN );
@@ -2269,24 +2281,27 @@ const char* XmlAttribute::Parse( const char* p, XmlParsingData* data, XmlEncodin
 	}
 	// Read the name, the '=' and the value.
 	const char* pErr = p;
-	p = ReadName( p, &name, encoding );
-	if ( !p || !*p )
-	{
-		if ( document ) document->SetError( TIXML_ERROR_READING_ATTRIBUTES, pErr, data, encoding );
+	p = ReadName( p, &_name, encoding );
+	if ( !p || !*p ) {
+		if ( _document ) {
+			_document->SetError( TIXML_ERROR_READING_ATTRIBUTES, pErr, data, encoding );
+		}
 		return 0;
 	}
 	p = SkipWhiteSpace( p, encoding );
-	if ( !p || !*p || *p != '=' )
-	{
-		if ( document ) document->SetError( TIXML_ERROR_READING_ATTRIBUTES, p, data, encoding );
+	if ( !p || !*p || *p != '=' ) {
+		if ( _document ) {
+			_document->SetError( TIXML_ERROR_READING_ATTRIBUTES, p, data, encoding );
+		}
 		return 0;
 	}
 
 	++p;	// skip '='
 	p = SkipWhiteSpace( p, encoding );
-	if ( !p || !*p )
-	{
-		if ( document ) document->SetError( TIXML_ERROR_READING_ATTRIBUTES, p, data, encoding );
+	if ( !p || !*p ) {
+		if ( _document ) {
+			_document->SetError( TIXML_ERROR_READING_ATTRIBUTES, p, data, encoding );
+		}
 		return 0;
 	}
 	
@@ -2294,36 +2309,33 @@ const char* XmlAttribute::Parse( const char* p, XmlParsingData* data, XmlEncodin
 	const char SINGLE_QUOTE = '\'';
 	const char DOUBLE_QUOTE = '\"';
 
-	if ( *p == SINGLE_QUOTE )
-	{
+	if ( *p == SINGLE_QUOTE ) {
 		++p;
 		end = "\'";		// single quote in string
-		p = ReadText( p, &value, false, end, false, encoding );
-	}
-	else if ( *p == DOUBLE_QUOTE )
-	{
+		p = ReadText( p, &_value, false, end, false, encoding );
+	} else if ( *p == DOUBLE_QUOTE ) {
 		++p;
 		end = "\"";		// double quote in string
-		p = ReadText( p, &value, false, end, false, encoding );
-	}
-	else
-	{
+		p = ReadText( p, &_value, false, end, false, encoding );
+	} else {
 		// All attribute values should be in single or double quotes.
 		// But this is such a common error that the parser will try
 		// its best, even without them.
-		value = "";
-		while (    p && *p											// existence
+		_value = "";
+		while (p && *p // existence
 				&& !IsWhiteSpace( *p ) && *p != '\n' && *p != '\r'	// whitespace
-				&& *p != '/' && *p != '>' )							// tag end
+				&& *p != '/' && *p != '>' )	// tag end
 		{
 			if ( *p == SINGLE_QUOTE || *p == DOUBLE_QUOTE ) {
 				// [ 1451649 ] Attribute values with trailing quotes not handled correctly
 				// We did not have an opening quote but seem to have a 
 				// closing one. Give up and throw an error.
-				if ( document ) document->SetError( TIXML_ERROR_READING_ATTRIBUTES, p, data, encoding );
+				if ( _document ) {
+					_document->SetError( TIXML_ERROR_READING_ATTRIBUTES, p, data, encoding );
+				}
 				return 0;
 			}
-			value += *p;
+			_value += *p;
 			++p;
 		}
 	}
@@ -2332,25 +2344,23 @@ const char* XmlAttribute::Parse( const char* p, XmlParsingData* data, XmlEncodin
 
 void XmlText::StreamIn( std::istream * in, std::string * tag )
 {
-	while ( in->good() )
-	{
+	while ( in->good() ) {
 		int c = in->peek();	
-		if ( !cdata && (c == '<' ) ) 
-		{
+		if ( !_cdata && (c == '<' ) ) {
 			return;
 		}
-		if ( c <= 0 )
-		{
+		if ( c <= 0 ) {
 			XmlDocument* document = GetDocument();
-			if ( document )
+			if ( document ) {
 				document->SetError( TIXML_ERROR_EMBEDDED_NULL, 0, 0, TIXML_ENCODING_UNKNOWN );
+			}
 			return;
 		}
 
 		(*tag) += (char) c;
 		in->get();	// "commits" the peek made above
 
-		if ( cdata && c == '>' && tag->size() >= 3 ) {
+		if ( _cdata && c == '>' && tag->size() >= 3 ) {
 			size_t len = tag->size();
 			if ( (*tag)[len-2] == ']' && (*tag)[len-3] == ']' ) {
 				// terminator of cdata.
@@ -2374,8 +2384,8 @@ const char* XmlText::Parse( const char* p, XmlParsingData* data, XmlEncoding enc
 	const char* const startTag = "<![CDATA[";
 	const char* const endTag   = "]]>";
 
-	if ( cdata || StringEqual( p, startTag, false, encoding ) ) {
-		cdata = true;
+	if ( _cdata || StringEqual( p, startTag, false, encoding ) ) {
+		_cdata = true;
 
 		if ( !StringEqual( p, startTag, false, encoding ) ) {
 			document->SetError( TIXML_ERROR_PARSING_CDATA, p, data, encoding );
@@ -2426,60 +2436,50 @@ void XmlDeclaration::StreamIn( std::istream * in, std::string * tag )
 	}
 }
 
-const char* XmlDeclaration::Parse( const char* p, XmlParsingData* data, XmlEncoding _encoding )
+const char* XmlDeclaration::Parse( const char* p, XmlParsingData* data, XmlEncoding encoding )
 {
-	p = SkipWhiteSpace( p, _encoding );
+	p = SkipWhiteSpace( p, encoding );
 	// Find the beginning, find the end, and look for
 	// the stuff in-between.
 	XmlDocument* document = GetDocument();
-	if ( !p || !*p || !StringEqual( p, "<?xml", true, _encoding ) )
-	{
-		if ( document ) document->SetError( TIXML_ERROR_PARSING_DECLARATION, 0, 0, _encoding );
+	if ( !p || !*p || !StringEqual( p, "<?xml", true, encoding ) ) {
+		if ( document ) document->SetError( TIXML_ERROR_PARSING_DECLARATION, 0, 0, encoding );
 		return 0;
 	}
-	if ( data )
-	{
-		data->Stamp( p, _encoding );
+	if ( data ) {
+		data->Stamp( p, encoding );
 		location = data->Cursor();
 	}
 	p += 5;
 
-	version = "";
-	encoding = "";
-	standalone = "";
+	_version = "";
+	_encoding = "";
+	_standalone = "";
 
-	while ( p && *p )
-	{
-		if ( *p == '>' )
-		{
+	while ( p && *p ) {
+		if ( *p == '>' ) {
 			++p;
 			return p;
 		}
 
-		p = SkipWhiteSpace( p, _encoding );
-		if ( StringEqual( p, "version", true, _encoding ) )
-		{
+		p = SkipWhiteSpace( p, encoding );
+		if ( StringEqual( p, "version", true, encoding ) ) {
 			XmlAttribute attrib;
-			p = attrib.Parse( p, data, _encoding );		
-			version = attrib.Value();
-		}
-		else if ( StringEqual( p, "encoding", true, _encoding ) )
-		{
+			p = attrib.Parse( p, data, encoding );		
+			_version = attrib.Value();
+		} else if ( StringEqual( p, "encoding", true, encoding ) ) {
 			XmlAttribute attrib;
-			p = attrib.Parse( p, data, _encoding );		
-			encoding = attrib.Value();
-		}
-		else if ( StringEqual( p, "standalone", true, _encoding ) )
-		{
+			p = attrib.Parse( p, data, encoding );		
+			_encoding = attrib.Value();
+		} else if ( StringEqual( p, "standalone", true, encoding ) ) {
 			XmlAttribute attrib;
-			p = attrib.Parse( p, data, _encoding );		
-			standalone = attrib.Value();
-		}
-		else
-		{
+			p = attrib.Parse( p, data, encoding );		
+			_standalone = attrib.Value();
+		} else {
 			// Read over whatever it is.
-			while( p && *p && *p != '>' && !IsWhiteSpace( *p ) )
+			while( p && *p && *p != '>' && !IsWhiteSpace( *p ) ) {
 				++p;
+			}
 		}
 	}
 	return 0;
@@ -2584,26 +2584,25 @@ void XmlBase::PutString( const std::string& str, std::string* outString )
 }
 
 
-XmlNode::XmlNode( NodeType _type ) : XmlBase()
+XmlNode::XmlNode( NodeType type ) : XmlBase()
 {
-	parent = 0;
-	type = _type;
-	firstChild = 0;
-	lastChild = 0;
-	prev = 0;
-	next = 0;
+	_parent = 0;
+	_type = type;
+	_firstChild = 0;
+	_lastChild = 0;
+	_prev = 0;
+	_next = 0;
 }
 
 
 XmlNode::~XmlNode()
 {
-	XmlNode* node = firstChild;
+	XmlNode* node = _firstChild;
 	XmlNode* temp = 0;
 
-	while ( node )
-	{
+	while ( node ) {
 		temp = node;
-		node = node->next;
+		node = node->_next;
 		delete temp;
 	}	
 }
@@ -2618,44 +2617,49 @@ void XmlNode::CopyTo( XmlNode* target ) const
 
 void XmlNode::Clear()
 {
-	XmlNode* node = firstChild;
+	XmlNode* node = _firstChild;
 	XmlNode* temp = 0;
 
 	while ( node )
 	{
 		temp = node;
-		node = node->next;
+		node = node->_next;
 		delete temp;
 	}	
 
-	firstChild = 0;
-	lastChild = 0;
+	_firstChild = 0;
+	_lastChild = 0;
 }
 
 
 XmlNode* XmlNode::LinkEndChild( XmlNode* node )
 {
-	assert( node->parent == 0 || node->parent == this );
+	assert( node->_parent == 0 || node->_parent == this );
 	assert( node->GetDocument() == 0 || node->GetDocument() == this->GetDocument() );
 
-	if ( node->Type() == XmlNode::DOCUMENT )
-	{
+	if ( node->Type() == XmlNode::DOCUMENT ) {
 		delete node;
-		if ( GetDocument() ) GetDocument()->SetError( TIXML_ERROR_DOCUMENT_TOP_ONLY, 0, 0, TIXML_ENCODING_UNKNOWN );
+
+		if ( GetDocument() ) {
+			GetDocument()->SetError( TIXML_ERROR_DOCUMENT_TOP_ONLY, 0, 0, TIXML_ENCODING_UNKNOWN );
+		}
+
 		return 0;
 	}
 
-	node->parent = this;
+	node->_parent = this;
 
-	node->prev = lastChild;
-	node->next = 0;
+	node->_prev = _lastChild;
+	node->_next = 0;
 
-	if ( lastChild )
-		lastChild->next = node;
-	else
-		firstChild = node;			// it was an empty list.
+	if ( _lastChild ) {
+		_lastChild->_next = node;
+	} else {
+		_firstChild = node;			// it was an empty list.
+	}
 
-	lastChild = node;
+	_lastChild = node;
+
 	return node;
 }
 
@@ -2677,151 +2681,163 @@ XmlNode* XmlNode::InsertEndChild( const XmlNode& addThis )
 
 XmlNode* XmlNode::InsertBeforeChild( XmlNode* beforeThis, const XmlNode& addThis )
 {	
-	if ( !beforeThis || beforeThis->parent != this ) {
+	if ( !beforeThis || beforeThis->_parent != this ) {
 		return 0;
 	}
-	if ( addThis.Type() == XmlNode::DOCUMENT )
-	{
-		if ( GetDocument() ) GetDocument()->SetError( TIXML_ERROR_DOCUMENT_TOP_ONLY, 0, 0, TIXML_ENCODING_UNKNOWN );
+
+	if ( addThis.Type() == XmlNode::DOCUMENT ) {
+		if ( GetDocument() ) {
+			GetDocument()->SetError( TIXML_ERROR_DOCUMENT_TOP_ONLY, 0, 0, TIXML_ENCODING_UNKNOWN );
+		}
+
 		return 0;
 	}
 
 	XmlNode* node = addThis.Clone();
-	if ( !node )
+	
+	if ( !node ) {
 		return 0;
-	node->parent = this;
+	}
+	
+	node->_parent = this;
 
-	node->next = beforeThis;
-	node->prev = beforeThis->prev;
-	if ( beforeThis->prev )
-	{
-		beforeThis->prev->next = node;
+	node->_next = beforeThis;
+	node->_prev = beforeThis->_prev;
+	if ( beforeThis->_prev ) {
+		beforeThis->_prev->_next = node;
+	} else {
+		assert( _firstChild == beforeThis );
+		_firstChild = node;
 	}
-	else
-	{
-		assert( firstChild == beforeThis );
-		firstChild = node;
-	}
-	beforeThis->prev = node;
+	beforeThis->_prev = node;
 	return node;
 }
 
 
 XmlNode* XmlNode::InsertAfterChild( XmlNode* afterThis, const XmlNode& addThis )
 {
-	if ( !afterThis || afterThis->parent != this ) {
+	if ( !afterThis || afterThis->_parent != this ) {
 		return 0;
 	}
-	if ( addThis.Type() == XmlNode::DOCUMENT )
-	{
-		if ( GetDocument() ) GetDocument()->SetError( TIXML_ERROR_DOCUMENT_TOP_ONLY, 0, 0, TIXML_ENCODING_UNKNOWN );
+
+	if ( addThis.Type() == XmlNode::DOCUMENT ) {
+		if ( GetDocument() ) {
+			GetDocument()->SetError( TIXML_ERROR_DOCUMENT_TOP_ONLY, 0, 0, TIXML_ENCODING_UNKNOWN );
+		}
+
 		return 0;
 	}
 
 	XmlNode* node = addThis.Clone();
-	if ( !node )
-		return 0;
-	node->parent = this;
 
-	node->prev = afterThis;
-	node->next = afterThis->next;
-	if ( afterThis->next )
-	{
-		afterThis->next->prev = node;
+	if ( !node ) {
+		return 0;
 	}
-	else
-	{
-		assert( lastChild == afterThis );
-		lastChild = node;
+
+	node->_parent = this;
+
+	node->_prev = afterThis;
+	node->_next = afterThis->_next;
+	if ( afterThis->_next ) {
+		afterThis->_next->_prev = node;
+	} else {
+		assert( _lastChild == afterThis );
+		_lastChild = node;
 	}
-	afterThis->next = node;
+	afterThis->_next = node;
 	return node;
 }
 
 
 XmlNode* XmlNode::ReplaceChild( XmlNode* replaceThis, const XmlNode& withThis )
 {
-	if ( replaceThis->parent != this )
+	if ( replaceThis->_parent != this )
 		return 0;
 
 	XmlNode* node = withThis.Clone();
-	if ( !node )
+	
+	if ( !node ) {
 		return 0;
+	}
 
-	node->next = replaceThis->next;
-	node->prev = replaceThis->prev;
+	node->_next = replaceThis->_next;
+	node->_prev = replaceThis->_prev;
 
-	if ( replaceThis->next )
-		replaceThis->next->prev = node;
-	else
-		lastChild = node;
+	if ( replaceThis->_next ) {
+		replaceThis->_next->_prev = node;
+	} else {
+		_lastChild = node;
+	}
 
-	if ( replaceThis->prev )
-		replaceThis->prev->next = node;
-	else
-		firstChild = node;
+	if ( replaceThis->_prev ) {
+		replaceThis->_prev->_next = node;
+	} else {
+		_firstChild = node;
+	}
 
 	delete replaceThis;
-	node->parent = this;
+	node->_parent = this;
+
 	return node;
 }
 
 
 bool XmlNode::RemoveChild( XmlNode* removeThis )
 {
-	if ( removeThis->parent != this )
-	{	
+	if ( removeThis->_parent != this ) {	
 		assert( 0 );
 		return false;
 	}
 
-	if ( removeThis->next )
-		removeThis->next->prev = removeThis->prev;
-	else
-		lastChild = removeThis->prev;
+	if ( removeThis->_next ) {
+		removeThis->_next->_prev = removeThis->_prev;
+	} else {
+		_lastChild = removeThis->_prev;
+	}
 
-	if ( removeThis->prev )
-		removeThis->prev->next = removeThis->next;
-	else
-		firstChild = removeThis->next;
+	if ( removeThis->_prev ) {
+		removeThis->_prev->_next = removeThis->_next;
+	} else {
+		_firstChild = removeThis->_next;
+	}
 
 	delete removeThis;
+
 	return true;
 }
 
-const XmlNode* XmlNode::FirstChild( const char * _value ) const
+const XmlNode* XmlNode::FirstChild( const char * value ) const
 {
 	const XmlNode* node;
-	for ( node = firstChild; node; node = node->next )
-	{
-		if ( strcmp( node->Value(), _value ) == 0 )
+
+	for ( node = _firstChild; node; node = node->_next ) {
+		if ( strcmp( node->Value(), value ) == 0 )
 			return node;
 	}
+
 	return 0;
 }
 
 
-const XmlNode* XmlNode::LastChild( const char * _value ) const
+const XmlNode* XmlNode::LastChild( const char * value ) const
 {
 	const XmlNode* node;
-	for ( node = lastChild; node; node = node->prev )
-	{
-		if ( strcmp( node->Value(), _value ) == 0 )
+
+	for ( node = _lastChild; node; node = node->_prev ) {
+		if ( strcmp( node->Value(), value ) == 0 )
 			return node;
 	}
+
 	return 0;
 }
 
 
 const XmlNode* XmlNode::IterateChildren( const XmlNode* previous ) const
 {
-	if ( !previous )
-	{
+	if ( !previous ) {
 		return FirstChild();
-	}
-	else
-	{
-		assert( previous->parent == this );
+	} else {
+		assert( previous->_parent == this );
 		return previous->NextSibling();
 	}
 }
@@ -2829,38 +2845,38 @@ const XmlNode* XmlNode::IterateChildren( const XmlNode* previous ) const
 
 const XmlNode* XmlNode::IterateChildren( const char * val, const XmlNode* previous ) const
 {
-	if ( !previous )
-	{
+	if ( !previous ) {
 		return FirstChild( val );
-	}
-	else
-	{
-		assert( previous->parent == this );
+	} else {
+		assert( previous->_parent == this );
 		return previous->NextSibling( val );
 	}
 }
 
 
-const XmlNode* XmlNode::NextSibling( const char * _value ) const 
+const XmlNode* XmlNode::NextSibling( const char * value ) const 
 {
 	const XmlNode* node;
-	for ( node = next; node; node = node->next )
-	{
-		if ( strcmp( node->Value(), _value ) == 0 )
+
+	for ( node = _next; node; node = node->_next ) {
+		if ( strcmp( node->Value(), value ) == 0 ) {
 			return node;
+		}
 	}
+
 	return 0;
 }
 
-
-const XmlNode* XmlNode::PreviousSibling( const char * _value ) const
+const XmlNode* XmlNode::PreviousSibling( const char * value ) const
 {
 	const XmlNode* node;
-	for ( node = prev; node; node = node->prev )
-	{
-		if ( strcmp( node->Value(), _value ) == 0 )
+
+	for ( node = _prev; node; node = node->_prev ) {
+		if ( strcmp( node->Value(), value ) == 0 ) {
 			return node;
+		}
 	}
+
 	return 0;
 }
 
@@ -2869,8 +2885,8 @@ void XmlElement::RemoveAttribute( const char * name )
 {
 	std::string str( name );
 	XmlAttribute* node = attributeSet.Find( str );
-	if ( node )
-	{
+	
+	if ( node ) {
 		attributeSet.Remove( node );
 		delete node;
 	}
@@ -2880,28 +2896,25 @@ const XmlElement* XmlNode::FirstChildElement() const
 {
 	const XmlNode* node;
 
-	for (	node = FirstChild();
-			node;
-			node = node->NextSibling() )
-	{
-		if ( node->ToElement() )
+	for (	node = FirstChild(); node; node = node->NextSibling() ) {
+		if ( node->ToElement() ) {
 			return node->ToElement();
+		}
 	}
+
 	return 0;
 }
 
-
-const XmlElement* XmlNode::FirstChildElement( const char * _value ) const
+const XmlElement* XmlNode::FirstChildElement( const char * value ) const
 {
 	const XmlNode* node;
 
-	for (	node = FirstChild( _value );
-			node;
-			node = node->NextSibling( _value ) )
-	{
-		if ( node->ToElement() )
+	for (	node = FirstChild( value ); node; node = node->NextSibling( value ) ) {
+		if ( node->ToElement() ) {
 			return node->ToElement();
+		}
 	}
+
 	return 0;
 }
 
@@ -2910,28 +2923,26 @@ const XmlElement* XmlNode::NextSiblingElement() const
 {
 	const XmlNode* node;
 
-	for (	node = NextSibling();
-			node;
-			node = node->NextSibling() )
-	{
-		if ( node->ToElement() )
+	for (	node = NextSibling(); node; node = node->NextSibling() ) {
+		if ( node->ToElement() ) {
 			return node->ToElement();
+		}
 	}
+
 	return 0;
 }
 
 
-const XmlElement* XmlNode::NextSiblingElement( const char * _value ) const
+const XmlElement* XmlNode::NextSiblingElement( const char * value ) const
 {
 	const XmlNode* node;
 
-	for (	node = NextSibling( _value );
-			node;
-			node = node->NextSibling( _value ) )
-	{
-		if ( node->ToElement() )
+	for (	node = NextSibling( value ); node; node = node->NextSibling( value ) ) {
+		if ( node->ToElement() ) {
 			return node->ToElement();
+		}
 	}
+	
 	return 0;
 }
 
@@ -2940,11 +2951,12 @@ const XmlDocument* XmlNode::GetDocument() const
 {
 	const XmlNode* node;
 
-	for( node = this; node; node = node->parent )
-	{
-		if ( node->ToDocument() )
+	for( node = this; node; node = node->_parent ) {
+		if ( node->ToDocument() ) {
 			return node->ToDocument();
+		}
 	}
+
 	return 0;
 }
 
@@ -2952,7 +2964,8 @@ const XmlDocument* XmlNode::GetDocument() const
 XmlElement::XmlElement (const char * value)
 	: XmlNode( XmlNode::ELEMENT )
 {
-	firstChild = lastChild = 0;
+	_firstChild = 0;
+	_lastChild = 0;
 	_value = value;
 }
 
@@ -2960,7 +2973,8 @@ XmlElement::XmlElement (const char * value)
 XmlElement::XmlElement( const std::string& value ) 
 	: XmlNode( XmlNode::ELEMENT )
 {
-	firstChild = lastChild = 0;
+	_firstChild = 0;
+	_lastChild = 0;
 	_value = value;
 }
 
@@ -2968,7 +2982,8 @@ XmlElement::XmlElement( const std::string& value )
 XmlElement::XmlElement( const XmlElement& copy)
 	: XmlNode( XmlNode::ELEMENT )
 {
-	firstChild = lastChild = 0;
+	_firstChild = 0;
+	_lastChild = 0;
 	copy.CopyTo( this );	
 }
 
@@ -2989,8 +3004,8 @@ XmlElement::~XmlElement()
 void XmlElement::ClearThis()
 {
 	Clear();
-	while( attributeSet.First() )
-	{
+
+	while( attributeSet.First() ) {
 		XmlAttribute* node = attributeSet.First();
 		attributeSet.Remove( node );
 		delete node;
@@ -3119,12 +3134,12 @@ void XmlElement::SetDoubleAttribute( const char * name, double val )
 
 void XmlElement::SetAttribute( const char * cname, const char * cvalue )
 {
-	std::string _name( cname );
-	std::string _value( cvalue );
+	std::string name( cname );
+	std::string value( cvalue );
 
-	XmlAttribute* node = attributeSet.Find( _name );
+	XmlAttribute* node = attributeSet.Find( name );
 	if ( node ) {
-		node->SetValue( _value );
+		node->SetValue( value );
 
 		return;
 	}
@@ -3144,17 +3159,17 @@ void XmlElement::SetAttribute( const char * cname, const char * cvalue )
 }
 
 
-void XmlElement::SetAttribute( const std::string& name, const std::string& _value )
+void XmlElement::SetAttribute( const std::string& name, const std::string& value )
 {
 	XmlAttribute* node = attributeSet.Find( name );
-	if ( node )
-	{
-		node->SetValue( _value );
+
+	if ( node ) {
+		node->SetValue( value );
 		return;
 	}
 
 	try {
-		XmlAttribute* attrib = new XmlAttribute( name, _value );
+		XmlAttribute* attrib = new XmlAttribute( name, value );
 		if ( attrib ) {
 			attributeSet.Add( attrib );
 		}
@@ -3190,16 +3205,16 @@ void XmlElement::Print( FILE* cfile, int depth ) const
 	// 2) An element with only a text child is printed as <foo> text </foo>
 	// 3) An element with children is printed on multiple lines.
 	XmlNode* node;
-	if ( !firstChild ) {
+	if ( !_firstChild ) {
 		fprintf( cfile, " />" );
-	} else if ( firstChild == lastChild && firstChild->ToText() ) {
+	} else if ( _firstChild == _lastChild && _firstChild->ToText() ) {
 		fprintf( cfile, ">" );
-		firstChild->Print( cfile, depth + 1 );
+		_firstChild->Print( cfile, depth + 1 );
 		fprintf( cfile, "</%s>", _value.c_str() );
 	} else {
 		fprintf( cfile, ">" );
 
-		for ( node = firstChild; node; node=node->NextSibling() ) {
+		for ( node = _firstChild; node; node=node->NextSibling() ) {
 			if ( !node->ToText() ) {
 				fprintf( cfile, "\n" );
 			}
@@ -3230,7 +3245,7 @@ void XmlElement::CopyTo( XmlElement* target ) const
 	}
 
 	XmlNode* node = 0;
-	for ( node = firstChild; node; node = node->NextSibling() )
+	for ( node = _firstChild; node; node = node->NextSibling() )
 	{
 		target->LinkEndChild( node->Clone() );
 	}
@@ -3282,7 +3297,7 @@ std::string XmlElement::GetText() const
 
 XmlDocument::XmlDocument() : XmlNode( XmlNode::DOCUMENT )
 {
-	tabsize = 4;
+	_tabsize = 4;
 	useMicrosoftBOM = false;
 	ClearError();
 }
@@ -3290,7 +3305,7 @@ XmlDocument::XmlDocument() : XmlNode( XmlNode::DOCUMENT )
 XmlDocument::XmlDocument( const char * documentName ) : 
 	XmlNode( XmlNode::DOCUMENT )
 {
-	tabsize = 4;
+	_tabsize = 4;
 	useMicrosoftBOM = false;
 	_value = documentName;
 	ClearError();
@@ -3300,7 +3315,7 @@ XmlDocument::XmlDocument( const char * documentName ) :
 XmlDocument::XmlDocument( const std::string& documentName ) : 
 	XmlNode( XmlNode::DOCUMENT )
 {
-	tabsize = 4;
+	_tabsize = 4;
 	useMicrosoftBOM = false;
 	_value = documentName;
 	ClearError();
@@ -3331,7 +3346,7 @@ bool XmlDocument::SaveFile() const
 	return SaveFile( Value() );
 }
 
-bool XmlDocument::LoadFile( const char* _filename, XmlEncoding encoding )
+bool XmlDocument::LoadFile( const char* path, XmlEncoding encoding )
 {
 	// There was a really terrifying little bug here. The code:
 	//		value = filename
@@ -3340,7 +3355,7 @@ bool XmlDocument::LoadFile( const char* _filename, XmlEncoding encoding )
 	// address as it's c_str() method, and so bad things happen. Looks
 	// like a bug in the Microsoft STL implementation.
 	// Add an extra string to avoid the crash.
-	std::string filename( _filename );
+	std::string filename( path );
 	_value = filename;
 
 	// reading in binary mode so that tinyxml can normalize the EOL
@@ -3519,8 +3534,7 @@ void XmlDocument::CopyTo( XmlDocument* target ) const
 	target->errorDesc = errorDesc.c_str ();
 
 	XmlNode* node = 0;
-	for ( node = firstChild; node; node = node->NextSibling() )
-	{
+	for ( node = _firstChild; node; node = node->NextSibling() ) {
 		target->LinkEndChild( node->Clone() );
 	}	
 }
@@ -3570,29 +3584,33 @@ const XmlAttribute* XmlAttribute::Next() const
 {
 	// We are using knowledge of the sentinel. The sentinel
 	// have a value or name.
-	if ( next->value.empty() && next->name.empty() )
+	if ( _next->_value.empty() && _next->_name.empty() ) {
 		return 0;
-	return next;
+	}
+
+	return _next;
 }
 
 /*
 XmlAttribute* XmlAttribute::Next()
 {
-	// We are using knowledge of the sentinel. The sentinel
-	// have a value or name.
-	if ( next->value.empty() && next->name.empty() )
+	// We are using knowledge of the sentinel. The sentinel have a value or name.
+	if ( _next->value.empty() && _next->name.empty() ) {
 		return 0;
-	return next;
+	}
+
+	return _next;
 }
 */
 
 const XmlAttribute* XmlAttribute::Previous() const
 {
-	// We are using knowledge of the sentinel. The sentinel
-	// have a value or name.
-	if ( prev->value.empty() && prev->name.empty() )
+	// We are using knowledge of the sentinel. The sentinel have a value or name.
+	if ( _prev->_value.empty() && _prev->_name.empty() ) {
 		return 0;
-	return prev;
+	}
+
+	return _prev;
 }
 
 /*
@@ -3600,9 +3618,11 @@ XmlAttribute* XmlAttribute::Previous()
 {
 	// We are using knowledge of the sentinel. The sentinel
 	// have a value or name.
-	if ( prev->value.empty() && prev->name.empty() )
+	if ( _prev->value.empty() && _prev->name.empty() ) {
 		return 0;
-	return prev;
+	}
+
+	return _prev;
 }
 */
 
@@ -3610,20 +3630,19 @@ void XmlAttribute::Print( FILE* cfile, int /*depth*/, std::string* str ) const
 {
 	std::string n, v;
 
-	PutString( name, &n );
-	PutString( value, &v );
+	PutString( _name, &n );
+	PutString( _value, &v );
 
-	if (value.find ('\"') == std::string::npos) {
+	if (_value.find ('\"') == std::string::npos) {
 		if ( cfile ) {
-		fprintf (cfile, "%s=\"%s\"", n.c_str(), v.c_str() );
+			fprintf (cfile, "%s=\"%s\"", n.c_str(), v.c_str() );
 		}
 		if ( str ) {
 			(*str) += n; (*str) += "=\""; (*str) += v; (*str) += "\"";
 		}
-	}
-	else {
+	} else {
 		if ( cfile ) {
-		fprintf (cfile, "%s='%s'", n.c_str(), v.c_str() );
+			fprintf (cfile, "%s='%s'", n.c_str(), v.c_str() );
 		}
 		if ( str ) {
 			(*str) += n; (*str) += "='"; (*str) += v; (*str) += "'";
@@ -3634,48 +3653,50 @@ void XmlAttribute::Print( FILE* cfile, int /*depth*/, std::string* str ) const
 
 int XmlAttribute::QueryIntValue( int* ival ) const
 {
-	if ( sscanf( value.c_str(), "%d", ival ) == 1 )
+	if ( sscanf( _value.c_str(), "%d", ival ) == 1 ) {
 		return TIXML_SUCCESS;
+	}
 	return TIXML_WRONG_TYPE;
 }
 
 int XmlAttribute::QueryDoubleValue( double* dval ) const
 {
-	if ( sscanf( value.c_str(), "%lf", dval ) == 1 )
+	if ( sscanf( _value.c_str(), "%lf", dval ) == 1 ) {
 		return TIXML_SUCCESS;
+	}
 	return TIXML_WRONG_TYPE;
 }
 
-void XmlAttribute::SetIntValue( int _value )
+void XmlAttribute::SetIntValue( int value )
 {
 	char buf [64];
 	#if defined(TIXML_SNPRINTF)		
-		TIXML_SNPRINTF(buf, sizeof(buf), "%d", _value);
+		TIXML_SNPRINTF(buf, sizeof(buf), "%d", value);
 	#else
-		sprintf (buf, "%d", _value);
+		sprintf (buf, "%d", value);
 	#endif
 	SetValue (buf);
 }
 
-void XmlAttribute::SetDoubleValue( double _value )
+void XmlAttribute::SetDoubleValue( double value )
 {
 	char buf [256];
 	#if defined(TIXML_SNPRINTF)		
-		TIXML_SNPRINTF( buf, sizeof(buf), "%lf", _value);
+		TIXML_SNPRINTF( buf, sizeof(buf), "%lf", value);
 	#else
-		sprintf (buf, "%lf", _value);
+		sprintf (buf, "%lf", value);
 	#endif
 	SetValue (buf);
 }
 
 int XmlAttribute::IntValue() const
 {
-	return atoi (value.c_str ());
+	return atoi (_value.c_str ());
 }
 
 double  XmlAttribute::DoubleValue() const
 {
-	return atof (value.c_str ());
+	return atof (_value.c_str ());
 }
 
 
@@ -3732,7 +3753,7 @@ XmlNode* XmlComment::Clone() const
 void XmlText::Print( FILE* cfile, int depth ) const
 {
 	assert( cfile );
-	if ( cdata ) {
+	if ( _cdata ) {
 		int i;
 		fprintf( cfile, "\n" );
 		for ( i=0; i<depth; i++ ) {
@@ -3748,18 +3769,18 @@ void XmlText::Print( FILE* cfile, int depth ) const
 
 bool XmlText::CDATA() const
 {
-   	return cdata; 
+   	return _cdata; 
 }
 
-void XmlText::SetCDATA( bool _cdata )
+void XmlText::SetCDATA( bool cdata )
 {
-   	cdata = _cdata; 
+   	_cdata = cdata; 
 }
 
 void XmlText::CopyTo( XmlText* target ) const
 {
 	XmlNode::CopyTo( target );
-	target->cdata = cdata;
+	target->_cdata = _cdata;
 }
 
 
@@ -3784,25 +3805,21 @@ XmlNode* XmlText::Clone() const
 }
 
 
-XmlDeclaration::XmlDeclaration( const char * _version,
-									const char * _encoding,
-									const char * _standalone )
+XmlDeclaration::XmlDeclaration( const char * version, const char * encoding, const char * standalone )
 	: XmlNode( XmlNode::DECLARATION )
 {
-	version = _version;
-	encoding = _encoding;
-	standalone = _standalone;
+	_version = version;
+	_encoding = encoding;
+	_standalone = standalone;
 }
 
 
-XmlDeclaration::XmlDeclaration(	const std::string& _version,
-									const std::string& _encoding,
-									const std::string& _standalone )
+XmlDeclaration::XmlDeclaration(	const std::string& version, const std::string& encoding, const std::string& standalone )
 	: XmlNode( XmlNode::DECLARATION )
 {
-	version = _version;
-	encoding = _encoding;
-	standalone = _standalone;
+	_version = version;
+	_encoding = encoding;
+	_standalone = standalone;
 }
 
 
@@ -3822,23 +3839,51 @@ void XmlDeclaration::operator=( const XmlDeclaration& copy )
 
 void XmlDeclaration::Print( FILE* cfile, int /*depth*/, std::string* str ) const
 {
-	if ( cfile ) fprintf( cfile, "<?xml " );
-	if ( str )	 (*str) += "<?xml ";
+	if ( cfile ) {
+		fprintf( cfile, "<?xml " );
+	}
 
-	if ( !version.empty() ) {
-		if ( cfile ) fprintf (cfile, "version=\"%s\" ", version.c_str ());
-		if ( str ) { (*str) += "version=\""; (*str) += version; (*str) += "\" "; }
+	if ( str ) {
+		(*str) += "<?xml ";
 	}
-	if ( !encoding.empty() ) {
-		if ( cfile ) fprintf (cfile, "encoding=\"%s\" ", encoding.c_str ());
-		if ( str ) { (*str) += "encoding=\""; (*str) += encoding; (*str) += "\" "; }
+
+	if ( !_version.empty() ) {
+		if ( cfile ) {
+			fprintf (cfile, "version=\"%s\" ", _version.c_str ());
+		}
+
+		if ( str ) { 
+			(*str) += "version=\""; (*str) += _version; (*str) += "\" "; 
+		}
 	}
-	if ( !standalone.empty() ) {
-		if ( cfile ) fprintf (cfile, "standalone=\"%s\" ", standalone.c_str ());
-		if ( str ) { (*str) += "standalone=\""; (*str) += standalone; (*str) += "\" "; }
+	
+	if ( !_encoding.empty() ) {
+		if ( cfile ) {
+			fprintf (cfile, "encoding=\"%s\" ", _encoding.c_str ());
+		}
+
+		if ( str ) {
+			(*str) += "encoding=\""; (*str) += _encoding; (*str) += "\" "; 
+		}
 	}
-	if ( cfile ) fprintf( cfile, "?>" );
-	if ( str )	 (*str) += "?>";
+	
+	if ( !_standalone.empty() ) {
+		if ( cfile ) {
+			fprintf (cfile, "standalone=\"%s\" ", _standalone.c_str ());
+		}
+
+		if ( str ) { 
+			(*str) += "standalone=\""; (*str) += _standalone; (*str) += "\" "; 
+		}
+	}
+	
+	if ( cfile ) {
+		fprintf( cfile, "?>" );
+	}
+	
+	if ( str ) {
+		(*str) += "?>";
+	}
 }
 
 
@@ -3846,9 +3891,9 @@ void XmlDeclaration::CopyTo( XmlDeclaration* target ) const
 {
 	XmlNode::CopyTo( target );
 
-	target->version = version;
-	target->encoding = encoding;
-	target->standalone = standalone;
+	target->_version = _version;
+	target->_encoding = _encoding;
+	target->_standalone = _standalone;
 }
 
 
@@ -3912,15 +3957,15 @@ XmlNode* XmlUnknown::Clone() const
 
 XmlAttributeSet::XmlAttributeSet()
 {
-	sentinel.next = &sentinel;
-	sentinel.prev = &sentinel;
+	sentinel._next = &sentinel;
+	sentinel._prev = &sentinel;
 }
 
 
 XmlAttributeSet::~XmlAttributeSet()
 {
-	assert( sentinel.next == &sentinel );
-	assert( sentinel.prev == &sentinel );
+	assert( sentinel._next == &sentinel );
+	assert( sentinel._prev == &sentinel );
 }
 
 
@@ -3928,46 +3973,46 @@ void XmlAttributeSet::Add( XmlAttribute* addMe )
 {
 	assert( !Find( std::string( addMe->Name() ) ) );	// Shouldn't be multiply adding to the set.
 
-	addMe->next = &sentinel;
-	addMe->prev = sentinel.prev;
+	addMe->_next = &sentinel;
+	addMe->_prev = sentinel._prev;
 
-	sentinel.prev->next = addMe;
-	sentinel.prev      = addMe;
+	sentinel._prev->_next = addMe;
+	sentinel._prev = addMe;
 }
 
 void XmlAttributeSet::Remove( XmlAttribute* removeMe )
 {
 	XmlAttribute* node;
 
-	for( node = sentinel.next; node != &sentinel; node = node->next )
-	{
-		if ( node == removeMe )
-		{
-			node->prev->next = node->next;
-			node->next->prev = node->prev;
-			node->next = 0;
-			node->prev = 0;
+	for( node = sentinel._next; node != &sentinel; node = node->_next ) {
+		if ( node == removeMe ) {
+			node->_prev->_next = node->_next;
+			node->_next->_prev = node->_prev;
+			node->_next = 0;
+			node->_prev = 0;
 			return;
 		}
 	}
+
 	assert( 0 );		// we tried to remove a non-linked attribute.
 }
 
 
 const XmlAttribute* XmlAttributeSet::Find( const std::string& name ) const
 {
-	for( const XmlAttribute* node = sentinel.next; node != &sentinel; node = node->next )
-	{
-		if ( node->name == name )
+	for( const XmlAttribute* node = sentinel._next; node != &sentinel; node = node->_next ) {
+		if ( node->_name == name ) {
 			return node;
+		}
 	}
+
 	return 0;
 }
 
 /*
 XmlAttribute*	XmlAttributeSet::Find( const std::string& name )
 {
-	for( XmlAttribute* node = sentinel.next; node != &sentinel; node = node->next )
+	for( XmlAttribute* node = sentinel._next; node != &sentinel; node = node->_next )
 	{
 		if ( node->name == name )
 			return node;
@@ -3979,9 +4024,9 @@ XmlAttribute*	XmlAttributeSet::Find( const std::string& name )
 
 const XmlAttribute* XmlAttributeSet::Find( const char* name ) const
 {
-	for( const XmlAttribute* node = sentinel.next; node != &sentinel; node = node->next )
+	for( const XmlAttribute* node = sentinel._next; node != &sentinel; node = node->_next )
 	{
-		if ( strcmp( node->name.c_str(), name ) == 0 )
+		if ( strcmp( node->_name.c_str(), name ) == 0 )
 			return node;
 	}
 	return 0;
@@ -3990,7 +4035,7 @@ const XmlAttribute* XmlAttributeSet::Find( const char* name ) const
 /*
 XmlAttribute*	XmlAttributeSet::Find( const char* name )
 {
-	for( XmlAttribute* node = sentinel.next; node != &sentinel; node = node->next )
+	for( XmlAttribute* node = sentinel._next; node != &sentinel; node = node->_next )
 	{
 		if ( strcmp( node->name.c_str(), name ) == 0 )
 			return node;
@@ -4169,86 +4214,81 @@ bool XmlPrinter::VisitExit( const XmlDocument& )
 bool XmlPrinter::VisitEnter( const XmlElement& element, const XmlAttribute* firstAttribute )
 {
 	DoIndent();
-	buffer += "<";
-	buffer += element.Value();
+	
+	_buffer += "<";
+	_buffer += element.Value();
 
-	for( const XmlAttribute* attrib = firstAttribute; attrib; attrib = attrib->Next() )
-	{
-		buffer += " ";
-		attrib->Print( 0, 0, &buffer );
+	for( const XmlAttribute* attrib = firstAttribute; attrib; attrib = attrib->Next() ) {
+		_buffer += " ";
+		attrib->Print( 0, 0, &_buffer );
 	}
 
-	if ( !element.FirstChild() ) 
-	{
-		buffer += " />";
+	if ( !element.FirstChild() ) {
+		_buffer += " />";
 		DoLineBreak();
-	}
-	else 
-	{
-		buffer += ">";
+	} else {
+		_buffer += ">";
 		if (    element.FirstChild()->ToText()
 			  && element.LastChild() == element.FirstChild()
 			  && element.FirstChild()->ToText()->CDATA() == false )
 		{
-			simpleTextPrint = true;
+			_simpleTextPrint = true;
 			// no DoLineBreak()!
-		}
-		else
-		{
+		} else {
 			DoLineBreak();
 		}
 	}
-	++depth;	
+
+	++_depth;	
+	
 	return true;
 }
 
 
 bool XmlPrinter::VisitExit( const XmlElement& element )
 {
-	--depth;
-	if ( !element.FirstChild() ) 
-	{
+	--_depth;
+
+	if ( !element.FirstChild() ) {
 		// nothing.
-	}
-	else 
-	{
-		if ( simpleTextPrint )
-		{
-			simpleTextPrint = false;
-		}
-		else
-		{
+	} else {
+		if ( _simpleTextPrint ) {
+			_simpleTextPrint = false;
+		} else {
 			DoIndent();
 		}
-		buffer += "</";
-		buffer += element.Value();
-		buffer += ">";
+		
+		_buffer += "</";
+		_buffer += element.Value();
+		_buffer += ">";
+
 		DoLineBreak();
 	}
+
 	return true;
 }
 
 
 bool XmlPrinter::Visit( const XmlText& text )
 {
-	if ( text.CDATA() )
-	{
+	if ( text.CDATA() ) {
 		DoIndent();
-		buffer += "<![CDATA[";
-		buffer += text.Value();
-		buffer += "]]>";
+
+		_buffer += "<![CDATA[";
+		_buffer += text.Value();
+		_buffer += "]]>";
+		
+		DoLineBreak();
+	} else if ( _simpleTextPrint ) {
+		_buffer += text.Value();
+	} else {
+		DoIndent();
+		
+		_buffer += text.Value();
+		
 		DoLineBreak();
 	}
-	else if ( simpleTextPrint )
-	{
-		buffer += text.Value();
-	}
-	else
-	{
-		DoIndent();
-		buffer += text.Value();
-		DoLineBreak();
-	}
+
 	return true;
 }
 
@@ -4256,7 +4296,7 @@ bool XmlPrinter::Visit( const XmlText& text )
 bool XmlPrinter::Visit( const XmlDeclaration& declaration )
 {
 	DoIndent();
-	declaration.Print( 0, 0, &buffer );
+	declaration.Print( 0, 0, &_buffer );
 	DoLineBreak();
 	return true;
 }
@@ -4265,9 +4305,9 @@ bool XmlPrinter::Visit( const XmlDeclaration& declaration )
 bool XmlPrinter::Visit( const XmlComment& comment )
 {
 	DoIndent();
-	buffer += "<!--";
-	buffer += comment.Value();
-	buffer += "-->";
+	_buffer += "<!--";
+	_buffer += comment.Value();
+	_buffer += "-->";
 	DoLineBreak();
 	return true;
 }
@@ -4276,9 +4316,9 @@ bool XmlPrinter::Visit( const XmlComment& comment )
 bool XmlPrinter::Visit( const XmlUnknown& unknown )
 {
 	DoIndent();
-	buffer += "<";
-	buffer += unknown.Value();
-	buffer += ">";
+	_buffer += "<";
+	_buffer += unknown.Value();
+	_buffer += ">";
 	DoLineBreak();
 	return true;
 }

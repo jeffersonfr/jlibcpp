@@ -237,7 +237,6 @@ void Menu::KeyPressed(KeyEvent *event)
 					DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_RIGHT));
 				} else {
 					if (event->GetSymbol() == jgui::JKS_ENTER) {
-						Item *item = GetCurrentItem();
 						int index = GetCurrentIndex();
 
 						Hide();
@@ -252,7 +251,7 @@ void Menu::KeyPressed(KeyEvent *event)
 							delete menu;
 						}
 						
-						DispatchSelectEvent(new SelectEvent(this, item, index, JSET_ACTION)); 
+						DispatchSelectEvent(new SelectEvent(this, GetCurrentItem(), index, JSET_ACTION)); 
 
 						Release();
 					}

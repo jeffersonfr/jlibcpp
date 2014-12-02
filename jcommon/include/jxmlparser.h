@@ -840,7 +840,7 @@ class XmlNode : public XmlBase{
 		 * \brief
 		 *
 		 */
-		XmlNode* PreviousSibling( const char *_prev ) ;
+		XmlNode* PreviousSibling( const char *prev ) ;
 		
 		/**
 		 * \brief
@@ -888,7 +888,7 @@ class XmlNode : public XmlBase{
 		 * \brief
 		 *
 		 */
-		XmlNode* NextSibling( const char* _next ) ;
+		XmlNode* NextSibling( const char* next ) ;
 		
 		/** Convenience function to get through elements.
 		  Calls NextSibling and ToElement. Will skip all non-Element
@@ -913,7 +913,7 @@ class XmlNode : public XmlBase{
 		 * \brief
 		 *
 		 */
-		XmlElement* NextSiblingElement( const char *_next );
+		XmlElement* NextSiblingElement( const char *next );
 		
 		/**
 		 * \brief
@@ -1094,7 +1094,7 @@ class XmlNode : public XmlBase{
 		 * \brief
 		 *
 		 */
-		XmlNode( NodeType _type );
+		XmlNode( NodeType type );
 		
 		/**
 		 * \brief Copy to the allocated object. Shared functionality between Clone, 
@@ -1115,16 +1115,16 @@ class XmlNode : public XmlBase{
 		 */
 		XmlNode* Identify( const char* start, XmlEncoding encoding );
 		
-		XmlNode*		parent;
-		NodeType		type;
+		XmlNode*		_parent;
+		NodeType		_type;
 		
-		XmlNode*		firstChild;
-		XmlNode*		lastChild;
+		XmlNode*		_firstChild;
+		XmlNode*		_lastChild;
 		
 		std::string	_value;
 		
-		XmlNode*		prev;
-		XmlNode*		next;
+		XmlNode*		_prev;
+		XmlNode*		_next;
 		
 	private:
 		/**
@@ -1163,7 +1163,7 @@ class XmlAttribute : public XmlBase
 		 * \brief std::string constructor.
 		 *
 		 */
-		XmlAttribute( const std::string& _name, const std::string& value );
+		XmlAttribute( const std::string& name, const std::string& value );
 		
 		/**
 		 * \brief Construct an attribute with a name and value.
@@ -1248,7 +1248,7 @@ class XmlAttribute : public XmlBase
 		 * \brief STL std::string form.
 		 *
 		 */
-		void SetName( const std::string& _name );
+		void SetName( const std::string& name );
 		
 		/**
 		 * \brief STL std::string form.	
@@ -1335,11 +1335,11 @@ class XmlAttribute : public XmlBase
 		 */
 		void operator=( const XmlAttribute& base );	// not allowed.
 		
-		XmlDocument*	document;	// A pointer back to a document, for error reporting.
-		std::string name;
-		std::string value;
-		XmlAttribute*	prev;
-		XmlAttribute*	next;
+		XmlDocument* _document;	// A pointer back to a document, for error reporting.
+		std::string _name;
+		std::string _value;
+		XmlAttribute*	_prev;
+		XmlAttribute*	_next;
 };
 
 /*	A class used to manage a group of attributes.
@@ -1408,25 +1408,25 @@ class XmlAttributeSet {
 		 * \brief
 		 *
 		 */
-		const XmlAttribute*	Find( const char* _name ) const;
+		const XmlAttribute*	Find( const char* name ) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlAttribute*	Find( const char* _name ) ;
+		XmlAttribute*	Find( const char* name ) ;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		const XmlAttribute*	Find( const std::string& _name ) const;
+		const XmlAttribute*	Find( const std::string& name ) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlAttribute*	Find( const std::string& _name ) ;
+		XmlAttribute*	Find( const std::string& name ) ;
 		
 	private:
 		// ME: Because of hidden/disabled copy-construktor in XmlAttribute (sentinel-element),
@@ -1856,7 +1856,7 @@ class XmlText : public XmlNode{
 		/**
 		 * \brief Constructor for text element. By default, it is treated as 
 		 * normal, encoded text. If you want it be output as a CDATA text
-		 * element, set the parameter _cdata to 'true'
+		 * element, set the parameter cdata to 'true'
 		 * 
   		 */
 		XmlText (const char * initValue );
@@ -1901,7 +1901,7 @@ class XmlText : public XmlNode{
 		 * \brief Turns on or off a CDATA representation of text.
 		 *
 		 */
-		void SetCDATA( bool _cdata );
+		void SetCDATA( bool cdata );
 		
 		/**
 		 * \brief
@@ -1953,7 +1953,7 @@ class XmlText : public XmlNode{
 		virtual void StreamIn( std::istream * in, std::string * tag );
 		
 	private:
-		bool cdata;			// true if this should be input and output as a CDATA style text element
+		bool _cdata;			// true if this should be input and output as a CDATA style text element
 };
 
 /**
@@ -1982,17 +1982,13 @@ class XmlDeclaration : public XmlNode{
 		 * \brief Constructor.
 		 *
 		 */
-		XmlDeclaration(const std::string& _version,
-				const std::string& _encoding,
-				const std::string& _standalone );
+		XmlDeclaration(const std::string& version, const std::string& encoding, const std::string& standalone );
 		
 		/**
 		 * \brief Construct.
 		 *
 		 */
-		XmlDeclaration(const char* _version,
-				const char* _encoding,
-				const char* _standalone );
+		XmlDeclaration(const char* version, const char* encoding, const char* standalone );
 		
 		/**
 		 * \brief
@@ -2087,9 +2083,9 @@ class XmlDeclaration : public XmlNode{
 		virtual void StreamIn( std::istream * in, std::string * tag );
 		
 	private:
-		std::string version;
-		std::string encoding;
-		std::string standalone;
+		std::string _version;
+		std::string _encoding;
+		std::string _standalone;
 };
 
 
@@ -2342,7 +2338,7 @@ class XmlDocument : public XmlNode{
 		  
 		  @sa Row, Column
 		  */
-		void SetTabSize( int _tabsize )	;
+		void SetTabSize( int tabsize )	;
 		
 		int TabSize() const;
 		
@@ -2419,7 +2415,7 @@ class XmlDocument : public XmlNode{
 		bool error;
 		int  errorId;
 		std::string errorDesc;
-		int tabsize;
+		int _tabsize;
 		XmlCursor errorLocation;
 		bool useMicrosoftBOM;		// the UTF-8 BOM were found when read. Note this, and try to write.
 };
@@ -2508,7 +2504,7 @@ for( child; child; child=child->NextSiblingElement() )
 class XmlHandle{
 	public:
 		/// Create a handle from any node (at any depth of the tree.) This can be a null pointer.
-		XmlHandle( XmlNode* _node )		;
+		XmlHandle( XmlNode* node )		;
 		
 		/// Copy constructor
 		XmlHandle( const XmlHandle& ref )	;
@@ -2692,7 +2688,7 @@ class XmlPrinter : public XmlVisitor
 		/** Set the indent characters for printing. By default 4 spaces
 		  but tab (\t) is also useful, or null/empty string for no indentation.
 		  */
-		void SetIndent( const char* _indent );
+		void SetIndent( const char* indent );
 		
 		/// Query the indention string.
 		const char* Indent();
@@ -2701,7 +2697,7 @@ class XmlPrinter : public XmlVisitor
 		  Some operating systems prefer other characters, or can be
 		  set to the null/empty string for no indenation.
 		  */
-		void SetLineBreak( const char* _lineBreak );
+		void SetLineBreak( const char* lineBreak );
 		
 		/// Query the current line breaking string.
 		const char* LineBreak();
@@ -2733,11 +2729,11 @@ class XmlPrinter : public XmlVisitor
 		 */
 		void DoLineBreak() ;
 		
-		int depth;
-		bool simpleTextPrint;
-		std::string buffer;
-		std::string indent;
-		std::string lineBreak;
+		int _depth;
+		bool _simpleTextPrint;
+		std::string _buffer;
+		std::string _indent;
+		std::string _lineBreak;
 };
 
 }

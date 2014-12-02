@@ -87,6 +87,12 @@ class Monitor {
 		virtual ~Monitor();
 
 		/**
+		 * \brief 
+		 *
+		 */
+		virtual void Release();
+
+		/**
 		 * \brief Requests a lock on the Monitor object. Will block if Lock is not available.
 		 *
 		 */

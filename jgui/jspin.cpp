@@ -302,21 +302,16 @@ void Spin::Paint(Graphics *g)
 					g->SetColor(_disabled_fgcolor);
 				}
 
-				int x = _horizontal_gap+_border_size,
-						y = _vertical_gap+_border_size,
-						w = _size.width-2*x,
-						h = _size.height-2*y,
+				int x1 = _horizontal_gap+_border_size,
+						y1 = _vertical_gap+_border_size,
+						w1 = _size.width-2*x1,
+						h1 = _size.height-2*y1,
 						gapx = arrow_size+4,
 						gapy = 0;
-				int px = x+gapx,
-						py = y+gapy,
-						pw = w-2*gapx,
-						ph = h-gapy;
-
-				x = (x < 0)?0:x;
-				y = (y < 0)?0:y;
-				w = (w < 0)?0:w;
-				h = (h < 0)?0:h;
+				int px = x1+gapx,
+						py = y1+gapy,
+						pw = w1-2*gapx,
+						ph = h1-gapy;
 
 				px = (px < 0)?0:px;
 				py = (py < 0)?0:py;
@@ -361,21 +356,16 @@ void Spin::Paint(Graphics *g)
 					g->SetColor(_disabled_fgcolor);
 				}
 
-				int x = _horizontal_gap+_border_size,
-						y = _vertical_gap+_border_size,
-						w = _size.width-2*x,
-						h = _size.height-2*y,
+				int x1 = _horizontal_gap+_border_size,
+						y1 = _vertical_gap+_border_size,
+						w1 = _size.width-2*x1,
+						h1 = _size.height-2*y1,
 						gapx = 0,
 						gapy = 0;
-				int px = x+gapx,
-						py = y+gapy,
-						pw = w-2*gapx,
-						ph = h-gapy;
-
-				x = (x < 0)?0:x;
-				y = (y < 0)?0:y;
-				w = (w < 0)?0:w;
-				h = (h < 0)?0:h;
+				int px = x1+gapx,
+						py = y1+gapy,
+						pw = w1-2*gapx,
+						ph = h1-gapy;
 
 				px = (px < 0)?0:px;
 				py = (py < 0)?0:py;
