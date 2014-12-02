@@ -21,8 +21,7 @@
 #define J_AUTOLOCK_H
 
 #include "jmutex.h"
-
-#include "jobject.h"
+#include "jmutexexception.h"
 
 namespace jthread{
 
@@ -50,7 +49,7 @@ class AutoLock : public virtual jcommon::Object{
 		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual ~AutoLock();
+		virtual ~AutoLock() throw (MutexException);
 
 };
 

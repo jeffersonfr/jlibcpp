@@ -293,8 +293,6 @@ void ConnectionPipe::main_pipe_receiver()
 		}
 
 #ifdef _WIN32
-		int n;
-
 		WriteFile(pipe, buffer, n, (DWORD *)&n, 0);
 #else
 		n = write(pipe, buffer, n);

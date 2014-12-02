@@ -53,18 +53,18 @@ namespace jmath {
 class Random : public virtual jcommon::Object{
 	
 	private:
-		static const long long BITS_PER_BYTE = 8;
-		static const long long BYTES_PER_INT = 4;
+		static const int64_t BITS_PER_BYTE = 8;
+		static const int64_t BYTES_PER_INT = 4;
 		
-		static const long long serialVersionUID = 3905348978240129619LL;
-		static const long long multiplier = 0x5DEECE66DLL;
-		static const long long addend = 0xBLL;
-		static const long long mask = (0x00000001LL << 48) - 1;
-		static const long long seedUniquifier = 8682522807148012LL;
+		static const int64_t serialVersionUID = 3905348978240129619LL;
+		static const int64_t multiplier = 0x5DEECE66DLL;
+		static const int64_t addend = 0xBLL;
+		static const int64_t mask = (0x00000001LL << 48) - 1;
+		static const int64_t seedUniquifier = 8682522807148012LL;
 		
 		double nextNextGaussian;
 		bool haveNextNextGaussian;
-		long long seed;
+		int64_t _seed;
 		
 	public:
 		/**
@@ -77,7 +77,7 @@ class Random : public virtual jcommon::Object{
 		 *
 		 */
 		
-		Random(long long seed = 65539LL);
+		Random(int64_t seed = 65539LL);
 		
 		/**
 		 * \brief
@@ -89,7 +89,7 @@ class Random : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-	 	long long Binomial(long long ntot, double prob);
+	 	int64_t Binomial(int64_t ntot, double prob);
 		
 		/**
 		 * \brief
@@ -119,16 +119,16 @@ class Random : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		long long GetSeed() 
+		int64_t GetSeed() 
 		{
-			return seed;
+			return _seed;
 		}
 		
 		/**
 		 * \brief
 		 *
 		 */
-		long long Integer(long long imax);
+		int64_t Integer(int64_t imax);
 		
 		/**
 		 * \brief
@@ -140,7 +140,7 @@ class Random : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		long long PoissonInteger(double mean);
+		int64_t PoissonInteger(double mean);
 		
 		/**
 		 * \brief
@@ -170,25 +170,25 @@ class Random : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void SetSeed(long long seed = 0x00000000ffffffffLL);
+		void SetSeed(int64_t seed = 0x00000000ffffffffLL);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		double RandomDouble(long long i = 0LL);
+		double RandomDouble(int64_t i = 0LL);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RandomArray(long long n, float *array);
+		void RandomArray(int64_t n, float *array);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void RandomArray(long long n, double *array);
+		void RandomArray(int64_t n, double *array);
 		
 		/**
 		 * \brief

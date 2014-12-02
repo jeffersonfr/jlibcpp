@@ -529,12 +529,12 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 	r->minWidthSize = maximumArrayYIndex;
 	r->minHeightSize = maximumArrayXIndex;
 
-	for (int i=0; i<maximumArrayXIndex; i++) {
+	for (i=0; i<maximumArrayXIndex; i++) {
 		r->weightY[i] = 0;
 		r->minHeight[i] = 0;
 	}
 
-	for (int i=0; i<maximumArrayYIndex; i++) {
+	for (i=0; i<maximumArrayYIndex; i++) {
 		r->weightX[i] = 0;
 		r->minWidth[i] = 0;
 	}
@@ -547,9 +547,7 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 
 	nextSize = INT_MAX;
 
-	for (i = 1;
-			i != INT_MAX;
-			i = nextSize, nextSize = INT_MAX) {
+	for (i=1; i!=INT_MAX; i=nextSize, nextSize=INT_MAX) {
 		for (compindex = 0 ; compindex < (int)components.size() ; compindex++) {
 			comp = components[compindex];
 			if (!comp->IsVisible())

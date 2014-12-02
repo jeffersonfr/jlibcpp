@@ -23,7 +23,7 @@
 
 namespace jmath {
 
-Random::Random(long long seed)
+Random::Random(int64_t seed)
 {
    SetSeed(seed);
 }
@@ -32,7 +32,7 @@ Random::~Random()
 {
 }
 
-long long Random::Binomial(long long ntot, double prob)
+int64_t Random::Binomial(int64_t ntot, double prob)
 {
 // Generates a random integer N according to the binomial law
 // Coded from Los Alamos report LA-5061-MS
@@ -46,8 +46,8 @@ long long Random::Binomial(long long ntot, double prob)
 // (with mean =*ntot+0.5 and standard deviation sqrt(ntot*prob*(1-prob)).
 
    if (prob < 0 || prob > 1) return 0;
-   long long n = 0;
-   for (long long i=0;i<ntot;i++) {
+   int64_t n = 0;
+   for (int64_t i=0;i<ntot;i++) {
       if (RandomDouble() > prob) continue;
       n++;
    }
@@ -100,12 +100,12 @@ double Random::Gaussian(double mean, double sigma)
    return result;
 }
 
-long long Random::Integer(long long imax)
+int64_t Random::Integer(int64_t imax)
 {
 //  returns a random integer on [ 0, imax-1 ].
 
-   long long ui;
-   ui = (long long)(imax*RandomDouble());
+   int64_t ui;
+   ui = (int64_t)(imax*RandomDouble());
    return ui;
 }
 
@@ -288,7 +288,7 @@ double Random::Landau(double mpv, double sigma)
    double ranlan, x, u, v;
    x = RandomDouble();
    u = 1000*x;
-   long long i = (long long)(u);
+   int64_t i = (int64_t)(u);
    u -= i;
    if (i >= 70 && i < 800) {
       ranlan = f[i-1] + u*(f[i] - f[i-1]);
@@ -315,7 +315,7 @@ double Random::Landau(double mpv, double sigma)
    return res;
 }
 
-long long Random::PoissonInteger(double mean)
+int64_t Random::PoissonInteger(double mean)
 {
 // Generates a random integer N according to a Poisson law.
 // Prob(N) = exp(-mean)*mean^N/Factorial(N)
@@ -329,7 +329,7 @@ long long Random::PoissonInteger(double mean)
 // This routine since is returning 32 bits integer will not work for values larger than 2*10**9
 // One should then use the Trandom::PoissonD for such large values
 //
-   long long n;
+   int64_t n;
    if (mean <= 0) return 0;
    if (mean < 25) {
 	  double expmean = Math<double>::Exp(-mean);
@@ -362,11 +362,11 @@ long long Random::PoissonInteger(double mean)
          t = 0.9*(1.0 + y*y)* Math<double>::Exp(em*alxm - Math<double>::LnGamma(em + 1.0) - g);
       } while( RandomDouble() > t );
 
-      return static_cast<long long> (em);
+      return static_cast<int64_t> (em);
    }
    else {
       // use Gaussian approximation vor very large values
-      n = (long long)(Gaussian(0,1)*Math<double>::Sqrt(mean) + mean +0.5);
+      n = (int64_t)(Gaussian(0,1)*Math<double>::Sqrt(mean) + mean +0.5);
 	  
       return n;
    }
@@ -382,7 +382,7 @@ double Random::PoissonDouble(double mean)
 // This function is a variant of Random::Poisson returning a double
 // instead of an integer.
 //
-   long long n;
+   int64_t n;
    if (mean <= 0) return 0;
    if (mean < 25) {
 	  double expmean = Math<double>::Exp(-mean);
@@ -450,7 +450,7 @@ void Random::Rannor(double &a, double &b)
    b = r * Math<double>::Cos(x);
 }
 
-double Random::RandomDouble(long long)
+double Random::RandomDouble(int64_t)
 {
 //  Machine independent random number generator.
 //  Based on the BSD Unix (Rand) Linear congrential generator
@@ -464,48 +464,65 @@ double Random::RandomDouble(long long)
 
 #ifdef OLD_TRANDOM_IMPL
    const double kCONS = 4.6566128730774E-10;
-   const long long kMASK24  = 2147483392;
+   const int64_t kMASK24  = 2147483392;
 
    seed *= 69069;
-   long long jy = (seed&kMASK24); // Set lower 8 bits to zero to assure exact float
-   if (jy) return kCONS*jy;
+   
+	 int64_t jy = (seed&kMASK24); // Set lower 8 bits to zero to assure exact float
+   
+	 if (jy) {
+		 return kCONS*jy;
+	 }
 #else
    const double kCONS = 4.6566128730774E-10; // (1/pow(2,31))
-   seed = (1103515245 * seed + 12345) & 0x7fffffffUL;
+   
+	 _seed = (1103515245 * _seed + 12345) & 0x7fffffffUL;
 
-   if (seed) return  kCONS*seed;
+   if (_seed) {
+		 return  kCONS*_seed;
+	 }
 #endif
    
    return RandomDouble();
 }
 
-void Random::RandomArray(long long n, double *array)
+void Random::RandomArray(int64_t n, double *array)
 {
    // Return an array of n random numbers uniformly distributed in ]0,1]
 
    const double kCONS = 4.6566128730774E-10; // (1/pow(2,31))
-   long long i=0;
+
+   int64_t i=0;
+
    while (i<n) {
-      seed = (1103515245 * seed + 12345) & 0x7fffffffUL;
-      if (seed) {array[i] = kCONS*seed; i++;}
+      _seed = (1103515245 * _seed + 12345) & 0x7fffffffUL;
+     
+			if (_seed) {
+				array[i] = kCONS*_seed; i++;
+			}
    }
 }
 
-void Random::RandomArray(long long n, float *array)
+void Random::RandomArray(int64_t n, float *array)
 {
    // Return an array of n random numbers uniformly distributed in ]0,1]
 
    const double kCONS = 4.6566128730774E-10; // (1/pow(2,31))
-   // long long jy;
-   long long i=0;
+
+   // int64_t jy;
+   int64_t i=0;
+
    while (i<n) {
-      seed = (1103515245 * seed + 12345) & 0x7fffffffUL;
+      _seed = (1103515245 * _seed + 12345) & 0x7fffffffUL;
       // jy = (seed & 0x7fffff00);  // Set lower 8 bits to zero to assure exact float
-      if (seed) {array[i] = float(kCONS*seed); i++;}
+
+      if (_seed) {
+				array[i] = float(kCONS*_seed); i++;
+			}
    }
 }
 
-void Random::SetSeed(long long seed)
+void Random::SetSeed(int64_t seed)
 {
 //  Set the random generator seed
 //  if seed is zero, the seed is set to the current  machine clock
@@ -516,9 +533,9 @@ void Random::SetSeed(long long seed)
    if (seed == 0) {
       time_t curtime;      // Set 'random' seed number  if seed=0
       time(&curtime);      // Get current time in seed.
-      this->seed = (long long)curtime;
+      _seed = (int64_t)curtime;
    } else {
-      this->seed = seed;
+      _seed = seed;
    }
 }
 

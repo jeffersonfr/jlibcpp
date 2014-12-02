@@ -172,22 +172,22 @@ const void * XmlBase::GetUserData() const
 
 const char * XmlNode::Value() const 
 {
-	return value.c_str (); 
+	return _value.c_str (); 
 }
 
 const std::string& XmlNode::ValueStr() const 
 {
-	return value; 
+	return _value; 
 }
 
-void XmlNode::SetValue(const char * _value) 
+void XmlNode::SetValue(const char * value) 
 {
-	value = _value;
+	_value = value;
 }
 
-void XmlNode::SetValue( const std::string& _value )	
+void XmlNode::SetValue( const std::string& value )	
 {
-	value = _value; 
+	_value = value; 
 }
 
 XmlNode* XmlNode::Parent()
@@ -210,12 +210,12 @@ XmlNode* XmlNode::FirstChild()
 	return firstChild; 
 }
 
-XmlNode* XmlNode::FirstChild( const char * _value )  
+XmlNode* XmlNode::FirstChild( const char * value )  
 {
 	// Call through to the const version - safe since nothing is changed.
 	// Exiting syntax: cast this to a const (always safe) call the method,
 	// cast the return back to non-const.
-	return const_cast< XmlNode* > ((const_cast< const XmlNode* >(this))->FirstChild( _value ));
+	return const_cast< XmlNode* > ((const_cast< const XmlNode* >(this))->FirstChild( value ));
 }
 
 const XmlNode* XmlNode::LastChild() const	
@@ -1981,15 +1981,15 @@ const char * XmlElement::Parse( const char* p, XmlParsingData* data, XmlEncoding
 	// Read the name.
 	const char* pErr = p;
 
-    p = ReadName( p, &value, encoding );
-	if ( !p || !*p )
-	{
+   p = ReadName( p, &_value, encoding );
+	if ( !p || !*p ) {
 		if ( document )	document->SetError( TIXML_ERROR_FAILED_TO_READ_ELEMENT_NAME, pErr, data, encoding );
 		return 0;
 	}
 
-    std::string endTag ("</");
-	endTag += value;
+	std::string endTag ("</");
+
+	endTag += _value;
 	endTag += ">";
 
 	// Check for and read attributes. Also look for an empty
@@ -2182,12 +2182,12 @@ const char* XmlUnknown::Parse( const char* p, XmlParsingData* data, XmlEncoding 
 		if ( document ) document->SetError( TIXML_ERROR_PARSING_UNKNOWN, p, data, encoding );
 		return 0;
 	}
-	++p;
-    value = "";
 
-	while ( p && *p && *p != '>' )
-	{
-		value += *p;
+	_value = "";
+	++p;
+
+	while ( p && *p && *p != '>' ) {
+		_value += *p;
 		++p;
 	}
 
@@ -2229,7 +2229,8 @@ void XmlComment::StreamIn( std::istream * in, std::string * tag )
 const char* XmlComment::Parse( const char* p, XmlParsingData* data, XmlEncoding encoding )
 {
 	XmlDocument* document = GetDocument();
-	value = "";
+
+	_value = "";
 
 	p = SkipWhiteSpace( p, encoding );
 
@@ -2247,7 +2248,7 @@ const char* XmlComment::Parse( const char* p, XmlParsingData* data, XmlEncoding 
 		return 0;
 	}
 	p += strlen( startTag );
-	p = ReadText( p, &value, false, endTag, false, encoding );
+	p = ReadText( p, &_value, false, endTag, false, encoding );
 	return p;
 }
 
@@ -2361,11 +2362,11 @@ void XmlText::StreamIn( std::istream * in, std::string * tag )
 
 const char* XmlText::Parse( const char* p, XmlParsingData* data, XmlEncoding encoding )
 {
-	value = "";
 	XmlDocument* document = GetDocument();
+	
+	_value = "";
 
-	if ( data )
-	{
+	if ( data ) {
 		data->Stamp( p, encoding );
 		location = data->Cursor();
 	}
@@ -2373,36 +2374,30 @@ const char* XmlText::Parse( const char* p, XmlParsingData* data, XmlEncoding enc
 	const char* const startTag = "<![CDATA[";
 	const char* const endTag   = "]]>";
 
-	if ( cdata || StringEqual( p, startTag, false, encoding ) )
-	{
+	if ( cdata || StringEqual( p, startTag, false, encoding ) ) {
 		cdata = true;
 
-		if ( !StringEqual( p, startTag, false, encoding ) )
-		{
+		if ( !StringEqual( p, startTag, false, encoding ) ) {
 			document->SetError( TIXML_ERROR_PARSING_CDATA, p, data, encoding );
 			return 0;
 		}
+
 		p += strlen( startTag );
 
 		// Keep all the white space, ignore the encoding, etc.
-		while (	   p && *p
-				&& !StringEqual( p, endTag, false, encoding )
-			  )
-		{
-			value += *p;
+		while (	p && *p && !StringEqual( p, endTag, false, encoding )) {
+			_value += *p;
 			++p;
 		}
 
 		std::string dummy; 
 		p = ReadText( p, &dummy, false, endTag, false, encoding );
 		return p;
-	}
-	else
-	{
+	} else {
 		bool ignoreWhite = true;
 
 		const char* end = "<";
-		p = ReadText( p, &value, ignoreWhite, end, false, encoding );
+		p = ReadText( p, &_value, ignoreWhite, end, false, encoding );
 		if ( p )
 			return p-1;	// don't truncate the '<'
 		return 0;
@@ -2492,9 +2487,12 @@ const char* XmlDeclaration::Parse( const char* p, XmlParsingData* data, XmlEncod
 
 bool XmlText::Blank() const
 {
-	for ( unsigned i=0; i<value.length(); i++ )
-		if ( !IsWhiteSpace( value[i] ) )
+	for ( unsigned i=0; i<_value.length(); i++ ) {
+		if ( !IsWhiteSpace( _value[i] ) ) {
 			return false;
+		}
+	}
+
 	return true;
 }
 
@@ -2613,7 +2611,7 @@ XmlNode::~XmlNode()
 
 void XmlNode::CopyTo( XmlNode* target ) const
 {
-	target->SetValue (value.c_str() );
+	target->SetValue (_value.c_str() );
 	target->userData = userData; 
 }
 
@@ -2951,19 +2949,19 @@ const XmlDocument* XmlNode::GetDocument() const
 }
 
 
-XmlElement::XmlElement (const char * _value)
+XmlElement::XmlElement (const char * value)
 	: XmlNode( XmlNode::ELEMENT )
 {
 	firstChild = lastChild = 0;
-	value = _value;
+	_value = value;
 }
 
 
-XmlElement::XmlElement( const std::string& _value ) 
+XmlElement::XmlElement( const std::string& value ) 
 	: XmlNode( XmlNode::ELEMENT )
 {
 	firstChild = lastChild = 0;
-	value = _value;
+	_value = value;
 }
 
 
@@ -3178,7 +3176,7 @@ void XmlElement::Print( FILE* cfile, int depth ) const
 		fprintf( cfile, "    " );
 	}
 
-	fprintf( cfile, "<%s", value.c_str() );
+	fprintf( cfile, "<%s", _value.c_str() );
 
 	const XmlAttribute* attrib;
 	for ( attrib = attributeSet.First(); attrib; attrib = attrib->Next() )
@@ -3192,24 +3190,17 @@ void XmlElement::Print( FILE* cfile, int depth ) const
 	// 2) An element with only a text child is printed as <foo> text </foo>
 	// 3) An element with children is printed on multiple lines.
 	XmlNode* node;
-	if ( !firstChild )
-	{
+	if ( !firstChild ) {
 		fprintf( cfile, " />" );
-	}
-	else if ( firstChild == lastChild && firstChild->ToText() )
-	{
+	} else if ( firstChild == lastChild && firstChild->ToText() ) {
 		fprintf( cfile, ">" );
 		firstChild->Print( cfile, depth + 1 );
-		fprintf( cfile, "</%s>", value.c_str() );
-	}
-	else
-	{
+		fprintf( cfile, "</%s>", _value.c_str() );
+	} else {
 		fprintf( cfile, ">" );
 
-		for ( node = firstChild; node; node=node->NextSibling() )
-		{
-			if ( !node->ToText() )
-			{
+		for ( node = firstChild; node; node=node->NextSibling() ) {
+			if ( !node->ToText() ) {
 				fprintf( cfile, "\n" );
 			}
 			node->Print( cfile, depth+1 );
@@ -3218,7 +3209,7 @@ void XmlElement::Print( FILE* cfile, int depth ) const
 		for( i=0; i<depth; ++i ) {
 			fprintf( cfile, "    " );
 		}
-		fprintf( cfile, "</%s>", value.c_str() );
+		fprintf( cfile, "</%s>", _value.c_str() );
 	}
 }
 
@@ -3296,29 +3287,31 @@ XmlDocument::XmlDocument() : XmlNode( XmlNode::DOCUMENT )
 	ClearError();
 }
 
-XmlDocument::XmlDocument( const char * documentName ) : XmlNode( XmlNode::DOCUMENT )
+XmlDocument::XmlDocument( const char * documentName ) : 
+	XmlNode( XmlNode::DOCUMENT )
 {
 	tabsize = 4;
 	useMicrosoftBOM = false;
-	value = documentName;
+	_value = documentName;
 	ClearError();
 }
 
 
-XmlDocument::XmlDocument( const std::string& documentName ) : XmlNode( XmlNode::DOCUMENT )
+XmlDocument::XmlDocument( const std::string& documentName ) : 
+	XmlNode( XmlNode::DOCUMENT )
 {
 	tabsize = 4;
 	useMicrosoftBOM = false;
-    value = documentName;
+	_value = documentName;
 	ClearError();
 }
 
 
-XmlDocument::XmlDocument( const XmlDocument& copy ) : XmlNode( XmlNode::DOCUMENT )
+XmlDocument::XmlDocument( const XmlDocument& copy ) : 
+	XmlNode( XmlNode::DOCUMENT )
 {
 	copy.CopyTo( this );
 }
-
 
 void XmlDocument::operator=( const XmlDocument& copy )
 {
@@ -3348,19 +3341,16 @@ bool XmlDocument::LoadFile( const char* _filename, XmlEncoding encoding )
 	// like a bug in the Microsoft STL implementation.
 	// Add an extra string to avoid the crash.
 	std::string filename( _filename );
-	value = filename;
+	_value = filename;
 
 	// reading in binary mode so that tinyxml can normalize the EOL
-	FILE* file = fopen( value.c_str (), "rb" );	
+	FILE* file = fopen( _value.c_str (), "rb" );	
 
-	if ( file )
-	{
+	if ( file ) {
 		bool result = LoadFile( file, encoding );
 		fclose( file );
 		return result;
-	}
-	else
-	{
+	} else {
 		SetError( TIXML_ERROR_OPENING_FILE, 0, 0, TIXML_ENCODING_UNKNOWN );
 		return false;
 	}
@@ -3705,11 +3695,10 @@ void XmlComment::operator=( const XmlComment& base )
 void XmlComment::Print( FILE* cfile, int depth ) const
 {
 	assert( cfile );
-	for ( int i=0; i<depth; i++ )
-	{
+	for ( int i=0; i<depth; i++ ) {
 		fprintf( cfile,  "    " );
 	}
-	fprintf( cfile, "<!--%s-->", value.c_str() );
+	fprintf( cfile, "<!--%s-->", _value.c_str() );
 }
 
 
@@ -3743,19 +3732,16 @@ XmlNode* XmlComment::Clone() const
 void XmlText::Print( FILE* cfile, int depth ) const
 {
 	assert( cfile );
-	if ( cdata )
-	{
+	if ( cdata ) {
 		int i;
 		fprintf( cfile, "\n" );
 		for ( i=0; i<depth; i++ ) {
 			fprintf( cfile, "    " );
 		}
-		fprintf( cfile, "<![CDATA[%s]]>\n", value.c_str() );	// unformatted output
-	}
-	else
-	{
+		fprintf( cfile, "<![CDATA[%s]]>\n", _value.c_str() );	// unformatted output
+	} else {
 		std::string buffer;
-		PutString( value, &buffer );
+		PutString( _value, &buffer );
 		fprintf( cfile, "%s", buffer.c_str() );
 	}
 }
@@ -3889,9 +3875,11 @@ XmlNode* XmlDeclaration::Clone() const
 
 void XmlUnknown::Print( FILE* cfile, int depth ) const
 {
-	for ( int i=0; i<depth; i++ )
+	for ( int i=0; i<depth; i++ ) {
 		fprintf( cfile, "    " );
-	fprintf( cfile, "<%s>", value.c_str() );
+	}
+
+	fprintf( cfile, "<%s>", _value.c_str() );
 }
 
 

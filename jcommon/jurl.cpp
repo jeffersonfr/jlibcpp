@@ -171,7 +171,7 @@ std::string URL::Encode(std::string s_, std::string standard_)
 
 	std::ostringstream o;
 
-	for (int i=0; i<(int)s_.length(); i++) {
+	for (i=0; i<(int)s_.length(); i++) {
 		int c = (int)s_[i];
 
 		if (dontNeedEncoding[c] == true) {

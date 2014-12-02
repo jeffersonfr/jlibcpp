@@ -387,7 +387,7 @@ class XmlBase{
 		 * \brief Get a character, while interpreting entities. The length can be from 0 to 4 bytes.
 		 *
 		 */
-		static const char * GetChar(const char* p, char* _value, int* length, XmlEncoding encoding);
+		static const char * GetChar(const char* p, char* value, int* length, XmlEncoding encoding);
 		
 		/**
 		 * \brief Puts a string to a stream, expanding entities as it goes. Note this 
@@ -634,13 +634,13 @@ class XmlNode : public XmlBase{
 		 *	Text:		the text string
 		 *	@endverbatim
 		 */
-		void SetValue(const char * _value);
+		void SetValue(const char * value);
 		
 		/**
 		 * \brief STL std::string form.
 		 *
 		 */
-		void SetValue( const std::string& _value )	;
+		void SetValue( const std::string& value )	;
 		
 		/**
 		 * \brief Delete all the children of this node. Does not affect 'this'.
@@ -683,7 +683,7 @@ class XmlNode : public XmlBase{
 		 * \brief The first child of this node with the matching 'value'. Will be null if none found.
 		 *
 		 */
-		XmlNode* FirstChild( const char * _value );
+		XmlNode* FirstChild( const char * value );
 		
 		/**
 		 * \brief
@@ -707,31 +707,31 @@ class XmlNode : public XmlBase{
 		 * \brief
 		 *
 		 */
-		XmlNode* LastChild( const char * _value ) ;
+		XmlNode* LastChild( const char * value ) ;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		const XmlNode* FirstChild( const std::string& _value ) const	;
+		const XmlNode* FirstChild( const std::string& value ) const	;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlNode* FirstChild( const std::string& _value );
+		XmlNode* FirstChild( const std::string& value );
 		
 		/**
 		 * \brief
 		 *
 		 */
-		const XmlNode* LastChild( const std::string& _value ) const	;
+		const XmlNode* LastChild( const std::string& value ) const	;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlNode* LastChild( const std::string& _value );
+		XmlNode* LastChild( const std::string& value );
 		
 		/** An alternate way to walk the children of a node.
 		  One way to iterate over nodes is:
@@ -767,19 +767,19 @@ class XmlNode : public XmlBase{
 		 * \brief
 		 *
 		 */
-		XmlNode* IterateChildren( const char * _value, XmlNode* previous ) ;
+		XmlNode* IterateChildren( const char * value, XmlNode* previous ) ;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		const XmlNode* IterateChildren( const std::string& _value, const XmlNode* previous ) const;
+		const XmlNode* IterateChildren( const std::string& value, const XmlNode* previous ) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlNode* IterateChildren( const std::string& _value, XmlNode* previous );
+		XmlNode* IterateChildren( const std::string& value, XmlNode* previous );
 		
 		/** Add a new node related to this. Adds a child past the LastChild.
 		  Returns a pointer to the new object or NULL if an error occured.
@@ -846,25 +846,25 @@ class XmlNode : public XmlBase{
 		 * \brief
 		 *
 		 */
-		const XmlNode* PreviousSibling( const std::string& _value ) const;
+		const XmlNode* PreviousSibling( const std::string& value ) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlNode* PreviousSibling( const std::string& _value );
+		XmlNode* PreviousSibling( const std::string& value );
 		
 		/**
 		 * \brief
 		 *
 		 */
-		const XmlNode* NextSibling( const std::string& _value) const;
+		const XmlNode* NextSibling( const std::string& value) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlNode* NextSibling( const std::string& _value) ;
+		XmlNode* NextSibling( const std::string& value) ;
 		
 		/**
 		 * \brief Navigate to a sibling node.
@@ -919,13 +919,13 @@ class XmlNode : public XmlBase{
 		 * \brief
 		 *
 		 */
-		const XmlElement* NextSiblingElement( const std::string& _value) const;
+		const XmlElement* NextSiblingElement( const std::string& value) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlElement* NextSiblingElement( const std::string& _value);
+		XmlElement* NextSiblingElement( const std::string& value);
 		
 		/**
 		 * \brief Convenience function to get through elements.
@@ -943,25 +943,25 @@ class XmlNode : public XmlBase{
 		 * \brief Convenience function to get through elements.
 		 *
 		 */
-		const XmlElement* FirstChildElement( const char * _value ) const;
+		const XmlElement* FirstChildElement( const char * value ) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlElement* FirstChildElement( const char * _value );
+		XmlElement* FirstChildElement( const char * value );
 		
 		/**
 		 * \brief
 		 *
 		 */
-		const XmlElement* FirstChildElement( const std::string& _value ) const	;
+		const XmlElement* FirstChildElement( const std::string& value ) const	;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlElement* FirstChildElement( const std::string& _value );
+		XmlElement* FirstChildElement( const std::string& value );
 		
 		/** 
 		 * \brief Query the type (as an enumerated value, above) of this node.
@@ -1121,7 +1121,7 @@ class XmlNode : public XmlBase{
 		XmlNode*		firstChild;
 		XmlNode*		lastChild;
 		
-		std::string	value;
+		std::string	_value;
 		
 		XmlNode*		prev;
 		XmlNode*		next;
@@ -1163,13 +1163,13 @@ class XmlAttribute : public XmlBase
 		 * \brief std::string constructor.
 		 *
 		 */
-		XmlAttribute( const std::string& _name, const std::string& _value );
+		XmlAttribute( const std::string& _name, const std::string& value );
 		
 		/**
 		 * \brief Construct an attribute with a name and value.
 		 *
 		 */
-		XmlAttribute( const char * _name, const char * _value );
+		XmlAttribute( const char * name, const char * value );
 		
 		/**
 		 * \brief
@@ -1212,13 +1212,13 @@ class XmlAttribute : public XmlBase
 		  A specialized but useful call. Note that for success it returns 0,
 		  which is the opposite of almost all other nyXml calls.
 		  */
-		int QueryIntValue( int* _value ) const;
+		int QueryIntValue( int * value ) const;
 		
 		/**
 		 * \brief QueryDoubleValue examines the value string. See QueryIntValue().
 		 *
 		 */
-		int QueryDoubleValue( double* _value ) const;
+		int QueryDoubleValue( double* value ) const;
 		
 		/**
 		 * \brief
@@ -1230,19 +1230,19 @@ class XmlAttribute : public XmlBase
 		 * \brief
 		 *
 		 */
-		void SetValue( const char* _value )	;
+		void SetValue( const char* value )	;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetIntValue( int _value );										///< Set the value from an integer.
+		void SetIntValue( int value );										///< Set the value from an integer.
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetDoubleValue( double _value );								///< Set the value from a double.
+		void SetDoubleValue( double value );								///< Set the value from a double.
 		
 		/**
 		 * \brief STL std::string form.
@@ -1254,7 +1254,7 @@ class XmlAttribute : public XmlBase
 		 * \brief STL std::string form.	
 		 *
 		 */
-		void SetValue( const std::string& _value );
+		void SetValue( const std::string& value );
 		
 		/**
 		 * \brief Get the next sibling attribute in the DOM. Returns null at end.
@@ -1459,7 +1459,7 @@ class XmlElement : public XmlNode
 		 * \brief std::string constructor.
 		 *
 		 */
-		XmlElement( const std::string& _value );
+		XmlElement( const std::string& value );
 		
 		/**
 		 * \brief
@@ -1535,19 +1535,19 @@ class XmlElement : public XmlNode
 		 * then TIXML_NO_ATTRIBUTE is returned.
 		 * 
 		 */	
-		int QueryIntAttribute( const char* name, int* _value ) const;
+		int QueryIntAttribute( const char* name, int* value ) const;
 		
 		/**
 		 * \brief QueryDoubleAttribute examines the attribute - see QueryIntAttribute().
 		 *
 		 */
-		int QueryDoubleAttribute( const char* name, double* _value ) const;
+		int QueryDoubleAttribute( const char* name, double* value ) const;
 		
 		/**
 		 * \brief QueryFloatAttribute examines the attribute - see QueryIntAttribute().
 		 *
 		 */
-		int QueryFloatAttribute( const char* name, float* _value ) const ;
+		int QueryFloatAttribute( const char* name, float* value ) const ;
 		
 		/**
 		 * Template form of the attribute query which will try to read the
@@ -1575,31 +1575,31 @@ class XmlElement : public XmlNode
 		 * will be created if it does not exist, or changed if it does.
 		 * 
 		 */
-		void SetAttribute( const char* name, const char * _value );
+		void SetAttribute( const char* name, const char * value );
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int QueryIntAttribute( const std::string& name, int* _value ) const;
+		int QueryIntAttribute( const std::string& name, int* value ) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int QueryDoubleAttribute( const std::string& name, double* _value ) const;
+		int QueryDoubleAttribute( const std::string& name, double* value ) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetAttribute( const std::string& name, const std::string& _value );
+		void SetAttribute( const std::string& name, const std::string& value );
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void SetAttribute( const std::string& name, int _value );
+		void SetAttribute( const std::string& name, int value );
 		
 		/** Sets an attribute of name to a given value. The attribute
 		  will be created if it does not exist, or changed if it does.
@@ -1767,7 +1767,7 @@ class XmlComment : public XmlNode
 		 * \brief Construct a comment from text.
 		 *
 		 */
-		XmlComment( const char* _value );
+		XmlComment( const char* value );
 		
 		/**
 		 * \brief
@@ -2553,25 +2553,25 @@ class XmlHandle{
 		 * \brief
 		 *
 		 */
-		XmlHandle FirstChild( const std::string& _value ) const;
+		XmlHandle FirstChild( const std::string& value ) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlHandle FirstChildElement( const std::string& _value ) const;
+		XmlHandle FirstChildElement( const std::string& value ) const;
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlHandle Child( const std::string& _value, int index ) const	;	
+		XmlHandle Child( const std::string& value, int index ) const	;	
 		
 		/**
 		 * \brief
 		 *
 		 */
-		XmlHandle ChildElement( const std::string& _value, int index ) const	;
+		XmlHandle ChildElement( const std::string& value, int index ) const	;
 		
 		/** Return the handle as a XmlNode. This may return null.
 		*/

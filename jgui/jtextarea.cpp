@@ -389,7 +389,6 @@ void TextArea::InitRowsString()
 		return;
 	}
 
-	std::vector<std::string> words;
 	int font_height;
 
 	// jpoint_t scroll_location = GetScrollLocation();

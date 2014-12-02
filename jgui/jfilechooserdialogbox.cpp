@@ -188,7 +188,7 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 	}
 
 	if (_filter == JFCF_FILE_ONLY || _filter == JFCF_FILE_AND_DIRECTORY) {
-		for (unsigned int i=0; i<files.size(); i++) {
+		for (int i=0; i<(int)files.size(); i++) {
 			std::string ext,
 				file = files[i];
 			bool b = false;

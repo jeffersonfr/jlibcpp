@@ -215,8 +215,6 @@ int IndexedBuffer::Read(jbuffer_chunk_t *chunk)
 
 		return t->size;
 	} else if (chunk->pindex == (_pass_index-1)) {
-		AutoLock lock(&_mutex);
-
 		if (chunk->rindex > _write_index) {
 			struct jbuffer_chunk_t *t = &_buffer[chunk->rindex];
 
@@ -290,8 +288,6 @@ int IndexedBuffer::Read(jbuffer_chunk_t *chunk, int size)
 			return diff;
 		}
 	} else if (chunk->pindex == (_pass_index-1)) {
-		AutoLock lock(&_mutex);
-
 		if (chunk->rindex > _write_index) {
 			struct jbuffer_chunk_t *t = &_buffer[chunk->rindex];
 

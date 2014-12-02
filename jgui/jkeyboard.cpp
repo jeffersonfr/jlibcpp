@@ -861,12 +861,12 @@ void Keyboard::ProcessCaps(Button *button)
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
 		if ((*i)->InstanceOf("KeyButton") == true) {
-			KeyButton *button = (KeyButton *)(*i);
+			KeyButton *btn = (KeyButton *)(*i);
 
-			std::string name = button->GetName();
+			std::string name = btn->GetName();
 
-			button->SetName(button->GetLabel());
-			button->SetLabel(name);
+			btn->SetName(btn->GetLabel());
+			btn->SetLabel(name);
 		}
 	}
 	

@@ -51,64 +51,64 @@ CalendarDialogBox::CalendarDialogBox():
 
 	char tmp[255];
 
-	year = new Spin(bx, by+0*bheight+10, 5*(bwidth+delta)-delta, 60);
+	_syear = new Spin(bx, by+0*bheight+10, 5*(bwidth+delta)-delta, 60);
 
 	for (int i=1970; i<2199; i++) {
 		sprintf(tmp, "%d", i);
 
-		year->AddTextItem(tmp);
+		_syear->AddTextItem(tmp);
 	}
 
-	year->SetLoop(true);
-	year->RegisterSelectListener(this);
+	_syear->SetLoop(true);
+	_syear->RegisterSelectListener(this);
 
-	month = new Spin(bx, by+1*bheight+10, 5*(bwidth+delta)-delta, 60);
+	_smonth = new Spin(bx, by+1*bheight+10, 5*(bwidth+delta)-delta, 60);
 
-	month->AddTextItem("Janeiro");
-	month->AddTextItem("Fevereiro");
-	month->AddTextItem("Março");
-	month->AddTextItem("Abril");
-	month->AddTextItem("Maio");
-	month->AddTextItem("Junho");
-	month->AddTextItem("Julho");
-	month->AddTextItem("Agosto");
-	month->AddTextItem("Setembro");
-	month->AddTextItem("Outubro");
-	month->AddTextItem("Novembro");
-	month->AddTextItem("Dezembro");
+	_smonth->AddTextItem("Janeiro");
+	_smonth->AddTextItem("Fevereiro");
+	_smonth->AddTextItem("Março");
+	_smonth->AddTextItem("Abril");
+	_smonth->AddTextItem("Maio");
+	_smonth->AddTextItem("Junho");
+	_smonth->AddTextItem("Julho");
+	_smonth->AddTextItem("Agosto");
+	_smonth->AddTextItem("Setembro");
+	_smonth->AddTextItem("Outubro");
+	_smonth->AddTextItem("Novembro");
+	_smonth->AddTextItem("Dezembro");
 
-	month->SetLoop(true);
-	month->RegisterSelectListener(this);
+	_smonth->SetLoop(true);
+	_smonth->RegisterSelectListener(this);
 
 	int dx = 0;
 
-	ldom = new Label("D", bx+0*(bwidth+delta+dx), by+170, bwidth, bheight);
-	lseg = new Label("S", bx+1*(bwidth+delta+dx), by+170, bwidth, bheight);
-	lter = new Label("T", bx+2*(bwidth+delta+dx), by+170, bwidth, bheight);
-	lqua = new Label("Q", bx+3*(bwidth+delta+dx), by+170, bwidth, bheight);
-	lqui = new Label("Q", bx+4*(bwidth+delta+dx), by+170, bwidth, bheight);
-	lsex = new Label("S", bx+5*(bwidth+delta+dx), by+170, bwidth, bheight);
-	lsab = new Label("S", bx+6*(bwidth+delta+dx), by+170, bwidth, bheight);
+	_ldom = new Label("D", bx+0*(bwidth+delta+dx), by+170, bwidth, bheight);
+	_lseg = new Label("S", bx+1*(bwidth+delta+dx), by+170, bwidth, bheight);
+	_lter = new Label("T", bx+2*(bwidth+delta+dx), by+170, bwidth, bheight);
+	_lqua = new Label("Q", bx+3*(bwidth+delta+dx), by+170, bwidth, bheight);
+	_lqui = new Label("Q", bx+4*(bwidth+delta+dx), by+170, bwidth, bheight);
+	_lsex = new Label("S", bx+5*(bwidth+delta+dx), by+170, bwidth, bheight);
+	_lsab = new Label("S", bx+6*(bwidth+delta+dx), by+170, bwidth, bheight);
 
 	Color color(0x60, 0x60, 0x80, 0xff);
 
-	ldom->SetBackgroundColor(color);
-	lseg->SetBackgroundColor(color);
-	lter->SetBackgroundColor(color);
-	lqua->SetBackgroundColor(color);
-	lqui->SetBackgroundColor(color);
-	lsex->SetBackgroundColor(color);
-	lsab->SetBackgroundColor(color);
+	_ldom->SetBackgroundColor(color);
+	_lseg->SetBackgroundColor(color);
+	_lter->SetBackgroundColor(color);
+	_lqua->SetBackgroundColor(color);
+	_lqui->SetBackgroundColor(color);
+	_lsex->SetBackgroundColor(color);
+	_lsab->SetBackgroundColor(color);
 
-	Add(month);
-	Add(year);
-	Add(ldom);
-	Add(lseg);
-	Add(lter);
-	Add(lqua);
-	Add(lqui);
-	Add(lsex);
-	Add(lsab);
+	Add(_smonth);
+	Add(_syear);
+	Add(_ldom);
+	Add(_lseg);
+	Add(_lter);
+	Add(_lqua);
+	Add(_lqui);
+	Add(_lsex);
+	Add(_lsab);
 
 	AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
 
@@ -125,40 +125,40 @@ CalendarDialogBox::~CalendarDialogBox()
 		delete b;
 	}
 
-	if (year != NULL) {
-		delete year;
+	if (_syear != NULL) {
+		delete _syear;
 	}
 
-	if (month != NULL) {
-		delete month;
+	if (_smonth != NULL) {
+		delete _smonth;
 	}
 
-	if (ldom != NULL) {
-		delete ldom;
+	if (_ldom != NULL) {
+		delete _ldom;
 	}
 
-	if (lseg != NULL) {
-		delete lseg;
+	if (_lseg != NULL) {
+		delete _lseg;
 	}
 
-	if (lter != NULL) {
-		delete lter;
+	if (_lter != NULL) {
+		delete _lter;
 	}
 
-	if (lqua != NULL) {
-		delete lqua;
+	if (_lqua != NULL) {
+		delete _lqua;
 	}
 
-	if (lqui != NULL) {
-		delete lqui;
+	if (_lqui != NULL) {
+		delete _lqui;
 	}
 
-	if (lsex != NULL) {
-		delete lsex;
+	if (_lsex != NULL) {
+		delete _lsex;
 	}
 	
-	if (lsab != NULL) {
-		delete lsab;
+	if (_lsab != NULL) {
+		delete _lsab;
 	}
 }
 
@@ -286,8 +286,8 @@ void CalendarDialogBox::BuildCalendar()
 		case 12: mes = 31; break;
 	}
 
-	year->SetCurrentIndex(_year);
-	month->SetCurrentIndex(_month);
+	_syear->SetCurrentIndex(_year);
+	_smonth->SetCurrentIndex(_month);
 
 	while (_buttons.size() > 0) {
 		button = (*_buttons.begin());
@@ -386,13 +386,13 @@ void CalendarDialogBox::ItemChanged(SelectEvent *event)
 			y = (_year+1970);
 
 		if (event->GetType() == jgui::JSET_LEFT) {
-			if (spin == year) {
+			if (spin == _syear) {
 				y--;
 
 				if (y < 1970) {
 					y = 1970;
 				}
-			} else if (spin == month) {
+			} else if (spin == _smonth) {
 				m--;
 
 				if (m < 1) {
@@ -406,13 +406,13 @@ void CalendarDialogBox::ItemChanged(SelectEvent *event)
 				}
 			}
 		} else {
-			if (spin == year) {
+			if (spin == _syear) {
 				y++;
 
 				if (y > 2100) {
 					y = 2100;
 				}
-			} else if (spin == month) {
+			} else if (spin == _smonth) {
 				m++;
 
 				if (m > 12) {

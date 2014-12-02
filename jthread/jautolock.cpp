@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jautolock.h"
-#include "jmutexexception.h"
 
 namespace jthread {
 
@@ -42,7 +41,7 @@ AutoLock::AutoLock(Mutex *mutex, bool rethrow):
 	}
 }
 
-AutoLock::~AutoLock()
+AutoLock::~AutoLock() throw (MutexException)
 {
 	if (_mutex != NULL) {
 		try {

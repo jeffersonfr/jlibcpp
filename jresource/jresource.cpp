@@ -66,22 +66,22 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int64_t tim
 
 			if (request == false) {
 				if (timeout <= 0LL) {
-					ResourceStatusEvent *event;
+					ResourceStatusEvent *e;
 
-					while (_listener->ReleaseRequested((event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED))) != true) {
-						DispatchResourceStatusEvent(event);
+					while (_listener->ReleaseRequested((e = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED))) != true) {
+						DispatchResourceStatusEvent(e);
 
 						// _sem.Wait(&_resource_mutex);
 
 						jthread::Thread::Sleep(1);
 					}
 				} else {
-					ResourceStatusEvent *event;
+					ResourceStatusEvent *e;
 					int64_t fixed = 100*1000LL;
 					int64_t count = fixed;
 
-					while ((request = _listener->ReleaseRequested((event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED)))) != true) {
-						DispatchResourceStatusEvent(event);
+					while ((request = _listener->ReleaseRequested((e = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED)))) != true) {
+						DispatchResourceStatusEvent(e);
 
 						// _resource_mutex.Unlock();
 
@@ -92,7 +92,9 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int64_t tim
 						count = count + fixed;
 
 						if (count > timeout) {
-							request = _listener->ReleaseRequested((event = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED)));
+							request = _listener->ReleaseRequested((e = new ResourceStatusEvent(this, JRS_RELEASE_REQUESTED)));
+
+							delete e;
 
 							break;
 						}
@@ -105,11 +107,11 @@ void Resource::Reserve(ResourceStatusListener *listener, bool force, int64_t tim
 			}
 		}
 
-		ResourceStatusEvent *event = new ResourceStatusEvent(this, JRS_RELEASED);
+		ResourceStatusEvent *e = new ResourceStatusEvent(this, JRS_RELEASED);
 
-		_listener->Released(event);
+		_listener->Released(e);
 					
-		DispatchResourceStatusEvent(event);
+		DispatchResourceStatusEvent(e);
 	}
 
 	_listener = listener;

@@ -67,15 +67,15 @@ class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, publi
 		std::vector<jcalendar_warnning_t> _warnning_days;
 		std::vector<Button *> _buttons;
 
-		Label *ldom,
-			  *lseg,
-			  *lter,
-			  *lqua,
-			  *lqui,
-			  *lsex,
-			  *lsab;
-		Spin *year,
-			 *month;
+		Label *_ldom,
+			  *_lseg,
+			  *_lter,
+			  *_lqua,
+			  *_lqui,
+			  *_lsex,
+			  *_lsab;
+		Spin *_syear,
+			 *_smonth;
 
 		std::string _text;
 		int delta,
