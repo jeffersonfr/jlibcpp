@@ -66,22 +66,7 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 	_address = InetAddress4::GetByName("127.0.0.1");
 
 	CreateSocket();
-
-#ifdef _WIN32
-	if (port_ == 0) {
-		for (int i=1024; i<65535; i++) {
-			try {
-				BindSocket(NULL, i);
-			
-				break;
-			} catch(SocketException &) {
-			}
-		}
-	} else
-#else
-		BindSocket(NULL, port_);
-#endif
-
+	BindSocket(NULL, port_);
 	InitStream(rbuf_, wbuf_);
 
 	_sent_bytes = 0;

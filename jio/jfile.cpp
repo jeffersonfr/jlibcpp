@@ -55,6 +55,10 @@ File::File(std::string filename_, int flags_):
 		opt |= GENERIC_READ;
 	}
 	
+	if ((flags_ & JFF_WRITE_ONLY) != 0) {
+		opt |= GENERIC_WRITE;
+	}
+	
 	if ((flags_ & JFF_READ_WRITE) != 0) {
 		opt |= GENERIC_READ | GENERIC_WRITE;
 	}
@@ -76,11 +80,17 @@ File::File(std::string filename_, int flags_):
 	}
 	*/
 	
-	if ((flags_ & JFF_CREATE) == 0) {
-		_fd = CreateFileA(filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
-	} else {
-		_fd = CreateFileA(filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	DWORD flags = OPEN_EXISTING;
+
+	if ((flags_ & JFF_CREATE) != 0) {
+		flags = CREATE_ALWAYS;
+		
+		if ((flags_ & JFF_EXCLUSIVE) != 0) {
+			flags = CREATE_NEW;
+		}
 	}
+
+	_fd = CreateFileA(filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, flags, FILE_ATTRIBUTE_NORMAL, 0);
 	
 	if (_fd != INVALID_HANDLE_VALUE) {
 		/*
@@ -717,7 +727,11 @@ int64_t File::Read(char *data_, int64_t length_)
 	int64_t r;
 	
 #ifdef _WIN32
+	DWORD n;
+
 	ReadFile(_fd, data_, (DWORD)length_, (DWORD *)&r, 0);
+
+	r = (int64_t)n;
 #else
 	r = (int64_t)read(_fd, data_, (size_t)length_);
 #endif
@@ -734,7 +748,11 @@ int64_t File::Write(const char *data_, int64_t length_)
 	int64_t r;
 	
 #ifdef _WIN32
-	  WriteFile(_fd, data_, (DWORD)length_, (DWORD *)&r, 0);
+	DWORD n;
+
+	WriteFile(_fd, data_, (DWORD)length_, (DWORD *)&n, 0);
+
+	r = (int64_t)n;
 #else
 		r = (int64_t)write(_fd, data_, (size_t)length_);
 #endif

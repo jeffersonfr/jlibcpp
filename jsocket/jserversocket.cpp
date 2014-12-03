@@ -37,15 +37,10 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
 
 	CreateSocket();
 
-	if (port_ != 0) {
-		BindSocket(addr_, port_);
-		ListenSocket(backlog_);
-	} else {
-#ifdef _WIN32
- 		BindSocket(addr_, port_);
-#endif
-		ListenSocket(backlog_);
-		
+	BindSocket(addr_, port_);
+	ListenSocket(backlog_);
+
+	if (port_ == 0) {
 #ifdef _WIN32
 		int len;
 #else

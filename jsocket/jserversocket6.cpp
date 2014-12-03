@@ -39,13 +39,18 @@ ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress *addr_):
 
 	CreateSocket();
 
-	if (port_ != 0) {
-		BindSocket(addr_, port_);
-		ListenSocket(backlog_);
+	BindSocket(addr_, port_);
+	ListenSocket(backlog_);
+
+	if (port_ == 0) {
 	} else {
-		socklen_t len = sizeof(_lsock);
-		
-		ListenSocket(backlog_);
+#ifdef _WIN32
+		int len;
+#else
+		socklen_t len;
+#endif
+
+		len = sizeof(_lsock);
 
 		if(getsockname(_fd, (struct sockaddr *)&_lsock, &len) < 0) {
 			throw jio::IOException("ServerSocket constructor exception");
