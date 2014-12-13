@@ -20,7 +20,7 @@
 #ifndef J_STREAMHANDLER_H
 #define J_STREAMHANDLER_H
 
-#include "jhandler.h"
+#include "jloggerhandler.h"
 #include "jmutex.h"
 
 namespace jlogger {
@@ -30,7 +30,7 @@ namespace jlogger {
  *
  * \author Jeff Ferr
 */
-class StreamHandler : public jlogger::Handler{
+class StreamHandler : public jlogger::LoggerHandler{
 
 	protected:
 		jthread::Mutex _mutex;

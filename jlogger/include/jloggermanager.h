@@ -21,7 +21,6 @@
 #define J_LOGGERMANAGER_H
 
 #include "jlogger.h"
-#include "jobject.h"
 
 #include <vector>
 
@@ -65,7 +64,7 @@ class LoggerManager : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual Logger * CreateLogger(Handler *handler_ = NULL, Formatter *format_ = NULL, Logger *group_ = NULL);
+		virtual Logger * CreateLogger(LoggerHandler *handler_ = NULL, Formatter *format_ = NULL, Logger *group_ = NULL);
 
 		/**
 		 * \brief

@@ -160,20 +160,20 @@ OBJS_jio += \
 	   jiolib.o\
 
 OBJS_jlogger += \
-	   jhandler.o\
-	   jsockethandler.o\
-	   jstreamhandler.o\
 	   jconsolehandler.o\
-	   jmemoryhandler.o\
 	   jfilehandler.o\
 	   jformatter.o\
-	   jsimpleformatter.o\
-	   jxmlformatter.o\
 	   jlogger.o\
 	   jloggerexception.o\
+	   jloggerhandler.o\
+	   jloggerlib.o
 	   jloggermanager.o\
 	   jlogrecord.o\
-	   jloggerlib.o
+	   jmemoryhandler.o\
+	   jsockethandler.o\
+	   jstreamhandler.o\
+	   jsimpleformatter.o\
+	   jxmlformatter.o\
 
 OBJS_jshared += \
 	   jqueueexception.o\

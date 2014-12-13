@@ -21,7 +21,7 @@
 #define J_LOGGERLOGGER_H
 
 #include "jlogrecord.h"
-#include "jhandler.h"
+#include "jloggerhandler.h"
 #include "jformatter.h"
 
 #include "jobject.h"
@@ -47,7 +47,7 @@ class Logger : public virtual jcommon::Object{
 		/** \brief */
 		std::vector<Logger *> _loggers;
 		/** \brief */
-		Handler *_handler;
+		LoggerHandler *_handler;
 		/** \brief */
 		Formatter *_format;
 		/** \brief */
@@ -57,7 +57,7 @@ class Logger : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		Logger(Handler *handler_ = NULL, Formatter *format_ = NULL);
+		Logger(LoggerHandler *handler_ = NULL, Formatter *format_ = NULL);
 
 		/**
 		 * \brief
@@ -99,7 +99,7 @@ class Logger : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual void SetHandler(Handler *handler_);
+		virtual void SetHandler(LoggerHandler *handler_);
 
 		/**
 		 * \brief

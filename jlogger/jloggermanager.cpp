@@ -45,9 +45,9 @@ LoggerManager * LoggerManager::GetInstance()
 	return _manager;
 }
  
-Logger * LoggerManager::CreateLogger(Handler *handler_, Formatter *format_, Logger *group_)
+Logger * LoggerManager::CreateLogger(LoggerHandler *handler_, Formatter *format_, Logger *group_)
 {
-	Handler *h;
+	LoggerHandler *h;
 	Formatter *f;
     
 	h = handler_;

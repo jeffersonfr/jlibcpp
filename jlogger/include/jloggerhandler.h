@@ -30,7 +30,7 @@ namespace jlogger {
  * 
  * \author Jeff Ferr
 */
-class Handler : public virtual jcommon::Object{
+class LoggerHandler : public virtual jcommon::Object{
 
 	private:
 		
@@ -38,12 +38,12 @@ class Handler : public virtual jcommon::Object{
 		/**
 		 * \brief
 		 */
-		Handler();
+		LoggerHandler();
 
 		/**
 		 * \brief
 		 */
-		virtual ~Handler();
+		virtual ~LoggerHandler();
 
 		/**
 		 * \brief

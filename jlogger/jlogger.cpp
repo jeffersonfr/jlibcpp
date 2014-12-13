@@ -22,7 +22,7 @@
 
 namespace jlogger {
 
-Logger::Logger(Handler *handler_, Formatter *format_):
+Logger::Logger(LoggerHandler *handler_, Formatter *format_):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jlogger::Logger");
@@ -126,7 +126,7 @@ void Logger::SetOutput(int mask_)
 	_mask = (jrecord_type_t)mask_;
 }
 
-void Logger::SetHandler(Handler *handler_)
+void Logger::SetHandler(LoggerHandler *handler_)
 {
 	if (handler_ != NULL) {
 		if (_handler != NULL) {

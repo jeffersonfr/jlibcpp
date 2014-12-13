@@ -47,20 +47,22 @@ File::File(std::string filename_, int flags_):
 	// _filename.remove(c); remove the last slash from url
 	
 #ifdef _WIN32
-	int opt = 0;
+	int access = 0;
+	int disposition = 0;
+	int attributes = 0;
 
 	_fd = INVALID_HANDLE_VALUE;
 
 	if ((flags_ & JFF_READ_ONLY) != 0) {
-		opt |= GENERIC_READ;
+		access |= GENERIC_READ;
 	}
 	
 	if ((flags_ & JFF_WRITE_ONLY) != 0) {
-		opt |= GENERIC_WRITE;
+		access |= GENERIC_WRITE;
 	}
 	
 	if ((flags_ & JFF_READ_WRITE) != 0) {
-		opt |= GENERIC_READ | GENERIC_WRITE;
+		access |= GENERIC_READ | GENERIC_WRITE;
 	}
 
 	// TODO:: 
@@ -79,18 +81,35 @@ File::File(std::string filename_, int flags_):
 		throw new IOException(Environment::LastErrorMessage());
 	}
 	*/
-	
-	DWORD flags = OPEN_EXISTING;
+
+	disposition = OPEN_EXISTING;
 
 	if ((flags_ & JFF_CREATE) != 0) {
-		flags = CREATE_ALWAYS;
-		
+		disposition = CREATE_ALWAYS;
+
 		if ((flags_ & JFF_EXCLUSIVE) != 0) {
-			flags = CREATE_NEW;
+			disposition = CREATE_NEW;
 		}
 	}
 
-	_fd = CreateFileA(filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, flags, FILE_ATTRIBUTE_NORMAL, 0);
+	if ((flags_ & JFF_TRUNCATE) != 0) {
+		disposition = TRUNCATE_EXISTING;
+	}
+
+	attributes = FILE_ATTRIBUTE_NORMAL;
+
+	if ((flags_ & JFF_ASYNC) != 0) {
+		attributes = attributes | FILE_FLAG_OVERLAPPED;
+	}
+
+	// _fd = CreateFileA(filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, flags, FILE_ATTRIBUTE_NORMAL, 0);
+	_fd = CreateFile(filename_.c_str(),
+                      access,
+                      FILE_SHARE_READ | FILE_SHARE_WRITE,
+                      NULL,
+                      disposition,
+                      attributes,
+                      NULL);
 	
 	if (_fd != INVALID_HANDLE_VALUE) {
 		/*
@@ -114,63 +133,61 @@ File::File(std::string filename_, int flags_):
 #else
 	_dir = NULL;
 
-	int opt = flags_;
+	int opt = 0;
 
-	flags_ = 0;
-
-	if ((opt & JFF_WRITE_ONLY) != 0) {
-		flags_ |= O_WRONLY;
+	if ((flags_ & JFF_WRITE_ONLY) != 0) {
+		 opt |= O_WRONLY;
 	}
 
-	if ((opt & JFF_READ_ONLY) != 0) {
-		flags_ |= O_RDONLY;
+	if ((flags_ & JFF_READ_ONLY) != 0) {
+		opt |= O_RDONLY;
 	}
 	
-	if ((opt & JFF_READ_WRITE) != 0) {
-		flags_ |= O_RDWR;
+	if ((flags_ & JFF_READ_WRITE) != 0) {
+		opt |= O_RDWR;
 	}
 	
-	if ((opt & JFF_EXCLUSIVE) != 0) {
-		flags_ |= O_EXCL;
+	if ((flags_ & JFF_EXCLUSIVE) != 0) {
+		opt |= O_EXCL;
 	}
 	
-	if ((opt & JFF_TRUNCATE) != 0) {
-		flags_ |= O_TRUNC;
+	if ((flags_ & JFF_TRUNCATE) != 0) {
+		opt |= O_TRUNC;
 	}
 	
-	if ((opt & JFF_APPEND) != 0) {
-		flags_ |= O_APPEND;
+	if ((flags_ & JFF_APPEND) != 0) {
+		opt |= O_APPEND;
 	}
 	
-	if ((opt & JFF_NON_BLOCK) != 0) {
-		flags_ |= O_NONBLOCK;
+	if ((flags_ & JFF_NON_BLOCK) != 0) {
+		opt |= O_NONBLOCK;
 	}
 	
-	if ((opt & JFF_SYNC) != 0) {
-		flags_ |= O_SYNC;
+	if ((flags_ & JFF_SYNC) != 0) {
+		opt |= O_SYNC;
 	}
 	
-	if ((opt & JFF_NON_FOLLOW) != 0) {
-		flags_ |= O_NOFOLLOW;
+	if ((flags_ & JFF_NON_FOLLOW) != 0) {
+		opt |= O_NOFOLLOW;
 	}
 	
-	if ((opt & JFF_DIR) != 0) {
-		flags_ |= O_DIRECTORY;
+	if ((flags_ & JFF_DIR) != 0) {
+		opt |= O_DIRECTORY;
 	}
 	
-	if ((opt & JFF_ASYNC) != 0) {
-		flags_ |= O_ASYNC;
+	if ((flags_ & JFF_ASYNC) != 0) {
+		opt |= O_ASYNC;
 	}
 	
-	if ((opt & JFF_LARGEFILE) != 0) {
-		flags_ |= O_LARGEFILE;
+	if ((flags_ & JFF_LARGEFILE) != 0) {
+		opt |= O_LARGEFILE;
 	}
 	
-	if ((opt & JFF_CREATE) != 0) {
-		flags_ |= O_CREAT;
+	if ((flags_ & JFF_CREATE) != 0) {
+		opt |= O_CREAT;
 	}
 
-	_fd = open(filename_.c_str(), flags_, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH);
+	_fd = open(filename_.c_str(), opt, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH);
 
 	if (_fd > 0) {
 		_is_closed = false;

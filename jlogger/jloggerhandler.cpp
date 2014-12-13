@@ -18,17 +18,17 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jhandler.h"
+#include "jloggerhandler.h"
 
 namespace jlogger {
 
-Handler::Handler():
+LoggerHandler::LoggerHandler():
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jlogger::Handler");
+	jcommon::Object::SetClassName("jlogger::LoggerHandler");
 }
 
-Handler::~Handler()
+LoggerHandler::~LoggerHandler()
 {
 }
 
