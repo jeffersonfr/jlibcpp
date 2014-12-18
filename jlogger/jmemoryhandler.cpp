@@ -23,7 +23,7 @@
 namespace jlogger {
 
 MemoryHandler::MemoryHandler():
-	jlogger::Handler()
+	jlogger::LoggerHandler()
 {
 	jcommon::Object::SetClassName("jlogger::MemoryHandler");
 }

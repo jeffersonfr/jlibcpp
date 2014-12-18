@@ -20,7 +20,7 @@
 #ifndef J_LOGGERMEMORYHANDLER_H
 #define J_LOGGERMEMORYHANDLER_H
 
-#include "jhandler.h"
+#include "jloggerhandler.h"
 
 namespace jlogger {
 
@@ -29,7 +29,7 @@ namespace jlogger {
  *
  * \author Jeff Ferr
 */
-class MemoryHandler : public jlogger::Handler {
+class MemoryHandler : public jlogger::LoggerHandler {
 
 	private:
 	
