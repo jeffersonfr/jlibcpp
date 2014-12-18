@@ -166,7 +166,7 @@ OBJS_jlogger += \
 	   jlogger.o\
 	   jloggerexception.o\
 	   jloggerhandler.o\
-	   jloggerlib.o
+	   jloggerlib.o\
 	   jloggermanager.o\
 	   jlogrecord.o\
 	   jmemoryhandler.o\
