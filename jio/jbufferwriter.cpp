@@ -91,7 +91,7 @@ void BufferWriter::WriteRaw(uint8_t *data, int size)
 	
 	WriteInteger(size);
 
-	_buffer.sputn((char *)data,size);
+	_buffer.sputn((char *)data, size);
 }
 
 void BufferWriter::Reset() 

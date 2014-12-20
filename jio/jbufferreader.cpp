@@ -24,21 +24,32 @@
 
 namespace jio {
 
-BufferReader::BufferReader(char *data, int size) 
+BufferReader::BufferReader(uint8_t *data, int size) 
 {
 	jcommon::Object::SetClassName("jio::BufferReader");
 
-	_buffer.sputn(data, size);
+	_buffer.sputn((char *)data, size);
 }
 
 BufferReader::~BufferReader() 
 {
 }
 
+void BufferReader::Reset()
+{
+	_buffer.pubseekpos(0);
+}
+
+void BufferReader::AppendBuffer(uint8_t *data, int size)
+{
+	_buffer.sputn((char *)data, size);
+}
+
 bool BufferReader::ReadBoolean() 
 {
 	int value = ReadByte();
-	return value == 1;
+
+	return (value == 1);
 }
 
 uint8_t BufferReader::ReadByte()
@@ -79,7 +90,7 @@ uint64_t BufferReader::ReadLong()
 
 float BufferReader::ReadFloat() 
 {
-	float value = 0.0;
+	float value = 0.0f;
 
 	_buffer.sgetn((char *)&value, sizeof (value));
 
@@ -130,11 +141,6 @@ uint8_t * BufferReader::ReadRaw(int *size)
 	(*size) = sz;
 
 	return data;
-}
-
-void BufferReader::Reset()
-{
-	_buffer.pubseekpos(0);
 }
 
 }

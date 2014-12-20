@@ -37,13 +37,25 @@ class BufferReader : public virtual jcommon::Object{
 		 * \brief Contructor.
 		 *
 		 */
-		BufferReader(char *data, int size);
+		BufferReader(uint8_t *data, int size);
 
 		/**
 		 * \brief Destructor.
 		 *
 		 */
 		virtual ~BufferReader();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Reset();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void AppendBuffer(uint8_t *data, int size);
 
 		/**
 		 * \brief
@@ -98,12 +110,6 @@ class BufferReader : public virtual jcommon::Object{
 		 *
 		 */
 		virtual uint8_t * ReadRaw(int *size);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Reset();
 
 };
 
