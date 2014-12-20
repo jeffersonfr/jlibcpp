@@ -18,120 +18,85 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jdatainputstream.h"
-#include "jioexception.h"
+#include "jbufferwriter.h"
+
+#include <iostream>
 
 namespace jio {
 
-DataInputStream::DataInputStream(InputStream *is):
-	Object()
+BufferWriter::BufferWriter() 
 {
-	jcommon::Object::SetClassName("jio::DataInputStream");
-		
-	if ((void *)is == NULL) {
-		throw IOException("Null pointer exception");
+	jcommon::Object::SetClassName("jio::BufferWriter");
+
+	_buffer.str("");
+}
+
+BufferWriter::~BufferWriter() 
+{
+	_buffer.str("");
+}
+
+std::string BufferWriter::GetData() 
+{
+	return _buffer.str();
+}
+
+void BufferWriter::WriteBoolean(bool value) 
+{
+	WriteByte((value == false)?0:1);
+}
+
+void BufferWriter::WriteByte(uint8_t value) 
+{
+	_buffer.sputn((char *)&value,sizeof(char));
+}
+
+void BufferWriter::WriteShort(uint16_t value) 
+{
+	_buffer.sputn((char *)&value,sizeof(value));
+}
+
+void BufferWriter::WriteInteger(uint32_t value) 
+{
+	_buffer.sputn((char *)&value,sizeof(value));
+}
+
+void BufferWriter::WriteLong(uint64_t value) 
+{
+	_buffer.sputn((char *)&value,sizeof(value));
+}
+
+void BufferWriter::WriteFloat(float value) 
+{
+	_buffer.sputn((char *)&value,sizeof(value));
+}
+
+void BufferWriter::WriteDouble(double value) 
+{
+	_buffer.sputn((char *)&value,sizeof(value));
+}
+
+void BufferWriter::WriteString(std::string value) 
+{
+	WriteInteger(value.length());
+
+	_buffer.sputn(value.c_str(), value.length());
+}
+
+void BufferWriter::WriteRaw(uint8_t *data, int size) 
+{
+	if (data == NULL || size <= 0) {
+		WriteInteger(0);
 	}
+	
+	WriteInteger(size);
 
-	stream = is;
+	_buffer.sputn((char *)data,size);
 }
 
-DataInputStream::~DataInputStream()
+void BufferWriter::Reset() 
 {
-}
-
-bool DataInputStream::IsEmpty()
-{
-	return Available() == 0;
-}
-
-int64_t DataInputStream::Available()
-{
-	return stream->Available();
-}
-
-int64_t DataInputStream::GetSize()
-{
-	if (stream != NULL) {
-		stream->GetSize();
-	}
-
-	return 0LL;
-}
-
-int64_t DataInputStream::GetPosition()
-{
-	if (stream != NULL) {
-		stream->GetPosition();
-	}
-
-	return 0LL;
-}
-
-int DataInputStream::Read(uint8_t *data)
-{
-	if (stream != NULL) {
-		return stream->Read((char *)data, sizeof(uint8_t));
-	}
-
-	return -1;
-}
-
-int DataInputStream::Read(uint16_t *data)
-{
-	if (stream != NULL) {
-		return stream->Read((char *)data, sizeof(uint16_t));
-	}
-
-	return -1;
-}
-
-int DataInputStream::Read(uint32_t *data)
-{
-	if (stream != NULL) {
-		return stream->Read((char *)data, sizeof(uint32_t));
-	}
-
-	return -1;
-}
-
-int DataInputStream::Read(uint64_t *data)
-{
-	if (stream != NULL) {
-		return stream->Read((char *)data, sizeof(uint64_t));
-	}
-
-	return -1;
-}
-
-void DataInputStream::Skip(int64_t skip)
-{
-	if (stream != NULL) {
-		stream->Skip(skip);
-	}
-}
-
-void DataInputStream::Reset()
-{
-	if (stream != NULL) {
-		stream->Reset();
-	}
-}
-
-void DataInputStream::Close()
-{
-	if (stream != NULL) {
-		stream->Close();
-	}
-}
-
-int64_t DataInputStream::GetReadedBytes()
-{
-	if (stream != NULL) {
-		return stream->GetReadedBytes();
-	}
-
-	return 0LL;
+	_buffer.str("");
 }
 
 }
-

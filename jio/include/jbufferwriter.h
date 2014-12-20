@@ -17,139 +17,104 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PARAMMAPPER_H
-#define J_PARAMMAPPER_H
+#ifndef J_BUFFERWRITER_H
+#define	J_BUFFERWRITER_H
 
 #include "jobject.h"
 
+#include <sstream>
 #include <string>
-#include <map>
 
-#include <stdint.h>
+namespace jio {
 
-namespace jcommon {
-
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class ParamMapper : public virtual jcommon::Object{
+class BufferWriter : public virtual jcommon::Object{
 
 	private:
-		std::map<std::string, std::string> _params;
+		/** \brief */
+		std::stringbuf _buffer;
 
 	public:
 		/**
-		 * \Constructor.
+		 * \brief
 		 *
 		 */
-		ParamMapper();
-
-		/**
-		 * \brief Destructor.
-		 *
-		 */
-		virtual ~ParamMapper();
+		BufferWriter();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual std::map<std::string, std::string> & GetParameters();
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual std::string GetTextParam(std::string key, std::string value = "");
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual bool GetBooleanParam(std::string key, bool value = false);
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual int64_t GetIntegerParam(std::string key, int64_t value = 0LL);
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual double GetDecimalParam(std::string key, double value = 0.0);
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual std::string GetArrayParam(std::string key, std::string value = "");
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetTextParam(std::string key, std::string value);
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetBooleanParam(std::string key, bool value);
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetIntegerParam(std::string key, int64_t value);
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetDecimalParam(std::string key, double value);
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetArrayParam(std::string key, uint8_t *value, uint64_t value_size);
+		virtual ~BufferWriter();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void RemoveParamByID(std::string id);
+		std::string GetData();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void RemoveParamByIndex(int index);
+		void WriteBoolean(bool value);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual Object * Clone();
-		
+		void WriteByte(uint8_t value);
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool Equals(Object *);
-		
+		void WriteShort(uint16_t value);
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Copy(Object *o);
+		void WriteInteger(uint32_t value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteLong(uint64_t value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteFloat(float value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteDouble(double value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteString(std::string value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteRaw(uint8_t *data, int size);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void Reset();
 
 };
 
 }
 
 #endif
+

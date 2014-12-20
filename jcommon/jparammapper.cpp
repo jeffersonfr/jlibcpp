@@ -104,6 +104,15 @@ double ParamMapper::GetDecimalParam(std::string key, double value)
 	return value;
 }
 
+std::string ParamMapper::GetArrayParam(std::string key, std::string value)
+{
+	if (_params.find(key) != _params.end()) {
+		return _params[key];
+	}
+
+	return value;
+}
+
 void ParamMapper::SetTextParam(std::string key, std::string value)
 {
 	_params[key] = value;
@@ -136,6 +145,15 @@ void ParamMapper::SetDecimalParam(std::string key, double value)
 	snprintf(str, 32, "%.2f", value);
 
 	_params[key] = str;
+}
+
+void ParamMapper::SetArrayParam(std::string key, uint8_t *value, uint64_t value_size)
+{
+	if (value == NULL || value_size == 0) {
+		return;
+	}
+
+	_params[key] = std::string((const char *)value, value_size);
 }
 
 void ParamMapper::RemoveParamByID(std::string id)

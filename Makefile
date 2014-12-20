@@ -137,6 +137,8 @@ OBJS_jresource += \
 OBJS_jio += \
 	   jbitinputstream.o\
 	   jbitoutputstream.o\
+	   jbufferreader.o\
+	   jbufferwriter.o\
 	   jfile.o\
 	   jfileexception.o\
 	   jfileinputstream.o\

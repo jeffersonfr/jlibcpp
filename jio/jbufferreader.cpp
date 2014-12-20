@@ -18,119 +18,123 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jdatainputstream.h"
-#include "jioexception.h"
+#include "jbufferreader.h"
+
+#include <stdlib.h>
 
 namespace jio {
 
-DataInputStream::DataInputStream(InputStream *is):
-	Object()
+BufferReader::BufferReader(char *data, int size) 
 {
-	jcommon::Object::SetClassName("jio::DataInputStream");
-		
-	if ((void *)is == NULL) {
-		throw IOException("Null pointer exception");
+	jcommon::Object::SetClassName("jio::BufferReader");
+
+	_buffer.sputn(data, size);
+}
+
+BufferReader::~BufferReader() 
+{
+}
+
+bool BufferReader::ReadBoolean() 
+{
+	int value = ReadByte();
+	return value == 1;
+}
+
+uint8_t BufferReader::ReadByte()
+{
+	uint8_t value = 0;
+	
+	_buffer.sgetn((char *)&value, sizeof(value));
+
+	return value;
+}
+
+uint16_t BufferReader::ReadShort() 
+{
+	uint16_t value = 0;
+
+	_buffer.sgetn((char *)&value, sizeof (value));
+
+	return value;
+}
+
+uint32_t BufferReader::ReadInteger() 
+{
+	uint32_t value = 0;
+
+	_buffer.sgetn((char *)&value, sizeof (value));
+
+	return value;
+}
+
+uint64_t BufferReader::ReadLong() 
+{
+	uint64_t value = 0;
+
+	_buffer.sgetn((char *)&value, sizeof (value));
+
+	return value;
+}
+
+float BufferReader::ReadFloat() 
+{
+	float value = 0.0;
+
+	_buffer.sgetn((char *)&value, sizeof (value));
+
+	return value;
+}
+
+double BufferReader::ReadDouble() 
+{
+	double value = 0.0;
+
+	_buffer.sgetn((char *)&value, sizeof (value));
+
+	return value;
+}
+
+std::string BufferReader::ReadString() 
+{
+	int size = ReadInteger();
+
+	if (size == -1){
+		return "";
 	}
 
-	stream = is;
+	char *psz_str = new char[size + 1];
+
+	_buffer.sgetn(psz_str, size+1);
+
+	std::string str = psz_str;
+
+	delete [] psz_str;
+
+	return str;
 }
 
-DataInputStream::~DataInputStream()
+uint8_t * BufferReader::ReadRaw(int *size) 
 {
-}
+	uint32_t sz = ReadInteger();
 
-bool DataInputStream::IsEmpty()
-{
-	return Available() == 0;
-}
-
-int64_t DataInputStream::Available()
-{
-	return stream->Available();
-}
-
-int64_t DataInputStream::GetSize()
-{
-	if (stream != NULL) {
-		stream->GetSize();
+	if (sz <= 0) {
+		(*size) = 0;
+		return NULL;
 	}
 
-	return 0LL;
+	uint8_t *data = new uint8_t[sz];
+
+	_buffer.sgetn((char *)data, sz);
+
+	(*size) = sz;
+
+	return data;
 }
 
-int64_t DataInputStream::GetPosition()
+void BufferReader::Reset()
 {
-	if (stream != NULL) {
-		stream->GetPosition();
-	}
-
-	return 0LL;
-}
-
-int DataInputStream::Read(uint8_t *data)
-{
-	if (stream != NULL) {
-		return stream->Read((char *)data, sizeof(uint8_t));
-	}
-
-	return -1;
-}
-
-int DataInputStream::Read(uint16_t *data)
-{
-	if (stream != NULL) {
-		return stream->Read((char *)data, sizeof(uint16_t));
-	}
-
-	return -1;
-}
-
-int DataInputStream::Read(uint32_t *data)
-{
-	if (stream != NULL) {
-		return stream->Read((char *)data, sizeof(uint32_t));
-	}
-
-	return -1;
-}
-
-int DataInputStream::Read(uint64_t *data)
-{
-	if (stream != NULL) {
-		return stream->Read((char *)data, sizeof(uint64_t));
-	}
-
-	return -1;
-}
-
-void DataInputStream::Skip(int64_t skip)
-{
-	if (stream != NULL) {
-		stream->Skip(skip);
-	}
-}
-
-void DataInputStream::Reset()
-{
-	if (stream != NULL) {
-		stream->Reset();
-	}
-}
-
-void DataInputStream::Close()
-{
-	if (stream != NULL) {
-		stream->Close();
-	}
-}
-
-int64_t DataInputStream::GetReadedBytes()
-{
-	if (stream != NULL) {
-		return stream->GetReadedBytes();
-	}
-
-	return 0LL;
+	_buffer.pubseekpos(0);
 }
 
 }
