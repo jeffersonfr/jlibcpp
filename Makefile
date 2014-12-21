@@ -91,9 +91,10 @@ OBJS_jcommon += \
 	   jpolicies.o\
 	   jregexp.o\
 	   jruntimeexception.o\
+	   jstringbuffer.o\
 	   jstringtokenizer.o\
-	   jsystem.o\
 	   jstringutils.o\
+	   jsystem.o\
 	   jtimeoutexception.o\
 	   jtypes.o\
 	   jurl.o\
