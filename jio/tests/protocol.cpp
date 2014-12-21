@@ -56,13 +56,21 @@ class Server : public jthread::Thread {
 			if (buffer_size > 0) {
 				jio::BufferReader reader((uint8_t *)buffer, buffer_size);
 
-				std::cout << "Server:: Receive:: "
-					<< "[" << (const char *)reader.ReadRaw(&buffer_size) << "]" 
-					<< "[" << reader.ReadInteger() << "]"
-					<< "[" << reader.ReadString() << "]"
-					<< "[" << reader.ReadFloat() <<  "]"
-					<< "[" << reader.ReadBoolean() << "]"
+				bool boolean = reader.ReadBoolean();
+				float decimal = reader.ReadFloat();
+				std::string str = reader.ReadString();
+				int integer = reader.ReadInteger();
+				uint8_t *raw = reader.ReadRaw(&buffer_size);
+
+				std::cout << "Client:: Receive:: "
+					<< "[" << (const char *)raw << "]" 
+					"[" << integer << "]"
+					"[" << str << "]"
+					"[" << decimal <<  "]"
+					"[" << boolean << "]"
 					<<  std::endl;
+
+				delete [] raw;
 
 				jio::BufferWriter writer;
 
@@ -113,13 +121,21 @@ class Client : public jthread::Thread {
 			if (buffer_size > 0) {
 				jio::BufferReader reader((uint8_t *)buffer, buffer_size);
 				
+				bool boolean = reader.ReadBoolean();
+				float decimal = reader.ReadFloat();
+				std::string str = reader.ReadString();
+				int integer = reader.ReadInteger();
+				uint8_t *raw = reader.ReadRaw(&buffer_size);
+
 				std::cout << "Client:: Receive:: "
-					<< "[" << (const char *)reader.ReadRaw(&buffer_size) << "]" 
-					"[" << reader.ReadInteger() << "]"
-					"[" << reader.ReadString() << "]"
-					"[" << reader.ReadFloat() <<  "]"
-					"[" << reader.ReadBoolean() << "]"
+					<< "[" << (const char *)raw << "]" 
+					"[" << integer << "]"
+					"[" << str << "]"
+					"[" << decimal <<  "]"
+					"[" << boolean << "]"
 					<<  std::endl;
+
+				delete [] raw;
 			}
 		}
 

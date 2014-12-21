@@ -147,6 +147,24 @@ class StringBuffer : public virtual jcommon::Object{
 			return _buffer.sputn((char *)out, count);
 		}
 
+		/**
+		 * \brief 
+		 *
+		 */
+		void Clear()
+		{
+			return _buffer.str("");
+		}
+
+		/**
+		 * \brief 
+		 *
+		 */
+		void Reset()
+		{
+			_buffer.pubseekpos(0);
+		}
+
 };
 
 }
