@@ -45,7 +45,10 @@ OBJS_calc_unit = \
 OBJS_access = \
 	   access.o\
 
-all: teste exceptions xml_teste xml_agenda regexp jsondump gcteste unit calc_unit access
+OBJS_buffer = \
+	   buffer.o\
+
+all: teste exceptions xml_teste xml_agenda regexp jsondump gcteste unit calc_unit access buffer
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -80,6 +83,9 @@ calc_unit: $(OBJS_calc_unit)
 access: $(OBJS_access)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+buffer: $(OBJS_buffer)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -87,4 +93,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste exceptions xml_teste xml_agenda myfile_teste.xml regexp jsondump gcteste pointer unit calc_unit access
+	@rm -rvf *.o *.xml *~ teste exceptions xml_teste xml_agenda myfile_teste.xml regexp jsondump gcteste pointer unit calc_unit access buffer
