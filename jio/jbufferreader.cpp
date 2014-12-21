@@ -28,97 +28,94 @@ BufferReader::BufferReader(uint8_t *data, int size)
 {
 	jcommon::Object::SetClassName("jio::BufferReader");
 
-	_buffer.sputn((char *)data, size);
+	_buffer.Put(data, size);
 }
 
 BufferReader::~BufferReader() 
 {
 }
 
-void BufferReader::Reset()
-{
-	_buffer.pubseekpos(0);
-}
-
 void BufferReader::AppendBuffer(uint8_t *data, int size)
 {
-	_buffer.sputn((char *)data, size);
+	_buffer.Put(data, size);
 }
 
 bool BufferReader::ReadBoolean() 
 {
-	int value = ReadByte();
+	bool byte;
 
-	return (value == 1);
+	_buffer.Get(&byte);
+
+	return byte;
 }
 
 uint8_t BufferReader::ReadByte()
 {
-	uint8_t value = 0;
-	
-	_buffer.sgetn((char *)&value, sizeof(value));
+	bool byte;
 
-	return value;
+	_buffer.Get(&byte);
+
+	return byte;
 }
 
 uint16_t BufferReader::ReadShort() 
 {
-	uint16_t value = 0;
+	uint16_t n;
 
-	_buffer.sgetn((char *)&value, sizeof (value));
+	_buffer.Get(&n);
 
-	return value;
+	return n;
 }
 
 uint32_t BufferReader::ReadInteger() 
 {
-	uint32_t value = 0;
+	uint32_t n;
 
-	_buffer.sgetn((char *)&value, sizeof (value));
+	_buffer.Get(&n);
 
-	return value;
+	return n;
 }
 
 uint64_t BufferReader::ReadLong() 
 {
-	uint64_t value = 0;
+	uint64_t n;
 
-	_buffer.sgetn((char *)&value, sizeof (value));
+	_buffer.Get(&n);
 
-	return value;
+	return n;
 }
 
 float BufferReader::ReadFloat() 
 {
-	float value = 0.0f;
+	float n;
 
-	_buffer.sgetn((char *)&value, sizeof (value));
+	_buffer.Get(&n);
 
-	return value;
+	return n;
 }
 
 double BufferReader::ReadDouble() 
 {
-	double value = 0.0;
+	double n;
 
-	_buffer.sgetn((char *)&value, sizeof (value));
+	_buffer.Get(&n);
 
-	return value;
+	return n;
 }
 
 std::string BufferReader::ReadString() 
 {
-	int size = ReadInteger();
+	uint32_t sz = ReadInteger();
 
-	if (size == -1){
+	if (sz <= 0){
 		return "";
 	}
 
-	char *psz_str = new char[size + 1];
+	char *psz_str = new char[sz];
 
-	_buffer.sgetn(psz_str, size+1);
+	_buffer.Get((uint8_t *)psz_str, sz);
 
-	std::string str = psz_str;
+	std::string str = std::string(psz_str, sz);
 
 	delete [] psz_str;
 
@@ -136,11 +133,16 @@ uint8_t * BufferReader::ReadRaw(int *size)
 
 	uint8_t *data = new uint8_t[sz];
 
-	_buffer.sgetn((char *)data, sz);
+	_buffer.Get(data, sz);
 
 	(*size) = sz;
 
 	return data;
+}
+
+void BufferReader::Reset()
+{
+	_buffer.Reset();
 }
 
 }

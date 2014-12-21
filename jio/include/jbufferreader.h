@@ -20,7 +20,7 @@
 #ifndef BUFFERREADER_H
 #define	BUFFERREADER_H
 
-#include "jobject.h"
+#include "jstringbuffer.h"
 
 #include <sstream>
 
@@ -30,7 +30,7 @@ class BufferReader : public virtual jcommon::Object{
 
 	private:
 		/** \brief */
-		std::stringbuf _buffer;
+		jcommon::StringBuffer _buffer;
 
 	public:
 		/**
@@ -44,12 +44,6 @@ class BufferReader : public virtual jcommon::Object{
 		 *
 		 */
 		virtual ~BufferReader();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Reset();
 
 		/**
 		 * \brief
@@ -110,6 +104,12 @@ class BufferReader : public virtual jcommon::Object{
 		 *
 		 */
 		virtual uint8_t * ReadRaw(int *size);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Reset();
 
 };
 

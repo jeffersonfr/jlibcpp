@@ -27,76 +27,81 @@ namespace jio {
 BufferWriter::BufferWriter() 
 {
 	jcommon::Object::SetClassName("jio::BufferWriter");
-
-	_buffer.str("");
 }
 
 BufferWriter::~BufferWriter() 
 {
-	_buffer.str("");
 }
 
 std::string BufferWriter::GetData() 
 {
-	return _buffer.str();
+	return _buffer.GetString();
 }
 
 void BufferWriter::WriteBoolean(bool value) 
 {
-	WriteByte((value == false)?0:1);
+	_buffer.Put(&value);
 }
 
 void BufferWriter::WriteByte(uint8_t value) 
 {
-	_buffer.sputn((char *)&value,sizeof(char));
+	_buffer.Put(&value);
 }
 
 void BufferWriter::WriteShort(uint16_t value) 
 {
-	_buffer.sputn((char *)&value,sizeof(value));
+	_buffer.Put(&value);
 }
 
 void BufferWriter::WriteInteger(uint32_t value) 
 {
-	_buffer.sputn((char *)&value,sizeof(value));
+	_buffer.Put(&value);
 }
 
 void BufferWriter::WriteLong(uint64_t value) 
 {
-	_buffer.sputn((char *)&value,sizeof(value));
+	_buffer.Put(&value);
 }
 
 void BufferWriter::WriteFloat(float value) 
 {
-	_buffer.sputn((char *)&value,sizeof(value));
+	_buffer.Put(&value);
 }
 
 void BufferWriter::WriteDouble(double value) 
 {
-	_buffer.sputn((char *)&value,sizeof(value));
+	_buffer.Put(&value);
 }
 
 void BufferWriter::WriteString(std::string value) 
 {
+	if (value.empty() == true || value.size() == 0) {
+		WriteInteger(0);
+
+		return;
+	}
+
 	WriteInteger(value.length());
 
-	_buffer.sputn(value.c_str(), value.length());
+	_buffer.Put((uint8_t *)value.c_str(), value.length());
 }
 
 void BufferWriter::WriteRaw(uint8_t *data, int size) 
 {
 	if (data == NULL || size <= 0) {
 		WriteInteger(0);
+
+		return;
 	}
 	
 	WriteInteger(size);
 
-	_buffer.sputn((char *)data, size);
+	_buffer.Put(data, size);
 }
 
 void BufferWriter::Reset() 
 {
-	_buffer.str("");
+	_buffer.Clear();
 }
 
 }

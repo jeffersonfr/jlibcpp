@@ -20,7 +20,7 @@
 #ifndef J_BUFFERWRITER_H
 #define	J_BUFFERWRITER_H
 
-#include "jobject.h"
+#include "jstringbuffer.h"
 
 #include <sstream>
 #include <string>
@@ -31,7 +31,7 @@ class BufferWriter : public virtual jcommon::Object{
 
 	private:
 		/** \brief */
-		std::stringbuf _buffer;
+		jcommon::StringBuffer _buffer;
 
 	public:
 		/**
