@@ -22,6 +22,7 @@
 
 #include "jobject.h"
 
+#include <stdio.h>
 #include <string>
 #include <sstream>
 
@@ -73,12 +74,45 @@ class StringBuffer : public virtual jcommon::Object{
 		}
 
 		/**
+		 * \brief
+		 * 
+		 */
+		virtual bool IsEmpty()
+		{
+			return (GetAvailable() == 0);
+		}
+
+		/**
 		 * \brief 
 		 *
 		 */
 		int64_t GetAvailable()
 		{
 			return (int64_t)_buffer.in_avail();
+		}
+
+		/**
+		 * \brief 
+		 *
+		 */
+		int64_t GetPosition()
+		{
+			return (int64_t)_buffer.pubseekoff(0, std::ios_base::cur, std::ios_base::in);
+		}
+
+		/**
+		 * \brief 
+		 *
+		 */
+		int64_t GetSize()
+		{
+			std::streampos i = _buffer.pubseekoff(0, std::ios_base::cur, std::ios_base::in);
+			std::streampos j = _buffer.pubseekoff(0, std::ios_base::end, std::ios_base::in);
+
+			_buffer.pubseekpos(i, std::ios_base::in);
+
+printf("------->> %d, %d\n", i, j);
+			return j;
 		}
 
 		/**
