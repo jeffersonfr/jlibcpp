@@ -60,7 +60,7 @@ int64_t Channel::GetSize()
 	return 0;
 }
 
-int64_t Channel::Write(char *b, int64_t size, int64_t offset)
+int64_t Channel::Write(const char *data, int64_t size, int64_t offset)
 {
 	return 0;
 }

@@ -24,7 +24,12 @@
 
 namespace jio {
 
-BufferReader::BufferReader(uint8_t *data, int size) 
+BufferReader::BufferReader() 
+{
+	jcommon::Object::SetClassName("jio::BufferReader");
+}
+
+BufferReader::BufferReader(char *data, int64_t size) 
 {
 	jcommon::Object::SetClassName("jio::BufferReader");
 
@@ -35,7 +40,7 @@ BufferReader::~BufferReader()
 {
 }
 
-void BufferReader::AppendBuffer(uint8_t *data, int size)
+void BufferReader::PushData(char *data, int64_t size)
 {
 	_buffer.Put(data, size);
 }
@@ -113,7 +118,7 @@ std::string BufferReader::ReadString()
 
 	char *psz_str = new char[sz];
 
-	_buffer.Get((uint8_t *)psz_str, sz);
+	_buffer.Get(psz_str, sz);
 
 	std::string str = std::string(psz_str, sz);
 
@@ -122,7 +127,7 @@ std::string BufferReader::ReadString()
 	return str;
 }
 
-uint8_t * BufferReader::ReadRaw(int *size) 
+char * BufferReader::ReadRaw(int64_t *size) 
 {
 	uint32_t sz = ReadInteger();
 
@@ -131,7 +136,7 @@ uint8_t * BufferReader::ReadRaw(int *size)
 		return NULL;
 	}
 
-	uint8_t *data = new uint8_t[sz];
+	char *data = new char[sz];
 
 	_buffer.Get(data, sz);
 

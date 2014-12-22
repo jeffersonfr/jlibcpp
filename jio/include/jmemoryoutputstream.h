@@ -35,7 +35,7 @@ class MemoryOutputStream : public jio::OutputStream{
 
 	private:
 		/** \brief */
-		uint8_t*_buffer;
+		char *_buffer;
 		/** \brief */
 		int64_t _buffer_size;
 		/** \brief */
@@ -46,7 +46,7 @@ class MemoryOutputStream : public jio::OutputStream{
 		 * \brief
 		 * 
 		 */
-		MemoryOutputStream(uint8_t *data, uint64_t size);
+		MemoryOutputStream(const char *data, int64_t size);
 		
 		/**
 		 * \brief
@@ -76,7 +76,7 @@ class MemoryOutputStream : public jio::OutputStream{
 		 * \brief
 		 * 
 		 */
-		virtual int64_t Write(char *data, int64_t size);
+		virtual int64_t Write(const char *data, int64_t size);
     
 		/**
 		 * \brief

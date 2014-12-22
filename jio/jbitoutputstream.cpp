@@ -83,7 +83,7 @@ int64_t BitOutputStream::Write(int b)
 	return stream->Write(b);
 }
 
-int64_t BitOutputStream::Write(char *b, int64_t size)
+int64_t BitOutputStream::Write(const char *b, int64_t size)
 {
 	return stream->Write(b, size);
 }

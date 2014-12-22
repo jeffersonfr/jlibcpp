@@ -32,7 +32,7 @@ DataOutputStream::DataOutputStream(OutputStream *os):
 		throw IOException("Null pointer exception");
 	}
 
-	stream = os;
+	_stream = os;
 }
 
 DataOutputStream::~DataOutputStream()
@@ -46,53 +46,86 @@ bool DataOutputStream::IsEmpty()
 
 int64_t DataOutputStream::Available()
 {
-	if (stream != NULL) {
-		return stream->Available();
+	if (_stream != NULL) {
+		return _stream->Available();
 	}
 
 	return 0LL;
 }
 
-int64_t DataOutputStream::Write(uint8_t data)
+int64_t DataOutputStream::GetSize()
 {
-	if (stream != NULL) {
-		return stream->Write((const char *)&data, sizeof(uint8_t));
-	}
-
-	return -1LL;
+	return _stream->GetSize();
 }
 
-int64_t DataOutputStream::Write(uint16_t data)
+int64_t DataOutputStream::Write(int64_t b)
 {
-	if (stream != NULL) {
-		return stream->Write((const char *)&data, sizeof(uint16_t));
-	}
-
-	return -1LL;
+	return _stream->Write(b);
 }
 
-int64_t DataOutputStream::Write(uint32_t data)
+int64_t DataOutputStream::Write(const char *data, int64_t size)
 {
-	if (stream != NULL) {
-		return stream->Write((const char *)&data, sizeof(uint32_t));
-	}
-
-	return -1LL;
+	return _stream->Write(data, size);
 }
 
-int64_t DataOutputStream::Write(uint64_t data)
+void DataOutputStream::WriteBoolean(bool value)
 {
-	if (stream != NULL) {
-		return stream->Write((const char *)&data, sizeof(uint64_t));
-	}
+	BufferWriter::WriteBoolean(value);
+}
 
-	return -1LL;
+void DataOutputStream::WriteByte(uint8_t value)
+{
+	BufferWriter::WriteByte(value);
+}
+
+void DataOutputStream::WriteShort(uint16_t value)
+{
+	BufferWriter::WriteShort(value);
+}
+
+void DataOutputStream::WriteInteger(uint32_t value)
+{
+	BufferWriter::WriteInteger(value);
+}
+
+void DataOutputStream::WriteLong(uint64_t value)
+{
+	BufferWriter::WriteLong(value);
+}
+
+void DataOutputStream::WriteFloat(float value)
+{
+	BufferWriter::WriteFloat(value);
+}
+
+void DataOutputStream::WriteDouble(double value)
+{
+	BufferWriter::WriteDouble(value);
+}
+
+void DataOutputStream::WriteString(std::string value)
+{
+	BufferWriter::WriteString(value);
+}
+
+void DataOutputStream::WriteRaw(const char *data, int64_t size)
+{
+	BufferWriter::WriteRaw(data, size);
+}
+
+void DataOutputStream::Seek(int64_t index)
+{
+	_stream->Seek(index);
 }
 
 int64_t DataOutputStream::Flush()
 {
-	if (stream != NULL) {
-		return stream->Flush();
+	if (_stream != NULL) {
+		std::string data = GetData();
+
+		Write(data.c_str(), data.size());
+
+		return _stream->Flush();
 	}
 
 	return 0LL;
@@ -100,15 +133,15 @@ int64_t DataOutputStream::Flush()
 
 void DataOutputStream::Close()
 {
-	if (stream != NULL) {
-		stream->Close();
+	if (_stream != NULL) {
+		_stream->Close();
 	}
 }
 
 int64_t DataOutputStream::GetSentBytes()
 {
-	if (stream != NULL) {
-		stream->GetSentBytes();
+	if (_stream != NULL) {
+		_stream->GetSentBytes();
 	}
 
 	return 0LL;

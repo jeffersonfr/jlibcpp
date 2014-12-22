@@ -95,7 +95,7 @@ class OutputStream : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual int64_t Write(const char *, int64_t size) = 0;
+		virtual int64_t Write(const char *data, int64_t size) = 0;
     
 		/**
 		 * \brief

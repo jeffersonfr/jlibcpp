@@ -104,7 +104,7 @@ Image * Image::CreateImage(uint32_t *data, int width, int height, int scale_widt
 	return image;
 }
 
-Image * Image::CreateImage(uint8_t *data, int size)
+Image * Image::CreateImage(char *data, int size)
 {
 	jio::MemoryInputStream input(data, size);
 

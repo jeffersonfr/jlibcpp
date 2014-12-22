@@ -49,18 +49,18 @@ class Server : public jthread::Thread {
 			jsocket::Socket *socket = server.Accept();
 
 			char buffer[4096];
-			int buffer_size;
+			int64_t buffer_size;
 
 			buffer_size = socket->Receive(buffer, 4096);
 
 			if (buffer_size > 0) {
-				jio::BufferReader reader((uint8_t *)buffer, buffer_size);
+				jio::BufferReader reader(buffer, buffer_size);
 
 				bool boolean = reader.ReadBoolean();
 				float decimal = reader.ReadFloat();
 				std::string str = reader.ReadString();
 				int integer = reader.ReadInteger();
-				uint8_t *raw = reader.ReadRaw(&buffer_size);
+				char *raw = reader.ReadRaw(&buffer_size);
 
 				std::cout << "Client:: Receive:: "
 					<< "[" << (const char *)raw << "]" 
@@ -78,7 +78,7 @@ class Server : public jthread::Thread {
 				writer.WriteFloat(20.0);
 				writer.WriteString("testando 1 2 3 ...");
 				writer.WriteInteger(30);
-				writer.WriteRaw((uint8_t *)"Jeff Ferr", 9+1);
+				writer.WriteRaw("Jeff Ferr", 9+1);
 			
 				socket->Send(writer.GetData().c_str(), writer.GetData().size());
 			}
@@ -109,23 +109,23 @@ class Client : public jthread::Thread {
 			writer.WriteFloat(2.0);
 			writer.WriteString("testando 1 2 3 ...");
 			writer.WriteInteger(3);
-			writer.WriteRaw((uint8_t *)"Ferr Jeff", 9+1);
+			writer.WriteRaw("Ferr Jeff", 9+1);
 
 			socket.Send(writer.GetData().c_str(), writer.GetData().size());
 
 			char buffer[4096];
-			int buffer_size;
+			int64_t buffer_size;
 
 			buffer_size = socket.Receive(buffer, 4096);
 
 			if (buffer_size > 0) {
-				jio::BufferReader reader((uint8_t *)buffer, buffer_size);
+				jio::BufferReader reader(buffer, buffer_size);
 				
 				bool boolean = reader.ReadBoolean();
 				float decimal = reader.ReadFloat();
 				std::string str = reader.ReadString();
 				int integer = reader.ReadInteger();
-				uint8_t *raw = reader.ReadRaw(&buffer_size);
+				char *raw = reader.ReadRaw(&buffer_size);
 
 				std::cout << "Client:: Receive:: "
 					<< "[" << (const char *)raw << "]" 

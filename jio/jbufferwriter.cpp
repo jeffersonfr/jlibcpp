@@ -35,7 +35,7 @@ BufferWriter::~BufferWriter()
 
 std::string BufferWriter::GetData() 
 {
-	return _buffer.GetString();
+	return _buffer.what();
 }
 
 void BufferWriter::WriteBoolean(bool value) 
@@ -83,10 +83,10 @@ void BufferWriter::WriteString(std::string value)
 
 	WriteInteger(value.length());
 
-	_buffer.Put((uint8_t *)value.c_str(), value.length());
+	_buffer.Put((char *)value.c_str(), value.length());
 }
 
-void BufferWriter::WriteRaw(uint8_t *data, int size) 
+void BufferWriter::WriteRaw(const char *data, int64_t size) 
 {
 	if (data == NULL || size <= 0) {
 		WriteInteger(0);

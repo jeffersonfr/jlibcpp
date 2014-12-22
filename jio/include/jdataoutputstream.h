@@ -21,6 +21,7 @@
 #define J_DATAOUTPUTSTREAM_H
 
 #include "joutputstream.h"
+#include "jbufferwriter.h"
 
 namespace jio {
 
@@ -29,10 +30,11 @@ namespace jio {
  * 
  * \author Jeff Ferr
  */
-class DataOutputStream : public virtual jcommon::Object{
+class DataOutputStream : public jio::OutputStream, jio::BufferWriter{
 
 	private:
-		jio::OutputStream *stream;
+		jio::OutputStream *_stream;
+		jio::BufferWriter _buffer;
 		
 	public:
 		/**
@@ -63,25 +65,79 @@ class DataOutputStream : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual int64_t Write(uint8_t data);
+		virtual int64_t GetSize();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual int64_t Write(uint16_t data);
+		virtual int64_t Write(int64_t b);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual int64_t Write(uint32_t data);
+		virtual int64_t Write(const char *, int64_t size);
+    
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteBoolean(bool value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteByte(uint8_t value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteShort(uint16_t value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteInteger(uint32_t value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteLong(uint64_t value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteFloat(float value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteDouble(double value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteString(std::string value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void WriteRaw(const char *data, int64_t size);
 
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual int64_t Write(uint64_t data);
+		virtual void Seek(int64_t index);
 
 		/**
 		 * \brief

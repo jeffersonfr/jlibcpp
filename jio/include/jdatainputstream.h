@@ -21,7 +21,7 @@
 #define J_DATAINPUTSTREAM_H
 
 #include "jinputstream.h"
-#include "jfile.h"
+#include "jbufferreader.h"
 
 namespace jio {
 
@@ -30,11 +30,14 @@ namespace jio {
  * 
  * \author Jeff Ferr
  */
-class DataInputStream : public virtual jcommon::Object{
+class DataInputStream : public jio::InputStream, public jio::BufferReader{
 
 	private:
-		InputStream *stream;
+		InputStream *_stream;
 		
+	protected:
+		virtual void VerifyData();
+
 	public:
 		/**
 		 * \brief
@@ -76,25 +79,73 @@ class DataInputStream : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual int Read(uint8_t *data);
+		virtual int64_t Read();
 
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual int Read(uint16_t *data);
-
+		virtual int64_t Read(char *data, int64_t size);
+    
 		/**
 		 * \brief
 		 * 
 		 */
-		virtual int Read(uint32_t *data);
+		virtual std::string Read(int64_t size);
+    
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool ReadBoolean();
 
 		/**
 		 * \brief
-		 * 
+		 *
 		 */
-		virtual int Read(uint64_t *data);
+		virtual uint8_t ReadByte();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual uint16_t ReadShort();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual uint32_t ReadInteger();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual uint64_t ReadLong();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual float ReadFloat();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual double ReadDouble();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string ReadString();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual char * ReadRaw(int64_t *size);
 
 		/**
 		 * \brief Salto relativo.
@@ -107,6 +158,12 @@ class DataInputStream : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void Reset();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsClosed();
 		
 		/**
 		 * \brief

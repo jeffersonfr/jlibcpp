@@ -104,7 +104,7 @@ class BufferWriter : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		void WriteRaw(uint8_t *data, int size);
+		void WriteRaw(const char *data, int64_t size);
 
 		/**
 		 * \brief

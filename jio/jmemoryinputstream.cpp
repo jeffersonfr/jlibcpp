@@ -23,7 +23,7 @@
 
 namespace jio {
 
-MemoryInputStream::MemoryInputStream(uint8_t *data, uint64_t size):
+MemoryInputStream::MemoryInputStream(const char *data, int64_t size):
 	jio::InputStream()
 {
 	jcommon::Object::SetClassName("jio::MemoryInputStream");
@@ -32,7 +32,7 @@ MemoryInputStream::MemoryInputStream(uint8_t *data, uint64_t size):
 		throw jcommon::RuntimeException("Null pointer exception");
 	}
 
-	_buffer = data;
+	_buffer = (char *)data;
 	_buffer_size = size;
 	_buffer_index = 0;
 }
@@ -84,7 +84,7 @@ int64_t MemoryInputStream::Read(char *data, int64_t size)
 		size = Available();
 	}
 
-	memcpy(data, (uint8_t *)(_buffer + _buffer_index), (uint32_t)size);
+	memcpy(data, _buffer + _buffer_index, (size_t)size);
 
 	_buffer_index = _buffer_index + size;
 

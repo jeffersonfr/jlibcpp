@@ -24,7 +24,7 @@
 
 namespace jio {
 
-MemoryOutputStream::MemoryOutputStream(uint8_t*data, uint64_t size):
+MemoryOutputStream::MemoryOutputStream(const char *data, int64_t size):
 	jio::OutputStream()
 {
 	jcommon::Object::SetClassName("jio::MemoryOutputStream");
@@ -33,7 +33,7 @@ MemoryOutputStream::MemoryOutputStream(uint8_t*data, uint64_t size):
 		throw jcommon::RuntimeException("Null pointer exception");
 	}
 
-	_buffer = data;
+	_buffer = (char *)data;
 	_buffer_size = size;
 	_buffer_index = 0;
 }
@@ -63,7 +63,7 @@ int64_t MemoryOutputStream::Write(int64_t b)
 	return 1LL;
 }
 
-int64_t MemoryOutputStream::Write(char *data, int64_t size)
+int64_t MemoryOutputStream::Write(const char *data, int64_t size)
 {
 	if (IsEmpty() == true) {
 		return 0LL;

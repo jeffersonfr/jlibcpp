@@ -22,50 +22,40 @@
 #include "jdatainputstream.h"
 #include "jdataoutputstream.h"
 
-using namespace std;
-using namespace jio;
+#include <iostream>
 
 int main() 
 {
-	FileOutputStream *fos = new FileOutputStream("/tmp/obj");
-	FileInputStream *fis = new FileInputStream("/tmp/obj");
-	DataOutputStream *oos = new DataOutputStream(fos);
-	DataInputStream *ois = new DataInputStream(fis);
-	char c;
-	short s;
-	int i;
-	long long l;
-	uint8_t uc;
-	uint16_t us;
-	uint32_t ui;
-	uint64_t ul;
+	jio::FileOutputStream *fos = new jio::FileOutputStream("/tmp/data.txt");
+	jio::DataOutputStream *dos = new jio::DataOutputStream(fos);
 	
+	dos->WriteBoolean(true);
+	dos->WriteInteger(3232);
+	dos->WriteString("Hello, world !");
+	dos->WriteFloat(3.141592654);
 
-	oos->Write((uint8_t)1);
-	oos->Write((uint16_t)1);
-	oos->Write((uint32_t)1);
-	oos->Write((uint64_t)1);
+	dos->Flush();
+	dos->Close();
 
-	oos->Flush();
-
-	ois->Read((uint8_t *)&c);
-	ois->Read((uint16_t *)&s);
-	ois->Read((uint32_t *)&i);
-	ois->Read((uint64_t *)&l);
-
-	ois->Reset();
-
-	ois->Read(&uc);
-	ois->Read(&us);
-	ois->Read(&ui);
-	ois->Read(&ul);
-
-	printf("char[%d], short[%d], int[%d], long[%lld]\n", c, s, i, l);
-	printf("uchar[%u], ushort[%u], uint[%u], ulong[%lu]\n", uc, us, ui, ul);
-
-	delete oos;
-	delete ois;
+	delete dos;
 	delete fos;
+
+	jio::FileInputStream *fis = new jio::FileInputStream("/tmp/data.txt");
+	jio::DataInputStream *dis = new jio::DataInputStream(fis);
+
+	std::string s;
+	bool b;
+	int i;
+	float f;
+
+	b = dis->ReadBoolean();
+	i = dis->ReadInteger();
+	s = dis->ReadString();
+	f = dis->ReadFloat();
+
+	std::cout << ":: " << b << ", " << i << ", " << s << ", " << f << std::endl;
+
+	delete dis;
 	delete fis;
 
 	return EXIT_SUCCESS;

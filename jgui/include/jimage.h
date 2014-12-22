@@ -122,7 +122,7 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static Image * CreateImage(uint8_t *data, int size);
+		static Image * CreateImage(char *data, int size);
 
 		/**
 		 * \brief

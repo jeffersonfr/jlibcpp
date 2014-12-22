@@ -48,7 +48,7 @@ int64_t PrintStream::Write(char c)
 	return Write((char *)&c, 1);
 }
 
-int64_t PrintStream::Write(char *data, int size)
+int64_t PrintStream::Write(const char *data, int64_t size)
 {
 	return _stream->Write(data, size);
 }

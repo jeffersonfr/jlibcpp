@@ -79,7 +79,7 @@ class BitOutputStream : public jio::OutputStream{
 		 * \brief
 		 * 
 		 */
-		virtual int64_t Write(char *, int64_t size);
+		virtual int64_t Write(const char *, int64_t size);
     
 		/**
 		 * \brief

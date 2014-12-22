@@ -91,7 +91,7 @@ class Channel : public virtual jcommon::Object{
 		 * \brief Writes a sequence of bytes to this channel from the given buffer.
 		 *
 		 */
-		virtual int64_t Write(char *b, int64_t size, int64_t offset = 0);
+		virtual int64_t Write(const char *b, int64_t size, int64_t offset = 0);
 
 		/**
 		 * \brief Transfers bytes into this channel's file from the given readable byte channel.

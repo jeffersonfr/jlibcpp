@@ -33,7 +33,7 @@ FileInputStream::FileInputStream(std::string filename_):
 		_flag = 0;
 		_file = new File(filename_);
 
-		_buffer = new uint8_t[4096];
+		_buffer = new char[4096];
 
 		_buffer_size = 0;
 		_buffer_index = 0;
@@ -53,7 +53,7 @@ FileInputStream::FileInputStream(File *file_):
 	_flag = 1;
 	_file = file_;
 
-	_buffer = new uint8_t[65535];
+	_buffer = new char[65535];
 
 	_buffer_size = 0;
 	_buffer_index = 0;

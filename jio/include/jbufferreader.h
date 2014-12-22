@@ -28,7 +28,7 @@ namespace jio {
 
 class BufferReader : public virtual jcommon::Object{
 
-	private:
+	protected:
 		/** \brief */
 		jcommon::StringBuffer _buffer;
 
@@ -37,7 +37,13 @@ class BufferReader : public virtual jcommon::Object{
 		 * \brief Contructor.
 		 *
 		 */
-		BufferReader(uint8_t *data, int size);
+		BufferReader();
+
+		/**
+		 * \brief Contructor.
+		 *
+		 */
+		BufferReader(char *data, int64_t size);
 
 		/**
 		 * \brief Destructor.
@@ -49,7 +55,7 @@ class BufferReader : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void AppendBuffer(uint8_t *data, int size);
+		virtual void PushData(char *data, int64_t size);
 
 		/**
 		 * \brief
@@ -103,7 +109,7 @@ class BufferReader : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual uint8_t * ReadRaw(int *size);
+		virtual char * ReadRaw(int64_t *size);
 
 		/**
 		 * \brief

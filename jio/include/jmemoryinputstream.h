@@ -35,7 +35,7 @@ class MemoryInputStream : public jio::InputStream{
 
 	private:
 		/** \brief */
-		uint8_t *_buffer;
+		char *_buffer;
 		/** \brief */
 		int64_t _buffer_size;
 		/** \brief */
@@ -46,7 +46,7 @@ class MemoryInputStream : public jio::InputStream{
 		 * \brief
 		 * 
 		 */
-		MemoryInputStream(uint8_t *data, uint64_t size);
+		MemoryInputStream(const char *data, int64_t size);
 		
 		/**
 		 * \brief

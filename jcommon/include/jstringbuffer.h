@@ -79,14 +79,14 @@ class StringBuffer : public virtual jcommon::Object{
 		 */
 		virtual bool IsEmpty()
 		{
-			return (GetAvailable() == 0);
+			return Available() == 0LL;
 		}
 
 		/**
 		 * \brief 
 		 *
 		 */
-		int64_t GetAvailable()
+		int64_t Available()
 		{
 			return (int64_t)_buffer.in_avail();
 		}
@@ -111,7 +111,6 @@ class StringBuffer : public virtual jcommon::Object{
 
 			_buffer.pubseekpos(i, std::ios_base::in);
 
-printf("------->> %d, %d\n", i, j);
 			return j;
 		}
 
@@ -119,16 +118,7 @@ printf("------->> %d, %d\n", i, j);
 		 * \brief 
 		 *
 		 */
-		std::string GetString()
-		{
-			return _buffer.str();
-		}
-
-		/**
-		 * \brief 
-		 *
-		 */
-		template<typename T> size_t Get(T *out)
+		template<typename T> int64_t Get(T *out)
 		{
 			union coercion { 
 				T value; 
@@ -137,7 +127,7 @@ printf("------->> %d, %d\n", i, j);
 
 			coercion c;
 
-			size_t s = _buffer.sgetn(c.data, sizeof(T));
+			int64_t s = (int64_t)_buffer.sgetn(c.data, sizeof(T));
 
 			(*out) = c.value;
 
@@ -149,7 +139,7 @@ printf("------->> %d, %d\n", i, j);
 		 * \brief 
 		 *
 		 */
-		template<typename T> size_t Put(T *in)
+		template<typename T> int64_t Put(T *in)
 		{	
 			union coercion { 
 				T value; 
@@ -160,25 +150,25 @@ printf("------->> %d, %d\n", i, j);
 
 			c.value = (*in);
 
-			return _buffer.sputn(c.data, sizeof(T));
+			return (int64_t)_buffer.sputn(c.data, sizeof(T));
 		}
 
 		/**
 		 * \brief 
 		 *
 		 */
-		size_t Get(uint8_t *out, size_t count)
+		int64_t Get(char *out, int64_t count)
 		{
-			return _buffer.sgetn((char *)out, count);
+			return (int64_t)_buffer.sgetn((char *)out, (size_t)count);
 		}
 
 		/**
 		 * \brief 
 		 *
 		 */
-		size_t Put(uint8_t *out, size_t count)
+		int64_t Put(const char *out, int64_t count)
 		{
-			return _buffer.sputn((char *)out, count);
+			return (int64_t)_buffer.sputn((char *)out, (size_t)count);
 		}
 
 		/**
@@ -197,6 +187,15 @@ printf("------->> %d, %d\n", i, j);
 		void Reset()
 		{
 			_buffer.pubseekpos(0);
+		}
+
+		/**
+		 * \brief 
+		 *
+		 */
+		std::string what()
+		{
+			return _buffer.str();
 		}
 
 };
