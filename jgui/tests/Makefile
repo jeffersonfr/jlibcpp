@@ -133,7 +133,10 @@ OBJS_paths = \
 OBJS_scroll = \
 		scroll.o\
 
-all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock events colorchooser paths scroll
+OBJS_hough = \
+		hough.o\
+
+all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock events colorchooser paths scroll hough
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -255,6 +258,9 @@ paths: $(OBJS_paths)
 scroll: $(OBJS_scroll)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+hough: $(OBJS_hough)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -262,4 +268,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp drawimage rotateimage sort noise kmeans som stock events colorchooser paths scroll
+	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp drawimage rotateimage sort noise kmeans som stock events colorchooser paths scroll hough
