@@ -111,6 +111,11 @@ void Thread::USleep(uint64_t time_)
 #endif
 }
 
+bool Thread::IsJoinable()
+{
+	return (_type == JTT_JOINABLE);
+}
+
 void Thread::SetCancelType(jthread_cancel_t type)
 {
 	_cancel = type;

@@ -216,6 +216,12 @@ class Thread : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual bool IsJoinable();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetCancelType(jthread_cancel_t type);
 
 		/**
