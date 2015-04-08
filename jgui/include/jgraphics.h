@@ -198,7 +198,7 @@ struct jinsets_t {
  * \brief
  *
  */
-struct jrect_t {
+struct jline_t {
 	int x0;
 	int y0;
 	int x1;

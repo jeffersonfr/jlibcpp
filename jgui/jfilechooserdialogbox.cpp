@@ -310,29 +310,5 @@ void FileChooserDialogBox::ItemSelected(jgui::SelectEvent *event)
 	}
 }
 
-bool FileChooserDialogBox::ProcessEvent(KeyEvent *event)
-{
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	jthread::AutoLock lock(&_mutex);
-
-	if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
-		if (_type == JFCT_OPEN_FILE_DIALOG) {
-			Release();
-			_last_key_code = jgui::JKS_BLUE; 
-		} else {
-			if (_file->GetText() != "") {
-				Release();
-
-				_last_key_code = jgui::JKS_BLUE; 
-			}
-		}
-	}
-
-	return true;
-}
-
 }
 

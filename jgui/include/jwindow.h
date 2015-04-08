@@ -25,6 +25,7 @@
 #include "jimage.h"
 #include "jthemelistener.h"
 #include "jmutex.h"
+#include "jcondition.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -44,7 +45,7 @@ class Graphics;
  *
  * \author Jeff Ferr
  */
-class Window : public jgui::Container, public jgui::ThemeListener{
+class Window : public jgui::Container{
 
 	friend class DFBInputManager;
 	friend class WindowManager;
@@ -57,13 +58,24 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 #endif
 		std::vector<WindowListener *> _window_listeners;
 		jthread::Mutex _window_mutex;
+		jthread::Condition _window_semaphore;
 		Graphics *_graphics;
 		int _opacity;
 		bool _is_undecorated;
 		jcursor_style_t _cursor;
 
 	protected:
+		/**
+		 * \brief
+		 *
+		 */
 		void InternalCreateWindow(void *params = NULL);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InternalRelease();
 
 	public:
 		/**
@@ -190,7 +202,7 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
-		virtual bool Show(bool modal = true);
+		virtual bool Show(bool modal = false);
 
 		/**
 		 * \brief
@@ -202,6 +214,12 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 * \brief
 		 *
 		 */
+		virtual void Release();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void PaintBackground(Graphics *g);
 
 		/**
@@ -209,12 +227,6 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 *
 		 */
 		virtual void Paint(Graphics *g);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ReleaseWindow();
 
 		/**
 		 * \brief
@@ -264,11 +276,6 @@ class Window : public jgui::Container, public jgui::ThemeListener{
 		 */
 		virtual std::vector<WindowListener *> & GetWindowListeners();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ThemeChanged(ThemeEvent *event);
 };
 
 }

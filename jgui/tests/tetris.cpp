@@ -101,50 +101,53 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 	public:
 		jgui::Graphics *goff;
 		jgui::Image *ii;
-		jgui::Font *largefont,
-			 *smallfont;
-		uint32_t blocks[7],
-				 textcolor1,
-				 textcolor2,
-				 barcolor,
-				 background;
-		bool ingame,
-			 showtitle;
+		jgui::Font *largefont;
+		jgui::Font *smallfont;
+		uint32_t blocks[7];
+		uint32_t textcolor1;
+		uint32_t textcolor2;
+		uint32_t barcolor;
+		uint32_t background;
+		bool ingame;
+		bool showtitle;
 		int screendata[X_BLOCKS][Y_BLOCKS];
-		int	xblocks,
-			yblocks,
-			blocksize,
-			width,
-			height,
-			maxcolors,
-			barwidth,
-			score,
-			emptyline,
-			objectx, 
-			objecty,
-			objectdx,
-			objecttype,
-			objectcolor,
-			objectrotation,
-			objectrotationd,
-			objectptr,
-			checkptr,
-			itemcount,
-			itemrotlen,
-			itemlen,
-			count,
-			maxcount,
-			curcount,
-			fast,
-			screendelay,
-			screencount;
+		int	xblocks;
+		int	yblocks;
+		int	blocksize;
+		int	width;
+		int	height;
+		int	maxcolors;
+		int	barwidth;
+		int	score;
+		int	emptyline;
+		int	objectx;
+		int	objecty;
+		int	objectdx;
+		int	objecttype;
+		int	objectcolor;
+		int	objectrotation;
+		int	objectrotationd;
+		int	objectptr;
+		int	checkptr;
+		int	itemcount;
+		int	itemrotlen;
+		int	itemlen;
+		int	count;
+		int	maxcount;
+		int	curcount;
+		int	fast;
+		int	screendelay;
+		int	screencount;
 		jgui::jregion_t d;
+		bool _running;
 
 	public:
 
 		Tetris():
 			jgui::Frame("Tetris", 0, 0, 1920, 1080)
 		{
+			_running = true;
+
 			smallfont = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 20);
 			largefont = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 28);
 
@@ -208,6 +211,9 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 
 		virtual ~Tetris()
 		{
+			_running = false;
+
+			WaitThread();
 		}
 
 		void init()
@@ -272,30 +278,41 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 			}
 		}
 
-		virtual bool ProcessEvent(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (event->GetType() == jgui::JKT_PRESSED) {
-				if (ingame) {
-					if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
-						objectdx = -1;
-					} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
-						objectdx = +1;
-					} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
-						objectrotationd = +1;
-					} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
-						fast = true;
-					} else if (event->GetSymbol() == jgui::JKS_ESCAPE) {
-						ingame = false;
-					}
-				} else {
-					if (event->GetSymbol() == jgui::JKS_S) {
-						ingame=true;
-						gameInit();
-					}
-				}
-			} else if (event->GetType() == jgui::JKT_RELEASED) {
-				fast = false;
+			if (jgui::Frame::KeyPressed(event) == true) {
+				return true;
 			}
+
+			if (ingame) {
+				if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
+					objectdx = -1;
+				} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
+					objectdx = +1;
+				} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
+					objectrotationd = +1;
+				} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
+					fast = true;
+				} else if (event->GetSymbol() == jgui::JKS_ESCAPE) {
+					ingame = false;
+				}
+			} else {
+				if (event->GetSymbol() == jgui::JKS_S) {
+					ingame=true;
+					gameInit();
+				}
+			}
+
+			return true;
+		}
+
+		virtual bool KeyReleased(jgui::KeyEvent *event)
+		{
+			if (jgui::Frame::KeyReleased(event) == true) {
+				return true;
+			}
+
+			fast = false;
 
 			return true;
 		}
@@ -572,7 +589,7 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 		{
 			uint64_t starttime;
 
-			while(true) {
+			while(_running) {
 				starttime = (jcommon::Date::CurrentTimeMillis()+10LL);
 
 				Repaint();
@@ -588,7 +605,7 @@ int main()
 	Tetris t;
 
 	t.init();
-	t.Show();
+	t.Show(true);
 
 	return 0;
 }

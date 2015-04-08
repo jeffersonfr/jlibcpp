@@ -78,23 +78,28 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 	DispatchWindowEvent(new WindowEvent(this, JWET_OPENED));
 
 	WindowManager::GetInstance()->Add(this);
+	
+	Theme *theme = ThemeManager::GetInstance()->GetTheme();
 
-	ThemeManager::GetInstance()->RegisterThemeListener(this);
+	theme->Update(this);
 }
 
 Window::~Window()
 {
-	ThemeManager::GetInstance()->RemoveThemeListener(this);
+	Release();
 
+	delete _graphics;
+	_graphics = NULL;
+}
+
+void Window::Release()
+{
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSING));
 
 	WindowManager::GetInstance()->Remove(this);
 
-	ReleaseWindow();
-
-	delete _graphics;
-	_graphics = NULL;
-
+	InternalRelease();
+	
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSED));
 }
 
@@ -120,7 +125,7 @@ void Window::SetNativeWindow(void *native)
 		return;
 	}
 
-	ReleaseWindow();
+	InternalRelease();
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 	_graphics->Lock();
@@ -712,6 +717,10 @@ bool Window::Show(bool modal)
 
 	Repaint();
 
+	if (modal == true) {
+		_window_semaphore.Wait();
+	}
+
 	return true;
 }
 
@@ -729,7 +738,7 @@ bool Window::Hide()
 	return true;
 }
 
-void Window::ReleaseWindow()
+void Window::InternalRelease()
 {
 	if (_graphics != NULL) {
 		_graphics->Lock();
@@ -844,22 +853,6 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 std::vector<WindowListener *> & Window::GetWindowListeners()
 {
 	return _window_listeners;
-}
-
-void Window::ThemeChanged(ThemeEvent *event)
-{
-	if (IsThemeEnabled() == false) {
-		return;
-	}
-
-	SetIgnoreRepaint(true);
-
-	Theme *theme = event->GetTheme();
-
-	theme->Update(this);
-	
-	SetIgnoreRepaint(false);
-	Repaint();
 }
 
 }

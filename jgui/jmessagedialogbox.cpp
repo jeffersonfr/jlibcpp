@@ -83,9 +83,9 @@ jvertical_align_t MessageDialogBox::GetVerticalAlign()
 
 void MessageDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 {
-		jthread::AutoLock lock(&_message_mutex);
+	jthread::AutoLock lock(&_message_mutex);
 
-		Release();
+	Release();
 }
 
 }

@@ -97,7 +97,7 @@ int main(int argc, char **argv)
 {
 	Main main("Reseting graphic engine on the fly", 100, 100, 900, 800);
 
-	main.Show(false);
+	main.Show();
 
 	sleep(4);
 

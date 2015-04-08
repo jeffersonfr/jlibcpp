@@ -111,53 +111,10 @@ jvertical_align_t CheckButton::GetVerticalAlign()
 	return _valign;
 }
 		
-bool CheckButton::ProcessEvent(MouseEvent *event)
+bool CheckButton::KeyPressed(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::KeyPressed(event) == true) {
 		return true;
-	}
-
-	bool catched = false;
-
-	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
-		catched = true;
-
-		int x1 = event->GetX(),
-				y1 = event->GetY(),
-				size = _size.height;
-
-		if (_size.height > _size.width) {
-			size = _size.width;
-		}
-
-		if ((x1 > 0 && x1 < (size)) && (y1 > 0 && y1 < (size))) {
-			if (_type == JCBT_CHECK) {
-				if (_checked == true) {
-					SetSelected(false);
-				} else {
-					SetSelected(true);
-				}
-			} else {
-				SetSelected(true);
-			}
-		}
-	}
-
-	return catched;
-}
-
-bool CheckButton::ProcessEvent(KeyEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	if (IsEnabled() == false) {
-		return false;
 	}
 
 	bool catched = false;
@@ -179,6 +136,66 @@ bool CheckButton::ProcessEvent(KeyEvent *event)
 	}
 
 	return catched;
+}
+
+bool CheckButton::MousePressed(MouseEvent *event)
+{
+	if (Component::MousePressed(event) == true) {
+		return true;
+	}
+
+	if (event->GetButton() == JMB_BUTTON1) {
+		int x1 = event->GetX(),
+				y1 = event->GetY(),
+				size = _size.height;
+
+		if (_size.height > _size.width) {
+			size = _size.width;
+		}
+
+		if ((x1 > 0 && x1 < (size)) && (y1 > 0 && y1 < (size))) {
+			if (_type == JCBT_CHECK) {
+				if (_checked == true) {
+					SetSelected(false);
+				} else {
+					SetSelected(true);
+				}
+			} else {
+				SetSelected(true);
+			}
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool CheckButton::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool CheckButton::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool CheckButton::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+
+	return false;
 }
 
 jcheckbox_type_t CheckButton::GetType()

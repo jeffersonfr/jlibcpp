@@ -51,27 +51,29 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 	private:
 		jgui::Image *off;
 		jgui::Graphics *goff;
-		int		player1score,
-					ballx,
-					bally,
-					batpos,
-					batdpos,
-					balldx, 
-					balldy,
-					dxval,
-					ballsleft,
-					count,
-					bricksperline;
-		bool	ingame,
-					showtitle;
-		bool	*showbrick;
+		int	player1score;
+		int	ballx;
+		int	bally;
+		int	batpos;
+		int	batdpos;
+		int	balldx ;
+		int	balldy;
+		int	dxval;
+		int	ballsleft;
+		int	count;
+		int	bricksperline;
+		bool ingame;
+		bool showtitle;
+		bool *showbrick;
+		bool _running;
 
 	public:
 		Breakout():
 			jgui::Frame("BreakOut", 100, 100, 720, 480)
 		{
 			SetUndecorated(true);
-			SetDefaultExitEnabled(false);
+
+			_running = true;
 
 			off = NULL;
 			goff = NULL;
@@ -98,6 +100,13 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 			GameInit();
 
 			Start();
+		}
+
+		virtual ~Breakout()
+		{
+			_running = false;
+
+			WaitThread();
 		}
 
 		void GameInit()
@@ -128,12 +137,10 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 				showbrick[i] = true;
 		}
 
-		virtual bool ProcessEvent(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (event->GetType() == jgui::JKT_RELEASED) {
-				batdpos = 0;
-
-				return false;
+			if (jgui::Frame::KeyPressed(event) == true) {
+				return true;
 			}
 
 			if (ingame) {
@@ -144,11 +151,6 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 				if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
 					batdpos = 3;
 				}
-
-				if (event->GetSymbol() == jgui::JKS_ESCAPE) {
-					ingame = false;
-				}
-
 			} else {
 				if (event->GetSymbol() == jgui::JKS_SPACE) {
 					ingame = true;
@@ -159,6 +161,19 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 
 			return true;
 		}
+
+		/*
+		virtual bool KeyReleased(jgui::KeyEvent *event)
+		{
+			if (jgui::Frame::KeyReleased(event) == true) {
+				return true;
+			}
+
+			batdpos = 0;
+
+			return true;
+		}
+		*/
 
 		virtual void Paint(jgui::Graphics *g)
 		{
@@ -415,7 +430,7 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 		{
 			uint64_t startTime = jcommon::Date::CurrentTimeMillis();
 				
-			while(true) {
+			while(_running) {
 				Repaint();
 				
 				// Delay depending on how far we are behind.
@@ -433,7 +448,7 @@ int main(int argc, char **argv)
 {
 	Breakout breakout;
 
-	breakout.Show();
+	breakout.Show(true);
 
 	return 0;
 }

@@ -132,7 +132,7 @@ class Cell : public virtual jcommon::Object{
  *
  * \author Jeff Ferr
  */
-class Table : public Component, public virtual jcommon::Object{
+class Table : public jgui::Component, public virtual jcommon::Object{
 
 	friend class Cell;
 
@@ -322,7 +322,31 @@ class Table : public Component, public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(KeyEvent *event);
+		virtual bool KeyPressed(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MousePressed(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseReleased(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseMoved(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseWheel(MouseEvent *event);
 		
 		/**
 		 * \brief

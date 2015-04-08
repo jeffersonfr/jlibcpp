@@ -21,6 +21,7 @@
 #define J_TEXTAREA_H
 
 #include "jtextcomponent.h"
+#include "jkeyboard.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -38,14 +39,23 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class TextArea : public jgui::TextComponent{
+class TextArea : public jgui::TextComponent, public jgui::KeyboardListener{
 
 	private:
+		/** \brief */
 		std::vector<std::string> _lines;
-		int _rows_gap,
-			_current_row;
-		bool _is_wrap,
-			_rows_string;
+		/** \brief */
+		Keyboard *_keyboard;
+		/** \brief */
+		bool _is_keyboard_enabled;
+		/** \brief */
+		int _rows_gap;
+		/** \brief */
+		int _current_row;
+		/** \brief */
+		int _rows_string;
+		/** \brief */
+		bool _is_wrap;
 
 		/**
 		 * \brief
@@ -78,6 +88,18 @@ class TextArea : public jgui::TextComponent{
 		 */
 		virtual ~TextArea();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetKeyboardEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsKeyboardEnabled();
+		
 		/**
 		 * \brief
 		 *
@@ -178,14 +200,37 @@ class TextArea : public jgui::TextComponent{
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(KeyEvent *event);
+		virtual bool KeyPressed(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MousePressed(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(MouseEvent *event);
+		virtual bool MouseReleased(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseMoved(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseWheel(MouseEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void KeyboardPressed(KeyEvent *event);
 };
 
 }

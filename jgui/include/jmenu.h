@@ -24,7 +24,6 @@
 #include "jimage.h"
 #include "jmouselistener.h"
 #include "jitemcomponent.h"
-#include "jthememanager.h"
 
 #include <string>
 #include <iostream>
@@ -48,14 +47,13 @@ enum jmenu_align_t {
  *
  * \author Jeff Ferr
  */
-class Menu : public KeyListener, public MouseListener, public jgui::ItemComponent, public jgui::ThemeListener{
+class Menu : public jgui::Frame, public jgui::ItemComponent{
 
 	private:
 		jthread::Mutex _menu_mutex;
 		jthread::Condition _menu_sem;
 
 		std::vector<Menu *> _menus;
-		jgui::Frame *_frame;
 		jgui::Image *_check;
 		jmenu_align_t _menu_align;
 		std::string _title;
@@ -69,31 +67,7 @@ class Menu : public KeyListener, public MouseListener, public jgui::ItemComponen
 		 * \brief
 		 *
 		 */
-		virtual void KeyPressed(KeyEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MousePressed(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseReleased(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseMoved(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseWheel(MouseEvent *event);
+		virtual bool KeyPressed(KeyEvent *event);
 
 	public:
 		/**
@@ -113,84 +87,6 @@ class Menu : public KeyListener, public MouseListener, public jgui::ItemComponen
 		 *
 		 */
 		virtual void SetTitle(std::string title);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBounds(int x, int y, int w, int h);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLocation(int x, int y);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Move(int x, int y);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t GetLocation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetX();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetY();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetHeight();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Show(bool modal = true);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Hide();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Release();
 		
 		/**
 		 * \brief
@@ -270,11 +166,6 @@ class Menu : public KeyListener, public MouseListener, public jgui::ItemComponen
 		 */
 		virtual void Paint(Graphics *g);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ThemeChanged(ThemeEvent *event);
 };
 
 }

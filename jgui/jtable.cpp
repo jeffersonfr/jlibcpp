@@ -440,18 +440,10 @@ int Table::GetRowSize(int index)
 	return _row_size[index];
 }
 
-bool Table::ProcessEvent(KeyEvent *event)
+bool Table::KeyPressed(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::KeyPressed(event) == true) {
 		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	if (_is_enabled == false) {
-		return false;
 	}
 
 	jkeyevent_symbol_t action = event->GetSymbol();
@@ -515,6 +507,42 @@ bool Table::ProcessEvent(KeyEvent *event)
 	}
 
 	return catched;
+}
+
+bool Table::MousePressed(MouseEvent *event)
+{
+	if (Component::MousePressed(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Table::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Table::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Table::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+
+	return false;
 }
 
 void Table::Paint(Graphics *g)

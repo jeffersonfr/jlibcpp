@@ -22,26 +22,28 @@
 class Main : public jgui::Frame, public jthread::Thread{
 
 	private:
-		jgui::Image *_image,
-			*_tiles;
-		double _tx,
-			_ty,
-			_tw,
-			_th,
-			_tc,
-			_has_bullet,
-			_bullet_x,
-			_bullet_y,
-			_bullet_angle,
-			_tile_w,
-			_tile_h,
-			_step,
-			_angle;
+		jgui::Image *_image;
+		jgui::Image *_tiles;
+		double _tx;
+		double _ty;
+		double _tw;
+		double _th;
+		double _tc;
+		double _has_bullet;
+		double _bullet_x;
+		double _bullet_y;
+		double _bullet_angle;
+		double _tile_w;
+		double _tile_h;
+		double _step;
+		double _angle;
+		bool _running;
 
 	public:
 		Main(int n, int p):
 			jgui::Frame("Rotate Image", 0, 0, 1, 1)
 		{
+			_running = true;
 			_tx = 200;
 			_ty = 200;
 			_tw = 60;
@@ -71,6 +73,10 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 		virtual ~Main()
 		{
+			_running = false;
+
+			WaitThread();
+
 			delete _image;
 			delete _tiles;
 		}
@@ -101,7 +107,7 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 		virtual void Run() 
 		{
-			while (true) {
+			while (_running) {
 				_tx = _tx + _step*cos(_angle);//+M_PI_2);
 				_ty = _ty - _step*sin(_angle);//+M_PI_2);
 
@@ -134,8 +140,12 @@ class Main : public jgui::Frame, public jthread::Thread{
 			}
 		}
 
-		virtual bool ProcessEvent(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
+			if (jgui::Frame::KeyPressed(event) == true) {
+				return true;
+			}
+
 			double angle_step = 0.1;
 
 			if (event->GetSymbol() == jgui::JKS_SPACE) {
@@ -179,7 +189,7 @@ int main(int argc, char **argv)
 	Main main(50, 100);
 
 	main.Start();
-	main.Show();
+	main.Show(true);
 
 	return 0;
 }

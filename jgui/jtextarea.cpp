@@ -35,12 +35,25 @@ TextArea::TextArea(int x, int y, int width, int height):
 	_rows_gap = 0;
 	_current_row = 0;
 	_is_wrap = true;
+	_is_keyboard_enabled = true;
+
+	_keyboard = NULL;
 
 	SetFocusable(true);
 }
 
 TextArea::~TextArea()
 {
+}
+
+void TextArea::SetKeyboardEnabled(bool b)
+{
+	_is_keyboard_enabled = b;
+}
+
+bool TextArea::IsKeyboardEnabled()
+{
+	return _is_keyboard_enabled;
 }
 
 int TextArea::GetRowsGap()
@@ -110,26 +123,13 @@ void TextArea::SetBounds(int x, int y, int w, int h)
 	TextComponent::SetBounds(x, y, w, h);
 }
 
-bool TextArea::ProcessEvent(MouseEvent *event)
+bool TextArea::KeyPressed(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::KeyPressed(event) == true) {
 		return true;
 	}
 
-	return false;
-}
-
-bool TextArea::ProcessEvent(KeyEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	if (IsEnabled() == false || IsEditable() == false) {
+	if (IsEditable() == false) {
 		return false;
 	}
 
@@ -297,6 +297,58 @@ bool TextArea::ProcessEvent(KeyEvent *event)
 	}
 
 	return catched;
+}
+
+
+bool TextArea::MousePressed(MouseEvent *event)
+{
+	if (Component::MousePressed(event) == true) {
+		return true;
+	}
+
+	if (_is_keyboard_enabled == true) {
+		if (_keyboard == NULL) {
+			_keyboard = new jgui::Keyboard(jgui::JKT_QWERTY, true);
+
+			_keyboard->RegisterKeyboardListener(this);
+		}
+
+		jgui::TextComponent *c = _keyboard->GetTextComponent();
+
+		c->SetText(GetText());
+		c->SetCaretPosition(GetCaretPosition());
+
+		_keyboard->Show();
+	}
+
+	return true;
+}
+
+bool TextArea::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+
+	return true;
+}
+
+bool TextArea::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+
+	return true;
+}
+
+bool TextArea::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+
+	return true;
 }
 
 void TextArea::IncrementLines(int lines)
@@ -631,6 +683,11 @@ jsize_t TextArea::GetScrollDimension()
 	}
 
 	return  size;
+}
+
+void TextArea::KeyboardPressed(KeyEvent *event)
+{
+	KeyPressed(event);
 }
 
 }

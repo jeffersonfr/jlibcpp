@@ -378,9 +378,9 @@ void MCalc::Process(std::string type)
 	}
 }
 
-bool MCalc::ProcessEvent(jgui::KeyEvent *event)
+bool MCalc::KeyPressed(jgui::KeyEvent *event)
 {
-	if (Frame::ProcessEvent(event) == true) {
+	if (Frame::KeyPressed(event) == true) {
 		return true;
 	}
 
@@ -600,7 +600,7 @@ int main()
 {
 	mcalc::MCalc app(100, 100);
 
-	app.Show();
+	app.Show(true);
 
 	return 0;
 }

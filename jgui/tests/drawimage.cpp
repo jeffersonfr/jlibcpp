@@ -796,12 +796,12 @@ class RawImageTest : public Picture {
 		{
 			jio::File file(FILENAME);
 
-			uint8_t *raw = new uint8_t[file.GetSize()];
+			char *raw = new char[file.GetSize()];
 			int64_t packet = 64*1024,
 							length,
 							count = 0;
 
-			while ((length = file.Read((char *)(raw+(int)count), packet)) > 0) {
+			while ((length = file.Read(raw+(int)count, packet)) > 0) {
 				count = count + length;
 			}
  
@@ -915,7 +915,7 @@ int main(int argc, char **argv)
 {
 	Main main;
 
-	main.Show();
+	main.Show(true);
 
 	return 0;
 }

@@ -19,36 +19,26 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jtree.h"
+#include "jthememanager.h"
 
 namespace jgui {
 
 Tree::Tree(int x, int y, int width, int visible_items):
-   	jgui::ItemComponent(x, y, width, 0)
+ 	Component(x, y, width, 0),
+ 	ItemComponent()
 {
 	jcommon::Object::SetClassName("jgui::Tree");
 
 	SetFocusable(true);
+
+	Theme *theme = ThemeManager::GetInstance()->GetTheme();
+
+	theme->Update(this);
 }
 
 Tree::~Tree() 
 {
 	jthread::AutoLock lock(&_tree_mutex);
-}
-
-void Tree::MousePressed(MouseEvent *event)
-{
-}
-
-void Tree::MouseReleased(MouseEvent *event)
-{
-}
-
-void Tree::MouseMoved(MouseEvent *event)
-{
-}
-
-void Tree::MouseWheel(MouseEvent *event)
-{
 }
 
 void Tree::SetTitle(std::string title)
@@ -82,19 +72,46 @@ void Tree::Paint(Graphics *g)
 	Component::Paint(g);
 }
 
-bool Tree::ProcessEvent(MouseEvent *event)
+bool Tree::KeyPressed(KeyEvent *event)
 {
-	return false;
-}
-
-bool Tree::ProcessEvent(KeyEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::KeyPressed(event) == true) {
 		return true;
 	}
 
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
+	return false;
+}
+
+bool Tree::MousePressed(MouseEvent *event)
+{
+	if (Component::MousePressed(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Tree::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Tree::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Tree::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
 	}
 
 	return false;

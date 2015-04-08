@@ -92,10 +92,12 @@ void Mines::Paint(jgui::Graphics *g)
 					g->DrawImage(small_bomb, _insets.left+i*(size+delta)+2, _insets.top+j*(size+delta)+2);
 				} else {
 					if (block.value != 0) {
-						char str[] = {block.value+'0', '\0'};
+						char tmp[256];
+
+						sprintf(tmp, "%d", block.value);
 
 						g->SetColor(0xff, 0x00, 0x00, 0xff);
-						g->DrawString(str, _insets.left+i*(size+delta), _insets.top+j*(size+delta), size, size, jgui::JHA_CENTER, jgui::JVA_CENTER);
+						g->DrawString(tmp, _insets.left+i*(size+delta), _insets.top+j*(size+delta), size, size, jgui::JHA_CENTER, jgui::JVA_CENTER);
 					}
 				}
 			} else if (block.state == MARKED_BLOCK) {
@@ -134,13 +136,13 @@ void Mines::Paint(jgui::Graphics *g)
 	g->FillRectangle(_insets.left+current_col*(size+delta), _insets.top+current_row*(size+delta), size, size);
 }
 
-bool Mines::ProcessEvent(jgui::KeyEvent *event)
+bool Mines::KeyPressed(jgui::KeyEvent *event)
 {
-	jthread::AutoLock lock(&mines_mutex);
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
+	if (jgui::Frame::KeyPressed(event) == true) {
+		return true;
 	}
+
+	jthread::AutoLock lock(&mines_mutex);
 
 	if (GetResult() == NONE) {
 		if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
@@ -359,7 +361,7 @@ int main()
 
 	mines::Mines app(100, 100);
 
-	app.Show();
+	app.Show(true);
 
 	return 0;
 }

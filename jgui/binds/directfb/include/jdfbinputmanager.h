@@ -39,7 +39,7 @@ class DFBInputManager : public jgui::InputManager, public jthread::Thread{
 	private:
 		jthread::Mutex _mutex;
 		IDirectFBEventBuffer *events;
-		std::vector<EventBroadcaster *> _broadcasters;
+		std::vector<jcommon::Listener *> _listeners;
 		uint64_t _last_keypress;
 		int _mouse_x,
 			_mouse_y,
@@ -47,9 +47,7 @@ class DFBInputManager : public jgui::InputManager, public jthread::Thread{
 			_click_count;
 		bool _initialized,
 			 _is_key_enabled,
-			 _is_mouse_enabled,
-			 _skip_key_events,
-			 _skip_mouse_events;
+			 _is_mouse_enabled;
 
 	public:
 		/**
@@ -100,18 +98,6 @@ class DFBInputManager : public jgui::InputManager, public jthread::Thread{
 		 */
 		virtual void ProcessWindowEvent(DFBWindowEvent event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SkipKeyEvents(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SkipMouseEvents(bool b);
-		
 		/**
 		 * \brief
 		 *

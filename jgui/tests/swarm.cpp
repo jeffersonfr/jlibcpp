@@ -50,6 +50,8 @@ class Main : public jgui::Frame, public jthread::Thread{
 		{
 			srand(time(NULL));
 
+			_active = true;
+
 			_size_objects = n;
 			_size_particles = p;
 
@@ -91,8 +93,6 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 		virtual ~Main()
 		{
-			_active = false;
-
 			WaitThread();
 		}
 
@@ -109,22 +109,20 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 		virtual void Run()
 		{
-			_active = true;
-
 			int scrumble = 0;
 
 			// for (int j=0; j<1000; j++) {
-			for (int j=0; ; j++) {
-				if (_active == false) {
-					break;
-				}
-
+			for (int j=0; _active != false; j++) {
 				double r = 10,
 					   vmax = 100,
 					   vmin = -vmax,
 					   xmax = 1920,
 					   xmin = 0;
 				int signal = 1;
+
+				if (j > 100) {
+					_active = false;
+				}
 
 				for (int i=0; i<_size_particles; i++) {
 					double k,
@@ -268,6 +266,7 @@ class Main : public jgui::Frame, public jthread::Thread{
 				}
 
 				Repaint();
+
 				usleep(100000);
 			}
 		}
@@ -296,8 +295,8 @@ int main(int argc, char **argv)
 {
 	Main main(50, 100);
 
-	main.Start();
 	main.Show();
+	main.Start();
 
 	return 0;
 }

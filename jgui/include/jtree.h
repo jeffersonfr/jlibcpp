@@ -36,7 +36,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class Tree : public jgui::ItemComponent{
+class Tree : public jgui::Component, public jgui::ItemComponent{
 
 	private:
 		jthread::Mutex _tree_mutex;
@@ -47,31 +47,6 @@ class Tree : public jgui::ItemComponent{
 		int _top_index,
 				_item_size,
 				_centered_interaction;
-
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MousePressed(MouseEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseReleased(MouseEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseMoved(MouseEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseWheel(MouseEvent *event);
 
 	public:
 		/**
@@ -120,13 +95,31 @@ class Tree : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(MouseEvent *event);
+		virtual bool KeyPressed(KeyEvent *event);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(KeyEvent *event);
+		virtual bool MousePressed(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseReleased(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseMoved(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseWheel(MouseEvent *event);
 
 };
 

@@ -27,7 +27,7 @@
 namespace jgui {
 
 Component::Component(int x, int y, int width, int height):
-	jcommon::Object()
+	jgui::ThemeListener()
 {
 	jcommon::Object::SetClassName("jgui::Component");
 
@@ -87,18 +87,39 @@ Component::Component(int x, int y, int width, int height):
 	_relative_mouse_y = 0;
 	_relative_mouse_w = 0;
 	_relative_mouse_h = 0;
-	_internal_state = 0;
+	_component_state = 0;
 
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();
 
 	theme->Update(this);
+	
+	ThemeManager::GetInstance()->RegisterThemeListener(this);
 }
 
 Component::~Component()
 {
+	ThemeManager::GetInstance()->RemoveThemeListener(this);
+
 	if (_parent != NULL) {
 		_parent->Remove(this);
 	}
+}
+
+void Component::ThemeChanged(ThemeEvent *event)
+{
+	if (IsThemeEnabled() == false) {
+		return;
+	}
+
+	SetIgnoreRepaint(true);
+
+	Theme *theme = event->GetTheme();
+
+	theme->Update(this);
+	
+	SetIgnoreRepaint(false);
+	
+	Repaint(this);
 }
 
 void Component::ScrollToVisibleArea(int x, int y, int width, int height, Component *coordinateSpace) 
@@ -1496,10 +1517,37 @@ bool Component::Intersect(int x, int y)
 	return false;
 }
 
-bool Component::ProcessEvent(MouseEvent *event)
+bool Component::KeyPressed(KeyEvent *event)
 {
-	if (IsEnabled() == false || IsVisible() == false) {
-		return true;
+	if (IsVisible() == false) {
+		return false;
+	}
+
+	return false;
+}
+
+bool Component::KeyReleased(KeyEvent *event)
+{
+	if (IsVisible() == false) {
+		return false;
+	}
+
+	return false;
+}
+
+bool Component::KeyTyped(KeyEvent *event)
+{
+	if (IsVisible() == false) {
+		return false;
+	}
+
+	return false;
+}
+
+bool Component::MousePressed(MouseEvent *event)
+{
+	if (IsVisible() == false) {
+		return false;
 	}
 	
 	jsize_t scroll_dimension = GetScrollDimension();
@@ -1509,79 +1557,118 @@ bool Component::ProcessEvent(MouseEvent *event)
 	int mousex = event->GetX(),
 			mousey = event->GetY();
 
-	if (event->GetType() == JMT_PRESSED) {
-		if (IsFocusable() == true) {
-			RequestFocus();
-		}
-
-		if (IsScrollableY() && mousex > (_size.width-GetScrollSize()-_border_size)) {
-			double offset_ratio = (double)scrolly/(double)scroll_dimension.height,
-						 block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
-			int offset = (int)(_size.height*offset_ratio),
-					block_size = (int)(_size.height*block_size_ratio);
-
-			if (mousey > offset && mousey < (offset+block_size)) {
-				_internal_state = 10;
-				_relative_mouse_x = mousex;
-				_relative_mouse_y = mousey;
-			} else if (mousey < offset) {
-				SetScrollY(scrolly-_scroll_major_increment);
-			
-				Repaint();
-			} else if (mousey > (offset+block_size)) {
-				SetScrollY(scrolly+_scroll_major_increment);
-			
-				Repaint();
-			}
-
-			return true;
-		} else if (IsScrollableX() && mousey > (_size.height-GetScrollSize()-_border_size)) {
-			double offset_ratio = (double)scrollx/(double)scroll_dimension.width,
-						 block_size_ratio = (double)_size.width/(double)scroll_dimension.width;
-			int offset = (int)(_size.width*offset_ratio),
-					block_size = (int)(_size.width*block_size_ratio);
-
-			if (mousex > offset && mousex < (offset+block_size)) {
-				_internal_state = 11;
-				_relative_mouse_x = mousex;
-				_relative_mouse_y = mousey;
-			} else if (mousex < offset) {
-				SetScrollX(scrollx-_scroll_major_increment);
-
-				Repaint();
-			} else if (mousex > (offset+block_size)) {
-				SetScrollX(scrollx+_scroll_major_increment);
-
-				Repaint();
-			}
-
-			return true;
-		} 
-	} else if (event->GetType() == JMT_MOVED) {
-		if (_internal_state == 10) {
-			SetScrollY(scrolly+(int)((mousey-_relative_mouse_y)*((double)scroll_dimension.height/(double)GetHeight())));
-			
-			Repaint();
-
-			_relative_mouse_y = mousey;
-
-			return true;
-		} else if (_internal_state == 11) {
-			SetScrollX(scrollx+(int)((mousex-_relative_mouse_x)*((double)scroll_dimension.width/(double)GetWidth())));
-
-			Repaint();
-
-			_relative_mouse_x = mousex;
-
-			return true;
-		}
-	} else if (event->GetType() == JMT_RELEASED) {
-		if (_internal_state != 0) {
-			_internal_state = 0;
-			
-			return true;
-		}
+	if (IsFocusable() == true) {
+		RequestFocus();
 	}
+
+	if (IsScrollableY() && mousex > (_size.width-GetScrollSize()-_border_size)) {
+		double offset_ratio = (double)scrolly/(double)scroll_dimension.height,
+					 block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
+		int offset = (int)(_size.height*offset_ratio),
+				block_size = (int)(_size.height*block_size_ratio);
+
+		if (mousey > offset && mousey < (offset+block_size)) {
+			_component_state = 10;
+			_relative_mouse_x = mousex;
+			_relative_mouse_y = mousey;
+		} else if (mousey < offset) {
+			SetScrollY(scrolly-_scroll_major_increment);
+
+			Repaint();
+		} else if (mousey > (offset+block_size)) {
+			SetScrollY(scrolly+_scroll_major_increment);
+
+			Repaint();
+		}
+
+		return true;
+	} else if (IsScrollableX() && mousey > (_size.height-GetScrollSize()-_border_size)) {
+		double offset_ratio = (double)scrollx/(double)scroll_dimension.width,
+					 block_size_ratio = (double)_size.width/(double)scroll_dimension.width;
+		int offset = (int)(_size.width*offset_ratio),
+				block_size = (int)(_size.width*block_size_ratio);
+
+		if (mousex > offset && mousex < (offset+block_size)) {
+			_component_state = 11;
+			_relative_mouse_x = mousex;
+			_relative_mouse_y = mousey;
+		} else if (mousex < offset) {
+			SetScrollX(scrollx-_scroll_major_increment);
+
+			Repaint();
+		} else if (mousex > (offset+block_size)) {
+			SetScrollX(scrollx+_scroll_major_increment);
+
+			Repaint();
+		}
+
+		return true;
+	} 
+
+	return false;
+}
+
+bool Component::MouseReleased(MouseEvent *event)
+{
+	if (IsVisible() == false) {
+		return false;
+	}
+
+	// int mousex = event->GetX(),
+	// 		mousey = event->GetY();
+
+	if (_component_state != 0) {
+		_component_state = 0;
+
+		return true;
+	}
+
+	return false;
+}
+
+bool Component::MouseMoved(MouseEvent *event)
+{
+	if (IsVisible() == false) {
+		return false;
+	}
+	
+	int mousex = event->GetX(),
+			mousey = event->GetY();
+
+	jsize_t scroll_dimension = GetScrollDimension();
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+
+	if (_component_state == 10) {
+		SetScrollY(scrolly+(int)((mousey-_relative_mouse_y)*((double)scroll_dimension.height/(double)GetHeight())));
+		
+		Repaint();
+
+		_relative_mouse_y = mousey;
+
+		return true;
+	} else if (_component_state == 11) {
+		SetScrollX(scrollx+(int)((mousex-_relative_mouse_x)*((double)scroll_dimension.width/(double)GetWidth())));
+
+		Repaint();
+
+		_relative_mouse_x = mousex;
+
+		return true;
+	}
+
+	return false;
+}
+
+bool Component::MouseWheel(MouseEvent *event)
+{
+	if (IsVisible() == false) {
+		return false;
+	}
+
+	// int mousex = event->GetX(),
+	//		mousey = event->GetY();
 
 	return false;
 }
@@ -1605,21 +1692,8 @@ void Component::GetInternalComponents(Container *parent, std::vector<Component *
 	}
 }
 
-bool Component::ProcessEvent(KeyEvent *event)
-{
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	return false;
-}
-
 bool Component::ProcessNavigation(KeyEvent *event)
 {
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
 	if (_is_navigation_enabled == false) {
 		return false;
 	}

@@ -19,12 +19,14 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jspin.h"
+#include "jthememanager.h"
 #include "jdebug.h"
 
 namespace jgui {
 
 Spin::Spin(int x, int y, int width, int height):
-	ItemComponent(x, y, width, height)
+	Component(x, y, width, height),
+	ItemComponent()
 {
 	jcommon::Object::SetClassName("jgui::Spin");
 
@@ -32,6 +34,10 @@ Spin::Spin(int x, int y, int width, int height):
 	// _type = JSO_VERTICAL;
 	
 	SetFocusable(true);
+
+	Theme *theme = ThemeManager::GetInstance()->GetTheme();
+
+	theme->Update(this);
 }
 
 Spin::~Spin()
@@ -88,70 +94,10 @@ void Spin::PreviousItem()
 	DispatchSelectEvent(new SelectEvent(this, _items[_index], _index, JSET_LEFT));
 }
 
-bool Spin::ProcessEvent(MouseEvent *event)
+bool Spin::KeyPressed(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::KeyPressed(event) == true) {
 		return true;
-	}
-
-	if (_items.size() == 0) {
-		return true;
-	}
-
-	bool catched = false;
-
-	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
-		catched = true;
-
-		int x1 = event->GetX(),
-				y1 = event->GetY();
-		int x = _vertical_gap+_border_size,
-				y = _horizontal_gap+_border_size,
-				h = _size.height-2*y,
-				arrow_size;
-
-		if (_type == JSO_HORIZONTAL) {
-			arrow_size = h/2;
-		} else {
-			arrow_size = (h-8)/2;
-		}
-
-		RequestFocus();
-
-		if (_type == JSO_HORIZONTAL) {
-			if (y1 > (y) && y1 < (y+_size.height)) {
-				if (x1 > (_size.width-arrow_size-x) && x1 < (_size.width-x)) {
-					NextItem();
-				} else if (x1 > (x) && x1 < (x+arrow_size)) {
-					PreviousItem();
-				}
-			}
-		} else if (_type == JSO_VERTICAL) {
-			if (x1 > (_size.width-2*arrow_size-x) && x1 < (_size.width-x)) {
-				if (y1 > (y) && y1 < (h/2)) {
-					PreviousItem();
-				} else if (y1 > (y+h/2) && y1 < (y+h)) {
-					NextItem();
-				}
-			}
-		}
-	}
-
-	return catched;
-}
-
-bool Spin::ProcessEvent(KeyEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	if (IsEnabled() == false) {
-		return false;
 	}
 
 	if (_items.size() == 0) {
@@ -193,6 +139,86 @@ bool Spin::ProcessEvent(KeyEvent *event)
 	}
 
 	return catched;
+}
+
+bool Spin::MousePressed(MouseEvent *event)
+{
+	if (Component::MousePressed(event) == true) {
+		return true;
+	}
+
+	if (_items.size() == 0) {
+		return true;
+	}
+
+	bool catched = false;
+
+	if (event->GetButton() == JMB_BUTTON1) {
+		catched = true;
+
+		int x1 = event->GetX(),
+				y1 = event->GetY();
+		int x = _vertical_gap+_border_size,
+				y = _horizontal_gap+_border_size,
+				h = _size.height-2*y,
+				arrow_size;
+
+		if (_type == JSO_HORIZONTAL) {
+			arrow_size = h/2;
+		} else {
+			arrow_size = (h-8)/2;
+		}
+
+		RequestFocus();
+
+		if (_type == JSO_HORIZONTAL) {
+			if (y1 > (y) && y1 < (y+_size.height)) {
+				if (x1 > (_size.width-arrow_size-x) && x1 < (_size.width-x)) {
+					NextItem();
+				} else if (x1 > (x) && x1 < (x+arrow_size)) {
+					PreviousItem();
+				}
+			}
+		} else if (_type == JSO_VERTICAL) {
+			if (x1 > (_size.width-2*arrow_size-x) && x1 < (_size.width-x)) {
+				if (y1 > (y) && y1 < (h/2)) {
+					PreviousItem();
+				} else if (y1 > (y+h/2) && y1 < (y+h)) {
+					NextItem();
+				}
+			}
+		}
+	}
+
+	return catched;
+}
+
+
+bool Spin::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+	
+	return false;
+}
+
+bool Spin::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+	
+	return false;
+}
+
+bool Spin::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+	
+	return false;
 }
 
 void Spin::AddEmptyItem()

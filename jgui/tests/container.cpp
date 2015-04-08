@@ -366,17 +366,13 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		delete list;
 	}
 
-	virtual bool ProcessEvent(jgui::KeyEvent *event)
+	virtual bool KeyPressed(jgui::KeyEvent *event)
 	{
-		jthread::AutoLock lock(&teste_mutex);
-
-		if (event->GetType() != jgui::JKT_PRESSED) {
-			return false;;
-		}
-
-		if (Frame::ProcessEvent(event) == true) {
+		if (jgui::Frame::KeyPressed(event) == true) {
 			return true;
 		}
+
+		jthread::AutoLock lock(&teste_mutex);
 
 		if (event->GetSymbol() == jgui::JKS_ENTER) {
 			if (GetFocusOwner() == text_field) {
@@ -462,7 +458,7 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 	virtual void KeyboardPressed(jgui::KeyEvent *event)
 	{
 		if (GetFocusOwner() == text_field) {
-			text_field->ProcessEvent(event);
+			text_field->KeyPressed(event);
 		}
 	}
 

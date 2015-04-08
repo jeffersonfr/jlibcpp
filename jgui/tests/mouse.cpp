@@ -46,7 +46,6 @@ class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 			// INFO:: necessario para receber os eventos de mouse
 			InternalCreateWindow();
 
-			jgui::InputManager::GetInstance()->SkipMouseEvents(true);
 			jgui::InputManager::GetInstance()->RegisterMouseListener(this);
 		}
 
@@ -55,7 +54,7 @@ class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 			jgui::InputManager::GetInstance()->RemoveMouseListener(this);
 		}
 
-		virtual void MousePressed(jgui::MouseEvent *event)
+		virtual bool MousePressed(jgui::MouseEvent *event)
 		{
 			cx = event->GetX();
 			cy = event->GetY();
@@ -83,26 +82,28 @@ class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 			}
 
 			Repaint();
+
+			return true;
 		}
 
-		virtual void MouseReleased(jgui::MouseEvent *event)
+		virtual bool MouseReleased(jgui::MouseEvent *event)
 		{
+			return true;
 		}
 
-		virtual void MouseClicked(jgui::MouseEvent *event)
-		{
-		}
-
-		virtual void MouseMoved(jgui::MouseEvent *event)
+		virtual bool MouseMoved(jgui::MouseEvent *event)
 		{
 			cx = event->GetX();
 			cy = event->GetY();
 			
 			Repaint();
+
+			return true;
 		}
 
-		virtual void MouseWheel(jgui::MouseEvent *event)
+		virtual bool MouseWheel(jgui::MouseEvent *event)
 		{
+			return true;
 		}
 
 		virtual void Paint(jgui::Graphics *g)
@@ -140,9 +141,7 @@ int main( int argc, char *argv[] )
 {
 	GraphicsTeste test;
 
-	test.SetVisible(true);
-
-	sleep(1000);
+	test.Show(true);
 
 	return 0;
 }

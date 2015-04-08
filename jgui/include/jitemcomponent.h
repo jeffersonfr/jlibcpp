@@ -224,7 +224,7 @@ class Item : public virtual jcommon::Object{
  *
  * \author Jeff Ferr
  */
-class ItemComponent : public jgui::Component{
+class ItemComponent : public virtual jcommon::Object{
 
 	protected:
 		std::vector<SelectListener *> _select_listeners;
@@ -250,7 +250,7 @@ class ItemComponent : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		ItemComponent(int x, int y, int width, int height);
+		ItemComponent();
 
 		/**
 		 * \brief

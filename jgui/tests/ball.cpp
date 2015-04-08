@@ -163,26 +163,27 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 
 	private:
 		std::vector<Ball *> _balls;
-		jgui::jsize_t offDimension,
-			backDimension;
-		jgui::Image *offImage,
-			*backImage,
-			*pin,
-			*ball;
+		jgui::jsize_t offDimension;
+		jgui::jsize_t backDimension;
+		jgui::Image *offImage;
+		jgui::Image *backImage;
+		jgui::Image *pin;
+		jgui::Image *ball;
 		double pinr;
-		int ballw,
-				ballh,
-				pinw,
-				pinh,
-				numracks,
-				*rackheight,
-				*rackdel;
+		int ballw;
+		int ballh;
+		int pinw;
+		int pinh;
+		int numracks;
+		int *rackheight;
+		int *rackdel;
+		bool _running;
 
 	public:
 		BallDrop():
 			jgui::Frame("Ball Drop", 0, 0, 720, 480)
 		{
-			SetUndecorated(true);
+			_running = true;
 
 			int w = 16,
 					h = 16;
@@ -207,7 +208,16 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 				_balls.push_back(ball);
 			}
 
+			SetUndecorated(true);
+
 			Start();
+		}
+
+		virtual ~BallDrop()
+		{
+			_running = false;
+
+			WaitThread();
 		}
 
 		virtual void Run() 
@@ -227,7 +237,7 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 				rackdel[i] = 0;
 			}
 
-			while (true) {
+			while (_running) {
 				UpdateBalls();
 
 				Repaint();
@@ -414,7 +424,7 @@ int main(int argc, char **argv)
 {
 	BallDrop ball;
 
-	ball.Show();
+	ball.Show(true);
 
 	return 0;
 }

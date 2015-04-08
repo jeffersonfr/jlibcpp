@@ -100,11 +100,9 @@ jvertical_align_t InputDialogBox::GetVerticalAlign()
 
 void InputDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 {
-		jthread::AutoLock lock(&_input_mutex);
+	jthread::AutoLock lock(&_input_mutex);
 
-		Hide();
-
-		_frame_sem.Notify();
+	Release();
 }
 
 }

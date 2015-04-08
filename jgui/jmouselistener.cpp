@@ -32,20 +32,24 @@ MouseListener::~MouseListener()
 {
 }
 
-void MouseListener::MousePressed(MouseEvent *event)
+bool MouseListener::MousePressed(MouseEvent *event)
 {
+	return false;
 }
 
-void MouseListener::MouseReleased(MouseEvent *event)
+bool MouseListener::MouseReleased(MouseEvent *event)
 {
+	return false;
 }
 
-void MouseListener::MouseMoved(MouseEvent *event)
+bool MouseListener::MouseMoved(MouseEvent *event)
 {
+	return false;
 }
 
-void MouseListener::MouseWheel(MouseEvent *event)
+bool MouseListener::MouseWheel(MouseEvent *event)
 {
+	return false;
 }
 
 }

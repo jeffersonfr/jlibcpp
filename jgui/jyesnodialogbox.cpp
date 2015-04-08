@@ -98,15 +98,15 @@ jvertical_align_t YesNoDialogBox::GetVerticalAlign()
 
 void YesNoDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 {
-		jthread::AutoLock lock(&_yesno_mutex);
+	jthread::AutoLock lock(&_yesno_mutex);
 
-		if (GetFocusOwner() == _yes) {
-			_response = JDR_YES;
-		} else {
-			_response = JDR_NO;
-		}
+	if (GetFocusOwner() == _yes) {
+		_response = JDR_YES;
+	} else {
+		_response = JDR_NO;
+	}
 
-		Release();
+	Release();
 }
 
 }

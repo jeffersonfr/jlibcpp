@@ -20,13 +20,12 @@
 #ifndef J_KEYBOARD_H
 #define J_KEYBOARD_H
 
-#include "jbutton.h"
-#include "jtextarea.h"
-#include "jkeyevent.h"
 #include "jframe.h"
+#include "jbutton.h"
 #include "jbuttonlistener.h"
 #include "jkeyboardlistener.h"
 #include "jtextlistener.h"
+#include "jtextcomponent.h"
 
 #include "jthread.h"
 #include "jmutex.h"
@@ -50,6 +49,8 @@ enum jkeyboard_type_t {
 	JKT_PHONE,
 	JKT_INTERNET
 };
+
+class TextArea;
 
 /**
  * \brief
@@ -115,6 +116,12 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener{
 		 * \brief
 		 *
 		 */
+		Keyboard(jkeyboard_type_t type, bool text_visible = true, bool is_password = false);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible = true, bool is_password = false);
 		
 		/**
@@ -127,32 +134,8 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener{
 		 * \brief
 		 *
 		 */
-		virtual void SetTextSize(int max);
+		virtual jgui::TextComponent * GetTextComponent();
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetTextSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWrap(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetText(std::string text);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetText();
-
 		/**
 		 * \brief
 		 *
@@ -164,12 +147,6 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener{
 		 *
 		 */
 		virtual void ActionPerformed(ButtonEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool ProcessEvent(jgui::KeyEvent *event);
 		
 		/**
 		 * \brief

@@ -452,7 +452,7 @@ int main()
 
 	g->Flip();
 
-	sleep(10000);
+	sleep(10);
 
 	return 0;
 }

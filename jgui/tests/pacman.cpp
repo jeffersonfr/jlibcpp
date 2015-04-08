@@ -242,8 +242,9 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 	{
 		int  i;
 
-		for (i=0; i<nrofblocks*nrofblocks; i++)
+		for (i=0; i<nrofblocks*nrofblocks; i++) {
 			screendata[i]=level1data[i];
+		}
 
 		LevelContinue();
 	}
@@ -301,49 +302,58 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		pacman_bmp = GetImage("images/pacman.png", 3*w, 5*h);
 	}
 
-	virtual bool ProcessEvent(jgui::KeyEvent *event)
+	virtual bool KeyPressed(jgui::KeyEvent *event)
 	{
-		if (event->GetType() == jgui::JKT_PRESSED) {
-			if (event->GetSymbol() == jgui::JKS_ESCAPE) {
-				flag = false;
+		if (jgui::Frame::KeyPressed(event) == true) {
+			return true;
+		}
 
-				jgui::Frame::Release();
+		if (event->GetSymbol() == jgui::JKS_ESCAPE) {
+			flag = false;
 
-				return false;
-			}
+			jgui::Frame::Release();
 
-			if (ingame) {
-				if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
-					reqdx=-1;
-					reqdy=0;
-				} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
-					reqdx=1;
-					reqdy=0;
-				} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
-					reqdx=0;
-					reqdy=-1;
-				} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
-					reqdx=0;
-					reqdy=1;
-				} else if (event->GetSymbol() == jgui::JKS_ESCAPE) {
-					ingame=false;
-				}
-			} else {
-				if (event->GetSymbol() == jgui::JKS_s) {
-					ingame=true;
-					GameInit();
-				}
-			}
-		} else if (event->GetType() == jgui::JKT_RELEASED) {
-			if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT || 
-				event->GetSymbol() == jgui::JKS_CURSOR_RIGHT || 
-				event->GetSymbol() == jgui::JKS_CURSOR_UP || 
-				event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
-				/*
-				reqdx=0;
+			return false;
+		}
+
+		if (ingame) {
+			if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
+				reqdx=-1;
 				reqdy=0;
-				*/
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
+				reqdx=1;
+				reqdy=0;
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
+				reqdx=0;
+				reqdy=-1;
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
+				reqdx=0;
+				reqdy=1;
+			} else if (event->GetSymbol() == jgui::JKS_ESCAPE) {
+				ingame=false;
 			}
+		} else {
+			if (event->GetSymbol() == jgui::JKS_s) {
+				ingame=true;
+				GameInit();
+			}
+		}
+
+		return true;
+	}
+
+	virtual bool KeyReleased(jgui::KeyEvent *event)
+	{
+		if (jgui::Frame::KeyReleased(event) == true) {
+			return true;
+		}
+
+		if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT || 
+			event->GetSymbol() == jgui::JKS_CURSOR_RIGHT || 
+			event->GetSymbol() == jgui::JKS_CURSOR_UP || 
+			event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
+			// reqdx=0;
+			// reqdy=0;
 		}
 
 		return true;
@@ -387,20 +397,25 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 	void DoAnim()
 	{
 		animcount--;
-		if (animcount<=0)
-		{
+
+		if (animcount<=0) {
 			animcount=animdelay;
 			ghostanimpos++;
-			if (ghostanimpos>=ghostanimcount)
+			
+			if (ghostanimpos>=ghostanimcount) {
 				ghostanimpos=0;
+			}
 		}
+		
 		pacanimcount--;
-		if (pacanimcount<=0)
-		{
+
+		if (pacanimcount<=0) {
 			pacanimcount=pacanimdelay;
 			pacmananimpos=pacmananimpos+pacanimdir;
-			if (pacmananimpos==(pacmananimcount-1) ||  pacmananimpos==0)
+			
+			if (pacmananimpos==(pacmananimcount-1) ||  pacmananimpos==0) {
 				pacanimdir=-pacanimdir;
+			}
 		}
 	}
 
@@ -473,8 +488,8 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		for (i=0; i<nrofghosts; i++) {
 			if (ghostx[i]%blocksize==0 && ghosty[i]%blocksize==0) {
 				pos=ghostx[i]/blocksize+nrofblocks*(int)(ghosty[i]/blocksize);
-
 				count=0;
+
 				if ((screendata[pos]&1)==0 && ghostdx[i]!=1) {
 					dx[count]=-1;
 					dy[count]=0;
@@ -568,13 +583,16 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 			viewdx=pacmandx;
 			viewdy=pacmandy;
 		}
+	
 		if (pacmanx%blocksize==0 && pacmany%blocksize==0) {
 			pos=pacmanx/blocksize+nrofblocks*(int)(pacmany/blocksize);
 			ch=screendata[pos];
+		
 			if ((ch&16)!=0) {
 				screendata[pos]=(int)(ch&15);
 				score++;
 			}
+			
 			if ((ch&32)!=0) {
 				scared=true;
 				scaredcount=scaredtime;
@@ -599,6 +617,7 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 				pacmandy=0;
 			}
 		}
+		
 		pacmanx=pacmanx+pacmanspeed*pacmandx;
 		pacmany=pacmany+pacmanspeed*pacmandy;
 	}
@@ -633,32 +652,40 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 		bigdotcolor=bigdotcolor+dbigdotcolor;
 
-		if (bigdotcolor<=64 || bigdotcolor>=192)
+		if (bigdotcolor<=64 || bigdotcolor>=192) {
 			dbigdotcolor=-dbigdotcolor;
+		}
 
 		for (y=0; y<scrsize; y+=blocksize) {
 			for (x=0; x<scrsize; x+=blocksize) {
 				goff->SetColor((mazecolor>>0x10)&0xff, (mazecolor>>0x08)&0xff, (mazecolor>>0x00)&0xff, (mazecolor>>0x18)&0xff);
+
 				if ((screendata[i]&1)!=0) {
 					goff->DrawLine(x, y, x, y+blocksize-1);
 				}
+
 				if ((screendata[i]&2)!=0) {
 					goff->DrawLine(x, y, x+blocksize-1, y);
 				}
+
 				if ((screendata[i]&4)!=0) {
 					goff->DrawLine(x+blocksize-1,y,x+blocksize-1,y+blocksize-1);
 				}
+
 				if ((screendata[i]&8)!=0) {
 					goff->DrawLine(x,y+blocksize-1,x+blocksize-1,y+blocksize-1);
 				}
+
 				if ((screendata[i]&16)!=0) {
 					goff->SetColor((dotcolor>>0x10)&0xff, (dotcolor>>0x08)&0xff, (dotcolor>>0x00)&0xff, (dotcolor>>0x18)&0xff);
 					goff->FillRectangle(x+(blocksize-2)/2, y+(blocksize-2)/2, 2, 2);
 				}
+
 				if ((screendata[i]&32)!=0) {
 					goff->SetColor(224, 224-bigdotcolor, bigdotcolor, 0xff);
 					goff->FillRectangle(x+(blocksize-8)/2, y+(blocksize-8)/2, 8, 8);
 				}
+
 				i++;
 			}
 		}
@@ -683,13 +710,16 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 	void CheckScared()
 	{
 		scaredcount--;
-		if (scaredcount<=0)
-			scared=false;
 
-		if (scared && scaredcount>=30)
+		if (scaredcount<=0) {
+			scared=false;
+		}
+
+		if (scared && scaredcount>=30) {
 			mazecolor = 0xffc020ff;
-		else
+		} else {
 			mazecolor = 0xff20c0ff;
+		}
 
 		if (scared) {
 			screendata[7*nrofblocks+6]=11;
@@ -706,21 +736,32 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		bool finished=true;
 
 		while (i<nrofblocks*nrofblocks && finished) {
-			if ((screendata[i]&48)!=0)
-				finished=false;
+			if ((screendata[i]&48)!=0) {
+				finished = false;
+			}
+
 			i++;
 		}
+
 		if (finished) {
 			score+=50;
 			DrawScore();
 			usleep(2000*1000);
-			if (nrofghosts < maxghosts)
-				nrofghosts++; 
-			if (currentspeed<maxspeed)
+			
+			if (nrofghosts < maxghosts) {
+				nrofghosts++;
+			}
+			
+			if (currentspeed<maxspeed) {
 				currentspeed++;
+			}
+			
 			scaredtime=scaredtime-20;
-			if (scaredtime<minscaredtime)
+			
+			if (scaredtime<minscaredtime) {
 				scaredtime=minscaredtime;
+			}
+			
 			LevelInit();
 		}
 	}
@@ -744,7 +785,7 @@ int main()
 {
 	PacMan p;
 
-	p.Show(false);
+	p.Show();
 	p.Init();
 	p.Run();
 

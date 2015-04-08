@@ -51,7 +51,19 @@ class KeyListener : public jcommon::Listener{
 		 * \brief
 		 *
 		 */
-		virtual void KeyPressed(jgui::KeyEvent *event);
+		virtual bool KeyPressed(jgui::KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyReleased(jgui::KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyTyped(jgui::KeyEvent *event);
 
 };
 

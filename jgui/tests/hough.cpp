@@ -291,10 +291,10 @@ class Test : public jgui::Frame {
 			}
 		}
 
-		virtual bool ProcessEvent(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (event->GetType() != jgui::JKT_PRESSED) {
-				return false;
+			if (jgui::Frame::KeyPressed(event) == true) {
+				return true;
 			}
 
 			if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
@@ -316,7 +316,7 @@ int main()
 {
 	Test test;
 
-	test.Show();
+	test.Show(true);
 
 	return 0;
 }

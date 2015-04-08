@@ -33,7 +33,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class Spin : public jgui::ItemComponent{
+class Spin : public jgui::Component, public jgui::ItemComponent{
 
 	private:
 		std::vector<SelectListener *> _select_listeners;
@@ -102,13 +102,31 @@ class Spin : public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(MouseEvent *event);
+		virtual bool KeyPressed(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MousePressed(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(KeyEvent *event);
+		virtual bool MouseReleased(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseMoved(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseWheel(MouseEvent *event);
 
 };
 

@@ -209,8 +209,12 @@ class GraphicsTeste : public jgui::Frame{
 
 		}
 
-		virtual bool ProcessEvent(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
+			if (jgui::Frame::KeyPressed(event) == true) {
+				return true;
+			}
+
 			jthread::AutoLock lock(&teste_mutex);
 
 			for (int i=0; i<100; i++) {
@@ -260,7 +264,7 @@ int main( int argc, char *argv[] )
 {
 	GraphicsTeste test;
 
-	test.Show();
+	test.Show(true);
 
 	return 0;
 }

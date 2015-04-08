@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jthemeevent.h"
+#include "jtheme.h"
 
 namespace jgui {
 

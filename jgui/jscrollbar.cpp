@@ -89,18 +89,10 @@ int ScrollBar::GetStoneSize()
 	return _stone_size;
 }
 
-bool ScrollBar::ProcessEvent(KeyEvent *event)
+bool ScrollBar::KeyPressed(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::KeyPressed(event) == true) {
 		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	if (IsEnabled() == false) {
-		return false;
 	}
 
 	jkeyevent_symbol_t action = event->GetSymbol();
@@ -148,9 +140,9 @@ bool ScrollBar::ProcessEvent(KeyEvent *event)
 	return catched;
 }
 
-bool ScrollBar::ProcessEvent(MouseEvent *event)
+bool ScrollBar::MousePressed(MouseEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::MousePressed(event) == true) {
 		return true;
 	}
 
@@ -173,69 +165,115 @@ bool ScrollBar::ProcessEvent(MouseEvent *event)
 		arrow_size = w/2;
 	}
 
-	if (event->GetType() == JMT_PRESSED) {
-		if (event->GetButton() != JMB_BUTTON1) {
-			return false;
-		}
+	if (event->GetButton() != JMB_BUTTON1) {
+		return false;
+	}
 
-		catched = true;
+	catched = true;
 
-		if (_type == JSO_HORIZONTAL) {
-			if (y1 > 0 && y1 < (_size.height)) {
-				int d = (int)((_value*(dw-2*arrow_size))/(GetMaximum()-GetMinimum()));
+	if (_type == JSO_HORIZONTAL) {
+		if (y1 > 0 && y1 < (_size.height)) {
+			int d = (int)((_value*(dw-2*arrow_size))/(GetMaximum()-GetMinimum()));
 
-				_pressed = false;
+			_pressed = false;
 
-				if (x1 > (dx) && x1 < (arrow_size+dx)) {
-					SetValue(_value-_minimum_tick);
-				} else if (x1 > (_size.width-arrow_size-dx) && x1 < (_size.width-dx)) {
-					SetValue(_value+_minimum_tick);
-				} else if (x1 > (arrow_size+dx) && x1 < (arrow_size+dx+d)) {
-					SetValue(_value-_maximum_tick);
-				} else if (x1 > (arrow_size+dx+d+_stone_size) && x1 < (_size.width-arrow_size)) {
-					SetValue(_value+_maximum_tick);
-				} else if (x1 > (arrow_size+dx+d) && x1 < (arrow_size+dx+d+_stone_size)) {
-					_pressed = true;
-				}
-			}
-		} else if (_type == JSO_VERTICAL) {
-			if (x1 > 0 && x1 < (_size.width)) {
-				int d = (int)((_value*(dh-2*arrow_size))/(GetMaximum()-GetMinimum()));
-
-				_pressed = false;
-
-				if (y1 > (dy) && y1 < (arrow_size+dy)) {
-					SetValue(_value-_minimum_tick);
-				} else if (y1 > (_size.height-arrow_size-dy) && y1 < (_size.height-dy)) {
-					SetValue(_value+_minimum_tick);
-				} else if (y1 > (arrow_size+dy) && y1 < (arrow_size+dy+d)) {
-					SetValue(_value-_maximum_tick);
-				} else if (y1 > (arrow_size+dy+d+_stone_size) && y1 < (_size.height-arrow_size)) {
-					SetValue(_value+_maximum_tick);
-				} else if (y1 > (arrow_size+dy+d) && y1 < (arrow_size+dy+d+_stone_size)) {
-					_pressed = true;
-				}
+			if (x1 > (dx) && x1 < (arrow_size+dx)) {
+				SetValue(_value-_minimum_tick);
+			} else if (x1 > (_size.width-arrow_size-dx) && x1 < (_size.width-dx)) {
+				SetValue(_value+_minimum_tick);
+			} else if (x1 > (arrow_size+dx) && x1 < (arrow_size+dx+d)) {
+				SetValue(_value-_maximum_tick);
+			} else if (x1 > (arrow_size+dx+d+_stone_size) && x1 < (_size.width-arrow_size)) {
+				SetValue(_value+_maximum_tick);
+			} else if (x1 > (arrow_size+dx+d) && x1 < (arrow_size+dx+d+_stone_size)) {
+				_pressed = true;
 			}
 		}
-	} else if (event->GetType() == JMT_MOVED) {
-		if (_pressed == true) {
-			int diff = GetMaximum()-GetMinimum();
+	} else if (_type == JSO_VERTICAL) {
+		if (x1 > 0 && x1 < (_size.width)) {
+			int d = (int)((_value*(dh-2*arrow_size))/(GetMaximum()-GetMinimum()));
 
-			if (_type == JSO_HORIZONTAL) {
-				SetValue(diff*(x1-_stone_size/2-arrow_size)/(dw-2*arrow_size));
-			} else if (_type == JSO_VERTICAL) {
-				SetValue(diff*(y1-_stone_size/2-arrow_size)/(dh-2*arrow_size));
+			_pressed = false;
+
+			if (y1 > (dy) && y1 < (arrow_size+dy)) {
+				SetValue(_value-_minimum_tick);
+			} else if (y1 > (_size.height-arrow_size-dy) && y1 < (_size.height-dy)) {
+				SetValue(_value+_minimum_tick);
+			} else if (y1 > (arrow_size+dy) && y1 < (arrow_size+dy+d)) {
+				SetValue(_value-_maximum_tick);
+			} else if (y1 > (arrow_size+dy+d+_stone_size) && y1 < (_size.height-arrow_size)) {
+				SetValue(_value+_maximum_tick);
+			} else if (y1 > (arrow_size+dy+d) && y1 < (arrow_size+dy+d+_stone_size)) {
+				_pressed = true;
 			}
-		}
-	} else {
-		_pressed = false;
-
-		if (event->GetType() == JMT_ROTATED) {
-			SetValue(GetValue()+_minimum_tick*event->GetClickCount());
 		}
 	}
 
+
 	return catched;
+}
+
+bool ScrollBar::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+	
+	_pressed = false;
+
+	return true;
+}
+
+bool ScrollBar::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+	
+	int x = _horizontal_gap-_border_size,
+			y = _vertical_gap-_border_size,
+			w = _size.width-2*x,
+			h = _size.height-2*y;
+	int arrow_size,
+			x1 = event->GetX(),
+			y1 = event->GetY(),
+			dx = _vertical_gap-_border_size,
+			dy = _horizontal_gap-_border_size,
+			dw = _size.width-2*dx-_stone_size,
+			dh = _size.height-2*dy-_stone_size;
+
+	if (_type == JSO_HORIZONTAL) {
+		arrow_size = h/2;
+	} else {
+		arrow_size = w/2;
+	}
+
+	if (_pressed == true) {
+		int diff = GetMaximum()-GetMinimum();
+
+		if (_type == JSO_HORIZONTAL) {
+			SetValue(diff*(x1-_stone_size/2-arrow_size)/(dw-2*arrow_size));
+		} else if (_type == JSO_VERTICAL) {
+			SetValue(diff*(y1-_stone_size/2-arrow_size)/(dh-2*arrow_size));
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+bool ScrollBar::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+	
+	_pressed = false;
+
+	SetValue(GetValue()+_minimum_tick*event->GetClickCount());
+
+	return true;
 }
 
 void ScrollBar::Paint(Graphics *g)

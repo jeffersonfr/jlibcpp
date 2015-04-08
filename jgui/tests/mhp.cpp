@@ -373,15 +373,17 @@ class Scene : public jgui::Container, public jgui::KeyListener, public jthread::
 			jgui::InputManager::GetInstance()->RemoveKeyListener(this);
 		}
 
-		virtual void KeyPressed(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
 			jthread::AutoLock lock(&_input);
 
 			jgui::Component *focus = GetFocusOwner();
 
 			if (focus != NULL) {
-				focus->ProcessEvent(event);
+				return focus->KeyPressed(event);
 			}
+
+			return false;
 		}
 
 		virtual bool Animated()
@@ -534,14 +536,10 @@ class MenuTest : public Scene{
 			return false;
 		}
 
-		virtual void KeyPressed(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (event->GetType() != jgui::JKT_PRESSED) {
-				return;
-			}
-
-			if (Scene::ProcessEvent(event) == true) {
-				return;
+			if (Scene::KeyPressed(event) == true) {
+				return true;
 			}
 
 			if (event->GetSymbol() == jgui::JKS_F1) {
@@ -567,6 +565,8 @@ class MenuTest : public Scene{
 					exit(0);
 				}
 			}
+
+			return true;
 		}
 
 };
@@ -590,7 +590,7 @@ int main(int argc, char **argv)
 
 	menu.Show();
 
-	sleep(100000);
+	sleep(3600);
 
 	return 0;
 }

@@ -81,35 +81,10 @@ jvertical_align_t Button::GetVerticalAlign()
 	return _valign;
 }
 
-bool Button::ProcessEvent(MouseEvent *event)
+bool Button::KeyPressed(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::KeyPressed(event) == true) {
 		return true;
-	}
-
-	bool catched = false;
-
-	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
-		catched = true;
-
-		DispatchButtonEvent(new ButtonEvent(this));
-	}
-
-	return catched;
-}
-
-bool Button::ProcessEvent(KeyEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	if (IsEnabled() == false) {
-		return false;
 	}
 
 	bool catched = false;
@@ -121,6 +96,48 @@ bool Button::ProcessEvent(KeyEvent *event)
 	}
 
 	return catched;
+}
+
+bool Button::MousePressed(MouseEvent *event)
+{
+	if (Component::MousePressed(event) == true) {
+		return true;
+	}
+
+	if (event->GetButton() == JMB_BUTTON1) {
+		DispatchButtonEvent(new ButtonEvent(this));
+
+		return true;
+	}
+
+	return false;
+}
+
+bool Button::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Button::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Button::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+
+	return false;
 }
 
 void Button::Paint(Graphics *g)

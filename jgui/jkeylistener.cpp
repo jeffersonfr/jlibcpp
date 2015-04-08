@@ -32,8 +32,19 @@ KeyListener::~KeyListener()
 {
 }
 
-void KeyListener::KeyPressed(KeyEvent *event)
+bool KeyListener::KeyPressed(KeyEvent *event)
 {
+	return false;
+}
+
+bool KeyListener::KeyReleased(KeyEvent *event)
+{
+	return false;
+}
+
+bool KeyListener::KeyTyped(KeyEvent *event)
+{
+	return false;
 }
 
 }

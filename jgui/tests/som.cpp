@@ -87,6 +87,13 @@ class som : public jgui::Frame, public jthread::Thread {
 			SetResizeEnabled(true);
 		}
 
+		virtual ~som()
+		{
+			please_stop = true;
+
+			WaitThread();
+		}
+
 		void kohonenInit()
 		{
 			please_stop = false;
@@ -274,7 +281,7 @@ int main()
 
 	n.kohonenInit();
 	n.Start();
-	n.Show();
+	n.Show(true);
 
 	return 0;
 }

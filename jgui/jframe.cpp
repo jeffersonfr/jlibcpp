@@ -42,7 +42,7 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_relative_mouse_w = 0;
 	_relative_mouse_h = 0;
 	
-	_internal_state = 0;
+	_frame_state = 0;
 	_release_enabled = true;
 	_is_maximized = false;
 	_title = title;
@@ -50,7 +50,6 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_is_undecorated = false;
 	_last_key_code = JKS_UNKNOWN;
 	_input_enabled = true;
-	_background_visible = true;
 	_move_enabled = true;
 	_resize_enabled = false;
 	_frame_buttons = (jframe_button_t)(JFB_CLOSE);
@@ -78,7 +77,7 @@ Frame::Frame(int x, int y, int width, int height, int scale_width, int scale_hei
 	_relative_mouse_w = 0;
 	_relative_mouse_h = 0;
 	
-	_internal_state = 0;
+	_frame_state = 0;
 	_release_enabled = true;
 	_is_maximized = false;
 	_title = "";
@@ -86,7 +85,6 @@ Frame::Frame(int x, int y, int width, int height, int scale_width, int scale_hei
 	_is_undecorated = true;
 	_last_key_code = JKS_UNKNOWN;
 	_input_enabled = true;
-	_background_visible = true;
 	_move_enabled = true;
 	_resize_enabled = false;
 	_frame_buttons = (jframe_button_t)(0);
@@ -250,24 +248,18 @@ void Frame::Pack(bool fit)
 
 bool Frame::Show(bool modal)
 {
-	jthread::AutoLock lock(&_input_mutex);
-
 	_is_visible = true;
 
 	DoLayout();
 
-	Window::Show();
-
 	if (_input_enabled == true) {
+		jthread::AutoLock lock(&_input_mutex);
+
 		InputManager::GetInstance()->RegisterKeyListener(this);
 		InputManager::GetInstance()->RegisterMouseListener(this);
 	}
 
-	if (modal == true) {
-		_frame_sem.Wait(&_input_mutex);
-	}
-
-	return true;
+	return Window::Show(modal);
 }
 
 bool Frame::Hide()
@@ -345,57 +337,70 @@ void Frame::Restore()
 	SetBounds(_old_x, _old_y, _old_width, _old_height);
 }
 
-void Frame::KeyPressed(KeyEvent *event)
+bool Frame::KeyPressed(KeyEvent *event)
 {
-	// JDEBUG(JINFO, "antes\n");
-	
-	if (_is_enabled == false) {
-		return;
-	}
-
-	if (_is_visible == false) {
-		return;
-	}
-
 	jthread::AutoLock lock(&_input_mutex);
-	
-	if (event->GetType() == JKT_PRESSED) {
-		_last_key_code = event->GetSymbol();
 
-		if ((event->GetSymbol() == JKS_ESCAPE || event->GetSymbol() == JKS_EXIT) && _release_enabled == true) {
-			_last_key_code = JKS_EXIT;
+	if (Container::KeyPressed(event) == true) {
+		return true;
+	}
 
+	_last_key_code = event->GetSymbol();
+
+	if ((event->GetSymbol() == JKS_ESCAPE || event->GetSymbol() == JKS_EXIT)) {
+		if (_release_enabled == true) {
 			Release();
 
-			return;
+			return true;
 		}
+
+		return false;
 	}
 
-	Component *current = GetFocusOwner();
-
-	if (current != NULL) {
-		if (current->ProcessEvent(event) == true) {
-			return;
-		}
-	}
-	
-	ProcessEvent(event);
+	return false;
 }
 
-void Frame::MousePressed(MouseEvent *event)
+bool Frame::KeyReleased(KeyEvent *event)
 {
+	jthread::AutoLock lock(&_input_mutex);
+
+	if (Container::KeyReleased(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Frame::KeyTyped(KeyEvent *event)
+{
+	jthread::AutoLock lock(&_input_mutex);
+
+	if (Container::KeyTyped(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool Frame::MousePressed(MouseEvent *event)
+{
+	MouseEvent e = *event;
+
+	e.SetX(event->GetX()-_location.x);
+	e.SetY(event->GetY()-_location.y);
+
+	if (Container::MousePressed(&e) == true) {
+		return true;
+	}
+
 	if (_is_enabled == false) {
-		return;
+		return true;
 	}
 	
-	if (_is_visible == false) {
-		return;
-	}
-
-	if (_internal_state != 0) {
+	if (_frame_state != 0) {
 		GFXHandler::GetInstance()->SetCursor(GetCursor());
 
-		_internal_state = 0;
+		_frame_state = 0;
 	}
 
 	int mousex = event->GetX()-_location.x,
@@ -413,11 +418,11 @@ void Frame::MousePressed(MouseEvent *event)
 					if (_move_enabled == true && _is_maximized == false) {
 						GFXHandler::GetInstance()->SetCursor(JCS_MOVE);
 
-						_internal_state = 1; // move
+						_frame_state = 1; // move
 						_relative_mouse_x = mousex;
 						_relative_mouse_y = mousey;
 
-						return;
+						return true;
 					}
 				} else if (mousex < (lwidth-1*btn)) {
 					if (_resize_enabled == true && gap == 2) {
@@ -427,19 +432,19 @@ void Frame::MousePressed(MouseEvent *event)
 							Maximize();
 						}
 
-						return;
+						return true;
 					}
 				} else if (mousex < (lwidth-0*btn)) {
 					if ((_frame_buttons & JFB_CLOSE) != 0 && _release_enabled == true) {
 						Release();
 					}
 
-					return;
+					return true;
 				}
 			} else {
 				if (_resize_enabled == true && _is_maximized == false) {
 					if (mousex > _size.width || mousey > _size.height) {
-						return;
+						return false;
 					}
 
 					_relative_mouse_x = mousex;
@@ -448,81 +453,84 @@ void Frame::MousePressed(MouseEvent *event)
 					_relative_mouse_h = _size.height;
 
 					if (mousex > lwidth && mousey > lheight) {
-						_internal_state = 2; // both resize
+						_frame_state = 2; // both resize
 
 						GFXHandler::GetInstance()->SetCursor(JCS_SE_CORNER);
 
-						return;
+						return true;
 					} else if (mousex > lwidth) {
 						// horizontal resize
-						_internal_state = 3;
+						_frame_state = 3;
 
 						GFXHandler::GetInstance()->SetCursor(JCS_WE);
 
-						return;
+						return true;
 					} else if (mousey > lheight) {
 						// vertical resize
-						_internal_state = 4;
+						_frame_state = 4;
 
 						GFXHandler::GetInstance()->SetCursor(JCS_NS);
 
-						return;
+						return true;
 					}
 				}
 			}
 		}
 	}
 
-	event->SetX(mousex);
-	event->SetY(mousey);
-
-	ProcessEvent(event);
+	return true;
 }
 
-void Frame::MouseReleased(MouseEvent *event)
+bool Frame::MouseReleased(MouseEvent *event)
 {
+	MouseEvent e = *event;
+
+	e.SetX(event->GetX()-_location.x);
+	e.SetY(event->GetY()-_location.y);
+
+	if (Container::MouseReleased(&e) == true) {
+		return true;
+	}
+
 	if (_is_enabled == false) {
-		return;
+		return true;
 	}
 
-	if (_is_visible == false) {
-		return;
-	}
+	// int mousex = event->GetX(),
+	//		mousey = event->GetY();
 
-	if (_internal_state > 0) {
-		if (event->GetButton() == JMB_BUTTON1) {
-			GFXHandler::GetInstance()->SetCursor(GetCursor());
+	if (event->GetButton() == JMB_BUTTON1) {
+		GFXHandler::GetInstance()->SetCursor(GetCursor());
 
-			_internal_state = 0;
-			_relative_mouse_x = 0;
-			_relative_mouse_y = 0;
-
-			return;
-		}
+		_frame_state = 0;
+		_relative_mouse_x = 0;
+		_relative_mouse_y = 0;
 	}
 	
-	event->SetX(event->GetX()-_location.x);
-	event->SetY(event->GetY()-_location.y);
-
-	ProcessEvent(event);
+	return true;
 }
 
-void Frame::MouseMoved(MouseEvent *event)
+bool Frame::MouseMoved(MouseEvent *event)
 {
-	if (_is_enabled == false) {
-		return;
-	}
-	
-	if (_is_visible == false) {
-		return;
+	MouseEvent e = *event;
+
+	e.SetX(event->GetX()-_location.x);
+	e.SetY(event->GetY()-_location.y);
+
+	if (Container::MouseMoved(&e) == true) {
+		return true;
 	}
 
+	if (_is_enabled == false) {
+		return true;
+	}
+	
 	int mousex = event->GetX()-_location.x,
 			mousey = event->GetY()-_location.y;
 
-	if (_internal_state == 0 && _resize_enabled == true) {
+	if (_frame_state == 0 && _resize_enabled == true) {
 		if (mousex > _size.width || mousey > _size.height) {
-			return;
+			return false;
 		}
 
 		int lwidth = _size.width - SIZE_TO_RESIZE,
@@ -537,51 +545,58 @@ void Frame::MouseMoved(MouseEvent *event)
 		} else {
 			GFXHandler::GetInstance()->SetCursor(GetCursor());
 		}
-	} else if (_internal_state == 1 && _move_enabled == true) {
+
+		return true;
+	} else if (_frame_state == 1 && _move_enabled == true) {
 		Move(mousex-_relative_mouse_x, mousey-_relative_mouse_y);
-	} else if (_internal_state == 2 && _resize_enabled == true) {
+
+		return true;
+	} else if (_frame_state == 2 && _resize_enabled == true) {
 		SetSize(_relative_mouse_w+mousex-_relative_mouse_x, _relative_mouse_h+mousey-_relative_mouse_y);
-	} else if (_internal_state == 3 && _resize_enabled == true) {
+
+		return true;
+	} else if (_frame_state == 3 && _resize_enabled == true) {
 		SetSize(_relative_mouse_w+mousex-_relative_mouse_x, _relative_mouse_h);
-	} else if (_internal_state == 4 && _resize_enabled == true) {
+
+		return true;
+	} else if (_frame_state == 4 && _resize_enabled == true) {
 		SetSize(_relative_mouse_w, _relative_mouse_h+mousey-_relative_mouse_y);
+
+		return true;
 	}
 	
-	event->SetX(mousex);
-	event->SetY(mousey);
-
-	ProcessEvent(event);
+	return true;
 }
 
-void Frame::MouseWheel(MouseEvent *event)
+bool Frame::MouseWheel(MouseEvent *event)
 {
+	MouseEvent e = *event;
+
+	e.SetX(event->GetX()-_location.x);
+	e.SetY(event->GetY()-_location.y);
+
+	if (Container::MouseWheel(&e) == true) {
+		return true;
+	}
+
 	if (_is_enabled == false) {
-		return;
+		return true;
 	}
 	
-	if (_is_visible == false) {
-		return;
-	}
+	// int mousex = event->GetX()-_location.x,
+	//		mousey = event->GetY()-_location.y;
 
-	event->SetX(event->GetX()-_location.x);
-	event->SetY(event->GetY()-_location.y);
-
-	ProcessEvent(event);
+	return true;
 }
 
 void Frame::Release()
 {
-	// WARNNING:: agora o frame estah sendo removido do WindowManager no metodo Release()
-	WindowManager::GetInstance()->Remove(this);
-
-	_is_enabled = false;
-
 	InputManager::GetInstance()->RemoveKeyListener(this);
 	InputManager::GetInstance()->RemoveMouseListener(this);
-
-	SetVisible(false);
 	
-	_frame_sem.Notify();
+	Window::Release();
+
+	_window_semaphore.Notify();
 }
 
 void Frame::Paint(Graphics *g)

@@ -149,7 +149,7 @@ int main(int argc, char **argv)
 {
 	Main main;
 
-	main.Show(false);
+	main.Show();
 
 	for (int i=0; i<100; i++) {
 		for (double j=0.0; j<2*M_PI; j+=0.1) {

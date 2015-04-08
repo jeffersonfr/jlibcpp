@@ -42,7 +42,7 @@ class ColorChooser : public jgui::Component {
 
 			for (double i = 0; i<360.; i+=.15) {
 				for (double j = 0; j<border2; j++) {
-					_image->GetGraphics()->SetPixel((int)(cx - cos(M_PI * i / 180.0)*j), (int)(cy - sin(M_PI * i / 180.0)*j), HLS2RGB(i, 0.5, j/border2));
+					_image->GetGraphics()->SetRGB(HLS2RGB(i, 0.5, j/border2), (int)(cx - cos(M_PI * i / 180.0)*j), (int)(cy - sin(M_PI * i / 180.0)*j));
 				}
 			}
 		}
@@ -116,12 +116,16 @@ class ColorChooser : public jgui::Component {
 			g->DrawImage(_image, 0, 0);
 		}
 		
-		virtual bool ProcessEvent(jgui::MouseEvent *event)
+		virtual bool MouseMoved(jgui::MouseEvent *event)
 		{
+			if (jgui::Component::MouseMoved(event) == true) {
+				return true;
+			}
+
 			int x = (event->GetX()-_location.x),
 					y = (event->GetY()-_location.y);
 
-			SetBackgroundColor(_image->GetGraphics()->GetPixel(x, y));
+			SetBackgroundColor(_image->GetGraphics()->GetRGB(x, y));
 
 			return true;
 		}
@@ -157,7 +161,7 @@ int main()
 {
 	FrameTest frame;
 
-	frame.Show();
+	frame.Show(true);
 
 	return 0;
 }

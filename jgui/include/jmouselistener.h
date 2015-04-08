@@ -51,25 +51,25 @@ class MouseListener : public jcommon::Listener{
 		 * \brief
 		 *
 		 */
-		virtual void MousePressed(MouseEvent *event);
+		virtual bool MousePressed(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void MouseReleased(MouseEvent *event);
+		virtual bool MouseReleased(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void MouseMoved(MouseEvent *event);
+		virtual bool MouseMoved(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void MouseWheel(MouseEvent *event);
+		virtual bool MouseWheel(MouseEvent *event);
 
 };
 

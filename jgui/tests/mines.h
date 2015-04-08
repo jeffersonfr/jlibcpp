@@ -77,7 +77,7 @@ class Mines : public jgui::Frame{
 	void Expose(int row, int col);
 	game_status_t GetResult();
 
-	virtual bool ProcessEvent(jgui::KeyEvent *event);
+	virtual bool KeyPressed(jgui::KeyEvent *event);
 
 };
 

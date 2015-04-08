@@ -94,14 +94,6 @@ jsize_t InputManager::GetWorkingScreenSize()
 	return _scale;
 }
 
-void InputManager::SkipKeyEvents(bool b)
-{
-}
-
-void InputManager::SkipMouseEvents(bool b)
-{
-}
-
 void InputManager::SetKeyEventsEnabled(bool b)
 {
 }

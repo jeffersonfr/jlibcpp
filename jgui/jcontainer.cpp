@@ -748,24 +748,30 @@ void Container::ReleaseComponentFocus(jgui::Component *c)
 	}
 }
 
-bool Container::ProcessEvent(KeyEvent *event)
+bool Container::KeyPressed(KeyEvent *event)
 {
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
+	if (Component::KeyPressed(event) == true) {
+		return true;
 	}
 
 	Component *current = GetFocusOwner();
 
 	if (current != NULL) {
-		return current->ProcessNavigation(event);
+		if (current->KeyPressed(event) == true) {
+			return true;
+		}
+		
+		if (current->ProcessNavigation(event) == true) {
+			return true;
+		}
 	}
 
 	return false;
 }
 
-bool Container::ProcessEvent(MouseEvent *event)
+bool Container::MousePressed(MouseEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::MousePressed(event) == true) {
 		return true;
 	}
 
@@ -774,22 +780,107 @@ bool Container::ProcessEvent(MouseEvent *event)
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 	int mousex = event->GetX(),
 			mousey = event->GetY();
-
 	int dx,
 			dy;
 
 	Component *c = GetTargetComponent(this, mousex, mousey, &dx, &dy);
 
 	if (c != NULL && c != this) {
-		event->SetX(dx+scrollx);
-		event->SetY(dy+scrolly);
+		MouseEvent e = *event;
 
-		return c->ProcessEvent(event);
+		e.SetX(dx+scrollx);
+		e.SetY(dy+scrolly);
+
+		return c->MousePressed(&e);
 	}
 
 	return false;
 }
-		
+
+bool Container::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	int mousex = event->GetX(),
+			mousey = event->GetY();
+	int dx,
+			dy;
+
+	Component *c = GetTargetComponent(this, mousex, mousey, &dx, &dy);
+
+	if (c != NULL && c != this) {
+		MouseEvent e = *event;
+
+		e.SetX(dx+scrollx);
+		e.SetY(dy+scrolly);
+
+		return c->MouseReleased(&e);
+	}
+
+	return false;
+}
+
+bool Container::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	int mousex = event->GetX(),
+			mousey = event->GetY();
+	int dx,
+			dy;
+
+	Component *c = GetTargetComponent(this, mousex, mousey, &dx, &dy);
+
+	if (c != NULL && c != this) {
+		MouseEvent e = *event;
+
+		e.SetX(dx+scrollx);
+		e.SetY(dy+scrolly);
+
+		return c->MouseMoved(&e);
+	}
+
+	return false;
+}
+
+bool Container::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	int mousex = event->GetX(),
+			mousey = event->GetY();
+	int dx,
+			dy;
+
+	Component *c = GetTargetComponent(this, mousex, mousey, &dx, &dy);
+
+	if (c != NULL && c != this) {
+		MouseEvent e = *event;
+
+		e.SetX(dx+scrollx);
+		e.SetY(dy+scrolly);
+
+		return c->MouseWheel(&e);
+	}
+
+	return false;
+}
+
 jgui::Component * Container::GetFocusOwner()
 {
 	if (_parent != NULL) {

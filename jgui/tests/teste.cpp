@@ -42,442 +42,426 @@
 #include "jyesnodialogbox.h"
 #include "jmenugroup.h"
 #include "jsystem.h"
+#include "jwindowlistener.h"
+#include "jthememanager.h"
 
 class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
 
 	private:
-		jthread::Mutex teste_mutex;
-		jgui::Animation *animation;
-		jgui::Marquee *marquee;
-		jgui::TextField *text_field;
-		jgui::TextArea *text_area;
-		jgui::ProgressBar *progress;
-		jgui::Watch *watch;
-		jgui::Button *button1,
-			*button2,
-			*button3;
-		jgui::Spin *spin;
-		jgui::CheckButton *check1,
-			*check2,
-			*check3;
-		jgui::CheckButton *radio1,
-			*radio2,
-			*radio3;
-		jgui::CheckButtonGroup *group;
-		jgui::Label *label1,
-			*label2;
-		jgui::ListBox *list;
-		jgui::Icon *static_image;
-		jgui::Slider *slider;
-		jgui::ScrollBar *scroll;
-		jgui::ImageButton *image_button1,
-			*image_button2,
-			*image_button3;
-		jgui::ToogleButton *toogle;
-		jgui::ComboBox *combo;
+		jthread::Mutex 
+			_mutex;
+		jgui::Animation 
+			*_animation;
+		jgui::Marquee 
+			*_marquee;
+		jgui::TextField 
+			*_textfield;
+		jgui::TextArea 
+			*_textarea;
+		jgui::ProgressBar 
+			*_progress;
+		jgui::Watch 
+			*_watch;
+		jgui::Button 
+			*_button1,
+			*_button2,
+			*_button3;
+		jgui::Spin 
+			*_spin;
+		jgui::CheckButton 
+			*_check1,
+			*_check2,
+			*_check3;
+		jgui::CheckButton 
+			*_radio1,
+			*_radio2,
+			*_radio3;
+		jgui::CheckButtonGroup 
+			*_group;
+		jgui::Label 
+			*_label1,
+			*_label2;
+		jgui::ListBox 
+			*_list;
+		jgui::Icon 
+			*_staticimage;
+		jgui::Slider 
+			*_slider;
+		jgui::ScrollBar 
+			*_scroll;
+		jgui::ImageButton 
+			*_imagebutton1,
+			*_imagebutton2,
+			*_imagebutton3;
+		jgui::ToogleButton 
+			*_toogle;
+		jgui::ComboBox 
+			*_combo;
 
 	public:
 		WindowTeste():
 			jgui::Frame("Frame Test", 0, 0, 1920, 1080)
 	{
 		{
-			animation = new jgui::Animation(150, 110, 150, 150);
+			_animation = new jgui::Animation(150, 110, 150, 150);
 
-			animation->SetInterval(2000);
+			_animation->SetInterval(2000);
 
-			animation->AddImage("images/tux-alien.png");
-			animation->AddImage("images/tux-bart.png");
-			animation->AddImage("images/tux-batman.png");
-			animation->AddImage("images/tux-freddy.png");
-			animation->AddImage("images/tux-homer.png");
-			animation->AddImage("images/tux-indiana.png");
-			animation->AddImage("images/tux-ipod.png");
-			animation->AddImage("images/tux-jamaican.png");
-			animation->AddImage("images/tux-jason.png");
-			animation->AddImage("images/tux-kenny.png");
-			animation->AddImage("images/tux-mario.png");
-			animation->AddImage("images/tux-neo.png");
-			animation->AddImage("images/tux-potter.png");
-			animation->AddImage("images/tux-raider.png");
-			animation->AddImage("images/tux-rambo.png");
-			animation->AddImage("images/tux-rapper.png");
-			animation->AddImage("images/tux-shrek.png");
-			animation->AddImage("images/tux-spiderman.png");
-			animation->AddImage("images/tux-turtle.png");
-			animation->AddImage("images/tux-wolverine.png");
-			animation->AddImage("images/tux-zombie.png");
+			_animation->AddImage("images/tux-alien.png");
+			_animation->AddImage("images/tux-bart.png");
+			_animation->AddImage("images/tux-batman.png");
+			_animation->AddImage("images/tux-freddy.png");
+			_animation->AddImage("images/tux-homer.png");
+			_animation->AddImage("images/tux-indiana.png");
+			_animation->AddImage("images/tux-ipod.png");
+			_animation->AddImage("images/tux-jamaican.png");
+			_animation->AddImage("images/tux-jason.png");
+			_animation->AddImage("images/tux-kenny.png");
+			_animation->AddImage("images/tux-mario.png");
+			_animation->AddImage("images/tux-neo.png");
+			_animation->AddImage("images/tux-potter.png");
+			_animation->AddImage("images/tux-raider.png");
+			_animation->AddImage("images/tux-rambo.png");
+			_animation->AddImage("images/tux-rapper.png");
+			_animation->AddImage("images/tux-shrek.png");
+			_animation->AddImage("images/tux-spiderman.png");
+			_animation->AddImage("images/tux-turtle.png");
+			_animation->AddImage("images/tux-wolverine.png");
+			_animation->AddImage("images/tux-zombie.png");
 
-			animation->Start();
+			_animation->Start();
 		}
 
 		{
-			marquee = new jgui::Marquee("Marquee Test", 500, 110, 700);
+			_marquee = new jgui::Marquee("Marquee Test", 500, 110, 700);
 
-			marquee->SetType(jgui::JMM_LOOP);
+			_marquee->SetType(jgui::JMM_LOOP);
 
-			marquee->Start();
+			_marquee->Start();
 		}
 
 		{
-			progress = new jgui::ProgressBar(500, 170, 700);
-			slider = new jgui::Slider(500, 170, 700);
-			scroll = new jgui::ScrollBar(500, 230, 700);
+			_progress = new jgui::ProgressBar(500, 170, 700);
+			_slider = new jgui::Slider(500, 170, 700);
+			_scroll = new jgui::ScrollBar(500, 230, 700);
 
-			progress->SetValue(20.0);
-			slider->SetValue(20.0);
-			scroll->SetValue(20.0);
+			_progress->SetValue(20.0);
+			_slider->SetValue(20.0);
+			_scroll->SetValue(20.0);
 
-			progress->Start();
+			_progress->Start();
 		}
 
 		{
-			text_field = new jgui::TextField(500, 290, 700);
+			_textfield = new jgui::TextField(500, 290, 700);
 
-			text_field->Insert("Text Field");
+			_textfield->Insert("Text Field");
 		}
 
 		{
-			text_area = new jgui::TextArea(500, 350, 700, 300);
+			_textarea = new jgui::TextArea(500, 350, 700, 300);
 
-			text_area->Insert("Text Area\nwriting some text ...\nbye bye");
+			_textarea->Insert("Text Area\nwriting some text ...\nbye bye");
 		}
 
 		{
-			watch = new jgui::Watch(jgui::JWT_CRONOMETERDOWN, 150, 300, 300);
+			_watch = new jgui::Watch(jgui::JWT_CRONOMETERDOWN, 150, 300, 300);
 
-			watch->SetSeconds(10);
-			watch->SetMinutes(0);
-			watch->SetHours(0);
+			_watch->SetSeconds(10);
+			_watch->SetMinutes(0);
+			_watch->SetHours(0);
 
-			watch->Start();
+			_watch->Start();
 		}
 
 		{
-			button1 = new jgui::Button("Increase", 150, 380, 300);
-			button2 = new jgui::Button("Decrease", 150, 450, 300);
-			button3 = new jgui::Button("Testing a long text in a buttom component", 150, 590, 300, 150);
+			_button1 = new jgui::Button("Increase", 150, 380, 300);
+			_button2 = new jgui::Button("Decrease", 150, 450, 300);
+			_button3 = new jgui::Button("Testing a long text in a buttom component", 150, 590, 300, 150);
 
-			button1->SetBackgroundFocusColor(0x40, 0xf0, 0x40, 0xff);
-			button2->SetBackgroundFocusColor(0xf0, 0x20, 0x20, 0xff);
-			button3->SetBackgroundFocusColor(0xf0, 0xf0, 0x40, 0xff);
+			_button1->SetBackgroundFocusColor(0x40, 0xf0, 0x40, 0xff);
+			_button2->SetBackgroundFocusColor(0xf0, 0x20, 0x20, 0xff);
+			_button3->SetBackgroundFocusColor(0xf0, 0xf0, 0x40, 0xff);
 
-			button1->RegisterButtonListener(this);
-			button2->RegisterButtonListener(this);
+			_button1->RegisterButtonListener(this);
+			_button2->RegisterButtonListener(this);
 
 			/*
-			button1->SetBorderSize(8);
-			button2->SetBorderSize(8);
-			button3->SetBorderSize(8);
+			_button1->SetBorderSize(8);
+			_button2->SetBorderSize(8);
+			_button3->SetBorderSize(8);
 
-			button1->SetBorderType(jgui::DOWN_BEVEL_BORDER);
-			button2->SetBorderType(jgui::BEVEL_BORDER);
-			button3->SetBorderType(jgui::ROUND_LINE_BORDER);
+			_button1->SetBorderType(jgui::DOWN_BEVEL_BORDER);
+			_button2->SetBorderType(jgui::BEVEL_BORDER);
+			_button3->SetBorderType(jgui::ROUND_LINE_BORDER);
 			*/
 		}
 
 		{
-			toogle = new jgui::ToogleButton("Toggle Button", 150, 520, 300);
+			_toogle = new jgui::ToogleButton("Toggle Button", 150, 520, 300);
 		}
 
 		{
-			image_button1 = new jgui::ImageButton("", "images/alert_icon.png", 150, 760, 80, 60);
-			image_button2 = new jgui::ImageButton("", "images/info_icon.png", 260, 760, 80, 60);
-			image_button3 = new jgui::ImageButton("", "images/error_icon.png", 370, 760, 80, 60);
+			_imagebutton1 = new jgui::ImageButton("", "images/alert_icon.png", 150, 760, 80, 60);
+			_imagebutton2 = new jgui::ImageButton("", "images/info_icon.png", 260, 760, 80, 60);
+			_imagebutton3 = new jgui::ImageButton("", "images/error_icon.png", 370, 760, 80, 60);
 		}
 
 		{
-			spin = new jgui::Spin(150, 850, 300);
+			_spin = new jgui::Spin(150, 850, 300);
 
-			spin->AddTextItem("loop");
-			spin->AddTextItem("bounce");
+			_spin->AddTextItem("loop");
+			_spin->AddTextItem("bounce");
 
-			spin->RegisterSelectListener(this);
+			_spin->RegisterSelectListener(this);
 		}
 
 		{
-			label1 = new jgui::Label("Label Test 1", 500, 680, 300);
-			label2 = new jgui::Label("Label Test 2", 860, 680, 300);
+			_label1 = new jgui::Label("Label Test 1", 500, 680, 300);
+			_label2 = new jgui::Label("Label Test 2", 860, 680, 300);
 		}
 
 		{
-			check1 = new jgui::CheckButton(jgui::JCBT_CHECK, "Wrap Text", 500, 740, 300);
-			check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "Password", 500, 795, 300);
-			check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "Hide", 500, 850, 300);
+			_check1 = new jgui::CheckButton(jgui::JCBT_CHECK, "Wrap Text", 500, 740, 300);
+			_check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "Password", 500, 795, 300);
+			_check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "Hide", 500, 850, 300);
 
-			check1->SetSelected(true);
+			_check1->SetSelected(true);
 
-			check1->RegisterCheckButtonListener(this);
-			check2->RegisterCheckButtonListener(this);
-			check3->RegisterCheckButtonListener(this);
+			_check1->RegisterCheckButtonListener(this);
+			_check2->RegisterCheckButtonListener(this);
+			_check3->RegisterCheckButtonListener(this);
 		}
 
 		{
-			radio1 = new jgui::CheckButton(jgui::JCBT_RADIO, "Left", 860, 740, 300);
-			radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "Center", 860, 795, 300);
-			radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "Right", 860, 850, 300);
+			_radio1 = new jgui::CheckButton(jgui::JCBT_RADIO, "Left", 860, 740, 300);
+			_radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "Center", 860, 795, 300);
+			_radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "Right", 860, 850, 300);
 
-			group = new jgui::CheckButtonGroup();
+			_group = new jgui::CheckButtonGroup();
 
-			radio2->SetSelected(true);
+			_radio2->SetSelected(true);
 
-			group->Add(radio1);
-			group->Add(radio2);
-			group->Add(radio3);
+			_group->Add(_radio1);
+			_group->Add(_radio2);
+			_group->Add(_radio3);
 
-			radio1->RegisterCheckButtonListener(this);
-			radio2->RegisterCheckButtonListener(this);
-			radio3->RegisterCheckButtonListener(this);
+			_radio1->RegisterCheckButtonListener(this);
+			_radio2->RegisterCheckButtonListener(this);
+			_radio3->RegisterCheckButtonListener(this);
 		}
 
 		{
-			static_image = new jgui::Icon(jcommon::System::GetResourceDirectory() + "/images/green_icon.png", 1250, 110, 400, 300);
+			_staticimage = new jgui::Icon(jcommon::System::GetResourceDirectory() + "/images/green_icon.png", 1250, 110, 400, 300);
 
-			static_image->SetText("Green Button");
+			_staticimage->SetText("Green Button");
 		}
 
 		{
-			list = new jgui::ListBox(1250, 450, 400, 300);
+			_list = new jgui::ListBox(1250, 450, 400, 300);
 
-			list->AddImageItem("Item 01", std::string("images/tux-alien.png"));
-			list->AddTextItem("Item 02");
-			list->AddImageItem("Item 03", std::string("images/tux-bart.png"));
-			list->AddTextItem("Item 04");
-			list->AddImageItem("Item 05", std::string("images/tux-batman.png"));
-			list->AddTextItem("Item 06");
-			list->AddImageItem("Item 07", std::string("images/tux-freddy.png"));
-			list->AddTextItem("Item 08");
-			list->AddImageItem("Item 09", std::string("images/tux-homer.png"));
-			list->AddTextItem("Item 10");
-			list->AddImageItem("Item 11", std::string("images/tux-indiana.png"));
-			list->AddTextItem("Item 12");
-			list->AddImageItem("Item 13", std::string("images/tux-ipod.png"));
-			list->AddTextItem("Item 14");
-			list->AddImageItem("Item 15", std::string("images/tux-jamaican.png"));
-			list->AddTextItem("Item 16");
-			list->AddImageItem("Item 17", std::string("images/tux-jason.png"));
-			list->AddTextItem("Item 18");
-			list->AddImageItem("Item 19", std::string("images/tux-kenny.png"));
-			list->AddTextItem("Item 20");
-			list->AddImageItem("Item 21", std::string("images/tux-mario.png"));
-			list->AddTextItem("Item 22");
-			list->AddImageItem("Item 23", std::string("images/tux-neo.png"));
-			list->AddTextItem("Item 24");
-			list->AddImageItem("Item 25", std::string("images/tux-potter.png"));
-			list->AddTextItem("Item 26");
-			list->AddImageItem("Item 27", std::string("images/tux-raider.png"));
-			list->AddTextItem("Item 28");
-			list->AddImageItem("Item 29", std::string("images/tux-rambo.png"));
-			list->AddTextItem("Item 30");
-			list->AddImageItem("Item 31", std::string("images/tux-rapper.png"));
-			list->AddTextItem("Item 32");
-			list->AddImageItem("Item 33", std::string("images/tux-shrek.png"));
-			list->AddTextItem("Item 34");
-			list->AddImageItem("Item 35", std::string("images/tux-spiderman.png"));
-			list->AddTextItem("Item 36");
-			list->AddImageItem("Item 37", std::string("images/tux-turtle.png"));
-			list->AddTextItem("Item 38");
-			list->AddImageItem("Item 39", std::string("images/tux-wolverine.png"));
-			list->AddTextItem("Item 40");
-			list->AddImageItem("Item 41", std::string("images/tux-zombie.png"));
-			list->AddTextItem("Item 42");
+			_list->AddImageItem("Item 01", std::string("images/tux-alien.png"));
+			_list->AddTextItem("Item 02");
+			_list->AddImageItem("Item 03", std::string("images/tux-bart.png"));
+			_list->AddTextItem("Item 04");
+			_list->AddImageItem("Item 05", std::string("images/tux-batman.png"));
+			_list->AddTextItem("Item 06");
+			_list->AddImageItem("Item 07", std::string("images/tux-freddy.png"));
+			_list->AddTextItem("Item 08");
+			_list->AddImageItem("Item 09", std::string("images/tux-homer.png"));
+			_list->AddTextItem("Item 10");
+			_list->AddImageItem("Item 11", std::string("images/tux-indiana.png"));
+			_list->AddTextItem("Item 12");
+			_list->AddImageItem("Item 13", std::string("images/tux-ipod.png"));
+			_list->AddTextItem("Item 14");
+			_list->AddImageItem("Item 15", std::string("images/tux-jamaican.png"));
+			_list->AddTextItem("Item 16");
+			_list->AddImageItem("Item 17", std::string("images/tux-jason.png"));
+			_list->AddTextItem("Item 18");
+			_list->AddImageItem("Item 19", std::string("images/tux-kenny.png"));
+			_list->AddTextItem("Item 20");
+			_list->AddImageItem("Item 21", std::string("images/tux-mario.png"));
+			_list->AddTextItem("Item 22");
+			_list->AddImageItem("Item 23", std::string("images/tux-neo.png"));
+			_list->AddTextItem("Item 24");
+			_list->AddImageItem("Item 25", std::string("images/tux-potter.png"));
+			_list->AddTextItem("Item 26");
+			_list->AddImageItem("Item 27", std::string("images/tux-raider.png"));
+			_list->AddTextItem("Item 28");
+			_list->AddImageItem("Item 29", std::string("images/tux-rambo.png"));
+			_list->AddTextItem("Item 30");
+			_list->AddImageItem("Item 31", std::string("images/tux-rapper.png"));
+			_list->AddTextItem("Item 32");
+			_list->AddImageItem("Item 33", std::string("images/tux-shrek.png"));
+			_list->AddTextItem("Item 34");
+			_list->AddImageItem("Item 35", std::string("images/tux-spiderman.png"));
+			_list->AddTextItem("Item 36");
+			_list->AddImageItem("Item 37", std::string("images/tux-turtle.png"));
+			_list->AddTextItem("Item 38");
+			_list->AddImageItem("Item 39", std::string("images/tux-wolverine.png"));
+			_list->AddTextItem("Item 40");
+			_list->AddImageItem("Item 41", std::string("images/tux-zombie.png"));
+			_list->AddTextItem("Item 42");
 		}
 
 		{
-			combo = new jgui::ComboBox(1250, 800, 400, DEFAULT_COMPONENT_HEIGHT, 3);
+			_combo = new jgui::ComboBox(1250, 800, 400, DEFAULT_COMPONENT_HEIGHT, 3);
 
-			combo->AddTextItem("Item 1");
-			combo->AddTextItem("Item 2");
-			combo->AddTextItem("Item 3");
-			combo->AddTextItem("Item 4");
-			combo->AddTextItem("Item 5");
-			combo->AddTextItem("Item 6");
-			combo->AddTextItem("Item 7");
-			combo->AddTextItem("Item 8");
-			combo->AddTextItem("Item 9");
-			combo->AddTextItem("Item 0");
+			_combo->AddTextItem("Item 1");
+			_combo->AddTextItem("Item 2");
+			_combo->AddTextItem("Item 3");
+			_combo->AddTextItem("Item 4");
+			_combo->AddTextItem("Item 5");
+			_combo->AddTextItem("Item 6");
+			_combo->AddTextItem("Item 7");
+			_combo->AddTextItem("Item 8");
+			_combo->AddTextItem("Item 9");
+			_combo->AddTextItem("Item 0");
 
-			combo->RegisterSelectListener(this);
+			_combo->RegisterSelectListener(this);
 		}
 
-		Add(text_field);
-		Add(text_area);
-		// Add(progress);
-		Add(slider);
-		Add(scroll);
-		Add(button1);
-		Add(button2);
-		Add(button3);
-		Add(toogle);
-		Add(image_button1);
-		Add(image_button2);
-		Add(image_button3);
-		Add(spin);
-		Add(combo);
-		Add(label1);
-		Add(label2);
-		Add(check1);
-		Add(check2);
-		Add(check3);
-		Add(radio1);
-		Add(radio2);
-		Add(radio3);
-		Add(static_image);
-		Add(marquee);
-		Add(animation);
-		Add(watch);
-		Add(list);
+		Add(_textfield);
+		Add(_textarea);
+		// Add(_progress);
+		Add(_slider);
+		Add(_scroll);
+		Add(_button1);
+		Add(_button2);
+		Add(_button3);
+		Add(_toogle);
+		Add(_imagebutton1);
+		Add(_imagebutton2);
+		Add(_imagebutton3);
+		Add(_spin);
+		Add(_combo);
+		Add(_label1);
+		Add(_label2);
+		Add(_check1);
+		Add(_check2);
+		Add(_check3);
+		Add(_radio1);
+		Add(_radio2);
+		Add(_radio3);
+		Add(_staticimage);
+		Add(_marquee);
+		Add(_animation);
+		Add(_watch);
+		Add(_list);
 
-		button1->RequestFocus();
+		_button1->RequestFocus();
 	}
 
 	virtual ~WindowTeste()
 	{
-		jthread::AutoLock lock(&teste_mutex);
-
-		// unregister listeners
-		button1->RemoveButtonListener(this);
-		button2->RemoveButtonListener(this);
-
-		spin->RemoveSelectListener(this);
-
-		check1->RemoveCheckButtonListener(this);
-		check2->RemoveCheckButtonListener(this);
-		check3->RemoveCheckButtonListener(this);
-
-		radio1->RemoveCheckButtonListener(this);
-		radio2->RemoveCheckButtonListener(this);
-		radio3->RemoveCheckButtonListener(this);
-
-		combo->RemoveSelectListener(this);
+		jthread::AutoLock lock(&_mutex);
 
 		Hide();
 
-		delete animation;
-		delete marquee;
-		delete text_field;
-		delete text_area;
-		delete progress;
-		delete watch;
-		delete button1;
-		delete button2;
-		delete toogle;
-		delete image_button1;
-		delete image_button2;
-		delete image_button3;
-		delete spin;
-		delete combo;
-		delete list;
-		delete label1;
-		delete label2;
+		delete _animation;
+		delete _marquee;
+		delete _textfield;
+		delete _textarea;
+		delete _progress;
+		delete _watch;
+		delete _button1;
+		delete _button2;
+		delete _button3;
+		delete _check1;
+		delete _check2;
+		delete _check3;
+		delete _radio1;
+		delete _radio2;
+		delete _radio3;
+		delete _toogle;
+		delete _imagebutton1;
+		delete _imagebutton2;
+		delete _imagebutton3;
+		delete _spin;
+		delete _combo;
+		delete _list;
+		delete _label1;
+		delete _label2;
 
 		// INFO:: delete group before the childs
-		delete group;
-
-		delete check1;
-		delete check2;
-		delete check3;
-		delete radio1;
-		delete radio2;
-		delete radio3;
-	}
-
-	virtual bool ProcessEvent(jgui::KeyEvent *event)
-	{
-		if (Frame::ProcessEvent(event) == true) {
-			return true;
-		}
-
-		jthread::AutoLock lock(&teste_mutex);
-
-		if (event->GetType() != jgui::JKT_PRESSED) {
-			return false;
-		}
-
-		if (event->GetSymbol() == jgui::JKS_ENTER) {
-			if (GetFocusOwner() == text_field) {
-				jgui::Keyboard keyboard(500, 400, jgui::JKT_QWERTY, false);
-
-				keyboard.RegisterKeyboardListener(dynamic_cast<jgui::KeyboardListener *>(this));
-				keyboard.Show();
-			}
-		}
-
-		return true;
+		delete _group;
 	}
 
 	virtual void ButtonSelected(jgui::CheckButtonEvent *event)
 	{
-		jthread::AutoLock lock(&teste_mutex);
+		jthread::AutoLock lock(&_mutex);
 
-		if (event->GetSource() == check1 ||
-				event->GetSource() == check2 ||
-				event->GetSource() == check3) {
-			if (check1->IsSelected() == true) {
-				text_area->SetWrap(true);
+		if (event->GetSource() == _check1 ||
+				event->GetSource() == _check2 ||
+				event->GetSource() == _check3) {
+			if (_check1->IsSelected() == true) {
+				_textarea->SetWrap(true);
 			} else {
-				text_area->SetWrap(false);
+				_textarea->SetWrap(false);
 			}
 
-			if (check2->IsSelected() == true) {
-				text_area->SetEchoChar('*');
+			if (_check2->IsSelected() == true) {
+				_textarea->SetEchoChar('*');
 			} else {
-				text_area->SetEchoChar('\0');
+				_textarea->SetEchoChar('\0');
 			}
 
-			if (check3->IsSelected() == true) {
-				text_area->SetVisible(false);
+			if (_check3->IsSelected() == true) {
+				_textarea->SetVisible(false);
 			} else {
-				text_area->SetVisible(true);
+				_textarea->SetVisible(true);
 			}
-		} else if (event->GetSource() == radio1) {
-			label1->SetHorizontalAlign(jgui::JHA_LEFT);
-			label2->SetHorizontalAlign(jgui::JHA_LEFT);
-		} else if (event->GetSource() == radio2) {
-			label1->SetHorizontalAlign(jgui::JHA_CENTER);
-			label2->SetHorizontalAlign(jgui::JHA_CENTER);
-		} else if (event->GetSource() == radio3) {
-			label1->SetHorizontalAlign(jgui::JHA_RIGHT);
-			label2->SetHorizontalAlign(jgui::JHA_RIGHT);
+		} else if (event->GetSource() == _radio1) {
+			_label1->SetHorizontalAlign(jgui::JHA_LEFT);
+			_label2->SetHorizontalAlign(jgui::JHA_LEFT);
+		} else if (event->GetSource() == _radio2) {
+			_label1->SetHorizontalAlign(jgui::JHA_CENTER);
+			_label2->SetHorizontalAlign(jgui::JHA_CENTER);
+		} else if (event->GetSource() == _radio3) {
+			_label1->SetHorizontalAlign(jgui::JHA_RIGHT);
+			_label2->SetHorizontalAlign(jgui::JHA_RIGHT);
 		}
 	}
 
 	virtual void ItemChanged(jgui::SelectEvent *event)
 	{
-		jthread::AutoLock lock(&teste_mutex);
+		jthread::AutoLock lock(&_mutex);
 
-		if (spin->GetCurrentIndex() == 0) {
-			marquee->SetType(jgui::JMM_LOOP);
-		} else if (spin->GetCurrentIndex() == 1) {
-			marquee->SetType(jgui::JMM_BOUNCE);
+		if (_spin->GetCurrentIndex() == 0) {
+			_marquee->SetType(jgui::JMM_LOOP);
+		} else if (_spin->GetCurrentIndex() == 1) {
+			_marquee->SetType(jgui::JMM_BOUNCE);
 		}
 	}
 
 	virtual void ActionPerformed(jgui::ButtonEvent *event)
 	{
-		jthread::AutoLock lock(&teste_mutex);
+		jthread::AutoLock lock(&_mutex);
 
-		if (event->GetSource() == button1) {
-			progress->SetValue(progress->GetValue()+10);
-			slider->SetValue(slider->GetValue()+10);
+		if (event->GetSource() == _button1) {
+			_progress->SetValue(_progress->GetValue()+10);
+			_slider->SetValue(_slider->GetValue()+10);
 
-			/*
+			//*
 			jgui::Theme *t = new jgui::Theme();
 
 			t->SetWindowBackgroundColor(0x75, 0x55, 0x35, 0xa0);
 			t->SetComponentBackgroundColor(0x35, 0x80, 0x35, 0xe0);
+			t->SetItemColor(0xf0, 0x80, 0x35, 0xe0);
 
 			jgui::ThemeManager::GetInstance()->SetTheme(t);
-			*/
-		} else if (event->GetSource() == button2) {
-			progress->SetValue(progress->GetValue()-10);
-			slider->SetValue(slider->GetValue()-10);
+			//*/
+		} else if (event->GetSource() == _button2) {
+			_progress->SetValue(_progress->GetValue()-10);
+			_slider->SetValue(_slider->GetValue()-10);
+		} else if (event->GetSource() == _button3) {
 		}
 	}
 
 	virtual void KeyboardPressed(jgui::KeyEvent *event)
 	{
-		if (GetFocusOwner() == text_field) {
-			text_field->ProcessEvent(event);
+		if (GetFocusOwner() == _textfield) {
+			_textfield->KeyPressed(event);
 		}
 	}
 
@@ -890,7 +874,7 @@ class GraphicPanel : public jgui::Canvas{
 class GraphicsTeste : public jgui::Frame{
 
 	private:
-		jthread::Mutex teste_mutex;
+		jthread::Mutex _mutex;
 
 		jgui::Canvas *panel;
 
@@ -905,7 +889,7 @@ class GraphicsTeste : public jgui::Frame{
 
 		virtual ~GraphicsTeste()
 		{
-			jthread::AutoLock lock(&teste_mutex);
+			jthread::AutoLock lock(&_mutex);
 
 			Hide();
 
@@ -914,181 +898,258 @@ class GraphicsTeste : public jgui::Frame{
 
 };
 
-class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener{
+class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::WindowListener{
 
 	private:
-		jthread::Mutex teste_mutex;
+		jthread::Mutex _mutex;
 
-		jgui::Button *button1,
-			*button2,
-			*button3,
-			*button4,
-			*button5,
-			*button6,
-			*button7;
+		jgui::Frame 
+			*_current;
+		jgui::Button 
+			*_button1,
+			*_button2,
+			*_button3,
+			*_button4,
+			*_button5,
+			*_button6,
+			*_button7;
+		jgui::Keyboard 
+			*_querty_kb,
+			*_alpha_kb,
+			*_numeric_kb,
+			*_phone_kb,
+			*_internet_kb;
+		jgui::CalendarDialogBox 
+			*_calendar;
+		jgui::MessageDialogBox
+			*_message_1,
+			*_message_2;
+		jgui::Menu 
+			*_menu;
+		int 
+			_index;
 
 	public:
 		ModulesTeste():
 			jgui::Frame("Graphics Test", 0, 0, 1920, 1080)
-	{
-		int h = 100;
+		{
+			int h = 100;
 
-		button1 = new jgui::Button("Keyboard Test", 150, 0*(h+10)+100, 500, h);
-		button2 = new jgui::Button("Calendar Test", 150, 1*(h+10)+100, 500, h);
-		button3 = new jgui::Button("Components Test", 150, 2*(h+10)+100, 500, h);
-		button4 = new jgui::Button("MessageDialog Test", 150, 3*(h+10)+100, 500, h);
-		button5 = new jgui::Button("InputDialogBox Test", 150, 4*(h+10)+100, 500, h);
-		button6 = new jgui::Button("Graphics Test", 150, 5*(h+10)+100, 500, h);
-		button7 = new jgui::Button("Menu Test", 150, 6*(h+10)+100, 500, h);
+			_current = NULL;
+			_index = -1;
 
-		button1->RegisterButtonListener(this);
-		button2->RegisterButtonListener(this);
-		button3->RegisterButtonListener(this);
-		button4->RegisterButtonListener(this);
-		button5->RegisterButtonListener(this);
-		button6->RegisterButtonListener(this);
-		button7->RegisterButtonListener(this);
+			_button1 = new jgui::Button("Keyboard Test", 150, 0*(h+10)+100, 500, h);
+			_button2 = new jgui::Button("Calendar Test", 150, 1*(h+10)+100, 500, h);
+			_button3 = new jgui::Button("Components Test", 150, 2*(h+10)+100, 500, h);
+			_button4 = new jgui::Button("MessageDialog Test", 150, 3*(h+10)+100, 500, h);
+			_button5 = new jgui::Button("InputDialogBox Test", 150, 4*(h+10)+100, 500, h);
+			_button6 = new jgui::Button("Graphics Test", 150, 5*(h+10)+100, 500, h);
+			_button7 = new jgui::Button("Menu Test", 150, 6*(h+10)+100, 500, h);
 
-		Add(button1);
-		Add(button2);
-		Add(button3);
-		Add(button4);
-		Add(button5);
-		Add(button6);
-		Add(button7);
+			_button1->RegisterButtonListener(this);
+			_button2->RegisterButtonListener(this);
+			_button3->RegisterButtonListener(this);
+			_button4->RegisterButtonListener(this);
+			_button5->RegisterButtonListener(this);
+			_button6->RegisterButtonListener(this);
+			_button7->RegisterButtonListener(this);
 
-		button1->RequestFocus();
-	}
+			Add(_button1);
+			Add(_button2);
+			Add(_button3);
+			Add(_button4);
+			Add(_button5);
+			Add(_button6);
+			Add(_button7);
+
+			_button1->RequestFocus();
+
+			_querty_kb = new jgui::Keyboard(150, 150, jgui::JKT_QWERTY, true);
+			_alpha_kb = new jgui::Keyboard(150, 150, jgui::JKT_ALPHA_NUMERIC, true);
+			_numeric_kb = new jgui::Keyboard(150, 150, jgui::JKT_NUMERIC, true);
+			_phone_kb = new jgui::Keyboard(150, 150, jgui::JKT_PHONE, true);
+			_internet_kb = new jgui::Keyboard(150, 150, jgui::JKT_INTERNET, true);
+
+			_querty_kb->RegisterWindowListener(this);
+			_alpha_kb->RegisterWindowListener(this);
+			_numeric_kb->RegisterWindowListener(this);
+			_phone_kb->RegisterWindowListener(this);
+			_internet_kb->RegisterWindowListener(this);
+
+			_calendar = new jgui::CalendarDialogBox;
+
+			_calendar->AddWarnning(10, 4, 2015);
+			_calendar->RegisterWindowListener(this);
+
+			_message_1 = new jgui::MessageDialogBox("Warning", "Testing the component of message with some text and breaks of line.\nThis is a new line using manual break-line character. The lines also can break in case of the width of this component be minor than the width of the current text line.");
+			_message_2 = new jgui::MessageDialogBox("Warning ", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+
+			_message_1->RegisterWindowListener(this);
+			_message_2->RegisterWindowListener(this);
+
+			_menu = new jgui::Menu(100, 100, 300, 4);
+
+			// TODO:: delete this items
+			jgui::Item 
+				*item1 = new jgui::Item("item 1"),
+				*item2 = new jgui::Item("item 2"),
+				*item3 = new jgui::Item("item 3"),
+				*item4 = new jgui::Item("item 4"),
+				*item11 = new jgui::Item("item 1.1"),
+				*item12 = new jgui::Item("item 1.2"),
+				*item111 = new jgui::Item("item 1.1.1", true),
+				*item112 = new jgui::Item("item 1.1.2", false),
+				*item31 = new jgui::Item("item 3.1"),
+				*item32 = new jgui::Item("item 3.2"),
+				*item33 = new jgui::Item("item 3.3");
+
+			item111->SetHorizontalAlign(jgui::JHA_LEFT);
+			item112->SetHorizontalAlign(jgui::JHA_LEFT);
+
+			item1->AddChild(item11);
+			item1->AddChild(item12);
+
+			item11->AddChild(item111);
+			item11->AddChild(item112);
+
+			item3->AddChild(item31);
+			item3->AddChild(item32);
+			item3->AddChild(item33);
+
+			item4->AddChild(item31);
+			item4->AddChild(item32);
+			item4->AddChild(item33);
+
+			item33->AddChild(item31);
+
+			_menu->AddItem(item1);
+			_menu->AddItem(item2);
+			_menu->AddItem(item3);
+			_menu->AddItem(item4);
+
+			jgui::MenuGroup *group = new jgui::MenuGroup(_menu);
+
+			group->Add(item111);
+			group->Add(item112);
+
+			_menu->RegisterSelectListener(this);
+		}
 
 		virtual ~ModulesTeste()
 		{
-			jthread::AutoLock lock(&teste_mutex);
+			jthread::AutoLock lock(&_mutex);
 
-			Hide();
+			Remove(_button1);
+			Remove(_button2);
+			Remove(_button3);
+			Remove(_button4);
+			Remove(_button5);
+			Remove(_button6);
+			Remove(_button7);
 
-			delete button1;
-			delete button2;
-			delete button3;
-			delete button4;
-			delete button5;
-			delete button6;
-			delete button7;
+			delete _button1;
+			delete _button2;
+			delete _button3;
+			delete _button4;
+			delete _button5;
+			delete _button6;
+			delete _button7;
+
+			delete _querty_kb;
+			delete _alpha_kb;
+			delete _numeric_kb;
+			delete _phone_kb;
+			delete _internet_kb;
+
+			delete _calendar;
+
+			delete _message_1;
+			delete _message_2;
+
+			delete _menu;
+		}
+
+		virtual void WindowOpened(jgui::WindowEvent *event)
+		{
+		}
+
+		virtual void WindowClosing(jgui::WindowEvent *event)
+		{
+		}
+
+		virtual void WindowClosed(jgui::WindowEvent *event)
+		{
+			_current = NULL;
+
+			if (_index == 0) {
+				_current = _alpha_kb;
+
+				_index = 1;
+			} else if (_index == 1) {
+				_current = _numeric_kb;
+
+				_index = 2;
+			} else if (_index == 2) {
+				_current = _phone_kb;
+
+				_index = 3;
+			} else if (_index == 3) {
+				_current = _internet_kb;
+
+				_index = -1;
+			}
+
+			if (_index == 10) {
+				_current = _message_2;
+
+				_index = -1;
+			}
+
+			if (_current != NULL) {
+				_current->Show();
+			}
+		}
+
+		virtual void WindowResized(jgui::WindowEvent *event)
+		{
+		}
+
+		virtual void WindowMoved(jgui::WindowEvent *event)
+		{
+		}
+
+		virtual void WindowPainted(jgui::WindowEvent *event)
+		{
 		}
 
 		virtual void ActionPerformed(jgui::ButtonEvent *event)
 		{
-			jthread::AutoLock lock(&teste_mutex);
+			jthread::AutoLock lock(&_mutex);
 
-			if (event->GetSource() == button1) {
-				bool visible = true;
+			if (event->GetSource() == _button1) {
+				_current = _querty_kb;
+					
+				_index = 0;
+			} else if (event->GetSource() == _button2) {
+				_calendar->Show();
+			} else if (event->GetSource() == _button3) {
+				_current = new WindowTeste();
 
-				{
-					jgui::Keyboard app(150, 150, jgui::JKT_QWERTY, visible);
+				_current->Show();
+			} else if (event->GetSource() == _button4) {
+				_current = _message_1;
 
-					app.GetText();
-					app.Show();
-				}
+				_index = 10;
+			} else if (event->GetSource() == _button5) {
+				_current = new jgui::YesNoDialogBox("Question", "This is the best of all the graphic engines of the world ?");
+			} else if (event->GetSource() == _button6) {
+				_current = new GraphicsTeste;
+			} else if (event->GetSource() == _button7) {
+				_current = _menu;
+			}
 
-				{
-					jgui::Keyboard app(150, 150, jgui::JKT_ALPHA_NUMERIC, visible);
-
-					app.Show();
-				}
-
-				{
-					jgui::Keyboard app(150, 150, jgui::JKT_NUMERIC, visible);
-
-					app.GetText();
-					app.Show();
-					app.GetText();
-				}
-
-				{
-					jgui::Keyboard app(150, 150, jgui::JKT_PHONE, visible);
-
-					app.GetText();
-					app.Show();
-					app.GetText();
-				}
-
-				{
-					jgui::Keyboard app(150, 150, jgui::JKT_INTERNET, visible);
-
-					app.Show();
-				}
-			} else if (event->GetSource() == button2) {
-				jgui::CalendarDialogBox app;
-
-				app.AddWarnning(2, 11, 2007);
-				app.Show();
-			} else if (event->GetSource() == button3) {
-				WindowTeste teste;
-
-				teste.Show();
-			} else if (event->GetSource() == button4) {
-				jgui::MessageDialogBox app1("Warning", "Testing the component of message with some text and breaks of line.\nThis is a new line using manual break-line character. The lines also can break in case of the width of this component be minor than the width of the current text line.");
-				jgui::MessageDialogBox app2("Warning ", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
-
-				app1.Show();
-				app2.Show();
-			} else if (event->GetSource() == button5) {
-				jgui::YesNoDialogBox app("Question", "This is the best of all the graphic engines of the world ?");
-
-				app.Show();
-			} else if (event->GetSource() == button6) {
-				GraphicsTeste teste;
-
-				teste.Show();
-			} else if (event->GetSource() == button7) {
-				jgui::Menu *menu = new jgui::Menu(100, 100, 300, 4);
-				jgui::Item 
-					*item1 = new jgui::Item("item 1"),
-					*item2 = new jgui::Item("item 2"),
-					*item3 = new jgui::Item("item 3"),
-					*item4 = new jgui::Item("item 4"),
-					*item11 = new jgui::Item("item 1.1"),
-					*item12 = new jgui::Item("item 1.2"),
-					*item111 = new jgui::Item("item 1.1.1", true),
-					*item112 = new jgui::Item("item 1.1.2", false),
-					*item31 = new jgui::Item("item 3.1"),
-					*item32 = new jgui::Item("item 3.2"),
-					*item33 = new jgui::Item("item 3.3");
-
-				item111->SetHorizontalAlign(jgui::JHA_LEFT);
-				item112->SetHorizontalAlign(jgui::JHA_LEFT);
-
-				item1->AddChild(item11);
-				item1->AddChild(item12);
-
-				item11->AddChild(item111);
-				item11->AddChild(item112);
-
-				item3->AddChild(item31);
-				item3->AddChild(item32);
-				item3->AddChild(item33);
-
-				item4->AddChild(item31);
-				item4->AddChild(item32);
-				item4->AddChild(item33);
-
-				item33->AddChild(item31);
-
-				menu->AddItem(item1);
-				menu->AddItem(item2);
-				menu->AddItem(item3);
-				menu->AddItem(item4);
-
-				menu->RegisterSelectListener(this);
-
-				// INFO:: items group
-				jgui::MenuGroup *group = new jgui::MenuGroup(menu);
-
-				group->Add(item111);
-				group->Add(item112);
-
-				menu->Show();
-				
-				menu->RemoveSelectListener(this);
+			if (_current != NULL) {
+				_current->Show();
 			}
 		}
 
@@ -1116,7 +1177,7 @@ int main( int argc, char *argv[] )
 {
 	ModulesTeste test;
 
-	test.Show();
+	test.Show(true);
 
 	return 0;
 }

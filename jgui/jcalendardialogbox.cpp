@@ -36,7 +36,7 @@ CalendarDialogBox::CalendarDialogBox():
 	bheight = 70;
 	delta = 2;
 
-	SetSize(8*(bwidth+delta)-30, 11*(bheight+delta)+10);
+	SetSize(8*(bwidth+delta)-30, 10*(bheight+delta));
 	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 
 	jcommon::Date date;
@@ -110,7 +110,7 @@ CalendarDialogBox::CalendarDialogBox():
 	Add(_lsex);
 	Add(_lsab);
 
-	AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
+	// AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
 
 	BuildCalendar();
 }
@@ -228,6 +228,8 @@ void CalendarDialogBox::AddWarnning(int day, int month, int year, int red, int g
 	t.blue = blue;
 
 	_warnning_days.push_back(t);
+
+	BuildCalendar();
 }
 
 void CalendarDialogBox::RemoveWarnning(jcalendar_warnning_t t)
@@ -336,24 +338,58 @@ void CalendarDialogBox::BuildCalendar()
 		_buttons[_day]->RequestFocus();
 	}
 
-	Repaint();
+	Pack();
 }
 
-bool CalendarDialogBox::ProcessEvent(KeyEvent *event)
+bool CalendarDialogBox::KeyPressed(KeyEvent *event)
 {
-	if (Frame::ProcessEvent(event) == true) {
+	if (Frame::KeyPressed(event) == true) {
 		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
 	}
 
 	if (event->GetSymbol() == JKS_BLUE || event->GetSymbol() == JKS_F4) {
 		Release();
+
+		return true;
 	}
 
-	return true;
+	return false;
+}
+
+bool CalendarDialogBox::MousePressed(MouseEvent *event)
+{
+	if (Frame::MousePressed(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool CalendarDialogBox::MouseReleased(MouseEvent *event)
+{
+	if (Frame::MouseReleased(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool CalendarDialogBox::MouseMoved(MouseEvent *event)
+{
+	if (Frame::MouseMoved(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool CalendarDialogBox::MouseWheel(MouseEvent *event)
+{
+	if (Frame::MouseWheel(event) == true) {
+		return true;
+	}
+
+	return false;
 }
 
 void CalendarDialogBox::ActionPerformed(jgui::ButtonEvent *event)

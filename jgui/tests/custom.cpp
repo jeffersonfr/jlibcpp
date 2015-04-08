@@ -108,7 +108,7 @@ int main(int argc, char **argv)
 {
 	Main main("Custom Frame", 100, 100, 720, 480);
 
-	main.Show();
+	main.Show(true);
 
 	return 0;
 }

@@ -64,43 +64,10 @@ bool ToogleButton::IsPressed()
 	return _is_pressed;
 }
 
-bool ToogleButton::ProcessEvent(MouseEvent *event)
+bool ToogleButton::KeyPressed(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::KeyPressed(event) == true) {
 		return true;
-	}
-
-	bool catched = false;
-
-	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
-		catched = true;
-
-		if (_is_pressed == true) {
-			_is_pressed = false;
-		} else {
-			_is_pressed = true;
-		}
-
-		DispatchButtonEvent(new ButtonEvent(this));
-		
-		Repaint();
-	}
-
-	return catched;
-}
-
-bool ToogleButton::ProcessEvent(KeyEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	if (IsEnabled() == false) {
-		return false;
 	}
 
 	jkeyevent_symbol_t action = event->GetSymbol();
@@ -122,6 +89,56 @@ bool ToogleButton::ProcessEvent(KeyEvent *event)
 	}
 
 	return catched;
+}
+
+bool ToogleButton::MousePressed(MouseEvent *event)
+{
+	if (Component::MousePressed(event) == true) {
+		return true;
+	}
+
+	if (event->GetButton() == JMB_BUTTON1) {
+		if (_is_pressed == true) {
+			_is_pressed = false;
+		} else {
+			_is_pressed = true;
+		}
+
+		DispatchButtonEvent(new ButtonEvent(this));
+		
+		Repaint();
+
+		return true;
+	}
+
+	return false;
+}
+
+bool ToogleButton::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool ToogleButton::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool ToogleButton::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+
+	return false;
 }
 
 void ToogleButton::Paint(Graphics *g)
@@ -195,7 +212,7 @@ void ToogleButton::Paint(Graphics *g)
 		}
 	}
 
-	if (_is_pressed == true && _is_enabled == true) {
+	if (_is_pressed == true) {
 		Color color = GetBackgroundColor().Brighter(0.4);
 
 		color.SetAlpha(0x80);

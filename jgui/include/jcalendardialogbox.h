@@ -187,7 +187,31 @@ class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, publi
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(jgui::KeyEvent *event);
+		virtual bool KeyPressed(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MousePressed(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseReleased(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseMoved(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseWheel(MouseEvent *event);
 
 		/**
 		 * \brief

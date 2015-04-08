@@ -299,60 +299,71 @@ class UserEventManager : public jgui::KeyListener, public jgui::MouseListener {
 			}
 		}
 
-		virtual void KeyPressed(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
 			struct event_t *t = _events[event->GetSymbol()];
 
-			if (event->GetType() == jgui::JKT_PRESSED) {
-				if ((void *)t == NULL) {
-					t = new struct event_t;
+			if ((void *)t == NULL) {
+				t = new struct event_t;
 
-					t->key_down = false;
-					t->start_time = -1L;
-				}
-
-				if (t->key_down == false) {
-					_events[event->GetSymbol()] = t;
-
-					t->key_down = true;
-					t->start_time = jcommon::Date::CurrentTimeMillis();
-
-					DispatchUserEvent(new UserEvent(ON_KEY_DOWN_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
-				}
-
-				long current_time = jcommon::Date::CurrentTimeMillis();
-
-				if ((current_time-t->start_time) >= LONG_PRESS_TIME) {
-					t->start_time = jcommon::Date::CurrentTimeMillis();
-
-					DispatchUserEvent(new UserEvent(ON_KEY_LONGPRESS_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
-				}
-
-				DispatchUserEvent(new UserEvent(ON_KEY_PRESS_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
-			} else if (event->GetType() == jgui::JKT_RELEASED) {
-				if ((void *)t != NULL) {
-					t->key_down = false;
-
-					DispatchUserEvent(new UserEvent(ON_KEY_UP_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
-				}
+				t->key_down = false;
+				t->start_time = -1L;
 			}
+
+			if (t->key_down == false) {
+				_events[event->GetSymbol()] = t;
+
+				t->key_down = true;
+				t->start_time = jcommon::Date::CurrentTimeMillis();
+
+				DispatchUserEvent(new UserEvent(ON_KEY_DOWN_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
+			}
+
+			long current_time = jcommon::Date::CurrentTimeMillis();
+
+			if ((current_time-t->start_time) >= LONG_PRESS_TIME) {
+				t->start_time = jcommon::Date::CurrentTimeMillis();
+
+				DispatchUserEvent(new UserEvent(ON_KEY_LONGPRESS_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
+			}
+
+			DispatchUserEvent(new UserEvent(ON_KEY_PRESS_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
+
+			return true;
 		}
 
-		virtual void MousePressed(jgui::MouseEvent *event)
+		virtual bool KeyReleased(jgui::KeyEvent *event)
+		{
+			struct event_t *t = _events[event->GetSymbol()];
+
+			if ((void *)t != NULL) {
+				t->key_down = false;
+
+				DispatchUserEvent(new UserEvent(ON_KEY_UP_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
+			}
+
+			return true;
+		}
+
+		virtual bool MousePressed(jgui::MouseEvent *event)
 		{
 			if (event->GetClickCount() == 1) {
 				DispatchUserEvent(new UserEvent(ON_MOUSE_CLICK_EVENT, event->GetButton(), event->GetClickCount(), event->GetX(), event->GetY(), 0.0, 0.0));
 			}
 
 			DispatchUserEvent(new UserEvent(ON_MOUSE_PRESS_EVENT, event->GetButton(), event->GetClickCount(), event->GetX(), event->GetY(), 0.0, 0.0));
+
+			return true;
 		}
 
-		virtual void MouseReleased(jgui::MouseEvent *event)
+		virtual bool MouseReleased(jgui::MouseEvent *event)
 		{
 			DispatchUserEvent(new UserEvent(ON_MOUSE_RELEASE_EVENT, event->GetButton(), event->GetClickCount(), event->GetX(), event->GetY(), 0.0, 0.0));
+
+			return true;
 		}
 
-		virtual void MouseMoved(jgui::MouseEvent *event)
+		virtual bool MouseMoved(jgui::MouseEvent *event)
 		{
 			double tdiff = (double)(jcommon::Date::CurrentTimeMillis()-_last_mouse_move),
 						 mdiff = (tdiff > -10 && tdiff < 10)?10:tdiff,
@@ -364,11 +375,15 @@ class UserEventManager : public jgui::KeyListener, public jgui::MouseListener {
 			_last_mouse_move = jcommon::Date::CurrentTimeMillis();
 			_last_mouse_location.x = event->GetX();
 			_last_mouse_location.y = event->GetY();
+
+			return true;
 		}
 
-		virtual void MouseWheel(jgui::MouseEvent *event)
+		virtual bool MouseWheel(jgui::MouseEvent *event)
 		{
 			DispatchUserEvent(new UserEvent(ON_MOUSE_WHEEL_EVENT, event->GetButton(), event->GetClickCount(), event->GetX(), event->GetY(), 0.0, 0.0));
+
+			return true;
 		}
 
 };
@@ -415,6 +430,10 @@ class Test : public jgui::Window, public UserEventListener {
 		virtual void OnKeyUp(UserEvent *event)
 		{
 			std::cout << "OnKeyUp: " << event->GetKeyCode() << std::endl;
+			
+			if ((event->GetKeySymbol() == jgui::JKS_ESCAPE || event->GetKeySymbol() == jgui::JKS_EXIT)) {
+				Release();
+			}
 		}
 
 		virtual void OnKeyLongPress(UserEvent *event)
@@ -511,9 +530,7 @@ int main()
 {
 	Test test;
 
-	test.Show();
-
-	sleep(3600);
+	test.Show(true);
 
 	return 0;
 }

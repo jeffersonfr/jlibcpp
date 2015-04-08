@@ -19,13 +19,16 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jlistbox.h"
-#include "jdebug.h"
+#include "jthememanager.h"
 #include "joutofboundsexception.h"
+#include "jthememanager.h"
+#include "jdebug.h"
 
 namespace jgui {
 
 ListBox::ListBox(int x, int y, int width, int height):
-  ItemComponent(x, y, width, height)
+  Component(x, y, width, height),
+  ItemComponent()
 {
 	jcommon::Object::SetClassName("jgui::ListBox");
 
@@ -36,6 +39,10 @@ ListBox::ListBox(int x, int y, int width, int height):
 	_selection = JLBM_NONE_SELECTION;
 
 	SetFocusable(true);
+
+	Theme *theme = ThemeManager::GetInstance()->GetTheme();
+
+	theme->Update(this);
 }
 
 ListBox::~ListBox() 
@@ -258,29 +265,10 @@ jsize_t ListBox::GetPreferredSize()
 	return t;
 }
 
-bool ListBox::ProcessEvent(MouseEvent *event)
+bool ListBox::KeyPressed(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::KeyPressed(event) == true) {
 		return true;
-	}
-	
-	if (event->GetType() == JMT_ROTATED) {
-		SetScrollY(GetScrollY()+_item_size*event->GetClickCount());
-
-		Repaint();
-	}
-
-	return false;
-}
-
-bool ListBox::ProcessEvent(KeyEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
 	}
 
 	if (IsEnabled() == false) {
@@ -326,6 +314,46 @@ bool ListBox::ProcessEvent(KeyEvent *event)
 	}
 
 	return catched;
+}
+
+bool ListBox::MousePressed(MouseEvent *event)
+{
+	if (Component::MousePressed(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool ListBox::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+	
+bool ListBox::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool ListBox::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+	
+	SetScrollY(GetScrollY()+_item_size*event->GetClickCount());
+
+	Repaint();
+
+	return true;
 }
 
 void ListBox::Paint(Graphics *g)

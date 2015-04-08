@@ -169,10 +169,10 @@ class Stock : public jgui::Frame{
 			return quotes;
 		}
 
-		virtual bool ProcessEvent(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (event->GetType() != jgui::JKT_PRESSED) {
-				return false;
+			if (jgui::Frame::KeyPressed(event) == true) {
+				return true;
 			}
 
 			if (event->GetSymbol() == jgui::JKS_ENTER && GetFocusOwner() == acao) {
@@ -204,7 +204,7 @@ int main()
 {
 	Stock stock(100, 100);
 
-	stock.Show();
+	stock.Show(true);
 
 	return 0;
 }

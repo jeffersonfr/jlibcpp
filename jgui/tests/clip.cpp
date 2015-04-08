@@ -81,7 +81,7 @@ int main(int argc, char **argv)
 {
 	Main main("Clip", 100, 100, 720, 480);
 
-	main.Show();
+	main.Show(true);
 
 	return 0;
 }

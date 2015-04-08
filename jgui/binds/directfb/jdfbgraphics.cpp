@@ -1193,6 +1193,10 @@ void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, 
 
 void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	if (_gradient_stops.size() == 0) {
 		return;
 	}
@@ -2334,6 +2338,10 @@ void DFBGraphics::UpdateGradientColor(Color &scolor, Color &dcolor, int distance
 
 void DFBGraphics::FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int y1p, int x2p, int y2p)
 {
+	if (_surface == NULL) {
+		return;
+	}
+
 	if (npoints < 3) {
 		return;
 	}

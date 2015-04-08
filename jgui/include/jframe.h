@@ -69,59 +69,27 @@ class Frame : public KeyListener, public MouseListener, public Window {
 			std::string subtitle;
 		};
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void KeyPressed(KeyEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MousePressed(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseReleased(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseMoved(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void MouseWheel(MouseEvent *event);
-
 	protected:
 		std::vector<frame_subtitle_t> _subtitles;
 		jthread::Mutex _input_mutex,
 			_paint_mutex;
-		jthread::Condition _frame_sem;
 		Image *_icon_image;
 		Image *_icon_close;
 		Image *_icon_maximize;
 		Image *_icon_restore;
-		std::string _title,
-			_icon;
+		std::string _title;
+		std::string _icon;
 		int _init_type;
-		int _old_x,
-				_old_y,
-				_old_width,
-				_old_height;
-		bool _input_enabled,
-				 _background_visible,
-				 _move_enabled,
-				 _release_enabled,
-				 _resize_enabled,
-				 _is_maximized;
+		int _frame_state;
+		int _old_x;
+		int _old_y;
+		int _old_width;
+		int _old_height;
+		bool _input_enabled;
+		bool _move_enabled;
+		bool _release_enabled;
+		bool _resize_enabled;
+		bool _is_maximized;
 		jframe_button_t _frame_buttons;
 		jkeyevent_symbol_t _last_key_code;
 
@@ -172,7 +140,7 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 * \brief
 		 *
 		 */
-		virtual bool Show(bool modal = true);
+		virtual bool Show(bool modal = false);
 
 		/**
 		 * \brief
@@ -293,6 +261,48 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 *
 		 */
 		virtual void PaintGlassPane(Graphics *g);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyPressed(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyReleased(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyTyped(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MousePressed(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseReleased(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseMoved(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseWheel(MouseEvent *event);
 
 };
 

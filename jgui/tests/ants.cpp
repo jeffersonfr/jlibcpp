@@ -339,7 +339,7 @@ int main(int argc, char **argv)
 	Main main(10, 10, time(NULL));
 
 #if ENABLE_GUI == 1
-	main.Show(false);
+	main.Show();
 #endif
 
 	main.Init();

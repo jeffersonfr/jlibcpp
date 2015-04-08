@@ -19,14 +19,18 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jcombobox.h"
+#include "jthememanager.h"
 #include "jdebug.h"
 
 namespace jgui {
 
 ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
-	ItemComponent(x, y, width, height)
+	Component(x, y, width, height),
+	ItemComponent()
 {
 	jcommon::Object::SetClassName("jgui::ComboBox");
+
+	_menu = NULL;
 
 	_halign = JHA_CENTER;
 	_valign = JVA_CENTER;
@@ -35,6 +39,10 @@ ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
 
 	SetVisibleItems(visible_items);
 	SetFocusable(true);
+
+	Theme *theme = ThemeManager::GetInstance()->GetTheme();
+
+	theme->Update(this);
 }
 
 ComboBox::~ComboBox()
@@ -75,15 +83,15 @@ void ComboBox::SetVisibleItems(int max_items)
 	InputManager::GetInstance()->RemoveMouseListener(_menu);
 }
 
-bool ComboBox::ProcessEvent(MouseEvent *event)
+bool ComboBox::MousePressed(MouseEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::MousePressed(event) == true) {
 		return true;
 	}
 
 	bool catched = false;
 
-	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
+	if (event->GetButton() == JMB_BUTTON1) {
 		catched = true;
 
 		int x1 = event->GetX(),
@@ -113,18 +121,37 @@ bool ComboBox::ProcessEvent(MouseEvent *event)
 	return catched;
 }
 
-bool ComboBox::ProcessEvent(KeyEvent *event)
+bool ComboBox::MouseReleased(MouseEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::MouseReleased(event) == true) {
 		return true;
 	}
 
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
+	return false;
+}
+
+bool ComboBox::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
 	}
 
-	if (IsEnabled() == false) {
-		return false;
+	return false;
+}
+
+bool ComboBox::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool ComboBox::KeyPressed(KeyEvent *event)
+{
+	if (Component::KeyPressed(event) == true) {
+		return true;
 	}
 
 	bool catched = false;

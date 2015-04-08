@@ -86,7 +86,7 @@ int main(int argc, char **argv)
 {
 	BorderTest main;
 
-	main.Show();
+	main.Show(true);
 
 	return 0;
 }

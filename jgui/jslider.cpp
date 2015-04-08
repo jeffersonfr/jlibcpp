@@ -72,80 +72,10 @@ void Slider::SetInverted(bool b)
 	Repaint();
 }
 
-bool Slider::ProcessEvent(MouseEvent *event)
+bool Slider::KeyPressed(KeyEvent *event)
 {
-	if (Component::ProcessEvent(event) == true) {
+	if (Component::KeyPressed(event) == true) {
 		return true;
-	}
-
-	int x1 = event->GetX(),
-			y1 = event->GetY(),
-			dx = _vertical_gap-_border_size,
-			dy = _horizontal_gap-_border_size,
-			dw = _size.width-2*dx-_stone_size,
-			dh = _size.height-2*dy-_stone_size;
-
-	bool catched = false;
-
-	if (event->GetType() == JMT_PRESSED && event->GetButton() == JMB_BUTTON1) {
-		catched = true;
-
-		if (_type == JSO_HORIZONTAL) {
-			if (y1 > 0 && y1 < (_size.height)) {
-				int d = (int)((_value*dw)/(GetMaximum()-GetMinimum()));
-
-				_pressed = false;
-
-				if (x1 > (dx) && x1 < (dx+d)) {
-					SetValue(_value-_maximum_tick);
-				} else if (x1 > (dx+d+_stone_size) && x1 < (_size.width)) {
-					SetValue(_value+_maximum_tick);
-				} else if (x1 > (dx+d) && x1 < (dx+d+_stone_size)) {
-					_pressed = true;
-				}
-			}
-		} else if (_type == JSO_VERTICAL) {
-			if (x1 > 0 && x1 < (_size.width)) {
-				int d = (int)((_value*dh)/(GetMaximum()-GetMinimum()));
-
-				_pressed = false;
-
-				if (y1 > (dy) && y1 < (dy+d)) {
-					SetValue(_value-_maximum_tick);
-				} else if (y1 > (dy+d+_stone_size) && y1 < (_size.height)) {
-					SetValue(_value+_maximum_tick);
-				}
-			}
-		}
-	} else if (event->GetType() == JMT_MOVED) {
-		if (_pressed == true) {
-			int diff = GetMaximum()-GetMinimum();
-
-			if (_type == JSO_HORIZONTAL) {
-				SetValue(diff*(x1-_stone_size/2)/dw);
-			} else if (_type == JSO_VERTICAL) {
-				SetValue(diff*(y1-_stone_size/2)/dh);
-			}
-		}
-	} else {
-		_pressed = false;
-
-		if (event->GetType() == JMT_ROTATED) {
-			SetValue(GetValue()+_minimum_tick*event->GetClickCount());
-		}
-	} 
-
-	return catched;
-}
-
-bool Slider::ProcessEvent(KeyEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
 	}
 
 	if (IsEnabled() == false) {
@@ -196,7 +126,110 @@ bool Slider::ProcessEvent(KeyEvent *event)
 
 	return catched;
 }
+		
+bool Slider::MousePressed(MouseEvent *event)
+{
+	if (Component::MousePressed(event) == true) {
+		return true;
+	}
 
+	int x1 = event->GetX(),
+			y1 = event->GetY(),
+			dx = _vertical_gap-_border_size,
+			dy = _horizontal_gap-_border_size,
+			dw = _size.width-2*dx-_stone_size,
+			dh = _size.height-2*dy-_stone_size;
+
+	bool catched = false;
+
+	if (event->GetButton() == JMB_BUTTON1) {
+		catched = true;
+
+		if (_type == JSO_HORIZONTAL) {
+			if (y1 > 0 && y1 < (_size.height)) {
+				int d = (int)((_value*dw)/(GetMaximum()-GetMinimum()));
+
+				_pressed = false;
+
+				if (x1 > (dx) && x1 < (dx+d)) {
+					SetValue(_value-_maximum_tick);
+				} else if (x1 > (dx+d+_stone_size) && x1 < (_size.width)) {
+					SetValue(_value+_maximum_tick);
+				} else if (x1 > (dx+d) && x1 < (dx+d+_stone_size)) {
+					_pressed = true;
+				}
+			}
+		} else if (_type == JSO_VERTICAL) {
+			if (x1 > 0 && x1 < (_size.width)) {
+				int d = (int)((_value*dh)/(GetMaximum()-GetMinimum()));
+
+				_pressed = false;
+
+				if (y1 > (dy) && y1 < (dy+d)) {
+					SetValue(_value-_maximum_tick);
+				} else if (y1 > (dy+d+_stone_size) && y1 < (_size.height)) {
+					SetValue(_value+_maximum_tick);
+				}
+			}
+		}
+	} 
+
+	return catched;
+}
+
+		
+bool Slider::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+
+	_pressed = false;
+
+	return false;
+}
+		
+bool Slider::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+
+	int x1 = event->GetX(),
+			y1 = event->GetY(),
+			dx = _vertical_gap-_border_size,
+			dy = _horizontal_gap-_border_size,
+			dw = _size.width-2*dx-_stone_size,
+			dh = _size.height-2*dy-_stone_size;
+
+	if (_pressed == true) {
+		int diff = GetMaximum()-GetMinimum();
+
+		if (_type == JSO_HORIZONTAL) {
+			SetValue(diff*(x1-_stone_size/2)/dw);
+		} else if (_type == JSO_VERTICAL) {
+			SetValue(diff*(y1-_stone_size/2)/dh);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+		
+bool Slider::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+
+	_pressed = false;
+
+	SetValue(GetValue()+_minimum_tick*event->GetClickCount());
+
+	return true;
+}
+		
 void Slider::Paint(Graphics *g)
 {
 	// JDEBUG(JINFO, "paint\n");

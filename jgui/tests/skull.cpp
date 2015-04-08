@@ -2362,13 +2362,13 @@ class GraphicsTeste : public jgui::Frame{
 			}
 		}
 
-		virtual bool ProcessEvent(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			jthread::AutoLock lock(&teste_mutex);
-
-			if (event->GetType() != jgui::JKT_PRESSED) {
-				return false;
+			if (jgui::Frame::KeyPressed(event) == true) {
+				return true;
 			}
+
+			jthread::AutoLock lock(&teste_mutex);
 
 			int step = 20;
 

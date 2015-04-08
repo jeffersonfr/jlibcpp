@@ -47,9 +47,7 @@ class DFBInputManager : public jgui::InputManager, public jthread::Thread{
 			_click_count;
 		bool _initialized,
 			 _is_key_enabled,
-			 _is_mouse_enabled,
-			 _skip_key_events,
-			 _skip_mouse_events;
+			 _is_mouse_enabled;
 
 	public:
 		/**
@@ -100,18 +98,6 @@ class DFBInputManager : public jgui::InputManager, public jthread::Thread{
 		 */
 		virtual void ProcessWindowEvent(DFBWindowEvent event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SkipKeyEvents(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SkipMouseEvents(bool b);
-		
 		/**
 		 * \brief
 		 *

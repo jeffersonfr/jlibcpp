@@ -21,9 +21,10 @@
 #define J_THEMEEVENT_H
 
 #include "jeventobject.h"
-#include "jtheme.h"
 
 namespace jgui {
+
+class Theme;
 
 /**
  * \brief
@@ -33,6 +34,7 @@ namespace jgui {
 class ThemeEvent : public jcommon::EventObject{
 
 	private:
+		/** \brief */
 		Theme *_theme;
 
 	public:

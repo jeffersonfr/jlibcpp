@@ -481,7 +481,7 @@ void AddMessage::KeyboardPressed(jgui::KeyEvent *event)
 	jgui::Component *owner = GetFocusOwner();
 
 	if (owner == date || owner == message) {
-		owner->ProcessEvent(event);
+		owner->KeyPressed(event);
 	} else {
 		if (owner == hour || owner == minute) {
 			int code = event->GetKeyCode();
@@ -533,13 +533,13 @@ void AddMessage::KeyboardPressed(jgui::KeyEvent *event)
 	}
 }
 
-bool AddMessage::ProcessEvent(jgui::KeyEvent *event)
+bool AddMessage::KeyPressed(jgui::KeyEvent *event)
 {
-	jthread::AutoLock lock(&add_mutex);
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
+	if (jgui::Frame::KeyPressed(event) == true) {
+		return true;
 	}
+
+	jthread::AutoLock lock(&add_mutex);
 
 	if ((event->GetSymbol() == jgui::JKS_1) |
 			(event->GetSymbol() == jgui::JKS_2) |
@@ -787,8 +787,12 @@ void ViewMessages::Update()
 	}
 }
 
-bool ViewMessages::ProcessEvent(jgui::KeyEvent *event)
+bool ViewMessages::KeyPressed(jgui::KeyEvent *event)
 {
+	if (jgui::Frame::KeyPressed(event) == true) {
+		return true;
+	}
+
 	jthread::AutoLock lock(&view_mutex);
 
 	if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {

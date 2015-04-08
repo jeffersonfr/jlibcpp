@@ -180,13 +180,13 @@ class GraphicsTeste : public jgui::Frame{
 			}
 		}
 
-		virtual bool ProcessEvent(jgui::KeyEvent *event)
+		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			jthread::AutoLock lock(&teste_mutex);
-
-			if (event->GetType() != jgui::JKT_PRESSED) {
-				return false;
+			if (jgui::Frame::KeyPressed(event) == true) {
+				return true;
 			}
+
+			jthread::AutoLock lock(&teste_mutex);
 
 			double frameTime = 0.1;	//frameTime is the time this frame has taken, in seconds
 			//speed modifiers
@@ -235,7 +235,7 @@ int main( int argc, char *argv[] )
 {
 	GraphicsTeste test;
 
-	test.Show();
+	test.Show(true);
 
 	return 0;
 }

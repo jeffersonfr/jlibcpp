@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jkeyboard.h"
+#include "jtextarea.h"
 #include "jsystem.h"
 #include "jgridlayout.h"
 #include "jflowlayout.h"
@@ -39,6 +40,7 @@
 																														\
 		display->SetFocusable(false); 													\
 		display->Insert(_text); 																\
+		display->SetKeyboardEnabled(false);											\
 																														\
 		Add(display); 																					\
 	} 																												\
@@ -91,6 +93,43 @@ class KeyButton : public Button{
 
 };
 
+Keyboard::Keyboard(jkeyboard_type_t type, bool text_visible, bool is_password):
+ 	jgui::Frame("Teclado Virtual", (1920-960)/2, (1080-720)/2, 960, 720)
+{
+	jcommon::Object::SetClassName("jgui::Keyboard");
+
+	SetIcon(jcommon::System::GetResourceDirectory() + "/images/keyboard_icon.png");
+
+	bwidth = 90;
+	bheight = 60;
+	delta = 2;
+	
+	display = NULL;
+
+	_show_text = text_visible;
+	_shift_pressed = false;
+	_type = type;
+	_is_password = is_password;
+
+	if (_type == JKT_QWERTY) {
+		BuildQWERTYKeyboard();
+	} else if (_type == JKT_ALPHA_NUMERIC) {
+		BuildAlphaNumericKeyboard();
+	} else if (_type == JKT_NUMERIC) {
+		BuildNumericKeyboard();
+	} else if (_type == JKT_PHONE) {
+		BuildPhoneKeyboard();
+	} else if (_type == JKT_INTERNET) {
+		BuildInternetKeyboard();
+	}
+
+	if (_show_text == false) {
+		SetSize(GetWidth(), GetHeight()/2+_insets.top+_insets.bottom);
+	}
+
+	// AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
+}
+
 Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool is_password):
  	jgui::Frame("Teclado Virtual", x, y, 960, 720)
 {
@@ -125,7 +164,7 @@ Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool 
 		SetSize(GetWidth(), GetHeight()/2+_insets.top+_insets.bottom);
 	}
 
-	AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
+	// AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
 }
 
 Keyboard::~Keyboard() 
@@ -137,25 +176,6 @@ Keyboard::~Keyboard()
 	if (display != NULL) {
 		delete display;
 	}
-}
-
-bool Keyboard::ProcessEvent(jgui::KeyEvent *event)
-{
-	if (Frame::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	if (event->GetSymbol() == JKS_BLUE || event->GetSymbol() == JKS_F4) {
-		jgui::Frame::Hide();
-
-		_frame_sem.Notify();
-	}
-
-	return true;
 }
 
 void Keyboard::ActionPerformed(ButtonEvent *event)
@@ -565,44 +585,21 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 		}
 	}
 
-	KeyEvent *kevent = new KeyEvent(this, JKT_PRESSED, modifiers, code, symbol);
+	KeyEvent *kevent1 = new KeyEvent(this, JKT_PRESSED, modifiers, code, symbol);
+	KeyEvent *kevent2 = new KeyEvent(this, JKT_RELEASED, modifiers, code, symbol);
 
 	if (_show_text == true) {
-		display->ProcessEvent(kevent);
+		display->KeyPressed(kevent1);
+		display->KeyReleased(kevent2);
 	}
 
-	DispatchKeyboardEvent(kevent);
+	DispatchKeyboardEvent(kevent1);
+	DispatchKeyboardEvent(kevent2);
 }
 
-void Keyboard::SetTextSize(int max)
+jgui::TextComponent * Keyboard::GetTextComponent()
 {
-	if (_show_text == true) {
-		display->SetTextSize(max);
-	}
-}
-
-int Keyboard::GetTextSize()
-{
-	if (_show_text == true) {
-		return display->GetTextSize();
-	}
-
-	return -1;
-}
-
-void Keyboard::SetWrap(bool b)
-{
-	if (_show_text == true && display != NULL) {
-		display->SetWrap(b);
-	} 
-}
-
-void Keyboard::SetText(std::string text)
-{
-	if (_show_text == true && display != NULL) {
-		display->SetText(text);
-		display->Repaint();
-	} 
+	return display;
 }
 
 void Keyboard::BuildInternetKeyboard()
@@ -875,15 +872,6 @@ void Keyboard::ProcessCaps(Button *button)
 	button->RequestFocus();
 
 	Repaint();
-}
-
-std::string Keyboard::GetText()
-{
-	if (_show_text == true) {
-		return display->GetText();
-	}
-
-	return std::string("");
 }
 
 void Keyboard::RegisterKeyboardListener(KeyboardListener *listener)

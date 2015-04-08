@@ -49,10 +49,6 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 		virtual ~WatchTeste()
 		{
-			jthread::AutoLock lock(&teste_mutex);
-
-			Hide();
-
 			_flag = false;
 
 			WaitThread();
@@ -157,7 +153,7 @@ int main( int argc, char *argv[] )
 	WatchTeste test;
 
 	test.Start();
-	test.Show();
+	test.Show(true);
 
 	return 0;
 }

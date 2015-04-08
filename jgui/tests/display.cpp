@@ -51,12 +51,12 @@ void Display::Paint(jgui::Graphics *g)
 	int size = 40;
 
 	if (GetFont() != NULL) {
-		size = GetFont()->GetSize();
+		size = GetFont()->GetLineSize();
 
 		g->SetFont(_font);
 	}
 
-	g->DrawString(_text, 0, (GetHeight()-size)/2, GetWidth()-10, GetHeight()-4, jgui::JHA_RIGHT, jgui::JVA_CENTER);
+	g->DrawString(_text, 0, (GetHeight()-size)/2, GetWidth()-10, GetHeight(), jgui::JHA_RIGHT, jgui::JVA_CENTER);
 	g->DrawString(_operation, 10, (GetHeight()-size)/2, 30, GetHeight()-4, jgui::JHA_LEFT, jgui::JVA_CENTER);
 }
 

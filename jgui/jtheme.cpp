@@ -82,7 +82,58 @@ void Theme::Update(Component *parent)
 		return;
 	}
 
-	// WARN:: esse metodo pode causar problemas pela falta de sincronizacao com a Window (em caso de remocao ou adicao de componentes)
+	std::vector<Component *> stack;
+
+	stack.push_back(parent);
+
+	while (stack.size() > 0) {
+		Container *container = dynamic_cast<jgui::Container *>(*stack.begin());
+
+		if (container != NULL) {
+			for (std::vector<Component *>::iterator i=container->GetComponents().begin(); i!=container->GetComponents().end(); i++) {
+				Container *internal_container = dynamic_cast<jgui::Container *>(*i);
+
+				if (internal_container != NULL) {
+					stack.push_back(internal_container);
+				}
+			}
+		} 
+		
+		Component *c = *stack.begin();
+
+		c->SetBackgroundColor(_component_bgcolor);
+		c->SetForegroundColor(_component_fgcolor);
+		c->SetBorderColor(_component_border_color);
+		c->SetBorderFocusColor(_component_border_focus_color);
+		c->SetBackgroundFocusColor(_component_focus_bgcolor);
+		c->SetForegroundFocusColor(_component_focus_fgcolor);
+		c->SetScrollbarColor(_component_scrollbar_color);
+		c->SetDisabledBackgroundColor(_component_disabled_bgcolor);
+		c->SetDisabledForegroundColor(_component_disabled_fgcolor);
+		c->SetDisabledBorderColor(_component_disabled_border_color);
+
+		c->SetBorderSize(_component_border_size);
+		c->SetBorder(_component_border);
+
+		if (_component_font != NULL) {
+			c->SetFont(_component_font);
+		}
+
+		ItemComponent *ic = dynamic_cast<ItemComponent *>(c);
+
+		if (ic != NULL) {
+			ic->SetItemColor(_item_color);
+			ic->SetItemForegroundColor(_item_fgcolor);
+			ic->SetItemFocusColor(_item_focus_color);
+			ic->SetItemForegroundFocusColor(_item_focus_fgcolor);
+			ic->SetSelectedItemColor(_item_selected_color);
+			ic->SetSelectedItemForegroundColor(_item_selected_fgcolor);
+			ic->SetDisabledItemColor(_item_disabled_color);
+			ic->SetDisabledItemForegroundColor(_item_disabled_fgcolor);
+		}
+
+		stack.erase(stack.begin());
+	}
 	
 	Window *w = dynamic_cast<Window *>(parent);
 
@@ -100,58 +151,6 @@ void Theme::Update(Component *parent)
 		}
 	}
 
-	std::vector<Component *> stack;
-
-	stack.push_back(parent);
-
-	while (stack.size() > 0) {
-		Container *container = dynamic_cast<jgui::Container *>(*stack.begin());
-
-		if (container != NULL) {
-			for (std::vector<Component *>::iterator i=container->GetComponents().begin(); i!=container->GetComponents().end(); i++) {
-				Container *internal_container = dynamic_cast<jgui::Container *>(*i);
-
-				if (internal_container != NULL) {
-					stack.push_back(internal_container);
-				}
-			}
-		} else {
-			Component *c = *stack.begin();
-
-			c->SetBackgroundColor(_component_bgcolor);
-			c->SetForegroundColor(_component_fgcolor);
-			c->SetBorderColor(_component_border_color);
-			c->SetBorderFocusColor(_component_border_focus_color);
-			c->SetBackgroundFocusColor(_component_focus_bgcolor);
-			c->SetForegroundFocusColor(_component_focus_fgcolor);
-			c->SetScrollbarColor(_component_scrollbar_color);
-			c->SetDisabledBackgroundColor(_component_disabled_bgcolor);
-			c->SetDisabledForegroundColor(_component_disabled_fgcolor);
-			c->SetDisabledBorderColor(_component_disabled_border_color);
-	
-			c->SetBorderSize(_component_border_size);
-			c->SetBorder(_component_border);
-
-			if (_component_font != NULL) {
-				c->SetFont(_component_font);
-			}
-		
-			ItemComponent *ic = dynamic_cast<ItemComponent *>(c);
-
-			if (ic != NULL) {
-				ic->SetItemColor(_item_color);
-				ic->SetItemForegroundColor(_item_fgcolor);
-				ic->SetItemFocusColor(_item_focus_color);
-				ic->SetItemForegroundFocusColor(_item_focus_fgcolor);
-				ic->SetSelectedItemColor(_item_selected_color);
-				ic->SetSelectedItemForegroundColor(_item_selected_fgcolor);
-				ic->SetDisabledItemColor(_item_disabled_color);
-				ic->SetDisabledItemForegroundColor(_item_disabled_fgcolor);
-			}
-		}
-
-		stack.erase(stack.begin());
-	}
 }
 
 void Theme::SetWindowBackgroundColor(int red, int green, int blue, int alpha)

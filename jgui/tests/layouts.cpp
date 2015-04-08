@@ -286,7 +286,7 @@ int main(int argc, char **argv)
 {
 	Main main("Layouts", 50, 50, 1820, 980);
 
-	main.Show();
+	main.Show(true);
 
 	return 0;
 }

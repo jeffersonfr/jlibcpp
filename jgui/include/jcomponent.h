@@ -31,6 +31,7 @@
 #include "jkeyevent.h"
 #include "jmouseevent.h"
 #include "jkeymap.h"
+#include "jthemelistener.h"
 
 #include <string>
 #include <vector>
@@ -113,13 +114,14 @@ class FocusEvent;
 class InteractionListener;
 class InteractionEvent;
 class Container;
+class ThemeManager;
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class Component : public virtual jcommon::Object{
+class Component : public jgui::ThemeListener{
 
 	friend class Container;
 	friend class Frame;
@@ -130,61 +132,61 @@ class Component : public virtual jcommon::Object{
 		std::vector<FocusListener *> _focus_listeners;
 		std::vector<ComponentListener *> _component_listeners;
 		jgui::Container *_parent;
-		Component *_left, 
-			*_right,
-			*_up,
-			*_down;
+		Component *_left;
+		Component *_right;
+		Component *_up;
+		Component *_down;
 		jgui::Font *_font;
 		jgui::KeyMap *_keymap;
 		std::string _name;
-		jpoint_t _location,
-			_scroll_location;
-		jsize_t _size,
-			_preferred_size,
-			_minimum_size,
-			_maximum_size;
-		Color _bgcolor,
-			_fgcolor,
-			_focus_bgcolor,
-			_focus_fgcolor,
-			_border_color,
-			_focus_border_color,
-			_scrollbar_color,
-			_disabled_bgcolor,
-			_disabled_fgcolor,
-			_disabled_border_color;
-		jcomponent_alignment_t _alignment_x,
-			_alignment_y;
+		jpoint_t _location;
+		jpoint_t _scroll_location;
+		jsize_t _size;
+		jsize_t _preferred_size;
+		jsize_t _minimum_size;
+		jsize_t _maximum_size;
+		Color _bgcolor;
+		Color _fgcolor;
+		Color _focus_bgcolor;
+		Color _focus_fgcolor;
+		Color _border_color;
+		Color _focus_border_color;
+		Color _scrollbar_color;
+		Color _disabled_bgcolor;
+		Color _disabled_fgcolor;
+		Color _disabled_border_color;
+		jcomponent_alignment_t _alignment_x;
+		jcomponent_alignment_t _alignment_y;
 		jcomponent_orientation_t _orientation;
 		jcomponent_border_t _border;
-		int _gradient_level,
-			_vertical_gap,
-			_horizontal_gap,
-			_border_size,
-			_scroll_size,
-			_scroll_gap,
-			_scroll_minor_increment,
-			_scroll_major_increment;
-		int _relative_mouse_x,
-			_relative_mouse_y,
-			_relative_mouse_w,
-			_relative_mouse_h,
-			_internal_state;
-		bool _has_focus,
-			_is_visible,
-			_is_cyclic_focus,
-			_is_navigation_enabled,
-			_is_ignore_repaint,
-			_is_background_visible,
-			_is_focusable,
-			_is_enabled,
-			_is_focus_cycle_root,
-			_is_theme_enabled,
-			_is_valid,
-			_is_scrollable_x,
-			_is_scrollable_y,
-			_is_scroll_visible,
-			_is_smooth_scroll;
+		int _gradient_level;
+		int _vertical_gap;
+		int _horizontal_gap;
+		int _border_size;
+		int _scroll_size;
+		int _scroll_gap;
+		int _scroll_minor_increment;
+		int _scroll_major_increment;
+		int _relative_mouse_x;
+		int _relative_mouse_y;
+		int _relative_mouse_w;
+		int _relative_mouse_h;
+		int _component_state;
+		bool _has_focus;
+		bool _is_visible;
+		bool _is_cyclic_focus;
+		bool _is_navigation_enabled;
+		bool _is_ignore_repaint;
+		bool _is_background_visible;
+		bool _is_focusable;
+		bool _is_enabled;
+		bool _is_focus_cycle_root;
+		bool _is_theme_enabled;
+		bool _is_valid;
+		bool _is_scrollable_x;
+		bool _is_scrollable_y;
+		bool _is_scroll_visible;
+		bool _is_smooth_scroll;
 
 	protected:
 		/**
@@ -661,13 +663,43 @@ class Component : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(KeyEvent *event);
+		virtual bool KeyPressed(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyReleased(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyTyped(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MousePressed(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(MouseEvent *event);
+		virtual bool MouseReleased(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseMoved(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseWheel(MouseEvent *event);
 		
 		/**
 		 * \brief
@@ -1226,6 +1258,11 @@ class Component : public virtual jcommon::Object{
 		 */
 		virtual std::vector<ComponentListener *> & GetComponentListeners();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ThemeChanged(ThemeEvent *event);
 };
 
 }

@@ -1381,9 +1381,9 @@ class SortComponent : public jgui::Component, public jthread::Thread, public jco
 			WaitThread();
 		}
 
-		virtual bool ProcessEvent(jgui::MouseEvent *event)
+		virtual bool MousePressed(jgui::MouseEvent *event)
 		{
-			if (jgui::Component::ProcessEvent(event) == true) {
+			if (jgui::Component::MousePressed(event) == true) {
 				return true;
 			}
 
@@ -1393,21 +1393,19 @@ class SortComponent : public jgui::Component, public jthread::Thread, public jco
 
 			bool catched = false;
 
-			if (event->GetType() == jgui::JMT_PRESSED) {
-				catched = true;
+			catched = true;
 
-				RequestFocus();
+			RequestFocus();
 
-				if (event->GetButton() == jgui::JMB_BUTTON1) {
-					if (IsRunning() == false) {
-						Start();
-					} else {
-						Stop();
-					}
-				} else if (event->GetButton() == jgui::JMB_BUTTON2) {
+			if (event->GetButton() == jgui::JMB_BUTTON1) {
+				if (IsRunning() == false) {
+					Start();
+				} else {
 					Stop();
-					Reset();
 				}
+			} else if (event->GetButton() == jgui::JMB_BUTTON2) {
+				Stop();
+				Reset();
 			}
 
 			return catched;
@@ -1513,7 +1511,7 @@ int main(int argc, char **argv)
 {
 	SortFrame main;
 
-	main.Show();
+	main.Show(true);
 
 	return 0;
 }

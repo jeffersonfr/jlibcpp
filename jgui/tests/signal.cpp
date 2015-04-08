@@ -126,12 +126,15 @@ class Plotter : public jgui::Frame, public jthread::Thread {
 
 	private:
 		SignalMetter *_signal;
+		int _counter;
 
 	public:
 		Plotter(int x, int y):
 			Frame("Signal Strength", x, y, 1, 1)
 		{
 			_signal = new SignalMetter(0, 0, 400, 400);
+
+			_counter = 1000;
 
 			Add(_signal);
 
@@ -140,25 +143,25 @@ class Plotter : public jgui::Frame, public jthread::Thread {
 
 		virtual ~Plotter()
 		{
+			_counter = 0;
+
+			WaitThread();
 		}
 
 		virtual void Run()
 		{
 			char receive[4096];
-			int r;
 
 			try {
 				DatagramSocket s(1234);
-
-				r = 1;
 
 				do {
 					// r = s.Receive(receive, 4096);
 
 					_signal->Plot(100+(int)(random()%50));
 
-					usleep(100000);
-				} while (r >= 0);
+					usleep(10000);
+				} while (_counter-- >= 0);
 
 				s.Close();
 			} catch (...) {
@@ -174,9 +177,8 @@ int main()
 
 	Plotter plotter(100, 100);
 
-	plotter.Show(false);
 	plotter.Start();
-	plotter.WaitThread();
+	plotter.Show(true);
 
 	ReleaseSocketLibrary();
 }

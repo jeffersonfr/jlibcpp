@@ -72,10 +72,10 @@ int main(int argc, char **argv)
 	Main main_1("Scale 720x480", 0, 0, 500, 400, 720, 480),
 			 main_2("Scale 1920x1080", 1100, 300, 500, 400, 1920, 1080);
 
-	main_1.Show(false);
-	main_2.Show(false);
+	main_1.Show();
+	main_2.Show();
 
-	sleep(100);
+	sleep(10);
 
 	return 0;
 }

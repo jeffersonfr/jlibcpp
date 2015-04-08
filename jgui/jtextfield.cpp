@@ -29,33 +29,40 @@ TextField::TextField(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::TextField");
 
+	_is_keyboard_enabled = true;
+
+	_keyboard = new jgui::Keyboard(jgui::JKT_QWERTY, true);
+
+	_keyboard->RegisterKeyboardListener(this);
+
 	SetFocusable(true);
 }
 
 TextField::~TextField()
 {
+	if (_keyboard != NULL) {
+		delete _keyboard;
+		_keyboard = NULL;
+	}
 }
 
-bool TextField::ProcessEvent(MouseEvent *event)
+void TextField::SetKeyboardEnabled(bool b)
 {
-	if (Component::ProcessEvent(event) == true) {
+	_is_keyboard_enabled = b;
+}
+
+bool TextField::IsKeyboardEnabled()
+{
+	return _is_keyboard_enabled;
+}
+
+bool TextField::KeyPressed(KeyEvent *event)
+{
+	if (Component::KeyPressed(event) == true) {
 		return true;
 	}
 
-	return false;
-}
-
-bool TextField::ProcessEvent(KeyEvent *event)
-{
-	if (Component::ProcessEvent(event) == true) {
-		return true;
-	}
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
-	}
-
-	if (IsEnabled() == false || IsEditable() == false) {
+	if (IsEditable() == false) {
 		return false;
 	}
 
@@ -210,6 +217,51 @@ bool TextField::ProcessEvent(KeyEvent *event)
 	return catched;
 }
 
+bool TextField::MousePressed(MouseEvent *event)
+{
+	if (Component::MousePressed(event) == true) {
+		return true;
+	}
+
+	if (_is_keyboard_enabled == true) {
+		jgui::TextComponent *c = _keyboard->GetTextComponent();
+
+		c->SetText(GetText());
+		c->SetCaretPosition(GetCaretPosition());
+
+		_keyboard->Show();
+	}
+
+	return true;
+}
+
+bool TextField::MouseReleased(MouseEvent *event)
+{
+	if (Component::MouseReleased(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool TextField::MouseMoved(MouseEvent *event)
+{
+	if (Component::MouseMoved(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
+bool TextField::MouseWheel(MouseEvent *event)
+{
+	if (Component::MouseWheel(event) == true) {
+		return true;
+	}
+
+	return false;
+}
+
 void TextField::Paint(Graphics *g)
 {
 	JDEBUG(JINFO, "paint\n");
@@ -326,6 +378,11 @@ void TextField::Paint(Graphics *g)
 			g->DrawString(cursor, x+current_text_size+offset, y, w, h, JHA_LEFT, _valign);
 		}
 	}
+}
+
+void TextField::KeyboardPressed(KeyEvent *event)
+{
+	KeyPressed(event);
 }
 
 }

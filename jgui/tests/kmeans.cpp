@@ -328,7 +328,7 @@ class SOM : public jgui::Window {
 				uint32_t classe = (int)c,
 								 color = GetColor(classe);
 
-				g->SetPixel((int)(x*s+dx), (int)(y*s+dy), color);
+				g->SetRGB(color, (int)(x*s+dx), (int)(y*s+dy));
 			}
 			
 			if (_classify_input != NULL) {
@@ -341,7 +341,7 @@ class SOM : public jgui::Window {
 					uint32_t classe = (int)round(c),
 									 color = GetColor(classe);
 
-					g->SetPixel((int)(x*s+ex), (int)(y*s+ey), color);
+					g->SetRGB(color, (int)(x*s+ex), (int)(y*s+ey));
 				}
 			}
 			
@@ -425,14 +425,14 @@ int main()
 
 	net.Init(CreatePoints(npoints), 8*npoints);
 	
-	net.Show(false);
+	net.Show();
 
 	net.Train(CreatePoints(npoints), 8*npoints);
 
 	npoints = 8000;
 	net.Classify(CreatePoints(4*npoints), 4*8*npoints);
 
-	sleep(100);
+	sleep(10);
 
 	return 0;
 }

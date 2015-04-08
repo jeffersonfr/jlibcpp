@@ -45,7 +45,7 @@ TextDialogBox::TextDialogBox(std::string msg, bool wrap):
 
 TextDialogBox::~TextDialogBox() 
 {
-		delete _label;
+	delete _label;
 }
 
 void TextDialogBox::SetHorizontalAlign(jhorizontal_align_t align)

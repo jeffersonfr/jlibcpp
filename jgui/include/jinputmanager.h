@@ -84,18 +84,6 @@ class InputManager : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SkipKeyEvents(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SkipMouseEvents(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetKeyEventsEnabled(bool b);
 		
 		/**

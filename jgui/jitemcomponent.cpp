@@ -235,17 +235,13 @@ jitem_type_t Item::GetType()
 	return _type;
 }
 
-ItemComponent::ItemComponent(int x, int y, int width, int height):
-  jgui::Component(x, y, width, height)
+ItemComponent::ItemComponent():
+  jcommon::Object()
 {
 	jcommon::Object::SetClassName("jgui::ItemComponent");
 
 	_index = 0;
 	_loop = false;
-	
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	theme->Update((Component *)this);
 }
 
 ItemComponent::~ItemComponent()

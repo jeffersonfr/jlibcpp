@@ -425,10 +425,10 @@ AddContact::~AddContact()
 	delete field3;
 }
 
-bool AddContact::ProcessEvent(jgui::KeyEvent *event)
+bool AddContact::KeyPressed(jgui::KeyEvent *event)
 {
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
+	if (jgui::Frame::KeyPressed(event) == true) {
+		return true;
 	}
 
 	jthread::AutoLock lock(&add_mutex);
@@ -623,13 +623,13 @@ void SearchContacts::KeyboardPressed(jgui::KeyEvent *event)
 	}
 }
 
-bool SearchContacts::ProcessEvent(jgui::KeyEvent *event)
+bool SearchContacts::KeyPressed(jgui::KeyEvent *event)
 {
-	jthread::AutoLock lock(&search_mutex);
-
-	if (event->GetType() != jgui::JKT_PRESSED) {
-		return false;
+	if (jgui::Frame::KeyPressed(event) == true) {
+		return true;
 	}
+
+	jthread::AutoLock lock(&search_mutex);
 
 	if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 		_index--;

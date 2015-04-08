@@ -21,6 +21,7 @@
 #define J_TEXTFIELD_H
 
 #include "jtextcomponent.h"
+#include "jkeyboard.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -37,7 +38,13 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class TextField : public jgui::TextComponent{
+class TextField : public jgui::TextComponent, jgui::KeyboardListener{
+
+	private:
+		/** \brief */
+		Keyboard *_keyboard;
+		/** \brief */
+		bool _is_keyboard_enabled;
 
 	public:
 		/**
@@ -62,14 +69,49 @@ class TextField : public jgui::TextComponent{
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(MouseEvent *event);
+		virtual void SetKeyboardEnabled(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool ProcessEvent(KeyEvent *event);
+		virtual bool IsKeyboardEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyPressed(KeyEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MousePressed(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseReleased(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseMoved(MouseEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseWheel(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void KeyboardPressed(KeyEvent *event);
 };
 
 }
