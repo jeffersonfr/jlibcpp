@@ -101,6 +101,8 @@ void Window::Release()
 	InternalRelease();
 	
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSED));
+	
+	_window_semaphore.Notify();
 }
 
 Graphics * Window::GetGraphics()

@@ -581,8 +581,6 @@ void Frame::Release()
 	InputManager::GetInstance()->RemoveMouseListener(this);
 	
 	Window::Release();
-
-	_window_semaphore.Notify();
 }
 
 void Frame::Paint(Graphics *g)
