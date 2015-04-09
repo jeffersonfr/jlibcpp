@@ -69,7 +69,7 @@ bool TextField::KeyPressed(KeyEvent *event)
 	jkeyevent_symbol_t action = event->GetSymbol();
 
 	if (_keymap != NULL && _keymap->HasKey(action) == false) {
-		return true;
+		return false;
 	}
 
 	bool catched = false;
