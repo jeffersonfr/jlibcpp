@@ -77,7 +77,19 @@ void DFBInputManager::Restore()
 
 	Initialize();
 
-	for (std::vector<jcommon::Listener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
+	for (std::vector<jcommon::Listener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
+		jcommon::Listener *l = (*i);
+
+		if (l->InstanceOf("jgui::Window") == true) {
+			Window *win = dynamic_cast<Window *>(l);
+
+			if (win->_window != NULL) {
+				win->_window->AttachEventBuffer(win->_window, events);
+			}
+		}
+	}
+
+	for (std::vector<jcommon::Listener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
 		jcommon::Listener *l = (*i);
 
 		if (l->InstanceOf("jgui::Window") == true) {
@@ -760,10 +772,10 @@ void DFBInputManager::RegisterKeyListener(KeyListener *listener)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	std::vector<jcommon::Listener *>::iterator i = std::find(_listeners.begin(), _listeners.end(), listener);
+	std::vector<jcommon::Listener *>::iterator i = std::find(_key_listeners.begin(), _key_listeners.end(), listener);
 
-	if (i == _listeners.end()) {
-		_listeners.push_back(listener);
+	if (i == _key_listeners.end()) {
+		_key_listeners.push_back(listener);
 	}
 
 	Window *w = dynamic_cast<Window *>(listener);
@@ -780,7 +792,7 @@ void DFBInputManager::RemoveKeyListener(KeyListener *listener)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<jcommon::Listener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
+	for (std::vector<jcommon::Listener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
 		jcommon::Listener *l = (*i);
 
 		if (dynamic_cast<jgui::KeyListener *>(l) == listener) {
@@ -792,7 +804,7 @@ void DFBInputManager::RemoveKeyListener(KeyListener *listener)
 				}
 			}
 
-			_listeners.erase(i);
+			_key_listeners.erase(i);
 
 			break;
 		}
@@ -810,52 +822,49 @@ void DFBInputManager::DispatchEvent(jcommon::EventObject *event)
 	jgui::KeyEvent *ke = dynamic_cast<jgui::KeyEvent *>(event);
 	jgui::MouseEvent *me = dynamic_cast<jgui::MouseEvent *>(event);
 
-	if (ke != NULL && IsKeyEventsEnabled() == false) {
-		return;
-	}
+	if (ke != NULL) {
+		if (IsKeyEventsEnabled() == false) {
+			return;
+		}
 
-	if (me != NULL && IsMouseEventsEnabled() == false) {
-		return;
-	}
-
-	for (std::vector<jcommon::Listener *>::reverse_iterator i=_listeners.rbegin(); i!=_listeners.rend(); i++) {
-		jcommon::Listener *l = (*i);
-		bool catched = false;
-
-		if (ke != NULL) {
-			jgui::KeyListener *kl = dynamic_cast<jgui::KeyListener *>(l);
+		for (std::vector<jcommon::Listener *>::reverse_iterator i=_key_listeners.rbegin(); i!=_key_listeners.rend(); i++) {
+			jgui::KeyListener *kl = dynamic_cast<jgui::KeyListener *>(*i);
 
 			if (kl != NULL) {
 				if (ke->GetType() == JKT_PRESSED) {
-					catched = kl->KeyPressed(ke);
+					kl->KeyPressed(ke);
 				} else if (ke->GetType() == JKT_RELEASED) {
-					catched = kl->KeyReleased(ke);
+					kl->KeyReleased(ke);
 				} else if (ke->GetType() == JKT_TYPED) {
-					catched = kl->KeyTyped(ke);
+					kl->KeyTyped(ke);
 				}
 
-				break;
-			}
-		} else if (me != NULL) {
-			jgui::MouseListener *ml = dynamic_cast<jgui::MouseListener *>(l);
-
-			if (ml != NULL) {
-				if (me->GetType() == JMT_PRESSED) {
-					catched = ml->MousePressed(me);
-				} else if (me->GetType() == JMT_RELEASED) {
-					catched = ml->MouseReleased(me);
-				} else if (me->GetType() == JMT_MOVED) {
-					catched = ml->MouseMoved(me);
-				} else if (me->GetType() == JMT_ROTATED) {
-					catched = ml->MouseWheel(me);
-				}
-			
 				break;
 			}
 		}
+	}
 
-		if (catched == true) {
-			break;
+	if (me != NULL) {
+		if (IsMouseEventsEnabled() == false) {
+			return;
+		}
+
+		for (std::vector<jcommon::Listener *>::reverse_iterator i=_mouse_listeners.rbegin(); i!=_mouse_listeners.rend(); i++) {
+			jgui::MouseListener *ml = dynamic_cast<jgui::MouseListener *>(*i);
+
+			if (ml != NULL) {
+				if (me->GetType() == JMT_PRESSED) {
+					ml->MousePressed(me);
+				} else if (me->GetType() == JMT_RELEASED) {
+					ml->MouseReleased(me);
+				} else if (me->GetType() == JMT_MOVED) {
+					ml->MouseMoved(me);
+				} else if (me->GetType() == JMT_ROTATED) {
+					ml->MouseWheel(me);
+				}
+
+				break;
+			}
 		}
 	}
 	
@@ -866,10 +875,10 @@ void DFBInputManager::RegisterMouseListener(MouseListener *listener)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	std::vector<jcommon::Listener *>::iterator i = std::find(_listeners.begin(), _listeners.end(), listener);
+	std::vector<jcommon::Listener *>::iterator i = std::find(_mouse_listeners.begin(), _mouse_listeners.end(), listener);
 
-	if (i == _listeners.end()) {
-		_listeners.push_back(listener);
+	if (i == _mouse_listeners.end()) {
+		_mouse_listeners.push_back(listener);
 	}
 
 	Window *w = dynamic_cast<Window *>(listener);
@@ -886,7 +895,7 @@ void DFBInputManager::RemoveMouseListener(MouseListener *listener)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<jcommon::Listener *>::iterator i=_listeners.begin(); i!=_listeners.end(); i++) {
+	for (std::vector<jcommon::Listener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
 		jcommon::Listener *l = (*i);
 
 		if (dynamic_cast<jgui::MouseListener *>(l) == listener) {
@@ -898,7 +907,7 @@ void DFBInputManager::RemoveMouseListener(MouseListener *listener)
 				}
 			}
 
-			_listeners.erase(i);
+			_mouse_listeners.erase(i);
 
 			break;
 		}

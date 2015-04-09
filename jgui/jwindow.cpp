@@ -689,13 +689,14 @@ void Window::PaintBackground(Graphics *g)
 {
 	g->SetDrawingFlags(JDF_NOFX);
 		
-	// g->Clear();
-
 	Container::PaintBackground(g);
 }
 
 void Window::Paint(Graphics *g)
 {
+	// CHANGE:: clear suface before paint (directfb-cairo)
+	_graphics->Clear();
+
 	Container::Paint(g);
 }
 
