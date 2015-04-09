@@ -464,7 +464,7 @@ bool Frame::MousePressed(MouseEvent *event)
 		}
 	}
 
-	return true;
+	return false;
 }
 
 bool Frame::MouseReleased(MouseEvent *event)
@@ -493,7 +493,7 @@ bool Frame::MouseReleased(MouseEvent *event)
 		_relative_mouse_y = 0;
 	}
 	
-	return true;
+	return false;
 }
 
 bool Frame::MouseMoved(MouseEvent *event)
@@ -551,7 +551,7 @@ bool Frame::MouseMoved(MouseEvent *event)
 		return true;
 	}
 	
-	return true;
+	return false;
 }
 
 bool Frame::MouseWheel(MouseEvent *event)
@@ -572,7 +572,7 @@ bool Frame::MouseWheel(MouseEvent *event)
 	// int mousex = event->GetX()-_location.x,
 	//		mousey = event->GetY()-_location.y;
 
-	return true;
+	return false;
 }
 
 void Frame::Release()

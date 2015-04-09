@@ -833,6 +833,8 @@ void DFBInputManager::DispatchEvent(jcommon::EventObject *event)
 				} else if (ke->GetType() == JKT_TYPED) {
 					catched = kl->KeyTyped(ke);
 				}
+
+				break;
 			}
 		} else if (me != NULL) {
 			jgui::MouseListener *ml = dynamic_cast<jgui::MouseListener *>(l);
@@ -847,6 +849,8 @@ void DFBInputManager::DispatchEvent(jcommon::EventObject *event)
 				} else if (me->GetType() == JMT_ROTATED) {
 					catched = ml->MouseWheel(me);
 				}
+			
+				break;
 			}
 		}
 
