@@ -26,17 +26,19 @@
 #include "jkeyboardlistener.h"
 #include "jtextfield.h"
 #include "jselectlistener.h"
+#include "jdatalistener.h"
+#include "jkeyboardlistener.h"
 
 namespace phone {
 
 class PhoneDB;
 
-class Phone : public jgui::Frame, public jgui::SelectListener{
+class Phone : public jgui::Frame, public jgui::SelectListener, public jcommon::DataListener{
 
 	private:
 		jthread::Mutex phone_mutex;
-
 		jgui::ListBox *_list;
+		jgui::Window *_status;
 		PhoneDB *db;
 		int _state;
 
@@ -45,8 +47,8 @@ class Phone : public jgui::Frame, public jgui::SelectListener{
 		virtual ~Phone();
 
 		void Process(std::string type);
-
 		virtual void ItemSelected(jgui::SelectEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
 
 };
 
@@ -54,9 +56,9 @@ class PhoneDB{
 
 	public:
 		struct phone_t{
-				std::string name;
-				std::string phone1;
-				std::string phone2;
+			std::string name;
+			std::string phone1;
+			std::string phone2;
 		};
 
 	private:
@@ -83,34 +85,37 @@ class PhoneDB{
 
 };
 
-class AddContact : public jgui::Frame, public jgui::KeyboardListener{
+class AddContact : public jgui::Frame, public jcommon::DataListener{
 
-		private:
-			jthread::Mutex add_mutex;
+	private:
+		jthread::Mutex add_mutex;
 
-			jgui::Label *label1,
-				*label2,
-				*label3;
-			jgui::TextField *field1,
-				*field2,
-				*field3;
-			PhoneDB *db;
-			int _index,
+		jgui::Window *_status;
+		jgui::Label *label1,
+			*label2,
+			*label3;
+		jgui::TextField *field1,
+			*field2,
+			*field3;
+		PhoneDB *db;
+		int _index,
 				_state;
 
-		public:
-			AddContact(PhoneDB *db, int index);
-			virtual ~AddContact();
+	public:
+		AddContact(PhoneDB *db, int index);
+		virtual ~AddContact();
 
-			virtual bool ProcessEvent(jgui::KeyEvent *event);
+		virtual bool KeyPressed(jgui::KeyEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
 
 };
 
-class SearchContacts : public jgui::Frame, public jgui::KeyboardListener{
+class SearchContacts : public jgui::Frame, public jcommon::DataListener, public jgui::KeyboardListener{
 
 	private:
 		jthread::Mutex search_mutex;
 
+		jgui::Window *_status;
 		jgui::Label *label_index,
 			*label_name,
 			*label_tel1,
@@ -129,8 +134,9 @@ class SearchContacts : public jgui::Frame, public jgui::KeyboardListener{
 		SearchContacts(PhoneDB *db);
 		virtual ~SearchContacts();
 
+		virtual bool KeyPressed(jgui::KeyEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
 		virtual void KeyboardPressed(jgui::KeyEvent *event);
-		virtual bool ProcessEvent(jgui::KeyEvent *event);
 
 };
 

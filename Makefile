@@ -64,6 +64,7 @@ OBJS_jcommon += \
 	   jcommonlib.o\
 	   jcalendar.o\
 	   jcharset.o\
+	   jdatalistener.o\
 	   jdate.o\
 		 jdebug.o\
 	   jdynamiclink.o\
@@ -279,6 +280,7 @@ OBJS_jthread += \
 	   jthreadexception.o\
 	   jsemaphoreexception.o\
 	   jsemaphoretimeoutexception.o\
+		 jsyncthread.o\
 	   jmutexexception.o\
 	   jspinlock.o\
 	   jthreadlib.o\
@@ -317,6 +319,7 @@ OBJS_jgui += \
 		jcontainerevent.o\
 		jcontainerlistener.o\
 		jcoordinatelayout.o\
+		jdialogbox.o\
 		jfilechooserdialogbox.o\
 		jflowlayout.o\
 		jfocusevent.o\
@@ -327,6 +330,7 @@ OBJS_jgui += \
 		jgraphics.o\
 		jgridbaglayout.o\
 		jgridlayout.o\
+		jhourdialogbox.o\
 		jicon.o\
 		jimage.o\
 		jimageexception.o\

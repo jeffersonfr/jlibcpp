@@ -18,19 +18,20 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "agenda.h"
-#include "jmessagedialogbox.h"
-#include "jyesnodialogbox.h"
-#include "jkeyboard.h"
-#include "jcalendardialogbox.h"
 #include "jxmlparser.h"
 #include "jsystem.h"
+#include "jmessagedialogbox.h"
+#include "jyesnodialogbox.h"
+#include "jcalendardialogbox.h"
+#include "jhourdialogbox.h"
 
-namespace magenda {
+namespace agenda {
 
 Agenda::Agenda():
 	jgui::Frame("Tasks", (1920-600)/2, 300, 0, 0)
 {
 	started = true;
+	_status = NULL;
 
 	db = new AgendaDB("./config/agenda.xml");
 
@@ -67,53 +68,57 @@ Agenda::~Agenda()
 		delete _list;
 		_list = NULL;
 	}
+
+	delete _status;
+	_status = NULL;
 }
 
 void Agenda::ItemSelected(jgui::SelectEvent *event)
 {
-	jthread::AutoLock lock(&agenda_mutex);
-
-	Hide();
+	if (_status != NULL) {
+		delete _status;
+		_status = NULL;
+	}
 
 	if (event->GetIndex() == 0) {
 		if (db->IsEmpty() == false) {
-		ViewMessages view(db);
-
-		view.Show();
+			_status = new ViewMessages(db);
 		} else {
-			jgui::MessageDialogBox dialog("Warning", "There are no appointments registered !");
-
-			dialog.Show();
+			_status = new jgui::MessageDialogBox("Warning", "There are no appointments registered !");
 		}
 	} else if (event->GetIndex() == 1) {
 		if (db->IsFull() == false) {
-			AddMessage add(db, -1);
-
-			add.Show();
+			_status = new AddMessage(db, -1);
 		} else {
-			jgui::MessageDialogBox dialog("Warning", "There are no space left !");
-
-			dialog.Show();
+			_status = new jgui::MessageDialogBox("Warning", "There are no space left !");
 		}
 	} else if (event->GetIndex() == 2) {
-		jgui::YesNoDialogBox dialog("Warning", "Remove all records ?");
+		jgui::YesNoDialogBox *dialog = new jgui::YesNoDialogBox("Warning", "Remove all records ?");
 
-		dialog.Show();
+		dialog->GetParams()->SetTextParam("id", "remove-all");
+		dialog->RegisterDataListener(this);
 
-		if (dialog.GetResponse() == jgui::JDR_YES) {
-			db->RemoveAll();
-		}
+		_status = dialog;
 	} else if (event->GetIndex() == 3) {
 		char tmp[255];
 
 		sprintf(tmp, "Used records: %d/%d", db->GetSize(), db->GetCapacity());
 
-		jgui::MessageDialogBox dialog("Memory status", tmp);
-
-		dialog.Show();
+		_status = new jgui::MessageDialogBox("Memory status", tmp);
 	}
-		
-	Show(false);
+	
+	if (_status != NULL) {
+		_status->Show();
+	}
+}
+
+void Agenda::DataChanged(jcommon::ParamMapper *params)
+{
+	if (params->GetTextParam("id") == "remove-all") {
+		if (params->GetTextParam("response") == "yes") {
+			db->RemoveAll();
+		}
+	}
 }
 
 static bool agenda_compare(const AgendaDB::agenda_t &a, const AgendaDB::agenda_t &b) 
@@ -380,39 +385,27 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 	int height = DEFAULT_COMPONENT_HEIGHT+4;
 
 	_index = index;
-
-	label1 = NULL;
-	label2 = NULL;
-	label3 = NULL;
+	_status = NULL;
 	date = NULL;
+	label1 = NULL;
+	label3 = NULL;
 
 	db = base;
 
 	label1 = new jgui::Label("Hour", _insets.left, _insets.top+0*height, 350);
 	label3 = new jgui::Label("Date", _insets.left, _insets.top+1*height, 350);
 
-	hour = new jgui::TextField(label1->GetX()+label1->GetWidth()+10, _insets.top+0*height, 80);
-	label2 = new jgui::Label(":", hour->GetX()+hour->GetWidth(), _insets.top+0*height, 20);
-	minute = new jgui::TextField(label2->GetX()+label2->GetWidth(), _insets.top+0*height, 80);
-
+	hour = new jgui::TextField(label1->GetX()+label1->GetWidth()+10, _insets.top+0*height, 180);
 	date = new jgui::TextField(label3->GetX()+label3->GetWidth()+10, _insets.top+1*height, 180);
 
-	label4 = new jgui::Label("Message", _insets.left, _insets.top+2*height, minute->GetX()+minute->GetWidth()-_insets.left);
-	message = new jgui::TextArea(_insets.left, _insets.top+3*height, minute->GetX()+minute->GetWidth()-_insets.left, 400);
+	label4 = new jgui::Label("Message", _insets.left, _insets.top+2*height, hour->GetX()+hour->GetWidth()-_insets.left);
+	message = new jgui::TextArea(_insets.left, _insets.top+3*height, hour->GetX()+hour->GetWidth()-_insets.left, 400);
 
-	label2->SetBackgroundVisible(false);
-	label2->SetBorder(jgui::JCB_EMPTY);
-
-	hour->Insert("12");
+	hour->Insert("12:00");
 	hour->SetCaretType(jgui::JCT_NONE);
 	hour->SetTextSize(2);
 	hour->SetHorizontalAlign(jgui::JHA_CENTER);
 	
-	minute->Insert("00");
-	minute->SetCaretType(jgui::JCT_NONE);
-	minute->SetTextSize(2);
-	minute->SetHorizontalAlign(jgui::JHA_CENTER);
-
 	date->SetCaretType(jgui::JCT_NONE);
 	date->SetHorizontalAlign(jgui::JHA_CENTER);
 
@@ -440,19 +433,15 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 
 	char tmp[255];
 
-	sprintf(tmp, "%02d", _hour);
+	sprintf(tmp, "%02d:%02d", _hour, _minute);
 	hour->Insert(tmp);
-	sprintf(tmp, "%02d", _minute);
-	minute->Insert(tmp);
 	sprintf(tmp, "%02d/%02d/%04d", _day, _month, _year);
 	date->Insert(tmp);
 
 	Add(label1);
-	Add(label2);
 	Add(label3);
 	Add(label4);
 	Add(hour);
-	Add(minute);
 	Add(date);
 	Add(message);
 
@@ -469,68 +458,9 @@ AddMessage::~AddMessage()
 	jthread::AutoLock lock(&add_mutex);
 
 	delete label1;
-	delete label2;
 	delete label3;
 	delete hour;
-	delete minute;
 	delete date;
-}
-
-void AddMessage::KeyboardPressed(jgui::KeyEvent *event)
-{
-	jgui::Component *owner = GetFocusOwner();
-
-	if (owner == date || owner == message) {
-		owner->KeyPressed(event);
-	} else {
-		if (owner == hour || owner == minute) {
-			int code = event->GetKeyCode();
-
-			if (code >= '0' && code <= '9') {
-				if (owner == hour) {
-					int h = atoi(hour->GetText().c_str());
-					char tmp[255];
-
-					hour->SetText("");
-
-					if (h == 0) {
-						sprintf(tmp, "0%d", code);
-					} else if (h == 1) {
-						sprintf(tmp, "1%d", code);
-					} else if (h == 2) {
-						if (code <= 3) {
-							sprintf(tmp, "2%d", code);
-						} else {
-							sprintf(tmp, "0%d", code);
-						}
-					} else {
-						sprintf(tmp, "0%d", code);
-					}
-
-					hour->Insert(tmp);
-
-					_hour = atoi(tmp);
-				} else if (owner == minute) {
-					int h = atoi(minute->GetText().c_str());
-					char tmp[255];
-
-					minute->SetText("");
-
-					if (h == 0) {
-						sprintf(tmp, "0%d", code);
-					} else if (h <= 5) {
-						sprintf(tmp, "%d%d", h, code);
-					} else {
-						sprintf(tmp, "0%d", code);
-					}
-
-					minute->Insert(tmp);
-					
-					_minute = atoi(tmp);
-				}
-			}
-		}
-	}
 }
 
 bool AddMessage::KeyPressed(jgui::KeyEvent *event)
@@ -541,161 +471,32 @@ bool AddMessage::KeyPressed(jgui::KeyEvent *event)
 
 	jthread::AutoLock lock(&add_mutex);
 
-	if ((event->GetSymbol() == jgui::JKS_1) |
-			(event->GetSymbol() == jgui::JKS_2) |
-			(event->GetSymbol() == jgui::JKS_3) |
-			(event->GetSymbol() == jgui::JKS_4) |
-			(event->GetSymbol() == jgui::JKS_5) |
-			(event->GetSymbol() == jgui::JKS_6) |
-			(event->GetSymbol() == jgui::JKS_7) |
-			(event->GetSymbol() == jgui::JKS_8) |
-			(event->GetSymbol() == jgui::JKS_9) |
-			(event->GetSymbol() == jgui::JKS_0)) {
-		std::string num;
+	if (_status != NULL) {
+		delete _status;
+		_status = NULL;
+	}
 
-		if (event->GetSymbol() == jgui::JKS_1) {
-			num = "1";
-		} else if (event->GetSymbol() == jgui::JKS_2) {
-			num = "2";
-		} else if (event->GetSymbol() == jgui::JKS_3) {
-			num = "3";
-		} else if (event->GetSymbol() == jgui::JKS_4) {
-			num = "4";
-		} else if (event->GetSymbol() == jgui::JKS_5) {
-			num = "5";
-		} else if (event->GetSymbol() == jgui::JKS_6) {
-			num = "6";
-		} else if (event->GetSymbol() == jgui::JKS_7) {
-			num = "7";
-		} else if (event->GetSymbol() == jgui::JKS_8) {
-			num = "8";
-		} else if (event->GetSymbol() == jgui::JKS_9) {
-			num = "9";
-		} else if (event->GetSymbol() == jgui::JKS_0) {
-			num = "0";
-		}
-
+	if (event->GetSymbol() == jgui::JKS_ENTER) {
 		if (GetFocusOwner() == hour) {
-			int h = atoi(hour->GetText().c_str()),
-			    delta = atoi(num.c_str());
-			char tmp[255];
+			jgui::HourDialogBox *dialog = new jgui::HourDialogBox("Future", 12, 0, 0);
 
-			hour->SetText("");
+			dialog->GetParams()->SetTextParam("id", "hour");
+			dialog->RegisterDataListener(this);
 
-			if (h == 0) {
-				sprintf(tmp, "0%d", delta);
-			} else if (h == 1) {
-				sprintf(tmp, "1%d", delta);
-			} else if (h == 2) {
-				if (delta <= 3) {
-					sprintf(tmp, "2%d", delta);
-				} else {
-					sprintf(tmp, "0%d", delta);
-				}
-			} else {
-				sprintf(tmp, "0%d", delta);
-			}
-
-			hour->Insert(tmp);
-
-			_hour = atoi(tmp);
-		} else if (GetFocusOwner() == minute) {
-			int h = atoi(minute->GetText().c_str()),
-			    delta = atoi(num.c_str());
-			char tmp[255];
-
-			minute->SetText("");
-
-			if (h == 0) {
-				sprintf(tmp, "0%d", delta);
-			} else if (h <= 5) {
-				sprintf(tmp, "%d%d", h, delta);
-			} else {
-				sprintf(tmp, "0%d", delta);
-			}
-
-			minute->Insert(tmp);
-
-			_minute = atoi(tmp);
-		}
-	} else if (event->GetSymbol() == jgui::JKS_ENTER) {
-		std::string tmp;
-
-		if (GetFocusOwner() == hour) {
-			tmp = hour->GetText();
-
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_PHONE, false);
-
-			keyboard.SetTextSize(20);
-			keyboard.SetText(hour->GetText());
-			keyboard.RegisterKeyboardListener(this);
-
-			keyboard.Show();
-
-			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE && keyboard.GetLastKeyCode() != jgui::JKS_F4) {
-				hour->SetText("");
-				hour->Insert(tmp);
-			}
-		} else if (GetFocusOwner() == minute) {
-			tmp = minute->GetText();
-
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_PHONE, false);
-
-			keyboard.SetTextSize(20);
-			keyboard.SetText(minute->GetText());
-			keyboard.RegisterKeyboardListener(this);
-
-			keyboard.Show();
-
-			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE && keyboard.GetLastKeyCode() != jgui::JKS_F4) {
-				minute->SetText("");
-				minute->Insert(tmp);
-			}
+			_status = dialog;
 		} else if (GetFocusOwner() == date) {
-			tmp = date->GetText();
-
-			jgui::CalendarDialogBox calendar;
+			jgui::CalendarDialogBox *dialog = new jgui::CalendarDialogBox;
 
 			for (int i=0; i<db->GetSize(); i++) {
 				AgendaDB::agenda_t *t = db->Get(i);
 
-				calendar.AddWarnning(t->day, t->month, t->year);
+				dialog->AddWarnning(t->day, t->month, t->year);
 			}
 
-			calendar.Show();
+			dialog->GetParams()->SetTextParam("id", "calendar");
+			dialog->RegisterDataListener(this);
 
-			if (calendar.GetLastKeyCode() == jgui::JKS_BLUE || calendar.GetLastKeyCode() == jgui::JKS_F4) {
-				char tmp[255];
-
-				sprintf(tmp, "%02d/%02d/%04d", calendar.GetDay(), calendar.GetMonth(), calendar.GetYear());
-
-				date->SetText("");
-				date->Insert(tmp);
-
-				_day = calendar.GetDay();
-				_month = calendar.GetMonth();
-				_year = calendar.GetYear();
-			} else {
-				date->SetText("");
-				date->Insert(tmp);
-			}
-		/*
-		} else if (GetFocusOwner() == message) {
-			tmp = message->GetText();
-
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_ALPHA_NUMERIC, false);
-
-			keyboard.SetTextSize(20);
-			keyboard.SetText(message->GetText());
-			keyboard.RegisterKeyboardListener(this);
-
-			keyboard.Show();
-
-			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE && keyboard.GetLastKeyCode() != jgui::JKS_F4) {
-				message->SetText("");
-				message->Insert(tmp);
-			}
-		*/
+			_status = dialog;
 		}
 	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (_state == 0) {
@@ -707,7 +508,35 @@ bool AddMessage::KeyPressed(jgui::KeyEvent *event)
 		Release();
 	}
 
+	if (_status != NULL) {
+		_status->Show();
+	}
+
 	return true;
+}
+
+void AddMessage::DataChanged(jcommon::ParamMapper *params)
+{
+	if (params->GetTextParam("id") == "hour") {
+		char tmp[256];
+
+		_hour = params->GetIntegerParam("hour");
+		_minute = params->GetIntegerParam("minute");
+
+		sprintf(tmp, "%02d:%02d", _hour, _minute);
+
+		hour->SetText(tmp);
+	} else if (params->GetTextParam("id") == "calendar") {
+		char tmp[256];
+
+		_day = params->GetIntegerParam("day");
+		_month = params->GetIntegerParam("month");
+		_year = params->GetIntegerParam("year");
+
+		sprintf(tmp, "%02d/%02d/%04d", _day, _month, _year);
+
+		date->SetText(tmp);
+	}
 }
 
 ViewMessages::ViewMessages(AgendaDB *base):
@@ -718,6 +547,7 @@ ViewMessages::ViewMessages(AgendaDB *base):
 			sheight = 50;
 
 	_index = 0;
+	_status = NULL;
 	label_date = NULL;
 	label_hour = NULL;
 	message = NULL;
@@ -795,6 +625,11 @@ bool ViewMessages::KeyPressed(jgui::KeyEvent *event)
 
 	jthread::AutoLock lock(&view_mutex);
 
+	if (_status != NULL) {
+		delete _status;
+		_status = NULL;
+	}
+
 	if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 		_index--;
 
@@ -813,46 +648,50 @@ bool ViewMessages::KeyPressed(jgui::KeyEvent *event)
 		Update();
 	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialogBox dialog("Warning", "Remove this record ?");
+			jgui::YesNoDialogBox *dialog = new jgui::YesNoDialogBox("Warning", "Remove this record ?");
 
-			dialog.Show();
+			dialog->GetParams()->SetTextParam("id", "remove");
+			dialog->RegisterDataListener(this);
 
-			if (dialog.GetResponse() == jgui::JDR_YES) {
-				db->Remove(_index);
-
-				_index--;
-
-				if (_index <= 0) {
-					_index = 0;
-				}
-
-				Update();
-			}
+			_status = dialog;
 		}
 	} else if (event->GetSymbol() == jgui::JKS_F3 || event->GetSymbol() == jgui::JKS_YELLOW) {
 		if (db->GetSize() > 0) {
-			Hide();
-
-			AddMessage update(db, _index);
-
-			update.Show();
-
-			Update();
-
-			Show(false);
+			_status = new AddMessage(db, _index);
 		}
 	}
-		
+	
+	if (_status != NULL) {
+		_status->Show();
+	}
+
 	return true;
+}
+
+void ViewMessages::DataChanged(jcommon::ParamMapper *params)
+{
+	if (params->GetTextParam("id") == "remove") {
+		if (params->GetTextParam("response") == "yes") {
+			db->Remove(_index);
+
+			_index--;
+
+			if (_index <= 0) {
+				_index = 0;
+			}
+
+			Update();
+		}
+	}
 }
 
 }
 
 int main()
 {
-	magenda::Agenda app;
+	agenda::Agenda app;
 
-	app.Show();
+	app.Show(true);
 
 	return 0;
 }

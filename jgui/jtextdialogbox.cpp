@@ -23,7 +23,7 @@
 namespace jgui {
 
 TextDialogBox::TextDialogBox(std::string msg, bool wrap):
-   	jgui::Frame("", 0, 0, 1000, 600)
+   	jgui::DialogBox("", 0, 0, 1000, 600)
 {
 	jcommon::Object::SetClassName("jgui::TextDialogBox");
 

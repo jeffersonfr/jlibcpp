@@ -23,7 +23,7 @@
 namespace jgui {
 
 InputDialogBox::InputDialogBox(std::string title, std::string msg):
-	jgui::Frame(title, 0, 0, 1000, 600)
+	jgui::DialogBox(title, 0, 0, 1000, 600)
 {
 	jcommon::Object::SetClassName("jgui::InputDialogBox");
 
@@ -61,8 +61,6 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg):
 
 InputDialogBox::~InputDialogBox() 
 {
-		jthread::AutoLock lock(&_input_mutex);
-
 		delete _label;
 		delete _field;
 		delete _ok;
@@ -100,7 +98,9 @@ jvertical_align_t InputDialogBox::GetVerticalAlign()
 
 void InputDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 {
-	jthread::AutoLock lock(&_input_mutex);
+	GetParams()->SetTextParam("text", _field->GetText());
+
+	DispatchDataEvent(GetParams());
 
 	Release();
 }

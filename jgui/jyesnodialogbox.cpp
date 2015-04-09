@@ -23,14 +23,12 @@
 namespace jgui {
 
 YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg):
-	jgui::Frame(title, 0, 0, 1000, 600)
+	jgui::DialogBox(title, 0, 0, 1000, 600)
 {
 	jcommon::Object::SetClassName("jgui::YesNoDialogBox");
 
 	int cw = DEFAULT_COMPONENT_WIDTH,
 			ch = DEFAULT_COMPONENT_HEIGHT;
-
-	_response = JDR_CANCEL;
 
 	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
 
@@ -60,20 +58,9 @@ YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg):
 
 YesNoDialogBox::~YesNoDialogBox() 
 {
-	jthread::AutoLock lock(&_yesno_mutex);
-
 	delete _label;
 	delete _yes;
 	delete _no;
-}
-
-jdialog_result_t YesNoDialogBox::GetResponse()
-{
-	if (_response != JDR_CANCEL && GetFocusOwner() == _yes) {
-		return JDR_YES;
-	}
-
-	return _response;
 }
 
 void YesNoDialogBox::SetHorizontalAlign(jhorizontal_align_t align)
@@ -98,13 +85,15 @@ jvertical_align_t YesNoDialogBox::GetVerticalAlign()
 
 void YesNoDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 {
-	jthread::AutoLock lock(&_yesno_mutex);
+	std::string response = "no";
 
 	if (GetFocusOwner() == _yes) {
-		_response = JDR_YES;
-	} else {
-		_response = JDR_NO;
+		response = "yes";
 	}
+		
+	GetParams()->SetTextParam("response", response);
+
+	DispatchDataEvent(GetParams());
 
 	Release();
 }

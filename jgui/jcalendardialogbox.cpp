@@ -24,7 +24,7 @@
 namespace jgui {
 
 CalendarDialogBox::CalendarDialogBox():
-	jgui::Frame("Calendar", 0, 0, 0, 0)
+	jgui::DialogBox("Calendar", 0, 0, 0, 0)
 {
 	jcommon::Object::SetClassName("jgui::CalendarDialogBox");
 
@@ -36,7 +36,7 @@ CalendarDialogBox::CalendarDialogBox():
 	bheight = 70;
 	delta = 2;
 
-	SetSize(8*(bwidth+delta)-30, 10*(bheight+delta));
+	SetSize(8*(bwidth+delta)-30, 11*(bheight+delta));
 	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 
 	jcommon::Date date;
@@ -262,7 +262,7 @@ void CalendarDialogBox::BuildCalendar()
 		first_day = -1;
 	char tmp[255];
 
-	jcommon::Date date(1, _month, _year+1970);
+	jcommon::Date date(1, _month+1, _year);
 
 	first_day = date.GetDayOfWeek();
 
@@ -338,7 +338,7 @@ void CalendarDialogBox::BuildCalendar()
 		_buttons[_day]->RequestFocus();
 	}
 
-	Pack();
+	Repaint();
 }
 
 bool CalendarDialogBox::KeyPressed(KeyEvent *event)
@@ -410,6 +410,12 @@ void CalendarDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 	_select_day = atoi(b1->GetLabel().c_str());
 	_select_month = (_month+1);
 	_select_year = (_year+1970);
+
+	GetParams()->SetIntegerParam("day", GetDay());
+	GetParams()->SetIntegerParam("month", GetMonth());
+	GetParams()->SetIntegerParam("year", GetYear());
+
+	DispatchDataEvent(GetParams());
 }
 
 void CalendarDialogBox::ItemChanged(SelectEvent *event)
@@ -470,63 +476,6 @@ void CalendarDialogBox::ItemChanged(SelectEvent *event)
 	}
 
 	BuildCalendar();
-}
-
-void CalendarDialogBox::RegisterCalendarListener(CalendarListener *listener)
-{
-	if (listener == NULL) {
-		return;
-	}
-
-	if (std::find(_calendar_listeners.begin(), _calendar_listeners.end(), listener) == _calendar_listeners.end()) {
-		_calendar_listeners.push_back(listener);
-	}
-}
-
-void CalendarDialogBox::RemoveCalendarListener(CalendarListener *listener)
-{
-	if (listener == NULL) {
-		return;
-	}
-
-	std::vector<CalendarListener *>::iterator i = std::find(_calendar_listeners.begin(), _calendar_listeners.end(), listener);
-	
-	if (i != _calendar_listeners.end()) {
-		_calendar_listeners.erase(i);
-	}
-}
-
-void CalendarDialogBox::DispatchCalendarEvent(CalendarEvent *event)
-{
-	if (event == NULL) {
-		return;
-	}
-
-	int k = 0,
-			size = (int)_calendar_listeners.size();
-
-	while (k++ < (int)_calendar_listeners.size() && event->IsConsumed() == false) {
-		_calendar_listeners[k-1]->DateChanged(event);
-
-		if (size != (int)_calendar_listeners.size()) {
-			size = (int)_calendar_listeners.size();
-
-			k--;
-		}
-	}
-
-	/*
-	for (std::vector<CalendarListener *>::iterator i=_calendar_listeners.begin(); i!=_calendar_listeners.end(); i++) {
-		(*i)->DateChanged(event);
-	}
-	*/
-
-	delete event;
-}
-
-std::vector<CalendarListener *> & CalendarDialogBox::GetCalendarListeners()
-{
-	return _calendar_listeners;
 }
 
 }

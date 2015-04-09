@@ -23,7 +23,7 @@
 #include "jbutton.h"
 #include "jbuttonlistener.h"
 #include "jlabel.h"
-#include "jframe.h"
+#include "jdialogbox.h"
 #include "jthread.h"
 #include "jmutex.h"
 #include "jdate.h"
@@ -36,26 +36,17 @@
 
 namespace jgui {
 
-enum jdialog_result_t {
-	JDR_YES,
-	JDR_NO,
-	JDR_CANCEL
-};
-
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class YesNoDialogBox : public jgui::Frame, public jgui::ButtonListener{
+class YesNoDialogBox : public jgui::DialogBox, public jgui::ButtonListener{
 
 	private:
-		jthread::Mutex _yesno_mutex;
-
 		Label *_label;
 		Button *_yes,
 					 *_no;
-		jdialog_result_t _response;
 
 	public:
 		/**
@@ -69,12 +60,6 @@ class YesNoDialogBox : public jgui::Frame, public jgui::ButtonListener{
 		 *
 		 */
 		virtual ~YesNoDialogBox();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jdialog_result_t GetResponse();
 
 		/**
 		 * \brief

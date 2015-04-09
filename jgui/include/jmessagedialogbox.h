@@ -23,7 +23,7 @@
 #include "jbutton.h"
 #include "jbuttonlistener.h"
 #include "jlabel.h"
-#include "jframe.h"
+#include "jdialogbox.h"
 #include "jthread.h"
 #include "jmutex.h"
 #include "jdate.h"
@@ -41,7 +41,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class MessageDialogBox : public jgui::Frame, public jgui::ButtonListener{
+class MessageDialogBox : public jgui::DialogBox, public jgui::ButtonListener{
 
 	private:
 		jthread::Mutex _message_mutex;

@@ -45,7 +45,7 @@
 #include "jwindowlistener.h"
 #include "jthememanager.h"
 
-class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
+class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
 
 	private:
 		jthread::Mutex 
@@ -455,13 +455,6 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 			_progress->SetValue(_progress->GetValue()-10);
 			_slider->SetValue(_slider->GetValue()-10);
 		} else if (event->GetSource() == _button3) {
-		}
-	}
-
-	virtual void KeyboardPressed(jgui::KeyEvent *event)
-	{
-		if (GetFocusOwner() == _textfield) {
-			_textfield->KeyPressed(event);
 		}
 	}
 

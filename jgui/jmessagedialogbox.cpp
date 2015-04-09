@@ -23,7 +23,7 @@
 namespace jgui {
 
 MessageDialogBox::MessageDialogBox(std::string title, std::string msg):
-   	jgui::Frame(title, 0, 0, 1000, 600)
+   	jgui::DialogBox(title, 0, 0, 1000, 600)
 {
 	jcommon::Object::SetClassName("jgui::MessageDialogBox");
 

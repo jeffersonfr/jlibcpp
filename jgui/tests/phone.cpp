@@ -29,6 +29,8 @@ namespace phone {
 Phone::Phone():
  	jgui::Frame("Phone Book", (1920-600)/2, 300, 0, 0)
 {
+	_status = NULL;
+
 	db = new PhoneDB("./config/phone.xml");
 
 	db->Load();
@@ -72,35 +74,42 @@ void Phone::ItemSelected(jgui::SelectEvent *event)
 {
 	jthread::AutoLock lock(&phone_mutex);
 
-	Hide();
+	if (_status != NULL) {
+		delete _status;
+		_status = NULL;
+	}
 
 	if (event->GetIndex() == 0) {
-		SearchContacts app(db);
-
-		app.Show();
+		_status = new SearchContacts(db);
 	} else if (event->GetIndex() == 1) {
-		AddContact app(db, -1);
-
-		app.Show();
+		_status = new AddContact(db, -1);
 	} else if (event->GetIndex() == 2) {
-		jgui::YesNoDialogBox dialog("Aviso", "Clear all contacts ?");
+		jgui::YesNoDialogBox *dialog = new jgui::YesNoDialogBox("Warning", "Remove all contacts ?");
 
-		dialog.Show();
+		dialog->GetParams()->SetTextParam("id", "remove-all");
+		dialog->RegisterDataListener(this);
 
-		if (dialog.GetResponse() == jgui::JDR_YES) {
-			db->RemoveAll();
-		}
+		_status = dialog;
 	} else if (event->GetIndex() == 3) {
 		char tmp[255];
 
-		sprintf(tmp, "Used Contacts: %d/%d", db->GetSize(), db->GetCapacity());
+		sprintf(tmp, "Used contacts: %d/%d", db->GetSize(), db->GetCapacity());
 
-		jgui::MessageDialogBox dialog("Memory Status", tmp);
-
-		dialog.Show();
+		_status = new jgui::MessageDialogBox("Memory status", tmp);
 	}
-		
-	Show(false);
+	
+	if (_status != NULL) {
+		_status->Show();
+	}
+}
+
+void Phone::DataChanged(jcommon::ParamMapper *params)
+{
+	if (params->GetTextParam("id") == "remove-all") {
+		if (params->GetTextParam("response") == "yes") {
+			db->RemoveAll();
+		}
+	}
 }
 
 static bool phone_compare(const PhoneDB::phone_t &a, const PhoneDB::phone_t &b) 
@@ -367,6 +376,7 @@ AddContact::AddContact(PhoneDB *base, int index):
 	int max_width = GetWidth()-_insets.left-_insets.right,
 			height = DEFAULT_COMPONENT_HEIGHT+4;
 
+	_status = NULL;
 	db = base;
 
 	_index = index;
@@ -431,8 +441,6 @@ bool AddContact::KeyPressed(jgui::KeyEvent *event)
 		return true;
 	}
 
-	jthread::AutoLock lock(&add_mutex);
-
 	if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
 		if (_state == 0) {
 			if (field1->GetText() != "" && (field2->GetText() != "" || field3->GetText() != "")) {
@@ -445,61 +453,15 @@ bool AddContact::KeyPressed(jgui::KeyEvent *event)
 		}
 
 		Release();
-	} else if (event->GetSymbol() == jgui::JKS_ENTER) {
-		std::string tmp;
-
-		if (GetFocusOwner() == field1) {
-			tmp = field1->GetText();
-
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_ALPHA_NUMERIC, false);
-
-			keyboard.SetTextSize(20);
-			keyboard.SetText(field1->GetText());
-			keyboard.RegisterKeyboardListener(this);
-
-			keyboard.Show();
-
-			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE &&
-					keyboard.GetLastKeyCode() != jgui::JKS_F4) {
-				field1->SetText("");
-				field1->Insert(tmp);
-			}
-		} else if (GetFocusOwner() == field2) {
-			tmp = field2->GetText();
-
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_PHONE, false);
-
-			keyboard.SetTextSize(20);
-			keyboard.SetText(field2->GetText());
-			keyboard.RegisterKeyboardListener(this);
-
-			keyboard.Show();
-
-			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE &&
-					keyboard.GetLastKeyCode() != jgui::JKS_F4) {
-				field2->SetText("");
-				field2->Insert(tmp);
-			}
-		} else if (GetFocusOwner() == field3) {
-			tmp = field3->GetText();
-
-			jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_PHONE, false);
-
-			keyboard.SetTextSize(20);
-			keyboard.SetText(field3->GetText());
-			keyboard.RegisterKeyboardListener(this);
-
-			keyboard.Show();
-
-			if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE ||
-					keyboard.GetLastKeyCode() != jgui::JKS_F4) {
-				field3->SetText("");
-				field3->Insert(tmp);
-			}
-		}
 	}
 
 	return true;
+}
+
+void AddContact::DataChanged(jcommon::ParamMapper *params)
+{
+	if (params->GetTextParam("id") == "") {
+	}
 }
 
 SearchContacts::SearchContacts(PhoneDB *base):
@@ -510,6 +472,7 @@ SearchContacts::SearchContacts(PhoneDB *base):
 	int height = DEFAULT_COMPONENT_HEIGHT,
 			max_width = GetWidth()-_insets.left-_insets.right;
 
+	_status = NULL;
 	db = base;
 
 	_index = 0;
@@ -610,26 +573,16 @@ void SearchContacts::Update()
 	}
 }
 
-void SearchContacts::KeyboardPressed(jgui::KeyEvent *event)
-{
-	jgui::Keyboard *kb = (jgui::Keyboard *)event->GetSource();
-
-	int i = db->Search(kb->GetText());
-
-	if (i >= 0) {
-		_index = i;
-
-		Update();
-	}
-}
-
 bool SearchContacts::KeyPressed(jgui::KeyEvent *event)
 {
 	if (jgui::Frame::KeyPressed(event) == true) {
 		return true;
 	}
 
-	jthread::AutoLock lock(&search_mutex);
+	if (_status != NULL) {
+		delete _status;
+		_status = NULL;
+	}
 
 	if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 		_index--;
@@ -648,56 +601,62 @@ bool SearchContacts::KeyPressed(jgui::KeyEvent *event)
 
 		Update();
 	} else if (event->GetSymbol() == jgui::JKS_F2 || event->GetSymbol() == jgui::JKS_GREEN) {
-		int index = _index;
+		jgui::Keyboard *dialog = new jgui::Keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_ALPHA_NUMERIC, true);
 
-		jgui::Keyboard keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_ALPHA_NUMERIC, true);
+		dialog->GetTextComponent()->SetTextSize(20);
+		dialog->RegisterKeyboardListener(this);
 
-		keyboard.SetTextSize(20);
-		keyboard.RegisterKeyboardListener(this);
-
-		keyboard.Show();
-
-		if (keyboard.GetLastKeyCode() != jgui::JKS_BLUE && keyboard.GetLastKeyCode() != jgui::JKS_F4) {
-			_index = index;
-
-			Update();
-		}
+		_status = dialog;
 	} else if (event->GetSymbol() == jgui::JKS_F3 || event->GetSymbol() == jgui::JKS_YELLOW) {
 		if (db->GetSize() > 0) {
-			Hide();
-
-			AddContact edit(db, _index);
-
-			edit.Show();
-
-			Update();
-			Show(false);
+			_status = new AddContact(db, _index);
 		}
 	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialogBox dialog("Warning", "Remove this contact ?");
+			jgui::YesNoDialogBox *dialog = new jgui::YesNoDialogBox("Warning", "Remove this contact ?");
 
-			dialog.Show();
+			dialog->GetParams()->SetTextParam("id", "remove");
+			dialog->RegisterDataListener(this);
 
-			if (dialog.GetResponse() == jgui::JDR_YES) {
-				db->Remove(_index);
-
-				_index--;
-
-				if (_index <= 0) {
-					_index = 0;
-				}
-
-				jgui::MessageDialogBox dialog("Information", "Contat removed !");
-
-				dialog.Show();
-
-				Update();
-			}
+			_status = dialog;
 		}
 	}
 
+	if (_status != NULL) {
+		_status->Show();
+	}
+
 	return true;
+}
+
+void SearchContacts::KeyboardPressed(jgui::KeyEvent *event)
+{
+	/*
+	int i = db->Search(kb->GetText());
+
+	if (i >= 0) {
+		_index = i;
+
+		Update();
+	}
+	*/
+}
+
+void SearchContacts::DataChanged(jcommon::ParamMapper *params)
+{
+	if (params->GetTextParam("id") == "remove") {
+		if (params->GetTextParam("response") == "yes") {
+			db->Remove(_index);
+
+			_index--;
+
+			if (_index <= 0) {
+				_index = 0;
+			}
+
+			Update();
+		}
+	}
 }
 
 }
@@ -706,7 +665,7 @@ int main()
 {
 	phone::Phone app;
 
-	app.Show();
+	app.Show(true);
 
 	return 0;
 }

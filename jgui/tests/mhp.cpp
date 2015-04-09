@@ -375,14 +375,6 @@ class Scene : public jgui::Container, public jgui::KeyListener, public jthread::
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			jthread::AutoLock lock(&_input);
-
-			jgui::Component *focus = GetFocusOwner();
-
-			if (focus != NULL) {
-				return focus->KeyPressed(event);
-			}
-
 			return false;
 		}
 
@@ -553,6 +545,18 @@ class MenuTest : public Scene{
 					_mstate = 3;
 				} else if (_mstate == 3) {
 					_mstate = 1;
+				}
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
+				if (GetFocusOwner() == _button1) {
+					_button2->RequestFocus();
+				} else if (GetFocusOwner() == _button2) {
+					_button3->RequestFocus();
+				}
+			} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP) {
+				if (GetFocusOwner() == _button2) {
+					_button1->RequestFocus();
+				} else if (GetFocusOwner() == _button3) {
+					_button2->RequestFocus();
 				}
 			} else if (event->GetSymbol() == jgui::JKS_ENTER) {
 				LayersManager *layers = LayersManager::GetInstance();

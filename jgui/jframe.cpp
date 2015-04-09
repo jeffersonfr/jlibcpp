@@ -48,7 +48,6 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_title = title;
 	_is_visible = false;
 	_is_undecorated = false;
-	_last_key_code = JKS_UNKNOWN;
 	_input_enabled = true;
 	_move_enabled = true;
 	_resize_enabled = false;
@@ -83,7 +82,6 @@ Frame::Frame(int x, int y, int width, int height, int scale_width, int scale_hei
 	_title = "";
 	_is_visible = false;
 	_is_undecorated = true;
-	_last_key_code = JKS_UNKNOWN;
 	_input_enabled = true;
 	_move_enabled = true;
 	_resize_enabled = false;
@@ -276,16 +274,6 @@ bool Frame::Hide()
 	return true;
 }
 
-jkeyevent_symbol_t Frame::GetLastKeyCode()
-{
-	return _last_key_code;
-}
-
-void Frame::SetLastKeyCode(jkeyevent_symbol_t key)
-{
-	_last_key_code = key;
-}
-
 jinsets_t Frame::GetInsets()
 {
 	if (_subtitles.size() == 0) {
@@ -344,8 +332,6 @@ bool Frame::KeyPressed(KeyEvent *event)
 	if (Container::KeyPressed(event) == true) {
 		return true;
 	}
-
-	_last_key_code = event->GetSymbol();
 
 	if ((event->GetSymbol() == JKS_ESCAPE || event->GetSymbol() == JKS_EXIT)) {
 		if (_release_enabled == true) {

@@ -458,10 +458,17 @@ int Date::GetDayOfWeek()
 #ifdef _WIN32
 	return _zone.wDayOfWeek;
 #else
-	// INFO:: segunda, terca, quarta, quinta, sexta, sabado, domingo
-	return ((GetYear()-1901)*365+(GetYear()-1901)/4+GetDayOfMonth()+(GetMonth()-1)*31-((GetMonth()*4+23)/10)*((GetMonth()+12)/15)+((4-GetYear()%4)/4)*((GetMonth()+12)/15)+1)%7;
-	
+	// INFO:: doming, segunda, terca, quarta, quinta, sexta, sabado
 	// return _zone->tm_wday;
+
+	// INFO:: segunda, terca, quarta, quinta, sexta, sabado, domingo
+	int w = ((GetYear()-1901)*365+(GetYear()-1901)/4+GetDayOfMonth()+(GetMonth()-1)*31-((GetMonth()*4+23)/10)*((GetMonth()+12)/15)+((4-GetYear()%4)/4)*((GetMonth()+12)/15)+1)%7;
+
+	if (w < 0) {
+		w = ((w + 7) + 5) % 7;
+	}
+
+	return w;
 #endif
 }
 

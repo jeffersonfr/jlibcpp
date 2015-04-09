@@ -52,6 +52,12 @@ class KeyboardListener : public jcommon::Listener{
 		 */
 		virtual void KeyboardPressed(KeyEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void KeyboardReleased(KeyEvent *event);
+
 };
 
 }

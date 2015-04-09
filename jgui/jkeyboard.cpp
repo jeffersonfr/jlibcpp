@@ -247,10 +247,6 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 		code = 27;
 		any = false;
 	} else if (label == "back") {
-		if (_show_text == true) {
-			display->Backspace();
-		}
-
 		symbol = JKS_BACKSPACE;
 		code = '\b';
 		any = false;
@@ -908,7 +904,11 @@ void Keyboard::DispatchKeyboardEvent(KeyEvent *event)
 			size = (int)_keyboard_listeners.size();
 
 	while (k++ < (int)_keyboard_listeners.size() && event->IsConsumed() == false) {
-		_keyboard_listeners[k-1]->KeyboardPressed(event);
+		if (event->GetType() == JKT_PRESSED) {
+			_keyboard_listeners[k-1]->KeyboardPressed(event);
+		} else if (event->GetType() == JKT_RELEASED) {
+			_keyboard_listeners[k-1]->KeyboardReleased(event);
+		}
 
 		if (size != (int)_keyboard_listeners.size()) {
 			size = (int)_keyboard_listeners.size();

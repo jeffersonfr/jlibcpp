@@ -17,14 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_INPUTDIALOGBOX_H
-#define J_INPUTDIALOGBOX_H
+#ifndef J_DIALOGBOX_H
+#define J_DIALOGBOX_H
 
-#include "jbutton.h"
-#include "jbuttonlistener.h"
-#include "jlabel.h"
-#include "jtextfield.h"
-#include "jdialogbox.h"
+#include "jframe.h"
+#include "jdatalistener.h"
 
 #include <string>
 #include <iostream>
@@ -39,62 +36,56 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class InputDialogBox : public jgui::DialogBox, public jgui::ButtonListener{
+class DialogBox : public jgui::Frame{
 
 	private:
-		TextField *_field;
-		Label *_label;
-		Button *_ok;
-		Button *_cancel;
+		/** \brief */
+		std::vector<jcommon::DataListener *> _data_listeners;
+		/** \brief */
+		jcommon::ParamMapper _params;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		InputDialogBox(std::string title, std::string warn);
+		DialogBox(std::string title, int x, int y, int width, int height);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~InputDialogBox();
+		virtual ~DialogBox();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual std::string GetText();
+		virtual jcommon::ParamMapper * GetParams();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetHorizontalAlign(jhorizontal_align_t align);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jhorizontal_align_t GetHorizontalAlign();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalAlign(jvertical_align_t align);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jvertical_align_t GetVerticalAlign();
+		virtual void RegisterDataListener(jcommon::DataListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void ActionPerformed(jgui::ButtonEvent *event);
+		virtual void RemoveDataListener(jcommon::DataListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DispatchDataEvent(jcommon::ParamMapper *params);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::vector<jcommon::DataListener *> & GetDataListeners();
 
 };
 

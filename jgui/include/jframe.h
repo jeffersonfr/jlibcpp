@@ -91,7 +91,6 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		bool _resize_enabled;
 		bool _is_maximized;
 		jframe_button_t _frame_buttons;
-		jkeyevent_symbol_t _last_key_code;
 
 	public:
 		/**
@@ -237,18 +236,6 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 *
 		 */
 		virtual void RemoveAllSubtitles();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jkeyevent_symbol_t GetLastKeyCode();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLastKeyCode(jkeyevent_symbol_t key);
 
 		/**
 		 * \brief

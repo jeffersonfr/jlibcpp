@@ -25,29 +25,30 @@
 #include "jlistbox.h"
 #include "jtextfield.h"
 #include "jtextarea.h"
-#include "jkeyboardlistener.h"
+#include "jdatalistener.h"
 
-namespace magenda {
+namespace agenda {
 
 class AgendaDB;
 
-class Agenda : public jgui::Frame, public jgui::SelectListener{
+class Agenda : public jgui::Frame, public jgui::SelectListener, public jcommon::DataListener{
 
-		private:
-			jthread::Mutex agenda_mutex;
+	private:
+		jthread::Mutex agenda_mutex;
+		jgui::Window *_status;
+		jgui::ListBox *_list;
+		AgendaDB *db;
+		int _state;
+		bool started;
 
-			jgui::ListBox *_list;
-			AgendaDB *db;
-			int _state;
-			bool started;
+	public:
+		Agenda();
+		virtual ~Agenda();
 
-		public:
-			Agenda();
-			virtual ~Agenda();
+		void Process(std::string type);
 
-			void Process(std::string type);
-
-			virtual void ItemSelected(jgui::SelectEvent *event);
+		virtual void ItemSelected(jgui::SelectEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
 };
 
 class AgendaDB{
@@ -85,17 +86,14 @@ class AgendaDB{
 
 };
 
-class AddMessage : public jgui::Frame, public jgui::KeyboardListener{
-
+class AddMessage : public jgui::Frame, public jcommon::DataListener{
 	private:
 		jthread::Mutex add_mutex;
-
+		jgui::Window *_status;
 		jgui::Label *label1,
-			*label2,
 			*label3,
 			*label4;
-		jgui::TextField *hour,
-			*minute;
+		jgui::TextField *hour;
 		jgui::TextField *date;
 		jgui::TextArea *message;
 		AgendaDB *db;
@@ -111,17 +109,18 @@ class AddMessage : public jgui::Frame, public jgui::KeyboardListener{
 		AddMessage(AgendaDB *db, int index);
 		virtual ~AddMessage();
 
-		virtual void KeyboardPressed(jgui::KeyEvent *event);
-		virtual bool ProcessEvent(jgui::KeyEvent *event);
+		virtual bool KeyPressed(jgui::KeyEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
 
 };
 
-class ViewMessages : public jgui::Frame{
+class ViewMessages : public jgui::Frame, public jcommon::DataListener{
 
 	private:
 		jthread::Mutex view_mutex;
 
 		AgendaDB *db;
+		jgui::Window *_status;
 		jgui::Label *label_date,
 			*label_hour,
 			*message;
@@ -134,7 +133,8 @@ class ViewMessages : public jgui::Frame{
 		ViewMessages(AgendaDB *db);
 		virtual ~ViewMessages();
 
-		virtual bool ProcessEvent(jgui::KeyEvent *event);
+		virtual bool KeyPressed(jgui::KeyEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
 
 };
 

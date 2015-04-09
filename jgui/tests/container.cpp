@@ -38,7 +38,7 @@
 #include "jtooglebutton.h"
 #include "jsystem.h"
 
-class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
+class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -366,26 +366,6 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		delete list;
 	}
 
-	virtual bool KeyPressed(jgui::KeyEvent *event)
-	{
-		if (jgui::Frame::KeyPressed(event) == true) {
-			return true;
-		}
-
-		jthread::AutoLock lock(&teste_mutex);
-
-		if (event->GetSymbol() == jgui::JKS_ENTER) {
-			if (GetFocusOwner() == text_field) {
-				jgui::Keyboard keyboard(500, 400, jgui::JKT_QWERTY, false);
-
-				keyboard.RegisterKeyboardListener(dynamic_cast<jgui::KeyboardListener *>(this));
-				keyboard.Show();
-			}
-		}
-
-		return true;
-	}
-
 	virtual void ButtonSelected(jgui::CheckButtonEvent *event)
 	{
 		jthread::AutoLock lock(&teste_mutex);
@@ -455,20 +435,13 @@ class WindowTeste : public jgui::Frame, public jgui::KeyboardListener, public jg
 		}
 	}
 
-	virtual void KeyboardPressed(jgui::KeyEvent *event)
-	{
-		if (GetFocusOwner() == text_field) {
-			text_field->KeyPressed(event);
-		}
-	}
-
 };
 
 int main( int argc, char *argv[] )
 {
 	WindowTeste test;
 
-	test.Show();
+	test.Show(true);
 
 	return 0;
 }

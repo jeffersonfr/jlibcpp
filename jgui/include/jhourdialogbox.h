@@ -17,13 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_INPUTDIALOGBOX_H
-#define J_INPUTDIALOGBOX_H
+#ifndef J_HOURDIALOGBOX_H
+#define J_HOURDIALOGBOX_H
 
-#include "jbutton.h"
-#include "jbuttonlistener.h"
-#include "jlabel.h"
-#include "jtextfield.h"
+#include "jspin.h"
 #include "jdialogbox.h"
 
 #include <string>
@@ -39,62 +36,40 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class InputDialogBox : public jgui::DialogBox, public jgui::ButtonListener{
+class HourDialogBox : public jgui::DialogBox, public jgui::SelectListener{
 
 	private:
-		TextField *_field;
-		Label *_label;
-		Button *_ok;
-		Button *_cancel;
+		/** \brief */
+		Spin *_hour;
+		/** \brief */
+		Spin *_minute;
+		/** \brief */
+		Spin *_second;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		InputDialogBox(std::string title, std::string warn);
+		HourDialogBox(std::string title, int hour, int minute, int seconds);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~InputDialogBox();
+		virtual ~HourDialogBox();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual std::string GetText();
+		virtual void ItemSelected(SelectEvent *event);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetHorizontalAlign(jhorizontal_align_t align);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jhorizontal_align_t GetHorizontalAlign();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalAlign(jvertical_align_t align);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jvertical_align_t GetVerticalAlign();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ActionPerformed(jgui::ButtonEvent *event);
+		virtual void ItemChanged(SelectEvent *event);
 
 };
 

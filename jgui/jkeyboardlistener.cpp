@@ -36,4 +36,8 @@ void KeyboardListener::KeyboardPressed(KeyEvent *event)
 {
 }
 
+void KeyboardListener::KeyboardReleased(KeyEvent *event)
+{
+}
+
 }

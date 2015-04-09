@@ -26,7 +26,7 @@
 #include "jselectlistener.h"
 #include "jbuttonlistener.h"
 #include "jlabel.h"
-#include "jframe.h"
+#include "jdialogbox.h"
 
 #include "jthread.h"
 #include "jmutex.h"
@@ -58,15 +58,13 @@ struct jcalendar_warnning_t {
  *
  * \author Jeff Ferr
  */
-class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener{
+class CalendarDialogBox : public jgui::DialogBox, public jgui::ButtonListener, public jgui::SelectListener{
 
 	private:
 		jthread::Mutex _cal_mutex;
 
-		std::vector<CalendarListener *> _calendar_listeners;
 		std::vector<jcalendar_warnning_t> _warnning_days;
 		std::vector<Button *> _buttons;
-
 		Label *_ldom,
 			  *_lseg,
 			  *_lter,
@@ -76,7 +74,6 @@ class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, publi
 			  *_lsab;
 		Spin *_syear,
 			 *_smonth;
-
 		std::string _text;
 		int delta,
 				bx,
@@ -212,30 +209,6 @@ class CalendarDialogBox : public jgui::Frame, public jgui::ButtonListener, publi
 		 *
 		 */
 		virtual bool MouseWheel(MouseEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterCalendarListener(CalendarListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveCalendarListener(CalendarListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchCalendarEvent(CalendarEvent *event);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::vector<CalendarListener *> & GetCalendarListeners();
 
 };
 
