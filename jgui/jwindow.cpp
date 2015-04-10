@@ -134,16 +134,7 @@ void Window::SetNativeWindow(void *native)
 
 	_window = (IDirectFBWindow *)native;
 	
-	if (_surface != NULL) {
-		_surface->Release(_surface);
-	}
-
 	if (_window->GetSurface(_window, &_surface) != DFB_OK) {
-		_window->SetOpacity(_window, 0x00);
-		_window->Close(_window);
-		_window->Destroy(_window);
-		_window->Release(_window);
-
 		_surface = NULL;
 		_window = NULL;
 		
@@ -214,19 +205,22 @@ void Window::InternalCreateWindow(void *params)
 
 	_graphics->SetNativeSurface(NULL);
 
+	if (_window != NULL) {
+		_window->SetOpacity(_window, 0x00);
+	}
+
 	if (_surface != NULL) {
 		_surface->Release(_surface);
-		_surface = NULL;
 	}
 
 	if (_window != NULL) {
-		_window->SetOpacity(_window, 0x00);
 		_window->Close(_window);
 		_window->Destroy(_window);
 		_window->Release(_window);
-		
-		_window = NULL;
 	}
+		
+	_surface = NULL;
+	_window = NULL;
 
 	if (params == NULL) {
 		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &_window, &_surface, _opacity, _scale.width, _scale.height);
@@ -763,11 +757,10 @@ void Window::InternalRelease()
 	}
 
 	if (_window != NULL) {
-		_window->SetOpacity(_window, 0x00);
 		_window->Close(_window);
-		_window->Destroy(_window);
-		_window->Release(_window);
-		_window = NULL;
+		// CHANGE:: freeze if resize before the first 'release' in tests/restore.cpp
+		// _window->Destroy(_window);
+		// _window->Release(_window);
 	}
 
 	_window = NULL;
