@@ -77,6 +77,7 @@ void DFBInputManager::Restore()
 
 	Initialize();
 
+	/*
 	for (std::vector<jcommon::Listener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
 		jcommon::Listener *l = (*i);
 
@@ -100,6 +101,7 @@ void DFBInputManager::Restore()
 			}
 		}
 	}
+	*/
 
 	Start();
 }
@@ -110,8 +112,7 @@ void DFBInputManager::Release()
 
 	_initialized = false;
 
-	// TODO:: problemas com SEGFAULT
-	// WaitThread();
+	WaitThread();
 
 	events->Release(events);
 
