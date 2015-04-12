@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jguilib.h"
-#include "jguilib.h"
 
 int main_gui(int argc, char *argv[])
 {
