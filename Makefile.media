@@ -1,0 +1,21 @@
+ifeq ($(ENABLE_MEDIA),directfb)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/$(ENABLE_MEDIA)/include \
+		 `pkg-config --cflags directfb` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs directfb` \
+
+	DEFINES		+= \
+		 -DDIRECTFB_MEDIA \
+
+	REQUIRES	+= \
+		 directfb \
+
+	OBJS_media	+= \
+		 jdfbplayer.o\
+
+OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
+
+endif
+

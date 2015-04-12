@@ -1,0 +1,74 @@
+ifeq ($(ENABLE_GRAPHICS),directfb)
+	CCFLAGS		+= \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
+		 `pkg-config --cflags directfb` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs directfb` \
+
+	DEFINES		+= \
+		 -DDIRECTFB_UI \
+
+	REQUIRES	+= \
+		 directfb \
+
+	OBJS_gfx	+= \
+		 jdfbhandler.o\
+		 jdfbfont.o\
+		 jdfbgraphics.o\
+		 jdfbimage.o\
+		 jdfbinputmanager.o\
+
+OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),directfb-cairo)
+	CCFLAGS 	+= \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
+		 `pkg-config --cflags cairo` \
+		 `pkg-config --cflags directfb` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs cairo` \
+		 `pkg-config --libs directfb` \
+
+	DEFINES		+= \
+		 -DDIRECTFB_CAIRO_UI \
+
+	REQUIRES	+= \
+		 directfb \
+		 cairo \
+
+	OBJS_gfx	+= \
+		 jdfbhandler.o\
+		 jdfbfont.o\
+		 jdfbgraphics.o\
+		 jdfbimage.o\
+		 jdfbinputmanager.o\
+
+OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),x11)
+	CCFLAGS 	+= \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
+		 `pkg-config --cflags x112` \
+
+	DEFINES		+= \
+		 -DX11_UI \
+
+	REQUIRES	+= \
+		 x11 \
+
+	OBJS_gfx	+= \
+		 jx11handler.o\
+		 jx11font.o\
+		 jx11graphics.o\
+		 jx11image.o\
+		 jx11inputmanager.o\
+
+OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif

@@ -8,8 +8,10 @@ include Makefile.defs
 
 # {yes, no}
 ENABLE_DEBUG		?= no
-# {none, dummy, directfb, directfb-cairo, x11}
+# {none, directfb, directfb-cairo, x11}
 ENABLE_GRAPHICS ?= directfb
+# {none, directfb}
+ENABLE_MEDIA ?= directfb
 
 DEBUG  		= \
 		 -g -ggdb \
@@ -28,6 +30,7 @@ CCFLAGS		= \
 		 -Ijio/include \
 		 -Ijlogger/include \
 		 -Ijmath/include \
+		 -Ijmedia/include \
 		 -Ijmpeg/include \
 		 -Ijresource/include \
 		 -Ijsecurity/include \
@@ -58,6 +61,9 @@ endif
 
 REQUIRES	= \
 		 libssl \
+
+include Makefile.gui
+include Makefile.media
 
 OBJS_jcommon += \
 	   jbitstream.o\
@@ -291,8 +297,6 @@ OBJS_jthread += \
 
 ifneq ($(ENABLE_GRAPHICS),none)
 
-include Makefile.gfx
-
 OBJS_jgui += \
 		jadjustmentevent.o\
 		jadjustmentlistener.o\
@@ -386,10 +390,27 @@ OBJS_jgui += \
 		jtable.o\
 		jguilib.o\
 
+ifneq ($(ENABLE_MEDIA),none)
+
+OBJS_jmedia += \
+		jaudioconfigurationcontrol.o\
+		jcontrol.o\
+		jcontrolexception.o\
+		jmediaexception.o\
+		jplayer.o\
+		jplayerevent.o\
+		jplayerlistener.o\
+		jplayermanager.o\
+		jvideoformatcontrol.o\
+		jvideosizecontrol.o\
+		jvolumecontrol.o\
+		jmedialib.o\
+
+endif
+
 endif
 
 SRCS_jcommon		+= $(addprefix jcommon/,$(OBJS_jcommon))
-SRCS_jgui				+= $(addprefix jgui/,$(OBJS_jgui))
 SRCS_jio				+= $(addprefix jio/,$(OBJS_jio))
 SRCS_jlogger		+= $(addprefix jlogger/,$(OBJS_jlogger))
 SRCS_jmath			+= $(addprefix jmath/,$(OBJS_jmath))
@@ -400,6 +421,8 @@ SRCS_jshared		+= $(addprefix jshared/,$(OBJS_jshared))
 SRCS_jipc				+= $(addprefix jipc/,$(OBJS_jipc))
 SRCS_jsocket		+= $(addprefix jsocket/,$(OBJS_jsocket))
 SRCS_jthread		+= $(addprefix jthread/,$(OBJS_jthread))
+SRCS_jgui				+= $(addprefix jgui/,$(OBJS_jgui))
+SRCS_jmedia			+= $(addprefix jmedia/,$(OBJS_jmedia))
 
 OBJS	= \
 		$(OBJS_jcommon) \
@@ -414,6 +437,7 @@ OBJS	= \
 		$(OBJS_jsocket) \
 		$(OBJS_jthread) \
 		$(OBJS_jgui) \
+		$(OBJS_jmedia) \
 
 SRCS	= \
 		$(SRCS_jcommon) \
@@ -428,6 +452,7 @@ SRCS	= \
 		$(SRCS_jsocket) \
 		$(SRCS_jthread) \
 		$(SRCS_jgui) \
+		$(SRCS_jmedia) \
 
 all: $(EXE)
 	
@@ -465,6 +490,9 @@ install: uninstall
 	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jsecurity && install -o nobody -m 644 jsecurity/include/* $(TARGET)/include/$(MODULE)/jsecurity
 	@if [ $(ENABLE_GRAPHICS) != "none" ]; then \
 		install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jgui && install -o nobody -m 644 jgui/include/* $(TARGET)/include/$(MODULE)/jgui; \
+		if [ $(ENABLE_MEDIA) != "none" ]; then \
+			install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jmedia && install -o nobody -m 644 jmedia/include/* $(TARGET)/include/$(MODULE)/jmedia; \
+		fi; \
 	fi;
 	@$(ECHO) "Installing $(EXE) in $(TARGET)/lib/lib$(MODULE).so $(OK)"
 	@install -d -o nobody -m 755 $(TARGET)/lib && install -o nobody -m 644 $(LIBDIR)/$(EXE) $(TARGET)/lib && cd $(TARGET)/lib; ln -s $(EXE) lib$(MODULE).so; cd -
@@ -496,6 +524,7 @@ ultraclean: clean uninstall
 	@cd jio/tests && make clean && cd -
 	@cd jlogger/tests && make clean && cd -
 	@cd jmath/tests && make clean && cd -
+	@cd jmedia/tests && make clean && cd -
 	@cd jmpeg/tests && make clean && cd -
 	@cd jresource/tests && make clean && cd -
 	@cd jsecurity/tests && make clean && cd -
