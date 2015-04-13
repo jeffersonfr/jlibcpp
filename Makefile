@@ -122,16 +122,12 @@ OBJS_jmath += \
 		 juuid.o\
 
 OBJS_jmpeg += \
-	   jadaptationfield.o\
-     jmpegexception.o\
+		 jdemux.o\
+		 jdemuxevent.o\
+		 jdemuxexception.o\
+		 jdemuxlistener.o\
+		 jdemuxmanager.o\
 	   jmpeglib.o\
-	   jprogramassociationsection.o\
-	   jprogrammapsection.o\
-	   jprogramelementarystreamsection.o\
-	   jprogramsysteminformationsection.o\
-	   jtransportstreampacket.o\
-	   # jprogramassociationtable.o\
-	   jprogramsysteminformationtable.o\
 
 OBJS_jresource += \
 		 jresource.o\
