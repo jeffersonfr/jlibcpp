@@ -17,172 +17,92 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_ADAPTATIONFIELD_H
-#define J_ADAPTATIONFIELD_H
+#ifndef J_DEMUXMANAGER_H
+#define J_DEMUXMANAGER_H
+
+#include "jthread.h"
+#include "jinputstream.h"
+#include "jmutex.h"
 
 #include <stdint.h>
 
 namespace jmpeg {
 
-class AdaptationField
-{
-	private:
+class Demux;
+
+class DemuxManager : public jthread::Thread{
+
+	friend class Demux;
+
+	protected:
 		/** \brief */
-		uint8_t *_data;
+		static DemuxManager *_instance;
+
 		/** \brief */
-		uint32_t _size;
+		std::vector<Demux *> _demuxes;
+		/** \brief */
+		jthread::Mutex _demux_mutex;
+		/** \brief */
+		jio::InputStream *_source;
+		/** \brief */
+		bool _is_running;
+
+	protected:
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void AddDemux(Demux *demux);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveDemux(Demux *demux);
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		AdaptationField(uint8_t *data, uint32_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~AdaptationField();
+		DemuxManager();
 
 		/**
 		 * \brief
 		 *
 		 */
-		uint32_t GetLength();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetDiscontinuityIndicator();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetRandomAccessIndicator();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetElementaryStreamPriorityIndicator();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetPCRFlag();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetOPCRFlag();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetSplicingPointFlag();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetPrivateDataFlag();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetAdaptationFieldExtensionFlag();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint64_t GetPCRBase();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetPCRExtension();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetOriginalPCRBase();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetOriginalPCRExtension();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetSpliceCountdown();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetTransportPrivateDataLength();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void GetPrivateData(uint8_t *data, uint32_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetAdaptationFieldExtensionLength();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetLTWFlag();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetPiecewiseRateFlag();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetLTWValidFlag();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetLTWOffset();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetPiecewiseRate();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t GetSpliceType();
+		virtual ~DemuxManager();
 
+		/**
+		 * \brief
+		 *
+		 */
+		static DemuxManager * GetInstance();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetInputStream(jio::InputStream *is);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Start();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Stop();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Run();
+		
 };
 
 }

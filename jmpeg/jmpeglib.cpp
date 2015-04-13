@@ -20,7 +20,29 @@
 #include "Stdafx.h"
 #include "jmpeglib.h"
 
+void DumpPacket(std::string id, const char *data, int length)
+{
+	printf("----:: Dump Packet (%s) :: BEGIN ::----\n", id.c_str());
+
+	for (int i=0; i<length; i++) {
+		printf("%02x ", data[i]);
+	}
+	
+	printf("\n\n");
+
+	for (int i=0; i<length; i++) {
+		if (isprint(data[i])) {
+			printf("%c", data[i]);
+		} else {
+			printf(".", data[i]);
+		}
+	}
+	
+	printf("----:: Dump Packet (%s) :: END ::----\n", id.c_str());
+}
+
 int main_mpeg(int argc, char *argv[])
 {
 	return EXIT_SUCCESS;
 }
+

@@ -17,131 +17,86 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PROGRAMASSOCIATIONSECTION_H
-#define J_PROGRAMASSOCIATIONSECTION_H
+#ifndef J_DEMUXEVENT_H
+#define J_DEMUXEVENT_H
 
-#include "jprogramsysteminformationsection.h"
-
-#include <vector>
-
-#include <stdint.h>
+#include "jeventobject.h"
 
 namespace jmpeg {
 
-class ProgramAssociationSection : public ProgramSystemInformationSection{
-	private:
-
-	protected:
-		
-	public:
-		class Program;
-
-		/**
-		 * \brief
-		 *
-		 */
-		ProgramAssociationSection();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ProgramAssociationSection();
-
-		/**
-		 * \brief
-		 *
-		 */
-		// TODO:: int GetPrograms(std::map<int, ProgramAssociationSection::Program *> &program_map);
-		int GetPrograms(std::vector<ProgramAssociationSection::Program *> &program_map);
-		
+/**
+ * \brief
+ *
+ */
+enum jdemuxevent_type_t {
+	JDET_DATA_ARRIVED,
+	JDET_DATA_NOT_FOUND
 };
 
-class ProgramAssociationSection::Program{
-	private:
-		/** \brief */
-		int _program_identifier;
-		/** \brief */
-		int _program_number;
-		/** \brief */
-		int _reserved;
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class DemuxEvent : public jcommon::EventObject{
 
-	protected:
+	private:
+		/** \brief Program Identify */
+		int _pid;
+		/** \brief Table Identify */
+		int _tid;
+		/** \brief */
+		const char *_data;
+		/** \brief */
+		int _data_length;
+		/** \brief */
+		jdemuxevent_type_t _type;
 
 	public:
 		/**
-		 * \brief
+		 * \brief 
 		 *
 		 */
-		Program()
-		{
-		}
+		DemuxEvent(void *source, jdemuxevent_type_t type, const char *data, int data_length, int pid, int tid);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~Program()
-		{
-		}
+		virtual ~DemuxEvent();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AppendProgramID(int pid)
-		{
-			_program_identifier = pid;
-		}
+		virtual jdemuxevent_type_t GetType();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AppendProgramNumber(int program_number)
-		{
-			_program_number = program_number;
-		}
+		virtual const char * GetData();
 
 		/**
 		 * \brief
 		 *
 		 */
-		void AppendReserved(int reserved)
-		{
-			_reserved = reserved;
-		}
+		virtual int GetDataLength();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetProgramID()
-		{
-			return _program_identifier;
-		}
+		virtual int GetPID();
 
 		/**
 		 * \brief
 		 *
 		 */
-		int GetProgramNumber()
-		{
-			return _program_number;
-		}
-
-		/**
-		 * \brief
-		 *
-		 */
-		int GetReserved()
-		{
-			return _reserved;
-		}
+		virtual int GetTID();
 
 };
 
 }
 
 #endif
-

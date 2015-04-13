@@ -17,123 +17,26 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PSISECTION_H
-#define J_PSISECTION_H
-
-#include <stdint.h>
+#include "jdemuxlistener.h"
 
 namespace jmpeg {
 
-class PSISection{
-	private:
-		/** \brief */
-		uint8_t *_data;
-		/** \brief */
-		uint32_t _data_size;
-		/** \brief */
-		bool _is_complete;
-
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		PSISection();
-		
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~PSISection();
-
-		/**
-		 * \brief
-		 *
-		 */
-		bool IsComplete();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int Push(uint8_t *buffer, uint32_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void GetPayload(uint8_t *buffer, uint32_t *size);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetTableID();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetSectionSyntaxIndicator();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetZero();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetReserved1();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint16_t GetSectionLength();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint16_t GetTansportStreamID();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetReserved2();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetVersionNumber();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetCurrentNextIndicator();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetSectionNumber();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetLastSectionNumber();
-		
-};
-
+DemuxListener::DemuxListener():
+	jcommon::Object()
+{
+	jcommon::Object::SetClassName("jmpeg::DemuxListener");
 }
 
-#endif
+DemuxListener::~DemuxListener()
+{
+}
 
+void DemuxListener::DataArrived(DemuxEvent *event)
+{
+}
+
+void DemuxListener::DataNotFound(DemuxEvent *event)
+{
+}
+
+}

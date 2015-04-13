@@ -17,76 +17,48 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PROGRAMASSOCIATIONSECTION_H
-#define J_PROGRAMASSOCIATIONSECTION_H
+#ifndef J_DEMUXLISTENER_H
+#define J_DEMUXLISTENER_H
 
-#include "jprogramsysteminformationsection.h"
-
-#include <map>
-
-#include <stdint.h>
+#include "jlistener.h"
+#include "jdemuxevent.h"
 
 namespace jmpeg {
 
-class ProgramAssociationSection : public ProgramSystemInformationSection{
-	private:
-
-	protected:
-		
-	public:
-		class Program;
-
-		/**
-		 * \brief
-		 *
-		 */
-		ProgramAssociationSection();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~ProgramAssociationSection();
-
-		/**
-		 * \brief
-		 *
-		 */
-		int GetPrograms(std::map<int, ProgramAssociationSection::Program *> &program_map);
-		
-};
-
-class ProgramAssociationSection::Program{
-	private:
-		/** \brief */
-		int _program_number;
-
-	protected:
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class DemuxListener : public jcommon::Listener{
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		Program(int program_number)
-		{
-			_program_number = program_number;
-		}
+		DemuxListener();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~Program()
-		{
-		}
+		virtual ~DemuxListener();
 
-		void AppendProgramID(int pid)
-		{
-		}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DataArrived(DemuxEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DataNotFound(DemuxEvent *event);
+
 };
 
 }
 
 #endif
-

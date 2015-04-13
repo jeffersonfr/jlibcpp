@@ -18,29 +18,29 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jmpegexception.h"
+#include "jdemuxexception.h"
 
 namespace jmpeg {
 
-MpegException::MpegException():
+DemuxException::DemuxException():
 	jcommon::RuntimeException()
 {
-	jcommon::Object::SetClassName("jmpeg::MpegException");
+	jcommon::Object::SetClassName("jmpeg::DemuxException");
 }
 
-MpegException::MpegException(std::string reason_):
+DemuxException::DemuxException(std::string reason_):
 	jcommon::RuntimeException(reason_)
 {
-	jcommon::Object::SetClassName("jmpeg::MpegException");
+	jcommon::Object::SetClassName("jmpeg::DemuxException");
 }
 
-MpegException::MpegException(jcommon::Exception *exception, std::string reason_):
+DemuxException::DemuxException(jcommon::Exception *exception, std::string reason_):
 	jcommon::RuntimeException(exception, reason_)
 {
-	jcommon::Object::SetClassName("jmpeg::MpegException");
+	jcommon::Object::SetClassName("jmpeg::DemuxException");
 }
 
-MpegException::~MpegException() throw()
+DemuxException::~DemuxException() throw()
 {
 }
 

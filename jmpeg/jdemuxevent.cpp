@@ -17,126 +17,49 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_SECTION_H
-#define J_SECTION_H
-
-#include <stdint.h>
+#include "jdemuxevent.h"
 
 namespace jmpeg {
 
-class Section{
-	private:
-
-	protected:
-		/** \brief */
-		uint8_t *_data;
-		/** \brief */
-		uint16_t _data_size;
-		/** \brief */
-		uint16_t _data_index;
-		/** \brief */
-		bool _is_complete;
-		
-		/**
-		 * \brief
-		 *
-		 */
-		Section();
-
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Section();
-
-		/**
-		 * \brief
-		 *
-		 */
-		bool IsComplete();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void PushData(uint8_t *buffer, uint32_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void GetPayload(uint8_t *buffer, uint32_t *size);
+DemuxEvent::DemuxEvent(void *source, jdemuxevent_type_t type, const char *data, int data_length, int pid, int tid):
+	jcommon::EventObject(source)
+{
+	jcommon::Object::SetClassName("jmpeg::DemuxEvent");
 	
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetTableID();
+	_type = type;
+	_data = data;
+	_data_length = data_length;
+	_pid = pid;
+	_tid = tid;
+}
 		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetSectionSyntaxIndicator();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetZero();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetReserved1();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint16_t GetSectionLength();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint16_t GetTansportStreamID();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetReserved2();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetVersionNumber();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetCurrentNextIndicator();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetSectionNumber();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetLastSectionNumber();
-		
-};
-
+DemuxEvent::~DemuxEvent()
+{
 }
 
-#endif
+jdemuxevent_type_t DemuxEvent::GetType()
+{
+	return _type;
+}
 
+const char * DemuxEvent::GetData()
+{
+	return _data;
+}
+
+int DemuxEvent::GetDataLength()
+{
+	return _data_length;
+}
+
+int DemuxEvent::GetPID()
+{
+	return _pid;
+}
+
+int DemuxEvent::GetTID()
+{
+	return _tid;
+}
+
+}

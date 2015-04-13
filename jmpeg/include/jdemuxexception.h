@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_MPEGEXCEPTION_H
-#define J_MPEGEXCEPTION_H
+#ifndef J_DEMUXEXCEPTION_H
+#define J_DEMUXEXCEPTION_H
 
 #include "jruntimeexception.h"
 
@@ -29,7 +29,7 @@ namespace jmpeg {
  *
  * \author Jeff Ferr
  */
-class MpegException : public jcommon::RuntimeException{
+class DemuxException : public jcommon::RuntimeException{
 
 	private:
 
@@ -38,25 +38,25 @@ class MpegException : public jcommon::RuntimeException{
 		 * \brief Construtor.
 		 *
 		 */
-		MpegException();
+		DemuxException();
 
 		/**
 		 * \brief Construtor.
 		 *
 		 */
-		MpegException(std::string reason);
+		DemuxException(std::string reason);
 
 		/**
 		 * \brief Construtor.
 		 *
 		 */
-		MpegException(jcommon::Exception *exception, std::string reason);
+		DemuxException(jcommon::Exception *exception, std::string reason);
 
 		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
-		virtual ~MpegException() throw();
+		virtual ~DemuxException() throw();
 
 };
 

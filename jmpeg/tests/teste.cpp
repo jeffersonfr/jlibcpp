@@ -17,328 +17,392 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jtransportstreampacket.h"
-#include "jprogramassociationsection.h"
-#include "jprogrammapsection.h"
-#include "jruntimeexception.h"
+#include "jdemuxmanager.h"
+#include "jdemux.h"
+#include "jdemuxlistener.h"
+#include "jmpeglib.h"
+#include "jfileinputstream.h"
 
 #include <iostream>
-#include <vector>
 #include <map>
 #include <algorithm>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
+#define TS_PAT_TIMEOUT	2000
+#define TS_SDT_TIMEOUT	2000
+#define TS_TDT_TIMEOUT	6000
+#define TS_PMT_TIMEOUT	4000
+#define TS_NIT_TIMEOUT	4000
 
-#define TS_PACKET_SIZE				0xbc // 188 bytes
-#define TS_HEADER_SYNC_BYTE		0x47
+std::string ISO8859_1_TO_UTF8(std::string str)
+{
+	const char *str_c_str = str.c_str();
+	char *utf8 = new char[2*str.size()];
+	int k = 0;
 
-#define NUMBER_OF_TRYS				0x03
+	for (int i=0; i<(int)str.size(); i++) {
+		uint8_t c = (uint8_t)str_c_str[i];
 
-#define TS_SYNC_NOT_FOUND			0x01
-
-class DataSource {
-	private:
-		// jio::File *_file;
-		int fd;
-	
-	public:
-		DataSource(std::string filename)
-		{
-			try {
-				// _file = new jio::File(filename);
-				fd = open(filename.c_str(), O_RDONLY | O_LARGEFILE);
-
-				if (fd < 1) {
-					exit(1);
-				}
-			} catch (...) {
-				exit(1);
-			}
+		if (c >= 0x80 && c <= 0xbf) {
+			utf8[k++] = 0xc2;
+			utf8[k++] = c;
+		} else if (c >= 0xc0 && c <= 0xff) {
+			utf8[k++] = 0xc3;
+			utf8[k++] = c-0x40;
+		} else {
+			utf8[k++] = c;
 		}
-		
-		virtual ~DataSource()
-		{
-		}
+	}
 
-		int Read(char *buffer, int size)
-		{
-			int r = read(fd, buffer, size);
+	utf8[k++] = 0;
 
-			if (r < 0) {
-				lseek(fd, 0, SEEK_SET);
-				r = read(fd, buffer, size);
-			}
+	std::string s = std::string(utf8);
 
-			return r;
-		}
-		
-};
+	delete [] utf8;
 
-class DataListener {
+	return s;
+}
 
-	public:
-		enum data_type_t {
-			RAW_DATA,
-			PSI_DATA,
-			PES_DATA
-		};
+bool IsInvalidChar(char c)
+{
+	switch (c) {
+		case 0x0e:
+			return true;
+		default:
+			break;
+	}
+
+	return false;
+}
+
+std::string RemoveInvalidChars(std::string str)
+{
+	str.erase(std::remove_if(str.begin(), str.end(), &IsInvalidChar), str.end());
+
+	return str;
+}
+
+class DemuxTest : public jmpeg::DemuxListener {
 
 	private:
-		data_type_t _type;
-		int _pid;
-		int _table_id;
-
-	public:
-		DataListener()
-		{
-			_type = DataListener::RAW_DATA;
-			_pid = -1;
-			_table_id = -1;
-		}
-
-		virtual ~DataListener()
-		{
-		}
-
-		virtual int GetPID()
-		{
-			return _pid;
-		}
-
-		virtual int GetTableID()
-		{
-			return _table_id;
-		}
-
-		virtual DataListener::data_type_t GetType()
-		{
-			return _type;
-		}
-
-		virtual void SetPID(int pid)
-		{
-			_pid = pid;
-		}
-
-		virtual void SetTableID(int table_id)
-		{
-			_table_id = table_id;
-		}
-
-		virtual void SetType(DataListener::data_type_t type)
-		{
-			_type = type;
-		}
-
-		virtual void DataArrived(uint8_t *data, int length)
-		{
-		}
-
-};
-
-class Demux {
+		std::map<std::string, jmpeg::Demux *> _demuxes;
+		std::map<int, std::string> _stream_types;
 
 	private:
-		std::vector<DataListener *> _data_listeners;
-		DataSource *_source;
+		void InitDemux(std::string id, int pid, int tid, int timeout)
+		{
+			jmpeg::Demux *demux = new jmpeg::Demux(jmpeg::JMDT_PSI);
+
+			demux->RegisterDemuxListener(this);
+			demux->SetPID(pid);
+			demux->SetTID(tid);
+			demux->SetTimeout(timeout);
+			demux->Start();
+
+			// TODO:: verify if the id already exists
+			std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.find(id);
+
+			if (i != _demuxes.end()) {
+				jmpeg::Demux *d = i->second;
+
+				d->Stop();
+
+				_demuxes.erase(i);
+
+				delete d;
+			}
+
+			_demuxes[id] = demux;
+		}
 
 	public:
-		Demux(DataSource *source)
+		DemuxTest()
 		{
-			_source = source;
+			_stream_types[0] = "reserved";
 
-			if (_source == NULL) {
-				throw jcommon::RuntimeException("Data source null pointer !");
+			_stream_types[1] = "video";
+			_stream_types[2] = "video";
+			_stream_types[16] = "video";
+			_stream_types[27] = "video";
+			_stream_types[36] = "video";
+			_stream_types[66] = "video";
+			_stream_types[209] = "video";
+			_stream_types[234] = "video";
+
+			_stream_types[3] = "audio";
+			_stream_types[4] = "audio";
+			_stream_types[15] = "audio";
+			_stream_types[17] = "audio";
+			_stream_types[128] = "audio";
+			_stream_types[129] = "audio";
+			_stream_types[130] = "audio";
+			_stream_types[131] = "audio";
+			_stream_types[132] = "audio";
+			_stream_types[133] = "audio";
+			_stream_types[134] = "audio";
+			_stream_types[135] = "audio";
+
+			_stream_types[5] = "application";
+
+			_stream_types[6] = "subtitle";
+			_stream_types[144] = "subtitle";
+
+			InitDemux("pat", 0x00, 0x00, TS_PAT_TIMEOUT);
+		}
+
+		virtual ~DemuxTest()
+		{
+			for (std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+				jmpeg::Demux *demux = i->second;
+
+				demux->Stop();
+
+				delete demux;
 			}
 		}
 
-		~Demux()
+		virtual void DataArrived(jmpeg::DemuxEvent *event)
 		{
-			if (_source != NULL) {
-				delete _source;
-			}
-		}
+			std::cout << "Data Arrived:: " << event->GetDataLength() << ", " << event->GetPID() << ", " << event->GetTID() << std::endl;
 
-		int Sync(uint8_t *buffer, uint32_t size)
-		{
-			uint32_t length, sync, i;
+			const char *data = event->GetData();
+			// int pid = event->GetPID();
+			int tid = event->GetTID();
+			int len = event->GetDataLength();
+			int section_lentgh = TS_PSI_G_SECTION_LENGTH(data);
 
-			length = sync = i = 0;
+			if (tid == TS_PAT_TABLE_ID) {
+				// INFO::
+				// 	start SDT to get the service name
+				// 	start TDT/TOT to get the current time
+				InitDemux("sdt", TS_SDT_PID, TS_SDT_PID, TS_SDT_TIMEOUT);
+				InitDemux("tdt", TS_TDT_PID, TS_TDT_PID, TS_TDT_TIMEOUT);
 
-			while (++i < size) {
-				length++;
+				int nit_pid = TS_NIT_PID;
+				int count = ((section_lentgh-5)/4)-1; // last 4 bytes are CRC	
 
-				if (buffer[i-1] == TS_HEADER_SYNC_BYTE) {
-					if (length == TS_PACKET_SIZE) {
-						sync++;
+				const char *ptr = data + TS_PSI_HEADER_LENGTH;
+
+				for (int i=0; i<count; i++) {
+					int program_number = TS_G16(ptr+i*4);
+					int map_pid = TS_GM16(ptr+i*4+2, 3, 13);
+
+					std::cout << "PAT:: program number:[" << program_number << "], map_pid:[" << map_pid << "]" << std::endl;
+
+					if (program_number == 0x0) {
+						nit_pid = map_pid;
 					} else {
-						sync=0;
+						InitDemux("pmt", map_pid, program_number, TS_PMT_TIMEOUT);
 					}
+				}
+						
+				InitDemux("nit", nit_pid, nit_pid, TS_NIT_TIMEOUT);
+			} else if (tid == TS_PMT_TABLE_ID) {
+				const char *ptr = data + TS_PSI_HEADER_LENGTH;
 
-					length = 0;
+				int pcr_pid = TS_GM16(ptr, 3, 13);
+				int vpid = -1;
+				int program_info_length = TS_GM16(data+2, 6, 10);
+
+				std::cout << "PMT:: service number:[" << tid << "], pcr_pid:[" << pcr_pid << "]" << std::endl;
+
+				ptr = ptr + 5;
+
+				int descriptors_length = program_info_length;
+				int descriptors_count = 0;
+
+				while (descriptors_count < descriptors_length) {
+					int descriptor_tag = TS_G8(ptr);
+					int descriptor_length = TS_G8(ptr+1);
+
+					std::cout << "PMT:: descritor:[" << descriptor_tag << "]" << std::endl;
+
+					ptr = ptr + descriptor_length + 2;
+
+					descriptors_count = descriptors_count + descriptor_length + 2;	
 				}
 
-				if (sync == NUMBER_OF_TRYS) {
-					break;
-				}
-			}	
+				int services_length = len - 4; // discards crc
+				int services_count = 0;
 
-			if (i >= size) {
-				return TS_SYNC_NOT_FOUND;
-			}
+				while (services_count < services_length) { //Last 4 bytes are CRC
+					int stream_type = TS_G8(ptr);
+					// int reserved_bits_1 = TS_GM8(1, 0, 3); // 0x07
+					int elementary_pid = TS_GM16(ptr+1, 3, 13);
+					// int reserved_bits_2 = TS_GM8(ptr+3, 0, 4); // 0x0f
+					// int es_info_length_unsed = TS_GM8(ptr+4, 4, 2); // 0x00
+					int es_info_length = TS_GM16(ptr+4, 6, 10);
 
-			return (i-1)-(NUMBER_OF_TRYS*TS_PACKET_SIZE);
-		}
+					std::cout << "PMT:: elementary stream:[" << elementary_pid << "], type:[" << stream_type << "]" << std::endl;
 
-		virtual void RegisterDataListener(DataListener *listener)
-		{
-			if (listener == NULL) {
-				return;
-			}
-
-			if (std::find(_data_listeners.begin(), _data_listeners.end(), listener) == _data_listeners.end()) {
-				_data_listeners.push_back(listener);
-			}
-		}
-
-		virtual void RemoveDataListener(DataListener *listener)
-		{
-			if (listener == NULL) {
-				return;
-			}
-
-			std::vector<DataListener *>::iterator i = std::find(_data_listeners.begin(), _data_listeners.end(), listener);
-
-			if (i != _data_listeners.end()) {
-				_data_listeners.erase(i);
-			}
-		}
-
-		virtual void DispatchDataEvent(uint8_t *data, int length)
-		{
-			if (data == NULL || length == 0) {
-				return;
-			}
-
-			int k = 0,
-					size = (int)_data_listeners.size();
-
-			while (k++ < (int)_data_listeners.size()) {
-				DataListener *listener = _data_listeners[k-1];
-
-				listener->DataArrived(data, length);
-
-				if (size != (int)_data_listeners.size()) {
-					size = (int)_data_listeners.size();
-
-					k--;
-				}
-			}
-		}
-
-		void Process()
-		{
-			uint8_t buffer[TS_PACKET_SIZE];
-			int buffer_length;
-
-			while ((buffer_length = _source->Read((char *)buffer, TS_PACKET_SIZE)) == TS_PACKET_SIZE) {
-				if (buffer_length != TS_PACKET_SIZE) {
-					break;
-				}
-
-				// TODO:: definir metodos como static para evitar milhares de allocs
-				// criar um metodo Check() para verificar se os bytes sao validos
-				if (jmpeg::TransportStreamPacket::Check(buffer, buffer_length) == false) {
-					std::cout << "Invalid Packet" << std::endl;
-
-					continue;
-				}
-
-				for (std::vector<DataListener *>::iterator i=_data_listeners.begin(); i!=_data_listeners.end(); i++) {
-					DataListener *listener = (*i);
-
-					if (listener->GetType() == DataListener::RAW_DATA) {
-						listener->DataArrived(buffer, buffer_length);
-					} else {
-						if (jmpeg::TransportStreamPacket::GetProgramID(buffer) == listener->GetPID()) {
-							jmpeg::ProgramSystemInformationSection psi;
-							uint8_t payload[TS_PACKET_SIZE];
-							int size, pointer = 0;
-
-							jmpeg::TransportStreamPacket::GetPayload(buffer, payload, &size);
-
-							if (jmpeg::TransportStreamPacket::GetPayloadUnitStartIndicator(buffer) == 1) {
-								if (listener->GetTableID() >= 0 && payload[0] != listener->GetTableID()) { // table_id
-									continue;
-								}
-
-								if (psi.GetSectionSize() > 0) {
-									psi.Clear();
-								}
-
-								pointer = 1;
-
-								if (jmpeg::TransportStreamPacket::HasAdaptationField(buffer) == true) {
-									pointer = payload[0];
-								}
-							}
-
-							psi.Push((payload + pointer), size - pointer);
-							printf(":::::::::: %d\n", size);
-
-							if (psi.HasFailed() == true) {
-								psi.Clear();
-							} else if (psi.IsComplete() == true) {
-								uint8_t buffer[4096];
-								uint32_t length;
-
-								psi.GetPayload(buffer, &length);
-								listener->DataArrived(buffer, length);
-							}
+					if (_stream_types[stream_type] == "video") {
+						if (vpid < 0) {
+							vpid = elementary_pid;
 						}
 					}
+
+					ptr = ptr + 6;
+
+					descriptors_length = es_info_length;
+					descriptors_count = 0;
+
+					while (descriptors_count < descriptors_length) {
+						int descriptor_tag = TS_G8(ptr);
+						int descriptor_length = TS_G8(ptr+1);
+					
+						std::cout << "PMT:: elementary stream descritor:[" << descriptor_tag << "]" << std::endl;
+
+						ptr = ptr + descriptor_length + 2;
+
+						descriptors_count = descriptors_count + descriptor_length + 2;	
+					}
+						
+					services_count = services_count + 6 + descriptors_length;
 				}
+
+				if (pcr_pid == 0x1fff) { // pmt pcr unsed
+					pcr_pid = vpid; // first video pid
+				}
+			} else if (tid == TS_NIT_TABLE_ID) {
+				int network_id = TS_G16(data+3);
+				
+				std::cout << "NIT:: network_id:[" << network_id << "]" << std::endl;
+
+				const char *ptr = data + 8;
+
+				int descriptors_length = TS_GM16(ptr, 4, 12);
+				int descriptors_count = 0;
+
+				ptr = ptr + 2;
+
+				while (descriptors_count < descriptors_length) {
+					int descriptor_tag = TS_G8(ptr);
+					int descriptor_length = TS_G8(ptr+1);
+
+					std::cout << "NIT:: descritor:[" << descriptor_tag << "]" << std::endl;
+					
+					if (descriptor_tag == 0x40) { // network descriptor tag
+						std::string name(ptr+2, descriptor_length);
+
+						name = ISO8859_1_TO_UTF8(name);
+					
+						std::cout << "NIT:: network descritor name:[" << name << "]" << std::endl;
+					}
+
+					ptr = ptr + descriptor_length + 2;
+
+					descriptors_count = descriptors_count + descriptor_length + 2;	
+				}
+
+				// int reserved_future_use = TS_GM8(ptr, 0, 4);
+				int transport_stream_loop_length = TS_GM16(ptr, 4, 12);
+				int transport_stream_loop_count = 0;
+
+				ptr = ptr + 2;
+
+				while (transport_stream_loop_count < transport_stream_loop_length) {
+					int transport_stream_id = TS_G16(ptr);
+					int original_network_id = TS_G16(ptr+2);
+					// int reserved_future_use = TS_GM8(ptr+4, 0, 4);
+
+					std::cout << "NIT:: transport stream id:[" << transport_stream_id << "], original network id:[" << original_network_id << "]" << std::endl;
+
+					descriptors_length = TS_GM16(ptr+4, 4, 12);
+					descriptors_count = 0;
+
+					ptr = ptr + 6;
+
+					while (descriptors_count < descriptors_length) {
+						int descriptor_tag = TS_G8(ptr);
+						int descriptor_length = TS_G8(ptr+1);
+					
+						std::cout << "NIT:: transport descritor:[" << descriptor_tag << "]" << std::endl;
+
+						if (descriptor_tag == 0xcd) { // ts information descriptor 
+							int number = TS_G16(ptr+2);
+
+							std::cout << "NIT:: channel number:[" << number << "]" << std::endl;
+						}
+
+						ptr = ptr + descriptor_length + 2;
+
+						descriptors_count = descriptors_count + descriptor_length + 2;	
+					}
+						
+					transport_stream_loop_count = transport_stream_loop_count + 6 + descriptors_length;
+				}
+			} else if (tid == (TS_SDT_TABLE_ID)) {
+				const char *ptr = data;
+
+				int section_length = TS_GM16(ptr+1, 4, 12);
+				int transport_stream_id = TS_G16(ptr+3);
+				int original_network_id = TS_G16(ptr+8);
+
+				std::cout << "SDT:: transport stream id:[" << transport_stream_id << "], original_network_id:[" << original_network_id << "]" << std::endl;
+
+				int services_length = section_length-8-4;
+				int services_count = 0;
+
+				ptr = ptr + 11;
+
+				while (services_count < services_length) {
+					int service_id = TS_G16(ptr);
+					// int reserved_future_use = TS_GM8(ptr+2, 0, 6);
+					// int EIT_schedule_flag = TS_GM8(ptr+2, 6, 1);
+					// int EIT_present_following_flag = TS_GM8(ptr+2, 7, 1);
+					int running_status = TS_GM8(ptr+3, 0, 3);
+					// int free_CA_mode = TS_GM8(ptr+3, 3, 1);
+
+					std::cout << "SDT:: service id:[" << service_id << "], running status:[" << running_status << "]" << std::endl;
+
+					int descriptors_length = TS_GM16(ptr+3, 4, 12);
+					int descriptors_count = 0;
+
+					ptr = ptr + 5;
+
+					while (descriptors_count < descriptors_length) {
+						int descriptor_tag = TS_G8(ptr);
+						int descriptor_length = TS_G8(ptr+1);
+					
+						std::cout << "SDT:: transport descritor:[" << descriptor_tag << "]" << std::endl;
+
+						if (descriptor_tag == 0x48) { // service descriptor
+							int service_type = TS_G8(ptr+2); // 0x01: HD, 0xXX: LD
+							int service_provider_name_length = TS_G8(ptr+3);
+							std::string service_provider_name(ptr+4, service_provider_name_length);
+							int service_name_length = TS_G8(ptr+service_provider_name_length+5);
+							std::string service_name(ptr+service_provider_name_length+5, service_name_length);
+
+							service_provider_name = ISO8859_1_TO_UTF8(service_provider_name);
+							service_name = ISO8859_1_TO_UTF8(service_name);
+						
+							std::cout << "SDT:: service type:[" << service_type << "], service provider name:[" << service_provider_name << "] service name:[" << service_name << "]" << std::endl;
+						}
+
+						ptr = ptr + descriptor_length + 2;
+
+						descriptors_count = descriptors_count + descriptor_length + 2;	
+					}
+						
+					services_count = services_count + 6 + descriptors_length;
+				}
+			} else if (tid == TS_TOT_TABLE_ID) {
+				uint16_t mjd = TS_G16(data + 3);
+				uint32_t utc = TS_GM32(data + 5, 0, 24);
+
+				printf("TOT:: data :[%02x], utc:[%03x]\n", mjd, utc);
 			}
 		}
-};
 
-class PATListener : public DataListener {
-
-	private:
-
-	public:
-		PATListener()
+		virtual void DataNotFound(jmpeg::DemuxEvent *event)
 		{
-			SetType(PSI_DATA);
-			SetPID(0);
-			SetTableID(0);
+			std::cout << "Data Not Found:: " << event->GetDataLength() << ", " << event->GetPID() << ", " << event->GetTID() << std::endl;
 		}
 
-		virtual ~PATListener()
+		// INFO:: si methods
+		void GetPrograms(std::vector<int> *programs)
 		{
 		}
 
-		virtual void DataArrived(uint8_t *data, int length)
-		{
-			printf("PAT\n");
-
-			jmpeg::ProgramAssociationSection pat;
-
-			pat.Push(data, length);
-
-			if (pat.HasFailed() == false && pat.IsComplete() == true) {
-				std::vector<jmpeg::ProgramAssociationSection::Program *> program_map;
-
-				pat.GetPrograms(program_map);
-
-				for (std::vector<jmpeg::ProgramAssociationSection::Program *>::iterator i=program_map.begin(); i!=program_map.end(); i++) {
-					std::cout << "Find PMT:: program number::" << std::hex << "0x" << (*i)->GetProgramNumber() << ", pid:: " << "0x" << (*i)->GetProgramID() << std::endl;
-				}
-			}
-		}
 };
 
 int main(int argc, char **argv)
@@ -346,13 +410,21 @@ int main(int argc, char **argv)
 	if (argc != 2) {
 		std::cout << "usage:: " << argv[0] << " <file.ts>" << std::endl;
 
-		exit(0);
+		return -1;
 	}
 
-	Demux *c = new Demux(new DataSource(argv[1]));
+	jmpeg::DemuxManager *manager = jmpeg::DemuxManager::GetInstance();
+	jio::FileInputStream *fis = new jio::FileInputStream(argv[1]);
 
-	c->RegisterDataListener(new PATListener());
-	c->Process();
+	manager->SetInputStream(new jio::FileInputStream(argv[1]));
+	manager->Start();
+
+	sleep(60);
+
+	manager->Stop();
+	manager->SetInputStream(NULL);
+
+	delete fis;
 
 	return 0;
 }

@@ -17,142 +17,166 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PROGRAMSYSTEMINFORMATIONSECTION_H
-#define J_PROGRAMSYSTEMINFORMATIONSECTION_H
+#ifndef J_DEMUX_H
+#define J_DEMUX_H
+
+#include "jdemuxlistener.h"
+
+#include <vector>
 
 #include <stdint.h>
 
 namespace jmpeg {
 
-class ProgramSystemInformationSection{
-	private:
+enum jmpeg_data_type_t {
+	JMDT_RAW,
+	JMDT_PSI
+};
+
+class Demux : public jcommon::Object{
 
 	protected:
 		/** \brief */
-		uint8_t *_data;
+		std::vector<DemuxListener *> _demux_listeners;
 		/** \brief */
-		uint16_t _data_size;
+		std::string _buffer;
 		/** \brief */
-		uint16_t _data_index;
+		std::string _data;
 		/** \brief */
-		bool _is_complete;
+		jmpeg_data_type_t _type;
 		/** \brief */
-		bool _has_failed;
-		
+		int _pid;
+		/** \brief */
+		int _tid;
+		/** \brief */
+		int _timeout;
+		/** \brief */
+		uint32_t _last_crc;
+		/** \brief */
+		bool _is_crc_enabled;
+		/** \brief */
+		bool _is_update_if_modified;
+
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		ProgramSystemInformationSection();
+		Demux(jmpeg_data_type_t _type);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~ProgramSystemInformationSection();
+		virtual ~Demux();
 
 		/**
 		 * \brief
 		 *
 		 */
-		bool IsComplete();
+		virtual void Start();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		bool HasFailed();
+		virtual void Stop();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Clear();
+		virtual void SetType(jmpeg_data_type_t type);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int GetSectionSize();
+		virtual void SetTimeout(int timeout);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetTimeout();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jmpeg_data_type_t GetType();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetPID(int pid);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void Push(uint8_t *buffer, uint32_t size);
+		virtual void SetTID(int tid);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		void GetPayload(uint8_t *buffer, uint32_t *size);
-	
+		virtual int GetPID();
+
 		/**
 		 * \brief
 		 *
 		 */
-		uint8_t GetTableID();
+		virtual int GetTID();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCRCCheckEnabled(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsCRCCheckEnabled();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetUpdateIfModified(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsUpdateIfModified();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Append(const char *data, int data_length);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		uint8_t GetSectionSyntaxIndicator();
+		virtual void RegisterDemuxListener(DemuxListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		uint8_t GetZero();
+		virtual void RemoveDemuxListener(DemuxListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		uint8_t GetReserved1();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint16_t GetSectionLength();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint16_t GetTansportStreamID();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetReserved2();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetVersionNumber();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetCurrentNextIndicator();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetSectionNumber();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		uint8_t GetLastSectionNumber();
+		virtual void DispatchDemuxEvent(DemuxEvent *event);
 		
 };
 
