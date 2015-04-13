@@ -115,8 +115,6 @@ class Thread : public virtual jcommon::Object{
 		size_t _stack_size;
 		/** \brief */
 		int _id;
-		/** \brief */
-		bool _is_running;
 
 #ifdef _WIN32
 		/**
