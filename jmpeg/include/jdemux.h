@@ -51,6 +51,8 @@ class Demux : public jcommon::Object{
 		/** \brief */
 		int _timeout;
 		/** \brief */
+		int _last_index;
+		/** \brief */
 		uint32_t _last_crc;
 		/** \brief */
 		bool _is_crc_enabled;
@@ -158,7 +160,7 @@ class Demux : public jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void Append(const char *data, int data_length);
+		virtual bool Append(const char *data, int data_length);
 		
 		/**
 		 * \brief

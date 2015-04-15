@@ -28,6 +28,11 @@
 
 namespace jmpeg {
 
+struct  jdemux_status_t {
+	uint64_t start_time;
+	bool found;
+};
+
 class Demux;
 
 class DemuxManager : public jthread::Thread{
@@ -38,6 +43,8 @@ class DemuxManager : public jthread::Thread{
 		/** \brief */
 		static DemuxManager *_instance;
 
+		/** \brief */
+		std::map<Demux *, struct jdemux_status_t> _demux_status;
 		/** \brief */
 		std::vector<Demux *> _demuxes;
 		/** \brief */

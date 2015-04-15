@@ -32,6 +32,7 @@ Demux::Demux(jmpeg_data_type_t type):
 
 	_type = type;
 	_last_crc = 0;
+	_last_index = -1;
 	_timeout = -1;
 	_is_crc_enabled = true;
 	_is_update_if_modified = true;
@@ -111,52 +112,94 @@ bool Demux::IsUpdateIfModified()
 	return _is_update_if_modified;
 }
 
-void Demux::Append(const char *data, int data_length)
+bool Demux::Append(const char *data, int data_length)
 {
 	int sync_byte = TS_G8(data);
 
 	if (sync_byte != TS_SYNC_BYTE) {
-		return;
+		return false;
 	}
 
 	// int transport_error_indicator = TS_GM8(data+1, 0, 1);
-	// int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
+	int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
 	// int transport_priority = TS_GM8(data+1, 2, 1);
 	int pid = TS_GM16(data+1, 3, 13);
 	// int scrambling_control = TS_GM8(data+3, 0, 2);
-	// int adaptation_field_exist = TS_GM8(data+3, 2, 1);
-	// int contains_payload = TS_GM8(data+3, 3, 1);
-	// int continuity_counter = TS_GM8(data+3, 4, 4);
+	int adaptation_field_exist = TS_GM8(data+3, 2, 1);
+	int contains_payload = TS_GM8(data+3, 3, 1);
+	int continuity_counter = TS_GM8(data+3, 4, 4);
 
 	if (_pid > 0 && _pid != pid) {
-		return;
+		return false;
 	}
 
 	if (_type == JMDT_RAW) {
 		DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, data, data_length, _pid, -1));
 
-		return;
+		return true;
 	}
 
-	int tid = TS_G8(data+4);
+	if (contains_payload == 0) {
+		return false;
+	}
+
+	int pointer_field = 0;
+
+	// INFO:: discards adaptation field
+	if (adaptation_field_exist == 1) {
+		int adaptation_field_length = TS_G8(data+4);
+		
+		pointer_field = adaptation_field_length+1;
+	}
+
+	const char *ptr = data+TS_HEADER_LENGTH+pointer_field;
+
+	int tid = TS_G8(ptr);
 
 	if (_tid > 0 && _tid != tid) {
-		return;
+		return false;
 	}
 
-	// TODO:: process section
-	
-	bool is_complete = false;
-	uint32_t crc;
+	std::string buffer(ptr, data_length-TS_HEADER_LENGTH-pointer_field);
 
-	if (is_complete) {
-		_data = _buffer;
-		_buffer.clear();
-
-		if (_is_crc_enabled == false || _last_crc != crc) {
-			DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_NOT_FOUND, data+TS_HEADER_LENGTH, data_length-TS_HEADER_LENGTH, _pid, _tid));
+	if (payload_unit_start_indicator == 1) {
+		_buffer = buffer;
+	} else {
+		if (_last_index == (continuity_counter-1)) {
+			_buffer.append(buffer);
 		}
 	}
+
+	int section_length = TS_PSI_G_SECTION_LENGTH(_buffer.data());
+	
+	if (section_length == (int)_buffer.size()) {
+		uint32_t crc = *(uint32_t *)(_buffer.data()-4);
+
+		if (_is_crc_enabled == true) {
+			uint32_t calculate = 0; // TODO::
+
+			if (crc != calculate) {
+				_buffer.clear();
+
+				_last_index = -1;
+
+				return false;
+			}
+		}
+		
+		if (_is_update_if_modified == false || _last_crc != crc) {
+			DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, _buffer.data(), _buffer.size(), _pid, _tid));
+
+			_buffer.clear();
+
+			_last_index = -1;
+			_last_crc = crc;
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void Demux::RegisterDemuxListener(DemuxListener *listener)

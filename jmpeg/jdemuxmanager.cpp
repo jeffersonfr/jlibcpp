@@ -20,6 +20,7 @@
 #include "jdemuxmanager.h"
 #include "jdemux.h"
 #include "jautolock.h"
+#include "jdate.h"
 
 #include <algorithm>
 
@@ -78,6 +79,12 @@ void DemuxManager::RemoveDemux(Demux *demux)
 		_demuxes.erase(i);
 	}
 	
+	std::map<Demux *, struct jdemux_status_t>::iterator j=_demux_status.find(demux);
+
+	if (j != _demux_status.end()) {
+		_demux_status.erase(j);
+	}
+
 	_demux_mutex.Unlock();
 }
 
@@ -126,7 +133,30 @@ void DemuxManager::Run()
 			for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
 				Demux *demux = (*i);
 
-				demux->Append(packet, 188);
+				std::map<Demux *, struct jdemux_status_t>::iterator j=_demux_status.find(demux);
+				uint64_t current_time = jcommon::Date::CurrentTimeMillis();
+				struct jdemux_status_t t;
+
+				if (j == _demux_status.end()) {
+					t.start_time = current_time;
+					t.found = false;
+
+					_demux_status[demux] = t;
+				}
+
+				bool complete = demux->Append(packet, 188);
+
+				if (complete) {
+					_demux_status[demux].found = true;
+				}
+
+				t = _demux_status[demux];
+
+				if (t.found == false || demux->GetTimeout() < (int)(current_time-t.start_time)) {
+					_demux_status[demux].start_time = current_time;
+
+					demux->DispatchDemuxEvent(new DemuxEvent(demux, JDET_DATA_NOT_FOUND, NULL, 0, -1, -1));
+				}
 			}
 		}
 
