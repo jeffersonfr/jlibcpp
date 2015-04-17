@@ -48,6 +48,8 @@ class DemuxManager : public jthread::Thread{
 		/** \brief */
 		std::vector<Demux *> _demuxes;
 		/** \brief */
+		std::vector<Demux *> _sync_demuxes;
+		/** \brief */
 		jthread::Mutex _demux_mutex;
 		/** \brief */
 		jio::InputStream *_source;

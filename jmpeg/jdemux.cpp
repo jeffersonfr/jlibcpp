@@ -129,7 +129,7 @@ bool Demux::Append(const char *data, int data_length)
 	int contains_payload = TS_GM8(data+3, 3, 1);
 	int continuity_counter = TS_GM8(data+3, 4, 4);
 
-	if (_pid > 0 && _pid != pid) {
+	if (_pid >= 0 && _pid != pid) {
 		return false;
 	}
 
@@ -143,7 +143,7 @@ bool Demux::Append(const char *data, int data_length)
 		return false;
 	}
 
-	int pointer_field = 0;
+	int pointer_field = 1;
 
 	// INFO:: discards adaptation field
 	if (adaptation_field_exist == 1) {
@@ -156,25 +156,37 @@ bool Demux::Append(const char *data, int data_length)
 
 	int tid = TS_G8(ptr);
 
-	if (_tid > 0 && _tid != tid) {
+	if (_tid >= 0 && _tid != tid) {
 		return false;
 	}
 
-	std::string buffer(ptr, data_length-TS_HEADER_LENGTH-pointer_field);
+	int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
 
 	if (payload_unit_start_indicator == 1) {
-		_buffer = buffer;
+		int chunk_length = section_length;
+
+		if (section_length > 184) {
+			chunk_length = data_length-TS_HEADER_LENGTH-pointer_field;
+		}
+			
+		_buffer = std::string(ptr, chunk_length);
 	} else {
+		int section_length = TS_PSI_G_SECTION_LENGTH(_buffer.data());
+		int chunk_length = section_length-_buffer.size();
+
+		if (chunk_length > 184) {
+			chunk_length = 184;
+		}
+			
 		if (_last_index == (continuity_counter-1)) {
-			_buffer.append(buffer);
+			_buffer.append(ptr, chunk_length);
 		}
 	}
 
-	int section_length = TS_PSI_G_SECTION_LENGTH(_buffer.data());
-	
 	if (section_length == (int)_buffer.size()) {
-		uint32_t crc = *(uint32_t *)(_buffer.data()-4);
+		uint32_t crc = *(uint32_t *)(_buffer.data()+_buffer.size()-4);
 
+		/*
 		if (_is_crc_enabled == true) {
 			uint32_t calculate = 0; // TODO::
 
@@ -186,7 +198,8 @@ bool Demux::Append(const char *data, int data_length)
 				return false;
 			}
 		}
-		
+		*/
+
 		if (_is_update_if_modified == false || _last_crc != crc) {
 			DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, _buffer.data(), _buffer.size(), _pid, _tid));
 

@@ -239,9 +239,11 @@ class DemuxTest : public jmpeg::DemuxListener {
 		{
 			std::cout << "Data Arrived:: " << event->GetDataLength() << ", " << event->GetPID() << ", " << event->GetTID() << std::endl;
 
-			// int pid = event->GetPID();
+			int pid = event->GetPID();
 			int tid = event->GetTID();
-			// int len = event->GetDataLength();
+			int len = event->GetDataLength();
+
+			std::cout << "PSI Section:: pid:[" << pid << "], tid:[" << tid << "], section length:[" << len << "]" << std::endl;
 
 			if (tid == TS_PAT_TABLE_ID) {
 				ProcessPAT(event);
@@ -258,12 +260,14 @@ class DemuxTest : public jmpeg::DemuxListener {
 			} else if (tid == TS_AIT_TABLE_ID) {
 				ProcessPrivate(event);
 			}
+
+			std::cout << std::endl;
 		}
 
 		virtual void ProcessPAT(jmpeg::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
-			int section_lentgh = TS_PSI_G_SECTION_LENGTH(ptr);
+			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
 
 			// INFO::
 			// 	start SDT to get the service name
@@ -272,19 +276,23 @@ class DemuxTest : public jmpeg::DemuxListener {
 			InitDemux("tdt", TS_TDT_PID, TS_TDT_PID, TS_TDT_TIMEOUT);
 
 			int nit_pid = TS_NIT_PID;
-			int count = ((section_lentgh-5)/4)-1; // last 4 bytes are CRC	
+			int count = ((section_length-5)/4-1); // last 4 bytes are CRC	
+
+			ptr = ptr + 8;
 
 			for (int i=0; i<count; i++) {
-				int program_number = TS_G16(ptr+i*4);
-				int map_pid = TS_GM16(ptr+i*4+2, 3, 13);
+				int program_number = TS_G16(ptr);
+				int map_pid = TS_GM16(ptr+2, 3, 13);
 
 				std::cout << "PAT:: program number:[" << program_number << "], map_pid:[" << map_pid << "]" << std::endl;
 
 				if (program_number == 0x0) {
 					nit_pid = map_pid;
 				} else {
-					InitDemux("pmt", map_pid, program_number, TS_PMT_TIMEOUT);
+					InitDemux("pmt", map_pid, 0x02, TS_PMT_TIMEOUT);
 				}
+
+				ptr = ptr + 4;
 			}
 
 			InitDemux("nit", nit_pid, nit_pid, TS_NIT_TIMEOUT);
@@ -296,13 +304,13 @@ class DemuxTest : public jmpeg::DemuxListener {
 			int tid = event->GetTID();
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
 
-			int pcr_pid = TS_GM16(ptr, 3, 13);
+			int pcr_pid = TS_GM16(ptr+8, 3, 13);
 			int vpid = -1;
-			int program_info_length = TS_GM16(ptr+2, 6, 10);
+			int program_info_length = TS_GM16(ptr+10, 4, 12);
 
 			std::cout << "PMT:: service number:[" << tid << "], pcr_pid:[" << pcr_pid << "]" << std::endl;
 
-			ptr = ptr + 5;
+			ptr = ptr + 12;
 
 			int descriptors_length = program_info_length;
 			int descriptors_count = 0;
@@ -318,7 +326,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 				descriptors_count = descriptors_count + descriptor_length + 2;	
 			}
 
-			int services_length = section_length - 4; // discards crc
+			int services_length = section_length - 14 - descriptors_length; // discards crc
 			int services_count = 0;
 
 			while (services_count < services_length) { //Last 4 bytes are CRC
@@ -327,7 +335,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int elementary_pid = TS_GM16(ptr+1, 3, 13);
 				// int reserved_bits_2 = TS_GM8(ptr+3, 0, 4); // 0x0f
 				// int es_info_length_unsed = TS_GM8(ptr+4, 4, 2); // 0x00
-				int es_info_length = TS_GM16(ptr+4, 6, 10);
+				int es_info_length = TS_GM16(ptr+3, 6, 10);
 
 				std::cout << "PMT:: elementary stream:[" << elementary_pid << "], type:[" << stream_type << "]" << std::endl;
 
@@ -340,7 +348,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					InitDemux("private", elementary_pid, 0x74, TS_PRIVATE_TIMEOUT); // 0x74:: Application Information Table
 				}
 
-				ptr = ptr + 6;
+				ptr = ptr + 5;
 
 				descriptors_length = es_info_length;
 				descriptors_count = 0;
@@ -356,7 +364,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					descriptors_count = descriptors_count + descriptor_length + 2;	
 				}
 
-				services_count = services_count + 6 + descriptors_length;
+				services_count = services_count + 5 + descriptors_length;
 			}
 
 			if (pcr_pid == 0x1fff) { // pmt pcr unsed
@@ -949,6 +957,8 @@ int main(int argc, char **argv)
 
 	manager->SetInputStream(new jio::FileInputStream(argv[1]));
 	manager->Start();
+
+	DemuxTest test;
 
 	sleep(60);
 

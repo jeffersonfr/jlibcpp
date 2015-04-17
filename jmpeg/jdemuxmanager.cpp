@@ -29,7 +29,8 @@ namespace jmpeg {
 DemuxManager * DemuxManager::_instance = NULL;
 
 DemuxManager::DemuxManager():
-	jthread::Thread()
+	jthread::Thread(),
+	_demux_mutex(jthread::JMT_RECURSIVE)
 {
 	jcommon::Object::SetClassName("jmpeg::DemuxManager");
 
@@ -58,8 +59,8 @@ void DemuxManager::AddDemux(Demux *demux)
 
 	_demux_mutex.Lock();
 
-	if (std::find(_demuxes.begin(), _demuxes.end(), demux) == _demuxes.end()) {
-		_demuxes.push_back(demux);
+	if (std::find(_sync_demuxes.begin(), _sync_demuxes.end(), demux) == _sync_demuxes.end()) {
+		_sync_demuxes.push_back(demux);
 	}
 	
 	_demux_mutex.Unlock();
@@ -73,10 +74,10 @@ void DemuxManager::RemoveDemux(Demux *demux)
 
 	_demux_mutex.Lock();
 
-	std::vector<Demux *>::iterator i = std::find(_demuxes.begin(), _demuxes.end(), demux);
+	std::vector<Demux *>::iterator i = std::find(_sync_demuxes.begin(), _sync_demuxes.end(), demux);
 	
-	if (i != _demuxes.end()) {
-		_demuxes.erase(i);
+	if (i != _sync_demuxes.end()) {
+		_sync_demuxes.erase(i);
 	}
 	
 	std::map<Demux *, struct jdemux_status_t>::iterator j=_demux_status.find(demux);
@@ -124,8 +125,6 @@ void DemuxManager::Run()
 	}
 
 	while (_is_running) {
-		_demux_mutex.Lock();
-
 		char packet[188];
 		int length = 188;
 
@@ -152,7 +151,7 @@ void DemuxManager::Run()
 
 				t = _demux_status[demux];
 
-				if (t.found == false || demux->GetTimeout() < (int)(current_time-t.start_time)) {
+				if (t.found == false && demux->GetTimeout() < (int)(current_time-t.start_time)) {
 					_demux_status[demux].start_time = current_time;
 
 					demux->DispatchDemuxEvent(new DemuxEvent(demux, JDET_DATA_NOT_FOUND, NULL, 0, -1, -1));
@@ -160,6 +159,10 @@ void DemuxManager::Run()
 			}
 		}
 
+		_demux_mutex.Lock();
+
+		_demuxes = _sync_demuxes;
+	
 		_demux_mutex.Unlock();
 	}
 }
