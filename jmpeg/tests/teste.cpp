@@ -112,6 +112,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 	private:
 		std::map<std::string, jmpeg::Demux *> _demuxes;
 		std::map<int, std::string> _stream_types;
+		std::map<int, int> _pids;
 
 	private:
 		std::string StreamTypeToString(int s)
@@ -173,19 +174,6 @@ class DemuxTest : public jmpeg::DemuxListener {
 			demux->SetTimeout(timeout);
 			demux->Start();
 
-			// TODO:: verify if the id already exists
-			std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.find(id);
-
-			if (i != _demuxes.end()) {
-				jmpeg::Demux *d = i->second;
-
-				d->Stop();
-
-				_demuxes.erase(i);
-
-				delete d;
-			}
-
 			_demuxes[id] = demux;
 		}
 
@@ -226,6 +214,12 @@ class DemuxTest : public jmpeg::DemuxListener {
 
 		virtual ~DemuxTest()
 		{
+			printf("List of PIDs\n");
+
+			for (std::map<int, int>::iterator i=_pids.begin(); i!=_pids.end(); i++) {
+				printf("PID:[%02x] = %d\n", i->first, i->second);
+			}
+
 			for (std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
 				jmpeg::Demux *demux = i->second;
 
@@ -248,6 +242,12 @@ class DemuxTest : public jmpeg::DemuxListener {
 			int len = event->GetDataLength();
 
 			std::cout << "PSI Section:: pid:[" << pid << "], tid:[" << tid << "], section length:[" << len << "]" << std::endl;
+
+			if (_pids.find(pid) == _pids.end()) {
+				_pids[pid] = 0;
+			}
+
+			_pids[pid] = _pids[pid] + 1;
 
 			if (tid == TS_PAT_TABLE_ID) {
 				ProcessPAT(event);
@@ -278,7 +278,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			// 	start TDT/TOT to get the current time
 			InitDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_SDT_TIMEOUT);
 			InitDemux("tdt", TS_TDT_PID, TS_TDT_TABLE_ID, TS_TDT_TIMEOUT);
-			InitDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_TDT_TIMEOUT);
+			InitDemux("eit", TS_EIT_PID, TS_EIT_TABLE_ID, TS_EIT_TIMEOUT);
 
 			int nit_pid = TS_NIT_PID;
 			int count = ((section_length-5)/4-1); // last 4 bytes are CRC	
@@ -294,7 +294,11 @@ class DemuxTest : public jmpeg::DemuxListener {
 				if (program_number == 0x0) {
 					nit_pid = map_pid;
 				} else {
-					InitDemux("pmt", map_pid, TS_PMT_TABLE_ID, TS_PMT_TIMEOUT);
+					char tmp[255];
+
+					sprintf(tmp, "pmt-%04x", program_number);
+
+					InitDemux(tmp, map_pid, TS_PMT_TABLE_ID, TS_PMT_TIMEOUT);
 				}
 
 				ptr = ptr + 4;
@@ -342,7 +346,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 				// int es_info_length_unsed = TS_GM8(ptr+4, 4, 2); // 0x00
 				int es_info_length = TS_GM16(ptr+3, 6, 10);
 
-				std::cout << "PMT:: elementary stream:[" << elementary_pid << "], type:[" << stream_type << "]" << std::endl;
+				std::cout << "PMT:: elementary stream:[" << elementary_pid << "], type:[" << stream_type << "]::[" << StreamTypeToString(stream_type) << "]" << std::endl;
 
 				if (_stream_types[stream_type] == "video") {
 					if (vpid < 0) {
@@ -362,7 +366,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					std::cout << "PMT:: elementary stream descritor:[" << descriptor_tag << "]" << std::endl;
+					std::cout << "PMT:: descritor:[" << descriptor_tag << "]" << std::endl;
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -432,7 +436,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					std::cout << "NIT:: transport descritor:[" << descriptor_tag << "]" << std::endl;
+					std::cout << "NIT:: descriptor:[" << descriptor_tag << "]" << std::endl;
 
 					if (descriptor_tag == 0xcd) { // ts information descriptor 
 						int number = TS_G16(ptr+2);
@@ -483,14 +487,14 @@ class DemuxTest : public jmpeg::DemuxListener {
 					int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					std::cout << "SDT:: transport descritor:[" << descriptor_tag << "]" << std::endl;
+					std::cout << "SDT:: descritor:[" << descriptor_tag << "]" << std::endl;
 
 					if (descriptor_tag == 0x48) { // service descriptor
 						int service_type = TS_G8(ptr+2); // 0x01: HD, 0xXX: LD
 						int service_provider_name_length = TS_G8(ptr+3);
 						std::string service_provider_name(ptr+4, service_provider_name_length);
-						int service_name_length = TS_G8(ptr+service_provider_name_length+5);
-						std::string service_name(ptr+service_provider_name_length+5, service_name_length);
+						int service_name_length = TS_G8(ptr+4+service_provider_name_length);
+						std::string service_name(ptr+5+service_provider_name_length, service_name_length);
 
 						service_provider_name = Utils::ISO8859_1_TO_UTF8(service_provider_name);
 						service_name = Utils::ISO8859_1_TO_UTF8(service_name);
