@@ -168,8 +168,6 @@ bool ComboBox::KeyPressed(KeyEvent *event)
 			_menu->Show();
 		}
 	
-		Repaint();
-
 		catched = true;
 	}
 

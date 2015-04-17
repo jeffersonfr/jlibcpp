@@ -60,14 +60,6 @@ class Menu : public jgui::Frame, public jgui::ItemComponent{
 		int _top_index,
 				_item_size,
 				_visible_items;
-		bool _centered_interaction;
-
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(KeyEvent *event);
 
 	public:
 		/**
@@ -88,12 +80,6 @@ class Menu : public jgui::Frame, public jgui::ItemComponent{
 		 */
 		virtual void SetTitle(std::string title);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCenteredInteraction(bool b);
-
 		/**
 		 * \brief
 		 *
@@ -165,6 +151,18 @@ class Menu : public jgui::Frame, public jgui::ItemComponent{
 		 *
 		 */
 		virtual void Paint(Graphics *g);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyPressed(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MouseWheel(MouseEvent *event);
 
 };
 

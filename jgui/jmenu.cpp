@@ -30,9 +30,9 @@ Menu::Menu(int x, int y, int width, int visible_items):
 {
 	jcommon::Object::SetClassName("jgui::Menu");
 
+	_top_index = 0;
 	_menu_align = JMA_ITEM;
 	_visible_items = visible_items;
-	_centered_interaction = true;
 	_item_size = DEFAULT_ITEM_SIZE;
 
 	if (_visible_items < 1) {
@@ -256,6 +256,73 @@ bool Menu::KeyPressed(KeyEvent *event)
 	return true;
 }
 
+bool Menu::MouseWheel(MouseEvent *event)
+{
+	int count = event->GetClickCount();
+
+	Menu *menu = this;
+
+	if (_menus.size() > 0) {
+		menu = (*_menus.rbegin());
+	}
+
+	if (count < 0) {
+		int old_index = menu->_index;
+
+		menu->_index = menu->_index + count;
+
+		if (menu->_index < 0) {
+			if (menu->_loop == false) {
+				menu->_index = 0;
+			} else {
+				menu->_index = (int)(menu->_items.size()-1);
+			}
+		}
+
+		if (menu->_index < menu->_top_index) {
+			menu->_top_index = menu->_index;
+		}
+
+		if (menu->_index != old_index) {
+			menu->Repaint();
+
+			DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_UP)); 
+		}
+	} else {
+		int old_index = menu->_index;
+
+		menu->_index = menu->_index + count;
+
+		if (menu->_index >= (int)menu->_items.size()) {
+			if (menu->_loop == false) {
+				if (menu->_items.size() > 0) {
+					menu->_index = menu->_items.size()-1;
+				} else {
+					menu->_index = 0;
+				}
+			} else {
+				menu->_index = 0;
+			}
+		}
+
+		if (menu->_index >= (menu->_top_index + menu->_visible_items)) {
+			menu->_top_index = menu->_index-menu->_visible_items+1;
+
+			if (menu->_top_index < 0) {
+				menu->_top_index = 0;
+			}
+		}
+
+		if (menu->_index != old_index) {
+			menu->Repaint();
+
+			DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_DOWN)); 
+		}
+	}
+
+	return true;
+}
+
 void Menu::SetMenuAlign(jmenu_align_t align)
 {
 	_menu_align = align;
@@ -418,10 +485,6 @@ void Menu::Paint(Graphics *g)
 			space = 0,
 			position = _top_index;
 
-	if (_centered_interaction == true) {
-		position = _index-_visible_items/2;
-	}
-
 	if (position > (int)(_items.size()-_visible_items)) {
 		position = (_items.size()-_visible_items);
 	}
@@ -511,65 +574,40 @@ void Menu::Paint(Graphics *g)
 	g->Flip();
 }
 
-void Menu::SetCenteredInteraction(bool b)
-{
-	_centered_interaction = b;
-}
-
 void Menu::SetCurrentIndex(int i)
 {
 	if (i < 0) {
 		i = 0;
 	}
 
-	if (_centered_interaction == true) {
-		if (i >= (int)_items.size()) {
-			if (_items.size() > 0) {
-				i = _items.size()-1;
-			} else {
-				i = 0;
-			}
-		}
+	if (i >= (int)_items.size()) {
+		i = 0;
+	}
 
-		if (_index != i) {
-			{
-				jthread::AutoLock lock(&_component_mutex);
+	if (_index != i) {
+		{
+			jthread::AutoLock lock(&_component_mutex);
 
-				_index = i;
+			_index = i;
+
+			if (_index >= (int)_items.size()) {
+				_index = 0;
 			}
 
-			Repaint();
-		}
-	} else {
-		if (i >= (int)_items.size()) {
-			i = 0;
-		}
-
-		if (_index != i) {
-			{
-				jthread::AutoLock lock(&_component_mutex);
-
-				_index = i;
-
-				if (_index >= (int)_items.size()) {
-					_index = 0;
-				}
-
-				if (_index < _top_index) {
-					_top_index = _index;
-				}
-
-				if (_index >= (_top_index + _visible_items)) {
-					_top_index = _index-_visible_items+1;
-
-					if (_top_index < 0) {
-						_top_index = 0;
-					}
-				}
+			if (_index < _top_index) {
+				_top_index = _index;
 			}
 
-			Repaint();
+			if (_index >= (_top_index + _visible_items)) {
+				_top_index = _index-_visible_items+1;
+
+				if (_top_index < 0) {
+					_top_index = 0;
+				}
+			}
 		}
+
+		Repaint();
 	}
 }
 
