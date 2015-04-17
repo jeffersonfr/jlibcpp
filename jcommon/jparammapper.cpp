@@ -133,7 +133,7 @@ void ParamMapper::SetIntegerParam(std::string key, int64_t value)
 {
 	char str[64];
 	
-	snprintf(str, 32, "%ld", value);
+	snprintf(str, 32, "%lld", value);
 
 	_params[key] = str;
 }

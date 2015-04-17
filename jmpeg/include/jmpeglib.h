@@ -47,8 +47,9 @@
 
 #define TS_PAT_PID 0x00
 #define TS_CAT_PID 0x01
-#define TS_SDT_PID 0x11
 #define TS_NIT_PID 0x10
+#define TS_SDT_PID 0x11
+#define TS_EIT_PID 0x12
 #define TS_TDT_PID 0x14
 
 #define TS_PSI_HEADER_LENGTH 8
@@ -59,8 +60,8 @@
 #define TS_SDT_TABLE_ID 0x42
 #define TS_TDT_TABLE_ID 0x70
 #define TS_TOT_TABLE_ID 0x73
-#define TS_EIT_TABLE_ID 0x12
 #define TS_AIT_TABLE_ID 0x74
+#define TS_EIT_TABLE_ID 0x78
 
 #define TS_DESCRIPTOR_HEADER_LENGTH 2
 

@@ -230,6 +230,12 @@ class DemuxTest : public jmpeg::DemuxListener {
 				jmpeg::Demux *demux = i->second;
 
 				demux->Stop();
+			}
+
+			jmpeg::DemuxManager::GetInstance()->WaitSync();
+			
+			for (std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+				jmpeg::Demux *demux = i->second;
 
 				delete demux;
 			}
@@ -237,8 +243,6 @@ class DemuxTest : public jmpeg::DemuxListener {
 
 		virtual void DataArrived(jmpeg::DemuxEvent *event)
 		{
-			std::cout << "Data Arrived:: " << event->GetDataLength() << ", " << event->GetPID() << ", " << event->GetTID() << std::endl;
-
 			int pid = event->GetPID();
 			int tid = event->GetTID();
 			int len = event->GetDataLength();
@@ -272,8 +276,9 @@ class DemuxTest : public jmpeg::DemuxListener {
 			// INFO::
 			// 	start SDT to get the service name
 			// 	start TDT/TOT to get the current time
-			InitDemux("sdt", TS_SDT_PID, TS_SDT_PID, TS_SDT_TIMEOUT);
-			InitDemux("tdt", TS_TDT_PID, TS_TDT_PID, TS_TDT_TIMEOUT);
+			InitDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_SDT_TIMEOUT);
+			InitDemux("tdt", TS_TDT_PID, TS_TDT_TABLE_ID, TS_TDT_TIMEOUT);
+			InitDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_TDT_TIMEOUT);
 
 			int nit_pid = TS_NIT_PID;
 			int count = ((section_length-5)/4-1); // last 4 bytes are CRC	
@@ -289,13 +294,13 @@ class DemuxTest : public jmpeg::DemuxListener {
 				if (program_number == 0x0) {
 					nit_pid = map_pid;
 				} else {
-					InitDemux("pmt", map_pid, 0x02, TS_PMT_TIMEOUT);
+					InitDemux("pmt", map_pid, TS_PMT_TABLE_ID, TS_PMT_TIMEOUT);
 				}
 
 				ptr = ptr + 4;
 			}
 
-			InitDemux("nit", nit_pid, nit_pid, TS_NIT_TIMEOUT);
+			InitDemux("nit", nit_pid, TS_NIT_TABLE_ID, TS_NIT_TIMEOUT);
 		}
 
 		virtual void ProcessPMT(jmpeg::DemuxEvent *event)

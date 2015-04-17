@@ -118,6 +118,11 @@ void DemuxManager::Stop()
 	}
 }
 
+void DemuxManager::WaitSync()
+{
+	jthread::AutoLock lock(&_demux_sync_mutex);
+}
+
 void DemuxManager::Run()
 {
 	if (_source == NULL) {
@@ -125,6 +130,8 @@ void DemuxManager::Run()
 	}
 
 	while (_is_running) {
+		jthread::AutoLock lock(&_demux_sync_mutex);
+
 		char packet[188];
 		int length = 188;
 
@@ -154,7 +161,7 @@ void DemuxManager::Run()
 				if (t.found == false && demux->GetTimeout() < (int)(current_time-t.start_time)) {
 					_demux_status[demux].start_time = current_time;
 
-					demux->DispatchDemuxEvent(new DemuxEvent(demux, JDET_DATA_NOT_FOUND, NULL, 0, -1, -1));
+					demux->DispatchDemuxEvent(new DemuxEvent(demux, JDET_DATA_NOT_FOUND, NULL, 0, demux->GetPID(), demux->GetTID()));
 				}
 			}
 		}

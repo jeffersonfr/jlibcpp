@@ -52,6 +52,8 @@ class DemuxManager : public jthread::Thread{
 		/** \brief */
 		jthread::Mutex _demux_mutex;
 		/** \brief */
+		jthread::Mutex _demux_sync_mutex;
+		/** \brief */
 		jio::InputStream *_source;
 		/** \brief */
 		bool _is_running;
@@ -105,6 +107,12 @@ class DemuxManager : public jthread::Thread{
 		 *
 		 */
 		virtual void Stop();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void WaitSync();
 		
 		/**
 		 * \brief
