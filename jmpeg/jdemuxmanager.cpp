@@ -135,34 +135,36 @@ void DemuxManager::Run()
 		char packet[188];
 		int length = 188;
 
-		if (_source->Read(packet, length) == length) {
-			for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
-				Demux *demux = (*i);
+		if (_source->Read(packet, length) != length) {
+			break;
+		}
 
-				std::map<Demux *, struct jdemux_status_t>::iterator j=_demux_status.find(demux);
-				uint64_t current_time = jcommon::Date::CurrentTimeMillis();
-				struct jdemux_status_t t;
+		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
+			Demux *demux = (*i);
 
-				if (j == _demux_status.end()) {
-					t.start_time = current_time;
-					t.found = false;
+			std::map<Demux *, struct jdemux_status_t>::iterator j=_demux_status.find(demux);
+			uint64_t current_time = jcommon::Date::CurrentTimeMillis();
+			struct jdemux_status_t t;
 
-					_demux_status[demux] = t;
-				}
+			if (j == _demux_status.end()) {
+				t.start_time = current_time;
+				t.found = false;
 
-				bool complete = demux->Append(packet, 188);
+				_demux_status[demux] = t;
+			}
 
-				if (complete) {
-					_demux_status[demux].found = true;
-				}
+			bool complete = demux->Append(packet, 188);
 
-				t = _demux_status[demux];
+			if (complete) {
+				_demux_status[demux].found = true;
+			}
 
-				if (t.found == false && demux->GetTimeout() < (int)(current_time-t.start_time)) {
-					_demux_status[demux].start_time = current_time;
+			t = _demux_status[demux];
 
-					demux->DispatchDemuxEvent(new DemuxEvent(demux, JDET_DATA_NOT_FOUND, NULL, 0, demux->GetPID(), demux->GetTID()));
-				}
+			if (t.found == false && demux->GetTimeout() < (int)(current_time-t.start_time)) {
+				_demux_status[demux].start_time = current_time;
+
+				demux->DispatchDemuxEvent(new DemuxEvent(demux, JDET_DATA_NOT_FOUND, NULL, 0, demux->GetPID(), demux->GetTID()));
 			}
 		}
 
@@ -172,6 +174,8 @@ void DemuxManager::Run()
 	
 		_demux_mutex.Unlock();
 	}
+
+	_is_running = false;
 }
 
 }
