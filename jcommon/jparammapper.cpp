@@ -23,6 +23,7 @@
 #include "joutofboundsexception.h"
 
 #include <sstream>
+#include <iomanip>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -131,20 +132,20 @@ void ParamMapper::SetBooleanParam(std::string key, bool value)
 
 void ParamMapper::SetIntegerParam(std::string key, int64_t value)
 {
-	char str[64];
-	
-	snprintf(str, 32, "%lld", value);
+	std::ostringstream o;
 
-	_params[key] = str;
+	o << value;
+
+	_params[key] = o.str();
 }
 
 void ParamMapper::SetDecimalParam(std::string key, double value)
 {
-	char str[64];
-	
-	snprintf(str, 32, "%.2f", value);
+	std::ostringstream o;
 
-	_params[key] = str;
+	o << std::setprecision(2) << value;
+	
+	_params[key] = o.str();
 }
 
 void ParamMapper::SetArrayParam(std::string key, uint8_t *value, uint64_t value_size)
