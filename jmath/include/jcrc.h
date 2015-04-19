@@ -53,25 +53,25 @@ class CRC : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static uint8_t Calculate8(uint8_t *begin, int count);
+		static uint8_t Calculate8(const uint8_t *begin, int count);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		static uint16_t Calculate16(uint16_t *begin, int count);
+		static uint16_t Calculate16(const uint8_t *begin, int count);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		static uint32_t Calculate32(uint32_t *begin, int count);
+		static uint32_t Calculate32(const uint8_t *begin, int count);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		static uint64_t Calculate64(uint64_t *begin, int count);
+		static uint64_t Calculate64(const uint8_t *begin, int count);
 		
 };
 

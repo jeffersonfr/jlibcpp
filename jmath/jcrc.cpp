@@ -172,7 +172,7 @@ CRC::~CRC()
 {
 }
 
-uint8_t CRC::Calculate8(uint8_t *begin, int count) 
+uint8_t CRC::Calculate8(const uint8_t *begin, int count) 
 {
 	uint8_t crc = 0x00;
 	
@@ -183,34 +183,34 @@ uint8_t CRC::Calculate8(uint8_t *begin, int count)
 	return crc ^ 0x00;
 }
 
-uint16_t CRC::Calculate16(uint16_t *begin, int count) 
+uint16_t CRC::Calculate16(const uint8_t *begin, int count) 
 {
 	uint16_t crc = 0xffff;
 	
 	while (count-- > 0) {
-		crc = (crc << 8) ^ crc_16[(crc >> 8) ^ ((uint16_t)(*begin++))];
+		crc = (crc << 8) ^ crc_16[(crc >> 8) ^ ((uint8_t)(*begin++))];
 	}
 	
 	return crc ^ 0x0000;
 }
 
-uint32_t CRC::Calculate32(uint32_t *begin, int count) 
+uint32_t CRC::Calculate32(const uint8_t *begin, int count) 
 {	
 	uint32_t crc = 0xffffffff;
 	
 	while (count-- > 0) {
-		crc = (crc << 8) ^ crc_32[(crc >> 24) ^ ((uint32_t)(*begin++))];
+		crc = (crc << 8) ^ crc_32[(crc >> 24) ^ ((uint8_t)(*begin++))];
 	}
 	
 	return crc ^ 0xffffffff;
 }
 
-uint64_t CRC::Calculate64(uint64_t *begin, int count) 
+uint64_t CRC::Calculate64(const uint8_t *begin, int count) 
 {	
 	uint64_t crc = 0xffffffffffffffffLL;
 	
 	while (count-- > 0) {
-		crc = (crc << 8) ^ crc_32[(crc >> 56) ^ ((uint64_t)(*begin++))];
+		crc = (crc << 8) ^ crc_32[(crc >> 56) ^ ((uint8_t)(*begin++))];
 	}
 	
 	return ~crc;
