@@ -25,8 +25,13 @@
 
 #include <iostream>
 #include <map>
+#include <set>
 #include <algorithm>
 #include <iomanip>
+
+// INFO:: extra table ids 
+#define TS_AIT_TABLE_ID 0x74
+#define TS_DSMCC_DESCRIPTORS_TABLE_ID 0x3d
 
 #define TS_PAT_TIMEOUT	2000
 #define TS_PMT_TIMEOUT	4000
@@ -113,7 +118,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 	private:
 		std::map<std::string, jmpeg::Demux *> _demuxes;
 		std::map<int, std::string> _stream_types;
-		std::map<int, int> _pids;
+		std::set<int> _pids;
 
 	private:
 		void InitDemux(std::string id, int pid, int tid, int timeout)
@@ -133,20 +138,19 @@ class DemuxTest : public jmpeg::DemuxListener {
 		DemuxTest()
 		{
 			_stream_types[0] = "reserved";
-
 			_stream_types[1] = "video";
 			_stream_types[2] = "video";
+			_stream_types[3] = "audio";
+			_stream_types[4] = "audio";
+			_stream_types[5] = "private";
+			_stream_types[6] = "subtitle";
+			_stream_types[12] = "dsmcc-descriptors";
+			_stream_types[15] = "audio";
 			_stream_types[16] = "video";
+			_stream_types[17] = "audio";
 			_stream_types[27] = "video";
 			_stream_types[36] = "video";
 			_stream_types[66] = "video";
-			_stream_types[209] = "video";
-			_stream_types[234] = "video";
-
-			_stream_types[3] = "audio";
-			_stream_types[4] = "audio";
-			_stream_types[15] = "audio";
-			_stream_types[17] = "audio";
 			_stream_types[128] = "audio";
 			_stream_types[129] = "audio";
 			_stream_types[130] = "audio";
@@ -155,11 +159,9 @@ class DemuxTest : public jmpeg::DemuxListener {
 			_stream_types[133] = "audio";
 			_stream_types[134] = "audio";
 			_stream_types[135] = "audio";
-
-			_stream_types[5] = "private";
-
-			_stream_types[6] = "subtitle";
 			_stream_types[144] = "subtitle";
+			_stream_types[209] = "video";
+			_stream_types[234] = "video";
 
 			InitDemux("pat", TS_PAT_PID, TS_PAT_TABLE_ID, TS_PAT_TIMEOUT);
 			InitDemux("tsdt", TS_TSDT_PID, TS_TSDT_TABLE_ID, TS_PAT_TIMEOUT);
@@ -167,10 +169,10 @@ class DemuxTest : public jmpeg::DemuxListener {
 
 		virtual ~DemuxTest()
 		{
-			printf("List of PIDs\n");
+			printf("\nList of PID's::\n");
 
-			for (std::map<int, int>::iterator i=_pids.begin(); i!=_pids.end(); i++) {
-				printf("PID:[0x%02x] = %d\n", i->first, i->second);
+			for (std::set<int, int>::iterator i=_pids.begin(); i!=_pids.end(); i++) {
+				printf("PID:[0x%02x]\n", *i);
 			}
 
 			for (std::map<std::string, jmpeg::Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
@@ -480,12 +482,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 
 			printf("PSI Section:: pid:[0x%04x], tid:[0x%04x], length:[%d]\n",  pid, tid, len);
 
-			if (_pids.find(pid) == _pids.end()) {
-				_pids[pid] = 0;
-			}
-
-			_pids[pid] = _pids[pid] + 1;
-
+			_pids.insert(pid);
 
 			if (tid == TS_PAT_TABLE_ID) {
 				ProcessPAT(event);
@@ -501,6 +498,8 @@ class DemuxTest : public jmpeg::DemuxListener {
 				ProcessEIT(event);
 			} else if (tid == TS_AIT_TABLE_ID) {
 				ProcessPrivate(event);
+			} else if (tid == TS_DSMCC_DESCRIPTORS_TABLE_ID) {
+				ProcessDSMCCDescriptors(event);
 			}
 
 			printf("\n");
@@ -593,6 +592,9 @@ class DemuxTest : public jmpeg::DemuxListener {
 				} else if (_stream_types[stream_type] == "private") {
 					// INFO:: ProcessPrivate()
 					InitDemux("private", elementary_pid, 0x74, TS_PRIVATE_TIMEOUT); // 0x74:: Application Information Table
+				} else if (_stream_types[stream_type] == "dsmcc-descriptors") {
+					// INFO:: ProcessDSMCCDescriptors()
+					InitDemux("dsmcc-descriptors", elementary_pid, 0x3d, TS_PRIVATE_TIMEOUT); // 0x74:: Application Information Table
 				}
 
 				ptr = ptr + 5;
@@ -865,10 +867,10 @@ class DemuxTest : public jmpeg::DemuxListener {
 
 					printf("AIT:: aid:[0x%04x], oid:[0x%04x], application control code:[0x%02x]\n", aid, oid, application_control_code);
 
-					int descriptors_length = TS_GM16(ptr+3, 4, 12);
+					int descriptors_length = TS_GM16(ptr+7, 4, 12);
 					int descriptors_count = 0;
 
-					ptr = ptr + 5;
+					ptr = ptr + 9;
 
 					while (descriptors_count < descriptors_length) {
 						// int descriptor_tag = TS_G8(ptr);
@@ -882,6 +884,83 @@ class DemuxTest : public jmpeg::DemuxListener {
 					}
 
 					application_loop_count = application_loop_count + 6 + descriptors_length;
+				}
+			}
+		}
+
+		virtual void ProcessDSMCCDescriptors(jmpeg::DemuxEvent *event)
+		{
+			const char *ptr = event->GetData();
+
+			int section_length = TS_GM16(ptr+1, 4, 12);
+
+			printf("DSMCC Descriptors:: section length:[0x%04x]\n", section_length);
+
+			if (event->GetTID() == 0x3d) {
+				int descriptors_length = section_length-3;
+				int descriptors_count = 0;
+
+				ptr = ptr + 8;
+
+				// INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf; pg.326
+				while (descriptors_count < descriptors_length) {
+					int descriptor_tag = TS_G8(ptr);
+					int descriptor_length = TS_G8(ptr+1);
+
+					if (descriptor_tag == 0x01) { // npt reference descriptor
+						// int post_discontinuity_indicator = TS_GM8(ptr+2, 0, 1);
+						int content_id = TS_GM8(ptr+2, 1, 7);
+						uint64_t STC_reference = (uint64_t)TS_GM8(ptr+3, 7, 1) << 32 | TS_G32(ptr+4);
+						uint64_t NPT_reference = (uint64_t)TS_GM8(ptr+11, 7, 1) << 32 | TS_G32(ptr+12);
+						int scale_numerator = TS_G16(ptr+16);
+						int scale_denominator = TS_G16(ptr+18);
+
+						printf(":: npt reference descriptor:: content id:[%04x], STC reference:[%lu], NPT reference:[%lu], scale numerator:[%d], scale denominator:[%d]\n", content_id, STC_reference, NPT_reference, scale_numerator, scale_denominator);
+					} else if (descriptor_tag == 0x02) { // npt endpoint descriptor
+						uint64_t start_NPT = (uint64_t)TS_GM8(ptr+3, 7, 1) << 32 | TS_G32(ptr+4);
+						uint64_t stop_NPT = (uint64_t)TS_GM8(ptr+11, 7, 1) << 32 | TS_G32(ptr+12);
+
+						printf(":: npt endpoint descriptor:: start NPT:[%lu], stop NPT:[%lu]\n", start_NPT, stop_NPT);
+					} else if (descriptor_tag == 0x03) { // stream mode descriptor
+						int stream_mode = TS_G8(ptr+2);
+						std::string mode = "ISO/IEC 13818-6 reserved";
+
+						if (stream_mode == 0x00) {
+							mode = "Open";
+						} else if (stream_mode == 0x01) {
+							mode = "Pause";
+						} else if (stream_mode == 0x02) {
+							mode = "Transport";
+						} else if (stream_mode == 0x03) {
+							mode = "Transport Pause";
+						} else if (stream_mode == 0x04) {
+							mode = "Search Transport";
+						} else if (stream_mode == 0x05) {
+							mode = "Search Transport Pause";
+						} else if (stream_mode == 0x06) {
+							mode = "Pause Search Transport";
+						} else if (stream_mode == 0x07) {
+							mode = "End of Stream";
+						} else if (stream_mode == 0x08) {
+							mode = "Pre Search Transport";
+						} else if (stream_mode == 0x09) {
+							mode = "Pre Search Transport Pause";
+						}
+
+						printf(":: stream mode descriptor:: mode:[%s]\n", mode.c_str());
+					} else if (descriptor_tag == 0x04) { // stream event descriptor
+						int event_id = TS_G16(ptr+2);
+						uint64_t event_NPT = (uint64_t)TS_GM8(ptr+7, 7, 1) << 32 | TS_G32(ptr+8);
+						std::string private_data_byte(ptr+12, descriptor_length-12);
+
+						printf(":: stream event descriptor:: event id:[%04x], event NPT:[%lu]\n", event_id, event_NPT);
+
+						DumpPacket("private data", private_data_byte.c_str(), private_data_byte.size());
+					}
+
+					ptr = ptr + descriptor_length + 2;
+
+					descriptors_count = descriptors_count + descriptor_length + 2;	
 				}
 			}
 		}

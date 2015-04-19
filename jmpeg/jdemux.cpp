@@ -20,6 +20,7 @@
 #include "jdemux.h"
 #include "jdemuxmanager.h"
 #include "jmpeglib.h"
+#include "jcrc.h"
 
 #include <algorithm>
 
@@ -185,12 +186,13 @@ bool Demux::Append(const char *data, int data_length)
 
 	if (section_length == (int)_buffer.size()) {
 		uint32_t crc = *(uint32_t *)(_buffer.data()+_buffer.size()-4);
-
+	
 		/*
 		if (_is_crc_enabled == true) {
-			uint32_t calculate = 0; // TODO::
+			uint32_t sum = jmath::CRC::Calculate32((const uint8_t *)_buffer.data(), _buffer.size()-4);
 
-			if (crc != calculate) {
+			printf(":: CRC:: %08x, %08x\n", crc, sum);
+			if (crc != sum) {
 				_buffer.clear();
 
 				_last_index = -1;
