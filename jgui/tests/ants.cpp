@@ -170,11 +170,7 @@ class Main : public jgui::Frame{
 				count;
 
 			// max interactions
-#if ENABLE_GUI == 0
 			for (int k=0; k<K_INTERACTIONS; k++) {
-#else
-			for (int k=0; k<K_INTERACTIONS && GetLastKeyCode()!=jgui::JKS_ESCAPE; k++) {
-#endif
 				// k ants
 				for (int j=0; j<K_ANTS; j++) {
 					count = 0;

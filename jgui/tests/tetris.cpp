@@ -587,10 +587,10 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 
 		void Run()
 		{
-			uint64_t starttime;
+			// uint64_t starttime;
 
 			while(_running) {
-				starttime = (jcommon::Date::CurrentTimeMillis()+10LL);
+				// starttime = (jcommon::Date::CurrentTimeMillis()+10LL);
 
 				Repaint();
 

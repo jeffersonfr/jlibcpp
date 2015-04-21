@@ -253,6 +253,7 @@ OBJS_jsocket += \
 		 jsocketoptionsexception.o\
 		 jsocketoutputstream.o\
 		 jsockettimeoutexception.o\
+		 junknownhostexception.o\
 		 jsslcontext.o\
 		 jsslserversocket.o\
 		 jsslsocket.o\
@@ -260,8 +261,6 @@ OBJS_jsocket += \
 		 jsslserversocket6.o\
 		 jsslsocketinputstream.o\
 		 jsslsocketoutputstream.o\
-		 junknownhostexception.o\
-		 #jrtpsocket.o\
 
 OBJS_jthread += \
 	   jautolock.o\

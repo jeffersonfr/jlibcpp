@@ -201,14 +201,10 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 	void Init()
 	{
-		jgui::Graphics *g;
-		
 		GetImages();
 
 		screendata = new int[nrofblocks*nrofblocks];
 
-		g = GetGraphics();
-		
 		d.x = GetX();
 		d.y = GetY();
 		d.w = GetWidth();
@@ -550,11 +546,11 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 	void DrawGhost(int x, int y)
 	{
-		int size,
+		int // size,
 			x_index,
 			y_index;
 
-		size = ghost_bmp->GetWidth()/8;
+		// size = ghost_bmp->GetWidth()/8;
 
 		x_index = ghostanimpos;
 
@@ -768,10 +764,10 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 	virtual void Run()
 	{
-		uint64_t starttime;
+		// uint64_t starttime;
 
 		while(flag) {
-			starttime = (jcommon::Date::CurrentTimeMillis()+10LL);
+			// starttime = (jcommon::Date::CurrentTimeMillis()+10LL);
 
 			Repaint();
 
