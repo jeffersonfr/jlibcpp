@@ -715,6 +715,38 @@ void DFBHandler::Release()
 	}
 }
 
+jgraphics_rotation_t DFBHandler::GetRotation()
+{
+	int rotation = 0;
+
+	_layer->GetRotation(_layer, &rotation);
+
+	if (rotation == 90) {
+		return JGR_90;
+	} else if (rotation == 180) {
+		return JGR_180;
+	} else if (rotation == 270) {
+		return JGR_270;
+	}
+		
+	return JGR_NONE;
+}
+
+void DFBHandler::SetRotation(jgraphics_rotation_t t)
+{
+	int rotation = 0;
+
+	if (t == JGR_90) {
+		rotation = 90;
+	} else if (t == JGR_180) {
+		rotation = 180;
+	} else if (t == JGR_270) {
+		rotation = 270;
+	}
+
+	_layer->SetRotation(_layer, rotation);
+}
+
 void DFBHandler::Suspend()
 {
 	_dfb->Suspend(_dfb);
