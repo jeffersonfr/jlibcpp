@@ -48,7 +48,6 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_title = title;
 	_is_visible = false;
 	_is_undecorated = false;
-	_input_enabled = true;
 	_move_enabled = true;
 	_resize_enabled = false;
 	_frame_buttons = (jframe_button_t)(JFB_CLOSE);
@@ -82,7 +81,6 @@ Frame::Frame(int x, int y, int width, int height, int scale_width, int scale_hei
 	_title = "";
 	_is_visible = false;
 	_is_undecorated = true;
-	_input_enabled = true;
 	_move_enabled = true;
 	_resize_enabled = false;
 	_frame_buttons = (jframe_button_t)(0);
@@ -179,19 +177,6 @@ std::string Frame::GetTitle()
 	return _title;
 }
 
-void Frame::SetInputEnabled(bool b)
-{
-	_input_enabled = b;
-
-	if (_input_enabled == true) {
-		InputManager::GetInstance()->RegisterKeyListener(this);
-		InputManager::GetInstance()->RegisterMouseListener(this);
-	} else {
-		InputManager::GetInstance()->RemoveKeyListener(this);
-		InputManager::GetInstance()->RemoveKeyListener(this);
-	}
-}
-
 void Frame::Pack(bool fit)
 {
 	jthread::AutoLock lock(&_container_mutex);
@@ -246,17 +231,6 @@ void Frame::Pack(bool fit)
 
 bool Frame::Show(bool modal)
 {
-	_is_visible = true;
-
-	DoLayout();
-
-	if (_input_enabled == true) {
-		jthread::AutoLock lock(&_input_mutex);
-
-		InputManager::GetInstance()->RegisterKeyListener(this);
-		InputManager::GetInstance()->RegisterMouseListener(this);
-	}
-
 	return Window::Show(modal);
 }
 

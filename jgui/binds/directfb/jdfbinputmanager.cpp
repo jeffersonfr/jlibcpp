@@ -77,32 +77,6 @@ void DFBInputManager::Restore()
 
 	Initialize();
 
-	/*
-	for (std::vector<jcommon::Listener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		jcommon::Listener *l = (*i);
-
-		if (l->InstanceOf("jgui::Window") == true) {
-			Window *win = dynamic_cast<Window *>(l);
-
-			if (win->_window != NULL) {
-				win->_window->AttachEventBuffer(win->_window, events);
-			}
-		}
-	}
-
-	for (std::vector<jcommon::Listener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
-		jcommon::Listener *l = (*i);
-
-		if (l->InstanceOf("jgui::Window") == true) {
-			Window *win = dynamic_cast<Window *>(l);
-
-			if (win->_window != NULL) {
-				win->_window->AttachEventBuffer(win->_window, events);
-			}
-		}
-	}
-	*/
-
 	Start();
 }
 
@@ -1113,6 +1087,19 @@ void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 		int cx,
 				cy;
 		
+		/*
+		_mouse_x = event.cx;
+		_mouse_y = event.cy;
+
+		IDirectFBWindow *native = (IDirectFBWindow *)current->GetNativeWindow();
+
+		if (event.type == DWET_BUTTONDOWN) {
+			native->GrabPointer(native);
+		} else if (event.type == DWET_BUTTONUP) {
+			native->UngrabPointer(native);
+		}
+		*/
+
 		if (current != NULL) {
 			jsize_t scale = current->GetWorkingScreenSize();
 

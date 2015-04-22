@@ -22,6 +22,7 @@
 #include "jwindowmanager.h"
 #include "jthememanager.h"
 #include "jsemaphore.h"
+#include "jinputmanager.h"
 
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
 #include "jdfbhandler.h"
@@ -70,6 +71,7 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 	_graphics = new X11Graphics(NULL, NULL, true);
 #endif
 
+	_is_input_enabled = true;
 	_opacity = 0xff;
 	_cursor = JCS_DEFAULT;
 	_rotation = JWR_NONE;
@@ -186,6 +188,24 @@ void Window::SetVisible(bool b)
 		Hide();
 	} else {
 		Show(false);
+	}
+}
+
+bool Window::IsInputEnabled()
+{
+	return _is_input_enabled;
+}
+
+void Window::SetInputEnabled(bool b)
+{
+	_is_input_enabled = b;
+
+	if (_is_input_enabled == true) {
+		InputManager::GetInstance()->RegisterKeyListener(this);
+		InputManager::GetInstance()->RegisterMouseListener(this);
+	} else {
+		InputManager::GetInstance()->RemoveKeyListener(this);
+		InputManager::GetInstance()->RemoveKeyListener(this);
 	}
 }
 
@@ -715,6 +735,14 @@ bool Window::Show(bool modal)
 	GFXHandler::GetInstance();
 #endif
 
+	if (_is_input_enabled == true) {
+		jthread::AutoLock lock(&_input_mutex);
+
+		InputManager::GetInstance()->RegisterKeyListener(this);
+		InputManager::GetInstance()->RegisterMouseListener(this);
+	}
+
+	DoLayout();
 	Repaint();
 
 	if (modal == true) {

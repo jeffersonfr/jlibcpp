@@ -32,6 +32,8 @@
 #include "jmouseevent.h"
 #include "jkeymap.h"
 #include "jthemelistener.h"
+#include "jkeylistener.h"
+#include "jmouselistener.h"
 
 #include <string>
 #include <vector>
@@ -121,7 +123,7 @@ class ThemeManager;
  *
  * \author Jeff Ferr
  */
-class Component : public jgui::ThemeListener{
+class Component : public KeyListener, public MouseListener, public jgui::ThemeListener{
 
 	friend class Container;
 	friend class Frame;

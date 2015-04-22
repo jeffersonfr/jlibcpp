@@ -55,7 +55,7 @@ enum jframe_button_t {
  *
  * \author Jeff Ferr
  */
-class Frame : public KeyListener, public MouseListener, public Window {
+class Frame : public Window {
 
 	friend class Component;
 
@@ -71,8 +71,7 @@ class Frame : public KeyListener, public MouseListener, public Window {
 
 	protected:
 		std::vector<frame_subtitle_t> _subtitles;
-		jthread::Mutex _input_mutex,
-			_paint_mutex;
+		jthread::Mutex _paint_mutex;
 		Image *_icon_image;
 		Image *_icon_close;
 		Image *_icon_maximize;
@@ -85,7 +84,6 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		int _old_y;
 		int _old_width;
 		int _old_height;
-		bool _input_enabled;
 		bool _move_enabled;
 		bool _release_enabled;
 		bool _resize_enabled;
@@ -218,12 +216,6 @@ class Frame : public KeyListener, public MouseListener, public Window {
 		 *
 		 */
 		virtual std::string GetTitle();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetInputEnabled(bool b);
 		
 		/**
 		 * \brief

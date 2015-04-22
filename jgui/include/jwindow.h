@@ -70,6 +70,8 @@ class Window : public jgui::Container{
 		/** \brief */
 		jthread::Mutex _window_mutex;
 		/** \brief */
+		jthread::Mutex _input_mutex;
+		/** \brief */
 		jthread::Condition _window_semaphore;
 		/** \brief */
 		Graphics *_graphics;
@@ -81,6 +83,8 @@ class Window : public jgui::Container{
 		jcursor_style_t _cursor;
 		/** \brief */
 		jwindow_rotation_t _rotation;
+		/** \brief */
+		bool _is_input_enabled;
 
 	protected:
 		/**
@@ -149,6 +153,18 @@ class Window : public jgui::Container{
 		 *
 		 */
 		virtual int GetOpacity();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetInputEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsInputEnabled();
 		
 		/**
 		 * \brief
