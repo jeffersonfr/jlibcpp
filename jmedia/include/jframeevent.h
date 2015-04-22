@@ -17,10 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PLAYEREVENT_H
-#define J_PLAYEREVENT_H
+#ifndef J_FRAMEEVENT_H
+#define J_FRAMEEVENT_H
 
 #include "jeventobject.h"
+#include "jimage.h"
 
 namespace jmedia {
 
@@ -28,12 +29,8 @@ namespace jmedia {
  * \brief Supported events
  *
  */
-enum jplayer_event_t {
-	JPE_STARTED,
-	JPE_PAUSED,
-	JPE_RESUMED,
-	JPE_STOPPED,
-	JPE_FINISHED
+enum jframe_event_t {
+	JFE_GRABBED
 };
 
 /**
@@ -41,29 +38,38 @@ enum jplayer_event_t {
  *
  * \author Jeff Ferr
  */
-class PlayerEvent : public jcommon::EventObject{
+class FrameEvent : public jcommon::EventObject{
 
 	private:
-		jplayer_event_t _type;
+		/** \brief */
+		jframe_event_t _type;
+		/** \brief */
+		jgui::Image *_image;
 
 	public:
 		/**
 		 * \brief 
 		 *
 		 */
-		PlayerEvent(void *source, jplayer_event_t type);
+		FrameEvent(void *source, jframe_event_t type, jgui::Image *image);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~PlayerEvent();
+		virtual ~FrameEvent();
 
 		/**
 		 * \brief
 		 *
 		 */
-		jplayer_event_t GetType();
+		jframe_event_t GetType();
+
+		/**
+		 * \brief
+		 *
+		 */
+		jgui::Image * GetFrame();
 
 };
 

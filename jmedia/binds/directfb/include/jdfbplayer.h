@@ -166,12 +166,6 @@ class DFBPlayer : public jmedia::Player, public jthread::Thread {
 		 */
 		virtual void Run();
 		
-		/*
-		 * \brief
-		 *
-		 */
-		virtual void DispatchPlayerEvent(PlayerEvent *event);
-		
 };
 
 }

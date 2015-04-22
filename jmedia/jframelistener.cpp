@@ -17,56 +17,22 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_PLAYEREVENT_H
-#define J_PLAYEREVENT_H
-
-#include "jeventobject.h"
+#include "jframelistener.h"
 
 namespace jmedia {
 
-/** 
- * \brief Supported events
- *
- */
-enum jplayer_event_t {
-	JPE_STARTED,
-	JPE_PAUSED,
-	JPE_RESUMED,
-	JPE_STOPPED,
-	JPE_FINISHED
-};
-
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class PlayerEvent : public jcommon::EventObject{
-
-	private:
-		jplayer_event_t _type;
-
-	public:
-		/**
-		 * \brief 
-		 *
-		 */
-		PlayerEvent(void *source, jplayer_event_t type);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~PlayerEvent();
-
-		/**
-		 * \brief
-		 *
-		 */
-		jplayer_event_t GetType();
-
-};
-
+FrameListener::FrameListener():
+	jcommon::Object()
+{
+	jcommon::Object::SetClassName("jmedia::FrameListener");
 }
 
-#endif
+FrameListener::~FrameListener()
+{
+}
+
+void FrameListener::FrameGrabbed(FrameEvent *event)
+{
+}
+
+}

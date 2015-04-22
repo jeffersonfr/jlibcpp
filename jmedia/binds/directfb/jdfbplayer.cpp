@@ -33,6 +33,8 @@ class VideoComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
+		Player *_player;
+		/** \brief */
 		jthread::Mutex _mutex;
 		/** \brief */
 		jgui::Image *_image;
@@ -44,10 +46,12 @@ class VideoComponentImpl : public jgui::Component {
 		bool _diff;
 
 	public:
-		VideoComponentImpl(int x, int y, int w, int h, int iw, int ih):
+		VideoComponentImpl(Player *player, int x, int y, int w, int h, int iw, int ih):
 			jgui::Component(x, y, w, h),
 			_mutex(jthread::JMT_RECURSIVE)
 		{
+			_player = player;
+
 			_image = jgui::Image::CreateImage(w, h, jgui::JPF_ARGB, iw, ih);
 
 			_src.x = 0;
@@ -81,7 +85,12 @@ class VideoComponentImpl : public jgui::Component {
 			}
 		}
 
-		virtual jgui::Image * GetImage()
+		virtual Player * GetPlayer()
+		{
+			return _player;
+		}
+
+		virtual jgui::Image * GetFrame()
 		{
 			return _image;
 		}
@@ -490,7 +499,7 @@ DFBPlayer::DFBPlayer(std::string file)
 		_controls.push_back(new VideoFormatControlImpl(this));
 	}
 
-	_component = new VideoComponentImpl(0, 0, sdsc.width, sdsc.height, sdsc.width, sdsc.height);
+	_component = new VideoComponentImpl(this, 0, 0, sdsc.width, sdsc.height, sdsc.width, sdsc.height);
 
 	Start();
 }
@@ -513,8 +522,11 @@ DFBPlayer::~DFBPlayer()
 
 void DFBPlayer::Callback(void *ctx)
 {
-	jgui::Component *cmp = reinterpret_cast<jgui::Component *>(ctx);
+	VideoComponentImpl *cmp = reinterpret_cast<VideoComponentImpl *>(ctx);
+	Player *player = cmp->GetPlayer();
 	
+	player->DispatchFrameEvent(new FrameEvent(player, JFE_GRABBED, cmp->GetFrame()));
+		
 	if (cmp->IsVisible() != false) {
 		cmp->Repaint();
 	}
@@ -525,7 +537,7 @@ void DFBPlayer::Play()
 	jthread::AutoLock lock(&_mutex);
 
 	if (_is_paused == false && _provider != NULL) {
-		jgui::Graphics *graphics = dynamic_cast<VideoComponentImpl *>(_component)->GetImage()->GetGraphics();
+		jgui::Graphics *graphics = dynamic_cast<VideoComponentImpl *>(_component)->GetFrame()->GetGraphics();
 
 		if (_has_video == true) {
 			_provider->PlayTo(_provider, (IDirectFBSurface *)graphics->GetNativeSurface(), NULL, DFBPlayer::Callback, (void *)_component);
@@ -547,7 +559,7 @@ void DFBPlayer::Pause()
 
 		SetDecodeRate(0.0);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, LPE_PAUSED));
+		DispatchPlayerEvent(new PlayerEvent(this, JPE_PAUSED));
 	}
 }
 
@@ -560,7 +572,7 @@ void DFBPlayer::Resume()
 
 		SetDecodeRate(_decode_rate);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, LPE_RESUMED));
+		DispatchPlayerEvent(new PlayerEvent(this, JPE_RESUMED));
 	}
 }
 
@@ -700,49 +712,15 @@ void DFBPlayer::Run()
 			if (event.clazz == DFEC_VIDEOPROVIDER) {
 				// TODO:: disparar eventos de midia
 				if (event.type == DVPET_STARTED) {
-					DispatchPlayerEvent(new PlayerEvent(this, LPE_STARTED));
+					DispatchPlayerEvent(new PlayerEvent(this, JPE_STARTED));
 				} else if (event.type == DVPET_STOPPED) {
-					DispatchPlayerEvent(new PlayerEvent(this, LPE_STOPPED));
+					DispatchPlayerEvent(new PlayerEvent(this, JPE_STOPPED));
 				} else if (event.type == DVPET_FINISHED) {
-					DispatchPlayerEvent(new PlayerEvent(this, LPE_FINISHED));
+					DispatchPlayerEvent(new PlayerEvent(this, JPE_FINISHED));
 				}
 			}
 		}
 	}
-}
-
-void DFBPlayer::DispatchPlayerEvent(PlayerEvent *event)
-{
-	if (event == NULL) {
-		return;
-	}
-
-	int k = 0,
-			size = (int)_player_listeners.size();
-
-	while (k++ < (int)_player_listeners.size()) {
-		PlayerListener *listener = _player_listeners[k-1];
-
-		if (event->GetType() == LPE_STARTED) {
-			listener->MediaStarted(event);
-		} else if (event->GetType() == LPE_PAUSED) {
-			listener->MediaPaused(event);
-		} else if (event->GetType() == LPE_RESUMED) {
-			listener->MediaResumed(event);
-		} else if (event->GetType() == LPE_STOPPED) {
-			listener->MediaStopped(event);
-		} else if (event->GetType() == LPE_FINISHED) {
-			listener->MediaFinished(event);
-		}
-
-		if (size != (int)_player_listeners.size()) {
-			size = (int)_player_listeners.size();
-
-			k--;
-		}
-	}
-
-	delete event;
 }
 
 }

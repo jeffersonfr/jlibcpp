@@ -153,4 +153,89 @@ void Player::RemovePlayerListener(PlayerListener *listener)
 	}
 }
 
+void Player::DispatchPlayerEvent(PlayerEvent *event)
+{
+	if (event == NULL) {
+		return;
+	}
+
+	int k = 0,
+			size = (int)_player_listeners.size();
+
+	while (k++ < (int)_player_listeners.size()) {
+		PlayerListener *listener = _player_listeners[k-1];
+
+		if (event->GetType() == JPE_STARTED) {
+			listener->MediaStarted(event);
+		} else if (event->GetType() == JPE_PAUSED) {
+			listener->MediaPaused(event);
+		} else if (event->GetType() == JPE_RESUMED) {
+			listener->MediaResumed(event);
+		} else if (event->GetType() == JPE_STOPPED) {
+			listener->MediaStopped(event);
+		} else if (event->GetType() == JPE_FINISHED) {
+			listener->MediaFinished(event);
+		}
+
+		if (size != (int)_player_listeners.size()) {
+			size = (int)_player_listeners.size();
+
+			k--;
+		}
+	}
+
+	delete event;
+}
+
+void Player::RegisterFrameListener(FrameListener *listener)
+{
+	if (listener == NULL) {
+		return;
+	}
+
+	if (std::find(_frame_listeners.begin(), _frame_listeners.end(), listener) == _frame_listeners.end()) {
+		_frame_listeners.push_back(listener);
+	}
+}
+
+void Player::RemoveFrameListener(FrameListener *listener)
+{
+	if (listener == NULL) {
+		return;
+	}
+
+	std::vector<FrameListener *>::iterator i = std::find(_frame_listeners.begin(), _frame_listeners.end(), listener);
+	
+	if (i != _frame_listeners.end()) {
+		_frame_listeners.erase(i);
+	}
+}
+
+void Player::DispatchFrameEvent(FrameEvent *event)
+{
+	if (event == NULL) {
+		return;
+	}
+
+	int k = 0,
+			size = (int)_frame_listeners.size();
+
+	while (k++ < (int)_frame_listeners.size()) {
+		FrameListener *listener = _frame_listeners[k-1];
+
+		if (event->GetType() == JFE_GRABBED) {
+			listener->FrameGrabbed(event);
+		}
+
+		if (size != (int)_frame_listeners.size()) {
+			size = (int)_frame_listeners.size();
+
+			k--;
+		}
+	}
+
+	delete event;
+}
+
+
 }

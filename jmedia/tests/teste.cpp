@@ -20,6 +20,7 @@
 #include "jframe.h"
 #include "jplayermanager.h"
 #include "jplayerlistener.h"
+#include "jframelistener.h"
 #include "jautolock.h"
 
 #include <stdio.h>
@@ -63,7 +64,7 @@ class MediaStart : public jthread::Thread {
 
 };
 
-class PlayerTest : public jgui::Frame, public jmedia::PlayerListener{
+class PlayerTest : public jgui::Frame, public jmedia::PlayerListener, public jmedia::FrameListener {
 
 	private:
 		std::vector<MediaStart *> _players;
@@ -78,6 +79,10 @@ class PlayerTest : public jgui::Frame, public jmedia::PlayerListener{
 
 			for (int i=0; i<BOX_NUMS; i++) {
 				jmedia::Player *player = jmedia::PlayerManager::CreatePlayer(file);
+
+				player->RegisterPlayerListener(this);
+				player->RegisterFrameListener(this);
+
 				jgui::Component *cmp = player->GetVisualComponent();
 
 				cmp->SetBounds(random()%(size.width-BOX_SIZE), random()%(size.height-BOX_SIZE), BOX_SIZE, BOX_SIZE);
@@ -170,22 +175,36 @@ class PlayerTest : public jgui::Frame, public jmedia::PlayerListener{
 
 		virtual void MediaStarted(jmedia::PlayerEvent *event)
 		{
+			std::cout << "Media Started" << std::endl;
 		}
 
 		virtual void MediaResumed(jmedia::PlayerEvent *event)
 		{
+			std::cout << "Media Resumed" << std::endl;
 		}
 
 		virtual void MediaPaused(jmedia::PlayerEvent *event)
 		{
+			std::cout << "Media Paused" << std::endl;
 		}
 
 		virtual void MediaStopped(jmedia::PlayerEvent *event)
 		{
+			std::cout << "Media Stopped" << std::endl;
 		}
 
 		virtual void MediaFinished(jmedia::PlayerEvent *event)
 		{
+			std::cout << "Media Finished" << std::endl;
+		}
+
+		virtual void FrameGrabbed(jmedia::FrameEvent *event)
+		{
+			jgui::Image *image = event->GetFrame();
+			jgui::Graphics *g = image->GetGraphics();
+
+			g->SetColor(jgui::Color::Blue);
+			g->FillRectangle(4, 4, 12, 12);
 		}
 
 };
