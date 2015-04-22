@@ -72,6 +72,7 @@ Window::Window(int x, int y, int width, int height, int scale_width, int scale_h
 
 	_opacity = 0xff;
 	_cursor = JCS_DEFAULT;
+	_rotation = JWR_NONE;
 
 	SetBackgroundVisible(true);
 
@@ -235,6 +236,8 @@ void Window::InternalCreateWindow(void *params)
 #elif defined(X11_UI)
 	// TODO::
 #endif
+	
+	SetRotation(_rotation);
 }
 
 void Window::RaiseToTop()
@@ -767,6 +770,32 @@ void Window::InternalRelease()
 	_surface = NULL;
 #elif defined(X11_UI)
 	// TODO::
+#endif
+}
+
+jwindow_rotation_t Window::GetRotation()
+{
+	return _rotation;
+}
+
+void Window::SetRotation(jwindow_rotation_t t)
+{
+	int rotation = 0;
+
+	_rotation = t;
+
+	if (t == JWR_90) {
+		rotation = 90;
+	} else if (t == JWR_180) {
+		rotation = 180;
+	} else if (t == JWR_270) {
+		rotation = 270;
+	}
+
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+	if (_window != NULL) {
+		_window->SetRotation(_window, rotation);
+	}
 #endif
 }
 

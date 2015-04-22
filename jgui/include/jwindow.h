@@ -38,6 +38,13 @@
 
 namespace jgui{
 
+enum jwindow_rotation_t {
+	JWR_NONE,
+	JWR_90,
+	JWR_180,
+	JWR_270,
+};
+
 class Graphics;
 
 /**
@@ -52,17 +59,28 @@ class Window : public jgui::Container{
 
 	protected:
 #if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+		/** \brief */
 		IDirectFBWindow *_window;
+		/** \brief */
 		IDirectFBSurface *_surface;
 #elif defined(X11_UI)
 #endif
+		/** \brief */
 		std::vector<WindowListener *> _window_listeners;
+		/** \brief */
 		jthread::Mutex _window_mutex;
+		/** \brief */
 		jthread::Condition _window_semaphore;
+		/** \brief */
 		Graphics *_graphics;
+		/** \brief */
 		int _opacity;
+		/** \brief */
 		bool _is_undecorated;
+		/** \brief */
 		jcursor_style_t _cursor;
+		/** \brief */
+		jwindow_rotation_t _rotation;
 
 	protected:
 		/**
@@ -252,6 +270,18 @@ class Window : public jgui::Container{
 		 */
 		virtual void PutBelow(Window *w);
 	
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetRotation(jwindow_rotation_t t);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jwindow_rotation_t GetRotation();
+
 		/**
 		 * \brief
 		 *

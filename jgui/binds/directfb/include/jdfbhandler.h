@@ -204,18 +204,6 @@ class DFBHandler : public virtual jgui::GFXHandler{
 		 * \brief
 		 *
 		 */
-		virtual void SetRotation(jgraphics_rotation_t t);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgraphics_rotation_t GetRotation();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Suspend();
 
 		/**

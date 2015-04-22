@@ -174,15 +174,6 @@ void GFXHandler::Release()
 {
 }
 
-void GFXHandler::SetRotation(jgraphics_rotation_t t)
-{
-}
-
-jgraphics_rotation_t GFXHandler::GetRotation()
-{
-	return JGR_NONE;
-}
-
 void GFXHandler::Suspend()
 {
 }

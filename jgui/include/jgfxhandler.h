@@ -55,13 +55,6 @@ enum jcursor_style_t {
 	JCS_WAIT
 };
 
-enum jgraphics_rotation_t {
-	JGR_NONE,
-	JGR_90,
-	JGR_180,
-	JGR_270,
-};
-
 class Window;
 class WindowManager;
 class Font;
@@ -196,18 +189,6 @@ class GFXHandler : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void Release();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetRotation(jgraphics_rotation_t t);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgraphics_rotation_t GetRotation();
 
 		/**
 		 * \brief
