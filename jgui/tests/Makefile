@@ -76,8 +76,8 @@ OBJS_mouse = \
 OBJS_watch = \
 		watch.o\
 
-OBJS_rotate = \
-		rotate.o\
+OBJS_tank = \
+		tank.o\
 
 OBJS_pacman = \
 		pacman.o\
@@ -136,7 +136,7 @@ OBJS_scroll = \
 OBJS_hough = \
 		hough.o\
 
-all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm changescale mouse watch rotate pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock events colorchooser paths scroll hough
+all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm changescale mouse watch tank pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock events colorchooser paths scroll hough
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -201,7 +201,7 @@ mouse: $(OBJS_mouse)
 watch: $(OBJS_watch)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-rotate: $(OBJS_rotate)
+tank: $(OBJS_tank)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 pacman: $(OBJS_pacman)
@@ -268,4 +268,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch rotate pacman tetris container signal stress layouts databuffer mhp drawimage rotateimage sort noise kmeans som stock events colorchooser paths scroll hough
+	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch tank pacman tetris container signal stress layouts databuffer mhp drawimage rotateimage sort noise kmeans som stock events colorchooser paths scroll hough
