@@ -21,6 +21,16 @@
 #include "jframe.h"
 #include "jwindowmanager.h"
 
+#define TRANSLATE_MOUSE_LOCATION(method) 	\
+	do { 																		\
+		MouseEvent e = *event;								\
+		e.SetX(event->GetX()-_location.x);		\
+		e.SetY(event->GetY()-_location.y);		\
+		if (Window::method(&e) == true) {			\
+			return true;												\
+		}																			\
+	} while (0) 														\
+
 #define SIZE_TO_RESIZE	16
 
 namespace jgui {
@@ -303,7 +313,7 @@ bool Frame::KeyPressed(KeyEvent *event)
 {
 	jthread::AutoLock lock(&_input_mutex);
 
-	if (Container::KeyPressed(event) == true) {
+	if (Window::KeyPressed(event) == true) {
 		return true;
 	}
 
@@ -324,7 +334,7 @@ bool Frame::KeyReleased(KeyEvent *event)
 {
 	jthread::AutoLock lock(&_input_mutex);
 
-	if (Container::KeyReleased(event) == true) {
+	if (Window::KeyReleased(event) == true) {
 		return true;
 	}
 
@@ -335,7 +345,7 @@ bool Frame::KeyTyped(KeyEvent *event)
 {
 	jthread::AutoLock lock(&_input_mutex);
 
-	if (Container::KeyTyped(event) == true) {
+	if (Window::KeyTyped(event) == true) {
 		return true;
 	}
 
@@ -344,14 +354,7 @@ bool Frame::KeyTyped(KeyEvent *event)
 
 bool Frame::MousePressed(MouseEvent *event)
 {
-	MouseEvent e = *event;
-
-	e.SetX(event->GetX()-_location.x);
-	e.SetY(event->GetY()-_location.y);
-
-	if (Container::MousePressed(&e) == true) {
-		return true;
-	}
+	TRANSLATE_MOUSE_LOCATION(MousePressed);
 
 	if (_is_enabled == false) {
 		return true;
@@ -443,14 +446,7 @@ bool Frame::MousePressed(MouseEvent *event)
 
 bool Frame::MouseReleased(MouseEvent *event)
 {
-	MouseEvent e = *event;
-
-	e.SetX(event->GetX()-_location.x);
-	e.SetY(event->GetY()-_location.y);
-
-	if (Container::MouseReleased(&e) == true) {
-		return true;
-	}
+	TRANSLATE_MOUSE_LOCATION(MouseReleased);
 
 	if (_is_enabled == false) {
 		return true;
@@ -472,14 +468,7 @@ bool Frame::MouseReleased(MouseEvent *event)
 
 bool Frame::MouseMoved(MouseEvent *event)
 {
-	MouseEvent e = *event;
-
-	e.SetX(event->GetX()-_location.x);
-	e.SetY(event->GetY()-_location.y);
-
-	if (Container::MouseMoved(&e) == true) {
-		return true;
-	}
+	TRANSLATE_MOUSE_LOCATION(MouseMoved);
 
 	if (_is_enabled == false) {
 		return true;
@@ -530,22 +519,12 @@ bool Frame::MouseMoved(MouseEvent *event)
 
 bool Frame::MouseWheel(MouseEvent *event)
 {
-	MouseEvent e = *event;
-
-	e.SetX(event->GetX()-_location.x);
-	e.SetY(event->GetY()-_location.y);
-
-	if (Container::MouseWheel(&e) == true) {
-		return true;
-	}
+	TRANSLATE_MOUSE_LOCATION(MouseWheel);
 
 	if (_is_enabled == false) {
 		return true;
 	}
 	
-	// int mousex = event->GetX()-_location.x,
-	//		mousey = event->GetY()-_location.y;
-
 	return false;
 }
 
