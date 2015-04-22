@@ -827,6 +827,62 @@ void Window::SetRotation(jwindow_rotation_t t)
 #endif
 }
 
+bool Window::KeyPressed(KeyEvent *event)
+{
+	return Container::KeyPressed(event);
+}
+
+bool Window::KeyReleased(KeyEvent *event)
+{
+	return Container::KeyReleased(event);
+}
+
+bool Window::KeyTyped(KeyEvent *event)
+{
+	return Container::KeyTyped(event);
+}
+
+bool Window::MousePressed(MouseEvent *event)
+{
+	return Container::MousePressed(event);
+}
+
+bool Window::MouseReleased(MouseEvent *event)
+{
+	return Container::MouseReleased(event);
+}
+
+bool Window::MouseMoved(MouseEvent *event)
+{
+	return Container::MouseMoved(event);
+
+	/*
+	int x = event->GetX()-_location.x;
+	int y = event->GetY()-_location.y;
+
+	if (GetRotation() == JWR_90) {
+		e.SetX(-(y-_scale.height));
+		e.SetY(x);
+	} else if (GetRotation() == JWR_180) {
+		e.SetX(1920-x);
+		e.SetY(1080-y);
+	} else if (GetRotation() == JWR_270) {
+		e.SetX(y, _scale.width-x);
+		e.SetY();
+	} else {
+		e.SetX(x);
+		e.SetY(y);
+	}
+
+	printf("Mouse Moved:: %d, %d\n", e.GetX(), e.GetY());
+	*/
+}
+
+bool Window::MouseWheel(MouseEvent *event)
+{
+	return Container::MouseWheel(event);
+}
+
 void Window::RegisterWindowListener(WindowListener *listener)
 {
 	if (listener == NULL) {
