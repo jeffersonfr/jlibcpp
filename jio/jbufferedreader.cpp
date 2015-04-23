@@ -103,7 +103,7 @@ std::string BufferedReader::ReadLine(std::string delim)
 			new_ptr = (char *)realloc(lineptr, tmp);
 
 			if (new_ptr == NULL) {
-				delete lineptr;
+				delete [] lineptr;
 				return "";
 			}
 
@@ -120,9 +120,13 @@ std::string BufferedReader::ReadLine(std::string delim)
 				return ""; 
 			}
 
-			lineptr[i] = 0; 
+			// lineptr[i] = 0; 
 
-			return lineptr; 
+			std::string str(lineptr, i);
+
+			delete [] lineptr;
+
+			return str; 
 		}
 
 		lineptr[i++] = x;
@@ -135,9 +139,13 @@ std::string BufferedReader::ReadLine(std::string delim)
 		}
 	}
 
-	lineptr[i] = 0;
+	// lineptr[i] = 0;
 
-	return lineptr;
+	std::string str(lineptr, i);
+
+	delete [] lineptr;
+
+	return str;
 }
 
 }
