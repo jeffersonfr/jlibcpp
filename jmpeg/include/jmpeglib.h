@@ -69,7 +69,7 @@
 #define TS_DESCRIPTOR_HEADER_LENGTH 2
 
 #define TS_PSI_G_TABLE_ID(data) TS_G8(data)
-#define TS_PSI_G_SECTION_LENGTH(data) (TS_G16(data+1) & 0x03ff)
+#define TS_PSI_G_SECTION_LENGTH(data) (TS_G16(data+1) & 0x0fff)
 #define TS_PSI_G_SECTION_NUMBER(data) TS_G8(data+6)
 #define TS_PSI_G_LAST_SECTION_NUMBER(data) TS_G8(data+7)
 

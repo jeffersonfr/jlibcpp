@@ -23,6 +23,7 @@
 #include "jdemuxlistener.h"
 
 #include <vector>
+#include <set>
 
 #include <stdint.h>
 
@@ -39,6 +40,8 @@ class Demux : public jcommon::Object{
 		/** \brief */
 		std::vector<DemuxListener *> _demux_listeners;
 		/** \brief */
+		std::set<int> _last_crcs;
+		/** \brief */
 		std::string _buffer;
 		/** \brief */
 		std::string _data;
@@ -52,8 +55,6 @@ class Demux : public jcommon::Object{
 		int _timeout;
 		/** \brief */
 		int _last_index;
-		/** \brief */
-		uint32_t _last_crc;
 		/** \brief */
 		bool _is_crc_enabled;
 		/** \brief */

@@ -197,7 +197,7 @@ void DemuxManager::Run()
 				chunk_length = length;
 			}
 
-			// TODO:: verificar
+			// TODO:: verify this error ... 
 			if (offset >= 184 || section_length == 3) {
 				continue;
 			}

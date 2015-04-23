@@ -32,7 +32,6 @@ Demux::Demux(jmpeg_data_type_t type):
 	jcommon::Object::SetClassName("jmpeg::Demux");
 
 	_type = type;
-	_last_crc = 0;
 	_last_index = -1;
 	_timeout = -1;
 	_is_crc_enabled = true;
@@ -142,8 +141,8 @@ bool Demux::Append(const char *data, int data_length)
 	}
 	*/
 
-	if (_is_update_if_modified == false || _last_crc != crc) {
-		_last_crc = crc;
+	if (_is_update_if_modified == false || _last_crcs.find(crc) == _last_crcs.end()) {
+		_last_crcs.insert(crc);
 
 		return true;
 	}
