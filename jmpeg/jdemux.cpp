@@ -126,12 +126,10 @@ bool Demux::Append(const char *data, int data_length)
 
 	uint32_t crc = *(uint32_t *)(data+(data_length-4));
 	
-	/*
 	if (_is_crc_enabled == true) {
 		uint32_t sum = jmath::CRC::Calculate32((const uint8_t *)_buffer.data(), _buffer.size()-4);
 
-		printf(":: CRC:: %08x, %08x\n", crc, sum);
-		if (crc != sum) {
+		if (sum != 0) {
 			_buffer.clear();
 
 			_last_index = -1;
@@ -139,7 +137,6 @@ bool Demux::Append(const char *data, int data_length)
 			return false;
 		}
 	}
-	*/
 
 	if (_is_update_if_modified == false || _last_crcs.find(crc) == _last_crcs.end()) {
 		_last_crcs.insert(crc);
