@@ -115,103 +115,37 @@ bool Demux::IsUpdateIfModified()
 
 bool Demux::Append(const char *data, int data_length)
 {
-	int sync_byte = TS_G8(data);
-
-	if (sync_byte != TS_SYNC_BYTE) {
-		return false;
-	}
-
-	// int transport_error_indicator = TS_GM8(data+1, 0, 1);
-	int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
-	// int transport_priority = TS_GM8(data+1, 2, 1);
-	int pid = TS_GM16(data+1, 3, 13);
-	// int scrambling_control = TS_GM8(data+3, 0, 2);
-	int adaptation_field_exist = TS_GM8(data+3, 2, 1);
-	int contains_payload = TS_GM8(data+3, 3, 1);
-	int continuity_counter = TS_GM8(data+3, 4, 4);
-
-	if (_pid >= 0 && _pid != pid) {
-		return false;
-	}
-
 	if (_type == JMDT_RAW) {
-		DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, data, data_length, _pid, -1));
-
 		return true;
 	}
 
-	if (contains_payload == 0) {
-		return false;
-	}
-
-	int pointer_field = 1;
-
-	// INFO:: discards adaptation field
-	if (adaptation_field_exist == 1) {
-		int adaptation_field_length = TS_G8(data+4);
-		
-		pointer_field = adaptation_field_length+1;
-	}
-
-	const char *ptr = data+TS_HEADER_LENGTH+pointer_field;
-
-	int tid = TS_G8(ptr);
+	int tid = TS_G8(data);
 
 	if (_tid >= 0 && _tid != tid) {
 		return false;
 	}
 
-	int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
-
-	if (payload_unit_start_indicator == 1) {
-		int chunk_length = section_length;
-
-		if (section_length > 184) {
-			chunk_length = data_length-TS_HEADER_LENGTH-pointer_field;
-		}
-			
-		_buffer = std::string(ptr, chunk_length);
-	} else {
-		int section_length = TS_PSI_G_SECTION_LENGTH(_buffer.data());
-		int chunk_length = section_length-_buffer.size();
-
-		if (chunk_length > 184) {
-			chunk_length = 184;
-		}
-			
-		if (_last_index == (continuity_counter-1)) {
-			_buffer.append(ptr, chunk_length);
-		}
-	}
-
-	if (section_length == (int)_buffer.size()) {
-		uint32_t crc = *(uint32_t *)(_buffer.data()+_buffer.size()-4);
+	uint32_t crc = *(uint32_t *)(data+(data_length-4));
 	
-		/*
-		if (_is_crc_enabled == true) {
-			uint32_t sum = jmath::CRC::Calculate32((const uint8_t *)_buffer.data(), _buffer.size()-4);
+	/*
+	if (_is_crc_enabled == true) {
+		uint32_t sum = jmath::CRC::Calculate32((const uint8_t *)_buffer.data(), _buffer.size()-4);
 
-			printf(":: CRC:: %08x, %08x\n", crc, sum);
-			if (crc != sum) {
-				_buffer.clear();
-
-				_last_index = -1;
-
-				return false;
-			}
-		}
-		*/
-
-		if (_is_update_if_modified == false || _last_crc != crc) {
-			DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, _buffer.data(), _buffer.size(), _pid, _tid));
-
+		printf(":: CRC:: %08x, %08x\n", crc, sum);
+		if (crc != sum) {
 			_buffer.clear();
 
 			_last_index = -1;
-			_last_crc = crc;
 
-			return true;
+			return false;
 		}
+	}
+	*/
+
+	if (_is_update_if_modified == false || _last_crc != crc) {
+		_last_crc = crc;
+
+		return true;
 	}
 
 	return false;

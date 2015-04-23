@@ -20,6 +20,35 @@
 #include "Stdafx.h"
 #include "jmpeglib.h"
 
+std::string GetTableDescription(int table_id)
+{
+	if (table_id >= 0x4e && table_id <= 0x6f) {
+		return "Event Information Table";
+	} else {
+		switch (table_id) {
+			case 0x00: return "Program Association Table";
+			case 0x01: return "Condicional Access Table";
+			case 0x02: return "Program Map Table";
+			case 0x03: return "Transport Stream Description";
+			case 0x04: return "Metadata Table";
+			case 0x40: return "Networkd Informatio Table";
+			case 0x42: return "Service Description Table";
+			case 0x70: return "Time Description Table";
+			case 0x73: return "Time Offset Table";
+			case 0x3a: return "DSM-CC Sections containing multi-protocol encapsulated data";
+			case 0x3b: return "DSM-CC Sections containing U-N Messages, except Download Data Messages";
+			case 0x3c: return "DSM-CC Sections containing Download Data Messages";
+			case 0x3d: return "DSM-CC Sections containing Stream Descriptors";
+			case 0x3e: return "DSM-CC Sections containing private data";
+			case 0x3f: return "DSM-CC Addressable Sections";
+			default: 
+								 break;
+		}
+	}
+
+	return "Unknown Table";
+}
+
 std::string GetStreamTypeDescription(int stream_type)
 {
 	if (stream_type > 0x1c && stream_type < 0x7e) {
@@ -52,10 +81,10 @@ std::string GetStreamTypeDescription(int stream_type)
 			case 0x07: return "13522 MHEG";
 			case 0x08: return "H.222.0/13818-1 Annex A - DSM CC";
 			case 0x09: return "H.222.1";
-			case 0x0A: return "13818-6 type A";
-			case 0x0B: return "13818-6 type B";
-			case 0x0C: return "13818-6 type C";
-			case 0x0D: return "13818-6 type D";
+			case 0x0A: return "13818-6 type A (Multi-protocol Encapsulation)";
+			case 0x0B: return "13818-6 type B (DSM-CC U-N Messages)";
+			case 0x0C: return "13818-6 type C (DSM-CC Stream Descriptors)";
+			case 0x0D: return "13818-6 type D (DSM-CC Sections (any type, including private data))";
 			case 0x0E: return "H.222.0/13818-1 auxiliary";
 			case 0x0F: return "13818-7 Audio with ADTS transport syntax";
 			case 0x10: return "14496-2 Visual (MPEG-4 part 2 video)";
@@ -95,7 +124,7 @@ std::string GetDescriptorName(int descriptor_tag)
 		case 0x0c: return "application_icons_descriptor";
 		case 0x0d: return "dii_location_descriptor";
 		case 0x11: return "ip_signalling_descriptor";
-		case 0x13: return "carousel_id_descriptot";
+		case 0x13: return "carousel_id_descriptor";
 		case 0x14: return "association_tag_descriptor";
 		case 0x15: return "extension_tag_descriptor";
 		// INFO:: DVB (en_300468v011101p.pdf)
@@ -184,25 +213,44 @@ std::string GetDescriptorName(int descriptor_tag)
 	return "unknown descriptor";
 }
 
-void DumpPacket(std::string id, const char *data, int length)
+void DumpBytes(std::string id, const char *data, int length, int columns)
 {
-	printf("----:: Dump Packet (%s) :: BEGIN ::----\n", id.c_str());
+	printf("----:: Dump (%s) :: BEGIN ::----\n", id.c_str());
 
-	for (int i=0; i<length; i++) {
-		printf("%02x ", (uint8_t)data[i]);
+	const char *ptr = data;
+
+	if (columns < 8) {
+		columns = 8;
 	}
-	
-	printf("\n");
 
-	for (int i=0; i<length; i++) {
-		if (isprint(data[i])) {
-			printf("%c", data[i]);
-		} else {
-			printf(".");
+	while (length > 0) {
+		for (int i=0; i<columns && i<length; i++) {
+			printf("%02x ", (uint8_t)ptr[i]);
+		}
+
+		if (length < columns) {
+			for (int i=0; i<(columns-length); i++) {
+				printf("   ");
+			}
+		}
+
+		for (int i=0; i<columns && i<length; i++) {
+			if (isprint(ptr[i])) {
+				printf("%c", ptr[i]);
+			} else {
+				printf(".");
+			}
+		}
+		
+		length = length - columns;
+		ptr = ptr + columns;
+		
+		if (length > 0) {
+			printf("\n");
 		}
 	}
 	
-	printf("\n----:: Dump Packet (%s) :: END ::----\n\n", id.c_str());
+	printf("\n----:: Dump (%s) :: END ::----\n\n", id.c_str());
 }
 
 int main_mpeg(int argc, char *argv[])

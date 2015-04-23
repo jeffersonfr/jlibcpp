@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "jdemuxmanager.h"
 #include "jdemux.h"
+#include "jmpeglib.h"
 #include "jautolock.h"
 #include "jdate.h"
 
@@ -129,14 +130,94 @@ void DemuxManager::Run()
 		return;
 	}
 
+	std::string buffer;
+
 	while (_is_running) {
 		jthread::AutoLock lock(&_demux_sync_mutex);
 
-		char packet[188];
-		int length = 188;
+		char packet[TS_PACKET_LENGTH];
+		int length = TS_PACKET_LENGTH;
 
 		if (_source->Read(packet, length) != length) {
 			break;
+		}
+
+		// INFO:: processing transport stream
+		const char *data = packet;
+
+		int sync_byte = TS_G8(data);
+
+		if (sync_byte != TS_SYNC_BYTE) {
+			continue;
+		}
+
+		// int transport_error_indicator = TS_GM8(data+1, 0, 1);
+		int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
+		// int transport_priority = TS_GM8(data+1, 2, 1);
+		int pid = TS_GM16(data+1, 3, 13);
+		// int scrambling_control = TS_GM8(data+3, 0, 2);
+		int adaptation_field_exist = TS_GM8(data+3, 2, 1);
+		int contains_payload = TS_GM8(data+3, 3, 1);
+		// int continuity_counter = TS_GM8(data+3, 4, 4);
+
+		if (contains_payload == 0) {
+			continue;
+		}
+
+		const char *ptr = data+TS_HEADER_LENGTH;
+		int offset = TS_HEADER_LENGTH;
+
+		// INFO:: discards adaptation field
+		if (adaptation_field_exist == 1) {
+			int adaptation_field_length = TS_G8(data+4);
+
+			ptr = ptr + adaptation_field_length;
+			offset = offset + adaptation_field_length;
+		}
+
+		int tid = -1;
+		int section_length = -1;
+
+		if (payload_unit_start_indicator == 1) {
+			int pointer_field = TS_G8(ptr);
+
+			if (pointer_field > 0) {
+				// TODO:: pad to and of last section
+			}
+
+			ptr = ptr + pointer_field + 1;
+			offset = offset + pointer_field + 1;
+			tid = TS_G8(ptr);
+			section_length = TS_PSI_G_SECTION_LENGTH(ptr) + 3;
+
+			int length = TS_PACKET_LENGTH - offset;
+			int chunk_length = (unsigned)section_length;
+
+			if (section_length > length) {
+				chunk_length = length;
+			}
+
+			// TODO:: verificar
+			if (offset >= 184 || section_length == 3) {
+				continue;
+			}
+			buffer = std::string(ptr, chunk_length);
+		} else {
+			if (buffer.size() == 0) {
+				continue;
+			}
+
+			tid = TS_G8(buffer.data());
+			section_length = TS_PSI_G_SECTION_LENGTH(buffer.data()) + 3;
+
+			int length = TS_PACKET_LENGTH - offset;
+			int chunk_length = section_length - buffer.size();
+
+			if (chunk_length > length) {
+				chunk_length = length;
+			}
+
+			buffer.append(ptr, chunk_length);
 		}
 
 		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
@@ -153,10 +234,22 @@ void DemuxManager::Run()
 				_demux_status[demux] = t;
 			}
 
-			bool complete = demux->Append(packet, 188);
+			if (demux->GetPID() < 0 || demux->GetPID() == pid) {
+				if (demux->GetType() == JMDT_RAW) {
+					if (demux->Append(packet, TS_PACKET_LENGTH) == true) {
+						_demux_status[demux].found = true;
 
-			if (complete) {
-				_demux_status[demux].found = true;
+						demux->DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, packet, TS_PACKET_LENGTH, pid, -1));
+					}
+				} else if (demux->GetType() == JMDT_PSI) {
+					if (section_length == (int)buffer.size()) {
+						if (demux->Append(buffer.c_str(), buffer.size()) == true) {
+							_demux_status[demux].found = true;
+
+							demux->DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, buffer.data(), buffer.size(), pid, tid));
+						}
+					}
+				}
 			}
 
 			t = _demux_status[demux];

@@ -56,10 +56,10 @@
 #define TS_PSI_HEADER_LENGTH 8
 
 #define TS_PAT_TABLE_ID 0x00
-#define TS_CAT_TABLE_ID 0x00
+#define TS_CAT_TABLE_ID 0x01
 #define TS_PMT_TABLE_ID 0x02
 #define TS_TSDT_TABLE_ID 0x03
-#define TS_METADATA_TABLE_ID 0x03
+#define TS_METADATA_TABLE_ID 0x04
 #define TS_NIT_TABLE_ID 0x40
 #define TS_SDT_TABLE_ID 0x42
 #define TS_TDT_TABLE_ID 0x70
@@ -74,8 +74,9 @@
 #define TS_PSI_G_LAST_SECTION_NUMBER(data) TS_G8(data+7)
 
 std::string GetStreamTypeDescription(int stream_type);
+std::string GetTableDescription(int table_id);
 std::string GetDescriptorName(int descriptor_tag);
 
-void DumpPacket(std::string id, const char *data, int length);
+void DumpBytes(std::string id, const char *data, int length, int columns = 16);
 
 #endif
