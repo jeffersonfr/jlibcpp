@@ -119,6 +119,8 @@ class DemuxTest : public jmpeg::DemuxListener {
 		std::map<std::string, jmpeg::Demux *> _demuxes;
 		std::map<int, std::string> _stream_types;
 		std::set<int> _pids;
+		std::string _dsmcc_private_payload;
+		int _dsmcc_sequence_number;
 		int _dsmcc_data_pid;
 		int _dsmcc_descriptors_pid;
 
@@ -142,6 +144,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 		{
 			_dsmcc_data_pid = -1;
 			_dsmcc_descriptors_pid = -1;
+			_dsmcc_sequence_number = 0;
 
 			_stream_types[0] = "reserved";
 			_stream_types[1] = "video";
@@ -503,11 +506,11 @@ class DemuxTest : public jmpeg::DemuxListener {
 			} else if (tid == TS_NIT_TABLE_ID) {
 				ProcessNIT(event);
 			} else if (tid == (TS_SDT_TABLE_ID)) {
-				ProcessSDT(event);
+				// ProcessSDT(event);
 			} else if (tid == TS_TOT_TABLE_ID) {
-				ProcessTOT(event);
+				// ProcessTOT(event);
 			} else if (tid == TS_AIT_TABLE_ID) {
-				ProcessPrivate(event);
+				// ProcessPrivate(event);
 			} else {
 				if (pid == TS_EIT_PID) {
 					// INFO:: 
@@ -517,7 +520,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					// 		0x50-0x5f: schedule (present ts)
 					// 		0x60-0x6f: schedule (other ts)
 					// 	}
-					ProcessEIT(event);
+					// ProcessEIT(event);
 				} else if (pid == _dsmcc_data_pid) {
 					ProcessDSMCCData(event);
 				} else if (pid == _dsmcc_descriptors_pid) {
@@ -538,7 +541,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			// 	start TDT/TOT to get the current time
 			InitDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_SDT_TIMEOUT);
 			InitDemux("tdt", TS_TDT_PID, TS_TDT_TABLE_ID, TS_TDT_TIMEOUT);
-			// InitDemux("eit", TS_EIT_PID, -1, TS_EIT_TIMEOUT);
+			InitDemux("eit", TS_EIT_PID, -1, TS_EIT_TIMEOUT);
 
 			int nit_pid = TS_NIT_PID;
 			int count = ((section_length-5)/4-1); // last 4 bytes are CRC	
@@ -922,50 +925,40 @@ class DemuxTest : public jmpeg::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-			int section_length = TS_GM16(ptr+1, 4, 12);
 
+			// INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf
 			if (event->GetTID() == 0x3c) {
 				ptr = ptr + 8;
 
-				int protocolDiscriminator = TS_G8(ptr);
-				int dsmccType = TS_G8(ptr + 1);
-				int messageId = TS_G16(ptr + 2);
-				int downloadId = TS_G32(ptr + 4);
+				int protocol_discriminator = TS_G8(ptr);
+				int dsmcc_type = TS_G8(ptr + 1);
+				int message_id = TS_G16(ptr + 2);
+				int download_id = TS_G32(ptr + 4);
 				int reserved = TS_G8(ptr + 8);
-				int adaptationLength = TS_G8(ptr + 9);
-				int messageLength = TS_G16(ptr + 10);
-				int dataPayloadIndex = 11+adaptationLength;
+				int adaptation_length = TS_G8(ptr + 9);
+				int message_length = TS_G16(ptr + 10);
 
-				printf("DSMCC Data:: dsmcc type:[%d], message id:[%d], download id:[%d], message length:[%d]\n", dsmccType, messageId, downloadId, messageLength);
-
-				ptr = ptr + dataPayloadIndex;
-
-				int biopPayloadIndex = -1;
-
-				if (protocolDiscriminator == 0x11 && dsmccType == 0x03 && reserved == 0xff) {
-					for (int i=0; i<section_length-dataPayloadIndex-4; i++) {
-						// find 'BIOP' in DSMCC message
-						if (ptr[i+0] == 'B' && 
-								ptr[i+1] == 'I' && 
-								ptr[i+2] == 'O' && 
-								ptr[i+3] == 'P') {
-							biopPayloadIndex = i;
-							break;
-						}
-					}
-				}
-
-				if (biopPayloadIndex < 0) {
-					printf("DSMCC Data:: BIOP header not found\n");
-
-					// DumpBytes("DDB", event->GetData(), event->GetDataLength());
-
+				if (protocol_discriminator != 0x11 || // MPEG-2 DSM -CC message
+						dsmcc_type != 0x03 || // Download message
+						reserved != 0xff ||
+						message_id != 0x1003) { // DownloadDataBlock
 					return;
 				}
 
-				printf("DSMCC Data:: Found BIOP header\n");
+				ptr = ptr + 12 + adaptation_length;
 
-				ptr = ptr + biopPayloadIndex;
+				int module_id = TS_G16(ptr);
+				// int module_version = TS_G8(ptr+2);
+				// int reserved = TS_G8(ptr+3);
+				int block_number = TS_G16(ptr+4);
+
+				int magic = TS_G32(ptr+6);
+
+				if (magic != 0x42494F50) {
+					return;
+				}
+
+				ptr = ptr + 6;
 
 				int biop_version_major = TS_G8(ptr+4);
 				int biop_version_minor = TS_G8(ptr+5);
@@ -973,12 +966,17 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int message_type = TS_G8(ptr+7);
 				// int message_size = TS_G32(ptr+8);
 				int objectKey_length = TS_G8(ptr+12); 
-				// int objectKind_length = TS_G32(ptr+13+objectKey_length);
+				int objectKind_length = TS_G32(ptr+13+objectKey_length);
 				int objectKind = TS_G32(ptr+17+objectKey_length);
 
-				if (biop_version_major != 0x01 || biop_version_minor != 0x00 || byte_order != 0x00 || message_type != 0x00) {
+				if (biop_version_major != 0x01 || 
+						biop_version_minor != 0x00 || 
+						byte_order != 0x00 || 
+						message_type != 0x00) { // 0x00: Indicates that the message is being sent from the User to the Network to begin a scenario
 					return;
 				}
+
+				printf("DSMCC Data:: biop:[%s], dsmcc type:[%d], message id:[%04x], module id:[%04x], block number:[%04x], download id:[%08x], message length:[%d]\n", ptr+17+objectKey_length, dsmcc_type, message_id, module_id, block_number, download_id, message_length);
 
 				ptr = ptr + 21 + objectKey_length;
 
@@ -1008,56 +1006,65 @@ class DemuxTest : public jmpeg::DemuxListener {
 						int eventName_length = TS_G8(ptr);
 						std::string name(ptr+1, eventName_length);
 
-						printf("DSMCC Data::[ste]:: event name:[%s]\n", name.c_str());
+						printf(":: event name:[%s]\n", name.c_str());
 
 						count = count + eventName_length;
 
 						ptr = ptr + eventName_length + 1;
 					}
 
-					int objectInfo_byte_length = objectInfo_length-(aDescription_length+10)-(2+eventNames_count+count);
-					char *objectInfo_byte = new char[objectInfo_byte_length];
-
-					for (int i=0; i<objectInfo_byte_length; i++) {
-						objectInfo_byte[i] = ptr[i];
-					}
+					// TODO:: verificar essa soma ...
+					int objectInfo_byte_length = objectInfo_length-(13+objectKey_length+4+objectKind_length+2)-7;
 
 					ptr = ptr + objectInfo_byte_length;
 
 					int serviceContextList_count = TS_G8(ptr);
 
-					if (serviceContextList_count == 0x00) {
-						for (int i=0; i<eventNames_count; i++) {
-							// int serviceContexList_data_byte = TS_G8(ptr+i+1);
-						}
-
-						ptr = ptr + 1 + eventNames_count;
-
-						// int messageBody_length = TS_G32(ptr);
-						int taps_count = TS_G8(ptr+4);
-
-						ptr = ptr + 5;
-
-						printf("############################### COUNT:: %d\n", taps_count);
-						for (int i=0; i<taps_count; i++) {
-							int id = TS_G16(ptr);
-							// int use = TS_G16(ptr+2);
-							int association_tag = TS_G16(ptr+4);
-							int selector_length = TS_G8(ptr);
-
-							printf("::::::::::: TAPS COUNT:: %d (must be 0), ASSOCIATION TAG:: %d, Selector Length:: %d\n", id, association_tag, selector_length);
-
-							ptr = ptr + 7;
-						}
+					if (serviceContextList_count != 0x00) {
+						return;
 					}
 
-					std::vector<int> event_ids;
-					int eventIds_count = TS_G8(ptr);
+					ptr = ptr + 1 + eventNames_count;
+
+					// int messageBody_length = TS_G32(ptr);
+					int taps_count = TS_G8(ptr+4);
+
+					ptr = ptr + 4 + 1;
+
+					for (int i=0; i<taps_count; i++) {
+						int id = TS_G16(ptr);
+						int use = TS_G16(ptr+2);
+						std::string use_str;
+						int association_tag = TS_G16(ptr+4);
+						// int selector_length = TS_G8(ptr+6);
+
+						if (use == 0x0b) {
+							use_str = "STREAM_NPT_USE";
+						} else if (use == 0x0c) {
+							use_str = "STREAM_STATUS_AND_EVENT_USE";
+						} else if (use == 0x0d) {
+							use_str = "STREAM_EVENT_USE";
+						} else if (use == 0x0e) {
+							use_str = "STREAM_STATUS_USE";
+						} else if (use == 0x18) {
+							use_str = "BIOP_ES_USE";
+						} else if (use == 0x19) {
+							use_str = "BIOP_PROGRAM_USE";
+						}
+
+						printf(":: id:[%04x], use:[%s], association tag:[%04x]\n", id, use_str.c_str(), association_tag);
+
+						ptr = ptr + 7;
+					}
+
+					int eventIds_count = eventNames_count; // TS_G8(ptr);
+
+					ptr = ptr + 1;
 
 					for (int i=0; i<eventIds_count; i++) {
-						int eventId = TS_G16(ptr);
+						int event_id = TS_G16(ptr);
 
-						event_ids.push_back(eventId);
+						printf(":: event id:[%04x]\n", event_id);
 
 						ptr = ptr + 2;
 					}
@@ -1126,13 +1133,33 @@ class DemuxTest : public jmpeg::DemuxListener {
 
 						printf(":: stream mode descriptor:: mode:[%s]\n", mode.c_str());
 					} else if (descriptor_tag == 0x04) { // stream event descriptor
+						// ABNTNBR15606_2D2_2007Vc3_2008.pdf
 						int event_id = TS_G16(ptr+2);
 						uint64_t event_NPT = (uint64_t)TS_GM8(ptr+7, 7, 1) << 32 | TS_G32(ptr+8);
-						std::string private_data_byte(ptr+12, descriptor_length-12);
+						int private_data_length = descriptor_length-14; // TS_G8(ptr+12);
+						int command_tag = TS_G8(ptr+13);
+						int sequence_number = TS_GM8(ptr+14, 0, 7);
+						int final_flag = TS_GM8(ptr+14, 7, 1);
+						std::string private_data_byte(ptr+15, private_data_length);
 
-						printf(":: stream event descriptor:: event id:[%04x], event NPT:[%lu]\n", event_id, event_NPT);
+						_dsmcc_private_payload.append(private_data_byte.c_str(), private_data_byte.size());
 
-						DumpBytes("private data", private_data_byte.c_str(), private_data_byte.size());
+						if (final_flag == 0) {
+							if (sequence_number == _dsmcc_sequence_number) {
+								printf(":: stream event descriptor:: event id:[%04x], event npt:[%lu], command tag:[%02x]\n", event_id, event_NPT, command_tag);
+
+								DumpBytes("private data", private_data_byte.c_str(), private_data_byte.size());
+							}
+							
+							_dsmcc_private_payload.clear();
+							_dsmcc_sequence_number = 0;
+						} else {
+							if (sequence_number == _dsmcc_sequence_number) {
+								_dsmcc_sequence_number = _dsmcc_sequence_number + 1;
+							} else {
+								_dsmcc_sequence_number = -1;
+							}
+						}
 					}
 
 					ptr = ptr + descriptor_length + 2;

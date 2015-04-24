@@ -250,7 +250,7 @@ void DumpBytes(std::string id, const char *data, int length, int columns)
 		}
 	}
 	
-	printf("\n----:: Dump (%s) :: END ::----\n\n", id.c_str());
+	printf("\n----:: Dump (%s) :: END ::----\n", id.c_str());
 }
 
 int main_mpeg(int argc, char *argv[])
