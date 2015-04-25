@@ -29,7 +29,7 @@
 
 namespace jmedia {
 
-class VideoComponentImpl : public jgui::Component {
+class VideoComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
@@ -71,7 +71,29 @@ class VideoComponentImpl : public jgui::Component {
 
 		virtual ~VideoComponentImpl()
 		{
+			if (IsRunning() == true) {
+				WaitThread();
+			}
+
 			delete _image;
+		}
+
+		virtual void UpdateComponent()
+		{
+			_player->DispatchFrameEvent(new FrameEvent(_player, JFE_GRABBED, _image));
+
+			if (IsRunning() == true) {
+				WaitThread();
+			}
+
+			Start();
+		}
+
+		virtual void Run()
+		{
+			if (IsVisible() != false) {
+				Repaint();
+			}
 		}
 
 		virtual void Paint(jgui::Graphics *g)
@@ -449,7 +471,8 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 };
 
-DFBPlayer::DFBPlayer(std::string file)
+DFBPlayer::DFBPlayer(std::string file):
+	jmedia::Player()
 {
 	_file = file;
 	_is_paused = false;
@@ -522,14 +545,7 @@ DFBPlayer::~DFBPlayer()
 
 void DFBPlayer::Callback(void *ctx)
 {
-	VideoComponentImpl *cmp = reinterpret_cast<VideoComponentImpl *>(ctx);
-	Player *player = cmp->GetPlayer();
-	
-	player->DispatchFrameEvent(new FrameEvent(player, JFE_GRABBED, cmp->GetFrame()));
-		
-	if (cmp->IsVisible() != false) {
-		cmp->Repaint();
-	}
+	reinterpret_cast<VideoComponentImpl *>(ctx)->UpdateComponent();
 }
 		
 void DFBPlayer::Play()
