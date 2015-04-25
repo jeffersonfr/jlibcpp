@@ -21,71 +21,15 @@
 #include "jproperties.h"
 #include "jstringutils.h"
 #include "jautolock.h"
-#include "jfileinputstream.h"
-#include "jbufferedreader.h"
 #include "jruntimeexception.h"
 #include "jillegalargumentexception.h"
+#include "jfile.h"
+
+#include <iostream>
+#include <fstream>
 
 namespace jcommon {
 
-#ifdef _WIN32
-
-long getdelim(char **lineptr, size_t *n, int delim, FILE *stream) {
-	size_t i;
-
-	if (!lineptr || !n) {
-		errno=EINVAL;
-		return -1;
-	}
-
-	if (!*lineptr) {
-		*n=0;
-	}
-
-	for (i=0; ; ) {
-		int x=fgetc(stream);
-		if (i>=*n) {
-			int tmp=*n+100;
-			char *new_ptr = (char *)realloc(*lineptr,tmp);
-			
-			if (!new_ptr) {
-				return -1;
-			}
-
-			*lineptr=new_ptr;
-			*n=tmp;
-		}
-
-		if (x==EOF) { 
-			if (!i) {
-				return -1; 
-			}
-
-			(*lineptr)[i]=0; 
-			
-			return i; 
-		}
-
-		(*lineptr)[i]=x;
-		++i;
-
-		if (x==delim) {
-			break;
-		}
-	}
-
-	(*lineptr)[i]=0;
-
-	return i;
-}
-
-int getline(char **lineptr, size_t *n, FILE *stream)
-{
-  return getdelim(lineptr, n, '\n', stream);
-}
-
-#endif
-	
 Properties::Properties():
 	jcommon::Object()
 {
@@ -102,12 +46,10 @@ void Properties::Load(std::string filename_, std::string escape_)
 
 	_filename = filename_;
 
-	jio::FileInputStream is(_filename);
-	jio::BufferedReader reader(&is);
+	std::ifstream reader(_filename.c_str());
+	std::string line;
 
-	while (reader.IsEOF() == false) {
-		std::string line = jcommon::StringUtils::Trim(reader.ReadLine());
-
+	while (std::getline(reader, line)) {
 		if (line.find("#") == 0) {
 				struct jproperty_t prop;
 	
@@ -137,6 +79,8 @@ void Properties::Load(std::string filename_, std::string escape_)
 			}
 		}
 	}
+
+	reader.close();
 }
 
 void Properties::Save(std::string escape_)
