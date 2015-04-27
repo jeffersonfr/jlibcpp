@@ -559,49 +559,57 @@ void Color::HSBtoRGB(double hue, double saturation, double brightness, int *red,
 			g = 0, 
 			b = 0;
 
-	if (saturation == 0) {
-		r = g = b = (int) (brightness * 255.0f + 0.5f);
+	// hue = (hue < 0.0)?0.0:(hue > 1.0)?1.0:hue ;
+	// saturation = (saturation < 0.0)?0.0:(saturation > 1.0)?1.0:saturation;
+	// brightness = (brightness < 0.0)?0.0:(brightness > 1.0)?1.0:brightness;
+
+	if (saturation == 0.0) {
+		r = g = b = (int) (brightness * 255.0 + 0.5);
 	} else {
-		double h = (hue - (double)jmath::Math<double>::Floor(hue)) * 6.0f;
+		double h = (hue - (double)jmath::Math<double>::Floor(hue)) * 6.0;
 		double f = h - (double)jmath::Math<double>::Floor(h);
-		double p = brightness * (1.0f - saturation);
-		double q = brightness * (1.0f - saturation * f);
-		double t = brightness * (1.0f - (saturation * (1.0f - f)));
+		double p = brightness * (1.0 - saturation);
+		double q = brightness * (1.0 - saturation * f);
+		double t = brightness * (1.0 - (saturation * (1.0 - f)));
 
 		switch ((int)h) {
 			case 0:
-				r = (int) (brightness * 255.0f + 0.5f);
-				g = (int) (t * 255.0f + 0.5f);
-				b = (int) (p * 255.0f + 0.5f);
+				r = (int) (brightness * 255.0 + 0.5);
+				g = (int) (t * 255.0 + 0.5);
+				b = (int) (p * 255.0 + 0.5);
 				break;
 			case 1:
-				r = (int) (q * 255.0f + 0.5f);
-				g = (int) (brightness * 255.0f + 0.5f);
-				b = (int) (p * 255.0f + 0.5f);
+				r = (int) (q * 255.0 + 0.5);
+				g = (int) (brightness * 255.0 + 0.5);
+				b = (int) (p * 255.0 + 0.5);
 				break;
 			case 2:
-				r = (int) (p * 255.0f + 0.5f);
-				g = (int) (brightness * 255.0f + 0.5f);
-				b = (int) (t * 255.0f + 0.5f);
+				r = (int) (p * 255.0 + 0.5);
+				g = (int) (brightness * 255.0 + 0.5);
+				b = (int) (t * 255.0 + 0.5);
 				break;
 			case 3:
-				r = (int) (p * 255.0f + 0.5f);
-				g = (int) (q * 255.0f + 0.5f);
-				b = (int) (brightness * 255.0f + 0.5f);
+				r = (int) (p * 255.0 + 0.5);
+				g = (int) (q * 255.0 + 0.5);
+				b = (int) (brightness * 255.0 + 0.5);
 				break;
 			case 4:
-				r = (int) (t * 255.0f + 0.5f);
-				g = (int) (p * 255.0f + 0.5f);
-				b = (int) (brightness * 255.0f + 0.5f);
+				r = (int) (t * 255.0 + 0.5);
+				g = (int) (p * 255.0 + 0.5);
+				b = (int) (brightness * 255.0 + 0.5);
 				break;
 			case 5:
-				r = (int) (brightness * 255.0f + 0.5f);
-				g = (int) (p * 255.0f + 0.5f);
-				b = (int) (q * 255.0f + 0.5f);
+				r = (int) (brightness * 255.0 + 0.5);
+				g = (int) (p * 255.0 + 0.5);
+				b = (int) (q * 255.0 + 0.5);
 				break;
 		}
 	}
 	
+	r = (r < 0)?0:(r > 255)?255:r;
+	g = (g < 0)?0:(g > 255)?255:g;
+	b = (b < 0)?0:(b > 255)?255:b;
+
 	(*red) = r;
 	(*green) = g;
 	(*blue) = b;
@@ -609,9 +617,11 @@ void Color::HSBtoRGB(double hue, double saturation, double brightness, int *red,
 
 void Color::RGBtoHSB(int red, int green, int blue, double *hue, double *saturation, double *brightness) 
 {
-	double h, 
-				 s, 
-				 b;
+	double h, s, b;
+
+	// red = (red < 0)?0:(red > 255)?255:red;
+	// green = (green < 0)?0:(green > 255)?255:green;
+	// blue = (blue < 0)?0:(blue > 255)?255:blue;
 
 	int cmax = (red > green) ? red : green;
 	if (blue > cmax) {
@@ -623,15 +633,15 @@ void Color::RGBtoHSB(int red, int green, int blue, double *hue, double *saturati
 		cmin = blue;
 	}
 
-	b = ((double) cmax) / 255.0f;
+	b = ((double) cmax) / 255.0;
 	if (cmax != 0) {
 		s = ((double) (cmax - cmin)) / ((double) cmax);
 	} else {
-		s = 0;
+		s = 0.0;
 	}
 	
-	if (s == 0) {
-		h = 0;
+	if (s == 0.0) {
+		h = 0.0;
 	} else {
 		double redc = ((double) (cmax - red)) / ((double) (cmax - cmin));
 		double greenc = ((double) (cmax - green)) / ((double) (cmax - cmin));
@@ -640,16 +650,20 @@ void Color::RGBtoHSB(int red, int green, int blue, double *hue, double *saturati
 		if (red == cmax) {
 			h = bluec - greenc;
 		} else if (green == cmax) {
-			h = 2.0f + redc - bluec;
+			h = 2.0 + redc - bluec;
 		} else {
-			h = 4.0f + greenc - redc;
+			h = 4.0 + greenc - redc;
 		}
 
-		h = h / 6.0f;
-		if (h < 0) {
+		h = h / 6.0;
+		if (h < 0.0) {
 			h = h + 1.0f;
 		}
 	}
+
+	h = (h < 0.0)?0.0:(h > 1.0)?1.0:h;
+	s = (s < 0.0)?0.0:(s > 1.0)?1.0:s;
+	b = (b < 0.0)?0.0:(b > 1.0)?1.0:b;
 
 	(*hue) = h;
 	(*saturation) = s;
