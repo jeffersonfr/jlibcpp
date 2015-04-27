@@ -237,7 +237,7 @@ class Color : public virtual jcommon::Object{
 		 *
      * \return the RGB value of the color with the indicated hue, saturation, and brightness.
      */
-    static Color HSBtoRGB(double hue, double saturation, double brightness);
+    static void HSBtoRGB(double hue, double saturation, double brightness, int *red, int *green, int *blue);
 
     /**
      * Converts the components of a color, as specified by the default RGB model, to an equivalent set of values for hue, saturation, 
@@ -249,12 +249,10 @@ class Color : public virtual jcommon::Object{
      * \param r the red component of the color
      * \param g the green component of the color
      * \param b the blue component of the color
-     * \param hsbvals the array used to return the three HSB values, or <code>null</code>
 		 *
-     * \return an array of three elements containing the hue, saturation, and brightness (in that order), of the color with  the indicated 
-		 * 		red, green, and blue components.
+     * \return the HSB value of the color with the indicated red, green, blue.
      */
-    static void RGBtoHSB(int red, int green, int blue, double *hsbvals);
+    static void RGBtoHSB(int red, int green, int blue, double *hue, double *saturation, double *brightness);
 
 		/**
 		 * \brief

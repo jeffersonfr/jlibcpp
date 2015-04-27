@@ -553,14 +553,14 @@ Color::~Color()
 {
 }
 
-Color Color::HSBtoRGB(double hue, double saturation, double brightness) 
+void Color::HSBtoRGB(double hue, double saturation, double brightness, int *red, int *green, int *blue) 
 {
-	int red = 0, 
-			green = 0, 
-			blue = 0;
+	int r = 0, 
+			g = 0, 
+			b = 0;
 
 	if (saturation == 0) {
-		red = green = blue = (int) (brightness * 255.0f + 0.5f);
+		r = g = b = (int) (brightness * 255.0f + 0.5f);
 	} else {
 		double h = (hue - (double)jmath::Math<double>::Floor(hue)) * 6.0f;
 		double f = h - (double)jmath::Math<double>::Floor(h);
@@ -570,50 +570,48 @@ Color Color::HSBtoRGB(double hue, double saturation, double brightness)
 
 		switch ((int)h) {
 			case 0:
-				red = (int) (brightness * 255.0f + 0.5f);
-				green = (int) (t * 255.0f + 0.5f);
-				blue = (int) (p * 255.0f + 0.5f);
+				r = (int) (brightness * 255.0f + 0.5f);
+				g = (int) (t * 255.0f + 0.5f);
+				b = (int) (p * 255.0f + 0.5f);
 				break;
 			case 1:
-				red = (int) (q * 255.0f + 0.5f);
-				green = (int) (brightness * 255.0f + 0.5f);
-				blue = (int) (p * 255.0f + 0.5f);
+				r = (int) (q * 255.0f + 0.5f);
+				g = (int) (brightness * 255.0f + 0.5f);
+				b = (int) (p * 255.0f + 0.5f);
 				break;
 			case 2:
-				red = (int) (p * 255.0f + 0.5f);
-				green = (int) (brightness * 255.0f + 0.5f);
-				blue = (int) (t * 255.0f + 0.5f);
+				r = (int) (p * 255.0f + 0.5f);
+				g = (int) (brightness * 255.0f + 0.5f);
+				b = (int) (t * 255.0f + 0.5f);
 				break;
 			case 3:
-				red = (int) (p * 255.0f + 0.5f);
-				green = (int) (q * 255.0f + 0.5f);
-				blue = (int) (brightness * 255.0f + 0.5f);
+				r = (int) (p * 255.0f + 0.5f);
+				g = (int) (q * 255.0f + 0.5f);
+				b = (int) (brightness * 255.0f + 0.5f);
 				break;
 			case 4:
-				red = (int) (t * 255.0f + 0.5f);
-				green = (int) (p * 255.0f + 0.5f);
-				blue = (int) (brightness * 255.0f + 0.5f);
+				r = (int) (t * 255.0f + 0.5f);
+				g = (int) (p * 255.0f + 0.5f);
+				b = (int) (brightness * 255.0f + 0.5f);
 				break;
 			case 5:
-				red = (int) (brightness * 255.0f + 0.5f);
-				green = (int) (p * 255.0f + 0.5f);
-				blue = (int) (q * 255.0f + 0.5f);
+				r = (int) (brightness * 255.0f + 0.5f);
+				g = (int) (p * 255.0f + 0.5f);
+				b = (int) (q * 255.0f + 0.5f);
 				break;
 		}
 	}
 	
-	return Color(red, green, blue, 0xff);
+	(*red) = r;
+	(*green) = g;
+	(*blue) = b;
 }
 
-void Color::RGBtoHSB(int red, int green, int blue, double *hsbvals) 
+void Color::RGBtoHSB(int red, int green, int blue, double *hue, double *saturation, double *brightness) 
 {
-	if (hsbvals == NULL) {
-		throw jcommon::NullPointerException("HSB parameter cannot be NULL");
-	}
-
-	double hue, 
-				 saturation, 
-				 brightness;
+	double h, 
+				 s, 
+				 b;
 
 	int cmax = (red > green) ? red : green;
 	if (blue > cmax) {
@@ -625,37 +623,37 @@ void Color::RGBtoHSB(int red, int green, int blue, double *hsbvals)
 		cmin = blue;
 	}
 
-	brightness = ((double) cmax) / 255.0f;
+	b = ((double) cmax) / 255.0f;
 	if (cmax != 0) {
-		saturation = ((double) (cmax - cmin)) / ((double) cmax);
+		s = ((double) (cmax - cmin)) / ((double) cmax);
 	} else {
-		saturation = 0;
+		s = 0;
 	}
 	
-	if (saturation == 0) {
-		hue = 0;
+	if (s == 0) {
+		h = 0;
 	} else {
 		double redc = ((double) (cmax - red)) / ((double) (cmax - cmin));
 		double greenc = ((double) (cmax - green)) / ((double) (cmax - cmin));
 		double bluec = ((double) (cmax - blue)) / ((double) (cmax - cmin));
 
 		if (red == cmax) {
-			hue = bluec - greenc;
+			h = bluec - greenc;
 		} else if (green == cmax) {
-			hue = 2.0f + redc - bluec;
+			h = 2.0f + redc - bluec;
 		} else {
-			hue = 4.0f + greenc - redc;
+			h = 4.0f + greenc - redc;
 		}
 
-		hue = hue / 6.0f;
-		if (hue < 0) {
-			hue = hue + 1.0f;
+		h = h / 6.0f;
+		if (h < 0) {
+			h = h + 1.0f;
 		}
 	}
 
-	hsbvals[0] = hue;
-	hsbvals[1] = saturation;
-	hsbvals[2] = brightness;
+	(*hue) = h;
+	(*saturation) = s;
+	(*brightness) = b;
 }
 
 Color Color::Darker(double factor)

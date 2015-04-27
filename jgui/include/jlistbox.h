@@ -54,11 +54,16 @@ enum jlistbox_mode_t {
 class ListBox : public jgui::Component, public jgui::ItemComponent{
 
 	private:
-		jlistbox_mode_t _selection;
-		int _item_size,
-			_item_gap,
-			_selected_index;
+		/** \brief */
+		int _item_size;
+		/** \brief */
+		int _item_gap;
+		/** \brief */
+		int _selected_index;
+		/** \brief */
 		bool _pressed;
+		/** \brief */
+		jlistbox_mode_t _mode;
 
 	private:
 		/**
@@ -103,6 +108,12 @@ class ListBox : public jgui::Component, public jgui::ItemComponent{
 		 *
 		 */
 		virtual void SetSelectionType(jlistbox_mode_t type);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jlistbox_mode_t GetSelectionType();
 		
 		/**
 		 * \brief
@@ -177,18 +188,6 @@ class ListBox : public jgui::Component, public jgui::ItemComponent{
 		 */
 		virtual void SetCurrentIndex(int i);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundFocusColor(int red, int green, int blue, int alpha);
-
 		/**
 		 * \brief
 		 *

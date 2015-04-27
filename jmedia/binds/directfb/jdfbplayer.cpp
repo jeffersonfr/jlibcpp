@@ -86,6 +86,7 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
+			// CHANGE:: to make this sync, use Run() instead Start()
 			Start();
 		}
 
@@ -112,9 +113,9 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 			return _player;
 		}
 
-		virtual jgui::Image * GetFrame()
+		virtual jgui::Graphics * GetGraphics()
 		{
-			return _image;
+			return _image->GetGraphics();
 		}
 
 };
@@ -553,7 +554,7 @@ void DFBPlayer::Play()
 	jthread::AutoLock lock(&_mutex);
 
 	if (_is_paused == false && _provider != NULL) {
-		jgui::Graphics *graphics = dynamic_cast<VideoComponentImpl *>(_component)->GetFrame()->GetGraphics();
+		jgui::Graphics *graphics = dynamic_cast<VideoComponentImpl *>(_component)->GetGraphics();
 
 		if (_has_video == true) {
 			_provider->PlayTo(_provider, (IDirectFBSurface *)graphics->GetNativeSurface(), NULL, DFBPlayer::Callback, (void *)_component);

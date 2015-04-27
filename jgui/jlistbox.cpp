@@ -36,7 +36,7 @@ ListBox::ListBox(int x, int y, int width, int height):
 	_pressed = false;
 	_item_size = DEFAULT_ITEM_SIZE;
 	_selected_index = -1;
-	_selection = JLBM_NONE_SELECTION;
+	_mode = JLBM_NONE_SELECTION;
 
 	SetFocusable(true);
 
@@ -51,16 +51,21 @@ ListBox::~ListBox()
 
 void ListBox::SetSelectionType(jlistbox_mode_t type)
 {
-	if (_selection == type) {
+	if (_mode == type) {
 		return;
 	}
 
-	_selection = type;
+	_mode = type;
 	_selected_index = -1;
 
 	for (std::vector<jgui::Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
 		(*i)->SetSelected(false);
 	}
+}
+
+jlistbox_mode_t ListBox::GetSelectionType()
+{
+	return _mode;
 }
 
 void ListBox::AddEmptyItem()
@@ -119,16 +124,6 @@ void ListBox::SetItemSize(int size)
 	Repaint();
 }
 
-void ListBox::SetForegroundColor(int red, int green, int blue, int alpha)
-{
-	SetItemForegroundColor(red, green, blue, alpha);
-}
-
-void ListBox::SetForegroundFocusColor(int red, int green, int blue, int alpha)
-{
-	SetItemForegroundFocusColor(red, green, blue, alpha);
-}
-
 void ListBox::SetCurrentIndex(int i)
 {
 	if (i < 0 || i >= (int)_items.size()) {
@@ -152,11 +147,11 @@ bool ListBox::IsSelected(int i)
 		return false;
 	}
 
-	if (_selection == JLBM_SINGLE_SELECTION) {
+	if (_mode == JLBM_SINGLE_SELECTION) {
 		if (_selected_index == i) {
 			return true;
 		}
-	} else if (_selection == JLBM_MULTI_SELECTION) {
+	} else if (_mode == JLBM_MULTI_SELECTION) {
 		return _items[i]->IsSelected();
 	}
 
@@ -175,7 +170,7 @@ void ListBox::SetSelected(int i)
 		return;
 	}
 
-	if (_selection == JLBM_SINGLE_SELECTION) {
+	if (_mode == JLBM_SINGLE_SELECTION) {
 		if (_selected_index == i) {
 			_selected_index = -1;
 		} else {
@@ -183,7 +178,7 @@ void ListBox::SetSelected(int i)
 		}
 
 		Repaint();
-	} else if (_selection == JLBM_MULTI_SELECTION) {
+	} else if (_mode == JLBM_MULTI_SELECTION) {
 		if (item->IsSelected()) {
 			item->SetSelected(false);
 		} else {
@@ -206,11 +201,11 @@ void ListBox::Select(int i)
 		return;
 	}
 
-	if (_selection == JLBM_SINGLE_SELECTION) {
+	if (_mode == JLBM_SINGLE_SELECTION) {
 		_selected_index = i;
 
 		Repaint();
-	} else if (_selection == JLBM_MULTI_SELECTION) {
+	} else if (_mode == JLBM_MULTI_SELECTION) {
 		item->SetSelected(true);
 
 		Repaint();
@@ -229,11 +224,11 @@ void ListBox::Deselect(int i)
 		return;
 	}
 
-	if (_selection == JLBM_SINGLE_SELECTION) {
+	if (_mode == JLBM_SINGLE_SELECTION) {
 		_selected_index = -1;
 
 		Repaint();
-	} else if (_selection == JLBM_MULTI_SELECTION) {
+	} else if (_mode == JLBM_MULTI_SELECTION) {
 		item->SetSelected(false);
 
 		Repaint();
@@ -401,11 +396,11 @@ void ListBox::Paint(Graphics *g)
 		}
 
 		if (_index != i) {
-			if (_selection == JLBM_SINGLE_SELECTION) {	
+			if (_mode == JLBM_SINGLE_SELECTION) {	
 				if (_selected_index == i) {	
 					g->SetColor(_selected_item_color);
 				}
-			} else if (_selection == JLBM_MULTI_SELECTION) {	
+			} else if (_mode == JLBM_MULTI_SELECTION) {	
 				if (item->IsSelected() == true) {	
 					g->SetColor(_selected_item_color);
 				}
@@ -416,11 +411,11 @@ void ListBox::Paint(Graphics *g)
 
 		g->FillRectangle(x, y+(_item_size+_item_gap)*i, w, _item_size);
 
-		if (_selection == JLBM_SINGLE_SELECTION) {
+		if (_mode == JLBM_SINGLE_SELECTION) {
 			if (_selected_index == i) {
 				g->SetColor(_selected_item_color);
 			}
-		} else if (_selection == JLBM_MULTI_SELECTION) {	
+		} else if (_mode == JLBM_MULTI_SELECTION) {	
 			if (_items[i]->IsSelected() == true) {	
 				g->SetColor(_selected_item_color);
 			}
