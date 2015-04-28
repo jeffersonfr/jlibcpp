@@ -119,7 +119,6 @@ class DemuxTest : public jmpeg::DemuxListener {
 		std::map<std::string, jmpeg::Demux *> _demuxes;
 		std::map<int, std::string> _stream_types;
 		std::set<int> _pids;
-		std::string _dsmcc_private_payload;
 		int _dsmcc_sequence_number;
 		int _dsmcc_data_pid;
 		int _dsmcc_descriptors_pid;
@@ -639,6 +638,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
+					DescriptorDump(ptr, descriptor_length);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -925,7 +925,6 @@ class DemuxTest : public jmpeg::DemuxListener {
 		{
 			const char *ptr = event->GetData();
 
-
 			// INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf
 			if (event->GetTID() == 0x3c) {
 				ptr = ptr + 8;
@@ -937,6 +936,8 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int reserved = TS_G8(ptr + 8);
 				int adaptation_length = TS_G8(ptr + 9);
 				int message_length = TS_G16(ptr + 10);
+
+				DumpBytes("Stream Events", ptr, event->GetDataLength());
 
 				if (protocol_discriminator != 0x11 || // MPEG-2 DSM -CC message
 						dsmcc_type != 0x03 || // Download message
@@ -969,6 +970,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int objectKind_length = TS_G32(ptr+13+objectKey_length);
 				int objectKind = TS_G32(ptr+17+objectKey_length);
 
+			printf("::::::::::::::::::04: %d\n", event->GetTID());
 				if (biop_version_major != 0x01 || 
 						biop_version_minor != 0x00 || 
 						byte_order != 0x00 || 
@@ -1084,6 +1086,8 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int descriptors_length = section_length-3;
 				int descriptors_count = 0;
 
+				DumpBytes("Events Descriptors", ptr, event->GetDataLength());
+
 				ptr = ptr + 8;
 
 				// INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf; pg.326
@@ -1135,31 +1139,14 @@ class DemuxTest : public jmpeg::DemuxListener {
 					} else if (descriptor_tag == 0x04) { // stream event descriptor
 						// ABNTNBR15606_2D2_2007Vc3_2008.pdf
 						int event_id = TS_G16(ptr+2);
+						// uint64_t reserved = TS_GM32(ptr+8, 1, 31);
 						uint64_t event_NPT = (uint64_t)TS_GM8(ptr+7, 7, 1) << 32 | TS_G32(ptr+8);
-						int private_data_length = descriptor_length-14; // TS_G8(ptr+12);
-						int command_tag = TS_G8(ptr+13);
-						int sequence_number = TS_GM8(ptr+14, 0, 7);
-						int final_flag = TS_GM8(ptr+14, 7, 1);
-						std::string private_data_byte(ptr+15, private_data_length);
+						int private_data_length = descriptor_length-10;
+						std::string private_data_byte(ptr+12, private_data_length);
 
-						_dsmcc_private_payload.append(private_data_byte.c_str(), private_data_byte.size());
+						printf(":: stream event descriptor:: event id:[%04x], event npt:[%lu]\n", event_id, event_NPT);
 
-						if (final_flag == 0) {
-							if (sequence_number == _dsmcc_sequence_number) {
-								printf(":: stream event descriptor:: event id:[%04x], event npt:[%lu], command tag:[%02x]\n", event_id, event_NPT, command_tag);
-
-								DumpBytes("private data", private_data_byte.c_str(), private_data_byte.size());
-							}
-							
-							_dsmcc_private_payload.clear();
-							_dsmcc_sequence_number = 0;
-						} else {
-							if (sequence_number == _dsmcc_sequence_number) {
-								_dsmcc_sequence_number = _dsmcc_sequence_number + 1;
-							} else {
-								_dsmcc_sequence_number = -1;
-							}
-						}
+						DumpBytes("private data", private_data_byte.c_str(), private_data_byte.size());
 					}
 
 					ptr = ptr + descriptor_length + 2;
