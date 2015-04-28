@@ -333,7 +333,7 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 
 };
 
-class Scene : public jgui::Container, public jgui::KeyListener, public jthread::TimerTask{
+class Scene : public jgui::Container, public jthread::TimerTask{
 
 	private:
 		jthread::Mutex _input;

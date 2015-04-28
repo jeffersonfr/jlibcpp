@@ -579,6 +579,7 @@ void Frame::PaintGlassPane(Graphics *g)
 		int h = (_insets.top-20);
 
 		if (h > 0) {
+			g->SetCompositeFlags(jgui::JCF_NONE);
 			g->DrawImage(_icon_image, _insets.left, 10, h, h);
 		}
 	}

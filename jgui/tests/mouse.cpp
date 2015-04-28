@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "jframe.h"
 
-class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
+class GraphicsTeste : public jgui::Window {
 
 	private:
 		std::vector<jgui::jpoint_t> points;
@@ -45,13 +45,10 @@ class GraphicsTeste : public jgui::Window, public jgui::MouseListener {
 
 			// INFO:: necessario para receber os eventos de mouse
 			InternalCreateWindow();
-
-			jgui::InputManager::GetInstance()->RegisterMouseListener(this);
 		}
 
 		virtual ~GraphicsTeste()
 		{
-			jgui::InputManager::GetInstance()->RemoveMouseListener(this);
 		}
 
 		virtual bool MousePressed(jgui::MouseEvent *event)

@@ -2413,7 +2413,7 @@ int main( int argc, char *argv[] )
 {
 	GraphicsTeste test;
 
-	test.Show();
+	test.Show(true);
 
 	return 0;
 }
