@@ -15,9 +15,15 @@ LDFLAGS		+= \
 OBJS_teste = \
 	   teste.o\
 
-all: teste
+OBJS_fullscreen = \
+	   fullscreen.o\
+
+all: teste fullscreen 
 	
 teste: $(OBJS_teste)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+fullscreen: $(OBJS_fullscreen)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
@@ -27,4 +33,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste
+	@rm -rvf *.o *.xml *~ teste fullscreen
