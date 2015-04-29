@@ -119,6 +119,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 		std::map<std::string, jmpeg::Demux *> _demuxes;
 		std::map<int, std::string> _stream_types;
 		std::set<int> _pids;
+		std::string _dsmcc_private_payload;
 		int _dsmcc_sequence_number;
 		int _dsmcc_data_pid;
 		int _dsmcc_descriptors_pid;
@@ -937,8 +938,6 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int adaptation_length = TS_G8(ptr + 9);
 				int message_length = TS_G16(ptr + 10);
 
-				DumpBytes("Stream Events", ptr, event->GetDataLength());
-
 				if (protocol_discriminator != 0x11 || // MPEG-2 DSM -CC message
 						dsmcc_type != 0x03 || // Download message
 						reserved != 0xff ||
@@ -970,7 +969,6 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int objectKind_length = TS_G32(ptr+13+objectKey_length);
 				int objectKind = TS_G32(ptr+17+objectKey_length);
 
-			printf("::::::::::::::::::04: %d\n", event->GetTID());
 				if (biop_version_major != 0x01 || 
 						biop_version_minor != 0x00 || 
 						byte_order != 0x00 || 
@@ -984,9 +982,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 
 				// "ste" (Stream Event messages)
 				if (objectKind == 0x66696c00) { // 'f', 'i', 'l', '\0'
-					printf("DSMCC Data::[fil]\n");
 				} else if (objectKind == 0x73747200) { // 's', 't', 'r', '\0'
-					printf("DSMCC Data::[str]\n");
 				} else if (objectKind == 0x73746500) { // 's', 't', 'e', '\0'
 					int objectInfo_length = TS_G16(ptr); 
 					int aDescription_length = TS_G8(ptr+2); 
@@ -1015,8 +1011,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 						ptr = ptr + eventName_length + 1;
 					}
 
-					// TODO:: verificar essa soma ...
-					int objectInfo_byte_length = objectInfo_length-(13+objectKey_length+4+objectKind_length+2)-7;
+					int objectInfo_byte_length = objectInfo_length-(aDescription_length+10)-(2+eventNames_count+count)-2;
 
 					ptr = ptr + objectInfo_byte_length;
 
@@ -1026,7 +1021,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 						return;
 					}
 
-					ptr = ptr + 1 + eventNames_count;
+					ptr = ptr + 1; // + eventNames_count;
 
 					// int messageBody_length = TS_G32(ptr);
 					int taps_count = TS_G8(ptr+4);
@@ -1086,8 +1081,6 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int descriptors_length = section_length-3;
 				int descriptors_count = 0;
 
-				DumpBytes("Events Descriptors", ptr, event->GetDataLength());
-
 				ptr = ptr + 8;
 
 				// INFO:: ISO IEC 13818-6 - MPEG2 DSMCC - Digital Storage Media Command & Control.pdf; pg.326
@@ -1139,8 +1132,8 @@ class DemuxTest : public jmpeg::DemuxListener {
 					} else if (descriptor_tag == 0x04) { // stream event descriptor
 						// ABNTNBR15606_2D2_2007Vc3_2008.pdf
 						int event_id = TS_G16(ptr+2);
-						// uint64_t reserved = TS_GM32(ptr+8, 1, 31);
 						uint64_t event_NPT = (uint64_t)TS_GM8(ptr+7, 7, 1) << 32 | TS_G32(ptr+8);
+
 						int private_data_length = descriptor_length-10;
 						std::string private_data_byte(ptr+12, private_data_length);
 

@@ -130,6 +130,7 @@ void DemuxManager::Run()
 		return;
 	}
 
+	std::map<int, std::string> timeline;
 	std::string buffer;
 
 	while (_is_running) {
@@ -175,18 +176,26 @@ void DemuxManager::Run()
 			offset = offset + adaptation_field_length;
 		}
 
+		std::string previous;
+		int previous_pid = -1;
 		int tid = -1;
 		int section_length = -1;
 
 		if (payload_unit_start_indicator == 1) {
-			int pointer_field = TS_G8(ptr);
+			int pointer_field = TS_G8(ptr) + 1;
 
 			if (pointer_field > 0) {
-				// TODO:: pad to and of last section
+				previous = timeline[pid];
+
+				if (previous.size() > 0) {
+					previous.append(ptr+1, pointer_field-1);
+
+					previous_pid = pid;
+				}
 			}
 
-			ptr = ptr + pointer_field + 1;
-			offset = offset + pointer_field + 1;
+			ptr = ptr + pointer_field;
+			offset = offset + pointer_field;
 			tid = TS_G8(ptr);
 			section_length = TS_PSI_G_SECTION_LENGTH(ptr) + 3;
 
@@ -201,6 +210,7 @@ void DemuxManager::Run()
 			if (offset >= 184 || section_length == 3) {
 				continue;
 			}
+
 			buffer = std::string(ptr, chunk_length);
 		} else {
 			if (buffer.size() == 0) {
@@ -218,6 +228,12 @@ void DemuxManager::Run()
 			}
 
 			buffer.append(ptr, chunk_length);
+		}
+
+		if (section_length == (int)buffer.size()) {
+			timeline[pid].clear();
+		} else {
+			timeline[pid] = buffer;
 		}
 
 		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
@@ -247,6 +263,20 @@ void DemuxManager::Run()
 							_demux_status[demux].found = true;
 
 							demux->DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, buffer.data(), buffer.size(), pid, tid));
+						}
+					}
+				}
+			}
+
+			if (demux->GetPID() < 0 || demux->GetPID() == previous_pid) {
+				if (demux->GetType() == JMDT_PSI) {
+					int section_length = TS_PSI_G_SECTION_LENGTH(previous.data()) + 3;
+
+					if (section_length == (int)previous.size()) {
+						if (demux->Append(previous.c_str(), previous.size()) == true) {
+							_demux_status[demux].found = true;
+
+							demux->DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, previous.data(), previous.size(), pid, tid));
 						}
 					}
 				}
