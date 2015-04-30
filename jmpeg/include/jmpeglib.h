@@ -23,7 +23,7 @@
 #include <string>
 
 // INFO:: bit masks
-#define TS_M8(offset, count) (uint8_t)((0xff << (8 - count)) >> offset)
+#define TS_M8(offset, count) (uint8_t)(((0xff << (8 - count)) & 0xff) >> offset)
 #define TS_M16(offset, count) ((uint16_t)(((0xffff << (16 - count)) & 0xffff) >> offset))
 #define TS_M32(offset, count) ((uint32_t)(((0xffffffff << (32 - count)) & 0xffffffff) >> offset))
 #define TS_M64(offset, count) ((uint64_t)(((0xffffffffffffffff << (64 - count)) & 0xffffffffffffffff) >> offset))
