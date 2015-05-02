@@ -131,6 +131,7 @@ void DemuxManager::Run()
 	}
 
 	std::map<int, std::string> timeline;
+	std::vector<int> last_pids;
 
 	while (_is_running) {
 		jthread::AutoLock lock(&_demux_sync_mutex);
@@ -158,7 +159,7 @@ void DemuxManager::Run()
 		// int scrambling_control = TS_GM8(data+3, 0, 2);
 		int adaptation_field_exist = TS_GM8(data+3, 2, 1);
 		int contains_payload = TS_GM8(data+3, 3, 1);
-		int continuity_counter = TS_GM8(data+3, 4, 4);
+		// int continuity_counter = TS_GM8(data+3, 4, 4);
 
 		if (contains_payload == 0) {
 			continue;
@@ -185,12 +186,16 @@ void DemuxManager::Run()
 			int pointer_field = TS_G8(ptr);
 
 			if (pointer_field > 0) {
-				previous = timeline[pid];
+				if (last_pids.size() > 0) {
+					previous = timeline[*last_pids.rbegin()];
 
-				if (previous.size() > 0) {
-					previous.append(ptr+1, pointer_field);
-			
-					previous_pid = pid;
+					last_pids.erase(last_pids.begin()+last_pids.size()-1);
+
+					if (previous.size() > 0) {
+						previous.append(ptr+1, pointer_field);
+
+						previous_pid = pid;
+					}
 				}
 			}
 
@@ -231,10 +236,20 @@ void DemuxManager::Run()
 			current.append(ptr, chunk_length);
 		}
 
-		if (current.size() == section_length) {
+		if (section_length == (int)current.size()) {
 			timeline[pid].clear();
+			
+			std::vector<int>::iterator i = std::find(last_pids.begin(), last_pids.end(), pid);
+			
+			if (i != last_pids.end()) {
+				last_pids.erase(i);
+			}
 		} else {
 			timeline[pid] = current;
+		
+			if (std::find(last_pids.begin(), last_pids.end(), pid) == last_pids.end()) {
+				last_pids.push_back(pid);
+			}
 		}
 
 		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
