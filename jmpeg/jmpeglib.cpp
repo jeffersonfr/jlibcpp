@@ -111,6 +111,52 @@ std::string GetStreamTypeDescription(int stream_type)
 std::string GetDescriptorName(int descriptor_tag)
 {
 	switch (descriptor_tag) {
+		// INFO:: T-REC-H.222.0-200605-PDF-E.pdf
+		case 0x00: return "reserved";
+		case 0x01: return "reserved";
+		case 0x02: return "video_stream_descriptor";
+		case 0x03: return "audio_stream_descriptor";
+		case 0x04: return "hierarchy_descriptor";
+		case 0x05: return "registration_descriptor";
+		case 0x06: return "data_stream_alignment_descriptor";
+		case 0x07: return "target_background_grid_descriptor";
+		case 0x08: return "video_window_descriptor";
+		case 0x09: return "ca_descriptor";
+		case 0x0a: return "iso_639_language_descriptor";
+		case 0x0b: return "system_clock_descriptor";
+		case 0x0c: return "multiplex_buffer_utilization_descriptor";
+		case 0x0d: return "copyright_descriptor";
+		case 0x0e: return "maximum_bitrate_descriptor";
+		case 0x0f: return "private_data_indicator_descriptor";
+		case 0x10: return "smoothing_buffer_descriptor";
+		case 0x11: return "std_descriptor";
+		case 0x12: return "ibp_descriptor";
+		case 0x13: 
+		case 0x14: 
+		case 0x15: 
+		case 0x16: 
+		case 0x17: 
+		case 0x18: 
+		case 0x19: 
+		case 0x1a: return "Defined in ISO/IEC 13818-6";
+		case 0x1b: return "mpeg-4_video_descriptor";
+		case 0x1c: return "mpeg-4_audio_descriptor";
+		case 0x1d: return "iod_descriptor";
+		case 0x1e: return "sl_descriptor";
+		case 0x1f: return "fmc_descriptor";
+		case 0x20: return "external_es_id_descriptor";
+		case 0x21: return "muxcode_descriptor";
+		case 0x22: return "fmxbuffersize_descriptor";
+		case 0x23: return "multiplex_buffer_descriptor";
+		case 0x24: return "content_labeling_descriptor";
+		case 0x25: return "metadata_pointer_descriptor";
+		case 0x26: return "metadata_descriptor";
+		case 0x27: return "metadata_std_descriptor";
+		case 0x28: return "avc_video_descriptor";
+		case 0x29: return "ipmp_descriptor";
+		case 0x2a: return "avc_timing_descriptor";
+		case 0x2b: return "mpeg-2_aac_audio_descriptor";
+		case 0x2c: return "flexmuxtiming_descriptor";
 		// INFO:: ABNTNBR15606-3_2007Vc_2008.pdf
 		case 0x00: return "application_descriptor";
 		case 0x01: return "application_name_descriptor";
