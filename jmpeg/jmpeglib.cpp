@@ -157,6 +157,11 @@ std::string GetDescriptorName(int descriptor_tag)
 		case 0x2a: return "avc_timing_descriptor";
 		case 0x2b: return "mpeg-2_aac_audio_descriptor";
 		case 0x2c: return "flexmuxtiming_descriptor";
+		default:
+							 break;
+	}
+
+	switch (descriptor_tag) {
 		// INFO:: ABNTNBR15606-3_2007Vc_2008.pdf
 		case 0x00: return "application_descriptor";
 		case 0x01: return "application_name_descriptor";
@@ -173,6 +178,11 @@ std::string GetDescriptorName(int descriptor_tag)
 		case 0x13: return "carousel_id_descriptor";
 		case 0x14: return "association_tag_descriptor";
 		case 0x15: return "extension_tag_descriptor";
+		default:
+							 break;
+	}
+
+	switch (descriptor_tag) {
 		// INFO:: DVB (en_300468v011101p.pdf)
 		case 0x40: return "network_name_descriptor";
 		case 0x41: return "service_list_descriptor";
