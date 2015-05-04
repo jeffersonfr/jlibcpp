@@ -187,9 +187,9 @@ void DemuxManager::Run()
 
 			if (pointer_field > 0) {
 				if (last_pids.size() > 0) {
-					previous = timeline[*last_pids.rbegin()];
+					previous = timeline[last_pids.back()];
 
-					last_pids.erase(last_pids.begin()+last_pids.size()-1);
+					last_pids.pop_back();
 
 					if (previous.size() > 0) {
 						previous.append(ptr+1, pointer_field);

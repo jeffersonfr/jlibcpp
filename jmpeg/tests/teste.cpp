@@ -34,6 +34,8 @@
 #define TS_DSMCC_DESCRIPTORS_TABLE_ID 0x3d
 
 #define TS_PAT_TIMEOUT	2000
+#define TS_CAT_TIMEOUT	4000
+#define TS_TSDT_TIMEOUT	4000
 #define TS_PMT_TIMEOUT	4000
 #define TS_NIT_TIMEOUT	4000
 #define TS_SDT_TIMEOUT	2000
@@ -501,6 +503,10 @@ class DemuxTest : public jmpeg::DemuxListener {
 
 			if (pid == TS_PAT_PID && tid == TS_PAT_TABLE_ID) {
 				ProcessPAT(event);
+			} else if (tid == TS_CAT_TABLE_ID) {
+				ProcessCAT(event);
+			} else if (tid == TS_TSDT_TABLE_ID) {
+				ProcessTSDT(event);
 			} else if (tid == TS_PMT_TABLE_ID) {
 				ProcessPMT(event);
 			} else if (tid == TS_NIT_TABLE_ID) {
@@ -539,6 +545,8 @@ class DemuxTest : public jmpeg::DemuxListener {
 			// INFO::
 			// 	start SDT to get the service name
 			// 	start TDT/TOT to get the current time
+			InitDemux("cat", TS_CAT_PID, TS_CAT_TABLE_ID, TS_CAT_TIMEOUT);
+			InitDemux("tsdt", TS_TSDT_PID, TS_TSDT_TABLE_ID, TS_TSDT_TIMEOUT);
 			InitDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_SDT_TIMEOUT);
 			InitDemux("tdt", TS_TDT_PID, TS_TDT_TABLE_ID, TS_TDT_TIMEOUT);
 			InitDemux("eit", TS_EIT_PID, -1, TS_EIT_TIMEOUT);
@@ -568,6 +576,54 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 
 			InitDemux("nit", nit_pid, TS_NIT_TABLE_ID, TS_NIT_TIMEOUT);
+		}
+
+		virtual void ProcessCAT(jmpeg::DemuxEvent *event)
+		{
+			const char *ptr = event->GetData();
+			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
+
+			printf("CAT::\n");
+
+			ptr = ptr + 8;
+
+			int descriptors_length = section_length - 5 - 4;
+			int descriptors_count = 0;
+
+			while (descriptors_count < descriptors_length) {
+				// int descriptor_tag = TS_G8(ptr);
+				int descriptor_length = TS_G8(ptr+1);
+
+				DescriptorDump(ptr, descriptor_length);
+
+				ptr = ptr + descriptor_length + 2;
+
+				descriptors_count = descriptors_count + descriptor_length + 2;	
+			}
+		}
+
+		virtual void ProcessTSDT(jmpeg::DemuxEvent *event)
+		{
+			const char *ptr = event->GetData();
+			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
+
+			printf("TSDT::\n");
+
+			ptr = ptr + 8;
+
+			int descriptors_length = section_length - 5 - 4;
+			int descriptors_count = 0;
+
+			while (descriptors_count < descriptors_length) {
+				// int descriptor_tag = TS_G8(ptr);
+				int descriptor_length = TS_G8(ptr+1);
+
+				DescriptorDump(ptr, descriptor_length);
+
+				ptr = ptr + descriptor_length + 2;
+
+				descriptors_count = descriptors_count + descriptor_length + 2;	
+			}
 		}
 
 		virtual void ProcessPMT(jmpeg::DemuxEvent *event)
@@ -966,7 +1022,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int message_type = TS_G8(ptr+7);
 				// int message_size = TS_G32(ptr+8);
 				int objectKey_length = TS_G8(ptr+12); 
-				int objectKind_length = TS_G32(ptr+13+objectKey_length);
+				// int objectKind_length = TS_G32(ptr+13+objectKey_length);
 				int objectKind = TS_G32(ptr+17+objectKey_length);
 
 				if (biop_version_major != 0x01 || 
