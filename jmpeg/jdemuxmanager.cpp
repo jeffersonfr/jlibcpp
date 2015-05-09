@@ -166,14 +166,13 @@ void DemuxManager::Run()
 		}
 
 		const char *ptr = data+TS_HEADER_LENGTH;
-		int offset = TS_HEADER_LENGTH;
+		const char *end = ptr+TS_PACKET_LENGTH;
 
 		// INFO:: discards adaptation field
 		if (adaptation_field_exist == 1) {
 			int adaptation_field_length = TS_G8(data+4);
 
 			ptr = ptr + adaptation_field_length;
-			offset = offset + adaptation_field_length;
 		}
 
 		std::string current;
@@ -200,18 +199,22 @@ void DemuxManager::Run()
 			}
 
 			ptr = ptr + pointer_field + 1;
-			offset = offset + pointer_field + 1;
+
+			if (ptr >= end) {
+				continue;
+			}
+
 			tid = TS_G8(ptr);
 			section_length = TS_PSI_G_SECTION_LENGTH(ptr) + 3;
 
-			int length = TS_PACKET_LENGTH - offset;
+			int length = end-ptr-4;
 			int chunk_length = section_length;
 
 			if (section_length > length) {
 				chunk_length = length;
 			}
 
-			if (offset >= 184 || section_length == 3) {
+			if (section_length == 3) {
 				continue;
 			}
 
@@ -226,7 +229,7 @@ void DemuxManager::Run()
 			tid = TS_G8(current.data());
 			section_length = TS_PSI_G_SECTION_LENGTH(current.data()) + 3;
 
-			int length = TS_PACKET_LENGTH - offset;
+			int length = end-ptr-4;
 			int chunk_length = section_length - current.size();
 
 			if (chunk_length > length) {
