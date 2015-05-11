@@ -18,15 +18,21 @@ OBJS_complex_test = \
 OBJS_uuid = \
 	   uuid.o\
 
+OBJS_digest = \
+	   digest.o\
+
 OBJS_matrix = \
 	   matrix.o\
 
-all: complex_test uuid matrix
+all: complex_test uuid digest matrix
 	
 complex_test: $(OBJS_complex_test)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 uuid: $(OBJS_uuid)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+digest: $(OBJS_digest)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 matrix: $(OBJS_matrix)
@@ -39,4 +45,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ complex_test uuid matrix
+	@rm -rvf *.o *~ complex_test uuid digest matrix

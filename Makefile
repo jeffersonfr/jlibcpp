@@ -113,6 +113,7 @@ OBJS_jmath += \
 		 jbase64.o\
 		 jcomplex.o\
 		 jcrc.o\
+		 jdigest.o\
 		 jmath.o\
 		 jmathlib.o\
 		 jmatrix.o\
@@ -380,7 +381,7 @@ OBJS_jgui += \
 		jwindowlistener.o\
 		jwindowmanager.o\
 		jyesnodialogbox.o\
-		jtree.o\
+		jtreelistview.o\
 		jtabbedpane.o\
 		jtable.o\
 		jguilib.o\
