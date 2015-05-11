@@ -119,7 +119,7 @@ class Object{
 		 * \brief
 		 *
 		 */
-		virtual bool Equals(Object *);
+		virtual bool Equals(Object *o);
 		
 		/**
 		 * \brief
@@ -131,7 +131,7 @@ class Object{
 		 * \brief
 		 *
 		 */
-		virtual int Compare(Object *);
+		virtual int Compare(Object *o);
 		
 		/**
 		 * \brief
