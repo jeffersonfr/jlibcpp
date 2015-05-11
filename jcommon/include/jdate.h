@@ -46,7 +46,7 @@ class Date : public virtual jcommon::Object{
 		SYSTEMTIME _zone;
 #else
 		/** \brief */
-		struct tm *_zone;
+		struct tm _zone;
 #endif
 		/** \brief */
 		time_t _time;

@@ -56,16 +56,13 @@ Date::Date():
 	_time = (time_t)SystemTime2LongTime(&_zone);
 #else
 	_time = time(NULL);
-	_zone = localtime(&_time);
-	
-	if (_zone == NULL) {
-		try {
-			_zone = new struct tm;
-		} catch (std::bad_alloc &e) {
-			jcommon::RuntimeException("Cannot allocate memory");
-		}
 
-		memset(_zone, 0, sizeof(struct tm));
+	memset(&_zone, 0, sizeof(struct tm));
+
+	struct tm *zone = localtime(&_time);
+	
+	if (zone != NULL) {
+		_zone = *zone;
 	}
 #endif
 }
@@ -111,16 +108,12 @@ Date::Date(time_t time_):
 	_zone.wMinute = minutos; // 0-59
 	_zone.wSecond = segundos; // 0-59
 #else
-	_zone = localtime(&_time);
-	
-	if (_zone == NULL) {
-		try {
-			_zone = new struct tm;
-		} catch (std::bad_alloc &e) {
-			jcommon::RuntimeException("Cannot allocate memory");
-		}
+	memset(&_zone, 0, sizeof(struct tm));
 
-		memset(_zone, 0, sizeof(struct tm));
+	struct tm *zone = localtime(&_time);
+	
+	if (zone != NULL) {
+		_zone = *zone;
 	}
 #endif
 }
@@ -160,16 +153,13 @@ Date::Date(int day, int month, int year):
 	// long tm_gmtoff; 			// offset from UTC in seconds 
 
 	_time = mktime(&t);
-	_zone = localtime(&_time);
-	
-	if (_zone == NULL) {
-		try {
-			_zone = new struct tm;
-		} catch (std::bad_alloc &e) {
-			jcommon::RuntimeException("Cannot allocate memory");
-		}
 
-		memset(_zone, 0, sizeof(struct tm));
+	memset(&_zone, 0, sizeof(struct tm));
+
+	struct tm *zone = localtime(&_time);
+	
+	if (zone != NULL) {
+		_zone = *zone;
 	}
 #endif
 }
@@ -208,16 +198,13 @@ Date::Date(int day, int month, int year, int hours, int minutes, int seconds):
 	// long tm_gmtoff; 			// offset from UTC in seconds 
 
 	_time = mktime(&t);
-	_zone = localtime(&_time);
-	
-	if (_zone == NULL) {
-		try {
-			_zone = new struct tm;
-		} catch (std::bad_alloc &e) {
-			jcommon::RuntimeException("Cannot allocate memory");
-		}
 
-		memset(_zone, 0, sizeof(struct tm));
+	memset(&_zone, 0, sizeof(struct tm));
+
+	struct tm *zone = localtime(&_time);
+	
+	if (zone != NULL) {
+		_zone = *zone;
 	}
 #endif
 }
@@ -262,28 +249,18 @@ Date::Date(double julian)
 	_zone.wMinute = minutos; // 0-59
 	_zone.wSecond = segundos; // 0-59
 #else
-	_zone = localtime(&_time);
-	
-	if (_zone == NULL) {
-		try {
-			_zone = new struct tm;
-		} catch (std::bad_alloc &e) {
-			jcommon::RuntimeException("Cannot allocate memory");
-		}
+	memset(&_zone, 0, sizeof(struct tm));
 
-		memset(_zone, 0, sizeof(struct tm));
+	struct tm *zone = localtime(&_time);
+	
+	if (zone != NULL) {
+		_zone = *zone;
 	}
 #endif
 }
 
 Date::~Date()
 {
-#ifdef _WIN32
-#else
-	if (_zone != NULL) {
-		// free(_zone);
-	}
-#endif
 }
 
 uint32_t Date::ToJulian()
@@ -295,9 +272,9 @@ uint32_t Date::ToJulian()
 	m = _zone.wMonth;
 	y = _zone.wYear;
 #else
-	d = _zone->tm_mday;
-	m = _zone->tm_mon+1;
-	y = 1900 + _zone->tm_year;
+	d = _zone.tm_mday;
+	m = _zone.tm_mon+1;
+	y = 1900 + _zone.tm_year;
 #endif
 
 	int a1 = (14 - m) / 12;
@@ -404,7 +381,7 @@ int Date::GetDayOfMonth()
 #ifdef _WIN32
 	return _zone.wDay;
 #else
-	return _zone->tm_mday;
+	return _zone.tm_mday;
 #endif
 }
 
@@ -413,7 +390,7 @@ int Date::GetMonth()
 #ifdef _WIN32
 	return (_zone.wMonth);
 #else
-	return _zone->tm_mon+1;
+	return _zone.tm_mon+1;
 #endif
 }
 
@@ -422,7 +399,7 @@ int Date::GetYear()
 #ifdef _WIN32
 	return _zone.wYear;
 #else
-	return (1900 + _zone->tm_year);
+	return (1900 + _zone.tm_year);
 #endif
 }
 
@@ -431,7 +408,7 @@ int Date::GetSecond()
 #ifdef _WIN32
 	return _zone.wSecond;
 #else
-	return _zone->tm_sec;
+	return _zone.tm_sec;
 #endif
 }
 
@@ -440,7 +417,7 @@ int Date::GetMinute()
 #ifdef _WIN32
 	return _zone.wMinute;
 #else
-	return _zone->tm_min;
+	return _zone.tm_min;
 #endif
 }
 
@@ -449,7 +426,7 @@ int Date::GetHour()
 #ifdef _WIN32
 	return _zone.wHour;
 #else
-	return _zone->tm_hour;
+	return _zone.tm_hour;
 #endif
 }
 
@@ -459,7 +436,7 @@ int Date::GetDayOfWeek()
 	return _zone.wDayOfWeek;
 #else
 	// INFO:: doming, segunda, terca, quarta, quinta, sexta, sabado
-	// return _zone->tm_wday;
+	// return _zone.tm_wday;
 
 	// INFO:: segunda, terca, quarta, quinta, sexta, sabado, domingo
 	int w = ((GetYear()-1901)*365+(GetYear()-1901)/4+GetDayOfMonth()+(GetMonth()-1)*31-((GetMonth()*4+23)/10)*((GetMonth()+12)/15)+((4-GetYear()%4)/4)*((GetMonth()+12)/15)+1)%7;
@@ -480,31 +457,39 @@ int Date::GetDayOfYear()
 
 	return c1.CountDays(&c2);
 #else
-	return _zone->tm_yday;
+	return _zone.tm_yday;
 #endif
 }
 
 std::string Date::what()
 {
 	std::ostringstream date;
-	std::string month;
 
-	switch (GetMonth()) {
-		case 1:  month = "Jan"; break;
-		case 2:  month = "Feb"; break;
-		case 3:  month = "Mar"; break;
-		case 4:  month = "Apr"; break;
-		case 5:  month = "May"; break;
-		case 6:  month = "Jun"; break;
-		case 7:  month = "Jul"; break;
-		case 8:  month = "Ago"; break;
-		case 9:  month = "Sep"; break;
-		case 10:  month = "Oct"; break;
-		case 11:  month = "Nov"; break;
-		case 12:  month = "Dez"; break;
-	}
+	std::string month[] = {
+		"Jan",
+		"Fev",
+		"Mar",
+		"Abr",
+		"Mai",
+		"Jun",
+		"Jul",
+		"Ago",
+		"Set",
+		"Out",
+		"Nov",
+		"Dez"
+	};
+	std::string week[] = {
+		"Seg",
+		"Ter",
+		"Qua",
+		"Qui",
+		"Sex",
+		"Sab",
+		"Dom",
+	};
 		
-	date << month << " " << GetDayOfMonth() << " " << GetHour() << ":" << GetMinute() << ":" << GetSecond() << " " << GetYear();
+	date << week[GetDayOfWeek()-1] << " " << month[GetMonth()-1] << " " << GetDayOfMonth() << " " << GetHour() << ":" << GetMinute() << ":" << GetSecond() << " " << GetYear();
 	
 	return date.str();
 }

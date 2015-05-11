@@ -50,6 +50,7 @@ void test(std::string id, bool expect)
 
 int main()
 {
+	test("a99459ce-f80b-11e4-bbce-e006e6ced7cf", true);
 	test("84949cc5-4701-4a84-895b-354c584a981b", true);
 	test("84949CC5-4701-4A84-895B-354C584A981B", true);
 	test("84949cc5-4701-4a84-895b-354c584a981bc", false);
