@@ -45,6 +45,7 @@ LDFLAGS		= \
 		 -lpthread \
 		 -ldl \
 		 -lrt \
+		 -luuid \
 
 DEFINES		= \
 		 -D_GNU_SOURCE \
@@ -117,9 +118,7 @@ OBJS_jmath += \
 		 jmath.o\
 		 jmathlib.o\
 		 jmatrix.o\
-		 jmd5.o\
 		 jrandom.o\
-		 jsha1.o\
 		 juuid.o\
 
 OBJS_jmpeg += \
