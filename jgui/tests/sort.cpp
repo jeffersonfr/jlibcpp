@@ -1224,9 +1224,9 @@ class RadixSortAlgorithm : public SortAlgorithm{
 					while(!Q[j]->IsEmpty()) {
 						_array[arrayPos] = Q[j]->Dequeue();
 						arrayPos++;
+					
+						Pause(j, arrayPos);
 					}
-
-					Pause(-1,arrayPos);
 				}
 			}
 		}
@@ -1289,6 +1289,256 @@ class RadixSortAlgorithm : public SortAlgorithm{
 
 			Sort(numDigits);
 			
+			_is_locked = false;
+		}
+
+};
+
+class CocktailSortAlgorithm: public SortAlgorithm{
+
+	private:
+		void Swap(int i, int j)
+		{
+			int T;
+
+			T = _array[i]; 
+			_array[i] = _array[j];
+			_array[j] = T;
+		}
+
+	public:
+		CocktailSortAlgorithm(): SortAlgorithm("CocktailSort")
+		{
+		}
+
+		virtual ~CocktailSortAlgorithm()
+		{
+		}
+		
+		virtual void Start()
+		{
+			_is_locked = true;
+			_stop_requested = false;
+
+			int begin = 0;
+			int end = _array_size;
+			bool swapped = true;
+
+			while (begin != end-- && swapped) {
+				if (_stop_requested == true) {
+					goto _exit;
+				}
+
+				swapped = false;
+
+				for (int i=begin; i!=end; ++i) {
+					if (_array[i + 1] < _array[i]) {
+						Pause(i, i+1);
+						Swap(i, i+1);
+
+						swapped = true;
+					}
+				}
+
+				if (!swapped) {
+					break;
+				}
+
+				swapped = false;
+
+				for (int i=end-1; i!=begin; --i) {
+					if (_array[i] < _array[i - 1]) {
+						Pause(i, i-1);
+						Swap(i, i-1);
+
+						swapped = true;
+					}
+				}
+
+				++begin;
+			}
+
+_exit:
+			_is_locked = false;
+		}
+
+};
+
+class CountingSortAlgorithm: public SortAlgorithm{
+
+	public:
+		CountingSortAlgorithm(): SortAlgorithm("CountingSort")
+		{
+		}
+
+		virtual ~CountingSortAlgorithm()
+		{
+		}
+		
+		virtual void Start()
+		{
+			_is_locked = true;
+			_stop_requested = false;
+
+			int begin = 0;
+			int end = _array_size;
+			int min = 9999;
+			int max = -1;
+
+			for (int i=0; i<_array_size; i++) {
+				if (min > _array[i]) {
+					min = _array[i];
+				}
+
+				if (max < _array[i]) {
+					max = _array[i];
+				}
+						
+				Pause(0, i);
+			}
+
+			if (min == max) {
+				return;
+			}
+
+			std::vector<unsigned> count((max - min) + 1, 0u);
+			
+			for (int i=begin; i!=end; ++i) {
+				++count[_array[i] - min];
+				
+				Pause(begin, i);
+			}
+
+			for (int i=min; i<=max; ++i) {
+				if (_stop_requested == true) {
+					goto _exit;
+				}
+
+				for (int j=0; j<(int)count[i-min]; ++j) {
+					_array[begin++] = i;
+				
+					Pause(i, j);
+				}
+			}
+
+_exit:
+			_is_locked = false;
+		}
+
+};
+
+class GnomeSortAlgorithm: public SortAlgorithm{
+
+	private:
+		void Swap(int i, int j)
+		{
+			int T;
+
+			T = _array[i]; 
+			_array[i] = _array[j];
+			_array[j] = T;
+		}
+
+	public:
+		GnomeSortAlgorithm(): SortAlgorithm("GnomeSort")
+		{
+		}
+
+		virtual ~GnomeSortAlgorithm()
+		{
+		}
+		
+		virtual void Start()
+		{
+			_is_locked = true;
+			_stop_requested = false;
+
+			int begin = 0;
+			int end = _array_size;
+			int i = begin + 1;
+			int j = begin + 2;
+
+			while (i < end) {
+				if (_stop_requested == true) {
+					goto _exit;
+				}
+
+				if (!(_array[i] < _array[i-1])) {
+					i = j;
+					++j;
+				} else {
+					Swap(i-1, i);
+					--i;
+					if (i == begin) {
+						i = j;
+						++j;
+					}
+				}
+					
+				Pause(i, j);
+			}
+
+_exit:
+			_is_locked = false;
+		}
+
+};
+
+class StoogeSortAlgorithm: public SortAlgorithm{
+
+	private:
+		void Swap(int i, int j)
+		{
+			int T;
+
+			T = _array[i]; 
+			_array[i] = _array[j];
+			_array[j] = T;
+		}
+
+	public:
+		StoogeSortAlgorithm(): SortAlgorithm("StoogeSort")
+		{
+		}
+
+		virtual ~StoogeSortAlgorithm()
+		{
+		}
+
+		void StoogeSort(int begin, int end)
+		{
+			if (_stop_requested == true) {
+				return;
+			}
+
+			if (_array[begin] > _array[end - 1]) {
+				Swap(begin, end - 1);
+				
+				Pause(begin, end-1);
+			}
+
+			int n = end - begin; 
+			
+			if (n > 2) {
+				n /= 3; 
+
+				StoogeSort(begin, end - n);
+				StoogeSort(begin + n, end); 
+				StoogeSort(begin, end - n);
+			}
+		}
+
+		virtual void Start()
+		{
+			_is_locked = true;
+			_stop_requested = false;
+
+			int begin = 0;
+			int end = _array_size;
+
+			StoogeSort(begin, end);
+
+// _exit:
 			_is_locked = false;
 		}
 
@@ -1454,8 +1704,8 @@ class SortFrame : public jgui::Frame {
 					h = 200,
 					gapx = 50,
 					gapy = 50,
-					dx = (1920-7*w-6*gapx)/2,
-					dy = (1080-2*h-1*gapy)/2,
+					dx = (1920-6*w-5*gapx)/2,
+					dy = (1080-3*h-2*gapy)/2,
 					array_size = 100;
 
 			_components.push_back(new SortComponent(array_size, dx+0*(w+gapx), dy+0*(h+gapy), w, h));
@@ -1464,15 +1714,20 @@ class SortFrame : public jgui::Frame {
 			_components.push_back(new SortComponent(array_size, dx+3*(w+gapx), dy+0*(h+gapy), w, h));
 			_components.push_back(new SortComponent(array_size, dx+4*(w+gapx), dy+0*(h+gapy), w, h));
 			_components.push_back(new SortComponent(array_size, dx+5*(w+gapx), dy+0*(h+gapy), w, h));
-			_components.push_back(new SortComponent(array_size, dx+6*(w+gapx), dy+0*(h+gapy), w, h));
-			
+
 			_components.push_back(new SortComponent(array_size, dx+0*(w+gapx), dy+1*(h+gapy), w, h));
 			_components.push_back(new SortComponent(array_size, dx+1*(w+gapx), dy+1*(h+gapy), w, h));
 			_components.push_back(new SortComponent(array_size, dx+2*(w+gapx), dy+1*(h+gapy), w, h));
 			_components.push_back(new SortComponent(array_size, dx+3*(w+gapx), dy+1*(h+gapy), w, h));
 			_components.push_back(new SortComponent(array_size, dx+4*(w+gapx), dy+1*(h+gapy), w, h));
 			_components.push_back(new SortComponent(array_size, dx+5*(w+gapx), dy+1*(h+gapy), w, h));
-			_components.push_back(new SortComponent(array_size, dx+6*(w+gapx), dy+1*(h+gapy), w, h));
+
+			_components.push_back(new SortComponent(array_size, dx+0*(w+gapx), dy+2*(h+gapy), w, h));
+			_components.push_back(new SortComponent(array_size, dx+1*(w+gapx), dy+2*(h+gapy), w, h));
+			_components.push_back(new SortComponent(array_size, dx+2*(w+gapx), dy+2*(h+gapy), w, h));
+			_components.push_back(new SortComponent(array_size, dx+3*(w+gapx), dy+2*(h+gapy), w, h));
+			_components.push_back(new SortComponent(array_size, dx+4*(w+gapx), dy+2*(h+gapy), w, h));
+			_components.push_back(new SortComponent(array_size, dx+5*(w+gapx), dy+2*(h+gapy), w, h));
 
 			_components[0]->SetAlgorithm(new BubbleSort2Algorithm());
 			_components[1]->SetAlgorithm(new BidirectionalBubbleSortAlgorithm());
@@ -1488,6 +1743,10 @@ class SortFrame : public jgui::Frame {
 			_components[11]->SetAlgorithm(new EQSortAlgorithm());
 			_components[12]->SetAlgorithm(new FastQSortAlgorithm());
 			_components[13]->SetAlgorithm(new RadixSortAlgorithm());
+			_components[14]->SetAlgorithm(new CocktailSortAlgorithm());
+			_components[15]->SetAlgorithm(new CountingSortAlgorithm());
+			_components[16]->SetAlgorithm(new GnomeSortAlgorithm());
+			_components[17]->SetAlgorithm(new StoogeSortAlgorithm());
 
 			for (std::vector<SortComponent *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 				Add(*i);
