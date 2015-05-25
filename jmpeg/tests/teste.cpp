@@ -241,7 +241,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					int name_length = TS_G8(ptr+5+count);
 					std::string name = std::string(ptr+6+count, name_length);
 
-					printf(":: application name:[%s], name:[%s]\n", language_code.c_str(), name.c_str());
+					printf(":: application language:[%s], name:[%s]\n", language_code.c_str(), name.c_str());
 
 					count = count + 5 + name_length;
 
@@ -516,7 +516,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			} else if (tid == TS_TOT_TABLE_ID) {
 				// ProcessTOT(event);
 			} else if (tid == TS_AIT_TABLE_ID) {
-				// ProcessPrivate(event);
+				ProcessPrivate(event);
 			} else {
 				if (pid == TS_EIT_PID) {
 					// INFO:: 
@@ -945,7 +945,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					descriptors_count = descriptors_count + descriptor_length + 2;	
 				}
 			
-				int application_loop_length = section_length-descriptors_count-4;
+				int application_loop_length = TS_GM16(ptr, 4, 12);
 				int application_loop_count = 0;
 
 				ptr = ptr + 2;
@@ -973,7 +973,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 						descriptors_count = descriptors_count + descriptor_length + 2;	
 					}
 
-					application_loop_count = application_loop_count + 6 + descriptors_length;
+					application_loop_count = application_loop_count + 9 + descriptors_length;
 				}
 			}
 		}
@@ -1250,14 +1250,14 @@ class ISDBTInputStream : public jio::FileInputStream {
 
 int main(int argc, char **argv)
 {
-	if (argc != 2) {
-		std::cout << "usage:: " << argv[0] << " <file.ts>" << std::endl;
+	if (argc != 3) {
+		std::cout << "usage:: " << argv[0] << " <file.ts> <packet size>" << std::endl;
 
 		return -1;
 	}
 
 	jmpeg::DemuxManager *manager = jmpeg::DemuxManager::GetInstance();
-	ISDBTInputStream is(argv[1], 204);
+	ISDBTInputStream is(argv[1], atoi(argv[2]));
 
 	manager->SetInputStream(&is);
 	manager->Start();

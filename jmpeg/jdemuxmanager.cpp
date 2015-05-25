@@ -131,7 +131,6 @@ void DemuxManager::Run()
 	}
 
 	std::map<int, std::string> timeline;
-	std::vector<int> last_pids;
 
 	while (_is_running) {
 		jthread::AutoLock lock(&_demux_sync_mutex);
@@ -152,7 +151,7 @@ void DemuxManager::Run()
 			continue;
 		}
 
-		// int transport_error_indicator = TS_GM8(data+1, 0, 1);
+		int transport_error_indicator = TS_GM8(data+1, 0, 1);
 		int payload_unit_start_indicator = TS_GM8(data+1, 1, 1);
 		// int transport_priority = TS_GM8(data+1, 2, 1);
 		int pid = TS_GM16(data+1, 3, 13);
@@ -161,64 +160,55 @@ void DemuxManager::Run()
 		int contains_payload = TS_GM8(data+3, 3, 1);
 		// int continuity_counter = TS_GM8(data+3, 4, 4);
 
+		if (transport_error_indicator == 1) {
+			continue;
+		}
+
 		if (contains_payload == 0) {
 			continue;
 		}
 
 		const char *ptr = data+TS_HEADER_LENGTH;
-		const char *end = ptr+TS_PACKET_LENGTH;
+		const char *end = data+TS_PACKET_LENGTH;
 
 		// INFO:: discards adaptation field
 		if (adaptation_field_exist == 1) {
-			int adaptation_field_length = TS_G8(data+4);
+			int adaptation_field_length = TS_G8(ptr);
 
-			ptr = ptr + adaptation_field_length;
+			ptr = ptr + adaptation_field_length + 1;
 		}
 
 		std::string current;
 		std::string previous;
-		int previous_pid = -1;
-		int tid = -1;
 		int section_length = -1;
 
 		if (payload_unit_start_indicator == 1) {
 			int pointer_field = TS_G8(ptr);
 
 			if (pointer_field > 0) {
-				if (last_pids.size() > 0) {
-					previous = timeline[last_pids.back()];
+				previous = timeline[pid];
 
-					last_pids.pop_back();
-
-					if (previous.size() > 0) {
-						previous.append(ptr+1, pointer_field);
-
-						previous_pid = pid;
-					}
+				if (previous.size() > 0) {
+					previous.append(ptr+1, pointer_field);
 				}
 			}
 
 			ptr = ptr + pointer_field + 1;
 
-			if (ptr >= end) {
-				continue;
+			if (ptr < end) {
+				section_length = TS_PSI_G_SECTION_LENGTH(ptr) + 3;
+
+				if (section_length > 3) {
+					int length = end - ptr;
+					int chunk = section_length;
+
+					if (chunk > length) {
+						chunk = length;
+					}
+
+					current = std::string(ptr, chunk);
+				}
 			}
-
-			tid = TS_G8(ptr);
-			section_length = TS_PSI_G_SECTION_LENGTH(ptr) + 3;
-
-			int length = end-ptr-4;
-			int chunk_length = section_length;
-
-			if (section_length > length) {
-				chunk_length = length;
-			}
-
-			if (section_length == 3) {
-				continue;
-			}
-
-			current = std::string(ptr, chunk_length);
 		} else {
 			current = timeline[pid];
 
@@ -226,34 +216,24 @@ void DemuxManager::Run()
 				continue;
 			}
 
-			tid = TS_G8(current.data());
 			section_length = TS_PSI_G_SECTION_LENGTH(current.data()) + 3;
 
-			int length = end-ptr-4;
-			int chunk_length = section_length - current.size();
+			int length = end - ptr;
 
-			if (chunk_length > length) {
-				chunk_length = length;
+			if (length < 0) {
+				continue;
 			}
 
-			current.append(ptr, chunk_length);
+			int chunk = section_length - current.size();
+
+			if (chunk > length) {
+				chunk = length;
+			}
+
+			current.append(ptr, chunk);
 		}
 
-		if (section_length == (int)current.size()) {
-			timeline[pid].clear();
-			
-			std::vector<int>::iterator i = std::find(last_pids.begin(), last_pids.end(), pid);
-			
-			if (i != last_pids.end()) {
-				last_pids.erase(i);
-			}
-		} else {
-			timeline[pid] = current;
-		
-			if (std::find(last_pids.begin(), last_pids.end(), pid) == last_pids.end()) {
-				last_pids.push_back(pid);
-			}
-		}
+		timeline[pid] = current;
 
 		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
 			Demux *demux = (*i);
@@ -279,23 +259,26 @@ void DemuxManager::Run()
 				} else if (demux->GetType() == JMDT_PSI) {
 					if (section_length == (int)current.size()) {
 						if (demux->Append(current.c_str(), current.size()) == true) {
+							int tid = TS_G8(current.data());
+
 							_demux_status[demux].found = true;
 
 							demux->DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, current.data(), current.size(), pid, tid));
 						}
 					}
-				}
-			}
+					
+					// INFO:: previous section
+					if (previous.size() > 0) {
+						int section_length = TS_PSI_G_SECTION_LENGTH(previous.data()) + 3;
 
-			if (demux->GetPID() < 0 || demux->GetPID() == previous_pid) {
-				if (demux->GetType() == JMDT_PSI) {
-					int section_length = TS_PSI_G_SECTION_LENGTH(previous.data()) + 3;
+						if (section_length == (int)previous.size()) {
+							if (demux->Append(previous.c_str(), previous.size()) == true) {
+								int tid = TS_G8(previous.data());
 
-					if (section_length == (int)previous.size()) {
-						if (demux->Append(previous.c_str(), previous.size()) == true) {
-							_demux_status[demux].found = true;
+								_demux_status[demux].found = true;
 
-							demux->DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, previous.data(), previous.size(), pid, tid));
+								demux->DispatchDemuxEvent(new DemuxEvent(this, JDET_DATA_ARRIVED, previous.data(), previous.size(), pid, tid));
+							}
 						}
 					}
 				}
