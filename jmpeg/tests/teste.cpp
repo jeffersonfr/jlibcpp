@@ -204,42 +204,41 @@ class DemuxTest : public jmpeg::DemuxListener {
 
 		virtual void DescriptorDump(const char *data, int length)
 		{
-			const char *ptr = data;
-
-			int descriptor_tag = TS_G8(ptr);
-			int descriptor_length = TS_G8(ptr+1);
+			int descriptor_tag = TS_G8(data);
+			int descriptor_length = length-2; // TS_G8(data+1);
+			const char *ptr = data+2;
 
 			printf("Descriptor:: tag:[0x%02x], length:[%d]::[%s]\n", descriptor_tag, descriptor_length, GetDescriptorName(descriptor_tag).c_str());
 
 			if (descriptor_tag == 0x00) { // transport protocol tag
-				int application_profile_length = TS_G8(ptr+2);
+				int application_profile_length = TS_G8(ptr);
 
 				printf(":: application profile length:[%d]\n", application_profile_length);
 
 				int profile_current_byte = 0;
 
 				while (profile_current_byte < application_profile_length) {
-					int application_profile = TS_G16(ptr+profile_current_byte+3);
-					int version_major = TS_G8(ptr+profile_current_byte+5);
-					int version_minor = TS_G8(ptr+profile_current_byte+6);
-					int version_micro = TS_G8(ptr+profile_current_byte+7);
+					int application_profile = TS_G16(ptr+profile_current_byte+1);
+					int version_major = TS_G8(ptr+profile_current_byte+3);
+					int version_minor = TS_G8(ptr+profile_current_byte+4);
+					int version_micro = TS_G8(ptr+profile_current_byte+5);
 
 					printf(":: application profile:[0x%04x], version:[%d.%d.%d]\n", application_profile, version_major, version_minor, version_micro);
 
 					profile_current_byte += 5;	
 				}
 
-				// int bound_visibility = TS_G8(ptr+profile_current_byte+3);
+				// int bound_visibility = TS_G8(ptr+profile_current_byte+1);
 				// int bound_flag = (bound_visibility & 0x80) >> 7;
 				// int visibility = (bound_visibility & 0x60) >> 5;
-				// int application_priotiry = TS_G8(ptr+profile_current_byte+4);
+				// int application_priotiry = TS_G8(ptr+profile_current_byte+2);
 			} else if (descriptor_tag == 0x01) { // application name descriptor
 				int count = 0;
 
 				while (count < descriptor_length) {
-					std::string language_code = std::string((ptr+2+count), 3);
-					int name_length = TS_G8(ptr+5+count);
-					std::string name = std::string(ptr+6+count, name_length);
+					std::string language_code = std::string((ptr+count), 3);
+					int name_length = TS_G8(ptr+3+count);
+					std::string name = std::string(ptr+4+count, name_length);
 
 					printf(":: application language:[%s], name:[%s]\n", language_code.c_str(), name.c_str());
 
@@ -248,23 +247,23 @@ class DemuxTest : public jmpeg::DemuxListener {
 					break; // we can get more than one app name ='[
 				}	
 			} else if (descriptor_tag == 0x02) { // transport protocol
-				int protocol_id = TS_G16(ptr+2);
-				int transpor_protocol_label = TS_G8(ptr+4);
+				int protocol_id = TS_G16(ptr);
+				int transpor_protocol_label = TS_G8(ptr+2);
 
 				printf(":: transport protocol tag:[0x%04x], transport_protocol_label:[0x%02x]\n", protocol_id, transpor_protocol_label);
 
 				if (protocol_id == 0x01) {
-					int remote_connection = TS_GM8(ptr+5, 0, 1);
+					int remote_connection = TS_GM8(ptr+3, 0, 1);
 
 					if (remote_connection == 0x01) {
-						int original_network_id = TS_G16(ptr+6);
-						int transport_stream_id = TS_G16(ptr+8);
-						int service_id = TS_G16(ptr+10);
-						int component_tag = TS_G8(ptr+11);
+						int original_network_id = TS_G16(ptr+4);
+						int transport_stream_id = TS_G16(ptr+6);
+						int service_id = TS_G16(ptr+8);
+						int component_tag = TS_G8(ptr+9);
 
 						printf(":: original network id:[0x%04x], transport_stream_id:[0x%04x], service id:[0x%04x], component tag:[0x%04x]\n", original_network_id, transport_stream_id, service_id, component_tag);
 					} else {
-						int component_tag = TS_G8(ptr+6);
+						int component_tag = TS_G8(ptr+4);
 
 						printf(":: component tag:[0x%04x]\n", component_tag);
 					}
@@ -273,49 +272,241 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int count = 0;
 
 				while (count < descriptor_length) {
-					int param_length = TS_G8(ptr+2+count);
-					std::string param(ptr+2+count, param_length);
+					int param_length = TS_G8(ptr+count);
+					std::string param(ptr+count+1, param_length);
 
 					printf(":: param:[%s]\n", param.c_str());
 
 					count = count + 1 + param_length;
 				}
 			} else if (descriptor_tag == 0x04 || descriptor_tag == 0x07) {  // gingaj location descriptor, gingancl location descriptor
-				int base_directory_length = TS_G8(ptr+2);
-				std::string base_directory(ptr+3, base_directory_length);
-				int class_extension_length = TS_G8(ptr+3+base_directory_length);
-				std::string class_extension = std::string(ptr+4+base_directory_length, class_extension_length);
+				int base_directory_length = TS_G8(ptr);
+				std::string base_directory(ptr+1, base_directory_length);
+				int class_extension_length = TS_G8(ptr+1+base_directory_length);
+				std::string class_extension = std::string(ptr+2+base_directory_length, class_extension_length);
 				int main_file_length = descriptor_length-base_directory_length-class_extension_length-2;
-				std::string main_file = std::string(ptr+4+base_directory_length+class_extension_length, main_file_length);
+				std::string main_file = std::string(ptr+2+base_directory_length+class_extension_length, main_file_length);
 
 				printf(":: base_directory:[%s], class extension:[%s], main_file:[%s]\n", base_directory.c_str(), class_extension.c_str(), main_file.c_str());
+			} else if (descriptor_tag == 0x13) { // carousel identifier descriptor
+				const char *end = ptr + descriptor_length;
+
+				int carousel_id = TS_G32(ptr);
+				int format_id = TS_G8(ptr+4);
+				std::string format = "No FormatterSpecifier";
+
+				if (format_id == 0x01) {
+					format = "This FormatSpecifier is an aggregation of the fields necessary to locate the ServiceGateway";
+				} else if (format_id > 0x01 && format_id <= 0x7f) {
+					format = "Reserved for future use of DVB";
+				} else if (format_id > 0x7f && format_id <= 0xff) {
+					format = "Reserved for private use";
+				}
+
+				printf(":: carousel id:[0x%02x], format id:[0x%02x]::[%s]\n", carousel_id, format_id, format.c_str());
+
+				ptr = ptr + 5;
+
+				if (format_id == 0x01) {
+					int module_version = TS_G8(ptr);
+					int module_id = TS_G16(ptr+1);
+					// int block_size = TS_G16(ptr+3);
+					// int module_size = TS_G32(ptr+5);
+					// int compression_method = TS_G8(ptr+9);
+					// int original_size = TS_G32(ptr+10);
+					int timeout = TS_G8(ptr+14);
+					int object_key_length = TS_G8(ptr+15);
+
+					printf(":: module version:[0x%02x], module id:[0x%04x], timeout:[%d]\n", module_version, module_id, timeout);
+				
+					if (object_key_length > 0) {
+						DumpBytes("ObjectKey Data", ptr+16, object_key_length);
+					}
+
+					ptr = ptr + 16 + object_key_length;
+				}
+				
+				int private_length = end-ptr;
+
+				if (private_length > 0) {
+					DumpBytes("Private Data", ptr, private_length);
+				}
+			} else if (descriptor_tag == 0x14) { // association tag descriptor
+				const char *end = ptr + descriptor_length;
+
+				int association_tag = TS_G16(ptr);
+				int use_id = TS_G16(ptr+2);
+				std::string use = "Unknown";
+
+				if (use_id == 0x0000) {
+					use = "DSI with IOR of SGW";
+				} else if (use_id >= 0x0100 && use_id <= 0x1fff) {
+					use = "DVD reserved";
+				} else if (use_id >= 0x2000 && use_id <= 0xffff) {
+					use = "User private";
+				}
+
+				printf(":: association tag:[0x%04x], use id:[0x%04x]::[%s]\n", association_tag, use_id, use.c_str());
+
+				int selector_length = TS_G8(ptr+4);
+
+				/*
+				if (use_id == 0x0000) {
+					// selection_length == 0x08
+					int transation_id = TS_G32(ptr+5);
+					int timeout = TS_G16(ptr+9);
+				} else if (use_id == 0x0001) {
+					// selection_length == 0x00
+				} else {
+					DumpBytes("Private Data", ptr+5, selector_length);
+				}
+				*/
+					
+				if (selector_length > 0) {
+					DumpBytes("Selector Bytes", ptr+5, selector_length);
+				}
+
+				ptr = ptr + 5 + selector_length;
+
+				int private_length = end-ptr;
+
+				if (private_length > 0) {
+					DumpBytes("Private Data", ptr, private_length);
+				}
+			} else if (descriptor_tag == 0x15) { // extension_tag_descriptor or deferred association tags descriptor
+				const char *end = ptr + descriptor_length;
+
+				int association_tags_loop_length = TS_G8(ptr);
+
+				for (int i=0; i<association_tags_loop_length; i+=2) {
+					int association_tag = TS_G16(ptr+1+i);
+
+					printf(":: association tag:[%d] = 0x%04x\n", i, association_tag);
+				}
+
+				ptr = ptr + association_tags_loop_length;
+
+				int transport_stream_id = TS_G16(ptr);
+				int program_number = TS_G16(ptr+2);
+				int original_network_id = TS_G16(ptr+4);
+
+				printf(":: transport stream id:[0x%04x], program number:[0x%04x], original network id::[0x%04x]\n", transport_stream_id, program_number, original_network_id);
+
+				ptr = ptr + 6;
+
+				int private_length = end-ptr;
+
+				if (private_length > 0) {
+					DumpBytes("Private Data", ptr, private_length);
+				}
 			} else if (descriptor_tag == 0x40) { // network descriptor
-				std::string name(ptr+2, descriptor_length);
+				std::string name(ptr, descriptor_length);
 
 				name = Utils::ISO8859_1_TO_UTF8(name);
 
 				printf(":: name:[%s]\n", name.c_str());
+			} else if (descriptor_tag == 0x41) { // service list descriptor
+				int services_loop_length = descriptor_length;
+				int services_loop_count = 0;
+
+				while (services_loop_count < services_loop_length) {
+					int service_id = TS_G16(ptr);
+					int service_type = TS_G8(ptr+2);
+					std::string service = "Reserved for future use";
+
+					if (service_type == 0x01) {
+						service = "Digital television service";
+					} else if (service_type == 0x02) {
+						service = "Digital radio sound service";
+					} else if (service_type == 0x03) {
+						service = "Teletext ser";
+					} else if (service_type == 0x04) {
+						service = "NVOD reference service ";
+					} else if (service_type == 0x05) {
+						service = "NVOD time-shifted service";
+					} else if (service_type == 0x06) {
+						service = "Mosaic ser";
+					} else if (service_type == 0x07) {
+						service = "FM radio service";
+					} else if (service_type == 0x08) {
+						service = "DVB SRM service ";
+					} else if (service_type == 0x09) {
+						service = "Reserved for future use";
+					} else if (service_type == 0x0a) {
+						service = "Advanced codec digital radio sound service";
+					} else if (service_type == 0x0b) {
+						service = "Advanced codec mosaic service";
+					} else if (service_type == 0x0c) {
+						service = "Data broadcast service";
+					} else if (service_type == 0x0d) {
+						service = "Reserved for Common Interface Usage (EN 50221 [37])";
+					} else if (service_type == 0x0e) {
+						service = "RCS Map (see EN 301 790 [7])";
+					} else if (service_type == 0x0f) {
+						service = "RCS FLS (see EN 301 790 [7])";
+					} else if (service_type == 0x10) {
+						service = "DB MHP service";
+					} else if (service_type == 0x11) {
+						service = "MPEG-2 HD digital television service";
+					} else if (service_type == 0x12) {
+						service = "Reserved for future use";
+					} else if (service_type == 0x13) {
+						service = "Reserved for future use";
+					} else if (service_type == 0x14) {
+						service = "Reserved for future use";
+					} else if (service_type == 0x15) {
+						service = "Reserved for future use";
+					} else if (service_type == 0x16) {
+						service = "Advanced codec SD digital television service";
+					} else if (service_type == 0x17) {
+						service = "Advanced codec SD NVOD time-shifted service";
+					} else if (service_type == 0x18) {
+						service = "Advanced codec SD NVOD reference service";
+					} else if (service_type == 0x19) {
+						service = "Advanced codec HD digital television service";
+					} else if (service_type == 0x1a) {
+						service = "Advanced codec HD NVOD time-shifted service";
+					} else if (service_type == 0x1b) {
+						service = "Advanced codec HD NVOD reference service";
+					} else if (service_type >= 0x1c && service_type <= 0x7f) {
+						service = "Reserved for future use";
+					} else if (service_type >= 0x80 && service_type <= 0xfe) {
+						service = "User defined";
+					} else if (service_type == 0xff) {
+						service = "Reserved for future use";
+					}
+
+					printf(":: service id:[0x%04x], service type:[0x%02x]::[%s]\n", service_id, service_type, service.c_str());
+
+					ptr = ptr + 3;
+
+					services_loop_count = services_loop_count + 3;
+				}
 			} else if (descriptor_tag == 0x48) { // service descriptor
-				int service_type = TS_G8(ptr+2); // 0x01: HD, 0xXX: LD
-				int service_provider_name_length = TS_G8(ptr+3);
-				std::string service_provider_name(ptr+4, service_provider_name_length);
-				int service_name_length = TS_G8(ptr+4+service_provider_name_length);
-				std::string service_name(ptr+5+service_provider_name_length, service_name_length);
+				int service_type = TS_G8(ptr); // 0x01: HD, 0xXX: LD
+				int service_provider_name_length = TS_G8(ptr+1);
+				std::string service_provider_name(ptr+2, service_provider_name_length);
+				int service_name_length = TS_G8(ptr+2+service_provider_name_length);
+				std::string service_name(ptr+3+service_provider_name_length, service_name_length);
 
 				service_provider_name = Utils::ISO8859_1_TO_UTF8(service_provider_name);
 				service_name = Utils::ISO8859_1_TO_UTF8(service_name);
 
 				printf(":: service type:[0x%02x], service provider name:[%s], service name:[%s]\n", service_type, service_provider_name.c_str(), service_name.c_str());
 			} else if (descriptor_tag == 0x4d) { // short event descriptor
-				std::string language = std::string(ptr+2, 3);
-				int event_name_length = TS_G8(ptr+5);
-				std::string event_name(ptr+5+1, event_name_length);
-				int text_length = TS_G8(ptr+6+event_name_length);
-				std::string text(ptr+6+1+event_name_length, text_length);
+				std::string language = std::string(ptr, 3);
+				int event_name_length = TS_G8(ptr+3);
+				std::string event_name(ptr+3+1, event_name_length);
+				int text_length = TS_G8(ptr+4+event_name_length);
+				std::string text(ptr+4+1+event_name_length, text_length);
 
 				printf(":: language:[%s], event name:[%s], text:[%s]\n", language.c_str(), event_name.c_str(), text.c_str());
+			} else if (descriptor_tag == 0x52) { // stream identifier descriptor
+				int component_tag = TS_G8(ptr);
+
+				printf(":: component tag:[0x%02x]\n", component_tag);
 			} else if (descriptor_tag == 0x54) { // content descriptor
-				int content_nibble = TS_G8(ptr+2);
+				int content_nibble = TS_G8(ptr);
 
 				int genre = (content_nibble >> 4) & 0x0f;
 				int genre_description = (content_nibble >> 0) & 0x0f;
@@ -454,8 +645,8 @@ class DemuxTest : public jmpeg::DemuxListener {
 					}
 				}
 			} else if (descriptor_tag == 0x55) { // parental rating descriptor
-				std::string country = std::string(ptr+2, 3);
-				int rate = TS_G8(ptr+5);
+				std::string country = std::string(ptr, 3);
+				int rate = TS_G8(ptr+3);
 
 				int rate_age = (rate >> 0) & 0xff; 
 				int rate_content = (rate >> 4) & 0x0f;
@@ -480,9 +671,82 @@ class DemuxTest : public jmpeg::DemuxListener {
 
 				printf(":: country:[%s], age:[%d], content:[%s]\n", country.c_str(), rate_age, content.c_str());
 			} else if (descriptor_tag == 0xcd) { // ts information descriptor 
-				int number = TS_G16(ptr+2);
+				const char *end = ptr + descriptor_length;
 
-				printf(":: channel number:[0x%04x]\n", number);
+				int remote_control_key_identification = TS_G8(ptr);
+				int ts_name_length = TS_GM8(ptr+1, 0, 6);
+				int transmission_type_count = TS_GM8(ptr+1, 6, 2);
+				std::string ts_name(ptr+2, ts_name_length);
+
+				printf(":: remote control key identification:[0x%02x], ts name:[%s]\n", remote_control_key_identification, ts_name.c_str());
+
+				ptr = ptr + 2 + ts_name_length;
+
+				if (transmission_type_count > 0) {
+					for (int i=0; i<transmission_type_count; i++) {
+						// CHANGE:: service_number should come after transmission_type_count2
+						int service_number = TS_G8(ptr);
+						int transmission_type_count2 = TS_G8(ptr+1);
+					
+						for (int j=0; j<transmission_type_count2; j++) {
+							int service_identification = TS_G16(ptr+2+j);
+
+							printf(":: service number:[0x%02x], service identification:[0x%04x]\n", service_number, service_identification);
+
+							ptr = ptr + 2;
+						}
+
+						ptr = ptr + 2;
+					}
+				}
+				
+				int private_length = end-ptr;
+
+				if (private_length > 0) {
+					DumpBytes("Private Data", ptr, private_length);
+				}
+			} else if (descriptor_tag == 0xfa) { // terrestrial delivery system descriptor
+				int area_code = TS_GM16(ptr, 0, 12);
+				int guard_interval = TS_GM16(ptr, 12, 2);
+				int transmission_mode = TS_GM16(ptr, 14, 2);
+
+				printf(":: area code:[%d], guard interval:[%d], tramission mode:[%d]\n", area_code, guard_interval, transmission_mode);
+
+				int count = (descriptor_length - 2)/2;
+				
+				ptr = ptr + 2;
+
+				for (int i=0; i<count; i++) {
+					int frequency = TS_G16(ptr);
+
+					printf(":: frequency:[%d]\n", frequency);
+
+					ptr = ptr + 2;
+				}
+			} else if (descriptor_tag == 0xfb) { // partial reception descriptor
+				int count = descriptor_length/2;
+
+				for (int i=0; i<count; i++) {
+					int service_id = TS_G16(ptr);
+
+					printf(":: service id:[0x%04x]\n", service_id);
+
+					ptr = ptr + 2;
+				}
+			} else if (descriptor_tag == 0xfe) { // system management descriptor
+				int system_management_id = TS_G16(ptr);
+
+				printf(":: system management id:[0x%04x]\n", system_management_id);
+
+				int count = (descriptor_length - 2);
+
+				ptr = ptr + 2;
+
+				if (count > 0) {
+					DumpBytes("Additional Identifier Info", ptr, count);
+				}
+			} else {
+				DumpBytes("Data", ptr, descriptor_length);
 			}
 		}
 
@@ -497,7 +761,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					pid, 
 					tid, 
 					len
-			);
+					);
 
 			_pids.insert(pid);
 
@@ -594,7 +858,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 				// int descriptor_tag = TS_G8(ptr);
 				int descriptor_length = TS_G8(ptr+1);
 
-				DescriptorDump(ptr, descriptor_length);
+				DescriptorDump(ptr, descriptor_length+2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -618,7 +882,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 				// int descriptor_tag = TS_G8(ptr);
 				int descriptor_length = TS_G8(ptr+1);
 
-				DescriptorDump(ptr, descriptor_length);
+				DescriptorDump(ptr, descriptor_length+2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -647,7 +911,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 				// int descriptor_tag = TS_G8(ptr);
 				int descriptor_length = TS_G8(ptr+1);
 
-				DescriptorDump(ptr, descriptor_length);
+				DescriptorDump(ptr, descriptor_length+2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -695,7 +959,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					DescriptorDump(ptr, descriptor_length);
+					DescriptorDump(ptr, descriptor_length+2);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -728,7 +992,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 				// int descriptor_tag = TS_G8(ptr);
 				int descriptor_length = TS_G8(ptr+1);
 
-				DescriptorDump(ptr, descriptor_length);
+				DescriptorDump(ptr, descriptor_length+2);
 
 				ptr = ptr + descriptor_length + 2;
 
@@ -757,7 +1021,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					DescriptorDump(ptr, descriptor_length);
+					DescriptorDump(ptr, descriptor_length+2);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -802,7 +1066,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					DescriptorDump(ptr, descriptor_length);
+					DescriptorDump(ptr, descriptor_length+2);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -896,7 +1160,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 
-					DescriptorDump(ptr, descriptor_length);
+					DescriptorDump(ptr, descriptor_length+2);
 
 					ptr = ptr + descriptor_length + 2;
 
@@ -938,7 +1202,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 	
-					DescriptorDump(ptr, descriptor_length);
+					DescriptorDump(ptr, descriptor_length+2);
 	
 					ptr = ptr + descriptor_length + 2;
 	
@@ -966,7 +1230,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 						// int descriptor_tag = TS_G8(ptr);
 						int descriptor_length = TS_G8(ptr+1);
 
-						DescriptorDump(ptr, descriptor_length);
+						DescriptorDump(ptr, descriptor_length+2);
 
 						ptr = ptr + descriptor_length + 2;
 
