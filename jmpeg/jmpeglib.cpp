@@ -110,6 +110,7 @@ std::string GetStreamTypeDescription(int stream_type)
 
 std::string GetDescriptorName(int descriptor_tag)
 {
+	/*
 	switch (descriptor_tag) {
 		// INFO:: T-REC-H.222.0-200605-PDF-E.pdf
 		case 0x00: return "reserved";
@@ -160,24 +161,58 @@ std::string GetDescriptorName(int descriptor_tag)
 		default:
 							 break;
 	}
+	*/
 
 	switch (descriptor_tag) {
 		// INFO:: ABNTNBR15606-3_2007Vc_2008.pdf
-		case 0x00: return "application_descriptor";
-		case 0x01: return "application_name_descriptor";
-		case 0x02: return "transport_protocol_descriptor";
-		case 0x03: return "gingaj_application_descriptor";
-		case 0x04: return "gingaj_application_location descriptor";
-		case 0x05: return "external_application_authorization_descriptor";
-		case 0x06: return "gingancl_application_descriptor";
-		case 0x07: return "gingancl_application_location descriptor";
-		case 0x0b: return "application_icons_descriptor";
-		case 0x0c: return "application_icons_descriptor";
-		case 0x0d: return "dii_location_descriptor";
+		// INFO:: ABNTNBR15603-1_2007Vc_2008.pdf
+		case 0x09: return "conditional_access_descriptor";
+		case 0x0d: return "copyright_descriptor";
 		case 0x11: return "ip_signalling_descriptor";
-		case 0x13: return "carousel_id_descriptor";
+		case 0x13: return "carousel_identifier_descriptor";
 		case 0x14: return "association_tag_descriptor";
-		case 0x15: return "extension_tag_descriptor";
+		case 0x15: return "extension_tag_descriptor"; // deferred_association_tags_descriptor
+		case 0x28: return "avc_video_descriptor";
+		case 0x2a: return "avc_timing_and_hrd_descriptor";
+		case 0xc0: return "hierarchical_transmission_descriptor";
+		case 0xc1: return "digital_copy_control_descriptor";
+		case 0xc2: return "network_identifier_descriptor";
+		case 0xc3: return "partial_transport_stream_time_descriptor";
+		case 0xc4: return "audio_component_descriptor";
+		case 0xc5: return "hyperlink_descriptor";
+		case 0xc6: return "target_area_descriptor";
+		case 0xc7: return "data_contents_descriptor";
+		case 0xc8: return "video_decode_control_descriptor";
+		case 0xc9: return "download_content_descriptor";
+		case 0xca: return "ca_emm_ts_descriptor";
+		case 0xcb: return "ca_contract_information_descriptor";
+		case 0xcc: return "ca_service_descriptor";
+		case 0xcd: return "ts_information_descriptor";
+		case 0xce: return "extender_broadcaster_descriptor";
+		case 0xcf: return "logo_transmission_descriptor";
+		case 0xd0: return "basic_local_event_descriptor";
+		case 0xd1: return "reference_descriptor";
+		case 0xd2: return "node_relation_descriptor";
+		case 0xd3: return "short_node_information_descriptor";
+		case 0xd4: return "stc_reference_descriptor";
+		case 0xd5: return "series_descriptor";
+		case 0xd6: return "event_group_descriptor";
+		case 0xd7: return "si_parameter_descriptor";
+		case 0xd8: return "broadcaster_name_descriptor";
+		case 0xd9: return "component_group_descriptor";
+		case 0xda: return "si_prime_ts_descriptor";
+		case 0xdb: return "board_information_descriptor";
+		case 0xdc: return "ldt_linkage_descriptor";
+		case 0xdd: return "connected_transmission_descriptor";
+		case 0xde: return "content_availability_descriptor";
+		case 0xe0: return "service_group_descriptor";
+		case 0xf7: return "carousel_compatible_composited_descriptor";
+		case 0xf8: return "conditional_playback_descriptor";
+		case 0xfa: return "terrestrial_delivery_system_descriptor";
+		case 0xfb: return "partial_reception_descriptor";
+		case 0xfc: return "emergency_information_descriptor";
+		case 0xfd: return "data_component_descriptor";
+		case 0xfe: return "system_management_descriptor";
 		default:
 							 break;
 	}
@@ -248,9 +283,6 @@ std::string GetDescriptorName(int descriptor_tag)
 		case 0x7d: return "XAIT location descriptor";
 		case 0x7e: return "FTA_content_management_descriptor";
 		case 0x7f: return "extension descriptor";
-		case 0xc7: return "data_contents_descriptor";
-		case 0xcd: return "ts_information_descriptor";
-		case 0xfd: return "data_coding_descriptor";
 		case 0xff: return "forbidden";
 		default: 
 							 break;

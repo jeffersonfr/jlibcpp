@@ -202,15 +202,43 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 		}
 
-		virtual void DescriptorDump(const char *data, int length)
+		std::string GetAITDescriptorName(int descriptor_tag)
+		{
+			switch (descriptor_tag) {
+				// INFO:: ABNTNBR15606-3 (2012).pdf
+				case 0x00: return "application_descriptor";
+				case 0x01: return "application_name_descriptor";
+				case 0x02: return "transport_protocol_descriptor";
+				case 0x03: return "gingaj_application_descriptor";
+				case 0x04: return "gingaj_application_location_descriptor";
+				case 0x05: return "external_application_authorization_descriptor";
+				case 0x06: return "gingancl_application_descriptor";
+				case 0x07: return "gingancl_application_location_descriptor";
+				case 0x08: 
+				case 0x09: 
+				case 0x0a: return "(NCL) reserved to the future";
+				case 0x0b: return "application_icons_descriptor";
+				case 0x0c: return "prefetch_descriptor";
+				case 0x0d: return "dii_location_descriptor";
+				case 0x11: return "ip_signalling_descriptor";
+				case 0x5f: return "private_data_specifier_descriptor";
+				case 0xfd: return "data_coding_descriptor";
+				default:
+									 break;
+			}
+
+			return "unknown descriptor";
+		}
+
+		virtual void AITDescriptorDump(const char *data, int length)
 		{
 			int descriptor_tag = TS_G8(data);
 			int descriptor_length = length-2; // TS_G8(data+1);
 			const char *ptr = data+2;
 
-			printf("Descriptor:: tag:[0x%02x], length:[%d]::[%s]\n", descriptor_tag, descriptor_length, GetDescriptorName(descriptor_tag).c_str());
+			printf("Descriptor:: tag:[0x%02x], length:[%d]::[%s]\n", descriptor_tag, descriptor_length, GetAITDescriptorName(descriptor_tag).c_str());
 
-			if (descriptor_tag == 0x00) { // transport protocol tag
+			if (descriptor_tag == 0x00) { // application descriptor
 				int application_profile_length = TS_G8(ptr);
 
 				printf(":: application profile length:[%d]\n", application_profile_length);
@@ -288,7 +316,62 @@ class DemuxTest : public jmpeg::DemuxListener {
 				std::string main_file = std::string(ptr+2+base_directory_length+class_extension_length, main_file_length);
 
 				printf(":: base_directory:[%s], class extension:[%s], main_file:[%s]\n", base_directory.c_str(), class_extension.c_str(), main_file.c_str());
-			} else if (descriptor_tag == 0x13) { // carousel identifier descriptor
+			} else if (descriptor_tag == 0x05) { // external application authorrisation descriptor
+				int count = 0;
+
+				while (count < descriptor_length) {
+					// TODO:: application_identifier()
+					// int application_priority = TS_G8(ptr+4);
+
+					ptr = ptr + 5;
+					count = count + 5;
+				}
+			} else if (descriptor_tag == 0x0b) { // application icons descriptor
+				int icon_locator_length = TS_G8(ptr);
+				std::string icon_locator(ptr+1, icon_locator_length);
+				int icon_flags = TS_G8(ptr+1+icon_locator_length);
+				
+				printf(":: icon locator:[%s], icon flags:[0x%02x]\n", icon_locator.c_str(), icon_flags);
+			} else if (descriptor_tag == 0x0c) { // prefetch descriptor
+				int transport_protocol_label = TS_G8(ptr);
+
+				printf(":: transport protocol label:[%d]\n", transport_protocol_label);
+
+				int loop_length = descriptor_length-1;
+				int count = 0;
+
+				ptr = ptr + 1;
+
+				while (count < loop_length) {
+					int label_length = TS_G8(ptr);
+					std::string label(ptr+1+label_length);
+					int prefetch_priority = TS_G8(ptr+1+label_length);
+
+					printf(":: label:[%s], prefetch priority:[0x%02x]\n", label.c_str(), prefetch_priority);
+
+					ptr = ptr + 1 + label_length + 1;
+					count = count + 1 + label_length + 1;
+				}
+			} else if (descriptor_tag == 0x0d) { // dii location descriptor
+			} else if (descriptor_tag == 0x11) { // ip signalling descriptor
+				int platform_id = TS_GM32(ptr, 0, 24);
+
+				printf(":: ip signaliing:[%d]\n", platform_id);
+			// } else if (descriptor_tag == 0xfd) { // data coding descriptor
+			} else {
+				DumpBytes("Data", ptr, descriptor_length);
+			}
+		}
+
+		virtual void DescriptorDump(const char *data, int length)
+		{
+			int descriptor_tag = TS_G8(data);
+			int descriptor_length = length-2; // TS_G8(data+1);
+			const char *ptr = data+2;
+
+			printf("Descriptor:: tag:[0x%02x], length:[%d]::[%s]\n", descriptor_tag, descriptor_length, GetDescriptorName(descriptor_tag).c_str());
+
+			if (descriptor_tag == 0x13) { // carousel identifier descriptor
 				const char *end = ptr + descriptor_length;
 
 				int carousel_id = TS_G32(ptr);
@@ -501,6 +584,29 @@ class DemuxTest : public jmpeg::DemuxListener {
 				std::string text(ptr+4+1+event_name_length, text_length);
 
 				printf(":: language:[%s], event name:[%s], text:[%s]\n", language.c_str(), event_name.c_str(), text.c_str());
+			} else if (descriptor_tag == 0x49) { // country availability descriptor
+				int country_availability_flag = TS_G8(ptr);
+				std::string country(ptr+1, 3);
+				
+				printf(":: country availability flag:[%d], country:[%s]\n", country_availability_flag, country.c_str());
+			} else if (descriptor_tag == 0x50) { // component descriptor 
+				const char *end = ptr + descriptor_length;
+
+				// int reserved = TS_GM8(ptr, 0, 4);
+				int stream_content = TS_GM8(ptr, 4, 4);
+				int component_type = TS_G8(ptr+1);
+				int component_tag = TS_G8(ptr+2);
+				std::string language(ptr+3, 3);
+
+				printf(":: stream content:[0x%02x], component type:[0x%02x], component tag:[0x%02x], language:[%s]\n", stream_content, component_type, component_tag, language.c_str());
+
+				ptr = ptr + 6;
+
+				int private_length = end-ptr;
+
+				if (private_length > 0) {
+					DumpBytes("Text Char", ptr, private_length);
+				}
 			} else if (descriptor_tag == 0x52) { // stream identifier descriptor
 				int component_tag = TS_G8(ptr);
 
@@ -670,6 +776,33 @@ class DemuxTest : public jmpeg::DemuxListener {
 				}
 
 				printf(":: country:[%s], age:[%d], content:[%s]\n", country.c_str(), rate_age, content.c_str());
+			} else if (descriptor_tag == 0x7d) { // aac descriptor
+				const char *end = ptr + descriptor_length;
+
+				int profile_and_level = TS_G8(ptr);
+
+				printf(":: profile and level:[%d]\n", profile_and_level);
+
+				if (descriptor_length > 1) {
+					int aac_type_flag = TS_GM8(ptr+1, 0, 1);
+					int aac_type = -1;
+
+					ptr = ptr + 2;
+
+					if (aac_type_flag == 0x01) {
+						aac_type = TS_G8(ptr);
+
+						ptr = ptr + 1;
+					}
+	
+					printf(":: aac type flag:[%d], aac type:[%d]\n", aac_type_flag, aac_type);
+
+					int private_length = end-ptr;
+
+					if (private_length > 0) {
+						DumpBytes("Additional Info", ptr, private_length);
+					}
+				}
 			} else if (descriptor_tag == 0xcd) { // ts information descriptor 
 				const char *end = ptr + descriptor_length;
 
@@ -732,6 +865,14 @@ class DemuxTest : public jmpeg::DemuxListener {
 					printf(":: service id:[0x%04x]\n", service_id);
 
 					ptr = ptr + 2;
+				}
+			} else if (descriptor_tag == 0xfd) { // data component descriptor
+				int data_coding_method_id = TS_G16(ptr);
+
+				printf(":: data coding method id:[0x%04x]\n", data_coding_method_id);
+
+				if (descriptor_length > 2) {
+					DumpBytes("Additional Identifier Info", ptr+2, descriptor_length-2);
 				}
 			} else if (descriptor_tag == 0xfe) { // system management descriptor
 				int system_management_id = TS_G16(ptr);
@@ -1202,7 +1343,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					// int descriptor_tag = TS_G8(ptr);
 					int descriptor_length = TS_G8(ptr+1);
 	
-					DescriptorDump(ptr, descriptor_length+2);
+					AITDescriptorDump(ptr, descriptor_length+2);
 	
 					ptr = ptr + descriptor_length + 2;
 	
@@ -1218,8 +1359,27 @@ class DemuxTest : public jmpeg::DemuxListener {
 					int oid = TS_G32(ptr);	
 					int aid = TS_G16(ptr+4);
 					int application_control_code = TS_G8(ptr+6);
+					std::string control_code = "Reserved to the future";
 
-					printf("AIT:: aid:[0x%04x], oid:[0x%04x], application control code:[0x%02x]\n", aid, oid, application_control_code);
+					if (application_control_code == 0x01) {
+						control_code = "AUTO_START";
+					} else if (application_control_code == 0x02) {
+						control_code = "PRESENT";
+					} else if (application_control_code == 0x03) {
+						control_code = "DESTROY";
+					} else if (application_control_code == 0x04) {
+						control_code = "KILL";
+					} else if (application_control_code == 0x05) {
+						control_code = "PREFETCH";
+					} else if (application_control_code == 0x06) {
+						control_code = "REMOTE";
+					} else if (application_control_code == 0x07) {
+						control_code = "UNBOUND";
+					} else if (application_control_code == 0x08) {
+						control_code = "STORE";
+					}
+
+					printf("AIT:: aid:[0x%04x], oid:[0x%04x], application control code:[0x%02x]::[%s]\n", aid, oid, application_control_code, control_code.c_str());
 
 					int descriptors_length = TS_GM16(ptr+7, 4, 12);
 					int descriptors_count = 0;
@@ -1230,7 +1390,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 						// int descriptor_tag = TS_G8(ptr);
 						int descriptor_length = TS_G8(ptr+1);
 
-						DescriptorDump(ptr, descriptor_length+2);
+						AITDescriptorDump(ptr, descriptor_length+2);
 
 						ptr = ptr + descriptor_length + 2;
 
