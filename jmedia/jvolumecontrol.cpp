@@ -40,7 +40,7 @@ void VolumeControl::SetLevel(int level)
 {
 }
 
-bool VolumeControl::IsMuted()
+bool VolumeControl::IsMute()
 {
 	return false;
 }

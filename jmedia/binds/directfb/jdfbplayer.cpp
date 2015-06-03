@@ -178,7 +178,7 @@ class VolumeControlImpl : public VolumeControl {
 			}
 		}
 		
-		virtual bool IsMuted()
+		virtual bool IsMute()
 		{
 			return _is_muted;
 		}

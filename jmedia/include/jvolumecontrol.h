@@ -60,7 +60,7 @@ class VolumeControl : public Control {
 		 * \brief
 		 *
 		 */
-		virtual bool IsMuted();
+		virtual bool IsMute();
 
 		/**
 		 * \brief
