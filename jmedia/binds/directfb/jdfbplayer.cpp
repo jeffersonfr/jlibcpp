@@ -274,12 +274,21 @@ class VideoFormatControlImpl : public VideoFormatControl {
 	
 	private:
 		DFBPlayer *_player;
+		jaspect_ratio_t _aspect_ratio;
+		jvideo_mode_t _video_mode;
+		jhd_video_format_t _hd_video_format;
+		jsd_video_format_t _sd_video_format;
 
 	public:
 		VideoFormatControlImpl(DFBPlayer *player):
 			VideoFormatControl()
 		{
 			_player = player;
+		
+			_aspect_ratio = LAR_16x9;
+			_video_mode = LVM_FULL;
+			_hd_video_format = LHVF_1080p;
+			_sd_video_format = LSVF_PAL_M;
 		}
 
 		virtual ~VideoFormatControlImpl()
@@ -288,18 +297,22 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual void SetAspectRatio(jaspect_ratio_t t)
 		{
+			_aspect_ratio = t;
 		}
 
 		virtual void SetContentMode(jvideo_mode_t t)
 		{
+			_video_mode = t;
 		}
 
 		virtual void SetVideoFormatHD(jhd_video_format_t vf)
 		{
+			_hd_video_format = vf;
 		}
 
 		virtual void SetVideoFormatSD(jsd_video_format_t vf)
 		{
+			_sd_video_format = vf;
 		}
 
 		virtual void SetContrast(int value)
@@ -371,8 +384,8 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 			if (aspect == (1.0/1.0)) {
 				return LAR_1x1;
-			} else if (aspect == (2.0/3.0)) {
-				return LAR_2x3;
+			} else if (aspect == (3.0/2.0)) {
+				return LAR_3x2;
 			} else if (aspect == (4.0/3.0)) {
 				return LAR_4x3;
 			} else if (aspect == (16.0/9.0)) {
