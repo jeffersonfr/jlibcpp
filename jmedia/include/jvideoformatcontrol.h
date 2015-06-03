@@ -30,7 +30,7 @@ namespace jmedia {
  */
 enum jaspect_ratio_t {
 	LAR_1x1,
-	LAR_2x3,
+	LAR_3x2,
 	LAR_4x3,
 	LAR_16x9
 };
