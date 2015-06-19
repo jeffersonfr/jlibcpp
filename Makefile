@@ -7,8 +7,8 @@ EXE				= lib$(MODULE)-$(VERSION).so
 include Makefile.defs
 
 # {yes, no}
-ENABLE_DEBUG		?= no
-# {none, directfb, directfb-cairo, x11}
+ENABLE_DEBUG ?= no
+# {none, directfb}
 ENABLE_GRAPHICS ?= directfb
 # {none, directfb}
 ENABLE_MEDIA ?= directfb
@@ -380,9 +380,9 @@ OBJS_jgui += \
 		jwindowlistener.o\
 		jwindowmanager.o\
 		jyesnodialogbox.o\
-		jtreelistview.o\
 		jtabbedpane.o\
 		jtable.o\
+		jtreelistview.o\
 		jguilib.o\
 
 ifneq ($(ENABLE_MEDIA),none)
