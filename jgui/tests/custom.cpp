@@ -24,10 +24,15 @@ using namespace jgui;
 
 class CustomContainer : public jgui::Container {
 
+	private:
+		jgui::Image *_image;
+
 	public:
 		CustomContainer(int x, int y, int w, int h):
 			jgui::Container(x, y, w, h)
 		{
+			_image = jgui::Image::CreateImage("images/bubble.png");
+
 			SetBorder(JCB_LINE);
 		}
 
@@ -57,7 +62,7 @@ class CustomContainer : public jgui::Container {
 						block_size = (int)(_size.width*block_size_ratio);
 
 				g->DrawRectangle(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size);
-				g->DrawImage("images/bubble.png", offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size);
+				g->DrawImage(_image, offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size);
 			}
 
 			if (IsScrollableY() == true) {
@@ -67,7 +72,7 @@ class CustomContainer : public jgui::Container {
 						block_size = (int)(_size.height*block_size_ratio);
 
 				g->DrawRectangle(_size.width-_scroll_size-_border_size, _border_size, _scroll_size, _size.height);
-				g->DrawImage("images/bubble.png", _size.width-_scroll_size-_border_size, offset, _scroll_size, block_size);
+				g->DrawImage(_image, _size.width-_scroll_size-_border_size, offset, _scroll_size, block_size);
 			}
 		}
 
@@ -106,7 +111,7 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main("Custom Frame", 100, 100, 720, 480);
+	Main main("Custom Frame", 32, 32, 720, 480);
 
 	main.Show(true);
 

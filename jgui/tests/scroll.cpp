@@ -33,7 +33,7 @@ class Main : public jgui::Frame{
 
 	public:
 		Main(std::string title, int x, int y, int w, int h):
-			jgui::Frame(title, 100, 100, 1280, 720)
+			jgui::Frame(title, 32, 32, 720, 480)
 		{
 			SetResizeEnabled(true);
 

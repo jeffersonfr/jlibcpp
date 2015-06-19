@@ -26,10 +26,8 @@
 #include "jwindowmanager.h"
 #include "jinputmanager.h"
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 #include "jdfbhandler.h"
-#elif defined(X11_UI)
-#include "jsdlhandler.h"
 #endif
 
 namespace jgui {
@@ -43,9 +41,6 @@ GFXHandler::GFXHandler():
 
 	_screen.width = 0;
 	_screen.height = 0;
-
-	_scale.width = DEFAULT_SCALE_WIDTH;
-	_scale.height = DEFAULT_SCALE_HEIGHT;
 }
 
 GFXHandler::~GFXHandler()
@@ -56,23 +51,11 @@ GFXHandler::~GFXHandler()
 GFXHandler * GFXHandler::GetInstance()
 {
 	if (_instance == NULL) {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 		DFBHandler *handler = NULL;
 		
 		try {
 			_instance = handler = new DFBHandler();
-
-			handler->InitEngine();
-			handler->InitResources();
-			handler->InitCursors();
-		} catch (...) {
-			_instance = NULL;
-		}
-#elif defined(X11_UI)
-		X11Handler *handler = NULL;
-		
-		try {
-			_instance = handler = new X11Handler();
 
 			handler->InitEngine();
 			handler->InitResources();
@@ -103,6 +86,10 @@ void GFXHandler::SetCursor(Image *shape, int hotx, int hoty)
 {
 }
 
+void GFXHandler::WarpCursor(int x, int y)
+{
+}
+
 void * GFXHandler::GetGraphicEngine()
 {
 	return NULL;
@@ -126,30 +113,6 @@ int GFXHandler::GetScreenHeight()
 jsize_t GFXHandler::GetScreenSize()
 {
 	return _screen;
-}
-
-void GFXHandler::SetWorkingScreenSize(jsize_t size)
-{
-	SetWorkingScreenSize(size.width, size.height);
-}
-
-void GFXHandler::SetWorkingScreenSize(int width, int height)
-{
-	_scale.width = width;
-	_scale.height = height;
-
-	if (_scale.width <= 0) {
-		_scale.width = DEFAULT_SCALE_WIDTH;
-	}
-
-	if (_scale.height <= 0) {
-		_scale.height = DEFAULT_SCALE_HEIGHT;
-	}
-}
-
-jsize_t GFXHandler::GetWorkingScreenSize()
-{
-	return _scale;
 }
 
 void GFXHandler::SetMousePosition(int x, int y)

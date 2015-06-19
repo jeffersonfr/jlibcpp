@@ -69,7 +69,7 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 
 	public:
 		Breakout():
-			jgui::Frame("BreakOut", 100, 100, 720, 480)
+			jgui::Frame("BreakOut", 32, 32, 720, 480)
 		{
 			SetUndecorated(true);
 
@@ -178,7 +178,7 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 		virtual void Paint(jgui::Graphics *g)
 		{
 			if (goff == NULL && _size.width > 0 && _size.height > 0) {
-				off = jgui::Image::CreateImage(_size.width, _size.height);
+				off = jgui::Image::CreateImage(jgui::JPF_ARGB, _size.width, _size.height);
 
 				goff = off->GetGraphics();
 			}

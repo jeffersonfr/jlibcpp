@@ -47,7 +47,7 @@ class ComboBox : public jgui::Component, public jgui::ItemComponent, public jgui
 		 * \brief
 		 *
 		 */
-		ComboBox(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT, int visible_items = 5);
+		ComboBox(int x = 0, int y = 0, int width = DEFAULT_COMPONENT_WIDTH, int height = DEFAULT_COMPONENT_HEIGHT);
 		
 		/**
 		 * \brief

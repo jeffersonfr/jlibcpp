@@ -43,12 +43,6 @@ DFBInputManager::DFBInputManager():
 	_last_keypress = 0LL;
 	_click_count = 1;
 	_click_delay = 200;
-	
-	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
-
-	_scale.width = DEFAULT_SCALE_WIDTH;
-	_scale.height = DEFAULT_SCALE_HEIGHT;
 }
 
 DFBInputManager::~DFBInputManager() 
@@ -104,8 +98,6 @@ int DFBInputManager::TranslateToDFBKeyCode(int code)
 			return '\b';
 		case DIKS_TAB:
 			return '\t';
-		// case DIKS_RETURN:
-			// break; // TODO::
 		case DIKS_ESCAPE:
 			return 0x1b;
 		case DIKS_SPACE:
@@ -360,14 +352,12 @@ int DFBInputManager::TranslateToDFBKeyCode(int code)
 			return 0xf202;
 		case DIKS_ALT:
 			return 0xf204;
-		case DIKS_ALTGR:
-			break; // TODO::
-		case DIKS_META:
-			break; // TODO::
 		case DIKS_SUPER:
 			return 0xF220;
+		// case DIKS_RETURN:
+		case DIKS_ALTGR:
+		case DIKS_META:
 		case DIKS_HYPER:
-			break; // TODO::
 		default: 
 			break;
 	}
@@ -893,6 +883,8 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 {
 	jthread::AutoLock lock(&_mutex);
 
+	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
+
 	if (event.type == DIET_KEYPRESS || event.type == DIET_KEYRELEASE) {
 		jkeyevent_type_t type;
 		jkeyevent_modifiers_t mod;
@@ -959,8 +951,8 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 				}
 			}
 
-			_mouse_x = CLAMP(_mouse_x, 0, _screen.width-1);
-			_mouse_y = CLAMP(_mouse_y, 0, _screen.height-1);
+			_mouse_x = CLAMP(_mouse_x, 0, screen.width-1);
+			_mouse_y = CLAMP(_mouse_y, 0, screen.height-1);
 			// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
 		} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE) {
 			if (event.type == DIET_BUTTONPRESS) {
@@ -1004,13 +996,11 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 				cy;
 		
 		if (current != NULL) {
-			jsize_t scale = current->GetWorkingScreenSize();
-
-			cx = SCREEN_TO_SCALE(_mouse_x, _screen.width, scale.width);
-			cy = SCREEN_TO_SCALE(_mouse_y, _screen.height, scale.height);
+			cx = _mouse_x;
+			cy = _mouse_y;
 		} else {
-			cx = SCREEN_TO_SCALE(_mouse_x, _screen.width, _scale.width);
-			cy = SCREEN_TO_SCALE(_mouse_y, _screen.height, _scale.height);
+			cx = _mouse_x;
+			cy = _mouse_y;
 		}
 
 		/*
@@ -1021,8 +1011,8 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 			Window *w = (*i);
 
 			if (w->IsVisible() == true) {
-				cx = SCREEN_TO_SCALE(_mouse_x, _screen.width, w->GetWorkingWidth());
-				cy = SCREEN_TO_SCALE(_mouse_y, _screen.height, w->GetWorkingHeight());
+				cx = _mouse_x;
+				cy = _mouse_y;
 
 				if ((cx > w->GetX() && cx < (w->GetX() + w->GetWidth()) && (cy > w->GetY() && cy < (w->GetY() + w->GetHeight())))) {
 					current = w;
@@ -1042,6 +1032,8 @@ void DFBInputManager::ProcessInputEvent(DFBInputEvent event)
 void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 {
 	jthread::AutoLock lock(&_mutex);
+
+	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
 
 	if (event.type == DWET_KEYDOWN || event.type == DWET_KEYUP) {
 		jkeyevent_type_t type;
@@ -1101,13 +1093,11 @@ void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 		*/
 
 		if (current != NULL) {
-			jsize_t scale = current->GetWorkingScreenSize();
-
-			cx = SCREEN_TO_SCALE(_mouse_x, _screen.width, scale.width);
-			cy = SCREEN_TO_SCALE(_mouse_y, _screen.height, scale.height);
+			cx = _mouse_x;
+			cy = _mouse_y;
 		} else {
-			cx = SCREEN_TO_SCALE(_mouse_x, _screen.width, _scale.width);
-			cy = SCREEN_TO_SCALE(_mouse_y, _screen.height, _scale.height);
+			cx = _mouse_x;
+			cy = _mouse_y;
 		}
 		
 		if (current != NULL) {
@@ -1152,8 +1142,8 @@ void DFBInputManager::ProcessWindowEvent(DFBWindowEvent event)
 					buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
 				}
 
-				_mouse_x = CLAMP(_mouse_x, 0, _screen.width-1);
-				_mouse_y = CLAMP(_mouse_y, 0, _screen.height-1);
+				_mouse_x = CLAMP(_mouse_x, 0, screen.width-1);
+				_mouse_y = CLAMP(_mouse_y, 0, screen.height-1);
 				// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
 
 				if (type == JMT_PRESSED) {

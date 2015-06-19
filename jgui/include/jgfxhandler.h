@@ -76,8 +76,7 @@ class GFXHandler : public virtual jcommon::Object{
 		std::vector<Image *> _images;
 		std::vector<Font *> _fonts;
 		jthread::Mutex _mutex;
-		jsize_t _screen,
-			_scale;
+		jsize_t _screen;
 		jcursor_style_t _cursor;
 
 	protected:
@@ -134,24 +133,6 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetWorkingScreenSize(jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetWorkingScreenSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual jpoint_t GetMousePosition();
 		
 		/**
@@ -177,6 +158,12 @@ class GFXHandler : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetCursor(Image *shape, int hotx, int hoty);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void WarpCursor(int x, int y);
 
 		/**
 		 * \brief

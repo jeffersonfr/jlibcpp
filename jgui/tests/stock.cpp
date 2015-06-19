@@ -125,15 +125,17 @@ class Stock : public jgui::Frame{
 		{
 			std::map<std::string, std::string> quotes;
 
-			std::ostringstream o;
+			std::string host = "download.finance.yahoo.com";
 
+			std::ostringstream o;
 			char receive[4098];
 			int count = 0;
 
-			o << "GET /d/quotes.csv?s=" << acao->GetText() << "&f=snd1t1l1c1p2poghvt HTTP/1.0\r\n\r\n";
+			o << "GET /d/quotes.csv?s=" << acao->GetText() << "&f=snd1t1l1c1p2poghvt HTTP/1.0\r\nHost: " << host << "\r\n\r\n";
 
 			try {
-				jsocket::Socket c("download.finance.yahoo.com", 80);
+				// http://finance.google.com/finance/info?client=ig&q=VALE5
+				jsocket::Socket c(host, 80);
 
 				c.Send((char *)o.str().c_str(), o.str().size());
 
@@ -149,7 +151,7 @@ class Stock : public jgui::Frame{
 			jcommon::StringTokenizer lines(std::string(receive), "\r\n\r\n", jcommon::JTT_STRING, false);
 			jcommon::StringTokenizer tokens(lines.GetToken(1), ",", jcommon::JTT_STRING, false);
 
-			if (tokens.GetSize() != 11) {
+			if (tokens.GetSize() != 13) {
 				std::cout << "Error:: \n\n" << lines.GetToken(1) << std::endl;
 
 				exit(1);

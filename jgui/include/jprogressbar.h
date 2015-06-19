@@ -40,14 +40,24 @@ class ButtonEvent;
 class ProgressBar : public jgui::Component, public jthread::Thread{
 
 	private:
+		/** \brief */
 		jscroll_orientation_t _type;
+		/** \brief */
 		int _value;
-		int _index,
-				_delta,
-				_fixe_delta;
-		bool _label_visible,
-				 _indeterminate,
-				 _running;
+		/** \brief */
+		int _index;
+		/** \brief */
+		int _delta;
+		/** \brief */
+		int _fixe_delta;
+		/** \brief */
+		int _stone_size;
+		/** \brief */
+		bool _label_visible;
+		/** \brief */
+		bool _indeterminate;
+		/** \brief */
+		bool _running;
 
 	public:
 		/**
@@ -74,6 +84,18 @@ class ProgressBar : public jgui::Component, public jthread::Thread{
 		 */
 		virtual void SetScrollOrientation(jscroll_orientation_t type);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetStoneSize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetStoneSize(int size);
+		
 		/**
 		 * \brief
 		 *

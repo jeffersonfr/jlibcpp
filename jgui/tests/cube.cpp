@@ -56,9 +56,9 @@ class GraphicsTeste : public jgui::Frame{
 
 	public:
 		GraphicsTeste():
-			jgui::Frame("Graphics Teste", 0, 0, 1920, 1080)
+			jgui::Frame("Graphics Teste", 0, 0)
 		{
-			TAM = 200;
+			TAM = _size.height/4;
 			nu = 40;
 			nv = 40;
 			teta = M_PI/7;
@@ -253,8 +253,6 @@ class GraphicsTeste : public jgui::Frame{
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Frame::Paint(g);
-
-			g->SetAntialias(false);
 
 			DesenhaCubo(g, &p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4);
 		}

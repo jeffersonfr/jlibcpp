@@ -29,7 +29,7 @@ Slider::Slider(int x, int y, int width, int height):
 	jcommon::Object::SetClassName("jgui::Slider");
 
 	_pressed = false;
-	_stone_size = 30;
+	_stone_size = 24;
 	_inverted = false;
 
 	SetFocusable(true);
@@ -96,11 +96,11 @@ bool Slider::KeyPressed(KeyEvent *event)
 
 			catched = true;
 		} else if (action == JKS_PAGE_DOWN) {
-			SetValue(_value-_maximum_tick);
+			SetValue(_value+_maximum_tick);
 
 			catched = true;
 		} else if (action == JKS_PAGE_UP) {
-			SetValue(_value+_maximum_tick);
+			SetValue(_value-_maximum_tick);
 
 			catched = true;
 		}
@@ -237,7 +237,7 @@ void Slider::Paint(Graphics *g)
 	Component::Paint(g);
 
 	Color color = _scrollbar_color,
-				bar = color.Darker(0.1);
+				bar = color.Darker(0.2);
 
 	int x = _vertical_gap-_border_size,
 			y = _horizontal_gap-_border_size,
@@ -252,7 +252,7 @@ void Slider::Paint(Graphics *g)
 		}
 
 		g->SetColor(bar);
-		g->FillRectangle(x, (h-10)/2+y, w, 10);
+		g->FillRectangle(x, (h-4)/2+y, w, 4);
 		g->SetColor(color);
 
 		if (_inverted == false) {

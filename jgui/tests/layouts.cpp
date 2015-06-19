@@ -284,7 +284,7 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 
 int main(int argc, char **argv)
 {
-	Main main("Layouts", 50, 50, 1820, 980);
+	Main main("Layouts", 0, 0, 1280, 720);
 
 	main.Show(true);
 

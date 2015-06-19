@@ -1698,15 +1698,15 @@ class SortFrame : public jgui::Frame {
 
 	public:
 		SortFrame():
-			jgui::Frame("Sort Algorithms", 0, 0, 1920, 1080)
+			jgui::Frame("Sort Algorithms", 0, 0)
 		{
-			int w = 200,
-					h = 200,
-					gapx = 50,
-					gapy = 50,
-					dx = (1920-6*w-5*gapx)/2,
-					dy = (1080-3*h-2*gapy)/2,
-					array_size = 100;
+			int w = 128,
+					h = 128,
+					gapx = 16,
+					gapy = 16,
+					dx = (_size.width-6*w-5*gapx)/2,
+					dy = (_size.height-3*h-2*gapy)/2,
+					array_size = 128;
 
 			_components.push_back(new SortComponent(array_size, dx+0*(w+gapx), dy+0*(h+gapy), w, h));
 			_components.push_back(new SortComponent(array_size, dx+1*(w+gapx), dy+0*(h+gapy), w, h));

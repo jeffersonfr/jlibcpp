@@ -45,7 +45,7 @@
 #include "jwindowlistener.h"
 #include "jthememanager.h"
 
-class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
+class WindowTest : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
 
 	private:
 		jthread::Mutex 
@@ -99,11 +99,11 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 			*_combo;
 
 	public:
-		WindowTeste():
-			jgui::Frame("Frame Test", 0, 0, 1920, 1080)
+		WindowTest():
+			jgui::Frame("Frame Test")
 	{
 		{
-			_animation = new jgui::Animation(150, 110, 150, 150);
+			_animation = new jgui::Animation(_insets.left, _insets.top, 98, 98);
 
 			_animation->SetInterval(2000);
 
@@ -133,39 +133,7 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 		}
 
 		{
-			_marquee = new jgui::Marquee("Marquee Test", 500, 110, 700);
-
-			_marquee->SetType(jgui::JMM_LOOP);
-
-			_marquee->Start();
-		}
-
-		{
-			_progress = new jgui::ProgressBar(500, 170, 700);
-			_slider = new jgui::Slider(500, 170, 700);
-			_scroll = new jgui::ScrollBar(500, 230, 700);
-
-			_progress->SetValue(20.0);
-			_slider->SetValue(20.0);
-			_scroll->SetValue(20.0);
-
-			_progress->Start();
-		}
-
-		{
-			_textfield = new jgui::TextField(500, 290, 700);
-
-			_textfield->Insert("Text Field");
-		}
-
-		{
-			_textarea = new jgui::TextArea(500, 350, 700, 300);
-
-			_textarea->Insert("Text Area\nwriting some text ...\nbye bye");
-		}
-
-		{
-			_watch = new jgui::Watch(jgui::JWT_CRONOMETERDOWN, 150, 300, 300);
+			_watch = new jgui::Watch(jgui::JWT_CRONOMETERDOWN, _insets.left, _insets.top + 98 + 8, 196);
 
 			_watch->SetSeconds(10);
 			_watch->SetMinutes(0);
@@ -175,9 +143,9 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 		}
 
 		{
-			_button1 = new jgui::Button("Increase", 150, 380, 300);
-			_button2 = new jgui::Button("Decrease", 150, 450, 300);
-			_button3 = new jgui::Button("Testing a long text in a buttom component", 150, 590, 300, 150);
+			_button1 = new jgui::Button("Increase", _insets.left, _watch->GetY()+1*(_watch->GetHeight()+8), 196);
+			_button2 = new jgui::Button("Decrease", _insets.left, _watch->GetY()+2*(_watch->GetHeight()+8), 196);
+			_button3 = new jgui::Button("Testing a long text in a buttom component", _insets.left, _watch->GetY()+3*(_watch->GetHeight()+8), 196, 96);
 
 			_button1->SetBackgroundFocusColor(0x40, 0xf0, 0x40, 0xff);
 			_button2->SetBackgroundFocusColor(0xf0, 0x20, 0x20, 0xff);
@@ -198,17 +166,17 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 		}
 
 		{
-			_toogle = new jgui::ToogleButton("Toggle Button", 150, 520, 300);
+			_toogle = new jgui::ToogleButton("Toggle Button", _insets.left, _button3->GetY()+_button3->GetHeight()+8, 196);
 		}
 
 		{
-			_imagebutton1 = new jgui::ImageButton("", "images/alert_icon.png", 150, 760, 80, 60);
-			_imagebutton2 = new jgui::ImageButton("", "images/info_icon.png", 260, 760, 80, 60);
-			_imagebutton3 = new jgui::ImageButton("", "images/error_icon.png", 370, 760, 80, 60);
+			_imagebutton1 = new jgui::ImageButton("", "images/alert_icon.png", _insets.left+0*(32+50), _toogle->GetY()+1*(_toogle->GetHeight()+8), 32, 32);
+			_imagebutton2 = new jgui::ImageButton("", "images/info_icon.png", _insets.left+1*(32+50), _toogle->GetY()+1*(_toogle->GetHeight()+8), 32, 32);
+			_imagebutton3 = new jgui::ImageButton("", "images/error_icon.png", _insets.left+2*(32+50), _toogle->GetY()+1*(_toogle->GetHeight()+8), 32, 32);
 		}
 
 		{
-			_spin = new jgui::Spin(150, 850, 300);
+			_spin = new jgui::Spin(_insets.left+0*(32+16), _toogle->GetY()+2*(_toogle->GetHeight()+8), 196);
 
 			_spin->AddTextItem("loop");
 			_spin->AddTextItem("bounce");
@@ -217,14 +185,46 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 		}
 
 		{
-			_label1 = new jgui::Label("Label Test 1", 500, 680, 300);
-			_label2 = new jgui::Label("Label Test 2", 860, 680, 300);
+			_marquee = new jgui::Marquee("Marquee Test", _insets.left+196+16, _insets.top, _size.width-2*(196+16)-_insets.left-_insets.right);
+
+			_marquee->SetType(jgui::JMM_LOOP);
+
+			_marquee->Start();
 		}
 
 		{
-			_check1 = new jgui::CheckButton(jgui::JCBT_CHECK, "Wrap Text", 500, 740, 300);
-			_check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "Password", 500, 795, 300);
-			_check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "Hide", 500, 850, 300);
+			_progress = new jgui::ProgressBar(_insets.left+196+16, _marquee->GetY()+1*(_marquee->GetHeight()+8), _size.width-2*(196+16)-_insets.left-_insets.right);
+			_slider = new jgui::Slider(_insets.left+196+16, _marquee->GetY()+2*(_marquee->GetHeight()+8), _size.width-2*(196+16)-_insets.left-_insets.right);
+			_scroll = new jgui::ScrollBar(_insets.left+196+16, _marquee->GetY()+3*(_marquee->GetHeight()+8), _size.width-2*(196+16)-_insets.left-_insets.right);
+
+			_progress->SetValue(20.0);
+			_slider->SetValue(20.0);
+			_scroll->SetValue(20.0);
+
+			_progress->Start();
+		}
+
+		{
+			_textfield = new jgui::TextField(_insets.left+196+16, _marquee->GetY()+4*(_marquee->GetHeight()+8), _size.width-2*(196+16)-_insets.left-_insets.right);
+
+			_textfield->Insert("Text Field");
+		}
+
+		{
+			_textarea = new jgui::TextArea(_insets.left+196+16, _marquee->GetY()+5*(_marquee->GetHeight()+8), _size.width-2*(196+16)-_insets.left-_insets.right, 96);
+
+			_textarea->Insert("Text Area\nwriting some text ...\nbye bye");
+		}
+
+		{
+			_label1 = new jgui::Label("Label Test 1", _insets.left+196+16, _textarea->GetY()+_textarea->GetHeight()+8, (_textarea->GetWidth()-16)/2);
+			_label2 = new jgui::Label("Label Test 2", _label1->GetX()+_label1->GetWidth()+16, _label1->GetY(), _label1->GetWidth());
+		}
+
+		{
+			_check1 = new jgui::CheckButton(jgui::JCBT_CHECK, "Wrap Text", _label1->GetX(), _label1->GetY()+1*(_label1->GetHeight()+8), _label1->GetWidth());
+			_check2 = new jgui::CheckButton(jgui::JCBT_CHECK, "Password", _label1->GetX(), _label1->GetY()+2*(_label1->GetHeight()+8), _label1->GetWidth());
+			_check3 = new jgui::CheckButton(jgui::JCBT_CHECK, "Hide", _label1->GetX(), _label1->GetY()+3*(_label1->GetHeight()+8), _label1->GetWidth());
 
 			_check1->SetSelected(true);
 
@@ -234,9 +234,9 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 		}
 
 		{
-			_radio1 = new jgui::CheckButton(jgui::JCBT_RADIO, "Left", 860, 740, 300);
-			_radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "Center", 860, 795, 300);
-			_radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "Right", 860, 850, 300);
+			_radio1 = new jgui::CheckButton(jgui::JCBT_RADIO, "Left", _label2->GetX(), _label2->GetY()+1*(_label2->GetHeight()+8), _label2->GetWidth());
+			_radio2 = new jgui::CheckButton(jgui::JCBT_RADIO, "Center", _label2->GetX(), _label2->GetY()+2*(_label2->GetHeight()+8), _label2->GetWidth());
+			_radio3 = new jgui::CheckButton(jgui::JCBT_RADIO, "Right", _label2->GetX(), _label2->GetY()+3*(_label2->GetHeight()+8), _label2->GetWidth());
 
 			_group = new jgui::CheckButtonGroup();
 
@@ -252,13 +252,13 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 		}
 
 		{
-			_staticimage = new jgui::Icon(jcommon::System::GetResourceDirectory() + "/images/green_icon.png", 1250, 110, 400, 300);
+			_staticimage = new jgui::Icon(jcommon::System::GetResourceDirectory() + "/images/green_icon.png", _marquee->GetX()+_marquee->GetWidth()+16, _marquee->GetY(), 196, 196);
 
 			_staticimage->SetText("Green Button");
 		}
 
 		{
-			_list = new jgui::ListBox(1250, 450, 400, 300);
+			_list = new jgui::ListBox(_staticimage->GetX(), _staticimage->GetY()+_staticimage->GetHeight()+8, 196, 196);
 
 			_list->AddImageItem("Item 01", std::string("images/tux-alien.png"));
 			_list->AddTextItem("Item 02");
@@ -305,7 +305,7 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 		}
 
 		{
-			_combo = new jgui::ComboBox(1250, 800, 400, DEFAULT_COMPONENT_HEIGHT, 3);
+			_combo = new jgui::ComboBox(_list->GetX(), _list->GetY()+_list->GetHeight()+8, 196);
 
 			_combo->AddTextItem("Item 1");
 			_combo->AddTextItem("Item 2");
@@ -323,7 +323,7 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 
 		Add(_textfield);
 		Add(_textarea);
-		// Add(_progress);
+		Add(_progress);
 		Add(_slider);
 		Add(_scroll);
 		Add(_button1);
@@ -352,7 +352,7 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 		_button1->RequestFocus();
 	}
 
-	virtual ~WindowTeste()
+	virtual ~WindowTest()
 	{
 		jthread::AutoLock lock(&_mutex);
 
@@ -505,7 +505,7 @@ class GraphicPanel : public jgui::Canvas{
 			}
 		}
 
-		g->SetAntialias(false);
+		g->SetAntialias(jgui::JAM_NONE);
 
 		for (int i=0; i<num_colors; i++) {
 			red = array[(i+4*sixth)%num_colors];
@@ -524,28 +524,35 @@ class GraphicPanel : public jgui::Canvas{
 			g->DrawLine(i+10, 1*(100+10)+20, i+10, 1*(100+10)+100+20);
 		}
 
-		g->SetAntialias(true);
+		g->SetAntialias(jgui::JAM_NORMAL);
 
 		// draw image
-		std::string path = jcommon::System::GetResourceDirectory() + "/images/blue_icon.png";
-
-		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL | jgui::JBF_COLORALPHA));
+		jgui::Image *path = jgui::Image::CreateImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png");
+		jgui::Image *path1 = path->Blend(1.0);
+		jgui::Image *path2 = path->Blend(0.5);
+		jgui::Image *path3 = path->Blend(0.25);
+		jgui::Image *path4 = path->Blend(0.125);
 
 		g->SetColor(0x00, 0x00, 0x00, 0xf0);
-		g->DrawImage(path, 400+40+0*(200+10), 0*(100+10)+20, 200, 100);
+		g->DrawImage(path1, 400+40+0*(200+10), 0*(100+10)+20, 200, 100);
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->DrawImage(path, 400+40+1*(200+10), 0*(100+10)+20, 200, 100);
+		g->DrawImage(path2, 400+40+1*(200+10), 0*(100+10)+20, 200, 100);
 		g->SetColor(0x00, 0x00, 0x00, 0x40);
-		g->DrawImage(path, 400+40+0*(200+10), 1*(100+10)+20, 200, 100);
+		g->DrawImage(path3, 400+40+0*(200+10), 1*(100+10)+20, 200, 100);
 		g->SetColor(0x00, 0x00, 0x00, 0x10);
-		g->DrawImage(path, 400+40+1*(200+10), 1*(100+10)+20, 200, 100);
+		g->DrawImage(path4, 400+40+1*(200+10), 1*(100+10)+20, 200, 100);
+
+		delete path4;
+		delete path3;
+		delete path2;
+		delete path1;
+		delete path;
 
 		jgui::Color pcolor(0xf0, 0xf0, 0xf0, 0x80),
 			ccolor(0x20, 0xf0, 0x20, 0x80),
 			rcolor(0x00, 0x00, 0x00, 0x80);
 
 		g->SetCompositeFlags(jgui::JCF_SRC_OVER);
-		g->SetDrawingFlags(jgui::JDF_BLEND);
 
 		g->SetColor(rcolor);
 		g->SetLineWidth(1);
@@ -773,9 +780,6 @@ class GraphicPanel : public jgui::Canvas{
 		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+80, 10+10*(120+10)-20, 6*(120+10)+80);
 		g->SetLineDash(NULL, 0);
 
-		// draw line dashes
-		// TODO:: criar algum teste com PATH e FILL
-
 		// draw bezier curve
 		x0 = 10+10*(120+10)+10;
 		y0 = 6*(120+10);
@@ -799,9 +803,6 @@ class GraphicPanel : public jgui::Canvas{
 		g->SetColor(ccolor);
 		g->DrawBezierCurve(pb1, 3, 100);
 		g->DrawBezierCurve(pb2, 3, 100);
-
-		// draw string (disable COLORALPHA)
-		g->SetBlittingFlags((jgui::jblitting_flags_t)(jgui::JBF_ALPHACHANNEL));
 
 		jgui::Font 
 			*f1 = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 50),
@@ -831,7 +832,7 @@ class GraphicPanel : public jgui::Canvas{
 
 		int sw = f1->GetStringWidth(text),
 				sh = (3*(45+10)+20+shadow)+f4->GetSize()-(0*(45+10)+20+shadow);
-		jgui::Image *timage = jgui::Image::CreateImage(sw, sh);
+		jgui::Image *timage = jgui::Image::CreateImage(jgui::JPF_ARGB, sw, sh);
 		jgui::Graphics *gt = timage->GetGraphics();
 
 		gt->SetColor(rcolor);
@@ -864,26 +865,22 @@ class GraphicPanel : public jgui::Canvas{
 
 };
 
-class GraphicsTeste : public jgui::Frame{
+class PrimitivesTest : public jgui::Frame{
 
 	private:
-		jthread::Mutex _mutex;
-
 		jgui::Canvas *panel;
 
 	public:
-		GraphicsTeste():
-			jgui::Frame("Graphics Test", 0, 0, 1920, 1080)
-	{
-		panel = new GraphicPanel((1920-1600)/2, 100, 1600, 900);
-
-		Add(panel);
-	}
-
-		virtual ~GraphicsTeste()
+		PrimitivesTest():
+			jgui::Frame("Primitives Test", 0, 0, 1600, 1080)
 		{
-			jthread::AutoLock lock(&_mutex);
+			panel = new GraphicPanel(_insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
 
+			Add(panel);
+		}
+
+		virtual ~PrimitivesTest()
+		{
 			Hide();
 
 			delete panel;
@@ -891,7 +888,30 @@ class GraphicsTeste : public jgui::Frame{
 
 };
 
-class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::WindowListener{
+class PathsTest : public jgui::Frame{
+
+	private:
+		jgui::Canvas *panel;
+
+	public:
+		PathsTest():
+			jgui::Frame("Paths Test")
+		{
+			panel = NULL;
+
+			// Add(panel);
+		}
+
+		virtual ~PathsTest()
+		{
+			Hide();
+
+			delete panel;
+		}
+
+};
+
+class ModulesTest : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::WindowListener{
 
 	private:
 		jthread::Mutex _mutex;
@@ -905,7 +925,8 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			*_button4,
 			*_button5,
 			*_button6,
-			*_button7;
+			*_button7,
+			*_button8;
 		jgui::Keyboard 
 			*_querty_kb,
 			*_alpha_kb,
@@ -917,27 +938,33 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 		jgui::MessageDialogBox
 			*_message_1,
 			*_message_2;
+		PrimitivesTest *_primitives;
+		PathsTest *_paths;
 		jgui::Menu 
 			*_menu;
 		int 
 			_index;
 
 	public:
-		ModulesTeste():
-			jgui::Frame("Graphics Test", 0, 0, 1920, 1080)
+		ModulesTest():
+			jgui::Frame("Graphics Test")
 		{
-			int h = 100;
+			jgui::jsize_t screen = jgui::GFXHandler::GetInstance()->GetScreenSize();
+
+			int w = (screen.width-3*120)/2;
+			int h = (screen.height-4*80)/4;
 
 			_current = NULL;
 			_index = -1;
 
-			_button1 = new jgui::Button("Keyboard Test", 150, 0*(h+10)+100, 500, h);
-			_button2 = new jgui::Button("Calendar Test", 150, 1*(h+10)+100, 500, h);
-			_button3 = new jgui::Button("Components Test", 150, 2*(h+10)+100, 500, h);
-			_button4 = new jgui::Button("MessageDialog Test", 150, 3*(h+10)+100, 500, h);
-			_button5 = new jgui::Button("InputDialogBox Test", 150, 4*(h+10)+100, 500, h);
-			_button6 = new jgui::Button("Graphics Test", 150, 5*(h+10)+100, 500, h);
-			_button7 = new jgui::Button("Menu Test", 150, 6*(h+10)+100, 500, h);
+			_button1 = new jgui::Button("Keyboard Test", 0*(w+120)+120, 0*(h+80/2)+80, w, h);
+			_button2 = new jgui::Button("Calendar Test", 0*(w+120)+120, 1*(h+80/2)+80, w, h);
+			_button3 = new jgui::Button("Components Test", 0*(w+120)+120, 2*(h+80/2)+80, w, h);
+			_button4 = new jgui::Button("MessageDialog Test", 0*(w+120)+120, 3*(h+80/2)+80, w, h);
+			_button5 = new jgui::Button("InputDialogBox Test", 1*(w+120)+120, 0*(h+80/2)+80, w, h);
+			_button6 = new jgui::Button("Primitives Test", 1*(w+120)+120, 1*(h+80/2)+80, w, h);
+			_button7 = new jgui::Button("Paths Test", 1*(w+120)+120, 2*(h+80/2)+80, w, h);
+			_button8 = new jgui::Button("Menu Test", 1*(w+120)+120, 3*(h+80/2)+80, w, h);
 
 			_button1->RegisterButtonListener(this);
 			_button2->RegisterButtonListener(this);
@@ -946,6 +973,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			_button5->RegisterButtonListener(this);
 			_button6->RegisterButtonListener(this);
 			_button7->RegisterButtonListener(this);
+			_button8->RegisterButtonListener(this);
 
 			Add(_button1);
 			Add(_button2);
@@ -954,14 +982,15 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			Add(_button5);
 			Add(_button6);
 			Add(_button7);
+			Add(_button8);
 
 			_button1->RequestFocus();
 
-			_querty_kb = new jgui::Keyboard(150, 150, jgui::JKT_QWERTY, true);
-			_alpha_kb = new jgui::Keyboard(150, 150, jgui::JKT_ALPHA_NUMERIC, true);
-			_numeric_kb = new jgui::Keyboard(150, 150, jgui::JKT_NUMERIC, true);
-			_phone_kb = new jgui::Keyboard(150, 150, jgui::JKT_PHONE, true);
-			_internet_kb = new jgui::Keyboard(150, 150, jgui::JKT_INTERNET, true);
+			_querty_kb = new jgui::Keyboard(jgui::JKT_QWERTY, true);
+			_alpha_kb = new jgui::Keyboard(jgui::JKT_ALPHA_NUMERIC, true);
+			_numeric_kb = new jgui::Keyboard(jgui::JKT_NUMERIC, true);
+			_phone_kb = new jgui::Keyboard(jgui::JKT_PHONE, true);
+			_internet_kb = new jgui::Keyboard(jgui::JKT_INTERNET, true);
 
 			_querty_kb->RegisterWindowListener(this);
 			_alpha_kb->RegisterWindowListener(this);
@@ -969,7 +998,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			_phone_kb->RegisterWindowListener(this);
 			_internet_kb->RegisterWindowListener(this);
 
-			_calendar = new jgui::CalendarDialogBox;
+			_calendar = new jgui::CalendarDialogBox();
 
 			_calendar->AddWarnning(10, 4, 2015);
 			_calendar->RegisterWindowListener(this);
@@ -1026,9 +1055,13 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			group->Add(item112);
 
 			_menu->RegisterSelectListener(this);
+			
+			_primitives = new PrimitivesTest();
+
+			_paths = new PathsTest();
 		}
 
-		virtual ~ModulesTeste()
+		virtual ~ModulesTest()
 		{
 			jthread::AutoLock lock(&_mutex);
 
@@ -1039,6 +1072,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			Remove(_button5);
 			Remove(_button6);
 			Remove(_button7);
+			Remove(_button8);
 
 			delete _button1;
 			delete _button2;
@@ -1047,6 +1081,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			delete _button5;
 			delete _button6;
 			delete _button7;
+			delete _button8;
 
 			delete _querty_kb;
 			delete _alpha_kb;
@@ -1060,6 +1095,10 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			delete _message_2;
 
 			delete _menu;
+
+			delete _primitives;
+
+			delete _paths;
 		}
 
 		virtual void WindowOpened(jgui::WindowEvent *event)
@@ -1124,9 +1163,9 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 					
 				_index = 0;
 			} else if (event->GetSource() == _button2) {
-				_calendar->Show();
+				_current = _calendar;
 			} else if (event->GetSource() == _button3) {
-				_current = new WindowTeste();
+				_current = new WindowTest();
 
 				_current->Show();
 			} else if (event->GetSource() == _button4) {
@@ -1136,8 +1175,10 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 			} else if (event->GetSource() == _button5) {
 				_current = new jgui::YesNoDialogBox("Question", "This is the best of all the graphic engines of the world ?");
 			} else if (event->GetSource() == _button6) {
-				_current = new GraphicsTeste;
+				_current = _primitives;
 			} else if (event->GetSource() == _button7) {
+				_current = _paths;
+			} else if (event->GetSource() == _button8) {
 				_current = _menu;
 			}
 
@@ -1168,7 +1209,7 @@ class ModulesTeste : public jgui::Frame, public jgui::ButtonListener, public jgu
 
 int main( int argc, char *argv[] )
 {
-	ModulesTeste test;
+	ModulesTest test;
 
 	test.Show(true);
 

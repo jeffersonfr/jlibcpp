@@ -63,7 +63,7 @@ class GraphicsTeste : public jgui::Frame{
 
 	public:
 		GraphicsTeste():
-			jgui::Frame("Graphics Teste", 0, 0, 1920, 1080)
+			jgui::Frame("Graphics Teste", 0, 0)
 		{
 			posX = 22;
 			posY = 12;

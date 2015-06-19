@@ -104,7 +104,9 @@ class SignalMetter : public jgui::Component{
 			}
 			
 			if (_horizontal_lines == true) {
-				// TODO::
+				for (int i=_interval; i<=GetWidth(); i+=_interval) {
+					g->DrawLine(0, GetHeight()-i, GetWidth()-1, GetHeight()-i);
+				}
 			}
 
 			g->SetColor(0x00, 0xf0, 0x40, 0xff);
@@ -132,7 +134,7 @@ class Plotter : public jgui::Frame, public jthread::Thread {
 		Plotter(int x, int y):
 			Frame("Signal Strength", x, y, 1, 1)
 		{
-			_signal = new SignalMetter(0, 0, 400, 400);
+			_signal = new SignalMetter(0, 0, 320, 320);
 
 			_counter = 1000;
 
@@ -150,7 +152,7 @@ class Plotter : public jgui::Frame, public jthread::Thread {
 
 		virtual void Run()
 		{
-			char receive[4096];
+			// char receive[4096];
 
 			try {
 				DatagramSocket s(1234);
@@ -175,7 +177,7 @@ int main()
 {
 	InitializeSocketLibrary();
 
-	Plotter plotter(100, 100);
+	Plotter plotter(32, 32);
 
 	plotter.Start();
 	plotter.Show(true);

@@ -28,12 +28,10 @@
 
 namespace jgui {
 
-Container::Container(int x, int y, int width, int height, int scale_width, int scale_height):
+Container::Container(int x, int y, int width, int height):
 	jgui::Component(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::Container");
-
-	SetWorkingScreenSize(scale_width, scale_height);
 
 	_default_layout = new BorderLayout();
 	_layout = _default_layout;
@@ -218,30 +216,6 @@ bool Container::MoveScrollTowards(Component *next, jkeyevent_symbol_t symbol)
 	return true;
 }
 
-void Container::SetWorkingScreenSize(jsize_t size)
-{
-	SetWorkingScreenSize(size.width, size.height);
-}
-
-void Container::SetWorkingScreenSize(int width, int height)
-{
-	_scale.width = width;
-	_scale.height = height;
-
-	if (_scale.width <= 0) {
-		_scale.width = jgui::GFXHandler::GetInstance()->GetScreenWidth();
-	}
-
-	if (_scale.height <= 0) {
-		_scale.height = jgui::GFXHandler::GetInstance()->GetScreenHeight();
-	}
-}
-
-jsize_t Container::GetWorkingScreenSize()
-{
-	return _scale;
-}
-
 jsize_t Container::GetScrollDimension()
 {
 	return _scroll_dimension;
@@ -252,6 +226,14 @@ Component * Container::GetTargetComponent(Container *target, int x, int y, int *
 	jpoint_t scroll_location = GetScrollLocation();
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+
+	if ((void *)dx != NULL) {
+		*dx = x;
+	}
+
+	if ((void *)dy != NULL) {
+		*dy = y;
+	}
 
 	for (std::vector<jgui::Component *>::reverse_iterator i=target->GetComponents().rbegin(); i!=target->GetComponents().rend(); i++) {
 		Component *c = (*i);
@@ -340,6 +322,11 @@ jinsets_t Container::GetInsets()
 	return _insets;
 }
 
+jsize_t Container::GetPreferredSize()
+{
+	return _size;
+}
+
 void Container::InvalidateAll()
 {
 	jthread::AutoLock lock(&_container_mutex);
@@ -402,8 +389,6 @@ void Container::Paint(Graphics *g)
 {
 	// JDEBUG(JINFO, "paint\n");
 
-	g->SetWorkingScreenSize(_scale.width, _scale.height);
-
 	jthread::AutoLock lock(&_container_mutex);
 
 	jpoint_t scroll_location = GetScrollLocation();
@@ -456,8 +441,6 @@ void Container::Paint(Graphics *g)
 			}
 
 			c->Revalidate();
-			
-			g->SetWorkingScreenSize(_scale.width, _scale.height);
 		}
 	}
 				

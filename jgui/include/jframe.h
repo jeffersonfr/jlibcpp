@@ -65,7 +65,7 @@ class Frame : public Window {
 		 *
 		 */
 		struct frame_subtitle_t {
-			std::string image;
+			jgui::Image *image;
 			std::string subtitle;
 		};
 
@@ -95,13 +95,13 @@ class Frame : public Window {
 		 * \brief
 		 *
 		 */
-		Frame(std::string title, int x, int y, int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Frame(std::string title, int x = 0, int y = 0, int width = -1, int height = -1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		Frame(int x, int y, int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Frame(int x = 0, int y = 0, int width = -1, int height = -1);
 
 		/**
 		 * \brief
@@ -234,6 +234,12 @@ class Frame : public Window {
 		 *
 		 */
 		virtual void Paint(Graphics *g);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void PaintScrollbars(Graphics *g);
 
 		/**
 		 * \brief

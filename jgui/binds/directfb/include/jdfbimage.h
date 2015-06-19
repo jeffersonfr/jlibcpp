@@ -42,7 +42,13 @@ class DFBImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
-		DFBImage(int width, int height, jpixelformat_t pixelformat, int scale_width, int scale_height);
+		DFBImage(jpixelformat_t pixelformat, int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		DFBImage(std::string file);
 		
 		/**
 		 * \brief
@@ -54,7 +60,7 @@ class DFBImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
-		static bool GetImageSize(std::string img, int *width, int *height);
+		static jsize_t GetImageSize(std::string img);
 		
 		/**
 		 * \brief
@@ -78,6 +84,30 @@ class DFBImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
+		static Image * Scale(Image *img, int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static Image * Crop(Image *img, int x, int y, int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static Image * Blend(Image *img, double alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static Image * Colorize(Image *img, Color color);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Release();
 		
 		/**
@@ -85,18 +115,6 @@ class DFBImage : public jgui::Image{
 		 *
 		 */
 		virtual void Restore();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcommon::Object * Clone();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSize(int width, int height);
 
 };
 

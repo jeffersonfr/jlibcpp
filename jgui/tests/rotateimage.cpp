@@ -35,7 +35,7 @@ class Main : public jgui::Frame{
 
 	public:
 		Main():
-			jgui::Frame("Image Test", 0, 0, 1920, 1080)
+			jgui::Frame("Image Test", 0, 0)
 		{
 			_angle = M_PI/6;
 
@@ -111,11 +111,12 @@ class Main : public jgui::Frame{
 			static jgui::Image *offsub = NULL;
 			
 			if (off == NULL) {
-				off = jgui::Image::CreateImage(iw, ih);
-				offsub = jgui::Image::CreateImage(iw/2, ih/2);
+				jgui::Image *image;
 
-		 		off->GetGraphics()->DrawImage("images/square.png", 0, 0, iw, ih);
-		 		offsub->GetGraphics()->DrawImage(off, 0, 0, iw/2, ih/2, 0, 0);
+				image = jgui::Image::CreateImage("images/square.png");
+				off = image->Scale(iw, ih);
+				offsub = off->Crop(0, 0, iw/2, ih/2);
+				delete image;
 			}
 		 
 			for (int k=0,j=-1; j<=1; k++,j++) {

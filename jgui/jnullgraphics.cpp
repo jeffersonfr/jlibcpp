@@ -41,28 +41,9 @@ void * NullGraphics::GetNativeSurface()
 	return Graphics::GetNativeSurface();
 }
 
-void NullGraphics::SetNativeSurface(void *surface)
+void NullGraphics::SetNativeSurface(void *data, int wp, int hp)
 {
-	Graphics::SetNativeSurface(surface);
-}
-
-void NullGraphics::SetWorkingScreenSize(jsize_t size)
-{
-	Graphics::SetWorkingScreenSize(size.width, size.height);
-}
-
-void NullGraphics::SetWorkingScreenSize(int width, int height)
-{
-	JDEBUG(JINFO, "called\n");
-
-	Graphics::SetWorkingScreenSize(width, height);
-}
-
-jsize_t NullGraphics::GetWorkingScreenSize()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return Graphics::GetWorkingScreenSize();
+	Graphics::SetNativeSurface(data, wp, hp);
 }
 
 jregion_t NullGraphics::ClipRect(int xp, int yp, int wp, int hp)
@@ -177,25 +158,18 @@ Font * NullGraphics::GetFont()
 	return Graphics::GetFont();
 }
 
-void NullGraphics::SetAntialias(bool b)
+void NullGraphics::SetAntialias(jantialias_mode_t mode)
 {
 	JDEBUG(JINFO, "called\n");
 
-	Graphics::SetAntialias(b);
+	Graphics::SetAntialias(mode);
 }
 
-jdrawing_flags_t NullGraphics::GetDrawingFlags()
-{
-	JDEBUG(JINFO, "called\n");
-	
-	return Graphics::GetDrawingFlags();
-}
-
-jblitting_flags_t NullGraphics::GetBlittingFlags()
+jantialias_mode_t NullGraphics::GetAntialias()
 {
 	JDEBUG(JINFO, "called\n");
 
-	return Graphics::GetBlittingFlags();
+	return Graphics::GetAntialias();
 }
 
 jdrawing_mode_t NullGraphics::GetDrawingMode()
@@ -219,35 +193,11 @@ void NullGraphics::SetCompositeFlags(jcomposite_flags_t t)
 	Graphics::SetCompositeFlags(t);
 }
 
-void NullGraphics::SetDrawingFlags(jdrawing_flags_t t)
-{
-	JDEBUG(JINFO, "called\n");
-
-	Graphics::SetDrawingFlags(t);
-}
-
-void NullGraphics::SetBlittingFlags(jblitting_flags_t t)
-{
-	JDEBUG(JINFO, "called\n");
-
-	Graphics::SetBlittingFlags(t);
-}
-
 void NullGraphics::SetDrawingMode(jdrawing_mode_t t)
 {
 	JDEBUG(JINFO, "called\n");
 
 	Graphics::SetDrawingMode(t);
-}
-
-void NullGraphics::SetPixels(uint8_t *pixels)
-{
-	JDEBUG(JINFO, "called\n");
-}
-
-void NullGraphics::GetPixels(uint8_t **pixels)
-{
-	JDEBUG(JINFO, "called\n");
 }
 
 void NullGraphics::SetLineJoin(jline_join_t t)
@@ -479,6 +429,30 @@ void NullGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, i
 	Graphics::FillLinearGradient(xp, yp, wp, hp, x1p, y1p, x2p, y2p);
 }
 
+jregion_t NullGraphics::GetStringExtends(std::string text)
+{
+	jregion_t t;
+
+	t.x = 0;
+	t.y = 0;
+	t.width = 0;
+	t.height = 0;
+
+	return t;
+}
+
+jregion_t NullGraphics::GetGlyphExtends(int symbol)
+{
+	jregion_t t;
+
+	t.x = 0;
+	t.y = 0;
+	t.width = 0;
+	t.height = 0;
+
+	return t;
+}
+
 void NullGraphics::DrawString(std::string s, int xp, int yp)
 {
 	JDEBUG(JINFO, "called\n");
@@ -498,34 +472,6 @@ void NullGraphics::DrawGlyph(int symbol, int xp, int yp)
 	JDEBUG(JINFO, "called\n");
 
 	Graphics::DrawGlyph(symbol, xp, yp);
-}
-
-bool NullGraphics::DrawImage(std::string img, int xp, int yp)
-{
-	JDEBUG(JINFO, "called\n");
-
-	return Graphics::DrawImage(img, xp, yp);
-}
-
-bool NullGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
-{
-	JDEBUG(JINFO, "called\n");
-
-	return Graphics::DrawImage(img, xp, yp, wp, hp);
-}
-
-bool NullGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp)
-{
-	JDEBUG(JINFO, "called\n");
-
-	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp);
-}
-
-bool NullGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
-{
-	JDEBUG(JINFO, "called\n");
-
-	return Graphics::DrawImage(img, sxp, syp, swp, shp, xp, yp, wp, hp);
 }
 
 bool NullGraphics::DrawImage(Image *img, int xp, int yp)
@@ -577,11 +523,11 @@ uint32_t NullGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 	return Graphics::GetRGB(xp, yp, pixel);
 }
 
-void NullGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize)
+void NullGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	Graphics::GetRGB(rgb, xp, yp, wp, hp, scansize);
+	Graphics::GetRGB(rgb, xp, yp, wp, hp);
 }
 
 void NullGraphics::SetRGB(uint32_t rgb, int xp, int yp)
@@ -591,11 +537,11 @@ void NullGraphics::SetRGB(uint32_t rgb, int xp, int yp)
 	Graphics::SetRGB(rgb, xp, yp);
 }
 
-void NullGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline)
+void NullGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	Graphics::SetRGB(rgb, xp, yp, wp, hp, scanline);
+	Graphics::SetRGB(rgb, xp, yp, wp, hp);
 }
 
 void NullGraphics::Reset()

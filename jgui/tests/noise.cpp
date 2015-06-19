@@ -368,35 +368,35 @@ int main()
 
 	printf("v1(%d) = %.6f  => %.6f, e::[%.6f]\n", t, v1(t), net.Process(&in01), v1(t)-net.Process(&in01));
 
-	double scalex = 10.0,
-				 scaley = 100.0,
+	double scalex = 8.0,
+				 scaley = 64.0,
 				 x0 = 0, y0 = 0, 
 				 x1 = 0, y1 = 0, 
 				 x2 = 0, y2 = 0, 
 				 x3 = 0, y3 = 0,
 				 x4 = 0, y4 = 0, 
 				 x5 = 0, y5 = 0;
-	int dx = 100,
-			dy = 500;
+	int dx = 48,
+			dy = 240;
 
-	jgui::Window window(0, 0, 1920, 1080);
+	jgui::Window window(0, 0, 960, 540);
 
 	window.Show();
 
 	jgui::Graphics *g = window.GetGraphics();
 
 	g->SetColor(0xff, 0x00, 0x00, 0xff);
-	g->FillRectangle(dx, dy-400, 20, 20);
-	g->DrawString("Sinal Original", dx+40, dy-400);
+	g->FillRectangle(dx, dy-200, 20, 20);
+	g->DrawString("Sinal Original", dx+40, dy-200);
 	
 	g->SetColor(0xff, 0xff, 0x00, 0xff);
 	g->SetColor(0xff, 0xff, 0x00, 0xff);
-	g->FillRectangle(dx, dy-350, 20, 20);
-	g->DrawString("Sinal Ruidoso", dx+40, dy-350);
+	g->FillRectangle(dx, dy-150, 20, 20);
+	g->DrawString("Sinal Ruidoso", dx+40, dy-150);
 	
 	g->SetColor(0x00, 0xff, 0x00, 0xff);
-	g->FillRectangle(dx, dy-300, 20, 20);
-	g->DrawString("Sinal Filtrado", dx+40, dy-300);
+	g->FillRectangle(dx, dy-100, 20, 20);
+	g->DrawString("Sinal Filtrado", dx+40, dy-100);
 	
 	for (double i=0.0; i<100.0; i+=1.0) {
 		Signal in(6);

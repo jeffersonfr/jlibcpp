@@ -50,10 +50,10 @@ class Main : public jgui::Frame{
 		static const int MAX_COLS = 90;
 		static const int MAX_ROWS = 45;
 		
-		static const int BLOCK_WIDTH = 16;
-		static const int BLOCK_HEIGHT = 16;
+		static const int BLOCK_WIDTH = 12;
+		static const int BLOCK_HEIGHT = 12;
 		
-		static const int BLOCK_GAP = 4;
+		static const int BLOCK_GAP = 2;
 		
 		static const int TRY_BETTER = 5;
 
@@ -80,13 +80,9 @@ class Main : public jgui::Frame{
 #endif
 		{
 #if ENABLE_GUI == 1
-			_insets.left = 10;
-			_insets.right = 10;
-			_insets.top = 60;
-
 			foffscreen = NULL;
 
-			fweights = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 12);
+			fweights = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 8);
 #endif
 
 			board = new path_t[MAX_COLS*MAX_ROWS];
@@ -271,7 +267,7 @@ class Main : public jgui::Frame{
 			char tmp[255];
 
 			if (foffscreen == NULL) {
-				foffscreen = jgui::Image::CreateImage(GetWidth(), GetHeight());
+				foffscreen = jgui::Image::CreateImage(jgui::JPF_ARGB, GetWidth(), GetHeight());
 			
 				jgui::Graphics *goff = foffscreen->GetGraphics();
 

@@ -44,14 +44,22 @@ class CheckButtonEvent;
 class CheckButton : public Component{
 
 	private:
+		/** \brief */
 		std::vector<CheckButtonListener *> _check_listeners;
+		/** \brief */
 		std::string _text;
+		/** \brief */
 		jcheckbox_type_t _type;
+		/** \brief */
 		jhorizontal_align_t _halign;
+		/** \brief */
 		jvertical_align_t _valign;
-		bool _checked,
-				 _just_check,
-				 _wrap;
+		/** \brief */
+		bool _checked;
+		/** \brief */
+		bool _just_check;
+		/** \brief */
+		bool _is_wrap;
 
 	public:
 		/**
@@ -66,6 +74,18 @@ class CheckButton : public Component{
 		 */
 		virtual ~CheckButton();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetWrap(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsWrap();
+		
 		/**
 		 * \brief
 		 *

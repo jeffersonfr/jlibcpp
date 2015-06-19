@@ -30,7 +30,7 @@ class ImageTest : public jgui::Component{
 		ImageTest():
 			jgui::Component()
 		{
-			_image = jgui::Image::CreateImage(100, 100);
+			_image = jgui::Image::CreateImage(jgui::JPF_ARGB, 100, 100);
 
 			jgui::Graphics *g = _image->GetGraphics();
 
@@ -70,14 +70,14 @@ class Main : public jgui::Frame{
 
 				sprintf(tmp, "Test %d", i+1);
 
-				_buttons[i] = new jgui::Button(tmp, 100+i*100, 100+i*100, 200, 200);
+				_buttons[i] = new jgui::Button(tmp, i*32+64, i*32+64, 120, 120);
 
 				Add(_buttons[i]);
 			}
 
 			_component = new ImageTest();
 
-			_component->SetBounds(50, 400, 100, 100);
+			_component->SetBounds(32, 320, 120, 120);
 
 			Add(_component);
 		}
@@ -95,7 +95,7 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main("Reseting graphic engine on the fly", 100, 100, 900, 800);
+	Main main("Reseting graphic engine on the fly", 32, 32, 720, 480);
 
 	main.Show();
 

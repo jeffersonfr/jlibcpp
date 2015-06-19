@@ -153,6 +153,12 @@ class TextArea : public jgui::TextComponent, public jgui::KeyboardListener{
 		 *
 		 */
 		virtual void SetWrap(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsWrap();
 
 		/**
 		 * \brief

@@ -46,13 +46,14 @@ class ScreenLayer : public jgui::Container{
 class BackgroundLayer : public ScreenLayer{
 
 	private:
-		std::string _image;
+		jgui::Image *_image;
 		jgui::Color _color;
 
 	public:
 		BackgroundLayer():
 			ScreenLayer()
 		{
+			_image = NULL;
 			_color = jgui::Color(0x00, 0x00, 0x00, 0xff);
 		}
 
@@ -69,7 +70,12 @@ class BackgroundLayer : public ScreenLayer{
 
 		void SetImage(std::string image)
 		{
-			_image = image;
+			if (_image != NULL) {
+				delete _image;
+				_image = NULL;
+			}
+
+			_image = jgui::Image::CreateImage(image);
 
 			Repaint();
 		}
@@ -103,7 +109,7 @@ class VideoLayer : public ScreenLayer{
 		{
 			_provider = NULL;
 
-			_buffer = jgui::Image::CreateImage(GetWidth(), GetHeight());
+			_buffer = jgui::Image::CreateImage(jgui::JPF_ARGB, GetWidth(), GetHeight());
 		}
 
 		virtual ~VideoLayer()
@@ -218,7 +224,7 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 		{
 			_refresh = false;
 
-			_buffer = jgui::Image::CreateImage(GetWidth(), GetHeight());
+			_buffer = jgui::Image::CreateImage(jgui::JPF_ARGB, GetWidth(), GetHeight());
 				
 			_background_layer = new BackgroundLayer();
 			_video_layer = new VideoLayer();
@@ -250,8 +256,6 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 
 			jgui::Graphics *gb = _buffer->GetGraphics();
 			jgui::Graphics *g = GetGraphics();
-
-			g->SetBlittingFlags(jgui::JBF_NOFX);
 
 			while (true) {
 				{
@@ -441,7 +445,6 @@ class ApplicationTest : public Scene{
 			int sx = _mindex/3,
 					sy = _mindex%3;
 
-			g->SetCompositeFlags(jgui::JCF_NONE);
 			g->DrawImage(_image, sx*169, sy*126, 169, 126, _dx, _dy, 128, 128);
 		}
 

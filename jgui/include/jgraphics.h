@@ -25,17 +25,6 @@
 
 #include <math.h>
 
-#define DEFAULT_SCALE_WIDTH		1920
-#define DEFAULT_SCALE_HEIGHT	1080
-
-#define DEFAULT_FONT_SIZE			20
-
-#define SCALE_TO_SCREEN(x, y, z) \
-	(int)round(((double)(x)*(double)(y))/(double)(z)) 
-
-#define SCREEN_TO_SCALE(x, z, y) \
-	(int)round(((double)(x)*(double)(y))/(double)(z)) 
-
 namespace jgui{
 
 /**
@@ -43,42 +32,19 @@ namespace jgui{
  *
  */
 enum jcomposite_flags_t {
-	JCF_NONE			= 0x0000,	// fs: sa fd: 1.0-sa (defaults)
-	JCF_CLEAR			= 0x0001,	// fs: 0.0 fd: 0.0
-	JCF_SRC				= 0x0002,	// fs: 1.0 fd: 0.0
-	JCF_DST				= 0x0004,	// fs: 1.0 fd: 0.0
-	JCF_SRC_OVER	= 0x0008,	// fs: 1.0 fd: 1.0-sa
-	JCF_DST_OVER	= 0x0010,	// fs: 1.0-da fd: 1.0
-	JCF_SRC_IN		= 0x0020,	// fs: da fd: 0.0
-	JCF_DST_IN		= 0x0040,	// fs: 0.0 fd: sa
-	JCF_SRC_OUT		= 0x0080,	// fs: 1.0-da fd: 0.0
-	JCF_DST_OUT		= 0x0100,	// fs: 0.0 fd: 1.0-sa
-	JCF_SRC_ATOP	= 0x0200,	// fs: da fd: 1.0-sa
-	JCF_DST_ATOP	= 0x0400,	// fs: 1.0-da fd: sa
-	JCF_ADD				= 0x0800,	// fs: 1.0 fd: 1.0
-	JCF_XOR				= 0x1000	// fs: 1.0-da fd: 1.0-sa 
-};
-
-/**
- * \brief
- *
- */
-enum jdrawing_flags_t {
-	JDF_NOFX		= 0x01,
-	JDF_BLEND		= 0x02,
-	JDF_XOR			= 0x04
-};
-
-/**
- * \brief
- *
- */
-enum jblitting_flags_t {
-	JBF_NOFX					= 0x01,
-	JBF_ALPHACHANNEL	= 0x02,
-	JBF_COLORALPHA		= 0x04,
-	JBF_COLORIZE			= 0x08,
-	JBF_XOR						= 0x80
+	JCF_CLEAR			 = 0x0001,	// fs: 0.0 fd: 0.0
+	JCF_SRC				 = 0x0002,	// fs: 1.0 fd: 0.0
+	JCF_SRC_OVER	 = 0x0004,	// fs: 1.0 fd: 1.0-sa
+	JCF_SRC_IN		 = 0x0008,	// fs: da fd: 0.0
+	JCF_SRC_OUT		 = 0x0010,	// fs: 1.0-da fd: 0.0
+	JCF_SRC_ATOP	 = 0x0020,	// fs: da fd: 1.0-sa
+	JCF_DST				 = 0x0040,	// fs: 1.0 fd: 0.0
+	JCF_DST_OVER	 = 0x0080,	// fs: 1.0-da fd: 1.0
+	JCF_DST_IN		 = 0x0100,	// fs: 0.0 fd: sa
+	JCF_DST_OUT		 = 0x0200,	// fs: 0.0 fd: 1.0-sa
+	JCF_DST_ATOP	 = 0x0400,	// fs: 1.0-da fd: sa
+	JCF_ADD				 = 0x0800,	// fs: 1.0 fd: 1.0
+	JCF_XOR				 = 0x1000,	// fs: 1.0-da fd: 1.0-sa 
 };
 
 /**
@@ -90,6 +56,17 @@ enum jdrawing_mode_t {
 	JDM_STROKE,
 	JDM_FILL,
 	JDM_CLIP
+};
+
+/**
+ * \brief
+ *
+ */
+enum jantialias_mode_t {
+	JAM_NONE,
+	JAM_FAST,
+	JAM_NORMAL,
+	JAM_GOOD
 };
 
 /**
@@ -218,15 +195,20 @@ class Image;
 class Graphics : public virtual jcommon::Object{
 	
 	protected:
+		/** \brief */
 		jthread::Mutex _graphics_mutex;
-
+		/** \brief */
 		std::vector<struct jgradient_t> _gradient_stops;
+		/** \brief */
 		Font *_font;
+		/** \brief */
 		Color _color;
+		/** \brief */
 		struct jpoint_t _translate;
-		struct jsize_t _screen;
-		struct jsize_t _scale;
+		/** \brief */
 		bool _vertical_sync;
+		/** \brief */
+		jantialias_mode_t _antialias;
 
 	protected:
 		/**
@@ -252,31 +234,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetNativeSurface(void *surface);
+		virtual void SetNativeSurface(void *data, int wp, int hp);
 
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void Dump(std::string dir, std::string pre);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetWorkingScreenSize();
 
 		/**
 		 * \brief
@@ -396,25 +360,19 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetAntialias(bool b);
+		virtual void SetAntialias(jantialias_mode_t mode);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jantialias_mode_t GetAntialias();
 
 		/**
 		 * \brief
 		 *
 		 */
 		virtual jcomposite_flags_t GetCompositeFlags();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jdrawing_flags_t GetDrawingFlags();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jblitting_flags_t GetBlittingFlags();
 		
 		/**
 		 * \brief
@@ -432,31 +390,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetDrawingFlags(jdrawing_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBlittingFlags(jblitting_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetDrawingMode(jdrawing_mode_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPixels(uint8_t *pixels);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetPixels(uint8_t **pixels);
 		
 		/**
 		 * \brief
@@ -670,30 +604,6 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int xp, int yp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool DrawImage(std::string img, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual bool DrawImage(Image *img, int xp, int yp);
 		
 		/**
@@ -718,6 +628,18 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual jregion_t GetStringExtends(std::string text);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jregion_t GetGlyphExtends(int symbol);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawString(std::string text, int xp, int yp);
 		
 		/**
@@ -736,7 +658,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize);
+		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
@@ -748,7 +670,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline);
+		virtual void SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp);
 	
 		/**
 		 * \brief

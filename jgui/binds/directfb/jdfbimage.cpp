@@ -84,23 +84,127 @@ class MediaLoaderThread : public jthread::Thread {
 
 };
 
-DFBImage::DFBImage(int width, int height, jpixelformat_t pixelformat, int scale_width, int scale_height):
-	jgui::Image(width, height, pixelformat, scale_width, scale_height)
+/*
+uint32_t * resize_bilinear(uint32_t *pixels, int w, int h, int w2, int h2) 
+{
+	uint32_t *temp = new uint32_t[w2*h2];
+	uint32_t a, b, c, d, x, y, index;
+	double x_ratio = ((double)(w-1))/w2;
+	double y_ratio = ((double)(h-1))/h2;
+	double x_diff, y_diff, blue, red, green;
+	int offset = 0;
+
+	for (int i=0; i<h2; i++) {
+		for (int j=0; j<w2; j++) {
+			x = (int)(x_ratio * j);
+			y = (int)(y_ratio * i);
+			x_diff = (x_ratio * j) - x;
+			y_diff = (y_ratio * i) - y;
+			index = (y*w+x); 
+			a = pixels[index];
+			b = pixels[index+1];
+			c = pixels[index+w];
+			d = pixels[index+w+1];
+
+			// blue element:: Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
+			blue = (a&0xff)*(1-x_diff)*(1-y_diff) + (b&0xff)*(x_diff)*(1-y_diff) + (c&0xff)*(y_diff)*(1-x_diff)   + (d&0xff)*(x_diff*y_diff);
+			// green element:: Yg = Ag(1-w)(1-h) + Bg(w)(1-h) + Cg(h)(1-w) + Dg(wh)
+			green = ((a>>8)&0xff)*(1-x_diff)*(1-y_diff) + ((b>>8)&0xff)*(x_diff)*(1-y_diff) + ((c>>8)&0xff)*(y_diff)*(1-x_diff)   + ((d>>8)&0xff)*(x_diff*y_diff);
+			// red element:: Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
+			red = ((a>>16)&0xff)*(1-x_diff)*(1-y_diff) + ((b>>16)&0xff)*(x_diff)*(1-y_diff) + ((c>>16)&0xff)*(y_diff)*(1-x_diff)   + ((d>>16)&0xff)*(x_diff*y_diff);
+
+			temp[offset++] = ((((int)red) << 24) & 0xff000000) | ((((int)red) << 16) & 0xff0000) | ((((int)green) << 8) & 0xff00) | ((int)blue);
+		}
+	}
+
+	return temp;
+}
+*/
+
+DFBImage::DFBImage(jpixelformat_t pixelformat, int width, int height):
+	jgui::Image(pixelformat, width, height)
 {
 	jcommon::Object::SetClassName("jgui::DFBImage");
 
 	_buffer = NULL;
 	
-	IDirectFBSurface *surface = NULL;
-
-	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->
-		CreateSurface(_size.width, _size.height, &surface, pixelformat, _scale.width, _scale.height);
-
-	if (surface == NULL) {
-		throw jcommon::NullPointerException("Cannot create a native surface");
+	if (width < 1 || height < 1) {
+		throw jcommon::RuntimeException("Invalid image size");
 	}
 
-	_graphics = new DFBGraphics(this, surface, false, _scale.width, _scale.height);
+	switch (pixelformat) {
+		case JPF_ARGB:
+		case JPF_RGB32:
+			break;
+		default:
+			throw jcommon::RuntimeException("Invalid pixel format");
+	}
+
+	_graphics = new DFBGraphics(NULL, width, height);
+
+	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
+}
+
+DFBImage::DFBImage(std::string file):
+	jgui::Image(JPF_ARGB, -1, -1)
+{
+	jcommon::Object::SetClassName("jgui::DFBImage");
+
+	_buffer = NULL;
+	
+	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
+
+	IDirectFBSurface *surface = NULL;
+	IDirectFBImageProvider *provider = NULL;
+	DFBSurfaceDescription desc;
+
+	if (engine->CreateImageProvider(engine, file.c_str(), &provider) != DFB_OK) {
+		throw jcommon::RuntimeException("Cannot open this image type");
+	}
+
+	if (provider->GetSurfaceDescription (provider, &desc) != DFB_OK) {
+		provider->Release(provider);
+
+		throw jcommon::RuntimeException("Cannot get image description");
+	}
+
+	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
+	desc.pixelformat = DSPF_ARGB;
+
+	if (engine->CreateSurface(engine, &desc, &surface) != DFB_OK) {
+		provider->Release(provider);
+
+		throw jcommon::RuntimeException("Cannot allocate memory to the image surface");
+	}
+
+	surface->SetPorterDuff(surface, DSPD_NONE);
+	surface->SetBlittingFlags(surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+	surface->Clear(surface, 0x00, 0x00, 0x00, 0x00);
+	
+	if (provider->RenderTo(provider, surface, NULL) != DFB_OK) {
+		provider->Release(provider);
+		surface->Release(surface);
+
+		throw jcommon::RuntimeException("Cannot blit image to the image surface");
+	}
+
+	_graphics = new DFBGraphics(NULL, desc.width, desc.height);
+
+	// INFO:: draw image pixels to cairo's surface
+	void *ptr;
+	int pitch;
+
+	surface->Lock(surface, DSLF_READ, &ptr, &pitch);
+	_graphics->SetRGB((uint32_t *)ptr, 0, 0, desc.width, desc.height);
+	surface->Unlock(surface);
+
+	provider->Release(provider);
+	surface->Release(surface);
+
+	_pixelformat = JPF_ARGB;
+	_size.width = desc.width;
+	_size.height = desc.height;
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
 }
@@ -109,32 +213,23 @@ DFBImage::~DFBImage()
 {
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Remove(this);
 
-	IDirectFBSurface *surface = (IDirectFBSurface *)_graphics->GetNativeSurface();
-
-	if (surface != NULL) {
-		surface->Release(surface);
+	if (_buffer != NULL) {
+		delete [] _buffer;
+		_buffer = NULL;
 	}
 
 	if (_graphics != NULL) {
 		delete _graphics;
 		_graphics = NULL;
 	}
-	
-	if (_buffer != NULL) {
-		delete [] _buffer;
-		_buffer = NULL;
-	}
 }
 
-bool DFBImage::GetImageSize(std::string img, int *width, int *height)
+jsize_t DFBImage::GetImageSize(std::string img)
 {
-	if (width != NULL) {
-		*width = -1;
-	}
+	jsize_t t;
 
-	if (height != NULL) {
-		*height = -1;
-	}
+	t.width = -1;
+	t.height = -1;
 
 	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
 	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
@@ -143,26 +238,21 @@ bool DFBImage::GetImageSize(std::string img, int *width, int *height)
 	DFBSurfaceDescription desc;
 
 	if (engine->CreateImageProvider(engine, img.c_str(), &provider) != DFB_OK) {
-		return false;
+		return t;
 	}
 
-	if (provider->GetSurfaceDescription(provider, &desc) == DFB_OK) {
+	if (provider->GetSurfaceDescription(provider, &desc) != DFB_OK) {
 		provider->Release(provider);
 
-		if (width != NULL) {
-			*width = desc.width;
-		}
-
-		if (height != NULL) {
-			*height = desc.height;
-		}
-
-		return true;
+		return t;
 	}
 
+	t.width = desc.width;
+	t.height = desc.height;
+		
 	provider->Release(provider);
-	
-	return false;
+
+	return t;
 }
 
 Image * DFBImage::CreateImageStream(jio::InputStream *stream)
@@ -201,11 +291,15 @@ Image * DFBImage::CreateImageStream(jio::InputStream *stream)
 
 	loader.WaitThread();
 
-	image = new DFBImage(sdsc.width, sdsc.height, JPF_ARGB, GFXHandler::GetInstance()->GetScreenWidth(), GFXHandler::GetInstance()->GetScreenHeight());
+	image = new DFBImage(JPF_ARGB, sdsc.width, sdsc.height);
 
-	IDirectFBSurface *image_surface = (IDirectFBSurface *)image->GetGraphics()->GetNativeSurface();
+	// INFO:: draw image pixels to cairo's surface
+	void *ptr;
+	int pitch;
 
-	image_surface->Blit(image_surface, surface, NULL, 0, 0);
+	surface->Lock(surface, DSLF_READ, &ptr, &pitch);
+	image->GetGraphics()->SetRGB((uint32_t *)ptr, 0, 0, sdsc.width, sdsc.height);
+	surface->Unlock(surface);
 
 	surface->Release(surface);
 	provider->Release(provider);
@@ -216,254 +310,193 @@ Image * DFBImage::CreateImageStream(jio::InputStream *stream)
 
 void DFBImage::Release()
 {
-	_graphics->Lock();
-	
-	IDirectFBSurface *surface = (IDirectFBSurface *)_graphics->GetNativeSurface();
-
-	if (_graphics != NULL) {
-		_graphics->SetNativeSurface(NULL);
-	}
-
-	_graphics->Unlock();
-
-	void *ptr;
-	int pitch,
-			width,
-			height;
-
-	surface->GetSize(surface, &width, &height);
-	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
-
-	if (_buffer != NULL) {
-		delete [] _buffer;
-		_buffer = NULL;
-	}
-
-	_buffer = new uint8_t[pitch*height];
-
-	memcpy(_buffer, ptr, pitch*height);
-
-	surface->Unlock(surface);
-
-	if (surface != NULL) {
-		surface->Release(surface);
-	}
 }
 
 void DFBImage::Restore()
 {
-	jsize_t scale = _graphics->GetWorkingScreenSize();
-
-	IDirectFBSurface *surface = NULL;
-
-	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->
-		CreateSurface(_size.width, _size.height, &surface, _pixelformat, scale.width, scale.height);
-
-	void *ptr;
-	int pitch,
-			width,
-			height;
-
-	surface->GetSize(surface, &width, &height);
-	surface->Lock(surface, (DFBSurfaceLockFlags)(DSLF_WRITE), &ptr, &pitch);
-
-	memcpy(ptr, _buffer, pitch*height);
-
-	surface->Unlock(surface);
-
-	if (_buffer != NULL) {
-		delete [] _buffer;
-		_buffer = NULL;
-	}
-	
-	_graphics->Lock();
-	_graphics->SetNativeSurface(surface);
-	_graphics->Unlock();
 }
 
-jcommon::Object * DFBImage::Clone()
+Image * DFBImage::Flip(Image *img, jflip_flags_t mode)
 {
-	jsize_t scale = _graphics->GetWorkingScreenSize();
-	
-	Image *clone = new DFBImage(GetWidth(), GetHeight(), GetPixelFormat(), scale.width, scale.height);
+	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(img->GetGraphics())->_cairo_context);
 
-	clone->GetGraphics()->SetCompositeFlags(JCF_NONE);
-
-	if (clone->GetGraphics()->DrawImage(this, 0, 0) == false) {
-		delete clone;
-		clone = NULL;
+	if (cairo_surface == NULL) {
+		return NULL;
 	}
 
-	return clone;
-}
+	int width = img->GetWidth();
+	int height = img->GetHeight();
 
-void DFBImage::SetSize(int width, int height)
-{
-	_size.width = width;
-	_size.height = height;
-}
+	DFBImage *image = new DFBImage(img->GetPixelFormat(), width, height);
+	cairo_t *cairo_context = dynamic_cast<DFBGraphics *>(image->GetGraphics())->_cairo_context;
 
-Image * DFBImage::Flip(Image *img, jflip_flags_t t)
-{
-	jsize_t size = img->GetSize();
-	jsize_t scale = img->GetWorkingScreenSize();
-	jpixelformat_t pixel = img->GetPixelFormat();
+	cairo_surface_flush(cairo_surface);
 
-	DFBImage *image = new DFBImage(size.width, size.height, pixel, scale.width, scale.height);
+	cairo_matrix_t ms, mt, m;
 
-	image->GetGraphics()->SetCompositeFlags(JCF_NONE);
-
-	IDirectFBSurface *isrc = (IDirectFBSurface *)img->GetGraphics()->GetNativeSurface();
-	IDirectFBSurface *idst = (IDirectFBSurface *)image->GetGraphics()->GetNativeSurface();
-
-	/*
-	// INFO:: use matrix
-	static const s32 x_mat[9] = {
-		-DFB_FIXED_POINT, 0, (size.width-1) << 16,
-		0, DFB_FIXED_POINT, 0,
-		0, 0, DFB_FIXED_POINT
-	};
-
-	static const s32 y_mat[9] = {
-		DFB_FIXED_POINT, 0, 0,
-		0, -DFB_FIXED_POINT, (size.height-1) << 16,
-		0, 0, DFB_FIXED_POINT
-	};
-
-	static const s32 xy_mat[9] = {
-		-DFB_FIXED_POINT, 0, (size.width-1) << 16,
-		0, -DFB_FIXED_POINT, (size.height-1) << 16,
-		0, 0, DFB_FIXED_POINT
-	};
-
-	idst->SetRenderOptions(idst, (DFBSurfaceRenderOptions)(DSRO_MATRIX | DSRO_ANTIALIAS));
-
-	if (t == JFF_HORIZONTAL) {
-		idst->SetMatrix(idst, x_mat);
-	} else if (t == JFF_VERTICAL) {
-		idst->SetMatrix(idst, y_mat);
+	if (mode == JFF_HORIZONTAL) {
+		cairo_matrix_init_scale(&ms, -1.0f, 1.0f);
+		cairo_matrix_init_translate(&mt, -width, 0.0f);
 	} else {
-		idst->SetMatrix(idst, xy_mat);
+		cairo_matrix_init_scale(&ms, 1.0f, -1.0f);
+		cairo_matrix_init_translate(&mt, 0.0f, -height);
 	}
 
-	idst->Blit(idst, isrc, NULL, 0, 0);
-	
-	idst->SetRenderOptions(idst, (DFBSurfaceRenderOptions)(DSRO_NONE));
-	*/
+	cairo_matrix_multiply(&m, &mt, &ms);
+	cairo_set_matrix(cairo_context, &m);
 
-	// INFO:: use blitting flags
-	if (t == JFF_HORIZONTAL) {
-		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_HORIZONTAL));
-	} else if (t == JFF_VERTICAL) {
-		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_VERTICAL));
-	} else {
-		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_HORIZONTAL | DSBLIT_FLIP_VERTICAL));
-	}
-
-	idst->Blit(idst, isrc, NULL, 0, 0);
-
-	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+	cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
+	cairo_paint(cairo_context);
 
 	return image;
 }
 
 Image * DFBImage::Rotate(Image *img, double radians, bool resize)
 {
+	cairo_t *src_context = dynamic_cast<DFBGraphics *>(img->GetGraphics())->_cairo_context;
+	cairo_surface_t *src_surface = cairo_get_target(src_context);
+
+	if (src_surface == NULL) {
+		return NULL;
+	}
+
+	cairo_surface_flush(src_surface);
+
 	jsize_t isize = img->GetSize();
-	jsize_t iscale = img->GetWorkingScreenSize();
-	jpixelformat_t ipixel = img->GetPixelFormat();
-	int precision = 1024;
 
 	double angle = fmod(radians, 2*M_PI);
-
-	int sinTheta = precision*sin(angle);
-	int cosTheta = precision*cos(angle);
 
 	int iw = isize.width;
 	int ih = isize.height;
 
 	if (resize == true) {
+		int precision = 10240;
+		int sinTheta = (int)(precision*sin(angle));
+		int cosTheta = (int)(precision*cos(angle));
+
 		iw = (abs(isize.width*cosTheta)+abs(isize.height*sinTheta))/precision;
 		ih = (abs(isize.width*sinTheta)+abs(isize.height*cosTheta))/precision;
+		
+		DFBImage *dst = new DFBImage(img->GetPixelFormat(), iw, ih);
+		cairo_t *dst_context = dynamic_cast<DFBGraphics *>(dst->GetGraphics())->_cairo_context;
+
+		cairo_translate(dst_context, iw/2, ih/2);
+		cairo_rotate(dst_context, -radians);
+		cairo_translate(dst_context, -iw/2, -ih/2);
+		cairo_set_source_surface(dst_context, src_surface, (iw-isize.width)/2, (ih-isize.height)/2);
+		cairo_paint(dst_context);
+
+		return dst;
 	}
 
-	DFBImage *rotate = new DFBImage(iw, ih, ipixel, iscale.width, iscale.height);
+	DFBImage *dst = new DFBImage(img->GetPixelFormat(), iw, ih);
+	cairo_t *dst_context = dynamic_cast<DFBGraphics *>(dst->GetGraphics())->_cairo_context;
 
-	rotate->GetGraphics()->SetCompositeFlags(JCF_NONE);
+	cairo_translate(dst_context, isize.width/2, isize.height/2);
+	cairo_rotate(dst_context, -radians);
+	cairo_translate(dst_context, -isize.width/2, -isize.height/2);
+	cairo_set_source_surface(dst_context, src_surface, 0, 0);
+	cairo_paint(dst_context);
 
-	IDirectFBSurface *isrc = (IDirectFBSurface *)img->GetGraphics()->GetNativeSurface();
-	IDirectFBSurface *idst = (IDirectFBSurface *)rotate->GetGraphics()->GetNativeSurface();
+	return dst;
+}
 
-	/*
-	// INFO:: use matrix
-	int sw, sh;
-	int dw, dh;
+Image * DFBImage::Scale(Image *img, int width, int height)
+{
+	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(img->GetGraphics())->_cairo_context);
 
-	isrc->GetSize(isrc, &sw, &sh);
-	idst->GetSize(idst, &dw, &dh);
+	if (cairo_surface == NULL) {
+		return NULL;
+	}
 
-	static const s32 r_mat[9] = {
-		(s32)(DFB_FIXED_POINT*cos(angle)), (s32)(DFB_FIXED_POINT*sin(angle)), (s32)(DFB_FIXED_POINT*(dw/2)),
-		(s32)(-DFB_FIXED_POINT*sin(angle)), (s32)(DFB_FIXED_POINT*cos(angle)), (s32)(DFB_FIXED_POINT*(dh/2)),
-		0, 0, DFB_FIXED_POINT
-	};
+	DFBImage *image = new DFBImage(img->GetPixelFormat(), width, height);
+	cairo_t *cairo_context = dynamic_cast<DFBGraphics *>(image->GetGraphics())->_cairo_context;
 
-	idst->SetRenderOptions(idst, (DFBSurfaceRenderOptions)(DSRO_MATRIX | DSRO_ANTIALIAS));
-	idst->SetMatrix(idst, r_mat);
+	cairo_surface_flush(cairo_surface);
+	cairo_scale(cairo_context, (double)width/img->GetWidth(), (double)height/img->GetHeight());
+	cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
+	cairo_paint(cairo_context);
 
-	idst->Blit(idst, isrc, NULL, -sw/2, -sh/2);
+	return image;
+}
+
+Image * DFBImage::Crop(Image *img, int x, int y, int width, int height)
+{
+	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(img->GetGraphics())->_cairo_context);
+
+	if (cairo_surface == NULL) {
+		return NULL;
+	}
+
+	DFBImage *image = new DFBImage(img->GetPixelFormat(), width, height);
+	cairo_t *cairo_context = dynamic_cast<DFBGraphics *>(image->GetGraphics())->_cairo_context;
+
+	cairo_surface_flush(cairo_surface);
+	cairo_set_source_surface(cairo_context, cairo_surface, -x, -y);
+	cairo_paint(cairo_context);
+
+	return image;
+}
+
+Image * DFBImage::Blend(Image *img, double alpha)
+{
+	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(img->GetGraphics())->_cairo_context);
+
+	if (cairo_surface == NULL) {
+		return NULL;
+	}
+
+	if (alpha < 0.0) {
+		alpha = 0.0;
+	}
+
+	if (alpha > 1.0) {
+		alpha = 1.0;
+	}
+
+	DFBImage *image = new DFBImage(img->GetPixelFormat(), img->GetWidth(), img->GetHeight());
+	cairo_t *cairo_context = dynamic_cast<DFBGraphics *>(image->GetGraphics())->_cairo_context;
+
+	cairo_surface_flush(cairo_surface);
+	cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
+	cairo_paint_with_alpha(cairo_context, alpha);
+
+	return image;
+}
+
+Image * DFBImage::Colorize(Image *img, Color color)
+{
+	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(img->GetGraphics())->_cairo_context);
+
+	if (cairo_surface == NULL) {
+		return NULL;
+	}
+
+	DFBImage *image = new DFBImage(img->GetPixelFormat(), img->GetWidth(), img->GetHeight());
+	cairo_t *cairo_context = dynamic_cast<DFBGraphics *>(image->GetGraphics())->_cairo_context;
+
+	int r = color.GetRed();
+	int g = color.GetGreen();
+	int b = color.GetBlue();
+
+	cairo_surface_t *ref_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, img->GetWidth(), img->GetHeight());
+	cairo_t *ref_context = cairo_create(ref_surface);
 	
-	idst->SetRenderOptions(idst, (DFBSurfaceRenderOptions)(DSRO_NONE));
-	*/
+	cairo_set_source_rgb(ref_context, r/255.0, g/255.0, b/255.0);
+	cairo_paint(ref_context);
 
-	// INFO:: use algebra
-	void *sptr;
-	uint32_t *sptr32;
-	void *dptr;
-	uint32_t *dptr32;
-	int spitch;
-	int dpitch;
-	int sw,
-			sh;
-	int dw,
-			dh;
+	cairo_surface_flush(cairo_surface);
+	cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
+	cairo_paint(cairo_context);
 
-	isrc->GetSize(isrc, &sw, &sh);
-	idst->GetSize(idst, &dw, &dh);
+	cairo_set_operator(cairo_context, CAIRO_OPERATOR_HSL_COLOR);
+	cairo_set_source_surface(cairo_context, ref_surface, 0, 0);
+	cairo_paint(cairo_context);
 
-	isrc->Lock(isrc, (DFBSurfaceLockFlags)(DSLF_READ), &sptr, &spitch);
-	idst->Lock(idst, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &dptr, &dpitch);
+	cairo_destroy(ref_context);
+	cairo_surface_destroy(ref_surface);
 
-	int sxc = sw/2;
-	int syc = sh/2;
-	int dxc = dw/2;
-	int dyc = dh/2;
-	int xo;
-	int yo;
-	int t1;
-	int t2;
-
-	sptr32 = (uint32_t *)sptr;
-
-	for (int j=0; j<dh; j++) {
-		dptr32 = (uint32_t *)((uint8_t *)dptr + j*dpitch);
-		t1 = (j-dyc)*sinTheta;
-		t2 = (j-dyc)*cosTheta;
-
-		for (int i=0; i<dw; i++) {
-			xo = ((i-dxc)*cosTheta - t1)/precision;
-			yo = ((i-dxc)*sinTheta + t2)/precision;
-
-			if (xo >= -sxc && xo < sxc && yo >= -syc && yo < syc) {
-				*(dptr32+i) = *((uint32_t *)((uint8_t *)sptr + (yo+syc)*spitch) + (xo+sxc));
-			}
-		}
-	}
-
-	isrc->Unlock(isrc);
-	idst->Unlock(idst);
-
-	return rotate;
+	return image;
 }
 
 }

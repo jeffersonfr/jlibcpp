@@ -20,105 +20,60 @@
 #include "Stdafx.h"
 #include "jfont.h"
 #include "jgfxhandler.h"
+#include "jnullpointerexception.h"
 #include "jstringutils.h"
 #include "jstringtokenizer.h"
-#include "jnullpointerexception.h"
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 #include "jdfbfont.h"
-#elif defined(X11_UI)
-#include "jsdlfont.h"
 #endif
+
+#define DEFAULT_FONT_SIZE			16
 
 namespace jgui {
 
 Font *Font::_default_font = NULL;
 
-Font::Font(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height):
+Font::Font(std::string name, jfont_attributes_t attributes, int size):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jgui::Font");
 
-	_attributes = attributes;
 	_name = name;
-	
-	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
-
-	SetWorkingScreenSize(scale_width, scale_height);
+	_size = size;
+	_attributes = attributes;
 }
 
 Font::~Font()
 {
 }
 
+void Font::ApplyContext(void *ctx)
+{
+}
+
 Font * Font::GetDefaultFont()
 {
 	if (_default_font == NULL) {
-		_default_font = Font::CreateFont(_DATA_PREFIX"/fonts/default.ttf", JFA_NORMAL, DEFAULT_FONT_SIZE);
+		// _default_font = Font::CreateFont("Sans-Serif", (jfont_attributes_t)(JFA_NORMAL), DEFAULT_FONT_SIZE);
+		_default_font = Font::CreateFont(_DATA_PREFIX"/fonts/default.ttf", (jfont_attributes_t)(JFA_NORMAL), DEFAULT_FONT_SIZE);
 	}
 
 	return _default_font;
 }
 
-Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int height, int scale_width, int scale_height)
+Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int size)
 {
 	Font *font = NULL;
 
-	jio::File file(name);
-
-	if (file.Exists() == false) {
-		if (attributes & JFA_BOLD) {
-			name = name + "-bold";
-		}
-		
-		if (attributes & JFA_ITALIC) {
-			name = name + "-italic";
-		}
-
-		name = std::string(_DATA_PREFIX"/fonts/") + name + ".ttf";
-
-		jio::File file(name);
-
-		if (file.Exists() == false) {
-			return NULL;
-		}
-	}
-
 	try {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-		font = new DFBFont(name, attributes, height, scale_width, scale_height);
-#elif defined(X11_UI)
-		font = new X11Font(name, attributes, height, scale_width, scale_height);
+#if defined(DIRECTFB_UI)
+		font = new DFBFont(name, attributes, size);
 #endif
 	} catch (jcommon::NullPointerException &) {
 	}
 
 	return font;
-}
-
-void Font::SetWorkingScreenSize(jsize_t size)
-{
-	SetWorkingScreenSize(size.width, size.height);
-}
-
-void Font::SetWorkingScreenSize(int width, int height)
-{
-	_scale.width = width;
-	_scale.height = height;
-
-	if (_scale.width <= 0) {
-		_scale.width = jgui::GFXHandler::GetInstance()->GetScreenWidth();
-	}
-
-	if (_scale.height <= 0) {
-		_scale.height = jgui::GFXHandler::GetInstance()->GetScreenHeight();
-	}
-}
-
-jsize_t Font::GetWorkingScreenSize()
-{
-	return _scale;
 }
 
 jfont_attributes_t Font::GetFontAttributes()
@@ -136,19 +91,19 @@ bool Font::SetEncoding(std::string code)
 	return false;
 }
 
+std::string Font::GetEncoding()
+{
+	return "Unknown";
+}
+
 std::string Font::GetName()
 {
 	return _name;
 }
 
-int Font::GetLineSize()
-{
-	return GetSize() + GetAscender() + GetDescender() + GetLeading();
-}
-
 int Font::GetSize()
 {
-	return -1;
+	return GetAscender() + GetDescender() + GetLeading();
 }
 
 int Font::GetAscender()
@@ -161,7 +116,12 @@ int Font::GetDescender()
 	return -1;
 }
 
-int Font::GetMaxAdvance()
+int Font::GetMaxAdvanceWidth()
+{
+	return -1;
+}
+
+int Font::GetMaxAdvanceHeight()
 {
 	return -1;
 }
@@ -200,7 +160,7 @@ jregion_t Font::GetGlyphExtends(int symbol)
 	return t;
 }
 
-void Font::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign)
+void Font::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, bool justify)
 {
 	if (wp < 0 || hp < 0) {
 		return;
@@ -216,7 +176,7 @@ void Font::GetStringBreak(std::vector<std::string> *lines, std::string text, int
 		line = jcommon::StringUtils::ReplaceString(line, "\n", "");
 		line = jcommon::StringUtils::ReplaceString(line, "\t", "    ");
 		
-		if (halign == JHA_JUSTIFY) {
+		if (justify == true) {
 			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, false);
 
 			std::string temp,
@@ -343,8 +303,6 @@ void Font::Release()
 
 void Font::Restore()
 {
-	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
 }
 
 }

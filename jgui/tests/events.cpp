@@ -401,13 +401,16 @@ class Test : public jgui::Window, public UserEventListener {
 
 	public:
 		Test():
-			jgui::Window(0, 0, 1920, 1080)
+			jgui::Window(0, 0, 960, 540)
 		{
-			_ball.x = 1920/2;
-			_ball.y = 1080/2;
-			_raio = 100;
+			_ball.x = 960/2;
+			_ball.y = 540/2;
+			_raio = 32;
 			_color = 0;
 			_pressed = false;
+
+			// INFO:: avoid that window register the events after userinputmanager
+			SetInputEnabled(false);
 
 			UserEventManager::GetInstance()->RegisterUserEventListener(this);
 		}

@@ -34,33 +34,32 @@
 
 namespace jgui {
 
-DFBGraphics::DFBGraphics(DFBImage *image, void *surface, bool premultiplied, int scale_width, int scale_height):
+DFBGraphics::DFBGraphics(void *surface, int wp, int hp):
 	jgui::Graphics()
 {
 	jcommon::Object::SetClassName("jgui::DFBGraphics");
 
-	_image = image;
-
-	_is_premultiply = premultiplied;
-
-	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
-
-	_scale.width = scale_width;
-	_scale.height = scale_height;
+	_clip.x = 0;
+	_clip.y = 0;
+	_clip.width = wp;
+	_clip.height = hp;
 
 	_surface = (IDirectFBSurface *)surface;
 
-	_clip.x = 0;
-	_clip.y = 0;
-	_clip.width = _scale.width;
-	_clip.height = _scale.height;
+	_cairo_context = NULL;
+
+	cairo_surface_t *cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wp, hp);
+
+	_cairo_context = cairo_create(cairo_surface);
+	
+	cairo_surface_destroy(cairo_surface);
 
 	Reset();
 }
 
 DFBGraphics::~DFBGraphics()
 {
+	cairo_destroy(_cairo_context);
 }
 
 void * DFBGraphics::GetNativeSurface()
@@ -68,19 +67,41 @@ void * DFBGraphics::GetNativeSurface()
 	return _surface;
 }
 
-void DFBGraphics::SetNativeSurface(void *surface)
+void DFBGraphics::SetNativeSurface(void *data, int wp, int hp)
 {
-	_surface = (IDirectFBSurface *)surface;
+	_surface = (IDirectFBSurface *)data;
+
+	cairo_destroy(_cairo_context);
+
+	_cairo_context = NULL;
+
+	if (_surface != NULL) {
+		int sw;
+		int sh;
+
+		_surface->GetSize(_surface, &sw, &sh);
+
+		cairo_surface_t *cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, sw, sh);
+
+		_cairo_context = cairo_create(cairo_surface);
+	}
 }
 
-void DFBGraphics::Dump(std::string dir, std::string pre)
+void DFBGraphics::Dump(std::string dir, std::string prefix)
 {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	if (_surface != NULL) {
-		_surface->Dump(_surface, dir.c_str(), pre.c_str());
+	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
+
+	if (cairo_surface == NULL) {
+		return;
 	}
-#elif defined(X11_UI)
-#endif
+
+	jio::File *temp = jio::File::CreateTemporaryFile(prefix);
+	std::string path = dir + "/" + temp->GetName() + ".png";
+
+	delete temp;
+
+	cairo_surface_flush(cairo_surface);
+	cairo_surface_write_to_png(cairo_surface, path.c_str());
 }
 
 jregion_t DFBGraphics::ClipRect(int xp, int yp, int wp, int hp)
@@ -94,17 +115,12 @@ jregion_t DFBGraphics::ClipRect(int xp, int yp, int wp, int hp)
 
 void DFBGraphics::SetClip(int xp, int yp, int wp, int hp)
 {
-	int w = _scale.width,
-			h = _scale.height;
+	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 
-	if (_surface != NULL) {
-		_surface->GetSize(_surface, &w, &h);
+	int sw = cairo_image_surface_get_width(cairo_surface);
+	int sh = cairo_image_surface_get_height(cairo_surface);
 
-		w = SCREEN_TO_SCALE(w, _screen.width, _scale.width);
-		h = SCREEN_TO_SCALE(h, _screen.height, _scale.height);
-	}
-
-	jregion_t clip = Rectangle::Intersection(xp+_translate.x, yp+_translate.y, wp, hp, 0, 0, w, h);
+	jregion_t clip = Rectangle::Intersection(xp+_translate.x, yp+_translate.y, wp, hp, 0, 0, sw, sh);
 	
 	_clip.x = clip.x - _translate.x;
 	_clip.y = clip.y - _translate.y;
@@ -113,17 +129,14 @@ void DFBGraphics::SetClip(int xp, int yp, int wp, int hp)
 	
 	_internal_clip = clip;
 
-	if (_surface != NULL) {
-		DFBRegion rgn;
+	int x1 = clip.x;
+	int y1 = clip.y;
+	int x2 = clip.x+clip.width+1;
+	int y2 = clip.y+clip.height+1;
 
-		rgn.x1 = SCALE_TO_SCREEN((clip.x), _screen.width, _scale.width);
-		rgn.y1 = SCALE_TO_SCREEN((clip.y), _screen.height, _scale.height);
-		rgn.x2 = SCALE_TO_SCREEN((clip.x+clip.width+1), _screen.width, _scale.width);
-		rgn.y2 = SCALE_TO_SCREEN((clip.y+clip.height+1), _screen.height, _scale.height);
-
-		_surface->SetClip(_surface, NULL);
-		_surface->SetClip(_surface, &rgn);
-	}
+	cairo_reset_clip(_cairo_context);
+	cairo_rectangle(_cairo_context, x1, y1, x2-x1, y2-y1);
+	cairo_clip(_cairo_context);
 }
 
 jregion_t DFBGraphics::GetClip()
@@ -133,114 +146,54 @@ jregion_t DFBGraphics::GetClip()
 
 void DFBGraphics::ReleaseClip()
 {
+	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
+
 	_clip.x = 0;
 	_clip.y = 0;
-	_clip.width = _scale.width;
-	_clip.height = _scale.height;
+	_clip.width = cairo_image_surface_get_width(cairo_surface);
+	_clip.height = cairo_image_surface_get_height(cairo_surface);
 
 	_internal_clip.x = _translate.x;
 	_internal_clip.y = _translate.y;
 	_internal_clip.width = _clip.width-_translate.x;
 	_internal_clip.height = _clip.height-_translate.y;
-
-	DFBRegion rgn;
-
-	if (_surface != NULL) {
-		_surface->SetClip(_surface, NULL);
-		_surface->GetClip(_surface, &rgn);
-
-		_clip.x = 0;
-		_clip.y = 0;
-		_clip.width = SCREEN_TO_SCALE(rgn.x2, _screen.width, _scale.width);
-		_clip.height = SCREEN_TO_SCALE(rgn.y2, _screen.height, _scale.height);
-	}
+	
+	cairo_reset_clip(_cairo_context);
 }
 
 void DFBGraphics::SetCompositeFlags(jcomposite_flags_t t)
 {
+	cairo_operator_t o = CAIRO_OPERATOR_CLEAR;
+
 	_composite_flags = t;
 
-	if (_surface != NULL) {
-		if (_composite_flags == JCF_NONE) {
-			_surface->SetPorterDuff(_surface, DSPD_NONE);
-		} else if (_composite_flags == JCF_CLEAR) {
-			_surface->SetPorterDuff(_surface, DSPD_CLEAR);
-		} else if (_composite_flags == JCF_SRC) {
-			_surface->SetPorterDuff(_surface, DSPD_SRC);
-		} else if (_composite_flags == JCF_SRC_OVER) {
-			_surface->SetPorterDuff(_surface, DSPD_SRC_OVER);
-		} else if (_composite_flags == JCF_DST_OVER) {
-			_surface->SetPorterDuff(_surface, DSPD_DST_OVER);
-		} else if (_composite_flags == JCF_SRC_IN) {
-			_surface->SetPorterDuff(_surface, DSPD_SRC_IN);
-		} else if (_composite_flags == JCF_DST_IN) {
-			_surface->SetPorterDuff(_surface, DSPD_DST_IN);
-		} else if (_composite_flags == JCF_SRC_OUT) {
-			_surface->SetPorterDuff(_surface, DSPD_SRC_OUT);
-		} else if (_composite_flags == JCF_DST_OUT) {
-			_surface->SetPorterDuff(_surface, DSPD_DST_OUT);
-		} else if (_composite_flags == JCF_SRC_ATOP) {
-			_surface->SetPorterDuff(_surface, DSPD_SRC_ATOP);
-		} else if (_composite_flags == JCF_DST_ATOP) {
-			_surface->SetPorterDuff(_surface, DSPD_DST_ATOP);
-		} else if (_composite_flags == JCF_ADD) {
-			_surface->SetPorterDuff(_surface, DSPD_ADD);
-		} else if (_composite_flags == JCF_XOR) {
-			_surface->SetPorterDuff(_surface, DSPD_XOR);
-		}
+	if (_composite_flags == JCF_SRC) {
+		o = CAIRO_OPERATOR_SOURCE;
+	} else if (_composite_flags == JCF_SRC_OVER) {
+		o = CAIRO_OPERATOR_OVER;
+	} else if (_composite_flags == JCF_SRC_IN) {
+		o = CAIRO_OPERATOR_IN;
+	} else if (_composite_flags == JCF_SRC_OUT) {
+		o = CAIRO_OPERATOR_OUT;
+	} else if (_composite_flags == JCF_SRC_ATOP) {
+		o = CAIRO_OPERATOR_ATOP;
+	} else if (_composite_flags == JCF_DST) {
+		o = CAIRO_OPERATOR_DEST;
+	} else if (_composite_flags == JCF_DST_OVER) {
+		o = CAIRO_OPERATOR_DEST_OVER;
+	} else if (_composite_flags == JCF_DST_IN) {
+		o = CAIRO_OPERATOR_DEST_IN;
+	} else if (_composite_flags == JCF_DST_OUT) {
+		o = CAIRO_OPERATOR_DEST_OUT;
+	} else if (_composite_flags == JCF_DST_ATOP) {
+		o = CAIRO_OPERATOR_DEST_ATOP;
+	} else if (_composite_flags == JCF_ADD) {
+		o = CAIRO_OPERATOR_ADD;
+	} else if (_composite_flags == JCF_XOR) {
+		o = CAIRO_OPERATOR_XOR;
 	}
-}
 
-void DFBGraphics::SetDrawingFlags(jdrawing_flags_t t)
-{
-	_draw_flags = t;
-
-	if (_surface != NULL) {
-		DFBSurfaceDrawingFlags flags = (DFBSurfaceDrawingFlags)DSDRAW_NOFX;
-
-		if (_draw_flags == JDF_BLEND) {
-			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_BLEND);
-		} else if (_draw_flags == JDF_XOR) {
-			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_XOR);
-		}
-		
-		if (_is_premultiply == true) {
-			flags = (DFBSurfaceDrawingFlags)(flags | DSDRAW_SRC_PREMULTIPLY);
-		}
-
-		_surface->SetDrawingFlags(_surface, (DFBSurfaceDrawingFlags)flags);
-	}
-}
-
-void DFBGraphics::SetBlittingFlags(jblitting_flags_t t)
-{
-	_blit_flags = t;
-
-	if (_surface != NULL) {
-		DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)DSBLIT_NOFX;
-
-		if (_blit_flags & JBF_ALPHACHANNEL) {
-			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_ALPHACHANNEL);
-		}
-
-		if (_blit_flags & JBF_COLORALPHA) {
-			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA);
-		} 
-
-		if (_blit_flags & JBF_COLORIZE) {
-			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE);
-		}
-
-		if (_blit_flags & JBF_XOR) {
-			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_XOR);
-		}
-
-		if (_is_premultiply == true) {
-			flags = (DFBSurfaceBlittingFlags)(flags | DSBLIT_SRC_PREMULTIPLY);
-		}
-
-		_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)flags);
-	}
+	cairo_set_operator(_cairo_context, o);
 }
 
 jcomposite_flags_t DFBGraphics::GetCompositeFlags()
@@ -248,75 +201,46 @@ jcomposite_flags_t DFBGraphics::GetCompositeFlags()
 	return _composite_flags;
 }
 
-jdrawing_flags_t DFBGraphics::GetDrawingFlags()
-{
-	return _draw_flags;
-}
-
-jblitting_flags_t DFBGraphics::GetBlittingFlags()
-{
-	return _blit_flags;
-}
-
-void DFBGraphics::SetWorkingScreenSize(int width, int height)
-{
-	if (_image != NULL) {
-		jsize_t size = _image->GetSize();
-
-		size.width = (size.width*width)/_scale.width;
-		size.height = (size.height*height)/_scale.height;
-
-		_image->SetSize(size.width, size.height);
-	}
-
-	_scale.width = width;
-	_scale.height = height;
-
-	if (_scale.width <= 0) {
-		_scale.width = DEFAULT_SCALE_WIDTH;
-	}
-
-	if (_scale.height <= 0) {
-		_scale.height = DEFAULT_SCALE_HEIGHT;
-	}
-}
-
-jsize_t DFBGraphics::GetWorkingScreenSize()
-{
-	return _scale;
-}
-
 void DFBGraphics::Clear()
 {
-	if (_surface == NULL) {
-		return;
-	}
+	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 
-	_surface->Clear(_surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
+	int sw = cairo_image_surface_get_width(cairo_surface);
+	int sh = cairo_image_surface_get_height(cairo_surface);
+
+	cairo_save(_cairo_context);
+	// cairo_reset_clip(_cairo_context);
+	cairo_set_operator(_cairo_context, CAIRO_OPERATOR_CLEAR);
+	cairo_rectangle(_cairo_context, 0, 0, sw, sh);
+	cairo_fill(_cairo_context);
+	cairo_restore(_cairo_context);
+
+	SetCompositeFlags(_composite_flags);
 }
 
 void DFBGraphics::Clear(int xp, int yp, int wp, int hp)
 {
-	if (_surface == NULL) {
-		return;
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int w = wp;
+	int h = hp;
+
+	if (x < 0) {
+		x = 0;
 	}
 
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
+	if (y < 0) {
+		y = 0;
+	}
 
-	IDirectFBSurface *sub;
-	DFBRectangle rect;
+	cairo_save(_cairo_context);
+	// cairo_reset_clip(_cairo_context);
+	cairo_set_operator(_cairo_context, CAIRO_OPERATOR_CLEAR);
+	cairo_rectangle(_cairo_context, x, y, w, h);
+	cairo_fill(_cairo_context);
+	cairo_restore(_cairo_context);
 
-	rect.x = x;
-	rect.y = y;
-	rect.w = w;
-	rect.h = h;
-
-	_surface->GetSubSurface(_surface, &rect, &sub);
-
-	sub->Clear(sub, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
+	SetCompositeFlags(_composite_flags);
 }
 
 void DFBGraphics::Idle()
@@ -333,11 +257,46 @@ void DFBGraphics::Flip()
 		return;
 	}
 
+	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
+	
+	if (cairo_surface == NULL) {
+		return;
+	}
+
+	cairo_surface_flush(cairo_surface);
+
+	int dw = cairo_image_surface_get_width(cairo_surface);
+	int dh = cairo_image_surface_get_height(cairo_surface);
+	int stride = cairo_image_surface_get_stride(cairo_surface);
+
+	void *ptr;
+	int sw;
+	int sh;
+	int pitch;
+
+	_surface->GetSize(_surface, &sw, &sh);
+	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
+
+	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+
+	if (data == NULL) {
+		return;
+	}
+
+	for (int j=0; j<sh && j<dh; j++) {
+		uint32_t *src = (uint32_t *)(data + j * stride);
+		uint32_t *dst = (uint32_t *)((uint8_t *)ptr + j * pitch);
+		
+		for (int i=0; i<sw && i<dw; i++) {
+			*(dst + i) = *(src + i);
+		}
+	}
+
+	_surface->Unlock(_surface);
+		
 	if (_vertical_sync == false) {
 		_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
 	} else {
-		// _surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_BLIT));
-		// _surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
 		_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
 	}
 }
@@ -348,10 +307,22 @@ void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	int x = SCALE_TO_SCREEN(xp, _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN(yp, _screen.height, _scale.height),
-			w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width),
-			h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
+	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
+
+	if (cairo_surface == NULL) {
+		return;
+	}
+
+	cairo_surface_flush(cairo_surface);
+
+	int dw = cairo_image_surface_get_width(cairo_surface);
+	int dh = cairo_image_surface_get_height(cairo_surface);
+	int stride = cairo_image_surface_get_stride(cairo_surface);
+
+	int x = xp;
+	int y = yp;
+	int w = wp;
+	int h = hp;
 
 	DFBRegion rgn;
 
@@ -360,11 +331,37 @@ void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
 	rgn.x2 = x+w;
 	rgn.y2 = y+h;
 
+	void *ptr;
+	int sw;
+	int sh;
+	int pitch;
+
+	_surface->GetSize(_surface, &sw, &sh);
+	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
+
+	cairo_surface_flush(cairo_surface);
+
+	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+
+	if (data == NULL) {
+		return;
+	}
+
+	for (int j=0; j<sh && j<dh; j++) {
+		uint32_t *src = (uint32_t *)(data + j * stride);
+		uint32_t *dst = (uint32_t *)((uint8_t *)ptr + j * pitch);
+		
+		for (int i=0; i<sw && i<dw; i++) {
+			*(dst + i) = *(src + i);
+		}
+	}
+
+
+	_surface->Unlock(_surface);
+
 	if (_vertical_sync == false) {
 		_surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
 	} else {
-		// _surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_BLIT));
-		// _surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_WAITFORSYNC));
 		_surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
 	}
 }
@@ -376,13 +373,14 @@ Color & DFBGraphics::GetColor()
 
 void DFBGraphics::SetColor(const Color &color)
 {
-	if (_surface == NULL) {
-		return;
-	}
-
 	_color = color;
 
-	_surface->SetColor(_surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
+	int r = _color.GetRed(),
+			g = _color.GetGreen(),
+			b = _color.GetBlue(),
+			a = _color.GetAlpha();
+
+	cairo_set_source_rgba(_cairo_context, r/255.0, g/255.0, b/255.0, a/255.0);
 } 
 
 void DFBGraphics::SetColor(uint32_t color)
@@ -395,95 +393,58 @@ void DFBGraphics::SetColor(int red, int green, int blue, int alpha)
 	SetColor(_color = Color(red, green, blue, alpha));
 } 
 
-bool DFBGraphics::HasFont()
-{
-	return (_font != NULL);
-}
-
 void DFBGraphics::SetFont(Font *font)
 {
-	if (_surface == NULL) {
-		return;
-	}
-
 	_font = font;
-
-	if (_font != NULL) {
-		_surface->SetFont(_surface, dynamic_cast<DFBFont *>(font)->_font);
-	}
-}
-
-Font * DFBGraphics::GetFont()
-{
-	return _font;
-}
-
-void DFBGraphics::SetAntialias(bool b)
-{
-	if (_surface == NULL) {
-		return;
-	}
-}
-
-void DFBGraphics::SetPixels(uint8_t *pixels)
-{
-	if (_surface == NULL) {
-		return;
-	}
-
-	void *ptr;
-	int width,
-			height,
-			pitch;
-
-	_surface->GetSize(_surface, &width, &height);
-	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
-
-	memcpy(ptr, pixels, pitch*height);
-
-	_surface->Unlock(_surface);
-}
-
-void DFBGraphics::GetPixels(uint8_t **pixels)
-{
-	if (_surface == NULL) {
-		return;
-	}
-
-	void *ptr;
-	int width,
-			height,
-			pitch;
-
-	_surface->GetSize(_surface, &width, &height);
 	
-	if (*pixels == NULL) {
-		(*pixels) = new uint8_t[pitch*height];
+	if (_font != NULL) {
+		_font->ApplyContext(_cairo_context);
+	} else {
+		cairo_set_font_face(_cairo_context, NULL);
 	}
+}
 
-	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
+void DFBGraphics::SetAntialias(jantialias_mode_t mode)
+{
+	Graphics::SetAntialias(mode);
 
-	memcpy((*pixels), ptr, pitch*height);
+	cairo_antialias_t t = CAIRO_ANTIALIAS_NONE;
 
-	_surface->Unlock(_surface);
+	if (mode == JAM_FAST) {
+		t = CAIRO_ANTIALIAS_FAST;
+	} else if (mode == JAM_NORMAL) {
+		t = CAIRO_ANTIALIAS_DEFAULT; // DEFAULT, SUBPIXEL
+	} else if (mode == JAM_GOOD) {
+		t = CAIRO_ANTIALIAS_GOOD; // GOOD, BEST
+	}
+		
+	cairo_set_antialias(_cairo_context, t);
 }
 
 void DFBGraphics::SetLineJoin(jline_join_t t)
 {
-	if (_surface == NULL) {
-		return;
-	}
-
 	_line_join = t;
+
+	if (_line_join == JLJ_BEVEL) {
+		cairo_set_line_join(_cairo_context, CAIRO_LINE_JOIN_BEVEL);
+	} else if (_line_join == JLJ_ROUND) {
+		cairo_set_line_join(_cairo_context, CAIRO_LINE_JOIN_ROUND);
+	} else if (_line_join == JLJ_MITER) {
+		cairo_set_line_join(_cairo_context, CAIRO_LINE_JOIN_MITER);
+	}
 }
 
 void DFBGraphics::SetLineStyle(jline_style_t t)
 {
-	if (_surface == NULL) {
-		return;
-	}
-
 	_line_style = t;
+
+	if (_line_style == JLS_ROUND) {
+		cairo_set_line_cap(_cairo_context, CAIRO_LINE_CAP_ROUND);
+	} else if (_line_style == JLS_BUTT) {
+		cairo_set_line_cap(_cairo_context, CAIRO_LINE_CAP_BUTT);
+	} else if (_line_style == JLS_SQUARE) {
+		cairo_set_line_cap(_cairo_context, CAIRO_LINE_CAP_SQUARE);
+	}
 }
 
 void DFBGraphics::SetLineWidth(int size)
@@ -493,9 +454,7 @@ void DFBGraphics::SetLineWidth(int size)
 
 void DFBGraphics::SetLineDash(double *dashes, int ndashes)
 {
-	if (_surface == NULL) {
-		return;
-	}
+	cairo_set_dash(_cairo_context, dashes, ndashes, 0.0);
 }
 
 jline_join_t DFBGraphics::GetLineJoin()
@@ -515,55 +474,28 @@ int DFBGraphics::GetLineWidth()
 
 void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 {
-	if (_surface == NULL) {
-		return;
-	}
-
-	int x0 = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y0 = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int x1 = SCALE_TO_SCREEN((_translate.x+xf), _screen.width, _scale.width); 
-	int y1 = SCALE_TO_SCREEN((_translate.y+yf), _screen.height, _scale.height);
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
-
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int x0 = _translate.x+xp;
+	int y0 = _translate.y+yp;
+	int x1 = _translate.x+xf;
+	int y1 = _translate.y+yf;
+	int line_width = _line_width;
 
 	if (line_width < 0) {
 		line_width = -line_width;
 	}
 
-	if (line_width == 1) {
-		_surface->DrawLine(_surface, x0, y0, x1, y1);
-	} else {
-		double r = (line_width),
-					 dx = xf-xp,
-					 dy = yf-yp,
-					 d = sqrt((dx*dx)+(dy*dy));
+	cairo_save(_cairo_context);
+	cairo_move_to(_cairo_context, x0, y0);
+	cairo_line_to(_cairo_context, x1, y1);
+	cairo_set_line_width(_cairo_context, line_width);
+	cairo_stroke(_cairo_context);
+	cairo_restore(_cairo_context);
 
-		if (d < 1.0) {
-			d = 1.0;
-		}
-
-		int c = (int)((r*dy)/d),
-				s = (int)((r*dx)/d),
-				xdiff = (int)(c/2),
-				ydiff = (int)(-s/2),
-				r1 = s;
-
-		if (line_width < 2*r1) {
-			r1 = c;
-		}
-
-		FillTriangle((int)(xp-xdiff), (int)(yp-ydiff), (int)(xp+dx-xdiff), (int)(yp+dy-ydiff), (int)(xp+c-xdiff), (int)(yp-s-ydiff));
-		FillTriangle((int)(xp+dx-xdiff), (int)(yp+dy-ydiff), (int)(xp+c-xdiff), (int)(yp-s-ydiff), (int)(xp+c+dx-xdiff), (int)(yp-s+dy-ydiff));
-	}
+	ApplyDrawing();
 }
 
 void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 {
-	if (_surface == NULL) {
-		return;
-	}
-
 	if (_line_width == 0) {
 		return;
 	}
@@ -576,9 +508,7 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 		return;
 	}
 
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
-
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int line_width = _line_width;
 
 	if (line_width < 0) {
 		line_width = -line_width;
@@ -587,8 +517,8 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 	double *x, 
 				 *y, 
 				 stepsize;
-	int x1, 
-			y1, 
+	int // x1, 
+			// y1, 
 			x2, 
 			y2;
 
@@ -598,137 +528,366 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 	y = new double[npoints+1];
 
 	for (int i=0; i<npoints; i++) {
-		x[i] = (double)SCALE_TO_SCREEN((_translate.x+p[i].x), _screen.width, _scale.width); 
-		y[i] = (double)SCALE_TO_SCREEN((_translate.y+p[i].y), _screen.height, _scale.height);
+		x[i] = (double)(_translate.x+p[i].x);
+		y[i] = (double)(_translate.y+p[i].y);
 	}
 
-	x[npoints] = (double)SCALE_TO_SCREEN((_translate.x+p[0].x), _screen.width, _scale.width); 
-	y[npoints] = (double)SCALE_TO_SCREEN((_translate.y+p[0].y), _screen.height, _scale.height);
+	x[npoints] = (double)(_translate.x+p[0].x);
+	y[npoints] = (double)(_translate.y+p[0].y);
 
 	double t = 0.0;
 	
-	x1 = lrint(EvaluateBezier0(x, npoints+1, t));
-	y1 = lrint(EvaluateBezier0(y, npoints+1, t));
-	
+	cairo_save(_cairo_context);
+  cairo_new_sub_path(_cairo_context);
+
 	for (int i=0; i<=(npoints*interpolation); i++) {
 		t = t + stepsize;
 
 		x2 = EvaluateBezier0(x, npoints, t);
 		y2 = EvaluateBezier0(y, npoints, t);
 	
-		_surface->DrawLine(_surface, x1, y1, x2, y2);
-		
-		x1 = x2;
-		y1 = y2;
+		cairo_line_to(_cairo_context, x2, y2);
 	}
     
 	delete [] x;
 	delete [] y;
+
+  cairo_restore(_cairo_context);
+	cairo_set_line_width(_cairo_context, line_width);
+
+	ApplyDrawing();
 }
 
 void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
 {
-	if (_surface == NULL) {
-		return;
-	}
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int w = wp;
+	int h = hp;
 
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-
-	w = (w >= 0)?w:-w;
-	h = (h >= 0)?h:-h;
-
-	_surface->FillRectangle(_surface, x, y ,w, h);
+	cairo_save(_cairo_context);
+	cairo_rectangle(_cairo_context, x, y, w, h);
+  cairo_fill(_cairo_context);
+  cairo_restore(_cairo_context);
 }
 
 void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 {
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int w = wp;
+	int h = hp;
+	int line_width = _line_width;
+	
+	if (line_width > 0) {
+		line_width = line_width/2;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
-
-	if (line_width < 0) {
-		DrawRectangle0(x, y, w, h, 0, 0, JLJ_MITER, line_width);
+		x = x - line_width;
+		y = y - line_width;
+		w = w + 2*line_width;
+		h = h + 2*line_width;
 	} else {
-		DrawRectangle0(x-line_width+1, y-line_width+1, w+2*(line_width-1), h+2*(line_width-1), 0, 0, JLJ_MITER, -line_width);
+		line_width = -line_width/2;
+
+		x = x + line_width;
+		y = y + line_width;
+		w = w - 2*line_width;
+		h = h - 2*line_width;
 	}
+
+	cairo_save(_cairo_context);
+	cairo_rectangle(_cairo_context, x, y, w, h);
+  cairo_restore(_cairo_context);
+	cairo_set_line_width(_cairo_context, abs(_line_width));
+
+	ApplyDrawing();
 }
 
 void DFBGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-	
-	dx = SCALE_TO_SCREEN((dx), _screen.width, _scale.width);
-	dy = SCALE_TO_SCREEN((dy), _screen.height, _scale.height);
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int w = wp;
+	int h = hp;
 
-	DrawRectangle0(x, y, w, h, dx, dy, JLJ_BEVEL, -std::max(w, h));
+	if (wp <=0 || hp <= 0) {
+		return;
+	}
+
+	if (dx > wp/2) {
+		dx = wp/2;
+	}
+
+	if (dy > hp/2) {
+		dy = hp/2;
+	}
+
+	cairo_save(_cairo_context);
+  cairo_new_sub_path(_cairo_context);
+
+  if (corners & JRC_TOP_RIGHT) {
+		cairo_line_to(_cairo_context, x + w - dx, y);
+		cairo_line_to(_cairo_context, x + w, y + dy);
+	} else {
+    cairo_line_to(_cairo_context, x + w, y);
+	}
+
+  if (corners & JRC_BOTTOM_RIGHT) {
+		cairo_line_to(_cairo_context, x + w, y + h - dy);
+		cairo_line_to(_cairo_context, x + w - dx, y + h);
+	} else {
+    cairo_line_to(_cairo_context, x + w, y + h);
+	}
+
+  if (corners & JRC_BOTTOM_LEFT) {
+		cairo_line_to(_cairo_context, x + dx, y + h);
+		cairo_line_to(_cairo_context, x, y + h - dy);
+	} else {
+		cairo_line_to(_cairo_context, x, y + h);
+	}
+
+  if (corners & JRC_TOP_LEFT) {
+		cairo_line_to(_cairo_context, x, y + dy);
+		cairo_line_to(_cairo_context, x + dx, y);
+	} else {
+    cairo_line_to(_cairo_context, x, y);
+	}
+
+  cairo_close_path(_cairo_context);
+	cairo_fill(_cairo_context);
+  cairo_restore(_cairo_context);
 }
 
 void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int w = wp;
+	int h = hp;
+	int line_width = _line_width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
-
-	dx = SCALE_TO_SCREEN((dx), _screen.width, _scale.width);
-	dy = SCALE_TO_SCREEN((dy), _screen.height, _scale.height);
-
-	if (line_width < 0) {
-		DrawRectangle0(x, y, w, h, dx, dy, JLJ_BEVEL, line_width);
-	} else {
-		DrawRectangle0(x-line_width+1, y-line_width+1, w+2*(line_width-1), h+2*(line_width-1), dx+line_width, dy+line_width, JLJ_BEVEL, -line_width);
+	if (wp <=0 || hp <= 0 || line_width == 0) {
+		return;
 	}
+
+	if (line_width > 0) {
+		line_width = line_width/2;
+
+		x = x - line_width;
+		y = y - line_width;
+		w = w + 2*line_width;
+		h = h + 2*line_width;
+	} else {
+		line_width = -line_width/2;
+
+		x = x + line_width - 1;
+		y = y + line_width - 1;
+		w = w - 2*line_width + 2;
+		h = h - 2*line_width + 2;
+	}
+
+	if (dx > wp/2) {
+		dx = wp/2;
+	}
+
+	if (dy > hp/2) {
+		dy = hp/2;
+	}
+
+	cairo_save(_cairo_context);
+  cairo_new_sub_path(_cairo_context);
+
+  if (corners & JRC_TOP_RIGHT) {
+		cairo_line_to(_cairo_context, x + w - dx, y);
+		cairo_line_to(_cairo_context, x + w, y + dy);
+	} else {
+    cairo_line_to(_cairo_context, x + w, y);
+	}
+
+  if (corners & JRC_BOTTOM_RIGHT) {
+		cairo_line_to(_cairo_context, x + w, y + h - dy);
+		cairo_line_to(_cairo_context, x + w - dx, y + h);
+	} else {
+    cairo_line_to(_cairo_context, x + w, y + h);
+	}
+
+  if (corners & JRC_BOTTOM_LEFT) {
+		cairo_line_to(_cairo_context, x + dx, y + h);
+		cairo_line_to(_cairo_context, x, y + h - dy);
+	} else {
+		cairo_line_to(_cairo_context, x, y + h);
+	}
+
+  if (corners & JRC_TOP_LEFT) {
+		cairo_line_to(_cairo_context, x, y + dy);
+		cairo_line_to(_cairo_context, x + dx, y);
+	} else {
+    cairo_line_to(_cairo_context, x, y);
+	}
+
+  cairo_close_path(_cairo_context);
+  cairo_restore(_cairo_context);
+	cairo_set_line_width(_cairo_context, abs(_line_width));
+
+	ApplyDrawing();
 }
 
 void DFBGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-	
-	dx = SCALE_TO_SCREEN((dx), _screen.width, _scale.width);
-	dy = SCALE_TO_SCREEN((dy), _screen.height, _scale.height);
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int w = wp;
+	int h = hp;
 
-	DrawRectangle0(x, y, w, h, dx, dy, JLJ_ROUND, -std::max(w, h));
+	if (wp <=0 || hp <= 0) {
+		return;
+	}
+
+	if (dx > wp/2) {
+		dx = wp/2;
+	}
+
+	if (dy > hp/2) {
+		dy = hp/2;
+	}
+
+	cairo_save(_cairo_context);
+  cairo_new_sub_path(_cairo_context);
+
+  if (corners & JRC_TOP_RIGHT) {
+		cairo_save(_cairo_context);
+		cairo_translate(_cairo_context, x + w - dx, y + dy);
+		cairo_scale(_cairo_context, dx, dy);
+    cairo_arc(_cairo_context, 0.0, 0.0, 1.0, -M_PI_2, 0.0);
+		cairo_restore(_cairo_context);
+	} else {
+    cairo_line_to(_cairo_context, x + w, y);
+	}
+
+  if (corners & JRC_BOTTOM_RIGHT) {
+		cairo_save(_cairo_context);
+		cairo_translate(_cairo_context, x + w - dx, y + h - dy);
+		cairo_scale(_cairo_context, dx, dy);
+    cairo_arc(_cairo_context, 0.0, 0.0, 1.0, 0.0, M_PI_2);
+  	cairo_restore(_cairo_context);
+	} else {
+    cairo_line_to(_cairo_context, x + w, y + h);
+	}
+
+  if (corners & JRC_BOTTOM_LEFT) {
+		cairo_save(_cairo_context);
+		cairo_translate(_cairo_context, x + dx, y + h - dy);
+		cairo_scale(_cairo_context, dx, dy);
+    cairo_arc(_cairo_context, 0.0, 0.0, 1.0, M_PI_2, M_PI);
+  	cairo_restore(_cairo_context);
+	} else {
+		cairo_line_to(_cairo_context, x, y + h);
+	}
+
+  if (corners & JRC_TOP_LEFT) {
+		cairo_save(_cairo_context);
+		cairo_translate(_cairo_context, x + dx, y + dy);
+		cairo_scale(_cairo_context, dx, dy);
+    cairo_arc(_cairo_context, 0.0, 0.0, 1.0, M_PI, M_PI+M_PI_2);
+	  cairo_restore(_cairo_context);
+	} else {
+    cairo_line_to(_cairo_context, x, y);
+	}
+
+  cairo_close_path(_cairo_context);
+	cairo_fill(_cairo_context);
+  cairo_restore(_cairo_context);
 }
 
 void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
 {
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int w = wp;
+	int h = hp;
+	int line_width = _line_width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
-
-	dx = SCALE_TO_SCREEN((dx), _screen.width, _scale.width);
-	dy = SCALE_TO_SCREEN((dy), _screen.height, _scale.height);
-
-	if (line_width < 0) {
-		DrawRectangle0(x, y, w, h, dx, dy, JLJ_ROUND, line_width);
-	} else {
-		DrawRectangle0(x-line_width+1, y-line_width+1, w+2*(line_width-1), h+2*(line_width-1), dx+line_width, dy+line_width, JLJ_ROUND, -line_width);
+	if (wp <=0 || hp <= 0 || line_width == 0) {
+		return;
 	}
+
+	if (line_width > 0) {
+		line_width = line_width/2;
+
+		x = x - line_width;
+		y = y - line_width;
+		w = w + 2*line_width;
+		h = h + 2*line_width;
+	} else {
+		line_width = -line_width/2;
+
+		x = x + line_width - 1;
+		y = y + line_width - 1;
+		w = w - 2*line_width + 2;
+		h = h - 2*line_width + 2;
+	}
+
+	if (dx > wp/2) {
+		dx = wp/2;
+	}
+
+	if (dy > hp/2) {
+		dy = hp/2;
+	}
+
+	cairo_save(_cairo_context);
+  cairo_new_sub_path(_cairo_context);
+
+  if (corners & JRC_TOP_RIGHT) {
+		cairo_save(_cairo_context);
+		cairo_translate(_cairo_context, x + w - dx, y + dy);
+		cairo_scale(_cairo_context, dx, dy);
+    cairo_arc(_cairo_context, 0.0, 0.0, 1.0, -M_PI_2, 0.0);
+		cairo_restore(_cairo_context);
+	} else {
+    cairo_line_to(_cairo_context, x + w, y);
+	}
+
+  if (corners & JRC_BOTTOM_RIGHT) {
+		cairo_save(_cairo_context);
+		cairo_translate(_cairo_context, x + w - dx, y + h - dy);
+		cairo_scale(_cairo_context, dx, dy);
+    cairo_arc(_cairo_context, 0.0, 0.0, 1.0, 0.0, M_PI_2);
+  	cairo_restore(_cairo_context);
+	} else {
+    cairo_line_to(_cairo_context, x + w, y + h);
+	}
+
+  if (corners & JRC_BOTTOM_LEFT) {
+		cairo_save(_cairo_context);
+		cairo_translate(_cairo_context, x + dx, y + h - dy);
+		cairo_scale(_cairo_context, dx, dy);
+    cairo_arc(_cairo_context, 0.0, 0.0, 1.0, M_PI_2, M_PI);
+  	cairo_restore(_cairo_context);
+	} else {
+		cairo_line_to(_cairo_context, x, y + h);
+	}
+
+  if (corners & JRC_TOP_LEFT) {
+		cairo_save(_cairo_context);
+		cairo_translate(_cairo_context, x + dx, y + dy);
+		cairo_scale(_cairo_context, dx, dy);
+    cairo_arc(_cairo_context, 0.0, 0.0, 1.0, M_PI, M_PI+M_PI_2);
+	  cairo_restore(_cairo_context);
+	} else {
+    cairo_line_to(_cairo_context, x, y);
+	}
+
+  cairo_close_path(_cairo_context);
+  cairo_restore(_cairo_context);
+	cairo_set_line_width(_cairo_context, abs(_line_width));
+
+	ApplyDrawing();
 }
 
 void DFBGraphics::FillCircle(int xcp, int ycp, int rp)
 {
-	FillArc(xcp, ycp, rp, rp, 0.0, 2*M_PI);
+	FillArc(xcp, ycp, rp, rp, 0.0, M_2PI);
 }
 
 void DFBGraphics::DrawCircle(int xcp, int ycp, int rp)
@@ -738,7 +897,7 @@ void DFBGraphics::DrawCircle(int xcp, int ycp, int rp)
 
 void DFBGraphics::FillEllipse(int xcp, int ycp, int rxp, int ryp)
 {
-	FillArc(xcp, ycp, rxp, ryp, 0.0, 2*M_PI);
+	FillArc(xcp, ycp, rxp, ryp, 0.0, M_2PI);
 }
 
 void DFBGraphics::DrawEllipse(int xcp, int ycp, int rxp, int ryp)
@@ -748,143 +907,104 @@ void DFBGraphics::DrawEllipse(int xcp, int ycp, int rxp, int ryp)
 
 void DFBGraphics::FillChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width)-1; 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
-	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
-	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
+	int xc = _translate.x+xcp;
+	int yc = _translate.y+ycp;
+	int rx = rxp;
+	int ry = ryp;
 
-	arc0 = fmod(arc0, 2*M_PI);
-	arc1 = fmod(arc1, 2*M_PI);
+	arc0 = M_2PI - arc0;
+	arc1 = M_2PI - arc1;
 
-	if (arc1 == 0.0) {
-		arc1 = 2*M_PI;
-	}
-
-	if (arc0 < 0.0) {
-		arc0 = 2*M_PI + arc0;
-	}
-
-	if (arc1 < 0.0) {
-		arc1 = 2*M_PI + arc1;
-	}
-
-	DrawChord0(xc, yc, rx, ry, arc0, arc1, std::max(rx, ry));
+	cairo_save(_cairo_context);
+	cairo_translate(_cairo_context, xc, yc);
+	cairo_scale(_cairo_context, rx, ry);
+	cairo_arc(_cairo_context, 0.0, 0.0, 1.0, arc1, arc0);
+	cairo_close_path(_cairo_context);
+	cairo_fill(_cairo_context);
+	cairo_restore(_cairo_context);
 }
 
 void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width)-1; 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
-	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
-	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
+	int xc = _translate.x+xcp;
+	int yc = _translate.y+ycp;
+	int rx = rxp;
+	int ry = ryp;
+	int line_width = _line_width;
 
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
-
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
-
-	arc0 = fmod(arc0, 2*M_PI);
-	arc1 = fmod(arc1, 2*M_PI);
-
-	if (arc1 == 0.0) {
-		arc1 = 2*M_PI;
-	}
-
-	if (arc0 < 0.0) {
-		arc0 = 2*M_PI + arc0;
-	}
-
-	if (arc1 < 0.0) {
-		arc1 = 2*M_PI + arc1;
-	}
-
-	if (line_width < 0) {
-		DrawChord0(xc, yc, rx, ry, arc0, arc1, -line_width);
+	if (line_width > 0) {
+		rx = rx + line_width / 2;
+		ry = ry + line_width / 2;
 	} else {
-		DrawChord0(xc, yc, rx+lw, ry+lw, arc0, arc1, line_width);
+		line_width = -line_width;
+
+		rx = rx - line_width / 2;
+		ry = ry - line_width / 2;
 	}
+
+	arc0 = M_2PI - arc0;
+	arc1 = M_2PI - arc1;
+
+	cairo_save(_cairo_context);
+	cairo_translate(_cairo_context, xc, yc);
+	cairo_scale(_cairo_context, rx, ry);
+	cairo_arc(_cairo_context, 0.0, 0.0, 1.0, arc1, arc0);
+	cairo_close_path(_cairo_context);
+	cairo_restore(_cairo_context);
+	cairo_set_line_width(_cairo_context, line_width);
+	
+	ApplyDrawing();
 }
 
 void DFBGraphics::FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width)-1; 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
-	int rx = SCALE_TO_SCREEN((rxp), _screen.width, _scale.width);
-	int ry = SCALE_TO_SCREEN((ryp), _screen.height, _scale.height);
+	int xc = _translate.x+xcp;
+	int yc = _translate.y+ycp;
+	int rx = rxp;
+	int ry = ryp;
 
-	arc0 = fmod(arc0, 2*M_PI);
-	arc1 = fmod(arc1, 2*M_PI);
+	arc0 = M_2PI - arc0;
+	arc1 = M_2PI - arc1;
 
-	if (arc1 == 0.0) {
-		arc1 = 2*M_PI;
-	}
-
-	if (arc0 < 0.0) {
-		arc0 = 2*M_PI + arc0;
-	}
-
-	if (arc1 < 0.0) {
-		arc1 = 2*M_PI + arc1;
-	}
-
-	int quadrant = -1;
-
-	if (arc0 >= 0.0 && arc0 < M_PI_2) {
-		quadrant = 0;
-	} else if (arc0 >= M_PI_2 && arc0 < M_PI) {
-		quadrant = 1;
-	} else if (arc0 >= M_PI && arc0 < (M_PI+M_PI_2)) {
-		quadrant = 2;
-	} else if (arc0 >= (M_PI+M_PI_2) && arc0 < 2*M_PI) {
-		quadrant = 3;
-	}
-
-	if (arc1 < arc0) {
-		arc1 = arc1 + 2*M_PI;
-	}
-
-	while (arc0 < arc1) {
-		double b = arc1,
-					 q = quadrant;
-
-		if (quadrant == 0) {
-			if (arc1 > M_PI_2) {
-				b = M_PI_2;
-			}
-		} else if (quadrant == 1) {
-			if (arc1 > M_PI) {
-				b = M_PI;
-			}
-		} else if (quadrant == 2) {
-			if (arc1 > (M_PI+M_PI_2)) {
-				b = (M_PI+M_PI_2);
-			}
-		} else if (quadrant == 3) {
-			if (arc1 > 2*M_PI) {
-				b = 0.0;
-
-				arc1 = arc1-2*M_PI;
-			}
-		}
-
-		DrawArc0(xc, yc, rx, ry, arc0, b, std::max(rx, ry), q);
-
-		arc0 = b;
-		quadrant = (quadrant+1)%4;
-	}
+	cairo_save(_cairo_context);
+	cairo_translate(_cairo_context, xc, yc);
+	cairo_scale(_cairo_context, rx, ry);
+	cairo_arc_negative(_cairo_context, 0.0, 0.0, 1.0, arc0, arc1);
+	cairo_line_to(_cairo_context, 0, 0);
+	cairo_close_path(_cairo_context);
+	cairo_fill(_cairo_context);
+	cairo_restore(_cairo_context);
 }
 
 void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-	int xc = SCALE_TO_SCREEN((_translate.x+xcp), _screen.width, _scale.width)-1; 
-	int yc = SCALE_TO_SCREEN((_translate.y+ycp), _screen.height, _scale.height)-1;
-	int rx = SCALE_TO_SCREEN((_translate.x+xcp+rxp), _screen.width, _scale.width)-xc;
-	int ry = SCALE_TO_SCREEN((_translate.y+ycp+ryp), _screen.height, _scale.height)-yc;
+	int xc = _translate.x+xcp;
+	int yc = _translate.y+ycp;
+	int rx = rxp;
+	int ry = ryp;
+	int line_width = _line_width;
 
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
+	if (line_width > 0) {
+		rx = rx + line_width / 2;
+		ry = ry + line_width / 2;
+	} else {
+		line_width = -line_width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+		rx = rx - line_width / 2;
+		ry = ry - line_width / 2;
+	}
 
-	DrawArcHelper(xc, yc, rx, ry, arc0, arc1, line_width);
+	arc0 = M_2PI - arc0;
+	arc1 = M_2PI - arc1;
+
+	cairo_save(_cairo_context);
+	cairo_translate(_cairo_context, xc, yc);
+	cairo_scale(_cairo_context, rx, ry);
+	cairo_arc_negative(_cairo_context, 0.0, 0.0, 1.0, arc0, arc1);
+	cairo_restore(_cairo_context);
+	cairo_set_line_width(_cairo_context, abs(_line_width));
+	
+	ApplyDrawing();
 }
 
 void DFBGraphics::FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
@@ -904,86 +1024,49 @@ jdrawing_mode_t DFBGraphics::GetDrawingMode()
 
 void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
+	int xc = _translate.x+xcp;
+	int yc = _translate.y+ycp;
+	int rx = rxp;
+	int ry = ryp;
+	int line_width = _line_width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
-
-	if (line_width < 0) {
+	if (line_width > 0) {
+		rx = rx + line_width / 2;
+		ry = ry + line_width / 2;
+	} else {
 		line_width = -line_width;
 
-		// TODO:: recursive DrawPie(xcp, ycp, rxp-line_width, ryp-line_width, arc0, arc1);
-		
-		return;
+		rx = rx - line_width / 2;
+		ry = ry - line_width / 2;
 	}
 
-	double t0 = fmod(arc0, 2*M_PI),
-				 t1 = fmod(arc1, 2*M_PI);
+	arc0 = M_2PI - arc0;
+	arc1 = M_2PI - arc1;
 
-	if (t1 == 0.0) {
-		t1 = 2*M_PI;
-	}
+	cairo_save(_cairo_context);
+	cairo_translate(_cairo_context, xc, yc);
+	cairo_scale(_cairo_context, rx, ry);
+	cairo_arc_negative(_cairo_context, 0.0, 0.0, 1.0, arc0, arc1);
+	cairo_line_to(_cairo_context, 0, 0);
+	cairo_close_path(_cairo_context);
+	cairo_restore(_cairo_context);
+	cairo_set_line_width(_cairo_context, abs(_line_width));
 
-	if (t0 < 0.0) {
-		t0 = M_PI+t0;
-	}
-
-	if (t1 < 0.0) {
-		t1 = 2*M_PI+t1;
-	}
-
-	double dxangle = (line_width*M_PI_2)/rxp,
-				 dyangle = (line_width*M_PI_2)/ryp,
-				 step = 0.01;
-	
-	jpoint_t p[3];
-
-	p[0].x = (rxp+line_width+1)*cos(t0+step);
-	p[0].y = -(ryp+line_width+1)*sin(t0+step);
-	p[1].x = 0;
-	p[1].y = 0;
-	p[2].x = (rxp+line_width)*cos(t1);
-	p[2].y = -(ryp+line_width)*sin(t1);
-
-	double pvetor = (p[0].x*p[2].y-p[0].y*p[2].x);
-
-	if (pvetor < 0.0) {
-		DrawArc(xcp, ycp, rxp, ryp, arc0, arc1);
-
-		double p0x = p[0].x,
-					 p0y = p[0].y;
-
-		p[0].x = p[2].x;
-		p[0].y = p[2].y;
-
-		p[2].x = p0x;
-		p[2].y = p0y;
-	} else {
-		DrawArc(xcp, ycp, rxp, ryp, arc0+dxangle/2, arc1-dyangle/2);
-	}
-
-	jline_join_t line_join = _line_join;
-
-	_line_join = JLJ_BEVEL;
-
-	DrawPolygon(xcp, ycp, p, 3, false);
-
-	_line_join = line_join;
+	ApplyDrawing();
 }
 		
 void DFBGraphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
 {
-	if (_surface == NULL) {
-		return;
-	}
+	jpoint_t p[3];
 
-	int x1 = SCALE_TO_SCREEN((_translate.x+x1p), _screen.width, _scale.width); 
-	int y1 = SCALE_TO_SCREEN((_translate.y+y1p), _screen.height, _scale.height);
-	int x2 = SCALE_TO_SCREEN((_translate.x+x2p), _screen.width, _scale.width); 
-	int y2 = SCALE_TO_SCREEN((_translate.y+y2p), _screen.height, _scale.height);
-	int x3 = SCALE_TO_SCREEN((_translate.x+x3p), _screen.width, _scale.width); 
-	int y3 = SCALE_TO_SCREEN((_translate.y+y3p), _screen.height, _scale.height);
+	p[0].x = x1p;
+	p[0].y = y1p;
+	p[1].x = x2p;
+	p[1].y = y2p;
+	p[2].x = x3p;
+	p[2].y = y3p;
 
-	_surface->FillTriangle(_surface, x1, y1, x2, y2, x3, y3);
+	FillPolygon(0, 0, p, 3, true);
 }
 
 void DFBGraphics::DrawTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
@@ -1006,115 +1089,35 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 		return;
 	}
 
-	int lw = SCALE_TO_SCREEN((_line_width), _screen.width, _scale.width);
+	int line_width = _line_width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
-
-	if (line_width == 1) {
-		int ox = p[0].x + xp, 
-				oy = p[0].y + yp, 
-				tx, 
-				ty;
-
-		for (int i=1; i<npoints; i++) {
-			tx = p[i].x + xp;
-			ty = p[i].y + yp;
-
-			DrawLine(ox, oy, tx, ty);
-
-			ox = tx;
-			oy = ty;
-		}
-
-		if (close) {
-			DrawLine(ox, oy, p[0].x + xp, p[0].y + yp);
-		}
-	} else {
-		jgui::jpoint_t scaled[npoints+1];
-		int opened = (close == true)?0:1;
-
-		for (int i=0; i<npoints-opened; i++) {
-			int	dx = p[(i+1)%npoints].x-p[i].x,
-					dy = p[(i+1)%npoints].y-p[i].y,
-					d = sqrt((dx*dx)+(dy*dy));
-
-			if (d > 0) {
-				int c = (int)((line_width*dy)/d),
-						s = (int)((line_width*dx)/d),
-						xr = p[i].x-c,
-						yr = p[i].y+s,
-						index = i*2;
-
-				FillTriangle(xp+xr, yp+yr, xp+xr+dx, yp+yr+dy, xp+xr+c, yp+yr-s);
-				FillTriangle(xp+xr+dx, yp+yr+dy, xp+xr+c, yp+yr-s, xp+xr+c+dx, yp+yr-s+dy);
-
-				scaled[index+0].x = xr;
-				scaled[index+0].y = yr;
-				scaled[index+1].x = xr+dx;
-				scaled[index+1].y = yr+dy;
-			}
-		}
-
-		if (opened != 0) {
-			opened++;
-		}
-
-		for (int i=0; i<npoints-opened; i++) {
-			if (_line_join == JLJ_BEVEL) {
-				FillTriangle(
-						xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
-						xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y, 
-						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
-			} else if (_line_join == JLJ_ROUND) {
-				double dx0 = p[(i+1)%npoints].x-p[(i+0)%npoints].x,
-							 dy0 = p[(i+1)%npoints].y-p[(i+0)%npoints].y,
-							 dx1 = p[(i+2)%npoints].x-p[(i+1)%npoints].x,
-							 dy1 = p[(i+2)%npoints].y-p[(i+1)%npoints].y,
-							 ang0 = asin(sqrt((dx0*dx0)/(dx0*dx0+dy0*dy0))),
-							 ang1 = asin(sqrt(dx1*dx1)/sqrt(dx1*dx1+dy1*dy1));
-
-				if (dx0 > 0.0) {
-					ang0 = ang0 + M_PI;
-				} else if (dy0 > 0.0) {
-					ang0 = M_PI - ang0;
-				}
-
-				if (dx1 > 0.0) {
-					ang1 = ang1 + M_PI;
-				} else if (dy1 > 0.0) {
-					ang1 = M_PI - ang1;
-				}
-
-				FillArc(xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y+1, line_width, line_width-1, ang0, ang1);
-			} else if (_line_join == JLJ_MITER) {
-				int a1 = scaled[((i+0)%npoints)*2+0].y-scaled[((i+0)%npoints)*2+1].y,
-						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x,
-						c1 = scaled[((i+0)%npoints)*2+0].x*scaled[((i+0)%npoints)*2+1].y-scaled[((i+0)%npoints)*2+1].x*scaled[((i+0)%npoints)*2+0].y;
-				int a2 = scaled[((i+1)%npoints)*2+0].y-scaled[((i+1)%npoints)*2+1].y,
-						b2 = scaled[((i+1)%npoints)*2+0].x-scaled[((i+1)%npoints)*2+1].x,
-						c2 = scaled[((i+1)%npoints)*2+0].x*scaled[((i+1)%npoints)*2+1].y-scaled[((i+1)%npoints)*2+1].x*scaled[((i+1)%npoints)*2+0].y;
-				int dx0 = (a1*b2-a2*b1),
-						dy0 = (a1*b2-a2*b1);
-				
-				FillTriangle(
-						xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
-						xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y, 
-						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
-				
-				if (dx0 != 0 && dy0 != 0) {
-					int x0 = (b1*c2-b2*c1)/(a1*b2-a2*b1),
-							y0 = (a1*c2-a2*c1)/(a1*b2-a2*b1);
-
-					/*
-					FillTriangle(
-							xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
-							xp+x0, yp+y0,
-							xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
-							*/
-				}
-			}
-		}
+	if (line_width < 0) {
+		line_width = -line_width;
 	}
+
+	jpoint_t t[npoints];
+
+	for (int i=0; i<npoints; i++) {
+		t[i].x = xp+p[i].x+_translate.x;
+		t[i].y = yp+p[i].y+_translate.y;
+	}
+	
+	cairo_save(_cairo_context);
+  cairo_new_sub_path(_cairo_context);
+  cairo_move_to(_cairo_context, t[0].x, t[0].y);
+  
+	for (int i=1; i < npoints; i++) {
+    cairo_line_to(_cairo_context, t[i].x, t[i].y);
+	}
+
+	if (close == true) {
+  	cairo_close_path(_cairo_context);
+	}
+	
+	cairo_restore(_cairo_context);
+	cairo_set_line_width(_cairo_context, line_width);
+
+  ApplyDrawing();
 }
 
 void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd)
@@ -1123,682 +1126,154 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 		return;
 	}
 
-	jpoint_t points[npoints];
-	int x1 = 0,
-			y1 = 0,
-			x2 = 0,
-			y2 = 0;
+	int line_width = _line_width;
 
-	for (int i=0; i<npoints; i++) {
-		points[i].x = SCALE_TO_SCREEN((xp+p[i].x+_translate.x), _screen.width, _scale.width); 
-		points[i].y = SCALE_TO_SCREEN((yp+p[i].y+_translate.y), _screen.height, _scale.height);
-
-		if (points[i].x < x1) {
-			x1 = points[i].x;
-		}
-
-		if (points[i].x > x2) {
-			x2 = points[i].x;
-		}
-
-		if (points[i].y < y1) {
-			y1 = points[i].y;
-		}
-
-		if (points[i].y > y2) {
-			y2 = points[i].y;
-		}
+	if (line_width < 0) {
+		line_width = -line_width;
 	}
 
-	FillPolygon0(points, npoints, x1, y1, x2, y2);
+	jpoint_t t[npoints];
+
+	for (int i=0; i<npoints; i++) {
+		t[i].x = xp+p[i].x+_translate.x;
+		t[i].y = yp+p[i].y+_translate.y;
+	}
+	
+	cairo_save(_cairo_context);
+  cairo_new_sub_path(_cairo_context);
+  cairo_move_to(_cairo_context, t[0].x, t[0].y);
+  
+	for (int i=1; i < npoints; i++) {
+    cairo_line_to(_cairo_context, t[i].x, t[i].y);
+	}
+
+  cairo_close_path(_cairo_context);	
+	cairo_restore(_cairo_context);
+
+	if (even_odd == true) {
+		cairo_set_fill_rule(_cairo_context, CAIRO_FILL_RULE_EVEN_ODD);
+	}
+
+	cairo_fill(_cairo_context);
+	
+	if (even_odd == true) {
+		cairo_set_fill_rule(_cairo_context, CAIRO_FILL_RULE_WINDING);
+	}
 }
 
 void DFBGraphics::FillRadialGradient(int xcp, int ycp, int wp, int hp, int x0p, int y0p, int r0p)
 {
-	std::vector<jgradient_t>::iterator i=_gradient_stops.begin();
-	Color color0 = i->color;
-	Color color1 = color0;
-	int start = 0;
-	int end = start;
-	int height = hp;
+	int xc = _translate.x+xcp;
+	int yc = _translate.y+ycp;
+	int rx = wp;
+	int ry = hp;
+	int x0 = _translate.x+xcp+x0p;
+	int y0 = _translate.y+ycp+y0p;
+	int r0 = r0p;
 
-	Color color = GetColor();
+	cairo_pattern_t *pattern = cairo_pattern_create_radial(xc, yc, std::max(rx, ry), x0, y0, r0);
 
-	for (; i!=_gradient_stops.end(); i++) {
-		jgradient_t t = (*i);
+	for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
+		jgradient_t gradient = (*i);
 
-		color1 = t.color;
-		end = (int)(height*t.stop);
+		int sr = gradient.color.GetRed(),
+				sg = gradient.color.GetGreen(),
+				sb = gradient.color.GetBlue(),
+				sa = gradient.color.GetAlpha();
 
-		for (int i=start; i<end; i++) {
-			UpdateGradientColor(color0, color1, abs(end-start), height-i);
-			FillArc(xcp, ycp, wp, hp, 0, 2*M_PI);
-
-			xcp += 1;
-			ycp += 1;
-			wp -= 2;
-			hp -= 2;
-
-			if (wp < 0 || hp < 0) {
-				break;
-			}
-		}
-
-		color0 = color1;
-		start = end;
+		cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
 	}
 
-	SetColor(color);
+	cairo_set_source(_cairo_context, pattern);
+	cairo_save(_cairo_context);
+	cairo_translate(_cairo_context, xc, yc);
+	cairo_scale(_cairo_context, rx, ry);
+	cairo_arc(_cairo_context, 0.0, 0.0, 1.0, 0.0, M_2PI);
+	cairo_fill(_cairo_context);
+	cairo_restore(_cairo_context);
+	cairo_pattern_destroy(pattern);
 }
 
 void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y1p, int x2p, int y2p)
 {
-	if (_surface == NULL) {
-		return;
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int w = wp;
+	int h = hp;
+	
+	int x1 = x1p;
+	int y1 = y1p;
+	int x2 = x2p;
+	int y2 = y2p;
+
+	cairo_pattern_t *pattern = cairo_pattern_create_linear(x1, y1, x2, y2);
+	
+	for (std::vector<jgradient_t>::iterator i=_gradient_stops.begin(); i!=_gradient_stops.end(); i++) {
+		jgradient_t gradient = (*i);
+
+		int sr = gradient.color.GetRed(),
+				sg = gradient.color.GetGreen(),
+				sb = gradient.color.GetBlue(),
+				sa = gradient.color.GetAlpha();
+
+		cairo_pattern_add_color_stop_rgba(pattern, gradient.stop, sr/255.0, sg/255.0, sb/255.0, sa/255.0);
 	}
-
-	if (_gradient_stops.size() == 0) {
-		return;
-	}
-
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x;
-	int h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-
-	std::vector<jgradient_t>::iterator i=_gradient_stops.begin();
-	Color color0 = i->color;
-	Color color1 = color0;
-	int start = 0;
-	int end = start;
-
-	Color color = GetColor();
-
-	for (; i!=_gradient_stops.end(); i++) {
-		jgradient_t t = (*i);
-
-		color1 = t.color;
-
-		if (x1p != x2p) {
-			end = (int)(w*t.stop);
-
-			for (int i=start; i<end; i++) {
-				UpdateGradientColor(color0, color1, abs(end-start), i);
-				_surface->DrawLine(_surface, x+i, y, x+i, y+h-1);
-			}
-		} else {
-			end = (int)(h*t.stop);
-
-			for (int i=start; i<end; i++) {
-				UpdateGradientColor(color0, color1, abs(end-start), i);
-				_surface->DrawLine(_surface, x, y+i, x+w-1, y+i);
-			}
-		}
-
-		color0 = color1;
-		start = end;
-	}
-
-	SetColor(color);
+	
+	cairo_save(_cairo_context);
+	cairo_translate(_cairo_context, x, y);
+	cairo_rectangle(_cairo_context, 0, 0, w, h);
+	cairo_set_source(_cairo_context, pattern);
+	cairo_fill(_cairo_context);
+	cairo_restore(_cairo_context);
+	
+	cairo_pattern_destroy(pattern);
+	
+	SetCompositeFlags(_composite_flags);
 }
+
 
 void DFBGraphics::DrawString(std::string text, int xp, int yp)
 {
-	if (_surface == NULL) {
-		return;
-	}
-
 	if (_font == NULL) {
 		return;
 	}
 
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int line_width = _line_width;
 
-	_surface->DrawString(_surface, text.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+	if (line_width < 0) {
+		line_width = -line_width;
+	}
+
+	cairo_move_to(_cairo_context, x, y+_font->GetAscender());
+	cairo_show_text(_cairo_context, text.c_str());
+	cairo_set_line_width(_cairo_context, line_width);
+
+	ApplyDrawing();
 }
 
 void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
 {
-	if (_surface == NULL) {
-		return;
-	}
-
 	if (_font == NULL) {
 		return;
 	}
 
-	IDirectFBFont *font = dynamic_cast<DFBFont *>(_font)->_font;
-	int advance;
-
-	if (font != NULL) {
-		font->GetGlyphExtents(font, symbol, NULL, &advance);
-	}
-
-	Image *off = Image::CreateImage(advance, _font->GetAscender() + _font->GetDescender(), JPF_ARGB, _scale.width, _scale.height);
-
-	off->GetGraphics()->SetFont(_font);
-	off->GetGraphics()->SetColor(_color);
-
-	IDirectFBSurface *fsurface = (IDirectFBSurface *)(off->GetGraphics()->GetNativeSurface());
-
-	fsurface->DrawGlyph(fsurface, symbol, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
-	fsurface->DrawGlyph(fsurface, symbol, 0, 0, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
-
-	DrawImage(off, xp, yp);
-
-	delete off;
-}
-
-bool DFBGraphics::DrawImage(std::string img, int xp, int yp)
-{
-	int iwidth,
-			iheight;
-
-	if (Image::GetImageSize(img, &iwidth, &iheight) != false) {
-		int wp = SCREEN_TO_SCALE((iwidth), _screen.width, _scale.width),
-				hp = SCREEN_TO_SCALE((iheight), _screen.height, _scale.height);
-
-		return DFBGraphics::DrawImage(img, xp, yp, wp, hp);
-	}
-
-	return false;
-}
-
-bool DFBGraphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
-{
-	if (_surface == NULL) {
-		return false;
-	}
-
-	if (xp < 0 || yp < 0) {
-		return false;
-	}
-
-	if (wp < 0 || hp < 0) {
-		return false;
-	}
-
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
-			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
-			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-
-	IDirectFBSurface *imgSurface = NULL;
-	IDirectFBImageProvider *imgProvider = NULL;
-	DFBSurfaceDescription desc;
-
-	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
-
-	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
-		return false;
-	}
-
-	if (imgProvider->GetSurfaceDescription (imgProvider, &desc) != DFB_OK) {
-		imgProvider->Release(imgProvider);
-
-		return false;
-	}
-
-	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
-	desc.width = w;
-	desc.height = h;
-	desc.pixelformat = DSPF_ARGB;
-
-	if (engine->CreateSurface(engine, &desc, &imgSurface) != DFB_OK) {
-		imgProvider->Release(imgProvider);
-
-		return false;
-	}
-
-	imgSurface->SetPorterDuff(imgSurface, DSPD_NONE);
-	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL | DSBLIT_COLORIZE));
-
-	imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
 	
-	if (imgProvider->RenderTo(imgProvider, imgSurface, NULL) != DFB_OK) {
-		imgProvider->Release(imgProvider);
-		imgSurface->Release(imgSurface);
+	cairo_glyph_t glyph;
 
-		return false;
-	}
+	glyph.x = 0;
+	glyph.y = 0;
+	glyph.index = symbol;
 
-	_surface->Blit(_surface, imgSurface, NULL, x, y);
-
-	imgProvider->Release(imgProvider);
-	imgSurface->Release(imgSurface);
-
-	return true;
-}
-
-bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp)
-{
-	if (_surface == NULL) {
-		return false;
-	}
-
-	if (sxp < 0 || syp < 0 || swp < 0 || shp < 0) {
-		return false;
-	}
-
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-
-	IDirectFBSurface *imgSurface = NULL;
-	IDirectFBImageProvider *imgProvider = NULL;
-	DFBSurfaceDescription desc;
-
-	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
-
-	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
-		return false;
-	}
-
-	if (imgProvider->GetSurfaceDescription (imgProvider, &desc) != DFB_OK) {
-		imgProvider->Release(imgProvider);
-
-		return false;
-	}
-
-	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_PIXELFORMAT);
-	desc.pixelformat = DSPF_ARGB;
-
-	if (engine->CreateSurface(engine, &desc, &imgSurface) != DFB_OK) {
-		imgProvider->Release(imgProvider);
-
-		return false;
-	}
-
-	imgSurface->SetPorterDuff(imgSurface, DSPD_NONE);
-	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-
-	imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
-	
-	if (imgProvider->RenderTo(imgProvider, imgSurface, NULL) != DFB_OK) {
-		imgProvider->Release(imgProvider);
-		imgSurface->Release(imgSurface);
-
-		return false;
-	}
-	
-	DFBRectangle srect;
-
-	srect.x = sxp;
-	srect.y = syp;
-	srect.w = swp;
-	srect.h = shp;
-
-	_surface->Blit(_surface, imgSurface, &srect, x, y);
-
-	imgProvider->Release(imgProvider);
-	imgSurface->Release(imgSurface);
-
-	return true;
-}
-
-bool DFBGraphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
-{
-	if (_surface == NULL) {
-		return false;
-	}
-
-	if (sxp < 0 || syp < 0 || xp < 0 || yp < 0) {
-		return false;
-	}
-
-	if (swp < 0 || shp < 0 || wp < 0 || hp < 0) {
-		return false;
-	}
-
-	int sx = sxp, // SCALE_TO_SCREEN(sxp, _screen.width, _scale.width),
-			sy = syp, // SCALE_TO_SCREEN(syp, _screen.height, _scale.height),
-			sw = swp, // SCALE_TO_SCREEN(swp, _screen.width, _scale.width),
-			sh = shp; // SCALE_TO_SCREEN(shp, _screen.height, _scale.height);
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
-			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
-			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-
-	IDirectFBSurface *imgSurface = NULL;
-	IDirectFBImageProvider *imgProvider = NULL;
-	DFBSurfaceDescription desc;
-
-	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
-
-	if (engine->CreateImageProvider(engine, img.c_str(), &imgProvider) != DFB_OK) {
-		return false;
-	}
-
-	if (imgProvider->GetSurfaceDescription (imgProvider, &desc) != DFB_OK) {
-		imgProvider->Release(imgProvider);
-
-		return false;
-	}
-
-	// INFO:: soh para garantir que as imagens seraum as mesmas
-	int dw = desc.width,
-			dh = desc.height;
-
-	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
-	desc.width = (w*dw)/sw;
-	desc.height = (h*dh)/sh;
-	desc.pixelformat = DSPF_ARGB;
-
-	if (engine->CreateSurface(engine, &desc, &imgSurface) != DFB_OK) {
-		imgProvider->Release(imgProvider);
-
-		return false;
-	}
-
-	imgSurface->SetPorterDuff(imgSurface, DSPD_NONE);
-	imgSurface->SetBlittingFlags(imgSurface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-
-	imgSurface->Clear(imgSurface, 0x00, 0x00, 0x00, 0x00);
-	
-	if (imgProvider->RenderTo(imgProvider, imgSurface, NULL) != DFB_OK) {
-		imgProvider->Release(imgProvider);
-		imgSurface->Release(imgSurface);
-
-		return false;
-	}
-
-	DFBRectangle srect,
-							 drect;
-
-	srect.x = (sx*desc.width)/dw;
-	srect.y = (sy*desc.height)/dh;
-	srect.w = w;
-	srect.h = h;
-
-	drect.x = x;
-	drect.y = y;
-	drect.w = w;
-	drect.h = h;
-
-	_surface->StretchBlit(_surface, imgSurface, &srect, &drect);
-
-	imgProvider->Release(imgProvider);
-	imgSurface->Release(imgSurface);
-
-	return true;
-}
-
-bool DFBGraphics::DrawImage(Image *img, int xp, int yp)
-{
-	if ((void *)img == NULL) {
-		return false;
-	}
-
-	return DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight(), xp, yp);
-}
-
-bool DFBGraphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
-{
-	if ((void *)img == NULL) {
-		return false;
-	}
-
-	return DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight(), xp, yp, wp, hp);
-}
-
-bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp)
-{
-	if (_surface == NULL) {
-		return false;
-	}
-
-	if ((void *)img == NULL) {
-		return false;
-	}
-
-	jsize_t scale = img->GetGraphics()->GetWorkingScreenSize();
-
-	int sx = SCALE_TO_SCREEN(sxp, _screen.width, scale.width),
-			sy = SCALE_TO_SCREEN(syp, _screen.height, scale.height),
-			sw = SCALE_TO_SCREEN(swp, _screen.width, scale.width),
-			sh = SCALE_TO_SCREEN(shp, _screen.height, scale.height);
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
-
-	DFBGraphics *g = dynamic_cast<DFBGraphics *>(img->GetGraphics());
-
-	if (g != NULL) {
-		DFBRectangle drect;
-
-		drect.x = sx;
-		drect.y = sy;
-		drect.w = sw;
-		drect.h = sh;
-
-		_surface->Blit(_surface, g->_surface, &drect, x, y);
-	} else {
-		uint32_t *rgb = NULL;
-
-		img->GetRGB(&rgb, sxp, syp, swp, shp);
-	
-		if (rgb != NULL) {
-			SetRGB(rgb, _translate.x+xp, _translate.y+yp, swp, shp, swp);
-
-			delete [] rgb;
-		}
-	}
-
-	return true;
-}
-
-bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
-{
-	if (_surface == NULL) {
-		return false;
-	}
-
-	if ((void *)img == NULL) {
-		return false;
-	}
-
-	jsize_t scale = img->GetGraphics()->GetWorkingScreenSize();
-
-	int sx = SCALE_TO_SCREEN(sxp, _screen.width, scale.width),
-			sy = SCALE_TO_SCREEN(syp, _screen.height, scale.height),
-			sw = SCALE_TO_SCREEN(swp, _screen.width, scale.width),
-			sh = SCALE_TO_SCREEN(shp, _screen.height, scale.height);
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height),
-			w = SCALE_TO_SCREEN((_translate.x+xp+wp), _screen.width, _scale.width)-x,
-			h = SCALE_TO_SCREEN((_translate.y+yp+hp), _screen.height, _scale.height)-y;
-
-	DFBGraphics *g = dynamic_cast<DFBGraphics *>(img->GetGraphics());
-
-	if (g != NULL) {
-		DFBRectangle srect,
-								 drect;
-
-		srect.x = sx;
-		srect.y = sy;
-		srect.w = sw;
-		srect.h = sh;
-
-		drect.x = x;
-		drect.y = y;
-		drect.w = w;
-		drect.h = h;
-
-		_surface->StretchBlit(_surface, g->_surface, &srect, &drect);
-	} else {
-		int iwp = wp; // SCALE_TO_SCREEN(wp, _screen.width, _scale.width); 
-		int ihp = hp; // SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-
-		Image *image = img->Scale(iwp, ihp);
-
-		if (image != NULL) {
-			uint32_t *rgb = NULL;
-
-			image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
-
-			if (rgb != NULL) {
-				SetRGB(rgb, _translate.x+xp, _translate.y+yp, iwp, ihp, iwp);
-
-				delete [] rgb;
-			}
-
-			delete image;
-		}
-
-		/*
-		jsize_t scale = img->GetGraphics()->GetWorkingScreenSize();
-
-		int iwp = (wp*scale.width)/_screen.width;
-		int ihp = (hp*scale.height)/_screen.height;
-
-		Image *image = img->Scale(iwp, ihp);
-
-		if (image != NULL) {
-			uint32_t *rgb = NULL;
-
-			image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
-
-			if (rgb != NULL) {
-				SetRGB(rgb, _translate.x+xp, _translate.y+yp, wp, hp, wp);
-
-				delete [] rgb;
-			}
-
-			delete image;
-		}
-		*/
-	}
-
-	return true;
-}
-
-void DFBGraphics::Translate(int x, int y)
-{
-	_translate.x += x;
-	_translate.y += y;
-}
-
-jpoint_t DFBGraphics::Translate()
-{
-	return _translate;
-}
-
-void DFBGraphics::GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign)
-{
-	if (wp < 0 || hp < 0) {
-		return;
-	}
-
-	jcommon::StringTokenizer token(text, "\n", jcommon::JTT_STRING, false);
-
-	for (int i=0; i<token.GetSize(); i++) {
-		std::vector<std::string> words;
-		
-		std::string line = token.GetToken(i);
-
-		line = jcommon::StringUtils::ReplaceString(line, "\n", "");
-		line = jcommon::StringUtils::ReplaceString(line, "\t", "    ");
-		
-		if (halign == JHA_JUSTIFY) {
-			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, false);
-
-			std::string temp,
-				previous;
-
-			for (int j=0; j<line_token.GetSize(); j++) {
-				temp = jcommon::StringUtils::Trim(line_token.GetToken(j));
-
-				if (_font->GetStringWidth(temp) > wp) {
-					int p = 1;
-
-					while (p < (int)temp.size()) {
-						if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
-							words.push_back(temp.substr(0, p-1));
-
-							temp = temp.substr(p-1);
-
-							p = 1;
-						}
-					}
-
-					if (temp != "") {
-						words.push_back(temp.substr(0, p));
-					}
-				} else {
-					words.push_back(temp);
-				}
-			}
-
-			temp = words[0];
-
-			for (int j=1; j<(int)words.size(); j++) {
-				previous = temp;
-				temp += " " + words[j];
-
-				if (_font->GetStringWidth(temp) > wp) {
-					temp = words[j];
-
-					lines->push_back(previous);
-				}
-			}
-
-			lines->push_back("\n" + temp);
-		} else {
-			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, true);
-
-			std::string temp,
-				previous;
-
-			for (int j=0; j<line_token.GetSize(); j++) {
-				temp = line_token.GetToken(j);
-
-				if (_font->GetStringWidth(temp) > wp) {
-					int p = 1;
-
-					while (p < (int)temp.size()) {
-						if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
-							words.push_back(temp.substr(0, p-1));
-
-							temp = temp.substr(p-1);
-
-							p = 1;
-						}
-					}
-
-					if (temp != "") {
-						words.push_back(temp.substr(0, p));
-					}
-				} else {
-					words.push_back(temp);
-				}
-			}
-
-			temp = words[0];
-			
-			for (int j=1; j<(int)words.size(); j++) {
-				previous = temp;
-				temp += words[j];
-
-				if (_font->GetStringWidth(temp.c_str()) > wp) {
-					temp = words[j];
-
-					lines->push_back(previous);
-				}
-			}
-
-			lines->push_back(temp);
-		}
-	}
+	cairo_move_to(_cairo_context, x, y+_font->GetAscender());
+	cairo_show_glyphs(_cairo_context, &glyph, 1);
 }
 
 void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
 {
-	if (_surface == NULL) {
-		return;
-	}
-
 	if (wp < 0 || hp < 0) {
 		return;
 	}
@@ -1810,7 +1285,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 			max_lines,
 			font_height;
 	
-	font_height = _font->GetLineSize();
+	font_height = _font->GetSize();
 
 	if (font_height <= 0) {
 		return;
@@ -1822,7 +1297,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 		max_lines = 1;
 	}
 
-	GetStringBreak(&lines, text, wp, hp, halign);
+	_font->GetStringBreak(&lines, text, wp, hp, halign);
 
 	int line_space = 0,
 			line_yinit = 0,
@@ -1850,8 +1325,6 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 			}
 		}
 	}
-
-	font_height = font_height - _font->GetLeading();
 
 	jregion_t clip = GetClip();
 
@@ -1939,308 +1412,311 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 
 uint32_t DFBGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 {
-	if (_surface == NULL) {
+	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
+
+	if (cairo_surface == NULL) {
 		return pixel;
 	}
 
-	int x = SCALE_TO_SCREEN((_translate.x+xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((_translate.y+yp), _screen.height, _scale.height);
+	cairo_surface_flush(cairo_surface);
 
-	int swmax,
-			shmax;
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int sw = cairo_image_surface_get_width(cairo_surface);
+	int sh = cairo_image_surface_get_height(cairo_surface);
+	// int stride = cairo_image_surface_get_stride(cairo_surface);
+	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-	_surface->GetSize(_surface, &swmax, &shmax);
-
-	if ((x < 0 || x >= swmax) || (y < 0 || y >= shmax)) {
+	if (data == NULL || (x < 0 || x >= sw) || (y < 0 || y >= sh)) {
 		return pixel;
 	}
 
-	void *ptr;
-	uint32_t *dst,
-					 rgb;
-	int pitch;
+	uint32_t *ptr = (uint32_t *)data;
 
-	_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
-
-	dst = (uint32_t *)((uint8_t *)ptr + y * pitch);
-	rgb = *(dst + x);
-
-	_surface->Unlock(_surface);
-
-	return rgb;
+	return ptr[y*sw+x];
 }
 
-void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize)
+void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
-	if (_surface == NULL) {
+	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
+
+	if (cairo_surface == NULL) {
 		return;
 	}
 
-	int startx = SCALE_TO_SCREEN(xp, _screen.width, _scale.width); 
-	int starty = SCALE_TO_SCREEN(yp, _screen.height, _scale.height);
-	// int w = SCALE_TO_SCREEN(wp, _screen.width, _scale.width);
-	// int h = SCALE_TO_SCREEN(hp, _screen.height, _scale.height);
-	int w = SCALE_TO_SCREEN((xp+wp), _screen.width, _scale.width)-startx;
-	int h = SCALE_TO_SCREEN((yp+hp), _screen.height, _scale.height)-starty;
+	cairo_surface_flush(cairo_surface);
 
-	void *ptr;
-	uint32_t *src,
-					 *dst;
-	int x,
-			y,
-			pitch;
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int sw = cairo_image_surface_get_width(cairo_surface);
+	int sh = cairo_image_surface_get_height(cairo_surface);
+	int stride = cairo_image_surface_get_stride(cairo_surface);
+	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+
+	if (data == NULL || (x < 0 || x >= sw) || (y < 0 || y >= sh)) {
+		return;
+	}
+
 	uint32_t *array = (*rgb);
 
 	if (*rgb == NULL) {
 		array = new uint32_t[wp*hp];
 	}
 
-	int img_w,
-			img_h;
-	int max_w = startx+w,
-			max_h = starty+h;
-
-	_surface->GetSize(_surface, &img_w, &img_h);
-
-	if (max_w > img_w || max_h > img_h) {
-		if ((*rgb) == NULL) {
-			delete [] array;
-		}
-
-		(*rgb) = NULL;
-
-		return;
-	}
-
-	_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
-
-	double scale_x = (double)_screen.width/(double)_scale.width,
-				 scale_y = (double)_screen.height/(double)_scale.height;
-
-	for (y=0; y<hp; y++) {
-		src = (uint32_t *)(array + y * scansize);
-		dst = (uint32_t *)((uint8_t *)ptr + ((int)((yp + y) * scale_y)) * pitch);
+	for (int j=0; j<hp; j++) {
+		uint32_t *src = (uint32_t *)(data + (yp + y + j) * stride);
+		uint32_t *dst = (uint32_t *)(array + j * wp);
 		
-		for (x=0; x<wp; x++) {
-			*(src + x) = *(dst + (int)((xp + x) * scale_x));
+		for (int i=0; i<wp; i++) {
+			*(dst + i) = *(src + xp + x + i);
 		}
 	}
-
-	_surface->Unlock(_surface);
 
 	(*rgb) = array;
 }
 
 void DFBGraphics::SetRGB(uint32_t argb, int xp, int yp) 
 {
-	if (_surface == NULL) {
-		return;
-	}
+	/*
+	Color color(argb);
 
-	int x = SCALE_TO_SCREEN((xp), _screen.width, _scale.width); 
-	int y = SCALE_TO_SCREEN((yp), _screen.height, _scale.height);
-
+	int r = color.GetRed(),
+			g = color.GetGreen(),
+			b = color.GetBlue(),
+			a = color.GetAlpha();
+			*/
 	int r = (argb >> 0x10) & 0xff,
 			g = (argb >> 0x08) & 0xff,
 			b = (argb >> 0x00) & 0xff,
 			a = (argb >> 0x18) & 0xff;
 
-	_surface->SetColor(_surface, r, g, b, a);
-	_surface->DrawLine(_surface, x, y, x, y);
+	cairo_save(_cairo_context);
+	cairo_set_source_rgba(_cairo_context, r/255.0, g/255.0, b/255.0, a/255.0);
+	cairo_rectangle(_cairo_context, _translate.x+xp, _translate.y+yp, 1, 1);
+  cairo_fill(_cairo_context);
+  cairo_restore(_cairo_context);
 }
 
-void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline) 
+void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp) 
 {
-	if (_surface == NULL) {
+	if (rgb == NULL) {
 		return;
 	}
 
-	void *ptr;
-	uint32_t *dst,
-					 *src = rgb;
-	int wmax,
-			hmax,
-			pitch;
+	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 
-	int x = SCALE_TO_SCREEN((xp), _screen.width, _scale.width),
-			y = SCALE_TO_SCREEN((yp), _screen.height, _scale.height),
-			w = SCALE_TO_SCREEN((xp+wp), _screen.width, _scale.width)-x,
-			h = SCALE_TO_SCREEN((yp+hp), _screen.height, _scale.height)-y;
-
-	_surface->GetSize(_surface, &wmax, &hmax);
-
-	if (x > wmax || y > hmax) {
+	if (cairo_surface == NULL) {
 		return;
 	}
 
-	if (x+w > wmax) {
-		w = wmax-x;
-	}
-	
-	if (y+h > hmax) {
-		h = hmax-y;
-	}
+	cairo_surface_flush(cairo_surface);
 
-	wmax = x+w;
-	hmax = y+h;
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int sw = cairo_image_surface_get_width(cairo_surface);
+	int sh = cairo_image_surface_get_height(cairo_surface);
+	int stride = cairo_image_surface_get_stride(cairo_surface);
+	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
+	/*
+	cairo_save(_cairo_context);
 
-	double scale_x = (double)_scale.width/(double)_screen.width,
-				 scale_y = (double)_scale.height/(double)_screen.height;
+	for (int j=0; j<hp; j++) {
+		for (int i=0; i<wp; i++) {
+			uint32_t argb = rgb[j*wp+i];
+			int r = (argb >> 0x10) & 0xff,
+					g = (argb >> 0x08) & 0xff,
+					b = (argb >> 0x00) & 0xff,
+					a = 0xff;
 
-	if (_draw_flags == JDF_NOFX) {
-		for (int j=0; j<h; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch)+x;
-			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
-
-			double k = 0;
-			int last = -1;
-
-			for (int i=0; i<w; i++) {
-				if (last != (int)k) {
-					uint32_t pixel = *(src+(int)k);
-
-					if (_is_premultiply == true) {
-						uint32_t pa = (pixel >> 0x18) + 1;
-
-						pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
-					}
-					
-					*dst++ = pixel;
-					
-					last = (int)k;
-				}
-				
-				k = k + scale_x;
-			}
+			cairo_set_source_rgba(_cairo_context, r/255.0, g/255.0, b/255.0, a/255.0);
+			cairo_rectangle(_cairo_context, x+i, y+j, 1, 1);
+			cairo_fill(_cairo_context);
 		}
-	} else if (_draw_flags == JDF_BLEND) {
-		for (int j=0; j<h; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
-			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
+	}
 
-			for (int i=0; i<w; i++) {
-				int argb = *(src+(int)(i*scale_x)),
-						pixel = *(dst+x+i),
-						r = (argb >> 0x10) & 0xff,
-						g = (argb >> 0x08) & 0xff,
-						b = (argb >> 0x00) & 0xff,
-						a = (argb >> 0x18) & 0xff,
-						pr = (pixel >> 0x10) & 0xff,
-						pg = (pixel >> 0x08) & 0xff,
-						pb = (pixel >> 0x00) & 0xff;
+  cairo_restore(_cairo_context);
+	*/
+	
+	if (data == NULL || (x < 0 || x >= sw) || (y < 0 || y >= sh)) {
+		return;
+	}
+
+	for (int j=0; j<hp; j++) {
+		uint32_t *src = (uint32_t *)(rgb + j * wp);
+		uint32_t *dst = (uint32_t *)(data + (y + j) * stride);
+		
+		for (int i=0; i<wp; i++) {
+			if (_composite_flags == JCF_SRC) {
+				*(dst + x + i) = *(src + i);
+			} else if (_composite_flags == JCF_SRC_OVER) {
+				int p1 = *(src + i),
+						p2 = *(dst + x + i),
+						r = (p1 >> 0x10) & 0xff,
+						g = (p1 >> 0x08) & 0xff,
+						b = (p1 >> 0x00) & 0xff,
+						a = (p1 >> 0x18) & 0xff,
+						pr = (p2 >> 0x10) & 0xff,
+						pg = (p2 >> 0x08) & 0xff,
+						pb = (p2 >> 0x00) & 0xff;
 
 				pr = (int)(pr*(0xff-a) + r*a) >> 0x08;
 				pg = (int)(pg*(0xff-a) + g*a) >> 0x08;
 				pb = (int)(pb*(0xff-a) + b*a) >> 0x08;
 
-				*(dst+x+i) = 0xff000000 | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
+				*(dst + x + i) = (a << 0x18) | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
+			} else if (_composite_flags == JCF_SRC_IN) {
+			} else if (_composite_flags == JCF_SRC_OUT) {
+			} else if (_composite_flags == JCF_SRC_ATOP) {
+			} else if (_composite_flags == JCF_DST) {
+				// do nothing
+			} else if (_composite_flags == JCF_DST_OVER) {
+				int p1 = *(src + i),
+						p2 = *(dst + x + i),
+						r = (p1 >> 0x10) & 0xff,
+						g = (p1 >> 0x08) & 0xff,
+						b = (p1 >> 0x00) & 0xff,
+						// a = (p1 >> 0x18) & 0xff,
+						pr = (p2 >> 0x10) & 0xff,
+						pg = (p2 >> 0x08) & 0xff,
+						pb = (p2 >> 0x00) & 0xff,
+						pa = (p2 >> 0x00) & 0xff;
+
+				pr = (int)(pr*(0xff-pa) + r*pa) >> 0x08;
+				pg = (int)(pg*(0xff-pa) + g*pa) >> 0x08;
+				pb = (int)(pb*(0xff-pa) + b*pa) >> 0x08;
+
+				*(dst + x + i) = (pa << 0x18) | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
+			} else if (_composite_flags == JCF_DST_IN) {
+			} else if (_composite_flags == JCF_DST_OUT) {
+			} else if (_composite_flags == JCF_DST_ATOP) {
+			} else if (_composite_flags == JCF_ADD) {
+			} else if (_composite_flags == JCF_XOR) {
+				*(dst + x + i) ^= *(src + i);
 			}
 		}
-	} else if (_draw_flags == JDF_XOR) {
-		for (int j=0; j<h; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch)+x;
-			src = (uint32_t *)(rgb+(int)(j*scale_y)*scanline);
-
-			double k = 0;
-			int last = -1;
-
-			for (int i=0; i<w; i++) {
-				if (last != (int)k) {
-					uint32_t pixel = *(src+(int)k);
-
-					if (_is_premultiply == true) {
-						uint32_t pa = (pixel >> 0x18) + 1;
-
-						pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
-					}
-					
-					*dst++ ^= pixel;
-					
-					last = (int)k;
-				}
-
-				k = k + scale_x;
-			}
-		}
-	}
-
-	_surface->Unlock(_surface);
-
-
-	/* INFO:: uses DrawLine
-	if (_surface == NULL) {
-		return;
-	}
-
-	double 
-		scale_x = (double)_scale.width/(double)_screen.width,
-		scale_y = (double)_scale.height/(double)_screen.height;
-	double step;
-	int 
-		x = SCALE_TO_SCREEN((xp), _screen.width, _scale.width),
-		y = SCALE_TO_SCREEN((yp), _screen.height, _scale.height),
-		w = SCALE_TO_SCREEN((xp+wp), _screen.width, _scale.width)-x,
-		h = SCALE_TO_SCREEN((yp+hp), _screen.height, _scale.height)-y;
-	int 
-		wmax,
-		hmax;
-	int
-		i,
-		j,
-		index,
-		pixel,
-		lastp;
-
-	_surface->GetSize(_surface, &wmax, &hmax);
-
-	if (x > wmax || y > hmax) {
-		return;
-	}
-
-	if (x+w > wmax) {
-		w = wmax-x;
 	}
 	
-	if (y+h > hmax) {
-		h = hmax-y;
+	cairo_surface_mark_dirty(cairo_surface);
+}
+
+bool DFBGraphics::DrawImage(Image *img, int xp, int yp)
+{
+	if ((void *)img == NULL) {
+		return false;
 	}
 
-	wmax = x+w;
-	hmax = y+h;
+	return DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight(), xp, yp);
+}
 
-	uint8_t *ptr = (uint8_t *)rgb;
+bool DFBGraphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
+{
+	if ((void *)img == NULL) {
+		return false;
+	}
 
-	lastp = pixel = *rgb;
+	return DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight(), xp, yp, wp, hp);
+}
+
+bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp)
+{
+	if ((void *)img == NULL) {
+		return false;
+	}
+
+	jgui::Image *aux = img->Crop(sxp, syp, swp, shp);
+
+	if (aux == NULL) {
+		return false;
+	}
+
+	DFBGraphics *g = dynamic_cast<DFBGraphics *>(aux->GetGraphics());
+
+	if (g != NULL) {
+		cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(g)->_cairo_context);
+
+		if (cairo_surface == NULL) {
+			return false;
+		}
+
+		cairo_surface_flush(cairo_surface);
 	
-	_surface->SetColor(_surface, ptr[0], ptr[1], ptr[2], ptr[3]);
+		cairo_save(_cairo_context);
+		cairo_set_source_surface(_cairo_context, cairo_surface, xp+_translate.x, yp+_translate.y);
+		cairo_paint(_cairo_context);
+		cairo_restore(_cairo_context);
+	} else {
+		uint32_t *rgb = NULL;
 
-	for (j=y; j<h; j++) {
-		index = (int)(j*scale_y)*scanline;
-		step = 0.0;
+		aux->GetRGB(&rgb, 0, 0, swp, shp);
+	
+		if (rgb != NULL) {
+			SetRGB(rgb, xp, yp, swp, shp);
 
-		for (i=x; i<w; i++) {
-			step = step + scale_x;
-			pixel = *(rgb+index+(int)step);
-
-			if (pixel != lastp) {
-				uint8_t *ptr = (uint8_t *)&pixel;
-
-				_surface->SetColor(_surface, ptr[2], ptr[1], ptr[0], ptr[3]);
-			}
-
-			lastp = pixel;
-
-			_surface->DrawLine(_surface, i, j, i, j);
+			delete [] rgb;
 		}
 	}
-	*/
+
+	delete aux;
+
+	return true;
+}
+
+bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
+{
+	if ((void *)img == NULL) {
+		return false;
+	}
+
+	jgui::Image *aux = img->Crop(sxp, syp, swp, shp);
+
+	if (aux == NULL) {
+		return false;
+	}
+
+	jgui::Image *scl = aux->Scale(wp, hp);
+
+	if (scl == NULL) {
+		return false;
+	}
+
+	delete aux;
+
+	DFBGraphics *g = dynamic_cast<DFBGraphics *>(scl->GetGraphics());
+
+	if (g != NULL) {
+		cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(g)->_cairo_context);
+
+		if (cairo_surface == NULL) {
+			return false;
+		}
+
+		cairo_surface_flush(cairo_surface);
+
+		cairo_save(_cairo_context);
+		cairo_set_source_surface(_cairo_context, cairo_surface, xp+_translate.x, yp+_translate.y);
+		cairo_paint(_cairo_context);
+		cairo_restore(_cairo_context);
+	} else {
+		uint32_t *rgb = NULL;
+
+		scl->GetRGB(&rgb, 0, 0, wp, hp);
+	
+		if (rgb != NULL) {
+			SetRGB(rgb, xp, yp, wp, hp);
+
+			delete [] rgb;
+		}
+	}
+
+	delete scl;
+
+	return true;
 }
 
 void DFBGraphics::Reset()
 {
-	SetAntialias(true);
+	SetAntialias(JAM_NORMAL);
 
 	SetColor(0x00000000);
 
@@ -2250,14 +1726,32 @@ void DFBGraphics::Reset()
 	SetLineDash(NULL, 0);
 
 	ResetGradientStop();
-	SetDrawingFlags(JDF_BLEND);
-	SetBlittingFlags(JBF_ALPHACHANNEL);
 	SetCompositeFlags(JCF_SRC_OVER);
 	SetDrawingMode(JDM_STROKE);
 }
 
 void DFBGraphics::ApplyDrawing()
 {
+	/* TODO:: apply paths
+	if (_dashPattern) {
+		cairo_set_dash(context, _dashPattern, _dashCount, _dashOffset);
+	} else {
+		cairo_set_dash(context, 0, 0, 0);
+	}
+
+	if (_mode == GradientMode && _gradient.getType() != Gradient::None) {
+		cairo_set_source(context, _gradient.getCairoGradient());
+	} else {
+		cairo_set_source_rgba(context, _color.red(), _color.green(), _color.blue(), _color.alpha());
+	}
+	*/
+
+	if (_drawing_mode == JDM_PATH) {
+	} else if (_drawing_mode == JDM_STROKE) {
+		cairo_stroke(_cairo_context);
+	} else if (_drawing_mode == JDM_FILL) {
+		cairo_fill(_cairo_context);
+	}
 }
 
 double DFBGraphics::EvaluateBezier0(double *data, int ndata, double t) 
@@ -2315,520 +1809,6 @@ double DFBGraphics::EvaluateBezier0(double *data, int ndata, double t)
 	}
 
 	return result;
-}
-
-int DFBGraphics::CalculateGradientChannel(int schannel, int dchannel, int distance, int offset) 
-{
-	if (schannel == dchannel) {
-		return schannel;
-	}
-
-	return (int)(schannel-((schannel-dchannel)*((double)offset/(double)distance))) & 0xff;
-}
-
-void DFBGraphics::UpdateGradientColor(Color &scolor, Color &dcolor, int distance, int offset) 
-{
-	int a = CalculateGradientChannel(scolor.GetAlpha(), dcolor.GetAlpha(), distance, offset);
-	int r = CalculateGradientChannel(scolor.GetRed(), dcolor.GetRed(), distance, offset);
-	int g = CalculateGradientChannel(scolor.GetGreen(), dcolor.GetGreen(), distance, offset);
-	int b = CalculateGradientChannel(scolor.GetBlue(), dcolor.GetBlue(), distance, offset);
-	
-	SetColor((a << 24) | (r << 16) | (g << 8) | (b << 0));
-}
-
-void DFBGraphics::FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int y1p, int x2p, int y2p)
-{
-	if (_surface == NULL) {
-		return;
-	}
-
-	if (npoints < 3) {
-		return;
-	}
-
-	int xnew,
-			ynew,
-			xold,
-			yold,
-			x1,
-			y1,
-			x2,
-			y2,
-			inside;
-
-	for (int x=x1p; x<x2p; x++) {
-		for (int y=y1p; y<y2p; y++) {
-			inside = 0;
-
-			xold = points[npoints-1].x;
-			yold = points[npoints-1].y;
-
-			for (int i=0; i<npoints; i++) {
-				xnew = points[i].x;
-				ynew = points[i].y;
-
-				if (xnew > xold) {
-					x1 = xold;
-					x2 = xnew;
-					y1 = yold;
-					y2 = ynew;
-				} else {
-					x1 = xnew;
-					x2 = xold;
-					y1 = ynew;
-					y2 = yold;
-				}
-
-				// edge "open" at one end
-				if ((xnew < x) == (x <= xold) && ((long)y-(long)y1)*(long)(x2-x1) < ((long)y2-(long)y1)*(long)(x-x1)) {
-					inside = !inside;
-				}
-
-				xold = xnew;
-				yold = ynew;
-			}
-
-			if (inside != 0) {
-				_surface->DrawLine(_surface, x, y, x, y);
-			}
-		}
-	}
-}
-
-void DFBGraphics::DrawRectangle0(int x, int y, int w, int h, int dx, int dy, jline_join_t join, int size)
-{ 
-	if (_surface == NULL || size >= 0 || w <= 0 || h <= 0) {
-		return;
-	}
-
-	bool close = false;
-
-	size = -size;
-
-	if (size > (std::min(w, h)/2)) {
-		size = std::min(w, h)/2;
-
-		close = true;
-	}
-
-	if (join == JLJ_MITER) {
-		x = x + size;
-		y = y + size;
-		w = w - 2*size;
-		h = h - 2*size;
-
-		_surface->FillRectangle(_surface, x-size, y-size, w+2*size, size);
-		_surface->FillRectangle(_surface, x-size, y+h, w+2*size, size); // _
-		_surface->FillRectangle(_surface, x-size, y, size, h); // |<- 
-		_surface->FillRectangle(_surface, x+w, y, size, h); // ->|
-
-		if (close == true) {
-			_surface->FillRectangle(_surface, x, y, w, h);
-		}
-	} else if (join == JLJ_BEVEL) {
-		if (dx > w/2) {
-			dx = w/2;
-		}
-
-		if (dy > h/2) {
-			dy = h/2;
-		}
-
-		if (size <= (std::max(dx, dy))) {
-			if (size == 1) {
-				_surface->DrawLine(_surface, x+dx, y, x, y+dy);
-				_surface->DrawLine(_surface, x+w-dx-1, y, x+w-1, y+dy);
-				_surface->DrawLine(_surface, x+w-1, y+h-dy, x+w-dx-1, y+h);
-				_surface->DrawLine(_surface, x, y+h-dy, x+dx, y+h);
-			} else {
-				_surface->FillTriangle(_surface, x+dx, y, x, y+dy, x+size, y+dy);
-				_surface->FillTriangle(_surface, x+size, y+dy, x+dx, y, x+dx, y+size);
-
-				_surface->FillTriangle(_surface, x+w-dx, y, x+w-dx, y+size, x+w, y+dy);
-				_surface->FillTriangle(_surface, x+w-dx, y+size, x+w-size, y+dy,  x+w, y+dy);
-
-				_surface->FillTriangle(_surface, x+w-size, y+h-dy, x+w, y+h-dy, x+w-dx, y+h);
-				_surface->FillTriangle(_surface, x+w-size, y+h-dy, x+w-dx, y+h, x+w-dx, y+h-size);
-
-				_surface->FillTriangle(_surface, x, y+h-dy, x+size, y+h-dy, x+dx, y+h);
-				_surface->FillTriangle(_surface, x+size, y+h-dy, x+dx, y+h-size, x+dx, y+h);
-			} 
-
-			_surface->FillRectangle(_surface, x+dx, y, w-2*dx, size);
-			_surface->FillRectangle(_surface, x+dx, y+h-size, w-2*dx, size);
-			_surface->FillRectangle(_surface, x, y+dy, size, h-2*dy);
-			_surface->FillRectangle(_surface, x+w-size, y+dy, size, h-2*dy);
-		} else {
-			_surface->FillTriangle(_surface, x+dx, y, x, y+dy, x+dx, y+dy);
-			_surface->FillTriangle(_surface, x+w-dx, y, x+w, y+dy, x+w-dx, y+dy);
-			_surface->FillTriangle(_surface, x, y+h-dy, x+dx, y+h-dy, x+dx, y+h);
-			_surface->FillTriangle(_surface, x+w-dx, y+h-dy, x+w, y+h-dy, x+w-dx, y+h);
-
-			_surface->FillRectangle(_surface, x+dx, y, w-2*dx, dy);
-			_surface->FillRectangle(_surface, x+dx, y+h-dy, w-2*dx, dy);
-			_surface->FillRectangle(_surface, x, y+dy, dx, h-2*dy);
-			_surface->FillRectangle(_surface, x+w-dx, y+dy, dx, h-2*dy);
-
-			DrawRectangle0(x+dx, y+dy, w-2*dx, h-2*dy, 0, 0, JLJ_MITER, std::max(dx, dy)-size-1);
-		}
-	} else if (join == JLJ_ROUND) {
-		DrawArcHelper(x+dx-1, y+dy-1, dx, dy, M_PI_2, M_PI, -size);
-		DrawArcHelper(x+dx-1, y+h-dy-1, dx, dy, M_PI, M_PI+M_PI_2, -size);
-		DrawArcHelper(x+w-dx-1, y+h-dy-1, dx, dy, M_PI+M_PI_2, 2*M_PI, -size);
-		DrawArcHelper(x+w-dx-1, y+dy-1, dx, dy, 0.0, M_PI_2, -size);
-
-		if (dx > w/2) {
-			dx = w/2;
-		}
-
-		if (dy > h/2) {
-			dy = h/2;
-		}
-
-		if (size <= (std::max(dx, dy))) {
-			_surface->FillRectangle(_surface, x+dx, y, w-2*dx, size);
-			_surface->FillRectangle(_surface, x+dx, y+h-size, w-2*dx, size);
-			_surface->FillRectangle(_surface, x, y+dy, size, h-2*dy);
-			_surface->FillRectangle(_surface, x+w-size, y+dy, size, h-2*dy);
-		} else {
-			_surface->FillRectangle(_surface, x+dx, y, w-2*dx, dy);
-			_surface->FillRectangle(_surface, x+dx, y+h-dy, w-2*dx, dy);
-			_surface->FillRectangle(_surface, x, y+dy, dx, h-2*dy);
-			_surface->FillRectangle(_surface, x+w-dx, y+dy, dx, h-2*dy);
-
-			DrawRectangle0(x+dx, y+dy, w-2*dx, h-2*dy, 0, 0, JLJ_MITER, std::max(dx, dy)-size-1);
-		}
-	}
-}
-
-void DFBGraphics::DrawArc0(int xc, int yc, int rx, int ry, double arc0, double arc1, int size, int quadrant)
-{
-	if (size == 0) {
-		return;
-	}
-
-	if (_surface == NULL) {
-		return;
-	}
-
-	double line_width = (double)size;
-	
-	if (line_width > std::max(rx, ry)-1) {
-		line_width = std::max(rx, ry)-1;
-	}
-	
-	if (quadrant == 0) {
-		arc0 = arc0-0.0;
-		arc1 = arc1-0.0;
-	} else if (quadrant == 1) {
-		double t0 = arc0;
-
-		arc0 = M_PI-arc1;
-		arc1 = M_PI-t0;
-	} else if (quadrant == 2) {
-		arc0 = arc0-M_PI;
-		arc1 = arc1-M_PI;
-	} else if (quadrant == 3) {
-		double t0 = arc0;
-
-		arc0 = 2*M_PI-arc1;
-		arc1 = 2*M_PI-t0;
-	}
-		
-	double min_rx = rx-line_width,
-				 min_ry = ry-line_width,
-				 max_rx = rx,
-				 max_ry = ry;
-	double dmin_rx = min_rx*min_rx,
-				 dmin_ry = min_ry*min_ry,
-				 dmax_rx = max_rx*max_rx,
-				 dmax_ry = max_ry*max_ry;
-	double x_inf = max_rx*cos(arc0),
-				 y_inf = max_ry*sin(arc0),
-				 x_sup = max_rx*cos(arc1),
-				 y_sup = max_ry*sin(arc1);
-	DFBRegion lines[4*(int)max_ry];
-	int old_x = -1,
-			old_y = -1;
-	int k = 0;
-
-	for (double y=0; y<max_ry; y+=1.0) {
-		double eq_y_sup0 = x_sup*y,
-					 eq_y_inf0 = x_inf*y;
-		double xi = -1.0,
-					 xf = -1.0;
-		bool flag = false;
-
-		for (double x=0; x<max_rx; x+=1.0) {
-			double min_ellipse,
-						 max_ellipse;
-
-			if (dmin_rx == 0.0 || dmin_ry == 0.0) {
-				min_ellipse = 1.0;
-				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
-			} else {
-				min_ellipse = (x*x)/dmin_rx+(y*y)/dmin_ry;
-				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
-			}
-
-			if (min_ellipse >= 1.0 && max_ellipse <= 1.0) {
-				double eq_y_sup = eq_y_sup0-y_sup*x,
-							 eq_y_inf = eq_y_inf0-y_inf*x;
-
-				eq_y_sup = eq_y_inf0-y_inf*x;
-				eq_y_inf = eq_y_sup0-y_sup*x;
-
-				if (eq_y_sup >= 0.0 && eq_y_inf <= 0.0) {
-						if (flag == false) {
-						xi = x;
-
-						flag = true;
-					}
-
-					xf = x;
-				}
-			}
-		}
-
-		if  (flag == false) {
-			continue;
-		}
-
-		if (line_width <= 1) {
-			if (old_x < 0) {
-				old_x = xi;
-			}
-
-			if (old_y < 0) {
-				old_y = y;
-			}
-
-			if (quadrant == 0) {
-				lines[k].x1 = (int)(xc+old_x);
-				lines[k].y1 = (int)(yc-y);
-				lines[k].x2 = (int)(xc+xi);
-				lines[k].y2 = (int)(yc-y);
-			} else if (quadrant == 1) {
-				lines[k].x1 = (int)(xc-old_x);
-				lines[k].y1 = (int)(yc-y);
-				lines[k].x2 = (int)(xc-xi+1);
-				lines[k].y2 = (int)(yc-y);
-			} else if (quadrant == 2) {
-				lines[k].x1 = (int)(xc-old_x);
-				lines[k].y1 = (int)(yc+y+1);
-				lines[k].x2 = (int)(xc-xi+1);
-				lines[k].y2 = (int)(yc+y+1);
-			} else if (quadrant == 3) {
-				lines[k].x1 = (int)(xc+old_x);
-				lines[k].y1 = (int)(yc+y+1);
-				lines[k].x2 = (int)(xc+xi);
-				lines[k].y2 = (int)(yc+y+1);
-			}
-
-			k++;
-
-			old_x = xi;
-			old_y = y;
-		} else {
-			if (quadrant == 0) {
-				lines[k].x1 = (int)(xc+xi);
-				lines[k].y1 = (int)(yc-y);
-				lines[k].x2 = (int)(xc+xf);
-				lines[k].y2 = (int)(yc-y);
-			} else if (quadrant == 1) {
-				lines[k].x1 = (int)(xc-xf);
-				lines[k].y1 = (int)(yc-y);
-				lines[k].x2 = (int)(xc-xi+1);
-				lines[k].y2 = (int)(yc-y);
-			} else if (quadrant == 2) {
-				lines[k].x1 = (int)(xc-xf);
-				lines[k].y1 = (int)(yc+y+1);
-				lines[k].x2 = (int)(xc-xi+1);
-				lines[k].y2 = (int)(yc+y+1);
-			} else if (quadrant == 3) {
-				lines[k].x1 = (int)(xc+xi);
-				lines[k].y1 = (int)(yc+y+1);
-				lines[k].x2 = (int)(xc+xf);
-				lines[k].y2 = (int)(yc+y+1);
-			}
-
-			k++;
-		}
-	}
-	
-	_surface->DrawLines(_surface, lines, k);
-}
-
-void DFBGraphics::DrawArcHelper(int xc, int yc, int rx, int ry, double arc0, double arc1, int size)
-{
-	arc0 = fmod(arc0, 2*M_PI);
-	arc1 = fmod(arc1, 2*M_PI);
-
-	if (arc1 == 0.0) {
-		arc1 = 2*M_PI;
-	}
-
-	if (arc0 < 0.0) {
-		arc0 = 2*M_PI + arc0;
-	}
-
-	if (arc1 < 0.0) {
-		arc1 = 2*M_PI + arc1;
-	}
-
-	int quadrant = -1;
-
-	if (arc0 >= 0.0 && arc0 < M_PI_2) {
-		quadrant = 0;
-	} else if (arc0 >= M_PI_2 && arc0 < M_PI) {
-		quadrant = 1;
-	} else if (arc0 >= M_PI && arc0 < (M_PI+M_PI_2)) {
-		quadrant = 2;
-	} else if (arc0 >= (M_PI+M_PI_2) && arc0 < 2*M_PI) {
-		quadrant = 3;
-	}
-
-	if (arc1 < arc0) {
-		arc1 = arc1 + 2*M_PI;
-	}
-
-	while (arc0 < arc1) {
-		double b = arc1,
-					 q = quadrant;
-
-		if (quadrant == 0) {
-			if (arc1 > M_PI_2) {
-				b = M_PI_2;
-			}
-		} else if (quadrant == 1) {
-			if (arc1 > M_PI) {
-				b = M_PI;
-			}
-		} else if (quadrant == 2) {
-			if (arc1 > (M_PI+M_PI_2)) {
-				b = (M_PI+M_PI_2);
-			}
-		} else if (quadrant == 3) {
-			if (arc1 > 2*M_PI) {
-				b = 0.0;
-
-				arc1 = arc1-2*M_PI;
-			}
-		}
-
-		if (size < 0) {
-			DrawArc0(xc, yc, rx-1, ry-1, arc0, b, -size, q);
-		} else {
-			DrawArc0(xc, yc, rx+size-1, ry+size-1, arc0, b, size, q);
-		}
-
-		arc0 = b;
-		quadrant = (quadrant+1)%4;
-	}
-}
-
-void DFBGraphics::DrawChord0(int xc, int yc, int rx, int ry, double arc0, double arc1, int size)
-{
-	if (_surface == NULL) {
-		return;
-	}
-
-	if (size == 0) {
-		return;
-	}
-
-	double line_width = (double)size;
-	
-	if (line_width > std::max(rx, ry)) {
-		line_width = std::max(rx, ry);
-	}
-	
-	double min_rx = rx-line_width,
-				 min_ry = ry-line_width,
-				 max_rx = rx,
-				 max_ry = ry;
-	double dmin_rx = min_rx*min_rx,
-				 dmin_ry = min_ry*min_ry,
-				 dmax_rx = max_rx*max_rx,
-				 dmax_ry = max_ry*max_ry;
-	double x_inf = max_rx*cos(arc0),
-				 y_inf = max_ry*sin(arc0),
-				 x_sup = max_rx*cos(arc1),
-				 y_sup = max_ry*sin(arc1);
-	double a = (y_inf-y_sup),
-				 b = (x_inf-x_sup),
-				 c = (x_inf*y_sup-x_sup*y_inf);
-	double dxangle = (line_width*M_PI_2)/max_rx,
-				 dyangle = (line_width*M_PI_2)/max_ry;
-
-	double x0_inf = min_rx*cos(arc0+dxangle),
-				 y0_inf = min_ry*sin(arc0+dyangle),
-				 x0_sup = min_rx*cos(arc1-dxangle),
-				 y0_sup = min_ry*sin(arc1-dyangle);
-	double a0 = (y0_inf-y0_sup),
-				 b0 = (x0_inf-x0_sup),
-				 c0 = (x0_inf*y0_sup-x0_sup*y0_inf);
-	
-	DFBRegion lines[4*(int)max_ry];
-	int k = 0;
-
-	for (double y=-max_ry; y<max_ry; y+=1.0) {
-		double xi = -1.0,
-					 xf = -1.0;
-		bool flag = false;
-
-		for (double x=-max_rx; x<max_rx; x+=1.0) {
-			double min_ellipse,
-						 max_ellipse;
-
-			if (dmin_rx == 0.0 || dmin_ry == 0.0) {
-				min_ellipse = 1.0;
-				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
-			} else {
-				min_ellipse = (x*x)/dmin_rx+(y*y)/dmin_ry;
-				max_ellipse = (x*x)/dmax_rx+(y*y)/dmax_ry;
-			}
-
-			double eq_y_inf = a0*x+b0*y+c0,
-						 eq_y_sup = a*x+b*y+c;
-
-			if (max_ellipse <= 1.0) {
-				if (eq_y_sup <= 0.0) {
-					if (min_ellipse >= 1.0 || eq_y_inf >= 0.0) {
-						if (flag == false) {
-							xi = x;
-
-							flag = true;
-						}
-
-						xf = x;
-					} else if (min_ellipse < 1.0) {
-						if (flag == true) {
-							lines[k].x1 = (int)(xc+xi);
-							lines[k].y1 = (int)(yc+y);
-							lines[k].x2 = (int)(xc+x);
-							lines[k].y2 = (int)(yc+y);
-
-							k++;
-
-							flag = false;
-						}
-					}
-				}
-			}
-		}
-
-		if (flag == true) {
-			lines[k].x1 = (int)(xc+xi);
-			lines[k].y1 = (int)(yc+y);
-			lines[k].x2 = (int)(xc+xf);
-			lines[k].y2 = (int)(yc+y);
-
-			k++;
-		}
-	}
-	
-	_surface->DrawLines(_surface, lines, k);
 }
 
 }

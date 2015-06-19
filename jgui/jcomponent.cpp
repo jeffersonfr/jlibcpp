@@ -31,14 +31,16 @@ Component::Component(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Component");
 
+	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
+
 	_font = jgui::Font::GetDefaultFont();
 
 	_preferred_size.width = DEFAULT_COMPONENT_WIDTH;
 	_preferred_size.height = DEFAULT_COMPONENT_HEIGHT;
 	_minimum_size.width = 0;
 	_minimum_size.height = 0;
-	_maximum_size.width = 1920;
-	_maximum_size.height = 1080;
+	_maximum_size.width = screen.width;
+	_maximum_size.height = screen.height;
 
 	_is_cyclic_focus = false;
 	_is_navigation_enabled = true;
@@ -530,12 +532,13 @@ void Component::PaintScrollbars(Graphics *g)
 		int offset = (int)(_size.width*offset_ratio),
 			block_size = (int)(_size.width*block_size_ratio);
 
+		g->SetColor(fgcolor);
+		g->FillRectangle(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size);
+
 		g->SetGradientStop(0.0, fgcolor);
 		g->SetGradientStop(1.0, bgcolor);
-		g->FillLinearGradient(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size, 0, 0, 0, _scroll_size);
+		g->FillLinearGradient(offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size, 0, 0, 0, _scroll_size);
 		g->ResetGradientStop();
-		g->SetColor(fgcolor);
-		g->FillRectangle(offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size);
 	}
 	
 	if (IsScrollableY() == true) {
@@ -544,12 +547,13 @@ void Component::PaintScrollbars(Graphics *g)
 		int offset = (int)(_size.height*offset_ratio),
 			block_size = (int)(_size.height*block_size_ratio);
 
+		g->SetColor(fgcolor);
+		g->FillRectangle(_size.width-_scroll_size-_border_size, _border_size, _scroll_size, _size.height);
+
 		g->SetGradientStop(0.0, fgcolor);
 		g->SetGradientStop(1.0, bgcolor);
-		g->FillLinearGradient(_size.width-_scroll_size-_border_size, _border_size, _scroll_size, _size.height, 0, 0, _scroll_size, 0);
+		g->FillLinearGradient(_size.width-_scroll_size-_border_size, offset, _scroll_size, block_size, 0, 0, _scroll_size, 0);
 		g->ResetGradientStop();
-		g->SetColor(fgcolor);
-		g->FillRectangle(_size.width-_scroll_size-_border_size, offset, _scroll_size, block_size);
 	}
 
 	if (IsScrollableX() == true && IsScrollableY() == true) {

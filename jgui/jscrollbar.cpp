@@ -29,7 +29,7 @@ ScrollBar::ScrollBar(int x, int y, int width, int height):
 	jcommon::Object::SetClassName("jgui::ScrollBar");
 
 	_pressed = false;
-	_stone_size = 40;
+	_stone_size = 32;
 	_label_visible = true;
 	
 	SetFocusable(true);

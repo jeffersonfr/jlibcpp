@@ -29,7 +29,7 @@ Button::Button(std::string label, int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Button");
 
-	_wrap = false;
+	_is_wrap = false;
 	_halign = JHA_CENTER;
 	_valign = JVA_CENTER;
 
@@ -41,6 +41,22 @@ Button::Button(std::string label, int x, int y, int width, int height):
 
 Button::~Button()
 {
+}
+
+void Button::SetWrap(bool b)
+{
+	if (_is_wrap == b) {
+		return;
+	}
+
+	_is_wrap = b;
+
+	Repaint();
+}
+
+bool Button::IsWrap()
+{
+	return _is_wrap;
 }
 
 void Button::SetLabel(std::string label)
@@ -189,7 +205,7 @@ void Button::Paint(Graphics *g)
 
 		std::string text = GetLabel();
 
-		if (_wrap == false) {
+		if (_is_wrap == false) {
 			text = _font->TruncateString(text, "...", pw);
 		}
 

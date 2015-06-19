@@ -89,7 +89,7 @@ void WindowManager::Release()
 	for (std::vector<Window *>::const_iterator i=windows.begin(); i!=windows.end(); ++i) {
 		Window *w = (*i);
 
-		w->InternalRelease();
+		w->InternalReleaseWindow();
 	}
 }
 

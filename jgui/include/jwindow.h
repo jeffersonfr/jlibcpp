@@ -30,10 +30,8 @@
 #include <stdint.h>
 #include <string.h>
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 #include <directfb.h>
-#elif defined(X11_UI)
-#include <SDL2/SDL.h>
 #endif
 
 namespace jgui{
@@ -58,17 +56,18 @@ class Window : public jgui::Container{
 	friend class WindowManager;
 
 	protected:
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 		/** \brief */
 		IDirectFBWindow *_window;
 		/** \brief */
 		IDirectFBSurface *_surface;
-#elif defined(X11_UI)
 #endif
 		/** \brief */
 		std::vector<WindowListener *> _window_listeners;
 		/** \brief */
 		jthread::Mutex _window_mutex;
+		/** \brief */
+		jthread::Mutex _graphics_mutex;
 		/** \brief */
 		jthread::Mutex _input_mutex;
 		/** \brief */
@@ -91,20 +90,20 @@ class Window : public jgui::Container{
 		 * \brief
 		 *
 		 */
-		void InternalCreateWindow(void *params = NULL);
+		void InternalCreateWindow();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void InternalRelease();
+		virtual void InternalReleaseWindow();
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		Window(int x, int y, int width, int height, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Window(int x = 0, int y = 0, int width = -1, int height = -1);
 		
 		/**
 		 * \brief
@@ -129,18 +128,6 @@ class Window : public jgui::Container{
 		 *
 		 */
 		virtual void SetNativeWindow(void *native);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
 
 		/**
 		 * \brief

@@ -24,51 +24,51 @@
 #include "jsemaphore.h"
 #include "jinputmanager.h"
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 #include "jdfbhandler.h"
 #include "jdfbgraphics.h"
-#elif defined(X11_UI)
-#include "jsdlhandler.h"
-#include "jsdlgraphics.h"
 #endif
 
 namespace jgui {
 
-Window::Window(int x, int y, int width, int height, int scale_width, int scale_height):
-	Container(x, y, width, height, scale_width, scale_height)
+Window::Window(int x, int y, int width, int height):
+	Container(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::Window");
 
-	_insets.left = 30;
-	_insets.right = 30;
-	_insets.top = 60;
-	_insets.bottom = 30;
+	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
+
+	_insets.left = 8;
+	_insets.right = 8;
+	_insets.top = 42;
+	_insets.bottom = 8;
 
 	_minimum_size.width = 16;
 	_minimum_size.height = 16;
-	_maximum_size.width = scale_width;
-	_maximum_size.height = scale_height;
+	_maximum_size.width = screen.width;
+	_maximum_size.height = screen.height;
 	
-	if (scale_width <= 0) {
-		_maximum_size.width = jgui::GFXHandler::GetInstance()->GetScreenWidth();
+	if (width < 0) {
+		width = jgui::GFXHandler::GetInstance()->GetScreenWidth();
 	}
 
-	if (scale_height <= 0) {
-		_maximum_size.height = jgui::GFXHandler::GetInstance()->GetScreenHeight();
+	if (height < 0) {
+		height = jgui::GFXHandler::GetInstance()->GetScreenHeight();
 	}
+
+	_size.width = width;
+	_size.height = height;
 
 	_location.x = x;
 	_location.y = y;
 	_size.width = width;
 	_size.height = height;
 	
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	_surface = NULL;
 	_window = NULL;
 	
-	_graphics = new DFBGraphics(NULL, NULL, true);
-#elif defined(X11_UI)
-	_graphics = new X11Graphics(NULL, NULL, true);
+	_graphics = NULL;
 #endif
 
 	_is_input_enabled = true;
@@ -101,7 +101,11 @@ void Window::Release()
 
 	WindowManager::GetInstance()->Remove(this);
 
-	InternalRelease();
+	_graphics_mutex.Lock();
+
+	InternalReleaseWindow();
+
+	_graphics_mutex.Unlock();
 	
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSED));
 	
@@ -115,10 +119,8 @@ Graphics * Window::GetGraphics()
 
 void * Window::GetNativeWindow()
 {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	return _window;
-#elif defined(X11_UI)
-	return NULL;
 #endif
 
 	return NULL;
@@ -130,11 +132,11 @@ void Window::SetNativeWindow(void *native)
 		return;
 	}
 
-	InternalRelease();
+	_graphics_mutex.Lock();
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	_graphics->Lock();
+	InternalReleaseWindow();
 
+#if defined(DIRECTFB_UI)
 	_window = (IDirectFBWindow *)native;
 	
 	if (_window->GetSurface(_window, &_surface) != DFB_OK) {
@@ -144,40 +146,14 @@ void Window::SetNativeWindow(void *native)
 		_size.width = 0;
 		_size.height = 0;
 	} else {
-		int w,
-				h;
-
-		_window->GetSize(_window, &w, &h);
-
-		_size.width = SCREEN_TO_SCALE(w, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
-		_size.height = SCREEN_TO_SCALE(h, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+		_window->GetSize(_window, &_size.width, &_size.height);
 	}
 
 	_window->SetOpacity(_window, _opacity);
-	_graphics->SetNativeSurface(_surface);
-	
-	_graphics->Unlock();
-#elif defined(X11_UI)
-	// TODO::
+	_graphics->SetNativeSurface(_surface, _size.width, _size.height);
 #endif
-}
-
-void Window::SetWorkingScreenSize(jsize_t size)
-{
-	SetWorkingScreenSize(size.width, size.height);
-}
-
-void Window::SetWorkingScreenSize(int width, int height)
-{
-	if (_scale.width == width || _scale.height == height) {
-		return;
-	}
-
-	Container::SetWorkingScreenSize(width, height);
-
-	_graphics->Lock();
-	InternalCreateWindow();
-	_graphics->Unlock();
+	
+	_graphics_mutex.Unlock();
 }
 
 void Window::SetVisible(bool b)
@@ -219,12 +195,11 @@ jcursor_style_t Window::GetCursor()
 	return _cursor;
 }
 
-void Window::InternalCreateWindow(void *params)
+void Window::InternalCreateWindow()
 {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-	DFBHandler *gfx = dynamic_cast<DFBHandler *>(GFXHandler::GetInstance());
-
-	_graphics->SetNativeSurface(NULL);
+#if defined(DIRECTFB_UI)
+	delete _graphics;
+	_graphics = NULL;
 
 	if (_window != NULL) {
 		_window->SetOpacity(_window, 0x00);
@@ -243,18 +218,57 @@ void Window::InternalCreateWindow(void *params)
 	_surface = NULL;
 	_window = NULL;
 
-	if (params == NULL) {
-		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &_window, &_surface, _opacity, _scale.width, _scale.height);
-	} else {
-		DFBWindowDescription desc = *(DFBWindowDescription *)params;
+	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
+	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
 
-		gfx->CreateWindow(_location.x, _location.y, _size.width, _size.height, &_window, &_surface, desc, _opacity, _scale.width, _scale.height);
+	DFBWindowDescription desc;
+
+	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_STACKING);
+	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION);
+	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_FLIPPING | DSCAPS_DOUBLE);
+	desc.pixelformat = DSPF_ARGB;
+	desc.options = (DFBWindowOptions) (DWOP_ALPHACHANNEL | DWOP_SCALE);
+	desc.stacking = DWSC_UPPER;
+	desc.posx   = _location.x;
+	desc.posy   = _location.y;
+	desc.width  = _size.width;
+	desc.height = _size.height;
+
+	IDirectFBDisplayLayer *layer;
+	
+	if (engine->GetDisplayLayer(engine, (DFBDisplayLayerID)(DLID_PRIMARY), &layer) != DFB_OK) {
+		throw jcommon::RuntimeException("Problem to get the device layer");
+	} 
+
+	if (layer->CreateWindow(layer, &desc, &_window) != DFB_OK) {
+		throw jcommon::RuntimeException("Cannot create a window");
 	}
-		
+
+	if (_window->GetSurface(_window, &_surface) != DFB_OK) {
+		_window->Release(_window);
+
+		throw jcommon::RuntimeException("Cannot get a window's surface");
+	}
+
+	// Add ghost option (behave like an overlay)
+	// _window->SetOptions(_window, (DFBWindowOptions)(DWOP_ALPHACHANNEL | DWOP_SCALE)); // | DWOP_GHOST));
+	// Move window to upper stacking class
+	// _window->SetStackingClass(_window, DWSC_UPPER);
+	// Make it the top most window
+	// _window->RaiseToTop(_window);
 	_window->SetOpacity(_window, _opacity);
-	_graphics->SetNativeSurface(_surface);
-#elif defined(X11_UI)
-	// TODO::
+	// _surface->SetRenderOptions(_surface, DSRO_ALL);
+	// _window->DisableEvents(_window, (DFBWindowEventType)(DWET_BUTTONDOWN | DWET_BUTTONUP | DWET_MOTION));
+	
+	_surface->SetDrawingFlags(_surface, (DFBSurfaceDrawingFlags)(DSDRAW_BLEND));
+	_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+	_surface->SetPorterDuff(_surface, (DFBSurfacePorterDuffRule)(DSPD_NONE));
+
+	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
+	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+	
+	_graphics = new DFBGraphics(_surface, _size.width, _size.height);
 #endif
 	
 	SetRotation(_rotation);
@@ -262,33 +276,31 @@ void Window::InternalCreateWindow(void *params)
 
 void Window::RaiseToTop()
 {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	if (_window != NULL) {
 		_window->RaiseToTop(_window);
 		_window->SetStackingClass(_window, DWSC_UPPER);
 
 		WindowManager::GetInstance()->RaiseToTop(this);
 	}
-#elif defined(X11_UI)
 #endif
 }
 
 void Window::LowerToBottom()
 {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	if (_window != NULL) {
 		_window->LowerToBottom(_window);
 		_window->SetStackingClass(_window, DWSC_LOWER);
 
 		WindowManager::GetInstance()->LowerToBottom(this);
 	}
-#elif defined(X11_UI)
 #endif
 }
 
 void Window::PutAtop(Window *w)
 {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	if (w == NULL) {
 		return;
 	}
@@ -298,13 +310,12 @@ void Window::PutAtop(Window *w)
 
 		WindowManager::GetInstance()->PutWindowATop(this, w);
 	}
-#elif defined(X11_UI)
 #endif
 }
 
 void Window::PutBelow(Window *w)
 {
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	if (w == NULL) {
 		return;
 	}
@@ -314,7 +325,6 @@ void Window::PutBelow(Window *w)
 
 		WindowManager::GetInstance()->PutWindowBelow(this, w);
 	}
-#elif defined(X11_UI)
 #endif
 }
 
@@ -355,34 +365,30 @@ void Window::SetBounds(int x, int y, int width, int height)
 		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
 		bool update = false;
 
-#if defined(DIRECTFB_CAIRO_UI)
-		if (_size.width < old_size.width || _size.height < old_size.height) {
-			// CHANGE:: causes segfault with media resizes
-			// update = true;
-		}
-#endif
+#if defined(DIRECTFB_UI)
+		_graphics_mutex.Lock();
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-		_graphics->Lock();
+		update = true;
 
 		if (update == true) {
-			InternalCreateWindow();
+			if (_window != NULL) {
+				InternalCreateWindow();
+			}
 		} else {
 			if (_window != NULL) {
-				x = SCALE_TO_SCREEN(_location.x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
-				y = SCALE_TO_SCREEN(_location.y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
-				width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
-				height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+				x = _location.x;
+				y = _location.y;
+				width = _size.width;
+				height = _size.height;
 
 				_window->SetBounds(_window, x, y, width, height);
 				_window->ResizeSurface(_window, width, height);
 				_window->GetSurface(_window, &_surface);
-				_graphics->SetNativeSurface(_surface);
+				_graphics->SetNativeSurface(_surface, width, height);
 			}
 		}
 	
-		_graphics->Unlock();
-#elif defined(X11_UI)
+		_graphics_mutex.Unlock();
 #endif
 	}
 	
@@ -404,18 +410,17 @@ void Window::SetLocation(int x, int y)
 		_location.x = x;
 		_location.y = y;
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-		_graphics->Lock();
+#if defined(DIRECTFB_UI)
+		_graphics_mutex.Lock();
 	
-		int dx = SCALE_TO_SCREEN(x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
-				dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+		int dx = x;
+		int dy = y;
 
 		if (_window != NULL) {
 			while (_window->MoveTo(_window, dx, dy) == DFB_LOCKED);
 		}
 		
-		_graphics->Unlock();
-#elif defined(X11_UI)
+		_graphics_mutex.Unlock();
 #endif
 	}
 	
@@ -529,35 +534,31 @@ void Window::SetSize(int width, int height)
 		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
 		bool update = false;
 
-#if defined(DIRECTFB_CAIRO_UI)
-		if (_size.width < old.width || _size.height < old.height) {
-			// CHANGE:: causes segfault with media resizes
-			// update = true;
-		}
-#endif
+#if defined(DIRECTFB_UI)
+		_graphics_mutex.Lock();
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-		_graphics->Lock();
+		update = true;
 
 		// INFO:: works, but with a lot of flicker
 		if (update == true) {
-			InternalCreateWindow();
+			if (_window != NULL) {
+				InternalCreateWindow();
+			}
 		} else {
 			if (_window != NULL) {
 				// jregion_t t = _graphics->GetClip();
 
-				width = SCALE_TO_SCREEN(_size.width, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width);
-				height = SCALE_TO_SCREEN(_size.height, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+				width = _size.width;
+				height = _size.height;
 
 				_window->Resize(_window, width, height);
 				_window->ResizeSurface(_window, width, height);
 				_window->GetSurface(_window, &_surface);
-				_graphics->SetNativeSurface(_surface);
+				_graphics->SetNativeSurface(_surface, width, height);
 			}
 		}
 	
-		_graphics->Unlock();
-#elif defined(X11_UI)
+		_graphics_mutex.Unlock();
 #endif
 	}
 	
@@ -574,14 +575,13 @@ void Window::Move(int x, int y)
 		_location.x = _location.x+x;
 		_location.y = _location.y+y;
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
-		int dx = SCALE_TO_SCREEN(x, GFXHandler::GetInstance()->GetScreenWidth(), _scale.width),
-				dy = SCALE_TO_SCREEN(y, GFXHandler::GetInstance()->GetScreenHeight(), _scale.height);
+#if defined(DIRECTFB_UI)
+		int dx = x;
+		int dy = y;
 
 		if (_window != NULL) {
 			while (_window->Move(_window, dx, dy) == DFB_LOCKED);
 		}
-#elif defined(X11_UI)
 #endif
 	}
 	
@@ -602,11 +602,10 @@ void Window::SetOpacity(int i)
 		_opacity = 0xff;
 	}
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, _opacity);
 	}
-#elif defined(X11_UI)
 #endif
 }
 
@@ -628,9 +627,11 @@ void Window::Repaint(Component *cmp)
 		return;
 	}
 
-	_graphics->Lock();
+	if (_graphics == NULL) {
+		return;
+	}
 
-	_graphics->SetWorkingScreenSize(_scale.width, _scale.height);
+	_graphics_mutex.Lock();
 
 	jpoint_t t = _graphics->Translate();
 
@@ -697,7 +698,7 @@ void Window::Repaint(Component *cmp)
 		_graphics->Flip(location.x, location.y, size.width, size.height);
 	}
 
-	_graphics->Unlock();
+	_graphics_mutex.Unlock();
 
 	Revalidate();
 
@@ -706,8 +707,6 @@ void Window::Repaint(Component *cmp)
 
 void Window::PaintBackground(Graphics *g)
 {
-	g->SetDrawingFlags(JDF_NOFX);
-		
 	Container::PaintBackground(g);
 }
 
@@ -723,16 +722,16 @@ bool Window::Show(bool modal)
 {
 	_is_visible = true;
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	if (_window == NULL) {
-		_graphics->Lock();
+		_graphics_mutex.Lock();
+
 		InternalCreateWindow();
-		_graphics->Unlock();
+
+		_graphics_mutex.Unlock();
 	}
 	
 	SetOpacity(_opacity);
-#elif defined(X11_UI)
-	GFXHandler::GetInstance();
 #endif
 
 	if (_is_input_enabled == true) {
@@ -756,29 +755,28 @@ bool Window::Hide()
 {
 	_is_visible = false;
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, 0x00);
 	}
-#elif defined(X11_UI)
 #endif
 
 	return true;
 }
 
-void Window::InternalRelease()
+void Window::InternalReleaseWindow()
 {
 	if (_graphics != NULL) {
-		_graphics->Lock();
 		_graphics->Clear();
-		_graphics->SetNativeSurface(NULL);
-		_graphics->Unlock();
+
+		delete _graphics;
+		_graphics = NULL;
 	}
 
 	// delete _graphics;
 	// _graphics = NULL;
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	if (_window) {
 		_window->SetOpacity(_window, 0x00);
 	}
@@ -796,8 +794,6 @@ void Window::InternalRelease()
 
 	_window = NULL;
 	_surface = NULL;
-#elif defined(X11_UI)
-	// TODO::
 #endif
 }
 
@@ -820,7 +816,7 @@ void Window::SetRotation(jwindow_rotation_t t)
 		rotation = 270;
 	}
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 	if (_window != NULL) {
 		_window->SetRotation(_window, rotation);
 	}
@@ -857,6 +853,7 @@ bool Window::MouseMoved(MouseEvent *event)
 	return Container::MouseMoved(event);
 
 	/*
+	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
 	int x = event->GetX()-_location.x;
 	int y = event->GetY()-_location.y;
 
@@ -864,8 +861,8 @@ bool Window::MouseMoved(MouseEvent *event)
 		e.SetX(-(y-_scale.height));
 		e.SetY(x);
 	} else if (GetRotation() == JWR_180) {
-		e.SetX(1920-x);
-		e.SetY(1080-y);
+		e.SetX(screen.width-x);
+		e.SetY(screen.height-y);
 	} else if (GetRotation() == JWR_270) {
 		e.SetX(y, _scale.width-x);
 		e.SetY();

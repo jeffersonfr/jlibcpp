@@ -31,12 +31,12 @@
 		}																			\
 	} while (0) 														\
 
-#define SIZE_TO_RESIZE	16
+#define SIZE_TO_RESIZE	4
 
 namespace jgui {
 
-Frame::Frame(std::string title, int x, int y, int width, int height, int scale_width, int scale_height):
-	Window(x, y, width, height, scale_width, scale_height)
+Frame::Frame(std::string title, int x, int y, int width, int height):
+	Window(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::Frame");
 
@@ -68,8 +68,8 @@ Frame::Frame(std::string title, int x, int y, int width, int height, int scale_w
 	_old_height = _size.height;
 }
 
-Frame::Frame(int x, int y, int width, int height, int scale_width, int scale_height):
-	Window(x, y, width, height, scale_width, scale_height)
+Frame::Frame(int x, int y, int width, int height):
+	Window(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::Frame");
 
@@ -235,7 +235,7 @@ void Frame::Pack(bool fit)
 	if (_subtitles.size() == 0) {
 		SetSize(max_width+_insets.right, max_height+_insets.bottom);
 	} else {
-		SetSize(max_width+_insets.right, max_height+_insets.bottom+40);
+		SetSize(max_width+_insets.right, max_height+_insets.bottom+32);
 	}
 }
 
@@ -266,16 +266,16 @@ jinsets_t Frame::GetInsets()
 
 	jinsets_t t = _insets;
 
-	t.bottom += _font->GetLineSize()+8;
+	t.bottom += _font->GetSize()+8;
 
 	return t;
 }
 
 void Frame::AddSubtitle(std::string image, std::string label)
 {
-	struct Frame::frame_subtitle_t t;
+	struct frame_subtitle_t t;
 
-	t.image = image;
+	t.image = jgui::Image::CreateImage(image);
 	t.subtitle = label;
 
 	_subtitles.push_back(t);
@@ -285,6 +285,12 @@ void Frame::AddSubtitle(std::string image, std::string label)
 
 void Frame::RemoveAllSubtitles()
 {
+	for (std::vector<struct frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
+		jgui::Image *image = (*i).image;
+
+		delete image;
+	}
+
 	_subtitles.clear();
 
 	Repaint();
@@ -292,6 +298,8 @@ void Frame::RemoveAllSubtitles()
 
 void Frame::Maximize()
 {
+	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
+
 	_is_maximized = true;
 
 	_old_x = _location.x;
@@ -299,7 +307,7 @@ void Frame::Maximize()
 	_old_width = _size.width;
 	_old_height = _size.height;
 
-	SetBounds(0, 0, _scale.width, _scale.height);
+	SetBounds(0, 0, screen.width, screen.height);
 }
 
 void Frame::Restore()
@@ -354,24 +362,24 @@ bool Frame::KeyTyped(KeyEvent *event)
 
 bool Frame::MousePressed(MouseEvent *event)
 {
-	TRANSLATE_MOUSE_LOCATION(MousePressed);
-
 	if (_is_enabled == false) {
 		return true;
 	}
 	
+	/*
 	if (_frame_state != 0) {
 		GFXHandler::GetInstance()->SetCursor(GetCursor());
 
 		_frame_state = 0;
 	}
+	*/
 
 	int mousex = event->GetX()-_location.x,
 			mousey = event->GetY()-_location.y;
 
 	if (event->GetButton() == JMB_BUTTON1) {
-		int lwidth = _size.width - SIZE_TO_RESIZE, // pixels to horizontal scroll
-				lheight = _size.height - SIZE_TO_RESIZE; // pixels to vertical scroll
+		int lwidth = _size.width - SIZE_TO_RESIZE; // pixels to horizontal scroll
+		// int lheight = _size.height - SIZE_TO_RESIZE; // pixels to vertical scroll
 		int btn = (_insets.top-30)+10,
 				gap = ((_frame_buttons & JFB_MAXIMIZE) != 0)? 2 : ((_frame_buttons & JFB_CLOSE) != 0)? 1 : 0;
 
@@ -406,29 +414,25 @@ bool Frame::MousePressed(MouseEvent *event)
 				}
 			} else {
 				if (_resize_enabled == true && _is_maximized == false) {
-					if (mousex > _size.width || mousey > _size.height) {
-						return false;
-					}
-
 					_relative_mouse_x = mousex;
 					_relative_mouse_y = mousey;
 					_relative_mouse_w = _size.width;
 					_relative_mouse_h = _size.height;
 
-					if (mousex > lwidth && mousey > lheight) {
+					if (_frame_state == -2) {
 						_frame_state = 2; // both resize
 
 						GFXHandler::GetInstance()->SetCursor(JCS_SE_CORNER);
 
 						return true;
-					} else if (mousex > lwidth) {
+					} else if (_frame_state == -3) {
 						// horizontal resize
 						_frame_state = 3;
 
 						GFXHandler::GetInstance()->SetCursor(JCS_WE);
 
 						return true;
-					} else if (mousey > lheight) {
+					} else if (_frame_state == -4) {
 						// vertical resize
 						_frame_state = 4;
 
@@ -441,35 +445,47 @@ bool Frame::MousePressed(MouseEvent *event)
 		}
 	}
 
+	TRANSLATE_MOUSE_LOCATION(MousePressed);
+
 	return false;
 }
 
 bool Frame::MouseReleased(MouseEvent *event)
 {
-	TRANSLATE_MOUSE_LOCATION(MouseReleased);
-
 	if (_is_enabled == false) {
 		return true;
 	}
 
-	// int mousex = event->GetX(),
-	//		mousey = event->GetY();
-
 	if (event->GetButton() == JMB_BUTTON1) {
 		GFXHandler::GetInstance()->SetCursor(GetCursor());
 
-		_frame_state = 0;
-		_relative_mouse_x = 0;
-		_relative_mouse_y = 0;
+		int mousex = event->GetX()-_location.x,
+				mousey = event->GetY()-_location.y;
+
+		if (_frame_state == 2 && _resize_enabled == true) {
+			SetSize(_relative_mouse_w+mousex-_relative_mouse_x, _relative_mouse_h+mousey-_relative_mouse_y);
+		} else if (_frame_state == 3 && _resize_enabled == true) {
+			SetSize(_relative_mouse_w+mousex-_relative_mouse_x, _relative_mouse_h);
+		} else if (_frame_state == 4 && _resize_enabled == true) {
+			SetSize(_relative_mouse_w, _relative_mouse_h+mousey-_relative_mouse_y);
+		}
+
+		if (_frame_state != 0) {
+			_frame_state = 0;
+			_relative_mouse_x = 0;
+			_relative_mouse_y = 0;
+
+			return true;
+		}
 	}
 	
+	TRANSLATE_MOUSE_LOCATION(MouseReleased);
+
 	return false;
 }
 
 bool Frame::MouseMoved(MouseEvent *event)
 {
-	TRANSLATE_MOUSE_LOCATION(MouseMoved);
-
 	if (_is_enabled == false) {
 		return true;
 	}
@@ -477,7 +493,7 @@ bool Frame::MouseMoved(MouseEvent *event)
 	int mousex = event->GetX()-_location.x,
 			mousey = event->GetY()-_location.y;
 
-	if (_frame_state == 0 && _resize_enabled == true) {
+	if (_frame_state <= 0 && _resize_enabled == true) {
 		if (mousex > _size.width || mousey > _size.height) {
 			return false;
 		}
@@ -486,45 +502,47 @@ bool Frame::MouseMoved(MouseEvent *event)
 				lheight = _size.height - SIZE_TO_RESIZE; 
 
 		if (mousex > lwidth && mousey > lheight) {
+			_frame_state = -2;
+
 			GFXHandler::GetInstance()->SetCursor(JCS_SE_CORNER);
+
+			return true;
 		} else if (mousex > lwidth && mousex < _size.width) {
+			_frame_state = -3;
+
 			GFXHandler::GetInstance()->SetCursor(JCS_WE);
+
+			return true;
 		} else if (mousey > lheight && mousey < _size.height) {
+			_frame_state = -4;
+
 			GFXHandler::GetInstance()->SetCursor(JCS_NS);
+
+			return true;
 		} else {
+			_frame_state = 0;
+
 			GFXHandler::GetInstance()->SetCursor(GetCursor());
 		}
-
-		return true;
 	} else if (_frame_state == 1 && _move_enabled == true) {
 		Move(mousex-_relative_mouse_x, mousey-_relative_mouse_y);
 
 		return true;
-	} else if (_frame_state == 2 && _resize_enabled == true) {
-		SetSize(_relative_mouse_w+mousex-_relative_mouse_x, _relative_mouse_h+mousey-_relative_mouse_y);
-
-		return true;
-	} else if (_frame_state == 3 && _resize_enabled == true) {
-		SetSize(_relative_mouse_w+mousex-_relative_mouse_x, _relative_mouse_h);
-
-		return true;
-	} else if (_frame_state == 4 && _resize_enabled == true) {
-		SetSize(_relative_mouse_w, _relative_mouse_h+mousey-_relative_mouse_y);
-
-		return true;
 	}
 	
+	TRANSLATE_MOUSE_LOCATION(MouseMoved);
+
 	return false;
 }
 
 bool Frame::MouseWheel(MouseEvent *event)
 {
-	TRANSLATE_MOUSE_LOCATION(MouseWheel);
-
 	if (_is_enabled == false) {
 		return true;
 	}
 	
+	TRANSLATE_MOUSE_LOCATION(MouseWheel);
+
 	return false;
 }
 
@@ -543,6 +561,68 @@ void Frame::Paint(Graphics *g)
 	Window::Paint(g);
 }
 
+void Frame::PaintScrollbars(Graphics *g)
+{
+	if (IsScrollable() == false) {
+		return;
+	}
+
+	Color bgcolor = GetBackgroundColor(),
+		fgcolor = GetScrollbarColor();
+
+	jsize_t scroll_dimension = GetScrollDimension();
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+
+	if (IsScrollableX() == true) {
+		double offset_ratio = (double)scrollx/(double)scroll_dimension.width,
+			block_size_ratio = (double)_size.width/(double)scroll_dimension.width;
+		int offset = (int)(_size.width*offset_ratio),
+			block_size = (int)(_size.width*block_size_ratio);
+
+		g->SetColor(fgcolor);
+		g->FillRectangle(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size);
+
+		g->SetGradientStop(0.0, fgcolor);
+		g->SetGradientStop(1.0, bgcolor);
+		g->FillLinearGradient(offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size, 0, 0, 0, _scroll_size);
+		g->ResetGradientStop();
+	}
+	
+	if (IsScrollableY() == true) {
+		int height = _insets.top-2*_border_size;
+		double offset_ratio = (double)scrolly/(double)scroll_dimension.height,
+			block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
+		int offset = (int)((_size.height-height)*offset_ratio),
+			block_size = (int)((_size.height-height)*block_size_ratio);
+
+		g->SetColor(fgcolor);
+		g->FillRectangle(_size.width-_scroll_size-_border_size, _border_size, _scroll_size, _size.height);
+
+		g->SetGradientStop(0.0, fgcolor);
+		g->SetGradientStop(1.0, bgcolor);
+		g->FillLinearGradient(_size.width-_scroll_size-_border_size, offset+height, _scroll_size, block_size, 0, 0, _scroll_size, 0);
+		g->ResetGradientStop();
+	}
+
+	if (IsScrollableX() == true && IsScrollableY() == true) {
+		int radius = _scroll_size,
+			radius2 = radius/2;
+
+		g->SetGradientStop(0.0, bgcolor);
+		g->SetGradientStop(1.0, fgcolor);
+		g->FillRadialGradient(_size.width-radius2, _size.height-radius2, radius, radius, 0, 0, 0);
+		g->ResetGradientStop();
+	}
+
+	int line_width = g->GetLineWidth();
+
+	g->SetLineWidth(-_border_size);
+	g->DrawRectangle(0, 0, _size.width, _size.height);
+	g->SetLineWidth(line_width);
+}
+
 void Frame::PaintGlassPane(Graphics *g)
 {
 	if (_is_undecorated == true) {
@@ -558,7 +638,7 @@ void Frame::PaintGlassPane(Graphics *g)
 		g->SetFont(_font);
 
 		if (IsFontSet() == true) {
-			int y = (_insets.top-_font->GetLineSize())/2;
+			int y = (_insets.top-_font->GetSize())/2;
 
 			if (y < 0) {
 				y = 0;
@@ -579,7 +659,6 @@ void Frame::PaintGlassPane(Graphics *g)
 		int h = (_insets.top-20);
 
 		if (h > 0) {
-			g->SetCompositeFlags(jgui::JCF_NONE);
 			g->DrawImage(_icon_image, _insets.left, 10, h, h);
 		}
 	}
@@ -592,15 +671,15 @@ void Frame::PaintGlassPane(Graphics *g)
 				count += _font->GetStringWidth((*i).subtitle.c_str());
 
 				g->SetColor(_fgcolor);
-				g->DrawString((*i).subtitle, _size.width-count, _size.height-_insets.bottom-_border_size-(_font->GetLineSize()-_font->GetLeading())/2);
+				g->DrawString((*i).subtitle, _size.width-count, _size.height-_insets.bottom-_border_size-_font->GetSize());
 			}
 
 			count += 10;
 
-			if ((*i).image != "") {
-				count += 40;
+			if ((*i).image != NULL) {
+				count += 32;
 
-				g->DrawImage((char *)(*i).image.c_str(), _size.width-count, _size.height-_insets.bottom-_border_size-20, 45, 40);
+				g->DrawImage((*i).image, _size.width-count, _size.height-_insets.bottom-_border_size-24, 32, 32);
 			}
 
 			count += 20;

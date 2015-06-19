@@ -2227,7 +2227,7 @@ class GraphicsTeste : public jgui::Frame{
 
 	public:
 		GraphicsTeste():
-			jgui::Frame("", 0, 0, 1920, 1080)
+			jgui::Frame("", 0, 0)
 	{
 		Width = _size.width;
 		Height = _size.height;
@@ -2252,9 +2252,8 @@ class GraphicsTeste : public jgui::Frame{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			g->SetAntialias(false);
-			
 			g->Clear();
+			g->SetAntialias(jgui::JAM_NONE);
 
 			int count, NumUsed = 0;
 			Tri3D *current = Triangles;

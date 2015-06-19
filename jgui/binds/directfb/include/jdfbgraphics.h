@@ -32,6 +32,7 @@
 #include <list>
 
 #include <directfb.h>
+#include <cairo-directfb.h>
 
 namespace jgui{
 
@@ -51,21 +52,17 @@ class DFBGraphics : public virtual jgui::Graphics{
 
 	protected:
 		jthread::Mutex _graphics_mutex;
-
-		DFBImage *_image;
 		struct jregion_t _clip;
 		struct jregion_t _internal_clip;
 		jline_join_t _line_join;
 		jline_style_t _line_style;
-		jdrawing_flags_t _draw_flags;
-		jblitting_flags_t _blit_flags;
 		jcomposite_flags_t _composite_flags;
 		jdrawing_mode_t _drawing_mode;
 		int _line_width;
-		bool _is_premultiply;
 
 	private:
 		IDirectFBSurface *_surface;
+		cairo_t *_cairo_context;
 		
 		/**
 		 * \brief
@@ -79,62 +76,13 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 */
 		virtual double EvaluateBezier0(double *data, int ndata, double t);
 
-		/**
-		 * \brief
-		 *
-		 */
-		int CalculateGradientChannel(int schannel, int dchannel, int distance, int offset); 
-
-		/**
-		 * \brief
-		 *
-		 */
-		void UpdateGradientColor(Color &scolor, Color &dcolor, int distance, int offset);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int y1p, int x2p, int y2p); 
-
-		/**
-		 * \brief
-		 *
-		 */
-		void DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jline_join_t join, int size);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void DrawArc0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size, int quadrant);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void DrawArcHelper(int xc, int yc, int rx, int ry, double arc0, double arc1, int size);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void DrawPie0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size);
-
-		/**
-		 * \brief
-		 *
-		 */
-		void DrawChord0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size);
-
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		DFBGraphics(DFBImage *image, void *surface, bool premultiplied, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
-
 	public:
+		/**
+		 * \brief
+		 *
+		 */
+		DFBGraphics(void *surface, int wp, int hp);
+
 		/**
 		 * \brief
 		 *
@@ -151,37 +99,13 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetNativeSurface(void *surface);
+		virtual void SetNativeSurface(void *data, int wp, int hp);
 
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void Dump(std::string dir, std::string pre);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetWorkingScreenSize();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Translate(int x, int y);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t Translate();
 
 		/**
 		 * \brief
@@ -265,43 +189,19 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual bool HasFont(); 
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetFont(Font *font); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual Font * GetFont(); 
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetAntialias(bool b);
+		virtual void SetAntialias(jantialias_mode_t mode);
 
 		/**
 		 * \brief
 		 *
 		 */
 		virtual jcomposite_flags_t GetCompositeFlags();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jdrawing_flags_t GetDrawingFlags();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jblitting_flags_t GetBlittingFlags();
 		
 		/**
 		 * \brief
@@ -319,32 +219,8 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetDrawingFlags(jdrawing_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBlittingFlags(jblitting_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetDrawingMode(jdrawing_mode_t t);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPixels(uint8_t *pixels);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetPixels(uint8_t **pixels);
-		
 		/**
 		 * \brief
 		 *
@@ -545,26 +421,38 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int xp, int yp);
+		virtual void DrawString(std::string text, int xp, int yp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int xp, int yp, int wp, int hp);
+		virtual void DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY, jvertical_align_t valign = JVA_CENTER, bool clipped = true);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual uint32_t GetRGB(int xp, int yp, uint32_t pixel = 0xff000000);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp);
+		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
+		virtual void SetRGB(uint32_t rgb, int xp, int yp);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp);
+	
 		/**
 		 * \brief
 		 *
@@ -589,48 +477,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 */
 		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DrawString(std::string text, int xp, int yp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY, jvertical_align_t valign = JVA_CENTER, bool clipped = true);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint32_t GetRGB(int xp, int yp, uint32_t pixel = 0xff000000);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetRGB(uint32_t **rgb, int startxp, int startyp, int widthp, int heightp, int scansize);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetRGB(uint32_t rgb, int xp, int yp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline);
-	
 		/**
 		 * \brief
 		 *

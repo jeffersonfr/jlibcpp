@@ -60,25 +60,24 @@ class TextArea;
 class Keyboard : public jgui::Frame, public jgui::ButtonListener{
 
 	private:
+		/** \brief */
 		jthread::Mutex _key_mutex;
-
+		/** \brief */
 		std::vector<KeyboardListener *> _keyboard_listeners;
-		TextArea *display;
-
+		/** \brief */
+		TextArea *_display;
+		/** \brief */
 		jkeyboard_type_t _type;
+		/** \brief */
 		std::string _text;
-		int delta,
-				bx,
-				by,
-				bwidth,
-				bheight,
-				_state;
-		bool started,
-				 _shift_pressed,
-				 _show_text,
-				 _response,
-				 _input_locked,
-				 _is_password;
+		/** \brief */
+		int _state;
+		/** \brief */
+		bool _shift_pressed;
+		/** \brief */
+		bool _input_locked;
+		/** \brief */
+		bool _is_password;
 
 	private:
 		/**
@@ -117,12 +116,6 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener{
 		 *
 		 */
 		Keyboard(jkeyboard_type_t type, bool text_visible = true, bool is_password = false);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible = true, bool is_password = false);
 		
 		/**
 		 * \brief

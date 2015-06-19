@@ -280,13 +280,14 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		scared=false;
 	}
 
-	jgui::Image * GetImage(std::string image, int w, int h)
+	jgui::Image * GetImage(std::string file, int w, int h)
 	{
-		jgui::Image *o = jgui::Image::CreateImage(w, h);
+		jgui::Image *image = jgui::Image::CreateImage(file);
+		jgui::Image *scale = image->Scale(w, h);
 
-		o->GetGraphics()->DrawImage(image, 0, 0, w, h);
-
-		return o;
+		delete image;
+		
+		return scale;
 	}
 
 	void GetImages()
@@ -362,7 +363,7 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		std::string s;
 
 		if (goff == NULL && d.w>0 && d.h>0) {
-			ii = jgui::Image::CreateImage(d.w, d.h);
+			ii = jgui::Image::CreateImage(jgui::JPF_ARGB, d.w, d.h);
 
 			goff = ii->GetGraphics();
 		}
@@ -564,7 +565,6 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		x_index = x_index*blocksize;
 		y_index = y_index*blocksize;
 
-		goff->SetCompositeFlags(jgui::JCF_NONE);
 		goff->DrawImage(ghost_bmp, x_index, y_index, blocksize, blocksize, x, y, blocksize, blocksize);
 	}
 

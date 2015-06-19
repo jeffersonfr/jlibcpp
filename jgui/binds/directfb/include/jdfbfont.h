@@ -22,7 +22,7 @@
 
 #include "jfont.h"
 
-#include <directfb.h>
+#include <cairo-ft.h>
 
 namespace jgui {
 
@@ -36,27 +36,44 @@ class DFBFont : public virtual jgui::Font{
 	friend class DFBGraphics;
 
 	private:
+		/** \brief */
 		static Font *_default_font;
 
-		IDirectFBFont *_font;
-		int _size,
-			_ascender,
-			_descender,
-			_max_advance,
-			_line_size;
+		/** \brief */
+		std::string _charset;
+		/** \brief */
+		cairo_font_face_t *_font;
+		/** \brief */
+		int _leading;
+		/** \brief */
+		int _ascender;
+		/** \brief */
+		int _descender;
+		/** \brief */
+		int _max_advance_width;
+		/** \brief */
+		int _max_advance_height;
+		/** \brief */
+		bool _is_builtin;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		DFBFont(std::string name, jfont_attributes_t attributes, int size, int scale_width, int scale_height);
+		DFBFont(std::string name, jfont_attributes_t attributes, int size);
 		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual ~DFBFont();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ApplyContext(void *ctx);
 
 		/**
 		 * \brief
@@ -75,6 +92,12 @@ class DFBFont : public virtual jgui::Font{
 		 *
 		 */
 		virtual bool SetEncoding(std::string code);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetEncoding();
 		
 		/**
 		 * \brief
@@ -104,7 +127,13 @@ class DFBFont : public virtual jgui::Font{
 		 * \brief
 		 *
 		 */
-		virtual int GetMaxAdvance();
+		virtual int GetMaxAdvanceWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetMaxAdvanceHeight();
 		
 		/**
 		 * \brief

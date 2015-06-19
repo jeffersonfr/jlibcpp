@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "jframe.h"
 
-class GraphicsTeste : public jgui::Window {
+class GraphicsTeste : public jgui::Frame {
 
 	private:
 		std::vector<jgui::jpoint_t> points;
@@ -32,7 +32,7 @@ class GraphicsTeste : public jgui::Window {
 
 	public:
 		GraphicsTeste():
-			jgui::Window(0, 0, 1920, 1080)
+			jgui::Frame(0, 0)
 		{
 			cx = GetWidth()/2;
 			cy = GetHeight()/2;
@@ -43,8 +43,7 @@ class GraphicsTeste : public jgui::Window {
 			wsize = GetWidth()/(double)wblocks;
 			hsize = GetHeight()/(double)hblocks;
 
-			// INFO:: necessario para receber os eventos de mouse
-			InternalCreateWindow();
+			SetUndecorated(true);
 		}
 
 		virtual ~GraphicsTeste()
@@ -105,10 +104,7 @@ class GraphicsTeste : public jgui::Window {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			g->SetDrawingFlags(jgui::JDF_BLEND);
-
 			g->Clear();
-			
 			g->SetColor(0x20, 0x20, 0x80, 0xff);
 			
 			for (int i=0; i<wblocks; i++) {

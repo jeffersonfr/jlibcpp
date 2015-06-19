@@ -71,8 +71,6 @@ HourDialogBox::HourDialogBox(std::string title, int hour, int minute, int second
 	_hour->RequestFocus();
 
 	Pack();
-
-	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 }
 
 HourDialogBox::~HourDialogBox() 

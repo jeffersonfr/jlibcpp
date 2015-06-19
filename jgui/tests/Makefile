@@ -64,9 +64,6 @@ OBJS_ants = \
 OBJS_swarm = \
 		swarm.o\
 
-OBJS_changescale = \
-		changescale.o\
-
 OBJS_cube = \
 		cube.o\
 
@@ -127,9 +124,6 @@ OBJS_events = \
 OBJS_colorchooser = \
 		colorchooser.o\
 
-OBJS_paths = \
-		paths.o\
-
 OBJS_scroll = \
 		scroll.o\
 
@@ -142,7 +136,7 @@ OBJS_2048 = \
 OBJS_tree = \
 		tree.o\
 
-all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm changescale mouse watch tank pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock events colorchooser paths scroll hough 2048 tree
+all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm mouse watch tank pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 tree
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -193,9 +187,6 @@ ants: $(OBJS_ants)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 swarm: $(OBJS_swarm)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-        
-changescale: $(OBJS_changescale)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 cube: $(OBJS_cube)
@@ -258,9 +249,6 @@ events: $(OBJS_events)
 colorchooser: $(OBJS_colorchooser)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-paths: $(OBJS_paths)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-        
 scroll: $(OBJS_scroll)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
@@ -280,4 +268,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm changescale mouse watch tank pacman tetris container signal stress layouts databuffer mhp drawimage rotateimage sort noise kmeans som stock events colorchooser paths scroll hough 2048 tree 
+	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris container signal stress layouts databuffer mhp drawimage rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 tree 

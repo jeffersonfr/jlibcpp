@@ -56,25 +56,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetNativeSurface(void *surface);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetWorkingScreenSize();
+		virtual void SetNativeSurface(void *data, int wp, int hp);
 
 		/**
 		 * \brief
@@ -188,25 +170,19 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetAntialias(bool b);
+		virtual void SetAntialias(jantialias_mode_t mode);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jantialias_mode_t GetAntialias();
 
 		/**
 		 * \brief
 		 *
 		 */
 		virtual jcomposite_flags_t GetCompositeFlags();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jdrawing_flags_t GetDrawingFlags();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jblitting_flags_t GetBlittingFlags();
 		
 		/**
 		 * \brief
@@ -224,31 +200,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetDrawingFlags(jdrawing_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBlittingFlags(jblitting_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetDrawingMode(jdrawing_mode_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetPixels(uint8_t *pixels);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetPixels(uint8_t **pixels);
 		
 		/**
 		 * \brief
@@ -462,30 +414,6 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual bool DrawImage(std::string img, int xp, int yp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool DrawImage(std::string img, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual bool DrawImage(Image *img, int xp, int yp);
 		
 		/**
@@ -510,6 +438,18 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual jregion_t GetStringExtends(std::string text);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jregion_t GetGlyphExtends(int symbol);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void DrawString(std::string text, int xp, int yp);
 		
 		/**
@@ -528,7 +468,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize);
+		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief
@@ -540,7 +480,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline);
+		virtual void SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp);
 	
 		/**
 		 * \brief

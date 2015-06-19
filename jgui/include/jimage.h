@@ -81,9 +81,11 @@ class Graphics;
 class Image : public virtual jcommon::Object{
 
 	protected:
+		/** \brief */
 		Graphics *_graphics;
+		/** \brief */
 		struct jsize_t _size;
-		struct jsize_t _scale;
+		/** \brief */
 		jpixelformat_t _pixelformat;
 
 	protected:
@@ -91,7 +93,7 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		Image(int wp, int hp, jpixelformat_t pixelformat = JPF_UNKNOWN, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Image(jpixelformat_t pixelformat, int wp, int hp);
 		
 	public:
 		/**
@@ -104,19 +106,19 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static bool GetImageSize(std::string img, int *width, int *height);
+		static jsize_t GetImageSize(std::string img);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		static Image * CreateImage(int wp, int hp, jpixelformat_t pixelformat = JPF_ARGB, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		static Image * CreateImage(jpixelformat_t pixelformat, int wp, int hp);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		static Image * CreateImage(uint32_t *data, int wp, int hp, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		static Image * CreateImage(uint32_t *data, int wp, int hp);
 
 		/**
 		 * \brief
@@ -158,54 +160,6 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetWorkingScreenSize(jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetWorkingScreenSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Flip(jflip_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Rotate(double radians, bool resize = true);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * Scale(int wp, int hp);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Image * SubImage(int xp, int yp, int wp, int hp);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual jpixelformat_t GetPixelFormat();
 
 		/**
@@ -230,6 +184,48 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual Image * Flip(jflip_flags_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * Rotate(double radians, bool resize = true);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * Scale(int wp, int hp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * Crop(int xp, int yp, int wp, int hp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * Blend(double alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * Colorize(Color color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Release();
 		
 		/**
@@ -237,6 +233,12 @@ class Image : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void Restore();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcommon::Object * Clone();
 
 };
 

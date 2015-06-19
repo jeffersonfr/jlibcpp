@@ -24,28 +24,37 @@
 namespace mines {
 
 Mines::Mines(int x, int y):
-	jgui::Frame("Minas", 150, 100, 920, 820)
+	jgui::Frame("Minas", 32, 32, 620, 480)
 {
+	_current = NULL;
+
 	_insets.left = 20;
 
-	size = 60;
+	size = 36;
 	max_rows = 10;
 	max_cols = 10;
 	max_bombs = 20;
 
 	board = new block_t[max_rows*max_cols+10]; // 10 _insets.toptes para overflow
 
-	small_bomb = jgui::Image::CreateImage(size, size);
-	huge_bomb = jgui::Image::CreateImage(4*size, 4*size);
-	flag = jgui::Image::CreateImage(size, size);
-	smile_face = jgui::Image::CreateImage(4*size, 4*size);
-	dead_face = jgui::Image::CreateImage(4*size, 4*size);
+	jgui::Image *image;
 
-	small_bomb->GetGraphics()->DrawImage("images/bomb.png", 0, 0, size, size);
-	huge_bomb->GetGraphics()->DrawImage("images/bomb.png", 0, 0, 4*size, 4*size);
-	flag->GetGraphics()->DrawImage("images/flag.png", 0, 0, size, size);
-	smile_face->GetGraphics()->DrawImage("images/smile_face.png", 0, 0, 4*size, 4*size);
-	dead_face->GetGraphics()->DrawImage("images/dead_face.png", 0, 0, 4*size, 4*size);
+	image = jgui::Image::CreateImage("images/bomb.png");
+	small_bomb = image->Scale(size, size);
+	huge_bomb = image->Scale(4*size, 4*size);
+	delete image;
+
+	image = jgui::Image::CreateImage("images/flag.png");
+	flag = image->Scale(size, size);
+	delete image;
+
+	image = jgui::Image::CreateImage("images/smile_face.png");
+	smile_face = image->Scale(4*size, 4*size);
+	delete image;
+
+	image = jgui::Image::CreateImage("images/dead_face.png");
+	dead_face = image->Scale(4*size, 4*size);
+	delete image;
 
 	SetupBoard();
 
@@ -58,8 +67,8 @@ Mines::~Mines()
 {
 	jthread::AutoLock lock(&mines_mutex);
 
+	delete _current;
 	delete board;
-
 	delete small_bomb;
 	delete huge_bomb;
 	delete flag;
@@ -89,7 +98,7 @@ void Mines::Paint(jgui::Graphics *g)
 
 				if (block.type == BOMB_BLOCK) {
 					g->FillRectangle(_insets.left+i*(size+delta), _insets.top+j*(size+delta), size, size);
-					g->DrawImage(small_bomb, _insets.left+i*(size+delta)+2, _insets.top+j*(size+delta)+2);
+					g->DrawImage(small_bomb, _insets.left+i*(size+delta), _insets.top+j*(size+delta));
 				} else {
 					if (block.value != 0) {
 						char tmp[256];
@@ -102,7 +111,7 @@ void Mines::Paint(jgui::Graphics *g)
 				}
 			} else if (block.state == MARKED_BLOCK) {
 				g->FillRectangle(_insets.left+i*(size+delta), _insets.top+j*(size+delta), size, size);
-				g->DrawImage(flag, _insets.left+i*(size+delta)+2, _insets.top+j*(size+delta)+2);
+				g->DrawImage(flag, _insets.left+i*(size+delta), _insets.top+j*(size+delta));
 			}
 		}
 	}
@@ -110,15 +119,15 @@ void Mines::Paint(jgui::Graphics *g)
 	g->SetColor(0x00, 0x00, 0x00, 0xff);
 
 	if (GetResult() != LOSE) {
-		g->DrawString("Parabens", GetWidth()-190, 100);
-		g->DrawImage(smile_face, GetWidth()-210, 180, 160, 140);
+		g->DrawString("Parabens", GetWidth()-140, 80);
+		g->DrawImage(smile_face, GetWidth()-180, 80, 160, 140);
 	} else {
-		g->DrawString("Perdeu", GetWidth()-160, 100);
-		g->DrawImage(dead_face, GetWidth()-210, 180, 160, 140);
+		g->DrawString("Perdeu", GetWidth()-140, 80);
+		g->DrawImage(dead_face, GetWidth()-180, 80, 160, 140);
 	}
 
-	int x = GetWidth()-210,
-			y = 400,
+	int x = GetWidth()-180,
+			y = 260,
 			w = 160,
 			h = 140;
 	char tmp[255];
@@ -143,6 +152,11 @@ bool Mines::KeyPressed(jgui::KeyEvent *event)
 	}
 
 	jthread::AutoLock lock(&mines_mutex);
+
+	if (_current != NULL) {
+		delete _current;
+		_current = NULL;
+	}
 
 	if (GetResult() == NONE) {
 		if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
@@ -192,9 +206,7 @@ bool Mines::KeyPressed(jgui::KeyEvent *event)
 			}
 		} else if (event->GetSymbol() == jgui::JKS_RED || event->GetSymbol() == jgui::JKS_F1) {
 		} else if (event->GetSymbol() == jgui::JKS_GREEN || event->GetSymbol() == jgui::JKS_F2) {
-			jgui::MessageDialogBox dialog("Ajuda", "O jogo termina quando todos os blocos que n\xe3o possuem minas s\xe3o revelados. Utilize as bandeirinhas para ajudar a identificar as minas escondidas.");
-
-			dialog.Show();
+			_current = new jgui::MessageDialogBox("Ajuda", "O jogo termina quando todos os blocos seguros forem revelados. Utilize as bandeirinhas para ajudar a identificar as minas escondidas.");
 		} else if (event->GetSymbol() == jgui::JKS_YELLOW || event->GetSymbol() == jgui::JKS_F3) {
 			block_t *block = &board[current_row*max_cols+current_col];
 
@@ -212,23 +224,13 @@ bool Mines::KeyPressed(jgui::KeyEvent *event)
 		}
 
 		if (GetResult() == WIN) {
-			int rx, ry;
-
 			for (int i=0; i<max_rows*max_cols; i++) {
-				ry = i/max_cols;
-				rx = i%max_cols;
-
 				if (board[i].type == BOMB_BLOCK) {
 					board[i].state = MARKED_BLOCK;
 				}
 			}
 		} else if (GetResult() == LOSE) {
-			int rx, ry;
-
 			for (int i=0; i<max_rows*max_cols; i++) {
-				ry = i/max_cols;
-				rx = i%max_cols;
-
 				if (board[i].type == BOMB_BLOCK) {
 					board[i].state = OPENED_BLOCK;
 				}
@@ -238,6 +240,10 @@ bool Mines::KeyPressed(jgui::KeyEvent *event)
 		Repaint();
 	} else if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
 		SetupBoard();
+	}
+
+	if (_current != NULL) {
+		_current->Show();
 	}
 
 	return true;

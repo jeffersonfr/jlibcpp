@@ -81,6 +81,11 @@ void TextArea::SetWrap(bool b)
 	}
 }
 
+bool TextArea::IsWrap()
+{
+	return _is_wrap;
+}
+
 void TextArea::SetEchoChar(char echo_char)
 {
 	_rows_string = true;
@@ -154,7 +159,7 @@ bool TextArea::KeyPressed(KeyEvent *event)
 
 		catched = true;
 	} else if (action == JKS_PAGE_UP) {
-		IncrementLines((_size.height-2*(_border_size+_vertical_gap))/(_font->GetLineSize()+_rows_gap));
+		IncrementLines((_size.height-2*(_border_size+_vertical_gap))/(_font->GetSize()+_rows_gap));
 
 		catched = true;
 	} else if (action == JKS_CURSOR_DOWN) {
@@ -162,7 +167,7 @@ bool TextArea::KeyPressed(KeyEvent *event)
 
 		catched = true;
 	} else if (action == JKS_PAGE_DOWN) {
-		DecrementLines((_size.height-2*(_border_size+_vertical_gap))/(_font->GetLineSize()+_rows_gap));
+		DecrementLines((_size.height-2*(_border_size+_vertical_gap))/(_font->GetSize()+_rows_gap));
 
 		catched = true;
 	} else if (action == JKS_HOME) {
@@ -376,7 +381,7 @@ void TextArea::IncrementLines(int lines)
 		jpoint_t scroll_location = GetScrollLocation();
 		int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-		int font_height = _font->GetLineSize();
+		int font_height = _font->GetSize();
 
 		if (scrolly > 0) {
 			SetScrollY((std::max)(0, (font_height+_rows_gap)*_current_row));
@@ -411,9 +416,9 @@ void TextArea::DecrementLines(int lines)
 		jpoint_t scroll_location = GetScrollLocation();
 		int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-		int font_height = _font->GetLineSize();
+		int font_height = _font->GetSize();
 
-		if ((scrolly+_size.height) < (_font->GetLineSize()+_rows_gap)*GetRows()) {
+		if ((scrolly+_size.height) < (_font->GetSize()+_rows_gap)*GetRows()) {
 			SetScrollY((std::max)(0, (font_height+_rows_gap)*_current_row));
 		}
 	}
@@ -457,9 +462,9 @@ void TextArea::InitRowsString()
 		wp = (wp < 0)?0:wp;
 		hp = (hp < 0)?0:hp;
 
-	// int default_space = _font->GetStringWidth(" ");
+	// int default_space = g->GetStringWidth(" ");
 
-	font_height = _font->GetLineSize();
+	font_height = _font->GetSize();
 
 	if (font_height < 1) {
 		return;
@@ -558,7 +563,7 @@ void TextArea::Paint(Graphics *g)
 	if (IsFontSet() == true) {
 		int current_text_size,
 			current_length = _caret_position,
-			font_height = _font->GetLineSize()+_rows_gap;
+			font_height = _font->GetSize()+_rows_gap;
 
 		x = x - scrollx;
 		y = y - scrolly;
@@ -679,7 +684,7 @@ jsize_t TextArea::GetScrollDimension()
 		size.height = _size.height;
 	} else {
 		size.width = _size.width;
-		size.height = GetRows()*(_font->GetLineSize())+2*(_vertical_gap+_border_size);
+		size.height = GetRows()*(_font->GetSize())+2*(_vertical_gap+_border_size);
 	}
 
 	return  size;

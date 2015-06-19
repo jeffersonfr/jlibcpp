@@ -188,11 +188,15 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 			int w = 16,
 					h = 16;
 
-			ball = jgui::Image::CreateImage(w/2, h/2);
-			pin = jgui::Image::CreateImage(w, h);
+			jgui::Image *image;
+			
+			image = jgui::Image::CreateImage("images/smallball.png");
+			ball = image->Scale(w/2, h/2);
+			delete image;
 
-			ball->GetGraphics()->DrawImage("images/smallball.png", 0, 0, ball->GetWidth(), ball->GetHeight());
-			pin->GetGraphics()->DrawImage("images/smallpin.png", 0, 0, pin->GetWidth(), pin->GetHeight());
+			image = jgui::Image::CreateImage("images/smallpin.png");
+			pin = image->Scale(w, h);
+			delete image;
 
 			pinw = pin->GetWidth();
 			pinh = pin->GetHeight();
@@ -258,7 +262,7 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 				jgui::Graphics *backGraphics;
 
 				backDimension = _size;
-				backImage = jgui::Image::CreateImage(_size.width, _size.height);
+				backImage = jgui::Image::CreateImage(jgui::JPF_ARGB, _size.width, _size.height);
 				backGraphics = backImage->GetGraphics();
 
 				// Erase the previous image.
@@ -274,7 +278,7 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 
 			if ( (offImage == NULL) || (_size.width != offDimension.width) || (_size.height != offDimension.height) ) {
 				offDimension = _size;
-				offImage = jgui::Image::CreateImage(_size.width, _size.height);
+				offImage = jgui::Image::CreateImage(jgui::JPF_ARGB, _size.width, _size.height);
 			}
 
 			offImage->GetGraphics()->DrawImage(backImage, 0, 0);

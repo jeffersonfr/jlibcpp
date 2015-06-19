@@ -1,9 +1,9 @@
 /***************************************************************************
- *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   Copyright (C) 2005 _insets.top Jeff Ferr                                       *
  *   root@sat                                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
+ *   it under the terms of the GNU General Public License as published _insets.top  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
@@ -30,14 +30,7 @@ CalendarDialogBox::CalendarDialogBox():
 
 	SetIcon(jcommon::System::GetResourceDirectory() + "/images/calendar_icon.png");
 
-	bx = _insets.left;
-	by = _insets.top;
-	bwidth = 90;
-	bheight = 70;
 	delta = 2;
-
-	SetSize(8*(bwidth+delta)-30, 11*(bheight+delta));
-	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 
 	jcommon::Date date;
 
@@ -49,9 +42,11 @@ CalendarDialogBox::CalendarDialogBox():
 	SetMonth(_current_month);
 	SetYear(_current_year);
 
+	SetSize(_insets.left+(DEFAULT_COMPONENT_HEIGHT+delta)*7+_insets.right, _insets.top+9*(DEFAULT_COMPONENT_HEIGHT+delta)+_insets.bottom+16);
+
 	char tmp[255];
 
-	_syear = new Spin(bx, by+0*bheight+10, 5*(bwidth+delta)-delta, 60);
+	_syear = new Spin(_insets.left, _insets.top+0*(DEFAULT_COMPONENT_HEIGHT+delta), _size.width-_insets.left-_insets.right);
 
 	for (int i=1970; i<2199; i++) {
 		sprintf(tmp, "%d", i);
@@ -62,11 +57,11 @@ CalendarDialogBox::CalendarDialogBox():
 	_syear->SetLoop(true);
 	_syear->RegisterSelectListener(this);
 
-	_smonth = new Spin(bx, by+1*bheight+10, 5*(bwidth+delta)-delta, 60);
+	_smonth = new Spin(_insets.left, _insets.top+1*(DEFAULT_COMPONENT_HEIGHT+delta), _size.width-_insets.left-_insets.right);
 
 	_smonth->AddTextItem("Janeiro");
 	_smonth->AddTextItem("Fevereiro");
-	_smonth->AddTextItem("Março");
+	_smonth->AddTextItem("Marco");
 	_smonth->AddTextItem("Abril");
 	_smonth->AddTextItem("Maio");
 	_smonth->AddTextItem("Junho");
@@ -81,14 +76,15 @@ CalendarDialogBox::CalendarDialogBox():
 	_smonth->RegisterSelectListener(this);
 
 	int dx = 0;
+	int dy = _smonth->GetY()+1*(_smonth->GetHeight()+delta)+8;
 
-	_ldom = new Label("D", bx+0*(bwidth+delta+dx), by+170, bwidth, bheight);
-	_lseg = new Label("S", bx+1*(bwidth+delta+dx), by+170, bwidth, bheight);
-	_lter = new Label("T", bx+2*(bwidth+delta+dx), by+170, bwidth, bheight);
-	_lqua = new Label("Q", bx+3*(bwidth+delta+dx), by+170, bwidth, bheight);
-	_lqui = new Label("Q", bx+4*(bwidth+delta+dx), by+170, bwidth, bheight);
-	_lsex = new Label("S", bx+5*(bwidth+delta+dx), by+170, bwidth, bheight);
-	_lsab = new Label("S", bx+6*(bwidth+delta+dx), by+170, bwidth, bheight);
+	_ldom = new Label("D", _insets.left+0*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lseg = new Label("S", _insets.left+1*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lter = new Label("T", _insets.left+2*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lqua = new Label("Q", _insets.left+3*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lqui = new Label("Q", _insets.left+4*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lsex = new Label("S", _insets.left+5*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lsab = new Label("S", _insets.left+6*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
 
 	Color color(0x60, 0x60, 0x80, 0xff);
 
@@ -110,9 +106,9 @@ CalendarDialogBox::CalendarDialogBox():
 	Add(_lsex);
 	Add(_lsab);
 
-	// AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
-
 	BuildCalendar();
+	
+	// AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
 }
 
 CalendarDialogBox::~CalendarDialogBox() 
@@ -301,12 +297,15 @@ void CalendarDialogBox::BuildCalendar()
 		delete button;
 	}
 
-	int k = 4;
+	int k = 2;
 
 	for (int i=0; i<mes; i++) {
+		int dx = _insets.left+(DEFAULT_COMPONENT_HEIGHT+delta)*first_day;
+		int dy = _smonth->GetY()+k*(_smonth->GetHeight()+delta)+16;
+
 		sprintf(tmp, "%d", (i+1));
 
-		button = new Button(tmp, bx+(bwidth+delta)*first_day, by+(bheight+delta)*k-30, bwidth, bheight);
+		button = new Button(tmp, dx, dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
 
 		first_day = ((first_day+1)%7);
 

@@ -35,13 +35,29 @@ CheckButton::CheckButton(jcheckbox_type_t type, std::string text, int x, int y, 
 	_type = type;
 	_text = text;
 	_checked = false;
-	_wrap = false;
+	_is_wrap = false;
 
 	SetFocusable(true);
 }
 
 CheckButton::~CheckButton()
 {
+}
+
+void CheckButton::SetWrap(bool b)
+{
+	if (_is_wrap == b) {
+		return;
+	}
+
+	_is_wrap = b;
+
+	Repaint();
+}
+
+bool CheckButton::IsWrap()
+{
+	return _is_wrap;
 }
 
 void CheckButton::SetText(std::string text)
@@ -284,7 +300,7 @@ void CheckButton::Paint(Graphics *g)
 
 		std::string text = GetText();
 
-		if (_wrap == false) {
+		if (_is_wrap == false) {
 			text = _font->TruncateString(text, "...", pw);
 		}
 

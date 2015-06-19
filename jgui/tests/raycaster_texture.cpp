@@ -21,8 +21,8 @@
 
 #include <fstream>
 
-#define SCREEN_WIDTH 1920
-#define SCREEN_HEIGHT 1080
+#define SCREEN_WIDTH 960
+#define SCREEN_HEIGHT 540
 
 #define texWidth 64
 #define texHeight 64
@@ -376,7 +376,7 @@ int decodePNG(std::vector<uint8_t>& out_image_32bit, unsigned long& image_width,
 			readPngHeader(&in[0], size); if(error) return;
 			size_t pos = 33; //first byte of the first chunk after the header
 			std::vector<uint8_t> idat; //the data from idat chunks
-			bool IEND = false, known_type = true;
+			bool IEND = false;
 			info.key_defined = false;
 			while(!IEND) //loop through the chunks, ignoring unknown chunks and stopping at IEND chunk. IDAT data is put at the start of the in buffer
 			{
@@ -428,7 +428,6 @@ int decodePNG(std::vector<uint8_t>& out_image_32bit, unsigned long& image_width,
 				{
 					if(!(in[pos + 0] & 32)) { error = 69; return; } //error: unknown critical chunk (5th bit of first byte of chunk type is 0)
 					pos += (chunkLength + 4); //skip 4 letters and uninterpreted data of unimplemented chunk
-					known_type = false;
 				}
 				pos += 4; //step over CRC (which is ignored)
 			}
@@ -759,7 +758,7 @@ class GraphicsTeste : public jgui::Frame{
 			int w = _size.width,
 					h = _size.height;
 
-			g->SetDrawingFlags(jgui::JDF_NOFX);
+			g->SetCompositeFlags(jgui::JCF_SRC);
 
 			//start the main loop
 			for(int x = 0; x < w; x++) {
@@ -992,7 +991,7 @@ class GraphicsTeste : public jgui::Frame{
 				}
 			}
 
-			g->SetRGB((uint32_t *)buffer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_WIDTH);
+			g->SetRGB((uint32_t *)buffer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		}
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)

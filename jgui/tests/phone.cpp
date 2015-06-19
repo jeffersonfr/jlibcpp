@@ -27,7 +27,7 @@
 namespace phone {
 
 Phone::Phone():
- 	jgui::Frame("Phone Book", (1920-600)/2, 300, 0, 0)
+ 	jgui::Frame("Phone Book", 32, 32)
 {
 	_status = NULL;
 
@@ -371,7 +371,7 @@ class NumericTextField : public jgui::KeyMap {
 NumericTextField ntf;
 
 AddContact::AddContact(PhoneDB *base, int index):
-	jgui::Frame("Add a Contact", (1920-600)/2, 300, 600, 400)
+	jgui::Frame("Add a Contact", 32, 32, 600, 400)
 {
 	int max_width = GetWidth()-_insets.left-_insets.right,
 			height = DEFAULT_COMPONENT_HEIGHT+4;
@@ -465,7 +465,7 @@ void AddContact::DataChanged(jcommon::ParamMapper *params)
 }
 
 SearchContacts::SearchContacts(PhoneDB *base):
-	jgui::Frame("Search Contacts", (1920-600)/2, 300, 600, 400)
+	jgui::Frame("Search Contacts", 32, 32, 600, 400)
 {
 
 	char tmp[255];
@@ -601,7 +601,7 @@ bool SearchContacts::KeyPressed(jgui::KeyEvent *event)
 
 		Update();
 	} else if (event->GetSymbol() == jgui::JKS_F2 || event->GetSymbol() == jgui::JKS_GREEN) {
-		jgui::Keyboard *dialog = new jgui::Keyboard(GetX()+GetWidth()+20, GetY(), jgui::JKT_ALPHA_NUMERIC, true);
+		jgui::Keyboard *dialog = new jgui::Keyboard(jgui::JKT_ALPHA_NUMERIC);
 
 		dialog->GetTextComponent()->SetTextSize(20);
 		dialog->RegisterKeyboardListener(this);

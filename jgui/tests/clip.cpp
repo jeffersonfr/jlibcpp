@@ -79,7 +79,7 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main("Clip", 100, 100, 720, 480);
+	Main main("Clip", 32, 32, 720, 480);
 
 	main.Show(true);
 

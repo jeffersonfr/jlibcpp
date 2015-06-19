@@ -24,7 +24,7 @@
 
 namespace jgui {
 
-ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
+ComboBox::ComboBox(int x, int y, int width, int height):
 	Component(x, y, width, height),
 	ItemComponent()
 {
@@ -37,7 +37,7 @@ ComboBox::ComboBox(int x, int y, int width, int height, int visible_items):
 
 	_old_index = 0;
 
-	SetVisibleItems(visible_items);
+	SetVisibleItems(5);
 	SetFocusable(true);
 
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();

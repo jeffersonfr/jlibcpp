@@ -28,7 +28,7 @@
 namespace agenda {
 
 Agenda::Agenda():
-	jgui::Frame("Tasks", (1920-600)/2, 300, 0, 0)
+	jgui::Frame("Tasks", 32, 32)
 {
 	started = true;
 	_status = NULL;
@@ -380,7 +380,7 @@ void AgendaDB::RemoveAll()
 }
 
 AddMessage::AddMessage(AgendaDB *base, int index):
-	jgui::Frame("Add Appointment", (1920-600)/2, 200, 600, 800)
+	jgui::Frame("Add Appointment", 32, 32)
 {
 	int height = DEFAULT_COMPONENT_HEIGHT+4;
 
@@ -399,7 +399,7 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 	date = new jgui::TextField(label3->GetX()+label3->GetWidth()+10, _insets.top+1*height, 180);
 
 	label4 = new jgui::Label("Message", _insets.left, _insets.top+2*height, hour->GetX()+hour->GetWidth()-_insets.left);
-	message = new jgui::TextArea(_insets.left, _insets.top+3*height, hour->GetX()+hour->GetWidth()-_insets.left, 400);
+	message = new jgui::TextArea(_insets.left, _insets.top+3*height, hour->GetX()+hour->GetWidth()-_insets.left, 240);
 
 	hour->Insert("12:00");
 	hour->SetCaretType(jgui::JCT_NONE);
@@ -457,10 +457,15 @@ AddMessage::~AddMessage()
 {
 	jthread::AutoLock lock(&add_mutex);
 
+	RemoveAll();
+
+	delete db;
 	delete label1;
 	delete label3;
+	delete label4;
 	delete hour;
 	delete date;
+	delete message;
 }
 
 bool AddMessage::KeyPressed(jgui::KeyEvent *event)
@@ -540,11 +545,10 @@ void AddMessage::DataChanged(jcommon::ParamMapper *params)
 }
 
 ViewMessages::ViewMessages(AgendaDB *base):
-		jgui::Frame("Appointments", (1920-600)/2, 200, 600, 800)
+		jgui::Frame("Appointments", 32, 32)
 {
-	int max_width = GetWidth()-_insets.left-_insets.right,
-			dheight = 40,
-			sheight = 50;
+	int dheight = 40;
+	int sheight = 50;
 
 	_index = 0;
 	_status = NULL;
@@ -559,12 +563,12 @@ ViewMessages::ViewMessages(AgendaDB *base):
 
 	sprintf(tmp, "[ %02d/%02d/%04d ]", t->day, t->month, t->year);
 
-	label_date = new jgui::Label(tmp, _insets.left, _insets.top, 400, dheight);
+	label_date = new jgui::Label(tmp, _insets.left, _insets.top, 200, dheight);
 
 	sprintf(tmp, "%02d:%02d", t->hour, t->minute);
 
-	label_hour = new jgui::Label(tmp, _insets.left+400+10, _insets.top, GetWidth()-400-10-_insets.left-_insets.right, dheight);
-	message = new jgui::Label(t->event, _insets.left, _insets.top+sheight, max_width, GetHeight()-240);
+	label_hour = new jgui::Label(tmp, label_date->GetX()+label_date->GetWidth()+8, label_date->GetY(), label_date->GetWidth(), label_date->GetHeight());
+	message = new jgui::Label(t->event, _insets.left, _insets.top+sheight, 2*label_date->GetWidth()+8, 240);
 
 	message->SetHorizontalAlign(jgui::JHA_LEFT);
 	message->SetVerticalAlign(jgui::JVA_TOP);

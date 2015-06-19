@@ -38,8 +38,8 @@
 #include <string>
 #include <vector>
 
-#define DEFAULT_COMPONENT_WIDTH		192
-#define DEFAULT_COMPONENT_HEIGHT	54
+#define DEFAULT_COMPONENT_WIDTH		128
+#define DEFAULT_COMPONENT_HEIGHT	32
 
 namespace jgui {
 

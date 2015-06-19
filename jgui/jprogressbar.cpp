@@ -35,6 +35,7 @@ ProgressBar::ProgressBar(int x, int y, int width, int height, jscroll_orientatio
 	_value = 0;
 	_fixe_delta = 10;
 	_delta = _fixe_delta;
+	_stone_size = 32;
 }
 
 ProgressBar::~ProgressBar()
@@ -59,6 +60,28 @@ jscroll_orientation_t ProgressBar::GetScrollOrientation()
 	return _type;
 }
 
+int ProgressBar::GetStoneSize()
+{
+	return _stone_size;
+}
+
+void ProgressBar::SetStoneSize(int size)
+{
+	_stone_size = size;
+
+	if (_type == JSO_HORIZONTAL) {
+		if (_stone_size > (_size.width-_horizontal_gap-_border_size)) {
+			_stone_size = (_size.width-_horizontal_gap-_border_size);
+		}
+	} else if (_type == JSO_VERTICAL) {
+		if (_stone_size > (_size.height-_vertical_gap-_border_size)) {
+			_stone_size = (_size.height-_vertical_gap-_border_size);
+		}
+	}
+
+	Repaint();
+}
+		
 double ProgressBar::GetValue()
 {
 	return _value;
@@ -260,9 +283,9 @@ void ProgressBar::Paint(Graphics *g)
 		if (_type == JSO_HORIZONTAL) {
 			_index = _index + _delta;
 
-			if (_index > (w-40)) {
+			if (_index > (w-_stone_size)) {
 				_delta = -_fixe_delta;
-				_index = w-40;
+				_index = w-_stone_size;
 			}
 
 			if (_index < 0) {
@@ -271,14 +294,14 @@ void ProgressBar::Paint(Graphics *g)
 			}
 
 			g->SetColor(color);
-			g->FillRectangle(x+_index, y, 40, h);
+			g->FillRectangle(x+_index, y, _stone_size, h);
 		} else if (_type == JSO_VERTICAL) {
 			if (_type == JSO_VERTICAL) {
 				_index = _index + _delta;
 
-				if (_index > (h-40)) {
+				if (_index > (h-_stone_size)) {
 					_delta = -_fixe_delta;
-					_index = h-40;
+					_index = h-_stone_size;
 				}
 
 				if (_index < 0) {
@@ -287,7 +310,7 @@ void ProgressBar::Paint(Graphics *g)
 				}
 
 				g->SetColor(color);
-				g->FillRectangle(x, y+_index, w, 40);
+				g->FillRectangle(x, y+_index, w, _stone_size);
 			}
 		}
 	}

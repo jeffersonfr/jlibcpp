@@ -148,7 +148,7 @@ class SOM : public jgui::Window {
 
 	public:
 		SOM(int ninputs, int neurons):
-			jgui::Window(0, 0, 3*400, 3*200)
+			jgui::Window(0, 0, 3*240, 3*128)
 		{
 			_classify_input = NULL;
 			_classify_input_size = 0;
@@ -291,7 +291,7 @@ class SOM : public jgui::Window {
 					}
 				}
 
-				// TODO:: alterando o classify altera o input
+				// CHANGE:: alterando o classify altera o input
 				input[3] = _neurons[min_index]->GetWeight(2);
 
 				int c1 = (int)round(input[2]),
@@ -353,7 +353,7 @@ class SOM : public jgui::Window {
 								 color = GetColor(classe);
 
 				g->SetColor(color);
-				g->FillRectangle((int)(neuron->GetWeight(0)*s+dx), (int)(neuron->GetWeight(1)*s+dy), 10, 10);
+				g->FillRectangle((int)(neuron->GetWeight(0)*s+dx), (int)(neuron->GetWeight(1)*s+dy), 8, 8);
 			}
 
 			g->SetColor(0x00, 0x00, 0x00, 0xff);

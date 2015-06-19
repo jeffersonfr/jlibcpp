@@ -58,10 +58,10 @@ Theme::Theme():
 
 	_component_font = NULL;
 
-	_insets.left = 30;
-	_insets.top = 60;
-	_insets.right = 30;
-	_insets.bottom = 30;
+	_insets.left = 8;
+	_insets.top = 42;
+	_insets.right = 8;
+	_insets.bottom = 8;
 	
 	_window_font = NULL;
 	_window_border_size = 4;

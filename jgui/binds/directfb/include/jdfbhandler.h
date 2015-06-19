@@ -23,6 +23,7 @@
 #include "jgfxhandler.h"
 
 #include <directfb.h>
+#include <cairo-ft.h>
 
 namespace jgui{
 
@@ -40,6 +41,7 @@ class DFBHandler : public virtual jgui::GFXHandler{
 	private:
 		IDirectFB *_dfb;
 		IDirectFBDisplayLayer *_layer;
+		FT_Library _ft_library;
 		
 		struct cursor_params_t {
 			Image *cursor;
@@ -114,38 +116,14 @@ class DFBHandler : public virtual jgui::GFXHandler{
 		 * \brief
 		 *
 		 */
-		int CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT, double radians = 0.0);
+		int CreateFont(std::string name, int height, cairo_font_face_t **font, std::string charset);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int CreateFont(std::string name, int height, IDirectFBFont **font, DFBFontDescription font_desc, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity = 0xff);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		int CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, jpixelformat_t pixelformat, int scale_width, int scale_height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, DFBSurfaceDescription surface_desc, int scale_width, int scale_height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, DFBWindowDescription window_desc, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
-
 		/**
 		 * \brief
 		 *
@@ -187,6 +165,12 @@ class DFBHandler : public virtual jgui::GFXHandler{
 		 *
 		 */
 		virtual void SetCursor(Image *shape, int hotx, int hoty);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void WarpCursor(int x, int y);
 
 		/**
 		 * \brief

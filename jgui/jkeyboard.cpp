@@ -25,25 +25,17 @@
 #include "jflowlayout.h"
 
 #define KEYBOARD_LAYOUT 																		\
-	if (_show_text == false) {																\
-		SetLayout(new GridLayout(1, 1)); 												\
-	} else {																									\
-		SetLayout(new GridLayout(2, 1)); 												\
-	}																													\
+	_display = new TextArea(); 																\
 																														\
-	if (_show_text == true) { 																\
-		display = new TextArea(); 															\
-																														\
-		if (_is_password == true) { 														\
-			display->SetEchoChar('*');					 									\
-		} 																											\
-																														\
-		display->SetFocusable(false); 													\
-		display->Insert(_text); 																\
-		display->SetKeyboardEnabled(false);											\
-																														\
-		Add(display); 																					\
+	if (_is_password == true) { 															\
+		_display->SetEchoChar('*');					 										\
 	} 																												\
+																														\
+	_display->SetFocusable(false); 														\
+	_display->Insert(_text); 																	\
+	_display->SetKeyboardEnabled(false);											\
+																														\
+	Add(_display, jgui::JBLA_CENTER); 												\
 																														\
 	Container *container = new Container(),					 					\
 						*lines[5]; 																			\
@@ -52,6 +44,7 @@
 																														\
 	container->SetScrollableX(false);													\
 	container->SetScrollableY(false);													\
+	container->SetSize(0, 5*(DEFAULT_COMPONENT_HEIGHT+4)); \
 																														\
 	for (int i=0; i<5; i++) { 																\
 		lines[i] = new Container(); 														\
@@ -60,16 +53,17 @@
 																														\
 		lines[i]->SetScrollableX(false);												\
 		lines[i]->SetScrollableY(false);												\
+		lines[i]->SetSize(0, DEFAULT_COMPONENT_HEIGHT); \
 																														\
 		container->Add(lines[i]); 															\
 	} 																												\
 																														\
-	Add(container); 																					\
+	Add(container, jgui::JBLA_SOUTH); 												\
 
 
-#define KEY_WIDTH_1	60
-#define KEY_WIDTH_2 120
-#define KEY_WIDTH_3	240
+#define KEY_WIDTH_1	DEFAULT_COMPONENT_HEIGHT
+#define KEY_WIDTH_2 (4*KEY_WIDTH_1)
+#define KEY_WIDTH_3	(6*KEY_WIDTH_1)
 
 namespace jgui {
 
@@ -94,22 +88,19 @@ class KeyButton : public Button{
 };
 
 Keyboard::Keyboard(jkeyboard_type_t type, bool text_visible, bool is_password):
- 	jgui::Frame("Teclado Virtual", (1920-960)/2, (1080-720)/2, 960, 720)
+ 	jgui::Frame("Teclado Virtual")
 {
 	jcommon::Object::SetClassName("jgui::Keyboard");
 
 	SetIcon(jcommon::System::GetResourceDirectory() + "/images/keyboard_icon.png");
 
-	bwidth = 90;
-	bheight = 60;
-	delta = 2;
-	
-	display = NULL;
+	_display = NULL;
 
-	_show_text = text_visible;
 	_shift_pressed = false;
 	_type = type;
 	_is_password = is_password;
+
+	SetLayout(new jgui::BorderLayout());
 
 	if (_type == JKT_QWERTY) {
 		BuildQWERTYKeyboard();
@@ -122,60 +113,53 @@ Keyboard::Keyboard(jkeyboard_type_t type, bool text_visible, bool is_password):
 	} else if (_type == JKT_INTERNET) {
 		BuildInternetKeyboard();
 	}
-
-	if (_show_text == false) {
-		SetSize(GetWidth(), GetHeight()/2+_insets.top+_insets.bottom);
-	}
-
-	// AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
-}
-
-Keyboard::Keyboard(int x, int y, jkeyboard_type_t type, bool text_visible, bool is_password):
- 	jgui::Frame("Teclado Virtual", x, y, 960, 720)
-{
-	jcommon::Object::SetClassName("jgui::Keyboard");
-
-	SetIcon(jcommon::System::GetResourceDirectory() + "/images/keyboard_icon.png");
-
-	bwidth = 90;
-	bheight = 60;
-	delta = 2;
-	
-	display = NULL;
-
-	_show_text = text_visible;
-	_shift_pressed = false;
-	_type = type;
-	_is_password = is_password;
-
-	if (_type == JKT_QWERTY) {
-		BuildQWERTYKeyboard();
-	} else if (_type == JKT_ALPHA_NUMERIC) {
-		BuildAlphaNumericKeyboard();
-	} else if (_type == JKT_NUMERIC) {
-		BuildNumericKeyboard();
-	} else if (_type == JKT_PHONE) {
-		BuildPhoneKeyboard();
-	} else if (_type == JKT_INTERNET) {
-		BuildInternetKeyboard();
-	}
-
-	if (_show_text == false) {
-		SetSize(GetWidth(), GetHeight()/2+_insets.top+_insets.bottom);
-	}
-
-	// AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Confirmar");
 }
 
 Keyboard::~Keyboard() 
 {
 	jthread::AutoLock lock(&_key_mutex);
 
+	std::vector<Component *> lines = GetComponents();
+
+	for (std::vector<Component *>::iterator i=lines.begin(); i!=lines.end(); i++) {
+		Component *cmp1 = (*i);
+		Container *ct1 = dynamic_cast<Container *>(cmp1);
+
+		if (ct1 != NULL) {
+			/* CHANGE:: problem with tests/agenda.cpp
+			 * - select the second option, exit and select third option (SEGFAULT)
+			std::vector<Component *> cmps = ct1->GetComponents();
+
+			for (std::vector<Component *>::iterator j=cmps.begin(); j!=cmps.end(); j++) {
+				Component *cmp1 = (*j);
+
+				delete cmp1;
+			}
+			*/
+
+			ct1->RemoveAll();
+
+			Layout *l = ct1->GetLayout();
+
+			ct1->SetLayout(NULL);
+
+			delete l;
+		}
+
+		delete ct1;
+	}
+
 	_keyboard_listeners.clear();
 
-	if (display != NULL) {
-		delete display;
-	}
+	delete _display;
+	
+	RemoveAll();
+
+	Layout *layout = GetLayout();
+
+	SetLayout(NULL);
+
+	delete layout;
 }
 
 void Keyboard::ActionPerformed(ButtonEvent *event)
@@ -584,10 +568,8 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 	KeyEvent *kevent1 = new KeyEvent(this, JKT_PRESSED, modifiers, code, symbol);
 	KeyEvent *kevent2 = new KeyEvent(this, JKT_RELEASED, modifiers, code, symbol);
 
-	if (_show_text == true) {
-		display->KeyPressed(kevent1);
-		display->KeyReleased(kevent2);
-	}
+	_display->KeyPressed(kevent1);
+	_display->KeyReleased(kevent2);
 
 	DispatchKeyboardEvent(kevent1);
 	DispatchKeyboardEvent(kevent2);
@@ -595,7 +577,7 @@ void Keyboard::ActionPerformed(ButtonEvent *event)
 
 jgui::TextComponent * Keyboard::GetTextComponent()
 {
-	return display;
+	return _display;
 }
 
 void Keyboard::BuildInternetKeyboard()
@@ -753,7 +735,7 @@ void Keyboard::BuildQWERTYKeyboard()
 	lines[2]->Add(new KeyButton("j", "J", this, KEY_WIDTH_1));
 	lines[2]->Add(new KeyButton("k", "K", this, KEY_WIDTH_1));
 	lines[2]->Add(new KeyButton("l", "L", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("ç", "Ç", this, KEY_WIDTH_1));
+	// lines[2]->Add(new KeyButton("ç", "Ç", this, KEY_WIDTH_1));
 	lines[2]->Add(new KeyButton("~", "^", this, KEY_WIDTH_1));
 	lines[2]->Add(new KeyButton("]", "}", this, KEY_WIDTH_1));
 
@@ -776,8 +758,6 @@ void Keyboard::BuildQWERTYKeyboard()
 	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_3));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
-
-	DoLayout();
 }
 
 void Keyboard::BuildNumericKeyboard()

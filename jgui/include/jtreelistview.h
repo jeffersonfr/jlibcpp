@@ -17,215 +17,234 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_DFBHANDLER_H
-#define J_DFBHANDLER_H
+#ifndef J_TREELISTVIEW_H
+#define J_TREELISTVIEW_H
 
-#include "jgfxhandler.h"
+#include "jselectlistener.h"
+#include "jitemcomponent.h"
+#include "jbuttonlistener.h"
+#include "jimage.h"
 
-#include <directfb.h>
+#include "jthread.h"
+#include "jmutex.h"
 
-namespace jgui{
+#include <string>
+#include <iostream>
+#include <vector>
+
+#include <stdlib.h>
+
+namespace jgui {
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class DFBHandler : public virtual jgui::GFXHandler{
-
-	friend class DFBImage;
-	friend class DFBFont;
-	friend class Window;
+class TreeListView : public jgui::Component, public jgui::ItemComponent{
 
 	private:
-		IDirectFB *_dfb;
-		IDirectFBDisplayLayer *_layer;
-		
-		struct cursor_params_t {
-			Image *cursor;
-			int hot_x;
-			int hot_y;
-		};
+		std::map<Item *, bool> _expanded_items;
+		/** \brief */
+		int _item_size;
+		/** \brief */
+		int _item_gap;
+		/** \brief */
+		int _selected_index;
+		/** \brief */
+		bool _pressed;
 
-		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
+	private:
+		/**
+		 * \brief
+		 *
+		 */
+		void IncrementLines(int lines);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void DecrementLines(int lines);
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		DFBHandler();
+		TreeListView(int x = 0, int y = 0, int width = 0, int height = 0);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~DFBHandler();
+		virtual ~TreeListView();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void InitEngine();
+		virtual int GetItemGap();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetItemGap(int gap);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddEmptyItem();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddTextItem(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddImageItem(std::string text, std::string image);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		void AddCheckedItem(std::string text, bool checked);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void InitCursors();
+		virtual bool IsSelected(int i);
+
+		/**
+		 * \brief Invert current selection state from item. Use with IsSelected() to avoid
+		 * unexpected states.
+		 *
+		 */
+		virtual void SetSelected(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void InitResources();
+		virtual void Select(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Add(Font *);
+		virtual void Deselect(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Remove(Font *);
+		virtual int GetSelectedIndex();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Add(Image *);
+		virtual int GetItemSize();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Remove(Image *);
+		virtual void SetItemSize(int size);
 
 		/**
 		 * \brief
 		 *
 		 */
-		IDirectFBDisplayLayer * GetDisplayLayer();
+		virtual void SetCurrentIndex(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		int CreateFont(std::string name, int height, IDirectFBFont **font, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT, double radians = 0.0);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int CreateFont(std::string name, int height, IDirectFBFont **font, DFBFontDescription font_desc, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, jpixelformat_t pixelformat, int scale_width, int scale_height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int CreateSurface(int widthp, int heightp, IDirectFBSurface **surface, DFBSurfaceDescription surface_desc, int scale_width, int scale_height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		int CreateWindow(int x, int y, int width, int height, IDirectFBWindow **window, IDirectFBSurface **surface, DFBWindowDescription window_desc, int opacity = 0xff, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		virtual void Expand(Item *item);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static std::string GetID();
+		virtual void Collapse(Item *item);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsExpanded(Item *item);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ExpandAll(Item *item);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void CollapseAll(Item *item);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetPreferredSize();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetScrollDimension();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool KeyPressed(KeyEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool MousePressed(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void * GetGraphicEngine();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t GetMousePosition();
+		virtual bool MouseReleased(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetMousePosition(int x, int y);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorEnabled(bool b);
+		virtual bool MouseMoved(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetCursor(jcursor_style_t t);
+		virtual bool MouseWheel(MouseEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetCursor(Image *shape, int hotx, int hoty);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Restore();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Release();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Suspend();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Resume();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitIdle();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitSync();
+		virtual void Paint(Graphics *g);
 
 };
 
 }
 
-#endif /*DFBHANDLER_H_*/
+#endif 

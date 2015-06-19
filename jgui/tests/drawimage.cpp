@@ -740,16 +740,15 @@ class BufferedImageTest : public Picture {
 		BufferedImageTest(int x, int y, int w, int h):
 			Picture(x, y, w, h)
 		{
-			int iw,
-					ih;
+			jgui::Image *image;
 
-			jgui::Image::GetImageSize(FILENAME, &iw, &ih);
+			image = jgui::Image::CreateImage(FILENAME);
 
-			_image = jgui::Image::CreateImage(iw, ih);
+			_image = jgui::Image::CreateImage(jgui::JPF_ARGB, image->GetWidth(), image->GetHeight());
 
-			if (_image->GetGraphics() != NULL) {
-				_image->GetGraphics()->DrawImage(FILENAME, 0, 0, _image->GetWidth(), _image->GetHeight());
-			}
+			_image->GetGraphics()->DrawImage(image, 0, 0);
+
+			delete image;
 
 			_title = "Buffered Image";
 		}
@@ -769,13 +768,12 @@ class RGBImageTest : public Picture {
 			Picture(x, y, w, h)
 		{
 			jgui::Image *image = jgui::Image::CreateImage(FILENAME);
-			jgui::jsize_t scale = image->GetGraphics()->GetWorkingScreenSize();;
 
 			uint32_t *rgb = NULL;
 
 			image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
 
-			_image = jgui::Image::CreateImage(rgb, image->GetWidth(), image->GetHeight(), scale.width, scale.height);
+			_image = jgui::Image::CreateImage(rgb, image->GetWidth(), image->GetHeight());
 
 			_title = "RGB Image";
 		}
@@ -878,24 +876,27 @@ class Main : public jgui::Frame{
 
 	public:
 		Main():
-			jgui::Frame("Image Create Test", 0, 0, 1920, 1080)
+			jgui::Frame("Image Create Test", 0, 0)
 		{
-			int w = 300,
-					h = 300,
-					gapx = 50,
-					gapy = 50,
-					dx = (1920-4*w-3*gapx)/2,
-					dy = (1080-2*h-1*gapy)/2;
+			int gapx = 64;
+			int gapy = 64;
+			int w = 180;
+			int h = 180;
+			int dx = (_size.width-4*w-3*gapx)/2;
+			int dy = (_size.height-2*h-1*gapy)/2;
 
-			Add(new FilePathImageTest(dx+0*(w+gapx), dy+0*(h+gapy), w, h));
-			Add(new FileImageTest(dx+1*(w+gapx), dy+0*(h+gapy), w, h));
-			Add(new InputStreamImageTest(dx+2*(w+gapx), dy+0*(h+gapy), w, h));
-			Add(new CopyImageTest(dx+3*(w+gapx), dy+0*(h+gapy), w, h));
+			gapx = gapx/2;
+			gapy = gapy/3;
+
+			Add(new FilePathImageTest(dx+0*(w+gapx)+gapx, dy+0*(h+gapy)+gapy, w, h));
+			Add(new FileImageTest(dx+1*(w+gapx)+gapx, dy+0*(h+gapy)+gapy, w, h));
+			Add(new InputStreamImageTest(dx+2*(w+gapx)+gapx, dy+0*(h+gapy)+gapy, w, h));
+			Add(new CopyImageTest(dx+3*(w+gapx)+gapx, dy+0*(h+gapy)+gapy, w, h));
 		
-			Add(new BufferedImageTest(dx+0*(w+gapx), dy+1*(h+gapy), w, h));
-			Add(new RGBImageTest(dx+1*(w+gapx), dy+1*(h+gapy), w, h));
-			Add(new RawImageTest(dx+2*(w+gapx), dy+1*(h+gapy), w, h));
-			Add(new IndexedImageTest(dx+3*(w+gapx), dy+1*(h+gapy), w, h));
+			Add(new BufferedImageTest(dx+0*(w+gapx)+gapx, dy+1*(h+gapy)+gapy, w, h));
+			Add(new RGBImageTest(dx+1*(w+gapx)+gapx, dy+1*(h+gapy)+gapy, w, h));
+			Add(new RawImageTest(dx+2*(w+gapx)+gapx, dy+1*(h+gapy)+gapy, w, h));
+			Add(new IndexedImageTest(dx+3*(w+gapx)+gapx, dy+1*(h+gapy)+gapy, w, h));
 		}
 
 		virtual ~Main()

@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jlistbox.h"
+#include "jtreelistview.h"
 #include "jthememanager.h"
 #include "joutofboundsexception.h"
 #include "jthememanager.h"
@@ -26,17 +26,16 @@
 
 namespace jgui {
 
-ListBox::ListBox(int x, int y, int width, int height):
+TreeListView::TreeListView(int x, int y, int width, int height):
   Component(x, y, width, height),
   ItemComponent()
 {
-	jcommon::Object::SetClassName("jgui::ListBox");
+	jcommon::Object::SetClassName("jgui::TreeListView");
 
 	_item_gap = 4;
 	_pressed = false;
 	_item_size = DEFAULT_COMPONENT_HEIGHT;
 	_selected_index = -1;
-	_mode = JLBM_NONE_SELECTION;
 
 	SetFocusable(true);
 
@@ -45,30 +44,11 @@ ListBox::ListBox(int x, int y, int width, int height):
 	theme->Update(this);
 }
 
-ListBox::~ListBox() 
+TreeListView::~TreeListView() 
 {
 }
 
-void ListBox::SetSelectionType(jlistbox_mode_t type)
-{
-	if (_mode == type) {
-		return;
-	}
-
-	_mode = type;
-	_selected_index = -1;
-
-	for (std::vector<jgui::Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-		(*i)->SetSelected(false);
-	}
-}
-
-jlistbox_mode_t ListBox::GetSelectionType()
-{
-	return _mode;
-}
-
-void ListBox::AddEmptyItem()
+void TreeListView::AddEmptyItem()
 {
 	Item *item = new Item();
 
@@ -78,7 +58,7 @@ void ListBox::AddEmptyItem()
 	AddItem(item);
 }
 
-void ListBox::AddTextItem(std::string text)
+void TreeListView::AddTextItem(std::string text)
 {
 	Item *item = new Item(text);
 
@@ -88,7 +68,7 @@ void ListBox::AddTextItem(std::string text)
 	AddItem(item);
 }
 
-void ListBox::AddImageItem(std::string text, std::string image)
+void TreeListView::AddImageItem(std::string text, std::string image)
 {
 	Item *item = new Item(text, image);
 
@@ -98,7 +78,7 @@ void ListBox::AddImageItem(std::string text, std::string image)
 	AddItem(item);
 }
 
-void ListBox::AddCheckedItem(std::string text, bool checked)
+void TreeListView::AddCheckedItem(std::string text, bool checked)
 {
 	Item *item = new Item(text, checked);
 
@@ -108,12 +88,12 @@ void ListBox::AddCheckedItem(std::string text, bool checked)
 	AddItem(item);
 }
 
-int ListBox::GetItemSize()
+int TreeListView::GetItemSize()
 {
 	return _item_size;
 }
 
-void ListBox::SetItemSize(int size)
+void TreeListView::SetItemSize(int size)
 {
 	if (size <= 0) {
 		return;
@@ -124,7 +104,7 @@ void ListBox::SetItemSize(int size)
 	Repaint();
 }
 
-void ListBox::SetCurrentIndex(int i)
+void TreeListView::SetCurrentIndex(int i)
 {
 	if (i < 0 || i >= (int)_items.size()) {
 		throw jcommon::OutOfBoundsException("Index out of bounds exception");
@@ -141,24 +121,20 @@ void ListBox::SetCurrentIndex(int i)
 	Repaint();
 }
 
-bool ListBox::IsSelected(int i)
+bool TreeListView::IsSelected(int i)
 {
 	if (i < 0 || i >= (int)_items.size()) {
 		return false;
 	}
 
-	if (_mode == JLBM_SINGLE_SELECTION) {
-		if (_selected_index == i) {
-			return true;
-		}
-	} else if (_mode == JLBM_MULTI_SELECTION) {
-		return _items[i]->IsSelected();
+	if (_selected_index == i) {
+		return true;
 	}
 
 	return false;
 }
 
-void ListBox::SetSelected(int i)
+void TreeListView::SetSelected(int i)
 {
 	if (i < 0 || i >= (int)_items.size()) {
 		return;
@@ -170,87 +146,102 @@ void ListBox::SetSelected(int i)
 		return;
 	}
 
-	if (_mode == JLBM_SINGLE_SELECTION) {
-		if (_selected_index == i) {
-			_selected_index = -1;
-		} else {
-			_selected_index = i;
-		}
-
-		Repaint();
-	} else if (_mode == JLBM_MULTI_SELECTION) {
-		if (item->IsSelected()) {
-			item->SetSelected(false);
-		} else {
-			item->SetSelected(true);
-		}
-
-		Repaint();
-	}
-}
-
-void ListBox::Select(int i)
-{
-	if (i < 0 || i >= (int)_items.size()) {
-		return;
-	}
-
-	Item *item = _items[i];
-
-	if (item->IsEnabled() == false) {
-		return;
-	}
-
-	if (_mode == JLBM_SINGLE_SELECTION) {
-		_selected_index = i;
-
-		Repaint();
-	} else if (_mode == JLBM_MULTI_SELECTION) {
-		item->SetSelected(true);
-
-		Repaint();
-	}
-}
-
-void ListBox::Deselect(int i)
-{
-	if (i < 0 || i >= (int)_items.size()) {
-		return;
-	}
-
-	Item *item = _items[i];
-
-	if (item->IsEnabled() == false) {
-		return;
-	}
-
-	if (_mode == JLBM_SINGLE_SELECTION) {
+	if (_selected_index == i) {
 		_selected_index = -1;
-
-		Repaint();
-	} else if (_mode == JLBM_MULTI_SELECTION) {
-		item->SetSelected(false);
-
-		Repaint();
+	} else {
+		_selected_index = i;
 	}
+
+	Repaint();
 }
 
-int ListBox::GetItemGap()
+void TreeListView::Select(int i)
+{
+	if (i < 0 || i >= (int)_items.size()) {
+		return;
+	}
+
+	Item *item = _items[i];
+
+	if (item->IsEnabled() == false) {
+		return;
+	}
+
+	_selected_index = i;
+
+	Repaint();
+}
+
+void TreeListView::Deselect(int i)
+{
+	if (i < 0 || i >= (int)_items.size()) {
+		return;
+	}
+
+	Item *item = _items[i];
+
+	if (item->IsEnabled() == false) {
+		return;
+	}
+
+	_selected_index = -1;
+
+	Repaint();
+}
+
+void TreeListView::Expand(Item *item)
+{
+	_expanded_items[item] = true;
+
+	Repaint();
+}
+
+void TreeListView::Collapse(Item *item)
+{
+	_expanded_items[item] = false;
+
+	Repaint();
+}
+
+bool TreeListView::IsExpanded(Item *item)
+{
+	return _expanded_items[item];
+}
+
+void TreeListView::ExpandAll(Item *item)
+{
+	for (std::map<Item *, bool>::iterator i=_expanded_items.begin(); i!=_expanded_items.end(); i++) {
+		_expanded_items[i->first] = true;
+	}
+
+	Repaint();
+}
+
+void TreeListView::CollapseAll(Item *item)
+{
+	for (std::map<Item *, bool>::iterator i=_expanded_items.begin(); i!=_expanded_items.end(); i++) {
+		_expanded_items[i->first] = false;
+	}
+
+	Repaint();
+}
+
+int TreeListView::GetItemGap()
 {
 	return _item_gap;
 }
 
-void ListBox::SetItemGap(int gap)
+void TreeListView::SetItemGap(int gap)
 {
 	_item_gap = gap;
 }
 
-int ListBox::GetSelectedIndex()
+int TreeListView::GetSelectedIndex()
 {
 	return _selected_index;
 }
 
-jsize_t ListBox::GetPreferredSize()
+jsize_t TreeListView::GetPreferredSize()
 {
 	jsize_t t;
 
@@ -260,7 +251,7 @@ jsize_t ListBox::GetPreferredSize()
 	return t;
 }
 
-bool ListBox::KeyPressed(KeyEvent *event)
+bool TreeListView::KeyPressed(KeyEvent *event)
 {
 	if (Component::KeyPressed(event) == true) {
 		return true;
@@ -311,7 +302,7 @@ bool ListBox::KeyPressed(KeyEvent *event)
 	return catched;
 }
 
-bool ListBox::MousePressed(MouseEvent *event)
+bool TreeListView::MousePressed(MouseEvent *event)
 {
 	if (Component::MousePressed(event) == true) {
 		return true;
@@ -320,7 +311,7 @@ bool ListBox::MousePressed(MouseEvent *event)
 	return false;
 }
 
-bool ListBox::MouseReleased(MouseEvent *event)
+bool TreeListView::MouseReleased(MouseEvent *event)
 {
 	if (Component::MouseReleased(event) == true) {
 		return true;
@@ -329,7 +320,7 @@ bool ListBox::MouseReleased(MouseEvent *event)
 	return false;
 }
 	
-bool ListBox::MouseMoved(MouseEvent *event)
+bool TreeListView::MouseMoved(MouseEvent *event)
 {
 	if (Component::MouseMoved(event) == true) {
 		return true;
@@ -338,7 +329,7 @@ bool ListBox::MouseMoved(MouseEvent *event)
 	return false;
 }
 
-bool ListBox::MouseWheel(MouseEvent *event)
+bool TreeListView::MouseWheel(MouseEvent *event)
 {
 	if (Component::MouseWheel(event) == true) {
 		return true;
@@ -351,7 +342,7 @@ bool ListBox::MouseWheel(MouseEvent *event)
 	return true;
 }
 
-void ListBox::Paint(Graphics *g)
+void TreeListView::Paint(Graphics *g)
 {
 	JDEBUG(JINFO, "paint\n");
 
@@ -376,7 +367,7 @@ void ListBox::Paint(Graphics *g)
 		}
 	}
 
-	// CHANGE:: try enhance scroll behaviour
+	// TODO:: tentar ajeitar
 	x = x - scrollx;
 	y = y - scrolly;
 
@@ -396,14 +387,8 @@ void ListBox::Paint(Graphics *g)
 		}
 
 		if (_index != i) {
-			if (_mode == JLBM_SINGLE_SELECTION) {	
-				if (_selected_index == i) {	
-					g->SetColor(_selected_item_color);
-				}
-			} else if (_mode == JLBM_MULTI_SELECTION) {	
-				if (item->IsSelected() == true) {	
-					g->SetColor(_selected_item_color);
-				}
+			if (_selected_index == i) {	
+				g->SetColor(_selected_item_color);
 			}
 		} else {
 			g->SetColor(_focus_item_color);
@@ -411,16 +396,9 @@ void ListBox::Paint(Graphics *g)
 
 		g->FillRectangle(x, y+(_item_size+_item_gap)*i, w, _item_size);
 
-		if (_mode == JLBM_SINGLE_SELECTION) {
-			if (_selected_index == i) {
-				g->SetColor(_selected_item_color);
-			}
-		} else if (_mode == JLBM_MULTI_SELECTION) {	
-			if (_items[i]->IsSelected() == true) {	
-				g->SetColor(_selected_item_color);
-			}
-		} else {
-			g->SetColor(_item_color);
+		// g->SetColor(_item_color);
+		if (_selected_index == i) {
+			g->SetColor(_selected_item_color);
 		}
 
 		if (_items[i]->GetType() == JIT_EMPTY) {
@@ -453,7 +431,7 @@ void ListBox::Paint(Graphics *g)
 	}
 }
 
-void ListBox::IncrementLines(int lines)
+void TreeListView::IncrementLines(int lines)
 {
 	if (_items.size() == 0) {
 		return;
@@ -488,7 +466,7 @@ void ListBox::IncrementLines(int lines)
 	}
 }
 
-void ListBox::DecrementLines(int lines)
+void TreeListView::DecrementLines(int lines)
 {
 	if (_items.size() == 0) { 
 		return;
@@ -527,7 +505,7 @@ void ListBox::DecrementLines(int lines)
 	}
 }
 
-jsize_t ListBox::GetScrollDimension()
+jsize_t TreeListView::GetScrollDimension()
 {
 	jsize_t size;
 

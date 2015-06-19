@@ -38,7 +38,7 @@ class ColorChooser : public jgui::Component {
 					cy = border / 2 + 1;
 			double border2 = border / 2;
 
-			_image = jgui::Image::CreateImage(GetWidth(), GetHeight());
+			_image = jgui::Image::CreateImage(jgui::JPF_ARGB, GetWidth(), GetHeight());
 
 			for (double i = 0; i<360.; i+=.15) {
 				for (double j = 0; j<border2; j++) {
@@ -122,8 +122,8 @@ class ColorChooser : public jgui::Component {
 				return true;
 			}
 
-			int x = (event->GetX()-_location.x),
-					y = (event->GetY()-_location.y);
+			int x = event->GetX();
+			int y = event->GetY();
 
 			SetBackgroundColor(_image->GetGraphics()->GetRGB(x, y));
 
@@ -141,7 +141,7 @@ class FrameTest : public jgui::Frame {
 
 	public:
 		FrameTest():
-			jgui::Frame("Color Chooser", 100, 100, 720, 720+30)
+			jgui::Frame("Color Chooser", 32, 32, 360, 360+30)
 		{
 			int size = std::min(GetWidth()-_insets.left-_insets.right, GetHeight()-_insets.top-_insets.bottom);
 

@@ -46,7 +46,7 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 	public:
 		Main(int n, int p):
-			jgui::Frame("Swarm Colony", 0, 0, 1920, 1080)
+			jgui::Frame("Swarm Colony", 0, 0)
 		{
 			srand(time(NULL));
 
@@ -59,15 +59,15 @@ class Main : public jgui::Frame, public jthread::Thread{
 			_particles = new struct particle_t[_size_particles];
 
 			for (int i=0; i<_size_objects; i++) {
-				_objects[i].x = rand()%1820+50;
-				_objects[i].y = rand()%980+50;
+				_objects[i].x = rand()%(_size.width-64)+64;
+				_objects[i].y = rand()%(_size.height-64)+64;
 			}
 
 			_gbest.pi_value = 999999999;
 
 			for (int i=0; i<_size_particles; i++) {
-				_particles[i].pi.x = _particles[i].xi.x = rand()%1820+50;
-				_particles[i].pi.y = _particles[i].xi.y = rand()%980+50;
+				_particles[i].pi.x = _particles[i].xi.x = rand()%(_size.width-64)+64;
+				_particles[i].pi.y = _particles[i].xi.y = rand()%(_size.height-64)+64;
 				
 				double k = 0;
 
@@ -93,6 +93,8 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 		virtual ~Main()
 		{
+			_active = false;
+
 			WaitThread();
 		}
 
@@ -114,9 +116,9 @@ class Main : public jgui::Frame, public jthread::Thread{
 			// for (int j=0; j<1000; j++) {
 			for (int j=0; _active != false; j++) {
 				double r = 10,
-					   vmax = 100,
-					   vmin = -vmax,
-					   xmax = 1920,
+					   // vmax = 100,
+					   // vmin = -vmax,
+					   xmax = _size.width,
 					   xmin = 0;
 				int signal = 1;
 
@@ -133,10 +135,10 @@ class Main : public jgui::Frame, public jthread::Thread{
 								 wmin = 1,
 								 r1,
 								 r2,
-								 x,
-								 kapa = 1,
-								 teta = c1+c2,
-								 c = 2;
+								 x;
+								 // kapa = 1,
+								 // teta = c1+c2,
+								 // c = 2;
 					struct particle_t *p = &_particles[i];
 
 					k = g(p);
@@ -161,8 +163,8 @@ class Main : public jgui::Frame, public jthread::Thread{
 							j = 0;
 							
 							for (int i=0; i<_size_particles; i++) {
-								_particles[i].pi.x = _particles[i].xi.x = rand()%1820+50;
-								_particles[i].pi.y = _particles[i].xi.y = rand()%980+50;
+								_particles[i].pi.x = _particles[i].xi.x = rand()%(_size.width-64)+64;
+								_particles[i].pi.y = _particles[i].xi.y = rand()%(_size.height-64)+64;
 
 								double k = 0;
 
@@ -277,16 +279,16 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			for (int i=0; i<_size_objects; i++) {
-				g->FillRectangle(_objects[i].x, _objects[i].y, 10, 10);
+				g->FillRectangle(_objects[i].x, _objects[i].y, 4, 4);
 			}
 			
 			g->SetColor(0x00, 0xff, 0x00, 0xff);
 			for (int i=0; i<_size_particles; i++) {
-				g->FillRectangle(_particles[i].xi.x, _particles[i].xi.y, 10, 10);
+				g->FillRectangle(_particles[i].xi.x, _particles[i].xi.y, 4, 4);
 			}
 
 			g->SetColor(0xff, 0x00, 0x00, 0xff);
-			g->FillRectangle(_gbest.xi.x, _gbest.xi.y, 10, 10);
+			g->FillRectangle(_gbest.xi.x, _gbest.xi.y, 4, 4);
 		}
 
 };
@@ -295,8 +297,8 @@ int main(int argc, char **argv)
 {
 	Main main(50, 100);
 
-	main.Show();
 	main.Start();
+	main.Show(true);
 
 	return 0;
 }

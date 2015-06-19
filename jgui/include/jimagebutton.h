@@ -40,10 +40,14 @@ class ButtonEvent;
 class ImageButton : public Button{
 
 	protected:
-		Image *_image_icon,
-			*_image_focus_icon;
-		std::string _image,
-			_image_focus;
+		/** \brief */
+		Image *_image_icon;
+		/** \brief */
+		Image *_image_focus_icon;
+		/** \brief */
+		std::string _image;
+		/** \brief */
+		std::string _image_focus;
 
 	public:
 		/**

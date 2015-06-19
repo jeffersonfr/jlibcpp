@@ -29,16 +29,10 @@
 namespace jgui {
 
 IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, int width, int height):
-	Image(width, height, JPF_UNKNOWN, 0, 0)
+	Image(JPF_UNKNOWN, width, height)
 {
 	jcommon::Object::SetClassName("jgui::IndexedImage");
 	
-	GFXHandler *handler = GFXHandler::GetInstance();
-
-	_graphics = new NullGraphics();
-
-	_graphics->SetWorkingScreenSize(handler->GetScreenWidth(), handler->GetScreenHeight());
-
 	_palette = new uint32_t[palette_size];
 	_palette_size = palette_size;
 	
@@ -52,15 +46,9 @@ IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint8_t *data, i
 }
 
 IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, int width, int height):
-	Image(width, height, JPF_UNKNOWN, 0, 0)
+	Image(JPF_UNKNOWN, width, height)
 {
 	jcommon::Object::SetClassName("jgui::IndexedImage");
-
-	GFXHandler *handler = GFXHandler::GetInstance();
-
-	_graphics = new NullGraphics();
-
-	_graphics->SetWorkingScreenSize(handler->GetScreenWidth(), handler->GetScreenHeight());
 
 	_palette = new uint32_t[palette_size];
 	_palette_size = palette_size;
@@ -103,8 +91,6 @@ IndexedImage * IndexedImage::Pack(Image *image)
 
 	if ((void *)image != NULL) {
 		if (image->GetGraphics() != NULL) {
-			GFXHandler *handler = GFXHandler::GetInstance();
-			jsize_t scale = image->GetGraphics()->GetWorkingScreenSize();
 			int size_w = image->GetWidth(),
 					size_h = image->GetHeight();
 			uint32_t *rgb = NULL;
@@ -112,7 +98,7 @@ IndexedImage * IndexedImage::Pack(Image *image)
 			image->GetRGB(&rgb, 0, 0, size_w, size_h);
 
 			if ((void *)rgb != NULL) {
-				packed = Pack(rgb, SCALE_TO_SCREEN(size_w, handler->GetScreenWidth(), scale.width), SCALE_TO_SCREEN(size_h, handler->GetScreenHeight(), scale.height));
+				packed = Pack(rgb, size_w, size_h);
 
 				delete [] rgb;
 			}
@@ -260,32 +246,22 @@ Image * IndexedImage::Scale(int width, int height)
 
 	IndexedImage *image = NULL;
 
-	int size = width*height,
-			srcWidth = GetWidth(),
-			srcHeight = GetHeight(),
-			srcSize = GetWidth()*GetHeight(),
-			yRatio = (srcHeight << 16) / height,
-			xRatio = (srcWidth << 16) / width,
-			xPos = xRatio / 2,
-			yPos = yRatio / 2;
+	int srcWidth = _size.width;
+	int srcHeight = _size.height;
+	double yRatio = srcHeight/(double)height;
+	double xRatio = srcWidth/(double)width;
+	int size = width*height;
 	uint8_t *data = new uint8_t[size];
 
-	for (int x = 0; x < width; x++) {
-		int srcX = xPos >> 16;
+	for(int y=0; y<height; y++) {
+		double src = ((int)(y * yRatio)) * srcWidth;
+		int dst = y * width;
 
-		for(int y = 0 ; y < height ; y++) {
-			int dpixel = x + y * width,
-					spixel = srcX + (yPos >> 16) * srcWidth;
-
-			if((dpixel >= 0 && dpixel < size) && (spixel >= 0 && spixel < srcSize)) {
-				data[dpixel] = _data[spixel];
-			}
-
-			yPos = yPos + yRatio;
+		for (int x=0; x<width; x++) {
+			data[dst + x] = _data[(int)src];
+		
+			src = src + xRatio;
 		}
-
-		yPos = yRatio / 2;
-		xPos = xPos + xRatio;
 	}
 
 	image = new IndexedImage(_palette, _palette_size, data, width, height);
@@ -295,7 +271,7 @@ Image * IndexedImage::Scale(int width, int height)
 	return image;
 }
 
-Image * IndexedImage::SubImage(int x, int y, int width, int height)
+Image * IndexedImage::Crop(int x, int y, int width, int height)
 {
 	if (width <= 0 || height <= 0) {
 		return NULL;
@@ -314,6 +290,36 @@ Image * IndexedImage::SubImage(int x, int y, int width, int height)
 
 	delete [] data;
 
+	return image;
+}
+
+Image * IndexedImage::Blend(double alpha)
+{
+	return NULL;
+}
+
+Image * IndexedImage::Colorize(Color color)
+{
+	IndexedImage *image = NULL;
+
+	uint32_t palette[_palette_size];
+	int red, green, blue;
+	double hue, saturation, brightness;
+
+  Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &hue, &saturation, &brightness);
+
+	for (int i=0; i<_palette_size; i++) {
+		jgui::Color color(_palette[i]);
+		double h, s, b;
+
+  	Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &h, &s, &b);
+		Color::HSBtoRGB(hue, s, b, &red, &green, &blue);
+
+		palette[i] = (0xff << 24) | (red << 16) | (green << 8) | (blue << 0);
+	}
+
+	image = new IndexedImage(palette, _palette_size, _data, GetWidth(), GetHeight());
+	
 	return image;
 }
 
@@ -368,14 +374,9 @@ void IndexedImage::SetPalette(uint32_t *palette, int palette_size)
 	memcpy(_palette, palette, palette_size*sizeof(uint32_t));
 }
 
-void IndexedImage::Release()
+jcommon::Object * IndexedImage::Clone()
 {
-	// do nothing
-}
-
-void IndexedImage::Restore()
-{
-	// do nothing
+	return (jcommon::Object *)(new IndexedImage(_palette, _palette_size, _data, _size.width, _size.height));
 }
 
 }

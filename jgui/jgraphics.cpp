@@ -33,16 +33,12 @@ Graphics::Graphics():
 
 	_font = NULL;
 
-	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
-
-	_scale.width = DEFAULT_SCALE_WIDTH;
-	_scale.height = DEFAULT_SCALE_HEIGHT;
-	
 	_translate.x = 0;
 	_translate.y = 0;
 
 	_vertical_sync = false;
+
+	_antialias = JAM_NORMAL;
 }
 
 Graphics::~Graphics()
@@ -54,7 +50,7 @@ void * Graphics::GetNativeSurface()
 	return NULL;
 }
 
-void Graphics::SetNativeSurface(void *addr)
+void Graphics::SetNativeSurface(void *data, int wp, int hp)
 {
 }
 
@@ -103,60 +99,18 @@ void Graphics::SetCompositeFlags(jcomposite_flags_t t)
 {
 }
 
-void Graphics::SetDrawingFlags(jdrawing_flags_t t)
-{
-}
-
-void Graphics::SetBlittingFlags(jblitting_flags_t t)
-{
-}
-
 void Graphics::SetDrawingMode(jdrawing_mode_t t)
 {
 }
 
 jcomposite_flags_t Graphics::GetCompositeFlags()
 {
-	return JCF_NONE;
-}
-
-jdrawing_flags_t Graphics::GetDrawingFlags()
-{
-	return JDF_NOFX;
-}
-
-jblitting_flags_t Graphics::GetBlittingFlags()
-{
-	return JBF_NOFX;
+	return JCF_CLEAR;
 }
 
 jdrawing_mode_t Graphics::GetDrawingMode()
 {
 	return JDM_STROKE;
-}
-
-void Graphics::SetWorkingScreenSize(jsize_t size)
-{
-	SetWorkingScreenSize(size.width, size.height);
-}
-
-void Graphics::SetWorkingScreenSize(int width, int height)
-{
-	_scale.width = width;
-	_scale.height = height;
-
-	if (_scale.width <= 0) {
-		_scale.width = DEFAULT_SCALE_WIDTH;
-	}
-
-	if (_scale.height <= 0) {
-		_scale.height = DEFAULT_SCALE_HEIGHT;
-	}
-}
-
-jsize_t Graphics::GetWorkingScreenSize()
-{
-	return _scale;
 }
 
 void Graphics::Clear()
@@ -214,16 +168,14 @@ Font * Graphics::GetFont()
 	return _font;
 }
 
-void Graphics::SetAntialias(bool b)
+void Graphics::SetAntialias(jantialias_mode_t mode)
 {
+	_antialias = mode;
 }
 
-void Graphics::SetPixels(uint8_t *pixels)
+jantialias_mode_t Graphics::GetAntialias()
 {
-}
-
-void Graphics::GetPixels(uint8_t **pixels)
-{
+	return _antialias;
 }
 
 void Graphics::SetLineJoin(jline_join_t t)
@@ -369,6 +321,30 @@ void Graphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, int y
 {
 }
 
+jregion_t Graphics::GetStringExtends(std::string text)
+{
+	jregion_t t;
+
+	t.x = 0;
+	t.y = 0;
+	t.width = 0;
+	t.height = 0;
+
+	return t;
+}
+
+jregion_t Graphics::GetGlyphExtends(int symbol)
+{
+	jregion_t t;
+
+	t.x = 0;
+	t.y = 0;
+	t.width = 0;
+	t.height = 0;
+
+	return t;
+}
+
 void Graphics::DrawString(std::string text, int xp, int yp)
 {
 }
@@ -377,62 +353,95 @@ void Graphics::DrawGlyph(int symbol, int xp, int yp)
 {
 }
 
-bool Graphics::DrawImage(std::string img, int xp, int yp)
-{
-	int iwidth,
-			iheight;
-
-	if (Image::GetImageSize(img, &iwidth, &iheight) != false) {
-		int wp = SCREEN_TO_SCALE((iwidth), _screen.width, _scale.width),
-				hp = SCREEN_TO_SCALE((iheight), _screen.height, _scale.height);
-
-		return Graphics::DrawImage(img, xp, yp, wp, hp);
-	}
-
-	return false;
-}
-
-bool Graphics::DrawImage(std::string img, int xp, int yp, int wp, int hp)
-{
-	return false;
-}
-
-bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp)
-{
-	return false;
-}
-
-bool Graphics::DrawImage(std::string img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
-{
-	return false;
-}
-
 bool Graphics::DrawImage(Image *img, int xp, int yp)
 {
-	if ((void *)img == NULL) {
-		return false;
-	}
-
 	return DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight(), xp, yp);
 }
 
 bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 {
-	if ((void *)img == NULL) {
-		return false;
-	}
-
 	return DrawImage(img, 0, 0, img->GetWidth(), img->GetHeight(), xp, yp, wp, hp);
 }
 
 bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
-	return false;
+	if ((void *)img == NULL) {
+		return false;
+	}
+
+	jgui::Image *aux = img->Crop(sxp, syp, swp, shp);
+
+	if (aux == NULL) {
+		return false;
+	}
+
+	jgui::Image *buffer = jgui::Image::CreateImage(aux->GetPixelFormat(), aux->GetWidth(), aux->GetHeight());
+
+	if (buffer == NULL) {
+		return false;
+	}
+
+	uint32_t *rgb = NULL;
+
+	aux->GetRGB(&rgb, 0, 0, swp, shp);
+
+	if (rgb != NULL) {
+		buffer->GetGraphics()->SetRGB(rgb, _translate.x+xp, _translate.y+yp, swp, shp);
+
+		delete [] rgb;
+
+		DrawImage(buffer, xp, yp);
+	}
+
+	delete aux;
+
+	return true;
 }
 
 bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
-	return false;
+	sleep(1);
+	if ((void *)img == NULL) {
+		return false;
+	}
+
+	jgui::Image *aux = img->Crop(sxp, syp, swp, shp);
+
+	if (aux == NULL) {
+		return false;
+	}
+
+	jgui::Image *scl = aux->Scale(wp, hp);
+
+	if (scl == NULL) {
+		return false;
+	}
+
+	delete aux;
+
+	jgui::Image *buffer = jgui::Image::CreateImage(scl->GetPixelFormat(), scl->GetWidth(), scl->GetHeight());
+
+	if (buffer == NULL) {
+		delete scl;
+
+		return false;
+	}
+
+	uint32_t *rgb = NULL;
+
+	scl->GetRGB(&rgb, 0, 0, wp, hp);
+
+	if (rgb != NULL) {
+		buffer->GetGraphics()->SetRGB(rgb, _translate.x+xp, _translate.y+yp, wp, hp);
+
+		delete [] rgb;
+
+		DrawImage(buffer, xp, yp);
+	}
+
+	delete scl;
+
+	return true;
 }
 
 void Graphics::Translate(int x, int y)
@@ -455,7 +464,7 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 	return 0;
 }
 
-void Graphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp, int scansize)
+void Graphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
 	(*rgb) = NULL;
 }
@@ -464,7 +473,7 @@ void Graphics::SetRGB(uint32_t argb, int xp, int yp)
 {
 }
 
-void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp, int scanline) 
+void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp) 
 {
 }
 

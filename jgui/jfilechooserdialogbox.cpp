@@ -39,8 +39,6 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 {
 	jcommon::Object::SetClassName("jgui::FileChooserDialogBox");
 
-	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
-
 	_label = NULL;
 	_file = NULL;
 

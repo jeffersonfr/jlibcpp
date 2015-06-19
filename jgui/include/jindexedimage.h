@@ -34,8 +34,11 @@ class Graphics;
 class IndexedImage : public jgui::Image{
 
 	private:
+		/** \brief */
 		uint32_t *_palette;
+		/** \brief */
 		int _palette_size;
+		/** \brief */
 		uint8_t *_data;
 
 	public:
@@ -91,7 +94,19 @@ class IndexedImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
-		virtual Image * SubImage(int xp, int yp, int wp, int hp);
+		virtual Image * Crop(int xp, int yp, int wp, int hp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * Blend(double alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * Colorize(Color color);
 
 		/**
 		 * \brief
@@ -115,13 +130,7 @@ class IndexedImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
-		virtual void Release();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Restore();
+		virtual jcommon::Object * Clone();
 
 };
 

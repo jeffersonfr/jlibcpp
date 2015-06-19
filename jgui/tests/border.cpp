@@ -32,26 +32,29 @@ class BorderTest : public jgui::Frame {
 
 	public:
 		BorderTest():
-			jgui::Frame("Border Test", 0, 0, 1920, 1080)
+			jgui::Frame("Border Test")
 		{
-			int w = 300,
-					h = 150,
-					gapx = 50,
-					gapy = 50,
-					dx = (1920-5*w-4*gapx)/2,
-					dy = (1080-2*h-1*gapy)/2;
+			int gapx = 32;
+			int gapy = 320;
+			int w = (_size.width-4*gapx)/5;
+			int h = (_size.height-1*gapy)/2;
+			int dx = (_size.width-5*w-4*gapx)/2;
+			int dy = (_size.height-2*h-1*gapy)/2;
 
-			_components.push_back(new jgui::Button("Empty", dx+0*(w+gapx), dy+0*(h+gapy), w, h));
-			_components.push_back(new jgui::Button("Line", dx+1*(w+gapx), dy+0*(h+gapy), w, h));
-			_components.push_back(new jgui::Button("Bevel", dx+2*(w+gapx), dy+0*(h+gapy), w, h));
-			_components.push_back(new jgui::Button("Round", dx+3*(w+gapx), dy+0*(h+gapy), w, h));
-			_components.push_back(new jgui::Button("Raised Gradient", dx+4*(w+gapx), dy+0*(h+gapy), w, h));
+			gapx = gapx/2;
+			gapy = gapy/3;
+
+			_components.push_back(new jgui::Button("Empty", dx+0*(w+gapx)+2*gapx, dy+0*(h+gapy)+gapy, w, h));
+			_components.push_back(new jgui::Button("Line", dx+1*(w+gapx)+2*gapx, dy+0*(h+gapy)+gapy, w, h));
+			_components.push_back(new jgui::Button("Bevel", dx+2*(w+gapx)+2*gapx, dy+0*(h+gapy)+gapy, w, h));
+			_components.push_back(new jgui::Button("Round", dx+3*(w+gapx)+2*gapx, dy+0*(h+gapy)+gapy, w, h));
+			_components.push_back(new jgui::Button("Raised Gradient", dx+4*(w+gapx)+2*gapx, dy+0*(h+gapy)+gapy, w, h));
 			
-			_components.push_back(new jgui::Button("Lowered Gradient", dx+0*(w+gapx), dy+1*(h+gapy), w, h));
-			_components.push_back(new jgui::Button("Raised Bevel", dx+1*(w+gapx), dy+1*(h+gapy), w, h));
-			_components.push_back(new jgui::Button("Lowered Bevel", dx+2*(w+gapx), dy+1*(h+gapy), w, h));
-			_components.push_back(new jgui::Button("Raised Etched", dx+3*(w+gapx), dy+1*(h+gapy), w, h));
-			_components.push_back(new jgui::Button("Lowered Etched", dx+4*(w+gapx), dy+1*(h+gapy), w, h));
+			_components.push_back(new jgui::Button("Lowered Gradient", dx+0*(w+gapx)+2*gapx, dy+1*(h+gapy)+gapy, w, h));
+			_components.push_back(new jgui::Button("Raised Bevel", dx+1*(w+gapx)+2*gapx, dy+1*(h+gapy)+gapy, w, h));
+			_components.push_back(new jgui::Button("Lowered Bevel", dx+2*(w+gapx)+2*gapx, dy+1*(h+gapy)+gapy, w, h));
+			_components.push_back(new jgui::Button("Raised Etched", dx+3*(w+gapx)+2*gapx, dy+1*(h+gapy)+gapy, w, h));
+			_components.push_back(new jgui::Button("Lowered Etched", dx+4*(w+gapx)+2*gapx, dy+1*(h+gapy)+gapy, w, h));
 
 			_components[0]->SetBorder(jgui::JCB_EMPTY);
 			_components[1]->SetBorder(jgui::JCB_LINE);

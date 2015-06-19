@@ -43,9 +43,12 @@ class Button : public Component{
 		std::string _label;
 
 	protected:
+		/** \brief */
 		jhorizontal_align_t _halign;
+		/** \brief */
 		jvertical_align_t _valign;
-		bool _wrap;
+		/** \brief */
+		bool _is_wrap;
 
 	public:
 		/**
@@ -66,6 +69,17 @@ class Button : public Component{
 		 */
 		virtual ~Button();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetWrap(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsWrap();
 		/**
 		 * \brief
 		 *

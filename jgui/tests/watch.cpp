@@ -31,9 +31,9 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 	public:
 		WatchTeste():
-			jgui::Frame("Watch Teste", 0, 0, 1920/4, 1080/2)
+			jgui::Frame("Watch Teste", 0, 0, 320, 320)
 		{
-			SetMinimumSize(400, 400);
+			SetMinimumSize(320, 320);
 
 			jcommon::Date date;
 

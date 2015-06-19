@@ -36,9 +36,12 @@ namespace jgui {
 class Slider : public jgui::SliderComponent{
 
 	private:
+		/** \brief */
 		int _stone_size;
-		bool _pressed,
-			_inverted;
+		/** \brief */
+		bool _pressed;
+		/** \brief */
+		bool _inverted;
 
 	public:
 		/**

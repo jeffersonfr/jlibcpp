@@ -204,7 +204,7 @@ void ToogleButton::Paint(Graphics *g)
 
 			std::string text = GetLabel();
 
-			if (_wrap == false) {
+			if (_is_wrap == false) {
 				text = _font->TruncateString(text, "...", pw);
 			}
 
@@ -217,7 +217,6 @@ void ToogleButton::Paint(Graphics *g)
 
 		color.SetAlpha(0x80);
 
-		g->SetDrawingFlags(JDF_BLEND);
 		g->SetColor(color);
 		g->FillRectangle(0, 0, _size.width, _size.height);
 	}

@@ -40,9 +40,6 @@ class InputManager : public virtual jcommon::Object{
 		static InputManager *_instance;
 		
 	protected:
-		jsize_t _screen,
-			_scale;
-
 		/**
 		 * \brief
 		 *
@@ -61,24 +58,6 @@ class InputManager : public virtual jcommon::Object{
 		 *
 		 */
 		static InputManager * GetInstance();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetWorkingScreenSize();
 
 		/**
 		 * \brief

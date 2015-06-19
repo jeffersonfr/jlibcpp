@@ -39,10 +39,14 @@ class ButtonEvent;
 class Label : public jgui::Component{
 
 	private:
+		/** \brief */
 		std::string _text;
+		/** \brief */
 		jhorizontal_align_t _halign;
+		/** \brief */
 		jvertical_align_t _valign;
-		bool _wrap;
+		/** \brief */
+		bool _is_wrap;
 
 	public:
 		/**
@@ -74,6 +78,12 @@ class Label : public jgui::Component{
 		 *
 		 */
 		virtual void SetWrap(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsWrap();
 		
 		/**
 		 * \brief

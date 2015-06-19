@@ -51,7 +51,7 @@ void Display::Paint(jgui::Graphics *g)
 	int size = 40;
 
 	if (GetFont() != NULL) {
-		size = GetFont()->GetLineSize();
+		size = GetFont()->GetSize();
 
 		g->SetFont(_font);
 	}

@@ -33,7 +33,7 @@ Menu::Menu(int x, int y, int width, int visible_items):
 	_top_index = 0;
 	_menu_align = JMA_ITEM;
 	_visible_items = visible_items;
-	_item_size = DEFAULT_ITEM_SIZE;
+	_item_size = DEFAULT_COMPONENT_HEIGHT;
 
 	if (_visible_items < 1) {
 		_visible_items = 1;
@@ -475,7 +475,7 @@ void Menu::Paint(Graphics *g)
 			// }
 
 			g->SetColor(_fgcolor);
-			g->DrawString(text, x+(w-_font->GetStringWidth(text))/2, (insets.top-_font->GetLineSize()+_font->GetLeading())/2);
+			g->DrawString(text, x+(w-_font->GetStringWidth(text))/2, (insets.top-_font->GetSize())/2);
 		}
 		
 		y = y + insets.top - 2*_vertical_gap;

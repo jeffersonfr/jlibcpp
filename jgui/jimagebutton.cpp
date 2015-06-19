@@ -133,7 +133,7 @@ void ImageButton::Paint(Graphics *g)
 
 			std::string text = GetLabel();
 
-			if (_wrap == false) {
+			if (_is_wrap == false) {
 				text = _font->TruncateString(text, "...", pw);
 			}
 

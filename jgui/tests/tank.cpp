@@ -48,8 +48,8 @@ class Main : public jgui::Frame, public jthread::Thread{
 			_ty = 200;
 			_tw = 60;
 			_th = 50;
-			_tile_w = 64;
-			_tile_h = 64;
+			_tile_w = 48;
+			_tile_h = 48;
 			_step = 0;
 			_angle = 0.0;
 			_has_bullet = false;
@@ -62,11 +62,15 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 			_tc = _tc/2;
 
-			_image = jgui::Image::CreateImage(_tw, _th);
-			_tiles = jgui::Image::CreateImage((10*_tile_w), (4*_tile_h));
+			jgui::Image *image;
 
-			_image->GetGraphics()->DrawImage("images/tank2.png", 0, 0, _tw, _th);
-			_tiles->GetGraphics()->DrawImage("images/tiles.png", 0, 0, (10*_tile_w), (4*_tile_h));
+			image = jgui::Image::CreateImage("images/tank2.png");
+			_image = image->Scale(_tw, _th);
+			delete image;
+
+			image = jgui::Image::CreateImage("images/tiles.png");
+			_tiles = image->Scale(10*_tile_w, 4*_tile_h);
+			delete image;
 
 			SetSize((int)(10*_tile_w+_insets.left+_insets.right), (8*_tile_h+_insets.top+_insets.bottom));
 		}

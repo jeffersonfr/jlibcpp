@@ -24,24 +24,33 @@
 
 namespace jgui {
 
-DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size, int scale_width, int scale_height):
-	jgui::Font(name, attributes, size, scale_width, scale_height)
+DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size):
+	jgui::Font(name, attributes, size)
 {
 	jcommon::Object::SetClassName("jgui::DFBFont");
 
+	jio::File file(name);
+
 	_font = NULL;
+	_is_builtin = false;
 
-	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(name, size, &_font, _scale.width, _scale.height);
+	if (file.Exists() == false) {
+		_is_builtin = true;
+	} else {
+		dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(name, size, &_font, "Unicode");
+	}
 
-	if (_font == NULL) {
+	if (_is_builtin == false && _font == NULL) {
 		throw jcommon::NullPointerException("Cannot create a native font");
 	}
 
-	_size = size;
-	
-	_font->GetHeight(_font, &_line_size);
-	_font->GetAscender(_font, &_ascender);
-	_font->GetDescender(_font, &_descender);
+	_charset = "Unicode";
+
+	_leading = -1;
+	_ascender = -1;
+	_descender = -1;
+	_max_advance_width = -1;
+	_max_advance_height = -1;
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
 }
@@ -51,8 +60,61 @@ DFBFont::~DFBFont()
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Remove(this);
 
 	if (_font != NULL) {
-		_font->Release(_font);
+		cairo_font_face_destroy(_font);
+		// FT_Done_Face (ft_face);
 	}
+}
+
+void DFBFont::ApplyContext(void *ctx)
+{
+	cairo_t *context = (cairo_t *)ctx;
+
+	cairo_font_extents_t t;
+
+	if (_is_builtin == false) {
+		int attr = 0;
+
+		if ((_attributes & JFA_BOLD) != 0) {
+			attr = attr | CAIRO_FT_SYNTHESIZE_BOLD;
+		}
+
+		if ((_attributes & JFA_ITALIC) != 0) {
+			attr = attr | CAIRO_FT_SYNTHESIZE_OBLIQUE;
+		}
+
+		cairo_ft_font_face_set_synthesize(_font, attr);
+		cairo_set_font_face(context, (cairo_font_face_t *)_font);
+	} else {
+		cairo_font_slant_t slant = CAIRO_FONT_SLANT_NORMAL;
+		cairo_font_weight_t weight = CAIRO_FONT_WEIGHT_NORMAL;
+
+		if ((_attributes & JFA_BOLD) != 0) {
+			weight = CAIRO_FONT_WEIGHT_BOLD;
+		}
+
+		if ((_attributes & JFA_ITALIC) != 0) {
+			slant = CAIRO_FONT_SLANT_ITALIC;
+		}
+
+		cairo_select_font_face(context, _name.c_str(), slant, weight);
+	}
+
+	// INFO:: setting font options
+	cairo_font_options_t *options = cairo_font_options_create();
+
+	// INFO:: DEFAULT, NONE, GRAY, SUBPIXEL, FAST, GOOD, BEST
+	cairo_font_options_set_antialias(options, CAIRO_ANTIALIAS_SUBPIXEL);
+	cairo_set_font_options(context, options);
+	cairo_font_options_destroy(options);
+
+	cairo_set_font_size(context, _size);
+	cairo_font_extents (context, &t);
+
+	_ascender = t.ascent;
+	_descender = t.descent;
+	_leading = t.height - t.ascent - t.descent;
+	_max_advance_width = t.max_x_advance;
+	_max_advance_height = t.max_y_advance;
 }
 
 jfont_attributes_t DFBFont::GetFontAttributes()
@@ -65,23 +127,48 @@ void * DFBFont::GetNativeFont()
 	return _font;
 }
 
-bool DFBFont::SetEncoding(std::string code)
+bool DFBFont::SetEncoding(std::string charset)
 {
-	DFBTextEncodingID enc_id;
-	
-	if (_font == NULL) {
+	if (_is_builtin == true) {
 		return false;
 	}
 
-	if (_font->FindEncoding(_font, code.c_str(), &enc_id) != DFB_OK) {
+	if (strcasecmp(charset.c_str(), "utf") == 0 || strcasecmp(charset.c_str(), "uni") == 0) {
+		charset = "Unicode";
+	} else if (strcasecmp(charset.c_str(), "latin1") == 0 || strcasecmp(charset.c_str(), "latin-1") == 0) {
+		charset = "Latin-1";
+	} else if (strcasecmp(charset.c_str(), "ms_symbol") == 0 || strcasecmp(charset.c_str(), "ms-symbol") == 0) {
+		charset = "MS Symbol";
+	} else if (strcasecmp(charset.c_str(), "sjis") == 0) {
+		charset = "SJIS";
+	} else if (strcasecmp(charset.c_str(), "gb2312") == 0 || strcasecmp(charset.c_str(), "gb-2312") == 0) {
+		charset = "GB-2312";
+	} else if (strcasecmp(charset.c_str(), "big5") == 0 || strcasecmp(charset.c_str(), "big-5") == 0) {
+		charset = "Big-5";
+	} else if (strcasecmp(charset.c_str(), "wansung") == 0) {
+		charset = "Wansung";
+	} else if (strcasecmp(charset.c_str(), "johab") == 0) {
+		charset = "Johab";
+	} else {
 		return false;
 	}
 
-	if (_font->SetEncoding(_font, enc_id) != DFB_OK) {
-		return false;
+	_charset = charset;
+
+	if (_font != NULL) {
+		cairo_font_face_destroy(_font);
+
+		_font = NULL;
 	}
+		
+	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(_name, _size, &_font, _charset);
 
 	return true;
+}
+
+std::string DFBFont::GetEncoding()
+{
+	return _charset;
 }
 
 std::string DFBFont::GetName()
@@ -96,106 +183,97 @@ int DFBFont::GetSize()
 
 int DFBFont::GetAscender()
 {
-	return SCREEN_TO_SCALE(_ascender, _screen.height, _scale.height)-_size;
+	return _ascender;
 }
 
 int DFBFont::GetDescender()
 {
-	return SCREEN_TO_SCALE(abs(_descender), _screen.height, _scale.height);
+	return abs(_descender);
 }
 
-int DFBFont::GetMaxAdvance()
+int DFBFont::GetMaxAdvanceWidth()
 {
-	return SCREEN_TO_SCALE(_max_advance, _screen.width, _scale.width);
+	return _max_advance_width;
+}
+
+int DFBFont::GetMaxAdvanceHeight()
+{
+	return _max_advance_height;
 }
 
 int DFBFont::GetLeading()
 {
-	return SCREEN_TO_SCALE(_line_size-_ascender+_descender, _screen.height, _scale.height);
+	return _leading;
 }
 
 int DFBFont::GetStringWidth(std::string text)
 {
-	int size = 0;
+	jregion_t t = GetStringExtends(text);
 
-	if (_font == NULL) {
-		return 0;
-	}
-
-	_font->GetStringWidth(_font, text.c_str(), -1, &size);
-	
-	return SCREEN_TO_SCALE(size, _screen.width, _scale.width);
+	return t.x+t.width;
 }
 
 jregion_t DFBFont::GetStringExtends(std::string text)
 {
-	jregion_t region;
+	cairo_text_extents_t ts, tc;
 
-	region.x = 0;
-	region.y = 0;
-	region.width = 0;
-	region.height = 0;
+	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
+	cairo_t *context = cairo_create(surface);
 
-	if (_font == NULL) {
-		return region;
-	}
+	ApplyContext(context);
 
-	DFBRectangle lrect;
-							 // irect;
-
-	_font->GetStringExtents(_font, text.c_str(), -1, &lrect, NULL); // &irect);
-
-	region.x = SCREEN_TO_SCALE(lrect.x, _screen.width, _scale.width);
-	region.y = SCREEN_TO_SCALE(lrect.y, _screen.height, _scale.height);
-	region.width = SCREEN_TO_SCALE(lrect.w, _screen.width, _scale.width);
-	region.height = SCREEN_TO_SCALE(lrect.h, _screen.height, _scale.height);
+	cairo_text_extents(context, (text+'A').c_str(), &ts);
+	cairo_text_extents(context, "A", &tc);
 	
-	return region;
+	cairo_surface_destroy(surface);
+	cairo_destroy(context);
+
+	jregion_t r;
+
+	r.x = ts.x_bearing;
+	r.y = ts.y_bearing;
+	r.width = ts.width-tc.width;
+	r.height = ts.height;
+
+	return r;
 }
 
 jregion_t DFBFont::GetGlyphExtends(int symbol)
 {
-	jregion_t region;
+	cairo_text_extents_t t;
+	cairo_glyph_t glyph;
 
-	region.x = 0;
-	region.y = 0;
-	region.width = 0;
-	region.height = 0;
+	glyph.x = 0;
+	glyph.y = 0;
+	glyph.index = symbol;
 
-	if (_font == NULL) {
-		return region;
-	}
+	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
+	cairo_t *context = cairo_create(surface);
 
-	DFBRectangle lrect;
-	int advance;
+	cairo_set_font_face(context, (cairo_font_face_t *)_font);
+	cairo_set_font_size(context, _size);
 
-	_font->GetGlyphExtents(_font, symbol, &lrect, &advance);
-
-	region.x = SCREEN_TO_SCALE(lrect.x, _screen.width, _scale.width);
-	region.y = SCREEN_TO_SCALE(lrect.y, _screen.height, _scale.height);
-	region.width = SCREEN_TO_SCALE(lrect.w, _screen.width, _scale.width);
-	region.height = SCREEN_TO_SCALE(lrect.h, _screen.height, _scale.height);
+	cairo_glyph_extents(context, &glyph, 1, &t);
 	
-	return region;
+	cairo_surface_destroy(surface);
+	cairo_destroy(context);
+
+	jregion_t r;
+
+	r.x = t.x_bearing;
+	r.y = t.y_bearing;
+	r.width = t.width;
+	r.height = t.height;
+
+	return r;
 }
 
 void DFBFont::Release()
 {
-	if (_font != NULL) {
-		_font->Dispose(_font);
-		_font->Release(_font);
-		_font = NULL;
-	}
 }
 
 void DFBFont::Restore()
 {
-	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
-
-	if (_font == NULL) {
-		dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(_name, GetSize(), &_font, _scale.width, _scale.height);
-	}
 }
 
 }

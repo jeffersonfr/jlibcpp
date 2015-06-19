@@ -30,7 +30,7 @@ Label::Label(std::string text, int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Label");
 
-	_wrap = false;
+	_is_wrap = false;
 	_halign = JHA_CENTER;
 	_valign = JVA_CENTER;
 
@@ -45,13 +45,18 @@ Label::~Label()
 
 void Label::SetWrap(bool b)
 {
-	if (_wrap == b) {
+	if (_is_wrap == b) {
 		return;
 	}
 
-	_wrap = b;
+	_is_wrap = b;
 
 	Repaint();
+}
+
+bool Label::IsWrap()
+{
+	return _is_wrap;
 }
 
 std::string Label::GetText()
@@ -100,7 +105,7 @@ jsize_t Label::GetPreferredSize()
 
 	if (IsFontSet() == true) {
 		int wp = _size.width-2*(_horizontal_gap-_border_size),
-				hp = _font->GetLineSize();
+				hp = _font->GetSize();
 
 		if (wp > 0) {
 			std::vector<std::string> lines;
@@ -120,7 +125,7 @@ void Label::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	if (_font != NULL) {
+	if (IsFontSet() == true) {
 		if (_is_enabled == true) {
 			if (_has_focus == true) {
 				g->SetColor(_focus_fgcolor);
@@ -154,7 +159,7 @@ void Label::Paint(Graphics *g)
 
 		std::string text = GetText();
 
-		if (_wrap == false) {
+		if (_is_wrap == false) {
 			text = _font->TruncateString(text, "...", w);
 		}
 

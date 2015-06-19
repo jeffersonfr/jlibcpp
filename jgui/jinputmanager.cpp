@@ -20,10 +20,8 @@
 #include "Stdafx.h"
 #include "jinputmanager.h"
 
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 #include "jdfbinputmanager.h"
-#elif defined(X11_UI)
-#include "jsdlinputmanager.h"
 #endif
 
 namespace jgui {
@@ -35,12 +33,6 @@ InputManager::InputManager()
 	jcommon::Object::SetClassName("jgui::InputManager");
 
 	// jpoint_t p = GFXHandler::GetInstance()->GetMousePosition();
-
-	_screen.width = GFXHandler::GetInstance()->GetScreenWidth();
-	_screen.height = GFXHandler::GetInstance()->GetScreenHeight();
-
-	_scale.width = DEFAULT_SCALE_WIDTH;
-	_scale.height = DEFAULT_SCALE_HEIGHT;
 }
 
 InputManager::~InputManager() 
@@ -50,15 +42,8 @@ InputManager::~InputManager()
 InputManager * InputManager::GetInstance()
 {
 	if (_instance == NULL){
-#if defined(DIRECTFB_UI) || defined(DIRECTFB_CAIRO_UI)
+#if defined(DIRECTFB_UI)
 		DFBInputManager *manager = new DFBInputManager();
-
-		manager->Initialize();
-		manager->Start();
-
-		_instance = manager;
-#elif defined(X11_UI)
-		X11InputManager *manager = new X11InputManager();
 
 		manager->Initialize();
 		manager->Start();
@@ -68,30 +53,6 @@ InputManager * InputManager::GetInstance()
 	}
 
 	return _instance;
-}
-
-void InputManager::SetWorkingScreenSize(jsize_t size)
-{
-	SetWorkingScreenSize(size.width, size.height);
-}
-
-void InputManager::SetWorkingScreenSize(int width, int height)
-{
-	_scale.width = width;
-	_scale.height = height;
-
-	if (_scale.width <= 0) {
-		_scale.width = jgui::GFXHandler::GetInstance()->GetScreenWidth();
-	}
-
-	if (_scale.height <= 0) {
-		_scale.height = jgui::GFXHandler::GetInstance()->GetScreenHeight();
-	}
-}
-
-jsize_t InputManager::GetWorkingScreenSize()
-{
-	return _scale;
 }
 
 void InputManager::SetKeyEventsEnabled(bool b)

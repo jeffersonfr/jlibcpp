@@ -52,9 +52,8 @@ class Font : public virtual jcommon::Object{
 		static Font *_default_font;
 
 	protected:
-		struct jsize_t _screen;
-		struct jsize_t _scale;
 		std::string _name;
+		int _size;
 		jfont_attributes_t _attributes;
 
 	protected:
@@ -62,7 +61,7 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		Font(std::string name, jfont_attributes_t attributes, int size, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Font(std::string name, jfont_attributes_t attributes, int size);
 		
 	public:
 		/**
@@ -75,13 +74,19 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void ApplyContext(void *ctx);
+
+		/**
+		 * \brief
+		 *
+		 */
 		static Font * GetDefaultFont();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		static Font * CreateFont(std::string name, jfont_attributes_t attributes, int size, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		static Font * CreateFont(std::string name, jfont_attributes_t attributes, int size);
 
 		/**
 		 * \brief
@@ -99,37 +104,19 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetWorkingScreenSize(jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetWorkingScreenSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual bool SetEncoding(std::string code);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual std::string GetName();
+		virtual std::string GetEncoding();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetLineSize();
+		virtual std::string GetName();
 		
 		/**
 		 * \brief
@@ -153,7 +140,13 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual int GetMaxAdvance();
+		virtual int GetMaxAdvanceWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetMaxAdvanceHeight();
 		
 		/**
 		 * \brief
@@ -183,7 +176,7 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, jhorizontal_align_t halign = JHA_JUSTIFY);
+		virtual void GetStringBreak(std::vector<std::string> *lines, std::string text, int wp, int hp, bool justify = true);
 		
 		/**
 		 * \brief

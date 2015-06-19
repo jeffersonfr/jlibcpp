@@ -50,34 +50,35 @@ class Mines : public jgui::Frame{
 	};
 
 	private:
-	jthread::Mutex mines_mutex;
-	jgui::Image *small_bomb,
-		*huge_bomb,
-		*flag,
-		*smile_face,
-		*dead_face;
-	block_t *board;
-	int size,
-			max_rows,
-			max_cols,
-			current_row,
-			current_col,
-			max_bombs,
-			hide_bombs;
-	game_status_t game_state;
+		jthread::Mutex mines_mutex;
+		jgui::Window *_current;
+		jgui::Image *small_bomb;
+		jgui::Image *huge_bomb;
+		jgui::Image *flag;
+		jgui::Image *smile_face;
+		jgui::Image *dead_face;
+		block_t *board;
+		int size;
+		int max_rows;
+		int max_cols;
+		int current_row;
+		int current_col;
+		int max_bombs;
+		int hide_bombs;
+		game_status_t game_state;
 
 	public:
-	Mines(int x, int y);
-	virtual ~Mines();
+		Mines(int x, int y);
+		virtual ~Mines();
 
-	virtual void Paint(jgui::Graphics *g);
+		virtual void Paint(jgui::Graphics *g);
 
-	void InitializeFlags();
-	void SetupBoard();
-	void Expose(int row, int col);
-	game_status_t GetResult();
+		void InitializeFlags();
+		void SetupBoard();
+		void Expose(int row, int col);
+		game_status_t GetResult();
 
-	virtual bool KeyPressed(jgui::KeyEvent *event);
+		virtual bool KeyPressed(jgui::KeyEvent *event);
 
 };
 

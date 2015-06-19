@@ -23,11 +23,11 @@
 namespace jgui {
 
 TextDialogBox::TextDialogBox(std::string msg, bool wrap):
-   	jgui::DialogBox("", 0, 0, 1000, 600)
+	jgui::DialogBox("", -1, -1, -1, -1)
 {
 	jcommon::Object::SetClassName("jgui::TextDialogBox");
 
-	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
+	_label = new Label(msg, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
 
 	_label->SetGap(10, 10);
 	_label->SetWrap(true);
@@ -39,8 +39,6 @@ TextDialogBox::TextDialogBox(std::string msg, bool wrap):
 	Add(_label);
 
 	Pack();
-
-	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 }
 
 TextDialogBox::~TextDialogBox() 

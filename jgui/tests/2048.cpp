@@ -60,7 +60,7 @@ class Tile {
 class Game2048 : public jgui::Frame {
 	
 	private:
-		std::map<int, std::string> _images;
+		std::map<int, jgui::Image *> _images;
 		Tile board[4][4];
 		int score;
 		bool win;
@@ -81,7 +81,7 @@ class Game2048 : public jgui::Frame {
 
 				o << i;
 
-				_images[i] = "images/2048/tux-n" + o.str() + ".png";
+				_images[i] = jgui::Image::CreateImage("images/2048/tux-n" + o.str() + ".png");
 
 				i = i*2;
 			}
@@ -91,6 +91,13 @@ class Game2048 : public jgui::Frame {
 
 		virtual ~Game2048()
 		{
+			for (int i=0; i<(int)_images.size(); i++) {
+				jgui::Image *image = _images[i];
+
+				delete image;
+			}
+
+			_images.clear();
 		}
 
 	private:

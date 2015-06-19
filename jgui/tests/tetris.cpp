@@ -320,7 +320,7 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 		virtual void Paint(jgui::Graphics *g)
 		{
 			if (goff == NULL && d.width>0 && d.height>0) {
-				ii = jgui::Image::CreateImage(d.width, d.height);
+				ii = jgui::Image::CreateImage(jgui::JPF_ARGB, d.width, d.height);
 
 				goff = ii->GetGraphics();
 			}

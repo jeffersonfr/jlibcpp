@@ -49,16 +49,23 @@ class Container : public jgui::Component{
 	friend class Component;
 
 	protected:
+		/** \brief */
 		jthread::Mutex _container_mutex;
-
+		/** \brief */
 		std::vector<ContainerListener *> _container_listeners;
+		/** \brief */
 		std::vector<Component *> _components;
+		/** \brief */
 		Component *_focus;
+		/** \brief */
 		Layout *_default_layout;
+		/** \brief */
 		Layout *_layout;
+		/** \brief */
 		jsize_t _scroll_dimension;
+		/** \brief */
 		jinsets_t _insets;
-		jsize_t _scale;
+		/** \brief */
 		bool _optimized_paint;
 
 	protected:
@@ -101,7 +108,7 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		Container(int x = 0, int y = 0, int width = 0, int height = 0, int scale_width = DEFAULT_SCALE_WIDTH, int scale_height = DEFAULT_SCALE_HEIGHT);
+		Container(int x = 0, int y = 0, int width = 0, int height = 0);
 		
 		/**
 		 * \brief
@@ -109,24 +116,6 @@ class Container : public jgui::Component{
 		 */
 		virtual ~Container();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(jsize_t size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWorkingScreenSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetWorkingScreenSize();
-		
 		/**
 		 * \brief
 		 *
@@ -240,6 +229,12 @@ class Container : public jgui::Component{
 		 *
 		 */
 		virtual Component * GetComponentAt(int x, int y);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jsize_t GetPreferredSize();
 
 		/**
 		 * \brief

@@ -23,14 +23,14 @@
 namespace jgui {
 
 MessageDialogBox::MessageDialogBox(std::string title, std::string msg):
-   	jgui::DialogBox(title, 0, 0, 1000, 600)
+	jgui::DialogBox(title, -1, -1, -1, -1)
 {
 	jcommon::Object::SetClassName("jgui::MessageDialogBox");
 
 	int cw = DEFAULT_COMPONENT_WIDTH,
 			ch = DEFAULT_COMPONENT_HEIGHT;
 
-	_label = new Label(msg, _insets.left, _insets.top, _size.width, _size.height);
+	_label = new Label(msg, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
 
 	_label->SetGap(10, 10);
 	_label->SetWrap(true);
@@ -49,8 +49,6 @@ MessageDialogBox::MessageDialogBox(std::string title, std::string msg):
 	_ok->RequestFocus();
 
 	Pack();
-
-	SetLocation((_scale.width-GetWidth())/2, (_scale.height-GetHeight())/2);
 }
 
 MessageDialogBox::~MessageDialogBox() 

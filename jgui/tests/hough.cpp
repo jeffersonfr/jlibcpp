@@ -167,7 +167,7 @@ class Test : public jgui::Frame {
 
 	public:
 		Test():
-			jgui::Frame("Hough Test", 0, 0, 1920, 1080)
+			jgui::Frame("Hough Test", 0, 0, 960, 540)
 		{
 			_binary_threshold = 195;
 			_lines_threshold = 195;
@@ -190,7 +190,7 @@ class Test : public jgui::Frame {
 			// INFO:: get  pixels
 			uint32_t *data = NULL;
 
-			_image->GetGraphics()->GetRGB(&data, 0, 0, size.width, size.height, size.width);
+			_image->GetGraphics()->GetRGB(&data, 0, 0, size.width, size.height);
 
 			// INFO:: convert to gray and binarize
 			uint8_t *gray = new uint8_t[size.width*size.height];
