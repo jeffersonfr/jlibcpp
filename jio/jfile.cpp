@@ -318,17 +318,15 @@ File::File(std::string prefix, std::string sufix, bool is_directory):
 #else
 	if (is_directory == false) {
 		std::string tmp = prefix + "XXXXXX" + sufix;
+		char *path = strdup(tmp.c_str());
 
-		_fd = mkstemp((char *)tmp.c_str());
-			
-		/* TODO:: get filename by file descriptor
-		char path[PATH_MAX];
+		_fd = mkstemp(path);
 
-		if (fcntl(_fd, F_GETPATH, path) >= 0) {
-			_filename = path;
+		if (_fd > 0) {
+			_exists = true;
 		}
-		*/
-
+			
+		_filename = std::string(path);
 		_type = JFT_REGULAR;
 	} else {
 		std::string tmp = prefix + "XXXXXX" + sufix;
