@@ -73,7 +73,7 @@ class PlayerTest : public jgui::Frame, public jmedia::PlayerListener, public jme
 
 	public:
 		PlayerTest(std::string file):
-			jgui::Frame("Player Test", 0, 0, 1920, 1080)
+			jgui::Frame("Player Test")
 		{
 			jgui::jsize_t size = GetSize();
 

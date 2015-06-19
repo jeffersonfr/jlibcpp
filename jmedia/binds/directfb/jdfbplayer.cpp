@@ -33,11 +33,13 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
+		IDirectFBSurface *_surface;
+		/** \brief */
 		Player *_player;
 		/** \brief */
-		jthread::Mutex _mutex;
-		/** \brief */
 		jgui::Image *_image;
+		/** \brief */
+		jthread::Mutex _mutex;
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
@@ -50,9 +52,28 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 			jgui::Component(x, y, w, h),
 			_mutex(jthread::JMT_RECURSIVE)
 		{
-			_player = player;
+			IDirectFB *engine = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
 
-			_image = jgui::Image::CreateImage(w, h, jgui::JPF_ARGB, iw, ih);
+			DFBSurfaceDescription desc;
+
+			desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
+			desc.pixelformat = DSPF_ARGB;
+			desc.width = w;
+			desc.height = h;
+
+			if (engine->CreateSurface(engine, &desc, &_surface) != DFB_OK) {
+				throw jcommon::RuntimeException("Cannot allocate memory to the image surface");
+			}
+
+			_surface->SetPorterDuff(_surface, DSPD_NONE);
+			_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+			_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+
+			_image = jgui::Image::CreateImage(jgui::JPF_ARGB, w, h);
+
+			_image->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
+
+			_player = player;
 
 			_src.x = 0;
 			_src.y = 0;
@@ -75,16 +96,27 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
-			delete _image;
+			_surface->Release(_surface);
 		}
 
 		virtual void UpdateComponent()
 		{
-			_player->DispatchFrameEvent(new FrameEvent(_player, JFE_GRABBED, _image));
-
 			if (IsRunning() == true) {
 				WaitThread();
 			}
+			
+			if (_surface != NULL) {
+				void *ptr;
+				int pitch;
+
+				_surface->Lock(_surface, DSLF_READ, &ptr, &pitch);
+
+				_image->GetGraphics()->SetRGB((uint32_t *)ptr, 0, 0, _image->GetWidth(), _image->GetHeight());
+
+				_surface->Unlock(_surface);
+			}
+
+			_player->DispatchFrameEvent(new FrameEvent(_player, JFE_GRABBED, _image));
 
 			// CHANGE:: to make this sync, use Run() instead Start()
 			Start();
@@ -111,11 +143,6 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 		virtual Player * GetPlayer()
 		{
 			return _player;
-		}
-
-		virtual jgui::Graphics * GetGraphics()
-		{
-			return _image->GetGraphics();
 		}
 
 };
@@ -567,15 +594,15 @@ void DFBPlayer::Play()
 	jthread::AutoLock lock(&_mutex);
 
 	if (_is_paused == false && _provider != NULL) {
-		jgui::Graphics *graphics = dynamic_cast<VideoComponentImpl *>(_component)->GetGraphics();
+		IDirectFBSurface *surface = dynamic_cast<VideoComponentImpl *>(_component)->_surface;
 
 		if (_has_video == true) {
-			_provider->PlayTo(_provider, (IDirectFBSurface *)graphics->GetNativeSurface(), NULL, DFBPlayer::Callback, (void *)_component);
+			_provider->PlayTo(_provider, surface, NULL, DFBPlayer::Callback, (void *)_component);
 		} else {
-			_provider->PlayTo(_provider, (IDirectFBSurface *)graphics->GetNativeSurface(), NULL, NULL, NULL);
+			_provider->PlayTo(_provider, surface, NULL, NULL, NULL);
 		}
 
-		usleep(500000);
+		// usleep(500000);
 	}
 }
 
