@@ -24,11 +24,12 @@
 #include "jgfxhandler.h"
 #include "jfont.h"
 #include "jstringutils.h"
-#include "joutofboundsexception.h"
 #include "jrectangle.h"
 #include "jdfbfont.h"
 #include "jdfbgraphics.h"
 #include "jdfbimage.h"
+#include "joutofboundsexception.h"
+#include "jnullpointerexception.h"
 
 #define M_2PI	(2*M_PI)
 
@@ -1410,34 +1411,26 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 	}
 }
 
-uint32_t DFBGraphics::GetRGB(int xp, int yp, uint32_t pixel)
+uint32_t DFBGraphics::GetRGB(int xp, int yp, uint32_t safe)
 {
-	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
+	try {
+		uint32_t rgb[1];
 
-	if (cairo_surface == NULL) {
-		return pixel;
+		GetRGBArray((uint32_t **)&rgb, xp, yp, 1, 1);
+
+		return rgb[0];
+	} catch (jcommon::OutOfBoundsException &e) {
 	}
 
-	cairo_surface_flush(cairo_surface);
-
-	int x = _translate.x+xp;
-	int y = _translate.y+yp;
-	int sw = cairo_image_surface_get_width(cairo_surface);
-	int sh = cairo_image_surface_get_height(cairo_surface);
-	// int stride = cairo_image_surface_get_stride(cairo_surface);
-	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-	if (data == NULL || (x < 0 || x >= sw) || (y < 0 || y >= sh)) {
-		return pixel;
-	}
-
-	uint32_t *ptr = (uint32_t *)data;
-
-	return ptr[y*sw+x];
+	return safe;
 }
 
-void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
+void DFBGraphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
+	if (rgb == NULL) {
+		throw jcommon::NullPointerException("Pixel array is null");
+	}
+
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 
 	if (cairo_surface == NULL) {
@@ -1450,57 +1443,49 @@ void DFBGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
 	int y = _translate.y+yp;
 	int sw = cairo_image_surface_get_width(cairo_surface);
 	int sh = cairo_image_surface_get_height(cairo_surface);
-	int stride = cairo_image_surface_get_stride(cairo_surface);
+	
+	if ((x < 0 || (x+wp) > sw) || (y < 0 || (y+hp) > sh)) {
+		throw jcommon::OutOfBoundsException("Index out of bounds");
+	}
+
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-	if (data == NULL || (x < 0 || x >= sw) || (y < 0 || y >= sh)) {
+	if (data == NULL) {
 		return;
 	}
 
-	uint32_t *array = (*rgb);
+	uint32_t *ptr = (*rgb);
 
-	if (*rgb == NULL) {
-		array = new uint32_t[wp*hp];
+	if (ptr == NULL) {
+		ptr = new uint32_t[hp*wp];
 	}
+
+	int stride = cairo_image_surface_get_stride(cairo_surface);
 
 	for (int j=0; j<hp; j++) {
 		uint32_t *src = (uint32_t *)(data + (yp + y + j) * stride);
-		uint32_t *dst = (uint32_t *)(array + j * wp);
+		uint32_t *dst = (uint32_t *)(ptr + j * wp);
 		
 		for (int i=0; i<wp; i++) {
 			*(dst + i) = *(src + xp + x + i);
 		}
 	}
 
-	(*rgb) = array;
+	(*rgb) = ptr;
 }
 
-void DFBGraphics::SetRGB(uint32_t argb, int xp, int yp) 
+void DFBGraphics::SetRGB(uint32_t rgb, int xp, int yp) 
 {
-	/*
-	Color color(argb);
-
-	int r = color.GetRed(),
-			g = color.GetGreen(),
-			b = color.GetBlue(),
-			a = color.GetAlpha();
-			*/
-	int r = (argb >> 0x10) & 0xff,
-			g = (argb >> 0x08) & 0xff,
-			b = (argb >> 0x00) & 0xff,
-			a = (argb >> 0x18) & 0xff;
-
-	cairo_save(_cairo_context);
-	cairo_set_source_rgba(_cairo_context, r/255.0, g/255.0, b/255.0, a/255.0);
-	cairo_rectangle(_cairo_context, _translate.x+xp, _translate.y+yp, 1, 1);
-  cairo_fill(_cairo_context);
-  cairo_restore(_cairo_context);
+	try {
+		SetRGBArray(&rgb, xp, yp, 1, 1);
+	} catch (jcommon::OutOfBoundsException &e) {
+	}
 }
 
-void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp) 
+void DFBGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp) 
 {
 	if (rgb == NULL) {
-		return;
+		throw jcommon::NullPointerException("Pixel array is null");
 	}
 
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
@@ -1515,78 +1500,76 @@ void DFBGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp)
 	int y = _translate.y+yp;
 	int sw = cairo_image_surface_get_width(cairo_surface);
 	int sh = cairo_image_surface_get_height(cairo_surface);
-	int stride = cairo_image_surface_get_stride(cairo_surface);
-	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-	/*
-	cairo_save(_cairo_context);
-
-	for (int j=0; j<hp; j++) {
-		for (int i=0; i<wp; i++) {
-			uint32_t argb = rgb[j*wp+i];
-			int r = (argb >> 0x10) & 0xff,
-					g = (argb >> 0x08) & 0xff,
-					b = (argb >> 0x00) & 0xff,
-					a = 0xff;
-
-			cairo_set_source_rgba(_cairo_context, r/255.0, g/255.0, b/255.0, a/255.0);
-			cairo_rectangle(_cairo_context, x+i, y+j, 1, 1);
-			cairo_fill(_cairo_context);
-		}
+	
+	if ((x < 0 || (x+wp) > sw) || (y < 0 || (y+hp) > sh)) {
+		throw jcommon::OutOfBoundsException("Index out of bounds");
 	}
 
-  cairo_restore(_cairo_context);
-	*/
-	
-	if (data == NULL || (x < 0 || x >= sw) || (y < 0 || y >= sh)) {
+	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+	int stride = cairo_image_surface_get_stride(cairo_surface);
+
+	if (data == NULL) {
 		return;
 	}
 
+	int pitch = 4*wp;
+
 	for (int j=0; j<hp; j++) {
-		uint32_t *src = (uint32_t *)(rgb + j * wp);
-		uint32_t *dst = (uint32_t *)(data + (y + j) * stride);
+		uint8_t *src = (uint8_t *)(rgb + j * wp);
+		uint8_t *dst = (uint8_t *)(data + (y + j) * stride + 4*x);
 		
-		for (int i=0; i<wp; i++) {
-			if (_composite_flags == JCF_SRC) {
-				*(dst + x + i) = *(src + i);
+		for (int i=0; i<pitch; i+=4) {
+			if (_composite_flags == JCF_CLEAR) {
+				*(dst + i + 3) = 0x00;
+				*(dst + i + 2) = 0x00;
+				*(dst + i + 1) = 0x00;
+				*(dst + i + 0) = 0x00;
+			} else if (_composite_flags == JCF_SRC) {
+				*(dst + i + 3) = *(src + i + 3);
+				*(dst + i + 2) = *(src + i + 2);
+				*(dst + i + 1) = *(src + i + 1);
+				*(dst + i + 0) = *(src + i + 0);
 			} else if (_composite_flags == JCF_SRC_OVER) {
-				int p1 = *(src + i),
-						p2 = *(dst + x + i),
-						r = (p1 >> 0x10) & 0xff,
-						g = (p1 >> 0x08) & 0xff,
-						b = (p1 >> 0x00) & 0xff,
-						a = (p1 >> 0x18) & 0xff,
-						pr = (p2 >> 0x10) & 0xff,
-						pg = (p2 >> 0x08) & 0xff,
-						pb = (p2 >> 0x00) & 0xff;
+				int a = *(src + i + 3);
+				int r = *(src + i + 2);
+				int g = *(src + i + 1);
+				int b = *(src + i + 0);
+				// int pa = *(dst + i + 3);
+				int pr = *(dst + i + 2);
+				int pg = *(dst + i + 1);
+				int pb = *(dst + i + 0);
 
 				pr = (int)(pr*(0xff-a) + r*a) >> 0x08;
 				pg = (int)(pg*(0xff-a) + g*a) >> 0x08;
 				pb = (int)(pb*(0xff-a) + b*a) >> 0x08;
 
-				*(dst + x + i) = (a << 0x18) | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
+				*(dst + i + 3) = a;
+				*(dst + i + 2) = pr;
+				*(dst + i + 1) = pg;
+				*(dst + i + 0) = pb;
 			} else if (_composite_flags == JCF_SRC_IN) {
 			} else if (_composite_flags == JCF_SRC_OUT) {
 			} else if (_composite_flags == JCF_SRC_ATOP) {
 			} else if (_composite_flags == JCF_DST) {
 				// do nothing
 			} else if (_composite_flags == JCF_DST_OVER) {
-				int p1 = *(src + i),
-						p2 = *(dst + x + i),
-						r = (p1 >> 0x10) & 0xff,
-						g = (p1 >> 0x08) & 0xff,
-						b = (p1 >> 0x00) & 0xff,
-						// a = (p1 >> 0x18) & 0xff,
-						pr = (p2 >> 0x10) & 0xff,
-						pg = (p2 >> 0x08) & 0xff,
-						pb = (p2 >> 0x00) & 0xff,
-						pa = (p2 >> 0x00) & 0xff;
+				// int a = *(src + i + 3);
+				int r = *(src + i + 2);
+				int g = *(src + i + 1);
+				int b = *(src + i + 0);
+				int pa = *(dst + i + 3);
+				int pr = *(dst + i + 2);
+				int pg = *(dst + i + 1);
+				int pb = *(dst + i + 0);
 
 				pr = (int)(pr*(0xff-pa) + r*pa) >> 0x08;
 				pg = (int)(pg*(0xff-pa) + g*pa) >> 0x08;
 				pb = (int)(pb*(0xff-pa) + b*pa) >> 0x08;
 
-				*(dst + x + i) = (pa << 0x18) | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
+				*(dst + i + 3) = pa;
+				*(dst + i + 2) = pr;
+				*(dst + i + 1) = pg;
+				*(dst + i + 0) = pb;
 			} else if (_composite_flags == JCF_DST_IN) {
 			} else if (_composite_flags == JCF_DST_OUT) {
 			} else if (_composite_flags == JCF_DST_ATOP) {
@@ -1648,10 +1631,10 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 	} else {
 		uint32_t *rgb = NULL;
 
-		aux->GetRGB(&rgb, 0, 0, swp, shp);
+		aux->GetRGBArray(&rgb, 0, 0, swp, shp);
 	
 		if (rgb != NULL) {
-			SetRGB(rgb, xp, yp, swp, shp);
+			SetRGBArray(rgb, xp, yp, swp, shp);
 
 			delete [] rgb;
 		}
@@ -1700,10 +1683,10 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 	} else {
 		uint32_t *rgb = NULL;
 
-		scl->GetRGB(&rgb, 0, 0, wp, hp);
+		scl->GetRGBArray(&rgb, 0, 0, wp, hp);
 	
 		if (rgb != NULL) {
-			SetRGB(rgb, xp, yp, wp, hp);
+			SetRGBArray(rgb, xp, yp, wp, hp);
 
 			delete [] rgb;
 		}

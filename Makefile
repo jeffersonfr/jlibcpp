@@ -393,8 +393,8 @@ OBJS_jmedia += \
 		jcontrolexception.o\
 		jmediaexception.o\
 		jplayer.o\
-		jframeevent.o\
-		jframelistener.o\
+		jframegrabberevent.o\
+		jframegrabberlistener.o\
 		jplayerevent.o\
 		jplayerlistener.o\
 		jplayermanager.o\

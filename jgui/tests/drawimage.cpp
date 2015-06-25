@@ -771,7 +771,7 @@ class RGBImageTest : public Picture {
 
 			uint32_t *rgb = NULL;
 
-			image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
+			image->GetRGBArray(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
 
 			_image = jgui::Image::CreateImage(rgb, image->GetWidth(), image->GetHeight());
 
@@ -830,7 +830,7 @@ class IndexedImageTest : public Picture {
 				uint32_t *pixels = new uint32_t[size];
 				uint32_t *rgb = NULL;
 
-				image->GetRGB(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
+				image->GetRGBArray(&rgb, 0, 0, image->GetWidth(), image->GetHeight());
 
     		Quantization q(rgb, image->GetWidth(), image->GetHeight(), 255, 1.0);
 

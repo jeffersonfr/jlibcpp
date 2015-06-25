@@ -230,9 +230,9 @@ void DFBHandler::SetCursor(Image *shape, int hotx, int hoty)
 	void *ptr;
 	int pitch;
 
-	surface->Lock(surface, DSLF_READ, &ptr, &pitch);
+	surface->Lock(surface, DSLF_WRITE, &ptr, &pitch);
 
-	shape->GetGraphics()->GetRGB((uint32_t **)&ptr, 0, 0, desc.width, desc.height);
+	shape->GetGraphics()->GetRGBArray((uint32_t **)&ptr, 0, 0, desc.width, desc.height);
 
 	surface->Unlock(surface);
 

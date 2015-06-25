@@ -523,11 +523,11 @@ uint32_t NullGraphics::GetRGB(int xp, int yp, uint32_t pixel)
 	return Graphics::GetRGB(xp, yp, pixel);
 }
 
-void NullGraphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
+void NullGraphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	Graphics::GetRGB(rgb, xp, yp, wp, hp);
+	Graphics::GetRGBArray(rgb, xp, yp, wp, hp);
 }
 
 void NullGraphics::SetRGB(uint32_t rgb, int xp, int yp)
@@ -537,11 +537,11 @@ void NullGraphics::SetRGB(uint32_t rgb, int xp, int yp)
 	Graphics::SetRGB(rgb, xp, yp);
 }
 
-void NullGraphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp)
+void NullGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");
 
-	Graphics::SetRGB(rgb, xp, yp, wp, hp);
+	Graphics::SetRGBArray(rgb, xp, yp, wp, hp);
 }
 
 void NullGraphics::Reset()

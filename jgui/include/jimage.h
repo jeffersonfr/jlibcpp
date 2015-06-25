@@ -220,7 +220,13 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp);
+		virtual void SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
+	
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp);
 		
 		/**
 		 * \brief

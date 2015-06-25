@@ -383,10 +383,10 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 
 	uint32_t *rgb = NULL;
 
-	aux->GetRGB(&rgb, 0, 0, swp, shp);
+	aux->GetRGBArray(&rgb, 0, 0, swp, shp);
 
 	if (rgb != NULL) {
-		buffer->GetGraphics()->SetRGB(rgb, _translate.x+xp, _translate.y+yp, swp, shp);
+		buffer->GetGraphics()->SetRGBArray(rgb, _translate.x+xp, _translate.y+yp, swp, shp);
 
 		delete [] rgb;
 
@@ -429,10 +429,10 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 
 	uint32_t *rgb = NULL;
 
-	scl->GetRGB(&rgb, 0, 0, wp, hp);
+	scl->GetRGBArray(&rgb, 0, 0, wp, hp);
 
 	if (rgb != NULL) {
-		buffer->GetGraphics()->SetRGB(rgb, _translate.x+xp, _translate.y+yp, wp, hp);
+		buffer->GetGraphics()->SetRGBArray(rgb, _translate.x+xp, _translate.y+yp, wp, hp);
 
 		delete [] rgb;
 
@@ -464,7 +464,7 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 	return 0;
 }
 
-void Graphics::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
+void Graphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
 	(*rgb) = NULL;
 }
@@ -473,7 +473,7 @@ void Graphics::SetRGB(uint32_t argb, int xp, int yp)
 {
 }
 
-void Graphics::SetRGB(uint32_t *rgb, int xp, int yp, int wp, int hp) 
+void Graphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp) 
 {
 }
 

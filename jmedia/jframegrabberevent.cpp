@@ -17,62 +17,31 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_FRAMEEVENT_H
-#define J_FRAMEEVENT_H
-
-#include "jeventobject.h"
-#include "jimage.h"
+#include "jframegrabberevent.h"
 
 namespace jmedia {
 
-/** 
- * \brief Supported events
- *
- */
-enum jframe_event_t {
-	JFE_GRABBED
-};
+FrameGrabberEvent::FrameGrabberEvent(void *source, jframe_event_t type, jgui::Image *image):
+	jcommon::EventObject(source)
+{
+	jcommon::Object::SetClassName("jmedia::FrameGrabberEvent");
 
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class FrameEvent : public jcommon::EventObject{
-
-	private:
-		/** \brief */
-		jframe_event_t _type;
-		/** \brief */
-		jgui::Image *_image;
-
-	public:
-		/**
-		 * \brief 
-		 *
-		 */
-		FrameEvent(void *source, jframe_event_t type, jgui::Image *image);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~FrameEvent();
-
-		/**
-		 * \brief
-		 *
-		 */
-		jframe_event_t GetType();
-
-		/**
-		 * \brief
-		 *
-		 */
-		jgui::Image * GetFrame();
-
-};
-
+	_type = type;
+	_image = image;
+}
+		
+FrameGrabberEvent::~FrameGrabberEvent()
+{
 }
 
-#endif
+jframe_event_t FrameGrabberEvent::GetType()
+{
+	return _type;
+}
+
+jgui::Image * FrameGrabberEvent::GetFrame()
+{
+	return _image;
+}
+
+}

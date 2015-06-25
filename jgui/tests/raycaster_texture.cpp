@@ -991,7 +991,7 @@ class GraphicsTeste : public jgui::Frame{
 				}
 			}
 
-			g->SetRGB((uint32_t *)buffer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+			g->SetRGBArray((uint32_t *)buffer, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 		}
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)

@@ -95,7 +95,7 @@ IndexedImage * IndexedImage::Pack(Image *image)
 					size_h = image->GetHeight();
 			uint32_t *rgb = NULL;
 
-			image->GetRGB(&rgb, 0, 0, size_w, size_h);
+			image->GetRGBArray(&rgb, 0, 0, size_w, size_h);
 
 			if ((void *)rgb != NULL) {
 				packed = Pack(rgb, size_w, size_h);
@@ -323,7 +323,12 @@ Image * IndexedImage::Colorize(Color color)
 	return image;
 }
 
-void IndexedImage::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
+void IndexedImage::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
+{
+	throw jcommon::RuntimeException("Not implemented");
+}
+
+void IndexedImage::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
 	int width = _size.width,
 			height = _size.height;

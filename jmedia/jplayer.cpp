@@ -187,7 +187,7 @@ void Player::DispatchPlayerEvent(PlayerEvent *event)
 	delete event;
 }
 
-void Player::RegisterFrameListener(FrameListener *listener)
+void Player::RegisterFrameListener(FrameGrabberListener *listener)
 {
 	if (listener == NULL) {
 		return;
@@ -198,20 +198,20 @@ void Player::RegisterFrameListener(FrameListener *listener)
 	}
 }
 
-void Player::RemoveFrameListener(FrameListener *listener)
+void Player::RemoveFrameListener(FrameGrabberListener *listener)
 {
 	if (listener == NULL) {
 		return;
 	}
 
-	std::vector<FrameListener *>::iterator i = std::find(_frame_listeners.begin(), _frame_listeners.end(), listener);
+	std::vector<FrameGrabberListener *>::iterator i = std::find(_frame_listeners.begin(), _frame_listeners.end(), listener);
 	
 	if (i != _frame_listeners.end()) {
 		_frame_listeners.erase(i);
 	}
 }
 
-void Player::DispatchFrameEvent(FrameEvent *event)
+void Player::DispatchFrameEvent(FrameGrabberEvent *event)
 {
 	if (event == NULL) {
 		return;
@@ -221,7 +221,7 @@ void Player::DispatchFrameEvent(FrameEvent *event)
 			size = (int)_frame_listeners.size();
 
 	while (k++ < (int)_frame_listeners.size()) {
-		FrameListener *listener = _frame_listeners[k-1];
+		FrameGrabberListener *listener = _frame_listeners[k-1];
 
 		if (event->GetType() == JFE_GRABBED) {
 			listener->FrameGrabbed(event);

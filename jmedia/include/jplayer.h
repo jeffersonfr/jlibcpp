@@ -21,7 +21,7 @@
 #define J_PLAYER_H
 
 #include "jplayerlistener.h"
-#include "jframelistener.h"
+#include "jframegrabberlistener.h"
 #include "jcontrol.h"
 #include "jcomponent.h"
 
@@ -49,7 +49,7 @@ class Player : public jcommon::Object{
 		/** \brief */
 		std::vector<PlayerListener *> _player_listeners;
 		/** \brief */
-		std::vector<FrameListener *> _frame_listeners;
+		std::vector<FrameGrabberListener *> _frame_listeners;
 		/** \brief */
 		std::vector<Control *> _controls;
 		/** \brief */
@@ -198,20 +198,20 @@ class Player : public jcommon::Object{
 		 *
 		 * \param listener
 		 */
-		virtual void RegisterFrameListener(FrameListener *listener);
+		virtual void RegisterFrameListener(FrameGrabberListener *listener);
 
 		/**
 		 * \brief Remove a listener.
 		 *
 		 * \param listener
 		 */
-		virtual void RemoveFrameListener(FrameListener *listener);
+		virtual void RemoveFrameListener(FrameGrabberListener *listener);
 
 		/*
 		 * \brief
 		 *
 		 */
-		virtual void DispatchFrameEvent(FrameEvent *event);
+		virtual void DispatchFrameEvent(FrameGrabberEvent *event);
 		
 };
 

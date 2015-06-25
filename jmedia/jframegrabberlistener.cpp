@@ -17,31 +17,22 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframeevent.h"
+#include "jframegrabberlistener.h"
 
 namespace jmedia {
 
-FrameEvent::FrameEvent(void *source, jframe_event_t type, jgui::Image *image):
-	jcommon::EventObject(source)
+FrameGrabberListener::FrameGrabberListener():
+	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmedia::FrameEvent");
-
-	_type = type;
-	_image = image;
+	jcommon::Object::SetClassName("jmedia::FrameGrabberListener");
 }
-		
-FrameEvent::~FrameEvent()
+
+FrameGrabberListener::~FrameGrabberListener()
 {
 }
 
-jframe_event_t FrameEvent::GetType()
+void FrameGrabberListener::FrameGrabbed(FrameGrabberEvent *event)
 {
-	return _type;
-}
-
-jgui::Image * FrameEvent::GetFrame()
-{
-	return _image;
 }
 
 }

@@ -17,11 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_FRAMELISTENER_H
-#define J_FRAMELISTENER_H
+#ifndef J_FRAMEGRABBERLISTENER_H
+#define J_FRAMEGRABBERLISTENER_H
 
 #include "jlistener.h"
-#include "jframeevent.h"
+#include "jframegrabberevent.h"
 
 namespace jmedia {
 
@@ -30,26 +30,26 @@ namespace jmedia {
  *
  * \author Jeff Ferr
  */
-class FrameListener : public jcommon::Listener{
+class FrameGrabberListener : public jcommon::Listener{
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		FrameListener();
+		FrameGrabberListener();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~FrameListener();
+		virtual ~FrameGrabberListener();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void FrameGrabbed(FrameEvent *event);
+		virtual void FrameGrabbed(FrameGrabberEvent *event);
 
 };
 

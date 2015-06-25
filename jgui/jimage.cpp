@@ -85,7 +85,7 @@ Image * Image::CreateImage(uint32_t *data, int width, int height)
 	}
 
 	if (image != NULL) {
-		image->GetGraphics()->SetRGB(data, 0, 0, width, height);
+		image->GetGraphics()->SetRGBArray(data, 0, 0, width, height);
 	}
 
 	return image;
@@ -257,10 +257,17 @@ Image * Image::Colorize(Color color)
 	return image;
 }
 
-void Image::GetRGB(uint32_t **rgb, int xp, int yp, int wp, int hp)
+void Image::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 {
 	if (_graphics != NULL) {
-		_graphics->GetRGB(rgb, xp, yp, wp, hp);
+		_graphics->SetRGBArray(rgb, xp, yp, wp, hp);
+	}
+}
+
+void Image::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
+{
+	if (_graphics != NULL) {
+		_graphics->GetRGBArray(rgb, xp, yp, wp, hp);
 
 		return;
 	}

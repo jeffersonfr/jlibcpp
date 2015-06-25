@@ -111,12 +111,12 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 
 				_surface->Lock(_surface, DSLF_READ, &ptr, &pitch);
 
-				_image->GetGraphics()->SetRGB((uint32_t *)ptr, 0, 0, _image->GetWidth(), _image->GetHeight());
+				_image->GetGraphics()->SetRGBArray((uint32_t *)ptr, 0, 0, _image->GetWidth(), _image->GetHeight());
 
 				_surface->Unlock(_surface);
 			}
 
-			_player->DispatchFrameEvent(new FrameEvent(_player, JFE_GRABBED, _image));
+			_player->DispatchFrameEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
 
 			// CHANGE:: to make this sync, use Run() instead Start()
 			Start();

@@ -196,7 +196,9 @@ DFBImage::DFBImage(std::string file):
 	int pitch;
 
 	surface->Lock(surface, DSLF_READ, &ptr, &pitch);
-	_graphics->SetRGB((uint32_t *)ptr, 0, 0, desc.width, desc.height);
+
+	_graphics->SetRGBArray((uint32_t *)ptr, 0, 0, desc.width, desc.height);
+
 	surface->Unlock(surface);
 
 	provider->Release(provider);
@@ -298,7 +300,9 @@ Image * DFBImage::CreateImageStream(jio::InputStream *stream)
 	int pitch;
 
 	surface->Lock(surface, DSLF_READ, &ptr, &pitch);
-	image->GetGraphics()->SetRGB((uint32_t *)ptr, 0, 0, sdsc.width, sdsc.height);
+
+	image->GetGraphics()->SetRGBArray((uint32_t *)ptr, 0, 0, sdsc.width, sdsc.height);
+
 	surface->Unlock(surface);
 
 	surface->Release(surface);
