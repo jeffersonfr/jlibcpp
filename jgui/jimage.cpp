@@ -257,11 +257,12 @@ Image * Image::Colorize(Color color)
 	return image;
 }
 
-void Image::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
+void Image::SetPixels(uint8_t *rgb, int xp, int yp, int wp, int hp, int stride)
 {
-	if (_graphics != NULL) {
-		_graphics->SetRGBArray(rgb, xp, yp, wp, hp);
-	}
+}
+
+void Image::GetPixels(uint8_t **pixels, int xp, int yp, int wp, int hp, int *stride)
+{
 }
 
 void Image::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)

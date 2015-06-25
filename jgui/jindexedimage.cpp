@@ -323,9 +323,12 @@ Image * IndexedImage::Colorize(Color color)
 	return image;
 }
 
-void IndexedImage::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
+void IndexedImage::SetPixels(uint8_t *rgb, int xp, int yp, int wp, int hp, int stride)
 {
-	throw jcommon::RuntimeException("Not implemented");
+}
+
+void IndexedImage::GetPixels(uint8_t **pixels, int xp, int yp, int wp, int hp, int *stride)
+{
 }
 
 void IndexedImage::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
