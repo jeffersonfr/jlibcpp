@@ -20,30 +20,30 @@
 #include "jframe.h"
 #include "jplayermanager.h"
 #include "jplayerlistener.h"
-#include "jframelistener.h"
 #include "jautolock.h"
+#include "jvideosizecontrol.h"
 
 #include <stdio.h>
 #include <unistd.h>
 
-class PlayerTest : public jgui::Window, public jmedia::PlayerListener {
+class PlayerTest : public jmedia::PlayerListener {
 
 	private:
 		jmedia::Player *_player;
 
 	public:
 		PlayerTest(std::string file):
-			jgui::Window(0, 0, 1920, 1080)
+			jmedia::PlayerListener()
 		{
+			jmedia::PlayerManager::SetHint(jmedia::JPH_LIGHTWEIGHT, false);
+
 			_player = jmedia::PlayerManager::CreatePlayer(file);
 
+			jmedia::VideoSizeControl *control = dynamic_cast<jmedia::VideoSizeControl *>(_player->GetControl("video.size"));
+
+			control->SetDestination(0, 0, 720, 480);
+
 			_player->RegisterPlayerListener(this);
-
-			jgui::Component *cmp = _player->GetVisualComponent();
-
-			cmp->SetBounds(0, 0, 1920, 1080);
-
-			Add(cmp);
 		}
 
 		virtual ~PlayerTest()
@@ -51,6 +51,7 @@ class PlayerTest : public jgui::Window, public jmedia::PlayerListener {
 			_player->Stop();
 
 			delete _player;
+			_player = NULL;
 		}
 
 		virtual void StartMedia()
@@ -102,7 +103,6 @@ int main(int argc, char *argv[])
 
 	PlayerTest test(argv[1]);
 
-	test.Show();
 	test.StartMedia();
 
 	sleep(30);

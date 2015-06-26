@@ -198,20 +198,20 @@ class Player : public jcommon::Object{
 		 *
 		 * \param listener
 		 */
-		virtual void RegisterFrameListener(FrameGrabberListener *listener);
+		virtual void RegisterFrameGrabberListener(FrameGrabberListener *listener);
 
 		/**
 		 * \brief Remove a listener.
 		 *
 		 * \param listener
 		 */
-		virtual void RemoveFrameListener(FrameGrabberListener *listener);
+		virtual void RemoveFrameGrabberListener(FrameGrabberListener *listener);
 
 		/*
 		 * \brief
 		 *
 		 */
-		virtual void DispatchFrameEvent(FrameGrabberEvent *event);
+		virtual void DispatchFrameGrabberEvent(FrameGrabberEvent *event);
 		
 };
 

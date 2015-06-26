@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jdfbplayer.h"
+#include "jdfblightplayer.h"
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
@@ -29,7 +29,7 @@
 
 namespace jmedia {
 
-class VideoComponentImpl : public jgui::Component, jthread::Thread {
+class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
@@ -48,7 +48,7 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 		bool _diff;
 
 	public:
-		VideoComponentImpl(Player *player, int x, int y, int w, int h, int iw, int ih):
+		VideoLightweightImpl(Player *player, int x, int y, int w, int h, int iw, int ih):
 			jgui::Component(x, y, w, h),
 			_mutex(jthread::JMT_RECURSIVE)
 		{
@@ -90,7 +90,7 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 			SetVisible(true);
 		}
 
-		virtual ~VideoComponentImpl()
+		virtual ~VideoLightweightImpl()
 		{
 			if (IsRunning() == true) {
 				WaitThread();
@@ -116,7 +116,7 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 				_surface->Unlock(_surface);
 			}
 
-			_player->DispatchFrameEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
+			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
 
 			// CHANGE:: to make this sync, use Run() instead Start()
 			Start();
@@ -151,14 +151,14 @@ class VolumeControlImpl : public VolumeControl {
 	
 	private:
 		/** \brief */
-		DFBPlayer *_player;
+		DFBLightPlayer *_player;
 		/** \brief */
 		int _level;
 		/** \brief */
 		bool _is_muted;
 
 	public:
-		VolumeControlImpl(DFBPlayer *player):
+		VolumeControlImpl(DFBLightPlayer *player):
 			VolumeControl()
 		{
 			_player = player;
@@ -236,10 +236,10 @@ class VolumeControlImpl : public VolumeControl {
 class VideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
-		DFBPlayer *_player;
+		DFBLightPlayer *_player;
 
 	public:
-		VideoSizeControlImpl(DFBPlayer *player):
+		VideoSizeControlImpl(DFBLightPlayer *player):
 			VideoSizeControl()
 		{
 			_player = player;
@@ -251,48 +251,54 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			jthread::AutoLock lock(&_player->_component->_mutex);
-			
-			_player->_component->_src.x = x;
-			_player->_component->_src.y = y;
-			_player->_component->_src.width = w;
-			_player->_component->_src.height = h;
-			
-			_player->_component->_diff = false;
+			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
 
-			if (_player->_component->_src.x != _player->_component->_dst.x ||
-					_player->_component->_src.y != _player->_component->_dst.y ||
-					_player->_component->_src.width != _player->_component->_dst.width ||
-					_player->_component->_src.height != _player->_component->_dst.height) {
-				_player->_component->_diff = true;
+			jthread::AutoLock lock(&impl->_mutex);
+			
+			impl->_src.x = x;
+			impl->_src.y = y;
+			impl->_src.width = w;
+			impl->_src.height = h;
+			
+			impl->_diff = false;
+
+			if (impl->_src.x != impl->_dst.x ||
+					impl->_src.y != impl->_dst.y ||
+					impl->_src.width != impl->_dst.width ||
+					impl->_src.height != impl->_dst.height) {
+				impl->_diff = true;
 			}
 		}
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			_player->_component->_dst.x = x;
-			_player->_component->_dst.y = y;
-			_player->_component->_dst.width = w;
-			_player->_component->_dst.height = h;
-			
-			_player->_component->_diff = false;
+			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
 
-			if (_player->_component->_src.x != _player->_component->_dst.x ||
-					_player->_component->_src.y != _player->_component->_dst.y ||
-					_player->_component->_src.width != _player->_component->_dst.width ||
-					_player->_component->_src.height != _player->_component->_dst.height) {
-				_player->_component->_diff = true;
+			jthread::AutoLock lock(&impl->_mutex);
+
+			impl->_dst.x = x;
+			impl->_dst.y = y;
+			impl->_dst.width = w;
+			impl->_dst.height = h;
+			
+			impl->_diff = false;
+
+			if (impl->_src.x != impl->_dst.x ||
+					impl->_src.y != impl->_dst.y ||
+					impl->_src.width != impl->_dst.width ||
+					impl->_src.height != impl->_dst.height) {
+				impl->_diff = true;
 			}
 		}
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return _player->_component->_src;
+			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return _player->_component->_dst;
+			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_dst;
 		}
 
 };
@@ -300,14 +306,14 @@ class VideoSizeControlImpl : public VideoSizeControl {
 class VideoFormatControlImpl : public VideoFormatControl {
 	
 	private:
-		DFBPlayer *_player;
+		DFBLightPlayer *_player;
 		jaspect_ratio_t _aspect_ratio;
 		jvideo_mode_t _video_mode;
 		jhd_video_format_t _hd_video_format;
 		jsd_video_format_t _sd_video_format;
 
 	public:
-		VideoFormatControlImpl(DFBPlayer *player):
+		VideoFormatControlImpl(DFBLightPlayer *player):
 			VideoFormatControl()
 		{
 			_player = player;
@@ -512,7 +518,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 };
 
-DFBPlayer::DFBPlayer(std::string file):
+DFBLightPlayer::DFBLightPlayer(std::string file):
 	jmedia::Player()
 {
 	_file = file;
@@ -563,12 +569,12 @@ DFBPlayer::DFBPlayer(std::string file):
 		_controls.push_back(new VideoFormatControlImpl(this));
 	}
 
-	_component = new VideoComponentImpl(this, 0, 0, sdsc.width, sdsc.height, sdsc.width, sdsc.height);
+	_component = new VideoLightweightImpl(this, 0, 0, sdsc.width, sdsc.height, sdsc.width, sdsc.height);
 
 	Start();
 }
 
-DFBPlayer::~DFBPlayer()
+DFBLightPlayer::~DFBLightPlayer()
 {
 	Close();
 	
@@ -584,20 +590,20 @@ DFBPlayer::~DFBPlayer()
 	_controls.clear();
 }
 
-void DFBPlayer::Callback(void *ctx)
+void DFBLightPlayer::Callback(void *ctx)
 {
-	reinterpret_cast<VideoComponentImpl *>(ctx)->UpdateComponent();
+	reinterpret_cast<VideoLightweightImpl *>(ctx)->UpdateComponent();
 }
 		
-void DFBPlayer::Play()
+void DFBLightPlayer::Play()
 {
 	jthread::AutoLock lock(&_mutex);
 
 	if (_is_paused == false && _provider != NULL) {
-		IDirectFBSurface *surface = dynamic_cast<VideoComponentImpl *>(_component)->_surface;
+		IDirectFBSurface *surface = dynamic_cast<VideoLightweightImpl *>(_component)->_surface;
 
 		if (_has_video == true) {
-			_provider->PlayTo(_provider, surface, NULL, DFBPlayer::Callback, (void *)_component);
+			_provider->PlayTo(_provider, surface, NULL, DFBLightPlayer::Callback, (void *)_component);
 		} else {
 			_provider->PlayTo(_provider, surface, NULL, NULL, NULL);
 		}
@@ -606,7 +612,7 @@ void DFBPlayer::Play()
 	}
 }
 
-void DFBPlayer::Pause()
+void DFBLightPlayer::Pause()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -620,7 +626,7 @@ void DFBPlayer::Pause()
 	}
 }
 
-void DFBPlayer::Resume()
+void DFBLightPlayer::Resume()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -633,7 +639,7 @@ void DFBPlayer::Resume()
 	}
 }
 
-void DFBPlayer::Stop()
+void DFBLightPlayer::Stop()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -648,7 +654,7 @@ void DFBPlayer::Stop()
 	}
 }
 
-void DFBPlayer::Close()
+void DFBLightPlayer::Close()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -670,7 +676,7 @@ void DFBPlayer::Close()
 	}
 }
 
-void DFBPlayer::SetCurrentTime(uint64_t time)
+void DFBLightPlayer::SetCurrentTime(uint64_t time)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -679,7 +685,7 @@ void DFBPlayer::SetCurrentTime(uint64_t time)
 	}
 }
 
-uint64_t DFBPlayer::GetCurrentTime()
+uint64_t DFBLightPlayer::GetCurrentTime()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -692,7 +698,7 @@ uint64_t DFBPlayer::GetCurrentTime()
 	return (uint64_t)(time*1000LL);
 }
 
-uint64_t DFBPlayer::GetMediaTime()
+uint64_t DFBLightPlayer::GetMediaTime()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -705,7 +711,7 @@ uint64_t DFBPlayer::GetMediaTime()
 	return (uint64_t)(time*1000LL);
 }
 
-void DFBPlayer::SetLoop(bool b)
+void DFBLightPlayer::SetLoop(bool b)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -720,12 +726,12 @@ void DFBPlayer::SetLoop(bool b)
 	}
 }
 
-bool DFBPlayer::IsLoop()
+bool DFBLightPlayer::IsLoop()
 {
 	return _is_loop;
 }
 
-void DFBPlayer::SetDecodeRate(double rate)
+void DFBLightPlayer::SetDecodeRate(double rate)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -738,7 +744,7 @@ void DFBPlayer::SetDecodeRate(double rate)
 	}
 }
 
-double DFBPlayer::GetDecodeRate()
+double DFBLightPlayer::GetDecodeRate()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -751,12 +757,12 @@ double DFBPlayer::GetDecodeRate()
 	return rate;
 }
 
-jgui::Component * DFBPlayer::GetVisualComponent()
+jgui::Component * DFBLightPlayer::GetVisualComponent()
 {
 	return _component;
 }
 
-void DFBPlayer::Run()
+void DFBLightPlayer::Run()
 {
 	while (_is_closed == false) {
 		_events->WaitForEventWithTimeout(_events, 0, 100);

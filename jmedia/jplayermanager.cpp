@@ -21,10 +21,13 @@
 #include "jurl.h"
 
 #if defined(DIRECTFB_UI) && defined(DIRECTFB_MEDIA)
-#include "jdfbplayer.h"
+#include "jdfblightplayer.h"
+#include "jdfbheavyplayer.h"
 #endif
 
 namespace jmedia {
+
+std::map<jplayer_hints_t, bool> PlayerManager::_hints;
 
 PlayerManager::PlayerManager():
 	jcommon::Object()
@@ -42,11 +45,34 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 
 	if (url.GetProtocol() == "file" || url.GetProtocol() == "http") {
 #if defined(DIRECTFB_UI) && defined(DIRECTFB_MEDIA)
-		return new DFBPlayer(url.GetPath());
+		std::map<jplayer_hints_t, bool>::iterator i = _hints.find(JPH_LIGHTWEIGHT);
+
+		if (i == _hints.end() || i->second == true) {
+			return new DFBLightPlayer(url.GetPath());
+		} else {
+			return new DFBHeavyPlayer(url.GetPath());
+		}
 #endif
 	}
 
 	return NULL;
 }
 		
+void PlayerManager::SetHint(jplayer_hints_t hint, bool value)
+{
+	_hints[hint] = value;
 }
+
+bool PlayerManager::GetHint(jplayer_hints_t hint)
+{
+	std::map<jplayer_hints_t, bool>::iterator i = _hints.find(hint);
+
+	if (i != _hints.end()) {
+		return i->second;
+	}
+
+	return false;
+}
+
+}
+

@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_VIDEOPLAYERIMPL_H
-#define J_VIDEOPLAYERIMPL_H
+#ifndef J_DFBHEAVYPLAYER_H
+#define J_DFBHEAVYPLAYER_H
 
 #include "jplayer.h"
 #include "jthread.h"
@@ -28,9 +28,7 @@
 
 namespace jmedia {
 
-class VideoComponentImpl;
-
-class DFBPlayer : public jmedia::Player, public jthread::Thread {
+class DFBHeavyPlayer : public jmedia::Player, public jthread::Thread {
 
 	public:
 		/** \brief */
@@ -46,7 +44,7 @@ class DFBPlayer : public jmedia::Player, public jthread::Thread {
 		/** \brief */
 		jmedia::Control *_video_format;
 		/** \brief */
-		VideoComponentImpl *_component;
+		jgui::Component *_component;
 		/** \brief */
 		double _aspect;
 		/** \brief */
@@ -74,13 +72,13 @@ class DFBPlayer : public jmedia::Player, public jthread::Thread {
 		 * \brief
 		 *
 		 */
-		DFBPlayer(std::string file);
+		DFBHeavyPlayer(std::string file);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~DFBPlayer();
+		virtual ~DFBHeavyPlayer();
 
 		/**
 		 * \brief

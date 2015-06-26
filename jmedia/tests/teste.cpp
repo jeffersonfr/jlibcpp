@@ -20,7 +20,7 @@
 #include "jframe.h"
 #include "jplayermanager.h"
 #include "jplayerlistener.h"
-#include "jframelistener.h"
+#include "jframegrabberlistener.h"
 #include "jautolock.h"
 
 #include <stdio.h>
@@ -64,7 +64,7 @@ class MediaStart : public jthread::Thread {
 
 };
 
-class PlayerTest : public jgui::Frame, public jmedia::PlayerListener, public jmedia::FrameListener {
+class PlayerTest : public jgui::Frame, public jmedia::PlayerListener, public jmedia::FrameGrabberListener {
 
 	private:
 		std::vector<MediaStart *> _players;
@@ -81,7 +81,7 @@ class PlayerTest : public jgui::Frame, public jmedia::PlayerListener, public jme
 				jmedia::Player *player = jmedia::PlayerManager::CreatePlayer(file);
 
 				player->RegisterPlayerListener(this);
-				player->RegisterFrameListener(this);
+				player->RegisterFrameGrabberListener(this);
 
 				jgui::Component *cmp = player->GetVisualComponent();
 
@@ -198,7 +198,7 @@ class PlayerTest : public jgui::Frame, public jmedia::PlayerListener, public jme
 			std::cout << "Media Finished" << std::endl;
 		}
 
-		virtual void FrameGrabbed(jmedia::FrameEvent *event)
+		virtual void FrameGrabbed(jmedia::FrameGrabberEvent *event)
 		{
 			jgui::Image *image = event->GetFrame();
 			jgui::Graphics *g = image->GetGraphics();

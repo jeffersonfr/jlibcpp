@@ -187,7 +187,7 @@ void Player::DispatchPlayerEvent(PlayerEvent *event)
 	delete event;
 }
 
-void Player::RegisterFrameListener(FrameGrabberListener *listener)
+void Player::RegisterFrameGrabberListener(FrameGrabberListener *listener)
 {
 	if (listener == NULL) {
 		return;
@@ -198,7 +198,7 @@ void Player::RegisterFrameListener(FrameGrabberListener *listener)
 	}
 }
 
-void Player::RemoveFrameListener(FrameGrabberListener *listener)
+void Player::RemoveFrameGrabberListener(FrameGrabberListener *listener)
 {
 	if (listener == NULL) {
 		return;
@@ -211,7 +211,7 @@ void Player::RemoveFrameListener(FrameGrabberListener *listener)
 	}
 }
 
-void Player::DispatchFrameEvent(FrameGrabberEvent *event)
+void Player::DispatchFrameGrabberEvent(FrameGrabberEvent *event)
 {
 	if (event == NULL) {
 		return;

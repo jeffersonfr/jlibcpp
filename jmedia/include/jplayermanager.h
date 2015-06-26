@@ -23,7 +23,16 @@
 #include "jplayer.h"
 #include "jmediaexception.h"
 
+#include <map>
+
 namespace jmedia {
+
+enum jplayer_hints_t {
+	JPH_CACHING = 0x01,
+	JPH_LIGHTWEIGHT = 0x02,
+	JPH_SECURITY = 0x04,
+	JPH_PLUGINS = 0x08
+};
 
 /**
  * \brief
@@ -31,6 +40,10 @@ namespace jmedia {
  * \author Jeff Ferr
  */
 class PlayerManager : public jcommon::Object{
+
+	private:
+		/** \brief */
+		static std::map<jplayer_hints_t, bool> _hints;
 
 	private:
 		/**
@@ -50,8 +63,20 @@ class PlayerManager : public jcommon::Object{
 		 * \brief 
 		 *
 		 */
-		static Player * CreatePlayer(std::string url_) throw (MediaException);
+		static Player * CreatePlayer(std::string url) throw (MediaException);
 		
+		/**
+		 * \brief 
+		 *
+		 */
+		static void SetHint(jplayer_hints_t hint, bool value);
+		
+		/**
+		 * \brief 
+		 *
+		 */
+		static bool GetHint(jplayer_hints_t hint);
+
 };
 
 }
