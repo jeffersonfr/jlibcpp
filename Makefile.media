@@ -13,7 +13,8 @@ ifeq ($(ENABLE_MEDIA),directfb)
 		 directfb \
 
 	OBJS_media	+= \
-		 jdfbplayer.o\
+		 jdfbheavyplayer.o\
+		 jdfblightplayer.o\
 
 OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
 
