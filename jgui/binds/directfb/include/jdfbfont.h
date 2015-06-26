@@ -167,6 +167,12 @@ class DFBFont : public virtual jgui::Font{
 		 * \brief
 		 *
 		 */
+		virtual bool CanDisplay(int ch);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Release();
 		
 		/**

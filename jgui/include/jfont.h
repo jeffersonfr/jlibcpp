@@ -52,8 +52,13 @@ class Font : public virtual jcommon::Object{
 		static Font *_default_font;
 
 	protected:
+		/** \brief */
 		std::string _name;
+		/** \brief */
 		int _size;
+		/** \brief */
+		int _widths[256];
+		/** \brief */
 		jfont_attributes_t _attributes;
 
 	protected:
@@ -183,6 +188,24 @@ class Font : public virtual jcommon::Object{
 		 *
 		 */
 		virtual std::string TruncateString(std::string text, std::string extension, int width);
+	
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool CanDisplay(int ch);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetCharWidth(char ch);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual const int * GetCharWidths();
 		
 		/**
 		 * \brief

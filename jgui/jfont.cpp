@@ -297,6 +297,21 @@ std::string Font::TruncateString(std::string text, std::string extension, int wi
 	return text;
 }
 
+bool Font::CanDisplay(int ch)
+{
+	return true;
+}
+
+int Font::GetCharWidth(char ch)
+{
+	return _widths[(int)ch];
+}
+
+const int * Font::GetCharWidths()
+{
+	return (int *)_widths;
+}
+
 void Font::Release()
 {
 }

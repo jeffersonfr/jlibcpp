@@ -51,6 +51,12 @@ DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size):
 
 	ApplyContext(context_ref);
 
+	for (int i=0; i<256; i++) {
+		std::string str;
+
+		_widths[i] = GetStringWidth(std::string(str + (char)i));
+	}
+
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
 }
 
@@ -256,6 +262,11 @@ jregion_t DFBFont::GetGlyphExtends(int symbol)
 	r.height = t.height;
 
 	return r;
+}
+
+bool DFBFont::CanDisplay(int ch)
+{
+	return true;
 }
 
 void DFBFont::Release()

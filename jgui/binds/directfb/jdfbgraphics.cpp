@@ -1413,16 +1413,32 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, j
 
 uint32_t DFBGraphics::GetRGB(int xp, int yp, uint32_t safe)
 {
-	try {
-		uint32_t rgb[1];
+	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 
-		GetRGBArray((uint32_t **)&rgb, xp, yp, 1, 1);
-
-		return rgb[0];
-	} catch (jcommon::OutOfBoundsException &e) {
+	if (cairo_surface == NULL) {
+		return safe;
 	}
 
-	return safe;
+	cairo_surface_flush(cairo_surface);
+
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int sw = cairo_image_surface_get_width(cairo_surface);
+	int sh = cairo_image_surface_get_height(cairo_surface);
+	
+	if ((x < 0 || x > sw) || (y < 0 || y > sh)) {
+		throw jcommon::OutOfBoundsException("Index out of bounds");
+	}
+
+	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+
+	if (data == NULL) {
+		return safe;
+	}
+
+	int stride = cairo_image_surface_get_stride(cairo_surface);
+	
+	return *((uint32_t *)(data + y * stride) + x);
 }
 
 void DFBGraphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
@@ -1463,11 +1479,11 @@ void DFBGraphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 	int stride = cairo_image_surface_get_stride(cairo_surface);
 
 	for (int j=0; j<hp; j++) {
-		uint32_t *src = (uint32_t *)(data + (yp + y + j) * stride);
+		uint32_t *src = (uint32_t *)(data + (y + j) * stride);
 		uint32_t *dst = (uint32_t *)(ptr + j * wp);
 		
 		for (int i=0; i<wp; i++) {
-			*(dst + i) = *(src + xp + x + i);
+			*(dst + i) = *(src + x + i);
 		}
 	}
 
