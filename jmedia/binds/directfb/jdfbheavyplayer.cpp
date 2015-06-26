@@ -107,7 +107,7 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 			// _window->SetStackingClass(_window, DWSC_UPPER);
 			// Make it the top most window
 			// _window->RaiseToTop(_window);
-			_window->SetOpacity(_window, 255);
+			_window->SetOpacity(_window, 0x00);
 			// _surface->SetRenderOptions(_surface, DSRO_ALL);
 			// _window->DisableEvents(_window, (DFBWindowEventType)(DWET_BUTTONDOWN | DWET_BUTTONUP | DWET_MOTION));
 
@@ -118,6 +118,8 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 			_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 			_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
 			_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+
+			SetVisible(false);
 		}
 
 		virtual ~VideoOverlayImpl()
@@ -165,6 +167,102 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 			 */
 
 			Start();
+		}
+
+		virtual void Move(int x, int y)
+		{
+			SetLocation(_dst.x+x, _dst.y+y);
+		}
+		
+		virtual void Move(jgui::jpoint_t location)
+		{
+			Move(location.x, location.y);
+		}
+		
+		virtual void SetBounds(int x, int y, int width, int height)
+		{
+			SetDestination(x, y, width, height);
+		}
+		
+		virtual void SetBounds(jgui::jpoint_t location, jgui::jsize_t size)
+		{
+			SetBounds(location.x, location.y, size.width, size.height);
+		}
+		
+		virtual void SetBounds(jgui::jregion_t region)
+		{
+			SetBounds(region.x, region.y, region.width, region.height);
+		}
+		
+		virtual void SetLocation(int x, int y)
+		{
+			SetDestination(x, y, _dst.width, _dst.height);
+		}
+		
+		virtual void SetLocation(jgui::jpoint_t point)
+		{
+			SetLocation(point.x, point.y);
+		}
+		
+		virtual void SetSize(int width, int height)
+		{
+			SetDestination(_dst.x, _dst.y, width, height);
+		}
+		
+		virtual void SetSize(jgui::jsize_t size)
+		{
+			SetSize(size.width, size.height);
+		}
+		
+		virtual int GetX()
+		{
+			return _dst.x;
+		}
+		
+		virtual int GetY()
+		{
+			return _dst.y;
+		}
+		
+		virtual int GetWidth()
+		{
+			return _dst.width;
+		}
+		
+		virtual int GetHeight()
+		{
+			return _dst.height;
+		}
+		
+		virtual jgui::jpoint_t GetLocation()
+		{
+			jgui::jpoint_t t;
+
+			t.x = _dst.x;
+			t.y = _dst.y;
+
+			return t;
+		}
+		
+		virtual jgui::jsize_t GetSize()
+		{
+			jgui::jsize_t t;
+
+			t.width = _dst.width;
+			t.height = _dst.height;
+
+			return t;
+		}
+		
+		virtual void SetVisible(bool visible)
+		{
+			jgui::Component::SetVisible(visible);
+
+			if (IsVisible() == true) {
+				_window->SetOpacity(_window, 0xff);
+			} else {
+				_window->SetOpacity(_window, 0x00);
+			}
 		}
 
 		virtual void Run()
@@ -675,10 +773,6 @@ void DFBHeavyPlayer::Stop()
 	if (_provider != NULL) {
 		_provider->Stop(_provider);
 
-		if (_has_video == true) {
-			_component->Repaint();
-		}
-
 		_is_paused = false;
 	}
 }
@@ -788,7 +882,7 @@ double DFBHeavyPlayer::GetDecodeRate()
 
 jgui::Component * DFBHeavyPlayer::GetVisualComponent()
 {
-	return NULL;
+	return _component;
 }
 
 void DFBHeavyPlayer::Run()
