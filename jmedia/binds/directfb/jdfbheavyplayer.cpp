@@ -285,7 +285,8 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 			}
 			*/
 
-			_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+			// _surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+			_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
 		}
 
 		virtual Player * GetPlayer()
