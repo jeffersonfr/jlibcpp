@@ -51,10 +51,14 @@ DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size):
 
 	ApplyContext(context_ref);
 
+	// TODO:: problem initializing invalid chars
 	for (int i=0; i<256; i++) {
 		std::string str;
+		jregion_t bounds;
 
-		_widths[i] = GetStringWidth(std::string(str + (char)i));
+		bounds = DFBFont::GetGlyphExtends(i);
+
+		_widths[i] = bounds.x+bounds.width;
 	}
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
@@ -267,6 +271,16 @@ jregion_t DFBFont::GetGlyphExtends(int symbol)
 bool DFBFont::CanDisplay(int ch)
 {
 	return true;
+}
+
+int DFBFont::GetCharWidth(char ch)
+{
+	return _widths[(int)ch];
+}
+
+const int * DFBFont::GetCharWidths()
+{
+	return (int *)_widths;
 }
 
 void DFBFont::Release()

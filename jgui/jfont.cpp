@@ -304,12 +304,12 @@ bool Font::CanDisplay(int ch)
 
 int Font::GetCharWidth(char ch)
 {
-	return _widths[(int)ch];
+	return -1;
 }
 
 const int * Font::GetCharWidths()
 {
-	return (int *)_widths;
+	return NULL;
 }
 
 void Font::Release()

@@ -57,8 +57,6 @@ class Font : public virtual jcommon::Object{
 		/** \brief */
 		int _size;
 		/** \brief */
-		int _widths[256];
-		/** \brief */
 		jfont_attributes_t _attributes;
 
 	protected:

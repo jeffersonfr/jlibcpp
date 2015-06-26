@@ -59,6 +59,8 @@ class DFBFont : public virtual jgui::Font{
 		int _max_advance_height;
 		/** \brief */
 		bool _is_builtin;
+		/** \brief */
+		int _widths[256];
 
 	public:
 		/**
@@ -169,6 +171,18 @@ class DFBFont : public virtual jgui::Font{
 		 */
 		virtual bool CanDisplay(int ch);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetCharWidth(char ch);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual const int * GetCharWidths();
+		
 		/**
 		 * \brief
 		 *
