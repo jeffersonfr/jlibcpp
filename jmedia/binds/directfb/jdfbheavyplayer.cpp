@@ -144,6 +144,8 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 			_src.y = y;
 			_src.width = width;
 			_src.height = height;
+
+			throw jcommon::RuntimeException("Cannot set source for non-lightweight player");
 		}
 
 		virtual void UpdateComponent()
@@ -176,10 +178,10 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 				src.w = _src.width;
 				src.h = _src.height;
 
-				dst.x = _dst.x;
-				dst.y = _dst.y;
-				dst.w = _dst.width;
-				dst.h = _dst.height;
+				dst.x = 0;
+				dst.y = 0;
+				dst.w = _size.width;
+				dst.h = _size.height;
 
 				_surface->StretchBlit(_surface, _surface, &src, &dst);
 			}

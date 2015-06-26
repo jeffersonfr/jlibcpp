@@ -44,6 +44,9 @@ DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size):
 		throw jcommon::NullPointerException("Cannot create a native font");
 	}
 
+	surface_ref = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
+	context_ref = cairo_create(surface_ref);
+
 	_charset = "Unicode";
 
 	_leading = -1;
@@ -60,6 +63,9 @@ DFBFont::~DFBFont()
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Remove(this);
 
 	if (_font != NULL) {
+		cairo_surface_destroy(surface_ref);
+		cairo_destroy(context_ref);
+
 		cairo_font_face_destroy(_font);
 		// FT_Done_Face (ft_face);
 	}
@@ -217,17 +223,11 @@ jregion_t DFBFont::GetStringExtends(std::string text)
 {
 	cairo_text_extents_t ts, tc;
 
-	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
-	cairo_t *context = cairo_create(surface);
+	ApplyContext(context_ref);
 
-	ApplyContext(context);
-
-	cairo_text_extents(context, (text+'A').c_str(), &ts);
-	cairo_text_extents(context, "A", &tc);
+	cairo_text_extents(context_ref, (text+'A').c_str(), &ts);
+	cairo_text_extents(context_ref, "A", &tc);
 	
-	cairo_surface_destroy(surface);
-	cairo_destroy(context);
-
 	jregion_t r;
 
 	r.x = ts.x_bearing;
@@ -247,17 +247,11 @@ jregion_t DFBFont::GetGlyphExtends(int symbol)
 	glyph.y = 0;
 	glyph.index = symbol;
 
-	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
-	cairo_t *context = cairo_create(surface);
+	cairo_set_font_face(context_ref, (cairo_font_face_t *)_font);
+	cairo_set_font_size(context_ref, _size);
 
-	cairo_set_font_face(context, (cairo_font_face_t *)_font);
-	cairo_set_font_size(context, _size);
-
-	cairo_glyph_extents(context, &glyph, 1, &t);
+	cairo_glyph_extents(context_ref, &glyph, 1, &t);
 	
-	cairo_surface_destroy(surface);
-	cairo_destroy(context);
-
 	jregion_t r;
 
 	r.x = t.x_bearing;

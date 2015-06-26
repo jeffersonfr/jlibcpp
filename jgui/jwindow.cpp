@@ -218,7 +218,7 @@ void Window::InternalCreateWindow()
 	_surface = NULL;
 	_window = NULL;
 
-	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
+	jgui::GFXHandler *handler = jgui::GFXHandler::GetInstance();
 	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
 
 	DFBWindowDescription desc;

@@ -44,6 +44,10 @@ class DFBFont : public virtual jgui::Font{
 		/** \brief */
 		cairo_font_face_t *_font;
 		/** \brief */
+		cairo_surface_t *surface_ref;
+		/** \brief */
+		cairo_t *context_ref;
+		/** \brief */
 		int _leading;
 		/** \brief */
 		int _ascender;

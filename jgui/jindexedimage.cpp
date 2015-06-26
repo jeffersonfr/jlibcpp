@@ -323,12 +323,41 @@ Image * IndexedImage::Colorize(Color color)
 	return image;
 }
 
-void IndexedImage::SetPixels(uint8_t *rgb, int xp, int yp, int wp, int hp, int stride)
+void IndexedImage::SetPixels(uint8_t *pixels, int xp, int yp, int wp, int hp, int stride)
 {
+	uint8_t *ptr = pixels;
+	
+	for (int j=0; j<hp; j++) {
+		uint8_t *src = (ptr + j*stride);
+		uint8_t *dst = (_data + (j+yp)*stride + xp);
+
+		for (int i=0; i<stride; i++) {
+			*(dst + i) = *(src + i);
+		}
+	}
 }
 
 void IndexedImage::GetPixels(uint8_t **pixels, int xp, int yp, int wp, int hp, int *stride)
 {
+	uint8_t *ptr = (*pixels);
+	
+	if (ptr == NULL) {
+		ptr = new uint8_t[wp*hp];
+	}
+
+	int pitch = (*stride);
+
+	for (int j=0; j<hp; j++) {
+		uint8_t *src = (_data + (j+yp)*pitch + xp);
+		uint8_t *dst = (ptr + j*pitch);
+
+		for (int i=0; i<wp; i++) {
+			*(dst + i) = *(src + i);
+		}
+	}
+
+	(*stride) = wp;
+	(*pixels) = ptr;
 }
 
 void IndexedImage::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
