@@ -265,6 +265,16 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 			}
 		}
 
+		virtual void RaiseToTop()
+		{
+			_window->RaiseToTop(_window);
+		}
+		
+		virtual void LowerToBottom()
+		{
+			_window->LowerToBottom(_window);
+		}
+
 		virtual void Run()
 		{
 			/*
@@ -735,8 +745,6 @@ void DFBHeavyPlayer::Play()
 		}
 
 		// usleep(500000);
-	
-		component->_window->RaiseToTop(component->_window);
 	}
 }
 
