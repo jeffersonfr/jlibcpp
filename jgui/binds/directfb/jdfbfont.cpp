@@ -44,16 +44,12 @@ DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size):
 		throw jcommon::NullPointerException("Cannot create a native font");
 	}
 
+	_charset = "Unicode";
+
 	surface_ref = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
 	context_ref = cairo_create(surface_ref);
 
-	_charset = "Unicode";
-
-	_leading = -1;
-	_ascender = -1;
-	_descender = -1;
-	_max_advance_width = -1;
-	_max_advance_height = -1;
+	ApplyContext(context_ref);
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
 }
@@ -184,7 +180,7 @@ std::string DFBFont::GetName()
 
 int DFBFont::GetSize()
 {
-	return _size;
+	return Font::GetSize();
 }
 
 int DFBFont::GetAscender()

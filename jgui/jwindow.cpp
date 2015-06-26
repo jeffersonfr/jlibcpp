@@ -150,7 +150,8 @@ void Window::SetNativeWindow(void *native)
 	}
 
 	_window->SetOpacity(_window, _opacity);
-	_graphics->SetNativeSurface(_surface, _size.width, _size.height);
+
+	_graphics = new DFBGraphics(_surface, _size.width, _size.height);
 #endif
 	
 	_graphics_mutex.Unlock();
