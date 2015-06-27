@@ -39,10 +39,12 @@ class DFBHandler : public virtual jgui::GFXHandler{
 	friend class Window;
 
 	private:
+		FT_Library _ft_library;
 		IDirectFB *_dfb;
 		IDirectFBDisplayLayer *_layer;
-		FT_Library _ft_library;
+		bool _is_cursor_enabled;
 		
+	private:
 		struct cursor_params_t {
 			Image *cursor;
 			int hot_x;
@@ -152,8 +154,25 @@ class DFBHandler : public virtual jgui::GFXHandler{
 		 * \brief
 		 *
 		 */
+		virtual void SetFlickerFilteringEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsFlickerFilteringEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetCursorEnabled(bool b);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsCursorEnabled();
 		/**
 		 * \brief
 		 *

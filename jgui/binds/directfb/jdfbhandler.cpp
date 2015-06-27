@@ -36,6 +36,7 @@ DFBHandler::DFBHandler():
 	_cursor = JCS_DEFAULT;
 	_dfb = NULL;
 	_layer = NULL;
+	_is_cursor_enabled = true;
 }
 
 DFBHandler::~DFBHandler()
@@ -187,15 +188,49 @@ void DFBHandler::InitEngine()
 	FT_Init_FreeType(&_ft_library);
 }
 
+void DFBHandler::SetFlickerFilteringEnabled(bool b)
+{
+	if (_layer == NULL) {
+		return;
+	}
+
+	DFBDisplayLayerConfig config;
+
+	config.flags = DLCONF_OPTIONS;
+	config.options = DLOP_FLICKER_FILTERING;
+		
+	_layer->SetConfiguration(_layer, &config);
+}
+
+bool DFBHandler::IsFlickerFilteringEnabled()
+{
+	if (_layer == NULL) {
+		return false;
+	}
+
+	DFBDisplayLayerConfig config;
+
+	_layer->GetConfiguration(_layer, &config);
+
+	return (config.flags & DLCONF_OPTIONS) & (config.options & DLOP_FLICKER_FILTERING);
+}
+
 void DFBHandler::SetCursorEnabled(bool b)
 {
 	if (_layer == NULL) {
 		return;
 	}
 
-	int i = (b==false)?0:1;
+	_is_cursor_enabled = b;
+
+	int i = (_is_cursor_enabled == false)?0:1;
 
 	_layer->EnableCursor(_layer, i);
+}
+
+bool DFBHandler::IsCursorEnabled()
+{
+	return _is_cursor_enabled;
 }
 
 void DFBHandler::SetCursor(jcursor_style_t t)

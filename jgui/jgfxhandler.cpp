@@ -69,8 +69,22 @@ GFXHandler * GFXHandler::GetInstance()
 	return _instance;
 }
 
+void GFXHandler::SetFlickerFilteringEnabled(bool b)
+{
+}
+
+bool GFXHandler::IsFlickerFilteringEnabled()
+{
+	return false;
+}
+
 void GFXHandler::SetCursorEnabled(bool b)
 {
+}
+
+bool GFXHandler::IsCursorEnabled()
+{
+	return false;
 }
 
 void GFXHandler::SetCursor(jcursor_style_t t)

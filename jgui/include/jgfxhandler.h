@@ -145,7 +145,25 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void SetFlickerFilteringEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsFlickerFilteringEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetCursorEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsCursorEnabled();
 		
 		/**
 		 * \brief

@@ -32,7 +32,7 @@
 #include <list>
 
 #include <directfb.h>
-#include <cairo-directfb.h>
+#include <cairo.h>
 
 namespace jgui{
 
