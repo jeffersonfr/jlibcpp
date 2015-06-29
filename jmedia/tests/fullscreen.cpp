@@ -39,9 +39,13 @@ class PlayerTest : public jmedia::PlayerListener {
 
 			_player = jmedia::PlayerManager::CreatePlayer(file);
 
-			jmedia::VideoSizeControl *control = dynamic_cast<jmedia::VideoSizeControl *>(_player->GetControl("video.size"));
+			jgui::Component *cmp = _player->GetVisualComponent();
 
-			control->SetDestination(0, 0, 720, 480);
+			cmp->SetBounds(0, 0, 1920, 1080);
+			cmp->SetVisible(true);
+			//jmedia::VideoSizeControl *control = dynamic_cast<jmedia::VideoSizeControl *>(_player->GetControl("video.size"));
+
+			//control->SetDestination(0, 0, 720, 480);
 
 			_player->RegisterPlayerListener(this);
 		}
