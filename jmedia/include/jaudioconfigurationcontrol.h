@@ -30,9 +30,11 @@ namespace jmedia {
  */
 enum jaudio_config_mode_t {
 	ACM_HDMI_PCM,
-	ACM_HDMI_PCM_2CH,
+	ACM_HDMI_PCM_STEREO,
 	ACM_HDMI_COMPRESSED,
-	ACM_HDMI_PCM_6CH
+	ACM_HDMI_PCM_2_1_CH,
+	ACM_HDMI_PCM_5_1_CH,
+	ACM_HDMI_PCM_7_1_CH
 };
 	
 /**
@@ -78,6 +80,18 @@ class AudioConfigurationControl : public Control {
 		 *
 		 */
 		virtual bool IsSPDIFPCM();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetAudioDelay();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetAudioDelay();
 
 };
 
