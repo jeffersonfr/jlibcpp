@@ -39,18 +39,24 @@ class DFBHandler : public virtual jgui::GFXHandler{
 	friend class Window;
 
 	private:
+		/** \brief */
 		FT_Library _ft_library;
+		/** \brief */
 		IDirectFB *_dfb;
+		/** \brief */
 		IDirectFBDisplayLayer *_layer;
+		/** \brief */
 		bool _is_cursor_enabled;
 		
 	private:
+		/** \brief */
 		struct cursor_params_t {
 			Image *cursor;
 			int hot_x;
 			int hot_y;
 		};
 
+		/** \brief */
 		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 
 	public:

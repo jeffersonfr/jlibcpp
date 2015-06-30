@@ -35,11 +35,12 @@
 
 namespace jgui {
 
-DFBGraphics::DFBGraphics(void *surface, int wp, int hp):
+DFBGraphics::DFBGraphics(void *surface, jpixelformat_t pixelformat, int wp, int hp):
 	jgui::Graphics()
 {
 	jcommon::Object::SetClassName("jgui::DFBGraphics");
 
+	_pixelformat = pixelformat;
 	_clip.x = 0;
 	_clip.y = 0;
 	_clip.width = wp;
@@ -47,9 +48,17 @@ DFBGraphics::DFBGraphics(void *surface, int wp, int hp):
 
 	_surface = (IDirectFBSurface *)surface;
 
-	_cairo_context = NULL;
+	cairo_surface_t *cairo_surface = NULL;
 
-	cairo_surface_t *cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wp, hp);
+	if (_pixelformat == JPF_ARGB) {
+		cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wp, hp);
+	} else if (_pixelformat == JPF_RGB32) {
+		cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wp, hp);
+	} else if (_pixelformat == JPF_RGB24) {
+		cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, wp, hp);
+	} else if (_pixelformat == JPF_RGB16) {
+		cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_RGB16_565, wp, hp);
+	}
 
 	_cairo_context = cairo_create(cairo_surface);
 	
@@ -1478,12 +1487,56 @@ void DFBGraphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 
 	int stride = cairo_image_surface_get_stride(cairo_surface);
 
-	for (int j=0; j<hp; j++) {
-		uint32_t *src = (uint32_t *)(data + (y + j) * stride);
-		uint32_t *dst = (uint32_t *)(ptr + j * wp);
-		
-		for (int i=0; i<wp; i++) {
-			*(dst + i) = *(src + x + i);
+	if (_pixelformat == JPF_ARGB) {
+		for (int j=0; j<hp; j++) {
+			uint8_t *src = (uint8_t *)(data + (y + j) * stride + x * 4);
+			uint8_t *dst = (uint8_t *)(ptr + j * wp);
+			int si = 0;
+			int di = 0;
+
+			for (int i=0; i<wp; i++) {
+				*(dst + di + 3) = *(src + si + 3);
+				*(dst + di + 2) = *(src + si + 2);
+				*(dst + di + 1) = *(src + si + 1);
+				*(dst + di + 0) = *(src + si + 0);
+
+				si = si + 4;
+				di = di + 4;
+			}
+		}
+	} else if (_pixelformat == JPF_RGB32) {
+		for (int j=0; j<hp; j++) {
+			uint8_t *src = (uint8_t *)(data + (y + j) * stride + x * 4);
+			uint8_t *dst = (uint8_t *)(ptr + j * wp);
+			int si = 0;
+			int di = 0;
+
+			for (int i=0; i<wp; i++) {
+				*(dst + di + 3) = *(src + si + 3);
+				*(dst + di + 2) = *(src + si + 2);
+				*(dst + di + 1) = *(src + si + 1);
+				*(dst + di + 0) = *(src + si + 0);
+
+				si = si + 4;
+				di = di + 4;
+			}
+		}
+	} else if (_pixelformat == JPF_RGB24) {
+		for (int j=0; j<hp; j++) {
+			uint8_t *src = (uint8_t *)(data + (y + j) * stride + x * 3);
+			uint8_t *dst = (uint8_t *)(ptr + j * wp);
+			int si = 0;
+			int di = 0;
+
+			for (int i=0; i<wp; i++) {
+				*(dst + di + 3) = 0xff;
+				*(dst + di + 2) = *(src + si + 2);
+				*(dst + di + 1) = *(src + si + 1);
+				*(dst + di + 0) = *(src + si + 0);
+
+				si = si + 3;
+				di = di + 4;
+			}
 		}
 	}
 
@@ -1528,70 +1581,129 @@ void DFBGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	int pitch = 4*wp;
+	int step = stride / sw;
 
-	for (int j=0; j<hp; j++) {
-		uint8_t *src = (uint8_t *)(rgb + j * wp);
-		uint8_t *dst = (uint8_t *)(data + (y + j) * stride + 4*x);
-		
-		for (int i=0; i<pitch; i+=4) {
-			if (_composite_flags == JCF_CLEAR) {
-				*(dst + i + 3) = 0x00;
-				*(dst + i + 2) = 0x00;
-				*(dst + i + 1) = 0x00;
-				*(dst + i + 0) = 0x00;
-			} else if (_composite_flags == JCF_SRC) {
-				*(dst + i + 3) = *(src + i + 3);
-				*(dst + i + 2) = *(src + i + 2);
-				*(dst + i + 1) = *(src + i + 1);
-				*(dst + i + 0) = *(src + i + 0);
-			} else if (_composite_flags == JCF_SRC_OVER) {
-				int a = *(src + i + 3);
-				int r = *(src + i + 2);
-				int g = *(src + i + 1);
-				int b = *(src + i + 0);
-				// int pa = *(dst + i + 3);
-				int pr = *(dst + i + 2);
-				int pg = *(dst + i + 1);
-				int pb = *(dst + i + 0);
+	if (_pixelformat == JPF_ARGB) {
+		for (int j=0; j<hp; j++) {
+			uint8_t *src = (uint8_t *)(rgb + j * wp);
+			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x*step);
+			int si = 0;
+			int di = 0;
 
-				pr = (int)(pr*(0xff-a) + r*a) >> 0x08;
-				pg = (int)(pg*(0xff-a) + g*a) >> 0x08;
-				pb = (int)(pb*(0xff-a) + b*a) >> 0x08;
+			for (int i=0; i<wp; i++) {
+				if (_composite_flags == JCF_CLEAR) {
+					*(dst + di + 3) = 0x00;
+					*(dst + di + 2) = 0x00;
+					*(dst + di + 1) = 0x00;
+					*(dst + di + 0) = 0x00;
+				} else if (_composite_flags == JCF_SRC) {
+					*(dst + di + 3) = *(src + si + 3);
+					*(dst + di + 2) = *(src + si + 2);
+					*(dst + di + 1) = *(src + si + 1);
+					*(dst + di + 0) = *(src + si + 0);
+				} else if (_composite_flags == JCF_SRC_OVER) {
+					int a = *(src + si + 3);
+					int r = *(src + si + 2);
+					int g = *(src + si + 1);
+					int b = *(src + si + 0);
+					// int pa = *(dst + di + 3);
+					int pr = *(dst + di + 2);
+					int pg = *(dst + di + 1);
+					int pb = *(dst + di + 0);
 
-				*(dst + i + 3) = a;
-				*(dst + i + 2) = pr;
-				*(dst + i + 1) = pg;
-				*(dst + i + 0) = pb;
-			} else if (_composite_flags == JCF_SRC_IN) {
-			} else if (_composite_flags == JCF_SRC_OUT) {
-			} else if (_composite_flags == JCF_SRC_ATOP) {
-			} else if (_composite_flags == JCF_DST) {
-				// do nothing
-			} else if (_composite_flags == JCF_DST_OVER) {
-				// int a = *(src + i + 3);
-				int r = *(src + i + 2);
-				int g = *(src + i + 1);
-				int b = *(src + i + 0);
-				int pa = *(dst + i + 3);
-				int pr = *(dst + i + 2);
-				int pg = *(dst + i + 1);
-				int pb = *(dst + i + 0);
+					pr = (int)(pr*(0xff-a) + r*a) >> 0x08;
+					pg = (int)(pg*(0xff-a) + g*a) >> 0x08;
+					pb = (int)(pb*(0xff-a) + b*a) >> 0x08;
 
-				pr = (int)(pr*(0xff-pa) + r*pa) >> 0x08;
-				pg = (int)(pg*(0xff-pa) + g*pa) >> 0x08;
-				pb = (int)(pb*(0xff-pa) + b*pa) >> 0x08;
+					*(dst + di + 3) = a;
+					*(dst + di + 2) = pr;
+					*(dst + di + 1) = pg;
+					*(dst + di + 0) = pb;
+				} else if (_composite_flags == JCF_SRC_IN) {
+				} else if (_composite_flags == JCF_SRC_OUT) {
+				} else if (_composite_flags == JCF_SRC_ATOP) {
+				} else if (_composite_flags == JCF_DST) {
+					// do nothing
+				} else if (_composite_flags == JCF_DST_OVER) {
+					// int a = *(src + si + 3);
+					int r = *(src + si + 2);
+					int g = *(src + si + 1);
+					int b = *(src + si + 0);
+					int pa = *(dst + di + 3);
+					int pr = *(dst + di + 2);
+					int pg = *(dst + di + 1);
+					int pb = *(dst + di + 0);
 
-				*(dst + i + 3) = pa;
-				*(dst + i + 2) = pr;
-				*(dst + i + 1) = pg;
-				*(dst + i + 0) = pb;
-			} else if (_composite_flags == JCF_DST_IN) {
-			} else if (_composite_flags == JCF_DST_OUT) {
-			} else if (_composite_flags == JCF_DST_ATOP) {
-			} else if (_composite_flags == JCF_ADD) {
-			} else if (_composite_flags == JCF_XOR) {
-				*(dst + x + i) ^= *(src + i);
+					pr = (int)(pr*(0xff-pa) + r*pa) >> 0x08;
+					pg = (int)(pg*(0xff-pa) + g*pa) >> 0x08;
+					pb = (int)(pb*(0xff-pa) + b*pa) >> 0x08;
+
+					*(dst + di + 3) = pa;
+					*(dst + di + 2) = pr;
+					*(dst + di + 1) = pg;
+					*(dst + di + 0) = pb;
+				} else if (_composite_flags == JCF_DST_IN) {
+				} else if (_composite_flags == JCF_DST_OUT) {
+				} else if (_composite_flags == JCF_DST_ATOP) {
+				} else if (_composite_flags == JCF_ADD) {
+				} else if (_composite_flags == JCF_XOR) {
+					// *(dst + di + 3) = *(src + si + 3);
+					*(dst + di + 2) ^= *(src + si + 2);
+					*(dst + di + 1) ^= *(src + si + 1);
+					*(dst + di + 0) ^= *(src + si + 0);
+				}
+				
+				si = si + 4;
+				di = di + 4;
+			}
+		}
+	} else if (_pixelformat == JPF_RGB32) {
+		for (int j=0; j<hp; j++) {
+			uint8_t *src = (uint8_t *)(rgb + j * wp);
+			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
+			int si = 0;
+			int di = 0;
+
+			for (int i=0; i<wp; i++) {
+				*(dst + di + 3) = *(src + si + 3);
+				*(dst + di + 2) = *(src + si + 2);
+				*(dst + di + 1) = *(src + si + 1);
+				*(dst + di + 0) = *(src + si + 0);
+
+				si = si + 4;
+				di = di + 4;
+			}
+		}
+	} else if (_pixelformat == JPF_RGB24) {
+		for (int j=0; j<hp; j++) {
+			uint8_t *src = (uint8_t *)(rgb + j * wp);
+			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
+			int si = 0;
+			int di = 0;
+
+			for (int i=0; i<wp; i++) {
+				*(dst + di + 2) = *(src + si + 2);
+				*(dst + di + 1) = *(src + si + 1);
+				*(dst + di + 0) = *(src + si + 0);
+
+				si = si + 4;
+				di = di + 3;
+			}
+		}
+	} else if (_pixelformat == JPF_RGB16) {
+		for (int j=0; j<hp; j++) {
+			uint8_t *src = (uint8_t *)(rgb + j * wp);
+			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
+			int si = 0;
+			int di = 0;
+
+			for (int i=0; i<wp; i++) {
+				int r = *(src + si + 2);
+				int g = *(src + si + 1);
+				int b = *(src + si + 0);
+
+				*(dst + di + 1) = (r << 0x03 | g >> 0x03) & 0xff;
+				*(dst + di + 0) = (g << 0x03 | b >> 0x00) & 0xff;
 			}
 		}
 	}

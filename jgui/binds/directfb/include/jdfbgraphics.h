@@ -51,13 +51,23 @@ class DFBGraphics : public virtual jgui::Graphics{
 	friend class Window;
 
 	protected:
+		/** \brief */
 		jthread::Mutex _graphics_mutex;
+		/** \brief */
 		struct jregion_t _clip;
+		/** \brief */
 		struct jregion_t _internal_clip;
+		/** \brief */
 		jline_join_t _line_join;
+		/** \brief */
 		jline_style_t _line_style;
+		/** \brief */
 		jcomposite_flags_t _composite_flags;
+		/** \brief */
 		jdrawing_mode_t _drawing_mode;
+		/** \brief */
+		jpixelformat_t _pixelformat;
+		/** \brief */
 		int _line_width;
 
 	private:
@@ -81,7 +91,7 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		DFBGraphics(void *surface, int wp, int hp);
+		DFBGraphics(void *surface, jpixelformat_t pixelformat, int wp, int hp);
 
 		/**
 		 * \brief

@@ -35,6 +35,7 @@ namespace jgui{
 class DFBImage : public jgui::Image{
 
 	private:
+		/** \brief */
 		uint8_t *_buffer;
 
 	public:
@@ -103,6 +104,18 @@ class DFBImage : public jgui::Image{
 		 *
 		 */
 		static Image * Colorize(Image *img, Color color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetPixels(uint8_t *buffer, int xp, int yp, int wp, int hp, int stride);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, int *stride);
 
 		/**
 		 * \brief

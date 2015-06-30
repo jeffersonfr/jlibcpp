@@ -151,7 +151,7 @@ void Window::SetNativeWindow(void *native)
 
 	_window->SetOpacity(_window, _opacity);
 
-	_graphics = new DFBGraphics(_surface, _size.width, _size.height);
+	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height);
 #endif
 	
 	_graphics_mutex.Unlock();
@@ -269,7 +269,7 @@ void Window::InternalCreateWindow()
 	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
 	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 	
-	_graphics = new DFBGraphics(_surface, _size.width, _size.height);
+	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height);
 #endif
 	
 	SetRotation(_rotation);

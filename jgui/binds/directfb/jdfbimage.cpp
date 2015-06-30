@@ -133,14 +133,16 @@ DFBImage::DFBImage(jpixelformat_t pixelformat, int width, int height):
 	}
 
 	switch (pixelformat) {
-		case JPF_ARGB:
+		case JPF_RGB16:
+		case JPF_RGB24:
 		case JPF_RGB32:
+		case JPF_ARGB:
 			break;
 		default:
 			throw jcommon::RuntimeException("Invalid pixel format");
 	}
 
-	_graphics = new DFBGraphics(NULL, width, height);
+	_graphics = new DFBGraphics(NULL, pixelformat, width, height);
 
 	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
 }
@@ -189,7 +191,7 @@ DFBImage::DFBImage(std::string file):
 		throw jcommon::RuntimeException("Cannot blit image to the image surface");
 	}
 
-	_graphics = new DFBGraphics(NULL, desc.width, desc.height);
+	_graphics = new DFBGraphics(NULL, JPF_ARGB, desc.width, desc.height);
 
 	// INFO:: draw image pixels to cairo's surface
 	void *ptr;
@@ -470,18 +472,89 @@ Image * DFBImage::Blend(Image *img, double alpha)
 
 Image * DFBImage::Colorize(Image *img, Color color)
 {
-	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(img->GetGraphics())->_cairo_context);
+	DFBImage *image = (DFBImage *)Blend(img, 1.0);
+
+	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(image->GetGraphics())->_cairo_context);
 
 	if (cairo_surface == NULL) {
+		delete image;
+
 		return NULL;
 	}
 
+	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+
+	if (data == NULL) {
+		delete image;
+
+		return NULL;
+	}
+
+	int stride = cairo_image_surface_get_stride(cairo_surface);
+	double hue, sat, bri, hue1, sat1, bri1;
+
+	jgui::Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &hue, &sat, &bri); 
+
+	if (image->GetPixelFormat() == JPF_RGB32 || image->GetPixelFormat() == JPF_ARGB) {
+		for (int j=0; j<image->GetHeight(); j++) {
+			uint8_t *dst = (uint8_t *)(data + j * stride);
+
+			for (int i=0; i<stride; i+=4) {
+				// int a = *(dst + i + 3);
+				int r = *(dst + i + 2);
+				int g = *(dst + i + 1);
+				int b = *(dst + i + 0);
+
+				jgui::Color::RGBtoHSB(r, g, b, &hue1, &sat1, &bri1); 
+				jgui::Color::HSBtoRGB(hue, sat1, bri1, &r, &g, &b); 
+
+				// *(dst + i + 3) = a;
+				*(dst + i + 2) = r;
+				*(dst + i + 1) = g;
+				*(dst + i + 0) = b;
+			}
+		}
+	} else if (image->GetPixelFormat() == JPF_RGB24) {
+		for (int j=0; j<image->GetHeight(); j++) {
+			uint8_t *dst = (uint8_t *)(data + j * stride);
+
+			for (int i=0; i<stride; i+=3) {
+				int r = *(dst + i + 2);
+				int g = *(dst + i + 1);
+				int b = *(dst + i + 0);
+
+				jgui::Color::RGBtoHSB(r, g, b, &hue1, &sat1, &bri1); 
+				jgui::Color::HSBtoRGB(hue, sat1, bri1, &r, &g, &b); 
+
+				*(dst + i + 2) = r;
+				*(dst + i + 1) = g;
+				*(dst + i + 0) = b;
+			}
+		}
+	} else if (image->GetPixelFormat() == JPF_RGB16) {
+		for (int j=0; j<image->GetHeight(); j++) {
+			uint8_t *dst = (uint8_t *)(data + j * stride);
+
+			for (int i=0; i<stride; i+=2) {
+				uint16_t pixel = *((uint16_t *)dst);
+				int r = (pixel >> 0x0b) & 0x1f;
+				int g = (pixel >> 0x05) & 0x3f;
+				int b = (pixel >> 0x00) & 0x1f;
+
+				jgui::Color::RGBtoHSB(r, g, b, &hue1, &sat1, &bri1); 
+				jgui::Color::HSBtoRGB(hue, sat1, bri1, &r, &g, &b); 
+
+				*(dst + i + 1) = (r << 0x03 | g >> 0x03) & 0xff;
+				*(dst + i + 0) = (g << 0x03 | b >> 0x00) & 0xff;
+			}
+		}
+	}
+	
+	cairo_surface_mark_dirty(cairo_surface);
+
+	/*
 	DFBImage *image = new DFBImage(img->GetPixelFormat(), img->GetWidth(), img->GetHeight());
 	cairo_t *cairo_context = dynamic_cast<DFBGraphics *>(image->GetGraphics())->_cairo_context;
-
-	int r = color.GetRed();
-	int g = color.GetGreen();
-	int b = color.GetBlue();
 
 	cairo_surface_t *ref_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, img->GetWidth(), img->GetHeight());
 	cairo_t *ref_context = cairo_create(ref_surface);
@@ -499,8 +572,73 @@ Image * DFBImage::Colorize(Image *img, Color color)
 
 	cairo_destroy(ref_context);
 	cairo_surface_destroy(ref_surface);
+	*/
 
 	return image;
+}
+
+void DFBImage::SetPixels(uint8_t *buffer, int xp, int yp, int wp, int hp, int stride)
+{
+	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(GetGraphics())->_cairo_context);
+
+	if (cairo_surface == NULL) {
+		return;
+	}
+
+	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+
+	if (data == NULL) {
+		return;
+	}
+
+	if (stride <= 0) {
+		stride = cairo_image_surface_get_stride(cairo_surface);
+	}
+
+	xp = (xp*stride)/GetWidth();
+	wp = (wp*stride)/GetWidth();
+
+	for (int j=0; j<hp; j++) {
+		uint8_t *src = (uint8_t *)(buffer + j * stride);
+		uint8_t *dst = (uint8_t *)(data + (j + yp) * stride);
+
+		for (int i=0; i<wp; i++) {
+			*(dst + (i + xp)) = *(src + i);
+		}
+	}
+
+	cairo_surface_mark_dirty(cairo_surface);
+}
+
+void DFBImage::GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, int *stride)
+{
+	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(GetGraphics())->_cairo_context);
+
+	if (cairo_surface == NULL) {
+		return;
+	}
+
+	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+
+	if (data == NULL) {
+		return;
+	}
+
+	int pitch = cairo_image_surface_get_stride(cairo_surface);
+
+	xp = (xp*pitch)/GetWidth();
+	wp = (wp*pitch)/GetWidth();
+
+	for (int j=0; j<hp; j++) {
+		uint8_t *src = (uint8_t *)(data + (j + yp) * pitch);
+		uint8_t *dst = (uint8_t *)(buffer + j * pitch);
+
+		for (int i=0; i<wp; i++) {
+			*(dst + i) = *(src + (i + xp));
+		}
+	}
+
+	(*stride) = pitch;
 }
 
 }

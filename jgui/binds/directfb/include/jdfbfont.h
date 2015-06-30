@@ -39,6 +39,7 @@ class DFBFont : public virtual jgui::Font{
 		/** \brief */
 		static Font *_default_font;
 
+	private:
 		/** \brief */
 		std::string _charset;
 		/** \brief */

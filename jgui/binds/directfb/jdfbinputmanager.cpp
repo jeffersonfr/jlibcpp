@@ -35,7 +35,7 @@ DFBInputManager::DFBInputManager():
 
 	jpoint_t p = GFXHandler::GetInstance()->GetMousePosition();
 
-	_initialized = false;
+	_is_initialized = false;
 	_mouse_x = p.x;
 	_mouse_y = p.y;
 	_is_key_enabled = true;
@@ -60,7 +60,7 @@ void DFBInputManager::Initialize()
 		events = NULL;
 	}
 
-	_initialized = true;
+	_is_initialized = true;
 }
 
 void DFBInputManager::Restore()
@@ -78,7 +78,7 @@ void DFBInputManager::Release()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	_initialized = false;
+	_is_initialized = false;
 
 	WaitThread();
 
@@ -1172,7 +1172,7 @@ void DFBInputManager::Run()
 
 	bool fired = false;
 
-	while (_initialized == true) {
+	while (_is_initialized == true) {
 		events->WaitForEventWithTimeout(events, 0, 100);
 
 		while (events->HasEvent(events) == DFB_OK) {
