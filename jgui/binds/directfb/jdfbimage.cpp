@@ -23,6 +23,7 @@
 #include "jdfbgraphics.h"
 #include "jdfbhandler.h"
 #include "jthread.h"
+#include "jhslcolorspace.h"
 #include "jnullpointerexception.h"
 
 #define DFB_FIXED_POINT	(1 << 16)
@@ -491,9 +492,11 @@ Image * DFBImage::Colorize(Image *img, Color color)
 	}
 
 	int stride = cairo_image_surface_get_stride(cairo_surface);
-	double hue, sat, bri, hue1, sat1, bri1;
+	double hue, sat, bri;
 
 	jgui::Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &hue, &sat, &bri); 
+
+	HSLColorSpace hsl(hue, sat, 0.0);
 
 	if (image->GetPixelFormat() == JPF_RGB32 || image->GetPixelFormat() == JPF_ARGB) {
 		for (int j=0; j<image->GetHeight(); j++) {
@@ -505,8 +508,7 @@ Image * DFBImage::Colorize(Image *img, Color color)
 				int g = *(dst + i + 1);
 				int b = *(dst + i + 0);
 
-				jgui::Color::RGBtoHSB(r, g, b, &hue1, &sat1, &bri1); 
-				jgui::Color::HSBtoRGB(hue, sat1, bri1, &r, &g, &b); 
+				hsl.GetRGB(&r, &g, &b);
 
 				// *(dst + i + 3) = a;
 				*(dst + i + 2) = r;
@@ -523,8 +525,7 @@ Image * DFBImage::Colorize(Image *img, Color color)
 				int g = *(dst + i + 1);
 				int b = *(dst + i + 0);
 
-				jgui::Color::RGBtoHSB(r, g, b, &hue1, &sat1, &bri1); 
-				jgui::Color::HSBtoRGB(hue, sat1, bri1, &r, &g, &b); 
+				hsl.GetRGB(&r, &g, &b);
 
 				*(dst + i + 2) = r;
 				*(dst + i + 1) = g;
@@ -541,8 +542,7 @@ Image * DFBImage::Colorize(Image *img, Color color)
 				int g = (pixel >> 0x05) & 0x3f;
 				int b = (pixel >> 0x00) & 0x1f;
 
-				jgui::Color::RGBtoHSB(r, g, b, &hue1, &sat1, &bri1); 
-				jgui::Color::HSBtoRGB(hue, sat1, bri1, &r, &g, &b); 
+				hsl.GetRGB(&r, &g, &b);
 
 				*(dst + i + 1) = (r << 0x03 | g >> 0x03) & 0xff;
 				*(dst + i + 0) = (g << 0x03 | b >> 0x00) & 0xff;
@@ -553,6 +553,8 @@ Image * DFBImage::Colorize(Image *img, Color color)
 	cairo_surface_mark_dirty(cairo_surface);
 
 	/*
+	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<DFBGraphics *>(img->GetGraphics())->_cairo_context);
+
 	DFBImage *image = new DFBImage(img->GetPixelFormat(), img->GetWidth(), img->GetHeight());
 	cairo_t *cairo_context = dynamic_cast<DFBGraphics *>(image->GetGraphics())->_cairo_context;
 

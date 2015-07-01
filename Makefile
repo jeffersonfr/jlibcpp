@@ -330,6 +330,7 @@ OBJS_jgui += \
 		jgridbaglayout.o\
 		jgridlayout.o\
 		jhourdialogbox.o\
+		jhslcolorspace.o\
 		jicon.o\
 		jimage.o\
 		jimageexception.o\

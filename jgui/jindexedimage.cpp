@@ -21,6 +21,7 @@
 #include "jindexedimage.h"
 #include "jimageexception.h"
 #include "jgfxhandler.h"
+#include "jhslcolorspace.h"
 #include "jruntimeexception.h"
 #include "jnullgraphics.h"
 
@@ -303,19 +304,21 @@ Image * IndexedImage::Colorize(Color color)
 	IndexedImage *image = NULL;
 
 	uint32_t palette[_palette_size];
-	int red, green, blue;
-	double hue, saturation, brightness;
+	double hue, sat, bri;
 
-  Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &hue, &saturation, &brightness);
+	jgui::Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &hue, &sat, &bri); 
+
+	HSLColorSpace hsl(hue, sat, 0.0);
 
 	for (int i=0; i<_palette_size; i++) {
 		jgui::Color color(_palette[i]);
-		double h, s, b;
+		int r = color.GetRed();
+		int g = color.GetGreen();
+		int b = color.GetBlue();
 
-  	Color::RGBtoHSB(color.GetRed(), color.GetGreen(), color.GetBlue(), &h, &s, &b);
-		Color::HSBtoRGB(hue, s, b, &red, &green, &blue);
+  	hsl.GetRGB(&r, &g, &b);
 
-		palette[i] = (0xff << 24) | (red << 16) | (green << 8) | (blue << 0);
+		palette[i] = (0xff << 24) | (r << 16) | (g << 8) | (b << 0);
 	}
 
 	image = new IndexedImage(palette, _palette_size, _data, GetWidth(), GetHeight());

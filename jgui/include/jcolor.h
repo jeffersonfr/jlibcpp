@@ -182,10 +182,14 @@ class Color : public virtual jcommon::Object{
 		const static uint32_t Transparent;
 	
 	private:
-		int _red,
-				_green,
-				_blue,
-				_alpha;
+		/** \brief */
+		int _red;
+		/** \brief */
+		int _green;
+		/** \brief */
+		int _blue;
+		/** \brief */
+		int _alpha;
 
 	public:
 		/**
