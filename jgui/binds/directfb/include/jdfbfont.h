@@ -41,13 +41,15 @@ class DFBFont : public virtual jgui::Font{
 
 	private:
 		/** \brief */
-		std::string _charset;
-		/** \brief */
 		cairo_font_face_t *_font;
 		/** \brief */
-		cairo_surface_t *surface_ref;
+		cairo_surface_t *_surface_ref;
 		/** \brief */
-		cairo_t *context_ref;
+		cairo_t *_context_ref;
+		/** \brief */
+		cairo_scaled_font_t *_scaled_font;
+		/** \brief */
+		cairo_font_options_t *_options;
 		/** \brief */
 		int _leading;
 		/** \brief */
@@ -92,31 +94,7 @@ class DFBFont : public virtual jgui::Font{
 		 * \brief
 		 *
 		 */
-		virtual jfont_attributes_t GetFontAttributes();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool SetEncoding(std::string code);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetEncoding();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual std::string GetName();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetSize();
 		
 		/**
 		 * \brief

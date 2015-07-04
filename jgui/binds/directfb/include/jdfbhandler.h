@@ -124,7 +124,7 @@ class DFBHandler : public virtual jgui::GFXHandler{
 		 * \brief
 		 *
 		 */
-		int CreateFont(std::string name, int height, cairo_font_face_t **font, std::string charset);
+		int CreateFont(std::string name, cairo_font_face_t **font);
 		
 		/**
 		 * \brief

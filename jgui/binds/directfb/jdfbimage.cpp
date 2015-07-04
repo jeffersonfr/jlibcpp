@@ -498,7 +498,25 @@ Image * DFBImage::Colorize(Image *img, Color color)
 
 	HSLColorSpace hsl(hue, sat, 0.0);
 
-	if (image->GetPixelFormat() == JPF_RGB32 || image->GetPixelFormat() == JPF_ARGB) {
+	if (image->GetPixelFormat() == JPF_ARGB) {
+		for (int j=0; j<image->GetHeight(); j++) {
+			uint8_t *dst = (uint8_t *)(data + j * stride);
+
+			for (int i=0; i<stride; i+=4) {
+				// int a = *(dst + i + 3);
+				int r = *(dst + i + 2);
+				int g = *(dst + i + 1);
+				int b = *(dst + i + 0);
+
+				hsl.GetRGB(&r, &g, &b);
+
+				// *(dst + i + 3) = a;
+				*(dst + i + 2) = r;
+				*(dst + i + 1) = g;
+				*(dst + i + 0) = b;
+			}
+		}
+	} else if (image->GetPixelFormat() == JPF_RGB32) {
 		for (int j=0; j<image->GetHeight(); j++) {
 			uint8_t *dst = (uint8_t *)(data + j * stride);
 

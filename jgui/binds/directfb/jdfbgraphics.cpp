@@ -25,6 +25,7 @@
 #include "jfont.h"
 #include "jstringutils.h"
 #include "jrectangle.h"
+#include "jcharset.h"
 #include "jdfbfont.h"
 #include "jdfbgraphics.h"
 #include "jdfbimage.h"
@@ -1256,9 +1257,33 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 		line_width = -line_width;
 	}
 
-	cairo_move_to(_cairo_context, x, y+_font->GetAscender());
-	cairo_show_text(_cairo_context, text.c_str());
-	cairo_set_line_width(_cairo_context, line_width);
+	cairo_set_line_width(_cairo_context, 0); // line_width);
+
+	DFBFont *font = dynamic_cast<DFBFont *>(_font);
+
+	const char *utf8 = text.c_str();
+	int utf8_len = text.size();
+	cairo_glyph_t *glyphs = NULL;
+	int glyphs_len = 0;
+	cairo_status_t status;
+
+	if (_font->GetEncoding() == JFE_ISO_8859_1) {
+		jcommon::Charset charset;
+
+		utf8 = charset.Latin1ToUTF8(utf8, &utf8_len);
+	}
+
+	status = cairo_scaled_font_text_to_glyphs(
+			font->_scaled_font, x, y+_font->GetAscender(), utf8, utf8_len, &glyphs, &glyphs_len, NULL, NULL, NULL);
+
+	if (status == CAIRO_STATUS_SUCCESS) {
+		cairo_show_glyphs(_cairo_context, glyphs, glyphs_len);
+		cairo_glyph_free(glyphs);
+	}
+
+	if (_font->GetEncoding() == JFE_ISO_8859_1) {
+		delete [] utf8;
+	}
 
 	ApplyDrawing();
 }
@@ -1274,11 +1299,10 @@ void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
 	
 	cairo_glyph_t glyph;
 
-	glyph.x = 0;
-	glyph.y = 0;
+	glyph.x = x;
+	glyph.y = y + _font->GetAscender();
 	glyph.index = symbol;
 
-	cairo_move_to(_cairo_context, x, y+_font->GetAscender());
 	cairo_show_glyphs(_cairo_context, &glyph, 1);
 }
 

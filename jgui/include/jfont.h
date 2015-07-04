@@ -41,6 +41,11 @@ enum jfont_attributes_t {
 	JFA_ITALIC	= 0x02
 };
 
+enum jfont_encoding_t {
+	JFE_UTF8,
+	JFE_ISO_8859_1
+};
+
 /**
  * \brief
  *
@@ -58,6 +63,8 @@ class Font : public virtual jcommon::Object{
 		int _size;
 		/** \brief */
 		jfont_attributes_t _attributes;
+		/** \brief */
+		jfont_encoding_t _encoding;
 
 	protected:
 		/**
@@ -101,19 +108,19 @@ class Font : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jfont_attributes_t GetFontAttributes();
+		virtual jfont_attributes_t GetAttributes();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool SetEncoding(std::string code);
+		virtual void SetEncoding(jfont_encoding_t encoding);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual std::string GetEncoding();
+		virtual jfont_encoding_t GetEncoding();
 		
 		/**
 		 * \brief

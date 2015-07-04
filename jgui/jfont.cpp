@@ -42,6 +42,7 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size):
 	_name = name;
 	_size = size;
 	_attributes = attributes;
+	_encoding = JFE_UTF8;
 }
 
 Font::~Font()
@@ -76,7 +77,7 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int siz
 	return font;
 }
 
-jfont_attributes_t Font::GetFontAttributes()
+jfont_attributes_t Font::GetAttributes()
 {
 	return _attributes;
 }
@@ -86,14 +87,14 @@ void * Font::GetNativeFont()
 	return NULL;
 }
 
-bool Font::SetEncoding(std::string code)
+void Font::SetEncoding(jfont_encoding_t encoding)
 {
-	return false;
+	_encoding = encoding;
 }
 
-std::string Font::GetEncoding()
+jfont_encoding_t Font::GetEncoding()
 {
-	return "Unknown";
+	return _encoding;
 }
 
 std::string Font::GetName()

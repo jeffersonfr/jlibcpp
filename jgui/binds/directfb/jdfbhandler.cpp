@@ -88,29 +88,17 @@ IDirectFBDisplayLayer * DFBHandler::GetDisplayLayer()
 	return _layer;
 }
 
-int DFBHandler::CreateFont(std::string name, int height, cairo_font_face_t **font, std::string charset)
+int DFBHandler::CreateFont(std::string name, cairo_font_face_t **font)
 {
 	FT_Face ft_face;
 
-	FT_New_Face(_ft_library, "/usr/share/fonts/truetype/freefont/FreeMono.ttf", 0, &ft_face);
+	if (FT_New_Face(_ft_library, name.c_str(), 0, &ft_face) != 0) {
+		(*font) = NULL;
 
-	if (charset == "Unicode") {
-		FT_Select_Charmap(ft_face, ft_encoding_unicode);
-	} else if (charset == "Latin-1") {
-		FT_Select_Charmap(ft_face, ft_encoding_latin_1);
-	} else if (charset == "MS Symbol") {
-		FT_Select_Charmap(ft_face, ft_encoding_symbol);
-	} else if (charset == "SJJIS") {
-		FT_Select_Charmap(ft_face, ft_encoding_sjis);
-	} else if (charset == "GB-2312") {
-		FT_Select_Charmap(ft_face, ft_encoding_gb2312);
-	} else if (charset == "Big-5") {
-		FT_Select_Charmap(ft_face, ft_encoding_big5);
-	} else if (charset == "Wansung") {
-		FT_Select_Charmap(ft_face, ft_encoding_wansung);
-	} else if (charset == "Johab") {
-		FT_Select_Charmap(ft_face, ft_encoding_johab);
+		return -1;
 	}
+
+	FT_Select_Charmap(ft_face, ft_encoding_unicode);
 
 	(*font) = cairo_ft_font_face_create_for_ft_face(ft_face, FT_LOAD_NO_AUTOHINT);
 
