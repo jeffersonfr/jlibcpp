@@ -21,6 +21,7 @@
 #define J_GRAPHICS_H
 
 #include "jcolor.h"
+#include "jpath.h"
 #include "jmutex.h"
 
 #include <math.h>
@@ -236,6 +237,12 @@ class Graphics : public virtual jcommon::Object{
 		 */
 		virtual void SetNativeSurface(void *data, int wp, int hp);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Path * CreatePath();
+		
 		/**
 		 * \brief
 		 *

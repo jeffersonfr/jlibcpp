@@ -46,6 +46,11 @@ void NullGraphics::SetNativeSurface(void *data, int wp, int hp)
 	Graphics::SetNativeSurface(data, wp, hp);
 }
 
+Path * NullGraphics::CreatePath()
+{
+	return NULL;
+}
+
 jregion_t NullGraphics::ClipRect(int xp, int yp, int wp, int hp)
 {
 	JDEBUG(JINFO, "called\n");

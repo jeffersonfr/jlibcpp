@@ -56,7 +56,6 @@ DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size):
 
 	// INFO:: initializing font parameters
 	if (_is_builtin == false) {
-		puts("native");
 		int attr = 0;
 
 		if ((_attributes & JFA_BOLD) != 0) {
@@ -70,7 +69,6 @@ DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size):
 		cairo_ft_font_face_set_synthesize(_font, attr);
 		cairo_set_font_face(_context_ref, (cairo_font_face_t *)_font);
 	} else {
-		puts("builtin");
 		cairo_font_slant_t slant = CAIRO_FONT_SLANT_NORMAL;
 		cairo_font_weight_t weight = CAIRO_FONT_WEIGHT_NORMAL;
 

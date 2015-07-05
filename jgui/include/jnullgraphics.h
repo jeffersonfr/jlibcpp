@@ -62,6 +62,12 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
+		virtual Path * CreatePath();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Translate(int x, int y);
 
 		/**

@@ -54,6 +54,11 @@ void Graphics::SetNativeSurface(void *data, int wp, int hp)
 {
 }
 
+Path * Graphics::CreatePath()
+{
+	return NULL;
+}
+
 void Graphics::Dump(std::string dir, std::string pre)
 {
 }
