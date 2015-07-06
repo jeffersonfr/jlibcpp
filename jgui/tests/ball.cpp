@@ -291,14 +291,8 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 		}
 
 		void PaintBackground(jgui::Graphics *g) {
-			double scale,
-						 x,
-						 y,
-						 oy;
-			int i,
-					j,
-					pinx,
-					piny;
+			double scale, x, y, oy;
+			int i, j, pinx, piny;
 
 			// Draw the pins
 
@@ -339,9 +333,7 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 
 		void UpdateRack(jgui::Graphics *g) 
 		{
-			int i,
-					pinx,
-					piny;
+			int i, pinx, piny;
 
 			for(i=0;i<numracks;++i) {
 				while(rackdel[i]>0) {
@@ -356,17 +348,8 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 
 		void UpdateBalls() 
 		{
+			int j, k, pinx, piny, rack, bottomy, fr, lr, fc, lc;
 			double scale;
-			int j,
-					k,
-					pinx,
-					piny,
-					rack,
-					bottomy,
-					fr,
-					lr,
-					fc,
-					lc;
 
 			bottomy=_size.height;
 

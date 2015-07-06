@@ -64,8 +64,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		/** \brief */
 		jcomposite_flags_t _composite_flags;
 		/** \brief */
-		jdrawing_mode_t _drawing_mode;
-		/** \brief */
 		jpixelformat_t _pixelformat;
 		/** \brief */
 		int _line_width;
@@ -219,18 +217,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 */
 		virtual void SetCompositeFlags(jcomposite_flags_t t);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jdrawing_mode_t GetDrawingMode();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDrawingMode(jdrawing_mode_t t);
-
 		/**
 		 * \brief
 		 *

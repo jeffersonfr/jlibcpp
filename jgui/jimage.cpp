@@ -26,6 +26,8 @@
 
 #if defined(DIRECTFB_UI)
 #include "jdfbimage.h"
+#elif defined(DIRECTFB_ONLY_UI)
+#include "jdfbimage.h"
 #endif
 
 namespace jgui {
@@ -54,6 +56,8 @@ jsize_t Image::GetImageSize(std::string img)
 
 #if defined(DIRECTFB_UI)
 	t = DFBImage::GetImageSize(img);
+#elif defined(DIRECTFB_ONLY_UI)
+	t = DFBImage::GetImageSize(img);
 #endif
 
 	return t;
@@ -65,6 +69,8 @@ Image * Image::CreateImage(jpixelformat_t pixelformat, int width, int height)
 
 	try {
 #if defined(DIRECTFB_UI)
+		image = new DFBImage(pixelformat, width, height);
+#elif defined(DIRECTFB_ONLY_UI)
 		image = new DFBImage(pixelformat, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -79,6 +85,8 @@ Image * Image::CreateImage(uint32_t *data, int width, int height)
 
 	try {
 #if defined(DIRECTFB_UI)
+		image = new DFBImage(JPF_ARGB, width, height);
+#elif defined(DIRECTFB_ONLY_UI)
 		image = new DFBImage(JPF_ARGB, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -104,6 +112,8 @@ Image * Image::CreateImage(std::string file)
 
 	try {
 #if defined(DIRECTFB_UI)
+			image = new DFBImage(file);
+#elif defined(DIRECTFB_ONLY_UI)
 			image = new DFBImage(file);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -131,6 +141,8 @@ Image * Image::CreateImage(jio::InputStream *stream)
 
 	try {
 #if defined(DIRECTFB_UI)
+		image = DFBImage::CreateImageStream(stream);
+#elif defined(DIRECTFB_ONLY_UI)
 		image = DFBImage::CreateImageStream(stream);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -180,6 +192,8 @@ Image * Image::Flip(jflip_flags_t t)
 	try {
 #if defined(DIRECTFB_UI)
 		image = DFBImage::Flip(this, t);
+#elif defined(DIRECTFB_ONLY_UI)
+		image = DFBImage::Flip(this, t);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -193,6 +207,8 @@ Image * Image::Rotate(double radians, bool resize)
 
 	try {
 #if defined(DIRECTFB_UI)
+		image = DFBImage::Rotate(this, radians, resize);
+#elif defined(DIRECTFB_ONLY_UI)
 		image = DFBImage::Rotate(this, radians, resize);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -208,6 +224,8 @@ Image * Image::Scale(int width, int height)
 	try {
 #if defined(DIRECTFB_UI)
 		image = DFBImage::Scale(this, width, height);
+#elif defined(DIRECTFB_ONLY_UI)
+		image = DFBImage::Scale(this, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -221,6 +239,8 @@ Image * Image::Crop(int x, int y, int width, int height)
 
 	try {
 #if defined(DIRECTFB_UI)
+		image = DFBImage::Crop(this, x, y, width, height);
+#elif defined(DIRECTFB_ONLY_UI)
 		image = DFBImage::Crop(this, x, y, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -236,6 +256,8 @@ Image * Image::Blend(double alpha)
 	try {
 #if defined(DIRECTFB_UI)
 		image = DFBImage::Blend(this, alpha);
+#elif defined(DIRECTFB_ONLY_UI)
+		image = DFBImage::Blend(this, alpha);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -249,6 +271,8 @@ Image * Image::Colorize(Color color)
 
 	try {
 #if defined(DIRECTFB_UI)
+		image = DFBImage::Colorize(this, color);
+#elif defined(DIRECTFB_ONLY_UI)
 		image = DFBImage::Colorize(this, color);
 #endif
 	} catch (jcommon::RuntimeException &) {

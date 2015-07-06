@@ -650,11 +650,11 @@ void DFBImage::GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, int *
 	wp = (wp*pitch)/GetWidth();
 
 	for (int j=0; j<hp; j++) {
-		uint8_t *src = (uint8_t *)(data + (j + yp) * pitch);
-		uint8_t *dst = (uint8_t *)(buffer + j * pitch);
+		uint8_t *src = (uint8_t *)(data + (j + yp) * pitch + xp);
+		uint8_t *dst = (uint8_t *)(*buffer + j * pitch);
 
 		for (int i=0; i<wp; i++) {
-			*(dst + i) = *(src + (i + xp));
+			*(dst + i) = *(src + i);
 		}
 	}
 

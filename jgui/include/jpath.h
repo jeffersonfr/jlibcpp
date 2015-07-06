@@ -17,73 +17,52 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jplayermanager.h"
-#include "jurl.h"
+#ifndef J_PATH_H
+#define J_PATH_H
 
-#if defined(DIRECTFB_UI)
-#include "jdfblightplayer.h"
-#include "jdfbheavyplayer.h"
-#elif defined(DIRECTFB_ONLY_UI)
-#include "jdfblightplayer.h"
-#include "jdfbheavyplayer.h"
-#endif
+#include "jcolor.h"
+#include "jmutex.h"
 
-namespace jmedia {
+#include <math.h>
 
-std::map<jplayer_hints_t, bool> PlayerManager::_hints;
+namespace jgui{
 
-PlayerManager::PlayerManager():
-	jcommon::Object()
-{
-	jcommon::Object::SetClassName("jmedia::PlayerManager");
-}
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class Path : public virtual jcommon::Object{
+	
+	protected:
+		/**
+		 * \brief
+		 *
+		 */
+		Path();
 
-PlayerManager::~PlayerManager()
-{
-}
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~Path();
 
-Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
-{
-	jcommon::URL url(url_);
-
-	if (url.GetProtocol() == "file" || url.GetProtocol() == "http") {
-#if defined(DIRECTFB_UI)
-		std::map<jplayer_hints_t, bool>::iterator i = _hints.find(JPH_LIGHTWEIGHT);
-
-		if (i == _hints.end() || i->second == true) {
-			return new DFBLightPlayer(url.GetPath());
-		} else {
-			return new DFBHeavyPlayer(url.GetPath());
-		}
-#elif defined(DIRECTFB_ONLY_UI)
-		std::map<jplayer_hints_t, bool>::iterator i = _hints.find(JPH_LIGHTWEIGHT);
-
-		if (i == _hints.end() || i->second == true) {
-			return new DFBLightPlayer(url.GetPath());
-		} else {
-			return new DFBHeavyPlayer(url.GetPath());
-		}
-#endif
-	}
-
-	return NULL;
-}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Begin();
 		
-void PlayerManager::SetHint(jplayer_hints_t hint, bool value)
-{
-	_hints[hint] = value;
-}
-
-bool PlayerManager::GetHint(jplayer_hints_t hint)
-{
-	std::map<jplayer_hints_t, bool>::iterator i = _hints.find(hint);
-
-	if (i != _hints.end()) {
-		return i->second;
-	}
-
-	return false;
-}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void End();
+		
+};
 
 }
+
+#endif 
 

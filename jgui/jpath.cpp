@@ -17,73 +17,27 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jplayermanager.h"
-#include "jurl.h"
+#include "Stdafx.h"
+#include "jpath.h"
 
-#if defined(DIRECTFB_UI)
-#include "jdfblightplayer.h"
-#include "jdfbheavyplayer.h"
-#elif defined(DIRECTFB_ONLY_UI)
-#include "jdfblightplayer.h"
-#include "jdfbheavyplayer.h"
-#endif
+namespace jgui {
 
-namespace jmedia {
-
-std::map<jplayer_hints_t, bool> PlayerManager::_hints;
-
-PlayerManager::PlayerManager():
+Path::Path():
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jmedia::PlayerManager");
+	jcommon::Object::SetClassName("jgui::Path");
 }
 
-PlayerManager::~PlayerManager()
+Path::~Path()
 {
 }
 
-Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
+void Path::Begin()
 {
-	jcommon::URL url(url_);
-
-	if (url.GetProtocol() == "file" || url.GetProtocol() == "http") {
-#if defined(DIRECTFB_UI)
-		std::map<jplayer_hints_t, bool>::iterator i = _hints.find(JPH_LIGHTWEIGHT);
-
-		if (i == _hints.end() || i->second == true) {
-			return new DFBLightPlayer(url.GetPath());
-		} else {
-			return new DFBHeavyPlayer(url.GetPath());
-		}
-#elif defined(DIRECTFB_ONLY_UI)
-		std::map<jplayer_hints_t, bool>::iterator i = _hints.find(JPH_LIGHTWEIGHT);
-
-		if (i == _hints.end() || i->second == true) {
-			return new DFBLightPlayer(url.GetPath());
-		} else {
-			return new DFBHeavyPlayer(url.GetPath());
-		}
-#endif
-	}
-
-	return NULL;
 }
-		
-void PlayerManager::SetHint(jplayer_hints_t hint, bool value)
+
+void Path::End()
 {
-	_hints[hint] = value;
-}
-
-bool PlayerManager::GetHint(jplayer_hints_t hint)
-{
-	std::map<jplayer_hints_t, bool>::iterator i = _hints.find(hint);
-
-	if (i != _hints.end()) {
-		return i->second;
-	}
-
-	return false;
 }
 
 }
-

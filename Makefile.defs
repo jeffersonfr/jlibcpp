@@ -17,6 +17,12 @@
 #   Free Software Foundation, Inc.,                                       *
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
+MODULE		= jlibcpp
+
+VERSION		= 1.8.0
+
+EXE				= lib$(MODULE)-$(VERSION).so
+
 HOST			= 
 BUILD			= 
 
@@ -37,11 +43,66 @@ OBJDIR		= obj
 TESTDIR		= tests
 DOCDIR		= doc
 
-PREFIX		= /usr/local
+PREFIX		= /jeff/local
 
 TARGET		= $(BUILD)$(PREFIX)
 
 ECHO			= echo
 
 OK 				= \033[30;32mOK\033[m
+
+DEBUG  		= \
+		 -g -ggdb \
+
+ARFLAGS		= \
+		 -rc \
+
+# {yes,no}
+ENABLE_DEBUG ?= no
+# {none,directfb}
+ENABLE_GRAPHICS ?= directfb-only
+
+# -ansi: problemas com va_copy()
+CCFLAGS		= \
+		 -Wall -shared -rdynamic -fPIC -funroll-loops -O2 -pthread \
+		 $(DEBUG) -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" \
+		 -I$(INCDIR) \
+		 -Iwin32\
+		 -Ijcommon/include \
+		 -Ijgui/include \
+		 -Ijio/include \
+		 -Ijlogger/include \
+		 -Ijmath/include \
+		 -Ijmedia/include \
+		 -Ijmpeg/include \
+		 -Ijresource/include \
+		 -Ijsecurity/include \
+		 -Ijshared/include \
+		 -Ijipc/include \
+		 -Ijsocket/include \
+		 -Ijthread/include \
+	 	 `pkg-config --cflags libssl` \
+
+LDFLAGS		= \
+	 	 `pkg-config --libs libssl` \
+		 -lpthread \
+		 -ldl \
+		 -lrt \
+		 -luuid \
+
+DEFINES		= \
+		 -D_GNU_SOURCE \
+		 -D_REENTRANT \
+		 -D_FILE_OFFSET_BITS=64 \
+		 -D_LARGEFILE_SOURCE \
+
+ifeq ($(ENABLE_DEBUG),yes)
+	
+DEFINES		+= \
+		 -DJDEBUG_ENABLED \
+
+endif
+
+REQUIRES	= \
+		 libssl \
 

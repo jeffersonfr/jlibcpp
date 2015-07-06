@@ -52,17 +52,6 @@ enum jcomposite_flags_t {
  * \brief
  *
  */
-enum jdrawing_mode_t {
-	JDM_PATH,
-	JDM_STROKE,
-	JDM_FILL,
-	JDM_CLIP
-};
-
-/**
- * \brief
- *
- */
 enum jantialias_mode_t {
 	JAM_NONE,
 	JAM_FAST,
@@ -385,19 +374,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jdrawing_mode_t GetDrawingMode();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetCompositeFlags(jcomposite_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDrawingMode(jdrawing_mode_t t);
 		
 		/**
 		 * \brief

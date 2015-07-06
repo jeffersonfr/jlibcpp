@@ -17,35 +17,136 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NULLGRAPHICS_H
-#define J_NULLGRAPHICS_H
+#ifndef J_DFBGRAPHICS_H
+#define J_DFBGRAPHICS_H
 
 #include "jgraphics.h"
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <vector>
+#include <ctype.h>
+#include <string>
+#include <math.h>
+#include <list>
+
+#include <directfb.h>
+
 namespace jgui{
+
+class Font;
+class Image;
+class DFBImage;
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class NullGraphics : public Graphics{
+class DFBGraphics : public virtual jgui::Graphics{
 	
+	friend class DFBImage;
+	friend class Window;
+
+	protected:
+		/** \brief */
+		jthread::Mutex _graphics_mutex;
+		/** \brief */
+		IDirectFBSurface *_surface;
+		/** \brief */
+		// DFBImage *_image;
+		/** \brief */
+		struct jregion_t _clip;
+		/** \brief */
+		struct jregion_t _internal_clip;
+		/** \brief */
+		jline_join_t _line_join;
+		/** \brief */
+		jline_style_t _line_style;
+		/** \brief */
+		jcomposite_flags_t _composite_flags;
+		/** \brief */
+		int _line_width;
+		/** \brief */
+		bool _premultiply;
+		/** \brief */
+		jpixelformat_t _pixelformat;
+
 	private:
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ApplyDrawing();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual double EvaluateBezier0(double *data, int ndata, double t);
+
+		/**
+		 * \brief
+		 *
+		 */
+		int CalculateGradientChannel(int schannel, int dchannel, int distance, int offset); 
+
+		/**
+		 * \brief
+		 *
+		 */
+		void UpdateGradientColor(Color &scolor, Color &dcolor, int distance, int offset);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void FillPolygon0(jgui::jpoint_t *points, int npoints, int x1p, int y1p, int x2p, int y2p); 
+
+		/**
+		 * \brief
+		 *
+		 */
+		void DrawRectangle0(int xp, int yp, int wp, int hp, int dx, int dy, jline_join_t join, int size);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void DrawArc0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size, int quadrant);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void DrawArcHelper(int xc, int yc, int rx, int ry, double arc0, double arc1, int size);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void DrawPie0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void DrawChord0(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1, int size);
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NullGraphics();
-		
+		DFBGraphics(void *surface, jpixelformat_t pixelformat, int wp, int hp, bool premultiply);
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~NullGraphics();
-	
+		virtual ~DFBGraphics();
+
 		/**
 		 * \brief
 		 *
@@ -62,19 +163,7 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual Path * CreatePath();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Translate(int x, int y);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t Translate();
+		virtual void Dump(std::string dir, std::string pre);
 
 		/**
 		 * \brief
@@ -158,31 +247,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual bool HasFont(); 
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetFont(Font *font); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual Font * GetFont(); 
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetAntialias(jantialias_mode_t mode);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jantialias_mode_t GetAntialias();
 
 		/**
 		 * \brief
@@ -366,26 +437,14 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd);
+		virtual void FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd = false);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool closed);
+		virtual void DrawPolygon(int xp, int yp, jpoint_t *p, int num, bool close);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetGradientStop(double stop, const Color &color);
-		
-			/**
-		 * \brief
-		 *
-		 */
-		virtual void ResetGradientStop();
-
 		/**
 		 * \brief
 		 *
@@ -404,42 +463,6 @@ class NullGraphics : public Graphics{
 		 */
 		virtual void DrawGlyph(int symbol, int xp, int yp);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool DrawImage(Image *img, int xp, int yp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool DrawImage(Image *img, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jregion_t GetStringExtends(std::string text);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jregion_t GetGlyphExtends(int symbol);
-
 		/**
 		 * \brief
 		 *
@@ -476,6 +499,30 @@ class NullGraphics : public Graphics{
 		 */
 		virtual void SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp);
 	
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool DrawImage(Image *img, int xp, int yp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool DrawImage(Image *img, int xp, int yp, int wp, int hp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp);
+		
 		/**
 		 * \brief
 		 *

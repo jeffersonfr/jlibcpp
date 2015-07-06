@@ -501,8 +501,6 @@ void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 	cairo_set_line_width(_cairo_context, line_width);
 	cairo_stroke(_cairo_context);
 	cairo_restore(_cairo_context);
-
-	ApplyDrawing();
 }
 
 void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
@@ -565,8 +563,6 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 
   cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, line_width);
-
-	ApplyDrawing();
 }
 
 void DFBGraphics::FillRectangle(int xp, int yp, int wp, int hp)
@@ -610,8 +606,7 @@ void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 	cairo_rectangle(_cairo_context, x, y, w, h);
   cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, abs(_line_width));
-
-	ApplyDrawing();
+	cairo_stroke(_cairo_context);
 }
 
 void DFBGraphics::FillBevelRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
@@ -739,8 +734,7 @@ void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
   cairo_close_path(_cairo_context);
   cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, abs(_line_width));
-
-	ApplyDrawing();
+	cairo_stroke(_cairo_context);
 }
 
 void DFBGraphics::FillRoundRectangle(int xp, int yp, int wp, int hp, int dx, int dy, jrect_corner_t corners)
@@ -892,8 +886,7 @@ void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
   cairo_close_path(_cairo_context);
   cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, abs(_line_width));
-
-	ApplyDrawing();
+	cairo_stroke(_cairo_context);
 }
 
 void DFBGraphics::FillCircle(int xcp, int ycp, int rp)
@@ -963,8 +956,7 @@ void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 	cairo_close_path(_cairo_context);
 	cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, line_width);
-	
-	ApplyDrawing();
+	cairo_stroke(_cairo_context);
 }
 
 void DFBGraphics::FillArc(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
@@ -1014,23 +1006,12 @@ void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	cairo_arc_negative(_cairo_context, 0.0, 0.0, 1.0, arc0, arc1);
 	cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, abs(_line_width));
-	
-	ApplyDrawing();
+	cairo_stroke(_cairo_context);
 }
 
 void DFBGraphics::FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
 	FillArc(xcp, ycp, rxp, ryp, arc0, arc1);
-}
-
-void DFBGraphics::SetDrawingMode(jdrawing_mode_t mode)
-{
-	_drawing_mode = mode;
-}
-
-jdrawing_mode_t DFBGraphics::GetDrawingMode()
-{
-	return _drawing_mode;
 }
 
 void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
@@ -1062,8 +1043,7 @@ void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	cairo_close_path(_cairo_context);
 	cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, abs(_line_width));
-
-	ApplyDrawing();
+	cairo_stroke(_cairo_context);
 }
 		
 void DFBGraphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
@@ -1127,8 +1107,7 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 	
 	cairo_restore(_cairo_context);
 	cairo_set_line_width(_cairo_context, line_width);
-
-  ApplyDrawing();
+	cairo_stroke(_cairo_context);
 }
 
 void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool even_odd)
@@ -1285,7 +1264,7 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 		delete [] utf8;
 	}
 
-	ApplyDrawing();
+	cairo_stroke(_cairo_context);
 }
 
 void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
@@ -1862,31 +1841,10 @@ void DFBGraphics::Reset()
 
 	ResetGradientStop();
 	SetCompositeFlags(JCF_SRC_OVER);
-	SetDrawingMode(JDM_STROKE);
 }
 
 void DFBGraphics::ApplyDrawing()
 {
-	/* TODO:: apply paths
-	if (_dashPattern) {
-		cairo_set_dash(context, _dashPattern, _dashCount, _dashOffset);
-	} else {
-		cairo_set_dash(context, 0, 0, 0);
-	}
-
-	if (_mode == GradientMode && _gradient.getType() != Gradient::None) {
-		cairo_set_source(context, _gradient.getCairoGradient());
-	} else {
-		cairo_set_source_rgba(context, _color.red(), _color.green(), _color.blue(), _color.alpha());
-	}
-	*/
-
-	if (_drawing_mode == JDM_PATH) {
-	} else if (_drawing_mode == JDM_STROKE) {
-		cairo_stroke(_cairo_context);
-	} else if (_drawing_mode == JDM_FILL) {
-		cairo_fill(_cairo_context);
-	}
 }
 
 double DFBGraphics::EvaluateBezier0(double *data, int ndata, double t) 

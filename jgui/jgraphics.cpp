@@ -104,18 +104,9 @@ void Graphics::SetCompositeFlags(jcomposite_flags_t t)
 {
 }
 
-void Graphics::SetDrawingMode(jdrawing_mode_t t)
-{
-}
-
 jcomposite_flags_t Graphics::GetCompositeFlags()
 {
 	return JCF_CLEAR;
-}
-
-jdrawing_mode_t Graphics::GetDrawingMode()
-{
-	return JDM_STROKE;
 }
 
 void Graphics::Clear()

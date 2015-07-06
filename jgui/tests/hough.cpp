@@ -190,7 +190,7 @@ class Test : public jgui::Frame {
 			// INFO:: get  pixels
 			uint32_t *data = NULL;
 
-			_image->GetGraphics()->GetRGB(&data, 0, 0, size.width, size.height);
+			_image->GetGraphics()->GetRGBArray(&data, 0, 0, size.width, size.height);
 
 			// INFO:: convert to gray and binarize
 			uint8_t *gray = new uint8_t[size.width*size.height];

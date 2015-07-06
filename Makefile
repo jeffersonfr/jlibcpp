@@ -1,68 +1,23 @@
-MODULE		= jlibcpp
-
-VERSION		= 1.6.0
-
-EXE				= lib$(MODULE)-$(VERSION).so
-
+#**************************************************************************
+#   Copyright (C) 2005 by Jeff Ferr                                       *
+#   root@sat                                                              *
+#                                                                         *
+#   This program is free software; you can redistribute it and/or modify  *
+#   it under the terms of the GNU General Public License as published by  *
+#   the Free Software Foundation; either version 2 of the License, or     *
+#   (at your option) any later version.                                   *
+#                                                                         *
+#   This program is distributed in the hope that it will be useful,       *
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+#   GNU General Public License for more details.                          *
+#                                                                         *
+#   You should have received a copy of the GNU General Public License     *
+#   along with this program; if not, write to the                         *
+#   Free Software Foundation, Inc.,                                       *
+#   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+#**************************************************************************
 include Makefile.defs
-
-# {yes, no}
-ENABLE_DEBUG ?= no
-# {none, directfb}
-ENABLE_GRAPHICS ?= directfb
-# {none, directfb}
-ENABLE_MEDIA ?= directfb
-
-DEBUG  		= \
-		 -g -ggdb \
-
-ARFLAGS		= \
-		 -rc \
-
-# -ansi: problemas com va_copy()
-CCFLAGS		= \
-		 -Wall -shared -rdynamic -fPIC -funroll-loops -O2 -pthread \
-		 $(DEBUG) -D_DATA_PREFIX=\"$(PREFIX)/$(MODULE)\" \
-		 -I$(INCDIR) \
-		 -Iwin32\
-		 -Ijcommon/include \
-		 -Ijgui/include \
-		 -Ijio/include \
-		 -Ijlogger/include \
-		 -Ijmath/include \
-		 -Ijmedia/include \
-		 -Ijmpeg/include \
-		 -Ijresource/include \
-		 -Ijsecurity/include \
-		 -Ijshared/include \
-		 -Ijipc/include \
-		 -Ijsocket/include \
-		 -Ijthread/include \
-	 	 `pkg-config --cflags libssl` \
-
-LDFLAGS		= \
-	 	 `pkg-config --libs libssl` \
-		 -lpthread \
-		 -ldl \
-		 -lrt \
-		 -luuid \
-
-DEFINES		= \
-		 -D_GNU_SOURCE \
-		 -D_REENTRANT \
-		 -D_FILE_OFFSET_BITS=64 \
-		 -D_LARGEFILE_SOURCE \
-
-ifeq ($(ENABLE_DEBUG),yes)
-	
-DEFINES		+= \
-		 -DJDEBUG_ENABLED \
-
-endif
-
-REQUIRES	= \
-		 libssl \
-
 include Makefile.gui
 include Makefile.media
 
@@ -356,6 +311,7 @@ OBJS_jgui += \
 		jnullgraphics.o\
 		jnulllayout.o\
 		jpanel.o\
+		jpath.o\
 		jprogressbar.o\
 		jrectangle.o\
 		jscrollbar.o\
@@ -386,8 +342,6 @@ OBJS_jgui += \
 		jtreelistview.o\
 		jguilib.o\
 
-ifneq ($(ENABLE_MEDIA),none)
-
 OBJS_jmedia += \
 		jaudioconfigurationcontrol.o\
 		jcontrol.o\
@@ -403,8 +357,6 @@ OBJS_jmedia += \
 		jvideosizecontrol.o\
 		jvolumecontrol.o\
 		jmedialib.o\
-
-endif
 
 endif
 
@@ -488,9 +440,7 @@ install: uninstall
 	@install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jsecurity && install -o nobody -m 644 jsecurity/include/* $(TARGET)/include/$(MODULE)/jsecurity
 	@if [ $(ENABLE_GRAPHICS) != "none" ]; then \
 		install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jgui && install -o nobody -m 644 jgui/include/* $(TARGET)/include/$(MODULE)/jgui; \
-		if [ $(ENABLE_MEDIA) != "none" ]; then \
-			install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jmedia && install -o nobody -m 644 jmedia/include/* $(TARGET)/include/$(MODULE)/jmedia; \
-		fi; \
+		install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jmedia && install -o nobody -m 644 jmedia/include/* $(TARGET)/include/$(MODULE)/jmedia; \
 	fi;
 	@$(ECHO) "Installing $(EXE) in $(TARGET)/lib/lib$(MODULE).so $(OK)"
 	@install -d -o nobody -m 755 $(TARGET)/lib && install -o nobody -m 644 $(LIBDIR)/$(EXE) $(TARGET)/lib && cd $(TARGET)/lib; ln -s $(EXE) lib$(MODULE).so; cd -

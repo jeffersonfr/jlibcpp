@@ -30,7 +30,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#if defined(DIRECTFB_UI)
+#if defined(DIRECTFB_UI) || defined(DIRECTFB_ONLY_UI)
 #include <directfb.h>
 #endif
 
@@ -57,6 +57,11 @@ class Window : public jgui::Container{
 
 	protected:
 #if defined(DIRECTFB_UI)
+		/** \brief */
+		IDirectFBWindow *_window;
+		/** \brief */
+		IDirectFBSurface *_surface;
+#elif defined(DIRECTFB_ONLY_UI)
 		/** \brief */
 		IDirectFBWindow *_window;
 		/** \brief */

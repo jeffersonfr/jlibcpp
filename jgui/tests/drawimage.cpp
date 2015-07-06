@@ -646,7 +646,6 @@ class Picture : public jgui::Component {
 
 				g->SetColor(jgui::Color::White);
 				g->DrawString(_title, 0, 0);
-				_image = _image->Colorize(0xffff0000);
 				g->DrawImage(_image, 0, height, GetWidth(), GetHeight()-height);
 			}
 		}

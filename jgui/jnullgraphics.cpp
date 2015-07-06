@@ -177,13 +177,6 @@ jantialias_mode_t NullGraphics::GetAntialias()
 	return Graphics::GetAntialias();
 }
 
-jdrawing_mode_t NullGraphics::GetDrawingMode()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return Graphics::GetDrawingMode();
-}
-
 jcomposite_flags_t NullGraphics::GetCompositeFlags()
 {
 	JDEBUG(JINFO, "called\n");
@@ -196,13 +189,6 @@ void NullGraphics::SetCompositeFlags(jcomposite_flags_t t)
 	JDEBUG(JINFO, "called\n");
 
 	Graphics::SetCompositeFlags(t);
-}
-
-void NullGraphics::SetDrawingMode(jdrawing_mode_t t)
-{
-	JDEBUG(JINFO, "called\n");
-
-	Graphics::SetDrawingMode(t);
 }
 
 void NullGraphics::SetLineJoin(jline_join_t t)

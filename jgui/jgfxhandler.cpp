@@ -28,6 +28,8 @@
 
 #if defined(DIRECTFB_UI)
 #include "jdfbhandler.h"
+#elif defined(DIRECTFB_ONLY_UI)
+#include "jdfbhandler.h"
 #endif
 
 namespace jgui {
@@ -52,6 +54,18 @@ GFXHandler * GFXHandler::GetInstance()
 {
 	if (_instance == NULL) {
 #if defined(DIRECTFB_UI)
+		DFBHandler *handler = NULL;
+		
+		try {
+			_instance = handler = new DFBHandler();
+
+			handler->InitEngine();
+			handler->InitResources();
+			handler->InitCursors();
+		} catch (...) {
+			_instance = NULL;
+		}
+#elif defined(DIRECTFB_ONLY_UI)
 		DFBHandler *handler = NULL;
 		
 		try {

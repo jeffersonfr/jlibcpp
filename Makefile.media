@@ -1,13 +1,32 @@
-ifeq ($(ENABLE_MEDIA),directfb)
+#**************************************************************************
+#   Copyright (C) 2005 by Jeff Ferr                                       *
+#   root@sat                                                              *
+#                                                                         *
+#   This program is free software; you can redistribute it and/or modify  *
+#   it under the terms of the GNU General Public License as published by  *
+#   the Free Software Foundation; either version 2 of the License, or     *
+#   (at your option) any later version.                                   *
+#                                                                         *
+#   This program is distributed in the hope that it will be useful,       *
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+#   GNU General Public License for more details.                          *
+#                                                                         *
+#   You should have received a copy of the GNU General Public License     *
+#   along with this program; if not, write to the                         *
+#   Free Software Foundation, Inc.,                                       *
+#   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+#**************************************************************************
+ifeq ($(ENABLE_GRAPHICS),directfb)
 	CCFLAGS		+= \
-		 -Ijmedia/binds/$(ENABLE_MEDIA)/include \
+		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
 		 `pkg-config --cflags directfb` \
 
 	LDFLAGS		+= \
 		 `pkg-config --libs directfb` \
 
 	DEFINES		+= \
-		 -DDIRECTFB_MEDIA \
+		 -DDIRECTFB_UI \
 
 	REQUIRES	+= \
 		 directfb \
@@ -16,7 +35,29 @@ ifeq ($(ENABLE_MEDIA),directfb)
 		 jdfbheavyplayer.o\
 		 jdfblightplayer.o\
 
-OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
+OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),directfb-only)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
+		 `pkg-config --cflags directfb` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs directfb` \
+
+	DEFINES		+= \
+		 -DDIRECTFB_ONLY_UI \
+
+	REQUIRES	+= \
+		 directfb \
+
+	OBJS_media	+= \
+		 jdfbheavyplayer.o\
+		 jdfblightplayer.o\
+
+OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
 
 endif
 
