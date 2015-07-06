@@ -453,13 +453,8 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 		line_width = -line_width;
 	}
 
-	double *x, 
-				 *y, 
-				 stepsize;
-	int x1, 
-			y1, 
-			x2, 
-			y2;
+	double *x, *y, stepsize;
+	int x1, y1, x2, y2; 
 
 	stepsize = (double)1.0/(double)interpolation;
 
@@ -932,11 +927,12 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 
 				FillArc(xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y+1, line_width, line_width-1, ang0, ang1);
 			} else if (_line_join == JLJ_MITER) {
+					/*
 				int a1 = scaled[((i+0)%npoints)*2+0].y-scaled[((i+0)%npoints)*2+1].y,
-						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x,
+						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x;
 						c1 = scaled[((i+0)%npoints)*2+0].x*scaled[((i+0)%npoints)*2+1].y-scaled[((i+0)%npoints)*2+1].x*scaled[((i+0)%npoints)*2+0].y;
 				int a2 = scaled[((i+1)%npoints)*2+0].y-scaled[((i+1)%npoints)*2+1].y,
-						b2 = scaled[((i+1)%npoints)*2+0].x-scaled[((i+1)%npoints)*2+1].x,
+						b2 = scaled[((i+1)%npoints)*2+0].x-scaled[((i+1)%npoints)*2+1].x;
 						c2 = scaled[((i+1)%npoints)*2+0].x*scaled[((i+1)%npoints)*2+1].y-scaled[((i+1)%npoints)*2+1].x*scaled[((i+1)%npoints)*2+0].y;
 				int dx0 = (a1*b2-a2*b1),
 						dy0 = (a1*b2-a2*b1);
@@ -946,7 +942,6 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 						xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y, 
 						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
 				
-					/*
 				if (dx0 != 0 && dy0 != 0) {
 					int x0 = (b1*c2-b2*c1)/(a1*b2-a2*b1),
 							y0 = (a1*c2-a2*c1)/(a1*b2-a2*b1);
@@ -1308,56 +1303,87 @@ uint32_t DFBGraphics::GetRGB(int xp, int yp, uint32_t safe)
 void DFBGraphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
 	if (_surface == NULL) {
-		return;
+		throw jcommon::NullPointerException("Surface is null");
 	}
 
-	int startx = xp;
-	int starty = yp;
-	// int w = wp;
-	// int h = hp;
-	int w = wp;
-	int h = hp;
+	if (rgb == NULL) {
+		throw jcommon::NullPointerException("Pixel array is null");
+	}
+
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int sw;
+	int sh;
+	
+	_surface->GetSize(_surface, &sw, &sh);
+
+	if ((x < 0 || (x+wp) > sw) || (y < 0 || (y+hp) > sh)) {
+		throw jcommon::OutOfBoundsException("Index out of bounds");
+	}
 
 	void *ptr;
-	uint32_t *src,
-					 *dst;
-	int x,
-			y,
-			pitch;
+	int pitch;
 	uint32_t *array = (*rgb);
 
-	if (*rgb == NULL) {
+	if (array == NULL) {
 		array = new uint32_t[wp*hp];
 	}
 
-	int img_w,
-			img_h;
-	int max_w = startx+w,
-			max_h = starty+h;
+	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
 
-	_surface->GetSize(_surface, &img_w, &img_h);
+	if (_pixelformat == JPF_ARGB) {
+		for (int j=0; j<hp; j++) {
+			uint8_t *src = (uint8_t *)((uint8_t *)ptr + (y + j) * pitch + x * 4);
+			uint8_t *dst = (uint8_t *)(array + j * wp);
+			int si = 0;
+			int di = 0;
 
-	if (max_w > img_w || max_h > img_h) {
-		if ((*rgb) == NULL) {
-			delete [] array;
+			for (int i=0; i<wp; i++) {
+				*(dst + di + 3) = *(src + si + 3);
+				*(dst + di + 2) = *(src + si + 2);
+				*(dst + di + 1) = *(src + si + 1);
+				*(dst + di + 0) = *(src + si + 0);
+
+				si = si + 4;
+				di = di + 4;
+			}
 		}
+	} else if (_pixelformat == JPF_RGB32) {
+		for (int j=0; j<hp; j++) {
+			uint8_t *src = (uint8_t *)((uint8_t *)ptr + (y + j) * pitch + x * 4);
+			uint8_t *dst = (uint8_t *)(array + j * wp);
+			int si = 0;
+			int di = 0;
 
-		(*rgb) = NULL;
+			for (int i=0; i<wp; i++) {
+				*(dst + di + 3) = *(src + si + 3);
+				*(dst + di + 2) = *(src + si + 2);
+				*(dst + di + 1) = *(src + si + 1);
+				*(dst + di + 0) = *(src + si + 0);
 
-		return;
-	}
+				si = si + 4;
+				di = di + 4;
+			}
+		}
+	} else if (_pixelformat == JPF_RGB24) {
+		for (int j=0; j<hp; j++) {
+			uint8_t *src = (uint8_t *)((uint8_t *)ptr + (y + j) * pitch + x * 3);
+			uint8_t *dst = (uint8_t *)(array + j * wp);
+			int si = 0;
+			int di = 0;
 
-	_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ), &ptr, &pitch);
+			for (int i=0; i<wp; i++) {
+				*(dst + di + 3) = 0xff;
+				*(dst + di + 2) = *(src + si + 2);
+				*(dst + di + 1) = *(src + si + 1);
+				*(dst + di + 0) = *(src + si + 0);
 
-	for (y=0; y<hp; y++) {
-		src = (uint32_t *)(array + y * wp);
-		dst = (uint32_t *)((uint8_t *)ptr + ((int)(yp + y)) * pitch);
-		
-		for (x=0; x<wp; x++) {
-			*(src + x) = *(dst + (int)(xp + x));
+				si = si + 3;
+				di = di + 4;
+			}
 		}
 	}
-
+	
 	_surface->Unlock(_surface);
 
 	(*rgb) = array;
@@ -1387,119 +1413,26 @@ void DFBGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	void *ptr;
-	uint32_t *dst,
-					 *src = rgb;
-	int wmax,
-			hmax,
-			pitch;
-
-	int x = xp;
-	int y = yp;
-	int w = wp;
-	int h = hp;
-
-	_surface->GetSize(_surface, &wmax, &hmax);
-
-	if (x > wmax || y > hmax) {
-		return;
-	}
-
-	if (x+w > wmax) {
-		w = wmax-x;
-	}
+	int x = _translate.x+xp;
+	int y = _translate.y+yp;
+	int sw;
+	int sh;
 	
-	if (y+h > hmax) {
-		h = hmax-y;
+	_surface->GetSize(_surface, &sw, &sh);
+
+	if ((x < 0 || (x+wp) > sw) || (y < 0 || (y+hp) > sh)) {
+		throw jcommon::OutOfBoundsException("Index out of bounds");
 	}
 
-	wmax = x+w;
-	hmax = y+h;
+	void *ptr;
+	int pitch;
 
 	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
 
-	if (_composite_flags == JCF_SRC) {
-		for (int j=0; j<h; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch)+x;
-			src = (uint32_t *)(rgb+(int)(j*wp));
-
-			double k = 0;
-			int last = -1;
-
-			for (int i=0; i<w; i++) {
-				if (last != (int)k) {
-					uint32_t pixel = *(src+(int)k);
-
-					if (_premultiply == true) {
-						uint32_t pa = (pixel >> 0x18) + 1;
-
-						pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
-					}
-					
-					*dst++ = pixel;
-					
-					last = (int)k;
-				}
-				
-				k = k + 1;
-			}
-		}
-	} else if (_composite_flags == JCF_SRC_OVER) {
-		for (int j=0; j<h; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch);
-			src = (uint32_t *)(rgb+(int)(j*wp));
-
-			for (int i=0; i<w; i++) {
-				int argb = *(src+(int)(i)),
-						pixel = *(dst+x+i),
-						r = (argb >> 0x10) & 0xff,
-						g = (argb >> 0x08) & 0xff,
-						b = (argb >> 0x00) & 0xff,
-						a = (argb >> 0x18) & 0xff,
-						pr = (pixel >> 0x10) & 0xff,
-						pg = (pixel >> 0x08) & 0xff,
-						pb = (pixel >> 0x00) & 0xff;
-
-				pr = (int)(pr*(0xff-a) + r*a) >> 0x08;
-				pg = (int)(pg*(0xff-a) + g*a) >> 0x08;
-				pb = (int)(pb*(0xff-a) + b*a) >> 0x08;
-
-				*(dst+x+i) = 0xff000000 | (pr << 0x10) | (pg << 0x08) | (pb << 0x00);
-			}
-		}
-	} else if (_composite_flags == JCF_XOR) {
-		for (int j=0; j<h; j++) {
-			dst = (uint32_t *)((uint8_t *)ptr+(y+j)*pitch)+x;
-			src = (uint32_t *)(rgb+(int)(j*wp));
-
-			double k = 0;
-			int last = -1;
-
-			for (int i=0; i<w; i++) {
-				if (last != (int)k) {
-					uint32_t pixel = *(src+(int)k);
-
-					if (_premultiply == true) {
-						uint32_t pa = (pixel >> 0x18) + 1;
-
-						pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
-					}
-					
-					*dst++ ^= pixel;
-					
-					last = (int)k;
-				}
-
-				k = k + 1;
-			}
-		}
-	}
-
-	/*
 	if (_pixelformat == JPF_ARGB) {
 		for (int j=0; j<hp; j++) {
 			uint8_t *src = (uint8_t *)(rgb + j * wp);
-			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x*step);
+			uint8_t *dst = (uint8_t *)((uint8_t *)ptr + (y + j) * pitch + x * 4);
 			int si = 0;
 			int di = 0;
 
@@ -1510,10 +1443,22 @@ void DFBGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 					*(dst + di + 1) = 0x00;
 					*(dst + di + 0) = 0x00;
 				} else if (_composite_flags == JCF_SRC) {
-					*(dst + di + 3) = *(src + si + 3);
-					*(dst + di + 2) = *(src + si + 2);
-					*(dst + di + 1) = *(src + si + 1);
-					*(dst + di + 0) = *(src + si + 0);
+					if (_premultiply == false) {
+						*(dst + di + 3) = *(src + si + 3);
+						*(dst + di + 2) = *(src + si + 2);
+						*(dst + di + 1) = *(src + si + 1);
+						*(dst + di + 0) = *(src + si + 0);
+					} else {
+						uint32_t pixel = *(uint32_t *)(src + si);
+						uint32_t pa = (pixel >> 0x18) + 1;
+
+						pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
+
+						*(dst + di + 3) = (pixel >> 0x18) & 0xff;
+						*(dst + di + 2) = (pixel >> 0x10) & 0xff;
+						*(dst + di + 1) = (pixel >> 0x08) & 0xff;
+						*(dst + di + 0) = (pixel >> 0x00) & 0xff;
+					}
 				} else if (_composite_flags == JCF_SRC_OVER) {
 					int a = *(src + si + 3);
 					int r = *(src + si + 2);
@@ -1560,12 +1505,24 @@ void DFBGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 				} else if (_composite_flags == JCF_DST_ATOP) {
 				} else if (_composite_flags == JCF_ADD) {
 				} else if (_composite_flags == JCF_XOR) {
-					// *(dst + di + 3) = *(src + si + 3);
-					*(dst + di + 2) ^= *(src + si + 2);
-					*(dst + di + 1) ^= *(src + si + 1);
-					*(dst + di + 0) ^= *(src + si + 0);
+					if (_premultiply == false) {
+						// *(dst + di + 3) = *(src + si + 3);
+						*(dst + di + 2) ^= *(src + si + 2);
+						*(dst + di + 1) ^= *(src + si + 1);
+						*(dst + di + 0) ^= *(src + si + 0);
+					} else {
+						uint32_t pixel = *(uint32_t *)(src + si);
+						uint32_t pa = (pixel >> 0x18) + 1;
+
+						pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
+						
+						// *(dst + di + 3) = (pixel >> 0x18) & 0xff;
+						*(dst + di + 2) ^= (pixel >> 0x10) & 0xff;
+						*(dst + di + 1) ^= (pixel >> 0x08) & 0xff;
+						*(dst + di + 0) ^= (pixel >> 0x00) & 0xff;
+					}
 				}
-				
+
 				si = si + 4;
 				di = di + 4;
 			}
@@ -1573,7 +1530,7 @@ void DFBGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 	} else if (_pixelformat == JPF_RGB32) {
 		for (int j=0; j<hp; j++) {
 			uint8_t *src = (uint8_t *)(rgb + j * wp);
-			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
+			uint8_t *dst = (uint8_t *)((uint8_t *)ptr + (y + j) * pitch + x * 4);
 			int si = 0;
 			int di = 0;
 
@@ -1590,7 +1547,7 @@ void DFBGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 	} else if (_pixelformat == JPF_RGB24) {
 		for (int j=0; j<hp; j++) {
 			uint8_t *src = (uint8_t *)(rgb + j * wp);
-			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
+			uint8_t *dst = (uint8_t *)((uint8_t *)ptr + (y + j) * pitch + x * 3);
 			int si = 0;
 			int di = 0;
 
@@ -1606,7 +1563,7 @@ void DFBGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 	} else if (_pixelformat == JPF_RGB16) {
 		for (int j=0; j<hp; j++) {
 			uint8_t *src = (uint8_t *)(rgb + j * wp);
-			uint8_t *dst = (uint8_t *)(data + (y + j) * stride + x * step);
+			uint8_t *dst = (uint8_t *)((uint8_t *)ptr + (y + j) * pitch + x * 2);
 			int si = 0;
 			int di = 0;
 
@@ -1620,7 +1577,6 @@ void DFBGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 			}
 		}
 	}
-	*/
 
 	_surface->Unlock(_surface);
 }
@@ -1667,10 +1623,10 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		DFBSurfaceBlittingFlags blit = DSBLIT_BLEND_ALPHACHANNEL;
 
 		if (_premultiply == true && g->_premultiply == false) {
-			blit = (DFBSurfaceBlittingFlags)(blit | DSBLIT_SRC_PREMULTIPLY);
+			blit = (DFBSurfaceBlittingFlags)(blit | DSBLIT_DEMULTIPLY);
 		}
 
-		_surface->SetBlittingFlags(_surface, blit);
+		// _surface->SetBlittingFlags(_surface, blit);
 
 		_surface->Blit(_surface, dfb_surface, NULL, xp+_translate.x, yp+_translate.y);
 	} else {
@@ -1722,10 +1678,10 @@ bool DFBGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int 
 		DFBSurfaceBlittingFlags blit = DSBLIT_BLEND_ALPHACHANNEL;
 
 		if (_premultiply == true && g->_premultiply == false) {
-			blit = (DFBSurfaceBlittingFlags)(blit | DSBLIT_SRC_PREMULTIPLY);
+			blit = (DFBSurfaceBlittingFlags)(blit | DSBLIT_DEMULTIPLY);
 		}
 
-		_surface->SetBlittingFlags(_surface, blit);
+		// _surface->SetBlittingFlags(_surface, blit);
 
 		_surface->Blit(_surface, dfb_surface, NULL, xp+_translate.x, yp+_translate.y);
 	} else {

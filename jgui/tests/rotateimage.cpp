@@ -125,7 +125,7 @@ class Main : public jgui::Frame{
 				for (int i=0; i<3; i++) {
 					jgui::Image *image = off->Rotate(radians[i], false);
 					jgui::Image *simage = offsub->Rotate(radians[i], false);
-
+ 
 					g->DrawImage(image, (int)(x+gapx+(i+k*3)*boxw), y+gapy+0*boxh);
 					g->DrawImage(image, (int)(x+gapx+(i+k*3)*boxw), y+gapy+1*boxh, iw, ih);
 					g->DrawImage(simage, (int)(x+gapx+(i+k*3)*boxw), y+gapy+2*boxh);

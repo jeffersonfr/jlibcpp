@@ -1,4 +1,5 @@
 1. gethostbyaddr is obsolescent, use getaddrinfo() instead.
 2. gethostbyname is obsolescent, use getnameinfo() instead.
-3. restore.cpp: freezing if call 'InitCursors()' in jdfbinputmanager::Restore()
-
+4. add TreeLock() and TreeUnlock() in jgui/jcomponent
+6. add fonts in themes
+7. implement the othres composition methods in jgraphics::SetRGB()

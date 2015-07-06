@@ -434,7 +434,7 @@ int Menu::GetCurrentIndex()
 	return 0;
 }
 
-void Menu::Repaint()
+void Menu::Repaint(Component *cmp)
 {
 	jgui::Graphics *g = GetGraphics();
 

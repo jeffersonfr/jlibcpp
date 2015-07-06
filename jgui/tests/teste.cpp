@@ -552,8 +552,6 @@ class GraphicPanel : public jgui::Canvas{
 			ccolor(0x20, 0xf0, 0x20, 0x80),
 			rcolor(0x00, 0x00, 0x00, 0x80);
 
-		g->SetCompositeFlags(jgui::JCF_SRC_OVER);
-
 		g->SetColor(rcolor);
 		g->SetLineWidth(1);
 		for (int i=0; i<=9; i++) {

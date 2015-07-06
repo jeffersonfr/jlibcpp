@@ -144,7 +144,7 @@ class Menu : public jgui::Frame, public jgui::ItemComponent{
 		 * \brief
 		 *
 		 */
-		virtual void Repaint();
+		virtual void Repaint(Component *cmp = NULL);
 
 		/**
 		 * \brief

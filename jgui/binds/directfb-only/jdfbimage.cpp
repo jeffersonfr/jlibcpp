@@ -495,9 +495,6 @@ Image * DFBImage::Flip(Image *img, jflip_flags_t mode)
 	IDirectFBSurface *isrc = (IDirectFBSurface *)img->GetGraphics()->GetNativeSurface();
 	IDirectFBSurface *idst = (IDirectFBSurface *)image->GetGraphics()->GetNativeSurface();
 
-	idst->SetPorterDuff(idst, (DFBSurfacePorterDuffRule)(DSPD_SRC_OVER));
-	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-
 	/*
 	// INFO:: use matrix
 	static const s32 x_mat[9] = {
@@ -543,8 +540,6 @@ Image * DFBImage::Flip(Image *img, jflip_flags_t mode)
 	}
 
 	idst->Blit(idst, isrc, NULL, 0, 0);
-
-	idst->SetPorterDuff(idst, (DFBSurfacePorterDuffRule)DSPD_SRC_OVER);
 	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
 
 	return image;
@@ -612,7 +607,7 @@ Image * DFBImage::Rotate(Image *img, double radians, bool resize)
 	idst->GetSize(idst, &dw, &dh);
 
 	isrc->Lock(isrc, (DFBSurfaceLockFlags)(DSLF_READ), &sptr, &spitch);
-	idst->Lock(idst, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &dptr, &dpitch);
+	idst->Lock(idst, (DFBSurfaceLockFlags)(DSLF_WRITE), &dptr, &dpitch);
 
 	int sxc = sw/2;
 	int syc = sh/2;
