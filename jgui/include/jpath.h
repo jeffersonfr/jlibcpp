@@ -21,6 +21,7 @@
 #define J_PATH_H
 
 #include "jcolor.h"
+#include "jimage.h"
 #include "jmutex.h"
 
 #include <math.h>
@@ -52,13 +53,79 @@ class Path : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void Begin();
+		virtual Image * CreatePattern();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void MoveTo(int xp, int yp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void LineTo(int xp, int yp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void CurveTo(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ArcTo(int xcp, int ycp, int radius, double arc0, double arc1, bool negative = true);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void TextTo(std::string text, int xp, int yp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Close();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Stroke();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void End();
+		virtual void Fill();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSource(Image *image);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetMask(Image *image);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetMatrix(double *matrix);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void GetMatrix(double **matrix);
 		
 };
 

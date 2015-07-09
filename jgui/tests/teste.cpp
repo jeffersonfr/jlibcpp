@@ -44,6 +44,7 @@
 #include "jsystem.h"
 #include "jwindowlistener.h"
 #include "jthememanager.h"
+#include "jpath.h"
 
 class WindowTest : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
 
@@ -551,9 +552,12 @@ class GraphicPanel : public jgui::Canvas{
 		jgui::Color pcolor(0xf0, 0xf0, 0xf0, 0x80),
 			ccolor(0x20, 0xf0, 0x20, 0x80),
 			rcolor(0x00, 0x00, 0x00, 0x80);
+		jgui::jpen_t pen = g->GetPen();
+
+		pen.width = 1;
+		g->SetPen(pen);
 
 		g->SetColor(rcolor);
-		g->SetLineWidth(1);
 		for (int i=0; i<=9; i++) {
 			g->DrawRectangle(10+i*(120+10)+10, 2*(120+10), 100, 100);
 			g->DrawRectangle(10+i*(120+10)+10, 3*(120+10), 100, 100);
@@ -562,41 +566,65 @@ class GraphicPanel : public jgui::Canvas{
 		}
 
 		// draw circle
+		pen.width = -10;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineWidth(-10);
 		g->DrawCircle(10+0*(120+10)+60, 10+3*(120+10)+40, 50);
-		g->SetLineWidth(+10);
+
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawCircle(10+0*(120+10)+60, 10+4*(120+10)+40, 50);
 		g->FillCircle(10+0*(120+10)+60, 10+5*(120+10)+40, 50);
 		g->SetColor(ccolor);
-		g->SetLineWidth(1);
+
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->DrawCircle(10+0*(120+10)+60, 10+2*(120+10)+40, 50);
 		g->DrawCircle(10+0*(120+10)+60, 10+3*(120+10)+40, 50);
 		g->DrawCircle(10+0*(120+10)+60, 10+4*(120+10)+40, 50);
 		g->DrawCircle(10+0*(120+10)+60, 10+5*(120+10)+40, 50);
 
 		// draw ellipse
+		pen.width = -10;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineWidth(-10);
 		g->DrawEllipse(10+1*(120+10)+60, 10+3*(120+10)+40, 30, 50);
-		g->SetLineWidth(+10);
+
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawEllipse(10+1*(120+10)+60, 10+4*(120+10)+40, 30, 50);
 		g->FillEllipse(10+1*(120+10)+60, 10+5*(120+10)+40, 30, 50);
 		g->SetColor(ccolor);
-		g->SetLineWidth(1);
+
+		pen.width = 1;
+		g->SetPen(pen);
+		
 		g->DrawEllipse(10+1*(120+10)+60, 10+2*(120+10)+40, 30, 50);
 		g->DrawEllipse(10+1*(120+10)+60, 10+3*(120+10)+40, 30, 50);
 		g->DrawEllipse(10+1*(120+10)+60, 10+4*(120+10)+40, 30, 50);
 		g->DrawEllipse(10+1*(120+10)+60, 10+5*(120+10)+40, 30, 50);
 
+		pen.width = -10;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineWidth(-10);
 		g->DrawEllipse(10+2*(120+10)+60, 10+3*(120+10)+40, 50, 30);
-		g->SetLineWidth(+10);
+	
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawEllipse(10+2*(120+10)+60, 10+4*(120+10)+40, 50, 30);
 		g->FillEllipse(10+2*(120+10)+60, 10+5*(120+10)+40, 50, 30);
 		g->SetColor(ccolor);
-		g->SetLineWidth(1);
+
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->DrawEllipse(10+2*(120+10)+60, 10+2*(120+10)+40, 50, 30);
 		g->DrawEllipse(10+2*(120+10)+60, 10+3*(120+10)+40, 50, 30);
 		g->DrawEllipse(10+2*(120+10)+60, 10+4*(120+10)+40, 50, 30);
@@ -606,14 +634,22 @@ class GraphicPanel : public jgui::Canvas{
 		double arc0 = M_PI/6.0,
 					 arc1 = -arc0;
 
+		pen.width = -10;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineWidth(-10);
 		g->DrawArc(10+3*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
-		g->SetLineWidth(+10);
+
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawArc(10+3*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
 		g->FillArc(10+3*(120+10)+60, 10+5*(120+10)+40, 50, 50, arc0, arc1);
 		g->SetColor(ccolor);
-		g->SetLineWidth(1);
+
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->DrawArc(10+3*(120+10)+60, 10+2*(120+10)+40, 50, 50, arc0, arc1);
 		g->DrawArc(10+3*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
 		g->DrawArc(10+3*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
@@ -623,14 +659,22 @@ class GraphicPanel : public jgui::Canvas{
 		arc0 = 3*M_PI_2+1*M_PI/3.0;
 		arc1 = 1*M_PI_2+1*M_PI/3.0;
 		
+		pen.width = -10;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineWidth(-10);
 		g->DrawChord(10+4*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
-		g->SetLineWidth(+10);
+
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawChord(10+4*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
 		g->FillChord(10+4*(120+10)+60, 10+5*(120+10)+40, 50, 50, arc0, arc1);
 		g->SetColor(ccolor);
-		g->SetLineWidth(1);
+
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->DrawChord(10+4*(120+10)+60, 10+2*(120+10)+40, 50, 50, arc0, arc1);
 		g->DrawChord(10+4*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
 		g->DrawChord(10+4*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
@@ -640,72 +684,115 @@ class GraphicPanel : public jgui::Canvas{
 		arc0 = M_PI/6.0;
 		arc1 = -arc0;
 
+		pen.width = -10;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineWidth(-10);
 		g->DrawPie(10+5*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
-		g->SetLineWidth(+10);
+
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawPie(10+5*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
 		g->FillPie(10+5*(120+10)+60, 10+5*(120+10)+40, 50, 50, arc0, arc1);
 		g->SetColor(ccolor);
-		g->SetLineWidth(1);
+
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->DrawPie(10+5*(120+10)+60, 10+2*(120+10)+40, 50, 50, arc0, arc1);
 		g->DrawPie(10+5*(120+10)+60, 10+3*(120+10)+40, 50, 50, arc0, arc1);
 		g->DrawPie(10+5*(120+10)+60, 10+4*(120+10)+40, 50, 50, arc0, arc1);
 		g->DrawPie(10+5*(120+10)+60, 10+5*(120+10)+40, 50, 50, arc0, arc1);
 
 		// draw rectangle miter
+		pen.width = -10;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineWidth(-10);
 		g->DrawRectangle(10+6*(120+10)+10, 3*(120+10), 100, 100);
-		g->SetLineWidth(+10);
+
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawRectangle(10+6*(120+10)+10, 4*(120+10), 100, 100);
 		g->FillRectangle(10+6*(120+10)+10, 5*(120+10), 100, 100);
 		g->SetColor(ccolor);
-		g->SetLineWidth(1);
+
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->DrawRectangle(10+6*(120+10)+10, 2*(120+10), 100, 100);
 		g->DrawRectangle(10+6*(120+10)+10, 3*(120+10), 100, 100);
 		g->DrawRectangle(10+6*(120+10)+10, 4*(120+10), 100, 100);
 		g->DrawRectangle(10+6*(120+10)+10, 5*(120+10), 100, 100);
 
 		// draw rectangle bevel
+		pen.width = -10;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineWidth(-10);
 		g->DrawBevelRectangle(10+7*(120+10)+10, 3*(120+10), 100, 100);
-		g->SetLineWidth(+10);
+
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawBevelRectangle(10+7*(120+10)+10, 4*(120+10), 100, 100);
 		g->FillBevelRectangle(10+7*(120+10)+10, 5*(120+10), 100, 100);
 		g->SetColor(ccolor);
-		g->SetLineWidth(1);
+		
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->DrawBevelRectangle(10+7*(120+10)+10, 2*(120+10), 100, 100);
 		g->DrawBevelRectangle(10+7*(120+10)+10, 3*(120+10), 100, 100);
 		g->DrawBevelRectangle(10+7*(120+10)+10, 4*(120+10), 100, 100);
 		g->DrawBevelRectangle(10+7*(120+10)+10, 5*(120+10), 100, 100);
 
 		// draw rectangle round
+		pen.width = -10;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineWidth(-10);
 		g->DrawRoundRectangle(10+8*(120+10)+10, 3*(120+10), 100, 100);
-		g->SetLineWidth(+10);
+
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawRoundRectangle(10+8*(120+10)+10, 4*(120+10), 100, 100);
 		g->FillRoundRectangle(10+8*(120+10)+10, 5*(120+10), 100, 100);
 		g->SetColor(ccolor);
-		g->SetLineWidth(1);
+
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->DrawRoundRectangle(10+8*(120+10)+10, 2*(120+10), 100, 100);
 		g->DrawRoundRectangle(10+8*(120+10)+10, 3*(120+10), 100, 100);
 		g->DrawRoundRectangle(10+8*(120+10)+10, 4*(120+10), 100, 100);
 		g->DrawRoundRectangle(10+8*(120+10)+10, 5*(120+10), 100, 100);
 
 		// draw triangle
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->SetColor(ccolor);
-		g->SetLineWidth(1);
 		g->DrawTriangle(10+9*(120+10)+10, 2*(120+10)+100, 10+9*(120+10)+10+100, 2*(120+10)+100, 10+9*(120+10)+10+100/2, 2*(120+10));
 		g->SetColor(pcolor);
-		g->SetLineWidth(+10);
-		g->SetLineJoin(jgui::JLJ_BEVEL);
+
+		pen.width = 10;
+		pen.join = jgui::JLJ_BEVEL;
+		g->SetPen(pen);
+
 		g->DrawTriangle(10+9*(120+10)+10, 3*(120+10)+100, 10+9*(120+10)+10+100, 3*(120+10)+100, 10+9*(120+10)+10+100/2, 3*(120+10));
-		g->SetLineJoin(jgui::JLJ_ROUND);
+		
+		pen.join = jgui::JLJ_ROUND;
+		g->SetPen(pen);
+
 		g->DrawTriangle(10+9*(120+10)+10, 4*(120+10)+100, 10+9*(120+10)+10+100, 4*(120+10)+100, 10+9*(120+10)+10+100/2, 4*(120+10));
-		g->SetLineJoin(jgui::JLJ_MITER);
+		
+		pen.join = jgui::JLJ_MITER;
+		g->SetPen(pen);
+
 		g->DrawTriangle(10+9*(120+10)+10, 5*(120+10)+100, 10+9*(120+10)+10+100, 5*(120+10)+100, 10+9*(120+10)+10+100/2, 5*(120+10));
 
 		// draw polygon
@@ -724,9 +811,10 @@ class GraphicPanel : public jgui::Canvas{
 			{15, 100}
 		};
 
-		g->SetLineJoin(jgui::JLJ_BEVEL);
+		pen.width = 1;
+		pen.join = jgui::JLJ_BEVEL;
+		g->SetPen(pen);
 
-		g->SetLineWidth(1);
 		g->SetColor(ccolor);
 		g->DrawPolygon(10+11*(120+10)+30, 2*(120+10), hourglass, 4, true);
 		g->SetColor(pcolor);
@@ -744,18 +832,32 @@ class GraphicPanel : public jgui::Canvas{
 		x0 = 10+10*(120+10)+10;
 		y0 = 4*(120+10);
 
+		pen.width = 40;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineWidth(40);
 		g->DrawLine(x0, y0, x0+100, y0+(240-10));
 		g->DrawLine(x0, y0+(240-10), x0+100, y0);
 		g->DrawLine(x0, y0+(240-10)/2, x0+100, y0+(240-10)/2);
-		g->SetLineWidth(40);
+
+		pen.width = 40;
+		g->SetPen(pen);
+
 		g->DrawLine(x0+150, y0, x0+250, y0+(240-10));
-		g->SetLineWidth(20);
+
+		pen.width = 20;
+		g->SetPen(pen);
+
 		g->DrawLine(x0+150, y0+(240-10), x0+250, y0);
-		g->SetLineWidth(10);
+
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawLine(x0+150, y0+(240-10)/2, x0+250, y0+(240-10)/2);
-		g->SetLineWidth(1);
+
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->SetColor(rcolor);
 		g->DrawRectangle(x0, y0, 250, (240-10));
 		g->DrawLine(x0, y0+(240-10)/2, x0+250, y0+(240-10)/2);
@@ -768,15 +870,27 @@ class GraphicPanel : public jgui::Canvas{
 			10.0   // skip
 		};
 
+		pen.width = 5;
+		pen.dashes = dashes;
+		pen.dashes_size = 4;
+		g->SetPen(pen);
+
 		g->SetColor(pcolor);
-		g->SetLineDash(dashes, 4);
-		g->SetLineWidth(5);
 		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+10, 10+10*(120+10)-20, 6*(120+10)+10);
-		g->SetLineWidth(10);
+
+		pen.width = 10;
+		g->SetPen(pen);
+
 		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+40, 10+10*(120+10)-20, 6*(120+10)+40);
-		g->SetLineWidth(20);
+
+		pen.width = 20;
+
+		g->SetPen(pen);
 		g->DrawLine(10+0*(120+10)+10, 6*(120+10)+80, 10+10*(120+10)-20, 6*(120+10)+80);
-		g->SetLineDash(NULL, 0);
+
+		pen.dashes = NULL;
+		pen.dashes_size = 0;
+		g->SetPen(pen);
 
 		// draw bezier curve
 		x0 = 10+10*(120+10)+10;
@@ -796,7 +910,10 @@ class GraphicPanel : public jgui::Canvas{
 		};
 
 		g->SetColor(rcolor);
-		g->SetLineWidth(1);
+
+		pen.width = 1;
+		g->SetPen(pen);
+
 		g->DrawRectangle(x0, y0, w0, h0);
 		g->SetColor(ccolor);
 		g->DrawBezierCurve(pb1, 3, 100);
@@ -905,6 +1022,218 @@ class PathsTest : public jgui::Frame{
 			Hide();
 
 			delete panel;
+		}
+
+		virtual void Paint(jgui::Graphics *g)
+		{
+			jgui::Frame::Paint(g);
+
+			jgui::Path *path = g->CreatePath();
+
+			if (path == NULL) {
+				g->SetColor(jgui::Color::Black);
+				g->DrawString("The graphic engine does not support this operation !", 0, 0, GetWidth(), GetHeight());
+
+				return;
+			}
+			
+			// draw lines
+			g->SetColor(jgui::Color::Green);
+			path->MoveTo(0*(150+32)+32, 0*(150+32)+64);
+			path->LineTo(0*(150+32)+32+150, 0*(150+32)+64+150);
+			path->LineTo(0*(150+32)+32, 0*(150+32)+64+150);
+			path->Stroke();
+			
+			path->MoveTo(1*(150+32)+32, 0*(150+32)+64);
+			path->LineTo(1*(150+32)+32+150, 0*(150+32)+64+150);
+			path->LineTo(1*(150+32)+32, 0*(150+32)+64+150);
+			path->Close();
+			path->Stroke();
+
+			g->SetColor(jgui::Color::Gray);
+			path->MoveTo(2*(150+32)+32, 0*(150+32)+64);
+			path->LineTo(2*(150+32)+32+150, 0*(150+32)+64+150);
+			path->LineTo(2*(150+32)+32, 0*(150+32)+64+150);
+			path->Close();
+			path->Fill();
+			
+			g->SetColor(jgui::Color::Gray);
+			path->MoveTo(3*(150+32)+32, 0*(150+32)+64);
+			path->LineTo(3*(150+32)+32+150, 0*(150+32)+64+150);
+			path->LineTo(3*(150+32)+32, 0*(150+32)+64+150);
+			path->Close();
+			path->Fill();
+			
+			jgui::jpen_t pen = g->GetPen();
+
+			pen.width = 16;
+			g->SetPen(pen);
+
+			g->SetColor(jgui::Color::Green);
+
+			jgui::Color color = g->GetColor();
+
+			color.SetAlpha(0x80);
+			g->SetColor(color);
+
+			path->MoveTo(3*(150+32)+32, 0*(150+32)+64);
+			path->LineTo(3*(150+32)+32+150, 0*(150+32)+64+150);
+			path->LineTo(3*(150+32)+32, 0*(150+32)+64+150);
+			path->Close();
+			path->Stroke();
+
+			pen.width = 1;
+			g->SetPen(pen);
+
+			// draw arcs
+			g->SetColor(jgui::Color::Green);
+			path->ArcTo(0*(150+32)+32+150/2, 1*(150+32)+64+150/2, 150/2.0, M_PI/6.0, 3.0*M_PI/2.0);
+			path->Stroke();
+			
+			path->ArcTo(1*(150+32)+32+150/2, 1*(150+32)+64+150/2, 150/2.0, M_PI/6.0, 3.0*M_PI/2.0);
+			path->Close();
+			path->Stroke();
+
+			g->SetColor(jgui::Color::Gray);
+			path->ArcTo(2*(150+32)+32+150/2, 1*(150+32)+64+150/2, 150/2.0, M_PI/6.0, 3.0*M_PI/2.0);
+			path->Close();
+			path->Fill();
+			
+			g->SetColor(jgui::Color::Gray);
+			path->ArcTo(3*(150+32)+32+150/2, 1*(150+32)+64+150/2, 150/2.0, M_PI/6.0, 3.0*M_PI/2.0);
+			path->Close();
+			path->Fill();
+			
+			pen = g->GetPen();
+
+			pen.width = 16;
+			g->SetPen(pen);
+
+			g->SetColor(jgui::Color::Green);
+
+			color = g->GetColor();
+
+			color.SetAlpha(0x80);
+			g->SetColor(color);
+
+			path->ArcTo(3*(150+32)+32+150/2, 1*(150+32)+64+150/2, 150/2.0, M_PI/6.0, 3.0*M_PI/2.0);
+			path->Close();
+			path->Stroke();
+
+			pen.width = 1;
+			g->SetPen(pen);
+
+			// draw curves
+			g->SetColor(jgui::Color::Green);
+			path->CurveTo(0*(150+32)+32, 2*(150+32)+64, 0*(150+32)+32+150, 2*(150+32)+64+0, 0*(150+32)+32+150, 2*(150+32)+64+150);
+			path->Stroke();
+			
+			path->CurveTo(1*(150+32)+32, 2*(150+32)+64, 1*(150+32)+32+150, 2*(150+32)+64+0, 1*(150+32)+32+150, 2*(150+32)+64+150);
+			path->Close();
+			path->Stroke();
+
+			g->SetColor(jgui::Color::Gray);
+			path->CurveTo(2*(150+32)+32, 2*(150+32)+64, 2*(150+32)+32+150, 2*(150+32)+64+0, 2*(150+32)+32+150, 2*(150+32)+64+150);
+			path->Close();
+			path->Fill();
+			
+			g->SetColor(jgui::Color::Gray);
+			path->CurveTo(3*(150+32)+32, 2*(150+32)+64, 3*(150+32)+32+150, 2*(150+32)+64+0, 3*(150+32)+32+150, 2*(150+32)+64+150);
+			path->Close();
+			path->Fill();
+			
+			pen = g->GetPen();
+
+			pen.width = 16;
+			g->SetPen(pen);
+
+			g->SetColor(jgui::Color::Green);
+
+			color = g->GetColor();
+
+			color.SetAlpha(0x80);
+			g->SetColor(color);
+
+			path->CurveTo(3*(150+32)+32, 2*(150+32)+64, 3*(150+32)+32+150, 2*(150+32)+64+0, 3*(150+32)+32+150, 2*(150+32)+64+150);
+			path->Close();
+			path->Stroke();
+
+			pen.width = 1;
+			g->SetPen(pen);
+
+			// draw text
+			jgui::Font *font = jgui::Font::CreateFont("Sans Serif", jgui::JFA_NORMAL, 64);
+			jgui::Font *old = g->GetFont();
+
+			g->SetFont(font);
+
+			std::string text = "Hello!";
+
+			g->SetColor(jgui::Color::Green);
+			path->TextTo(text, 0*(150+32)+32, 3*(150+32)+64);
+			path->Stroke();
+			
+			path->TextTo(text, 1*(150+32)+32, 3*(150+32)+64);
+			path->Close();
+			path->Stroke();
+
+			g->SetColor(jgui::Color::Gray);
+			path->TextTo(text, 2*(150+32)+32, 3*(150+32)+64);
+			path->Close();
+			path->Fill();
+			
+			g->SetColor(jgui::Color::Gray);
+			path->TextTo(text, 3*(150+32)+32, 3*(150+32)+64);
+			path->Close();
+			path->Fill();
+			
+			pen = g->GetPen();
+
+			pen.width = 16;
+			g->SetPen(pen);
+
+			g->SetColor(jgui::Color::Green);
+
+			color = g->GetColor();
+
+			color.SetAlpha(0x80);
+			g->SetColor(color);
+
+			path->TextTo(text, 3*(150+32)+32, 3*(150+32)+64);
+			path->Close();
+			path->Stroke();
+
+			pen.width = 1;
+			g->SetPen(pen);
+
+			g->SetFont(old);
+
+			// draw text
+			pen.width = 10;
+			g->SetPen(pen);
+
+			g->SetColor(jgui::Color::Gray);
+			path->MoveTo(0*(150+32)+32, 3*(150+32)+72+96);
+			path->LineTo(1*(150+32)+32, 4*(150+32)+72+32);
+			path->LineTo(2*(150+32)+32, 4*(150+32)+72+32);
+			path->ArcTo(2*(150+32)+32, 3*(150+32)+96+72+96-10, 32, -M_PI/2.0, M_PI/2.0);
+			path->LineTo(2*(150+32)+32, 3*(150+32)+96+72);
+			path->CurveTo(2*(150+32)+32, 3*(150+32)+96+72, 3*(150+32)+32, 3*(150+32)+96+72, 4*(150+32)+32, 3*(150+32)+96+72+72+32);
+			path->Stroke();
+
+			pen.width = 1;
+			g->SetPen(pen);
+
+			g->SetColor(jgui::Color::Black);
+			path->MoveTo(0*(150+32)+32, 3*(150+32)+72+96);
+			path->LineTo(1*(150+32)+32, 4*(150+32)+72+32);
+			path->LineTo(2*(150+32)+32, 4*(150+32)+72+32);
+			path->ArcTo(2*(150+32)+32, 3*(150+32)+96+72+96-10, 32, -M_PI/2.0, M_PI/2.0);
+			path->LineTo(2*(150+32)+32, 3*(150+32)+96+72);
+			path->CurveTo(2*(150+32)+32, 3*(150+32)+96+72, 3*(150+32)+32, 3*(150+32)+96+72, 4*(150+32)+32, 3*(150+32)+96+72+72+32);
+			path->Stroke();
+
+			delete path;
 		}
 
 };

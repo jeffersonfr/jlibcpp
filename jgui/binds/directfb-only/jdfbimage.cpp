@@ -277,8 +277,7 @@ DFBImage::DFBImage(std::string file):
 	
 	IDirectFBSurface *src = NULL;
 
-	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
-	desc.caps = (DFBSurfaceCapabilities)(DSCAPS_SYSTEMONLY);
+	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
 	desc.pixelformat = DSPF_ARGB;
 
 	if (engine->CreateSurface(engine, &desc, &src) != DFB_OK) {

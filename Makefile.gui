@@ -40,6 +40,7 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 		 jdfbgraphics.o\
 		 jdfbimage.o\
 		 jdfbinputmanager.o\
+		 jdfbpath.o\
 
 OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 

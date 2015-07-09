@@ -200,43 +200,13 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetLineJoin(jline_join_t t);
+		virtual void SetPen(jpen_t t);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetLineStyle(jline_style_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineWidth(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineDash(double *dashes, int ndashes);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jline_join_t GetLineJoin();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jline_style_t GetLineStyle();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetLineWidth();
+		virtual jpen_t GetPen();
 		
 		/**
 		 * \brief

@@ -17,72 +17,119 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "Stdafx.h"
+#ifndef J_DFBPATH_H
+#define J_DFBPATH_H
+
 #include "jpath.h"
+#include "jdfbgraphics.h"
 
-namespace jgui {
+namespace jgui{
 
-Path::Path():
-	jcommon::Object()
-{
-	jcommon::Object::SetClassName("jgui::Path");
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class DFBPath : public jgui::Path{
+	
+	private:
+		/** \brief */
+		DFBGraphics *_graphics;
+
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		DFBPath(DFBGraphics *g);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~DFBPath();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Image * CreatePattern();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void MoveTo(int xp, int yp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void LineTo(int xp, int yp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void CurveTo(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ArcTo(int xcp, int ycp, int radius, double arc0, double arc1, bool negative = true);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void TextTo(std::string text, int xp, int yp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Close();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Stroke();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Fill();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSource(Image *image);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetMask(Image *image);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetMatrix(double *matrix);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void GetMatrix(double **matrix);
+		
+};
+
 }
 
-Path::~Path()
-{
-}
+#endif 
 
-Image * Path::CreatePattern()
-{
-	return NULL;
-}
-
-void Path::MoveTo(int xp, int yp)
-{
-}
-
-void Path::LineTo(int xp, int yp)
-{
-}
-
-void Path::CurveTo(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
-{
-}
-
-void Path::ArcTo(int xcp, int ycp, int radius, double arc0, double arc1, bool negative)
-{
-}
-
-void Path::TextTo(std::string text, int xp, int yp)
-{
-}
-
-void Path::Close()
-{
-}
-
-void Path::Stroke()
-{
-}
-
-void Path::Fill()
-{
-}
-
-void Path::SetSource(Image *image)
-{
-}
-
-void Path::SetMask(Image *image)
-{
-}
-
-void Path::SetMatrix(double *matrix)
-{
-}
-
-void Path::GetMatrix(double **matrix)
-{
-}
-
-}

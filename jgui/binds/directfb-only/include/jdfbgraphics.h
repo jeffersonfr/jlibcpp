@@ -61,13 +61,7 @@ class DFBGraphics : public virtual jgui::Graphics{
 		/** \brief */
 		struct jregion_t _internal_clip;
 		/** \brief */
-		jline_join_t _line_join;
-		/** \brief */
-		jline_style_t _line_style;
-		/** \brief */
 		jcomposite_flags_t _composite_flags;
-		/** \brief */
-		int _line_width;
 		/** \brief */
 		bool _premultiply;
 		/** \brief */
@@ -266,48 +260,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 *
 		 */
 		virtual void SetCompositeFlags(jcomposite_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineJoin(jline_join_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineStyle(jline_style_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineWidth(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineDash(double *dashes, int ndashes);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jline_join_t GetLineJoin();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jline_style_t GetLineStyle();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetLineWidth();
 		
 		/**
 		 * \brief

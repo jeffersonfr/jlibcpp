@@ -81,16 +81,7 @@ Image * Image::CreateImage(jpixelformat_t pixelformat, int width, int height)
 
 Image * Image::CreateImage(uint32_t *data, int width, int height)
 {
-	Image *image = NULL;
-
-	try {
-#if defined(DIRECTFB_UI)
-		image = new DFBImage(JPF_ARGB, width, height);
-#elif defined(DIRECTFB_ONLY_UI)
-		image = new DFBImage(JPF_ARGB, width, height);
-#endif
-	} catch (jcommon::RuntimeException &) {
-	}
+	Image *image = Image::CreateImage(JPF_ARGB, width, height);
 
 	if (image != NULL) {
 		image->GetGraphics()->SetRGBArray(data, 0, 0, width, height);

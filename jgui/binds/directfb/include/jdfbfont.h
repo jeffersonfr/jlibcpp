@@ -34,6 +34,7 @@ namespace jgui {
 class DFBFont : public virtual jgui::Font{
 
 	friend class DFBGraphics;
+	friend class DFBPath;
 
 	private:
 		/** \brief */

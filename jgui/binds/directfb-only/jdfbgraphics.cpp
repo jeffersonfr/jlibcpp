@@ -348,40 +348,6 @@ void DFBGraphics::SetAntialias(jantialias_mode_t mode)
 {
 }
 
-void DFBGraphics::SetLineJoin(jline_join_t t)
-{
-	_line_join = t;
-}
-
-void DFBGraphics::SetLineStyle(jline_style_t t)
-{
-	_line_style = t;
-}
-
-void DFBGraphics::SetLineWidth(int size)
-{
-	_line_width = size;
-}
-
-void DFBGraphics::SetLineDash(double *dashes, int ndashes)
-{
-}
-
-jline_join_t DFBGraphics::GetLineJoin()
-{
-	return _line_join;
-}
-
-jline_style_t DFBGraphics::GetLineStyle()
-{
-	return _line_style;
-}
-
-int DFBGraphics::GetLineWidth()
-{
-	return _line_width;
-}
-
 void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 {
 	if (_surface == NULL) {
@@ -392,9 +358,9 @@ void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 	int y0 = _translate.y+yp;
 	int x1 = _translate.x+xf;
 	int y1 = _translate.y+yf;
-	int lw = _line_width;
+	int lw = _pen.width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int line_width = (lw != 0)?lw:(_pen.width != 0)?1:0;
 
 	if (line_width < 0) {
 		line_width = -line_width;
@@ -433,7 +399,7 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 		return;
 	}
 
-	if (_line_width == 0) {
+	if (_pen.width == 0) {
 		return;
 	}
 
@@ -445,9 +411,9 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 		return;
 	}
 
-	int lw = _line_width;
+	int lw = _pen.width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int line_width = (lw != 0)?lw:(_pen.width != 0)?1:0;
 
 	if (line_width < 0) {
 		line_width = -line_width;
@@ -513,9 +479,9 @@ void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 	int y = _translate.y+yp;
 	int w = wp;
 	int h = hp;
-	int lw = _line_width;
+	int lw = _pen.width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int line_width = (lw != 0)?lw:(_pen.width != 0)?1:0;
 
 	if (line_width < 0) {
 		DrawRectangle0(x, y, w, h, 0, 0, JLJ_MITER, line_width);
@@ -540,9 +506,9 @@ void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
 	int y = _translate.y+yp;
 	int w = wp;
 	int h = hp;
-	int lw = _line_width;
+	int lw = _pen.width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int line_width = (lw != 0)?lw:(_pen.width != 0)?1:0;
 
 	if (line_width < 0) {
 		DrawRectangle0(x, y, w, h, dx, dy, JLJ_BEVEL, line_width);
@@ -567,9 +533,9 @@ void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
 	int y = _translate.y+yp;
 	int w = wp;
 	int h = hp;
-	int lw = _line_width;
+	int lw = _pen.width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int line_width = (lw != 0)?lw:(_pen.width != 0)?1:0;
 
 	if (line_width < 0) {
 		DrawRectangle0(x, y, w, h, dx, dy, JLJ_ROUND, line_width);
@@ -629,9 +595,9 @@ void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 	int yc = _translate.y+ycp;
 	int rx = rxp;
 	int ry = ryp;
-	int lw = _line_width;
+	int lw = _pen.width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int line_width = (lw != 0)?lw:(_pen.width != 0)?1:0;
 
 	arc0 = fmod(arc0, 2*M_PI);
 	arc1 = fmod(arc1, 2*M_PI);
@@ -730,9 +696,9 @@ void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	int yc = _translate.y+ycp;
 	int rx = rxp;
 	int ry = ryp;
-	int lw = _line_width;
+	int lw = _pen.width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int line_width = (lw != 0)?lw:(_pen.width != 0)?1:0;
 
 	DrawArcHelper(xc, yc, rx, ry, arc0, arc1, line_width);
 }
@@ -744,9 +710,9 @@ void DFBGraphics::FillPie(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 
 void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, double arc1)
 {
-	int lw = _line_width;
+	int lw = _pen.width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int line_width = (lw != 0)?lw:(_pen.width != 0)?1:0;
 
 	if (line_width < 0) {
 		line_width = -line_width;
@@ -801,13 +767,13 @@ void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 		DrawArc(xcp, ycp, rxp, ryp, arc0+dxangle/2, arc1-dyangle/2);
 	}
 
-	jline_join_t line_join = _line_join;
+	jline_join_t join = _pen.join;
 
-	_line_join = JLJ_BEVEL;
+	_pen.join = JLJ_BEVEL;
 
 	DrawPolygon(xcp, ycp, p, 3, false);
 
-	_line_join = line_join;
+	_pen.join = join;
 }
 		
 void DFBGraphics::FillTriangle(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p)
@@ -846,9 +812,9 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 		return;
 	}
 
-	int lw = _line_width;
+	int lw = _pen.width;
 
-	int line_width = (lw != 0)?lw:(_line_width != 0)?1:0;
+	int line_width = (lw != 0)?lw:(_pen.width != 0)?1:0;
 
 	if (line_width == 1) {
 		int ox = p[0].x + xp, 
@@ -900,12 +866,12 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 		}
 
 		for (int i=0; i<npoints-opened; i++) {
-			if (_line_join == JLJ_BEVEL) {
+			if (_pen.join == JLJ_BEVEL) {
 				FillTriangle(
 						xp+scaled[((i+0)%npoints)*2+1].x, yp+scaled[((i+0)%npoints)*2+1].y, 
 						xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y, 
 						xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
-			} else if (_line_join == JLJ_ROUND) {
+			} else if (_pen.join == JLJ_ROUND) {
 				double dx0 = p[(i+1)%npoints].x-p[(i+0)%npoints].x,
 							 dy0 = p[(i+1)%npoints].y-p[(i+0)%npoints].y,
 							 dx1 = p[(i+2)%npoints].x-p[(i+1)%npoints].x,
@@ -926,13 +892,12 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 				}
 
 				FillArc(xp+p[(i+1)%npoints].x, yp+p[(i+1)%npoints].y+1, line_width, line_width-1, ang0, ang1);
-			} else if (_line_join == JLJ_MITER) {
-					/*
+			} else if (_pen.join == JLJ_MITER) {
 				int a1 = scaled[((i+0)%npoints)*2+0].y-scaled[((i+0)%npoints)*2+1].y,
-						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x;
+						b1 = scaled[((i+0)%npoints)*2+0].x-scaled[((i+0)%npoints)*2+1].x,
 						c1 = scaled[((i+0)%npoints)*2+0].x*scaled[((i+0)%npoints)*2+1].y-scaled[((i+0)%npoints)*2+1].x*scaled[((i+0)%npoints)*2+0].y;
 				int a2 = scaled[((i+1)%npoints)*2+0].y-scaled[((i+1)%npoints)*2+1].y,
-						b2 = scaled[((i+1)%npoints)*2+0].x-scaled[((i+1)%npoints)*2+1].x;
+						b2 = scaled[((i+1)%npoints)*2+0].x-scaled[((i+1)%npoints)*2+1].x,
 						c2 = scaled[((i+1)%npoints)*2+0].x*scaled[((i+1)%npoints)*2+1].y-scaled[((i+1)%npoints)*2+1].x*scaled[((i+1)%npoints)*2+0].y;
 				int dx0 = (a1*b2-a2*b1),
 						dy0 = (a1*b2-a2*b1);
@@ -951,7 +916,6 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 							xp+x0, yp+y0,
 							xp+scaled[((i+1)%npoints)*2+0].x, yp+scaled[((i+1)%npoints)*2+0].y);
 				}
-							*/
 			}
 		}
 	}
@@ -1707,11 +1671,13 @@ void DFBGraphics::Reset()
 
 	SetColor(0x00000000);
 
-	SetLineWidth(1);
-	SetLineJoin(JLJ_MITER);
-	SetLineStyle(JLS_BUTT);
-	SetLineDash(NULL, 0);
+	_pen.dashes = NULL;
+	_pen.dashes_size = 0;
+	_pen.width = 1;
+	_pen.join = JLJ_MITER;
+	_pen.style = JLS_BUTT;
 
+	SetPen(_pen);
 	ResetGradientStop();
 	SetCompositeFlags(JCF_SRC_OVER);
 }

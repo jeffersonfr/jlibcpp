@@ -29,6 +29,7 @@
 #include "jdfbfont.h"
 #include "jdfbgraphics.h"
 #include "jdfbimage.h"
+#include "jdfbpath.h"
 #include "joutofboundsexception.h"
 #include "jnullpointerexception.h"
 
@@ -98,6 +99,11 @@ void DFBGraphics::SetNativeSurface(void *data, int wp, int hp)
 	}
 }
 
+Path * DFBGraphics::CreatePath()
+{
+	return new DFBPath(this);
+}
+		
 void DFBGraphics::Dump(std::string dir, std::string prefix)
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
@@ -432,55 +438,27 @@ void DFBGraphics::SetAntialias(jantialias_mode_t mode)
 	cairo_set_antialias(_cairo_context, t);
 }
 
-void DFBGraphics::SetLineJoin(jline_join_t t)
+void DFBGraphics::SetPen(jpen_t t)
 {
-	_line_join = t;
+	_pen = t;
 
-	if (_line_join == JLJ_BEVEL) {
+	if (_pen.join == JLJ_BEVEL) {
 		cairo_set_line_join(_cairo_context, CAIRO_LINE_JOIN_BEVEL);
-	} else if (_line_join == JLJ_ROUND) {
+	} else if (_pen.join == JLJ_ROUND) {
 		cairo_set_line_join(_cairo_context, CAIRO_LINE_JOIN_ROUND);
-	} else if (_line_join == JLJ_MITER) {
+	} else if (_pen.join == JLJ_MITER) {
 		cairo_set_line_join(_cairo_context, CAIRO_LINE_JOIN_MITER);
 	}
-}
-
-void DFBGraphics::SetLineStyle(jline_style_t t)
-{
-	_line_style = t;
-
-	if (_line_style == JLS_ROUND) {
+	
+	if (_pen.style == JLS_ROUND) {
 		cairo_set_line_cap(_cairo_context, CAIRO_LINE_CAP_ROUND);
-	} else if (_line_style == JLS_BUTT) {
+	} else if (_pen.style == JLS_BUTT) {
 		cairo_set_line_cap(_cairo_context, CAIRO_LINE_CAP_BUTT);
-	} else if (_line_style == JLS_SQUARE) {
+	} else if (_pen.style == JLS_SQUARE) {
 		cairo_set_line_cap(_cairo_context, CAIRO_LINE_CAP_SQUARE);
 	}
-}
-
-void DFBGraphics::SetLineWidth(int size)
-{
-	_line_width = size;
-}
-
-void DFBGraphics::SetLineDash(double *dashes, int ndashes)
-{
-	cairo_set_dash(_cairo_context, dashes, ndashes, 0.0);
-}
-
-jline_join_t DFBGraphics::GetLineJoin()
-{
-	return _line_join;
-}
-
-jline_style_t DFBGraphics::GetLineStyle()
-{
-	return _line_style;
-}
-
-int DFBGraphics::GetLineWidth()
-{
-	return _line_width;
+	
+	cairo_set_dash(_cairo_context, _pen.dashes, _pen.dashes_size, 0.0);
 }
 
 void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
@@ -489,7 +467,7 @@ void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 	int y0 = _translate.y+yp;
 	int x1 = _translate.x+xf;
 	int y1 = _translate.y+yf;
-	int line_width = _line_width;
+	int line_width = _pen.width;
 
 	if (line_width < 0) {
 		line_width = -line_width;
@@ -505,7 +483,7 @@ void DFBGraphics::DrawLine(int xp, int yp, int xf, int yf)
 
 void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 {
-	if (_line_width == 0) {
+	if (_pen.width == 0) {
 		return;
 	}
 
@@ -517,7 +495,7 @@ void DFBGraphics::DrawBezierCurve(jpoint_t *p, int npoints, int interpolation)
 		return;
 	}
 
-	int line_width = _line_width;
+	int line_width = _pen.width;
 
 	if (line_width < 0) {
 		line_width = -line_width;
@@ -584,7 +562,7 @@ void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 	int y = _translate.y+yp;
 	int w = wp;
 	int h = hp;
-	int line_width = _line_width;
+	int line_width = _pen.width;
 	
 	if (line_width > 0) {
 		line_width = line_width/2;
@@ -605,7 +583,7 @@ void DFBGraphics::DrawRectangle(int xp, int yp, int wp, int hp)
 	cairo_save(_cairo_context);
 	cairo_rectangle(_cairo_context, x, y, w, h);
   cairo_restore(_cairo_context);
-	cairo_set_line_width(_cairo_context, abs(_line_width));
+	cairo_set_line_width(_cairo_context, abs(_pen.width));
 	cairo_stroke(_cairo_context);
 }
 
@@ -670,7 +648,7 @@ void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
 	int y = _translate.y+yp;
 	int w = wp;
 	int h = hp;
-	int line_width = _line_width;
+	int line_width = _pen.width;
 
 	if (wp <=0 || hp <= 0 || line_width == 0) {
 		return;
@@ -733,7 +711,7 @@ void DFBGraphics::DrawBevelRectangle(int xp, int yp, int wp, int hp, int dx, int
 
   cairo_close_path(_cairo_context);
   cairo_restore(_cairo_context);
-	cairo_set_line_width(_cairo_context, abs(_line_width));
+	cairo_set_line_width(_cairo_context, abs(_pen.width));
 	cairo_stroke(_cairo_context);
 }
 
@@ -810,7 +788,7 @@ void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
 	int y = _translate.y+yp;
 	int w = wp;
 	int h = hp;
-	int line_width = _line_width;
+	int line_width = _pen.width;
 
 	if (wp <=0 || hp <= 0 || line_width == 0) {
 		return;
@@ -885,7 +863,7 @@ void DFBGraphics::DrawRoundRectangle(int xp, int yp, int wp, int hp, int dx, int
 
   cairo_close_path(_cairo_context);
   cairo_restore(_cairo_context);
-	cairo_set_line_width(_cairo_context, abs(_line_width));
+	cairo_set_line_width(_cairo_context, abs(_pen.width));
 	cairo_stroke(_cairo_context);
 }
 
@@ -934,7 +912,7 @@ void DFBGraphics::DrawChord(int xcp, int ycp, int rxp, int ryp, double arc0, dou
 	int yc = _translate.y+ycp;
 	int rx = rxp;
 	int ry = ryp;
-	int line_width = _line_width;
+	int line_width = _pen.width;
 
 	if (line_width > 0) {
 		rx = rx + line_width / 2;
@@ -985,7 +963,7 @@ void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	int yc = _translate.y+ycp;
 	int rx = rxp;
 	int ry = ryp;
-	int line_width = _line_width;
+	int line_width = _pen.width;
 
 	if (line_width > 0) {
 		rx = rx + line_width / 2;
@@ -1005,7 +983,7 @@ void DFBGraphics::DrawArc(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	cairo_scale(_cairo_context, rx, ry);
 	cairo_arc_negative(_cairo_context, 0.0, 0.0, 1.0, arc0, arc1);
 	cairo_restore(_cairo_context);
-	cairo_set_line_width(_cairo_context, abs(_line_width));
+	cairo_set_line_width(_cairo_context, abs(_pen.width));
 	cairo_stroke(_cairo_context);
 }
 
@@ -1020,7 +998,7 @@ void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	int yc = _translate.y+ycp;
 	int rx = rxp;
 	int ry = ryp;
-	int line_width = _line_width;
+	int line_width = _pen.width;
 
 	if (line_width > 0) {
 		rx = rx + line_width / 2;
@@ -1042,7 +1020,7 @@ void DFBGraphics::DrawPie(int xcp, int ycp, int rxp, int ryp, double arc0, doubl
 	cairo_line_to(_cairo_context, 0, 0);
 	cairo_close_path(_cairo_context);
 	cairo_restore(_cairo_context);
-	cairo_set_line_width(_cairo_context, abs(_line_width));
+	cairo_set_line_width(_cairo_context, abs(_pen.width));
 	cairo_stroke(_cairo_context);
 }
 		
@@ -1080,7 +1058,7 @@ void DFBGraphics::DrawPolygon(int xp, int yp, jpoint_t *p, int npoints, bool clo
 		return;
 	}
 
-	int line_width = _line_width;
+	int line_width = _pen.width;
 
 	if (line_width < 0) {
 		line_width = -line_width;
@@ -1116,7 +1094,7 @@ void DFBGraphics::FillPolygon(int xp, int yp, jpoint_t *p, int npoints, bool eve
 		return;
 	}
 
-	int line_width = _line_width;
+	int line_width = _pen.width;
 
 	if (line_width < 0) {
 		line_width = -line_width;
@@ -1230,13 +1208,6 @@ void DFBGraphics::DrawString(std::string text, int xp, int yp)
 
 	int x = _translate.x+xp;
 	int y = _translate.y+yp;
-	int line_width = _line_width;
-
-	if (line_width < 0) {
-		line_width = -line_width;
-	}
-
-	cairo_set_line_width(_cairo_context, 0); // line_width);
 
 	DFBFont *font = dynamic_cast<DFBFont *>(_font);
 
@@ -1287,6 +1258,10 @@ void DFBGraphics::DrawGlyph(int symbol, int xp, int yp)
 
 void DFBGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
 {
+	if (_font == NULL) {
+		return;
+	}
+
 	if (wp < 0 || hp < 0) {
 		return;
 	}
@@ -1834,17 +1809,15 @@ void DFBGraphics::Reset()
 
 	SetColor(0x00000000);
 
-	SetLineWidth(1);
-	SetLineJoin(JLJ_MITER);
-	SetLineStyle(JLS_BUTT);
-	SetLineDash(NULL, 0);
+	_pen.dashes = NULL;
+	_pen.dashes_size = 0;
+	_pen.width = 1;
+	_pen.join = JLJ_MITER;
+	_pen.style = JLS_BUTT;
 
+	SetPen(_pen);
 	ResetGradientStop();
 	SetCompositeFlags(JCF_SRC_OVER);
-}
-
-void DFBGraphics::ApplyDrawing()
-{
 }
 
 double DFBGraphics::EvaluateBezier0(double *data, int ndata, double t) 

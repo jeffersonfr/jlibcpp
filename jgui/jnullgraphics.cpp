@@ -191,57 +191,24 @@ void NullGraphics::SetCompositeFlags(jcomposite_flags_t t)
 	Graphics::SetCompositeFlags(t);
 }
 
-void NullGraphics::SetLineJoin(jline_join_t t)
+void NullGraphics::SetPen(jpen_t t)
+{
+	JDEBUG(JINFO, "called\n");
+	
+	Graphics::SetPen(t);
+}
+
+jpen_t NullGraphics::GetPen()
 {
 	JDEBUG(JINFO, "called\n");
 
-	Graphics::SetLineJoin(t);
-}
-
-void NullGraphics::SetLineStyle(jline_style_t t)
-{
-	JDEBUG(JINFO, "called\n");
-
-	Graphics::SetLineStyle(t);
-}
-
-void NullGraphics::SetLineWidth(int size)
-{
-	JDEBUG(JINFO, "called\n");
-
-	Graphics::SetLineWidth(size);
-}
-
-void NullGraphics::SetLineDash(double *dashes, int ndashes)
-{
-	JDEBUG(JINFO, "called\n");
-
-	Graphics::SetLineDash(dashes, ndashes);
-}
-
-jline_join_t NullGraphics::GetLineJoin()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return Graphics::GetLineJoin();
-}
-
-jline_style_t NullGraphics::GetLineStyle()
-{
-	JDEBUG(JINFO, "called\n");
-
-	return Graphics::GetLineStyle();
-}
-
-int NullGraphics::GetLineWidth()
-{
-	return Graphics::GetLineWidth();
+	return Graphics::GetPen();
 }
 
 void NullGraphics::DrawLine(int xp, int yp, int xf, int yf)
 {
 	JDEBUG(JINFO, "called\n");
-
+	
 	Graphics::DrawLine(xp, yp, xf, yf);
 }
 

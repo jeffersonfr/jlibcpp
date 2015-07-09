@@ -21,7 +21,6 @@
 #define J_GRAPHICS_H
 
 #include "jcolor.h"
-#include "jpath.h"
 #include "jmutex.h"
 
 #include <math.h>
@@ -116,6 +115,18 @@ enum jrect_corner_t {
  * \brief
  *
  */
+struct jpen_t {
+	jline_join_t join;
+	jline_style_t style;
+	double *dashes;
+	int dashes_size;
+	int width;
+};
+
+/**
+ * \brief
+ *
+ */
 struct jgradient_t {
 	Color color;
 	double stop;
@@ -176,6 +187,7 @@ class Window;
 class Image;
 class Font;
 class Image;
+class Path;
 
 /**
  * \brief
@@ -199,6 +211,8 @@ class Graphics : public virtual jcommon::Object{
 		bool _vertical_sync;
 		/** \brief */
 		jantialias_mode_t _antialias;
+		/** \brief */
+		jpen_t _pen;
 
 	protected:
 		/**
@@ -380,43 +394,13 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void SetLineJoin(jline_join_t t);
+		virtual void SetPen(jpen_t t);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetLineStyle(jline_style_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineWidth(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineDash(double *dashes, int ndashes);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jline_join_t GetLineJoin();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jline_style_t GetLineStyle();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetLineWidth();
+		virtual jpen_t GetPen();
 		
 		/**
 		 * \brief

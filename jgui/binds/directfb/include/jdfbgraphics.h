@@ -48,6 +48,7 @@ class DFBImage;
 class DFBGraphics : public virtual jgui::Graphics{
 	
 	friend class DFBImage;
+	friend class DFBPath;
 	friend class Window;
 
 	protected:
@@ -58,26 +59,15 @@ class DFBGraphics : public virtual jgui::Graphics{
 		/** \brief */
 		struct jregion_t _internal_clip;
 		/** \brief */
-		jline_join_t _line_join;
-		/** \brief */
-		jline_style_t _line_style;
-		/** \brief */
 		jcomposite_flags_t _composite_flags;
 		/** \brief */
 		jpixelformat_t _pixelformat;
 		/** \brief */
-		int _line_width;
+		IDirectFBSurface *_surface;
+		/** \brief */
+		cairo_t *_cairo_context;
 
 	private:
-		IDirectFBSurface *_surface;
-		cairo_t *_cairo_context;
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ApplyDrawing();
-
 		/**
 		 * \brief
 		 *
@@ -109,6 +99,12 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 */
 		virtual void SetNativeSurface(void *data, int wp, int hp);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual Path * CreatePath();
+		
 		/**
 		 * \brief
 		 *
@@ -209,6 +205,12 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
+		virtual void SetPen(jpen_t t);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual jcomposite_flags_t GetCompositeFlags();
 		
 		/**
@@ -216,48 +218,6 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 *
 		 */
 		virtual void SetCompositeFlags(jcomposite_flags_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineJoin(jline_join_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineStyle(jline_style_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineWidth(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLineDash(double *dashes, int ndashes);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jline_join_t GetLineJoin();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jline_style_t GetLineStyle();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetLineWidth();
 		
 		/**
 		 * \brief

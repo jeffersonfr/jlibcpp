@@ -566,11 +566,16 @@ void Component::PaintScrollbars(Graphics *g)
 		g->ResetGradientStop();
 	}
 
-	int line_width = g->GetLineWidth();
+	jpen_t pen = g->GetPen();
+	int width = pen.width;
 
-	g->SetLineWidth(-_border_size);
+	pen.width = -_border_size;
+	g->SetPen(pen);
+
 	g->DrawRectangle(0, 0, _size.width, _size.height);
-	g->SetLineWidth(line_width);
+
+	pen.width = width;
+	g->SetPen(pen);
 }
 
 void Component::SetGap(int hgap, int vgap)
@@ -655,18 +660,23 @@ void Component::PaintBorders(Graphics *g)
 			dg = color.GetGreen(),
 			db = color.GetBlue(),
 			da = color.GetAlpha();
+	jpen_t pen = g->GetPen();
+	int width = pen.width;
 
 	if (_border == JCB_LINE) {
 		g->SetColor(dr, dg, db, da);
-		g->SetLineWidth(-_border_size);
+		pen.width = -_border_size;
+		g->SetPen(pen);
 		g->DrawRectangle(xp, yp, wp, hp);
 	} else if (_border == JCB_BEVEL) {
 		g->SetColor(dr, dg, db, da);
-		g->SetLineWidth(-_border_size);
+		pen.width = -_border_size;
+		g->SetPen(pen);
 		g->DrawBevelRectangle(xp, yp, wp, hp);
 	} else if (_border == JCB_ROUND) {
 		g->SetColor(dr, dg, db, da);
-		g->SetLineWidth(-_border_size);
+		pen.width = -_border_size;
+		g->SetPen(pen);
 		g->DrawRoundRectangle(xp, yp, wp, hp);
 	} else if (_border == JCB_RAISED_GRADIENT) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
@@ -726,21 +736,27 @@ void Component::PaintBorders(Graphics *g)
 		}
 	} else if (_border == JCB_RAISED_ETCHED) {
 		g->SetColor(dr+step, dg+step, db+step, da);
-		g->SetLineWidth(-_border_size);
+		pen.width = -_border_size;
+		g->SetPen(pen);
 		g->DrawRectangle(xp, yp, wp, hp);
 		
 		g->SetColor(dr-step, dg-step, db-step, da);
-		g->SetLineWidth(-_border_size/2);
+		pen.width = -_border_size/2;
+		g->SetPen(pen);
 		g->DrawRectangle(xp, yp, wp-_border_size/2, hp-_border_size/2);
 	} else if (_border == JCB_LOWERED_ETCHED) {
 		g->SetColor(dr-step, dg-step, db-step, da);
-		g->SetLineWidth(-_border_size);
+		pen.width = -_border_size;
+		g->SetPen(pen);
 		g->DrawRectangle(xp, yp, wp, hp);
 		
 		g->SetColor(dr+step, dg+step, db+step, da);
-		g->SetLineWidth(-_border_size/2);
+		pen.width = -_border_size/2;
 		g->DrawRectangle(xp, yp, wp-_border_size/2, hp-_border_size/2);
 	}
+
+	pen.width = width;
+	g->SetPen(pen);
 
 	if (_is_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);

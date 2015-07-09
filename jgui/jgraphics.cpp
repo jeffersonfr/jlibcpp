@@ -32,13 +32,16 @@ Graphics::Graphics():
 	jcommon::Object::SetClassName("jgui::Graphics");
 
 	_font = NULL;
-
 	_translate.x = 0;
 	_translate.y = 0;
-
 	_vertical_sync = false;
-
 	_antialias = JAM_NORMAL;
+
+	_pen.dashes = NULL;
+	_pen.dashes_size = 0;
+	_pen.width = 1;
+	_pen.join = JLJ_MITER;
+	_pen.style = JLS_BUTT;
 }
 
 Graphics::~Graphics()
@@ -174,35 +177,14 @@ jantialias_mode_t Graphics::GetAntialias()
 	return _antialias;
 }
 
-void Graphics::SetLineJoin(jline_join_t t)
+void Graphics::SetPen(jpen_t t)
 {
+	_pen = t;
 }
 
-void Graphics::SetLineStyle(jline_style_t t)
+jpen_t Graphics::GetPen()
 {
-}
-
-void Graphics::SetLineWidth(int size)
-{
-}
-
-void Graphics::SetLineDash(double *dashes, int ndashes)
-{
-}
-
-jline_join_t Graphics::GetLineJoin()
-{
-	return JLJ_MITER;
-}
-
-jline_style_t Graphics::GetLineStyle()
-{
-	return JLS_BUTT;
-}
-
-int Graphics::GetLineWidth()
-{
-	return 0;
+	return _pen;
 }
 
 void Graphics::DrawLine(int xp, int yp, int xf, int yf)

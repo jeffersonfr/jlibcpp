@@ -616,11 +616,16 @@ void Frame::PaintScrollbars(Graphics *g)
 		g->ResetGradientStop();
 	}
 
-	int line_width = g->GetLineWidth();
+	jpen_t pen = g->GetPen();
+	int width = pen.width;
 
-	g->SetLineWidth(-_border_size);
+	pen.width = -_border_size;
+	g->SetPen(pen);
+
 	g->DrawRectangle(0, 0, _size.width, _size.height);
-	g->SetLineWidth(line_width);
+
+	pen.width = width;
+	g->SetPen(pen);
 }
 
 void Frame::PaintGlassPane(Graphics *g)
