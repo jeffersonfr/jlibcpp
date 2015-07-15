@@ -24,9 +24,9 @@
 #include "jstringutils.h"
 #include "jstringtokenizer.h"
 
-#if defined(DIRECTFB_UI)
+#if defined(DIRECTFB_CAIRO_UI)
 #include "jdfbfont.h"
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_UI)
 #include "jdfbfont.h"
 #endif
 
@@ -72,7 +72,7 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int siz
 	try {
 #if defined(DIRECTFB_UI)
 		font = new DFBFont(name, attributes, size);
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 		font = new DFBFont(name, attributes, size);
 #endif
 	} catch (jcommon::NullPointerException &) {

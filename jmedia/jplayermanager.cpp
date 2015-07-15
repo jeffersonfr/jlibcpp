@@ -23,7 +23,7 @@
 #if defined(DIRECTFB_UI)
 #include "jdfblightplayer.h"
 #include "jdfbheavyplayer.h"
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 #include "jdfblightplayer.h"
 #include "jdfbheavyplayer.h"
 #endif
@@ -55,7 +55,7 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 		} else {
 			return new DFBHeavyPlayer(url.GetPath());
 		}
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 		std::map<jplayer_hints_t, bool>::iterator i = _hints.find(JPH_LIGHTWEIGHT);
 
 		if (i == _hints.end() || i->second == true) {

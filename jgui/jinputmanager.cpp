@@ -22,7 +22,7 @@
 
 #if defined(DIRECTFB_UI)
 #include "jdfbinputmanager.h"
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 #include "jdfbinputmanager.h"
 #endif
 
@@ -51,7 +51,7 @@ InputManager * InputManager::GetInstance()
 		manager->Start();
 
 		_instance = manager;
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 		DFBInputManager *manager = new DFBInputManager();
 
 		manager->Initialize();

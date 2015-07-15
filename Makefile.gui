@@ -20,6 +20,31 @@
 ifeq ($(ENABLE_GRAPHICS),directfb)
 	CCFLAGS 	+= \
 		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
+		 `pkg-config --cflags directfb` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs directfb` \
+
+	DEFINES		+= \
+		 -DDIRECTFB_UI \
+
+	REQUIRES	+= \
+		 directfb \
+
+	OBJS_gfx	+= \
+		 jdfbhandler.o\
+		 jdfbfont.o\
+		 jdfbgraphics.o\
+		 jdfbimage.o\
+		 jdfbinputmanager.o\
+
+OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),directfb-cairo)
+	CCFLAGS 	+= \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
 		 `pkg-config --cflags cairo` \
 		 `pkg-config --cflags directfb` \
 
@@ -28,7 +53,7 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 		 `pkg-config --libs directfb` \
 
 	DEFINES		+= \
-		 -DDIRECTFB_UI \
+		 -DDIRECTFB_CAIRO_UI \
 
 	REQUIRES	+= \
 		 directfb \
@@ -46,27 +71,3 @@ OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),directfb-only)
-	CCFLAGS 	+= \
-		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
-		 `pkg-config --cflags directfb` \
-
-	LDFLAGS		+= \
-		 `pkg-config --libs directfb` \
-
-	DEFINES		+= \
-		 -DDIRECTFB_ONLY_UI \
-
-	REQUIRES	+= \
-		 directfb \
-
-	OBJS_gfx	+= \
-		 jdfbhandler.o\
-		 jdfbfont.o\
-		 jdfbgraphics.o\
-		 jdfbimage.o\
-		 jdfbinputmanager.o\
-
-OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
-
-endif

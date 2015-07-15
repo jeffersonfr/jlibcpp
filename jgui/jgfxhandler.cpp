@@ -28,7 +28,7 @@
 
 #if defined(DIRECTFB_UI)
 #include "jdfbhandler.h"
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 #include "jdfbhandler.h"
 #endif
 
@@ -65,7 +65,7 @@ GFXHandler * GFXHandler::GetInstance()
 		} catch (...) {
 			_instance = NULL;
 		}
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 		DFBHandler *handler = NULL;
 		
 		try {

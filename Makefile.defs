@@ -43,7 +43,7 @@ OBJDIR		= obj
 TESTDIR		= tests
 DOCDIR		= doc
 
-PREFIX		= /jeff/local
+PREFIX		= /usr/local
 
 TARGET		= $(BUILD)$(PREFIX)
 
@@ -57,10 +57,10 @@ DEBUG  		= \
 ARFLAGS		= \
 		 -rc \
 
-# {yes,no}
+# {no, yes}
 ENABLE_DEBUG ?= no
-# {none,directfb}
-ENABLE_GRAPHICS ?= directfb-only
+# {none, directfb, directfb-cairo}
+ENABLE_GRAPHICS ?= directfb
 
 # -ansi: problemas com va_copy()
 CCFLAGS		= \

@@ -39,7 +39,7 @@ OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),directfb-only)
+ifeq ($(ENABLE_GRAPHICS),directfb-cairo)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
 		 `pkg-config --cflags directfb` \
@@ -48,7 +48,7 @@ ifeq ($(ENABLE_GRAPHICS),directfb-only)
 		 `pkg-config --libs directfb` \
 
 	DEFINES		+= \
-		 -DDIRECTFB_ONLY_UI \
+		 -DDIRECTFB_CAIRO_UI \
 
 	REQUIRES	+= \
 		 directfb \

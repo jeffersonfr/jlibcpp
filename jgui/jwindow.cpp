@@ -27,7 +27,7 @@
 #if defined(DIRECTFB_UI)
 #include "jdfbhandler.h"
 #include "jdfbgraphics.h"
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 #include "jdfbhandler.h"
 #include "jdfbgraphics.h"
 #endif
@@ -71,7 +71,7 @@ Window::Window(int x, int y, int width, int height):
 	_surface = NULL;
 	_window = NULL;
 	_graphics = NULL;
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 	_surface = NULL;
 	_window = NULL;
 	_graphics = NULL;
@@ -127,7 +127,7 @@ void * Window::GetNativeWindow()
 {
 #if defined(DIRECTFB_UI)
 	return _window;
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 	return _window;
 #endif
 
@@ -159,8 +159,8 @@ void Window::SetNativeWindow(void *native)
 
 	_window->SetOpacity(_window, _opacity);
 
-	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height);
-#elif defined(DIRECTFB_ONLY_UI)
+	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height, true);
+#elif defined(DIRECTFB_CAIRO_UI)
 	_window = (IDirectFBWindow *)native;
 	
 	if (_window->GetSurface(_window, &_surface) != DFB_OK) {
@@ -175,7 +175,7 @@ void Window::SetNativeWindow(void *native)
 
 	_window->SetOpacity(_window, _opacity);
 
-	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height, true);
+	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height);
 #endif
 	
 	_graphics_mutex.Unlock();
@@ -251,78 +251,6 @@ void Window::InternalCreateWindow()
 	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_STACKING | DWDESC_SURFACE_CAPS);
 	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION);
 	desc.pixelformat = DSPF_ARGB;
-	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE);
-	desc.options = (DFBWindowOptions) (DWOP_ALPHACHANNEL | DWOP_SCALE);
-	desc.stacking = DWSC_UPPER;
-	desc.posx   = _location.x;
-	desc.posy   = _location.y;
-	desc.width  = _size.width;
-	desc.height = _size.height;
-
-	IDirectFBDisplayLayer *layer;
-	
-	if (engine->GetDisplayLayer(engine, (DFBDisplayLayerID)(DLID_PRIMARY), &layer) != DFB_OK) {
-		throw jcommon::RuntimeException("Problem to get the device layer");
-	} 
-
-	if (layer->CreateWindow(layer, &desc, &_window) != DFB_OK) {
-		throw jcommon::RuntimeException("Cannot create a window");
-	}
-
-	if (_window->GetSurface(_window, &_surface) != DFB_OK) {
-		_window->Release(_window);
-
-		throw jcommon::RuntimeException("Cannot get a window's surface");
-	}
-
-	// Add ghost option (behave like an overlay)
-	// _window->SetOptions(_window, (DFBWindowOptions)(DWOP_ALPHACHANNEL | DWOP_SCALE)); // | DWOP_GHOST));
-	// Move window to upper stacking class
-	// _window->SetStackingClass(_window, DWSC_UPPER);
-	// Make it the top most window
-	// _window->RaiseToTop(_window);
-	_window->SetOpacity(_window, _opacity);
-	// _surface->SetRenderOptions(_surface, DSRO_ALL);
-	// _window->DisableEvents(_window, (DFBWindowEventType)(DWET_BUTTONDOWN | DWET_BUTTONUP | DWET_MOTION));
-	
-	_surface->SetDrawingFlags(_surface, (DFBSurfaceDrawingFlags)(DSDRAW_BLEND));
-	_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-	_surface->SetPorterDuff(_surface, (DFBSurfacePorterDuffRule)(DSPD_NONE));
-
-	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
-	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
-	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
-	
-	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height);
-#elif defined(DIRECTFB_ONLY_UI)
-	delete _graphics;
-	_graphics = NULL;
-
-	if (_window != NULL) {
-		_window->SetOpacity(_window, 0x00);
-	}
-
-	if (_surface != NULL) {
-		_surface->Release(_surface);
-	}
-
-	if (_window != NULL) {
-		_window->Close(_window);
-		_window->Destroy(_window);
-		_window->Release(_window);
-	}
-		
-	_surface = NULL;
-	_window = NULL;
-
-	jgui::GFXHandler *handler = jgui::GFXHandler::GetInstance();
-	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
-
-	DFBWindowDescription desc;
-
-	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_STACKING | DWDESC_SURFACE_CAPS);
-	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION);
-	desc.pixelformat = DSPF_ARGB;
 	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_DOUBLE);
 	desc.options = (DFBWindowOptions) (DWOP_ALPHACHANNEL | DWOP_SCALE);
 	desc.stacking = DWSC_UPPER;
@@ -366,6 +294,78 @@ void Window::InternalCreateWindow()
 	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 	
 	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height, true);
+#elif defined(DIRECTFB_CAIRO_UI)
+	delete _graphics;
+	_graphics = NULL;
+
+	if (_window != NULL) {
+		_window->SetOpacity(_window, 0x00);
+	}
+
+	if (_surface != NULL) {
+		_surface->Release(_surface);
+	}
+
+	if (_window != NULL) {
+		_window->Close(_window);
+		_window->Destroy(_window);
+		_window->Release(_window);
+	}
+		
+	_surface = NULL;
+	_window = NULL;
+
+	jgui::GFXHandler *handler = jgui::GFXHandler::GetInstance();
+	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
+
+	DFBWindowDescription desc;
+
+	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_STACKING | DWDESC_SURFACE_CAPS);
+	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION);
+	desc.pixelformat = DSPF_ARGB;
+	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE);
+	desc.options = (DFBWindowOptions) (DWOP_ALPHACHANNEL | DWOP_SCALE);
+	desc.stacking = DWSC_UPPER;
+	desc.posx   = _location.x;
+	desc.posy   = _location.y;
+	desc.width  = _size.width;
+	desc.height = _size.height;
+
+	IDirectFBDisplayLayer *layer;
+	
+	if (engine->GetDisplayLayer(engine, (DFBDisplayLayerID)(DLID_PRIMARY), &layer) != DFB_OK) {
+		throw jcommon::RuntimeException("Problem to get the device layer");
+	} 
+
+	if (layer->CreateWindow(layer, &desc, &_window) != DFB_OK) {
+		throw jcommon::RuntimeException("Cannot create a window");
+	}
+
+	if (_window->GetSurface(_window, &_surface) != DFB_OK) {
+		_window->Release(_window);
+
+		throw jcommon::RuntimeException("Cannot get a window's surface");
+	}
+
+	// Add ghost option (behave like an overlay)
+	// _window->SetOptions(_window, (DFBWindowOptions)(DWOP_ALPHACHANNEL | DWOP_SCALE)); // | DWOP_GHOST));
+	// Move window to upper stacking class
+	// _window->SetStackingClass(_window, DWSC_UPPER);
+	// Make it the top most window
+	// _window->RaiseToTop(_window);
+	_window->SetOpacity(_window, _opacity);
+	// _surface->SetRenderOptions(_surface, DSRO_ALL);
+	// _window->DisableEvents(_window, (DFBWindowEventType)(DWET_BUTTONDOWN | DWET_BUTTONUP | DWET_MOTION));
+	
+	_surface->SetDrawingFlags(_surface, (DFBSurfaceDrawingFlags)(DSDRAW_BLEND));
+	_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+	_surface->SetPorterDuff(_surface, (DFBSurfacePorterDuffRule)(DSPD_NONE));
+
+	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
+	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+	
+	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height);
 #endif
 	
 	SetRotation(_rotation);
@@ -380,7 +380,7 @@ void Window::RaiseToTop()
 
 		WindowManager::GetInstance()->RaiseToTop(this);
 	}
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->RaiseToTop(_window);
 		_window->SetStackingClass(_window, DWSC_UPPER);
@@ -399,7 +399,7 @@ void Window::LowerToBottom()
 
 		WindowManager::GetInstance()->LowerToBottom(this);
 	}
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->LowerToBottom(_window);
 		_window->SetStackingClass(_window, DWSC_LOWER);
@@ -421,7 +421,7 @@ void Window::PutAtop(Window *w)
 
 		WindowManager::GetInstance()->PutWindowATop(this, w);
 	}
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 	if (w == NULL) {
 		return;
 	}
@@ -446,7 +446,7 @@ void Window::PutBelow(Window *w)
 
 		WindowManager::GetInstance()->PutWindowBelow(this, w);
 	}
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 	if (w == NULL) {
 		return;
 	}
@@ -520,7 +520,7 @@ void Window::SetBounds(int x, int y, int width, int height)
 		}
 	
 		_graphics_mutex.Unlock();
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 		_graphics_mutex.Lock();
 
 		update = true;
@@ -576,7 +576,7 @@ void Window::SetLocation(int x, int y)
 		}
 		
 		_graphics_mutex.Unlock();
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 		_graphics_mutex.Lock();
 	
 		int dx = x;
@@ -703,7 +703,7 @@ void Window::SetSize(int width, int height)
 #if defined(DIRECTFB_UI)
 		_graphics_mutex.Lock();
 
-		update = true;
+		update = false;
 
 		// INFO:: works, but with a lot of flicker
 		if (update == true) {
@@ -725,10 +725,10 @@ void Window::SetSize(int width, int height)
 		}
 	
 		_graphics_mutex.Unlock();
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 		_graphics_mutex.Lock();
 
-		update = false;
+		update = true;
 
 		// INFO:: works, but with a lot of flicker
 		if (update == true) {
@@ -773,7 +773,7 @@ void Window::Move(int x, int y)
 		if (_window != NULL) {
 			while (_window->Move(_window, dx, dy) == DFB_LOCKED);
 		}
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 		int dx = x;
 		int dy = y;
 
@@ -804,7 +804,7 @@ void Window::SetOpacity(int i)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, _opacity);
 	}
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, _opacity);
 	}
@@ -934,7 +934,7 @@ bool Window::Show(bool modal)
 	}
 	
 	SetOpacity(_opacity);
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 	if (_window == NULL) {
 		_graphics_mutex.Lock();
 
@@ -971,7 +971,7 @@ bool Window::Hide()
 	if (_window != NULL) {
 		_window->SetOpacity(_window, 0x00);
 	}
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, 0x00);
 	}
@@ -992,7 +992,7 @@ void Window::InternalReleaseWindow()
 	// delete _graphics;
 	// _graphics = NULL;
 
-#if defined(DIRECTFB_UI)
+#if defined(DIRECTFB_CAIRO_UI)
 	if (_window) {
 		_window->SetOpacity(_window, 0x00);
 	}
@@ -1010,7 +1010,7 @@ void Window::InternalReleaseWindow()
 
 	_window = NULL;
 	_surface = NULL;
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_UI)
 	if (_window) {
 		_window->SetOpacity(_window, 0x00);
 	}
@@ -1050,11 +1050,11 @@ void Window::SetRotation(jwindow_rotation_t t)
 		rotation = 270;
 	}
 
-#if defined(DIRECTFB_UI)
+#if defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->SetRotation(_window, rotation);
 	}
-#elif defined(DIRECTFB_ONLY_UI)
+#elif defined(DIRECTFB_UI)
 	if (_window != NULL) {
 		_window->SetRotation(_window, rotation);
 	}
