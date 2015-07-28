@@ -91,6 +91,28 @@ class Window : public jgui::Container{
 		jwindow_rotation_t _rotation;
 		/** \brief */
 		bool _is_input_enabled;
+		/** \brief */
+		bool _is_fullscreen;
+		/** \brief */
+		int _old_x;
+		/** \brief */
+		int _old_y;
+		/** \brief */
+		int _old_width;
+		/** \brief */
+		int _old_height;
+		/** \brief */
+		int _old_border_size;
+		/** \brief */
+		bool _old_undecorated;
+		/** \brief */
+		bool _move_enabled;
+		/** \brief */
+		bool _release_enabled;
+		/** \brief */
+		bool _resize_enabled;
+		/** \brief */
+		bool _is_maximized;
 
 	protected:
 		/**
@@ -136,6 +158,66 @@ class Window : public jgui::Container{
 		 */
 		virtual void SetNativeWindow(void *native);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetFullScreenEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsFullScreenEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetMoveEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetResizeEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsMoveEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsResizeEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Maximize();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsMaximized();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Restore();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetBorderSize(int size);
+		
 		/**
 		 * \brief
 		 *

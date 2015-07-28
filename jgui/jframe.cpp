@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "jframe.h"
 #include "jwindowmanager.h"
+#include "jthememanager.h"
 
 #define TRANSLATE_MOUSE_LOCATION(method) 	\
 	do { 																		\
@@ -31,6 +32,7 @@
 		}																			\
 	} while (0) 														\
 
+#define SUBTITLE_SIZE		32
 #define SIZE_TO_RESIZE	4
 
 namespace jgui {
@@ -53,19 +55,8 @@ Frame::Frame(std::string title, int x, int y, int width, int height):
 	_relative_mouse_h = 0;
 	
 	_frame_state = 0;
-	_release_enabled = true;
-	_is_maximized = false;
 	_title = title;
-	_is_visible = false;
-	_is_undecorated = false;
-	_move_enabled = true;
-	_resize_enabled = false;
 	_frame_buttons = (jframe_button_t)(JFB_CLOSE);
-	
-	_old_x = _location.x;
-	_old_y = _location.y;
-	_old_width = _size.width;
-	_old_height = _size.height;
 }
 
 Frame::Frame(int x, int y, int width, int height):
@@ -86,19 +77,8 @@ Frame::Frame(int x, int y, int width, int height):
 	_relative_mouse_h = 0;
 	
 	_frame_state = 0;
-	_release_enabled = true;
-	_is_maximized = false;
 	_title = "";
-	_is_visible = false;
-	_is_undecorated = true;
-	_move_enabled = true;
-	_resize_enabled = false;
 	_frame_buttons = (jframe_button_t)(0);
-	
-	_old_x = _location.x;
-	_old_y = _location.y;
-	_old_width = _size.width;
-	_old_height = _size.height;
 }
 
 Frame::~Frame() 
@@ -148,26 +128,6 @@ jframe_button_t Frame::GetFrameButtons()
 void Frame::SetFrameButtons(jframe_button_t buttons)
 {
 	_frame_buttons = buttons;
-}
-
-void Frame::SetMoveEnabled(bool b)
-{
-	_move_enabled = b;
-}
-
-void Frame::SetResizeEnabled(bool b)
-{
-	_resize_enabled = b;
-}
-
-bool Frame::IsMoveEnabled()
-{
-	return _move_enabled;
-}
-
-bool Frame::IsResizeEnabled()
-{
-	return _resize_enabled;
 }
 
 void Frame::SetDefaultExitEnabled(bool b)
@@ -239,38 +199,6 @@ void Frame::Pack(bool fit)
 	}
 }
 
-bool Frame::Show(bool modal)
-{
-	return Window::Show(modal);
-}
-
-bool Frame::Hide()
-{
-	Window::Hide();
-
-	{
-		jthread::AutoLock lock(&_input_mutex);
-
-		InputManager::GetInstance()->RemoveKeyListener(this);
-		InputManager::GetInstance()->RemoveMouseListener(this);
-	}
-
-	return true;
-}
-
-jinsets_t Frame::GetInsets()
-{
-	if (_subtitles.size() == 0) {
-		return _insets;
-	}
-
-	jinsets_t t = _insets;
-
-	t.bottom += _font->GetSize()+8;
-
-	return t;
-}
-
 void Frame::AddSubtitle(std::string image, std::string label)
 {
 	struct frame_subtitle_t t;
@@ -279,6 +207,18 @@ void Frame::AddSubtitle(std::string image, std::string label)
 	t.subtitle = label;
 
 	_subtitles.push_back(t);
+
+	Theme *theme = ThemeManager::GetInstance()->GetTheme();
+
+	if (theme != NULL) {
+		jinsets_t insets = theme->GetWindowInsets();
+
+		_insets.bottom = insets.bottom;
+	}
+
+	if (_subtitles.size() > 0) {
+		_insets.bottom = _insets.bottom + SUBTITLE_SIZE + 8;
+	}
 
 	Repaint();
 }
@@ -293,28 +233,15 @@ void Frame::RemoveAllSubtitles()
 
 	_subtitles.clear();
 
+	Theme *theme = ThemeManager::GetInstance()->GetTheme();
+
+	if (theme != NULL) {
+		jinsets_t insets = theme->GetWindowInsets();
+
+		_insets.bottom = insets.bottom;
+	}
+
 	Repaint();
-}
-
-void Frame::Maximize()
-{
-	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
-
-	_is_maximized = true;
-
-	_old_x = _location.x;
-	_old_y = _location.y;
-	_old_width = _size.width;
-	_old_height = _size.height;
-
-	SetBounds(0, 0, screen.width, screen.height);
-}
-
-void Frame::Restore()
-{
-	_is_maximized = false;
-
-	SetBounds(_old_x, _old_y, _old_width, _old_height);
 }
 
 bool Frame::KeyPressed(KeyEvent *event)
@@ -546,14 +473,6 @@ bool Frame::MouseWheel(MouseEvent *event)
 	return false;
 }
 
-void Frame::Release()
-{
-	InputManager::GetInstance()->RemoveKeyListener(this);
-	InputManager::GetInstance()->RemoveMouseListener(this);
-	
-	Window::Release();
-}
-
 void Frame::Paint(Graphics *g)
 {
 	jthread::AutoLock lock(&_paint_mutex);
@@ -676,15 +595,15 @@ void Frame::PaintGlassPane(Graphics *g)
 				count += _font->GetStringWidth((*i).subtitle.c_str());
 
 				g->SetColor(_fgcolor);
-				g->DrawString((*i).subtitle, _size.width-count, _size.height-_insets.bottom-_border_size-_font->GetSize());
+				g->DrawString((*i).subtitle, _size.width-count, _size.height-_insets.bottom+(SUBTITLE_SIZE-_font->GetSize())/2+8);
 			}
 
-			count += 10;
+			count += 8;
 
 			if ((*i).image != NULL) {
-				count += 32;
+				count += SUBTITLE_SIZE;
 
-				g->DrawImage((*i).image, _size.width-count, _size.height-_insets.bottom-_border_size-24, 32, 32);
+				g->DrawImage((*i).image, _size.width-count, _size.height-_insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
 			}
 
 			count += 20;

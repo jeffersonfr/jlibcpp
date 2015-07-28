@@ -162,7 +162,7 @@ class Thread : public virtual jcommon::Object{
 		virtual void Run();
 
 		/**
-		 * \brief
+		 * \brief Need be called manually after the WaitThread() in case of joinable threads.
 		 *
 		 */
 		virtual void Cleanup();

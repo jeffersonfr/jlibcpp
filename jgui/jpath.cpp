@@ -32,9 +32,16 @@ Path::~Path()
 {
 }
 
-Image * Path::CreatePattern()
+void Path::SetPattern(Image *image)
 {
-	return NULL;
+}
+
+void Path::SetPattern(int xp, int yp, int wp, int hp)
+{
+}
+
+void Path::SetPattern(int x0p, int y0p, int rad0, int x1p, int y1p, int rad1)
+{
 }
 
 void Path::MoveTo(int xp, int yp)

@@ -67,6 +67,11 @@ Window::Window(int x, int y, int width, int height):
 	_size.width = width;
 	_size.height = height;
 	
+	_old_x = _location.x;
+	_old_y = _location.y;
+	_old_width = _size.width;
+	_old_height = _size.height;
+
 #if defined(DIRECTFB_UI)
 	_surface = NULL;
 	_window = NULL;
@@ -76,11 +81,18 @@ Window::Window(int x, int y, int width, int height):
 	_window = NULL;
 	_graphics = NULL;
 #endif
-
+	
+	_release_enabled = true;
+	_is_undecorated = false;
+	_is_visible = false;
+	_is_fullscreen = false;
 	_is_input_enabled = true;
 	_opacity = 0xff;
 	_cursor = JCS_DEFAULT;
 	_rotation = JWR_NONE;
+	_is_maximized = false;
+	_move_enabled = true;
+	_resize_enabled = true;
 
 	SetBackgroundVisible(true);
 
@@ -103,6 +115,9 @@ Window::~Window()
 
 void Window::Release()
 {
+	InputManager::GetInstance()->RemoveKeyListener(this);
+	InputManager::GetInstance()->RemoveMouseListener(this);
+
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSING));
 
 	WindowManager::GetInstance()->Remove(this);
@@ -190,6 +205,96 @@ void Window::SetVisible(bool b)
 	} else {
 		Show(false);
 	}
+}
+
+void Window::SetFullScreenEnabled(bool b)
+{
+	if (_is_fullscreen == b) {
+		return;
+	}
+
+	_is_fullscreen = b;
+
+	if (_is_fullscreen == false) {
+		_border_size = _old_border_size;
+		_is_undecorated = _old_undecorated;
+		
+		SetBounds(_old_x, _old_y, _old_width, _old_height);
+	} else {
+		jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
+
+		_old_border_size = _border_size;
+		_old_undecorated = _is_undecorated;
+		
+		_border_size = 0;
+		_is_undecorated = true;
+		
+		_old_x = _location.x;
+		_old_y = _location.y;
+		_old_width = _size.width;
+		_old_height = _size.height;
+
+		SetBounds(0, 0, screen.width, screen.height);
+	}
+}
+
+bool Window::IsFullScreenEnabled()
+{
+	return _is_fullscreen;
+}
+
+void Window::Maximize()
+{
+	if (_is_fullscreen == true) {
+		return;
+	}
+
+	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
+
+	_is_maximized = true;
+
+	_old_x = _location.x;
+	_old_y = _location.y;
+	_old_width = _size.width;
+	_old_height = _size.height;
+
+	SetBounds(0, 0, screen.width, screen.height);
+}
+
+bool Window::IsMaximized()
+{
+	return _is_maximized;
+}
+
+void Window::Restore()
+{
+	if (_is_fullscreen == true) {
+		return;
+	}
+
+	_is_maximized = false;
+
+	SetBounds(_old_x, _old_y, _old_width, _old_height);
+}
+
+void Window::SetMoveEnabled(bool b)
+{
+	_move_enabled = b;
+}
+
+void Window::SetResizeEnabled(bool b)
+{
+	_resize_enabled = b;
+}
+
+bool Window::IsMoveEnabled()
+{
+	return _move_enabled;
+}
+
+bool Window::IsResizeEnabled()
+{
+	return _resize_enabled;
 }
 
 bool Window::IsInputEnabled()
@@ -461,31 +566,40 @@ void Window::PutBelow(Window *w)
 
 void Window::SetBounds(int x, int y, int width, int height)
 {
+	if (_is_fullscreen == true) {
+		return;
+	}
+
 	{
 		jthread::AutoLock lock(&_window_mutex);
 
 		jpoint_t old_point = _location;
 		jsize_t old_size = _size;
 
-		_location.x = x;
-		_location.y = y;
-		_size.width = width;
-		_size.height = height;
-
-		if (_size.width < _minimum_size.width) {
-			_size.width = _minimum_size.width;
+		if (_move_enabled == false) {
+			_location.x = x;
+			_location.y = y;
 		}
 
-		if (_size.height < _minimum_size.height) {
-			_size.height = _minimum_size.height;
-		}
+		if (_resize_enabled == false) {
+			_size.width = width;
+			_size.height = height;
 
-		if (_size.width > _maximum_size.width) {
-			_size.width = _maximum_size.width;
-		}
+			if (_size.width < _minimum_size.width) {
+				_size.width = _minimum_size.width;
+			}
 
-		if (_size.height > _maximum_size.height) {
-			_size.height = _maximum_size.height;
+			if (_size.height < _minimum_size.height) {
+				_size.height = _minimum_size.height;
+			}
+
+			if (_size.width > _maximum_size.width) {
+				_size.width = _maximum_size.width;
+			}
+
+			if (_size.height > _maximum_size.height) {
+				_size.height = _maximum_size.height;
+			}
 		}
 
 		if (_location.x == old_point.x && _location.y == old_point.y && 
@@ -555,6 +669,14 @@ void Window::SetBounds(int x, int y, int width, int height)
 
 void Window::SetLocation(int x, int y)
 {
+	if (_is_fullscreen == true) {
+		return;
+	}
+
+	if (_move_enabled == false) {
+		return;
+	}
+
 	{
 		jthread::AutoLock lock(&_window_mutex);
 	
@@ -669,6 +791,14 @@ void Window::SetMaximumSize(int width, int height)
 
 void Window::SetSize(int width, int height)
 {
+	if (_is_fullscreen == true) {
+		return;
+	}
+
+	if (_resize_enabled == false) {
+		return;
+	}
+
 	{
 		jthread::AutoLock lock(&_window_mutex);
 
@@ -760,6 +890,14 @@ void Window::SetSize(int width, int height)
 
 void Window::Move(int x, int y)
 {
+	if (_is_fullscreen == true) {
+		return;
+	}
+
+	if (_move_enabled == false) {
+		return;
+	}
+
 	{
 		jthread::AutoLock lock(&_window_mutex);
 	
@@ -818,9 +956,22 @@ int Window::GetOpacity()
 
 void Window::SetUndecorated(bool b)
 {
+	if (_is_fullscreen == true) {
+		return;
+	}
+
 	_is_undecorated = b;
 
 	Repaint();
+}
+
+void Window::SetBorderSize(int size)
+{
+	if (_is_fullscreen == true) {
+		return;
+	}
+
+	Component::SetBorderSize(size);
 }
 
 void Window::Repaint(Component *cmp)
@@ -946,15 +1097,15 @@ bool Window::Show(bool modal)
 	SetOpacity(_opacity);
 #endif
 
+	DoLayout();
+	Repaint();
+
 	if (_is_input_enabled == true) {
 		jthread::AutoLock lock(&_input_mutex);
 
 		InputManager::GetInstance()->RegisterKeyListener(this);
 		InputManager::GetInstance()->RegisterMouseListener(this);
 	}
-
-	DoLayout();
-	Repaint();
 
 	if (modal == true) {
 		_window_semaphore.Wait();
@@ -965,6 +1116,13 @@ bool Window::Show(bool modal)
 
 bool Window::Hide()
 {
+	{
+		jthread::AutoLock lock(&_input_mutex);
+
+		InputManager::GetInstance()->RemoveKeyListener(this);
+		InputManager::GetInstance()->RemoveMouseListener(this);
+	}
+
 	_is_visible = false;
 
 #if defined(DIRECTFB_UI)
@@ -1166,6 +1324,10 @@ void Window::DispatchWindowEvent(WindowEvent *event)
 			listener->WindowMoved(event);
 		} else if (event->GetType() == JWET_PAINTED) {
 			listener->WindowPainted(event);
+		} else if (event->GetType() == JWET_ENTERED) {
+			listener->WindowEntered(event);
+		} else if (event->GetType() == JWET_LEAVED) {
+			listener->WindowLeaved(event);
 		}
 
 		if (size != (int)_window_listeners.size()) {

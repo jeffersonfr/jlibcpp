@@ -70,24 +70,27 @@ class Frame : public Window {
 		};
 
 	protected:
+		/** \brief */
 		std::vector<frame_subtitle_t> _subtitles;
+		/** \brief */
 		jthread::Mutex _paint_mutex;
+		/** \brief */
 		Image *_icon_image;
+		/** \brief */
 		Image *_icon_close;
+		/** \brief */
 		Image *_icon_maximize;
+		/** \brief */
 		Image *_icon_restore;
+		/** \brief */
 		std::string _title;
+		/** \brief */
 		std::string _icon;
+		/** \brief */
 		int _init_type;
+		/** \brief */
 		int _frame_state;
-		int _old_x;
-		int _old_y;
-		int _old_width;
-		int _old_height;
-		bool _move_enabled;
-		bool _release_enabled;
-		bool _resize_enabled;
-		bool _is_maximized;
+		/** \brief */
 		jframe_button_t _frame_buttons;
 
 	public:
@@ -119,42 +122,6 @@ class Frame : public Window {
 		 * \brief
 		 *
 		 */
-		virtual void Maximize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Restore();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Hide();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool Show(bool modal = false);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Release();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jinsets_t GetInsets();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual std::string GetIcon();
 		
 		/**
@@ -175,30 +142,6 @@ class Frame : public Window {
 		 */
 		virtual void SetFrameButtons(jframe_button_t buttons);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMoveEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetResizeEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsMoveEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsResizeEnabled();
-		
 		/**
 		 * \brief
 		 *

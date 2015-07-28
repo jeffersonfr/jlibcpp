@@ -212,7 +212,7 @@ void * Thread::ThreadMain(void *owner_)
 		pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 	}
 
-	pthread_cleanup_push((Thread::ThreadCleanup), owner_); 
+	// pthread_cleanup_push((Thread::ThreadCleanup), owner_); 
 
 	t->thiz->_thread_semaphore.Notify();
 
@@ -224,7 +224,7 @@ void * Thread::ThreadMain(void *owner_)
 
 	pthread_exit(NULL);
 	
-	pthread_cleanup_pop(0);
+	// pthread_cleanup_pop(0);
 #endif
 }
 
@@ -635,8 +635,6 @@ void Thread::WaitThread(int id)
 			_thread_mutex.Lock();
 			pthread_detach(t->thread);
 	
-			// Cleanup();
-
 			t->detached = true;
 			t->alive = false;
 		}

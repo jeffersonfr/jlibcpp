@@ -8,8 +8,8 @@
 
 :Makefile defines
 
-ENABLE_DEBUG=<no,yes>
-ENABLE_GRAPHICS=<none,directfb,directfb-only>
+ENABLE_DEBUG=<no, yes>
+ENABLE_GRAPHICS=<none, directfb, directfb-cairo>
 
 :Compiling
 

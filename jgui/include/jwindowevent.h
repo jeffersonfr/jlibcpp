@@ -34,7 +34,9 @@ enum jwindowevent_type_t {
 	JWET_OPENED,
 	JWET_RESIZED,
 	JWET_MOVED,
-	JWET_PAINTED
+	JWET_PAINTED,
+	JWET_ENTERED,
+	JWET_LEAVED
 };
 
 /**

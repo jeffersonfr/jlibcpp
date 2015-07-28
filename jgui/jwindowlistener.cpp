@@ -56,4 +56,12 @@ void WindowListener::WindowPainted(WindowEvent *event)
 {
 }
 
+void WindowListener::WindowEntered(WindowEvent *event)
+{
+}
+
+void WindowListener::WindowLeaved(WindowEvent *event)
+{
+}
+
 }

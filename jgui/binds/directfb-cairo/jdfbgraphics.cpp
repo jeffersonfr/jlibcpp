@@ -1193,7 +1193,6 @@ void DFBGraphics::FillLinearGradient(int xp, int yp, int wp, int hp, int x1p, in
 	cairo_set_source(_cairo_context, pattern);
 	cairo_fill(_cairo_context);
 	cairo_restore(_cairo_context);
-	
 	cairo_pattern_destroy(pattern);
 	
 	SetCompositeFlags(_composite_flags);

@@ -88,6 +88,18 @@ class WindowListener : public jcommon::Listener{
 		 */
 		virtual void WindowPainted(WindowEvent *event);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void WindowEntered(WindowEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void WindowLeaved(WindowEvent *event);
+
 };
 
 }

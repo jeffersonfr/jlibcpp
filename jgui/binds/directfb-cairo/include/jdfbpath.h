@@ -53,7 +53,19 @@ class DFBPath : public jgui::Path{
 		 * \brief
 		 *
 		 */
-		virtual Image * CreatePattern();
+		virtual void SetPattern(Image *image);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetPattern(int xp, int yp, int wp, int hp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetPattern(int x0p, int y0p, int rad0, int x1p, int y1p, int rad1);
 
 		/**
 		 * \brief

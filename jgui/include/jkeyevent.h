@@ -269,6 +269,12 @@ class KeyEvent : public jcommon::EventObject{
 		 * \brief
 		 *
 		 */
+		static int GetCodeFromSymbol(jkeyevent_symbol_t symbol);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual int GetKeyCode();
 		
 		/**

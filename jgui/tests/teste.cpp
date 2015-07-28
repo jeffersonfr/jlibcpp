@@ -1233,7 +1233,145 @@ class PathsTest : public jgui::Frame{
 			path->CurveTo(2*(150+32)+32, 3*(150+32)+96+72, 3*(150+32)+32, 3*(150+32)+96+72, 4*(150+32)+32, 3*(150+32)+96+72+72+32);
 			path->Stroke();
 
+			// draw linear pattern
+			g->ResetGradientStop();
+			g->SetGradientStop(0.0, 0x80000000);
+			g->SetGradientStop(1.0, 0x80f0f0f0);
+
+			path->MoveTo(4*(150+32)+32, 0*(150+32)+64);
+			path->LineTo(4*(150+32)+32+150, 0*(150+32)+64);
+			path->LineTo(4*(150+32)+32+150, 0*(150+32)+64+150);
+			path->LineTo(4*(150+32)+32, 0*(150+32)+64+150);
+			path->Close();
+			path->SetPattern(4*(150+32)+32, 0*(150+32)+64, 4*(150+32)+32+150, 0*(150+32)+64+150);
+			
+			g->ResetGradientStop();
+			g->SetGradientStop(0.0, 0x80f0f0f0);
+			g->SetGradientStop(1.0, 0x80000000);
+
+			path->MoveTo(4*(150+32)+32, 1*(150+32)+64);
+			path->LineTo(4*(150+32)+32+150, 1*(150+32)+64);
+			path->LineTo(4*(150+32)+32+150, 1*(150+32)+64+150);
+			path->LineTo(4*(150+32)+32, 1*(150+32)+64+150);
+			path->Close();
+			path->SetPattern(4*(150+32)+32, 1*(150+32)+64+150, 4*(150+32)+32+150, 1*(150+32)+64);
+			
+			g->ResetGradientStop();
+			g->SetGradientStop(0.0, 0x80f0f0f0);
+			g->SetGradientStop(1.0, 0x80000000);
+
+			path->MoveTo(4*(150+32)+32, 2*(150+32)+64);
+			path->LineTo(4*(150+32)+32+150, 2*(150+32)+64);
+			path->LineTo(4*(150+32)+32+150, 2*(150+32)+64+150);
+			path->LineTo(4*(150+32)+32, 2*(150+32)+64+150);
+			path->Close();
+			path->SetPattern(4*(150+32)+32, 2*(150+32)+64, 4*(150+32)+32+150, 2*(150+32)+64+150);
+			
+			g->ResetGradientStop();
+			g->SetGradientStop(0.0, 0x80000000);
+			g->SetGradientStop(1.0, 0x80f0f0f0);
+
+			path->MoveTo(4*(150+32)+32, 3*(150+32)+64);
+			path->LineTo(4*(150+32)+32+150, 3*(150+32)+64);
+			path->LineTo(4*(150+32)+32+150, 3*(150+32)+64+150);
+			path->LineTo(4*(150+32)+32, 3*(150+32)+64+150);
+			path->Close();
+			path->SetPattern(4*(150+32)+32, 3*(150+32)+64+150, 4*(150+32)+32+150, 3*(150+32)+64);
+			
+			// draw radial pattern
+			g->ResetGradientStop();
+			g->SetGradientStop(0.0, 0x80000000);
+			g->SetGradientStop(1.0, 0x80f0f0f0);
+
+			path->MoveTo(5*(150+32)+32, 0*(150+32)+64);
+			path->ArcTo(5*(150+32)+32+150/2, 0*(150+32)+64+150/2, 150/2, 0.0, 2*M_PI);
+			path->SetPattern(5*(150+32)+32+150/2, 0*(150+32)+64+150/2, 150/2, 5*(150+32)+32+150/2-32, 0*(150+32)+64+150/2-32, 150/6);
+			
+			g->ResetGradientStop();
+			g->SetGradientStop(0.0, 0x80000000);
+			g->SetGradientStop(1.0, 0x80f0f0f0);
+
+			path->MoveTo(5*(150+32)+32, 1*(150+32)+64);
+			path->ArcTo(5*(150+32)+32+150/2, 1*(150+32)+64+150/2, 150/2, 0.0, 2*M_PI);
+			path->SetPattern(5*(150+32)+32+150/2, 1*(150+32)+64+150/2, 150/2, 5*(150+32)+32+150/2+32, 1*(150+32)+64+150/2-32, 150/6);
+			
+			g->ResetGradientStop();
+			g->SetGradientStop(0.0, 0x80000000);
+			g->SetGradientStop(1.0, 0x80f0f0f0);
+
+			path->MoveTo(5*(150+32)+32, 2*(150+32)+64);
+			path->ArcTo(5*(150+32)+32+150/2, 2*(150+32)+64+150/2, 150/2, 0.0, 2*M_PI);
+			path->SetPattern(5*(150+32)+32+150/2, 2*(150+32)+64+150/2, 150/2, 5*(150+32)+32+150/2+32, 2*(150+32)+64+150/2+32, 150/6);
+			
+			g->ResetGradientStop();
+			g->SetGradientStop(0.0, 0x80000000);
+			g->SetGradientStop(1.0, 0x80f0f0f0);
+
+			path->MoveTo(5*(150+32)+32, 3*(150+32)+64);
+			path->ArcTo(5*(150+32)+32+150/2, 3*(150+32)+64+150/2, 150/2, 0.0, 2*M_PI);
+			path->SetPattern(5*(150+32)+32+150/2, 3*(150+32)+64+150/2, 150/2, 5*(150+32)+32+150/2-32, 3*(150+32)+64+150/2+32, 150/6);
+			
+			// draw image pattern
+			jgui::Image *image1 = jgui::Image::CreateImage(jcommon::System::GetResourceDirectory() + "/images/red_icon.png");
+			jgui::Image *image2 = jgui::Image::CreateImage(jcommon::System::GetResourceDirectory() + "/images/green_icon.png");
+			jgui::Image *image3 = jgui::Image::CreateImage(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png");
+			jgui::Image *image4 = jgui::Image::CreateImage(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png");
+
+			path->MoveTo(6*(150+32)+32, 0*(150+32)+64);
+			path->LineTo(6*(150+32)+32+150, 0*(150+32)+64);
+			path->LineTo(6*(150+32)+32+150, 0*(150+32)+64+150);
+			path->LineTo(6*(150+32)+32, 0*(150+32)+64+150);
+			path->Close();
+			path->SetPattern(image1);
+
+			path->MoveTo(6*(150+32)+32, 1*(150+32)+64);
+			path->LineTo(6*(150+32)+32+150, 1*(150+32)+64);
+			path->LineTo(6*(150+32)+32+150, 1*(150+32)+64+150);
+			path->LineTo(6*(150+32)+32, 1*(150+32)+64+150);
+			path->Close();
+			path->SetPattern(image2);
+
+			path->MoveTo(6*(150+32)+32, 2*(150+32)+64);
+			path->LineTo(6*(150+32)+32+150, 2*(150+32)+64);
+			path->LineTo(6*(150+32)+32+150, 2*(150+32)+64+150);
+			path->LineTo(6*(150+32)+32, 2*(150+32)+64+150);
+			path->Close();
+			path->SetPattern(image3);
+			
+			path->MoveTo(6*(150+32)+32, 3*(150+32)+64);
+			path->LineTo(6*(150+32)+32+150, 3*(150+32)+64);
+			path->LineTo(6*(150+32)+32+150, 3*(150+32)+64+150);
+			path->LineTo(6*(150+32)+32, 3*(150+32)+64+150);
+			path->Close();
+			path->SetPattern(image4);
+
+			delete image1;
+			delete image2;
+			delete image3;
+			delete image4;
+
+			// draw mask
+			g->SetFont(font);
+
+			g->ResetGradientStop();
+			g->SetGradientStop(0.0, 0x80000000);
+			g->SetGradientStop(1.0, 0x80f0f0f0);
+
+			path->TextTo(text, 7*(150+32)+32, 0*(150+32)+64);
+			path->SetPattern(7*(150+32)+32, 0*(150+32)+64, 7*(150+32)+32+150, 0*(150+32)+64+150);
+			
+			path->TextTo(text, 7*(150+32)+32, 1*(150+32)+64);
+			path->SetPattern(7*(150+32)+32+150, 1*(150+32)+64, 7*(150+32)+32, 1*(150+32)+64+150);
+			
+			path->TextTo(text, 7*(150+32)+32, 2*(150+32)+64);
+			path->SetPattern(7*(150+32)+32+150, 2*(150+32)+64+150, 7*(150+32)+32, 2*(150+32)+64);
+			
+			path->TextTo(text, 7*(150+32)+32, 3*(150+32)+64);
+			path->SetPattern(7*(150+32)+32, 3*(150+32)+64+150, 7*(150+32)+32+150, 3*(150+32)+64);
+			
+			// dispose path
 			delete path;
+			delete font;
 		}
 
 };
