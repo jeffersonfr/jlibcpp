@@ -187,6 +187,13 @@ class Player : public jcommon::Object{
 		 */
 		virtual void RemovePlayerListener(PlayerListener *listener);
 
+		/**
+		 * \brief Remove a listener.
+		 *
+		 * \param listener
+		 */
+		virtual std::vector<PlayerListener *> & GetPlayerListeners();
+
 		/*
 		 * \brief
 		 *
@@ -206,6 +213,13 @@ class Player : public jcommon::Object{
 		 * \param listener
 		 */
 		virtual void RemoveFrameGrabberListener(FrameGrabberListener *listener);
+
+		/**
+		 * \brief Remove a listener.
+		 *
+		 * \param listener
+		 */
+		virtual std::vector<FrameGrabberListener *> & GetFrameGrabberListeners();
 
 		/*
 		 * \brief

@@ -33,7 +33,7 @@ DFBInputManager::DFBInputManager():
 {
 	jcommon::Object::SetClassName("jgui::DFBInputManager");
 
-	jpoint_t p = GFXHandler::GetInstance()->GetMousePosition();
+	jpoint_t p = GFXHandler::GetInstance()->GetCursorLocation();
 
 	_is_initialized = false;
 	_mouse_x = p.x;

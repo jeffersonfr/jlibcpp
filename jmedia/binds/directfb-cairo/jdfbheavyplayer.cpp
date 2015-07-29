@@ -173,36 +173,38 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
-			void *ptr;
-			int pitch;
-			int sw,
-					sh;
+			if (_player->GetFrameGrabberListeners().size() > 0) {
+				void *ptr;
+				int pitch;
+				int sw,
+						sh;
 
-			_surface->GetSize(_surface, &sw, &sh);
+				_surface->GetSize(_surface, &sw, &sh);
 
-			_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
+				_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
 
-			jgui::DFBImage *image = new jgui::DFBImage(jgui::JPF_ARGB, sw, sh);
+				jgui::DFBImage *image = new jgui::DFBImage(jgui::JPF_ARGB, sw, sh);
 
-			image->GetGraphics()->SetRGBArray((uint32_t *)ptr, 0, 0, sw, sh);
-			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, image));
+				image->GetGraphics()->SetRGBArray((uint32_t *)ptr, 0, 0, sw, sh);
+				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, image));
 
-			jgui::DFBGraphics *g = dynamic_cast<jgui::DFBGraphics *>(image->GetGraphics());
-			cairo_t *cairo_context = g->GetCairoContext();
-			cairo_surface_t *cairo_surface = cairo_get_target(cairo_context);
+				jgui::DFBGraphics *g = dynamic_cast<jgui::DFBGraphics *>(image->GetGraphics());
+				cairo_t *cairo_context = g->GetCairoContext();
+				cairo_surface_t *cairo_surface = cairo_get_target(cairo_context);
 
-			if (cairo_surface != NULL) {
-				cairo_surface_flush(cairo_surface);
+				if (cairo_surface != NULL) {
+					cairo_surface_flush(cairo_surface);
 
-				int stride = cairo_image_surface_get_stride(cairo_surface);
-				uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+					int stride = cairo_image_surface_get_stride(cairo_surface);
+					uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-				if (data != NULL) {
-					memcpy(ptr, data, stride*sh);
+					if (data != NULL) {
+						memcpy(ptr, data, stride*sh);
+					}
 				}
-			}
 
-			_surface->Unlock(_surface);
+				_surface->Unlock(_surface);
+			}
 
 			Start();
 		}

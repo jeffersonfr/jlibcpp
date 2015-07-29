@@ -153,6 +153,11 @@ void Player::RemovePlayerListener(PlayerListener *listener)
 	}
 }
 
+std::vector<PlayerListener *> & Player::GetPlayerListeners()
+{
+	return _player_listeners;
+}
+
 void Player::DispatchPlayerEvent(PlayerEvent *event)
 {
 	if (event == NULL) {
@@ -209,6 +214,11 @@ void Player::RemoveFrameGrabberListener(FrameGrabberListener *listener)
 	if (i != _frame_listeners.end()) {
 		_frame_listeners.erase(i);
 	}
+}
+
+std::vector<FrameGrabberListener *> & Player::GetFrameGrabberListeners()
+{
+	return _frame_listeners;
 }
 
 void Player::DispatchFrameGrabberEvent(FrameGrabberEvent *event)

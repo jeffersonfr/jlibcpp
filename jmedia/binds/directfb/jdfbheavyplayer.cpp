@@ -170,38 +170,40 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
-			IDirectFBSurface *frame;
-			DFBSurfaceDescription desc;
-			void *ptr;
-			int pitch;
-			int sw,
-					sh;
+			if (_player->GetFrameGrabberListeners().size() > 0) {
+				IDirectFBSurface *frame;
+				DFBSurfaceDescription desc;
+				void *ptr;
+				int pitch;
+				int sw,
+						sh;
 
-			_surface->GetSize(_surface, &sw, &sh);
+				_surface->GetSize(_surface, &sw, &sh);
 
-			_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
+				_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
 
-			desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT | DSDESC_PREALLOCATED);
-			desc.caps = (DFBSurfaceCapabilities)(DSCAPS_NONE);
-			desc.width = sw;
-			desc.height = sh;
-			desc.pixelformat = DSPF_ABGR;
-			desc.preallocated[0].data = ptr;
-			desc.preallocated[0].pitch = pitch;
+				desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT | DSDESC_PREALLOCATED);
+				desc.caps = (DFBSurfaceCapabilities)(DSCAPS_NONE);
+				desc.width = sw;
+				desc.height = sh;
+				desc.pixelformat = DSPF_ABGR;
+				desc.preallocated[0].data = ptr;
+				desc.preallocated[0].pitch = pitch;
 
-			IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
+				IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
 
-			if (directfb->CreateSurface(directfb, &desc, &frame) == DFB_OK) {
-				jgui::DFBImage *image = new jgui::DFBImage(jgui::JPF_ARGB, sw, sh, false);
+				if (directfb->CreateSurface(directfb, &desc, &frame) == DFB_OK) {
+					jgui::DFBImage *image = new jgui::DFBImage(jgui::JPF_ARGB, sw, sh, false);
 
-				image->GetGraphics()->SetNativeSurface(frame, sw, sh);
-				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, image));
-				image->GetGraphics()->SetNativeSurface(NULL, 0, 0);
+					image->GetGraphics()->SetNativeSurface(frame, sw, sh);
+					_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, image));
+					image->GetGraphics()->SetNativeSurface(NULL, 0, 0);
 
-				frame->Release(frame);
+					frame->Release(frame);
+				}
+
+				_surface->Unlock(_surface);
 			}
-
-			_surface->Unlock(_surface);
 
 			Start();
 		}

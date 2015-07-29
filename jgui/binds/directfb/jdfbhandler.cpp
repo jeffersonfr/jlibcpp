@@ -257,27 +257,6 @@ void DFBHandler::SetCursor(Image *shape, int hotx, int hoty)
 	layer->SetCursorShape(layer, surface, hotx, hoty);
 }
 
-void DFBHandler::WarpCursor(int x, int y)
-{
-	if (x < 0) {
-		x = 0;
-	}
-
-	if (y < 0) {
-		y = 0;
-	}
-
-	if (x > _screen.width) {
-		x = _screen.width;
-	}
-
-	if (y > _screen.height) {
-		y = _screen.height;
-	}
-
-	_layer->WarpCursor(_layer, x, y);
-}
-
 void DFBHandler::InitResources()
 {
 }
@@ -330,12 +309,28 @@ std::string DFBHandler::GetID()
 	return "directfb";
 }
 
-void DFBHandler::SetMousePosition(int x, int y)
+void DFBHandler::SetCursorLocation(int x, int y)
 {
+	if (x < 0) {
+		x = 0;
+	}
+
+	if (y < 0) {
+		y = 0;
+	}
+
+	if (x > _screen.width) {
+		x = _screen.width;
+	}
+
+	if (y > _screen.height) {
+		y = _screen.height;
+	}
+
 	_layer->WarpCursor(_layer, x, y);
 }
 
-jpoint_t DFBHandler::GetMousePosition()
+jpoint_t DFBHandler::GetCursorLocation()
 {
 	jpoint_t p;
 
