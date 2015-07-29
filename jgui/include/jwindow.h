@@ -34,6 +34,9 @@
 #include <directfb.h>
 #elif defined(DIRECTFB_CAIRO_UI)
 #include <directfb.h>
+#elif defined(GTK3_UI)
+#include <gtk/gtk.h>
+#include <cairo.h>
 #endif
 
 namespace jgui{
@@ -68,6 +71,11 @@ class Window : public jgui::Container{
 		IDirectFBWindow *_window;
 		/** \brief */
 		IDirectFBSurface *_surface;
+#elif defined(GTK3_UI)
+		/** \brief */
+  	GtkWidget *_window;
+		/** \brief */
+	  GtkWidget *_surface;
 #endif
 		/** \brief */
 		std::vector<WindowListener *> _window_listeners;

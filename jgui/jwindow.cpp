@@ -30,9 +30,46 @@
 #elif defined(DIRECTFB_CAIRO_UI)
 #include "jdfbhandler.h"
 #include "jdfbgraphics.h"
+#elif defined(GTK3_UI)
+#include "jgtkhandler.h"
+#include "jgtkgraphics.h"
 #endif
 
 namespace jgui {
+
+#if defined(GTK3_UI)
+
+static gboolean OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data)
+{
+	Window *window = (Window *)user_data;
+	Graphics *graphics = window->GetGraphics();
+
+	cairo_t *cairo_context = (cairo_t *)window->GetGraphics()->GetNativeSurface();
+	cairo_surface_t *cairo_surface = cairo_get_target(cairo_context);
+
+	if (cairo_surface != NULL) {
+		graphics->Lock();
+
+		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+		cairo_set_source_surface(cr, cairo_surface, 0, 0);
+		cairo_paint(cr);
+
+		graphics->Unlock();
+	}
+
+	/*
+	cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); 
+	cairo_select_font_face(cr, "Purisa", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_size(cr, 13);
+	cairo_move_to(cr, 20, 30);
+	cairo_show_text(cr, "Most relationships seem so transitory");  
+	cairo_stroke(cr);
+	*/
+
+  return FALSE;
+}
+
+#endif
 
 Window::Window(int x, int y, int width, int height):
 	Container(x, y, width, height)
@@ -77,6 +114,10 @@ Window::Window(int x, int y, int width, int height):
 	_window = NULL;
 	_graphics = NULL;
 #elif defined(DIRECTFB_CAIRO_UI)
+	_surface = NULL;
+	_window = NULL;
+	_graphics = NULL;
+#elif defined(GTK3_UI)
 	_surface = NULL;
 	_window = NULL;
 	_graphics = NULL;
@@ -144,6 +185,7 @@ void * Window::GetNativeWindow()
 	return _window;
 #elif defined(DIRECTFB_CAIRO_UI)
 	return _window;
+#elif defined(GTK3_UI)
 #endif
 
 	return NULL;
@@ -191,6 +233,7 @@ void Window::SetNativeWindow(void *native)
 	_window->SetOpacity(_window, _opacity);
 
 	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height);
+#elif defined(GTK3_UI)
 #endif
 	
 	_graphics_mutex.Unlock();
@@ -471,6 +514,24 @@ void Window::InternalCreateWindow()
 	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 	
 	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height);
+#elif defined(GTK3_UI)
+  _window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+  _surface = gtk_drawing_area_new();
+  gtk_container_add(GTK_CONTAINER(_window), _surface);
+ 
+ //  gtk_widget_add_events(_window, GDK_BUTTON_PRESS_MASK);
+
+  g_signal_connect(G_OBJECT(_surface), "draw", G_CALLBACK(OnDrawEvent), this); 
+  // g_signal_connect(_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);  
+  // g_signal_connect(window, "button-press-event", G_CALLBACK(clicked), NULL);
+ 
+  gtk_window_set_position(GTK_WINDOW(_window), GTK_WIN_POS_CENTER);
+  gtk_window_set_default_size(GTK_WINDOW(_window), _size.width, _size.height); 
+
+	_graphics = new GTKGraphics(_surface, JPF_ARGB, _size.width, _size.height);
+
+  gtk_widget_show_all(_window);
 #endif
 	
 	SetRotation(_rotation);
@@ -492,6 +553,7 @@ void Window::RaiseToTop()
 
 		WindowManager::GetInstance()->RaiseToTop(this);
 	}
+#elif defined(GTK3_UI)
 #endif
 }
 
@@ -511,6 +573,7 @@ void Window::LowerToBottom()
 
 		WindowManager::GetInstance()->LowerToBottom(this);
 	}
+#elif defined(GTK3_UI)
 #endif
 }
 
@@ -536,6 +599,7 @@ void Window::PutAtop(Window *w)
 
 		WindowManager::GetInstance()->PutWindowATop(this, w);
 	}
+#elif defined(GTK3_UI)
 #endif
 }
 
@@ -561,6 +625,7 @@ void Window::PutBelow(Window *w)
 
 		WindowManager::GetInstance()->PutWindowBelow(this, w);
 	}
+#elif defined(GTK3_UI)
 #endif
 }
 
@@ -607,13 +672,10 @@ void Window::SetBounds(int x, int y, int width, int height)
 			return;
 		}
 
-		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
-		bool update = false;
-
 #if defined(DIRECTFB_UI)
 		_graphics_mutex.Lock();
 
-		update = true;
+		bool update = true;
 
 		if (update == true) {
 			if (_window != NULL) {
@@ -637,7 +699,8 @@ void Window::SetBounds(int x, int y, int width, int height)
 #elif defined(DIRECTFB_CAIRO_UI)
 		_graphics_mutex.Lock();
 
-		update = true;
+		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
+		bool update = true;
 
 		if (update == true) {
 			if (_window != NULL) {
@@ -658,6 +721,7 @@ void Window::SetBounds(int x, int y, int width, int height)
 		}
 	
 		_graphics_mutex.Unlock();
+#elif defined(GTK3_UI)
 #endif
 	}
 	
@@ -709,6 +773,7 @@ void Window::SetLocation(int x, int y)
 		}
 		
 		_graphics_mutex.Unlock();
+#elif defined(GTK3_UI)
 #endif
 	}
 	
@@ -827,13 +892,10 @@ void Window::SetSize(int width, int height)
 			return;
 		}	
 
-		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
-		bool update = false;
-
 #if defined(DIRECTFB_UI)
 		_graphics_mutex.Lock();
 
-		update = false;
+		bool update = false;
 
 		// INFO:: works, but with a lot of flicker
 		if (update == true) {
@@ -858,7 +920,8 @@ void Window::SetSize(int width, int height)
 #elif defined(DIRECTFB_CAIRO_UI)
 		_graphics_mutex.Lock();
 
-		update = true;
+		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
+		bool update = true;
 
 		// INFO:: works, but with a lot of flicker
 		if (update == true) {
@@ -880,6 +943,7 @@ void Window::SetSize(int width, int height)
 		}
 	
 		_graphics_mutex.Unlock();
+#elif defined(GTK3_UI)
 #endif
 	}
 	
@@ -918,6 +982,7 @@ void Window::Move(int x, int y)
 		if (_window != NULL) {
 			while (_window->Move(_window, dx, dy) == DFB_LOCKED);
 		}
+#elif defined(GTK3_UI)
 #endif
 	}
 	
@@ -946,6 +1011,7 @@ void Window::SetOpacity(int i)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, _opacity);
 	}
+#elif defined(GTK3_UI)
 #endif
 }
 
@@ -1095,6 +1161,8 @@ bool Window::Show(bool modal)
 	}
 	
 	SetOpacity(_opacity);
+#elif defined(GTK3_UI)
+	InternalCreateWindow();
 #endif
 
 	DoLayout();
@@ -1133,6 +1201,8 @@ bool Window::Hide()
 	if (_window != NULL) {
 		_window->SetOpacity(_window, 0x00);
 	}
+#elif defined(GTK3_UI)
+	// SDL_HideWindow(_window);
 #endif
 
 	return true;
@@ -1186,6 +1256,7 @@ void Window::InternalReleaseWindow()
 
 	_window = NULL;
 	_surface = NULL;
+#elif defined(GTK3_UI)
 #endif
 }
 
@@ -1215,6 +1286,10 @@ void Window::SetRotation(jwindow_rotation_t t)
 #elif defined(DIRECTFB_UI)
 	if (_window != NULL) {
 		_window->SetRotation(_window, rotation);
+	}
+#elif defined(GTK3_UI)
+	if (rotation != 0) {
+		throw jcommon::RuntimeException("Rotate not implemented");
 	}
 #endif
 }

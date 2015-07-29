@@ -5,11 +5,12 @@
 - openssl (http://www.openssl.org)
 - directfb (http://directfb.org)
 - cairo (http://cairographics.org)
+- gtk+ (http://www.gtk.org/)
 
 :Makefile defines
 
 ENABLE_DEBUG=<no, yes>
-ENABLE_GRAPHICS=<none, directfb, directfb-cairo>
+ENABLE_GRAPHICS=<none, directfb, directfb-cairo, gtk3>
 
 :Compiling
 

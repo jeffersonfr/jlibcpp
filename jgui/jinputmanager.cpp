@@ -24,6 +24,8 @@
 #include "jdfbinputmanager.h"
 #elif defined(DIRECTFB_CAIRO_UI)
 #include "jdfbinputmanager.h"
+#elif defined(GTK3_UI)
+#include "jgtkinputmanager.h"
 #endif
 
 namespace jgui {
@@ -45,19 +47,38 @@ InputManager * InputManager::GetInstance()
 {
 	if (_instance == NULL){
 #if defined(DIRECTFB_UI)
-		DFBInputManager *manager = new DFBInputManager();
+		DFBInputManager *manager = NULL;
+		
+		try {
+			_instance = manager = new DFBInputManager();
 
-		manager->Initialize();
-		manager->Start();
-
-		_instance = manager;
+			manager->Initialize();
+			manager->Start();
+		} catch (...) {
+			_instance = NULL;
+		}
 #elif defined(DIRECTFB_CAIRO_UI)
-		DFBInputManager *manager = new DFBInputManager();
+		DFBInputManager *manager = NULL;
+		
+		try {
+			_instance = manager = new DFBInputManager();
 
-		manager->Initialize();
-		manager->Start();
+			manager->Initialize();
+			manager->Start();
+		} catch (...) {
+			_instance = NULL;
+		}
+#elif defined(GTK3_UI)
+		GTKInputManager *manager = NULL;
+		
+		try {
+			_instance = manager = new GTKInputManager();
 
-		_instance = manager;
+			manager->Initialize();
+			manager->Start();
+		} catch (...) {
+			_instance = NULL;
+		}
 #endif
 	}
 

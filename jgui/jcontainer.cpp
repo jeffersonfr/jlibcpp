@@ -1007,7 +1007,7 @@ void Container::DispatchContainerEvent(ContainerEvent *event)
 	delete event;
 }
 
-std::vector<ContainerListener *> & Container::GetFrameListeners()
+std::vector<ContainerListener *> & Container::GetContainerListeners()
 {
 	return _container_listeners;
 }

@@ -20,16 +20,12 @@
 ifeq ($(ENABLE_GRAPHICS),directfb)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
-		 `pkg-config --cflags directfb` \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs directfb` \
 
 	DEFINES		+= \
-		 -DDIRECTFB_UI \
 
 	REQUIRES	+= \
-		 directfb \
 
 	OBJS_media	+= \
 		 jdfbheavyplayer.o\
@@ -42,20 +38,34 @@ endif
 ifeq ($(ENABLE_GRAPHICS),directfb-cairo)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
-		 `pkg-config --cflags directfb` \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs directfb` \
 
 	DEFINES		+= \
-		 -DDIRECTFB_CAIRO_UI \
 
 	REQUIRES	+= \
-		 directfb \
 
 	OBJS_media	+= \
 		 jdfbheavyplayer.o\
 		 jdfblightplayer.o\
+
+OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),gtk3)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+
+	REQUIRES	+= \
+
+	OBJS_media	+= \
+		 #jgtkheavyplayer.o\
+		 jgtklightplayer.o\
 
 OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
 

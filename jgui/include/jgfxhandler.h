@@ -133,13 +133,13 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual jpoint_t GetMousePosition();
+		virtual jpoint_t GetCursorLocation();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetMousePosition(int x, int y);
+		virtual void SetCursorLocation(int x, int y);
 
 		/**
 		 * \brief
@@ -176,12 +176,6 @@ class GFXHandler : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetCursor(Image *shape, int hotx, int hoty);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WarpCursor(int x, int y);
 
 		/**
 		 * \brief

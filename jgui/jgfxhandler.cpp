@@ -30,6 +30,8 @@
 #include "jdfbhandler.h"
 #elif defined(DIRECTFB_CAIRO_UI)
 #include "jdfbhandler.h"
+#elif defined(GTK3_UI)
+#include "jgtkhandler.h"
 #endif
 
 namespace jgui {
@@ -77,6 +79,18 @@ GFXHandler * GFXHandler::GetInstance()
 		} catch (...) {
 			_instance = NULL;
 		}
+#elif defined(GTK3_UI)
+		GTKHandler *handler = NULL;
+		
+		try {
+			_instance = handler = new GTKHandler();
+
+			handler->InitEngine();
+			handler->InitResources();
+			handler->InitCursors();
+		} catch (...) {
+			_instance = NULL;
+		}
 #endif
 	}
 
@@ -114,10 +128,6 @@ void GFXHandler::SetCursor(Image *shape, int hotx, int hoty)
 {
 }
 
-void GFXHandler::WarpCursor(int x, int y)
-{
-}
-
 void * GFXHandler::GetGraphicEngine()
 {
 	return NULL;
@@ -143,11 +153,11 @@ jsize_t GFXHandler::GetScreenSize()
 	return _screen;
 }
 
-void GFXHandler::SetMousePosition(int x, int y)
+void GFXHandler::SetCursorLocation(int x, int y)
 {
 }
 
-jpoint_t GFXHandler::GetMousePosition()
+jpoint_t GFXHandler::GetCursorLocation()
 {
 	jpoint_t p;
 

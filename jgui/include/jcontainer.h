@@ -354,7 +354,7 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual std::vector<ContainerListener *> & GetFrameListeners();
+		virtual std::vector<ContainerListener *> & GetContainerListeners();
 
 };
 

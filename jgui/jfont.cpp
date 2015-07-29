@@ -28,6 +28,8 @@
 #include "jdfbfont.h"
 #elif defined(DIRECTFB_UI)
 #include "jdfbfont.h"
+#elif defined(GTK3_UI)
+#include "jgtkfont.h"
 #endif
 
 #define DEFAULT_FONT_SIZE			16
@@ -74,6 +76,8 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int siz
 		font = new DFBFont(name, attributes, size);
 #elif defined(DIRECTFB_CAIRO_UI)
 		font = new DFBFont(name, attributes, size);
+#elif defined(GTK3_UI)
+		font = new GTKFont(name, attributes, size);
 #endif
 	} catch (jcommon::NullPointerException &) {
 	}
