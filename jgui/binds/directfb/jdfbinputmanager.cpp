@@ -737,7 +737,7 @@ void DFBInputManager::RegisterKeyListener(KeyListener *listener)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	std::vector<jcommon::Listener *>::iterator i = std::find(_key_listeners.begin(), _key_listeners.end(), listener);
+	std::vector<jgui::KeyListener *>::iterator i = std::find(_key_listeners.begin(), _key_listeners.end(), listener);
 
 	if (i == _key_listeners.end()) {
 		_key_listeners.push_back(listener);
@@ -757,8 +757,8 @@ void DFBInputManager::RemoveKeyListener(KeyListener *listener)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<jcommon::Listener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		jcommon::Listener *l = (*i);
+	for (std::vector<jgui::KeyListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
+		jgui::KeyListener *l = (*i);
 
 		if (dynamic_cast<jgui::KeyListener *>(l) == listener) {
 			Window *w = dynamic_cast<Window *>(l);
@@ -792,8 +792,8 @@ void DFBInputManager::DispatchEvent(jcommon::EventObject *event)
 			return;
 		}
 
-		for (std::vector<jcommon::Listener *>::reverse_iterator i=_key_listeners.rbegin(); i!=_key_listeners.rend(); i++) {
-			jgui::KeyListener *kl = dynamic_cast<jgui::KeyListener *>(*i);
+		for (std::vector<jgui::KeyListener *>::reverse_iterator i=_key_listeners.rbegin(); i!=_key_listeners.rend(); i++) {
+			jgui::KeyListener *kl = (*i);
 
 			if (kl != NULL) {
 				if (ke->GetType() == JKT_PRESSED) {
@@ -814,8 +814,8 @@ void DFBInputManager::DispatchEvent(jcommon::EventObject *event)
 			return;
 		}
 
-		for (std::vector<jcommon::Listener *>::reverse_iterator i=_mouse_listeners.rbegin(); i!=_mouse_listeners.rend(); i++) {
-			jgui::MouseListener *ml = dynamic_cast<jgui::MouseListener *>(*i);
+		for (std::vector<jgui::MouseListener *>::reverse_iterator i=_mouse_listeners.rbegin(); i!=_mouse_listeners.rend(); i++) {
+			jgui::MouseListener *ml = (*i);
 
 			if (ml != NULL) {
 				if (me->GetType() == JMT_PRESSED) {
@@ -840,7 +840,7 @@ void DFBInputManager::RegisterMouseListener(MouseListener *listener)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	std::vector<jcommon::Listener *>::iterator i = std::find(_mouse_listeners.begin(), _mouse_listeners.end(), listener);
+	std::vector<jgui::MouseListener *>::iterator i = std::find(_mouse_listeners.begin(), _mouse_listeners.end(), listener);
 
 	if (i == _mouse_listeners.end()) {
 		_mouse_listeners.push_back(listener);
@@ -860,8 +860,8 @@ void DFBInputManager::RemoveMouseListener(MouseListener *listener)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<jcommon::Listener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
-		jcommon::Listener *l = (*i);
+	for (std::vector<jgui::MouseListener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
+		jgui::MouseListener *l = (*i);
 
 		if (dynamic_cast<jgui::MouseListener *>(l) == listener) {
 			Window *w = dynamic_cast<Window *>(l);

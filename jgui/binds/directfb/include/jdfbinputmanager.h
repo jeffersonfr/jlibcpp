@@ -42,10 +42,6 @@ class DFBInputManager : public jgui::InputManager, public jthread::Thread{
 		/** \brief */
 		IDirectFBEventBuffer *events;
 		/** \brief */
-		std::vector<jcommon::Listener *> _key_listeners;
-		/** \brief */
-		std::vector<jcommon::Listener *> _mouse_listeners;
-		/** \brief */
 		uint64_t _last_keypress;
 		/** \brief */
 		int _mouse_x;

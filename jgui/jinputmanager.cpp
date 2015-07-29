@@ -136,12 +136,22 @@ void InputManager::RemoveKeyListener(KeyListener *listener)
 {
 }
 
+std::vector<jgui::KeyListener *> & InputManager::GetKeyListeners()
+{
+	return _key_listeners;
+}
+
 void InputManager::DispatchEvent(jcommon::EventObject *event)
 {
 }
 
 void InputManager::RegisterMouseListener(MouseListener *listener) 
 {
+}
+
+std::vector<jgui::MouseListener *> & InputManager::GetMouseListeners()
+{
+	return _mouse_listeners;
 }
 
 void InputManager::RemoveMouseListener(MouseListener *listener) 

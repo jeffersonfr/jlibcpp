@@ -64,6 +64,8 @@ void ComboBox::SetVisibleItems(int max_items)
 	menu->SetLoop(false);
 	menu->SetCurrentIndex(0);
 	menu->RegisterSelectListener(this);
+	menu->SetMoveEnabled(true);
+	menu->SetResizeEnabled(true);
 
 	if (_menu != NULL) {
 		std::vector<Item *> items = _menu->GetItems();

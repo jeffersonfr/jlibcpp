@@ -641,12 +641,12 @@ void Window::SetBounds(int x, int y, int width, int height)
 		jpoint_t old_point = _location;
 		jsize_t old_size = _size;
 
-		if (_move_enabled == false) {
+		if (_move_enabled == true) {
 			_location.x = x;
 			_location.y = y;
 		}
 
-		if (_resize_enabled == false) {
+		if (_resize_enabled == true) {
 			_size.width = width;
 			_size.height = height;
 
