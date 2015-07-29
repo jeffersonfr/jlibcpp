@@ -27,6 +27,10 @@
 #include "jimage.h"
 #include "jwindow.h"
 #include "jgfxhandler.h"
+#include "jdfbimage.h"
+#include "jdfbgraphics.h"
+
+#include <cairo.h>
 
 namespace jmedia {
 
@@ -169,15 +173,36 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
-			/*
-			 jgui::Image *image = jgui::Image::CreateImage(jgui::JPF_ARGB, _size.width, _size.height);
-			 uint32_t *rgb = NULL;
+			void *ptr;
+			int pitch;
+			int sw,
+					sh;
 
-			 GetGraphics()->GetRGBArray(&rgb, 0, 0, _size.width, _size.height);
-			 image->GetGraphics()->SetRGBArray(rgb, 0, 0, _size.width, _size.height);
+			_surface->GetSize(_surface, &sw, &sh);
 
-			 _player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
-			 */
+			_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
+
+			jgui::DFBImage *image = new jgui::DFBImage(jgui::JPF_ARGB, sw, sh);
+
+			image->GetGraphics()->SetRGBArray((uint32_t *)ptr, 0, 0, sw, sh);
+			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, image));
+
+			jgui::DFBGraphics *g = dynamic_cast<jgui::DFBGraphics *>(image->GetGraphics());
+			cairo_t *cairo_context = g->GetCairoContext();
+			cairo_surface_t *cairo_surface = cairo_get_target(cairo_context);
+
+			if (cairo_surface != NULL) {
+				cairo_surface_flush(cairo_surface);
+
+				int stride = cairo_image_surface_get_stride(cairo_surface);
+				uint8_t *data = cairo_image_surface_get_data(cairo_surface);
+
+				if (data != NULL) {
+					memcpy(ptr, data, stride*sh);
+				}
+			}
+
+			_surface->Unlock(_surface);
 
 			Start();
 		}

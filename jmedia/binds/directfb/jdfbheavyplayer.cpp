@@ -27,6 +27,7 @@
 #include "jimage.h"
 #include "jwindow.h"
 #include "jgfxhandler.h"
+#include "jdfbimage.h"
 
 namespace jmedia {
 
@@ -169,15 +170,38 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
-			/*
-			 jgui::Image *image = jgui::Image::CreateImage(jgui::JPF_ARGB, _size.width, _size.height);
-			 uint32_t *rgb = NULL;
+			IDirectFBSurface *frame;
+			DFBSurfaceDescription desc;
+			void *ptr;
+			int pitch;
+			int sw,
+					sh;
 
-			 GetGraphics()->GetRGBArray(&rgb, 0, 0, _size.width, _size.height);
-			 image->GetGraphics()->SetRGBArray(rgb, 0, 0, _size.width, _size.height);
+			_surface->GetSize(_surface, &sw, &sh);
 
-			 _player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
-			 */
+			_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
+
+			desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT | DSDESC_PREALLOCATED);
+			desc.caps = (DFBSurfaceCapabilities)(DSCAPS_NONE);
+			desc.width = sw;
+			desc.height = sh;
+			desc.pixelformat = DSPF_ABGR;
+			desc.preallocated[0].data = ptr;
+			desc.preallocated[0].pitch = pitch;
+
+			IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
+
+			if (directfb->CreateSurface(directfb, &desc, &frame) == DFB_OK) {
+				jgui::DFBImage *image = new jgui::DFBImage(jgui::JPF_ARGB, sw, sh, false);
+
+				image->GetGraphics()->SetNativeSurface(frame, sw, sh);
+				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, image));
+				image->GetGraphics()->SetNativeSurface(NULL, 0, 0);
+
+				frame->Release(frame);
+			}
+
+			_surface->Unlock(_surface);
 
 			Start();
 		}

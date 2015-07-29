@@ -220,7 +220,7 @@ bool CreateSurface(IDirectFBSurface **surface, jpixelformat_t pixelformat, int w
 	return true;
 }
 
-DFBImage::DFBImage(jpixelformat_t pixelformat, int width, int height):
+DFBImage::DFBImage(jpixelformat_t pixelformat, int width, int height, bool allocate):
 	jgui::Image(pixelformat, width, height)
 {
 	jcommon::Object::SetClassName("jgui::DFBImage");
@@ -243,8 +243,10 @@ DFBImage::DFBImage(jpixelformat_t pixelformat, int width, int height):
 
 	IDirectFBSurface *surface = NULL;
 	
-	if (CreateSurface(&surface, pixelformat, width, height) == false) {
-		throw jcommon::NullPointerException("Cannot create a native surface");
+	if (allocate == true) {
+		if (CreateSurface(&surface, pixelformat, width, height) == false) {
+			throw jcommon::NullPointerException("Cannot create a native surface");
+		}
 	}
 
 	_graphics = new DFBGraphics(surface, pixelformat, width, height, false);

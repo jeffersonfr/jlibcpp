@@ -103,6 +103,12 @@ class DFBGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
+		virtual cairo_t * GetCairoContext();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Path * CreatePath();
 		
 		/**

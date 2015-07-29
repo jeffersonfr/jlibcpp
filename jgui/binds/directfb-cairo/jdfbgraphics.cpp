@@ -79,6 +79,11 @@ void * DFBGraphics::GetNativeSurface()
 	return _surface;
 }
 
+cairo_t * DFBGraphics::GetCairoContext()
+{
+	return _cairo_context;
+}
+
 void DFBGraphics::SetNativeSurface(void *data, int wp, int hp)
 {
 	_surface = (IDirectFBSurface *)data;
@@ -282,17 +287,22 @@ void DFBGraphics::Flip()
 
 	cairo_surface_flush(cairo_surface);
 
-	int dw = cairo_image_surface_get_width(cairo_surface);
-	int dh = cairo_image_surface_get_height(cairo_surface);
+	// int dw = cairo_image_surface_get_width(cairo_surface);
+	// int dh = cairo_image_surface_get_height(cairo_surface);
 	int stride = cairo_image_surface_get_stride(cairo_surface);
 
-	void *ptr;
+	DFBRectangle rect;
+	// void *ptr;
 	int sw;
 	int sh;
-	int pitch;
+	// int pitch;
 
 	_surface->GetSize(_surface, &sw, &sh);
-	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
+
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = sw;
+	rect.h = sh;
 
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
@@ -300,16 +310,7 @@ void DFBGraphics::Flip()
 		return;
 	}
 
-	for (int j=0; j<sh && j<dh; j++) {
-		uint32_t *src = (uint32_t *)(data + j * stride);
-		uint32_t *dst = (uint32_t *)((uint8_t *)ptr + j * pitch);
-		
-		for (int i=0; i<sw && i<dw; i++) {
-			*(dst + i) = *(src + i);
-		}
-	}
-
-	_surface->Unlock(_surface);
+	_surface->Write(_surface, &rect, data, stride);
 		
 	if (_vertical_sync == false) {
 		_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
@@ -332,8 +333,8 @@ void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
 
 	cairo_surface_flush(cairo_surface);
 
-	int dw = cairo_image_surface_get_width(cairo_surface);
-	int dh = cairo_image_surface_get_height(cairo_surface);
+	// int dw = cairo_image_surface_get_width(cairo_surface);
+	// int dh = cairo_image_surface_get_height(cairo_surface);
 	int stride = cairo_image_surface_get_stride(cairo_surface);
 
 	int x = xp;
@@ -348,15 +349,18 @@ void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
 	rgn.x2 = x+w;
 	rgn.y2 = y+h;
 
-	void *ptr;
+	DFBRectangle rect;
+	// void *ptr;
 	int sw;
 	int sh;
-	int pitch;
+	// int pitch;
 
 	_surface->GetSize(_surface, &sw, &sh);
-	_surface->Lock(_surface, DSLF_WRITE, &ptr, &pitch);
 
-	cairo_surface_flush(cairo_surface);
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = sw;
+	rect.h = sh;
 
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
@@ -364,17 +368,7 @@ void DFBGraphics::Flip(int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	for (int j=0; j<sh && j<dh; j++) {
-		uint32_t *src = (uint32_t *)(data + j * stride);
-		uint32_t *dst = (uint32_t *)((uint8_t *)ptr + j * pitch);
-		
-		for (int i=0; i<sw && i<dw; i++) {
-			*(dst + i) = *(src + i);
-		}
-	}
-
-
-	_surface->Unlock(_surface);
+	_surface->Write(_surface, &rect, data, stride);
 
 	if (_vertical_sync == false) {
 		_surface->Flip(_surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_NONE));

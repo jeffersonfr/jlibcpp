@@ -20,13 +20,14 @@
 #include "jframe.h"
 #include "jplayermanager.h"
 #include "jplayerlistener.h"
-#include "jautolock.h"
 #include "jvideosizecontrol.h"
+#include "jgfxhandler.h"
+#include "jautolock.h"
 
 #include <stdio.h>
 #include <unistd.h>
 
-class PlayerTest : public jmedia::PlayerListener {
+class PlayerTest : public jmedia::PlayerListener, public jmedia::FrameGrabberListener {
 
 	private:
 		jmedia::Player *_player;
@@ -35,19 +36,22 @@ class PlayerTest : public jmedia::PlayerListener {
 		PlayerTest(std::string file):
 			jmedia::PlayerListener()
 		{
+			jgui::jsize_t size = jgui::GFXHandler::GetInstance()->GetScreenSize();
+
 			jmedia::PlayerManager::SetHint(jmedia::JPH_LIGHTWEIGHT, false);
 
 			_player = jmedia::PlayerManager::CreatePlayer(file);
 
 			jgui::Component *cmp = _player->GetVisualComponent();
 
-			cmp->SetBounds(0, 0, 1920, 1080);
+			cmp->SetBounds(0, 0, size.width, size.height);
 			cmp->SetVisible(true);
 			//jmedia::VideoSizeControl *control = dynamic_cast<jmedia::VideoSizeControl *>(_player->GetControl("video.size"));
 
 			//control->SetDestination(0, 0, 720, 480);
 
 			_player->RegisterPlayerListener(this);
+			_player->RegisterFrameGrabberListener(this);
 		}
 
 		virtual ~PlayerTest()
@@ -66,6 +70,15 @@ class PlayerTest : public jmedia::PlayerListener {
 		virtual void StopMedia()
 		{
 			_player->Stop();
+		}
+
+		virtual void FrameGrabbed(jmedia::FrameGrabberEvent *event)
+		{
+			jgui::Image *image = event->GetFrame();
+			jgui::Graphics *g = image->GetGraphics();
+
+			g->SetColor(jgui::Color::Blue);
+			g->FillRectangle(8, 8, 32, 32);
 		}
 
 		virtual void MediaStarted(jmedia::PlayerEvent *event)
