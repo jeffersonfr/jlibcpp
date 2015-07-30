@@ -79,11 +79,6 @@ void * DFBGraphics::GetNativeSurface()
 	return _surface;
 }
 
-cairo_t * DFBGraphics::GetCairoContext()
-{
-	return _cairo_context;
-}
-
 void DFBGraphics::SetNativeSurface(void *data, int wp, int hp)
 {
 	_surface = (IDirectFBSurface *)data;

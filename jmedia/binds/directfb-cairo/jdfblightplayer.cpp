@@ -26,6 +26,9 @@
 #include "jmediaexception.h"
 #include "jimage.h"
 #include "jgfxhandler.h"
+#include "jdfbimage.h"
+
+#include <cairo.h>
 
 namespace jmedia {
 
@@ -49,8 +52,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		VideoLightweightImpl(Player *player, int x, int y, int w, int h, int iw, int ih):
-			jgui::Component(x, y, w, h),
-			_mutex(jthread::JMT_RECURSIVE)
+			jgui::Component(x, y, w, h)
 		{
 			IDirectFB *engine = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
 
@@ -69,9 +71,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
 			_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 
-			_image = jgui::Image::CreateImage(jgui::JPF_ARGB, w, h);
-
-			_image->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
+			_image = NULL;
 
 			_player = player;
 
@@ -96,7 +96,17 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
+			_mutex.Lock();
+
+			if (_image != NULL) {
+				delete _image;
+				_image = NULL;
+			}
+
 			_surface->Release(_surface);
+			_surface = NULL;
+
+			_mutex.Unlock();
 		}
 
 		virtual void UpdateComponent()
@@ -104,22 +114,41 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			if (IsRunning() == true) {
 				WaitThread();
 			}
-			
+	
 			if (_surface != NULL) {
 				void *ptr;
 				int pitch;
+				int sw,
+						sh;
 
-				_surface->Lock(_surface, DSLF_READ, &ptr, &pitch);
+				_surface->GetSize(_surface, &sw, &sh);
+				_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_WRITE), &ptr, &pitch);
 
-				_image->GetGraphics()->SetRGBArray((uint32_t *)ptr, 0, 0, _image->GetWidth(), _image->GetHeight());
+				cairo_surface_t *cairo_surface = cairo_image_surface_create_for_data(
+						(uint8_t *)ptr, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
+				cairo_t *cairo_context = cairo_create(cairo_surface);
+
+				_mutex.Lock();
+
+				if (_image != NULL) {
+					delete _image;
+					_image = NULL;
+				}
+
+				_image = new jgui::DFBImage(cairo_context, jgui::JPF_ARGB, sw, sh);
+
+				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
+
+				cairo_surface_flush(cairo_surface);
+				cairo_surface_destroy(cairo_surface);
+			
+				_mutex.Unlock();
 
 				_surface->Unlock(_surface);
+				
 			}
 
-			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
-
-			// CHANGE:: to make this sync, use Run() instead Start()
-			Start();
+			Run();
 		}
 
 		virtual void Run()
@@ -133,11 +162,15 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 		{
 			jgui::Component::Paint(g);
 
+			_mutex.Lock();
+
 			if (_diff == false) {
 				g->DrawImage(_image, 0, 0, GetWidth(), GetHeight());
 			} else {
 				g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, _dst.x, _dst.y, _dst.width, _dst.height);
 			}
+				
+			_mutex.Unlock();
 		}
 
 		virtual Player * GetPlayer()

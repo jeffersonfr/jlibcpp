@@ -122,6 +122,26 @@ uint32_t * resize_bilinear(uint32_t *pixels, int w, int h, int w2, int h2)
 }
 */
 
+DFBImage::DFBImage(cairo_t *cairo_context, jpixelformat_t pixelformat, int width, int height):
+	jgui::Image(pixelformat, width, height)
+{
+	jcommon::Object::SetClassName("jgui::DFBImage");
+
+	_buffer = NULL;
+	
+	if (width < 1 || height < 1) {
+		throw jcommon::RuntimeException("Invalid image size");
+	}
+
+	DFBGraphics *g = new DFBGraphics(NULL, pixelformat, width, height);
+
+	g->_cairo_context = cairo_context;
+
+	_graphics = g;
+
+	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Add(this);
+}
+
 DFBImage::DFBImage(jpixelformat_t pixelformat, int width, int height):
 	jgui::Image(pixelformat, width, height)
 {

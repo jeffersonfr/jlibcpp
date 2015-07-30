@@ -170,7 +170,7 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
-			if (_player->GetFrameGrabberListeners().size() > 0) {
+			if (_surface != NULL) {
 				IDirectFBSurface *frame;
 				DFBSurfaceDescription desc;
 				void *ptr;

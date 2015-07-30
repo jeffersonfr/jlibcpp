@@ -25,6 +25,8 @@
 #include <stdint.h>
 #include <string.h>
 
+#include <cairo.h>
+
 namespace jgui{
 
 /**
@@ -39,6 +41,12 @@ class DFBImage : public jgui::Image{
 		uint8_t *_buffer;
 
 	public:
+		/**
+		 * \brief
+		 *
+		 */
+		DFBImage(cairo_t *cairo_context, jpixelformat_t pixelformat, int width, int height);
+		
 		/**
 		 * \brief
 		 *

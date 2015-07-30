@@ -80,11 +80,15 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 
 		virtual void UpdateComponent()
 		{
-			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
-
 			if (IsRunning() == true) {
 				WaitThread();
 			}
+
+			_mutex.Lock();
+
+			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
+			
+			_mutex.Unlock();
 
 			// CHANGE:: to make this sync, use Run() instead Start()
 			Start();
@@ -101,11 +105,15 @@ class VideoComponentImpl : public jgui::Component, jthread::Thread {
 		{
 			jgui::Component::Paint(g);
 
+			_mutex.Lock();
+
 			if (_diff == false) {
 				g->DrawImage(_image, 0, 0, GetWidth(), GetHeight());
 			} else {
 				g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, _dst.x, _dst.y, _dst.width, _dst.height);
 			}
+			
+			_mutex.Unlock();
 		}
 
 		virtual Player * GetPlayer()

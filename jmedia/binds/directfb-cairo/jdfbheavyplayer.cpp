@@ -173,35 +173,25 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
-			if (_player->GetFrameGrabberListeners().size() > 0) {
+			if (_surface != NULL) {
 				void *ptr;
 				int pitch;
 				int sw,
 						sh;
 
 				_surface->GetSize(_surface, &sw, &sh);
-
 				_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
 
-				jgui::DFBImage *image = new jgui::DFBImage(jgui::JPF_ARGB, sw, sh);
+				cairo_surface_t *cairo_surface = cairo_image_surface_create_for_data(
+						(uint8_t *)ptr, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
+				cairo_t *cairo_context = cairo_create(cairo_surface);
 
-				image->GetGraphics()->SetRGBArray((uint32_t *)ptr, 0, 0, sw, sh);
+				jgui::DFBImage *image = new jgui::DFBImage(cairo_context, jgui::JPF_ARGB, sw, sh);
+
 				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, image));
 
-				jgui::DFBGraphics *g = dynamic_cast<jgui::DFBGraphics *>(image->GetGraphics());
-				cairo_t *cairo_context = g->GetCairoContext();
-				cairo_surface_t *cairo_surface = cairo_get_target(cairo_context);
-
-				if (cairo_surface != NULL) {
-					cairo_surface_flush(cairo_surface);
-
-					int stride = cairo_image_surface_get_stride(cairo_surface);
-					uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-					if (data != NULL) {
-						memcpy(ptr, data, stride*sh);
-					}
-				}
+				cairo_surface_flush(cairo_surface);
+				cairo_surface_destroy(cairo_surface);
 
 				_surface->Unlock(_surface);
 			}
