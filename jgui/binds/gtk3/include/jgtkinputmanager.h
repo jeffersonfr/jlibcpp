@@ -17,172 +17,122 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_GFXHANDLER_H
-#define J_GFXHANDLER_H
+#ifndef J_GTKINPUTMANAGER_H
+#define J_GTKINPUTMANAGER_H
 
-#include "jobject.h"
-#include "jmutex.h"
-#include "jgraphics.h"
-#include "jimage.h"
+#include "jinputmanager.h"
 
 #include <vector>
 #include <map>
+#include <list>
 
-#define JGUI_MAX_FONTS	30
+namespace jgui {
 
-namespace jgui{
+class EventBroadcaster;
 
-/**
- * \brief
- *
- */
-enum jcursor_style_t {
-	JCS_DEFAULT,
-	JCS_CROSSHAIR,
-	JCS_EAST,
-	JCS_WEST,
-	JCS_NORTH,
-	JCS_SOUTH,
-	JCS_HAND,
-	JCS_MOVE,
-	JCS_NS,
-	JCS_WE,
-	JCS_NW_CORNER,
-	JCS_NE_CORNER,
-	JCS_SW_CORNER,
-	JCS_SE_CORNER,
-	JCS_TEXT,
-	JCS_WAIT
-};
+class GTKInputManager : public jgui::InputManager, public jthread::Thread{
 
-class Window;
-class WindowManager;
-class Font;
-class Image;
-class InputManager;
+	friend class GTKHandler;
 
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class GFXHandler : public virtual jcommon::Object{
-
-	friend class Image;
-
-	protected:
-		static GFXHandler * _instance;
-		
-		std::vector<Image *> _images;
-		std::vector<Font *> _fonts;
+	private:
+		/** \brief */
 		jthread::Mutex _mutex;
-		jsize_t _screen;
-		jcursor_style_t _cursor;
+		/** \brief */
+		uint64_t _last_keypress;
+		/** \brief */
+		int _mouse_x;
+		/** \brief */
+		int _mouse_y;
+		/** \brief */
+		int _click_delay;
+		/** \brief */
+		int _click_count;
+		/** \brief */
+		bool _is_initialized;
+		/** \brief */
+		bool _is_key_enabled;
+		/** \brief */
+		bool _is_mouse_enabled;
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		GFXHandler();
-		
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~GFXHandler();
+		GTKInputManager();
 
 		/**
 		 * \brief
 		 *
 		 */
-		static std::string GetEngineID();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static GFXHandler * GetInstance();
+		virtual ~GTKInputManager();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void * GetGraphicEngine();
+		virtual void Initialize();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetScreenWidth();
+		virtual void SetKeyEventsEnabled(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetScreenHeight();
+		virtual void SetMouseEventsEnabled(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jsize_t GetScreenSize();
+		virtual bool IsKeyEventsEnabled();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jpoint_t GetCursorLocation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorLocation(int x, int y);
+		virtual bool IsMouseEventsEnabled();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetFlickerFilteringEnabled(bool b);
+		virtual void SetClickDelay(int ms);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool IsFlickerFilteringEnabled();
+		virtual int GetClickDelay();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetCursorEnabled(bool b);
+		virtual void PostEvent(KeyEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool IsCursorEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(jcursor_style_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(Image *shape, int hotx, int hoty);
+		virtual void PostEvent(MouseEvent *event);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Restore();
-		
+		// jkeyevent_symbol_t TranslateToGTKKeySymbol(GTK_Keysym symbol);
+
+		/**
+		 * \brief
+		 *
+		 */
+		// void ProcessInputEvent(GTK_Event event);
+
 		/**
 		 * \brief
 		 *
@@ -193,28 +143,46 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void Suspend();
+		virtual void Restore();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Resume();
+		virtual void Run();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void WaitIdle();
-
+		virtual void RegisterKeyListener(KeyListener *listener);
+		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void WaitSync();
+		virtual void RemoveKeyListener(KeyListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RegisterMouseListener(MouseListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveMouseListener(MouseListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DispatchEvent(jcommon::EventObject *event);
 
 };
 
 }
 
-#endif /*GFXHANDLER_H_*/
+#endif

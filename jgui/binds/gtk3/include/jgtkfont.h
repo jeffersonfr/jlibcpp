@@ -17,204 +17,166 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_GFXHANDLER_H
-#define J_GFXHANDLER_H
+#ifndef J_GTKFONT_H
+#define J_GTKFONT_H
 
-#include "jobject.h"
-#include "jmutex.h"
-#include "jgraphics.h"
-#include "jimage.h"
+#include "jfont.h"
 
-#include <vector>
-#include <map>
+#include <cairo-ft.h>
 
-#define JGUI_MAX_FONTS	30
-
-namespace jgui{
-
-/**
- * \brief
- *
- */
-enum jcursor_style_t {
-	JCS_DEFAULT,
-	JCS_CROSSHAIR,
-	JCS_EAST,
-	JCS_WEST,
-	JCS_NORTH,
-	JCS_SOUTH,
-	JCS_HAND,
-	JCS_MOVE,
-	JCS_NS,
-	JCS_WE,
-	JCS_NW_CORNER,
-	JCS_NE_CORNER,
-	JCS_SW_CORNER,
-	JCS_SE_CORNER,
-	JCS_TEXT,
-	JCS_WAIT
-};
-
-class Window;
-class WindowManager;
-class Font;
-class Image;
-class InputManager;
+namespace jgui {
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class GFXHandler : public virtual jcommon::Object{
+class GTKFont : public virtual jgui::Font{
 
-	friend class Image;
+	friend class GTKGraphics;
+	friend class GTKPath;
 
-	protected:
-		static GFXHandler * _instance;
-		
-		std::vector<Image *> _images;
-		std::vector<Font *> _fonts;
-		jthread::Mutex _mutex;
-		jsize_t _screen;
-		jcursor_style_t _cursor;
+	private:
+		/** \brief */
+		static Font *_default_font;
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		GFXHandler();
-		
+	private:
+		/** \brief */
+		cairo_font_face_t *_font;
+		/** \brief */
+		cairo_surface_t *_surface_ref;
+		/** \brief */
+		cairo_t *_context_ref;
+		/** \brief */
+		cairo_scaled_font_t *_scaled_font;
+		/** \brief */
+		cairo_font_options_t *_options;
+		/** \brief */
+		int _leading;
+		/** \brief */
+		int _ascender;
+		/** \brief */
+		int _descender;
+		/** \brief */
+		int _max_advance_width;
+		/** \brief */
+		int _max_advance_height;
+		/** \brief */
+		bool _is_builtin;
+		/** \brief */
+		int _widths[256];
+
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~GFXHandler();
+		GTKFont(std::string name, jfont_attributes_t attributes, int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~GTKFont();
 
 		/**
 		 * \brief
 		 *
 		 */
-		static std::string GetEngineID();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static GFXHandler * GetInstance();
+		virtual void ApplyContext(void *ctx);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void * GetGraphicEngine();
+		virtual void * GetNativeFont();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetScreenWidth();
+		virtual std::string GetName();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetScreenHeight();
+		virtual int GetAscender();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jsize_t GetScreenSize();
+		virtual int GetDescender();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jpoint_t GetCursorLocation();
+		virtual int GetMaxAdvanceWidth();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetCursorLocation(int x, int y);
+		virtual int GetMaxAdvanceHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetLeading();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetStringWidth(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jregion_t GetStringExtends(std::string text);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetFlickerFilteringEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsFlickerFilteringEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsCursorEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(jcursor_style_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(Image *shape, int hotx, int hoty);
+		virtual jregion_t GetGlyphExtends(int symbol);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Restore();
+		virtual bool CanDisplay(int ch);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetCharWidth(char ch);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual const int * GetCharWidths();
 		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void Release();
-
+		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Suspend();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Resume();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitIdle();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitSync();
+		virtual void Restore();
 
 };
 
 }
 
-#endif /*GFXHANDLER_H_*/
+#endif /*GTKFONT_H*/

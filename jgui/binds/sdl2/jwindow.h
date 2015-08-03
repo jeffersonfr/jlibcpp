@@ -34,9 +34,6 @@
 #include <directfb.h>
 #elif defined(DIRECTFB_CAIRO_UI)
 #include <directfb.h>
-#elif defined(GTK3_UI)
-#include <gtk/gtk.h>
-#include <cairo.h>
 #elif defined(SDL2_UI)
 #include <SDL2/SDL.h>
 #endif
@@ -59,19 +56,8 @@ class Graphics;
  */
 class Window : public jgui::Container{
 
+	friend class DFBInputManager;
 	friend class WindowManager;
-
-#if defined(DIRECTFB_UI)
-	friend class DFBInputManager;
-#elif defined(DIRECTFB_CAIRO_UI)
-	friend class DFBInputManager;
-#elif defined(GTK3_UI)
-	friend class GTKInputManager;
-#elif defined(SDL2_UI)
-	friend class SDLInputManager;
-
-	void InternalInstanciateWindow();
-#endif
 
 	protected:
 #if defined(DIRECTFB_UI)
@@ -84,11 +70,6 @@ class Window : public jgui::Container{
 		IDirectFBWindow *_window;
 		/** \brief */
 		IDirectFBSurface *_surface;
-#elif defined(GTK3_UI)
-		/** \brief */
-  	GtkWidget *_window;
-		/** \brief */
-	  GtkWidget *_surface;
 #elif defined(SDL2_UI)
 		/** \brief */
 		SDL_Window *_window;
@@ -117,28 +98,6 @@ class Window : public jgui::Container{
 		jwindow_rotation_t _rotation;
 		/** \brief */
 		bool _is_input_enabled;
-		/** \brief */
-		bool _is_fullscreen;
-		/** \brief */
-		int _old_x;
-		/** \brief */
-		int _old_y;
-		/** \brief */
-		int _old_width;
-		/** \brief */
-		int _old_height;
-		/** \brief */
-		int _old_border_size;
-		/** \brief */
-		bool _old_undecorated;
-		/** \brief */
-		bool _move_enabled;
-		/** \brief */
-		bool _release_enabled;
-		/** \brief */
-		bool _resize_enabled;
-		/** \brief */
-		bool _is_maximized;
 
 	protected:
 		/**
@@ -153,12 +112,6 @@ class Window : public jgui::Container{
 		 */
 		virtual void InternalReleaseWindow();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InternalRepaint(Component *cmp = NULL);
-		
 	public:
 		/**
 		 * \brief
@@ -190,66 +143,6 @@ class Window : public jgui::Container{
 		 */
 		virtual void SetNativeWindow(void *native);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetFullScreenEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsFullScreenEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetMoveEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetResizeEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsMoveEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsResizeEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Maximize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsMaximized();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Restore();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBorderSize(int size);
-		
 		/**
 		 * \brief
 		 *

@@ -30,6 +30,8 @@
 #include "jdfbfont.h"
 #elif defined(GTK3_UI)
 #include "jgtkfont.h"
+#elif defined(SDL2_UI)
+#include "jsdlfont.h"
 #endif
 
 #define DEFAULT_FONT_SIZE			16
@@ -78,6 +80,8 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int siz
 		font = new DFBFont(name, attributes, size);
 #elif defined(GTK3_UI)
 		font = new GTKFont(name, attributes, size);
+#elif defined(SDL2_UI)
+		font = new SDLFont(name, attributes, size);
 #endif
 	} catch (jcommon::NullPointerException &) {
 	}

@@ -97,3 +97,28 @@ OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),sdl2)
+	CCFLAGS 	+= \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
+		 `pkg-config --cflags sdl2 SDL2_ttf` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs sdl2 SDL2_ttf` \
+
+	DEFINES		+= \
+		 -DSDL2_UI \
+
+	REQUIRES	+= \
+		 sdl2 \
+
+	OBJS_gfx	+= \
+		 jsdlhandler.o\
+		 jsdlfont.o\
+		 jsdlgraphics.o\
+		 jsdlimage.o\
+		 jsdlinputmanager.o\
+
+OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+

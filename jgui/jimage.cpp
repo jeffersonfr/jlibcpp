@@ -30,6 +30,8 @@
 #include "jdfbimage.h"
 #elif defined(GTK3_UI)
 #include "jgtkimage.h"
+#elif defined(SDL2_UI)
+#include "jsdlimage.h"
 #endif
 
 namespace jgui {
@@ -62,6 +64,8 @@ jsize_t Image::GetImageSize(std::string img)
 	t = DFBImage::GetImageSize(img);
 #elif defined(GTK3_UI)
 	t = GTKImage::GetImageSize(img);
+#elif defined(SDL2_UI)
+	t = SDLImage::GetImageSize(img);
 #endif
 
 	return t;
@@ -78,6 +82,8 @@ Image * Image::CreateImage(jpixelformat_t pixelformat, int width, int height)
 		image = new DFBImage(pixelformat, width, height);
 #elif defined(GTK3_UI)
 		image = new GTKImage(pixelformat, width, height);
+#elif defined(SDL2_UI)
+		image = new SDLImage(pixelformat, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -114,6 +120,8 @@ Image * Image::CreateImage(std::string file)
 			image = new DFBImage(file);
 #elif defined(GTK3_UI)
 			image = new GTKImage(file);
+#elif defined(SDL2_UI)
+			image = new SDLImage(file);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -145,6 +153,8 @@ Image * Image::CreateImage(jio::InputStream *stream)
 		image = DFBImage::CreateImageStream(stream);
 #elif defined(GTK3_UI)
 		image = GTKImage::CreateImageStream(stream);
+#elif defined(SDL2_UI)
+		image = SDLImage::CreateImageStream(stream);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -197,6 +207,8 @@ Image * Image::Flip(jflip_flags_t t)
 		image = DFBImage::Flip(this, t);
 #elif defined(GTK3_UI)
 		image = GTKImage::Flip(this, t);
+#elif defined(SDL2_UI)
+		image = SDLImage::Flip(this, t);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -215,6 +227,8 @@ Image * Image::Rotate(double radians, bool resize)
 		image = DFBImage::Rotate(this, radians, resize);
 #elif defined(GTK3_UI)
 		image = GTKImage::Rotate(this, radians, resize);
+#elif defined(SDL2_UI)
+		image = SDLImage::Rotate(this, radians, resize);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -233,6 +247,8 @@ Image * Image::Scale(int width, int height)
 		image = DFBImage::Scale(this, width, height);
 #elif defined(GTK3_UI)
 		image = GTKImage::Scale(this, width, height);
+#elif defined(SDL2_UI)
+		image = SDLImage::Scale(this, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -251,6 +267,8 @@ Image * Image::Crop(int x, int y, int width, int height)
 		image = DFBImage::Crop(this, x, y, width, height);
 #elif defined(GTK3_UI)
 		image = GTKImage::Crop(this, x, y, width, height);
+#elif defined(SDL2_UI)
+		image = SDLImage::Crop(this, x, y, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -269,6 +287,8 @@ Image * Image::Blend(double alpha)
 		image = DFBImage::Blend(this, alpha);
 #elif defined(GTK3_UI)
 		image = GTKImage::Blend(this, alpha);
+#elif defined(SDL2_UI)
+		image = SDLImage::Blend(this, alpha);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -287,6 +307,8 @@ Image * Image::Colorize(Color color)
 		image = DFBImage::Colorize(this, color);
 #elif defined(GTK3_UI)
 		image = GTKImage::Colorize(this, color);
+#elif defined(SDL2_UI)
+		image = SDLImage::Colorize(this, color);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}

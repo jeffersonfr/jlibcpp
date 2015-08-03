@@ -17,81 +17,109 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_GFXHANDLER_H
-#define J_GFXHANDLER_H
+#ifndef J_SDLHANDLER_H
+#define J_SDLHANDLER_H
 
-#include "jobject.h"
-#include "jmutex.h"
-#include "jgraphics.h"
-#include "jimage.h"
+#include "jgfxhandler.h"
+#include "jthread.h"
 
-#include <vector>
-#include <map>
-
-#define JGUI_MAX_FONTS	30
+#include <SDL2/SDL.h>
 
 namespace jgui{
 
-/**
- * \brief
- *
- */
-enum jcursor_style_t {
-	JCS_DEFAULT,
-	JCS_CROSSHAIR,
-	JCS_EAST,
-	JCS_WEST,
-	JCS_NORTH,
-	JCS_SOUTH,
-	JCS_HAND,
-	JCS_MOVE,
-	JCS_NS,
-	JCS_WE,
-	JCS_NW_CORNER,
-	JCS_NE_CORNER,
-	JCS_SW_CORNER,
-	JCS_SE_CORNER,
-	JCS_TEXT,
-	JCS_WAIT
-};
-
-class Window;
-class WindowManager;
-class Font;
-class Image;
-class InputManager;
+class SDLInputManager;
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class GFXHandler : public virtual jcommon::Object{
+class SDLHandler : public virtual jgui::GFXHandler, public jthread::Thread{
 
-	friend class Image;
+	friend SDLInputManager;
 
-	protected:
-		static GFXHandler * _instance;
-		
-		std::vector<Image *> _images;
-		std::vector<Font *> _fonts;
-		jthread::Mutex _mutex;
-		jsize_t _screen;
-		jcursor_style_t _cursor;
+	private:
+		/** \brief */
+		bool _is_cursor_enabled;
 
-	protected:
+	private:
+		/** \brief */
+		struct cursor_params_t {
+			Image *cursor;
+			int hot_x;
+			int hot_y;
+		};
+
+		/** \brief */
+		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
+
+	private:
 		/**
 		 * \brief
 		 *
 		 */
-		GFXHandler();
-		
+		virtual void InternalInitEngine();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InternalRelease();
+
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~GFXHandler();
+		SDLHandler();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~SDLHandler();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitEngine();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitCursors();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitResources();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Add(Font *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Remove(Font *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Add(Image *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Remove(Image *);
 
 		/**
 		 * \brief
@@ -103,32 +131,8 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static GFXHandler * GetInstance();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void * GetGraphicEngine();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScreenWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScreenHeight();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetScreenSize();
-		
 		/**
 		 * \brief
 		 *
@@ -164,7 +168,6 @@ class GFXHandler : public virtual jcommon::Object{
 		 *
 		 */
 		virtual bool IsCursorEnabled();
-		
 		/**
 		 * \brief
 		 *
@@ -213,8 +216,14 @@ class GFXHandler : public virtual jcommon::Object{
 		 */
 		virtual void WaitSync();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Run();
+
 };
 
 }
 
-#endif /*GFXHANDLER_H_*/
+#endif /*SDLHANDLER_H_*/

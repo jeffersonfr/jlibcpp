@@ -26,6 +26,8 @@
 #include "jdfbinputmanager.h"
 #elif defined(GTK3_UI)
 #include "jgtkinputmanager.h"
+#elif defined(SDL2_UI)
+#include "jsdlinputmanager.h"
 #endif
 
 namespace jgui {
@@ -73,6 +75,17 @@ InputManager * InputManager::GetInstance()
 		
 		try {
 			_instance = manager = new GTKInputManager();
+
+			manager->Initialize();
+			manager->Start();
+		} catch (...) {
+			_instance = NULL;
+		}
+#elif defined(SDL2_UI)
+		SDLInputManager *manager = NULL;
+		
+		try {
+			_instance = manager = new SDLInputManager();
 
 			manager->Initialize();
 			manager->Start();

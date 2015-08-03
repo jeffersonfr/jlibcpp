@@ -71,3 +71,21 @@ OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),sdl2)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+
+	REQUIRES	+= \
+
+	OBJS_media	+= \
+		 #jsdlheavyplayer.o\
+		 jsdllightplayer.o\
+
+OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
+
+endif
+

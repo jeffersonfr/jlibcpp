@@ -32,6 +32,8 @@
 #include "jdfbhandler.h"
 #elif defined(GTK3_UI)
 #include "jgtkhandler.h"
+#elif defined(SDL2_UI)
+#include "jsdlhandler.h"
 #endif
 
 namespace jgui {
@@ -91,6 +93,18 @@ GFXHandler * GFXHandler::GetInstance()
 		} catch (...) {
 			_instance = NULL;
 		}
+#elif defined(SDL2_UI)
+		SDLHandler *handler = NULL;
+		
+		try {
+			_instance = handler = new SDLHandler();
+
+			handler->InitEngine();
+			handler->InitResources();
+			handler->InitCursors();
+		} catch (...) {
+			_instance = NULL;
+		}
 #endif
 	}
 
@@ -133,7 +147,7 @@ void * GFXHandler::GetGraphicEngine()
 	return NULL;
 }
 
-std::string GFXHandler::GetID()
+std::string GFXHandler::GetEngineID()
 {
 	return "none";
 }

@@ -17,204 +17,120 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_GFXHANDLER_H
-#define J_GFXHANDLER_H
+#ifndef J_SDLIMAGE_H
+#define J_SDLIMAGE_H
 
-#include "jobject.h"
-#include "jmutex.h"
-#include "jgraphics.h"
-#include "jimage.h"
+#include "jsdlimage.h"
 
-#include <vector>
-#include <map>
-
-#define JGUI_MAX_FONTS	30
+#include <stdint.h>
+#include <string.h>
 
 namespace jgui{
 
 /**
  * \brief
  *
- */
-enum jcursor_style_t {
-	JCS_DEFAULT,
-	JCS_CROSSHAIR,
-	JCS_EAST,
-	JCS_WEST,
-	JCS_NORTH,
-	JCS_SOUTH,
-	JCS_HAND,
-	JCS_MOVE,
-	JCS_NS,
-	JCS_WE,
-	JCS_NW_CORNER,
-	JCS_NE_CORNER,
-	JCS_SW_CORNER,
-	JCS_SE_CORNER,
-	JCS_TEXT,
-	JCS_WAIT
-};
-
-class Window;
-class WindowManager;
-class Font;
-class Image;
-class InputManager;
-
-/**
- * \brief
- *
  * \author Jeff Ferr
  */
-class GFXHandler : public virtual jcommon::Object{
+class SDLImage : public jgui::Image{
 
-	friend class Image;
+	private:
+		/** \brief */
+		uint8_t *_buffer;
 
-	protected:
-		static GFXHandler * _instance;
-		
-		std::vector<Image *> _images;
-		std::vector<Font *> _fonts;
-		jthread::Mutex _mutex;
-		jsize_t _screen;
-		jcursor_style_t _cursor;
-
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		GFXHandler();
-		
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~GFXHandler();
+		SDLImage(jpixelformat_t pixelformat, int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		SDLImage(std::string file);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~SDLImage();
 
 		/**
 		 * \brief
 		 *
 		 */
-		static std::string GetEngineID();
+		static jsize_t GetImageSize(std::string img);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		static GFXHandler * GetInstance();
+		static Image * CreateImageStream(jio::InputStream *stream);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void * GetGraphicEngine();
+		static Image * Flip(Image *img, jflip_flags_t t);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetScreenWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScreenHeight();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetScreenSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t GetCursorLocation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorLocation(int x, int y);
+		static Image * Rotate(Image *img, double radians, bool resize);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetFlickerFilteringEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsFlickerFilteringEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsCursorEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(jcursor_style_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(Image *shape, int hotx, int hoty);
+		static Image * Scale(Image *img, int width, int height);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Restore();
+		static Image * Crop(Image *img, int x, int y, int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static Image * Blend(Image *img, double alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static Image * Colorize(Image *img, Color color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetPixels(uint8_t *buffer, int xp, int yp, int wp, int hp, int stride);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, int *stride);
+
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void Release();
-
+		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Suspend();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Resume();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitIdle();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitSync();
+		virtual void Restore();
 
 };
 
 }
 
-#endif /*GFXHANDLER_H_*/
+#endif 

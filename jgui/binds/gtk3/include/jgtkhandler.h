@@ -17,118 +17,107 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_GFXHANDLER_H
-#define J_GFXHANDLER_H
+#ifndef J_GTKHANDLER_H
+#define J_GTKHANDLER_H
 
-#include "jobject.h"
-#include "jmutex.h"
-#include "jgraphics.h"
-#include "jimage.h"
+#include "jgfxhandler.h"
 
-#include <vector>
-#include <map>
-
-#define JGUI_MAX_FONTS	30
+#include <gtk/gtk.h>
+#include <cairo-ft.h>
 
 namespace jgui{
 
 /**
  * \brief
  *
- */
-enum jcursor_style_t {
-	JCS_DEFAULT,
-	JCS_CROSSHAIR,
-	JCS_EAST,
-	JCS_WEST,
-	JCS_NORTH,
-	JCS_SOUTH,
-	JCS_HAND,
-	JCS_MOVE,
-	JCS_NS,
-	JCS_WE,
-	JCS_NW_CORNER,
-	JCS_NE_CORNER,
-	JCS_SW_CORNER,
-	JCS_SE_CORNER,
-	JCS_TEXT,
-	JCS_WAIT
-};
-
-class Window;
-class WindowManager;
-class Font;
-class Image;
-class InputManager;
-
-/**
- * \brief
- *
  * \author Jeff Ferr
  */
-class GFXHandler : public virtual jcommon::Object{
+class GTKHandler : public virtual jgui::GFXHandler{
 
-	friend class Image;
+	private:
+		/** \brief */
+		FT_Library _ft_library;
+		/** \brief */
+		bool _is_cursor_enabled;
 
-	protected:
-		static GFXHandler * _instance;
-		
-		std::vector<Image *> _images;
-		std::vector<Font *> _fonts;
-		jthread::Mutex _mutex;
-		jsize_t _screen;
-		jcursor_style_t _cursor;
+	private:
+		/** \brief */
+		struct cursor_params_t {
+			Image *cursor;
+			int hot_x;
+			int hot_y;
+		};
 
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		GFXHandler();
-		
+		/** \brief */
+		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
+
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~GFXHandler();
-
-		/**
-		 * \brief
-		 *
-		 */
-		static std::string GetEngineID();
+		GTKHandler();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		static GFXHandler * GetInstance();
+		virtual ~GTKHandler();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitEngine();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitCursors();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitResources();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Add(Font *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Remove(Font *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Add(Image *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Remove(Image *);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static std::string GetID();
+		
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void * GetGraphicEngine();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScreenWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScreenHeight();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetScreenSize();
-		
 		/**
 		 * \brief
 		 *
@@ -164,7 +153,6 @@ class GFXHandler : public virtual jcommon::Object{
 		 *
 		 */
 		virtual bool IsCursorEnabled();
-		
 		/**
 		 * \brief
 		 *
@@ -177,6 +165,12 @@ class GFXHandler : public virtual jcommon::Object{
 		 */
 		virtual void SetCursor(Image *shape, int hotx, int hoty);
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int CreateFont(std::string name, cairo_font_face_t **font);
+		
 		/**
 		 * \brief
 		 *
@@ -217,4 +211,4 @@ class GFXHandler : public virtual jcommon::Object{
 
 }
 
-#endif /*GFXHANDLER_H_*/
+#endif /*GTKHANDLER_H_*/

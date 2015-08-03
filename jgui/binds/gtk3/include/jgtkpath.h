@@ -17,204 +17,119 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_GFXHANDLER_H
-#define J_GFXHANDLER_H
+#ifndef J_GTKPATH_H
+#define J_GTKPATH_H
 
-#include "jobject.h"
-#include "jmutex.h"
-#include "jgraphics.h"
-#include "jimage.h"
-
-#include <vector>
-#include <map>
-
-#define JGUI_MAX_FONTS	30
+#include "jpath.h"
+#include "jgtkgraphics.h"
 
 namespace jgui{
 
 /**
  * \brief
  *
- */
-enum jcursor_style_t {
-	JCS_DEFAULT,
-	JCS_CROSSHAIR,
-	JCS_EAST,
-	JCS_WEST,
-	JCS_NORTH,
-	JCS_SOUTH,
-	JCS_HAND,
-	JCS_MOVE,
-	JCS_NS,
-	JCS_WE,
-	JCS_NW_CORNER,
-	JCS_NE_CORNER,
-	JCS_SW_CORNER,
-	JCS_SE_CORNER,
-	JCS_TEXT,
-	JCS_WAIT
-};
-
-class Window;
-class WindowManager;
-class Font;
-class Image;
-class InputManager;
-
-/**
- * \brief
- *
  * \author Jeff Ferr
  */
-class GFXHandler : public virtual jcommon::Object{
+class GTKPath : public jgui::Path{
+	
+	private:
+		/** \brief */
+		GTKGraphics *_graphics;
 
-	friend class Image;
-
-	protected:
-		static GFXHandler * _instance;
-		
-		std::vector<Image *> _images;
-		std::vector<Font *> _fonts;
-		jthread::Mutex _mutex;
-		jsize_t _screen;
-		jcursor_style_t _cursor;
-
-	protected:
-		/**
-		 * \brief
-		 *
-		 */
-		GFXHandler();
-		
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~GFXHandler();
+		GTKPath(GTKGraphics *g);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static std::string GetEngineID();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		static GFXHandler * GetInstance();
+		virtual ~GTKPath();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void * GetGraphicEngine();
+		virtual Image * CreatePattern();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetScreenWidth();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScreenHeight();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetScreenSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t GetCursorLocation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorLocation(int x, int y);
+		virtual void MoveTo(int xp, int yp);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetFlickerFilteringEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsFlickerFilteringEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsCursorEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(jcursor_style_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(Image *shape, int hotx, int hoty);
+		virtual void LineTo(int xp, int yp);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Restore();
+		virtual void CurveTo(int x1p, int y1p, int x2p, int y2p, int x3p, int y3p);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ArcTo(int xcp, int ycp, int radius, double arc0, double arc1, bool negative = true);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void TextTo(std::string text, int xp, int yp);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Close();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Stroke();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Release();
-
+		virtual void Fill();
+		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Suspend();
-
+		virtual void SetSource(Image *image);
+		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Resume();
-
+		virtual void SetMask(Image *image);
+		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void WaitIdle();
-
+		virtual void SetMatrix(double *matrix);
+		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void WaitSync();
-
+		virtual void GetMatrix(double **matrix);
+		
 };
 
 }
 
-#endif /*GFXHANDLER_H_*/
+#endif 
+

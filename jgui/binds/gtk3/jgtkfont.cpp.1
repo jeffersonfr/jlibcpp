@@ -1,0 +1,149 @@
+/***************************************************************************
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   root@sat                                                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#include "Stdafx.h"
+#include "jgtkfont.h"
+#include "jgtkhandler.h"
+#include "jnullpointerexception.h"
+
+namespace jgui {
+
+GTKFont::GTKFont(std::string name, jfont_attributes_t attributes, int size):
+	jgui::Font(name, attributes, size)
+{
+	jcommon::Object::SetClassName("jgui::GTKFont");
+
+	_ascender = 10;
+	_descender = 10;
+	_leading = size - _ascender - _descender;
+	_max_advance_width = 0;
+	_max_advance_height = 0;
+	
+	for (int i=0; i<256; i++) {
+		jregion_t bounds;
+
+		bounds = GTKFont::GetGlyphExtends(i);
+
+		_widths[i] = bounds.x+bounds.width;
+	}
+
+	GTKHandler *handler = dynamic_cast<GTKHandler *>(GFXHandler::GetInstance());
+
+	handler->Add(this);
+}
+
+GTKFont::~GTKFont()
+{
+	dynamic_cast<GTKHandler *>(GFXHandler::GetInstance())->Remove(this);
+}
+
+void GTKFont::ApplyContext(void *ctx)
+{
+}
+
+void * GTKFont::GetNativeFont()
+{
+	return NULL;
+}
+
+std::string GTKFont::GetName()
+{
+	return _name;
+}
+
+int GTKFont::GetAscender()
+{
+	return _ascender;
+}
+
+int GTKFont::GetDescender()
+{
+	return abs(_descender);
+}
+
+int GTKFont::GetMaxAdvanceWidth()
+{
+	return _max_advance_width;
+}
+
+int GTKFont::GetMaxAdvanceHeight()
+{
+	return _max_advance_height;
+}
+
+int GTKFont::GetLeading()
+{
+	return _leading;
+}
+
+int GTKFont::GetStringWidth(std::string text)
+{
+	int size = 0;
+
+	return size;
+}
+
+jregion_t GTKFont::GetStringExtends(std::string text)
+{
+	jregion_t r;
+
+	r.x = 0;
+	r.y = 0;
+	r.width = 0;
+	r.height = 0;
+
+	return r;
+}
+
+jregion_t GTKFont::GetGlyphExtends(int symbol)
+{
+	jregion_t r;
+
+	r.x = 0;
+	r.y = 0;
+	r.width = 0;
+	r.height = 0;
+
+	return r;
+}
+
+bool GTKFont::CanDisplay(int ch)
+{
+	return true;
+}
+
+int GTKFont::GetCharWidth(char ch)
+{
+	return _widths[(int)ch];
+}
+
+const int * GTKFont::GetCharWidths()
+{
+	return (int *)_widths;
+}
+
+void GTKFont::Release()
+{
+}
+
+void GTKFont::Restore()
+{
+}
+
+}

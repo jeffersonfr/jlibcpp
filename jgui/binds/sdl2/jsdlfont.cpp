@@ -18,18 +18,21 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jdfbfont.h"
-#include "jdfbhandler.h"
+#include "jsdlfont.h"
+#include "jsdlhandler.h"
 #include "jnullpointerexception.h"
 
 namespace jgui {
 
-DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size):
+SDLFont::SDLFont(std::string name, jfont_attributes_t attributes, int size):
 	jgui::Font(name, attributes, size)
 {
-	jcommon::Object::SetClassName("jgui::DFBFont");
+	jcommon::Object::SetClassName("jgui::SDLFont");
 
-	DFBHandler *handler = dynamic_cast<DFBHandler *>(GFXHandler::GetInstance());
+	// CHANGE:: force initialization ... sync with SDLHandler::InitEngine()
+	TTF_Init();
+
+	_encoding = JFE_UTF8;
 
 	jio::File file(name);
 
@@ -51,173 +54,170 @@ DFBFont::DFBFont(std::string name, jfont_attributes_t attributes, int size):
 		}
 	}
 
-	handler->CreateFont(name, size, &_font);
+	_font = TTF_OpenFont(name.c_str(), size);
 
-	if (_font == NULL) {
+	if (_font == NULL) { 
 		throw jcommon::NullPointerException("Cannot create a native font");
 	}
 
-	_font->GetAscender(_font, &_ascender);
-	_font->GetDescender(_font, &_descender);
-	_leading = size - _ascender - _descender;
+	int style = TTF_STYLE_NORMAL;
+
+	if ((attributes & JFA_BOLD) != 0) {
+		style = style | TTF_STYLE_BOLD;
+	}
+	
+	if ((attributes & JFA_ITALIC) != 0) {
+		style = style | TTF_STYLE_ITALIC;
+	}
+	
+	TTF_SetFontStyle(_font, style);
+	TTF_SetFontOutline(_font, 0);
+	TTF_SetFontHinting(_font, TTF_HINTING_NORMAL);
+	TTF_SetFontKerning(_font, 1); 
+
+	_ascender = abs(TTF_FontAscent(_font));
+	_descender = abs(TTF_FontDescent(_font));
+	_leading = TTF_FontLineSkip(_font) - _ascender - _descender;
 	_max_advance_width = 0;
 	_max_advance_height = 0;
 	
 	for (int i=0; i<256; i++) {
 		jregion_t bounds;
 
-		bounds = DFBFont::GetGlyphExtends(i);
+		bounds = SDLFont::GetGlyphExtends(i);
 
 		_widths[i] = bounds.x+bounds.width;
 	}
 
-	handler->Add(this);
+	dynamic_cast<SDLHandler *>(GFXHandler::GetInstance())->Add(this);
 }
 
-DFBFont::~DFBFont()
+SDLFont::~SDLFont()
 {
-	dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->Remove(this);
+	dynamic_cast<SDLHandler *>(GFXHandler::GetInstance())->Remove(this);
 
-	if (_font != NULL) {
-		_font->Release(_font);
-	}
+	TTF_CloseFont(_font);
+
+	_font = NULL;
 }
 
-void DFBFont::ApplyContext(void *ctx)
+void SDLFont::ApplyContext(void *ctx)
 {
-	IDirectFBSurface *context = (IDirectFBSurface *)ctx;
-
-	context->SetFont(context, _font);
 }
 
-void * DFBFont::GetNativeFont()
+void * SDLFont::GetNativeFont()
 {
 	return _font;
 }
 
-std::string DFBFont::GetName()
+std::string SDLFont::GetName()
 {
 	return _name;
 }
 
-int DFBFont::GetAscender()
+int SDLFont::GetAscender()
 {
 	return _ascender;
 }
 
-int DFBFont::GetDescender()
+int SDLFont::GetDescender()
 {
 	return abs(_descender);
 }
 
-int DFBFont::GetMaxAdvanceWidth()
+int SDLFont::GetMaxAdvanceWidth()
 {
 	return _max_advance_width;
 }
 
-int DFBFont::GetMaxAdvanceHeight()
+int SDLFont::GetMaxAdvanceHeight()
 {
 	return _max_advance_height;
 }
 
-int DFBFont::GetLeading()
+int SDLFont::GetLeading()
 {
 	return _leading;
 }
 
-int DFBFont::GetStringWidth(std::string text)
+int SDLFont::GetStringWidth(std::string text)
 {
-	if (_font == NULL) {
-		return 0;
-	}
-
-	int size = 0;
-
-	_font->GetStringWidth(_font, text.c_str(), text.size(), &size);
-	
-	return size;
+	return GetStringExtends(text).width;
 }
 
-jregion_t DFBFont::GetStringExtends(std::string text)
+jregion_t SDLFont::GetStringExtends(std::string text)
 {
 	jregion_t r;
+	int w, h;
 
 	r.x = 0;
 	r.y = 0;
 	r.width = 0;
 	r.height = 0;
 
-	if (_font == NULL) {
-		return r;
+	if (_encoding == JFE_UTF8) {
+		if (TTF_SizeUTF8(_font, text.c_str(), &w, &h) != 0) {
+			return r;
+		}
+	} else if (_encoding == JFE_ISO_8859_1) {
+		if (TTF_SizeText(_font, text.c_str(), &w, &h) != 0) {
+			return r;
+		}
 	}
 
-	DFBRectangle rect;
+	r.width = w;
+	r.height = h;
 
-	_font->GetStringExtents(_font, text.c_str(), text.size(), &rect, NULL);
-
-	r.x = rect.x;
-	r.y = rect.y;
-	r.width = rect.w;
-	r.height = rect.h;
-	
 	return r;
 }
 
-jregion_t DFBFont::GetGlyphExtends(int symbol)
+jregion_t SDLFont::GetGlyphExtends(int symbol)
 {
 	jregion_t r;
-
-	r.x = 0;
-	r.y = 0;
-	r.width = 0;
-	r.height = 0;
-
-	if (_font == NULL) {
-		return r;
-	}
-
-	DFBRectangle rect;
+	int minx;
+	int maxx;
+	int miny;
+	int maxy;
 	int advance;
 
-	_font->GetGlyphExtents(_font, symbol, &rect, &advance);
+	r.x = 0;
+	r.y = 0;
+	r.width = 0;
+	r.height = 0;
 
-	r.x = rect.x;
-	r.y = rect.y;
-	r.width = rect.w;
-	r.height = rect.h;
-	
+	if (TTF_GlyphMetrics(_font, symbol, &minx, &maxx, &miny, &maxy, &advance) != 0) {
+		return r;
+	}
+
+	r.x = advance;
+	r.y = 0;
+	r.width = maxx-minx;
+	r.height = maxy-miny;
+
 	return r;
 }
 
-bool DFBFont::CanDisplay(int ch)
+bool SDLFont::CanDisplay(int ch)
 {
 	return true;
 }
 
-int DFBFont::GetCharWidth(char ch)
+int SDLFont::GetCharWidth(char ch)
 {
 	return _widths[(int)ch];
 }
 
-const int * DFBFont::GetCharWidths()
+const int * SDLFont::GetCharWidths()
 {
 	return (int *)_widths;
 }
 
-void DFBFont::Release()
+void SDLFont::Release()
 {
-	if (_font != NULL) {
-		_font->Dispose(_font);
-		_font->Release(_font);
-		_font = NULL;
-	}
 }
 
-void DFBFont::Restore()
+void SDLFont::Restore()
 {
-	if (_font == NULL) {
-		dynamic_cast<DFBHandler *>(GFXHandler::GetInstance())->CreateFont(_name, GetSize(), &_font);
-	}
 }
 
 }
