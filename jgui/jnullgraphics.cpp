@@ -93,13 +93,6 @@ void NullGraphics::Clear(int xp, int yp, int wp, int hp)
 	Graphics::Clear(xp, yp, wp, hp);
 }
 
-void NullGraphics::Idle()
-{
-	JDEBUG(JINFO, "called\n");
-
-	Graphics::Idle();
-}
-
 void NullGraphics::Flip()
 {
 	JDEBUG(JINFO, "called\n");

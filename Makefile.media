@@ -28,44 +28,8 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 	REQUIRES	+= \
 
 	OBJS_media	+= \
-		 jdfbheavyplayer.o\
-		 jdfblightplayer.o\
-
-OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
-
-endif
-
-ifeq ($(ENABLE_GRAPHICS),directfb-cairo)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
-
-	LDFLAGS		+= \
-
-	DEFINES		+= \
-
-	REQUIRES	+= \
-
-	OBJS_media	+= \
-		 jdfbheavyplayer.o\
-		 jdfblightplayer.o\
-
-OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
-
-endif
-
-ifeq ($(ENABLE_GRAPHICS),gtk3)
-	CCFLAGS		+= \
-		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
-
-	LDFLAGS		+= \
-
-	DEFINES		+= \
-
-	REQUIRES	+= \
-
-	OBJS_media	+= \
-		 #jgtkheavyplayer.o\
-		 jgtklightplayer.o\
+		 nativeheavyplayer.o\
+		 nativelightplayer.o\
 
 OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
 
@@ -82,8 +46,26 @@ ifeq ($(ENABLE_GRAPHICS),sdl2)
 	REQUIRES	+= \
 
 	OBJS_media	+= \
-		 #jsdlheavyplayer.o\
-		 jsdllightplayer.o\
+		 #nativeheavyplayer.o\
+		 nativelightplayer.o\
+
+OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),gtk3)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+
+	REQUIRES	+= \
+
+	OBJS_media	+= \
+		 #nativeheavyplayer.o\
+		 nativelightplayer.o\
 
 OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
 

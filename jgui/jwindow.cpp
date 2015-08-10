@@ -25,18 +25,15 @@
 #include "jinputmanager.h"
 
 #if defined(DIRECTFB_UI)
-#include "jdfbhandler.h"
-#include "jdfbgraphics.h"
-#elif defined(DIRECTFB_CAIRO_UI)
-#include "jdfbhandler.h"
-#include "jdfbgraphics.h"
+#include "nativehandler.h"
+#include "nativegraphics.h"
 #elif defined(GTK3_UI)
-#include "jgtkhandler.h"
-#include "jgtkgraphics.h"
+#include "nativehandler.h"
+#include "nativegraphics.h"
 #elif defined(SDL2_UI)
-#include "jsdlhandler.h"
-#include "jsdlgraphics.h"
-#include "jsdltypes.h"
+#include "nativehandler.h"
+#include "nativegraphics.h"
+#include "nativetypes.h"
 #endif
 
 namespace jgui {
@@ -78,10 +75,11 @@ void Window::InternalInstanciateWindow()
 
 	_window = SDL_CreateWindow(NULL, _location.x, _location.y, _size.width, _size.height, flags);
 
-	printf("Creating window:1: %d, %d, %d, %d, %p\n", _location.x, _location.y, _size.width, _size.height, _window);
 	if (_window == NULL) {
 		throw jcommon::RuntimeException("Cannot create a window");
 	}
+
+	SDL_SetWindowBordered(_window, SDL_FALSE);
 
 	_surface = SDL_CreateRenderer(_window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // SDL_RENDERER_SOFTWARE
 
@@ -89,11 +87,9 @@ void Window::InternalInstanciateWindow()
 		throw jcommon::RuntimeException("Cannot get a window's surface");
 	}
 
-	_graphics = new SDLGraphics(_surface, JPF_ARGB, _size.width, _size.height);
-	printf("Creating window:2: %p, %d\n", _graphics, _is_visible);
+	_graphics = new NativeGraphics((void *)_surface, NULL, JPF_ARGB, _size.width, _size.height);
 
 	if (_is_visible == true) {
-	printf("Creating window:3: %p, %d\n", _graphics, _is_visible);
 		SDL_ShowWindow(_window);
 
 		// CHANGE:: call from jsdlinputmanager:: user events
@@ -106,7 +102,6 @@ Window::Window(int x, int y, int width, int height):
 	Container(x, y, width, height)
 {
 	jcommon::Object::SetClassName("jgui::Window");
-	printf("CreateWindow::Constructor:1: %d, %d\n", _size.width, _size.height);
 
 	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
 
@@ -145,10 +140,6 @@ Window::Window(int x, int y, int width, int height):
 	_surface = NULL;
 	_window = NULL;
 	_graphics = NULL;
-#elif defined(DIRECTFB_CAIRO_UI)
-	_surface = NULL;
-	_window = NULL;
-	_graphics = NULL;
 #elif defined(GTK3_UI)
 	_surface = NULL;
 	_window = NULL;
@@ -180,7 +171,6 @@ Window::Window(int x, int y, int width, int height):
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();
 
 	theme->Update(this);
-	printf("CreateWindow::Constructor:2: %d, %d\n", _size.width, _size.height);
 }
 
 Window::~Window()
@@ -220,8 +210,6 @@ void * Window::GetNativeWindow()
 {
 #if defined(DIRECTFB_UI)
 	return _window;
-#elif defined(DIRECTFB_CAIRO_UI)
-	return _window;
 #elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
 	return _window;
@@ -255,23 +243,7 @@ void Window::SetNativeWindow(void *native)
 
 	_window->SetOpacity(_window, _opacity);
 
-	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height, true);
-#elif defined(DIRECTFB_CAIRO_UI)
-	_window = (IDirectFBWindow *)native;
-	
-	if (_window->GetSurface(_window, &_surface) != DFB_OK) {
-		_surface = NULL;
-		_window = NULL;
-		
-		_size.width = 0;
-		_size.height = 0;
-	} else {
-		_window->GetSize(_window, &_size.width, &_size.height);
-	}
-
-	_window->SetOpacity(_window, _opacity);
-
-	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height);
+	_graphics = new NativeGraphics(_surface, NULL, JPF_ARGB, _size.width, _size.height);
 #elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
 #endif
@@ -299,11 +271,23 @@ void Window::SetFullScreenEnabled(bool b)
 	_is_fullscreen = b;
 
 	if (_is_fullscreen == false) {
+#if defined(DIRECTFB_UI)
+#elif defined(GTK3_UI)
+#elif defined(SDL2_UI)
+		SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
+#endif
+
 		_border_size = _old_border_size;
 		_is_undecorated = _old_undecorated;
 		
 		SetBounds(_old_x, _old_y, _old_width, _old_height);
 	} else {
+#if defined(DIRECTFB_UI)
+#elif defined(GTK3_UI)
+#elif defined(SDL2_UI)
+		SDL_SetWindowFullscreen(_window, 0);
+#endif
+
 		jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
 
 		_old_border_size = _border_size;
@@ -439,78 +423,6 @@ void Window::InternalCreateWindow()
 	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_STACKING | DWDESC_SURFACE_CAPS);
 	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION);
 	desc.pixelformat = DSPF_ARGB;
-	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_DOUBLE);
-	desc.options = (DFBWindowOptions) (DWOP_ALPHACHANNEL | DWOP_SCALE);
-	desc.stacking = DWSC_UPPER;
-	desc.posx   = _location.x;
-	desc.posy   = _location.y;
-	desc.width  = _size.width;
-	desc.height = _size.height;
-
-	IDirectFBDisplayLayer *layer;
-	
-	if (engine->GetDisplayLayer(engine, (DFBDisplayLayerID)(DLID_PRIMARY), &layer) != DFB_OK) {
-		throw jcommon::RuntimeException("Problem to get the device layer");
-	} 
-
-	if (layer->CreateWindow(layer, &desc, &_window) != DFB_OK) {
-		throw jcommon::RuntimeException("Cannot create a window");
-	}
-
-	if (_window->GetSurface(_window, &_surface) != DFB_OK) {
-		_window->Release(_window);
-
-		throw jcommon::RuntimeException("Cannot get a window's surface");
-	}
-
-	// Add ghost option (behave like an overlay)
-	// _window->SetOptions(_window, (DFBWindowOptions)(DWOP_ALPHACHANNEL | DWOP_SCALE)); // | DWOP_GHOST));
-	// Move window to upper stacking class
-	// _window->SetStackingClass(_window, DWSC_UPPER);
-	// Make it the top most window
-	// _window->RaiseToTop(_window);
-	_window->SetOpacity(_window, _opacity);
-	// _surface->SetRenderOptions(_surface, DSRO_ALL);
-	// _window->DisableEvents(_window, (DFBWindowEventType)(DWET_BUTTONDOWN | DWET_BUTTONUP | DWET_MOTION));
-	
-	_surface->SetDrawingFlags(_surface, (DFBSurfaceDrawingFlags)(DSDRAW_BLEND));
-	_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-	_surface->SetPorterDuff(_surface, (DFBSurfacePorterDuffRule)(DSPD_NONE));
-
-	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
-	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
-	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
-	
-	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height, true);
-#elif defined(DIRECTFB_CAIRO_UI)
-	delete _graphics;
-	_graphics = NULL;
-
-	if (_window != NULL) {
-		_window->SetOpacity(_window, 0x00);
-	}
-
-	if (_surface != NULL) {
-		_surface->Release(_surface);
-	}
-
-	if (_window != NULL) {
-		_window->Close(_window);
-		_window->Destroy(_window);
-		_window->Release(_window);
-	}
-		
-	_surface = NULL;
-	_window = NULL;
-
-	jgui::GFXHandler *handler = jgui::GFXHandler::GetInstance();
-	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
-
-	DFBWindowDescription desc;
-
-	desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_STACKING | DWDESC_SURFACE_CAPS);
-	desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION);
-	desc.pixelformat = DSPF_ARGB;
 	desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_DOUBLE);
 	desc.options = (DFBWindowOptions) (DWOP_ALPHACHANNEL | DWOP_SCALE);
 	desc.stacking = DWSC_UPPER;
@@ -553,7 +465,7 @@ void Window::InternalCreateWindow()
 	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
 	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 	
-	_graphics = new DFBGraphics(_surface, JPF_ARGB, _size.width, _size.height);
+	_graphics = new NativeGraphics(_surface, NULL, JPF_ARGB, _size.width, _size.height);
 #elif defined(GTK3_UI)
   _window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -569,17 +481,11 @@ void Window::InternalCreateWindow()
   gtk_window_set_position(GTK_WINDOW(_window), GTK_WIN_POS_CENTER);
   gtk_window_set_default_size(GTK_WINDOW(_window), _size.width, _size.height); 
 
-	_graphics = new GTKGraphics(_surface, JPF_ARGB, _size.width, _size.height);
+	_graphics = new NativeGraphics(_surface, NULL, JPF_ARGB, _size.width, _size.height);
 
   gtk_widget_show_all(_window);
 #elif defined(SDL2_UI)
-	// CHANGE:: sync ?
-	SDL_Event event;
-
-	event.type = USER_SDL_EVENT_WINDOW_CREATE;
-	event.user.data1 = this;
-
-	SDL_PushEvent(&event);
+	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->CreateWindow(this);
 #endif
 	
 	SetRotation(_rotation);
@@ -594,28 +500,15 @@ void Window::RaiseToTop()
 
 		WindowManager::GetInstance()->RaiseToTop(this);
 	}
-#elif defined(DIRECTFB_CAIRO_UI)
-	if (_window != NULL) {
-		_window->RaiseToTop(_window);
-		_window->SetStackingClass(_window, DWSC_UPPER);
-
-		WindowManager::GetInstance()->RaiseToTop(this);
-	}
 #elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
+	SDL_RaiseWindow(_window);
 #endif
 }
 
 void Window::LowerToBottom()
 {
 #if defined(DIRECTFB_UI)
-	if (_window != NULL) {
-		_window->LowerToBottom(_window);
-		_window->SetStackingClass(_window, DWSC_LOWER);
-
-		WindowManager::GetInstance()->LowerToBottom(this);
-	}
-#elif defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->LowerToBottom(_window);
 		_window->SetStackingClass(_window, DWSC_LOWER);
@@ -639,16 +532,6 @@ void Window::PutAtop(Window *w)
 
 		WindowManager::GetInstance()->PutWindowATop(this, w);
 	}
-#elif defined(DIRECTFB_CAIRO_UI)
-	if (w == NULL) {
-		return;
-	}
-
-	if (_window != NULL) {
-		_window->PutAtop(_window, w->_window);
-
-		WindowManager::GetInstance()->PutWindowATop(this, w);
-	}
 #elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
 #endif
@@ -657,16 +540,6 @@ void Window::PutAtop(Window *w)
 void Window::PutBelow(Window *w)
 {
 #if defined(DIRECTFB_UI)
-	if (w == NULL) {
-		return;
-	}
-
-	if (_window != NULL) {
-		_window->PutBelow(_window, w->_window);
-
-		WindowManager::GetInstance()->PutWindowBelow(this, w);
-	}
-#elif defined(DIRECTFB_CAIRO_UI)
 	if (w == NULL) {
 		return;
 	}
@@ -727,30 +600,6 @@ void Window::SetBounds(int x, int y, int width, int height)
 #if defined(DIRECTFB_UI)
 		_graphics_mutex.Lock();
 
-		bool update = true;
-
-		if (update == true) {
-			if (_window != NULL) {
-				InternalCreateWindow();
-			}
-		} else {
-			if (_window != NULL) {
-				x = _location.x;
-				y = _location.y;
-				width = _size.width;
-				height = _size.height;
-
-				_window->SetBounds(_window, x, y, width, height);
-				_window->ResizeSurface(_window, width, height);
-				_window->GetSurface(_window, &_surface);
-				_graphics->SetNativeSurface(_surface, width, height);
-			}
-		}
-	
-		_graphics_mutex.Unlock();
-#elif defined(DIRECTFB_CAIRO_UI)
-		_graphics_mutex.Lock();
-
 		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
 		bool update = true;
 
@@ -807,17 +656,6 @@ void Window::SetLocation(int x, int y)
 		_location.y = y;
 
 #if defined(DIRECTFB_UI)
-		_graphics_mutex.Lock();
-	
-		int dx = x;
-		int dy = y;
-
-		if (_window != NULL) {
-			while (_window->MoveTo(_window, dx, dy) == DFB_LOCKED);
-		}
-		
-		_graphics_mutex.Unlock();
-#elif defined(DIRECTFB_CAIRO_UI)
 		_graphics_mutex.Lock();
 	
 		int dx = x;
@@ -952,31 +790,6 @@ void Window::SetSize(int width, int height)
 #if defined(DIRECTFB_UI)
 		_graphics_mutex.Lock();
 
-		bool update = false;
-
-		// INFO:: works, but with a lot of flicker
-		if (update == true) {
-			if (_window != NULL) {
-				InternalCreateWindow();
-			}
-		} else {
-			if (_window != NULL) {
-				// jregion_t t = _graphics->GetClip();
-
-				width = _size.width;
-				height = _size.height;
-
-				_window->Resize(_window, width, height);
-				_window->ResizeSurface(_window, width, height);
-				_window->GetSurface(_window, &_surface);
-				_graphics->SetNativeSurface(_surface, width, height);
-			}
-		}
-	
-		_graphics_mutex.Unlock();
-#elif defined(DIRECTFB_CAIRO_UI)
-		_graphics_mutex.Lock();
-
 		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
 		bool update = true;
 
@@ -1034,13 +847,6 @@ void Window::Move(int x, int y)
 		if (_window != NULL) {
 			while (_window->Move(_window, dx, dy) == DFB_LOCKED);
 		}
-#elif defined(DIRECTFB_CAIRO_UI)
-		int dx = x;
-		int dy = y;
-
-		if (_window != NULL) {
-			while (_window->Move(_window, dx, dy) == DFB_LOCKED);
-		}
 #elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
 		SDL_SetWindowPosition(_window, _location.x, _location.y);
@@ -1065,10 +871,6 @@ void Window::SetOpacity(int i)
 	}
 
 #if defined(DIRECTFB_UI)
-	if (_window != NULL) {
-		_window->SetOpacity(_window, _opacity);
-	}
-#elif defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, _opacity);
 	}
@@ -1106,19 +908,10 @@ void Window::Repaint(Component *cmp)
 {
 #if defined(DIRECTFB_UI)
 	InternalRepaint(cmp);
-#elif defined(DIRECTFB_CAIRO_UI)
-	InternalRepaint(cmp);
 #elif defined(GTK3_UI)
 	InternalRepaint(cmp);
 #elif defined(SDL2_UI)
-	// CHANGE:: sync ?
-	SDL_Event event;
-
-	event.type = USER_SDL_EVENT_WINDOW_REPAINT;
-	event.user.data1 = this;
-	event.user.data2 = cmp;
-
-	SDL_PushEvent(&event);
+	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->RepaintWindow(this, cmp);
 #endif
 }
 
@@ -1233,16 +1026,6 @@ bool Window::Show(bool modal)
 	}
 	
 	SetOpacity(_opacity);
-#elif defined(DIRECTFB_CAIRO_UI)
-	if (_window == NULL) {
-		_graphics_mutex.Lock();
-
-		InternalCreateWindow();
-
-		_graphics_mutex.Unlock();
-	}
-	
-	SetOpacity(_opacity);
 #elif defined(GTK3_UI)
 	InternalCreateWindow();
 #elif defined(SDL2_UI)
@@ -1287,10 +1070,6 @@ bool Window::Hide()
 	if (_window != NULL) {
 		_window->SetOpacity(_window, 0x00);
 	}
-#elif defined(DIRECTFB_CAIRO_UI)
-	if (_window != NULL) {
-		_window->SetOpacity(_window, 0x00);
-	}
 #elif defined(GTK3_UI)
 	// SDL_HideWindow(_window);
 #elif defined(SDL2_UI)
@@ -1313,24 +1092,6 @@ void Window::InternalReleaseWindow()
 	// _graphics = NULL;
 
 #if defined(DIRECTFB_UI)
-	if (_window) {
-		_window->SetOpacity(_window, 0x00);
-	}
-
-	if (_surface != NULL) {
-		_surface->Release(_surface);
-	}
-
-	if (_window != NULL) {
-		_window->Close(_window);
-		// CHANGE:: freeze if resize before the first 'release' in tests/restore.cpp
-		// _window->Destroy(_window);
-		// _window->Release(_window);
-	}
-
-	_window = NULL;
-	_surface = NULL;
-#elif defined(DIRECTFB_CAIRO_UI)
 	if (_window) {
 		_window->SetOpacity(_window, 0x00);
 	}
@@ -1383,10 +1144,6 @@ void Window::SetRotation(jwindow_rotation_t t)
 	}
 
 #if defined(DIRECTFB_UI)
-	if (_window != NULL) {
-		_window->SetRotation(_window, rotation);
-	}
-#elif defined(DIRECTFB_CAIRO_UI)
 	if (_window != NULL) {
 		_window->SetRotation(_window, rotation);
 	}

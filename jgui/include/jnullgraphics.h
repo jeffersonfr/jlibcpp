@@ -116,12 +116,6 @@ class NullGraphics : public Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void Idle();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Flip();
 		
 		/**

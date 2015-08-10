@@ -154,7 +154,7 @@ jthread_t Thread::GetHandler(int id)
 	return 0;
 }
 
-int Thread::GetID()
+int Thread::GetThreadID()
 {
 	for (std::map<int, jthread_map_t *>::iterator i=_threads.begin(); i!=_threads.end(); i++) {
 		jthread_map_t *t = i->second;

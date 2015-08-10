@@ -37,7 +37,13 @@ class ImageTest : public jgui::Component{
 			g->SetColor(jgui::Color::Blue);
 			g->FillRectangle(0, 0, 100, 100);
 			g->SetColor(jgui::Color::Black);
-			g->SetLineWidth(10);
+
+			jgui::jpen_t pen = g->GetPen();
+
+			pen.width = 10;
+
+			g->SetPen(pen);
+
 			g->DrawLine(0, 0, 100, 100);
 			g->DrawLine(0, 100, 100, 0);
 		}

@@ -250,7 +250,7 @@ class Thread : public virtual jcommon::Object{
 		 * \brief Get thread identifier
 		 *
 		 */
-		virtual int GetID();
+		virtual int GetThreadID();
 
 		/**
 		 * \brief 

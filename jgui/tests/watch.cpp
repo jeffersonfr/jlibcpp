@@ -90,10 +90,18 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 			sprintf(tmp, "%02d:%02d:%02d", hours, minutes, seconds);
 
+			jgui::jpen_t pen = g->GetPen();
+
 			g->SetColor(0x40, 0x80, 0x60, 0xff);
-			g->SetLineWidth(10);
+			
+			pen.width = 10;
+			g->SetPen(pen);
+			
 			g->DrawCircle((int)xc, (int)yc, (int)(vs+10));
-			g->SetLineWidth(1);
+
+			pen.width = 1;
+			g->SetPen(pen);
+			
 			g->SetColor(0x80, 0xc0, 0xf0, 0xff);
 
 			for (int i=0; i<12; i++) {

@@ -310,12 +310,6 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void Idle();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Flip();
 		
 		/**

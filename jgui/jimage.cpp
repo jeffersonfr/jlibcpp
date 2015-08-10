@@ -25,13 +25,11 @@
 #include "jnullpointerexception.h"
 
 #if defined(DIRECTFB_UI)
-#include "jdfbimage.h"
-#elif defined(DIRECTFB_CAIRO_UI)
-#include "jdfbimage.h"
+#include "nativeimage.h"
 #elif defined(GTK3_UI)
-#include "jgtkimage.h"
+#include "nativeimage.h"
 #elif defined(SDL2_UI)
-#include "jsdlimage.h"
+#include "nativeimage.h"
 #endif
 
 namespace jgui {
@@ -59,13 +57,11 @@ jsize_t Image::GetImageSize(std::string img)
 	t.height = -1;
 
 #if defined(DIRECTFB_UI)
-	t = DFBImage::GetImageSize(img);
-#elif defined(DIRECTFB_CAIRO_UI)
-	t = DFBImage::GetImageSize(img);
+	t = NativeImage::GetImageSize(img);
 #elif defined(GTK3_UI)
-	t = GTKImage::GetImageSize(img);
+	t = NativeImage::GetImageSize(img);
 #elif defined(SDL2_UI)
-	t = SDLImage::GetImageSize(img);
+	t = NativeImage::GetImageSize(img);
 #endif
 
 	return t;
@@ -77,13 +73,11 @@ Image * Image::CreateImage(jpixelformat_t pixelformat, int width, int height)
 
 	try {
 #if defined(DIRECTFB_UI)
-		image = new DFBImage(pixelformat, width, height);
-#elif defined(DIRECTFB_CAIRO_UI)
-		image = new DFBImage(pixelformat, width, height);
+		image = new NativeImage(NULL, pixelformat, width, height);
 #elif defined(GTK3_UI)
-		image = new GTKImage(pixelformat, width, height);
+		image = new NativeImage(NULL, pixelformat, width, height);
 #elif defined(SDL2_UI)
-		image = new SDLImage(pixelformat, width, height);
+		image = new NativeImage(NULL, pixelformat, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -115,13 +109,11 @@ Image * Image::CreateImage(std::string file)
 
 	try {
 #if defined(DIRECTFB_UI)
-			image = new DFBImage(file);
-#elif defined(DIRECTFB_CAIRO_UI)
-			image = new DFBImage(file);
+			image = new NativeImage(file);
 #elif defined(GTK3_UI)
-			image = new GTKImage(file);
+			image = new NativeImage(file);
 #elif defined(SDL2_UI)
-			image = new SDLImage(file);
+			image = new NativeImage(file);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -148,13 +140,11 @@ Image * Image::CreateImage(jio::InputStream *stream)
 
 	try {
 #if defined(DIRECTFB_UI)
-		image = DFBImage::CreateImageStream(stream);
-#elif defined(DIRECTFB_CAIRO_UI)
-		image = DFBImage::CreateImageStream(stream);
+		image = NativeImage::CreateImageStream(stream);
 #elif defined(GTK3_UI)
-		image = GTKImage::CreateImageStream(stream);
+		image = NativeImage::CreateImageStream(stream);
 #elif defined(SDL2_UI)
-		image = SDLImage::CreateImageStream(stream);
+		image = NativeImage::CreateImageStream(stream);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -202,13 +192,11 @@ Image * Image::Flip(jflip_flags_t t)
 
 	try {
 #if defined(DIRECTFB_UI)
-		image = DFBImage::Flip(this, t);
-#elif defined(DIRECTFB_CAIRO_UI)
-		image = DFBImage::Flip(this, t);
+		image = NativeImage::Flip(this, t);
 #elif defined(GTK3_UI)
-		image = GTKImage::Flip(this, t);
+		image = NativeImage::Flip(this, t);
 #elif defined(SDL2_UI)
-		image = SDLImage::Flip(this, t);
+		image = NativeImage::Flip(this, t);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -222,13 +210,11 @@ Image * Image::Rotate(double radians, bool resize)
 
 	try {
 #if defined(DIRECTFB_UI)
-		image = DFBImage::Rotate(this, radians, resize);
-#elif defined(DIRECTFB_CAIRO_UI)
-		image = DFBImage::Rotate(this, radians, resize);
+		image = NativeImage::Rotate(this, radians, resize);
 #elif defined(GTK3_UI)
-		image = GTKImage::Rotate(this, radians, resize);
+		image = NativeImage::Rotate(this, radians, resize);
 #elif defined(SDL2_UI)
-		image = SDLImage::Rotate(this, radians, resize);
+		image = NativeImage::Rotate(this, radians, resize);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -242,13 +228,11 @@ Image * Image::Scale(int width, int height)
 
 	try {
 #if defined(DIRECTFB_UI)
-		image = DFBImage::Scale(this, width, height);
-#elif defined(DIRECTFB_CAIRO_UI)
-		image = DFBImage::Scale(this, width, height);
+		image = NativeImage::Scale(this, width, height);
 #elif defined(GTK3_UI)
-		image = GTKImage::Scale(this, width, height);
+		image = NativeImage::Scale(this, width, height);
 #elif defined(SDL2_UI)
-		image = SDLImage::Scale(this, width, height);
+		image = NativeImage::Scale(this, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -262,13 +246,11 @@ Image * Image::Crop(int x, int y, int width, int height)
 
 	try {
 #if defined(DIRECTFB_UI)
-		image = DFBImage::Crop(this, x, y, width, height);
-#elif defined(DIRECTFB_CAIRO_UI)
-		image = DFBImage::Crop(this, x, y, width, height);
+		image = NativeImage::Crop(this, x, y, width, height);
 #elif defined(GTK3_UI)
-		image = GTKImage::Crop(this, x, y, width, height);
+		image = NativeImage::Crop(this, x, y, width, height);
 #elif defined(SDL2_UI)
-		image = SDLImage::Crop(this, x, y, width, height);
+		image = NativeImage::Crop(this, x, y, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -282,13 +264,11 @@ Image * Image::Blend(double alpha)
 
 	try {
 #if defined(DIRECTFB_UI)
-		image = DFBImage::Blend(this, alpha);
-#elif defined(DIRECTFB_CAIRO_UI)
-		image = DFBImage::Blend(this, alpha);
+		image = NativeImage::Blend(this, alpha);
 #elif defined(GTK3_UI)
-		image = GTKImage::Blend(this, alpha);
+		image = NativeImage::Blend(this, alpha);
 #elif defined(SDL2_UI)
-		image = SDLImage::Blend(this, alpha);
+		image = NativeImage::Blend(this, alpha);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -302,13 +282,11 @@ Image * Image::Colorize(Color color)
 
 	try {
 #if defined(DIRECTFB_UI)
-		image = DFBImage::Colorize(this, color);
-#elif defined(DIRECTFB_CAIRO_UI)
-		image = DFBImage::Colorize(this, color);
+		image = NativeImage::Colorize(this, color);
 #elif defined(GTK3_UI)
-		image = GTKImage::Colorize(this, color);
+		image = NativeImage::Colorize(this, color);
 #elif defined(SDL2_UI)
-		image = SDLImage::Colorize(this, color);
+		image = NativeImage::Colorize(this, color);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}

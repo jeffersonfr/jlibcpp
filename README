@@ -1,28 +1,9 @@
 [Installing jlibcpp]
 
-:Dependencies
-
-- openssl (http://www.openssl.org)
-
-[directfb]
-- directfb (http://directfb.org)
-
-[directfb, directfb-cairo]
-- directfb (http://directfb.org)
-- cairo (http://cairographics.org)
-
-[gtk3]
-- gtk+ (http://www.gtk.org/)
-
-[sdl2]
-- sdl2 (https://www.libsdl.org)
-- libsdl2_ttf (https://www.libsdl.org/projects/SDL_ttf)
-- libsdl2_image (https://www.libsdl.org/projects/SDL_image)
-
 :Makefile defines
 
 ENABLE_DEBUG=<no, yes>
-ENABLE_GRAPHICS=<none, directfb, directfb-cairo, gtk3, sdl2>
+ENABLE_GRAPHICS=<none, directfb, sdl2, gtk3>
 
 :Compiling
 

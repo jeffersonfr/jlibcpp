@@ -163,14 +163,18 @@ class GraphicPanel : public jgui::Frame{
 		Clear(g);
 
 		// draw lines
+		jgui::jpen_t pen = g->GetPen();
+
 		for (int k=0; k<3; k++) {
 			if (k == 0) {
-				g->SetLineWidth(1);
+				pen.width = 1;
 			} else if (k == 1) {
-				g->SetLineWidth(20);
+				pen.width = 20;
 			} else if (k == 2) {
-				g->SetLineWidth(40);
+				pen.width = 40;
 			}
+
+			g->SetPen(pen);
 
 			// lines
 			DrawString(g, "DrawLine");
@@ -178,8 +182,14 @@ class GraphicPanel : public jgui::Frame{
 			for (int i=0; i<iterations; i++) {
 				int w = rand()%(800),
 						h = rand()%(800);
-				x = rand()%(_size.width-w-_insets.left-_insets.right);
-				y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+				int mx = _size.width-w-_insets.left-_insets.right,
+						my = _size.height-h-_insets.top-_insets.bottom;
+
+				mx = (mx == 0)?1:mx;
+				my = (my == 0)?1:my;
+
+				x = rand()%(mx);
+				y = rand()%(my);
 				r1 = rand()%0xff;
 				g1 = rand()%0xff;
 				b1 = rand()%0xff;
@@ -198,8 +208,14 @@ class GraphicPanel : public jgui::Frame{
 			for (int i=0; i<iterations; i++) {
 				int w = rand()%(800),
 						h = rand()%(800);
-				x = rand()%(_size.width-w-_insets.left-_insets.right);
-				y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+				int mx = _size.width-w-_insets.left-_insets.right,
+						my = _size.height-h-_insets.top-_insets.bottom;
+
+				mx = (mx == 0)?1:mx;
+				my = (my == 0)?1:my;
+
+				x = rand()%(mx);
+				y = rand()%(my);
 				r1 = rand()%0xff;
 				g1 = rand()%0xff;
 				b1 = rand()%0xff;
@@ -214,7 +230,8 @@ class GraphicPanel : public jgui::Frame{
 			Clear(g);
 		}
 
-		g->SetLineWidth(1);
+		pen.width = 1;
+		g->SetPen(pen);
 
 		// triangles
 		DrawString(g, "FillTriangle");

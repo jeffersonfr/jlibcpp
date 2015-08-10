@@ -27,13 +27,11 @@
 #include "jinputmanager.h"
 
 #if defined(DIRECTFB_UI)
-#include "jdfbhandler.h"
-#elif defined(DIRECTFB_CAIRO_UI)
-#include "jdfbhandler.h"
+#include "nativehandler.h"
 #elif defined(GTK3_UI)
-#include "jgtkhandler.h"
+#include "nativehandler.h"
 #elif defined(SDL2_UI)
-#include "jsdlhandler.h"
+#include "nativehandler.h"
 #endif
 
 namespace jgui {
@@ -58,22 +56,10 @@ GFXHandler * GFXHandler::GetInstance()
 {
 	if (_instance == NULL) {
 #if defined(DIRECTFB_UI)
-		DFBHandler *handler = NULL;
+		NativeHandler *handler = NULL;
 		
 		try {
-			_instance = handler = new DFBHandler();
-
-			handler->InitEngine();
-			handler->InitResources();
-			handler->InitCursors();
-		} catch (...) {
-			_instance = NULL;
-		}
-#elif defined(DIRECTFB_CAIRO_UI)
-		DFBHandler *handler = NULL;
-		
-		try {
-			_instance = handler = new DFBHandler();
+			_instance = handler = new NativeHandler();
 
 			handler->InitEngine();
 			handler->InitResources();
@@ -82,10 +68,10 @@ GFXHandler * GFXHandler::GetInstance()
 			_instance = NULL;
 		}
 #elif defined(GTK3_UI)
-		GTKHandler *handler = NULL;
+		NativeHandler *handler = NULL;
 		
 		try {
-			_instance = handler = new GTKHandler();
+			_instance = handler = new NativeHandler();
 
 			handler->InitEngine();
 			handler->InitResources();
@@ -94,10 +80,10 @@ GFXHandler * GFXHandler::GetInstance()
 			_instance = NULL;
 		}
 #elif defined(SDL2_UI)
-		SDLHandler *handler = NULL;
+		NativeHandler *handler = NULL;
 		
 		try {
-			_instance = handler = new SDLHandler();
+			_instance = handler = new NativeHandler();
 
 			handler->InitEngine();
 			handler->InitResources();

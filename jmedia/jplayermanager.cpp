@@ -21,11 +21,10 @@
 #include "jurl.h"
 
 #if defined(DIRECTFB_UI)
-#include "jdfblightplayer.h"
-#include "jdfbheavyplayer.h"
-#elif defined(DIRECTFB_CAIRO_UI)
-#include "jdfblightplayer.h"
-#include "jdfbheavyplayer.h"
+#include "nativelightplayer.h"
+#include "nativeheavyplayer.h"
+#elif defined(SDL2_UI)
+#elif defined(GTK3_UI)
 #endif
 
 namespace jmedia {
@@ -51,18 +50,12 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 		std::map<jplayer_hints_t, bool>::iterator i = _hints.find(JPH_LIGHTWEIGHT);
 
 		if (i == _hints.end() || i->second == true) {
-			return new DFBLightPlayer(url.GetPath());
+			return new NativeLightPlayer(url.GetPath());
 		} else {
-			return new DFBHeavyPlayer(url.GetPath());
+			return new NativeHeavyPlayer(url.GetPath());
 		}
-#elif defined(DIRECTFB_CAIRO_UI)
-		std::map<jplayer_hints_t, bool>::iterator i = _hints.find(JPH_LIGHTWEIGHT);
-
-		if (i == _hints.end() || i->second == true) {
-			return new DFBLightPlayer(url.GetPath());
-		} else {
-			return new DFBHeavyPlayer(url.GetPath());
-		}
+#elif defined(SDL2_UI)
+#elif defined(GTK3_UI)
 #endif
 	}
 

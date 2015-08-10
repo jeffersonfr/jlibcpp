@@ -32,8 +32,6 @@
 
 #if defined(DIRECTFB_UI)
 #include <directfb.h>
-#elif defined(DIRECTFB_CAIRO_UI)
-#include <directfb.h>
 #elif defined(GTK3_UI)
 #include <gtk/gtk.h>
 #include <cairo.h>
@@ -62,24 +60,17 @@ class Window : public jgui::Container{
 	friend class WindowManager;
 
 #if defined(DIRECTFB_UI)
-	friend class DFBInputManager;
-#elif defined(DIRECTFB_CAIRO_UI)
-	friend class DFBInputManager;
+	friend class NativeInputManager;
 #elif defined(GTK3_UI)
-	friend class GTKInputManager;
+	friend class NativeInputManager;
 #elif defined(SDL2_UI)
-	friend class SDLInputManager;
+	friend class NativeInputManager;
 
 	void InternalInstanciateWindow();
 #endif
 
 	protected:
 #if defined(DIRECTFB_UI)
-		/** \brief */
-		IDirectFBWindow *_window;
-		/** \brief */
-		IDirectFBSurface *_surface;
-#elif defined(DIRECTFB_CAIRO_UI)
 		/** \brief */
 		IDirectFBWindow *_window;
 		/** \brief */

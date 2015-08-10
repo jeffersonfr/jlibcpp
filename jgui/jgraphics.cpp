@@ -120,10 +120,6 @@ void Graphics::Clear(int xp, int yp, int wp, int hp)
 {
 }
 
-void Graphics::Idle()
-{
-}
-
 void Graphics::Flip()
 {
 }

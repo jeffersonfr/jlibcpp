@@ -97,14 +97,14 @@ class GFXHandler : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static std::string GetEngineID();
-		
+		static GFXHandler * GetInstance();
+
 		/**
 		 * \brief
 		 *
 		 */
-		static GFXHandler * GetInstance();
-
+		virtual std::string GetEngineID();
+		
 		/**
 		 * \brief
 		 *

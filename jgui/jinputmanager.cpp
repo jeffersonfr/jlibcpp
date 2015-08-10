@@ -21,13 +21,11 @@
 #include "jinputmanager.h"
 
 #if defined(DIRECTFB_UI)
-#include "jdfbinputmanager.h"
-#elif defined(DIRECTFB_CAIRO_UI)
-#include "jdfbinputmanager.h"
+#include "nativeinputmanager.h"
 #elif defined(GTK3_UI)
-#include "jgtkinputmanager.h"
+#include "nativeinputmanager.h"
 #elif defined(SDL2_UI)
-#include "jsdlinputmanager.h"
+#include "nativeinputmanager.h"
 #endif
 
 namespace jgui {
@@ -49,21 +47,10 @@ InputManager * InputManager::GetInstance()
 {
 	if (_instance == NULL){
 #if defined(DIRECTFB_UI)
-		DFBInputManager *manager = NULL;
+		NativeInputManager *manager = NULL;
 		
 		try {
-			_instance = manager = new DFBInputManager();
-
-			manager->Initialize();
-			manager->Start();
-		} catch (...) {
-			_instance = NULL;
-		}
-#elif defined(DIRECTFB_CAIRO_UI)
-		DFBInputManager *manager = NULL;
-		
-		try {
-			_instance = manager = new DFBInputManager();
+			_instance = manager = new NativeInputManager();
 
 			manager->Initialize();
 			manager->Start();
@@ -71,10 +58,10 @@ InputManager * InputManager::GetInstance()
 			_instance = NULL;
 		}
 #elif defined(GTK3_UI)
-		GTKInputManager *manager = NULL;
+		NativeInputManager *manager = NULL;
 		
 		try {
-			_instance = manager = new GTKInputManager();
+			_instance = manager = new NativeInputManager();
 
 			manager->Initialize();
 			manager->Start();
@@ -82,10 +69,10 @@ InputManager * InputManager::GetInstance()
 			_instance = NULL;
 		}
 #elif defined(SDL2_UI)
-		SDLInputManager *manager = NULL;
+		NativeInputManager *manager = NULL;
 		
 		try {
-			_instance = manager = new SDLInputManager();
+			_instance = manager = new NativeInputManager();
 
 			manager->Initialize();
 			manager->Start();
