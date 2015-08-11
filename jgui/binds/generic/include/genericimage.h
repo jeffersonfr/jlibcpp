@@ -55,6 +55,12 @@ class GenericImage : public jgui::Image{
 		 * \brief
 		 *
 		 */
+		GenericImage(jio::InputStream *stream);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~GenericImage();
 
 		/**
@@ -63,12 +69,6 @@ class GenericImage : public jgui::Image{
 		 */
 		static jsize_t GetImageSize(std::string img);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		static Image * CreateImageStream(jio::InputStream *stream);
-
 		/**
 		 * \brief
 		 *

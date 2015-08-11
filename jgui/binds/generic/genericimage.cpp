@@ -20,10 +20,13 @@
 #include "Stdafx.h"
 #include "genericimage.h"
 #include "genericgraphics.h"
+#include "genericprovider_png.h"
+#include "genericprovider_jpg.h"
 #include "generichandler.h"
 #include "jimage.h"
 #include "jthread.h"
 #include "jhslcolorspace.h"
+#include "jinputstream.h"
 #include "jnullpointerexception.h"
 
 namespace jgui {
@@ -47,8 +50,72 @@ GenericImage::GenericImage(std::string file):
 {
 	jcommon::Object::SetClassName("jgui::GenericImage");
 
-	cairo_surface_t *cairo_surface = cairo_image_surface_create_from_png(file.c_str());
+	cairo_surface_t *cairo_surface = create_png_surface_from_file(file.c_str());
 	
+	if (cairo_surface == NULL) {
+		cairo_surface = create_jpg_surface_from_file(file.c_str());
+	}
+
+	if (cairo_surface == NULL) {
+		throw jcommon::RuntimeException("Cannot open this image type");
+	}
+
+	_pixelformat = JPF_UNKNOWN;
+
+	cairo_format_t format = cairo_image_surface_get_format(cairo_surface);
+
+	if (format == CAIRO_FORMAT_ARGB32) {
+		_pixelformat = JPF_ARGB;
+	} else if (format == CAIRO_FORMAT_RGB24) {
+		_pixelformat = JPF_RGB24;
+	} else if (format == CAIRO_FORMAT_RGB16_565) {
+		_pixelformat = JPF_RGB16;
+	}
+
+	_size.width = cairo_image_surface_get_width(cairo_surface);
+	_size.height = cairo_image_surface_get_height(cairo_surface);
+
+	cairo_t *cairo_context = cairo_create(cairo_surface);
+	
+	// cairo_surface_destroy(cairo_surface);
+
+	_graphics = new GenericGraphics(NULL, cairo_context, _pixelformat, _size.width, _size.height);
+
+	dynamic_cast<GenericHandler *>(GFXHandler::GetInstance())->Add(this);
+}
+
+GenericImage::GenericImage(jio::InputStream *stream):
+	jgui::Image(JPF_ARGB, -1, -1)
+{
+	if ((void *)stream == NULL) {
+		throw jcommon::NullPointerException("Cannot request data from a invalid stream");
+	}
+
+	int size = stream->Available();
+
+	if (size <= 0) {
+		throw jcommon::NullPointerException("Cannot request avaiable data from the stream");
+	}
+
+	uint8_t buffer[size];
+	int r, count = 0;
+
+	do {
+		r = stream->Read((char *)(buffer+count), 4096);
+
+		if (r <= 0) {
+			break;
+		}
+
+		count = count + r;
+	} while (count < size);
+	
+	cairo_surface_t *cairo_surface = create_png_surface_from_data(buffer, count);
+
+	if (cairo_surface == NULL) {
+		cairo_surface = create_jpg_surface_from_data(buffer, count);
+	}
+
 	if (cairo_surface == NULL) {
 		throw jcommon::RuntimeException("Cannot open this image type");
 	}
@@ -118,63 +185,6 @@ jsize_t GenericImage::GetImageSize(std::string img)
 	*/
 
 	return t;
-}
-
-Image * GenericImage::CreateImageStream(jio::InputStream *stream)
-{
-	Image *image = NULL;
-
-	/*
-	if ((void *)stream == NULL) {
-		return NULL;
-	}
-
-	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
-
-	IDirectFBDataBuffer *buffer;
-	IDirectFBImageProvider *provider = NULL;
-	IDirectFBSurface *surface;
-	GenericSurfaceDescription sdsc;
-
-	engine->CreateDataBuffer(engine, NULL, &buffer);
-
-	MediaLoaderThread loader(stream, buffer);
-
-	loader.Start();
-
-	if (buffer->CreateImageProvider(buffer, &provider) != Generic_OK) {
-		loader.Cancel();
-		loader.WaitThread();
-
-		return NULL;
-	}
-
-	provider->GetSurfaceDescription(provider, &sdsc);
-
-	engine->CreateSurface(engine, &sdsc, &surface);
-	provider->RenderTo(provider, surface, NULL);
-
-	loader.WaitThread();
-
-	image = new GenericImage(NULL, JPF_ARGB, sdsc.width, sdsc.height);
-
-	// INFO:: draw image pixels to cairo's surface
-	void *ptr;
-	int pitch;
-
-	surface->Lock(surface, DSLF_READ, &ptr, &pitch);
-
-	image->GetGraphics()->SetRGBArray((uint32_t *)ptr, 0, 0, sdsc.width, sdsc.height);
-
-	surface->Unlock(surface);
-
-	surface->Release(surface);
-	provider->Release(provider);
-	buffer->Release( buffer );
-	*/
-
-	return image;
 }
 
 void GenericImage::Release()

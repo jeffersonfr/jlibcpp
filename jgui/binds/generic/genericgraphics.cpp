@@ -89,6 +89,11 @@ void GenericGraphics::SetNativeSurface(void *data, int wp, int hp)
 {
 }
 
+cairo_t * GenericGraphics::GetCairoContext()
+{
+	return _cairo_context;
+}
+
 Path * GenericGraphics::CreatePath()
 {
 	return new GenericPath(this);

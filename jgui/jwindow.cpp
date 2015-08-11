@@ -44,7 +44,8 @@ static gboolean OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 	Window *window = (Window *)user_data;
 	Graphics *graphics = window->GetGraphics();
 
-	cairo_t *cairo_context = (cairo_t *)window->GetGraphics()->GetNativeSurface();
+	cairo_t *cairo_context = dynamic_cast<NativeGraphics *>(graphics)->GetCairoContext();
+
 	cairo_surface_t *cairo_surface = cairo_get_target(cairo_context);
 
 	if (cairo_surface != NULL) {

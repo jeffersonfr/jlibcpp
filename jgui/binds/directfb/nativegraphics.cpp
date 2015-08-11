@@ -20,6 +20,8 @@
 #include "Stdafx.h"
 #include "nativegraphics.h"
 
+#include <directfb.h>
+
 #define M_2PI	(2*M_PI)
 
 namespace jgui {
@@ -43,7 +45,7 @@ void NativeGraphics::SetNativeSurface(void *data, int wp, int hp)
 	_cairo_context = NULL;
 
 	if (_surface != NULL) {
-		IDirectFBSurfa *surface = (IDirectFBSurface *)_surface;
+		IDirectFBSurface *surface = (IDirectFBSurface *)_surface;
 
 		surface->GetSize(surface, &wp, &hp);
 

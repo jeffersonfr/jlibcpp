@@ -622,7 +622,6 @@ void NativeInputManager::ProcessInputEvent(Native_Event event)
 void NativeInputManager::Run()
 {
 	while (_is_initialized == true) {
-		puts("Input loop");
 		gtk_main();
 	}
 

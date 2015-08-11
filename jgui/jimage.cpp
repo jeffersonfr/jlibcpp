@@ -140,12 +140,13 @@ Image * Image::CreateImage(jio::InputStream *stream)
 
 	try {
 #if defined(DIRECTFB_UI)
-		image = NativeImage::CreateImageStream(stream);
+			image = new NativeImage(stream);
 #elif defined(GTK3_UI)
-		image = NativeImage::CreateImageStream(stream);
+			image = new NativeImage(stream);
 #elif defined(SDL2_UI)
-		image = NativeImage::CreateImageStream(stream);
+			image = new NativeImage(stream);
 #endif
+	} catch (jcommon::NullPointerException &) {
 	} catch (jcommon::RuntimeException &) {
 	}
 

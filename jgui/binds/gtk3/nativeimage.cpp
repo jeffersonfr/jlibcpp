@@ -34,6 +34,12 @@ NativeImage::NativeImage(std::string file):
 	jcommon::Object::SetClassName("jgui::NativeImage");
 }
 
+NativeImage::NativeImage(jio::InputStream *stream):
+	GenericImage(stream)
+{
+	jcommon::Object::SetClassName("jgui::NativeImage");
+}
+
 NativeImage::~NativeImage()
 {
 }

@@ -48,6 +48,12 @@ class NativeImage : public GenericImage{
 		 * \brief
 		 *
 		 */
+		NativeImage(jio::InputStream *stream);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~NativeImage();
 
 };

@@ -103,6 +103,12 @@ class GenericGraphics : public jgui::Graphics{
 		 * \brief
 		 *
 		 */
+		virtual cairo_t * GetCairoContext();
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual Path * CreatePath();
 		
 		/**
