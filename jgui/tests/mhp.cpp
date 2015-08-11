@@ -24,6 +24,8 @@
 #include "jthread.h"
 #include "jobservable.h"
 #include "jsemaphoretimeoutexception.h"
+#include "jplayermanager.h"
+#include "jframegrabberlistener.h"
 #include "jtimer.h"
 
 class ScreenLayer : public jgui::Container{
@@ -89,67 +91,78 @@ class BackgroundLayer : public ScreenLayer{
 
 };
 
-class VideoLayer : public ScreenLayer{
+class VideoLayer : public ScreenLayer, public jmedia::FrameGrabberListener{
 
 	private:
-		IDirectFBVideoProvider *_provider;
 		jthread::Mutex _mutex;
-		jgui::Image *_buffer;
-		std::string _file;
-
-	private:
-		static void callback(void *ctx)
-		{
-			reinterpret_cast<VideoLayer *>(ctx)->Repaint();
-		}
+		jmedia::Player *_player;
+		jgui::Image *_image;
 
 	public:
 		VideoLayer():
 			ScreenLayer()
 		{
-			_provider = NULL;
-
-			_buffer = jgui::Image::CreateImage(jgui::JPF_ARGB, GetWidth(), GetHeight());
+			_player = NULL;
+			_image = NULL;
 		}
 
 		virtual ~VideoLayer()
 		{
+			if (_player != NULL) {
+				jgui::Component *cmp = _player->GetVisualComponent();
+
+				Remove(cmp);
+			}
+
+			_player->Stop();
+
+			delete _player;
+			_player = NULL;
 		}
 
 		void SetFile(std::string file)
 		{
-			_file = file;
+			_player = jmedia::PlayerManager::CreatePlayer(file);
 
-			IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
+			_player->RegisterFrameGrabberListener(this);
 
-			if (directfb->CreateVideoProvider(directfb, _file.c_str(), &_provider) != DFB_OK) {
-				return;
-			}
+			jgui::Component *cmp = _player->GetVisualComponent();
+
+			cmp->SetBounds(0, 0, GetWidth(), GetHeight());
+
+			Add(cmp);
 		}
 
 		void Play() 
 		{
-			jthread::AutoLock lock(&_mutex);
-
-			if (_provider != NULL) {
-				IDirectFBSurface *surface = (IDirectFBSurface *)_buffer->GetGraphics()->GetNativeSurface();
-
-				_provider->PlayTo(_provider, surface, NULL, VideoLayer::callback, this);
-			}
+			_player->Play();
 		}
 
 		void Stop() 
 		{
+			_player->Stop();
+		}
+
+		virtual void Paint(jgui::Graphics *g) 
+		{
 			jthread::AutoLock lock(&_mutex);
 
-			if (_provider != NULL) {
-				_provider->Stop(_provider);
+			if (_image != NULL) {
+				g->DrawImage(_image, 0, 0, GetWidth(), GetHeight());
 			}
 		}
 
-		virtual void Paint(jgui::Graphics *g)
+		virtual void FrameGrabbed(jmedia::FrameGrabberEvent *event)
 		{
-			g->DrawImage(_buffer, _location.x, _location.y, _size.width, _size.height);
+			jthread::AutoLock lock(&_mutex);
+
+			jgui::Image *image = event->GetFrame();
+
+			if (_image == NULL) {
+				_image = jgui::Image::CreateImage(jgui::JPF_ARGB, image->GetWidth(), image->GetHeight());
+			}
+
+			_image->GetGraphics()->DrawImage(image, 0, 0);
 		}
 };
 
@@ -258,18 +271,15 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 			jgui::Graphics *g = GetGraphics();
 
 			while (true) {
-				{
-					jthread::AutoLock lock(&_mutex);
+				jthread::AutoLock lock(&_mutex);
 
-					while (_refresh == false) {
-						_sem.Wait(&_mutex);
-					}
-
-					_refresh = false;
+				while (_refresh == false) {
+					_sem.Wait(&_mutex);
 				}
 
-				Paint(gb);
+				_refresh = false;
 
+				Paint(gb);
 				g->DrawImage(_buffer, 0, 0);
 				g->Flip();
 			}
@@ -306,16 +316,6 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 			return (GraphicLayer *)_graphic_layer;
 		}
 
-		virtual void Repaint(bool all = true)
-		{
-			Refresh();
-		}
-		
-		virtual void Repaint(int x, int y, int width, int height)
-		{
-			Refresh();
-		}
-		
 		virtual void Repaint(jgui::Component *c)
 		{
 			Refresh();
@@ -472,7 +472,7 @@ class MenuTest : public Scene{
 			_label->SetBackgroundVisible(false);
 
 			Add(_button1 = new jgui::Button("Full Screen", (960-400)/2, 0*(100+10)+180, 400, 100));
-			Add(_button2 = new jgui::Button("Streched Screen", (960-400)/2, 1*(100+10)+180, 400, 100));
+			Add(_button2 = new jgui::Button("Stretched Screen", (960-400)/2, 1*(100+10)+180, 400, 100));
 			Add(_button3 = new jgui::Button("Exit", (960-400)/2, 2*(100+10)+180, 400, 100));
 
 			SetBackgroundColor(0x00, 0x00, 0x00, 0xa0);
