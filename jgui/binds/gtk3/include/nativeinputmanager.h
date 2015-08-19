@@ -26,6 +26,8 @@
 #include <map>
 #include <list>
 
+#include <gtk/gtk.h>
+
 namespace jgui {
 
 class EventBroadcaster;
@@ -129,13 +131,7 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		// jkeyevent_symbol_t TranslateToNativeKeySymbol(Native_Keysym symbol);
-
-		/**
-		 * \brief
-		 *
-		 */
-		// void ProcessInputEvent(Native_Event event);
+		virtual jkeyevent_symbol_t TranslateToNativeKeySymbol(guint symbol);
 
 		/**
 		 * \brief

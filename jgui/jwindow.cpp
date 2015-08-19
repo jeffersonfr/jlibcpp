@@ -27,18 +27,30 @@
 #if defined(DIRECTFB_UI)
 #include "nativehandler.h"
 #include "nativegraphics.h"
-#elif defined(GTK3_UI)
-#include "nativehandler.h"
-#include "nativegraphics.h"
 #elif defined(SDL2_UI)
 #include "nativehandler.h"
 #include "nativegraphics.h"
 #include "nativetypes.h"
+#elif defined(GTK3_UI)
+#include "nativehandler.h"
+#include "nativegraphics.h"
+
+#include <gdk/gdktypes.h>
+#include <gdk/gdkkeysyms-compat.h>
 #endif
 
 namespace jgui {
 
 #if defined(GTK3_UI)
+int OnDestroyEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
+	Window *window = (Window *)user_data;
+
+	window->Release();
+
+	return TRUE;
+}
+
 static gboolean OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
 	Window *window = (Window *)user_data;
@@ -475,11 +487,16 @@ void Window::InternalCreateWindow()
  
  //  gtk_widget_add_events(_window, GDK_BUTTON_PRESS_MASK);
 
+  gtk_widget_set_events(GTK_WIDGET(_window), 
+			GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
+
+  // gtk_signal_connect (GTK_OBJECT(glarea), "expose_event", GTK_SIGNAL_FUNC(glarea_expose), NULL);
   g_signal_connect(G_OBJECT(_surface), "draw", G_CALLBACK(OnDrawEvent), this); 
-  // g_signal_connect(_window, "destroy", G_CALLBACK(gtk_main_quit), NULL);  
-  // g_signal_connect(window, "button-press-event", G_CALLBACK(clicked), NULL);
- 
-  gtk_window_set_position(GTK_WINDOW(_window), GTK_WIN_POS_CENTER);
+	g_signal_connect(G_OBJECT(_window), "destroy", G_CALLBACK(OnDestroyEvent), this);
+
+	gtk_container_set_border_width(GTK_CONTAINER(_window), 0);
+	gtk_window_set_decorated(GTK_WINDOW(_window), false);
+	gtk_window_set_position(GTK_WINDOW(_window), GTK_WIN_POS_CENTER);
   gtk_window_set_default_size(GTK_WINDOW(_window), _size.width, _size.height); 
 
 	_graphics = new NativeGraphics(_surface, NULL, JPF_ARGB, _size.width, _size.height);

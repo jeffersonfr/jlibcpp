@@ -136,7 +136,7 @@ OBJS_2048 = \
 OBJS_newvox = \
 		newvox.o\
 
-all: teste border skull databuffer ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm mouse watch tank pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox
+all: teste border skull ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm mouse watch tank pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 

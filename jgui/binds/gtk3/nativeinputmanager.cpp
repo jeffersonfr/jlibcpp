@@ -22,13 +22,156 @@
 #include "jwindowmanager.h"
 #include "jdate.h"
 
-#include <gtk/gtk.h>
+#include <gdk/gdktypes.h>
+#include <gdk/gdkkeysyms-compat.h>
 
 #ifndef CLAMP
 #define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 #endif
 
+#define KEY_PRESS_EVENT_NAME "key_press_event"
+#define MOUSE_MOTION_EVENT_NAME "motion_notify_event"
+#define MOUSE_PRESS_EVENT_NAME "button_press_event"
+#define MOUSE_RELEASE_EVENT_NAME "button_release_event"
+
 namespace jgui {
+
+static gboolean OnKeyPressEvent(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+{
+	NativeInputManager *manager = (NativeInputManager *)user_data;
+
+	// jthread::AutoLock lock(&_mutex);
+
+	jkeyevent_type_t type;
+	jkeyevent_modifiers_t mod;
+
+	mod = (jkeyevent_modifiers_t)(0);
+
+	if (event->state & GDK_SHIFT_MASK) {
+		mod = (jkeyevent_modifiers_t)(mod | JKM_SHIFT);
+	} else if (event->state & GDK_CONTROL_MASK) {
+		mod = (jkeyevent_modifiers_t)(mod | JKM_CONTROL);
+	} else if (event->state & GDK_MOD1_MASK) {
+		mod = (jkeyevent_modifiers_t)(mod | JKM_ALT);
+	} else if (event->state & GDK_SUPER_MASK) {
+		mod = (jkeyevent_modifiers_t)(mod | JKM_SUPER);
+	} else if (event->state & GDK_HYPER_MASK) {
+		mod = (jkeyevent_modifiers_t)(mod | JKM_HYPER);
+	} else if (event->state & GDK_META_MASK) {
+		mod = (jkeyevent_modifiers_t)(mod | JKM_META);
+	}
+	
+	type = (jkeyevent_type_t)(0);
+
+	if (event->type == GDK_KEY_PRESS) {
+		type = JKT_PRESSED;
+	} else if (event->type == GDK_KEY_RELEASE	) {
+		type = JKT_RELEASED;
+	}
+
+	jkeyevent_symbol_t symbol = manager->TranslateToNativeKeySymbol(event->keyval);
+
+	manager->DispatchEvent(new KeyEvent(NULL, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
+
+	return FALSE;
+}
+
+static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
+{
+	NativeInputManager *manager = (NativeInputManager *)user_data;
+
+	GdkModifierType	state;
+
+	state = (GdkModifierType)event->state;
+	
+	jmouseevent_button_t button = JMB_UNKNOWN;
+	jmouseevent_button_t buttons = JMB_UNKNOWN;
+	jmouseevent_type_t type = JMT_MOVED;
+
+	int mouse_x = event->x_root; // event->x_root;
+	int mouse_y = event->y_root; // event->y_root;
+	int mouse_z = 0;
+	
+	// handle (x,y) motion
+	gdk_event_request_motions(event); // handles is_hint events
+
+  if(state & GDK_BUTTON1_MASK) {
+		buttons = (jmouseevent_button_t)(button | JMB_BUTTON1);
+  }
+
+  if(state & GDK_BUTTON2_MASK) {
+		buttons = (jmouseevent_button_t)(button | JMB_BUTTON2);
+  }
+
+  if(state & GDK_BUTTON3_MASK) {
+		buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
+  }
+
+	manager->DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, mouse_x, mouse_y));
+
+  return TRUE;
+}
+
+static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+{
+	NativeInputManager *manager = (NativeInputManager *)user_data;
+
+	GdkModifierType	state;
+
+	state = (GdkModifierType)event->state;
+	
+	jmouseevent_button_t button = JMB_UNKNOWN;
+	jmouseevent_button_t buttons = JMB_UNKNOWN;
+	jmouseevent_type_t type = JMT_UNKNOWN;
+
+	int mouse_x = event->x; // event->x_root;
+	int mouse_y = event->y; // event->y_root;
+	int mouse_z = 0;
+	
+	if (event->type == GDK_BUTTON_PRESS || event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
+		puts("t1");
+		type = JMT_PRESSED;
+	} else { // if (event->type == GDK_BUTTON_RELEASE) {
+		puts("t2");
+		type = JMT_RELEASED;
+	}
+
+	if (event->button == 1) {
+		puts("b1");
+		button = JMB_BUTTON1;
+	} else if (event->button == 2) {
+		puts("b2");
+		button = JMB_BUTTON3;
+	} else if (event->button == 3) {
+		puts("b3");
+		button = JMB_BUTTON2;
+	}
+
+	if (event->type == GDK_BUTTON_PRESS) {
+		mouse_z = 1;
+	} else if (event->type == GDK_2BUTTON_PRESS) {
+		mouse_z = 2;
+	} else if (event->type == GDK_3BUTTON_PRESS) {
+		mouse_z = 3;
+	}
+	printf("count:: %d\n", mouse_z);
+
+  if(state & GDK_BUTTON1_MASK) {
+		buttons = (jmouseevent_button_t)(button | JMB_BUTTON1);
+  }
+
+  if(state & GDK_BUTTON2_MASK) {
+		buttons = (jmouseevent_button_t)(button | JMB_BUTTON2);
+  }
+
+  if(state & GDK_BUTTON3_MASK) {
+		buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
+  }
+
+	manager->DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, mouse_x, mouse_y));
+
+  return TRUE;
+}
 
 NativeInputManager::NativeInputManager():
 	jgui::InputManager(), jthread::Thread()
@@ -125,6 +268,20 @@ void NativeInputManager::RegisterKeyListener(KeyListener *listener)
 	if (i == _key_listeners.end()) {
 		_key_listeners.push_back(listener);
 	}
+	
+	Window *w = dynamic_cast<Window *>(listener);
+
+	if (w != NULL) {
+		if (w->_window != NULL) {
+			std::map<std::string, gulong>::iterator i = w->_event_handlers.find(KEY_PRESS_EVENT_NAME);
+
+			if (i != w->_event_handlers.end()) {
+				g_signal_handler_disconnect(G_OBJECT(w->_window), i->second);
+			}
+
+			w->_event_handlers[KEY_PRESS_EVENT_NAME] = g_signal_connect(G_OBJECT(w->_window), KEY_PRESS_EVENT_NAME, G_CALLBACK(OnKeyPressEvent), this);
+		}
+	}
 }
 
 void NativeInputManager::RemoveKeyListener(KeyListener *listener) 
@@ -135,6 +292,18 @@ void NativeInputManager::RemoveKeyListener(KeyListener *listener)
 		jcommon::Listener *l = (*i);
 
 		if (dynamic_cast<jgui::KeyListener *>(l) == listener) {
+			Window *w = dynamic_cast<Window *>(l);
+
+			if (w != NULL) {
+				if (w->_window != NULL) {
+					std::map<std::string, gulong>::iterator i = w->_event_handlers.find(KEY_PRESS_EVENT_NAME);
+
+					if (i != w->_event_handlers.end()) {
+						g_signal_handler_disconnect(G_OBJECT(w->_window), i->second);
+					}
+				}
+			}
+
 			_key_listeners.erase(i);
 
 			break;
@@ -211,6 +380,34 @@ void NativeInputManager::RegisterMouseListener(MouseListener *listener)
 	if (i == _mouse_listeners.end()) {
 		_mouse_listeners.push_back(listener);
 	}
+
+	Window *w = dynamic_cast<Window *>(listener);
+
+	if (w != NULL) {
+		if (w->_window != NULL) {
+			std::map<std::string, gulong>::iterator i = w->_event_handlers.find(MOUSE_MOTION_EVENT_NAME);
+
+			if (i != w->_event_handlers.end()) {
+				g_signal_handler_disconnect(G_OBJECT(w->_window), i->second);
+			}
+
+			i = w->_event_handlers.find(MOUSE_PRESS_EVENT_NAME);
+
+			if (i != w->_event_handlers.end()) {
+				g_signal_handler_disconnect(G_OBJECT(w->_window), i->second);
+			}
+
+			i = w->_event_handlers.find(MOUSE_RELEASE_EVENT_NAME);
+
+			if (i != w->_event_handlers.end()) {
+				g_signal_handler_disconnect(G_OBJECT(w->_window), i->second);
+			}
+
+			w->_event_handlers[MOUSE_MOTION_EVENT_NAME] = g_signal_connect(G_OBJECT(w->_window), MOUSE_MOTION_EVENT_NAME, G_CALLBACK(OnMouseMoveEvent), this);
+			w->_event_handlers[MOUSE_PRESS_EVENT_NAME] = g_signal_connect(G_OBJECT(w->_window), MOUSE_PRESS_EVENT_NAME, G_CALLBACK(OnMousePressEvent), this);
+			w->_event_handlers[MOUSE_RELEASE_EVENT_NAME] = g_signal_connect(G_OBJECT(w->_window), MOUSE_RELEASE_EVENT_NAME, G_CALLBACK(OnMousePressEvent), this);
+		}
+	}
 }
 
 void NativeInputManager::RemoveMouseListener(MouseListener *listener) 
@@ -221,6 +418,30 @@ void NativeInputManager::RemoveMouseListener(MouseListener *listener)
 		jcommon::Listener *l = (*i);
 
 		if (dynamic_cast<jgui::MouseListener *>(l) == listener) {
+			Window *w = dynamic_cast<Window *>(l);
+
+			if (w != NULL) {
+				if (w->_window != NULL) {
+					std::map<std::string, gulong>::iterator i = w->_event_handlers.find(MOUSE_MOTION_EVENT_NAME);
+
+					if (i != w->_event_handlers.end()) {
+						g_signal_handler_disconnect(G_OBJECT(w->_window), i->second);
+					}
+
+					i = w->_event_handlers.find(MOUSE_PRESS_EVENT_NAME);
+
+					if (i != w->_event_handlers.end()) {
+						g_signal_handler_disconnect(G_OBJECT(w->_window), i->second);
+					}
+
+					i = w->_event_handlers.find(MOUSE_RELEASE_EVENT_NAME);
+
+					if (i != w->_event_handlers.end()) {
+						g_signal_handler_disconnect(G_OBJECT(w->_window), i->second);
+					}
+				}
+			}
+
 			_mouse_listeners.erase(i);
 
 			break;
@@ -228,285 +449,333 @@ void NativeInputManager::RemoveMouseListener(MouseListener *listener)
 	}
 }
 
-/*
-jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(Native_Keysym symbol)
+jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(guint symbol)
 {
-	switch (symbol.sym) {
-		case NativeK_RETURN:
-			return JKS_ENTER; // JKS_RETURN;
-		case NativeK_BACKSPACE:
+	switch (symbol) {
+		case GDK_Return:
+		case GDK_KP_Enter:
+			return JKS_ENTER;
+		case GDK_BackSpace:
 			return JKS_BACKSPACE;
-		case NativeK_TAB:
+		case GDK_Tab:
+		case GDK_KP_Tab:
 			return JKS_TAB;
-		// case NativeK_CANCEL:
-		//	return JKS_CANCEL;
-		case NativeK_ESCAPE:
+		//case DIKS_RETURN:
+		//	return JKS_RETURN;
+		case GDK_Cancel:
+			return JKS_CANCEL;
+		case GDK_Escape:
 			return JKS_ESCAPE;
-		case NativeK_SPACE:
+		case GDK_space:
+		case GDK_KP_Space:
 			return JKS_SPACE;
-		case NativeK_EXCLAIM:
+		case GDK_exclam:
 			return JKS_EXCLAMATION_MARK;
-		case NativeK_QUOTEDBL:
+		case GDK_quotedbl:
 			return JKS_QUOTATION;
-		case NativeK_HASH:
+		case GDK_numbersign:
 			return JKS_NUMBER_SIGN;
-		case NativeK_DOLLAR:
+		case GDK_dollar:
+		case GDK_currency:
 			return JKS_DOLLAR_SIGN;
-		// case NativeK_PERCENT_SIGN:
-		//	return JKS_PERCENT_SIGN;
-		case NativeK_AMPERSAND:   
+		case GDK_percent:
+			return JKS_PERCENT_SIGN;
+		case GDK_ampersand:
 			return JKS_AMPERSAND;
-		case NativeK_QUOTE:
+		case GDK_apostrophe:
+		// case GDK_quoteright:
 			return JKS_APOSTROPHE;
-		case NativeK_LEFTPAREN:
+		case GDK_parenleft:
 			return JKS_PARENTHESIS_LEFT;
-		case NativeK_RIGHTPAREN:
+		case GDK_parenright:
 			return JKS_PARENTHESIS_RIGHT;
-		case NativeK_ASTERISK:
+		case GDK_asterisk:
+		case GDK_KP_Multiply:
 			return JKS_STAR;
-		case NativeK_PLUS:
+		case GDK_plus:
+		case GDK_KP_Add:
 			return JKS_PLUS_SIGN;
-		case NativeK_COMMA:   
-			return JKS_COMMA;
-		case NativeK_MINUS:
+		case GDK_minus:
+		case GDK_hyphen:
+		case GDK_KP_Subtract:
 			return JKS_MINUS_SIGN;
-		case NativeK_PERIOD:  
+		case GDK_period:
+		case GDK_KP_Decimal:
 			return JKS_PERIOD;
-		case NativeK_SLASH:
+		case GDK_slash:
+		case GDK_KP_Divide:
 			return JKS_SLASH;
-		case NativeK_0:     
+		case GDK_0:
+		case GDK_KP_0:
 			return JKS_0;
-		case NativeK_1:
+		case GDK_1:
+		case GDK_KP_1:
 			return JKS_1;
-		case NativeK_2:
+		case GDK_2:
+		case GDK_KP_2:
 			return JKS_2;
-		case NativeK_3:
+		case GDK_3:
+		case GDK_KP_3:
 			return JKS_3;
-		case NativeK_4:
+		case GDK_4:
+		case GDK_KP_4:
 			return JKS_4;
-		case NativeK_5:
+		case GDK_5:
+		case GDK_KP_5:
 			return JKS_5;
-		case NativeK_6:
+		case GDK_6:
+		case GDK_KP_6:
 			return JKS_6;
-		case NativeK_7:
+		case GDK_7:
+		case GDK_KP_7:
 			return JKS_7;
-		case NativeK_8:
+		case GDK_8:
+		case GDK_KP_8:
 			return JKS_8;
-		case NativeK_9:
+		case GDK_9:
+		case GDK_KP_9:
 			return JKS_9;
-		case NativeK_COLON:
+		case GDK_colon:
 			return JKS_COLON;
-		case NativeK_SEMICOLON:
+		case GDK_semicolon:
 			return JKS_SEMICOLON;
-		case NativeK_LESS:
-			return JKS_LESS_THAN_SIGN;
-		case NativeK_EQUALS: 
+		case GDK_comma:
+			return JKS_COMMA;
+		case GDK_equal:
+		case GDK_KP_Equal:
 			return JKS_EQUALS_SIGN;
-		case NativeK_GREATER:
+		case GDK_less:
+			return JKS_LESS_THAN_SIGN;
+		case GDK_greater:
 			return JKS_GREATER_THAN_SIGN;
-		case NativeK_QUESTION:   
+		case GDK_question:
 			return JKS_QUESTION_MARK;
-		case NativeK_AT:
+		case GDK_at:
 			return JKS_AT;
-		case NativeK_CAPITAL_A:
+		case GDK_A:
 			return JKS_A;
-		case NativeK_CAPITAL_B:
+		case GDK_B:
 			return JKS_B;
-		case NativeK_CAPITAL_C:
+		case GDK_C:
 			return JKS_C;
-		case NativeK_CAPITAL_D:
+		case GDK_D:
 			return JKS_D;
-		case NativeK_CAPITAL_E:
+		case GDK_E:
 			return JKS_E;
-		case NativeK_CAPITAL_F:
+		case GDK_F:
 			return JKS_F;
-		case NativeK_CAPITAL_G:
+		case GDK_G:
 			return JKS_G;
-		case NativeK_CAPITAL_H:
+		case GDK_H:
 			return JKS_H;
-		case NativeK_CAPITAL_I:
+		case GDK_I:
 			return JKS_I;
-		case NativeK_CAPITAL_J:
+		case GDK_J:
 			return JKS_J;
-		case NativeK_CAPITAL_K:
+		case GDK_K:
 			return JKS_K;
-		case NativeK_CAPITAL_L:
+		case GDK_L:
 			return JKS_L;
-		case NativeK_CAPITAL_M:
+		case GDK_M:
 			return JKS_M;
-		case NativeK_CAPITAL_N:
+		case GDK_N:
 			return JKS_N;
-		case NativeK_CAPITAL_O:
+		case GDK_O:
 			return JKS_O;
-		case NativeK_CAPITAL_P:
+		case GDK_P:
 			return JKS_P;
-		case NativeK_CAPITAL_Q:
+		case GDK_Q:
 			return JKS_Q;
-		case NativeK_CAPITAL_R:
+		case GDK_R:
 			return JKS_R;
-		case NativeK_CAPITAL_S:
+		case GDK_S:
 			return JKS_S;
-		case NativeK_CAPITAL_T:
+		case GDK_T:
 			return JKS_T;
-		case NativeK_CAPITAL_U:
+		case GDK_U:
 			return JKS_U;
-		case NativeK_CAPITAL_V:
+		case GDK_V:
 			return JKS_V;
-		case NativeK_CAPITAL_W:
+		case GDK_W:
 			return JKS_W;
-		case NativeK_CAPITAL_X:
+		case GDK_X:
 			return JKS_X;
-		case NativeK_CAPITAL_Y:
+		case GDK_Y:
 			return JKS_Y;
-		case NativeK_CAPITAL_Z:
+		case GDK_Z:
 			return JKS_Z;
-		case NativeK_LEFTBRACKET:
+		case GDK_bracketleft:
 			return JKS_SQUARE_BRACKET_LEFT;
-		case NativeK_BACKSLASH:   
+		case GDK_backslash:
 			return JKS_BACKSLASH;
-		case NativeK_RIGHTBRACKET:
+		case GDK_bracketright:
 			return JKS_SQUARE_BRACKET_RIGHT;
-		case NativeK_CARET:
+		case GDK_asciicircum:
 			return JKS_CIRCUMFLEX_ACCENT;
-		case NativeK_UNDERSCORE:    
+		case GDK_underscore:
 			return JKS_UNDERSCORE;
-		case NativeK_BACKQUOTE:
+		case GDK_acute:
+			return JKS_ACUTE_ACCENT;
+		case GDK_grave:
+		// case GDK_quoteleft:
 			return JKS_GRAVE_ACCENT;
-		case NativeK_a:       
+		case GDK_a:       
 			return JKS_a;
-		case NativeK_b:
+		case GDK_b:
 			return JKS_b;
-		case NativeK_c:
+		case GDK_c:
 			return JKS_c;
-		case NativeK_d:
+		case GDK_d:
 			return JKS_d;
-		case NativeK_e:
+		case GDK_e:
 			return JKS_e;
-		case NativeK_f:
+		case GDK_f:
 			return JKS_f;
-		case NativeK_g:
+		case GDK_g:
 			return JKS_g;
-		case NativeK_h:
+		case GDK_h:
 			return JKS_h;
-		case NativeK_i:
+		case GDK_i:
 			return JKS_i;
-		case NativeK_j:
+		case GDK_j:
 			return JKS_j;
-		case NativeK_k:
+		case GDK_k:
 			return JKS_k;
-		case NativeK_l:
+		case GDK_l:
 			return JKS_l;
-		case NativeK_m:
+		case GDK_m:
 			return JKS_m;
-		case NativeK_n:
+		case GDK_n:
 			return JKS_n;
-		case NativeK_o:
+		case GDK_o:
 			return JKS_o;
-		case NativeK_p:
+		case GDK_p:
 			return JKS_p;
-		case NativeK_q:
+		case GDK_q:
 			return JKS_q;
-		case NativeK_r:
+		case GDK_r:
 			return JKS_r;
-		case NativeK_s:
+		case GDK_s:
 			return JKS_s;
-		case NativeK_t:
+		case GDK_t:
 			return JKS_t;
-		case NativeK_u:
+		case GDK_u:
 			return JKS_u;
-		case NativeK_v:
+		case GDK_v:
 			return JKS_v;
-		case NativeK_w:
+		case GDK_w:
 			return JKS_w;
-		case NativeK_x:
+		case GDK_x:
 			return JKS_x;
-		case NativeK_y:
+		case GDK_y:
 			return JKS_y;
-		case NativeK_z:
+		case GDK_z:
 			return JKS_z;
-		// case NativeK_CURLY_BRACKET_LEFT:
-		//	return JKS_CURLY_BRACKET_LEFT;
-		// case NativeK_VERTICAL_BAR:  
-		//	return JKS_VERTICAL_BAR;
-		// case NativeK_CURLY_BRACKET_RIGHT:
-		//	return JKS_CURLY_BRACKET_RIGHT;
-		// case NativeK_TILDE:  
-		//	return JKS_TILDE;
-		case NativeK_DELETE:
+		// case GDK_Cedilla:
+		//	return JKS_CAPITAL_CEDILlA;
+		case GDK_cedilla:
+			return JKS_SMALL_CEDILLA;
+		case GDK_braceleft:
+			return JKS_CURLY_BRACKET_LEFT;
+		case GDK_bar:
+		case GDK_brokenbar:
+			return JKS_VERTICAL_BAR;
+		case GDK_braceright:
+			return JKS_CURLY_BRACKET_RIGHT;
+		case GDK_asciitilde:
+			return JKS_TILDE;
+		case GDK_Delete:
+		case GDK_KP_Delete:
 			return JKS_DELETE;
-		case NativeK_LEFT:
+		case GDK_Left:
+		case GDK_KP_Left:
 			return JKS_CURSOR_LEFT;
-		case NativeK_RIGHT:
+		case GDK_Right:
+		case GDK_KP_Right:
 			return JKS_CURSOR_RIGHT;
-		case NativeK_UP:  
+		case GDK_Up:
+		case GDK_KP_Up:
 			return JKS_CURSOR_UP;
-		case NativeK_DOWN:
+		case GDK_Down:
+		case GDK_KP_Down:
 			return JKS_CURSOR_DOWN;
-		case NativeK_INSERT:  
+		case GDK_Break:
+			return JKS_BREAK;
+		case GDK_Insert:
+		case GDK_KP_Insert:
 			return JKS_INSERT;
-		case NativeK_HOME:     
+		case GDK_Home:
+		case GDK_KP_Home:
 			return JKS_HOME;
-		case NativeK_END:
+		case GDK_End:
+		case GDK_KP_End:
 			return JKS_END;
-		case NativeK_PAGEUP:
+		case GDK_Page_Up:
+		case GDK_KP_Page_Up:
 			return JKS_PAGE_UP;
-		case NativeK_PAGEDOWN:
+		case GDK_Page_Down:
+		case GDK_KP_Page_Down:
 			return JKS_PAGE_DOWN;
-		// case NativeK_PRINT:   
-		//	return JKS_PRINT;
-		case NativeK_PAUSE:
+		case GDK_Print:
+			return JKS_PRINT;
+		case GDK_Pause:
 			return JKS_PAUSE;
-		// case NativeK_RED:
-		//	return JKS_RED;
-		// case NativeK_GREEN:
-		//	return JKS_GREEN;
-		// case NativeK_YELLOW:
-		//	return JKS_YELLOW;
-		// case NativeK_BLUE:
-		//	return JKS_BLUE;
-		case NativeK_F1:
+		case GDK_Red:
+			return JKS_RED;
+		case GDK_Green:
+			return JKS_GREEN;
+		case GDK_Yellow:
+			return JKS_YELLOW;
+		case GDK_Blue:
+			return JKS_BLUE;
+		case GDK_F1:
 			return JKS_F1;
-		case NativeK_F2:
+		case GDK_F2:
 			return JKS_F2;
-		case NativeK_F3:
+		case GDK_F3:
 			return JKS_F3;
-		case NativeK_F4:
+		case GDK_F4:
 			return JKS_F4;
-		case NativeK_F5:
+		case GDK_F5:
 			return JKS_F5;
-		case NativeK_F6:     
+		case GDK_F6:
 			return JKS_F6;
-		case NativeK_F7:    
+		case GDK_F7:
 			return JKS_F7;
-		case NativeK_F8:   
+		case GDK_F8:
 			return JKS_F8;
-		case NativeK_F9:  
+		case GDK_F9:
 			return JKS_F9;
-		case NativeK_F10: 
+		case GDK_F10:
 			return JKS_F10;
-		case NativeK_F11:
+		case GDK_F11:
 			return JKS_F11;
-		case NativeK_F12:
+		case GDK_F12:
 			return JKS_F12;
-		case NativeK_LSHIFT:
-		case NativeK_RSHIFT:
+		case GDK_Shift_L:
+		case GDK_Shift_R:
 			return JKS_SHIFT;
-		case NativeK_LCTRL:
-		case NativeK_RCTRL:
+		case GDK_Control_L:
+		case GDK_Control_R:
 			return JKS_CONTROL;
-		case NativeK_LALT:
-		case NativeK_RALT:
+		case GDK_Alt_L:
+		case GDK_Alt_R:
 			return JKS_ALT;
-		// case NativeK_ALTGR:
-		//	return JKS_ALTGR;
-		// case NativeK_LMETA:
-		// case NativeK_RMETA:
-		//	return JKS_META;
-		// case NativeK_LSUPER:
-		// case NativeK_RSUPER:
-		//	return JKS_SUPER;
-		// case NativeK_HYPER:
-		//	return JKS_HYPER;
+		case GDK_Meta_L:
+		case GDK_Meta_R:
+			return JKS_META;
+		case GDK_Super_L:
+		case GDK_Super_R:
+			return JKS_SUPER;
+		case GDK_Hyper_L:
+		case GDK_Hyper_R:
+			return JKS_HYPER;
+		case GDK_Sleep:
+			return JKS_SLEEP;
+		case GDK_Suspend:
+			return JKS_SUSPEND;
+		case GDK_Hibernate:
+			return JKS_HIBERNATE;
 		default: 
 			break;
 	}
@@ -514,126 +783,11 @@ jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(Native_Keysym 
 	return JKS_UNKNOWN;
 }
 
-void NativeInputManager::ProcessInputEvent(Native_Event event)
-{
-	jthread::AutoLock lock(&_mutex);
-
-	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
-
-	if (event.type == Native_KEYDOWN || event.type == Native_KEYUP) {
-		jkeyevent_type_t type;
-		jkeyevent_modifiers_t mod;
-
-		mod = (jkeyevent_modifiers_t)(0);
-
-		if ((event.key.keysym.mod & KMOD_LSHIFT) != 0) {
-			mod = (jkeyevent_modifiers_t)(mod | JKM_SHIFT);
-		} else if ((event.key.keysym.mod & KMOD_RSHIFT) != 0) {
-			mod = (jkeyevent_modifiers_t)(mod | JKM_SHIFT);
-		} else if ((event.key.keysym.mod & KMOD_LCTRL) != 0) {
-			mod = (jkeyevent_modifiers_t)(mod | JKM_CONTROL);
-		} else if ((event.key.keysym.mod & KMOD_RCTRL) != 0) {
-			mod = (jkeyevent_modifiers_t)(mod | JKM_CONTROL);
-		} else if ((event.key.keysym.mod & KMOD_LALT) != 0) {
-			mod = (jkeyevent_modifiers_t)(mod | JKM_ALT);
-		} else if ((event.key.keysym.mod & KMOD_RALT) != 0) {
-			mod = (jkeyevent_modifiers_t)(mod | JKM_ALT);
-		// } else if ((event.key.keysym.mod & ) != 0) {
-		//	mod = (jkeyevent_modifiers_t)(mod | JKM_ALTGR);
-		// } else if ((event.key.keysym.mod & KMOD_LMETA) != 0) {
-		//	mod = (jkeyevent_modifiers_t)(mod | JKM_META);
-		// } else if ((event.key.keysym.mod & KMOD_RMETA) != 0) {
-		//	mod = (jkeyevent_modifiers_t)(mod | JKM_META);
-		// } else if ((event.key.keysym.mod & ) != 0) {
-		//	mod = (jkeyevent_modifiers_t)(mod | JKM_SUPER);
-		// } else if ((event.key.keysym.mod & ) != 0) {
-		//	mod = (jkeyevent_modifiers_t)(mod | JKM_HYPER);
-		}
-
-		type = (jkeyevent_type_t)(0);
-
-		if (event.key.state == Native_PRESSED) {
-			type = JKT_PRESSED;
-		} else if (event.key.state == Native_RELEASED) {
-			type = JKT_RELEASED;
-		}
-
-		jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key.keysym);
-
-		DispatchEvent(new KeyEvent(NULL, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
-	} else if (event.type == Native_MOUSEMOTION || event.type == Native_MOUSEBUTTONDOWN || event.type == Native_MOUSEBUTTONUP || event.type == Native_MOUSEWHEEL) {
-		if (event.type == Native_MOUSEMOTION) {
-			// e.motion.x/y
-		} else if (event.type == Native_MOUSEBUTTONDOWN) {
-			// e.button.button == Native_BUTTON_LEFT
-			// e.button.clicks
-		} else if (event.type == Native_MOUSEBUTTONUP) {
-		} else if (event.type == Native_MOUSEWHEEL) {
-		}
-
-		int mouse_z = 0;
-		jmouseevent_button_t button = JMB_UNKNOWN;
-		jmouseevent_button_t buttons = JMB_UNKNOWN;
-		jmouseevent_type_t type = JMT_UNKNOWN;
-
-		if (event.type == Native_MOUSEMOTION) {
-			type = JMT_MOVED;
-			_mouse_x = event.motion.x;
-			_mouse_y = event.motion.y;
-
-			_mouse_x = CLAMP(_mouse_x, 0, screen.width-1);
-			_mouse_y = CLAMP(_mouse_y, 0, screen.height-1);
-		} else if (event.type == Native_MOUSEBUTTONDOWN || event.type == Native_MOUSEBUTTONUP) {
-			if (event.type == Native_MOUSEBUTTONDOWN) {
-				type = JMT_PRESSED;
-			} else if (event.type == Native_MOUSEBUTTONUP) {
-				type = JMT_RELEASED;
-			}
-
-			if (event.button.button == Native_BUTTON_LEFT) {
-				button = JMB_BUTTON1;
-			} else if (event.button.button == Native_BUTTON_MIDDLE) {
-				button = JMB_BUTTON2;
-			} else if (event.button.button == Native_BUTTON_RIGHT) {
-				button = JMB_BUTTON3;
-			}
-
-			_click_count = event.button.clicks;
-		} else if (event.type == Native_MOUSEWHEEL) {
-			type = JMT_ROTATED;
-			mouse_z = event.motion.y;
-		}
-
-		uint32_t state = Native_GetMouseState(NULL, NULL);
-		
-		if ((state & Native_BUTTON(Native_BUTTON_LEFT)) != 0) {
-			buttons = (jmouseevent_button_t)(button | JMB_BUTTON1);
-		} else if ((state & Native_BUTTON(Native_BUTTON_MIDDLE)) != 0) {
-			buttons = (jmouseevent_button_t)(button | JMB_BUTTON2);
-		} else if ((state & Native_BUTTON(Native_BUTTON_RIGHT)) != 0) {
-			buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
-		}
-
-		DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
-	}
-}
-*/
-
 void NativeInputManager::Run()
 {
 	while (_is_initialized == true) {
 		gtk_main();
 	}
-
-	/*
-	Native_Event event;
-
-	while (_is_initialized == true) {
-		while (Native_PollEvent(&event)) {
-			// ProcessInputEvent(event);
-		}
-	}
-	*/
 }
 
 }

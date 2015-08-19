@@ -1391,7 +1391,7 @@ void GenericGraphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp
 				*(dst + di + 1) = *(src + si + 1);
 				*(dst + di + 0) = *(src + si + 0);
 
-				si = si + 3;
+				si = si + 4; // INFO:: cairo allocates 4 bytes instead 3 to rgb24's array
 				di = di + 4;
 			}
 		}

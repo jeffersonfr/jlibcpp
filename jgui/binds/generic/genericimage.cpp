@@ -154,35 +154,23 @@ GenericImage::~GenericImage()
 	}
 }
 
-jsize_t GenericImage::GetImageSize(std::string img)
+jsize_t GenericImage::GetImageSize(std::string file)
 {
+	GenericImage *image = NULL;
+	
 	jsize_t t;
 
 	t.width = -1;
 	t.height = -1;
 
-	/*
-	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
+	try {
+		image = new GenericImage(file);
 
-	IDirectFBImageProvider *provider = NULL;
-	GenericSurfaceDescription desc;
+		t = image->GetSize();
 
-	if (engine->CreateImageProvider(engine, img.c_str(), &provider) != Generic_OK) {
-		return t;
+		delete image;
+	} catch (jcommon::Exception &e) {
 	}
-
-	if (provider->GetSurfaceDescription(provider, &desc) != Generic_OK) {
-		provider->Release(provider);
-
-		return t;
-	}
-
-	t.width = desc.width;
-	t.height = desc.height;
-		
-	provider->Release(provider);
-	*/
 
 	return t;
 }

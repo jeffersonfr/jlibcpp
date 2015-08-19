@@ -32,11 +32,10 @@
 
 #if defined(DIRECTFB_UI)
 #include <directfb.h>
-#elif defined(GTK3_UI)
-#include <gtk/gtk.h>
-#include <cairo.h>
 #elif defined(SDL2_UI)
 #include <SDL2/SDL.h>
+#elif defined(GTK3_UI)
+#include <gtk/gtk.h>
 #endif
 
 namespace jgui{
@@ -75,16 +74,18 @@ class Window : public jgui::Container{
 		IDirectFBWindow *_window;
 		/** \brief */
 		IDirectFBSurface *_surface;
-#elif defined(GTK3_UI)
-		/** \brief */
-  	GtkWidget *_window;
-		/** \brief */
-	  GtkWidget *_surface;
 #elif defined(SDL2_UI)
 		/** \brief */
 		SDL_Window *_window;
 		/** \brief */
 		SDL_Renderer *_surface;
+#elif defined(GTK3_UI)
+		/** \brief */
+		std::map<std::string, gulong> _event_handlers;
+		/** \brief */
+  	GtkWidget *_window;
+		/** \brief */
+	  GtkWidget *_surface;
 #endif
 		/** \brief */
 		std::vector<WindowListener *> _window_listeners;
