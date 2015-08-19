@@ -55,7 +55,7 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 		bool _diff;
 
 	public:
-		VideoOverlayImpl(Player *player, int x, int y, int w, int h, int iw, int ih):
+		VideoOverlayImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h),
 			_mutex(jthread::JMT_RECURSIVE)
 		{
@@ -734,7 +734,7 @@ NativeHeavyPlayer::NativeHeavyPlayer(std::string file):
 		_controls.push_back(new VideoFormatControlImpl(this));
 	}
 
-	_component = new VideoOverlayImpl(this, 0, 0, sdsc.width, sdsc.height, sdsc.width, sdsc.height);
+	_component = new VideoOverlayImpl(this, 0, 0, sdsc.width, sdsc.height);
 
 	Start();
 }

@@ -23,32 +23,30 @@
 #include "jvideosizecontrol.h"
 #include "jgfxhandler.h"
 #include "jautolock.h"
+#include "jwindow.h"
 
 #include <stdio.h>
 #include <unistd.h>
 
-class PlayerTest : public jmedia::PlayerListener, public jmedia::FrameGrabberListener {
+class PlayerTest : public jgui::Window, public jmedia::PlayerListener, public jmedia::FrameGrabberListener {
 
 	private:
 		jmedia::Player *_player;
 
 	public:
 		PlayerTest(std::string file):
+			jgui::Window(),
 			jmedia::PlayerListener()
 		{
 			jgui::jsize_t size = jgui::GFXHandler::GetInstance()->GetScreenSize();
-
-			jmedia::PlayerManager::SetHint(jmedia::JPH_LIGHTWEIGHT, false);
 
 			_player = jmedia::PlayerManager::CreatePlayer(file);
 
 			jgui::Component *cmp = _player->GetVisualComponent();
 
 			cmp->SetBounds(0, 0, size.width, size.height);
-			cmp->SetVisible(true);
-			//jmedia::VideoSizeControl *control = dynamic_cast<jmedia::VideoSizeControl *>(_player->GetControl("video.size"));
 
-			//control->SetDestination(0, 0, 720, 480);
+			Add(cmp);
 
 			_player->RegisterPlayerListener(this);
 			_player->RegisterFrameGrabberListener(this);
@@ -120,12 +118,11 @@ int main(int argc, char *argv[])
 
 	PlayerTest test(argv[1]);
 
+	test.Show();
+
 	test.StartMedia();
-
 	sleep(30);
-
 	test.StopMedia();
-
 	sleep(2);
 
 	return 0;

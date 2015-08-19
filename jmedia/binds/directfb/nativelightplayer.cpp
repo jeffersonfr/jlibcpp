@@ -51,14 +51,15 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 		bool _diff;
 
 	public:
-		VideoLightweightImpl(Player *player, int x, int y, int w, int h, int iw, int ih):
+		VideoLightweightImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			IDirectFB *engine = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
 
 			DFBSurfaceDescription desc;
 
-			desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
+			desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_CAPS |  DSDESC_PIXELFORMAT);
+			desc.caps = (DFBSurfaceCapabilities)DSCAPS_DOUBLE;
 			desc.pixelformat = DSPF_ARGB;
 			desc.width = w;
 			desc.height = h;
@@ -145,10 +146,11 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 				_mutex.Unlock();
 
 				_surface->Unlock(_surface);
+				_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)0);
 				
 			}
 
-			Run();
+			Start();
 		}
 
 		virtual void Run()
@@ -602,7 +604,7 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 		_controls.push_back(new VideoFormatControlImpl(this));
 	}
 
-	_component = new VideoLightweightImpl(this, 0, 0, sdsc.width, sdsc.height, sdsc.width, sdsc.height);
+	_component = new VideoLightweightImpl(this, 0, 0, sdsc.width, sdsc.height);
 
 	Start();
 }

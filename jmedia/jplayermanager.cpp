@@ -20,11 +20,13 @@
 #include "jplayermanager.h"
 #include "jurl.h"
 
-#if defined(DIRECTFB_UI)
+#if defined(DIRECTFB_MEDIA)
 #include "nativelightplayer.h"
 #include "nativeheavyplayer.h"
-#elif defined(SDL2_UI)
-#elif defined(GTK3_UI)
+#elif defined(LIBVLC_MEDIA)
+#include "nativelightplayer.h"
+#elif defined(LIBAV_MEDIA)
+#include "nativelightplayer.h"
 #endif
 
 namespace jmedia {
@@ -43,21 +45,13 @@ PlayerManager::~PlayerManager()
 
 Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 {
-	jcommon::URL url(url_);
-
-	if (url.GetProtocol() == "file" || url.GetProtocol() == "http") {
-#if defined(DIRECTFB_UI)
-		std::map<jplayer_hints_t, bool>::iterator i = _hints.find(JPH_LIGHTWEIGHT);
-
-		if (i == _hints.end() || i->second == true) {
-			return new NativeLightPlayer(url.GetPath());
-		} else {
-			return new NativeHeavyPlayer(url.GetPath());
-		}
-#elif defined(SDL2_UI)
-#elif defined(GTK3_UI)
+#if defined(DIRECTFB_MEDIA)
+	return new NativeLightPlayer(url_);
+#elif defined(LIBVLC_MEDIA)
+	return new NativeLightPlayer(url_);
+#elif defined(LIBAV_MEDIA)
+	return new NativeLightPlayer(url_);
 #endif
-	}
 
 	return NULL;
 }
