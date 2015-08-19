@@ -27,6 +27,7 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 	LDFLAGS		+= \
 		 `pkg-config --libs cairo` \
 		 `pkg-config --libs directfb` \
+		 -ljpeg \
 
 	DEFINES		+= \
 		 -DDIRECTFB_UI \
@@ -41,6 +42,8 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 		 ../generic/genericgraphics.o\
 		 ../generic/genericimage.o\
 		 ../generic/genericpath.o\
+		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_jpg.o\
 		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
@@ -62,6 +65,7 @@ ifeq ($(ENABLE_GRAPHICS),sdl2)
 	LDFLAGS		+= \
 		 `pkg-config --libs cairo` \
 		 `pkg-config --libs sdl2` \
+		 -ljpeg \
 
 	DEFINES		+= \
 		 -DSDL2_UI \
@@ -75,6 +79,8 @@ ifeq ($(ENABLE_GRAPHICS),sdl2)
 		 ../generic/genericgraphics.o\
 		 ../generic/genericimage.o\
 		 ../generic/genericpath.o\
+		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_jpg.o\
 		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
@@ -94,6 +100,7 @@ ifeq ($(ENABLE_GRAPHICS),gtk3)
 
 	LDFLAGS		+= \
 		 `pkg-config --libs gtk+-3.0` \
+		 -ljpeg \
 
 	DEFINES		+= \
 		 -DGTK3_UI \
@@ -107,6 +114,8 @@ ifeq ($(ENABLE_GRAPHICS),gtk3)
 		 ../generic/genericgraphics.o\
 		 ../generic/genericimage.o\
 		 ../generic/genericpath.o\
+		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_jpg.o\
 		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\

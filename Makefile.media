@@ -17,6 +17,7 @@
 #   Free Software Foundation, Inc.,                                       *
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
+ifeq ($(ENABLE_MEDIA),none)
 ifeq ($(ENABLE_GRAPHICS),directfb)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
@@ -24,6 +25,7 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 	LDFLAGS		+= \
 
 	DEFINES		+= \
+		 -DDIRECTFB_MEDIA \
 
 	REQUIRES	+= \
 
@@ -32,42 +34,46 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 		 nativelightplayer.o\
 
 OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
-
+endif
 endif
 
-ifeq ($(ENABLE_GRAPHICS),sdl2)
+ifeq ($(ENABLE_MEDIA),libvlc)
 	CCFLAGS		+= \
-		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
+		 -Ijmedia/binds/$(ENABLE_MEDIA)/include \
+		 `pkg-config --cflags libvlc` \
 
 	LDFLAGS		+= \
+		 `pkg-config --libs libvlc` \
 
 	DEFINES		+= \
+		 -DLIBVLC_MEDIA \
 
 	REQUIRES	+= \
 
 	OBJS_media	+= \
-		 #nativeheavyplayer.o\
 		 nativelightplayer.o\
 
-OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
+OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),gtk3)
+ifeq ($(ENABLE_MEDIA),libav)
 	CCFLAGS		+= \
-		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
+		 -Ijmedia/binds/$(ENABLE_MEDIA)/include \
+		 `pkg-config --cflags libavutil libavformat libavcodec libswscale libavresample` \
 
 	LDFLAGS		+= \
+		 `pkg-config --libs libavutil libavformat libavcodec libswscale libavresample` \
 
 	DEFINES		+= \
+		 -DLIBAV_MEDIA \
 
 	REQUIRES	+= \
 
 	OBJS_media	+= \
-		 #nativeheavyplayer.o\
 		 nativelightplayer.o\
 
-OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
+OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
 
 endif
 

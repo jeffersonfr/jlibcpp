@@ -59,8 +59,10 @@ ARFLAGS		= \
 
 # {no, yes}
 ENABLE_DEBUG ?= no
-# {none, directfb, directfb-cairo}
+# {none, directfb, sdl2, gtk3}
 ENABLE_GRAPHICS ?= directfb
+# {none, libvlc, libav}
+ENABLE_MEDIA ?= none
 
 # -ansi: problemas com va_copy()
 CCFLAGS		= \
