@@ -18,9 +18,8 @@
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
 ifeq ($(ENABLE_MEDIA),none)
-ifeq ($(ENABLE_GRAPHICS),directfb)
 	CCFLAGS		+= \
-		 -Ijmedia/binds/$(ENABLE_GRAPHICS)/include \
+		 -Ijmedia/binds/$(ENABLE_MEDIA)/include \
 
 	LDFLAGS		+= \
 
@@ -30,11 +29,11 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 	REQUIRES	+= \
 
 	OBJS_media	+= \
-		 nativeheavyplayer.o\
 		 nativelightplayer.o\
+		 nativeheavyplayer.o\
 
-OBJS_jmedia	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_media))
-endif
+	OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
+
 endif
 
 ifeq ($(ENABLE_MEDIA),libvlc)
@@ -53,17 +52,19 @@ ifeq ($(ENABLE_MEDIA),libvlc)
 	OBJS_media	+= \
 		 nativelightplayer.o\
 
-OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
+	OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
 
 endif
 
 ifeq ($(ENABLE_MEDIA),libav)
 	CCFLAGS		+= \
+		 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPIC -DZLIB_CONST -O3 \
 		 -Ijmedia/binds/$(ENABLE_MEDIA)/include \
-		 `pkg-config --cflags libavutil libavformat libavcodec libswscale libavresample` \
+		 `pkg-config --cflags libavcodec libavformat libavresample libavutil libavfilter libswscale libavdevice directfb sdl` \
+		 -lm -lbz2 -lasound \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs libavutil libavformat libavcodec libswscale libavresample` \
+		 `pkg-config --libs libavcodec libavformat libavresample libavutil libavfilter libswscale libavdevice directfb sdl` \
 
 	DEFINES		+= \
 		 -DLIBAV_MEDIA \
@@ -71,9 +72,11 @@ ifeq ($(ENABLE_MEDIA),libav)
 	REQUIRES	+= \
 
 	OBJS_media	+= \
+		 cmdutils.o\
+		 avplay.o\
 		 nativelightplayer.o\
 
-OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
+	OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
 
 endif
 

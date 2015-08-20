@@ -256,7 +256,12 @@ void Window::SetNativeWindow(void *native)
 
 	_window->SetOpacity(_window, _opacity);
 
+#if defined(DIRECTFB_NODEPS_UI)
+	_graphics = new NativeGraphics(_surface, JPF_ARGB, _size.width, _size.height, true);
+#elif defined(DIRECTFB_NODEPS_UI)
 	_graphics = new NativeGraphics(_surface, NULL, JPF_ARGB, _size.width, _size.height);
+#endif
+
 #elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
 #endif
@@ -478,7 +483,12 @@ void Window::InternalCreateWindow()
 	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
 	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 	
+#if defined(DIRECTFB_NODEPS_UI)
+	_graphics = new NativeGraphics(_surface, JPF_ARGB, _size.width, _size.height, true);
+#else
 	_graphics = new NativeGraphics(_surface, NULL, JPF_ARGB, _size.width, _size.height);
+#endif
+
 #elif defined(GTK3_UI)
   _window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 

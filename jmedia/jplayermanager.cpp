@@ -45,13 +45,20 @@ PlayerManager::~PlayerManager()
 
 Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 {
+	try {
 #if defined(DIRECTFB_MEDIA)
-	return new NativeLightPlayer(url_);
+		if (_hints[JPH_LIGHTWEIGHT] == false) {
+			return new NativeHeavyPlayer(url_);
+		}
+			
+		return new NativeLightPlayer(url_);
 #elif defined(LIBVLC_MEDIA)
-	return new NativeLightPlayer(url_);
+		return new NativeLightPlayer(url_);
 #elif defined(LIBAV_MEDIA)
-	return new NativeLightPlayer(url_);
+		return new NativeLightPlayer(url_);
 #endif
+	} catch (jcommon::Exception &e) {
+	}
 
 	return NULL;
 }

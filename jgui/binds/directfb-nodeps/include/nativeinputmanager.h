@@ -17,150 +17,191 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVELIGHTPLAYER_H
-#define J_NATIVELIGHTPLAYER_H
+#ifndef J_NATIVEINPUTMANAGER_H
+#define J_NATIVEINPUTMANAGER_H
 
-#include "jplayer.h"
-#include "jthread.h"
-#include "jcomponent.h"
+#include "jinputmanager.h"
 
-#include <vlc/vlc.h>
+#include <vector>
+#include <map>
+#include <list>
 
-namespace jmedia {
+#include <directfb.h>
 
-class NativeLightPlayer : public jmedia::Player, public jthread::Thread {
+namespace jgui {
 
-	public:
-		/** \brief */
-		libvlc_instance_t *_engine;
-		/** \brief */
-		libvlc_media_player_t *_provider;
-		/** \brief */
-		libvlc_event_manager_t *_event_manager;
+class EventBroadcaster;
+
+class NativeInputManager : public jgui::InputManager, public jthread::Thread{
+
+	friend class NativeHandler;
+
+	private:
 		/** \brief */
 		jthread::Mutex _mutex;
 		/** \brief */
-		std::string _file;
+		IDirectFBEventBuffer *events;
 		/** \brief */
-		jmedia::Control *_video_size;
+		uint64_t _last_keypress;
 		/** \brief */
-		jmedia::Control *_video_format;
+		int _mouse_x;
 		/** \brief */
-		jgui::Component *_component;
+		int _mouse_y;
 		/** \brief */
-		double _aspect;
+		int _click_delay;
 		/** \brief */
-		double _decode_rate;
+		int _click_count;
 		/** \brief */
-		uint64_t _media_time;
+		bool _is_initialized;
 		/** \brief */
-		bool _is_paused;
+		bool _is_key_enabled;
 		/** \brief */
-		bool _is_closed;
-		/** \brief */
-		bool _is_loop;
-		/** \brief */
-		bool _has_audio;
-		/** \brief */
-		bool _has_video;
-
-	private:
-		/**
-		 * \brief Loops a video at the end of media.
-		 *
-		 */
-		virtual void Run();
+		bool _is_mouse_enabled;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NativeLightPlayer(std::string file);
+		NativeInputManager();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~NativeLightPlayer();
+		virtual ~NativeInputManager();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Play();
+		virtual void Initialize();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Pause();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Stop();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Resume();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Close();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCurrentTime(uint64_t i);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint64_t GetCurrentTime();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint64_t GetMediaTime();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLoop(bool b);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsLoop();
+		virtual int TranslateToNativeKeyCode(int code);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual double GetDecodeRate();
+		virtual int TranslateToNativeKeyID(DFBInputDeviceKeyIdentifier id);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jkeyevent_symbol_t TranslateToNativeKeySymbol(DFBInputDeviceKeySymbol symbol);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetDecodeRate(double rate);
+		virtual void ProcessInputEvent(DFBInputEvent event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ProcessWindowEvent(DFBWindowEvent event);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jgui::Component * GetVisualComponent();
+		virtual void SetKeyEventsEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetMouseEventsEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsKeyEventsEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsMouseEventsEnabled();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetClickDelay(int ms);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetClickDelay();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void PostEvent(KeyEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void PostEvent(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Release();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Restore();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Run();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RegisterKeyListener(KeyListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveKeyListener(KeyListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RegisterMouseListener(MouseListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveMouseListener(MouseListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DispatchEvent(jcommon::EventObject *event);
 
 };
 

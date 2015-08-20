@@ -17,90 +17,188 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVELIGHTPLAYER_H
-#define J_NATIVELIGHTPLAYER_H
+#ifndef J_NATIVEHANDLER_H
+#define J_NATIVEHANDLER_H
 
-#include "jplayer.h"
-#include "jthread.h"
-#include "jcomponent.h"
+#include "jgfxhandler.h"
 
-#include <vlc/vlc.h>
+#include <directfb.h>
 
-namespace jmedia {
+namespace jgui{
 
-class NativeLightPlayer : public jmedia::Player, public jthread::Thread {
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class NativeHandler : public virtual jgui::GFXHandler{
 
-	public:
-		/** \brief */
-		libvlc_instance_t *_engine;
-		/** \brief */
-		libvlc_media_player_t *_provider;
-		/** \brief */
-		libvlc_event_manager_t *_event_manager;
-		/** \brief */
-		jthread::Mutex _mutex;
-		/** \brief */
-		std::string _file;
-		/** \brief */
-		jmedia::Control *_video_size;
-		/** \brief */
-		jmedia::Control *_video_format;
-		/** \brief */
-		jgui::Component *_component;
-		/** \brief */
-		double _aspect;
-		/** \brief */
-		double _decode_rate;
-		/** \brief */
-		uint64_t _media_time;
-		/** \brief */
-		bool _is_paused;
-		/** \brief */
-		bool _is_closed;
-		/** \brief */
-		bool _is_loop;
-		/** \brief */
-		bool _has_audio;
-		/** \brief */
-		bool _has_video;
+	friend class NativeImage;
+	friend class NativeFont;
+	friend class Window;
 
 	private:
-		/**
-		 * \brief Loops a video at the end of media.
-		 *
-		 */
-		virtual void Run();
+		/** \brief */
+		IDirectFB *_directfb;
+		/** \brief */
+		IDirectFBDisplayLayer *_layer;
+		/** \brief */
+		bool _is_cursor_enabled;
+
+	private:
+		/** \brief */
+		struct cursor_params_t {
+			Image *cursor;
+			int hot_x;
+			int hot_y;
+		};
+
+		/** \brief */
+		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NativeLightPlayer(std::string file);
+		NativeHandler();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~NativeHandler();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~NativeLightPlayer();
+		virtual void InitEngine();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Play();
+		virtual void InitCursors();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InitResources();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Add(Font *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Remove(Font *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Add(Image *);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Remove(Image *);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Pause();
+		IDirectFBDisplayLayer * GetDisplayLayer();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		bool CreateFont(std::string name, int size, IDirectFBFont **font);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetEngineID();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void * GetGraphicEngine();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Stop();
+		virtual jpoint_t GetCursorLocation();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCursorLocation(int x, int y);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetFlickerFilteringEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsFlickerFilteringEnabled();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCursorEnabled(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsCursorEnabled();
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCursor(jcursor_style_t t);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCursor(Image *shape, int hotx, int hoty);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Restore();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Release();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Suspend();
 
 		/**
 		 * \brief
@@ -112,55 +210,13 @@ class NativeLightPlayer : public jmedia::Player, public jthread::Thread {
 		 * \brief
 		 *
 		 */
-		virtual void Close();
+		virtual void WaitIdle();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetCurrentTime(uint64_t i);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint64_t GetCurrentTime();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual uint64_t GetMediaTime();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetLoop(bool b);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsLoop();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual double GetDecodeRate();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDecodeRate(double rate);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::Component * GetVisualComponent();
+		virtual void WaitSync();
 
 };
 

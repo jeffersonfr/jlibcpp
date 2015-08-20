@@ -17,84 +17,153 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_AUDIOCONFIGURATIONCONTROL_H
-#define J_AUDIOCONFIGURATIONCONTROL_H
+#ifndef J_NATIVEFONT_H
+#define J_NATIVEFONT_H
 
-#include "jcontrol.h"
+#include "jfont.h"
 
-namespace jmedia {
+#include <directfb.h>
 
-/**
- * \brief
- *
- */
-enum jaudio_config_mode_t {
-	ACM_HDMI_PCM,
-	ACM_HDMI_PCM_STEREO,
-	ACM_HDMI_COMPRESSED,
-	ACM_HDMI_PCM_2_1_CH,
-	ACM_HDMI_PCM_5_1_CH,
-	ACM_HDMI_PCM_7_1_CH
-};
-	
+namespace jgui {
+
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class AudioConfigurationControl : public Control {
+class NativeFont : public virtual jgui::Font{
+
+	friend class NativeGraphics;
+
+	private:
+		/** \brief */
+		static Font *_default_font;
+		/** \brief */
+		IDirectFBFont *_font;
+		/** \brief */
+		int _leading;
+		/** \brief */
+		int _ascender;
+		/** \brief */
+		int _descender;
+		/** \brief */
+		int _max_advance_width;
+		/** \brief */
+		int _max_advance_height;
+		/** \brief */
+		int _widths[256];
 
 	public:
 		/**
-		 * \brief 
+		 * \brief
 		 *
 		 */
-		AudioConfigurationControl();
+		NativeFont(std::string name, jfont_attributes_t attributes, int size);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~NativeFont();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~AudioConfigurationControl();
-
-		/**
-		 * \brief 
-		 *
-		 */
-		virtual void SetAudioMode(jaudio_config_mode_t);
+		virtual void ApplyContext(void *ctx);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jaudio_config_mode_t GetHDMIAudioMode();
+		virtual void * GetNativeFont();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetSPDIFPCM(bool pcm);
+		virtual std::string GetName();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetAscender();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetDescender();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetMaxAdvanceWidth();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetMaxAdvanceHeight();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetLeading();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetStringWidth(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jregion_t GetStringExtends(std::string text);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool IsSPDIFPCM();
+		virtual jregion_t GetGlyphExtends(int symbol);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetAudioDelay(int64_t delay);
+		virtual bool CanDisplay(int ch);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int64_t GetAudioDelay();
+		virtual int GetCharWidth(char ch);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual const int * GetCharWidths();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Release();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Restore();
 
 };
 
 }
 
-#endif 
+#endif /*NativeFONT_H*/

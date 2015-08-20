@@ -49,11 +49,11 @@ bool AudioConfigurationControl::IsSPDIFPCM()
 	return false;
 }
 
-void AudioConfigurationControl::SetAudioDelay()
+void AudioConfigurationControl::SetAudioDelay(int64_t delay)
 {
 }
 
-int AudioConfigurationControl::GetAudioDelay()
+int64_t AudioConfigurationControl::GetAudioDelay()
 {
 	return 0;
 }

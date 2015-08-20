@@ -24,11 +24,15 @@
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
 #include "jvolumecontrol.h"
+#include "jaudioconfigurationcontrol.h"
 #include "jmediaexception.h"
 #include "jgfxhandler.h"
-#include "genericimage.h"
 
+#if defined(DIRECTFB_NODEPS_UI)
+#include <directfb.h>
+#else
 #include <cairo.h>
+#endif
 
 namespace jmedia {
 
@@ -180,6 +184,43 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 
 		virtual void UpdateComponent()
 		{
+#if defined(DIRECTFB_NODEPS_UI)
+			if (IsRunning() == true) {
+				WaitThread();
+			}
+
+			IDirectFBSurface *frame;
+			DFBSurfaceDescription desc;
+			int sw = _media_width;
+			int sh = _media_height;
+
+			desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT | DSDESC_PREALLOCATED);
+			desc.caps = (DFBSurfaceCapabilities)(DSCAPS_NONE);
+			desc.width = sw;
+			desc.height = sh;
+			desc.pixelformat = DSPF_ARGB;
+			desc.preallocated[0].data = (uint8_t *)_buffer[(_buffer_index+1)%2];
+			desc.preallocated[0].pitch = sw*4;
+
+			IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
+
+			if (directfb->CreateSurface(directfb, &desc, &frame) == DFB_OK) {
+				_mutex.Lock();
+
+				if (_image != NULL) {
+					delete _image;
+					_image = NULL;
+				}
+
+				_image = new jgui::NativeImage(frame, jgui::JPF_ARGB, sw, sh);
+
+				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
+
+				_mutex.Unlock();
+
+				Start();
+			}
+#else
 			if (IsRunning() == true) {
 				WaitThread();
 			}
@@ -208,6 +249,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			_mutex.Unlock();
 
 			Start();
+#endif
 		}
 
 		virtual void Run()
@@ -283,6 +325,8 @@ void MediaEventsCallback(const libvlc_event_t *event, void *data)
 	//} else if (event->type == libvlc_MediaPlayerBackward) {
 	} else if (event->type == libvlc_MediaPlayerEndReached) {
 		player->DispatchPlayerEvent(new PlayerEvent(player, JPE_FINISHED));
+
+		player->Start();
 	// } else if (event->type == libvlc_MediaPlayerEncounteredError) {
 	// } else if (event->type == libvlc_MediaPlayerTimeChanged) {
 	// } else if (event->type == libvlc_MediaPlayerPositionChanged) {
@@ -407,6 +451,65 @@ class VolumeControlImpl : public VolumeControl {
 
 };
 
+class AudioConfigurationControlImpl : public AudioConfigurationControl {
+	
+	private:
+		/** \brief */
+		NativeLightPlayer *_player;
+
+	public:
+		AudioConfigurationControlImpl(NativeLightPlayer *player):
+			AudioConfigurationControl()
+		{
+			_player = player;
+		}
+
+		virtual ~AudioConfigurationControlImpl()
+		{
+		}
+
+		virtual void SetAudioMode(jaudio_config_mode_t)
+		{
+		}
+
+		virtual jaudio_config_mode_t GetHDMIAudioMode()
+		{
+			return AudioConfigurationControl::GetHDMIAudioMode();
+		}
+
+		virtual void SetSPDIFPCM(bool pcm)
+		{
+		}
+
+		virtual bool IsSPDIFPCM()
+		{
+			return AudioConfigurationControl::IsSPDIFPCM();
+		}
+
+		virtual void SetAudioDelay(int64_t delay)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+	
+			if (_player->_provider != NULL) {
+				 libvlc_audio_set_delay(_player->_provider, delay);
+			}
+		}
+
+		virtual int64_t GetAudioDelay()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+	
+			int64_t delay = 0LL;
+
+			if (_player->_provider != NULL) {
+				 delay = libvlc_audio_get_delay(_player->_provider);
+			}
+
+			return delay;
+		}
+
+};
+
 class VideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
@@ -513,6 +616,7 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 				_has_audio = true;
 
 				_controls.push_back(new VolumeControlImpl(this));
+				_controls.push_back(new AudioConfigurationControlImpl(this));
 			}
 		} else if (t->i_type == libvlc_track_video) {
 			if (_has_video == false) {
@@ -525,19 +629,38 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 
 	libvlc_media_tracks_release(tracks, count);
 
-	uint32_t iw;
-	uint32_t ih;
+	uint32_t iw = 1;
+	uint32_t ih = 1;
 
-	if (libvlc_video_get_size(_provider, 0, &iw, &ih) != 0) {
-		throw jcommon::RuntimeException("Cannot retrive the size of media content");
-	}
+	if (_has_video == true) {
+		if (libvlc_video_get_size(_provider, 0, &iw, &ih) != 0 || iw <= 0 || ih <= 0) {
+			// CHANGE:: fix this section (currently needed to wait the finshing of tracks loading)
+			libvlc_audio_set_mute(_provider, 1);
+			libvlc_media_player_play(_provider);
+			libvlc_media_player_pause(_provider);
 
-	if (iw <= 0 || ih <= 0) {
-		throw jcommon::RuntimeException("Invalid size of media content");
-	}
+			// waits 5 seconds to get video size
+			for (int i=0; i<50; i++) {
+				libvlc_video_get_size(_provider, 0, &iw, &ih);
 
-	if (_aspect == 0.0) {
-		_aspect = (double)(iw/(double)ih);
+				if (iw > 0 && ih > 0) {
+					break;
+				}
+
+				usleep(100000);
+			}
+
+			libvlc_media_player_stop(_provider);
+			libvlc_audio_set_mute(_provider, 0);
+
+			if (iw <= 0 || ih <= 0) {
+				throw jcommon::RuntimeException("Cannot retrive the size of media content");
+			}
+		}
+
+		if (_aspect == 0.0) {
+			_aspect = (double)(iw/(double)ih);
+		}
 	}
 
 	_media_time = (uint64_t)libvlc_media_get_duration(media);
@@ -611,6 +734,10 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 
 NativeLightPlayer::~NativeLightPlayer()
 {
+	if (IsRunning() == true) {
+		WaitThread();
+	}
+
 	for (int i=0; i<mi_events_len; i++) {
 		libvlc_event_detach(_event_manager, mi_events[i], MediaEventsCallback, this);
 	}
@@ -627,6 +754,15 @@ NativeLightPlayer::~NativeLightPlayer()
 	}
 
 	_controls.clear();
+}
+
+void NativeLightPlayer::Run()
+{
+	Stop();
+
+	if (IsLoop() == true) {
+		Play();
+	}
 }
 
 void NativeLightPlayer::Play()

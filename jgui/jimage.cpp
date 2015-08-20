@@ -140,7 +140,11 @@ Image * Image::CreateImage(jio::InputStream *stream)
 
 	try {
 #if defined(DIRECTFB_UI)
+	#if defined(DIRECTFB_NODEPS_UI)
+			image = NativeImage::CreateImageStream(stream);
+	#else
 			image = new NativeImage(stream);
+	#endif
 #elif defined(GTK3_UI)
 			image = new NativeImage(stream);
 #elif defined(SDL2_UI)

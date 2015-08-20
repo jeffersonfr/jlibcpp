@@ -28,3 +28,7 @@ all:
 
 ## Makefile -- with pkgconfig -- end ##
 
+:Problems
+
+1. with ENABLE_MEDIA=libvlc the jmedia not working corretly with lua
+R: disable or remove the lua plugin "/usr/lib/vlc/plugins/lua/liblua_plugin.so"

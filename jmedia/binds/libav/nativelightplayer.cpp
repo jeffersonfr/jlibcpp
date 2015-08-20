@@ -27,6 +27,7 @@
 #include "jmediaexception.h"
 #include "jgfxhandler.h"
 #include "genericimage.h"
+#include "avplay.h"
 
 #include <cairo.h>
 
@@ -326,6 +327,8 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 };
 
+VideoState *_provider = NULL;
+
 NativeLightPlayer::NativeLightPlayer(std::string file):
 	jmedia::Player()
 {
@@ -342,7 +345,11 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 	_aspect = 16.0/9.0;
 	_media_time = 0LL;
 	
-	// _component = new VideoLightweightImpl(this, 0, 0, iw, ih);
+	avplay_init();
+
+	_provider = avplay_open(_file.c_str());
+
+	_component = new VideoLightweightImpl(this, 0, 0, 100, 100);//iw, ih);
 }
 
 NativeLightPlayer::~NativeLightPlayer()
@@ -431,15 +438,11 @@ void NativeLightPlayer::Close()
 
 	_is_closed = true;
 
-	/*
 	if (_provider != NULL) {
-		libvlc_media_player_release(_provider);
-		_provider = NULL;
+		avplay_close(_provider);
 
-		libvlc_release(_engine);
-		_engine = NULL;
+		_provider = NULL;
 	}
-	*/
 }
 
 void NativeLightPlayer::SetCurrentTime(uint64_t time)

@@ -17,81 +17,117 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_AUDIOCONFIGURATIONCONTROL_H
-#define J_AUDIOCONFIGURATIONCONTROL_H
+#ifndef J_NATIVEIMAGE_H
+#define J_NATIVEIMAGE_H
 
-#include "jcontrol.h"
+#include "jimage.h"
 
-namespace jmedia {
+#include <stdint.h>
+#include <string.h>
 
-/**
- * \brief
- *
- */
-enum jaudio_config_mode_t {
-	ACM_HDMI_PCM,
-	ACM_HDMI_PCM_STEREO,
-	ACM_HDMI_COMPRESSED,
-	ACM_HDMI_PCM_2_1_CH,
-	ACM_HDMI_PCM_5_1_CH,
-	ACM_HDMI_PCM_7_1_CH
-};
-	
+namespace jgui{
+
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class AudioConfigurationControl : public Control {
+class NativeImage : public jgui::Image{
+
+	private:
+		/** \brief */
+		uint8_t *_buffer;
 
 	public:
 		/**
-		 * \brief 
+		 * \brief
 		 *
 		 */
-		AudioConfigurationControl();
+		NativeImage(void *surface, jpixelformat_t pixelformat, int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		NativeImage(std::string file);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~NativeImage();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~AudioConfigurationControl();
-
+		static jsize_t GetImageSize(std::string img);
+		
 		/**
-		 * \brief 
+		 * \brief
 		 *
 		 */
-		virtual void SetAudioMode(jaudio_config_mode_t);
+		static Image * CreateImageStream(jio::InputStream *stream);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jaudio_config_mode_t GetHDMIAudioMode();
+		static Image * Flip(Image *img, jflip_flags_t t);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetSPDIFPCM(bool pcm);
+		static Image * Rotate(Image *img, double radians, bool resize);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual bool IsSPDIFPCM();
+		static Image * Scale(Image *img, int width, int height);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetAudioDelay(int64_t delay);
+		static Image * Crop(Image *img, int x, int y, int width, int height);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int64_t GetAudioDelay();
+		static Image * Blend(Image *img, double alpha);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static Image * Colorize(Image *img, Color color);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetPixels(uint8_t *buffer, int xp, int yp, int wp, int hp, int stride);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, int *stride);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Release();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Restore();
 
 };
 
