@@ -1631,8 +1631,6 @@ class ModulesTest : public jgui::Frame, public jgui::ButtonListener, public jgui
 				_current = _calendar;
 			} else if (event->GetSource() == _button3) {
 				_current = new WindowTest();
-
-				_current->Show();
 			} else if (event->GetSource() == _button4) {
 				_current = _message_1;
 

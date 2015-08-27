@@ -31,9 +31,7 @@ CheckButtonGroup::~CheckButtonGroup()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	for (std::vector<CheckButton *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
-		(*i)->RemoveCheckButtonListener(this);
-	}
+	// INFO:: the user must remove listeners manually
 }
 
 void CheckButtonGroup::Add(CheckButton *button)

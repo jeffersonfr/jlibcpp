@@ -21,12 +21,20 @@
 #include "jurl.h"
 
 #if defined(DIRECTFB_MEDIA)
-#include "nativelightplayer.h"
-#include "nativeheavyplayer.h"
-#elif defined(LIBVLC_MEDIA)
-#include "nativelightplayer.h"
-#elif defined(LIBAV_MEDIA)
-#include "nativelightplayer.h"
+#include "directfblightplayer.h"
+#include "directfbheavyplayer.h"
+#endif
+
+#if defined(LIBVLC_MEDIA)
+#include "libvlclightplayer.h"
+#endif
+
+#if defined(LIBAV_MEDIA)
+#include "libavlightplayer.h"
+#endif
+
+#if defined(LIBXINE_MEDIA)
+#include "libxinelightplayer.h"
 #endif
 
 namespace jmedia {
@@ -45,20 +53,44 @@ PlayerManager::~PlayerManager()
 
 Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 {
-	try {
+	if (_hints.size() == 0) {
+		_hints[JPH_CACHING] = false;
+		_hints[JPH_LIGHTWEIGHT] = false;
+		_hints[JPH_SECURITY] = false;
+		_hints[JPH_PLUGINS] = false;
+	}
+
 #if defined(DIRECTFB_MEDIA)
+	try {
 		if (_hints[JPH_LIGHTWEIGHT] == false) {
-			return new NativeHeavyPlayer(url_);
+			return new DirectFBHeavyPlayer(url_);
 		}
 			
-		return new NativeLightPlayer(url_);
-#elif defined(LIBVLC_MEDIA)
-		return new NativeLightPlayer(url_);
-#elif defined(LIBAV_MEDIA)
-		return new NativeLightPlayer(url_);
-#endif
+		return new DirectFBLightPlayer(url_);
 	} catch (jcommon::Exception &e) {
 	}
+#endif
+
+#if defined(LIBVLC_MEDIA)
+	try {
+		return new LibVLCLightPlayer(url_);
+	} catch (jcommon::Exception &e) {
+	}
+#endif
+
+#if defined(LIBAV_MEDIA)
+	try {
+		return new LibAVLightPlayer(url_);
+	} catch (jcommon::Exception &e) {
+	}
+#endif
+	
+#if defined(LIBXINE_MEDIA)
+	try {
+		return new LibXineLightPlayer(url_);
+	} catch (jcommon::Exception &e) {
+	}
+#endif
 
 	return NULL;
 }

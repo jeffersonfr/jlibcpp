@@ -35,7 +35,7 @@ struct jmedia_info_t {
 	std::string album;
 	std::string genre;
 	std::string comments;
-	int year;
+	std::string date;
 };
 
 /**

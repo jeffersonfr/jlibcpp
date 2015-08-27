@@ -949,11 +949,13 @@ void Window::InternalRepaint(Component *cmp)
 		return;
 	}
 
+	_graphics_mutex.Lock();
+
 	if (_graphics == NULL) {
+		_graphics_mutex.Unlock();
+
 		return;
 	}
-
-	_graphics_mutex.Lock();
 
 	jpoint_t t = _graphics->Translate();
 

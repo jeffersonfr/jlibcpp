@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVEHEAVYPLAYER_H
-#define J_NATIVEHEAVYPLAYER_H
+#ifndef J_NATIVELIGHTPLAYER_H
+#define J_NATIVELIGHTPLAYER_H
 
 #include "jplayer.h"
 #include "jthread.h"
@@ -28,7 +28,7 @@
 
 namespace jmedia {
 
-class NativeHeavyPlayer : public jmedia::Player, public jthread::Thread {
+class DirectFBLightPlayer : public jmedia::Player, public jthread::Thread {
 
 	public:
 		/** \brief */
@@ -72,13 +72,13 @@ class NativeHeavyPlayer : public jmedia::Player, public jthread::Thread {
 		 * \brief
 		 *
 		 */
-		NativeHeavyPlayer(std::string file);
+		DirectFBLightPlayer(std::string file);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~NativeHeavyPlayer();
+		virtual ~DirectFBLightPlayer();
 
 		/**
 		 * \brief

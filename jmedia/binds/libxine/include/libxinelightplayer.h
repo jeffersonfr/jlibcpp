@@ -17,16 +17,19 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVELIGHTPLAYER_H
-#define J_NATIVELIGHTPLAYER_H
+#ifndef J_LIBXINELIGHTPLAYER_H
+#define J_LIBXINELIGHTPLAYER_H
 
 #include "jplayer.h"
 #include "jthread.h"
 #include "jcomponent.h"
 
+#include <xine.h>
+#include <xine/xineutils.h>
+
 namespace jmedia {
 
-class NativeLightPlayer : public jmedia::Player {
+class LibXineLightPlayer : public jmedia::Player {
 
 	public:
 		/** \brief */
@@ -44,30 +47,44 @@ class NativeLightPlayer : public jmedia::Player {
 		/** \brief */
 		double _decode_rate;
 		/** \brief */
+		double _frame_rate;
+		/** \brief */
 		uint64_t _media_time;
 		/** \brief */
 		bool _is_paused;
 		/** \brief */
-		bool _is_closed;
-		/** \brief */
 		bool _is_loop;
+		/** \brief */
+		bool _is_closed;
 		/** \brief */
 		bool _has_audio;
 		/** \brief */
 		bool _has_video;
+		/** \brief */
+		xine_t *_xine;
+		/** \brief */
+		xine_stream_t *_stream;
+		/** \brief */
+		xine_video_port_t *_vo_port;
+		/** \brief */
+		xine_audio_port_t *_ao_port;
+		/** \brief */
+		xine_event_queue_t *_event_queue;
+		/** \brief */
+		xine_post_t *_post;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NativeLightPlayer(std::string file);
+		LibXineLightPlayer(std::string file);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~NativeLightPlayer();
+		virtual ~LibXineLightPlayer();
 
 		/**
 		 * \brief

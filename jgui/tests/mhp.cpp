@@ -265,7 +265,7 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 
 		virtual void Run()
 		{
-			InternalCreateWindow();
+			Show();
 
 			jgui::Graphics *gb = _buffer->GetGraphics();
 			jgui::Graphics *g = GetGraphics();

@@ -36,8 +36,8 @@ GenericImage::GenericImage(cairo_t *cairo_context, jpixelformat_t pixelformat, i
 {
 	jcommon::Object::SetClassName("jgui::GenericImage");
 
-	if (width < 1 || height < 1) {
-		throw jcommon::RuntimeException("Invalid image size");
+	if (width <= 0 || height <= 0) {
+		throw jcommon::RuntimeException("Image must have width and height greater than 0");
 	}
 
 	_graphics = new GenericGraphics(NULL, cairo_context, pixelformat, width, height);

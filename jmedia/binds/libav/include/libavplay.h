@@ -19,7 +19,7 @@ extern "C" {
 # include "libavfilter/buffersrc.h"
 #endif
 
-#include "cmdutils.h"
+#include "libavutils.h"
 }
 
 #define MAX_QUEUE_SIZE (15 * 1024 * 1024)
@@ -51,6 +51,7 @@ typedef struct PacketQueue {
     int abort_request;
     pthread_mutex_t mutex;
     pthread_cond_t cond;
+		AVPacket flush_pkt;
 } PacketQueue;
 
 #define VIDEO_PICTURE_QUEUE_SIZE 2
@@ -80,6 +81,9 @@ enum {
     AV_SYNC_EXTERNAL_CLOCK, /* synchronize to an external clock */
 };
 
+typedef void( * render_callback_t)(void *data, uint8_t *buffer, int width, int height);
+typedef void( * endofmedia_callback_t)(void *data);
+
 typedef struct VideoState {
     pthread_t parse_tid;
     pthread_t video_tid;
@@ -91,14 +95,33 @@ typedef struct VideoState {
     int last_paused;
     int seek_req;
     int seek_flags;
+		int loop;
     int64_t seek_pos;
     int64_t seek_rel;
     int read_pause_return;
     AVFormatContext *ic;
 
+		render_callback_t render_callback;
+		void *render_callback_data;
+		endofmedia_callback_t endofmedia_callback;
+		void *endofmedia_callback_data;
+
+		int64_t sws_flags;
+
+		/* options specified by the user */
+		int seek_by_bytes;
+		int av_sync_type;
+		int64_t start_time;
+		int64_t duration;
+		int framedrop;
+		int infinite_buffer;
+
+#if CONFIG_AVFILTER
+		char *vfilters;
+#endif
+
     int audio_stream;
 
-    int av_sync_type;
     double external_clock; /* external clock base */
     int64_t external_clock_time;
 
@@ -182,6 +205,18 @@ void avplay_init();
 void avplay_release();
 VideoState *avplay_open(const char *filename);
 void avplay_close(VideoState *is);
+void avplay_set_rendercallback(VideoState *is, render_callback_t cb, void *data);
+void avplay_set_endofmediacallback(VideoState *is, endofmedia_callback_t cb, void *data);
+void avplay_play(VideoState *is);
 void avplay_pause(VideoState *is, bool state);
+void avplay_stop(VideoState *is);
+void avplay_setloop(VideoState *is, bool state);
+bool avplay_isloop(VideoState *is);
 void avplay_mute(VideoState *is, bool state);
-void avplay_seek(VideoState *is, int incr);
+void avplay_setvolume(VideoState *is, int level);
+int avplay_getvolume(VideoState *is);
+int64_t avplay_getmediatime(VideoState *is);
+int64_t avplay_getcurrentmediatime(VideoState *is);
+void avplay_setcurrentmediatime(VideoState *is, int64_t time);
+const char * avplay_getmetadata(VideoState *is, const char *id);
+

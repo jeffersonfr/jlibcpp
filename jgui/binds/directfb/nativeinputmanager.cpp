@@ -22,10 +22,6 @@
 #include "jwindowmanager.h"
 #include "jdate.h"
 
-#ifndef CLAMP
-#define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-#endif
-
 namespace jgui {
 
 NativeInputManager::NativeInputManager():

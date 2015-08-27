@@ -17,26 +17,24 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVELIGHTPLAYER_H
-#define J_NATIVELIGHTPLAYER_H
+#ifndef J_NATIVEHEAVYPLAYER_H
+#define J_NATIVEHEAVYPLAYER_H
 
 #include "jplayer.h"
 #include "jthread.h"
 #include "jcomponent.h"
 
-#include <vlc/vlc.h>
+#include <directfb.h>
 
 namespace jmedia {
 
-class NativeLightPlayer : public jmedia::Player, public jthread::Thread {
+class DirectFBHeavyPlayer : public jmedia::Player, public jthread::Thread {
 
 	public:
 		/** \brief */
-		libvlc_instance_t *_engine;
+		IDirectFBVideoProvider *_provider;
 		/** \brief */
-		libvlc_media_player_t *_provider;
-		/** \brief */
-		libvlc_event_manager_t *_event_manager;
+		IDirectFBEventBuffer *_events;
 		/** \brief */
 		jthread::Mutex _mutex;
 		/** \brief */
@@ -52,8 +50,6 @@ class NativeLightPlayer : public jmedia::Player, public jthread::Thread {
 		/** \brief */
 		double _decode_rate;
 		/** \brief */
-		uint64_t _media_time;
-		/** \brief */
 		bool _is_paused;
 		/** \brief */
 		bool _is_closed;
@@ -66,23 +62,23 @@ class NativeLightPlayer : public jmedia::Player, public jthread::Thread {
 
 	private:
 		/**
-		 * \brief Loops a video at the end of media.
+		 * \brief
 		 *
 		 */
-		virtual void Run();
-
+		static void Callback(void *ctx);
+		
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NativeLightPlayer(std::string file);
+		DirectFBHeavyPlayer(std::string file);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~NativeLightPlayer();
+		virtual ~DirectFBHeavyPlayer();
 
 		/**
 		 * \brief
@@ -162,6 +158,12 @@ class NativeLightPlayer : public jmedia::Player, public jthread::Thread {
 		 */
 		virtual jgui::Component * GetVisualComponent();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Run();
+		
 };
 
 }

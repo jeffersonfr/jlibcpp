@@ -17,9 +17,9 @@
 #   Free Software Foundation, Inc.,                                       *
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
-ifeq ($(ENABLE_MEDIA),none)
+ifeq ($(findstring directfb, $(ENABLE_MEDIA)), directfb)
 	CCFLAGS		+= \
-		 -Ijmedia/binds/$(ENABLE_MEDIA)/include \
+		 -Ijmedia/binds/directfb/include \
 
 	LDFLAGS		+= \
 
@@ -28,17 +28,17 @@ ifeq ($(ENABLE_MEDIA),none)
 
 	REQUIRES	+= \
 
-	OBJS_media	+= \
-		 nativelightplayer.o\
-		 nativeheavyplayer.o\
+	OBJS_directfb	+= \
+		 directfblightplayer.o\
+		 directfbheavyplayer.o\
 
-	OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
+	OBJS_jmedia	+= $(addprefix binds/directfb/,$(OBJS_directfb))
 
 endif
 
-ifeq ($(ENABLE_MEDIA),libvlc)
+ifeq ($(findstring libvlc, $(ENABLE_MEDIA)), libvlc)
 	CCFLAGS		+= \
-		 -Ijmedia/binds/$(ENABLE_MEDIA)/include \
+		 -Ijmedia/binds/libvlc/include \
 		 `pkg-config --cflags libvlc` \
 
 	LDFLAGS		+= \
@@ -49,17 +49,17 @@ ifeq ($(ENABLE_MEDIA),libvlc)
 
 	REQUIRES	+= \
 
-	OBJS_media	+= \
-		 nativelightplayer.o\
+	OBJS_libvlc	+= \
+		 libvlclightplayer.o\
 
-	OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
+	OBJS_jmedia	+= $(addprefix binds/libvlc/,$(OBJS_libvlc))
 
 endif
 
-ifeq ($(ENABLE_MEDIA),libav)
+ifeq ($(findstring libav, $(ENABLE_MEDIA)), libav)
 	CCFLAGS		+= \
 		 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPIC -DZLIB_CONST -O3 \
-		 -Ijmedia/binds/$(ENABLE_MEDIA)/include \
+		 -Ijmedia/binds/libav/include \
 		 `pkg-config --cflags libavcodec libavformat libavresample libavutil libavfilter libswscale libavdevice directfb sdl` \
 		 -lm -lbz2 -lasound \
 
@@ -71,12 +71,32 @@ ifeq ($(ENABLE_MEDIA),libav)
 
 	REQUIRES	+= \
 
-	OBJS_media	+= \
-		 cmdutils.o\
-		 avplay.o\
-		 nativelightplayer.o\
+	OBJS_libav	+= \
+		 libavplay.o\
+		 libavutils.o\
+		 libavlightplayer.o\
 
-	OBJS_jmedia	= $(addprefix binds/$(ENABLE_MEDIA)/,$(OBJS_media))
+	OBJS_jmedia	+= $(addprefix binds/libav/,$(OBJS_libav))
+
+endif
+
+ifeq ($(findstring libxine, $(ENABLE_MEDIA)), libxine)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/libxine/include \
+		 `pkg-config --cflags libxine` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs libxine` \
+
+	DEFINES		+= \
+		 -DLIBXINE_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_libxine	+= \
+		 libxinelightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/libxine/,$(OBJS_libxine))
 
 endif
 

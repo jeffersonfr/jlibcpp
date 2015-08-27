@@ -21,6 +21,7 @@
 #define J_VIDEOFORMATCONTROL_H
 
 #include "jcontrol.h"
+#include "jgraphics.h"
 
 namespace jmedia {
 
@@ -169,6 +170,19 @@ class VideoFormatControl : public Control {
 		virtual void SetSharpness(int value);
 
 		/**
+		 * \brief Define a value to HUE. The value must is between [0..100].
+		 *
+		 * \param value 
+		 */
+		virtual void SetGamma(int value);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jgui::jsize_t GetFrameSize();
+
+		/**
 		 * \brief Returns the aspect ratio.
 		 *
 		 * \return 
@@ -230,6 +244,13 @@ class VideoFormatControl : public Control {
 		 * \return 
 		 */
 		virtual int GetSharpness();
+
+		/**
+		 * \brief Returns the HUE.
+		 *
+		 * \return 
+		 */
+		virtual int GetGamma();
 
 };
 

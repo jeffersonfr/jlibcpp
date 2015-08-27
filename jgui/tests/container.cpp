@@ -347,6 +347,10 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 	{
 		jthread::AutoLock lock(&teste_mutex);
 
+		_radio1->RemoveCheckButtonListener(this);
+		_radio2->RemoveCheckButtonListener(this);
+		_radio3->RemoveCheckButtonListener(this);
+
 		Hide();
 
 		delete _animation;

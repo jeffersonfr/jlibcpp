@@ -25,10 +25,6 @@
 #include <gdk/gdktypes.h>
 #include <gdk/gdkkeysyms-compat.h>
 
-#ifndef CLAMP
-#define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-#endif
-
 #define KEY_PRESS_EVENT_NAME "key_press_event"
 #define MOUSE_MOTION_EVENT_NAME "motion_notify_event"
 #define MOUSE_PRESS_EVENT_NAME "button_press_event"

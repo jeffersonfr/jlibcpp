@@ -2,4 +2,9 @@
 2. gethostbyname is obsolescent, use getnameinfo() instead.
 4. add TreeLock() and TreeUnlock() in jgui/jcomponent
 6. add fonts in themes
-7. implement the othres composition methods in jgraphics::SetRGB()
+7. implement the others composition methods in jgraphics::SetRGB()
+8. (sdl2) scrolls only working if drag window by title bar before
+9. (sdl2) cube/newvox/pacman/sort/som neeeds sync Window.Repaint() to avoid sleep() calls after repaints
+10. (sdl2) mhp/noise needs sync Window.Show() to make possible call Window.GetGraphics() != NULL
+11. (sdl2) agenda/phone breaks if create/release some windows
+12. (sdl2) rotateimage/stress has the same problem (cannot find a display)

@@ -17,26 +17,23 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVELIGHTPLAYER_H
-#define J_NATIVELIGHTPLAYER_H
+#ifndef J_LIBAVLIGHTPLAYER_H
+#define J_LIBAVLIGHTPLAYER_H
 
 #include "jplayer.h"
 #include "jthread.h"
 #include "jcomponent.h"
-
-#include <directfb.h>
+#include "libavplay.h"
 
 namespace jmedia {
 
-class NativeLightPlayer : public jmedia::Player, public jthread::Thread {
+class LibAVLightPlayer : public jmedia::Player {
 
 	public:
 		/** \brief */
-		IDirectFBVideoProvider *_provider;
-		/** \brief */
-		IDirectFBEventBuffer *_events;
-		/** \brief */
 		jthread::Mutex _mutex;
+		/** \brief */
+		VideoState *_provider;
 		/** \brief */
 		std::string _file;
 		/** \brief */
@@ -50,35 +47,28 @@ class NativeLightPlayer : public jmedia::Player, public jthread::Thread {
 		/** \brief */
 		double _decode_rate;
 		/** \brief */
+		uint64_t _media_time;
+		/** \brief */
 		bool _is_paused;
 		/** \brief */
 		bool _is_closed;
-		/** \brief */
-		bool _is_loop;
 		/** \brief */
 		bool _has_audio;
 		/** \brief */
 		bool _has_video;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		static void Callback(void *ctx);
-		
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NativeLightPlayer(std::string file);
+		LibAVLightPlayer(std::string file);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~NativeLightPlayer();
+		virtual ~LibAVLightPlayer();
 
 		/**
 		 * \brief
@@ -158,12 +148,6 @@ class NativeLightPlayer : public jmedia::Player, public jthread::Thread {
 		 */
 		virtual jgui::Component * GetVisualComponent();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
-		
 };
 
 }

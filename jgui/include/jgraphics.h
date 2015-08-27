@@ -25,6 +25,10 @@
 
 #include <math.h>
 
+#ifndef CLAMP
+#define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
+#endif
+
 namespace jgui{
 
 /**
@@ -181,6 +185,15 @@ struct jline_t {
 	int y0;
 	int x1;
 	int y1;
+};
+
+/**
+ * \brief
+ *
+ */
+struct jaspect_t {
+	int num;
+	int den;
 };
 
 class Window;

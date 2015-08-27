@@ -29,7 +29,7 @@
    Studio) will not omit unused inline functions and create undefined
    references to libraries that are not being built. */
 
-#include "config.h"
+#include "libavconfig.h"
 
 extern "C" {
 #include "libavfilter/avfilter.h"
@@ -40,7 +40,7 @@ extern "C" {
 #include "libavutil/pixdesc.h"
 #include "libavutil/eval.h"
 #include "libavutil/opt.h"
-#include "cmdutils.h"
+#include "libavutils.h"
 
 #if CONFIG_NETWORK
 #include "libavformat/network.h"
@@ -166,7 +166,7 @@ void show_help_children(const AVClass *clasz, int flags)
     av_opt_show2(&clasz, NULL, flags, 0);
     printf("\n");
 
-    while (child = av_opt_child_class_next(clasz, child))
+    while ((child = av_opt_child_class_next(clasz, child)))
         show_help_children(child, flags);
 }
 
@@ -176,7 +176,7 @@ static const OptionDef *find_option(const OptionDef *po, const char *name)
     int len = p ? p - name : strlen(name);
 
     while (po->name) {
-        if (!strncmp(name, po->name, len) && strlen(po->name) == len)
+        if (!strncmp(name, po->name, len) && len == (int)strlen(po->name))
             break;
         po++;
     }
@@ -1423,7 +1423,7 @@ int cmdutils_read_file(const char *filename, char **bufptr, size_t *size)
         goto out;
     }
     ret = fread(*bufptr, 1, *size, f);
-    if (ret < *size) {
+    if (ret < (int)*size) {
         av_free(*bufptr);
         if (ferror(f)) {
             av_log(NULL, AV_LOG_ERROR, "Error while reading file '%s': %s\n",
@@ -1508,7 +1508,7 @@ int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec)
         return strtol(spec, NULL, 0) == st->index;
     else if (*spec == 'v' || *spec == 'a' || *spec == 's' || *spec == 'd' ||
              *spec == 't') { /* opt:[vasdt] */
-        enum AVMediaType type;
+        enum AVMediaType type = AVMEDIA_TYPE_DATA;
 
         switch (*spec++) {
         case 'v': type = AVMEDIA_TYPE_VIDEO;      break;
@@ -1522,7 +1522,7 @@ int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec)
             return 0;
         if (*spec++ == ':') { /* possibly followed by :index */
             int i, index = strtol(spec, NULL, 0);
-            for (i = 0; i < s->nb_streams; i++)
+            for (i = 0; i < (int)s->nb_streams; i++)
                 if (s->streams[i]->codec->codec_type == type && index-- == 0)
                    return i == st->index;
             return 0;
@@ -1533,19 +1533,19 @@ int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec)
         char *endptr;
         spec += 2;
         prog_id = strtol(spec, &endptr, 0);
-        for (i = 0; i < s->nb_programs; i++) {
+        for (i = 0; i < (int)s->nb_programs; i++) {
             if (s->programs[i]->id != prog_id)
                 continue;
 
             if (*endptr++ == ':') {
                 int stream_idx = strtol(endptr, NULL, 0);
                 return stream_idx >= 0 &&
-                    stream_idx < s->programs[i]->nb_stream_indexes &&
-                    st->index == s->programs[i]->stream_index[stream_idx];
+                    stream_idx < (int)s->programs[i]->nb_stream_indexes &&
+                    st->index == (int)s->programs[i]->stream_index[stream_idx];
             }
 
-            for (j = 0; j < s->programs[i]->nb_stream_indexes; j++)
-                if (st->index == s->programs[i]->stream_index[j])
+            for (j = 0; j < (int)s->programs[i]->nb_stream_indexes; j++)
+                if (st->index == (int)s->programs[i]->stream_index[j])
                     return 1;
         }
         return 0;
@@ -1612,9 +1612,11 @@ AVDictionary *filter_codec_opts(AVDictionary *opts, enum AVCodecID codec_id,
         prefix  = 's';
         flags  |= AV_OPT_FLAG_SUBTITLE_PARAM;
         break;
+		default:
+				break;
     }
 
-    while (t = av_dict_get(opts, "", t, AV_DICT_IGNORE_SUFFIX)) {
+    while ((t = av_dict_get(opts, "", t, AV_DICT_IGNORE_SUFFIX))) {
         char *p = strchr(t->key, ':');
 
         /* check stream specification in opt name */
@@ -1655,7 +1657,7 @@ AVDictionary **setup_find_stream_info_opts(AVFormatContext *s,
                "Could not alloc memory for stream options.\n");
         return NULL;
     }
-    for (i = 0; i < s->nb_streams; i++)
+    for (i = 0; i < (int)s->nb_streams; i++)
         opts[i] = filter_codec_opts(codec_opts, s->streams[i]->codec->codec_id,
                                     s, s->streams[i], NULL);
     return opts;

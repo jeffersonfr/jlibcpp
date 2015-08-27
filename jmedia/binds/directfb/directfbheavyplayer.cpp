@@ -18,27 +18,27 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "nativelightplayer.h"
+#include "directfbheavyplayer.h"
 #include "nativeimage.h"
+#include "nativegraphics.h"
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
 #include "jvolumecontrol.h"
 #include "jmediaexception.h"
 #include "jimage.h"
+#include "jwindow.h"
 #include "jgfxhandler.h"
 
-#if defined(DIRECTFB_NODEPS_UI)
 #include <directfb.h>
-#else
-#include <cairo.h>
-#endif
 
 namespace jmedia {
 
-class VideoLightweightImpl : public jgui::Component, jthread::Thread {
+class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 
 	public:
+		/** \brief */
+		IDirectFBWindow *_window;
 		/** \brief */
 		IDirectFBSurface *_surface;
 		/** \brief */
@@ -50,34 +50,13 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
-		jgui::jregion_t _dst;
-		/** \brief */
-		bool _diff;
+		jgui::jsize_t _frame_size;
 
 	public:
-		VideoLightweightImpl(Player *player, int x, int y, int w, int h):
-			jgui::Component(x, y, w, h)
+		VideoOverlayImpl(Player *player, int x, int y, int w, int h):
+			jgui::Component(x, y, w, h),
+			_mutex(jthread::JMT_RECURSIVE)
 		{
-			IDirectFB *engine = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
-
-			DFBSurfaceDescription desc;
-
-			desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_CAPS |  DSDESC_PIXELFORMAT);
-			desc.caps = (DFBSurfaceCapabilities)DSCAPS_DOUBLE;
-			desc.pixelformat = DSPF_ARGB;
-			desc.width = w;
-			desc.height = h;
-
-			if (engine->CreateSurface(engine, &desc, &_surface) != DFB_OK) {
-				throw jcommon::RuntimeException("Cannot allocate memory to the image surface");
-			}
-
-			_surface->SetPorterDuff(_surface, DSPD_NONE);
-			_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
-			_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
-
-			_image = NULL;
-
 			_player = player;
 
 			_src.x = 0;
@@ -85,42 +64,91 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			_src.width = w;
 			_src.height = h;
 
-			_dst.x = 0;
-			_dst.y = 0;
-			_dst.width = w;
-			_dst.height = h;
+			_frame_size.width = w;
+			_frame_size.height = h;
 
-			_diff = false;
+			jgui::GFXHandler *handler = jgui::GFXHandler::GetInstance();
+			IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
+
+			DFBWindowDescription desc;
+
+			desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_STACKING | DWDESC_SURFACE_CAPS);
+			desc.caps   = (DFBWindowCapabilities)(DWCAPS_NODECORATION);
+			desc.pixelformat = DSPF_RGB32;
+			desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_FLIPPING | DSCAPS_DOUBLE);
+			desc.options = (DFBWindowOptions)(DWOP_SCALE);
+			desc.stacking = DWSC_UPPER;
+			desc.posx   = _location.x;
+			desc.posy   = _location.y;
+			desc.width  = _size.width;
+			desc.height = _size.height;
+
+			/*
+			desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_STACKING);
+			desc.caps   = (DFBWindowCapabilities)(DWCAPS_ALPHACHANNEL | DWCAPS_NODECORATION);
+			desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_PREMULTIPLIED | DSCAPS_FLIPPING | DSCAPS_DOUBLE);
+			desc.pixelformat = DSPF_ARGB;
+			desc.options = (DFBWindowOptions) (DWOP_ALPHACHANNEL | DWOP_SCALE);
+			desc.stacking = DWSC_UPPER;
+			desc.posx   = _location.x;
+			desc.posy   = _location.y;
+			desc.width  = _size.width;
+			desc.height = _size.height;
+			*/
+
+			IDirectFBDisplayLayer *layer;
+
+			if (engine->GetDisplayLayer(engine, (DFBDisplayLayerID)(DLID_PRIMARY), &layer) != DFB_OK) {
+				throw jcommon::RuntimeException("Problem to get the device layer");
+			} 
+
+			if (layer->CreateWindow(layer, &desc, &_window) != DFB_OK) {
+				throw jcommon::RuntimeException("Cannot create a window");
+			}
+
+			if (_window->GetSurface(_window, &_surface) != DFB_OK) {
+				_window->Release(_window);
+
+				throw jcommon::RuntimeException("Cannot get a window's surface");
+			}
+
+			// Add ghost option (behave like an overlay)
+			// _window->SetOptions(_window, (DFBWindowOptions)(DWOP_ALPHACHANNEL | DWOP_SCALE)); // | DWOP_GHOST));
+			// Move window to upper stacking class
+			// _window->SetStackingClass(_window, DWSC_UPPER);
+			// Make it the top most window
+			// _window->RaiseToTop(_window);
+			_window->SetOpacity(_window, 0x00);
+			// _surface->SetRenderOptions(_surface, DSRO_ALL);
+			// _window->DisableEvents(_window, (DFBWindowEventType)(DWET_BUTTONDOWN | DWET_BUTTONUP | DWET_MOTION));
+
+			_surface->SetDrawingFlags(_surface, (DFBSurfaceDrawingFlags)(DSDRAW_BLEND));
+			_surface->SetBlittingFlags(_surface, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+			_surface->SetPorterDuff(_surface, (DFBSurfacePorterDuffRule)(DSPD_NONE));
+
+			_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+			_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
+			_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 
 			SetVisible(true);
 		}
 
-		virtual ~VideoLightweightImpl()
+		virtual ~VideoOverlayImpl()
 		{
 			if (IsRunning() == true) {
 				WaitThread();
 			}
-
-			_mutex.Lock();
-
-			if (_image != NULL) {
-				delete _image;
-				_image = NULL;
-			}
-
-			_surface->Release(_surface);
-			_surface = NULL;
-
-			_mutex.Unlock();
 		}
 
 		virtual void UpdateComponent()
 		{
+			RaiseToTop();
+
 #if defined(DIRECTFB_NODEPS_UI)
 			if (IsRunning() == true) {
 				WaitThread();
 			}
-	
+
 			if (_surface != NULL) {
 				void *ptr;
 				int pitch;
@@ -128,8 +156,8 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 						sh;
 
 				_surface->GetSize(_surface, &sw, &sh);
-				_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_WRITE), &ptr, &pitch);
-
+				_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
+				
 				IDirectFBSurface *frame;
 				DFBSurfaceDescription desc;
 
@@ -157,10 +185,10 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 
 					_mutex.Unlock();
 				
+					Start();
+					
 					_surface->Unlock(_surface);
 					_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)0);
-
-					Start();
 				} else {
 					_surface->Unlock(_surface);
 				}
@@ -169,7 +197,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			if (IsRunning() == true) {
 				WaitThread();
 			}
-	
+
 			if (_surface != NULL) {
 				void *ptr;
 				int pitch;
@@ -177,57 +205,106 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 						sh;
 
 				_surface->GetSize(_surface, &sw, &sh);
-				_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_WRITE), &ptr, &pitch);
+				_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
 
 				cairo_surface_t *cairo_surface = cairo_image_surface_create_for_data(
 						(uint8_t *)ptr, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
 				cairo_t *cairo_context = cairo_create(cairo_surface);
 
-				_mutex.Lock();
+				jgui::NativeImage *image = new jgui::NativeImage(cairo_context, jgui::JPF_ARGB, sw, sh);
 
-				if (_image != NULL) {
-					delete _image;
-					_image = NULL;
-				}
-
-				_image = new jgui::NativeImage(cairo_context, jgui::JPF_ARGB, sw, sh);
-
-				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
+				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, image));
 
 				cairo_surface_flush(cairo_surface);
 				cairo_surface_destroy(cairo_surface);
-			
-				_mutex.Unlock();
 
 				_surface->Unlock(_surface);
-				_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)0);
-				
 			}
 
 			Start();
 #endif
 		}
 
-		virtual void Run()
+		virtual void Move(int x, int y)
 		{
-			if (IsVisible() != false) {
-				Repaint();
+			SetLocation(x, y);
+		}
+		
+		virtual void SetBounds(int x, int y, int width, int height)
+		{
+			jgui::Component::SetBounds(x, y, width, height);
+
+			_window->SetBounds(_window, x, y, width, height);
+			_window->ResizeSurface(_window, width, height);
+		}
+		
+		virtual void SetLocation(int x, int y)
+		{
+			SetLocation(x, y);
+
+			_window->MoveTo(_window, x, y);
+		}
+		
+		virtual void SetSize(int width, int height)
+		{
+			jgui::Component::SetSize(width, height);
+
+			_window->Resize(_window, width, height);
+			_window->ResizeSurface(_window, width, height);
+		}
+		
+		virtual void SetVisible(bool visible)
+		{
+			jgui::Component::SetVisible(visible);
+
+			if (IsVisible() == true) {
+				_window->SetOpacity(_window, 0xff);
+			} else {
+				_window->SetOpacity(_window, 0x00);
 			}
 		}
 
-		virtual void Paint(jgui::Graphics *g)
+		virtual void RaiseToTop()
 		{
-			jgui::Component::Paint(g);
+			jgui::Container *parent = GetTopLevelAncestor();
+			
+			if (parent != NULL) {
+				jgui::Window *window = dynamic_cast<jgui::Window *>(parent);
 
-			_mutex.Lock();
+				if (window != NULL) {
+					IDirectFBWindow *native = (IDirectFBWindow *)window->GetNativeWindow();
 
-			if (_diff == false) {
-				g->DrawImage(_image, 0, 0, GetWidth(), GetHeight());
+					if (native != NULL) {
+						_window->PutAtop(_window, native);
+					}
+				}
 			} else {
-				g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, _dst.x, _dst.y, _dst.width, _dst.height);
+				_window->RaiseToTop(_window);
 			}
-				
-			_mutex.Unlock();
+		}
+		
+		virtual void LowerToBottom()
+		{
+			jgui::Container *parent = GetTopLevelAncestor();
+			
+			if (parent != NULL) {
+				jgui::Window *window = dynamic_cast<jgui::Window *>(parent);
+
+				if (window != NULL) {
+					IDirectFBWindow *native = (IDirectFBWindow *)window->GetNativeWindow();
+
+					if (native != NULL) {
+						_window->PutAtop(_window, native);
+					}
+				}
+			} else {
+				_window->LowerToBottom(_window);
+			}
+		}
+
+		virtual void Run()
+		{
+			_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
 		}
 
 		virtual Player * GetPlayer()
@@ -241,14 +318,14 @@ class VolumeControlImpl : public VolumeControl {
 	
 	private:
 		/** \brief */
-		NativeLightPlayer *_player;
+		DirectFBHeavyPlayer *_player;
 		/** \brief */
 		int _level;
 		/** \brief */
 		bool _is_muted;
 
 	public:
-		VolumeControlImpl(NativeLightPlayer *player):
+		VolumeControlImpl(DirectFBHeavyPlayer *player):
 			VolumeControl()
 		{
 			_player = player;
@@ -326,10 +403,10 @@ class VolumeControlImpl : public VolumeControl {
 class VideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
-		NativeLightPlayer *_player;
+		DirectFBHeavyPlayer *_player;
 
 	public:
-		VideoSizeControlImpl(NativeLightPlayer *player):
+		VideoSizeControlImpl(DirectFBHeavyPlayer *player):
 			VideoSizeControl()
 		{
 			_player = player;
@@ -341,7 +418,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			VideoOverlayImpl *impl = dynamic_cast<VideoOverlayImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -349,46 +426,34 @@ class VideoSizeControlImpl : public VideoSizeControl {
 			impl->_src.y = y;
 			impl->_src.width = w;
 			impl->_src.height = h;
-			
-			impl->_diff = false;
-
-			if (impl->_src.x != impl->_dst.x ||
-					impl->_src.y != impl->_dst.y ||
-					impl->_src.width != impl->_dst.width ||
-					impl->_src.height != impl->_dst.height) {
-				impl->_diff = true;
-			}
 		}
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			VideoOverlayImpl *impl = dynamic_cast<VideoOverlayImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
-			impl->_dst.x = x;
-			impl->_dst.y = y;
-			impl->_dst.width = w;
-			impl->_dst.height = h;
-			
-			impl->_diff = false;
-
-			if (impl->_src.x != impl->_dst.x ||
-					impl->_src.y != impl->_dst.y ||
-					impl->_src.width != impl->_dst.width ||
-					impl->_src.height != impl->_dst.height) {
-				impl->_diff = true;
-			}
+			impl->SetBounds(x, y, w, h);
 		}
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_src;
+			return dynamic_cast<VideoOverlayImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_dst;
+			VideoOverlayImpl *impl = dynamic_cast<VideoOverlayImpl *>(_player->_component);
+
+			jgui::jregion_t t;
+
+			t.x = impl->GetX();
+			t.y = impl->GetY();
+			t.width = impl->GetWidth();
+			t.height = impl->GetHeight();
+
+			return t;
 		}
 
 };
@@ -396,14 +461,14 @@ class VideoSizeControlImpl : public VideoSizeControl {
 class VideoFormatControlImpl : public VideoFormatControl {
 	
 	private:
-		NativeLightPlayer *_player;
+		DirectFBHeavyPlayer *_player;
 		jaspect_ratio_t _aspect_ratio;
 		jvideo_mode_t _video_mode;
 		jhd_video_format_t _hd_video_format;
 		jsd_video_format_t _sd_video_format;
 
 	public:
-		VideoFormatControlImpl(NativeLightPlayer *player):
+		VideoFormatControlImpl(DirectFBHeavyPlayer *player):
 			VideoFormatControl()
 		{
 			_player = player;
@@ -499,6 +564,11 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			// TODO::
 		}
 
+		virtual jgui::jsize_t GetFrameSize()
+		{
+			return dynamic_cast<VideoOverlayImpl *>(_player->_component)->_frame_size;
+		}
+
 		virtual jaspect_ratio_t GetAspectRatio()
 		{
 			jthread::AutoLock lock(&_player->_mutex);
@@ -543,10 +613,10 @@ class VideoFormatControlImpl : public VideoFormatControl {
 				adj.flags = (DFBColorAdjustmentFlags)(DCAF_CONTRAST);
 
 				_player->_provider->GetColorAdjustment(_player->_provider, &adj);
-
+			
 				return adj.contrast;
 			}
-
+				
 			return 0;
 		}
 
@@ -560,10 +630,10 @@ class VideoFormatControlImpl : public VideoFormatControl {
 				adj.flags = (DFBColorAdjustmentFlags)(DCAF_SATURATION);
 
 				_player->_provider->GetColorAdjustment(_player->_provider, &adj);
-
+			
 				return adj.saturation;
 			}
-
+				
 			return 0;
 		}
 
@@ -577,10 +647,10 @@ class VideoFormatControlImpl : public VideoFormatControl {
 				adj.flags = (DFBColorAdjustmentFlags)(DCAF_HUE);
 
 				_player->_provider->GetColorAdjustment(_player->_provider, &adj);
-
+			
 				return adj.hue;
 			}
-
+				
 			return 0;
 		}
 
@@ -594,10 +664,10 @@ class VideoFormatControlImpl : public VideoFormatControl {
 				adj.flags = (DFBColorAdjustmentFlags)(DCAF_BRIGHTNESS);
 
 				_player->_provider->GetColorAdjustment(_player->_provider, &adj);
-
+			
 				return adj.brightness;
 			}
-
+				
 			return 0;
 		}
 
@@ -608,7 +678,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 };
 
-NativeLightPlayer::NativeLightPlayer(std::string file):
+DirectFBHeavyPlayer::DirectFBHeavyPlayer(std::string file):
 	jmedia::Player()
 {
 	_file = file;
@@ -621,33 +691,37 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 	_component = NULL;
 
 	IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
-
+	
 	if (directfb->CreateVideoProvider(directfb, _file.c_str(), &_provider) != DFB_OK) {
 		_provider = NULL;
 
 		throw jmedia::MediaException("Media format not supported");
 	}
-
+		
 	DFBSurfaceDescription sdsc;
 	DFBStreamDescription mdsc;
-
+	
 	_provider->SetPlaybackFlags(_provider, DVPLAY_NOFX);
 	_provider->GetSurfaceDescription(_provider, &sdsc);
 	_provider->GetStreamDescription(_provider, &mdsc);
 	_provider->CreateEventBuffer(_provider, &_events);
 
 	_aspect = 16.0/9.0;
+	
+	char tmp[256];
+
+	sprintf(tmp, "%d", mdsc.year);
 
 	_media_info.title = std::string(mdsc.title);
 	_media_info.author = std::string(mdsc.author);
 	_media_info.album = std::string(mdsc.album);
 	_media_info.genre = std::string(mdsc.genre);
 	_media_info.comments = std::string(mdsc.comment);
-	_media_info.year = mdsc.year;
+	_media_info.date = std::string(tmp);
 
 	if (mdsc.caps & DVSCAPS_AUDIO) {
 		_has_audio = true;
-
+	
 		_controls.push_back(new VolumeControlImpl(this));
 	}
 
@@ -659,12 +733,12 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 		_controls.push_back(new VideoFormatControlImpl(this));
 	}
 
-	_component = new VideoLightweightImpl(this, 0, 0, sdsc.width, sdsc.height);
+	_component = new VideoOverlayImpl(this, 0, 0, sdsc.width, sdsc.height);
 
 	Start();
 }
 
-NativeLightPlayer::~NativeLightPlayer()
+DirectFBHeavyPlayer::~DirectFBHeavyPlayer()
 {
 	Close();
 	
@@ -680,20 +754,21 @@ NativeLightPlayer::~NativeLightPlayer()
 	_controls.clear();
 }
 
-void NativeLightPlayer::Callback(void *ctx)
+void DirectFBHeavyPlayer::Callback(void *ctx)
 {
-	reinterpret_cast<VideoLightweightImpl *>(ctx)->UpdateComponent();
+	reinterpret_cast<VideoOverlayImpl *>(ctx)->UpdateComponent();
 }
 		
-void NativeLightPlayer::Play()
+void DirectFBHeavyPlayer::Play()
 {
 	jthread::AutoLock lock(&_mutex);
 
 	if (_is_paused == false && _provider != NULL) {
-		IDirectFBSurface *surface = dynamic_cast<VideoLightweightImpl *>(_component)->_surface;
+		VideoOverlayImpl *component = dynamic_cast<VideoOverlayImpl *>(_component);
+		IDirectFBSurface *surface = (IDirectFBSurface *)component->_surface;
 
 		if (_has_video == true) {
-			_provider->PlayTo(_provider, surface, NULL, NativeLightPlayer::Callback, (void *)_component);
+			_provider->PlayTo(_provider, surface, NULL, DirectFBHeavyPlayer::Callback, (void *)_component);
 		} else {
 			_provider->PlayTo(_provider, surface, NULL, NULL, NULL);
 		}
@@ -702,7 +777,7 @@ void NativeLightPlayer::Play()
 	}
 }
 
-void NativeLightPlayer::Pause()
+void DirectFBHeavyPlayer::Pause()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -716,7 +791,7 @@ void NativeLightPlayer::Pause()
 	}
 }
 
-void NativeLightPlayer::Resume()
+void DirectFBHeavyPlayer::Resume()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -729,22 +804,18 @@ void NativeLightPlayer::Resume()
 	}
 }
 
-void NativeLightPlayer::Stop()
+void DirectFBHeavyPlayer::Stop()
 {
 	jthread::AutoLock lock(&_mutex);
 
 	if (_provider != NULL) {
 		_provider->Stop(_provider);
 
-		if (_has_video == true) {
-			_component->Repaint();
-		}
-
 		_is_paused = false;
 	}
 }
 
-void NativeLightPlayer::Close()
+void DirectFBHeavyPlayer::Close()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -766,7 +837,7 @@ void NativeLightPlayer::Close()
 	}
 }
 
-void NativeLightPlayer::SetCurrentTime(uint64_t time)
+void DirectFBHeavyPlayer::SetCurrentTime(uint64_t time)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -775,7 +846,7 @@ void NativeLightPlayer::SetCurrentTime(uint64_t time)
 	}
 }
 
-uint64_t NativeLightPlayer::GetCurrentTime()
+uint64_t DirectFBHeavyPlayer::GetCurrentTime()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -788,7 +859,7 @@ uint64_t NativeLightPlayer::GetCurrentTime()
 	return (uint64_t)(time*1000LL);
 }
 
-uint64_t NativeLightPlayer::GetMediaTime()
+uint64_t DirectFBHeavyPlayer::GetMediaTime()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -801,7 +872,7 @@ uint64_t NativeLightPlayer::GetMediaTime()
 	return (uint64_t)(time*1000LL);
 }
 
-void NativeLightPlayer::SetLoop(bool b)
+void DirectFBHeavyPlayer::SetLoop(bool b)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -816,12 +887,12 @@ void NativeLightPlayer::SetLoop(bool b)
 	}
 }
 
-bool NativeLightPlayer::IsLoop()
+bool DirectFBHeavyPlayer::IsLoop()
 {
 	return _is_loop;
 }
 
-void NativeLightPlayer::SetDecodeRate(double rate)
+void DirectFBHeavyPlayer::SetDecodeRate(double rate)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -834,7 +905,7 @@ void NativeLightPlayer::SetDecodeRate(double rate)
 	}
 }
 
-double NativeLightPlayer::GetDecodeRate()
+double DirectFBHeavyPlayer::GetDecodeRate()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -847,12 +918,12 @@ double NativeLightPlayer::GetDecodeRate()
 	return rate;
 }
 
-jgui::Component * NativeLightPlayer::GetVisualComponent()
+jgui::Component * DirectFBHeavyPlayer::GetVisualComponent()
 {
 	return _component;
 }
 
-void NativeLightPlayer::Run()
+void DirectFBHeavyPlayer::Run()
 {
 	while (_is_closed == false) {
 		_events->WaitForEventWithTimeout(_events, 0, 100);

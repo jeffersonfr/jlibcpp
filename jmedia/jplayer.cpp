@@ -35,7 +35,7 @@ Player::Player():
 	_media_info.album = "";
 	_media_info.genre = "";
 	_media_info.comments = "";
-	_media_info.year = -1;
+	_media_info.date = "";
 }
 
 Player::~Player()

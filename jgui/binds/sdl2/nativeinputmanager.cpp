@@ -24,10 +24,6 @@
 #include "jwindowmanager.h"
 #include "jdate.h"
 
-#ifndef CLAMP
-#define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
-#endif
-
 namespace jgui {
 
 NativeInputManager::NativeInputManager():
@@ -517,11 +513,34 @@ jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(SDL_Keysym sym
 
 void NativeInputManager::ProcessInputEvent(SDL_Event event)
 {
+	static int window_id = -1;
+
 	jthread::AutoLock lock(&_mutex);
 
 	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
 
-	if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+	if (event.type == SDL_WINDOWEVENT) {
+		if (event.window.event == SDL_WINDOWEVENT_ENTER) {
+			// SDL_CaptureMouse(true);
+
+			window_id = event.window.windowID;
+		} else if (event.window.event == SDL_WINDOWEVENT_LEAVE) {
+			// SDL_CaptureMouse(false);
+
+			window_id = -1;
+		} else if (event.window.event == SDL_WINDOWEVENT_SHOWN) {
+		} else if (event.window.event == SDL_WINDOWEVENT_HIDDEN) {
+		} else if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
+		} else if (event.window.event == SDL_WINDOWEVENT_MOVED) {
+		} else if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+		} else if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+		} else if (event.window.event == SDL_WINDOWEVENT_MINIMIZED) {
+		} else if (event.window.event == SDL_WINDOWEVENT_MAXIMIZED) {
+		} else if (event.window.event == SDL_WINDOWEVENT_RESTORED) {
+		} else if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
+		} else if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
+		}
+	} else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
 		jkeyevent_type_t type;
 		jkeyevent_modifiers_t mod;
 
@@ -577,13 +596,14 @@ void NativeInputManager::ProcessInputEvent(SDL_Event event)
 		jmouseevent_button_t buttons = JMB_UNKNOWN;
 		jmouseevent_type_t type = JMT_UNKNOWN;
 
+		_mouse_x = event.motion.x;
+		_mouse_y = event.motion.y;
+
+		_mouse_x = CLAMP(_mouse_x, 0, screen.width-1);
+		_mouse_y = CLAMP(_mouse_y, 0, screen.height-1);
+
 		if (event.type == SDL_MOUSEMOTION) {
 			type = JMT_MOVED;
-			_mouse_x = event.motion.x;
-			_mouse_y = event.motion.y;
-
-			_mouse_x = CLAMP(_mouse_x, 0, screen.width-1);
-			_mouse_y = CLAMP(_mouse_y, 0, screen.height-1);
 		} else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
 			if (event.type == SDL_MOUSEBUTTONDOWN) {
 				type = JMT_PRESSED;
@@ -600,6 +620,20 @@ void NativeInputManager::ProcessInputEvent(SDL_Event event)
 			}
 
 			_click_count = event.button.clicks;
+
+			if (type == JMT_PRESSED) {
+				/*
+				if ((jcommon::Date::CurrentTimeMillis()-_last_keypress) < 200L) {
+					_click_count = _click_count + 1;
+				} else {
+					_click_count = 1;
+				}
+			
+				_last_keypress = jcommon::Date::CurrentTimeMillis();
+				*/
+
+				mouse_z = _click_count;
+			}
 		} else if (event.type == SDL_MOUSEWHEEL) {
 			type = JMT_ROTATED;
 			mouse_z = event.motion.y;
@@ -613,6 +647,16 @@ void NativeInputManager::ProcessInputEvent(SDL_Event event)
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON2);
 		} else if ((state & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
+		}
+
+		if (window_id > 0) {
+			SDL_Window *window = SDL_GetWindowFromID(window_id);
+			int x, y;
+
+			SDL_GetWindowPosition(window, &x, &y);
+
+			_mouse_x = _mouse_x + x;
+			_mouse_y = _mouse_y + y;
 		}
 
 		DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));

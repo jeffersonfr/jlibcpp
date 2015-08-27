@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "nativelightplayer.h"
+#include "libvlclightplayer.h"
 #include "nativeimage.h"
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
@@ -120,11 +120,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 		/** \brief */
 		int _buffer_index;
 		/** \brief */
-		int _media_width;
-		/** \brief */
-		int _media_height;
-		/** \brief */
-		bool _diff;
+		jgui::jsize_t _frame_size;
 
 	public:
 		VideoLightweightImpl(Player *player, int x, int y, int w, int h):
@@ -140,8 +136,8 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			_image = NULL;
 			_player = player;
 			
-			_media_width = w;
-			_media_height = h;
+			_frame_size.width = w;
+			_frame_size.height = h;
 
 			_src.x = 0;
 			_src.y = 0;
@@ -152,8 +148,6 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			_dst.y = 0;
 			_dst.width = w;
 			_dst.height = h;
-
-			_diff = false;
 
 			SetVisible(true);
 		}
@@ -191,8 +185,8 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 
 			IDirectFBSurface *frame;
 			DFBSurfaceDescription desc;
-			int sw = _media_width;
-			int sh = _media_height;
+			int sw = _frame_size.width;
+			int sh = _frame_size.height;
 
 			desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT | DSDESC_PREALLOCATED);
 			desc.caps = (DFBSurfaceCapabilities)(DSCAPS_NONE);
@@ -225,8 +219,8 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
-			int sw = _media_width;
-			int sh = _media_height;
+			int sw = _frame_size.width;
+			int sh = _frame_size.height;
 
 			cairo_surface_t *cairo_surface = cairo_image_surface_create_for_data(
 					(uint8_t *)_buffer[(_buffer_index+1)%2], CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
@@ -265,11 +259,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 
 			_mutex.Lock();
 
-			if (_diff == false) {
-				g->DrawImage(_image, 0, 0, GetWidth(), GetHeight());
-			} else {
-				g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, _dst.x, _dst.y, _dst.width, _dst.height);
-			}
+			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, _location.x, _location.y, _size.width, _size.height);
 				
 			_mutex.Unlock();
 		}
@@ -303,7 +293,7 @@ void DisplayMediaSurface(void *data, void *id)
 
 void MediaEventsCallback(const libvlc_event_t *event, void *data)
 {
-	NativeLightPlayer	*player = reinterpret_cast<NativeLightPlayer *>(data);
+	LibVLCLightPlayer	*player = reinterpret_cast<LibVLCLightPlayer *>(data);
 
 	if (event->type == libvlc_MediaMetaChanged) {
 	//} else if (event->type == libvlc_MediaSubItemAdded) {
@@ -378,14 +368,14 @@ class VolumeControlImpl : public VolumeControl {
 	
 	private:
 		/** \brief */
-		NativeLightPlayer *_player;
+		LibVLCLightPlayer *_player;
 		/** \brief */
 		int _level;
 		/** \brief */
 		bool _is_muted;
 
 	public:
-		VolumeControlImpl(NativeLightPlayer *player):
+		VolumeControlImpl(LibVLCLightPlayer *player):
 			VolumeControl()
 		{
 			_player = player;
@@ -455,10 +445,10 @@ class AudioConfigurationControlImpl : public AudioConfigurationControl {
 	
 	private:
 		/** \brief */
-		NativeLightPlayer *_player;
+		LibVLCLightPlayer *_player;
 
 	public:
-		AudioConfigurationControlImpl(NativeLightPlayer *player):
+		AudioConfigurationControlImpl(LibVLCLightPlayer *player):
 			AudioConfigurationControl()
 		{
 			_player = player;
@@ -513,10 +503,10 @@ class AudioConfigurationControlImpl : public AudioConfigurationControl {
 class VideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
-		NativeLightPlayer *_player;
+		LibVLCLightPlayer *_player;
 
 	public:
-		VideoSizeControlImpl(NativeLightPlayer *player):
+		VideoSizeControlImpl(LibVLCLightPlayer *player):
 			VideoSizeControl()
 		{
 			_player = player;
@@ -524,6 +514,11 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual ~VideoSizeControlImpl()
 		{
+		}
+
+		virtual jgui::jsize_t GetFrameSize()
+		{
+			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual void SetSource(int x, int y, int w, int h)
@@ -536,15 +531,6 @@ class VideoSizeControlImpl : public VideoSizeControl {
 			impl->_src.y = y;
 			impl->_src.width = w;
 			impl->_src.height = h;
-			
-			impl->_diff = false;
-
-			if (impl->_src.x != impl->_dst.x ||
-					impl->_src.y != impl->_dst.y ||
-					impl->_src.width != impl->_dst.width ||
-					impl->_src.height != impl->_dst.height) {
-				impl->_diff = true;
-			}
 		}
 
 		virtual void SetDestination(int x, int y, int w, int h)
@@ -553,19 +539,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 			jthread::AutoLock lock(&impl->_mutex);
 
-			impl->_dst.x = x;
-			impl->_dst.y = y;
-			impl->_dst.width = w;
-			impl->_dst.height = h;
-			
-			impl->_diff = false;
-
-			if (impl->_src.x != impl->_dst.x ||
-					impl->_src.y != impl->_dst.y ||
-					impl->_src.width != impl->_dst.width ||
-					impl->_src.height != impl->_dst.height) {
-				impl->_diff = true;
-			}
+			impl->SetBounds(x, y, w, h);
 		}
 
 		virtual jgui::jregion_t GetSource()
@@ -575,12 +549,217 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_dst;
+			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+
+			jgui::jregion_t t;
+
+			t.x = impl->GetX();
+			t.y = impl->GetY();
+			t.width = impl->GetWidth();
+			t.height = impl->GetHeight();
+
+			return t;
 		}
 
 };
 
-NativeLightPlayer::NativeLightPlayer(std::string file):
+class VideoFormatControlImpl : public VideoFormatControl {
+	
+	private:
+		LibVLCLightPlayer *_player;
+		jaspect_ratio_t _aspect_ratio;
+		jvideo_mode_t _video_mode;
+		jhd_video_format_t _hd_video_format;
+		jsd_video_format_t _sd_video_format;
+
+	public:
+		VideoFormatControlImpl(LibVLCLightPlayer *player):
+			VideoFormatControl()
+		{
+			_player = player;
+		
+			_aspect_ratio = LAR_16x9;
+			_video_mode = LVM_FULL;
+			_hd_video_format = LHVF_1080p;
+			_sd_video_format = LSVF_PAL_M;
+		}
+
+		virtual ~VideoFormatControlImpl()
+		{
+		}
+
+		virtual void SetAspectRatio(jaspect_ratio_t t)
+		{
+			_aspect_ratio = t;
+		}
+
+		virtual void SetContentMode(jvideo_mode_t t)
+		{
+			_video_mode = t;
+		}
+
+		virtual void SetVideoFormatHD(jhd_video_format_t vf)
+		{
+			_hd_video_format = vf;
+		}
+
+		virtual void SetVideoFormatSD(jsd_video_format_t vf)
+		{
+			_sd_video_format = vf;
+		}
+
+		virtual void SetContrast(int value)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_provider != NULL) {
+				// xine_set_param(_player->_provider, XINE_PARAM_VO_CONTRAST, value);
+			}
+		}
+
+		virtual void SetSaturation(int value)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_provider != NULL) {
+				// xine_set_param(_player->_provider, XINE_PARAM_VO_SATURATION, value);
+			}
+		}
+
+		virtual void SetHUE(int value)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_provider != NULL) {
+				// xine_set_param(_player->_provider, XINE_PARAM_VO_HUE, value);
+			}
+		}
+
+		virtual void SetBrightness(int value)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_provider != NULL) {
+				// xine_set_param(_player->_provider, XINE_PARAM_VO_BRIGHTNESS, value);
+			}
+		}
+
+		virtual void SetSharpness(int value)
+		{
+			// TODO::
+		}
+
+		virtual void SetGamma(int value)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_provider != NULL) {
+				// xine_set_param(_player->_provider, XINE_PARAM_VO_GAMMA, value);
+			}
+		}
+
+		virtual jgui::jsize_t GetFrameSize()
+		{
+			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_frame_size;
+		}
+
+		virtual jaspect_ratio_t GetAspectRatio()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			double aspect = _player->_aspect;
+
+			if (aspect == (1.0/1.0)) {
+				return LAR_1x1;
+			} else if (aspect == (3.0/2.0)) {
+				return LAR_3x2;
+			} else if (aspect == (4.0/3.0)) {
+				return LAR_4x3;
+			} else if (aspect == (16.0/9.0)) {
+				return LAR_16x9;
+			}
+
+			return LAR_16x9;
+		}
+
+		virtual jvideo_mode_t GetContentMode()
+		{
+			return LVM_FULL;
+		}
+
+		virtual jhd_video_format_t GetVideoFormatHD()
+		{
+			return LHVF_1080p;
+		}
+
+		virtual jsd_video_format_t GetVideoFormatSD()
+		{
+			return LSVF_PAL_M;
+		}
+
+		virtual int GetContrast()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_provider != NULL) {
+				// return xine_get_param(_player->_provider, XINE_PARAM_VO_CONTRAST);
+			}
+
+			return 0;
+		}
+
+		virtual int GetSaturation()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_provider != NULL) {
+				// return xine_get_param(_player->_provider, XINE_PARAM_VO_SATURATION);
+			}
+
+			return 0;
+		}
+
+		virtual int GetHUE()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_provider != NULL) {
+				// return xine_get_param(_player->_provider, XINE_PARAM_VO_HUE);
+			}
+
+			return 0;
+		}
+
+		virtual int GetBrightness()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_provider != NULL) {
+				// return xine_get_param(_player->_provider, XINE_PARAM_VO_BRIGHTNESS);
+			}
+
+			return 0;
+		}
+
+		virtual int GetSharpness()
+		{
+			return 0;
+		}
+
+		virtual int GetGamma()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_provider != NULL) {
+				// return xine_get_param(_player->_provider, XINE_PARAM_VO_GAMMA);
+			}
+
+			return 0;
+		}
+
+};
+
+LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	jmedia::Player()
 {
 	_file = file;
@@ -623,6 +802,7 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 				_has_video = true;
 				
 				_controls.push_back(new VideoSizeControlImpl(this));
+				_controls.push_back(new VideoFormatControlImpl(this));
 			}
 		}
 	}
@@ -654,6 +834,9 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 			libvlc_audio_set_mute(_provider, 0);
 
 			if (iw <= 0 || ih <= 0) {
+				libvlc_media_player_release(_provider);
+				libvlc_release(_engine);
+
 				throw jcommon::RuntimeException("Cannot retrive the size of media content");
 			}
 		}
@@ -671,34 +854,12 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 	libvlc_video_set_format(_provider, "RV32", iw, ih, iw*4);
 	libvlc_video_set_callbacks(_provider, LockMediaSurface, UnlockMediaSurface, DisplayMediaSurface, _component);
 
-	char *str;
-
-	str = libvlc_media_get_meta(media, libvlc_meta_Title);
-	if (str != NULL) {
-		_media_info.title = str;
-	}
-
-	str = libvlc_media_get_meta(media, libvlc_meta_Artist);
-	if (str != NULL) {
-		_media_info.author = str;
-	}
-
-	str = libvlc_media_get_meta(media, libvlc_meta_Album);
-	if (str != NULL) {
-		_media_info.album = str;
-	}
-
-	str = libvlc_media_get_meta(media, libvlc_meta_Genre);
-	if (str != NULL) {
-		_media_info.genre = str;
-	}
-
-	str = libvlc_media_get_meta(media, libvlc_meta_Description);
-	if (str != NULL) {
-		_media_info.comments = str;
-	}
-
-	_media_info.year = 1900;
+	_media_info.title = std::string(libvlc_media_get_meta(media, libvlc_meta_Title)?:"");
+	_media_info.author = std::string(libvlc_media_get_meta(media, libvlc_meta_Artist)?:"");
+	_media_info.album = std::string(libvlc_media_get_meta(media, libvlc_meta_Album)?:"");
+	_media_info.genre = std::string(libvlc_media_get_meta(media, libvlc_meta_Genre)?:"");
+	_media_info.comments = std::string(libvlc_media_get_meta(media, libvlc_meta_Description)?:"");
+	_media_info.date = std::string(libvlc_media_get_meta(media, libvlc_meta_Date)?:"");
 	
 	/*
 	libvlc_meta_Copyright
@@ -732,7 +893,7 @@ NativeLightPlayer::NativeLightPlayer(std::string file):
 	}
 }
 
-NativeLightPlayer::~NativeLightPlayer()
+LibVLCLightPlayer::~LibVLCLightPlayer()
 {
 	if (IsRunning() == true) {
 		WaitThread();
@@ -756,7 +917,7 @@ NativeLightPlayer::~NativeLightPlayer()
 	_controls.clear();
 }
 
-void NativeLightPlayer::Run()
+void LibVLCLightPlayer::Run()
 {
 	Stop();
 
@@ -765,7 +926,7 @@ void NativeLightPlayer::Run()
 	}
 }
 
-void NativeLightPlayer::Play()
+void LibVLCLightPlayer::Play()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -774,7 +935,7 @@ void NativeLightPlayer::Play()
 	}
 }
 
-void NativeLightPlayer::Pause()
+void LibVLCLightPlayer::Pause()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -789,7 +950,7 @@ void NativeLightPlayer::Pause()
 	}
 }
 
-void NativeLightPlayer::Resume()
+void LibVLCLightPlayer::Resume()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -802,7 +963,7 @@ void NativeLightPlayer::Resume()
 	}
 }
 
-void NativeLightPlayer::Stop()
+void LibVLCLightPlayer::Stop()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -817,7 +978,7 @@ void NativeLightPlayer::Stop()
 	}
 }
 
-void NativeLightPlayer::Close()
+void LibVLCLightPlayer::Close()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -840,7 +1001,7 @@ void NativeLightPlayer::Close()
 	}
 }
 
-void NativeLightPlayer::SetCurrentTime(uint64_t time)
+void LibVLCLightPlayer::SetCurrentTime(uint64_t time)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -851,7 +1012,7 @@ void NativeLightPlayer::SetCurrentTime(uint64_t time)
 	}
 }
 
-uint64_t NativeLightPlayer::GetCurrentTime()
+uint64_t LibVLCLightPlayer::GetCurrentTime()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -864,24 +1025,24 @@ uint64_t NativeLightPlayer::GetCurrentTime()
 	return time;
 }
 
-uint64_t NativeLightPlayer::GetMediaTime()
+uint64_t LibVLCLightPlayer::GetMediaTime()
 {
 	return _media_time;
 }
 
-void NativeLightPlayer::SetLoop(bool b)
+void LibVLCLightPlayer::SetLoop(bool b)
 {
 	jthread::AutoLock lock(&_mutex);
 
 	_is_loop = b;
 }
 
-bool NativeLightPlayer::IsLoop()
+bool LibVLCLightPlayer::IsLoop()
 {
 	return _is_loop;
 }
 
-void NativeLightPlayer::SetDecodeRate(double rate)
+void LibVLCLightPlayer::SetDecodeRate(double rate)
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -896,7 +1057,7 @@ void NativeLightPlayer::SetDecodeRate(double rate)
 	}
 }
 
-double NativeLightPlayer::GetDecodeRate()
+double LibVLCLightPlayer::GetDecodeRate()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -909,7 +1070,7 @@ double NativeLightPlayer::GetDecodeRate()
 	return rate;
 }
 
-jgui::Component * NativeLightPlayer::GetVisualComponent()
+jgui::Component * LibVLCLightPlayer::GetVisualComponent()
 {
 	return _component;
 }
