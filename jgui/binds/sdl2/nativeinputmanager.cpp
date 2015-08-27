@@ -520,14 +520,43 @@ void NativeInputManager::ProcessInputEvent(SDL_Event event)
 	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
 
 	if (event.type == SDL_WINDOWEVENT) {
+		std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
+		Window *window = NULL;
+
+		for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
+			SDL_Window *native = (*i)->_window;
+
+			if (native != NULL) {
+				uint32_t id = SDL_GetWindowID(native);
+
+				if (event.window.windowID == id) {
+					window = (*i);
+
+					break;
+				}
+			}
+		}
+
 		if (event.window.event == SDL_WINDOWEVENT_ENTER) {
+			window_id = event.window.windowID;
+
 			// SDL_CaptureMouse(true);
 
-			window_id = event.window.windowID;
+			if (window != NULL) {
+				GFXHandler::GetInstance()->SetCursor(window->GetCursor());
+
+				window->DispatchWindowEvent(new WindowEvent(window, JWET_ENTERED));
+			}
 		} else if (event.window.event == SDL_WINDOWEVENT_LEAVE) {
+			window_id = -1;
+
 			// SDL_CaptureMouse(false);
 
-			window_id = -1;
+			if (window != NULL) {
+				GFXHandler::GetInstance()->SetCursor(JCS_DEFAULT);
+
+				window->DispatchWindowEvent(new WindowEvent(window, JWET_LEAVED));
+			}
 		} else if (event.window.event == SDL_WINDOWEVENT_SHOWN) {
 		} else if (event.window.event == SDL_WINDOWEVENT_HIDDEN) {
 		} else if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
