@@ -99,6 +99,10 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 				D = u - 128;
 				E = v - 128;			
 
+				if (y == 0) {
+					D = E = 0;
+				}
+
 				rgb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
 				rgb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
 				rgb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
@@ -114,6 +118,10 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 				C = y - 16;
 				D = u - 128;
 				E = v - 128;			
+
+				if (y == 0) {
+					D = E = 0;
+				}
 
 				rgb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
 				rgb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
@@ -150,20 +158,30 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 				y[1] = *(pixel+2);
 				v = *(pixel+3);
 
+				uint8_t *argb;
+				int C = 0;
 				int D = u - 128;
 				int E = v - 128;			
-				uint8_t *argb;
 
-				for (int i=0; i<2; i++) {
-					argb = (uint8_t *)(ptr++);
+				// pixel 1
+				argb = (uint8_t *)(ptr++);
 
-					int C = y[i] - 16;
+				C = y[0] - 16;
 
-					argb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
-					argb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
-					argb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
-					argb[3] = 0xff;
-				}
+				argb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
+				argb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
+				argb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
+				argb[3] = 0xff;
+				
+				// pixel 2
+				argb = (uint8_t *)(ptr++);
+
+				C = y[1] - 16;
+
+				argb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
+				argb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
+				argb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
+				argb[3] = 0xff;
 
 				pixel = pixel + 4;
 			}
