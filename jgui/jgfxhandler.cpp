@@ -80,6 +80,8 @@ GFXHandler * GFXHandler::GetInstance()
 			_instance = NULL;
 		}
 #elif defined(SDL2_UI)
+		jgui::InputManager::GetInstance();
+	
 		NativeHandler *handler = NULL;
 		
 		try {

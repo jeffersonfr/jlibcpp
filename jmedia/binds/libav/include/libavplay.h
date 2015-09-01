@@ -7,6 +7,8 @@
 #define CONFIG_SWSCALE 1
 #define CONFIG_RTSP_DEMUXER 1
 
+#include <string>
+
 extern "C" {
 #include "libavutil/time.h"
 #include "libavdevice/avdevice.h"
@@ -196,6 +198,16 @@ typedef struct VideoState {
     float skip_frames;
     float skip_frames_index;
     int refresh;
+
+		bool has_audio;
+		bool has_video;
+
+    char title[1024];
+    char author[1024];
+    char album[1024];
+    char genre[1024];
+    char comments[1024];
+    char date[1024];
 } VideoState;
 
 // #########################################################################

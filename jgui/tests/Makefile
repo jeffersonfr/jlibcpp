@@ -100,6 +100,9 @@ OBJS_mhp = \
 OBJS_drawimage = \
 		drawimage.o\
 
+OBJS_drawtypes = \
+		drawtypes.o\
+
 OBJS_rotateimage = \
 		rotateimage.o\
 
@@ -136,7 +139,10 @@ OBJS_2048 = \
 OBJS_newvox = \
 		newvox.o\
 
-all: teste border skull ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm mouse watch tank pacman tetris container signal stress layouts mhp drawimage rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox
+OBJS_mandelbrot = \
+		mandelbrot.o\
+
+all: teste border skull ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm mouse watch tank pacman tetris container signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox mandelbrot
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -225,6 +231,9 @@ mhp: $(OBJS_mhp)
 drawimage: $(OBJS_drawimage)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+drawtypes: $(OBJS_drawtypes)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 rotateimage: $(OBJS_rotateimage)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
@@ -261,6 +270,9 @@ hough: $(OBJS_hough)
 newvox: $(OBJS_newvox)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+mandelbrot: $(OBJS_mandelbrot)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -268,4 +280,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris container signal stress layouts databuffer mhp drawimage rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox
+	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris container signal stress layouts databuffer mhp drawimage drawtypes rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox mandelbrot

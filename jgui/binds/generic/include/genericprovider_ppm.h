@@ -17,20 +17,16 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVETYPES_H
-#define J_NATIVETYPES_H
+#ifndef J_GENERICPROVIDER_PPM_H
+#define J_GENERICPROVIDER_PPM_H
 
-#define USER_NATIVE_EVENT_ENGINE_INIT		1010
-#define USER_NATIVE_EVENT_ENGINE_RELEASE	1020
-#define USER_NATIVE_EVENT_WINDOW_CREATE	1030
-#define USER_NATIVE_EVENT_WINDOW_REPAINT	1040
+#include <cairo.h>
 
-struct jnative_pointers_t {
-	void *data0;
-	void *data1;
-	void *data2;
-	void *data3;
-	void *data4;
-};
+namespace jgui{
 
-#endif
+cairo_surface_t * create_ppm_surface_from_file(const char *file);
+cairo_surface_t * create_ppm_surface_from_data(uint8_t *data, int size);
+
+}
+
+#endif 

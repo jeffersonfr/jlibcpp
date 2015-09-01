@@ -1127,6 +1127,30 @@ static int stream_component_open(VideoState *is, int stream_index)
         return AVERROR_OPTION_NOT_FOUND;
     }
 
+		while ((t = av_dict_get(is->ic->metadata, "", t, AV_DICT_IGNORE_SUFFIX))) {
+			if (strcasecmp(t->key, "album") == 0 ) {
+				strncpy(is->album, t->value, 1024-1);
+			} else if (strcasecmp(t->key, "artist") == 0 ) {
+				strncpy(is->author, t->value, 1024-1);
+			} else if (strcasecmp(t->key, "album_artist") == 0) {
+				strncpy(is->author, t->value, 1024-1);
+			} else if (strcasecmp(t->key, "composer") == 0) {
+				strncpy(is->author, t->value, 1024-1);
+			} else if (strcasecmp(t->key, "performer") == 0) {
+				strncpy(is->author, t->value, 1024-1);
+			} else if (strcasecmp(t->key, "title") == 0) {
+				strncpy(is->title, t->value, 1024-1);
+			} else if (strcasecmp(t->key, "genre") == 0) {
+				strncpy(is->genre, t->value, 1024-1);
+			} else if (strcasecmp(t->key, "comment") == 0) {
+				strncpy(is->comments, t->value, 1024-1);
+			} else if (strcasecmp(t->key, "date") == 0) {
+				strncpy(is->date, t->value, 1024-1);
+			} else if (strcasecmp(t->key, "creation_time") == 0) {
+				strncpy(is->date, t->value, 1024-1);
+			}
+		}
+
     /* prepare audio output */
     if (avctx->codec_type == AVMEDIA_TYPE_AUDIO) {
         is->sdl_sample_rate = avctx->sample_rate;
@@ -1165,6 +1189,7 @@ static int stream_component_open(VideoState *is, int stream_index)
     ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;
     switch (avctx->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
+				is->has_audio = true;
         is->audio_stream = stream_index;
         is->audio_st = ic->streams[stream_index];
         is->audio_buf_size  = 0;
@@ -1182,6 +1207,7 @@ static int stream_component_open(VideoState *is, int stream_index)
         SDL_PauseAudio(0);
         break;
     case AVMEDIA_TYPE_VIDEO:
+				is->has_video = true;
         is->video_stream = stream_index;
         is->video_st = ic->streams[stream_index];
 

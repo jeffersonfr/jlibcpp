@@ -68,8 +68,11 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 		 ../generic/genericgraphics.o\
 		 ../generic/genericimage.o\
 		 ../generic/genericpath.o\
-		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_bmp.o\
 		 ../generic/genericprovider_jpg.o\
+		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_gif.o\
+		 ../generic/genericprovider_ppm.o\
 		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
@@ -105,8 +108,11 @@ ifeq ($(ENABLE_GRAPHICS),sdl2)
 		 ../generic/genericgraphics.o\
 		 ../generic/genericimage.o\
 		 ../generic/genericpath.o\
-		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_bmp.o\
 		 ../generic/genericprovider_jpg.o\
+		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_gif.o\
+		 ../generic/genericprovider_ppm.o\
 		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
@@ -140,8 +146,11 @@ ifeq ($(ENABLE_GRAPHICS),gtk3)
 		 ../generic/genericgraphics.o\
 		 ../generic/genericimage.o\
 		 ../generic/genericpath.o\
-		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_bmp.o\
 		 ../generic/genericprovider_jpg.o\
+		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_gif.o\
+		 ../generic/genericprovider_ppm.o\
 		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\

@@ -100,3 +100,23 @@ ifeq ($(findstring libxine, $(ENABLE_MEDIA)), libxine)
 
 endif
 
+ifeq ($(findstring v4l2, $(ENABLE_MEDIA)), v4l2)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/v4l2/include \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DV4L2_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_v4l2	+= \
+		 videocontrol.o\
+		 videograbber.o\
+		 v4l2lightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/v4l2/,$(OBJS_v4l2))
+
+endif
+

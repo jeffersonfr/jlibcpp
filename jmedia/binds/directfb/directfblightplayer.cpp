@@ -36,7 +36,7 @@
 
 namespace jmedia {
 
-class VideoLightweightImpl : public jgui::Component, jthread::Thread {
+class DirectFBLightComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
@@ -53,7 +53,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 		jgui::jsize_t _frame_size;
 
 	public:
-		VideoLightweightImpl(Player *player, int x, int y, int w, int h):
+		DirectFBLightComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			IDirectFB *engine = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
@@ -89,7 +89,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			SetVisible(true);
 		}
 
-		virtual ~VideoLightweightImpl()
+		virtual ~DirectFBLightComponentImpl()
 		{
 			if (IsRunning() == true) {
 				WaitThread();
@@ -331,12 +331,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jsize_t GetFrameSize()
 		{
-			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_frame_size;
+			return dynamic_cast<DirectFBLightComponentImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			DirectFBLightComponentImpl *impl = dynamic_cast<DirectFBLightComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -348,7 +348,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			DirectFBLightComponentImpl *impl = dynamic_cast<DirectFBLightComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
@@ -357,12 +357,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_src;
+			return dynamic_cast<DirectFBLightComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			DirectFBLightComponentImpl *impl = dynamic_cast<DirectFBLightComponentImpl *>(_player->_component);
 
 			jgui::jregion_t t;
 
@@ -619,7 +619,7 @@ DirectFBLightPlayer::DirectFBLightPlayer(std::string file):
 	_provider->GetStreamDescription(_provider, &mdsc);
 	_provider->CreateEventBuffer(_provider, &_events);
 
-	_aspect = 16.0/9.0;
+	_aspect = (double)sdsc.width/(double)sdsc.height;
 
 	char tmp[256];
 
@@ -646,7 +646,7 @@ DirectFBLightPlayer::DirectFBLightPlayer(std::string file):
 		_controls.push_back(new VideoFormatControlImpl(this));
 	}
 
-	_component = new VideoLightweightImpl(this, 0, 0, sdsc.width, sdsc.height);
+	_component = new DirectFBLightComponentImpl(this, 0, 0, sdsc.width, sdsc.height);
 
 	Start();
 }
@@ -669,7 +669,7 @@ DirectFBLightPlayer::~DirectFBLightPlayer()
 
 void DirectFBLightPlayer::Callback(void *ctx)
 {
-	reinterpret_cast<VideoLightweightImpl *>(ctx)->UpdateComponent();
+	reinterpret_cast<DirectFBLightComponentImpl *>(ctx)->UpdateComponent();
 }
 		
 void DirectFBLightPlayer::Play()
@@ -677,7 +677,7 @@ void DirectFBLightPlayer::Play()
 	jthread::AutoLock lock(&_mutex);
 
 	if (_is_paused == false && _provider != NULL) {
-		IDirectFBSurface *surface = dynamic_cast<VideoLightweightImpl *>(_component)->_surface;
+		IDirectFBSurface *surface = dynamic_cast<DirectFBLightComponentImpl *>(_component)->_surface;
 
 		if (_has_video == true) {
 			_provider->PlayTo(_provider, surface, NULL, DirectFBLightPlayer::Callback, (void *)_component);

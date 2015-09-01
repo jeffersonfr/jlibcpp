@@ -224,36 +224,44 @@ void NativeHandler::Restore()
 
 void NativeHandler::InitEngine()
 {
-	InternalInitEngine();
+	SDL_Event event;
+	jthread::Semaphore sem;
 
-	// SDL_Event event;
-
-	// event.type = USER_SDL_EVENT_ENGINE_INIT;
-	// event.user.data1 = this;
-	// event.user.data2 = NULL;
+	event.type = USER_NATIVE_EVENT_ENGINE_INIT;
+	event.user.data1 = this;
+	event.user.data2 = &sem;
 	
-	// SDL_PushEvent(&event);
+	SDL_PushEvent(&event);
+
+	sem.Wait();
 }
 
 void NativeHandler::Release()
 {
 	SDL_Event event;
+	jthread::Semaphore sem;
 
 	event.type = USER_NATIVE_EVENT_ENGINE_RELEASE;
 	event.user.data1 = this;
+	event.user.data2 = &sem;
 
 	SDL_PushEvent(&event);
+
+	sem.Wait();
 }
 
 void NativeHandler::CreateWindow(Window *window)
 {
 	SDL_Event event;
+	jthread::Semaphore sem;
 
 	event.type = USER_NATIVE_EVENT_WINDOW_CREATE;
 	event.user.data1 = window;
-	event.user.data2 = NULL;
+	event.user.data2 = &sem;
 
 	SDL_PushEvent(&event);
+	
+	sem.Wait();
 }
 
 void NativeHandler::RepaintWindow(Window *window, Component *cmp)

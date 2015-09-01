@@ -22,7 +22,24 @@
 
 #include <jpeglib.h>
 
+#include <setjmp.h>
+
 namespace jgui {
+
+struct my_error_mgr {
+	struct jpeg_error_mgr pub;
+	jmp_buf setjmp_buffer;
+};
+
+METHODDEF(void) my_error_exit(j_common_ptr cinfo)
+{
+	my_error_mgr *myerr = (my_error_mgr *) cinfo->err;
+
+	// INFO:: error message
+	// (*cinfo->err->output_message) (cinfo);
+
+	longjmp(myerr->setjmp_buffer, 1);
+}
 
 static cairo_surface_t * cairocks_surface_from_jpeg_private(struct jpeg_decompress_struct *cinfo) 
 {
@@ -65,7 +82,7 @@ static cairo_surface_t * cairocks_surface_from_jpeg_private(struct jpeg_decompre
 cairo_surface_t * create_jpg_surface_from_file(const char *file) 
 {
 	struct jpeg_decompress_struct cinfo;
-	struct jpeg_error_mgr jerr;
+	struct my_error_mgr jerr;
 	cairo_surface_t *surface;
 	FILE *infile;
 
@@ -73,7 +90,14 @@ cairo_surface_t * create_jpg_surface_from_file(const char *file)
 		return NULL;
 	}
 
-	cinfo.err = jpeg_std_error(&jerr);
+	cinfo.err = jpeg_std_error(&jerr.pub);
+	jerr.pub.error_exit = my_error_exit;
+
+	if (setjmp(jerr.setjmp_buffer)) {
+		jpeg_destroy_decompress(&cinfo);
+
+		return NULL;
+	}
 
 	jpeg_create_decompress(&cinfo);
 	jpeg_stdio_src(&cinfo, infile);
@@ -103,9 +127,16 @@ cairo_surface_t * create_jpg_surface_from_data(uint8_t *data, int size)
 {
 	cairo_surface_t *surface;
 	struct jpeg_decompress_struct cinfo;
-	struct jpeg_error_mgr jerr;
+	struct my_error_mgr jerr;
 
-	cinfo.err = jpeg_std_error(&jerr);
+	cinfo.err = jpeg_std_error(&jerr.pub);
+	jerr.pub.error_exit = my_error_exit;
+
+	if (setjmp(jerr.setjmp_buffer)) {
+		jpeg_destroy_decompress(&cinfo);
+
+		return NULL;
+	}
 
 	jpeg_create_decompress(&cinfo);
 	jpeg_mem_src(&cinfo, data, size);

@@ -41,76 +41,6 @@
 
 namespace jgui {
 
-#if defined(GTK3_UI)
-int OnDestroyEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
-{
-	Window *window = (Window *)user_data;
-
-	window->Release();
-
-	return TRUE;
-}
-
-static gboolean OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data)
-{
-	Window *window = (Window *)user_data;
-	Graphics *graphics = window->GetGraphics();
-
-	cairo_t *cairo_context = dynamic_cast<NativeGraphics *>(graphics)->GetCairoContext();
-
-	cairo_surface_t *cairo_surface = cairo_get_target(cairo_context);
-
-	if (cairo_surface != NULL) {
-		graphics->Lock();
-
-		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-		cairo_set_source_surface(cr, cairo_surface, 0, 0);
-		cairo_paint(cr);
-
-		graphics->Unlock();
-	}
-
-	/*
-	cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); 
-	cairo_select_font_face(cr, "Purisa", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-	cairo_set_font_size(cr, 13);
-	cairo_move_to(cr, 20, 30);
-	cairo_show_text(cr, "Most relationships seem so transitory");  
-	cairo_stroke(cr);
-	*/
-
-  return FALSE;
-}
-#elif defined(SDL2_UI)
-void Window::InternalInstanciateWindow()
-{
-	int flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS;
-
-	_window = SDL_CreateWindow(NULL, _location.x, _location.y, _size.width, _size.height, flags);
-
-	if (_window == NULL) {
-		throw jcommon::RuntimeException("Cannot create a window");
-	}
-
-	SDL_SetWindowBordered(_window, SDL_FALSE);
-
-	_surface = SDL_CreateRenderer(_window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // SDL_RENDERER_SOFTWARE
-
-	if (_surface == NULL) {
-		throw jcommon::RuntimeException("Cannot get a window's surface");
-	}
-
-	_graphics = new NativeGraphics((void *)_surface, NULL, JPF_ARGB, _size.width, _size.height);
-
-	if (_is_visible == true) {
-		SDL_ShowWindow(_window);
-
-		// CHANGE:: call from jsdlinputmanager:: user events
-		Repaint();
-	}
-}
-#endif
-
 Window::Window(int x, int y, int width, int height):
 	Container(x, y, width, height)
 {
@@ -193,6 +123,76 @@ Window::~Window()
 	delete _graphics;
 	_graphics = NULL;
 }
+
+#if defined(GTK3_UI)
+int OnDestroyEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+{
+	Window *window = (Window *)user_data;
+
+	window->Release();
+
+	return TRUE;
+}
+
+static gboolean OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data)
+{
+	Window *window = (Window *)user_data;
+	Graphics *graphics = window->GetGraphics();
+
+	cairo_t *cairo_context = dynamic_cast<NativeGraphics *>(graphics)->GetCairoContext();
+
+	cairo_surface_t *cairo_surface = cairo_get_target(cairo_context);
+
+	if (cairo_surface != NULL) {
+		graphics->Lock();
+
+		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+		cairo_set_source_surface(cr, cairo_surface, 0, 0);
+		cairo_paint(cr);
+
+		graphics->Unlock();
+	}
+
+	/*
+	cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); 
+	cairo_select_font_face(cr, "Purisa", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_size(cr, 13);
+	cairo_move_to(cr, 20, 30);
+	cairo_show_text(cr, "Most relationships seem so transitory");  
+	cairo_stroke(cr);
+	*/
+
+  return FALSE;
+}
+#elif defined(SDL2_UI)
+void Window::InternalInstanciateWindow()
+{
+	int flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS;
+
+	_window = SDL_CreateWindow(NULL, _location.x, _location.y, _size.width, _size.height, flags);
+
+	if (_window == NULL) {
+		throw jcommon::RuntimeException("Cannot create a window");
+	}
+
+	SDL_SetWindowBordered(_window, SDL_FALSE);
+
+	_surface = SDL_CreateRenderer(_window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC); // SDL_RENDERER_SOFTWARE
+
+	if (_surface == NULL) {
+		throw jcommon::RuntimeException("Cannot get a window's surface");
+	}
+
+	_graphics = new NativeGraphics((void *)_surface, NULL, JPF_ARGB, _size.width, _size.height);
+
+	if (_is_visible == true) {
+		SDL_ShowWindow(_window);
+
+		// CHANGE:: call from jsdlinputmanager:: user events
+		Repaint();
+	}
+}
+#endif
 
 void Window::Release()
 {
@@ -1060,11 +1060,11 @@ bool Window::Show(bool modal)
 	InternalCreateWindow();
 #elif defined(SDL2_UI)
 	if (_window == NULL) {
-		_graphics_mutex.Lock();
+		// _graphics_mutex.Lock();
 
 		InternalCreateWindow();
 
-		_graphics_mutex.Unlock();
+		// _graphics_mutex.Unlock();
 	}
 #endif
 

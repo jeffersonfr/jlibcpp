@@ -43,7 +43,7 @@ struct jmedia_info_t {
  *
  * \author Jeff Ferr
  */
-class Player : public jcommon::Object{
+class Player : public virtual jcommon::Object{
 
 	protected:
 		/** \brief */

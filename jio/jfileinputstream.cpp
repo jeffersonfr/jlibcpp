@@ -27,17 +27,13 @@ namespace jio {
 FileInputStream::FileInputStream(std::string filename_):
 	jio::InputStream()
 {
-    jcommon::Object::SetClassName("jio::FileInputStream");
+	jcommon::Object::SetClassName("jio::FileInputStream");
 
 	try {
 		_flag = 0;
-		_file = new File(filename_);
-
-		_buffer = new char[4096];
-
-		_buffer_size = 0;
-		_buffer_index = 0;
 		_current = 0;
+
+		_file = new File(filename_);
 	} catch (...) {
 		_file = NULL;
 
@@ -48,20 +44,16 @@ FileInputStream::FileInputStream(std::string filename_):
 FileInputStream::FileInputStream(File *file_):
 	jio::InputStream()
 {
-    jcommon::Object::SetClassName("jio::FileInputStream");
-
-	_flag = 1;
-	_file = file_;
-
-	_buffer = new char[65535];
-
-	_buffer_size = 0;
-	_buffer_index = 0;
-	_current = 0;
+	jcommon::Object::SetClassName("jio::FileInputStream");
 
 	if (_file == NULL) {
 		throw jcommon::NullPointerException("File pointer is null");
 	}
+
+	_flag = 1;
+	_current = 0;
+	_file = file_;
+
 }
 
 FileInputStream::~FileInputStream()
@@ -69,10 +61,6 @@ FileInputStream::~FileInputStream()
 	if (_flag == 0 && (void *)_file != NULL) {
 		// _file->Close();
 		delete _file;
-	}
-
-	if ((void *)_buffer != NULL) {
-		delete [] _buffer;
 	}
 }
 
@@ -102,49 +90,14 @@ int64_t FileInputStream::Read()
 		return -1LL;
 	}
 
-	/* correct:: slow
-	char c = 0,
-		 r;
+	char c = 0;
 	
-	r = _file->Read(&c, 1);
-	
-	if (r < 0) {
-		return -1;
+	if (_file->Read(&c, 1LL) <= 0LL) {
+		return -1LL;
 	}
 	
 	_current++;
 	
-	return (int64_t)c;
-	*/
-
-	int64_t r,
-		d = _buffer_size - _buffer_index;
-	char c;
-	
-	if (d == 0) {
-		r = _file->Read((char *)_buffer, 4096);
-			
-		if (r <= 0) {
-			_buffer_size = 0;
-			_buffer_index = 0;
-
-			return -1;
-		}
-
-		_buffer_index = 0;
-		_buffer_size = r;
-
-		d = r;
-	}
-	
-	c = _buffer[_buffer_index++];
-	
-	if (_buffer_index >= _buffer_size) {
-		_buffer_index = _buffer_size = 0;
-	}
-	
-	_current++;
-
 	return (int64_t)c;
 }
 
@@ -158,70 +111,22 @@ int64_t FileInputStream::Read(char *data, int64_t size)
 		return -1LL;
 	}
 
-	/*
 	int r;
    
 	r = _file->Read((char *)data, size);
 
 	if (r <= 0) {
-		return -1;
+		return -1LL;
 	}
 
 	_current += r;
 
 	return r;
-	*/
-
-	int64_t r,
-		d,
-		count = size;
-	
-	do {
-		d = _buffer_size - _buffer_index;
-
-		if (d == 0) {
-			r = _file->Read((char *)_buffer, 4096);
-
-			if (r <= 0) {
-				_buffer_size = 0;
-				_buffer_index = 0;
-
-				if (count == size) {
-					return -1;
-				} else {
-					return size - count;
-				}
-			}
-
-			_buffer_index = 0;
-			_buffer_size = r;
-
-			d = r;
-		}
-
-		r = count;
-
-		if (r > d) {
-			r = d;
-		}
-
-		memcpy((char *)(data + size - count), (char *)(_buffer + _buffer_index), (uint32_t)r);
-
-		_buffer_index += r;
-		_current += r;
-		count -= r;
-
-		if (_buffer_index >= _buffer_size) {
-			_buffer_index = _buffer_size = 0;
-		}
-	} while (count > 0);
-
-	return size;
 }
 
 void FileInputStream::Skip(int64_t skip)
 {
-	if (skip <= 0) {
+	if (skip <= 0LL) {
 		return;
 	}
 

@@ -26,6 +26,7 @@
 #include "jvolumecontrol.h"
 #include "jmediaexception.h"
 #include "jgfxhandler.h"
+#include "jcolorconversion.h"
 
 #if defined(DIRECTFB_NODEPS_UI)
 #include <directfb.h>
@@ -35,7 +36,7 @@
 
 namespace jmedia {
 
-class VideoLightweightImpl : public jgui::Component, jthread::Thread {
+class LibXineLightComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
@@ -51,145 +52,8 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 		/** \brief */
 		jgui::jsize_t _frame_size;
 
-	private:
-		void rgb24_to_rgb32_array(const uint8_t **rgb24_array, uint32_t **rgb32_array, int width, int height)
-		{
-			uint32_t size_1 = width*height;
-			uint8_t *src = ((uint8_t *)(*rgb24_array));
-			uint8_t *dst = ((uint8_t *)(*rgb32_array));
-
-			for (uint32_t i=0; i<size_1; i++) {
-				dst[0] = src[2];
-				dst[1] = src[1];
-				dst[2] = src[0];
-				dst[3] = 0xff;
-
-				src = src + 3;
-				dst = dst + 4;
-			}
-		}
-
-		void yv12_to_rgb32_array(const uint8_t **y_array, const uint8_t **u_array, const uint8_t **v_array, uint32_t **rgb32_array, int width, int height)
-		{
-			uint8_t *ybuf = (uint8_t *)*y_array;
-			uint8_t *ubuf = (uint8_t *)*u_array;
-			uint8_t *vbuf = (uint8_t *)*v_array;
-			uint8_t *rgb = (uint8_t *)*rgb32_array;
-	
-			// CHANGE:: avoid segfault
-			height = height - 1;
-
-			int size = width*height;
-			int width_2 = width/2;
-			int i;
-
-			int py = 0;
-			int px = 0;
-
-			for (i=0; i<size; i+=2) {
-				int y, u, v;
-				int C, D, E;
-
-				// pixel 1
-				y = ybuf[2*py*width+2*px];
-				u = ubuf[py * width_2 + px];
-				v = vbuf[py * width_2 + px];
-
-				C = y - 16;
-				D = u - 128;
-				E = v - 128;			
-
-				if (y == 0) {
-					D = E = 0;
-				}
-
-				rgb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
-				rgb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
-				rgb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
-				rgb[3] = 0xff;
-
-				rgb = rgb + 4;
-
-				// pixel 2
-				y = ybuf[2*py*width+2*px];
-				u = ubuf[py * width_2 + px];
-				v = vbuf[py * width_2 + px];
-
-				C = y - 16;
-				D = u - 128;
-				E = v - 128;			
-
-				if (y == 0) {
-					D = E = 0;
-				}
-
-				rgb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
-				rgb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
-				rgb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
-				rgb[3] = 0xff;
-
-				rgb = rgb + 4;
-
-				// update counters
-				px = (px + 1)%width;
-				
-				if (px == 0) {
-					py = py + 1;
-				}
-			}
-		}
-
-		void yuyv_to_rgb32_array(const uint8_t **yuv_array, uint32_t **rgb32_array, int width, int height)
-		{
-			uint8_t *pixel = ((uint8_t *)(*yuv_array));
-
-			height = height - 1;
-
-			uint32_t size_1 = width*height,
-							 size_2 = size_1/2,
-							 *ptr = *rgb32_array;
-			int y[2], 
-					u, 
-					v;
-
-			for (uint32_t j=0; j<size_2; j++) {
-				y[0] = *(pixel+0);
-				u = *(pixel+1);
-				y[1] = *(pixel+2);
-				v = *(pixel+3);
-
-				uint8_t *argb;
-				int C = 0;
-				int D = u - 128;
-				int E = v - 128;			
-
-				// pixel 1
-				argb = (uint8_t *)(ptr++);
-
-				C = y[0] - 16;
-
-				argb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
-				argb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
-				argb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
-				argb[3] = 0xff;
-				
-				// pixel 2
-				argb = (uint8_t *)(ptr++);
-
-				C = y[1] - 16;
-
-				argb[2] = CLAMP((298 * C + 409 * E + 128) >> 8, 0, 255);
-				argb[1] = CLAMP((298 * C - 100 * D - 208 * E + 128) >> 8, 0, 255);
-				argb[0] = CLAMP((298 * C + 516 * D + 128) >> 8, 0, 255);
-				argb[3] = 0xff;
-
-				pixel = pixel + 4;
-			}
-		}
-
-
 	public:
-		VideoLightweightImpl(Player *player, int x, int y, int w, int h):
+		LibXineLightComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = NULL;
@@ -207,7 +71,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			SetVisible(true);
 		}
 
-		virtual ~VideoLightweightImpl()
+		virtual ~LibXineLightComponentImpl()
 		{
 			if (IsRunning() == true) {
 				WaitThread();
@@ -242,11 +106,11 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			}
 
 			if (format == XINE_VORAW_YV12) {
-				yv12_to_rgb32_array((const uint8_t **)&data0, (const uint8_t **)&data1, (const uint8_t **)&data2, (uint32_t **)&_buffer, width, height);
+				ColorConversion::GetRGB32FromYV12((uint8_t **)&data0, (uint8_t **)&data1, (uint8_t **)&data2, (uint32_t **)&_buffer, width, height);
 			} else if (format == XINE_VORAW_YUY2) {
-				yuyv_to_rgb32_array((const uint8_t **)&data0, (uint32_t **)&_buffer, width, height);
+				ColorConversion::GetRGB32FromYUYV((uint8_t **)&data0, (uint32_t **)&_buffer, width, height);
 			} else if (format == XINE_VORAW_RGB) {
-				rgb24_to_rgb32_array((const uint8_t **)&data0, (uint32_t **)&_buffer, width, height);
+				ColorConversion::GetRGB32FromRGB24((uint8_t **)&data0, (uint32_t **)&_buffer, width, height);
 			} 
 
 #if defined(DIRECTFB_NODEPS_UI)
@@ -314,7 +178,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 
 			_mutex.Unlock();
 
-			Run();
+			Start();
 #endif
 		}
 
@@ -454,7 +318,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			LibXineLightComponentImpl *impl = dynamic_cast<LibXineLightComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -466,7 +330,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			LibXineLightComponentImpl *impl = dynamic_cast<LibXineLightComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
@@ -475,12 +339,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_src;
+			return dynamic_cast<LibXineLightComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			LibXineLightComponentImpl *impl = dynamic_cast<LibXineLightComponentImpl *>(_player->_component);
 
 			jgui::jregion_t t;
 
@@ -591,7 +455,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual jgui::jsize_t GetFrameSize()
 		{
-			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_frame_size;
+			return dynamic_cast<LibXineLightComponentImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual jaspect_ratio_t GetAspectRatio()
@@ -692,7 +556,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 static void render_callback(void *data, int format, int width, int height, double aspect, void *data0, void *data1, void *data2)
 {
-	reinterpret_cast<VideoLightweightImpl *>(data)->UpdateComponent(format, width, height, aspect, data0, data1, data2);
+	reinterpret_cast<LibXineLightComponentImpl *>(data)->UpdateComponent(format, width, height, aspect, data0, data1, data2);
 }
 
 static void overlay_callback(void *user_data, int num_ovl, raw_overlay_t *overlays_array)
@@ -722,13 +586,13 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	_is_closed = false;
 	_has_audio = false;
 	_has_video = false;
-	_aspect = 16.0/9.0;
+	_aspect = 1.0;
 	_media_time = 0LL;
 	_is_loop = false;
 	_decode_rate = 0.0;
 	_frame_rate = 0.0;
 	
-	_component = new VideoLightweightImpl(this, 0, 0, -1, -1);
+	_component = new LibXineLightComponentImpl(this, 0, 0, -1, -1);
 
 	raw_visual_t t;
 

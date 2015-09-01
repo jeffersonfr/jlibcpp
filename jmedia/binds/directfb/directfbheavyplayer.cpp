@@ -706,7 +706,7 @@ DirectFBHeavyPlayer::DirectFBHeavyPlayer(std::string file):
 	_provider->GetStreamDescription(_provider, &mdsc);
 	_provider->CreateEventBuffer(_provider, &_events);
 
-	_aspect = 16.0/9.0;
+	_aspect = (double)sdsc.width/(double)sdsc.height;
 	
 	char tmp[256];
 

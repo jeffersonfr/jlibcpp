@@ -36,13 +36,7 @@ class FileInputStream : public jio::InputStream{
 		/** \brief */
 		File *_file;
 		/** \brief */
-		char *_buffer;
-		/** \brief */
 		int64_t _current;
-		/** \brief */
-		int64_t _buffer_size;
-		/** \brief */
-		int64_t _buffer_index;
 		/** \brief */
 		bool _is_eof;
 		/** \brief */

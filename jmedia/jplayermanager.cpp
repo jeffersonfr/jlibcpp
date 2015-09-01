@@ -37,6 +37,10 @@
 #include "libxinelightplayer.h"
 #endif
 
+#if defined(V4L2_MEDIA)
+#include "v4l2lightplayer.h"
+#endif
+
 namespace jmedia {
 
 std::map<jplayer_hints_t, bool> PlayerManager::_hints;
@@ -59,6 +63,17 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 		_hints[JPH_SECURITY] = false;
 		_hints[JPH_PLUGINS] = false;
 	}
+
+	jcommon::URL url(url_);
+
+#if defined(V4L2_MEDIA)
+	try {
+		if (strncasecmp(url.GetProtocol().c_str(), "v4l", 3) == 0) {
+			return new V4L2LightPlayer(url.GetPath());
+		}
+	} catch (jcommon::Exception &e) {
+	}
+#endif
 
 #if defined(DIRECTFB_MEDIA)
 	try {

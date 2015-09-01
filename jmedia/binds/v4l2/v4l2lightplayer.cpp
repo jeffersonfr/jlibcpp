@@ -18,14 +18,13 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "libavlightplayer.h"
+#include "v4l2lightplayer.h"
 #include "nativeimage.h"
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
-#include "jvolumecontrol.h"
 #include "jmediaexception.h"
-#include "jgfxhandler.h"
+#include "jcolorconversion.h"
 
 #if defined(DIRECTFB_NODEPS_UI)
 #include <directfb.h>
@@ -35,7 +34,7 @@
 
 namespace jmedia {
 
-class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
+class V4LComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
@@ -47,14 +46,15 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
-		jgui::jregion_t _dst;
+		uint32_t *_buffer;
 		/** \brief */
 		jgui::jsize_t _frame_size;
 
 	public:
-		LibAVLightComponentImpl(Player *player, int x, int y, int w, int h):
+		V4LComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
+			_buffer = NULL;
 			_image = NULL;
 			_player = player;
 			
@@ -66,15 +66,10 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 			_src.width = w;
 			_src.height = h;
 
-			_dst.x = 0;
-			_dst.y = 0;
-			_dst.width = w;
-			_dst.height = h;
-
 			SetVisible(true);
 		}
 
-		virtual ~LibAVLightComponentImpl()
+		virtual ~V4LComponentImpl()
 		{
 			if (IsRunning() == true) {
 				WaitThread();
@@ -88,19 +83,32 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 			}
 
 			_mutex.Unlock();
+
+			if (_buffer != NULL) {
+				delete [] _buffer;
+				_buffer = NULL;
+			}
 		}
 
-		virtual void UpdateComponent(uint8_t *buffer, int width, int height)
+		virtual void UpdateComponent(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
 		{
 			if (width <= 0 || height <= 0) {
 				return;
 			}
 
-			if (_src.width <= 0 || _src.height <= 0) {
-				dynamic_cast<LibAVLightPlayer *>(_player)->_aspect = (double)width/(double)height;
-
+			if (_buffer == NULL) {
 				_frame_size.width = _src.width = width;
 				_frame_size.height = _src.height = height;
+
+				_buffer = new uint32_t[width*height];
+			}
+
+			if (format == jgui::JPF_UYVY) {
+				ColorConversion::GetRGB32FromYUYV((uint8_t **)&buffer, (uint32_t **)&_buffer, width, height);
+			} else if (format == jgui::JPF_RGB24) {
+				ColorConversion::GetRGB32FromRGB24((uint8_t **)&buffer, (uint32_t **)&_buffer, width, height);
+			} else if (format == jgui::JPF_RGB32) {
+				memcpy(_buffer, buffer, width*height*4);
 			}
 
 #if defined(DIRECTFB_NODEPS_UI)
@@ -119,7 +127,7 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 			desc.width = sw;
 			desc.height = sh;
 			desc.pixelformat = DSPF_ARGB;
-			desc.preallocated[0].data = buffer;
+			desc.preallocated[0].data = _buffer;
 			desc.preallocated[0].pitch = sw*4;
 
 			IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
@@ -149,7 +157,7 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 			int sh = height;
 
 			cairo_surface_t *cairo_surface = cairo_image_surface_create_for_data(
-					(uint8_t *)buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
+					(uint8_t *)_buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
 			cairo_t *cairo_context = cairo_create(cairo_surface);
 
 			_mutex.Lock();
@@ -197,89 +205,13 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 
 };
 
-class VolumeControlImpl : public VolumeControl {
-	
-	private:
-		/** \brief */
-		LibAVLightPlayer *_player;
-		/** \brief */
-		int _level;
-		/** \brief */
-		bool _is_muted;
-
-	public:
-		VolumeControlImpl(LibAVLightPlayer *player):
-			VolumeControl()
-		{
-			_player = player;
-			_level = 50;
-			_is_muted = false;
-		}
-
-		virtual ~VolumeControlImpl()
-		{
-		}
-
-		virtual int GetLevel()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			int level = 0;
-
-			/*
-			if (_player->_provider != NULL) {
-				level = libvlc_audio_get_volume(_player->_provider);
-			}
-			*/
-
-			return level;
-		}
-
-		virtual void SetLevel(int level)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			_level = (level < 0)?0:(level > 100)?100:level;
-
-			if (_level != 0) {
-				_is_muted = true;
-			} else {
-				_is_muted = false;
-			}
-
-			/*
-			if (_player->_provider != NULL) {
-				libvlc_audio_set_mute(_player->_provider, (_is_muted == true)?1:0);
-				libvlc_audio_set_volume(_player->_provider, _level);
-			}
-			*/
-		}
-		
-		virtual bool IsMute()
-		{
-			return _is_muted;
-		}
-
-		virtual void SetMute(bool b)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-	
-			_is_muted = b;
-			
-			if (_player->_provider != NULL) {
-				avplay_mute(_player->_provider, _is_muted);
-			}
-		}
-
-};
-
 class VideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
-		LibAVLightPlayer *_player;
+		V4L2LightPlayer *_player;
 
 	public:
-		VideoSizeControlImpl(LibAVLightPlayer *player):
+		VideoSizeControlImpl(V4L2LightPlayer *player):
 			VideoSizeControl()
 		{
 			_player = player;
@@ -291,7 +223,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			LibAVLightComponentImpl *impl = dynamic_cast<LibAVLightComponentImpl *>(_player->_component);
+			V4LComponentImpl *impl = dynamic_cast<V4LComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -303,7 +235,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			LibAVLightComponentImpl *impl = dynamic_cast<LibAVLightComponentImpl *>(_player->_component);
+			V4LComponentImpl *impl = dynamic_cast<V4LComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
@@ -312,12 +244,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<LibAVLightComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<V4LComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			LibAVLightComponentImpl *impl = dynamic_cast<LibAVLightComponentImpl *>(_player->_component);
+			V4LComponentImpl *impl = dynamic_cast<V4LComponentImpl *>(_player->_component);
 
 			jgui::jregion_t t;
 
@@ -334,14 +266,14 @@ class VideoSizeControlImpl : public VideoSizeControl {
 class VideoFormatControlImpl : public VideoFormatControl {
 	
 	private:
-		LibAVLightPlayer *_player;
+		V4L2LightPlayer *_player;
 		jaspect_ratio_t _aspect_ratio;
 		jvideo_mode_t _video_mode;
 		jhd_video_format_t _hd_video_format;
 		jsd_video_format_t _sd_video_format;
 
 	public:
-		VideoFormatControlImpl(LibAVLightPlayer *player):
+		VideoFormatControlImpl(V4L2LightPlayer *player):
 			VideoFormatControl()
 		{
 			_player = player;
@@ -380,8 +312,12 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_CONTRAST, value);
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				if (control->HasControl(CONTRAST_CONTROL) == true) {
+					control->SetValue(CONTRAST_CONTROL, value);
+				}
 			}
 		}
 
@@ -389,8 +325,12 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_SATURATION, value);
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				if (control->HasControl(SATURATION_CONTROL) == true) {
+					control->SetValue(SATURATION_CONTROL, value);
+				}
 			}
 		}
 
@@ -398,8 +338,12 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_HUE, value);
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				if (control->HasControl(HUE_CONTROL) == true) {
+					control->SetValue(HUE_CONTROL, value);
+				}
 			}
 		}
 
@@ -407,8 +351,12 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_BRIGHTNESS, value);
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				if (control->HasControl(BRIGHTNESS_CONTROL) == true) {
+					control->SetValue(BRIGHTNESS_CONTROL, value);
+				}
 			}
 		}
 
@@ -421,14 +369,18 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_GAMMA, value);
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				if (control->HasControl(GAMMA_CONTROL) == true) {
+					control->SetValue(GAMMA_CONTROL, value);
+				}
 			}
 		}
 
 		virtual jgui::jsize_t GetFrameSize()
 		{
-			return dynamic_cast<LibAVLightComponentImpl *>(_player->_component)->_frame_size;
+			return dynamic_cast<V4LComponentImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual jaspect_ratio_t GetAspectRatio()
@@ -469,8 +421,12 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_CONTRAST);
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				if (control->HasControl(CONTRAST_CONTROL) == true) {
+					return control->GetValue(CONTRAST_CONTROL);
+				}
 			}
 
 			return 0;
@@ -480,8 +436,12 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_SATURATION);
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				if (control->HasControl(SATURATION_CONTROL) == true) {
+					return control->GetValue(SATURATION_CONTROL);
+				}
 			}
 
 			return 0;
@@ -491,8 +451,12 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_HUE);
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				if (control->HasControl(HUE_CONTROL) == true) {
+					return control->GetValue(HUE_CONTROL);
+				}
 			}
 
 			return 0;
@@ -502,8 +466,12 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_BRIGHTNESS);
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				if (control->HasControl(BRIGHTNESS_CONTROL) == true) {
+					return control->GetValue(BRIGHTNESS_CONTROL);
+				}
 			}
 
 			return 0;
@@ -518,8 +486,12 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_GAMMA);
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				if (control->HasControl(GAMMA_CONTROL) == true) {
+					return control->GetValue(GAMMA_CONTROL);
+				}
 			}
 
 			return 0;
@@ -527,53 +499,39 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 };
 
-static void render_callback(void *data, uint8_t *buffer, int width, int height)
-{
-	reinterpret_cast<LibAVLightComponentImpl *>(data)->UpdateComponent(buffer, width, height);
-}
-
-static void endofmedia_callback(void *data)
-{
-	LibAVLightPlayer *player = reinterpret_cast<LibAVLightPlayer *>(data);
-	
-	player->DispatchPlayerEvent(new PlayerEvent(player, JPE_FINISHED));
-}
-
-LibAVLightPlayer::LibAVLightPlayer(std::string file):
+V4L2LightPlayer::V4L2LightPlayer(std::string file):
 	jmedia::Player()
 {
 	_file = file;
 	_is_paused = false;
 	_is_closed = false;
 	_has_audio = false;
-	_has_video = false;
+	_has_video = true;
 	_aspect = 1.0;
 	_media_time = 0LL;
+	_is_loop = false;
+	_decode_rate = 0.0;
+	_frame_rate = 0.0;
+	_component = NULL;
 	
-	avplay_init();
+  _grabber = new VideoGrabber(this, file);
 
-	_provider = avplay_open(_file.c_str());
-
-	if (_provider == NULL) {
-		throw MediaException("Cannot recognize the media file");
-	}
-
-	_component = new LibAVLightComponentImpl(this, 0, 0, -1, -1);//iw, ih);
-
-	avplay_set_rendercallback(_provider, render_callback, (void *)_component);
-	avplay_set_endofmediacallback(_provider, endofmedia_callback, (void *)this);
-		
-	if (_provider->has_audio == true) {
-		_controls.push_back(new VolumeControlImpl(this));
-	}
+	jgui::jsize_t size;
 	
-	if (_provider->has_video == true) {
-		_controls.push_back(new VideoSizeControlImpl(this));
-		_controls.push_back(new VideoFormatControlImpl(this));
-	}
+	size.width = 720;
+	size.height = 480;
+
+	_grabber->Open();
+	_grabber->Configure(size.width, size.height);
+	_grabber->GetVideoControl()->Reset();
+
+	_controls.push_back(new VideoSizeControlImpl(this));
+	_controls.push_back(new VideoFormatControlImpl(this));
+	
+	_component = new V4LComponentImpl(this, 0, 0, -1, -1);
 }
 
-LibAVLightPlayer::~LibAVLightPlayer()
+V4L2LightPlayer::~V4L2LightPlayer()
 {
 	Close();
 	
@@ -589,49 +547,54 @@ LibAVLightPlayer::~LibAVLightPlayer()
 	_controls.clear();
 }
 
-void LibAVLightPlayer::Play()
+void V4L2LightPlayer::ProcessFrame(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
+{
+	dynamic_cast<V4LComponentImpl *>(_component)->UpdateComponent(buffer, width, height, format);
+}
+
+void V4L2LightPlayer::Play()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if (_is_paused == false && _provider != NULL) {
-		avplay_play(_provider);
+	if (_is_paused == false && _grabber != NULL) {
+		_grabber->Start();
 		
 		DispatchPlayerEvent(new PlayerEvent(this, JPE_STARTED));
 	}
 }
 
-void LibAVLightPlayer::Pause()
+void V4L2LightPlayer::Pause()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if (_is_paused == false && _provider != NULL) {
+	if (_is_paused == false && _grabber != NULL) {
 		_is_paused = true;
 		
-		avplay_pause(_provider, true);
+		_grabber->Pause();
 		
 		DispatchPlayerEvent(new PlayerEvent(this, JPE_PAUSED));
 	}
 }
 
-void LibAVLightPlayer::Resume()
+void V4L2LightPlayer::Resume()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if (_is_paused == true && _provider != NULL) {
+	if (_is_paused == true && _grabber != NULL) {
 		_is_paused = false;
 		
-		avplay_pause(_provider, false);
+		_grabber->Resume();
 		
 		DispatchPlayerEvent(new PlayerEvent(this, JPE_RESUMED));
 	}
 }
 
-void LibAVLightPlayer::Stop()
+void V4L2LightPlayer::Stop()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if (_provider != NULL) {
-		avplay_stop(_provider);
+	if (_grabber != NULL) {
+		_grabber->Stop();
 
 		if (_has_video == true) {
 			_component->Repaint();
@@ -641,7 +604,7 @@ void LibAVLightPlayer::Stop()
 	}
 }
 
-void LibAVLightPlayer::Close()
+void V4L2LightPlayer::Close()
 {
 	jthread::AutoLock lock(&_mutex);
 
@@ -651,95 +614,48 @@ void LibAVLightPlayer::Close()
 
 	_is_closed = true;
 
-	if (_provider != NULL) {
-		avplay_close(_provider);
-
-		_provider = NULL;
+	if (_grabber != NULL) {
+		delete _grabber;
+		_grabber = NULL;
 	}
 }
 
-void LibAVLightPlayer::SetCurrentTime(uint64_t time)
+void V4L2LightPlayer::SetCurrentTime(uint64_t time)
 {
-	jthread::AutoLock lock(&_mutex);
-
-	if (_provider != NULL) {
-		avplay_setcurrentmediatime(_provider, time);
-	}
 }
 
-uint64_t LibAVLightPlayer::GetCurrentTime()
+uint64_t V4L2LightPlayer::GetCurrentTime()
 {
-	jthread::AutoLock lock(&_mutex);
-
-	uint64_t time = 0LL;
-
-	if (_provider != NULL) {
-		time = (uint64_t)avplay_getcurrentmediatime(_provider);
-	}
-
-	return time;
+	return 0LL;
 }
 
-uint64_t LibAVLightPlayer::GetMediaTime()
+uint64_t V4L2LightPlayer::GetMediaTime()
 {
-	uint64_t time = 0LL;
-
-	if (_provider != NULL) {
-		time = (uint64_t)avplay_getmediatime(_provider);
-	}
-
-	return time;
+	return 0LL;
 }
 
-void LibAVLightPlayer::SetLoop(bool b)
+void V4L2LightPlayer::SetLoop(bool b)
 {
-	jthread::AutoLock lock(&_mutex);
-
-	if (_provider != NULL) {
-		avplay_setloop(_provider, b);
-	}
 }
 
-bool LibAVLightPlayer::IsLoop()
+bool V4L2LightPlayer::IsLoop()
 {
-	if (_provider != NULL) {
-		return avplay_isloop(_provider);
-	}
-
 	return false;
 }
 
-void LibAVLightPlayer::SetDecodeRate(double rate)
+void V4L2LightPlayer::SetDecodeRate(double rate)
 {
-	jthread::AutoLock lock(&_mutex);
-
-	_decode_rate = rate;
-
-	if (_decode_rate != 0.0) {
-		_is_paused = false;
-	}
-
-	if (_provider != NULL) {
-		// libvlc_media_player_set_rate(_provider, (float)rate);
-	}
 }
 
-double LibAVLightPlayer::GetDecodeRate()
+double V4L2LightPlayer::GetDecodeRate()
 {
-	jthread::AutoLock lock(&_mutex);
-
-	double rate = 1.0;
-
-	if (_provider != NULL) {
-		// rate = (double)libvlc_media_player_get_rate(_provider);
-	}
-
-	return rate;
+	return 0.0;
 }
 
-jgui::Component * LibAVLightPlayer::GetVisualComponent()
+jgui::Component * V4L2LightPlayer::GetVisualComponent()
 {
 	return _component;
 }
 
 }
+

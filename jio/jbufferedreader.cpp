@@ -35,10 +35,18 @@ BufferedReader::BufferedReader(InputStream *stream_)
 
 	_is_eof = false;
 	_stream = stream_;
+	
+	_buffer = new char[4096];
+
+	_buffer_size = 0;
+	_buffer_index = 0;
 }
 
 BufferedReader::~BufferedReader()
 {
+	if ((void *)_buffer != NULL) {
+		delete [] _buffer;
+	}
 }
 
 int64_t BufferedReader::Available()
@@ -53,32 +61,86 @@ bool BufferedReader::IsEOF()
 
 int64_t BufferedReader::Read()
 {
-	int64_t r;
+	int64_t r, d = _buffer_size - _buffer_index;
+	char c;
+	
+	_is_eof = false;
 
-	r = _stream->Read();
+	if (d == 0) {
+		r = _stream->Read((char *)_buffer, 4096);
+			
+		if (r <= 0) {
+			_is_eof = false;
+			_buffer_size = 0;
+			_buffer_index = 0;
 
-	if (r < 0LL) {
-		_is_eof = true;
-	} else {
-		_is_eof = false;
+			return -1;
+		}
+
+		_buffer_index = 0;
+		_buffer_size = r;
+
+		d = r;
 	}
+	
+	c = _buffer[_buffer_index++];
+	
+	if (_buffer_index >= _buffer_size) {
+		_buffer_index = _buffer_size = 0;
+	}
+	
+	return (int64_t)c;
 
-	return r;
 }
 
 int64_t BufferedReader::Read(char *data, int64_t size)
 {
-	int64_t r;
+	int64_t r, d, count = size;
+	
+	_is_eof = false;
 
-	r = _stream->Read(data, size);
+	do {
+		d = _buffer_size - _buffer_index;
 
-	if (r < 0LL) {
-		_is_eof = true;
-	} else {
-		_is_eof = false;
-	}
+		if (d == 0) {
+			r = _stream->Read((char *)_buffer, 4096);
 
-	return r;
+			if (r <= 0) {
+				_is_eof = true;
+
+				_buffer_size = 0;
+				_buffer_index = 0;
+
+				if (count == size) {
+					return -1;
+				} else {
+					return size - count;
+				}
+			}
+
+			_buffer_index = 0;
+			_buffer_size = r;
+
+			d = r;
+		}
+
+		r = count;
+
+		if (r > d) {
+			r = d;
+		}
+
+		memcpy((char *)(data + size - count), (char *)(_buffer + _buffer_index), (uint32_t)r);
+
+		_buffer_index += r;
+		count -= r;
+
+		if (_buffer_index >= _buffer_size) {
+			_buffer_index = _buffer_size = 0;
+		}
+	} while (count > 0);
+
+	return size;
 }
 
 std::string BufferedReader::ReadLine(std::string delim)
@@ -96,7 +158,7 @@ std::string BufferedReader::ReadLine(std::string delim)
 	_is_eof = false;
 
 	for (i=0; ; ) {
-		x = (int)_stream->Read();
+		x = (int)Read();
 
 		if (i >= n) {
 			tmp = n+100;

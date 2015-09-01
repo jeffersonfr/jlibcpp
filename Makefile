@@ -344,6 +344,7 @@ OBJS_jgui += \
 
 OBJS_jmedia += \
 		jaudioconfigurationcontrol.o\
+		jcolorconversion.o\
 		jcontrol.o\
 		jcontrolexception.o\
 		jmediaexception.o\

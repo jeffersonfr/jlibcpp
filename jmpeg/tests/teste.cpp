@@ -42,6 +42,7 @@
 #define TS_TDT_TIMEOUT	6000
 #define TS_EIT_TIMEOUT	4000
 #define TS_PRIVATE_TIMEOUT	10000
+#define TS_PCR_TIMEOUT	1000
 
 #define DHEX2DEC(value) ((((value & 0xf0) >> 4) * 10) + (value & 0x0f))
 
@@ -122,6 +123,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 		std::map<int, std::string> _stream_types;
 		std::set<int> _pids;
 		std::string _dsmcc_private_payload;
+		int _pcr_pid;
 		int _dsmcc_sequence_number;
 		int _dsmcc_data_pid;
 		int _dsmcc_descriptors_pid;
@@ -136,6 +138,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			demux->SetTID(tid);
 			demux->SetTimeout(timeout);
 			// demux->SetUpdateIfModified(false);
+			demux->SetCRCCheckEnabled(false);
 			demux->Start();
 
 			_demuxes[id] = demux;
@@ -144,6 +147,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 	public:
 		DemuxTest()
 		{
+			_pcr_pid = -1;
 			_dsmcc_data_pid = -1;
 			_dsmcc_descriptors_pid = -1;
 			_dsmcc_sequence_number = 0;
@@ -320,11 +324,14 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int count = 0;
 
 				while (count < descriptor_length) {
-					// TODO:: application_identifier()
-					// int application_priority = TS_G8(ptr+4);
+					int oid = TS_G32(ptr);	
+					int aid = TS_G16(ptr+4);
+					int application_priority = TS_G8(ptr+6);
 
-					ptr = ptr + 5;
-					count = count + 5;
+					printf(":: oid:[0x%08x], aid:[0x%04x], application priority:[%d]\n", oid, aid, application_priority);
+
+					ptr = ptr + 7;
+					count = count + 7;
 				}
 			} else if (descriptor_tag == 0x0b) { // application icons descriptor
 				int icon_locator_length = TS_G8(ptr);
@@ -757,6 +764,22 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int rate_age = (rate >> 0) & 0xff; 
 				int rate_content = (rate >> 4) & 0x0f;
 
+				std::string age = "Not defined";
+
+				if (rate_age == 0x01) {
+					age = "L";
+				} else if (rate_age == 0x02) {
+					age = "10";
+				} else if (rate_age == 0x03) {
+					age = "12";
+				} else if (rate_age == 0x04) {
+					age = "14";
+				} else if (rate_age == 0x05) {
+					age = "16";
+				} else if (rate_age == 0x06) {
+					age = "18";
+				}
+
 				std::string content;
 
 				if (rate_content == 0x01) {
@@ -775,7 +798,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					content = "violencia, sexo e drogas";
 				}
 
-				printf(":: country:[%s], age:[%d], content:[%s]\n", country.c_str(), rate_age, content.c_str());
+				printf(":: country:[%s], age:[%d]::[%s], content:[%02x]::[%s]\n", country.c_str(), rate_age, age.c_str(), rate_content,  content.c_str());
 			} else if (descriptor_tag == 0x7d) { // aac descriptor
 				const char *end = ptr + descriptor_length;
 
@@ -842,8 +865,30 @@ class DemuxTest : public jmpeg::DemuxListener {
 				int area_code = TS_GM16(ptr, 0, 12);
 				int guard_interval = TS_GM16(ptr, 12, 2);
 				int transmission_mode = TS_GM16(ptr, 14, 2);
+				std::string interval;
+				std::string mode;
 
-				printf(":: area code:[%d], guard interval:[%d], tramission mode:[%d]\n", area_code, guard_interval, transmission_mode);
+				if (guard_interval == 0x00) {
+					interval = "1/32";
+				} else if (guard_interval == 0x01) {
+					interval = "1/16";
+				} else if (guard_interval == 0x02) {
+					interval = "1/8";
+				} else if (guard_interval == 0x03) {
+					interval = "1/4";
+				}
+				
+				if (transmission_mode == 0x00) {
+					mode = "Mode 1";
+				} else if (transmission_mode == 0x01) {
+					mode = "Mode 2";
+				} else if (transmission_mode == 0x02) {
+					mode = "Mode 3";
+				} else if (transmission_mode == 0x03) {
+					mode = "Undefined";
+				}
+
+				printf(":: area code:[%d], guard interval:[%d]::[%s], tramission mode:[%d]::[%s]\n", area_code, guard_interval, interval.c_str(), transmission_mode, mode.c_str());
 
 				int count = (descriptor_length - 2)/2;
 				
@@ -853,6 +898,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					int frequency = TS_G16(ptr);
 
 					printf(":: frequency:[%d]\n", frequency);
+					// printf(":: frequency:[%.0f + 1/7 MHz]\n", (473.0 + 6.0 * (frequency - 14.0) + 1.0/7.0) * 7.0);
 
 					ptr = ptr + 2;
 				}
@@ -932,6 +978,8 @@ class DemuxTest : public jmpeg::DemuxListener {
 					// 		0x60-0x6f: schedule (other ts)
 					// 	}
 					// ProcessEIT(event);
+				} else if (pid == _pcr_pid) {
+					ProcessPCR(event);
 				} else if (pid == _dsmcc_data_pid) {
 					ProcessDSMCCData(event);
 				} else if (pid == _dsmcc_descriptors_pid) {
@@ -1113,6 +1161,8 @@ class DemuxTest : public jmpeg::DemuxListener {
 			if (pcr_pid == 0x1fff) { // pmt pcr unsed
 				pcr_pid = vpid; // first video pid
 			}
+			
+			InitDemux("pcr", pcr_pid, -1, TS_PCR_TIMEOUT);
 		}
 
 		virtual void ProcessNIT(jmpeg::DemuxEvent *event)
@@ -1329,8 +1379,23 @@ class DemuxTest : public jmpeg::DemuxListener {
 				// int section_number = TS_G8(ptr+6);
 				// int last_section_number = TS_G8(ptr+7);
 				// int reserved_future_use = TS_GM8(ptr+8, 0, 4);
-				
-				printf("AIT:: application flag:[0x%02x], version number:[0x%04x]\n", application_type, version_number);
+				std::string type = "Unknown";
+
+				if (application_type == 0x01) {
+					type = "Ginga-J";
+				} else if (application_type == 0x02) {
+					type = "DVB-HHTML";
+				} else if (application_type == 0x06) {
+					type = "ACAP-J";
+				} else if (application_type == 0x07) {
+					type = "ARIB-BML";
+				} else if (application_type == 0x09) {
+					type = "Ginga-NCL";
+				} else if (application_type == 0x10) {
+					type = "Resident";
+				}
+
+				printf("AIT:: application type:[0x%02x]::[%s], version number:[0x%04x]\n", application_type, type.c_str(), version_number);
 
 				ptr = ptr + 8;
 	
@@ -1400,6 +1465,17 @@ class DemuxTest : public jmpeg::DemuxListener {
 					application_loop_count = application_loop_count + 9 + descriptors_length;
 				}
 			}
+		}
+
+		virtual void ProcessPCR(jmpeg::DemuxEvent *event)
+		{
+			const char *ptr = event->GetData();
+
+			uint64_t program_clock_reference_base = (uint64_t)TS_GM32(ptr, 0, 32) << 1 | TS_GM8(ptr+4, 0, 1);
+			// int reserved = TS_GM8(ptr+4, 1, 6);
+			uint64_t program_clock_reference_extension = (uint64_t)TS_GM16(ptr+4, 7, 9);
+					
+			printf("PCR:: base:[%lu], extension:[%lu]\n", program_clock_reference_base, program_clock_reference_extension);
 		}
 
 		virtual void ProcessDSMCCData(jmpeg::DemuxEvent *event)

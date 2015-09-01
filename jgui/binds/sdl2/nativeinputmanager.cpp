@@ -31,11 +31,9 @@ NativeInputManager::NativeInputManager():
 {
 	jcommon::Object::SetClassName("jgui::NativeInputManager");
 
-	jpoint_t p = GFXHandler::GetInstance()->GetCursorLocation();
-
 	_is_initialized = false;
-	_mouse_x = p.x;
-	_mouse_y = p.y;
+	_mouse_x = 0;
+	_mouse_y = 0;
 	_is_key_enabled = true;
 	_is_mouse_enabled = true;
 	_last_keypress = 0LL;
@@ -694,31 +692,47 @@ void NativeInputManager::ProcessInputEvent(SDL_Event event)
 
 void NativeInputManager::Run()
 {
-	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->InitEngine();
-
 	SDL_Event event;
 
+	printf(":: 100:: %d\n", __LINE__);
 	while (_is_initialized == true) {
 		while (SDL_PollEvent(&event)) {
 			if (event.type == USER_NATIVE_EVENT_ENGINE_INIT) {
 				NativeHandler *handler = (NativeHandler *)event.user.data1;
+				jthread::Semaphore *sem = (jthread::Semaphore *)event.user.data2;
 
+	printf(":: 100:: %d\n", __LINE__);
 				handler->InternalInitEngine();
+
+				sem->Notify();
+	printf(":: 100:: %d\n", __LINE__);
 			} else if (event.type == USER_NATIVE_EVENT_ENGINE_RELEASE) {
 				NativeHandler *handler = (NativeHandler *)event.user.data1;
+				jthread::Semaphore *sem = (jthread::Semaphore *)event.user.data2;
 
+	printf(":: 100:: %d\n", __LINE__);
 				handler->InternalRelease();
+				
+				sem->Notify();
+	printf(":: 100:: %d\n", __LINE__);
 			} else if (event.type == USER_NATIVE_EVENT_WINDOW_CREATE) {
 				Window *window = (Window *)event.user.data1;
+				jthread::Semaphore *sem = (jthread::Semaphore *)event.user.data2;
 
+	printf(":: 100:: %d\n", __LINE__);
 				window->InternalInstanciateWindow();
+				
+				sem->Notify();
+	printf(":: 100:: %d\n", __LINE__);
 			} else if (event.type == USER_NATIVE_EVENT_WINDOW_REPAINT) {
 				Window *window = (Window *)event.user.data1;
 				Component *cmp = (Component *)event.user.data2;
 
 				window->InternalRepaint(cmp);
 			} else {
+	printf(":: 100:: %d\n", __LINE__);
 				ProcessInputEvent(event);
+	printf(":: 100:: %d\n", __LINE__);
 			}
 		}
 	}

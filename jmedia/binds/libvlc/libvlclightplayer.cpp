@@ -102,7 +102,7 @@ libvlc_event_type_t mi_events[] = {
 	
 int mi_events_len = sizeof(mi_events)/sizeof(*mi_events);
 
-class VideoLightweightImpl : public jgui::Component, jthread::Thread {
+class LibVLCLightComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
@@ -123,7 +123,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 		jgui::jsize_t _frame_size;
 
 	public:
-		VideoLightweightImpl(Player *player, int x, int y, int w, int h):
+		LibVLCLightComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = new uint32_t*[2];
@@ -152,7 +152,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 			SetVisible(true);
 		}
 
-		virtual ~VideoLightweightImpl()
+		virtual ~LibVLCLightComponentImpl()
 		{
 			if (IsRunning() == true) {
 				WaitThread();
@@ -273,7 +273,7 @@ class VideoLightweightImpl : public jgui::Component, jthread::Thread {
 
 void * LockMediaSurface(void *data, void **p_pixels)
 {
-	VideoLightweightImpl *cmp = reinterpret_cast<VideoLightweightImpl *>(data);
+	LibVLCLightComponentImpl *cmp = reinterpret_cast<LibVLCLightComponentImpl *>(data);
 	
 	(*p_pixels) = cmp->_buffer[cmp->_buffer_index];
 
@@ -288,7 +288,7 @@ void UnlockMediaSurface(void *data, void *id, void *const *p_pixels)
 
 void DisplayMediaSurface(void *data, void *id)
 {
-	reinterpret_cast<VideoLightweightImpl *>(data)->UpdateComponent();
+	reinterpret_cast<LibVLCLightComponentImpl *>(data)->UpdateComponent();
 }
 
 void MediaEventsCallback(const libvlc_event_t *event, void *data)
@@ -518,12 +518,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jsize_t GetFrameSize()
 		{
-			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_frame_size;
+			return dynamic_cast<LibVLCLightComponentImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			LibVLCLightComponentImpl *impl = dynamic_cast<LibVLCLightComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -535,7 +535,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			LibVLCLightComponentImpl *impl = dynamic_cast<LibVLCLightComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
@@ -544,12 +544,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_src;
+			return dynamic_cast<LibVLCLightComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			VideoLightweightImpl *impl = dynamic_cast<VideoLightweightImpl *>(_player->_component);
+			LibVLCLightComponentImpl *impl = dynamic_cast<LibVLCLightComponentImpl *>(_player->_component);
 
 			jgui::jregion_t t;
 
@@ -660,7 +660,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual jgui::jsize_t GetFrameSize()
 		{
-			return dynamic_cast<VideoLightweightImpl *>(_player->_component)->_frame_size;
+			return dynamic_cast<LibVLCLightComponentImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual jaspect_ratio_t GetAspectRatio()
@@ -768,7 +768,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	_is_closed = false;
 	_has_audio = false;
 	_has_video = false;
-	_aspect = 16.0/9.0;
+	_aspect = 1.0;
 	_media_time = 0LL;
 	
 	char const *vlc_argv[] = {
@@ -841,15 +841,13 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 			}
 		}
 
-		if (_aspect == 0.0) {
-			_aspect = (double)(iw/(double)ih);
-		}
+		_aspect = (double)(iw/(double)ih);
 	}
 
 	_media_time = (uint64_t)libvlc_media_get_duration(media);
 	// _frame_per_sec = libvlc_media_player_get_fps(_provider);
 
-	_component = new VideoLightweightImpl(this, 0, 0, iw, ih);
+	_component = new LibVLCLightComponentImpl(this, 0, 0, iw, ih);
 
 	libvlc_video_set_format(_provider, "RV32", iw, ih, iw*4);
 	libvlc_video_set_callbacks(_provider, LockMediaSurface, UnlockMediaSurface, DisplayMediaSurface, _component);
@@ -939,7 +937,7 @@ void LibVLCLightPlayer::Pause()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if (_is_paused == false) {
+	if (_is_paused == false && _provider != NULL) {
 		_is_paused = true;
 
 		if (libvlc_media_player_can_pause(_provider) == true) {
@@ -954,7 +952,7 @@ void LibVLCLightPlayer::Resume()
 {
 	jthread::AutoLock lock(&_mutex);
 
-	if (_is_paused == true) {
+	if (_is_paused == true && _provider != NULL) {
 		_is_paused = false;
 
 		libvlc_media_player_set_pause(_provider, 0);

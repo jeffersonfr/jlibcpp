@@ -17,20 +17,55 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVETYPES_H
-#define J_NATIVETYPES_H
+#ifndef J_COLORCONVERSION_H
+#define J_COLORCONVERSION_H
 
-#define USER_NATIVE_EVENT_ENGINE_INIT		1010
-#define USER_NATIVE_EVENT_ENGINE_RELEASE	1020
-#define USER_NATIVE_EVENT_WINDOW_CREATE	1030
-#define USER_NATIVE_EVENT_WINDOW_REPAINT	1040
+#include "jobject.h"
 
-struct jnative_pointers_t {
-	void *data0;
-	void *data1;
-	void *data2;
-	void *data3;
-	void *data4;
+namespace jmedia {
+
+class ColorConversion : public virtual jcommon::Object {
+
+	private:
+		/**
+		 * \brief
+		 *
+		 */
+		ColorConversion();
+
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~ColorConversion();
+
+		/**
+		 * \brief
+		 *
+		 */
+		static void GetRGB32FromRGB16(uint8_t **rgb24_array, uint32_t **rgb32_array, int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static void GetRGB32FromRGB24(uint8_t **rgb24_array, uint32_t **rgb32_array, int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		static void GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uint8_t **v_array, uint32_t **rgb32_array, int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		static void GetRGB32FromYUYV(uint8_t **yuv_array, uint32_t **rgb32_array, int width, int height);
+
 };
+
+}
 
 #endif

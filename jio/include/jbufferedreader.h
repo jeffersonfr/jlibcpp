@@ -37,6 +37,12 @@ class BufferedReader : public virtual jcommon::Object{
 		/** \brief */
 		InputStream *_stream;
 		/** \brief */
+		char *_buffer;
+		/** \brief */
+		int64_t _buffer_size;
+		/** \brief */
+		int64_t _buffer_index;
+		/** \brief */
 		bool _is_eof;
 		
 	public:
