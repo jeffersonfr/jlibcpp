@@ -120,3 +120,39 @@ ifeq ($(findstring v4l2, $(ENABLE_MEDIA)), v4l2)
 
 endif
 
+ifeq ($(findstring gif, $(ENABLE_MEDIA)), gif)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/gif/include \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DGIF_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_gif += \
+		 giflightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/gif/,$(OBJS_gif))
+
+endif
+
+ifeq ($(findstring ilist, $(ENABLE_MEDIA)), ilist)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/ilist/include \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DIMAGE_LIST_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_ilist += \
+		 ilistlightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/ilist/,$(OBJS_ilist))
+
+endif
+
