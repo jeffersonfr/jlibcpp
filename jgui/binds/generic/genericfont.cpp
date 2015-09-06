@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "genericfont.h"
 #include "generichandler.h"
+#include "jcharset.h"
 #include "jnullpointerexception.h"
 
 namespace jgui {
@@ -184,9 +185,14 @@ int GenericFont::GetStringWidth(std::string text)
 jregion_t GenericFont::GetStringExtends(std::string text)
 {
 	const char *utf8 = text.c_str();
+	int utf8_len = text.size();
 	cairo_text_extents_t t;
 
-	// TODO:: convert to latin1
+	if (GetEncoding() == JFE_ISO_8859_1) {
+		jcommon::Charset charset;
+
+		utf8 = charset.Latin1ToUTF8(utf8, &utf8_len);
+	}
 
 	cairo_scaled_font_text_extents(_scaled_font, utf8, &t);
 
@@ -196,6 +202,10 @@ jregion_t GenericFont::GetStringExtends(std::string text)
 	r.y = t.y_bearing;
 	r.width = t.width;
 	r.height = t.height;
+
+	if (GetEncoding() == JFE_ISO_8859_1) {
+		delete [] utf8;
+	}
 
 	return r;
 }
