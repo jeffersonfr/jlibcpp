@@ -90,6 +90,11 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 			_mutex.Unlock();
 		}
 
+		virtual jgui::jsize_t GetPreferredSize()
+		{
+			return _frame_size;
+		}
+
 		virtual void UpdateComponent(uint8_t *buffer, int width, int height)
 		{
 			if (width <= 0 || height <= 0) {
@@ -378,57 +383,26 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual void SetContrast(int value)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_CONTRAST, value);
-			}
 		}
 
 		virtual void SetSaturation(int value)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_SATURATION, value);
-			}
 		}
 
 		virtual void SetHUE(int value)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_HUE, value);
-			}
 		}
 
 		virtual void SetBrightness(int value)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_BRIGHTNESS, value);
-			}
 		}
 
 		virtual void SetSharpness(int value)
 		{
-			// TODO::
 		}
 
 		virtual void SetGamma(int value)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_GAMMA, value);
-			}
-		}
-
-		virtual jgui::jsize_t GetFrameSize()
-		{
-			return dynamic_cast<LibAVLightComponentImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual jaspect_ratio_t GetAspectRatio()
@@ -467,45 +441,21 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual int GetContrast()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_CONTRAST);
-			}
-
 			return 0;
 		}
 
 		virtual int GetSaturation()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_SATURATION);
-			}
-
 			return 0;
 		}
 
 		virtual int GetHUE()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_HUE);
-			}
-
 			return 0;
 		}
 
 		virtual int GetBrightness()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_BRIGHTNESS);
-			}
-
 			return 0;
 		}
 
@@ -516,12 +466,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual int GetGamma()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_GAMMA);
-			}
-
 			return 0;
 		}
 
@@ -549,6 +493,7 @@ LibAVLightPlayer::LibAVLightPlayer(std::string file):
 	_has_video = false;
 	_aspect = 1.0;
 	_media_time = 0LL;
+	_decode_rate = 1.0;
 	
 	avplay_init();
 

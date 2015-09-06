@@ -108,6 +108,11 @@ class DirectFBLightComponentImpl : public jgui::Component, jthread::Thread {
 			_mutex.Unlock();
 		}
 
+		virtual jgui::jsize_t GetPreferredSize()
+		{
+			return _frame_size;
+		}
+
 		virtual void UpdateComponent()
 		{
 #if defined(DIRECTFB_NODEPS_UI)
@@ -329,11 +334,6 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		{
 		}
 
-		virtual jgui::jsize_t GetFrameSize()
-		{
-			return dynamic_cast<DirectFBLightComponentImpl *>(_player->_component)->_frame_size;
-		}
-
 		virtual void SetSource(int x, int y, int w, int h)
 		{
 			DirectFBLightComponentImpl *impl = dynamic_cast<DirectFBLightComponentImpl *>(_player->_component);
@@ -479,7 +479,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual void SetSharpness(int value)
 		{
-			// TODO::
 		}
 
 		virtual jaspect_ratio_t GetAspectRatio()
@@ -850,7 +849,6 @@ void DirectFBLightPlayer::Run()
 			_events->GetEvent(_events, DFB_EVENT(&event));
 
 			if (event.clazz == DFEC_VIDEOPROVIDER) {
-				// TODO:: disparar eventos de midia
 				if (event.type == DVPET_STARTED) {
 					DispatchPlayerEvent(new PlayerEvent(this, JPE_STARTED));
 				} else if (event.type == DVPET_STOPPED) {

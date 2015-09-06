@@ -41,6 +41,14 @@
 #include "v4l2lightplayer.h"
 #endif
 
+#if defined(GIF_MEDIA)
+#include "giflightplayer.h"
+#endif
+
+#if defined(IMAGE_LIST_MEDIA)
+#include "ilistlightplayer.h"
+#endif
+
 namespace jmedia {
 
 std::map<jplayer_hints_t, bool> PlayerManager::_hints;
@@ -66,6 +74,13 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 
 	jcommon::URL url(url_);
 
+#if defined(IMAGE_LIST_MEDIA)
+	try {
+		return new ImageListLightPlayer(url_);
+	} catch (jcommon::Exception &e) {
+	}
+#endif
+
 #if defined(V4L2_MEDIA)
 	try {
 		if (strncasecmp(url.GetProtocol().c_str(), "v4l", 3) == 0) {
@@ -75,7 +90,14 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 	}
 #endif
 
-#if defined(DIRECTFB_MEDIA)
+#if defined(GIF_MEDIA)
+	try {
+		return new GIFLightPlayer(url.GetPath());
+	} catch (jcommon::Exception &e) {
+	}
+#endif
+
+#if defined(DIRECTFB_MEDIA) && defined(DIRECTFB_UI)
 	try {
 		if (_hints[JPH_LIGHTWEIGHT] == false) {
 			return new DirectFBHeavyPlayer(url_);

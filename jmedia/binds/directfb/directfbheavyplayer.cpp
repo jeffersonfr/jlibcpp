@@ -140,6 +140,11 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 			}
 		}
 
+		virtual jgui::jsize_t GetPreferredSize()
+		{
+			return _frame_size;
+		}
+
 		virtual void UpdateComponent()
 		{
 			RaiseToTop();
@@ -561,12 +566,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual void SetSharpness(int value)
 		{
-			// TODO::
-		}
-
-		virtual jgui::jsize_t GetFrameSize()
-		{
-			return dynamic_cast<VideoOverlayImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual jaspect_ratio_t GetAspectRatio()
@@ -934,7 +933,6 @@ void DirectFBHeavyPlayer::Run()
 			_events->GetEvent(_events, DFB_EVENT(&event));
 
 			if (event.clazz == DFEC_VIDEOPROVIDER) {
-				// TODO:: disparar eventos de midia
 				if (event.type == DVPET_STARTED) {
 					DispatchPlayerEvent(new PlayerEvent(this, JPE_STARTED));
 				} else if (event.type == DVPET_STOPPED) {

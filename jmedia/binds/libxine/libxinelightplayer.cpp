@@ -92,6 +92,11 @@ class LibXineLightComponentImpl : public jgui::Component, jthread::Thread {
 			}
 		}
 
+		virtual jgui::jsize_t GetPreferredSize()
+		{
+			return _frame_size;
+		}
+
 		virtual void UpdateComponent(int format, int width, int height, double aspect, void *data0, void *data1, void *data2)
 		{
 			if (width <= 0 || height <= 0) {
@@ -441,7 +446,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual void SetSharpness(int value)
 		{
-			// TODO::
 		}
 
 		virtual void SetGamma(int value)
@@ -451,11 +455,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			if (_player->_stream != NULL) {
 				xine_set_param(_player->_stream, XINE_PARAM_VO_GAMMA, value);
 			}
-		}
-
-		virtual jgui::jsize_t GetFrameSize()
-		{
-			return dynamic_cast<LibXineLightComponentImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual jaspect_ratio_t GetAspectRatio()
@@ -589,7 +588,7 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	_aspect = 1.0;
 	_media_time = 0LL;
 	_is_loop = false;
-	_decode_rate = 0.0;
+	_decode_rate = 1.0;
 	_frame_rate = 0.0;
 	
 	_component = new LibXineLightComponentImpl(this, 0, 0, -1, -1);

@@ -177,12 +177,6 @@ class VideoFormatControl : public Control {
 		virtual void SetGamma(int value);
 
 		/**
-		 * \brief
-		 *
-		 */
-		virtual jgui::jsize_t GetFrameSize();
-
-		/**
 		 * \brief Returns the aspect ratio.
 		 *
 		 * \return 

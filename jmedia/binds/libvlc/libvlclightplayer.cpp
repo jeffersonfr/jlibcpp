@@ -36,7 +36,7 @@
 
 namespace jmedia {
 
-libvlc_event_type_t mi_events[] = {
+static libvlc_event_type_t mi_events[] = {
 	// libvlc_MediaMetaChanged,	
 	// libvlc_MediaSubItemAdded,	
 	// libvlc_MediaDurationChanged,
@@ -100,7 +100,7 @@ libvlc_event_type_t mi_events[] = {
 	// libvlc_VlmMediaInstanceStatusError,
 };
 	
-int mi_events_len = sizeof(mi_events)/sizeof(*mi_events);
+static int mi_events_len = sizeof(mi_events)/sizeof(*mi_events);
 
 class LibVLCLightComponentImpl : public jgui::Component, jthread::Thread {
 
@@ -176,6 +176,11 @@ class LibVLCLightComponentImpl : public jgui::Component, jthread::Thread {
 			_mutex.Unlock();
 		}
 
+		virtual jgui::jsize_t GetPreferredSize()
+		{
+			return _frame_size;
+		}
+
 		virtual void UpdateComponent()
 		{
 #if defined(DIRECTFB_NODEPS_UI)
@@ -183,10 +188,11 @@ class LibVLCLightComponentImpl : public jgui::Component, jthread::Thread {
 				WaitThread();
 			}
 
-			IDirectFBSurface *frame;
-			DFBSurfaceDescription desc;
 			int sw = _frame_size.width;
 			int sh = _frame_size.height;
+
+			IDirectFBSurface *frame;
+			DFBSurfaceDescription desc;
 
 			desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT | DSDESC_PREALLOCATED);
 			desc.caps = (DFBSurfaceCapabilities)(DSCAPS_NONE);
@@ -271,7 +277,7 @@ class LibVLCLightComponentImpl : public jgui::Component, jthread::Thread {
 
 };
 
-void * LockMediaSurface(void *data, void **p_pixels)
+static void * LockMediaSurface(void *data, void **p_pixels)
 {
 	LibVLCLightComponentImpl *cmp = reinterpret_cast<LibVLCLightComponentImpl *>(data);
 	
@@ -282,16 +288,16 @@ void * LockMediaSurface(void *data, void **p_pixels)
 	return NULL; 
 }
 
-void UnlockMediaSurface(void *data, void *id, void *const *p_pixels)
+static void UnlockMediaSurface(void *data, void *id, void *const *p_pixels)
 {
 }
 
-void DisplayMediaSurface(void *data, void *id)
+static void DisplayMediaSurface(void *data, void *id)
 {
 	reinterpret_cast<LibVLCLightComponentImpl *>(data)->UpdateComponent();
 }
 
-void MediaEventsCallback(const libvlc_event_t *event, void *data)
+static void MediaEventsCallback(const libvlc_event_t *event, void *data)
 {
 	LibVLCLightPlayer	*player = reinterpret_cast<LibVLCLightPlayer *>(data);
 
@@ -314,8 +320,6 @@ void MediaEventsCallback(const libvlc_event_t *event, void *data)
 	//} else if (event->type == libvlc_MediaPlayerForward) {
 	//} else if (event->type == libvlc_MediaPlayerBackward) {
 	} else if (event->type == libvlc_MediaPlayerEndReached) {
-		player->DispatchPlayerEvent(new PlayerEvent(player, JPE_FINISHED));
-
 		player->Start();
 	// } else if (event->type == libvlc_MediaPlayerEncounteredError) {
 	// } else if (event->type == libvlc_MediaPlayerTimeChanged) {
@@ -516,11 +520,6 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		{
 		}
 
-		virtual jgui::jsize_t GetFrameSize()
-		{
-			return dynamic_cast<LibVLCLightComponentImpl *>(_player->_component)->_frame_size;
-		}
-
 		virtual void SetSource(int x, int y, int w, int h)
 		{
 			LibVLCLightComponentImpl *impl = dynamic_cast<LibVLCLightComponentImpl *>(_player->_component);
@@ -646,7 +645,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual void SetSharpness(int value)
 		{
-			// TODO::
 		}
 
 		virtual void SetGamma(int value)
@@ -656,11 +654,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			if (_player->_provider != NULL) {
 				// xine_set_param(_player->_provider, XINE_PARAM_VO_GAMMA, value);
 			}
-		}
-
-		virtual jgui::jsize_t GetFrameSize()
-		{
-			return dynamic_cast<LibVLCLightComponentImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual jaspect_ratio_t GetAspectRatio()
@@ -770,6 +763,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	_has_video = false;
 	_aspect = 1.0;
 	_media_time = 0LL;
+	_decode_rate = 1.0;
 	
 	char const *vlc_argv[] = {
 		"--vout=dummy"
@@ -917,10 +911,13 @@ LibVLCLightPlayer::~LibVLCLightPlayer()
 
 void LibVLCLightPlayer::Run()
 {
-	Stop();
-
 	if (IsLoop() == true) {
+		Stop();
 		Play();
+	} else {
+		Stop();
+
+		DispatchPlayerEvent(new PlayerEvent(this, JPE_FINISHED));
 	}
 }
 

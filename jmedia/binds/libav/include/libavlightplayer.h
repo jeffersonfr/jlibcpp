@@ -37,10 +37,6 @@ class LibAVLightPlayer : public jmedia::Player {
 		/** \brief */
 		std::string _file;
 		/** \brief */
-		jmedia::Control *_video_size;
-		/** \brief */
-		jmedia::Control *_video_format;
-		/** \brief */
 		jgui::Component *_component;
 		/** \brief */
 		double _aspect;

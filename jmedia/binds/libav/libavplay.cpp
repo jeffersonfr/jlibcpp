@@ -548,7 +548,7 @@ static int queue_picture(VideoState *is, AVFrame *src_frame, double pts, int64_t
         is->pictq_size++;
         pthread_mutex_unlock(&is->pictq_mutex);
 			
-				// TODO:: CALLBACK 2:: FLIP
+				// CHANGE:: callback the method flip()
     }
 
     return 0;

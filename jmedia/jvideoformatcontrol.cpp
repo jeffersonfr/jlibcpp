@@ -71,16 +71,6 @@ void VideoFormatControl::SetGamma(int value)
 {
 }
 
-jgui::jsize_t VideoFormatControl::GetFrameSize()
-{
-	jgui::jsize_t t;
-
-	t.width = 0;
-	t.height = 0;
-
-	return t;
-}
-
 jaspect_ratio_t VideoFormatControl::GetAspectRatio()
 {
 	return LAR_16x9;

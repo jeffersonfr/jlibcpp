@@ -17,24 +17,18 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVEHEAVYPLAYER_H
-#define J_NATIVEHEAVYPLAYER_H
+#ifndef J_GIFLIGHTPLAYER_H
+#define J_GIFLIGHTPLAYER_H
 
 #include "jplayer.h"
 #include "jthread.h"
 #include "jcomponent.h"
 
-#include <directfb.h>
-
 namespace jmedia {
 
-class DirectFBHeavyPlayer : public jmedia::Player, public jthread::Thread {
+class GIFLightPlayer : public jmedia::Player, public jthread::Thread {
 
 	public:
-		/** \brief */
-		IDirectFBVideoProvider *_provider;
-		/** \brief */
-		IDirectFBEventBuffer *_events;
 		/** \brief */
 		jthread::Mutex _mutex;
 		/** \brief */
@@ -46,6 +40,8 @@ class DirectFBHeavyPlayer : public jmedia::Player, public jthread::Thread {
 		/** \brief */
 		double _decode_rate;
 		/** \brief */
+		uint64_t _media_time;
+		/** \brief */
 		bool _is_paused;
 		/** \brief */
 		bool _is_closed;
@@ -55,26 +51,23 @@ class DirectFBHeavyPlayer : public jmedia::Player, public jthread::Thread {
 		bool _has_audio;
 		/** \brief */
 		bool _has_video;
+		/** \brief */
+		bool _is_playing;
+		/** \brief */
+		void *_provider;
 
-	private:
-		/**
-		 * \brief
-		 *
-		 */
-		static void Callback(void *ctx);
-		
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		DirectFBHeavyPlayer(std::string file);
+		GIFLightPlayer(std::string file);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~DirectFBHeavyPlayer();
+		virtual ~GIFLightPlayer();
 
 		/**
 		 * \brief
@@ -159,7 +152,6 @@ class DirectFBHeavyPlayer : public jmedia::Player, public jthread::Thread {
 		 *
 		 */
 		virtual void Run();
-		
 };
 
 }

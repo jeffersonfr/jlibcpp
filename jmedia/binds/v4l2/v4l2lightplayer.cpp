@@ -90,6 +90,11 @@ class V4LComponentImpl : public jgui::Component, jthread::Thread {
 			}
 		}
 
+		virtual jgui::jsize_t GetPreferredSize()
+		{
+			return _frame_size;
+		}
+
 		virtual void UpdateComponent(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
 		{
 			if (width <= 0 || height <= 0) {
@@ -362,7 +367,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual void SetSharpness(int value)
 		{
-			// TODO::
 		}
 
 		virtual void SetGamma(int value)
@@ -376,11 +380,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 					control->SetValue(GAMMA_CONTROL, value);
 				}
 			}
-		}
-
-		virtual jgui::jsize_t GetFrameSize()
-		{
-			return dynamic_cast<V4LComponentImpl *>(_player->_component)->_frame_size;
 		}
 
 		virtual jaspect_ratio_t GetAspectRatio()
@@ -510,7 +509,7 @@ V4L2LightPlayer::V4L2LightPlayer(std::string file):
 	_aspect = 1.0;
 	_media_time = 0LL;
 	_is_loop = false;
-	_decode_rate = 0.0;
+	_decode_rate = 1.0;
 	_frame_rate = 0.0;
 	_component = NULL;
 	
