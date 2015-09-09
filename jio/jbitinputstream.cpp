@@ -27,7 +27,7 @@ namespace jio {
 
 #define MASKS_LENGTH	8
 
-int masks[8] = {
+static int masks[8] = {
 	0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01
 };
 
