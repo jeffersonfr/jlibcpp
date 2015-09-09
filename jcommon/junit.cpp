@@ -22,14 +22,12 @@
 
 namespace jcommon {
 
-bool verbose = true;
-bool line_fmt = false;
-
 void Tester::Summary()
 {
 	os << "Tests [Ok-Fail-Error]: [" << n_test.n_ok() << '-'
 	<< n_test.n_fail() << '-' << n_test.n_err() << "]\n";
 }
+
 void Tester::Visit(Test& t)
 {
 	try {
@@ -50,8 +48,10 @@ void Tester::Visit(Test& t)
 
 void Tester::Visit(Suite& t)
 {
-	if (verbose)
+	if (verbose) {
 		os << "****** " << t.GetName() << " ******" << std::endl;
+	}
+
 	accu.push(n_test);
 }
 
@@ -59,34 +59,42 @@ void Tester::Visit(Suite& , int)
 {
 	res_cnt r(accu.top());
 	accu.pop();
-	if (n_test.n_err() != r.n_err())
+	if (n_test.n_err() != r.n_err()) {
 		n_suite.add_err();
-	else if (n_test.n_fail() != r.n_fail())
+	} else if (n_test.n_fail() != r.n_fail()) {
 		n_suite.add_fail();
-	else
+	} else {
 		n_suite.add_ok();
+	}
 }
+
 void Tester::Write(Test& t)
 {
-	if (verbose)
+	if (verbose) {
 		Disp(t, "OK");
+	}
 }
+
 void Tester::Disp(Test& t, const std::string& status)
 {
 	os << status << ": " << t.GetName() << std::endl;
 }
+
 void Tester::Write(Test& t, AssertionError& e)
 {
-	if (line_fmt)
+	if (line_fmt) {
 		os << e.GetFile() << ':' << e.GetLine() << ':';
+	}
 	Disp(t, "FAIL");
 	os << e << '\n';
 }
+
 void Tester::Write(Test& t, RuntimeException& e)
 {
 	Disp(t, "ERROR");
 	os << "     : [" << typeid(e).name() << "] " << e.what() << '\n';
 }
+
 void Tester::Write(Test& t, int )
 {
 	Disp(t, "ERROR");
@@ -97,15 +105,18 @@ void Test::Visit(Visitor* v)
 {
 	v->Visit(*this);
 }
-TestCase::TestCase(Test* t)
-: cnt(new size_t(1)), tst(t)
+
+TestCase::TestCase(Test* t): 
+	cnt(new size_t(1)), tst(t)
 {
 }
-TestCase::TestCase(const TestCase& t)
-: cnt(t.cnt), tst(t.tst)
+
+TestCase::TestCase(const TestCase& t): 
+	cnt(t.cnt), tst(t.tst)
 {
 	(*cnt)++;
 }
+
 void TestCase::dec_cnt()
 {
 	if (--(*cnt) == 0) {
@@ -113,10 +124,12 @@ void TestCase::dec_cnt()
 		delete tst;
 	}
 }
+
 TestCase::~TestCase()
 {
 	dec_cnt();
 }
+
 TestCase& TestCase::operator=(const TestCase& t)
 {
 	++*(t.cnt);
@@ -125,18 +138,22 @@ TestCase& TestCase::operator=(const TestCase& t)
 	tst = t.tst;
 	return *this;
 }
+
 Suite& Suite::Main()
 {
 	static Suite instance("top");
 	return instance;
 }
+
 Test* Suite::GetChild(const std::string& id)
 {
 	std::vector<std::string>::iterator p = std::find(ids.begin(), ids.end(), id);
-	if (p != ids.end())
+	if (p != ids.end()) {
 		return &(static_cast<Test&>(tests[p - ids.begin()]));
+	}
 	return 0;
 }
+
 std::vector<std::string> vectorize(const std::string& str, char c)
 {
 	std::vector<std::string> res;
@@ -148,20 +165,25 @@ std::vector<std::string> vectorize(const std::string& str, char c)
 	}
 	return res;
 }
+
 Test* Suite::Find(const std::string& id)
 {
 	std::vector<std::string> ss(vectorize(id, '.'));
 	Test* tp = this;
-	for (std::vector<std::string>::iterator p = ss.begin(); p != ss.end(); ++p)
-		if (!(tp = tp->GetChild(*p)))
+	for (std::vector<std::string>::iterator p = ss.begin(); p != ss.end(); ++p) {
+		if (!(tp = tp->GetChild(*p))) {
 			break;
+		}
+	}
 	return tp;
 }
+
 void Suite::Add(const std::string& id, const TestCase& t)
 {
 	ids.push_back(id);
 	tests.push_back(t);
 }
+
 void Suite::Visit(Visitor* v)
 {
 	v->Visit(*this);

@@ -20,12 +20,10 @@
 #include "Stdafx.h"
 #include "joptions.h"
 
-extern int opterr;
-
 #ifdef _WIN32
 
-char	*optarg;		// global argument pointer
-int		optind = 0; 	// global argv index
+static char *optarg;		// global argument pointer
+static int optind = 0;	// global argv index
 
 int getopt(int argc, TCHAR *argv[], TCHAR *optstring)
 {
@@ -85,7 +83,6 @@ int getopt(int argc, TCHAR *argv[], TCHAR *optstring)
 	return c;
 }
 #else
-int opterr = 0;
 #endif
 
 namespace jcommon {

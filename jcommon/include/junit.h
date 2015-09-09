@@ -33,9 +33,6 @@
 
 namespace jcommon {
 
-extern bool verbose;
-extern bool line_fmt;
-
 class Visitor;
 
 /**
@@ -561,7 +558,7 @@ class plain_runner : public test_runner {
 		// Run the test and return true if succesful. @see{run_test-id}
 		bool run_test(Test* tp)
 		{
-			Tester tst(std::cout, verbose, line_fmt);
+			Tester tst(std::cout, true, true); // CHANGE:: use defaults ?
 			tp->Visit(&tst);
 			tst.Summary();
 			res_cnt res(tst.res_tests());

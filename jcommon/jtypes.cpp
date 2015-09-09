@@ -28,7 +28,7 @@ namespace jcommon {
  * Written by Lukás Chmela
  * Released under GPLv3.
  */
-char * IntToStr(int64_t value, char *result, int radix) 
+static char * IntToStr(int64_t value, char *result, int radix) 
 {
 	if (radix < 2 || radix > 36) { 
 		*result = '\0'; 
