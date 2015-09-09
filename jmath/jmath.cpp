@@ -51,12 +51,12 @@ template<>double Math<double>::Rgair							= (1000.0 * R) / MWair;
 template<>double Math<double>::Qe									= 1.602176462e-19;
 template<>double Math<double>::QeUncertainty			= 0.000000063e-19;
 
-const int kWorkMax = 100;
+static const int kWorkMax = 100;
 
-double GamCf(double a,double x);
-double GamSer(double a,double x);
-double VavilovDenEval(double rlam, double *AC, double *HC, int itype);
-void VavilovSet(double rkappa, double beta2, bool mode, double *WCM, double *AC, double *HC, int &itype, int &npt);
+// static double GamCf(double a,double x);
+// static double GamSer(double a,double x);
+// static double VavilovDenEval(double rlam, double *AC, double *HC, int itype);
+// static void VavilovSet(double rkappa, double beta2, bool mode, double *WCM, double *AC, double *HC, int &itype, int &npt);
 
 #ifdef R__KCC
 static double hypot(double x, double y)
