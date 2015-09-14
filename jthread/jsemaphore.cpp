@@ -93,16 +93,14 @@ void Semaphore::Wait()
 			throw SemaphoreException("Waiting semaphore failed"); 
 	}
 #else
-	{
-		AutoLock lock(&_mutex);
-
-		_counter = _counter + 1;
-	}
+	_mutex.Lock();
+	_counter = _counter + 1;
+	_mutex.Unlock();
 
 	if (sem_wait(&_handler) != 0) {
-		AutoLock lock(&_mutex);
-
+		_mutex.Lock();
 		_counter = _counter - 1;
+		_mutex.Unlock();
 
 		throw SemaphoreException("Semaphore waiting failed");
 	}
@@ -131,20 +129,18 @@ void Semaphore::Wait(uint64_t time_)
 	t.tv_sec += (int64_t)(time_/1000000LL);
 	t.tv_nsec += (int64_t)((time_%1000000LL)*1000LL);
 
-	{
-		AutoLock lock(&_mutex);
-
-		_counter = _counter + 1;
-	}
+	_mutex.Lock();
+	_counter = _counter + 1;
+	_mutex.Unlock();
 
 	while ((result = sem_timedwait(&_handler, &t)) != 0 && errno == EINTR) {
 		continue; 
 	}
 
-	AutoLock lock(&_mutex);
-
 	if (result != 0) {
+		_mutex.Lock();
 		_counter = _counter - 1;
+		_mutex.Unlock();
 
 		if (errno == ETIMEDOUT) {
 			throw SemaphoreTimeoutException("Semaphore wait timeout");
@@ -157,8 +153,6 @@ void Semaphore::Wait(uint64_t time_)
 
 void Semaphore::Notify()
 {
-	AutoLock lock(&_mutex);
-
 #ifdef _WIN32
 		if (ReleaseSemaphore(_handler, 1, NULL) == 0) {
 			throw SemaphoreException("Notify semaphore failed");
@@ -173,13 +167,13 @@ void Semaphore::Notify()
 	}
 #endif
 
+	_mutex.Lock();
 	_counter = _counter - 1;
+	_mutex.Unlock();
 }
 
 void Semaphore::NotifyAll()
 {
-	AutoLock lock(&_mutex);
-
 	int r = _counter;
 
 #ifdef _WIN32
@@ -196,7 +190,9 @@ void Semaphore::NotifyAll()
 	}
 #endif
 	
+	_mutex.Lock();
 	_counter = _counter - r;
+	_mutex.Unlock();
 }
 
 bool Semaphore::TryWait()
@@ -225,15 +221,21 @@ bool Semaphore::TryWait()
 
 int Semaphore::GetValue()
 {
+	int count = 0;
+
 #ifdef _WIN32
 	LONG value;
 
 	ReleaseSemaphore(_handler, 0, &value);
 	
-	return value;
+	count = (int)value;
 #else
-	return _counter;
+	_mutex.Lock();
+	count = _counter;
+	_mutex.Unlock();
 #endif
+
+	return count;
 }
 
 void Semaphore::Release()
