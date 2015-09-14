@@ -46,7 +46,7 @@ bool _keyboard;
 #else
 static struct termios g_old_kbd_mode;
 static int console = -1;
-static bool init = false;
+// static bool init = false;
 
 static void cooked()
 {

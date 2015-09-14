@@ -29,16 +29,14 @@ FileInputStream::FileInputStream(std::string filename_):
 {
 	jcommon::Object::SetClassName("jio::FileInputStream");
 
-	try {
-		_flag = 0;
-		_current = 0;
+	_file = new File(filename_);
 
-		_file = new File(filename_);
-	} catch (...) {
-		_file = NULL;
-
-		throw IOException("Open file failed");
+	if (_file->Exists() == false) {
+		throw IOException("File not exists");
 	}
+	
+	_flag = 0;
+	_current = 0;
 }
 
 FileInputStream::FileInputStream(File *file_):
@@ -46,14 +44,18 @@ FileInputStream::FileInputStream(File *file_):
 {
 	jcommon::Object::SetClassName("jio::FileInputStream");
 
+	_file = file_;
+
 	if (_file == NULL) {
-		throw jcommon::NullPointerException("File pointer is null");
+		throw jcommon::NullPointerException("File must be a valid pointer");
+	}
+
+	if (_file->Exists() == false) {
+		throw IOException("File not exists");
 	}
 
 	_flag = 1;
 	_current = 0;
-	_file = file_;
-
 }
 
 FileInputStream::~FileInputStream()

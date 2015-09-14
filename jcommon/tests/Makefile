@@ -48,7 +48,10 @@ OBJS_access = \
 OBJS_buffer = \
 	   buffer.o\
 
-all: teste exceptions xml_teste xml_agenda regexp jsondump gcteste unit calc_unit access buffer
+OBJS_piano = \
+	   piano.o\
+
+all: teste exceptions xml_teste xml_agenda regexp jsondump gcteste unit calc_unit access buffer piano
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -86,6 +89,9 @@ access: $(OBJS_access)
 buffer: $(OBJS_buffer)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+piano: $(OBJS_piano)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -93,4 +99,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste exceptions xml_teste xml_agenda myfile_teste.xml regexp jsondump gcteste pointer unit calc_unit access buffer
+	@rm -rvf *.o *.xml *~ teste exceptions xml_teste xml_agenda myfile_teste.xml regexp jsondump gcteste pointer unit calc_unit access buffer piano
