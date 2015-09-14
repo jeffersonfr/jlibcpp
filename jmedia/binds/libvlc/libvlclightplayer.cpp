@@ -36,6 +36,8 @@
 
 namespace jmedia {
 
+namespace libvlclightplayer {
+
 static libvlc_event_type_t mi_events[] = {
 	// libvlc_MediaMetaChanged,	
 	// libvlc_MediaSubItemAdded,	
@@ -607,55 +609,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_sd_video_format = vf;
 		}
 
-		virtual void SetContrast(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_CONTRAST, value);
-			}
-		}
-
-		virtual void SetSaturation(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_SATURATION, value);
-			}
-		}
-
-		virtual void SetHUE(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_HUE, value);
-			}
-		}
-
-		virtual void SetBrightness(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_BRIGHTNESS, value);
-			}
-		}
-
-		virtual void SetSharpness(int value)
-		{
-		}
-
-		virtual void SetGamma(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// xine_set_param(_player->_provider, XINE_PARAM_VO_GAMMA, value);
-			}
-		}
-
 		virtual jaspect_ratio_t GetAspectRatio()
 		{
 			jthread::AutoLock lock(&_player->_mutex);
@@ -690,67 +643,9 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			return LSVF_PAL_M;
 		}
 
-		virtual int GetContrast()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_CONTRAST);
-			}
-
-			return 0;
-		}
-
-		virtual int GetSaturation()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_SATURATION);
-			}
-
-			return 0;
-		}
-
-		virtual int GetHUE()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_HUE);
-			}
-
-			return 0;
-		}
-
-		virtual int GetBrightness()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_BRIGHTNESS);
-			}
-
-			return 0;
-		}
-
-		virtual int GetSharpness()
-		{
-			return 0;
-		}
-
-		virtual int GetGamma()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				// return xine_get_param(_player->_provider, XINE_PARAM_VO_GAMMA);
-			}
-
-			return 0;
-		}
-
 };
+
+}
 
 LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	jmedia::Player()
@@ -788,15 +683,15 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 			if (_has_audio == false) {
 				_has_audio = true;
 
-				_controls.push_back(new VolumeControlImpl(this));
-				_controls.push_back(new AudioConfigurationControlImpl(this));
+				_controls.push_back(new libvlclightplayer::VolumeControlImpl(this));
+				_controls.push_back(new libvlclightplayer::AudioConfigurationControlImpl(this));
 			}
 		} else if (t->i_type == libvlc_track_video) {
 			if (_has_video == false) {
 				_has_video = true;
 				
-				_controls.push_back(new VideoSizeControlImpl(this));
-				_controls.push_back(new VideoFormatControlImpl(this));
+				_controls.push_back(new libvlclightplayer::VideoSizeControlImpl(this));
+				_controls.push_back(new libvlclightplayer::VideoFormatControlImpl(this));
 			}
 		}
 	}
@@ -841,10 +736,15 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	_media_time = (uint64_t)libvlc_media_get_duration(media);
 	// _frame_per_sec = libvlc_media_player_get_fps(_provider);
 
-	_component = new LibVLCLightComponentImpl(this, 0, 0, iw, ih);
+	_component = new libvlclightplayer::LibVLCLightComponentImpl(this, 0, 0, iw, ih);
 
 	libvlc_video_set_format(_provider, "RV32", iw, ih, iw*4);
-	libvlc_video_set_callbacks(_provider, LockMediaSurface, UnlockMediaSurface, DisplayMediaSurface, _component);
+	libvlc_video_set_callbacks(
+			_provider, 
+			libvlclightplayer::LockMediaSurface, 
+			libvlclightplayer::UnlockMediaSurface, 
+			libvlclightplayer::DisplayMediaSurface, 
+			_component);
 
 	_media_info.title = std::string(libvlc_media_get_meta(media, libvlc_meta_Title)?:"");
 	_media_info.author = std::string(libvlc_media_get_meta(media, libvlc_meta_Artist)?:"");
@@ -880,8 +780,8 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	
 	_event_manager = libvlc_media_player_event_manager(_provider);
 
-	for (int i = 0; i < mi_events_len; i++) {
-		libvlc_event_attach(_event_manager, mi_events[i], MediaEventsCallback, this);
+	for (int i=0; i<libvlclightplayer::mi_events_len; i++) {
+		libvlc_event_attach(_event_manager, libvlclightplayer::mi_events[i], libvlclightplayer::MediaEventsCallback, this);
 	}
 }
 
@@ -891,8 +791,8 @@ LibVLCLightPlayer::~LibVLCLightPlayer()
 		WaitThread();
 	}
 
-	for (int i=0; i<mi_events_len; i++) {
-		libvlc_event_detach(_event_manager, mi_events[i], MediaEventsCallback, this);
+	for (int i=0; i<libvlclightplayer::mi_events_len; i++) {
+		libvlc_event_detach(_event_manager, libvlclightplayer::mi_events[i], libvlclightplayer::MediaEventsCallback, this);
 	}
 
 	Close();

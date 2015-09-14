@@ -23,6 +23,7 @@
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
+#include "jvideodevicecontrol.h"
 #include "jmediaexception.h"
 #include "jcolorconversion.h"
 
@@ -33,6 +34,8 @@
 #endif
 
 namespace jmedia {
+
+namespace v4l2lightplayer {
 
 class V4LComponentImpl : public jgui::Component, jthread::Thread {
 
@@ -313,75 +316,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_sd_video_format = vf;
 		}
 
-		virtual void SetContrast(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_grabber != NULL) {
-				VideoControl *control = _player->_grabber->GetVideoControl();
-
-				if (control->HasControl(CONTRAST_CONTROL) == true) {
-					control->SetValue(CONTRAST_CONTROL, value);
-				}
-			}
-		}
-
-		virtual void SetSaturation(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_grabber != NULL) {
-				VideoControl *control = _player->_grabber->GetVideoControl();
-
-				if (control->HasControl(SATURATION_CONTROL) == true) {
-					control->SetValue(SATURATION_CONTROL, value);
-				}
-			}
-		}
-
-		virtual void SetHUE(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_grabber != NULL) {
-				VideoControl *control = _player->_grabber->GetVideoControl();
-
-				if (control->HasControl(HUE_CONTROL) == true) {
-					control->SetValue(HUE_CONTROL, value);
-				}
-			}
-		}
-
-		virtual void SetBrightness(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_grabber != NULL) {
-				VideoControl *control = _player->_grabber->GetVideoControl();
-
-				if (control->HasControl(BRIGHTNESS_CONTROL) == true) {
-					control->SetValue(BRIGHTNESS_CONTROL, value);
-				}
-			}
-		}
-
-		virtual void SetSharpness(int value)
-		{
-		}
-
-		virtual void SetGamma(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_grabber != NULL) {
-				VideoControl *control = _player->_grabber->GetVideoControl();
-
-				if (control->HasControl(GAMMA_CONTROL) == true) {
-					control->SetValue(GAMMA_CONTROL, value);
-				}
-			}
-		}
-
 		virtual jaspect_ratio_t GetAspectRatio()
 		{
 			jthread::AutoLock lock(&_player->_mutex);
@@ -416,87 +350,81 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			return LSVF_PAL_M;
 		}
 
-		virtual int GetContrast()
+};
+
+class VideoDeviceControlImpl : public VideoDeviceControl {
+	
+	private:
+		V4L2LightPlayer *_player;
+
+	public:
+		VideoDeviceControlImpl(V4L2LightPlayer *player):
+			VideoDeviceControl()
+		{
+			_player = player;
+
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+				std::vector<jmedia::jvideo_control_t> controls = control->GetControls();
+
+				for (std::vector<jmedia::jvideo_control_t>::iterator i=controls.begin(); i!=controls.end(); i++) {
+					_controls.push_back(*i);
+				}
+			}
+		}
+
+		virtual ~VideoDeviceControlImpl()
+		{
+		}
+
+		virtual int GetValue(jvideo_control_t id)
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
 			if (_player->_grabber != NULL) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
 
-				if (control->HasControl(CONTRAST_CONTROL) == true) {
-					return control->GetValue(CONTRAST_CONTROL);
+				if (control->HasControl(id) == true) {
+					return control->GetValue(id);
 				}
 			}
 
 			return 0;
 		}
 
-		virtual int GetSaturation()
+		virtual bool SetValue(jvideo_control_t id, int value)
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
 			if (_player->_grabber != NULL) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
 
-				if (control->HasControl(SATURATION_CONTROL) == true) {
-					return control->GetValue(SATURATION_CONTROL);
+				if (control->HasControl(id) == true) {
+					control->SetValue(id, value);
+
+					return true;
 				}
 			}
 
-			return 0;
+			return false;
 		}
 
-		virtual int GetHUE()
+		virtual void Reset(jvideo_control_t id)
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
 			if (_player->_grabber != NULL) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
 
-				if (control->HasControl(HUE_CONTROL) == true) {
-					return control->GetValue(HUE_CONTROL);
+				if (control->HasControl(id) == true) {
+					control->Reset(id);
 				}
 			}
-
-			return 0;
-		}
-
-		virtual int GetBrightness()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_grabber != NULL) {
-				VideoControl *control = _player->_grabber->GetVideoControl();
-
-				if (control->HasControl(BRIGHTNESS_CONTROL) == true) {
-					return control->GetValue(BRIGHTNESS_CONTROL);
-				}
-			}
-
-			return 0;
-		}
-
-		virtual int GetSharpness()
-		{
-			return 0;
-		}
-
-		virtual int GetGamma()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_grabber != NULL) {
-				VideoControl *control = _player->_grabber->GetVideoControl();
-
-				if (control->HasControl(GAMMA_CONTROL) == true) {
-					return control->GetValue(GAMMA_CONTROL);
-				}
-			}
-
-			return 0;
 		}
 
 };
+
+}
 
 V4L2LightPlayer::V4L2LightPlayer(std::string file):
 	jmedia::Player()
@@ -524,10 +452,11 @@ V4L2LightPlayer::V4L2LightPlayer(std::string file):
 	_grabber->Configure(size.width, size.height);
 	_grabber->GetVideoControl()->Reset();
 
-	_controls.push_back(new VideoSizeControlImpl(this));
-	_controls.push_back(new VideoFormatControlImpl(this));
+	_controls.push_back(new v4l2lightplayer::VideoSizeControlImpl(this));
+	_controls.push_back(new v4l2lightplayer::VideoFormatControlImpl(this));
+	_controls.push_back(new v4l2lightplayer::VideoDeviceControlImpl(this));
 	
-	_component = new V4LComponentImpl(this, 0, 0, -1, -1);
+	_component = new v4l2lightplayer::V4LComponentImpl(this, 0, 0, -1, -1);
 }
 
 V4L2LightPlayer::~V4L2LightPlayer()
@@ -548,7 +477,7 @@ V4L2LightPlayer::~V4L2LightPlayer()
 
 void V4L2LightPlayer::ProcessFrame(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
 {
-	dynamic_cast<V4LComponentImpl *>(_component)->UpdateComponent(buffer, width, height, format);
+	dynamic_cast<v4l2lightplayer::V4LComponentImpl *>(_component)->UpdateComponent(buffer, width, height, format);
 }
 
 void V4L2LightPlayer::Play()

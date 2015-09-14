@@ -56,22 +56,24 @@ VideoControl::~VideoControl()
 
 void VideoControl::EnumerateControls()
 {
-	video_control_t id;
+	jmedia::jvideo_control_t id = jmedia::JVC_UNKNOWN;
 
-	if (queryctrl.id == V4L2_CID_BRIGHTNESS) {
-		id = BRIGHTNESS_CONTROL;
-	} else if (queryctrl.id == V4L2_CID_CONTRAST) {
-		id = CONTRAST_CONTROL;
+	if (queryctrl.id == V4L2_CID_CONTRAST) {
+		id = jmedia::JVC_CONTRAST;
+	} else if (queryctrl.id == V4L2_CID_BRIGHTNESS) {
+		id = jmedia::JVC_BRIGHTNESS;
 	} else if (queryctrl.id == V4L2_CID_SATURATION) {
-		id = SATURATION_CONTROL;
+		id = jmedia::JVC_SATURATION;
 	} else if (queryctrl.id == V4L2_CID_HUE) {
-		id = HUE_CONTROL;
+		id = jmedia::JVC_HUE;
 	} else if (queryctrl.id == V4L2_CID_GAMMA) {
-		id = GAMMA_CONTROL;
+		id = jmedia::JVC_GAMMA;
 	} else if (queryctrl.id == V4L2_CID_FOCUS_AUTO) {
-		id = FOCUS_AUTO_CONTROL;
+		id = jmedia::JVC_AUTO_FOCUS;
 	} else if (queryctrl.id == V4L2_CID_ZOOM_ABSOLUTE) {
-		id = ZOOM_ABSOLUTE_CONTROL;
+		// id = jmedia::JVC_ZOOM_ABSOLUTE;
+	} else if (queryctrl.id == V4L2_CID_EXPOSURE_AUTO_PRIORITY) {
+		id = jmedia::JVC_AUTO_EXPOSURE;
 	} else {
 		return;
 	}
@@ -89,9 +91,9 @@ void VideoControl::EnumerateControls()
 	_query_controls.push_back(t);
 }
 
-std::vector<video_control_t> VideoControl::GetControls()
+std::vector<jmedia::jvideo_control_t> VideoControl::GetControls()
 {
-	std::vector<video_control_t> controls;
+	std::vector<jmedia::jvideo_control_t> controls;
 
 	for (std::vector<video_query_control_t>::iterator i=_query_controls.begin(); i!=_query_controls.end(); i++) {
 		controls.push_back((*i).id);
@@ -100,7 +102,7 @@ std::vector<video_control_t> VideoControl::GetControls()
 	return controls;
 }
 
-bool VideoControl::HasControl(video_control_t id)
+bool VideoControl::HasControl(jmedia::jvideo_control_t id)
 {
 	for (std::vector<video_query_control_t>::iterator i=_query_controls.begin(); i!=_query_controls.end(); i++) {
 		if ((*i).id == id) {
@@ -111,7 +113,7 @@ bool VideoControl::HasControl(video_control_t id)
 	return false;
 }
 
-int VideoControl::GetValue(video_control_t id)
+int VideoControl::GetValue(jmedia::jvideo_control_t id)
 {
 	for (std::vector<video_query_control_t>::iterator i=_query_controls.begin(); i!=_query_controls.end(); i++) {
 		struct video_query_control_t t = (*i);
@@ -124,7 +126,7 @@ int VideoControl::GetValue(video_control_t id)
 	return -1;
 }
 
-bool VideoControl::SetValue(video_control_t id, int value)
+bool VideoControl::SetValue(jmedia::jvideo_control_t id, int value)
 {
 	if (value < 0) {
 		value = 0;
@@ -166,27 +168,7 @@ bool VideoControl::SetValue(video_control_t id, int value)
 	return false;
 }
 
-void VideoControl::Reset()
-{
-	for (std::vector<video_query_control_t>::iterator i=_query_controls.begin(); i!=_query_controls.end(); i++) {
-		struct video_query_control_t t = (*i);
-
-		struct v4l2_control control;
-
-		CLEAR(control);
-
-		control.id = t.v4l_id;
-		control.value = t.default_value;
-
-		if (-1 == ioctl (_handler, VIDIOC_S_CTRL, &control) && errno != ERANGE) {
-			perror ("VIDIOC_S_CTRL");
-		}
-		
-		(*i).value = (100*(t.default_value-t.minimum))/(t.maximum-t.minimum);
-	}
-}
-
-void VideoControl::Reset(video_control_t id)
+void VideoControl::Reset(jmedia::jvideo_control_t id)
 {
 	for (std::vector<video_query_control_t>::iterator i=_query_controls.begin(); i!=_query_controls.end(); i++) {
 		struct video_query_control_t t = (*i);
@@ -209,6 +191,26 @@ void VideoControl::Reset(video_control_t id)
 		(*i).value = (100*(t.default_value-t.minimum))/(t.maximum-t.minimum);
 
 		break;
+	}
+}
+
+void VideoControl::Reset()
+{
+	for (std::vector<video_query_control_t>::iterator i=_query_controls.begin(); i!=_query_controls.end(); i++) {
+		struct video_query_control_t t = (*i);
+
+		struct v4l2_control control;
+
+		CLEAR(control);
+
+		control.id = t.v4l_id;
+		control.value = t.default_value;
+
+		if (-1 == ioctl (_handler, VIDIOC_S_CTRL, &control) && errno != ERANGE) {
+			perror ("VIDIOC_S_CTRL");
+		}
+		
+		(*i).value = (100*(t.default_value-t.minimum))/(t.maximum-t.minimum);
 	}
 }
 

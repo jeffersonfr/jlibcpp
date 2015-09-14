@@ -35,6 +35,8 @@
 
 namespace jmedia {
 
+namespace libavlightplayer {
+
 class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
@@ -381,30 +383,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_sd_video_format = vf;
 		}
 
-		virtual void SetContrast(int value)
-		{
-		}
-
-		virtual void SetSaturation(int value)
-		{
-		}
-
-		virtual void SetHUE(int value)
-		{
-		}
-
-		virtual void SetBrightness(int value)
-		{
-		}
-
-		virtual void SetSharpness(int value)
-		{
-		}
-
-		virtual void SetGamma(int value)
-		{
-		}
-
 		virtual jaspect_ratio_t GetAspectRatio()
 		{
 			jthread::AutoLock lock(&_player->_mutex);
@@ -439,36 +417,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			return LSVF_PAL_M;
 		}
 
-		virtual int GetContrast()
-		{
-			return 0;
-		}
-
-		virtual int GetSaturation()
-		{
-			return 0;
-		}
-
-		virtual int GetHUE()
-		{
-			return 0;
-		}
-
-		virtual int GetBrightness()
-		{
-			return 0;
-		}
-
-		virtual int GetSharpness()
-		{
-			return 0;
-		}
-
-		virtual int GetGamma()
-		{
-			return 0;
-		}
-
 };
 
 static void render_callback(void *data, uint8_t *buffer, int width, int height)
@@ -481,6 +429,8 @@ static void endofmedia_callback(void *data)
 	LibAVLightPlayer *player = reinterpret_cast<LibAVLightPlayer *>(data);
 	
 	player->DispatchPlayerEvent(new PlayerEvent(player, JPE_FINISHED));
+}
+
 }
 
 LibAVLightPlayer::LibAVLightPlayer(std::string file):
@@ -503,18 +453,18 @@ LibAVLightPlayer::LibAVLightPlayer(std::string file):
 		throw MediaException("Cannot recognize the media file");
 	}
 
-	_component = new LibAVLightComponentImpl(this, 0, 0, -1, -1);//iw, ih);
+	_component = new libavlightplayer::LibAVLightComponentImpl(this, 0, 0, -1, -1);//iw, ih);
 
-	avplay_set_rendercallback(_provider, render_callback, (void *)_component);
-	avplay_set_endofmediacallback(_provider, endofmedia_callback, (void *)this);
+	avplay_set_rendercallback(_provider, libavlightplayer::render_callback, (void *)_component);
+	avplay_set_endofmediacallback(_provider, libavlightplayer::endofmedia_callback, (void *)this);
 		
 	if (_provider->has_audio == true) {
-		_controls.push_back(new VolumeControlImpl(this));
+		_controls.push_back(new libavlightplayer::VolumeControlImpl(this));
 	}
 	
 	if (_provider->has_video == true) {
-		_controls.push_back(new VideoSizeControlImpl(this));
-		_controls.push_back(new VideoFormatControlImpl(this));
+		_controls.push_back(new libavlightplayer::VideoSizeControlImpl(this));
+		_controls.push_back(new libavlightplayer::VideoFormatControlImpl(this));
 	}
 }
 

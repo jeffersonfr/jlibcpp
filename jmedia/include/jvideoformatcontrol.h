@@ -135,48 +135,6 @@ class VideoFormatControl : public Control {
 		virtual void SetVideoFormatSD(jsd_video_format_t vf);
 
 		/**
-		 * \brief Define a value to contrast. The value must is between [0..100].
-		 *
-		 * \param value 
-		 */
-		virtual void SetContrast(int value);
-
-		/**
-		 * \brief Define a value to saturation. The value must is between [0..100].
-		 *
-		 * \param value 
-		 */
-		virtual void SetSaturation(int value);
-
-		/**
-		 * \brief Define a value to HUE. The value must is between [0..100].
-		 *
-		 * \param value 
-		 */
-		virtual void SetHUE(int value);
-
-		/**
-		 * \brief Define a value to brightness. The value must is between [0..100].
-		 *
-		 * \param value 
-		 */
-		virtual void SetBrightness(int value);
-
-		/**
-		 * \brief Define a value to sharpness. The value must is between [0..100].
-		 *
-		 * \param value
-		 */
-		virtual void SetSharpness(int value);
-
-		/**
-		 * \brief Define a value to HUE. The value must is between [0..100].
-		 *
-		 * \param value 
-		 */
-		virtual void SetGamma(int value);
-
-		/**
 		 * \brief Returns the aspect ratio.
 		 *
 		 * \return 
@@ -203,48 +161,6 @@ class VideoFormatControl : public Control {
 		 * \return 
 		 */
 		virtual jsd_video_format_t GetVideoFormatSD();
-
-		/**
-		 * \brief Returns the contrast.
-		 *
-		 * \return 
-		 */
-		virtual int GetContrast();
-
-		/**
-		 * \brief Returns de saturation.
-		 *
-		 * \return 
-		 */
-		virtual int GetSaturation();
-
-		/**
-		 * \brief Returns the HUE.
-		 *
-		 * \return 
-		 */
-		virtual int GetHUE();
-
-		/**
-		 * \brief Returns the brightness.
-		 *
-		 * \return 
-		 */
-		virtual int GetBrightness();
-
-		/**
-		 * \brief Returns the sharpness.
-		 *
-		 * \return 
-		 */
-		virtual int GetSharpness();
-
-		/**
-		 * \brief Returns the HUE.
-		 *
-		 * \return 
-		 */
-		virtual int GetGamma();
 
 };
 

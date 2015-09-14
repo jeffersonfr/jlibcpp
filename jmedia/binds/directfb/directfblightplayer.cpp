@@ -23,6 +23,7 @@
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
+#include "jvideodevicecontrol.h"
 #include "jvolumecontrol.h"
 #include "jmediaexception.h"
 #include "jimage.h"
@@ -35,6 +36,8 @@
 #endif
 
 namespace jmedia {
+
+namespace directfblightplayer {
 
 class DirectFBLightComponentImpl : public jgui::Component, jthread::Thread {
 
@@ -421,66 +424,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_sd_video_format = vf;
 		}
 
-		virtual void SetContrast(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				DFBColorAdjustment adj;
-
-				adj.flags = (DFBColorAdjustmentFlags)(DCAF_CONTRAST);
-				adj.contrast = value;
-
-				_player->_provider->SetColorAdjustment(_player->_provider, &adj);
-			}
-		}
-
-		virtual void SetSaturation(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				DFBColorAdjustment adj;
-
-				adj.flags = (DFBColorAdjustmentFlags)(DCAF_SATURATION);
-				adj.saturation = value;
-
-				_player->_provider->SetColorAdjustment(_player->_provider, &adj);
-			}
-		}
-
-		virtual void SetHUE(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				DFBColorAdjustment adj;
-
-				adj.flags = (DFBColorAdjustmentFlags)(DCAF_HUE);
-				adj.hue = value;
-
-				_player->_provider->SetColorAdjustment(_player->_provider, &adj);
-			}
-		}
-
-		virtual void SetBrightness(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				DFBColorAdjustment adj;
-
-				adj.flags = (DFBColorAdjustmentFlags)(DCAF_BRIGHTNESS);
-				adj.brightness = value;
-
-				_player->_provider->SetColorAdjustment(_player->_provider, &adj);
-			}
-		}
-
-		virtual void SetSharpness(int value)
-		{
-		}
-
 		virtual jaspect_ratio_t GetAspectRatio()
 		{
 			jthread::AutoLock lock(&_player->_mutex);
@@ -515,80 +458,106 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			return LSVF_PAL_M;
 		}
 
-		virtual int GetContrast()
+};
+
+class VideoDeviceControlImpl : public VideoDeviceControl {
+	
+	private:
+		DirectFBLightPlayer *_player;
+		std::map<jvideo_control_t, int> _default_values;
+
+	public:
+		VideoDeviceControlImpl(DirectFBLightPlayer *player):
+			VideoDeviceControl()
+		{
+			_player = player;
+			
+			_controls.push_back(JVC_CONTRAST);
+			_controls.push_back(JVC_SATURATION);
+			_controls.push_back(JVC_HUE);
+			_controls.push_back(JVC_BRIGHTNESS);
+
+			for (std::vector<jvideo_control_t>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
+				_default_values[*i] = GetValue(*i);
+			}
+		}
+
+		virtual ~VideoDeviceControlImpl()
+		{
+		}
+
+		virtual int GetValue(jvideo_control_t id)
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
 			if (_player->_provider != NULL) {
-				DFBColorAdjustment adj;
+				if (HasControl(id) == true) {
+					DFBColorAdjustment adj;
 
-				adj.flags = (DFBColorAdjustmentFlags)(DCAF_CONTRAST);
+					if (id == JVC_CONTRAST) {
+						adj.flags = (DFBColorAdjustmentFlags)(DCAF_CONTRAST);
+					} else if (id == JVC_SATURATION) {
+						adj.flags = (DFBColorAdjustmentFlags)(DCAF_SATURATION);
+					} else if (id == JVC_HUE) {
+						adj.flags = (DFBColorAdjustmentFlags)(DCAF_HUE);
+					} else if (id == JVC_BRIGHTNESS) {
+						adj.flags = (DFBColorAdjustmentFlags)(DCAF_BRIGHTNESS);
+					}
+					
+					_player->_provider->GetColorAdjustment(_player->_provider, &adj);
 
-				_player->_provider->GetColorAdjustment(_player->_provider, &adj);
-
-				return adj.contrast;
+					if (id == JVC_CONTRAST) {
+						return adj.contrast;
+					} else if (id == JVC_SATURATION) {
+						return adj.saturation;
+					} else if (id == JVC_HUE) {
+						return adj.hue;
+					} else if (id == JVC_BRIGHTNESS) {
+						return adj.brightness;
+					}
+				}
 			}
-
+				
 			return 0;
 		}
 
-		virtual int GetSaturation()
+		virtual bool SetValue(jvideo_control_t id, int value)
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
 			if (_player->_provider != NULL) {
-				DFBColorAdjustment adj;
+				if (HasControl(id) == true) {
+					DFBColorAdjustment adj;
 
-				adj.flags = (DFBColorAdjustmentFlags)(DCAF_SATURATION);
+					adj.contrast = value;
 
-				_player->_provider->GetColorAdjustment(_player->_provider, &adj);
+					if (id == JVC_CONTRAST) {
+						adj.flags = (DFBColorAdjustmentFlags)(DCAF_CONTRAST);
+					} else if (id == JVC_SATURATION) {
+						adj.flags = (DFBColorAdjustmentFlags)(DCAF_SATURATION);
+					} else if (id == JVC_HUE) {
+						adj.flags = (DFBColorAdjustmentFlags)(DCAF_HUE);
+					} else if (id == JVC_BRIGHTNESS) {
+						adj.flags = (DFBColorAdjustmentFlags)(DCAF_BRIGHTNESS);
+					}
+					
+					_player->_provider->SetColorAdjustment(_player->_provider, &adj);
 
-				return adj.saturation;
+					return true;
+				}
 			}
 
-			return 0;
+			return false;
 		}
 
-		virtual int GetHUE()
+		virtual void Reset(jvideo_control_t id)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				DFBColorAdjustment adj;
-
-				adj.flags = (DFBColorAdjustmentFlags)(DCAF_HUE);
-
-				_player->_provider->GetColorAdjustment(_player->_provider, &adj);
-
-				return adj.hue;
-			}
-
-			return 0;
-		}
-
-		virtual int GetBrightness()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_provider != NULL) {
-				DFBColorAdjustment adj;
-
-				adj.flags = (DFBColorAdjustmentFlags)(DCAF_BRIGHTNESS);
-
-				_player->_provider->GetColorAdjustment(_player->_provider, &adj);
-
-				return adj.brightness;
-			}
-
-			return 0;
-		}
-
-		virtual int GetSharpness()
-		{
-			return 0;
+			SetValue(id, _default_values[id]);
 		}
 
 };
+
+}
 
 DirectFBLightPlayer::DirectFBLightPlayer(std::string file):
 	jmedia::Player()
@@ -634,18 +603,19 @@ DirectFBLightPlayer::DirectFBLightPlayer(std::string file):
 	if (mdsc.caps & DVSCAPS_AUDIO) {
 		_has_audio = true;
 
-		_controls.push_back(new VolumeControlImpl(this));
+		_controls.push_back(new directfblightplayer::VolumeControlImpl(this));
 	}
 
 	if (mdsc.caps & DVSCAPS_VIDEO) {
 		_has_video = true;
 		_aspect = mdsc.video.aspect;
 
-		_controls.push_back(new VideoSizeControlImpl(this));
-		_controls.push_back(new VideoFormatControlImpl(this));
+		_controls.push_back(new directfblightplayer::VideoSizeControlImpl(this));
+		_controls.push_back(new directfblightplayer::VideoFormatControlImpl(this));
+		_controls.push_back(new directfblightplayer::VideoDeviceControlImpl(this));
 	}
 
-	_component = new DirectFBLightComponentImpl(this, 0, 0, sdsc.width, sdsc.height);
+	_component = new directfblightplayer::DirectFBLightComponentImpl(this, 0, 0, sdsc.width, sdsc.height);
 
 	Start();
 }
@@ -668,7 +638,7 @@ DirectFBLightPlayer::~DirectFBLightPlayer()
 
 void DirectFBLightPlayer::Callback(void *ctx)
 {
-	reinterpret_cast<DirectFBLightComponentImpl *>(ctx)->UpdateComponent();
+	reinterpret_cast<directfblightplayer::DirectFBLightComponentImpl *>(ctx)->UpdateComponent();
 }
 		
 void DirectFBLightPlayer::Play()
@@ -676,7 +646,7 @@ void DirectFBLightPlayer::Play()
 	jthread::AutoLock lock(&_mutex);
 
 	if (_is_paused == false && _provider != NULL) {
-		IDirectFBSurface *surface = dynamic_cast<DirectFBLightComponentImpl *>(_component)->_surface;
+		IDirectFBSurface *surface = dynamic_cast<directfblightplayer::DirectFBLightComponentImpl *>(_component)->_surface;
 
 		if (_has_video == true) {
 			_provider->PlayTo(_provider, surface, NULL, DirectFBLightPlayer::Callback, (void *)_component);

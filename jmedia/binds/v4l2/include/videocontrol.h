@@ -1,6 +1,7 @@
 #ifndef __VIDEOCONTROL_PHOTOBOOTH_H
 #define __VIDEOCONTROL_PHOTOBOOTH_H
 
+#include "jvideodevicecontrol.h"
 #include "jthread.h"
 
 #include <stdio.h>
@@ -8,18 +9,8 @@
 #include <stdarg.h>
 #include <string.h>
 
-enum video_control_t {
-	BRIGHTNESS_CONTROL,
-	CONTRAST_CONTROL,
-	SATURATION_CONTROL,
-	HUE_CONTROL,
-	GAMMA_CONTROL,
-	FOCUS_AUTO_CONTROL,
-	ZOOM_ABSOLUTE_CONTROL 
-};
-
 struct video_query_control_t {
-	video_control_t id;
+	jmedia::jvideo_control_t id;
 	int v4l_id;
 	int value;
 	int default_value;
@@ -42,18 +33,18 @@ class VideoControl {
 
 		virtual ~VideoControl();
 
-		virtual std::vector<video_control_t> GetControls();
+		virtual std::vector<jmedia::jvideo_control_t> GetControls();
 		
-		virtual bool HasControl(video_control_t id);
+		virtual bool HasControl(jmedia::jvideo_control_t id);
 
-		virtual int GetValue(video_control_t id);
+		virtual int GetValue(jmedia::jvideo_control_t id);
 
-		virtual bool SetValue(video_control_t id, int value);
+		virtual bool SetValue(jmedia::jvideo_control_t id, int value);
+
+		virtual void Reset(jmedia::jvideo_control_t id);
 
 		virtual void Reset();
 		
-		virtual void Reset(video_control_t id);
-
 };
 
 #endif

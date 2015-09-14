@@ -41,6 +41,8 @@
 
 namespace jmedia {
 
+namespace imagelistlightplayer {
+
 class ImageListLightComponentImpl : public jgui::Component {
 
 	public:
@@ -216,6 +218,8 @@ struct ascending_sort {
 	}
 };
 
+}
+
 ImageListLightPlayer::ImageListLightPlayer(std::string directory):
 	jmedia::Player()
 {
@@ -259,11 +263,11 @@ ImageListLightPlayer::ImageListLightPlayer(std::string directory):
 		}
 	}
 
-	std::sort(_image_list.begin(), _image_list.end(), ascending_sort());
+	std::sort(_image_list.begin(), _image_list.end(), imagelistlightplayer::ascending_sort());
 
-	_controls.push_back(new VideoSizeControlImpl(this));
+	_controls.push_back(new imagelistlightplayer::VideoSizeControlImpl(this));
 
-	_component = new ImageListLightComponentImpl(this, 0, 0, -1, -1);
+	_component = new imagelistlightplayer::ImageListLightComponentImpl(this, 0, 0, -1, -1);
 }
 
 ImageListLightPlayer::~ImageListLightPlayer()
@@ -325,7 +329,7 @@ void ImageListLightPlayer::Run()
 			}
 		}
 
-		dynamic_cast<ImageListLightComponentImpl *>(_component)->UpdateComponent(frame);
+		dynamic_cast<imagelistlightplayer::ImageListLightComponentImpl *>(_component)->UpdateComponent(frame);
 
 		try {
 			if (_decode_rate == 0) {

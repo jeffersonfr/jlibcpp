@@ -17,54 +17,42 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jvideoformatcontrol.h"
+#include "jvideodevicecontrol.h"
 
 namespace jmedia {
 
-VideoFormatControl::VideoFormatControl():
-	Control("video.format")
+VideoDeviceControl::VideoDeviceControl():
+	Control("video.device")
 {
-	jcommon::Object::SetClassName("jmedia::VideoFormatControl");
+	jcommon::Object::SetClassName("jmedia::VideoDeviceControl");
 }
 		
-VideoFormatControl::~VideoFormatControl()
+VideoDeviceControl::~VideoDeviceControl()
 {
 }
 
-void VideoFormatControl::SetAspectRatio(jaspect_ratio_t t)
+std::vector<jvideo_control_t> & VideoDeviceControl::GetControls()
 {
+	return _controls;
 }
 
-void VideoFormatControl::SetContentMode(jvideo_mode_t t)
+bool VideoDeviceControl::HasControl(jvideo_control_t id)
 {
+	return false;
 }
 
-void VideoFormatControl::SetVideoFormatHD(jhd_video_format_t vf)
+int VideoDeviceControl::GetValue(jvideo_control_t id)
 {
+	return -1;
 }
 
-void VideoFormatControl::SetVideoFormatSD(jsd_video_format_t vf)
+bool VideoDeviceControl::SetValue(jvideo_control_t id, int value)
 {
+	return false;
 }
 
-jaspect_ratio_t VideoFormatControl::GetAspectRatio()
+void VideoDeviceControl::Reset(jvideo_control_t id)
 {
-	return LAR_16x9;
-}
-
-jvideo_mode_t VideoFormatControl::GetContentMode()
-{
-	return LVM_FULL;
-}
-
-jhd_video_format_t VideoFormatControl::GetVideoFormatHD()
-{
-	return LHVF_1080i;
-}
-
-jsd_video_format_t VideoFormatControl::GetVideoFormatSD()
-{
-	return LSVF_PAL_M;
 }
 
 }

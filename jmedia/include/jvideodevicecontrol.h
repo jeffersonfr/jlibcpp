@@ -17,54 +17,86 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jvideoformatcontrol.h"
+#ifndef J_VIDEODEVICECONTROL_H
+#define J_VIDEODEVICECONTROL_H
+
+#include "jcontrol.h"
+#include "jgraphics.h"
 
 namespace jmedia {
 
-VideoFormatControl::VideoFormatControl():
-	Control("video.format")
-{
-	jcommon::Object::SetClassName("jmedia::VideoFormatControl");
-}
+/**
+ * \brief
+ *
+ */
+enum jvideo_control_t {
+	JVC_UNKNOWN,
+	JVC_CONTRAST,
+	JVC_SATURATION,
+	JVC_HUE,
+	JVC_BRIGHTNESS,
+	JVCSHARPNESS_,
+	JVC_GAMMA,
+	JVC_AUTO_EXPOSURE,
+	JVC_AUTO_FOCUS
+};
+
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class VideoDeviceControl : public Control {
+
+	protected:
+		/** \brief */
+		std::vector<jvideo_control_t> _controls;
+
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		VideoDeviceControl();
+
+		/**
+		 * \brief Destructor.
+		 *
+		 */
+		virtual ~VideoDeviceControl();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::vector<jvideo_control_t> & GetControls();
 		
-VideoFormatControl::~VideoFormatControl()
-{
-}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool HasControl(jvideo_control_t id);
 
-void VideoFormatControl::SetAspectRatio(jaspect_ratio_t t)
-{
-}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual int GetValue(jvideo_control_t id);
 
-void VideoFormatControl::SetContentMode(jvideo_mode_t t)
-{
-}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool SetValue(jvideo_control_t id, int value);
 
-void VideoFormatControl::SetVideoFormatHD(jhd_video_format_t vf)
-{
-}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Reset(jvideo_control_t id);
 
-void VideoFormatControl::SetVideoFormatSD(jsd_video_format_t vf)
-{
-}
-
-jaspect_ratio_t VideoFormatControl::GetAspectRatio()
-{
-	return LAR_16x9;
-}
-
-jvideo_mode_t VideoFormatControl::GetContentMode()
-{
-	return LVM_FULL;
-}
-
-jhd_video_format_t VideoFormatControl::GetVideoFormatHD()
-{
-	return LHVF_1080i;
-}
-
-jsd_video_format_t VideoFormatControl::GetVideoFormatSD()
-{
-	return LSVF_PAL_M;
-}
+};
 
 }
+
+#endif 

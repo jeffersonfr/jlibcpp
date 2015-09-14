@@ -23,6 +23,7 @@
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
+#include "jvideodevicecontrol.h"
 #include "jvolumecontrol.h"
 #include "jmediaexception.h"
 #include "jgfxhandler.h"
@@ -35,6 +36,8 @@
 #endif
 
 namespace jmedia {
+
+namespace libxinelightplayer {
 
 class LibXineLightComponentImpl : public jgui::Component, jthread::Thread {
 
@@ -408,55 +411,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_sd_video_format = vf;
 		}
 
-		virtual void SetContrast(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_stream != NULL) {
-				xine_set_param(_player->_stream, XINE_PARAM_VO_CONTRAST, value);
-			}
-		}
-
-		virtual void SetSaturation(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_stream != NULL) {
-				xine_set_param(_player->_stream, XINE_PARAM_VO_SATURATION, value);
-			}
-		}
-
-		virtual void SetHUE(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_stream != NULL) {
-				xine_set_param(_player->_stream, XINE_PARAM_VO_HUE, value);
-			}
-		}
-
-		virtual void SetBrightness(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_stream != NULL) {
-				xine_set_param(_player->_stream, XINE_PARAM_VO_BRIGHTNESS, value);
-			}
-		}
-
-		virtual void SetSharpness(int value)
-		{
-		}
-
-		virtual void SetGamma(int value)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_stream != NULL) {
-				xine_set_param(_player->_stream, XINE_PARAM_VO_GAMMA, value);
-			}
-		}
-
 		virtual jaspect_ratio_t GetAspectRatio()
 		{
 			jthread::AutoLock lock(&_player->_mutex);
@@ -491,64 +445,94 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			return LSVF_PAL_M;
 		}
 
-		virtual int GetContrast()
+};
+
+class VideoDeviceControlImpl : public VideoDeviceControl {
+	
+	private:
+		LibXineLightPlayer *_player;
+		std::map<jvideo_control_t, int> _default_values;
+
+	public:
+		VideoDeviceControlImpl(LibXineLightPlayer *player):
+			VideoDeviceControl()
+		{
+			_player = player;
+
+			_controls.push_back(JVC_CONTRAST);
+			_controls.push_back(JVC_SATURATION);
+			_controls.push_back(JVC_HUE);
+			_controls.push_back(JVC_BRIGHTNESS);
+			_controls.push_back(JVC_GAMMA);
+		
+			for (std::vector<jvideo_control_t>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
+				_default_values[*i] = GetValue(*i);
+			}
+		}
+
+		virtual ~VideoDeviceControlImpl()
+		{
+		}
+
+		virtual int GetValue(jvideo_control_t id)
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
 			if (_player->_stream != NULL) {
-				return xine_get_param(_player->_stream, XINE_PARAM_VO_CONTRAST);
-			}
+				if (HasControl(id) == true) {
+					int control = -1;
 
+					if (id == JVC_CONTRAST) {
+						control = XINE_PARAM_VO_CONTRAST;
+					} else if (id == JVC_SATURATION) {
+						control = XINE_PARAM_VO_SATURATION;
+					} else if (id == JVC_HUE) {
+						control = XINE_PARAM_VO_HUE;
+					} else if (id == JVC_BRIGHTNESS) {
+						control = XINE_PARAM_VO_BRIGHTNESS;
+					} else if (id == JVC_GAMMA) {
+						control = XINE_PARAM_VO_GAMMA;
+					}
+					
+					return xine_get_param(_player->_stream, control);
+				}
+			}
+				
 			return 0;
 		}
 
-		virtual int GetSaturation()
+		virtual bool SetValue(jvideo_control_t id, int value)
 		{
 			jthread::AutoLock lock(&_player->_mutex);
 
 			if (_player->_stream != NULL) {
-				return xine_get_param(_player->_stream, XINE_PARAM_VO_SATURATION);
+				if (HasControl(id) == true) {
+					int control = -1;
+
+					if (id == JVC_CONTRAST) {
+						control = XINE_PARAM_VO_CONTRAST;
+					} else if (id == JVC_SATURATION) {
+						control = XINE_PARAM_VO_SATURATION;
+					} else if (id == JVC_HUE) {
+						control = XINE_PARAM_VO_HUE;
+					} else if (id == JVC_BRIGHTNESS) {
+						control = XINE_PARAM_VO_BRIGHTNESS;
+					} else if (id == JVC_GAMMA) {
+						control = XINE_PARAM_VO_GAMMA;
+					}
+					
+					xine_set_param(_player->_stream, control, value);
+
+					return true;
+				}
 			}
 
-			return 0;
+			return false;
 		}
 
-		virtual int GetHUE()
+		virtual void Reset(jvideo_control_t id)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_stream != NULL) {
-				return xine_get_param(_player->_stream, XINE_PARAM_VO_HUE);
-			}
-
-			return 0;
-		}
-
-		virtual int GetBrightness()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_stream != NULL) {
-				return xine_get_param(_player->_stream, XINE_PARAM_VO_BRIGHTNESS);
-			}
-
-			return 0;
-		}
-
-		virtual int GetSharpness()
-		{
-			return 0;
-		}
-
-		virtual int GetGamma()
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			if (_player->_stream != NULL) {
-				return xine_get_param(_player->_stream, XINE_PARAM_VO_GAMMA);
-			}
-
-			return 0;
+			SetValue(id, _default_values[id]);
 		}
 
 };
@@ -577,6 +561,8 @@ static void events_callback(void *data, const xine_event_t *event)
   }
 }
   
+}
+
 LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	jmedia::Player()
 {
@@ -591,15 +577,15 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	_decode_rate = 1.0;
 	_frame_rate = 0.0;
 	
-	_component = new LibXineLightComponentImpl(this, 0, 0, -1, -1);
+	_component = new libxinelightplayer::LibXineLightComponentImpl(this, 0, 0, -1, -1);
 
 	raw_visual_t t;
 
 	memset(&t, 0, sizeof(t));
 
 	t.supported_formats = (int)(XINE_VORAW_YV12 | XINE_VORAW_YUY2 | XINE_VORAW_RGB);
-	t.raw_output_cb = render_callback;
-	t.raw_overlay_cb = overlay_callback;
+	t.raw_output_cb = libxinelightplayer::render_callback;
+	t.raw_overlay_cb = libxinelightplayer::overlay_callback;
 	t.user_data = _component;
 
   _xine = xine_new();
@@ -616,7 +602,7 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
   _stream = xine_stream_new(_xine, _ao_port, _vo_port);
   _event_queue = xine_event_new_queue(_stream);
   
-	xine_event_create_listener_thread(_event_queue, events_callback, this);
+	xine_event_create_listener_thread(_event_queue, libxinelightplayer::events_callback, this);
 
   if (xine_open(_stream, _file.c_str()) == 0) {
 		xine_close(_stream);
@@ -642,7 +628,7 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	if (xine_get_stream_info(_stream, XINE_STREAM_INFO_HAS_AUDIO)) {
 		_has_audio = true;
 
-		_controls.push_back(new VolumeControlImpl(this));
+		_controls.push_back(new libxinelightplayer::VolumeControlImpl(this));
 	}
 
 	if (xine_get_stream_info(_stream, XINE_STREAM_INFO_HAS_VIDEO)) {
@@ -654,8 +640,9 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 			_frame_rate = 90000.0/_frame_rate;
 		}
 
-		_controls.push_back(new VideoSizeControlImpl(this));
-		_controls.push_back(new VideoFormatControlImpl(this));
+		_controls.push_back(new libxinelightplayer::VideoSizeControlImpl(this));
+		_controls.push_back(new libxinelightplayer::VideoFormatControlImpl(this));
+		_controls.push_back(new libxinelightplayer::VideoDeviceControlImpl(this));
 	}
 
 	if (_has_video == false && _has_audio == true) {

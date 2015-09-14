@@ -60,6 +60,7 @@
 #include "jcondition.h"
 #include "jfileinputstream.h"
 #include "jsemaphoretimeoutexception.h"
+#include "jdebug.h"
 
 #if defined(DIRECTFB_NODEPS_UI)
 #include <directfb.h>
@@ -82,13 +83,9 @@
 
 #define LM_to_uint(a,b) (((b)<<8)|(a))
 
-#define GIFERRORMSG(x, ...) \
-	printf( "GIF: " #x "!\n", ## __VA_ARGS__ )
-
-#define GIFDEBUGMSG(x, ...) \
-	// printf( "GIF: " #x "!\n", ## __VA_ARGS__ )
-
 namespace jmedia {
+
+namespace giflightplayer {
 
 struct AnimatedGIFData {
 	jio::InputStream   *stream;
@@ -150,7 +147,7 @@ static int ReadColorMap(jio::InputStream *stream, int number, uint8_t buf[3][MAX
 	int i;
 
 	if (FetchData(stream, rgb, sizeof(rgb))) {
-		GIFERRORMSG("bad colormap");
+		JDEBUG(JINFO, "bad colormap");
 
 		return -1;
 	}
@@ -169,7 +166,7 @@ static int GetDataBlock(AnimatedGIFData *data, uint8_t *buf)
 	unsigned char count;
 
 	if (FetchData(data->stream, &count, 1)) {
-		GIFERRORMSG("error in getting DataBlock size");
+		JDEBUG(JINFO, "error in getting DataBlock size");
 
 		return -1;
 	}
@@ -177,7 +174,7 @@ static int GetDataBlock(AnimatedGIFData *data, uint8_t *buf)
 	data->ZeroDataBlock = (count == 0);
 
 	if ((count != 0) && FetchData(data->stream, buf, count)) {
-		GIFERRORMSG("error in reading DataBlock");
+		JDEBUG(JINFO, "error in reading DataBlock");
 
 		return -1;
 	}
@@ -200,7 +197,7 @@ static int GetCode(AnimatedGIFData *data, int code_size, int flag)
 	if ( (data->curbit+code_size) >= data->lastbit) {
 		if (data->done) {
 			if (data->curbit >= data->lastbit) {
-				GIFERRORMSG("ran off the end of my bits");
+				JDEBUG(JINFO, "ran off the end of my bits");
 			}
 			return -1;
 		}
@@ -243,7 +240,7 @@ static int DoExtension( AnimatedGIFData *data, int label )
 		case 0xfe:              // Comment Extension 
 			str = (char *)"Comment Extension";
 			while (GetDataBlock(data, (uint8_t*) buf) != 0)
-				GIFDEBUGMSG("gif comment: %s", buf);
+				JDEBUG(JINFO, "gif comment: %s", buf);
 			return false;
 		case 0xf9:              // Graphic Control Extension 
 			str = (char *)"Graphic Control Extension";
@@ -270,7 +267,7 @@ static int DoExtension( AnimatedGIFData *data, int label )
 			break;
 	}
 
-	GIFDEBUGMSG("got a '%s' extension", str );
+	JDEBUG(JINFO, "got a '%s' extension", str );
 
 	while (GetDataBlock(data, (uint8_t*)buf) != 0);
 
@@ -348,7 +345,7 @@ static int LWZReadByte( AnimatedGIFData *data, int flag, int input_code_size )
 			while ((count = GetDataBlock(data, buf)) > 0);
 
 			if (count != 0) {
-				GIFERRORMSG("missing EOD in data stream (common occurence)");
+				JDEBUG(JINFO, "missing EOD in data stream (common occurence)");
 			}
 
 			return -2;
@@ -365,7 +362,7 @@ static int LWZReadByte( AnimatedGIFData *data, int flag, int input_code_size )
 			*data->sp++ = data->table[1][code];
 
 			if (code == data->table[0][code]) {
-				GIFERRORMSG("circular table entry BIG ERROR");
+				JDEBUG(JINFO, "circular table entry BIG ERROR");
 			}
 
 			code = data->table[0][code];
@@ -401,16 +398,16 @@ static int ReadImage( AnimatedGIFData *data, int left, int top, int width, int h
 
 	//  Initialize the decompression routines
 	if (FetchData( data->stream, &c, 1 )) {
-		GIFERRORMSG("EOF / read error on image data");
+		JDEBUG(JINFO, "EOF / read error on image data");
 	}
 
 	if (LWZReadByte( data, true, c ) < 0) {
-		GIFERRORMSG("error reading image");
+		JDEBUG(JINFO, "error reading image");
 	}
 
 	// If this is an "uninteresting picture" ignore it.
 	if (ignore) {
-		GIFDEBUGMSG("skipping image...");
+		JDEBUG(JINFO, "skipping image...");
 
 		while (LWZReadByte(data, false, c) >= 0);
 
@@ -419,11 +416,11 @@ static int ReadImage( AnimatedGIFData *data, int left, int top, int width, int h
 
 	switch (data->disposal) {
 		case 2:
-			GIFDEBUGMSG("restoring to background color...");
+			JDEBUG(JINFO, "restoring to background color...");
 			memset( data->image, 0, data->Width * data->Height * 4 );
 			break;
 		case 3:
-			GIFERRORMSG("restoring to previous frame is unsupported");
+			JDEBUG(JINFO, "restoring to previous frame is unsupported");
 			break;
 		default:
 			break;
@@ -431,7 +428,7 @@ static int ReadImage( AnimatedGIFData *data, int left, int top, int width, int h
 
 	dst = image = data->image + (top * data->Width + left);
 
-	GIFDEBUGMSG("reading %dx%d at %dx%d %sGIF image", width, height, left, top, interlace ? " interlaced " : "" );
+	JDEBUG(JINFO, "reading %dx%d at %dx%d %sGIF image", width, height, left, top, interlace ? " interlaced " : "" );
 
 	while ((v = LWZReadByte( data, false, c )) >= 0 ) {
 		if (v != data->transparent) {
@@ -486,7 +483,7 @@ static int ReadImage( AnimatedGIFData *data, int left, int top, int width, int h
 
 fini:
 	if (LWZReadByte( data, false, c ) >= 0) {
-		GIFERRORMSG("too much input data, ignoring extra...");
+		JDEBUG(JINFO, "too much input data, ignoring extra...");
 		//while (LWZReadByte( data, false, c ) >= 0);
 	}
 
@@ -512,13 +509,13 @@ static int GIFReadHeader( AnimatedGIFData *data )
 
 	ret = FetchData( data->stream, buf, 6 );
 	if (ret) {
-		GIFERRORMSG("error reading header");
+		JDEBUG(JINFO, "error reading header");
 
 		return ret;
 	}
 
 	if (memcmp( buf, "GIF", 3 )) {
-		GIFERRORMSG("bad magic");
+		JDEBUG(JINFO, "bad magic");
 
 		return -1;
 	}
@@ -528,7 +525,7 @@ static int GIFReadHeader( AnimatedGIFData *data )
 
 	ret = FetchData( data->stream, buf, 7 );
 	if (ret) {
-		GIFERRORMSG("error reading screen descriptor");
+		JDEBUG(JINFO, "error reading screen descriptor");
 
 		return ret;
 	}
@@ -548,7 +545,7 @@ static int GIFReadHeader( AnimatedGIFData *data )
 
 	if (BitSet(buf[4], LOCALCOLORMAP)) { // Global Colormap
 		if (ReadColorMap( data->stream, data->BitPixel, data->ColorMap )) {
-			GIFERRORMSG("error reading global colormap");
+			JDEBUG(JINFO, "error reading global colormap");
 
 			return -1;
 		}
@@ -576,7 +573,7 @@ static int GIFReadFrame(AnimatedGIFData *data)
 
 		ret = FetchData( data->stream, &c, 1);
 		if (ret) {
-			GIFERRORMSG("EOF / read error on image data" );
+			JDEBUG(JINFO, "EOF / read error on image data" );
 
 			return -1;
 		}
@@ -587,7 +584,7 @@ static int GIFReadFrame(AnimatedGIFData *data)
 
 		if (c == '!') { // Extension
 			if (FetchData( data->stream, &c, 1)) {
-				GIFERRORMSG("EOF / read error on extention function code");
+				JDEBUG(JINFO, "EOF / read error on extention function code");
 
 				return -1;
 			}
@@ -598,14 +595,14 @@ static int GIFReadFrame(AnimatedGIFData *data)
 		} 
 
 		if (c != ',') { // Not a valid start character
-			// GIFERRORMSG("bogus character 0x%02x, ignoring", (int)c);
+			// JDEBUG(JINFO, "bogus character 0x%02x, ignoring", (int)c);
 
 			continue;
 		}
 
 		ret = FetchData(data->stream, buf, 9);
 		if (ret) {
-			GIFERRORMSG("couldn't read left/top/width/height");
+			JDEBUG(JINFO, "couldn't read left/top/width/height");
 
 			return ret;
 		}
@@ -621,12 +618,12 @@ static int GIFReadFrame(AnimatedGIFData *data)
 			int bitPixel = 2 << (buf[8] & 0x07);
 
 			if (ReadColorMap( data->stream, bitPixel, localColorMap )) {
-				GIFERRORMSG("error reading local colormap");
+				JDEBUG(JINFO, "error reading local colormap");
 			}
 		}
 
 		if (ReadImage(data, left, top, width, height, (useGlobalColormap?data->ColorMap:localColorMap), BitSet(buf[8], INTERLACE), 0)) {
-			GIFERRORMSG("error reading image");
+			JDEBUG(JINFO, "error reading image");
 
 			return -1;
 		}
@@ -838,6 +835,8 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 };
 
+}
+
 GIFLightPlayer::GIFLightPlayer(std::string file):
 	jmedia::Player()
 {
@@ -854,7 +853,7 @@ GIFLightPlayer::GIFLightPlayer(std::string file):
 	
 	jio::FileInputStream *stream = new jio::FileInputStream(file);
 
-	struct AnimatedGIFData *data = new struct AnimatedGIFData;
+	giflightplayer::AnimatedGIFData *data = new giflightplayer::AnimatedGIFData;
 
 	data->thread = NULL;
 	data->stream = stream;
@@ -892,9 +891,9 @@ GIFLightPlayer::GIFLightPlayer(std::string file):
 
 	data->image = new uint32_t[data->Width*data->Height];
 
-	_controls.push_back(new VideoSizeControlImpl(this));
+	_controls.push_back(new giflightplayer::VideoSizeControlImpl(this));
 
-	_component = new GIFLightComponentImpl(this, 0, 0, data->Width, data->Height);
+	_component = new giflightplayer::GIFLightComponentImpl(this, 0, 0, data->Width, data->Height);
 	
 	_provider = data;
 }
@@ -917,7 +916,7 @@ GIFLightPlayer::~GIFLightPlayer()
 
 void GIFLightPlayer::Run()
 {
-	struct AnimatedGIFData *data = (struct AnimatedGIFData *)_provider;
+	giflightplayer::AnimatedGIFData *data = (giflightplayer::AnimatedGIFData *)_provider;
 
 	while (_is_playing == true) {
 		bool skip = false;
@@ -945,7 +944,7 @@ void GIFLightPlayer::Run()
 		}
 
 		if (skip == false) {
-			dynamic_cast<GIFLightComponentImpl *>(_component)->UpdateComponent(data->image);
+			dynamic_cast<giflightplayer::GIFLightComponentImpl *>(_component)->UpdateComponent(data->image);
 
 			try {
 				if (_decode_rate == 0) {
@@ -1038,7 +1037,7 @@ void GIFLightPlayer::Close()
 	_is_playing = false;
 	_is_closed = true;
 	
-	struct AnimatedGIFData *data = (struct AnimatedGIFData *)_provider;
+	giflightplayer::AnimatedGIFData *data = (giflightplayer::AnimatedGIFData *)_provider;
 
 	data->cond.Notify();
 
@@ -1093,7 +1092,7 @@ void GIFLightPlayer::SetDecodeRate(double rate)
 	_decode_rate = rate;
 
 	if (_decode_rate != 0.0) {
-		struct AnimatedGIFData *data = (struct AnimatedGIFData *)_provider;
+		giflightplayer::AnimatedGIFData *data = (giflightplayer::AnimatedGIFData *)_provider;
 		
 		_is_paused = false;
 			
