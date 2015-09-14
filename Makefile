@@ -355,6 +355,7 @@ OBJS_jmedia += \
 		jplayerlistener.o\
 		jplayermanager.o\
 		jvideoformatcontrol.o\
+		jvideodevicecontrol.o\
 		jvideosizecontrol.o\
 		jvolumecontrol.o\
 		jmedialib.o\
