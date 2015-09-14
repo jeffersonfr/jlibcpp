@@ -448,8 +448,11 @@ class Test : public jgui::Window, public UserEventListener {
 		{
 			std::cout << "OnMousePress: "  << event->GetClickCount() << ", Button: " << event->GetButton() << std::endl;
 
-			int x = event->GetX()-_ball.x,
-					y = event->GetY()-_ball.y;
+			int cx = event->GetX()-_location.x;
+			int cy = event->GetY()-_location.y;
+
+			int x = cx-_ball.x,
+					y = cy-_ball.y;
 
 			if ((x*x+y*y) <= _raio*_raio) {
 				if (event->GetClickCount() == 1) {
@@ -483,11 +486,14 @@ class Test : public jgui::Window, public UserEventListener {
 
 		virtual void OnMouseMove(UserEvent *event)
 		{
-			std::cout << "OnMouseMove: " << event->GetX() << ", " << event->GetY() << " [" << event->GetVelocityX() << ", " << event->GetVelocityY() << "]" << std::endl;
+			int cx = event->GetX()-_location.x;
+			int cy = event->GetY()-_location.y;
+
+			std::cout << "OnMouseMove: " << cx << ", " << cy << " [" << event->GetVelocityX() << ", " << event->GetVelocityY() << "]" << std::endl;
 
 			if (_pressed == true) {
-				_ball.x = event->GetX()+_ball_diff.x;
-				_ball.y = event->GetY()+_ball_diff.y;
+				_ball.x = cx+_ball_diff.x;
+				_ball.y = cy+_ball_diff.y;
 
 				if (_ball.x < _raio) {
 					_ball.x = _raio;

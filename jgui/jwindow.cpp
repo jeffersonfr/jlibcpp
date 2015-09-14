@@ -125,7 +125,7 @@ Window::~Window()
 }
 
 #if defined(GTK3_UI)
-int OnDestroyEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
+int Window::OnDestroyEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 {
 	Window *window = (Window *)user_data;
 
@@ -134,24 +134,25 @@ int OnDestroyEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
 	return TRUE;
 }
 
-static gboolean OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data)
+gboolean Window::OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
-	Window *window = (Window *)user_data;
-	Graphics *graphics = window->GetGraphics();
+	Window *window = reinterpret_cast<Window *>(user_data);
+	NativeGraphics *native = dynamic_cast<NativeGraphics *>(window->GetGraphics());
 
-	cairo_t *cairo_context = dynamic_cast<NativeGraphics *>(graphics)->GetCairoContext();
+	window->_graphics_mutex.Lock();
 
+	cairo_t *cairo_context = native->GetCairoContext();
 	cairo_surface_t *cairo_surface = cairo_get_target(cairo_context);
 
 	if (cairo_surface != NULL) {
-		graphics->Lock();
-
 		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 		cairo_set_source_surface(cr, cairo_surface, 0, 0);
 		cairo_paint(cr);
-
-		graphics->Unlock();
 	}
+		
+	native->_gtk_sem.Notify();
+	
+	window->_graphics_mutex.Unlock();
 
 	/*
 	cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); 
@@ -165,7 +166,7 @@ static gboolean OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data)
   return FALSE;
 }
 #elif defined(SDL2_UI)
-void Window::InternalInstanciateWindow()
+void Window::InternalCreateNativeWindow()
 {
 	int flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS;
 
@@ -187,10 +188,24 @@ void Window::InternalInstanciateWindow()
 
 	if (_is_visible == true) {
 		SDL_ShowWindow(_window);
-
-		// CHANGE:: call from jsdlinputmanager:: user events
-		Repaint();
 	}
+}
+
+void Window::InternalReleaseNativeWindow()
+{
+	SDL_HideWindow(_window);
+
+	if (_surface != NULL) {
+		SDL_DestroyRenderer(_surface);  
+	}  
+
+	_surface = NULL;
+
+	if (_window != NULL) {  
+		SDL_DestroyWindow(_window);  
+	} 
+
+	_window = NULL;
 }
 #endif
 
@@ -514,6 +529,8 @@ void Window::InternalCreateWindow()
   gtk_widget_show_all(_window);
 #elif defined(SDL2_UI)
 	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->CreateWindow(this);
+
+	Repaint();
 #endif
 	
 	SetRotation(_rotation);
@@ -877,7 +894,12 @@ void Window::Move(int x, int y)
 		}
 #elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
-		SDL_SetWindowPosition(_window, _location.x, _location.y);
+		int dx = _location.x;
+		int dy = _location.y;
+
+		if (_window != NULL) {
+			SDL_SetWindowPosition(_window, dx, dy);
+		}
 #endif
 	}
 	
@@ -933,17 +955,6 @@ void Window::SetBorderSize(int size)
 }
 
 void Window::Repaint(Component *cmp)
-{
-#if defined(DIRECTFB_UI)
-	InternalRepaint(cmp);
-#elif defined(GTK3_UI)
-	InternalRepaint(cmp);
-#elif defined(SDL2_UI)
-	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->RepaintWindow(this, cmp);
-#endif
-}
-
-void Window::InternalRepaint(Component *cmp)
 {
 	if (_is_visible == false || _is_ignore_repaint == true) {
 		return;
@@ -1049,22 +1060,18 @@ bool Window::Show(bool modal)
 #if defined(DIRECTFB_UI)
 	if (_window == NULL) {
 		_graphics_mutex.Lock();
-
 		InternalCreateWindow();
-
 		_graphics_mutex.Unlock();
 	}
 	
 	SetOpacity(_opacity);
 #elif defined(GTK3_UI)
-	InternalCreateWindow();
+	if (_window == NULL) {
+		InternalCreateWindow();
+	}
 #elif defined(SDL2_UI)
 	if (_window == NULL) {
-		// _graphics_mutex.Lock();
-
 		InternalCreateWindow();
-
-		// _graphics_mutex.Unlock();
 	}
 #endif
 
@@ -1141,16 +1148,7 @@ void Window::InternalReleaseWindow()
 	_surface = NULL;
 #elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
-	if (_surface != NULL) {
-		SDL_DestroyRenderer(_surface);  
-	}  
-
-	if (_window != NULL) {  
-		SDL_DestroyWindow(_window);  
-	}  
-
-	_window = NULL;
-	_surface = NULL;
+	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->ReleaseWindow(this);
 #endif
 }
 

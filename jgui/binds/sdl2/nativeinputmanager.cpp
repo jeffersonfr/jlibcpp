@@ -20,11 +20,77 @@
 #include "Stdafx.h"
 #include "nativeinputmanager.h"
 #include "nativehandler.h"
+#include "nativegraphics.h"
 #include "nativetypes.h"
 #include "jwindowmanager.h"
 #include "jdate.h"
 
 namespace jgui {
+
+class ProcessInputEventThread : public jthread::Thread {
+
+	private:
+		std::vector<jcommon::EventObject *> _events;
+		NativeInputManager *_manager;
+		jthread::Mutex _mutex;
+		jthread::Semaphore _sem;
+		bool _is_running;
+
+	public:
+		ProcessInputEventThread(NativeInputManager *manager)
+		{
+			_manager = manager;
+			_is_running = false;
+		}
+
+		virtual ~ProcessInputEventThread()
+		{
+		}
+
+		virtual void AddEvent(jcommon::EventObject *event)
+		{
+			_mutex.Lock();
+
+			_events.push_back(event);
+
+			_mutex.Unlock();
+
+			_sem.Notify();
+		}
+
+		virtual void Stop()
+		{
+			_is_running = false;
+
+			WaitThread();
+		}
+
+		virtual void Run()
+		{
+			jcommon::EventObject *event = NULL;
+
+			_is_running = true;
+
+			do {
+				do {
+					_sem.Wait();
+				} while (_events.size() == 0);
+
+				_mutex.Lock();
+
+				event = *_events.begin();
+
+				_events.erase(_events.begin());
+
+				_mutex.Unlock();
+				
+				_manager->DispatchEvent(event);
+			} while (_is_running == true);
+		}
+
+};
+
+static ProcessInputEventThread *_event_thread = NULL;
 
 NativeInputManager::NativeInputManager():
 	jgui::InputManager(), jthread::Thread()
@@ -39,6 +105,8 @@ NativeInputManager::NativeInputManager():
 	_last_keypress = 0LL;
 	_click_count = 1;
 	_click_delay = 200;
+
+	_event_thread = new ProcessInputEventThread(this);
 }
 
 NativeInputManager::~NativeInputManager() 
@@ -50,6 +118,8 @@ void NativeInputManager::Initialize()
 	jthread::AutoLock lock(&_mutex);
 
 	_is_initialized = true;
+
+	_event_thread->Start();
 }
 
 void NativeInputManager::Restore()
@@ -66,6 +136,8 @@ void NativeInputManager::Release()
 	_is_initialized = false;
 
 	WaitThread();
+	
+	_event_thread->Stop();
 }
 
 void NativeInputManager::SetKeyEventsEnabled(bool b)
@@ -138,7 +210,8 @@ void NativeInputManager::RemoveKeyListener(KeyListener *listener)
 
 void NativeInputManager::DispatchEvent(jcommon::EventObject *event)
 {
-	jthread::AutoLock lock(&_mutex);
+	// CHANGE:: avoid dead-locks
+	// jthread::AutoLock lock(&_mutex);
 
 	if ((void *)event == NULL) {
 		return;
@@ -511,7 +584,7 @@ jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(SDL_Keysym sym
 
 void NativeInputManager::ProcessInputEvent(SDL_Event event)
 {
-	static int window_id = -1;
+	static uint32_t window_id = -1;
 
 	jthread::AutoLock lock(&_mutex);
 
@@ -539,7 +612,9 @@ void NativeInputManager::ProcessInputEvent(SDL_Event event)
 			window_id = event.window.windowID;
 
 			// SDL_CaptureMouse(true);
-
+			// void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
+			// SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
+			
 			if (window != NULL) {
 				GFXHandler::GetInstance()->SetCursor(window->GetCursor());
 
@@ -549,6 +624,8 @@ void NativeInputManager::ProcessInputEvent(SDL_Event event)
 			window_id = -1;
 
 			// SDL_CaptureMouse(false);
+			// void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
+			// SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
 
 			if (window != NULL) {
 				GFXHandler::GetInstance()->SetCursor(JCS_DEFAULT);
@@ -607,7 +684,8 @@ void NativeInputManager::ProcessInputEvent(SDL_Event event)
 
 		jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key.keysym);
 
-		DispatchEvent(new KeyEvent(NULL, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
+		_event_thread->AddEvent(new KeyEvent(NULL, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
+		// DispatchEvent(new KeyEvent(NULL, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
 	} else if (event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL) {
 		if (event.type == SDL_MOUSEMOTION) {
 			// e.motion.x/y
@@ -677,16 +755,38 @@ void NativeInputManager::ProcessInputEvent(SDL_Event event)
 		}
 
 		if (window_id > 0) {
-			SDL_Window *window = SDL_GetWindowFromID(window_id);
+			SDL_Window *native = SDL_GetWindowFromID(window_id);
 			int x, y;
 
-			SDL_GetWindowPosition(window, &x, &y);
+			SDL_GetWindowPosition(native, &x, &y);
 
 			_mouse_x = _mouse_x + x;
 			_mouse_y = _mouse_y + y;
+
+			std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
+
+			for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
+				jgui::Window *window = (*i);
+
+				if (window->_window == native) {
+					window->_location.x = x;
+					window->_location.y = y;
+
+					break;
+				}
+			}
+	
+			// void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
+			// SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
+			if (event.type == SDL_MOUSEBUTTONDOWN) {
+				SDL_SetWindowGrab(native, SDL_TRUE);
+			} else if (event.type == SDL_MOUSEBUTTONUP) {
+				SDL_SetWindowGrab(native, SDL_FALSE);
+			}
 		}
 
-		DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+		_event_thread->AddEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+		// DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
 	}
 }
 
@@ -694,45 +794,42 @@ void NativeInputManager::Run()
 {
 	SDL_Event event;
 
-	printf(":: 100:: %d\n", __LINE__);
 	while (_is_initialized == true) {
 		while (SDL_PollEvent(&event)) {
 			if (event.type == USER_NATIVE_EVENT_ENGINE_INIT) {
 				NativeHandler *handler = (NativeHandler *)event.user.data1;
 				jthread::Semaphore *sem = (jthread::Semaphore *)event.user.data2;
 
-	printf(":: 100:: %d\n", __LINE__);
 				handler->InternalInitEngine();
 
 				sem->Notify();
-	printf(":: 100:: %d\n", __LINE__);
 			} else if (event.type == USER_NATIVE_EVENT_ENGINE_RELEASE) {
 				NativeHandler *handler = (NativeHandler *)event.user.data1;
 				jthread::Semaphore *sem = (jthread::Semaphore *)event.user.data2;
 
-	printf(":: 100:: %d\n", __LINE__);
 				handler->InternalRelease();
 				
 				sem->Notify();
-	printf(":: 100:: %d\n", __LINE__);
 			} else if (event.type == USER_NATIVE_EVENT_WINDOW_CREATE) {
 				Window *window = (Window *)event.user.data1;
-				jthread::Semaphore *sem = (jthread::Semaphore *)event.user.data2;
 
-	printf(":: 100:: %d\n", __LINE__);
-				window->InternalInstanciateWindow();
-				
-				sem->Notify();
-	printf(":: 100:: %d\n", __LINE__);
-			} else if (event.type == USER_NATIVE_EVENT_WINDOW_REPAINT) {
+				window->InternalCreateNativeWindow();
+	
+				window->_sdl_sem.Notify();
+			} else if (event.type == USER_NATIVE_EVENT_WINDOW_RELEASE) {
 				Window *window = (Window *)event.user.data1;
-				Component *cmp = (Component *)event.user.data2;
 
-				window->InternalRepaint(cmp);
+				window->InternalReleaseNativeWindow();
+	
+				window->_sdl_sem.Notify();
+			} else if (event.type == USER_NATIVE_EVENT_WINDOW_REPAINT) {
+				NativeGraphics *graphics = (NativeGraphics *)event.user.data1;
+
+				graphics->InternalFlip();
+				
+				graphics->_sdl_sem.Notify();
 			} else {
-	printf(":: 100:: %d\n", __LINE__);
 				ProcessInputEvent(event);
-	printf(":: 100:: %d\n", __LINE__);
 			}
 		}
 	}

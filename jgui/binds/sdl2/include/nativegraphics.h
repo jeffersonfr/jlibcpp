@@ -21,6 +21,7 @@
 #define J_NATIVEGRAPHICS_H
 
 #include "genericgraphics.h"
+#include "jsemaphore.h"
 
 namespace jgui{
 
@@ -35,6 +36,10 @@ class NativeImage;
  */
 class NativeGraphics : public GenericGraphics{
 	
+	public:
+		/** \brief */
+		jthread::Semaphore _sdl_sem;
+
 	public:
 		/**
 		 * \brief
@@ -65,6 +70,18 @@ class NativeGraphics : public GenericGraphics{
 		 *
 		 */
 		virtual void Flip(int x, int y, int w, int h);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InternalFlip();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InternalFlip(int x, int y, int w, int h);
 
 };
 

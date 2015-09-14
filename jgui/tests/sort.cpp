@@ -1757,11 +1757,18 @@ class SortFrame : public jgui::Frame {
 
 		virtual ~SortFrame()
 		{
-			RemoveAll();
-
 			for (std::vector<SortComponent *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-				delete (*i);
+				SortComponent *cmp = (*i);
+
+				if (cmp->IsRunning() == true) {
+					cmp->Stop();
+					cmp->WaitThread();
+				}
+
+				delete cmp;
 			}
+			
+			RemoveAll();
 		}
 
 };

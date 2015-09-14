@@ -50,6 +50,8 @@ class NativeHandler : public GenericHandler{
 
 		/** \brief */
 		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
+		/** \brief */
+		jthread::Semaphore _sdl_sem;
 
 	private:
 		/**
@@ -105,7 +107,13 @@ class NativeHandler : public GenericHandler{
 		 * \brief
 		 *
 		 */
-		virtual void RepaintWindow(Window *window, Component *cmp);
+		virtual void ReleaseWindow(Window *window);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RepaintWindow(Graphics *graphics);
 
 		/**
 		 * \brief

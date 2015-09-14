@@ -52,8 +52,8 @@ class GraphicsTeste : public jgui::Frame {
 
 		virtual bool MousePressed(jgui::MouseEvent *event)
 		{
-			cx = event->GetX();
-			cy = event->GetY();
+			cx = event->GetX()-_location.x;
+			cy = event->GetY()-_location.y;
 
 			int x = (int)((cx/(int)wsize)*wsize),
 					y = (int)((cy/(int)hsize)*hsize);
@@ -89,8 +89,8 @@ class GraphicsTeste : public jgui::Frame {
 
 		virtual bool MouseMoved(jgui::MouseEvent *event)
 		{
-			cx = event->GetX();
-			cy = event->GetY();
+			cx = event->GetX()-_location.x;
+			cy = event->GetY()-_location.y;
 			
 			Repaint();
 

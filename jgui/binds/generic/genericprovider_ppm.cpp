@@ -28,7 +28,6 @@
 	if (len == 0) {\
 		return 0;\
 	} else if (len < 0) {\
-		printf( "PNM: couldn't get %i bytes from data buffer...\n", n );\
 		return -1;\
 	}\
 }
@@ -104,7 +103,7 @@ struct PNMData {
 static int __rawpbm_getrow(void *ptr, uint8_t *dest)
 {
 	PNMData *data = (PNMData *)ptr;
-	unsigned int  len;
+	int  len;
 	int           i, j;
 	uint8_t       *s = dest;
 	uint32_t      *d = (uint32_t*) dest;
@@ -126,7 +125,7 @@ static int __rawpbm_getrow(void *ptr, uint8_t *dest)
 static int __rawpgm_getrow(void *ptr, uint8_t *dest)
 {
 	PNMData *data = (PNMData *)ptr;
-	unsigned int  len;
+	int  len;
 	uint8_t       *s = dest;
 	uint32_t      *d = (uint32_t*) dest;
 
@@ -145,7 +144,7 @@ static int __rawpgm_getrow(void *ptr, uint8_t *dest)
 static int __rawppm_getrow(void *ptr, uint8_t *dest)
 {
 	PNMData *data = (PNMData *)ptr;
-	unsigned int  len;
+	int  len;
 	int           i;
 	uint8_t       *s = dest;
 	uint32_t      *d = (uint32_t*) dest;
@@ -304,7 +303,7 @@ static const PFormatData p_dta[][2] = {
 
 static int p_getheader(PNMData *data, char *to, int size)
 {
-	unsigned int len;
+	int len;
 
 	while (size--) {
 		P_GET( to, 1 );

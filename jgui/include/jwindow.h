@@ -26,6 +26,7 @@
 #include "jthemelistener.h"
 #include "jmutex.h"
 #include "jcondition.h"
+#include "jsemaphore.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -62,10 +63,15 @@ class Window : public jgui::Container{
 	friend class NativeInputManager;
 #elif defined(GTK3_UI)
 	friend class NativeInputManager;
+
+	static int OnDestroyEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data);
+	static gboolean OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data);
 #elif defined(SDL2_UI)
 	friend class NativeInputManager;
+	friend class NativeHandler;
 
-	void InternalInstanciateWindow();
+	void InternalCreateNativeWindow();
+	void InternalReleaseNativeWindow();
 #endif
 
 	protected:
@@ -75,6 +81,8 @@ class Window : public jgui::Container{
 		/** \brief */
 		IDirectFBSurface *_surface;
 #elif defined(SDL2_UI)
+		/** \brief */
+		jthread::Semaphore _sdl_sem;
 		/** \brief */
 		SDL_Window *_window;
 		/** \brief */
@@ -137,7 +145,7 @@ class Window : public jgui::Container{
 		 * \brief
 		 *
 		 */
-		void InternalCreateWindow();
+		virtual void InternalCreateWindow();
 		
 		/**
 		 * \brief
@@ -145,12 +153,6 @@ class Window : public jgui::Container{
 		 */
 		virtual void InternalReleaseWindow();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InternalRepaint(Component *cmp = NULL);
-		
 	public:
 		/**
 		 * \brief

@@ -225,15 +225,14 @@ void NativeHandler::Restore()
 void NativeHandler::InitEngine()
 {
 	SDL_Event event;
-	jthread::Semaphore sem;
 
 	event.type = USER_NATIVE_EVENT_ENGINE_INIT;
 	event.user.data1 = this;
-	event.user.data2 = &sem;
+	event.user.data2 = &_sdl_sem;
 	
 	SDL_PushEvent(&event);
 
-	sem.Wait();
+	_sdl_sem.Wait();
 }
 
 void NativeHandler::Release()
@@ -243,36 +242,47 @@ void NativeHandler::Release()
 
 	event.type = USER_NATIVE_EVENT_ENGINE_RELEASE;
 	event.user.data1 = this;
-	event.user.data2 = &sem;
+	event.user.data2 = &_sdl_sem;
 
 	SDL_PushEvent(&event);
 
-	sem.Wait();
+	_sdl_sem.Wait();
 }
 
 void NativeHandler::CreateWindow(Window *window)
 {
 	SDL_Event event;
-	jthread::Semaphore sem;
 
 	event.type = USER_NATIVE_EVENT_WINDOW_CREATE;
 	event.user.data1 = window;
-	event.user.data2 = &sem;
 
 	SDL_PushEvent(&event);
 	
-	sem.Wait();
+	window->_sdl_sem.Wait();
 }
 
-void NativeHandler::RepaintWindow(Window *window, Component *cmp)
+void NativeHandler::ReleaseWindow(Window *window)
+{
+	SDL_Event event;
+
+	event.type = USER_NATIVE_EVENT_WINDOW_RELEASE;
+	event.user.data1 = window;
+
+	SDL_PushEvent(&event);
+	
+	window->_sdl_sem.Wait();
+}
+
+void NativeHandler::RepaintWindow(Graphics *graphics)
 {
 	SDL_Event event;
 
 	event.type = USER_NATIVE_EVENT_WINDOW_REPAINT;
-	event.user.data1 = window;
-	event.user.data2 = cmp;
+	event.user.data1 = graphics;
 
 	SDL_PushEvent(&event);
+	
+	dynamic_cast<NativeGraphics *>(graphics)->_sdl_sem.Wait();
 }
 
 void NativeHandler::InternalRelease()

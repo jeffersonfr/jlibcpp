@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "nativegraphics.h"
+#include "nativehandler.h"
 
 #include <SDL2/SDL.h>
 
@@ -60,6 +61,17 @@ void NativeGraphics::SetNativeSurface(void *data, int wp, int hp)
 
 void NativeGraphics::Flip()
 {
+	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->RepaintWindow(this);
+}
+
+void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
+{
+	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->RepaintWindow(this);
+}
+
+void NativeGraphics::InternalFlip()
+{
+
 	if (_surface == NULL) {
 		return;
 	}
@@ -76,14 +88,13 @@ void NativeGraphics::Flip()
 	int dh = cairo_image_surface_get_height(cairo_surface);
 	// int stride = cairo_image_surface_get_stride(cairo_surface);
 
-	SDL_Renderer *renderer = (SDL_Renderer *)_surface;
-
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
 	if (data == NULL) {
 		return;
 	}
 
+	SDL_Renderer *renderer = (SDL_Renderer *)_surface;
 	SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, dw, dh, 32, dw*4, 0, 0, 0, 0);
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
 
@@ -93,13 +104,20 @@ void NativeGraphics::Flip()
 		return;
 	}
 
-	SDL_RenderCopy(renderer, texture, NULL, NULL);
+	SDL_Rect dst;
+
+	dst.x = 0;
+	dst.y = 0;
+	dst.w = dw;
+	dst.h = dh;
+
+	SDL_RenderCopy(renderer, texture, NULL, &dst);
 	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface);
 	SDL_RenderPresent(renderer);
 }
 
-void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
+void NativeGraphics::InternalFlip(int xp, int yp, int wp, int hp)
 {
 	if (_surface == NULL) {
 		return;

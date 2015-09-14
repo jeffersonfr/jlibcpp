@@ -204,6 +204,31 @@ class GraphicLayer : public ScreenLayer{
 			return _system_container;
 		}
 
+		virtual bool KeyPressed(jgui::KeyEvent *event)
+		{
+			std::vector<jgui::Component *> cmps =_system_container->GetComponents();
+			
+			for (std::vector<jgui::Component *>::reverse_iterator i=cmps.rbegin(); i!=cmps.rend(); i++) {
+				jgui::Component *cmp = (*i);
+
+				if (cmp->KeyPressed(event) == true) {
+					break;
+				}
+			}
+
+			cmps =_user_container->GetComponents();
+			
+			for (std::vector<jgui::Component *>::reverse_iterator i=cmps.rbegin(); i!=cmps.rend(); i++) {
+				jgui::Component *cmp = (*i);
+
+				if (cmp->KeyPressed(event) == true) {
+					break;
+				}
+			}
+
+			return false;
+		}
+
 		virtual void Paint(jgui::Graphics *g)
 		{
 			_user_container->InvalidateAll();
@@ -261,6 +286,11 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 			_refresh = true;
 
 			_sem.Notify();
+		}
+
+		virtual bool KeyPressed(jgui::KeyEvent *event)
+		{
+			return _graphic_layer->KeyPressed(event);
 		}
 
 		virtual void Run()
@@ -362,8 +392,6 @@ class Scene : public jgui::Container, public jthread::TimerTask{
 			SetBackgroundVisible(true);
 			SetFocusCycleRoot(true);
 			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
-
-			jgui::InputManager::GetInstance()->RegisterKeyListener(this);
 		}
 
 		virtual ~Scene()
@@ -373,8 +401,6 @@ class Scene : public jgui::Container, public jthread::TimerTask{
 			jthread::TimerTask::Cancel();
 
 			jthread::AutoLock lock(&_input);
-			
-			jgui::InputManager::GetInstance()->RemoveKeyListener(this);
 		}
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
