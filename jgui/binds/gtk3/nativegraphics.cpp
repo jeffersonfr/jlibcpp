@@ -70,6 +70,8 @@ void NativeGraphics::Flip()
 
 	if (_surface != NULL) {
 		gtk_widget_queue_draw((GtkWidget *)_surface);
+		
+		// _gtk_sem.Wait();
 	}
 }
 
@@ -85,6 +87,8 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 
 	if (_surface != NULL) {
 		gtk_widget_queue_draw((GtkWidget *)_surface);
+	
+		// _gtk_sem.Wait();
 	}
 }
 

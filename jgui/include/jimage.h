@@ -220,6 +220,12 @@ class Image : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual void GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetPixels(uint8_t *buffer, int xp, int yp, int wp, int hp, int stride);
 		
 		/**
@@ -228,12 +234,6 @@ class Image : public virtual jcommon::Object{
 		 */
 		virtual void GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, int *stride);
 	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp);
-		
 		/**
 		 * \brief
 		 *

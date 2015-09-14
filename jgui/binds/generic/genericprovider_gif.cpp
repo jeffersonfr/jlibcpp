@@ -50,13 +50,7 @@
 #include "genericprovider_gif.h"
 #include "jfileinputstream.h"
 #include "jmemoryinputstream.h"
-
-#ifndef NODEBUG
-#define GIFERRORMSG(...)     { fprintf( stderr, "(GIFLOADER) " __VA_ARGS__ ); \
-                                fprintf( stderr, "\n" ); }
-#else
-#define GIFERRORMSG(...)
-#endif
+#include "jdebug.h"
 
 #define MAXCOLORMAPSIZE 256
 
@@ -123,7 +117,7 @@ static int ReadColorMap(jio::InputStream *stream, int number, uint8_t buf[3][MAX
 
 	for (int i=0; i<number; i++) {
 		if (stream->Read((char *)rgb, sizeof(rgb)) <= 0) {
-			GIFERRORMSG("bad colormap" );
+			JDEBUG(JINFO, "bad colormap" );
 
 			return true;
 		}
@@ -141,7 +135,7 @@ static int GetDataBlock(jio::InputStream *stream, uint8_t *buf)
 	uint8_t count;
 
 	if (stream->Read((char *)&count, 1) <= 0) {
-		GIFERRORMSG("error in getting DataBlock size" );
+		JDEBUG(JINFO, "error in getting DataBlock size" );
 
 		return -1;
 	}
@@ -151,7 +145,7 @@ static int GetDataBlock(jio::InputStream *stream, uint8_t *buf)
 	}
 
 	if (count != 0 && stream->Read((char *)buf, count) <= 0) {
-		GIFERRORMSG("error in reading DataBlock" );
+		JDEBUG(JINFO, "error in reading DataBlock" );
 
 		return -1;
 	}
@@ -175,7 +169,7 @@ static int GetCode(GIFData *data, int code_size, int flag)
 	if ( (data->curbit+code_size) >= data->lastbit) {
 		if (data->done) {
 			if (data->curbit >= data->lastbit) {
-				GIFERRORMSG("ran off the end of my bits" );
+				JDEBUG(JINFO, "ran off the end of my bits" );
 			}
 
 			return -1;
@@ -316,7 +310,7 @@ static int LWZReadByte(GIFData *data, int flag, int input_code_size)
 			while ((count = GetDataBlock(data->stream, buf)) > 0);
 
 			if (count != 0) {
-				GIFERRORMSG("missing EOD in data stream " "(common occurence)");
+				JDEBUG(JINFO, "missing EOD in data stream " "(common occurence)");
 			}
 
 			return -2;
@@ -333,7 +327,7 @@ static int LWZReadByte(GIFData *data, int flag, int input_code_size)
 			*data->sp++ = data->table[1][code];
 			
 			if (code == data->table[0][code]) {
-				GIFERRORMSG("circular table entry BIG ERROR");
+				JDEBUG(JINFO, "circular table entry BIG ERROR");
 			}
 			
 			code = data->table[0][code];
@@ -422,11 +416,11 @@ static uint32_t * ReadImage(GIFData *data, int width, int height, uint8_t cmap[3
 
 	// Initialize the decompression routines
 	if (data->stream->Read((char *)&c, 1 ) <= 0) {
-		GIFERRORMSG("EOF / read error on image data" );
+		JDEBUG(JINFO, "EOF / read error on image data" );
 	}
 
 	if (LWZReadByte(data, true, c) < 0) {
-		GIFERRORMSG("error reading image" );
+		JDEBUG(JINFO, "error reading image" );
 	}
 
 	// If this is an "uninteresting picture" ignore it.
@@ -498,7 +492,7 @@ static uint32_t * ReadImage(GIFData *data, int width, int height, uint8_t cmap[3
 
 fini:
 	if (LWZReadByte( data, false, c ) >= 0) {
-		GIFERRORMSG("too much input data, ignoring extra...");
+		JDEBUG(JINFO, "too much input data, ignoring extra...");
 	}
 
 	return image;
@@ -516,21 +510,21 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 	bool useGlobalColormap;
 
 	if (data->stream->Read((char *)buf, 6) <= 0) {
-		GIFERRORMSG("error reading magic number" );
+		JDEBUG(JINFO, "error reading magic number" );
 	}
 
 	if (strncmp( (char *)buf, "GIF", 3 ) != 0) {
-		GIFERRORMSG("not a GIF file" );
+		JDEBUG(JINFO, "not a GIF file" );
 	}
 
 	memcpy(version, (char *)buf + 3, 4);
 
 	if ((strcmp(version, "87a") != 0) && (strcmp(version, "89a") != 0)) {
-		GIFERRORMSG("bad version number, not '87a' or '89a'" );
+		JDEBUG(JINFO, "bad version number, not '87a' or '89a'" );
 	}
 
 	if (data->stream->Read((char *)buf, 7) <= 0) {
-		GIFERRORMSG("failed to read screen descriptor" );
+		JDEBUG(JINFO, "failed to read screen descriptor" );
 	}
 
 	data->Width = LM_to_uint( buf[0], buf[1] );
@@ -543,13 +537,13 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 	// Global Colormap
 	if (BitSet(buf[4], LOCALCOLORMAP)) {
 		if (ReadColorMap(data->stream, data->BitPixel, data->ColorMap )) {
-			GIFERRORMSG("error reading global colormap" );
+			JDEBUG(JINFO, "error reading global colormap" );
 		}
 	}
 
 	if (data->AspectRatio != 0 && data->AspectRatio != 49) {
 		// float r = ( (float) data->AspectRatio + 15.0 ) / 64.0;
-		GIFERRORMSG("warning - non-square pixels");
+		JDEBUG(JINFO, "warning - non-square pixels");
 	}
 
 	data->transparent = -1;
@@ -559,7 +553,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 
 	for (;;) {
 		if (data->stream->Read((char *)&c, 1) <= 0) {
-			GIFERRORMSG("EOF / read error on image data" );
+			JDEBUG(JINFO, "EOF / read error on image data" );
 
 			return NULL;
 		}
@@ -567,7 +561,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		// GIF terminator
 		if (c == ';') {
 			if (imageCount < imageNumber) {
-				GIFERRORMSG("only %d image%s found in file", imageCount, imageCount>1?"s":"" );
+				JDEBUG(JINFO, "only %d image%s found in file", imageCount, imageCount>1?"s":"" );
 			}
 
 			return NULL;
@@ -576,7 +570,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		// Extension
 		if (c == '!') {
 			if (data->stream->Read((char *)&c, 1) <= 0) {
-				GIFERRORMSG("EOF / read error on extention function code");
+				JDEBUG(JINFO, "EOF / read error on extention function code");
 			}
 
 			DoExtension( data, c );
@@ -586,7 +580,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 
 		// Not a valid start character
 		if (c != ',') {
-			GIFERRORMSG("bogus character 0x%02x, ignoring", (int) c );
+			JDEBUG(JINFO, "bogus character 0x%02x, ignoring", (int) c );
 			
 			continue;
 		}
@@ -594,7 +588,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		++imageCount;
 
 		if (data->stream->Read((char *)buf, 9) <= 0) {
-			GIFERRORMSG("couldn't read left/top/width/height");
+			JDEBUG(JINFO, "couldn't read left/top/width/height");
 		}
 
 		*width  = LM_to_uint( buf[4], buf[5] );
@@ -615,7 +609,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 			bitPixel = 2 << (buf[8] & 0x07);
 			
 			if (ReadColorMap(data->stream, bitPixel, localColorMap)) {
-				GIFERRORMSG("error reading local colormap" );
+				JDEBUG(JINFO, "error reading local colormap" );
 			}
 
 			if (*transparency && (key_rgb || !headeronly)) {

@@ -21,6 +21,7 @@
 #define J_NATIVEGRAPHICS_H
 
 #include "genericgraphics.h"
+#include "jsemaphore.h"
 
 namespace jgui{
 
@@ -30,6 +31,10 @@ namespace jgui{
  * \author Jeff Ferr
  */
 class NativeGraphics : public GenericGraphics{
+
+	public:
+		/** \brief */
+		jthread::Semaphore _gtk_sem;
 
 	public:
 		/**

@@ -67,6 +67,8 @@
 
 namespace jgui {
 
+namespace jkeybutton {
+
 class KeyButton : public Button{
 
 	public:
@@ -86,6 +88,8 @@ class KeyButton : public Button{
 		}
 
 };
+
+}
 
 Keyboard::Keyboard(jkeyboard_type_t type, bool text_visible, bool is_password):
  	jgui::Frame("Teclado Virtual")
@@ -584,63 +588,63 @@ void Keyboard::BuildInternetKeyboard()
 {
 	KEYBOARD_LAYOUT
 
-	lines[0]->Add(new KeyButton("@", "#", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("0", "0", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("+", "=", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("@", "#", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("1", "1", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("2", "2", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("3", "3", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("4", "4", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("5", "5", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("6", "6", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("7", "7", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("8", "8", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("9", "9", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("0", "0", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("+", "=", this, KEY_WIDTH_1));
 
-	lines[1]->Add(new KeyButton("q", "Q", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("w", "W", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("e", "E", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("r", "R", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("t", "T", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("y", "Y", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("u", "U", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("i", "I", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("o", "O", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("p", "P", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("(", "[", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton(")", "]", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("q", "Q", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("w", "W", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("e", "E", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("r", "R", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("t", "T", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("y", "Y", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("u", "U", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("i", "I", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("o", "O", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("p", "P", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("(", "[", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton(")", "]", this, KEY_WIDTH_1));
 
-	lines[2]->Add(new KeyButton("a", "A", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("s", "S", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("d", "D", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("f", "F", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("g", "G", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("h", "H", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("j", "J", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("k", "K", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("l", "L", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("~", "^", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("-", "_", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("a", "A", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("s", "S", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("d", "D", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("f", "F", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("g", "G", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("h", "H", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("j", "J", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("k", "K", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("l", "L", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("~", "^", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("-", "_", this, KEY_WIDTH_1));
 
-	lines[3]->Add(new KeyButton("caps", "caps", this, KEY_WIDTH_2));
-	lines[3]->Add(new KeyButton("/", "|", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("z", "Z", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("x", "X", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("c", "C", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("v", "V", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("b", "B", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("n", "N", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("m", "M", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(".", ":", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("&", "%", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("?", "!", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("caps", "caps", this, KEY_WIDTH_2));
+	lines[3]->Add(new jkeybutton::KeyButton("/", "|", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("z", "Z", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("x", "X", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("c", "C", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("v", "V", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("b", "B", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("n", "N", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("m", "M", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton(".", ":", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("&", "%", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("?", "!", this, KEY_WIDTH_1));
 
-	lines[4]->Add(new KeyButton("shift", "shift", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("http://", "http://", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("www.", "www.", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton(".com", ".com", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("shift", "shift", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("back", "back", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("http://", "http://", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("www.", "www.", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton(".com", ".com", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("enter", "enter", this, KEY_WIDTH_2));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
 }
@@ -649,46 +653,46 @@ void Keyboard::BuildAlphaNumericKeyboard()
 {
 	KEYBOARD_LAYOUT
 
-	lines[0]->Add(new KeyButton("a", "A", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("b", "B", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("c", "C", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("d", "D", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("e", "E", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("f", "F", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("g", "G", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("h", "H", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("a", "A", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("b", "B", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("c", "C", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("d", "D", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("e", "E", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("f", "F", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("g", "G", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("h", "H", this, KEY_WIDTH_1));
 
-	lines[1]->Add(new KeyButton("i", "I", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("j", "J", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("k", "K", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("l", "L", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("m", "M", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("n", "N", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("o", "O", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("p", "P", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("i", "I", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("j", "J", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("k", "K", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("l", "L", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("m", "M", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("n", "N", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("o", "O", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("p", "P", this, KEY_WIDTH_1));
 
-	lines[2]->Add(new KeyButton("q", "Q", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("r", "R", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("s", "S", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("t", "T", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("u", "U", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("v", "V", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("x", "X", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("w", "W", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("q", "Q", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("r", "R", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("s", "S", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("t", "T", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("u", "U", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("v", "V", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("x", "X", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("w", "W", this, KEY_WIDTH_1));
 
-	lines[3]->Add(new KeyButton("y", "Y", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("z", "Z", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("@", "#", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("(", "*", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(")", "-", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(".", ",", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(";", ":", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("/", "?", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("y", "Y", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("z", "Z", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("@", "#", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("(", "*", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton(")", "-", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton(".", ",", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton(";", ":", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("/", "?", this, KEY_WIDTH_1));
 
-	lines[4]->Add(new KeyButton("caps", "caps", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("caps", "caps", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("space", "space", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("back", "back", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("enter", "enter", this, KEY_WIDTH_2));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
 }
@@ -697,65 +701,65 @@ void Keyboard::BuildQWERTYKeyboard()
 {
 	KEYBOARD_LAYOUT
 
-	lines[0]->Add(new KeyButton("'", "\"", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("0", "0", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("-", "_", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("=", "+", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("'", "\"", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("1", "1", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("2", "2", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("3", "3", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("4", "4", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("5", "5", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("6", "6", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("7", "7", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("8", "8", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("9", "9", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("0", "0", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("-", "_", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("=", "+", this, KEY_WIDTH_1));
 
-	lines[1]->Add(new KeyButton("tab", "tab", this, KEY_WIDTH_2));
-	lines[1]->Add(new KeyButton("q", "Q", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("w", "W", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("e", "E", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("r", "R", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("t", "T", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("y", "Y", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("u", "U", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("i", "I", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("o", "O", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("p", "P", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("'", "`", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("[", "{", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("tab", "tab", this, KEY_WIDTH_2));
+	lines[1]->Add(new jkeybutton::KeyButton("q", "Q", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("w", "W", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("e", "E", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("r", "R", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("t", "T", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("y", "Y", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("u", "U", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("i", "I", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("o", "O", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("p", "P", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("'", "`", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("[", "{", this, KEY_WIDTH_1));
 
-	lines[2]->Add(new KeyButton("caps", "caps", this, KEY_WIDTH_2));
-	lines[2]->Add(new KeyButton("a", "A", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("s", "S", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("d", "D", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("f", "F", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("g", "G", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("h", "H", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("j", "J", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("k", "K", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("l", "L", this, KEY_WIDTH_1));
-	// lines[2]->Add(new KeyButton("ç", "Ç", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("~", "^", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("]", "}", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("caps", "caps", this, KEY_WIDTH_2));
+	lines[2]->Add(new jkeybutton::KeyButton("a", "A", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("s", "S", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("d", "D", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("f", "F", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("g", "G", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("h", "H", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("j", "J", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("k", "K", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("l", "L", this, KEY_WIDTH_1));
+	// lines[2]->Add(new jkeybutton::KeyButton("ç", "Ç", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("~", "^", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("]", "}", this, KEY_WIDTH_1));
 
-	lines[3]->Add(new KeyButton("shift", "shift", this, KEY_WIDTH_2));
-	lines[3]->Add(new KeyButton("\\", "|", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("z", "Z", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("x", "X", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("c", "C", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("v", "V", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("b", "B", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("n", "N", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("m", "M", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(",", "<", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(".", ">", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton(";", ":", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("/", "?", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("shift", "shift", this, KEY_WIDTH_2));
+	lines[3]->Add(new jkeybutton::KeyButton("\\", "|", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("z", "Z", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("x", "X", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("c", "C", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("v", "V", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("b", "B", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("n", "N", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("m", "M", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton(",", "<", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton(".", ">", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton(";", ":", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("/", "?", this, KEY_WIDTH_1));
 
-	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_3));
-	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_3));
-	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_3));
+	lines[4]->Add(new jkeybutton::KeyButton("back", "back", this, KEY_WIDTH_3));
+	lines[4]->Add(new jkeybutton::KeyButton("space", "space", this, KEY_WIDTH_3));
+	lines[4]->Add(new jkeybutton::KeyButton("enter", "enter", this, KEY_WIDTH_3));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
 }
@@ -764,31 +768,31 @@ void Keyboard::BuildNumericKeyboard()
 {
 	KEYBOARD_LAYOUT
 
-	lines[0]->Add(new KeyButton("(", "(", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("+", "+", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("(", "(", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("7", "7", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("8", "8", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("9", "9", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("+", "+", this, KEY_WIDTH_1));
 
-	lines[1]->Add(new KeyButton(")", ")", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("-", "-", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton(")", ")", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("4", "4", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("5", "5", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("6", "6", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("-", "-", this, KEY_WIDTH_1));
 
-	lines[2]->Add(new KeyButton("%", "%", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("*", "*", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("%", "%", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("1", "1", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("2", "2", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("3", "3", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("*", "*", this, KEY_WIDTH_1));
 
-	lines[3]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2));
-	lines[3]->Add(new KeyButton(".", ".", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("=", "=", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("/", "/", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("back", "back", this, KEY_WIDTH_2));
+	lines[3]->Add(new jkeybutton::KeyButton(".", ".", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("=", "=", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("/", "/", this, KEY_WIDTH_1));
 
-	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("enter", "enter", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("space", "space", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("enter", "enter", this, KEY_WIDTH_2));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
 }
@@ -797,29 +801,29 @@ void Keyboard::BuildPhoneKeyboard()
 {
 	KEYBOARD_LAYOUT
 
-	lines[0]->Add(new KeyButton("7", "7", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("8", "8", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("9", "9", this, KEY_WIDTH_1));
-	lines[0]->Add(new KeyButton("(", "(", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("7", "7", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("8", "8", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("9", "9", this, KEY_WIDTH_1));
+	lines[0]->Add(new jkeybutton::KeyButton("(", "(", this, KEY_WIDTH_1));
 
-	lines[1]->Add(new KeyButton("4", "4", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("5", "5", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton("6", "6", this, KEY_WIDTH_1));
-	lines[1]->Add(new KeyButton(")", ")", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("4", "4", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("5", "5", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton("6", "6", this, KEY_WIDTH_1));
+	lines[1]->Add(new jkeybutton::KeyButton(")", ")", this, KEY_WIDTH_1));
 
-	lines[2]->Add(new KeyButton("1", "1", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("2", "2", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("3", "3", this, KEY_WIDTH_1));
-	lines[2]->Add(new KeyButton("-", "-", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("1", "1", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("2", "2", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("3", "3", this, KEY_WIDTH_1));
+	lines[2]->Add(new jkeybutton::KeyButton("-", "-", this, KEY_WIDTH_1));
 	
-	lines[3]->Add(new KeyButton("*", "*", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("0", "0", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("+", "+", this, KEY_WIDTH_1));
-	lines[3]->Add(new KeyButton("#", "#", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("*", "*", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("0", "0", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("+", "+", this, KEY_WIDTH_1));
+	lines[3]->Add(new jkeybutton::KeyButton("#", "#", this, KEY_WIDTH_1));
 
 
-	lines[4]->Add(new KeyButton("space", "space", this, KEY_WIDTH_2));
-	lines[4]->Add(new KeyButton("back", "back", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("space", "space", this, KEY_WIDTH_2));
+	lines[4]->Add(new jkeybutton::KeyButton("back", "back", this, KEY_WIDTH_2));
 
 	lines[0]->GetComponents()[0]->RequestFocus();
 }
@@ -834,7 +838,7 @@ void Keyboard::ProcessCaps(Button *button)
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
 		if ((*i)->InstanceOf("KeyButton") == true) {
-			KeyButton *btn = (KeyButton *)(*i);
+			jkeybutton::KeyButton *btn = (jkeybutton::KeyButton *)(*i);
 
 			std::string name = btn->GetName();
 

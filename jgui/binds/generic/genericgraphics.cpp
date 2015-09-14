@@ -34,6 +34,8 @@
 #include "jnullpointerexception.h"
 
 #define M_2PI	(2*M_PI)
+	
+#define IMAGE_SIZE_LIMIT 32768
 
 namespace jgui {
 
@@ -1544,7 +1546,7 @@ void GenericGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 				*(dst + di + 0) = *(src + si + 0);
 
 				si = si + 4;
-				di = di + 3;
+				di = di + 4;
 			}
 		}
 	} else if (_pixelformat == JPF_RGB16) {
@@ -1561,6 +1563,9 @@ void GenericGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 
 				*(dst + di + 1) = (r << 0x03 | g >> 0x03) & 0xff;
 				*(dst + di + 0) = (g << 0x03 | b >> 0x00) & 0xff;
+
+				si = si + 4;
+				di = di + 2;
 			}
 		}
 	}
@@ -1589,6 +1594,14 @@ bool GenericGraphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 bool GenericGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
 	if ((void *)img == NULL) {
+		return false;
+	}
+
+	if (swp <= 0 || shp <= 0) {
+		return false;
+	}
+
+	if (swp > IMAGE_SIZE_LIMIT || shp > IMAGE_SIZE_LIMIT) {
 		return false;
 	}
 
@@ -1633,6 +1646,14 @@ bool GenericGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, 
 bool GenericGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
 	if ((void *)img == NULL) {
+		return false;
+	}
+
+	if (swp <= 0 || shp <= 0 || wp <= 0 || hp <= 0) {
+		return false;
+	}
+
+	if (swp > IMAGE_SIZE_LIMIT || shp > IMAGE_SIZE_LIMIT || wp > IMAGE_SIZE_LIMIT || hp > IMAGE_SIZE_LIMIT) {
 		return false;
 	}
 
