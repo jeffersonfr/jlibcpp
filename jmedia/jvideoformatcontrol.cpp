@@ -35,6 +35,10 @@ void VideoFormatControl::SetAspectRatio(jaspect_ratio_t t)
 {
 }
 
+void VideoFormatControl::SetFramesPerSecond(double fps)
+{
+}
+
 void VideoFormatControl::SetContentMode(jvideo_mode_t t)
 {
 }
@@ -50,6 +54,11 @@ void VideoFormatControl::SetVideoFormatSD(jsd_video_format_t vf)
 jaspect_ratio_t VideoFormatControl::GetAspectRatio()
 {
 	return LAR_16x9;
+}
+
+double VideoFormatControl::GetFramesPerSecond()
+{
+	return 0.0;
 }
 
 jvideo_mode_t VideoFormatControl::GetContentMode()

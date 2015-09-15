@@ -31,6 +31,11 @@ VideoSizeControl::~VideoSizeControl()
 {
 }
 
+void VideoSizeControl::SetSize(jgui::jsize_t t)
+{
+	SetSize(t.width, t.height);
+}
+
 void VideoSizeControl::SetSource(jgui::jregion_t t)
 {
 	SetSource(t.x, t.y, t.width, t.height);
@@ -41,12 +46,26 @@ void VideoSizeControl::SetDestination(jgui::jregion_t t)
 	SetDestination(t.x, t.y, t.width, t.height);
 }
 
+void VideoSizeControl::SetSize(int w, int h)
+{
+}
+
 void VideoSizeControl::SetSource(int x, int y, int w, int h)
 {
 }
 
 void VideoSizeControl::SetDestination(int x, int y, int w, int h)
 {
+}
+
+jgui::jsize_t VideoSizeControl::GetSize()
+{
+	jgui::jsize_t t;
+
+	t.width = 0;
+	t.height = 0;
+
+	return t;
 }
 
 jgui::jregion_t VideoSizeControl::GetSource()

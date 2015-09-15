@@ -67,7 +67,7 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 {
 	if (_hints.size() == 0) {
 		_hints[JPH_CACHING] = false;
-		_hints[JPH_LIGHTWEIGHT] = false;
+		_hints[JPH_LIGHTWEIGHT] = true;
 		_hints[JPH_SECURITY] = false;
 		_hints[JPH_PLUGINS] = false;
 	}
@@ -100,6 +100,7 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 #if defined(DIRECTFB_MEDIA) && defined(DIRECTFB_UI)
 	try {
 		if (_hints[JPH_LIGHTWEIGHT] == false) {
+			// INFO:: the component's visible must be set to true
 			return new DirectFBHeavyPlayer(url_);
 		}
 			

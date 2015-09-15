@@ -1387,6 +1387,11 @@ static void * decode_thread(void *arg)
     ret = -1;
     if (st_index[AVMEDIA_TYPE_VIDEO] >= 0) {
         ret = stream_component_open(is, st_index[AVMEDIA_TYPE_VIDEO]);
+				
+				// INFO:: get the fps from media
+				AVStream *st = is->ic->streams[st_index[AVMEDIA_TYPE_VIDEO]];
+
+				is->frames_per_second = st->avg_frame_rate.num / (double)st->avg_frame_rate.den;
     }
     pthread_create(&is->refresh_tid, NULL, refresh_thread, is);
     if (ret < 0) {
@@ -1469,7 +1474,7 @@ static void * decode_thread(void *arg)
             }
             usleep(10000);
             if (is->audioq.size + is->videoq.size == 0) {
-                if (is->loop != 1 && (!is->loop || --is->loop)) {
+                if (is->loop != 0) {
                     stream_seek(is, is->start_time != AV_NOPTS_VALUE ? is->start_time : 0, 0, 0);
                 } else {
                   ret = AVERROR_EOF;
@@ -1693,6 +1698,8 @@ VideoState *avplay_open(const char *filename)
     is->img_convert_ctx = NULL;
 #endif
 
+		is->frames_per_second = 0.0;
+
     is->width = 0;
 		is->height = 0;
 		is->xleft = 0;
@@ -1793,7 +1800,7 @@ int64_t avplay_getmediatime(VideoState *is)
 {
 	int64_t t = -1LL;
 
-	if (is) {
+	if (is && is->ic) {
 		if (is->seek_by_bytes || is->ic->duration <= 0) {
 			t = avio_size(is->ic->pb);
 		} else {
@@ -1808,7 +1815,7 @@ int64_t avplay_getcurrentmediatime(VideoState *is)
 {
 	int64_t t = 0LL;
 
-	if (is) {
+	if (is && is->ic) {
 		if (is->seek_by_bytes) {
 			if (is->video_stream >= 0 && is->video_current_pos >= 0) {
 				t = is->video_current_pos;
@@ -1825,7 +1832,7 @@ int64_t avplay_getcurrentmediatime(VideoState *is)
 
 void avplay_setcurrentmediatime(VideoState *is, int64_t time)
 {
-	if (is) {
+	if (is && is->ic) {
 		if (is->seek_by_bytes || is->ic->duration <= 0) {
 			uint64_t size =  avio_size(is->ic->pb);
 

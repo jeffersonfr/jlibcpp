@@ -114,6 +114,13 @@ class VideoFormatControl : public Control {
 		virtual void SetAspectRatio(jaspect_ratio_t t);
 
 		/**
+		 * \brief Define media's aspect ratio.
+		 *
+		 * \param t
+		 */
+		virtual void SetFramesPerSecond(double fps);
+
+		/**
 		 * \brief Define the video mode. The final result will depend from content mode and aspect ratio.
 		 *
 		 * \param t
@@ -140,6 +147,13 @@ class VideoFormatControl : public Control {
 		 * \return 
 		 */
 		virtual jaspect_ratio_t GetAspectRatio();
+
+		/**
+		 * \brief Returns the frame rate.
+		 *
+		 * \return 
+		 */
+		virtual double GetFramesPerSecond();
 
 		/**
 		 * \brief Returns the content mode.

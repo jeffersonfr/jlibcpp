@@ -203,7 +203,7 @@ class LibXineLightComponentImpl : public jgui::Component, jthread::Thread {
 
 			_mutex.Lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, _location.x, _location.y, _size.width, _size.height);
+			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
 				
 			_mutex.Unlock();
 		}
@@ -352,16 +352,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			LibXineLightComponentImpl *impl = dynamic_cast<LibXineLightComponentImpl *>(_player->_component);
-
-			jgui::jregion_t t;
-
-			t.x = impl->GetX();
-			t.y = impl->GetY();
-			t.width = impl->GetWidth();
-			t.height = impl->GetHeight();
-
-			return t;
+			return dynamic_cast<LibXineLightComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -396,6 +387,13 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_aspect_ratio = t;
 		}
 
+		virtual void SetFramesPerSecond(double fps)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			// SetDecodeRate ?
+		}
+
 		virtual void SetContentMode(jvideo_mode_t t)
 		{
 			_video_mode = t;
@@ -428,6 +426,13 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			}
 
 			return LAR_16x9;
+		}
+
+		virtual double GetFramesPerSecond()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			return _player->_frames_per_second;
 		}
 
 		virtual jvideo_mode_t GetContentMode()
@@ -575,7 +580,7 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	_media_time = 0LL;
 	_is_loop = false;
 	_decode_rate = 1.0;
-	_frame_rate = 0.0;
+	_frames_per_second = 0.0;
 	
 	_component = new libxinelightplayer::LibXineLightComponentImpl(this, 0, 0, -1, -1);
 
@@ -634,10 +639,10 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	if (xine_get_stream_info(_stream, XINE_STREAM_INFO_HAS_VIDEO)) {
 		_has_video = true;
 		_aspect = xine_get_stream_info(_stream, XINE_STREAM_INFO_VIDEO_RATIO)/10000.0;
-		_frame_rate = xine_get_stream_info(_stream, XINE_STREAM_INFO_FRAME_DURATION);
+		_frames_per_second = xine_get_stream_info(_stream, XINE_STREAM_INFO_FRAME_DURATION);
 
-		if (_frame_rate) {
-			_frame_rate = 90000.0/_frame_rate;
+		if (_frames_per_second) {
+			_frames_per_second = 90000.0/_frames_per_second;
 		}
 
 		_controls.push_back(new libxinelightplayer::VideoSizeControlImpl(this));

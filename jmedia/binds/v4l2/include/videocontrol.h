@@ -33,6 +33,8 @@ class VideoControl {
 
 		virtual ~VideoControl();
 
+		virtual double GetFramesPerSecond();
+
 		virtual std::vector<jmedia::jvideo_control_t> GetControls();
 		
 		virtual bool HasControl(jmedia::jvideo_control_t id);

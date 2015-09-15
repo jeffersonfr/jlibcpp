@@ -195,6 +195,8 @@ typedef struct VideoState {
     AVFilterContext *out_video_filter;  // the last filter in the video chain
 #endif
 
+		double frames_per_second;
+
     float skip_frames;
     float skip_frames_index;
     int refresh;

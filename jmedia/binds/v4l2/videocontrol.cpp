@@ -91,6 +91,17 @@ void VideoControl::EnumerateControls()
 	_query_controls.push_back(t);
 }
 
+double VideoControl::GetFramesPerSecond()
+{
+	struct v4l2_streamparm fps;
+
+	memset(&fps, 0, sizeof(fps));
+
+	fps.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
+	return (double)fps.parm.capture.timeperframe.numerator/(double)fps.parm.capture.timeperframe.denominator;
+}
+
 std::vector<jmedia::jvideo_control_t> VideoControl::GetControls()
 {
 	std::vector<jmedia::jvideo_control_t> controls;

@@ -26,11 +26,10 @@ VideoGrabber::VideoGrabber(V4LFrameListener *listener, std::string device)
 	_device = device;
 	_method = IO_METHOD_MMAP;
 	_handler = -1;
-	buffers = NULL;
-	n_buffers = 0;
-	out_buf = 0;
-	xres = 0;
-	yres = 0;
+	_buffers = NULL;
+	_n_buffers = 0;
+	_xres = 0;
+	_yres = 0;
 	_running = false;
 }
 
@@ -51,16 +50,16 @@ int xioctl(int fh, int request, void *arg)
 
 void VideoGrabber::InitBuffer(unsigned int buffer_size)
 {
-	buffers = (buffer *)calloc(1, sizeof(*buffers));
+	_buffers = (buffer *)calloc(1, sizeof(*_buffers));
 
-	if (!buffers) {
+	if (!_buffers) {
 		ExceptionHandler("Out of memory");
 	}
 
-	buffers[0].length = buffer_size;
-	buffers[0].start = malloc(buffer_size);
+	_buffers[0].length = buffer_size;
+	_buffers[0].start = malloc(buffer_size);
 
-	if (!buffers[0].start) {
+	if (!_buffers[0].start) {
 		ExceptionHandler("Out of memory");
 	}
 }
@@ -87,33 +86,33 @@ void VideoGrabber::InitSharedMemory()
 		ExceptionHandler("Insufficient buffer memory on " + _device);
 	}
 
-	buffers = (buffer *)calloc(req.count, sizeof(*buffers));
+	_buffers = (buffer *)calloc(req.count, sizeof(*_buffers));
 
-	if (!buffers) {
+	if (!_buffers) {
 		ExceptionHandler("Out of memory");
 	}
 
-	for (n_buffers = 0; n_buffers < req.count; ++n_buffers) {
+	for (_n_buffers = 0; _n_buffers < req.count; ++_n_buffers) {
 		struct v4l2_buffer buf;
 
 		CLEAR(buf);
 
 		buf.type        = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 		buf.memory      = V4L2_MEMORY_MMAP;
-		buf.index       = n_buffers;
+		buf.index       = _n_buffers;
 
 		if (-1 == xioctl(_handler, VIDIOC_QUERYBUF, &buf))
 			ExceptionHandler("VIDIOC_QUERYBUF");
 
-		buffers[n_buffers].length = buf.length;
-		buffers[n_buffers].start =
+		_buffers[_n_buffers].length = buf.length;
+		_buffers[_n_buffers].start =
 			mmap(NULL /* start anywhere */,
 					buf.length,
 					PROT_READ | PROT_WRITE /* required */,
 					MAP_SHARED /* recommended */,
 					_handler, buf.m.offset);
 
-		if (MAP_FAILED == buffers[n_buffers].start)
+		if (MAP_FAILED == _buffers[_n_buffers].start)
 			ExceptionHandler("mmap");
 	}
 }
@@ -136,17 +135,17 @@ void VideoGrabber::InitUserPtr(unsigned int buffer_size)
 		}
 	}
 
-	buffers = (buffer *)calloc(4, sizeof(*buffers));
+	_buffers = (buffer *)calloc(4, sizeof(*_buffers));
 
-	if (!buffers) {
+	if (!_buffers) {
 		ExceptionHandler("Out of memory");
 	}
 
-	for (n_buffers = 0; n_buffers < 4; ++n_buffers) {
-		buffers[n_buffers].length = buffer_size;
-		buffers[n_buffers].start = malloc(buffer_size);
+	for (_n_buffers = 0; _n_buffers < 4; ++_n_buffers) {
+		_buffers[_n_buffers].length = buffer_size;
+		_buffers[_n_buffers].start = malloc(buffer_size);
 
-		if (!buffers[n_buffers].start) {
+		if (!_buffers[_n_buffers].start) {
 			ExceptionHandler("Out of memory");
 		}
 	}
@@ -213,6 +212,7 @@ void VideoGrabber::Configure(int width, int height)
 	CLEAR(fmt);
 
 	fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
+
 	if (width > 0 && height > 0) {
 		fmt.fmt.pix.width       = width;
 		fmt.fmt.pix.height      = height;
@@ -247,10 +247,10 @@ void VideoGrabber::Configure(int width, int height)
 		ExceptionHandler("Not implemented to this pixel format");
 	}
 
-	xres = fmt.fmt.pix.width;
-	yres = fmt.fmt.pix.height;
+	_xres = fmt.fmt.pix.width;
+	_yres = fmt.fmt.pix.height;
 
-	printf("camera.mode:: [%d, %d] -> [%d, %d]\n", width, height, xres, yres);
+	printf("camera.mode:: [%d, %d] -> [%d, %d]\n", width, height, _xres, _yres);
 
 	// buggy driver paranoia
 	min = fmt.fmt.pix.width * 2;
@@ -314,22 +314,22 @@ void VideoGrabber::ReleaseDevice()
 
 	switch (_method) {
 		case IO_METHOD_READ:
-			free(buffers[0].start);
+			free(_buffers[0].start);
 			break;
 
 		case IO_METHOD_MMAP:
-			for (i = 0; i < n_buffers; ++i)
-				if (-1 == munmap(buffers[i].start, buffers[i].length))
+			for (i = 0; i < _n_buffers; ++i)
+				if (-1 == munmap(_buffers[i].start, _buffers[i].length))
 					ExceptionHandler("munmap");
 			break;
 
 		case IO_METHOD_USERPTR:
-			for (i = 0; i < n_buffers; ++i)
-				free(buffers[i].start);
+			for (i = 0; i < _n_buffers; ++i)
+				free(_buffers[i].start);
 			break;
 	}
 
-	free(buffers);
+	free(_buffers);
 
 	if (-1 == close(_handler))
 		ExceptionHandler("close");
@@ -344,7 +344,7 @@ int VideoGrabber::GetFrame()
 
 	switch (_method) {
 		case IO_METHOD_READ:
-			if (-1 == read(_handler, buffers[0].start, buffers[0].length)) {
+			if (-1 == read(_handler, _buffers[0].start, _buffers[0].length)) {
 				switch (errno) {
 					case EAGAIN:
 						return 0;
@@ -358,7 +358,7 @@ int VideoGrabber::GetFrame()
 			}
 
 			if (_listener != NULL) {
-				_listener->ProcessFrame((const uint8_t *)buffers[0].start, xres, yres, _pixelformat);
+				_listener->ProcessFrame((const uint8_t *)_buffers[0].start, _xres, _yres, _pixelformat);
 				// _listener->ProcessFrame((const uint8_t *)buffers[0].start, buffers[0].length, _pixelformat);
 			}
 			break;
@@ -382,12 +382,12 @@ int VideoGrabber::GetFrame()
 				}
 			}
 
-			if (buf.index >= n_buffers) {
+			if (buf.index >= _n_buffers) {
 				ExceptionHandler("Buffer index is out of bounds");
 			}
 
 			if (_listener != NULL) {
-				_listener->ProcessFrame((const uint8_t *)buffers[buf.index].start, xres, yres, _pixelformat);
+				_listener->ProcessFrame((const uint8_t *)_buffers[buf.index].start, _xres, _yres, _pixelformat);
 				// _listener->ProcessFrame((const uint8_t *)buffers[buf.index].start, buf.bytesused, _pixelformat);
 			}
 
@@ -414,17 +414,17 @@ int VideoGrabber::GetFrame()
 				}
 			}
 
-			for (i = 0; i < n_buffers; ++i)
-				if (buf.m.userptr == (unsigned long)buffers[i].start
-						&& buf.length == buffers[i].length)
+			for (i = 0; i < _n_buffers; ++i)
+				if (buf.m.userptr == (unsigned long)_buffers[i].start
+						&& buf.length == _buffers[i].length)
 					break;
 
-			if (i >= n_buffers) {
+			if (i >= _n_buffers) {
 				ExceptionHandler("Buffer index is out of bounds");
 			}
 
 			if (_listener != NULL) {
-				_listener->ProcessFrame((const uint8_t *)buf.m.userptr, xres, yres, _pixelformat);
+				_listener->ProcessFrame((const uint8_t *)buf.m.userptr, _xres, _yres, _pixelformat);
 				// _listener->ProcessFrame((const uint8_t *)buf.m.userptr, buf.bytesused, _pixelformat);
 			}
 
@@ -473,7 +473,7 @@ void VideoGrabber::Start()
 			break;
 
 		case IO_METHOD_MMAP:
-			for (i = 0; i < n_buffers; ++i) {
+			for (i = 0; i < _n_buffers; ++i) {
 				struct v4l2_buffer buf;
 
 				CLEAR(buf);
@@ -490,15 +490,15 @@ void VideoGrabber::Start()
 			break;
 
 		case IO_METHOD_USERPTR:
-			for (i = 0; i < n_buffers; ++i) {
+			for (i = 0; i < _n_buffers; ++i) {
 				struct v4l2_buffer buf;
 
 				CLEAR(buf);
 				buf.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 				buf.memory = V4L2_MEMORY_USERPTR;
 				buf.index = i;
-				buf.m.userptr = (unsigned long)buffers[i].start;
-				buf.length = buffers[i].length;
+				buf.m.userptr = (unsigned long)_buffers[i].start;
+				buf.length = _buffers[i].length;
 
 				if (-1 == xioctl(_handler, VIDIOC_QBUF, &buf))
 					ExceptionHandler("VIDIOC_QBUF");

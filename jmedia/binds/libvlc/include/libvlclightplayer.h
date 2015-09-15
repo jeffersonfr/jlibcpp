@@ -46,6 +46,8 @@ class LibVLCLightPlayer : public jmedia::Player, public jthread::Thread {
 		/** \brief */
 		double _aspect;
 		/** \brief */
+		double _frames_per_second;
+		/** \brief */
 		double _decode_rate;
 		/** \brief */
 		uint64_t _media_time;

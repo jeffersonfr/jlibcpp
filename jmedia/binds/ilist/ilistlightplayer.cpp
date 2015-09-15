@@ -137,7 +137,7 @@ class ImageListLightComponentImpl : public jgui::Component {
 
 			_mutex.Lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, _location.x, _location.y, _size.width, _size.height);
+			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
 				
 			_mutex.Unlock();
 		}
@@ -193,16 +193,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			ImageListLightComponentImpl *impl = dynamic_cast<ImageListLightComponentImpl *>(_player->_component);
-
-			jgui::jregion_t t;
-
-			t.x = impl->GetX();
-			t.y = impl->GetY();
-			t.width = impl->GetWidth();
-			t.height = impl->GetHeight();
-
-			return t;
+			return dynamic_cast<ImageListLightComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };

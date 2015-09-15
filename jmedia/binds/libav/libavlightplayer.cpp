@@ -145,7 +145,7 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 
 				_mutex.Unlock();
 
-				Start();
+				Run();
 			}
 #else
 			if (IsRunning() == true) {
@@ -175,7 +175,7 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 
 			_mutex.Unlock();
 
-			Start();
+			Run();
 #endif
 		}
 
@@ -192,7 +192,7 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 
 			_mutex.Lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, _location.x, _location.y, _size.width, _size.height);
+			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
 				
 			_mutex.Unlock();
 		}
@@ -324,16 +324,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			LibAVLightComponentImpl *impl = dynamic_cast<LibAVLightComponentImpl *>(_player->_component);
-
-			jgui::jregion_t t;
-
-			t.x = impl->GetX();
-			t.y = impl->GetY();
-			t.width = impl->GetWidth();
-			t.height = impl->GetHeight();
-
-			return t;
+			return dynamic_cast<LibAVLightComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -368,6 +359,13 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_aspect_ratio = t;
 		}
 
+		virtual void SetFramesPerSecond(double fps)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			// SetDecodeRate ?
+		}
+
 		virtual void SetContentMode(jvideo_mode_t t)
 		{
 			_video_mode = t;
@@ -400,6 +398,13 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			}
 
 			return LAR_16x9;
+		}
+
+		virtual double GetFramesPerSecond()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			return _player->_provider->frames_per_second;
 		}
 
 		virtual jvideo_mode_t GetContentMode()

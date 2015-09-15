@@ -267,7 +267,7 @@ class LibVLCLightComponentImpl : public jgui::Component, jthread::Thread {
 
 			_mutex.Lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, _location.x, _location.y, _size.width, _size.height);
+			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
 				
 			_mutex.Unlock();
 		}
@@ -550,16 +550,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			LibVLCLightComponentImpl *impl = dynamic_cast<LibVLCLightComponentImpl *>(_player->_component);
-
-			jgui::jregion_t t;
-
-			t.x = impl->GetX();
-			t.y = impl->GetY();
-			t.width = impl->GetWidth();
-			t.height = impl->GetHeight();
-
-			return t;
+			return dynamic_cast<LibVLCLightComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -592,6 +583,13 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		virtual void SetAspectRatio(jaspect_ratio_t t)
 		{
 			_aspect_ratio = t;
+		}
+
+		virtual void SetFramesPerSecond(double fps)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			// SetDecodeRate ?
 		}
 
 		virtual void SetContentMode(jvideo_mode_t t)
@@ -628,6 +626,13 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			return LAR_16x9;
 		}
 
+		virtual double GetFramesPerSecond()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			return _player->_frames_per_second;
+		}
+
 		virtual jvideo_mode_t GetContentMode()
 		{
 			return LVM_FULL;
@@ -659,6 +664,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	_aspect = 1.0;
 	_media_time = 0LL;
 	_decode_rate = 1.0;
+	_frames_per_second = 0.0;
 	
 	char const *vlc_argv[] = {
 		"--vout=dummy"
@@ -734,7 +740,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	}
 
 	_media_time = (uint64_t)libvlc_media_get_duration(media);
-	// _frame_per_sec = libvlc_media_player_get_fps(_provider);
+	_frames_per_second = libvlc_media_player_get_fps(_provider);
 
 	_component = new libvlclightplayer::LibVLCLightComponentImpl(this, 0, 0, iw, ih);
 

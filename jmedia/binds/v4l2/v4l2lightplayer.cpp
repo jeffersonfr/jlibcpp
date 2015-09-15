@@ -98,6 +98,15 @@ class V4LComponentImpl : public jgui::Component, jthread::Thread {
 			return _frame_size;
 		}
 
+		virtual void Reset()
+		{
+			_frame_size.width = _src.width = -1;
+			_frame_size.height = _src.height = -1;
+
+			delete [] _buffer;
+			_buffer = NULL;
+		}
+
 		virtual void UpdateComponent(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
 		{
 			if (width <= 0 || height <= 0) {
@@ -201,7 +210,7 @@ class V4LComponentImpl : public jgui::Component, jthread::Thread {
 
 			_mutex.Lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, _location.x, _location.y, _size.width, _size.height);
+			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
 				
 			_mutex.Unlock();
 		}
@@ -229,16 +238,43 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		{
 		}
 
+		virtual void SetSize(int w, int h)
+		{
+			V4LComponentImpl *impl = dynamic_cast<V4LComponentImpl *>(_player->_component);
+
+			jthread::AutoLock lock(&impl->_mutex);
+			
+			VideoGrabber *grabber = _player->_grabber;
+
+			grabber->Stop();
+			impl->Reset();
+			grabber->Open();
+			grabber->Configure(w, h);
+			grabber->GetVideoControl()->Reset();
+		}
+
 		virtual void SetSource(int x, int y, int w, int h)
 		{
 			V4LComponentImpl *impl = dynamic_cast<V4LComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
+			/*
+			VideoGrabber *grabber = _player->_grabber;
+
+			grabber->Stop();
+
+			impl->Reset();
+
+			grabber->Open();
+			grabber->Configure(w, h);
+			grabber->GetVideoControl()->Reset();
+			*/
+			
 			impl->_src.x = x;
 			impl->_src.y = y;
-			impl->_src.width = w;
-			impl->_src.height = h;
+			impl->_src.width = -1;
+			impl->_src.height = -1;
 		}
 
 		virtual void SetDestination(int x, int y, int w, int h)
@@ -250,6 +286,11 @@ class VideoSizeControlImpl : public VideoSizeControl {
 			impl->SetBounds(x, y, w, h);
 		}
 
+		virtual jgui::jsize_t GetSize()
+		{
+			return dynamic_cast<V4LComponentImpl *>(_player->_component)->GetPreferredSize();
+		}
+
 		virtual jgui::jregion_t GetSource()
 		{
 			return dynamic_cast<V4LComponentImpl *>(_player->_component)->_src;
@@ -257,16 +298,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			V4LComponentImpl *impl = dynamic_cast<V4LComponentImpl *>(_player->_component);
-
-			jgui::jregion_t t;
-
-			t.x = impl->GetX();
-			t.y = impl->GetY();
-			t.width = impl->GetWidth();
-			t.height = impl->GetHeight();
-
-			return t;
+			return dynamic_cast<V4LComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -301,6 +333,13 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			_aspect_ratio = t;
 		}
 
+		virtual void SetFramesPerSecond(double fps)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			// SetDecodeRate ?
+		}
+
 		virtual void SetContentMode(jvideo_mode_t t)
 		{
 			_video_mode = t;
@@ -333,6 +372,19 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			}
 
 			return LAR_16x9;
+		}
+
+		virtual double GetFramesPerSecond()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			if (_player->_grabber != NULL) {
+				VideoControl *control = _player->_grabber->GetVideoControl();
+
+				return control->GetFramesPerSecond();
+			}
+
+			return 0.0;
 		}
 
 		virtual jvideo_mode_t GetContentMode()

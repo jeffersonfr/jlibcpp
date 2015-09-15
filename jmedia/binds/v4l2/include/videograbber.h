@@ -47,23 +47,21 @@ class VideoGrabber : public jthread::Thread {
 		/** \brief */
 		V4LFrameListener *_listener;
 		/** \brief */
+		struct buffer *_buffers;
+		/** \brief */
 		std::string _device;
 		/** \brief */
-		jcapture_method_t _method;
+		uint32_t _n_buffers;
 		/** \brief */
 		int _handler;
 		/** \brief */
-		struct buffer *buffers;
+		int _xres;
 		/** \brief */
-		unsigned int n_buffers;
-		/** \brief */
-		int out_buf;
-		/** \brief */
-		int xres;
-		/** \brief */
-		int yres;
+		int _yres;
 		/** \brief */
 		bool _running;
+		/** \brief */
+		jcapture_method_t _method;
 		/** \brief */
 		jgui::jpixelformat_t _pixelformat;
 

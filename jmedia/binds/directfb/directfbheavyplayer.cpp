@@ -452,16 +452,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			VideoOverlayImpl *impl = dynamic_cast<VideoOverlayImpl *>(_player->_component);
-
-			jgui::jregion_t t;
-
-			t.x = impl->GetX();
-			t.y = impl->GetY();
-			t.width = impl->GetWidth();
-			t.height = impl->GetHeight();
-
-			return t;
+			return dynamic_cast<VideoOverlayImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };

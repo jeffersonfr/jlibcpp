@@ -49,6 +49,12 @@ class VideoSizeControl : public Control {
 		 * \brief
 		 *
 		 */
+		virtual void SetSize(jgui::jsize_t t);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetSource(jgui::jregion_t t);
 
 		/**
@@ -61,6 +67,12 @@ class VideoSizeControl : public Control {
 		 * \brief
 		 *
 		 */
+		virtual void SetSize(int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetSource(int x, int y, int width, int height);
 
 		/**
@@ -68,6 +80,12 @@ class VideoSizeControl : public Control {
 		 *
 		 */
 		virtual void SetDestination(int x, int y, int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jgui::jsize_t GetSize();
 
 		/**
 		 * \brief

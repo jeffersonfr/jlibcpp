@@ -46,6 +46,9 @@ class PlayerTest : public jgui::Window, public jmedia::PlayerListener, public jm
 
 			cmp->SetBounds(0, 0, size.width, size.height);
 
+			// INFO:: needed to heavy players
+			cmp->SetVisible(true);
+
 			Add(cmp);
 
 			_player->RegisterPlayerListener(this);

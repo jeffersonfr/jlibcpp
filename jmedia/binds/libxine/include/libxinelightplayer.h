@@ -43,7 +43,7 @@ class LibXineLightPlayer : public jmedia::Player {
 		/** \brief */
 		double _decode_rate;
 		/** \brief */
-		double _frame_rate;
+		double _frames_per_second;
 		/** \brief */
 		uint64_t _media_time;
 		/** \brief */
