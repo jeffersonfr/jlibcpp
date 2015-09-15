@@ -191,7 +191,7 @@ struct jline_t {
  * \brief
  *
  */
-struct jaspect_t {
+struct jrational_t {
 	int num;
 	int den;
 };
