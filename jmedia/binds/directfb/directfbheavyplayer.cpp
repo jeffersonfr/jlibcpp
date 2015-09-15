@@ -133,7 +133,7 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 			_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
 			_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 
-			SetVisible(true);
+			// SetVisible(true);
 		}
 
 		virtual ~VideoOverlayImpl()
