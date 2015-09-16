@@ -445,7 +445,7 @@ install: uninstall
 		install -d -o nobody -m 755 $(TARGET)/include/$(MODULE)/jmedia && install -o nobody -m 644 jmedia/include/* $(TARGET)/include/$(MODULE)/jmedia; \
 	fi;
 	@$(ECHO) "Installing $(EXE) in $(TARGET)/lib/lib$(MODULE).so $(OK)"
-	@install -d -o nobody -m 755 $(TARGET)/lib && install -o nobody -m 644 $(LIBDIR)/$(EXE) $(TARGET)/lib && cd $(TARGET)/lib; ln -s $(EXE) lib$(MODULE).so; cd -
+	@install -d -o nobody -m 755 $(TARGET)/lib && install -o nobody -m 644 $(LIBDIR)/$(EXE) $(TARGET)/lib && cd $(TARGET)/lib && ln -s $(EXE) lib$(MODULE).so && cd -
 	@$(ECHO) "Installing $(MODULE).pc in $(TARGET)/lib/pkgconfig $(OK)"
 	@mkdir -p $(TARGET)/lib/pkgconfig && \
 		sed -e 's/@module@/$(MODULE)/g' jlibcpp.pc | \

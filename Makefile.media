@@ -60,11 +60,11 @@ ifeq ($(findstring libav, $(ENABLE_MEDIA)), libav)
 	CCFLAGS		+= \
 		 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPIC -DZLIB_CONST -O3 \
 		 -Ijmedia/binds/libav/include \
-		 `pkg-config --cflags libavcodec libavformat libavresample libavutil libavfilter libswscale libavdevice directfb sdl` \
+		 `pkg-config --cflags libavcodec libavformat libavresample libavutil libavfilter libswscale directfb sdl2` \
 		 -lm -lbz2 -lasound \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs libavcodec libavformat libavresample libavutil libavfilter libswscale libavdevice directfb sdl` \
+		 `pkg-config --libs libavcodec libavformat libavresample libavutil libavfilter libswscale directfb sdl2` \
 
 	DEFINES		+= \
 		 -DLIBAV_MEDIA \
