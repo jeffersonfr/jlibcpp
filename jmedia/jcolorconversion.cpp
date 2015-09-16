@@ -89,7 +89,7 @@ void ColorConversion::GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uin
 		int C, D, E;
 
 		// pixel 1
-		y = ybuf[2*py*width+2*px];
+		y = ybuf[2*(py*width+px)+0];
 		u = ubuf[py * width_2 + px];
 		v = vbuf[py * width_2 + px];
 
@@ -109,13 +109,13 @@ void ColorConversion::GetRGB32FromYV12(uint8_t **y_array, uint8_t **u_array, uin
 		rgb = rgb + 4;
 
 		// pixel 2
-		y = ybuf[2*py*width+2*px];
-		u = ubuf[py * width_2 + px];
-		v = vbuf[py * width_2 + px];
+		y = ybuf[2*(py*width+px)+1];
+		// u = ubuf[py * width_2 + px];
+		// v = vbuf[py * width_2 + px];
 
 		C = y - 16;
-		D = u - 128;
-		E = v - 128;			
+		// D = u - 128;
+		// E = v - 128;			
 
 		if (y == 0) {
 			D = E = 0;

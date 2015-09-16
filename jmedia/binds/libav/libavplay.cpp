@@ -2,7 +2,6 @@
 
 #include <directfb.h>
 #include <pthread.h>
-#include <SDL2/SDL.h>
 
 const char program_name[] = "avplay";
 const int program_birth_year = 2003;
@@ -1174,11 +1173,15 @@ static int stream_component_open(VideoState *is, int stream_index)
         wanted_spec.samples = ALSA_AUDIO_BUFFER_SIZE;
         wanted_spec.callback = sdl_audio_callback;
         wanted_spec.userdata = is;
-				if (SDL_OpenAudio(&wanted_spec, &spec) < 0) {
+
+				is->audio_device = SDL_OpenAudioDevice(NULL, 0, &wanted_spec, &spec, 0);
+
+				if (is->audio_device == 0) {
 					fprintf(stderr, "SDL_OpenAudio: %s\n", SDL_GetError());
 
 					return -1;
 				}
+
 				is->audio_hw_buf_size = spec.size;
         is->audio_hw_buf_size = 1024*is->sdl_channels*ALSA_AUDIO_BUFFER_SIZE*2;
         is->sdl_sample_fmt          = AV_SAMPLE_FMT_S16;
@@ -1205,7 +1208,7 @@ static int stream_component_open(VideoState *is, int stream_index)
 
         memset(&is->audio_pkt, 0, sizeof(is->audio_pkt));
         packet_queue_init(&is->audioq);
-        SDL_PauseAudio(0);
+        SDL_PauseAudioDevice(is->audio_device, 0);
         break;
     case AVMEDIA_TYPE_VIDEO:
 				is->has_video = true;
@@ -1234,7 +1237,7 @@ static void stream_component_close(VideoState *is, int stream_index)
     case AVMEDIA_TYPE_AUDIO:
         packet_queue_abort(&is->audioq);
 
-       	SDL_CloseAudio();
+       	SDL_CloseAudioDevice(is->audio_device);
 
         packet_queue_end(&is->audioq);
         av_free_packet(&is->audio_pkt);
@@ -1593,6 +1596,8 @@ void avplay_init()
 	avformat_network_init();
 
 	init_opts();
+				 
+	SDL_Init(SDL_INIT_AUDIO);
 }
 
 void avplay_release()
