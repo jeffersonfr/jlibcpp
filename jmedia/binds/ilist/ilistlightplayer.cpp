@@ -43,7 +43,7 @@ namespace jmedia {
 
 namespace imagelistlightplayer {
 
-class ImageListLightComponentImpl : public jgui::Component {
+class PlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -60,7 +60,7 @@ class ImageListLightComponentImpl : public jgui::Component {
 		jgui::jsize_t _frame_size;
 
 	public:
-		ImageListLightComponentImpl(Player *player, int x, int y, int w, int h):
+		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_image = NULL;
@@ -82,7 +82,7 @@ class ImageListLightComponentImpl : public jgui::Component {
 			SetVisible(true);
 		}
 
-		virtual ~ImageListLightComponentImpl()
+		virtual ~PlayerComponentImpl()
 		{
 			_mutex.Lock();
 
@@ -167,7 +167,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			ImageListLightComponentImpl *impl = dynamic_cast<ImageListLightComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -179,7 +179,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			ImageListLightComponentImpl *impl = dynamic_cast<ImageListLightComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
@@ -188,12 +188,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<ImageListLightComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<ImageListLightComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -258,7 +258,7 @@ ImageListLightPlayer::ImageListLightPlayer(std::string directory):
 
 	_controls.push_back(new imagelistlightplayer::VideoSizeControlImpl(this));
 
-	_component = new imagelistlightplayer::ImageListLightComponentImpl(this, 0, 0, -1, -1);
+	_component = new imagelistlightplayer::PlayerComponentImpl(this, 0, 0, -1, -1);
 }
 
 ImageListLightPlayer::~ImageListLightPlayer()
@@ -320,7 +320,7 @@ void ImageListLightPlayer::Run()
 			}
 		}
 
-		dynamic_cast<imagelistlightplayer::ImageListLightComponentImpl *>(_component)->UpdateComponent(frame);
+		dynamic_cast<imagelistlightplayer::PlayerComponentImpl *>(_component)->UpdateComponent(frame);
 
 		try {
 			if (_decode_rate == 0) {

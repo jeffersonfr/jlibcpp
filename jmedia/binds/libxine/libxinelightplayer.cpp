@@ -39,7 +39,7 @@ namespace jmedia {
 
 namespace libxinelightplayer {
 
-class LibXineLightComponentImpl : public jgui::Component, jthread::Thread {
+class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
@@ -56,7 +56,7 @@ class LibXineLightComponentImpl : public jgui::Component, jthread::Thread {
 		jgui::jsize_t _frame_size;
 
 	public:
-		LibXineLightComponentImpl(Player *player, int x, int y, int w, int h):
+		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = NULL;
@@ -74,7 +74,7 @@ class LibXineLightComponentImpl : public jgui::Component, jthread::Thread {
 			SetVisible(true);
 		}
 
-		virtual ~LibXineLightComponentImpl()
+		virtual ~PlayerComponentImpl()
 		{
 			if (IsRunning() == true) {
 				WaitThread();
@@ -326,7 +326,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			LibXineLightComponentImpl *impl = dynamic_cast<LibXineLightComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -338,7 +338,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			LibXineLightComponentImpl *impl = dynamic_cast<LibXineLightComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
@@ -347,12 +347,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<LibXineLightComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<LibXineLightComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -530,7 +530,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 
 static void render_callback(void *data, int format, int width, int height, double aspect, void *data0, void *data1, void *data2)
 {
-	reinterpret_cast<LibXineLightComponentImpl *>(data)->UpdateComponent(format, width, height, aspect, data0, data1, data2);
+	reinterpret_cast<PlayerComponentImpl *>(data)->UpdateComponent(format, width, height, aspect, data0, data1, data2);
 }
 
 static void overlay_callback(void *user_data, int num_ovl, raw_overlay_t *overlays_array)
@@ -568,7 +568,7 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	_decode_rate = 1.0;
 	_frames_per_second = 0.0;
 	
-	_component = new libxinelightplayer::LibXineLightComponentImpl(this, 0, 0, -1, -1);
+	_component = new libxinelightplayer::PlayerComponentImpl(this, 0, 0, -1, -1);
 
 	raw_visual_t t;
 

@@ -104,7 +104,7 @@ static libvlc_event_type_t mi_events[] = {
 	
 static int mi_events_len = sizeof(mi_events)/sizeof(*mi_events);
 
-class LibVLCLightComponentImpl : public jgui::Component, jthread::Thread {
+class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
@@ -125,7 +125,7 @@ class LibVLCLightComponentImpl : public jgui::Component, jthread::Thread {
 		jgui::jsize_t _frame_size;
 
 	public:
-		LibVLCLightComponentImpl(Player *player, int x, int y, int w, int h):
+		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = new uint32_t*[2];
@@ -154,7 +154,7 @@ class LibVLCLightComponentImpl : public jgui::Component, jthread::Thread {
 			SetVisible(true);
 		}
 
-		virtual ~LibVLCLightComponentImpl()
+		virtual ~PlayerComponentImpl()
 		{
 			if (IsRunning() == true) {
 				WaitThread();
@@ -281,7 +281,7 @@ class LibVLCLightComponentImpl : public jgui::Component, jthread::Thread {
 
 static void * LockMediaSurface(void *data, void **p_pixels)
 {
-	LibVLCLightComponentImpl *cmp = reinterpret_cast<LibVLCLightComponentImpl *>(data);
+	PlayerComponentImpl *cmp = reinterpret_cast<PlayerComponentImpl *>(data);
 	
 	(*p_pixels) = cmp->_buffer[cmp->_buffer_index];
 
@@ -296,7 +296,7 @@ static void UnlockMediaSurface(void *data, void *id, void *const *p_pixels)
 
 static void DisplayMediaSurface(void *data, void *id)
 {
-	reinterpret_cast<LibVLCLightComponentImpl *>(data)->UpdateComponent();
+	reinterpret_cast<PlayerComponentImpl *>(data)->UpdateComponent();
 }
 
 static void MediaEventsCallback(const libvlc_event_t *event, void *data)
@@ -506,7 +506,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			LibVLCLightComponentImpl *impl = dynamic_cast<LibVLCLightComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -518,7 +518,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			LibVLCLightComponentImpl *impl = dynamic_cast<LibVLCLightComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
@@ -527,12 +527,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<LibVLCLightComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<LibVLCLightComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -710,7 +710,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	_media_time = (uint64_t)libvlc_media_get_duration(media);
 	_frames_per_second = libvlc_media_player_get_fps(_provider);
 
-	_component = new libvlclightplayer::LibVLCLightComponentImpl(this, 0, 0, iw, ih);
+	_component = new libvlclightplayer::PlayerComponentImpl(this, 0, 0, iw, ih);
 
 	libvlc_video_set_format(_provider, "RV32", iw, ih, iw*4);
 	libvlc_video_set_callbacks(

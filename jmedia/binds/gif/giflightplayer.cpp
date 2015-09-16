@@ -634,7 +634,7 @@ static int GIFReadFrame(AnimatedGIFData *data)
 	return 0;
 }
 
-class GIFLightComponentImpl : public jgui::Component {
+class PlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -651,7 +651,7 @@ class GIFLightComponentImpl : public jgui::Component {
 		jgui::jsize_t _frame_size;
 
 	public:
-		GIFLightComponentImpl(Player *player, int x, int y, int w, int h):
+		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_image = NULL;
@@ -673,7 +673,7 @@ class GIFLightComponentImpl : public jgui::Component {
 			SetVisible(true);
 		}
 
-		virtual ~GIFLightComponentImpl()
+		virtual ~PlayerComponentImpl()
 		{
 			_mutex.Lock();
 
@@ -795,7 +795,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			GIFLightComponentImpl *impl = dynamic_cast<GIFLightComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -807,7 +807,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			GIFLightComponentImpl *impl = dynamic_cast<GIFLightComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
@@ -816,12 +816,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<GIFLightComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<GIFLightComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -884,7 +884,7 @@ GIFLightPlayer::GIFLightPlayer(std::string file):
 
 	_controls.push_back(new giflightplayer::VideoSizeControlImpl(this));
 
-	_component = new giflightplayer::GIFLightComponentImpl(this, 0, 0, data->Width, data->Height);
+	_component = new giflightplayer::PlayerComponentImpl(this, 0, 0, data->Width, data->Height);
 	
 	_provider = data;
 }
@@ -935,7 +935,7 @@ void GIFLightPlayer::Run()
 		}
 
 		if (skip == false) {
-			dynamic_cast<giflightplayer::GIFLightComponentImpl *>(_component)->UpdateComponent(data->image);
+			dynamic_cast<giflightplayer::PlayerComponentImpl *>(_component)->UpdateComponent(data->image);
 
 			try {
 				if (_decode_rate == 0) {

@@ -37,7 +37,7 @@ namespace jmedia {
 
 namespace v4l2lightplayer {
 
-class V4LComponentImpl : public jgui::Component, jthread::Thread {
+class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
@@ -54,7 +54,7 @@ class V4LComponentImpl : public jgui::Component, jthread::Thread {
 		jgui::jsize_t _frame_size;
 
 	public:
-		V4LComponentImpl(Player *player, int x, int y, int w, int h):
+		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = NULL;
@@ -72,7 +72,7 @@ class V4LComponentImpl : public jgui::Component, jthread::Thread {
 			SetVisible(true);
 		}
 
-		virtual ~V4LComponentImpl()
+		virtual ~PlayerComponentImpl()
 		{
 			if (IsRunning() == true) {
 				WaitThread();
@@ -240,7 +240,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSize(int w, int h)
 		{
-			V4LComponentImpl *impl = dynamic_cast<V4LComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -255,7 +255,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			V4LComponentImpl *impl = dynamic_cast<V4LComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -279,7 +279,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			V4LComponentImpl *impl = dynamic_cast<V4LComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
@@ -288,17 +288,17 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jsize_t GetSize()
 		{
-			return dynamic_cast<V4LComponentImpl *>(_player->_component)->GetPreferredSize();
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetPreferredSize();
 		}
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<V4LComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<V4LComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -494,7 +494,7 @@ V4L2LightPlayer::V4L2LightPlayer(std::string file):
 	_controls.push_back(new v4l2lightplayer::VideoFormatControlImpl(this));
 	_controls.push_back(new v4l2lightplayer::VideoDeviceControlImpl(this));
 	
-	_component = new v4l2lightplayer::V4LComponentImpl(this, 0, 0, -1, -1);
+	_component = new v4l2lightplayer::PlayerComponentImpl(this, 0, 0, -1, -1);
 }
 
 V4L2LightPlayer::~V4L2LightPlayer()
@@ -515,7 +515,7 @@ V4L2LightPlayer::~V4L2LightPlayer()
 
 void V4L2LightPlayer::ProcessFrame(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
 {
-	dynamic_cast<v4l2lightplayer::V4LComponentImpl *>(_component)->UpdateComponent(buffer, width, height, format);
+	dynamic_cast<v4l2lightplayer::PlayerComponentImpl *>(_component)->UpdateComponent(buffer, width, height, format);
 }
 
 void V4L2LightPlayer::Play()

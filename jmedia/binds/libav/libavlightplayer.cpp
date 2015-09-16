@@ -37,7 +37,7 @@ namespace jmedia {
 
 namespace libavlightplayer {
 
-class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
+class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 
 	public:
 		/** \brief */
@@ -54,7 +54,7 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 		jgui::jsize_t _frame_size;
 
 	public:
-		LibAVLightComponentImpl(Player *player, int x, int y, int w, int h):
+		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
 			_image = NULL;
@@ -76,7 +76,7 @@ class LibAVLightComponentImpl : public jgui::Component, jthread::Thread {
 			SetVisible(true);
 		}
 
-		virtual ~LibAVLightComponentImpl()
+		virtual ~PlayerComponentImpl()
 		{
 			if (IsRunning() == true) {
 				WaitThread();
@@ -298,7 +298,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
-			LibAVLightComponentImpl *impl = dynamic_cast<LibAVLightComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 			
@@ -310,7 +310,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
-			LibAVLightComponentImpl *impl = dynamic_cast<LibAVLightComponentImpl *>(_player->_component);
+			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
 			jthread::AutoLock lock(&impl->_mutex);
 
@@ -319,12 +319,12 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual jgui::jregion_t GetSource()
 		{
-			return dynamic_cast<LibAVLightComponentImpl *>(_player->_component)->_src;
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->_src;
 		}
 
 		virtual jgui::jregion_t GetDestination()
 		{
-			return dynamic_cast<LibAVLightComponentImpl *>(_player->_component)->GetVisibleBounds();
+			return dynamic_cast<PlayerComponentImpl *>(_player->_component)->GetVisibleBounds();
 		}
 
 };
@@ -412,7 +412,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 static void render_callback(void *data, uint8_t *buffer, int width, int height)
 {
-	reinterpret_cast<LibAVLightComponentImpl *>(data)->UpdateComponent(buffer, width, height);
+	reinterpret_cast<PlayerComponentImpl *>(data)->UpdateComponent(buffer, width, height);
 }
 
 static void endofmedia_callback(void *data)
@@ -444,7 +444,7 @@ LibAVLightPlayer::LibAVLightPlayer(std::string file):
 		throw MediaException("Cannot recognize the media file");
 	}
 
-	_component = new libavlightplayer::LibAVLightComponentImpl(this, 0, 0, -1, -1);//iw, ih);
+	_component = new libavlightplayer::PlayerComponentImpl(this, 0, 0, -1, -1);//iw, ih);
 
 	avplay_set_rendercallback(_provider, libavlightplayer::render_callback, (void *)_component);
 	avplay_set_endofmediacallback(_provider, libavlightplayer::endofmedia_callback, (void *)this);
