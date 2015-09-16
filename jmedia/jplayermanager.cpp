@@ -97,18 +97,6 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 	}
 #endif
 
-#if defined(DIRECTFB_MEDIA) && defined(DIRECTFB_UI)
-	try {
-		if (_hints[JPH_LIGHTWEIGHT] == false) {
-			// INFO:: the component's visible must be set to true
-			return new DirectFBHeavyPlayer(url_);
-		}
-			
-		return new DirectFBLightPlayer(url_);
-	} catch (jcommon::Exception &e) {
-	}
-#endif
-
 #if defined(LIBVLC_MEDIA)
 	try {
 		return new LibVLCLightPlayer(url_);
@@ -126,6 +114,18 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 #if defined(LIBXINE_MEDIA)
 	try {
 		return new LibXineLightPlayer(url_);
+	} catch (jcommon::Exception &e) {
+	}
+#endif
+
+#if defined(DIRECTFB_MEDIA) && defined(DIRECTFB_UI)
+	try {
+		if (_hints[JPH_LIGHTWEIGHT] == false) {
+			// INFO:: the component's visible must be set to true
+			return new DirectFBHeavyPlayer(url_);
+		}
+			
+		return new DirectFBLightPlayer(url_);
 	} catch (jcommon::Exception &e) {
 	}
 #endif
