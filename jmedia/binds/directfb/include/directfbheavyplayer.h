@@ -44,6 +44,8 @@ class DirectFBHeavyPlayer : public jmedia::Player, public jthread::Thread {
 		/** \brief */
 		double _aspect;
 		/** \brief */
+		double _frames_per_second;
+		/** \brief */
 		double _decode_rate;
 		/** \brief */
 		bool _is_paused;

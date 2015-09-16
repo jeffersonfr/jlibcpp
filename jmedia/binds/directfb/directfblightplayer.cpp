@@ -24,6 +24,7 @@
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
 #include "jvideodevicecontrol.h"
+#include "jaudioconfigurationcontrol.h"
 #include "jvolumecontrol.h"
 #include "jmediaexception.h"
 #include "jimage.h"
@@ -321,6 +322,46 @@ class VolumeControlImpl : public VolumeControl {
 
 };
 
+class AudioConfigurationControlImpl : public AudioConfigurationControl {
+	
+	private:
+		/** \brief */
+		DirectFBLightPlayer *_player;
+		/** \brief */
+		int64_t _audio_delay;
+
+	public:
+		AudioConfigurationControlImpl(DirectFBLightPlayer *player):
+			AudioConfigurationControl()
+		{
+			_player = player;
+			_audio_delay = 0LL;
+		}
+
+		virtual ~AudioConfigurationControlImpl()
+		{
+		}
+
+		virtual void SetAudioDelay(int64_t delay)
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+	
+			if (_player->_provider != NULL) {
+				if (_player->_provider->SetAudioDelay(_player->_provider, delay) == DFB_OK) {
+					_audio_delay = delay;
+				}
+			}
+		}
+
+		virtual int64_t GetAudioDelay()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+	
+			return _audio_delay;
+		}
+
+};
+
 class VideoSizeControlImpl : public VideoSizeControl {
 	
 	private:
@@ -374,7 +415,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 	
 	private:
 		DirectFBLightPlayer *_player;
-		jaspect_ratio_t _aspect_ratio;
 		jvideo_mode_t _video_mode;
 		jhd_video_format_t _hd_video_format;
 		jsd_video_format_t _sd_video_format;
@@ -385,7 +425,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			_player = player;
 		
-			_aspect_ratio = LAR_16x9;
 			_video_mode = LVM_FULL;
 			_hd_video_format = LHVF_1080p;
 			_sd_video_format = LSVF_PAL_M;
@@ -393,11 +432,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual ~VideoFormatControlImpl()
 		{
-		}
-
-		virtual void SetAspectRatio(jaspect_ratio_t t)
-		{
-			_aspect_ratio = t;
 		}
 
 		virtual void SetContentMode(jvideo_mode_t t)
@@ -432,6 +466,13 @@ class VideoFormatControlImpl : public VideoFormatControl {
 			}
 
 			return LAR_16x9;
+		}
+
+		virtual double GetFramesPerSecond()
+		{
+			jthread::AutoLock lock(&_player->_mutex);
+
+			return _player->_frames_per_second;
 		}
 
 		virtual jvideo_mode_t GetContentMode()
@@ -561,6 +602,7 @@ DirectFBLightPlayer::DirectFBLightPlayer(std::string file):
 	_has_audio = false;
 	_has_video = false;
 	_component = NULL;
+	_frames_per_second = 0.0;
 
 	IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
 
@@ -595,11 +637,13 @@ DirectFBLightPlayer::DirectFBLightPlayer(std::string file):
 		_has_audio = true;
 
 		_controls.push_back(new directfblightplayer::VolumeControlImpl(this));
+		_controls.push_back(new directfblightplayer::AudioConfigurationControlImpl(this));
 	}
 
 	if (mdsc.caps & DVSCAPS_VIDEO) {
 		_has_video = true;
 		_aspect = mdsc.video.aspect;
+		_frames_per_second = mdsc.video.framerate;
 
 		_controls.push_back(new directfblightplayer::VideoSizeControlImpl(this));
 		_controls.push_back(new directfblightplayer::VideoFormatControlImpl(this));

@@ -11,7 +11,6 @@
 
 extern "C" {
 #include "libavutil/time.h"
-#include "libavdevice/avdevice.h"
 #include "libavresample/avresample.h"
 #include "libavutil/opt.h"
 #include "libavcodec/avfft.h"

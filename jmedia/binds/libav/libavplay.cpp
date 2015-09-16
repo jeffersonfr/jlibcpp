@@ -2,7 +2,7 @@
 
 #include <directfb.h>
 #include <pthread.h>
-#include <SDL/SDL.h>
+#include <SDL2/SDL.h>
 
 const char program_name[] = "avplay";
 const int program_birth_year = 2003;
@@ -1174,11 +1174,12 @@ static int stream_component_open(VideoState *is, int stream_index)
         wanted_spec.samples = ALSA_AUDIO_BUFFER_SIZE;
         wanted_spec.callback = sdl_audio_callback;
         wanted_spec.userdata = is;
-        if (SDL_OpenAudio(&wanted_spec, &spec) < 0) {
-            fprintf(stderr, "SDL_OpenAudio: %s\n", SDL_GetError());
-            return -1;
-        }
-        is->audio_hw_buf_size = spec.size;
+				if (SDL_OpenAudio(&wanted_spec, &spec) < 0) {
+					fprintf(stderr, "SDL_OpenAudio: %s\n", SDL_GetError());
+
+					return -1;
+				}
+				is->audio_hw_buf_size = spec.size;
         is->audio_hw_buf_size = 1024*is->sdl_channels*ALSA_AUDIO_BUFFER_SIZE*2;
         is->sdl_sample_fmt          = AV_SAMPLE_FMT_S16;
         is->resample_sample_fmt     = is->sdl_sample_fmt;
@@ -1233,7 +1234,7 @@ static void stream_component_close(VideoState *is, int stream_index)
     case AVMEDIA_TYPE_AUDIO:
         packet_queue_abort(&is->audioq);
 
-        SDL_CloseAudio();
+       	SDL_CloseAudio();
 
         packet_queue_end(&is->audioq);
         av_free_packet(&is->audio_pkt);
@@ -1585,9 +1586,6 @@ void avplay_init()
 
 	/* register all codecs, demux and protocols */
 	avcodec_register_all();
-#if CONFIG_AVDEVICE
-	avdevice_register_all();
-#endif
 #if CONFIG_AVFILTER
 	avfilter_register_all();
 #endif
@@ -1715,6 +1713,8 @@ VideoState *avplay_open(const char *filename)
     is->refresh = 0;
 
 		avplay_pause(is, true);
+		
+		// usleep(100000);
 	}
 
 	return is;

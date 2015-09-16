@@ -333,7 +333,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 	
 	private:
 		LibAVLightPlayer *_player;
-		jaspect_ratio_t _aspect_ratio;
 		jvideo_mode_t _video_mode;
 		jhd_video_format_t _hd_video_format;
 		jsd_video_format_t _sd_video_format;
@@ -344,7 +343,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
 			_player = player;
 		
-			_aspect_ratio = LAR_16x9;
 			_video_mode = LVM_FULL;
 			_hd_video_format = LHVF_1080p;
 			_sd_video_format = LSVF_PAL_M;
@@ -352,18 +350,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual ~VideoFormatControlImpl()
 		{
-		}
-
-		virtual void SetAspectRatio(jaspect_ratio_t t)
-		{
-			_aspect_ratio = t;
-		}
-
-		virtual void SetFramesPerSecond(double fps)
-		{
-			jthread::AutoLock lock(&_player->_mutex);
-
-			// SetDecodeRate ?
 		}
 
 		virtual void SetContentMode(jvideo_mode_t t)
