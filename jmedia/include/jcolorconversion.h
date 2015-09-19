@@ -44,6 +44,18 @@ class ColorConversion : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
+		static void GetRGB32FromGray(uint8_t **gray_array, uint32_t **rgb32_array, int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static void GetRGB32FromPalette(uint8_t **color_array, uint32_t **palette_array, uint32_t **rgb32_array, int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
 		static void GetRGB32FromRGB16(uint8_t **rgb24_array, uint32_t **rgb32_array, int width, int height);
 
 		/**

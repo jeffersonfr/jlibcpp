@@ -69,6 +69,7 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 		 ../generic/genericimage.o\
 		 ../generic/genericpath.o\
 		 ../generic/genericprovider_bmp.o\
+		 ../generic/genericprovider_ico.o\
 		 ../generic/genericprovider_jpg.o\
 		 ../generic/genericprovider_png.o\
 		 ../generic/genericprovider_gif.o\
@@ -109,6 +110,7 @@ ifeq ($(ENABLE_GRAPHICS),sdl2)
 		 ../generic/genericimage.o\
 		 ../generic/genericpath.o\
 		 ../generic/genericprovider_bmp.o\
+		 ../generic/genericprovider_ico.o\
 		 ../generic/genericprovider_jpg.o\
 		 ../generic/genericprovider_png.o\
 		 ../generic/genericprovider_gif.o\
@@ -147,6 +149,7 @@ ifeq ($(ENABLE_GRAPHICS),gtk3)
 		 ../generic/genericimage.o\
 		 ../generic/genericpath.o\
 		 ../generic/genericprovider_bmp.o\
+		 ../generic/genericprovider_ico.o\
 		 ../generic/genericprovider_jpg.o\
 		 ../generic/genericprovider_png.o\
 		 ../generic/genericprovider_gif.o\

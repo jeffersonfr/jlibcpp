@@ -2,15 +2,9 @@
 2. gethostbyname is obsolescent, use getnameinfo() instead.
 4. add TreeLock() and TreeUnlock() in jgui/jcomponent
 6. add fonts in themes
-7. implement the others composition methods in jgraphics::SetRGB()
-8. (sdl2) scrolls only working if drag window by title bar before
-9. (sdl2) cube/newvox/pacman/sort/som neeeds sync Window.Repaint() to avoid sleep() calls after repaints
-10. (sdl2) mhp/noise needs sync Window.Show() to make possible call Window.GetGraphics() != NULL
-11. (sdl2) agenda/phone breaks if create/release some windows
-12. (sdl2) rotateimage/stress has the same problem (cannot find a display)
-13. (gtk3) clip/custom/scroll/colorchooser/mouse have problems with the mouse location (see if the window's location should be subtract from)
 14. (gtk3) cube/newvox apparently are skiping repaints
 15. (gtk3) pacman/rotateimage/signal/som/sort has serious problem with flickering
 16. (gtk3) agenda/phone/teste breaks if another window open
 17. (gtk3) container/events/mhp/stress breaks from a unusual way
 18. (gtk3) stress/tank not working
+20. (sdl2) restore freezes

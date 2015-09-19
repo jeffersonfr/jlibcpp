@@ -33,6 +33,38 @@ ColorConversion::~ColorConversion()
 {
 }
 
+void ColorConversion::GetRGB32FromGray(uint8_t **gray_array, uint32_t **rgb32_array, int width, int height)
+{
+	uint32_t size_1 = width*height;
+	uint8_t *src = ((uint8_t *)(*gray_array));
+	uint8_t *dst = ((uint8_t *)(*rgb32_array));
+
+	for (uint32_t i=0; i<size_1; i++) {
+		dst[0] = src[0];
+		dst[1] = src[0];
+		dst[2] = src[0];
+		dst[3] = 0xff;
+
+		src = src + 1;
+		dst = dst + 4;
+	}
+}
+
+void ColorConversion::GetRGB32FromPalette(uint8_t **color_array, uint32_t **palette_array, uint32_t **rgb32_array, int width, int height)
+{
+	uint32_t size_1 = width*height;
+	uint8_t *src = ((uint8_t *)(*color_array));
+	uint32_t *dst = ((uint32_t *)(*rgb32_array));
+	uint32_t *palette = ((uint32_t *)(*palette_array));
+
+	for (uint32_t i=0; i<size_1; i++) {
+		dst[0] = palette[src[0]];
+
+		src = src + 1;
+		dst = dst + 1;
+	}
+}
+
 void ColorConversion::GetRGB32FromRGB16(uint8_t **rgb24_array, uint32_t **rgb32_array, int width, int height)
 {
 	uint32_t size_1 = width*height;

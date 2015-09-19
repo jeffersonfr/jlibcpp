@@ -49,3 +49,11 @@ R: edit the file 'DirectFB/interfaces/IDirectFBVideoProvider/video_out_dfb/video
 	
 	   if (this->dest && this->dest->GetSize) {
 
+4. jsystem::Beep() not working
+R: enable pcspkr module as following:
+
+	sudo modprobe pcspkr
+	echo -e "\a"
+
+5. the module sox no compile and print a message asking for -fpic
+R: recompile libsox with the option "--enable-shared"

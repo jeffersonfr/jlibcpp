@@ -51,7 +51,9 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
-		uint32_t *_buffer;
+		uint32_t **_buffer;
+		/** \brief */
+		int _buffer_index;
 		/** \brief */
 		jgui::jsize_t _frame_size;
 
@@ -60,6 +62,9 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 			jgui::Component(x, y, w, h)
 		{
 			_buffer = NULL;
+
+			_buffer_index = 0;
+
 			_image = NULL;
 			_player = player;
 			
@@ -90,7 +95,10 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 			_mutex.Unlock();
 
 			if (_buffer != NULL) {
-				delete [] _buffer;
+				delete [] _buffer[0];
+				delete [] _buffer[1];
+
+				delete _buffer;
 				_buffer = NULL;
 			}
 		}
@@ -110,16 +118,23 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 				_frame_size.width = _src.width = width;
 				_frame_size.height = _src.height = height;
 
-				_buffer = new uint32_t[width*height];
+				_buffer = new uint32_t*[2];
+
+				_buffer[0] = new uint32_t[width*height];
+				_buffer[1] = new uint32_t[width*height];
 			}
+			
+			uint32_t *buffer = (uint32_t *)_buffer[(_buffer_index+1)%2];
 
 			if (format == XINE_VORAW_YV12) {
-				ColorConversion::GetRGB32FromYV12((uint8_t **)&data0, (uint8_t **)&data1, (uint8_t **)&data2, (uint32_t **)&_buffer, width, height);
+				ColorConversion::GetRGB32FromYV12((uint8_t **)&data0, (uint8_t **)&data1, (uint8_t **)&data2, (uint32_t **)&buffer, width, height);
 			} else if (format == XINE_VORAW_YUY2) {
-				ColorConversion::GetRGB32FromYUYV((uint8_t **)&data0, (uint32_t **)&_buffer, width, height);
+				ColorConversion::GetRGB32FromYUYV((uint8_t **)&data0, (uint32_t **)&buffer, width, height);
 			} else if (format == XINE_VORAW_RGB) {
-				ColorConversion::GetRGB32FromRGB24((uint8_t **)&data0, (uint32_t **)&_buffer, width, height);
+				ColorConversion::GetRGB32FromRGB24((uint8_t **)&data0, (uint32_t **)&buffer, width, height);
 			} 
+	
+			_buffer_index = (_buffer_index + 1)%2;
 
 #if defined(DIRECTFB_NODEPS_UI)
 			if (IsRunning() == true) {
@@ -137,7 +152,7 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 			desc.width = sw;
 			desc.height = sh;
 			desc.pixelformat = DSPF_ARGB;
-			desc.preallocated[0].data = _buffer;
+			desc.preallocated[0].data = buffer;
 			desc.preallocated[0].pitch = sw*4;
 
 			IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
@@ -167,7 +182,7 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 			int sh = height;
 
 			cairo_surface_t *cairo_surface = cairo_image_surface_create_for_data(
-					(uint8_t *)_buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
+					(uint8_t *)buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
 			cairo_t *cairo_context = cairo_create(cairo_surface);
 
 			_mutex.Lock();
