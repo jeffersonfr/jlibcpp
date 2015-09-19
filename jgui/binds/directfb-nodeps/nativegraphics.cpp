@@ -190,7 +190,9 @@ void NativeGraphics::SetCompositeFlags(jcomposite_flags_t t)
 
 	_composite_flags = t;
 
-	if (_composite_flags == JCF_SRC) {
+	if (_composite_flags == JCF_CLEAR) {
+		_surface->SetPorterDuff(_surface, DSPD_CLEAR);
+	} else if (_composite_flags == JCF_SRC) {
 		_surface->SetPorterDuff(_surface, DSPD_SRC);
 	} else if (_composite_flags == JCF_SRC_OVER) {
 		_surface->SetPorterDuff(_surface, DSPD_SRC_OVER);
@@ -1401,91 +1403,124 @@ void NativeGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 			int di = 0;
 
 			for (int i=0; i<wp; i++) {
-				if (_composite_flags == JCF_CLEAR) {
-					*(dst + di + 3) = 0x00;
-					*(dst + di + 2) = 0x00;
-					*(dst + di + 1) = 0x00;
-					*(dst + di + 0) = 0x00;
-				} else if (_composite_flags == JCF_SRC) {
-					if (_premultiply == false) {
-						*(dst + di + 3) = *(src + si + 3);
-						*(dst + di + 2) = *(src + si + 2);
-						*(dst + di + 1) = *(src + si + 1);
-						*(dst + di + 0) = *(src + si + 0);
-					} else {
-						uint32_t pixel = *(uint32_t *)(src + si);
-						uint32_t pa = (pixel >> 0x18) + 1;
+				int a = *(src + si + 3);
+				int r = *(src + si + 2);
+				int g = *(src + si + 1);
+				int b = *(src + si + 0);
+				int pa = *(dst + di + 3);
+				int pr = *(dst + di + 2);
+				int pg = *(dst + di + 1);
+				int pb = *(dst + di + 0);
 
-						pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
+				/*
+				if (_premultiply == true) {
+					uint32_t pixel = *(uint32_t *)(src + si);
+					uint32_t pa = (pixel >> 0x18) + 1;
 
-						*(dst + di + 3) = (pixel >> 0x18) & 0xff;
-						*(dst + di + 2) = (pixel >> 0x10) & 0xff;
-						*(dst + di + 1) = (pixel >> 0x08) & 0xff;
-						*(dst + di + 0) = (pixel >> 0x00) & 0xff;
-					}
-				} else if (_composite_flags == JCF_SRC_OVER) {
-					int a = *(src + si + 3);
-					int r = *(src + si + 2);
-					int g = *(src + si + 1);
-					int b = *(src + si + 0);
-					// int pa = *(dst + di + 3);
-					int pr = *(dst + di + 2);
-					int pg = *(dst + di + 1);
-					int pb = *(dst + di + 0);
+					pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
 
-					pr = (int)(pr*(0xff-a) + r*a) >> 0x08;
-					pg = (int)(pg*(0xff-a) + g*a) >> 0x08;
-					pb = (int)(pb*(0xff-a) + b*a) >> 0x08;
-
-					*(dst + di + 3) = a;
-					*(dst + di + 2) = pr;
-					*(dst + di + 1) = pg;
-					*(dst + di + 0) = pb;
-				} else if (_composite_flags == JCF_SRC_IN) {
-				} else if (_composite_flags == JCF_SRC_OUT) {
-				} else if (_composite_flags == JCF_SRC_ATOP) {
-				} else if (_composite_flags == JCF_DST) {
-					// do nothing
-				} else if (_composite_flags == JCF_DST_OVER) {
-					// int a = *(src + si + 3);
-					int r = *(src + si + 2);
-					int g = *(src + si + 1);
-					int b = *(src + si + 0);
-					int pa = *(dst + di + 3);
-					int pr = *(dst + di + 2);
-					int pg = *(dst + di + 1);
-					int pb = *(dst + di + 0);
-
-					pr = (int)(pr*(0xff-pa) + r*pa) >> 0x08;
-					pg = (int)(pg*(0xff-pa) + g*pa) >> 0x08;
-					pb = (int)(pb*(0xff-pa) + b*pa) >> 0x08;
-
-					*(dst + di + 3) = pa;
-					*(dst + di + 2) = pr;
-					*(dst + di + 1) = pg;
-					*(dst + di + 0) = pb;
-				} else if (_composite_flags == JCF_DST_IN) {
-				} else if (_composite_flags == JCF_DST_OUT) {
-				} else if (_composite_flags == JCF_DST_ATOP) {
-				} else if (_composite_flags == JCF_ADD) {
-				} else if (_composite_flags == JCF_XOR) {
-					if (_premultiply == false) {
-						// *(dst + di + 3) = *(src + si + 3);
-						*(dst + di + 2) ^= *(src + si + 2);
-						*(dst + di + 1) ^= *(src + si + 1);
-						*(dst + di + 0) ^= *(src + si + 0);
-					} else {
-						uint32_t pixel = *(uint32_t *)(src + si);
-						uint32_t pa = (pixel >> 0x18) + 1;
-
-						pixel = ((((pixel & 0x00ff00ff) * pa) >> 8) & 0x00ff00ff) | ((((pixel & 0x0000ff00) * pa) >> 8) & 0x0000ff00) | ((((pixel & 0xff000000))));
-						
-						// *(dst + di + 3) = (pixel >> 0x18) & 0xff;
-						*(dst + di + 2) ^= (pixel >> 0x10) & 0xff;
-						*(dst + di + 1) ^= (pixel >> 0x08) & 0xff;
-						*(dst + di + 0) ^= (pixel >> 0x00) & 0xff;
-					}
+					*(dst + di + 3) = (pixel >> 0x18) & 0xff;
+					*(dst + di + 2) = (pixel >> 0x10) & 0xff;
+					*(dst + di + 1) = (pixel >> 0x08) & 0xff;
+					*(dst + di + 0) = (pixel >> 0x00) & 0xff;
 				}
+				*/
+
+				if (_composite_flags == JCF_CLEAR) {
+					pr = 0x00;
+					pg = 0x00;
+					pb = 0x00;
+					pa = 0x00;
+				} else if (_composite_flags == JCF_SRC) {
+					pr = r;
+					pg = g;
+					pb = b;
+					pa = a;
+				} else if (_composite_flags == JCF_SRC_OVER) {
+					pr = (int)(r + (((0xff-a)*pr) >> 0x08));
+					pg = (int)(g + (((0xff-a)*pg) >> 0x08));
+					pb = (int)(b + (((0xff-a)*pb) >> 0x08));
+					pa = a + (((0xff-a)*pa) >> 0x08);
+				} else if (_composite_flags == JCF_SRC_IN) {
+					pr = (int)(r*pa) >> 0x08;
+					pg = (int)(g*pa) >> 0x08;
+					pb = (int)(b*pa) >> 0x08;
+					pa = (a*pa) >> 0x08;
+				} else if (_composite_flags == JCF_SRC_OUT) {
+					pr = (int)(r*(0xff-pa)) >> 0x08;
+					pg = (int)(g*(0xff-pa)) >> 0x08;
+					pb = (int)(b*(0xff-pa)) >> 0x08;
+					pa = (a*(0xff-pa)) >> 0x08;
+				} else if (_composite_flags == JCF_SRC_ATOP) {
+					pr = (int)(r*pa + (0xff-a)*pr) >> 0x08;
+					pg = (int)(g*pa + (0xff-a)*pg) >> 0x08;
+					pb = (int)(b*pa + (0xff-a)*pb) >> 0x08;
+					pa = pa;
+				} else if (_composite_flags == JCF_DST) {
+					pr = pr;
+					pg = pg;
+					pb = pb;
+					pa = pa;
+				} else if (_composite_flags == JCF_DST_OVER) {
+					pr = (int)(pr + (((0xff-pa)*r) >> 0x08));
+					pg = (int)(pg + (((0xff-pa)*g) >> 0x08));
+					pb = (int)(pb + (((0xff-pa)*b) >> 0x08));
+					pa = a + (((0xff-a)*pa) >> 0x08);
+				} else if (_composite_flags == JCF_DST_IN) {
+					pr = (int)(pr*a) >> 0x08;
+					pg = (int)(pg*a) >> 0x08;
+					pb = (int)(pb*a) >> 0x08;
+					pa = (a*pa) >> 0x08;
+				} else if (_composite_flags == JCF_DST_OUT) {
+					pr = (int)(pr*(0xff-a)) >> 0x08;
+					pg = (int)(pg*(0xff-a)) >> 0x08;
+					pb = (int)(pb*(0xff-a)) >> 0x08;
+					pa = (pa*(0xff-a)) >> 0x08;
+				} else if (_composite_flags == JCF_DST_ATOP) {
+					pr = (int)(pr*a + (0xff-pa)*r) >> 0x08;
+					pg = (int)(pg*a + (0xff-pa)*g) >> 0x08;
+					pb = (int)(pb*a + (0xff-pa)*b) >> 0x08;
+					pa = a;
+				} else if (_composite_flags == JCF_XOR) {
+					pr = (int)(r*(0xff-pa) + (0xff-a)*pr) >> 0x08;
+					pg = (int)(g*(0xff-pa) + (0xff-a)*pg) >> 0x08;
+					pb = (int)(b*(0xff-pa) + (0xff-a)*pb) >> 0x08;
+					pa = a + pa - ((2*a*pa) >> 0x08);
+				} else if (_composite_flags == JCF_ADD) {
+					pr = r + pr;
+					pg = g + pg;
+					pb = b + pb;
+					pa = a + pa;
+
+					pr = (pr > 0xff)?0xff:pr;
+					pg = (pg > 0xff)?0xff:pg;
+					pb = (pb > 0xff)?0xff:pb;
+					pa = (pa > 0xff)?0xff:pa;
+				} else if (_composite_flags == JCF_MULTIPLY) {
+					/*
+					pr = (int)((r*pr) >> 0x08);
+					pg = (int)((g*pg) >> 0x08);
+					pb = (int)((b*pb) >> 0x08);
+					pa = (a*pa) >> 0x08;
+					*/
+				} else if (_composite_flags == JCF_SCREEN) {
+					pr = (int)(r+pr - ((r*pr) >> 0x08));
+					pg = (int)(g+pg - ((g*pg) >> 0x08));
+					pb = (int)(b+pb - ((b*pb) >> 0x08));
+					pa = a+pa - ((a*pa) >> 0x08);
+				}
+
+				/*
+				pr = (pr > 0xff)?0xff:pr;
+				pg = (pg > 0xff)?0xff:pg;
+				pb = (pb > 0xff)?0xff:pb;
+				pa = (pa > 0xff)?0xff:pa;
+				*/
+
+				*(dst + di + 3) = pa;
+				*(dst + di + 2) = pr;
+				*(dst + di + 1) = pg;
+				*(dst + di + 0) = pb;
 
 				si = si + 4;
 				di = di + 4;

@@ -36,19 +36,21 @@ namespace jgui{
  *
  */
 enum jcomposite_flags_t {
-	JCF_CLEAR			 = 0x0001,	// fs: 0.0 fd: 0.0
-	JCF_SRC				 = 0x0002,	// fs: 1.0 fd: 0.0
-	JCF_SRC_OVER	 = 0x0004,	// fs: 1.0 fd: 1.0-sa
-	JCF_SRC_IN		 = 0x0008,	// fs: da fd: 0.0
-	JCF_SRC_OUT		 = 0x0010,	// fs: 1.0-da fd: 0.0
-	JCF_SRC_ATOP	 = 0x0020,	// fs: da fd: 1.0-sa
-	JCF_DST				 = 0x0040,	// fs: 1.0 fd: 0.0
-	JCF_DST_OVER	 = 0x0080,	// fs: 1.0-da fd: 1.0
-	JCF_DST_IN		 = 0x0100,	// fs: 0.0 fd: sa
-	JCF_DST_OUT		 = 0x0200,	// fs: 0.0 fd: 1.0-sa
-	JCF_DST_ATOP	 = 0x0400,	// fs: 1.0-da fd: sa
-	JCF_ADD				 = 0x0800,	// fs: 1.0 fd: 1.0
-	JCF_XOR				 = 0x1000,	// fs: 1.0-da fd: 1.0-sa 
+	JCF_CLEAR			 = 0x0001,	// [0, 0]
+	JCF_SRC				 = 0x0002,	// [Sa, Sc]
+	JCF_SRC_OVER	 = 0x0004,	// [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc]
+	JCF_SRC_IN		 = 0x0008,	// [Sa * Da, Sc * Da]
+	JCF_SRC_OUT		 = 0x0010,	// [Sa * (1 - Da), Sc * (1 - Da)]
+	JCF_SRC_ATOP	 = 0x0020,	// [Da, Sc * Da + (1 - Sa) * Dc]
+	JCF_DST				 = 0x0040,	// [Da, Dc]
+	JCF_DST_OVER	 = 0x0080,	// [Sa + (1 - Sa)*Da, Rc = Dc + (1 - Da)*Sc]
+	JCF_DST_IN		 = 0x0100,	// [Sa * Da, Sa * Dc]
+	JCF_DST_OUT		 = 0x0200,	// [Da * (1 - Sa), Dc * (1 - Sa)
+	JCF_DST_ATOP	 = 0x0400,	// [Sa, Sa * Dc + Sc * (1 - Da)]
+	JCF_XOR				 = 0x0800,	// [Sa + Da - 2 * Sa * Da, Sc * (1 - Da) + (1 - Sa) * Dc]
+	JCF_ADD        = 0x1000,  // Saturate(S + D)
+	JCF_MULTIPLY   = 0x2000,  // [Sa * Da, Sc * Dc]
+	JCF_SCREEN     = 0x4000,  // [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc]
 };
 
 /**

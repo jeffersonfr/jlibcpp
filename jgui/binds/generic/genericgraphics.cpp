@@ -201,10 +201,14 @@ void GenericGraphics::SetCompositeFlags(jcomposite_flags_t t)
 		o = CAIRO_OPERATOR_DEST_OUT;
 	} else if (_composite_flags == JCF_DST_ATOP) {
 		o = CAIRO_OPERATOR_DEST_ATOP;
-	} else if (_composite_flags == JCF_ADD) {
-		o = CAIRO_OPERATOR_ADD;
 	} else if (_composite_flags == JCF_XOR) {
 		o = CAIRO_OPERATOR_XOR;
+	} else if (_composite_flags == JCF_ADD) {
+		o = CAIRO_OPERATOR_ADD;
+	} else if (_composite_flags == JCF_MULTIPLY) {
+		o = CAIRO_OPERATOR_MULTIPLY;
+	} else if (_composite_flags == JCF_SCREEN) {
+		o = CAIRO_OPERATOR_SCREEN;
 	}
 
 	cairo_set_operator(_cairo_context, o);
@@ -1450,68 +1454,111 @@ void GenericGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 			int di = 0;
 
 			for (int i=0; i<wp; i++) {
+				int a = *(src + si + 3);
+				int r = *(src + si + 2);
+				int g = *(src + si + 1);
+				int b = *(src + si + 0);
+				int pa = *(dst + di + 3);
+				int pr = *(dst + di + 2);
+				int pg = *(dst + di + 1);
+				int pb = *(dst + di + 0);
+
 				if (_composite_flags == JCF_CLEAR) {
-					*(dst + di + 3) = 0x00;
-					*(dst + di + 2) = 0x00;
-					*(dst + di + 1) = 0x00;
-					*(dst + di + 0) = 0x00;
+					pr = 0x00;
+					pg = 0x00;
+					pb = 0x00;
+					pa = 0x00;
 				} else if (_composite_flags == JCF_SRC) {
-					*(dst + di + 3) = *(src + si + 3);
-					*(dst + di + 2) = *(src + si + 2);
-					*(dst + di + 1) = *(src + si + 1);
-					*(dst + di + 0) = *(src + si + 0);
+					pr = r;
+					pg = g;
+					pb = b;
+					pa = a;
 				} else if (_composite_flags == JCF_SRC_OVER) {
-					int a = *(src + si + 3);
-					int r = *(src + si + 2);
-					int g = *(src + si + 1);
-					int b = *(src + si + 0);
-					// int pa = *(dst + di + 3);
-					int pr = *(dst + di + 2);
-					int pg = *(dst + di + 1);
-					int pb = *(dst + di + 0);
-
-					pr = (int)(pr*(0xff-a) + r*a) >> 0x08;
-					pg = (int)(pg*(0xff-a) + g*a) >> 0x08;
-					pb = (int)(pb*(0xff-a) + b*a) >> 0x08;
-
-					*(dst + di + 3) = a;
-					*(dst + di + 2) = pr;
-					*(dst + di + 1) = pg;
-					*(dst + di + 0) = pb;
+					pr = (int)(r + (((0xff-a)*pr) >> 0x08));
+					pg = (int)(g + (((0xff-a)*pg) >> 0x08));
+					pb = (int)(b + (((0xff-a)*pb) >> 0x08));
+					pa = a + (((0xff-a)*pa) >> 0x08);
 				} else if (_composite_flags == JCF_SRC_IN) {
+					pr = (int)(r*pa) >> 0x08;
+					pg = (int)(g*pa) >> 0x08;
+					pb = (int)(b*pa) >> 0x08;
+					pa = (a*pa) >> 0x08;
 				} else if (_composite_flags == JCF_SRC_OUT) {
+					pr = (int)(r*(0xff-pa)) >> 0x08;
+					pg = (int)(g*(0xff-pa)) >> 0x08;
+					pb = (int)(b*(0xff-pa)) >> 0x08;
+					pa = (a*(0xff-pa)) >> 0x08;
 				} else if (_composite_flags == JCF_SRC_ATOP) {
+					pr = (int)(r*pa + (0xff-a)*pr) >> 0x08;
+					pg = (int)(g*pa + (0xff-a)*pg) >> 0x08;
+					pb = (int)(b*pa + (0xff-a)*pb) >> 0x08;
+					pa = pa;
 				} else if (_composite_flags == JCF_DST) {
-					// do nothing
+					pr = pr;
+					pg = pg;
+					pb = pb;
+					pa = pa;
 				} else if (_composite_flags == JCF_DST_OVER) {
-					// int a = *(src + si + 3);
-					int r = *(src + si + 2);
-					int g = *(src + si + 1);
-					int b = *(src + si + 0);
-					int pa = *(dst + di + 3);
-					int pr = *(dst + di + 2);
-					int pg = *(dst + di + 1);
-					int pb = *(dst + di + 0);
-
-					pr = (int)(pr*(0xff-pa) + r*pa) >> 0x08;
-					pg = (int)(pg*(0xff-pa) + g*pa) >> 0x08;
-					pb = (int)(pb*(0xff-pa) + b*pa) >> 0x08;
-
-					*(dst + di + 3) = pa;
-					*(dst + di + 2) = pr;
-					*(dst + di + 1) = pg;
-					*(dst + di + 0) = pb;
+					pr = (int)(pr + (((0xff-pa)*r) >> 0x08));
+					pg = (int)(pg + (((0xff-pa)*g) >> 0x08));
+					pb = (int)(pb + (((0xff-pa)*b) >> 0x08));
+					pa = a + (((0xff-a)*pa) >> 0x08);
 				} else if (_composite_flags == JCF_DST_IN) {
+					pr = (int)(pr*a) >> 0x08;
+					pg = (int)(pg*a) >> 0x08;
+					pb = (int)(pb*a) >> 0x08;
+					pa = (a*pa) >> 0x08;
 				} else if (_composite_flags == JCF_DST_OUT) {
+					pr = (int)(pr*(0xff-a)) >> 0x08;
+					pg = (int)(pg*(0xff-a)) >> 0x08;
+					pb = (int)(pb*(0xff-a)) >> 0x08;
+					pa = (pa*(0xff-a)) >> 0x08;
 				} else if (_composite_flags == JCF_DST_ATOP) {
-				} else if (_composite_flags == JCF_ADD) {
+					pr = (int)(pr*a + (0xff-pa)*r) >> 0x08;
+					pg = (int)(pg*a + (0xff-pa)*g) >> 0x08;
+					pb = (int)(pb*a + (0xff-pa)*b) >> 0x08;
+					pa = a;
 				} else if (_composite_flags == JCF_XOR) {
-					// *(dst + di + 3) = *(src + si + 3);
-					*(dst + di + 2) ^= *(src + si + 2);
-					*(dst + di + 1) ^= *(src + si + 1);
-					*(dst + di + 0) ^= *(src + si + 0);
+					pr = (int)(r*(0xff-pa) + (0xff-a)*pr) >> 0x08;
+					pg = (int)(g*(0xff-pa) + (0xff-a)*pg) >> 0x08;
+					pb = (int)(b*(0xff-pa) + (0xff-a)*pb) >> 0x08;
+					pa = a + pa - ((2*a*pa) >> 0x08);
+				} else if (_composite_flags == JCF_ADD) {
+					pr = r + pr;
+					pg = g + pg;
+					pb = b + pb;
+					pa = a + pa;
+
+					pr = (pr > 0xff)?0xff:pr;
+					pg = (pg > 0xff)?0xff:pg;
+					pb = (pb > 0xff)?0xff:pb;
+					pa = (pa > 0xff)?0xff:pa;
+				} else if (_composite_flags == JCF_MULTIPLY) {
+					/*
+					pr = (int)((r*pr) >> 0x08);
+					pg = (int)((g*pg) >> 0x08);
+					pb = (int)((b*pb) >> 0x08);
+					pa = (a*pa) >> 0x08;
+					*/
+				} else if (_composite_flags == JCF_SCREEN) {
+					pr = (int)(r+pr - ((r*pr) >> 0x08));
+					pg = (int)(g+pg - ((g*pg) >> 0x08));
+					pb = (int)(b+pb - ((b*pb) >> 0x08));
+					pa = a + pa - ((a*pa) >> 0x08);
 				}
-				
+
+				/*
+				pr = (pr > 0xff)?0xff:pr;
+				pg = (pg > 0xff)?0xff:pg;
+				pb = (pb > 0xff)?0xff:pb;
+				pa = (pa > 0xff)?0xff:pa;
+				*/
+
+				*(dst + di + 3) = pa;
+				*(dst + di + 2) = pr;
+				*(dst + di + 1) = pg;
+				*(dst + di + 0) = pb;
+
 				si = si + 4;
 				di = di + 4;
 			}

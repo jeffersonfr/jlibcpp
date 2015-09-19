@@ -323,7 +323,17 @@ static int LWZReadByte(GIFData *data, int flag, int input_code_size)
 			code = data->oldcode;
 		}
 
+		int count = 0, sz = (1<<(MAX_LWZ_BITS))*2;
+
 		while (code >= data->clear_code) {
+			count = count + 1;
+
+			if (count >= sz) {
+				data->sp = data->stack;
+
+				return -2;
+			}
+
 			*data->sp++ = data->table[1][code];
 			
 			if (code == data->table[0][code]) {

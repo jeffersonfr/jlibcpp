@@ -25,6 +25,7 @@
 #include "genericprovider_bmp.h"
 #include "genericprovider_ppm.h"
 #include "genericprovider_gif.h"
+#include "genericprovider_ico.h"
 #include "generichandler.h"
 #include "jimage.h"
 #include "jthread.h"
@@ -65,6 +66,10 @@ GenericImage::GenericImage(std::string file):
 
 	if (cairo_surface == NULL) {
 		cairo_surface = create_ppm_surface_from_file(file.c_str());
+	}
+
+	if (cairo_surface == NULL) {
+		cairo_surface = create_ico_surface_from_file(file.c_str());
 	}
 
 	if (cairo_surface == NULL) {
@@ -137,6 +142,10 @@ GenericImage::GenericImage(jio::InputStream *stream):
 
 	if (cairo_surface == NULL) {
 		cairo_surface = create_ppm_surface_from_data(buffer, count);
+	}
+
+	if (cairo_surface == NULL) {
+		cairo_surface = create_ico_surface_from_data(buffer, count);
 	}
 
 	if (cairo_surface == NULL) {

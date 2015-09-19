@@ -32,7 +32,7 @@
 
 namespace jgui {
 
-static gboolean OnKeyPressEvent(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
+gboolean NativeInputManager::OnKeyPressEvent(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
 	NativeInputManager *manager = (NativeInputManager *)user_data;
 
@@ -72,7 +72,7 @@ static gboolean OnKeyPressEvent(GtkWidget *widget, GdkEventKey *event, gpointer 
 	return FALSE;
 }
 
-static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
+gboolean NativeInputManager::OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
 	NativeInputManager *manager = (NativeInputManager *)user_data;
 
@@ -84,8 +84,8 @@ static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpoin
 	jmouseevent_button_t buttons = JMB_UNKNOWN;
 	jmouseevent_type_t type = JMT_MOVED;
 
-	int mouse_x = event->x_root; // event->x_root;
-	int mouse_y = event->y_root; // event->y_root;
+	int mouse_x = event->x_root; // event->x;
+	int mouse_y = event->y_root; // event->y;
 	int mouse_z = 0;
 	
 	// handle (x,y) motion
@@ -103,12 +103,38 @@ static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpoin
 		buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
   }
 
+	GdkWindow *native = event->window;
+
+	// native = gtk_widget_get_parent_window(widget); 
+	
+	if (native != NULL) {
+		int x, y;
+
+		gdk_window_get_root_origin(native, &x, &y);
+
+		//mouse_x = mouse_x + x;
+		//mouse_y = mouse_y + y;
+			
+		std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
+
+		for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
+			jgui::Window *window = (*i);
+
+			if (window->_window == widget) {
+				window->_location.x = x;
+				window->_location.y = y;
+
+				break;
+			}
+		}
+	}
+
 	manager->DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, mouse_x, mouse_y));
 
   return TRUE;
 }
 
-static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
+gboolean NativeInputManager::OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
 	NativeInputManager *manager = (NativeInputManager *)user_data;
 
@@ -120,26 +146,21 @@ static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpoi
 	jmouseevent_button_t buttons = JMB_UNKNOWN;
 	jmouseevent_type_t type = JMT_UNKNOWN;
 
-	int mouse_x = event->x; // event->x_root;
-	int mouse_y = event->y; // event->y_root;
+	int mouse_x = event->x_root; // event->x_root;
+	int mouse_y = event->y_root; // event->y_root;
 	int mouse_z = 0;
 	
 	if (event->type == GDK_BUTTON_PRESS || event->type == GDK_2BUTTON_PRESS || event->type == GDK_3BUTTON_PRESS) {
-		puts("t1");
 		type = JMT_PRESSED;
 	} else { // if (event->type == GDK_BUTTON_RELEASE) {
-		puts("t2");
 		type = JMT_RELEASED;
 	}
 
 	if (event->button == 1) {
-		puts("b1");
 		button = JMB_BUTTON1;
 	} else if (event->button == 2) {
-		puts("b2");
 		button = JMB_BUTTON3;
 	} else if (event->button == 3) {
-		puts("b3");
 		button = JMB_BUTTON2;
 	}
 
@@ -150,7 +171,6 @@ static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpoi
 	} else if (event->type == GDK_3BUTTON_PRESS) {
 		mouse_z = 3;
 	}
-	printf("count:: %d\n", mouse_z);
 
   if(state & GDK_BUTTON1_MASK) {
 		buttons = (jmouseevent_button_t)(button | JMB_BUTTON1);
@@ -163,6 +183,32 @@ static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpoi
   if(state & GDK_BUTTON3_MASK) {
 		buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
   }
+
+	GdkWindow *native = event->window;
+
+	// native = gtk_widget_get_parent_window(widget); 
+	
+	if (native != NULL) {
+		int x, y;
+
+		gdk_window_get_root_origin(native, &x, &y);
+
+		//mouse_x = mouse_x + x;
+		//mouse_y = mouse_y + y;
+			
+		std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
+
+		for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
+			jgui::Window *window = (*i);
+
+			if (window->_window == widget) {
+				window->_location.x = x;
+				window->_location.y = y;
+
+				break;
+			}
+		}
+	}
 
 	manager->DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, mouse_x, mouse_y));
 

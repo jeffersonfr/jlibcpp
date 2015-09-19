@@ -35,9 +35,10 @@ class Main : public jgui::Frame{
 			jgui::Frame("Image Types", 0, 0)
 		{
 			_types["BMP"] = jgui::Image::CreateImage("images/image.bmp");
+			_types["GIF"] = jgui::Image::CreateImage("images/image.gif");
+			_types["ICO"] = jgui::Image::CreateImage("images/image.ico");
 			_types["JPG"] = jgui::Image::CreateImage("images/image.jpg");
 			_types["PNG"] = jgui::Image::CreateImage("images/image.png");
-			_types["GIF"] = jgui::Image::CreateImage("images/image.gif");
 			_types["PPM"] = jgui::Image::CreateImage("images/image.ppm");
 		}
 
@@ -46,6 +47,7 @@ class Main : public jgui::Frame{
 			for (std::map<std::string, jgui::Image *>::iterator i=_types.begin(); i!=_types.end(); i++) {
 				jgui::Image *image = i->second;
 
+				printf(":: %s\n", i->first.c_str());
 				delete image;
 			}
 

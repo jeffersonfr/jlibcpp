@@ -60,6 +60,24 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		/** \brief */
 		bool _is_mouse_enabled;
 
+	private:
+		/**
+		 * \brief
+		 *
+		 */
+		static gboolean OnKeyPressEvent(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+
+		/**
+		 * \brief
+		 *
+		 */
+		static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
+		/**
+		 * \brief
+		 *
+		 */
+		static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+
 	public:
 		/**
 		 * \brief
