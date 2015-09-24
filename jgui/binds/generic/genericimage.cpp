@@ -20,12 +20,13 @@
 #include "Stdafx.h"
 #include "genericimage.h"
 #include "genericgraphics.h"
-#include "genericprovider_png.h"
-#include "genericprovider_jpg.h"
 #include "genericprovider_bmp.h"
-#include "genericprovider_ppm.h"
 #include "genericprovider_gif.h"
 #include "genericprovider_ico.h"
+#include "genericprovider_jpg.h"
+#include "genericprovider_pcx.h"
+#include "genericprovider_png.h"
+#include "genericprovider_ppm.h"
 #include "generichandler.h"
 #include "jimage.h"
 #include "jthread.h"
@@ -70,6 +71,10 @@ GenericImage::GenericImage(std::string file):
 
 	if (cairo_surface == NULL) {
 		cairo_surface = create_ico_surface_from_file(file.c_str());
+	}
+
+	if (cairo_surface == NULL) {
+		cairo_surface = create_pcx_surface_from_file(file.c_str());
 	}
 
 	if (cairo_surface == NULL) {
@@ -146,6 +151,10 @@ GenericImage::GenericImage(jio::InputStream *stream):
 
 	if (cairo_surface == NULL) {
 		cairo_surface = create_ico_surface_from_data(buffer, count);
+	}
+
+	if (cairo_surface == NULL) {
+		cairo_surface = create_pcx_surface_from_data(buffer, count);
 	}
 
 	if (cairo_surface == NULL) {

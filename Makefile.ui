@@ -43,6 +43,20 @@ OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
+GENERIC_OBJS = \
+		 ../generic/generichandler.o\
+		 ../generic/genericfont.o\
+		 ../generic/genericgraphics.o\
+		 ../generic/genericimage.o\
+		 ../generic/genericpath.o\
+		 ../generic/genericprovider_bmp.o\
+		 ../generic/genericprovider_gif.o\
+		 ../generic/genericprovider_ico.o\
+		 ../generic/genericprovider_jpg.o\
+		 ../generic/genericprovider_pcx.o\
+		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_ppm.o\
+
 ifeq ($(ENABLE_GRAPHICS),directfb)
 	CCFLAGS 	+= \
 		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
@@ -63,17 +77,7 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 		 cairo \
 
 	OBJS_gfx	+= \
-		 ../generic/generichandler.o\
-		 ../generic/genericfont.o\
-		 ../generic/genericgraphics.o\
-		 ../generic/genericimage.o\
-		 ../generic/genericpath.o\
-		 ../generic/genericprovider_bmp.o\
-		 ../generic/genericprovider_ico.o\
-		 ../generic/genericprovider_jpg.o\
-		 ../generic/genericprovider_png.o\
-		 ../generic/genericprovider_gif.o\
-		 ../generic/genericprovider_ppm.o\
+		 $(GENERIC_OBJS)\
 		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
@@ -104,17 +108,7 @@ ifeq ($(ENABLE_GRAPHICS),sdl2)
 		 sdl2 \
 
 	OBJS_gfx	+= \
-		 ../generic/generichandler.o\
-		 ../generic/genericfont.o\
-		 ../generic/genericgraphics.o\
-		 ../generic/genericimage.o\
-		 ../generic/genericpath.o\
-		 ../generic/genericprovider_bmp.o\
-		 ../generic/genericprovider_ico.o\
-		 ../generic/genericprovider_jpg.o\
-		 ../generic/genericprovider_png.o\
-		 ../generic/genericprovider_gif.o\
-		 ../generic/genericprovider_ppm.o\
+		 $(GENERIC_OBJS)\
 		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
@@ -143,17 +137,7 @@ ifeq ($(ENABLE_GRAPHICS),gtk3)
 		 gtk+-3.0 \
 
 	OBJS_gfx	+= \
-		 ../generic/generichandler.o\
-		 ../generic/genericfont.o\
-		 ../generic/genericgraphics.o\
-		 ../generic/genericimage.o\
-		 ../generic/genericpath.o\
-		 ../generic/genericprovider_bmp.o\
-		 ../generic/genericprovider_ico.o\
-		 ../generic/genericprovider_jpg.o\
-		 ../generic/genericprovider_png.o\
-		 ../generic/genericprovider_gif.o\
-		 ../generic/genericprovider_ppm.o\
+		 $(GENERIC_OBJS)\
 		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\

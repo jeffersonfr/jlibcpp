@@ -38,6 +38,7 @@ class Main : public jgui::Frame{
 			_types["GIF"] = jgui::Image::CreateImage("images/image.gif");
 			_types["ICO"] = jgui::Image::CreateImage("images/image.ico");
 			_types["JPG"] = jgui::Image::CreateImage("images/image.jpg");
+			_types["PCX"] = jgui::Image::CreateImage("images/image.pcx");
 			_types["PNG"] = jgui::Image::CreateImage("images/image.png");
 			_types["PPM"] = jgui::Image::CreateImage("images/image.ppm");
 		}
