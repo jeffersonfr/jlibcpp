@@ -145,7 +145,10 @@ OBJS_mandelbrot = \
 OBJS_porter = \
 		porter.o\
 
-all: teste border skull ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm mouse watch tank pacman tetris container signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox mandelbrot porter
+OBJS_fire = \
+		fire.o\
+
+all: teste border skull ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm mouse watch tank pacman tetris container signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox mandelbrot porter fire
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -279,6 +282,9 @@ mandelbrot: $(OBJS_mandelbrot)
 porter: $(OBJS_porter)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+fire: $(OBJS_fire)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -286,4 +292,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris container signal stress layouts databuffer mhp drawimage drawtypes rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox mandelbrot porter
+	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris container signal stress layouts databuffer mhp drawimage drawtypes rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox mandelbrot porter fire
