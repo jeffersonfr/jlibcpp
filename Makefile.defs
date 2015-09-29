@@ -61,8 +61,8 @@ ARFLAGS		= \
 ENABLE_DEBUG ?= no
 # {directfb-nodeps, directfb, sdl2, gtk3}
 ENABLE_GRAPHICS ?= directfb-nodeps
-# {gif, ilist, v4l2, libvlc, libav, libxine}
-ENABLE_MEDIA ?= gif, ilist, v4l2
+# {gif, ilist, v4l2, alsa, libvlc, libav, libxine}
+ENABLE_MEDIA ?= gif, ilist, v4l2, alsa
 
 # -ansi: problemas com va_copy()
 CCFLAGS		= \

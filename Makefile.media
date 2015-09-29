@@ -60,11 +60,11 @@ ifeq ($(findstring libav, $(ENABLE_MEDIA)), libav)
 	CCFLAGS		+= \
 		 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPIC -DZLIB_CONST -O3 \
 		 -Ijmedia/binds/libav/include \
-		 `pkg-config --cflags libavcodec libavformat libavresample libavutil libavfilter libswscale directfb sdl2` \
+		 `pkg-config --cflags libavcodec libavformat libavresample libavutil libavfilter libswscale sdl2` \
 		 -lm -lbz2 -lasound \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs libavcodec libavformat libavresample libavutil libavfilter libswscale directfb sdl2` \
+		 `pkg-config --libs libavcodec libavformat libavresample libavutil libavfilter libswscale sdl2` \
 
 	DEFINES		+= \
 		 -DLIBAV_MEDIA \
@@ -153,6 +153,26 @@ ifeq ($(findstring ilist, $(ENABLE_MEDIA)), ilist)
 		 ilistlightplayer.o\
 
 	OBJS_jmedia	+= $(addprefix binds/ilist/,$(OBJS_ilist))
+
+endif
+
+ifeq ($(findstring alsa, $(ENABLE_MEDIA)), alsa)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/alsa/include \
+		 `pkg-config --cflags alsa` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs alsa` \
+
+	DEFINES		+= \
+		 -DALSA_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_alsa += \
+		 alsalightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/alsa/,$(OBJS_alsa))
 
 endif
 
