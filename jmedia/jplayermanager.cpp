@@ -49,6 +49,10 @@
 #include "ilistlightplayer.h"
 #endif
 
+#if defined(ALSA_MEDIA)
+#include "alsalightplayer.h"
+#endif
+
 namespace jmedia {
 
 std::map<jplayer_hints_t, bool> PlayerManager::_hints;
@@ -73,6 +77,13 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 	}
 
 	jcommon::URL url(url_);
+
+#if defined(ALSA_MEDIA)
+	try {
+		return new AlsaLightPlayer(url_);
+	} catch (jcommon::Exception &e) {
+	}
+#endif
 
 #if defined(IMAGE_LIST_MEDIA)
 	try {
