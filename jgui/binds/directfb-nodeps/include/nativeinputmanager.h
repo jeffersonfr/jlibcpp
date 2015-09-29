@@ -81,18 +81,6 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual int TranslateToNativeKeyCode(int code);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int TranslateToNativeKeyID(DFBInputDeviceKeyIdentifier id);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual jkeyevent_symbol_t TranslateToNativeKeySymbol(DFBInputDeviceKeySymbol symbol);
 
 		/**
