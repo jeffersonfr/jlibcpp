@@ -585,7 +585,7 @@ and types of icon images in the file, plus one or more icon images.
 /* I have changed the structure member names from the published defaults
 	to more meaningful names. 
 */
-typedef struct _IconDirEntry {
+struct ICODirEntry {
 	uint8_t	width;		/* width of the image in pixels */
 	uint8_t	height;		/* height of the image in pixels */
 	uint8_t	color_count;	/* number of colors in image, 0 if >= 8bpp */
@@ -594,14 +594,14 @@ typedef struct _IconDirEntry {
 	uint16_t	bits_per_pixel;
 	uint32_t	bytes_in_resource; /* length of the DIB image */
 	uint32_t	offset_in_file;	/* where in the file is this image? */
-} IconDirEntry;
+};
 
-typedef struct _IconDir {
+struct ICODir {
 	uint16_t	reserved;
 	uint16_t	resource_type;	/* 1 = icon */
 	uint16_t	image_count;	/* number of images in the file */
-	IconDirEntry* image_entries;
-} IconDir;
+	ICODirEntry* image_entries;
+};
 
 /* The following two structs are DIB information. */
 /*
@@ -610,7 +610,7 @@ typedef struct _IconDir {
    members' types to uint32_t from long: width, height, x_pels_per_meter,
 	y_pels_per_meter
 */
-typedef struct _BitmapInfoHeader {
+struct ICOImageHeader {
 	uint32_t	size;		/* number of bytes required by this struct */
 	uint32_t	width;		/* width of bitmap in pixels */
 	uint32_t	height;		/* height of bitmap in pixels */
@@ -618,80 +618,77 @@ typedef struct _BitmapInfoHeader {
 	uint16_t	bits_per_pixel;	/* valid values are 1,4,8,24 */
 		/* all members below should be set to zero for icons */
 	uint32_t	compression;	/* type of compression: BI_RGB,BI_RLE8,BI_RLE4
-				   which are 0, 1, 2 respectively.  It's
-				   always zero for icons. */
+				   which are 0, 1, 2 respectively.  It's always zero for icons. */
 	uint32_t	image_size;	/* size in bytes */
 	uint32_t	x_pels_per_meter; /* horizontal resolution in pixels per meter*/
 	uint32_t	y_pels_per_meter; /* vertical resolution in pixels per meter */
 	uint32_t	colors_used;	/* number of color indexes actually used */
 	uint32_t	colors_important; /* number of important colors */
-} BitmapInfoHeader;
+};
 
-typedef struct _RGBQuad {
+struct ICORGBColor {
 	uint8_t	blue;
 	uint8_t	green;
 	uint8_t	red;
 	uint8_t	reserved;	/* must be set to zero */
-} RGBQuad;
+};
 
 /* 
    This structure is a single icon image.  The data here is normalized to
    1 uint8_t per pixel, with a maximum of 256 colors.
 */
-typedef struct _ICOImage {
+struct ICOImage {
 	uint32_t	width;		/* in pixels */
 	uint32_t	height;		/* in pixels */
-	RGBQuad* colors;
+	ICORGBColor* colors;
 	uint32_t	num_colors;
 	uint8_t*	data;
 	uint8_t*	mask;
-} ICOImage;
+};
 
 /** DLL structures for loading Icon Libraries. **/
-typedef struct _NameInfo {
+struct ICONameInfo {
 	uint16_t	offset;		/* offset to resource data from beginning
 				   of file */
 	uint16_t	length;		/* resource length in bytes */
 	uint16_t	flags;		/* flags important to executables */
-	uint16_t	id;		/* specifies or points to the resource 
-				   identifier */
+	uint16_t	id;		/* specifies or points to the resource identifier */
 	uint16_t	handle;		/* reserved */
 	uint16_t	usage;		/* reserved */
-} NameInfo;
+};
 
-typedef struct _TypeInfo {
+struct ICOTypeInfo {
 	uint16_t	type_id;	/* type identifier of the resource */
 	uint16_t	resource_count;	/* number of resources of this type in file */
 	uint32_t	reserved;
-	NameInfo* name_info;	/* information about individual resources,
+	ICONameInfo* name_info;	/* information about individual resources,
 				   there are resource_count number of these */
-} TypeInfo;
+};
 
-typedef struct _ResourceTable {
+struct ICOResourceTable {
 	uint16_t	alignment_shift;  /* alignment shift count for resource data */
-	TypeInfo types[2];  	  /* contains information about a resource,
+	ICOTypeInfo types[2];  	  /* contains information about a resource,
 				     one per resource type in the file */
-	/* NOTE: since only icons, changing TypeInfo* to a single TypeInfo */
-	uint16_t	end_types;	  /* marks end of resource type defns,
-				     must be zero */
+	/* NOTE: since only icons, changing ICOTypeInfo* to a single ICOTypeInfo */
+	uint16_t	end_types;	  /* marks end of resource type defns, must be zero */
 	uint8_t*	resource_names;	  /* names assoc. with the resources, first
 				     uint8_t is number of chars in name */
 	uint8_t	end_names;	  /* marks end of resource names */
-} ResourceTable;
+};
 
 /* My internal structure for file offsets. 
 	All offsets are to the beginning of the named structure.
 	All offsets are from the beginning of the file.
 */
-typedef struct _TableOffsets {
+struct ICOTableOffsets {
 	uint32_t	win_header_start;
 	uint32_t	resource_table;
 	uint32_t	resident_name_table;
 	uint32_t	first_resource;
 	uint32_t	first_DIB_resource;
-} TableOffsets;
+};
 
-/** Error codes - internal, use get_err_msg() to get a descriptive error **/
+// Error codes - internal, use get_err_msg() to get a descriptive error
 enum {
 	icoSuccess,
 	icoNoMemory,
@@ -700,7 +697,6 @@ enum {
 	icoUnknown
 };
 
-/** GLOBAL **/
 static int  ico_error_code;
 
 /** PROTOTYPES **/
@@ -709,9 +705,9 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images);
 
 /* internal */
 static int read_icon_directory(jio::InputStream *stream);
-static int read_icon_dir_entry(jio::InputStream *stream, IconDirEntry* ide);
-static int read_DIB_header(jio::InputStream *stream, BitmapInfoHeader* bmp_header);
-static int read_DIB_color(jio::InputStream *stream, RGBQuad* color);
+static int read_icon_dir_entry(jio::InputStream *stream, ICODirEntry* ide);
+static int read_DIB_header(jio::InputStream *stream, ICOImageHeader* bmp_header);
+static int read_DIB_color(jio::InputStream *stream, ICORGBColor* color);
 static int read_image_data(jio::InputStream *stream, uint32_t width, uint32_t height, uint32_t bpp, uint8_t* data, uint8_t* mask_data);
 static int read_uint8_t(jio::InputStream *stream, uint8_t* b);
 static int read_uint16_t(jio::InputStream *stream, uint16_t* w);
@@ -727,8 +723,8 @@ static int remove_unused_colors(ICOImage* image);
 	After that, check and free any of my memory after an error.
 **/
 static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
-	IconDir icondir;
-	BitmapInfoHeader bmp_header;
+	ICODir icondir;
+	ICOImageHeader bmp_header;
 	ICOImage* images = NULL;
 	int rv = 1;
 	int i=0, j=0;
@@ -753,8 +749,8 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 
 	/* Read Icon Directory Entries */
 	icondir.image_entries = NULL;
-	icondir.image_entries = (IconDirEntry *) malloc(icondir.image_count *
-							sizeof(IconDirEntry));
+	icondir.image_entries = (ICODirEntry *) malloc(icondir.image_count *
+							sizeof(ICODirEntry));
 	if (icondir.image_entries == NULL) {
 		ico_error_code = icoNoMemory;
 		return -1;
@@ -808,8 +804,8 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 			images[i].num_colors = 256;
 		}
 		images[i].colors = NULL;
-		images[i].colors = (RGBQuad *) malloc(images[i].num_colors *
-							sizeof(RGBQuad));
+		images[i].colors = (ICORGBColor *) malloc(images[i].num_colors *
+							sizeof(ICORGBColor));
 		if (images[i].colors == NULL) {
 			ico_error_code = icoNoMemory;
 			goto error;
@@ -908,9 +904,9 @@ static int read_icon_directory(jio::InputStream *stream) {
 
 /**
    read_icon_dir_entry()
-	Read the IconDirEntry structure from disk.
+	Read the ICODirEntry structure from disk.
 **/
-static int read_icon_dir_entry(jio::InputStream *stream, IconDirEntry* ide) {
+static int read_icon_dir_entry(jio::InputStream *stream, ICODirEntry* ide) {
 	int rv = 1;
 
 	/* width */
@@ -957,9 +953,9 @@ static int read_icon_dir_entry(jio::InputStream *stream, IconDirEntry* ide) {
 
 /**
    read_DIB_header()
-	Read the BitmapInfoHeader structure members from a file.
+	Read the ICOImageHeader structure members from a file.
 **/
-static int read_DIB_header(jio::InputStream *stream, BitmapInfoHeader* bmp_header) {
+static int read_DIB_header(jio::InputStream *stream, ICOImageHeader* bmp_header) {
 	int rv = 0;
 
 	/* size */
@@ -1027,9 +1023,9 @@ static int read_DIB_header(jio::InputStream *stream, BitmapInfoHeader* bmp_heade
 
 /**
    read_DIB_color()
-	Read an RGBQuad structure from a file.
+	Read an ICORGBColor structure from a file.
 **/
-static int read_DIB_color(jio::InputStream *stream, RGBQuad* color) {
+static int read_DIB_color(jio::InputStream *stream, ICORGBColor* color) {
 	int rv = 1;
 
 	/* RGB and the order is blue, green, red??? */
@@ -1217,7 +1213,7 @@ static int remove_unused_colors(ICOImage* image) {
 	int i = 0;
 	int j = 0;
 	int num_used_colors = 0;
-	RGBQuad* used_colors = NULL;
+	ICORGBColor* used_colors = NULL;
 
 	/* flag used colors in original color map */
 	for (i=0; i<(int)(image->width*image->height); i++) {
@@ -1228,7 +1224,7 @@ static int remove_unused_colors(ICOImage* image) {
 	}
 
 	/* make space for used colors array */
-	used_colors = (RGBQuad *) malloc(num_used_colors * sizeof(RGBQuad));
+	used_colors = (ICORGBColor *) malloc(num_used_colors * sizeof(ICORGBColor));
 	if (used_colors == NULL) {
 		return 0;
 	}

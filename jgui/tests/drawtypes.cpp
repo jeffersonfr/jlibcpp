@@ -41,6 +41,7 @@ class Main : public jgui::Frame{
 			_types["PCX"] = jgui::Image::CreateImage("images/image.pcx");
 			_types["PNG"] = jgui::Image::CreateImage("images/image.png");
 			_types["PPM"] = jgui::Image::CreateImage("images/image.ppm");
+			_types["TGA"] = jgui::Image::CreateImage("images/image.tga");
 		}
 
 		virtual ~Main()

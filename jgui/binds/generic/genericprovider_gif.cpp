@@ -424,6 +424,11 @@ static uint32_t * ReadImage(GIFData *data, int width, int height, uint8_t cmap[3
 	uint32_t *image;
 	uint8_t c;
 
+	// CHANGE:: avoid invalid images 
+	if (width > 16384 || height > 16384) {
+		return NULL;
+	}
+
 	// Initialize the decompression routines
 	if (data->stream->Read((char *)&c, 1 ) <= 0) {
 		JDEBUG(JINFO, "EOF / read error on image data" );
@@ -521,20 +526,28 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 
 	if (data->stream->Read((char *)buf, 6) <= 0) {
 		JDEBUG(JINFO, "error reading magic number" );
+
+		return NULL;
 	}
 
 	if (strncmp( (char *)buf, "GIF", 3 ) != 0) {
 		JDEBUG(JINFO, "not a GIF file" );
+
+		return NULL;
 	}
 
 	memcpy(version, (char *)buf + 3, 4);
 
 	if ((strcmp(version, "87a") != 0) && (strcmp(version, "89a") != 0)) {
 		JDEBUG(JINFO, "bad version number, not '87a' or '89a'" );
+
+		return NULL;
 	}
 
 	if (data->stream->Read((char *)buf, 7) <= 0) {
 		JDEBUG(JINFO, "failed to read screen descriptor" );
+
+		return NULL;
 	}
 
 	data->Width = LM_to_uint( buf[0], buf[1] );
@@ -548,6 +561,8 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 	if (BitSet(buf[4], LOCALCOLORMAP)) {
 		if (ReadColorMap(data->stream, data->BitPixel, data->ColorMap )) {
 			JDEBUG(JINFO, "error reading global colormap" );
+
+			return NULL;
 		}
 	}
 
@@ -599,6 +614,8 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 
 		if (data->stream->Read((char *)buf, 9) <= 0) {
 			JDEBUG(JINFO, "couldn't read left/top/width/height");
+
+			return NULL;
 		}
 
 		*width  = LM_to_uint( buf[4], buf[5] );
@@ -618,8 +635,10 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		} else {
 			bitPixel = 2 << (buf[8] & 0x07);
 			
-			if (ReadColorMap(data->stream, bitPixel, localColorMap)) {
+			if (ReadColorMap(data->stream, bitPixel, localColorMap) != true) {
 				JDEBUG(JINFO, "error reading local colormap" );
+
+				return NULL;
 			}
 
 			if (*transparency && (key_rgb || !headeronly)) {
