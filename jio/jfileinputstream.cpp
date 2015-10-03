@@ -36,7 +36,6 @@ FileInputStream::FileInputStream(std::string filename_):
 	}
 	
 	_flag = 0;
-	_current = 0;
 }
 
 FileInputStream::FileInputStream(File *file_):
@@ -55,7 +54,6 @@ FileInputStream::FileInputStream(File *file_):
 	}
 
 	_flag = 1;
-	_current = 0;
 }
 
 FileInputStream::~FileInputStream()
@@ -68,12 +66,12 @@ FileInputStream::~FileInputStream()
 
 bool FileInputStream::IsEmpty()
 {
-	return (_current >= GetSize());
+	return (_file->Tell() >= _file->GetSize());
 }
 
 int64_t FileInputStream::Available()
 {
-	return GetSize() - GetPosition();
+	return (_file->GetSize() - _file->Tell());
 }
 
 int64_t FileInputStream::GetSize()
@@ -83,7 +81,7 @@ int64_t FileInputStream::GetSize()
 
 int64_t FileInputStream::GetPosition()
 {
-	return _current;
+	return _file->Tell();
 }
 
 int64_t FileInputStream::Read()
@@ -97,8 +95,6 @@ int64_t FileInputStream::Read()
 	if (_file->Read(&c, 1LL) <= 0LL) {
 		return -1LL;
 	}
-	
-	_current++;
 	
 	return (int64_t)c;
 }
@@ -121,8 +117,6 @@ int64_t FileInputStream::Read(char *data, int64_t size)
 		return -1LL;
 	}
 
-	_current += r;
-
 	return r;
 }
 
@@ -138,18 +132,12 @@ void FileInputStream::Skip(int64_t skip)
 		r = Available();
 	}
 
-	char *tmp = new char[(int)r];
-
-	r = _file->Read((char *)tmp, r);
-
-	delete [] tmp;
+	_file->Seek(r);
 }
 
 void FileInputStream::Reset()
 {
 	_file->Reset();
-
-	_current = 0;
 }
 
 void FileInputStream::Close()
@@ -159,7 +147,7 @@ void FileInputStream::Close()
 
 int64_t FileInputStream::GetReadedBytes()
 {
-	return _current;
+	return _file->Tell();
 }
 
 }

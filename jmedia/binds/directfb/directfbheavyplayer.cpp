@@ -76,7 +76,7 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 
 			DFBWindowDescription desc;
 
-			desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_STACKING | DWDESC_SURFACE_CAPS);
+			desc.flags  = (DFBWindowDescriptionFlags)(DWDESC_POSX | DWDESC_POSY | DWDESC_WIDTH | DWDESC_HEIGHT | DWDESC_CAPS | DWDESC_PIXELFORMAT | DWDESC_OPTIONS | DWDESC_SURFACE_CAPS); // | DWDESC_STACKING);
 			desc.caps   = (DFBWindowCapabilities)(DWCAPS_NODECORATION);
 			desc.pixelformat = DSPF_RGB32;
 			desc.surface_caps = (DFBSurfaceCapabilities)(DSCAPS_FLIPPING | DSCAPS_DOUBLE);
