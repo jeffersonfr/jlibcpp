@@ -145,10 +145,10 @@ typedef struct VideoState {
     int audio_buf_index; /* in bytes */
     AVPacket audio_pkt_temp;
     AVPacket audio_pkt;
-    enum AVSampleFormat sdl_sample_fmt;
-    uint64_t sdl_channel_layout;
-    int sdl_channels;
-    int sdl_sample_rate;
+    enum AVSampleFormat audio_sample_fmt;
+    uint64_t audio_channel_layout;
+    int audio_channels;
+    int audio_sample_rate;
     enum AVSampleFormat resample_sample_fmt;
     uint64_t resample_channel_layout;
     int resample_sample_rate;

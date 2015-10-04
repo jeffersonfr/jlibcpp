@@ -515,8 +515,8 @@ void AlsaLightPlayer::Run()
 {
 	_stream->Reset();
 
-	// INFO:: avoid initial noise 
-	_stream->Read((char *)_buffer, 1024);
+	// CHANGE:: skip initial noise
+	_stream->Skip(128); 
 
 	_is_playing = true;
 
