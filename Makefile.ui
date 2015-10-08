@@ -150,3 +150,30 @@ ifeq ($(ENABLE_GRAPHICS),sfml2)
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),x11)
+	CCFLAGS 	+= \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/../generic/include \
+		 `pkg-config --cflags cairo` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs x11 cairo` -ljpeg \
+
+	DEFINES		+= \
+		 -DX11_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 nativefont.o\
+		 nativegraphics.o\
+		 nativehandler.o\
+		 nativeimage.o\
+		 nativeinputmanager.o\
+		 nativepath.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+

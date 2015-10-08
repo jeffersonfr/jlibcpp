@@ -17,63 +17,33 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVEGRAPHICS_H
-#define J_NATIVEGRAPHICS_H
+#ifndef J_NATIVEPATH_H
+#define J_NATIVEPATH_H
 
+#include "genericpath.h"
 #include "genericgraphics.h"
-#include "jsemaphore.h"
-
-#include <SFML/Graphics.hpp>
 
 namespace jgui{
-
-class Font;
-class Image;
-class NativeImage;
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class NativeGraphics : public GenericGraphics{
+class NativePath : public GenericPath{
 	
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NativeGraphics(void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp);
+		NativePath(GenericGraphics *g);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~NativeGraphics();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetNativeSurface(void *surface, int wp, int hp);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Flip();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Flip(int x, int y, int w, int h);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalSyncEnabled(bool b);
+		virtual ~NativePath();
 
 };
 

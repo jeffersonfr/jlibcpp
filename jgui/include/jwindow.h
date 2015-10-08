@@ -38,6 +38,8 @@
 #include <SDL2/SDL.h>
 #elif defined(SFML2_UI)
 #include <SFML/Graphics.hpp>
+#elif defined(X11_UI)
+#include <X11/Xlib.h>
 #endif
 
 namespace jgui{
@@ -71,6 +73,9 @@ class Window : public jgui::Container{
 #elif defined(SFML2_UI)
 	friend class NativeInputManager;
 	friend class NativeHandler;
+#elif defined(X11_UI)
+	friend class NativeInputManager;
+	friend class NativeHandler;
 #endif
 
 	protected:
@@ -89,6 +94,9 @@ class Window : public jgui::Container{
 #elif defined(SFML2_UI)
 		/** \brief */
 		sf::RenderWindow *_window;
+#elif defined(X11_UI)
+		/** \brief */
+		::Window _window;
 #endif
 		/** \brief */
 		std::vector<WindowListener *> _window_listeners;

@@ -23,8 +23,6 @@
 #include "genericgraphics.h"
 #include "jsemaphore.h"
 
-#include <SFML/Graphics.hpp>
-
 namespace jgui{
 
 class Font;
@@ -68,12 +66,6 @@ class NativeGraphics : public GenericGraphics{
 		 *
 		 */
 		virtual void Flip(int x, int y, int w, int h);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalSyncEnabled(bool b);
 
 };
 

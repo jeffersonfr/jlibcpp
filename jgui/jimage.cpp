@@ -30,6 +30,8 @@
 #include "nativeimage.h"
 #elif defined(SFML2_UI)
 #include "nativeimage.h"
+#elif defined(X11_UI)
+#include "nativeimage.h"
 #endif
 
 namespace jgui {
@@ -62,6 +64,8 @@ jsize_t Image::GetImageSize(std::string img)
 	t = NativeImage::GetImageSize(img);
 #elif defined(SFML2_UI)
 	t = NativeImage::GetImageSize(img);
+#elif defined(X11_UI)
+	t = NativeImage::GetImageSize(img);
 #endif
 
 	return t;
@@ -77,6 +81,8 @@ Image * Image::CreateImage(jpixelformat_t pixelformat, int width, int height)
 #elif defined(SDL2_UI)
 		image = new NativeImage(NULL, pixelformat, width, height);
 #elif defined(SFML2_UI)
+		image = new NativeImage(NULL, pixelformat, width, height);
+#elif defined(X11_UI)
 		image = new NativeImage(NULL, pixelformat, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -114,6 +120,8 @@ Image * Image::CreateImage(std::string file)
 			image = new NativeImage(file);
 #elif defined(SFML2_UI)
 			image = new NativeImage(file);
+#elif defined(X11_UI)
+			image = new NativeImage(file);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -148,6 +156,8 @@ Image * Image::CreateImage(jio::InputStream *stream)
 #elif defined(SDL2_UI)
 			image = new NativeImage(stream);
 #elif defined(SFML2_UI)
+			image = new NativeImage(stream);
+#elif defined(X11_UI)
 			image = new NativeImage(stream);
 #endif
 	} catch (jcommon::NullPointerException &) {
@@ -202,6 +212,8 @@ Image * Image::Flip(jflip_flags_t t)
 		image = NativeImage::Flip(this, t);
 #elif defined(SFML2_UI)
 		image = NativeImage::Flip(this, t);
+#elif defined(X11_UI)
+		image = NativeImage::Flip(this, t);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -219,6 +231,8 @@ Image * Image::Rotate(double radians, bool resize)
 #elif defined(SDL2_UI)
 		image = NativeImage::Rotate(this, radians, resize);
 #elif defined(SFML2_UI)
+		image = NativeImage::Rotate(this, radians, resize);
+#elif defined(X11_UI)
 		image = NativeImage::Rotate(this, radians, resize);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -238,6 +252,8 @@ Image * Image::Scale(int width, int height)
 		image = NativeImage::Scale(this, width, height);
 #elif defined(SFML2_UI)
 		image = NativeImage::Scale(this, width, height);
+#elif defined(X11_UI)
+		image = NativeImage::Scale(this, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -255,6 +271,8 @@ Image * Image::Crop(int x, int y, int width, int height)
 #elif defined(SDL2_UI)
 		image = NativeImage::Crop(this, x, y, width, height);
 #elif defined(SFML2_UI)
+		image = NativeImage::Crop(this, x, y, width, height);
+#elif defined(X11_UI)
 		image = NativeImage::Crop(this, x, y, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -274,6 +292,8 @@ Image * Image::Blend(double alpha)
 		image = NativeImage::Blend(this, alpha);
 #elif defined(SFML2_UI)
 		image = NativeImage::Blend(this, alpha);
+#elif defined(X11_UI)
+		image = NativeImage::Blend(this, alpha);
 #endif
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -291,6 +311,8 @@ Image * Image::Colorize(Color color)
 #elif defined(SDL2_UI)
 		image = NativeImage::Colorize(this, color);
 #elif defined(SFML2_UI)
+		image = NativeImage::Colorize(this, color);
+#elif defined(X11_UI)
 		image = NativeImage::Colorize(this, color);
 #endif
 	} catch (jcommon::RuntimeException &) {

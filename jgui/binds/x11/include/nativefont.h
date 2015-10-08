@@ -17,67 +17,35 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVEGRAPHICS_H
-#define J_NATIVEGRAPHICS_H
+#ifndef J_NAtIVEFONT_H
+#define J_NATIVEFONT_H
 
-#include "genericgraphics.h"
-#include "jsemaphore.h"
+#include "genericfont.h"
 
-#include <SFML/Graphics.hpp>
-
-namespace jgui{
-
-class Font;
-class Image;
-class NativeImage;
+namespace jgui {
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class NativeGraphics : public GenericGraphics{
-	
+class NativeFont : public GenericFont{
+
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NativeGraphics(void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~NativeGraphics();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetNativeSurface(void *surface, int wp, int hp);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Flip();
+		NativeFont(std::string name, jfont_attributes_t attributes, int size);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Flip(int x, int y, int w, int h);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalSyncEnabled(bool b);
+		virtual ~NativeFont();
 
 };
 
 }
 
-#endif 
-
+#endif

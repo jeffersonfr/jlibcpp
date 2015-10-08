@@ -25,6 +25,8 @@
 #include "jwindowmanager.h"
 #include "jdate.h"
 
+// #include <X11/extensions/Xrandr.h>
+
 namespace jgui {
 
 NativeInputManager::NativeInputManager(jgui::Window *window):
@@ -178,253 +180,210 @@ void NativeInputManager::DispatchEvent(jcommon::EventObject *event)
 	delete event;
 }
 
-jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(sf::Keyboard::Key symbol)
+jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(KeySym symbol)
 {
+	// First convert to uppercase (to avoid dealing with two different keysyms for the same key)
+	// KeySym lower, key;
+	// XConvertCase(symbol, &lower, &key);
+
 	switch (symbol) {
-		case sf::Keyboard::Return:
-			return JKS_ENTER; // JKS_RETURN;
-		case sf::Keyboard::BackSpace:
-			return JKS_BACKSPACE;
-		case sf::Keyboard::Tab:
-			return JKS_TAB;
-		// case sf::Keyboard::CANCEL:
-		//	return JKS_CANCEL;
-		case sf::Keyboard::Escape:
+		/*
+		case XK_Shift_L:
+			return JKS_LShift;
+		case XK_Shift_R:
+			return JKS_RShift;
+		case XK_Control_L:
+			return JKS_LControl;
+		case XK_Control_R:
+			return JKS_RControl;
+		case XK_Alt_L:
+			return JKS_LAlt;
+		case XK_Alt_R:
+			return JKS_RAlt;
+		case XK_Super_L:
+			return JKS_LSystem;
+		case XK_Super_R:
+			return JKS_RSystem;
+		case XK_Menu:
+			return JKS_Menu;
+		*/
+		case XK_Escape:
 			return JKS_ESCAPE;
-		case sf::Keyboard::Space:
-			return JKS_SPACE;
-		// case sf::Keyboard::EXCLAIM:
-		//	return JKS_EXCLAMATION_MARK;
-		// case sf::Keyboard::QUOTEDBL:
-		//	return JKS_QUOTATION;
-		// case sf::Keyboard::HASH:
-		//	return JKS_NUMBER_SIGN;
-		// case sf::Keyboard::DOLLAR:
-		//	return JKS_DOLLAR_SIGN;
-		// case sf::Keyboard::PERCENT_SIGN:
-		//	return JKS_PERCENT_SIGN;
-		// case sf::Keyboard::AMPERSAND:   
-		//	return JKS_AMPERSAND;
-		case sf::Keyboard::Quote:
-			return JKS_APOSTROPHE;
-		// case sf::Keyboard::LEFTPAREN:
-		//	return JKS_PARENTHESIS_LEFT;
-		// case sf::Keyboard::RIGHTPAREN:
-		//	return JKS_PARENTHESIS_RIGHT;
-		case sf::Keyboard::Multiply:
-			return JKS_STAR;
-		case sf::Keyboard::Add:
-			return JKS_PLUS_SIGN;
-		case sf::Keyboard::Comma:   
-			return JKS_COMMA;
-		case sf::Keyboard::Dash:
-		case sf::Keyboard::Subtract:
-			return JKS_MINUS_SIGN;
-		case sf::Keyboard::Period:  
-			return JKS_PERIOD;
-		case sf::Keyboard::Divide:
-		case sf::Keyboard::Slash:
-			return JKS_SLASH;
-		case sf::Keyboard::Numpad0: 
-		case sf::Keyboard::Num0: 
-			return JKS_0;
-		case sf::Keyboard::Numpad1: 
-		case sf::Keyboard::Num1:
-			return JKS_1;
-		case sf::Keyboard::Numpad2: 
-		case sf::Keyboard::Num2:
-			return JKS_2;
-		case sf::Keyboard::Numpad3: 
-		case sf::Keyboard::Num3:
-			return JKS_3;
-		case sf::Keyboard::Numpad4: 
-		case sf::Keyboard::Num4:
-			return JKS_4;
-		case sf::Keyboard::Numpad5: 
-		case sf::Keyboard::Num5:
-			return JKS_5;
-		case sf::Keyboard::Numpad6: 
-		case sf::Keyboard::Num6:
-			return JKS_6;
-		case sf::Keyboard::Numpad7: 
-		case sf::Keyboard::Num7:
-			return JKS_7;
-		case sf::Keyboard::Numpad8: 
-		case sf::Keyboard::Num8:
-			return JKS_8;
-		case sf::Keyboard::Numpad9: 
-		case sf::Keyboard::Num9:
-			return JKS_9;
-		// case sf::Keyboard::COLON:
-		//	return JKS_COLON;
-		case sf::Keyboard::SemiColon:
+		case XK_semicolon:
 			return JKS_SEMICOLON;
-		// case sf::Keyboard::LESS:
-		// 	return JKS_LESS_THAN_SIGN;
-		case sf::Keyboard::Equal: 
+		case XK_KP_Divide:
+		case XK_slash:
+			return JKS_SLASH;
+		case XK_equal:
 			return JKS_EQUALS_SIGN;
-		// case sf::Keyboard::GREATER:
-		//	return JKS_GREATER_THAN_SIGN;
-		// case sf::Keyboard::QUESTION:   
-		//	return JKS_QUESTION_MARK;
-		// case sf::Keyboard::AT:
-		//	return JKS_AT;
-		case sf::Keyboard::A:
-			return JKS_a;
-		case sf::Keyboard::B:
-			return JKS_b;
-		case sf::Keyboard::C:
-			return JKS_c;
-		case sf::Keyboard::D:
-			return JKS_d;
-		case sf::Keyboard::E:
-			return JKS_e;
-		case sf::Keyboard::F:
-			return JKS_f;
-		case sf::Keyboard::G:
-			return JKS_g;
-		case sf::Keyboard::H:
-			return JKS_h;
-		case sf::Keyboard::I:
-			return JKS_i;
-		case sf::Keyboard::J:
-			return JKS_j;
-		case sf::Keyboard::K:
-			return JKS_k;
-		case sf::Keyboard::L:
-			return JKS_l;
-		case sf::Keyboard::M:
-			return JKS_m;
-		case sf::Keyboard::N:
-			return JKS_n;
-		case sf::Keyboard::O:
-			return JKS_o;
-		case sf::Keyboard::P:
-			return JKS_p;
-		case sf::Keyboard::Q:
-			return JKS_q;
-		case sf::Keyboard::R:
-			return JKS_r;
-		case sf::Keyboard::S:
-			return JKS_s;
-		case sf::Keyboard::T:
-			return JKS_t;
-		case sf::Keyboard::U:
-			return JKS_u;
-		case sf::Keyboard::V:
-			return JKS_v;
-		case sf::Keyboard::W:
-			return JKS_w;
-		case sf::Keyboard::X:
-			return JKS_x;
-		case sf::Keyboard::Y:
-			return JKS_y;
-		case sf::Keyboard::Z:
-			return JKS_z;
-		case sf::Keyboard::LBracket:
+		case XK_KP_Subtract:
+		case XK_minus:
+			return JKS_MINUS_SIGN;
+		case XK_bracketleft:
 			return JKS_SQUARE_BRACKET_LEFT;
-		case sf::Keyboard::BackSlash:   
-			return JKS_BACKSLASH;
-		case sf::Keyboard::RBracket:
+		case XK_bracketright:
 			return JKS_SQUARE_BRACKET_RIGHT;
-		// case sf::Keyboard::CARET:
-		//	return JKS_CIRCUMFLEX_ACCENT;
-		// case sf::Keyboard::UNDERSCORE:    
-		//	return JKS_UNDERSCORE;
-		// case sf::Keyboard::BACKQUOTE:
-		//	return JKS_GRAVE_ACCENT;
-		// case sf::Keyboard::CURLY_BRACKET_LEFT:
-		//	return JKS_CURLY_BRACKET_LEFT;
-		// case sf::Keyboard::VERTICAL_BAR:  
-		//	return JKS_VERTICAL_BAR;
-		// case sf::Keyboard::CURLY_BRACKET_RIGHT:
-		//	return JKS_CURLY_BRACKET_RIGHT;
-		case sf::Keyboard::Tilde:  
+		case XK_comma:
+			return JKS_COMMA;
+		case XK_period:
+			return JKS_PERIOD;
+		case XK_dead_acute:
+			return JKS_APOSTROPHE;
+		case XK_backslash:
+			return JKS_BACKSLASH;
+		case XK_dead_grave:
 			return JKS_TILDE;
-		case sf::Keyboard::Delete:
-			return JKS_DELETE;
-		case sf::Keyboard::Left:
-			return JKS_CURSOR_LEFT;
-		case sf::Keyboard::Right:
-			return JKS_CURSOR_RIGHT;
-		case sf::Keyboard::Up:
-			return JKS_CURSOR_UP;
-		case sf::Keyboard::Down:
-			return JKS_CURSOR_DOWN;
-		case sf::Keyboard::Insert:  
-			return JKS_INSERT;
-		case sf::Keyboard::Home:     
-			return JKS_HOME;
-		case sf::Keyboard::End:
-			return JKS_END;
-		case sf::Keyboard::PageUp:
+		case XK_space:
+			return JKS_SPACE;
+		case XK_KP_Enter:
+		case XK_Return:
+			return JKS_ENTER;
+		case XK_BackSpace:
+			return JKS_BACKSPACE;
+		case XK_Tab:
+			return JKS_TAB;
+		case XK_Prior:
 			return JKS_PAGE_UP;
-		case sf::Keyboard::PageDown:
+		case XK_Next:
 			return JKS_PAGE_DOWN;
-		// case sf::Keyboard::PRINT:   
-		//	return JKS_PRINT;
-		case sf::Keyboard::Pause:
+		case XK_End:
+			return JKS_END;
+		case XK_Home:
+			return JKS_HOME;
+		case XK_Insert:
+			return JKS_INSERT;
+		case XK_Delete:
+			return JKS_DELETE;
+		case XK_KP_Add:
+			return JKS_PLUS_SIGN;
+		case XK_KP_Multiply:
+			return JKS_STAR;
+		case XK_Pause:
 			return JKS_PAUSE;
-		// case sf::Keyboard::RED:
-		//	return JKS_RED;
-		// case sf::Keyboard::GREEN:
-		//	return JKS_GREEN;
-		// case sf::Keyboard::YELLOW:
-		//	return JKS_YELLOW;
-		// case sf::Keyboard::BLUE:
-		//	return JKS_BLUE;
-		case sf::Keyboard::F1:
+		case XK_F1:
 			return JKS_F1;
-		case sf::Keyboard::F2:
+		case XK_F2:
 			return JKS_F2;
-		case sf::Keyboard::F3:
+		case XK_F3:
 			return JKS_F3;
-		case sf::Keyboard::F4:
+		case XK_F4:
 			return JKS_F4;
-		case sf::Keyboard::F5:
+		case XK_F5:
 			return JKS_F5;
-		case sf::Keyboard::F6:     
+		case XK_F6:
 			return JKS_F6;
-		case sf::Keyboard::F7:    
+		case XK_F7:
 			return JKS_F7;
-		case sf::Keyboard::F8:   
+		case XK_F8:
 			return JKS_F8;
-		case sf::Keyboard::F9:  
+		case XK_F9:
 			return JKS_F9;
-		case sf::Keyboard::F10: 
+		case XK_F10:
 			return JKS_F10;
-		case sf::Keyboard::F11:
+		case XK_F11:
 			return JKS_F11;
-		case sf::Keyboard::F12:
+		case XK_F12:
 			return JKS_F12;
-		case sf::Keyboard::LShift:
-		case sf::Keyboard::RShift:
-			return JKS_SHIFT;
-		case sf::Keyboard::LControl:
-		case sf::Keyboard::RControl:
-			return JKS_CONTROL;
-		case sf::Keyboard::LAlt:
-		case sf::Keyboard::RAlt:
-			return JKS_ALT;
-		// case sf::Keyboard::ALTGR:
-		//	return JKS_ALTGR;
-		// case sf::Keyboard::LMETA:
-		// case sf::Keyboard::RMETA:
-		//	return JKS_META;
-		// case sf::Keyboard::LSUPER:
-		// case sf::Keyboard::RSUPER:
-		//	return JKS_SUPER;
-		case sf::Keyboard::RSystem:
-			return JKS_HYPER;
-		default: 
+		case XK_Left:
+			return JKS_CURSOR_LEFT;
+		case XK_Right:
+			return JKS_CURSOR_RIGHT;
+		case XK_Up:
+			return JKS_CURSOR_UP;
+		case XK_Down:
+			return JKS_CURSOR_DOWN;
+		case XK_KP_0:
+		case XK_0:
+			return JKS_0;
+		case XK_KP_1:
+		case XK_1:
+			return JKS_1;
+		case XK_KP_2:
+		case XK_2:
+			return JKS_2;
+		case XK_KP_3:
+		case XK_3:
+			return JKS_3;
+		case XK_KP_4:
+		case XK_4:
+			return JKS_4;
+		case XK_KP_5:
+		case XK_5:
+			return JKS_5;
+		case XK_KP_6:
+		case XK_6:
+			return JKS_6;
+		case XK_KP_7:
+		case XK_7:
+			return JKS_7;
+		case XK_KP_8:
+		case XK_8:
+			return JKS_8;
+		case XK_KP_9:
+		case XK_9:
+			return JKS_9;
+		case XK_A:
+			return JKS_A;
+		case XK_B:
+			return JKS_B;
+		case XK_C:
+			return JKS_C;
+		case XK_D:
+			return JKS_D;
+		case XK_E:
+			return JKS_E;
+		case XK_F:
+			return JKS_F;
+		case XK_G:
+			return JKS_G;
+		case XK_H:
+			return JKS_H;
+		case XK_I:
+			return JKS_I;
+		case XK_J:
+			return JKS_J;
+		case XK_K:
+			return JKS_K;
+		case XK_L:
+			return JKS_L;
+		case XK_M:
+			return JKS_M;
+		case XK_N:
+			return JKS_N;
+		case XK_O:
+			return JKS_O;
+		case XK_P:
+			return JKS_P;
+		case XK_Q:
+			return JKS_Q;
+		case XK_R:
+			return JKS_R;
+		case XK_S:
+			return JKS_S;
+		case XK_T:
+			return JKS_T;
+		case XK_U:
+			return JKS_U;
+		case XK_V:
+			return JKS_V;
+		case XK_X:
+			return JKS_X;
+		case XK_W:
+			return JKS_W;
+		case XK_Y:
+			return JKS_Y;
+		case XK_Z:
+			return JKS_Z;
+		default:
 			break;
 	}
 
 	return JKS_UNKNOWN;
 }
 
-void NativeInputManager::ProcessInputEvent(sf::Event event)
+void NativeInputManager::ProcessInputEvent(XEvent event)
 {
+	/*
 	if (event.type == sf::Event::MouseEntered) {
 		GFXHandler::GetInstance()->SetCursor(_window->GetCursor());
 
@@ -468,64 +427,6 @@ void NativeInputManager::ProcessInputEvent(sf::Event event)
 		}
 
 		jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key.code);
-
-		/*
-		if (shift == true) {
-			if (symbol == JKS_a) {
-				symbol = JKS_A;
-			} else if (symbol == JKS_b) {
-				symbol = JKS_B;
-			} else if (symbol == JKS_c) {
-				symbol = JKS_C;
-			} else if (symbol == JKS_d) {
-				symbol = JKS_D;
-			} else if (symbol == JKS_e) {
-				symbol = JKS_E;
-			} else if (symbol == JKS_f) {
-				symbol = JKS_F;
-			} else if (symbol == JKS_g) {
-				symbol = JKS_G;
-			} else if (symbol == JKS_h) {
-				symbol = JKS_H;
-			} else if (symbol == JKS_i) {
-				symbol = JKS_I;
-			} else if (symbol == JKS_j) {
-				symbol = JKS_J;
-			} else if (symbol == JKS_k) {
-				symbol = JKS_K;
-			} else if (symbol == JKS_l) {
-				symbol = JKS_L;
-			} else if (symbol == JKS_m) {
-				symbol = JKS_M;
-			} else if (symbol == JKS_n) {
-				symbol = JKS_N;
-			} else if (symbol == JKS_o) {
-				symbol = JKS_O;
-			} else if (symbol == JKS_p) {
-				symbol = JKS_P;
-			} else if (symbol == JKS_q) {
-				symbol = JKS_Q;
-			} else if (symbol == JKS_r) {
-				symbol = JKS_R;
-			} else if (symbol == JKS_s) {
-				symbol = JKS_S;
-			} else if (symbol == JKS_t) {
-				symbol = JKS_T;
-			} else if (symbol == JKS_u) {
-				symbol = JKS_U;
-			} else if (symbol == JKS_v) {
-				symbol = JKS_V;
-			} else if (symbol == JKS_w) {
-				symbol = JKS_W;
-			} else if (symbol == JKS_x) {
-				symbol = JKS_X;
-			} else if (symbol == JKS_y) {
-				symbol = JKS_Y;
-			} else if (symbol == JKS_z) {
-				symbol = JKS_Z;
-			}
-		}
-		*/
 
 		// AddEvent(new KeyEvent(NULL, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
 		DispatchEvent(new KeyEvent(NULL, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
@@ -606,13 +507,11 @@ void NativeInputManager::ProcessInputEvent(sf::Event event)
 		// _window->_location.x = pos.x;
 		// _window->_location.y = pos.y;
 	
-		/*
 		if (event.type == SDL_MOUSEBUTTONDOWN) {
-			SDL_SetWindowGrab(native, SDL_TRUE);
+			// SDL_SetWindowGrab(native, SDL_TRUE);
 		} else if (event.type == SDL_MOUSEBUTTONUP) {
-			SDL_SetWindowGrab(native, SDL_FALSE);
+			// SDL_SetWindowGrab(native, SDL_FALSE);
 		}
-		*/
 
 		// AddEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
 		DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
@@ -620,6 +519,7 @@ void NativeInputManager::ProcessInputEvent(sf::Event event)
 	} else if (event.type == sf::Event::TouchMoved) {
 	} else if (event.type == sf::Event::TouchEnded) {
 	}
+*/
 }
 
 void NativeInputManager::AddEvent(jcommon::EventObject *event)
@@ -633,24 +533,28 @@ void NativeInputManager::AddEvent(jcommon::EventObject *event)
 	_events_sem.Notify();
 }
 
+// Filter the events received by windows (only allow those matching a specific window)
+static Bool check_x11_event(::Display*, XEvent* event, XPointer userData)
+{
+	// Just check if the event matches the window
+	return event->xany.window == reinterpret_cast< ::Window >(userData);
+}
+
 void NativeInputManager::Run()
 {
-	sf::RenderWindow *window = _window->_window;
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
 
-	while (window->isOpen() == true) {
-		sf::Event event;
+	XSelectInput(display, _window->_window, ExposureMask);
 
-		// while (window->waitEvent(event)) {
-		while (window->pollEvent(event)) {
-			if (event.type == sf::Event::Closed) {
-				// _window->Release();
-			} else {
-				ProcessInputEvent(event);
-			}
+	XEvent event;
+
+	do {
+		while (XCheckIfEvent(display, &event, &check_x11_event, reinterpret_cast<XPointer>(_window->_window))) {
+			ProcessInputEvent(event);
 		}
-
+	
 		usleep(10000);
-	}
+	} while (_is_initialized == true);
 }
 
 }

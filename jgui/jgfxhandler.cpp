@@ -32,6 +32,8 @@
 #include "nativehandler.h"
 #elif defined(SFML2_UI)
 #include "nativehandler.h"
+#elif defined(X11_UI)
+#include "nativehandler.h"
 #endif
 
 namespace jgui {
@@ -80,6 +82,18 @@ GFXHandler * GFXHandler::GetInstance()
 			_instance = NULL;
 		}
 #elif defined(SFML2_UI)
+		NativeHandler *handler = NULL;
+		
+		try {
+			_instance = handler = new NativeHandler();
+
+			handler->InitEngine();
+			handler->InitResources();
+			handler->InitCursors();
+		} catch (...) {
+			_instance = NULL;
+		}
+#elif defined(X11_UI)
 		NativeHandler *handler = NULL;
 		
 		try {

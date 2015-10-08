@@ -21,6 +21,8 @@
 #include "nativegraphics.h"
 #include "nativehandler.h"
 
+#include <X11/Xutil.h>
+
 #define M_2PI	(2*M_PI)
 
 namespace jgui {
@@ -78,40 +80,40 @@ void NativeGraphics::Flip()
 		return;
 	}
 
-	sf::Texture texture;
+	// Create the icon pixmap
+	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
+	::Display *display = (Display *)handler->GetGraphicEngine();
+	int screen = handler->GetScreenNumber();
 
-	texture.create(dw, dh);
+	Visual *visual = DefaultVisual(display, screen);
+	unsigned int depth = DefaultDepth(display, screen);
+	XImage *image = XCreateImage(display, visual, depth, ZPixmap, 0, (char *)data, dw, dh, 32, 0);
 
-	sf::Sprite sprite(texture);
-
-	int size = dw*dh;
-	uint8_t buffer[size*4];
-	uint8_t *src = data;
-	uint8_t *dst = buffer;
-
-	for (int i=0; i<size; i++) {
-		dst[3] = src[3];
-		dst[2] = src[0];
-		dst[1] = src[1];
-		dst[0] = src[2];
-
-		src = src + 4;
-		dst = dst + 4;
+	if (image == NULL) {
+		return;
 	}
 
-	texture.update(buffer);
+	Pixmap pixmap = XCreatePixmap(display, RootWindow(display, screen), dw, dh, depth);
+	GC gc = XCreateGC(display, pixmap, 0, NULL);
+	
+	// draw image to pixmap
+	XPutImage(display, pixmap, gc, image, 0, 0, 0, 0, dw, dh);
+	XCopyArea(display, pixmap, *(::Window *)_surface, gc, 0, 0, dw, dh, 0, 0);
 
-	sf::RenderWindow *window = (sf::RenderWindow *)_surface;
+	// XDestroyImage(image);
+	XFreePixmap(display, pixmap);
 
-	window->setActive(true);
-	window->clear();
-	window->draw(sprite);
-	window->display();
-	window->setActive(false);
+	XFlush(display);
+
+	// INFO:: wait x11 process all events
+	// True:: discards all events remaing
+	// False:: not discards events remaing
+	// XSync(display, False);
 }
 
 void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 {
+	Flip(); return;
 	if (_surface == NULL) {
 		return;
 	}
@@ -134,49 +136,25 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	sf::Texture texture;
+	/*
+	// Create the icon pixmap
+	Visual *visual = DefaultVisual(_display, _screen);
+	unsigned int depth = DefaultDepth(_display, _screen);
+	XImage *image = XCreateImage(_display, visual, depth, ZPixmap, 0, (char *)data, dw, dh, 32, 0);
 
-	// texture.setActive(false);
-	texture.create(dw, dh);
-	texture.setSmooth(GetAntialias() != JAM_NONE);
-
-	sf::Sprite sprite(texture);
-
-	int size = dw*dh;
-	uint8_t buffer[size*4];
-	uint8_t *src = data;
-	uint8_t *dst = buffer;
-
-	for (int i=0; i<size; i++) {
-		dst[3] = src[3];
-		dst[2] = src[0];
-		dst[1] = src[1];
-		dst[0] = src[2];
-
-		src = src + 4;
-		dst = dst + 4;
-	}
-
-	texture.update(buffer);
-
-	sf::RenderWindow *window = (sf::RenderWindow *)_surface;
-
-	window->setActive(true);
-	window->clear();
-	window->draw(sprite);
-	window->display();
-	window->setActive(false);
-}
-
-void NativeGraphics::SetVerticalSyncEnabled(bool b)
-{
-	if (_surface == NULL) {
+	if (image == NULL) {
 		return;
 	}
 
-	sf::RenderWindow *window = (sf::RenderWindow *)_surface;
+	Pixmap pixmap = XCreatePixmap(_display, RootWindow(_display, _screen), dw, dh, depth);
+	GC gc = XCreateGC(_display, pixmap, 0, NULL);
 
-	window->setVerticalSyncEnabled(b);
+	// draw image to pixmap
+	XPutImage(_display, pixmap, gc, image, 0, 0, 0, 0, width, height);
+	XCopyArea(_display, pixmap, _window, gc, 0, 0, width, height, 0, 0);
+
+	// XFlush(_display);
+	*/
 }
 
 }

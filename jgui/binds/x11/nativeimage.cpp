@@ -17,67 +17,32 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVEGRAPHICS_H
-#define J_NATIVEGRAPHICS_H
+#include "Stdafx.h"
+#include "nativeimage.h"
 
-#include "genericgraphics.h"
-#include "jsemaphore.h"
+namespace jgui {
 
-#include <SFML/Graphics.hpp>
-
-namespace jgui{
-
-class Font;
-class Image;
-class NativeImage;
-
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class NativeGraphics : public GenericGraphics{
-	
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		NativeGraphics(void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~NativeGraphics();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetNativeSurface(void *surface, int wp, int hp);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Flip();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Flip(int x, int y, int w, int h);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVerticalSyncEnabled(bool b);
-
-};
-
+NativeImage::NativeImage(cairo_t *cairo_context, jpixelformat_t pixelformat, int width, int height):
+	GenericImage(cairo_context, pixelformat, width, height)
+{
+	jcommon::Object::SetClassName("jgui::NativeImage");
 }
 
-#endif 
+NativeImage::NativeImage(std::string file):
+	GenericImage(file)
+{
+	jcommon::Object::SetClassName("jgui::NativeImage");
+}
+
+NativeImage::NativeImage(jio::InputStream *stream):
+	GenericImage(stream)
+{
+	jcommon::Object::SetClassName("jgui::NativeImage");
+}
+
+NativeImage::~NativeImage()
+{
+}
+
+}
 

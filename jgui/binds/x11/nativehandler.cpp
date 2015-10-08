@@ -29,9 +29,6 @@
 #include "jproperties.h"
 #include "jruntimeexception.h"
 
-#include <SFML/Graphics.hpp>
-#include <X11/Xlib.h>
-
 namespace jgui {
 
 NativeHandler::NativeHandler():
@@ -40,6 +37,9 @@ NativeHandler::NativeHandler():
 	jcommon::Object::SetClassName("jgui::NativeHandler");
 
 	_cursor = JCS_DEFAULT;
+	_display = NULL;
+	_screen_id = 0;
+	_hidden_cursor = 0;
 
 	XInitThreads();
 }
@@ -52,10 +52,12 @@ void NativeHandler::InitEngine()
 {
 	GenericHandler::InitEngine();
 
-	sf::VideoMode display = sf::VideoMode::getDesktopMode();
+	// Open a connection with the X server
+	_display = XOpenDisplay(NULL);
+	_screen_id = DefaultScreen(_display);
 
-	_screen.width = display.width;
-	_screen.height = display.height;
+	_screen.width = DisplayWidth(_display, _screen_id);
+	_screen.height = DisplayHeight(_display, _screen_id);
 }
 
 void NativeHandler::SetFlickerFilteringEnabled(bool b)
@@ -69,6 +71,8 @@ bool NativeHandler::IsFlickerFilteringEnabled()
 
 void NativeHandler::SetCursorEnabled(bool b)
 {
+	// XDefineCursor(_display, _window, b);
+	// XFlush(_display);
 }
 
 bool NativeHandler::IsCursorEnabled()
@@ -184,12 +188,17 @@ void NativeHandler::InitCursors()
 
 void * NativeHandler::GetGraphicEngine()
 {
-	return NULL;
+	return _display;
+}
+
+int NativeHandler::GetScreenNumber()
+{
+	return _screen_id;
 }
 
 std::string NativeHandler::GetEngineID()
 {
-	return "sfml2";
+	return "x11";
 }
 
 void NativeHandler::SetCursorLocation(int x, int y)
@@ -210,7 +219,7 @@ void NativeHandler::SetCursorLocation(int x, int y)
 		y = _screen.height;
 	}
 
-	sf::Mouse::setPosition(sf::Vector2i(x, y));
+	// sf::Mouse::setPosition(sf::Vector2i(x, y));
 }
 
 jpoint_t NativeHandler::GetCursorLocation()
@@ -220,10 +229,7 @@ jpoint_t NativeHandler::GetCursorLocation()
 	p.x = 0;
 	p.y = 0;
 
-	sf::Vector2i pos = sf::Mouse::getPosition();
-
-	p.x = pos.x;
-	p.y = pos.y;
+	// sf::Vector2i pos = sf::Mouse::getPosition();
 
 	return p;
 }
@@ -269,6 +275,13 @@ void NativeHandler::Release()
 	for (std::vector<Font *>::iterator i=_fonts.begin(); i!=_fonts.end(); i++) {
 		(*i)->Release();
 	}
+    
+	if (_hidden_cursor) {
+		XFreeCursor(_display, _hidden_cursor);
+	}
+
+	// Close the connection with the X server
+	XCloseDisplay(_display);
 }
 
 void NativeHandler::Suspend()

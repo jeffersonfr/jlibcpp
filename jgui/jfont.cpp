@@ -30,6 +30,8 @@
 #include "nativefont.h"
 #elif defined(SFML2_UI)
 #include "nativefont.h"
+#elif defined(X11_UI)
+#include "nativefont.h"
 #endif
 
 #define DEFAULT_FONT_SIZE			16
@@ -77,6 +79,8 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int siz
 #elif defined(SDL2_UI)
 		font = new NativeFont(name, attributes, size);
 #elif defined(SFML2_UI)
+		font = new NativeFont(name, attributes, size);
+#elif defined(X11_UI)
 		font = new NativeFont(name, attributes, size);
 #endif
 	} catch (jcommon::NullPointerException &) {

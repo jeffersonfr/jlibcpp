@@ -37,6 +37,10 @@
 #include "nativehandler.h"
 #include "nativegraphics.h"
 #include "nativeinputmanager.h"
+#elif defined(X11_UI)
+#include "nativehandler.h"
+#include "nativegraphics.h"
+#include "nativeinputmanager.h"
 #endif
 
 namespace jgui {
@@ -95,6 +99,11 @@ Window::Window(int x, int y, int width, int height):
 	_input_manager = new NativeInputManager(this);
 
 	_window = NULL;
+	_graphics = NULL;
+#elif defined(X11_UI)
+	_input_manager = new NativeInputManager(this);
+
+	_window = 0;
 	_graphics = NULL;
 #endif
 	
@@ -214,6 +223,8 @@ void * Window::GetNativeWindow()
 	return _window;
 #elif defined(SFML2_UI)
 	return _window;
+#elif defined(X11_UI)
+	return (void *)&_window;
 #endif
 
 	return NULL;
@@ -258,6 +269,7 @@ void Window::SetNativeWindow(void *native)
 #endif
 
 #elif defined(SDL2_UI)
+	// TODO::
 #elif defined(SFML2_UI)
 	_window = (sf::RenderWindow *)native;
 	
@@ -269,6 +281,19 @@ void Window::SetNativeWindow(void *native)
 	_graphics = new NativeGraphics(_window, NULL, JPF_ARGB, _size.width, _size.height);
 	
 	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
+#elif defined(X11_UI)
+	/* TODO::
+	_window = (::Window *)native;
+	
+	sf::Vector2u size = _window->getSize();
+
+	_size.width = size.x;
+	_size.height = size.y;
+	
+	_graphics = new NativeGraphics(_window, NULL, JPF_ARGB, _size.width, _size.height);
+	
+	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
+	*/
 #endif
 	
 	_graphics_mutex.Unlock();
@@ -298,6 +323,7 @@ void Window::SetFullScreenEnabled(bool b)
 #elif defined(SDL2_UI)
 		SDL_SetWindowFullscreen(_window, 0);
 #elif defined(SFML2_UI)
+#elif defined(X11_UI)
 #endif
 
 		_border_size = _old_border_size;
@@ -309,6 +335,7 @@ void Window::SetFullScreenEnabled(bool b)
 #elif defined(SDL2_UI)
 		SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
 #elif defined(SFML2_UI)
+#elif defined(X11_UI)
 #endif
 
 		jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
@@ -485,12 +512,86 @@ void Window::InternalCreateWindow()
 
 	Repaint();
 #elif defined(SFML2_UI)
-	_window = new sf::RenderWindow(sf::VideoMode(_size.width, _size.height), "");
+	_window = new sf::RenderWindow(sf::VideoMode(_size.width, _size.height), "", sf::Style::None);
 
 	// _window->setActive(false);
 	_window->requestFocus();
 
 	_graphics = new NativeGraphics(_window, NULL, JPF_ARGB, _size.width, _size.height);
+
+	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
+#elif defined(X11_UI)
+	XSetWindowAttributes attr;
+
+	attr.event_mask = 0;
+	attr.override_redirect = 0;
+
+	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
+	::Display *display = (Display *)handler->GetGraphicEngine();
+	int screen = handler->GetScreenNumber();
+
+	_window = XCreateWindow(
+			display, RootWindow(display, screen), 0, 0, _size.width, _size.height, 0, 
+			DefaultDepth(display, screen), InputOutput, DefaultVisual(display, screen), CWEventMask | CWOverrideRedirect, &attr);
+
+	if (_window == 0) {
+		throw jcommon::RuntimeException("Unable to open a new window");
+	}
+
+	// Set the window's style (tell the windows manager to change our window's decorations and functions according to the requested style)
+	Atom WMHintsAtom = XInternAtom(display, "_MOTIF_WM_HINTS", False);
+
+	if (WMHintsAtom) {
+		//static flags
+		static const unsigned long MWM_HINTS_FUNCTIONS   = 1 << 0;
+		static const unsigned long MWM_HINTS_DECORATIONS = 1 << 1;
+
+		//static const unsigned long MWM_DECOR_ALL         = 1 << 0;
+		static const unsigned long MWM_DECOR_BORDER      = 1 << 1;
+		static const unsigned long MWM_DECOR_RESIZEH     = 1 << 2;
+		static const unsigned long MWM_DECOR_TITLE       = 1 << 3;
+		static const unsigned long MWM_DECOR_MENU        = 1 << 4;
+		static const unsigned long MWM_DECOR_MINIMIZE    = 1 << 5;
+		static const unsigned long MWM_DECOR_MAXIMIZE    = 1 << 6;
+
+		//static const unsigned long MWM_FUNC_ALL          = 1 << 0;
+		static const unsigned long MWM_FUNC_RESIZE       = 1 << 1;
+		static const unsigned long MWM_FUNC_MOVE         = 1 << 2;
+		static const unsigned long MWM_FUNC_MINIMIZE     = 1 << 3;
+		static const unsigned long MWM_FUNC_MAXIMIZE     = 1 << 4;
+		static const unsigned long MWM_FUNC_CLOSE        = 1 << 5;
+
+		struct WMHints {
+			unsigned long Flags;
+			unsigned long Functions;
+			unsigned long Decorations;
+			long          InputMode;
+			unsigned long State;
+		};
+
+		WMHints hints;
+
+		hints.Flags       = MWM_HINTS_FUNCTIONS | MWM_HINTS_DECORATIONS;
+		hints.Decorations = 0;
+		hints.Functions   = MWM_FUNC_MOVE | MWM_FUNC_RESIZE;
+
+		const unsigned char *ptr = reinterpret_cast<const unsigned char*>(&hints);
+
+		XChangeProperty(display, _window, WMHintsAtom, WMHintsAtom, 32, PropModeReplace, ptr, 5);
+	}
+
+	/*
+	// This is a hack to force some windows managers to disable resizing
+	XSizeHints sizeHints;
+
+	sizeHints.flags = PMinSize | PMaxSize;
+	sizeHints.min_width = sizeHints.max_width  = width;
+	sizeHints.min_height = sizeHints.max_height = height;
+
+	XSetWMNormalHints(display, _window, &sizeHints); 
+	*/
+
+	_graphics = new NativeGraphics(&_window, NULL, JPF_ARGB, _size.width, _size.height);
 
 	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
 #endif
@@ -510,6 +611,7 @@ void Window::RaiseToTop()
 		SDL_RaiseWindow(_window);
 	}
 #elif defined(SFML2_UI)
+#elif defined(X11_UI)
 #endif
 }
 
@@ -522,6 +624,7 @@ void Window::LowerToBottom()
 	}
 #elif defined(SDL2_UI)
 #elif defined(SFML2_UI)
+#elif defined(X11_UI)
 #endif
 }
 
@@ -537,6 +640,7 @@ void Window::PutAtop(Window *w)
 	}
 #elif defined(SDL2_UI)
 #elif defined(SFML2_UI)
+#elif defined(X11_UI)
 #endif
 }
 
@@ -552,6 +656,7 @@ void Window::PutBelow(Window *w)
 	}
 #elif defined(SDL2_UI)
 #elif defined(SFML2_UI)
+#elif defined(X11_UI)
 #endif
 }
 
@@ -631,6 +736,11 @@ void Window::SetBounds(int x, int y, int width, int height)
 			_window->setPosition(sf::Vector2i(_location.x, _location.y));
 			_window->setSize(sf::Vector2u(_size.width, _size.height));
 		}
+#elif defined(X11_UI)
+		if (_window != 0) {
+			XMoveResizeWindow(
+				(::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine(), _window, _location.x, _location.y, _size.width, _size.height);
+		}
 #endif
 	}
 	
@@ -676,6 +786,11 @@ void Window::SetLocation(int x, int y)
 #elif defined(SFML2_UI)
 		if (_window != NULL) {
 			_window->setPosition(sf::Vector2i(_location.x, _location.y));
+		}
+#elif defined(X11_UI)
+		if (_window != 0) {
+			XMoveWindow(
+				(::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine(), _window, _location.x, _location.y);
 		}
 #endif
 	}
@@ -827,6 +942,11 @@ void Window::SetSize(int width, int height)
 		if (_window != NULL) {
 			_window->setSize(sf::Vector2u(_size.width, _size.height));
 		}
+#elif defined(X11_UI)
+		if (_window != 0) {
+			XResizeWindow(
+				(::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine(), _window, _size.width, _size.height);
+		}
 #endif
 	}
 	
@@ -867,6 +987,11 @@ void Window::Move(int x, int y)
 		if (_window != NULL) {
 			_window->setPosition(sf::Vector2i(dx, dy));
 		}
+#elif defined(X11_UI)
+		if (_window != 0) {
+			XMoveWindow(
+				(::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine(), _window, dx, dy);
+		}
 #endif
 	}
 	
@@ -893,6 +1018,7 @@ void Window::SetOpacity(int i)
 	}
 #elif defined(SDL2_UI)
 #elif defined(SFML2_UI)
+#elif defined(X11_UI)
 #endif
 }
 
@@ -1027,7 +1153,9 @@ bool Window::Show(bool modal)
 #if defined(DIRECTFB_UI)
 	if (_window == NULL) {
 		_graphics_mutex.Lock();
+
 		InternalCreateWindow();
+
 		_graphics_mutex.Unlock();
 	}
 	
@@ -1036,12 +1164,22 @@ bool Window::Show(bool modal)
 	if (_window == NULL) {
 		InternalCreateWindow();
 	}
+
+	// CHANGE:: define as visble = true
 #elif defined(SFML2_UI)
 	if (_window == NULL) {
 		InternalCreateWindow();
 	}
 	
 	_window->setVisible(true);
+#elif defined(X11_UI)
+	if (_window == 0) {
+		InternalCreateWindow();
+	}
+
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+
+	XMapWindow(display, _window);
 #endif
 
 	DoLayout();
@@ -1063,10 +1201,20 @@ bool Window::Hide()
 		_window->SetOpacity(_window, 0x00);
 	}
 #elif defined(SDL2_UI)
-	SDL_HideWindow(_window);
+	if (_window != NULL) {
+		SDL_HideWindow(_window);
+	}
 #elif defined(SFML2_UI)
 	if (_window != NULL) {
 		_window->setVisible(false);
+	}
+#elif defined(X11_UI)
+	if (_window != 0) {
+		::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+
+		XUnmapWindow(display, _window);
+		XFlush(display);
+		XSync(display, False);
 	}
 #endif
 
@@ -1106,6 +1254,13 @@ void Window::InternalReleaseWindow()
 	if (_window != NULL) {
 		_window->close();
 	}
+#elif defined(X11_UI)
+	if (_window != 0) {
+		::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+
+		XDestroyWindow(display, _window);
+		XFlush(display);
+	}
 #endif
 }
 
@@ -1137,6 +1292,10 @@ void Window::SetRotation(jwindow_rotation_t t)
 		throw jcommon::RuntimeException("Rotate not implemented");
 	}
 #elif defined(SFML2_UI)
+	if (rotation != 0) {
+		throw jcommon::RuntimeException("Rotate not implemented");
+	}
+#elif defined(X11_UI)
 	if (rotation != 0) {
 		throw jcommon::RuntimeException("Rotate not implemented");
 	}
