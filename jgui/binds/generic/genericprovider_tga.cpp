@@ -436,6 +436,23 @@ class TGAImg {
 
 						break;
 					}
+				case 11: // RLE GrayScale (CHANGE:: copy from 'case 10')
+					{
+						// Double check image type field
+						if (pData[1]!=0) {
+							return TGA_IMG_ERR_BAD_FORMAT;
+						}
+
+						// Load image data
+						iRet=LoadTgaRLEData();
+						if (iRet!=TGA_IMG_OK) {
+							return iRet;
+						}
+
+						BGRtoRGB(); // Convert to RGB
+
+						break;
+					}
 				default:
 					return TGA_IMG_ERR_UNSUPPORTED;
 			}

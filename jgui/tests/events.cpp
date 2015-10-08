@@ -212,9 +212,6 @@ class UserEventManager : public jgui::KeyListener, public jgui::MouseListener {
 			_last_mouse_move = 0LL;
 			_last_mouse_location.x = 0LL;
 			_last_mouse_location.y = 0LL;
-
-			jgui::InputManager::GetInstance()->RegisterKeyListener(this);
-			jgui::InputManager::GetInstance()->RegisterMouseListener(this);
 		}
 
 		void DispatchUserEvent(UserEvent *event)
@@ -262,8 +259,6 @@ class UserEventManager : public jgui::KeyListener, public jgui::MouseListener {
 	public:
 		virtual ~UserEventManager()
 		{
-			jgui::InputManager::GetInstance()->RemoveKeyListener(this);
-			jgui::InputManager::GetInstance()->RemoveMouseListener(this);
 		}
 
 		static UserEventManager * GetInstance()
@@ -409,8 +404,8 @@ class Test : public jgui::Window, public UserEventListener {
 			_color = 0;
 			_pressed = false;
 
-			// INFO:: avoid that window register the events after userinputmanager
-			SetInputEnabled(false);
+			GetInputManager()->RegisterKeyListener(UserEventManager::GetInstance());
+			GetInputManager()->RegisterMouseListener(UserEventManager::GetInstance());
 
 			UserEventManager::GetInstance()->RegisterUserEventListener(this);
 		}
@@ -418,6 +413,9 @@ class Test : public jgui::Window, public UserEventListener {
 		virtual ~Test()
 		{
 			UserEventManager::GetInstance()->RemoveUserEventListener(this);
+			
+			GetInputManager()->RemoveKeyListener(UserEventManager::GetInstance());
+			GetInputManager()->RemoveMouseListener(UserEventManager::GetInstance());
 		}
 
 		virtual void OnKeyDown(UserEvent *event)
@@ -454,13 +452,17 @@ class Test : public jgui::Window, public UserEventListener {
 			int x = cx-_ball.x,
 					y = cy-_ball.y;
 
+				printf("0:::: %d\n", event->GetClickCount());
 			if ((x*x+y*y) <= _raio*_raio) {
+				printf("1:::: %d\n", event->GetClickCount());
 				if (event->GetClickCount() == 1) {
+				printf("2:::: %d\n", event->GetClickCount());
 					_pressed = true;
 
 					_ball_diff.x = -x;
 					_ball_diff.y = -y;
 				} else {
+				printf("3:::: %d\n", event->GetClickCount());
 					_pressed = false;
 
 					if (event->GetClickCount() == 2) {

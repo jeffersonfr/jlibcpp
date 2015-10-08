@@ -30,17 +30,17 @@
 
 namespace jgui {
 
+class Window;
 class EventBroadcaster;
 
 class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 
+	friend class Window;
 	friend class NativeHandler;
 
 	private:
 		/** \brief */
-		jthread::Mutex _mutex;
-		/** \brief */
-		IDirectFBEventBuffer *events;
+		IDirectFBEventBuffer *_event_buffer;
 		/** \brief */
 		uint64_t _last_keypress;
 		/** \brief */
@@ -63,7 +63,7 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		NativeInputManager();
+		NativeInputManager(jgui::Window *window);
 
 		/**
 		 * \brief
@@ -75,7 +75,13 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void Initialize();
+		virtual void Restart();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Release();
 
 		/**
 		 * \brief
@@ -83,12 +89,6 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		 */
 		virtual jkeyevent_symbol_t TranslateToNativeKeySymbol(DFBInputDeviceKeySymbol symbol);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ProcessInputEvent(DFBInputEvent event);
-		
 		/**
 		 * \brief
 		 *
@@ -147,44 +147,8 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void Release();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Restore();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Run();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterKeyListener(KeyListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveKeyListener(KeyListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterMouseListener(MouseListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveMouseListener(MouseListener *listener);
-		
 		/**
 		 * \brief
 		 *

@@ -34,24 +34,28 @@
 
 namespace jgui {
 
+class Window;
+
 class InputManager : public virtual jcommon::Object{
 
-	private:
-		/** \brief */
-		static InputManager *_instance;
+	friend class Window;
 
 	protected:
+		/** \brief */
+		jthread::Mutex _mutex;
 		/** \brief */
 		std::vector<jgui::KeyListener *> _key_listeners;
 		/** \brief */
 		std::vector<jgui::MouseListener *> _mouse_listeners;
+		/** \brief */
+		jgui::Window *_window;
 		
 	protected:
 		/**
 		 * \brief
 		 *
 		 */
-		InputManager();
+		InputManager(jgui::Window *window);
 
 	public:
 		/**
@@ -59,12 +63,6 @@ class InputManager : public virtual jcommon::Object{
 		 *
 		 */
 		virtual ~InputManager();
-
-		/**
-		 * \brief
-		 *
-		 */
-		static InputManager * GetInstance();
 
 		/**
 		 * \brief
@@ -118,18 +116,6 @@ class InputManager : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void Release();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Restore();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void RegisterKeyListener(KeyListener *listener);
 		
 		/**
@@ -162,12 +148,6 @@ class InputManager : public virtual jcommon::Object{
 		 */
 		virtual std::vector<jgui::MouseListener *> & GetMouseListeners();
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchEvent(jcommon::EventObject *event);
-
 };
 
 }

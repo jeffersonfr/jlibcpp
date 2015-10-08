@@ -17,81 +17,65 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "Stdafx.h"
-#include "jwindowmanager.h"
+#ifndef J_NATIVEGRAPHICS_H
+#define J_NATIVEGRAPHICS_H
 
-namespace jgui {
+#include "genericgraphics.h"
+#include "jsemaphore.h"
 
-WindowManager * WindowManager::_instance = NULL;
+#include <SFML/Graphics.hpp>
 
-WindowManager::WindowManager():
-	jcommon::Object()
-{
-	jcommon::Object::SetClassName("jgui::WindowManager");
-}
+namespace jgui{
 
-WindowManager::~WindowManager()
-{
-}
+class Font;
+class Image;
+class NativeImage;
 
-WindowManager * WindowManager::GetInstance()
-{
-	if (_instance == NULL) {
-		_instance = new WindowManager();
-	}
+/**
+ * \brief
+ *
+ * \author Jeff Ferr
+ */
+class NativeGraphics : public GenericGraphics{
+	
+	public:
+		/** \brief */
+		jthread::Semaphore _sfml_sem;
 
-	return _instance;
-}
+	public:
+		/**
+		 * \brief
+		 *
+		 */
+		NativeGraphics(void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp);
 
-std::vector<Window *> & WindowManager::GetWindows()
-{
-	return windows;
-}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual ~NativeGraphics();
 
-Window * WindowManager::GetFocusOwner()
-{
-	if (windows.size() > 0) {
-		return *windows.begin();
-	}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetNativeSurface(void *surface, int wp, int hp);
 
-	return NULL;
-}
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Flip();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Flip(int x, int y, int w, int h);
 
-void WindowManager::Add(Window *w)
-{
-	windows.insert(windows.begin(), w);
-}
-
-void WindowManager::Remove(Window *w)
-{
-	for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); ++i) {
-		if ((*i) == w) {
-			windows.erase(i);
-
-			break;
-		}
-	}
-}
-
-void WindowManager::Restore()
-{
-	for (std::vector<Window *>::const_iterator i=windows.begin(); i!=windows.end(); ++i) {
-		Window *w = (*i);
-
-		if (w->IsVisible() == true) {
-			w->Show(false);
-		}
-	} 
-}
-
-void WindowManager::Release()
-{
-	for (std::vector<Window *>::const_iterator i=windows.begin(); i!=windows.end(); ++i) {
-		Window *w = (*i);
-
-		w->InternalReleaseWindow();
-	}
-}
+};
 
 }
+
+#endif 
 

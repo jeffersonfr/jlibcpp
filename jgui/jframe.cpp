@@ -83,14 +83,7 @@ Frame::Frame(int x, int y, int width, int height):
 
 Frame::~Frame() 
 {
-	InputManager::GetInstance()->RemoveKeyListener(this);
-	InputManager::GetInstance()->RemoveMouseListener(this);
-
 	while (_paint_mutex.TryLock() == false) {
-		jthread::Thread::MSleep(100);
-	}
-
-	while (_input_mutex.TryLock() == false) {
 		jthread::Thread::MSleep(100);
 	}
 
@@ -246,8 +239,6 @@ void Frame::RemoveAllSubtitles()
 
 bool Frame::KeyPressed(KeyEvent *event)
 {
-	jthread::AutoLock lock(&_input_mutex);
-
 	if (Window::KeyPressed(event) == true) {
 		return true;
 	}
@@ -267,8 +258,6 @@ bool Frame::KeyPressed(KeyEvent *event)
 
 bool Frame::KeyReleased(KeyEvent *event)
 {
-	jthread::AutoLock lock(&_input_mutex);
-
 	if (Window::KeyReleased(event) == true) {
 		return true;
 	}
@@ -278,8 +267,6 @@ bool Frame::KeyReleased(KeyEvent *event)
 
 bool Frame::KeyTyped(KeyEvent *event)
 {
-	jthread::AutoLock lock(&_input_mutex);
-
 	if (Window::KeyTyped(event) == true) {
 		return true;
 	}

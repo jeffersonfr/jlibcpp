@@ -226,16 +226,16 @@ class ItemComponent : public virtual jcommon::Object{
 
 	protected:
 		std::vector<SelectListener *> _select_listeners;
-		std::vector<Item *> _items,
-			_internal;
-		Color _item_color,
-			_item_fgcolor,
-			_selected_item_color,
-			_selected_item_fgcolor,
-			_focus_item_color,
-			_focus_item_fgcolor,
-			_disabled_item_color,
-			_disabled_item_fgcolor;
+		std::vector<Item *> _items;
+		std::vector<Item *> _internal;
+		Color _item_color;
+		Color _item_fgcolor;
+		Color _selected_item_color;
+		Color _selected_item_fgcolor;
+		Color _focus_item_color;
+		Color _focus_item_fgcolor;
+		Color _disabled_item_color;
+		Color _disabled_item_fgcolor;
 		std::string _text;
 		int _index;
 		bool _loop;

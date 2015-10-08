@@ -213,7 +213,7 @@ void ToogleButton::Paint(Graphics *g)
 	}
 
 	if (_is_pressed == true) {
-		Color color = GetBackgroundColor().Brighter(0.4);
+		Color color = GetBackgroundColor().Brighter();
 
 		color.SetAlpha(0x80);
 

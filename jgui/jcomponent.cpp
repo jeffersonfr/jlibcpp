@@ -618,7 +618,11 @@ void Component::PaintBackground(Graphics *g)
 			h = _size.height;
 
 	if (_is_enabled == true) {
-		g->SetColor(_bgcolor);
+		if (_has_focus == true) {
+			g->SetColor(_focus_bgcolor);
+		} else {
+			g->SetColor(_bgcolor);
+		}
 	} else {
 		g->SetColor(_disabled_bgcolor);
 	}
@@ -629,6 +633,16 @@ void Component::PaintBackground(Graphics *g)
 		g->FillBevelRectangle(x, y, w, h);
 	} else {
 		g->FillRectangle(x, y, w, h);
+
+		/*
+		Color light = g->GetColor().Brighter();
+
+		int h1 = h*0.40;
+
+		g->FillRectangle(x, y+h1, w, h-h1);
+		g->SetColor(light);
+		g->FillRectangle(x, y, w, h1);
+		*/
 	}
 }
 

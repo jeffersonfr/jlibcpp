@@ -24,8 +24,9 @@
 
 namespace jgui {
 
-NativeInputManager::NativeInputManager():
-	jgui::InputManager(), jthread::Thread()
+NativeInputManager::NativeInputManager(jgui::Window *window):
+	jgui::InputManager(window),
+	jthread::Thread()
 {
 	jcommon::Object::SetClassName("jgui::NativeInputManager");
 
@@ -39,48 +40,57 @@ NativeInputManager::NativeInputManager():
 	_last_keypress = 0LL;
 	_click_count = 1;
 	_click_delay = 200;
+	_event_buffer = NULL;
 }
 
-NativeInputManager::~NativeInputManager() 
+void NativeInputManager::Restart()
 {
-}
-
-void NativeInputManager::Initialize()
-{
-	jthread::AutoLock lock(&_mutex);
-
-	GFXHandler *handler = ((GFXHandler *)GFXHandler::GetInstance());
-	IDirectFB *engine = ((IDirectFB *)handler->GetGraphicEngine());
-
-	if (engine->CreateInputEventBuffer(engine, DICAPS_ALL, DFB_TRUE, &events) != DFB_OK) {
-		events = NULL;
-	}
+	Release();
 
 	_is_initialized = true;
-}
 
-void NativeInputManager::Restore()
-{
-	if (events != NULL) {
-		return;
+	IDirectFBWindow *native = _window->_window;
+
+	if (native != NULL) {
+		native->CreateEventBuffer(native, &_event_buffer);
+		// native->AttachEventBuffer(native, _event_buffer);
 	}
 
-	Initialize();
+	RegisterKeyListener(_window);
+	RegisterMouseListener(_window);
+
+	_window->_window->RequestFocus(_window->_window);
 
 	Start();
 }
 
 void NativeInputManager::Release()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	_is_initialized = false;
 
-	WaitThread();
+	if (IsRunning() == true) {
+		WaitThread();
+	}
 
-	events->Release(events);
+	jthread::AutoLock lock(&_mutex);
 
-	events = NULL;
+	RemoveKeyListener(_window);
+	RemoveMouseListener(_window);
+
+	IDirectFBWindow *native = _window->_window;
+
+	if (native != NULL) {
+		// native->DetachEventBuffer(native, _event_buffer);
+	}
+	
+	if (_event_buffer != NULL) {
+		_event_buffer->Release(_event_buffer);
+	}
+}
+
+NativeInputManager::~NativeInputManager() 
+{
+	Release();
 }
 
 jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(DFBInputDeviceKeySymbol symbol)
@@ -401,7 +411,7 @@ int NativeInputManager::GetClickDelay()
 
 void NativeInputManager::PostEvent(KeyEvent *event)
 {
-	if (events == NULL) {
+	if (_event_buffer == NULL) {
 		return;
 	}
 
@@ -419,12 +429,12 @@ void NativeInputManager::PostEvent(KeyEvent *event)
 	evt.input.key_id = DIKI_UNKNOWN;
 	evt.input.key_symbol = DIKS_NULL;
 
-	events->PostEvent(events, &evt);
+	_event_buffer->PostEvent(_event_buffer, &evt);
 }
 
 void NativeInputManager::PostEvent(MouseEvent *event)
 {
-	if (events == NULL) {
+	if (_event_buffer == NULL) {
 		return;
 	}
 
@@ -443,50 +453,7 @@ void NativeInputManager::PostEvent(MouseEvent *event)
 	evt.input.buttons = DIBM_LEFT;
 	evt.input.axisabs = 10;
 
-	events->PostEvent(events, &evt);
-}
-
-void NativeInputManager::RegisterKeyListener(KeyListener *listener) 
-{
-	jthread::AutoLock lock(&_mutex);
-
-	std::vector<jgui::KeyListener *>::iterator i = std::find(_key_listeners.begin(), _key_listeners.end(), listener);
-
-	if (i == _key_listeners.end()) {
-		_key_listeners.push_back(listener);
-	}
-
-	Window *w = dynamic_cast<Window *>(listener);
-
-	if (w != NULL) {
-		if (w->_window != NULL) {
-			w->_window->DetachEventBuffer(w->_window, events);
-			w->_window->AttachEventBuffer(w->_window, events);
-		}
-	}
-}
-
-void NativeInputManager::RemoveKeyListener(KeyListener *listener) 
-{
-	jthread::AutoLock lock(&_mutex);
-
-	for (std::vector<jgui::KeyListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
-		jgui::KeyListener *l = (*i);
-
-		if (dynamic_cast<jgui::KeyListener *>(l) == listener) {
-			Window *w = dynamic_cast<Window *>(l);
-
-			if (w != NULL) {
-				if (w->_window != NULL) {
-					w->_window->DetachEventBuffer(w->_window, events);
-				}
-			}
-
-			_key_listeners.erase(i);
-
-			break;
-		}
-	}
+	_event_buffer->PostEvent(_event_buffer, &evt);
 }
 
 void NativeInputManager::DispatchEvent(jcommon::EventObject *event)
@@ -497,10 +464,13 @@ void NativeInputManager::DispatchEvent(jcommon::EventObject *event)
 		return;
 	}
 
-	jgui::KeyEvent *ke = dynamic_cast<jgui::KeyEvent *>(event);
-	jgui::MouseEvent *me = dynamic_cast<jgui::MouseEvent *>(event);
+	if (_is_initialized == false) {
+		return;
+	}
 
-	if (ke != NULL) {
+	jgui::KeyEvent *key_event = dynamic_cast<jgui::KeyEvent *>(event);
+
+	if (key_event != NULL) {
 		if (IsKeyEventsEnabled() == false) {
 			return;
 		}
@@ -509,20 +479,20 @@ void NativeInputManager::DispatchEvent(jcommon::EventObject *event)
 			jgui::KeyListener *kl = (*i);
 
 			if (kl != NULL) {
-				if (ke->GetType() == JKT_PRESSED) {
-					kl->KeyPressed(ke);
-				} else if (ke->GetType() == JKT_RELEASED) {
-					kl->KeyReleased(ke);
-				} else if (ke->GetType() == JKT_TYPED) {
-					kl->KeyTyped(ke);
+				if (key_event->GetType() == JKT_PRESSED) {
+					kl->KeyPressed(key_event);
+				} else if (key_event->GetType() == JKT_RELEASED) {
+					kl->KeyReleased(key_event);
+				} else if (key_event->GetType() == JKT_TYPED) {
+					kl->KeyTyped(key_event);
 				}
-
-				break;
 			}
 		}
 	}
 
-	if (me != NULL) {
+	jgui::MouseEvent *mouse_event = dynamic_cast<jgui::MouseEvent *>(event);
+
+	if (mouse_event != NULL) {
 		if (IsMouseEventsEnabled() == false) {
 			return;
 		}
@@ -531,17 +501,15 @@ void NativeInputManager::DispatchEvent(jcommon::EventObject *event)
 			jgui::MouseListener *ml = (*i);
 
 			if (ml != NULL) {
-				if (me->GetType() == JMT_PRESSED) {
-					ml->MousePressed(me);
-				} else if (me->GetType() == JMT_RELEASED) {
-					ml->MouseReleased(me);
-				} else if (me->GetType() == JMT_MOVED) {
-					ml->MouseMoved(me);
-				} else if (me->GetType() == JMT_ROTATED) {
-					ml->MouseWheel(me);
+				if (mouse_event->GetType() == JMT_PRESSED) {
+					ml->MousePressed(mouse_event);
+				} else if (mouse_event->GetType() == JMT_RELEASED) {
+					ml->MouseReleased(mouse_event);
+				} else if (mouse_event->GetType() == JMT_MOVED) {
+					ml->MouseMoved(mouse_event);
+				} else if (mouse_event->GetType() == JMT_ROTATED) {
+					ml->MouseWheel(mouse_event);
 				}
-
-				break;
 			}
 		}
 	}
@@ -549,56 +517,41 @@ void NativeInputManager::DispatchEvent(jcommon::EventObject *event)
 	delete event;
 }
 
-void NativeInputManager::RegisterMouseListener(MouseListener *listener) 
+void NativeInputManager::ProcessWindowEvent(DFBWindowEvent event)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	std::vector<jgui::MouseListener *>::iterator i = std::find(_mouse_listeners.begin(), _mouse_listeners.end(), listener);
+	if (event.type == DWET_ENTER || event.type == DWET_LEAVE) {
+		std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
+		Window *window = NULL;
 
-	if (i == _mouse_listeners.end()) {
-		_mouse_listeners.push_back(listener);
-	}
+		for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
+			IDirectFBWindow *native = (*i)->_window;
+			DFBWindowID id;
 
-	Window *w = dynamic_cast<Window *>(listener);
+			if (native != NULL) {
+				native->GetID(native, &id);
 
-	if (w != NULL) {
-		if (w->_window != NULL) {
-			w->_window->DetachEventBuffer(w->_window, events);
-			w->_window->AttachEventBuffer(w->_window, events);
-		}
-	}
-}
+				if (event.window_id == id) {
+					window = (*i);
 
-void NativeInputManager::RemoveMouseListener(MouseListener *listener) 
-{
-	jthread::AutoLock lock(&_mutex);
-
-	for (std::vector<jgui::MouseListener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
-		jgui::MouseListener *l = (*i);
-
-		if (dynamic_cast<jgui::MouseListener *>(l) == listener) {
-			Window *w = dynamic_cast<Window *>(l);
-
-			if (w != NULL) {
-				if (w->_window != NULL) {
-					w->_window->DetachEventBuffer(w->_window, events);
+					break;
 				}
 			}
-
-			_mouse_listeners.erase(i);
-
-			break;
 		}
-	}
-}
 
-void NativeInputManager::ProcessInputEvent(DFBInputEvent event)
-{
-	jthread::AutoLock lock(&_mutex);
+		if (window != NULL) {
+			if (event.type == DWET_ENTER) {
+				GFXHandler::GetInstance()->SetCursor(window->GetCursor());
 
-	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
+				window->DispatchWindowEvent(new WindowEvent(window, JWET_ENTERED));
+			} else if (event.type == DWET_LEAVE) {
+				GFXHandler::GetInstance()->SetCursor(JCS_DEFAULT);
 
-	if (event.type == DIET_KEYPRESS || event.type == DIET_KEYRELEASE) {
+				window->DispatchWindowEvent(new WindowEvent(window, JWET_LEAVED));
+			}
+		}
+	} else if (event.type == DWET_KEYDOWN || event.type == DWET_KEYUP) {
 		jkeyevent_type_t type;
 		jkeyevent_modifiers_t mod;
 
@@ -624,9 +577,9 @@ void NativeInputManager::ProcessInputEvent(DFBInputEvent event)
 
 		type = (jkeyevent_type_t)(0);
 
-		if (event.type == DIET_KEYPRESS) {
+		if (event.type == DWET_KEYDOWN) {
 			type = JKT_PRESSED;
-		} else if (event.type == DIET_KEYRELEASE) {
+		} else if (event.type == DWET_KEYUP) {
 			type = JKT_RELEASED;
 		}
 
@@ -635,47 +588,33 @@ void NativeInputManager::ProcessInputEvent(DFBInputEvent event)
 
 			DispatchEvent(new KeyEvent(this, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
 		}
-	} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE || event.type == DIET_AXISMOTION) {
+	} else if (event.type == DWET_BUTTONDOWN || event.type == DWET_BUTTONUP || event.type == DWET_WHEEL || event.type == DWET_MOTION) {
 		int mouse_z = 0;
 		jmouseevent_button_t button = JMB_UNKNOWN;
 		jmouseevent_button_t buttons = JMB_UNKNOWN;
 		jmouseevent_type_t type = JMT_UNKNOWN;
 
-		if (event.type == DIET_AXISMOTION) {
-			if (event.flags & DIEF_AXISABS) {
-				if (event.axis == DIAI_X) {
-					type = JMT_MOVED;
-					_mouse_x = event.axisabs;
-				} else if (event.axis == DIAI_Y) {
-					type = JMT_MOVED;
-					_mouse_y = event.axisabs;
-				} else if (event.axis == DIAI_Z) {
-					button = JMB_WHEEL;
-					type = JMT_ROTATED;
-					mouse_z = event.axisabs;
-				}
-			} else if (event.flags & DIEF_AXISREL) {
-				if (event.axis == DIAI_X) {
-					type = JMT_MOVED;
-					_mouse_x += event.axisrel;
-				} else if (event.axis == DIAI_Y) {
-					type = JMT_MOVED;
-					_mouse_y += event.axisrel;
-				} else if (event.axis == DIAI_Z) {
-					button = JMB_WHEEL;
-					type = JMT_ROTATED;
-					mouse_z += event.axisrel;
-				}
-			}
-
-			_mouse_x = CLAMP(_mouse_x, 0, screen.width-1);
-			_mouse_y = CLAMP(_mouse_y, 0, screen.height-1);
-			// mouse_z = CLAMP(mouse_z, 0, wheel - 1);
-		} else if (event.type == DIET_BUTTONPRESS || event.type == DIET_BUTTONRELEASE) {
-			if (event.type == DIET_BUTTONPRESS) {
+		_mouse_x = event.cx;
+		_mouse_y = event.cy;
+			
+		if (event.type == DWET_MOTION) {
+			type = JMT_MOVED;
+		} else if (event.type == DWET_WHEEL) {
+			type = JMT_ROTATED;
+			mouse_z = event.step;
+		} else if (event.type == DWET_BUTTONDOWN || event.type == DWET_BUTTONUP) {
+			if (event.type == DWET_BUTTONDOWN) {
 				type = JMT_PRESSED;
-			} else if (event.type == DIET_BUTTONRELEASE) {
+
+				if (_window->_window != NULL) {
+					_window->_window->GrabPointer(_window->_window);
+				}
+			} else if (event.type == DWET_BUTTONUP) {
 				type = JMT_RELEASED;
+
+				if (_window->_window != NULL) {
+					_window->_window->UngrabPointer(_window->_window);
+				}
 			}
 
 			if (event.button == DIBI_LEFT) {
@@ -720,72 +659,19 @@ void NativeInputManager::ProcessInputEvent(DFBInputEvent event)
 	}
 }
 
-void NativeInputManager::ProcessWindowEvent(DFBWindowEvent event)
-{
-	jthread::AutoLock lock(&_mutex);
-
-	if (event.type == DWET_ENTER || event.type == DWET_LEAVE) {
-		std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
-		Window *window = NULL;
-
-		for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
-			IDirectFBWindow *native = (*i)->_window;
-			DFBWindowID id;
-
-			if (native != NULL) {
-				native->GetID(native, &id);
-
-				if (event.window_id == id) {
-					window = (*i);
-
-					break;
-				}
-			}
-		}
-
-		if (window != NULL) {
-			if (event.type == DWET_ENTER) {
-				GFXHandler::GetInstance()->SetCursor(window->GetCursor());
-
-				window->DispatchWindowEvent(new WindowEvent(window, JWET_ENTERED));
-			} else if (event.type == DWET_LEAVE) {
-				GFXHandler::GetInstance()->SetCursor(JCS_DEFAULT);
-
-				window->DispatchWindowEvent(new WindowEvent(window, JWET_LEAVED));
-			}
-		}
-	}
-}
-
 void NativeInputManager::Run()
 {
-	if (events == NULL) {
+	if (_event_buffer == NULL) {
 		return;
 	}
 
 	while (_is_initialized == true) {
-		events->WaitForEventWithTimeout(events, 0, 100);
+		_event_buffer->WaitForEventWithTimeout(_event_buffer, 0, 100);
 
-		while (events->HasEvent(events) == DFB_OK) {
-			DFBInputEvent ievent;
+		DFBWindowEvent event;
 
-			events->PeekEvent(events, DFB_EVENT(&ievent));
-
-			if (ievent.clazz == DFEC_INPUT) {
-				DFBInputEvent event;
-
-				events->GetEvent(events, DFB_EVENT(&event));
-
-				ProcessInputEvent(event);
-			} else if (ievent.clazz == DFEC_WINDOW) {
-				DFBWindowEvent event;
-
-				events->GetEvent(events, DFB_EVENT(&event));
-
-				ProcessWindowEvent(event);
-			} else {
-				events->GetEvent(events, DFB_EVENT(&ievent));
-			}
+		while (_event_buffer->GetEvent(_event_buffer, DFB_EVENT(&event)) == DFB_OK) {
+			ProcessWindowEvent(event);
 		}
 	}
 }

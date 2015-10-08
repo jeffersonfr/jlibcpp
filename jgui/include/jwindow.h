@@ -27,6 +27,7 @@
 #include "jmutex.h"
 #include "jcondition.h"
 #include "jsemaphore.h"
+#include "jinputmanager.h"
 
 #include <stdint.h>
 #include <string.h>
@@ -35,8 +36,8 @@
 #include <directfb.h>
 #elif defined(SDL2_UI)
 #include <SDL2/SDL.h>
-#elif defined(GTK3_UI)
-#include <gtk/gtk.h>
+#elif defined(SFML2_UI)
+#include <SFML/Graphics.hpp>
 #endif
 
 namespace jgui{
@@ -61,17 +62,15 @@ class Window : public jgui::Container{
 
 #if defined(DIRECTFB_UI)
 	friend class NativeInputManager;
-#elif defined(GTK3_UI)
-	friend class NativeInputManager;
-
-	static int OnDestroyEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data);
-	static gboolean OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data);
 #elif defined(SDL2_UI)
 	friend class NativeInputManager;
 	friend class NativeHandler;
 
 	void InternalCreateNativeWindow();
 	void InternalReleaseNativeWindow();
+#elif defined(SFML2_UI)
+	friend class NativeInputManager;
+	friend class NativeHandler;
 #endif
 
 	protected:
@@ -87,13 +86,9 @@ class Window : public jgui::Container{
 		SDL_Window *_window;
 		/** \brief */
 		SDL_Renderer *_surface;
-#elif defined(GTK3_UI)
+#elif defined(SFML2_UI)
 		/** \brief */
-		std::map<std::string, gulong> _event_handlers;
-		/** \brief */
-  	GtkWidget *_window;
-		/** \brief */
-	  GtkWidget *_surface;
+		sf::RenderWindow *_window;
 #endif
 		/** \brief */
 		std::vector<WindowListener *> _window_listeners;
@@ -102,11 +97,11 @@ class Window : public jgui::Container{
 		/** \brief */
 		jthread::Mutex _graphics_mutex;
 		/** \brief */
-		jthread::Mutex _input_mutex;
-		/** \brief */
 		jthread::Condition _window_semaphore;
 		/** \brief */
 		Graphics *_graphics;
+		/** \brief */
+		InputManager *_input_manager;
 		/** \brief */
 		int _opacity;
 		/** \brief */
@@ -115,8 +110,6 @@ class Window : public jgui::Container{
 		jcursor_style_t _cursor;
 		/** \brief */
 		jwindow_rotation_t _rotation;
-		/** \brief */
-		bool _is_input_enabled;
 		/** \brief */
 		bool _is_fullscreen;
 		/** \brief */
@@ -171,6 +164,12 @@ class Window : public jgui::Container{
 		 *
 		 */
 		virtual Graphics * GetGraphics();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual InputManager * GetInputManager();
 
 		/**
 		 * \brief
@@ -255,18 +254,6 @@ class Window : public jgui::Container{
 		 *
 		 */
 		virtual int GetOpacity();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetInputEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsInputEnabled();
 		
 		/**
 		 * \brief

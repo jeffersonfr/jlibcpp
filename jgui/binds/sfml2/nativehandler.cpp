@@ -19,12 +19,18 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "nativehandler.h"
-#include "jimage.h"
-#include "jruntimeexception.h"
-#include "jproperties.h"
+#include "nativetypes.h"
+#include "nativeimage.h"
+#include "nativegraphics.h"
 #include "jfont.h"
-#include "jwindowmanager.h"
+#include "jimage.h"
 #include "jinputmanager.h"
+#include "jwindowmanager.h"
+#include "jproperties.h"
+#include "jruntimeexception.h"
+
+#include <SFML/Graphics.hpp>
+#include <X11/Xlib.h>
 
 namespace jgui {
 
@@ -34,7 +40,8 @@ NativeHandler::NativeHandler():
 	jcommon::Object::SetClassName("jgui::NativeHandler");
 
 	_cursor = JCS_DEFAULT;
-	_is_cursor_enabled = true;
+
+	XInitThreads();
 }
 
 NativeHandler::~NativeHandler()
@@ -45,12 +52,10 @@ void NativeHandler::InitEngine()
 {
 	GenericHandler::InitEngine();
 
-  gtk_init(NULL, NULL);
+	sf::VideoMode display = sf::VideoMode::getDesktopMode();
 
-	GdkScreen *screen = gdk_screen_get_default();
-
-	_screen.width = gdk_screen_get_width(screen);
-	_screen.height = gdk_screen_get_height(screen);
+	_screen.width = display.width;
+	_screen.height = display.height;
 }
 
 void NativeHandler::SetFlickerFilteringEnabled(bool b)
@@ -64,12 +69,11 @@ bool NativeHandler::IsFlickerFilteringEnabled()
 
 void NativeHandler::SetCursorEnabled(bool b)
 {
-	_is_cursor_enabled = b;
 }
 
 bool NativeHandler::IsCursorEnabled()
 {
-	return _is_cursor_enabled;
+	return true;
 }
 
 void NativeHandler::SetCursor(jcursor_style_t t)
@@ -88,6 +92,50 @@ void NativeHandler::SetCursor(Image *shape, int hotx, int hoty)
 	if ((void *)shape == NULL) {
 		return;
 	}
+
+	uint32_t *data = NULL;
+
+	/*
+	jsize_t t = shape->GetSize();
+	
+	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
+
+	if (data == NULL) {
+		return;
+	}
+
+	SDL_Surface *surface = NULL;
+	uint32_t rmask = 0x000000ff;
+	uint32_t gmask = 0x0000ff00;
+	uint32_t bmask = 0x00ff0000;
+	uint32_t amask = 0xff000000;
+
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+	rmask = 0xff000000;
+	gmask = 0x00ff0000;
+	bmask = 0x0000ff00;
+	amask = 0x000000ff;
+#endif
+
+	surface = SDL_CreateRGBSurfaceFrom(data, t.width, t.height, 32, t.width*4, rmask, gmask, bmask, amask);
+
+	if (surface == NULL) {
+		delete [] data;
+
+		return;
+	}
+
+	SDL_Cursor *cursor = SDL_CreateColorCursor(surface, hotx, hoty);
+
+	if (cursor != NULL) {
+		SDL_SetCursor(cursor);
+		// SDL_FreeCursor(cursor);
+	}
+
+	SDL_FreeSurface(surface);
+	*/
+
+	delete [] data;
 }
 
 void NativeHandler::InitResources()
@@ -96,6 +144,42 @@ void NativeHandler::InitResources()
 
 void NativeHandler::InitCursors()
 {
+#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
+	t.cursor = Image::CreateImage(JPF_ARGB, w, h);												\
+																																				\
+	t.hot_x = hotx;																												\
+	t.hot_y = hoty;																												\
+																																				\
+	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
+																																				\
+	_cursors[type] = t;																										\
+
+	struct cursor_params_t t;
+	int w = 30,
+			h = 30;
+
+	Image *cursors = Image::CreateImage(_DATA_PREFIX"/images/cursors.png");
+
+	CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
+	CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
+	CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
+	CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
+	CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
+	CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
+	CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
+	CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
+	CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
+	CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
+	CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
+	CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
+	CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
+	CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
+	CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
+	CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
+	
+	delete cursors;
+
+	SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
 }
 
 void * NativeHandler::GetGraphicEngine()
@@ -105,7 +189,7 @@ void * NativeHandler::GetGraphicEngine()
 
 std::string NativeHandler::GetEngineID()
 {
-	return "gtk5";
+	return "sdl2";
 }
 
 void NativeHandler::SetCursorLocation(int x, int y)
@@ -125,6 +209,8 @@ void NativeHandler::SetCursorLocation(int x, int y)
 	if (y > _screen.height) {
 		y = _screen.height;
 	}
+
+	// SDL_WarpMouseInWindow(NULL, x, y);
 }
 
 jpoint_t NativeHandler::GetCursorLocation()
@@ -133,6 +219,8 @@ jpoint_t NativeHandler::GetCursorLocation()
 
 	p.x = 0;
 	p.y = 0;
+
+	// SDL_GetMouseState(&p.x, &p.y);
 
 	return p;
 }
@@ -154,22 +242,17 @@ void NativeHandler::Restore()
 	
 	// INFO:: restoring windows
 	WindowManager::GetInstance()->Restore();
-
-	// INFO:: restoring input events
-	InputManager::GetInstance()->Restore();
 }
 
 void NativeHandler::Release()
 {
-	GenericHandler::Release();
+	GenericHandler::InitEngine();
 
 	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
 		delete i->second.cursor;
 	}
 
 	_cursors.clear();
-
-	InputManager::GetInstance()->Release();
 
 	// INFO:: release windows
 	WindowManager::GetInstance()->Release();

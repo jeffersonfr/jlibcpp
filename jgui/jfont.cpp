@@ -26,9 +26,9 @@
 
 #if defined(DIRECTFB_UI)
 #include "nativefont.h"
-#elif defined(GTK3_UI)
-#include "nativefont.h"
 #elif defined(SDL2_UI)
+#include "nativefont.h"
+#elif defined(SFML2_UI)
 #include "nativefont.h"
 #endif
 
@@ -74,9 +74,9 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int siz
 	try {
 #if defined(DIRECTFB_UI)
 		font = new NativeFont(name, attributes, size);
-#elif defined(GTK3_UI)
-		font = new NativeFont(name, attributes, size);
 #elif defined(SDL2_UI)
+		font = new NativeFont(name, attributes, size);
+#elif defined(SFML2_UI)
 		font = new NativeFont(name, attributes, size);
 #endif
 	} catch (jcommon::NullPointerException &) {

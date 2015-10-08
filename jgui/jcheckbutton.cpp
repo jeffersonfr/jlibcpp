@@ -248,7 +248,11 @@ void CheckButton::Paint(Graphics *g)
 	}
 	*/
 
-	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
+	if (_has_focus == true) {
+		g->SetColor(_focus_fgcolor);
+	} else {
+		g->SetColor(_fgcolor);
+	}
 
 	if (_type == JCBT_CHECK) {
 		g->FillRectangle(cx, cy, cw, ch);
@@ -257,7 +261,11 @@ void CheckButton::Paint(Graphics *g)
 	}
 
 	if (_checked == true) {
-		g->SetColor(0x00, 0x00, 0x00, 0xff);
+		if (_has_focus == true) {
+			g->SetColor(_fgcolor);
+		} else {
+			g->SetColor(_focus_fgcolor);
+		}
 
 		if (_type == JCBT_CHECK) {
 			g->FillRectangle(cx+4, cy+4, cw-8, ch-8);

@@ -1194,6 +1194,7 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		 *
 		 */
 		virtual void PaintBackground(Graphics *g);
+		
 		/**
 		 * \brief
 		 *

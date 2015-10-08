@@ -156,7 +156,7 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 };
 
-int main( int argc, char *argv[] )
+int main(int argc, char *argv[])
 {
 	WatchTeste test;
 

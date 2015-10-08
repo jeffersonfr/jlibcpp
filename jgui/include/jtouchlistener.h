@@ -17,162 +17,59 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVEHANDLER_H
-#define J_NATIVEHANDLER_H
+#ifndef J_TOUCHLISTENER_H
+#define J_TOUCHLISTENER_H
 
-#include "generichandler.h"
+#include "jtouchevent.h"
+#include "jlistener.h"
 
-#include <gtk/gtk.h>
-
-namespace jgui{
+namespace jgui {
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class NativeHandler : public GenericHandler{
+class TouchListener : public jcommon::Listener{
 
 	private:
-		/** \brief */
-		bool _is_cursor_enabled;
-
-	private:
-		/** \brief */
-		struct cursor_params_t {
-			Image *cursor;
-			int hot_x;
-			int hot_y;
-		};
-
-		/** \brief */
-		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NativeHandler();
+		TouchListener();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~NativeHandler();
+		virtual ~TouchListener();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void InitEngine();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InitCursors();
+		virtual bool FingerPressed(TouchEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void InitResources();
+		virtual bool FingerReleased(TouchEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual std::string GetEngineID();
+		virtual bool FingerMoved(TouchEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void * GetGraphicEngine();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t GetCursorLocation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorLocation(int x, int y);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetFlickerFilteringEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsFlickerFilteringEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsCursorEnabled();
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(jcursor_style_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursor(Image *shape, int hotx, int hoty);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Restore();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Release();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Suspend();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Resume();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitIdle();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitSync();
+		virtual bool GesturePerformed(TouchEvent *event);
 
 };
 

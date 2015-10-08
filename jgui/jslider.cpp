@@ -236,9 +236,6 @@ void Slider::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	Color color = _scrollbar_color,
-				bar = color.Darker(0.2);
-
 	int x = _vertical_gap-_border_size,
 			y = _horizontal_gap-_border_size,
 			w = _size.width-2*x,
@@ -251,9 +248,13 @@ void Slider::Paint(Graphics *g)
 			d = w-_stone_size;
 		}
 
-		g->SetColor(bar);
+		if (_has_focus == true) {
+			g->SetColor(_focus_fgcolor);
+		} else {
+			g->SetColor(_scrollbar_color);
+		}
+		
 		g->FillRectangle(x, (h-4)/2+y, w, 4);
-		g->SetColor(color);
 
 		if (_inverted == false) {
 			jgui::jpoint_t p[] = {
@@ -283,9 +284,13 @@ void Slider::Paint(Graphics *g)
 			d = h-_stone_size;
 		}
 
-		g->SetColor(bar);
+		if (_has_focus == true) {
+			g->SetColor(_focus_fgcolor);
+		} else {
+			g->SetColor(_scrollbar_color);
+		}
+		
 		g->FillRectangle((w-10)/2+x, y, 10, h);
-		g->SetColor(color);
 
 		if (_inverted == false) {
 			jgui::jpoint_t p[] = {

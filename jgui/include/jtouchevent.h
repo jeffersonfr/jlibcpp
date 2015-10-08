@@ -17,10 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_MOUSEEVENT_H
-#define J_MOUSEEVENT_H
+#ifndef J_TOUCHEVENT_H
+#define J_TOUCHEVENT_H
 
 #include "jeventobject.h"
+#include "jgraphics.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -38,24 +39,12 @@ namespace jgui {
  * \brief
  *
  */
-enum jmouseevent_type_t {
-	JMT_UNKNOWN,
-	JMT_PRESSED,
-	JMT_RELEASED,
-	JMT_MOVED,
-	JMT_ROTATED
-};
-
-/**
- * \brief
- *
- */
-enum jmouseevent_button_t {
-	JMB_UNKNOWN = 0x00,
-	JMB_BUTTON1 = 0x01,
-	JMB_BUTTON2 = 0x02,
-	JMB_BUTTON3 = 0x04,
-	JMB_WHEEL		= 0x08
+enum jtouchevent_type_t {
+	JTT_UNKNOWN,
+	JTT_FINGER_MOTION,
+	JTT_FINGER_UP,
+	JTT_FINGER_DOWN,
+	JTT_GESTURE
 };
 
 /**
@@ -63,76 +52,84 @@ enum jmouseevent_button_t {
  *
  * \author Jeff Ferr
  */
-class MouseEvent : public jcommon::EventObject{
+class TouchEvent : public jcommon::EventObject{
 
 	private:
-		int _x;
-		int _y;
-		int _click_count;
-		jmouseevent_button_t _button;
-		jmouseevent_button_t _buttons;
-		jmouseevent_type_t _type;
+		jpoint_t _location;
+		jpoint_t _distance;
+		double _pressure;
+		double _delta;
+		double _radians;
+		int _finger_index;
+		int _fingers;
+		jtouchevent_type_t _type;
 
 	public:
 		/**
-		 * \brief
+		 * \brief Touch event;
 		 *
 		 */
-		MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button_t button, jmouseevent_button_t buttons, int click_count, int x, int y);
+		TouchEvent(void *source, jtouchevent_type_t type, jpoint_t location, jpoint_t distance, double pressure, int finger_index);
+		
+		/**
+		 * \brief Gesture event;
+		 *
+		 */
+		TouchEvent(void *source, jtouchevent_type_t type, jpoint_t distance, double radians, double delta, int fingers);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~MouseEvent();
+		virtual ~TouchEvent();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jmouseevent_type_t GetType();
+		virtual jtouchevent_type_t GetType();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetClickCount();
+		virtual int GetFingerIndex();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jmouseevent_button_t GetButton();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jmouseevent_button_t GetButtons();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetX();
+		virtual jpoint_t GetLocation();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetY();
+		virtual jpoint_t GetDistance();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetX(int x);
-		
+		virtual double GetPressure();
+
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetY(int y);
+		virtual double GetAngle();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual double GetDelta();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual double GetFingers();
 
 };
 

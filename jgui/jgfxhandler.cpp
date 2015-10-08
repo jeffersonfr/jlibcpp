@@ -28,9 +28,9 @@
 
 #if defined(DIRECTFB_UI)
 #include "nativehandler.h"
-#elif defined(GTK3_UI)
-#include "nativehandler.h"
 #elif defined(SDL2_UI)
+#include "nativehandler.h"
+#elif defined(SFML2_UI)
 #include "nativehandler.h"
 #endif
 
@@ -67,7 +67,7 @@ GFXHandler * GFXHandler::GetInstance()
 		} catch (...) {
 			_instance = NULL;
 		}
-#elif defined(GTK3_UI)
+#elif defined(SDL2_UI)
 		NativeHandler *handler = NULL;
 		
 		try {
@@ -79,9 +79,7 @@ GFXHandler * GFXHandler::GetInstance()
 		} catch (...) {
 			_instance = NULL;
 		}
-#elif defined(SDL2_UI)
-		jgui::InputManager::GetInstance();
-	
+#elif defined(SFML2_UI)
 		NativeHandler *handler = NULL;
 		
 		try {

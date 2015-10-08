@@ -80,9 +80,6 @@ void ComboBox::SetVisibleItems(int max_items)
 	}
 
 	_menu = menu;
-	
-	InputManager::GetInstance()->RemoveKeyListener(_menu);
-	InputManager::GetInstance()->RemoveMouseListener(_menu);
 }
 
 bool ComboBox::MousePressed(MouseEvent *event)
@@ -106,14 +103,15 @@ bool ComboBox::MousePressed(MouseEvent *event)
 
 		if (x1 > (x+w-arrow_size-2) && x1 < (x+w-2) && y1 > (y) && y1 < (y+h)) {
 			if (_parent != NULL) {
-				InputManager::GetInstance()->RegisterKeyListener(_menu);
-				InputManager::GetInstance()->RegisterMouseListener(_menu);
-
 				Container *root = GetTopLevelAncestor();
 				jpoint_t p = GetAbsoluteLocation();
 
 				_menu->SetBounds(root->GetX()+p.x, root->GetY()+p.y+GetHeight(), GetWidth(), _menu->GetHeight());
+				
 				_menu->Show();
+				
+				_menu->GetInputManager()->RegisterKeyListener(_menu);
+				_menu->GetInputManager()->RegisterMouseListener(_menu);
 			}
 		}
 	
@@ -160,14 +158,15 @@ bool ComboBox::KeyPressed(KeyEvent *event)
 
 	if (event->GetSymbol() == JKS_ENTER) {
 		if (_parent != NULL) {
-			InputManager::GetInstance()->RegisterKeyListener(_menu);
-			InputManager::GetInstance()->RegisterMouseListener(_menu);
-
 			Container *root = GetTopLevelAncestor();
 			jpoint_t p = GetAbsoluteLocation();
 
 			_menu->SetBounds(root->GetX()+p.x, root->GetY()+p.y+GetHeight(), GetWidth(), _menu->GetHeight());
+			
 			_menu->Show();
+			
+			_menu->GetInputManager()->RegisterKeyListener(_menu);
+			_menu->GetInputManager()->RegisterMouseListener(_menu);
 		}
 	
 		catched = true;
@@ -371,7 +370,12 @@ void ComboBox::Paint(Graphics *g)
 			}
 		}
 
-		g->SetColor(0x80, 0x80, 0xe0, 0xff);
+		if (_has_focus == true) {
+			g->SetColor(_focus_fgcolor);
+		} else {
+			g->SetColor(_fgcolor);
+		}
+
 		g->FillTriangle(dx, dy, dx+arrow_size, dy, dx+arrow_size/2, dy+arrow_size/2);
 
 		Item *item = GetCurrentItem();

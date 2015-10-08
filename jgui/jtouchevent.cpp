@@ -18,78 +18,84 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "nativegraphics.h"
-
-#include <gtk/gtk.h>
-
-#define M_2PI	(2*M_PI)
+#include "jtouchevent.h"
 
 namespace jgui {
 
-NativeGraphics::NativeGraphics(void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp):
-	GenericGraphics(surface, cairo_context, pixelformat, wp, hp)
+
+TouchEvent::TouchEvent(void *source, jtouchevent_type_t type, jpoint_t location, jpoint_t distance, double pressure, int finger_index):
+	jcommon::EventObject(source)
 {
-	jcommon::Object::SetClassName("jgui::NativeGraphics");
-}
-
-NativeGraphics::~NativeGraphics()
-{
-}
-
-void NativeGraphics::SetNativeSurface(void *data, int wp, int hp)
-{
-	_surface = data;
-
-	cairo_destroy(_cairo_context);
-
-	_cairo_context = NULL;
-
-	if (_surface != NULL) {
-		// SDL_Renderer *surface = (SDL_Renderer *)_surface;
-
-		// GetRenderGetLogicalSize(surface, &wp, &hp);
-		// GetRendererOutputSize(surface, &wp, &hp);
-
-		cairo_surface_t *cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wp, hp);
-
-		_cairo_context = cairo_create(cairo_surface);
-	
-		// cairo_surface_destroy(cairo_surface);
-	}
-}
-
-void NativeGraphics::Flip()
-{
-	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
-
-	if (cairo_surface == NULL) {
-		return;
-	}
-
-	cairo_surface_flush(cairo_surface);
-
-	if (_surface != NULL) {
-		gtk_widget_queue_draw((GtkWidget *)_surface);
+	jcommon::Object::SetClassName("jgui::TouchEvent");
 		
-		// _gtk_sem.Wait();
-	}
+	_type = type;
+	_location = location;
+	_distance = distance;
+	_pressure = pressure;
+	_delta = 0.0;
+	_radians = 0.0;
+	_finger_index = finger_index;
+	_fingers = -1;
 }
 
-void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
+TouchEvent::TouchEvent(void *source, jtouchevent_type_t type, jpoint_t distance, double radians, double delta, int fingers):
+	jcommon::EventObject(source)
 {
-	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
-
-	if (cairo_surface == NULL) {
-		return;
-	}
-
-	cairo_surface_flush(cairo_surface);
-
-	if (_surface != NULL) {
-		gtk_widget_queue_draw((GtkWidget *)_surface);
+	jcommon::Object::SetClassName("jgui::TouchEvent");
 	
-		// _gtk_sem.Wait();
-	}
+	_type = type;
+	// _location = location;
+	_distance = distance;
+	_pressure = 0.0;
+	_delta = delta;
+	_radians = radians;
+	_finger_index = -1;
+	_fingers = fingers;
+}
+
+TouchEvent::~TouchEvent()
+{
+}
+
+jtouchevent_type_t TouchEvent::GetType()
+{
+	return _type;
+}
+
+int TouchEvent::GetFingerIndex()
+{
+	return _finger_index;
+}
+
+jpoint_t TouchEvent::GetLocation()
+{
+	return _location;
+}
+
+jpoint_t TouchEvent::GetDistance()
+{
+	return _distance;
+}
+
+double TouchEvent::GetPressure()
+{
+	return _pressure;
+}
+
+double TouchEvent::GetAngle()
+{
+	return _radians;
+}
+
+double TouchEvent::GetDelta()
+{
+	return _delta;
+}
+
+double TouchEvent::GetFingers()
+{
+	return _fingers;
 }
 
 }
+

@@ -17,59 +17,21 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_NATIVEGRAPHICS_H
-#define J_NATIVEGRAPHICS_H
+#ifndef J_NATIVETYPES_H
+#define J_NATIVETYPES_H
 
-#include "genericgraphics.h"
-#include "jsemaphore.h"
+#define USER_NATIVE_EVENT_ENGINE_INIT			1010
+#define USER_NATIVE_EVENT_ENGINE_RELEASE	1020
+#define USER_NATIVE_EVENT_WINDOW_CREATE		1030
+#define USER_NATIVE_EVENT_WINDOW_RELEASE	1040
+#define USER_NATIVE_EVENT_WINDOW_REPAINT	1050
 
-namespace jgui{
-
-/**
- * \brief
- *
- * \author Jeff Ferr
- */
-class NativeGraphics : public GenericGraphics{
-
-	public:
-		/** \brief */
-		jthread::Semaphore _gtk_sem;
-
-	public:
-		/**
-		 * \brief
-		 *
-		 */
-		NativeGraphics(void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~NativeGraphics();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetNativeSurface(void *data, int wp, int hp);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Flip();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Flip(int x, int y, int w, int h);
-
+struct jnative_pointers_t {
+	void *data0;
+	void *data1;
+	void *data2;
+	void *data3;
+	void *data4;
 };
 
-}
-
-#endif 
-
+#endif

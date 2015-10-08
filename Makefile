@@ -339,6 +339,8 @@ OBJS_jgui += \
 		jyesnodialogbox.o\
 		jtabbedpane.o\
 		jtable.o\
+		jtouchevent.o\
+		jtouchlistener.o\
 		jtreelistview.o\
 		jguilib.o\
 

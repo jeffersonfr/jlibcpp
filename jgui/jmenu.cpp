@@ -39,9 +39,11 @@ Menu::Menu(int x, int y, int width, int visible_items):
 		_visible_items = 1;
 	}
 
-	SetSize(width, _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size));
+	SetSize(width, _visible_items*(_item_size+_vertical_gap)+2*_vertical_gap+_border_size);
 
 	_check = Image::CreateImage(_DATA_PREFIX"/images/check.png");
+
+	SetUndecorated(true);
 
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();
 
@@ -212,9 +214,6 @@ bool Menu::KeyPressed(KeyEvent *event)
 						menu = new Menu(x, y, last->GetWidth(), items.size());
 					}
 
-					InputManager::GetInstance()->RemoveKeyListener(menu);
-					InputManager::GetInstance()->RemoveMouseListener(menu);
-
 					for (std::vector<Item *>::iterator i=items.begin(); i!=items.end(); i++) {
 						if ((*i)->IsVisible() == true) {
 							menu->AddItem((*i));
@@ -223,8 +222,11 @@ bool Menu::KeyPressed(KeyEvent *event)
 
 					_menus.push_back(menu);
 
-					menu->SetInputEnabled(false);
+					// INFO:: disable events
 					menu->Show(false);
+
+					menu->GetInputManager()->RemoveKeyListener(menu);
+					menu->GetInputManager()->RemoveMouseListener(menu);
 
 					DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_RIGHT));
 				} else {

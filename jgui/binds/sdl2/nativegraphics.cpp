@@ -37,9 +37,9 @@ NativeGraphics::~NativeGraphics()
 {
 }
 
-void NativeGraphics::SetNativeSurface(void *data, int wp, int hp)
+void NativeGraphics::SetNativeSurface(void *surface, int wp, int hp)
 {
-	_surface = data;
+	_surface = surface;
 
 	cairo_destroy(_cairo_context);
 

@@ -53,7 +53,7 @@ void * Graphics::GetNativeSurface()
 	return NULL;
 }
 
-void Graphics::SetNativeSurface(void *data, int wp, int hp)
+void Graphics::SetNativeSurface(void *surface, int wp, int hp)
 {
 }
 

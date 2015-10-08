@@ -22,12 +22,13 @@
 #include "nativetypes.h"
 #include "nativeimage.h"
 #include "nativegraphics.h"
-#include "jfont.h"
+#include "nativeinputmanager.h"
 #include "jimage.h"
 #include "jinputmanager.h"
 #include "jwindowmanager.h"
 #include "jproperties.h"
 #include "jruntimeexception.h"
+#include "jfont.h"
 
 namespace jgui {
 
@@ -37,6 +38,7 @@ NativeHandler::NativeHandler():
 	jcommon::Object::SetClassName("jgui::NativeHandler");
 
 	_cursor = JCS_DEFAULT;
+	_is_initialized = false;
 }
 
 NativeHandler::~NativeHandler()
@@ -245,36 +247,28 @@ void NativeHandler::Restore()
 	
 	// INFO:: restoring windows
 	WindowManager::GetInstance()->Restore();
-
-	// INFO:: restoring input events
-	InputManager::GetInstance()->Restore();
 }
 
 void NativeHandler::InitEngine()
 {
-	SDL_Event event;
+	if (_is_initialized == true) {
+		return;
+	}
 
-	event.type = USER_NATIVE_EVENT_ENGINE_INIT;
-	event.user.data1 = this;
-	event.user.data2 = &_sdl_sem;
-	
-	SDL_PushEvent(&event);
+	_is_initialized = true;
+
+	Start();
 
 	_sdl_sem.Wait();
 }
 
 void NativeHandler::Release()
 {
-	SDL_Event event;
-	jthread::Semaphore sem;
+	_is_initialized = true;
 
-	event.type = USER_NATIVE_EVENT_ENGINE_RELEASE;
-	event.user.data1 = this;
-	event.user.data2 = &_sdl_sem;
-
-	SDL_PushEvent(&event);
-
-	_sdl_sem.Wait();
+	if (IsRunning() == true) {
+		WaitThread();
+	}
 }
 
 void NativeHandler::CreateWindow(Window *window)
@@ -323,8 +317,6 @@ void NativeHandler::InternalRelease()
 
 	_cursors.clear();
 
-	InputManager::GetInstance()->Release();
-
 	// INFO:: release windows
 	WindowManager::GetInstance()->Release();
 	
@@ -355,6 +347,61 @@ void NativeHandler::WaitIdle()
 
 void NativeHandler::WaitSync()
 {
+}
+
+void NativeHandler::Run()
+{
+	SDL_Event event;
+
+	InternalInitEngine();
+
+	_sdl_sem.Notify();
+
+	while (_is_initialized == true) {
+		while (SDL_PollEvent(&event)) {
+			if (event.type == USER_NATIVE_EVENT_WINDOW_CREATE) {
+				Window *window = (Window *)event.user.data1;
+
+				window->InternalCreateNativeWindow();
+	
+				window->_sdl_sem.Notify();
+			} else if (event.type == USER_NATIVE_EVENT_WINDOW_RELEASE) {
+				Window *window = (Window *)event.user.data1;
+
+				window->InternalReleaseNativeWindow();
+	
+				window->_sdl_sem.Notify();
+			} else if (event.type == USER_NATIVE_EVENT_WINDOW_REPAINT) {
+				NativeGraphics *graphics = (NativeGraphics *)event.user.data1;
+
+				graphics->InternalFlip();
+				
+				graphics->_sdl_sem.Notify();
+			} else {
+				std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
+
+				for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
+					SDL_Window *native = (*i)->_window;
+
+					if (native != NULL) {
+						uint32_t id = SDL_GetWindowID(native);
+
+						if (event.window.windowID == id) {
+							NativeInputManager *input = dynamic_cast<NativeInputManager *>((*i)->GetInputManager());
+							
+							if (input != NULL) {
+								input->ProcessInputEvent(event);
+							}
+
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+				
+	InternalRelease();
 }
 
 }

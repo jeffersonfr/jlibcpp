@@ -262,13 +262,13 @@ class Color : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		Color Darker(double factor);
+		Color Darker();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		Color Brighter(double factor);
+		Color Brighter();
 
 		/**
 		 * \brief

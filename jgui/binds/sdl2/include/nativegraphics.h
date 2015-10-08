@@ -57,7 +57,7 @@ class NativeGraphics : public GenericGraphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetNativeSurface(void *data, int wp, int hp);
+		virtual void SetNativeSurface(void *surface, int wp, int hp);
 
 		/**
 		 * \brief

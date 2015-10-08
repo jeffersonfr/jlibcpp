@@ -306,9 +306,6 @@ void NativeHandler::Restore()
 	
 	// INFO:: restoring windows
 	WindowManager::GetInstance()->Restore();
-
-	// INFO:: restoring input events
-	InputManager::GetInstance()->Restore();
 }
 
 void NativeHandler::Release()
@@ -320,8 +317,6 @@ void NativeHandler::Release()
 	}
 
 	_cursors.clear();
-
-	InputManager::GetInstance()->Release();
 
 	// INFO:: release windows
 	WindowManager::GetInstance()->Release();

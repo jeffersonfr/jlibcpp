@@ -27,16 +27,16 @@
 #if defined(DIRECTFB_UI)
 #include "nativehandler.h"
 #include "nativegraphics.h"
+#include "nativeinputmanager.h"
 #elif defined(SDL2_UI)
 #include "nativehandler.h"
 #include "nativegraphics.h"
+#include "nativeinputmanager.h"
 #include "nativetypes.h"
-#elif defined(GTK3_UI)
+#elif defined(SFML2_UI)
 #include "nativehandler.h"
 #include "nativegraphics.h"
-
-#include <gdk/gdktypes.h>
-#include <gdk/gdkkeysyms-compat.h>
+#include "nativeinputmanager.h"
 #endif
 
 namespace jgui {
@@ -80,15 +80,20 @@ Window::Window(int x, int y, int width, int height):
 	_old_height = _size.height;
 
 #if defined(DIRECTFB_UI)
-	_surface = NULL;
-	_window = NULL;
-	_graphics = NULL;
-#elif defined(GTK3_UI)
+	_input_manager = new NativeInputManager(this);
+
 	_surface = NULL;
 	_window = NULL;
 	_graphics = NULL;
 #elif defined(SDL2_UI)
+	_input_manager = new NativeInputManager(this);
+
 	_surface = NULL;
+	_window = NULL;
+	_graphics = NULL;
+#elif defined(SFML2_UI)
+	_input_manager = new NativeInputManager(this);
+
 	_window = NULL;
 	_graphics = NULL;
 #endif
@@ -97,7 +102,6 @@ Window::Window(int x, int y, int width, int height):
 	_is_undecorated = false;
 	_is_visible = false;
 	_is_fullscreen = false;
-	_is_input_enabled = true;
 	_opacity = 0xff;
 	_cursor = JCS_DEFAULT;
 	_rotation = JWR_NONE;
@@ -118,54 +122,18 @@ Window::Window(int x, int y, int width, int height):
 
 Window::~Window()
 {
+	if (_input_manager != NULL) {
+		delete _input_manager;
+		_input_manager = NULL;
+	}
+
 	Release();
 
 	delete _graphics;
 	_graphics = NULL;
 }
 
-#if defined(GTK3_UI)
-int Window::OnDestroyEvent(GtkWidget *widget, GdkEvent *event, gpointer user_data)
-{
-	Window *window = (Window *)user_data;
-
-	window->Release();
-
-	return TRUE;
-}
-
-gboolean Window::OnDrawEvent(GtkWidget *widget, cairo_t *cr, gpointer user_data)
-{
-	Window *window = reinterpret_cast<Window *>(user_data);
-	NativeGraphics *native = dynamic_cast<NativeGraphics *>(window->GetGraphics());
-
-	window->_graphics_mutex.Lock();
-
-	cairo_t *cairo_context = native->GetCairoContext();
-	cairo_surface_t *cairo_surface = cairo_get_target(cairo_context);
-
-	if (cairo_surface != NULL) {
-		cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-		cairo_set_source_surface(cr, cairo_surface, 0, 0);
-		cairo_paint(cr);
-	}
-		
-	native->_gtk_sem.Notify();
-	
-	window->_graphics_mutex.Unlock();
-
-	/*
-	cairo_set_source_rgb(cr, 0.1, 0.1, 0.1); 
-	cairo_select_font_face(cr, "Purisa", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
-	cairo_set_font_size(cr, 13);
-	cairo_move_to(cr, 20, 30);
-	cairo_show_text(cr, "Most relationships seem so transitory");  
-	cairo_stroke(cr);
-	*/
-
-  return FALSE;
-}
-#elif defined(SDL2_UI)
+#if defined(SDL2_UI)
 void Window::InternalCreateNativeWindow()
 {
 	int flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_BORDERLESS;
@@ -189,6 +157,8 @@ void Window::InternalCreateNativeWindow()
 	if (_is_visible == true) {
 		SDL_ShowWindow(_window);
 	}
+
+	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
 }
 
 void Window::InternalReleaseNativeWindow()
@@ -211,9 +181,6 @@ void Window::InternalReleaseNativeWindow()
 
 void Window::Release()
 {
-	InputManager::GetInstance()->RemoveKeyListener(this);
-	InputManager::GetInstance()->RemoveMouseListener(this);
-
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSING));
 
 	WindowManager::GetInstance()->Remove(this);
@@ -234,12 +201,18 @@ Graphics * Window::GetGraphics()
 	return _graphics;
 }
 
+InputManager * Window::GetInputManager()
+{
+	return _input_manager;
+}
+
 void * Window::GetNativeWindow()
 {
 #if defined(DIRECTFB_UI)
 	return _window;
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
+	return _window;
+#elif defined(SFML2_UI)
 	return _window;
 #endif
 
@@ -249,7 +222,11 @@ void * Window::GetNativeWindow()
 void Window::SetNativeWindow(void *native)
 {
 	if ((void *)native == NULL) {
-		return;
+		throw jcommon::RuntimeException("Native window must be not null");
+	}
+
+	if (_graphics != NULL) {
+		throw jcommon::RuntimeException("This window was already created");
 	}
 
 	_graphics_mutex.Lock();
@@ -270,15 +247,28 @@ void Window::SetNativeWindow(void *native)
 	}
 
 	_window->SetOpacity(_window, _opacity);
-
 #if defined(DIRECTFB_NODEPS_UI)
 	_graphics = new NativeGraphics(_surface, JPF_ARGB, _size.width, _size.height, true);
+	
+	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
 #elif defined(DIRECTFB_NODEPS_UI)
 	_graphics = new NativeGraphics(_surface, NULL, JPF_ARGB, _size.width, _size.height);
+	
+	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
 #endif
 
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
+#elif defined(SFML2_UI)
+	_window = (sf::RenderWindow *)native;
+	
+	sf::Vector2u size = _window->getSize();
+
+	_size.width = size.x;
+	_size.height = size.y;
+	
+	_graphics = new NativeGraphics(_window, NULL, JPF_ARGB, _size.width, _size.height);
+	
+	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
 #endif
 	
 	_graphics_mutex.Unlock();
@@ -305,9 +295,9 @@ void Window::SetFullScreenEnabled(bool b)
 
 	if (_is_fullscreen == false) {
 #if defined(DIRECTFB_UI)
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
-		SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
+		SDL_SetWindowFullscreen(_window, 0);
+#elif defined(SFML2_UI)
 #endif
 
 		_border_size = _old_border_size;
@@ -316,9 +306,9 @@ void Window::SetFullScreenEnabled(bool b)
 		SetBounds(_old_x, _old_y, _old_width, _old_height);
 	} else {
 #if defined(DIRECTFB_UI)
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
-		SDL_SetWindowFullscreen(_window, 0);
+		SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
+#elif defined(SFML2_UI)
 #endif
 
 		jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
@@ -395,24 +385,6 @@ bool Window::IsMoveEnabled()
 bool Window::IsResizeEnabled()
 {
 	return _resize_enabled;
-}
-
-bool Window::IsInputEnabled()
-{
-	return _is_input_enabled;
-}
-
-void Window::SetInputEnabled(bool b)
-{
-	_is_input_enabled = b;
-
-	if (_is_input_enabled == true) {
-		InputManager::GetInstance()->RegisterKeyListener(this);
-		InputManager::GetInstance()->RegisterMouseListener(this);
-	} else {
-		InputManager::GetInstance()->RemoveKeyListener(this);
-		InputManager::GetInstance()->RemoveKeyListener(this);
-	}
 }
 
 void Window::SetCursor(jcursor_style_t t)
@@ -500,37 +472,27 @@ void Window::InternalCreateWindow()
 	
 #if defined(DIRECTFB_NODEPS_UI)
 	_graphics = new NativeGraphics(_surface, JPF_ARGB, _size.width, _size.height, true);
+	
+	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
 #else
 	_graphics = new NativeGraphics(_surface, NULL, JPF_ARGB, _size.width, _size.height);
+	
+	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
 #endif
 
-#elif defined(GTK3_UI)
-  _window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-
-  _surface = gtk_drawing_area_new();
-  gtk_container_add(GTK_CONTAINER(_window), _surface);
- 
- //  gtk_widget_add_events(_window, GDK_BUTTON_PRESS_MASK);
-
-  gtk_widget_set_events(GTK_WIDGET(_window), 
-			GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK | GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
-
-  // gtk_signal_connect (GTK_OBJECT(glarea), "expose_event", GTK_SIGNAL_FUNC(glarea_expose), NULL);
-  g_signal_connect(G_OBJECT(_surface), "draw", G_CALLBACK(OnDrawEvent), this); 
-	g_signal_connect(G_OBJECT(_window), "destroy", G_CALLBACK(OnDestroyEvent), this);
-
-	gtk_container_set_border_width(GTK_CONTAINER(_window), 0);
-	gtk_window_set_decorated(GTK_WINDOW(_window), false);
-	gtk_window_set_position(GTK_WINDOW(_window), GTK_WIN_POS_CENTER);
-  gtk_window_set_default_size(GTK_WINDOW(_window), _size.width, _size.height); 
-
-	_graphics = new NativeGraphics(_surface, NULL, JPF_ARGB, _size.width, _size.height);
-
-  gtk_widget_show_all(_window);
 #elif defined(SDL2_UI)
 	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->CreateWindow(this);
 
 	Repaint();
+#elif defined(SFML2_UI)
+	_window = new sf::RenderWindow(sf::VideoMode(_size.width, _size.height), "");
+
+	// _window->setActive(false);
+	_window->requestFocus();
+
+	_graphics = new NativeGraphics(_window, NULL, JPF_ARGB, _size.width, _size.height);
+
+	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
 #endif
 	
 	SetRotation(_rotation);
@@ -541,13 +503,13 @@ void Window::RaiseToTop()
 #if defined(DIRECTFB_UI)
 	if (_window != NULL) {
 		_window->RaiseToTop(_window);
-		_window->SetStackingClass(_window, DWSC_UPPER);
-
-		WindowManager::GetInstance()->RaiseToTop(this);
+		// _window->SetStackingClass(_window, DWSC_UPPER);
 	}
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
-	SDL_RaiseWindow(_window);
+	if (_window != NULL) {
+		SDL_RaiseWindow(_window);
+	}
+#elif defined(SFML2_UI)
 #endif
 }
 
@@ -556,12 +518,10 @@ void Window::LowerToBottom()
 #if defined(DIRECTFB_UI)
 	if (_window != NULL) {
 		_window->LowerToBottom(_window);
-		_window->SetStackingClass(_window, DWSC_LOWER);
-
-		WindowManager::GetInstance()->LowerToBottom(this);
+		// _window->SetStackingClass(_window, DWSC_LOWER);
 	}
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
+#elif defined(SFML2_UI)
 #endif
 }
 
@@ -574,11 +534,9 @@ void Window::PutAtop(Window *w)
 
 	if (_window != NULL) {
 		_window->PutAtop(_window, w->_window);
-
-		WindowManager::GetInstance()->PutWindowATop(this, w);
 	}
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
+#elif defined(SFML2_UI)
 #endif
 }
 
@@ -591,11 +549,9 @@ void Window::PutBelow(Window *w)
 
 	if (_window != NULL) {
 		_window->PutBelow(_window, w->_window);
-
-		WindowManager::GetInstance()->PutWindowBelow(this, w);
 	}
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
+#elif defined(SFML2_UI)
 #endif
 }
 
@@ -667,10 +623,14 @@ void Window::SetBounds(int x, int y, int width, int height)
 		}
 	
 		_graphics_mutex.Unlock();
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
 		SDL_SetWindowPosition(_window, _location.x, _location.y);
 		SDL_SetWindowSize(_window, _size.width, _size.height);
+#elif defined(SFML2_UI)
+		if (_window != NULL) {
+			_window->setPosition(sf::Vector2i(_location.x, _location.y));
+			_window->setSize(sf::Vector2u(_size.width, _size.height));
+		}
 #endif
 	}
 	
@@ -711,9 +671,12 @@ void Window::SetLocation(int x, int y)
 		}
 		
 		_graphics_mutex.Unlock();
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
 		SDL_SetWindowPosition(_window, _location.x, _location.y);
+#elif defined(SFML2_UI)
+		if (_window != NULL) {
+			_window->setPosition(sf::Vector2i(_location.x, _location.y));
+		}
 #endif
 	}
 	
@@ -858,9 +821,12 @@ void Window::SetSize(int width, int height)
 		}
 	
 		_graphics_mutex.Unlock();
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
 		SDL_SetWindowSize(_window, _size.width, _size.height);
+#elif defined(SFML2_UI)
+		if (_window != NULL) {
+			_window->setSize(sf::Vector2u(_size.width, _size.height));
+		}
 #endif
 	}
 	
@@ -885,20 +851,21 @@ void Window::Move(int x, int y)
 		_location.x = _location.x+x;
 		_location.y = _location.y+y;
 
-#if defined(DIRECTFB_UI)
-		int dx = x;
-		int dy = y;
-
-		if (_window != NULL) {
-			while (_window->Move(_window, dx, dy) == DFB_LOCKED);
-		}
-#elif defined(GTK3_UI)
-#elif defined(SDL2_UI)
 		int dx = _location.x;
 		int dy = _location.y;
 
+#if defined(DIRECTFB_UI)
+		if (_window != NULL) {
+			while (_window->MoveTo(_window, dx, dy) == DFB_LOCKED);
+			// while (_window->Move(_window, dx, dy) == DFB_LOCKED);
+		}
+#elif defined(SDL2_UI)
 		if (_window != NULL) {
 			SDL_SetWindowPosition(_window, dx, dy);
+		}
+#elif defined(SFML2_UI)
+		if (_window != NULL) {
+			_window->setPosition(sf::Vector2i(dx, dy));
 		}
 #endif
 	}
@@ -924,8 +891,8 @@ void Window::SetOpacity(int i)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, _opacity);
 	}
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
+#elif defined(SFML2_UI)
 #endif
 }
 
@@ -1065,25 +1032,20 @@ bool Window::Show(bool modal)
 	}
 	
 	SetOpacity(_opacity);
-#elif defined(GTK3_UI)
-	if (_window == NULL) {
-		InternalCreateWindow();
-	}
 #elif defined(SDL2_UI)
 	if (_window == NULL) {
 		InternalCreateWindow();
 	}
+#elif defined(SFML2_UI)
+	if (_window == NULL) {
+		InternalCreateWindow();
+	}
+	
+	_window->setVisible(true);
 #endif
 
 	DoLayout();
 	Repaint();
-
-	if (_is_input_enabled == true) {
-		jthread::AutoLock lock(&_input_mutex);
-
-		InputManager::GetInstance()->RegisterKeyListener(this);
-		InputManager::GetInstance()->RegisterMouseListener(this);
-	}
 
 	if (modal == true) {
 		_window_semaphore.Wait();
@@ -1094,23 +1056,18 @@ bool Window::Show(bool modal)
 
 bool Window::Hide()
 {
-	{
-		jthread::AutoLock lock(&_input_mutex);
-
-		InputManager::GetInstance()->RemoveKeyListener(this);
-		InputManager::GetInstance()->RemoveMouseListener(this);
-	}
-
 	_is_visible = false;
 
 #if defined(DIRECTFB_UI)
 	if (_window != NULL) {
 		_window->SetOpacity(_window, 0x00);
 	}
-#elif defined(GTK3_UI)
-	// SDL_HideWindow(_window);
 #elif defined(SDL2_UI)
 	SDL_HideWindow(_window);
+#elif defined(SFML2_UI)
+	if (_window != NULL) {
+		_window->setVisible(false);
+	}
 #endif
 
 	return true;
@@ -1124,10 +1081,7 @@ void Window::InternalReleaseWindow()
 		delete _graphics;
 		_graphics = NULL;
 	}
-
-	// delete _graphics;
-	// _graphics = NULL;
-
+	
 #if defined(DIRECTFB_UI)
 	if (_window) {
 		_window->SetOpacity(_window, 0x00);
@@ -1146,9 +1100,12 @@ void Window::InternalReleaseWindow()
 
 	_window = NULL;
 	_surface = NULL;
-#elif defined(GTK3_UI)
 #elif defined(SDL2_UI)
 	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->ReleaseWindow(this);
+#elif defined(SFML2_UI)
+	if (_window != NULL) {
+		_window->close();
+	}
 #endif
 }
 
@@ -1175,11 +1132,11 @@ void Window::SetRotation(jwindow_rotation_t t)
 	if (_window != NULL) {
 		_window->SetRotation(_window, rotation);
 	}
-#elif defined(GTK3_UI)
+#elif defined(SDL2_UI)
 	if (rotation != 0) {
 		throw jcommon::RuntimeException("Rotate not implemented");
 	}
-#elif defined(SDL2_UI)
+#elif defined(SFML2_UI)
 	if (rotation != 0) {
 		throw jcommon::RuntimeException("Rotate not implemented");
 	}

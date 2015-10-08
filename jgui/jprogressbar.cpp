@@ -194,8 +194,6 @@ void ProgressBar::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	Color color(0x80, 0x80, 0xe0, 0xff);
-
 	int x = _vertical_gap-_border_size,
 			y = _horizontal_gap-_border_size,
 			w = _size.width-2*x,
@@ -213,7 +211,7 @@ void ProgressBar::Paint(Graphics *g)
 				d = w;
 			}
 
-			g->SetColor(color);
+			g->SetColor(_scrollbar_color);
 			g->FillRectangle(x, y, (int)d, h);
 
 			char t[255];
@@ -232,7 +230,7 @@ void ProgressBar::Paint(Graphics *g)
 				d = h;
 			}
 
-			g->SetColor(color);
+			g->SetColor(_scrollbar_color);
 			g->FillRectangle(x, y, w, (int)d);
 
 			char t[255];
@@ -293,7 +291,7 @@ void ProgressBar::Paint(Graphics *g)
 				_index = 0;
 			}
 
-			g->SetColor(color);
+			g->SetColor(_scrollbar_color);
 			g->FillRectangle(x+_index, y, _stone_size, h);
 		} else if (_type == JSO_VERTICAL) {
 			if (_type == JSO_VERTICAL) {
@@ -309,7 +307,7 @@ void ProgressBar::Paint(Graphics *g)
 					_index = 0;
 				}
 
-				g->SetColor(color);
+				g->SetColor(_scrollbar_color);
 				g->FillRectangle(x, y+_index, w, _stone_size);
 			}
 		}

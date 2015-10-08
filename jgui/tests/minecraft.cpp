@@ -137,7 +137,7 @@ void renderMap()
 {
 	jgui::Graphics *g = screen.GetGraphics();
 	jgui::jsize_t size = screen.GetSize();
-	uint32_t buffer[size.width*size.height];
+	uint32_t *buffer = new uint32_t[size.width*size.height];
 	bool running = true;
 
 	do {
@@ -255,12 +255,13 @@ void renderMap()
 		g->SetRGBArray(buffer, 0, 0, size.width, size.height);
 		g->Flip();
 	} while (running);
+
+	delete [] buffer;
 }
 
 int main( void ) 
 {
-	screen.Show(false);
-
+	screen.Show();
 	makeTextures();
 	makeMap();
 	renderMap();

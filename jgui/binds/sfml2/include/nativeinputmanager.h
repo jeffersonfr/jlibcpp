@@ -26,7 +26,7 @@
 #include <map>
 #include <list>
 
-#include <gtk/gtk.h>
+#include <SFML/Graphics.hpp>
 
 namespace jgui {
 
@@ -38,11 +38,9 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 
 	private:
 		/** \brief */
-		jthread::Mutex _mutex;
+		std::vector<jcommon::EventObject *> _events;
 		/** \brief */
-		std::vector<jcommon::Listener *> _key_listeners;
-		/** \brief */
-		std::vector<jcommon::Listener *> _mouse_listeners;
+		std::map<jmouseevent_button_t, bool> _state_buttons;
 		/** \brief */
 		uint64_t _last_keypress;
 		/** \brief */
@@ -59,31 +57,30 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		bool _is_key_enabled;
 		/** \brief */
 		bool _is_mouse_enabled;
+		/** \brief */
+		jthread::Mutex _events_mutex;
+		/** \brief */
+		jthread::Semaphore _events_sem;
 
 	private:
 		/**
 		 * \brief
 		 *
 		 */
-		static gboolean OnKeyPressEvent(GtkWidget *widget, GdkEventKey *event, gpointer user_data);
+		virtual void AddEvent(jcommon::EventObject *event);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpointer user_data);
-		/**
-		 * \brief
-		 *
-		 */
-		static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpointer user_data);
+		virtual void Run();
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NativeInputManager();
+		NativeInputManager(jgui::Window *window);
 
 		/**
 		 * \brief
@@ -95,7 +92,13 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void Initialize();
+		virtual void Restart();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Release();
 
 		/**
 		 * \brief
@@ -149,50 +152,14 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual jkeyevent_symbol_t TranslateToNativeKeySymbol(guint symbol);
+		virtual jkeyevent_symbol_t TranslateToNativeKeySymbol(sf::Keyboard::Key symbol);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Release();
+		virtual void ProcessInputEvent(sf::Event event);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Restore();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterKeyListener(KeyListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveKeyListener(KeyListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterMouseListener(MouseListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveMouseListener(MouseListener *listener);
-		
 		/**
 		 * \brief
 		 *

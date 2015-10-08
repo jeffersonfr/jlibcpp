@@ -670,26 +670,32 @@ void Color::RGBtoHSB(int red, int green, int blue, double *hue, double *saturati
 	(*brightness) = b;
 }
 
-Color Color::Darker(double factor)
+Color Color::Darker()
 {
-	if (factor < 0.0 || factor > 1.0) {
-		factor = 0.0;
-	}
+	double h, s, b;
+	int r1, g1, b1;
 
-	factor = 1.0 - factor;
+	RGBtoHSB(_red, _green, _blue, &h, &s, &b);
 
-	return Color((int)(_red*factor), (int)(_green*factor), (int)(_blue*factor), _alpha);
+	b = b - 0.10;
+
+	HSBtoRGB(h, s, b, &r1, &g1, &b1);
+
+	return Color(r1, g1, b1);
 }
 
-Color Color::Brighter(double factor)
+Color Color::Brighter()
 {
-	if (factor < 0.0 || factor > 1.0) {
-		factor = 0.0;
-	}
+	double h, s, b;
+	int r1, g1, b1;
 
-	factor = 1.0 + factor;
+	RGBtoHSB(GetRed(), GetGreen(), GetBlue(), &h, &s, &b);
 
-	return Color((int)(_red*factor), (int)(_green*factor), (int)(_blue*factor), _alpha);
+	b = b + 0.10;
+
+	HSBtoRGB(h, s, b, &r1, &g1, &b1);
+
+	return Color(r1, g1, b1);
 }
 
 uint8_t Color::GetRed()

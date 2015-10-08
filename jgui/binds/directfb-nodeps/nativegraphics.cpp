@@ -230,7 +230,7 @@ void NativeGraphics::Clear()
 		return;
 	}
 
-	_surface->Clear(_surface, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
+	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 }
 
 void NativeGraphics::Clear(int xp, int yp, int wp, int hp)
@@ -254,7 +254,7 @@ void NativeGraphics::Clear(int xp, int yp, int wp, int hp)
 
 	_surface->GetSubSurface(_surface, &rect, &sub);
 
-	sub->Clear(sub, _color.GetRed(), _color.GetGreen(), _color.GetBlue(), _color.GetAlpha());
+	sub->Clear(sub, 0x00, 0x00, 0x00, 0x00);
 }
 
 void NativeGraphics::Idle()

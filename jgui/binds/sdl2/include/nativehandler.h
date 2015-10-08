@@ -36,7 +36,7 @@ class NativeInputManager;
  *
  * \author Jeff Ferr
  */
-class NativeHandler : public GenericHandler{
+class NativeHandler : public GenericHandler, public jthread::Thread{
 
 	friend NativeInputManager;
 
@@ -52,6 +52,8 @@ class NativeHandler : public GenericHandler{
 		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 		/** \brief */
 		jthread::Semaphore _sdl_sem;
+		/** \brief */
+		bool _is_initialized;
 
 	private:
 		/**
@@ -209,6 +211,12 @@ class NativeHandler : public GenericHandler{
 		 *
 		 */
 		virtual void WaitSync();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Run();
 
 };
 

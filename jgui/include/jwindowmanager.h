@@ -96,30 +96,6 @@ class WindowManager : public virtual jcommon::Object{
 		 */
 		virtual void Release();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RaiseToTop(Window *c);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void LowerToBottom(Window *c);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PutWindowATop(Window *c, Window *c1);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void PutWindowBelow(Window *c, Window *c1);
-
 };
 
 }

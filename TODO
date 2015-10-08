@@ -2,9 +2,3 @@
 2. gethostbyname is obsolescent, use getnameinfo() instead.
 4. add TreeLock() and TreeUnlock() in jgui/jcomponent
 6. add fonts in themes
-14. (gtk3) cube/newvox apparently are skiping repaints
-15. (gtk3) pacman/rotateimage/signal/som/sort has serious problem with flickering
-16. (gtk3) agenda/phone/teste breaks if another window open
-17. (gtk3) container/events/mhp/stress breaks from a unusual way
-18. (gtk3) stress/tank not working
-20. (sdl2) restore freezes

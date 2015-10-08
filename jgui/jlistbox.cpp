@@ -364,13 +364,13 @@ void ListBox::Paint(Graphics *g)
 			scrollw = (IsScrollableY() == true)?(_scroll_size+_scroll_gap):0;
 	int x = _horizontal_gap+_border_size,
 			y = _vertical_gap+_border_size,
-			w = _size.width-scrollw-2*x;
+			w = _size.width-scrollw-2*_horizontal_gap;
 			// h = _size.height-2*y;
-	int space = 4;
+	int gap = 4;
 
 	for (std::vector<jgui::Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
 		if ((*i)->GetType() == JIT_IMAGE) {
-			space += _item_size + 8;
+			gap += _item_size + 8;
 
 			break;
 		}
@@ -390,9 +390,9 @@ void ListBox::Paint(Graphics *g)
 		Item *item = _items[i];
 
 		if (item->IsEnabled() == true) {
-			g->SetColor(GetItemColor());
+			g->SetColor(_item_color);
 		} else {
-			g->SetColor(GetDisabledItemColor());
+			g->SetColor(_disabled_item_color);
 		}
 
 		if (_index != i) {
@@ -434,9 +434,9 @@ void ListBox::Paint(Graphics *g)
 		if (IsFontSet() == true) {
 			if (_is_enabled == true) {
 				if (_has_focus == true) {
-					g->SetColor(_focus_fgcolor);
+					g->SetColor(_focus_item_fgcolor);
 				} else {
-					g->SetColor(_fgcolor);
+					g->SetColor(_item_fgcolor);
 				}
 			} else {
 				g->SetColor(_disabled_fgcolor);
@@ -445,10 +445,10 @@ void ListBox::Paint(Graphics *g)
 			std::string text = _items[i]->GetValue();
 
 			// if (_wrap == false) {
-				text = _font->TruncateString(text, "...", w-space);
+				text = _font->TruncateString(text, "...", w-gap);
 			// }
 
-			g->DrawString(text, x+space, y+(_item_size+_item_gap)*i, w-space, _item_size, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
+			g->DrawString(text, x+gap, y+(_item_size+_item_gap)*i, w-gap, _item_size, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
 		}
 	}
 }

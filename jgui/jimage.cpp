@@ -26,9 +26,9 @@
 
 #if defined(DIRECTFB_UI)
 #include "nativeimage.h"
-#elif defined(GTK3_UI)
-#include "nativeimage.h"
 #elif defined(SDL2_UI)
+#include "nativeimage.h"
+#elif defined(SFML2_UI)
 #include "nativeimage.h"
 #endif
 
@@ -58,9 +58,9 @@ jsize_t Image::GetImageSize(std::string img)
 
 #if defined(DIRECTFB_UI)
 	t = NativeImage::GetImageSize(img);
-#elif defined(GTK3_UI)
-	t = NativeImage::GetImageSize(img);
 #elif defined(SDL2_UI)
+	t = NativeImage::GetImageSize(img);
+#elif defined(SFML2_UI)
 	t = NativeImage::GetImageSize(img);
 #endif
 
@@ -74,9 +74,9 @@ Image * Image::CreateImage(jpixelformat_t pixelformat, int width, int height)
 	try {
 #if defined(DIRECTFB_UI)
 		image = new NativeImage(NULL, pixelformat, width, height);
-#elif defined(GTK3_UI)
-		image = new NativeImage(NULL, pixelformat, width, height);
 #elif defined(SDL2_UI)
+		image = new NativeImage(NULL, pixelformat, width, height);
+#elif defined(SFML2_UI)
 		image = new NativeImage(NULL, pixelformat, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -110,9 +110,9 @@ Image * Image::CreateImage(std::string file)
 	try {
 #if defined(DIRECTFB_UI)
 			image = new NativeImage(file);
-#elif defined(GTK3_UI)
-			image = new NativeImage(file);
 #elif defined(SDL2_UI)
+			image = new NativeImage(file);
+#elif defined(SFML2_UI)
 			image = new NativeImage(file);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -145,9 +145,9 @@ Image * Image::CreateImage(jio::InputStream *stream)
 	#else
 			image = new NativeImage(stream);
 	#endif
-#elif defined(GTK3_UI)
-			image = new NativeImage(stream);
 #elif defined(SDL2_UI)
+			image = new NativeImage(stream);
+#elif defined(SFML2_UI)
 			image = new NativeImage(stream);
 #endif
 	} catch (jcommon::NullPointerException &) {
@@ -198,9 +198,9 @@ Image * Image::Flip(jflip_flags_t t)
 	try {
 #if defined(DIRECTFB_UI)
 		image = NativeImage::Flip(this, t);
-#elif defined(GTK3_UI)
-		image = NativeImage::Flip(this, t);
 #elif defined(SDL2_UI)
+		image = NativeImage::Flip(this, t);
+#elif defined(SFML2_UI)
 		image = NativeImage::Flip(this, t);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -216,9 +216,9 @@ Image * Image::Rotate(double radians, bool resize)
 	try {
 #if defined(DIRECTFB_UI)
 		image = NativeImage::Rotate(this, radians, resize);
-#elif defined(GTK3_UI)
-		image = NativeImage::Rotate(this, radians, resize);
 #elif defined(SDL2_UI)
+		image = NativeImage::Rotate(this, radians, resize);
+#elif defined(SFML2_UI)
 		image = NativeImage::Rotate(this, radians, resize);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -234,9 +234,9 @@ Image * Image::Scale(int width, int height)
 	try {
 #if defined(DIRECTFB_UI)
 		image = NativeImage::Scale(this, width, height);
-#elif defined(GTK3_UI)
-		image = NativeImage::Scale(this, width, height);
 #elif defined(SDL2_UI)
+		image = NativeImage::Scale(this, width, height);
+#elif defined(SFML2_UI)
 		image = NativeImage::Scale(this, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -252,9 +252,9 @@ Image * Image::Crop(int x, int y, int width, int height)
 	try {
 #if defined(DIRECTFB_UI)
 		image = NativeImage::Crop(this, x, y, width, height);
-#elif defined(GTK3_UI)
-		image = NativeImage::Crop(this, x, y, width, height);
 #elif defined(SDL2_UI)
+		image = NativeImage::Crop(this, x, y, width, height);
+#elif defined(SFML2_UI)
 		image = NativeImage::Crop(this, x, y, width, height);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -270,9 +270,9 @@ Image * Image::Blend(double alpha)
 	try {
 #if defined(DIRECTFB_UI)
 		image = NativeImage::Blend(this, alpha);
-#elif defined(GTK3_UI)
-		image = NativeImage::Blend(this, alpha);
 #elif defined(SDL2_UI)
+		image = NativeImage::Blend(this, alpha);
+#elif defined(SFML2_UI)
 		image = NativeImage::Blend(this, alpha);
 #endif
 	} catch (jcommon::RuntimeException &) {
@@ -288,9 +288,9 @@ Image * Image::Colorize(Color color)
 	try {
 #if defined(DIRECTFB_UI)
 		image = NativeImage::Colorize(this, color);
-#elif defined(GTK3_UI)
-		image = NativeImage::Colorize(this, color);
 #elif defined(SDL2_UI)
+		image = NativeImage::Colorize(this, color);
+#elif defined(SFML2_UI)
 		image = NativeImage::Colorize(this, color);
 #endif
 	} catch (jcommon::RuntimeException &) {

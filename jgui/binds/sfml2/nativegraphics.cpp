@@ -19,8 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "nativegraphics.h"
-
-#include <directfb.h>
+#include "nativehandler.h"
 
 #define M_2PI	(2*M_PI)
 
@@ -30,6 +29,8 @@ NativeGraphics::NativeGraphics(void *surface, cairo_t *cairo_context, jpixelform
 	GenericGraphics(surface, cairo_context, pixelformat, wp, hp)
 {
 	jcommon::Object::SetClassName("jgui::NativeGraphics");
+
+	_surface = surface;
 }
 
 NativeGraphics::~NativeGraphics()
@@ -45,14 +46,10 @@ void NativeGraphics::SetNativeSurface(void *surface, int wp, int hp)
 	_cairo_context = NULL;
 
 	if (_surface != NULL) {
-		IDirectFBSurface *surface = (IDirectFBSurface *)_surface;
-
-		surface->GetSize(surface, &wp, &hp);
-
 		cairo_surface_t *cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wp, hp);
 
 		_cairo_context = cairo_create(cairo_surface);
-		
+	
 		// cairo_surface_destroy(cairo_surface);
 	}
 }
@@ -71,23 +68,9 @@ void NativeGraphics::Flip()
 
 	cairo_surface_flush(cairo_surface);
 
-	// int dw = cairo_image_surface_get_width(cairo_surface);
-	// int dh = cairo_image_surface_get_height(cairo_surface);
-	int stride = cairo_image_surface_get_stride(cairo_surface);
-
-	IDirectFBSurface *surface = (IDirectFBSurface *)_surface;
-	DFBRectangle rect;
-	// void *ptr;
-	int sw;
-	int sh;
-	// int pitch;
-
-	surface->GetSize(surface, &sw, &sh);
-
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = sw;
-	rect.h = sh;
+	int dw = cairo_image_surface_get_width(cairo_surface);
+	int dh = cairo_image_surface_get_height(cairo_surface);
+	// int stride = cairo_image_surface_get_stride(cairo_surface);
 
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
@@ -95,13 +78,33 @@ void NativeGraphics::Flip()
 		return;
 	}
 
-	surface->Write(surface, &rect, data, stride);
-		
-	if (_vertical_sync == false) {
-		surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
-	} else {
-		surface->Flip(surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
+	sf::Texture texture;
+
+	texture.create(dw, dh);
+
+	sf::Sprite sprite(texture);
+
+	int size = dw*dh;
+	uint8_t buffer[size*4];
+	uint8_t *src = data;
+	uint8_t *dst = buffer;
+
+	for (int i=0; i<size; i++) {
+		dst[3] = src[3];
+		dst[2] = src[0];
+		dst[1] = src[1];
+		dst[0] = src[2];
+
+		src = src + 4;
+		dst = dst + 4;
 	}
+
+	texture.update(buffer);
+
+	sf::RenderWindow *window = (sf::RenderWindow *)_surface;
+
+	window->draw(sprite);
+	window->display();
 }
 
 void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
@@ -111,42 +114,16 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 	}
 
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
-
+	
 	if (cairo_surface == NULL) {
 		return;
 	}
 
 	cairo_surface_flush(cairo_surface);
 
-	// int dw = cairo_image_surface_get_width(cairo_surface);
-	// int dh = cairo_image_surface_get_height(cairo_surface);
-	int stride = cairo_image_surface_get_stride(cairo_surface);
-
-	IDirectFBSurface *surface = (IDirectFBSurface *)_surface;
-	int x = xp;
-	int y = yp;
-	int w = wp;
-	int h = hp;
-
-	DFBRegion rgn;
-
-	rgn.x1 = x;
-	rgn.y1 = y;
-	rgn.x2 = x+w;
-	rgn.y2 = y+h;
-
-	DFBRectangle rect;
-	// void *ptr;
-	int sw;
-	int sh;
-	// int pitch;
-
-	surface->GetSize(surface, &sw, &sh);
-
-	rect.x = 0;
-	rect.y = 0;
-	rect.w = sw;
-	rect.h = sh;
+	int dw = cairo_image_surface_get_width(cairo_surface);
+	int dh = cairo_image_surface_get_height(cairo_surface);
+	// int stride = cairo_image_surface_get_stride(cairo_surface);
 
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
@@ -154,13 +131,38 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	surface->Write(surface, &rect, data, stride);
+	sf::Texture texture;
 
-	if (_vertical_sync == false) {
-		surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
-	} else {
-		surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
+	// texture.setActive(false);
+	texture.create(dw, dh);
+	texture.setSmooth(GetAntialias() != JAM_NONE);
+
+	sf::Sprite sprite(texture);
+
+	int size = dw*dh;
+	uint8_t buffer[size*4];
+	uint8_t *src = data;
+	uint8_t *dst = buffer;
+
+	for (int i=0; i<size; i++) {
+		dst[3] = src[3];
+		dst[2] = src[0];
+		dst[1] = src[1];
+		dst[0] = src[2];
+
+		src = src + 4;
+		dst = dst + 4;
 	}
+
+	texture.update(buffer);
+
+	sf::RenderWindow *window = (sf::RenderWindow *)_surface;
+
+	window->setActive(true);
+	window->clear();
+	window->draw(sprite);
+	window->display();
+	window->setActive(false);
 }
 
 }

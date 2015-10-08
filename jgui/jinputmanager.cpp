@@ -20,69 +20,17 @@
 #include "Stdafx.h"
 #include "jinputmanager.h"
 
-#if defined(DIRECTFB_UI)
-#include "nativeinputmanager.h"
-#elif defined(GTK3_UI)
-#include "nativeinputmanager.h"
-#elif defined(SDL2_UI)
-#include "nativeinputmanager.h"
-#endif
-
 namespace jgui {
 	
-InputManager *InputManager::_instance = NULL;
-
-InputManager::InputManager() 
+InputManager::InputManager(jgui::Window *window) 
 {
 	jcommon::Object::SetClassName("jgui::InputManager");
 
-	// jpoint_t p = GFXHandler::GetInstance()->GetMousePosition();
+	_window = window;
 }
 
 InputManager::~InputManager() 
 {
-}
-
-InputManager * InputManager::GetInstance()
-{
-	if (_instance == NULL){
-#if defined(DIRECTFB_UI)
-		NativeInputManager *manager = NULL;
-		
-		try {
-			_instance = manager = new NativeInputManager();
-
-			manager->Initialize();
-			manager->Start();
-		} catch (...) {
-			_instance = NULL;
-		}
-#elif defined(GTK3_UI)
-		NativeInputManager *manager = NULL;
-		
-		try {
-			_instance = manager = new NativeInputManager();
-
-			manager->Initialize();
-			manager->Start();
-		} catch (...) {
-			_instance = NULL;
-		}
-#elif defined(SDL2_UI)
-		NativeInputManager *manager = NULL;
-		
-		try {
-			_instance = manager = new NativeInputManager();
-
-			manager->Initialize();
-			manager->Start();
-		} catch (...) {
-			_instance = NULL;
-		}
-#endif
-	}
-
-	return _instance;
 }
 
 void InputManager::SetKeyEventsEnabled(bool b)
@@ -120,20 +68,30 @@ void InputManager::PostEvent(MouseEvent *event)
 {
 }
 
-void InputManager::Restore()
-{
-}
-
-void InputManager::Release()
-{
-}
-
 void InputManager::RegisterKeyListener(KeyListener *listener) 
 {
+	jthread::AutoLock lock(&_mutex);
+
+	std::vector<jgui::KeyListener *>::iterator i = std::find(_key_listeners.begin(), _key_listeners.end(), listener);
+
+	if (i == _key_listeners.end()) {
+		_key_listeners.push_back(listener);
+	}
 }
 
 void InputManager::RemoveKeyListener(KeyListener *listener) 
 {
+	jthread::AutoLock lock(&_mutex);
+
+	for (std::vector<jgui::KeyListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
+		jgui::KeyListener *l = (*i);
+
+		if (dynamic_cast<jgui::KeyListener *>(l) == listener) {
+			_key_listeners.erase(i);
+
+			break;
+		}
+	}
 }
 
 std::vector<jgui::KeyListener *> & InputManager::GetKeyListeners()
@@ -141,12 +99,15 @@ std::vector<jgui::KeyListener *> & InputManager::GetKeyListeners()
 	return _key_listeners;
 }
 
-void InputManager::DispatchEvent(jcommon::EventObject *event)
-{
-}
-
 void InputManager::RegisterMouseListener(MouseListener *listener) 
 {
+	jthread::AutoLock lock(&_mutex);
+
+	std::vector<jgui::MouseListener *>::iterator i = std::find(_mouse_listeners.begin(), _mouse_listeners.end(), listener);
+
+	if (i == _mouse_listeners.end()) {
+		_mouse_listeners.push_back(listener);
+	}
 }
 
 std::vector<jgui::MouseListener *> & InputManager::GetMouseListeners()
@@ -156,6 +117,17 @@ std::vector<jgui::MouseListener *> & InputManager::GetMouseListeners()
 
 void InputManager::RemoveMouseListener(MouseListener *listener) 
 {
+	jthread::AutoLock lock(&_mutex);
+
+	for (std::vector<jgui::MouseListener *>::iterator i=_mouse_listeners.begin(); i!=_mouse_listeners.end(); i++) {
+		jgui::MouseListener *l = (*i);
+
+		if (dynamic_cast<jgui::MouseListener *>(l) == listener) {
+			_mouse_listeners.erase(i);
+
+			break;
+		}
+	}
 }
 
 }

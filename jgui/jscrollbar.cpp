@@ -282,16 +282,15 @@ void ScrollBar::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	Color color = _scrollbar_color;
-	
 	int x = _horizontal_gap-_border_size,
 			y = _vertical_gap-_border_size,
 			w = _size.width-2*x,
 			h = _size.height-2*y;
+	int gap = 4;
 
 	if (_type == JSO_HORIZONTAL) {
 		int arrow_size = h/2,
-				limit = w-_stone_size-2*arrow_size;
+				limit = w-_stone_size-2*arrow_size-2*gap;
 
 		double d = (_value*limit)/(GetMaximum()-GetMinimum());
 
@@ -299,14 +298,19 @@ void ScrollBar::Paint(Graphics *g)
 			d = limit;
 		}
 
-		g->SetColor(color);
-		g->FillRectangle((int)d+arrow_size+x, y, _stone_size, h);
+		if (_has_focus == true) {
+			g->SetColor(_focus_fgcolor);
+		} else {
+			g->SetColor(_scrollbar_color);
+		}
+
+		g->FillRectangle((int)d+arrow_size+x+gap, y, _stone_size, h);
 
 		g->FillTriangle(x+w, y+arrow_size, x+w-arrow_size, y, x+w-arrow_size, y+2*arrow_size);
 		g->FillTriangle(x, y+arrow_size, x+arrow_size, y, x+arrow_size, y+2*arrow_size);
 	} else if (_type == JSO_VERTICAL) {
 		int arrow_size = w/2,
-				limit = h-_stone_size-2*arrow_size;
+				limit = h-_stone_size-2*arrow_size-2*gap;
 
 		double d = (_value*limit)/(GetMaximum()-GetMinimum());
 
@@ -314,9 +318,13 @@ void ScrollBar::Paint(Graphics *g)
 			d = limit;
 		}
 
-		g->SetColor(color);
-		g->FillRectangle(x, (int)d+arrow_size+y, w, _stone_size);
+		if (_has_focus == true) {
+			g->SetColor(_focus_fgcolor);
+		} else {
+			g->SetColor(_scrollbar_color);
+		}
 
+		g->FillRectangle(x, (int)d+arrow_size+y+gap, w, _stone_size);
 		g->FillTriangle(x, y+arrow_size, x+w/2, y,x+w, y+arrow_size);
 		g->FillTriangle(x, y+h-arrow_size, x+w/2, y+h,x+w, y+h-arrow_size);
 	}

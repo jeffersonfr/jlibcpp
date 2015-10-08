@@ -275,9 +275,6 @@ void Spin::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	Color color(0x80, 0x80, 0xe0, 0xff),
-				disable = color.Darker(0.1);
-
 	/*
 	if (_has_focus == true) {
 		g->FillGradientRectangle(0, 0, _size.width, _size.height/2+1, 
@@ -301,20 +298,22 @@ void Spin::Paint(Graphics *g)
 
 	if (_type == JSO_HORIZONTAL) {
 		if (_loop == true || (_index < ((int)_items.size()-1))) {
-			g->SetColor(color);
-		} else {
-			g->SetColor(disable);
+			if (_has_focus == true) {
+				g->SetColor(_focus_fgcolor);
+			} else {
+				g->SetColor(_fgcolor);
+			}
+			g->FillTriangle(x+w, y+arrow_size, x+w-arrow_size, y, x+w-arrow_size, y+2*arrow_size);
 		}
-
-		g->FillTriangle(x+w, y+arrow_size, x+w-arrow_size, y, x+w-arrow_size, y+2*arrow_size);
 
 		if (_loop == true || (_index > 0 && _items.size() > 0)) {
-			g->SetColor(color);
-		} else {
-			g->SetColor(disable);
+			if (_has_focus == true) {
+				g->SetColor(_focus_fgcolor);
+			} else {
+				g->SetColor(_fgcolor);
+			}
+			g->FillTriangle(x, y+arrow_size, x+arrow_size, y, x+arrow_size, y+2*arrow_size);
 		}
-
-		g->FillTriangle(x, y+arrow_size, x+arrow_size, y, x+arrow_size, y+2*arrow_size);
 
 		if (_items.size() > 0) {
 			if (_font != NULL) {
@@ -355,17 +354,21 @@ void Spin::Paint(Graphics *g)
 		}
 	} else if (_type == JSO_VERTICAL) {
 		if (_loop == true || (_index < ((int)_items.size()-1))) {
-			g->SetColor(color);
-		} else {
-			g->SetColor(disable);
+			if (_has_focus == true) {
+				g->SetColor(_focus_fgcolor);
+			} else {
+				g->SetColor(_fgcolor);
+			}
 		}
 
 		g->FillTriangle(_size.width-2*arrow_size-x, y+arrow_size, _size.width-x, y+arrow_size, _size.width-arrow_size-x, y);
 
 		if (_loop == true || (_index > 0 && _items.size() > 0)) {
-			g->SetColor(color);
-		} else {
-			g->SetColor(disable);
+			if (_has_focus == true) {
+				g->SetColor(_focus_fgcolor);
+			} else {
+				g->SetColor(_fgcolor);
+			}
 		}
 
 		g->FillTriangle(_size.width-2*arrow_size-x, y+arrow_size+8, _size.width-x, y+arrow_size+8, _size.width-arrow_size-x, y+h);

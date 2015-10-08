@@ -18,80 +18,38 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jwindowmanager.h"
+#include "jtouchlistener.h"
 
 namespace jgui {
 
-WindowManager * WindowManager::_instance = NULL;
-
-WindowManager::WindowManager():
-	jcommon::Object()
+TouchListener::TouchListener():
+	jcommon::Listener()
 {
-	jcommon::Object::SetClassName("jgui::WindowManager");
+	jcommon::Object::SetClassName("jgui::TouchListener");
 }
 
-WindowManager::~WindowManager()
+TouchListener::~TouchListener() 
 {
 }
 
-WindowManager * WindowManager::GetInstance()
+bool TouchListener::FingerPressed(TouchEvent *event)
 {
-	if (_instance == NULL) {
-		_instance = new WindowManager();
-	}
-
-	return _instance;
+	return false;
 }
 
-std::vector<Window *> & WindowManager::GetWindows()
+bool TouchListener::FingerReleased(TouchEvent *event)
 {
-	return windows;
+	return false;
 }
 
-Window * WindowManager::GetFocusOwner()
+bool TouchListener::FingerMoved(TouchEvent *event)
 {
-	if (windows.size() > 0) {
-		return *windows.begin();
-	}
-
-	return NULL;
+	return false;
 }
 
-void WindowManager::Add(Window *w)
+bool TouchListener::GesturePerformed(TouchEvent *event)
 {
-	windows.insert(windows.begin(), w);
-}
-
-void WindowManager::Remove(Window *w)
-{
-	for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); ++i) {
-		if ((*i) == w) {
-			windows.erase(i);
-
-			break;
-		}
-	}
-}
-
-void WindowManager::Restore()
-{
-	for (std::vector<Window *>::const_iterator i=windows.begin(); i!=windows.end(); ++i) {
-		Window *w = (*i);
-
-		if (w->IsVisible() == true) {
-			w->Show(false);
-		}
-	} 
-}
-
-void WindowManager::Release()
-{
-	for (std::vector<Window *>::const_iterator i=windows.begin(); i!=windows.end(); ++i) {
-		Window *w = (*i);
-
-		w->InternalReleaseWindow();
-	}
+	return false;
 }
 
 }
-
