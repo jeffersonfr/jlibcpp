@@ -25,7 +25,7 @@
 #include "jwindowmanager.h"
 #include "jdate.h"
 
-// #include <X11/extensions/Xrandr.h>
+#include <X11/extensions/Xrandr.h>
 
 namespace jgui {
 
@@ -43,6 +43,8 @@ NativeInputManager::NativeInputManager(jgui::Window *window):
 	_last_keypress = 0LL;
 	_click_count = 1;
 	_click_delay = 200;
+	_last_key_release_event.type = -1;
+	_key_repeat = true;
 
 	RegisterKeyListener(_window);
 	RegisterMouseListener(_window);
@@ -182,10 +184,6 @@ void NativeInputManager::DispatchEvent(jcommon::EventObject *event)
 
 jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(KeySym symbol)
 {
-	// First convert to uppercase (to avoid dealing with two different keysyms for the same key)
-	// KeySym lower, key;
-	// XConvertCase(symbol, &lower, &key);
-
 	switch (symbol) {
 		/*
 		case XK_Shift_L:
@@ -217,6 +215,7 @@ jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(KeySym symbol)
 		case XK_equal:
 			return JKS_EQUALS_SIGN;
 		case XK_KP_Subtract:
+		case XK_hyphen:
 		case XK_minus:
 			return JKS_MINUS_SIGN;
 		case XK_bracketleft:
@@ -225,6 +224,7 @@ jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(KeySym symbol)
 			return JKS_SQUARE_BRACKET_RIGHT;
 		case XK_comma:
 			return JKS_COMMA;
+		case XK_KP_Decimal:
 		case XK_period:
 			return JKS_PERIOD;
 		case XK_dead_acute:
@@ -246,15 +246,20 @@ jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(KeySym symbol)
 			return JKS_PAGE_UP;
 		case XK_Next:
 			return JKS_PAGE_DOWN;
+		case XK_KP_End:
 		case XK_End:
 			return JKS_END;
+		case XK_KP_Home:
 		case XK_Home:
 			return JKS_HOME;
+		case XK_KP_Insert:
 		case XK_Insert:
 			return JKS_INSERT;
+		case XK_KP_Delete:
 		case XK_Delete:
 			return JKS_DELETE;
 		case XK_KP_Add:
+		case XK_plus:
 			return JKS_PLUS_SIGN;
 		case XK_KP_Multiply:
 			return JKS_STAR;
@@ -284,12 +289,16 @@ jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(KeySym symbol)
 			return JKS_F11;
 		case XK_F12:
 			return JKS_F12;
+		case XK_KP_Left:
 		case XK_Left:
 			return JKS_CURSOR_LEFT;
+		case XK_KP_Right:
 		case XK_Right:
 			return JKS_CURSOR_RIGHT;
+		case XK_KP_Up:
 		case XK_Up:
 			return JKS_CURSOR_UP;
+		case XK_KP_Down:
 		case XK_Down:
 			return JKS_CURSOR_DOWN;
 		case XK_KP_0:
@@ -374,6 +383,106 @@ jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(KeySym symbol)
 			return JKS_Y;
 		case XK_Z:
 			return JKS_Z;
+		case XK_a:
+			return JKS_a;
+		case XK_b:
+			return JKS_b;
+		case XK_c:
+			return JKS_c;
+		case XK_d:
+			return JKS_d;
+		case XK_e:
+			return JKS_e;
+		case XK_f:
+			return JKS_f;
+		case XK_g:
+			return JKS_g;
+		case XK_h:
+			return JKS_h;
+		case XK_i:
+			return JKS_i;
+		case XK_j:
+			return JKS_j;
+		case XK_k:
+			return JKS_k;
+		case XK_l:
+			return JKS_l;
+		case XK_m:
+			return JKS_m;
+		case XK_n:
+			return JKS_n;
+		case XK_o:
+			return JKS_o;
+		case XK_p:
+			return JKS_p;
+		case XK_q:
+			return JKS_q;
+		case XK_r:
+			return JKS_r;
+		case XK_s:
+			return JKS_s;
+		case XK_t:
+			return JKS_t;
+		case XK_u:
+			return JKS_u;
+		case XK_v:
+			return JKS_v;
+		case XK_x:
+			return JKS_x;
+		case XK_w:
+			return JKS_w;
+		case XK_y:
+			return JKS_y;
+		case XK_z:
+			return JKS_z;
+		case XK_Print:
+			return JKS_PRINT;
+		case XK_Break:
+			return JKS_BREAK;
+		case XK_exclam:
+			return JKS_EXCLAMATION_MARK;
+		case XK_quotedbl:
+			return JKS_QUOTATION;
+		case XK_numbersign:
+			return JKS_NUMBER_SIGN;
+		case XK_dollar:
+			return JKS_DOLLAR_SIGN;
+		case XK_percent:
+			return JKS_PERCENT_SIGN;
+		case XK_ampersand:
+			return JKS_AMPERSAND;
+		case XK_apostrophe:
+			return JKS_APOSTROPHE;
+		case XK_parenleft:
+			return JKS_PARENTHESIS_LEFT;
+		case XK_parenright:
+			return JKS_PARENTHESIS_RIGHT;
+		case XK_asterisk:
+			return JKS_STAR;
+		case XK_less:
+			return JKS_LESS_THAN_SIGN;
+		case XK_greater:
+			return JKS_GREATER_THAN_SIGN;
+		case XK_question:
+			return JKS_QUESTION_MARK;
+		case XK_at:
+			return JKS_AT;
+		case XK_asciicircum:
+			return JKS_CIRCUMFLEX_ACCENT;
+		case XK_grave:
+			return JKS_GRAVE_ACCENT;
+		case XK_bar:
+			return JKS_VERTICAL_BAR;  
+		case XK_braceleft:
+			return JKS_CURLY_BRACKET_LEFT;
+		case XK_braceright:
+			return JKS_CURLY_BRACKET_RIGHT;
+		case XK_asciitilde:
+			return JKS_TILDE;
+		case XK_underscore:
+			return JKS_UNDERSCORE;
+		case XK_acute:
+			return JKS_ACUTE_ACCENT;
 		default:
 			break;
 	}
@@ -383,89 +492,204 @@ jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(KeySym symbol)
 
 void NativeInputManager::ProcessInputEvent(XEvent event)
 {
-	/*
-	if (event.type == sf::Event::MouseEntered) {
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+
+	// This function implements a workaround to properly discard repeated key events when necessary. 
+	// The problem is that the system's key events policy doesn't match SFML's one: X server will 
+	// generate both repeated KeyPress and KeyRelease events when maintaining a key down, while SFML 
+	// only wants repeated KeyPress events. Thus, we have to:
+	//   - Discard duplicated KeyRelease events when EnableKeyRepeat is true
+	//   - Discard both duplicated KeyPress and KeyRelease events when EnableKeyRepeat is false
+
+	// Detect repeated key events
+	if ((event.type == KeyPress) || (event.type == KeyRelease)) {
+		if (event.xkey.keycode < 256) {
+			// To detect if it is a repeated key event, we check the current state of the key.
+			// - If the state is "down", KeyReleased events must obviously be discarded.
+			// - KeyPress events are a little bit harder to handle: they depend on the EnableKeyRepeat state,
+			//   and we need to properly forward the first one.
+			char keys[32];
+			
+			XQueryKeymap(display, keys);
+
+			if (keys[event.xkey.keycode / 8] & (1 << (event.xkey.keycode % 8))) {
+				// KeyRelease event + key down = repeated event --> discard
+				if (event.type == KeyRelease) {
+					_last_key_release_event = event;
+					return;
+				}
+
+				// KeyPress event + key repeat disabled + matching KeyRelease event = repeated event --> discard
+				if ((event.type == KeyPress) && !_key_repeat &&
+						(_last_key_release_event.xkey.keycode == event.xkey.keycode) && (_last_key_release_event.xkey.time == event.xkey.time)) {
+					return;
+				}
+			}
+		}
+	}
+
+	if (event.type == DestroyNotify) {
+		printf("Event:: DestroyNotify\n");
+
+		// CHANGE:: cleanup resources
+	} else if (event.type == MapNotify) {
+		// printf("Event:: MapNotify\n");
+
+		// INFO:: avoid any draw before MapNotify's event
+		_window->SetIgnoreRepaint(false);
+		_window->Repaint();
+	} else if (event.type == ExposureMask) {
+		printf("Event:: ExposureMask\n");
+	} else if (event.type == EnterNotify) {
+		printf("Event:: EnterNotify\n");
+		
 		GFXHandler::GetInstance()->SetCursor(_window->GetCursor());
 
 		_window->DispatchWindowEvent(new WindowEvent(_window, JWET_ENTERED));
-	} else if (event.type == sf::Event::MouseLeft) {
+	} else if (event.type == LeaveNotify) {
+		printf("Event:: LeaveNotify\n");
+		
 		GFXHandler::GetInstance()->SetCursor(JCS_DEFAULT);
 
 		_window->DispatchWindowEvent(new WindowEvent(_window, JWET_LEAVED));
-	} else if (event.type == sf::Event::KeyPressed || event.type == sf::Event::KeyReleased) {
+	} else if (event.type == FocusIn) {
+		// printf("Event:: FocusIn\n");
+
+		/*
+		if (m_inputContext) {
+			XSetICFocus(m_inputContext);
+		}
+
+		Event e;
+		
+		e.type = Event::GainedFocus;
+		
+		pushEvent(e);
+		*/
+	} else if (event.type == FocusOut) {
+		// printf("Event:: FocusOut\n");
+
+		/*
+		if (m_inputContext) {
+			XUnsetICFocus(m_inputContext);
+		}
+
+		Event e;
+
+		e.type = Event::LostFocus;
+		
+		pushEvent(e);
+		*/
+	} else if (event.type == ConfigureNotify) {
+		// printf("Event:: ConfigureNotify\n");
+		
+		/*
+		Event e;
+
+		e.type = Event::Resized;
+		e.size.width  = event.xconfigure.width;
+		e.size.height = event.xconfigure.height;
+
+		pushEvent(e);
+		*/
+	} else if (event.type == ClientMessage) {
+		// printf("Event:: ClientMessage\n");
+
+		/*
+		if ((windowEvent.xclient.format == 32) && (windowEvent.xclient.data.l[0]) == static_cast<long>(m_atomClose)) {
+			Event e;
+			
+			e.type = Event::Closed;
+			
+			pushEvent(e);
+		}
+		*/
+	} else if (event.type == KeyPress || event.type == KeyRelease) {
 		jkeyevent_type_t type;
 		jkeyevent_modifiers_t mod;
 
 		mod = (jkeyevent_modifiers_t)(0);
 
-		bool shift = sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) || sf::Keyboard::isKeyPressed(sf::Keyboard::RShift);
-		bool control = sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::isKeyPressed(sf::Keyboard::RControl);
-		bool alt = sf::Keyboard::isKeyPressed(sf::Keyboard::LAlt) || sf::Keyboard::isKeyPressed(sf::Keyboard::RAlt);
-
-		if (shift == true) {
+		if (event.xkey.state & ShiftMask) {
 			mod = (jkeyevent_modifiers_t)(mod | JKM_SHIFT);
 		}
 
-		if (control == true) {
+		if (event.xkey.state & ControlMask) {
 			mod = (jkeyevent_modifiers_t)(mod | JKM_CONTROL);
 		}
 
-		if (alt == true) {
+		if (event.xkey.state & Mod1Mask) {
 			mod = (jkeyevent_modifiers_t)(mod | JKM_ALT);
 		}
 
 		type = (jkeyevent_type_t)(0);
 
-		if (event.type == sf::Event::KeyPressed) {
+		if (event.type == KeyPress) {
 			type = JKT_PRESSED;
 
 			// TODO:: grab pointer events
-		} else if (event.type == sf::Event::KeyReleased) {
+		} else if (event.type == KeyRelease) {
 			type = JKT_RELEASED;
 			
 			// TODO:: ungrab pointer events
 		}
 
-		jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key.code);
+		static XComposeStatus keyboard;
+
+		char buffer[32];
+		KeySym sym;
+
+		XLookupString(&event.xkey, buffer, sizeof(buffer), &sym, &keyboard);
+
+		jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(sym);
 
 		// AddEvent(new KeyEvent(NULL, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
 		DispatchEvent(new KeyEvent(NULL, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
-	} else if (
-			event.type == sf::Event::MouseMoved || 
-			event.type == sf::Event::MouseButtonPressed || 
-			event.type == sf::Event::MouseButtonReleased ||
-			event.type == sf::Event::MouseWheelMoved ||
-			event.type == sf::Event::MouseWheelScrolled) {
+	} else if (event.type == ButtonPress || event.type == ButtonRelease || event.type == MotionNotify) {
 		int mouse_z = 0;
 		jmouseevent_button_t button = JMB_UNKNOWN;
 		jmouseevent_button_t buttons = JMB_UNKNOWN;
 		jmouseevent_type_t type = JMT_UNKNOWN;
 
-		if (event.type == sf::Event::MouseMoved) {
+		if (event.type == MotionNotify) {
 			type = JMT_MOVED;
 		
-			_mouse_x = event.mouseMove.x;
-			_mouse_y = event.mouseMove.y;
-		} else if (event.type == sf::Event::MouseButtonPressed || event.type == sf::Event::MouseButtonReleased) {
-			if (event.type == sf::Event::MouseButtonPressed) {
+			_mouse_x = event.xmotion.x;
+			_mouse_y = event.xmotion.y;
+		} else if (event.type == ButtonPress || event.type == ButtonRelease) {
+			if (event.type == ButtonPress) {
 				type = JMT_PRESSED;
-			} else if (event.type == sf::Event::MouseButtonReleased) {
+			} else if (event.type == ButtonRelease) {
 				type = JMT_RELEASED;
 			}
 
-			_mouse_x = event.mouseButton.x;
-			_mouse_y = event.mouseButton.y;
+			_mouse_x = event.xbutton.x;
+			_mouse_y = event.xbutton.y;
 
-			if (event.mouseButton.button == sf::Mouse::Left) {
+			if (event.xbutton.button == Button1) {
 				button = JMB_BUTTON1;
-			} else if (event.mouseButton.button == sf::Mouse::Middle) {
+			} else if (event.xbutton.button == Button2) {
 				button = JMB_BUTTON2;
-			} else if (event.mouseButton.button == sf::Mouse::Right) {
+			} else if (event.xbutton.button == Button3) {
 				button = JMB_BUTTON3;
+			} else if (event.xbutton.button == Button4) {
+				if (type == JMT_RELEASED) {
+					return;
+				}
+
+				type = JMT_ROTATED;
+				button = JMB_WHEEL;
+				mouse_z = -1;
+			} else if (event.xbutton.button == Button5) {
+				if (type == JMT_RELEASED) {
+					return;
+				}
+
+				type = JMT_ROTATED;
+				button = JMB_WHEEL;
+				mouse_z = 1;
 			}
 		
-			_state_buttons[button] = (type == JMT_PRESSED)?true:false;
-
 			if (type == JMT_PRESSED) {
 				if ((jcommon::Date::CurrentTimeMillis()-_last_keypress) < 200L) {
 					_click_count = _click_count + 1;
@@ -477,49 +701,38 @@ void NativeInputManager::ProcessInputEvent(XEvent event)
 
 				mouse_z = _click_count;
 			}
-		} else if (event.type == sf::Event::MouseWheelMoved || event.type == sf::Event::MouseWheelScrolled) {
-			type = JMT_ROTATED;
-
-			if (event.type == sf::Event::MouseWheelMoved) {
-				_mouse_x = event.mouseWheel.x;
-				_mouse_y = event.mouseWheel.y;
-				mouse_z = event.mouseWheel.delta;
-			} else if (event.type == sf::Event::MouseWheelScrolled) {
-				_mouse_x = event.mouseWheelScroll.x;
-				_mouse_y = event.mouseWheelScroll.y;
-				mouse_z = event.mouseWheelScroll.delta;
-			}
 		}
 
-		if (_state_buttons[JMB_BUTTON1] == true) {
+		if (event.xbutton.state & Button1) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON1);
-		} else if (_state_buttons[JMB_BUTTON2] == true) {
+		} else if (event.xbutton.state & Button2) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON2);
-		} else if (_state_buttons[JMB_BUTTON3] == true) {
+		} else if (event.xbutton.state & Button3) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
 		}
 
-		sf::Vector2i pos = _window->_window->getPosition();
-		
-		_mouse_x = _mouse_x + pos.x;
-		_mouse_y = _mouse_y + pos.y;
+		XWindowAttributes attr;
 
-		// _window->_location.x = pos.x;
-		// _window->_location.y = pos.y;
+		XGetWindowAttributes(display, _window->_window, &attr);
+		
+		_mouse_x = _mouse_x + attr.x;
+		_mouse_y = _mouse_y + attr.y;
+
+		printf("NativeInput:WindowSize: %d, %d\n", attr.x, attr.y);
+		_window->_location.x = attr.x;
+		_window->_location.y = attr.y;
 	
+		/*
 		if (event.type == SDL_MOUSEBUTTONDOWN) {
-			// SDL_SetWindowGrab(native, SDL_TRUE);
+			SDL_SetWindowGrab(native, SDL_TRUE);
 		} else if (event.type == SDL_MOUSEBUTTONUP) {
-			// SDL_SetWindowGrab(native, SDL_FALSE);
+			SDL_SetWindowGrab(native, SDL_FALSE);
 		}
+		*/
 
 		// AddEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
 		DispatchEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
-	} else if (event.type == sf::Event::TouchBegan) {
-	} else if (event.type == sf::Event::TouchMoved) {
-	} else if (event.type == sf::Event::TouchEnded) {
 	}
-*/
 }
 
 void NativeInputManager::AddEvent(jcommon::EventObject *event)
@@ -544,7 +757,13 @@ void NativeInputManager::Run()
 {
 	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
 
-	XSelectInput(display, _window->_window, ExposureMask);
+	XSelectInput(display, _window->_window, 
+			ExposureMask | 
+			EnterNotify | LeaveNotify | 
+			KeyPress | KeyRelease | 
+			ButtonPress | ButtonRelease | MotionNotify | PointerMotionMask | 
+			StructureNotifyMask | SubstructureNotifyMask
+	);
 
 	XEvent event;
 

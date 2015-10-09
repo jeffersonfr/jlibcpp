@@ -53,14 +53,14 @@ class UserEvent {
 		// \brief key event
 		jgui::jkeyevent_symbol_t _symbol;
 		jgui::jkeyevent_modifiers_t _mod;
-		int _code;
 		// \brief mouse events
 		jgui::jmouseevent_button_t _button;
-		double _vx,
-			_vy;
-		int _click_count,
-			_x,
-			_y;
+		int _code;
+		int _x;
+		int _y;
+		double _vx;
+		double _vy;
+		int _click_count;
 
 	public:
 		UserEvent(userevent_type_t type, jgui::jkeyevent_modifiers_t mod, int code, jgui::jkeyevent_symbol_t symbol)
@@ -452,17 +452,13 @@ class Test : public jgui::Window, public UserEventListener {
 			int x = cx-_ball.x,
 					y = cy-_ball.y;
 
-				printf("0:::: %d\n", event->GetClickCount());
 			if ((x*x+y*y) <= _raio*_raio) {
-				printf("1:::: %d\n", event->GetClickCount());
 				if (event->GetClickCount() == 1) {
-				printf("2:::: %d\n", event->GetClickCount());
 					_pressed = true;
 
 					_ball_diff.x = -x;
 					_ball_diff.y = -y;
 				} else {
-				printf("3:::: %d\n", event->GetClickCount());
 					_pressed = false;
 
 					if (event->GetClickCount() == 2) {

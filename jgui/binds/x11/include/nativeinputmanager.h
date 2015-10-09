@@ -62,6 +62,10 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		jthread::Mutex _events_mutex;
 		/** \brief */
 		jthread::Semaphore _events_sem;
+		/** \brief */
+		bool _key_repeat;
+		/** \brief */
+		XEvent _last_key_release_event;
 
 	private:
 		/**

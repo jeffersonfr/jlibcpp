@@ -521,6 +521,8 @@ void Window::InternalCreateWindow()
 
 	dynamic_cast<NativeInputManager *>(_input_manager)->Restart();
 #elif defined(X11_UI)
+	SetIgnoreRepaint(true);
+
 	XSetWindowAttributes attr;
 
 	attr.event_mask = 0;
@@ -546,20 +548,24 @@ void Window::InternalCreateWindow()
 		static const unsigned long MWM_HINTS_FUNCTIONS   = 1 << 0;
 		static const unsigned long MWM_HINTS_DECORATIONS = 1 << 1;
 
-		//static const unsigned long MWM_DECOR_ALL         = 1 << 0;
-		static const unsigned long MWM_DECOR_BORDER      = 1 << 1;
-		static const unsigned long MWM_DECOR_RESIZEH     = 1 << 2;
-		static const unsigned long MWM_DECOR_TITLE       = 1 << 3;
-		static const unsigned long MWM_DECOR_MENU        = 1 << 4;
-		static const unsigned long MWM_DECOR_MINIMIZE    = 1 << 5;
-		static const unsigned long MWM_DECOR_MAXIMIZE    = 1 << 6;
+		enum mwm_decor_t {
+			MWM_DECOR_ALL         = 1 << 0,
+			MWM_DECOR_BORDER      = 1 << 1,
+			MWM_DECOR_RESIZEH     = 1 << 2,
+			MWM_DECOR_TITLE       = 1 << 3,
+			MWM_DECOR_MENU        = 1 << 4,
+			MWM_DECOR_MINIMIZE    = 1 << 5,
+			MWM_DECOR_MAXIMIZE    = 1 << 6
+		};
 
-		//static const unsigned long MWM_FUNC_ALL          = 1 << 0;
-		static const unsigned long MWM_FUNC_RESIZE       = 1 << 1;
-		static const unsigned long MWM_FUNC_MOVE         = 1 << 2;
-		static const unsigned long MWM_FUNC_MINIMIZE     = 1 << 3;
-		static const unsigned long MWM_FUNC_MAXIMIZE     = 1 << 4;
-		static const unsigned long MWM_FUNC_CLOSE        = 1 << 5;
+		enum mwm_func_t {
+			MWM_FUNC_ALL          = 1 << 0,
+			MWM_FUNC_RESIZE       = 1 << 1,
+			MWM_FUNC_MOVE         = 1 << 2,
+			MWM_FUNC_MINIMIZE     = 1 << 3,
+			MWM_FUNC_MAXIMIZE     = 1 << 4,
+			MWM_FUNC_CLOSE        = 1 << 5
+		};
 
 		struct WMHints {
 			unsigned long Flags;
@@ -612,6 +618,10 @@ void Window::RaiseToTop()
 	}
 #elif defined(SFML2_UI)
 #elif defined(X11_UI)
+	if (_window != 0) {
+		XRaiseWindow(
+				(::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine(), _window);
+	}
 #endif
 }
 
@@ -625,6 +635,10 @@ void Window::LowerToBottom()
 #elif defined(SDL2_UI)
 #elif defined(SFML2_UI)
 #elif defined(X11_UI)
+	if (_window != 0) {
+		XLowerWindow(
+				(::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine(), _window);
+	}
 #endif
 }
 
@@ -729,8 +743,10 @@ void Window::SetBounds(int x, int y, int width, int height)
 	
 		_graphics_mutex.Unlock();
 #elif defined(SDL2_UI)
-		SDL_SetWindowPosition(_window, _location.x, _location.y);
-		SDL_SetWindowSize(_window, _size.width, _size.height);
+		if (_window != NULL) {
+			SDL_SetWindowPosition(_window, _location.x, _location.y);
+			SDL_SetWindowSize(_window, _size.width, _size.height);
+		}
 #elif defined(SFML2_UI)
 		if (_window != NULL) {
 			_window->setPosition(sf::Vector2i(_location.x, _location.y));
@@ -782,7 +798,9 @@ void Window::SetLocation(int x, int y)
 		
 		_graphics_mutex.Unlock();
 #elif defined(SDL2_UI)
-		SDL_SetWindowPosition(_window, _location.x, _location.y);
+		if (_window != NULL) {
+			SDL_SetWindowPosition(_window, _location.x, _location.y);
+		}
 #elif defined(SFML2_UI)
 		if (_window != NULL) {
 			_window->setPosition(sf::Vector2i(_location.x, _location.y));
@@ -1259,6 +1277,9 @@ void Window::InternalReleaseWindow()
 		::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
 
 		XDestroyWindow(display, _window);
+
+		_window = 0;
+
 		XFlush(display);
 	}
 #endif

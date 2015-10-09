@@ -3,7 +3,7 @@
 :Makefile defines
 
 ENABLE_DEBUG = <no, yes>
-ENABLE_GRAPHICS = <directfb-nodeps, directfb, sdl2, sfml2>
+ENABLE_GRAPHICS = <directfb-nodeps, directfb, sdl2, sfml2, x11>
 ENABLE_MEDIA = <gif, ilist, v4l2, alsa, directfb, libvlc, libav, libxine>
 
 :Compiling

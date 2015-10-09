@@ -113,7 +113,6 @@ void NativeGraphics::Flip()
 
 void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 {
-	Flip(); return;
 	if (_surface == NULL) {
 		return;
 	}
@@ -136,25 +135,35 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 		return;
 	}
 
-	/*
 	// Create the icon pixmap
-	Visual *visual = DefaultVisual(_display, _screen);
-	unsigned int depth = DefaultDepth(_display, _screen);
-	XImage *image = XCreateImage(_display, visual, depth, ZPixmap, 0, (char *)data, dw, dh, 32, 0);
+	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
+	::Display *display = (Display *)handler->GetGraphicEngine();
+	int screen = handler->GetScreenNumber();
+
+	Visual *visual = DefaultVisual(display, screen);
+	unsigned int depth = DefaultDepth(display, screen);
+	XImage *image = XCreateImage(display, visual, depth, ZPixmap, 0, (char *)data, dw, dh, 32, 0);
 
 	if (image == NULL) {
 		return;
 	}
 
-	Pixmap pixmap = XCreatePixmap(_display, RootWindow(_display, _screen), dw, dh, depth);
-	GC gc = XCreateGC(_display, pixmap, 0, NULL);
-
+	Pixmap pixmap = XCreatePixmap(display, RootWindow(display, screen), wp, hp, depth);
+	GC gc = XCreateGC(display, pixmap, 0, NULL);
+	
 	// draw image to pixmap
-	XPutImage(_display, pixmap, gc, image, 0, 0, 0, 0, width, height);
-	XCopyArea(_display, pixmap, _window, gc, 0, 0, width, height, 0, 0);
+	XPutImage(display, pixmap, gc, image, xp, yp, 0, 0, dw, dh);
+	XCopyArea(display, pixmap, *(::Window *)_surface, gc, 0, 0, dw, dh, xp, yp);
 
-	// XFlush(_display);
-	*/
+	// XDestroyImage(image);
+	XFreePixmap(display, pixmap);
+
+	XFlush(display);
+
+	// INFO:: wait x11 process all events
+	// True:: discards all events remaing
+	// False:: not discards events remaing
+	// XSync(display, False);
 }
 
 }

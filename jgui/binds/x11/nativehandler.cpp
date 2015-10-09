@@ -93,13 +93,13 @@ void NativeHandler::SetCursor(jcursor_style_t t)
 
 void NativeHandler::SetCursor(Image *shape, int hotx, int hoty)
 {
+	/*
 	if ((void *)shape == NULL) {
 		return;
 	}
 
 	uint32_t *data = NULL;
 
-	/*
 	jsize_t t = shape->GetSize();
 	
 	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
@@ -108,38 +108,27 @@ void NativeHandler::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	SDL_Surface *surface = NULL;
-	uint32_t rmask = 0x000000ff;
-	uint32_t gmask = 0x0000ff00;
-	uint32_t bmask = 0x00ff0000;
-	uint32_t amask = 0xff000000;
+	// Create the icon pixmap
+	Visual *visual = DefaultVisual(_display, _screen_id);
+	unsigned int depth = DefaultDepth(_display, _screen_id);
+	XImage *image = XCreateImage(_display, visual, depth, ZPixmap, 0, (char *)data, t.width, t.height, 32, 0);
 
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	rmask = 0xff000000;
-	gmask = 0x00ff0000;
-	bmask = 0x0000ff00;
-	amask = 0x000000ff;
-#endif
-
-	surface = SDL_CreateRGBSurfaceFrom(data, t.width, t.height, 32, t.width*4, rmask, gmask, bmask, amask);
-
-	if (surface == NULL) {
-		delete [] data;
-
+	if (image == NULL) {
 		return;
 	}
 
-	SDL_Cursor *cursor = SDL_CreateColorCursor(surface, hotx, hoty);
+	Pixmap pixmap = XCreatePixmap(_display, RootWindow(_display, _screen_id), t.width, t.height, depth);
+	XColor color;
 
-	if (cursor != NULL) {
-		SDL_SetCursor(cursor);
-		// SDL_FreeCursor(cursor);
-	}
+	color.flags = DoRed | DoGreen | DoBlue;
+	color.red = color.blue = color.green = 0;
 
-	SDL_FreeSurface(surface);
-	*/
+	cursor = XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
+
+	XFreePixmap(_display, pixmap);
 
 	delete [] data;
+	*/
 }
 
 void NativeHandler::InitResources()
