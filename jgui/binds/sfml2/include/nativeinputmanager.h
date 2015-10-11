@@ -140,6 +140,18 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		 * \brief
 		 *
 		 */
+		virtual void SetCursorLocation(int x, int y);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jpoint_t GetCursorLocation();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void PostEvent(KeyEvent *event);
 		
 		/**

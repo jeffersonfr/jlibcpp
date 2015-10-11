@@ -60,6 +60,20 @@ int InputManager::GetClickDelay()
 	return 0;
 }
 
+void InputManager::SetCursorLocation(int x, int y)
+{
+}
+
+jpoint_t InputManager::GetCursorLocation()
+{
+	jpoint_t p;
+
+	p.x = 0;
+	p.y = 0;
+
+	return p;
+}
+
 void InputManager::PostEvent(KeyEvent *event)
 {
 }

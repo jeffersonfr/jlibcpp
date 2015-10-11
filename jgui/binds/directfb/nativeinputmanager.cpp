@@ -409,6 +409,37 @@ int NativeInputManager::GetClickDelay()
 	return _click_delay;
 }
 
+void NativeInputManager::SetCursorLocation(int x, int y)
+{
+	if (x < 0) {
+		x = 0;
+	}
+
+	if (y < 0) {
+		y = 0;
+	}
+
+	jpoint_t t = _window->GetLocation();
+
+	GFXHandler::GetInstance()->SetCursorLocation(x + t.x, y + t.y);
+}
+
+jpoint_t NativeInputManager::GetCursorLocation()
+{
+	jpoint_t p;
+
+	p.x = 0;
+	p.y = 0;
+
+	jpoint_t tc = GFXHandler::GetInstance()->GetCursorLocation();
+	jpoint_t tw = _window->GetLocation();
+
+	p.x = tc.x - tw.x;
+	p.y = tc.y - tw.y;
+
+	return p;
+}
+
 void NativeInputManager::PostEvent(KeyEvent *event)
 {
 	if (_event_buffer == NULL) {

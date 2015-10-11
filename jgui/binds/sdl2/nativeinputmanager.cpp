@@ -109,6 +109,40 @@ int NativeInputManager::GetClickDelay()
 	return _click_delay;
 }
 
+void NativeInputManager::SetCursorLocation(int x, int y)
+{
+	if (x < 0) {
+		x = 0;
+	}
+
+	if (y < 0) {
+		y = 0;
+	}
+
+	if (_window->_window != NULL) {
+		SDL_WarpMouseInWindow(_window->_window, x, y);
+	}
+}
+
+jpoint_t NativeInputManager::GetCursorLocation()
+{
+	jpoint_t p;
+
+	p.x = 0;
+	p.y = 0;
+
+	if (_window->_window != NULL) {
+		jpoint_t t = _window->GetLocation();
+		SDL_GetMouseState(&p.x, &p.y);
+		// SDL_GetGlobalMouseState(&p.x, &p.y);
+
+		p.x = p.x - t.x;
+		p.y = p.y - t.y;
+	}
+
+	return p;
+}
+
 void NativeInputManager::PostEvent(KeyEvent *event)
 {
 	// SDL_PushEvent

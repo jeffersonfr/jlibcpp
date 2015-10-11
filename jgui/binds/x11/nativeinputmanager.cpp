@@ -113,6 +113,36 @@ int NativeInputManager::GetClickDelay()
 	return _click_delay;
 }
 
+void NativeInputManager::SetCursorLocation(int x, int y)
+{
+	if (x < 0) {
+		x = 0;
+	}
+
+	if (y < 0) {
+		y = 0;
+	}
+
+	// sf::Mouse::setPosition(sf::Vector2i(x, y));
+}
+
+jpoint_t NativeInputManager::GetCursorLocation()
+{
+	jpoint_t p;
+
+	p.x = 0;
+	p.y = 0;
+
+	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
+	::Display *display = (::Display *)handler->GetGraphicEngine();
+	int screen = handler->GetScreenNumber();
+	::Window child_return;
+
+	XTranslateCoordinates(display, _window->_window, RootWindow(display, screen), 0, 0, &p.x, &p.y, &child_return);
+
+	return p;
+}
+
 void NativeInputManager::PostEvent(KeyEvent *event)
 {
 	// SDL_PushEvent
@@ -711,16 +741,10 @@ void NativeInputManager::ProcessInputEvent(XEvent event)
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
 		}
 
-		XWindowAttributes attr;
+		_window->_location = GetCursorLocation();
 
-		XGetWindowAttributes(display, _window->_window, &attr);
-		
-		_mouse_x = _mouse_x + attr.x;
-		_mouse_y = _mouse_y + attr.y;
-
-		printf("NativeInput:WindowSize: %d, %d\n", attr.x, attr.y);
-		_window->_location.x = attr.x;
-		_window->_location.y = attr.y;
+		_mouse_x = _mouse_x + _window->_location.x;
+		_mouse_y = _mouse_y + _window->_location.y;
 	
 		/*
 		if (event.type == SDL_MOUSEBUTTONDOWN) {

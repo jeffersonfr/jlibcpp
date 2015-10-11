@@ -109,6 +109,43 @@ int NativeInputManager::GetClickDelay()
 	return _click_delay;
 }
 
+void NativeInputManager::SetCursorLocation(int x, int y)
+{
+	if (x < 0) {
+		x = 0;
+	}
+
+	if (y < 0) {
+		y = 0;
+	}
+
+	if (_window->_window != NULL) {
+  	sf::Vector2i pos;
+		
+		pos.x = x;
+		pos.y = y;
+	
+		sf::Mouse::setPosition(pos, *_window->_window);
+	}
+}
+
+jpoint_t NativeInputManager::GetCursorLocation()
+{
+	jpoint_t p;
+
+	p.x = 0;
+	p.y = 0;
+
+	if (_window->_window != NULL) {
+  	sf::Vector2i pos = sf::Mouse::getPosition(*_window->_window);
+	
+		p.x = pos.x;
+		p.y = pos.y;
+	}
+
+	return p;
+}
+
 void NativeInputManager::PostEvent(KeyEvent *event)
 {
 	// SDL_PushEvent
@@ -599,12 +636,12 @@ void NativeInputManager::ProcessInputEvent(sf::Event event)
 		}
 
 		sf::Vector2i pos = _window->_window->getPosition();
-		
+
 		_mouse_x = _mouse_x + pos.x;
 		_mouse_y = _mouse_y + pos.y;
 
-		// _window->_location.x = pos.x;
-		// _window->_location.y = pos.y;
+		_window->_location.x = pos.x;
+		_window->_location.y = pos.y;
 	
 		/*
 		if (event.type == SDL_MOUSEBUTTONDOWN) {
