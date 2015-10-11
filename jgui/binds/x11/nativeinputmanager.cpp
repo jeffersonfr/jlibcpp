@@ -735,9 +735,13 @@ void NativeInputManager::ProcessInputEvent(XEvent event)
 
 		if (event.xbutton.state & Button1) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON1);
-		} else if (event.xbutton.state & Button2) {
+		}
+
+		if (event.xbutton.state & Button2) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON2);
-		} else if (event.xbutton.state & Button3) {
+		}
+
+		if (event.xbutton.state & Button3) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
 		}
 

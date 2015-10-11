@@ -600,8 +600,6 @@ void NativeInputManager::ProcessInputEvent(sf::Event event)
 				button = JMB_BUTTON3;
 			}
 		
-			_state_buttons[button] = (type == JMT_PRESSED)?true:false;
-
 			if (type == JMT_PRESSED) {
 				if ((jcommon::Date::CurrentTimeMillis()-_last_keypress) < 200L) {
 					_click_count = _click_count + 1;
@@ -627,11 +625,15 @@ void NativeInputManager::ProcessInputEvent(sf::Event event)
 			}
 		}
 
-		if (_state_buttons[JMB_BUTTON1] == true) {
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Left) == true) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON1);
-		} else if (_state_buttons[JMB_BUTTON2] == true) {
+		}
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Middle) == true) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON2);
-		} else if (_state_buttons[JMB_BUTTON3] == true) {
+		}
+
+		if (sf::Mouse::isButtonPressed(sf::Mouse::Right) == true) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
 		}
 

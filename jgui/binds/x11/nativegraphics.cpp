@@ -96,6 +96,8 @@ void NativeGraphics::Flip()
 	Pixmap pixmap = XCreatePixmap(display, RootWindow(display, screen), dw, dh, depth);
 	GC gc = XCreateGC(display, pixmap, 0, NULL);
 	
+	// XClearWindow(*(::Window *)_surface);
+
 	// draw image to pixmap
 	XPutImage(display, pixmap, gc, image, 0, 0, 0, 0, dw, dh);
 	XCopyArea(display, pixmap, *(::Window *)_surface, gc, 0, 0, dw, dh, 0, 0);
@@ -150,6 +152,8 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 
 	Pixmap pixmap = XCreatePixmap(display, RootWindow(display, screen), wp, hp, depth);
 	GC gc = XCreateGC(display, pixmap, 0, NULL);
+	
+	// XClearWindow(*(::Window *)_surface);
 	
 	// draw image to pixmap
 	XPutImage(display, pixmap, gc, image, xp, yp, 0, 0, dw, dh);

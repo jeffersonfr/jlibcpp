@@ -646,9 +646,13 @@ void NativeInputManager::ProcessInputEvent(SDL_Event event)
 		
 		if ((state & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON1);
-		} else if ((state & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0) {
+		}
+
+		if ((state & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON2);
-		} else if ((state & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0) {
+		}
+
+		if ((state & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0) {
 			buttons = (jmouseevent_button_t)(button | JMB_BUTTON3);
 		}
 
