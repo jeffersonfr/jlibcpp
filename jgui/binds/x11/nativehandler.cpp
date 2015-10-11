@@ -208,7 +208,12 @@ void NativeHandler::SetCursorLocation(int x, int y)
 		y = _screen.height;
 	}
 
-	// sf::Mouse::setPosition(sf::Vector2i(x, y));
+	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
+	::Display *display = (::Display *)handler->GetGraphicEngine();
+	int screen = handler->GetScreenNumber();
+
+	XWarpPointer(display, None, XRootWindow(display, screen), 0, 0, 0, 0, x, y);
+	XFlush(display);
 }
 
 jpoint_t NativeHandler::GetCursorLocation()
