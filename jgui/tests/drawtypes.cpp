@@ -42,6 +42,8 @@ class Main : public jgui::Frame{
 			_types["PNG"] = jgui::Image::CreateImage("images/image.png");
 			_types["PPM"] = jgui::Image::CreateImage("images/image.ppm");
 			_types["TGA"] = jgui::Image::CreateImage("images/image.tga");
+			_types["XBM"] = jgui::Image::CreateImage("images/image.xbm");
+			_types["XPM"] = jgui::Image::CreateImage("images/image.xpm");
 		}
 
 		virtual ~Main()
@@ -49,7 +51,6 @@ class Main : public jgui::Frame{
 			for (std::map<std::string, jgui::Image *>::iterator i=_types.begin(); i!=_types.end(); i++) {
 				jgui::Image *image = i->second;
 
-				printf(":: %s\n", i->first.c_str());
 				delete image;
 			}
 
@@ -60,20 +61,24 @@ class Main : public jgui::Frame{
 		{
 			jgui::Frame::Paint(g);
 
-			int size = _types.size();
-			int w = _size.width/(_types.size()+1);
-			int h = w;
-			int gapx = w/(_types.size()+1);
-			int gapy = (_size.height-h)/2;
-			int dx = (_size.width-size*w-(size-1)*gapx)/2;
+			int items = 5;
+			int gap = 16;
+			int size = (_size.width-3*gap-_insets.top-_insets.bottom)/(items);
+			int count = 0;
 
 			for (std::map<std::string, jgui::Image *>::iterator i=_types.begin(); i!=_types.end(); i++) {
 				jgui::Image *image = i->second;
 
-				g->DrawImage(image, dx, gapy, w, h);
-				g->DrawString(i->first, dx, gapy+h);
+				int x = count%items;
+				int y = count/items;
 
-				dx = dx + w + gapx;
+				g->DrawImage(image, x*(size+gap)+gap, y*(size+gap)+120, size, size);
+				g->SetColor(jgui::Color::Black);
+				g->FillRectangle(x*(size+gap)+gap, y*(size+gap)+120, 36, 24);
+				g->SetColor(jgui::Color::White);
+				g->DrawString(i->first, x*(size+gap)+gap, y*(size+gap)+120);
+
+				count = count + 1;
 			}
 		}
 

@@ -28,6 +28,7 @@
 #include "genericprovider_png.h"
 #include "genericprovider_ppm.h"
 #include "genericprovider_tga.h"
+#include "genericprovider_xbm.h"
 #include "generichandler.h"
 #include "jimage.h"
 #include "jthread.h"
@@ -124,6 +125,10 @@ GenericImage::GenericImage(std::string file):
 	}
 
 	if (cairo_surface == NULL) {
+		cairo_surface = create_xbm_surface_from_file(file.c_str());
+	}
+
+	if (cairo_surface == NULL) {
 		throw jcommon::RuntimeException("Cannot open this image type");
 	}
 
@@ -205,6 +210,10 @@ GenericImage::GenericImage(jio::InputStream *stream):
 
 	if (cairo_surface == NULL) {
 		cairo_surface = create_tga_surface_from_data(buffer, count);
+	}
+
+	if (cairo_surface == NULL) {
+		cairo_surface = create_xbm_surface_from_data(buffer, count);
 	}
 
 	if (cairo_surface == NULL) {
