@@ -334,16 +334,16 @@ cairo_surface_t * create_pcx_surface_from_stream(jio::InputStream *stream)
 		uint8_t *palette = loader.GetPalette();
 		
 		for (int i=0; i<size; i++) {
-			data[i*4+0] = palette[3*image[i*3+0]];
+			data[i*4+0] = palette[3*image[i*3+2]];
 			data[i*4+1] = palette[3*image[i*3+1]];
-			data[i*4+2] = palette[3*image[i*3+2]];
+			data[i*4+2] = palette[3*image[i*3+0]];
 			data[i*4+3] = 0xff;
 		}
 	} else {
 		for (int i=0; i<size; i++) {
-			data[i*4+0] = image[i*3+0];
+			data[i*4+0] = image[i*3+2];
 			data[i*4+1] = image[i*3+1];
-			data[i*4+2] = image[i*3+2];
+			data[i*4+2] = image[i*3+0];
 			data[i*4+3] = 0xff;
 		}
 	}

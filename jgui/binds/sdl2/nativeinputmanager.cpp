@@ -51,6 +51,28 @@ NativeInputManager::~NativeInputManager()
 	Release();
 }
 
+bool NativeInputManager::GrabKeyEvents(bool b)
+{
+	return false;
+}
+
+bool NativeInputManager::GrabMouseEvents(bool b)
+{
+	/*
+	if (b == true) {
+		if (SDL_CaptureMouse(SDL_TRUE) == 0) {
+			return true;
+		}
+	} else {
+		if (SDL_CaptureMouse(SDL_FALSE) == 0) {
+			return true;
+		}
+	}
+	*/
+
+	return false;
+}
+
 void NativeInputManager::Restart()
 {
 	Release();

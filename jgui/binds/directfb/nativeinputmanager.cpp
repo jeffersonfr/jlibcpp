@@ -22,6 +22,8 @@
 #include "jwindowmanager.h"
 #include "jdate.h"
 
+#include <directfb.h>
+
 namespace jgui {
 
 NativeInputManager::NativeInputManager(jgui::Window *window):
@@ -41,6 +43,53 @@ NativeInputManager::NativeInputManager(jgui::Window *window):
 	_click_count = 1;
 	_click_delay = 200;
 	_event_buffer = NULL;
+}
+
+NativeInputManager::~NativeInputManager() 
+{
+	Release();
+}
+
+bool NativeInputManager::GrabKeyEvents(bool b)
+{
+	IDirectFBWindow *window = (IDirectFBWindow *)_window->GetNativeWindow();
+
+	if (window == NULL) {
+		return false;
+	}
+
+	if (b == true) {
+		if (window->GrabKeyboard(window) == DFB_OK) {
+			return true;
+		}
+	} else {
+		if (window->UngrabKeyboard(window) == DFB_OK) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool NativeInputManager::GrabMouseEvents(bool b)
+{
+	IDirectFBWindow *window = (IDirectFBWindow *)_window->GetNativeWindow();
+
+	if (window == NULL) {
+		return false;
+	}
+
+	if (b == true) {
+		if (window->GrabPointer(window) == DFB_OK) {
+			return true;
+		}
+	} else {
+		if (window->UngrabPointer(window) == DFB_OK) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void NativeInputManager::Restart()
@@ -86,11 +135,6 @@ void NativeInputManager::Release()
 	if (_event_buffer != NULL) {
 		_event_buffer->Release(_event_buffer);
 	}
-}
-
-NativeInputManager::~NativeInputManager() 
-{
-	Release();
 }
 
 jkeyevent_symbol_t NativeInputManager::TranslateToNativeKeySymbol(DFBInputDeviceKeySymbol symbol)

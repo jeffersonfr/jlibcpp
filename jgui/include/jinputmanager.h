@@ -80,6 +80,18 @@ class InputManager : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
+		virtual bool GrabKeyEvents(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool GrabMouseEvents(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool IsKeyEventsEnabled();
 		
 		/**

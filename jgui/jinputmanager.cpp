@@ -41,6 +41,16 @@ void InputManager::SetMouseEventsEnabled(bool b)
 {
 }
 
+bool InputManager::GrabKeyEvents(bool b)
+{
+	return false;
+}
+
+bool InputManager::GrabMouseEvents(bool b)
+{
+	return false;
+}
+
 bool InputManager::IsKeyEventsEnabled()
 {
 	return false;

@@ -21,7 +21,7 @@
 #include "jbufferedreader.h"
 #include "jioexception.h"
 
-#define LINE_SIZE	1024
+#define LINE_SIZE	4096
 
 namespace jio {
 
@@ -36,7 +36,7 @@ BufferedReader::BufferedReader(InputStream *stream_)
 	_is_eof = false;
 	_stream = stream_;
 	
-	_buffer = new char[4096];
+	_buffer = new char[LINE_SIZE];
 
 	_buffer_size = 0;
 	_buffer_index = 0;
@@ -67,7 +67,7 @@ int64_t BufferedReader::Read()
 	_is_eof = false;
 
 	if (d == 0) {
-		r = _stream->Read((char *)_buffer, 4096);
+		r = _stream->Read((char *)_buffer, LINE_SIZE);
 			
 		if (r <= 0) {
 			_is_eof = false;
@@ -103,7 +103,7 @@ int64_t BufferedReader::Read(char *data, int64_t size)
 		d = _buffer_size - _buffer_index;
 
 		if (d == 0) {
-			r = _stream->Read((char *)_buffer, 4096);
+			r = _stream->Read((char *)_buffer, LINE_SIZE);
 
 			if (r <= 0) {
 				_is_eof = true;
@@ -145,33 +145,16 @@ int64_t BufferedReader::Read(char *data, int64_t size)
 
 std::string BufferedReader::ReadLine(std::string delim)
 {
-	char *new_ptr,
-			 *lineptr = new char[LINE_SIZE];
-	int i,
-			n = LINE_SIZE,
-			x,
-			tmp;
-
+	char *new_ptr;
+	char *lineptr = new char[LINE_SIZE];
+	int i, n = LINE_SIZE;
 	const char *cdelim = delim.c_str();
 	int csize = delim.size();
 
 	_is_eof = false;
 
 	for (i=0; ; ) {
-		x = (int)Read();
-
-		if (i >= n) {
-			tmp = n+100;
-			new_ptr = (char *)realloc(lineptr, tmp);
-
-			if (new_ptr == NULL) {
-				delete [] lineptr;
-				return "";
-			}
-
-			lineptr = new_ptr;
-			n = tmp;
-		}
+		int x = (int)Read();
 
 		if (x < 0) { 
 			_is_eof = true;
@@ -189,6 +172,20 @@ std::string BufferedReader::ReadLine(std::string delim)
 			delete [] lineptr;
 
 			return str; 
+		}
+
+		if (i >= n) {
+			int tmp = n + LINE_SIZE;
+			new_ptr = (char *)realloc(lineptr, tmp);
+
+			if (new_ptr == NULL) {
+				delete [] lineptr;
+
+				return "";
+			}
+
+			lineptr = new_ptr;
+			n = tmp;
 		}
 
 		lineptr[i++] = x;

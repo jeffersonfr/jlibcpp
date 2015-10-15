@@ -378,18 +378,22 @@ void NativeHandler::Run()
 				
 				graphics->_sdl_sem.Notify();
 			} else {
+				puts("1");
 				std::vector<Window *> windows = WindowManager::GetInstance()->GetWindows();
 
 				for (std::vector<Window *>::iterator i=windows.begin(); i!=windows.end(); i++) {
 					SDL_Window *native = (*i)->_window;
 
 					if (native != NULL) {
+				puts("2");
 						uint32_t id = SDL_GetWindowID(native);
 
-						if (event.window.windowID == id) {
+						if (event.window.windowID == id || SDL_GetWindowGrab(native) == SDL_TRUE) {
+				puts("3");
 							NativeInputManager *input = dynamic_cast<NativeInputManager *>((*i)->GetInputManager());
 							
 							if (input != NULL) {
+				puts("4");
 								input->ProcessInputEvent(event);
 							}
 

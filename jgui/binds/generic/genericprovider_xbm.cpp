@@ -106,7 +106,7 @@ init_hex_table (void)
 }
 
 static int
-next_int (jio::InputStream *stream)
+next_int (jio::BufferedReader *stream)
 {
 	int ch;
 	int value = 0;
@@ -178,6 +178,7 @@ cairo_surface_t * create_xbm_surface_from_stream(jio::InputStream *stream)
 				if (type-- == name_and_type || type-- == name_and_type)
 					continue;
 			}
+
 			continue;
 		}
     
@@ -223,26 +224,28 @@ cairo_surface_t * create_xbm_surface_from_stream(jio::InputStream *stream)
 		bits = new uint8_t[size];
 
 		if (version10p) {
-			unsigned char *ptr;
-			int bytes;
+			uint8_t *ptr = bits;
 
-			for (bytes = 0, ptr = bits; bytes < size; (bytes += 2)) {
-				if ((value = next_int (stream)) < 0) {
-					break;
+			for (int i=0; i<size; i+=2) {
+				if ((value = next_int(&reader)) < 0) {
+					// break;
 				}
+				
 				*(ptr++) = value;
-				if (!padding || ((bytes+2) % bytes_per_line))
+				
+				if (!padding || ((i+2) % bytes_per_line)) {
 					*(ptr++) = value >> 8;
+				}
 			}
 		} else {
-			unsigned char *ptr;
-			int bytes;
+			uint8_t *ptr = bits;
 
-			for (bytes = 0, ptr = bits; bytes < size; bytes++, ptr++) {
-				if ((value = next_int (stream)) < 0) {
-					break;
+			for (int i=0; i<size; i++) {
+				if ((value = next_int(&reader)) < 0) {
+					// break;
 				}
-				*ptr=value;
+				
+				*ptr++ = value;
 			}
 		}
 	}
@@ -269,22 +272,22 @@ cairo_surface_t * create_xbm_surface_from_stream(jio::InputStream *stream)
 
 	uint8_t *src = bits;
 	uint32_t *dst = (uint32_t *)data;
-	uint8_t mask = 0x80;
+	uint8_t mask = 0x01;
 
 	for (int i=0; i<sz; i++) {
 		uint8_t bit = *src & mask;
 
 		if (bit == 0x00) {
-			dst[i] = 0xff000000;
-		} else {
 			dst[i] = 0xffffffff;
+		} else {
+			dst[i] = 0xff000000;
 		}
 
-		mask = mask >> 0x01;
+		mask = mask << 0x01;
 
 		if (mask == 0x00) {
 			src = src + 1;
-			mask = 0x80;
+			mask = 0x01;
 		}
 	}
 

@@ -54,8 +54,6 @@ class NativeHandler : public GenericHandler{
 		Display *_display;
 		/** \brief */
 		Cursor _hidden_cursor;
-		/** \brief */
-		int _screen_id;
 
 	public:
 		/**
@@ -99,12 +97,6 @@ class NativeHandler : public GenericHandler{
 		 *
 		 */
 		virtual void * GetGraphicEngine();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetScreenNumber();
 
 		/**
 		 * \brief

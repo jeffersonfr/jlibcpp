@@ -92,6 +92,18 @@ class NativeInputManager : public jgui::InputManager, public jthread::Thread{
 		 * \brief
 		 *
 		 */
+		virtual bool GrabKeyEvents(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool GrabMouseEvents(bool b);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void Restart();
 
 		/**

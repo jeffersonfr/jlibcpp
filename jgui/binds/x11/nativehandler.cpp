@@ -38,7 +38,6 @@ NativeHandler::NativeHandler():
 
 	_cursor = JCS_DEFAULT;
 	_display = NULL;
-	_screen_id = 0;
 	_hidden_cursor = 0;
 
 	XInitThreads();
@@ -54,10 +53,15 @@ void NativeHandler::InitEngine()
 
 	// Open a connection with the X server
 	_display = XOpenDisplay(NULL);
-	_screen_id = DefaultScreen(_display);
 
-	_screen.width = DisplayWidth(_display, _screen_id);
-	_screen.height = DisplayHeight(_display, _screen_id);
+	if (_display == NULL) {
+		throw jcommon::RuntimeException("Unable to connect with X server");
+	}
+
+	int default_screen = DefaultScreen(_display);
+
+	_screen.width = DisplayWidth(_display, default_screen);
+	_screen.height = DisplayHeight(_display, default_screen);
 }
 
 void NativeHandler::SetFlickerFilteringEnabled(bool b)
@@ -109,22 +113,33 @@ void NativeHandler::SetCursor(Image *shape, int hotx, int hoty)
 	}
 
 	// Create the icon pixmap
-	Visual *visual = DefaultVisual(_display, _screen_id);
-	unsigned int depth = DefaultDepth(_display, _screen_id);
+	int default_screen = DefaultScreen(_display);
+	Visual *visual = DefaultVisual(_display, default_screen);
+	unsigned int depth = DefaultDepth(_display, default_screen);
 	XImage *image = XCreateImage(_display, visual, depth, ZPixmap, 0, (char *)data, t.width, t.height, 32, 0);
+	::Window root_window = XRootWindow(_display, default_screen);
 
 	if (image == NULL) {
 		return;
 	}
 
-	Pixmap pixmap = XCreatePixmap(_display, RootWindow(_display, _screen_id), t.width, t.height, depth);
+	Pixmap pixmap = XCreatePixmap(_display, RootWindow(_display, default_screen), t.width, t.height, depth);
+	GC gc = XCreateGC(_display, pixmap, 0, NULL);
+	
+	XPutImage(_display, pixmap, gc, image, 0, 0, 0, 0, t.width, t.height);
+
 	XColor color;
 
 	color.flags = DoRed | DoGreen | DoBlue;
-	color.red = color.blue = color.green = 0;
+	color.red = 0;
+	color.green = 0;
+	color.blue = 0;
 
-	cursor = XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
+	Cursor cursor = XCreatePixmapCursor(_display, pixmap, pixmap, &color, &color, 0, 0);
 
+	// XUndefineCursor(_display, root_window);
+	XDefineCursor(_display, root_window, cursor);
+	XSync(_display, root_window);
 	XFreePixmap(_display, pixmap);
 
 	delete [] data;
@@ -180,11 +195,6 @@ void * NativeHandler::GetGraphicEngine()
 	return _display;
 }
 
-int NativeHandler::GetScreenNumber()
-{
-	return _screen_id;
-}
-
 std::string NativeHandler::GetEngineID()
 {
 	return "x11";
@@ -208,11 +218,11 @@ void NativeHandler::SetCursorLocation(int x, int y)
 		y = _screen.height;
 	}
 
-	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
-	::Display *display = (::Display *)handler->GetGraphicEngine();
-	int screen = handler->GetScreenNumber();
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+	int default_screen = DefaultScreen(_display);
+	::Window root_window = XRootWindow(display, default_screen);
 
-	XWarpPointer(display, None, XRootWindow(display, screen), 0, 0, 0, 0, x, y);
+	XWarpPointer(display, None, root_window, 0, 0, 0, 0, x, y);
 	XFlush(display);
 }
 
@@ -250,6 +260,11 @@ void NativeHandler::Restore()
 void NativeHandler::Release()
 {
 	GenericHandler::InitEngine();
+
+	int default_screen = DefaultScreen(_display);
+	::Window root_window = XRootWindow(_display, default_screen);
+
+	XUndefineCursor(_display, root_window);
 
 	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
 		delete i->second.cursor;

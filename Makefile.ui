@@ -58,6 +58,7 @@ GENERIC_OBJS = \
 		 ../generic/genericprovider_ppm.o\
 		 ../generic/genericprovider_tga.o\
 		 ../generic/genericprovider_xbm.o\
+		 ../generic/genericprovider_xpm.o\
 
 ifeq ($(ENABLE_GRAPHICS),directfb)
 	CCFLAGS 	+= \

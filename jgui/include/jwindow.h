@@ -119,15 +119,13 @@ class Window : public jgui::Container{
 		/** \brief */
 		jwindow_rotation_t _rotation;
 		/** \brief */
-		bool _is_fullscreen;
+		bool _is_fullscreen_activated;
 		/** \brief */
-		int _old_x;
+		jpoint_t _old_location;
 		/** \brief */
-		int _old_y;
+		jsize_t _old_size;
 		/** \brief */
-		int _old_width;
-		/** \brief */
-		int _old_height;
+		jinsets_t _old_insets;
 		/** \brief */
 		int _old_border_size;
 		/** \brief */
@@ -153,6 +151,12 @@ class Window : public jgui::Container{
 		 *
 		 */
 		virtual void InternalReleaseWindow();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InternalReleaseFullScreen();
 
 	public:
 		/**
@@ -195,13 +199,7 @@ class Window : public jgui::Container{
 		 * \brief
 		 *
 		 */
-		virtual void SetFullScreenEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsFullScreenEnabled();
+		virtual bool ActiveFullScreen();
 		
 		/**
 		 * \brief

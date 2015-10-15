@@ -81,19 +81,19 @@ void NativeGraphics::Flip()
 	}
 
 	// Create the icon pixmap
-	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
-	::Display *display = (Display *)handler->GetGraphicEngine();
-	int screen = handler->GetScreenNumber();
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+	int default_screen = DefaultScreen(display);
+	::Window root_window = XRootWindow(display, default_screen);
+	Visual *visual = DefaultVisual(display, default_screen);
+	unsigned int depth = DefaultDepth(display, default_screen);
 
-	Visual *visual = DefaultVisual(display, screen);
-	unsigned int depth = DefaultDepth(display, screen);
 	XImage *image = XCreateImage(display, visual, depth, ZPixmap, 0, (char *)data, dw, dh, 32, 0);
 
 	if (image == NULL) {
 		return;
 	}
 
-	Pixmap pixmap = XCreatePixmap(display, RootWindow(display, screen), dw, dh, depth);
+	Pixmap pixmap = XCreatePixmap(display, root_window, dw, dh, depth);
 	GC gc = XCreateGC(display, pixmap, 0, NULL);
 	
 	// XClearWindow(*(::Window *)_surface);
@@ -138,19 +138,19 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 	}
 
 	// Create the icon pixmap
-	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
-	::Display *display = (Display *)handler->GetGraphicEngine();
-	int screen = handler->GetScreenNumber();
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+	int default_screen = DefaultScreen(display);
+	::Window root_window = XRootWindow(display, default_screen);
+	Visual *visual = DefaultVisual(display, default_screen);
+	unsigned int depth = DefaultDepth(display, default_screen);
 
-	Visual *visual = DefaultVisual(display, screen);
-	unsigned int depth = DefaultDepth(display, screen);
 	XImage *image = XCreateImage(display, visual, depth, ZPixmap, 0, (char *)data, dw, dh, 32, 0);
 
 	if (image == NULL) {
 		return;
 	}
 
-	Pixmap pixmap = XCreatePixmap(display, RootWindow(display, screen), wp, hp, depth);
+	Pixmap pixmap = XCreatePixmap(display, root_window, wp, hp, depth);
 	GC gc = XCreateGC(display, pixmap, 0, NULL);
 	
 	// XClearWindow(*(::Window *)_surface);

@@ -78,10 +78,8 @@ Window::Window(int x, int y, int width, int height):
 	_size.width = width;
 	_size.height = height;
 	
-	_old_x = _location.x;
-	_old_y = _location.y;
-	_old_width = _size.width;
-	_old_height = _size.height;
+	_old_location = _location;
+	_old_size = _size;
 
 #if defined(DIRECTFB_UI)
 	_input_manager = new NativeInputManager(this);
@@ -110,7 +108,7 @@ Window::Window(int x, int y, int width, int height):
 	_release_enabled = true;
 	_is_undecorated = false;
 	_is_visible = false;
-	_is_fullscreen = false;
+	_is_fullscreen_activated = false;
 	_opacity = 0xff;
 	_cursor = JCS_DEFAULT;
 	_rotation = JWR_NONE;
@@ -122,15 +120,17 @@ Window::Window(int x, int y, int width, int height):
 
 	DispatchWindowEvent(new WindowEvent(this, JWET_OPENED));
 
-	WindowManager::GetInstance()->Add(this);
-	
 	Theme *theme = ThemeManager::GetInstance()->GetTheme();
 
 	theme->Update(this);
+	
+	WindowManager::GetInstance()->Add(this);
 }
 
 Window::~Window()
 {
+	WindowManager::GetInstance()->Remove(this);
+
 	if (_input_manager != NULL) {
 		delete _input_manager;
 		_input_manager = NULL;
@@ -191,8 +191,6 @@ void Window::InternalReleaseNativeWindow()
 void Window::Release()
 {
 	DispatchWindowEvent(new WindowEvent(this, JWET_CLOSING));
-
-	WindowManager::GetInstance()->Remove(this);
 
 	_graphics_mutex.Lock();
 
@@ -310,59 +308,130 @@ void Window::SetVisible(bool b)
 	}
 }
 
-void Window::SetFullScreenEnabled(bool b)
+bool Window::ActiveFullScreen()
 {
-	if (_is_fullscreen == b) {
+	jthread::AutoLock lock(&_window_mutex);
+
+	if (_is_fullscreen_activated == true) {
+		return true;
+	}
+
+	_is_fullscreen_activated = true;
+
+	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
+
+	_old_border_size = _border_size;
+	_old_undecorated = _is_undecorated;
+	_old_location = _location;
+	_old_size = _size;
+	_old_insets = _insets;
+
+	_border_size = 0;
+	_is_undecorated = true;
+	_insets.left = 0;
+	_insets.right = 0;
+	_insets.top = 0;
+	_insets.bottom = 0;
+	_location.x = 0;
+	_location.y = 0;
+	_size = screen;
+
+#if defined(DIRECTFB_UI)
+		_graphics_mutex.Lock();
+
+		if (_window != NULL) {
+			_window->SetBounds(_window, _location.x, _location.y, _size.width, _size.height);
+			_window->ResizeSurface(_window, _size.width, _size.height);
+			_window->GetSurface(_window, &_surface);
+			_graphics->SetNativeSurface(_surface, _size.width, _size.height);
+		}
+	
+		_graphics_mutex.Unlock();
+#elif defined(SDL2_UI)
+		if (_window != NULL) {
+			SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+
+			SDL_DisplayMode display;
+
+			if (SDL_GetCurrentDisplayMode(0, &display) != 0) {
+				throw jcommon::RuntimeException("Could not get screen mode");
+			}
+
+			_size.width = display.w;
+			_size.height = display.h;
+
+			_graphics->SetNativeSurface(_surface, _size.width, _size.height);
+		}
+#elif defined(SFML2_UI)
+		if (_window != NULL) {
+			_window->create(sf::VideoMode(_size.width, _size.height), "", sf::Style::Fullscreen);
+
+			// _window->setActive(false);
+			_window->requestFocus();
+
+			_graphics->SetNativeSurface((void *)_window, _size.width, _size.height);
+		}
+#elif defined(X11_UI)
+		::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+		int default_screen = DefaultScreen(display);
+		::Window root_window = XRootWindow(display, default_screen);
+
+		if (_window != 0) {
+			XMoveResizeWindow(
+				(::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine(), _window, _location.x, _location.y, _size.width, _size.height);
+			_graphics->SetNativeSurface((void *)&_window, _size.width, _size.height);
+		}
+
+		XEvent xev;
+
+		Atom wm_state = XInternAtom(display, "_NET_WM_STATE", False);
+		Atom fullscreen = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", False);
+
+		memset(&xev, 0, sizeof(xev));
+
+		xev.type = ClientMessage;
+		xev.xclient.window = _window;
+		xev.xclient.message_type = wm_state;
+		xev.xclient.format = 32;
+		xev.xclient.data.l[0] = 1;
+		xev.xclient.data.l[1] = fullscreen;
+		xev.xclient.data.l[2] = 0;
+
+		XSendEvent(display, root_window, False, SubstructureNotifyMask, &xev);
+#endif
+	
+	Repaint();
+
+	return true;
+}
+
+void Window::InternalReleaseFullScreen()
+{
+	jthread::AutoLock lock(&_window_mutex);
+
+	if (_is_fullscreen_activated == false) {
 		return;
 	}
 
-	_is_fullscreen = b;
+	_is_fullscreen_activated = false;
 
-	if (_is_fullscreen == false) {
+	_border_size = _old_border_size;
+	_is_undecorated = _old_undecorated;
+	_location = _old_location;
+	_size = _old_size;
+	_insets = _old_insets;
+
 #if defined(DIRECTFB_UI)
 #elif defined(SDL2_UI)
-		SDL_SetWindowFullscreen(_window, 0);
+	SDL_SetWindowFullscreen(_window, 0);
 #elif defined(SFML2_UI)
 #elif defined(X11_UI)
 #endif
-
-		_border_size = _old_border_size;
-		_is_undecorated = _old_undecorated;
-		
-		SetBounds(_old_x, _old_y, _old_width, _old_height);
-	} else {
-#if defined(DIRECTFB_UI)
-#elif defined(SDL2_UI)
-		SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
-#elif defined(SFML2_UI)
-#elif defined(X11_UI)
-#endif
-
-		jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
-
-		_old_border_size = _border_size;
-		_old_undecorated = _is_undecorated;
-		
-		_border_size = 0;
-		_is_undecorated = true;
-		
-		_old_x = _location.x;
-		_old_y = _location.y;
-		_old_width = _size.width;
-		_old_height = _size.height;
-
-		SetBounds(0, 0, screen.width, screen.height);
-	}
-}
-
-bool Window::IsFullScreenEnabled()
-{
-	return _is_fullscreen;
 }
 
 void Window::Maximize()
 {
-	if (_is_fullscreen == true) {
+	if (_is_fullscreen_activated == true) {
 		return;
 	}
 
@@ -370,10 +439,8 @@ void Window::Maximize()
 
 	_is_maximized = true;
 
-	_old_x = _location.x;
-	_old_y = _location.y;
-	_old_width = _size.width;
-	_old_height = _size.height;
+	_old_location = _location;
+	_old_size = _size;
 
 	SetBounds(0, 0, screen.width, screen.height);
 }
@@ -385,13 +452,13 @@ bool Window::IsMaximized()
 
 void Window::Restore()
 {
-	if (_is_fullscreen == true) {
+	if (_is_fullscreen_activated == true) {
 		return;
 	}
 
 	_is_maximized = false;
 
-	SetBounds(_old_x, _old_y, _old_width, _old_height);
+	SetBounds(_old_location.x, _old_location.y, _old_size.width, _old_size.height);
 }
 
 void Window::SetMoveEnabled(bool b)
@@ -526,15 +593,16 @@ void Window::InternalCreateWindow()
 	XSetWindowAttributes attr;
 
 	attr.event_mask = 0;
-	attr.override_redirect = 0;
+	attr.override_redirect = False;
 
-	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
-	::Display *display = (Display *)handler->GetGraphicEngine();
-	int screen = handler->GetScreenNumber();
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+	int default_screen = DefaultScreen(display);
+	::Window root_window = XRootWindow(display, default_screen);
+	Visual *visual = DefaultVisual(display, default_screen);
+	unsigned int depth = DefaultDepth(display, default_screen);
 
 	_window = XCreateWindow(
-			display, RootWindow(display, screen), 0, 0, _size.width, _size.height, 0, 
-			DefaultDepth(display, screen), InputOutput, DefaultVisual(display, screen), CWEventMask | CWOverrideRedirect, &attr);
+			display, root_window, _location.x, _location.y, _size.width, _size.height, 0, depth, InputOutput, visual, CWEventMask | CWOverrideRedirect, &attr);
 
 	if (_window == 0) {
 		throw jcommon::RuntimeException("Unable to open a new window");
@@ -676,7 +744,7 @@ void Window::PutBelow(Window *w)
 
 void Window::SetBounds(int x, int y, int width, int height)
 {
-	if (_is_fullscreen == true) {
+	if (_is_fullscreen_activated == true) {
 		return;
 	}
 
@@ -720,25 +788,11 @@ void Window::SetBounds(int x, int y, int width, int height)
 #if defined(DIRECTFB_UI)
 		_graphics_mutex.Lock();
 
-		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
-		bool update = true;
-
-		if (update == true) {
-			if (_window != NULL) {
-				InternalCreateWindow();
-			}
-		} else {
-			if (_window != NULL) {
-				x = _location.x;
-				y = _location.y;
-				width = _size.width;
-				height = _size.height;
-
-				_window->SetBounds(_window, x, y, width, height);
-				_window->ResizeSurface(_window, width, height);
-				_window->GetSurface(_window, &_surface);
-				_graphics->SetNativeSurface(_surface, width, height);
-			}
+		if (_window != NULL) {
+			_window->SetBounds(_window, _location.x, _location.y, _size.width, _size.height);
+			_window->ResizeSurface(_window, _size.width, _size.height);
+			_window->GetSurface(_window, &_surface);
+			_graphics->SetNativeSurface(_surface, _size.width, _size.height);
 		}
 	
 		_graphics_mutex.Unlock();
@@ -746,16 +800,19 @@ void Window::SetBounds(int x, int y, int width, int height)
 		if (_window != NULL) {
 			SDL_SetWindowPosition(_window, _location.x, _location.y);
 			SDL_SetWindowSize(_window, _size.width, _size.height);
+			_graphics->SetNativeSurface((void *)_surface, _size.width, _size.height);
 		}
 #elif defined(SFML2_UI)
 		if (_window != NULL) {
 			_window->setPosition(sf::Vector2i(_location.x, _location.y));
 			_window->setSize(sf::Vector2u(_size.width, _size.height));
+			_graphics->SetNativeSurface((void *)_window, _size.width, _size.height);
 		}
 #elif defined(X11_UI)
 		if (_window != 0) {
 			XMoveResizeWindow(
 				(::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine(), _window, _location.x, _location.y, _size.width, _size.height);
+			_graphics->SetNativeSurface((void *)&_window, _size.width, _size.height);
 		}
 #endif
 	}
@@ -768,7 +825,7 @@ void Window::SetBounds(int x, int y, int width, int height)
 
 void Window::SetLocation(int x, int y)
 {
-	if (_is_fullscreen == true) {
+	if (_is_fullscreen_activated == true) {
 		return;
 	}
 
@@ -892,7 +949,7 @@ void Window::SetMaximumSize(int width, int height)
 
 void Window::SetSize(int width, int height)
 {
-	if (_is_fullscreen == true) {
+	if (_is_fullscreen_activated == true) {
 		return;
 	}
 
@@ -931,39 +988,29 @@ void Window::SetSize(int width, int height)
 #if defined(DIRECTFB_UI)
 		_graphics_mutex.Lock();
 
-		// CHANGE:: fix a problem with directfb-cairo (unknown broken)
-		bool update = true;
-
-		// INFO:: works, but with a lot of flicker
-		if (update == true) {
-			if (_window != NULL) {
-				InternalCreateWindow();
-			}
-		} else {
-			if (_window != NULL) {
-				// jregion_t t = _graphics->GetClip();
-
-				width = _size.width;
-				height = _size.height;
-
-				_window->Resize(_window, width, height);
-				_window->ResizeSurface(_window, width, height);
-				_window->GetSurface(_window, &_surface);
-				_graphics->SetNativeSurface(_surface, width, height);
-			}
+		if (_window != NULL) {
+			_window->Resize(_window, _size.width, _size.height);
+			_window->ResizeSurface(_window, _size.width, _size.height);
+			_window->GetSurface(_window, &_surface);
+			_graphics->SetNativeSurface(_surface, _size.width, _size.height);
 		}
 	
 		_graphics_mutex.Unlock();
 #elif defined(SDL2_UI)
-		SDL_SetWindowSize(_window, _size.width, _size.height);
+		if (_window != NULL) {
+			SDL_SetWindowSize(_window, _size.width, _size.height);
+			_graphics->SetNativeSurface((void *)_surface, _size.width, _size.height);
+		}
 #elif defined(SFML2_UI)
 		if (_window != NULL) {
 			_window->setSize(sf::Vector2u(_size.width, _size.height));
+			_graphics->SetNativeSurface((void *)_window, _size.width, _size.height);
 		}
 #elif defined(X11_UI)
 		if (_window != 0) {
 			XResizeWindow(
 				(::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine(), _window, _size.width, _size.height);
+			_graphics->SetNativeSurface((void *)&_window, _size.width, _size.height);
 		}
 #endif
 	}
@@ -975,7 +1022,7 @@ void Window::SetSize(int width, int height)
 
 void Window::Move(int x, int y)
 {
-	if (_is_fullscreen == true) {
+	if (_is_fullscreen_activated == true) {
 		return;
 	}
 
@@ -1047,7 +1094,7 @@ int Window::GetOpacity()
 
 void Window::SetUndecorated(bool b)
 {
-	if (_is_fullscreen == true) {
+	if (_is_fullscreen_activated == true) {
 		return;
 	}
 
@@ -1058,7 +1105,7 @@ void Window::SetUndecorated(bool b)
 
 void Window::SetBorderSize(int size)
 {
-	if (_is_fullscreen == true) {
+	if (_is_fullscreen_activated == true) {
 		return;
 	}
 
@@ -1248,6 +1295,8 @@ void Window::InternalReleaseWindow()
 		_graphics = NULL;
 	}
 	
+	InternalReleaseFullScreen();
+
 #if defined(DIRECTFB_UI)
 	if (_window) {
 		_window->SetOpacity(_window, 0x00);
@@ -1272,6 +1321,8 @@ void Window::InternalReleaseWindow()
 	if (_window != NULL) {
 		_window->close();
 	}
+
+	_window = NULL;
 #elif defined(X11_UI)
 	if (_window != 0) {
 		::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();

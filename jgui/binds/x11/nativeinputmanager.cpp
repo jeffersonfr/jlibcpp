@@ -55,6 +55,42 @@ NativeInputManager::~NativeInputManager()
 	Release();
 }
 
+bool NativeInputManager::GrabKeyEvents(bool b)
+{
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+
+	if (b == true) {
+		XGrabKeyboard(display, _window->_window, False, GrabModeAsync, GrabModeAsync, CurrentTime);
+
+		return true;
+	} else {
+		XUngrabKeyboard(display, CurrentTime);
+
+		return true;
+	}
+
+	return false;
+}
+
+bool NativeInputManager::GrabMouseEvents(bool b)
+{
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+	int default_screen = DefaultScreen(display);
+	::Window root_window = XRootWindow(display, default_screen);
+
+	if (b == true) {
+		XGrabPointer(display, _window->_window, False, ButtonPressMask | ButtonReleaseMask | PointerMotionMask | FocusChangeMask | EnterWindowMask | LeaveWindowMask, GrabModeAsync, GrabModeAsync, root_window, None, CurrentTime);
+
+		return true;
+	} else {
+		XUngrabPointer(display, CurrentTime);
+
+		return true;
+	}
+
+	return false;
+}
+
 void NativeInputManager::Restart()
 {
 	Release();
@@ -123,9 +159,7 @@ void NativeInputManager::SetCursorLocation(int x, int y)
 		y = 0;
 	}
 
-	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
-	::Display *display = (::Display *)handler->GetGraphicEngine();
-	int screen = handler->GetScreenNumber();
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
 
 	XWarpPointer(display, None, _window->_window, 0, 0, 0, 0, x, y);
 	XFlush(display);
@@ -138,12 +172,12 @@ jpoint_t NativeInputManager::GetCursorLocation()
 	p.x = 0;
 	p.y = 0;
 
-	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
-	::Display *display = (::Display *)handler->GetGraphicEngine();
-	int screen = handler->GetScreenNumber();
+	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
+	int default_screen = DefaultScreen(display);
+	::Window root_window = XRootWindow(display, default_screen);
 	::Window child_return;
 
-	XTranslateCoordinates(display, _window->_window, RootWindow(display, screen), 0, 0, &p.x, &p.y, &child_return);
+	XTranslateCoordinates(display, _window->_window, root_window, 0, 0, &p.x, &p.y, &child_return);
 
 	return p;
 }

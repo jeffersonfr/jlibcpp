@@ -51,6 +51,16 @@ NativeInputManager::~NativeInputManager()
 	Release();
 }
 
+bool NativeInputManager::GrabKeyEvents(bool b)
+{
+	return false;
+}
+
+bool NativeInputManager::GrabMouseEvents(bool b)
+{
+	return false;
+}
+
 void NativeInputManager::Restart()
 {
 	Release();
