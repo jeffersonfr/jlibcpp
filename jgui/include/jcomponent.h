@@ -34,6 +34,7 @@
 #include "jthemelistener.h"
 #include "jkeylistener.h"
 #include "jmouselistener.h"
+#include "jdatalistener.h"
 
 #include <string>
 #include <vector>
@@ -129,65 +130,127 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 	friend class Frame;
 
 	protected:
+		/** \brief */
 		jthread::Mutex _component_mutex;
-
+		/** \brief */
 		std::vector<FocusListener *> _focus_listeners;
+		/** \brief */
 		std::vector<ComponentListener *> _component_listeners;
+		/** \brief */
+		std::vector<jcommon::DataListener *> _data_listeners;
+		/** \brief */
+		jcommon::ParamMapper _params;
+		/** \brief */
 		jgui::Container *_parent;
+		/** \brief */
 		Component *_left;
+		/** \brief */
 		Component *_right;
+		/** \brief */
 		Component *_up;
+		/** \brief */
 		Component *_down;
+		/** \brief */
 		jgui::Font *_font;
+		/** \brief */
 		jgui::KeyMap *_keymap;
+		/** \brief */
 		std::string _name;
+		/** \brief */
 		jpoint_t _location;
+		/** \brief */
 		jpoint_t _scroll_location;
+		/** \brief */
 		jsize_t _size;
+		/** \brief */
 		jsize_t _preferred_size;
+		/** \brief */
 		jsize_t _minimum_size;
+		/** \brief */
 		jsize_t _maximum_size;
+		/** \brief */
 		Color _bgcolor;
+		/** \brief */
 		Color _fgcolor;
+		/** \brief */
 		Color _focus_bgcolor;
+		/** \brief */
 		Color _focus_fgcolor;
+		/** \brief */
 		Color _border_color;
+		/** \brief */
 		Color _focus_border_color;
+		/** \brief */
 		Color _scrollbar_color;
+		/** \brief */
 		Color _disabled_bgcolor;
+		/** \brief */
 		Color _disabled_fgcolor;
+		/** \brief */
 		Color _disabled_border_color;
+		/** \brief */
 		jcomponent_alignment_t _alignment_x;
+		/** \brief */
 		jcomponent_alignment_t _alignment_y;
+		/** \brief */
 		jcomponent_orientation_t _orientation;
+		/** \brief */
 		jcomponent_border_t _border;
+		/** \brief */
 		int _gradient_level;
+		/** \brief */
 		int _vertical_gap;
+		/** \brief */
 		int _horizontal_gap;
+		/** \brief */
 		int _border_size;
+		/** \brief */
 		int _scroll_size;
+		/** \brief */
 		int _scroll_gap;
+		/** \brief */
 		int _scroll_minor_increment;
+		/** \brief */
 		int _scroll_major_increment;
+		/** \brief */
 		int _relative_mouse_x;
+		/** \brief */
 		int _relative_mouse_y;
+		/** \brief */
 		int _relative_mouse_w;
+		/** \brief */
 		int _relative_mouse_h;
+		/** \brief */
 		int _component_state;
+		/** \brief */
 		bool _has_focus;
+		/** \brief */
 		bool _is_visible;
+		/** \brief */
 		bool _is_cyclic_focus;
+		/** \brief */
 		bool _is_navigation_enabled;
+		/** \brief */
 		bool _is_ignore_repaint;
+		/** \brief */
 		bool _is_background_visible;
+		/** \brief */
 		bool _is_focusable;
+		/** \brief */
 		bool _is_enabled;
+		/** \brief */
 		bool _is_focus_cycle_root;
+		/** \brief */
 		bool _is_theme_enabled;
+		/** \brief */
 		bool _is_valid;
+		/** \brief */
 		bool _is_scrollable_x;
+		/** \brief */
 		bool _is_scrollable_y;
+		/** \brief */
 		bool _is_scroll_visible;
+		/** \brief */
 		bool _is_smooth_scroll;
 
 	protected:
@@ -1260,6 +1323,36 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		 *
 		 */
 		virtual std::vector<ComponentListener *> & GetComponentListeners();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jcommon::ParamMapper * GetParams();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RegisterDataListener(jcommon::DataListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveDataListener(jcommon::DataListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DispatchDataEvent(jcommon::ParamMapper *params);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::vector<jcommon::DataListener *> & GetDataListeners();
 
 		/**
 		 * \brief

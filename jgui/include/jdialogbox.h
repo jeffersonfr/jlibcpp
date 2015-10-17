@@ -21,7 +21,6 @@
 #define J_DIALOGBOX_H
 
 #include "jframe.h"
-#include "jdatalistener.h"
 
 #include <string>
 #include <iostream>
@@ -39,10 +38,6 @@ namespace jgui {
 class DialogBox : public jgui::Frame{
 
 	private:
-		/** \brief */
-		std::vector<jcommon::DataListener *> _data_listeners;
-		/** \brief */
-		jcommon::ParamMapper _params;
 
 	public:
 		/**
@@ -56,36 +51,6 @@ class DialogBox : public jgui::Frame{
 		 *
 		 */
 		virtual ~DialogBox();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcommon::ParamMapper * GetParams();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterDataListener(jcommon::DataListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveDataListener(jcommon::DataListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchDataEvent(jcommon::ParamMapper *params);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::vector<jcommon::DataListener *> & GetDataListeners();
 
 };
 

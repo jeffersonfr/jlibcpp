@@ -566,6 +566,10 @@ void Container::Remove(jgui::Component *c)
 {
 	jthread::AutoLock lock(&_container_mutex);
 
+	if (c == NULL) {
+		return;
+	}
+
 	// INFO:: se o componente em foco pertencer ao container remover o foco
 	jgui::Container *container = dynamic_cast<jgui::Container *>(c);
 
