@@ -1288,6 +1288,8 @@ bool Window::Hide()
 
 void Window::InternalReleaseWindow()
 {
+	Hide();
+
 	if (_graphics != NULL) {
 		_graphics->Clear();
 
