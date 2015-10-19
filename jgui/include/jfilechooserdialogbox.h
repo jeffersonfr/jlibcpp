@@ -63,17 +63,28 @@ enum jfilechooser_filter_t {
 class FileChooserDialogBox : public jgui::DialogBox, public jgui::SelectListener{
 
 	private:
+		/** \brief */
 		std::vector<std::string> _extensions;
+		/** \brief */
 		jthread::Mutex _mutex;
+		/** \brief */
 		jgui::Label *_label;
+		/** \brief */
 		jgui::ListBox *_list;
+		/** \brief */
 		jgui::TextField *_file;
-		std::string _base_dir,
-			_current_dir;
+		/** \brief */
+		std::string _base_dir;
+		/** \brief */
+		std::string _current_dir;
+		/** \brief */
 		jfilechooser_type_t _type;
+		/** \brief */
 		jfilechooser_filter_t _filter;
-		bool _has_parent,
-			 _extension_ignorecase;
+		/** \brief */
+		bool _has_parent;
+		/** \brief */
+		bool _extension_ignorecase;
 
 		/**
 		 * \brief

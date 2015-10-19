@@ -44,9 +44,11 @@ namespace jgui {
 class MessageDialogBox : public jgui::DialogBox, public jgui::ButtonListener{
 
 	private:
+		/** \brief */
 		jthread::Mutex _message_mutex;
-
+		/** \brief */
 		Label *_label;
+		/** \brief */
 		Button *_ok;
 
 	public:

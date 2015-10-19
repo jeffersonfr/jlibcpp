@@ -36,9 +36,12 @@ namespace jgui{
 class WindowManager : public virtual jcommon::Object{
 
 	private:
+		/** \brief */
 		static WindowManager *_instance;
 	
+		/** \brief */
 		jthread::Mutex _mutex;
+		/** \brief */
 		std::vector<Window *> windows;
 		
 		/**

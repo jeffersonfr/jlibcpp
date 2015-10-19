@@ -37,9 +37,13 @@ namespace jgui {
 class ComboBox : public jgui::Component, public jgui::ItemComponent, public jgui::SelectListener{
 
 	private:
+		/** \brief */
 		Menu *_menu;
+		/** \brief */
 		jhorizontal_align_t _halign;
+		/** \brief */
 		jvertical_align_t _valign;
+		/** \brief */
 		int _old_index;
 
 	public:

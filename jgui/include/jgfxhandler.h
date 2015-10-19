@@ -71,12 +71,18 @@ class GFXHandler : public virtual jcommon::Object{
 	friend class Image;
 
 	protected:
+		/** \brief */
 		static GFXHandler * _instance;
 		
+		/** \brief */
 		std::vector<Image *> _images;
+		/** \brief */
 		std::vector<Font *> _fonts;
+		/** \brief */
 		jthread::Mutex _mutex;
+		/** \brief */
 		jsize_t _screen;
+		/** \brief */
 		jcursor_style_t _cursor;
 
 	protected:

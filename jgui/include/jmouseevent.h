@@ -66,11 +66,17 @@ enum jmouseevent_button_t {
 class MouseEvent : public jcommon::EventObject{
 
 	private:
+		/** \brief */
 		int _x;
+		/** \brief */
 		int _y;
+		/** \brief */
 		int _click_count;
+		/** \brief */
 		jmouseevent_button_t _button;
+		/** \brief */
 		jmouseevent_button_t _buttons;
+		/** \brief */
 		jmouseevent_type_t _type;
 
 	public:

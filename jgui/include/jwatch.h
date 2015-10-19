@@ -53,13 +53,21 @@ class ButtonEvent;
 class Watch : public jgui::Component, public jthread::Thread{
 
 	private:
-		int _hour,
-			_minute,
-			_second;
-		bool _running,
-			 _paused;
+		/** \brief */
+		int _hour;
+		/** \brief */
+		int _minute;
+		/** \brief */
+		int _second;
+		/** \brief */
+		bool _running;
+		/** \brief */
+		bool _paused;
+		/** \brief */
 		jwatch_type_t _type;
+		/** \brief */
 		jhorizontal_align_t _halign;
+		/** \brief */
 		jvertical_align_t _valign;
 
 	public:

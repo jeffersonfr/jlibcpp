@@ -36,6 +36,8 @@ namespace jgui {
 class Panel : public Container{
 
 	private:
+		/** \brief */
+		std::string _title;
 
 	public:
 		/**
@@ -48,8 +50,26 @@ class Panel : public Container{
 		 * \brief
 		 *
 		 */
+		Panel(std::string title, int x = 0, int y = 0, int width = 0, int height = 0);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual ~Panel();
 
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetTitle(std::string title);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::string GetTitle();
+		
 		/**
 		 * \brief
 		 *

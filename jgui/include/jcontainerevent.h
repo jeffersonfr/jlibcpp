@@ -46,7 +46,9 @@ enum jcontainerevent_type_t {
 class ContainerEvent : public jcommon::EventObject{
 
 	private:
+		/** \brief */
 		Component *_component;
+		/** \brief */
 		jcontainerevent_type_t _type;
 
 	public:

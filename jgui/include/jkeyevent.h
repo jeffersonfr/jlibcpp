@@ -255,9 +255,13 @@ enum jkeyevent_symbol_t {
 class KeyEvent : public jcommon::EventObject{
 
 	private:
+		/** \brief */
 		int _code;
+		/** \brief */
 		jkeyevent_symbol_t _symbol;
+		/** \brief */
 		jkeyevent_type_t _type;
+		/** \brief */
 		jkeyevent_modifiers_t _mod;
 
 	public:

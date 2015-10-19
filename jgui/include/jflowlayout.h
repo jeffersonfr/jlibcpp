@@ -49,10 +49,15 @@ enum jflowlayout_align_t {
 class FlowLayout : public Layout{
 
 	private:
-		jflowlayout_align_t _align,
-			_newalign;
-		int _hgap,
-				_vgap;
+		/** \brief */
+		jflowlayout_align_t _align;
+		/** \brief */
+		jflowlayout_align_t _newalign;
+		/** \brief */
+		int _hgap;
+		/** \brief */
+		int _vgap;
+		/** \brief */
 		bool _align_on_baseline;
 
 	public:

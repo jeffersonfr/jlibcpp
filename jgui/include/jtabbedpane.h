@@ -39,8 +39,9 @@ namespace jgui {
 class TabbedPane : public jgui::Container{
 
 	private:
+		/** \brief */
 		std::vector<SelectListener *> _select_listeners;
-
+		/** \brief */
 		jthread::Mutex _pane_mutex;
 
 	public:

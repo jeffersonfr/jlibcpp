@@ -46,9 +46,12 @@ enum jcoordinatelayout_orientation_t {
 class CoordinateLayout : public Layout{
 
 	private:
+		/** \brief */
 		jcoordinatelayout_orientation_t _type;
-		int _width,
-				_height;
+		/** \brief */
+		int _width;
+		/** \brief */
+		int _height;
 
 	public:
 		/**

@@ -32,6 +32,7 @@ namespace jgui {
 class TextEvent : public jcommon::EventObject{
 
 	private:
+		/** \brief */
 		std::string _text;
 
 	public:

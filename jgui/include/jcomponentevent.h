@@ -55,6 +55,7 @@ enum jcomponentevent_type_t {
 class ComponentEvent : public jcommon::EventObject{
 
 	private:
+		/** \brief */
 		jcomponentevent_type_t _type;
 
 	public:

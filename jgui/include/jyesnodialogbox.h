@@ -44,9 +44,12 @@ namespace jgui {
 class YesNoDialogBox : public jgui::DialogBox, public jgui::ButtonListener{
 
 	private:
+		/** \brief */
 		Label *_label;
-		Button *_yes,
-					 *_no;
+		/** \brief */
+		Button *_yes;
+		/** \brief */
+		Button *_no;
 
 	public:
 		/**

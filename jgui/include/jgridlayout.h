@@ -36,10 +36,14 @@ namespace jgui {
 class GridLayout : public Layout{
 
 	private:
-		int _hgap,
-				_vgap,
-				_rows,
-				_cols;
+		/** \brief */
+		int _hgap;
+		/** \brief */
+		int _vgap;
+		/** \brief */
+		int _rows;
+		/** \brief */
+		int _cols;
 
 	public:
 		/**

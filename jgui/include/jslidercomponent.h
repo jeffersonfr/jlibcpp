@@ -42,13 +42,21 @@ enum jscroll_orientation_t {
 class SliderComponent : public jgui::Component{
 
 	protected:
+		/** \brief */
 		std::vector<AdjustmentListener *> _adjust_listeners;
-		int _index,
-				_value,
-				_minimum,
-				_maximum,
-				_minimum_tick,
-				_maximum_tick;
+		/** \brief */
+		int _index;
+		/** \brief */
+		int _value;
+		/** \brief */
+		int _minimum;
+		/** \brief */
+		int _maximum;
+		/** \brief */
+		int _minimum_tick;
+		/** \brief */
+		int _maximum_tick;
+		/** \brief */
 		jscroll_orientation_t _type;
 
 	public:

@@ -58,17 +58,28 @@ enum jborderlayout_align_t {
 class BorderLayout : public Layout{
 
 	private:
-		Component *north,
-							*west,
-							*east,
-							*south,
-							*center,
-							*firstLine,
-							*lastLine,
-							*firstItem,
-							*lastItem;
-		int _hgap,
-				_vgap;
+		/** \brief */
+		Component *north;
+		/** \brief */
+		Component *west;
+		/** \brief */
+		Component *east;
+		/** \brief */
+		Component *south;
+		/** \brief */
+		Component *center;
+		/** \brief */
+		Component *firstLine;
+		/** \brief */
+		Component *lastLine;
+		/** \brief */
+		Component *firstItem;
+		/** \brief */
+		Component *lastItem;
+		/** \brief */
+		int _hgap;
+		/** \brief */
+		int _vgap;
 
 	public:
 		/**

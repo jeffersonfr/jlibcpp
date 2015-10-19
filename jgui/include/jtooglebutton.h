@@ -40,6 +40,7 @@ class ButtonEvent;
 class ToogleButton : public ImageButton{
 
 	private:
+		/** \brief */
 		bool _is_pressed;
 
 	public:

@@ -39,6 +39,7 @@ namespace jgui {
 class TextDialogBox : public jgui::DialogBox{
 
 	private:
+		/** \brief */
 		Label *_label;
 
 	public:

@@ -36,12 +36,18 @@ namespace jgui {
 class ScrollBar : public jgui::SliderComponent{
 
 	private:
+		/** \brief */
 		std::vector<AdjustmentListener *> _adjust_listeners;
-		int _index,
-			_stone_size,
-			_count_paint;
-		bool _pressed,
-			_label_visible;
+		/** \brief */
+		int _index;
+		/** \brief */
+		int _stone_size;
+		/** \brief */
+		int _count_paint;
+		/** \brief */
+		bool _pressed;
+		/** \brief */
+		bool _label_visible;
 		
 	public:
 		/**

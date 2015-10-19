@@ -36,11 +36,17 @@ namespace jgui{
 class Icon : public jgui::Component{
 
 	private:
+		/** \brief */
 		jgui::Image *_image;
-		std::string _file,
-			_text;
+		/** \brief */
+		std::string _file;
+		/** \brief */
+		std::string _text;
+		/** \brief */
 		jhorizontal_align_t _halign;
+		/** \brief */
 		jvertical_align_t _valign;
+		/** \brief */
 		bool _wrap;
 
 	public:

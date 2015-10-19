@@ -41,6 +41,7 @@ enum jfocusevent_type_t {
 class FocusEvent : public jcommon::EventObject{
 
 	private:
+		/** \brief */
 		jfocusevent_type_t _type;
 
 	public:

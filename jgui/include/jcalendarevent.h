@@ -32,9 +32,12 @@ namespace jgui {
 class CalendarEvent : public jcommon::EventObject{
 
 	private:
-		int _day,
-				_month,
-				_year;
+		/** \brief */
+		int _day;
+		/** \brief */
+		int _month;
+		/** \brief */
+		int _year;
 
 	public:
 		/**

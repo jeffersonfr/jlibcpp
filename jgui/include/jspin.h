@@ -36,7 +36,9 @@ namespace jgui {
 class Spin : public jgui::Component, public jgui::ItemComponent{
 
 	private:
+		/** \brief */
 		std::vector<SelectListener *> _select_listeners;
+		/** \brief */
 		jscroll_orientation_t _type;
 
 	private:

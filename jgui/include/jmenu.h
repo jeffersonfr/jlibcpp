@@ -50,16 +50,24 @@ enum jmenu_align_t {
 class Menu : public jgui::Frame, public jgui::ItemComponent{
 
 	private:
+		/** \brief */
 		jthread::Mutex _menu_mutex;
+		/** \brief */
 		jthread::Condition _menu_sem;
-
+		/** \brief */
 		std::vector<Menu *> _menus;
+		/** \brief */
 		jgui::Image *_check;
+		/** \brief */
 		jmenu_align_t _menu_align;
+		/** \brief */
 		std::string _title;
-		int _top_index,
-				_item_size,
-				_visible_items;
+		/** \brief */
+		int _top_index;
+		/** \brief */
+		int _item_size;
+		/** \brief */
+		int _visible_items;
 
 	public:
 		/**

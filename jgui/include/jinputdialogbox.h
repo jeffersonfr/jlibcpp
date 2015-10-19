@@ -42,9 +42,13 @@ namespace jgui {
 class InputDialogBox : public jgui::DialogBox, public jgui::ButtonListener{
 
 	private:
+		/** \brief */
 		TextField *_field;
+		/** \brief */
 		Label *_label;
+		/** \brief */
 		Button *_ok;
+		/** \brief */
 		Button *_cancel;
 
 	public:

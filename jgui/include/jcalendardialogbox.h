@@ -61,38 +61,68 @@ struct jcalendar_warnning_t {
 class CalendarDialogBox : public jgui::DialogBox, public jgui::ButtonListener, public jgui::SelectListener{
 
 	private:
+		/** \brief */
 		jthread::Mutex _cal_mutex;
-
+		/** \brief */
 		std::vector<jcalendar_warnning_t> _warnning_days;
+		/** \brief */
 		std::vector<Button *> _buttons;
-		Label *_ldom,
-			  *_lseg,
-			  *_lter,
-			  *_lqua,
-			  *_lqui,
-			  *_lsex,
-			  *_lsab;
-		Spin *_syear,
-			 *_smonth;
+		/** \brief */
+		Label *_ldom;
+		/** \brief */
+		Label *_lseg;
+		/** \brief */
+		Label *_lter;
+		/** \brief */
+		Label *_lqua;
+		/** \brief */
+		Label *_lqui;
+		/** \brief */
+		Label *_lsex;
+		/** \brief */
+		Label *_lsab;
+		/** \brief */
+		Spin *_syear;
+		/** \brief */
+		Spin *_smonth;
+		/** \brief */
 		std::string _text;
-		int delta,
-				bx,
-				by,
-				bwidth,
-				bheight,
-				_state;
-		int _day,
-				_month,
-				_year,
-				_current_day,
-				_current_month,
-				_current_year,
-				_select_day,
-				_select_month,
-				_select_year;
-		bool started,
-				 _show_text,
-				 _response;
+		/** \brief */
+		int delta;
+		/** \brief */
+		int bx;
+		/** \brief */
+		int by;
+		/** \brief */
+		int bwidth;
+		/** \brief */
+		int bheight;
+		/** \brief */
+		int _state;
+		/** \brief */
+		int _day;
+		/** \brief */
+		int _month;
+		/** \brief */
+		int _year;
+		/** \brief */
+		int _current_day;
+		/** \brief */
+		int _current_month;
+		/** \brief */
+		int _current_year;
+		/** \brief */
+		int _select_day;
+		/** \brief */
+		int _select_month;
+		/** \brief */
+		int _select_year;
+		/** \brief */
+		bool started;
+		/** \brief */
+		bool _show_text;
+		/** \brief */
+		bool _response;
 
 	private:
 		/**

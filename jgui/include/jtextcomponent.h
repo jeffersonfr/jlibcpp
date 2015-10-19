@@ -49,18 +49,31 @@ enum jcaret_type_t {
 class TextComponent : public jgui::Component{
 
 	protected:
+		/** \brief */
 		std::vector<TextListener *> _text_listeners;
+		/** \brief */
 		Color _caret_color;
+		/** \brief */
 		jhorizontal_align_t _halign;
+		/** \brief */
 		jvertical_align_t _valign;
+		/** \brief */
 		jcaret_type_t _caret_type;
+		/** \brief */
 		std::string _text;
-		int _caret_position,
-			_selection_start,
-			_selection_end,
-			_max_text_length;
-		bool _is_editable,
-			 _caret_visible;
+		/** \brief */
+		int _caret_position;
+		/** \brief */
+		int _selection_start;
+		/** \brief */
+		int _selection_end;
+		/** \brief */
+		int _max_text_length;
+		/** \brief */
+		bool _is_editable;
+		/** \brief */
+		bool _caret_visible;
+		/** \brief */
 		char _echo_char;
 
 	public:

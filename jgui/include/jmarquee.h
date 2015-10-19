@@ -55,12 +55,19 @@ enum jmarquee_mode_t {
 class Marquee : public Component, public jthread::Thread{
 
 	private:
+		/** \brief */
 		std::string _text;
+		/** \brief */
 		jmarquee_mode_t _type;
-		int _position,
-				_interval,
-				_index,
-				_step;
+		/** \brief */
+		int _position;
+		/** \brief */
+		int _interval;
+		/** \brief */
+		int _index;
+		/** \brief */
+		int _step;
+		/** \brief */
 		bool _running;
 
 	public:

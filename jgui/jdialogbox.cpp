@@ -23,7 +23,7 @@
 namespace jgui {
 
 DialogBox::DialogBox(std::string title, int x, int y, int width, int height):
- 	jgui::DialogBox(title, x, y, width, height)
+ 	jgui::Frame(title, x, y, width, height)
 {
 	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
 

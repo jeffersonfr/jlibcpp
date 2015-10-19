@@ -45,8 +45,11 @@ enum jselectevent_type_t {
 class SelectEvent : public jcommon::EventObject{
 
 	private:
+		/** \brief */
 		jgui::Item *_item;
+		/** \brief */
 		jselectevent_type_t _type;
+		/** \brief */
 		int _index;
 
 	public:

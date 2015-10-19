@@ -44,10 +44,14 @@ class Container;
 class CardLayout : public Layout{
 
 	private:
+		/** \brief */
 		std::vector<jcardlayout_map_t> vector;
-		int _hgap,
-				_vgap,
-				_current_card;
+		/** \brief */
+		int _hgap;
+		/** \brief */
+		int _vgap;
+		/** \brief */
+		int _current_card;
 
 	public:
 		/**

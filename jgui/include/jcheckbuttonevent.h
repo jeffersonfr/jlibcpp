@@ -32,6 +32,7 @@ namespace jgui {
 class CheckButtonEvent : public jcommon::EventObject{
 
 	private:
+		/** \brief */
 		bool _selected;
 
 	public:

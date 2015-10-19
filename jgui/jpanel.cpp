@@ -28,18 +28,33 @@ Panel::Panel(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Panel");
 	
-	int d = 0x10;
+	// SetBackgroundVisible(true);
+}
 
-	SetBackgroundColor(0x15-d, 0x35-d, 0x55-d, 0xff);
-	SetBorderColor(0x60-d, 0x60-d, 0x80-d, 0xff);
+Panel::Panel(std::string title, int x, int y, int width, int height):
+	Container(x, y, width, height)
+{
+	jcommon::Object::SetClassName("jgui::Panel");
+	
+	_title = title;
+
 	SetBackgroundVisible(true);
-	SetBorder(JCB_LINE);
 }
 
 Panel::~Panel()
 {
 }
 
+void Panel::SetTitle(std::string title)
+{
+	_title = title;
+}
+
+std::string Panel::GetTitle()
+{
+	return _title;
+}
+		
 void Panel::Paint(Graphics *g)
 {
 	JDEBUG(JINFO, "paint\n");

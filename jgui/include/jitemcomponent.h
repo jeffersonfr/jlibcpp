@@ -47,16 +47,26 @@ class SelectListener;
 class Item : public virtual jcommon::Object{
 
 	private:
+		/** \brief */
 		std::vector<Item *> _childs;
+		/** \brief */
 		Image *_prefetch;
-		std::string _value,
-			_image;
+		/** \brief */
+		std::string _value;
+		/** \brief */
+		std::string _image;
+		/** \brief */
 		jitem_type_t _type;
+		/** \brief */
 		jhorizontal_align_t _halign;
+		/** \brief */
 		jvertical_align_t _valign;
-		bool _is_checked,
-		 	_is_visible,
-		 	_is_enabled;
+		/** \brief */
+		bool _is_checked;
+		/** \brief */
+		bool _is_visible;
+		/** \brief */
+		bool _is_enabled;
 
 	public:
 		/**

@@ -47,6 +47,7 @@ enum jwindowevent_type_t {
 class WindowEvent : public jcommon::EventObject{
 
 	private:
+		/** \brief */
 		jwindowevent_type_t _type;
 
 	public:

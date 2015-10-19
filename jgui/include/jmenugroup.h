@@ -38,7 +38,9 @@ namespace jgui {
 class MenuGroup : public SelectListener{
 
 	private:
+		/** \brief */
 		std::vector<Item *> _items;
+		/** \brief */
 		Menu *_menu;
 
 	protected:

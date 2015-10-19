@@ -43,9 +43,13 @@ namespace jgui {
 class Animation : public Component, public jthread::Thread{
 
 	private:
+		/** \brief */
 		std::vector<Image *> _images;
-		int _index,
-			_interval;
+		/** \brief */
+		int _index;
+		/** \brief */
+		int _interval;
+		/** \brief */
 		bool _running;
 
 	public:

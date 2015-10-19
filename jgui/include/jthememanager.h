@@ -37,11 +37,15 @@ namespace jgui {
 class ThemeManager : public virtual jcommon::Object{
 
 	private:
+		/** \brief */
 		static ThemeManager *_instance;
 
+		/** \brief */
 		std::vector<ThemeListener *> _theme_listeners;
-		Theme *_theme,
-					*_default_theme;
+		/** \brief */
+		Theme *_theme;
+		/** \brief */
+		Theme *_default_theme;
 
 		/**
 		 * \brief

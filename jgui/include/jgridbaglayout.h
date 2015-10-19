@@ -196,29 +196,52 @@ class GridBagConstraints{
 	private:
 
 	public:
+		/** \brief */
     jinsets_t insets;
-    double weightx,
-					 weighty;
-		int anchor,
-				fill,
-				ipadx,
-				ipady,
-				tempX,
-				tempY,
-				tempWidth,
-				tempHeight,
-				minWidth,
-				minHeight,
-				ascent,
-				descent,
-				centerPadding,
-				centerOffset,
-				gridx,
-				gridy,
-				gridwidth,
-				gridheight;
+		/** \brief */
+    double weightx;
+		/** \brief */
+		double weighty;
+		/** \brief */
+		int anchor;
+		/** \brief */
+		int fill;
+		/** \brief */
+		int ipadx;
+		/** \brief */
+		int ipady;
+		/** \brief */
+		int tempX;
+		/** \brief */
+		int tempY;
+		/** \brief */
+		int tempWidth;
+		/** \brief */
+		int tempHeight;
+		/** \brief */
+		int minWidth;
+		/** \brief */
+		int minHeight;
+		/** \brief */
+		int ascent;
+		/** \brief */
+		int descent;
+		/** \brief */
+		int centerPadding;
+		/** \brief */
+		int centerOffset;
+		/** \brief */
+		int gridx;
+		/** \brief */
+		int gridy;
+		/** \brief */
+		int gridwidth;
+		/** \brief */
+		int gridheight;
+		/** \brief */
 		jcomponent_behavior_t baselineResizeBehavior;
 
+	public:
 		GridBagConstraints() 
 		{
 			this->gridx = JGBLC_RELATIVE;
@@ -292,26 +315,45 @@ class GridBagConstraints{
 class GridBagLayoutInfo{
 
 	public:
-		int width, 
-				height;							// number of  cells: horizontal and vertical
-		int startx, 
-				starty;							// starting point for layout
-		int *minWidth,				// largest minWidth in each column
-				*minHeight,											// largest minHeight in each row
-				*maxAscent,											// Max ascent (baseline)
-				*maxDescent;										// Max descent (height - baseline)
-		double *weightX,			// largest weight in each column
-					 *weightY;												// largest weight in each row
-		bool hasBaseline;								// Whether or not baseline layout has been requested and one of the components has a valid baseline
+		/** \brief */
+		int width; 
+		/** \brief */
+		int height;						// number of  cells: horizontal and vertical
+		/** \brief */
+		int startx; 
+		/** \brief */
+		int starty;						// starting point for layout
+		/** \brief */
+		int *minWidth;				// largest minWidth in each column
+		/** \brief */
+		int *minHeight;				// largest minHeight in each row
+		/** \brief */
+		int *maxAscent;				// Max ascent (baseline)
+		/** \brief */
+		int *maxDescent;			// Max descent (height - baseline)
+		/** \brief */
+		double *weightX;			// largest weight in each column
+		/** \brief */
+		double *weightY;			// largest weight in each row
+		/** \brief */
+		bool hasBaseline;			// Whether or not baseline layout has been requested and one of the components has a valid baseline
 		// These are only valid if hasBaseline is true and are indexed by row
+		/** \brief */
 		short *baselineType;	// The type of baseline for a particular row.  A mix of the BaselineResizeBehavior constants (1 << ordinal())
-		int minWidthSize,
-				minHeightSize,
-				maxAscentSize,
-				maxDescentSize,
-				weightXSize,
-				weightYSize,
-				baselineTypeSize;
+		/** \brief */
+		int minWidthSize;
+		/** \brief */
+		int minHeightSize;
+		/** \brief */
+		int maxAscentSize;
+		/** \brief */
+		int maxDescentSize;
+		/** \brief */
+		int weightXSize;
+		/** \brief */
+		int weightYSize;
+		/** \brief */
+		int baselineTypeSize;
 
 	public:
 		GridBagLayoutInfo(int width, int height) 
