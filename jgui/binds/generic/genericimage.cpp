@@ -39,42 +39,113 @@
 
 namespace jgui {
 
-/*
-uint32_t * resize_bilinear(uint32_t *pixels, int w, int h, int w2, int h2) 
+static void NearestNeighborScale(uint32_t *src, uint32_t *dst, int w, int h, int sw, int sh) 
 {
-	uint32_t *temp = new uint32_t[w2*h2];
-	uint32_t a, b, c, d, x, y, index;
-	double x_ratio = ((double)(w-1))/w2;
-	double y_ratio = ((double)(h-1))/h2;
-	double x_diff, y_diff, blue, red, green;
+	int x_ratio = (int)((w << 16)/sw) + 1;
+	int y_ratio = (int)((h << 16)/sh) + 1;
+	int x2, y2;
+
+	for (int i=0; i<sh; i++) {
+		y2 = ((i*y_ratio) >> 16);
+
+		uint32_t *t = dst + i*sw;
+		uint32_t *p = src + y2*w;
+		int rat = 0;
+
+		for (int j=0; j<sw; j++) {
+			x2 = (rat >> 16);
+			*t++ = p[x2];
+			rat += x_ratio;
+		}
+	}
+
+	/*
+	for (int i=0; i<sh; i++) {
+		for (int j=0; j<sw; j++) {
+			x2 = ((j*x_ratio) >> 16) ;
+			y2 = ((i*y_ratio) >> 16) ;
+			dst[(i*sw)+j] = src[(y2*w)+x2] ;
+		}                
+	}
+	*/
+}
+		
+static void BilinearScale(uint32_t *src, uint32_t *dst, int w, int h, int sw, int sh) 
+{
+	int a, b, c, d, x, y, index;
+	float x_ratio = ((float)(w-1))/sw;
+	float y_ratio = ((float)(h-1))/sh;
+	float x_diff, y_diff;
+	int blue, red, green, alpha;
 	int offset = 0;
 
-	for (int i=0; i<h2; i++) {
-		for (int j=0; j<w2; j++) {
+	for (int i=0; i<sh; i++) {
+		for (int j=0; j<sw; j++) {
 			x = (int)(x_ratio * j);
 			y = (int)(y_ratio * i);
 			x_diff = (x_ratio * j) - x;
 			y_diff = (y_ratio * i) - y;
-			index = (y*w+x); 
-			a = pixels[index];
-			b = pixels[index+1];
-			c = pixels[index+w];
-			d = pixels[index+w+1];
+			index = (y*w + x);
 
-			// blue element:: Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
-			blue = (a&0xff)*(1-x_diff)*(1-y_diff) + (b&0xff)*(x_diff)*(1-y_diff) + (c&0xff)*(y_diff)*(1-x_diff)   + (d&0xff)*(x_diff*y_diff);
-			// green element:: Yg = Ag(1-w)(1-h) + Bg(w)(1-h) + Cg(h)(1-w) + Dg(wh)
-			green = ((a>>8)&0xff)*(1-x_diff)*(1-y_diff) + ((b>>8)&0xff)*(x_diff)*(1-y_diff) + ((c>>8)&0xff)*(y_diff)*(1-x_diff)   + ((d>>8)&0xff)*(x_diff*y_diff);
-			// red element:: Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
-			red = ((a>>16)&0xff)*(1-x_diff)*(1-y_diff) + ((b>>16)&0xff)*(x_diff)*(1-y_diff) + ((c>>16)&0xff)*(y_diff)*(1-x_diff)   + ((d>>16)&0xff)*(x_diff*y_diff);
+			a = src[index + 0*w + 0];
+			b = src[index + 0*w + 1];
+			c = src[index + 1*w + 0];
+			d = src[index + 1*w + 1];
 
-			temp[offset++] = ((((int)red) << 24) & 0xff000000) | ((((int)red) << 16) & 0xff0000) | ((((int)green) << 8) & 0xff00) | ((int)blue);
+			float m1 = (1-x_diff)*(1-y_diff);
+			float m2 = (x_diff)*(1-y_diff);
+			float m3 = (y_diff)*(1-x_diff);
+			float m4 = (x_diff*y_diff);
+
+			blue = (int)(((a>>0x00) & 0xff)*m1 + ((b>>0x00) & 0xff)*m2 + ((c>>0x00) & 0xff)*m3 + ((d>>0x00) & 0xff)*m4);
+			green = (int)(((a>>0x08) & 0xff)*m1 + ((b>>0x08) & 0xff)*m2 + ((c>>0x08) & 0xff)*m3 + ((d>>0x08) & 0xff)*m4);
+			red = (int)(((a>>0x10) & 0xff)*m1 + ((b>>0x10) & 0xff)*m2 + ((c>>0x10) & 0xff)*m3 + ((d>>0x10) & 0xff)*m4);
+			alpha = (int)(((a>>0x18) & 0xff)*m1 + ((b>>0x18) & 0xff)*m2 + ((c>>0x18) & 0xff)*m3 + ((d>>0x18) & 0xff)*m4);
+
+			dst[offset++] = 
+				((alpha << 0x18) & 0xff000000) | ((red << 0x10) & 0x00ff0000) |
+				((green << 0x08) & 0x0000ff00) | ((blue << 0x00) & 0x000000ff);
 		}
 	}
-
-	return temp;
 }
-*/
+
+static void NearesNeighborRotate(uint32_t *src, int w, int h, uint32_t *dst, int dw, int dh, double radians, bool resize)
+{
+	double angle = fmod(radians, 2*M_PI);
+	int precision = 1024;
+	int sinTheta = precision*sin(angle);
+	int cosTheta = precision*cos(angle);
+
+	int iw = dw;
+	int ih = dh;
+
+	memset(dst, 0, iw*ih*sizeof(uint32_t));
+
+	int sxc = w/2;
+	int syc = h/2;
+	int dxc = iw/2;
+	int dyc = ih/2;
+	int xo;
+	int yo;
+	int t1;
+	int t2;
+
+	for (int j=0; j<ih; j++) {
+		uint32_t *ptr = dst + j*iw;
+
+		t1 = (j-dyc)*sinTheta;
+		t2 = (j-dyc)*cosTheta;
+
+		for (int i=0; i<iw; i++) {
+			xo = ((i-dxc)*cosTheta - t1)/precision;
+			yo = ((i-dxc)*sinTheta + t2)/precision;
+
+			if (xo >= -sxc && xo < sxc && yo >= -syc && yo < syc) {
+				*(ptr+i) = *(src + (yo+syc)*w + (xo+sxc));
+			}
+		}
+	}
+}
 
 GenericImage::GenericImage(cairo_t *cairo_context, jpixelformat_t pixelformat, int width, int height):
 	jgui::Image(pixelformat, width, height)
@@ -353,28 +424,58 @@ Image * GenericImage::Rotate(Image *img, double radians, bool resize)
 		iw = (abs(isize.width*cosTheta)+abs(isize.height*sinTheta))/precision;
 		ih = (abs(isize.width*sinTheta)+abs(isize.height*cosTheta))/precision;
 		
-		GenericImage *dst = new GenericImage(NULL, img->GetPixelFormat(), iw, ih);
-		cairo_t *dst_context = dynamic_cast<GenericGraphics *>(dst->GetGraphics())->_cairo_context;
+		GenericImage *image = new GenericImage(NULL, img->GetPixelFormat(), iw, ih);
 
-		cairo_translate(dst_context, iw/2, ih/2);
-		cairo_rotate(dst_context, -radians);
-		cairo_translate(dst_context, -iw/2, -ih/2);
-		cairo_set_source_surface(dst_context, src_surface, (iw-isize.width)/2, (ih-isize.height)/2);
-		cairo_paint(dst_context);
+		if (img->GetGraphics()->GetAntialias() == JAM_NONE) {
+			uint32_t *src = new uint32_t[isize.width*isize.height];
+			uint32_t *dst = new uint32_t[iw*ih];
 
-		return dst;
+			img->GetRGBArray(&src, 0, 0, isize.width, isize.height);
+
+			NearesNeighborRotate(src, isize.width, isize.height, dst, iw, ih, radians, true);
+
+			image->GetGraphics()->SetRGBArray(dst, 0, 0, iw, ih);
+
+			delete [] src;
+			delete [] dst;
+		} else {
+			cairo_t *dst_context = dynamic_cast<GenericGraphics *>(image->GetGraphics())->_cairo_context;
+
+			cairo_translate(dst_context, iw/2, ih/2);
+			cairo_rotate(dst_context, -radians);
+			cairo_translate(dst_context, -iw/2, -ih/2);
+			cairo_set_source_surface(dst_context, src_surface, (iw-isize.width)/2, (ih-isize.height)/2);
+			cairo_paint(dst_context);
+		}
+
+		return image;
 	}
 
-	GenericImage *dst = new GenericImage(NULL, img->GetPixelFormat(), iw, ih);
-	cairo_t *dst_context = dynamic_cast<GenericGraphics *>(dst->GetGraphics())->_cairo_context;
+	GenericImage *image = new GenericImage(NULL, img->GetPixelFormat(), iw, ih);
+	
+	if (img->GetGraphics()->GetAntialias() == JAM_NONE) {
+		uint32_t *src = new uint32_t[isize.width*isize.height];
+		uint32_t *dst = new uint32_t[iw*ih];
 
-	cairo_translate(dst_context, isize.width/2, isize.height/2);
-	cairo_rotate(dst_context, -radians);
-	cairo_translate(dst_context, -isize.width/2, -isize.height/2);
-	cairo_set_source_surface(dst_context, src_surface, 0, 0);
-	cairo_paint(dst_context);
+		img->GetRGBArray(&src, 0, 0, isize.width, isize.height);
 
-	return dst;
+		NearesNeighborRotate(src, isize.width, isize.height, dst, iw, ih, radians, false);
+
+		image->GetGraphics()->SetRGBArray(dst, 0, 0, iw, ih);
+
+		delete [] src;
+		delete [] dst;
+	} else {
+		cairo_t *dst_context = dynamic_cast<GenericGraphics *>(image->GetGraphics())->_cairo_context;
+
+		cairo_translate(dst_context, isize.width/2, isize.height/2);
+		cairo_rotate(dst_context, -radians);
+		cairo_translate(dst_context, -isize.width/2, -isize.height/2);
+		cairo_set_source_surface(dst_context, src_surface, 0, 0);
+		cairo_paint(dst_context);
+	}
+
+	return image;
 }
 
 Image * GenericImage::Scale(Image *img, int width, int height)
@@ -386,12 +487,29 @@ Image * GenericImage::Scale(Image *img, int width, int height)
 	}
 
 	GenericImage *image = new GenericImage(NULL, img->GetPixelFormat(), width, height);
-	cairo_t *cairo_context = dynamic_cast<GenericGraphics *>(image->GetGraphics())->_cairo_context;
+	jsize_t size = img->GetSize();
+	
+	if (img->GetGraphics()->GetAntialias() == JAM_NONE) {
+		uint32_t *src = new uint32_t[size.width*size.height];
+		uint32_t *dst = new uint32_t[width*height];
 
-	cairo_surface_flush(cairo_surface);
-	cairo_scale(cairo_context, (double)width/img->GetWidth(), (double)height/img->GetHeight());
-	cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
-	cairo_paint(cairo_context);
+		img->GetRGBArray(&src, 0, 0, size.width, size.height);
+
+		NearestNeighborScale(src, dst, size.width, size.height, width, height); 
+		// BilinearScale(src, dst, size.width, size.height, width, height); 
+
+		image->GetGraphics()->SetRGBArray(dst, 0, 0, width, height);
+
+		delete [] src;
+		delete [] dst;
+	} else {
+		cairo_t *cairo_context = dynamic_cast<GenericGraphics *>(image->GetGraphics())->_cairo_context;
+
+		cairo_surface_flush(cairo_surface);
+		cairo_scale(cairo_context, (double)width/img->GetWidth(), (double)height/img->GetHeight());
+		cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
+		cairo_paint(cairo_context);
+	}
 
 	return image;
 }
