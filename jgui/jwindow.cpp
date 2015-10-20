@@ -1206,7 +1206,7 @@ void Window::PaintBackground(Graphics *g)
 void Window::Paint(Graphics *g)
 {
 	// CHANGE:: clear suface before paint (directfb-cairo)
-	_graphics->Clear();
+	g->Clear();
 
 	Container::Paint(g);
 }
