@@ -27,7 +27,6 @@
 #include "jbuttonlistener.h"
 #include "jlabel.h"
 #include "jdialogbox.h"
-
 #include "jthread.h"
 #include "jmutex.h"
 #include "jdate.h"

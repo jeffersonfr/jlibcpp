@@ -1031,7 +1031,7 @@ class PathsTest : public jgui::Frame{
 			jgui::Path *path = g->CreatePath();
 
 			if (path == NULL) {
-				g->SetColor(jgui::Color::Black);
+				g->SetColor(_fgcolor);
 				g->DrawString("The graphic engine does not support this operation !", 0, 0, GetWidth(), GetHeight());
 
 				return;

@@ -44,6 +44,7 @@ Container::Container(int x, int y, int width, int height):
 	_parent = NULL;
 	_optimized_paint = false;
 	_border = JCB_EMPTY;
+	_dialog = NULL;
 
 	_scroll_dimension.width = _size.width;
 	_scroll_dimension.height = _size.height;
@@ -261,6 +262,13 @@ void Container::SetOptimizedPaint(bool b)
 	_optimized_paint = b;
 }
 
+void Container::ShowDialog(Container *dialog)
+{
+	_dialog = dialog;
+
+	Repaint();
+}
+
 void Container::SetLayout(jgui::Layout *layout)
 {
 	if (layout == NULL) {
@@ -445,6 +453,11 @@ void Container::Paint(Graphics *g)
 	}
 				
 	g->SetClip(clip.x, clip.y, clip.width, clip.height);
+
+	if (_dialog != NULL) {
+		g->Reset(); 
+		_dialog->Paint(g);
+	}
 
 	if (IsScrollVisible() == true) {
 		g->Reset(); 
@@ -737,6 +750,25 @@ void Container::ReleaseComponentFocus(jgui::Component *c)
 
 bool Container::KeyPressed(KeyEvent *event)
 {
+	bool exit = (event->GetSymbol() == jgui::JKS_ESCAPE || event->GetSymbol() == jgui::JKS_EXIT);
+
+	if (_dialog != NULL) {
+		if (exit == true || event->GetSymbol() == jgui::JKS_BACKSPACE) {
+			if (_dialog->KeyPressed(event) == false) {
+				ShowDialog(NULL);
+
+				delete _dialog;
+				_dialog = NULL;
+
+				Repaint();
+			}
+			
+			return true;
+		} else {
+			return _dialog->KeyPressed(event);
+		}
+	}
+
 	if (Component::KeyPressed(event) == true) {
 		return true;
 	}
@@ -758,6 +790,10 @@ bool Container::KeyPressed(KeyEvent *event)
 
 bool Container::MousePressed(MouseEvent *event)
 {
+	if (_dialog != NULL) {
+		return _dialog->MousePressed(event);
+	}
+
 	if (Component::MousePressed(event) == true) {
 		return true;
 	}
@@ -786,6 +822,10 @@ bool Container::MousePressed(MouseEvent *event)
 
 bool Container::MouseReleased(MouseEvent *event)
 {
+	if (_dialog != NULL) {
+		return _dialog->MouseReleased(event);
+	}
+
 	if (Component::MouseReleased(event) == true) {
 		return true;
 	}
@@ -814,6 +854,10 @@ bool Container::MouseReleased(MouseEvent *event)
 
 bool Container::MouseMoved(MouseEvent *event)
 {
+	if (_dialog != NULL) {
+		return _dialog->MouseMoved(event);
+	}
+
 	if (Component::MouseMoved(event) == true) {
 		return true;
 	}
@@ -842,6 +886,10 @@ bool Container::MouseMoved(MouseEvent *event)
 
 bool Container::MouseWheel(MouseEvent *event)
 {
+	if (_dialog != NULL) {
+		return _dialog->MouseWheel(event);
+	}
+
 	if (Component::MouseWheel(event) == true) {
 		return true;
 	}
