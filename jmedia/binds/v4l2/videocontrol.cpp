@@ -177,7 +177,7 @@ bool VideoControl::SetValue(jmedia::jvideo_control_t id, int value)
 		}
 
 		if (t.value == value) {
-			return true;
+			// return true;
 		}
 
 		struct v4l2_control control;
