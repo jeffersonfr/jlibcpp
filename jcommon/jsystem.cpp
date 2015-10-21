@@ -69,6 +69,10 @@ System::~System()
 
 void System::Beep(int freq, int delay)
 {
+	if (freq == 0) {
+		return;
+	}
+
 #ifdef _WIN32
 	::Beep(freq, delay);
 #else

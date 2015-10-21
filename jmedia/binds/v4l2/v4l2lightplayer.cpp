@@ -162,8 +162,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
 
 				_mutex.Unlock();
-
-				Start();
 			}
 #else
 			if (IsRunning() == true) {
@@ -192,9 +190,9 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 			cairo_surface_destroy(cairo_surface);
 
 			_mutex.Unlock();
-
-			Start();
 #endif
+
+			Run();
 		}
 
 		virtual void Run()

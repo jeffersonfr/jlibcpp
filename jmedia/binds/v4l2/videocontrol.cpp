@@ -35,6 +35,16 @@ VideoControl::VideoControl(int handler)
 		}
 	}
 
+	for (queryctrl.id = V4L2_CID_CAMERA_CLASS_BASE; queryctrl.id < V4L2_CID_CAMERA_CLASS_BASE + 32; queryctrl.id++) {
+		if (0 == ioctl (_handler, VIDIOC_QUERYCTRL, &queryctrl)) {
+			if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED) {
+				continue;
+			}
+
+			EnumerateControls();
+		}
+	}
+
 	for (queryctrl.id = V4L2_CID_PRIVATE_BASE;; queryctrl.id++) {
 		if (0 == ioctl (_handler, VIDIOC_QUERYCTRL, &queryctrl)) {
 			if (queryctrl.flags & V4L2_CTRL_FLAG_DISABLED) {
@@ -68,12 +78,24 @@ void VideoControl::EnumerateControls()
 		id = jmedia::JVC_HUE;
 	} else if (queryctrl.id == V4L2_CID_GAMMA) {
 		id = jmedia::JVC_GAMMA;
+	} else if (queryctrl.id == V4L2_CID_SHARPNESS) {
+		id = jmedia::JVC_SHARPNESS;
 	} else if (queryctrl.id == V4L2_CID_FOCUS_AUTO) {
 		id = jmedia::JVC_AUTO_FOCUS;
 	} else if (queryctrl.id == V4L2_CID_ZOOM_ABSOLUTE) {
-		// id = jmedia::JVC_ZOOM_ABSOLUTE;
+		id = jmedia::JVC_ZOOM;
+	} else if (queryctrl.id == V4L2_CID_HFLIP) {
+		id = jmedia::JVC_HFLIP;
+	} else if (queryctrl.id == V4L2_CID_VFLIP) {
+		id = jmedia::JVC_VFLIP;
+	} else if (queryctrl.id == V4L2_CID_BACKLIGHT_COMPENSATION) {
+		id = jmedia::JVC_BACKLIGHT;
+	} else if (queryctrl.id == V4L2_CID_EXPOSURE) {
+		// id = jmedia::JVC_AUTO_EXPOSURE;
 	} else if (queryctrl.id == V4L2_CID_EXPOSURE_AUTO_PRIORITY) {
 		id = jmedia::JVC_AUTO_EXPOSURE;
+	} else if (queryctrl.id == V4L2_CID_EXPOSURE_AUTO) {
+		// id = jmedia::JVC_AUTO_EXPOSURE;
 	} else {
 		return;
 	}
