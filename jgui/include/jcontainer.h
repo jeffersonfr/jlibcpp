@@ -58,8 +58,6 @@ class Container : public jgui::Component{
 		/** \brief */
 		Component *_focus;
 		/** \brief */
-		Container *_dialog;
-		/** \brief */
 		Layout *_default_layout;
 		/** \brief */
 		Layout *_layout;
@@ -141,12 +139,6 @@ class Container : public jgui::Component{
 		 *
 		 */
 		virtual void DoLayout();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ShowDialog(Container *dialog);
 
 		/**
 		 * \brief
