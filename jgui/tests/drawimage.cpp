@@ -641,8 +641,11 @@ class Picture : public jgui::Component {
 		{
 			jgui::Component::Paint(g);
 
-			if (IsFontSet() == true) {
-				int height = _font->GetSize();
+			jgui::Theme *theme = GetTheme();
+			jgui::Font *font = theme->GetFont("component");
+
+			if (font != NULL) {
+				int height = font->GetSize();
 
 				g->SetColor(jgui::Color::White);
 				g->DrawString(_title, 0, 0);

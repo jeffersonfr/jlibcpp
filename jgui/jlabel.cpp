@@ -101,18 +101,22 @@ jvertical_align_t Label::GetVerticalAlign()
 
 jsize_t Label::GetPreferredSize()
 {
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	int bordersize = theme->GetBorderSize("component");
+
 	jsize_t t = _size;
 
-	if (IsFontSet() == true) {
-		int wp = _size.width-2*(_horizontal_gap-_border_size),
-				hp = _font->GetSize();
+	if (font != NULL) {
+		int wp = _size.width-2*(_horizontal_gap-bordersize),
+				hp = font->GetSize();
 
 		if (wp > 0) {
 			std::vector<std::string> lines;
 
-			_font->GetStringBreak(&lines, _text, wp, INT_MAX, _halign);
+			font->GetStringBreak(&lines, _text, wp, INT_MAX, _halign);
 
-			t.height = lines.size()*hp+2*(_vertical_gap+_border_size);
+			t.height = lines.size()*hp+2*(_vertical_gap+bordersize);
 		}
 	}
 
@@ -125,25 +129,35 @@ void Label::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	if (IsFontSet() == true) {
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	int bordersize = theme->GetBorderSize("component");
+
+	if (font != NULL) {
+		g->SetFont(font);
+
 		if (_is_enabled == true) {
 			if (_has_focus == true) {
-				g->SetColor(_focus_fgcolor);
+				g->SetColor(fgfocus);
 			} else {
-				g->SetColor(_fgcolor);
+				g->SetColor(fg);
 			}
 		} else {
-			g->SetColor(_disabled_fgcolor);
+			g->SetColor(fgdisable);
 		}
 
-		int x = _horizontal_gap+_border_size,
-				y = _vertical_gap+_border_size,
+		int x = _horizontal_gap+bordersize,
+				y = _vertical_gap+bordersize,
 				w = _size.width-2*x,
 				h = _size.height-2*y,
 				gapx = 0,
 				gapy = 0;
 		int px = x+gapx,
-				py = y+gapy,//(h-_font->GetSize())/2+gapy,
+				py = y+gapy,//(h-font->GetSize())/2+gapy,
 				pw = w-gapx,
 				ph = h-gapy;
 
@@ -160,7 +174,7 @@ void Label::Paint(Graphics *g)
 		std::string text = GetText();
 
 		if (_is_wrap == false) {
-			text = _font->TruncateString(text, "...", w);
+			text = font->TruncateString(text, "...", w);
 		}
 
 		g->DrawString(text, px, py, pw, ph, _halign, _valign);

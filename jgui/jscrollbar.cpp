@@ -57,8 +57,11 @@ jscroll_orientation_t ScrollBar::GetScrollOrientation()
 
 void ScrollBar::SetStoneSize(int size)
 {
-	int x = _vertical_gap-_border_size,
-			y = _horizontal_gap-_border_size,
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
+	int x = _vertical_gap-bordersize,
+			y = _horizontal_gap-bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y,
 			arrow_size;
@@ -146,15 +149,18 @@ bool ScrollBar::MousePressed(MouseEvent *event)
 		return true;
 	}
 
-	int x = _horizontal_gap-_border_size,
-			y = _vertical_gap-_border_size,
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
+	int x = _horizontal_gap-bordersize,
+			y = _vertical_gap-bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y;
 	int arrow_size,
 			x1 = event->GetX(),
 			y1 = event->GetY(),
-			dx = _vertical_gap-_border_size,
-			dy = _horizontal_gap-_border_size,
+			dx = _vertical_gap-bordersize,
+			dy = _horizontal_gap-bordersize,
 			dw = _size.width-2*dx-_stone_size,
 			dh = _size.height-2*dy-_stone_size;
 	bool catched = false;
@@ -230,15 +236,18 @@ bool ScrollBar::MouseMoved(MouseEvent *event)
 		return true;
 	}
 	
-	int x = _horizontal_gap-_border_size,
-			y = _vertical_gap-_border_size,
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
+	int x = _horizontal_gap-bordersize,
+			y = _vertical_gap-bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y;
 	int arrow_size,
 			x1 = event->GetX(),
 			y1 = event->GetY(),
-			dx = _vertical_gap-_border_size,
-			dy = _horizontal_gap-_border_size,
+			dx = _vertical_gap-bordersize,
+			dy = _horizontal_gap-bordersize,
 			dw = _size.width-2*dx-_stone_size,
 			dh = _size.height-2*dy-_stone_size;
 
@@ -282,8 +291,13 @@ void ScrollBar::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int x = _horizontal_gap-_border_size,
-			y = _vertical_gap-_border_size,
+	Theme *theme = GetTheme();
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color scroll = theme->GetColor("component.scroll");
+	int bordersize = theme->GetBorderSize("component");
+
+	int x = _horizontal_gap-bordersize,
+			y = _vertical_gap-bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y;
 	int gap = 4;
@@ -299,9 +313,9 @@ void ScrollBar::Paint(Graphics *g)
 		}
 
 		if (_has_focus == true) {
-			g->SetColor(_focus_fgcolor);
+			g->SetColor(fgfocus);
 		} else {
-			g->SetColor(_scrollbar_color);
+			g->SetColor(scroll);
 		}
 
 		g->FillRectangle((int)d+arrow_size+x+gap, y, _stone_size, h);
@@ -319,9 +333,9 @@ void ScrollBar::Paint(Graphics *g)
 		}
 
 		if (_has_focus == true) {
-			g->SetColor(_focus_fgcolor);
+			g->SetColor(fgfocus);
 		} else {
-			g->SetColor(_scrollbar_color);
+			g->SetColor(scroll);
 		}
 
 		g->FillRectangle(x, (int)d+arrow_size+y+gap, w, _stone_size);

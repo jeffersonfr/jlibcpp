@@ -39,15 +39,14 @@ Menu::Menu(int x, int y, int width, int visible_items):
 		_visible_items = 1;
 	}
 
-	SetSize(width, _visible_items*(_item_size+_vertical_gap)+2*_vertical_gap+_border_size);
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
+	SetSize(width, _visible_items*(_item_size+_vertical_gap)+2*_vertical_gap+bordersize);
 
 	_check = Image::CreateImage(_DATA_PREFIX"/images/check.png");
 
 	SetUndecorated(true);
-
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	theme->Update(this);
 }
 
 Menu::~Menu() 
@@ -72,6 +71,9 @@ Menu::~Menu()
 
 bool Menu::KeyPressed(KeyEvent *event)
 {
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	/*
 	if (Frame::KeyPressed(event) == true) {
 		return true;
@@ -205,10 +207,10 @@ bool Menu::KeyPressed(KeyEvent *event)
 					} else if (_menu_align == JMA_ITEM) {
 						jinsets_t insets = last->GetInsets();
 						int x = last->GetX()+last->GetWidth()+5,
-								y = last->GetY()+position*((last->GetHeight()-_vertical_gap-_border_size)/last->GetVisibleItems());
+								y = last->GetY()+position*((last->GetHeight()-_vertical_gap-bordersize)/last->GetVisibleItems());
 
 						if (_title != "" && _menus.size() == 0) {
-							y = last->GetY()+position*((last->GetHeight()-insets.top-_vertical_gap-_border_size)/last->GetVisibleItems())+insets.top;
+							y = last->GetY()+position*((last->GetHeight()-insets.top-_vertical_gap-bordersize)/last->GetVisibleItems())+insets.top;
 						}
 
 						menu = new Menu(x, y, last->GetWidth(), items.size());
@@ -336,10 +338,13 @@ void Menu::SetTitle(std::string title)
 		return;
 	}
 
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	_title = title;
 
 	int w = _size.width,
-			h = _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+_border_size);
+			h = _visible_items*(_item_size+_vertical_gap)+2*(_vertical_gap+bordersize);
 
 	if (_title != "") {
 		h = h + GetInsets().top-_vertical_gap;
@@ -451,8 +456,15 @@ void Menu::Paint(Graphics *g)
 
 	Frame::Paint(g);
 
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color scroll = theme->GetColor("component.scroll");
+	int bordersize = theme->GetBorderSize("component");
+
+	int x = _horizontal_gap+bordersize,
+			y = _vertical_gap+bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y;
 
@@ -464,20 +476,21 @@ void Menu::Paint(Graphics *g)
 	if (_title != "") {
 		jinsets_t insets = GetInsets();
 
-		g->SetGradientStop(0.0, _bgcolor);
-		g->SetGradientStop(1.0, _scrollbar_color);
-		g->FillLinearGradient(_border_size, _border_size, _size.width-2*_border_size, insets.top-2*_border_size, 0, 0, _size.width-2*_border_size, insets.top-2*_border_size);
+		g->SetGradientStop(0.0, bg);
+		g->SetGradientStop(1.0, scroll);
+		g->FillLinearGradient(bordersize, bordersize, _size.width-2*bordersize, insets.top-2*bordersize, 0, 0, _size.width-2*bordersize, insets.top-2*bordersize);
 		g->ResetGradientStop();
 
-		if (IsFontSet() == true) {
+		if (font != NULL) {
 			std::string text = _title;
 			
 			// if (_wrap == false) {
-				text = _font->TruncateString(text, "...", w);
+				text = font->TruncateString(text, "...", w);
 			// }
 
-			g->SetColor(_fgcolor);
-			g->DrawString(text, x+(w-_font->GetStringWidth(text))/2, (insets.top-_font->GetSize())/2);
+			g->SetColor(fg);
+			g->SetFont(font);
+			g->DrawString(text, x+(w-font->GetStringWidth(text))/2, (insets.top-font->GetSize())/2);
 		}
 		
 		y = y + insets.top - 2*_vertical_gap;
@@ -521,18 +534,20 @@ void Menu::Paint(Graphics *g)
 			*/
 		}
 
-		if (IsFontSet() == true) {
-			std::string text = _items[i]->GetValue();
-			int px = x+space,
-					py = y+(_item_size+_vertical_gap)*count,
-					pw = w-space,
-					ph = _item_size;
+		if (font != NULL) {
+			g->SetFont(font);
 
 			if (_has_focus == true) {
 				g->SetColor(_focus_item_fgcolor);
 			} else {
 				g->SetColor(_item_fgcolor);
 			}
+
+			std::string text = _items[i]->GetValue();
+			int px = x+space,
+					py = y+(_item_size+_vertical_gap)*count,
+					pw = w-space,
+					ph = _item_size;
 
 			if (_items[i]->GetType() == JIT_EMPTY) {
 			} else if (_items[i]->GetType() == JIT_TEXT) {
@@ -548,7 +563,7 @@ void Menu::Paint(Graphics *g)
 			}
 
 			// if (_wrap == false) {
-				text = _font->TruncateString(text, "...", pw);
+				text = font->TruncateString(text, "...", pw);
 			// }
 
 			g->DrawString(text, px, py, pw, ph, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());

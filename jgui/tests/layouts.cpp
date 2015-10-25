@@ -66,6 +66,7 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			*_last,
 			*_previous,
 			*_next;
+		jgui::Theme _theme;
 		std::vector<jgui::Container *> _b,
 			_c;
 		std::vector<jgui::Button *> _buttons;
@@ -224,14 +225,14 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 				*l5 = new jgui::Label("GridBagLayout", 0, 0, 0, 0),
 				*l6 = new jgui::Label("NullLayout", 0, 0, 0, 0);
 			
-			jgui::Color color(0x40, 0x40, 0x40, 0xff);
+			_theme.SetColor("component.bg", 0x40, 0x40, 0x40, 0xff);
 			
-			l1->SetBackgroundColor(color);
-			l2->SetBackgroundColor(color);
-			l3->SetBackgroundColor(color);
-			l4->SetBackgroundColor(color);
-			l5->SetBackgroundColor(color);
-			l6->SetBackgroundColor(color);
+			l1->SetTheme(&_theme);
+			l2->SetTheme(&_theme);
+			l3->SetTheme(&_theme);
+			l4->SetTheme(&_theme);
+			l5->SetTheme(&_theme);
+			l6->SetTheme(&_theme);
 			
 			_b[0]->Add(l1, jgui::JBLA_NORTH);
 			_b[1]->Add(l2, jgui::JBLA_NORTH);

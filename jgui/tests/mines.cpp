@@ -80,9 +80,12 @@ void Mines::Paint(jgui::Graphics *g)
 {
 	jgui::Frame::Paint(g);
 
+	jgui::Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+
 	int delta = 4;
 
-	g->SetFont(_font);
+	g->SetFont(font);
 
 	for (int i=0; i<max_cols; i++) {
 		for (int j=0; j<max_rows; j++) {
@@ -137,7 +140,7 @@ void Mines::Paint(jgui::Graphics *g)
 	g->DrawImage(huge_bomb, x, y, w, h);
 
 	g->SetColor(0x00, 0x00, 0x00, 0xff);
-	g->FillRectangle(x, y+h+10, w, _font->GetSize());
+	g->FillRectangle(x, y+h+10, w, font->GetSize());
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 	g->DrawString(tmp, x+10, y+h+10);
 				

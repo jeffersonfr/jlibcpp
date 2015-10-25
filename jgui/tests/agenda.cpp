@@ -447,6 +447,8 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 
 	hour->RequestFocus();
 
+	_theme.SetColor("component.bg", 0x40, 0x60, 0x80, 0xff);
+
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Add");
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/vertical_arrows.png", "Select");
 
@@ -495,7 +497,7 @@ bool AddMessage::KeyPressed(jgui::KeyEvent *event)
 			for (int i=0; i<db->GetSize(); i++) {
 				AgendaDB::agenda_t *t = db->Get(i);
 
-				dialog->AddWarnning(t->day, t->month, t->year);
+				dialog->AddWarnning(&_theme, t->day, t->month, t->year);
 			}
 
 			dialog->GetParams()->SetTextParam("id", "calendar");

@@ -43,7 +43,6 @@ Container::Container(int x, int y, int width, int height):
 	_is_visible = true;
 	_parent = NULL;
 	_optimized_paint = false;
-	_border = JCB_EMPTY;
 
 	_scroll_dimension.width = _size.width;
 	_scroll_dimension.height = _size.height;
@@ -301,20 +300,9 @@ void Container::DoLayout()
 	UpdateScrollDimension();
 }
 
-void Container::SetInsets(jinsets_t insets)
+jsize_t Container::GetPreferredSize()
 {
-	_insets.left = insets.left;
-	_insets.top = insets.top;
-	_insets.right = insets.right;
-	_insets.bottom = insets.bottom;
-}
-
-void Container::SetInsets(int left, int top, int right, int bottom)
-{
-	_insets.left = left;
-	_insets.top = top;
-	_insets.right = right;
-	_insets.bottom = bottom;
+	return _size;
 }
 
 jinsets_t Container::GetInsets()
@@ -322,9 +310,9 @@ jinsets_t Container::GetInsets()
 	return _insets;
 }
 
-jsize_t Container::GetPreferredSize()
+void Container::SetInsets(jinsets_t insets)
 {
-	return _size;
+	_insets = insets;
 }
 
 void Container::InvalidateAll()

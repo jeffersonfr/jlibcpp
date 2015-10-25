@@ -39,10 +39,6 @@ ListBox::ListBox(int x, int y, int width, int height):
 	_mode = JLBM_NONE_SELECTION;
 
 	SetFocusable(true);
-
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	theme->Update(this);
 }
 
 ListBox::~ListBox() 
@@ -252,10 +248,13 @@ int ListBox::GetSelectedIndex()
 
 jsize_t ListBox::GetPreferredSize()
 {
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	jsize_t t;
 
 	t.width = _size.width;
-	t.height = 2*(_vertical_gap+_border_size)+_items.size()*(_item_size+_item_gap)-_item_gap;
+	t.height = 2*(_vertical_gap+bordersize)+_items.size()*(_item_size+_item_gap)-_item_gap;
 
 	return t;
 }
@@ -270,6 +269,9 @@ bool ListBox::KeyPressed(KeyEvent *event)
 		return false;
 	}
 
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	jkeyevent_symbol_t action = event->GetSymbol();
 
 	bool catched = false;
@@ -279,7 +281,7 @@ bool ListBox::KeyPressed(KeyEvent *event)
 		
 		catched = true;
 	} else if (action == JKS_PAGE_UP) {
-		IncrementLines((_size.height-2*(_border_size+_vertical_gap))/(_item_size+_item_gap));
+		IncrementLines((_size.height-2*(bordersize+_vertical_gap))/(_item_size+_item_gap));
 		
 		catched = true;
 	} else if (action == JKS_CURSOR_DOWN) {
@@ -287,7 +289,7 @@ bool ListBox::KeyPressed(KeyEvent *event)
 
 		catched = true;
 	} else if (action == JKS_PAGE_DOWN) {
-		DecrementLines((_size.height-2*(_border_size+_vertical_gap))/(_item_size+_item_gap));
+		DecrementLines((_size.height-2*(bordersize+_vertical_gap))/(_item_size+_item_gap));
 
 		catched = true;
 	} else if (action == JKS_HOME) {
@@ -357,13 +359,28 @@ void ListBox::Paint(Graphics *g)
 
 	Component::Paint(g);
 
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	Color itembg = theme->GetColor("item.bg");
+	Color itemfg = theme->GetColor("item.fg");
+	Color itembgselect = theme->GetColor("item.bg.select");
+	Color itembgdisable = theme->GetColor("item.bg.disable");
+	Color itemfgdisable = theme->GetColor("item.fg.disable");
+	Color itembgfocus = theme->GetColor("item.bg.focus");
+	Color itemfgfocus = theme->GetColor("item.fg.focus");
+	int bordersize = theme->GetBorderSize("component");
+
 	// jsize_t scroll_dimension = GetScrollDimension();
 	jpoint_t scroll_location = GetScrollLocation();
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0,
 			scrollw = (IsScrollableY() == true)?(_scroll_size+_scroll_gap):0;
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
+	int x = _horizontal_gap+bordersize,
+			y = _vertical_gap+bordersize,
 			w = _size.width-scrollw-2*_horizontal_gap;
 			// h = _size.height-2*y;
 	int gap = 4;
@@ -390,37 +407,37 @@ void ListBox::Paint(Graphics *g)
 		Item *item = _items[i];
 
 		if (item->IsEnabled() == true) {
-			g->SetColor(_item_color);
+			g->SetColor(itembg);
 		} else {
-			g->SetColor(_disabled_item_color);
+			g->SetColor(itembgdisable);
 		}
 
 		if (_index != i) {
 			if (_mode == JLBM_SINGLE_SELECTION) {	
 				if (_selected_index == i) {	
-					g->SetColor(_selected_item_color);
+					g->SetColor(itembgselect);
 				}
 			} else if (_mode == JLBM_MULTI_SELECTION) {	
 				if (item->IsSelected() == true) {	
-					g->SetColor(_selected_item_color);
+					g->SetColor(itembgselect);
 				}
 			}
 		} else {
-			g->SetColor(_focus_item_color);
+			g->SetColor(itembgfocus);
 		}
 
 		g->FillRectangle(x, y+(_item_size+_item_gap)*i, w, _item_size);
 
 		if (_mode == JLBM_SINGLE_SELECTION) {
 			if (_selected_index == i) {
-				g->SetColor(_selected_item_color);
+				g->SetColor(itembgselect);
 			}
 		} else if (_mode == JLBM_MULTI_SELECTION) {	
 			if (_items[i]->IsSelected() == true) {	
-				g->SetColor(_selected_item_color);
+				g->SetColor(itembgselect);
 			}
 		} else {
-			g->SetColor(_item_color);
+			g->SetColor(itembg);
 		}
 
 		if (_items[i]->GetType() == JIT_EMPTY) {
@@ -431,21 +448,23 @@ void ListBox::Paint(Graphics *g)
 			}
 		}
 
-		if (IsFontSet() == true) {
+		if (font != NULL) {
+			g->SetFont(font);
+
 			if (_is_enabled == true) {
 				if (_has_focus == true) {
-					g->SetColor(_focus_item_fgcolor);
+					g->SetColor(itemfgfocus);
 				} else {
-					g->SetColor(_item_fgcolor);
+					g->SetColor(itemfg);
 				}
 			} else {
-				g->SetColor(_disabled_fgcolor);
+				g->SetColor(itemfgdisable);
 			}
 
 			std::string text = _items[i]->GetValue();
 
 			// if (_wrap == false) {
-				text = _font->TruncateString(text, "...", w-gap);
+				text = font->TruncateString(text, "...", w-gap);
 			// }
 
 			g->DrawString(text, x+gap, y+(_item_size+_item_gap)*i, w-gap, _item_size, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
@@ -529,10 +548,13 @@ void ListBox::DecrementLines(int lines)
 
 jsize_t ListBox::GetScrollDimension()
 {
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	jsize_t size;
 
 	size.width = _size.width;
-	size.height = _items.size()*(_item_size+_item_gap)+2*(_vertical_gap+_border_size);
+	size.height = _items.size()*(_item_size+_item_gap)+2*(_vertical_gap+bordersize);
 
 	return  size;
 }

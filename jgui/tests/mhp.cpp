@@ -30,13 +30,16 @@
 
 class ScreenLayer : public jgui::Container{
 
+	private:
+		jgui::Theme _theme;
+
 	public:
 		ScreenLayer():
 			jgui::Container(0, 0, 1920, 1080)
 		{
 			SetVisible(true);
 	
-			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
+			_theme.SetColor("component.bg", 0x00, 0x00, 0x00, 0x00);
 		}
 
 		virtual ~ScreenLayer()
@@ -391,7 +394,6 @@ class Scene : public jgui::Container, public jthread::TimerTask{
 			
 			SetBackgroundVisible(true);
 			SetFocusCycleRoot(true);
-			SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
 		}
 
 		virtual ~Scene()
@@ -483,6 +485,7 @@ class MenuTest : public Scene{
 			*_button2,
 			*_button3;
 		jgui::Label *_label;
+		jgui::Theme _theme;
 		double _malpha;
 		int _mstate;
 
@@ -500,8 +503,6 @@ class MenuTest : public Scene{
 			Add(_button1 = new jgui::Button("Full Screen", (960-400)/2, 0*(100+10)+180, 400, 100));
 			Add(_button2 = new jgui::Button("Stretched Screen", (960-400)/2, 1*(100+10)+180, 400, 100));
 			Add(_button3 = new jgui::Button("Exit", (960-400)/2, 2*(100+10)+180, 400, 100));
-
-			SetBackgroundColor(0x00, 0x00, 0x00, 0xa0);
 		}
 
 		virtual ~MenuTest()
@@ -516,7 +517,7 @@ class MenuTest : public Scene{
 
 		virtual bool Animated()
 		{
-			jgui::Color color = GetBackgroundColor();
+			jgui::Color color = GetTheme()->GetColor("component.bg");
 
 			if (_mstate == 1) {
 				int y = GetY()+80;
@@ -537,7 +538,9 @@ class MenuTest : public Scene{
 
 				color.SetAlpha(0x80 + (int)(64.0*sin(_malpha)));
 
-				SetBackgroundColor(color);
+				_theme.SetColor("component.bg", color);
+
+				SetTheme(&_theme);
 
 				return true;
 			} else if (_mstate == 3) {

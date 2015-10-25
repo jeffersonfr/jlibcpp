@@ -52,27 +52,25 @@ class GraphicPanel : public jgui::Frame{
 	{
 		Frame::Paint(g);
 
-		int x,
-				y,
-				z;
+		jgui::Theme *theme = GetTheme();
+		jgui::Font *font = theme->GetFont("component");
+
+		int x, y, z;
 		int w = 200,
 				h = 200;
-		int r1,
-				g1,
-				b1,
-				a1;
+		int r1, g1, b1, a1;
 		int size,
 				iterations = 1000;
 
-		g->SetFont(_font);
+		g->SetFont(font);
 
 		Clear(g);
 
 		// fonts 
 		DrawString(g, "DrawString");
 
-		int wfont = _font->GetStringWidth("Font Testing"),
-				hfont = _font->GetSize();
+		int wfont = font->GetStringWidth("Font Testing"),
+				hfont = font->GetSize();
 
 		for (int i=0; i<iterations; i++) {
 			x = rand()%(_size.width-wfont-_insets.left-_insets.right);
@@ -111,7 +109,7 @@ class GraphicPanel : public jgui::Frame{
 		// rotate string
 		DrawString(g, "Rotate String");
 
-		jgui::Font *font = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 72);
+		font = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 72);
 		// jgui::Font *font = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/default.tff", jgui::JFA_NORMAL, 72);
 
 		double angle = 0.1;
@@ -158,7 +156,7 @@ class GraphicPanel : public jgui::Frame{
 
 		delete fimage;
 
-		g->SetFont(_font);
+		g->SetFont(font);
 
 		Clear(g);
 

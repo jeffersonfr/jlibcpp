@@ -67,7 +67,6 @@ class Main : public jgui::Frame{
 			_container1->Add(_container2);
 
 			Add(_container1);
-			SetBorderSize(10);
 		}
 
 		virtual ~Main()

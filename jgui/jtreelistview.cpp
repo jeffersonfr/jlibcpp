@@ -38,10 +38,6 @@ TreeListView::TreeListView(int x, int y, int width, int height):
 	_selected_index = -1;
 
 	SetFocusable(true);
-
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	theme->Update(this);
 }
 
 TreeListView::~TreeListView() 
@@ -243,10 +239,13 @@ int TreeListView::GetSelectedIndex()
 
 jsize_t TreeListView::GetPreferredSize()
 {
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	jsize_t t;
 
 	t.width = _size.width;
-	t.height = 2*(_vertical_gap+_border_size)+_items.size()*(_item_size+_item_gap)-_item_gap;
+	t.height = 2*(_vertical_gap+bordersize)+_items.size()*(_item_size+_item_gap)-_item_gap;
 
 	return t;
 }
@@ -261,6 +260,9 @@ bool TreeListView::KeyPressed(KeyEvent *event)
 		return false;
 	}
 
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	jkeyevent_symbol_t action = event->GetSymbol();
 
 	bool catched = false;
@@ -270,7 +272,7 @@ bool TreeListView::KeyPressed(KeyEvent *event)
 		
 		catched = true;
 	} else if (action == JKS_PAGE_UP) {
-		IncrementLines((_size.height-2*(_border_size+_vertical_gap))/(_item_size+_item_gap));
+		IncrementLines((_size.height-2*(bordersize+_vertical_gap))/(_item_size+_item_gap));
 		
 		catched = true;
 	} else if (action == JKS_CURSOR_DOWN) {
@@ -278,7 +280,7 @@ bool TreeListView::KeyPressed(KeyEvent *event)
 
 		catched = true;
 	} else if (action == JKS_PAGE_DOWN) {
-		DecrementLines((_size.height-2*(_border_size+_vertical_gap))/(_item_size+_item_gap));
+		DecrementLines((_size.height-2*(bordersize+_vertical_gap))/(_item_size+_item_gap));
 
 		catched = true;
 	} else if (action == JKS_HOME) {
@@ -348,13 +350,21 @@ void TreeListView::Paint(Graphics *g)
 
 	Component::Paint(g);
 
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	int bordersize = theme->GetBorderSize("component");
+
 	// jsize_t scroll_dimension = GetScrollDimension();
 	jpoint_t scroll_location = GetScrollLocation();
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0,
 			scrollw = (IsScrollableY() == true)?(_scroll_size+_scroll_gap):0;
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
+	int x = _horizontal_gap+bordersize,
+			y = _vertical_gap+bordersize,
 			w = _size.width-scrollw-2*x;
 			// h = _size.height-2*y;
 	int space = 4;
@@ -409,21 +419,23 @@ void TreeListView::Paint(Graphics *g)
 			}
 		}
 
-		if (IsFontSet() == true) {
+		if (font != NULL) {
+			g->SetFont(font);
+
 			if (_is_enabled == true) {
 				if (_has_focus == true) {
-					g->SetColor(_focus_fgcolor);
+					g->SetColor(fgfocus);
 				} else {
-					g->SetColor(_fgcolor);
+					g->SetColor(fg);
 				}
 			} else {
-				g->SetColor(_disabled_fgcolor);
+				g->SetColor(fgdisable);
 			}
 
 			std::string text = _items[i]->GetValue();
 
 			// if (_wrap == false) {
-				text = _font->TruncateString(text, "...", w-space);
+				text = font->TruncateString(text, "...", w-space);
 			// }
 
 			g->DrawString(text, x+space, y+(_item_size+_item_gap)*i, w-space, _item_size, _items[i]->GetHorizontalAlign(), _items[i]->GetVerticalAlign());
@@ -507,10 +519,13 @@ void TreeListView::DecrementLines(int lines)
 
 jsize_t TreeListView::GetScrollDimension()
 {
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	jsize_t size;
 
 	size.width = _size.width;
-	size.height = _items.size()*(_item_size+_item_gap)+2*(_vertical_gap+_border_size);
+	size.height = _items.size()*(_item_size+_item_gap)+2*(_vertical_gap+bordersize);
 
 	return  size;
 }

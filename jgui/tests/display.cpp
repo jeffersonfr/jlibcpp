@@ -46,14 +46,17 @@ void Display::Paint(jgui::Graphics *g)
 
 	jgui::Component::Paint(g);
 
-	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
+	jgui::Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
 
 	int size = 40;
 
-	if (GetFont() != NULL) {
-		size = GetFont()->GetSize();
+	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
-		g->SetFont(_font);
+	if (font != NULL) {
+		size = font->GetSize();
+
+		g->SetFont(font);
 	}
 
 	g->DrawString(_text, 0, (GetHeight()-size)/2, GetWidth()-10, GetHeight(), jgui::JHA_RIGHT, jgui::JVA_CENTER);

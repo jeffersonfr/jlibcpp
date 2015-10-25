@@ -138,6 +138,10 @@ bool TextArea::KeyPressed(KeyEvent *event)
 		return false;
 	}
 
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	int bordersize = theme->GetBorderSize("component");
+
 	bool catched = false;
 
 	jkeyevent_symbol_t action = event->GetSymbol();
@@ -159,7 +163,7 @@ bool TextArea::KeyPressed(KeyEvent *event)
 
 		catched = true;
 	} else if (action == JKS_PAGE_UP) {
-		IncrementLines((_size.height-2*(_border_size+_vertical_gap))/(_font->GetSize()+_rows_gap));
+		IncrementLines((_size.height-2*(bordersize+_vertical_gap))/(font->GetSize()+_rows_gap));
 
 		catched = true;
 	} else if (action == JKS_CURSOR_DOWN) {
@@ -167,7 +171,7 @@ bool TextArea::KeyPressed(KeyEvent *event)
 
 		catched = true;
 	} else if (action == JKS_PAGE_DOWN) {
-		DecrementLines((_size.height-2*(_border_size+_vertical_gap))/(_font->GetSize()+_rows_gap));
+		DecrementLines((_size.height-2*(bordersize+_vertical_gap))/(font->GetSize()+_rows_gap));
 
 		catched = true;
 	} else if (action == JKS_HOME) {
@@ -293,8 +297,8 @@ bool TextArea::KeyPressed(KeyEvent *event)
 		}
 	}
 
-	if (IsFontSet()) {
-		int w = _font->GetStringWidth(GetText().substr(0, _caret_position));
+	if (font != NULL) {
+		int w = font->GetStringWidth(GetText().substr(0, _caret_position));
 
 		if ((w-_size.width) > 0) {
 			SetScrollX(w-_size.width);
@@ -362,6 +366,9 @@ void TextArea::IncrementLines(int lines)
 		return;
 	}
 
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+
 	int current_length = 0;
 
 	_current_row = _current_row - lines;
@@ -377,11 +384,11 @@ void TextArea::IncrementLines(int lines)
 
 	_caret_position = current_length;
 
-	if (_font != NULL) {
+	if (font != NULL) {
 		jpoint_t scroll_location = GetScrollLocation();
 		int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-		int font_height = _font->GetSize();
+		int font_height = font->GetSize();
 
 		if (scrolly > 0) {
 			SetScrollY((std::max)(0, (font_height+_rows_gap)*_current_row));
@@ -396,6 +403,9 @@ void TextArea::DecrementLines(int lines)
 	if (_lines.size() == 0) {
 		return;
 	}
+
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
 
 	int current_length = 0;
 
@@ -412,13 +422,13 @@ void TextArea::DecrementLines(int lines)
 
 	_caret_position = current_length;
 
-	if (_font != NULL) {
+	if (font != NULL) {
 		jpoint_t scroll_location = GetScrollLocation();
 		int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-		int font_height = _font->GetSize();
+		int font_height = font->GetSize();
 
-		if ((scrolly+_size.height) < (_font->GetSize()+_rows_gap)*GetRows()) {
+		if ((scrolly+_size.height) < (font->GetSize()+_rows_gap)*GetRows()) {
 			SetScrollY((std::max)(0, (font_height+_rows_gap)*_current_row));
 		}
 	}
@@ -428,7 +438,11 @@ void TextArea::DecrementLines(int lines)
 
 void TextArea::InitRowsString()
 {
-	if (IsFontSet() == false) {
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	int bordersize = theme->GetBorderSize("component");
+
+	if (font == NULL) {
 		return;
 	}
 
@@ -452,8 +466,8 @@ void TextArea::InitRowsString()
 	int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			// scrolly = (IsScrollableY() == true)?scroll_location.y:0,
 			scrollw = (IsScrollableY() == true)?(_scroll_size+_scroll_gap):0;
-	int xp = _horizontal_gap+_border_size,
-			yp = _vertical_gap+_border_size,
+	int xp = _horizontal_gap+bordersize,
+			yp = _vertical_gap+bordersize,
 			wp = _size.width-scrollw-2*xp,
 			hp = _size.height-2*yp;
 
@@ -464,7 +478,7 @@ void TextArea::InitRowsString()
 
 	// int default_space = g->GetStringWidth(" ");
 
-	font_height = _font->GetSize();
+	font_height = font->GetSize();
 
 	if (font_height < 1) {
 		return;
@@ -484,11 +498,11 @@ void TextArea::InitRowsString()
 		for (int j=0; j<line_token.GetSize(); j++) {
 			temp = line_token.GetToken(j);
 
-			if (_font->GetStringWidth(temp) > wp) {
+			if (font->GetStringWidth(temp) > wp) {
 				int p = 1;
 
 				while (p < (int)temp.size()) {
-					if (_font->GetStringWidth(temp.substr(0, ++p)) > wp) {
+					if (font->GetStringWidth(temp.substr(0, ++p)) > wp) {
 						words.push_back(temp.substr(0, p-1));
 
 						temp = temp.substr(p-1);
@@ -511,7 +525,7 @@ void TextArea::InitRowsString()
 			previous = temp;
 			temp += words[j];
 
-			if (_font->GetStringWidth(temp.c_str()) > wp) {
+			if (font->GetStringWidth(temp.c_str()) > wp) {
 				temp = words[j];
 
 				_lines.push_back(previous);
@@ -552,73 +566,83 @@ void TextArea::Paint(Graphics *g)
 
 	Component::Paint(g);
 
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	int bordersize = theme->GetBorderSize("component");
+
 	jpoint_t scroll_location = GetScrollLocation();
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size;
+	int x = _horizontal_gap+bordersize,
+			y = _vertical_gap+bordersize;
 
 	InitRowsString();
 
-	if (IsFontSet() == true) {
-		int current_text_size,
+	if (font == NULL) {
+		return;
+	}
+
+	g->SetFont(font);
+
+	int current_text_size,
 			current_length = _caret_position,
-			font_height = _font->GetSize()+_rows_gap;
+			font_height = font->GetSize()+_rows_gap;
 
-		x = x - scrollx;
-		y = y - scrolly;
+	x = x - scrollx;
+	y = y - scrolly;
 
-		// INFO:: Draw text
-		for (int i=0, k=0; i<=(int)_lines.size()-1; i++) {
-			std::string s = _lines[i];
+	// INFO:: Draw text
+	for (int i=0, k=0; i<=(int)_lines.size()-1; i++) {
+		std::string s = _lines[i];
 
-			{
-				char *c = (char *)strchr(s.c_str(), '\n');
+		char *c = (char *)strchr(s.c_str(), '\n');
 
-				if (c != NULL) {
-					c[0] = ' ';
-				}
+		if (c != NULL) {
+			c[0] = ' ';
+		}
 
-				if (_is_enabled == true) {
-					if (_has_focus == true) {
-						g->SetColor(_focus_fgcolor);
-					} else {
-						g->SetColor(_fgcolor);
-					}
-				} else {
-					g->SetColor(_disabled_fgcolor);
-				}
+		if (_is_enabled == true) {
+			if (_has_focus == true) {
+				g->SetColor(fgfocus);
+			} else {
+				g->SetColor(fg);
+			}
+		} else {
+			g->SetColor(fgdisable);
+		}
 
-				g->DrawString(s, x, y+k*font_height);
+		g->DrawString(s, x, y+k*font_height);
 
-				if (_caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
-					std::string cursor;
+		if (_caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
+			std::string cursor;
 
-					if (_caret_type == JCT_UNDERSCORE) {
-						cursor = "_";
-					} else if (_caret_type == JCT_STICK) {
-						cursor = "|";
-					} else if (_caret_type == JCT_BLOCK) {
-						cursor = "?";
-					}
-
-					current_text_size = _font->GetStringWidth(_lines[i].substr(0, current_length).c_str());
-
-					if (_has_focus == true && _is_editable == true) {
-						g->SetColor(_caret_color);
-					}
-
-					g->DrawString(cursor, x+current_text_size, y+k*font_height);
-
-					current_length = -1;
-				}
-
-				k++;
+			if (_caret_type == JCT_UNDERSCORE) {
+				cursor = "_";
+			} else if (_caret_type == JCT_STICK) {
+				cursor = "|";
+			} else if (_caret_type == JCT_BLOCK) {
+				cursor = "?";
 			}
 
-			if (current_length >= (int)s.size()) {
-				current_length -= s.size();
+			current_text_size = font->GetStringWidth(_lines[i].substr(0, current_length).c_str());
+
+			if (_has_focus == true && _is_editable == true) {
+				g->SetColor(_caret_color);
 			}
+
+			g->DrawString(cursor, x+current_text_size, y+k*font_height);
+
+			current_length = -1;
+		}
+
+		k++;
+
+		if (current_length >= (int)s.size()) {
+			current_length -= s.size();
 		}
 	}
 }
@@ -670,9 +694,13 @@ int TextArea::GetCurrentRow()
 
 jsize_t TextArea::GetScrollDimension()
 {
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	int bordersize = theme->GetBorderSize("component");
+
 	jsize_t size;
 
-	if (_font == NULL) {
+	if (font == NULL) {
 		size.width = _size.width;
 		size.height = _size.height;
 
@@ -680,11 +708,11 @@ jsize_t TextArea::GetScrollDimension()
 	}
 
 	if (_is_wrap == false) {
-		size.width = _font->GetStringWidth(GetText());
+		size.width = font->GetStringWidth(GetText());
 		size.height = _size.height;
 	} else {
 		size.width = _size.width;
-		size.height = GetRows()*(_font->GetSize())+2*(_vertical_gap+_border_size);
+		size.height = GetRows()*(font->GetSize())+2*(_vertical_gap+bordersize);
 	}
 
 	return  size;

@@ -32,8 +32,6 @@ class CustomContainer : public jgui::Container {
 			jgui::Container(x, y, w, h)
 		{
 			_image = jgui::Image::CreateImage("images/bubble.png");
-
-			SetBorder(JCB_LINE);
 		}
 
 		virtual ~CustomContainer()
@@ -46,14 +44,16 @@ class CustomContainer : public jgui::Container {
 				return;
 			}
 
-			Color sbcolor = GetScrollbarColor();
+			jgui::Theme *theme = GetTheme();
+			Color scroll = theme->GetColor("component.scroll");
+			int bordersize = theme->GetBorderSize("component");
 
 			jsize_t scroll_dimension = GetScrollDimension();
 			jpoint_t scroll_location = GetScrollLocation();
 			int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 					scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
-			g->SetColor(sbcolor);
+			g->SetColor(scroll);
 
 			if (IsScrollableX() == true) {
 				double offset_ratio = (double)scrollx/(double)scroll_dimension.width,
@@ -61,8 +61,8 @@ class CustomContainer : public jgui::Container {
 				int offset = (int)(_size.width*offset_ratio),
 						block_size = (int)(_size.width*block_size_ratio);
 
-				g->DrawRectangle(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size);
-				g->DrawImage(_image, offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size);
+				g->DrawRectangle(bordersize, _size.height-_scroll_size-bordersize, _size.width-2*bordersize, _scroll_size);
+				g->DrawImage(_image, offset, _size.height-_scroll_size-bordersize, block_size, _scroll_size);
 			}
 
 			if (IsScrollableY() == true) {
@@ -71,8 +71,8 @@ class CustomContainer : public jgui::Container {
 				int offset = (int)(_size.height*offset_ratio),
 						block_size = (int)(_size.height*block_size_ratio);
 
-				g->DrawRectangle(_size.width-_scroll_size-_border_size, _border_size, _scroll_size, _size.height);
-				g->DrawImage(_image, _size.width-_scroll_size-_border_size, offset, _scroll_size, block_size);
+				g->DrawRectangle(_size.width-_scroll_size-bordersize, bordersize, _scroll_size, _size.height);
+				g->DrawImage(_image, _size.width-_scroll_size-bordersize, offset, _scroll_size, block_size);
 			}
 		}
 
@@ -99,7 +99,6 @@ class Main : public jgui::Frame{
 			_container1->Add(_container2);
 
 			Add(_container1);
-			SetBorderSize(10);
 		}
 
 		virtual ~Main()

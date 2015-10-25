@@ -58,7 +58,7 @@ class Graphics;
  *
  * \author Jeff Ferr
  */
-class Window : public jgui::Container{
+class Window : public jgui::Container, public jgui::ThemeListener{
 
 	friend class WindowManager;
 
@@ -124,10 +124,6 @@ class Window : public jgui::Container{
 		jpoint_t _old_location;
 		/** \brief */
 		jsize_t _old_size;
-		/** \brief */
-		jinsets_t _old_insets;
-		/** \brief */
-		int _old_border_size;
 		/** \brief */
 		bool _old_undecorated;
 		/** \brief */
@@ -243,12 +239,6 @@ class Window : public jgui::Container{
 		 */
 		virtual void Restore();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBorderSize(int size);
-		
 		/**
 		 * \brief
 		 *
@@ -434,6 +424,12 @@ class Window : public jgui::Container{
 		 *
 		 */
 		virtual bool MouseWheel(MouseEvent *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ThemeChanged(ThemeEvent *event);
 
 		/**
 		 * \brief

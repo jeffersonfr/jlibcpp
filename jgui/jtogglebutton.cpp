@@ -147,6 +147,14 @@ void ToogleButton::Paint(Graphics *g)
 
 	Component::Paint(g);
 
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	int bordersize = theme->GetBorderSize("component");
+
 	/*
 	if (_has_focus == true) {
 		g->FillGradientRectangle(0, 0, _width, _height/2+1, 
@@ -156,8 +164,8 @@ void ToogleButton::Paint(Graphics *g)
 	}
 	*/
 
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
+	int x = _horizontal_gap+bordersize,
+			y = _vertical_gap+bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y,
 			gapx = 0,
@@ -172,15 +180,15 @@ void ToogleButton::Paint(Graphics *g)
 	} else {
 		g->DrawImage((_has_focus == true && _image_focus_icon != NULL)?_image_focus_icon:_image_icon, px, py, ph, ph);
 
-		if (_font != NULL) {
+		if (font != NULL) {
 			if (_is_enabled == true) {
 				if (_has_focus == true) {
-					g->SetColor(_focus_fgcolor);
+					g->SetColor(fgfocus);
 				} else {
-					g->SetColor(_fgcolor);
+					g->SetColor(fg);
 				}
 			} else {
-				g->SetColor(_disabled_fgcolor);
+				g->SetColor(fgdisable);
 			}
 
 			if (_image != "") {
@@ -205,7 +213,7 @@ void ToogleButton::Paint(Graphics *g)
 			std::string text = GetLabel();
 
 			if (_is_wrap == false) {
-				text = _font->TruncateString(text, "...", pw);
+				text = font->TruncateString(text, "...", pw);
 			}
 
 			g->DrawString(text, px, py, pw, ph, _halign, _valign);
@@ -213,7 +221,7 @@ void ToogleButton::Paint(Graphics *g)
 	}
 
 	if (_is_pressed == true) {
-		Color color = GetBackgroundColor().Brighter();
+		Color color = bg.Brighter();
 
 		color.SetAlpha(0x80);
 

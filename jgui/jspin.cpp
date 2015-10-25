@@ -34,10 +34,6 @@ Spin::Spin(int x, int y, int width, int height):
 	// _type = JSO_VERTICAL;
 	
 	SetFocusable(true);
-
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	theme->Update(this);
 }
 
 Spin::~Spin()
@@ -151,6 +147,9 @@ bool Spin::MousePressed(MouseEvent *event)
 		return true;
 	}
 
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	bool catched = false;
 
 	if (event->GetButton() == JMB_BUTTON1) {
@@ -158,8 +157,8 @@ bool Spin::MousePressed(MouseEvent *event)
 
 		int x1 = event->GetX(),
 				y1 = event->GetY();
-		int x = _vertical_gap+_border_size,
-				y = _horizontal_gap+_border_size,
+		int x = _vertical_gap+bordersize,
+				y = _horizontal_gap+bordersize,
 				h = _size.height-2*y,
 				arrow_size;
 
@@ -275,6 +274,14 @@ void Spin::Paint(Graphics *g)
 
 	Component::Paint(g);
 
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	int bordersize = theme->GetBorderSize("component");
+
 	/*
 	if (_has_focus == true) {
 		g->FillGradientRectangle(0, 0, _size.width, _size.height/2+1, 
@@ -284,8 +291,8 @@ void Spin::Paint(Graphics *g)
 	}
 	*/
 
-	int x = _vertical_gap-_border_size,
-			y = _horizontal_gap-_border_size,
+	int x = _vertical_gap-bordersize,
+			y = _horizontal_gap-bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y,
 			arrow_size;
@@ -299,36 +306,38 @@ void Spin::Paint(Graphics *g)
 	if (_type == JSO_HORIZONTAL) {
 		if (_loop == true || (_index < ((int)_items.size()-1))) {
 			if (_has_focus == true) {
-				g->SetColor(_focus_fgcolor);
+				g->SetColor(fgfocus);
 			} else {
-				g->SetColor(_fgcolor);
+				g->SetColor(fg);
 			}
 			g->FillTriangle(x+w, y+arrow_size, x+w-arrow_size, y, x+w-arrow_size, y+2*arrow_size);
 		}
 
 		if (_loop == true || (_index > 0 && _items.size() > 0)) {
 			if (_has_focus == true) {
-				g->SetColor(_focus_fgcolor);
+				g->SetColor(fgfocus);
 			} else {
-				g->SetColor(_fgcolor);
+				g->SetColor(fg);
 			}
 			g->FillTriangle(x, y+arrow_size, x+arrow_size, y, x+arrow_size, y+2*arrow_size);
 		}
 
 		if (_items.size() > 0) {
-			if (_font != NULL) {
+			if (font != NULL) {
+				g->SetFont(font);
+
 				if (_is_enabled == true) {
 					if (_has_focus == true) {
-						g->SetColor(_focus_fgcolor);
+						g->SetColor(fgfocus);
 					} else {
-						g->SetColor(_fgcolor);
+						g->SetColor(fg);
 					}
 				} else {
-					g->SetColor(_disabled_fgcolor);
+					g->SetColor(fgdisable);
 				}
 
-				int x1 = _horizontal_gap+_border_size,
-						y1 = _vertical_gap+_border_size,
+				int x1 = _horizontal_gap+bordersize,
+						y1 = _vertical_gap+bordersize,
 						w1 = _size.width-2*x1,
 						h1 = _size.height-2*y1,
 						gapx = arrow_size+4,
@@ -346,7 +355,7 @@ void Spin::Paint(Graphics *g)
 				std::string text = _items[_index]->GetValue();
 
 				// if (_wrap == false) {
-					text = _font->TruncateString(text, "...", w);
+					text = font->TruncateString(text, "...", w);
 				// }
 
 				g->DrawString(text, px, py, pw, ph, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());
@@ -355,9 +364,9 @@ void Spin::Paint(Graphics *g)
 	} else if (_type == JSO_VERTICAL) {
 		if (_loop == true || (_index < ((int)_items.size()-1))) {
 			if (_has_focus == true) {
-				g->SetColor(_focus_fgcolor);
+				g->SetColor(fgfocus);
 			} else {
-				g->SetColor(_fgcolor);
+				g->SetColor(fg);
 			}
 		}
 
@@ -365,28 +374,30 @@ void Spin::Paint(Graphics *g)
 
 		if (_loop == true || (_index > 0 && _items.size() > 0)) {
 			if (_has_focus == true) {
-				g->SetColor(_focus_fgcolor);
+				g->SetColor(fgfocus);
 			} else {
-				g->SetColor(_fgcolor);
+				g->SetColor(fg);
 			}
 		}
 
 		g->FillTriangle(_size.width-2*arrow_size-x, y+arrow_size+8, _size.width-x, y+arrow_size+8, _size.width-arrow_size-x, y+h);
 
 		if (_items.size() > 0) {
-			if (_font != NULL) {
+			if (font != NULL) {
+				g->SetFont(font);
+
 				if (_is_enabled == true) {
 					if (_has_focus == true) {
-						g->SetColor(_focus_fgcolor);
+						g->SetColor(fgfocus);
 					} else {
-						g->SetColor(_fgcolor);
+						g->SetColor(fg);
 					}
 				} else {
-					g->SetColor(_disabled_fgcolor);
+					g->SetColor(fgdisable);
 				}
 
-				int x1 = _horizontal_gap+_border_size,
-						y1 = _vertical_gap+_border_size,
+				int x1 = _horizontal_gap+bordersize,
+						y1 = _vertical_gap+bordersize,
 						w1 = _size.width-2*x1,
 						h1 = _size.height-2*y1,
 						gapx = 0,
@@ -404,7 +415,7 @@ void Spin::Paint(Graphics *g)
 				std::string text = _items[_index]->GetValue();
 
 				// if (_wrap == false) {
-					text = _font->TruncateString(text, "...", w);
+					text = font->TruncateString(text, "...", w);
 				// }
 
 				g->DrawString(text, px, py, pw, ph, _items[_index]->GetHorizontalAlign(), _items[_index]->GetVerticalAlign());

@@ -187,7 +187,7 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 				return;
 			}
 
-			goff->SetColor(GetBackgroundColor());
+			goff->SetColor(GetTheme()->GetColor("window.bg"));
 			goff->FillRectangle(0, 0, _size.width, _size.height);
 
 			if (ingame) {
@@ -227,7 +227,12 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 				showtitle = !showtitle;
 			}
 			
-			goff->DrawString("Pressione SPACE para iniciar", (GetWidth()-_font->GetStringWidth("Pressione SPACE para iniciar"))/2, GetHeight()/2);
+			jgui::Theme *theme = GetTheme();
+			jgui::Font *font = theme->GetFont("window");
+
+			if (font != NULL) {
+				goff->DrawString("Pressione SPACE para iniciar", (GetWidth()-font->GetStringWidth("Pressione SPACE para iniciar"))/2, GetHeight()/2);
+			}
 		}
 
 		void DrawBricks()
@@ -270,16 +275,23 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 
 		void ShowScore()
 		{
+			jgui::Theme *theme = GetTheme();
+			jgui::Font *font = theme->GetFont("window");
+
+			if (font == NULL) {
+				return;
+			}
+
 			char tmp[255];
 
-			goff->SetFont(_font);
+			goff->SetFont(font);
 
 			goff->SetColor(0xff, 0xff, 0xff, 0xff);
 
 			sprintf(tmp, "Score: %d", player1score); 
 			goff->DrawString(tmp, borderwidth, borderwidth);
 			sprintf(tmp, "Balls left: %d", ballsleft); 
-			goff->DrawString(tmp, _size.width-borderwidth-_font->GetStringWidth(tmp), borderwidth);
+			goff->DrawString(tmp, _size.width-borderwidth-font->GetStringWidth(tmp), borderwidth);
 		}
 
 		void MoveBall()

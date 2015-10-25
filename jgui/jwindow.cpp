@@ -52,11 +52,6 @@ Window::Window(int x, int y, int width, int height):
 
 	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
 
-	_insets.left = 8;
-	_insets.right = 8;
-	_insets.top = 42;
-	_insets.bottom = 8;
-
 	_minimum_size.width = 16;
 	_minimum_size.height = 16;
 	_maximum_size.width = screen.width;
@@ -116,20 +111,23 @@ Window::Window(int x, int y, int width, int height):
 	_move_enabled = true;
 	_resize_enabled = true;
 
+	_insets.left = 8;
+	_insets.right = 8;
+	_insets.top = 48;
+	_insets.bottom = 8;
+
 	SetBackgroundVisible(true);
 
-	DispatchWindowEvent(new WindowEvent(this, JWET_OPENED));
-
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	theme->Update(this);
-	
+	ThemeManager::GetInstance()->RegisterThemeListener(this);
 	WindowManager::GetInstance()->Add(this);
+	
+	DispatchWindowEvent(new WindowEvent(this, JWET_OPENED));
 }
 
 Window::~Window()
 {
 	WindowManager::GetInstance()->Remove(this);
+	ThemeManager::GetInstance()->RemoveThemeListener(this);
 
 	if (_input_manager != NULL) {
 		delete _input_manager;
@@ -320,18 +318,11 @@ bool Window::ActiveFullScreen()
 
 	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
 
-	_old_border_size = _border_size;
 	_old_undecorated = _is_undecorated;
 	_old_location = _location;
 	_old_size = _size;
-	_old_insets = _insets;
 
-	_border_size = 0;
 	_is_undecorated = true;
-	_insets.left = 0;
-	_insets.right = 0;
-	_insets.top = 0;
-	_insets.bottom = 0;
 	_location.x = 0;
 	_location.y = 0;
 	_size = screen;
@@ -415,11 +406,9 @@ void Window::InternalReleaseFullScreen()
 
 	_is_fullscreen_activated = false;
 
-	_border_size = _old_border_size;
 	_is_undecorated = _old_undecorated;
 	_location = _old_location;
 	_size = _old_size;
-	_insets = _old_insets;
 
 #if defined(DIRECTFB_UI)
 #elif defined(SDL2_UI)
@@ -550,6 +539,7 @@ void Window::InternalCreateWindow()
 	// _window->SetOptions(_window, (DFBWindowOptions)(DWOP_ALPHACHANNEL | DWOP_SCALE)); // | DWOP_GHOST));
 	// Move window to upper stacking class
 	// _window->SetStackingClass(_window, DWSC_UPPER);
+	// _window->RequestFocus(_window);
 	// Make it the top most window
 	// _window->RaiseToTop(_window);
 	_window->SetOpacity(_window, _opacity);
@@ -1103,15 +1093,6 @@ void Window::SetUndecorated(bool b)
 	Repaint();
 }
 
-void Window::SetBorderSize(int size)
-{
-	if (_is_fullscreen_activated == true) {
-		return;
-	}
-
-	Component::SetBorderSize(size);
-}
-
 void Window::Repaint(Component *cmp)
 {
 	if (_is_visible == false || _is_ignore_repaint == true) {
@@ -1431,6 +1412,11 @@ bool Window::MouseMoved(MouseEvent *event)
 bool Window::MouseWheel(MouseEvent *event)
 {
 	return Container::MouseWheel(event);
+}
+
+void Window::ThemeChanged(ThemeEvent *event)
+{
+	Repaint();
 }
 
 void Window::RegisterWindowListener(WindowListener *listener)

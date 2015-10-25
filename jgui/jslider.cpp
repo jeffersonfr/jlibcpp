@@ -46,15 +46,18 @@ int Slider::GetStoneSize()
 		
 void Slider::SetStoneSize(int size)
 {
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	_stone_size = size;
 
 	if (_type == JSO_HORIZONTAL) {
-		if (_stone_size > (_size.width-_horizontal_gap-_border_size)) {
-			_stone_size = (_size.width-_horizontal_gap-_border_size);
+		if (_stone_size > (_size.width-_horizontal_gap-bordersize)) {
+			_stone_size = (_size.width-_horizontal_gap-bordersize);
 		}
 	} else if (_type == JSO_VERTICAL) {
-		if (_stone_size > (_size.height-_vertical_gap-_border_size)) {
-			_stone_size = (_size.height-_vertical_gap-_border_size);
+		if (_stone_size > (_size.height-_vertical_gap-bordersize)) {
+			_stone_size = (_size.height-_vertical_gap-bordersize);
 		}
 	}
 
@@ -133,10 +136,13 @@ bool Slider::MousePressed(MouseEvent *event)
 		return true;
 	}
 
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	int x1 = event->GetX(),
 			y1 = event->GetY(),
-			dx = _vertical_gap-_border_size,
-			dy = _horizontal_gap-_border_size,
+			dx = _vertical_gap-bordersize,
+			dy = _horizontal_gap-bordersize,
 			dw = _size.width-2*dx-_stone_size,
 			dh = _size.height-2*dy-_stone_size;
 
@@ -195,10 +201,13 @@ bool Slider::MouseMoved(MouseEvent *event)
 		return true;
 	}
 
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	int x1 = event->GetX(),
 			y1 = event->GetY(),
-			dx = _vertical_gap-_border_size,
-			dy = _horizontal_gap-_border_size,
+			dx = _vertical_gap-bordersize,
+			dy = _horizontal_gap-bordersize,
 			dw = _size.width-2*dx-_stone_size,
 			dh = _size.height-2*dy-_stone_size;
 
@@ -236,8 +245,13 @@ void Slider::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int x = _vertical_gap-_border_size,
-			y = _horizontal_gap-_border_size,
+	Theme *theme = GetTheme();
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color scroll = theme->GetColor("component.scroll");
+	int bordersize = theme->GetBorderSize("component");
+
+	int x = _vertical_gap-bordersize,
+			y = _horizontal_gap-bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y;
 
@@ -249,9 +263,9 @@ void Slider::Paint(Graphics *g)
 		}
 
 		if (_has_focus == true) {
-			g->SetColor(_focus_fgcolor);
+			g->SetColor(fgfocus);
 		} else {
-			g->SetColor(_scrollbar_color);
+			g->SetColor(scroll);
 		}
 		
 		g->FillRectangle(x, (h-4)/2+y, w, 4);
@@ -285,9 +299,9 @@ void Slider::Paint(Graphics *g)
 		}
 
 		if (_has_focus == true) {
-			g->SetColor(_focus_fgcolor);
+			g->SetColor(fgfocus);
 		} else {
-			g->SetColor(_scrollbar_color);
+			g->SetColor(scroll);
 		}
 		
 		g->FillRectangle((w-10)/2+x, y, 10, h);

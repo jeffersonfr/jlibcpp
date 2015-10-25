@@ -43,9 +43,6 @@ class Main : public jgui::Frame{
 			_container1 = new Container(100, 100, 960, 540);
 			_container2 = new Container(-200, 200, 960, 540);
 
-			_container1->SetBorder(jgui::JCB_LINE);
-			_container2->SetBorder(jgui::JCB_LINE);
-
 			_button1 = new jgui::Button("Button 1", 50, 100, ws, hs);
 			_button2 = new jgui::Button("Button 2", 100, 100, ws, hs);
 			_button3 = new jgui::Button("Button 3", 400, 100, ws, hs);
@@ -61,7 +58,6 @@ class Main : public jgui::Frame{
 			_container2->Add(_button4);
 
 			Add(_container1);
-			SetBorderSize(10);
 		}
 
 		virtual ~Main()

@@ -1,9 +1,9 @@
 /***************************************************************************
- *   Copyright (C) 2005 _insets.top Jeff Ferr                                       *
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
  *   root@sat                                                              *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published _insets.top  *
+ *   it under the terms of the GNU General Public License as published by  *
  *   the Free Software Foundation; either version 2 of the License, or     *
  *   (at your option) any later version.                                   *
  *                                                                         *
@@ -42,11 +42,13 @@ CalendarDialogBox::CalendarDialogBox():
 	SetMonth(_current_month);
 	SetYear(_current_year);
 
-	SetSize(_insets.left+(DEFAULT_COMPONENT_HEIGHT+delta)*7+_insets.right, _insets.top+9*(DEFAULT_COMPONENT_HEIGHT+delta)+_insets.bottom+16);
+	jgui::jinsets_t insets = GetInsets();
+
+	SetSize(insets.left+(DEFAULT_COMPONENT_HEIGHT+delta)*7+insets.right, insets.top+9*(DEFAULT_COMPONENT_HEIGHT+delta)+insets.bottom+16);
 
 	char tmp[255];
 
-	_syear = new Spin(_insets.left, _insets.top+0*(DEFAULT_COMPONENT_HEIGHT+delta), _size.width-_insets.left-_insets.right);
+	_syear = new Spin(insets.left, insets.top+0*(DEFAULT_COMPONENT_HEIGHT+delta), _size.width-insets.left-insets.right);
 
 	for (int i=1970; i<2199; i++) {
 		sprintf(tmp, "%d", i);
@@ -57,7 +59,7 @@ CalendarDialogBox::CalendarDialogBox():
 	_syear->SetLoop(true);
 	_syear->RegisterSelectListener(this);
 
-	_smonth = new Spin(_insets.left, _insets.top+1*(DEFAULT_COMPONENT_HEIGHT+delta), _size.width-_insets.left-_insets.right);
+	_smonth = new Spin(insets.left, insets.top+1*(DEFAULT_COMPONENT_HEIGHT+delta), _size.width-insets.left-insets.right);
 
 	_smonth->AddTextItem("Janeiro");
 	_smonth->AddTextItem("Fevereiro");
@@ -78,23 +80,24 @@ CalendarDialogBox::CalendarDialogBox():
 	int dx = 0;
 	int dy = _smonth->GetY()+1*(_smonth->GetHeight()+delta)+8;
 
-	_ldom = new Label("D", _insets.left+0*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-	_lseg = new Label("S", _insets.left+1*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-	_lter = new Label("T", _insets.left+2*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-	_lqua = new Label("Q", _insets.left+3*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-	_lqui = new Label("Q", _insets.left+4*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-	_lsex = new Label("S", _insets.left+5*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
-	_lsab = new Label("S", _insets.left+6*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_ldom = new Label("D", insets.left+0*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lseg = new Label("S", insets.left+1*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lter = new Label("T", insets.left+2*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lqua = new Label("Q", insets.left+3*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lqui = new Label("Q", insets.left+4*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lsex = new Label("S", insets.left+5*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
+	_lsab = new Label("S", insets.left+6*(DEFAULT_COMPONENT_HEIGHT+delta+dx), dy, DEFAULT_COMPONENT_HEIGHT, DEFAULT_COMPONENT_HEIGHT);
 
-	Color color(0x60, 0x60, 0x80, 0xff);
+	_week_day_theme.SetColor("component.bg", 0x60, 0x60, 0x80, 0xff);
+	_selected_theme.SetColor("component.bg", 0x40, 0x80, 0x40, 0xff);
 
-	_ldom->SetBackgroundColor(color);
-	_lseg->SetBackgroundColor(color);
-	_lter->SetBackgroundColor(color);
-	_lqua->SetBackgroundColor(color);
-	_lqui->SetBackgroundColor(color);
-	_lsex->SetBackgroundColor(color);
-	_lsab->SetBackgroundColor(color);
+	_ldom->SetTheme(&_week_day_theme);
+	_lseg->SetTheme(&_week_day_theme);
+	_lter->SetTheme(&_week_day_theme);
+	_lqua->SetTheme(&_week_day_theme);
+	_lqui->SetTheme(&_week_day_theme);
+	_lsex->SetTheme(&_week_day_theme);
+	_lsab->SetTheme(&_week_day_theme);
 
 	Add(_smonth);
 	Add(_syear);
@@ -212,16 +215,14 @@ int CalendarDialogBox::GetYear()
 	return _select_year; // _year+1970;
 }
 
-void CalendarDialogBox::AddWarnning(int day, int month, int year, int red, int green, int blue)
+void CalendarDialogBox::AddWarnning(jgui::Theme *theme, int day, int month, int year)
 {
 	jcalendar_warnning_t t;
 
+	t.theme = theme;
 	t.day = day;
 	t.month = month;
 	t.year = year;
-	t.red = red;
-	t.green = green;
-	t.blue = blue;
 
 	_warnning_days.push_back(t);
 
@@ -231,12 +232,7 @@ void CalendarDialogBox::AddWarnning(int day, int month, int year, int red, int g
 void CalendarDialogBox::RemoveWarnning(jcalendar_warnning_t t)
 {
 	for (std::vector<jcalendar_warnning_t >::iterator i=_warnning_days.begin(); i!=_warnning_days.end(); i++) {
-		if (t.day == (*i).day &&
-				t.month == (*i).month &&
-				t.year == (*i).year &&
-				t.red == (*i).red &&
-				t.green == (*i).green &&
-				t.blue == (*i).blue) {
+		if (t.day == (*i).day && t.month == (*i).month && t.year == (*i).year) {
 			_warnning_days.erase(i);
 
 			break;
@@ -297,10 +293,12 @@ void CalendarDialogBox::BuildCalendar()
 		delete button;
 	}
 
+	jgui::jinsets_t insets = GetInsets();
+
 	int k = 2;
 
 	for (int i=0; i<mes; i++) {
-		int dx = _insets.left+(DEFAULT_COMPONENT_HEIGHT+delta)*first_day;
+		int dx = insets.left+(DEFAULT_COMPONENT_HEIGHT+delta)*first_day;
 		int dy = _smonth->GetY()+k*(_smonth->GetHeight()+delta)+16;
 
 		sprintf(tmp, "%d", (i+1));
@@ -318,13 +316,14 @@ void CalendarDialogBox::BuildCalendar()
 		if ((_month+1) == _current_month &&
 				(_year+1970) == _current_year) {
 			if (_current_day == (i+1)) {
-				button->SetBackgroundColor(0x40, 0x80, 0x40, 0xff);
+
+				button->SetTheme(&_selected_theme);
 			}
 		}
 
 		for (std::vector<jcalendar_warnning_t>::iterator it=_warnning_days.begin(); it!=_warnning_days.end(); it++) {
 			if ((i+1) == (*it).day && (_month+1) == (*it).month && (_year+1970) == (*it).year) {
-				button->SetBackgroundColor((*it).red, (*it).green, (*it).blue, 0xff);
+				button->SetTheme((*it).theme);
 			}
 		}
 
@@ -393,18 +392,16 @@ bool CalendarDialogBox::MouseWheel(MouseEvent *event)
 
 void CalendarDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 {
-	Button *b1 = (jgui::Button *)event->GetSource(),
-		   *b2 = _buttons[_select_day-1];
+	Button *b1 = (jgui::Button *)event->GetSource();
+	Button *b2 = _buttons[_select_day-1];
 	
 	if (_select_month == (_month+1) && _select_year == (_year+1970)) {
 		if (b1 != b2) {
-			b2->SetForegroundColor(0xf0, 0xf0, 0xf0, 0xff);
-			b2->SetForegroundFocusColor(0xf0, 0xf0, 0xf0, 0xff);
+			b2->SetTheme(GetTheme());
 		}
 	}
 
-	b1->SetForegroundColor(0x60, 0x60, 0xc0, 0xff);
-	b1->SetForegroundFocusColor(0x60, 0x60, 0xc0, 0xff);
+	b1->SetTheme(&_selected_theme);
 
 	_select_day = atoi(b1->GetLabel().c_str());
 	_select_month = (_month+1);

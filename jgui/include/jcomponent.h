@@ -31,10 +31,10 @@
 #include "jkeyevent.h"
 #include "jmouseevent.h"
 #include "jkeymap.h"
-#include "jthemelistener.h"
 #include "jkeylistener.h"
 #include "jmouselistener.h"
 #include "jdatalistener.h"
+#include "jtheme.h"
 
 #include <string>
 #include <vector>
@@ -44,87 +44,18 @@
 
 namespace jgui {
 
-enum jcomponent_alignment_t {
-	JCA_TOP,
-	JCA_CENTER,
-	JCA_BOTTOM,
-	JCA_LEFT,
-	JCA_RIGHT
-};
-
-enum jcomponent_orientation_t {
-	JCO_LEFT_TO_RIGHT,
-	JCO_RIGHT_TO_LEFT,
-	JCO_UP_TO_BOTTOM,
-	JCO_BOTTOM_TO_UP,
-};
-
-enum jcomponent_border_t {
-	JCB_EMPTY,
-	JCB_LINE,
-	JCB_BEVEL,
-	JCB_ROUND,
-	JCB_RAISED_GRADIENT,
-	JCB_LOWERED_GRADIENT,
-	JCB_RAISED_BEVEL,
-	JCB_LOWERED_BEVEL,
-	JCB_RAISED_ETCHED,
-	JCB_LOWERED_ETCHED
-};
-
-// component baseline resize behavior
-enum jcomponent_behavior_t {
-	// Indicates the baseline remains fixed relative to the y-origin.  That is, <code>getBaseline</code> returns
-	// the same value regardless of the height or width.  For example, a <code>JLabel</code> containing non-empty 
-	// text with a vertical alignment of <code>TOP</code> should have a baseline type of <code>CONSTANT_ASCENT</code>.
-	JCB_CONSTANT_ASCENT,
-	// Indicates the baseline remains fixed relative to the height and does not change as the width is varied.  That is, 
-	// for any height H the difference between H and <code>getBaseline(w, H)</code> is the same.  For example, a <code>
-	// JLabel</code> containing non-empty text with a vertical alignment of <code>BOTTOM</code> should have a baseline 
-	// type of <code>CONSTANT_DESCENT</code>.
-	JCB_CONSTANT_DESCENT,
-	// Indicates the baseline remains a fixed distance from the center of the component.  That is, for any height H the
-	// difference between <code>getBaseline(w, H)</code> and <code>H / 2</code> is the same (plus or minus one depending 
-	// upon rounding error). <p> Because of possible rounding errors it is recommended you ask for the baseline with two 
-	// consecutive heights and use the return value to determine if you need to pad calculations by 1.  The following shows 
-	// how to calculate the baseline for any height:
-	// <pre>
-	//    jregion_t preferredSize = component->GetPreferredSize();
-	//    int baseline = GetBaseline(preferredSize.width, preferredSize.height);
-	//    int nextBaseline = GetBaseline(preferredSize.width, preferredSize.height + 1);
-	// 		// Amount to add to height when calculating where baseline lands for a particular height:
-	// 		int padding = 0;
-	// 		// Where the baseline is relative to the mid point
-	// 		int baselineOffset = baseline - height / 2;
-	// 		if (preferredSize.height % 2 == 0 && baseline != nextBaseline) {
-	// 			padding = 1;
-	// 		} else if (preferredSize.height % 2 == 1 && baseline == nextBaseline) {
-	// 		  baselineOffset--;
-	// 		  padding = 1;
-	// 		}
-	// 		// The following calculates where the baseline lands for the height z:
-	// 		int calculatedBaseline = (z + padding) / 2 + baselineOffset;
-	// 	</pre>
-	JCB_CENTER_OFFSET,
-	// Indicates the baseline resize behavior can not be expressed using any of the other constants.  
-	// This may also indicate the baseline varies with the width of the component.  This is also returned
-	// by components that do not have a baseline.
-	JCB_OTHER
-};
-
 class FocusListener;
 class FocusEvent;
 class InteractionListener;
 class InteractionEvent;
 class Container;
-class ThemeManager;
 
 /**
  * \brief
  *
  * \author Jeff Ferr
  */
-class Component : public KeyListener, public MouseListener, public jgui::ThemeListener{
+class Component : public KeyListener, public MouseListener{
 
 	friend class Container;
 	friend class Frame;
@@ -151,7 +82,7 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		/** \brief */
 		Component *_down;
 		/** \brief */
-		jgui::Font *_font;
+		jgui::Theme *_theme;
 		/** \brief */
 		jgui::KeyMap *_keymap;
 		/** \brief */
@@ -169,41 +100,17 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		/** \brief */
 		jsize_t _maximum_size;
 		/** \brief */
-		Color _bgcolor;
-		/** \brief */
-		Color _fgcolor;
-		/** \brief */
-		Color _focus_bgcolor;
-		/** \brief */
-		Color _focus_fgcolor;
-		/** \brief */
-		Color _border_color;
-		/** \brief */
-		Color _focus_border_color;
-		/** \brief */
-		Color _scrollbar_color;
-		/** \brief */
-		Color _disabled_bgcolor;
-		/** \brief */
-		Color _disabled_fgcolor;
-		/** \brief */
-		Color _disabled_border_color;
-		/** \brief */
 		jcomponent_alignment_t _alignment_x;
 		/** \brief */
 		jcomponent_alignment_t _alignment_y;
 		/** \brief */
 		jcomponent_orientation_t _orientation;
 		/** \brief */
-		jcomponent_border_t _border;
-		/** \brief */
 		int _gradient_level;
 		/** \brief */
 		int _vertical_gap;
 		/** \brief */
 		int _horizontal_gap;
-		/** \brief */
-		int _border_size;
 		/** \brief */
 		int _scroll_size;
 		/** \brief */
@@ -240,8 +147,6 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		bool _is_enabled;
 		/** \brief */
 		bool _is_focus_cycle_root;
-		/** \brief */
-		bool _is_theme_enabled;
 		/** \brief */
 		bool _is_valid;
 		/** \brief */
@@ -542,6 +447,18 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		 * \brief
 		 *
 		 */
+		virtual Theme * GetTheme();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetTheme(Theme *theme);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetKeyMap(KeyMap *keymap);
 
 		/**
@@ -549,18 +466,6 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		 *
 		 */
 		virtual KeyMap * GetKeyMap();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetThemeEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsThemeEnabled();
 
 		/**
 		 * \brief
@@ -797,24 +702,6 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		virtual bool HasFocus();
 
 		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBorder(jcomponent_border_t t);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBorderSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetBorderSize();
-		
-		/**
 		 * \brief Verify if the second component contains the first one;
 		 *
 		 */
@@ -992,24 +879,6 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		 * \brief
 		 *
 		 */
-		virtual void SetFont(Font *font);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsFontSet();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Font * GetFont();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void RaiseToTop();
 		
 		/**
@@ -1029,186 +898,6 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		 *
 		 */
 		virtual void PutBelow(Component *c);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBackgroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBackgroundFocusColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundFocusColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBorderColor(int red, int green, int blue, int alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBorderFocusColor(int red, int green, int blue, int alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScrollbarColor(int red, int green, int blue, int alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDisabledBackgroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDisabledForegroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDisabledBorderColor(int red, int green, int blue, int alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBackgroundColor(const Color &color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundColor(const Color &color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBackgroundFocusColor(const Color &color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetForegroundFocusColor(const Color &color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBorderColor(const Color &color);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetBorderFocusColor(const Color &color);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScrollbarColor(const Color &color);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDisabledBackgroundColor(const Color &color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDisabledForegroundColor(const Color &color);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDisabledBorderColor(const Color &color);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetBackgroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetForegroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetBackgroundFocusColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetForegroundFocusColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetBorderColor();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetBorderFocusColor();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetScrollbarColor();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetDisabledBackgroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetDisabledForegroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetDisabledBorderColor();
 
 		/**
 		 * \brief
@@ -1354,11 +1043,6 @@ class Component : public KeyListener, public MouseListener, public jgui::ThemeLi
 		 */
 		virtual std::vector<jcommon::DataListener *> & GetDataListeners();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void ThemeChanged(ThemeEvent *event);
 };
 
 }

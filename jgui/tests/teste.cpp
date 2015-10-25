@@ -98,11 +98,24 @@ class WindowTest : public jgui::Frame, public jgui::ButtonListener, public jgui:
 			*_toogle;
 		jgui::ComboBox 
 			*_combo;
+		jgui::Theme 
+			_theme1,
+			_theme2,
+			_theme3,
+			_theme4;
 
 	public:
 		WindowTest():
 			jgui::Frame("Frame Test")
 	{
+		_theme1.SetColor("component.bg.focus", 0x40, 0xf0, 0x40, 0xff);
+		_theme2.SetColor("component.bg.focus", 0xf0, 0x20, 0x20, 0xff);
+		_theme3.SetColor("component.bg.focus", 0xf0, 0xf0, 0x40, 0xff);
+
+		_theme4.SetColor("component.bg", 0x35, 0x80, 0x35, 0xe0);
+		_theme4.SetColor("window.bg", 0x75, 0x55, 0x35, 0xa0);
+		_theme4.SetColor("item.bg", 0xf0, 0x80, 0x35, 0xe0);
+
 		{
 			_animation = new jgui::Animation(_insets.left, _insets.top, 98, 98);
 
@@ -148,9 +161,9 @@ class WindowTest : public jgui::Frame, public jgui::ButtonListener, public jgui:
 			_button2 = new jgui::Button("Decrease", _insets.left, _watch->GetY()+2*(_watch->GetHeight()+8), 196);
 			_button3 = new jgui::Button("Testing a long text in a buttom component", _insets.left, _watch->GetY()+3*(_watch->GetHeight()+8), 196, 96);
 
-			_button1->SetBackgroundFocusColor(0x40, 0xf0, 0x40, 0xff);
-			_button2->SetBackgroundFocusColor(0xf0, 0x20, 0x20, 0xff);
-			_button3->SetBackgroundFocusColor(0xf0, 0xf0, 0x40, 0xff);
+			_button1->SetTheme(&_theme1);
+			_button1->SetTheme(&_theme2);
+			_button1->SetTheme(&_theme3);
 
 			_button1->RegisterButtonListener(this);
 			_button2->RegisterButtonListener(this);
@@ -359,6 +372,8 @@ class WindowTest : public jgui::Frame, public jgui::ButtonListener, public jgui:
 
 		Hide();
 
+		jgui::ThemeManager::GetInstance()->SetTheme(NULL);
+
 		delete _animation;
 		delete _marquee;
 		delete _textfield;
@@ -443,15 +458,7 @@ class WindowTest : public jgui::Frame, public jgui::ButtonListener, public jgui:
 			_progress->SetValue(_progress->GetValue()+10);
 			_slider->SetValue(_slider->GetValue()+10);
 
-			//*
-			jgui::Theme *t = new jgui::Theme();
-
-			t->SetWindowBackgroundColor(0x75, 0x55, 0x35, 0xa0);
-			t->SetComponentBackgroundColor(0x35, 0x80, 0x35, 0xe0);
-			t->SetItemColor(0xf0, 0x80, 0x35, 0xe0);
-
-			jgui::ThemeManager::GetInstance()->SetTheme(t);
-			//*/
+			jgui::ThemeManager::GetInstance()->SetTheme(&_theme4);
 		} else if (event->GetSource() == _button2) {
 			_progress->SetValue(_progress->GetValue()-10);
 			_slider->SetValue(_slider->GetValue()-10);
@@ -469,7 +476,6 @@ class GraphicPanel : public jgui::Canvas{
 		GraphicPanel(int x, int y, int w, int h):
 			jgui::Canvas(x, y, w, h)
 	{
-		SetBackgroundColor(0x40, 0x40, 0x60, 0xff);
 		SetBackgroundVisible(true);
 	}
 
@@ -1028,10 +1034,13 @@ class PathsTest : public jgui::Frame{
 		{
 			jgui::Frame::Paint(g);
 
+			jgui::Theme *theme = GetTheme();
+			// jgui::Color bg = theme->GetColor("component.bg");
+			jgui::Color fg = theme->GetColor("component.fg");
 			jgui::Path *path = g->CreatePath();
 
 			if (path == NULL) {
-				g->SetColor(_fgcolor);
+				g->SetColor(fg);
 				g->DrawString("The graphic engine does not support this operation !", 0, 0, GetWidth(), GetHeight());
 
 				return;
@@ -1407,6 +1416,8 @@ class ModulesTest : public jgui::Frame, public jgui::ButtonListener, public jgui
 		PathsTest *_paths;
 		jgui::Menu 
 			*_menu;
+		jgui::Theme
+			_theme1;
 		int 
 			_index;
 
@@ -1415,6 +1426,8 @@ class ModulesTest : public jgui::Frame, public jgui::ButtonListener, public jgui
 			jgui::Frame("Graphics Test")
 		{
 			jgui::jsize_t screen = jgui::GFXHandler::GetInstance()->GetScreenSize();
+
+			_theme1.SetColor("component.bg", 0x80, 0x90, 0xa0, 0xff);
 
 			int w = (screen.width-3*120)/2;
 			int h = (screen.height-4*80)/4;
@@ -1465,7 +1478,7 @@ class ModulesTest : public jgui::Frame, public jgui::ButtonListener, public jgui
 
 			_calendar = new jgui::CalendarDialogBox();
 
-			_calendar->AddWarnning(10, 4, 2015);
+			_calendar->AddWarnning(&_theme1, 10, 4, 2015);
 			_calendar->RegisterWindowListener(this);
 
 			_message_1 = new jgui::MessageDialogBox("Warning", "Testing the component of message with some text and breaks of line.\nThis is a new line using manual break-line character. The lines also can break in case of the width of this component be minor than the width of the current text line.");

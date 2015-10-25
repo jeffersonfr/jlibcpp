@@ -227,9 +227,17 @@ void CheckButton::Paint(Graphics *g)
 
 	Component::Paint(g);
 
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	int bordersize = theme->GetBorderSize("component");
+
 	int cw = _size.height/2,
 			ch = _size.height/2,
-			cx = 2*_horizontal_gap+_border_size,
+			cx = 2*_horizontal_gap+bordersize,
 			cy = (_size.height-ch)/2,
 			csize = ch/2;
 
@@ -249,9 +257,9 @@ void CheckButton::Paint(Graphics *g)
 	*/
 
 	if (_has_focus == true) {
-		g->SetColor(_focus_fgcolor);
+		g->SetColor(fgfocus);
 	} else {
-		g->SetColor(_fgcolor);
+		g->SetColor(fg);
 	}
 
 	if (_type == JCBT_CHECK) {
@@ -262,9 +270,9 @@ void CheckButton::Paint(Graphics *g)
 
 	if (_checked == true) {
 		if (_has_focus == true) {
-			g->SetColor(_fgcolor);
+			g->SetColor(fg);
 		} else {
-			g->SetColor(_focus_fgcolor);
+			g->SetColor(fgfocus);
 		}
 
 		if (_type == JCBT_CHECK) {
@@ -274,19 +282,21 @@ void CheckButton::Paint(Graphics *g)
 		}
 	}
 
-	if (IsFontSet() == true) {
+	if (font != NULL) {
+		g->SetFont(font);
+
 		if (_is_enabled == true) {
 			if (_has_focus == true) {
-				g->SetColor(_focus_fgcolor);
+				g->SetColor(fgfocus);
 			} else {
-				g->SetColor(_fgcolor);
+				g->SetColor(fg);
 			}
 		} else {
-			g->SetColor(_disabled_fgcolor);
+			g->SetColor(fgdisable);
 		}
 
-		int x = _horizontal_gap+_border_size,
-				y = _vertical_gap+_border_size,
+		int x = _horizontal_gap+bordersize,
+				y = _vertical_gap+bordersize,
 				w = _size.width-2*x,
 				h = _size.height-2*y,
 				gapx = cx+cw+5,
@@ -309,7 +319,7 @@ void CheckButton::Paint(Graphics *g)
 		std::string text = GetText();
 
 		if (_is_wrap == false) {
-			text = _font->TruncateString(text, "...", pw);
+			text = font->TruncateString(text, "...", pw);
 		}
 
 		g->DrawString(text, px, py, pw, ph, _halign, _valign);

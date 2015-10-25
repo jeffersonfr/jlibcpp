@@ -20,13 +20,82 @@
 #ifndef J_THEME_H
 #define J_THEME_H
 
-#include "jcomponent.h"
+#include "jgraphics.h"
 
 #include <string>
+#include <map>
 
 #include <stdlib.h>
 
 namespace jgui {
+
+enum jcomponent_alignment_t {
+	JCA_TOP,
+	JCA_CENTER,
+	JCA_BOTTOM,
+	JCA_LEFT,
+	JCA_RIGHT
+};
+
+enum jcomponent_orientation_t {
+	JCO_LEFT_TO_RIGHT,
+	JCO_RIGHT_TO_LEFT,
+	JCO_UP_TO_BOTTOM,
+	JCO_BOTTOM_TO_UP,
+};
+
+enum jcomponent_border_t {
+	JCB_EMPTY,
+	JCB_LINE,
+	JCB_BEVEL,
+	JCB_ROUND,
+	JCB_RAISED_GRADIENT,
+	JCB_LOWERED_GRADIENT,
+	JCB_RAISED_BEVEL,
+	JCB_LOWERED_BEVEL,
+	JCB_RAISED_ETCHED,
+	JCB_LOWERED_ETCHED
+};
+
+// component baseline resize behavior
+enum jcomponent_behavior_t {
+	// Indicates the baseline remains fixed relative to the y-origin.  That is, <code>getBaseline</code> returns
+	// the same value regardless of the height or width.  For example, a <code>JLabel</code> containing non-empty 
+	// text with a vertical alignment of <code>TOP</code> should have a baseline type of <code>CONSTANT_ASCENT</code>.
+	JCB_CONSTANT_ASCENT,
+	// Indicates the baseline remains fixed relative to the height and does not change as the width is varied.  That is, 
+	// for any height H the difference between H and <code>getBaseline(w, H)</code> is the same.  For example, a <code>
+	// JLabel</code> containing non-empty text with a vertical alignment of <code>BOTTOM</code> should have a baseline 
+	// type of <code>CONSTANT_DESCENT</code>.
+	JCB_CONSTANT_DESCENT,
+	// Indicates the baseline remains a fixed distance from the center of the component.  That is, for any height H the
+	// difference between <code>getBaseline(w, H)</code> and <code>H / 2</code> is the same (plus or minus one depending 
+	// upon rounding error). <p> Because of possible rounding errors it is recommended you ask for the baseline with two 
+	// consecutive heights and use the return value to determine if you need to pad calculations by 1.  The following shows 
+	// how to calculate the baseline for any height:
+	// <pre>
+	//    jregion_t preferredSize = component->GetPreferredSize();
+	//    int baseline = GetBaseline(preferredSize.width, preferredSize.height);
+	//    int nextBaseline = GetBaseline(preferredSize.width, preferredSize.height + 1);
+	// 		// Amount to add to height when calculating where baseline lands for a particular height:
+	// 		int padding = 0;
+	// 		// Where the baseline is relative to the mid point
+	// 		int baselineOffset = baseline - height / 2;
+	// 		if (preferredSize.height % 2 == 0 && baseline != nextBaseline) {
+	// 			padding = 1;
+	// 		} else if (preferredSize.height % 2 == 1 && baseline == nextBaseline) {
+	// 		  baselineOffset--;
+	// 		  padding = 1;
+	// 		}
+	// 		// The following calculates where the baseline lands for the height z:
+	// 		int calculatedBaseline = (z + padding) / 2 + baselineOffset;
+	// 	</pre>
+	JCB_CENTER_OFFSET,
+	// Indicates the baseline resize behavior can not be expressed using any of the other constants.  
+	// This may also indicate the baseline varies with the width of the component.  This is also returned
+	// by components that do not have a baseline.
+	JCB_OTHER
+};
 
 class Component;
 class Window;
@@ -39,41 +108,11 @@ class ItemComponent;
  */
 class Theme : public virtual jcommon::Object{
 
-	friend class ThemeManager;
-	friend class Component;
-	friend class Window;
-	friend class ItemComponent;
-	friend class Frame;
-
 	private:
-		Font *_window_font,
-		 	*_component_font;
-		jinsets_t _insets;
-		Color _window_bgcolor,
-			_window_fgcolor,
-			_window_border_color,
-			_component_bgcolor,
-			_component_fgcolor,
-			_component_border_color,
-			_component_border_focus_color,
-			_component_focus_bgcolor,
-			_component_focus_fgcolor,
-			_component_scrollbar_color,
-			_component_disabled_bgcolor,
-			_component_disabled_fgcolor,
-			_component_disabled_border_color,
-			_item_color,
-			_item_fgcolor,
-			_item_focus_color,
-			_item_focus_fgcolor,
-			_item_selected_color,
-			_item_selected_fgcolor,
-			_item_disabled_color,
-			_item_disabled_fgcolor;
-		jcomponent_border_t _component_border,
-			_window_border;
-		int _window_border_size,
-			_component_border_size;
+		std::map<std::string, jgui::Color> _colors;
+		std::map<std::string, jgui::Font *> _fonts;
+		std::map<std::string, jgui::jcomponent_border_t> _borders;
+		std::map<std::string, int> _size_borders;
 
 	public:
 		/**
@@ -92,344 +131,62 @@ class Theme : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void Update(Component *parent);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWindowBackgroundColor(int red, int green, int blue, int alpha);
+		virtual Color & GetColor(std::string id); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetWindowForegroundColor(int red, int green, int blue, int alpha);
+		virtual void SetColor(std::string id, const jgui::Color &color);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetWindowBorderColor(int red, int green, int blue, int alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetComponentBackgroundColor(int red, int green, int blue, int alpha);
+		virtual void SetColor(std::string id, uint32_t color); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetComponentForegroundColor(int red, int green, int blue, int alpha);
+		virtual void SetColor(std::string id, int red, int green, int blue, int alpha = 0xff); 
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetComponentBorderColor(int red, int green, int blue, int alpha);
+		virtual jcomponent_border_t GetBorder(std::string id);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetComponentBorderFocusColor(int red, int green, int blue, int alpha);
+		virtual void SetBorder(std::string id, jcomponent_border_t border);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetComponentBackgroundFocusColor(int red, int green, int blue, int alpha);
+		virtual int GetBorderSize(std::string id);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetComponentForegroundFocusColor(int red, int green, int blue, int alpha);
+		virtual void SetBorderSize(std::string id, int size);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetComponentScrollbarColor(int red, int green, int blue, int alpha);
+		virtual jgui::Font * GetFont(std::string id);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetComponentDisabledBackgroundColor(int red, int green, int blue, int alpha);
+		virtual void SetFont(std::string id, jgui::Font *font);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetComponentDisabledForegroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetComponentDisabledBorderColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetItemColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetItemForegroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetItemFocusColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetItemForegroundFocusColor(int red, int green, int blue, int alpha);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSelectedItemColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSelectedItemForegroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDisabledItemColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetDisabledItemForegroundColor(int red, int green, int blue, int alpha);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetComponentBorder(jcomponent_border_t border);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWindowBorder(jcomponent_border_t border);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWindowInsets(int left, int top, int right, int bottom);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWindowBorderSize(int size);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetComponentBorderSize(int size);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetWindowFont(Font *font);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetComponentFont(Font *font);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetWindowBackgroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetWindowForegroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetWindowBorderColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetComponentBackgroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetComponentForegroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetComponentBorderColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetComponentBorderFocusColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetComponentBackgroundFocusColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetComponentForegroundFocusColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetComponentScrollbarColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetComponentDisabledBackgroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetComponentDisabledForegroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetComponentDisabledBorderColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetItemColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetItemForegroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetItemFocusColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetItemForegroundFocusColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetSelectedItemColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetSelectedItemForegroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetDisabledItemColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Color & GetDisabledItemForegroundColor();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcomponent_border_t GetComponentBorder();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jcomponent_border_t GetWindowBorder();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jinsets_t GetWindowInsets();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetWindowBorderSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual int GetComponentBorderSize();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Font * GetWindowFont();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual Font * GetComponentFont();
-
 };
 
 }

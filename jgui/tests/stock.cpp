@@ -47,11 +47,16 @@ class Stock : public jgui::Frame{
 				*vminimo,
 				*vmaximo,
 				*vvolume;
+			jgui::Theme _theme1, 
+				_theme2;
 
 	public:
 		Stock(int x, int y):
 			jgui::Frame("Stock", x, y, 500, 400)
 		{
+			_theme1.SetColor("component.fg", 0xf0, 0x00, 0x00, 0xff);
+			_theme2.SetColor("component.fg", 0x00, 0xf0, 0x00, 0xff);
+
 			int px = 0,
 					py = 0,
 					pw = DEFAULT_COMPONENT_WIDTH,
@@ -191,9 +196,9 @@ class Stock : public jgui::Frame{
 				vvolume->SetText(quotes["volume"]);
 
 				if (quotes["variacao"].find("-") != std::string::npos) {
-					vvariacao->SetForegroundColor(0xf0, 0x00, 0x00, 0xff);
+					vvariacao->SetTheme(&_theme1);
 				} else {
-					vvariacao->SetForegroundColor(0x00, 0xf0, 0x00, 0xff);
+					vvariacao->SetTheme(&_theme2);
 				}
 			}
 

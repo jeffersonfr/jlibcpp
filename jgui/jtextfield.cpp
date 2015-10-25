@@ -268,7 +268,15 @@ void TextField::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	if (IsFontSet() == false) {
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	int bordersize = theme->GetBorderSize("component");
+
+	if (font == NULL) {
 		return;
 	}
 
@@ -290,17 +298,19 @@ void TextField::Paint(Graphics *g)
 
 	if (_is_enabled == true) {
 		if (_has_focus == true) {
-			g->SetColor(_focus_fgcolor);
+			g->SetColor(fgfocus);
 		} else {
-			g->SetColor(_fgcolor);
+			g->SetColor(fg);
 		}
 	} else {
-		g->SetColor(_disabled_fgcolor);
+		g->SetColor(fgdisable);
 	}
 
 	current_text_size = 0;
 
-	if (_font != NULL) {
+	if (font != NULL) {
+		g->SetFont(font);
+
 		if (_caret_visible == true) {
 			if (_caret_type == JCT_UNDERSCORE) {
 				cursor = "_";
@@ -310,14 +320,14 @@ void TextField::Paint(Graphics *g)
 				cursor = "?";
 			}
 
-			caret_size = _font->GetStringWidth(cursor);
+			caret_size = font->GetStringWidth(cursor);
 		}
 
-		current_text_size = _font->GetStringWidth(text.substr(0, _caret_position));
+		current_text_size = font->GetStringWidth(text.substr(0, _caret_position));
 	}
 
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
+	int x = _horizontal_gap+bordersize,
+			y = _vertical_gap+bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y;
 	int offset = 0;
@@ -329,12 +339,12 @@ void TextField::Paint(Graphics *g)
 			do {
 				count++;
 
-				current_text_size = _font->GetStringWidth(text.substr(_caret_position-count, count));
+				current_text_size = font->GetStringWidth(text.substr(_caret_position-count, count));
 			} while (current_text_size < (w-caret_size));
 
 			count = count-1;
 			text = text.substr(_caret_position-count, count);
-			current_text_size = _font->GetStringWidth(text);
+			current_text_size = font->GetStringWidth(text);
 			offset = (w-current_text_size-caret_size)-caret_size;
 
 			if (_caret_position < (int)paint_text.size()) {
@@ -344,7 +354,7 @@ void TextField::Paint(Graphics *g)
 			int count = 1;
 
 			do {
-				current_text_size = _font->GetStringWidth(text.substr(0, count));
+				current_text_size = font->GetStringWidth(text.substr(0, count));
 
 				if (count++ > (int)paint_text.size()) {
 					break;
@@ -365,7 +375,7 @@ void TextField::Paint(Graphics *g)
 				offset = 0;
 			}
 
-			current_text_size = _font->GetStringWidth(text.substr(0, _caret_position));
+			current_text_size = font->GetStringWidth(text.substr(0, _caret_position));
 		}
 
 		g->DrawString(text, x+offset, y, w, h, JHA_LEFT, _valign);

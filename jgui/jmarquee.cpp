@@ -118,36 +118,46 @@ void Marquee::Paint(Graphics *g)
 
 	Component::Paint(g);
 
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	int bordersize = theme->GetBorderSize("component");
+
 	/*
 	g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
 	g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
 	*/
 
-	if (IsFontSet() == true) {
+	if (font != NULL) {
+		g->SetFont(font);
+
 		if (_is_enabled == true) {
 			if (_has_focus == true) {
-				g->SetColor(_focus_fgcolor);
+				g->SetColor(fgfocus);
 			} else {
-				g->SetColor(_fgcolor);
+				g->SetColor(fg);
 			}
 		} else {
-			g->SetColor(_disabled_fgcolor);
+			g->SetColor(fgdisable);
 		}
 
-		int x = _horizontal_gap+_border_size,
-				y = _vertical_gap+_border_size,
+		int x = _horizontal_gap+bordersize,
+				y = _vertical_gap+bordersize,
 				w = _size.width-2*x,
 				h = _size.height-2*y,
 				gapx = 0,
 				gapy = 0;
 		int px = x+gapx,
-				py = y+(h-_font->GetSize())/2,
+				py = y+(h-font->GetSize())/2,
 				pw = w-gapx,
 				ph = h-gapy;
 
 		std::string text = _text;
 
-		if (_type == JMM_BOUNCE && _size.width >= _font->GetStringWidth(_text.c_str())) {
+		if (_type == JMM_BOUNCE && _size.width >= font->GetStringWidth(_text.c_str())) {
 			text = (char *)(_text.c_str());
 		}
 
@@ -192,16 +202,20 @@ void Marquee::Paint(Graphics *g)
 
 void Marquee::Run()
 {
-	int x = _horizontal_gap+_border_size,
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	int bordersize = theme->GetBorderSize("component");
+
+	int x = _horizontal_gap+bordersize,
 			w = _size.width-2*x;
 
-	if (_font == NULL) {
+	if (font == NULL) {
 		return;
 	}
 
 	while (_running == true) {
 		if (_type == JMM_BOUNCE) {
-			int width = _font->GetStringWidth(_text.c_str()),
+			int width = font->GetStringWidth(_text.c_str()),
 					diff = (w-width);
 
 			if (diff > 0) {
@@ -218,7 +232,7 @@ void Marquee::Run()
 				_step = -_step;
 			}
 		} else {
-			int width = _font->GetStringWidth(_text.c_str());
+			int width = font->GetStringWidth(_text.c_str());
 
 			if (_step < 0) {
 				_step = -_step;

@@ -54,13 +54,13 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 	jgui::Graphics *goff;
 	jgui::Image *ii;
-	
+	jgui::Theme _theme;
 	dimension_t d;
-	
-	uint32_t dotcolor,
-			 mazecolor,
-			 bigdotcolor,
-			 dbigdotcolor;
+	uint32_t 
+		dotcolor,
+		mazecolor,
+		bigdotcolor,
+		dbigdotcolor;
 	int	screendelay;
 	int blocksize;
 	int nrofblocks;
@@ -88,7 +88,8 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		*ghostdx, 
 		*ghostdy, 
 		*ghostspeed;
-	int pacmanx, 
+	int 
+		pacmanx, 
 		pacmany, 
 		pacmandx, 
 		pacmandy,
@@ -103,12 +104,14 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		maxspeed,
 		currentspeed,
 		*screendata;
-	bool ingame,
+	bool 
+		ingame,
 		 showtitle,
 		 scared,
 		 dying,
 		 flag;
-	jgui::Image *ghost_bmp,
+	jgui::Image 
+		*ghost_bmp,
 		*pacman_bmp;
 
 	public:
@@ -190,6 +193,8 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 	
 		flag = true;
 
+		_theme.SetColor("window.bg", 0x00, 0x00, 0x00, 0xff);
+
 		SetDefaultExitEnabled(false);
 		SetSize(scrsize+4, scrsize+nrofblocks+blocksize+10);
 	}
@@ -210,7 +215,7 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		d.w = GetWidth();
 		d.h = GetHeight();
 
-		SetBackgroundColor(0x00, 0x00, 0x00, 0xff);
+		SetTheme(&_theme);
 		
 		ghostx = new int[maxghosts];
 		ghostdx = new int[maxghosts];
@@ -694,7 +699,7 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 		sprintf(tmp, "Score: %d", score);
 		
-		goff->SetFont(GetFont());
+		goff->SetFont(GetTheme()->GetFont("window"));
 		goff->SetColor(96, 128, 255, 0xff);
 		goff->DrawString(tmp, GetWidth()-180, scrsize+16);
 

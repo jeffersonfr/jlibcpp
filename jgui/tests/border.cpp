@@ -29,6 +29,17 @@ class BorderTest : public jgui::Frame {
 
 	private:
 		std::vector<jgui::Component *> _components;
+		jgui::Theme
+			_theme0,
+			_theme1,
+			_theme2,
+			_theme3,
+			_theme4,
+			_theme5,
+			_theme6,
+			_theme7,
+			_theme8,
+			_theme9;
 
 	public:
 		BorderTest():
@@ -56,20 +67,40 @@ class BorderTest : public jgui::Frame {
 			_components.push_back(new jgui::Button("Raised Etched", dx+3*(w+gapx)+2*gapx, dy+1*(h+gapy)+gapy, w, h));
 			_components.push_back(new jgui::Button("Lowered Etched", dx+4*(w+gapx)+2*gapx, dy+1*(h+gapy)+gapy, w, h));
 
-			_components[0]->SetBorder(jgui::JCB_EMPTY);
-			_components[1]->SetBorder(jgui::JCB_LINE);
-			_components[2]->SetBorder(jgui::JCB_BEVEL);
-			_components[3]->SetBorder(jgui::JCB_ROUND);
-			_components[4]->SetBorder(jgui::JCB_RAISED_GRADIENT);
-			_components[5]->SetBorder(jgui::JCB_LOWERED_GRADIENT);
-			_components[6]->SetBorder(jgui::JCB_RAISED_BEVEL);
-			_components[7]->SetBorder(jgui::JCB_LOWERED_BEVEL);
-			_components[8]->SetBorder(jgui::JCB_RAISED_ETCHED);
-			_components[9]->SetBorder(jgui::JCB_LOWERED_ETCHED);
+			_theme0.SetBorder("component", jgui::JCB_EMPTY);
+			_theme1.SetBorder("component", jgui::JCB_LINE);
+			_theme2.SetBorder("component", jgui::JCB_BEVEL);
+			_theme3.SetBorder("component", jgui::JCB_ROUND);
+			_theme4.SetBorder("component", jgui::JCB_RAISED_GRADIENT);
+			_theme5.SetBorder("component", jgui::JCB_LOWERED_GRADIENT);
+			_theme6.SetBorder("component", jgui::JCB_RAISED_BEVEL);
+			_theme7.SetBorder("component", jgui::JCB_LOWERED_BEVEL);
+			_theme8.SetBorder("component", jgui::JCB_RAISED_ETCHED);
+			_theme9.SetBorder("component", jgui::JCB_LOWERED_ETCHED);
+
+			_theme0.SetBorderSize("component", 8);
+			_theme1.SetBorderSize("component", 8);
+			_theme2.SetBorderSize("component", 8);
+			_theme3.SetBorderSize("component", 8);
+			_theme4.SetBorderSize("component", 8);
+			_theme5.SetBorderSize("component", 8);
+			_theme6.SetBorderSize("component", 8);
+			_theme7.SetBorderSize("component", 8);
+			_theme8.SetBorderSize("component", 8);
+			_theme9.SetBorderSize("component", 8);
+
+			_components[0]->SetTheme(&_theme0);
+			_components[1]->SetTheme(&_theme1);
+			_components[2]->SetTheme(&_theme2);
+			_components[3]->SetTheme(&_theme3);
+			_components[4]->SetTheme(&_theme4);
+			_components[5]->SetTheme(&_theme5);
+			_components[6]->SetTheme(&_theme6);
+			_components[7]->SetTheme(&_theme7);
+			_components[8]->SetTheme(&_theme8);
+			_components[9]->SetTheme(&_theme9);
 
 			for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-				(*i)->SetBorderSize(8);
-
 				Add(*i);
 			}
 		}

@@ -67,15 +67,18 @@ int ProgressBar::GetStoneSize()
 
 void ProgressBar::SetStoneSize(int size)
 {
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	_stone_size = size;
 
 	if (_type == JSO_HORIZONTAL) {
-		if (_stone_size > (_size.width-_horizontal_gap-_border_size)) {
-			_stone_size = (_size.width-_horizontal_gap-_border_size);
+		if (_stone_size > (_size.width-_horizontal_gap-bordersize)) {
+			_stone_size = (_size.width-_horizontal_gap-bordersize);
 		}
 	} else if (_type == JSO_VERTICAL) {
-		if (_stone_size > (_size.height-_vertical_gap-_border_size)) {
-			_stone_size = (_size.height-_vertical_gap-_border_size);
+		if (_stone_size > (_size.height-_vertical_gap-bordersize)) {
+			_stone_size = (_size.height-_vertical_gap-bordersize);
 		}
 	}
 
@@ -194,8 +197,17 @@ void ProgressBar::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int x = _vertical_gap-_border_size,
-			y = _horizontal_gap-_border_size,
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	Color scroll = theme->GetColor("component.scroll");
+	int bordersize = theme->GetBorderSize("component");
+
+	int x = _vertical_gap-bordersize,
+			y = _horizontal_gap-bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y,
 			gapx = 0,
@@ -211,7 +223,7 @@ void ProgressBar::Paint(Graphics *g)
 				d = w;
 			}
 
-			g->SetColor(_scrollbar_color);
+			g->SetColor(scroll);
 			g->FillRectangle(x, y, (int)d, h);
 
 			char t[255];
@@ -230,7 +242,7 @@ void ProgressBar::Paint(Graphics *g)
 				d = h;
 			}
 
-			g->SetColor(_scrollbar_color);
+			g->SetColor(scroll);
 			g->FillRectangle(x, y, w, (int)d);
 
 			char t[255];
@@ -247,12 +259,12 @@ void ProgressBar::Paint(Graphics *g)
 		if (_label_visible == true) {
 			if (_is_enabled == true) {
 				if (_has_focus == true) {
-					g->SetColor(_focus_fgcolor);
+					g->SetColor(fgfocus);
 				} else {
-					g->SetColor(_fgcolor);
+					g->SetColor(fg);
 				}
 			} else {
-				g->SetColor(_disabled_fgcolor);
+				g->SetColor(fgdisable);
 			}
 
 			int px = x+gapx,
@@ -271,8 +283,8 @@ void ProgressBar::Paint(Graphics *g)
 			ph = (ph < 0)?0:ph;
 
 			// if (_wrap == false) {
-			text = _font->TruncateString(text, "...", w);
-			px = px+(w-_font->GetStringWidth(text))/2;
+			text = font->TruncateString(text, "...", w);
+			px = px+(w-font->GetStringWidth(text))/2;
 			// }
 
 			g->DrawString(text, px, py, pw, ph);
@@ -291,7 +303,7 @@ void ProgressBar::Paint(Graphics *g)
 				_index = 0;
 			}
 
-			g->SetColor(_scrollbar_color);
+			g->SetColor(scroll);
 			g->FillRectangle(x+_index, y, _stone_size, h);
 		} else if (_type == JSO_VERTICAL) {
 			if (_type == JSO_VERTICAL) {
@@ -307,7 +319,7 @@ void ProgressBar::Paint(Graphics *g)
 					_index = 0;
 				}
 
-				g->SetColor(_scrollbar_color);
+				g->SetColor(scroll);
 				g->FillRectangle(x, y+_index, w, _stone_size);
 			}
 		}

@@ -150,24 +150,6 @@ class Container : public jgui::Component{
 		 * \brief
 		 *
 		 */
-		virtual jinsets_t GetInsets();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetInsets(jinsets_t insets);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetInsets(int left, int top, int right, int bottom);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Add(Component *c, int index);
 		
 		/**
@@ -235,6 +217,18 @@ class Container : public jgui::Component{
 		 *
 		 */
 		virtual jsize_t GetPreferredSize();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual jinsets_t GetInsets();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetInsets(jinsets_t insets);
 
 		/**
 		 * \brief

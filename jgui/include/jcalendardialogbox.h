@@ -44,12 +44,10 @@ namespace jgui {
  *
  */
 struct jcalendar_warnning_t {
+	jgui::Theme *theme;
 	int day;
 	int month;
 	int year;
-	int red;
-	int green;
-	int blue;
 };
 
 /**
@@ -66,6 +64,10 @@ class CalendarDialogBox : public jgui::DialogBox, public jgui::ButtonListener, p
 		std::vector<jcalendar_warnning_t> _warnning_days;
 		/** \brief */
 		std::vector<Button *> _buttons;
+		/** \brief */
+		jgui::Theme _week_day_theme;
+		/** \brief */
+		jgui::Theme _selected_theme;
 		/** \brief */
 		Label *_ldom;
 		/** \brief */
@@ -183,7 +185,7 @@ class CalendarDialogBox : public jgui::DialogBox, public jgui::ButtonListener, p
 		 * \brief
 		 *
 		 */
-		virtual void AddWarnning(int day, int month, int year, int red = 0xf0, int green = 0x20, int blue = 0x20);
+		virtual void AddWarnning(jgui::Theme *theme, int day, int month, int year);
 		
 		/**
 		 * \brief

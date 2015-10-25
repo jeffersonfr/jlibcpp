@@ -27,13 +27,14 @@
 namespace jgui {
 
 Component::Component(int x, int y, int width, int height):
-	jgui::ThemeListener()
+	jgui::KeyListener(),
+	jgui::MouseListener()
 {
 	jcommon::Object::SetClassName("jgui::Component");
 
 	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
 
-	_font = jgui::Font::GetDefaultFont();
+	_theme = NULL;
 
 	_preferred_size.width = DEFAULT_COMPONENT_WIDTH;
 	_preferred_size.height = DEFAULT_COMPONENT_HEIGHT;
@@ -45,7 +46,6 @@ Component::Component(int x, int y, int width, int height):
 	_is_cyclic_focus = false;
 	_is_navigation_enabled = true;
 	_is_background_visible = true;
-	_is_theme_enabled = true;
 	_is_valid = true;
 	_is_focusable = false;
 	_is_enabled = true;
@@ -59,8 +59,6 @@ Component::Component(int x, int y, int width, int height):
 	_right = NULL;
 	_up = NULL;
 	_down = NULL;
-	_border_size = 1;
-	_border = JCB_LINE;
 	_gradient_level = 0x40;
 	_vertical_gap = 4;
 	_horizontal_gap = 4;
@@ -90,38 +88,13 @@ Component::Component(int x, int y, int width, int height):
 	_relative_mouse_w = 0;
 	_relative_mouse_h = 0;
 	_component_state = 0;
-
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	theme->Update(this);
-	
-	ThemeManager::GetInstance()->RegisterThemeListener(this);
 }
 
 Component::~Component()
 {
-	ThemeManager::GetInstance()->RemoveThemeListener(this);
-
 	if (_parent != NULL) {
 		_parent->Remove(this);
 	}
-}
-
-void Component::ThemeChanged(ThemeEvent *event)
-{
-	if (IsThemeEnabled() == false) {
-		return;
-	}
-
-	SetIgnoreRepaint(true);
-
-	Theme *theme = event->GetTheme();
-
-	theme->Update(this);
-	
-	SetIgnoreRepaint(false);
-	
-	Repaint(this);
 }
 
 void Component::ScrollToVisibleArea(int x, int y, int width, int height, Component *coordinateSpace) 
@@ -242,6 +215,28 @@ std::string Component::GetName()
 	return _name;
 }
 
+Theme * Component::GetTheme()
+{
+	jgui::Theme *theme = _theme;
+
+	if (theme == NULL) {
+		theme = ThemeManager::GetInstance()->GetTheme();
+	}
+
+	if (theme == NULL) {
+		theme = ThemeManager::GetInstance()->GetDefaultTheme();
+	}
+
+	return theme;
+}
+
+void Component::SetTheme(Theme *theme)
+{
+	_theme = theme;
+
+	Repaint();
+}
+
 void Component::SetKeyMap(KeyMap *keymap)
 {
 	_keymap = keymap;
@@ -250,11 +245,6 @@ void Component::SetKeyMap(KeyMap *keymap)
 KeyMap * Component::GetKeyMap()
 {
 	return _keymap;
-}
-
-void Component::SetThemeEnabled(bool b)
-{
-	_is_theme_enabled = b;
 }
 
 void Component::SetCyclicFocus(bool b)
@@ -267,14 +257,12 @@ bool Component::IsCyclicFocus()
 	return _is_cyclic_focus;
 }
 
-bool Component::IsThemeEnabled()
-{
-	return _is_theme_enabled;
-}
-
 bool Component::IsOpaque()
 {
-	return (IsBackgroundVisible() == true) && (GetBackgroundColor().GetAlpha() == 0xff);
+	Theme *theme = GetTheme();
+	Color bg = theme->GetColor("component.bg");
+
+	return (IsBackgroundVisible() == true) && (bg.GetAlpha() == 0xff);
 }
 
 void Component::Invalidate()
@@ -518,8 +506,10 @@ void Component::PaintScrollbars(Graphics *g)
 		return;
 	}
 
-	Color bgcolor = GetBackgroundColor(),
-		fgcolor = GetScrollbarColor();
+	Theme *theme = GetTheme();
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	int bordersize = theme->GetBorderSize("component");
 
 	jsize_t scroll_dimension = GetScrollDimension();
 	jpoint_t scroll_location = GetScrollLocation();
@@ -532,12 +522,12 @@ void Component::PaintScrollbars(Graphics *g)
 		int offset = (int)(_size.width*offset_ratio),
 			block_size = (int)(_size.width*block_size_ratio);
 
-		g->SetColor(fgcolor);
-		g->FillRectangle(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size);
+		g->SetColor(fg);
+		g->FillRectangle(bordersize, _size.height-_scroll_size-bordersize, _size.width-2*bordersize, _scroll_size);
 
-		g->SetGradientStop(0.0, fgcolor);
-		g->SetGradientStop(1.0, bgcolor);
-		g->FillLinearGradient(offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size, 0, 0, 0, _scroll_size);
+		g->SetGradientStop(0.0, fg);
+		g->SetGradientStop(1.0, bg);
+		g->FillLinearGradient(offset, _size.height-_scroll_size-bordersize, block_size, _scroll_size, 0, 0, 0, _scroll_size);
 		g->ResetGradientStop();
 	}
 	
@@ -547,12 +537,12 @@ void Component::PaintScrollbars(Graphics *g)
 		int offset = (int)(_size.height*offset_ratio),
 			block_size = (int)(_size.height*block_size_ratio);
 
-		g->SetColor(fgcolor);
-		g->FillRectangle(_size.width-_scroll_size-_border_size, _border_size, _scroll_size, _size.height);
+		g->SetColor(fg);
+		g->FillRectangle(_size.width-_scroll_size-bordersize, bordersize, _scroll_size, _size.height);
 
-		g->SetGradientStop(0.0, fgcolor);
-		g->SetGradientStop(1.0, bgcolor);
-		g->FillLinearGradient(_size.width-_scroll_size-_border_size, offset, _scroll_size, block_size, 0, 0, _scroll_size, 0);
+		g->SetGradientStop(0.0, fg);
+		g->SetGradientStop(1.0, bg);
+		g->FillLinearGradient(_size.width-_scroll_size-bordersize, offset, _scroll_size, block_size, 0, 0, _scroll_size, 0);
 		g->ResetGradientStop();
 	}
 
@@ -560,8 +550,8 @@ void Component::PaintScrollbars(Graphics *g)
 		int radius = _scroll_size,
 			radius2 = radius/2;
 
-		g->SetGradientStop(0.0, bgcolor);
-		g->SetGradientStop(1.0, fgcolor);
+		g->SetGradientStop(0.0, bg);
+		g->SetGradientStop(1.0, fg);
 		g->FillRadialGradient(_size.width-radius2, _size.height-radius2, radius, radius, 0, 0, 0);
 		g->ResetGradientStop();
 	}
@@ -569,7 +559,7 @@ void Component::PaintScrollbars(Graphics *g)
 	jpen_t pen = g->GetPen();
 	int width = pen.width;
 
-	pen.width = -_border_size;
+	pen.width = -bordersize;
 	g->SetPen(pen);
 
 	g->DrawRectangle(0, 0, _size.width, _size.height);
@@ -612,6 +602,12 @@ void Component::PaintBackground(Graphics *g)
 		return;
 	}
 	
+	Theme *theme = GetTheme();
+	Color bg = theme->GetColor("component.bg");
+	Color bgfocus = theme->GetColor("component.bg.focus");
+	Color bgdisable = theme->GetColor("component.bg.disable");
+	jcomponent_border_t bordertype = theme->GetBorder("component");
+
 	int x = 0,
 			y = 0,
 			w = _size.width,
@@ -619,17 +615,17 @@ void Component::PaintBackground(Graphics *g)
 
 	if (_is_enabled == true) {
 		if (_has_focus == true) {
-			g->SetColor(_focus_bgcolor);
+			g->SetColor(bgfocus);
 		} else {
-			g->SetColor(_bgcolor);
+			g->SetColor(bg);
 		}
 	} else {
-		g->SetColor(_disabled_bgcolor);
+		g->SetColor(bgdisable);
 	}
 
-	if (_border == JCB_ROUND) {
+	if (bordertype == JCB_ROUND) {
 		g->FillRoundRectangle(x, y, w, h);
-	} else if (_border == JCB_BEVEL) {
+	} else if (bordertype == JCB_BEVEL) {
 		g->FillBevelRectangle(x, y, w, h);
 	} else {
 		g->FillRectangle(x, y, w, h);
@@ -648,7 +644,22 @@ void Component::PaintBackground(Graphics *g)
 
 void Component::PaintBorders(Graphics *g)
 {
-	if (_border == JCB_EMPTY) {
+	Theme *theme = GetTheme();
+	Color border = theme->GetColor("component.border");
+	Color borderfocus = theme->GetColor("component.border.focus");
+	Color borderdisable = theme->GetColor("component.border.disable");
+	jcomponent_border_t bordertype = theme->GetBorder("component");
+	int bordersize = theme->GetBorderSize("component");
+
+	if (InstanceOf("jgui::Window") == true) {
+		border = theme->GetColor("window.border");
+		borderfocus = theme->GetColor("window.border.focus");
+		borderdisable = theme->GetColor("window.border.disable");
+		bordertype = theme->GetBorder("window");
+		bordersize = theme->GetBorderSize("window");
+	}
+
+	if (bordertype == JCB_EMPTY) {
 		return;
 	}
 
@@ -657,17 +668,17 @@ void Component::PaintBorders(Graphics *g)
 			yp = 0,
 			wp = _size.width,
 			hp = _size.height,
-			size = _border_size;
+			size = bordersize;
 	int step = 0x20;
 
 	if (_is_enabled == true) {
 		if (_has_focus == true) {
-			color = _focus_border_color;
+			color = borderfocus;
 		} else {
-			color = _border_color;
+			color = border;
 		}
 	} else {
-		color = _disabled_border_color;
+		color = borderdisable;
 	}
 
 	int dr = color.GetRed(),
@@ -677,22 +688,22 @@ void Component::PaintBorders(Graphics *g)
 	jpen_t pen = g->GetPen();
 	int width = pen.width;
 
-	if (_border == JCB_LINE) {
+	if (bordertype == JCB_LINE) {
 		g->SetColor(dr, dg, db, da);
-		pen.width = -_border_size;
+		pen.width = -bordersize;
 		g->SetPen(pen);
 		g->DrawRectangle(xp, yp, wp, hp);
-	} else if (_border == JCB_BEVEL) {
+	} else if (bordertype == JCB_BEVEL) {
 		g->SetColor(dr, dg, db, da);
-		pen.width = -_border_size;
+		pen.width = -bordersize;
 		g->SetPen(pen);
 		g->DrawBevelRectangle(xp, yp, wp, hp);
-	} else if (_border == JCB_ROUND) {
+	} else if (bordertype == JCB_ROUND) {
 		g->SetColor(dr, dg, db, da);
-		pen.width = -_border_size;
+		pen.width = -bordersize;
 		g->SetPen(pen);
 		g->DrawRoundRectangle(xp, yp, wp, hp);
-	} else if (_border == JCB_RAISED_GRADIENT) {
+	} else if (bordertype == JCB_RAISED_GRADIENT) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
 			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
@@ -706,7 +717,7 @@ void Component::PaintBorders(Graphics *g)
 			g->SetColor(dr-step*(size-i), dg-step*(size-i), db-step*(size-i));
 			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
-	} else if (_border == JCB_LOWERED_GRADIENT) {
+	} else if (bordertype == JCB_LOWERED_GRADIENT) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr-step*(size-i), dg-step*(size-i), db-step*(size-i));
 			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
@@ -720,7 +731,7 @@ void Component::PaintBorders(Graphics *g)
 			g->SetColor(dr+step*(size-i), dg+step*(size-i), db+step*(size-i));
 			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
-	} else if (_border == JCB_RAISED_BEVEL) {
+	} else if (bordertype == JCB_RAISED_BEVEL) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr+step, dg+step, db+step);
 			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
@@ -734,7 +745,7 @@ void Component::PaintBorders(Graphics *g)
 			g->SetColor(dr-step, dg-step, db-step);
 			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
-	} else if (_border == JCB_LOWERED_BEVEL) {
+	} else if (bordertype == JCB_LOWERED_BEVEL) {
 		for (int i=0; i<size && i<wp && i<hp; i++) {
 			g->SetColor(dr-step, dg-step, db-step);
 			g->DrawLine(xp+i, yp+i, xp+wp-i, yp+i); //cima
@@ -748,25 +759,25 @@ void Component::PaintBorders(Graphics *g)
 			g->SetColor(dr+step, dg+step, db+step);
 			g->DrawLine(xp+wp-i, yp+i, xp+wp-i, yp+hp-i); //direita
 		}
-	} else if (_border == JCB_RAISED_ETCHED) {
+	} else if (bordertype == JCB_RAISED_ETCHED) {
 		g->SetColor(dr+step, dg+step, db+step, da);
-		pen.width = -_border_size;
+		pen.width = -bordersize;
 		g->SetPen(pen);
 		g->DrawRectangle(xp, yp, wp, hp);
 		
 		g->SetColor(dr-step, dg-step, db-step, da);
-		pen.width = -_border_size/2;
+		pen.width = -bordersize/2;
 		g->SetPen(pen);
-		g->DrawRectangle(xp, yp, wp-_border_size/2, hp-_border_size/2);
-	} else if (_border == JCB_LOWERED_ETCHED) {
+		g->DrawRectangle(xp, yp, wp-bordersize/2, hp-bordersize/2);
+	} else if (bordertype == JCB_LOWERED_ETCHED) {
 		g->SetColor(dr-step, dg-step, db-step, da);
-		pen.width = -_border_size;
+		pen.width = -bordersize;
 		g->SetPen(pen);
 		g->DrawRectangle(xp, yp, wp, hp);
 		
 		g->SetColor(dr+step, dg+step, db+step, da);
-		pen.width = -_border_size/2;
-		g->DrawRectangle(xp, yp, wp-_border_size/2, hp-_border_size/2);
+		pen.width = -bordersize/2;
+		g->DrawRectangle(xp, yp, wp-bordersize/2, hp-bordersize/2);
 	}
 
 	pen.width = width;
@@ -780,9 +791,6 @@ void Component::PaintBorders(Graphics *g)
 
 void Component::Paint(Graphics *g)
 {
-	if (_font != NULL) {
-		g->SetFont(_font);
-	}
 }
 
 Container * Component::GetParent()
@@ -898,17 +906,6 @@ void Component::SetBackgroundVisible(bool b)
 	}
 
 	_is_background_visible = b;
-
-	Repaint();
-}
-
-void Component::SetBorder(jcomponent_border_t t)
-{
-	if (_border == t) {
-		return;
-	}
-
-	_border = t;
 
 	Repaint();
 }
@@ -1158,30 +1155,6 @@ void Component::SetSize(jsize_t size)
 	SetSize(size.width, size.height);
 }
 
-void Component::SetBorderSize(int size)
-{
-	if (_border == size) {
-		return;
-	}
-
-	_border_size = size;
-
-	if (_border_size < 0) {
-		_border_size = 0;
-	}
-
-	if (_border_size > 65535) {
-		_border_size = 65535;
-	}
-
-	Repaint();
-}
-
-int Component::GetBorderSize()
-{
-	return _border_size;
-}
-
 bool Component::Contains(Component *c1, Component *c2)
 {
 	return Contains(c1->GetX(), c1->GetY(), c1->GetWidth(), c1->GetHeight(), c2->GetX(), c2->GetY(), c2->GetWidth(), c2->GetHeight());
@@ -1287,21 +1260,6 @@ jsize_t Component::GetSize()
 	return _size;
 }
 
-void Component::SetFont(Font *font)
-{
-	_font = font;
-}
-
-bool Component::IsFontSet()
-{
-	return ((void *)_font != NULL);
-}
-
-Font * Component::GetFont()
-{
-	return _font;
-}
-
 void Component::RaiseToTop()
 {
 	// frame repaint is needed
@@ -1372,176 +1330,6 @@ int Component::GetGradientLevel()
 	return _gradient_level;
 }
 
-void Component::SetBackgroundColor(int red, int green, int blue, int alpha)
-{
-	SetBackgroundColor(Color(red, green, blue, alpha));
-}
-
-void Component::SetForegroundColor(int red, int green, int blue, int alpha)
-{
-	SetForegroundColor(Color(red, green, blue, alpha));
-}
-
-void Component::SetBackgroundFocusColor(int red, int green, int blue, int alpha)
-{
-	SetBackgroundFocusColor(Color(red, green, blue, alpha));
-}
-
-void Component::SetForegroundFocusColor(int red, int green, int blue, int alpha)
-{
-	SetForegroundFocusColor(Color(red, green, blue, alpha));
-}
-
-void Component::SetBorderColor(int red, int green, int blue, int alpha)
-{
-	SetBorderColor(Color(red, green, blue, alpha));
-}
-
-void Component::SetBorderFocusColor(int red, int green, int blue, int alpha)
-{
-	SetBorderFocusColor(Color(red, green, blue, alpha));
-}
-
-void Component::SetScrollbarColor(int red, int green, int blue, int alpha)
-{
-	SetScrollbarColor(Color(red, green, blue, alpha));
-}
-
-void Component::SetDisabledBackgroundColor(int red, int green, int blue, int alpha)
-{
-	SetDisabledBackgroundColor(Color(red, green, blue, alpha));
-}
-
-void Component::SetDisabledForegroundColor(int red, int green, int blue, int alpha)
-{
-	SetDisabledForegroundColor(Color(red, green, blue, alpha));
-}
-
-void Component::SetDisabledBorderColor(int red, int green, int blue, int alpha)
-{
-	SetDisabledBorderColor(Color(red, green, blue, alpha));
-}
-
-void Component::SetBackgroundColor(const Color &color)
-{
-	_bgcolor = color;
-
-	Repaint();
-}
-
-void Component::SetForegroundColor(const Color &color)
-{
-	_fgcolor = color;
-
-	Repaint();
-}
-
-void Component::SetBackgroundFocusColor(const Color &color)
-{
-	_focus_bgcolor = color;
-
-	Repaint();
-}
-
-void Component::SetForegroundFocusColor(const Color &color)
-{
-	_focus_fgcolor = color;
-
-	Repaint();
-}
-
-void Component::SetBorderColor(const Color &color)
-{
-	_border_color = color;
-
-	Repaint();
-}
-
-void Component::SetBorderFocusColor(const Color &color)
-{
-	_focus_border_color = color;
-
-	Repaint();
-}
-
-void Component::SetScrollbarColor(const Color &color)
-{
-	_scrollbar_color = color;
-
-	Repaint();
-}
-
-void Component::SetDisabledBackgroundColor(const Color &color)
-{
-	_disabled_bgcolor = color;
-
-	Repaint();
-}
-
-void Component::SetDisabledForegroundColor(const Color &color)
-{
-	_disabled_fgcolor = color;
-
-	Repaint();
-}
-
-void Component::SetDisabledBorderColor(const Color &color)
-{
-	_disabled_border_color = color;
-
-	Repaint();
-}
-
-Color & Component::GetBackgroundColor()
-{
-	return _bgcolor;
-}
-
-Color & Component::GetForegroundColor()
-{
-	return _fgcolor;
-}
-
-Color & Component::GetBackgroundFocusColor()
-{
-	return _focus_bgcolor;
-}
-
-Color & Component::GetForegroundFocusColor()
-{
-	return _focus_fgcolor;
-}
-
-Color & Component::GetBorderColor()
-{
-	return _border_color;
-}
-
-Color & Component::GetBorderFocusColor()
-{
-	return _focus_border_color;
-}
-
-Color & Component::GetScrollbarColor()
-{
-	return _scrollbar_color;
-}
-
-Color & Component::GetDisabledBackgroundColor()
-{
-	return _disabled_bgcolor;
-}
-
-Color & Component::GetDisabledForegroundColor()
-{
-	return _disabled_fgcolor;
-}
-
-Color & Component::GetDisabledBorderColor()
-{
-	return _disabled_border_color;
-}
-
 bool Component::Intersect(int x, int y)
 {
 	if ((x>_location.x && x<(_location.x+_size.width)) && (y>_location.y && y<(_location.y+_size.height))) {
@@ -1584,6 +1372,9 @@ bool Component::MousePressed(MouseEvent *event)
 		return false;
 	}
 	
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	jsize_t scroll_dimension = GetScrollDimension();
 	jpoint_t scroll_location = GetScrollLocation();
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
@@ -1595,7 +1386,7 @@ bool Component::MousePressed(MouseEvent *event)
 		RequestFocus();
 	}
 
-	if (IsScrollableY() && mousex > (_size.width-GetScrollSize()-_border_size)) {
+	if (IsScrollableY() && mousex > (_size.width-GetScrollSize()-bordersize)) {
 		double offset_ratio = (double)scrolly/(double)scroll_dimension.height,
 					 block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
 		int offset = (int)(_size.height*offset_ratio),
@@ -1616,7 +1407,7 @@ bool Component::MousePressed(MouseEvent *event)
 		}
 
 		return true;
-	} else if (IsScrollableX() && mousey > (_size.height-GetScrollSize()-_border_size)) {
+	} else if (IsScrollableX() && mousey > (_size.height-GetScrollSize()-bordersize)) {
 		double offset_ratio = (double)scrollx/(double)scroll_dimension.width,
 					 block_size_ratio = (double)_size.width/(double)scroll_dimension.width;
 		int offset = (int)(_size.width*offset_ratio),

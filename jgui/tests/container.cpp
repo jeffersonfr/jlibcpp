@@ -90,6 +90,10 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 			*_toogle;
 		jgui::ComboBox 
 			*_combo;
+		jgui::Theme
+			_theme1,
+			_theme2,
+			_theme3;
 
 	public:
 		WindowTeste():
@@ -178,9 +182,13 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 			_button2 = new jgui::Button("Decrease", 0, _watch->GetY()+2*(_watch->GetHeight()+8), 196);
 			_button3 = new jgui::Button("Testing a long text in a buttom component", 0, _watch->GetY()+3*(_watch->GetHeight()+8), 196, 96);
 
-			_button1->SetBackgroundFocusColor(0x40, 0xf0, 0x40, 0xff);
-			_button2->SetBackgroundFocusColor(0xf0, 0x20, 0x20, 0xff);
-			_button3->SetBackgroundFocusColor(0xf0, 0xf0, 0x40, 0xff);
+			_theme1.SetColor("component.bg.focus", 0x40, 0xf0, 0x40, 0xff);
+			_theme2.SetColor("component.bg.focus", 0xf0, 0x20, 0x20, 0xff);
+			_theme3.SetColor("component.bg.focus", 0xf0, 0xf0, 0x40, 0xff);
+
+			_button1->SetTheme(&_theme1);
+			_button2->SetTheme(&_theme1);
+			_button3->SetTheme(&_theme1);
 
 			_button1->RegisterButtonListener(this);
 			_button2->RegisterButtonListener(this);

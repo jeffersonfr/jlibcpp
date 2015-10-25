@@ -31,9 +31,11 @@ HourDialogBox::HourDialogBox(std::string title, int hour, int minute, int second
 	minute = (minute < 0)?0:(minute > 59)?59:minute;
 	second = (second< 0)?0:(second > 59)?59:second;
 
-	_hour = new Spin(_insets.left, _insets.top+16);
-	_minute = new Spin(_hour->GetX()+_hour->GetWidth() + 16, _insets.top+16);
-	_second = new Spin(_minute->GetX()+_minute->GetWidth() + 16, _insets.top+16);
+	jgui::jinsets_t insets = GetInsets();
+
+	_hour = new Spin(insets.left, insets.top+16);
+	_minute = new Spin(_hour->GetX()+_hour->GetWidth() + 16, insets.top+16);
+	_second = new Spin(_minute->GetX()+_minute->GetWidth() + 16, insets.top+16);
 	
 	for (int i=0; i<24; i++) {
 		std::ostringstream o;

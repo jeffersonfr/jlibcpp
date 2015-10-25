@@ -2223,25 +2223,26 @@ class GraphicsTeste : public jgui::Frame{
 
 	private:
 		jthread::Mutex teste_mutex;
+		jgui::Theme _theme;
 		int dxL, dyL;
 
 	public:
 		GraphicsTeste():
 			jgui::Frame("", 0, 0)
-	{
-		Width = _size.width;
-		Height = _size.height;
+		{
+			Width = _size.width;
+			Height = _size.height;
 
-		ScaleFactor *= Height;
+			ScaleFactor *= Height;
 
-		InitMatrix();
-		SetupMatrix(ScaleFactor);
-		
-		dxL = 11;
-		dyL = 7;
+			InitMatrix();
+			SetupMatrix(ScaleFactor);
 
-		SetBackgroundColor(0x00, 0x00, 0x00, 0x00);
-	}
+			dxL = 11;
+			dyL = 7;
+
+			_theme.SetColor("window", 0x00, 0x00, 0x00, 0x00);
+		}
 
 		virtual ~GraphicsTeste()
 		{

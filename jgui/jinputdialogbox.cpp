@@ -30,7 +30,9 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg):
 	int cw = DEFAULT_COMPONENT_WIDTH,
 			ch = DEFAULT_COMPONENT_HEIGHT;
 
-	_label = new Label(msg, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
+	jgui::jinsets_t insets = GetInsets();
+
+	_label = new Label(msg, insets.left, insets.top, _size.width-insets.left-insets.right, _size.height-insets.top-insets.bottom);
 
 	_label->SetGap(10, 10);
 	_label->SetWrap(true);

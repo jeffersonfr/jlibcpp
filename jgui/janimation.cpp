@@ -112,8 +112,11 @@ void Animation::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
+	int x = _horizontal_gap+bordersize,
+			y = _vertical_gap+bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y,
 			gapx = 0,

@@ -49,16 +49,17 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 	_filter = JFCF_FILE_AND_DIRECTORY;
 	_extension_ignorecase = true;
 
-	_list = new jgui::ListBox(_insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
+	jinsets_t insets = GetInsets();
+
+	_list = new jgui::ListBox(insets.left, insets.top, _size.width-insets.left-insets.right, _size.height-insets.top-insets.bottom);
 
 	Add(_list);
 
 	if (_type == JFCT_SAVE_FILE_DIALOG) {
-		_label = new jgui::Label("File name", _insets.left, _list->GetY()+_list->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
-		_file = new jgui::TextField(_insets.left, _label->GetY()+_label->GetHeight()+10, _size.width-_insets.left-_insets.right, 45);
+		_label = new jgui::Label("File name", insets.left, _list->GetY()+_list->GetHeight()+10, _size.width-insets.left-insets.right, 45);
+		_file = new jgui::TextField(insets.left, _label->GetY()+_label->GetHeight()+10, _size.width-insets.left-insets.right, 45);
 
 		_label->SetBackgroundVisible(false);
-		_label->SetBorder(JCB_EMPTY);
 
 		Add(_label);
 		Add(_file);

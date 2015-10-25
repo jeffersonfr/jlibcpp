@@ -28,6 +28,7 @@ class ColorChooser : public jgui::Component {
 
 	private:
 		jgui::Image *_image;
+		jgui::Theme _theme;
 
 	public:
 		ColorChooser(int x, int y, int width, int height):
@@ -125,7 +126,9 @@ class ColorChooser : public jgui::Component {
 			int x = event->GetX();
 			int y = event->GetY();
 
-			SetBackgroundColor(_image->GetGraphics()->GetRGB(x, y));
+			_theme.SetColor("component.bg", _image->GetGraphics()->GetRGB(x, y));
+
+			SetTheme(&_theme);
 
 			return true;
 		}

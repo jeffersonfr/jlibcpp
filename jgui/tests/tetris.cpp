@@ -204,7 +204,6 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 			d.width = GetWidth();
 			d.height = GetHeight();
 
-			SetBackgroundColor((background>>0x10)&0xff, (background>>0x08)&0xff, (background>>0x00)&0xff, (background>>0x18)&0xff);
 			SetUndecorated(true);
 			SetSize(width+2*barwidth, height+2*barwidth);
 		}

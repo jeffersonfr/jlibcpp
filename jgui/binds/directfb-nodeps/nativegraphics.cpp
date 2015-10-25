@@ -1098,6 +1098,10 @@ void NativeGraphics::DrawGlyph(int symbol, int xp, int yp)
 
 void NativeGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
 {
+	if (_font == NULL) {
+		return;
+	}
+
 	if (wp < 0 || hp < 0) {
 		return;
 	}

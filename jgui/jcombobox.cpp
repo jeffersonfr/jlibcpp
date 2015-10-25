@@ -39,10 +39,6 @@ ComboBox::ComboBox(int x, int y, int width, int height):
 
 	SetVisibleItems(5);
 	SetFocusable(true);
-
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	theme->Update(this);
 }
 
 ComboBox::~ComboBox()
@@ -88,6 +84,9 @@ bool ComboBox::MousePressed(MouseEvent *event)
 		return true;
 	}
 
+	Theme *theme = GetTheme();
+	int bordersize = theme->GetBorderSize("component");
+
 	bool catched = false;
 
 	if (event->GetButton() == JMB_BUTTON1) {
@@ -95,8 +94,8 @@ bool ComboBox::MousePressed(MouseEvent *event)
 
 		int x1 = event->GetX(),
 				y1 = event->GetY();
-		int x = _vertical_gap+_border_size,
-				y = _horizontal_gap+_border_size,
+		int x = _vertical_gap+bordersize,
+				y = _horizontal_gap+bordersize,
 				w = _size.width-2*x,
 				h = _size.height-2*y,
 				arrow_size = h;
@@ -345,50 +344,60 @@ void ComboBox::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	{
-		/*
-		if (_has_focus == true) {
-				g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
-				g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	int bordersize = theme->GetBorderSize("component");
+		
+	/*
+		 if (_has_focus == true) {
+		 g->FillGradientRectangle(0, 0, _width, _height/2+1, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha);
+		 g->FillGradientRectangle(0, _height/2, _width, _height/2, _bgfocus_red, _bgfocus_green, _bgfocus_blue, _bgfocus_alpha, _bgfocus_red-_gradient_level, _bgfocus_green-_gradient_level, _bgfocus_blue-_gradient_level, _bgfocus_alpha);
+		 }
+		 */
+
+	int x = _vertical_gap+bordersize,
+			y = _horizontal_gap+bordersize,
+			w = _size.width-2*x,
+			h = _size.height-2*y,
+			gapx = 0,
+			gapy = 0;
+	int arrow_size = 32,
+			dx = x+w-arrow_size-2,
+			dy = y+(h-arrow_size/2)/2;
+
+	// INFO:: ajusta o tamanho do triangulo baseado no tamanho da fonte
+	if (font != NULL) {
+		if (font->GetSize() > arrow_size) {
+			arrow_size = font->GetSize();
 		}
-		*/
+	}
 
-		int x = _vertical_gap+_border_size,
-				y = _horizontal_gap+_border_size,
-				w = _size.width-2*x,
-				h = _size.height-2*y,
-				gapx = 0,
-				gapy = 0;
-		int arrow_size = 32,
-				dx = x+w-arrow_size-2,
-				dy = y+(h-arrow_size/2)/2;
+	if (_has_focus == true) {
+		g->SetColor(fgfocus);
+	} else {
+		g->SetColor(fg);
+	}
 
-		// INFO:: ajusta o tamanho do triangulo baseado no tamanho da fonte
-		if (_font != NULL) {
-			if (_font->GetSize() > arrow_size) {
-				arrow_size = _font->GetSize();
-			}
-		}
+	g->FillTriangle(dx, dy, dx+arrow_size, dy, dx+arrow_size/2, dy+arrow_size/2);
 
-		if (_has_focus == true) {
-			g->SetColor(_focus_fgcolor);
-		} else {
-			g->SetColor(_fgcolor);
-		}
+	Item *item = GetCurrentItem();
 
-		g->FillTriangle(dx, dy, dx+arrow_size, dy, dx+arrow_size/2, dy+arrow_size/2);
+	if (item != NULL) {
+		if (font != NULL) {
+			g->SetFont(font);
 
-		Item *item = GetCurrentItem();
-
-		if (item != NULL && _font != NULL) {
 			if (_is_enabled == true) {
 				if (_has_focus == true) {
-					g->SetColor(_focus_fgcolor);
+					g->SetColor(fgfocus);
 				} else {
-					g->SetColor(_fgcolor);
+					g->SetColor(fg);
 				}
 			} else {
-				g->SetColor(_disabled_fgcolor);
+				g->SetColor(fgdisable);
 			}
 
 			int px = x+gapx,
@@ -409,7 +418,7 @@ void ComboBox::Paint(Graphics *g)
 			std::string text = item->GetValue();
 
 			// if (_wrap == false) {
-				text = _font->TruncateString(text, "...", pw);
+			text = font->TruncateString(text, "...", pw);
 			// }
 
 			g->DrawString(text, px, py, pw, ph, _halign, _valign);

@@ -116,8 +116,16 @@ void Icon::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	int x = _horizontal_gap+_border_size,
-			y = _vertical_gap+_border_size,
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color fgfocus = theme->GetColor("component.fg.focus");
+	Color fgdisable = theme->GetColor("component.fg.disable");
+	int bordersize = theme->GetBorderSize("component");
+
+	int x = _horizontal_gap+bordersize,
+			y = _vertical_gap+bordersize,
 			w = _size.width-2*x,
 			h = _size.height-2*y,
 			gapx = 0,
@@ -140,21 +148,23 @@ void Icon::Paint(Graphics *g)
 	if (_image != NULL) {
 		g->DrawImage(_image, px, py, pw, ph);
 	} else {
-		if (_font != NULL) {
+		if (font != NULL) {
+			g->SetFont(font);
+
 			if (_is_enabled == true) {
 				if (_has_focus == true) {
-					g->SetColor(_focus_fgcolor);
+					g->SetColor(fgfocus);
 				} else {
-					g->SetColor(_fgcolor);
+					g->SetColor(fg);
 				}
 			} else {
-				g->SetColor(_disabled_fgcolor);
+				g->SetColor(fgdisable);
 			}
 
 			std::string text = GetText();
 
 			if (_wrap == false) {
-				text = _font->TruncateString(text, "...", pw);
+				text = font->TruncateString(text, "...", pw);
 			}
 
 			g->DrawString(text, px, py, pw, ph, _halign, _valign);

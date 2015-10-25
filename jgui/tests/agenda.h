@@ -96,6 +96,7 @@ class AddMessage : public jgui::Frame, public jcommon::DataListener{
 		jgui::TextField *hour;
 		jgui::TextField *date;
 		jgui::TextArea *message;
+		jgui::Theme _theme;
 		AgendaDB *db;
 		int _day,
 				_month,

@@ -31,7 +31,7 @@ ThemeManager::ThemeManager():
 
 	_default_theme = new Theme();
 
-	_theme = _default_theme;
+	_theme = NULL;
 }
 
 ThemeManager::~ThemeManager()

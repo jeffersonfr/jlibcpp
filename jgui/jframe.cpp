@@ -144,9 +144,11 @@ void Frame::Pack(bool fit)
 {
 	jthread::AutoLock lock(&_container_mutex);
 
+	jinsets_t insets = GetInsets();
+
 	Component *c;
-	int min_x = _insets.left,
-			min_y = _insets.top;
+	int min_x = insets.left,
+			min_y = insets.top;
 	int max_width = 0,
 			max_height = 0;
 
@@ -163,8 +165,8 @@ void Frame::Pack(bool fit)
 			}
 		}
 
-		min_x = _insets.left-min_x;
-		min_y = _insets.top-min_y;
+		min_x = insets.left-min_x;
+		min_y = insets.top-min_y;
 
 		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 			c = (*i);
@@ -186,9 +188,9 @@ void Frame::Pack(bool fit)
 	}
 
 	if (_subtitles.size() == 0) {
-		SetSize(max_width+_insets.right, max_height+_insets.bottom);
+		SetSize(max_width+insets.right, max_height+insets.bottom);
 	} else {
-		SetSize(max_width+_insets.right, max_height+_insets.bottom+32);
+		SetSize(max_width+insets.right, max_height+insets.bottom+32);
 	}
 }
 
@@ -199,25 +201,23 @@ void Frame::AddSubtitle(std::string image, std::string label)
 	t.image = jgui::Image::CreateImage(image);
 	t.subtitle = label;
 
-	_subtitles.push_back(t);
-
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	if (theme != NULL) {
-		jinsets_t insets = theme->GetWindowInsets();
-
-		_insets.bottom = insets.bottom;
-	}
-
-	if (_subtitles.size() > 0) {
+	if (_subtitles.size() == 0) {
 		_insets.bottom = _insets.bottom + SUBTITLE_SIZE + 8;
 	}
+
+	_subtitles.push_back(t);
 
 	Repaint();
 }
 
 void Frame::RemoveAllSubtitles()
 {
+	if (_subtitles.size() == 0) {
+		return;
+	}
+
+	_insets.bottom = _insets.bottom - SUBTITLE_SIZE - 8;
+
 	for (std::vector<struct frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
 		jgui::Image *image = (*i).image;
 
@@ -225,14 +225,6 @@ void Frame::RemoveAllSubtitles()
 	}
 
 	_subtitles.clear();
-
-	Theme *theme = ThemeManager::GetInstance()->GetTheme();
-
-	if (theme != NULL) {
-		jinsets_t insets = theme->GetWindowInsets();
-
-		_insets.bottom = insets.bottom;
-	}
 
 	Repaint();
 }
@@ -280,6 +272,8 @@ bool Frame::MousePressed(MouseEvent *event)
 		return true;
 	}
 	
+	jinsets_t insets = GetInsets();
+
 	/*
 	if (_frame_state != 0) {
 		GFXHandler::GetInstance()->SetCursor(GetCursor());
@@ -294,11 +288,11 @@ bool Frame::MousePressed(MouseEvent *event)
 	if (event->GetButton() == JMB_BUTTON1) {
 		int lwidth = _size.width - SIZE_TO_RESIZE; // pixels to horizontal scroll
 		// int lheight = _size.height - SIZE_TO_RESIZE; // pixels to vertical scroll
-		int btn = (_insets.top-30)+10,
+		int btn = (insets.top-30)+10,
 				gap = ((_frame_buttons & JFB_MAXIMIZE) != 0)? 2 : ((_frame_buttons & JFB_CLOSE) != 0)? 1 : 0;
 
 		if (mousey > 0) {
-			if (mousey < _insets.top && _is_undecorated == false) {
+			if (mousey < insets.top && _is_undecorated == false) {
 				if (mousex < (lwidth-gap*btn)) {
 					if (_move_enabled == true && _is_maximized == false) {
 						GFXHandler::GetInstance()->SetCursor(JCS_MOVE);
@@ -473,13 +467,16 @@ void Frame::PaintScrollbars(Graphics *g)
 		return;
 	}
 
-	Color bgcolor = GetBackgroundColor(),
-		fgcolor = GetScrollbarColor();
+	Theme *theme = GetTheme();
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	int bordersize = theme->GetBorderSize("component");
 
 	jsize_t scroll_dimension = GetScrollDimension();
 	jpoint_t scroll_location = GetScrollLocation();
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	jinsets_t insets = GetInsets();
 
 	if (IsScrollableX() == true) {
 		double offset_ratio = (double)scrollx/(double)scroll_dimension.width,
@@ -487,28 +484,28 @@ void Frame::PaintScrollbars(Graphics *g)
 		int offset = (int)(_size.width*offset_ratio),
 			block_size = (int)(_size.width*block_size_ratio);
 
-		g->SetColor(fgcolor);
-		g->FillRectangle(_border_size, _size.height-_scroll_size-_border_size, _size.width-2*_border_size, _scroll_size);
+		g->SetColor(fg);
+		g->FillRectangle(bordersize, _size.height-_scroll_size-bordersize, _size.width-2*bordersize, _scroll_size);
 
-		g->SetGradientStop(0.0, fgcolor);
-		g->SetGradientStop(1.0, bgcolor);
-		g->FillLinearGradient(offset, _size.height-_scroll_size-_border_size, block_size, _scroll_size, 0, 0, 0, _scroll_size);
+		g->SetGradientStop(0.0, fg);
+		g->SetGradientStop(1.0, bg);
+		g->FillLinearGradient(offset, _size.height-_scroll_size-bordersize, block_size, _scroll_size, 0, 0, 0, _scroll_size);
 		g->ResetGradientStop();
 	}
 	
 	if (IsScrollableY() == true) {
-		int height = _insets.top-2*_border_size;
+		int height = insets.top-2*bordersize;
 		double offset_ratio = (double)scrolly/(double)scroll_dimension.height,
 			block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
 		int offset = (int)((_size.height-height)*offset_ratio),
 			block_size = (int)((_size.height-height)*block_size_ratio);
 
-		g->SetColor(fgcolor);
-		g->FillRectangle(_size.width-_scroll_size-_border_size, _border_size, _scroll_size, _size.height);
+		g->SetColor(fg);
+		g->FillRectangle(_size.width-_scroll_size-bordersize, bordersize, _scroll_size, _size.height);
 
-		g->SetGradientStop(0.0, fgcolor);
-		g->SetGradientStop(1.0, bgcolor);
-		g->FillLinearGradient(_size.width-_scroll_size-_border_size, offset+height, _scroll_size, block_size, 0, 0, _scroll_size, 0);
+		g->SetGradientStop(0.0, fg);
+		g->SetGradientStop(1.0, bg);
+		g->FillLinearGradient(_size.width-_scroll_size-bordersize, offset+height, _scroll_size, block_size, 0, 0, _scroll_size, 0);
 		g->ResetGradientStop();
 	}
 
@@ -516,8 +513,8 @@ void Frame::PaintScrollbars(Graphics *g)
 		int radius = _scroll_size,
 			radius2 = radius/2;
 
-		g->SetGradientStop(0.0, bgcolor);
-		g->SetGradientStop(1.0, fgcolor);
+		g->SetGradientStop(0.0, bg);
+		g->SetGradientStop(1.0, fg);
 		g->FillRadialGradient(_size.width-radius2, _size.height-radius2, radius, radius, 0, 0, 0);
 		g->ResetGradientStop();
 	}
@@ -525,7 +522,7 @@ void Frame::PaintScrollbars(Graphics *g)
 	jpen_t pen = g->GetPen();
 	int width = pen.width;
 
-	pen.width = -_border_size;
+	pen.width = -bordersize;
 	g->SetPen(pen);
 
 	g->DrawRectangle(0, 0, _size.width, _size.height);
@@ -540,16 +537,23 @@ void Frame::PaintGlassPane(Graphics *g)
 		return;
 	}
 
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+	Color bg = theme->GetColor("component.bg");
+	Color fg = theme->GetColor("component.fg");
+	Color scroll = theme->GetColor("component.scroll");
+	int bordersize = theme->GetBorderSize("component");
+
+	jinsets_t insets = GetInsets();
+
 	if (_title != "") {
-		g->SetGradientStop(0.0, _bgcolor);
-		g->SetGradientStop(1.0, _scrollbar_color);
-		g->FillLinearGradient(_border_size, _border_size, _size.width-2*_border_size, _insets.top-2*_border_size, 0, 0, 0, _insets.top-2*_border_size);
+		g->SetGradientStop(0.0, bg);
+		g->SetGradientStop(1.0, scroll);
+		g->FillLinearGradient(bordersize, bordersize, _size.width-2*bordersize, insets.top-2*bordersize, 0, 0, 0, insets.top-2*bordersize);
 		g->ResetGradientStop();
 
-		g->SetFont(_font);
-
-		if (IsFontSet() == true) {
-			int y = (_insets.top-_font->GetSize())/2;
+		if (font != NULL) {
+			int y = (insets.top-font->GetSize())/2;
 
 			if (y < 0) {
 				y = 0;
@@ -558,31 +562,32 @@ void Frame::PaintGlassPane(Graphics *g)
 			std::string text = _title;
 			
 			// if (_wrap == false) {
-				text = _font->TruncateString(text, "...", (_size.width-_insets.left-_insets.right));
+				text = font->TruncateString(text, "...", (_size.width-insets.left-insets.right));
 			// }
 
-			g->SetColor(_fgcolor);
-			g->DrawString(text, _insets.left+(_size.width-_insets.left-_insets.right-_font->GetStringWidth(text))/2, y);
+			g->SetFont(font);
+			g->SetColor(fg);
+			g->DrawString(text, insets.left+(_size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
 		}
 	}
 
 	if (_icon_image != NULL) {
-		int h = (_insets.top-20);
+		int h = (insets.top-20);
 
 		if (h > 0) {
-			g->DrawImage(_icon_image, _insets.left, 10, h, h);
+			g->DrawImage(_icon_image, insets.left, 10, h, h);
 		}
 	}
 
 	if (_subtitles.size() > 0) {
-		int count = _insets.right;
+		int count = insets.right;
 
 		for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
-			if (IsFontSet() == true) {
-				count += _font->GetStringWidth((*i).subtitle.c_str());
+			if (font != NULL) {
+				count += font->GetStringWidth((*i).subtitle.c_str());
 
-				g->SetColor(_fgcolor);
-				g->DrawString((*i).subtitle, _size.width-count, _size.height-_insets.bottom+(SUBTITLE_SIZE-_font->GetSize())/2+8);
+				g->SetColor(fg);
+				g->DrawString((*i).subtitle, _size.width-count, _size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
 			}
 
 			count += 8;
@@ -590,25 +595,25 @@ void Frame::PaintGlassPane(Graphics *g)
 			if ((*i).image != NULL) {
 				count += SUBTITLE_SIZE;
 
-				g->DrawImage((*i).image, _size.width-count, _size.height-_insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
+				g->DrawImage((*i).image, _size.width-count, _size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
 			}
 
 			count += 20;
 		}
 	}
 
-	int s = _insets.top-30;
+	int s = insets.top-30;
 
 	if (s > 4) {
 		if (_release_enabled == true && (_frame_buttons & JFB_CLOSE) != 0) {
-			g->DrawImage(_icon_close, _size.width-_insets.right-s, 15, s, s);
+			g->DrawImage(_icon_close, _size.width-insets.right-s, 15, s, s);
 		}
 
 		if ((_frame_buttons & JFB_MAXIMIZE) != 0) { 
 			if (_is_maximized == false) {
-				g->DrawImage(_icon_maximize, _size.width-_insets.right-2*s-10, 15, s, s);
+				g->DrawImage(_icon_maximize, _size.width-insets.right-2*s-10, 15, s, s);
 			} else {
-				g->DrawImage(_icon_restore, _size.width-_insets.right-2*s-10, 15, s, s);
+				g->DrawImage(_icon_restore, _size.width-insets.right-2*s-10, 15, s, s);
 			}
 		}
 	}
