@@ -538,12 +538,12 @@ void Frame::PaintGlassPane(Graphics *g)
 	}
 
 	Theme *theme = GetTheme();
-	jgui::Font *font = theme->GetFont("component");
-	Color bg = theme->GetColor("component.bg");
-	Color fg = theme->GetColor("component.fg");
-	Color scroll = theme->GetColor("component.scroll");
-	int bordersize = theme->GetBorderSize("component");
-
+	jgui::Font *font = theme->GetFont("window");
+	Color bg = theme->GetColor("window.bg");
+	Color fg = theme->GetColor("window.fg");
+	Color scroll = theme->GetColor("window.scroll");
+	int bordersize = theme->GetBorderSize("window");
+	
 	jinsets_t insets = GetInsets();
 
 	if (_title != "") {

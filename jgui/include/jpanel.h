@@ -75,6 +75,12 @@ class Panel : public Container{
 		 *
 		 */
 		virtual void Paint(Graphics *g);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void PaintGlassPane(Graphics *g);
 
 };
 

@@ -28,7 +28,13 @@ Panel::Panel(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Panel");
 	
-	// SetBackgroundVisible(true);
+	_insets.left = 8;
+	_insets.right = 8;
+	_insets.top = 64;
+	_insets.bottom = 8;
+
+	SetFocusable(true);
+	SetBackgroundVisible(true);
 }
 
 Panel::Panel(std::string title, int x, int y, int width, int height):
@@ -38,6 +44,12 @@ Panel::Panel(std::string title, int x, int y, int width, int height):
 	
 	_title = title;
 
+	_insets.left = 8;
+	_insets.right = 8;
+	_insets.top = 64;
+	_insets.bottom = 8;
+
+	SetFocusable(true);
 	SetBackgroundVisible(true);
 }
 
@@ -60,6 +72,43 @@ void Panel::Paint(Graphics *g)
 	JDEBUG(JINFO, "paint\n");
 
 	Container::Paint(g);
+}
+
+void Panel::PaintGlassPane(Graphics *g)
+{
+	Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("window");
+	Color bg = theme->GetColor("window.bg");
+	Color fg = theme->GetColor("window.fg");
+	Color scroll = theme->GetColor("window.scroll");
+	int bordersize = theme->GetBorderSize("window");
+
+	jinsets_t insets = GetInsets();
+
+	if (_title != "") {
+		g->SetGradientStop(0.0, bg);
+		g->SetGradientStop(1.0, scroll);
+		g->FillLinearGradient(bordersize, bordersize, _size.width-2*bordersize, insets.top-2*bordersize, 0, 0, 0, insets.top-2*bordersize);
+		g->ResetGradientStop();
+
+		if (font != NULL) {
+			int y = (insets.top-font->GetSize())/2;
+
+			if (y < 0) {
+				y = 0;
+			}
+
+			std::string text = _title;
+			
+			// if (_wrap == false) {
+				text = font->TruncateString(text, "...", (_size.width-insets.left-insets.right));
+			// }
+
+			g->SetFont(font);
+			g->SetColor(fg);
+			g->DrawString(text, insets.left+(_size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
+		}
+	}
 }
 
 }

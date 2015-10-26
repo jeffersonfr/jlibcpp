@@ -61,6 +61,22 @@ Theme::Theme():
 	SetColor("container.border.disable", GetColor("component.border.disable"));
 	SetColor("container.scroll.disable", GetColor("component.scroll.disable"));
 
+	// INFO:: container colors
+	SetColor("window.bg", GetColor("component.bg"));
+	SetColor("window.fg", GetColor("component.fg"));
+	SetColor("window.border", GetColor("component.border"));
+	SetColor("window.scroll", GetColor("component.scroll"));
+
+	SetColor("window.bg.focus", GetColor("component.bg.focus"));
+	SetColor("window.fg.focus", GetColor("component.fg.focus"));
+	SetColor("window.border.focus", GetColor("component.border.focus"));
+	SetColor("window.scroll.focus", GetColor("component.scroll.focus"));
+
+	SetColor("window.bg.disable", GetColor("component.bg.disable"));
+	SetColor("window.fg.disable", GetColor("component.fg.disable"));
+	SetColor("window.border.disable", GetColor("component.border.disable"));
+	SetColor("window.scroll.disable", GetColor("component.scroll.disable"));
+
 	// INFO:: item colors
 	SetColor("item.bg", 0x00, 0x00, 0x00, 0xff);
 	SetColor("item.fg", 0xf0, 0xf0, 0xf0, 0xff);
@@ -89,7 +105,7 @@ Theme::Theme():
 
 	_size_borders["component"] = 1;
 	_size_borders["container"] = 0;
-	_size_borders["window"] = 4;
+	_size_borders["window"] = 2;
 }
 
 Theme::~Theme()
