@@ -232,7 +232,8 @@ void Font::GetStringBreak(std::vector<std::string> *lines, std::string text, int
 				}
 			}
 
-			lines->push_back("\n" + temp);
+			lines->push_back(temp);
+			// lines->push_back("\n" + temp);
 		} else {
 			jcommon::StringTokenizer line_token(line, " ", jcommon::JTT_STRING, true);
 

@@ -1212,7 +1212,6 @@ void NativeGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp
 
 		for (int i=0; i<(int)lines.size() && i<max_lines; i++) {
 			std::string text = jcommon::StringUtils::Trim(lines[i]);
-			
 			int size = _font->GetStringWidth(text);
 
 			if (halign == JHA_LEFT) {
