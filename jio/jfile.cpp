@@ -24,185 +24,128 @@
 #include "jstringtokenizer.h"
 #include "jsystem.h"
 
+#ifdef _WIN32
+#else
+#include <sys/sendfile.h>
+#endif
+
 namespace jio {
 
-File::File(std::string filename_, int flags_):
+#ifdef _WIN32
+#else
+static int GetFlags(jfile_flags_t flags)
+{
+	int o = 0;
+
+	if (flags & JFF_WRITE_ONLY) {
+		 o = o | O_WRONLY;
+	}
+
+	if (flags & JFF_READ_ONLY) {
+		o = o | O_RDONLY;
+	}
+	
+	if (flags & JFF_READ_WRITE) {
+		o = o | O_RDWR;
+	}
+	
+	if (flags & JFF_TRUNCATE) {
+		o = o | O_TRUNC;
+	}
+	
+	if (flags & JFF_APPEND) {
+		o = o | O_APPEND;
+	}
+	
+	if (flags & JFF_NON_BLOCK) {
+		o = o | O_NONBLOCK;
+	}
+	
+	if (flags & JFF_SYNC) {
+		o = o | O_SYNC;
+	}
+	
+	if (flags & JFF_NON_FOLLOW) {
+		o = o | O_NOFOLLOW;
+	}
+	
+	if (flags & JFF_ASYNC) {
+		o = o | O_ASYNC;
+	}
+	
+	if (flags & JFF_LARGEFILE) {
+		o = o | O_LARGEFILE;
+	}
+
+	return o;
+}
+
+static mode_t GetPermissions(jfile_permissions_t perms)
+{
+	mode_t mode = 0;
+
+	if (perms & JFP_USR_READ) {
+		mode = mode | S_IRUSR;
+	}
+
+	if (perms & JFP_USR_WRITE) {
+		mode = mode | S_IWUSR;
+	}
+
+	if (perms & JFP_USR_EXEC) {
+		mode = mode | S_IXUSR;
+	}
+
+	if (perms & JFP_GRP_READ) {
+		mode = mode | S_IRGRP;
+	}
+
+	if (perms & JFP_GRP_WRITE) {
+		mode = mode | S_IWGRP;
+	}
+
+	if (perms & JFP_GRP_EXEC) {
+		mode = mode | S_IXGRP;
+	}
+
+	if (perms & JFP_OTH_READ) {
+		mode = mode | S_IROTH;
+	}
+
+	if (perms & JFP_OTH_WRITE) {
+		mode = mode | S_IWOTH;
+	}
+
+	if (perms & JFP_OTH_EXEC) {
+		mode = mode | S_IXOTH;
+	}
+
+	return mode;
+}
+#endif
+
+File::File(jfile_t fd, void *dir, std::string path, jfile_type_t type):
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jio::File");
-	
-	_type = JFT_UNKNOWN;
-	_is_closed = true;
-	_exists = false;
-	
-	if (filename_ == "") {
-		return;
-	}
-	
-	_filename = filename_;
 	
 	// TODO::
 	// int c = filename_.size() - 1;
 	// _filename.replace("\\", "/");
 	// _filename.remove(c); remove the last slash from url
-	
-#ifdef _WIN32
-	int access = 0;
-	int disposition = 0;
-	int attributes = 0;
 
-	_fd = INVALID_HANDLE_VALUE;
-
-	if ((flags_ & JFF_READ_ONLY) != 0) {
-		access |= GENERIC_READ;
-	}
-	
-	if ((flags_ & JFF_WRITE_ONLY) != 0) {
-		access |= GENERIC_WRITE;
-	}
-	
-	if ((flags_ & JFF_READ_WRITE) != 0) {
-		access |= GENERIC_READ | GENERIC_WRITE;
-	}
-
-	// TODO:: 
-	// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/ipc/base/createnamedpipe.asp
-	
-	/**
-	 * TODO:: CreateDirectory
-	SECURITY_ATTRIBUTES sa;
-	_WinPerms wperm;
-
-	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-	sa.lpSecurityDescriptor = wperm.pdesc;
-	sa.bInheritHandle = FALSE;
-
-	if (::CreateDirectory(RemoveTrailingSeperator(path)->GetChars(), &sa) != TRUE) {
-		throw new IOException(Environment::LastErrorMessage());
-	}
-	*/
-
-	disposition = OPEN_EXISTING;
-
-	if ((flags_ & JFF_CREATE) != 0) {
-		disposition = CREATE_ALWAYS;
-
-		if ((flags_ & JFF_EXCLUSIVE) != 0) {
-			disposition = CREATE_NEW;
-		}
-	}
-
-	if ((flags_ & JFF_TRUNCATE) != 0) {
-		disposition = TRUNCATE_EXISTING;
-	}
-
-	attributes = FILE_ATTRIBUTE_NORMAL;
-
-	if ((flags_ & JFF_ASYNC) != 0) {
-		attributes = attributes | FILE_FLAG_OVERLAPPED;
-	}
-
-	// _fd = CreateFileA(filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, flags, FILE_ATTRIBUTE_NORMAL, 0);
-	_fd = CreateFile(filename_.c_str(),
-                      access,
-                      FILE_SHARE_READ | FILE_SHARE_WRITE,
-                      NULL,
-                      disposition,
-                      attributes,
-                      NULL);
-	
-	if (_fd != INVALID_HANDLE_VALUE) {
-		/*
-		DWORD code = GetLastError();
-		LPTSTR msg;
-
-		FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM,
-			0,			        // no source buffer needed
-			code,						// error code for this message
-			0,							// default language ID
-			(LPTSTR)&msg,		// allocated by fcn
-			0,							// minimum size of buffer
-			(va_list *)NULL);	// no inserts
-		*/
-
-		_is_closed = false;
-		_exists = true;
-	}
-#else
-	_dir = NULL;
-
-	int opt = 0;
-
-	if ((flags_ & JFF_WRITE_ONLY) != 0) {
-		 opt |= O_WRONLY;
-	}
-
-	if ((flags_ & JFF_READ_ONLY) != 0) {
-		opt |= O_RDONLY;
-	}
-	
-	if ((flags_ & JFF_READ_WRITE) != 0) {
-		opt |= O_RDWR;
-	}
-	
-	if ((flags_ & JFF_EXCLUSIVE) != 0) {
-		opt |= O_EXCL;
-	}
-	
-	if ((flags_ & JFF_TRUNCATE) != 0) {
-		opt |= O_TRUNC;
-	}
-	
-	if ((flags_ & JFF_APPEND) != 0) {
-		opt |= O_APPEND;
-	}
-	
-	if ((flags_ & JFF_NON_BLOCK) != 0) {
-		opt |= O_NONBLOCK;
-	}
-	
-	if ((flags_ & JFF_SYNC) != 0) {
-		opt |= O_SYNC;
-	}
-	
-	if ((flags_ & JFF_NON_FOLLOW) != 0) {
-		opt |= O_NOFOLLOW;
-	}
-	
-	if ((flags_ & JFF_DIR) != 0) {
-		opt |= O_DIRECTORY;
-	}
-	
-	if ((flags_ & JFF_ASYNC) != 0) {
-		opt |= O_ASYNC;
-	}
-	
-	if ((flags_ & JFF_LARGEFILE) != 0) {
-		opt |= O_LARGEFILE;
-	}
-	
-	if ((flags_ & JFF_CREATE) != 0) {
-		opt |= O_CREAT;
-	}
-
-	_fd = open(filename_.c_str(), opt, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH);
-
-	if (_fd > 0) {
-		_is_closed = false;
-		_exists = true;
-	}
-#endif
+	_fd = fd;
+	_dir = dir;
+	_path = path;
+	_type = JFT_UNKNOWN;
+	_is_closed = false;
 
 #ifdef _WIN32
-	DWORD r = GetFileAttributesA(filename_.c_str()); 
+	DWORD r = GetFileAttributesA(_path.c_str()); 
 
 	if (r == INVALID_FILE_ATTRIBUTES) {
 		return;
 	}
-
-	_exists = true;
 
 	if ((r & FILE_ATTRIBUTE_NORMAL) != 0) {
 		_type = JFT_REGULAR;
@@ -220,133 +163,32 @@ File::File(std::string filename_, int flags_):
 		_type = JFT_OFFLINE;
 	} else if ((r & FILE_ATTRIBUTE_SYSTEM) != 0) {
 		_type = JFT_SYSTEM;
-	} else {
-		_type = JFT_UNKNOWN;
 	}
 #else
 	memset(&_stat, 0, sizeof(struct stat));
 
-	if (stat(_filename.c_str(), &_stat) < 0) {
-		return;
-	}
-
-	_exists = true;
-
-	if (S_ISREG(_stat.st_mode)) {
-		_type = JFT_REGULAR;
-	} else if (S_ISDIR(_stat.st_mode)) {
-		_type = JFT_DIRECTORY;
-	} else if (S_ISCHR(_stat.st_mode)) {
-		_type = JFT_CHAR_DEVICE;
-	} else if (S_ISBLK(_stat.st_mode)) {
-		_type = JFT_BLOCK_DEVICE;
-	} else if (S_ISFIFO(_stat.st_mode)) {
-		_type = JFT_FIFO;
-	} else if (S_ISLNK(_stat.st_mode)) {
-		_type = JFT_SYMBOLIC_LINK;
-	} else if (S_ISSOCK(_stat.st_mode)) {
-		_type = JFT_SOCKET;
-	} else {
-		_type = JFT_UNKNOWN;
-	}
-
-	if (_type == JFT_DIRECTORY) {
-		close(_fd);
-
-		_dir = opendir(_filename.c_str());
-
-		if (_dir != NULL) {
-			_is_closed = false;
-			_exists = true;
+	if (_fd > 0) {
+		if (fstat(_fd, &_stat) < 0) {
+			return;
 		}
-	}
-#endif
-}
-	
-File::File(std::string prefix, std::string sufix, bool is_directory):
-	jcommon::Object()
-{
-	jcommon::Object::SetClassName("jio::File");
-	
-	_type = JFT_UNKNOWN;
-	_is_closed = true;
-	_exists = false;
-	
-#ifdef _WIN32
-	char *tmp = new char[_filename.size()+6+1];
 
-	sprintf(tmp, "%s%6x", prefix.c_str(), 1 + (int)(1000000.0 * (rand() / (RAND_MAX + 1.0))));
-
-	_filename = tmp;
-
-	if (sufix != "") {
-		_filename = _filename + "." + sufix;
-	}
-
-	_fd = CreateFileA(_filename.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
-	
-	if (_fd != INVALID_HANDLE_VALUE) {
-		/*
-		DWORD code = GetLastError();
-		LPTSTR msg;
-
-		FormatMessage(
-			FORMAT_MESSAGE_ALLOCATE_BUFFER |
-			FORMAT_MESSAGE_FROM_SYSTEM,
-			0,			        // no source buffer needed
-			code,				// error code for this message
-			0,					// default language ID
-			(LPTSTR)&msg,		// allocated by fcn
-			0,					// minimum size of buffer
-			(va_list *)NULL);	// no inserts
-
-			_exists = false;
-			_is_closed = true;
-		*/
-
-		_is_closed = false;
-		_exists = true;
-	}
-
-	if (is_directory == true) {
-		_type = JFT_REGULAR;
-	} else {
-		_type = JFT_DIRECTORY;
-	}
-
-	delete tmp;
-#else
-	if (is_directory == false) {
-		std::string tmp = prefix + "XXXXXX" + sufix;
-		char *path = strdup(tmp.c_str());
-
-		_fd = mkstemp(path);
-
-		if (_fd > 0) {
-			_exists = true;
-		}
-			
-		_filename = std::string(path);
-		_type = JFT_REGULAR;
-	} else {
-		std::string tmp = prefix + "XXXXXX" + sufix;
-
-		_filename = mkdtemp((char *)tmp.c_str());
-
-		_filename = _filename + sufix;
-
-		if ((_fd = open(_filename.c_str(), O_RDWR | O_DIRECTORY | O_CREAT, S_IREAD | S_IWRITE | S_IRGRP | S_IROTH)) > 0) {
-			close(_fd);
-
-			_dir = opendir(_filename.c_str());
-
-			if (_dir != NULL) {
-				_is_closed = false;
-				_exists = true;
-			}
-
+		if (S_ISREG(_stat.st_mode)) {
+			_type = JFT_REGULAR;
+		} else if (S_ISDIR(_stat.st_mode)) {
 			_type = JFT_DIRECTORY;
+		} else if (S_ISCHR(_stat.st_mode)) {
+			_type = JFT_CHAR_DEVICE;
+		} else if (S_ISBLK(_stat.st_mode)) {
+			_type = JFT_BLOCK_DEVICE;
+		} else if (S_ISFIFO(_stat.st_mode)) {
+			_type = JFT_FIFO;
+		} else if (S_ISLNK(_stat.st_mode)) {
+			_type = JFT_SYMBOLIC_LINK;
+		} else if (S_ISSOCK(_stat.st_mode)) {
+			_type = JFT_SOCKET;
 		}
+	} else {
+		_type = JFT_DIRECTORY;
 	}
 #endif
 }
@@ -481,28 +323,398 @@ std::string File::GetFixedPath(std::string pathname)
 	return pathname;
 }
 
-File * File::CreateTemporaryFile(std::string prefix, std::string sufix)
+bool File::Exists(std::string path)
 {
-	File *file = new File(prefix, sufix, false);
+#ifdef _WIN32
+	/* 
+	// INFO:: method 1
+	OFSTRUCT of_struct;
 
-	if (file->Exists() == false) {
-		delete file;
-		file = NULL;
+	return OpenFile(path.c_str(), &of_struct, OF_EXIST) != INVALID_HANDLE_VALUE && of_struct.nErrCode == 0;
+	*/
+
+	/* 
+	// INFO:: method 1
+	HANDLE hFile = CreateFile(path.c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+	if (hFile != NULL && hFile != INVALID_HANDLE) {
+		CloseFile(hFile);
+		
+		return true;
 	}
 
-	return file;
+	return false;
+	*/
+
+	// INFO:: method 1
+	return GetFileAttributes(path.c_str()) != INVALID_FILE_ATTRIBUTES;
+#else
+	/*
+	// INFO:: method 1
+	ifstream f(path.c_str());
+	if (f.good()) {
+		f.close();
+		return true;
+	} else {
+		f.close();
+		return false;
+	}
+	*/
+
+	/*
+	// INFO:: method 2
+	if (FILE *file = fopen(path.c_str(), "r")) {
+		fclose(file);
+
+		return true;
+	} else {
+		return false;
+	}
+	*/
+
+	/*
+	// INFO:: method 3
+	return (access(path.c_str(), F_OK) != -1);
+	*/
+
+	// INFO:: method 3
+	struct stat buffer;   
+
+	return (stat(path.c_str(), &buffer) == 0); 
+#endif
 }
 
-File * File::CreateTemporaryDirectory(std::string prefix, std::string sufix)
+File * File::OpenFile(std::string path, jfile_flags_t flags)
 {
-	File *file = new File(prefix, sufix, true);
+#ifdef _WIN32
+	int fd = INVALID_HANDLE_VALUE;
+	int access = 0;
+	int disposition = 0;
+	int attributes = 0;
 
-	if (file->Exists() == false) {
-		delete file;
-		file = NULL;
+	if ((flags & JFF_READ_ONLY) != 0) {
+		access |= GENERIC_READ;
+	}
+	
+	if ((flags & JFF_WRITE_ONLY) != 0) {
+		access |= GENERIC_WRITE;
+	}
+	
+	if ((flags & JFF_READ_WRITE) != 0) {
+		access |= GENERIC_READ | GENERIC_WRITE;
 	}
 
-	return file;
+	disposition = OPEN_EXISTING;
+
+	if ((flags & JFF_TRUNCATE) != 0) {
+		disposition = TRUNCATE_EXISTING;
+	}
+
+	attributes = FILE_ATTRIBUTE_NORMAL;
+
+	if ((flags & JFF_ASYNC) != 0) {
+		attributes = attributes | FILE_FLAG_OVERLAPPED;
+	}
+
+	fd = CreateFile(
+			filename_.c_str(),
+			access,
+			FILE_SHARE_READ | FILE_SHARE_WRITE,
+			NULL,
+			disposition,
+			attributes,
+			NULL);
+	
+	if (_fd != INVALID_HANDLE_VALUE) {
+		return NULL;
+	}
+
+	return new File(fd, NULL, path, JFT_REGULAR);
+#else
+	// mode_t mode = GetPermissions(perms);
+	int o = GetFlags(flags);
+
+	int fd = open(path.c_str(), o, S_IREAD | S_IWRITE); // S_IRWXU
+
+	if (fd < 0) {
+		return NULL;
+	}
+
+	return new File(fd, NULL, path, JFT_REGULAR);
+#endif
+
+	return NULL;
+}
+
+File * File::OpenDirectory(std::string path, jfile_flags_t flags)
+{
+#ifdef _WIN32
+	int fd = INVALID_HANDLE_VALUE;
+	int access = 0;
+	int disposition = 0;
+	int attributes = 0;
+
+	if ((flags & JFF_READ_ONLY) != 0) {
+		access |= GENERIC_READ;
+	}
+	
+	if ((flags & JFF_WRITE_ONLY) != 0) {
+		access |= GENERIC_WRITE;
+	}
+	
+	if ((flags & JFF_READ_WRITE) != 0) {
+		access |= GENERIC_READ | GENERIC_WRITE;
+	}
+
+	disposition = OPEN_EXISTING;
+
+	if ((flags & JFF_TRUNCATE) != 0) {
+		disposition = TRUNCATE_EXISTING;
+	}
+
+	attributes = FILE_ATTRIBUTE_NORMAL;
+
+	if ((flags & JFF_ASYNC) != 0) {
+		attributes = attributes | FILE_FLAG_OVERLAPPED;
+	}
+
+	fd = CreateFile(
+			filename_.c_str(),
+			access,
+			FILE_SHARE_READ | FILE_SHARE_WRITE,
+			NULL,
+			disposition,
+			attributes,
+			NULL);
+	
+	if (_fd != INVALID_HANDLE_VALUE) {
+		return NULL;
+	}
+
+	return new File(fd, NULL, path, JFT_DIRECTORY);
+#else
+	int fd = open(path.c_str(), GetFlags(flags) | O_DIRECTORY, S_IREAD | S_IWRITE); // S_IRWXU
+
+	if (fd < 0) {
+		return NULL;
+	}
+
+	DIR *dir = fdopendir(fd);
+
+	return new File(-1, dir, path, JFT_DIRECTORY);
+#endif
+}
+
+File * File::CreateFile(std::string path, jfile_flags_t flags, jfile_permissions_t perms)
+{
+#ifdef _WIN32
+	int fd = INVALID_HANDLE_VALUE;
+	int access = 0;
+	int disposition = 0;
+	int attributes = 0;
+
+	if ((flags & JFF_READ_ONLY) != 0) {
+		access |= GENERIC_READ;
+	}
+	
+	if ((flags & JFF_WRITE_ONLY) != 0) {
+		access |= GENERIC_WRITE;
+	}
+	
+	if ((flags & JFF_READ_WRITE) != 0) {
+		access |= GENERIC_READ | GENERIC_WRITE;
+	}
+
+	// TODO:: 
+	// http://msdn.microsoft.com/library/default.asp?url=/library/en-us/ipc/base/createnamedpipe.asp
+	
+	disposition = OPEN_EXISTING;
+
+	if ((flags & JFF_CREATE) != 0) {
+		disposition = CREATE_ALWAYS;
+
+		if ((flags & JFF_EXCLUSIVE) != 0) {
+			disposition = CREATE_NEW;
+		}
+	}
+
+	if ((flags & JFF_TRUNCATE) != 0) {
+		disposition = TRUNCATE_EXISTING;
+	}
+
+	attributes = FILE_ATTRIBUTE_NORMAL;
+
+	if ((flags & JFF_ASYNC) != 0) {
+		attributes = attributes | FILE_FLAG_OVERLAPPED;
+	}
+
+	// _fd = CreateFileA(filename_.c_str(), opt, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, flags, FILE_ATTRIBUTE_NORMAL, 0);
+	_fd = CreateFile(filename_.c_str(),
+                      access,
+                      FILE_SHARE_READ | FILE_SHARE_WRITE,
+                      NULL,
+                      disposition,
+                      attributes,
+                      NULL);
+	
+	if (_fd != INVALID_HANDLE_VALUE) {
+		/*
+		DWORD code = GetLastError();
+		LPTSTR msg;
+
+		FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER |
+			FORMAT_MESSAGE_FROM_SYSTEM,
+			0,			        // no source buffer needed
+			code,						// error code for this message
+			0,							// default language ID
+			(LPTSTR)&msg,		// allocated by fcn
+			0,							// minimum size of buffer
+			(va_list *)NULL);	// no inserts
+		*/
+
+		_is_closed = false;
+	}
+#else
+	mode_t mode = GetPermissions(perms);
+	int o = GetFlags(flags);
+
+	int fd = open(path.c_str(), o | O_CREAT | O_EXCL, mode);
+
+	if (fd < 0) {
+		return NULL;
+	}
+
+	return new File(fd, NULL, path, JFT_REGULAR);
+#endif
+
+	return NULL;
+}
+
+File * File::CreateDirectory(std::string path, jfile_permissions_t perms)
+{
+#ifdef _WIN32
+	SECURITY_ATTRIBUTES sa;
+	_WinPerms wperm;
+
+	sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+	sa.lpSecurityDescriptor = wperm.pdesc;
+	sa.bInheritHandle = FALSE;
+
+	int fd = ::CreateDirectory(RemoveTrailingSeperator(path)->GetChars(), &sa);
+
+	if (fd != INVALID_HANDLE_VALUE) {
+		throw new IOException(Environment::LastErrorMessage());
+	}
+
+	return new File(fd, NULL, path, JFT_DIRECTORY);
+#else
+	mode_t mode = GetPermissions(perms);
+
+	if (mkdir(path.c_str(), mode) != 0) {
+		return NULL;
+	}
+
+	DIR *dir = opendir(path.c_str());
+
+	if (dir == NULL) {
+		return NULL;
+	}
+
+	return new File(-1, dir, path, JFT_DIRECTORY);
+#endif
+
+	return NULL;
+}
+
+File * File::CreateTemporaryFile(std::string path, std::string prefix, std::string sufix, jfile_flags_t flags)
+{
+#ifdef _WIN32
+	char *tmp = new char[path.size()+6+1];
+
+	sprintf(tmp, "%s%6x", prefix.c_str(), 1 + (int)(1000000.0 * (rand() / (RAND_MAX + 1.0))));
+
+	std::string str = tmp;
+
+	if (sufix.empty() == false) {
+		str = str + sufix;
+	}
+
+	int fd = CreateFileA(path.c_str(), GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	
+	if (fd != INVALID_HANDLE_VALUE) {
+		return NULL;
+	}
+
+	return new File(_fd, NULL, path, JFT_REGULAR);
+#else
+	int o = GetFlags(flags);
+	std::string tmp = path + "/";
+	
+	if (prefix.empty() == false) {
+	 	tmp = tmp + prefix;
+	}
+
+	tmp = tmp + "XXXXXX";
+
+	if (sufix.empty() == false) {
+		tmp = tmp + sufix;
+	}
+
+	char *aux = strdup(tmp.c_str());
+	int fd;
+
+	if (sufix.empty() == false) {
+		fd = mkostemps(aux, sufix.size(), o);
+	} else {
+		fd = mkostemp(aux, o);
+	}
+
+	tmp = aux;
+
+	free(aux);
+
+	if (fd < 0) {
+		return NULL;
+	}
+
+	return new File(fd, NULL, tmp, JFT_REGULAR);
+#endif
+
+	return NULL;
+}
+
+File * File::CreateTemporaryDirectory(std::string path, std::string prefix)
+{
+#ifdef _WIN32
+	return NULL;
+#else
+	std::string tmp = path + "/" + prefix + "XXXXXX";
+	char *ptr = new char[tmp.size() + 1];
+	char *aux = ptr;
+
+	strcpy(aux, (char *)tmp.c_str());
+
+	aux = mkdtemp(aux);
+
+	if (aux == NULL) {
+		free(ptr);
+
+		return NULL;
+	}
+
+	DIR *dir = opendir(aux);
+
+	path = std::string(aux);
+
+	if (dir == NULL) {
+		return NULL;
+	}
+	
+	return new File(-1, dir, path, JFT_DIRECTORY);
+#endif
+
+	return NULL;
 }
 
 #ifdef _WIN32
@@ -512,11 +724,6 @@ int File::GetFileDescriptor()
 #endif
 {
 	return _fd;
-}
-
-bool File::Exists()
-{
-	return _exists; 
 }
 
 jfile_type_t File::GetType()
@@ -652,7 +859,7 @@ int64_t File::GetSize()
 
 std::string File::GetName() 
 {
-	std::string name = NormalizePath(_filename);
+	std::string name = NormalizePath(_path);
 
 	std::string::size_type i = name.rfind(GetDelimiter());
 
@@ -669,7 +876,7 @@ std::string File::GetName()
 
 std::string File::GetPath()
 {
-	return _filename;
+	return _path;
 }
 
 std::string File::GetCanonicalPath()
@@ -679,7 +886,7 @@ std::string File::GetCanonicalPath()
 
 std::string File::GetAbsolutePath()
 {
-	if (_filename.find(GetDelimiter()) == 0) {
+	if (_path.find(GetDelimiter()) == 0) {
 		return GetPath();
 	}
 
@@ -781,20 +988,28 @@ int64_t File::Write(const char *data_, int64_t length_)
 
 void File::Close()
 {
+	if (_is_closed == true) {
+		return;
+	}
+
+	_is_closed = true;
 #ifdef _WIN32
 	CloseHandle(_fd);
 #else
-	if (_type == JFT_DIRECTORY) {
-		if (_dir != NULL) {
-			closedir(_dir);
-			_dir = NULL;
-		}
-	} else {
+	DIR *dir = (DIR *)_dir;
+
+	if (dir != NULL) {
+		closedir(dir);
+	}
+
+	_dir = NULL;
+
+	if (_fd > 0) {
 		close(_fd);
 	}
-#endif
 
-	_is_closed = true;
+	_fd = -1;
+#endif
 }
 
 bool File::IsClosed()
@@ -875,11 +1090,12 @@ bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 	}
 
 	struct dirent *namelist;
+	DIR *dir = (DIR *)_dir;
 	
-	rewinddir(_dir);
+	rewinddir(dir);
 
 	if (extension == "") {
-		while ((namelist = readdir(_dir)) != NULL) {
+		while ((namelist = readdir(dir)) != NULL) {
 			files->push_back(namelist->d_name);
 
 			// WARN:: delete ??
@@ -887,7 +1103,7 @@ bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 	} else {
 		std::string file;
 
-		while ((namelist = readdir(_dir)) != NULL) {
+		while ((namelist = readdir(dir)) != NULL) {
 			file = namelist->d_name;
 
 			if (file.size() > extension.size()) {
@@ -904,10 +1120,32 @@ bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 	return true;
 }
 
+void File::Copy(std::string newpath_)
+{
+#ifdef _WIN32
+#else
+	off_t bytes = 0;
+	int output;
+
+	output = open(newpath_.c_str(), O_RDWR | O_CREAT, S_IWRITE | S_IRGRP | S_IROTH);
+	
+	if (output < 0) {
+		throw FileException(strerror(errno));
+	}
+
+	// sendfile will work with non-socket output on Linux 2.6.33+
+	if (sendfile(output, _fd, &bytes, GetSize()) < 0) {
+		throw FileException(strerror(errno));
+	}
+
+	close(output);
+#endif
+}
+
 void File::Move(std::string newpath_)
 {
 	std::string o = GetAbsolutePath();
-	
+
 #ifdef _WIN32
 	MoveFileA(o.c_str(), newpath_.c_str());
 #else
@@ -930,10 +1168,6 @@ void File::Rename(std::string newpath_)
 #ifdef _WIN32
 	MoveFileA(o.c_str(), newpath_.c_str());
 #else
-	if (_type != JFT_DIRECTORY) {
-		o += "/";
-	}
-
 	int r = rename(o.c_str(), newpath_.c_str());
 		
 	if (r < 0) {
@@ -962,6 +1196,7 @@ void File::Remove()
 		}
 	}
 #else
+	// calls unlink(2) for files, and rmdir(2) for directories
 	int r = remove(s.c_str());
 
 	if (r < 0) {

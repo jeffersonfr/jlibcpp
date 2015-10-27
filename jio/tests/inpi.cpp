@@ -167,13 +167,12 @@ int removeWhiteSpace(File *file, File *temp, std::string filename)
 
 int inpi_compress_process(std::string filename)
 {
-	File *file = NULL,
-		 *temp = NULL;
+	File *file = NULL;
+	File *temp = NULL;
 
 	try {
-		file = new File(filename);
-
-		temp = File::CreateTemporaryFile("jeff");
+		file = jio::File::OpenFile(filename);
+		temp = jio::File::CreateTemporaryFile("/tmp", "jeff");
 
 		if ((void *)temp == NULL) {
 			std::cout << "Cannot create temporary file !" << std::endl;
@@ -190,77 +189,80 @@ int inpi_compress_process(std::string filename)
 		std::cout << "INPI process failed:: " << e.what() << std::endl;
 	}
 
-	if ((void *)file != NULL) {
-		delete file;
-	}
-
-	if ((void *)temp != NULL) {
-		delete temp;
-	}
+	delete file;
+	delete temp;
 
 	return 0;
 }
 
 int inpi_extract_process(std::string filename)
 {
+	File *file = NULL;
+	File *temp = NULL;
+
 	try {
-		File file(filename);
-		int r, k;
 		char filename[256];
  		uint8_t c, previous = 0;
+		int r, k;
 
-		while ((r = file.Read((char *)&c, 1)) != EOF && r != 0) {
+		file = jio::File::OpenFile(filename);
+
+		while ((r = file->Read((char *)&c, 1)) != EOF && r != 0) {
 			if (c == '/') {
-				while ((r = file.Read((char *)&c, 1)) != EOF && r != 0 && c != ' ');
-				while ((r = file.Read((char *)&c, 1)) != EOF && r != 0 && c != ' ');
+				while ((r = file->Read((char *)&c, 1)) != EOF && r != 0 && c != ' ');
+				while ((r = file->Read((char *)&c, 1)) != EOF && r != 0 && c != ' ');
 
 				k = 0;
 
-				while ((r = file.Read((char *)&c, 1)) != EOF && r != 0 && c != ' ') {
+				while ((r = file->Read((char *)&c, 1)) != EOF && r != 0 && c != ' ') {
 					filename[k++] = c;
 				}
 
 				filename[k] = 0;
 				
-				while ((r = file.Read((char *)&c, 1)) != EOF && r != 0 && c != '\n');
+				while ((r = file->Read((char *)&c, 1)) != EOF && r != 0 && c != '\n');
 				
-				File temp(filename, JFF_WRITE_ONLY | JFF_CREATE);
-				
+				temp = jio::File::CreateFile(filename, (jio::jfile_flags_t)(JFF_WRITE_ONLY));
+
 				do {
-					while ((r = file.Read((char *)&c, 1)) != EOF && r != 0 && c != '/') {
+					while ((r = file->Read((char *)&c, 1)) != EOF && r != 0 && c != '/') {
 						previous = c;
 
-						temp.Write((char *)&c, 1);
+						temp->Write((char *)&c, 1);
 					}
 					
 					if (previous != '\n') {
-						temp.Write((char *)"/", 1);
+						temp->Write((char *)"/", 1);
 					} else {
-						if ((r = file.Read((char *)&c, 1)) == EOF) {
+						if ((r = file->Read((char *)&c, 1)) == EOF) {
 							break;
 						}
 
 						if (c == '*') {
 							break;
 						} else {
-							temp.Write((char *)"/", 1);
-							temp.Write((char *)&c, 1);
+							temp->Write((char *)"/", 1);
+							temp->Write((char *)&c, 1);
 						}
 					}
 				} while (true);
 
+				temp->Close();
 
-				temp.Close();
+				delete temp;
+				temp = NULL;
 
-				while ((r = file.Read((char *)&c, 1)) != EOF && r != 0 && c != '\n');
+				while ((r = file->Read((char *)&c, 1)) != EOF && r != 0 && c != '\n');
 			}	
-
 		};
 
-		file.Close();
+		file->Close();
 	} catch (jcommon::RuntimeException &e) {
 		std::cout << "INPI process failed:: " << e.what() << std::endl;
 	}
+
+	delete file;
+	delete temp;
 
 	return 0;
 }

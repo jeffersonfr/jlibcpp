@@ -681,10 +681,12 @@ class FileImageTest : public Picture {
 		FileImageTest(int x, int y, int w, int h):
 			Picture(x, y, w, h)
 		{
-			jio::File file(FILENAME);
+			jio::File *file = jio::File::OpenFile(FILENAME);
 
-			_image = jgui::Image::CreateImage(&file);
+			_image = jgui::Image::CreateImage(file);
 			_title = "File Object";
+
+			delete file;
 		}
 
 		virtual ~FileImageTest()
@@ -795,20 +797,21 @@ class RawImageTest : public Picture {
 		RawImageTest(int x, int y, int w, int h):
 			Picture(x, y, w, h)
 		{
-			jio::File file(FILENAME);
+			jio::File *file = jio::File::OpenFile(FILENAME);
 
-			char *raw = new char[file.GetSize()];
+			char *raw = new char[file->GetSize()];
 			int64_t packet = 64*1024,
 							length,
 							count = 0;
 
-			while ((length = file.Read(raw+(int)count, packet)) > 0) {
+			while ((length = file->Read(raw+(int)count, packet)) > 0) {
 				count = count + length;
 			}
  
-			_image = jgui::Image::CreateImage(raw, file.GetSize());
+			_image = jgui::Image::CreateImage(raw, file->GetSize());
 			_title = "Raw Image";
 
+			delete file;
 			delete [] raw;
 		}
 

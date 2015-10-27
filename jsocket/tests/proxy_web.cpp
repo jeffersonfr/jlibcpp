@@ -481,7 +481,9 @@ int process_request(jsocket::Socket *sockIn)
 		char *p;
 
 		do {
-			fgets(data, LDATA, fsin);
+			if (fgets(data, LDATA, fsin) == NULL) {
+				break;
+			}
 			ldata = strlen(data);
 			if (strncasecmp(data, "Content-Length", 14) == 0) {
 				p = data + 14;
@@ -504,7 +506,9 @@ int process_request(jsocket::Socket *sockIn)
 		  * METHOD_GET, METHOD_HEAD
 		  */
 		do {
-			fgets(data, LDATA, fsin);
+			if (fgets(data, LDATA, fsin) == NULL) {
+				break;
+			}
 			ldata = strlen(data);
 			if (!NoCache || (strncmp(data, "If-Mod", 6))) {
 				sockOut->Send(data, ldata);

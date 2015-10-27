@@ -30,7 +30,10 @@ OBJS_data = \
 OBJS_protocol = \
 	   protocol.o\
 
-all: inpi object data teste file protocol
+OBJS_filesystem = \
+	   filesystem.o\
+
+all: inpi object data teste file protocol filesystem
 	
 inpi: $(OBJS_inpi)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -50,6 +53,9 @@ data: $(OBJS_data)
 protocol : $(OBJS_protocol)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+filesystem: $(OBJS_filesystem)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -57,4 +63,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *~ teste inpi object data file protocol
+	@rm -rvf *.o *~ teste inpi object data file protocol filesystem

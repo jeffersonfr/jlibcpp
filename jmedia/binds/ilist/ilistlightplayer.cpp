@@ -226,15 +226,15 @@ ImageListLightPlayer::ImageListLightPlayer(std::string directory):
 	_decode_rate = 1.0;
 	_frame_index = 0;
 	
-	jio::File file(_directory);
+	jio::File *file = jio::File::OpenDirectory(_directory);
 
-	if (file.IsDirectory() == false) {
-		throw jcommon::RuntimeException("The path must be a local directory");
+	if (file == NULL) {
+		throw jcommon::RuntimeException("Unable to open the media directory");
 	}
 
 	std::vector<std::string> files;
 
-	if (file.ListFiles(&files) == false) {
+	if (file->ListFiles(&files) == false) {
 		throw jcommon::RuntimeException("Unable to list files in the local directory");
 	}
 
@@ -246,13 +246,17 @@ ImageListLightPlayer::ImageListLightPlayer(std::string directory):
 		std::string file = (*i);
 
 		if (file.size() > 3 && file[0] != '.') {
-			jio::File f(file);
+			jio::File *tmp = jio::File::OpenFile(file);
 
-			if (f.IsDirectory() == false) {
+			if (tmp != NULL) {
 				_image_list.push_back(_directory + "/" + file);
 			}
+
+			delete tmp;
 		}
 	}
+
+	delete file;
 
 	std::sort(_image_list.begin(), _image_list.end(), imagelistlightplayer::ascending_sort());
 

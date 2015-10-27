@@ -18,20 +18,20 @@ OBJS_proxy_udp = \
 OBJS_options = \
 	   options.o\
 
-OBJS_http_teste = \
-	   http_teste.o\
+OBJS_http = \
+	   http.o\
 
-OBJS_dump_teste = \
-	   dump_teste.o\
+OBJS_dump = \
+	   dump.o\
 
-OBJS_sniff_teste = \
-	   sniff_teste.o\
+OBJS_sniff = \
+	   sniff.o\
 
-OBJS_server_teste = \
-	   server_teste.o\
+OBJS_server = \
+	   server.o\
 
-OBJS_streamer_teste = \
-	   streamer_teste.o\
+OBJS_streamer = \
+	   streamer.o\
 
 OBJS_proxy_web = \
 		proxy_web.o\
@@ -63,7 +63,7 @@ OBJS_ping = \
 OBJS_broadcast = \
 		broadcast.o\
 
-all: proxy_udp options http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request sslclient sslserver ssltelnet lookup interfaces sockspeed ping broadcast
+all: proxy_udp options http dump server sniff streamer proxy_web http_request sslclient sslserver ssltelnet lookup interfaces sockspeed ping broadcast
 	
 proxy_udp: $(OBJS_proxy_udp)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -71,19 +71,19 @@ proxy_udp: $(OBJS_proxy_udp)
 options: $(OBJS_options)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
-http_teste: $(OBJS_http_teste)
+http: $(OBJS_http)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
-dump_teste: $(OBJS_dump_teste)
+dump: $(OBJS_dump)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
-sniff_teste: $(OBJS_sniff_teste)
+sniff: $(OBJS_sniff)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
-server_teste: $(OBJS_server_teste)
+server: $(OBJS_server)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
-streamer_teste: $(OBJS_streamer_teste)
+streamer: $(OBJS_streamer)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
 
 proxy_web: $(OBJS_proxy_web)
@@ -122,4 +122,4 @@ broadcast: $(OBJS_broadcast)
 install:
 
 clean:
-	@rm -rvf *.o *.exe *.dll *.lib *.a *~ proxy_udp options http_teste dump_teste server_teste sniff_teste streamer_teste proxy_web http_request lookup sslserver sslclient ssltelnet interfaces sockspeed ping broadcast
+	@rm -rvf *.o *.exe *.dll *.lib *.a *~ proxy_udp options http dump server sniff streamer proxy_web http_request lookup sslserver sslclient ssltelnet interfaces sockspeed ping broadcast

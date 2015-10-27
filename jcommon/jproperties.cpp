@@ -87,9 +87,15 @@ void Properties::Save(std::string escape_)
 {
 	jthread::AutoLock lock(&_mutex);
 
+	jio::File *file = NULL;
+
 	try {
-		jio::File f(_filename, jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_TRUNCATE);
+		file = jio::File::OpenFile(_filename, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_TRUNCATE));
 	
+		if (file == NULL) {
+			throw RuntimeException("Unable to save properties");
+		}
+
 		for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
 			std::ostringstream o;
 			
@@ -101,13 +107,19 @@ void Properties::Save(std::string escape_)
 				o << p.value << std::endl;
 			}
 
-			f.Write(o.str().c_str(), (long)o.str().size());
+			file->Write(o.str().c_str(), (long)o.str().size());
 		}
 
-		f.Flush();
-		f.Close();
-	} catch (...) {
-		throw RuntimeException("File not found");
+		file->Flush();
+		file->Close();
+
+		delete file;
+	} catch (jcommon::RuntimeException &e) {
+		if (file != NULL) {
+			delete file;
+		}
+
+		throw e;
 	}
 }
 

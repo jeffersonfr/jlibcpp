@@ -41,7 +41,7 @@
 namespace jio {
 
 /**
- * \brief Tipo de arquivo.
+ * \brief File types
  *
  */
 enum jfile_type_t {
@@ -57,27 +57,40 @@ enum jfile_type_t {
 	JFT_BLOCK_DEVICE,
 	JFT_FIFO,
 	JFT_SYMBOLIC_LINK,
-	JFT_SOCKET,
+	JFT_SOCKET
 };
 
 /**
- * \brief Flags de arquivo.
+ * \brief File flags
  * 
  */
 enum jfile_flags_t {
 	JFF_WRITE_ONLY	= 0x0001,
 	JFF_READ_ONLY 	= 0x0002,
 	JFF_READ_WRITE 	= 0x0004,
-	JFF_EXCLUSIVE		= 0x0008,
 	JFF_TRUNCATE 		= 0x0010,
 	JFF_APPEND 			= 0x0020,
 	JFF_NON_BLOCK 	= 0x0040,
 	JFF_SYNC 				= 0x0080,
 	JFF_NON_FOLLOW 	= 0x0100,
-	JFF_DIR		 			= 0x0200,
 	JFF_ASYNC 			= 0x0400,
-	JFF_LARGEFILE 	= 0x0800,
-	JFF_CREATE			= 0x1000,
+	JFF_LARGEFILE 	= 0x0800
+};
+
+/**
+ * \brief File permissions (user, group, others)
+ * 
+ */
+enum jfile_permissions_t {
+	JFP_USR_READ	      = 0x0001,
+	JFP_USR_WRITE       = 0x0002,
+	JFP_USR_EXEC        = 0x0004,
+	JFP_GRP_READ	      = 0x0008,
+	JFP_GRP_WRITE       = 0x0010,
+	JFP_GRP_EXEC        = 0x0020,
+	JFP_OTH_READ	      = 0x0040,
+	JFP_OTH_WRITE       = 0x0080,
+	JFP_OTH_EXEC        = 0x0100
 };
 
 /**
@@ -98,17 +111,10 @@ typedef int jfile_t;
 class File : public virtual jcommon::Object{
 
 	private:
-#ifdef _WIN32
 		/** \brief */
-		HANDLE _fd;
-#else
+		jfile_t _fd;
 		/** \brief */
-		int _fd;
-		/** \brief */
-		DIR *_dir;
-#endif
-		/** \brief */
-		std::string _filename;
+		std::string _path;
 		/** \brief */
 		struct stat _stat;
 		/** \brief */
@@ -116,28 +122,16 @@ class File : public virtual jcommon::Object{
 		/** \brief */
 		bool _is_closed;
 		/** \brief */
-		bool _exists;
+		void *_dir;
 
 	private:
 		/**
-		 * \brief Construtor.
+		 * \brief Constructs a new file.
 		 *
 		 */
-		File(std::string prefix, std::string sufix, bool is_directory);
-	
+		File(jfile_t fd, void *dir, std::string path, jfile_type_t type);
+		
 	public:
-		/**
-		 * \brief Create a new file.
-		 *
-		 */
-		File(std::string filename_, int = JFF_READ_ONLY | JFF_LARGEFILE);
-		
-		/**
-		 * \brief Create a new directory.
-		 *
-		 */
-		File(std::string filename_, int flags_, bool recursive_);
-		
 		/**
 		 * \brief Destrutor virtual.
 		 *
@@ -166,13 +160,43 @@ class File : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		static File * CreateTemporaryFile(std::string prefix, std::string sufix = std::string(""));
+		static bool Exists(std::string path);
 
 		/**
 		 * \brief
 		 *
 		 */
-		static File * CreateTemporaryDirectory(std::string prefix, std::string sufix = std::string(""));
+		static File * OpenFile(std::string path, jfile_flags_t flags = (jfile_flags_t)(JFF_READ_WRITE | JFF_LARGEFILE));
+
+		/**
+		 * \brief
+		 *
+		 */
+		static File * OpenDirectory(std::string path, jfile_flags_t flags = (jfile_flags_t)(JFF_READ_WRITE | JFF_LARGEFILE));
+
+		/**
+		 * \brief
+		 *
+		 */
+		static File * CreateFile(std::string path, jfile_flags_t flags = (jfile_flags_t)(JFF_READ_WRITE | JFF_LARGEFILE),  jfile_permissions_t perms = (jfile_permissions_t)(JFP_USR_READ | JFP_USR_WRITE));
+
+		/**
+		 * \brief
+		 *
+		 */
+		static File * CreateDirectory(std::string path, jfile_permissions_t perms = (jfile_permissions_t)(JFP_USR_READ | JFP_USR_WRITE));
+
+		/**
+		 * \brief
+		 *
+		 */
+		static File * CreateTemporaryFile(std::string path, std::string prefix, std::string sufix = std::string(""), jfile_flags_t flags = (jfile_flags_t)(JFF_READ_WRITE | JFF_LARGEFILE));
+
+		/**
+		 * \brief
+		 *
+		 */
+		static File * CreateTemporaryDirectory(std::string path, std::string prefix);
 
 		/**
 		 * \brief
@@ -186,12 +210,6 @@ class File : public virtual jcommon::Object{
 		 */
 		virtual jfile_t GetFileDescriptor();
 	
-		/**
-		 * \brief Retorna o tipo do arquivo.
-		 *
-		 */
-		virtual bool Exists();
-		
 		/**
 		 * \brief Retorna o tipo do arquivo.
 		 *
@@ -312,6 +330,12 @@ class File : public virtual jcommon::Object{
 		 */
 		virtual bool IsClosed();
 	
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Copy(std::string newpath_);
+		
 		/**
 		 * \brief
 		 *

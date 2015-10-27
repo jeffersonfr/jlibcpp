@@ -109,13 +109,18 @@ void GenericGraphics::Dump(std::string dir, std::string prefix)
 		return;
 	}
 
-	jio::File *temp = jio::File::CreateTemporaryFile(prefix);
-	std::string path = dir + "/" + temp->GetName() + ".png";
+	mkdir(dir.c_str(), 0755);
+	
+	if (dir.empty() == false) {
+		prefix = dir + "/" + prefix;
+	}
 
-	delete temp;
+	jio::File *temp = jio::File::CreateTemporaryFile(prefix, ".png");
 
 	cairo_surface_flush(cairo_surface);
-	cairo_surface_write_to_png(cairo_surface, path.c_str());
+	cairo_surface_write_to_png(cairo_surface, temp->GetAbsolutePath().c_str());
+	
+	delete temp;
 }
 
 jregion_t GenericGraphics::ClipRect(int xp, int yp, int wp, int hp)

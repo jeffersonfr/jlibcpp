@@ -40,7 +40,11 @@ void Policies::Load(std::string filename, std::string escape)
 
 	_filename = filename;
 
-	jio::File file(_filename);
+	jio::File *file = jio::File::OpenFile(_filename);
+
+	if (file == NULL) {
+		return;
+	}
 
 	std::string id,
 		content;
@@ -48,7 +52,7 @@ void Policies::Load(std::string filename, std::string escape)
 		state = 0;
 	char c;
 
-	while ((r = file.Read((char *)&c, 1)) != EOF) {
+	while ((r = file->Read((char *)&c, 1)) != EOF) {
 		if (state == -1) {
 			// remove comment from file
 			if (c == '\n') {
@@ -85,20 +89,32 @@ void Policies::Save(std::string escape)
 {
 	jthread::AutoLock lock(&_mutex);
 
+	jio::File *file = NULL;
+
 	try {
-		jio::File f(_filename, jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_TRUNCATE);
+		file = jio::File::OpenFile(_filename, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_TRUNCATE));
+
+		if (file == NULL) {
+			throw jcommon::RuntimeException("Unable to save polices");
+		}
 
 		for (std::map<std::string, std::string>::iterator i=_polices.begin(); i!=_polices.end(); i++) {
 			std::ostringstream o;
 
 			o << i->first << " {\n" << i->second << "\n}\n" << std::endl;
 
-			f.Write(o.str().c_str(), (uint64_t)o.str().size());
+			file->Write(o.str().c_str(), (uint64_t)o.str().size());
 		}
 
-		f.Flush();
-	} catch (...) {
-		throw jcommon::RuntimeException("File not found");
+		file->Flush();
+
+		delete file;
+	} catch (jcommon::RuntimeException &e) {
+		if (file != NULL) {
+			delete file;
+		}
+
+		throw e;
 	}
 }
 

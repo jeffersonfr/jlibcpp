@@ -42,7 +42,7 @@ BitInputStream::BitInputStream(std::string filename):
 	currentByte = 0LL;
 
 	try {
-		file = new File(filename);
+		file = jio::File::OpenFile(filename);
 		stream = new FileInputStream(file);
 	} catch (...) {
 		if (file != NULL) {

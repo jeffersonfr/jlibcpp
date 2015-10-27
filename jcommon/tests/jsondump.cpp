@@ -43,12 +43,13 @@ void populate_sources(const char *filter, std::vector<std::vector<char> > &sourc
 		int size = ftell(fp);
 		fseek(fp, 0, SEEK_SET);
 		std::vector<char> buffer(size + 1);
-		fread (&buffer[0], 1, size, fp);
+		if (fread (&buffer[0], 1, size, fp) > 0) {
+			sources.push_back(buffer);
+		}
 		fclose(fp);
-		sources.push_back(buffer);
 	}
 
-	printf("Loaded %d json files\n", sources.size());
+	printf("Loaded %ld json files\n", sources.size());
 }
 
 void print(jcommon::JSONValue *value, int ident = 0)
@@ -113,14 +114,14 @@ int main(int argc, char **argv)
 	populate_sources("test/fail%d.json", sources);
 	
 	for (size_t i = 0; i < sources.size(); ++i) {
-		printf("Parsing %d\n", i + 1);
+		printf("Parsing %ld\n", i + 1);
 
 		if (parse(&sources[i][0])) {
 			++passed;
 		}
 	}
 
-	printf("Passed %d from %d tests\n", passed, sources.size());
+	printf("Passed %d from %ld tests\n", passed, sources.size());
 
 	// Pass
 	printf("\n:: PASS ::n\n");
@@ -129,14 +130,14 @@ int main(int argc, char **argv)
 	passed = 0;
 
 	for (size_t i = 0; i < sources.size(); ++i) {
-		printf("Parsing %d\n", i + 1);
+		printf("Parsing %ld\n", i + 1);
 
 		if (parse(&sources[i][0])) {
 			++passed;
 		}
 	}
 
-	printf("Passed %d from %d tests\n", passed, sources.size());
+	printf("Passed %d from %ld tests\n", passed, sources.size());
 
 	return 0;
 }

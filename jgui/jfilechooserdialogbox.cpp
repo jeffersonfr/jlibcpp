@@ -229,25 +229,49 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 	return true;
 }
 
-bool FileChooserDialogBox::ListFiles(std::string dirPath, std::vector<std::string> *files)
+bool FileChooserDialogBox::ListFiles(std::string path, std::vector<std::string> *files)
 {
-	jio::File file(dirPath);
+	jio::File *file = jio::File::OpenDirectory(path);
+	
+	if (file == NULL) {
+		return false;
+	}
 
-	return file.ListFiles(files);
+	if (file->ListFiles(files) == false) {
+		delete file;
+
+		return false;
+	}
+
+	delete file;
+
+	return true;
 }
 
 bool FileChooserDialogBox::IsDirectory(std::string path)
 {
-	jio::File file(path);
+	jio::File *file = jio::File::OpenDirectory(path);
 
-	return file.IsDirectory();
+	if (file != NULL) {
+		delete file;
+
+		return true;
+	}
+
+	return false;
 }
 
 bool FileChooserDialogBox::IsFile(std::string path)
 {
-	jio::File file(path);
+	jio::File *file = jio::File::OpenFile(path);
 
-	return file.IsFile();
+	if (file != NULL) {
+		delete file;
+
+		return true;
+	}
+
+	return false;
 }
 
 void FileChooserDialogBox::ItemSelected(jgui::SelectEvent *event)

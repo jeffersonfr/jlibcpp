@@ -162,8 +162,8 @@ void sniffer()
 	struct iphdr *ip_header;
 	struct icmphdr *icmp_header;
 	struct udphdr *udp_header;
-	struct ethhdr *ether_header;
-	struct ip *IP;
+	// struct ethhdr *ether_header;
+	// struct ip *IP;
 	long ContaTCP,
 		 ContaUDP,
 		 QuantiUDP,
@@ -182,7 +182,7 @@ void sniffer()
 				return;
 			}
 			
-			ether_header = (struct ethhdr *)receive;
+			// ether_header = (struct ethhdr *)receive;
 			ip_header =  (struct iphdr *)(receive + sizeof(struct ethhdr));
 
 			switch (ip_header->protocol) {
@@ -206,7 +206,7 @@ void sniffer()
 
 				case IPPROTO_TCP:
 				tcp_header = (struct tcphdr *)(receive + sizeof(struct ethhdr)+ sizeof(struct iphdr));
-				IP = (struct ip *)(receive + sizeof(ether_header));
+				// IP = (struct ip *)(receive + sizeof(ether_header));
 
 				if (CheckSYN==0) {
 					if ((tcp_header->syn==0x01) && (tcp_header->ack!=0x01)) {

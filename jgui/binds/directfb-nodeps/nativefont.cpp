@@ -31,9 +31,9 @@ NativeFont::NativeFont(std::string name, jfont_attributes_t attributes, int size
 
 	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
 
-	jio::File file(name);
+	jio::File *file = jio::File::OpenFile(name);
 
-	if (file.Exists() == false) {
+	if (file == NULL) {
 		if (attributes & JFA_BOLD) {
 			name = name + "-bold";
 		}
@@ -44,12 +44,16 @@ NativeFont::NativeFont(std::string name, jfont_attributes_t attributes, int size
 
 		name = std::string(_DATA_PREFIX"/fonts/") + name + ".ttf";
 
-		jio::File file(name);
+		jio::File *file = jio::File::OpenFile(name);
 
-		if (file.Exists() == false) {
+		if (file == NULL) {
 			throw jcommon::NullPointerException("Cannot create a native font");
 		}
+
+		delete file;
 	}
+
+	delete file;
 
 	handler->CreateFont(name, size, &_font);
 

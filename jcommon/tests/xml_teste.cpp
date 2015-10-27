@@ -538,7 +538,11 @@ int main()
 			{
 				while ( fgets( verifyBuf, 256, verify ) )
 				{
-					fgets( savedBuf, 256, saved );
+					if (fgets( savedBuf, 256, saved ) == NULL) 
+					{
+						break;
+					}
+
 					if ( strcmp( verifyBuf, savedBuf ) )
 					{
 						okay = 0;
@@ -844,7 +848,7 @@ int main()
 		bool loadOkay = doc.LoadFile();
 		loadOkay = true;	// get rid of compiler warning.
 		// Won't pass on non-dev systems. Just a "no crash" check.
-		//XmlTest( "Long filename. ", true, loadOkay );
+		XmlTest( "Long filename. ", true, loadOkay );
 	}
 
 	{
@@ -875,12 +879,13 @@ int main()
 		assert( textfile );
 		if ( textfile ) {
 			char buf[ 1024 ];
-			fgets( buf, 1024, textfile );
-			XmlTest( "Entity transformation: write. ",
-					 "<psg context=\'Line 5 has &quot;quotation marks&quot; and &apos;apostrophe marks&apos;."
-					 " It also has &lt;, &gt;, and &amp;, as well as a fake copyright \xC2\xA9.' />",
-					 buf,
-					 true );
+			if (fgets( buf, 1024, textfile ) != NULL) {
+				XmlTest( "Entity transformation: write. ",
+						 "<psg context=\'Line 5 has &quot;quotation marks&quot; and &apos;apostrophe marks&apos;."
+						 " It also has &lt;, &gt;, and &amp;, as well as a fake copyright \xC2\xA9.' />",
+						 buf,
+						 true );
+			}
 		}
 		fclose( textfile );
 	}

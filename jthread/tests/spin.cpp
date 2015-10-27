@@ -38,8 +38,6 @@ class Consumer : public jthread::Thread {
 		{
 			printf("Consumer TID %lu\n", (unsigned long)syscall( __NR_gettid ));
 
-			int i;
-
 			while (1) {
 				mutex.Lock();
 
@@ -49,7 +47,7 @@ class Consumer : public jthread::Thread {
 					break;
 				}
 
-				i = the_list.front();
+				// the_list.front();
 				the_list.pop_front();
 
 				mutex.Unlock();

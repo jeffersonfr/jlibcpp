@@ -36,10 +36,10 @@ jshared::SharedQueue *fifo = NULL;
 
 void fifo_teste() 
 {
-  	int child;
-   	int status;
-	
 	fifo = new jshared::SharedQueue(0, 100, sizeof(struct priv));
+	
+  int child;
+  int status;
 	
 	if ((child=fork()) != 0) {
 		int i;
@@ -87,7 +87,7 @@ void fifo_teste()
 		sleep(1);
 		std::cout << "parent quit" << std::endl;
 		fifo->Detach();
-		fifo->Dealloc();
+		fifo->Deallocate();
 		
 		exit(0);
 	} else {

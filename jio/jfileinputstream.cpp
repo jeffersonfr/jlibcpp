@@ -29,10 +29,10 @@ FileInputStream::FileInputStream(std::string filename_):
 {
 	jcommon::Object::SetClassName("jio::FileInputStream");
 
-	_file = new File(filename_);
+	_file = jio::File::OpenFile(filename_);
 
-	if (_file->Exists() == false) {
-		throw IOException("File not exists");
+	if (_file == NULL) {
+		throw IOException("Unable to open file");
 	}
 	
 	_flag = 0;
@@ -47,10 +47,6 @@ FileInputStream::FileInputStream(File *file_):
 
 	if (_file == NULL) {
 		throw jcommon::NullPointerException("File must be a valid pointer");
-	}
-
-	if (_file->Exists() == false) {
-		throw IOException("File not exists");
 	}
 
 	_flag = 1;

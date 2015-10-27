@@ -583,6 +583,11 @@ class DemuxTest : public jmpeg::DemuxListener {
 				service_name = Utils::ISO8859_1_TO_UTF8(service_name);
 
 				printf(":: service type:[0x%02x], service provider name:[%s], service name:[%s]\n", service_type, service_provider_name.c_str(), service_name.c_str());
+			} else if (descriptor_tag == 0x49) { // country availability descriptor
+				int country_availability_flag = TS_G8(ptr);
+				std::string country(ptr+1, 3);
+				
+				printf(":: country availability flag:[%d], country:[%s]\n", country_availability_flag, country.c_str());
 			} else if (descriptor_tag == 0x4d) { // short event descriptor
 				std::string language = std::string(ptr, 3);
 				int event_name_length = TS_G8(ptr+3);
@@ -591,11 +596,30 @@ class DemuxTest : public jmpeg::DemuxListener {
 				std::string text(ptr+4+1+event_name_length, text_length);
 
 				printf(":: language:[%s], event name:[%s], text:[%s]\n", language.c_str(), event_name.c_str(), text.c_str());
-			} else if (descriptor_tag == 0x49) { // country availability descriptor
-				int country_availability_flag = TS_G8(ptr);
-				std::string country(ptr+1, 3);
+			} else if (descriptor_tag == 0x4e) { // extended event descriptor
+				int descriptor_number = TS_GM8(ptr+0, 0, 4);
+				int last_descriptor_number = TS_GM8(ptr+0, 4, 4);
+				std::string language(ptr+1, 3);
 				
-				printf(":: country availability flag:[%d], country:[%s]\n", country_availability_flag, country.c_str());
+				printf(":: descriptor number:[0x%02x], last descriptor number:[0x%02x], language:[%s]\n", descriptor_number, last_descriptor_number, language.c_str());
+
+				int length_of_items = TS_G8(ptr+4);
+				int count = 0;
+
+				ptr = ptr + 5;
+
+				while (count < length_of_items) {
+					int item_description_length = TS_G8(ptr);
+					std::string item_description(ptr+1, item_description_length);
+					int item_length = TS_G8(ptr+1+item_description_length);
+					std::string item(ptr+1+item_description_length+1, item_length);
+
+					ptr = ptr + item_description_length + item_length + 2;
+
+					count = count + item_description_length + item_length + 2;	
+
+					printf(":: item description:[%s], item:[%s]\n", item_description.c_str(), item.c_str());
+				}
 			} else if (descriptor_tag == 0x50) { // component descriptor 
 				const char *end = ptr + descriptor_length;
 
@@ -937,6 +961,29 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 		}
 
+		virtual std::string GetTableDescription(int pid, int tid)
+		{
+			if (pid == TS_PAT_PID && tid == TS_PAT_TABLE_ID) {
+				return "Program Association Table";
+			} else if (pid == TS_CAT_PID && tid == TS_CAT_TABLE_ID) {
+				return "Condition Access Table";
+			} else if (pid == TS_NIT_PID && tid == TS_NIT_TABLE_ID) {
+				return "Network Information Table";
+			} else if (pid == TS_TSDT_PID && tid == TS_TSDT_TABLE_ID) {
+				return "Transport Stream Descriptor Table";
+			} else if (pid == TS_SDT_PID && tid == TS_SDT_TABLE_ID) {
+				return "Service Descriptor Table";
+			} else if (pid == TS_TDT_PID && tid == TS_TDT_TABLE_ID) {
+				return "Time Descriptor Table";
+			} else if (pid == TS_EIT_PID) {
+				return "Event Information Table";
+			} else if (tid == TS_PMT_TABLE_ID) {
+				return "Program Map Table ?";
+			}
+
+			return "...";
+		}
+
 		virtual void DataArrived(jmpeg::DemuxEvent *event)
 		{
 			int pid = event->GetPID();
@@ -944,7 +991,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			int len = event->GetDataLength();
 
 			printf("PSI Section:[%s]: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", 
-					"...", // GetTableDescription(tid).c_str(), 
+					GetTableDescription(pid, tid).c_str(), 
 					pid, 
 					tid, 
 					len
@@ -963,13 +1010,13 @@ class DemuxTest : public jmpeg::DemuxListener {
 			} else if (tid == TS_NIT_TABLE_ID) {
 				ProcessNIT(event);
 			} else if (tid == (TS_SDT_TABLE_ID)) {
-				// ProcessSDT(event);
+				ProcessSDT(event);
 			} else if (tid == TS_TOT_TABLE_ID) {
-				// ProcessTOT(event);
+				ProcessTOT(event);
 			} else if (tid == TS_AIT_TABLE_ID) {
 				ProcessPrivate(event);
 			} else {
-				if (pid == TS_EIT_PID) {
+				if (pid == TS_EIT_PID || (tid >= 0x4e && tid <= 0x6f)) {
 					// INFO:: 
 					// 	switch (tid) {
 					// 		0x4e: present and following (present ts)
@@ -977,7 +1024,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 					// 		0x50-0x5f: schedule (present ts)
 					// 		0x60-0x6f: schedule (other ts)
 					// 	}
-					// ProcessEIT(event);
+					ProcessEIT(event);
 				} else if (pid == _pcr_pid) {
 					ProcessPCR(event);
 				} else if (pid == _dsmcc_data_pid) {
@@ -1003,6 +1050,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			InitDemux("sdt", TS_SDT_PID, TS_SDT_TABLE_ID, TS_SDT_TIMEOUT);
 			InitDemux("tdt", TS_TDT_PID, TS_TDT_TABLE_ID, TS_TDT_TIMEOUT);
 			InitDemux("eit", TS_EIT_PID, -1, TS_EIT_TIMEOUT);
+			InitDemux("eit-now&next", -1, 0x4e, TS_EIT_TIMEOUT);
 
 			int nit_pid = TS_NIT_PID;
 			int count = ((section_length-5)/4-1); // last 4 bytes are CRC	

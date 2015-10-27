@@ -33,15 +33,17 @@ int main()
 	};
 
 	for (int i=0; i<6; i++) {
-		jio::File file(args[i]);
+		jio::File *file = jio::File::OpenFile(args[i]);
 
 		std::cout << "File Reference: [" << args[i] << "]" << std::endl;
-		std::cout << "GetPath: [" << file.GetPath() << "]" << std::endl;
-		std::cout << "GetName: [" << file.GetName() << "]" << std::endl;
-		std::cout << "Process: [" << jio::File::GetFixedPath(file.GetPath()) << "]" << std::endl;
-		std::cout << "Normalize: [" << jio::File::NormalizePath(file.GetPath()) << "]" << std::endl;
-		std::cout << "GetAbsolutePath: [" << file.GetAbsolutePath() << "]" << std::endl;
-		std::cout << "GetCanonicalPath: [" << file.GetCanonicalPath() << "]\n" << std::endl;
+		std::cout << "GetPath: [" << file->GetPath() << "]" << std::endl;
+		std::cout << "GetName: [" << file->GetName() << "]" << std::endl;
+		std::cout << "Process: [" << jio::File::GetFixedPath(file->GetPath()) << "]" << std::endl;
+		std::cout << "Normalize: [" << jio::File::NormalizePath(file->GetPath()) << "]" << std::endl;
+		std::cout << "GetAbsolutePath: [" << file->GetAbsolutePath() << "]" << std::endl;
+		std::cout << "GetCanonicalPath: [" << file->GetCanonicalPath() << "]\n" << std::endl;
+
+		delete file;
 	}
 
 	return 0;

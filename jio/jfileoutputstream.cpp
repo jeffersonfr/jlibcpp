@@ -40,7 +40,11 @@ FileOutputStream::FileOutputStream(std::string filename_):
 	}
 
 	try {
-		_file = new File(filename_, JFF_READ_WRITE | JFF_LARGEFILE | JFF_CREATE);
+		_file = jio::File::OpenFile(filename_, (jio::jfile_flags_t)(JFF_READ_WRITE | JFF_LARGEFILE));
+
+		if (_file == NULL) {
+			_file = jio::File::CreateFile(filename_, (jio::jfile_flags_t)(JFF_READ_WRITE | JFF_LARGEFILE));
+		}
 	} catch (...) {
 		_file = NULL;
 

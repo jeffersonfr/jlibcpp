@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     try {
     	// g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger(NULL, NULL);
 			// g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger(NULL, new jlogger::XMLFormatter());
-			g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger((jlogger::Handler *)(new jlogger::FileHandler("teste.log")), new jlogger::XMLFormatter());
+			g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger((jlogger::LoggerHandler *)(new jlogger::FileHandler("teste.log")), new jlogger::XMLFormatter());
 			// g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger((jlogger::Handler *)(new jlogger::SocketHandler(1234)), new jlogger::XMLFormatter());
 
 			// g_default_logger->SetOutput(jlogger::INFO_LOGGER);
