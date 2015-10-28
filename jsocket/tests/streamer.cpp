@@ -106,17 +106,19 @@ class Streamer {
 			jio::FileInputStream input(_file);
 
 			uint8_t *data = new uint8_t [_packet_size];
-			uint64_t pcr = 0, ipcr = 0, factor = 0;
-			int pcr_pid = 0, counter = 0;
+
+			double clock2 = (double)1.0/0.09;
+			uint64_t pcr = 0, factor = 0;
 			uint64_t current_time = 0LL;
 			uint64_t reference_time = 0LL;
 			uint64_t pcr_extension = 0LL;
-			double clock2 = (double)1.0/0.09;
+			int pcr_pid = 0, counter = 0;
+			bool is_opcr = false;
 			
 			pipe.Start();
 
 			while (true) {
-				if (input.Read((char *)data, _packet_size) < 0) {
+				if (input.Read((char *)data, _packet_size) != _packet_size) {
 					if (_loop == true) {
 						reference_time = 0;
 
@@ -153,6 +155,11 @@ class Streamer {
 						int opcr_flag = TS_GM8(ptr+1, 4, 1);
 
 						if (pcr_flag == 1) {
+					 		if (is_opcr == true) {
+								is_opcr = false;
+								reference_time = 0LL;
+							}
+
 							if (reference_time == 0LL) {
 								pcr = TS_GM64(ptr+2, 0, 33);
 								pcr_extension = TS_GM64(ptr+2, 39, 9);
@@ -164,7 +171,8 @@ class Streamer {
 
 								reference_time = jcommon::Date::CurrentTimeMicros();
 							} else if (pid == pcr_pid) {
-								ipcr = TS_GM64(ptr+2, 0, 33);
+								uint64_t ipcr = TS_GM64(ptr+2, 0, 33);
+
 								pcr_extension = TS_GM64(ptr+2, 39, 9);
 								ipcr = (ipcr * 300LL + pcr_extension) / 300LL;
 
@@ -188,10 +196,46 @@ class Streamer {
 								}
 							}
 						} else if (opcr_flag == 1) {
-							// opcr = TS_GM64(ptr+2, 0, 33);
-							// opcr_extension = TS_GM64(ptr+2, 39, 9);
+							if (is_opcr == false) {
+								is_opcr = true;
+								reference_time = 0LL;
+							}
 
-							// process original_program_clock_reference
+							if (reference_time == 0LL) {
+								pcr = TS_GM64(ptr+2, 0, 33);
+								pcr_extension = TS_GM64(ptr+2, 39, 9);
+								pcr = (pcr * 300LL + pcr_extension) / 300LL;
+
+								if (pcr_pid == 0) {
+									pcr_pid = pid;
+								}
+
+								reference_time = jcommon::Date::CurrentTimeMicros();
+							} else if (pid == pcr_pid) {
+								uint64_t ipcr = TS_GM64(ptr+2, 0, 33);
+
+								pcr_extension = TS_GM64(ptr+2, 39, 9);
+								ipcr = (ipcr * 300LL + pcr_extension) / 300LL;
+
+								if (ipcr >= pcr) {
+									current_time = jcommon::Date::CurrentTimeMicros();
+									factor = (uint64_t)((ipcr-pcr)*clock2);
+
+									uint64_t diff = factor - (current_time - reference_time);
+
+									if (diff > 1000000) {
+										reference_time = 0;
+
+										continue;
+									}
+
+									if (diff > 0) {
+										jthread::Thread::USleep(diff);
+									}
+								} else {
+									reference_time = 0;
+								}
+							}
 						}
 					}
 				}

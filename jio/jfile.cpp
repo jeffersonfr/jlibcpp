@@ -493,7 +493,8 @@ File * File::OpenDirectory(std::string path, jfile_flags_t flags)
 
 	return new File(fd, NULL, path, JFT_DIRECTORY);
 #else
-	int fd = open(path.c_str(), GetFlags(flags) | O_DIRECTORY, S_IREAD | S_IWRITE); // S_IRWXU
+	// int fd = open(path.c_str(), O_DIRECTORY);
+	int fd = open(path.c_str(), O_DIRECTORY, S_IREAD | S_IWRITE); // S_IRWXU
 
 	if (fd < 0) {
 		return NULL;
