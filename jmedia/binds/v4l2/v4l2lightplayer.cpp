@@ -481,7 +481,7 @@ V4L2LightPlayer::V4L2LightPlayer(std::string file):
 
 	jgui::jsize_t size;
 	
-	size.width = 720;
+	size.width = 640;
 	size.height = 480;
 
 	_grabber->Open();
