@@ -345,6 +345,7 @@ jcommon::Object * Image::Clone()
 {
 	Image *clone = CreateImage(GetPixelFormat(), GetWidth(), GetHeight());
 	Graphics *g = clone->GetGraphics();
+	jcomposite_flags_t flags = g->GetCompositeFlags();
 
 	g->SetCompositeFlags(jgui::JCF_SRC);
 
@@ -352,6 +353,8 @@ jcommon::Object * Image::Clone()
 		delete clone;
 		clone = NULL;
 	}
+
+	g->SetCompositeFlags(flags);
 
 	return clone;
 }

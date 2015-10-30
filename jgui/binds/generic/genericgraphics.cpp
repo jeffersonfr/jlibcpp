@@ -117,6 +117,10 @@ void GenericGraphics::Dump(std::string dir, std::string prefix)
 
 	jio::File *temp = jio::File::CreateTemporaryFile(prefix, ".png");
 
+	if (temp == NULL) {
+		return;
+	}
+
 	cairo_surface_flush(cairo_surface);
 	cairo_surface_write_to_png(cairo_surface, temp->GetAbsolutePath().c_str());
 	

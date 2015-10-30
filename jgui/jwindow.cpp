@@ -551,7 +551,11 @@ void Window::InternalCreateWindow()
 	_surface->SetPorterDuff(_surface, (DFBSurfacePorterDuffRule)(DSPD_NONE));
 
 	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+#if ((DIRECTFB_MAJOR_VERSION * 1000000) + (DIRECTFB_MINOR_VERSION * 1000) + DIRECTFB_MICRO_VERSION) >= 1007000
 	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_FLUSH));
+#else
+	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
+#endif
 	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
 	
 #if defined(DIRECTFB_NODEPS_UI)
@@ -1339,9 +1343,13 @@ void Window::SetRotation(jwindow_rotation_t t)
 	}
 
 #if defined(DIRECTFB_UI)
+
+#if ((DIRECTFB_MAJOR_VERSION * 1000000) + (DIRECTFB_MINOR_VERSION * 1000) + DIRECTFB_MICRO_VERSION) >= 1007000
 	if (_window != NULL) {
 		_window->SetRotation(_window, rotation);
 	}
+#endif
+
 #elif defined(SDL2_UI)
 	if (rotation != 0) {
 		throw jcommon::RuntimeException("Rotate not implemented");

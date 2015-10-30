@@ -731,7 +731,7 @@ bool Container::KeyPressed(KeyEvent *event)
 
 	Component *current = GetFocusOwner();
 
-	if (current != NULL) {
+	if (current != NULL && current != this) {
 		if (current->KeyPressed(event) == true) {
 			return true;
 		}

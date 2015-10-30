@@ -29,6 +29,10 @@ all:
 
 ## Makefile -- with pkgconfig -- end ##
 
+:Dependencies
+
+	libdirectfb, libsdl2, libsfml2, libx11, libasound2, libssl, uuid
+
 :Problems
 
 1. with ENABLE_MEDIA=libvlc the jmedia not working corretly with lua

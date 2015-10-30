@@ -3,12 +3,12 @@
  *
  * \author The8BitPimp (the8bitpimp.wordpress.com)
  */
-#include "jwindow.h"
+#include "jframe.h"
 #include "jdate.h"
 
 #include <math.h>
 
-jgui::Window screen;
+jgui::Frame screen;
  
 // the texture map
 int texmap[16*16*16*3];
@@ -138,7 +138,6 @@ void renderMap()
 	jgui::Graphics *g = screen.GetGraphics();
 	jgui::jsize_t size = screen.GetSize();
 	uint32_t *buffer = new uint32_t[size.width*size.height];
-	bool running = true;
 
 	do {
 		float now = (double)(jcommon::Date::CurrentTimeMillis() % 10000LL)/10000.0f;
@@ -254,7 +253,7 @@ void renderMap()
 
 		g->SetRGBArray(buffer, 0, 0, size.width, size.height);
 		g->Flip();
-	} while (running);
+	} while (screen.IsVisible());
 
 	delete [] buffer;
 }

@@ -211,7 +211,9 @@ const int * NativeFont::GetCharWidths()
 void NativeFont::Release()
 {
 	if (_font != NULL) {
+#if ((DIRECTFB_MAJOR_VERSION * 1000000) + (DIRECTFB_MINOR_VERSION * 1000) + DIRECTFB_MICRO_VERSION) >= 1007000
 		_font->Dispose(_font);
+#endif
 		_font->Release(_font);
 		_font = NULL;
 	}

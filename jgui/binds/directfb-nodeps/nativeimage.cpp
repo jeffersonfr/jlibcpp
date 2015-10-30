@@ -135,8 +135,6 @@ bool CreateSurface(IDirectFBSurface **surface, jpixelformat_t pixelformat, int w
 		desc.pixelformat = DSPF_ARGB2554;
 	} else if (pixelformat == JPF_ARGB4444) {
 		desc.pixelformat = DSPF_ARGB4444;
-	} else if (pixelformat == JPF_RGBA4444) {
-		desc.pixelformat = DSPF_RGBA4444;
 	} else if (pixelformat == JPF_NV21) {
 		desc.pixelformat = DSPF_NV21;
 	} else if (pixelformat == JPF_AYUV) {
@@ -157,12 +155,16 @@ bool CreateSurface(IDirectFBSurface **surface, jpixelformat_t pixelformat, int w
 		desc.pixelformat = DSPF_RGB555;
 	} else if (pixelformat == JPF_BGR555) {
 		desc.pixelformat = DSPF_BGR555;
+#if ((DIRECTFB_MAJOR_VERSION * 1000000) + (DIRECTFB_MINOR_VERSION * 1000) + DIRECTFB_MICRO_VERSION) >= 1007000
+	} else if (pixelformat == JPF_RGBA4444) {
+		desc.pixelformat = DSPF_RGBA4444;
 	} else if (pixelformat == JPF_RGBA5551) {
 		desc.pixelformat = DSPF_RGBA5551;
 	} else if (pixelformat == JPF_AVYU) {
 		desc.pixelformat = DSPF_AVYU;
 	} else if (pixelformat == JPF_VYU) {
 		desc.pixelformat = DSPF_VYU;
+#endif
 	}
 
 	NativeHandler *handler = dynamic_cast<NativeHandler *>(GFXHandler::GetInstance());
@@ -205,7 +207,7 @@ NativeImage::NativeImage(void *surface, jpixelformat_t pixelformat, int width, i
 	}
 
 	if (surface != NULL) {
-		_graphics = new NativeGraphics(surface, pixelformat, width, height, false);
+		_graphics = new NativeGraphics(surface, pixelformat, width, height, true);
 	} else {
 		IDirectFBSurface *surface = NULL;
 
@@ -213,7 +215,7 @@ NativeImage::NativeImage(void *surface, jpixelformat_t pixelformat, int width, i
 			throw jcommon::NullPointerException("Cannot create a native surface");
 		}
 
-		_graphics = new NativeGraphics(surface, pixelformat, width, height, false);
+		_graphics = new NativeGraphics(surface, pixelformat, width, height, true);
 	}
 
 	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->Add(this);
@@ -278,7 +280,7 @@ NativeImage::NativeImage(std::string file):
 	
 	src->Release(src);
 
-	_graphics = new NativeGraphics(dst, JPF_ARGB, desc.width, desc.height, false);
+	_graphics = new NativeGraphics(dst, JPF_ARGB, desc.width, desc.height, true);
 
 	_pixelformat = JPF_ARGB;
 	_size.width = desc.width;
@@ -461,7 +463,19 @@ Image * NativeImage::Flip(Image *img, jflip_flags_t mode)
 	IDirectFBSurface *isrc = (IDirectFBSurface *)img->GetGraphics()->GetNativeSurface();
 	IDirectFBSurface *idst = (IDirectFBSurface *)image->GetGraphics()->GetNativeSurface();
 
-	/*
+#if ((DIRECTFB_MAJOR_VERSION * 1000000) + (DIRECTFB_MINOR_VERSION * 1000) + DIRECTFB_MICRO_VERSION) >= 1007000
+	// INFO:: use blitting flags
+	if (mode == JFF_HORIZONTAL) {
+		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_HORIZONTAL));
+	} else if (mode == JFF_VERTICAL) {
+		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_VERTICAL));
+	} else {
+		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_HORIZONTAL | DSBLIT_FLIP_VERTICAL));
+	}
+
+	idst->Blit(idst, isrc, NULL, 0, 0);
+	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+#else
 	// INFO:: use matrix
 	static const s32 x_mat[9] = {
 		-Native_FIXED_POINT, 0, (size.width-1) << 16,
@@ -483,30 +497,17 @@ Image * NativeImage::Flip(Image *img, jflip_flags_t mode)
 
 	idst->SetRenderOptions(idst, (DFBSurfaceRenderOptions)(DSRO_MATRIX | DSRO_ANTIALIAS));
 
-	if (t == JFF_HORIZONTAL) {
+	if (mode == JFF_HORIZONTAL) {
 		idst->SetMatrix(idst, x_mat);
-	} else if (t == JFF_VERTICAL) {
+	} else if (mode == JFF_VERTICAL) {
 		idst->SetMatrix(idst, y_mat);
 	} else {
 		idst->SetMatrix(idst, xy_mat);
 	}
 
 	idst->Blit(idst, isrc, NULL, 0, 0);
-	
 	idst->SetRenderOptions(idst, (DFBSurfaceRenderOptions)(DSRO_NONE));
-	*/
-
-	// INFO:: use blitting flags
-	if (mode == JFF_HORIZONTAL) {
-		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_HORIZONTAL));
-	} else if (mode == JFF_VERTICAL) {
-		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_VERTICAL));
-	} else {
-		idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_FLIP_HORIZONTAL | DSBLIT_FLIP_VERTICAL));
-	}
-
-	idst->Blit(idst, isrc, NULL, 0, 0);
-	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+#endif
 
 	return image;
 }

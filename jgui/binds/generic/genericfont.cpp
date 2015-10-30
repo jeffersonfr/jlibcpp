@@ -30,14 +30,14 @@ GenericFont::GenericFont(std::string name, jfont_attributes_t attributes, int si
 {
 	jcommon::Object::SetClassName("jgui::GenericFont");
 
-	jio::File file(name);
+	jio::File *file = jio::File::OpenFile(name);
 
 	_font = NULL;
 	_is_builtin = false;
 
 	GenericHandler *handler = dynamic_cast<GenericHandler *>(GFXHandler::GetInstance());
 
-	if (file.Exists() == false) {
+	if (file == NULL) {
 		_is_builtin = true;
 	} else {
 		handler->CreateFont(name, &_font);
@@ -46,6 +46,8 @@ GenericFont::GenericFont(std::string name, jfont_attributes_t attributes, int si
 			throw jcommon::NullPointerException("Cannot load a native font");
 		}
 	}
+
+	delete file;
 
 	_surface_ref = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 0, 0);
 	_context_ref = cairo_create(_surface_ref);
