@@ -344,8 +344,11 @@ void Image::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 jcommon::Object * Image::Clone()
 {
 	Image *clone = CreateImage(GetPixelFormat(), GetWidth(), GetHeight());
+	Graphics *g = clone->GetGraphics();
 
-	if (clone->GetGraphics()->DrawImage(this, 0, 0) == false) {
+	g->SetCompositeFlags(jgui::JCF_SRC);
+
+	if (g->DrawImage(this, 0, 0) == false) {
 		delete clone;
 		clone = NULL;
 	}
