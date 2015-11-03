@@ -165,7 +165,7 @@ class FileChooserDialogBox : public jgui::DialogBox, public jgui::SelectListener
 		 * \brief
 		 *
 		 */
-		virtual void SetFileFilter(jfilechooser_filter_t filter);
+		virtual void SetFilter(jfilechooser_filter_t filter);
 
 		/**
 		 * \brief

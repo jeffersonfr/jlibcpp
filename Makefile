@@ -427,7 +427,7 @@ doc:
 
 install: uninstall
 	@$(ECHO) "Installing resources files in $(TARGET)/$(MODULE) $(OK)" && mkdir -p $(TARGET)/$(MODULE)
-	@install -d -o nobody -m 755 $(TARGET)/$(MODULE)/fonts && install -o nobody -m 644 resources/fonts/* $(TARGET)/$(MODULE)/fonts
+	@install -d -o nobody -m 755 $(TARGET)/$(MODULE)/fonts && install -o nobody -m 666 resources/fonts/* $(TARGET)/$(MODULE)/fonts
 	@install -d -o nobody -m 755 $(TARGET)/$(MODULE)/images && install -o nobody -m 644 resources/images/* $(TARGET)/$(MODULE)/images
 	@install -d -o nobody -m 755 $(TARGET)/$(MODULE)/sounds && install -o nobody -m 644 resources/sounds/* $(TARGET)/$(MODULE)/sounds
 	@$(ECHO) "Installing include files in $(TARGET)/include/$(MODULE) $(OK)" && mkdir -p $(TARGET)/include/$(MODULE)

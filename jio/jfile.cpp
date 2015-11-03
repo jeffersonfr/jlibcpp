@@ -434,7 +434,15 @@ File * File::OpenFile(std::string path, jfile_flags_t flags)
 	// mode_t mode = GetPermissions(perms);
 	int o = GetFlags(flags);
 
-	int fd = open(path.c_str(), o, S_IREAD | S_IWRITE); // S_IRWXU
+	int fd = open(path.c_str(), o | O_DIRECTORY);
+
+	if (fd > 0) {
+		close(fd);
+
+		return NULL;
+	}
+
+	fd = open(path.c_str(), o);
 
 	if (fd < 0) {
 		return NULL;
@@ -1097,7 +1105,9 @@ bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 
 	if (extension == "") {
 		while ((namelist = readdir(dir)) != NULL) {
-			files->push_back(namelist->d_name);
+			if (strcmp(namelist->d_name, ".") != 0 && strcmp(namelist->d_name, "..") != 0) {
+				files->push_back(namelist->d_name);
+			}
 
 			// WARN:: delete ??
 		}
@@ -1107,7 +1117,7 @@ bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 		while ((namelist = readdir(dir)) != NULL) {
 			file = namelist->d_name;
 
-			if (file.size() > extension.size()) {
+			if (strcmp(namelist->d_name, ".") != 0 && strcmp(namelist->d_name, "..") != 0 && file.size() > extension.size()) {
 				if (strcmp((const char *)(file.c_str()-extension.size()), extension.c_str()) == 0) {
 					files->push_back(file);
 				}

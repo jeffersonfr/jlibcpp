@@ -145,7 +145,7 @@ void FileChooserDialogBox::AddExtension(std::string ext)
 	_extensions.push_back(ext);
 }
 
-void FileChooserDialogBox::SetFileFilter(jfilechooser_filter_t filter)
+void FileChooserDialogBox::SetFilter(jfilechooser_filter_t filter)
 {
 	_filter = filter;
 }
@@ -159,7 +159,9 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 {
 	std::vector<std::string> files;
 	
-	ListFiles(current_dir, &files);
+	if (ListFiles(current_dir, &files) == false) {
+		return false;
+	}
 
 	_list->RemoveItems();
 	_list->AddImageItem("..", _DATA_PREFIX"/images/folder.png");
@@ -175,13 +177,9 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 
 	if (_filter == JFCF_DIRECTORY_ONLY || _filter == JFCF_FILE_AND_DIRECTORY) {
 		for (unsigned int i=0; i<files.size(); i++) {
-			if (files[i] == "." || files[i] == "..") {
-				continue;
-			}
-
-			if (IsDirectory(current_dir +jio::File::GetDelimiter() + files[i])) {
+			if (IsDirectory(current_dir + jio::File::GetDelimiter() + files[i])) {
 				// adiciona um icone para o diretorio
-				_list->AddImageItem(files[i], _DATA_PREFIX"/images/lockfolder.png"); 
+				_list->AddImageItem(files[i], _DATA_PREFIX"/images/folder.png"); 
 			}
 		}
 	}
@@ -218,7 +216,7 @@ bool FileChooserDialogBox::ShowFiles(std::string current_dir)
 
 			if (b == true) {
 				if (IsFile(current_dir + jio::File::GetDelimiter() + file)) {
-					_list->AddImageItem(file, _DATA_PREFIX"/images/lockfile.png");
+					_list->AddImageItem(file, _DATA_PREFIX"/images/file.png");
 				}
 			}
 		}
@@ -233,19 +231,15 @@ bool FileChooserDialogBox::ListFiles(std::string path, std::vector<std::string> 
 {
 	jio::File *file = jio::File::OpenDirectory(path);
 	
-	if (file == NULL) {
-		return false;
-	}
+	if (file != NULL) {
+		file->ListFiles(files);
 
-	if (file->ListFiles(files) == false) {
 		delete file;
-
-		return false;
+	
+		return true;
 	}
 
-	delete file;
-
-	return true;
+	return false;
 }
 
 bool FileChooserDialogBox::IsDirectory(std::string path)
@@ -263,7 +257,11 @@ bool FileChooserDialogBox::IsDirectory(std::string path)
 
 bool FileChooserDialogBox::IsFile(std::string path)
 {
-	jio::File *file = jio::File::OpenFile(path);
+	if (path == "." || path == "..") {
+		return false;
+	}
+
+	jio::File *file = jio::File::OpenFile(path, jio::JFF_READ_ONLY);
 
 	if (file != NULL) {
 		delete file;
