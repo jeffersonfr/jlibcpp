@@ -1061,7 +1061,7 @@ void NativeGraphics::DrawString(std::string text, int xp, int yp)
 	int x = _translate.x+xp;
 	int y = _translate.y+yp;
 
-	_surface->DrawString(_surface, text.c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
+	_surface->DrawString(_surface, jcommon::StringUtils::ReplaceString(text, "\n", "").c_str(), -1, x, y, (DFBSurfaceTextFlags)(DSTF_LEFT | DSTF_TOP));
 }
 
 void NativeGraphics::DrawGlyph(int symbol, int xp, int yp)
@@ -1167,7 +1167,6 @@ void NativeGraphics::DrawString(std::string text, int xp, int yp, int wp, int hp
 
 		for (int i=0; i<(int)lines.size() && i<max_lines; i++) {
 			jcommon::StringTokenizer token(lines[i], " ", jcommon::JTT_STRING, false);
-
 
 			if (lines[i].find("\n") == 0) {
 				// INFO:: eh soh uma maneira de informar a ultima linha de cada linha terminada com '\n'

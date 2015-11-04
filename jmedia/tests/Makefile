@@ -18,12 +18,18 @@ OBJS_teste = \
 OBJS_fullscreen = \
 	   fullscreen.o\
 
-all: teste fullscreen 
+OBJS_synth = \
+	   synth.o\
+
+all: teste fullscreen synth
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 fullscreen: $(OBJS_fullscreen)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+synth: $(OBJS_synth)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
@@ -33,4 +39,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste fullscreen
+	@rm -rvf *.o *.xml *~ teste fullscreen synth

@@ -356,6 +356,7 @@ OBJS_jmedia += \
 		jplayerevent.o\
 		jplayerlistener.o\
 		jplayermanager.o\
+		jsynthesizer.o\
 		jvideoformatcontrol.o\
 		jvideodevicecontrol.o\
 		jvideosizecontrol.o\
