@@ -48,6 +48,7 @@
 */
 #include "Stdafx.h"
 #include "genericprovider_gif.h"
+#include "genericutils.h"
 #include "jfileinputstream.h"
 #include "jmemoryinputstream.h"
 #include "jdebug.h"
@@ -726,6 +727,15 @@ cairo_surface_t * create_gif_surface_from_stream(jio::InputStream *stream)
 	memcpy(data, t.image, t.image_width*t.image_height*4);
 
 	delete [] t.image;
+
+	int sz = t.image_width*t.image_height;
+
+	for (int i=0; i<sz; i++) {
+		int alpha = data[i*4+3];
+		data[i*4+2] = PREMULTIPLY(data[i*4+2], alpha);
+		data[i*4+1] = PREMULTIPLY(data[i*4+1], alpha);
+		data[i*4+0] = PREMULTIPLY(data[i*4+0], alpha);
+	}
 
 	cairo_surface_mark_dirty(surface);
 

@@ -23,11 +23,11 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 	private:
 		jthread::Mutex teste_mutex;
-		int hours,
-			minutes,
-			seconds;
-		bool _flag,
-				 _filled;
+		int _hours;
+		int _minutes;
+		int _seconds;
+		bool _flag;
+		bool _filled;
 
 	public:
 		WatchTeste():
@@ -37,9 +37,9 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 			jcommon::Date date;
 
-			hours = date.GetHour();
-			minutes = date.GetMinute();
-			seconds = date.GetSecond();
+			_hours = date.GetHour();
+			_minutes = date.GetMinute();
+			_seconds = date.GetSecond();
 
 			SetResizeEnabled(true);
 
@@ -59,9 +59,9 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 			while (_flag) {
 				jcommon::Date date;
 
-				hours = date.GetHour();
-				minutes = date.GetMinute();
-				seconds = date.GetSecond();
+				_hours = date.GetHour();
+				_minutes = date.GetMinute();
+				_seconds = date.GetSecond();
 
 				Repaint();
 
@@ -75,39 +75,40 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 			int m = std::min(GetWidth(), GetHeight()-_insets.top);
 
-			double th = (30*hours+minutes/2)*M_PI/180.0-M_PI/2,
-				tm = (minutes*6+seconds/10)*M_PI/180.0-M_PI/2,
-				ts = (seconds*6)*M_PI/180.0-M_PI/2;
-			double xc = GetWidth()/2,
-				yc = (GetHeight()-_insets.top)/2+_insets.top,
-				hh = 0.03*m,
-				vh = 0.25*m,
-				hm = 0.02*m,
-				vm = 0.35*m,
-				hs = 0.10*m,
-				vs = 0.40*m;
+			double th = (30*_hours+_minutes/2)*M_PI/180.0-M_PI/2;
+			double tm = (_minutes*6+_seconds/10)*M_PI/180.0-M_PI/2;
+			double ts = (_seconds*6)*M_PI/180.0-M_PI/2;
+			double xc = GetWidth()/2;
+			double yc = (GetHeight()-_insets.top)/2+_insets.top;
+			double hh = 0.03*m;
+			double vh = 0.25*m;
+			double hm = 0.02*m;
+			double vm = 0.35*m;
+			double hs = 0.10*m;
+			double vs = 0.40*m;
 			char tmp[255];
 
-			sprintf(tmp, "%02d:%02d:%02d", hours, minutes, seconds);
+			sprintf(tmp, "%02d:%02d:%02d", _hours, _minutes, _seconds);
 
 			jgui::jpen_t pen = g->GetPen();
 
-			g->SetColor(0x40, 0x80, 0x60, 0xff);
-			
 			pen.width = 10;
 			g->SetPen(pen);
 			
+			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 			g->DrawCircle((int)xc, (int)yc, (int)(vs+10));
 
 			pen.width = 1;
 			g->SetPen(pen);
 			
-			g->SetColor(0x80, 0xc0, 0xf0, 0xff);
+			g->SetColor(0x00, 0x0, 0x00, 0xff);
+			g->DrawCircle((int)xc, (int)yc, (int)(vs+10+5));
 
 			for (int i=0; i<12; i++) {
 				double teta = (i*30)*M_PI/180.0;
 
-				g->DrawLine((int)(xc+(vs+10)*cos(teta)), (int)(yc+(vs+10)*sin(teta)), (int)(xc+(vs+10+10)*cos(teta)), (int)(yc+(vs+10+10)*sin(teta)));
+				g->FillCircle((int)(xc+(vs+10+4)*cos(teta)), (int)(yc+(vs+10+4)*sin(teta)), 5);
+				// g->DrawLine((int)(xc+(vs+10)*cos(teta)), (int)(yc+(vs+10)*sin(teta)), (int)(xc+(vs+10+10)*cos(teta)), (int)(yc+(vs+10+10)*sin(teta)));
 			}
 
 			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);

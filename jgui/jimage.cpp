@@ -96,7 +96,11 @@ Image * Image::CreateImage(uint32_t *data, int width, int height)
 	Image *image = Image::CreateImage(JPF_ARGB, width, height);
 
 	if (image != NULL) {
-		image->GetGraphics()->SetRGBArray(data, 0, 0, width, height);
+		Graphics *g = image->GetGraphics();
+
+		g->SetCompositeFlags(JCF_SRC);
+		g->SetRGBArray(data, 0, 0, width, height);
+		g->Reset();
 	}
 
 	return image;

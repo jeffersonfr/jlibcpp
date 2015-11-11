@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "genericprovider_tga.h"
+#include "genericutils.h"
 #include "jfileinputstream.h"
 #include "jmemoryinputstream.h"
 #include "jdebug.h"
@@ -557,6 +558,13 @@ cairo_surface_t * create_tga_surface_from_stream(jio::InputStream *stream)
 			ptr[i*4+1] = src[i*4+1];
 			ptr[i*4+0] = src[i*4+2];
 		}
+	}
+
+	for (int i=0; i<(int)sz; i++) {
+		int alpha = data[i*4+3];
+		data[i*4+2] = PREMULTIPLY(data[i*4+2], alpha);
+		data[i*4+1] = PREMULTIPLY(data[i*4+1], alpha);
+		data[i*4+0] = PREMULTIPLY(data[i*4+0], alpha);
 	}
 
 	cairo_surface_mark_dirty(surface);

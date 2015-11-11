@@ -22,6 +22,7 @@
 #include "genericfont.h"
 #include "genericimage.h"
 #include "genericpath.h"
+#include "genericutils.h"
 #include "jmath.h"
 #include "jstringtokenizer.h"
 #include "jimage.h"
@@ -1367,10 +1368,11 @@ void GenericGraphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp
 			int di = 0;
 
 			for (int i=0; i<wp; i++) {
-				*(dst + di + 3) = *(src + si + 3);
-				*(dst + di + 2) = *(src + si + 2);
-				*(dst + di + 1) = *(src + si + 1);
-				*(dst + di + 0) = *(src + si + 0);
+				int alpha = *(src + si + 3);
+				*(dst + di + 3) = alpha;
+				*(dst + di + 2) = DEMULTIPLY(*(src + si + 2), alpha);
+				*(dst + di + 1) = DEMULTIPLY(*(src + si + 1), alpha);
+				*(dst + di + 0) = DEMULTIPLY(*(src + si + 0), alpha);
 
 				si = si + 4;
 				di = di + 4;
@@ -1467,10 +1469,11 @@ void GenericGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 				int r = *(src + si + 2);
 				int g = *(src + si + 1);
 				int b = *(src + si + 0);
-				int pa = *(dst + di + 3);
-				int pr = *(dst + di + 2);
-				int pg = *(dst + di + 1);
-				int pb = *(dst + di + 0);
+				int alpha = *(dst + di + 3);
+				int pa = alpha;
+				int pr = DEMULTIPLY(*(dst + di + 2), pa);
+				int pg = DEMULTIPLY(*(dst + di + 1), pa);
+				int pb = DEMULTIPLY(*(dst + di + 0), pa);
 
 				if (_composite_flags == JCF_CLEAR) {
 					pr = 0x00;
@@ -1564,9 +1567,9 @@ void GenericGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 				*/
 
 				*(dst + di + 3) = pa;
-				*(dst + di + 2) = pr;
-				*(dst + di + 1) = pg;
-				*(dst + di + 0) = pb;
+				*(dst + di + 2) = PREMULTIPLY(pr, pa);
+				*(dst + di + 1) = PREMULTIPLY(pg, pa);
+				*(dst + di + 0) = PREMULTIPLY(pb, pa);
 
 				si = si + 4;
 				di = di + 4;
@@ -1676,12 +1679,18 @@ bool GenericGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, 
 			return false;
 		}
 
+		jregion_t clip = GetClip();
+
+		SetClip(xp, yp, swp, shp);
+
 		cairo_surface_flush(cairo_surface);
 	
 		cairo_save(_cairo_context);
 		cairo_set_source_surface(_cairo_context, cairo_surface, xp+_translate.x, yp+_translate.y);
 		cairo_paint(_cairo_context);
 		cairo_restore(_cairo_context);
+
+		SetClip(clip.x, clip.y, clip.width, clip.height);
 	} else {
 		uint32_t *rgb = NULL;
 
@@ -1736,12 +1745,18 @@ bool GenericGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, 
 			return false;
 		}
 
+		jregion_t clip = GetClip();
+
+		SetClip(xp, yp, wp, hp);
+
 		cairo_surface_flush(cairo_surface);
 
 		cairo_save(_cairo_context);
 		cairo_set_source_surface(_cairo_context, cairo_surface, xp+_translate.x, yp+_translate.y);
 		cairo_paint(_cairo_context);
 		cairo_restore(_cairo_context);
+
+		SetClip(clip.x, clip.y, clip.width, clip.height);
 	} else {
 		uint32_t *rgb = NULL;
 

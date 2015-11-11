@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "genericprovider_bmp.h"
+#include "genericutils.h"
 #include "jfileinputstream.h"
 #include "jmemoryinputstream.h"
 #include "bitmap.h"
@@ -63,6 +64,13 @@ cairo_surface_t * create_bmp_surface_from_stream(jio::InputStream *stream)
 			ptr[(j*sw+i)] = ptr[((sh-j-1)*sw+i)];
 			ptr[((sh-j-1)*sw+i)] = k;
 		}
+	}
+
+	for (int i=0; i<(int)sz; i++) {
+		int alpha = data[i*4+3];
+		data[i*4+2] = PREMULTIPLY(data[i*4+2], alpha);
+		data[i*4+1] = PREMULTIPLY(data[i*4+1], alpha);
+		data[i*4+0] = PREMULTIPLY(data[i*4+0], alpha);
 	}
 
 	cairo_surface_mark_dirty(surface);

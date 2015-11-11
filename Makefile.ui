@@ -49,6 +49,7 @@ GENERIC_OBJS = \
 		 ../generic/genericgraphics.o\
 		 ../generic/genericimage.o\
 		 ../generic/genericpath.o\
+		 ../generic/genericutils.o\
 		 ../generic/genericprovider_bmp.o\
 		 ../generic/genericprovider_gif.o\
 		 ../generic/genericprovider_ico.o\
