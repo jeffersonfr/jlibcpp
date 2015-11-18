@@ -99,6 +99,8 @@ class VolumeControlImpl : public VolumeControl {
 
 				return;
 			}
+
+			SetLevel(100);
 		}
 
 		virtual ~VolumeControlImpl()

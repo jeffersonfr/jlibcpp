@@ -247,6 +247,8 @@ class VolumeControlImpl : public VolumeControl {
 			_player = player;
 			_level = 50;
 			_is_muted = false;
+
+			SetLevel(100);
 		}
 
 		virtual ~VolumeControlImpl()

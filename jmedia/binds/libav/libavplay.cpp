@@ -659,19 +659,12 @@ static int configure_video_filters(AVFilterGraph *graph, VideoState *is, const c
              codec->sample_aspect_ratio.num, codec->sample_aspect_ratio.den);
 
 
-    if ((ret = avfilter_graph_create_filter(&filt_src,
-                                            avfilter_get_by_name("buffer"),
-                                            "src", buffersrc_args, NULL,
-                                            graph)) < 0)
+    if ((ret = avfilter_graph_create_filter(&filt_src, avfilter_get_by_name("buffer"), "src", buffersrc_args, NULL, graph)) < 0)
         return ret;
-    if ((ret = avfilter_graph_create_filter(&filt_out,
-                                            avfilter_get_by_name("buffersink"),
-                                            "out", NULL, NULL, graph)) < 0)
+    if ((ret = avfilter_graph_create_filter(&filt_out, avfilter_get_by_name("buffersink"), "out", NULL, NULL, graph)) < 0)
         return ret;
 
-    if ((ret = avfilter_graph_create_filter(&filt_format,
-                                            avfilter_get_by_name("format"),
-                                            "format", "bgra", NULL, graph)) < 0)
+    if ((ret = avfilter_graph_create_filter(&filt_format, avfilter_get_by_name("format"), "format", "bgra", NULL, graph)) < 0)
         return ret;
     if ((ret = avfilter_link(filt_format, 0, filt_out, 0)) < 0)
         return ret;
@@ -825,8 +818,7 @@ static void update_sample_display(VideoState *is, short *samples, int samples_si
 
 /* return the new audio buffer size (samples can be added or deleted
    to get better sync if video or external master clock) */
-static int synchronize_audio(VideoState *is, short *samples,
-                             int samples_size1, double pts)
+static int synchronize_audio(VideoState *is, short *samples, int samples_size1, double pts)
 {
     int n, samples_size;
     double ref_clock;
@@ -962,44 +954,38 @@ static int audio_decode_frame(VideoState *is, double *pts_ptr)
                     }
                 }
                 if (audio_resample) {
-                    av_opt_set_int(is->avr, "in_channel_layout",  is->frame->channel_layout, 0);
-                    av_opt_set_int(is->avr, "in_sample_fmt",      is->frame->format,         0);
-                    av_opt_set_int(is->avr, "in_sample_rate",     is->frame->sample_rate,    0);
-                    av_opt_set_int(is->avr, "out_channel_layout", is->audio_channel_layout,    0);
-                    av_opt_set_int(is->avr, "out_sample_fmt",     is->audio_sample_fmt,        0);
-                    av_opt_set_int(is->avr, "out_sample_rate",    is->audio_sample_rate,       0);
+                    av_opt_set_int(is->avr, "in_channel_layout", is->frame->channel_layout, 0);
+                    av_opt_set_int(is->avr, "in_sample_fmt", is->frame->format, 0);
+                    av_opt_set_int(is->avr, "in_sample_rate", is->frame->sample_rate, 0);
+                    av_opt_set_int(is->avr, "out_channel_layout", is->audio_channel_layout, 0);
+                    av_opt_set_int(is->avr, "out_sample_fmt", is->audio_sample_fmt, 0);
+                    av_opt_set_int(is->avr, "out_sample_rate", is->audio_sample_rate, 0);
 
                     if ((ret = avresample_open(is->avr)) < 0) {
                         fprintf(stderr, "error initializing libavresample\n");
                         break;
                     }
                 }
-                is->resample_sample_fmt     = (AVSampleFormat)is->frame->format;
+                is->resample_sample_fmt = (AVSampleFormat)is->frame->format;
                 is->resample_channel_layout = is->frame->channel_layout;
-                is->resample_sample_rate    = is->frame->sample_rate;
+                is->resample_sample_rate = is->frame->sample_rate;
             }
 
             if (audio_resample) {
                 void *tmp_out;
                 int out_samples, out_size, out_linesize;
-                int osize      = av_get_bytes_per_sample(is->audio_sample_fmt);
+                int osize = av_get_bytes_per_sample(is->audio_sample_fmt);
                 int nb_samples = is->frame->nb_samples;
 
                 out_size = av_samples_get_buffer_size(&out_linesize,
-                                                      is->audio_channels,
-                                                      nb_samples,
-                                                      is->audio_sample_fmt, 0);
+                    is->audio_channels, nb_samples, is->audio_sample_fmt, 0);
                 tmp_out = av_realloc(is->audio_buf1, out_size);
                 if (!tmp_out)
                     return AVERROR(ENOMEM);
                 is->audio_buf1 = (uint8_t*)tmp_out;
 
                 out_samples = avresample_convert(is->avr,
-                                                 &is->audio_buf1,
-                                                 out_linesize, nb_samples,
-                                                 is->frame->data,
-                                                 is->frame->linesize[0],
-                                                 is->frame->nb_samples);
+										&is->audio_buf1, out_linesize, nb_samples, is->frame->data, is->frame->linesize[0], is->frame->nb_samples);
                 if (out_samples < 0) {
                     fprintf(stderr, "avresample_convert() failed\n");
                     break;
@@ -1184,10 +1170,10 @@ static int stream_component_open(VideoState *is, int stream_index)
 
 				is->audio_hw_buf_size = spec.size;
         is->audio_hw_buf_size = 1024*is->audio_channels*ALSA_AUDIO_BUFFER_SIZE*2;
-        is->audio_sample_fmt          = AV_SAMPLE_FMT_S16;
-        is->resample_sample_fmt     = is->audio_sample_fmt;
+        is->audio_sample_fmt = AV_SAMPLE_FMT_S16;
+        is->resample_sample_fmt = is->audio_sample_fmt;
         is->resample_channel_layout = avctx->channel_layout;
-        is->resample_sample_rate    = avctx->sample_rate;
+        is->resample_sample_rate = avctx->sample_rate;
     }
 
     ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;
@@ -1601,7 +1587,8 @@ void avplay_init()
 
 	init_opts();
 				 
-	SDL_Init(SDL_INIT_AUDIO);
+	// SDL_Init(SDL_INIT_AUDIO);
+	SDL_InitSubSystem(SDL_INIT_AUDIO);
 }
 
 void avplay_release()
