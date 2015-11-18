@@ -161,6 +161,8 @@ class ColorAlphaTeste : public jgui::Frame{
 			jgui::Image *image = jgui::Image::CreateImage(buffer, size.width, size.height);
 			g->DrawImage(image, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
 			delete image;
+
+			delete [] buffer;
 		}
 
 };
