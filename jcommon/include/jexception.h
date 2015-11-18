@@ -59,8 +59,20 @@ class Exception : public virtual jcommon::Object, std::exception{
 		 * \brief Construtor.
 		 *
 		 */
+		Exception(const char *fmt, ...);
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		Exception(Exception *exception, std::string reason);
 
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+		Exception(jcommon::Exception *exception, const char *fmt, ...);
+		
 		/**
 		 * \brief Destrutor virtual.
 		 *
