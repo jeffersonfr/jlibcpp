@@ -29,6 +29,10 @@
 #define CLAMP(x, low, high) (((x) > (high)) ? (high) : (((x) < (low)) ? (low) : (x)))
 #endif
 
+#define ALPHA_PREMULTIPLY(color, alpha) ((color * alpha + 127) / 255)
+
+#define ALPHA_DEMULTIPLY(color, alpha) ((alpha == 0)?0:((color * 255 + alpha / 2) / alpha))
+
 namespace jgui{
 
 /**
@@ -36,21 +40,41 @@ namespace jgui{
  *
  */
 enum jcomposite_flags_t {
-	JCF_CLEAR			 = 0x0001,	// [0, 0]
-	JCF_SRC				 = 0x0002,	// [Sa, Sc]
-	JCF_SRC_OVER	 = 0x0004,	// [Sa + (1 - Sa)*Da, Rc = Sc + (1 - Sa)*Dc]
-	JCF_SRC_IN		 = 0x0008,	// [Sa * Da, Sc * Da]
-	JCF_SRC_OUT		 = 0x0010,	// [Sa * (1 - Da), Sc * (1 - Da)]
-	JCF_SRC_ATOP	 = 0x0020,	// [Da, Sc * Da + (1 - Sa) * Dc]
-	JCF_DST				 = 0x0040,	// [Da, Dc]
-	JCF_DST_OVER	 = 0x0080,	// [Sa + (1 - Sa)*Da, Rc = Dc + (1 - Da)*Sc]
-	JCF_DST_IN		 = 0x0100,	// [Sa * Da, Sa * Dc]
-	JCF_DST_OUT		 = 0x0200,	// [Da * (1 - Sa), Dc * (1 - Sa)
-	JCF_DST_ATOP	 = 0x0400,	// [Sa, Sa * Dc + Sc * (1 - Da)]
-	JCF_XOR				 = 0x0800,	// [Sa + Da - 2 * Sa * Da, Sc * (1 - Da) + (1 - Sa) * Dc]
-	JCF_ADD        = 0x1000,  // Saturate(S + D)
-	JCF_MULTIPLY   = 0x2000,  // [Sa * Da, Sc * Dc]
-	JCF_SCREEN     = 0x4000,  // [Sa + Da - Sa * Da, Sc + Dc - Sc * Dc]
+	// INFO:: Composition Modes
+	//
+	// aA, aB, aR: src alpha, dst alpha, result alpha
+	// xA, xB, xR: src color, dst color, result color
+	// xaA, xaB: aA*xA, aB*xB
+	JCF_CLEAR			 = 1,	// [0, 0]
+	JCF_SRC				 = 2,	// [aA, xA]
+	JCF_SRC_OVER	 = 3,	// [aA + aB·(1−aA), (xaA + xaB·(1−aA))/aR]
+	JCF_SRC_IN		 = 4,	// [aA·aB, xA]
+	JCF_SRC_OUT		 = 5,	// [aA·(1−aB), xA]
+	JCF_SRC_ATOP	 = 6,	// [aB, xaA + xB·(1−aA)]
+	JCF_DST				 = 7,	// [aB, xB]
+	JCF_DST_OVER	 = 8,	// [(1−aB)·aA + aB, (xaA·(1−aB) + xaB)/aR]
+	JCF_DST_IN		 = 9,	// [aA·aB, xB]
+	JCF_DST_OUT		 = 10,	// [(1−aA)·aB, xB]
+	JCF_DST_ATOP	 = 11,	// [aA, xA·(1−aB) + xaB]
+	JCF_XOR				 = 12,	// [aA + aB − 2·aA·aB, (xaA·(1−aB) + xaB·(1−aA))/aR]
+	JCF_ADD        = 13,  // [min(1, aA+aB), (xaA + xaB)/aR]
+	JCF_SATURATE   = 14,  // [min(1, aA+aB), (min(aA, 1−aB)·xA + xaB)/aR]
+	// INFO:: Blend Modes
+	//
+	// aR = aA + aB·(1−aA)
+	// xR = 1/aR · [ (1−aB)·xaA + (1−aA)·xaB + aA·aB·f(xA,xB) ]
+	JCF_MULTIPLY   = 15,  // f(xA,xB) = xA·xB
+	JCF_SCREEN     = 16,  // f(xA,xB) = xA + xB − xA·xB
+	JCF_OVERLAY    = 17,  // if (xB ≤ 0.5) f(xA,xB) = 2·xA·xB else f(xA,xB) = 1 − 2·(1 − xA)·(1 − xB)
+	JCF_DARKEN     = 18,  // f(xA,xB) = min(xA,xB)
+	JCF_LIGHTEN    = 19,  // f(xA,xB) = max(xA,xB)
+	JCF_DIFFERENCE = 20,  // f(xA,xB) = abs(xB−xA)
+	JCF_EXCLUSION  = 21,  // f(xA,xB) = xA + xB − 2·xA·xB
+	JCF_DODGE      = 22,  // if (xA < 1) f(xA,xB) = min(1, xB/(1−xA)) else f(xA,xB) = 1
+	JCF_BURN       = 23,  // if (xA > 0) f(xA,xB) = 1 − min(1, (1−xB)/xA) else f(xA,xB) = 0
+	JCF_HARD       = 24,  // if (xA ≤ 0.5) f(xA,xB) = 2·xA·xB else f(xA,xB) = 1 − 2·(1 − xA)·(1 − xB)
+	JCF_LIGHT      = 25  // if (xA ≤ 0.5) f(xA,xB) = xB − (1 − 2·xA)·xB·(1 − xB) else f(xA,xB) = xB + (2·xA − 1)·(g(xB) − xB),
+												// where, if (x ≤ 0.25) g(x) = ((16·x − 12)·x + 4)·x else g(x) = sqrt(x)
 };
 
 /**

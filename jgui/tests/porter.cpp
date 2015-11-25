@@ -119,8 +119,19 @@ class PorterTeste : public jgui::Frame {
 			
 			PaintComposition(g, "XOR", jgui::JCF_XOR, 0*(2*RECT_SIZE+16), 4*(2*RECT_SIZE+16));
 			PaintComposition(g, "ADD", jgui::JCF_ADD, 1*(2*RECT_SIZE+16), 4*(2*RECT_SIZE+16));
-			PaintComposition(g, "MULTIPLY", jgui::JCF_MULTIPLY, 2*(2*RECT_SIZE+16), 4*(2*RECT_SIZE+16));
-			PaintComposition(g, "SCREEN", jgui::JCF_SCREEN, 3*(2*RECT_SIZE+16), 4*(2*RECT_SIZE+16));
+			PaintComposition(g, "SATURATE", jgui::JCF_SATURATE, 2*(2*RECT_SIZE+16), 4*(2*RECT_SIZE+16));
+			PaintComposition(g, "MULTIPLY", jgui::JCF_MULTIPLY, 3*(2*RECT_SIZE+16), 4*(2*RECT_SIZE+16));
+			PaintComposition(g, "SCREEN", jgui::JCF_SCREEN, 4*(2*RECT_SIZE+16), 4*(2*RECT_SIZE+16));
+			PaintComposition(g, "OVERLAY", jgui::JCF_OVERLAY, 5*(2*RECT_SIZE+16), 4*(2*RECT_SIZE+16));
+			PaintComposition(g, "DARKEN", jgui::JCF_DARKEN, 6*(2*RECT_SIZE+16), 4*(2*RECT_SIZE+16));
+
+			PaintComposition(g, "LIGHTEN", jgui::JCF_LIGHTEN, 0*(2*RECT_SIZE+16), 5*(2*RECT_SIZE+16));
+			PaintComposition(g, "DIFFERENCE", jgui::JCF_DIFFERENCE, 1*(2*RECT_SIZE+16), 5*(2*RECT_SIZE+16));
+			PaintComposition(g, "EXCLUSION", jgui::JCF_EXCLUSION, 2*(2*RECT_SIZE+16), 5*(2*RECT_SIZE+16));
+			PaintComposition(g, "DODGE", jgui::JCF_DODGE, 3*(2*RECT_SIZE+16), 5*(2*RECT_SIZE+16));
+			PaintComposition(g, "BURN", jgui::JCF_BURN, 4*(2*RECT_SIZE+16), 5*(2*RECT_SIZE+16));
+			PaintComposition(g, "HARD", jgui::JCF_HARD, 5*(2*RECT_SIZE+16), 5*(2*RECT_SIZE+16));
+			PaintComposition(g, "LIGHT", jgui::JCF_LIGHT, 6*(2*RECT_SIZE+16), 5*(2*RECT_SIZE+16));
 		}
 
 };

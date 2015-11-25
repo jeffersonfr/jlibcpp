@@ -24,10 +24,6 @@
 
 namespace jgui {
 
-#define PREMULTIPLY(color, alpha) ((color * alpha + 127) / 255);
-
-#define DEMULTIPLY(color, alpha) ((alpha == 0)?0:((color * 255 + alpha / 2) / alpha));
-
 }
 
 #endif
