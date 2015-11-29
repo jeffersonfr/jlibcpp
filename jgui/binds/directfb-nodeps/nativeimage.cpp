@@ -90,7 +90,7 @@ bool CreateSurface(IDirectFBSurface **surface, jpixelformat_t pixelformat, int w
 	DFBSurfaceDescription desc;
 
 	desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT);
-	desc.caps = (DFBSurfaceCapabilities)(DSCAPS_SYSTEMONLY);
+	desc.caps = (DFBSurfaceCapabilities)(DSCAPS_SYSTEMONLY | DSCAPS_PREMULTIPLIED);
 	// desc.caps = (DFBSurfaceCapabilities)(DSCAPS_SYSTEMONLY);
 	desc.width = wp;
 	desc.height = hp;
@@ -275,7 +275,7 @@ NativeImage::NativeImage(std::string file):
 	}
 
 	dst->SetPorterDuff(dst, (DFBSurfacePorterDuffRule)(DSPD_NONE));
-	dst->SetBlittingFlags(dst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+	dst->SetBlittingFlags(dst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL | DSBLIT_SRC_PREMULTIPLY));
 	dst->Blit(dst, src, NULL, 0, 0);
 	
 	src->Release(src);
@@ -673,10 +673,12 @@ Image * NativeImage::Blend(Image *img, double alpha)
 	IDirectFBSurface *isrc = (IDirectFBSurface *)img->GetGraphics()->GetNativeSurface();
 	IDirectFBSurface *idst = (IDirectFBSurface *)image->GetGraphics()->GetNativeSurface();
 
+	DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL | DSBLIT_SRC_PREMULTIPLY);
+
 	idst->SetColor(idst, 0x00, 0x00, 0x00, (int)(alpha*255.0));
-	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL | DSBLIT_BLEND_COLORALPHA));
+	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(flags | DSBLIT_BLEND_COLORALPHA));
 	idst->Blit(idst, isrc, NULL, 0, 0);
-	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(flags));
 
 	return image;
 }
@@ -688,10 +690,12 @@ Image * NativeImage::Colorize(Image *img, Color color)
 	IDirectFBSurface *isrc = (IDirectFBSurface *)img->GetGraphics()->GetNativeSurface();
 	IDirectFBSurface *idst = (IDirectFBSurface *)image->GetGraphics()->GetNativeSurface();
 
+	DFBSurfaceBlittingFlags flags = (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL | DSBLIT_SRC_PREMULTIPLY);
+
 	idst->SetColor(idst, color.GetRed(), color.GetGreen(), color.GetBlue(), color.GetAlpha());
-	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL | DSBLIT_COLORIZE));
+	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(flags | DSBLIT_COLORIZE));
 	idst->Blit(idst, isrc, NULL, 0, 0);
-	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(DSBLIT_BLEND_ALPHACHANNEL));
+	idst->SetBlittingFlags(idst, (DFBSurfaceBlittingFlags)(flags));
 
 	return image;
 }

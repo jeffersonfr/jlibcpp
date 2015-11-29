@@ -203,7 +203,10 @@ void NativeGraphics::SetCompositeFlags(jcomposite_flags_t t)
 	} else if (_composite_flags == JCF_SRC_ATOP) {
 		_surface->SetPorterDuff(_surface, DSPD_SRC_ATOP);
 	} else if (_composite_flags == JCF_DST) {
+#if ((DIRECTFB_MAJOR_VERSION * 1000000) + (DIRECTFB_MINOR_VERSION * 1000) + DIRECTFB_MICRO_VERSION) >= 1007000
 		_surface->SetPorterDuff(_surface, DSPD_DST);
+#else
+#endif
 	} else if (_composite_flags == JCF_DST_OVER) {
 		_surface->SetPorterDuff(_surface, DSPD_DST_OVER);
 	} else if (_composite_flags == JCF_DST_IN) {
@@ -1307,10 +1310,11 @@ void NativeGraphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 			int di = 0;
 
 			for (int i=0; i<wp; i++) {
-				*(dst + di + 3) = *(src + si + 3);
-				*(dst + di + 2) = *(src + si + 2);
-				*(dst + di + 1) = *(src + si + 1);
-				*(dst + di + 0) = *(src + si + 0);
+				int alpha = *(src + si + 3);
+				*(dst + di + 3) = alpha;
+				*(dst + di + 2) = ALPHA_DEMULTIPLY(*(src + si + 2), alpha);
+				*(dst + di + 1) = ALPHA_DEMULTIPLY(*(src + si + 1), alpha);
+				*(dst + di + 0) = ALPHA_DEMULTIPLY(*(src + si + 0), alpha);
 
 				si = si + 4;
 				di = di + 4;
@@ -1616,9 +1620,9 @@ void NativeGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 							cb = 1.0;
 						}
 
-						fxr = (fpr <= 1.0)?(cr):(1.0);
-						fxg = (fpg <= 1.0)?(cg):(1.0);
-						fxb = (fpb <= 1.0)?(cb):(1.0);
+						fxr = (fr < 1.0)?cr:1.0;
+						fxg = (fg < 1.0)?cg:1.0;
+						fxb = (fb < 1.0)?cb:1.0;
 					} else if (_composite_flags == JCF_BURN) {
 						double cr = (1.0 - fpr)/fr;
 						double cg = (1.0 - fpg)/fg;
@@ -1636,21 +1640,21 @@ void NativeGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 							cb = 1.0;
 						}
 
-						fxr = (fpr <= 1.0)?(1.0-cr):(0.0);
-						fxg = (fpg <= 1.0)?(1.0-cg):(0.0);
-						fxb = (fpb <= 1.0)?(1.0-cb):(0.0);
+						fxr = (fr > 0.0)?(1.0-cr):0.0;
+						fxg = (fg > 0.0)?(1.0-cg):0.0;
+						fxb = (fb > 0.0)?(1.0-cb):0.0;
 					} else if (_composite_flags == JCF_HARD) {
-						fxr = (fpr <= 0.5)?(2*fr*fpr):(1.0 - 2*(1.0 - fr)*(1.0 - fpr));
-						fxg = (fpg <= 0.5)?(2*fg*fpg):(1.0 - 2*(1.0 - fg)*(1.0 - fpg));
-						fxb = (fpb <= 0.5)?(2*fb*fpb):(1.0 - 2*(1.0 - fb)*(1.0 - fpb));
+						fxr = (fr <= 0.5)?(2*fr*fpr):(1.0 - 2*(1.0 - fr)*(1.0 - fpr));
+						fxg = (fg <= 0.5)?(2*fg*fpg):(1.0 - 2*(1.0 - fg)*(1.0 - fpg));
+						fxb = (fb <= 0.5)?(2*fb*fpb):(1.0 - 2*(1.0 - fb)*(1.0 - fpb));
 					} else if (_composite_flags == JCF_LIGHT) {
 						double gr = (fpr <= 0.25)?(((16*fpr - 12)*fpr + 4)*fpr):(sqrt(fpr));
 						double gg = (fpg <= 0.25)?(((16*fpg - 12)*fpg + 4)*fpg):(sqrt(fpg));
 						double gb = (fpb <= 0.25)?(((16*fpb - 12)*fpb + 4)*fpb):(sqrt(fpb));
 
-						fxr = (fpr <= 0.5)?(fpr - (1.0 - 2*fr)*fpr*(1.0 - fpr)):(fpr + (2*fr - 1.0)*(gr - fpr));
-						fxg = (fpg <= 0.5)?(fpg - (1.0 - 2*fg)*fpg*(1.0 - fpg)):(fpg + (2*fg - 1.0)*(gg - fpg));
-						fxb = (fpb <= 0.5)?(fpb - (1.0 - 2*fb)*fpb*(1.0 - fpb)):(fpb + (2*fb - 1.0)*(gb - fpb));
+						fxr = (fr <= 0.5)?(fpr - (1.0 - 2*fr)*fpr*(1.0 - fpr)):(fpr + (2*fr - 1.0)*(gr - fpr));
+						fxg = (fg <= 0.5)?(fpg - (1.0 - 2*fg)*fpg*(1.0 - fpg)):(fpg + (2*fg - 1.0)*(gg - fpg));
+						fxb = (fb <= 0.5)?(fpb - (1.0 - 2*fb)*fpb*(1.0 - fpb)):(fpb + (2*fb - 1.0)*(gb - fpb));
 					}
 						
 					pr = (int)((c1 * (c2*fr + c3*fpr + c4*fxr)) * 255);
@@ -1775,11 +1779,11 @@ bool NativeGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, i
 
 		DFBSurfaceBlittingFlags blit = DSBLIT_BLEND_ALPHACHANNEL;
 
-		if (_premultiply == true && g->_premultiply == false) {
+		if (_premultiply == false && g->_premultiply == true) {
 			blit = (DFBSurfaceBlittingFlags)(blit | DSBLIT_DEMULTIPLY);
 		}
 
-		// _surface->SetBlittingFlags(_surface, blit);
+		_surface->SetBlittingFlags(_surface, blit);
 
 		_surface->Blit(_surface, dfb_surface, NULL, xp+_translate.x, yp+_translate.y);
 	} else {
@@ -1830,11 +1834,11 @@ bool NativeGraphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, i
 
 		DFBSurfaceBlittingFlags blit = DSBLIT_BLEND_ALPHACHANNEL;
 
-		if (_premultiply == true && g->_premultiply == false) {
+		if (_premultiply == false && g->_premultiply == true) {
 			blit = (DFBSurfaceBlittingFlags)(blit | DSBLIT_DEMULTIPLY);
 		}
 
-		// _surface->SetBlittingFlags(_surface, blit);
+		_surface->SetBlittingFlags(_surface, blit);
 
 		_surface->Blit(_surface, dfb_surface, NULL, xp+_translate.x, yp+_translate.y);
 	} else {

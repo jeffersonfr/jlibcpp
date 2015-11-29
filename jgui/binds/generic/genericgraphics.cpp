@@ -1691,9 +1691,9 @@ void GenericGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 							cb = 1.0;
 						}
 
-						fxr = (fpr <= 1.0)?(cr):(1.0);
-						fxg = (fpg <= 1.0)?(cg):(1.0);
-						fxb = (fpb <= 1.0)?(cb):(1.0);
+						fxr = (fr < 1.0)?cr:1.0;
+						fxg = (fg < 1.0)?cg:1.0;
+						fxb = (fb < 1.0)?cb:1.0;
 					} else if (_composite_flags == JCF_BURN) {
 						double cr = (1.0 - fpr)/fr;
 						double cg = (1.0 - fpg)/fg;
@@ -1711,21 +1711,21 @@ void GenericGraphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 							cb = 1.0;
 						}
 
-						fxr = (fpr <= 1.0)?(1.0-cr):(0.0);
-						fxg = (fpg <= 1.0)?(1.0-cg):(0.0);
-						fxb = (fpb <= 1.0)?(1.0-cb):(0.0);
+						fxr = (fr > 0.0)?(1.0-cr):0.0;
+						fxg = (fg > 0.0)?(1.0-cg):0.0;
+						fxb = (fb > 0.0)?(1.0-cb):0.0;
 					} else if (_composite_flags == JCF_HARD) {
-						fxr = (fpr <= 0.5)?(2*fr*fpr):(1.0 - 2*(1.0 - fr)*(1.0 - fpr));
-						fxg = (fpg <= 0.5)?(2*fg*fpg):(1.0 - 2*(1.0 - fg)*(1.0 - fpg));
-						fxb = (fpb <= 0.5)?(2*fb*fpb):(1.0 - 2*(1.0 - fb)*(1.0 - fpb));
+						fxr = (fr <= 0.5)?(2*fr*fpr):(1.0 - 2*(1.0 - fr)*(1.0 - fpr));
+						fxg = (fg <= 0.5)?(2*fg*fpg):(1.0 - 2*(1.0 - fg)*(1.0 - fpg));
+						fxb = (fb <= 0.5)?(2*fb*fpb):(1.0 - 2*(1.0 - fb)*(1.0 - fpb));
 					} else if (_composite_flags == JCF_LIGHT) {
 						double gr = (fpr <= 0.25)?(((16*fpr - 12)*fpr + 4)*fpr):(sqrt(fpr));
 						double gg = (fpg <= 0.25)?(((16*fpg - 12)*fpg + 4)*fpg):(sqrt(fpg));
 						double gb = (fpb <= 0.25)?(((16*fpb - 12)*fpb + 4)*fpb):(sqrt(fpb));
 
-						fxr = (fpr <= 0.5)?(fpr - (1.0 - 2*fr)*fpr*(1.0 - fpr)):(fpr + (2*fr - 1.0)*(gr - fpr));
-						fxg = (fpg <= 0.5)?(fpg - (1.0 - 2*fg)*fpg*(1.0 - fpg)):(fpg + (2*fg - 1.0)*(gg - fpg));
-						fxb = (fpb <= 0.5)?(fpb - (1.0 - 2*fb)*fpb*(1.0 - fpb)):(fpb + (2*fb - 1.0)*(gb - fpb));
+						fxr = (fr <= 0.5)?(fpr - (1.0 - 2*fr)*fpr*(1.0 - fpr)):(fpr + (2*fr - 1.0)*(gr - fpr));
+						fxg = (fg <= 0.5)?(fpg - (1.0 - 2*fg)*fpg*(1.0 - fpg)):(fpg + (2*fg - 1.0)*(gg - fpg));
+						fxb = (fb <= 0.5)?(fpb - (1.0 - 2*fb)*fpb*(1.0 - fpb)):(fpb + (2*fb - 1.0)*(gb - fpb));
 					}
 						
 					pr = (int)((c1 * (c2*fr + c3*fpr + c4*fxr)) * 255);
