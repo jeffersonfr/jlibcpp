@@ -47,7 +47,7 @@ void RemoteIPCClient::CallMethod(Method *method, Response **response)
 	}
 
 	try {
-		jsocket::Socket client(_host, _port);
+		jsocket::Socket client(_host, _port, _call_timeout);
 
 		std::string encoded = method->Encode();
 		const char *buffer = encoded.c_str();
