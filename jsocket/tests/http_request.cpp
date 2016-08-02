@@ -191,7 +191,9 @@ class HTTPRequest : public jthread::Thread {
 					_resource_size = 0;
 				}
 
-				c->Close();
+				if (c != NULL) {
+					c->Close();
+				}
 
 				std::cerr << "error [" << strerror(errno) << "]: " << e.what() << std::endl;
 			}

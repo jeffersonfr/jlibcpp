@@ -266,57 +266,57 @@ void Socket::ConnectSocket(InetAddress *addr_, int port_)
 	}
 #else
 	if (_timeout > 0) {
-		int opt = 1;
+		long arg;
 
-		ioctl(_fd, FIONBIO, &opt);
+		if( (arg = fcntl(_fd, F_GETFL, NULL)) < 0) { 
+			throw SocketException("Cannont set non blocking socket");
+		}
+
+		arg |= O_NONBLOCK; 
+
+		if( fcntl(_fd, F_SETFL, arg) < 0) { 
+			throw SocketException("Cannont set non blocking socket");
+		} 
 
 		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
 
-		if (r != 0) {
-			if (errno != EINPROGRESS) {
-				throw SocketException("Connection error");
-			}
+		if (r < 0) {
+			if (errno == EINPROGRESS) { 
+				// EINPROGRESS in connect() - selecting
+				do { 
+					struct timeval tv; 
+					fd_set wset;
 
-			fd_set wset;
-			struct timeval t;
+					tv.tv_sec = _timeout/1000;
+					tv.tv_usec = (_timeout%1000)*1000;
 
-			t.tv_sec = _timeout/1000;
-			t.tv_usec = (_timeout%1000)*1000;
+					FD_ZERO(&wset); 
+					FD_SET(_fd, &wset); 
 
-			FD_ZERO(&wset);
-			FD_SET(_fd, &wset);
+					r = select(_fd+1, NULL, &wset, NULL, &tv); 
 
-			r = select(_fd + 1, &wset, &wset, &wset, &t);
+					if (r < 0 && errno != EINTR) { 
+						throw SocketException("Connection error");
+					} else if (r > 0) { 
+						socklen_t len = sizeof(int); 
+						int val; 
+						
+						if (getsockopt(_fd, SOL_SOCKET, SO_ERROR, (void*)(&val), &len) < 0) { 
+							throw SocketException("Unknown error in getsockopt()");
+						} 
 
-			if (r <= 0) {
-				opt = 0;
+						if (val) { 
+							throw SocketException("Error in delayed connection");
+						}
 
-				if (ioctl(_fd, FIONBIO, &opt) < 0) {
-					throw SocketException("Connection error");
-				}
-
-				shutdown(_fd, SHUT_RDWR);
-
-				if (r == 0) {
-					throw SocketException("Socket connection timeout exception");
-				} else if (r < 0) {
-					throw SocketException("Connection error");
-				}
-			}
-
-			int optlen = sizeof(r);
-
-			getsockopt(_fd, SOL_SOCKET, SO_ERROR, (void *)&r, (socklen_t *)&optlen);
-
-			if (r != 0) {
+						break; 
+					} else { 
+						throw SocketException("Socket connection timeout exception");
+					} 
+				} while (true); 
+			} else { 
 				throw SocketException("Unknown error");
-			}
-		}
-
-		opt = 0;
-
-		if (ioctl(_fd, FIONBIO, &opt) < 0) {
-			throw SocketException("Connection error");
+			} 
 		}
 	} else {
 		r = connect(_fd, (struct sockaddr *)&_server_sock, sizeof(_server_sock));
