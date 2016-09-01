@@ -392,6 +392,27 @@ void Process::Start()
 
 	_handle = pi.hProcess;
 	_pid = GetProcessId(_handle);
+#else
+	if (_process.empty() == true) {
+		ForkChild();
+	} else {
+		jcommon::StringTokenizer tokens(_process, " ", jcommon::JTT_STRING, false);
+
+		int length = tokens.GetSize();
+		char *argv[length+1];
+
+		for (int i=0; i<length; i++) {
+			argv[i] = (char *)strdup(tokens.GetToken(i).c_str());
+		}
+
+		argv[length] = NULL;
+
+		ForkChild(argv[0], argv);
+		
+		for (int i=0; i<length; i++) {
+			free(argv[i]);
+		}
+	}
 #endif
 }
 
