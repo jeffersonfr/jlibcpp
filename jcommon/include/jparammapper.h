@@ -92,6 +92,12 @@ class ParamMapper : public virtual jcommon::Object{
 		 * \brief 
 		 *
 		 */
+		virtual std::string GetParamByIndex(int index);
+
+		/**
+		 * \brief 
+		 *
+		 */
 		virtual void SetTextParam(std::string key, std::string value);
 
 		/**
@@ -117,6 +123,12 @@ class ParamMapper : public virtual jcommon::Object{
 		 *
 		 */
 		virtual void SetArrayParam(std::string key, uint8_t *value, uint64_t value_size);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetParamByIndex(int index, std::string value);
 
 		/**
 		 * \brief

@@ -114,6 +114,21 @@ std::string ParamMapper::GetArrayParam(std::string key, std::string value)
 	return value;
 }
 
+std::string ParamMapper::GetParamByIndex(int index)
+{
+	if (index < 0 || index >= (int)_params.size()) {
+		throw OutOfBoundsException("Index out of index");
+	}
+
+	std::map<std::string, std::string>::iterator i=_params.begin();
+
+	for (int j=0; j<=index; j++) {
+		i++;
+	}
+
+	return i->second;
+}
+
 void ParamMapper::SetTextParam(std::string key, std::string value)
 {
 	_params[key] = value;
@@ -155,6 +170,25 @@ void ParamMapper::SetArrayParam(std::string key, uint8_t *value, uint64_t value_
 	}
 
 	_params[key] = std::string((const char *)value, value_size);
+}
+
+void ParamMapper::SetParamByIndex(int index, std::string value)
+{
+	if (_params.size() < 1) {
+		throw OutOfBoundsException("List of parameters is empty");
+	}
+
+	if (index < 0 || index >= (int)_params.size()) {
+		throw OutOfBoundsException("Index out of index");
+	}
+
+	std::map<std::string, std::string>::iterator i=_params.begin();
+
+	for (int j=0; j<=index; j++) {
+		i++;
+	}
+
+	i->second = value;
 }
 
 void ParamMapper::RemoveParamByID(std::string id)

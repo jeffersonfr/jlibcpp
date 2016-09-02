@@ -51,31 +51,18 @@ void Properties::Load(std::string filename_, std::string escape_)
 
 	while (std::getline(reader, line)) {
 		if (line.find("#") == 0) {
-				struct jproperty_t prop;
-	
-				prop.value = line;
-				prop.comment = true;
-					
-				_properties.push_back(prop);
+			// INFO:: comments
 		} else {
 			std::string::size_type r1 = line.find(escape_);
 			std::string::size_type r2 = line.find("#");
 
 			if (line.size() > 0 && r1 != std::string::npos && (r2 == std::string::npos || (r2 != std::string::npos && r1 < r2))) {
-				struct jproperty_t prop;
+				std::string key = jcommon::StringUtils::Trim(line.substr(0, r1));
+				std::string value = jcommon::StringUtils::Trim(line.substr(r1+1));
 
-				prop.key = jcommon::StringUtils::Trim(line.substr(0, r1));
-				prop.value = jcommon::StringUtils::Trim(line.substr(r1+1));
-				prop.comment = false;
-
-				_properties.push_back(prop);
+				SetTextParam(key, value);
 			} else {
-				struct jproperty_t prop;
-	
-				prop.value = line;
-				prop.comment = true;
-					
-				_properties.push_back(prop);
+				// INFO:: comments
 			}
 		}
 	}
@@ -93,21 +80,19 @@ void Properties::Save(std::string escape_)
 		file = jio::File::OpenFile(_filename, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_TRUNCATE));
 	
 		if (file == NULL) {
-			throw RuntimeException("Unable to save properties");
+			file = jio::File::CreateFile(_filename, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_TRUNCATE));
+		
+			if (file == NULL) {
+				throw RuntimeException("Unable to save properties");
+			}
 		}
 
-		for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
-			std::ostringstream o;
-			
-			jproperty_t p = *i;
-			
-			if (p.comment == false) {
-				o << p.key << " " << escape_ << " " << p.value << std::endl;
-			} else {
-				o << p.value << std::endl;
-			}
+		std::map<std::string, std::string> params = GetParameters();
 
-			file->Write(o.str().c_str(), (long)o.str().size());
+		for (std::map<std::string, std::string>::iterator i=params.begin(); i!=params.end(); i++) {
+			std::string line = i->first + " " + escape_ + " " + i->second + "\n";
+
+			file->Write(line.c_str(), (int64_t)line.size());
 		}
 
 		file->Flush();
@@ -121,111 +106,6 @@ void Properties::Save(std::string escape_)
 
 		throw e;
 	}
-}
-
-void Properties::SetPropertyByName(std::string key, std::string value)
-{
-	jthread::AutoLock lock(&_mutex);
-
-	for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
-		if ((*i).comment == false && (*i).key == key) {
-			(*i).value = value;
-
-			return;
-		}
-	}
-
-	struct jproperty_t p;
-
-	p.key = key;
-	p.value = value;
-	p.comment = false;
-
-	_properties.push_back(p);
-}
-
-void Properties::SetPropertyByIndex(int index, std::string value)
-{
-	if ((int)_properties.size() == 0 || index < 0 || index > (int)_properties.size()-1) {
-		throw IllegalArgumentException("Index out of bounds");
-	}
-
-	int k = 0;
-
-	for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++, k++) {
-		if (k == index) {
-			jproperty_t p = *i;
-
-			p.value = value;
-
-			break;
-		}
-	}
-}
-
-std::string Properties::GetPropertyByName(std::string key, std::string reserv)
-{
-	jthread::AutoLock lock(&_mutex);
-
-	for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
-		jproperty_t p = *i;
-		
-		if (p.comment == false && p.key == key) {
-			return p.value;
-		}
-	}
-	
-	return reserv;
-}
-
-std::string Properties::GetPropertyByIndex(int index, std::string reserv)
-{
-	jthread::AutoLock lock(&_mutex);
-
-	if ((int)_properties.size() == 0 || index < 0 || index > (int)_properties.size()-1) {
-		return reserv;
-	}
-
-	return _properties[index].value;
-}
-
-void Properties::RemovePropertyByName(std::string key)
-{
-	jthread::AutoLock lock(&_mutex);
-
-	for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
-		if ((*i).key == key) {
-			_properties.erase(i);
-
-			break;
-		}
-	}
-}
-
-void Properties::RemovePropertyByIndex(int index)
-{
-	jthread::AutoLock lock(&_mutex);
-
-	if ((int)_properties.size() == 0 || index < 0 || index > (int)_properties.size()-1) {
-		throw IllegalArgumentException("Index out of bounds");
-	}
-
-	_properties.erase(_properties.begin()+index);
-}
-
-std::vector<std::string> Properties::GetProperties()
-{
-	jthread::AutoLock lock(&_mutex);
-
-	std::vector<std::string> properties;
-
-	for (std::vector<struct jproperty_t>::iterator i=_properties.begin(); i != _properties.end(); i++) {
-		if ((*i).comment == false) {
-			properties.push_back((*i).key);	
-		}
-	}
-	
-	return properties;
 }
 
 }

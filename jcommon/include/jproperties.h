@@ -20,6 +20,7 @@
 #ifndef J_PROPERTIES_H
 #define J_PROPERTIES_H
 
+#include "jparammapper.h"
 #include "jmutex.h"
 
 #include <string>
@@ -28,24 +29,16 @@
 
 namespace jcommon {
 
-struct jproperty_t {
-	std::string key;
-	std::string value;
-	bool comment;
-};
-
 /**
  * \brief
  * 
  * \author Jeff Ferr
  */
-class Properties : public virtual jcommon::Object{
+class Properties : public virtual jcommon::ParamMapper{
 
 	private:
 		/** \brief */
 		jthread::Mutex _mutex;
-		/** \brief */
-		std::vector<struct jproperty_t> _properties;
 		/** \brief */
 		std::string _filename;
 		/** \brief */
@@ -76,48 +69,6 @@ class Properties : public virtual jcommon::Object{
 		 */
 		void Save(std::string escape = "=");
 	
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPropertyByName(std::string key, std::string value);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void SetPropertyByIndex(int index, std::string value);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPropertyByName(std::string key, std::string reserv = std::string(""));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		std::string GetPropertyByIndex(int index, std::string reserv = std::string(""));
-		
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePropertyByName(std::string key);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		void RemovePropertyByIndex(int index);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		std::vector<std::string> GetProperties();
-
 };
 
 }
