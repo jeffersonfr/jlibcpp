@@ -781,6 +781,8 @@ class DemuxTest : public jmpeg::DemuxListener {
 						description = "Outros";
 					}
 				}
+
+				printf("Description:: %s\n", description.c_str());
 			} else if (descriptor_tag == 0x55) { // parental rating descriptor
 				std::string country = std::string(ptr, 3);
 				int rate = TS_G8(ptr+3);
@@ -1768,13 +1770,15 @@ class DemuxTest : public jmpeg::DemuxListener {
 class ISDBTInputStream : public jio::FileInputStream {
 
 	private:
-		int _packet_size;
+		int _lgap;
+		int _rgap;
 
 	public:
-		ISDBTInputStream(std::string file, int packet_size):
+		ISDBTInputStream(std::string file, int lgap, int rgap):
 			jio::FileInputStream(file)
 		{
-			_packet_size = packet_size;
+			_lgap = lgap;
+			_rgap = rgap;
 		}
 		
 		virtual ~ISDBTInputStream() 
@@ -1783,14 +1787,14 @@ class ISDBTInputStream : public jio::FileInputStream {
 		
 		virtual int64_t Read(char *data, int64_t size)
 		{
-			char tmp[_packet_size];
-			int64_t r = jio::FileInputStream::Read(tmp, _packet_size);
+			char tmp[_lgap+size+_rgap];
+			int64_t r = jio::FileInputStream::Read(tmp, _lgap+size+_rgap);
 
 			if (r <= 0) {
 				return -1LL;
 			}
 
-			memcpy(data, tmp, size);
+			memcpy(data, tmp+_lgap, size);
 
 			return size;
 		}
@@ -1798,14 +1802,23 @@ class ISDBTInputStream : public jio::FileInputStream {
 
 int main(int argc, char **argv)
 {
-	if (argc != 3) {
-		std::cout << "usage:: " << argv[0] << " <file.ts> <packet size>" << std::endl;
+	if (argc != 4) {
+		std::cout << "usage:: " << argv[0] << " <file.ts> <lgap> <rgap>" << std::endl;
+		std::cout << std::endl;
+		std::cout << "  lgap: bytes before ts packet (lgap+188 bytes)" << std::endl;
+		std::cout << "  rgap: bytes after ts packet (188+rgap bytes)" << std::endl;
+		std::cout << std::endl;
+		std::cout << "  examples ..." << std::endl;
+		std::cout << "    DVB Packet Size (0+188+0 = 188 bytes) -> (lgap, rgap) = (0, 0)" << std::endl;
+		std::cout << "    ISDBT Packet Size (0+188+16 = 204 bytes) -> (lgap, rgap) = (0, 16)" << std::endl;
+		std::cout << "    MTS Packet Size (4+188+0 = 192 bytes) -> (lgap, rgap) = (4, 0)" << std::endl;
+		std::cout << std::endl;
 
 		return -1;
 	}
 
 	jmpeg::DemuxManager *manager = jmpeg::DemuxManager::GetInstance();
-	ISDBTInputStream is(argv[1], atoi(argv[2]));
+	ISDBTInputStream is(argv[1], atoi(argv[2]), atoi(argv[3]));
 
 	manager->SetInputStream(&is);
 	manager->Start();
