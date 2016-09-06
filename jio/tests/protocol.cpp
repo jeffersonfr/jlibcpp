@@ -62,7 +62,7 @@ class Server : public jthread::Thread {
 				int integer = reader.ReadInteger();
 				char *raw = reader.ReadRaw(&buffer_size);
 
-				std::cout << "Client:: Receive:: "
+				std::cout << "Server:: "
 					<< "[" << (const char *)raw << "]" 
 					"[" << integer << "]"
 					"[" << str << "]"
@@ -75,10 +75,10 @@ class Server : public jthread::Thread {
 				jio::BufferWriter writer;
 
 				writer.WriteBoolean(true);
-				writer.WriteFloat(20.0);
-				writer.WriteString("testando 1 2 3 ...");
-				writer.WriteInteger(30);
-				writer.WriteRaw("Jeff Ferr", 9+1);
+				writer.WriteFloat(-1.0);
+				writer.WriteString("testando 3 2 1 ...");
+				writer.WriteInteger(-10);
+				writer.WriteRaw("Jeff Ferr *", 11+1);
 			
 				socket->Send(writer.GetData().c_str(), writer.GetData().size());
 			}
@@ -105,11 +105,11 @@ class Client : public jthread::Thread {
 
 			jio::BufferWriter writer;
 
-			writer.WriteBoolean(true);
-			writer.WriteFloat(2.0);
+			writer.WriteBoolean(false);
+			writer.WriteFloat(1.0);
 			writer.WriteString("testando 1 2 3 ...");
-			writer.WriteInteger(3);
-			writer.WriteRaw("Ferr Jeff", 9+1);
+			writer.WriteInteger(10);
+			writer.WriteRaw("* Jeff Ferr", 11+1);
 
 			socket.Send(writer.GetData().c_str(), writer.GetData().size());
 
@@ -127,7 +127,7 @@ class Client : public jthread::Thread {
 				int integer = reader.ReadInteger();
 				char *raw = reader.ReadRaw(&buffer_size);
 
-				std::cout << "Client:: Receive:: "
+				std::cout << "Client:: "
 					<< "[" << (const char *)raw << "]" 
 					"[" << integer << "]"
 					"[" << str << "]"
