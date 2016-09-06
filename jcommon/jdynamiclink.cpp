@@ -55,6 +55,8 @@ void DynamicLink::Load(std::string lib, jlink_flags_t mode)
 	if (_handle == NULL) {
 		throw RuntimeException(dlerror());
 	}
+	
+	dlerror();
 #endif
 }
 
@@ -63,13 +65,7 @@ void * DynamicLink::FindSymbol(std::string symbol)
 #ifdef WIN32
 	return GetProcAddress((HMODULE)_handle, symbol.c_str());
 #else
-	void *sym = dlsym(_handle, symbol.c_str());
-
-	if (sym == NULL) {
-		return NULL;
-	}
-
-	return (void *)sym;
+	return dlsym(_handle, symbol.c_str());
 #endif
 }
 

@@ -31,6 +31,8 @@
 
 #include <iostream>
 
+#include <gnu/lib-names.h>
+
 namespace teste {
 	
 class Teste : public jcommon::Object{
@@ -73,13 +75,14 @@ void testTrim()
 void testLink()
 {
 	jcommon::DynamicLink link;
-	double (**cossine)(double) = NULL;
+	double (*cosine)(double) = NULL;
 
-	link.Load("libm.so", jcommon::JLF_LAZY);
-	
-	*(void **)(cossine) = link.FindSymbol("cos");
+	link.Load(LIBM_SO, jcommon::JLF_LAZY);
 
-	std::cout << "Cos(0.0) = " << (*cossine)(0.0) << std::endl;
+	*(void **)(&cosine) = link.FindSymbol("cos");
+	// cosine = (double (*)(double))link.FindSymbol("cos");
+
+	std::cout << "Cos(0.0) = " << (*cosine)(0.0) << std::endl;
 	
 	link.Unload();
 }
@@ -88,7 +91,7 @@ void testProperties()
 {
 	jcommon::Properties p;
 
-	p.Load("/var/dlive/config/reflector.ini");
+	p.Load("properties.ini");
 	p.Save();
 }
 
@@ -231,17 +234,17 @@ void html_parser_test()
 
 int main(int argc, char *argv[])
 {
-	//testObject();
+	testObject();
 	testTrim();
-	//testLink();
-	//testProperties();
-	//testSystem();
-	//testStringToken();
+	testLink();
+	testProperties();
+	testSystem();
+	testStringToken();
 	testURL();
-	//testOptions(argc, argv);
-	//testDate();
-	//create_xml_file();
-	//html_parser_test();
+	testOptions(argc, argv);
+	testDate();
+	create_xml_file();
+	html_parser_test();
 
 	return EXIT_SUCCESS;
 }
