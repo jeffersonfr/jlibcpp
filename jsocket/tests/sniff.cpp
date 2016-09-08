@@ -48,7 +48,7 @@
 using namespace jsocket;
 using namespace jio;
 
-void set_col(char fg_color,char bg_color)
+void set_col(int fg_color, int bg_color)
 {
 	fg_color += 30; bg_color += 40;
 	std::cout << "\033[" << fg_color << ";" << bg_color << "m" << std::flush;
@@ -70,7 +70,7 @@ char * Indirizzo(unsigned int I)
 void LoggaUDP(struct udphdr *uh, unsigned long S, unsigned long D )
 {
 	set_col(CYN,BLK);
-	std::cout << "UDP  ";
+	std::cout << "UDP";
 	nocol();
 	set_col(RED,BLK);
 	std::cout << "packet from " << Indirizzo(S) << " on (" << ntohs(uh->dest) << ")";
@@ -155,7 +155,7 @@ void LoggaConnessioneTCP( struct tcphdr  * th, unsigned long S, unsigned long D)
 	nocol();
 	std::cout << std::endl;
 }
-void sniffer() 
+void sniffer(std::string device) 
 {
 	char receive[4098];
 	struct tcphdr  *tcp_header;
@@ -175,7 +175,7 @@ void sniffer()
 	ContaTCP = ContaUDP = QuantiUDP = ContaICMP = QuantiICMP = 0;
 
 	try {
-		RawSocket sniff("lo");
+		RawSocket sniff(device);
 
 		do {
 			if ((r = sniff.Receive(receive, sizeof(receive))) <= 0) {
@@ -230,11 +230,17 @@ void sniffer()
 	}
 }
 
-int main()
+int main(int argc, char **argv)
 {
+	if (argc != 2) {
+		std::cout << "usage:: " << argv[0] << " <device>" << std::endl;
+
+		return 0;
+	}
+
 	InitializeSocketLibrary();
 
-	sniffer();
+	sniffer(argv[1]);
 
 	ReleaseSocketLibrary();
 }
