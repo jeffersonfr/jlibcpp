@@ -139,20 +139,16 @@ void NativeHandler::InitEngine()
 	DirectFBSetOption("linux-input-devices", "keyboard");
 	*/
 
-	std::vector<std::string> v;
+	std::map<std::string, std::string> v;
 	jcommon::Properties p;
 
 	try {
 		p.Load("/etc/directfbrc");
-		v = p.GetProperties();
+		v = p.GetParameters();
 
-		for (std::vector<std::string>::iterator i=v.begin(); i!=v.end(); i++) {
-			std::string value = p.GetPropertyByName((*i), "nono");
-
-			if (value != "nono") {
-				// INFO:: /usr/local/etc/directfbrc
-				DirectFBSetOption((*i).c_str(), value.c_str());
-			}
+		for (std::map<std::string, std::string>::iterator i=v.begin(); i!=v.end(); i++) {
+			// INFO:: /usr/local/etc/directfbrc
+			DirectFBSetOption(i->first.c_str(), i->second.c_str());
 		}
 	} catch (...) {
 	}

@@ -156,7 +156,7 @@ class NativeGraphics : public virtual jgui::Graphics{
 		 * \brief
 		 *
 		 */
-		virtual void Dump(std::string dir, std::string pre);
+		virtual std::string Dump(std::string dir, std::string pre);
 
 		/**
 		 * \brief

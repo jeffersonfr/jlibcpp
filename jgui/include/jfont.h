@@ -228,4 +228,4 @@ class Font : public virtual jcommon::Object{
 
 }
 
-#endif /*DFBHANDLER_H_*/
+#endif

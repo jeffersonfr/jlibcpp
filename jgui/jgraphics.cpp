@@ -62,8 +62,9 @@ Path * Graphics::CreatePath()
 	return NULL;
 }
 
-void Graphics::Dump(std::string dir, std::string pre)
+std::string Graphics::Dump(std::string dir, std::string pre)
 {
+	return "";
 }
 
 void Graphics::SetVerticalSyncEnabled(bool b)

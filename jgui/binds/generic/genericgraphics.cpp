@@ -33,6 +33,7 @@
 #include "jcharset.h"
 #include "joutofboundsexception.h"
 #include "jnullpointerexception.h"
+#include "jioexception.h"
 
 #define M_2PI	(2*M_PI)
 	
@@ -102,30 +103,36 @@ Path * GenericGraphics::CreatePath()
 	return new GenericPath(this);
 }
 		
-void GenericGraphics::Dump(std::string dir, std::string prefix)
+std::string GenericGraphics::Dump(std::string dir, std::string prefix)
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 
 	if (cairo_surface == NULL) {
-		return;
+		throw jcommon::NullPointerException("The surface is null");
 	}
 
+	/*
 	mkdir(dir.c_str(), 0755);
 	
 	if (dir.empty() == false) {
 		prefix = dir + "/" + prefix;
 	}
+	*/
 
-	jio::File *temp = jio::File::CreateTemporaryFile(prefix, ".png");
+	jio::File *temp = jio::File::CreateTemporaryFile(dir, prefix, ".png");
 
 	if (temp == NULL) {
-		return;
+		throw jio::IOException("Cannot create the temporary image file");
 	}
+
+	std::string name = temp->GetName();
 
 	cairo_surface_flush(cairo_surface);
 	cairo_surface_write_to_png(cairo_surface, temp->GetAbsolutePath().c_str());
 	
 	delete temp;
+
+	return name;
 }
 
 jregion_t GenericGraphics::ClipRect(int xp, int yp, int wp, int hp)

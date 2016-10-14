@@ -289,7 +289,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual void Dump(std::string dir, std::string pre);
+		virtual std::string Dump(std::string dir, std::string pre);
 
 		/**
 		 * \brief

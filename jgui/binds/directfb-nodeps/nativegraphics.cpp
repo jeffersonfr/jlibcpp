@@ -99,6 +99,8 @@ void NativeGraphics::Dump(std::string dir, std::string prefix)
 	if (_surface != NULL) {
 		_surface->Dump(_surface, dir.c_str(), prefix.c_str());
 	}
+
+	return "";
 }
 
 jregion_t NativeGraphics::ClipRect(int xp, int yp, int wp, int hp)

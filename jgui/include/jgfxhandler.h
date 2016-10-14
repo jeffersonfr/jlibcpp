@@ -223,4 +223,4 @@ class GFXHandler : public virtual jcommon::Object{
 
 }
 
-#endif /*GFXHANDLER_H_*/
+#endif 

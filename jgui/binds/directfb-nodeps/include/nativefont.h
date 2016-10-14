@@ -166,4 +166,4 @@ class NativeFont : public virtual jgui::Font{
 
 }
 
-#endif /*NativeFONT_H*/
+#endif 
