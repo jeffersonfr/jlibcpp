@@ -225,7 +225,7 @@ GenericImage::GenericImage(std::string file):
 
 	cairo_t *cairo_context = cairo_create(cairo_surface);
 	
-	// cairo_surface_destroy(cairo_surface);
+	cairo_surface_destroy(cairo_surface);
 
 	_graphics = new GenericGraphics(NULL, cairo_context, _pixelformat, _size.width, _size.height);
 

@@ -841,6 +841,7 @@ GIFLightPlayer::GIFLightPlayer(std::string file):
 	_aspect = 1.0;
 	_media_time = 0LL;
 	_decode_rate = 1.0;
+	_provider = NULL;
 	
 	jio::FileInputStream *stream = new jio::FileInputStream(file);
 
@@ -877,6 +878,8 @@ GIFLightPlayer::GIFLightPlayer(std::string file):
 	GIFReset(data);
 
 	if (GIFReadHeader(data) != 0) {
+		delete data;
+
 		throw MediaException("Unable to process gif header");
 	}
 
@@ -903,6 +906,10 @@ GIFLightPlayer::~GIFLightPlayer()
 	}
 
 	_controls.clear();
+
+	giflightplayer::AnimatedGIFData *data = (giflightplayer::AnimatedGIFData *)_provider;
+
+	delete data;
 }
 
 void GIFLightPlayer::Run()
