@@ -83,7 +83,7 @@ void Properties::Save(std::string escape_)
 			file = jio::File::CreateFile(_filename, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_TRUNCATE));
 		
 			if (file == NULL) {
-				throw RuntimeException("Unable to save properties");
+				throw RuntimeException(jcommon::StringUtils::Format("Unable to save properties at '%s'", _filename.c_str()));
 			}
 		}
 

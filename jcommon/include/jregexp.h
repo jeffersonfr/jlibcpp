@@ -2132,7 +2132,7 @@ std::basic_ostream<E>& basic_terminal<E,value,F>::format( std::basic_ostream<E>&
 template< typename E, E value, typename F >
 std::basic_istream<E>& basic_terminal<E,value,F>::parse( std::basic_istream<E>& is )
 {
-	typedef std::basic_istream<E> std_is;
+	// typedef std::basic_istream<E> std_is;
 
 #ifdef TRACE
 	tracer<basic_terminal<E,value> > t(*this, "parse", __FILE__, __LINE__);
