@@ -40,18 +40,6 @@ NativeGraphics::~NativeGraphics()
 void NativeGraphics::SetNativeSurface(void *surface, int wp, int hp)
 {
 	_surface = surface;
-
-	cairo_destroy(_cairo_context);
-
-	_cairo_context = NULL;
-
-	if (_surface != NULL) {
-		cairo_surface_t *cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wp, hp);
-
-		_cairo_context = cairo_create(cairo_surface);
-	
-		// cairo_surface_destroy(cairo_surface);
-	}
 }
 
 void NativeGraphics::Flip()
@@ -82,7 +70,7 @@ void NativeGraphics::Flip()
 
 	texture.create(dw, dh);
 
-	sf::Sprite sprite(texture);
+	_sprite.setTexture(texture);
 
 	int size = dw*dh;
 	uint8_t buffer[size*4];
@@ -101,18 +89,12 @@ void NativeGraphics::Flip()
 
 	texture.update(buffer);
 
-	sf::RenderWindow *window = (sf::RenderWindow *)_surface;
-
-	window->setActive(true);
-	window->clear();
-	window->draw(sprite);
-	window->display();
-	window->setActive(false);
+	InternalFlip();
 }
 
 void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 {
-	if (_surface == NULL) {
+	if (wp <= 0 || hp <= 0) {
 		return;
 	}
 
@@ -136,11 +118,10 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 
 	sf::Texture texture;
 
-	// texture.setActive(false);
 	texture.create(dw, dh);
 	texture.setSmooth(GetAntialias() != JAM_NONE);
 
-	sf::Sprite sprite(texture);
+	_sprite.setTexture(texture);
 
 	int size = dw*dh;
 	uint8_t buffer[size*4];
@@ -159,16 +140,10 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 
 	texture.update(buffer);
 
-	sf::RenderWindow *window = (sf::RenderWindow *)_surface;
-
-	window->setActive(true);
-	window->clear();
-	window->draw(sprite);
-	window->display();
-	window->setActive(false);
+	InternalFlip();
 }
 
-void NativeGraphics::SetVerticalSyncEnabled(bool b)
+void NativeGraphics::InternalFlip()
 {
 	if (_surface == NULL) {
 		return;
@@ -176,7 +151,11 @@ void NativeGraphics::SetVerticalSyncEnabled(bool b)
 
 	sf::RenderWindow *window = (sf::RenderWindow *)_surface;
 
-	window->setVerticalSyncEnabled(b);
+	window->setActive(true);
+	window->clear();
+	window->draw(_sprite);
+	window->display();
+	window->setActive(false);
 }
 
 }

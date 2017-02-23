@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jcheckbutton.h"
-#include "jcheckbuttonlistener.h"
 #include "jdebug.h"
 
 namespace jgui {
@@ -74,8 +73,6 @@ std::string CheckButton::GetText()
 
 void CheckButton::SetType(jcheckbox_type_t type)
 {
-	jthread::AutoLock lock(&_component_mutex);
-
 	_type = type;
 }
 
@@ -87,15 +84,11 @@ bool CheckButton::IsSelected()
 void CheckButton::SetSelected(bool b)
 {
 	if (_checked != b) {
-		{
-			jthread::AutoLock lock(&_component_mutex);
-
-			_checked = b;
-		}
-
-		DispatchCheckButtonEvent(new CheckButtonEvent(this, _checked));
+		_checked = b;
 
 		Repaint();
+
+		DispatchToggleEvent(new ToggleEvent(this, _checked));
 	}
 }
 
@@ -216,8 +209,6 @@ bool CheckButton::MouseWheel(MouseEvent *event)
 
 jcheckbox_type_t CheckButton::GetType()
 {
-	jthread::AutoLock lock(&_component_mutex);
-
 	return _type;
 }
 
@@ -326,59 +317,58 @@ void CheckButton::Paint(Graphics *g)
 	}
 }
 
-void CheckButton::RegisterCheckButtonListener(CheckButtonListener *listener)
+void CheckButton::RegisterToggleListener(ToggleListener *listener)
 {
 	if (listener == NULL) {
 		return;
 	}
+
+	jthread::AutoLock lock(&_check_listener_mutex);
 
 	if (std::find(_check_listeners.begin(), _check_listeners.end(), listener) == _check_listeners.end()) {
 		_check_listeners.push_back(listener);
 	}
 }
 
-void CheckButton::RemoveCheckButtonListener(CheckButtonListener *listener)
+void CheckButton::RemoveToggleListener(ToggleListener *listener)
 {
 	if (listener == NULL) {
 		return;
 	}
 
-	std::vector<CheckButtonListener *>::iterator i = std::find(_check_listeners.begin(), _check_listeners.end(), listener);
+	jthread::AutoLock lock(&_check_listener_mutex);
+
+	std::vector<ToggleListener *>::iterator i = std::find(_check_listeners.begin(), _check_listeners.end(), listener);
 	
 	if (i != _check_listeners.end()) {
 		_check_listeners.erase(i);
 	}
 }
 
-void CheckButton::DispatchCheckButtonEvent(CheckButtonEvent *event)
+void CheckButton::DispatchToggleEvent(ToggleEvent *event)
 {
 	if (event == NULL) {
 		return;
 	}
 
-	int k = 0,
-			size = (int)_check_listeners.size();
+	std::vector<ToggleListener *> listeners;
+	
+	_check_listener_mutex.Lock();
 
-	while (k++ < (int)_check_listeners.size() && event->IsConsumed() == false) {
-		_check_listeners[k-1]->ButtonSelected(event);
+	listeners = _check_listeners;
 
-		if (size != (int)_check_listeners.size()) {
-			size = (int)_check_listeners.size();
+	_check_listener_mutex.Unlock();
 
-			k--;
-		}
+	for (std::vector<ToggleListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		ToggleListener *listener = (*i);
+
+		listener->StateChanged(event);
 	}
-
-	/*
-	for (std::vector<CheckButtonListener *>::iterator i=_check_listeners.begin(); i!=_check_listeners.end(); i++) {
-		(*i)->ButtonSelected(event);
-	}
-	*/
 
 	delete event;
 }
 
-std::vector<CheckButtonListener *> & CheckButton::GetCheckButtonListeners()
+std::vector<ToggleListener *> & CheckButton::GetToggleListeners()
 {
 	return _check_listeners;
 }

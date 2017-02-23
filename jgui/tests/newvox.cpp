@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jwindow.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -44,7 +45,7 @@ float FOV=3.141592654/4;   // half of the xy field of view
 int lasty[MAXW];   // Last pixel drawn on a given column
 int lastc[MAXW];   // Color of last pixel on a column
 
-class NewVox : public jgui::Window {
+class NewVox : public jgui::Widget{
 
 	private:
 		float ss;
@@ -186,7 +187,7 @@ class NewVox : public jgui::Window {
 
 	public:
 		NewVox():
-			jgui::Window(0, 0, MAXW, MAXH)
+			jgui::Widget(0, 0, MAXW, MAXH)
 		{
 			done = 0;
 			a = 0; 
@@ -212,13 +213,11 @@ class NewVox : public jgui::Window {
 		{
 		}
 
-		virtual void Init()
+		virtual void Render()
 		{
-			Show();
-			
 			do {
 				Repaint();
-			} while (done == 0);
+			} while (done == 0 && IsHidden() == false);
 		}
 
 		virtual void Paint(jgui::Graphics *g)
@@ -322,9 +321,16 @@ class NewVox : public jgui::Window {
 
 int main(int argc, char *argv[])
 {
-	NewVox vox;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	vox.Init();
+	NewVox app;
+
+	main->SetTitle("Newvox");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	
+	app.Render();
 
 	return 0;
 }

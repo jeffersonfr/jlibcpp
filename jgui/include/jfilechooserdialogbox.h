@@ -20,7 +20,7 @@
 #ifndef J_FILESYSTEMDIALOGBOX_H
 #define J_FILESYSTEMDIALOGBOX_H
 
-#include "jdialogbox.h"
+#include "jwidget.h"
 #include "jselectlistener.h"
 #include "jlistbox.h"
 #include "jlabel.h"
@@ -60,7 +60,7 @@ enum jfilechooser_filter_t {
  *
  * \author Jeff Ferr
  */
-class FileChooserDialogBox : public jgui::DialogBox, public jgui::SelectListener{
+class FileChooserDialogBox : public jgui::Widget, public jgui::SelectListener{
 
 	private:
 		/** \brief */

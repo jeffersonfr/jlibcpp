@@ -17,11 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 #define RECT_SIZE	64
 
-class PorterTeste : public jgui::Frame {
+class PorterTeste : public jgui::Widget{
 
 	private:
 		jgui::Image *_bg;
@@ -31,7 +32,7 @@ class PorterTeste : public jgui::Frame {
 
 	public:
 		PorterTeste():
-			jgui::Frame("Porter Teste")
+			jgui::Widget("Porter Teste", 0, 0, 1280, 960)
 		{
 			_is_drawimage = true;
 
@@ -73,6 +74,12 @@ class PorterTeste : public jgui::Frame {
 
 			g->SetCompositeFlags(jgui::JCF_SRC_OVER);
 			g->DrawImage(image, x, y);
+			
+			jgui::Theme *theme = GetTheme();
+			jgui::Font *font = theme->GetFont("component");
+
+			g->SetColor(jgui::Color::White);
+			g->SetFont(font);
 			g->DrawString(name, x+RECT_SIZE/2, y);
 
 			delete image;
@@ -80,7 +87,7 @@ class PorterTeste : public jgui::Frame {
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 	
@@ -97,10 +104,15 @@ class PorterTeste : public jgui::Frame {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			g->DrawImage(_bg, 0, 0, _size.width, _size.height);
 
+			jgui::Theme *theme = GetTheme();
+			jgui::Font *font = theme->GetFont("component");
+
+			g->SetColor(jgui::Color::White);
+			g->SetFont(font);
 			g->DrawString("Press 1 to use DrawImage() and 2 to use SetRGBArray()", _insets.left, _insets.top);
 
 			PaintComposition(g, "CLEAR", jgui::JCF_CLEAR, 0*(2*RECT_SIZE+16), 1*(2*RECT_SIZE+16));
@@ -138,9 +150,15 @@ class PorterTeste : public jgui::Frame {
 
 int main( int argc, char *argv[] )
 {
-	PorterTeste test;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show(true);
+	PorterTeste app;
+
+	main->SetTitle("Porter");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

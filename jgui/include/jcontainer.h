@@ -50,9 +50,11 @@ class Container : public jgui::Component{
 
 	protected:
 		/** \brief */
+		std::vector<ContainerListener *> _container_listeners;
+		/** \brief */
 		jthread::Mutex _container_mutex;
 		/** \brief */
-		std::vector<ContainerListener *> _container_listeners;
+		jthread::Mutex _container_listener_mutex;
 		/** \brief */
 		std::vector<Component *> _components;
 		/** \brief */
@@ -139,6 +141,12 @@ class Container : public jgui::Component{
 		 *
 		 */
 		virtual void DoLayout();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Pack(bool fit);
 
 		/**
 		 * \brief

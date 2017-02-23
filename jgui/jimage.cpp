@@ -18,21 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
+#include "genericimage.h"
 #include "jimage.h"
-#include "jgfxhandler.h"
 #include "jmemoryinputstream.h"
 #include "jthread.h"
 #include "jnullpointerexception.h"
-
-#if defined(DIRECTFB_UI)
-#include "nativeimage.h"
-#elif defined(SDL2_UI)
-#include "nativeimage.h"
-#elif defined(SFML2_UI)
-#include "nativeimage.h"
-#elif defined(X11_UI)
-#include "nativeimage.h"
-#endif
 
 namespace jgui {
 
@@ -58,15 +48,7 @@ jsize_t Image::GetImageSize(std::string img)
 	t.width = -1;
 	t.height = -1;
 
-#if defined(DIRECTFB_UI)
-	t = NativeImage::GetImageSize(img);
-#elif defined(SDL2_UI)
-	t = NativeImage::GetImageSize(img);
-#elif defined(SFML2_UI)
-	t = NativeImage::GetImageSize(img);
-#elif defined(X11_UI)
-	t = NativeImage::GetImageSize(img);
-#endif
+	t = GenericImage::GetImageSize(img);
 
 	return t;
 }
@@ -76,15 +58,7 @@ Image * Image::CreateImage(jpixelformat_t pixelformat, int width, int height)
 	Image *image = NULL;
 
 	try {
-#if defined(DIRECTFB_UI)
-		image = new NativeImage(NULL, pixelformat, width, height);
-#elif defined(SDL2_UI)
-		image = new NativeImage(NULL, pixelformat, width, height);
-#elif defined(SFML2_UI)
-		image = new NativeImage(NULL, pixelformat, width, height);
-#elif defined(X11_UI)
-		image = new NativeImage(NULL, pixelformat, width, height);
-#endif
+		image = new GenericImage(NULL, pixelformat, width, height);
 	} catch (jcommon::RuntimeException &) {
 	}
 
@@ -118,15 +92,7 @@ Image * Image::CreateImage(std::string file)
 	Image *image = NULL;
 
 	try {
-#if defined(DIRECTFB_UI)
-			image = new NativeImage(file);
-#elif defined(SDL2_UI)
-			image = new NativeImage(file);
-#elif defined(SFML2_UI)
-			image = new NativeImage(file);
-#elif defined(X11_UI)
-			image = new NativeImage(file);
-#endif
+			image = new GenericImage(file);
 	} catch (jcommon::RuntimeException &) {
 	}
 
@@ -151,19 +117,7 @@ Image * Image::CreateImage(jio::InputStream *stream)
 	Image *image = NULL;
 
 	try {
-#if defined(DIRECTFB_UI)
-	#if defined(DIRECTFB_NODEPS_UI)
-			image = NativeImage::CreateImageStream(stream);
-	#else
-			image = new NativeImage(stream);
-	#endif
-#elif defined(SDL2_UI)
-			image = new NativeImage(stream);
-#elif defined(SFML2_UI)
-			image = new NativeImage(stream);
-#elif defined(X11_UI)
-			image = new NativeImage(stream);
-#endif
+		image = new GenericImage(stream);
 	} catch (jcommon::NullPointerException &) {
 	} catch (jcommon::RuntimeException &) {
 	}
@@ -210,15 +164,7 @@ Image * Image::Flip(jflip_flags_t t)
 	Image *image = NULL;
 
 	try {
-#if defined(DIRECTFB_UI)
-		image = NativeImage::Flip(this, t);
-#elif defined(SDL2_UI)
-		image = NativeImage::Flip(this, t);
-#elif defined(SFML2_UI)
-		image = NativeImage::Flip(this, t);
-#elif defined(X11_UI)
-		image = NativeImage::Flip(this, t);
-#endif
+		image = GenericImage::Flip(this, t);
 	} catch (jcommon::RuntimeException &) {
 	}
 
@@ -230,15 +176,7 @@ Image * Image::Rotate(double radians, bool resize)
 	Image *image = NULL;
 
 	try {
-#if defined(DIRECTFB_UI)
-		image = NativeImage::Rotate(this, radians, resize);
-#elif defined(SDL2_UI)
-		image = NativeImage::Rotate(this, radians, resize);
-#elif defined(SFML2_UI)
-		image = NativeImage::Rotate(this, radians, resize);
-#elif defined(X11_UI)
-		image = NativeImage::Rotate(this, radians, resize);
-#endif
+		image = GenericImage::Rotate(this, radians, resize);
 	} catch (jcommon::RuntimeException &) {
 	}
 
@@ -250,15 +188,7 @@ Image * Image::Scale(int width, int height)
 	Image *image = NULL;
 
 	try {
-#if defined(DIRECTFB_UI)
-		image = NativeImage::Scale(this, width, height);
-#elif defined(SDL2_UI)
-		image = NativeImage::Scale(this, width, height);
-#elif defined(SFML2_UI)
-		image = NativeImage::Scale(this, width, height);
-#elif defined(X11_UI)
-		image = NativeImage::Scale(this, width, height);
-#endif
+		image = GenericImage::Scale(this, width, height);
 	} catch (jcommon::RuntimeException &) {
 	}
 
@@ -270,15 +200,7 @@ Image * Image::Crop(int x, int y, int width, int height)
 	Image *image = NULL;
 
 	try {
-#if defined(DIRECTFB_UI)
-		image = NativeImage::Crop(this, x, y, width, height);
-#elif defined(SDL2_UI)
-		image = NativeImage::Crop(this, x, y, width, height);
-#elif defined(SFML2_UI)
-		image = NativeImage::Crop(this, x, y, width, height);
-#elif defined(X11_UI)
-		image = NativeImage::Crop(this, x, y, width, height);
-#endif
+		image = GenericImage::Crop(this, x, y, width, height);
 	} catch (jcommon::RuntimeException &) {
 	}
 
@@ -290,15 +212,7 @@ Image * Image::Blend(double alpha)
 	Image *image = NULL;
 
 	try {
-#if defined(DIRECTFB_UI)
-		image = NativeImage::Blend(this, alpha);
-#elif defined(SDL2_UI)
-		image = NativeImage::Blend(this, alpha);
-#elif defined(SFML2_UI)
-		image = NativeImage::Blend(this, alpha);
-#elif defined(X11_UI)
-		image = NativeImage::Blend(this, alpha);
-#endif
+		image = GenericImage::Blend(this, alpha);
 	} catch (jcommon::RuntimeException &) {
 	}
 
@@ -310,15 +224,7 @@ Image * Image::Colorize(Color color)
 	Image *image = NULL;
 
 	try {
-#if defined(DIRECTFB_UI)
-		image = NativeImage::Colorize(this, color);
-#elif defined(SDL2_UI)
-		image = NativeImage::Colorize(this, color);
-#elif defined(SFML2_UI)
-		image = NativeImage::Colorize(this, color);
-#elif defined(X11_UI)
-		image = NativeImage::Colorize(this, color);
-#endif
+		image = GenericImage::Colorize(this, color);
 	} catch (jcommon::RuntimeException &) {
 	}
 

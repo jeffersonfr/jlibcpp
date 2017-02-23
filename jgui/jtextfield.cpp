@@ -105,6 +105,8 @@ bool TextField::KeyPressed(KeyEvent *event)
 	} else {
 		std::string s;
 
+		catched = true;
+
 		switch (action) {
 			case JKS_TAB: s = "\t"; break;
 			// case JKS_ENTER: s = "\n"; break;
@@ -203,7 +205,7 @@ bool TextField::KeyPressed(KeyEvent *event)
 			case JKS_VERTICAL_BAR: s = "|"; break;
 			case JKS_CURLY_BRACKET_RIGHT: s = "}"; break;
 			case JKS_TILDE: s = "~"; break;
-			default: break;
+			default: catched = false; break;
 		}
 
 		if (s != "") {
@@ -229,7 +231,7 @@ bool TextField::MousePressed(MouseEvent *event)
 		c->SetText(GetText());
 		c->SetCaretPosition(GetCaretPosition());
 
-		_keyboard->Show();
+		// _keyboard->Show();
 	}
 
 	return true;

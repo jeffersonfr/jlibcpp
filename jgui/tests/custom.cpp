@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jbutton.h"
 
 using namespace jgui;
@@ -78,7 +79,7 @@ class CustomContainer : public jgui::Container {
 
 };
 
-class Main : public jgui::Frame{
+class Main : public jgui::Widget{
 
 	private:
 		jgui::Container *_container1,
@@ -86,11 +87,9 @@ class Main : public jgui::Frame{
 		jgui::Button *_button1;
 
 	public:
-		Main(std::string title, int x, int y, int w, int h):
-			jgui::Frame(title, x, y, w, h)
+		Main(std::string title, int w, int h):
+			jgui::Widget(title, 0, 0, w, h)
 		{
-			SetResizeEnabled(true);
-	
 			_container1 = new CustomContainer(100, 100, 400, 400);
 			_container2 = new CustomContainer(100, 100, 400, 400);
 			_button1 = new jgui::Button("Testing Clipping", 200, 100, 300, 100);
@@ -110,9 +109,15 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main("Custom Frame", 32, 32, 720, 480);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Show(true);
+	Main app("Custom Frame", 720, 480);
+
+	main->SetTitle("Custom");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

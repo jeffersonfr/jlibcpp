@@ -20,7 +20,7 @@
 #include "Stdafx.h"
 #include "jgraphics.h"
 #include "jfont.h"
-#include "jgfxhandler.h"
+#include "jimage.h"
 
 #include <math.h>
 

@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jbutton.h"
 #include "jsystem.h"
 
@@ -59,7 +60,7 @@ class ImageTest : public jgui::Component{
 
 };
 
-class Main : public jgui::Frame{
+class Main : public jgui::Widget{
 
 	private:
 		jgui::Button *_buttons[5];
@@ -67,10 +68,8 @@ class Main : public jgui::Frame{
 
 	public:
 		Main(std::string title, int x, int y, int w, int h):
-			jgui::Frame(title, x, y, w, h)
+			jgui::Widget(title, x, y, w, h)
 		{
-			SetResizeEnabled(true);
-
 			for (int i=0; i<4; i++) {
 				char tmp[255];
 
@@ -101,17 +100,22 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main("Reseting graphic engine on the fly", 32, 32, 720, 480);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Show();
+	Main app("Reseting graphic engine on the fly", 32, 32, 720, 480);
+
+	main->SetTitle("Restore");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
 
 	sleep(4);
 
-	jgui::GFXHandler::GetInstance()->Release();
+	main->SetVisible(false);
 	
 	sleep(2);
 	
-	jgui::GFXHandler::GetInstance()->Restore();
+	main->SetVisible(true);
 
 	sleep(4);
 

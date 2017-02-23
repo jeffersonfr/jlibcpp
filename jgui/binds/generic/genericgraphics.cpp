@@ -26,7 +26,6 @@
 #include "jmath.h"
 #include "jstringtokenizer.h"
 #include "jimage.h"
-#include "jgfxhandler.h"
 #include "jfont.h"
 #include "jstringutils.h"
 #include "jrectangle.h"

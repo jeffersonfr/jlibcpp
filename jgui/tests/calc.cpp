@@ -17,16 +17,113 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "calc.h"
+#include "japplication.h"
 #include "jgridlayout.h"
+#include "jwidget.h"
+#include "jbutton.h"
+#include "jmutex.h"
 
-namespace mcalc {
+#include <list>
 
-MCalc::MCalc(int x, int y):
-	jgui::Frame("Calculadora", x, y, 500, 400)
+class Display : public jgui::Component{
+
+		private:
+				std::string _text,
+						_operation;
+				int draw;
+
+		public:
+				Display(int x, int y, int width, int height);
+				virtual ~Display();
+
+				void SetText(std::string text);
+				void SetOperation(std::string text);
+				void Clear();
+
+				virtual void Paint(jgui::Graphics *g);
+
+};
+
+Display::Display(int x, int y, int width, int height):
+   	jgui::Component(x, y, width, height)
 {
-	SetResizeEnabled(true);
+}
 
+Display::~Display()
+{
+}
+
+void Display::SetText(std::string text)
+{
+		_text = text;
+		draw = 0;
+
+		Repaint();
+} 
+
+void Display::Paint(jgui::Graphics *g)
+{
+	if ((void *)g == NULL) {
+		return;
+	}
+
+	jgui::Component::Paint(g);
+
+	jgui::Theme *theme = GetTheme();
+	jgui::Font *font = theme->GetFont("component");
+
+	int size = 40;
+
+	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
+
+	if (font != NULL) {
+		size = font->GetSize();
+
+		g->SetFont(font);
+	}
+
+	g->DrawString(_text, 0, (GetHeight()-size)/2, GetWidth()-10, GetHeight(), jgui::JHA_RIGHT, jgui::JVA_CENTER);
+	g->DrawString(_operation, 10, (GetHeight()-size)/2, 30, GetHeight()-4, jgui::JHA_LEFT, jgui::JVA_CENTER);
+}
+
+void Display::SetOperation(std::string text)
+{
+		_operation = text;
+		draw = 1;
+
+		Repaint();
+}
+
+void Display::Clear()
+{
+		SetText("0");
+}
+
+class Calculator : public jgui::Widget, public jgui::ActionListener{
+
+		private:
+			std::list<jgui::Button *> _buttons;
+			jthread::Mutex mcalc_mutex;
+			std::string _number0;
+			std::string _number1;
+			std::string _operation;
+			Display *_display;
+			int _state;
+
+		public:
+			Calculator();
+			virtual ~Calculator();
+
+			void Process(std::string type);
+
+			virtual bool KeyPressed(jgui::KeyEvent *event);
+			virtual void ActionPerformed(jgui::ActionEvent *event);
+
+};
+
+Calculator::Calculator():
+	jgui::Widget("Calculator", 0, 0, 500, 400)
+{
 	_number0 = "";
 	_number1 = "";
 	_operation = -1;
@@ -70,7 +167,7 @@ MCalc::MCalc(int x, int y):
 	for (int i=0; i<20; i++) {
 		_buttons.push_back(b[i]);
 
-		b[i]->RegisterButtonListener(this);
+		b[i]->RegisterActionListener(this);
 
 		container->Add(b[i]);
 	}
@@ -80,7 +177,7 @@ MCalc::MCalc(int x, int y):
 	b[10]->RequestFocus();
 }
 
-MCalc::~MCalc() 
+Calculator::~Calculator() 
 {
 	jthread::AutoLock lock(&mcalc_mutex);
 
@@ -98,7 +195,7 @@ MCalc::~MCalc()
 	}
 }
 
-void MCalc::Process(std::string type)
+void Calculator::Process(std::string type)
 {
 	jgui::Button *button = (jgui::Button *)GetFocusOwner();
 
@@ -378,9 +475,9 @@ void MCalc::Process(std::string type)
 	}
 }
 
-bool MCalc::KeyPressed(jgui::KeyEvent *event)
+bool Calculator::KeyPressed(jgui::KeyEvent *event)
 {
-	if (Frame::KeyPressed(event) == true) {
+	if (Widget::KeyPressed(event) == true) {
 		return true;
 	}
 
@@ -516,7 +613,7 @@ bool MCalc::KeyPressed(jgui::KeyEvent *event)
 	return true;
 }
 
-void MCalc::ActionPerformed(jgui::ButtonEvent *event)
+void Calculator::ActionPerformed(jgui::ActionEvent *event)
 {
 	jgui::Button *button = (jgui::Button *)event->GetSource();
 
@@ -594,13 +691,17 @@ void MCalc::ActionPerformed(jgui::ButtonEvent *event)
 	}
 }
 
-}
-
 int main()
 {
-	mcalc::MCalc app(100, 100);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	app.Show(true);
+	Calculator app;
+
+	main->SetTitle("Calculator");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

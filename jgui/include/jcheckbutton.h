@@ -21,6 +21,7 @@
 #define J_CHECKButton_H
 
 #include "jcomponent.h"
+#include "jtogglelistener.h"
 
 #include <string>
 
@@ -33,8 +34,8 @@ enum jcheckbox_type_t {
 	JCBT_RADIO
 };
 
-class CheckButtonListener;
-class CheckButtonEvent;
+class ToggleListener;
+class ToggleEvent;
 
 /**
  * \brief
@@ -45,7 +46,9 @@ class CheckButton : public Component{
 
 	private:
 		/** \brief */
-		std::vector<CheckButtonListener *> _check_listeners;
+		std::vector<ToggleListener *> _check_listeners;
+		/** \brief */
+		jthread::Mutex _check_listener_mutex;
 		/** \brief */
 		std::string _text;
 		/** \brief */
@@ -186,25 +189,25 @@ class CheckButton : public Component{
 		 * \brief
 		 *
 		 */
-		virtual void RegisterCheckButtonListener(CheckButtonListener *listener);
+		virtual void RegisterToggleListener(ToggleListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void RemoveCheckButtonListener(CheckButtonListener *listener);
+		virtual void RemoveToggleListener(ToggleListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DispatchCheckButtonEvent(CheckButtonEvent *event);
+		virtual void DispatchToggleEvent(ToggleEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual std::vector<CheckButtonListener *> & GetCheckButtonListeners();
+		virtual std::vector<ToggleListener *> & GetToggleListeners();
 
 };
 

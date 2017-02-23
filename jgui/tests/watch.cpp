@@ -17,9 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
+#include "jdate.h"
 
-class WatchTeste : public jgui::Frame, public jthread::Thread{
+class WatchTeste : public jgui::Widget{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -31,17 +33,13 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 	public:
 		WatchTeste():
-			jgui::Frame("Watch Teste", 0, 0, 320, 320)
+			jgui::Widget("Watch Teste", 0, 0, 320, 320)
 		{
-			SetMinimumSize(320, 320);
-
 			jcommon::Date date;
 
 			_hours = date.GetHour();
 			_minutes = date.GetMinute();
 			_seconds = date.GetSecond();
-
-			SetResizeEnabled(true);
 
 			_flag = true;
 			_filled = false; // true;
@@ -50,13 +48,11 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 		virtual ~WatchTeste()
 		{
 			_flag = false;
-
-			WaitThread();
 		}
 
-		virtual void Run()
+		virtual void Render()
 		{
-			while (_flag) {
+			do {
 				jcommon::Date date;
 
 				_hours = date.GetHour();
@@ -66,12 +62,12 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 				Repaint();
 
 				sleep(1);
-			}
+			} while (IsHidden() == false);
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			int m = std::min(GetWidth(), GetHeight()-_insets.top);
 
@@ -111,7 +107,11 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 				// g->DrawLine((int)(xc+(vs+10)*cos(teta)), (int)(yc+(vs+10)*sin(teta)), (int)(xc+(vs+10+10)*cos(teta)), (int)(yc+(vs+10+10)*sin(teta)));
 			}
 
-			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
+			jgui::Theme *theme = GetTheme();
+			jgui::Font *font = theme->GetFont("component");
+
+			g->SetColor(jgui::Color::White);
+			g->SetFont(font);
 			g->DrawString(tmp, _insets.left, _insets.top);
 	
 			g->SetColor(0xd0, 0xd0, 0xd0, 0xff);
@@ -159,10 +159,16 @@ class WatchTeste : public jgui::Frame, public jthread::Thread{
 
 int main(int argc, char *argv[])
 {
-	WatchTeste test;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Start();
-	test.Show(true);
+	WatchTeste app;
+
+	main->SetTitle("Watch");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+
+	app.Render();
 
 	return 0;
 }

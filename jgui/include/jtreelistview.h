@@ -22,7 +22,6 @@
 
 #include "jselectlistener.h"
 #include "jitemcomponent.h"
-#include "jbuttonlistener.h"
 #include "jimage.h"
 
 #include "jthread.h"

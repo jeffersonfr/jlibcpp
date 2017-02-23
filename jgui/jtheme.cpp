@@ -19,8 +19,8 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jtheme.h"
-#include "jwindow.h"
 #include "jitemcomponent.h"
+#include "japplication.h"
 
 namespace jgui {
 
@@ -62,20 +62,20 @@ Theme::Theme():
 	SetColor("container.scroll.disable", GetColor("component.scroll.disable"));
 
 	// INFO:: container colors
-	SetColor("window.bg", GetColor("component.bg"));
-	SetColor("window.fg", GetColor("component.fg"));
-	SetColor("window.border", GetColor("component.border"));
-	SetColor("window.scroll", GetColor("component.scroll"));
+	SetColor("widget.bg", GetColor("component.bg"));
+	SetColor("widget.fg", GetColor("component.fg"));
+	SetColor("widget.border", GetColor("component.border"));
+	SetColor("widget.scroll", GetColor("component.scroll"));
 
-	SetColor("window.bg.focus", GetColor("component.bg.focus"));
-	SetColor("window.fg.focus", GetColor("component.fg.focus"));
-	SetColor("window.border.focus", GetColor("component.border.focus"));
-	SetColor("window.scroll.focus", GetColor("component.scroll.focus"));
+	SetColor("widget.bg.focus", GetColor("component.bg.focus"));
+	SetColor("widget.fg.focus", GetColor("component.fg.focus"));
+	SetColor("widget.border.focus", GetColor("component.border.focus"));
+	SetColor("widget.scroll.focus", GetColor("component.scroll.focus"));
 
-	SetColor("window.bg.disable", GetColor("component.bg.disable"));
-	SetColor("window.fg.disable", GetColor("component.fg.disable"));
-	SetColor("window.border.disable", GetColor("component.border.disable"));
-	SetColor("window.scroll.disable", GetColor("component.scroll.disable"));
+	SetColor("widget.bg.disable", GetColor("component.bg.disable"));
+	SetColor("widget.fg.disable", GetColor("component.fg.disable"));
+	SetColor("widget.border.disable", GetColor("component.border.disable"));
+	SetColor("widget.scroll.disable", GetColor("component.scroll.disable"));
 
 	// INFO:: item colors
 	SetColor("item.bg", 0x00, 0x00, 0x00, 0xff);
@@ -87,25 +87,25 @@ Theme::Theme():
 	SetColor("item.bg.disable", 0x10, 0x10, 0x10, 0xff);
 	SetColor("item.fg.disable", 0xf0, 0xf0, 0xf0, 0xff);
 
-	// INFO:: window colors
-	SetColor("window.bg", 0x00, 0x00, 0x00, 0xff);
-	SetColor("window.fg", 0xf0, 0xf0, 0xf0, 0xff);
-	SetColor("window.border", 0xf0, 0xf0, 0xf0, 0xff);
+	// INFO:: widget colors
+	SetColor("widget.bg", 0x00, 0x00, 0x00, 0xff);
+	SetColor("widget.fg", 0xf0, 0xf0, 0xf0, 0xff);
+	SetColor("widget.border", 0xf0, 0xf0, 0xf0, 0xff);
 
 	// INFO:: create fonts
 	jgui::Font *font = jgui::Font::GetDefaultFont();
 
 	_fonts["component"] = font;
 	_fonts["container"] = font;
-	_fonts["window"] = font;
+	_fonts["widget"] = font;
 
 	_borders["component"] = JCB_LINE;
 	_borders["container"] = JCB_EMPTY;
-	_borders["window"] = JCB_RAISED_GRADIENT;
+	_borders["widget"] = JCB_RAISED_GRADIENT;
 
 	_size_borders["component"] = 1;
 	_size_borders["container"] = 0;
-	_size_borders["window"] = 2;
+	_size_borders["widget"] = 2;
 }
 
 Theme::~Theme()

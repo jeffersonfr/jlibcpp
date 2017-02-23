@@ -23,7 +23,7 @@
 namespace jgui {
 
 MessageDialogBox::MessageDialogBox(std::string title, std::string msg):
-	jgui::DialogBox(title, -1, -1, -1, -1)
+	jgui::Widget(title, -1, -1, -1, -1)
 {
 	jcommon::Object::SetClassName("jgui::MessageDialogBox");
 
@@ -41,14 +41,14 @@ MessageDialogBox::MessageDialogBox(std::string title, std::string msg):
 
 	_ok = new Button("Ok", _label->GetX()+_label->GetWidth()-cw, _label->GetY()+_label->GetHeight()+20, cw, ch);
 	
-	_ok->RegisterButtonListener(this);
+	_ok->RegisterActionListener(this);
 
 	Add(_label);
 	Add(_ok);
 
 	_ok->RequestFocus();
 
-	Pack();
+	Pack(true);
 }
 
 MessageDialogBox::~MessageDialogBox() 
@@ -79,11 +79,11 @@ jvertical_align_t MessageDialogBox::GetVerticalAlign()
 	return _label->GetVerticalAlign();
 }
 
-void MessageDialogBox::ActionPerformed(jgui::ButtonEvent *event)
+void MessageDialogBox::ActionPerformed(jgui::ActionEvent *event)
 {
 	jthread::AutoLock lock(&_message_mutex);
 
-	Release();
+	// Release();
 }
 
 }

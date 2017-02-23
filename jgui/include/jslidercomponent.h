@@ -43,7 +43,9 @@ class SliderComponent : public jgui::Component{
 
 	protected:
 		/** \brief */
-		std::vector<AdjustmentListener *> _adjust_listeners;
+		std::vector<AdjustmentListener *> _adjustment_listeners;
+		/** \brief */
+		jthread::Mutex _adjustment_listener_mutex;
 		/** \brief */
 		int _index;
 		/** \brief */

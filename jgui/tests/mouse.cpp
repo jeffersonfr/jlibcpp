@@ -17,9 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
-class GraphicsTeste : public jgui::Frame {
+class GraphicsTeste : public jgui::Widget{
 
 	private:
 		std::vector<jgui::jpoint_t> points;
@@ -32,7 +33,7 @@ class GraphicsTeste : public jgui::Frame {
 
 	public:
 		GraphicsTeste():
-			jgui::Frame(0, 0)
+			jgui::Widget(0, 0, 720, 480)
 		{
 			cx = GetWidth()/2;
 			cy = GetHeight()/2;
@@ -42,8 +43,6 @@ class GraphicsTeste : public jgui::Frame {
 
 			wsize = GetWidth()/(double)wblocks;
 			hsize = GetHeight()/(double)hblocks;
-
-			SetUndecorated(true);
 		}
 
 		virtual ~GraphicsTeste()
@@ -77,7 +76,7 @@ class GraphicsTeste : public jgui::Frame {
 				points.erase(i);
 			}
 
-			Repaint();
+			// Repaint();
 
 			return true;
 		}
@@ -132,9 +131,15 @@ class GraphicsTeste : public jgui::Frame {
 
 int main( int argc, char *argv[] )
 {
-	GraphicsTeste test;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show(true);
+	GraphicsTeste app;
+
+	main->SetTitle("Mouse");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

@@ -19,8 +19,8 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "directfbheavyplayer.h"
-#include "nativeimage.h"
-#include "nativegraphics.h"
+#include "genericimage.h"
+#include "nativehandler.h"
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
@@ -29,8 +29,7 @@
 #include "jvolumecontrol.h"
 #include "jmediaexception.h"
 #include "jimage.h"
-#include "jwindow.h"
-#include "jgfxhandler.h"
+#include "japplication.h"
 
 #include <directfb.h>
 
@@ -71,8 +70,7 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 			_frame_size.width = w;
 			_frame_size.height = h;
 
-			jgui::GFXHandler *handler = jgui::GFXHandler::GetInstance();
-			IDirectFB *engine = (IDirectFB *)handler->GetGraphicEngine();
+			IDirectFB *engine = dynamic_cast<jgui::NativeHandler *>(jgui::Application::GetInstance())->GetHandler();
 
 			DFBWindowDescription desc;
 
@@ -157,56 +155,6 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 		{
 			RaiseToTop();
 
-#if defined(DIRECTFB_NODEPS_UI)
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-
-			if (_surface != NULL) {
-				void *ptr;
-				int pitch;
-				int sw,
-						sh;
-
-				_surface->GetSize(_surface, &sw, &sh);
-				_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_READ | DSLF_WRITE), &ptr, &pitch);
-				
-				IDirectFBSurface *frame;
-				DFBSurfaceDescription desc;
-
-				desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT | DSDESC_PREALLOCATED);
-				desc.caps = (DFBSurfaceCapabilities)(DSCAPS_NONE);
-				desc.width = sw;
-				desc.height = sh;
-				desc.pixelformat = DSPF_ARGB;
-				desc.preallocated[0].data = ptr;
-				desc.preallocated[0].pitch = pitch;
-
-				IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
-
-				if (directfb->CreateSurface(directfb, &desc, &frame) == DFB_OK) {
-					_mutex.Lock();
-
-					if (_image != NULL) {
-						delete _image;
-						_image = NULL;
-					}
-
-					_image = new jgui::NativeImage(frame, jgui::JPF_ARGB, sw, sh);
-
-					_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
-
-					_mutex.Unlock();
-				
-					Start();
-					
-					_surface->Unlock(_surface);
-					_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)0);
-				} else {
-					_surface->Unlock(_surface);
-				}
-			}
-#else
 			if (IsRunning() == true) {
 				WaitThread();
 			}
@@ -224,7 +172,7 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 						(uint8_t *)ptr, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
 				cairo_t *cairo_context = cairo_create(cairo_surface);
 
-				jgui::NativeImage *image = new jgui::NativeImage(cairo_context, jgui::JPF_ARGB, sw, sh);
+				jgui::GenericImage *image = new jgui::GenericImage(cairo_context, jgui::JPF_ARGB, sw, sh);
 
 				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, image));
 
@@ -235,7 +183,6 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 			}
 
 			Start();
-#endif
 		}
 
 		virtual void Move(int x, int y)
@@ -274,44 +221,6 @@ class VideoOverlayImpl : public jgui::Component, jthread::Thread {
 				_window->SetOpacity(_window, 0xff);
 			} else {
 				_window->SetOpacity(_window, 0x00);
-			}
-		}
-
-		virtual void RaiseToTop()
-		{
-			jgui::Container *parent = GetTopLevelAncestor();
-			
-			if (parent != NULL) {
-				jgui::Window *window = dynamic_cast<jgui::Window *>(parent);
-
-				if (window != NULL) {
-					IDirectFBWindow *native = (IDirectFBWindow *)window->GetNativeWindow();
-
-					if (native != NULL) {
-						_window->PutAtop(_window, native);
-					}
-				}
-			} else {
-				_window->RaiseToTop(_window);
-			}
-		}
-		
-		virtual void LowerToBottom()
-		{
-			jgui::Container *parent = GetTopLevelAncestor();
-			
-			if (parent != NULL) {
-				jgui::Window *window = dynamic_cast<jgui::Window *>(parent);
-
-				if (window != NULL) {
-					IDirectFBWindow *native = (IDirectFBWindow *)window->GetNativeWindow();
-
-					if (native != NULL) {
-						_window->PutAtop(_window, native);
-					}
-				}
-			} else {
-				_window->LowerToBottom(_window);
 			}
 		}
 
@@ -697,9 +606,9 @@ DirectFBHeavyPlayer::DirectFBHeavyPlayer(std::string file):
 	_component = NULL;
 	_frames_per_second = 0.0;
 
-	IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
+	IDirectFB *engine = dynamic_cast<jgui::NativeHandler *>(jgui::Application::GetInstance())->GetHandler();
 	
-	if (directfb->CreateVideoProvider(directfb, _file.c_str(), &_provider) != DFB_OK) {
+	if (engine->CreateVideoProvider(engine, _file.c_str(), &_provider) != DFB_OK) {
 		_provider = NULL;
 
 		throw jmedia::MediaException("Media format not supported");

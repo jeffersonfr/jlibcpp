@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jthememanager.h"
+#include "jautolock.h"
 
 namespace jgui {
 
@@ -85,6 +86,8 @@ void ThemeManager::RegisterThemeListener(ThemeListener *listener)
 		return;
 	}
 
+	jthread::AutoLock lock(&_theme_listener_mutex);
+
 	if (std::find(_theme_listeners.begin(), _theme_listeners.end(), listener) == _theme_listeners.end()) {
 		_theme_listeners.push_back(listener);
 
@@ -104,6 +107,8 @@ void ThemeManager::RemoveThemeListener(ThemeListener *listener)
 		return;
 	}
 
+	jthread::AutoLock lock(&_theme_listener_mutex);
+
 	std::vector<ThemeListener *>::iterator i = std::find(_theme_listeners.begin(), _theme_listeners.end(), listener);
 	
 	if (i != _theme_listeners.end()) {
@@ -117,26 +122,19 @@ void ThemeManager::DispatchThemeEvent(ThemeEvent *event)
 		return;
 	}
 
-	int k = 0,
-			size = (int)_theme_listeners.size();
+	std::vector<ThemeListener *> listeners;
+	
+	_theme_listener_mutex.Lock();
 
-	while (k++ < (int)_theme_listeners.size() && event->IsConsumed() == false) {
-		ThemeListener *listener = _theme_listeners[k-1];
+	listeners = _theme_listeners;
+
+	_theme_listener_mutex.Unlock();
+
+	for (std::vector<ThemeListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		ThemeListener *listener = (*i);
 
 		listener->ThemeChanged(event);
-
-		if (size != (int)_theme_listeners.size()) {
-			size = (int)_theme_listeners.size();
-
-			k--;
-		}
 	}
-
-	/*
-	for (std::vector<ThemeListener *>::iterator i=_theme_listeners.begin(); i!=_theme_listeners.end(); i++) {
-		listener->ChangedTheme(event);
-	}
-	*/
 
 	delete event;
 }

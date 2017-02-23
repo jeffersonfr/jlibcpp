@@ -20,7 +20,7 @@
 #ifndef AGENDA_H_
 #define AGENDA_H_
 
-#include "jframe.h"
+#include "jwidget.h"
 #include "jlabel.h"
 #include "jlistbox.h"
 #include "jtextfield.h"
@@ -31,11 +31,11 @@ namespace agenda {
 
 class AgendaDB;
 
-class Agenda : public jgui::Frame, public jgui::SelectListener, public jcommon::DataListener{
+class Agenda : public jgui::Widget, public jgui::SelectListener, public jcommon::DataListener{
 
 	private:
 		jthread::Mutex agenda_mutex;
-		jgui::Window *_status;
+		jgui::Widget *_status;
 		jgui::ListBox *_list;
 		AgendaDB *db;
 		int _state;
@@ -86,10 +86,10 @@ class AgendaDB{
 
 };
 
-class AddMessage : public jgui::Frame, public jcommon::DataListener{
+class AddMessage : public jgui::Widget, public jcommon::DataListener{
 	private:
 		jthread::Mutex add_mutex;
-		jgui::Window *_status;
+		jgui::Widget *_status;
 		jgui::Label *label1,
 			*label3,
 			*label4;
@@ -115,13 +115,13 @@ class AddMessage : public jgui::Frame, public jcommon::DataListener{
 
 };
 
-class ViewMessages : public jgui::Frame, public jcommon::DataListener{
+class ViewMessages : public jgui::Widget, public jcommon::DataListener{
 
 	private:
 		jthread::Mutex view_mutex;
 
 		AgendaDB *db;
-		jgui::Window *_status;
+		jgui::Widget *_status;
 		jgui::Label *label_date,
 			*label_hour,
 			*message;

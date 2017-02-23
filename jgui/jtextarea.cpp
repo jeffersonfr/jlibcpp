@@ -71,11 +71,7 @@ void TextArea::SetRowsGap(int gap)
 void TextArea::SetWrap(bool b)
 {
 	if (b != _is_wrap) {
-		{
-			jthread::AutoLock lock(&_component_mutex);
-
-			_is_wrap = b;
-		}
+		_is_wrap = b;
 
 		Repaint();
 	}
@@ -327,7 +323,7 @@ bool TextArea::MousePressed(MouseEvent *event)
 		c->SetText(GetText());
 		c->SetCaretPosition(GetCaretPosition());
 
-		_keyboard->Show();
+		// _keyboard->Show();
 	}
 
 	return true;

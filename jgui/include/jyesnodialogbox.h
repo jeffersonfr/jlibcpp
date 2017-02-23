@@ -21,9 +21,9 @@
 #define J_YESNODIALOGBOX_H
 
 #include "jbutton.h"
-#include "jbuttonlistener.h"
+#include "jactionlistener.h"
 #include "jlabel.h"
-#include "jdialogbox.h"
+#include "jwidget.h"
 #include "jthread.h"
 #include "jmutex.h"
 #include "jdate.h"
@@ -41,7 +41,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class YesNoDialogBox : public jgui::DialogBox, public jgui::ButtonListener{
+class YesNoDialogBox : public jgui::Widget, public jgui::ActionListener{
 
 	private:
 		/** \brief */
@@ -92,7 +92,7 @@ class YesNoDialogBox : public jgui::DialogBox, public jgui::ButtonListener{
 		 * \brief
 		 *
 		 */
-		virtual void ActionPerformed(jgui::ButtonEvent *event);
+		virtual void ActionPerformed(jgui::ActionEvent *event);
 
 };
 

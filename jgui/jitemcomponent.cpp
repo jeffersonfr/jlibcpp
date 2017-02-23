@@ -527,6 +527,8 @@ void ItemComponent::RegisterSelectListener(SelectListener *listener)
 		return;
 	}
 
+	jthread::AutoLock lock(&_select_listener_mutex);
+
 	if (std::find(_select_listeners.begin(), _select_listeners.end(), listener) == _select_listeners.end()) {
 		_select_listeners.push_back(listener);
 	}
@@ -537,6 +539,8 @@ void ItemComponent::RemoveSelectListener(SelectListener *listener)
 	if (listener == NULL) {
 		return;
 	}
+
+	jthread::AutoLock lock(&_select_listener_mutex);
 
 	std::vector<SelectListener *>::iterator i = std::find(_select_listeners.begin(), _select_listeners.end(), listener);
 
@@ -551,34 +555,23 @@ void ItemComponent::DispatchSelectEvent(SelectEvent *event)
 		return;
 	}
 
-	int k = 0,
-			size = (int)_select_listeners.size();
+	std::vector<SelectListener *> listeners;
+	
+	_select_listener_mutex.Lock();
 
-	while (k++ < (int)_select_listeners.size()) {
-		SelectListener *listener = _select_listeners[k-1];
+	listeners = _select_listeners;
+
+	_select_listener_mutex.Unlock();
+
+	for (std::vector<SelectListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		SelectListener *listener = (*i);
 
 		if (event->GetType() == JSET_ACTION) {
 			listener->ItemSelected(event);
 		} else {
 			listener->ItemChanged(event);
 		}
-
-		if (size != (int)_select_listeners.size()) {
-			size = (int)_select_listeners.size();
-
-			k--;
-		}
 	}
-
-	/*
-	for (std::vector<SelectListener *>::iterator i=_select_listeners.begin(); i!=_select_listeners.end(); i++) {
-		if (event->GetType() == ACTION_ITEM) {
-			(*i)->ItemSelected(event);
-		} else {
-			(*i)->ItemChanged(event);
-		}
-	}
-	*/
 
 	delete event;
 }

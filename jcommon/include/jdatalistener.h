@@ -21,7 +21,7 @@
 #define J_DATALISTENER_H
 
 #include "jlistener.h"
-#include "jparammapper.h"
+#include "jdataevent.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -56,7 +56,7 @@ class DataListener : public jcommon::Listener{
 		 * \brief
 		 *
 		 */
-		virtual void DataChanged(jcommon::ParamMapper *mapper);
+		virtual void DataChanged(jcommon::DataEvent *event);
 		
 };
 

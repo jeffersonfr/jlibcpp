@@ -32,7 +32,7 @@ DataListener::~DataListener()
 {
 }
 
-void DataListener::DataChanged(jcommon::ParamMapper *mapper)
+void DataListener::DataChanged(jcommon::DataEvent *event)
 {
 }
 

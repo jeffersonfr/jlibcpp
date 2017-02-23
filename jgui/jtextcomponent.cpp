@@ -204,17 +204,13 @@ std::string TextComponent::GetText()
 
 void TextComponent::IncrementCaretPosition(int size)
 {
-	{
-		jthread::AutoLock lock(&_component_mutex);
+	_caret_position += size;
 
-		_caret_position += size;
-
-		if (_caret_position > (int)_text.size()) {
-			_caret_position = _text.size();
-		} else {
-			if (_text[_caret_position] == -61) {
-				_caret_position++;
-			}
+	if (_caret_position > (int)_text.size()) {
+		_caret_position = _text.size();
+	} else {
+		if (_text[_caret_position] == -61) {
+			_caret_position++;
 		}
 	}
 
@@ -223,17 +219,13 @@ void TextComponent::IncrementCaretPosition(int size)
 
 void TextComponent::DecrementCaretPosition(int size)
 {
-	{
-		jthread::AutoLock lock(&_component_mutex);
+	_caret_position -= size;
 
-		_caret_position -= size;
-
-		if (_caret_position < 0) {
-			_caret_position = 0;
-		} else {
-			if (_text[_caret_position] == -89) {
-				_caret_position--;
-			}
+	if (_caret_position < 0) {
+		_caret_position = 0;
+	} else {
+		if (_text[_caret_position] == -89) {
+			_caret_position--;
 		}
 	}
 
@@ -346,6 +338,8 @@ void TextComponent::RegisterTextListener(TextListener *listener)
 		return;
 	}
 
+	jthread::AutoLock lock(&_text_listener_mutex);
+
 	if (std::find(_text_listeners.begin(), _text_listeners.end(), listener) == _text_listeners.end()) {
 		_text_listeners.push_back(listener);
 	}
@@ -356,6 +350,8 @@ void TextComponent::RemoveTextListener(TextListener *listener)
 	if (listener == NULL) {
 		return;
 	}
+
+	jthread::AutoLock lock(&_text_listener_mutex);
 
 	std::vector<TextListener *>::iterator i = std::find(_text_listeners.begin(), _text_listeners.end(), listener);
 
@@ -370,24 +366,19 @@ void TextComponent::DispatchTextEvent(TextEvent *event)
 		return;
 	}
 
-	int k = 0,
-			size = (int)_text_listeners.size();
+	std::vector<TextListener *> listeners;
+	
+	_text_listener_mutex.Lock();
 
-	while (k++ < (int)_text_listeners.size() && event->IsConsumed() == false) {
-		_text_listeners[k-1]->TextChanged(event);
+	listeners = _text_listeners;
 
-		if (size != (int)_text_listeners.size()) {
-			size = (int)_text_listeners.size();
+	_text_listener_mutex.Unlock();
 
-			k--;
-		}
+	for (std::vector<TextListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		TextListener *listener = (*i);
+
+		listener->TextChanged(event);
 	}
-
-	/*
-	for (std::vector<TextListener *>::iterator i=_text_listeners.begin(); i!=_text_listeners.end(); i++) {
-		(*i)->TextChanged(event);
-	}
-	*/
 
 	delete event;
 }

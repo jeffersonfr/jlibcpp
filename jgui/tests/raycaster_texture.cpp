@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 #include <fstream>
 
@@ -156,7 +157,7 @@ int loadImage(std::vector<uint32_t>& out, unsigned long& w, unsigned long& h, co
 	return 0;
 }
 
-class GraphicsTeste : public jgui::Frame{
+class GraphicsTeste : public jgui::Widget{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -171,7 +172,7 @@ class GraphicsTeste : public jgui::Frame{
 
 	public:
 		GraphicsTeste():
-			jgui::Frame("Graphics Teste", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
+			jgui::Widget("Graphics Teste", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		{
 			posX = 22.0;
 			posY = 11.5; //x and y start position
@@ -212,7 +213,7 @@ class GraphicsTeste : public jgui::Frame{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			// jgui::Frame::Paint(g);
+			// jgui::Widget::Paint(g);
 
 			int w = _size.width;
 			int h = _size.height;
@@ -467,7 +468,7 @@ class GraphicsTeste : public jgui::Frame{
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
@@ -520,9 +521,15 @@ class GraphicsTeste : public jgui::Frame{
 
 int main( int argc, char *argv[] )
 {
-	GraphicsTeste test;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show(true);
+	GraphicsTeste app;
+
+	main->SetTitle("Raycast Texture");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

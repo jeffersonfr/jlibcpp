@@ -17,8 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "japplication.h"
 #include "jpanel.h"
-#include "jframe.h"
+#include "jwidget.h"
 #include "jfont.h"
 
 #include <stdio.h>
@@ -28,14 +29,14 @@
 #define ENABLE_GUI	1
 #define DRAW_ANTS	0
 
-class Main : public jgui::Frame{
+class Main : public jgui::Widget{
 
 	private:
 		double _angle;
 
 	public:
 		Main():
-			jgui::Frame("Image Test", 0, 0)
+			jgui::Widget("Image Test", 0, 0, 1280, 720)
 		{
 			_angle = M_PI/6;
 
@@ -75,7 +76,7 @@ class Main : public jgui::Frame{
 			// | DrawImage(offscreen, sx, sy, sw, sh, x, y, w, h)                      |
 			// |-----------------------------------------------------------------------|
 
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			int x = _insets.left,
 					y = _insets.top,
@@ -148,16 +149,23 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Show();
+	Main app;
 
-	for (int i=0; i<100; i++) {
-		for (double j=0.0; j<2*M_PI; j+=0.1) {
-			main.SetAngle(j);
-			main.Repaint();
-		}
-	}
+	main->SetTitle("Rotate Image");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+
+	double j = 0.0;
+
+	do {
+		app.SetAngle(j);
+		app.Repaint();
+
+		j = fmod(j + 0.1, 2*M_PI);
+	} while (main->IsVisible() == true);
 
 	return 0;
 }

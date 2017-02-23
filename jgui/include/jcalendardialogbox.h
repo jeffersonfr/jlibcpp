@@ -24,9 +24,9 @@
 #include "jcalendarlistener.h"
 #include "jspin.h"
 #include "jselectlistener.h"
-#include "jbuttonlistener.h"
+#include "jactionlistener.h"
 #include "jlabel.h"
-#include "jdialogbox.h"
+#include "jwidget.h"
 #include "jthread.h"
 #include "jmutex.h"
 #include "jdate.h"
@@ -55,7 +55,7 @@ struct jcalendar_warnning_t {
  *
  * \author Jeff Ferr
  */
-class CalendarDialogBox : public jgui::DialogBox, public jgui::ButtonListener, public jgui::SelectListener{
+class CalendarDialogBox : public jgui::Widget, public jgui::ActionListener, public jgui::SelectListener{
 
 	private:
 		/** \brief */
@@ -203,7 +203,7 @@ class CalendarDialogBox : public jgui::DialogBox, public jgui::ButtonListener, p
 		 * \brief
 		 *
 		 */
-		virtual void ActionPerformed(ButtonEvent *event);
+		virtual void ActionPerformed(ActionEvent *event);
 		
 		/**
 		 * \brief

@@ -20,15 +20,16 @@
 #include "Stdafx.h"
 #include "jcalendardialogbox.h"
 #include "jsystem.h"
+#include "jdataevent.h"
 
 namespace jgui {
 
 CalendarDialogBox::CalendarDialogBox():
-	jgui::DialogBox("Calendar", 0, 0, 0, 0)
+	jgui::Widget("Calendar", 0, 0, 0, 0)
 {
 	jcommon::Object::SetClassName("jgui::CalendarDialogBox");
 
-	SetIcon(jcommon::System::GetResourceDirectory() + "/images/calendar_icon.png");
+	// SetIcon(jcommon::System::GetResourceDirectory() + "/images/calendar_icon.png");
 
 	delta = 2;
 
@@ -327,7 +328,7 @@ void CalendarDialogBox::BuildCalendar()
 			}
 		}
 
-		button->RegisterButtonListener(this);
+		button->RegisterActionListener(this);
 
 		Add(button);
 	}
@@ -341,12 +342,12 @@ void CalendarDialogBox::BuildCalendar()
 
 bool CalendarDialogBox::KeyPressed(KeyEvent *event)
 {
-	if (Frame::KeyPressed(event) == true) {
+	if (Widget::KeyPressed(event) == true) {
 		return true;
 	}
 
 	if (event->GetSymbol() == JKS_BLUE || event->GetSymbol() == JKS_F4) {
-		Release();
+		// Release();
 
 		return true;
 	}
@@ -356,7 +357,7 @@ bool CalendarDialogBox::KeyPressed(KeyEvent *event)
 
 bool CalendarDialogBox::MousePressed(MouseEvent *event)
 {
-	if (Frame::MousePressed(event) == true) {
+	if (Widget::MousePressed(event) == true) {
 		return true;
 	}
 
@@ -365,7 +366,7 @@ bool CalendarDialogBox::MousePressed(MouseEvent *event)
 
 bool CalendarDialogBox::MouseReleased(MouseEvent *event)
 {
-	if (Frame::MouseReleased(event) == true) {
+	if (Widget::MouseReleased(event) == true) {
 		return true;
 	}
 
@@ -374,7 +375,7 @@ bool CalendarDialogBox::MouseReleased(MouseEvent *event)
 
 bool CalendarDialogBox::MouseMoved(MouseEvent *event)
 {
-	if (Frame::MouseMoved(event) == true) {
+	if (Widget::MouseMoved(event) == true) {
 		return true;
 	}
 
@@ -383,14 +384,14 @@ bool CalendarDialogBox::MouseMoved(MouseEvent *event)
 
 bool CalendarDialogBox::MouseWheel(MouseEvent *event)
 {
-	if (Frame::MouseWheel(event) == true) {
+	if (Widget::MouseWheel(event) == true) {
 		return true;
 	}
 
 	return false;
 }
 
-void CalendarDialogBox::ActionPerformed(jgui::ButtonEvent *event)
+void CalendarDialogBox::ActionPerformed(jgui::ActionEvent *event)
 {
 	Button *b1 = (jgui::Button *)event->GetSource();
 	Button *b2 = _buttons[_select_day-1];
@@ -411,7 +412,7 @@ void CalendarDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 	GetParams()->SetIntegerParam("month", GetMonth());
 	GetParams()->SetIntegerParam("year", GetYear());
 
-	DispatchDataEvent(GetParams());
+	DispatchDataEvent(new jcommon::DataEvent(this, GetParams()));
 }
 
 void CalendarDialogBox::ItemChanged(SelectEvent *event)

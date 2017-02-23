@@ -27,7 +27,7 @@
 namespace phone {
 
 Phone::Phone():
- 	jgui::Frame("Phone Book", 32, 32)
+ 	jgui::Widget("Phone Book", 32, 32)
 {
 	_status = NULL;
 
@@ -371,7 +371,7 @@ class NumericTextField : public jgui::KeyMap {
 NumericTextField ntf;
 
 AddContact::AddContact(PhoneDB *base, int index):
-	jgui::Frame("Add a Contact", 32, 32, 600, 400)
+	jgui::Widget("Add a Contact", 32, 32, 600, 400)
 {
 	int max_width = GetWidth()-_insets.left-_insets.right,
 			height = DEFAULT_COMPONENT_HEIGHT+4;
@@ -437,7 +437,7 @@ AddContact::~AddContact()
 
 bool AddContact::KeyPressed(jgui::KeyEvent *event)
 {
-	if (jgui::Frame::KeyPressed(event) == true) {
+	if (jgui::Widget::KeyPressed(event) == true) {
 		return true;
 	}
 
@@ -465,7 +465,7 @@ void AddContact::DataChanged(jcommon::ParamMapper *params)
 }
 
 SearchContacts::SearchContacts(PhoneDB *base):
-	jgui::Frame("Search Contacts", 32, 32, 600, 400)
+	jgui::Widget("Search Contacts", 32, 32, 600, 400)
 {
 
 	char tmp[255];
@@ -575,7 +575,7 @@ void SearchContacts::Update()
 
 bool SearchContacts::KeyPressed(jgui::KeyEvent *event)
 {
-	if (jgui::Frame::KeyPressed(event) == true) {
+	if (jgui::Widget::KeyPressed(event) == true) {
 		return true;
 	}
 
@@ -663,9 +663,13 @@ void SearchContacts::DataChanged(jcommon::ParamMapper *params)
 
 int main()
 {
+	jgui::MainWindow *window = jgui::MainWindow::GetInstance();
+
 	phone::Phone app;
 
-	app.Show(true);
+	window->SetUndecorated(true);
+	window->Add(&app);
+	window->SetVisible(true);
 
 	return 0;
 }

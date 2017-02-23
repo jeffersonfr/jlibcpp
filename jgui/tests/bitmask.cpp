@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jnullpointerexception.h"
 #include "jinvalidargumentexception.h"
 
@@ -577,7 +578,7 @@ class BitMask : public jcommon::Object {
 
 };
 
-class BitMaskTeste : public jgui::Frame{
+class BitMaskTeste : public jgui::Widget{
 
 	private:
 		BitMask *bmbg;
@@ -586,7 +587,7 @@ class BitMaskTeste : public jgui::Frame{
 
 	public:
 		BitMaskTeste():
-			jgui::Frame("BitMask Teste", 0, 0, 320, 320)
+			jgui::Widget("Bitmask Test", 0, 0, 320, 320)
 		{
 			_pacman_location.x = 0;
 			_pacman_location.y = 0;
@@ -596,8 +597,8 @@ class BitMaskTeste : public jgui::Frame{
 
 			jgui::jsize_t size = bmbg->GetSize();
 
-			SetSize(size.width+_insets.left+_insets.right, size.height+_insets.top+_insets.bottom);
-			SetResizeEnabled(false);
+			// TODO:: set random values
+			// SetSize(size.width, size.height);
 		}
 
 		virtual ~BitMaskTeste()
@@ -608,7 +609,7 @@ class BitMaskTeste : public jgui::Frame{
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
@@ -647,7 +648,7 @@ class BitMaskTeste : public jgui::Frame{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			jgui::jsize_t size = bmpacman->GetSize();
 			int index = 1;
@@ -663,7 +664,7 @@ class BitMaskTeste : public jgui::Frame{
 			buffer->BlitAnd(bmpacman, _pacman_location.x, _pacman_location.y, 1*size.width/2, index*size.height/3, size.width/2, size.height/3);
 			buffer->BlitOr(bmpacman, _pacman_location.x, _pacman_location.y, 0*size.width/2, index*size.height/3, size.width/2, size.height/3);
 
-			buffer->DrawTo(g, _insets.left, _insets.top);
+			buffer->DrawTo(g, 0, 0);
 
 			delete buffer;
 
@@ -676,34 +677,44 @@ class BitMaskTeste : public jgui::Frame{
 			*/
 		}
 
+		void Render()
+		{
+			// INFO:: 15 frames per second
+			uint64_t ref_time = 1000000000LL/15LL;
+
+			do {
+				struct timespec t1, t2;
+
+				clock_gettime(CLOCK_REALTIME, &t1);
+
+				Repaint();
+
+				clock_gettime(CLOCK_REALTIME, &t2);
+
+				uint64_t diff = (t2.tv_sec - t1.tv_sec) * 1000000000LL + (t2.tv_nsec - t1.tv_nsec);
+
+				if (diff < ref_time) {
+					diff = ref_time - diff;
+
+					usleep(diff/1000);
+				}
+			} while (IsHidden() == false);
+		}
+
 };
 
 int main(int argc, char *argv[])
 {
+	jgui::Application *main = jgui::Application::GetInstance();
+
 	BitMaskTeste app;
 
-	app.Show();
+	main->SetTitle("Bitmask");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
 
-	// INFO:: 15 frames per second
-	uint64_t ref_time = 1000000000LL/15LL;
-
-	do {
-		struct timespec t1, t2;
-
-		clock_gettime(CLOCK_REALTIME, &t1);
-
-		app.Repaint();
-		
-		clock_gettime(CLOCK_REALTIME, &t2);
-
-		uint64_t diff = (t2.tv_sec - t1.tv_sec) * 1000000000LL + (t2.tv_nsec - t1.tv_nsec);
-
-		if (diff < ref_time) {
-			diff = ref_time - diff;
-
-			usleep(diff/1000);
-		}
-	} while (app.IsVisible() == true);
+	app.Render();
 
 	return 0;
 }

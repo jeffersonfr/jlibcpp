@@ -17,7 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
+
+#define SCREEN_WIDTH 960
+#define SCREEN_HEIGHT 540
 
 #define mapWidth 24
 #define mapHeight 24
@@ -50,7 +54,7 @@ int worldMap[mapWidth][mapHeight]=
   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-class GraphicsTeste : public jgui::Frame{
+class GraphicsTeste : public jgui::Widget{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -63,7 +67,7 @@ class GraphicsTeste : public jgui::Frame{
 
 	public:
 		GraphicsTeste():
-			jgui::Frame("Graphics Teste", 0, 0)
+			jgui::Widget("Graphics Teste", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 		{
 			posX = 22;
 			posY = 12;
@@ -76,13 +80,11 @@ class GraphicsTeste : public jgui::Frame{
 		virtual ~GraphicsTeste()
 		{
 			jthread::AutoLock lock(&teste_mutex);
-
-			Hide();
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			int w = _size.width,
 					h = _size.height;
@@ -182,7 +184,7 @@ class GraphicsTeste : public jgui::Frame{
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
@@ -233,9 +235,15 @@ class GraphicsTeste : public jgui::Frame{
 
 int main( int argc, char *argv[] )
 {
-	GraphicsTeste test;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show(true);
+	GraphicsTeste app;
+
+	main->SetTitle("Raycast Flat");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

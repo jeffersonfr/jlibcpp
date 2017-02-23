@@ -43,7 +43,7 @@ OBJDIR		= obj
 TESTDIR		= tests
 DOCDIR		= doc
 
-PREFIX		= /usr/local
+PREFIX		= /usr
 
 TARGET		= $(BUILD)$(PREFIX)
 
@@ -58,11 +58,11 @@ ARFLAGS		= \
 		 -rc \
 
 # {no, yes}
-ENABLE_DEBUG ?= no
-# {directfb-nodeps, directfb, sdl2, sfml2, x11}
-ENABLE_GRAPHICS ?= directfb-nodeps
+ENABLE_DEBUG ?= yes
+# {directfb, sdl2, sfml2, x11, gtk3}
+ENABLE_GRAPHICS ?= gtk3
 # {gif, ilist, v4l2, alsa, libvlc, libav, libxine}
-ENABLE_MEDIA ?= gif, ilist, v4l2, alsa
+ENABLE_MEDIA ?= gif, ilist, v4l2, alsa, libvlc
 
 # -ansi: problemas com va_copy()
 CCFLAGS		= \

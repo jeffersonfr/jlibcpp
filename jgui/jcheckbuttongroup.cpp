@@ -38,7 +38,7 @@ void CheckButtonGroup::Add(CheckButton *button)
 {
 	jthread::AutoLock lock(&_mutex);
 
-	button->RegisterCheckButtonListener(this);
+	button->RegisterToggleListener(this);
 
 	_buttons.push_back(button);
 }
@@ -49,7 +49,7 @@ void CheckButtonGroup::Remove(CheckButton *button)
 
 	for (std::vector<CheckButton *>::iterator i=_buttons.begin(); i!=_buttons.end(); i++) {
 		if (button == (*i)) {
-			(*i)->RemoveCheckButtonListener(this);
+			(*i)->RemoveToggleListener(this);
 
 			_buttons.erase(i);
 
@@ -58,7 +58,7 @@ void CheckButtonGroup::Remove(CheckButton *button)
 	}
 }
 
-void CheckButtonGroup::ButtonSelected(CheckButtonEvent *event)
+void CheckButtonGroup::StateChanged(ToggleEvent *event)
 {
 	jthread::AutoLock lock(&_mutex);
 

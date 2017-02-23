@@ -19,11 +19,9 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "alsalightplayer.h"
-#include "nativeimage.h"
 #include "jcontrolexception.h"
 #include "jvolumecontrol.h"
 #include "jmediaexception.h"
-#include "jgfxhandler.h"
 #include "jfileinputstream.h"
 
 #define ALSA_PLAYER_DEVICE_NAME "default"

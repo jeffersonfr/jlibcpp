@@ -20,6 +20,8 @@
 #include "Stdafx.h"
 #include "nativegraphics.h"
 #include "nativehandler.h"
+#include "jsemaphoreexception.h"
+#include "jsemaphoretimeoutexception.h"
 
 #include <X11/Xutil.h>
 
@@ -27,11 +29,12 @@
 
 namespace jgui {
 
-NativeGraphics::NativeGraphics(void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp):
+NativeGraphics::NativeGraphics(NativeHandler *handler, void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp):
 	GenericGraphics(surface, cairo_context, pixelformat, wp, hp)
 {
 	jcommon::Object::SetClassName("jgui::NativeGraphics");
 
+	_handler = handler;
 	_surface = surface;
 }
 
@@ -58,70 +61,88 @@ void NativeGraphics::SetNativeSurface(void *surface, int wp, int hp)
 
 void NativeGraphics::Flip()
 {
-	if (_surface == NULL) {
-		return;
+	::Display *display = (::Display *)_handler->GetDisplay();
+
+	XEvent event;
+
+	event.xexpose.type = Expose;
+	event.xexpose.serial = 0;
+	event.xexpose.send_event = True;
+	event.xexpose.display = display;
+	event.xexpose.window = *(::Window *)_surface;
+	event.xexpose.x = _handler->GetX();
+	event.xexpose.y = _handler->GetY();
+	event.xexpose.width = _handler->GetWidth();
+	event.xexpose.height = _handler->GetHeight();
+	event.xexpose.count = 0;
+
+	_has_bounds = false;
+
+	XPutBackEvent(display, &event);
+
+	// CHANGE:: if continues to block exit, change to timed semaphore
+	if (_handler->IsVisible() == true) {
+		try {
+			_sem.Wait(2000000);
+		} catch (jthread::SemaphoreException) {
+		} catch (jthread::SemaphoreTimeoutException) {
+		}
 	}
-
-	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
-	
-	if (cairo_surface == NULL) {
-		return;
-	}
-
-	cairo_surface_flush(cairo_surface);
-
-	int dw = cairo_image_surface_get_width(cairo_surface);
-	int dh = cairo_image_surface_get_height(cairo_surface);
-	// int stride = cairo_image_surface_get_stride(cairo_surface);
-
-	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-	if (data == NULL) {
-		return;
-	}
-
-	// Create the icon pixmap
-	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
-	int default_screen = DefaultScreen(display);
-	::Window root_window = XRootWindow(display, default_screen);
-	Visual *visual = DefaultVisual(display, default_screen);
-	unsigned int depth = DefaultDepth(display, default_screen);
-
-	XImage *image = XCreateImage(display, visual, depth, ZPixmap, 0, (char *)data, dw, dh, 32, 0);
-
-	if (image == NULL) {
-		return;
-	}
-
-	Pixmap pixmap = XCreatePixmap(display, root_window, dw, dh, depth);
-	GC gc = XCreateGC(display, pixmap, 0, NULL);
-	
-	// XClearWindow(*(::Window *)_surface);
-
-	// draw image to pixmap
-	XPutImage(display, pixmap, gc, image, 0, 0, 0, 0, dw, dh);
-	XCopyArea(display, pixmap, *(::Window *)_surface, gc, 0, 0, dw, dh, 0, 0);
-
-	// XDestroyImage(image);
-	XFreePixmap(display, pixmap);
-
-	XFlush(display);
-
-	// INFO:: wait x11 process all events
-	// True:: discards all events remaing
-	// False:: not discards events remaing
-	// XSync(display, False);
 }
 
 void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 {
+	if (wp <= 0 || hp <= 0) {
+		return;
+	}
+
+	::Display *display = (::Display *)_handler->GetDisplay();
+
+	XEvent event;
+
+	event.xexpose.type = Expose;
+	event.xexpose.serial = 0;
+	event.xexpose.send_event = True;
+	event.xexpose.display = display;
+	event.xexpose.window = *(::Window *)_surface;
+	event.xexpose.x = _handler->GetX();
+	event.xexpose.y = _handler->GetY();
+	event.xexpose.width = _handler->GetWidth();
+	event.xexpose.height = _handler->GetHeight();
+	event.xexpose.count = 0;
+
+	_region.x = xp;
+	_region.y = yp;
+	_region.width = wp;
+	_region.height = hp;
+
+	_has_bounds = true;
+
+	XPutBackEvent(display, &event);
+
+	// CHANGE:: if continues to block exit, change to timed semaphore
+	if (_handler->IsVisible() == true) {
+		try {
+			_sem.Wait(2000000);
+		} catch (jthread::SemaphoreException) {
+		} catch (jthread::SemaphoreTimeoutException) {
+		}
+	}
+}
+
+void NativeGraphics::InternalFlip()
+{
 	if (_surface == NULL) {
+		_has_bounds = false;
+
 		return;
 	}
 
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 	
 	if (cairo_surface == NULL) {
+		_has_bounds = false;
+
 		return;
 	}
 
@@ -134,40 +155,57 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
 	if (data == NULL) {
+		_has_bounds = false;
+
 		return;
 	}
 
 	// Create the icon pixmap
-	::Display *display = (::Display *)dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->GetGraphicEngine();
-	int default_screen = DefaultScreen(display);
-	::Window root_window = XRootWindow(display, default_screen);
-	Visual *visual = DefaultVisual(display, default_screen);
-	unsigned int depth = DefaultDepth(display, default_screen);
+	::Display *display = (::Display *)_handler->GetDisplay();
+	int screen = DefaultScreen(display);
+	Visual *visual = DefaultVisual(display, screen);
+	unsigned int depth = DefaultDepth(display, screen);
 
 	XImage *image = XCreateImage(display, visual, depth, ZPixmap, 0, (char *)data, dw, dh, 32, 0);
 
 	if (image == NULL) {
+		_has_bounds = false;
+
 		return;
 	}
 
-	Pixmap pixmap = XCreatePixmap(display, root_window, wp, hp, depth);
+	Pixmap pixmap;
+
+	if (_has_bounds == false) {
+		pixmap = XCreatePixmap(display, XRootWindow(display, screen), dw, dh, depth);
+	} else {
+		pixmap = XCreatePixmap(display, XRootWindow(display, screen), _region.width, _region.height, depth);
+	}
+
 	GC gc = XCreateGC(display, pixmap, 0, NULL);
 	
 	// XClearWindow(*(::Window *)_surface);
 	
 	// draw image to pixmap
-	XPutImage(display, pixmap, gc, image, xp, yp, 0, 0, dw, dh);
-	XCopyArea(display, pixmap, *(::Window *)_surface, gc, 0, 0, dw, dh, xp, yp);
+	if (_has_bounds == false) {
+		XPutImage(display, pixmap, gc, image, 0, 0, 0, 0, dw, dh);
+		XCopyArea(display, pixmap, *(::Window *)_surface, gc, 0, 0, dw, dh, 0, 0);
+	} else {
+		XPutImage(display, pixmap, gc, image, _region.x, _region.y, 0, 0, dw, dh);
+		XCopyArea(display, pixmap, *(::Window *)_surface, gc, 0, 0, dw, dh, _region.x, _region.y);
+	}
 
 	// XDestroyImage(image);
 	XFreePixmap(display, pixmap);
 
-	XFlush(display);
+	// XFlush(display);
 
 	// INFO:: wait x11 process all events
 	// True:: discards all events remaing
 	// False:: not discards events remaing
-	// XSync(display, False);
+	XSync(display, True);
+	
+	_sem.Notify();
 }
 
 }

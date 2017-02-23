@@ -21,10 +21,10 @@
 #define J_INPUTDIALOGBOX_H
 
 #include "jbutton.h"
-#include "jbuttonlistener.h"
+#include "jactionlistener.h"
 #include "jlabel.h"
 #include "jtextfield.h"
-#include "jdialogbox.h"
+#include "jwidget.h"
 
 #include <string>
 #include <iostream>
@@ -39,7 +39,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class InputDialogBox : public jgui::DialogBox, public jgui::ButtonListener{
+class InputDialogBox : public jgui::Widget, public jgui::ActionListener{
 
 	private:
 		/** \brief */

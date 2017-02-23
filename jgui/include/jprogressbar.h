@@ -136,12 +136,6 @@ class ProgressBar : public jgui::Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void SetVisible(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Paint(Graphics *g);
 
 		/**

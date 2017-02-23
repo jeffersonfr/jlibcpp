@@ -106,6 +106,10 @@ void NativeGraphics::Flip()
 
 void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 {
+	if (wp <= 0 || hp <= 0) {
+		return;
+	}
+
 	if (_surface == NULL) {
 		return;
 	}
@@ -161,6 +165,16 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 	} else {
 		surface->Flip(surface, &rgn, (DFBSurfaceFlipFlags)(DSFLIP_BLIT | DSFLIP_WAITFORSYNC));
 	}
+}
+
+void NativeGraphics::Lock()
+{
+	_mutex.Lock();
+}
+
+void NativeGraphics::Unlock()
+{
+	_mutex.Unlock();
 }
 
 }

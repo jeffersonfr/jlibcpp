@@ -20,7 +20,7 @@
 #ifndef J_NATIVEHANDLER_H
 #define J_NATIVEHANDLER_H
 
-#include "generichandler.h"
+#include "japplication.h"
 #include "jthread.h"
 #include "jsemaphore.h"
 #include "jcomponent.h"
@@ -36,7 +36,7 @@ class NativeInputManager;
  *
  * \author Jeff Ferr
  */
-class NativeHandler : public GenericHandler, public jthread::Thread{
+class NativeHandler : public jgui::Application, public jthread::Thread{
 
 	friend NativeInputManager;
 
@@ -51,22 +51,62 @@ class NativeHandler : public GenericHandler, public jthread::Thread{
 		/** \brief */
 		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 		/** \brief */
-		jthread::Semaphore _sdl_sem;
+		jthread::Semaphore _init_sem;
+		/** \brief */
+		jthread::Condition _exit_sem;
+		/** \brief */
+		SDL_Window *_window;
+		/** \brief */
+		SDL_Renderer *_surface;
+		/** \brief */
+		uint64_t _last_keypress;
+		/** \brief */
+		int _mouse_x;
+		/** \brief */
+		int _mouse_y;
+		/** \brief */
+		int _click_count;
 		/** \brief */
 		bool _is_initialized;
+		/** \brief */
+		bool _is_running;
 
 	private:
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void InternalInitEngine();
+		void InternalInitCursors();
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void InternalRelease();
+		void InternalReleaseCursors();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void InternalInitialize();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void InternalRelease();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void InternalEventHandler(SDL_Event event);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void MainLoop();
 
 	public:
 		/**
@@ -85,49 +125,73 @@ class NativeHandler : public GenericHandler, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void InitEngine();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InitCursors();
+		virtual void SetFullScreenEnabled(bool b);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void InitResources();
+		virtual void WaitForExit();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetTitle(std::string title);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetUndecorated(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsUndecorated();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetOpacity(int i);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void CreateWindow(Window *window);
-
+		virtual void SetVisible(bool b);
+	
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void ReleaseWindow(Window *window);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RepaintWindow(Graphics *graphics);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string GetEngineID();
+		virtual void SetBounds(int x, int y, int width, int height);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void * GetGraphicEngine();
+		virtual void SetLocation(int x, int y);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Move(int x, int y);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetCursorLocation(int x, int y);
 
 		/**
 		 * \brief
@@ -139,37 +203,20 @@ class NativeHandler : public GenericHandler, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void SetCursorLocation(int x, int y);
+		virtual void SetCursorEnabled(bool b);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetFlickerFilteringEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsFlickerFilteringEnabled();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetCursorEnabled(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual bool IsCursorEnabled();
+
 		/**
 		 * \brief
 		 *
 		 */
 		virtual void SetCursor(jcursor_style_t t);
-		
+
 		/**
 		 * \brief
 		 *
@@ -180,37 +227,25 @@ class NativeHandler : public GenericHandler, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void Restore();
+		virtual void PostEvent(KeyEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Release();
+		virtual void PostEvent(MouseEvent *event);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Suspend();
+		virtual void SetRotation(jwidget_rotation_t t);
 
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void Resume();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitIdle();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void WaitSync();
+		virtual jwidget_rotation_t GetRotation();
 
 		/**
 		 * \brief

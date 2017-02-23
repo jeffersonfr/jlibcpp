@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 typedef struct { 
 	float x, 
@@ -30,7 +31,7 @@ typedef struct {
 		  y; 
 } ponto_plano;
 
-class GraphicsTeste : public jgui::Frame{
+class GraphicsTeste : public jgui::Widget{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -56,7 +57,7 @@ class GraphicsTeste : public jgui::Frame{
 
 	public:
 		GraphicsTeste():
-			jgui::Frame("Graphics Teste", 0, 0)
+			jgui::Widget("Graphics Teste", 0, 0, 720, 480)
 		{
 			TAM = _size.height/4;
 			nu = 40;
@@ -78,15 +79,13 @@ class GraphicsTeste : public jgui::Frame{
 			q2.x = 1, q2.y = -1, q2.z = 1;
 			q3.x = 1, q3.y = 1, q3.z = 1;
 			q4.x = -1, q4.y = 1, q4.z = 1;
-
-			SetUndecorated(true);
 		}
 
 		virtual ~GraphicsTeste()
 		{
 			jthread::AutoLock lock(&teste_mutex);
 
-			Hide();
+			SetVisible(false);
 		}
 
 		void ProjetaPonto(float x, float y, float z) 
@@ -211,7 +210,7 @@ class GraphicsTeste : public jgui::Frame{
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
@@ -252,7 +251,7 @@ class GraphicsTeste : public jgui::Frame{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			DesenhaCubo(g, &p1, &p2, &p3, &p4, &q1, &q2, &q3, &q4);
 		}
@@ -260,9 +259,15 @@ class GraphicsTeste : public jgui::Frame{
 
 int main( int argc, char *argv[] )
 {
-	GraphicsTeste test;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show(true);
+	GraphicsTeste app;
+
+	main->SetTitle("Cube");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

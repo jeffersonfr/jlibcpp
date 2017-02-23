@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 #define VMAX 100
 
@@ -34,7 +35,7 @@ struct particle_t {
 	double pi_value;
 };
 
-class Main : public jgui::Frame, public jthread::Thread{
+class Main : public jgui::Widget{
 
 	private:
 		struct point_t *_objects;
@@ -46,7 +47,7 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 	public:
 		Main(int n, int p):
-			jgui::Frame("Swarm Colony", 0, 0)
+			jgui::Widget("Swarm Colony", 0, 0, 720, 480)
 		{
 			srand(time(NULL));
 
@@ -94,8 +95,6 @@ class Main : public jgui::Frame, public jthread::Thread{
 		virtual ~Main()
 		{
 			_active = false;
-
-			WaitThread();
 		}
 
 		double g(struct particle_t *particle) 
@@ -109,7 +108,7 @@ class Main : public jgui::Frame, public jthread::Thread{
 			return k;
 		}
 
-		virtual void Run()
+		virtual void Render()
 		{
 			int scrumble = 0;
 
@@ -269,13 +268,17 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 				Repaint();
 
+				if (IsHidden() == true) {
+					return;
+				}
+
 				usleep(100000);
 			}
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			for (int i=0; i<_size_objects; i++) {
@@ -295,10 +298,16 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 int main(int argc, char **argv)
 {
-	Main main(50, 100);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Start();
-	main.Show(true);
+	Main app(50, 100);
+
+	main->SetTitle("Swarm");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+
+	app.Render();
 
 	return 0;
 }

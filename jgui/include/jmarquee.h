@@ -87,12 +87,6 @@ class Marquee : public Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void SetVisible(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetType(jmarquee_mode_t type);
 		
 		/**

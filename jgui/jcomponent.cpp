@@ -20,9 +20,9 @@
 #include "Stdafx.h"
 #include "jcomponent.h"
 #include "jcontainer.h"
-#include "jwindow.h"
 #include "jfocuslistener.h"
 #include "jthememanager.h"
+#include "japplication.h"
 
 namespace jgui {
 
@@ -32,16 +32,14 @@ Component::Component(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Component");
 
-	jsize_t screen = GFXHandler::GetInstance()->GetScreenSize();
-
 	_theme = NULL;
 
 	_preferred_size.width = DEFAULT_COMPONENT_WIDTH;
 	_preferred_size.height = DEFAULT_COMPONENT_HEIGHT;
-	_minimum_size.width = 0;
-	_minimum_size.height = 0;
-	_maximum_size.width = screen.width;
-	_maximum_size.height = screen.height;
+	_minimum_size.width = 16;
+	_minimum_size.height = 16;
+	_maximum_size.width = 16384;
+	_maximum_size.height = 16384;
 
 	_is_cyclic_focus = false;
 	_is_navigation_enabled = true;
@@ -651,12 +649,12 @@ void Component::PaintBorders(Graphics *g)
 	jcomponent_border_t bordertype = theme->GetBorder("component");
 	int bordersize = theme->GetBorderSize("component");
 
-	if (InstanceOf("jgui::Window") == true) {
-		border = theme->GetColor("window.border");
-		borderfocus = theme->GetColor("window.border.focus");
-		borderdisable = theme->GetColor("window.border.disable");
-		bordertype = theme->GetBorder("window");
-		bordersize = theme->GetBorderSize("window");
+	if (InstanceOf("jgui::Widget") == true) {
+		border = theme->GetColor("widget.border");
+		borderfocus = theme->GetColor("widget.border.focus");
+		borderdisable = theme->GetColor("widget.border.disable");
+		bordertype = theme->GetBorder("widget");
+		bordersize = theme->GetBorderSize("widget");
 	}
 
 	if (bordertype == JCB_EMPTY) {
@@ -801,7 +799,7 @@ Container * Component::GetParent()
 Container * Component::GetTopLevelAncestor()
 {
 	for (Component *cmp = this; cmp != NULL; cmp = cmp->GetParent()) {
-		Container *container = dynamic_cast<jgui::Window *>(cmp);
+		Container *container = dynamic_cast<jgui::Application *>(cmp);
 		
 		if (container != NULL) {
 			return container;
@@ -1124,13 +1122,17 @@ void Component::SetLocation(jpoint_t point)
 
 void Component::SetSize(int w, int h)
 {
+	printf("Compnent ::::::::: 01:: %d, %d, %d, %d\n", w, h, _size.width, _size.height);
 	if (_size.width == w && _size.height == h) {
 		return;
 	}
 
+	printf("Compnent ::::::::: 02:: %d, %d, %d, %d\n", w, h, _size.width, _size.height);
 	_size.width = w;
 	_size.height = h;
 
+	printf("Compnent ::::::::: 03:: %d, %d, %d, %d\n", w, h, _size.width, _size.height);
+	printf("Compnent ::::::::: 03:1: %d, %d, %d, %d\n", _minimum_size.width, _minimum_size.height, _maximum_size.width, _maximum_size.height);
 	if (_size.width < _minimum_size.width) {
 		_size.width = _minimum_size.width;
 	}
@@ -1147,6 +1149,7 @@ void Component::SetSize(int w, int h)
 		_size.height = _maximum_size.height;
 	}
 
+	printf("Compnent ::::::::: 04:: %d, %d, %d, %d\n", w, h, _size.width, _size.height);
 	Repaint();
 }
 
@@ -1766,6 +1769,25 @@ bool Component::IsVisible()
 	return _is_visible;
 }
 
+bool Component::IsHidden()
+{
+	if (_is_visible == false) {
+		return true;
+	}
+
+	Container *cmp = GetParent();
+	
+	while (cmp != NULL) {
+		if (cmp->IsVisible() == false) {
+			return true;
+		}
+
+		cmp = cmp->GetParent();
+	}
+
+	return false;
+}
+
 void Component::SetVisible(bool b)
 {
 	if (_is_visible == b) {
@@ -1793,6 +1815,8 @@ void Component::RegisterFocusListener(FocusListener *listener)
 		return;
 	}
 
+	jthread::AutoLock lock(&_focus_listener_mutex);
+
 	if (std::find(_focus_listeners.begin(), _focus_listeners.end(), listener) == _focus_listeners.end()) {
 		_focus_listeners.push_back(listener);
 	}
@@ -1803,6 +1827,8 @@ void Component::RemoveFocusListener(FocusListener *listener)
 	if (listener == NULL) {
 		return;
 	}
+
+	jthread::AutoLock lock(&_focus_listener_mutex);
 
 	std::vector<FocusListener *>::iterator i = std::find(_focus_listeners.begin(), _focus_listeners.end(), listener);
 	
@@ -1817,22 +1843,21 @@ void Component::DispatchFocusEvent(FocusEvent *event)
 		return;
 	}
 
-	int k = 0,
-			size = (int)_focus_listeners.size();
+	std::vector<FocusListener *> listeners;
+	
+	_focus_listener_mutex.Lock();
 
-	while (k++ < (int)_focus_listeners.size() && event->IsConsumed() == false) {
-		FocusListener *listener = _focus_listeners[k-1];
+	listeners = _focus_listeners;
+
+	_focus_listener_mutex.Unlock();
+
+	for (std::vector<FocusListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		FocusListener *listener = (*i);
 
 		if (event->GetType() == JFET_GAINED) {
 			listener->FocusGained(event);
 		} else if (event->GetType() == JFET_LOST) {
 			listener->FocusLost(event);
-		}
-
-		if (size != (int)_focus_listeners.size()) {
-			size = (int)_focus_listeners.size();
-
-			k--;
 		}
 	}
 
@@ -1860,6 +1885,8 @@ void Component::RegisterComponentListener(ComponentListener *listener)
 		return;
 	}
 
+	jthread::AutoLock lock(&_component_listener_mutex);
+
 	if (std::find(_component_listeners.begin(), _component_listeners.end(), listener) == _component_listeners.end()) {
 		_component_listeners.push_back(listener);
 	}
@@ -1870,6 +1897,8 @@ void Component::RemoveComponentListener(ComponentListener *listener)
 	if (listener == NULL) {
 		return;
 	}
+
+	jthread::AutoLock lock(&_component_listener_mutex);
 
 	std::vector<ComponentListener *>::iterator i = std::find(_component_listeners.begin(), _component_listeners.end(), listener);
 
@@ -1884,11 +1913,16 @@ void Component::DispatchComponentEvent(ComponentEvent *event)
 		return;
 	}
 
-	int k = 0,
-			size = (int)_component_listeners.size();
+	std::vector<ComponentListener *> listeners;
+	
+	_component_listener_mutex.Lock();
 
-	while (k++ < (int)_component_listeners.size() && event->IsConsumed() == false) {
-		ComponentListener *listener = _component_listeners[k-1];
+	listeners = _component_listeners;
+
+	_component_listener_mutex.Unlock();
+
+	for (std::vector<ComponentListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		ComponentListener *listener = (*i);
 
 		if (event->GetType() == JCET_ONHIDE) {
 			listener->OnHide(event);
@@ -1903,27 +1937,7 @@ void Component::DispatchComponentEvent(ComponentEvent *event)
 		} else if (event->GetType() == JCET_ONLEAVE) {
 			listener->OnLeave(event);
 		}
-
-		if (size != (int)_component_listeners.size()) {
-			size = (int)_component_listeners.size();
-
-			k--;
-		}
 	}
-
-	/*
-	for (std::vector<ComponentListener *>::iterator i=_component_listeners.begin(); i!=_component_listeners.end(); i++) {
-		if (event->GetType() == COMPONENT_HIDDEN_EVENT) {
-			(*i)->ComponentHidden(event);
-		} else if (event->GetType() == COMPONENT_SHOWN_EVENT) {
-			(*i)->ComponentShown(event);
-		} else if (event->GetType() == COMPONENT_MOVED_EVENT) {
-			(*i)->ComponentMoved(event);
-		} else if (event->GetType() == COMPONENT_PAINT_EVENT) {
-			(*i)->ComponentRepainted(event);
-		}
-	}
-	*/
 
 	delete event;
 }
@@ -1944,6 +1958,8 @@ void Component::RegisterDataListener(jcommon::DataListener *listener)
 		return;
 	}
 
+	jthread::AutoLock lock(&_data_listener_mutex);
+
 	if (std::find(_data_listeners.begin(), _data_listeners.end(), listener) == _data_listeners.end()) {
 		_data_listeners.push_back(listener);
 	}
@@ -1955,6 +1971,8 @@ void Component::RemoveDataListener(jcommon::DataListener *listener)
 		return;
 	}
 
+	jthread::AutoLock lock(&_data_listener_mutex);
+
 	std::vector<jcommon::DataListener *>::iterator i = std::find(_data_listeners.begin(), _data_listeners.end(), listener);
 
 	if (i != _data_listeners.end()) {
@@ -1962,42 +1980,25 @@ void Component::RemoveDataListener(jcommon::DataListener *listener)
 	}
 }
 
-void Component::DispatchDataEvent(jcommon::ParamMapper *params)
+void Component::DispatchDataEvent(jcommon::DataEvent *event)
 {
-	if (params == NULL) {
+	if (event == NULL) {
 		return;
 	}
 
-	int k = 0,
-			size = (int)_data_listeners.size();
+	std::vector<jcommon::DataListener *> listeners;
+	
+	_data_listener_mutex.Lock();
 
-	while (k++ < (int)_data_listeners.size()) {
-		jcommon::DataListener *listener = _data_listeners[k-1];
+	listeners = _data_listeners;
 
-		listener->DataChanged(params);
+	_data_listener_mutex.Unlock();
 
-		if (size != (int)_data_listeners.size()) {
-			size = (int)_data_listeners.size();
+	for (std::vector<jcommon::DataListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		jcommon::DataListener *listener = (*i);
 
-			k--;
-		}
+		listener->DataChanged(event);
 	}
-
-	/*
-	for (std::vector<DataListener *>::iterator i=_data_listeners.begin(); i!=_data_listeners.end(); i++) {
-		if (event->GetType() == JWET_CLOSING) {
-			(*i)->DataClosing(event);
-		} else if (event->GetType() == JWET_CLOSED) {
-			(*i)->DataClosed(event);
-		} else if (event->GetType() == JWET_OPENED) {
-			(*i)->DataOpened(event);
-		} else if (event->GetType() == JWET_RESIZED) {
-			(*i)->DataResized(event);
-		} else if (event->GetType() == JWET_MOVED) {
-			(*i)->DataMoved(event);
-		}
-	}
-	*/
 }
 
 std::vector<jcommon::DataListener *> & Component::GetDataListeners()

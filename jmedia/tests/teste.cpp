@@ -17,10 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jplayermanager.h"
 #include "jplayerlistener.h"
 #include "jframegrabberlistener.h"
+#include "jthread.h"
 #include "jautolock.h"
 
 #include <stdio.h>
@@ -64,7 +66,7 @@ class MediaStart : public jthread::Thread {
 
 };
 
-class PlayerTest : public jgui::Frame, public jmedia::PlayerListener, public jmedia::FrameGrabberListener {
+class PlayerTest : public jgui::Widget, public jmedia::PlayerListener, public jmedia::FrameGrabberListener {
 
 	private:
 		std::vector<MediaStart *> _players;
@@ -73,7 +75,7 @@ class PlayerTest : public jgui::Frame, public jmedia::PlayerListener, public jme
 
 	public:
 		PlayerTest(std::string file):
-			jgui::Frame("Player Test")
+			jgui::Widget("Player Test")
 		{
 			jgui::jsize_t size = GetSize();
 
@@ -130,7 +132,7 @@ class PlayerTest : public jgui::Frame, public jmedia::PlayerListener, public jme
 			_is_playing = false;
 		}
 
-		virtual void Run()
+		virtual void Render()
 		{
 			jthread::AutoLock lock(&_mutex);
 
@@ -219,21 +221,26 @@ int main(int argc, char *argv[])
 
 	srand(time(NULL));
 
-	PlayerTest test(argv[1]);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show();
+	PlayerTest app(argv[1]);
 
-	test.StartMedia();
-
+	main->SetTitle("Video Player");
+	main->Add(&app);
+	// main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	
+	app.StartMedia();
+	
 	int k = 100;
 
 	while (k-- > 0) {
-		test.Run();
+		app.Render();
 
 		usleep(100000);
 	}
 
-	test.StopMedia();
+	app.StopMedia();
 
 	sleep(2);
 

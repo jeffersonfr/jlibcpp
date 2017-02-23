@@ -21,13 +21,14 @@
 #define J_NATIVEGRAPHICS_H
 
 #include "genericgraphics.h"
-#include "jsemaphore.h"
+#include "jcondition.h"
 
 namespace jgui{
 
 class Font;
 class Image;
 class NativeImage;
+class NativeHandler;
 
 /**
  * \brief
@@ -38,14 +39,20 @@ class NativeGraphics : public GenericGraphics{
 	
 	public:
 		/** \brief */
-		jthread::Semaphore _sdl_sem;
+		jthread::Condition _sem;
+		/** \brief */
+		NativeHandler *_handler;
+		/** \brief */
+		jregion_t _region;
+		/** \brief */
+		bool _has_bounds;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		NativeGraphics(void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp);
+		NativeGraphics(NativeHandler *handler, void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp);
 
 		/**
 		 * \brief
@@ -77,12 +84,6 @@ class NativeGraphics : public GenericGraphics{
 		 */
 		virtual void InternalFlip();
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void InternalFlip(int x, int y, int w, int h);
-
 };
 
 }

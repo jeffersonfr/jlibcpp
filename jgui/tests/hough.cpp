@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 #include <iostream>
 #include <vector>
@@ -156,7 +157,7 @@ class Hough {
 
 };
 
-class Test : public jgui::Frame {
+class Test : public jgui::Widget{
 	
 	private:
 		Hough _transform;
@@ -167,7 +168,7 @@ class Test : public jgui::Frame {
 
 	public:
 		Test():
-			jgui::Frame("Hough Test", 0, 0, 960, 540)
+			jgui::Widget("Hough Test", 0, 0, 960, 540)
 		{
 			_binary_threshold = 195;
 			_lines_threshold = 195;
@@ -270,7 +271,7 @@ class Test : public jgui::Frame {
 
 		virtual void Paint(jgui::Graphics *g) 
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			ProcessFrame();
 
@@ -293,7 +294,7 @@ class Test : public jgui::Frame {
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
@@ -314,9 +315,15 @@ class Test : public jgui::Frame {
 };
 int main()
 {
-	Test test;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show(true);
+	Test app;
+
+	main->SetTitle("Hough");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

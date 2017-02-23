@@ -235,19 +235,35 @@ class Item : public virtual jcommon::Object{
 class ItemComponent : public virtual jcommon::Object{
 
 	protected:
+		/** \brief */
 		std::vector<SelectListener *> _select_listeners;
+		/** \brief */
+		jthread::Mutex _select_listener_mutex;
+		/** \brief */
 		std::vector<Item *> _items;
+		/** \brief */
 		std::vector<Item *> _internal;
+		/** \brief */
 		Color _item_color;
+		/** \brief */
 		Color _item_fgcolor;
+		/** \brief */
 		Color _selected_item_color;
+		/** \brief */
 		Color _selected_item_fgcolor;
+		/** \brief */
 		Color _focus_item_color;
+		/** \brief */
 		Color _focus_item_fgcolor;
+		/** \brief */
 		Color _disabled_item_color;
+		/** \brief */
 		Color _disabled_item_fgcolor;
+		/** \brief */
 		std::string _text;
+		/** \brief */
 		int _index;
+		/** \brief */
 		bool _loop;
 
 	protected:

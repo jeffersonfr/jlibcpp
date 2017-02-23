@@ -52,6 +52,8 @@ class TextComponent : public jgui::Component{
 		/** \brief */
 		std::vector<TextListener *> _text_listeners;
 		/** \brief */
+		jthread::Mutex _text_listener_mutex;
+		/** \brief */
 		Color _caret_color;
 		/** \brief */
 		jhorizontal_align_t _halign;

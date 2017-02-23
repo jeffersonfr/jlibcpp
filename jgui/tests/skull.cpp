@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 #ifndef PI
 # define PI 3.1415927
@@ -2219,7 +2220,7 @@ static void DrawTriangle(jgui::Graphics *g, float light1, float light2, Tri3D* t
 	}
 }
 
-class GraphicsTeste : public jgui::Frame{
+class GraphicsTeste : public jgui::Widget{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -2228,7 +2229,7 @@ class GraphicsTeste : public jgui::Frame{
 
 	public:
 		GraphicsTeste():
-			jgui::Frame("", 0, 0)
+			jgui::Widget("", 0, 0, 720, 480)
 		{
 			Width = _size.width;
 			Height = _size.height;
@@ -2246,9 +2247,6 @@ class GraphicsTeste : public jgui::Frame{
 
 		virtual ~GraphicsTeste()
 		{
-			jthread::AutoLock lock(&teste_mutex);
-
-			Hide();
 		}
 
 		virtual void Paint(jgui::Graphics *g)
@@ -2364,11 +2362,11 @@ class GraphicsTeste : public jgui::Frame{
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
-			jthread::AutoLock lock(&teste_mutex);
+			// jthread::AutoLock lock(&teste_mutex);
 
 			int step = 20;
 
@@ -2411,9 +2409,15 @@ class GraphicsTeste : public jgui::Frame{
 
 int main( int argc, char *argv[] )
 {
-	GraphicsTeste test;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show(true);
+	GraphicsTeste app;
+
+	main->SetTitle("Skull");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

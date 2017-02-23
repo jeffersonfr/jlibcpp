@@ -46,6 +46,8 @@ class Animation : public Component, public jthread::Thread{
 		/** \brief */
 		std::vector<Image *> _images;
 		/** \brief */
+		jthread::Mutex _animation_mutex;
+		/** \brief */
 		int _index;
 		/** \brief */
 		int _interval;

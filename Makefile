@@ -27,6 +27,7 @@ OBJS_jcommon += \
 	   jcalendar.o\
 	   jcharset.o\
 	   jdatalistener.o\
+		 jdataevent.o\
 	   jdate.o\
 		 jdebug.o\
 	   jdynamiclink.o\
@@ -248,22 +249,21 @@ OBJS_jthread += \
 ifneq ($(ENABLE_GRAPHICS),none)
 
 OBJS_jgui += \
+		jactionevent.o\
+		jactionlistener.o\
 		jadjustmentevent.o\
 		jadjustmentlistener.o\
 		janimation.o\
+		japplication.o\
 		jborderlayout.o\
 		jbutton.o\
-		jbuttonevent.o\
-		jbuttonlistener.o\
 		jcalendardialogbox.o\
 		jcalendarevent.o\
 		jcalendarlistener.o\
 		jcanvas.o\
 		jcardlayout.o\
 		jcheckbutton.o\
-		jcheckbuttonevent.o\
 		jcheckbuttongroup.o\
-		jcheckbuttonlistener.o\
 		jcolor.o\
 		jcombobox.o\
 		jcomponent.o\
@@ -273,14 +273,11 @@ OBJS_jgui += \
 		jcontainerevent.o\
 		jcontainerlistener.o\
 		jcoordinatelayout.o\
-		jdialogbox.o\
 		jfilechooserdialogbox.o\
 		jflowlayout.o\
 		jfocusevent.o\
 		jfocuslistener.o\
 		jfont.o\
-		jframe.o\
-		jgfxhandler.o\
 		jgraphics.o\
 		jgridbaglayout.o\
 		jgridlayout.o\
@@ -292,7 +289,6 @@ OBJS_jgui += \
 		jindexedimage.o\
 		jimagebutton.o\
 		jinputdialogbox.o\
-		jinputmanager.o\
 		jitemcomponent.o\
 		jkeyboard.o\
 		jkeyboardlistener.o\
@@ -332,16 +328,17 @@ OBJS_jgui += \
 		jthememanager.o\
 		jtogglebutton.o\
 		jwatch.o\
-		jwindow.o\
-		jwindowevent.o\
-		jwindowlistener.o\
-		jwindowmanager.o\
+		jwidgetevent.o\
+		jwidgetlistener.o\
 		jyesnodialogbox.o\
 		jtabbedpane.o\
 		jtable.o\
+		jtoggleevent.o\
+		jtogglelistener.o\
 		jtouchevent.o\
 		jtouchlistener.o\
 		jtreelistview.o\
+		jwidget.o\
 		jguilib.o\
 
 OBJS_jmedia += \

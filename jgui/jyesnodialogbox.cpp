@@ -19,11 +19,12 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jyesnodialogbox.h"
+#include "jdataevent.h"
 
 namespace jgui {
 
 YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg):
-	jgui::DialogBox(title, -1, -1, -1, -1)
+	jgui::Widget(title, -1, -1, -1, -1)
 {
 	jcommon::Object::SetClassName("jgui::YesNoDialogBox");
 
@@ -42,8 +43,8 @@ YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg):
 	_yes = new Button("Sim", _label->GetX()+_label->GetWidth()-2*cw-1*30, _label->GetY()+_label->GetHeight()+20, cw, ch);
 	_no = new Button("Nao", _label->GetX()+_label->GetWidth()-1*cw-0*30, _label->GetY()+_label->GetHeight()+20, cw, ch);
 	
-	_no->RegisterButtonListener(this);
-	_yes->RegisterButtonListener(this);
+	_no->RegisterActionListener(this);
+	_yes->RegisterActionListener(this);
 
 	Add(_label);
 	Add(_no);
@@ -51,7 +52,7 @@ YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg):
 
 	_no->RequestFocus();
 
-	Pack();
+	Pack(true);
 }
 
 YesNoDialogBox::~YesNoDialogBox() 
@@ -81,7 +82,7 @@ jvertical_align_t YesNoDialogBox::GetVerticalAlign()
 	return _label->GetVerticalAlign();
 }
 
-void YesNoDialogBox::ActionPerformed(jgui::ButtonEvent *event)
+void YesNoDialogBox::ActionPerformed(jgui::ActionEvent *event)
 {
 	std::string response = "no";
 
@@ -91,9 +92,9 @@ void YesNoDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 		
 	GetParams()->SetTextParam("response", response);
 
-	DispatchDataEvent(GetParams());
+	DispatchDataEvent(new jcommon::DataEvent(this, GetParams()));
 
-	Release();
+	// Release();
 }
 
 }

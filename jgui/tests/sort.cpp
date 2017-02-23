@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jfont.h"
 #include "jobservable.h"
 #include "jthread.h"
@@ -1680,7 +1681,11 @@ class SortComponent : public jgui::Component, public jthread::Thread, public jco
 				g->DrawRectangle(0, _algorithm->GetIndex1()*hsize, _size.width, hsize);
 			}
 
-			g->SetColor(0xff, 0xff, 0xff, 0xff);
+			jgui::Theme *theme = GetTheme();
+			jgui::Font *font = theme->GetFont("component");
+
+			g->SetColor(jgui::Color::White);
+			g->SetFont(font);
 			g->DrawString(_algorithm->GetName(), 0, 0, _size.width, _size.height);
 		}
 
@@ -1691,14 +1696,14 @@ class SortComponent : public jgui::Component, public jthread::Thread, public jco
 
 };
 
-class SortFrame : public jgui::Frame {
+class SortFrame : public jgui::Widget{
 
 	private:
 		std::vector<SortComponent *> _components;
 
 	public:
 		SortFrame():
-			jgui::Frame("Sort Algorithms", 0, 0)
+			jgui::Widget("Sort Algorithms", 0, 0, 1280, 720)
 		{
 			int w = 128,
 					h = 128,
@@ -1775,9 +1780,15 @@ class SortFrame : public jgui::Frame {
 
 int main(int argc, char **argv)
 {
-	SortFrame main;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Show(true);
+	SortFrame app;
+
+	main->SetTitle("Sort");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

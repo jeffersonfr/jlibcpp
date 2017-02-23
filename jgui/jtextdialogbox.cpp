@@ -23,7 +23,7 @@
 namespace jgui {
 
 TextDialogBox::TextDialogBox(std::string msg, bool wrap):
-	jgui::DialogBox("", -1, -1, -1, -1)
+	jgui::Widget("", -1, -1, -1, -1)
 {
 	jcommon::Object::SetClassName("jgui::TextDialogBox");
 
@@ -38,7 +38,7 @@ TextDialogBox::TextDialogBox(std::string msg, bool wrap):
 
 	Add(_label);
 
-	Pack();
+	Pack(true);
 }
 
 TextDialogBox::~TextDialogBox() 

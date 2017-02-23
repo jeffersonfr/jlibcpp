@@ -20,9 +20,9 @@
 #ifndef J_KEYBOARD_H
 #define J_KEYBOARD_H
 
-#include "jframe.h"
+#include "jwidget.h"
 #include "jbutton.h"
-#include "jbuttonlistener.h"
+#include "jactionlistener.h"
 #include "jkeyboardlistener.h"
 #include "jtextlistener.h"
 #include "jtextcomponent.h"
@@ -57,13 +57,15 @@ class TextArea;
  *
  * \author Jeff Ferr
  */
-class Keyboard : public jgui::Frame, public jgui::ButtonListener{
+class Keyboard : public jgui::Widget, public jgui::ActionListener{
 
 	private:
 		/** \brief */
+		std::vector<KeyboardListener *> _keyboard_listeners;
+		/** \brief */
 		jthread::Mutex _key_mutex;
 		/** \brief */
-		std::vector<KeyboardListener *> _keyboard_listeners;
+		jthread::Mutex _key_listener_mutex;
 		/** \brief */
 		TextArea *_display;
 		/** \brief */
@@ -139,7 +141,7 @@ class Keyboard : public jgui::Frame, public jgui::ButtonListener{
 		 * \brief
 		 *
 		 */
-		virtual void ActionPerformed(ButtonEvent *event);
+		virtual void ActionPerformed(ActionEvent *event);
 		
 		/**
 		 * \brief

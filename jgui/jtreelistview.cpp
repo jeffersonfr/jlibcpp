@@ -106,13 +106,9 @@ void TreeListView::SetCurrentIndex(int i)
 		throw jcommon::OutOfBoundsException("Index out of bounds exception");
 	}
 
-	{
-		jthread::AutoLock lock(&_component_mutex);
+	_index = i;
 
-		_index = i;
-
-		SetScrollY(_index*(GetItemSize()+GetItemGap()));
-	}
+	SetScrollY(_index*(GetItemSize()+GetItemGap()));
 
 	Repaint();
 }

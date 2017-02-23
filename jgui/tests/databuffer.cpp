@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "jmainwindow.h"
+#include "jwidget.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -166,13 +167,14 @@ int main(int argc, char **argv)
 
 	dfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
 
-	jgui::Window *window = new jgui::Window(0, 0, 1920, 1080);
+	jgui::MainWindow *window = jgui::MainWindow::GetInstance();
+	
+	window->SetVisible(true);
 
-	window->Show(false);
 	primary = (IDirectFBSurface *)window->GetGraphics()->GetNativeSurface();
 
-	screen_width = jgui::GFXHandler::GetInstance()->GetScreenWidth();
-	screen_height = jgui::GFXHandler::GetInstance()->GetScreenHeight();
+	screen_width = window->GetScreenSize().width;
+	screen_height = window->GetScreenSize().height;
 
 	TestFileStreamed test(filename);
 

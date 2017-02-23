@@ -21,7 +21,7 @@
 #define J_NATIVEGRAPHICS_H
 
 #include "genericgraphics.h"
-#include "jsemaphore.h"
+#include "jcondition.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -38,6 +38,10 @@ class NativeImage;
  */
 class NativeGraphics : public GenericGraphics{
 	
+	private:
+		/** \brief */
+		sf::Sprite _sprite;
+
 	public:
 		/**
 		 * \brief
@@ -73,7 +77,7 @@ class NativeGraphics : public GenericGraphics{
 		 * \brief
 		 *
 		 */
-		virtual void SetVerticalSyncEnabled(bool b);
+		virtual void InternalFlip();
 
 };
 

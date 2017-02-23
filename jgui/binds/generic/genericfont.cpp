@@ -19,11 +19,38 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "genericfont.h"
-#include "generichandler.h"
 #include "jcharset.h"
+#include "jfile.h"
 #include "jnullpointerexception.h"
 
 namespace jgui {
+
+static FT_Library _ft_library;
+
+int InternalCreateFont(std::string name, cairo_font_face_t **font)
+{
+	static bool init = false;
+
+	if (init == false) {
+		init = true;
+
+		FT_Init_FreeType(&_ft_library);
+	}
+
+	FT_Face ft_face;
+
+	if (FT_New_Face(_ft_library, name.c_str(), 0, &ft_face) != 0) {
+		(*font) = NULL;
+
+		return -1;
+	}
+
+	FT_Select_Charmap(ft_face, ft_encoding_unicode);
+
+	(*font) = cairo_ft_font_face_create_for_ft_face(ft_face, FT_LOAD_NO_AUTOHINT);
+
+	return 0;
+}
 
 GenericFont::GenericFont(std::string name, jfont_attributes_t attributes, int size):
 	jgui::Font(name, attributes, size)
@@ -35,12 +62,10 @@ GenericFont::GenericFont(std::string name, jfont_attributes_t attributes, int si
 	_font = NULL;
 	_is_builtin = false;
 
-	GenericHandler *handler = dynamic_cast<GenericHandler *>(GFXHandler::GetInstance());
-
 	if (file == NULL) {
 		_is_builtin = true;
 	} else {
-		handler->CreateFont(name, &_font);
+		InternalCreateFont(name, &_font);
 	
 		if (_font == NULL) {
 			throw jcommon::NullPointerException("Cannot load a native font");
@@ -119,14 +144,10 @@ GenericFont::GenericFont(std::string name, jfont_attributes_t attributes, int si
 
 		_widths[i] = bounds.x+bounds.width;
 	}
-
-	handler->Add(this);
 }
 
 GenericFont::~GenericFont()
 {
-	dynamic_cast<GenericHandler *>(GFXHandler::GetInstance())->Remove(this);
-
 	if (_font != NULL) {
 		cairo_scaled_font_destroy(_scaled_font);
 		cairo_font_face_destroy(_font);

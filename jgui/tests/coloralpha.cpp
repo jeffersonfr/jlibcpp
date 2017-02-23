@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 struct color_t {
 	float a;
@@ -26,7 +27,9 @@ struct color_t {
 	float b;
 };
 
-class ColorAlphaTeste : public jgui::Frame{
+jgui::Application *gmain = NULL;
+
+class ColorAlphaTeste : public jgui::Widget{
 
 	private:
 		jgui::Image *_fg;
@@ -89,7 +92,7 @@ class ColorAlphaTeste : public jgui::Frame{
 
 	public:
 		ColorAlphaTeste():
-			jgui::Frame("Color Alpha Teste", 0, 0, 320, 320)
+			jgui::Widget("Color Alpha Teste", 0, 0, 320, 320)
 		{
 			_fg = jgui::Image::CreateImage("images/image.bmp");
 			_bg = jgui::Image::CreateImage("images/tux-zombie.jpg");
@@ -97,8 +100,6 @@ class ColorAlphaTeste : public jgui::Frame{
 			_ref_color.r = 0x00;
 			_ref_color.g = 0x00;
 			_ref_color.b = 0x00;
-
-			SetResizeEnabled(true);
 		}
 
 		virtual ~ColorAlphaTeste()
@@ -109,11 +110,13 @@ class ColorAlphaTeste : public jgui::Frame{
 
 		virtual bool MousePressed(jgui::MouseEvent *event)
 		{
-			if (jgui::Frame::MousePressed(event) == true) {
+			if (jgui::Widget::MousePressed(event) == true) {
 				return true;
 			}
 
-			jgui::Color color(GetGraphics()->GetRGB(event->GetX()-_location.x, event->GetY()-_location.y));
+			jgui::Graphics *g = gmain->GetGraphics();
+
+			jgui::Color color(g->GetRGB(event->GetX()-_location.x, event->GetY()-_location.y));
 
 			_ref_color.a = 0xff/255.0;
 			_ref_color.r = color.GetRed()/255.0;
@@ -127,7 +130,7 @@ class ColorAlphaTeste : public jgui::Frame{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			jgui::jsize_t size = _fg->GetSize();
 			uint32_t *buffer = NULL;
@@ -169,9 +172,15 @@ class ColorAlphaTeste : public jgui::Frame{
 
 int main(int argc, char *argv[])
 {
-	ColorAlphaTeste test;
+	gmain = jgui::Application::GetInstance();
 
-	test.Show(true);
+	ColorAlphaTeste app;
+
+	gmain->SetTitle("Coloralpha");
+	gmain->Add(&app);
+	gmain->SetSize(app.GetWidth(), app.GetHeight());
+	gmain->SetVisible(true);
+	gmain->WaitForExit();
 
 	return 0;
 }

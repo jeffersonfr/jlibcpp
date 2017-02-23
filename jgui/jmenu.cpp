@@ -25,7 +25,7 @@
 namespace jgui {
 
 Menu::Menu(int x, int y, int width, int visible_items):
-	jgui::Frame(x, y, 0, 0),
+	jgui::Widget("Menu", x, y, 0, 0),
 	jgui::ItemComponent()
 {
 	jcommon::Object::SetClassName("jgui::Menu");
@@ -46,7 +46,7 @@ Menu::Menu(int x, int y, int width, int visible_items):
 
 	_check = Image::CreateImage(_DATA_PREFIX"/images/check.png");
 
-	SetUndecorated(true);
+	// SetUndecorated(true);
 }
 
 Menu::~Menu() 
@@ -58,7 +58,7 @@ Menu::~Menu()
 
 		_menus.erase(_menus.begin());
 
-		menu->Release();
+		// menu->Release();
 
 		delete menu;
 	}
@@ -89,19 +89,19 @@ bool Menu::KeyPressed(KeyEvent *event)
 	}
 
 	if (event->GetSymbol() == JKS_ESCAPE || event->GetSymbol() == JKS_EXIT) {
-		Hide();
+		// Hide();
 
 		while (_menus.size() > 0) {
 			Menu *menu = *(_menus.begin()+_menus.size()-1);
 
 			_menus.erase(_menus.begin()+_menus.size()-1);
 
-			menu->Release();
+			// menu->Release();
 
 			delete menu;
 		}
 
-		Release();
+		// Release();
 	} else if (event->GetSymbol() == jgui::JKS_CURSOR_UP || event->GetSymbol() == jgui::JKS_CURSOR_DOWN) {
 		Menu *menu = last;
 
@@ -168,7 +168,7 @@ bool Menu::KeyPressed(KeyEvent *event)
 		if (last != this) {
 			_menus.erase(_menus.begin()+_menus.size()-1);
 
-			last->Release();
+			// last->Release();
 
 			delete last;
 		}
@@ -225,10 +225,10 @@ bool Menu::KeyPressed(KeyEvent *event)
 					_menus.push_back(menu);
 
 					// INFO:: disable events
-					menu->Show(false);
+					// menu->Show(false);
 
-					menu->GetInputManager()->RemoveKeyListener(menu);
-					menu->GetInputManager()->RemoveMouseListener(menu);
+					// menu->GetInputManager()->RemoveKeyListener(menu);
+					// menu->GetInputManager()->RemoveMouseListener(menu);
 
 					DispatchSelectEvent(new SelectEvent(GetCurrentMenu(), GetCurrentItem(), GetCurrentIndex(), JSET_RIGHT));
 				} else {
@@ -236,21 +236,21 @@ bool Menu::KeyPressed(KeyEvent *event)
 						Item *item = GetCurrentItem();
 						int index = GetCurrentIndex();
 
-						Hide();
+						// Hide();
 
 						while (_menus.size() > 0) {
 							Menu *menu = *(_menus.begin()+_menus.size()-1);
 
 							_menus.erase(_menus.begin()+_menus.size()-1);
 
-							menu->Release();
+							// menu->Release();
 
 							delete menu;
 						}
 						
 						DispatchSelectEvent(new SelectEvent(this, item, index, JSET_ACTION)); 
 
-						Release();
+						// Release();
 					}
 				}
 			}
@@ -443,18 +443,20 @@ int Menu::GetCurrentIndex()
 
 void Menu::Repaint(Component *cmp)
 {
+	/*
 	jgui::Graphics *g = GetGraphics();
 
 	if (g != NULL) {
 		Paint(g);
 	}
+	*/
 }
 
 void Menu::Paint(Graphics *g)
 {
 	// JDEBUG(JINFO, "paint\n");
 
-	Frame::Paint(g);
+	Widget::Paint(g);
 
 	Theme *theme = GetTheme();
 	jgui::Font *font = theme->GetFont("component");
@@ -602,25 +604,21 @@ void Menu::SetCurrentIndex(int i)
 	}
 
 	if (_index != i) {
-		{
-			jthread::AutoLock lock(&_component_mutex);
+		_index = i;
 
-			_index = i;
+		if (_index >= (int)_items.size()) {
+			_index = 0;
+		}
 
-			if (_index >= (int)_items.size()) {
-				_index = 0;
-			}
+		if (_index < _top_index) {
+			_top_index = _index;
+		}
 
-			if (_index < _top_index) {
-				_top_index = _index;
-			}
+		if (_index >= (_top_index + _visible_items)) {
+			_top_index = _index-_visible_items+1;
 
-			if (_index >= (_top_index + _visible_items)) {
-				_top_index = _index-_visible_items+1;
-
-				if (_top_index < 0) {
-					_top_index = 0;
-				}
+			if (_top_index < 0) {
+				_top_index = 0;
 			}
 		}
 

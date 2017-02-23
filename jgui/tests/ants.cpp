@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
 #include "jimage.h"
 #include "jsystem.h"
 
@@ -36,7 +36,7 @@ struct path_t {
 #if ENABLE_GUI == 0
 class Main{
 #else 
-class Main : public jgui::Frame{
+class Main : public jgui::Container{
 #endif
 
 	private:
@@ -73,10 +73,10 @@ class Main : public jgui::Frame{
 
 	public:
 #if ENABLE_GUI == 0
-		Main(int x, int y, int r)
+		Main(int r)
 #else
-		Main(int x, int y, int r):
-			jgui::Frame("Ant Colony", x, y, MAX_COLS*(BLOCK_WIDTH+BLOCK_GAP)+20, MAX_ROWS*(BLOCK_HEIGHT+BLOCK_GAP)+60+50)
+		Main(int r):
+			jgui::Container(/* "Ant Colony", */ 0, 0, MAX_COLS*(BLOCK_WIDTH+BLOCK_GAP), MAX_ROWS*(BLOCK_HEIGHT+BLOCK_GAP))
 #endif
 		{
 #if ENABLE_GUI == 1
@@ -159,7 +159,7 @@ class Main : public jgui::Frame{
 			delete fweights;
 		}
 
-		void Init()
+		void Render()
 		{
 			path_t *temp[MAX_COLS];
 			int r,
@@ -245,7 +245,9 @@ class Main : public jgui::Frame{
 				// end update
 
 #if ENABLE_GUI == 1
-				Repaint();
+				if (IsHidden() == false) {
+					Repaint();
+				}
 #endif
 			}
 
@@ -273,7 +275,7 @@ class Main : public jgui::Frame{
 
 				sprintf(tmp, "Current Solution [%d]", best);
 
-				jgui::Frame::Paint(goff);
+				jgui::Container::Paint(goff);
 
 				goff->SetFont(jgui::Font::GetDefaultFont());
 				goff->SetColor(0x00, 0x00, 0x00, 0xff);
@@ -328,13 +330,18 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main(10, 10, time(NULL));
+	jgui::Application *main = jgui::Application::GetInstance();
 
+	Main app(time(NULL));
+	
 #if ENABLE_GUI == 1
-	main.Show();
-#endif
+	main->SetTitle("Ants");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
 
-	main.Init();
+	app.Render();
+#endif
 
 	return 0;
 }

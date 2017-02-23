@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,14 +26,14 @@
 #include <stdint.h>
 #include <values.h>
 
-class Main : public jgui::Frame{
+class Main : public jgui::Widget{
 
 	private:
 		std::map<std::string, jgui::Image *> _types;
 
 	public:
 		Main():
-			jgui::Frame("Image Types", 0, 0)
+			jgui::Widget("Image Types", 0, 0, 1280, 720)
 		{
 			_types["BMP"] = jgui::Image::CreateImage("images/image.bmp");
 			_types["GIF"] = jgui::Image::CreateImage("images/image.gif");
@@ -59,11 +60,11 @@ class Main : public jgui::Frame{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			int items = 5;
-			int gap = 16;
-			int size = (_size.width-3*gap-_insets.top-_insets.bottom)/(items);
+			int gap = 32;
+			int size = (_size.width-6*gap-_insets.top-_insets.bottom)/(items);
 			int count = 0;
 
 			for (std::map<std::string, jgui::Image *>::iterator i=_types.begin(); i!=_types.end(); i++) {
@@ -86,9 +87,15 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Show(true);
+	Main app;
+
+	main->SetTitle("Draw Types");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

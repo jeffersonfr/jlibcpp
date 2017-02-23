@@ -130,6 +130,7 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 #endif
 
 #if defined(DIRECTFB_MEDIA) && defined(DIRECTFB_UI)
+	/* TODO:: uncomment
 	try {
 		if (_hints[JPH_LIGHTWEIGHT] == false) {
 			// INFO:: the component's visible must be set to true
@@ -139,6 +140,7 @@ Player * PlayerManager::CreatePlayer(std::string url_) throw (MediaException)
 		return new DirectFBLightPlayer(url_);
 	} catch (jcommon::Exception &e) {
 	}
+	*/
 #endif
 
 	return NULL;

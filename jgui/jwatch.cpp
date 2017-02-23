@@ -43,31 +43,6 @@ Watch::~Watch()
 	WaitThread();
 }
 
-void Watch::SetVisible(bool b)
-{
-	jthread::AutoLock lock(&_component_mutex);
-
-	if (_is_visible == b) {
-		return;
-	}
-
-	_is_visible = b;
-
-	if (_is_visible == true) {
-		if (IsRunning() == false) {
-			_running = true;
-
-			Start();
-		}
-	} else {
-		_running = false;
-
-		Release();
-		WaitThread();
-		Repaint();
-	}
-}
-
 void Watch::Pause()
 {
 	if (_paused == true) {
@@ -86,11 +61,9 @@ void Watch::Reset()
 
 void Watch::Release()
 {
-	{
-		jthread::AutoLock lock(&_component_mutex);
+	_running = false;
 
-		_running = false;
-	}
+	WaitThread();
 }
 
 void Watch::Run()

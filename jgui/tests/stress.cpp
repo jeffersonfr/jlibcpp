@@ -17,18 +17,20 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
 #include "jsystem.h"
 
-class GraphicPanel : public jgui::Frame{
+class GraphicPanel : public jgui::Container{
 
 	private:
 
 	public:
 		GraphicPanel():
-			jgui::Frame("", 0, 0)
+			jgui::Container(0, 0, 1600, 900)
 	{
 		srand(time(NULL));
+
+		_insets.top = 100;
 	}
 
 	virtual ~GraphicPanel()
@@ -48,19 +50,25 @@ class GraphicPanel : public jgui::Frame{
 		g->Flip(0, 0, _size.width, _insets.top);
 	}
 
-	virtual void Paint(jgui::Graphics *g)
+	virtual void Render()
 	{
-		Frame::Paint(g);
+		jgui::Application *main = jgui::Application::GetInstance();
 
-		jgui::Theme *theme = GetTheme();
-		jgui::Font *font = theme->GetFont("component");
+		main->SetTitle("Stress");
+		main->SetSize(GetWidth(), GetHeight());
+		main->SetVisible(true);
+
+		jgui::Graphics *g = main->GetGraphics();
+
+		Container::Paint(g);
+
+		jgui::Font *font = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 72);
 
 		int x, y, z;
-		int w = 200,
-				h = 200;
+		int w = 200;
+		int h = 200;
 		int r1, g1, b1, a1;
-		int size,
-				iterations = 1000;
+		int size, iterations = 1000;
 
 		g->SetFont(font);
 
@@ -72,7 +80,7 @@ class GraphicPanel : public jgui::Frame{
 		int wfont = font->GetStringWidth("Font Testing"),
 				hfont = font->GetSize();
 
-		for (int i=0; i<iterations; i++) {
+		for (int i=0; i<iterations*4; i++) {
 			x = rand()%(_size.width-wfont-_insets.left-_insets.right);
 			y = rand()%(_size.height-hfont-_insets.top-_insets.bottom);
 			r1 = rand()%0xff;
@@ -82,7 +90,7 @@ class GraphicPanel : public jgui::Frame{
 			g->SetColor(r1, g1, b1, 0xff);
 			g->DrawString("Font Testing", x+_insets.left, y+_insets.top);
 
-			g->Flip(x+_insets.left, y+_insets.top, w, h);
+			g->Flip(x+_insets.left, y+_insets.top, wfont, font->GetSize());
 		}
 
 		Clear(g);
@@ -101,16 +109,13 @@ class GraphicPanel : public jgui::Frame{
 			g->SetColor(r1, g1, b1, a1+0x80);
 			g->DrawString("Font Testing", x+_insets.left, y+_insets.top);
 
-			g->Flip(x+_insets.left, y+_insets.top, w, h);
+			g->Flip(x+_insets.left, y+_insets.top, wfont, font->GetSize());
 		}
 
 		Clear(g);
 
 		// rotate string
 		DrawString(g, "Rotate String");
-
-		font = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 72);
-		// jgui::Font *font = jgui::Font::CreateFont(jcommon::System::GetResourceDirectory() + "/fonts/default.tff", jgui::JFA_NORMAL, 72);
 
 		double angle = 0.1;
 		
@@ -417,8 +422,9 @@ class GraphicPanel : public jgui::Frame{
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawCircle(x+_insets.left+200, y+_insets.top+200, z);
 
-			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
+			g->Flip(x+_insets.left+200-z, y+_insets.top+200-z, 2*z, 2*z);
 		}
+		
 		
 		Clear(g);
 
@@ -439,7 +445,7 @@ class GraphicPanel : public jgui::Frame{
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawCircle(x+_insets.left+200, y+_insets.top+200, z);
 
-			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
+			g->Flip(x+_insets.left+200-z, y+_insets.top+200-z, 2*z, 2*z);
 		}
 
 		Clear(g);
@@ -460,7 +466,7 @@ class GraphicPanel : public jgui::Frame{
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawArc(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
 
-			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
+			g->Flip(x+_insets.left+200-z, y+_insets.top+200-z, 2*z, 2*z);
 		}
 		
 		Clear(g);
@@ -482,7 +488,7 @@ class GraphicPanel : public jgui::Frame{
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawArc(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
 
-			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
+			g->Flip(x+_insets.left+200-z, y+_insets.top+200-z, 2*z, 2*z);
 		}
 
 		Clear(g);
@@ -503,7 +509,7 @@ class GraphicPanel : public jgui::Frame{
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawChord(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
 
-			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
+			g->Flip(x+_insets.left+200-z, y+_insets.top+200-z, 2*z, 2*z);
 		}
 		
 		Clear(g);
@@ -525,7 +531,7 @@ class GraphicPanel : public jgui::Frame{
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
 			g->DrawChord(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
 
-			g->Flip(x+_insets.left-z, y+_insets.top-z, w+2*z, h+2*z);
+			g->Flip(x+_insets.left+200-z, y+_insets.top+200-z, 2*z, 2*z);
 		}
 
 		Clear(g);
@@ -642,9 +648,9 @@ class GraphicPanel : public jgui::Frame{
 
 int main( int argc, char *argv[] )
 {
-	GraphicPanel test;
+	GraphicPanel app;
 
-	test.Show();
+	app.Render();
 
 	return 0;
 }

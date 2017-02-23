@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jbutton.h"
 #include "jlabel.h"
 #include "jsemaphore.h"
@@ -243,7 +244,7 @@ class GraphicLayer : public ScreenLayer{
 
 };
 
-class LayersManager : public jgui::Window, public jthread::Thread{
+class LayersManager : public jgui::Widget, public jthread::Thread{
 
 	private:
 		static LayersManager *_instance;
@@ -261,7 +262,7 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 
 	private:
 		LayersManager():
-			jgui::Window(0, 0, 1920, 1080)
+			jgui::Widget(0, 0, 1920, 1080)
 		{
 			_refresh = false;
 
@@ -298,8 +299,6 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 
 		virtual void Run()
 		{
-			Show();
-
 			jgui::Graphics *gb = _buffer->GetGraphics();
 			jgui::Graphics *g = GetGraphics();
 
@@ -313,6 +312,7 @@ class LayersManager : public jgui::Window, public jthread::Thread{
 				_refresh = false;
 
 				Paint(gb);
+
 				g->DrawImage(_buffer, 0, 0);
 				g->Flip();
 			}
@@ -618,15 +618,25 @@ int main(int argc, char **argv)
 		manager->GetVideoLayer()->Play();
 	}
 
-	ApplicationTest app;
+	jgui::Application *main = jgui::Application::GetInstance();
+
+	LayersManager *app = LayersManager::GetInstance();
+
+	main->SetTitle("Ball Drop");
+	main->Add(app);
+	main->SetSize(app->GetWidth(), app->GetHeight());
+	main->SetVisible(true);
 	
+	app->Show();
+
+	// INFO:: tests
+	ApplicationTest app;
 	app.Show();
 
 	MenuTest menu;
-
 	menu.Show();
 
-	sleep(3600);
+	main->WaitForExit();
 
 	return 0;
 }

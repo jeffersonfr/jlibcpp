@@ -62,8 +62,6 @@ std::string Icon::GetText()
 
 void Icon::SetImage(std::string file)
 {
-	jthread::AutoLock lock(&_component_mutex);
-
 	_file = file;
 
 	if (_text == "") {
@@ -110,8 +108,6 @@ jvertical_align_t Icon::GetVerticalAlign()
 		
 void Icon::Paint(Graphics *g)
 {
-	jthread::AutoLock lock(&_component_mutex);
-
 	JDEBUG(JINFO, "paint\n");
 
 	Component::Paint(g);

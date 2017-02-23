@@ -19,11 +19,12 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jhourdialogbox.h"
+#include "jdataevent.h"
 
 namespace jgui {
 
 HourDialogBox::HourDialogBox(std::string title, int hour, int minute, int second):
-	jgui::DialogBox(title, 0, 0, 1000, 600)
+	jgui::Widget(title, 0, 0, 1000, 600)
 {
 	jcommon::Object::SetClassName("jgui::HourDialogBox");
 
@@ -72,7 +73,7 @@ HourDialogBox::HourDialogBox(std::string title, int hour, int minute, int second
 
 	_hour->RequestFocus();
 
-	Pack();
+	Pack(true);
 }
 
 HourDialogBox::~HourDialogBox() 
@@ -88,7 +89,7 @@ void HourDialogBox::ItemSelected(SelectEvent *event)
 	GetParams()->SetTextParam("minute", _minute->GetCurrentItem()->GetValue());
 	GetParams()->SetTextParam("second", _second->GetCurrentItem()->GetValue());
 
-	DispatchDataEvent(GetParams());
+	DispatchDataEvent(new jcommon::DataEvent(this, GetParams()));
 }
 
 void HourDialogBox::ItemChanged(SelectEvent *event)

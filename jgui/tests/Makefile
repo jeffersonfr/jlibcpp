@@ -53,7 +53,6 @@ OBJS_phone = \
 
 OBJS_calc = \
 	   calc.o\
-	   display.o\
 
 OBJS_mines = \
 	   mines.o\

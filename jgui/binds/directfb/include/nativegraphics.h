@@ -35,6 +35,10 @@ class NativeImage;
  */
 class NativeGraphics : public GenericGraphics{
 	
+	private:
+		/** \brief */
+		jthread::Mutex _mutex;
+
 	public:
 		/**
 		 * \brief
@@ -65,6 +69,18 @@ class NativeGraphics : public GenericGraphics{
 		 *
 		 */
 		virtual void Flip(int x, int y, int w, int h);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Lock();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Unlock();
 
 };
 

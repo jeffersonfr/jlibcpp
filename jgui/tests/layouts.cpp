@@ -17,10 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jbutton.h"
 #include "jlabel.h"
-#include "jbuttonlistener.h"
 #include "jcardlayout.h"
 #include "jgridlayout.h"
 #include "jborderlayout.h"
@@ -52,7 +52,7 @@ class RectangleContainer : public jgui::Container {
  * \brief Ajuste o PreferredSize() caso deseje um nivel diferente de adaptacao dos layouts.
  *
  */
-class Main : public jgui::Frame, public jgui::ButtonListener{
+class Main : public jgui::Widget, public jgui::ActionListener{
 
 	private:
 		jgui::Layout *_main,
@@ -72,13 +72,10 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 		std::vector<jgui::Button *> _buttons;
 
 	public:
-		Main(std::string title, int x, int y, int w, int h):
-			jgui::Frame(title, x, y, w, h)
+		Main(std::string title, int w, int h):
+			jgui::Widget(title, 0, 0, w, h)
 		{
 			SetLayout(_main = new jgui::GridLayout(2, 3));
-
-			SetFrameButtons((jgui::jframe_button_t)(jgui::JFB_CLOSE | jgui::JFB_MAXIMIZE));
-			SetResizeEnabled(true);
 		
 			_flow = new jgui::FlowLayout();
 			_grid = new jgui::GridLayout(3, 3);
@@ -143,10 +140,10 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			_c[6]->Add(_previous);
 			_c[6]->Add(_last);
 
-			_first->RegisterButtonListener(this);
-			_previous->RegisterButtonListener(this);
-			_next->RegisterButtonListener(this);
-			_last->RegisterButtonListener(this);
+			_first->RegisterActionListener(this);
+			_previous->RegisterActionListener(this);
+			_next->RegisterActionListener(this);
+			_last->RegisterActionListener(this);
 
 			_c[7]->SetLayout(new jgui::CardLayout());
 			_c[7]->Add(new jgui::Button("First Screen", 0, 0, 100, 100), "01");
@@ -266,7 +263,7 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 			}
 		}
 
-		virtual void ActionPerformed(jgui::ButtonEvent *event)
+		virtual void ActionPerformed(jgui::ActionEvent *event)
 		{
 			jgui::CardLayout *card = ((jgui::CardLayout *)_c[7]->GetLayout());
 
@@ -285,9 +282,15 @@ class Main : public jgui::Frame, public jgui::ButtonListener{
 
 int main(int argc, char **argv)
 {
-	Main main("Layouts", 0, 0, 1280, 720);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Show(true);
+	Main app("Layouts", 1280, 720);
+
+	main->SetTitle("Layouts");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

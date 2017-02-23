@@ -17,9 +17,10 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
-class Main : public jgui::Frame, public jthread::Thread{
+class Main : public jgui::Widget{
 
 	private:
 		jgui::Image *_image;
@@ -41,7 +42,7 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 	public:
 		Main(int n, int p):
-			jgui::Frame("Rotate Image", 0, 0, 1, 1)
+			jgui::Widget("Rotate Image")
 		{
 			_running = true;
 			_tx = 200;
@@ -72,14 +73,13 @@ class Main : public jgui::Frame, public jthread::Thread{
 			_tiles = image->Scale(10*_tile_w, 4*_tile_h);
 			delete image;
 
-			SetSize((int)(10*_tile_w+_insets.left+_insets.right), (8*_tile_h+_insets.top+_insets.bottom));
+			printf(":SIZE:: %f, %f, %f, %f, %d, %d\n", _tile_w, _tile_h, (10*_tile_w), (8*_tile_h), (int)(10*_tile_w), (int)(8*_tile_h));
+			SetSize((int)(10.0*_tile_w), (int)(8.0*_tile_h));
 		}
 
 		virtual ~Main()
 		{
 			_running = false;
-
-			WaitThread();
 
 			delete _image;
 			delete _tiles;
@@ -87,13 +87,13 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			for (int j=0; j<8; j++) {
 				for (int i=0; i<10; i++) {
 					g->DrawImage(_tiles, 
 							(int)(2*_tile_w), (int)(0*_tile_h), (int)(_tile_w), (int)(_tile_h), 
-							(int)(_insets.left+i*_tile_w), (int)(_insets.top+j*_tile_h), (int)_tile_w, (int)_tile_h);
+							(int)(i*_tile_w), (int)(j*_tile_h), (int)_tile_w, (int)_tile_h);
 				}
 			}
 
@@ -109,32 +109,32 @@ class Main : public jgui::Frame, public jthread::Thread{
 			delete image;
 		}
 
-		virtual void Run() 
+		virtual void Render() 
 		{
-			while (_running) {
+			while (_running && IsHidden() == false) {
 				_tx = _tx + _step*cos(_angle);//+M_PI_2);
 				_ty = _ty - _step*sin(_angle);//+M_PI_2);
 
-				if (_tx < (_insets.left)) {
-					_tx = (_insets.left);
+				if (_tx < 0) {
+					_tx = 0;
 				}
 
-				if (_tx > (GetWidth()-_insets.right-_tw)) {
-					_tx = (GetWidth()-_insets.right-_tw);
+				if (_tx > (GetWidth()-_tw)) {
+					_tx = (GetWidth()-_tw);
 				}
 
-				if (_ty < (_insets.top)) {
-					_ty = (_insets.top);
+				if (_ty < 0) {
+					_ty = 0;
 				}
 
-				if (_ty > (GetHeight()-_insets.bottom-_th)) {
-					_ty = (GetHeight()-_insets.bottom-_th);
+				if (_ty > (GetHeight()-_th)) {
+					_ty = (GetHeight()-_th);
 				}
 
 				_bullet_x = _bullet_x + 12*cos(_bullet_angle);
 				_bullet_y = _bullet_y - 12*sin(_bullet_angle);
 
-				if (_bullet_x < (_insets.left) || _bullet_x > (GetWidth()-_insets.right) || _bullet_y < (_insets.top) || _bullet_y > (GetHeight()-_insets.bottom)) {
+				if (_bullet_x < 0 || _bullet_x > GetWidth() || _bullet_y < 0 || _bullet_y > GetHeight()) {
 					_has_bullet = false;
 				}
 
@@ -146,7 +146,7 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
@@ -190,10 +190,16 @@ class Main : public jgui::Frame, public jthread::Thread{
 
 int main(int argc, char **argv)
 {
-	Main main(50, 100);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Start();
-	main.Show(true);
+	Main app(50, 100);
+
+	main->SetTitle("Tank");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+
+	app.Render();
 
 	return 0;
 }

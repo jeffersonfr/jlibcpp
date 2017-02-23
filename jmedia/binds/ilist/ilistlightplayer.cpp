@@ -19,25 +19,20 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "ilistlightplayer.h"
-#include "nativeimage.h"
+#include "genericimage.h"
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
 #include "jvolumecontrol.h"
 #include "jaudioconfigurationcontrol.h"
 #include "jmediaexception.h"
-#include "jgfxhandler.h"
 #include "jinputstream.h"
 #include "jcondition.h"
 #include "jfileinputstream.h"
 #include "jsemaphoretimeoutexception.h"
 #include "jfile.h"
 
-#if defined(DIRECTFB_NODEPS_UI)
-#include <directfb.h>
-#else
 #include <cairo.h>
-#endif
 
 namespace jmedia {
 

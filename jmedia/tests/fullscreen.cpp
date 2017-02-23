@@ -17,39 +17,39 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jplayermanager.h"
 #include "jplayerlistener.h"
 #include "jvideosizecontrol.h"
-#include "jgfxhandler.h"
 #include "jautolock.h"
-#include "jwindow.h"
 
 #include <stdio.h>
 #include <unistd.h>
 
-class PlayerTest : public jgui::Window, public jmedia::PlayerListener, public jmedia::FrameGrabberListener {
+class PlayerTest : public jgui::Widget, public jmedia::PlayerListener, public jmedia::FrameGrabberListener {
 
 	private:
 		jmedia::Player *_player;
+		jgui::GridLayout *_fullscreen_layout;
 
 	public:
 		PlayerTest(std::string file):
-			jgui::Window(),
+			jgui::Widget(),
 			jmedia::PlayerListener()
 		{
-			jgui::jsize_t size = jgui::GFXHandler::GetInstance()->GetScreenSize();
-
 			_player = jmedia::PlayerManager::CreatePlayer(file);
 
 			jgui::Component *cmp = _player->GetVisualComponent();
 
-			cmp->SetBounds(0, 0, size.width, size.height);
-
-			// INFO:: needed to heavy players
+			cmp->SetSize(720, 480);
 			cmp->SetVisible(true);
 
 			Add(cmp);
+
+			_fullscreen_layout = new jgui::GridLayout(1, 1);
+
+			SetLayout(_fullscreen_layout);
 
 			_player->RegisterPlayerListener(this);
 			_player->RegisterFrameGrabberListener(this);
@@ -61,6 +61,9 @@ class PlayerTest : public jgui::Window, public jmedia::PlayerListener, public jm
 
 			delete _player;
 			_player = NULL;
+
+			delete _fullscreen_layout;
+			_fullscreen_layout = NULL;
 		}
 
 		virtual void StartMedia()
@@ -119,13 +122,21 @@ int main(int argc, char *argv[])
 
 	srand(time(NULL));
 
-	PlayerTest test(argv[1]);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show();
+	PlayerTest app(argv[1]);
 
-	test.StartMedia();
+	main->SetTitle("Video Player");
+	main->Add(&app);
+	main->SetSize(main->GetScreenSize().width, main->GetScreenSize().height);
+	main->SetVisible(true);
+	
+	app.StartMedia();
+
 	sleep(30);
-	test.StopMedia();
+	
+	app.StopMedia();
+	
 	sleep(2);
 
 	return 0;

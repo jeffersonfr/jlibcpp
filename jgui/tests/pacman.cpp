@@ -17,7 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
+#include "jthread.h"
 
 struct dimension_t {
 	int x;
@@ -48,7 +50,7 @@ int	validspeeds[] = {
 	1, 2, 3, 4, 6, 8 
 };
 
-class PacMan : public jgui::Frame, public jthread::Thread {
+class PacMan : public jgui::Widget {
 
 	private:
 
@@ -117,10 +119,8 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 	public:
 
 	PacMan():
-		jgui::Frame("PacMan", 0, 0, 1, 1)
+		jgui::Widget("PacMan", 0, 0, 1, 1)
 	{
-		SetUndecorated(true);
-
 		goff = NULL;
 		ii = NULL;
 	
@@ -195,7 +195,7 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 		_theme.SetColor("window.bg", 0x00, 0x00, 0x00, 0xff);
 
-		SetDefaultExitEnabled(false);
+		// SetDefaultExitEnabled(false);
 		SetSize(scrsize+4, scrsize+nrofblocks+blocksize+10);
 	}
 	
@@ -306,14 +306,14 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 	virtual bool KeyPressed(jgui::KeyEvent *event)
 	{
-		if (jgui::Frame::KeyPressed(event) == true) {
+		if (jgui::Widget::KeyPressed(event) == true) {
 			return true;
 		}
 
 		if (event->GetSymbol() == jgui::JKS_ESCAPE) {
 			flag = false;
 
-			jgui::Frame::Release();
+			// TODO:: SetVisible(jgui::Frame::Release();
 
 			return false;
 		}
@@ -346,7 +346,7 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 	virtual bool KeyReleased(jgui::KeyEvent *event)
 	{
-		if (jgui::Frame::KeyReleased(event) == true) {
+		if (jgui::Widget::KeyReleased(event) == true) {
 			return true;
 		}
 
@@ -363,7 +363,7 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 
 	virtual void Paint(jgui::Graphics *g)
 	{
-		Frame::Paint(g);
+		Widget::Paint(g);
 
 		std::string s;
 
@@ -767,28 +767,36 @@ class PacMan : public jgui::Frame, public jthread::Thread {
 		}
 	}
 
-	virtual void Run()
+	virtual void Render()
 	{
 		// uint64_t starttime;
 
-		while(flag) {
+		Init();
+
+		do {
 			// starttime = (jcommon::Date::CurrentTimeMillis()+10LL);
 
 			Repaint();
 
 			usleep(5000);
+
 			// INFO:: as vezes trava:: usleep(1000*((long long)jcommon::Date::CurrentTimeMillis()-(long long)starttime));
-		}
+		} while (flag && IsHidden() == false);
 	}
 };
 
 int main()
 {
-	PacMan p;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	p.Show();
-	p.Init();
-	p.Run();
+	PacMan app;
+
+	main->SetTitle("Pacman");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+
+	app.Render();
 
 	return 0;
 }

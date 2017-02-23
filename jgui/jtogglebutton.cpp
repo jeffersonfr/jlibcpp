@@ -18,8 +18,8 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
-#include "jtooglebutton.h"
-#include "jbuttonlistener.h"
+#include "jtogglebutton.h"
+#include "jactionlistener.h"
 #include "jdebug.h"
 
 namespace jgui {
@@ -83,7 +83,7 @@ bool ToogleButton::KeyPressed(KeyEvent *event)
 
 		Repaint();
 
-		DispatchButtonEvent(new ButtonEvent(this));
+		DispatchActionEvent(new ActionEvent(this));
 
 		catched = true;
 	}
@@ -104,7 +104,7 @@ bool ToogleButton::MousePressed(MouseEvent *event)
 			_is_pressed = true;
 		}
 
-		DispatchButtonEvent(new ButtonEvent(this));
+		DispatchActionEvent(new ActionEvent(this));
 		
 		Repaint();
 

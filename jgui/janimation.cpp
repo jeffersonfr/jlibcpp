@@ -52,7 +52,7 @@ Animation::~Animation()
 void Animation::Release()
 {
 	{
-		jthread::AutoLock lock(&_component_mutex);
+		jthread::AutoLock lock(&_animation_mutex);
 
 		_running = false;
 	}
@@ -60,7 +60,7 @@ void Animation::Release()
 
 void Animation::SetVisible(bool b)
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_animation_mutex);
 
 	if (_is_visible == b) {
 		return;
@@ -85,21 +85,21 @@ void Animation::SetVisible(bool b)
 
 void Animation::RemoveAll()
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_animation_mutex);
 
 	_images.clear();
 }
 
 void Animation::SetInterval(int i)
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_animation_mutex);
 
 	_interval = i;
 }
 
 void Animation::AddImage(std::string file)
 {
-	jthread::AutoLock lock(&_component_mutex);
+	jthread::AutoLock lock(&_animation_mutex);
 
 	Image *prefetch = Image::CreateImage(file);
 

@@ -98,8 +98,6 @@ void ProgressBar::SetIndeterminate(bool b)
 		if (_indeterminate == false) {
 			SetVisible(false);
 		} else {
-			jthread::AutoLock lock(&_component_mutex);
-
 			_running = true;
 
 			Start();
@@ -109,18 +107,14 @@ void ProgressBar::SetIndeterminate(bool b)
 
 void ProgressBar::SetValue(double i)
 {
-	{
-		jthread::AutoLock lock(&_component_mutex);
+	_value = (int)i;
 
-		_value = (int)i;
+	if (_value < 0.0) {
+		_value = 0;
+	}
 
-		if (_value < 0.0) {
-			_value = 0;
-		}
-
-		if (_value > 100) {
-			_value = 100;
-		}
+	if (_value > 100) {
+		_value = 100;
 	}
 
 	Repaint();
@@ -128,15 +122,9 @@ void ProgressBar::SetValue(double i)
 
 void ProgressBar::SetStringPainted(bool b)
 {
-	if (_label_visible != b) {
-		{
-			jthread::AutoLock lock(&_component_mutex);
-
-			_label_visible = b;
-		}
-
-		Repaint();
-	}
+	_label_visible = b;
+		
+	Repaint();
 }
 
 bool ProgressBar::IsStringPainted()
@@ -144,34 +132,11 @@ bool ProgressBar::IsStringPainted()
 	return _label_visible;
 }
 
-void ProgressBar::SetVisible(bool b)
-{
-	jthread::AutoLock lock(&_component_mutex);
-
-	if (_is_visible == b) {
-		return;
-	}
-
-	_is_visible = b;
-
-	if (_is_visible == true) {
-		_running = true;
-
-		Repaint();
-	} else {
-		_running = false;
-
-		Repaint();
-	}
-}
-
 void ProgressBar::Release()
 {
-	{
-		jthread::AutoLock lock(&_component_mutex);
+	_running = false;
 
-		_running = false;
-	}
+	WaitThread();
 }
 
 void ProgressBar::Run()

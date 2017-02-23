@@ -20,8 +20,11 @@
 ifeq ($(findstring directfb, $(ENABLE_GRAPHICS)), directfb)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/directfb/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags cairo` \
 
 	LDFLAGS		+= \
+		 `pkg-config --libs alsa cairo` \
 
 	DEFINES		+= \
 		 -DDIRECTFB_MEDIA \
@@ -39,10 +42,11 @@ endif
 ifeq ($(findstring libvlc, $(ENABLE_MEDIA)), libvlc)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/libvlc/include \
-		 `pkg-config --cflags libvlc` \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags libvlc cairo` \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs libvlc` \
+		 `pkg-config --libs libvlc alsa cairo` \
 
 	DEFINES		+= \
 		 -DLIBVLC_MEDIA \
@@ -60,11 +64,12 @@ ifeq ($(findstring libav, $(ENABLE_MEDIA)), libav)
 	CCFLAGS		+= \
 		 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPIC -DZLIB_CONST -O3 \
 		 -Ijmedia/binds/libav/include \
-		 `pkg-config --cflags libavcodec libavformat libavresample libavutil libavfilter libswscale sdl2` \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags libavcodec libavformat libavresample libavutil libavfilter libswscale sdl2 cairo` \
 		 -lm -lbz2 -lasound \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs libavcodec libavformat libavresample libavutil libavfilter libswscale sdl2` \
+		 `pkg-config --libs libavcodec libavformat libavresample libavutil libavfilter libswscale sdl2 cairo` \
 
 	DEFINES		+= \
 		 -DLIBAV_MEDIA \
@@ -83,6 +88,7 @@ endif
 ifeq ($(findstring libxine, $(ENABLE_MEDIA)), libxine)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/libxine/include \
+		 -Ijgui/binds/generic/include \
 		 `pkg-config --cflags libxine` \
 
 	LDFLAGS		+= \
@@ -103,6 +109,7 @@ endif
 ifeq ($(findstring v4l2, $(ENABLE_MEDIA)), v4l2)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/v4l2/include \
+		 -Ijgui/binds/generic/include \
 
 	LDFLAGS		+= \
 
@@ -123,8 +130,11 @@ endif
 ifeq ($(findstring gif, $(ENABLE_MEDIA)), gif)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/gif/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags cairo` \
 
 	LDFLAGS		+= \
+		 `pkg-config --cflags cairo` \
 
 	DEFINES		+= \
 		 -DGIF_MEDIA \
@@ -141,8 +151,11 @@ endif
 ifeq ($(findstring ilist, $(ENABLE_MEDIA)), ilist)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/ilist/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags cairo` \
 
 	LDFLAGS		+= \
+		 `pkg-config --cflags cairo` \
 
 	DEFINES		+= \
 		 -DIMAGE_LIST_MEDIA \
@@ -159,10 +172,11 @@ endif
 ifeq ($(findstring alsa, $(ENABLE_MEDIA)), alsa)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/alsa/include \
-		 `pkg-config --cflags alsa` \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags alsa cairo` \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs alsa` \
+		 `pkg-config --libs alsa cairo` \
 
 	DEFINES		+= \
 		 -DALSA_MEDIA \

@@ -30,7 +30,6 @@
 #include "genericprovider_tga.h"
 #include "genericprovider_xbm.h"
 #include "genericprovider_xpm.h"
-#include "generichandler.h"
 #include "jimage.h"
 #include "jthread.h"
 #include "jhslcolorspace.h"
@@ -157,8 +156,6 @@ GenericImage::GenericImage(cairo_t *cairo_context, jpixelformat_t pixelformat, i
 	}
 
 	_graphics = new GenericGraphics(NULL, cairo_context, pixelformat, width, height);
-
-	dynamic_cast<GenericHandler *>(GFXHandler::GetInstance())->Add(this);
 }
 
 GenericImage::GenericImage(std::string file):
@@ -228,8 +225,6 @@ GenericImage::GenericImage(std::string file):
 	cairo_surface_destroy(cairo_surface);
 
 	_graphics = new GenericGraphics(NULL, cairo_context, _pixelformat, _size.width, _size.height);
-
-	dynamic_cast<GenericHandler *>(GFXHandler::GetInstance())->Add(this);
 }
 
 GenericImage::GenericImage(jio::InputStream *stream):
@@ -320,14 +315,10 @@ GenericImage::GenericImage(jio::InputStream *stream):
 	// cairo_surface_destroy(cairo_surface);
 
 	_graphics = new GenericGraphics(NULL, cairo_context, _pixelformat, _size.width, _size.height);
-
-	dynamic_cast<GenericHandler *>(GFXHandler::GetInstance())->Add(this);
 }
 
 GenericImage::~GenericImage()
 {
-	dynamic_cast<GenericHandler *>(GFXHandler::GetInstance())->Remove(this);
-
 	if (_graphics != NULL) {
 		delete _graphics;
 		_graphics = NULL;

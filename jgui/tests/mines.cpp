@@ -24,7 +24,7 @@
 namespace mines {
 
 Mines::Mines(int x, int y):
-	jgui::Frame("Minas", 32, 32, 620, 480)
+	jgui::Widget("Minas", 32, 32, 620, 480)
 {
 	_current = NULL;
 
@@ -78,7 +78,7 @@ Mines::~Mines()
 
 void Mines::Paint(jgui::Graphics *g)
 {
-	jgui::Frame::Paint(g);
+	jgui::Widget::Paint(g);
 
 	jgui::Theme *theme = GetTheme();
 	jgui::Font *font = theme->GetFont("component");
@@ -150,7 +150,7 @@ void Mines::Paint(jgui::Graphics *g)
 
 bool Mines::KeyPressed(jgui::KeyEvent *event)
 {
-	if (jgui::Frame::KeyPressed(event) == true) {
+	if (jgui::Widget::KeyPressed(event) == true) {
 		return true;
 	}
 
@@ -368,9 +368,13 @@ int main()
 {
 	srand((int)time(NULL));
 
+	jgui::MainWindow *window = jgui::MainWindow::GetInstance();
+
 	mines::Mines app(100, 100);
 
-	app.Show(true);
+	window->SetUndecorated(true);
+	window->Add(&app);
+	window->SetVisible(true);
 
 	return 0;
 }

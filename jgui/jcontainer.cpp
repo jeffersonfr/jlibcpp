@@ -24,7 +24,6 @@
 #include "joutofboundsexception.h"
 #include "jnullpointerexception.h"
 #include "jrectangle.h"
-#include "jwindow.h"
 
 namespace jgui {
 
@@ -47,10 +46,10 @@ Container::Container(int x, int y, int width, int height):
 	_scroll_dimension.width = _size.width;
 	_scroll_dimension.height = _size.height;
 
-	_insets.left = 2;
-	_insets.right = 2;
-	_insets.top = 2;
-	_insets.bottom = 2;
+	_insets.left = 0;
+	_insets.right = 0;
+	_insets.top = 0;
+	_insets.bottom = 0;
 
 	SetBackgroundVisible(false);
 }
@@ -300,6 +299,62 @@ void Container::DoLayout()
 	UpdateScrollDimension();
 }
 
+void Container::Pack(bool fit)
+{
+	jthread::AutoLock lock(&_container_mutex);
+
+	jinsets_t insets = GetInsets();
+
+	Component *c;
+	int min_x = insets.left,
+			min_y = insets.top;
+	int max_width = 0,
+			max_height = 0;
+
+	if (fit == true) {
+		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+			c = (*i);
+
+			if (c->GetX() < min_x) {
+				min_x = c->GetX();
+			}
+
+			if (c->GetY() < min_y) {
+				min_y = c->GetY();
+			}
+		}
+
+		min_x = insets.left-min_x;
+		min_y = insets.top-min_y;
+
+		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+			c = (*i);
+
+			c->SetLocation(c->GetX()+min_x, c->GetY()+min_y);
+		}
+	}
+
+	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+		c = (*i);
+
+		if (max_width < (c->GetX()+c->GetWidth())) {
+			max_width = (c->GetX()+c->GetWidth());
+		}
+
+		if (max_height < (c->GetY()+c->GetHeight())) {
+			max_height = (c->GetY()+c->GetHeight());
+		}
+	}
+
+	/*
+	if (_subtitles.size() == 0) {
+		SetSize(max_width+insets.right, max_height+insets.bottom);
+	} else {
+		SetSize(max_width+insets.right, max_height+insets.bottom+32);
+	}
+	*/
+}
+
 jsize_t Container::GetPreferredSize()
 {
 	return _size;
@@ -377,7 +432,7 @@ void Container::Paint(Graphics *g)
 {
 	// JDEBUG(JINFO, "paint\n");
 
-	jthread::AutoLock lock(&_container_mutex);
+	// jthread::AutoLock lock(&_container_mutex);
 
 	jpoint_t scroll_location = GetScrollLocation();
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
@@ -388,6 +443,7 @@ void Container::Paint(Graphics *g)
 
 	if (IsBackgroundVisible() == true) {
 		g->Reset(); 
+
 		PaintBackground(g);
 	}
 
@@ -943,6 +999,8 @@ void Container::RegisterContainerListener(ContainerListener *listener)
 		return;
 	}
 
+	jthread::AutoLock lock(&_container_listener_mutex);
+
 	if (std::find(_container_listeners.begin(), _container_listeners.end(), listener) == _container_listeners.end()) {
 		_container_listeners.push_back(listener);
 	}
@@ -953,6 +1011,8 @@ void Container::RemoveContainerListener(ContainerListener *listener)
 	if (listener == NULL) {
 		return;
 	}
+
+	jthread::AutoLock lock(&_container_listener_mutex);
 
 	std::vector<ContainerListener *>::iterator i = std::find(_container_listeners.begin(), _container_listeners.end(), listener);
 
@@ -967,34 +1027,23 @@ void Container::DispatchContainerEvent(ContainerEvent *event)
 		return;
 	}
 
-	int k = 0,
-			size = (int)_container_listeners.size();
+	std::vector<ContainerListener *> listeners;
+	
+	_container_listener_mutex.Lock();
 
-	while (k++ < (int)_container_listeners.size() && event->IsConsumed() == false) {
-		ContainerListener *listener = _container_listeners[k-1];
+	listeners = _container_listeners;
+
+	_container_listener_mutex.Unlock();
+
+	for (std::vector<ContainerListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		ContainerListener *listener = (*i);
 
 		if (event->GetType() == JCET_COMPONENT_ADDED) {
 			listener->ComponentAdded(event);
 		} else if (event->GetType() == JCET_COMPONENT_ADDED) {
 			listener->ComponentRemoved(event);
 		}
-
-		if (size != (int)_container_listeners.size()) {
-			size = (int)_container_listeners.size();
-
-			k--;
-		}
 	}
-
-	/*
-	for (std::vector<ContainerListener *>::iterator i=_container_listeners.begin(); i!=_container_listeners.end(); i++) {
-		if (event->GetType() == JCET_COMPONENT_ADDED) {
-			(*i)->ComponentAdded(event);
-		} else if (event->GetType() == JCET_COMPONENT_ADDED) {
-			(*i)->ComponentRemoved(event);
-		}
-	}
-	*/
 
 	delete event;
 }

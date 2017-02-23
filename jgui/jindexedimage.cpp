@@ -20,7 +20,6 @@
 #include "Stdafx.h"
 #include "jindexedimage.h"
 #include "jimageexception.h"
-#include "jgfxhandler.h"
 #include "jhslcolorspace.h"
 #include "jruntimeexception.h"
 #include "jnullgraphics.h"

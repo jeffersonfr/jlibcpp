@@ -61,3 +61,6 @@ R: enable pcspkr module as following:
 
 5. the module sox no compile and print a message asking for -fpic
 R: recompile libsox with the option "--enable-shared"
+
+6. the events not working with (ENABLE_GRAPHICS == directfb*) and (ENABLE_MEDIA == libav)
+R: this occurs because the directfb uses SDL and libav uses SDL2. try to edit Makefile.media and change 'sdl2' by 'sdl' in libav's compilation

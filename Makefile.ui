@@ -27,24 +27,19 @@ ifeq ($(ENABLE_GRAPHICS),directfb-nodeps)
 
 	DEFINES		+= \
 		 -DDIRECTFB_UI \
-		 -DDIRECTFB_NODEPS_UI \
 
 	REQUIRES	+= \
 		 directfb \
 
 	OBJS_gfx	+= \
-		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
-		 nativeimage.o\
-		 nativeinputmanager.o\
 
 	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
 GENERIC_OBJS = \
-		 ../generic/generichandler.o\
 		 ../generic/genericfont.o\
 		 ../generic/genericgraphics.o\
 		 ../generic/genericimage.o\
@@ -65,12 +60,10 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 	CCFLAGS 	+= \
 		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
 		 -Ijgui/binds/$(ENABLE_GRAPHICS)/../generic/include \
-		 `pkg-config --cflags cairo` \
-		 `pkg-config --cflags directfb` \
+		 `pkg-config --cflags cairo directfb` \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs cairo` \
-		 `pkg-config --libs directfb` \
+		 `pkg-config --libs cairo directfb` \
 		 -ljpeg \
 
 	DEFINES		+= \
@@ -82,12 +75,8 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 
 	OBJS_gfx	+= \
 		 $(GENERIC_OBJS)\
-		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
-		 nativeimage.o\
-		 nativeinputmanager.o\
-		 nativepath.o\
 
 	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
@@ -97,12 +86,10 @@ ifeq ($(ENABLE_GRAPHICS),sdl2)
 	CCFLAGS 	+= \
 		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
 		 -Ijgui/binds/$(ENABLE_GRAPHICS)/../generic/include \
-		 `pkg-config --cflags cairo` \
-		 `pkg-config --cflags sdl2` \
+		 `pkg-config --cflags cairo sdl2` \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs cairo` \
-		 `pkg-config --libs sdl2` \
+		 `pkg-config --libs cairo sdl2` \
 		 -ljpeg \
 
 	DEFINES		+= \
@@ -113,12 +100,8 @@ ifeq ($(ENABLE_GRAPHICS),sdl2)
 
 	OBJS_gfx	+= \
 		 $(GENERIC_OBJS)\
-		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
-		 nativeimage.o\
-		 nativeinputmanager.o\
-		 nativepath.o\
 
 	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
@@ -132,7 +115,7 @@ ifeq ($(ENABLE_GRAPHICS),sfml2)
 
 	LDFLAGS		+= \
 		 `pkg-config --libs cairo` \
-		 -lsfml-graphics -lsfml-window -lsfml-system \
+		 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio \
 		 -ljpeg \
 
 	DEFINES		+= \
@@ -142,12 +125,8 @@ ifeq ($(ENABLE_GRAPHICS),sfml2)
 
 	OBJS_gfx	+= \
 		 $(GENERIC_OBJS)\
-		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
-		 nativeimage.o\
-		 nativeinputmanager.o\
-		 nativepath.o\
 
 	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
@@ -169,12 +148,33 @@ ifeq ($(ENABLE_GRAPHICS),x11)
 
 	OBJS_gfx	+= \
 		 $(GENERIC_OBJS)\
-		 nativefont.o\
 		 nativegraphics.o\
 		 nativehandler.o\
-		 nativeimage.o\
-		 nativeinputmanager.o\
-		 nativepath.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),gtk3)
+	CCFLAGS 	+= \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/include \
+		 -Ijgui/binds/$(ENABLE_GRAPHICS)/../generic/include \
+		 `pkg-config --cflags gtk+-3.0 cairo` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs gtk+-3.0 cairo` \
+		 -ljpeg \
+
+	DEFINES		+= \
+		 -DGTK3_UI \
+
+	REQUIRES	+= \
+		 sdl2 \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 nativegraphics.o\
+		 nativehandler.o\
 
 	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 

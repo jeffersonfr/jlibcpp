@@ -21,6 +21,7 @@
 #define J_BUTTON_H
 
 #include "jcomponent.h"
+#include "jactionlistener.h"
 
 #include <string>
 
@@ -28,8 +29,8 @@
 
 namespace jgui {
 
-class ButtonListener;
-class ButtonEvent;
+class ActionListener;
+class ActionEvent;
 
 /**
  * \brief
@@ -39,10 +40,12 @@ class ButtonEvent;
 class Button : public Component{
 
 	private:
-		std::vector<ButtonListener *> _button_listeners;
+		std::vector<ActionListener *> _action_listeners;
 		std::string _label;
 
 	protected:
+		/** \brief */
+		jthread::Mutex _action_listener_mutex;
 		/** \brief */
 		jhorizontal_align_t _halign;
 		/** \brief */
@@ -156,25 +159,25 @@ class Button : public Component{
 		 * \brief
 		 *
 		 */
-		virtual void RegisterButtonListener(ButtonListener *listener);
+		virtual void RegisterActionListener(ActionListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void RemoveButtonListener(ButtonListener *listener);
+		virtual void RemoveActionListener(ActionListener *listener);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void DispatchButtonEvent(ButtonEvent *event);
+		virtual void DispatchActionEvent(ActionEvent *event);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual std::vector<ButtonListener *> & GetButtonListeners();
+		virtual std::vector<ActionListener *> & GetActionListeners();
 
 };
 

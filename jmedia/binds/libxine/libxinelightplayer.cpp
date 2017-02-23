@@ -19,21 +19,16 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "libxinelightplayer.h"
-#include "nativeimage.h"
+#include "genericimage.h"
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
 #include "jvideodevicecontrol.h"
 #include "jvolumecontrol.h"
 #include "jmediaexception.h"
-#include "jgfxhandler.h"
 #include "jcolorconversion.h"
 
-#if defined(DIRECTFB_NODEPS_UI)
-#include <directfb.h>
-#else
 #include <cairo.h>
-#endif
 
 namespace jmedia {
 
@@ -136,44 +131,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 	
 			_buffer_index = (_buffer_index + 1)%2;
 
-#if defined(DIRECTFB_NODEPS_UI)
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-
-			int sw = width;
-			int sh = height;
-
-			IDirectFBSurface *frame;
-			DFBSurfaceDescription desc;
-
-			desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT | DSDESC_PREALLOCATED);
-			desc.caps = (DFBSurfaceCapabilities)(DSCAPS_NONE);
-			desc.width = sw;
-			desc.height = sh;
-			desc.pixelformat = DSPF_ARGB;
-			desc.preallocated[0].data = buffer;
-			desc.preallocated[0].pitch = sw*4;
-
-			IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
-
-			if (directfb->CreateSurface(directfb, &desc, &frame) == DFB_OK) {
-				_mutex.Lock();
-
-				if (_image != NULL) {
-					delete _image;
-					_image = NULL;
-				}
-
-				_image = new jgui::NativeImage(frame, jgui::JPF_ARGB, sw, sh);
-
-				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
-
-				_mutex.Unlock();
-
-				Start();
-			}
-#else
 			if (IsRunning() == true) {
 				WaitThread();
 			}
@@ -192,7 +149,7 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 				_image = NULL;
 			}
 
-			_image = new jgui::NativeImage(cairo_context, jgui::JPF_RGB24, sw, sh);
+			_image = new jgui::GenericImage(cairo_context, jgui::JPF_RGB24, sw, sh);
 
 			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
 
@@ -202,7 +159,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 			_mutex.Unlock();
 
 			Start();
-#endif
 		}
 
 		virtual void Run()

@@ -23,7 +23,8 @@
  *
  */
 
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jimage.h"
 #include "jdate.h"
 #include "jthread.h"
@@ -46,7 +47,7 @@ double myrandom()
 	return ((double)(random()%1000))/1000.0;
 }
 
-class Breakout : public jgui::Frame, public jthread::Thread {
+class Breakout : public jgui::Widget {
 
 	private:
 		jgui::Image *off;
@@ -65,16 +66,11 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 		bool ingame;
 		bool showtitle;
 		bool *showbrick;
-		bool _running;
 
 	public:
 		Breakout():
-			jgui::Frame("BreakOut", 32, 32, 720, 480)
+			jgui::Widget("BreakOut", 0, 0, 720, 480)
 		{
-			SetUndecorated(true);
-
-			_running = true;
-
 			off = NULL;
 			goff = NULL;
 
@@ -95,18 +91,11 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 
 			showbrick = new bool[bricksperline*numlines];
 
-			SetSize(bricksperline*(brickwidth+brickspace)+(2*borderwidth), _size.height);
-
 			GameInit();
-
-			Start();
 		}
 
 		virtual ~Breakout()
 		{
-			_running = false;
-
-			WaitThread();
 		}
 
 		void GameInit()
@@ -139,7 +128,7 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
@@ -165,7 +154,7 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 		/*
 		virtual bool KeyReleased(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyReleased(event) == true) {
+			if (jgui::Widget::KeyReleased(event) == true) {
 				return true;
 			}
 
@@ -187,7 +176,7 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 				return;
 			}
 
-			goff->SetColor(GetTheme()->GetColor("window.bg"));
+			goff->SetColor(GetTheme()->GetColor("widget.bg"));
 			goff->FillRectangle(0, 0, _size.width, _size.height);
 
 			if (ingame) {
@@ -228,7 +217,7 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 			}
 			
 			jgui::Theme *theme = GetTheme();
-			jgui::Font *font = theme->GetFont("window");
+			jgui::Font *font = theme->GetFont("widget");
 
 			if (font != NULL) {
 				goff->DrawString("Pressione SPACE para iniciar", (GetWidth()-font->GetStringWidth("Pressione SPACE para iniciar"))/2, GetHeight()/2);
@@ -276,7 +265,7 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 		void ShowScore()
 		{
 			jgui::Theme *theme = GetTheme();
-			jgui::Font *font = theme->GetFont("window");
+			jgui::Font *font = theme->GetFont("widget");
 
 			if (font == NULL) {
 				return;
@@ -438,11 +427,12 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 			}
 		}
 
-		virtual void Run()
+		virtual void Render()
 		{
 			uint64_t startTime = jcommon::Date::CurrentTimeMillis();
-				
-			while(_running) {
+	
+			while (IsHidden() == false) {
+				// TODO:: estou tendo que forcar o tamanho
 				Repaint();
 				
 				// Delay depending on how far we are behind.
@@ -458,9 +448,17 @@ class Breakout : public jgui::Frame, public jthread::Thread {
 
 int main(int argc, char **argv) 
 {
-	Breakout breakout;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	breakout.Show(true);
+	Breakout app;
+
+	main->SetTitle("Breakout");
+	main->Add(&app);
+	main->SetSize(720, 480);
+	main->SetUndecorated(true);
+	main->SetVisible(true);
+
+	app.Render();
 
 	return 0;
 }

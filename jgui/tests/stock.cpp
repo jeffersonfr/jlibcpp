@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jtextfield.h"
 #include "jlabel.h"
 #include "jstringtokenizer.h"
@@ -27,7 +28,7 @@
 
 #include <sstream>
 
-class Stock : public jgui::Frame{
+class Stock : public jgui::Widget{
 
 	private:
 			jgui::TextField *acao;
@@ -51,8 +52,8 @@ class Stock : public jgui::Frame{
 				_theme2;
 
 	public:
-		Stock(int x, int y):
-			jgui::Frame("Stock", x, y, 500, 400)
+		Stock():
+			jgui::Widget("Stock", 0, 0, 500, 400)
 		{
 			_theme1.SetColor("component.fg", 0xf0, 0x00, 0x00, 0xff);
 			_theme2.SetColor("component.fg", 0x00, 0xf0, 0x00, 0xff);
@@ -102,7 +103,7 @@ class Stock : public jgui::Frame{
 
 			acao->RequestFocus();
 
-			Pack();
+			Pack(true);
 		}
 
 		virtual ~Stock() 
@@ -178,7 +179,7 @@ class Stock : public jgui::Frame{
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
@@ -209,9 +210,15 @@ class Stock : public jgui::Frame{
 
 int main()
 {
-	Stock stock(100, 100);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	stock.Show(true);
+	Stock app;
+
+	main->SetTitle("Stock");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

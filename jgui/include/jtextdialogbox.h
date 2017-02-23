@@ -21,9 +21,8 @@
 #define J_TEXTDIALOGBOX_H
 
 #include "jbutton.h"
-#include "jbuttonlistener.h"
 #include "jlabel.h"
-#include "jdialogbox.h"
+#include "jwidget.h"
 #include "jthread.h"
 #include "jmutex.h"
 #include "jdate.h"
@@ -36,7 +35,7 @@
 
 namespace jgui {
 
-class TextDialogBox : public jgui::DialogBox{
+class TextDialogBox : public jgui::Widget{
 
 	private:
 		/** \brief */

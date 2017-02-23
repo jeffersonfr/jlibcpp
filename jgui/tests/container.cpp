@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "janimation.h"
 #include "jmarquee.h"
 #include "jtextfield.h"
@@ -35,10 +36,10 @@
 #include "jkeyboard.h"
 #include "jscrollbar.h"
 #include "jcombobox.h"
-#include "jtooglebutton.h"
+#include "jtogglebutton.h"
 #include "jsystem.h"
 
-class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
+class WindowTeste : public jgui::Widget, public jgui::ActionListener, public jgui::SelectListener, public jgui::ToggleListener{
 
 	private:
 		jthread::Mutex teste_mutex;
@@ -97,7 +98,7 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 
 	public:
 		WindowTeste():
-			jgui::Frame("Widgets", 0, 0, 960, 540)
+			jgui::Widget("Widgets", 0, 0, 960, 540)
 	{
 		{
 			jgui::jinsets_t t = GetInsets();
@@ -190,8 +191,8 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 			_button2->SetTheme(&_theme1);
 			_button3->SetTheme(&_theme1);
 
-			_button1->RegisterButtonListener(this);
-			_button2->RegisterButtonListener(this);
+			_button1->RegisterActionListener(this);
+			_button2->RegisterActionListener(this);
 		}
 
 		{
@@ -225,9 +226,9 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 
 			_check1->SetSelected(true);
 
-			_check1->RegisterCheckButtonListener(this);
-			_check2->RegisterCheckButtonListener(this);
-			_check3->RegisterCheckButtonListener(this);
+			_check1->RegisterToggleListener(this);
+			_check2->RegisterToggleListener(this);
+			_check3->RegisterToggleListener(this);
 		}
 
 		{
@@ -243,9 +244,9 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 			_group->Add(_radio2);
 			_group->Add(_radio3);
 
-			_radio1->RegisterCheckButtonListener(this);
-			_radio2->RegisterCheckButtonListener(this);
-			_radio3->RegisterCheckButtonListener(this);
+			_radio1->RegisterToggleListener(this);
+			_radio2->RegisterToggleListener(this);
+			_radio3->RegisterToggleListener(this);
 		}
 
 		{
@@ -355,11 +356,11 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 	{
 		jthread::AutoLock lock(&teste_mutex);
 
-		_radio1->RemoveCheckButtonListener(this);
-		_radio2->RemoveCheckButtonListener(this);
-		_radio3->RemoveCheckButtonListener(this);
+		_radio1->RemoveToggleListener(this);
+		_radio2->RemoveToggleListener(this);
+		_radio3->RemoveToggleListener(this);
 
-		Hide();
+		SetVisible(false);
 
 		delete _animation;
 		delete _marquee;
@@ -392,7 +393,7 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 		delete _container;
 	}
 
-	virtual void ButtonSelected(jgui::CheckButtonEvent *event)
+	virtual void StateChanged(jgui::ToggleEvent *event)
 	{
 		jthread::AutoLock lock(&teste_mutex);
 
@@ -439,7 +440,7 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 		}
 	}
 
-	virtual void ActionPerformed(jgui::ButtonEvent *event)
+	virtual void ActionPerformed(jgui::ActionEvent *event)
 	{
 		jthread::AutoLock lock(&teste_mutex);
 
@@ -465,9 +466,15 @@ class WindowTeste : public jgui::Frame, public jgui::ButtonListener, public jgui
 
 int main( int argc, char *argv[] )
 {
-	WindowTeste test;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show(true);
+	WindowTeste app;
+
+	main->SetTitle("Container");
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->Add(&app);
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

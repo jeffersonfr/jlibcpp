@@ -27,7 +27,6 @@
 #include "jautolock.h"
 #include "jcomponentlistener.h"
 #include "jfont.h"
-#include "jgfxhandler.h"
 #include "jkeyevent.h"
 #include "jmouseevent.h"
 #include "jkeymap.h"
@@ -35,6 +34,7 @@
 #include "jmouselistener.h"
 #include "jdatalistener.h"
 #include "jtheme.h"
+#include "jdataevent.h"
 
 #include <string>
 #include <vector>
@@ -62,13 +62,17 @@ class Component : public KeyListener, public MouseListener{
 
 	protected:
 		/** \brief */
-		jthread::Mutex _component_mutex;
-		/** \brief */
 		std::vector<FocusListener *> _focus_listeners;
 		/** \brief */
 		std::vector<ComponentListener *> _component_listeners;
 		/** \brief */
 		std::vector<jcommon::DataListener *> _data_listeners;
+		/** \brief */
+		jthread::Mutex _focus_listener_mutex;
+		/** \brief */
+		jthread::Mutex _component_listener_mutex;
+		/** \brief */
+		jthread::Mutex _data_listener_mutex;
 		/** \brief */
 		jcommon::ParamMapper _params;
 		/** \brief */
@@ -699,6 +703,12 @@ class Component : public KeyListener, public MouseListener{
 		 * \brief
 		 *
 		 */
+		virtual bool IsHidden();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual bool HasFocus();
 
 		/**
@@ -1035,7 +1045,7 @@ class Component : public KeyListener, public MouseListener{
 		 * \brief
 		 *
 		 */
-		virtual void DispatchDataEvent(jcommon::ParamMapper *params);
+		virtual void DispatchDataEvent(jcommon::DataEvent *event);
 		
 		/**
 		 * \brief

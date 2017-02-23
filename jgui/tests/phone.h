@@ -20,7 +20,8 @@
 #ifndef PHONEBOOK_H_
 #define PHONEBOOK_H_
 
-#include "jframe.h"
+#include "jmainwindow.h"
+#include "jwidget.h"
 #include "jlabel.h"
 #include "jlistbox.h"
 #include "jkeyboardlistener.h"
@@ -33,7 +34,7 @@ namespace phone {
 
 class PhoneDB;
 
-class Phone : public jgui::Frame, public jgui::SelectListener, public jcommon::DataListener{
+class Phone : public jgui::Widget, public jgui::SelectListener, public jcommon::DataListener{
 
 	private:
 		jthread::Mutex phone_mutex;
@@ -85,7 +86,7 @@ class PhoneDB{
 
 };
 
-class AddContact : public jgui::Frame, public jcommon::DataListener{
+class AddContact : public jgui::Widget, public jcommon::DataListener{
 
 	private:
 		jthread::Mutex add_mutex;
@@ -110,7 +111,7 @@ class AddContact : public jgui::Frame, public jcommon::DataListener{
 
 };
 
-class SearchContacts : public jgui::Frame, public jcommon::DataListener, public jgui::KeyboardListener{
+class SearchContacts : public jgui::Widget, public jcommon::DataListener, public jgui::KeyboardListener{
 
 	private:
 		jthread::Mutex search_mutex;
@@ -142,4 +143,4 @@ class SearchContacts : public jgui::Frame, public jcommon::DataListener, public 
 
 }
 
-#endif /*NCLAPPLICATION_H_*/
+#endif 

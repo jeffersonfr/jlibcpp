@@ -98,7 +98,6 @@ enum jcomponent_behavior_t {
 };
 
 class Component;
-class Window;
 class ItemComponent;
 
 /**

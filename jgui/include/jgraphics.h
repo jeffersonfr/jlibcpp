@@ -222,7 +222,6 @@ struct jrational_t {
 	int den;
 };
 
-class Window;
 class Image;
 class Font;
 class Image;
@@ -289,7 +288,7 @@ class Graphics : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual std::string Dump(std::string dir, std::string pre);
+		virtual std::string Dump(std::string dir, std::string prefix);
 
 		/**
 		 * \brief

@@ -44,66 +44,31 @@ Marquee::~Marquee()
 	WaitThread();
 }
 
-void Marquee::SetVisible(bool b)
-{
-	jthread::AutoLock lock(&_component_mutex);
-
-	if (_is_visible == b) {
-		return;
-	}
-
-	_is_visible = b;
-
-	if (_is_visible == true) {
-		if (IsRunning() == false) {
-			_running = true;
-
-			Start();
-		}
-	} else {
-		_running = false;
-
-		Release();
-		WaitThread();
-		Repaint();
-	}
-}
-
 void Marquee::SetStep(int i)
 {
-	jthread::AutoLock lock(&_component_mutex);
-
 	_step = i;
 }
 
 void Marquee::SetInterval(int i)
 {
-	jthread::AutoLock lock(&_component_mutex);
-
 	_interval = i;
 }
 
 void Marquee::SetType(jmarquee_mode_t type)
 {
-	jthread::AutoLock lock(&_component_mutex);
-
 	_type = type;
 	_position = 0;
 }
 
 void Marquee::Release()
 {
-	{
-		jthread::AutoLock lock(&_component_mutex);
+	_running = false;
 
-		_running = false;
-	}
+	WaitThread();
 }
 
 void Marquee::SetText(std::string text)
 {
-	jthread::AutoLock lock(&_component_mutex);
-
 	_text = text;
 }
 

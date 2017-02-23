@@ -24,11 +24,13 @@
 #include "jyesnodialogbox.h"
 #include "jcalendardialogbox.h"
 #include "jhourdialogbox.h"
+#include "jmainwindow.h"
+#include "jwidget.h"
 
 namespace agenda {
 
 Agenda::Agenda():
-	jgui::Frame("Tasks", 32, 32)
+	jgui::Widget("Tasks", 32, 32)
 {
 	started = true;
 	_status = NULL;
@@ -52,7 +54,7 @@ Agenda::Agenda():
 
 	_list->RequestFocus();
 
-	Pack();
+	Pack(true);
 }
 
 Agenda::~Agenda() 
@@ -108,7 +110,7 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 	}
 	
 	if (_status != NULL) {
-		_status->Show();
+		_status->SetVisible(true);
 	}
 }
 
@@ -380,7 +382,7 @@ void AgendaDB::RemoveAll()
 }
 
 AddMessage::AddMessage(AgendaDB *base, int index):
-	jgui::Frame("Add Appointment", 32, 32)
+	jgui::Widget("Add Appointment", 32, 32)
 {
 	int height = DEFAULT_COMPONENT_HEIGHT+4;
 
@@ -452,7 +454,7 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Add");
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/vertical_arrows.png", "Select");
 
-	Pack();
+	Pack(true);
 }
 
 AddMessage::~AddMessage() 
@@ -472,7 +474,8 @@ AddMessage::~AddMessage()
 
 bool AddMessage::KeyPressed(jgui::KeyEvent *event)
 {
-	if (jgui::Frame::KeyPressed(event) == true) {
+	puts("EVENT 01");
+	if (jgui::Widget::KeyPressed(event) == true) {
 		return true;
 	}
 
@@ -512,11 +515,12 @@ bool AddMessage::KeyPressed(jgui::KeyEvent *event)
 			db->Update(_index, _day, _month, _year, _hour, _minute, message->GetText());
 		}
 
-		Release();
+		// TODO:: this code locks
+		// SetVisible(false);
 	}
 
 	if (_status != NULL) {
-		_status->Show();
+		_status->SetVisible(true);
 	}
 
 	return true;
@@ -547,7 +551,7 @@ void AddMessage::DataChanged(jcommon::ParamMapper *params)
 }
 
 ViewMessages::ViewMessages(AgendaDB *base):
-		jgui::Frame("Appointments", 32, 32)
+		jgui::Widget("Appointments", 32, 32)
 {
 	int dheight = 40;
 	int sheight = 50;
@@ -583,7 +587,7 @@ ViewMessages::ViewMessages(AgendaDB *base):
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png", "Edit");
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/horizontal_arrows.png", "List");
 
-	Pack();
+	Pack(true);
 }
 
 ViewMessages::~ViewMessages() 
@@ -625,7 +629,8 @@ void ViewMessages::Update()
 
 bool ViewMessages::KeyPressed(jgui::KeyEvent *event)
 {
-	if (jgui::Frame::KeyPressed(event) == true) {
+	puts("EVENT 02");
+	if (jgui::Widget::KeyPressed(event) == true) {
 		return true;
 	}
 
@@ -668,7 +673,7 @@ bool ViewMessages::KeyPressed(jgui::KeyEvent *event)
 	}
 	
 	if (_status != NULL) {
-		_status->Show();
+		_status->SetVisible(true);
 	}
 
 	return true;
@@ -695,9 +700,14 @@ void ViewMessages::DataChanged(jcommon::ParamMapper *params)
 
 int main()
 {
+	jgui::Application *main = jgui::Application::GetInstance();
+
 	agenda::Agenda app;
 
-	app.Show(true);
+	main->SetTitle("Agenda");
+	main->Add(&app);
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jfont.h"
 #include "jbutton.h"
 
@@ -25,7 +26,7 @@
 #include <stdlib.h>
 #include <signal.h>
 
-class BorderTest : public jgui::Frame {
+class BorderTest : public jgui::Widget {
 
 	private:
 		std::vector<jgui::Component *> _components;
@@ -43,7 +44,7 @@ class BorderTest : public jgui::Frame {
 
 	public:
 		BorderTest():
-			jgui::Frame("Border Test")
+			jgui::Widget("Border Test", 0, 0, 720, 480)
 		{
 			int gapx = 32;
 			int gapy = 320;
@@ -118,10 +119,16 @@ class BorderTest : public jgui::Frame {
 
 int main(int argc, char **argv)
 {
-	BorderTest main;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Show(true);
+	BorderTest app;
 
+	main->SetTitle("Border");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
+	
 	return 0;
 }
 

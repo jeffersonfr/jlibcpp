@@ -22,7 +22,7 @@
 
 #include "jeventobject.h"
 #include "jcheckbutton.h"
-#include "jcheckbuttonlistener.h"
+#include "jtogglelistener.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -35,7 +35,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class CheckButtonGroup : public CheckButtonListener{
+class CheckButtonGroup : public ToggleListener{
 
 	private:
 		std::vector<CheckButton *> _buttons;
@@ -46,7 +46,7 @@ class CheckButtonGroup : public CheckButtonListener{
 		 * \brief
 		 *
 		 */
-		virtual void ButtonSelected(CheckButtonEvent *event);
+		virtual void StateChanged(ToggleEvent *event);
 
 	public:
 		/**

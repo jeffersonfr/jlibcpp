@@ -19,7 +19,6 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jbutton.h"
-#include "jbuttonlistener.h"
 #include "jdebug.h"
 
 namespace jgui {
@@ -106,7 +105,7 @@ bool Button::KeyPressed(KeyEvent *event)
 	bool catched = false;
 
 	if (event->GetSymbol() == JKS_ENTER) {
-		DispatchButtonEvent(new ButtonEvent(this));
+		DispatchActionEvent(new ActionEvent(this));
 
 		catched = true;
 	}
@@ -121,7 +120,7 @@ bool Button::MousePressed(MouseEvent *event)
 	}
 
 	if (event->GetButton() == JMB_BUTTON1) {
-		DispatchButtonEvent(new ButtonEvent(this));
+		DispatchActionEvent(new ActionEvent(this));
 
 		return true;
 	}
@@ -223,61 +222,60 @@ void Button::Paint(Graphics *g)
 	}
 }
 
-void Button::RegisterButtonListener(ButtonListener *listener)
+void Button::RegisterActionListener(ActionListener *listener)
 {
 	if (listener == NULL) {
 		return;
 	}
 
-	if (std::find(_button_listeners.begin(), _button_listeners.end(), listener) == _button_listeners.end()) {
-		_button_listeners.push_back(listener);
+	jthread::AutoLock lock(&_action_listener_mutex);
+
+	if (std::find(_action_listeners.begin(), _action_listeners.end(), listener) == _action_listeners.end()) {
+		_action_listeners.push_back(listener);
 	}
 }
 
-void Button::RemoveButtonListener(ButtonListener *listener)
+void Button::RemoveActionListener(ActionListener *listener)
 {
 	if (listener == NULL) {
 		return;
 	}
 
-	std::vector<ButtonListener *>::iterator i = std::find(_button_listeners.begin(), _button_listeners.end(), listener);
+	jthread::AutoLock lock(&_action_listener_mutex);
+
+	std::vector<ActionListener *>::iterator i = std::find(_action_listeners.begin(), _action_listeners.end(), listener);
 	
-	if (i != _button_listeners.end()) {
-		_button_listeners.erase(i);
+	if (i != _action_listeners.end()) {
+		_action_listeners.erase(i);
 	}
 }
 
-void Button::DispatchButtonEvent(ButtonEvent *event)
+void Button::DispatchActionEvent(ActionEvent *event)
 {
 	if (event == NULL) {
 		return;
 	}
 
-	int k = 0,
-			size = (int)_button_listeners.size();
+	std::vector<ActionListener *> listeners;
+	
+	_action_listener_mutex.Lock();
 
-	while (k++ < (int)_button_listeners.size() && event->IsConsumed() == false) {
-		_button_listeners[k-1]->ActionPerformed(event);
+	listeners = _action_listeners;
 
-		if (size != (int)_button_listeners.size()) {
-			size = (int)_button_listeners.size();
+	_action_listener_mutex.Unlock();
 
-			k--;
-		}
+	for (std::vector<ActionListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		ActionListener *listener = (*i);
+
+		listener->ActionPerformed(event);
 	}
-
-	/*
-	for (std::vector<ButtonListener *>::iterator i=_button_listeners.begin(); i!=_button_listeners.end(); i++) {
-		(*i)->ActionPerformed(event);
-	}
-	*/
 
 	delete event;
 }
 
-std::vector<ButtonListener *> & Button::GetButtonListeners()
+std::vector<ActionListener *> & Button::GetActionListeners()
 {
-	return _button_listeners;
+	return _action_listeners;
 }
 
 }

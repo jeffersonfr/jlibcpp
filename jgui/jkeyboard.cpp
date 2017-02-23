@@ -72,7 +72,7 @@ namespace jkeybutton {
 class KeyButton : public Button{
 
 	public:
-		KeyButton(std::string label1, std::string label2, ButtonListener *listener, int width = KEY_WIDTH_1):
+		KeyButton(std::string label1, std::string label2, ActionListener *listener, int width = KEY_WIDTH_1):
 			Button(label1, 0, 0, 0, 0) 
 		{
 			jcommon::Object::SetClassName("KeyButton");
@@ -84,7 +84,8 @@ class KeyButton : public Button{
 
 			SetName(label2);
 			SetPreferredSize(t);
-			RegisterButtonListener(listener);
+
+			RegisterActionListener(listener);
 		}
 
 };
@@ -92,11 +93,11 @@ class KeyButton : public Button{
 }
 
 Keyboard::Keyboard(jkeyboard_type_t type, bool text_visible, bool is_password):
- 	jgui::Frame("Teclado Virtual")
+ 	jgui::Widget("Teclado Virtual", 0, 0, 0, 0)
 {
 	jcommon::Object::SetClassName("jgui::Keyboard");
 
-	SetIcon(jcommon::System::GetResourceDirectory() + "/images/keyboard_icon.png");
+	// SetIcon(jcommon::System::GetResourceDirectory() + "/images/keyboard_icon.png");
 
 	_display = NULL;
 
@@ -166,7 +167,7 @@ Keyboard::~Keyboard()
 	delete layout;
 }
 
-void Keyboard::ActionPerformed(ButtonEvent *event)
+void Keyboard::ActionPerformed(ActionEvent *event)
 {
 	jthread::AutoLock lock(&_key_mutex);
 
@@ -860,6 +861,8 @@ void Keyboard::RegisterKeyboardListener(KeyboardListener *listener)
 		return;
 	}
 
+	jthread::AutoLock lock(&_key_listener_mutex);
+
 	if (std::find(_keyboard_listeners.begin(), _keyboard_listeners.end(), listener) == _keyboard_listeners.end()) {
 		_keyboard_listeners.push_back(listener);
 	}
@@ -870,6 +873,8 @@ void Keyboard::RemoveKeyboardListener(KeyboardListener *listener)
 	if (listener == NULL) {
 		return;
 	}
+
+	jthread::AutoLock lock(&_key_listener_mutex);
 
 	std::vector<KeyboardListener *>::iterator i = std::find(_keyboard_listeners.begin(), _keyboard_listeners.end(), listener);
 
@@ -884,28 +889,23 @@ void Keyboard::DispatchKeyboardEvent(KeyEvent *event)
 		return;
 	}
 
-	int k = 0,
-			size = (int)_keyboard_listeners.size();
+	std::vector<KeyboardListener *> listeners;
+	
+	_key_listener_mutex.Lock();
 
-	while (k++ < (int)_keyboard_listeners.size() && event->IsConsumed() == false) {
+	listeners = _keyboard_listeners;
+
+	_key_listener_mutex.Unlock();
+
+	for (std::vector<KeyboardListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		KeyboardListener *listener = (*i);
+
 		if (event->GetType() == JKT_PRESSED) {
-			_keyboard_listeners[k-1]->KeyboardPressed(event);
+			listener->KeyboardPressed(event);
 		} else if (event->GetType() == JKT_RELEASED) {
-			_keyboard_listeners[k-1]->KeyboardReleased(event);
-		}
-
-		if (size != (int)_keyboard_listeners.size()) {
-			size = (int)_keyboard_listeners.size();
-
-			k--;
+			listener->KeyboardReleased(event);
 		}
 	}
-
-	/*
-	 for (std::vector<KeyboardListener *>::iterator i=_keyboard_listeners.begin(); i!=_keyboard_listeners.end(); i++) {
-		 (*i)->KeyboardPressed(event);
-	 }
-	 */
 
 	delete event;
 }

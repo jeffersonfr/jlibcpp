@@ -43,10 +43,6 @@ ComboBox::ComboBox(int x, int y, int width, int height):
 
 ComboBox::~ComboBox()
 {
-	jthread::AutoLock lock(&_component_mutex);
-
-	// WaitThread();
-	
 	_menu->RemoveSelectListener(this);
 
 	delete _menu;
@@ -60,8 +56,6 @@ void ComboBox::SetVisibleItems(int max_items)
 	menu->SetLoop(false);
 	menu->SetCurrentIndex(0);
 	menu->RegisterSelectListener(this);
-	menu->SetMoveEnabled(true);
-	menu->SetResizeEnabled(true);
 
 	if (_menu != NULL) {
 		std::vector<Item *> items = _menu->GetItems();
@@ -107,10 +101,10 @@ bool ComboBox::MousePressed(MouseEvent *event)
 
 				_menu->SetBounds(root->GetX()+p.x, root->GetY()+p.y+GetHeight(), GetWidth(), _menu->GetHeight());
 				
-				_menu->Show();
+				// _menu->Show();
 				
-				_menu->GetInputManager()->RegisterKeyListener(_menu);
-				_menu->GetInputManager()->RegisterMouseListener(_menu);
+				// _menu->GetInputManager()->RegisterKeyListener(_menu);
+				// _menu->GetInputManager()->RegisterMouseListener(_menu);
 			}
 		}
 	
@@ -162,10 +156,10 @@ bool ComboBox::KeyPressed(KeyEvent *event)
 
 			_menu->SetBounds(root->GetX()+p.x, root->GetY()+p.y+GetHeight(), GetWidth(), _menu->GetHeight());
 			
-			_menu->Show();
+			// _menu->Show();
 			
-			_menu->GetInputManager()->RegisterKeyListener(_menu);
-			_menu->GetInputManager()->RegisterMouseListener(_menu);
+			// _menu->GetInputManager()->RegisterKeyListener(_menu);
+			// _menu->GetInputManager()->RegisterMouseListener(_menu);
 		}
 	
 		catched = true;
@@ -262,8 +256,6 @@ void ComboBox::SetLoop(bool loop)
 
 void ComboBox::SetCurrentIndex(int i)
 {
-	jthread::AutoLock lock(&_component_mutex);
-
 	_old_index = _menu->GetCurrentIndex();
 	_menu->SetCurrentIndex(i);
 }

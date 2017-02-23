@@ -18,21 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "Stdafx.h"
+#include "genericfont.h"
 #include "jfont.h"
-#include "jgfxhandler.h"
 #include "jnullpointerexception.h"
 #include "jstringutils.h"
 #include "jstringtokenizer.h"
-
-#if defined(DIRECTFB_UI)
-#include "nativefont.h"
-#elif defined(SDL2_UI)
-#include "nativefont.h"
-#elif defined(SFML2_UI)
-#include "nativefont.h"
-#elif defined(X11_UI)
-#include "nativefont.h"
-#endif
 
 #define DEFAULT_FONT_SIZE			16
 
@@ -74,15 +64,7 @@ Font * Font::CreateFont(std::string name, jfont_attributes_t attributes, int siz
 	Font *font = NULL;
 
 	try {
-#if defined(DIRECTFB_UI)
-		font = new NativeFont(name, attributes, size);
-#elif defined(SDL2_UI)
-		font = new NativeFont(name, attributes, size);
-#elif defined(SFML2_UI)
-		font = new NativeFont(name, attributes, size);
-#elif defined(X11_UI)
-		font = new NativeFont(name, attributes, size);
-#endif
+		font = new GenericFont(name, attributes, size);
 	} catch (jcommon::NullPointerException &) {
 	}
 

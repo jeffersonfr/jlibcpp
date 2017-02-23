@@ -1,4 +1,24 @@
-#include "jframe.h"
+/***************************************************************************
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   root@sat                                                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#include "japplication.h"
+#include "jwidget.h"
 #include "jimage.h"
 #include "jthread.h"
 
@@ -49,7 +69,7 @@ class Neuron {
 
 double	COUNTRY = 1.00;
 
-class som : public jgui::Frame, public jthread::Thread {
+class som : public jgui::Widget {
 
 	public:
 		enum {
@@ -79,19 +99,14 @@ class som : public jgui::Frame, public jthread::Thread {
 
 	public:
 		som():
-			jgui::Frame("SOM", 10, 10, 400, 400),
-			jthread::Thread() 
+			jgui::Widget("SOM", 0, 0, 400, 400)
 		{
 			kohonenInit();
-
-			SetResizeEnabled(true);
 		}
 
 		virtual ~som()
 		{
 			please_stop = true;
-
-			WaitThread();
 		}
 
 		void kohonenInit()
@@ -135,13 +150,13 @@ class som : public jgui::Frame, public jthread::Thread {
 			}
 		}
 
-		void Run() {
+		void Render() {
 			double x1,
 						 x2,
 						 mindist;
 			int j;
 
-			while(!please_stop) {
+			while (please_stop == 0 && IsHidden() == false) {
 				counter++;
 
 				// CHOSE A RANDOM PATTERN
@@ -277,11 +292,17 @@ int main()
 {
 	srand(time(NULL));
 
-	som n;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	n.kohonenInit();
-	n.Start();
-	n.Show(true);
+	som app;
+
+	main->SetTitle("Som");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+
+	app.kohonenInit();
+	app.Render();
 
 	return 0;
 }

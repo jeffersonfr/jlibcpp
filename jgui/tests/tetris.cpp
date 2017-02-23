@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 #define X_BLOCKS	10
 #define Y_BLOCKS	20
@@ -96,7 +97,9 @@ int checks[] = {
 	-1,1,  0,1,  1,1,  1,1
 };
 
-class Tetris : public jgui::Frame, public jthread::Thread{
+int screendata[X_BLOCKS][Y_BLOCKS];
+
+class Tetris : public jgui::Widget{
 
 	public:
 		jgui::Graphics *goff;
@@ -110,7 +113,6 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 		uint32_t background;
 		bool ingame;
 		bool showtitle;
-		int screendata[X_BLOCKS][Y_BLOCKS];
 		int	xblocks;
 		int	yblocks;
 		int	blocksize;
@@ -139,15 +141,12 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 		int	screendelay;
 		int	screencount;
 		jgui::jregion_t d;
-		bool _running;
 
 	public:
 
 		Tetris():
-			jgui::Frame("Tetris", 0, 0, 1920, 1080)
+			jgui::Widget("Tetris", 0, 0, 1920, 1080)
 		{
-			_running = true;
-
 			smallfont = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 20);
 			largefont = jgui::Font::CreateFont("default", jgui::JFA_NORMAL, 28);
 
@@ -204,23 +203,18 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 			d.width = GetWidth();
 			d.height = GetHeight();
 
-			SetUndecorated(true);
 			SetSize(width+2*barwidth, height+2*barwidth);
 		}
 
 		virtual ~Tetris()
 		{
-			_running = false;
-
-			WaitThread();
 		}
 
 		void init()
 		{
-			ingame=true;
-			gameInit();
+			ingame = true;
 
-			Start();
+			gameInit();
 		}
 
 		void gameInit()
@@ -279,7 +273,7 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
@@ -307,7 +301,7 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 
 		virtual bool KeyReleased(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyReleased(event) == true) {
+			if (jgui::Widget::KeyReleased(event) == true) {
 				return true;
 			}
 
@@ -511,8 +505,7 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 
 		void drawBlocks()
 		{
-			int x,
-				y;
+			int x, y;
 
 			for (x=0; x<xblocks; x++) {
 				for (y=0; y<yblocks; y++) {
@@ -525,33 +518,34 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 
 		void checkFull()
 		{
-			int	x,y;
-			bool found=false;
+			int	x, y;
+			bool found = false;
 
 			for (y=yblocks-1; ( y>=0 && !found); y--) {
-				found=true;
+				found = true;
 				for (x=0; x<xblocks; x++) {
-					if (screendata[x][y]==0)
-						found=false;
+					if (screendata[x][y] == 0)
+						found = false;
 				}
+
 				if (found) {
-					score+=10;
+					score = score + 10;
 
 					// increase speed when you've got a lot of points
-					if (score>800)
-						curcount=1;
-					else if (score>600)
-						curcount=2;
-					else if (score>400)
-						curcount=3;
-					else if (score>200)
-						curcount=4;
+					if (score > 800) 
+						curcount = 1;
+					else if (score > 600)
+						curcount = 2;
+					else if (score > 400)
+						curcount = 3;
+					else if (score > 200)
+						curcount = 4;
 
-					for (x=0; x<xblocks; x++)
-					{
-						screendata[x][y]=0;
+					for (x=0; x<xblocks; x++) {
+						screendata[x][y] = 0;
 					}
-					emptyline=y;
+
+					emptyline = y;
 				}
 			}
 		}
@@ -584,11 +578,13 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 			goff->DrawString(s,width/2-40,(yblocks+1)*blocksize+10);
 		}
 
-		void Run()
+		void Render()
 		{
 			// uint64_t starttime;
 
-			while(_running) {
+			init();
+
+			while (ingame == true && IsHidden() == false) {
 				// starttime = (jcommon::Date::CurrentTimeMillis()+10LL);
 
 				Repaint();
@@ -601,10 +597,17 @@ class Tetris : public jgui::Frame, public jthread::Thread{
 
 int main()
 {
-	Tetris t;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	t.init();
-	t.Show(true);
+	Tetris app;
+
+	main->SetTitle("Tetris");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+
+	app.Render();
 
 	return 0;
 }

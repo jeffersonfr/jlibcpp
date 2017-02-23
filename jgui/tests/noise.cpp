@@ -1,4 +1,24 @@
-#include "jwindow.h"
+/***************************************************************************
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   root@sat                                                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#include "japplication.h"
+#include "jwidget.h"
 #include "jgraphics.h"
 
 #include <stdio.h>
@@ -379,24 +399,33 @@ int main()
 	int dx = 48,
 			dy = 240;
 
-	jgui::Window window(0, 0, 960, 540);
+	jgui::Application *main = jgui::Application::GetInstance();
+	
+	main->SetTitle("Noise");
+	main->SetSize(960, 540);
+	main->SetVisible(true);
 
-	window.Show();
+	jgui::Graphics *g = main->GetGraphics();
+			
+	jgui::Theme *theme = main->GetTheme();
+	jgui::Font *font = theme->GetFont("widget");
 
-	jgui::Graphics *g = window.GetGraphics();
+	g->SetFont(font);
+	g->SetColor(theme->GetColor("component.fg"));
+
+	g->DrawString("Sinal Original", dx+40, dy-200);
+	g->DrawString("Sinal Ruidoso", dx+40, dy-150);
+	g->DrawString("Sinal Filtrado", dx+40, dy-100);
 
 	g->SetColor(0xff, 0x00, 0x00, 0xff);
 	g->FillRectangle(dx, dy-200, 20, 20);
-	g->DrawString("Sinal Original", dx+40, dy-200);
 	
 	g->SetColor(0xff, 0xff, 0x00, 0xff);
 	g->SetColor(0xff, 0xff, 0x00, 0xff);
 	g->FillRectangle(dx, dy-150, 20, 20);
-	g->DrawString("Sinal Ruidoso", dx+40, dy-150);
 	
 	g->SetColor(0x00, 0xff, 0x00, 0xff);
 	g->FillRectangle(dx, dy-100, 20, 20);
-	g->DrawString("Sinal Filtrado", dx+40, dy-100);
 	
 	for (double i=0.0; i<100.0; i+=1.0) {
 		Signal in(6);
@@ -452,7 +481,9 @@ int main()
 
 	g->Flip();
 
-	sleep(10);
+	do {
+		sleep(1);
+	} while (main->IsVisible() == true);
 
 	return 0;
 }

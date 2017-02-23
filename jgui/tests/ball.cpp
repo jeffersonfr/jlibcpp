@@ -23,10 +23,12 @@
  *
  */
 
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jimage.h"
 #include "jmath.h"
 #include "jdate.h"
+#include "jthread.h"
 
 double slowdown = .75,
 			 getout = 1;
@@ -159,7 +161,7 @@ class Ball {
 
 };
 
-class BallDrop : public jgui::Frame, public jthread::Thread {
+class BallDrop : public jgui::Widget {
 
 	private:
 		std::vector<Ball *> _balls;
@@ -177,14 +179,11 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 		int numracks;
 		int *rackheight;
 		int *rackdel;
-		bool _running;
 
 	public:
 		BallDrop():
-			jgui::Frame("Ball Drop", 0, 0, 720, 480)
+			jgui::Widget("Ball Drop", 0, 0, 720, 480)
 		{
-			_running = true;
-
 			int w = 16,
 					h = 16;
 
@@ -211,27 +210,7 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 
 				_balls.push_back(ball);
 			}
-
-			SetUndecorated(true);
-
-			Start();
-		}
-
-		virtual ~BallDrop()
-		{
-			_running = false;
-
-			WaitThread();
-		}
-
-		virtual void Run() 
-		{
-			uint64_t startTime = jcommon::Date::CurrentTimeMillis();
-
-			for (std::vector<Ball *>::iterator i=_balls.begin(); i!=_balls.end(); i++) {
-				(*i)->SetImage(ball);
-			}
-
+			
 			// Allocate rack information
 			numracks = _size.width/ballw;
 			rackheight = new int[numracks];
@@ -240,8 +219,21 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 				rackheight[i] = 0;
 				rackdel[i] = 0;
 			}
+		}
 
-			while (_running) {
+		virtual ~BallDrop()
+		{
+		}
+
+		virtual void Render() 
+		{
+			uint64_t startTime = jcommon::Date::CurrentTimeMillis();
+
+			for (std::vector<Ball *>::iterator i=_balls.begin(); i!=_balls.end(); i++) {
+				(*i)->SetImage(ball);
+			}
+
+			do {
 				UpdateBalls();
 
 				Repaint();
@@ -252,7 +244,7 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 				if ((int64_t)(startTime-jcommon::Date::CurrentTimeMillis()) > 0) {
 					jthread::Thread::MSleep(startTime-jcommon::Date::CurrentTimeMillis());
 				}
-			}
+			} while (IsHidden() == false);
 		}
 
 		void Paint(jgui::Graphics *g) 
@@ -266,7 +258,7 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 				backGraphics = backImage->GetGraphics();
 
 				// Erase the previous image.
-				backGraphics->SetColor(GetTheme()->GetColor("window.bg"));
+				backGraphics->SetColor(GetTheme()->GetColor("widget.bg"));
 				backGraphics->FillRectangle(0, 0, _size.width, _size.height);
 				backGraphics->SetColor(0x00, 0x00, 0x00, 0xff);
 
@@ -307,21 +299,19 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 			}
 
 			//  Draw density curve
-
 			scale=(double)_size.width/numracks;
-			g->SetColor(0x00, 0x00, 0x00, 0xff);
+			g->SetColor(jgui::Color::White);
 			oy=0;
-			for(i=0;i<=numracks;++i) {
+			for (i=0; i<=numracks; i++) {
 				x=numracks/2;        
 				y=_size.height*(1.0-.5*exp(-(double)(i-x)*(i-x)/(2*81)));
-				if(i>0) {
+				if (i > 0) {
 					g->DrawLine((int)((i-1)*scale),(int)oy,(int)(i*scale),(int)y);
 				}
 				oy=y;
 			}
 
 			// Draw 'racks'
-
 			for(i=0;i<numracks;++i) {
 				for(j=0;j<rackheight[i];++j) {
 					pinx=i*ballw;
@@ -400,7 +390,6 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 					}
 				}
 
-
 				aBall->Accelerate(0,.075);
 			}
 		}
@@ -409,9 +398,16 @@ class BallDrop : public jgui::Frame, public jthread::Thread {
 
 int main(int argc, char **argv)
 {
-	BallDrop ball;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	ball.Show(true);
+	BallDrop app;
+
+	main->SetTitle("Ball Drop");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	
+	app.Render();
 
 	return 0;
 }

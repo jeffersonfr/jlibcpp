@@ -17,10 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jbutton.h"
 
-class Main : public jgui::Frame{
+class Main : public jgui::Widget{
 
 	private:
 		jgui::Container *_container1,
@@ -32,11 +33,9 @@ class Main : public jgui::Frame{
 			*_button5;
 
 	public:
-		Main(std::string title, int x, int y, int w, int h):
-			jgui::Frame(title, 32, 32, 720, 480)
+		Main(std::string title, int w, int h):
+			jgui::Widget(title, 0, 0, w, h)
 		{
-			SetResizeEnabled(true);
-
 			int ws = 120,
 					hs = 60;
 
@@ -78,9 +77,15 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main("Clip", 100, 100, 720, 480);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Show(true);
+	Main app("Clip", 720, 480);
+
+	main->SetTitle("Scroll");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

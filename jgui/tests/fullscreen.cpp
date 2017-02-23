@@ -17,42 +17,58 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
+#include "jwidgetlistener.h"
+#include "jsemaphore.h"
 
-class FullscreenTeste : public jgui::Frame {
+class Fullscreen : public jgui::Widget, public jgui::WidgetListener{
 
 	private:
+		jgui::Application *_main;
 		jgui::Image *_bg;
+		jthread::Semaphore _sem;
 
 	public:
-		FullscreenTeste():
-			jgui::Frame("Fullscreen Teste", 100, 100, 720, 480)
+		Fullscreen(jgui::Application *main):
+			jgui::Widget("Fullscreen Widget")
 		{
+			_main = main;
 			_bg = jgui::Image::CreateImage("images/background.png");
+
+			_main->RegisterWidgetListener(this);
 		}
 
-		virtual ~FullscreenTeste()
+		virtual ~Fullscreen()
 		{
+			_main->RemoveWidgetListener(this);
 		}
 
-		virtual bool KeyPressed(jgui::KeyEvent *event)
+		virtual void WidgetChanged(jgui::WidgetEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			Repaint();
+		}
+
+		virtual bool KeyReleased(jgui::KeyEvent *event)
+		{
+			if (jgui::Widget::KeyReleased(event) == true) {
 				return true;
 			}
 	
 			if (event->GetSymbol() == jgui::JKS_F || event->GetSymbol() == jgui::JKS_f) {
-				ActiveFullScreen();
+				if (_main->IsFullScreenEnabled() == false) {
+					_main->SetFullScreenEnabled(true);
+				} else {
+					_main->SetFullScreenEnabled(false);
+				}
 			}
-
-			Repaint();
 
 			return true;
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			printf("Window Bounds:: %d, %d, %d, %d\n", _insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
 
@@ -65,21 +81,19 @@ class FullscreenTeste : public jgui::Frame {
 			g->DrawString("Press F to use enable/disable fullscreen mode", 100, 100);
 		}
 
-		virtual void Run()
-		{
-			Repaint();
-		}
-
 };
 
 int main( int argc, char *argv[] )
 {
-	FullscreenTeste app;
-	int i = 3;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	do {
-		app.Show(true);
-	} while (--i > 0);
+	Fullscreen app(main);
+
+	main->SetTitle("Full Screen");
+	main->Add(&app);
+	main->SetSize(720, 480);
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

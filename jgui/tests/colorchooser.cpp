@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jlabel.h"
 
 #include <stdlib.h>
@@ -135,7 +136,7 @@ class ColorChooser : public jgui::Component {
 
 };
 
-class FrameTest : public jgui::Frame {
+class FrameTest : public jgui::Widget{
 
 	private:
 		ColorChooser *_color_chooser;
@@ -144,11 +145,11 @@ class FrameTest : public jgui::Frame {
 
 	public:
 		FrameTest():
-			jgui::Frame("Color Chooser", 32, 32, 360, 360+30)
+			jgui::Widget("Color Chooser", 0, 0, 360, 360)
 		{
-			int size = std::min(GetWidth()-_insets.left-_insets.right, GetHeight()-_insets.top-_insets.bottom);
+			int size = std::min(GetWidth(), GetHeight());
 
-			_color_chooser = new ColorChooser(_insets.left, _insets.top, size, size);
+			_color_chooser = new ColorChooser(0, 0, size, size);
 
 			Add(_color_chooser);
 		}
@@ -162,9 +163,15 @@ class FrameTest : public jgui::Frame {
 
 int main()
 {
-	FrameTest frame;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	frame.Show(true);
+	FrameTest app;
+
+	main->SetTitle("Colorchooser");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

@@ -87,12 +87,6 @@ class Watch : public jgui::Component, public jthread::Thread{
 		 * \brief
 		 *
 		 */
-		virtual void SetVisible(bool b);
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetSeconds(int i);
 		
 		/**

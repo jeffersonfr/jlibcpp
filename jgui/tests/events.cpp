@@ -17,12 +17,12 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "japplication.h"
 #include "jkeylistener.h"
 #include "jmouselistener.h"
-#include "jinputmanager.h"
 #include "jmutex.h"
 #include "jdate.h"
-#include "jwindow.h"
+#include "jwidget.h"
 
 #include <string>
 #include <iostream>
@@ -385,7 +385,7 @@ class UserEventManager : public jgui::KeyListener, public jgui::MouseListener {
 
 UserEventManager *UserEventManager::_instance = NULL;
 
-class Test : public jgui::Window, public UserEventListener {
+class Test : public jgui::Widget, public UserEventListener {
 
 	private:
 		jgui::jpoint_t _ball,
@@ -396,7 +396,7 @@ class Test : public jgui::Window, public UserEventListener {
 
 	public:
 		Test():
-			jgui::Window(0, 0, 960, 540)
+			jgui::Widget(0, 0, 960, 540)
 		{
 			_ball.x = 960/2;
 			_ball.y = 540/2;
@@ -404,18 +404,12 @@ class Test : public jgui::Window, public UserEventListener {
 			_color = 0;
 			_pressed = false;
 
-			GetInputManager()->RegisterKeyListener(UserEventManager::GetInstance());
-			GetInputManager()->RegisterMouseListener(UserEventManager::GetInstance());
-
 			UserEventManager::GetInstance()->RegisterUserEventListener(this);
 		}
 
 		virtual ~Test()
 		{
 			UserEventManager::GetInstance()->RemoveUserEventListener(this);
-			
-			GetInputManager()->RemoveKeyListener(UserEventManager::GetInstance());
-			GetInputManager()->RemoveMouseListener(UserEventManager::GetInstance());
 		}
 
 		virtual void OnKeyDown(UserEvent *event)
@@ -433,7 +427,7 @@ class Test : public jgui::Window, public UserEventListener {
 			std::cout << "OnKeyUp: " << event->GetKeyCode() << std::endl;
 			
 			if ((event->GetKeySymbol() == jgui::JKS_ESCAPE || event->GetKeySymbol() == jgui::JKS_EXIT)) {
-				Release();
+				SetVisible(false);
 			}
 		}
 
@@ -520,7 +514,7 @@ class Test : public jgui::Window, public UserEventListener {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Window::Paint(g);
+			jgui::Widget::Paint(g);
 
 			if (_color == 0) {
 				g->SetColor(jgui::Color::Red);
@@ -535,9 +529,18 @@ class Test : public jgui::Window, public UserEventListener {
 
 int main()
 {
-	Test test;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	test.Show(true);
+	Test app;
+
+	main->RegisterKeyListener(UserEventManager::GetInstance());
+	main->RegisterMouseListener(UserEventManager::GetInstance());
+
+	main->SetTitle("Events");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

@@ -1,4 +1,24 @@
-#include "jwindow.h"
+/***************************************************************************
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   root@sat                                                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#include "japplication.h"
+#include "jwidget.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -134,7 +154,7 @@ class Neuron {
 
 };
 
-class SOM : public jgui::Window {
+class SOM : public jgui::Widget{
 
 	private:
 		double **_train_input,
@@ -148,7 +168,7 @@ class SOM : public jgui::Window {
 
 	public:
 		SOM(int ninputs, int neurons):
-			jgui::Window(0, 0, 3*240, 3*128)
+			jgui::Widget(0, 0, 3*240, 3*128)
 		{
 			_classify_input = NULL;
 			_classify_input_size = 0;
@@ -421,18 +441,22 @@ int main()
 
 	srand(time(NULL));
 
-	SOM net(4, 2*256);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	net.Init(CreatePoints(npoints), 8*npoints);
-	
-	net.Show();
+	SOM app(4, 2*256);
 
-	net.Train(CreatePoints(npoints), 8*npoints);
+	app.Init(CreatePoints(npoints), 8*npoints);
 
+	main->SetTitle("K-means");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+
+	app.Train(CreatePoints(npoints), 8*npoints);
 	npoints = 8000;
-	net.Classify(CreatePoints(4*npoints), 4*8*npoints);
+	app.Classify(CreatePoints(4*npoints), 4*8*npoints);
 
-	sleep(10);
+	main->WaitForExit();
 
 	return 0;
 }

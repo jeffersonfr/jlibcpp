@@ -19,7 +19,8 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "directfblightplayer.h"
-#include "nativeimage.h"
+#include "genericimage.h"
+#include "nativehandler.h"
 #include "jcontrolexception.h"
 #include "jvideosizecontrol.h"
 #include "jvideoformatcontrol.h"
@@ -28,13 +29,8 @@
 #include "jvolumecontrol.h"
 #include "jmediaexception.h"
 #include "jimage.h"
-#include "jgfxhandler.h"
 
-#if defined(DIRECTFB_NODEPS_UI)
-#include <directfb.h>
-#else
 #include <cairo.h>
-#endif
 
 namespace jmedia {
 
@@ -60,7 +56,7 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			IDirectFB *engine = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
+			IDirectFB *engine = dynamic_cast<jgui::NativeHandler *>(jgui::Application::GetInstance())->GetHandler();
 
 			DFBSurfaceDescription desc;
 
@@ -119,56 +115,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 
 		virtual void UpdateComponent()
 		{
-#if defined(DIRECTFB_NODEPS_UI)
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-	
-			if (_surface != NULL) {
-				void *ptr;
-				int pitch;
-				int sw,
-						sh;
-
-				_surface->GetSize(_surface, &sw, &sh);
-				_surface->Lock(_surface, (DFBSurfaceLockFlags)(DSLF_WRITE), &ptr, &pitch);
-
-				IDirectFBSurface *frame;
-				DFBSurfaceDescription desc;
-
-				desc.flags = (DFBSurfaceDescriptionFlags)(DSDESC_CAPS | DSDESC_WIDTH | DSDESC_HEIGHT | DSDESC_PIXELFORMAT | DSDESC_PREALLOCATED);
-				desc.caps = (DFBSurfaceCapabilities)(DSCAPS_NONE);
-				desc.width = sw;
-				desc.height = sh;
-				desc.pixelformat = DSPF_ARGB;
-				desc.preallocated[0].data = ptr;
-				desc.preallocated[0].pitch = pitch;
-
-				IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
-
-				if (directfb->CreateSurface(directfb, &desc, &frame) == DFB_OK) {
-					_mutex.Lock();
-
-					if (_image != NULL) {
-						delete _image;
-						_image = NULL;
-					}
-
-					_image = new jgui::NativeImage(frame, jgui::JPF_ARGB, sw, sh);
-
-					_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
-
-					_mutex.Unlock();
-				
-					_surface->Unlock(_surface);
-					_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)0);
-				} else {
-					_surface->Unlock(_surface);
-				}
-			}
-					
-			Start();
-#else
 			if (IsRunning() == true) {
 				WaitThread();
 			}
@@ -193,7 +139,7 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 					_image = NULL;
 				}
 
-				_image = new jgui::NativeImage(cairo_context, jgui::JPF_ARGB, sw, sh);
+				_image = new jgui::GenericImage(cairo_context, jgui::JPF_ARGB, sw, sh);
 
 				_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
 
@@ -208,7 +154,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 			}
 
 			Start();
-#endif
 		}
 
 		virtual void Run()
@@ -606,9 +551,9 @@ DirectFBLightPlayer::DirectFBLightPlayer(std::string file):
 	_component = NULL;
 	_frames_per_second = 0.0;
 
-	IDirectFB *directfb = (IDirectFB *)jgui::GFXHandler::GetInstance()->GetGraphicEngine();
+	IDirectFB *engine = dynamic_cast<jgui::NativeHandler *>(jgui::Application::GetInstance())->GetHandler();
 
-	if (directfb->CreateVideoProvider(directfb, _file.c_str(), &_provider) != DFB_OK) {
+	if (engine->CreateVideoProvider(engine, _file.c_str(), &_provider) != DFB_OK) {
 		_provider = NULL;
 
 		throw jmedia::MediaException("Media format not supported");

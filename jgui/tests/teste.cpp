@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "jmainwindow.h"
+#include "jwidget.h"
 #include "janimation.h"
 #include "jmarquee.h"
 #include "jtextfield.h"
@@ -46,7 +47,7 @@
 #include "jthememanager.h"
 #include "jpath.h"
 
-class WindowTest : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
+class WindowTest : public jgui::Widget, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
 
 	private:
 		jthread::Mutex 
@@ -106,7 +107,7 @@ class WindowTest : public jgui::Frame, public jgui::ButtonListener, public jgui:
 
 	public:
 		WindowTest():
-			jgui::Frame("Frame Test")
+			jgui::Widget("Frame Test")
 	{
 		_theme1.SetColor("component.bg.focus", 0x40, 0xf0, 0x40, 0xff);
 		_theme2.SetColor("component.bg.focus", 0xf0, 0x20, 0x20, 0xff);
@@ -986,14 +987,14 @@ class GraphicPanel : public jgui::Canvas{
 
 };
 
-class PrimitivesTest : public jgui::Frame{
+class PrimitivesTest : public jgui::Widget{
 
 	private:
 		jgui::Canvas *panel;
 
 	public:
 		PrimitivesTest():
-			jgui::Frame("Primitives Test", 0, 0, 1600, 1080)
+			jgui::Widget("Primitives Test", 0, 0, 1600, 1080)
 		{
 			panel = new GraphicPanel(_insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
 
@@ -1009,14 +1010,14 @@ class PrimitivesTest : public jgui::Frame{
 
 };
 
-class PathsTest : public jgui::Frame{
+class PathsTest : public jgui::Widget{
 
 	private:
 		jgui::Canvas *panel;
 
 	public:
 		PathsTest():
-			jgui::Frame("Paths Test")
+			jgui::Widget("Paths Test")
 		{
 			panel = NULL;
 
@@ -1032,7 +1033,7 @@ class PathsTest : public jgui::Frame{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			jgui::Frame::Paint(g);
+			jgui::Widget::Paint(g);
 
 			jgui::Theme *theme = GetTheme();
 			// jgui::Color bg = theme->GetColor("component.bg");
@@ -1385,12 +1386,12 @@ class PathsTest : public jgui::Frame{
 
 };
 
-class ModulesTest : public jgui::Frame, public jgui::ButtonListener, public jgui::SelectListener, public jgui::WindowListener{
+class ModulesTest : public jgui::Widget, public jgui::ButtonListener, public jgui::SelectListener, public jgui::WindowListener{
 
 	private:
 		jthread::Mutex _mutex;
 
-		jgui::Frame 
+		jgui::Widget
 			*_current;
 		jgui::Button 
 			*_button1,
@@ -1423,7 +1424,7 @@ class ModulesTest : public jgui::Frame, public jgui::ButtonListener, public jgui
 
 	public:
 		ModulesTest():
-			jgui::Frame("Graphics Test")
+			jgui::Widget("Graphics Test")
 		{
 			jgui::jsize_t screen = jgui::GFXHandler::GetInstance()->GetScreenSize();
 
@@ -1685,9 +1686,13 @@ class ModulesTest : public jgui::Frame, public jgui::ButtonListener, public jgui
 
 int main( int argc, char *argv[] )
 {
-	ModulesTest test;
+	jgui::MainWindow *window = jgui::MainWindow::GetInstance();
 
-	test.Show(true);
+	ModulesTest app;
+
+	window->SetUndecorated(true);
+	window->Add(&app);
+	window->SetVisible(true);
 
 	return 0;
 }

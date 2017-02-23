@@ -20,6 +20,9 @@
 #include "Stdafx.h"
 #include "nativegraphics.h"
 #include "nativehandler.h"
+#include "nativetypes.h"
+#include "jsemaphoreexception.h"
+#include "jsemaphoretimeoutexception.h"
 
 #include <SDL2/SDL.h>
 
@@ -27,10 +30,12 @@
 
 namespace jgui {
 
-NativeGraphics::NativeGraphics(void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp):
+NativeGraphics::NativeGraphics(NativeHandler *handler, void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp):
 	GenericGraphics(surface, cairo_context, pixelformat, wp, hp)
 {
 	jcommon::Object::SetClassName("jgui::NativeGraphics");
+
+	_handler = handler;
 }
 
 NativeGraphics::~NativeGraphics()
@@ -61,71 +66,80 @@ void NativeGraphics::SetNativeSurface(void *surface, int wp, int hp)
 
 void NativeGraphics::Flip()
 {
-	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->RepaintWindow(this);
+	SDL_Event event;
+
+	event.type = USER_NATIVE_EVENT_APPLICATION_FLIP;
+	event.user.data1 = this;
+
+	_has_bounds = false;
+
+	SDL_PushEvent(&event);
+
+	// CHANGE:: if continues to block exit, change to timed semaphore
+	if (_handler->IsVisible() == true && _handler->IsVerticalSyncEnabled() == true) {
+		try {
+			_sem.Wait(2000000);
+		} catch (jthread::SemaphoreException) {
+		} catch (jthread::SemaphoreTimeoutException) {
+		}
+	}
 }
 
 void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 {
-	dynamic_cast<NativeHandler *>(GFXHandler::GetInstance())->RepaintWindow(this);
+	if (wp <= 0 || hp <= 0) {
+		return;
+	}
+
+	jregion_t *t = new jregion_t;
+
+	t->x = xp;
+	t->y = yp;
+	t->width = wp;
+	t->height = hp;
+
+	SDL_Event event;
+
+	event.type = USER_NATIVE_EVENT_APPLICATION_FLIP;
+	event.user.data1 = this;
+	event.user.data2 = t;
+
+	_region.x = xp;
+	_region.y = yp;
+	_region.width = wp;
+	_region.height = hp;
+
+	_has_bounds = true;
+
+	SDL_PushEvent(&event);
+	
+	// CHANGE:: if continues to block exit, change to timed semaphore
+	if (_handler->IsVisible() == true && _handler->IsVerticalSyncEnabled() == true) {
+		try {
+			_sem.Wait(2000000);
+		} catch (jthread::SemaphoreException) {
+		} catch (jthread::SemaphoreTimeoutException) {
+		}
+	}
 }
 
 void NativeGraphics::InternalFlip()
 {
-
 	if (_surface == NULL) {
+		_has_bounds = false;
+
+		_sem.Notify();
+
 		return;
 	}
 
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 	
 	if (cairo_surface == NULL) {
-		return;
-	}
+		_has_bounds = false;
 
-	cairo_surface_flush(cairo_surface);
+		_sem.Notify();
 
-	int dw = cairo_image_surface_get_width(cairo_surface);
-	int dh = cairo_image_surface_get_height(cairo_surface);
-	// int stride = cairo_image_surface_get_stride(cairo_surface);
-
-	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-	if (data == NULL) {
-		return;
-	}
-
-	SDL_Renderer *renderer = (SDL_Renderer *)_surface;
-	SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, dw, dh, 32, dw*4, 0, 0, 0, 0);
-	SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-
-	if (texture == NULL) {
-		SDL_FreeSurface(surface);
-
-		return;
-	}
-
-	SDL_Rect dst;
-
-	dst.x = 0;
-	dst.y = 0;
-	dst.w = dw;
-	dst.h = dh;
-
-	SDL_RenderCopy(renderer, texture, NULL, &dst);
-	SDL_DestroyTexture(texture);
-	SDL_FreeSurface(surface);
-	SDL_RenderPresent(renderer);
-}
-
-void NativeGraphics::InternalFlip(int xp, int yp, int wp, int hp)
-{
-	if (_surface == NULL) {
-		return;
-	}
-
-	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
-	
-	if (cairo_surface == NULL) {
 		return;
 	}
 
@@ -140,6 +154,10 @@ void NativeGraphics::InternalFlip(int xp, int yp, int wp, int hp)
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
 	if (data == NULL) {
+		_has_bounds = false;
+
+		_sem.Notify();
+
 		return;
 	}
 
@@ -149,25 +167,47 @@ void NativeGraphics::InternalFlip(int xp, int yp, int wp, int hp)
 	if (texture == NULL) {
 		SDL_FreeSurface(surface);
 
+		_has_bounds = false;
+
+		_sem.Notify();
+
 		return;
 	}
 
-	SDL_Rect src, dst;
+	if (_has_bounds == false) {
+		SDL_Rect dst;
 
-	src.x = xp;
-	src.y = yp;
-	src.w = wp;
-	src.h = hp;
+		dst.x = 0;
+		dst.y = 0;
+		dst.w = dw;
+		dst.h = dh;
 
-	dst.x = xp;
-	dst.y = yp;
-	dst.w = wp;
-	dst.h = hp;
+		SDL_RenderCopy(renderer, texture, NULL, &dst);
+	} else {
+		SDL_Rect src, dst;
 
-	SDL_RenderCopy(renderer, texture, &src, &dst);
+		src.x = _region.x;
+		src.y = _region.y;
+		src.w = _region.width;
+		src.h = _region.height;
+
+		dst.x = _region.x;
+		dst.y = _region.y;
+		dst.w = _region.width;
+		dst.h = _region.height;
+
+		SDL_RenderCopy(renderer, texture, &src, &dst);
+	}
+
+	_has_bounds = false;
+
 	SDL_DestroyTexture(texture);
 	SDL_FreeSurface(surface);
 	SDL_RenderPresent(renderer);
+
+	if (_handler->IsVisible() == true && _handler->IsVerticalSyncEnabled() == true) {
+		_sem.Notify();
+	}
 }
 
 }

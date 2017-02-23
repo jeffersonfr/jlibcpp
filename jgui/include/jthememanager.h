@@ -22,6 +22,7 @@
 
 #include "jtheme.h"
 #include "jthemelistener.h"
+#include "jmutex.h"
 
 #include <string>
 
@@ -42,6 +43,8 @@ class ThemeManager : public virtual jcommon::Object{
 
 		/** \brief */
 		std::vector<ThemeListener *> _theme_listeners;
+		/** \brief */
+		jthread::Mutex _theme_listener_mutex;
 		/** \brief */
 		Theme *_theme;
 		/** \brief */

@@ -20,6 +20,7 @@
 #include "Stdafx.h"
 #include "jfilechooserdialogbox.h"
 #include "jfile.h"
+#include "jdataevent.h"
 
 namespace jgui {
 
@@ -35,7 +36,7 @@ struct ascending_sort {
 };
 
 FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string directory, jfilechooser_type_t type):
-	jgui::DialogBox(title, 0, 0, 1000, 600)
+	jgui::Widget(title, 0, 0, 1000, 600)
 {
 	jcommon::Object::SetClassName("jgui::FileChooserDialogBox");
 
@@ -70,6 +71,7 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 
 	ShowFiles(_current_dir);
 
+	/*
 	if (_type == JFCT_OPEN_FILE_DIALOG) {
 		AddSubtitle(_DATA_PREFIX"/images/blue_icon.png", "Open");
 	} else {
@@ -77,6 +79,7 @@ FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string direct
 	}
 
 	Pack();
+	*/
 }
 
 FileChooserDialogBox::~FileChooserDialogBox()
@@ -321,7 +324,7 @@ void FileChooserDialogBox::ItemSelected(jgui::SelectEvent *event)
 		} else { 
 			// INFO:: Selecionar um arquivo
 			if (_type == JFCT_OPEN_FILE_DIALOG) {
-				Release();
+				// Release();
 			} else {
 				_file->SetText(selectedItem);
 		
@@ -332,7 +335,7 @@ void FileChooserDialogBox::ItemSelected(jgui::SelectEvent *event)
 		GetParams()->SetTextParam("directory", GetCurrentDirectory());
 		GetParams()->SetTextParam("filepath", GetFile());
 				
-		DispatchDataEvent(GetParams());
+		DispatchDataEvent(new jcommon::DataEvent(this, GetParams()));
 	}
 }
 

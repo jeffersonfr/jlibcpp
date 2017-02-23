@@ -20,11 +20,11 @@
 #ifndef MINES_H_
 #define MINES_H_
 
-#include "jframe.h"
+#include "jwidget.h"
 
 namespace mines {
 
-class Mines : public jgui::Frame{
+class Mines : public jgui::Widget{
 
 	enum game_status_t {
 		NONE,

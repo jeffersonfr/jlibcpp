@@ -20,10 +20,11 @@
 #ifndef J_MENU_H
 #define J_MENU_H
 
-#include "jframe.h"
-#include "jimage.h"
+#include "jwidget.h"
 #include "jmouselistener.h"
 #include "jitemcomponent.h"
+#include "jcondition.h"
+#include "jimage.h"
 
 #include <string>
 #include <iostream>
@@ -47,7 +48,7 @@ enum jmenu_align_t {
  *
  * \author Jeff Ferr
  */
-class Menu : public jgui::Frame, public jgui::ItemComponent{
+class Menu : public jgui::Widget, public jgui::ItemComponent{
 
 	private:
 		/** \brief */

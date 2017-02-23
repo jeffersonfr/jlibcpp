@@ -77,22 +77,18 @@ void SliderComponent::SetValue(int i)
 		i = _maximum;
 	}
 		
-	{
-		jthread::AutoLock lock(&_component_mutex);
+	int diff = i-_value;
 
-		int diff = i-_value;
+	_value = i;
 
-		_value = i;
-
-		if (diff > _minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_BLOCK_INCREMENT, _value));
-		} else if (diff < -_minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_BLOCK_DECREMENT, _value));
-		} else if (diff > 0 && diff <= _minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_UNIT_INCREMENT, _value));
-		} else if (diff < 0 && diff >= -_minimum_tick) {
-			DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_UNIT_DECREMENT, _value));
-		}
+	if (diff > _minimum_tick) {
+		DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_BLOCK_INCREMENT, _value));
+	} else if (diff < -_minimum_tick) {
+		DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_BLOCK_DECREMENT, _value));
+	} else if (diff > 0 && diff <= _minimum_tick) {
+		DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_UNIT_INCREMENT, _value));
+	} else if (diff < 0 && diff >= -_minimum_tick) {
+		DispatchAdjustmentEvent(new AdjustmentEvent(this, JAET_UNIT_DECREMENT, _value));
 	}
 
 	Repaint();
@@ -151,8 +147,10 @@ void SliderComponent::RegisterAdjustmentListener(AdjustmentListener *listener)
 		return;
 	}
 
-	if (std::find(_adjust_listeners.begin(), _adjust_listeners.end(), listener) == _adjust_listeners.end()) {
-		_adjust_listeners.push_back(listener);
+	jthread::AutoLock lock(&_adjustment_listener_mutex);
+
+	if (std::find(_adjustment_listeners.begin(), _adjustment_listeners.end(), listener) == _adjustment_listeners.end()) {
+		_adjustment_listeners.push_back(listener);
 	}
 }
 
@@ -162,10 +160,12 @@ void SliderComponent::RemoveAdjustmentListener(AdjustmentListener *listener)
 		return;
 	}
 
-	std::vector<AdjustmentListener *>::iterator i = std::find(_adjust_listeners.begin(), _adjust_listeners.end(), listener);
+	jthread::AutoLock lock(&_adjustment_listener_mutex);
 
-	if (i != _adjust_listeners.end()) {
-		_adjust_listeners.erase(i);
+	std::vector<AdjustmentListener *>::iterator i = std::find(_adjustment_listeners.begin(), _adjustment_listeners.end(), listener);
+
+	if (i != _adjustment_listeners.end()) {
+		_adjustment_listeners.erase(i);
 	}
 }
 
@@ -175,31 +175,26 @@ void SliderComponent::DispatchAdjustmentEvent(AdjustmentEvent *event)
 		return;
 	}
 
-	int k = 0,
-			size = (int)_adjust_listeners.size();
+	std::vector<AdjustmentListener *> listeners;
+	
+	_adjustment_listener_mutex.Lock();
 
-	while (k++ < (int)_adjust_listeners.size() && event->IsConsumed() == false) {
-		_adjust_listeners[k-1]->AdjustmentValueChanged(event);
+	listeners = _adjustment_listeners;
 
-		if (size != (int)_adjust_listeners.size()) {
-			size = (int)_adjust_listeners.size();
+	_adjustment_listener_mutex.Unlock();
 
-			k--;
-		}
+	for (std::vector<AdjustmentListener *>::iterator i=listeners.begin(); i!=listeners.end() && event->IsConsumed() == false; i++) {
+		AdjustmentListener *listener = (*i);
+
+		listener->AdjustmentValueChanged(event);
 	}
-
-	/*
-	for (std::vector<AdjustmentListener *>::iterator i=_adjust_listeners.begin(); i!=_adjust_listeners.end(); i++) {
-		(*i)->AdjustmentValueChanged(event);
-	}
-	*/
 
 	delete event;
 }
 
 std::vector<AdjustmentListener *> & SliderComponent::GetAdjustmentListeners()
 {
-	return _adjust_listeners;
+	return _adjustment_listeners;
 }
 
 }

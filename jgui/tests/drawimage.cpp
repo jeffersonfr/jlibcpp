@@ -17,8 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "japplication.h"
+#include "jwidget.h"
 #include "jpanel.h"
-#include "jframe.h"
 #include "jfileinputstream.h"
 #include "jindexedimage.h"
 
@@ -647,7 +648,11 @@ class Picture : public jgui::Component {
 			if (font != NULL) {
 				int height = font->GetSize();
 
+				jgui::Theme *theme = GetTheme();
+				jgui::Font *font = theme->GetFont("component");
+
 				g->SetColor(jgui::Color::White);
+				g->SetFont(font);
 				g->DrawString(_title, 0, 0);
 				g->DrawImage(_image, 0, height, GetWidth(), GetHeight()-height);
 			}
@@ -876,13 +881,13 @@ class Test : public Picture {
 
 };
 
-class Main : public jgui::Frame{
+class Main : public jgui::Widget{
 
 	private:
 
 	public:
 		Main():
-			jgui::Frame("Image Create Test", 0, 0)
+			jgui::Widget("Image Create Test", 0, 0, 960, 540)
 		{
 			int gapx = 64;
 			int gapy = 64;
@@ -920,9 +925,15 @@ class Main : public jgui::Frame{
 
 int main(int argc, char **argv)
 {
-	Main main;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	main.Show(true);
+	Main app;
+
+	main->SetTitle("Draw Image");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

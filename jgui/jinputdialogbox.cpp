@@ -19,11 +19,12 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jinputdialogbox.h"
+#include "jdataevent.h"
 
 namespace jgui {
 
 InputDialogBox::InputDialogBox(std::string title, std::string msg):
-	jgui::DialogBox(title, -1, -1, -1, -1)
+	jgui::Widget(title, -1, -1, -1, -1)
 {
 	jcommon::Object::SetClassName("jgui::InputDialogBox");
 
@@ -46,8 +47,8 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg):
 	_ok = new Button("Ok", _label->GetX()+_label->GetWidth()-2*cw-1*30, _field->GetY()+_field->GetHeight()+20, cw, ch);
 	_cancel = new Button("Cancel", _label->GetX()+_label->GetWidth()-1*cw-0*30, _field->GetY()+_field->GetHeight()+20, cw, ch);
 	
-	_ok->RegisterButtonListener(this);
-	_cancel->RegisterButtonListener(this);
+	_ok->RegisterActionListener(this);
+	_cancel->RegisterActionListener(this);
 	
 	Add(_label);
 	Add(_field);
@@ -56,7 +57,7 @@ InputDialogBox::InputDialogBox(std::string title, std::string msg):
 
 	_field->RequestFocus();
 
-	Pack();
+	Pack(true);
 }
 
 InputDialogBox::~InputDialogBox() 
@@ -100,9 +101,9 @@ void InputDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 {
 	GetParams()->SetTextParam("text", _field->GetText());
 
-	DispatchDataEvent(GetParams());
+	DispatchDataEvent(new jcommon::DataEvent(this, GetParams()));
 
-	Release();
+	// Release();
 }
 
 }

@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jframe.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jsocketlib.h"
 #include "jdatagramsocket.h"
 
@@ -124,33 +125,32 @@ class SignalMetter : public jgui::Component{
 
 };
 
-class Plotter : public jgui::Frame, public jthread::Thread {
+class Plotter : public jgui::Widget {
 
 	private:
 		SignalMetter *_signal;
 		int _counter;
 
 	public:
-		Plotter(int x, int y):
-			Frame("Signal Strength", x, y, 1, 1)
-		{
+		Plotter():
+			Widget("Signal Strength", 0, 0, 320, 320) {
 			_signal = new SignalMetter(0, 0, 320, 320);
 
 			_counter = 1000;
 
 			Add(_signal);
 
-			Pack();
+			SetScrollable(false);
+
+			Pack(true);
 		}
 
 		virtual ~Plotter()
 		{
 			_counter = 0;
-
-			WaitThread();
 		}
 
-		virtual void Run()
+		virtual void Render()
 		{
 			// char receive[4096];
 
@@ -163,7 +163,7 @@ class Plotter : public jgui::Frame, public jthread::Thread {
 					_signal->Plot(100+(int)(random()%50));
 
 					usleep(10000);
-				} while (_counter-- >= 0);
+				} while (IsHidden() == false && _counter-- >= 0);
 
 				s.Close();
 			} catch (...) {
@@ -177,10 +177,16 @@ int main()
 {
 	InitializeSocketLibrary();
 
-	Plotter plotter(32, 32);
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	plotter.Start();
-	plotter.Show(true);
+	Plotter app;
+
+	main->SetTitle("Signal");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	
+	app.Render();
 
 	ReleaseSocketLibrary();
 }

@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jwindow.h"
+#include "japplication.h"
+#include "jwidget.h"
 
 #include <cmath>
 #include <string>
@@ -30,11 +31,14 @@ uint32_t palette[256]; //this will contain the color palette
 
 int main(int argc, char *argv[])
 {
-	jgui::Window window;
-	jgui::Image *image = jgui::Image::CreateImage(jgui::JPF_ARGB, window.GetWidth()/6, window.GetHeight()/6);
+	jgui::Application *main = jgui::Application::GetInstance();
+	jgui::jsize_t wsize = main->GetSize();
+	jgui::Image *image = jgui::Image::CreateImage(jgui::JPF_ARGB, wsize.width/6, wsize.height/6);
 	jgui::jsize_t size = image->GetSize();
 
-	window.Show(false);
+	main->SetTitle("Fire");
+	// main->SetSize(960, 540);
+	main->SetVisible(true);
 
 	fire = new uint32_t[size.width*size.height];
 	buffer = new uint32_t[size.width*size.height];
@@ -59,7 +63,7 @@ int main(int argc, char *argv[])
   }
   
   //start the loop (one frame per loop)
-  while(true) {
+	do {
     //randomize the bottom row of the fire buffer
     for(int x = 0; x < size.width; x++) {
 			fire[(size.height - 1)*size.width + x] = abs(32768 + rand()) % 256;
@@ -96,7 +100,10 @@ int main(int argc, char *argv[])
 		}
     
 		image->GetGraphics()->SetRGBArray(buffer, 0, 0, size.width, size.height);
-		window.GetGraphics()->DrawImage(image, 0, 0, window.GetWidth(), window.GetHeight());
-		window.GetGraphics()->Flip();
-  }
+		
+		main->GetGraphics()->DrawImage(image, 0, 0, wsize.width, wsize.height);
+		main->GetGraphics()->Flip();
+  } while (main->IsVisible() == true);
+
+	return 0;
 }

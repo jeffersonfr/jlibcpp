@@ -17,6 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+
 /*
  * Copyright Rodrigo Setti 2013
  *
@@ -28,8 +29,10 @@
  *
  * https://github.com/rodrigosetti/sdl-mandelbrot
  */
+
+#include "japplication.h"
+#include "jwidget.h"
 #include "jpanel.h"
-#include "jframe.h"
 #include "jfont.h"
 
 #include <stdio.h>
@@ -49,7 +52,7 @@
 
 #define ZOOM_FACTOR	4
 
-class Mandelbrot : public jgui::Frame {
+class Mandelbrot : public jgui::Widget{
 
 	private:
 		complex double center;
@@ -57,12 +60,10 @@ class Mandelbrot : public jgui::Frame {
 
 	public:
 		Mandelbrot():
-			jgui::Frame(0, 0, MAX_WIDTH, MAX_HEIGHT)
+			jgui::Widget(0, 0, MAX_WIDTH, MAX_HEIGHT)
 		{
     	center = START_POS;
     	zoom = START_ZOOM;
-
-			Show();
 		}
 
 		virtual ~Mandelbrot()
@@ -71,7 +72,7 @@ class Mandelbrot : public jgui::Frame {
 
 		virtual bool KeyPressed(jgui::KeyEvent *event)
 		{
-			if (jgui::Frame::KeyPressed(event) == true) {
+			if (jgui::Widget::KeyPressed(event) == true) {
 				return true;
 			}
 
@@ -85,7 +86,7 @@ class Mandelbrot : public jgui::Frame {
 		
 		virtual bool MousePressed(jgui::MouseEvent *event)
 		{
-			if (jgui::Frame::MousePressed(event) == true) {
+			if (jgui::Widget::MousePressed(event) == true) {
 				return true;
 			}
 
@@ -156,9 +157,15 @@ class Mandelbrot : public jgui::Frame {
 
 int main(int argc, char **argv)
 {
-	Mandelbrot mandel;
+	jgui::Application *main = jgui::Application::GetInstance();
 
-	mandel.Show(true);
+	Mandelbrot app;
+
+	main->SetTitle("Mandelbrot");
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }
