@@ -21,7 +21,6 @@
 #define J_APPLICATION_H
 
 #include "jwidget.h"
-#include "jwidgetlistener.h"
 #include "jimage.h"
 #include "jthemelistener.h"
 #include "jgridlayout.h"
@@ -74,13 +73,9 @@ class Application : public jgui::Widget, public jgui::ThemeListener{
 
 	protected:
 		/** \brief */
-		std::vector<WidgetListener *> _widget_listeners;
-		/** \brief */
 		std::vector<jgui::KeyListener *> _key_listeners;
 		/** \brief */
 		std::vector<jgui::MouseListener *> _mouse_listeners;
-		/** \brief */
-		jthread::Mutex _widget_listener_mutex;
 		/** \brief */
 		jthread::Mutex _key_listener_mutex;
 		/** \brief */
@@ -475,30 +470,6 @@ class Application : public jgui::Widget, public jgui::ThemeListener{
 		 *
 		 */
 		virtual std::vector<jgui::MouseListener *> & GetMouseListeners();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RegisterWidgetListener(WidgetListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveWidgetListener(WidgetListener *listener);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void DispatchWidgetEvent(WidgetEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::vector<WidgetListener *> & GetWidgetListeners();
 
 };
 

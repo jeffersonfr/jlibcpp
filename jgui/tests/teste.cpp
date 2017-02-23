@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "jmainwindow.h"
+#include "japplication.h"
 #include "jwidget.h"
 #include "janimation.h"
 #include "jmarquee.h"
@@ -36,18 +36,18 @@
 #include "jkeyboard.h"
 #include "jscrollbar.h"
 #include "jcombobox.h"
-#include "jtooglebutton.h"
+#include "jtogglebutton.h"
 #include "jcanvas.h"
 #include "jcalendardialogbox.h"
 #include "jmessagedialogbox.h"
 #include "jyesnodialogbox.h"
 #include "jmenugroup.h"
 #include "jsystem.h"
-#include "jwindowlistener.h"
+#include "jwidgetlistener.h"
 #include "jthememanager.h"
 #include "jpath.h"
 
-class WindowTest : public jgui::Widget, public jgui::ButtonListener, public jgui::SelectListener, public jgui::CheckButtonListener{
+class WindowTest : public jgui::Widget, public jgui::ActionListener, public jgui::SelectListener, public jgui::ToggleListener{
 
 	private:
 		jthread::Mutex 
@@ -166,8 +166,8 @@ class WindowTest : public jgui::Widget, public jgui::ButtonListener, public jgui
 			_button1->SetTheme(&_theme2);
 			_button1->SetTheme(&_theme3);
 
-			_button1->RegisterButtonListener(this);
-			_button2->RegisterButtonListener(this);
+			_button1->RegisterActionListener(this);
+			_button2->RegisterActionListener(this);
 
 			/*
 			_button1->SetBorderSize(8);
@@ -243,9 +243,9 @@ class WindowTest : public jgui::Widget, public jgui::ButtonListener, public jgui
 
 			_check1->SetSelected(true);
 
-			_check1->RegisterCheckButtonListener(this);
-			_check2->RegisterCheckButtonListener(this);
-			_check3->RegisterCheckButtonListener(this);
+			_check1->RegisterToggleListener(this);
+			_check2->RegisterToggleListener(this);
+			_check3->RegisterToggleListener(this);
 		}
 
 		{
@@ -261,9 +261,9 @@ class WindowTest : public jgui::Widget, public jgui::ButtonListener, public jgui
 			_group->Add(_radio2);
 			_group->Add(_radio3);
 
-			_radio1->RegisterCheckButtonListener(this);
-			_radio2->RegisterCheckButtonListener(this);
-			_radio3->RegisterCheckButtonListener(this);
+			_radio1->RegisterToggleListener(this);
+			_radio2->RegisterToggleListener(this);
+			_radio3->RegisterToggleListener(this);
 		}
 
 		{
@@ -371,10 +371,7 @@ class WindowTest : public jgui::Widget, public jgui::ButtonListener, public jgui
 	{
 		jthread::AutoLock lock(&_mutex);
 
-		Hide();
-
-		jgui::ThemeManager::GetInstance()->SetTheme(NULL);
-
+		delete _group;
 		delete _animation;
 		delete _marquee;
 		delete _textfield;
@@ -399,12 +396,9 @@ class WindowTest : public jgui::Widget, public jgui::ButtonListener, public jgui
 		delete _list;
 		delete _label1;
 		delete _label2;
-
-		// INFO:: delete group before the childs
-		delete _group;
 	}
 
-	virtual void ButtonSelected(jgui::CheckButtonEvent *event)
+	virtual void StateChanged(jgui::ToggleEvent *event)
 	{
 		jthread::AutoLock lock(&_mutex);
 
@@ -451,7 +445,7 @@ class WindowTest : public jgui::Widget, public jgui::ButtonListener, public jgui
 		}
 	}
 
-	virtual void ActionPerformed(jgui::ButtonEvent *event)
+	virtual void ActionPerformed(jgui::ActionEvent *event)
 	{
 		jthread::AutoLock lock(&_mutex);
 
@@ -1003,8 +997,6 @@ class PrimitivesTest : public jgui::Widget{
 
 		virtual ~PrimitivesTest()
 		{
-			Hide();
-
 			delete panel;
 		}
 
@@ -1026,8 +1018,6 @@ class PathsTest : public jgui::Widget{
 
 		virtual ~PathsTest()
 		{
-			Hide();
-
 			delete panel;
 		}
 
@@ -1386,54 +1376,44 @@ class PathsTest : public jgui::Widget{
 
 };
 
-class ModulesTest : public jgui::Widget, public jgui::ButtonListener, public jgui::SelectListener, public jgui::WindowListener{
+class ModulesTest : public jgui::Widget, public jgui::ActionListener, public jgui::SelectListener, public jgui::WidgetListener{
 
 	private:
 		jthread::Mutex _mutex;
 
-		jgui::Widget
-			*_current;
-		jgui::Button 
-			*_button1,
-			*_button2,
-			*_button3,
-			*_button4,
-			*_button5,
-			*_button6,
-			*_button7,
-			*_button8;
-		jgui::Keyboard 
-			*_querty_kb,
-			*_alpha_kb,
-			*_numeric_kb,
-			*_phone_kb,
-			*_internet_kb;
-		jgui::CalendarDialogBox 
-			*_calendar;
-		jgui::MessageDialogBox
-			*_message_1,
-			*_message_2;
+		jgui::Button *_button1;
+		jgui::Button *_button2;
+		jgui::Button *_button3;
+		jgui::Button *_button4;
+		jgui::Button *_button5;
+		jgui::Button *_button6;
+		jgui::Button *_button7;
+		jgui::Button *_button8;
+		jgui::Keyboard *_querty_kb;
+		jgui::Keyboard *_alpha_kb;
+		jgui::Keyboard *_numeric_kb;
+		jgui::Keyboard *_phone_kb;
+		jgui::Keyboard *_internet_kb;
+		jgui::CalendarDialogBox *_calendar;
+		jgui::MessageDialogBox *_message_1;
+		jgui::MessageDialogBox *_message_2;
 		PrimitivesTest *_primitives;
 		PathsTest *_paths;
-		jgui::Menu 
-			*_menu;
-		jgui::Theme
-			_theme1;
-		int 
-			_index;
+		jgui::Menu *_menu;
+		jgui::Theme _theme1;
+		int _index;
 
 	public:
 		ModulesTest():
-			jgui::Widget("Graphics Test")
+			jgui::Widget("Graphics Test", 0, 0, 1920, 1080)
 		{
-			jgui::jsize_t screen = jgui::GFXHandler::GetInstance()->GetScreenSize();
+			jgui::jsize_t screen = jgui::Application::GetInstance()->GetScreenSize();
 
 			_theme1.SetColor("component.bg", 0x80, 0x90, 0xa0, 0xff);
 
 			int w = (screen.width-3*120)/2;
 			int h = (screen.height-4*80)/4;
 
-			_current = NULL;
 			_index = -1;
 
 			_button1 = new jgui::Button("Keyboard Test", 0*(w+120)+120, 0*(h+80/2)+80, w, h);
@@ -1445,14 +1425,14 @@ class ModulesTest : public jgui::Widget, public jgui::ButtonListener, public jgu
 			_button7 = new jgui::Button("Paths Test", 1*(w+120)+120, 2*(h+80/2)+80, w, h);
 			_button8 = new jgui::Button("Menu Test", 1*(w+120)+120, 3*(h+80/2)+80, w, h);
 
-			_button1->RegisterButtonListener(this);
-			_button2->RegisterButtonListener(this);
-			_button3->RegisterButtonListener(this);
-			_button4->RegisterButtonListener(this);
-			_button5->RegisterButtonListener(this);
-			_button6->RegisterButtonListener(this);
-			_button7->RegisterButtonListener(this);
-			_button8->RegisterButtonListener(this);
+			_button1->RegisterActionListener(this);
+			_button2->RegisterActionListener(this);
+			_button3->RegisterActionListener(this);
+			_button4->RegisterActionListener(this);
+			_button5->RegisterActionListener(this);
+			_button6->RegisterActionListener(this);
+			_button7->RegisterActionListener(this);
+			_button8->RegisterActionListener(this);
 
 			Add(_button1);
 			Add(_button2);
@@ -1471,22 +1451,22 @@ class ModulesTest : public jgui::Widget, public jgui::ButtonListener, public jgu
 			_phone_kb = new jgui::Keyboard(jgui::JKT_PHONE, true);
 			_internet_kb = new jgui::Keyboard(jgui::JKT_INTERNET, true);
 
-			_querty_kb->RegisterWindowListener(this);
-			_alpha_kb->RegisterWindowListener(this);
-			_numeric_kb->RegisterWindowListener(this);
-			_phone_kb->RegisterWindowListener(this);
-			_internet_kb->RegisterWindowListener(this);
+			_querty_kb->RegisterWidgetListener(this);
+			_alpha_kb->RegisterWidgetListener(this);
+			_numeric_kb->RegisterWidgetListener(this);
+			_phone_kb->RegisterWidgetListener(this);
+			_internet_kb->RegisterWidgetListener(this);
 
 			_calendar = new jgui::CalendarDialogBox();
 
 			_calendar->AddWarnning(&_theme1, 10, 4, 2015);
-			_calendar->RegisterWindowListener(this);
+			_calendar->RegisterWidgetListener(this);
 
 			_message_1 = new jgui::MessageDialogBox("Warning", "Testing the component of message with some text and breaks of line.\nThis is a new line using manual break-line character. The lines also can break in case of the width of this component be minor than the width of the current text line.");
 			_message_2 = new jgui::MessageDialogBox("Warning ", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
 
-			_message_1->RegisterWindowListener(this);
-			_message_2->RegisterWindowListener(this);
+			_message_1->RegisterWidgetListener(this);
+			_message_2->RegisterWidgetListener(this);
 
 			_menu = new jgui::Menu(100, 100, 300, 4);
 
@@ -1580,18 +1560,17 @@ class ModulesTest : public jgui::Widget, public jgui::ButtonListener, public jgu
 			delete _paths;
 		}
 
-		virtual void WindowOpened(jgui::WindowEvent *event)
+		virtual void WidgetOpened(jgui::WidgetEvent *event)
 		{
 		}
 
-		virtual void WindowClosing(jgui::WindowEvent *event)
+		virtual void WidgetClosing(jgui::WidgetEvent *event)
 		{
 		}
 
-		virtual void WindowClosed(jgui::WindowEvent *event)
+		virtual void WidgetClosed(jgui::WidgetEvent *event)
 		{
-			_current = NULL;
-
+			/* TODO::
 			if (_index == 0) {
 				_current = _alpha_kb;
 
@@ -1619,24 +1598,26 @@ class ModulesTest : public jgui::Widget, public jgui::ButtonListener, public jgu
 			if (_current != NULL) {
 				_current->Show();
 			}
+			*/
 		}
 
-		virtual void WindowResized(jgui::WindowEvent *event)
+		virtual void WidgetResized(jgui::WidgetEvent *event)
 		{
 		}
 
-		virtual void WindowMoved(jgui::WindowEvent *event)
+		virtual void WidgetMoved(jgui::WidgetEvent *event)
 		{
 		}
 
-		virtual void WindowPainted(jgui::WindowEvent *event)
+		virtual void WidgetPainted(jgui::WidgetEvent *event)
 		{
 		}
 
-		virtual void ActionPerformed(jgui::ButtonEvent *event)
+		virtual void ActionPerformed(jgui::ActionEvent *event)
 		{
 			jthread::AutoLock lock(&_mutex);
 
+			/*
 			if (event->GetSource() == _button1) {
 				_current = _querty_kb;
 					
@@ -1658,10 +1639,7 @@ class ModulesTest : public jgui::Widget, public jgui::ButtonListener, public jgu
 			} else if (event->GetSource() == _button8) {
 				_current = _menu;
 			}
-
-			if (_current != NULL) {
-				_current->Show();
-			}
+			*/
 		}
 
 		virtual void ItemSelected(jgui::SelectEvent *event)
@@ -1686,13 +1664,14 @@ class ModulesTest : public jgui::Widget, public jgui::ButtonListener, public jgu
 
 int main( int argc, char *argv[] )
 {
-	jgui::MainWindow *window = jgui::MainWindow::GetInstance();
+	jgui::Application *main = jgui::Application::GetInstance();
 
 	ModulesTest app;
 
-	window->SetUndecorated(true);
-	window->Add(&app);
-	window->SetVisible(true);
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }

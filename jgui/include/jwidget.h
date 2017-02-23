@@ -21,6 +21,7 @@
 #define J_WIDGET_H
 
 #include "jcontainer.h"
+#include "jwidgetlistener.h"
 #include "jimage.h"
 
 #include <string>
@@ -49,6 +50,10 @@ class Widget : public jgui::Container{
 		};
 
 	protected:
+		/** \brief */
+		std::vector<WidgetListener *> _widget_listeners;
+		/** \brief */
+		jthread::Mutex _widget_listener_mutex;
 		/** \brief */
 		std::vector<frame_subtitle_t> _subtitles;
 		/** \brief */
@@ -122,6 +127,30 @@ class Widget : public jgui::Container{
 		 *
 		 */
 		virtual void PaintGlassPane(Graphics *g);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RegisterWidgetListener(WidgetListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveWidgetListener(WidgetListener *listener);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void DispatchWidgetEvent(WidgetEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual std::vector<WidgetListener *> & GetWidgetListeners();
 
 };
 

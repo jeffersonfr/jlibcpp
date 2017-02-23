@@ -1122,17 +1122,13 @@ void Component::SetLocation(jpoint_t point)
 
 void Component::SetSize(int w, int h)
 {
-	printf("Compnent ::::::::: 01:: %d, %d, %d, %d\n", w, h, _size.width, _size.height);
 	if (_size.width == w && _size.height == h) {
 		return;
 	}
 
-	printf("Compnent ::::::::: 02:: %d, %d, %d, %d\n", w, h, _size.width, _size.height);
 	_size.width = w;
 	_size.height = h;
 
-	printf("Compnent ::::::::: 03:: %d, %d, %d, %d\n", w, h, _size.width, _size.height);
-	printf("Compnent ::::::::: 03:1: %d, %d, %d, %d\n", _minimum_size.width, _minimum_size.height, _maximum_size.width, _maximum_size.height);
 	if (_size.width < _minimum_size.width) {
 		_size.width = _minimum_size.width;
 	}
@@ -1149,7 +1145,6 @@ void Component::SetSize(int w, int h)
 		_size.height = _maximum_size.height;
 	}
 
-	printf("Compnent ::::::::: 04:: %d, %d, %d, %d\n", w, h, _size.width, _size.height);
 	Repaint();
 }
 

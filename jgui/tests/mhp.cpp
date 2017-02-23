@@ -249,15 +249,13 @@ class LayersManager : public jgui::Widget, public jthread::Thread{
 	private:
 		static LayersManager *_instance;
 
+		jgui::Application *_main;
+		ScreenLayer *_background_layer;
+		ScreenLayer *_video_layer;
+		ScreenLayer *_graphic_layer;
+		jgui::Image *_buffer;
 		jthread::Mutex _mutex;
 		jthread::Condition _sem;
-
-		ScreenLayer *_background_layer,
-								*_video_layer,
-								*_graphic_layer;
-		
-		jgui::Image *_buffer;
-
 		bool _refresh;
 
 	private:
@@ -277,6 +275,12 @@ class LayersManager : public jgui::Widget, public jthread::Thread{
 			_graphic_layer->SetParent(this);
 
 			GetBackgroundLayer()->SetImage("images/background.png");
+	
+			_main = jgui::Application::GetInstance();
+
+			_main->SetTitle("Layers Manager");
+			_main->Add(this);
+			_main->SetSize(GetWidth(), GetHeight());
 		}
 
 		virtual void Refresh()
@@ -299,8 +303,10 @@ class LayersManager : public jgui::Widget, public jthread::Thread{
 
 		virtual void Run()
 		{
+			_main->SetVisible(true);
+
 			jgui::Graphics *gb = _buffer->GetGraphics();
-			jgui::Graphics *g = GetGraphics();
+			jgui::Graphics *g = _main->GetGraphics();
 
 			while (true) {
 				jthread::AutoLock lock(&_mutex);
@@ -312,10 +318,11 @@ class LayersManager : public jgui::Widget, public jthread::Thread{
 				_refresh = false;
 
 				Paint(gb);
-
 				g->DrawImage(_buffer, 0, 0);
 				g->Flip();
 			}
+			
+			_main->WaitForExit();
 		}
 
 	public:
@@ -618,25 +625,15 @@ int main(int argc, char **argv)
 		manager->GetVideoLayer()->Play();
 	}
 
-	jgui::Application *main = jgui::Application::GetInstance();
-
-	LayersManager *app = LayersManager::GetInstance();
-
-	main->SetTitle("Ball Drop");
-	main->Add(app);
-	main->SetSize(app->GetWidth(), app->GetHeight());
-	main->SetVisible(true);
-	
-	app->Show();
-
-	// INFO:: tests
 	ApplicationTest app;
+	
 	app.Show();
 
 	MenuTest menu;
+
 	menu.Show();
 
-	main->WaitForExit();
+	sleep(3600);
 
 	return 0;
 }

@@ -17,20 +17,134 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "agenda.h"
+#include "japplication.h"
+#include "jwidget.h"
+#include "jlabel.h"
+#include "jlistbox.h"
+#include "jtextfield.h"
+#include "jtextarea.h"
+#include "jdatalistener.h"
 #include "jxmlparser.h"
 #include "jsystem.h"
 #include "jmessagedialogbox.h"
 #include "jyesnodialogbox.h"
 #include "jcalendardialogbox.h"
 #include "jhourdialogbox.h"
-#include "jmainwindow.h"
-#include "jwidget.h"
 
 namespace agenda {
 
+class AgendaDB;
+
+class Agenda : public jgui::Widget, public jgui::SelectListener, public jcommon::DataListener{
+
+	private:
+		jthread::Mutex agenda_mutex;
+		jgui::Widget *_status;
+		jgui::ListBox *_list;
+		AgendaDB *db;
+		int _state;
+		bool started;
+
+	public:
+		Agenda();
+		virtual ~Agenda();
+
+		void Process(std::string type);
+
+		virtual void ItemSelected(jgui::SelectEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
+};
+
+class AgendaDB{
+
+	public:
+		struct agenda_t{
+			int day;
+			int month;
+			int year;
+			int hour;
+			int minute;
+			std::string event;
+		};
+
+	private:
+		std::vector<agenda_t> events;
+		std::string _file;
+
+	public:
+		AgendaDB(std::string file);
+		virtual ~AgendaDB();
+
+		bool Load();
+		bool Save();
+		int GetCapacity();
+		int GetSize();
+		struct AgendaDB::agenda_t * Get(int i);
+		bool IsFull();
+		bool IsEmpty();
+		bool Add(int dia, int mes, int ano, int hora, int minuto, std::string event);
+		bool Update(int i, int dia, int mes, int ano, int hora, int minuto, std::string event);
+		int Find(int dia, int mes, int ano, int hora, int minuto, std::string event);
+		void Remove(int i);
+		void RemoveAll();
+
+};
+
+class AddMessage : public jgui::Widget, public jcommon::DataListener{
+	private:
+		jthread::Mutex add_mutex;
+		jgui::Widget *_status;
+		jgui::Label *label1,
+			*label3,
+			*label4;
+		jgui::TextField *hour;
+		jgui::TextField *date;
+		jgui::TextArea *message;
+		jgui::Theme _theme;
+		AgendaDB *db;
+		int _day,
+				_month,
+				_year,
+				_hour,
+				_minute,
+				_index,
+				_state;
+
+	public:
+		AddMessage(AgendaDB *db, int index);
+		virtual ~AddMessage();
+
+		virtual bool KeyPressed(jgui::KeyEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
+
+};
+
+class ViewMessages : public jgui::Widget, public jcommon::DataListener{
+
+	private:
+		jthread::Mutex view_mutex;
+
+		AgendaDB *db;
+		jgui::Widget *_status;
+		jgui::Label *label_date,
+			*label_hour,
+			*message;
+		int _index;
+
+	private:
+		void Update();
+
+	public:
+		ViewMessages(AgendaDB *db);
+		virtual ~ViewMessages();
+
+		virtual bool KeyPressed(jgui::KeyEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
+
+};
+
 Agenda::Agenda():
-	jgui::Widget("Tasks", 32, 32)
+	jgui::Widget("Tasks", 0, 0, 720, 480)
 {
 	started = true;
 	_status = NULL;
@@ -706,6 +820,7 @@ int main()
 
 	main->SetTitle("Agenda");
 	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
 	main->SetVisible(true);
 	main->WaitForExit();
 

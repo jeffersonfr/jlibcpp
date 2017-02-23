@@ -303,13 +303,12 @@ void Container::Pack(bool fit)
 {
 	jthread::AutoLock lock(&_container_mutex);
 
+	Component *c = NULL;
 	jinsets_t insets = GetInsets();
-
-	Component *c;
-	int min_x = insets.left,
-			min_y = insets.top;
-	int max_width = 0,
-			max_height = 0;
+	int min_x = insets.left;
+	int min_y = insets.top;
+	int max_w = 0;
+	int max_h = 0;
 
 	if (fit == true) {
 		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
@@ -337,22 +336,16 @@ void Container::Pack(bool fit)
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		c = (*i);
 
-		if (max_width < (c->GetX()+c->GetWidth())) {
-			max_width = (c->GetX()+c->GetWidth());
+		if (max_w < (c->GetX()+c->GetWidth())) {
+			max_w = (c->GetX()+c->GetWidth());
 		}
 
-		if (max_height < (c->GetY()+c->GetHeight())) {
-			max_height = (c->GetY()+c->GetHeight());
+		if (max_h < (c->GetY()+c->GetHeight())) {
+			max_h = (c->GetY()+c->GetHeight());
 		}
 	}
 
-	/*
-	if (_subtitles.size() == 0) {
-		SetSize(max_width+insets.right, max_height+insets.bottom);
-	} else {
-		SetSize(max_width+insets.right, max_height+insets.bottom+32);
-	}
-	*/
+	SetSize(max_w+insets.right, max_h+insets.bottom);
 }
 
 jsize_t Container::GetPreferredSize()

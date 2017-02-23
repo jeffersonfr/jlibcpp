@@ -17,19 +17,75 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "mines.h"
+#include "japplication.h"
+#include "jwidget.h"
 #include "jmessagedialogbox.h"
 #include "jsystem.h"
 
 namespace mines {
 
+jgui::Application *main = NULL;
+
+class Mines : public jgui::Widget{
+
+	enum game_status_t {
+		NONE,
+		WIN,
+		LOSE
+	};
+
+	enum block_type_t {
+		BOMB_BLOCK,
+		SAFE_BLOCK
+	};
+
+	enum block_state_t {
+		CLOSED_BLOCK,
+		OPENED_BLOCK,
+		MARKED_BLOCK
+	};
+
+	struct block_t {
+		block_type_t type;
+		block_state_t state;
+		int value;
+	};
+
+	private:
+		jthread::Mutex mines_mutex;
+		jgui::Image *small_bomb;
+		jgui::Image *huge_bomb;
+		jgui::Image *flag;
+		jgui::Image *smile_face;
+		jgui::Image *dead_face;
+		block_t *board;
+		int size;
+		int max_rows;
+		int max_cols;
+		int current_row;
+		int current_col;
+		int max_bombs;
+		int hide_bombs;
+		game_status_t game_state;
+
+	public:
+		Mines(int x, int y);
+		virtual ~Mines();
+
+		virtual void Paint(jgui::Graphics *g);
+
+		void InitializeFlags();
+		void SetupBoard();
+		void Expose(int row, int col);
+		game_status_t GetResult();
+
+		virtual bool KeyPressed(jgui::KeyEvent *event);
+
+};
+
 Mines::Mines(int x, int y):
 	jgui::Widget("Minas", 32, 32, 620, 480)
 {
-	_current = NULL;
-
-	_insets.left = 20;
-
 	size = 36;
 	max_rows = 10;
 	max_cols = 10;
@@ -67,7 +123,6 @@ Mines::~Mines()
 {
 	jthread::AutoLock lock(&mines_mutex);
 
-	delete _current;
 	delete board;
 	delete small_bomb;
 	delete huge_bomb;
@@ -82,7 +137,6 @@ void Mines::Paint(jgui::Graphics *g)
 
 	jgui::Theme *theme = GetTheme();
 	jgui::Font *font = theme->GetFont("component");
-
 	int delta = 4;
 
 	g->SetFont(font);
@@ -119,13 +173,13 @@ void Mines::Paint(jgui::Graphics *g)
 		}
 	}
 
-	g->SetColor(0x00, 0x00, 0x00, 0xff);
+	g->SetColor(theme->GetColor("component.fg"));
 
 	if (GetResult() != LOSE) {
-		g->DrawString("Parabens", GetWidth()-140, 80);
+		g->DrawString("You Win", GetWidth()-140, 80);
 		g->DrawImage(smile_face, GetWidth()-180, 80, 160, 140);
 	} else {
-		g->DrawString("Perdeu", GetWidth()-140, 80);
+		g->DrawString("You Lost", GetWidth()-140, 80);
 		g->DrawImage(dead_face, GetWidth()-180, 80, 160, 140);
 	}
 
@@ -135,7 +189,7 @@ void Mines::Paint(jgui::Graphics *g)
 			h = 140;
 	char tmp[255];
 
-	sprintf(tmp, "%02d", hide_bombs);
+	sprintf(tmp, "bombs [ %02d ]", hide_bombs);
 
 	g->DrawImage(huge_bomb, x, y, w, h);
 
@@ -155,11 +209,6 @@ bool Mines::KeyPressed(jgui::KeyEvent *event)
 	}
 
 	jthread::AutoLock lock(&mines_mutex);
-
-	if (_current != NULL) {
-		delete _current;
-		_current = NULL;
-	}
 
 	if (GetResult() == NONE) {
 		if (event->GetSymbol() == jgui::JKS_CURSOR_RIGHT) {
@@ -209,7 +258,7 @@ bool Mines::KeyPressed(jgui::KeyEvent *event)
 			}
 		} else if (event->GetSymbol() == jgui::JKS_RED || event->GetSymbol() == jgui::JKS_F1) {
 		} else if (event->GetSymbol() == jgui::JKS_GREEN || event->GetSymbol() == jgui::JKS_F2) {
-			_current = new jgui::MessageDialogBox("Ajuda", "O jogo termina quando todos os blocos seguros forem revelados. Utilize as bandeirinhas para ajudar a identificar as minas escondidas.");
+			// jgui::Widget *widget = new jgui::MessageDialogBox("Ajuda", "O jogo termina quando todos os blocos seguros forem revelados. Utilize as bandeirinhas para ajudar a identificar as minas escondidas.");
 		} else if (event->GetSymbol() == jgui::JKS_YELLOW || event->GetSymbol() == jgui::JKS_F3) {
 			block_t *block = &board[current_row*max_cols+current_col];
 
@@ -243,10 +292,6 @@ bool Mines::KeyPressed(jgui::KeyEvent *event)
 		Repaint();
 	} else if (event->GetSymbol() == jgui::JKS_BLUE || event->GetSymbol() == jgui::JKS_F4) {
 		SetupBoard();
-	}
-
-	if (_current != NULL) {
-		_current->Show();
 	}
 
 	return true;
@@ -368,13 +413,15 @@ int main()
 {
 	srand((int)time(NULL));
 
-	jgui::MainWindow *window = jgui::MainWindow::GetInstance();
+	mines::main = jgui::Application::GetInstance();
+	// jgui::Application *main = jgui::Application::GetInstance();
 
 	mines::Mines app(100, 100);
 
-	window->SetUndecorated(true);
-	window->Add(&app);
-	window->SetVisible(true);
+	mines::main->Add(&app);
+	mines::main->SetSize(app.GetWidth(), app.GetHeight());
+	mines::main->SetVisible(true);
+	mines::main->WaitForExit();
 
 	return 0;
 }

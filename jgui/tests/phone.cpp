@@ -17,7 +17,16 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "phone.h"
+#include "japplication.h"
+#include "jwidget.h"
+#include "jlabel.h"
+#include "jlistbox.h"
+#include "jicon.h"
+#include "jkeyboardlistener.h"
+#include "jtextfield.h"
+#include "jselectlistener.h"
+#include "jdatalistener.h"
+#include "jkeyboardlistener.h"
 #include "jkeyboard.h"
 #include "jmessagedialogbox.h"
 #include "jyesnodialogbox.h"
@@ -26,11 +35,115 @@
 
 namespace phone {
 
-Phone::Phone():
- 	jgui::Widget("Phone Book", 32, 32)
-{
-	_status = NULL;
+class PhoneDB;
 
+class Phone : public jgui::Widget, public jgui::SelectListener, public jcommon::DataListener{
+
+	private:
+		jthread::Mutex phone_mutex;
+		jgui::ListBox *_list;
+		PhoneDB *db;
+		int _state;
+
+	public:
+		Phone();
+		virtual ~Phone();
+
+		void Process(std::string type);
+		virtual void ItemSelected(jgui::SelectEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
+
+};
+
+class PhoneDB{
+
+	public:
+		struct phone_t{
+			std::string name;
+			std::string phone1;
+			std::string phone2;
+		};
+
+	private:
+		std::vector<phone_t> events;
+		std::string _file;
+
+	public:
+		PhoneDB(std::string file);
+		virtual ~PhoneDB();
+
+		bool Load();
+		bool Save();
+		int GetCapacity();
+		int GetSize();
+		struct PhoneDB::phone_t * Get(int i);
+		bool IsFull();
+		bool IsEmpty();
+		bool Add(std::string name, std::string phone1, std::string phone2);
+		int Find(std::string name, std::string phone1, std::string phone2);
+		int Search(std::string name);
+		bool Update(int i, std::string name, std::string phone1, std::string phone2);
+		void Remove(int i);
+		void RemoveAll();
+
+};
+
+class AddContact : public jgui::Widget, public jcommon::DataListener{
+
+	private:
+		jthread::Mutex add_mutex;
+
+		jgui::Label *label1;
+		jgui::Label *label2;
+		jgui::Label *label3;
+		jgui::TextField *field1;
+		jgui::TextField *field2;
+		jgui::TextField *field3;
+		PhoneDB *db;
+		int _index;
+		int _state;
+
+	public:
+		AddContact(PhoneDB *db, int index);
+		virtual ~AddContact();
+
+		virtual bool KeyPressed(jgui::KeyEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
+
+};
+
+class SearchContacts : public jgui::Widget, public jcommon::DataListener, public jgui::KeyboardListener{
+
+	private:
+		jthread::Mutex search_mutex;
+
+		jgui::Label *label_index;
+		jgui::Label *label_name;
+		jgui::Label *label_tel1;
+		jgui::Label *tel1;
+		jgui::Label *label_tel2;
+		jgui::Label *tel2;
+		jgui::Icon *left_arrow;
+		jgui::Icon *right_arrow;
+		PhoneDB *db;
+		int _index;
+
+	private:
+		void Update();
+
+	public:
+		SearchContacts(PhoneDB *db);
+		virtual ~SearchContacts();
+
+		virtual bool KeyPressed(jgui::KeyEvent *event);
+		virtual void DataChanged(jcommon::ParamMapper *params);
+		virtual void KeyboardPressed(jgui::KeyEvent *event);
+
+};
+
+Phone::Phone():
+ 	jgui::Widget("Phone Book", 0, 0, 720, 480)
+{
 	db = new PhoneDB("./config/phone.xml");
 
 	db->Load();
@@ -50,7 +163,7 @@ Phone::Phone():
 
 	_list->RequestFocus();
 
-	Pack();
+	Pack(true);
 }
 
 Phone::~Phone() 
@@ -74,11 +187,7 @@ void Phone::ItemSelected(jgui::SelectEvent *event)
 {
 	jthread::AutoLock lock(&phone_mutex);
 
-	if (_status != NULL) {
-		delete _status;
-		_status = NULL;
-	}
-
+	/* TODO::
 	if (event->GetIndex() == 0) {
 		_status = new SearchContacts(db);
 	} else if (event->GetIndex() == 1) {
@@ -97,10 +206,7 @@ void Phone::ItemSelected(jgui::SelectEvent *event)
 
 		_status = new jgui::MessageDialogBox("Memory status", tmp);
 	}
-	
-	if (_status != NULL) {
-		_status->Show();
-	}
+	*/
 }
 
 void Phone::DataChanged(jcommon::ParamMapper *params)
@@ -371,12 +477,11 @@ class NumericTextField : public jgui::KeyMap {
 NumericTextField ntf;
 
 AddContact::AddContact(PhoneDB *base, int index):
-	jgui::Widget("Add a Contact", 32, 32, 600, 400)
+	jgui::Widget("Add a Contact", 0, 0, 720, 480)
 {
 	int max_width = GetWidth()-_insets.left-_insets.right,
 			height = DEFAULT_COMPONENT_HEIGHT+4;
 
-	_status = NULL;
 	db = base;
 
 	_index = index;
@@ -420,7 +525,7 @@ AddContact::AddContact(PhoneDB *base, int index):
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Adicionar");
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/vertical_arrows.png", "Selecionar");
 
-	Pack();
+	Pack(true);
 }
 
 AddContact::~AddContact() 
@@ -452,7 +557,7 @@ bool AddContact::KeyPressed(jgui::KeyEvent *event)
 			}
 		}
 
-		Release();
+		// Release();
 	}
 
 	return true;
@@ -465,14 +570,13 @@ void AddContact::DataChanged(jcommon::ParamMapper *params)
 }
 
 SearchContacts::SearchContacts(PhoneDB *base):
-	jgui::Widget("Search Contacts", 32, 32, 600, 400)
+	jgui::Widget("Search Contacts", 0, 0, 720, 480)
 {
 
 	char tmp[255];
 	int height = DEFAULT_COMPONENT_HEIGHT,
 			max_width = GetWidth()-_insets.left-_insets.right;
 
-	_status = NULL;
 	db = base;
 
 	_index = 0;
@@ -512,7 +616,7 @@ SearchContacts::SearchContacts(PhoneDB *base):
 		AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/green_icon.png", "Buscar");
 	}
 
-	Pack();
+	Pack(true);
 }
 
 SearchContacts::~SearchContacts() 
@@ -579,11 +683,7 @@ bool SearchContacts::KeyPressed(jgui::KeyEvent *event)
 		return true;
 	}
 
-	if (_status != NULL) {
-		delete _status;
-		_status = NULL;
-	}
-
+	/*
 	if (event->GetSymbol() == jgui::JKS_CURSOR_LEFT) {
 		_index--;
 
@@ -621,10 +721,7 @@ bool SearchContacts::KeyPressed(jgui::KeyEvent *event)
 			_status = dialog;
 		}
 	}
-
-	if (_status != NULL) {
-		_status->Show();
-	}
+	*/
 
 	return true;
 }
@@ -663,13 +760,14 @@ void SearchContacts::DataChanged(jcommon::ParamMapper *params)
 
 int main()
 {
-	jgui::MainWindow *window = jgui::MainWindow::GetInstance();
+	jgui::Application *main = jgui::Application::GetInstance();
 
 	phone::Phone app;
 
-	window->SetUndecorated(true);
-	window->Add(&app);
-	window->SetVisible(true);
+	main->Add(&app);
+	main->SetSize(app.GetWidth(), app.GetHeight());
+	main->SetVisible(true);
+	main->WaitForExit();
 
 	return 0;
 }
