@@ -450,7 +450,7 @@ void NativeHandler::InternalReleaseCursors()
 
 void NativeHandler::MainLoop()
 {
-	int flags = (int)(sf::Style::Titlebar | sf::Style::Close);
+	int flags = (int)(sf::Style::Titlebar | sf::Style::Resize | sf::Style::Close);
 
 	if (_is_undecorated == true) {
 		flags = (int)(0); // sf::Style::None);
@@ -834,7 +834,13 @@ void NativeHandler::InternalEventHandler(sf::Event event)
 	} else if (event.type == sf::Event::Closed) {
 		DispatchWidgetEvent(new WidgetEvent(this, JWET_CLOSED));
 	} else if (event.type == sf::Event::Resized) {
-		DispatchWidgetEvent(new WidgetEvent(this, JWET_CHANGED));
+		_size.width = event.size.width;
+		_size.height = event.size.height;
+
+		_graphics->SetNativeSurface((void *)_window, _size.width, _size.height);
+		
+		Repaint();
+
 		DispatchWidgetEvent(new WidgetEvent(this, JWET_RESIZED));
 	} else if (event.type == sf::Event::LostFocus) {
 	} else if (event.type == sf::Event::GainedFocus) {

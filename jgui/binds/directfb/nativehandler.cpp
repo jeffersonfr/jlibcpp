@@ -662,8 +662,6 @@ void NativeHandler::MainLoop()
 				_graphics->SetNativeSurface(_surface, _size.width, _size.height);
 
 				native_graphics->Unlock();
-			
-				DispatchWidgetEvent(new WidgetEvent(this, JWET_CHANGED));
 			} else {
 				_size.width = ox;
 				_size.height = oy;
@@ -675,8 +673,6 @@ void NativeHandler::MainLoop()
 				_graphics->SetNativeSurface(_surface, _size.width, _size.height);
 				
 				native_graphics->Unlock();
-				
-				DispatchWidgetEvent(new WidgetEvent(this, JWET_CHANGED));
 			}
 			
 			DispatchWidgetEvent(new WidgetEvent(this, JWET_RESIZED));

@@ -30,6 +30,7 @@
 #include "jyesnodialogbox.h"
 #include "jcalendardialogbox.h"
 #include "jhourdialogbox.h"
+#include "jwidget.h"
 
 namespace agenda {
 

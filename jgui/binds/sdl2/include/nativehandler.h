@@ -179,6 +179,12 @@ class NativeHandler : public jgui::Application, public jthread::Thread{
 		 * \brief
 		 *
 		 */
+		virtual void SetResizable(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetSize(int width, int height);
 		
 		/**

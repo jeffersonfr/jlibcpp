@@ -36,6 +36,7 @@ NativeGraphics::NativeGraphics(NativeHandler *handler, void *surface, cairo_t *c
 
 	_handler = handler;
 	_surface = surface;
+	_is_first = true;
 }
 
 NativeGraphics::~NativeGraphics()
@@ -57,6 +58,8 @@ void NativeGraphics::SetNativeSurface(void *surface, int wp, int hp)
 	
 		// cairo_surface_destroy(cairo_surface);
 	}
+
+	_is_first = true;
 }
 
 void NativeGraphics::Flip()
@@ -81,9 +84,9 @@ void NativeGraphics::Flip()
 	XPutBackEvent(display, &event);
 
 	// CHANGE:: if continues to block exit, change to timed semaphore
-	if (_handler->IsVisible() == true) {
+	if (_handler->IsVisible() == true && _is_first == false) {
 		try {
-			_sem.Wait(2000000);
+			_sem.Wait(1000000);
 		} catch (jthread::SemaphoreException) {
 		} catch (jthread::SemaphoreTimeoutException) {
 		}
@@ -121,9 +124,9 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 	XPutBackEvent(display, &event);
 
 	// CHANGE:: if continues to block exit, change to timed semaphore
-	if (_handler->IsVisible() == true) {
+	if (_handler->IsVisible() == true && _is_first == false) {
 		try {
-			_sem.Wait(2000000);
+			_sem.Wait(1000000);
 		} catch (jthread::SemaphoreException) {
 		} catch (jthread::SemaphoreTimeoutException) {
 		}
@@ -205,7 +208,14 @@ void NativeGraphics::InternalFlip()
 	// False:: not discards events remaing
 	XSync(display, True);
 	
+	_is_first = false;
+
 	_sem.Notify();
+}
+
+void NativeGraphics::ReleaseFlip()
+{
+	_is_first = true;
 }
 
 }

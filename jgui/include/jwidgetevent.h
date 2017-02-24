@@ -31,7 +31,6 @@ namespace jgui {
 enum jwidgetevent_type_t {
 	JWET_CLOSING,
 	JWET_CLOSED,
-	JWET_CHANGED,
 	JWET_OPENED,
 	JWET_RESIZED,
 	JWET_MOVED,

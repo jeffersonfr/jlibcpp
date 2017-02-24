@@ -60,6 +60,8 @@ class Widget : public jgui::Container{
 		jgui::Image *_icon;
 		/** \brief */
 		std::string _title;
+		/** \brief */
+		bool _is_resizable;
 
 	public:
 		/**
@@ -91,6 +93,30 @@ class Widget : public jgui::Container{
 		 *
 		 */
 		virtual std::string GetTitle();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetResizable(bool b);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsResizable();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetSize(int width, int height);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetBounds(int x, int y, int w, int h);
 
 		/**
 		 * \brief

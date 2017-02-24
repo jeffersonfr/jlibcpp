@@ -88,6 +88,12 @@ class NativeGraphics : public GenericGraphics{
 		 */
 		virtual void InternalFlip(cairo_t *cr);
 		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ReleaseFlip();
+		
 };
 
 }

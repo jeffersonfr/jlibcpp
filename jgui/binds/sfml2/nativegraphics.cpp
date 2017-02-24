@@ -40,6 +40,18 @@ NativeGraphics::~NativeGraphics()
 void NativeGraphics::SetNativeSurface(void *surface, int wp, int hp)
 {
 	_surface = surface;
+
+	cairo_destroy(_cairo_context);
+
+	_cairo_context = NULL;
+
+	if (_surface != NULL) {
+		cairo_surface_t *cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wp, hp);
+
+		_cairo_context = cairo_create(cairo_surface);
+	
+		// cairo_surface_destroy(cairo_surface);
+	}
 }
 
 void NativeGraphics::Flip()
@@ -69,8 +81,9 @@ void NativeGraphics::Flip()
 	sf::Texture texture;
 
 	texture.create(dw, dh);
+	texture.setSmooth(GetAntialias() != JAM_NONE);
 
-	_sprite.setTexture(texture);
+	_sprite.setTexture(texture, true);
 
 	int size = dw*dh;
 	uint8_t buffer[size*4];
@@ -121,7 +134,7 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 	texture.create(dw, dh);
 	texture.setSmooth(GetAntialias() != JAM_NONE);
 
-	_sprite.setTexture(texture);
+	_sprite.setTexture(texture, true);
 
 	int size = dw*dh;
 	uint8_t buffer[size*4];
@@ -150,7 +163,7 @@ void NativeGraphics::InternalFlip()
 	}
 
 	sf::RenderWindow *window = (sf::RenderWindow *)_surface;
-
+	
 	window->setActive(true);
 	window->clear();
 	window->draw(_sprite);

@@ -35,7 +35,8 @@ Widget::Widget(int x, int y, int width, int height):
 	_insets.right = 8;
 	_insets.bottom = 8;
 
-	SetFocusable(true);
+	_is_resizable = true;
+	_is_focusable = true;
 }
 
 Widget::Widget(std::string title, int x, int y, int width, int height):
@@ -53,7 +54,8 @@ Widget::Widget(std::string title, int x, int y, int width, int height):
 
 	_icon = jgui::Image::CreateImage(_DATA_PREFIX"/images/small-gnu.png");
 	
-	SetFocusable(true);
+	_is_resizable = true;
+	_is_focusable = true;
 }
 
 Widget::~Widget() 
@@ -74,6 +76,34 @@ std::string Widget::GetTitle()
 	return _title;
 }
 
+void Widget::SetResizable(bool b)
+{
+	_is_resizable = b;
+}
+
+bool Widget::IsResizable()
+{
+	return _is_resizable;
+}
+
+void Widget::SetSize(int width, int height)
+{
+	if (_is_resizable == false) {
+		return;
+	}
+
+	Container::SetSize(width, height);
+}
+		
+void Widget::SetBounds(int x, int y, int width, int height)
+{
+	if (_is_resizable == false) {
+		return;
+	}
+
+	Container::SetBounds(x, y, width, height);
+}
+		
 void Widget::SetIcon(std::string icon)
 {
 	if (_icon != NULL) {
@@ -229,8 +259,6 @@ void Widget::DispatchWidgetEvent(WidgetEvent *event)
 			listener->WidgetOpened(event);
 		} else if (event->GetType() == JWET_RESIZED) {
 			listener->WidgetResized(event);
-		} else if (event->GetType() == JWET_CHANGED) {
-			listener->WidgetChanged(event);
 		} else if (event->GetType() == JWET_MOVED) {
 			listener->WidgetMoved(event);
 		} else if (event->GetType() == JWET_PAINTED) {

@@ -597,8 +597,7 @@ class BitMaskTeste : public jgui::Widget{
 
 			jgui::jsize_t size = bmbg->GetSize();
 
-			// TODO:: set random values
-			// SetSize(size.width, size.height);
+			SetSize(size.width, size.height);
 		}
 
 		virtual ~BitMaskTeste()

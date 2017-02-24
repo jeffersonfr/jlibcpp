@@ -66,7 +66,7 @@ void NativeGraphics::Flip()
 	// CHANGE:: if continues to block exit, change to timed semaphore
 	if (_handler->IsVisible() == true && _is_first != true) {
 		try {
-			_sem.Wait(2000000);
+			_sem.Wait(1000000);
 		} catch (jthread::SemaphoreException) {
 		} catch (jthread::SemaphoreTimeoutException) {
 		}
@@ -88,12 +88,12 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 
 	_has_bounds = true;
 
-	_handler->RequestDrawing();
+	_handler->RequestDrawing(xp, yp, wp, hp);
 
 	// CHANGE:: if continues to block exit, change to timed semaphore
 	if (_handler->IsVisible() == true && _is_first != true) {
 		try {
-			_sem.Wait(2000000);
+			_sem.Wait(1000000);
 		} catch (jthread::SemaphoreException) {
 		} catch (jthread::SemaphoreTimeoutException) {
 		}
@@ -134,6 +134,11 @@ void NativeGraphics::InternalFlip(cairo_t *cr)
 	_is_first = false;
 
 	_sem.Notify();
+}
+
+void NativeGraphics::ReleaseFlip()
+{
+	_is_first = true;
 }
 
 }

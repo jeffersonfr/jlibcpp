@@ -48,10 +48,6 @@ void WidgetListener::WidgetResized(WidgetEvent *event)
 {
 }
 
-void WidgetListener::WidgetChanged(WidgetEvent *event)
-{
-}
-
 void WidgetListener::WidgetMoved(WidgetEvent *event)
 {
 }

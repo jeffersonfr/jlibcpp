@@ -721,7 +721,7 @@ class Component : public KeyListener, public MouseListener{
 		 * \brief
 		 *
 		 */
-		virtual bool Contains(Component *c, int x, int y, int w, int h);
+		virtual bool Contains(Component *c, int x, int y, int width, int height);
 
 		/**
 		 * \brief
@@ -739,7 +739,7 @@ class Component : public KeyListener, public MouseListener{
 		 * \brief
 		 *
 		 */
-		virtual bool Intersects(Component *c, int x, int y, int w, int h);
+		virtual bool Intersects(Component *c, int x, int y, int width, int height);
 
 		/**
 		 * \brief
@@ -799,7 +799,7 @@ class Component : public KeyListener, public MouseListener{
 		 * \brief
 		 *
 		 */
-		virtual void SetBounds(int x, int y, int w, int h);
+		virtual void SetBounds(int x, int y, int width, int height);
 		
 		/**
 		 * \brief

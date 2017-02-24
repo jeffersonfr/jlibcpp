@@ -2251,7 +2251,8 @@ class GraphicsTeste : public jgui::Widget{
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			g->Clear();
+			jgui::Widget::Paint(g);
+
 			g->SetAntialias(jgui::JAM_NONE);
 
 			int count, NumUsed = 0;

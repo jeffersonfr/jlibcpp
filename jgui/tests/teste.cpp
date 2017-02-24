@@ -1451,22 +1451,24 @@ class ModulesTest : public jgui::Widget, public jgui::ActionListener, public jgu
 			_phone_kb = new jgui::Keyboard(jgui::JKT_PHONE, true);
 			_internet_kb = new jgui::Keyboard(jgui::JKT_INTERNET, true);
 
+			/*
 			_querty_kb->RegisterWidgetListener(this);
 			_alpha_kb->RegisterWidgetListener(this);
 			_numeric_kb->RegisterWidgetListener(this);
 			_phone_kb->RegisterWidgetListener(this);
 			_internet_kb->RegisterWidgetListener(this);
+			*/
 
 			_calendar = new jgui::CalendarDialogBox();
 
 			_calendar->AddWarnning(&_theme1, 10, 4, 2015);
-			_calendar->RegisterWidgetListener(this);
+			// _calendar->RegisterWidgetListener(this);
 
 			_message_1 = new jgui::MessageDialogBox("Warning", "Testing the component of message with some text and breaks of line.\nThis is a new line using manual break-line character. The lines also can break in case of the width of this component be minor than the width of the current text line.");
 			_message_2 = new jgui::MessageDialogBox("Warning ", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
 
-			_message_1->RegisterWidgetListener(this);
-			_message_2->RegisterWidgetListener(this);
+			// _message_1->RegisterWidgetListener(this);
+			// _message_2->RegisterWidgetListener(this);
 
 			_menu = new jgui::Menu(100, 100, 300, 4);
 
@@ -1615,31 +1617,29 @@ class ModulesTest : public jgui::Widget, public jgui::ActionListener, public jgu
 
 		virtual void ActionPerformed(jgui::ActionEvent *event)
 		{
-			jthread::AutoLock lock(&_mutex);
+			jgui::Application *main = jgui::Application::GetInstance();
 
-			/*
+			main->RemoveAll();
+
 			if (event->GetSource() == _button1) {
-				_current = _querty_kb;
-					
-				_index = 0;
+				main->Add(_querty_kb);
 			} else if (event->GetSource() == _button2) {
-				_current = _calendar;
+				main->Add(_calendar);
 			} else if (event->GetSource() == _button3) {
-				_current = new WindowTest();
+				main->Add(new WindowTest());
 			} else if (event->GetSource() == _button4) {
-				_current = _message_1;
-
-				_index = 10;
+				main->Add(_message_1);
 			} else if (event->GetSource() == _button5) {
-				_current = new jgui::YesNoDialogBox("Question", "This is the best of all the graphic engines of the world ?");
+				main->Add(new jgui::YesNoDialogBox("Question", "This is the best of all the graphic engines of the world ?"));
 			} else if (event->GetSource() == _button6) {
-				_current = _primitives;
+				main->Add(_primitives);
 			} else if (event->GetSource() == _button7) {
-				_current = _paths;
+				main->Add(_paths);
 			} else if (event->GetSource() == _button8) {
-				_current = _menu;
+				main->Add(_menu);
 			}
-			*/
+
+			main->Repaint();
 		}
 
 		virtual void ItemSelected(jgui::SelectEvent *event)

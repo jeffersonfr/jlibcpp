@@ -1,6 +1,9 @@
 . gethostbyaddr is obsolescent, use getaddrinfo() instead.
 . gethostbyname is obsolescent, use getnameinfo() instead.
-. fix jmenu and jcombobox to new version of jlibcpp (use dialogs)
-. fix dead-lock at jgui(x11)/tests/fullscreen.cpp (the repaint is lock the main loop)
+. fix jmenu, jcombobox, keyboard and dialogs to new version of jlibcpp (use dialogs)
 . optimize the japplication::repaint() to avoid not needs locks
-. implements the both flips in gtk3
+. teste.cpp and calc.cpp are lost focus when the left key is pressed
+. implements the dialog message in tests (mines.cpp, agenda.cpp, phone.cpp, teste.cpp)
+. implements dialogs in jgui
+. sfml2 has paint problems when resize the window
+. mhp.cpp appears unstable

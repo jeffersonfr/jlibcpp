@@ -696,6 +696,9 @@ static gboolean OnConfigureEvent(GtkWidget *widget, GdkEventConfigure *event, gp
 
 	graphics->SetNativeSurface(surface, w, h);
 
+	handler->SetSize(w, h);
+	handler->Repaint();
+
 	_is_first_draw == true;
 
   return TRUE;
@@ -750,47 +753,13 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
 	g_signal_connect(G_OBJECT(_window), "button_release_event", G_CALLBACK(OnMousePressEvent), handler);
 
 	/*
-		if (event.window.event == SDL_WINDOWEVENT_ENTER) {
-			SetCursor(GetCursor());
-
-			DispatchWidgetEvent(new WidgetEvent(this, JWET_ENTERED));
-		} else if (event.window.event == SDL_WINDOWEVENT_LEAVE) {
-			SetCursor(JCS_DEFAULT);
-
-			DispatchWidgetEvent(new WidgetEvent(this, JWET_LEAVED));
-		} else if (event.window.event == SDL_WINDOWEVENT_SHOWN) {
-			DispatchWidgetEvent(new WidgetEvent(this, JWET_OPENED));
-		} else if (event.window.event == SDL_WINDOWEVENT_HIDDEN) {
-			DispatchWidgetEvent(new WidgetEvent(this, JWET_CLOSED));
-		} else if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
-		} else if (event.window.event == SDL_WINDOWEVENT_MOVED) {
-			DispatchWidgetEvent(new WidgetEvent(this, JWET_MOVED));
-		} else if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-			// _size.width = event.window.data1;
-			// _size.height = event.window.data2;
-
-			DispatchWidgetEvent(new WidgetEvent(this, JWET_RESIZED));
-		} else if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-			_size.width = event.window.data1;
-			_size.height = event.window.data2;
-
-			DispatchWidgetEvent(new WidgetEvent(this, JWET_CHANGED));
-		} else if (event.window.event == SDL_WINDOWEVENT_MINIMIZED) {
-		} else if (event.window.event == SDL_WINDOWEVENT_MAXIMIZED) {
-		} else if (event.window.event == SDL_WINDOWEVENT_RESTORED) {
-		} else if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
-		} else if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
-		}
-		*/
-
-	/*
 	g_signal_handler_disconnect(G_OBJECT(_window), id_keypress);
 	g_signal_handler_disconnect(G_OBJECT(_window), id_mousemove);
 	g_signal_handler_disconnect(G_OBJECT(_window), id_mousepress);
 	g_signal_handler_disconnect(G_OBJECT(_window), id_mouserelease);
 	*/
 
-  gtk_widget_set_events(_drawing_area, gtk_widget_get_events(_drawing_area) | GDK_BUTTON_PRESS_MASK | GDK_POINTER_MOTION_MASK);
+  gtk_widget_set_events(_drawing_area, gtk_widget_get_events(_drawing_area) | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
 
 	handler->SetNativeGraphics(new NativeGraphics(handler, (void *)NULL, NULL, JPF_ARGB, size.width, size.height));
 
@@ -830,6 +799,11 @@ void NativeHandler::RequestDrawing()
   gtk_widget_queue_draw(_drawing_area);
 }
 
+void NativeHandler::RequestDrawing(int x, int y, int width, int height)
+{
+  gtk_widget_queue_draw_area(_drawing_area, x, y, width, height);
+}
+
 void NativeHandler::SetFullScreenEnabled(bool b)
 {
 	if (_is_fullscreen_enabled == b) {
@@ -838,11 +812,15 @@ void NativeHandler::SetFullScreenEnabled(bool b)
 
 	_is_fullscreen_enabled = b;
 	
+	// event: window-state-event
+
 	if (_is_fullscreen_enabled == false) {
 		gtk_window_unfullscreen((GtkWindow *)_window);
 	} else {
 		gtk_window_fullscreen((GtkWindow *)_window);
 	}
+
+	Repaint();
 }
 
 void NativeHandler::WaitForExit()

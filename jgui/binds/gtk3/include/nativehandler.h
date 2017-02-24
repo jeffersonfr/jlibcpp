@@ -125,6 +125,12 @@ class NativeHandler : public jgui::Application, public jthread::Thread{
 		 * \brief
 		 *
 		 */
+		virtual void RequestDrawing(int x, int y, int width, int height);
+
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void WaitForExit();
 
 		/**

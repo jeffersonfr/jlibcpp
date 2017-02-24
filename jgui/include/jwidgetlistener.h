@@ -80,12 +80,6 @@ class WidgetListener : public jcommon::Listener{
 		 * \brief
 		 *
 		 */
-		virtual void WidgetChanged(WidgetEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void WidgetMoved(WidgetEvent *event);
 
 		/**

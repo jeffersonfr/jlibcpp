@@ -638,7 +638,7 @@ void NativeHandler::MainLoop()
 
 		hints.Flags       = MWM_HINTS_FUNCTIONS | MWM_HINTS_DECORATIONS;
 		hints.Decorations = True;
-		hints.Functions   = MWM_FUNC_MOVE | MWM_FUNC_CLOSE;
+		hints.Functions   = MWM_FUNC_MOVE | MWM_FUNC_RESIZE | MWM_FUNC_CLOSE;
 
 		if (_is_undecorated == true) {
 			hints.Decorations = False;
@@ -1124,6 +1124,8 @@ void NativeHandler::InternalEventHandler(XEvent event)
 		}
 	}
 
+	NativeGraphics *graphics = dynamic_cast<NativeGraphics *>(_graphics);
+
 	if (event.type == DestroyNotify) {
 		printf("Event:: DestroyNotify\n");
 
@@ -1182,7 +1184,11 @@ void NativeHandler::InternalEventHandler(XEvent event)
 		_size.width = event.xconfigure.width;
 		_size.height = event.xconfigure.height;
 
-		DispatchWidgetEvent(new WidgetEvent(this, JWET_CHANGED));
+		graphics->SetNativeSurface(&_window, _size.width, _size.height);
+		graphics->ReleaseFlip();
+
+		Repaint();
+
 		DispatchWidgetEvent(new WidgetEvent(this, JWET_RESIZED));
 	} else if (event.type == ClientMessage) {
 		// printf("Event:: ClientMessage\n");

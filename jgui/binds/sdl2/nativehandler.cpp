@@ -523,6 +523,9 @@ void NativeHandler::MainLoop()
 
 	_graphics = new NativeGraphics(this, (void *)_surface, NULL, JPF_ARGB, _size.width, _size.height);
 
+	SDL_SetWindowMinimumSize(_window, _minimum_size.width, _minimum_size.height);
+	SDL_SetWindowMaximumSize(_window, _maximum_size.width, _maximum_size.height);
+
 	SDL_ShowWindow(_window);
 
 	_is_running = true;
@@ -618,6 +621,11 @@ void NativeHandler::SetTitle(std::string title)
 
 void NativeHandler::SetOpacity(int i)
 {
+	Application::SetOpacity(i);
+
+	if (_is_visible == true) {
+		// SDL_SetWindowOpacity(_window, (float)(i/256.0));
+	}
 }
 
 void NativeHandler::SetUndecorated(bool b)
@@ -704,6 +712,17 @@ void NativeHandler::SetLocation(int x, int y)
 	SDL_PushEvent(&event);
 }
 
+void NativeHandler::SetResizable(bool b)
+{
+	Application::SetResizable(b);
+
+	if (_is_visible == false) {
+		return;
+	}
+
+	// SDL_SetWindowResizable(_window, _is_resizable);
+}
+
 void NativeHandler::SetSize(int width, int height)
 {
 	Application::SetSize(width, height);
@@ -711,6 +730,9 @@ void NativeHandler::SetSize(int width, int height)
 	if (_is_visible == false) {
 		return;
 	}
+
+	SDL_SetWindowMinimumSize(_window, _minimum_size.width, _minimum_size.height);
+	SDL_SetWindowMaximumSize(_window, _maximum_size.width, _maximum_size.height);
 
 	SDL_Event event;
 
@@ -892,6 +914,8 @@ jwidget_rotation_t NativeHandler::GetRotation()
 void NativeHandler::InternalEventHandler(SDL_Event event)
 {
 	if (event.type == SDL_WINDOWEVENT) {
+		NativeGraphics *graphics = dynamic_cast<NativeGraphics *>(_graphics);
+		
 		if (event.window.event == SDL_WINDOWEVENT_ENTER) {
 			// SDL_CaptureMouse(true);
 			// void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
@@ -913,19 +937,21 @@ void NativeHandler::InternalEventHandler(SDL_Event event)
 		} else if (event.window.event == SDL_WINDOWEVENT_HIDDEN) {
 			DispatchWidgetEvent(new WidgetEvent(this, JWET_CLOSED));
 		} else if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
-			_graphics->Flip();
+			graphics->ReleaseFlip();
+
+			Repaint();
 		} else if (event.window.event == SDL_WINDOWEVENT_MOVED) {
 			DispatchWidgetEvent(new WidgetEvent(this, JWET_MOVED));
 		} else if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-			// _size.width = event.window.data1;
-			// _size.height = event.window.data2;
-
-			DispatchWidgetEvent(new WidgetEvent(this, JWET_RESIZED));
-		} else if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
 			_size.width = event.window.data1;
 			_size.height = event.window.data2;
 
-			DispatchWidgetEvent(new WidgetEvent(this, JWET_CHANGED));
+			graphics->SetNativeSurface((void *)_surface, _size.width, _size.height);
+			graphics->ReleaseFlip();
+
+			Repaint();
+
+			DispatchWidgetEvent(new WidgetEvent(this, JWET_RESIZED));
 		} else if (event.window.event == SDL_WINDOWEVENT_MINIMIZED) {
 		} else if (event.window.event == SDL_WINDOWEVENT_MAXIMIZED) {
 		} else if (event.window.event == SDL_WINDOWEVENT_RESTORED) {

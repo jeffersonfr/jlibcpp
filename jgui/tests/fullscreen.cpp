@@ -44,11 +44,6 @@ class Fullscreen : public jgui::Widget, public jgui::WidgetListener{
 			_main->RemoveWidgetListener(this);
 		}
 
-		virtual void WidgetChanged(jgui::WidgetEvent *event)
-		{
-			Repaint();
-		}
-
 		virtual bool KeyReleased(jgui::KeyEvent *event)
 		{
 			if (jgui::Widget::KeyReleased(event) == true) {
@@ -93,6 +88,7 @@ int main( int argc, char *argv[] )
 	main->Add(&app);
 	main->SetSize(720, 480);
 	main->SetVisible(true);
+	app.Repaint();
 	main->WaitForExit();
 
 	return 0;

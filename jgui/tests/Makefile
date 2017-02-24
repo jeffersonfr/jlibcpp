@@ -18,17 +18,11 @@ OBJS_teste = \
 OBJS_border = \
 	   border.o\
 
-OBJS_databuffer = \
-	   databuffer.o\
-
 OBJS_ball = \
 	   ball.o\
 
 OBJS_breakout = \
 	   breakout.o\
-
-OBJS_restore = \
-	   restore.o\
 
 OBJS_raycaster_flat = \
 	   raycaster_flat.o\
@@ -159,7 +153,7 @@ OBJS_coloralpha = \
 OBJS_bitmask = \
 		bitmask.o\
 
-all: teste border skull ball breakout restore raycaster_flat raycaster_texture clip custom agenda phone calc mines ants cube swarm mouse watch tank pacman tetris container signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask
+all: teste border ball breakout raycaster_flat skull raycaster_texture clip custom agenda phone calc mines ants swarm cube mouse watch tank pacman tetris container signal layouts stress mhp drawimage drawtypes rotateimage sort stock noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -167,16 +161,10 @@ teste: $(OBJS_teste)
 border: $(OBJS_border)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-databuffer: $(OBJS_databuffer)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-        
 ball: $(OBJS_ball)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 breakout: $(OBJS_breakout)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-        
-restore: $(OBJS_restore)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 raycaster_flat: $(OBJS_raycaster_flat)
@@ -315,4 +303,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste border ball breakout restore clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris container signal stress layouts databuffer mhp drawimage drawtypes rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask
+	@rm -rvf *.o *.xml *~ teste border ball breakout clip custom agenda phone calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris container signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask

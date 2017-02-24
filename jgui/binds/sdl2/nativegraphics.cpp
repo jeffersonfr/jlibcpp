@@ -36,6 +36,7 @@ NativeGraphics::NativeGraphics(NativeHandler *handler, void *surface, cairo_t *c
 	jcommon::Object::SetClassName("jgui::NativeGraphics");
 
 	_handler = handler;
+	_is_first = true;
 }
 
 NativeGraphics::~NativeGraphics()
@@ -51,17 +52,14 @@ void NativeGraphics::SetNativeSurface(void *surface, int wp, int hp)
 	_cairo_context = NULL;
 
 	if (_surface != NULL) {
-		// SDL_Renderer *surface = (SDL_Renderer *)_surface;
-
-		// GetRenderGetLogicalSize(surface, &wp, &hp);
-		// GetRendererOutputSize(surface, &wp, &hp);
-
 		cairo_surface_t *cairo_surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, wp, hp);
 
 		_cairo_context = cairo_create(cairo_surface);
 	
 		// cairo_surface_destroy(cairo_surface);
 	}
+	
+	_is_first = true;
 }
 
 void NativeGraphics::Flip()
@@ -76,9 +74,9 @@ void NativeGraphics::Flip()
 	SDL_PushEvent(&event);
 
 	// CHANGE:: if continues to block exit, change to timed semaphore
-	if (_handler->IsVisible() == true && _handler->IsVerticalSyncEnabled() == true) {
+	if (_handler->IsVisible() == true && _is_first == false) {
 		try {
-			_sem.Wait(2000000);
+			_sem.Wait(1000000);
 		} catch (jthread::SemaphoreException) {
 		} catch (jthread::SemaphoreTimeoutException) {
 		}
@@ -114,9 +112,9 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 	SDL_PushEvent(&event);
 	
 	// CHANGE:: if continues to block exit, change to timed semaphore
-	if (_handler->IsVisible() == true && _handler->IsVerticalSyncEnabled() == true) {
+	if (_handler->IsVisible() == true && _is_first == false) {
 		try {
-			_sem.Wait(2000000);
+			_sem.Wait(1000000);
 		} catch (jthread::SemaphoreException) {
 		} catch (jthread::SemaphoreTimeoutException) {
 		}
@@ -205,9 +203,14 @@ void NativeGraphics::InternalFlip()
 	SDL_FreeSurface(surface);
 	SDL_RenderPresent(renderer);
 
-	if (_handler->IsVisible() == true && _handler->IsVerticalSyncEnabled() == true) {
-		_sem.Notify();
-	}
+	_is_first = false;
+
+	_sem.Notify();
+}
+
+void NativeGraphics::ReleaseFlip()
+{
+	_is_first = true;
 }
 
 }

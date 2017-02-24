@@ -46,6 +46,8 @@ class NativeGraphics : public GenericGraphics{
 		jregion_t _region;
 		/** \brief */
 		bool _has_bounds;
+		/** \brief */
+		bool _is_first;
 
 	public:
 		/**
@@ -83,6 +85,12 @@ class NativeGraphics : public GenericGraphics{
 		 *
 		 */
 		virtual void InternalFlip();
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void ReleaseFlip();
 		
 };
 

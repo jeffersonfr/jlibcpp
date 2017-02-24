@@ -198,8 +198,6 @@ void Application::SetBounds(int x, int y, int width, int height)
 			_size.width == old_size.width && _size.height == old_size.height) {
 		return;
 	}
-
-	// Repaint();
 }
 
 void Application::SetLocation(int x, int y)
@@ -284,8 +282,6 @@ void Application::SetSize(int width, int height)
 
 	_size.width = width;
 	_size.height = height;
-
-	// Repaint();
 }
 
 void Application::Move(int x, int y)
