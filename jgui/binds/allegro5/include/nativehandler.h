@@ -51,6 +51,8 @@ class NativeHandler : public jgui::Application, public jthread::Thread{
 		/** \brief */
 		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 		/** \brief */
+		std::map<int, int> _key_modifiers;
+		/** \brief */
 		std::map<int, int> _mouse_buttons;
 		/** \brief */
 		jthread::Semaphore _init_sem;
@@ -58,6 +60,8 @@ class NativeHandler : public jgui::Application, public jthread::Thread{
 		jthread::Condition _exit_sem;
 		/** \brief */
 		ALLEGRO_DISPLAY *_display;
+		/** \brief */
+		ALLEGRO_MOUSE_CURSOR *_cursor_bitmap;
 		/** \brief */
 		uint64_t _last_keypress;
 		/** \brief */

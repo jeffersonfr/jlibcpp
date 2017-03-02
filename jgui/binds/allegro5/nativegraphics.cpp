@@ -149,33 +149,6 @@ void NativeGraphics::InternalFlip(void *surface)
 		return;
 	}
 
-	/*
-	if (_has_bounds == false) {
-		SDL_Rect dst;
-
-		dst.x = 0;
-		dst.y = 0;
-		dst.w = dw;
-		dst.h = dh;
-
-		SDL_RenderCopy(renderer, texture, NULL, &dst);
-	} else {
-		SDL_Rect src, dst;
-
-		src.x = _region.x;
-		src.y = _region.y;
-		src.w = _region.width;
-		src.h = _region.height;
-
-		dst.x = _region.x;
-		dst.y = _region.y;
-		dst.w = _region.width;
-		dst.h = _region.height;
-
-		SDL_RenderCopy(renderer, texture, &src, &dst);
-	}
-	*/
-
 	_has_bounds = false;
 
 	ALLEGRO_LOCKED_REGION *lock = al_lock_bitmap(_surface, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
@@ -195,6 +168,8 @@ void NativeGraphics::InternalFlip(void *surface)
 	}
 
 	al_unlock_bitmap(_surface);
+	
+	al_clear_to_color(al_map_rgb(0, 0, 0));
 	al_draw_bitmap(_surface, 0, 0, 0);
 	al_flip_display();
 

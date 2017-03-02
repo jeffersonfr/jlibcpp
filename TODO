@@ -2,8 +2,7 @@
 . gethostbyname is obsolescent, use getnameinfo() instead.
 . fix jmenu, jcombobox, keyboard and dialogs to new version of jlibcpp (use dialogs)
 . optimize the japplication::repaint() to avoid not needs locks
-. teste.cpp and calc.cpp are lost focus when the left key is pressed
 . implements the dialog message in tests (mines.cpp, agenda.cpp, phone.cpp, teste.cpp)
 . implements dialogs in jgui
-. sfml2 has paint problems when resize the window
-. mhp.cpp appears unstable
+. mhp.cpp appears unstable with some engines
+. fix allegro5 resize and fullscreen

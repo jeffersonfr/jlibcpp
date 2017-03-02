@@ -105,7 +105,7 @@ class InputEventDispatcher : public jthread::Thread {
 
 };
 
-static jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
+static jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
 {
 	switch (symbol) {
 		case ALLEGRO_KEY_ENTER:
@@ -146,8 +146,8 @@ static jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
 			return JKS_COMMA;
 		case ALLEGRO_KEY_MINUS:
 			return JKS_MINUS_SIGN;
-		// case ALLEGRO_KEY_PERIOD:  
-		// 	return JKS_PERIOD;
+		case ALLEGRO_KEY_FULLSTOP:  
+		 	return JKS_PERIOD;
 		case ALLEGRO_KEY_SLASH:
 			return JKS_SLASH;
 		case ALLEGRO_KEY_0:     
@@ -185,7 +185,7 @@ static jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
 		case ALLEGRO_KEY_AT:
 			return JKS_AT;
 		case ALLEGRO_KEY_A:
-			return JKS_A;
+			return (capital == false)?JKS_a:JKS_A;
 		case ALLEGRO_KEY_B:
 			return JKS_B;
 		case ALLEGRO_KEY_C:
@@ -236,12 +236,12 @@ static jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
 			return JKS_Y;
 		case ALLEGRO_KEY_Z:
 			return JKS_Z;
-		// case ALLEGRO_KEY_LEFTBRACKET:
-		// 	return JKS_SQUARE_BRACKET_LEFT;
+		case ALLEGRO_KEY_OPENBRACE:
+			return JKS_SQUARE_BRACKET_LEFT;
 		case ALLEGRO_KEY_BACKSLASH:   
 			return JKS_BACKSLASH;
-		// case ALLEGRO_KEY_RIGHTBRACKET:
-		// 	return JKS_SQUARE_BRACKET_RIGHT;
+		case ALLEGRO_KEY_CLOSEBRACE:
+			return JKS_SQUARE_BRACKET_RIGHT;
 		// case ALLEGRO_KEY_CARET:
 		// 	return JKS_CIRCUMFLEX_ACCENT;
 		// case ALLEGRO_KEY_UNDERSCORE:    
@@ -330,8 +330,8 @@ static jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
 			return JKS_PAGE_UP;
 		case ALLEGRO_KEY_PGDN:
 			return JKS_PAGE_DOWN;
-		// case ALLEGRO_KEY_PRINT:   
-		// 	return JKS_PRINT;
+		case ALLEGRO_KEY_PRINTSCREEN:   
+			return JKS_PRINT;
 		case ALLEGRO_KEY_PAUSE:
 			return JKS_PAUSE;
 		// case ALLEGRO_KEY_RED:
@@ -400,12 +400,26 @@ NativeHandler::NativeHandler():
 
 	_display = NULL;
 	_graphics = NULL;
+	_cursor_bitmap = NULL;
 	_is_running = false;
 	_is_initialized = false;
 	_mouse_x = 0;
 	_mouse_y = 0;
 	_last_keypress = 0LL;
 	_click_count = 1;
+
+	_key_modifiers[ALLEGRO_KEY_LSHIFT] = false;
+	_key_modifiers[ALLEGRO_KEY_RSHIFT] = false;
+	_key_modifiers[ALLEGRO_KEY_LCTRL] = false;
+	_key_modifiers[ALLEGRO_KEY_RCTRL] = false;
+	_key_modifiers[ALLEGRO_KEY_ALT] = false;
+	_key_modifiers[ALLEGRO_KEY_ALTGR] = false;
+	_key_modifiers[ALLEGRO_KEY_LWIN] = false;
+	_key_modifiers[ALLEGRO_KEY_RWIN] = false;
+	_key_modifiers[ALLEGRO_KEY_MENU] = false;
+	_key_modifiers[ALLEGRO_KEY_SCROLLLOCK] = false;
+	_key_modifiers[ALLEGRO_KEY_NUMLOCK] = false;
+	_key_modifiers[ALLEGRO_KEY_CAPSLOCK] = false;
 
 	InternalInitialize();
 }
@@ -449,7 +463,11 @@ void NativeHandler::InternalRelease()
 {
 	InternalReleaseCursors();
 
-	// SDL_Quit();
+	if (_cursor_bitmap != NULL) {
+		al_destroy_mouse_cursor(_cursor_bitmap);
+	}
+
+	// how quit allegro ?
 	
 	delete _dispatcher;
 	_dispatcher = NULL;
@@ -517,23 +535,25 @@ void NativeHandler::InternalReleaseCursors()
 
 void NativeHandler::MainLoop()
 {
-	_display = al_create_display(_size.width, _size.height);
-
-	if (_display == NULL) {
-		return;
-	}
+	al_set_new_window_position(_location.x, _location.y);
 
 	al_set_new_display_option(ALLEGRO_UPDATE_DISPLAY_REGION, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
 	al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
 
 	if (_is_fullscreen_enabled == false) {
-		al_set_new_display_flags(ALLEGRO_WINDOWED);
+		al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE);
 	} else {
-		al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW | ALLEGRO_RESIZABLE); // | ALLEGRO_GENERATE_EXPOSE_EVENTS);
+		al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW); // | ALLEGRO_GENERATE_EXPOSE_EVENTS);
 	}
 
 	if (_is_undecorated == true) {
 		al_set_new_display_flags(ALLEGRO_NOFRAME);
+	}
+
+	_display = al_create_display(_size.width, _size.height);
+
+	if (_display == NULL) {
+		return;
 	}
 
 	// al_set_new_display_refresh_rate(60);
@@ -571,9 +591,9 @@ void NativeHandler::MainLoop()
 			break;
 		}
 
-		// TODO:: verificar se a espera eh melhor que 
 		// al_get_next_event(queue, &event);
-    al_wait_for_event(queue, &event);
+    // al_wait_for_event(queue, &event);
+		al_wait_for_event_timed(queue, &event, 1);
 
 		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			_is_running = false;
@@ -582,12 +602,7 @@ void NativeHandler::MainLoop()
 		} else {
 			InternalEventHandler(event);
 		}
-
-		// INFO:: expose events
-		// graphics->ReleaseFlip();
-		// Repaint();
-
-		usleep(10000);
+		
 	} while (_is_running == true);
 	
   al_destroy_bitmap(_surface);
@@ -596,6 +611,10 @@ void NativeHandler::MainLoop()
 	_graphics = NULL;
 
 	al_destroy_event_queue(queue);
+
+	al_destroy_display(_display);
+
+	_display = NULL;
 }
 
 void NativeHandler::SetFullScreenEnabled(bool b)
@@ -606,14 +625,7 @@ void NativeHandler::SetFullScreenEnabled(bool b)
 
 	_is_fullscreen_enabled = b;
 	
-	/*
-	SDL_Event event;
-
-	event.type = USER_NATIVE_EVENT_APPLICATION_FULLSCREEN;
-	event.user.data1 = this;
-
-	SDL_PushEvent(&event);
-	*/
+	// _need_destroy = true;
 }
 
 void NativeHandler::WaitForExit()
@@ -628,11 +640,9 @@ void NativeHandler::SetTitle(std::string title)
 {
 	_title = title;
 
-	/*
-	if (_window != NULL) {
-		SDL_SetWindowTitle(_window, _title.c_str());
+	if (_is_visible == true) {
+		// TODO:: 
 	}
-	*/
 }
 
 void NativeHandler::SetOpacity(int i)
@@ -640,7 +650,7 @@ void NativeHandler::SetOpacity(int i)
 	Application::SetOpacity(i);
 
 	if (_is_visible == true) {
-		// SDL_SetWindowOpacity(_window, (float)(i/256.0));
+		// TODO::
 	}
 }
 
@@ -648,15 +658,9 @@ void NativeHandler::SetUndecorated(bool b)
 {
 	_is_undecorated = b;
 
-	/*
 	if (_is_visible == true) {
-		if (_is_undecorated == true) {
-			SDL_SetWindowBordered(_window, SDL_FALSE);
-		} else {
-			SDL_SetWindowBordered(_window, SDL_TRUE);
-		}
+		// _need_destroy;
 	}
-	*/
 }
 
 bool NativeHandler::IsUndecorated()
@@ -679,8 +683,6 @@ void NativeHandler::SetVisible(bool b)
 	_is_visible = b;
 
 	if (_is_visible == true) {
-		// TODO:: create window
-
 		DoLayout();
 		Start();
 
@@ -706,14 +708,8 @@ void NativeHandler::SetBounds(int x, int y, int width, int height)
 		return;
 	}
 
-	/*
-	SDL_Event event;
-
-	event.type = USER_NATIVE_EVENT_APPLICATION_SETBOUNDS;
-	event.user.data1 = this;
-
-	SDL_PushEvent(&event);
-	*/
+	al_set_window_position(_display, _location.x, _location.y);
+	al_resize_display(_display, _size.width, _size.height);
 }
 
 void NativeHandler::SetLocation(int x, int y)
@@ -724,14 +720,7 @@ void NativeHandler::SetLocation(int x, int y)
 		return;
 	}
 
-	/*
-	SDL_Event event;
-
-	event.type = USER_NATIVE_EVENT_APPLICATION_SETLOCATION;
-	event.user.data1 = this;
-
-	SDL_PushEvent(&event);
-	*/
+	al_set_window_position(_display, _location.x, _location.y);
 }
 
 void NativeHandler::SetResizable(bool b)
@@ -741,8 +730,6 @@ void NativeHandler::SetResizable(bool b)
 	if (_is_visible == false) {
 		return;
 	}
-
-	// SDL_SetWindowResizable(_window, _is_resizable);
 }
 
 void NativeHandler::SetSize(int width, int height)
@@ -753,17 +740,7 @@ void NativeHandler::SetSize(int width, int height)
 		return;
 	}
 
-	/*
-	SDL_SetWindowMinimumSize(_window, _minimum_size.width, _minimum_size.height);
-	SDL_SetWindowMaximumSize(_window, _maximum_size.width, _maximum_size.height);
-
-	SDL_Event event;
-
-	event.type = USER_NATIVE_EVENT_APPLICATION_SETSIZE;
-	event.user.data1 = this;
-
-	SDL_PushEvent(&event);
-	*/
+	al_resize_display(_display, width, height);
 }
 
 void NativeHandler::Move(int x, int y)
@@ -774,14 +751,7 @@ void NativeHandler::Move(int x, int y)
 		return;
 	}
 
-	/*
-	SDL_Event event;
-
-	event.type = USER_NATIVE_EVENT_APPLICATION_SETLOCATION;
-	event.user.data1 = this;
-
-	SDL_PushEvent(&event);
-	*/
+	al_set_window_position(_display, _location.x, _location.y);
 }
 
 void NativeHandler::SetCursorLocation(int x, int y)
@@ -794,7 +764,6 @@ void NativeHandler::SetCursorLocation(int x, int y)
 		y = 0;
 	}
 
-	/*
 	if (x > _screen.width) {
 		x = _screen.width;
 	}
@@ -802,14 +771,8 @@ void NativeHandler::SetCursorLocation(int x, int y)
 	if (y > _screen.height) {
 		y = _screen.height;
 	}
-	*/
 
-	// if (_window != NULL) {
-	// 	SDL_WarpMouseInWindow(_window, x, y);
-	// }
-	
-	// SDL_WarpMouseInWindow(NULL, x, y);
-	// SDL_WarpMouseGlobal(x, y);
+	al_set_mouse_xy(_display, x, y);
 }
 
 jpoint_t NativeHandler::GetCursorLocation()
@@ -819,9 +782,8 @@ jpoint_t NativeHandler::GetCursorLocation()
 	p.x = 0;
 	p.y = 0;
 
-	// SDL_GetMouseState(&p.x, &p.y);
-	// SDL_GetGlobalMouseState(&p.x, &p.y);
-
+	al_get_mouse_cursor_position(&p.x, &p.y);
+	
 	return p;
 }
 
@@ -829,7 +791,11 @@ void NativeHandler::SetCursorEnabled(bool b)
 {
 	jgui::Application::SetCursorEnabled(b);
 
-	// SDL_ShowCursor((_is_cursor_enabled == false)?SDL_DISABLE:SDL_ENABLE);
+	if (_is_cursor_enabled == false) {
+		al_hide_mouse_cursor(_display);
+	} else {
+		al_show_mouse_cursor(_display);
+	}
 }
 
 bool NativeHandler::IsCursorEnabled()
@@ -854,7 +820,6 @@ void NativeHandler::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	/*
 	jsize_t t = shape->GetSize();
 	uint32_t *data = NULL;
 
@@ -864,38 +829,32 @@ void NativeHandler::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-	SDL_Surface *surface = NULL;
-	uint32_t rmask = 0x000000ff;
-	uint32_t gmask = 0x0000ff00;
-	uint32_t bmask = 0x00ff0000;
-	uint32_t amask = 0xff000000;
-
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	rmask = 0xff000000;
-	gmask = 0x00ff0000;
-	bmask = 0x0000ff00;
-	amask = 0x000000ff;
-#endif
-
-	surface = SDL_CreateRGBSurfaceFrom(data, t.width, t.height, 32, t.width*4, rmask, gmask, bmask, amask);
-
-	if (surface == NULL) {
-		delete [] data;
-
-		return;
+	if (_cursor_bitmap != NULL) {
+		al_destroy_mouse_cursor(_cursor_bitmap);
 	}
 
-	SDL_Cursor *cursor = SDL_CreateColorCursor(surface, hotx, hoty);
+	ALLEGRO_BITMAP *sprite = al_create_bitmap(t.width, t.height);
+	ALLEGRO_LOCKED_REGION *lock = al_lock_bitmap(sprite, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
 
-	if (cursor != NULL) {
-		SDL_SetCursor(cursor);
-		// SDL_FreeCursor(cursor);
+	int size = t.width*t.height;
+	uint8_t *src = (uint8_t *)data;
+	uint8_t *dst = (uint8_t *)lock->data;
+
+	for (int i=0; i<size; i++) {
+		dst[3] = src[3];
+		dst[2] = src[2];
+		dst[1] = src[1];
+		dst[0] = src[0];
+
+		src = src + 4;
+		dst = dst + 4;
 	}
 
-	SDL_FreeSurface(surface);
+	al_unlock_bitmap(sprite);
 
-	delete [] data;
-	*/
+	_cursor_bitmap = al_create_mouse_cursor(sprite, hotx, hoty);
+
+	al_set_mouse_cursor(_display, _cursor_bitmap);
 }
 
 void NativeHandler::PostEvent(KeyEvent *event)
@@ -937,36 +896,58 @@ void NativeHandler::InternalEventHandler(ALLEGRO_EVENT event)
 
 		DispatchWidgetEvent(new WidgetEvent(this, JWET_LEAVED));
 	} else if (event.type == ALLEGRO_EVENT_DISPLAY_RESIZE) {
+		NativeGraphics *graphics = dynamic_cast<NativeGraphics *>(_graphics);
+
 		al_acknowledge_resize(event.display.source);
 		
-		/* TODO::
-		_size.width = event.window.data1;
-		_size.height = event.window.data2;
+		_size.width = event.display.width;
+		_size.height = event.display.height;
 
-		_graphics->SetNativeSurface((void *)_surface, _size.width, _size.height);
-		_graphics->ReleaseFlip();
-		*/
+		graphics->SetNativeSurface((void *)_surface, _size.width, _size.height);
+		graphics->ReleaseFlip();
 
 		Repaint();
-
-		DispatchWidgetEvent(new WidgetEvent(this, JWET_RESIZED));
+	} else if (event.type == ALLEGRO_EVENT_DISPLAY_EXPOSE) {
+		Repaint();
 	} else if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
 		jkeyevent_type_t type;
 		jkeyevent_modifiers_t mod;
 
 		mod = (jkeyevent_modifiers_t)(0);
 
-		if ((event.keyboard.modifiers & ALLEGRO_KEYMOD_SHIFT) != 0) {
+		switch (event.keyboard.keycode) {
+			case ALLEGRO_KEY_LSHIFT:
+			case ALLEGRO_KEY_RSHIFT:
+			case ALLEGRO_KEY_LCTRL:
+			case ALLEGRO_KEY_RCTRL:
+			case ALLEGRO_KEY_ALT:
+			case ALLEGRO_KEY_ALTGR:
+			case ALLEGRO_KEY_LWIN:
+			case ALLEGRO_KEY_RWIN:
+			case ALLEGRO_KEY_MENU:
+			case ALLEGRO_KEY_SCROLLLOCK:
+			case ALLEGRO_KEY_NUMLOCK:
+			case ALLEGRO_KEY_CAPSLOCK:
+				_key_modifiers[event.keyboard.keycode] = (event.type == ALLEGRO_EVENT_KEY_DOWN)?true:false;
+			default:
+				break;
+		};
+
+		if (_key_modifiers[ALLEGRO_KEY_LSHIFT] == true) {
 			mod = (jkeyevent_modifiers_t)(mod | JKM_SHIFT);
-		} else if ((event.keyboard.modifiers & ALLEGRO_KEYMOD_CTRL) != 0) {
+		} else if (_key_modifiers[ALLEGRO_KEY_RSHIFT] == true) {
+			mod = (jkeyevent_modifiers_t)(mod | JKM_SHIFT);
+		} else if (_key_modifiers[ALLEGRO_KEY_LCTRL] == true) {
 			mod = (jkeyevent_modifiers_t)(mod | JKM_CONTROL);
-		} else if ((event.keyboard.modifiers & ALLEGRO_KEYMOD_ALT) != 0) {
+		} else if (_key_modifiers[ALLEGRO_KEY_RCTRL] == true) {
+			mod = (jkeyevent_modifiers_t)(mod | JKM_CONTROL);
+		} else if (_key_modifiers[ALLEGRO_KEY_ALT] == true) {
 			mod = (jkeyevent_modifiers_t)(mod | JKM_ALT);
-		} else if ((event.keyboard.modifiers & ALLEGRO_KEYMOD_ALTGR) != 0) {
+		} else if (_key_modifiers[ALLEGRO_KEY_ALTGR] == true) {
 			mod = (jkeyevent_modifiers_t)(mod | JKM_ALTGR);
-		} else if ((event.keyboard.modifiers & ALLEGRO_KEYMOD_LWIN) != 0) {
+		} else if (_key_modifiers[ALLEGRO_KEY_LWIN] == true) {
 			mod = (jkeyevent_modifiers_t)(mod | JKM_META);
-		} else if ((event.keyboard.modifiers & ALLEGRO_KEYMOD_RWIN) != 0) {
+		} else if (_key_modifiers[ALLEGRO_KEY_RWIN] == true) {
 			// mod = (jkeyevent_modifiers_t)(mod | JKM_RMETA);
 		}
 
@@ -976,13 +957,18 @@ void NativeHandler::InternalEventHandler(ALLEGRO_EVENT event)
 			type = JKT_PRESSED;
 
 			// TODO:: grab pointer events
+			// al_grab_mouse(_display);
 		} else if (event.type == ALLEGRO_EVENT_KEY_UP) {
 			type = JKT_RELEASED;
 
 			// TODO:: ungrab pointer events
+			// al_ungrab_mouse();
 		}
 
-		jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.keyboard.keycode);
+		int shift = _key_modifiers[ALLEGRO_KEY_LSHIFT] | _key_modifiers[ALLEGRO_KEY_RSHIFT];
+		int capslock = _key_modifiers[ALLEGRO_KEY_CAPSLOCK];
+
+		jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.keyboard.keycode, shift != capslock);
 
 		_dispatcher->PostEvent(new KeyEvent(this, type, mod, KeyEvent::GetCodeFromSymbol(symbol), symbol));
 	} else if (event.type == ALLEGRO_EVENT_MOUSE_AXES || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP || event.type == ALLEGRO_EVENT_MOUSE_WARPED) {

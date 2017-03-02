@@ -367,17 +367,6 @@ class Game2048 : public jgui::Widget {
 			_images.clear();
 		}
 
-		void Render()
-		{
-			RequestFocus();
-
-			_sem.Wait();
-
-			Repaint();
-
-			sleep(2);
-		}
-
 };
 
 int main( int argc, char* argv[] )
@@ -392,8 +381,7 @@ int main( int argc, char* argv[] )
 	main->Add(&app);
 	main->SetSize(app.GetWidth(), app.GetHeight());
 	main->SetVisible(true);
-
-	app.Render();
+	main->WaitForExit();
 
 	return 0;
 }
