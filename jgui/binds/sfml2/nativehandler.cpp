@@ -499,7 +499,7 @@ void NativeHandler::MainLoop()
 			_window->close();
 			_window = NULL;
 
-			int flags = (int)(sf::Style::Titlebar | sf::Style::Close);
+			int flags = (int)(sf::Style::Titlebar | sf::Style::Resize | sf::Style::Close);
 
 			if (_is_undecorated == true) {
 				flags = (int)(0); // sf::Style::None;

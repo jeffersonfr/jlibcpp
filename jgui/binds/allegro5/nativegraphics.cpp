@@ -20,17 +20,27 @@
 #include "Stdafx.h"
 #include "nativegraphics.h"
 #include "nativehandler.h"
+#include "nativetypes.h"
+#include "jsemaphoreexception.h"
+#include "jsemaphoretimeoutexception.h"
+
+#include <allegro5/allegro.h>
+#include <allegro5/events.h>
 
 #define M_2PI	(2*M_PI)
 
 namespace jgui {
 
-NativeGraphics::NativeGraphics(void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp):
+extern ALLEGRO_DISPLAY *_display;
+
+NativeGraphics::NativeGraphics(NativeHandler *handler, void *surface, cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, int hp):
 	GenericGraphics(surface, cairo_context, pixelformat, wp, hp)
 {
 	jcommon::Object::SetClassName("jgui::NativeGraphics");
 
+	_handler = handler;
 	_surface = surface;
+	_is_first = true;
 }
 
 NativeGraphics::~NativeGraphics()
@@ -52,70 +62,74 @@ void NativeGraphics::SetNativeSurface(void *surface, int wp, int hp)
 	
 		// cairo_surface_destroy(cairo_surface);
 	}
-
-	_sprite.setScale((float)_sprite.getLocalBounds().width/wp, (float)_sprite.getLocalBounds().height/hp);
+	
+	_is_first = true;
 }
 
 void NativeGraphics::Flip()
 {
-	if (_surface == NULL) {
-		return;
+	_has_bounds = false;
+
+	_handler->RequestFlip();
+
+	// CHANGE:: if continues to block exit, change to timed semaphore
+	if (_handler->IsVisible() == true && _is_first == false) {
+		try {
+			_sem.Wait(1000000);
+		} catch (jthread::SemaphoreException) {
+		} catch (jthread::SemaphoreTimeoutException) {
+		}
 	}
-
-	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
-	
-	if (cairo_surface == NULL) {
-		return;
-	}
-
-	cairo_surface_flush(cairo_surface);
-
-	int dw = cairo_image_surface_get_width(cairo_surface);
-	int dh = cairo_image_surface_get_height(cairo_surface);
-	// int stride = cairo_image_surface_get_stride(cairo_surface);
-
-	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-	if (data == NULL) {
-		return;
-	}
-
-	sf::Texture texture;
-
-	texture.create(dw, dh);
-	texture.setSmooth(GetAntialias() != JAM_NONE);
-
-	_sprite.setTexture(texture, true);
-
-	int size = dw*dh;
-	uint8_t buffer[size*4];
-	uint8_t *src = data;
-	uint8_t *dst = buffer;
-
-	for (int i=0; i<size; i++) {
-		dst[3] = src[3];
-		dst[2] = src[0];
-		dst[1] = src[1];
-		dst[0] = src[2];
-
-		src = src + 4;
-		dst = dst + 4;
-	}
-
-	texture.update(buffer);
-
-	InternalFlip();
 }
 
 void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 {
+	Flip(); return;
+
 	if (wp <= 0 || hp <= 0) {
 		return;
 	}
 
+	_region.x = xp;
+	_region.y = yp;
+	_region.width = wp;
+	_region.height = hp;
+
+	_has_bounds = true;
+
+	_handler->RequestFlip();
+
+	// CHANGE:: if continues to block exit, change to timed semaphore
+	if (_handler->IsVisible() == true && _is_first == false) {
+		try {
+			_sem.Wait(1000000);
+		} catch (jthread::SemaphoreException) {
+		} catch (jthread::SemaphoreTimeoutException) {
+		}
+	}
+}
+
+void NativeGraphics::InternalFlip(void *surface)
+{
+	ALLEGRO_BITMAP *_surface = (ALLEGRO_BITMAP *)surface;
+
+	/*
+	if (_surface == NULL) {
+		_has_bounds = false;
+
+		_sem.Notify();
+
+		return;
+	}
+	*/
+
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 	
 	if (cairo_surface == NULL) {
+		_has_bounds = false;
+
+		_sem.Notify();
+
 		return;
 	}
 
@@ -128,50 +142,70 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
 	if (data == NULL) {
+		_has_bounds = false;
+
+		_sem.Notify();
+
 		return;
 	}
 
-	sf::Texture texture;
+	/*
+	if (_has_bounds == false) {
+		SDL_Rect dst;
 
-	texture.create(dw, dh);
-	texture.setSmooth(GetAntialias() != JAM_NONE);
+		dst.x = 0;
+		dst.y = 0;
+		dst.w = dw;
+		dst.h = dh;
 
-	_sprite.setTexture(texture, true);
+		SDL_RenderCopy(renderer, texture, NULL, &dst);
+	} else {
+		SDL_Rect src, dst;
+
+		src.x = _region.x;
+		src.y = _region.y;
+		src.w = _region.width;
+		src.h = _region.height;
+
+		dst.x = _region.x;
+		dst.y = _region.y;
+		dst.w = _region.width;
+		dst.h = _region.height;
+
+		SDL_RenderCopy(renderer, texture, &src, &dst);
+	}
+	*/
+
+	_has_bounds = false;
+
+	ALLEGRO_LOCKED_REGION *lock = al_lock_bitmap(_surface, ALLEGRO_PIXEL_FORMAT_ARGB_8888, ALLEGRO_LOCK_WRITEONLY);
 
 	int size = dw*dh;
-	uint8_t buffer[size*4];
 	uint8_t *src = data;
-	uint8_t *dst = buffer;
+	uint8_t *dst = (uint8_t *)lock->data;
 
 	for (int i=0; i<size; i++) {
 		dst[3] = src[3];
-		dst[2] = src[0];
+		dst[2] = src[2];
 		dst[1] = src[1];
-		dst[0] = src[2];
+		dst[0] = src[0];
 
 		src = src + 4;
 		dst = dst + 4;
 	}
 
-	texture.update(buffer);
+	al_unlock_bitmap(_surface);
+	al_draw_bitmap(_surface, 0, 0, 0);
+	al_flip_display();
 
-	InternalFlip();
+	_is_first = false;
+
+	_sem.Notify();
 }
 
-void NativeGraphics::InternalFlip()
+void NativeGraphics::ReleaseFlip()
 {
-	if (_surface == NULL) {
-		return;
-	}
-
-	sf::RenderWindow *window = (sf::RenderWindow *)_surface;
-	
-	window->setActive(true);
-	window->clear();
-	window->draw(_sprite);
-	window->display();
-	window->setActive(false);
+	_is_first = true;
 }
 
 }
-

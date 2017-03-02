@@ -33,6 +33,8 @@
 #include "nativehandler.h"
 #elif defined(GTK3_UI)
 #include "nativehandler.h"
+#elif defined(ALLEGRO5_UI)
+#include "nativehandler.h"
 #endif
 
 #define MIN_WINDOW_SIZE 16
@@ -124,6 +126,8 @@ Application * Application::GetInstance()
 #elif defined(X11_UI)
 			_instance = new NativeHandler();
 #elif defined(GTK3_UI)
+			_instance = new NativeHandler();
+#elif defined(ALLEGRO5_UI)
 			_instance = new NativeHandler();
 #endif
 		} catch (jcommon::NullPointerException &) {

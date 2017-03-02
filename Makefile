@@ -273,6 +273,7 @@ OBJS_jgui += \
 		jcontainerevent.o\
 		jcontainerlistener.o\
 		jcoordinatelayout.o\
+		jdialog.o\
 		jfilechooserdialogbox.o\
 		jflowlayout.o\
 		jfocusevent.o\

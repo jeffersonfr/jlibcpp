@@ -32,6 +32,8 @@
 
 namespace jgui {
 
+class Dialog;
+
 /**
  * \brief
  *
@@ -135,6 +137,24 @@ class Widget : public jgui::Container{
 		 *
 		 */
 		virtual jgui::Image * GetIcon();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void AddDialog(Dialog *dialog);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveDialog(Dialog *dialog);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void RemoveAllDialogs();
 
 		/**
 		 * \brief

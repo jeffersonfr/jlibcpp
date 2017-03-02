@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jwidget.h"
+#include "jdialog.h"
 
 #define SUBTITLE_SIZE		32
 #define SIZE_TO_RESIZE	4
@@ -36,7 +37,6 @@ Widget::Widget(int x, int y, int width, int height):
 	_insets.bottom = 8;
 
 	_is_resizable = true;
-	_is_focusable = true;
 }
 
 Widget::Widget(std::string title, int x, int y, int width, int height):
@@ -55,7 +55,6 @@ Widget::Widget(std::string title, int x, int y, int width, int height):
 	_icon = jgui::Image::CreateImage(_DATA_PREFIX"/images/small-gnu.png");
 	
 	_is_resizable = true;
-	_is_focusable = true;
 }
 
 Widget::~Widget() 
@@ -127,6 +126,27 @@ void Widget::SetIcon(jgui::Image *image)
 jgui::Image * Widget::GetIcon()
 {
 	return _icon;
+}
+
+void Widget::AddDialog(Dialog *dialog)
+{
+	// do
+	
+	Repaint();
+}
+
+void Widget::RemoveDialog(Dialog *dialog)
+{
+	// do
+	
+	Repaint();
+}
+
+void Widget::RemoveAllDialogs()
+{
+	// do
+	
+	Repaint();
 }
 
 void Widget::AddSubtitle(std::string image, std::string label)
