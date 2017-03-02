@@ -61,6 +61,10 @@ class NativeHandler : public jgui::Application, public jthread::Thread{
 		/** \brief */
 		ALLEGRO_DISPLAY *_display;
 		/** \brief */
+		ALLEGRO_BITMAP *_surface;
+		/** \brief */
+		ALLEGRO_EVENT_SOURCE _user_event;
+		/** \brief */
 		ALLEGRO_MOUSE_CURSOR *_cursor_bitmap;
 		/** \brief */
 		uint64_t _last_keypress;

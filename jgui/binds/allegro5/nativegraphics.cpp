@@ -84,8 +84,6 @@ void NativeGraphics::Flip()
 
 void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 {
-	Flip(); return;
-
 	if (wp <= 0 || hp <= 0) {
 		return;
 	}
@@ -157,14 +155,31 @@ void NativeGraphics::InternalFlip(void *surface)
 	uint8_t *src = data;
 	uint8_t *dst = (uint8_t *)lock->data;
 
-	for (int i=0; i<size; i++) {
-		dst[3] = src[3];
-		dst[2] = src[2];
-		dst[1] = src[1];
-		dst[0] = src[0];
+	if (_has_bounds == false) {
+		for (int i=0; i<size; i++) {
+			dst[3] = src[3];
+			dst[2] = src[2];
+			dst[1] = src[1];
+			dst[0] = src[0];
 
-		src = src + 4;
-		dst = dst + 4;
+			src = src + 4;
+			dst = dst + 4;
+		}
+	} else {
+		for (int y=_region.y; y<_region.height; y++) {
+			src = (uint8_t *)data + (y*dw + _region.x)*4;
+			dst = (uint8_t *)lock->data + (y*dw + _region.x)*4;
+
+			for (int x=0; x<_region.width; x++) {
+				dst[3] = src[3];
+				dst[2] = src[2];
+				dst[1] = src[1];
+				dst[0] = src[0];
+
+				src = src + 4;
+				dst = dst + 4;
+			}
+		}
 	}
 
 	al_unlock_bitmap(_surface);

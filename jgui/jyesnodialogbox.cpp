@@ -23,8 +23,8 @@
 
 namespace jgui {
 
-YesNoDialogBox::YesNoDialogBox(std::string title, std::string msg):
-	jgui::Widget(title, -1, -1, -1, -1)
+YesNoDialogBox::YesNoDialogBox(jgui::Application *root, std::string title, std::string msg):
+	jgui::Dialog(root, title)
 {
 	jcommon::Object::SetClassName("jgui::YesNoDialogBox");
 
@@ -94,7 +94,7 @@ void YesNoDialogBox::ActionPerformed(jgui::ActionEvent *event)
 
 	DispatchDataEvent(new jcommon::DataEvent(this, GetParams()));
 
-	// Release();
+	Hide();
 }
 
 }

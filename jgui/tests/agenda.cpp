@@ -32,15 +32,15 @@
 #include "jhourdialogbox.h"
 #include "jwidget.h"
 
-namespace agenda {
-
 class AgendaDB;
+
+jgui::Application *root = NULL;
 
 class Agenda : public jgui::Widget, public jgui::SelectListener, public jcommon::DataListener{
 
 	private:
 		jthread::Mutex agenda_mutex;
-		jgui::Widget *_status;
+		jgui::Dialog *_status;
 		jgui::ListBox *_list;
 		AgendaDB *db;
 		int _state;
@@ -91,10 +91,10 @@ class AgendaDB{
 
 };
 
-class AddMessage : public jgui::Widget, public jcommon::DataListener{
+class AddMessage : public jgui::Dialog, public jcommon::DataListener{
 	private:
 		jthread::Mutex add_mutex;
-		jgui::Widget *_status;
+		jgui::Dialog *_status;
 		jgui::Label *label1,
 			*label3,
 			*label4;
@@ -120,13 +120,13 @@ class AddMessage : public jgui::Widget, public jcommon::DataListener{
 
 };
 
-class ViewMessages : public jgui::Widget, public jcommon::DataListener{
+class ViewMessages : public jgui::Dialog, public jcommon::DataListener{
 
 	private:
 		jthread::Mutex view_mutex;
 
 		AgendaDB *db;
-		jgui::Widget *_status;
+		jgui::Dialog *_status;
 		jgui::Label *label_date,
 			*label_hour,
 			*message;
@@ -155,7 +155,7 @@ Agenda::Agenda():
 	db->Load();
 
 	// _list = new jgui::ListBox(_insets.left, _insets.top, 600);
-	_list = new jgui::ListBox(0, 0, 600);
+	_list = new jgui::ListBox(_insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
 
 	_list->AddTextItem("Check Appointments");
 	_list->AddTextItem("Add Appointments");
@@ -163,13 +163,9 @@ Agenda::Agenda():
 	_list->AddTextItem("Memory Status");
 	_list->RegisterSelectListener(this);
 
-	_list->SetSize(_list->GetPreferredSize());
-
 	Add(_list);
 
 	_list->RequestFocus();
-
-	Pack(true);
 }
 
 Agenda::~Agenda() 
@@ -201,16 +197,16 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 		if (db->IsEmpty() == false) {
 			_status = new ViewMessages(db);
 		} else {
-			_status = new jgui::MessageDialogBox("Warning", "There are no appointments registered !");
+			_status = new jgui::MessageDialogBox(root, "Warning", "There are no appointments registered !");
 		}
 	} else if (event->GetIndex() == 1) {
 		if (db->IsFull() == false) {
 			_status = new AddMessage(db, -1);
 		} else {
-			_status = new jgui::MessageDialogBox("Warning", "There are no space left !");
+			_status = new jgui::MessageDialogBox(root, "Warning", "There are no space left !");
 		}
 	} else if (event->GetIndex() == 2) {
-		jgui::YesNoDialogBox *dialog = new jgui::YesNoDialogBox("Warning", "Remove all records ?");
+		jgui::YesNoDialogBox *dialog = new jgui::YesNoDialogBox(root, "Warning", "Remove all records ?");
 
 		dialog->GetParams()->SetTextParam("id", "remove-all");
 		dialog->RegisterDataListener(this);
@@ -221,11 +217,12 @@ void Agenda::ItemSelected(jgui::SelectEvent *event)
 
 		sprintf(tmp, "Used records: %d/%d", db->GetSize(), db->GetCapacity());
 
-		_status = new jgui::MessageDialogBox("Memory status", tmp);
+		_status = new jgui::MessageDialogBox(root, "Memory status", tmp);
 	}
 	
 	if (_status != NULL) {
-		_status->SetVisible(true);
+		printf(":: MEG:: %d, %d, %d, %d\n", _status->GetX(), _status->GetY(), _status->GetWidth(), _status->GetHeight());
+		_status->Show();
 	}
 }
 
@@ -497,7 +494,7 @@ void AgendaDB::RemoveAll()
 }
 
 AddMessage::AddMessage(AgendaDB *base, int index):
-	jgui::Widget("Add Appointment", 32, 32)
+	jgui::Dialog(root, "Add Appointment", 0, 0, 720, 480)
 {
 	int height = DEFAULT_COMPONENT_HEIGHT+4;
 
@@ -568,8 +565,6 @@ AddMessage::AddMessage(AgendaDB *base, int index):
 
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Add");
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/vertical_arrows.png", "Select");
-
-	Pack(true);
 }
 
 AddMessage::~AddMessage() 
@@ -589,7 +584,6 @@ AddMessage::~AddMessage()
 
 bool AddMessage::KeyPressed(jgui::KeyEvent *event)
 {
-	puts("EVENT 01");
 	if (jgui::Widget::KeyPressed(event) == true) {
 		return true;
 	}
@@ -603,14 +597,14 @@ bool AddMessage::KeyPressed(jgui::KeyEvent *event)
 
 	if (event->GetSymbol() == jgui::JKS_ENTER) {
 		if (GetFocusOwner() == hour) {
-			jgui::HourDialogBox *dialog = new jgui::HourDialogBox("Future", 12, 0, 0);
+			jgui::HourDialogBox *dialog = new jgui::HourDialogBox(root, "Future", 12, 0, 0);
 
 			dialog->GetParams()->SetTextParam("id", "hour");
 			dialog->RegisterDataListener(this);
 
 			_status = dialog;
 		} else if (GetFocusOwner() == date) {
-			jgui::CalendarDialogBox *dialog = new jgui::CalendarDialogBox;
+			jgui::CalendarDialogBox *dialog = new jgui::CalendarDialogBox(root);
 
 			for (int i=0; i<db->GetSize(); i++) {
 				AgendaDB::agenda_t *t = db->Get(i);
@@ -666,7 +660,7 @@ void AddMessage::DataChanged(jcommon::ParamMapper *params)
 }
 
 ViewMessages::ViewMessages(AgendaDB *base):
-		jgui::Widget("Appointments", 32, 32)
+		jgui::Dialog(root, "Appointments", 0, 0, 720, 480)
 {
 	int dheight = 40;
 	int sheight = 50;
@@ -701,8 +695,6 @@ ViewMessages::ViewMessages(AgendaDB *base):
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/blue_icon.png", "Remove");
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/yellow_icon.png", "Edit");
 	AddSubtitle(jcommon::System::GetResourceDirectory() + "/images/horizontal_arrows.png", "List");
-
-	Pack(true);
 }
 
 ViewMessages::~ViewMessages() 
@@ -744,7 +736,6 @@ void ViewMessages::Update()
 
 bool ViewMessages::KeyPressed(jgui::KeyEvent *event)
 {
-	puts("EVENT 02");
 	if (jgui::Widget::KeyPressed(event) == true) {
 		return true;
 	}
@@ -774,7 +765,7 @@ bool ViewMessages::KeyPressed(jgui::KeyEvent *event)
 		Update();
 	} else if (event->GetSymbol() == jgui::JKS_F4 || event->GetSymbol() == jgui::JKS_BLUE) {
 		if (db->GetSize() > 0) {
-			jgui::YesNoDialogBox *dialog = new jgui::YesNoDialogBox("Warning", "Remove this record ?");
+			jgui::YesNoDialogBox *dialog = new jgui::YesNoDialogBox(root, "Warning", "Remove this record ?");
 
 			dialog->GetParams()->SetTextParam("id", "remove");
 			dialog->RegisterDataListener(this);
@@ -811,19 +802,17 @@ void ViewMessages::DataChanged(jcommon::ParamMapper *params)
 	}
 }
 
-}
-
 int main()
 {
-	jgui::Application *main = jgui::Application::GetInstance();
+	root = jgui::Application::GetInstance();
 
-	agenda::Agenda app;
+	Agenda app;
 
-	main->SetTitle("Agenda");
-	main->Add(&app);
-	main->SetSize(app.GetWidth(), app.GetHeight());
-	main->SetVisible(true);
-	main->WaitForExit();
+	root->SetTitle("Agenda");
+	root->Add(&app);
+	root->SetSize(app.GetWidth(), app.GetHeight());
+	root->SetVisible(true);
+	root->WaitForExit();
 
 	return 0;
 }

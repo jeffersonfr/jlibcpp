@@ -30,6 +30,8 @@
 
 namespace jgui {
 
+class Application;
+
 /**
  * \brief
  *
@@ -39,20 +41,20 @@ class Dialog : public jgui::Widget{
 
 	protected:
 		/** \brief */
-		Widget *_root;
+		Application *_root;
 
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		Dialog(Widget *root, int x = 0, int y = 0, int width = -1, int height = -1);
+		Dialog(Application *root, int x = 0, int y = 0, int width = -1, int height = -1);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		Dialog(Widget *root, std::string title, int x = 0, int y = 0, int width = -1, int height = -1);
+		Dialog(Application *root, std::string title, int x = 0, int y = 0, int width = -1, int height = -1);
 		
 		/**
 		 * \brief

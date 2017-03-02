@@ -24,7 +24,7 @@
 #include "jactionlistener.h"
 #include "jlabel.h"
 #include "jtextfield.h"
-#include "jwidget.h"
+#include "jdialog.h"
 
 #include <string>
 #include <iostream>
@@ -39,7 +39,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class InputDialogBox : public jgui::Widget, public jgui::ActionListener{
+class InputDialogBox : public jgui::Dialog, public jgui::ActionListener{
 
 	private:
 		/** \brief */
@@ -56,7 +56,7 @@ class InputDialogBox : public jgui::Widget, public jgui::ActionListener{
 		 * \brief
 		 *
 		 */
-		InputDialogBox(std::string title, std::string warn);
+		InputDialogBox(jgui::Application *root, std::string title, std::string warn);
 		
 		/**
 		 * \brief

@@ -20,13 +20,13 @@
 #ifndef J_CALENDARDIALOG_H
 #define J_CALENDARDIALOG_H
 
+#include "jdialog.h"
 #include "jbutton.h"
 #include "jcalendarlistener.h"
 #include "jspin.h"
 #include "jselectlistener.h"
 #include "jactionlistener.h"
 #include "jlabel.h"
-#include "jwidget.h"
 #include "jthread.h"
 #include "jmutex.h"
 #include "jdate.h"
@@ -55,7 +55,7 @@ struct jcalendar_warnning_t {
  *
  * \author Jeff Ferr
  */
-class CalendarDialogBox : public jgui::Widget, public jgui::ActionListener, public jgui::SelectListener{
+class CalendarDialogBox : public jgui::Dialog, public jgui::ActionListener, public jgui::SelectListener{
 
 	private:
 		/** \brief */
@@ -137,7 +137,7 @@ class CalendarDialogBox : public jgui::Widget, public jgui::ActionListener, publ
 		 * \brief
 		 *
 		 */
-		CalendarDialogBox();
+		CalendarDialogBox(jgui::Application *root);
 		
 		/**
 		 * \brief
@@ -211,36 +211,6 @@ class CalendarDialogBox : public jgui::Widget, public jgui::ActionListener, publ
 		 */
 		virtual void ItemChanged(SelectEvent *event);
 		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool KeyPressed(KeyEvent *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MousePressed(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseReleased(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseMoved(MouseEvent *event);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool MouseWheel(MouseEvent *event);
-
 };
 
 }

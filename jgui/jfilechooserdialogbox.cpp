@@ -35,8 +35,8 @@ struct ascending_sort {
 	}
 };
 
-FileChooserDialogBox::FileChooserDialogBox(std::string title, std::string directory, jfilechooser_type_t type):
-	jgui::Widget(title, 0, 0, 1000, 600)
+FileChooserDialogBox::FileChooserDialogBox(jgui::Application *root, std::string title, std::string directory, jfilechooser_type_t type):
+	jgui::Dialog(root, title, 0, 0, 720, 480)
 {
 	jcommon::Object::SetClassName("jgui::FileChooserDialogBox");
 
@@ -324,7 +324,7 @@ void FileChooserDialogBox::ItemSelected(jgui::SelectEvent *event)
 		} else { 
 			// INFO:: Selecionar um arquivo
 			if (_type == JFCT_OPEN_FILE_DIALOG) {
-				// Release();
+				Hide();
 			} else {
 				_file->SetText(selectedItem);
 		

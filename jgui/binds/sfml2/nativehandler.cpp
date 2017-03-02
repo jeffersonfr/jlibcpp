@@ -468,14 +468,14 @@ void NativeHandler::MainLoop()
 
 	_is_running = true;
 
-	_init_sem.Notify();
-
 	int ox, oy;
 
 	ox = _size.width;
 	oy = _size.height;
 
 	_window->setActive(false);
+
+	_init_sem.Notify();
 
 	while (_window->isOpen() == true) {
 		if (_is_running == false) {

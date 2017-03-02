@@ -20,10 +20,10 @@
 #ifndef J_YESNODIALOGBOX_H
 #define J_YESNODIALOGBOX_H
 
+#include "jdialog.h"
 #include "jbutton.h"
 #include "jactionlistener.h"
 #include "jlabel.h"
-#include "jwidget.h"
 #include "jthread.h"
 #include "jmutex.h"
 #include "jdate.h"
@@ -41,7 +41,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class YesNoDialogBox : public jgui::Widget, public jgui::ActionListener{
+class YesNoDialogBox : public jgui::Dialog, public jgui::ActionListener{
 
 	private:
 		/** \brief */
@@ -56,7 +56,7 @@ class YesNoDialogBox : public jgui::Widget, public jgui::ActionListener{
 		 * \brief
 		 *
 		 */
-		YesNoDialogBox(std::string title, std::string msg);
+		YesNoDialogBox(jgui::Application *root, std::string title, std::string msg);
 		
 		/**
 		 * \brief

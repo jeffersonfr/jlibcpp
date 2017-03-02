@@ -139,7 +139,7 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 	_sprite.setTexture(texture, true);
 
 	int size = dw*dh;
-	uint8_t buffer[size*4];
+	uint8_t *buffer = new uint8_t[size*4];
 	uint8_t *src = data;
 	uint8_t *dst = buffer;
 
@@ -156,6 +156,8 @@ void NativeGraphics::Flip(int xp, int yp, int wp, int hp)
 	texture.update(buffer);
 
 	InternalFlip();
+
+	delete [] buffer;
 }
 
 void NativeGraphics::InternalFlip()

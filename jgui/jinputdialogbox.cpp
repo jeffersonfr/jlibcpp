@@ -23,8 +23,8 @@
 
 namespace jgui {
 
-InputDialogBox::InputDialogBox(std::string title, std::string msg):
-	jgui::Widget(title, -1, -1, -1, -1)
+InputDialogBox::InputDialogBox(jgui::Application *root, std::string title, std::string msg):
+	jgui::Dialog(root, title)
 {
 	jcommon::Object::SetClassName("jgui::InputDialogBox");
 
@@ -103,7 +103,7 @@ void InputDialogBox::ActionPerformed(jgui::ButtonEvent *event)
 
 	DispatchDataEvent(new jcommon::DataEvent(this, GetParams()));
 
-	// Release();
+	Hide();
 }
 
 }

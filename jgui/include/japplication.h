@@ -60,6 +60,7 @@ enum jcursor_style_t {
 };
 
 class Graphics;
+class Dialog;
 
 /**
  * \brief
@@ -68,6 +69,8 @@ class Graphics;
  */
 class Application : public jgui::Widget, public jgui::ThemeListener{
 
+	friend class Dialog;
+
 	private:
 		static Application *_instance;
 
@@ -75,11 +78,15 @@ class Application : public jgui::Widget, public jgui::ThemeListener{
 		/** \brief */
 		std::vector<jgui::KeyListener *> _key_listeners;
 		/** \brief */
-		std::vector<jgui::MouseListener *> _mouse_listeners;
-		/** \brief */
 		jthread::Mutex _key_listener_mutex;
 		/** \brief */
+		std::vector<jgui::MouseListener *> _mouse_listeners;
+		/** \brief */
 		jthread::Mutex _mouse_listener_mutex;
+		/** \brief */
+		std::vector<jgui::Dialog *> _dialogs;
+		/** \brief */
+		jthread::Mutex _dialog_mutex;
 		/** \brief */
 		jthread::Mutex _paint_mutex;
 		/** \brief */
@@ -116,6 +123,25 @@ class Application : public jgui::Widget, public jgui::ThemeListener{
 		 */
 		Application(int x = 0, int y = 0, int width = 0, int height = 0);
 		
+	private:
+		/**
+		 * \brief
+		 *
+		 */
+		void InternalAddDialog(jgui::Dialog *dialog);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void InternalRemoveDialog(jgui::Dialog *dialog);
+
+		/**
+		 * \brief
+		 *
+		 */
+		void InternalPaintDialogs(jgui::Graphics *g);
+
 	public:
 		/**
 		 * \brief

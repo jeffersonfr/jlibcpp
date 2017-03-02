@@ -20,6 +20,7 @@
 #ifndef J_TEXTDIALOGBOX_H
 #define J_TEXTDIALOGBOX_H
 
+#include "jdialog.h"
 #include "jbutton.h"
 #include "jlabel.h"
 #include "jwidget.h"
@@ -35,7 +36,7 @@
 
 namespace jgui {
 
-class TextDialogBox : public jgui::Widget{
+class TextDialogBox : public jgui::Dialog{
 
 	private:
 		/** \brief */
@@ -46,7 +47,7 @@ class TextDialogBox : public jgui::Widget{
 		 * \brief
 		 *
 		 */
-		TextDialogBox(std::string msg, bool wrap = false);
+		TextDialogBox(jgui::Application *root, std::string msg, bool wrap = false);
 		
 		/**
 		 * \brief

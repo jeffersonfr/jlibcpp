@@ -19,36 +19,51 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "jdialog.h"
+#include "japplication.h"
+#include "jnullpointerexception.h"
 
 #define SUBTITLE_SIZE		32
 #define SIZE_TO_RESIZE	4
 
 namespace jgui {
 
-Dialog::Dialog(Widget *root, int x, int y, int width, int height):
+Dialog::Dialog(jgui::Application *root, int x, int y, int width, int height):
  	jgui::Widget(x, y, width, height)
 {
+	if (root == NULL) {
+		throw jcommon::NullPointerException("Dialog needs a valid pointer to the root widget");
+	}
+
 	_root = root;
 }
 
-Dialog::Dialog(Widget *root, std::string title, int x, int y, int width, int height):
+Dialog::Dialog(jgui::Application *root, std::string title, int x, int y, int width, int height):
  	jgui::Widget(title, x, y, width, height)
 {
+	if (root == NULL) {
+		throw jcommon::NullPointerException("Dialog needs a valid pointer to the root widget");
+	}
+
 	_root = root;
 }
 
 Dialog::~Dialog() 
 {
+	Hide();
 }
 
 void Dialog::Show()
 {
-	_root->AddDialog(this);
+	_root->InternalAddDialog(this);
+
+	_root->Repaint();
 }
 
 void Dialog::Hide()
 {
-	_root->RemoveDialog(this);
+	_root->InternalRemoveDialog(this);
+
+	_root->Repaint();
 }
 
 }

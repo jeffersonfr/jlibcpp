@@ -24,8 +24,8 @@
 
 namespace jgui {
 
-CalendarDialogBox::CalendarDialogBox():
-	jgui::Widget("Calendar", 0, 0, 0, 0)
+CalendarDialogBox::CalendarDialogBox(jgui::Application *root):
+	jgui::Dialog(root, "Calendar")
 {
 	jcommon::Object::SetClassName("jgui::CalendarDialogBox");
 
@@ -338,57 +338,6 @@ void CalendarDialogBox::BuildCalendar()
 	}
 
 	Repaint();
-}
-
-bool CalendarDialogBox::KeyPressed(KeyEvent *event)
-{
-	if (Widget::KeyPressed(event) == true) {
-		return true;
-	}
-
-	if (event->GetSymbol() == JKS_BLUE || event->GetSymbol() == JKS_F4) {
-		// Release();
-
-		return true;
-	}
-
-	return false;
-}
-
-bool CalendarDialogBox::MousePressed(MouseEvent *event)
-{
-	if (Widget::MousePressed(event) == true) {
-		return true;
-	}
-
-	return false;
-}
-
-bool CalendarDialogBox::MouseReleased(MouseEvent *event)
-{
-	if (Widget::MouseReleased(event) == true) {
-		return true;
-	}
-
-	return false;
-}
-
-bool CalendarDialogBox::MouseMoved(MouseEvent *event)
-{
-	if (Widget::MouseMoved(event) == true) {
-		return true;
-	}
-
-	return false;
-}
-
-bool CalendarDialogBox::MouseWheel(MouseEvent *event)
-{
-	if (Widget::MouseWheel(event) == true) {
-		return true;
-	}
-
-	return false;
 }
 
 void CalendarDialogBox::ActionPerformed(jgui::ActionEvent *event)

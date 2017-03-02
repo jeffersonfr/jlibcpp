@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-TextDialogBox::TextDialogBox(std::string msg, bool wrap):
-	jgui::Widget("", -1, -1, -1, -1)
+TextDialogBox::TextDialogBox(jgui::Application *root, std::string msg, bool wrap):
+	jgui::Dialog(root, "")
 {
 	jcommon::Object::SetClassName("jgui::TextDialogBox");
 

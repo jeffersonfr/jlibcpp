@@ -32,10 +32,6 @@
 
 namespace jgui {
 
-ALLEGRO_DISPLAY *_display = NULL;
-ALLEGRO_BITMAP *_surface;
-ALLEGRO_EVENT_SOURCE _user_event;
-
 class InputEventDispatcher : public jthread::Thread {
 
 	private:
@@ -399,6 +395,7 @@ NativeHandler::NativeHandler():
 	jcommon::Object::SetClassName("jgui::NativeHandler");
 
 	_display = NULL;
+	_surface = NULL;
 	_graphics = NULL;
 	_cursor_bitmap = NULL;
 	_is_running = false;
@@ -467,7 +464,8 @@ void NativeHandler::InternalRelease()
 		al_destroy_mouse_cursor(_cursor_bitmap);
 	}
 
-	// how quit allegro ?
+	al_uninstall_keyboard();
+	al_uninstall_mouse();
 	
 	delete _dispatcher;
 	_dispatcher = NULL;
@@ -591,9 +589,9 @@ void NativeHandler::MainLoop()
 			break;
 		}
 
-		// al_get_next_event(queue, &event);
     // al_wait_for_event(queue, &event);
 		al_wait_for_event_timed(queue, &event, 1);
+		// al_get_next_event(queue, &event);
 
 		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
 			_is_running = false;
@@ -602,7 +600,8 @@ void NativeHandler::MainLoop()
 		} else {
 			InternalEventHandler(event);
 		}
-		
+
+		// usleep(10000);
 	} while (_is_running == true);
 	
   al_destroy_bitmap(_surface);
@@ -955,14 +954,8 @@ void NativeHandler::InternalEventHandler(ALLEGRO_EVENT event)
 
 		if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
 			type = JKT_PRESSED;
-
-			// TODO:: grab pointer events
-			// al_grab_mouse(_display);
 		} else if (event.type == ALLEGRO_EVENT_KEY_UP) {
 			type = JKT_RELEASED;
-
-			// TODO:: ungrab pointer events
-			// al_ungrab_mouse();
 		}
 
 		int shift = _key_modifiers[ALLEGRO_KEY_LSHIFT] | _key_modifiers[ALLEGRO_KEY_RSHIFT];

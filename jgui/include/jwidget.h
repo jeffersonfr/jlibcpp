@@ -32,8 +32,6 @@
 
 namespace jgui {
 
-class Dialog;
-
 /**
  * \brief
  *
@@ -53,7 +51,7 @@ class Widget : public jgui::Container{
 
 	protected:
 		/** \brief */
-		std::vector<WidgetListener *> _widget_listeners;
+		std::vector<jgui::WidgetListener *> _widget_listeners;
 		/** \brief */
 		jthread::Mutex _widget_listener_mutex;
 		/** \brief */
@@ -137,24 +135,6 @@ class Widget : public jgui::Container{
 		 *
 		 */
 		virtual jgui::Image * GetIcon();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void AddDialog(Dialog *dialog);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveDialog(Dialog *dialog);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void RemoveAllDialogs();
 
 		/**
 		 * \brief

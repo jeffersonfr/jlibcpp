@@ -22,8 +22,8 @@
 
 namespace jgui {
 
-MessageDialogBox::MessageDialogBox(std::string title, std::string msg):
-	jgui::Widget(title, -1, -1, -1, -1)
+MessageDialogBox::MessageDialogBox(jgui::Application *root, std::string title, std::string msg):
+	jgui::Dialog(root, title, 100, 100, 400, 200)
 {
 	jcommon::Object::SetClassName("jgui::MessageDialogBox");
 
@@ -47,8 +47,6 @@ MessageDialogBox::MessageDialogBox(std::string title, std::string msg):
 	Add(_ok);
 
 	_ok->RequestFocus();
-
-	Pack(true);
 }
 
 MessageDialogBox::~MessageDialogBox() 
@@ -83,7 +81,7 @@ void MessageDialogBox::ActionPerformed(jgui::ActionEvent *event)
 {
 	jthread::AutoLock lock(&_message_mutex);
 
-	// Release();
+	Hide();
 }
 
 }

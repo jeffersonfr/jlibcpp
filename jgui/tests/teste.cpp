@@ -47,6 +47,8 @@
 #include "jthememanager.h"
 #include "jpath.h"
 
+jgui::Application *root = NULL;
+
 class WindowTest : public jgui::Widget, public jgui::ActionListener, public jgui::SelectListener, public jgui::ToggleListener{
 
 	private:
@@ -1459,13 +1461,13 @@ class ModulesTest : public jgui::Widget, public jgui::ActionListener, public jgu
 			_internet_kb->RegisterWidgetListener(this);
 			*/
 
-			_calendar = new jgui::CalendarDialogBox();
+			_calendar = new jgui::CalendarDialogBox(root);
 
 			_calendar->AddWarnning(&_theme1, 10, 4, 2015);
 			// _calendar->RegisterWidgetListener(this);
 
-			_message_1 = new jgui::MessageDialogBox("Warning", "Testing the component of message with some text and breaks of line.\nThis is a new line using manual break-line character. The lines also can break in case of the width of this component be minor than the width of the current text line.");
-			_message_2 = new jgui::MessageDialogBox("Warning ", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
+			_message_1 = new jgui::MessageDialogBox(root, "Warning", "Testing the component of message with some text and breaks of line.\nThis is a new line using manual break-line character. The lines also can break in case of the width of this component be minor than the width of the current text line.");
+			_message_2 = new jgui::MessageDialogBox(root, "Warning ", "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.");
 
 			// _message_1->RegisterWidgetListener(this);
 			// _message_2->RegisterWidgetListener(this);
@@ -1630,7 +1632,7 @@ class ModulesTest : public jgui::Widget, public jgui::ActionListener, public jgu
 			} else if (event->GetSource() == _button4) {
 				main->Add(_message_1);
 			} else if (event->GetSource() == _button5) {
-				main->Add(new jgui::YesNoDialogBox("Question", "This is the best of all the graphic engines of the world ?"));
+				main->Add(new jgui::YesNoDialogBox(root, "Question", "This is the best of all the graphic engines of the world ?"));
 			} else if (event->GetSource() == _button6) {
 				main->Add(_primitives);
 			} else if (event->GetSource() == _button7) {
@@ -1664,14 +1666,14 @@ class ModulesTest : public jgui::Widget, public jgui::ActionListener, public jgu
 
 int main( int argc, char *argv[] )
 {
-	jgui::Application *main = jgui::Application::GetInstance();
+	root = jgui::Application::GetInstance();
 
 	ModulesTest app;
 
-	main->Add(&app);
-	main->SetSize(app.GetWidth(), app.GetHeight());
-	main->SetVisible(true);
-	main->WaitForExit();
+	root->Add(&app);
+	root->SetSize(app.GetWidth(), app.GetHeight());
+	root->SetVisible(true);
+	root->WaitForExit();
 
 	return 0;
 }

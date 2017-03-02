@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include "Stdafx.h"
 #include "japplication.h"
+#include "jdialog.h"
 #include "jthememanager.h"
 #include "jsemaphore.h"
 #include "jnullpointerexception.h"
@@ -135,6 +136,98 @@ Application * Application::GetInstance()
 	}
 
 	return _instance;
+}
+
+void Application::InternalAddDialog(jgui::Dialog *dialog)
+{
+	if (dialog == NULL) {
+		return;
+	}
+
+	jthread::AutoLock lock(&_dialog_mutex);
+
+	_dialogs.push_back(dialog);
+}
+
+void Application::InternalRemoveDialog(jgui::Dialog *dialog)
+{
+	if (dialog == NULL) {
+		return;
+	}
+
+	jthread::AutoLock lock(&_dialog_mutex);
+
+	std::vector<jgui::Dialog *>::iterator i = std::find(_dialogs.begin(), _dialogs.end(), dialog);
+
+	if (i != _dialogs.end()) {
+		_dialogs.erase(i);
+	}
+}
+
+void Application::InternalPaintDialogs(jgui::Graphics *g)
+{
+	jthread::AutoLock lock(&_dialog_mutex);
+
+	jpoint_t scroll_location = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	jregion_t clip = g->GetClip();
+
+	for (std::vector<jgui::Dialog*>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+		Component *c = (*i);
+
+		if (c->IsVisible() == true && c->IsValid() == false) {
+			// TODO:: considerar o scroll de um component
+			int cx = c->GetX()-scrollx,
+					cy = c->GetY()-scrolly,
+					cw = c->GetWidth(),
+					ch = c->GetHeight();
+			bool flag = (dynamic_cast<jgui::Container *>(c) != NULL);
+
+			if (cw > 0 && ch > 0) {
+				g->Translate(cx, cy);
+				g->ClipRect(0, 0, cw-1, ch-1);
+	
+				if (flag == false && c->IsBackgroundVisible() == true) {
+					g->Reset(); 
+					c->PaintBackground(g);
+				}
+
+				g->Reset(); 
+				c->Paint(g);
+				
+				if (flag == false && c->IsScrollVisible() == true) {
+					g->Reset(); 
+					c->PaintScrollbars(g);
+				}
+
+				if (flag == false) {
+					g->Reset(); 
+					c->PaintBorders(g);
+				}
+				
+				g->Translate(-cx, -cy);
+				g->SetClip(clip.x, clip.y, clip.width, clip.height);
+			}
+
+			c->Revalidate();
+		}
+	}
+				
+	g->SetClip(clip.x, clip.y, clip.width, clip.height);
+
+	if (IsScrollVisible() == true) {
+		g->Reset(); 
+		PaintScrollbars(g);
+	}
+
+	g->Reset(); 
+	PaintBorders(g);
+
+	g->Reset(); 
+	PaintGlassPane(g);
+
+	Revalidate();
 }
 
 void Application::WaitForExit()
@@ -484,12 +577,14 @@ void Application::PaintGlassPane(Graphics *g)
 	*/
 }
 
-void Application::Paint(Graphics *g)
+void Application::Paint(jgui::Graphics *g)
 {
 	// CHANGE:: clear suface before paint (directfb-cairo)
 	g->Clear();
 
 	Container::Paint(g);
+	
+	InternalPaintDialogs(g);
 }
 
 jwidget_rotation_t Application::GetRotation()
@@ -536,6 +631,12 @@ bool Application::KeyPressed(KeyEvent *event)
 		}
 	} 
 
+	for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+		if ((*i)->KeyPressed(event) == true) {
+			return true;
+		}
+	}
+
 	std::vector<Component *> components = GetComponents();
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
@@ -551,6 +652,12 @@ bool Application::KeyReleased(KeyEvent *event)
 {
 	if (Container::KeyReleased(event) == true) {
 		return true;
+	}
+
+	for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+		if ((*i)->KeyReleased(event) == true) {
+			return true;
+		}
 	}
 
 	std::vector<Component *> components = GetComponents();
@@ -570,6 +677,12 @@ bool Application::KeyTyped(KeyEvent *event)
 		return true;
 	}
 
+	for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+		if ((*i)->KeyTyped(event) == true) {
+			return true;
+		}
+	}
+
 	std::vector<Component *> components = GetComponents();
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
@@ -583,6 +696,12 @@ bool Application::KeyTyped(KeyEvent *event)
 
 bool Application::MousePressed(MouseEvent *event)
 {
+	for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+		if ((*i)->MousePressed(event) == true) {
+			return true;
+		}
+	}
+
 	std::vector<Component *> components = GetComponents();
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
@@ -596,6 +715,12 @@ bool Application::MousePressed(MouseEvent *event)
 
 bool Application::MouseReleased(MouseEvent *event)
 {
+	for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+		if ((*i)->MouseReleased(event) == true) {
+			return true;
+		}
+	}
+
 	std::vector<Component *> components = GetComponents();
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
@@ -609,6 +734,12 @@ bool Application::MouseReleased(MouseEvent *event)
 
 bool Application::MouseMoved(MouseEvent *event)
 {
+	for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+		if ((*i)->MouseMoved(event) == true) {
+			return true;
+		}
+	}
+
 	std::vector<Component *> components = GetComponents();
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
@@ -644,6 +775,12 @@ bool Application::MouseMoved(MouseEvent *event)
 
 bool Application::MouseWheel(MouseEvent *event)
 {
+	for (std::vector<Dialog *>::iterator i=_dialogs.begin(); i!=_dialogs.end(); i++) {
+		if ((*i)->MouseWheel(event) == true) {
+			return true;
+		}
+	}
+
 	std::vector<Component *> components = GetComponents();
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {

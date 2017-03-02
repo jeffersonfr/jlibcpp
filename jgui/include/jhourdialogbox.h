@@ -21,7 +21,7 @@
 #define J_HOURDIALOGBOX_H
 
 #include "jspin.h"
-#include "jwidget.h"
+#include "jdialog.h"
 
 #include <string>
 #include <iostream>
@@ -36,7 +36,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class HourDialogBox : public jgui::Widget, public jgui::SelectListener{
+class HourDialogBox : public jgui::Dialog, public jgui::SelectListener{
 
 	private:
 		/** \brief */
@@ -51,7 +51,7 @@ class HourDialogBox : public jgui::Widget, public jgui::SelectListener{
 		 * \brief
 		 *
 		 */
-		HourDialogBox(std::string title, int hour, int minute, int seconds);
+		HourDialogBox(jgui::Application *root, std::string title, int hour, int minute, int seconds);
 		
 		/**
 		 * \brief

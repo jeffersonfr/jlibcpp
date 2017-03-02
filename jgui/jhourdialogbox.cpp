@@ -23,8 +23,8 @@
 
 namespace jgui {
 
-HourDialogBox::HourDialogBox(std::string title, int hour, int minute, int second):
-	jgui::Widget(title, 0, 0, 1000, 600)
+HourDialogBox::HourDialogBox(jgui::Application *root, std::string title, int hour, int minute, int second):
+	jgui::Dialog(root, title, 0, 0, 720, 480)
 {
 	jcommon::Object::SetClassName("jgui::HourDialogBox");
 

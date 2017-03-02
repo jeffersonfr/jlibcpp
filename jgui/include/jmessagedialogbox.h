@@ -23,7 +23,7 @@
 #include "jbutton.h"
 #include "jactionlistener.h"
 #include "jlabel.h"
-#include "jwidget.h"
+#include "jdialog.h"
 #include "jthread.h"
 #include "jmutex.h"
 #include "jdate.h"
@@ -41,7 +41,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class MessageDialogBox : public jgui::Widget, public jgui::ActionListener{
+class MessageDialogBox : public jgui::Dialog, public jgui::ActionListener{
 
 	private:
 		/** \brief */
@@ -56,7 +56,7 @@ class MessageDialogBox : public jgui::Widget, public jgui::ActionListener{
 		 * \brief
 		 *
 		 */
-		MessageDialogBox(std::string title, std::string msg);
+		MessageDialogBox(jgui::Application *root, std::string title, std::string msg);
 		
 		/**
 		 * \brief
