@@ -224,11 +224,7 @@ void Widget::RemoveWidgetListener(WidgetListener *listener)
 
 	jthread::AutoLock lock(&_widget_listener_mutex);
 
-	std::vector<WidgetListener *>::iterator i = std::find(_widget_listeners.begin(), _widget_listeners.end(), listener);
-
-	if (i != _widget_listeners.end()) {
-		_widget_listeners.erase(i);
-	}
+  _widget_listeners.erase(std::remove(_widget_listeners.begin(), _widget_listeners.end(), listener), _widget_listeners.end());
 }
 
 void Widget::DispatchWidgetEvent(WidgetEvent *event)

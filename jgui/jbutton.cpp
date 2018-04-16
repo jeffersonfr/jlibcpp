@@ -243,11 +243,7 @@ void Button::RemoveActionListener(ActionListener *listener)
 
 	jthread::AutoLock lock(&_action_listener_mutex);
 
-	std::vector<ActionListener *>::iterator i = std::find(_action_listeners.begin(), _action_listeners.end(), listener);
-	
-	if (i != _action_listeners.end()) {
-		_action_listeners.erase(i);
-	}
+  _action_listeners.erase(std::remove(_action_listeners.begin(), _action_listeners.end(), listener), _action_listeners.end());
 }
 
 void Button::DispatchActionEvent(ActionEvent *event)

@@ -51,15 +51,7 @@ void MenuGroup::Add(Item *item)
 
 void MenuGroup::Remove(Item *item)
 {
-	for (std::vector<Item *>::iterator i=_items.begin(); i!=_items.end(); i++) {
-		if (item == (*i)) {
-			_menu->RemoveSelectListener(this);
-
-			_items.erase(i);
-
-			return;
-		}
-	}
+  _items.erase(std::remove(_items.begin(), _items.end(), item), _items.end());
 }
 
 void MenuGroup::ItemSelected(SelectEvent *event)

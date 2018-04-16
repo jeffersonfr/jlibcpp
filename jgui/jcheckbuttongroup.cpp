@@ -38,6 +38,11 @@ void CheckButtonGroup::Add(CheckButton *button)
 {
 	jthread::AutoLock lock(&_mutex);
 
+	if (std::find(_buttons.begin(), _buttons.end(), button) != _buttons.end()) {
+		// CHANGE:: throw an exception
+		return;
+	}
+
 	button->RegisterToggleListener(this);
 
 	_buttons.push_back(button);
@@ -51,9 +56,7 @@ void CheckButtonGroup::Remove(CheckButton *button)
 		if (button == (*i)) {
 			(*i)->RemoveToggleListener(this);
 
-			_buttons.erase(i);
-
-			return;
+			i = _buttons.erase(i);
 		}
 	}
 }

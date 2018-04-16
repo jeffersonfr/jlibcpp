@@ -57,10 +57,10 @@ bool ParamMapper::GetBooleanParam(std::string key, bool value)
 	if (_params.find(key) != _params.end()) {
 		std::string str = _params[key];
 
-		if (str == "0" || str == "false") {
-			return false;
-		} else {
+		if (str == "1" || str == "on" || str == "yes" || str == "true") {
 			return true;
+		} else {
+			return false;
 		}
 	}
 

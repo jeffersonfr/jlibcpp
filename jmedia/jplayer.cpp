@@ -146,11 +146,7 @@ void Player::RemovePlayerListener(PlayerListener *listener)
 		return;
 	}
 
-	std::vector<PlayerListener *>::iterator i = std::find(_player_listeners.begin(), _player_listeners.end(), listener);
-	
-	if (i != _player_listeners.end()) {
-		_player_listeners.erase(i);
-	}
+  _player_listeners.erase(std::remove(_player_listeners.begin(), _player_listeners.end(), listener), _player_listeners.end());
 }
 
 std::vector<PlayerListener *> & Player::GetPlayerListeners()
@@ -209,11 +205,7 @@ void Player::RemoveFrameGrabberListener(FrameGrabberListener *listener)
 		return;
 	}
 
-	std::vector<FrameGrabberListener *>::iterator i = std::find(_frame_listeners.begin(), _frame_listeners.end(), listener);
-	
-	if (i != _frame_listeners.end()) {
-		_frame_listeners.erase(i);
-	}
+  _frame_listeners.erase(std::remove(_frame_listeners.begin(), _frame_listeners.end(), listener), _frame_listeners.end());
 }
 
 std::vector<FrameGrabberListener *> & Player::GetFrameGrabberListeners()

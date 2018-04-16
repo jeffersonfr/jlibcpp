@@ -164,11 +164,7 @@ void Demux::RemoveDemuxListener(DemuxListener *listener)
 		return;
 	}
 
-	std::vector<DemuxListener *>::iterator i = std::find(_demux_listeners.begin(), _demux_listeners.end(), listener);
-	
-	if (i != _demux_listeners.end()) {
-		_demux_listeners.erase(i);
-	}
+  _demux_listeners.erase(std::remove(_demux_listeners.begin(), _demux_listeners.end(), listener), _demux_listeners.end());
 }
 
 void Demux::DispatchDemuxEvent(DemuxEvent *event)

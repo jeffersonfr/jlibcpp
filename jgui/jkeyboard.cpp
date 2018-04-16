@@ -876,11 +876,7 @@ void Keyboard::RemoveKeyboardListener(KeyboardListener *listener)
 
 	jthread::AutoLock lock(&_key_listener_mutex);
 
-	std::vector<KeyboardListener *>::iterator i = std::find(_keyboard_listeners.begin(), _keyboard_listeners.end(), listener);
-
-	if (i != _keyboard_listeners.end()) {
-		_keyboard_listeners.erase(i);
-	}
+  _keyboard_listeners.erase(std::remove(_keyboard_listeners.begin(), _keyboard_listeners.end(), listener), _keyboard_listeners.end());
 }
 
 void Keyboard::DispatchKeyboardEvent(KeyEvent *event)

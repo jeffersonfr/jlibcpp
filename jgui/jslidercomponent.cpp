@@ -162,11 +162,7 @@ void SliderComponent::RemoveAdjustmentListener(AdjustmentListener *listener)
 
 	jthread::AutoLock lock(&_adjustment_listener_mutex);
 
-	std::vector<AdjustmentListener *>::iterator i = std::find(_adjustment_listeners.begin(), _adjustment_listeners.end(), listener);
-
-	if (i != _adjustment_listeners.end()) {
-		_adjustment_listeners.erase(i);
-	}
+  _adjustment_listeners.erase(std::remove(_adjustment_listeners.begin(), _adjustment_listeners.end(), listener), _adjustment_listeners.end());
 }
 
 void SliderComponent::DispatchAdjustmentEvent(AdjustmentEvent *event)

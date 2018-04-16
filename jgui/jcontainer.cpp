@@ -646,11 +646,9 @@ void Container::Remove(jgui::Component *c)
 		if (c == (*i)) {
 			c->SetParent(NULL);
 
-			_components.erase(i);
+			i = _components.erase(i);
 
 			DispatchContainerEvent(new ContainerEvent(this, c, JCET_COMPONENT_REMOVED));
-
-			break;
 		}
 	}
 }
@@ -922,11 +920,9 @@ void Container::RaiseComponentToTop(Component *c)
 
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		if (c == (*i)) {
-			_components.erase(i);
+			i = _components.erase(i);
 
 			b = true;
-
-			break;
 		}
 	}
 	
@@ -943,11 +939,9 @@ void Container::LowerComponentToBottom(Component *c)
 
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		if (c == (*i)) {
-			_components.erase(i);
+			i = _components.erase(i);
 
 			b = true;
-
-			break;
 		}
 	}
 	
@@ -1007,11 +1001,7 @@ void Container::RemoveContainerListener(ContainerListener *listener)
 
 	jthread::AutoLock lock(&_container_listener_mutex);
 
-	std::vector<ContainerListener *>::iterator i = std::find(_container_listeners.begin(), _container_listeners.end(), listener);
-
-	if (i != _container_listeners.end()) {
-		_container_listeners.erase(i);
-	}
+  _container_listeners.erase(std::remove(_container_listeners.begin(), _container_listeners.end(), listener), _container_listeners.end());
 }
 
 void Container::DispatchContainerEvent(ContainerEvent *event)

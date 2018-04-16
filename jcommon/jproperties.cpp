@@ -50,6 +50,8 @@ void Properties::Load(std::string filename_, std::string escape_)
 	std::string line;
 
 	while (std::getline(reader, line)) {
+		line = jcommon::StringUtils::Trim(line);
+
 		if (line.find("#") == 0) {
 			// INFO:: comments
 		} else {

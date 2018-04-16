@@ -157,11 +157,7 @@ void Application::InternalRemoveDialog(jgui::Dialog *dialog)
 
 	jthread::AutoLock lock(&_dialog_mutex);
 
-	std::vector<jgui::Dialog *>::iterator i = std::find(_dialogs.begin(), _dialogs.end(), dialog);
-
-	if (i != _dialogs.end()) {
-		_dialogs.erase(i);
-	}
+  _dialogs.erase(std::remove(_dialogs.begin(), _dialogs.end(), dialog), _dialogs.end());
 }
 
 void Application::InternalPaintDialogs(jgui::Graphics *g)
@@ -898,7 +894,6 @@ void Application::RegisterKeyListener(KeyListener *listener)
 void Application::RemoveKeyListener(KeyListener *listener) 
 {
 	jthread::AutoLock lock(&_key_listener_mutex);
-
 
 	for (std::vector<jgui::KeyListener *>::iterator i=_key_listeners.begin(); i!=_key_listeners.end(); i++) {
 		jgui::KeyListener *l = (*i);

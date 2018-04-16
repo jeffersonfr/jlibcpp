@@ -468,11 +468,7 @@ void ItemComponent::RemoveItem(Item *item)
 
 	// jthread::AutoLock lock(&_component_mutex);
 		
-	std::vector<Item *>::iterator i = std::find(_items.begin(), _items.end(), item);
-	
-	if (i != _items.end()) {
-		_items.erase(i);
-	}
+  _items.erase(std::remove(_items.begin(), _items.end(), item), _items.end());
 }
 
 void ItemComponent::RemoveItem(int index)
@@ -542,11 +538,7 @@ void ItemComponent::RemoveSelectListener(SelectListener *listener)
 
 	jthread::AutoLock lock(&_select_listener_mutex);
 
-	std::vector<SelectListener *>::iterator i = std::find(_select_listeners.begin(), _select_listeners.end(), listener);
-
-	if (i != _select_listeners.end()) {
-		_select_listeners.erase(i);
-	}
+  _select_listeners.erase(std::remove(_select_listeners.begin(), _select_listeners.end(), listener), _select_listeners.end());
 }
 
 void ItemComponent::DispatchSelectEvent(SelectEvent *event)

@@ -151,7 +151,6 @@ JSONValue * JSONValue::GetLastChild()
 char * atoi(char *first, char *last, int *out)
 {
 	int sign = 1;
-	int result = 0;
 
 	if (first != last) {
 		if (*first == '-') {
@@ -161,6 +160,8 @@ char * atoi(char *first, char *last, int *out)
 			++first;
 		}
 	}
+
+	int result = 0;
 
 	for (; first != last && __IS_DIGIT(*first); ++first) {
 		result = 10 * result + (*first - '0');
@@ -174,7 +175,7 @@ char * atoi(char *first, char *last, int *out)
 // convert hexadecimal string to uint32_teger
 char * hatoui(char *first, char *last, uint32_t *out)
 {
-	uint32_t result = 0;
+	unsigned int result = 0;
 
 	for (; first != last; ++first) {
 		int digit;
@@ -188,9 +189,9 @@ char * hatoui(char *first, char *last, uint32_t *out)
 			break;
 		}
 
-		result = 16 * result + digit;
+		result = 16 * result + (unsigned int)digit;
 	}
-
+	
 	*out = result;
 
 	return first;
@@ -200,7 +201,7 @@ char * hatoui(char *first, char *last, uint32_t *out)
 char * atof(char *first, char *last, double *out)
 {
 	// sign
-	double sign = 1;
+	float sign = 1;
 
 	if (first != last) {
 		if (*first == '-') {
@@ -212,19 +213,20 @@ char * atof(char *first, char *last, double *out)
 	}
 
 	// integer part
-	double result = 0;
+	float result = 0;
 
 	for (; first != last && __IS_DIGIT(*first); ++first) {
-		result = 10 * result + (*first - '0');
+		result = 10 * result + (float)(*first - '0');
 	}
 
 	// fraction part
 	if (first != last && *first == '.') {
 		++first;
 
-		double inv_base = 0.1f;
+		float inv_base = 0.1f;
+
 		for (; first != last && __IS_DIGIT(*first); ++first) {
-			result += (*first - '0') * inv_base;
+			result += (float)(*first - '0') * inv_base;
 			inv_base *= 0.1f;
 		}
 	}
@@ -235,6 +237,7 @@ char * atof(char *first, char *last, double *out)
 	// exponent
 	bool exponent_negative = false;
 	int exponent = 0;
+
 	if (first != last && (*first == 'e' || *first == 'E')) {
 		++first;
 
@@ -251,7 +254,7 @@ char * atof(char *first, char *last, double *out)
 	}
 
 	if (exponent) {
-		double power_of_ten = 10;
+		float power_of_ten = 10;
 
 		for (; exponent > 1; exponent--) {
 			power_of_ten *= 10;
@@ -271,6 +274,303 @@ char * atof(char *first, char *last, double *out)
 
 JSONValue * JSON::Parse(const char *source)
 {
+	JSONValue *root = 0;
+	JSONValue *top = 0;
+
+	int escaped_newlines = 0;
+	int lines = 0;
+	char *dup = strdup(source);
+	char *it = dup;
+	char *name = NULL;
+
+	while (*it) {
+		// skip white space
+		while (*it == '\x20' || *it == '\x9' || *it == '\xD' || *it == '\xA') {
+			++it;
+		}
+
+		switch (*it) {
+		case '\0':
+			break;
+		case '{':
+		case '[': {
+				// create new value
+				JSONValue *object = new JSONValue();
+
+				// name
+				object->_name = NULL;
+
+				if (name != NULL) {
+					object->_name = strdup(name);
+				}
+
+				name = 0;
+
+				// type
+				object->_type = (*it == '{') ? JSON_OBJECT : JSON_ARRAY;
+
+				// skip open character
+				++it;
+
+				// set top and root
+				if (top) {
+					top->Append(object);
+				} else if (!root) {
+					root = object;
+				} else {
+					__ERROR(it, "Second root. Only one root allowed");
+				}
+				top = object;
+			}
+
+			break;
+		case '}':
+		case ']': {
+				if (!top || top->_type != ((*it == '}') ? JSON_OBJECT : JSON_ARRAY)) {
+					__ERROR(it, "Mismatch closing brace/bracket");
+				}
+
+				// skip close character
+				++it;
+
+				// set top
+				top = top->_parent;
+			}
+
+			break;
+		case ':':
+			if (!top || top->_type != JSON_OBJECT) {
+				__ERROR(it, "Unexpected character");
+			}
+
+			++it;
+
+			break;
+		case ',':
+			__CHECK_TOP();
+			
+			++it;
+
+			break;
+		case '"': {
+				__CHECK_TOP();
+
+				// skip '"' character
+				++it;
+
+				char *first = it;
+				char *last = it;
+
+				while (*it) {
+					if ((unsigned char)*it < '\x20') {
+						__ERROR(first, "Control characters not allowed in strings");
+					} else if (*it == '\\') {
+						switch (it[1]) {
+						case '"':
+							*last = '"';
+							break;
+						case '\\':
+							*last = '\\';
+							break;
+						case '/':
+							*last = '/';
+							break;
+						case 'b':
+							*last = '\b';
+							break;
+						case 'f':
+							*last = '\f';
+							break;
+						case 'n':
+							*last = '\n';
+							++escaped_newlines;
+							break;
+						case 'r':
+							*last = '\r';
+							break;
+						case 't':
+							*last = '\t';
+							break;
+						case 'u': {
+								unsigned int codepoint;
+
+								if (hatoui(it + 2, it + 6, &codepoint) != it + 6) {
+									__ERROR(it, "Bad unicode codepoint");
+								}
+
+								if (codepoint <= 0x7F) {
+									*last = (char)codepoint;
+								} else if (codepoint <= 0x7FF) {
+									*last++ = (char)(0xC0 | (codepoint >> 6));
+									*last = (char)(0x80 | (codepoint & 0x3F));
+								} else if (codepoint <= 0xFFFF) {
+									*last++ = (char)(0xE0 | (codepoint >> 12));
+									*last++ = (char)(0x80 | ((codepoint >> 6) & 0x3F));
+									*last = (char)(0x80 | (codepoint & 0x3F));
+								}
+							}
+
+							it += 4;
+
+							break;
+						default:
+							__ERROR(first, "Unrecognized escape sequence");
+						}
+
+						++last;
+						it += 2;
+					} else if (*it == '"') {
+						*last = 0;
+						++it;
+						break;
+					} else {
+						*last++ = *it++;
+					}
+				}
+
+				if (!name && top->_type == JSON_OBJECT) {
+					// field name in object
+					name = first;
+				} else {
+					// new string value
+					JSONValue *object = new JSONValue();
+
+					object->_name = NULL;
+
+					if (name != NULL) {
+						object->_name = strdup(name);
+					}
+
+					name = 0;
+
+					object->_type = JSON_STRING;
+						
+					object->_string_value = NULL;
+
+					if (first != NULL) {
+						object->_string_value = strdup(first);
+					}
+
+					top->Append(object);
+				}
+			}
+			break;
+
+		case 'n':
+		case 't':
+		case 'f': {
+				__CHECK_TOP();
+
+				// new null/bool value
+				JSONValue *object = new JSONValue();
+
+				object->_name = NULL;
+
+				if (name != NULL) {
+					object->_name = strdup(name);
+				}
+
+				name = 0;
+
+				// null
+				if (it[0] == 'n' && it[1] == 'u' && it[2] == 'l' && it[3] == 'l') {
+					object->_type = JSON_NULL;
+					it += 4;
+				}
+				// true
+				else if (it[0] == 't' && it[1] == 'r' && it[2] == 'u' && it[3] == 'e') {
+					object->_type = JSON_BOOL;
+					object->_int_value = 1;
+					it += 4;
+				}
+				// false
+				else if (it[0] == 'f' && it[1] == 'a' && it[2] == 'l' && it[3] == 's' && it[4] == 'e') {
+					object->_type = JSON_BOOL;
+					object->_int_value = 0;
+					it += 5;
+				} else {
+					__ERROR(it, "Unknown identifier");
+				}
+
+				top->Append(object);
+			}
+			break;
+
+		case '-':
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9': {
+				__CHECK_TOP();
+
+				// new number value
+				JSONValue *object = new JSONValue();
+
+				object->_name = NULL;
+
+				if (name != NULL) {
+					object->_name = strdup(name);
+				}
+
+				name = 0;
+
+				object->_type = JSON_INT;
+
+				char *first = it;
+
+				while (*it != '\x20' && *it != '\x9' && *it != '\xD' && *it != '\xA' && *it != ',' && *it != ']' && *it != '}') {
+					if (*it == '.' || *it == 'e' || *it == 'E') {
+						object->_type = JSON_FLOAT;
+					}
+					++it;
+				}
+
+				if (object->_type == JSON_INT && atoi(first, it, &object->_int_value) != it) {
+					__ERROR(first, "Bad integer number");
+				}
+
+				if (object->_type == JSON_FLOAT && atof(first, it, &object->_double_value) != it) {
+					__ERROR(first, "Bad float number");
+				}
+
+				top->Append(object);
+			}
+
+			break;
+		default:
+			__ERROR(it, "Unexpected character");
+		}
+	}
+
+	if (top) {
+		__ERROR(it, "Not all objects/arrays have been properly closed");
+	}
+
+	return root;
+
+
+
+
+
+
+
+
+
+
+
+/*
+
+
+
+
+
+
 	if (source == NULL) {
 		return NULL;
 	}
@@ -548,6 +848,7 @@ JSONValue * JSON::Parse(const char *source)
 	delete [] dup;
 
 	return root;
+	*/
 }
 
 }

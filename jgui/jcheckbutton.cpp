@@ -338,11 +338,7 @@ void CheckButton::RemoveToggleListener(ToggleListener *listener)
 
 	jthread::AutoLock lock(&_check_listener_mutex);
 
-	std::vector<ToggleListener *>::iterator i = std::find(_check_listeners.begin(), _check_listeners.end(), listener);
-	
-	if (i != _check_listeners.end()) {
-		_check_listeners.erase(i);
-	}
+  _check_listeners.erase(std::remove(_check_listeners.begin(), _check_listeners.end(), listener), _check_listeners.end());
 }
 
 void CheckButton::DispatchToggleEvent(ToggleEvent *event)

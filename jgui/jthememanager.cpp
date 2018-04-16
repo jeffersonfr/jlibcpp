@@ -109,11 +109,7 @@ void ThemeManager::RemoveThemeListener(ThemeListener *listener)
 
 	jthread::AutoLock lock(&_theme_listener_mutex);
 
-	std::vector<ThemeListener *>::iterator i = std::find(_theme_listeners.begin(), _theme_listeners.end(), listener);
-	
-	if (i != _theme_listeners.end()) {
-		_theme_listeners.erase(i);
-	}
+  _theme_listeners.erase(std::remove(_theme_listeners.begin(), _theme_listeners.end(), listener), _theme_listeners.end());
 }
 
 void ThemeManager::DispatchThemeEvent(ThemeEvent *event)

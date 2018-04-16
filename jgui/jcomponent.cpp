@@ -1825,11 +1825,7 @@ void Component::RemoveFocusListener(FocusListener *listener)
 
 	jthread::AutoLock lock(&_focus_listener_mutex);
 
-	std::vector<FocusListener *>::iterator i = std::find(_focus_listeners.begin(), _focus_listeners.end(), listener);
-	
-	if (i != _focus_listeners.end()) {
-		_focus_listeners.erase(i);
-	}
+  _focus_listeners.erase(std::remove(_focus_listeners.begin(), _focus_listeners.end(), listener), _focus_listeners.end());
 }
 
 void Component::DispatchFocusEvent(FocusEvent *event)
@@ -1895,11 +1891,7 @@ void Component::RemoveComponentListener(ComponentListener *listener)
 
 	jthread::AutoLock lock(&_component_listener_mutex);
 
-	std::vector<ComponentListener *>::iterator i = std::find(_component_listeners.begin(), _component_listeners.end(), listener);
-
-	if (i != _component_listeners.end()) {
-		_component_listeners.erase(i);
-	}
+  _component_listeners.erase(std::remove(_component_listeners.begin(), _component_listeners.end(), listener), _component_listeners.end());
 }
 
 void Component::DispatchComponentEvent(ComponentEvent *event)
@@ -1968,11 +1960,7 @@ void Component::RemoveDataListener(jcommon::DataListener *listener)
 
 	jthread::AutoLock lock(&_data_listener_mutex);
 
-	std::vector<jcommon::DataListener *>::iterator i = std::find(_data_listeners.begin(), _data_listeners.end(), listener);
-
-	if (i != _data_listeners.end()) {
-		_data_listeners.erase(i);
-	}
+  _data_listeners.erase(std::remove(_data_listeners.begin(), _data_listeners.end(), listener), _data_listeners.end());
 }
 
 void Component::DispatchDataEvent(jcommon::DataEvent *event)

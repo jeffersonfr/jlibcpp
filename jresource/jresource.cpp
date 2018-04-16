@@ -156,11 +156,7 @@ void Resource::RemoveResourceTypeListener(ResourceTypeListener *listener)
 		return;
 	}
 
-	std::vector<ResourceTypeListener *>::iterator i = std::find(_type_listeners.begin(), _type_listeners.end(), listener);
-
-	if (i != _type_listeners.end()) {
-		_type_listeners.erase(i);
-	}
+  _type_listeners.erase(std::remove(_type_listeners.begin(), _type_listeners.end(), listener), _type_listeners.end());
 }
 
 void Resource::DispatchResourceTypeEvent(ResourceTypeEvent *event)
@@ -208,11 +204,7 @@ void Resource::RemoveResourceStatusListener(ResourceStatusListener *listener)
 		return;
 	}
 
-	std::vector<ResourceStatusListener *>::iterator i = std::find(_status_listeners.begin(), _status_listeners.end(), listener);
-
-	if (i != _status_listeners.end()) {
-		_status_listeners.erase(i);
-	}
+  _status_listeners.erase(std::remove(_status_listeners.begin(), _status_listeners.end(), listener), _status_listeners.end());
 }
 
 void Resource::DispatchResourceStatusEvent(ResourceStatusEvent *event)

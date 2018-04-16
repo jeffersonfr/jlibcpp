@@ -59,7 +59,7 @@ ARFLAGS		= \
 
 # {no, yes}
 ENABLE_DEBUG ?= yes
-# {directfb, sdl2, sfml2, x11, gtk3, allegro}
+# {directfb, sdl2, sfml2, x11, gtk3, allegro5}
 ENABLE_GRAPHICS ?= sdl2
 # {gif, ilist, v4l2, alsa, libvlc, libav, libxine}
 ENABLE_MEDIA ?= gif, ilist, v4l2, alsa, libvlc

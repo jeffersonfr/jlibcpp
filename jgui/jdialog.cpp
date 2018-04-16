@@ -35,6 +35,8 @@ Dialog::Dialog(jgui::Application *root, int x, int y, int width, int height):
 	}
 
 	_root = root;
+
+	SetBackgroundVisible(true);
 }
 
 Dialog::Dialog(jgui::Application *root, std::string title, int x, int y, int width, int height):
@@ -45,6 +47,8 @@ Dialog::Dialog(jgui::Application *root, std::string title, int x, int y, int wid
 	}
 
 	_root = root;
+
+	SetBackgroundVisible(true);
 }
 
 Dialog::~Dialog() 

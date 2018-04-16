@@ -353,11 +353,7 @@ void TextComponent::RemoveTextListener(TextListener *listener)
 
 	jthread::AutoLock lock(&_text_listener_mutex);
 
-	std::vector<TextListener *>::iterator i = std::find(_text_listeners.begin(), _text_listeners.end(), listener);
-
-	if (i != _text_listeners.end()) {
-		_text_listeners.erase(i);
-	}
+  _text_listeners.erase(std::remove(_text_listeners.begin(), _text_listeners.end(), listener), _text_listeners.end());
 }
 
 void TextComponent::DispatchTextEvent(TextEvent *event)
