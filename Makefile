@@ -51,7 +51,6 @@ OBJS_jcommon += \
 		 jparammapper.o\
 		 jparserexception.o\
 	   jproperties.o\
-	   jpointer.o\
 	   jpolicies.o\
 	   jregexp.o\
 	   jruntimeexception.o\
