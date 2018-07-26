@@ -1,0 +1,170 @@
+#**************************************************************************
+#   Copyright (C) 2005 by Jeff Ferr                                       *
+#   root@sat                                                              *
+#                                                                         *
+#   This program is free software; you can redistribute it and/or modify  *
+#   it under the terms of the GNU General Public License as published by  *
+#   the Free Software Foundation; either version 2 of the License, or     *
+#   (at your option) any later version.                                   *
+#                                                                         *
+#   This program is distributed in the hope that it will be useful,       *
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+#   GNU General Public License for more details.                          *
+#                                                                         *
+#   You should have received a copy of the GNU General Public License     *
+#   along with this program; if not, write to the                         *
+#   Free Software Foundation, Inc.,                                       *
+#   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+#**************************************************************************
+GENERIC_OBJS = \
+		 ../generic/genericprovider_bmp.o\
+		 ../generic/genericprovider_gif.o\
+		 ../generic/genericprovider_ico.o\
+		 ../generic/genericprovider_jpg.o\
+		 ../generic/genericprovider_pcx.o\
+		 ../generic/genericprovider_png.o\
+		 ../generic/genericprovider_ppm.o\
+		 ../generic/genericprovider_tga.o\
+		 ../generic/genericprovider_xbm.o\
+		 ../generic/genericprovider_xpm.o\
+
+CCFLAGS 	+= \
+     -Ijgui/binds \
+	   `pkg-config --cflags cairo` \
+
+LDFLAGS		+= \
+	   `pkg-config --libs cairo` \
+
+REQUIRES	+= \
+		 cairo \
+
+# choose the graphic engine
+
+ifeq ($(ENABLE_GRAPHICS),directfb)
+	CCFLAGS 	+= \
+		 `pkg-config --cflags directfb` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs directfb alsa` \
+		 -ljpeg \
+
+	DEFINES		+= \
+		 -DDIRECTFB_UI \
+
+	REQUIRES	+= \
+		 directfb \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 directfbapplication.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),sdl2)
+	CCFLAGS 	+= \
+		 `pkg-config --cflags sdl2` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs sdl2` \
+		 -ljpeg \
+
+	DEFINES		+= \
+		 -DSDL2_UI \
+
+	REQUIRES	+= \
+		 sdl2 \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 sdl2application.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),sfml2)
+	CCFLAGS 	+= \
+
+	LDFLAGS		+= \
+     `pkg-config --libs alsa` \
+		 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio \
+     -ljpeg \
+
+	DEFINES		+= \
+		 -DSFML2_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 sfml2application.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),x11)
+	CCFLAGS 	+= \
+
+	LDFLAGS		+= \
+     `pkg-config --libs x11 alsa` \
+     -ljpeg \
+
+	DEFINES		+= \
+		 -DX11_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 x11application.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),gtk3)
+	CCFLAGS 	+= \
+		 `pkg-config --cflags gtk+-3.0` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs gtk+-3.0 alsa` \
+		 -ljpeg \
+
+	DEFINES		+= \
+		 -DGTK3_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 gtk3application.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),allegro5)
+	CCFLAGS 	+= \
+		 `pkg-config --cflags allegro-5 allegro_video-5 allegro_main-5` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs allegro-5 allegro_video-5 allegro_main-5 alsa` \
+		 -ljpeg \
+
+	DEFINES		+= \
+		 -DALLEGRO5_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 allegro5application.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+

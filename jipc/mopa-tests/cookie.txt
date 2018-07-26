@@ -1,0 +1,6 @@
+# Netscape HTTP Cookie File
+# http://www.netscape.com/newsref/std/cookie_spec.html
+# This is a generated file!  Do not edit.
+
+.youtube.com	TRUE	/	FALSE	1416101366	PREF	gl=US&hl=en&f1=50000000
+.youtube.com	TRUE	/	FALSE	1416101366	VISITOR_INFO1_LIVE	psBPt5GmE_o

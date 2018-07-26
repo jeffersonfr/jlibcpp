@@ -1,0 +1,226 @@
+/***************************************************************************
+ *   Copyright (C) 2005 by Jeff Ferr                                       *
+ *   root@sat                                                              *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ *   This program is distributed in the hope that it will be useful,       *
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+ *   GNU General Public License for more details.                          *
+ *                                                                         *
+ *   You should have received a copy of the GNU General Public License     *
+ *   along with this program; if not, write to the                         *
+ *   Free Software Foundation, Inc.,                                       *
+ *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+ ***************************************************************************/
+#include "jgui/japplication.h"
+#include "jgui/jwindow.h"
+#include "jgui/jtextfield.h"
+#include "jgui/jlabel.h"
+#include "jcommon/jstringtokenizer.h"
+#include "jcommon/jstringutils.h"
+#include "jnetwork/jsocket.h"
+
+#include <iostream>
+#include <sstream>
+
+class Stock : public jgui::Window {
+
+	private:
+			jgui::TextField 
+        *acao;
+			jgui::Label 
+        *ldata,
+				*lcotacao,
+				*lvariacao,
+				*lanterior,
+				*labertura,
+				*lminimo,
+				*lmaximo,
+				*lvolume,
+				*vdata,
+				*vcotacao,
+				*vvariacao,
+				*vanterior,
+				*vabertura,
+				*vminimo,
+				*vmaximo,
+				*vvolume;
+			jgui::Theme 
+        _theme1, 
+				_theme2;
+
+	public:
+		Stock():
+			jgui::Window(/*"Stock", */0, 0, 500, 400)
+		{
+			_theme1.SetIntegerParam("component.fg", 0xfff00000);
+			_theme2.SetIntegerParam("component.fg", 0xff00f000);
+
+			int px = 0,
+					py = 0,
+					pw = DEFAULT_COMPONENT_WIDTH,
+					pr = DEFAULT_COMPONENT_WIDTH,
+					ph = DEFAULT_COMPONENT_HEIGHT,
+					gap = 5;
+
+			acao = new jgui::TextField(px, py+0*(ph+gap), (pw+pr+gap), ph);
+			ldata = new jgui::Label("Data", px, py+1*(ph+gap), pw, ph);
+			lcotacao = new jgui::Label("Cotacao", px, py+2*(ph+gap), pw, ph);
+			lvariacao = new jgui::Label("Variacao", px, py+3*(ph+gap), pw, ph);
+			lanterior = new jgui::Label("Anterior", px, py+4*(ph+gap), pw, ph);
+			labertura = new jgui::Label("Abertura", px, py+5*(ph+gap), pw, ph);
+			lminimo = new jgui::Label("Minimo", px, py+6*(ph+gap), pw, ph);
+			lmaximo = new jgui::Label("Maximo", px, py+7*(ph+gap), pw, ph);
+			lvolume = new jgui::Label("Volume", px, py+8*(ph+gap), pw, ph);
+			vdata = new jgui::Label("--/--/--", px+(pw+gap), py+1*(ph+gap), pr, ph);
+			vcotacao = new jgui::Label("0.00", px+(pw+gap), py+2*(ph+gap), pr, ph);
+			vvariacao = new jgui::Label("0.00%", px+(pw+gap), py+3*(ph+gap), pr, ph);
+			vanterior = new jgui::Label("0.00", px+(pw+gap), py+4*(ph+gap), pr, ph);
+			vabertura = new jgui::Label("0.00", px+(pw+gap), py+5*(ph+gap), pr, ph);
+			vminimo = new jgui::Label("0.00", px+(pw+gap), py+6*(ph+gap), pr, ph);
+			vmaximo = new jgui::Label("0.00", px+(pw+gap), py+7*(ph+gap), pr, ph);
+			vvolume = new jgui::Label("0.00", px+(pw+gap), py+8*(ph+gap), pr, ph);
+
+			Add(acao);
+			Add(ldata);
+			Add(lcotacao);
+			Add(lvariacao);
+			Add(lanterior);
+			Add(labertura);
+			Add(lminimo);
+			Add(lmaximo);
+			Add(lvolume);
+			Add(vdata);
+			Add(vcotacao);
+			Add(vvariacao);
+			Add(vanterior);
+			Add(vabertura);
+			Add(vminimo);
+			Add(vmaximo);
+			Add(vvolume);
+
+			acao->RequestFocus();
+
+			Pack(true);
+		}
+
+		virtual ~Stock() 
+		{
+			delete acao;
+			delete ldata;
+			delete lcotacao;
+			delete lvariacao;
+			delete lanterior;
+			delete labertura;
+			delete lminimo;
+			delete lmaximo;
+			delete lvolume;
+			delete vdata;
+			delete vcotacao;
+			delete vvariacao;
+			delete vanterior;
+			delete vabertura;
+			delete vminimo;
+			delete vmaximo;
+			delete vvolume;
+		}
+
+		std::map<std::string, std::string> RequestQuotes(std::string stock)
+		{
+			std::map<std::string, std::string> quotes;
+
+			std::string host = "download.finance.yahoo.com";
+
+			std::ostringstream o;
+			char receive[4098];
+			int count = 0;
+
+			o << "GET /d/quotes.csv?s=" << acao->GetText() << "&f=snd1t1l1c1p2poghvt HTTP/1.0\r\nHost: " << host << "\r\n\r\n";
+
+			try {
+				// http://finance.google.com/finance/info?client=ig&q=VALE5
+				jnetwork::Socket c(host, 80);
+
+				c.Send((char *)o.str().c_str(), o.str().size());
+
+				do {
+					count = count + (int)c.Receive((receive+count), 4096);
+				} while (true);
+					
+			} catch (...) {
+			}
+
+			receive[count] = '\0';
+
+			jcommon::StringTokenizer lines(std::string(receive), "\r\n\r\n", jcommon::JTT_STRING, false);
+			jcommon::StringTokenizer tokens(lines.GetToken(1), ",", jcommon::JTT_STRING, false);
+
+			if (tokens.GetSize() != 13) {
+				std::cout << "Error:: \n\n" << lines.GetToken(1) << std::endl;
+
+				exit(1);
+			}
+
+			quotes["nome"] = tokens.GetToken(1);
+			quotes["data"] = jcommon::StringUtils::ReplaceString(tokens.GetToken(2), "\"", "");
+			quotes["hora"] = tokens.GetToken(3);
+			quotes["cotacao"] = tokens.GetToken(4);
+			quotes["variacao"] = jcommon::StringUtils::ReplaceString(tokens.GetToken(6), "\"", "");
+			quotes["anterior"] = tokens.GetToken(7);
+			quotes["abertura"] = tokens.GetToken(8);
+			quotes["minimo"] = tokens.GetToken(9);
+			quotes["maximo"] = tokens.GetToken(10);
+			quotes["volume"] = tokens.GetToken(11);
+
+			return quotes;
+		}
+
+		virtual bool KeyPressed(jevent::KeyEvent *event)
+		{
+			if (jgui::Window::KeyPressed(event) == true) {
+				return true;
+			}
+
+			if (event->GetSymbol() == jevent::JKS_ENTER && GetFocusOwner() == acao) {
+				std::map<std::string, std::string> quotes = RequestQuotes(acao->GetText() + ".sa");
+			
+				vdata->SetText(quotes["data"]);
+				// vhora->SetText(quotes["hora"]);
+				vcotacao->SetText(quotes["cotacao"]);
+				vvariacao->SetText(quotes["variacao"]);
+				vanterior->SetText(quotes["anterior"]);
+				vabertura->SetText(quotes["abertura"]);
+				vminimo->SetText(quotes["minimo"]);
+				vmaximo->SetText(quotes["maximo"]);
+				vvolume->SetText(quotes["volume"]);
+
+				if (quotes["variacao"].find("-") != std::string::npos) {
+					vvariacao->SetTheme(&_theme1);
+				} else {
+					vvariacao->SetTheme(&_theme2);
+				}
+			}
+
+			return true;
+		}
+
+};
+
+int main(int argc, char **argv)
+{
+	jgui::Application::Init(argc, argv);
+
+	Stock app;
+
+	app.SetTitle("Stock");
+	app.SetVisible(true);
+
+	jgui::Application::Loop();
+
+	return 0;
+}

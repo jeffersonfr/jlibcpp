@@ -1,0 +1,189 @@
+#**************************************************************************
+#   Copyright (C) 2005 by Jeff Ferr                                       *
+#   root@sat                                                              *
+#                                                                         *
+#   This program is free software; you can redistribute it and/or modify  *
+#   it under the terms of the GNU General Public License as published by  *
+#   the Free Software Foundation; either version 2 of the License, or     *
+#   (at your option) any later version.                                   *
+#                                                                         *
+#   This program is distributed in the hope that it will be useful,       *
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+#   GNU General Public License for more details.                          *
+#                                                                         *
+#   You should have received a copy of the GNU General Public License     *
+#   along with this program; if not, write to the                         *
+#   Free Software Foundation, Inc.,                                       *
+#   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+#**************************************************************************
+ifeq ($(findstring directfb, $(ENABLE_MEDIA)), directfb)
+	CCFLAGS		+= \
+		 `pkg-config --cflags cairo` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs alsa cairo` \
+
+	DEFINES		+= \
+		 -DDIRECTFB_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_directfb	+= \
+		 directfblightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/directfb/,$(OBJS_directfb))
+
+endif
+
+ifeq ($(findstring libvlc, $(ENABLE_MEDIA)), libvlc)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/libvlc/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags libvlc cairo` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs libvlc alsa cairo` \
+
+	DEFINES		+= \
+		 -DLIBVLC_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_libvlc	+= \
+		 libvlclightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/libvlc/,$(OBJS_libvlc))
+
+endif
+
+ifeq ($(findstring libav, $(ENABLE_MEDIA)), libav)
+	CCFLAGS		+= \
+		 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPIC -DZLIB_CONST -O3 \
+		 -Ijmedia/binds/libav/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags libavcodec libavformat libavresample libavutil libavfilter libswscale sdl2 cairo` \
+		 -lm -lbz2 -lasound \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs libavcodec libavformat libavresample libavutil libavfilter libswscale sdl2 cairo` \
+
+	DEFINES		+= \
+		 -DLIBAV_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_libav	+= \
+		 libavplay.o\
+		 libavutils.o\
+		 libavlightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/libav/,$(OBJS_libav))
+
+endif
+
+ifeq ($(findstring libxine, $(ENABLE_MEDIA)), libxine)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/libxine/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags libxine` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs libxine` \
+
+	DEFINES		+= \
+		 -DLIBXINE_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_libxine	+= \
+		 libxinelightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/libxine/,$(OBJS_libxine))
+
+endif
+
+ifeq ($(findstring v4l2, $(ENABLE_MEDIA)), v4l2)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/v4l2/include \
+		 -Ijgui/binds/generic/include \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DV4L2_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_v4l2	+= \
+		 videocontrol.o\
+		 videograbber.o\
+		 v4l2lightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/v4l2/,$(OBJS_v4l2))
+
+endif
+
+ifeq ($(findstring gif, $(ENABLE_MEDIA)), gif)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/gif/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags cairo` \
+
+	LDFLAGS		+= \
+		 `pkg-config --cflags cairo` \
+
+	DEFINES		+= \
+		 -DGIF_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_gif += \
+		 giflightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/gif/,$(OBJS_gif))
+
+endif
+
+ifeq ($(findstring ilist, $(ENABLE_MEDIA)), ilist)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/ilist/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags cairo` \
+
+	LDFLAGS		+= \
+		 `pkg-config --cflags cairo` \
+
+	DEFINES		+= \
+		 -DIMAGE_LIST_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_ilist += \
+		 ilistlightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/ilist/,$(OBJS_ilist))
+
+endif
+
+ifeq ($(findstring alsa, $(ENABLE_MEDIA)), alsa)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/alsa/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags alsa cairo` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs alsa cairo` \
+
+	DEFINES		+= \
+		 -DALSA_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_alsa += \
+		 alsalightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/alsa/,$(OBJS_alsa))
+
+endif
+

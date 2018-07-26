@@ -1,0 +1,17 @@
+{
+    "jean-luc" : null,
+    "william t." : "hello",
+    "geordi" : { "een" : "one", "twee" : "two" },
+    "beverly" : "wesley",
+    "bar" : -17E-66,
+    "number" : -1234,
+    "foo" : 12.2e+15,
+    "bla" : 3.1415,
+    "snafu" : 2345,
+    "number" : -1234,
+    "array":[ "dit", "is",
+
+        "een", "array" ],
+    "one" : { "burp":123, "two" : { "three" : "hello" } }
+
+ }
