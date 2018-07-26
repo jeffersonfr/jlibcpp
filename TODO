@@ -1,8 +1,0 @@
-. gethostbyaddr is obsolescent, use getaddrinfo() instead.
-. gethostbyname is obsolescent, use getnameinfo() instead.
-. fix jmenu, jcombobox, keyboard and dialogs to new version of jlibcpp (use dialogs)
-. optimize the japplication::repaint() to avoid not needs locks
-. implements the dialog message in tests (mines.cpp, agenda.cpp, phone.cpp, teste.cpp)
-. implements dialogs in jgui
-. mhp.cpp appears unstable with some engines
-. fix allegro5 resize and fullscreen

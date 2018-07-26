@@ -1,9 +1,0 @@
-# comment polices 1
-allow {
-	192.168.0.*
-	189.99.84.*
-}
-
-deny { # comment policies 2
-	all
-}
