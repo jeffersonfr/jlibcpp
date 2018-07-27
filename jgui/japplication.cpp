@@ -20,9 +20,7 @@
 #include "jgui/japplication.h"
 #include "jexception/jnullpointerexception.h"
 
-#if defined(DIRECTFB_UI)
-#include "directfb/include/directfbapplication.h"
-#elif defined(SDL2_UI)
+#if defined(SDL2_UI)
 #include "sdl2/include/sdl2application.h"
 #elif defined(SFML2_UI)
 #include "sfml2/include/sfml2application.h"
@@ -73,9 +71,7 @@ void Application::Init(int argc, char **argv)
 
 	if (_instance == NULL) {
 	  try {
-#if defined(DIRECTFB_UI)
-			_instance = new DirectFBApplication();
-#elif defined(SDL2_UI)
+#if defined(SDL2_UI)
 			_instance = new SDL2Application();
 #elif defined(SFML2_UI)
 			_instance = new SFML2Application();

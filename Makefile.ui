@@ -41,28 +41,6 @@ REQUIRES	+= \
 
 # choose the graphic engine
 
-ifeq ($(ENABLE_GRAPHICS),directfb)
-	CCFLAGS 	+= \
-		 `pkg-config --cflags directfb` \
-
-	LDFLAGS		+= \
-		 `pkg-config --libs directfb alsa` \
-		 -ljpeg \
-
-	DEFINES		+= \
-		 -DDIRECTFB_UI \
-
-	REQUIRES	+= \
-		 directfb \
-
-	OBJS_gfx	+= \
-		 $(GENERIC_OBJS)\
-		 directfbapplication.o\
-
-	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
-
-endif
-
 ifeq ($(ENABLE_GRAPHICS),sdl2)
 	CCFLAGS 	+= \
 		 `pkg-config --cflags sdl2` \

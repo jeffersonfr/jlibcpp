@@ -21,10 +21,6 @@
 #include "jnetwork/jurl.h"
 #include "jexception/jmediaexception.h"
 
-#if defined(DIRECTFB_MEDIA)
-#include "directfblightplayer.h"
-#endif
-
 #if defined(LIBVLC_MEDIA)
 #include "libvlclightplayer.h"
 #endif
@@ -127,20 +123,6 @@ Player * PlayerManager::CreatePlayer(std::string url_)
 		return new LibXineLightPlayer(url_);
 	} catch (jexception::Exception &e) {
 	}
-#endif
-
-#if defined(DIRECTFB_MEDIA) && defined(DIRECTFB_UI)
-	/* TODO:: uncomment
-	try {
-		if (_hints[JPH_LIGHTWEIGHT] == false) {
-			// INFO:: the component's visible must be set to true
-			return new DirectFBHeavyPlayer(url_);
-		}
-			
-		return new DirectFBLightPlayer(url_);
-	} catch (jexception::Exception &e) {
-	}
-	*/
 #endif
 
 	return NULL;

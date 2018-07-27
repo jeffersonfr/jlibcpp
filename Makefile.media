@@ -17,25 +17,6 @@
 #   Free Software Foundation, Inc.,                                       *
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
-ifeq ($(findstring directfb, $(ENABLE_MEDIA)), directfb)
-	CCFLAGS		+= \
-		 `pkg-config --cflags cairo` \
-
-	LDFLAGS		+= \
-		 `pkg-config --libs alsa cairo` \
-
-	DEFINES		+= \
-		 -DDIRECTFB_MEDIA \
-
-	REQUIRES	+= \
-
-	OBJS_directfb	+= \
-		 directfblightplayer.o\
-
-	OBJS_jmedia	+= $(addprefix binds/directfb/,$(OBJS_directfb))
-
-endif
-
 ifeq ($(findstring libvlc, $(ENABLE_MEDIA)), libvlc)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/libvlc/include \

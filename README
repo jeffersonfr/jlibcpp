@@ -3,7 +3,7 @@
 :Makefile defines
 
 ENABLE_DEBUG = <no, yes>
-ENABLE_GRAPHICS = <directfb-nodeps, directfb, sdl2, sfml2, x11>
+ENABLE_GRAPHICS = <sdl2, sfml2, x11, gtk3, allegro5>
 ENABLE_MEDIA = <gif, ilist, v4l2, alsa, libvlc, libav, libxine>
 
 :Compiling
@@ -31,36 +31,18 @@ all:
 
 :Dependencies
 
-	libdirectfb, libsdl2, libsfml2, libx11, libasound2, libssl, uuid
+	libsdl2, libsfml2, libx11, libgtk3, liballegro5, libasound2, libssl, uuid
 
 :Problems
 
 1. with ENABLE_MEDIA=libvlc the jmedia not working corretly with lua
 R: disable or remove the lua plugin "/usr/lib/vlc/plugins/lua/liblua_plugin.so"
 
-2. the directfb video provider (xine) not working properly
-R: edit the file 'DirectFB/interfaces/IDirectFBVideoProvider/Makefile' and search 
-	 for the definition $(XINE_LIBS) and swap for the $(XINE_VDPAU_LIBS). Finishing 
-	 with 'make clean all install'
-
-3. directfb video provider (libdirectfb) with problem
-R: edit the file 'DirectFB/interfaces/IDirectFBVideoProvider/video_out_dfb/video_out_dfb.c'
-	 at line 270 and change the old line ...
-     
-		 if (this->dest) {
-	 
-	   for this one ...
-	
-	   if (this->dest && this->dest->GetSize) {
-
-4. jsystem::Beep() not working
+2. jsystem::Beep() not working
 R: enable pcspkr module as following:
 
 	sudo modprobe pcspkr
 	echo -e "\a"
 
-5. the module sox no compile and print a message asking for -fpic
+3. the module sox no compile and print a message asking for -fpic
 R: recompile libsox with the option "--enable-shared"
-
-6. the events not working with (ENABLE_GRAPHICS == directfb*) and (ENABLE_MEDIA == libav)
-R: this occurs because the directfb uses SDL and libav uses SDL2. try to edit Makefile.media and change 'sdl2' by 'sdl' in libav's compilation

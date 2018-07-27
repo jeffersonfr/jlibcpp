@@ -21,9 +21,7 @@
 #include "jgui/jnulllayout.h"
 #include "jexception/jnullpointerexception.h"
 
-#if defined(DIRECTFB_UI)
-#include "directfb/include/directfbwindow.h"
-#elif defined(SDL2_UI)
+#if defined(SDL2_UI)
 #include "sdl2/include/sdl2window.h"
 #elif defined(SFML2_UI)
 #include "sfml2/include/sfml2window.h"
@@ -59,9 +57,7 @@ Window::Window(int x, int y, int width, int height):
 
   // TODO:: estah entrando em loop
   try {
-#if defined(DIRECTFB_UI)
-		_instance = new DirectFBWindow(x, y, width, height);
-#elif defined(SDL2_UI)
+#if defined(SDL2_UI)
 		_instance = new SDL2Window(x, y, width, height);
 #elif defined(SFML2_UI)
 		_instance = new SFML2Window(x, y, width, height);
@@ -293,15 +289,6 @@ void Window::PaintGlassPane(Graphics *g)
 	g->SetFont(font);
 	g->SetColor(jgui::Color::White);
 	
-  /* TODO:: used only by directfb
-	if (_icon != NULL) {
-		g->DrawImage(_icon, _insets.left + 2, 2, _insets.top - 4, _insets.top - 4);
-		g->DrawString(_title, _insets.left + 2 + _insets.top + 2, 2, _size.width, _insets.top, jgui::JHA_LEFT, jgui::JVA_CENTER);
-	} else {
-		g->DrawString(_title, _insets.left + 2, 2, _size.width, _insets.top, jgui::JHA_LEFT, jgui::JVA_CENTER);
-	}
-  */
-
 	if (_subtitles.size() > 0) {
 		int count = _insets.right;
 
@@ -399,9 +386,6 @@ void Window::PaintGlassPane(Graphics *g)
 
 void Window::Paint(jgui::Graphics *g)
 {
-	// CHANGE:: clear suface before paint (directfb-cairo)
-	g->Clear();
-
 	Container::Paint(g);
 }
 
