@@ -17,6 +17,8 @@
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
 
+namespace jmedia {
+ 
 struct v4l2_queryctrl queryctrl;
 
 VideoControl::VideoControl(int handler)
@@ -247,3 +249,4 @@ void VideoControl::Reset()
 	}
 }
 
+}

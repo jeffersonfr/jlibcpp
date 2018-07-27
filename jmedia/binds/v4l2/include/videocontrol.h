@@ -1,13 +1,14 @@
 #ifndef __VIDEOCONTROL_PHOTOBOOTH_H
 #define __VIDEOCONTROL_PHOTOBOOTH_H
 
-#include "jvideodevicecontrol.h"
-#include "jthread.h"
+#include "jmedia/jvideodevicecontrol.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+
+namespace jmedia {
 
 struct video_query_control_t {
 	jmedia::jvideo_control_t id;
@@ -48,5 +49,7 @@ class VideoControl {
 		virtual void Reset();
 		
 };
+
+}
 
 #endif

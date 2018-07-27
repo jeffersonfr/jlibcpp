@@ -20,22 +20,26 @@
 #ifndef J_ImageListLIGHTPLAYER_H
 #define J_ImageListLIGHTPLAYER_H
 
-#include "jplayer.h"
-#include "jthread.h"
-#include "jcondition.h"
-#include "jcomponent.h"
+#include "jmedia/jplayer.h"
+#include "jgui/jcomponent.h"
+
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 namespace jmedia {
 
-class ImageListLightPlayer : public jmedia::Player, public jthread::Thread {
+class ImageListLightPlayer : public jmedia::Player {
 
 	public:
 		/** \brief */
 		std::vector<std::string> _image_list;
 		/** \brief */
-		jthread::Mutex _mutex;
+    std::thread _thread;
 		/** \brief */
-		jthread::Condition _sem;
+    std::mutex _mutex;
+		/** \brief */
+    std::condition_variable _condition;
 		/** \brief */
 		std::string _directory;
 		/** \brief */

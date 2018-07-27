@@ -17,22 +17,20 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "libavlightplayer.h"
-#include "nativeimage.h"
-#include "jcontrolexception.h"
-#include "jvideosizecontrol.h"
-#include "jvideoformatcontrol.h"
-#include "jvolumecontrol.h"
-#include "jmediaexception.h"
-#include "jgfxhandler.h"
+#include "jmedia/binds/libav/include/libavlightplayer.h"
+#include "jmedia/binds/libav/include/libavplay.h"
+#include "jmedia/jvideosizecontrol.h"
+#include "jmedia/jvideoformatcontrol.h"
+#include "jmedia/jvolumecontrol.h"
+#include "jgui/jbufferedimage.h"
+#include "jexception/jmediaexception.h"
+#include "jexception/jcontrolexception.h"
 
 #include <cairo.h>
 
 namespace jmedia {
 
-namespace libavlightplayer {
-
-class PlayerComponentImpl : public jgui::Component, jthread::Thread {
+class PlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -40,7 +38,7 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 		/** \brief */
 		jgui::Image *_image;
 		/** \brief */
-		jthread::Mutex _mutex;
+    std::mutex _mutex;
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
@@ -73,18 +71,10 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 
 		virtual ~PlayerComponentImpl()
 		{
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-
-			_mutex.Lock();
-
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
 			}
-
-			_mutex.Unlock();
 		}
 
 		virtual jgui::jsize_t GetPreferredSize()
@@ -105,10 +95,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 				_frame_size.height = _src.height = height;
 			}
 
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-
 			int sw = width;
 			int sh = height;
 
@@ -116,41 +102,34 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 					(uint8_t *)buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
 			cairo_t *cairo_context = cairo_create(cairo_surface);
 
-			_mutex.Lock();
+			_mutex.lock();
 
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
 			}
 
-			_image = new jgui::NativeImage(cairo_context, jgui::JPF_RGB24, sw, sh);
+			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_RGB24, sw, sh);
 
-			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
+			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
 
 			cairo_surface_flush(cairo_surface);
 			cairo_surface_destroy(cairo_surface);
 
-			_mutex.Unlock();
+			_mutex.unlock();
 
-			Run();
-		}
-
-		virtual void Run()
-		{
-			if (IsVisible() != false) {
-				Repaint();
-			}
+      Repaint();
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Component::Paint(g);
 
-			_mutex.Lock();
+			_mutex.lock();
 
 			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
 				
-			_mutex.Unlock();
+			_mutex.unlock();
 		}
 
 		virtual Player * GetPlayer()
@@ -187,8 +166,6 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual int GetLevel()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
 			int level = 0;
 
 			/*
@@ -202,8 +179,6 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual void SetLevel(int level)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
 			_level = (level < 0)?0:(level > 100)?100:level;
 
 			if (_level != 0) {
@@ -227,7 +202,7 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual void SetMute(bool b)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 	
 			_is_muted = b;
 			
@@ -258,7 +233,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		{
 			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
-			jthread::AutoLock lock(&impl->_mutex);
+      std::unique_lock<std::mutex> lock(impl->_mutex);
 			
 			impl->_src.x = x;
 			impl->_src.y = y;
@@ -270,7 +245,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		{
 			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
-			jthread::AutoLock lock(&impl->_mutex);
+      std::unique_lock<std::mutex> lock(impl->_mutex);
 
 			impl->SetBounds(x, y, w, h);
 		}
@@ -327,7 +302,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual jaspect_ratio_t GetAspectRatio()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			double aspect = _player->_aspect;
 
@@ -346,7 +321,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual double GetFramesPerSecond()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			return _player->_provider->frames_per_second;
 		}
@@ -377,9 +352,7 @@ static void endofmedia_callback(void *data)
 {
 	LibAVLightPlayer *player = reinterpret_cast<LibAVLightPlayer *>(data);
 	
-	player->DispatchPlayerEvent(new PlayerEvent(player, JPE_FINISHED));
-}
-
+	player->DispatchPlayerEvent(new jevent::PlayerEvent(player, jevent::JPE_FINISHED));
 }
 
 LibAVLightPlayer::LibAVLightPlayer(std::string file):
@@ -399,21 +372,21 @@ LibAVLightPlayer::LibAVLightPlayer(std::string file):
 	_provider = avplay_open(_file.c_str());
 
 	if (_provider == NULL) {
-		throw MediaException("Cannot recognize the media file");
+		throw jexception::MediaException("Cannot recognize the media file");
 	}
 
-	_component = new libavlightplayer::PlayerComponentImpl(this, 0, 0, -1, -1);//iw, ih);
+	_component = new PlayerComponentImpl(this, 0, 0, -1, -1);//iw, ih);
 
-	avplay_set_rendercallback(_provider, libavlightplayer::render_callback, (void *)_component);
-	avplay_set_endofmediacallback(_provider, libavlightplayer::endofmedia_callback, (void *)this);
+	avplay_set_rendercallback(_provider, render_callback, (void *)_component);
+	avplay_set_endofmediacallback(_provider, endofmedia_callback, (void *)this);
 		
 	if (_provider->has_audio == true) {
-		_controls.push_back(new libavlightplayer::VolumeControlImpl(this));
+		_controls.push_back(new VolumeControlImpl(this));
 	}
 	
 	if (_provider->has_video == true) {
-		_controls.push_back(new libavlightplayer::VideoSizeControlImpl(this));
-		_controls.push_back(new libavlightplayer::VideoFormatControlImpl(this));
+		_controls.push_back(new VideoSizeControlImpl(this));
+		_controls.push_back(new VideoFormatControlImpl(this));
 	}
 }
 
@@ -435,44 +408,44 @@ LibAVLightPlayer::~LibAVLightPlayer()
 
 void LibAVLightPlayer::Play()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_paused == false && _provider != NULL) {
 		avplay_play(_provider);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_STARTED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_STARTED));
 	}
 }
 
 void LibAVLightPlayer::Pause()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_paused == false && _provider != NULL) {
 		_is_paused = true;
 		
 		avplay_pause(_provider, true);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_PAUSED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_PAUSED));
 	}
 }
 
 void LibAVLightPlayer::Resume()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_paused == true && _provider != NULL) {
 		_is_paused = false;
 		
 		avplay_pause(_provider, false);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_RESUMED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_RESUMED));
 	}
 }
 
 void LibAVLightPlayer::Stop()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_provider != NULL) {
 		avplay_stop(_provider);
@@ -487,7 +460,7 @@ void LibAVLightPlayer::Stop()
 
 void LibAVLightPlayer::Close()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_closed == true) {
 		return;
@@ -504,7 +477,7 @@ void LibAVLightPlayer::Close()
 
 void LibAVLightPlayer::SetCurrentTime(uint64_t time)
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_provider != NULL) {
 		avplay_setcurrentmediatime(_provider, time);
@@ -513,9 +486,9 @@ void LibAVLightPlayer::SetCurrentTime(uint64_t time)
 
 uint64_t LibAVLightPlayer::GetCurrentTime()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	uint64_t time = 0LL;
+
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_provider != NULL) {
 		time = (uint64_t)avplay_getcurrentmediatime(_provider);
@@ -537,7 +510,7 @@ uint64_t LibAVLightPlayer::GetMediaTime()
 
 void LibAVLightPlayer::SetLoop(bool b)
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_provider != NULL) {
 		avplay_setloop(_provider, b);
@@ -555,7 +528,7 @@ bool LibAVLightPlayer::IsLoop()
 
 void LibAVLightPlayer::SetDecodeRate(double rate)
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	_decode_rate = rate;
 
@@ -570,7 +543,7 @@ void LibAVLightPlayer::SetDecodeRate(double rate)
 
 double LibAVLightPlayer::GetDecodeRate()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	double rate = 1.0;
 

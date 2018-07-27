@@ -17,20 +17,20 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "libvlclightplayer.h"
-#include "genericimage.h"
-#include "jcontrolexception.h"
-#include "jvideosizecontrol.h"
-#include "jvideoformatcontrol.h"
-#include "jvolumecontrol.h"
-#include "jaudioconfigurationcontrol.h"
-#include "jmediaexception.h"
+#include "jmedia/binds/libvlc/include/libvlclightplayer.h"
+#include "jmedia/jvideosizecontrol.h"
+#include "jmedia/jvideoformatcontrol.h"
+#include "jmedia/jvolumecontrol.h"
+#include "jmedia/jaudioconfigurationcontrol.h"
+#include "jgui/jbufferedimage.h"
+#include "jexception/jmediaexception.h"
+#include "jexception/jcontrolexception.h"
+
+#include <vlc/vlc.h>
 
 #include <cairo.h>
 
 namespace jmedia {
-
-namespace libvlclightplayer {
 
 static libvlc_event_type_t mi_events[] = {
 	// libvlc_MediaMetaChanged,	
@@ -98,7 +98,7 @@ static libvlc_event_type_t mi_events[] = {
 	
 static int mi_events_len = sizeof(mi_events)/sizeof(*mi_events);
 
-class PlayerComponentImpl : public jgui::Component, jthread::Thread {
+class PlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -106,7 +106,7 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 		/** \brief */
 		jgui::Image *_image;
 		/** \brief */
-		jthread::Mutex _mutex;
+    std::mutex _mutex;
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
@@ -150,12 +150,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 
 		virtual ~PlayerComponentImpl()
 		{
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-
-			_mutex.Lock();
-
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
@@ -168,8 +162,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 				delete _buffer;
 				_buffer = NULL;
 			}
-
-			_mutex.Unlock();
 		}
 
 		virtual jgui::jsize_t GetPreferredSize()
@@ -179,10 +171,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 
 		virtual void UpdateComponent()
 		{
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-
 			int sw = _frame_size.width;
 			int sh = _frame_size.height;
 
@@ -190,41 +178,34 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 					(uint8_t *)_buffer[(_buffer_index+1)%2], CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
 			cairo_t *cairo_context = cairo_create(cairo_surface);
 
-			_mutex.Lock();
+			_mutex.lock();
 
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
 			}
 
-			_image = new jgui::GenericImage(cairo_context, jgui::JPF_ARGB, sw, sh);
+			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_ARGB, sw, sh);
 
-			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
+			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
 
 			cairo_surface_flush(cairo_surface);
 			cairo_surface_destroy(cairo_surface);
 
-			_mutex.Unlock();
+			_mutex.unlock();
 
-			Start();
-		}
-
-		virtual void Run()
-		{
-			if (IsVisible() != false) {
-				Repaint();
-			}
+      Repaint();
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Component::Paint(g);
 
-			_mutex.Lock();
+			_mutex.lock();
 
 			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
 				
-			_mutex.Unlock();
+			_mutex.unlock();
 		}
 
 		virtual Player * GetPlayer()
@@ -270,14 +251,14 @@ static void MediaEventsCallback(const libvlc_event_t *event, void *data)
 	//} else if (event->type == libvlc_MediaPlayerOpening) {
 	//} else if (event->type == libvlc_MediaPlayerBuffering) {
 	} else if (event->type == libvlc_MediaPlayerPlaying) {
-		player->DispatchPlayerEvent(new PlayerEvent(player, JPE_STARTED));
+		player->DispatchPlayerEvent(new jevent::PlayerEvent(player, jevent::JPE_STARTED));
 	// } else if (event->type == libvlc_MediaPlayerPaused) {
 	} else if (event->type == libvlc_MediaPlayerStopped) {
-		player->DispatchPlayerEvent(new PlayerEvent(player, JPE_STOPPED));
+		player->DispatchPlayerEvent(new jevent::PlayerEvent(player, jevent::JPE_STOPPED));
 	//} else if (event->type == libvlc_MediaPlayerForward) {
 	//} else if (event->type == libvlc_MediaPlayerBackward) {
 	} else if (event->type == libvlc_MediaPlayerEndReached) {
-		player->Start();
+		player->Play();
 	// } else if (event->type == libvlc_MediaPlayerEncounteredError) {
 	// } else if (event->type == libvlc_MediaPlayerTimeChanged) {
 	// } else if (event->type == libvlc_MediaPlayerPositionChanged) {
@@ -352,8 +333,6 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual int GetLevel()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
 			int level = 0;
 
 			if (_player->_provider != NULL) {
@@ -365,8 +344,6 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual void SetLevel(int level)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
 			_level = level;
 
 			if (_level <= 0) {
@@ -393,8 +370,6 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual void SetMute(bool b)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-	
 			_is_muted = b;
 			
 			if (_player->_provider != NULL) {
@@ -423,8 +398,6 @@ class AudioConfigurationControlImpl : public AudioConfigurationControl {
 
 		virtual void SetAudioDelay(int64_t delay)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-	
 			if (_player->_provider != NULL) {
 				 libvlc_audio_set_delay(_player->_provider, delay);
 			}
@@ -432,8 +405,6 @@ class AudioConfigurationControlImpl : public AudioConfigurationControl {
 
 		virtual int64_t GetAudioDelay()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-	
 			int64_t delay = 0LL;
 
 			if (_player->_provider != NULL) {
@@ -465,7 +436,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		{
 			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
-			jthread::AutoLock lock(&impl->_mutex);
+      std::unique_lock<std::mutex> lock(impl->_mutex);
 			
 			impl->_src.x = x;
 			impl->_src.y = y;
@@ -477,7 +448,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		{
 			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
-			jthread::AutoLock lock(&impl->_mutex);
+      std::unique_lock<std::mutex> lock(impl->_mutex);
 
 			impl->SetBounds(x, y, w, h);
 		}
@@ -534,8 +505,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual jaspect_ratio_t GetAspectRatio()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
 			double aspect = _player->_aspect;
 
 			if (aspect == (1.0/1.0)) {
@@ -553,8 +522,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual double GetFramesPerSecond()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
 			return _player->_frames_per_second;
 		}
 
@@ -574,8 +541,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		}
 
 };
-
-}
 
 LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	jmedia::Player()
@@ -614,15 +579,15 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 			if (_has_audio == false) {
 				_has_audio = true;
 
-				_controls.push_back(new libvlclightplayer::VolumeControlImpl(this));
-				_controls.push_back(new libvlclightplayer::AudioConfigurationControlImpl(this));
+				_controls.push_back(new VolumeControlImpl(this));
+				_controls.push_back(new AudioConfigurationControlImpl(this));
 			}
 		} else if (t->i_type == libvlc_track_video) {
 			if (_has_video == false) {
 				_has_video = true;
 				
-				_controls.push_back(new libvlclightplayer::VideoSizeControlImpl(this));
-				_controls.push_back(new libvlclightplayer::VideoFormatControlImpl(this));
+				_controls.push_back(new VideoSizeControlImpl(this));
+				_controls.push_back(new VideoFormatControlImpl(this));
 			}
 		}
 	}
@@ -657,7 +622,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 				libvlc_media_player_release(_provider);
 				libvlc_release(_engine);
 
-				throw jcommon::RuntimeException("Cannot retrive the size of media content");
+				throw jexception::RuntimeException("Cannot retrive the size of media content");
 			}
 		}
 
@@ -667,14 +632,14 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	_media_time = (uint64_t)libvlc_media_get_duration(media);
 	_frames_per_second = libvlc_media_player_get_fps(_provider);
 
-	_component = new libvlclightplayer::PlayerComponentImpl(this, 0, 0, iw, ih);
+	_component = new PlayerComponentImpl(this, 0, 0, iw, ih);
 
 	libvlc_video_set_format(_provider, "RV32", iw, ih, iw*4);
 	libvlc_video_set_callbacks(
 			_provider, 
-			libvlclightplayer::LockMediaSurface, 
-			libvlclightplayer::UnlockMediaSurface, 
-			libvlclightplayer::DisplayMediaSurface, 
+			LockMediaSurface, 
+			UnlockMediaSurface, 
+			DisplayMediaSurface, 
 			_component);
 
 	_media_info.title = std::string(libvlc_media_get_meta(media, libvlc_meta_Title)?:"");
@@ -711,19 +676,15 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	
 	_event_manager = libvlc_media_player_event_manager(_provider);
 
-	for (int i=0; i<libvlclightplayer::mi_events_len; i++) {
-		libvlc_event_attach(_event_manager, libvlclightplayer::mi_events[i], libvlclightplayer::MediaEventsCallback, this);
+	for (int i=0; i<mi_events_len; i++) {
+		libvlc_event_attach(_event_manager, mi_events[i], MediaEventsCallback, this);
 	}
 }
 
 LibVLCLightPlayer::~LibVLCLightPlayer()
 {
-	if (IsRunning() == true) {
-		WaitThread();
-	}
-
-	for (int i=0; i<libvlclightplayer::mi_events_len; i++) {
-		libvlc_event_detach(_event_manager, libvlclightplayer::mi_events[i], libvlclightplayer::MediaEventsCallback, this);
+	for (int i=0; i<mi_events_len; i++) {
+		libvlc_event_detach(_event_manager, mi_events[i], MediaEventsCallback, this);
 	}
 
 	Close();
@@ -748,14 +709,12 @@ void LibVLCLightPlayer::Run()
 	} else {
 		Stop();
 
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_FINISHED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_FINISHED));
 	}
 }
 
 void LibVLCLightPlayer::Play()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	if (_is_paused == false && _provider != NULL) {
 		libvlc_media_player_play(_provider);
 	}
@@ -763,8 +722,6 @@ void LibVLCLightPlayer::Play()
 
 void LibVLCLightPlayer::Pause()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	if (_is_paused == false && _provider != NULL) {
 		_is_paused = true;
 
@@ -772,27 +729,23 @@ void LibVLCLightPlayer::Pause()
 			libvlc_media_player_set_pause(_provider, 1);
 		}
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_PAUSED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_PAUSED));
 	}
 }
 
 void LibVLCLightPlayer::Resume()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	if (_is_paused == true && _provider != NULL) {
 		_is_paused = false;
 
 		libvlc_media_player_set_pause(_provider, 0);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_RESUMED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_RESUMED));
 	}
 }
 
 void LibVLCLightPlayer::Stop()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	if (_provider != NULL) {
 		libvlc_media_player_stop(_provider);
 
@@ -806,8 +759,6 @@ void LibVLCLightPlayer::Stop()
 
 void LibVLCLightPlayer::Close()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	if (_is_closed == true) {
 		return;
 	}
@@ -829,8 +780,6 @@ void LibVLCLightPlayer::Close()
 
 void LibVLCLightPlayer::SetCurrentTime(uint64_t time)
 {
-	jthread::AutoLock lock(&_mutex);
-
 	if (_provider != NULL) {
 		if (libvlc_media_player_is_seekable(_provider) == true) {
 			libvlc_media_player_set_time(_provider, (libvlc_time_t)time);
@@ -840,8 +789,6 @@ void LibVLCLightPlayer::SetCurrentTime(uint64_t time)
 
 uint64_t LibVLCLightPlayer::GetCurrentTime()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	uint64_t time = 0LL;
 
 	if (_provider != NULL) {
@@ -858,8 +805,6 @@ uint64_t LibVLCLightPlayer::GetMediaTime()
 
 void LibVLCLightPlayer::SetLoop(bool b)
 {
-	jthread::AutoLock lock(&_mutex);
-
 	_is_loop = b;
 }
 
@@ -870,8 +815,6 @@ bool LibVLCLightPlayer::IsLoop()
 
 void LibVLCLightPlayer::SetDecodeRate(double rate)
 {
-	jthread::AutoLock lock(&_mutex);
-
 	_decode_rate = rate;
 
 	if (_decode_rate != 0.0) {
@@ -885,8 +828,6 @@ void LibVLCLightPlayer::SetDecodeRate(double rate)
 
 double LibVLCLightPlayer::GetDecodeRate()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	double rate = 1.0;
 
 	if (_provider != NULL) {

@@ -46,19 +46,22 @@
    Free Software Foundation, Inc., 59 Temple Place - Suite 330,
    Boston, MA 02111-1307, USA.
 */
-#include "giflightplayer.h"
-#include "genericimage.h"
-#include "jcontrolexception.h"
-#include "jvideosizecontrol.h"
-#include "jvideoformatcontrol.h"
-#include "jvolumecontrol.h"
-#include "jaudioconfigurationcontrol.h"
-#include "jmediaexception.h"
-#include "jinputstream.h"
-#include "jcondition.h"
-#include "jfileinputstream.h"
-#include "jsemaphoretimeoutexception.h"
-#include "jdebug.h"
+#include "jmedia/binds/gif/include/giflightplayer.h"
+#include "jmedia/jvideosizecontrol.h"
+#include "jmedia/jvideoformatcontrol.h"
+#include "jmedia/jvolumecontrol.h"
+#include "jmedia/jaudioconfigurationcontrol.h"
+#include "jgui/jbufferedimage.h"
+#include "jlogger/jloggerlib.h"
+#include "jio/jinputstream.h"
+#include "jio/jfileinputstream.h"
+#include "jexception/jsemaphoretimeoutexception.h"
+#include "jexception/jmediaexception.h"
+#include "jexception/jcontrolexception.h"
+
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #include <cairo.h>
 
@@ -79,13 +82,12 @@
 
 namespace jmedia {
 
-namespace giflightplayer {
-
 struct AnimatedGIFData {
-	jio::InputStream   *stream;
-	jthread::Thread    *thread;
-	jthread::Mutex     lock;
-	jthread::Condition cond;
+  jio::InputStream *stream;
+
+  std::thread thread;
+  std::mutex mutex;
+  std::condition_variable condition;
 
 	uint32_t  *image;
 
@@ -636,7 +638,7 @@ class PlayerComponentImpl : public jgui::Component {
 		/** \brief */
 		jgui::Image *_image;
 		/** \brief */
-		jthread::Mutex _mutex;
+    std::mutex _mutex;
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
@@ -669,14 +671,14 @@ class PlayerComponentImpl : public jgui::Component {
 
 		virtual ~PlayerComponentImpl()
 		{
-			_mutex.Lock();
+			_mutex.lock();
 
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
 			}
 
-			_mutex.Unlock();
+			_mutex.unlock();
 		}
 
 		virtual jgui::jsize_t GetPreferredSize()
@@ -693,21 +695,21 @@ class PlayerComponentImpl : public jgui::Component {
 					(uint8_t *)data, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
 			cairo_t *cairo_context = cairo_create(cairo_surface);
 
-			_mutex.Lock();
+			_mutex.lock();
 
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
 			}
 
-			_image = new jgui::GenericImage(cairo_context, jgui::JPF_ARGB, sw, sh);
+			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_ARGB, sw, sh);
 
-			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
+			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
 
 			cairo_surface_flush(cairo_surface);
 			cairo_surface_destroy(cairo_surface);
 
-			_mutex.Unlock();
+			_mutex.unlock();
 
 			Run();
 		}
@@ -723,11 +725,11 @@ class PlayerComponentImpl : public jgui::Component {
 		{
 			jgui::Component::Paint(g);
 
-			_mutex.Lock();
+			_mutex.lock();
 
 			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
 				
-			_mutex.Unlock();
+			_mutex.unlock();
 		}
 
 		virtual Player * GetPlayer()
@@ -757,21 +759,25 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		{
 			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
-			jthread::AutoLock lock(&impl->_mutex);
+      impl->_mutex.lock();
 			
 			impl->_src.x = x;
 			impl->_src.y = y;
 			impl->_src.width = w;
 			impl->_src.height = h;
+      
+      impl->_mutex.unlock();
 		}
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
 			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
-			jthread::AutoLock lock(&impl->_mutex);
+      impl->_mutex.lock();
 
 			impl->SetBounds(x, y, w, h);
+      
+      impl->_mutex.unlock();
 		}
 
 		virtual jgui::jregion_t GetSource()
@@ -785,8 +791,6 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		}
 
 };
-
-}
 
 GIFLightPlayer::GIFLightPlayer(std::string file):
 	jmedia::Player()
@@ -807,7 +811,6 @@ GIFLightPlayer::GIFLightPlayer(std::string file):
 
 	giflightplayer::AnimatedGIFData *data = new giflightplayer::AnimatedGIFData;
 
-	data->thread = NULL;
 	data->stream = stream;
 	data->image = NULL;
 	data->Width = -1;
@@ -840,7 +843,7 @@ GIFLightPlayer::GIFLightPlayer(std::string file):
 	if (GIFReadHeader(data) != 0) {
 		delete data;
 
-		throw MediaException("Unable to process gif header");
+		throw jexception::MediaException("Unable to process gif header");
 	}
 
 	data->image = new uint32_t[data->Width*data->Height];
@@ -879,7 +882,7 @@ void GIFLightPlayer::Run()
 	while (_is_playing == true) {
 		bool skip = false;
 
-		data->lock.Lock();
+    std::unique_lock<std::mutex> lock(data->mutex);
 
 		if (GIFReadFrame(data) != 0) { 
 			GIFReset(data);
@@ -893,9 +896,9 @@ void GIFLightPlayer::Run()
 					break;
 				}
 			} else {
-				DispatchPlayerEvent(new PlayerEvent(this, JPE_FINISHED));
+				DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_FINISHED));
 
-				data->lock.Unlock();
+				data->mutex.unlock();
 
 				break;
 			}
@@ -906,7 +909,7 @@ void GIFLightPlayer::Run()
 
 			try {
 				if (_decode_rate == 0) {
-					data->cond.Wait(&data->lock);
+					data->condition.wait(lock);
 				} else {
 					uint64_t us;
 
@@ -916,32 +919,32 @@ void GIFLightPlayer::Run()
 						us = ((double)us / _decode_rate + 0.5);
 					}
 
-					data->cond.Wait(us, &data->lock);
+          data->condition.wait_for(lock, std::chrono::microseconds(us));
 				}
-			} catch (jthread::SemaphoreTimeoutException &e) {
+			} catch (jexception::SemaphoreTimeoutException &e) {
 			}
 		}
-
-		data->lock.Unlock();
 	}
 }
 
 void GIFLightPlayer::Play()
 {
-	jthread::AutoLock lock(&_mutex);
+  _mutex.lock();
 
 	if (_is_paused == false) {
-		if (IsRunning() == false) {
+		if (_is_playing == false) {
 			_is_playing = true;
 
-			Start();
+      _thread = std::thread(&GIFLightPlayer::Run, this);
 		}
 	}
+  
+  _mutex.unlock();
 }
 
 void GIFLightPlayer::Pause()
 {
-	jthread::AutoLock lock(&_mutex);
+  _mutex.lock();
 
 	if (_is_paused == false) {
 		_is_paused = true;
@@ -950,58 +953,66 @@ void GIFLightPlayer::Pause()
 
 		SetDecodeRate(0.0);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_PAUSED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_PAUSED));
 	}
+  
+  _mutex.unlock();
 }
 
 void GIFLightPlayer::Resume()
 {
-	jthread::AutoLock lock(&_mutex);
+  _mutex.lock();
 
 	if (_is_paused == true) {
 		_is_paused = false;
 		
 		SetDecodeRate(_decode_rate);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_RESUMED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_RESUMED));
 	}
+  
+  _mutex.unlock();
 }
 
 void GIFLightPlayer::Stop()
 {
-	jthread::AutoLock lock(&_mutex);
+  _mutex.lock();
+
+  if (_is_playing == true) {
+    _thread.join();
+  }
 
 	_is_playing = false;
-
-	if (IsRunning() == true) {
-		WaitThread();
-	}
 
 	if (_has_video == true) {
 		_component->Repaint();
 	}
 
 	_is_paused = false;
+
+  _mutex.unlock();
 }
 
 void GIFLightPlayer::Close()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	if (_is_closed == true) {
 		return;
 	}
+
+  _mutex.lock();
 
 	_is_playing = false;
 	_is_closed = true;
 	
 	giflightplayer::AnimatedGIFData *data = (giflightplayer::AnimatedGIFData *)_provider;
 
-	data->cond.Notify();
+	data->condition.notify_one();
 
-	if (IsRunning() == true) {
-		WaitThread();
-	}
+  if (_is_playing == true) {
+    _thread.join();
+  }
+
+	_is_playing = false;
 
 	if (data->stream != NULL) {
 		data->stream->Close();
@@ -1015,6 +1026,8 @@ void GIFLightPlayer::Close()
 	delete data;
 
 	_provider = NULL;
+
+  _mutex.unlock();
 }
 
 void GIFLightPlayer::SetCurrentTime(uint64_t time)
@@ -1033,8 +1046,6 @@ uint64_t GIFLightPlayer::GetMediaTime()
 
 void GIFLightPlayer::SetLoop(bool b)
 {
-	jthread::AutoLock lock(&_mutex);
-
 	_is_loop = b;
 }
 
@@ -1045,7 +1056,7 @@ bool GIFLightPlayer::IsLoop()
 
 void GIFLightPlayer::SetDecodeRate(double rate)
 {
-	jthread::AutoLock lock(&_mutex);
+  _mutex.lock();
 
 	_decode_rate = rate;
 
@@ -1054,14 +1065,14 @@ void GIFLightPlayer::SetDecodeRate(double rate)
 		
 		_is_paused = false;
 			
-		data->cond.Notify();
+		data->condition.notify_one();
 	}
+  
+  _mutex.unlock();
 }
 
 double GIFLightPlayer::GetDecodeRate()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	return _decode_rate;
 }
 

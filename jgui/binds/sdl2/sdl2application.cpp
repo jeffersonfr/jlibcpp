@@ -19,9 +19,9 @@
  ***************************************************************************/
 #include "sdl2/include/sdl2application.h"
 #include "sdl2/include/sdl2window.h"
-#include "jgui/jfont.h"
 #include "jgui/jbufferedimage.h"
 #include "jcommon/jproperties.h"
+#include "jcommon/jdate.h"
 #include "jexception/jruntimeexception.h"
 #include "jexception/jillegalargumentexception.h"
 
@@ -612,7 +612,7 @@ void SDL2Application::InternalLoop()
         //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_HYPER);
         }
 
-        type = (jevent::jkeyevent_type_t)(0);
+        type = jevent::JKT_UNKNOWN;
 
         if (event.key.state == SDL_PRESSED) {
           type = jevent::JKT_PRESSED;
@@ -638,8 +638,8 @@ void SDL2Application::InternalLoop()
         }
 
         int mouse_z = 0;
-        jevent::jmouseevent_button_t button = jevent::JMB_UNKNOWN;
-        jevent::jmouseevent_button_t buttons = jevent::JMB_UNKNOWN;
+        jevent::jmouseevent_button_t button = jevent::JMB_NONE;
+        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
 
         _mouse_x = event.motion.x;
@@ -761,7 +761,6 @@ SDL2Window::SDL2Window(int x, int y, int width, int height):
 	if (_renderer == NULL) {
 		throw jexception::RuntimeException("Cannot get a window's surface");
 	}
-
 
 	// SDL_SetWindowBordered(_window, SDL_FALSE);
 

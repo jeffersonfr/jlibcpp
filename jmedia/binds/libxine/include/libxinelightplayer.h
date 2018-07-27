@@ -20,9 +20,10 @@
 #ifndef J_LIBXINELIGHTPLAYER_H
 #define J_LIBXINELIGHTPLAYER_H
 
-#include "jplayer.h"
-#include "jthread.h"
-#include "jcomponent.h"
+#include "jmedia/jplayer.h"
+#include "jgui/jcomponent.h"
+
+#include <mutex>
 
 #include <xine.h>
 #include <xine/xineutils.h>
@@ -33,7 +34,7 @@ class LibXineLightPlayer : public jmedia::Player {
 
 	public:
 		/** \brief */
-		jthread::Mutex _mutex;
+    std::mutex _mutex;
 		/** \brief */
 		std::string _file;
 		/** \brief */

@@ -17,23 +17,21 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "libxinelightplayer.h"
-#include "genericimage.h"
-#include "jcontrolexception.h"
-#include "jvideosizecontrol.h"
-#include "jvideoformatcontrol.h"
-#include "jvideodevicecontrol.h"
-#include "jvolumecontrol.h"
-#include "jmediaexception.h"
-#include "jcolorconversion.h"
+#include "jmedia/binds/libxine/include/libxinelightplayer.h"
+#include "jmedia/jvideosizecontrol.h"
+#include "jmedia/jvideoformatcontrol.h"
+#include "jmedia/jvideodevicecontrol.h"
+#include "jmedia/jvolumecontrol.h"
+#include "jmedia/jcolorconversion.h"
+#include "jgui/jbufferedimage.h"
+#include "jexception/jmediaexception.h"
+#include "jexception/jcontrolexception.h"
 
 #include <cairo.h>
 
 namespace jmedia {
 
-namespace libxinelightplayer {
-
-class PlayerComponentImpl : public jgui::Component, jthread::Thread {
+class PlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -41,7 +39,7 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 		/** \brief */
 		jgui::Image *_image;
 		/** \brief */
-		jthread::Mutex _mutex;
+		std::mutex _mutex;
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
@@ -75,18 +73,10 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 
 		virtual ~PlayerComponentImpl()
 		{
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-
-			_mutex.Lock();
-
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
 			}
-
-			_mutex.Unlock();
 
 			if (_buffer != NULL) {
 				delete [] _buffer[0];
@@ -130,10 +120,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 	
 			_buffer_index = (_buffer_index + 1)%2;
 
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-
 			int sw = width;
 			int sh = height;
 
@@ -141,41 +127,34 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 					(uint8_t *)buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
 			cairo_t *cairo_context = cairo_create(cairo_surface);
 
-			_mutex.Lock();
+			_mutex.lock();
 
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
 			}
 
-			_image = new jgui::GenericImage(cairo_context, jgui::JPF_RGB24, sw, sh);
+			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_RGB24, sw, sh);
 
-			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
+			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
 
 			cairo_surface_flush(cairo_surface);
 			cairo_surface_destroy(cairo_surface);
 
-			_mutex.Unlock();
+			_mutex.unlock();
 
-			Start();
-		}
-
-		virtual void Run()
-		{
-			if (IsVisible() != false) {
-				Repaint();
-			}
+      Repaint();
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Component::Paint(g);
 
-			_mutex.Lock();
+			_mutex.lock();
 
 			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
 				
-			_mutex.Unlock();
+			_mutex.unlock();
 		}
 
 		virtual Player * GetPlayer()
@@ -212,9 +191,9 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual int GetLevel()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
 			int level = 0;
+
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			if (_player->_stream != NULL) {
 				level = xine_get_param(_player->_stream, XINE_PARAM_AUDIO_VOLUME);
@@ -229,7 +208,7 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual void SetLevel(int level)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			if (_player->_stream != NULL) {
 				_level = (level < 0)?0:(level > 100)?100:level;
@@ -269,7 +248,7 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual void SetMute(bool b)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 	
 			_is_muted = b;
 			
@@ -300,7 +279,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		{
 			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
-			jthread::AutoLock lock(&impl->_mutex);
+      std::unique_lock<std::mutex> lock(impl->_mutex);
 			
 			impl->_src.x = x;
 			impl->_src.y = y;
@@ -312,7 +291,7 @@ class VideoSizeControlImpl : public VideoSizeControl {
 		{
 			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
-			jthread::AutoLock lock(&impl->_mutex);
+      std::unique_lock<std::mutex> lock(impl->_mutex);
 
 			impl->SetBounds(x, y, w, h);
 		}
@@ -369,7 +348,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual jaspect_ratio_t GetAspectRatio()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			double aspect = _player->_aspect;
 
@@ -388,7 +367,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual double GetFramesPerSecond()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			return _player->_frames_per_second;
 		}
@@ -439,7 +418,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 
 		virtual int GetValue(jvideo_control_t id)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			if (_player->_stream != NULL) {
 				if (HasControl(id) == true) {
@@ -466,7 +445,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 
 		virtual bool SetValue(jvideo_control_t id, int value)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			if (_player->_stream != NULL) {
 				if (HasControl(id) == true) {
@@ -514,7 +493,7 @@ static void events_callback(void *data, const xine_event_t *event)
 	LibXineLightPlayer *player = reinterpret_cast<LibXineLightPlayer *>(data);
 
 	if (event->type == XINE_EVENT_UI_PLAYBACK_FINISHED) {
-		player->DispatchPlayerEvent(new PlayerEvent(player, JPE_FINISHED));
+		player->DispatchPlayerEvent(new jevent::PlayerEvent(player, jevent::JPE_FINISHED));
 
 		if (player->IsLoop() == true) {
 			player->Play();
@@ -524,8 +503,6 @@ static void events_callback(void *data, const xine_event_t *event)
   }
 }
   
-}
-
 LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	jmedia::Player()
 {
@@ -540,15 +517,15 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	_decode_rate = 1.0;
 	_frames_per_second = 0.0;
 	
-	_component = new libxinelightplayer::PlayerComponentImpl(this, 0, 0, -1, -1);
+	_component = new PlayerComponentImpl(this, 0, 0, -1, -1);
 
 	raw_visual_t t;
 
 	memset(&t, 0, sizeof(t));
 
 	t.supported_formats = (int)(XINE_VORAW_YV12 | XINE_VORAW_YUY2 | XINE_VORAW_RGB);
-	t.raw_output_cb = libxinelightplayer::render_callback;
-	t.raw_overlay_cb = libxinelightplayer::overlay_callback;
+	t.raw_output_cb = render_callback;
+	t.raw_overlay_cb = overlay_callback;
 	t.user_data = _component;
 
   _xine = xine_new();
@@ -565,7 +542,7 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
   _stream = xine_stream_new(_xine, _ao_port, _vo_port);
   _event_queue = xine_event_new_queue(_stream);
   
-	xine_event_create_listener_thread(_event_queue, libxinelightplayer::events_callback, this);
+	xine_event_create_listener_thread(_event_queue, events_callback, this);
 
   if (xine_open(_stream, _file.c_str()) == 0) {
 		xine_close(_stream);
@@ -575,7 +552,7 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 		xine_close_video_driver(_xine, _vo_port);  
 		xine_exit(_xine);
 
-		throw jmedia::MediaException("Unable to open the media file");
+		throw jexception::MediaException("Unable to open the media file");
   }
 
 	xine_set_param(_stream, XINE_PARAM_VERBOSITY, 1);
@@ -591,7 +568,7 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 	if (xine_get_stream_info(_stream, XINE_STREAM_INFO_HAS_AUDIO)) {
 		_has_audio = true;
 
-		_controls.push_back(new libxinelightplayer::VolumeControlImpl(this));
+		_controls.push_back(new VolumeControlImpl(this));
 	}
 
 	if (xine_get_stream_info(_stream, XINE_STREAM_INFO_HAS_VIDEO)) {
@@ -603,9 +580,9 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 			_frames_per_second = 90000.0/_frames_per_second;
 		}
 
-		_controls.push_back(new libxinelightplayer::VideoSizeControlImpl(this));
-		_controls.push_back(new libxinelightplayer::VideoFormatControlImpl(this));
-		_controls.push_back(new libxinelightplayer::VideoDeviceControlImpl(this));
+		_controls.push_back(new VideoSizeControlImpl(this));
+		_controls.push_back(new VideoFormatControlImpl(this));
+		_controls.push_back(new VideoDeviceControlImpl(this));
 	}
 
 	if (_has_video == false && _has_audio == true) {
@@ -642,7 +619,7 @@ LibXineLightPlayer::~LibXineLightPlayer()
 
 void LibXineLightPlayer::Play()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_paused == false && _stream != NULL) {
 		int speed = xine_get_param(_stream, XINE_PARAM_SPEED);
@@ -650,13 +627,13 @@ void LibXineLightPlayer::Play()
 		xine_play(_stream, 0, 0);
 		xine_set_param(_stream, XINE_PARAM_SPEED, speed);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_STARTED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_STARTED));
 	}
 }
 
 void LibXineLightPlayer::Pause()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_paused == false) {
 		_is_paused = true;
@@ -665,26 +642,26 @@ void LibXineLightPlayer::Pause()
 
 		SetDecodeRate(0.0);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_PAUSED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_PAUSED));
 	}
 }
 
 void LibXineLightPlayer::Resume()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_paused == true) {
 		_is_paused = false;
 		
 		SetDecodeRate(_decode_rate);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_RESUMED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_RESUMED));
 	}
 }
 
 void LibXineLightPlayer::Stop()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_stream != NULL) {
 		xine_stop(_stream);
@@ -699,7 +676,7 @@ void LibXineLightPlayer::Stop()
 
 void LibXineLightPlayer::Close()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_closed == true) {
 		return;
@@ -724,7 +701,7 @@ void LibXineLightPlayer::Close()
 
 void LibXineLightPlayer::SetCurrentTime(uint64_t time)
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_stream != NULL) {
 		if (xine_get_stream_info(_stream, XINE_STREAM_INFO_SEEKABLE) == 0) {
@@ -743,7 +720,7 @@ void LibXineLightPlayer::SetCurrentTime(uint64_t time)
 
 uint64_t LibXineLightPlayer::GetCurrentTime()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	uint64_t time = 0LL;
 
@@ -781,7 +758,7 @@ uint64_t LibXineLightPlayer::GetMediaTime()
 
 void LibXineLightPlayer::SetLoop(bool b)
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	_is_loop = b;
 }
@@ -793,7 +770,7 @@ bool LibXineLightPlayer::IsLoop()
 
 void LibXineLightPlayer::SetDecodeRate(double rate)
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	_decode_rate = rate;
 
@@ -808,7 +785,7 @@ void LibXineLightPlayer::SetDecodeRate(double rate)
 
 double LibXineLightPlayer::GetDecodeRate()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	double rate = 1.0;
 

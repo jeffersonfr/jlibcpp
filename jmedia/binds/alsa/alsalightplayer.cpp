@@ -17,11 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "alsalightplayer.h"
-#include "jcontrolexception.h"
-#include "jvolumecontrol.h"
-#include "jmediaexception.h"
-#include "jfileinputstream.h"
+#include "jmedia/binds/alsa/include/alsalightplayer.h"
+#include "jmedia/jvolumecontrol.h"
+#include "jio/jfileinputstream.h"
+#include "jexception/jmediaexception.h"
+#include "jexception/jcontrolexception.h"
 
 #define ALSA_PLAYER_DEVICE_NAME "default"
 #define ALSA_PLAYER_MIXER_NAME "Master"
@@ -29,8 +29,6 @@
 #define ALSA_PLAYER_BUFFER 1024
 
 namespace jmedia {
-
-namespace wavlightplayer {
 
 class VolumeControlImpl : public VolumeControl {
 	
@@ -107,10 +105,10 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual int GetLevel()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
 			long level = 0;
 			
+      std::unique_lock<std::mutex> lock(_player->_mutex);
+
 			if (_mixer != NULL) {
 				long minv, maxv;
 
@@ -128,7 +126,7 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual void SetLevel(int level)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			_level = (level < 0)?0:(level > 100)?100:level;
 
@@ -154,7 +152,7 @@ class VolumeControlImpl : public VolumeControl {
 
 		virtual void SetMute(bool b)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 	
 			_is_muted = b;
 			
@@ -170,8 +168,6 @@ class VolumeControlImpl : public VolumeControl {
 		}
 
 };
-
-}
 
 static bool load_wave_params(const char *file, uint32_t *channels_, uint32_t *bits_per_sample_, uint32_t *sample_rate_)
 {
@@ -284,36 +280,36 @@ AlsaLightPlayer::AlsaLightPlayer(std::string file):
 	_stream = new jio::FileInputStream(file);
 
 	if (load_wave_params(file.c_str(), &_channels, &_bit_depth, &_sample_rate) == false) {
-		throw jmedia::MediaException("Unable to open a wav file");
+		throw jexception::MediaException("Unable to open a wav file");
 	}
 
 	int pcm;
 
 	if ((pcm = snd_pcm_open(&_pcm_handle, ALSA_PLAYER_DEVICE_NAME, SND_PCM_STREAM_PLAYBACK, 0)) < 0) {
-		throw jmedia::MediaException("Unable to open the default pcm device");
+		throw jexception::MediaException("Unable to open the default pcm device");
 	}
 
 	snd_pcm_hw_params_alloca(&_params);
 	snd_pcm_hw_params_any(_pcm_handle, _params);
 
 	if ((pcm = snd_pcm_hw_params_set_access(_pcm_handle, _params, SND_PCM_ACCESS_RW_INTERLEAVED)) < 0) {
-		throw jmedia::MediaException("Cannot set interleaved mode");
+		throw jexception::MediaException("Cannot set interleaved mode");
 	}
 
 	if ((pcm = snd_pcm_hw_params_set_format(_pcm_handle, _params, SND_PCM_FORMAT_S16_LE)) < 0) {
-		throw jmedia::MediaException("Cannot set the PCM_S16_LE format");
+		throw jexception::MediaException("Cannot set the PCM_S16_LE format");
 	}
 
 	if ((pcm = snd_pcm_hw_params_set_channels(_pcm_handle, _params, _channels)) < 0) {
-		throw jmedia::MediaException("Cannot set the channels number");
+		throw jexception::MediaException("Cannot set the channels number");
 	}
 
 	if ((pcm = snd_pcm_hw_params_set_rate_near(_pcm_handle, _params, &_sample_rate, 0)) < 0) {
-		throw jmedia::MediaException("Cannot set the rate");
+		throw jexception::MediaException("Cannot set the rate");
 	}
 
 	if ((pcm = snd_pcm_hw_params(_pcm_handle, _params)) < 0) {
-		throw jmedia::MediaException("Cannot set the hardware parameters");
+		throw jexception::MediaException("Cannot set the hardware parameters");
 	}
 
 	snd_pcm_hw_params_get_period_size(_params, &_frames, 0);
@@ -327,7 +323,7 @@ AlsaLightPlayer::AlsaLightPlayer(std::string file):
 
 	_component = new jgui::Component();
 
-	_controls.push_back(new wavlightplayer::VolumeControlImpl(this));
+	_controls.push_back(new VolumeControlImpl(this));
 }
 
 AlsaLightPlayer::~AlsaLightPlayer()
@@ -351,40 +347,40 @@ AlsaLightPlayer::~AlsaLightPlayer()
 
 void AlsaLightPlayer::Play()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_pcm_handle != NULL && IsRunning() == false) {
-		Start();
+	if (_pcm_handle != NULL && _is_playing == false) {
+    _thread = std::thread(&AlsaLightPlayer::Run, this);
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_STARTED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_STARTED));
 	}
 }
 
 void AlsaLightPlayer::Pause()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_pcm_handle != NULL && snd_pcm_state(_pcm_handle) == SND_PCM_STATE_RUNNING) {
 		snd_pcm_pause(_pcm_handle, 1);
 	
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_PAUSED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_PAUSED));
 	}
 }
 
 void AlsaLightPlayer::Resume()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_pcm_handle != NULL && snd_pcm_state(_pcm_handle) == SND_PCM_STATE_PAUSED) {
 		snd_pcm_pause(_pcm_handle, 0);
 	
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_RESUMED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_RESUMED));
 	}
 }
 
 void AlsaLightPlayer::Stop()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_pcm_handle != NULL) {
 		snd_pcm_state_t state = snd_pcm_state(_pcm_handle);
@@ -405,10 +401,10 @@ void AlsaLightPlayer::Stop()
 		}
 	}
 
-	if (IsRunning() == true) {
+	if (_is_playing == true) {
 		_is_playing = false;
 
-		WaitThread();
+    _thread.join();
 	}
 
 	_stream->Reset();
@@ -416,7 +412,7 @@ void AlsaLightPlayer::Stop()
 
 void AlsaLightPlayer::Close()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_closed == true) {
 		return;
@@ -431,10 +427,10 @@ void AlsaLightPlayer::Close()
 
 void AlsaLightPlayer::SetCurrentTime(uint64_t time)
 {
-	jthread::AutoLock lock(&_mutex);
-
 	double period;
 	
+  std::unique_lock<std::mutex> lock(_mutex);
+
 	period = _channels * _sample_rate * _bit_depth * 60.0 / 8;
 
 	if (period != 0) {
@@ -445,10 +441,10 @@ void AlsaLightPlayer::SetCurrentTime(uint64_t time)
 
 uint64_t AlsaLightPlayer::GetCurrentTime()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	uint64_t time = 0LL;
 	double period;
+
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	period = _channels * _sample_rate * _bit_depth * 60.0 / 8;
 
@@ -475,7 +471,7 @@ uint64_t AlsaLightPlayer::GetMediaTime()
 
 void AlsaLightPlayer::SetLoop(bool b)
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	_is_loop = b;
 }
@@ -487,7 +483,7 @@ bool AlsaLightPlayer::IsLoop()
 
 void AlsaLightPlayer::SetDecodeRate(double rate)
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	_decode_rate = rate;
 
@@ -500,8 +496,6 @@ void AlsaLightPlayer::SetDecodeRate(double rate)
 
 double AlsaLightPlayer::GetDecodeRate()
 {
-	jthread::AutoLock lock(&_mutex);
-
 	return _decode_rate;
 }
 
@@ -547,7 +541,7 @@ void AlsaLightPlayer::Run()
 		}
 	} while (_is_playing == true);
 
-	DispatchPlayerEvent(new PlayerEvent(this, JPE_FINISHED));
+	DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_FINISHED));
 }
 
 }

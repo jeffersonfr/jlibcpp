@@ -1,14 +1,11 @@
-#ifndef __VIDEOGRABBER_PHOTOBOOTH_H
-#define __VIDEOGRABBER_PHOTOBOOTH_H
+#ifndef J_VIDEOGRABBER_H
+#define J_VIDEOGRABBER_H
 
-#include "videocontrol.h"
-#include "jimage.h"
-#include "jthread.h"
+#include "jgui/jimage.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
+#include <thread>
+
+namespace jmedia {
 
 enum jcapture_method_t {
 	IO_METHOD_READ,
@@ -39,13 +36,17 @@ class V4LFrameListener {
 		}
 };
 
-class VideoGrabber : public jthread::Thread {
+class VideoControl;
+
+class VideoGrabber {
 
 	private:
 		/** \brief */
 		VideoControl *_video_control;
 		/** \brief */
 		V4LFrameListener *_listener;
+		/** \brief */
+    std::thread _thread;
 		/** \brief */
 		struct buffer *_buffers;
 		/** \brief */
@@ -164,5 +165,7 @@ class VideoGrabber : public jthread::Thread {
 		virtual void Run();
 
 };
+
+}
 
 #endif

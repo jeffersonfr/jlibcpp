@@ -20,10 +20,10 @@
 #ifndef J_LIBAVLIGHTPLAYER_H
 #define J_LIBAVLIGHTPLAYER_H
 
-#include "jplayer.h"
-#include "jthread.h"
-#include "jcomponent.h"
-#include "libavplay.h"
+#include "jmedia/jplayer.h"
+#include "jgui/jcomponent.h"
+
+struct VideoState;
 
 namespace jmedia {
 
@@ -31,7 +31,7 @@ class LibAVLightPlayer : public jmedia::Player {
 
 	public:
 		/** \brief */
-		jthread::Mutex _mutex;
+    std::mutex _mutex;
 		/** \brief */
 		VideoState *_provider;
 		/** \brief */

@@ -20,19 +20,24 @@
 #ifndef J_ALSALIGHTPLAYER_H
 #define J_ALSALIGHTPLAYER_H
 
-#include "jplayer.h"
-#include "jthread.h"
-#include "jcomponent.h"
+#include "jmedia/jplayer.h"
+#include "jgui/jcomponent.h"
+#include "jio/jinputstream.h"
+
+#include <thread>
+#include <mutex>
 
 #include <alsa/asoundlib.h>
 
 namespace jmedia {
 
-class AlsaLightPlayer : public jmedia::Player, public jthread::Thread {
+class AlsaLightPlayer : public jmedia::Player {
 
 	public:
 		/** \brief */
-		jthread::Mutex _mutex;
+    std::thread _thread;
+		/** \brief */
+    std::mutex _mutex;
 		/** \brief */
 		std::string _file;
 		/** \brief */

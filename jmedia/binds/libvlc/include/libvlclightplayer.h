@@ -20,15 +20,19 @@
 #ifndef J_LIBVLCLIGHTPLAYER_H
 #define J_LIBVLCLIGHTPLAYER_H
 
-#include "jplayer.h"
-#include "jthread.h"
-#include "jcomponent.h"
+#include "jmedia/jplayer.h"
+#include "jgui/jcomponent.h"
 
-#include <vlc/vlc.h>
+#include <thread>
+#include <mutex>
+
+struct libvlc_instance_t;
+struct libvlc_media_player_t;
+struct libvlc_event_manager_t;
 
 namespace jmedia {
 
-class LibVLCLightPlayer : public jmedia::Player, public jthread::Thread {
+class LibVLCLightPlayer : public jmedia::Player {
 
 	public:
 		/** \brief */
@@ -37,8 +41,6 @@ class LibVLCLightPlayer : public jmedia::Player, public jthread::Thread {
 		libvlc_media_player_t *_provider;
 		/** \brief */
 		libvlc_event_manager_t *_event_manager;
-		/** \brief */
-		jthread::Mutex _mutex;
 		/** \brief */
 		std::string _file;
 		/** \brief */

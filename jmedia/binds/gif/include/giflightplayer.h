@@ -20,17 +20,20 @@
 #ifndef J_GIFLIGHTPLAYER_H
 #define J_GIFLIGHTPLAYER_H
 
-#include "jplayer.h"
-#include "jthread.h"
-#include "jcomponent.h"
+#include "jmedia/jplayer.h"
+#include "jgui/jcomponent.h"
+
+#include <thread>
 
 namespace jmedia {
 
-class GIFLightPlayer : public jmedia::Player, public jthread::Thread {
+class GIFLightPlayer : public jmedia::Player {
 
 	public:
 		/** \brief */
-		jthread::Mutex _mutex;
+    std::thread _thread;
+		/** \brief */
+    std::mutex _mutex;
 		/** \brief */
 		std::string _file;
 		/** \brief */

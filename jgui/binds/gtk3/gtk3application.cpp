@@ -412,57 +412,63 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(guint symbol)
 	return jevent::JKS_UNKNOWN;
 }
 
-static gboolean OnConfigureEvent(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data)
+static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
-  /*
+	if (g_window == NULL || g_window->IsVisible() == false) {
+		return FALSE;
+	}
+
 	GTK3Window 
     *handler = reinterpret_cast<GTK3Window *>(user_data);
-	NativeGraphics 
-    *graphics = (NativeGraphics *)handler->GetGraphics();
+  jregion_t 
+    r = g_window->GetVisibleBounds();
+  jgui::Image 
+    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, r.width, r.height);
+  jgui::Graphics 
+    *g = buffer->GetGraphics();
+	jpoint_t 
+    t = g->Translate();
 
-	int w = gtk_widget_get_allocated_width(widget);
-	int h = gtk_widget_get_allocated_height(widget);
+  /* CHANGE:: use this cairo surface instead
+	int 
+    w = gtk_widget_get_allocated_width(widget),
+	  h = gtk_widget_get_allocated_height(widget);
 
   cairo_surface_t *surface = gdk_window_create_similar_surface(gtk_widget_get_window(widget), CAIRO_CONTENT_COLOR, w, h);
-
-	graphics->SetNativeSurface(surface, w, h);
-
-	handler->SetSize(w, h);
-	handler->Repaint();
   */
+
+	g->Reset();
+	g->Translate(-t.x, -t.y);
+	g->ReleaseClip();
+	g_window->DoLayout();
+	g_window->InvalidateAll();
+  g->SetClip(r.x, r.y, r.width, r.height);
+  g_window->PaintBackground(g);
+  g_window->Paint(g);
+  g_window->PaintGlassPane(g);
+	// g->Translate(t.x, t.y);
+
+  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
+
+  if (cairo_surface == NULL) {
+    return FALSE;
+  }
+
+  cairo_surface_flush(cairo_surface);
+  cairo_set_source_surface(cr, cairo_surface, 0, 0);
+  cairo_paint(cr);
+
+  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 
   return TRUE;
 }
 
-static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
-{
-  /*
-	GTK3Window 
-    *handler = reinterpret_cast<GTK3Window *>(user_data);
-	NativeGraphics 
-   *graphics = (NativeGraphics *)handler->GetGraphics();
-
-	if (_is_first_draw == true) {
-		_is_first_draw = false;
-
-		handler->Repaint();
-	}
-
-	graphics->InternalFlip(cr);
-  */
-
-  return FALSE;
-}
-
 static gboolean OnKeyPressEvent(GtkWidget *widget, GdkEventKey *event, gpointer user_data)
 {
-	GTK3Window 
-    *handler = reinterpret_cast<GTK3Window *>(user_data);
-
   jevent::jkeyevent_type_t type;
 	jevent::jkeyevent_modifiers_t mod;
 
-	mod = (jevent::jkeyevent_modifiers_t)(0);
+	mod = jevent::JKM_NONE;
 
 	if (event->state & GDK_SHIFT_MASK) {
 		mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
@@ -495,15 +501,12 @@ static gboolean OnKeyPressEvent(GtkWidget *widget, GdkEventKey *event, gpointer 
 
 static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpointer user_data)
 {
-	GTK3Window 
-    *handler = reinterpret_cast<GTK3Window *>(user_data);
-
 	GdkModifierType	state;
 
 	state = (GdkModifierType)event->state;
 	
-  jevent::jmouseevent_button_t button = jevent::JMB_UNKNOWN;
-	jevent::jmouseevent_button_t buttons = jevent::JMB_UNKNOWN;
+  jevent::jmouseevent_button_t button = jevent::JMB_NONE;
+	jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
 	jevent::jmouseevent_type_t type = jevent::JMT_MOVED;
 
 	int mouse_x = event->x;
@@ -532,15 +535,12 @@ static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpoin
 
 static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpointer user_data)
 {
-	GTK3Window 
-    *handler = reinterpret_cast<GTK3Window *>(user_data);
-
 	GdkModifierType	state;
 
 	state = (GdkModifierType)event->state;
 	
-  jevent::jmouseevent_button_t button = jevent::JMB_UNKNOWN;
-	jevent::jmouseevent_button_t buttons = jevent::JMB_UNKNOWN;
+  jevent::jmouseevent_button_t button = jevent::JMB_NONE;
+	jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
 	jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
 
 	int mouse_x = event->x; // event->x_root;
@@ -590,43 +590,47 @@ static void OnClose(void)
 {
 }
 
+static gboolean OnConfigureEvent(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data)
+{
+  gtk_widget_queue_draw(_drawing_area);
+
+  return TRUE;
+}
+
 static void ConfigureApplication(GtkApplication *app, gpointer user_data)
 {
-	GTK3Window 
-    *handler = reinterpret_cast<GTK3Window *>(user_data);
 	jgui::jsize_t 
-    size = handler->GetSize();
+    *size = reinterpret_cast<jgui::jsize_t *>(user_data);
 
   _window = gtk_application_window_new(app);
 
   gtk_window_set_title(GTK_WINDOW(_window), _title.c_str());
-	gtk_window_set_decorated(GTK_WINDOW(_window), _undecorated);
+	// gtk_window_set_decorated(GTK_WINDOW(_window), _undecorated);
 
-  g_signal_connect(_window, "destroy", G_CALLBACK(OnClose), NULL);
-
-  gtk_container_set_border_width(GTK_CONTAINER(_window), 2);
+  // gtk_container_set_border_width(GTK_CONTAINER(_window), 2);
 
   _frame = gtk_frame_new(NULL);
 
-  gtk_frame_set_shadow_type(GTK_FRAME(_frame), GTK_SHADOW_IN);
+  // gtk_frame_set_shadow_type(GTK_FRAME(_frame), GTK_SHADOW_IN);
   gtk_container_add(GTK_CONTAINER(_window), _frame);
 
   _drawing_area = gtk_drawing_area_new();
 
-  gtk_widget_set_size_request(_drawing_area, size.width, size.height);
+  gtk_widget_set_size_request(_drawing_area, size->width, size->height);
   gtk_container_add(GTK_CONTAINER(_frame), _drawing_area);
 
-  g_signal_connect(_drawing_area, "draw", G_CALLBACK(OnDraw), handler);
-	g_signal_connect(G_OBJECT(_drawing_area),"configure-event", G_CALLBACK (OnConfigureEvent), handler);
-	g_signal_connect(G_OBJECT(_window), "key_press_event", G_CALLBACK(OnKeyPressEvent), handler);
-	g_signal_connect(G_OBJECT(_window), "key_release_event", G_CALLBACK(OnKeyPressEvent), handler);
-	g_signal_connect(G_OBJECT(_window), "motion_notify_event", G_CALLBACK(OnMouseMoveEvent), handler);
-	g_signal_connect(G_OBJECT(_window), "button_press_event", G_CALLBACK(OnMousePressEvent), handler);
-	g_signal_connect(G_OBJECT(_window), "button_release_event", G_CALLBACK(OnMousePressEvent), handler);
+	g_signal_connect(G_OBJECT(_drawing_area),"configure-event", G_CALLBACK (OnConfigureEvent), NULL);
+  g_signal_connect(_window, "destroy", G_CALLBACK(OnClose), NULL);
+  g_signal_connect(_drawing_area, "draw", G_CALLBACK(OnDraw), NULL);
+	g_signal_connect(G_OBJECT(_window), "key_press_event", G_CALLBACK(OnKeyPressEvent), NULL);
+	g_signal_connect(G_OBJECT(_window), "key_release_event", G_CALLBACK(OnKeyPressEvent), NULL);
+	g_signal_connect(G_OBJECT(_window), "motion_notify_event", G_CALLBACK(OnMouseMoveEvent), NULL);
+	g_signal_connect(G_OBJECT(_window), "button_press_event", G_CALLBACK(OnMousePressEvent), NULL);
+	g_signal_connect(G_OBJECT(_window), "button_release_event", G_CALLBACK(OnMousePressEvent), NULL);
 
   gtk_widget_set_events(_drawing_area, gtk_widget_get_events(_drawing_area) | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
-
-  gtk_widget_show_all(_window); // TODO:: isso deveria ir para SetVisible() ?
+  
+  gtk_widget_show_all(_window);
 }
 
 static jgui::jsize_t _screen = {0, 0};
@@ -710,83 +714,17 @@ void GTK3Application::InternalInit(int argc, char **argv)
 void GTK3Application::InternalPaint()
 {
   gtk_widget_queue_draw(_drawing_area);
-
-/*
-	if (g_window == NULL || g_window->IsVisible() == false) {
-		return;
-	}
-
-  jregion_t 
-    r = g_window->GetVisibleBounds();
-  jgui::Image 
-    *buffer = new jgui::BufferedImage(jgui::JPF_ARGB, r.width, r.height);
-  jgui::Graphics 
-    *g = buffer->GetGraphics();
-	jpoint_t 
-    t = g->Translate();
-
-	g->Reset();
-	g->Translate(-t.x, -t.y);
-	g->ReleaseClip();
-	g_window->DoLayout();
-	g_window->InvalidateAll();
-  g->SetClip(r.x, r.y, r.width, r.height);
-  g_window->PaintBackground(g);
-  g_window->Paint(g);
-  g_window->PaintGlassPane(g);
-	// g->Translate(t.x, t.y);
-
-  cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
-
-  if (cairo_surface == NULL) {
-    return;
-  }
-
-  cairo_surface_flush(cairo_surface);
-
-  int dw = cairo_image_surface_get_width(cairo_surface);
-  int dh = cairo_image_surface_get_height(cairo_surface);
-  // int stride = cairo_image_surface_get_stride(cairo_surface);
-
-  uint8_t *data = cairo_image_surface_get_data(cairo_surface);
-
-  if (data == NULL) {
-    return;
-  }
-
-  SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, dw, dh, 32, dw*4, 0, 0, 0, 0);
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(_renderer, surface);
-
-  if (texture == NULL) {
-    SDL_FreeSurface(surface);
-
-    return;
-  }
-
-  SDL_Rect dst;
-
-  dst.x = 0;
-  dst.y = 0;
-  dst.w = dw;
-  dst.h = dh;
-
-  SDL_RenderCopy(_renderer, texture, NULL, &dst);
-
-  */
-	
-  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
-void GTK3Application::InternalLoop()
-{
-  /*
-	SDL_Event event;
-  bool quitting = false;
+static std::thread _main_thread;
+static bool quitting = false;
 
+static void main_thread(GTK3Application *app)
+{
 	while (quitting == false) {
     // INFO:: process api events
     // TODO:: ver isso melhor, pq o PushEvent + GrabEvent (com mutex descomentado) causa dead-lock no sistema
-    std::vector<jevent::EventObject *> &events = GrabEvents();
+    std::vector<jevent::EventObject *> &events = app->GrabEvents();
 
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
@@ -795,7 +733,7 @@ void GTK3Application::InternalLoop()
         jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
 
         if (window_event->GetType() == jevent::JWET_PAINTED) {
-          InternalPaint();
+          gtk_widget_queue_draw(_drawing_area);
         }
       }
 
@@ -809,183 +747,24 @@ void GTK3Application::InternalLoop()
       }
     }
 
-    // INFO:: process engine events
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_WINDOWEVENT) {
-        if (event.window.event == SDL_WINDOWEVENT_ENTER) {
-          // SDL_CaptureMouse(true);
-          // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-          // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
-          // SetCursor(GetCursor());
-
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_ENTERED));
-        } else if (event.window.event == SDL_WINDOWEVENT_LEAVE) {
-          // SDL_CaptureMouse(false);
-          // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-          // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
-          // SetCursor(JCS_DEFAULT);
-
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_LEAVED));
-        } else if (event.window.event == SDL_WINDOWEVENT_SHOWN) {
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_OPENED));
-        } else if (event.window.event == SDL_WINDOWEVENT_HIDDEN) {
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
-        } else if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
-          InternalPaint();
-        } else if (event.window.event == SDL_WINDOWEVENT_MOVED) {
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_MOVED));
-        } else if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-          InternalPaint();
-        
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_RESIZED));
-        } else if (event.window.event == SDL_WINDOWEVENT_MINIMIZED) {
-        } else if (event.window.event == SDL_WINDOWEVENT_MAXIMIZED) {
-        } else if (event.window.event == SDL_WINDOWEVENT_RESTORED) {
-        } else if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
-        } else if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
-        }
-      } else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
-        jevent::jkeyevent_type_t type;
-        jevent::jkeyevent_modifiers_t mod;
-
-        mod = (jevent::jkeyevent_modifiers_t)(0);
-
-        if ((event.key.keysym.mod & KMOD_LSHIFT) != 0) {
-          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
-        } else if ((event.key.keysym.mod & KMOD_RSHIFT) != 0) {
-          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
-        } else if ((event.key.keysym.mod & KMOD_LCTRL) != 0) {
-          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
-        } else if ((event.key.keysym.mod & KMOD_RCTRL) != 0) {
-          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_CONTROL);
-        } else if ((event.key.keysym.mod & KMOD_LALT) != 0) {
-          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
-        } else if ((event.key.keysym.mod & KMOD_RALT) != 0) {
-          mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_ALT);
-        // } else if ((event.key.keysym.mod & ) != 0) {
-        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_ALTGR);
-        // } else if ((event.key.keysym.mod & KMOD_LMETA) != 0) {
-        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
-        // } else if ((event.key.keysym.mod & KMOD_RMETA) != 0) {
-        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_META);
-        // } else if ((event.key.keysym.mod & ) != 0) {
-        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_SUPER);
-        // } else if ((event.key.keysym.mod & ) != 0) {
-        //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_HYPER);
-        }
-
-        type = (jevent::jkeyevent_type_t)(0);
-
-        if (event.key.state == SDL_PRESSED) {
-          type = jevent::JKT_PRESSED;
-
-          // TODO:: grab pointer events
-        } else if (event.key.state == SDL_RELEASED) {
-          type = jevent::JKT_RELEASED;
-
-          // TODO:: ungrab pointer events
-        }
-
-        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key.keysym);
-
-        g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
-      } else if (event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL) {
-        if (event.type == SDL_MOUSEMOTION) {
-          // e.motion.x/y
-        } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-          // e.button.button == SDL_BUTTON_LEFT
-          // e.button.clicks
-        } else if (event.type == SDL_MOUSEBUTTONUP) {
-        } else if (event.type == SDL_MOUSEWHEEL) {
-        }
-
-        int mouse_z = 0;
-        jevent::jmouseevent_button_t button = jevent::JMB_UNKNOWN;
-        jevent::jmouseevent_button_t buttons = jevent::JMB_UNKNOWN;
-        jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
-
-        _mouse_x = event.motion.x;
-        _mouse_y = event.motion.y;
-
-        _mouse_x = CLAMP(_mouse_x, 0, _screen.width-1);
-        _mouse_y = CLAMP(_mouse_y, 0, _screen.height-1);
-
-        if (event.type == SDL_MOUSEMOTION) {
-          type = jevent::JMT_MOVED;
-        } else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
-          if (event.type == SDL_MOUSEBUTTONDOWN) {
-            type = jevent::JMT_PRESSED;
-          } else if (event.type == SDL_MOUSEBUTTONUP) {
-            type = jevent::JMT_RELEASED;
-          }
-
-          if (event.button.button == SDL_BUTTON_LEFT) {
-            button = jevent::JMB_BUTTON1;
-          } else if (event.button.button == SDL_BUTTON_MIDDLE) {
-            button = jevent::JMB_BUTTON2;
-          } else if (event.button.button == SDL_BUTTON_RIGHT) {
-            button = jevent::JMB_BUTTON3;
-          }
-
-          _click_count = event.button.clicks;
-
-          if (type == jevent::JMT_PRESSED) {
-            if ((jcommon::Date::CurrentTimeMillis() - _last_keypress) < 200L) {
-              _click_count = _click_count + 1;
-            } else {
-            	_click_count = 1;
-            }
-
-            _last_keypress = jcommon::Date::CurrentTimeMillis();
-
-            mouse_z = _click_count;
-          }
-        } else if (event.type == SDL_MOUSEWHEEL) {
-          type = jevent::JMT_ROTATED;
-          mouse_z = event.motion.y;
-        }
-
-        uint32_t state = SDL_GetMouseState(NULL, NULL);
-
-        if ((state & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-        }
-
-        if ((state & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-        }
-
-        if ((state & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-        }
-
-        // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-        // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-        if (event.type == SDL_MOUSEBUTTONDOWN) {
-          SDL_SetWindowGrab(_window, SDL_TRUE);
-        } else if (event.type == SDL_MOUSEBUTTONUP) {
-          SDL_SetWindowGrab(_window, SDL_FALSE);
-        }
-
-        g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
-      } else if(event.type == SDL_QUIT) {
-        g_window->SetVisible(false);
-
-        quitting = true;
-        
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
-      }
-    }
-
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
-  */
+}
+
+void GTK3Application::InternalLoop()
+{
+  _main_thread = std::thread(main_thread, this);
+
+ 	g_application_run(G_APPLICATION(_handler), 0, NULL);
+
+  quitting = true;
+
+  _main_thread.join();
 }
 
 void GTK3Application::InternalQuit()
 {
+  // g_application_quit();
   gtk_main_quit();
 
 	InternalReleaseCursors();
@@ -1014,8 +793,7 @@ GTK3Window::GTK3Window(int x, int y, int width, int height):
 
   _handler = gtk_application_new("jlibcpp.gtk", G_APPLICATION_FLAGS_NONE);
 
-  g_signal_connect(_handler, "activate", G_CALLBACK(ConfigureApplication), this);
- 	g_application_run(G_APPLICATION(_handler), 0, NULL);
+  g_signal_connect(_handler, "activate", G_CALLBACK(ConfigureApplication), &_size);
 }
 
 GTK3Window::~GTK3Window()
@@ -1107,14 +885,11 @@ void GTK3Window::SetVisible(bool visible)
 
 	if (_is_visible == true) {
 		DoLayout();
-		// Start(); TODO:: initialize the thread that controls the creation of window
-    // Repaint();
+    Repaint();
 
-    // TODO:: _condition.wait() ?
+    gtk_widget_show_all(_window);
 	} else {
 		gtk_window_close((GtkWindow *)_window);
-
-    // TODO:: _thread.join() ?
   }
 }
 
@@ -1258,8 +1033,8 @@ jsize_t GTK3Window::GetSize()
 {
 	jgui::jsize_t t;
 
-  t.width = 0;
-  t.height = 0;
+  t.width = gtk_widget_get_allocated_width(_drawing_area);
+  t.height = gtk_widget_get_allocated_height(_drawing_area);
 
 	return t;
 }

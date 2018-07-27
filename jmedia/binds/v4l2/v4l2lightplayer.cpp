@@ -17,22 +17,26 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "v4l2lightplayer.h"
-#include "genericimage.h"
-#include "jcontrolexception.h"
-#include "jvideosizecontrol.h"
-#include "jvideoformatcontrol.h"
-#include "jvideodevicecontrol.h"
-#include "jmediaexception.h"
-#include "jcolorconversion.h"
+#include "jmedia/binds/v4l2/include/v4l2lightplayer.h"
+#include "jmedia/binds/v4l2/include/videocontrol.h"
+#include "jmedia/binds/v4l2/include/videograbber.h"
+#include "jmedia/jvideosizecontrol.h"
+#include "jmedia/jvideoformatcontrol.h"
+#include "jmedia/jvideodevicecontrol.h"
+#include "jmedia/jcolorconversion.h"
+#include "jgui/jbufferedimage.h"
+#include "jexception/jmediaexception.h"
+#include "jexception/jcontrolexception.h"
+
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #include <cairo.h>
 
 namespace jmedia {
 
-namespace v4l2lightplayer {
-
-class PlayerComponentImpl : public jgui::Component, jthread::Thread {
+class PlayerComponentImpl : public jgui::Component {
 
 	public:
 		/** \brief */
@@ -40,7 +44,7 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 		/** \brief */
 		jgui::Image *_image;
 		/** \brief */
-		jthread::Mutex _mutex;
+    std::mutex  _mutex;
 		/** \brief */
 		jgui::jregion_t _src;
 		/** \brief */
@@ -69,18 +73,10 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 
 		virtual ~PlayerComponentImpl()
 		{
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-
-			_mutex.Lock();
-
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
 			}
-
-			_mutex.Unlock();
 
 			if (_buffer != NULL) {
 				delete [] _buffer;
@@ -123,10 +119,6 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 				memcpy(_buffer, buffer, width*height*4);
 			}
 
-			if (IsRunning() == true) {
-				WaitThread();
-			}
-
 			int sw = width;
 			int sh = height;
 
@@ -134,41 +126,34 @@ class PlayerComponentImpl : public jgui::Component, jthread::Thread {
 					(uint8_t *)_buffer, CAIRO_FORMAT_ARGB32, sw, sh, cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, sw));
 			cairo_t *cairo_context = cairo_create(cairo_surface);
 
-			_mutex.Lock();
+			_mutex.lock();
 
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
 			}
 
-			_image = new jgui::GenericImage(cairo_context, jgui::JPF_RGB24, sw, sh);
+			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_RGB24, sw, sh);
 
-			_player->DispatchFrameGrabberEvent(new FrameGrabberEvent(_player, JFE_GRABBED, _image));
+			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
 
 			cairo_surface_flush(cairo_surface);
 			cairo_surface_destroy(cairo_surface);
 
-			_mutex.Unlock();
+			_mutex.unlock();
 
-			Run();
-		}
-
-		virtual void Run()
-		{
-			if (IsVisible() != false) {
-				Repaint();
-			}
+			Repaint();
 		}
 
 		virtual void Paint(jgui::Graphics *g)
 		{
 			jgui::Component::Paint(g);
 
-			_mutex.Lock();
+			_mutex.lock();
 
 			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
 				
-			_mutex.Unlock();
+			_mutex.unlock();
 		}
 
 		virtual Player * GetPlayer()
@@ -196,24 +181,27 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 		virtual void SetSize(int w, int h)
 		{
-			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			PlayerComponentImpl 
+        *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
+			VideoGrabber 
+        *grabber = _player->_grabber;
 
-			jthread::AutoLock lock(&impl->_mutex);
-			
-			VideoGrabber *grabber = _player->_grabber;
+      impl->_mutex.lock();
 
 			grabber->Stop();
 			impl->Reset();
 			grabber->Open();
 			grabber->Configure(w, h);
 			grabber->GetVideoControl()->Reset();
+      
+      impl->_mutex.unlock();
 		}
 
 		virtual void SetSource(int x, int y, int w, int h)
 		{
 			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
-			jthread::AutoLock lock(&impl->_mutex);
+      impl->_mutex.lock();
 			
 			/*
 			VideoGrabber *grabber = _player->_grabber;
@@ -231,15 +219,19 @@ class VideoSizeControlImpl : public VideoSizeControl {
 			impl->_src.y = y;
 			impl->_src.width = -1;
 			impl->_src.height = -1;
+
+      impl->_mutex.unlock();
 		}
 
 		virtual void SetDestination(int x, int y, int w, int h)
 		{
 			PlayerComponentImpl *impl = dynamic_cast<PlayerComponentImpl *>(_player->_component);
 
-			jthread::AutoLock lock(&impl->_mutex);
+      impl->_mutex.lock();
 
 			impl->SetBounds(x, y, w, h);
+      
+      impl->_mutex.unlock();
 		}
 
 		virtual jgui::jsize_t GetSize()
@@ -299,8 +291,6 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual jaspect_ratio_t GetAspectRatio()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
-
 			double aspect = _player->_aspect;
 
 			if (aspect == (1.0/1.0)) {
@@ -318,7 +308,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 		virtual double GetFramesPerSecond()
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			if (_player->_grabber != NULL) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
@@ -373,7 +363,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 
 		virtual int GetValue(jvideo_control_t id)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			if (_player->_grabber != NULL) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
@@ -388,7 +378,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 
 		virtual bool SetValue(jvideo_control_t id, int value)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			if (_player->_grabber != NULL) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
@@ -405,7 +395,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 
 		virtual void Reset(jvideo_control_t id)
 		{
-			jthread::AutoLock lock(&_player->_mutex);
+      std::unique_lock<std::mutex> lock(_player->_mutex);
 
 			if (_player->_grabber != NULL) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
@@ -417,8 +407,6 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 		}
 
 };
-
-}
 
 V4L2LightPlayer::V4L2LightPlayer(std::string file):
 	jmedia::Player()
@@ -446,11 +434,11 @@ V4L2LightPlayer::V4L2LightPlayer(std::string file):
 	_grabber->Configure(size.width, size.height);
 	_grabber->GetVideoControl()->Reset();
 
-	_controls.push_back(new v4l2lightplayer::VideoSizeControlImpl(this));
-	_controls.push_back(new v4l2lightplayer::VideoFormatControlImpl(this));
-	_controls.push_back(new v4l2lightplayer::VideoDeviceControlImpl(this));
+	_controls.push_back(new VideoSizeControlImpl(this));
+	_controls.push_back(new VideoFormatControlImpl(this));
+	_controls.push_back(new VideoDeviceControlImpl(this));
 	
-	_component = new v4l2lightplayer::PlayerComponentImpl(this, 0, 0, -1, -1);
+	_component = new PlayerComponentImpl(this, 0, 0, -1, -1);
 }
 
 V4L2LightPlayer::~V4L2LightPlayer()
@@ -471,49 +459,49 @@ V4L2LightPlayer::~V4L2LightPlayer()
 
 void V4L2LightPlayer::ProcessFrame(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
 {
-	dynamic_cast<v4l2lightplayer::PlayerComponentImpl *>(_component)->UpdateComponent(buffer, width, height, format);
+	dynamic_cast<PlayerComponentImpl *>(_component)->UpdateComponent(buffer, width, height, format);
 }
 
 void V4L2LightPlayer::Play()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_paused == false && _grabber != NULL) {
 		_grabber->Start();
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_STARTED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_STARTED));
 	}
 }
 
 void V4L2LightPlayer::Pause()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_paused == false && _grabber != NULL) {
 		_is_paused = true;
 		
 		_grabber->Pause();
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_PAUSED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_PAUSED));
 	}
 }
 
 void V4L2LightPlayer::Resume()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_paused == true && _grabber != NULL) {
 		_is_paused = false;
 		
 		_grabber->Resume();
 		
-		DispatchPlayerEvent(new PlayerEvent(this, JPE_RESUMED));
+		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_RESUMED));
 	}
 }
 
 void V4L2LightPlayer::Stop()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_grabber != NULL) {
 		_grabber->Stop();
@@ -528,7 +516,7 @@ void V4L2LightPlayer::Stop()
 
 void V4L2LightPlayer::Close()
 {
-	jthread::AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (_is_closed == true) {
 		return;

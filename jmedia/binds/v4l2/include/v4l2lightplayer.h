@@ -20,18 +20,19 @@
 #ifndef J_V4L2LIGHTPLAYER_H
 #define J_V4L2LIGHTPLAYER_H
 
-#include "jplayer.h"
-#include "jthread.h"
-#include "jcomponent.h"
-#include "videograbber.h"
+#include "jmedia/binds/v4l2/include/videograbber.h"
+#include "jmedia/jplayer.h"
+#include "jgui/jcomponent.h"
+
+#include <mutex>
 
 namespace jmedia {
 
-class V4L2LightPlayer : public jmedia::Player, public V4LFrameListener {
+class V4L2LightPlayer : public jmedia::Player, public jmedia::V4LFrameListener {
 
 	public:
 		/** \brief */
-		jthread::Mutex _mutex;
+    std::mutex _mutex;
 		/** \brief */
 		std::string _file;
 		/** \brief */

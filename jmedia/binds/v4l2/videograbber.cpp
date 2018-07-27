@@ -1,11 +1,10 @@
-#include "videograbber.h"
-#include "videodev2.h"
+#include "jmedia/binds/v4l2/include/videograbber.h"
+#include "jmedia/binds/v4l2/include/videocontrol.h"
+#include "jmedia/binds/v4l2/include/videodev2.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+#include "jexception/jruntimeexception.h"
+
 #include <string.h>
-
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
@@ -18,6 +17,8 @@
 #define AUTO_EXPOSURE_ENABLED	1
 
 #define CLEAR(x) memset(&(x), 0, sizeof(x))
+
+namespace jmedia {
 
 VideoGrabber::VideoGrabber(V4LFrameListener *listener, std::string device)
 {
@@ -438,7 +439,7 @@ int VideoGrabber::GetFrame()
 
 void VideoGrabber::ExceptionHandler(std::string msg)
 {
-	throw jcommon::RuntimeException(msg + ": " + strerror(errno));
+	throw jexception::RuntimeException(msg + ": " + strerror(errno));
 }
 
 void VideoGrabber::Open()
@@ -509,9 +510,7 @@ void VideoGrabber::Start()
 			break;
 	}
 
-	_running = true;
-
-	jthread::Thread::Start();
+  _thread = std::thread(&VideoGrabber::Run, this);
 }
 
 void VideoGrabber::Pause()
@@ -519,26 +518,24 @@ void VideoGrabber::Pause()
 	if (_running == true) {
 		_running = false;
 
-		jthread::Thread::WaitThread();
+    _thread.join();
 	}
 }
 
 void VideoGrabber::Resume()
 {
 	if (_running == false) {
-		_running = true;
-
-		jthread::Thread::Start();
+    _thread = std::thread(&VideoGrabber::Run, this);
 	}
 }
 
 void VideoGrabber::Stop()
 {
+	enum v4l2_buf_type type;
+
 	_running = false;
 
-	jthread::Thread::WaitThread();
-
-	enum v4l2_buf_type type;
+  _thread.join();
 
 	switch (_method) {
 		case IO_METHOD_READ:
@@ -563,6 +560,8 @@ VideoControl * VideoGrabber::GetVideoControl()
 
 void VideoGrabber::Run()
 {
+	_running = true;
+
 	while (_running) {
 		for (;;) {
 			fd_set fds;
@@ -597,5 +596,8 @@ void VideoGrabber::Run()
 			// EAGAIN - continue select loop
 		}
 	}
+
+  _running = false;
 }
 
+}
