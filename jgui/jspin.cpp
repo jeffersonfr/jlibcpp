@@ -145,17 +145,20 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
 		return true;
 	}
 
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return false;
   }
 
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		// w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		// w = size.width - 2*x,
+		h = size.height - 2*y;
 	bool 
     catched = false;
 
@@ -176,15 +179,15 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
 		RequestFocus();
 
 		if (_type == JSO_HORIZONTAL) {
-			if (y1 > (y) && y1 < (y+_size.height)) {
-				if (x1 > (_size.width-arrow_size-x) && x1 < (_size.width-x)) {
+			if (y1 > (y) && y1 < (y+size.height)) {
+				if (x1 > (size.width-arrow_size-x) && x1 < (size.width-x)) {
 					NextItem();
 				} else if (x1 > (x) && x1 < (x+arrow_size)) {
 					PreviousItem();
 				}
 			}
 		} else if (_type == JSO_VERTICAL) {
-			if (x1 > (_size.width-2*arrow_size-x) && x1 < (_size.width-x)) {
+			if (x1 > (size.width-2*arrow_size-x) && x1 < (size.width-x)) {
 				if (y1 > (y) && y1 < (h/2)) {
 					PreviousItem();
 				} else if (y1 > (y+h/2) && y1 < (y+h)) {
@@ -285,18 +288,20 @@ void Spin::Paint(Graphics *g)
     return;
   }
 
-	Font 
+  jgui::Font 
     *font = theme->GetFont("component.font");
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  fg = theme->GetIntegerParam("component.fg"),
 	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
 	  fgdisable = theme->GetIntegerParam("component.fg.disable");
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
   int
 			arrow_size;
 
@@ -308,7 +313,7 @@ void Spin::Paint(Graphics *g)
 
 	if (_type == JSO_HORIZONTAL) {
 		if (_loop == true || (_index < ((int)_items.size()-1))) {
-			if (_has_focus == true) {
+			if (HasFocus() == true) {
 				g->SetColor(fgfocus);
 			} else {
 				g->SetColor(fg);
@@ -317,7 +322,7 @@ void Spin::Paint(Graphics *g)
 		}
 
 		if (_loop == true || (_index > 0 && _items.size() > 0)) {
-			if (_has_focus == true) {
+			if (HasFocus() == true) {
 				g->SetColor(fgfocus);
 			} else {
 				g->SetColor(fg);
@@ -329,8 +334,8 @@ void Spin::Paint(Graphics *g)
 			if (font != NULL) {
 				g->SetFont(font);
 
-				if (_is_enabled == true) {
-					if (_has_focus == true) {
+				if (IsEnabled() == true) {
+					if (HasFocus() == true) {
 						g->SetColor(fgfocus);
 					} else {
 						g->SetColor(fg);
@@ -350,31 +355,31 @@ void Spin::Paint(Graphics *g)
 		}
 	} else if (_type == JSO_VERTICAL) {
 		if (_loop == true || (_index < ((int)_items.size()-1))) {
-			if (_has_focus == true) {
+			if (HasFocus() == true) {
 				g->SetColor(fgfocus);
 			} else {
 				g->SetColor(fg);
 			}
 		}
 
-		g->FillTriangle(_size.width-2*arrow_size-x, y+arrow_size, _size.width-x, y+arrow_size, _size.width-arrow_size-x, y);
+		g->FillTriangle(size.width-2*arrow_size-x, y+arrow_size, size.width-x, y+arrow_size, size.width-arrow_size-x, y);
 
 		if (_loop == true || (_index > 0 && _items.size() > 0)) {
-			if (_has_focus == true) {
+			if (HasFocus() == true) {
 				g->SetColor(fgfocus);
 			} else {
 				g->SetColor(fg);
 			}
 		}
 
-		g->FillTriangle(_size.width-2*arrow_size-x, y+arrow_size+8, _size.width-x, y+arrow_size+8, _size.width-arrow_size-x, y+h);
+		g->FillTriangle(size.width-2*arrow_size-x, y+arrow_size+8, size.width-x, y+arrow_size+8, size.width-arrow_size-x, y+h);
 
 		if (_items.size() > 0) {
 			if (font != NULL) {
 				g->SetFont(font);
 
-				if (_is_enabled == true) {
-					if (_has_focus == true) {
+				if (IsEnabled() == true) {
+					if (HasFocus() == true) {
 						g->SetColor(fgfocus);
 					} else {
 						g->SetColor(fg);

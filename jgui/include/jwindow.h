@@ -86,11 +86,19 @@ class Window : public jgui::Container {
 
 	private:
 		/** \brief */
+	  std::vector<jevent::KeyListener *> _key_listeners;
+		/** \brief */
+	  std::vector<jevent::MouseListener *> _mouse_listeners;
+		/** \brief */
 		std::vector<jevent::WindowListener *> _window_listeners;
 		/** \brief */
 		std::vector<struct frame_subtitle_t> _subtitles;
 		/** \brief */
 		std::thread _exec_thread;
+		/** \brief */
+ 	  std::mutex _key_listener_mutex;
+		/** \brief */
+ 	  std::mutex _mouse_listener_mutex;
 		/** \brief */
 		std::mutex _paint_mutex;
 		/** \brief */
@@ -101,16 +109,6 @@ class Window : public jgui::Container {
     Font *_font;
     /** \brief */
     EventManager *_event_manager;
-
-	protected:
-		/** \brief */
-	  std::vector<jevent::KeyListener *> _key_listeners;
-		/** \brief */
-	  std::vector<jevent::MouseListener *> _mouse_listeners;
-		/** \brief */
- 	  std::mutex _key_listener_mutex;
-		/** \brief */
- 	  std::mutex _mouse_listener_mutex;
 
 	public:
 		/**

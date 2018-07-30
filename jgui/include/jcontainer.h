@@ -42,7 +42,7 @@ class Container : public jgui::Component {
 
 	friend class Component;
 
-	protected:
+	private:
 		/** \brief */
 		std::vector<jevent::ContainerListener *> _container_listeners;
 		/** \brief */

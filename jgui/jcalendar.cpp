@@ -41,13 +41,16 @@ Calendar::Calendar():
 	SetMonth(_current_month);
 	SetYear(_current_year);
 
-	jgui::jinsets_t insets = GetInsets();
+	jgui::jinsets_t 
+    insets = GetInsets();
+  jgui::jsize_t
+    size = GetSize();
+	char 
+    tmp[255];
 
-	SetSize(insets.left+(DEFAULT_COMPONENT_HEIGHT+delta)*7+insets.right, insets.top+9*(DEFAULT_COMPONENT_HEIGHT+delta)+insets.bottom+16);
+	SetSize(insets.left+(DEFAULT_COMPONENT_HEIGHT+delta)*7 + insets.right, insets.top + 9*(DEFAULT_COMPONENT_HEIGHT + delta) + insets.bottom + 16);
 
-	char tmp[255];
-
-	_syear = new Spin(insets.left, insets.top+0*(DEFAULT_COMPONENT_HEIGHT+delta), _size.width-insets.left-insets.right);
+	_syear = new Spin(insets.left, insets.top+0*(DEFAULT_COMPONENT_HEIGHT+delta), size.width - insets.left - insets.right);
 
 	for (int i=1970; i<2199; i++) {
 		sprintf(tmp, "%d", i);
@@ -58,7 +61,7 @@ Calendar::Calendar():
 	_syear->SetLoop(true);
 	_syear->RegisterSelectListener(this);
 
-	_smonth = new Spin(insets.left, insets.top+1*(DEFAULT_COMPONENT_HEIGHT+delta), _size.width-insets.left-insets.right);
+	_smonth = new Spin(insets.left, insets.top + 1*(DEFAULT_COMPONENT_HEIGHT + delta), size.width - insets.left - insets.right);
 
 	_smonth->AddTextItem("Janeiro");
 	_smonth->AddTextItem("Fevereiro");

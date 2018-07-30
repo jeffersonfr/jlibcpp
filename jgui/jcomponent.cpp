@@ -88,6 +88,9 @@ Component::~Component()
 	if (_parent != NULL) {
 		_parent->Remove(this);
 	}
+
+  delete _theme;
+  _theme = NULL;
 }
 
 void Component::ScrollToVisibleArea(int x, int y, int width, int height, Component *coordinateSpace) 
@@ -892,7 +895,7 @@ void Component::SetIgnoreRepaint(bool b)
 	_is_ignore_repaint = b;
 }
 
-bool Component::GetIgnoreRepaint()
+bool Component::IsIgnoreRepaint()
 {
 	return _is_ignore_repaint;
 }

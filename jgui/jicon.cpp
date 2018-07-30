@@ -84,16 +84,18 @@ void Icon::Paint(Graphics *g)
     return;
   }
 
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  fg = theme->GetIntegerParam("component.fg"),
 	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
 	  fgdisable = theme->GetIntegerParam("component.fg.disable");
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 
 	if (_image != NULL) {
 		g->DrawImage(_image, x, y, w, h);

@@ -51,6 +51,9 @@ class Main : public jgui::Window {
 		Main(int n, int p):
 			jgui::Window(/*"Swarm Colony", */0, 0, 720, 480)
 		{
+      jgui::jsize_t
+        size = GetSize();
+
 			srand(time(NULL));
 
 			_active = true;
@@ -62,15 +65,15 @@ class Main : public jgui::Window {
 			_particles = new struct particle_t[_size_particles];
 
 			for (int i=0; i<_size_objects; i++) {
-				_objects[i].x = rand()%(_size.width-64)+64;
-				_objects[i].y = rand()%(_size.height-64)+64;
+				_objects[i].x = rand()%(size.width-64)+64;
+				_objects[i].y = rand()%(size.height-64)+64;
 			}
 
 			_gbest.pi_value = 999999999;
 
 			for (int i=0; i<_size_particles; i++) {
-				_particles[i].pi.x = _particles[i].xi.x = rand()%(_size.width-64)+64;
-				_particles[i].pi.y = _particles[i].xi.y = rand()%(_size.height-64)+64;
+				_particles[i].pi.x = _particles[i].xi.x = rand()%(size.width-64)+64;
+				_particles[i].pi.y = _particles[i].xi.y = rand()%(size.height-64)+64;
 				
 				double k = 0;
 
@@ -112,35 +115,42 @@ class Main : public jgui::Window {
 
 		virtual void ShowApp()
 		{
-			int scrumble = 0;
+      jgui::jsize_t
+        size = GetSize();
+			int 
+        scrumble = 0;
 
 			// for (int j=0; j<1000; j++) {
 			for (int j=0; _active != false; j++) {
-				double r = 10,
-					   // vmax = 100,
-					   // vmin = -vmax,
-					   xmax = _size.width,
-					   xmin = 0;
-				int signal = 1;
+				double 
+          r = 10,
+					// vmax = 100,
+					// vmin = -vmax,
+					xmax = size.width,
+					xmin = 0;
+				int 
+          signal = 1;
 
 				if (j > 100) {
 					_active = false;
 				}
 
 				for (int i=0; i<_size_particles; i++) {
-					double k,
-								 c1 = 2.05,
-								 c2 = 2.05,
-								 // w = 200,
-								 wmax = 10,
-								 wmin = 1,
-								 r1,
-								 r2,
-								 x;
-								 // kapa = 1,
-								 // teta = c1+c2,
-								 // c = 2;
-					struct particle_t *p = &_particles[i];
+					struct particle_t 
+            *p = &_particles[i];
+					double 
+            k,
+						c1 = 2.05,
+						c2 = 2.05,
+						// w = 200,
+						wmax = 10,
+						wmin = 1,
+						r1,
+						r2,
+						x;
+						// kapa = 1,
+						// teta = c1+c2,
+						// c = 2;
 
 					k = g(p);
 
@@ -164,8 +174,8 @@ class Main : public jgui::Window {
 							j = 0;
 							
 							for (int i=0; i<_size_particles; i++) {
-								_particles[i].pi.x = _particles[i].xi.x = rand()%(_size.width-64)+64;
-								_particles[i].pi.y = _particles[i].xi.y = rand()%(_size.height-64)+64;
+								_particles[i].pi.x = _particles[i].xi.x = rand()%(size.width-64)+64;
+								_particles[i].pi.y = _particles[i].xi.y = rand()%(size.height-64)+64;
 
 								double k = 0;
 

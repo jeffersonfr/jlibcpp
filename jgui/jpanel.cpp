@@ -27,11 +27,15 @@ Panel::Panel(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Panel");
 	
-	_insets.left = 8;
-	_insets.right = 8;
-	_insets.top = 64;
-	_insets.bottom = 8;
+  jgui::jinsets_t
+    insets;
 
+	insets.left = 8;
+	insets.right = 8;
+	insets.top = 64;
+	insets.bottom = 8;
+
+  SetInsets(insets);
 	SetFocusable(true);
 	SetBackgroundVisible(true);
 }
@@ -43,11 +47,15 @@ Panel::Panel(std::string title, int x, int y, int width, int height):
 	
 	_title = title;
 
-	_insets.left = 8;
-	_insets.right = 8;
-	_insets.top = 64;
-	_insets.bottom = 8;
+  jgui::jinsets_t
+    insets;
 
+	insets.left = 8;
+	insets.right = 8;
+	insets.top = 64;
+	insets.bottom = 8;
+
+  SetInsets(insets);
 	SetFocusable(true);
 	SetBackgroundVisible(true);
 }
@@ -83,19 +91,21 @@ void Panel::PaintGlassPane(Graphics *g)
 
 	jgui::Font 
     *font = theme->GetFont("window.font");
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("window.bg"),
 	  fg = theme->GetIntegerParam("window.fg"),
 	  scroll = theme->GetIntegerParam("window.scroll");
-	int 
-    bs = theme->GetIntegerParam("window.border.size");
+  jgui::jsize_t
+    size = GetSize();
 	jinsets_t 
     insets = GetInsets();
+	int 
+    bs = theme->GetIntegerParam("window.border.size");
 
 	if (_title != "") {
 		g->SetGradientStop(0.0, bg);
 		g->SetGradientStop(1.0, scroll);
-		g->FillLinearGradient(bs, bs, _size.width - 2*bs, insets.top - 2*bs, 0, 0, 0, insets.top - 2*bs);
+		g->FillLinearGradient(bs, bs, size.width - 2*bs, insets.top - 2*bs, 0, 0, 0, insets.top - 2*bs);
 		g->ResetGradientStop();
 
 		if (font != NULL) {
@@ -108,12 +118,12 @@ void Panel::PaintGlassPane(Graphics *g)
 			std::string text = _title;
 			
 			// if (_wrap == false) {
-				text = font->TruncateString(text, "...", (_size.width-insets.left-insets.right));
+				text = font->TruncateString(text, "...", (size.width-insets.left-insets.right));
 			// }
 
 			g->SetFont(font);
 			g->SetColor(fg);
-			g->DrawString(text, insets.left+(_size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
+			g->DrawString(text, insets.left+(size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
 		}
 	}
 }

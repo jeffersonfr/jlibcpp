@@ -121,11 +121,14 @@ bool TextArea::KeyPressed(jevent::KeyEvent *event)
 	}
 
   // TODO:: usar scroll para exibir o texto
-	bool catched = false;
+  jgui::KeyMap *
+    keymap = GetKeyMap();
+	jevent::jkeyevent_symbol_t 
+    action = event->GetSymbol();
+	bool 
+    catched = false;
 
-	jevent::jkeyevent_symbol_t action = event->GetSymbol();
-
-	if (_keymap != NULL && _keymap->HasKey(action) == false) {
+	if (keymap != NULL && keymap->HasKey(action) == false) {
 		return false;
 	}
 
@@ -354,10 +357,10 @@ void TextArea::IncrementLines(int lines)
 		jpoint_t scroll_location = GetScrollLocation();
 		int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-		int font_height = font->GetSize();
+		int fs = font->GetSize();
 
 		if (scrolly > 0) {
-			SetScrollY((std::max)(0, (font_height+_rows_gap)*_current_row));
+			SetScrollY((std::max)(0, (fs+_rows_gap)*_current_row));
 		}
 	}
 
@@ -370,10 +373,19 @@ void TextArea::DecrementLines(int lines)
 		return;
 	}
 
-	Theme *theme = GetTheme();
-	jgui::Font *font = theme->GetFont("component.font");
+	Theme 
+    *theme = GetTheme();
 
-	int current_length = 0;
+  if (theme == NULL) {
+    return;
+  }
+
+	jgui::Font 
+    *font = theme->GetFont("component.font");
+  jgui::jsize_t
+    size = GetSize();
+	int 
+    current_length = 0;
 
 	_current_row = _current_row + lines;
 
@@ -392,10 +404,10 @@ void TextArea::DecrementLines(int lines)
 		jpoint_t scroll_location = GetScrollLocation();
 		int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-		int font_height = font->GetSize();
+		int fs = font->GetSize();
 
-		if ((scrolly+_size.height) < (font->GetSize()+_rows_gap)*GetRows()) {
-			SetScrollY((std::max)(0, (font_height+_rows_gap)*_current_row));
+		if ((scrolly + size.height) < (font->GetSize() + _rows_gap)*GetRows()) {
+			SetScrollY((std::max)(0, (fs + _rows_gap)*_current_row));
 		}
 	}
 
@@ -404,7 +416,8 @@ void TextArea::DecrementLines(int lines)
 
 void TextArea::InitRowsString()
 {
-	Theme *theme = GetTheme();
+	Theme
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return;
@@ -417,17 +430,15 @@ void TextArea::InitRowsString()
 		return;
 	}
 
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		// y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x;
-		// h = _size.height - 2*y;
+		w = size.width - 2*x;
+		// h = size.height - 2*y;
 	int 
-    font_height = font->GetSize();
-
-	if (font_height < 1) {
-		return;
-	}
+    fs = font->GetSize();
 
 	std::string 
     text = _text;
@@ -512,7 +523,7 @@ void TextArea::InitRowsString()
 
 	_rows_string = false;
 	
-	SetScrollY((std::max)(0, (font_height+_rows_gap)*_current_row));
+	SetScrollY((std::max)(0, (fs+_rows_gap)*_current_row));
 }
 
 std::vector<std::string> & TextArea::GetLines()
@@ -558,7 +569,7 @@ void TextArea::Paint(Graphics *g)
 
 	int current_text_size,
 			current_length = _caret_position,
-			font_height = font->GetSize()+_rows_gap;
+			fs = font->GetSize()+_rows_gap;
 
 	x = x - scrollx;
 	y = y - scrolly;
@@ -573,8 +584,8 @@ void TextArea::Paint(Graphics *g)
 			c[0] = ' ';
 		}
 
-		if (_is_enabled == true) {
-			if (_has_focus == true) {
+		if (IsEnabled() == true) {
+			if (HasFocus() == true) {
 				g->SetColor(fgfocus);
 			} else {
 				g->SetColor(fg);
@@ -583,7 +594,7 @@ void TextArea::Paint(Graphics *g)
 			g->SetColor(fgdisable);
 		}
 
-		g->DrawString(s, x, y+k*font_height);
+		g->DrawString(s, x, y+k*fs);
 
 		if (_caret_visible == true && current_length < (int)s.size() && current_length >= 0) {
 			std::string cursor;
@@ -598,11 +609,11 @@ void TextArea::Paint(Graphics *g)
 
 			current_text_size = font->GetStringWidth(_lines[i].substr(0, current_length).c_str());
 
-			if (_has_focus == true && _is_editable == true) {
+			if (HasFocus() == true && IsEditable() == true) {
 				g->SetColor(_caret_color);
 			}
 
-			g->DrawString(cursor, x+current_text_size, y+k*font_height);
+			g->DrawString(cursor, x+current_text_size, y+k*fs);
 
 			current_length = -1;
 		}
@@ -676,18 +687,17 @@ jsize_t TextArea::GetScrollDimension()
     // hg = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
     vg = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size");
 
-	if (font == NULL) {
-		t.width = _size.width;
-		t.height = _size.height;
+  t = GetSize();
 
-		return t;
+	if (font == NULL) {
+    return t;
 	}
 
 	if (_is_wrap == false) {
 		t.width = font->GetStringWidth(GetText());
-		t.height = _size.height;
+		// t.height = t.height;
 	} else {
-		t.width = _size.width;
+		// t.width = t.width;
 		t.height = GetRows()*(font->GetSize()) + 2*vg;
 	}
 

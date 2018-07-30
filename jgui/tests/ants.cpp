@@ -269,9 +269,11 @@ class Main : public jgui::Window {
 		{
 			jgui::jsize_t
 				size = GetSize();
+      jgui::jinsets_t
+        insets = GetInsets();
 			int 
-				dx = _insets.left,
-				dy = _insets.top;
+				dx = insets.left,
+				dy = insets.top;
 			char tmp[255];
 
 			if (foffscreen == NULL) {
@@ -286,7 +288,7 @@ class Main : public jgui::Window {
 				// TODO:: pega a fonte do theme
         // goff->SetFont(jgui::Font::GetDefaultFont());
 				goff->SetColor(0x00, 0x00, 0x00, 0xff);
-				goff->DrawString(tmp, _insets.left, size.height - 50);
+				goff->DrawString(tmp, insets.left, size.height - 50);
 
 				goff->SetFont(fweights);
 

@@ -107,14 +107,19 @@ class PorterTeste : public jgui::Window {
 		{
 			jgui::Window::Paint(g);
 
-			g->DrawImage(_bg, 0, 0, _size.width, _size.height);
+      jgui::jsize_t
+        size = GetSize();
+      jgui::jinsets_t
+        insets = GetInsets();
+      
+			g->DrawImage(_bg, 0, 0, size.width, size.height);
 
 			jgui::Theme *theme = GetTheme();
 			jgui::Font *font = theme->GetFont("component.font");
 
 			g->SetColor(jgui::Color::White);
 			g->SetFont(font);
-			g->DrawString("Press 1 to use DrawImage() and 2 to use SetRGBArray()", _insets.left, _insets.top);
+			g->DrawString("Press 1 to use DrawImage() and 2 to use SetRGBArray()", insets.left, insets.top);
 
 			PaintComposition(g, "CLEAR", jgui::JCF_CLEAR, 0*(2*RECT_SIZE+16), 1*(2*RECT_SIZE+16));
 

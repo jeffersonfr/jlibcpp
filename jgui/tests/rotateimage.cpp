@@ -73,17 +73,26 @@ class Main : public jgui::Window {
 
 			jgui::Window::Paint(g);
 
-			int x = _insets.left,
-					y = _insets.top,
-					w = _size.width-_insets.left-_insets.right,
-					h = _size.height-_insets.top-_insets.bottom;
-			int gapx = 40,
-					gapy = 20;
-			double boxw = w/9.0,
-						 boxh = h/8.0;
-			int iw = (int)(boxw-2*gapx),
-					ih = (int)(boxh-2*gapy);
-			double radians[3] = {-_angle, 0, _angle};
+      jgui::jsize_t
+        size = GetSize();
+      jgui::jinsets_t
+        insets = GetInsets();
+			int 
+        x = insets.left,
+				y = insets.top,
+				w = size.width-insets.left-insets.right,
+				h = size.height-insets.top-insets.bottom;
+			int 
+        gapx = 40,
+				gapy = 20;
+			double 
+        boxw = w/9.0,
+				boxh = h/8.0;
+			int 
+        iw = (int)(boxw-2*gapx),
+				ih = (int)(boxh-2*gapy);
+			double 
+        radians[3] = {-_angle, 0, _angle};
 
 			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 

@@ -58,7 +58,7 @@ class GraphicsTeste : public jgui::Window {
 			jgui::jsize_t
 				size = GetSize();
 
-			TAM = _size.height/4;
+			TAM = size.width/5;
 			nu = 40;
 			nv = 40;
 			teta = M_PI/7;

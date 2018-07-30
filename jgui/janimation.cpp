@@ -124,11 +124,13 @@ void Animation::Paint(Graphics *g)
     return;
   }
 
+  jgui::jsize_t
+    size = GetSize();
 	int 
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 
 	if (_images.size() != 0) {
 		Image *image = _images[_index];

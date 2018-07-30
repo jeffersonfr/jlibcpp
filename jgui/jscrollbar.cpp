@@ -129,19 +129,21 @@ bool ScrollBar::MousePressed(jevent::MouseEvent *event)
     return false;
   }
 
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 	int 
     arrow_size,
 		x1 = event->GetX(),
 		y1 = event->GetY(),
 		dx = x,
 		dy = y,
-		dw = _size.width - 2*dx-_stone_size,
-		dh = _size.height - 2*dy-_stone_size;
+		dw = size.width - 2*dx-_stone_size,
+		dh = size.height - 2*dy-_stone_size;
 	bool 
     catched = false;
 
@@ -158,38 +160,38 @@ bool ScrollBar::MousePressed(jevent::MouseEvent *event)
 	catched = true;
 
 	if (_type == JSO_HORIZONTAL) {
-		if (y1 > 0 && y1 < (_size.height)) {
+		if (y1 > 0 && y1 < (size.height)) {
 			int d = (int)((_value*(dw-2*arrow_size))/(GetMaximum()-GetMinimum()));
 
 			_pressed = false;
 
-			if (x1 > (dx) && x1 < (arrow_size+dx)) {
-				SetValue(_value-_minimum_tick);
-			} else if (x1 > (_size.width-arrow_size-dx) && x1 < (_size.width-dx)) {
-				SetValue(_value+_minimum_tick);
-			} else if (x1 > (arrow_size+dx) && x1 < (arrow_size+dx+d)) {
-				SetValue(_value-_maximum_tick);
-			} else if (x1 > (arrow_size+dx+d+_stone_size) && x1 < (_size.width-arrow_size)) {
-				SetValue(_value+_maximum_tick);
-			} else if (x1 > (arrow_size+dx+d) && x1 < (arrow_size+dx+d+_stone_size)) {
+			if (x1 > (dx) && x1 < (arrow_size + dx)) {
+				SetValue(_value - _minimum_tick);
+			} else if (x1 > (size.width - arrow_size - dx) && x1 < (size.width - dx)) {
+				SetValue(_value + _minimum_tick);
+			} else if (x1 > (arrow_size + dx) && x1 < (arrow_size + dx + d)) {
+				SetValue(_value - _maximum_tick);
+			} else if (x1 > (arrow_size + dx + d + _stone_size) && x1 < (size.width - arrow_size)) {
+				SetValue(_value + _maximum_tick);
+			} else if (x1 > (arrow_size + dx + d) && x1 < (arrow_size + dx + d + _stone_size)) {
 				_pressed = true;
 			}
 		}
 	} else if (_type == JSO_VERTICAL) {
-		if (x1 > 0 && x1 < (_size.width)) {
+		if (x1 > 0 && x1 < (size.width)) {
 			int d = (int)((_value*(dh-2*arrow_size))/(GetMaximum()-GetMinimum()));
 
 			_pressed = false;
 
-			if (y1 > (dy) && y1 < (arrow_size+dy)) {
-				SetValue(_value-_minimum_tick);
-			} else if (y1 > (_size.height-arrow_size-dy) && y1 < (_size.height-dy)) {
-				SetValue(_value+_minimum_tick);
-			} else if (y1 > (arrow_size+dy) && y1 < (arrow_size+dy+d)) {
-				SetValue(_value-_maximum_tick);
-			} else if (y1 > (arrow_size+dy+d+_stone_size) && y1 < (_size.height-arrow_size)) {
-				SetValue(_value+_maximum_tick);
-			} else if (y1 > (arrow_size+dy+d) && y1 < (arrow_size+dy+d+_stone_size)) {
+			if (y1 > (dy) && y1 < (arrow_size + dy)) {
+				SetValue(_value - _minimum_tick);
+			} else if (y1 > (size.height - arrow_size - dy) && y1 < (size.height - dy)) {
+				SetValue(_value + _minimum_tick);
+			} else if (y1 > (arrow_size + dy) && y1 < (arrow_size + dy + d)) {
+				SetValue(_value - _maximum_tick);
+			} else if (y1 > (arrow_size + dy + d + _stone_size) && y1 < (size.height - arrow_size)) {
+				SetValue(_value + _maximum_tick);
+			} else if (y1 > (arrow_size + dy + d) && y1 < (arrow_size + dy + d + _stone_size)) {
 				_pressed = true;
 			}
 		}
@@ -216,25 +218,28 @@ bool ScrollBar::MouseMoved(jevent::MouseEvent *event)
 		return true;
 	}
 	
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return false;
   }
 
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 	int 
     arrow_size,
 		x1 = event->GetX(),
 		y1 = event->GetY(),
 		dx = x,
 		dy = y,
-		dw = _size.width - 2*dx - _stone_size,
-		dh = _size.height - 2*dy - _stone_size;
+		dw = size.width - 2*dx - _stone_size,
+		dh = size.height - 2*dy - _stone_size;
 
 	if (_type == JSO_HORIZONTAL) {
 		arrow_size = h/2;
@@ -243,7 +248,8 @@ bool ScrollBar::MouseMoved(jevent::MouseEvent *event)
 	}
 
 	if (_pressed == true) {
-		int diff = GetMaximum()-GetMinimum();
+		int 
+      diff = GetMaximum()-GetMinimum();
 
 		if (_type == JSO_HORIZONTAL) {
 			SetValue(diff*(x1-_stone_size/2-arrow_size)/(dw-2*arrow_size));
@@ -282,20 +288,22 @@ void ScrollBar::Paint(Graphics *g)
     return;
   }
 
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  fg = theme->GetIntegerParam("component.fg"),
 	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
 	  fgdisable = theme->GetIntegerParam("component.fg.disable"),
 	  scroll = theme->GetIntegerParam("component.scroll");
+  jgui::jsize_t
+    size = GetSize();
   int
     hg = theme->GetIntegerParam("component.hgap"),
 		vg = theme->GetIntegerParam("component.vgap");
   int
     x = hg + theme->GetIntegerParam("component.border.size"),
 		y = vg + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 
 	if (_type == JSO_HORIZONTAL) {
 		int
@@ -308,7 +316,7 @@ void ScrollBar::Paint(Graphics *g)
 			d = limit;
 		}
 
-		if (_has_focus == true) {
+		if (HasFocus() == true) {
 			g->SetColor(fgfocus);
 		} else {
 			g->SetColor(scroll);
@@ -329,7 +337,7 @@ void ScrollBar::Paint(Graphics *g)
 			d = limit;
 		}
 
-		if (_has_focus == true) {
+		if (HasFocus() == true) {
 			g->SetColor(fgfocus);
 		} else {
 			g->SetColor(scroll);

@@ -202,6 +202,8 @@ class BallDrop : public jgui::Window {
 		{
 			jgui::Image 
         *image;
+      jgui::jsize_t
+        size = GetSize();
 			int 
         w = 16,
 				h = 16;
@@ -225,17 +227,19 @@ class BallDrop : public jgui::Window {
 			ballh = bs.height;
 
 			for(int i=0; i<numballs; ++i) {
-				Ball *ball = new Ball(_size.width/2,0);
+				Ball 
+          *ball = new Ball(size.width/2,0);
 
-				ball->Accelerate((myrandom()-.5)*.5, 0);
+				ball->Accelerate((myrandom() - 0.5)*.5, 0);
 
 				_balls.push_back(ball);
 			}
 			
 			// Allocate rack information
-			numracks = _size.width/ballw;
+			numracks = size.width/ballw;
 			rackheight = new int[numracks];
 			rackdel = new int[numracks];
+
 			for(int i=0; i<numracks; i++) {
 				rackheight[i] = 0;
 				rackdel[i] = 0;
@@ -271,17 +275,20 @@ class BallDrop : public jgui::Window {
 
 		void Paint(jgui::Graphics *g) 
 		{
+      jgui::jsize_t
+        size = GetSize();
+
 			// Create the background image if necessary
-			if ((backImage == NULL) || (_size.width != backDimension.width) || (_size.height != backDimension.height) ) {
+			if ((backImage == NULL) || (size.width != backDimension.width) || (size.height != backDimension.height) ) {
 				jgui::Graphics *backGraphics;
 
-				backDimension = _size;
-				backImage = new jgui::BufferedImage(jgui::JPF_ARGB, _size.width, _size.height);
+				backDimension = size;
+				backImage = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
 				backGraphics = backImage->GetGraphics();
 
 				// Erase the previous image.
 				backGraphics->SetColor(GetTheme()->GetIntegerParam("window.bg"));
-				backGraphics->FillRectangle(0, 0, _size.width, _size.height);
+				backGraphics->FillRectangle(0, 0, size.width, size.height);
 				backGraphics->SetColor(0x00, 0x00, 0x00, 0xff);
 
 				//Paint the frame into the image.
@@ -290,9 +297,9 @@ class BallDrop : public jgui::Window {
 				UpdateRack(backImage->GetGraphics());
 			}
 
-			if ( (offImage == NULL) || (_size.width != offDimension.width) || (_size.height != offDimension.height) ) {
-				offDimension = _size;
-				offImage = new jgui::BufferedImage(jgui::JPF_ARGB, _size.width, _size.height);
+			if ( (offImage == NULL) || (size.width != offDimension.width) || (size.height != offDimension.height) ) {
+				offDimension = size;
+				offImage = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
 			}
 
 			offImage->GetGraphics()->DrawImage(backImage, 0, 0);
@@ -305,14 +312,24 @@ class BallDrop : public jgui::Window {
 		}
 
 		void PaintBackground(jgui::Graphics *g) {
-			double scale, x, y, oy;
-			int i, j, pinx, piny;
+      jgui::jsize_t
+        size = GetSize();
+			double 
+        scale, 
+        x, 
+        y, 
+        oy;
+			int 
+        i, 
+        j, 
+        pinx, 
+        piny;
 
 			// Draw the pins
 
 			for(i=0;i<numrows;++i) {  // Rows
-				piny=i*(_size.height-2*topspace)/(numrows*2)+topspace;
-				scale=(double)(_size.width-2*sidespace)/(double)numcolumns;
+				piny=i*(size.height-2*topspace)/(numrows*2)+topspace;
+				scale=(double)(size.width-2*sidespace)/(double)numcolumns;
 
 				for(j=0;j<numcolumns;++j) { // Columns
 					pinx=(int)((j+(i%2)/2.0)*scale)+sidespace;
@@ -321,12 +338,16 @@ class BallDrop : public jgui::Window {
 			}
 
 			//  Draw density curve
-			scale=(double)_size.width/numracks;
+			scale = (double)size.width/numracks;
+
 			g->SetColor(jgui::Color::White);
-			oy=0;
+
+			oy = 0;
+
 			for (i=0; i<=numracks; i++) {
-				x=numracks/2;        
-				y=_size.height*(1.0-.5*exp(-(double)(i-x)*(i-x)/(2*81)));
+				x = numracks/2;        
+				y = size.height*(1.0-.5*exp(-(double)(i-x)*(i-x)/(2*81)));
+
 				if (i > 0) {
 					g->DrawLine((int)((i-1)*scale),(int)oy,(int)(i*scale),(int)y);
 				}
@@ -337,7 +358,7 @@ class BallDrop : public jgui::Window {
 			for(i=0;i<numracks;++i) {
 				for(j=0;j<rackheight[i];++j) {
 					pinx=i*ballw;
-					piny=_size.height-(j+1)*ballh;
+					piny=size.height-(j+1)*ballh;
 					g->DrawImage(ball, pinx, piny);            
 				}
 			}
@@ -345,13 +366,18 @@ class BallDrop : public jgui::Window {
 
 		void UpdateRack(jgui::Graphics *g) 
 		{
-			int i, pinx, piny;
+      jgui::jsize_t
+        size = GetSize();
+			int 
+        i, 
+        pinx, 
+        piny;
 
 			for(i=0;i<numracks;++i) {
 				while(rackdel[i]>0) {
 					++rackheight[i];
-					pinx=i*ballw;
-					piny=_size.height-rackheight[i]*ballh;
+					pinx = i*ballw;
+					piny = size.height - rackheight[i]*ballh;
 					g->DrawImage(ball, pinx, piny);            
 					--rackdel[i];
 				}
@@ -360,59 +386,73 @@ class BallDrop : public jgui::Window {
 
 		void UpdateBalls() 
 		{
-			int j, k, pinx, piny, rack, bottomy, fr, lr, fc, lc;
-			double scale;
+      jgui::jsize_t
+        size = GetSize();
+			double 
+        scale;
+			int 
+        j, 
+        k, 
+        pinx, 
+        piny, 
+        rack, 
+        bottomy, 
+        fr, 
+        lr, 
+        fc, 
+        lc;
 
-			bottomy=_size.height;
+			bottomy = size.height;
 
 			for (std::vector<Ball *>::iterator i=_balls.begin(); i!=_balls.end(); i++) {
-				Ball *aBall = (*i);
+				Ball
+          *aBall = (*i);
 
 				aBall->Move();
 
-				if(aBall->y > bottomy-aBall->r) {
-					if(aBall->vlen > .25) {
+				if(aBall->y > bottomy - aBall->r) {
+					if(aBall->vlen > 0.25) {
 						aBall->vx = 0;
 						aBall->vy = -aBall->vy*.25;
-						aBall->y = bottomy-aBall->r;
+						aBall->y = bottomy - aBall->r;
 					} else {
-						rack=(int)(aBall->x/ballw);
+						rack = (int)(aBall->x/ballw);
 
-						if(rack>=0 && rack<numracks) {
+						if(rack >= 0 && rack < numracks) {
 							++rackdel[rack];
 						}
 
-						aBall->x=_size.width/2;
-						aBall->y=aBall->r;
+						aBall->x = size.width/2;
+						aBall->y = aBall->r;
 
-						aBall->vx=(myrandom()-.5)/3;
-						aBall->vy=0;
+						aBall->vx = (myrandom() - 0.5)/3;
+						aBall->vy = 0;
 					}
 				} else {
-					k=(int)((aBall->y-topspace)*2*numrows/(_size.height-2*topspace));
+					k = (int)((aBall->y - topspace)*2*numrows/(size.height - 2*topspace));
 
-					fr= k<=0 ? 0 : k-1;
-					lr= k>=numrows-1 ? numrows-1 : k+1;
+					fr = k <= 0 ? 0 : k - 1;
+					lr = k >= numrows - 1 ? numrows - 1 : k + 1;
 
 					for (int i=fr; i<=lr; i++) {  // Rows
-						piny=i*(_size.height-2*topspace)/(2*numrows)+topspace;
+						piny = i*(size.height - 2*topspace)/(2*numrows) + topspace;
 
-						scale=(double)(_size.width-2*sidespace)/(double)numcolumns;
+						scale=(double)(size.width-2*sidespace)/(double)numcolumns;
 
 						k=(int)((aBall->x-sidespace)/scale-(i%2)/2.0);
 
-						fc= k<=0 ? 0 : k-1;
-						lc= k>=numcolumns-1 ? numcolumns-1 : k+1;
+						fc = k<=0 ? 0 : k-1;
+						lc = k >= numcolumns - 1 ? numcolumns - 1 : k + 1;
 
-						for (j=fc;j<=lc;++j) { // Columns
-							pinx=(int)((j+(i%2)/2.0)*scale+sidespace);
+						for (j=fc; j<=lc; ++j) { // Columns
+							pinx = (int)((j + (i%2)/2.0)*scale + sidespace);
 
-							aBall->Boink(pinx,piny,pinr);
+							aBall->Boink(pinx, piny, pinr);
 						}
 					}
 				}
 
-				aBall->Accelerate(0,.075);
+				aBall->Accelerate(0, 0.075);
 			}
 		}
 

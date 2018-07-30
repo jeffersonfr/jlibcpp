@@ -113,9 +113,12 @@ class ColorAlphaTeste : public jgui::Window {
 				return true;
 			}
 
-			jgui::Graphics *g = NULL; // TODO:: gmain->GetGraphics();
+			jgui::Graphics 
+        *g = NULL; // TODO:: gmain->GetGraphics();
+      jgui::jpoint_t
+        location = GetLocation();
 
-			jgui::Color color(g->GetRGB(event->GetX()-_location.x, event->GetY()-_location.y));
+			jgui::Color color(g->GetRGB(event->GetX()-location.x, event->GetY()-location.y));
 
 			_ref_color.a = 0xff/255.0;
 			_ref_color.r = color.GetRed()/255.0;
@@ -131,12 +134,18 @@ class ColorAlphaTeste : public jgui::Window {
 		{
 			jgui::Window::Paint(g);
 
-			jgui::jsize_t size = _fg->GetSize();
-			uint32_t *buffer = NULL;
+			jgui::jsize_t 
+        size = GetSize();
+			jgui::jsize_t 
+        isize = _fg->GetSize();
+      jgui::jinsets_t
+        insets = GetInsets();
+			uint32_t 
+        *buffer = NULL;
 
-			_fg->GetRGBArray(&buffer, 0, 0, size.width, size.height);
+			_fg->GetRGBArray(&buffer, 0, 0, isize.width, isize.height);
 
-			for (int i=0; i<size.width*size.height; i++) {
+			for (int i=0; i<isize.width*isize.height; i++) {
 				color_t color;
 				int a = (buffer[i] >> 0x18) & 0xff;
 				int r = (buffer[i] >> 0x10) & 0xff;
@@ -158,14 +167,14 @@ class ColorAlphaTeste : public jgui::Window {
 				buffer[i] = (a << 0x18) | (r << 0x10) | (g << 0x08) | (b << 0x00);
 			}
 
-			g->DrawImage(_bg, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
+			g->DrawImage(_bg, insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom);
 
       jgui::Image *image = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
 
       image->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
-      image->GetGraphics()->SetRGBArray(buffer, 0, 0, _size.width, _size.height);
+      image->GetGraphics()->SetRGBArray(buffer, 0, 0, size.width, size.height);
 
-			g->DrawImage(image, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
+			g->DrawImage(image, insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom);
 
 			delete image;
 

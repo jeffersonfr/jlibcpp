@@ -148,31 +148,37 @@ void ProgressBar::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
   
   if (theme == NULL) {
     return;
   }
 
-	Font 
+  jgui::Font 
     *font = theme->GetFont("component.font");
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  fg = theme->GetIntegerParam("component.fg"),
 	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
 	  fgdisable = theme->GetIntegerParam("component.fg.disable"),
 	  scroll = theme->GetIntegerParam("component.scroll");
+  jgui::jsize_t
+    size = GetSize();
+	std::string 
+    text;
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
-
-	std::string text;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 
 	if (_indeterminate == false) {
 		if (_type == JSO_HORIZONTAL) {
-			double d = (_value*w)/100.0;
+			double 
+        d = (_value*w)/100.0;
+			char 
+        t[255];
 
 			if (d > w) {
 				d = w;
@@ -181,13 +187,14 @@ void ProgressBar::Paint(Graphics *g)
 			g->SetColor(scroll);
 			g->FillRectangle(x, y, (int)d, h);
 
-			char t[255];
-
 			snprintf(t, 255-1, "%d %%", _value);
 
 			text = (char *)t;
 		} else if (_type == JSO_VERTICAL) {
-			double d = (_value*h)/100.0;
+			double 
+        d = (_value*h)/100.0;
+			char 
+        t[255];
 
 			if (d > h) {
 				d = h;
@@ -196,16 +203,14 @@ void ProgressBar::Paint(Graphics *g)
 			g->SetColor(scroll);
 			g->FillRectangle(x, y, w, (int)d);
 
-			char t[255];
-
 			snprintf(t, 255-1, "%d %%", _value);
 
 			text = (char *)t;
 		}
 
 		if (_label_visible == true) {
-			if (_is_enabled == true) {
-				if (_has_focus == true) {
+			if (IsEnabled() == true) {
+				if (HasFocus() == true) {
 					g->SetColor(fgfocus);
 				} else {
 					g->SetColor(fg);
@@ -225,9 +230,9 @@ void ProgressBar::Paint(Graphics *g)
 		if (_type == JSO_HORIZONTAL) {
 			_index = _index + _delta;
 
-			if (_index > (w-_stone_size)) {
+			if (_index > (w - _stone_size)) {
 				_delta = -_fixe_delta;
-				_index = w-_stone_size;
+				_index = w - _stone_size;
 			}
 
 			if (_index < 0) {
@@ -241,9 +246,9 @@ void ProgressBar::Paint(Graphics *g)
 			if (_type == JSO_VERTICAL) {
 				_index = _index + _delta;
 
-				if (_index > (h-_stone_size)) {
+				if (_index > (h - _stone_size)) {
 					_delta = -_fixe_delta;
-					_index = h-_stone_size;
+					_index = h - _stone_size;
 				}
 
 				if (_index < 0) {

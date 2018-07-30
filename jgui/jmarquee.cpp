@@ -89,24 +89,26 @@ void Marquee::Paint(Graphics *g)
     return;
   }
 
-	Font 
+  jgui::Font 
     *font = theme->GetFont("component.font");
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  fg = theme->GetIntegerParam("component.fg"),
 	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
 	  fgdisable = theme->GetIntegerParam("component.fg.disable");
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 
 	if (font != NULL) {
 		g->SetFont(font);
 
-		if (_is_enabled == true) {
-			if (_has_focus == true) {
+		if (IsEnabled() == true) {
+			if (HasFocus() == true) {
 				g->SetColor(fgfocus);
 			} else {
 				g->SetColor(fg);
@@ -117,12 +119,12 @@ void Marquee::Paint(Graphics *g)
 
 		std::string text = _text;
 
-		if (_type == JMM_BOUNCE && _size.width >= font->GetStringWidth(_text.c_str())) {
+		if (_type == JMM_BOUNCE && size.width >= font->GetStringWidth(_text.c_str())) {
 			text = (char *)(_text.c_str());
 		}
 
-		jregion_t clip = g->GetClip();
-
+		jregion_t 
+      clip = g->GetClip();
 		int 
       cx = x,
 			cy = y,
@@ -153,7 +155,8 @@ void Marquee::Paint(Graphics *g)
 
 void Marquee::Run()
 {
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return;
@@ -166,13 +169,16 @@ void Marquee::Run()
 		return;
 	}
 
+  jgui::jsize_t
+    size = GetSize();
 	int 
     hg = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size");
 
 	while (_running == true) {
 		if (_type == JMM_BOUNCE) {
-			int tw = font->GetStringWidth(_text.c_str()),
-					td = (_size.width - 2*hg - tw);
+			int 
+        tw = font->GetStringWidth(_text.c_str()),
+				td = (size.width - 2*hg - tw);
 
 			if (td > 0) {
 				td = hg;
@@ -184,7 +190,7 @@ void Marquee::Run()
 
 			if (_position < -td) {
 				_step = -_step;
-			} else if (_position > (_size.width - 2*hg - tw + td)) {
+			} else if (_position > (size.width - 2*hg - tw + td)) {
 				_step = -_step;
 			}
 		} else {
@@ -197,7 +203,7 @@ void Marquee::Run()
 			_position = _position - _step;
 
 			if (_position <= -width) {
-				_position = _size.width - 2*hg;
+				_position = size.width - 2*hg;
 			}
 		}
 

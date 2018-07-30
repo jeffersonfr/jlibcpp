@@ -432,11 +432,14 @@ class Test : public jgui::Window, public UserEventListener {
 		{
 			std::cout << "OnMousePress: "  << event->GetClickCount() << ", Button: " << event->GetButton() << std::endl;
 
-			int cx = event->GetX()-_location.x;
-			int cy = event->GetY()-_location.y;
-
-			int x = cx-_ball.x,
-					y = cy-_ball.y;
+      jgui::jpoint_t
+        location = GetLocation();
+			int 
+        cx = event->GetX() - location.x,
+			  cy = event->GetY() - location.y;
+			int 
+        x = cx-_ball.x,
+				y = cy-_ball.y;
 
 			if ((x*x+y*y) <= _raio*_raio) {
 				if (event->GetClickCount() == 1) {

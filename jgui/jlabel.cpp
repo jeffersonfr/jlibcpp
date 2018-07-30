@@ -108,13 +108,15 @@ jsize_t Label::GetPreferredSize()
 
 	jgui::Font 
     *font = theme->GetFont("component.font");
+  jgui::jsize_t
+    size = GetSize();
   int
     gx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		gy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size");
 
 	if (font != NULL) {
 		int 
-      wp = _size.width - 2*gx,
+      wp = size.width - 2*gx,
 			hp = font->GetSize();
 
 		if (wp > 0) {
@@ -141,24 +143,26 @@ void Label::Paint(Graphics *g)
     return;
   }
 
-	Font 
+  jgui::Font 
     *font = theme->GetFont("component.font");
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  fg = theme->GetIntegerParam("component.fg"),
 	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
 	  fgdisable = theme->GetIntegerParam("component.fg.disable");
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 
 	if (font != NULL) {
 		g->SetFont(font);
 
-		if (_is_enabled == true) {
-			if (_has_focus == true) {
+		if (IsEnabled() == true) {
+			if (HasFocus() == true) {
 				g->SetColor(fgfocus);
 			} else {
 				g->SetColor(fg);

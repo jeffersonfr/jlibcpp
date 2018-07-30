@@ -61,9 +61,14 @@ class Fullscreen : public jgui::Window {
 		{
 			jgui::Window::Paint(g);
 
-			printf("Window Bounds:: %d, %d, %d, %d\n", _insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
+      jgui::jsize_t
+        size = GetSize();
+      jgui::jinsets_t
+        insets = GetInsets();
 
-			g->DrawImage(_bg, _insets.left, _insets.top, _size.width-_insets.left-_insets.right, _size.height-_insets.top-_insets.bottom);
+			printf("Window Bounds:: %d, %d, %d, %d\n", insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom);
+
+			g->DrawImage(_bg, insets.left, insets.top, size.width-insets.left-insets.right, size.height-insets.top-insets.bottom);
 
 			g->SetColor(jgui::Color::Red);
 			g->FillRectangle(100, 100, 100, 100);

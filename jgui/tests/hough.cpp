@@ -276,19 +276,21 @@ class Test : public jgui::Window {
 
 			jgui::jsize_t 
 				size = _hough->GetSize();
+      jgui::jinsets_t
+        insets = GetInsets();
 
-			g->DrawImage(_image, _insets.left, _insets.top, size.width, size.height);
-			g->DrawImage(_hough, _insets.left+size.width+16, _insets.top, size.width, size.height);
+			g->DrawImage(_image, insets.left, insets.top, size.width, size.height);
+			g->DrawImage(_hough, insets.left+size.width+16, insets.top, size.width, size.height);
 
 			std::vector<jgui::jline_t> lines = _transform.GetLines(_lines_threshold);
 
 			g->SetColor(jgui::Color::Red);
-			g->SetClip(_insets.left, _insets.top, size.width, size.height);
+			g->SetClip(insets.left, insets.top, size.width, size.height);
 
 			for (std::vector<jgui::jline_t>::iterator i=lines.begin(); i!=lines.end(); i++) {
 				jgui::jline_t t = (*i);
 
-				g->DrawLine(_insets.left+t.x0, _insets.top+t.y0, _insets.left+t.x1, _insets.top+t.y1);
+				g->DrawLine(insets.left+t.x0, insets.top+t.y0, insets.left+t.x1, insets.top+t.y1);
 			}
 		}
 

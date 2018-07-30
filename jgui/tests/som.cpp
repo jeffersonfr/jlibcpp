@@ -211,22 +211,27 @@ class SOM : public jgui::Window {
 
 		int toXReal(double val)
 		{
-			int w = _size.width;
+      jgui::jsize_t
+        size = GetSize();
 
-			return (int)(val *((double)w-50.0) / COUNTRY +25.0);
+			return (int)(val *((double)size.width - 50.0) / COUNTRY + 25.0);
 		}
 
 		int toYReal(double val)
 		{
-			int h = _size.height;
+      jgui::jsize_t
+        size = GetSize();
 
-			return (int)(val *((double)h-50.0) / COUNTRY +25.0);
+			return (int)(val *((double)size.height - 50.0) / COUNTRY + 25.0);
 		}
 
 		void paintLeft(jgui::Graphics *g) 
 		{
-			int w = _size.width, 
-					h = _size.height;
+      jgui::jsize_t
+        size = GetSize();
+			int 
+        w = size.width, 
+				h = size.height;
 
 			// CLEAR ALL
 			g->SetColor(bkC);
@@ -264,18 +269,21 @@ class SOM : public jgui::Window {
 			double dx = toXReal(0.0),
 						 dy = toYReal(0.0);
 
-			g->DrawArc(dx, dy, _size.width-2*dx, _size.height-2*dy, 3*M_PI_2,  2*M_PI);
+			g->DrawArc(dx, dy, size.width-2*dx, size.height-2*dy, 3*M_PI_2,  2*M_PI);
 			
 			g->DrawCircle( toXReal(px), toYReal(py), 6);
 		}    
 
 		virtual void Paint(jgui::Graphics *g) 
 		{
-			int w = _size.width, 
-					h = _size.height;
+      jgui::jsize_t
+        size = GetSize();
+			int 
+        w = size.width, 
+				h = size.height;
 
 			g->SetColor(bkC);
-			g->FillRectangle(0, 0, _size.width, _size.height);
+			g->FillRectangle(0, 0, size.width, size.height);
 
 			if ((offscreen == NULL) || ((imagewidth != w) || (imageheight != h))) {
 				offscreen = new jgui::BufferedImage(jgui::JPF_ARGB, w, h);

@@ -2230,8 +2230,8 @@ class GraphicsTeste : public jgui::Window {
 		GraphicsTeste():
 			jgui::Window(0, 0, 720, 480)
 		{
-			Width = _size.width;
-			Height = _size.height;
+			Width = 720;
+			Height = 480;
 
 			ScaleFactor *= Height;
 

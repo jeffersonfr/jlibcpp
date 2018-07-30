@@ -133,6 +133,8 @@ void Mines::Paint(jgui::Graphics *g)
     *theme = GetTheme();
 	jgui::Font 
     *font = theme->GetFont("component.font");
+  jgui::jinsets_t
+    insets = GetInsets();
 	int 
     delta = 4;
 
@@ -145,14 +147,14 @@ void Mines::Paint(jgui::Graphics *g)
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
 
 			if (block.state == CLOSED_BLOCK) {
-				g->FillRectangle(_insets.left+i*(isize+delta), _insets.top+j*(isize+delta), isize, isize);
+				g->FillRectangle(insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize);
 			} else if (block.state == OPENED_BLOCK) {
 				g->SetColor(0xd0, 0xd0, 0xd0, 0xff);
-				g->FillRectangle(_insets.left+i*(isize+delta), _insets.top+j*(isize+delta), isize, isize);
+				g->FillRectangle(insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize);
 
 				if (block.type == BOMB_BLOCK) {
-					g->FillRectangle(_insets.left+i*(isize+delta), _insets.top+j*(isize+delta), isize, isize);
-					g->DrawImage(small_bomb, _insets.left+i*(isize+delta), _insets.top+j*(isize+delta));
+					g->FillRectangle(insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize);
+					g->DrawImage(small_bomb, insets.left+i*(isize+delta), insets.top+j*(isize+delta));
 				} else {
 					if (block.value != 0) {
 						char tmp[256];
@@ -160,12 +162,12 @@ void Mines::Paint(jgui::Graphics *g)
 						sprintf(tmp, "%d", block.value);
 
 						g->SetColor(0xff, 0x00, 0x00, 0xff);
-						g->DrawString(tmp, _insets.left+i*(isize+delta), _insets.top+j*(isize+delta), isize, isize, jgui::JHA_CENTER, jgui::JVA_CENTER);
+						g->DrawString(tmp, insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize, jgui::JHA_CENTER, jgui::JVA_CENTER);
 					}
 				}
 			} else if (block.state == MARKED_BLOCK) {
-				g->FillRectangle(_insets.left+i*(isize+delta), _insets.top+j*(isize+delta), isize, isize);
-				g->DrawImage(flag, _insets.left+i*(isize+delta), _insets.top+j*(isize+delta));
+				g->FillRectangle(insets.left+i*(isize+delta), insets.top+j*(isize+delta), isize, isize);
+				g->DrawImage(flag, insets.left+i*(isize+delta), insets.top+j*(isize+delta));
 			}
 		}
 	}
@@ -174,6 +176,13 @@ void Mines::Paint(jgui::Graphics *g)
 
 	jgui::jsize_t
 		size = GetSize();
+	int 
+		x = size.width - 180,
+		y = 260,
+		w = 160,
+		h = 140;
+	char tmp[255];
+
 
 	if (GetResult() != LOSE) {
 		g->DrawString("You Win", size.width - 150, 80);
@@ -182,13 +191,6 @@ void Mines::Paint(jgui::Graphics *g)
 		g->DrawString("You Lost", size.width - 150, 80);
 		g->DrawImage(dead_face, size.width - 200, 80, 160, 140);
 	}
-
-	int 
-		x = size.width - 180,
-		y = 260,
-		w = 160,
-		h = 140;
-	char tmp[255];
 
 	sprintf(tmp, "bombs [ %02d ]", hide_bombs);
 
@@ -200,7 +202,7 @@ void Mines::Paint(jgui::Graphics *g)
 	g->DrawString(tmp, x+10, y+h+10);
 				
 	g->SetColor(0x20, 0x40, 0xa0, 0x80);
-	g->FillRectangle(_insets.left+current_col*(isize+delta), _insets.top+current_row*(isize+delta), isize, isize);
+	g->FillRectangle(insets.left+current_col*(isize+delta), insets.top+current_row*(isize+delta), isize, isize);
 }
 
 bool Mines::KeyPressed(jevent::KeyEvent *event)

@@ -215,8 +215,11 @@ class GraphicsTeste : public jgui::Window {
 		{
 			// jgui::Window::Paint(g);
 
-			int w = _size.width;
-			int h = _size.height;
+      jgui::jsize_t
+        size = GetSize();
+			int 
+        w = size.width,
+			  h = size.height;
 
 			//start the main loop
 			for(int x = 0; x < w; x++) {

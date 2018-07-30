@@ -223,22 +223,22 @@ int ListBox::GetSelectedIndex()
 
 jsize_t ListBox::GetPreferredSize()
 {
-	Theme *theme = GetTheme();
-
-	jsize_t t {0, 0};
+	Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
-    return t;
+    return jgui::jsize_t {0, 0};
   }
 
+  jgui::jsize_t 
+    t = GetSize();
   int
     // gx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
-		gy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size");
-	int 
+		gy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
 		is = theme->GetIntegerParam("item.size"),
 		ig = theme->GetIntegerParam("item.gap");
 
-	t.width = _size.width;
+	// t.width = t.width;
 	t.height = 2*gy + _items.size()*(is + ig) - ig;
 
 	return t;
@@ -254,27 +254,32 @@ bool ListBox::KeyPressed(jevent::KeyEvent *event)
 		return false;
 	}
 
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return false;
   }
 	
+  jgui::jsize_t
+    size = GetSize();
+	jevent::jkeyevent_symbol_t 
+    action = event->GetSymbol();
   int
     bs = theme->GetIntegerParam("component.border.size"),
     is = theme->GetIntegerParam("item.size"),
     ig = theme->GetIntegerParam("item.gap"),
     // hp = theme->GetIntegerParam("component.hgap"),
 		vg = theme->GetIntegerParam("component.vgap");
-	jevent::jkeyevent_symbol_t action = event->GetSymbol();
-	bool catched = false;
+	bool 
+    catched = false;
 
 	if (action == jevent::JKS_CURSOR_UP) {
 		IncrementLines(1);
 		
 		catched = true;
 	} else if (action == jevent::JKS_PAGE_UP) {
-		IncrementLines((_size.height-2*(bs + vg))/(is + ig));
+		IncrementLines((size.height-2*(bs + vg))/(is + ig));
 		
 		catched = true;
 	} else if (action == jevent::JKS_CURSOR_DOWN) {
@@ -282,7 +287,7 @@ bool ListBox::KeyPressed(jevent::KeyEvent *event)
 
 		catched = true;
 	} else if (action == jevent::JKS_PAGE_DOWN) {
-		DecrementLines((_size.height-2*(bs + vg))/(is + ig));
+		DecrementLines((size.height-2*(bs + vg))/(is + ig));
 
 		catched = true;
 	} else if (action == jevent::JKS_HOME) {
@@ -366,7 +371,7 @@ void ListBox::Paint(Graphics *g)
 	
 	jgui::Font 
     *font = theme->GetFont("component.font");
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
     fg = theme->GetIntegerParam("component.fg"),
     fgfocus = theme->GetIntegerParam("component.fg.focus"),
@@ -378,6 +383,10 @@ void ListBox::Paint(Graphics *g)
     itemfgdisable = theme->GetIntegerParam("item.fg.disable"),
     itembgfocus = theme->GetIntegerParam("item.bg.focus"),
     itemfgfocus = theme->GetIntegerParam("item.fg.focus");
+	jpoint_t 
+    scroll_location = GetScrollLocation();
+  jgui::jsize_t
+    size = GetSize();
 	// int 
     // bs = theme->GetIntegerParam("component.border.size"),
     // ss = theme->GetIntegerParam("component.scroll.size"),
@@ -391,12 +400,8 @@ void ListBox::Paint(Graphics *g)
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x;
-		// h = _size.height - 2*y;
-
-	// jsize_t scroll_dimension = GetScrollDimension();
-	jpoint_t 
-    scroll_location = GetScrollLocation();
+		w = size.width - 2*x;
+		// h = size.height - 2*y;
 	int 
     scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
@@ -419,7 +424,7 @@ void ListBox::Paint(Graphics *g)
 	for (int i=0; i<(int)_items.size(); i++) {
 		int dy = y+(is + ig)*i;
 
-		if ((dy + is) < 0 || dy > _size.height) {
+		if ((dy + is) < 0 || dy > size.height) {
 			continue;
 		}
 
@@ -470,8 +475,8 @@ void ListBox::Paint(Graphics *g)
 		if (font != NULL) {
 			g->SetFont(font);
 
-			if (_is_enabled == true) {
-				if (_has_focus == true) {
+			if (IsEnabled() == true) {
+				if (HasFocus() == true) {
 					g->SetColor(itemfgfocus);
 				} else {
 					g->SetColor(itemfg);
@@ -497,7 +502,8 @@ void ListBox::IncrementLines(int lines)
 		return;
 	}
 
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
   
   if (theme == NULL) {
     return;
@@ -505,9 +511,8 @@ void ListBox::IncrementLines(int lines)
 	
 	int 
     is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap");
-
-	int old_index = _index;
+    ig = theme->GetIntegerParam("item.gap"),
+	  old_index = _index;
 
 	_index = _index - lines;
 
@@ -519,14 +524,18 @@ void ListBox::IncrementLines(int lines)
 		}
 	}
 
-	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+  jgui::jpoint_t 
+    scroll_location = GetScrollLocation();
+  jgui::jsize_t
+    size = GetSize();
+	int 
+    scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
 	if ((is + ig)*_index < scrolly) {
-		ScrollToVisibleArea(scrollx, (std::max)(0, (is + ig)*_index), _size.width, _size.height, this);
-	} else if ((scrolly+_size.height) < (is + ig)*(int)_index) {
-		ScrollToVisibleArea(scrollx, (is + ig)*(_index + 1) - _size.height + 2*ig, _size.width, _size.height, this);
+		ScrollToVisibleArea(scrollx, (std::max)(0, (is + ig)*_index), size.width, size.height, this);
+	} else if ((scrolly+size.height) < (is + ig)*(int)_index) {
+		ScrollToVisibleArea(scrollx, (is + ig)*(_index + 1) - size.height + 2*ig, size.width, size.height, this);
 	}
 
 	if (_index != old_index) {
@@ -542,7 +551,8 @@ void ListBox::DecrementLines(int lines)
 		return;
 	}
 
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
   
   if (theme == NULL) {
     return;
@@ -550,8 +560,8 @@ void ListBox::DecrementLines(int lines)
 	
 	int 
     is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap");
-	int old_index = _index;
+    ig = theme->GetIntegerParam("item.gap"),
+    old_index = _index;
 
 	_index = _index + lines;
 
@@ -567,14 +577,18 @@ void ListBox::DecrementLines(int lines)
 		}
 	}
 
-	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+  jgui::jpoint_t 
+    scroll_location = GetScrollLocation();
+  jgui::jsize_t
+    size = GetSize();
+	int 
+    scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
-	if ((scrolly + _size.height) < (is + ig)*(int)(_index + 1)) {
-		ScrollToVisibleArea(scrollx, (is + ig)*(_index + 1)-_size.height+2*ig, _size.width, _size.height, this);
+	if ((scrolly + size.height) < (is + ig)*(int)(_index + 1)) {
+		ScrollToVisibleArea(scrollx, (is + ig)*(_index + 1)-size.height+2*ig, size.width, size.height, this);
 	} else if ((is + ig)*_index < scrolly) {
-		ScrollToVisibleArea(scrollx, (std::max)(0, (is + ig)*_index), _size.width, _size.height, this);
+		ScrollToVisibleArea(scrollx, (std::max)(0, (is + ig)*_index), size.width, size.height, this);
 	}
 
 	if (_index != old_index) {
@@ -588,22 +602,20 @@ jsize_t ListBox::GetScrollDimension()
 {
 	Theme *theme = GetTheme();
 
-	jsize_t t {0, 0};
-
   if (theme == NULL) {
-    return t;
+    return jgui::jsize_t {0, 0};
   }
 
+	jsize_t 
+    t = GetSize();
 	int 
-    bs = theme->GetIntegerParam("component.border.size");
-	int 
+    bs = theme->GetIntegerParam("component.border.size"),
     is = theme->GetIntegerParam("item.size"),
-    ig = theme->GetIntegerParam("item.gap");
-	int 
+    ig = theme->GetIntegerParam("item.gap"),
     // hg = theme->GetIntegerParam("component.hgap"),
     vg = theme->GetIntegerParam("component.vgap");
 
-	t.width = _size.width;
+	// t.width = t.width;
 	t.height = _items.size()*(is + ig) + 2*(vg + bs);
 
 	return t;

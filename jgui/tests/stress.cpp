@@ -79,6 +79,10 @@ class GraphicPanel : public jgui::Window {
       *g = _buffer->GetGraphics();
 		jgui::Font 
       *font = new jgui::Font("default", jgui::JFA_NORMAL, 48);
+    jgui::jsize_t
+      t = GetSize();
+    jgui::jinsets_t
+      insets = GetInsets();
 		
     g->SetFont(font);
 
@@ -103,14 +107,14 @@ class GraphicPanel : public jgui::Window {
       hfont = font->GetSize();
 
     for (int i=0; i<iterations*4; i++) {
-      x = rand()%(_size.width-wfont-_insets.left-_insets.right);
-      y = rand()%(_size.height-hfont-_insets.top-_insets.bottom);
+      x = rand()%(t.width-wfont-insets.left-insets.right);
+      y = rand()%(t.height-hfont-insets.top-insets.bottom);
       r1 = rand()%0xff;
       g1 = rand()%0xff;
       b1 = rand()%0xff;
 
       g->SetColor(r1, g1, b1, 0xff);
-      g->DrawString("Font Testing", x+_insets.left, y+_insets.top);
+      g->DrawString("Font Testing", x+insets.left, y+insets.top);
 
       Repaint();
     }
@@ -126,15 +130,15 @@ class GraphicPanel : public jgui::Window {
 		DrawString("DrawString [BLEND]");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-wfont-_insets.left-_insets.right);
-			y = rand()%(_size.height-hfont-_insets.top-_insets.bottom);
+			x = rand()%(t.width-wfont-insets.left-insets.right);
+			y = rand()%(t.height-hfont-insets.top-insets.bottom);
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
 			g->SetColor(r1, g1, b1, a1+0x80);
-			g->DrawString("Font Testing", x+_insets.left, y+_insets.top);
+			g->DrawString("Font Testing", x+insets.left, y+insets.top);
 
       Repaint();
 		}
@@ -157,8 +161,8 @@ class GraphicPanel : public jgui::Window {
       sw = region.x + region.width,
 			sh = region.x + region.height;
 
-		x = (_size.width - sw)/2;
-		y = (_size.height + sh)/2;
+		x = (t.width - sw)/2;
+		y = (t.height + sh)/2;
 
 		jgui::Image 
       *fimage = new jgui::BufferedImage(jgui::JPF_ARGB, 2*sw, sh);
@@ -227,8 +231,8 @@ class GraphicPanel : public jgui::Window {
 				int 
           w = rand()%(800),
 					h = rand()%(800),
-          mx = _size.width-w-_insets.left-_insets.right,
-					my = _size.height-h-_insets.top-_insets.bottom;
+          mx = t.width-w-insets.left-insets.right,
+					my = t.height-h-insets.top-insets.bottom;
 
 				mx = (mx == 0)?1:mx;
 				my = (my == 0)?1:my;
@@ -240,7 +244,7 @@ class GraphicPanel : public jgui::Window {
 				b1 = rand()%0xff;
 
 				g->SetColor(r1, g1, b1, 0xff);
-				g->DrawLine(x+_insets.left, y+_insets.top, x+_insets.left+w, y+_insets.top+h);
+				g->DrawLine(x+insets.left, y+insets.top, x+insets.left+w, y+insets.top+h);
 
         Repaint();
 			}
@@ -251,8 +255,8 @@ class GraphicPanel : public jgui::Window {
 				int 
           w = rand()%(800),
 					h = rand()%(800),
-				  mx = _size.width-w-_insets.left-_insets.right,
-					my = _size.height-h-_insets.top-_insets.bottom;
+				  mx = t.width-w-insets.left-insets.right,
+					my = t.height-h-insets.top-insets.bottom;
 
 				mx = (mx == 0)?1:mx;
 				my = (my == 0)?1:my;
@@ -265,7 +269,7 @@ class GraphicPanel : public jgui::Window {
 				a1 = rand()%0x80;
 
 				g->SetColor(r1, g1, b1, a1+0x80);
-				g->DrawLine(x+_insets.left, y+_insets.top, x+_insets.left+w, y+_insets.top+h);
+				g->DrawLine(x+insets.left, y+insets.top, x+insets.left+w, y+insets.top+h);
 
         Repaint();
 			}
@@ -286,14 +290,14 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Triangles");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+			x = rand()%(t.width-w-insets.left-insets.right);
+			y = rand()%(t.height-h-insets.top-insets.bottom);
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
-			x = x+_insets.left;
-			y = y+_insets.top+h;
+			x = x+insets.left;
+			y = y+insets.top+h;
 
 			g->SetColor(r1, g1, b1, 0xff);
 			g->FillTriangle(x, y, x+w/2, y-h, x+w, y);
@@ -314,15 +318,15 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Triangles [BLEND]");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+			x = rand()%(t.width-w-insets.left-insets.right);
+			y = rand()%(t.height-h-insets.top-insets.bottom);
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
-			x = x+_insets.left;
-			y = y+_insets.top+h;
+			x = x+insets.left;
+			y = y+insets.top+h;
 
 			g->SetColor(r1, g1, b1, a1+0x80);
 			g->FillTriangle(x, y, x+w/2, y-h, x+w, y);
@@ -343,16 +347,16 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Rectangles");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+			x = rand()%(t.width-w-insets.left-insets.right);
+			y = rand()%(t.height-h-insets.top-insets.bottom);
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
 			g->SetColor(r1, g1, b1, 0xff);
-			g->FillRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->FillRectangle(x+insets.left, y+insets.top, w, h);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->DrawRectangle(x+insets.left, y+insets.top, w, h);
 
       Repaint();
 		}
@@ -368,17 +372,17 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Rectangles [BLEND]");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+			x = rand()%(t.width-w-insets.left-insets.right);
+			y = rand()%(t.height-h-insets.top-insets.bottom);
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
 			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->FillRectangle(x+insets.left, y+insets.top, w, h);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->DrawRectangle(x+insets.left, y+insets.top, w, h);
 
       Repaint();
 		}
@@ -394,16 +398,16 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Round Rectangles");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+			x = rand()%(t.width-w-insets.left-insets.right);
+			y = rand()%(t.height-h-insets.top-insets.bottom);
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
 			g->SetColor(r1, g1, b1, 0xff);
-			g->FillRoundRectangle(x+_insets.left, y+_insets.top, w, h, 40, 40);
+			g->FillRoundRectangle(x+insets.left, y+insets.top, w, h, 40, 40);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h, 40, 40);
+			g->DrawRoundRectangle(x+insets.left, y+insets.top, w, h, 40, 40);
 
       Repaint();
 		}
@@ -419,17 +423,17 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Round Rectangles [BLEND]");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+			x = rand()%(t.width-w-insets.left-insets.right);
+			y = rand()%(t.height-h-insets.top-insets.bottom);
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
 			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillRoundRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->FillRoundRectangle(x+insets.left, y+insets.top, w, h);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawRoundRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->DrawRoundRectangle(x+insets.left, y+insets.top, w, h);
 
       Repaint();
 		}
@@ -445,16 +449,16 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Bevel Rectangles");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+			x = rand()%(t.width-w-insets.left-insets.right);
+			y = rand()%(t.height-h-insets.top-insets.bottom);
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
 			g->SetColor(r1, g1, b1, 0xff);
-			g->FillBevelRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->FillBevelRectangle(x+insets.left, y+insets.top, w, h);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawBevelRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->DrawBevelRectangle(x+insets.left, y+insets.top, w, h);
 
       Repaint();
 		}
@@ -470,17 +474,17 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Bevel Rectangles [BLEND]");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+			x = rand()%(t.width-w-insets.left-insets.right);
+			y = rand()%(t.height-h-insets.top-insets.bottom);
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 			a1 = rand()%0x80;
 
 			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillBevelRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->FillBevelRectangle(x+insets.left, y+insets.top, w, h);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawBevelRectangle(x+_insets.left, y+_insets.top, w, h);
+			g->DrawBevelRectangle(x+insets.left, y+insets.top, w, h);
 
       Repaint();
 		}
@@ -496,17 +500,17 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Circles");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right-200);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom-200);
+			x = rand()%(t.width-w-insets.left-insets.right-200);
+			y = rand()%(t.height-h-insets.top-insets.bottom-200);
 			z = rand()%100+100;
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
 			g->SetColor(r1, g1, b1, 0xff);
-			g->FillCircle(x+_insets.left+200, y+_insets.top+200, z);
+			g->FillCircle(x+insets.left+200, y+insets.top+200, z);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawCircle(x+_insets.left+200, y+_insets.top+200, z);
+			g->DrawCircle(x+insets.left+200, y+insets.top+200, z);
 
       Repaint();
 		}
@@ -522,8 +526,8 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Circles [BLEND]");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right-200);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom-200);
+			x = rand()%(t.width-w-insets.left-insets.right-200);
+			y = rand()%(t.height-h-insets.top-insets.bottom-200);
 			z = rand()%100+100;
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
@@ -531,9 +535,9 @@ class GraphicPanel : public jgui::Window {
 			a1 = rand()%0x80;
 
 			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillCircle(x+_insets.left+200, y+_insets.top+200, z);
+			g->FillCircle(x+insets.left+200, y+insets.top+200, z);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawCircle(x+_insets.left+200, y+_insets.top+200, z);
+			g->DrawCircle(x+insets.left+200, y+insets.top+200, z);
 
       Repaint();
 		}
@@ -549,17 +553,17 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Arcs");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right-200);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom-200);
+			x = rand()%(t.width-w-insets.left-insets.right-200);
+			y = rand()%(t.height-h-insets.top-insets.bottom-200);
 			z = rand()%100+100;
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
 			g->SetColor(r1, g1, b1, 0xff);
-			g->FillArc(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->FillArc(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawArc(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->DrawArc(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
 
       Repaint();
 		}
@@ -575,8 +579,8 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Arcs [BLEND]");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right-200);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom-200);
+			x = rand()%(t.width-w-insets.left-insets.right-200);
+			y = rand()%(t.height-h-insets.top-insets.bottom-200);
 			z = rand()%100+100;
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
@@ -584,9 +588,9 @@ class GraphicPanel : public jgui::Window {
 			a1 = rand()%0x80;
 
 			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillArc(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->FillArc(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawArc(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->DrawArc(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
 
       Repaint();
 		}
@@ -602,17 +606,17 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Chords");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right-200);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom-200);
+			x = rand()%(t.width-w-insets.left-insets.right-200);
+			y = rand()%(t.height-h-insets.top-insets.bottom-200);
 			z = rand()%100+100;
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
 			b1 = rand()%0xff;
 
 			g->SetColor(r1, g1, b1, 0xff);
-			g->FillChord(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->FillChord(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawChord(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->DrawChord(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
 
       Repaint();
 		}
@@ -628,8 +632,8 @@ class GraphicPanel : public jgui::Window {
 		DrawString("Fill Chords [BLEND]");
 
 		for (int i=0; i<iterations; i++) {
-			x = rand()%(_size.width-w-_insets.left-_insets.right-200);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom-200);
+			x = rand()%(t.width-w-insets.left-insets.right-200);
+			y = rand()%(t.height-h-insets.top-insets.bottom-200);
 			z = rand()%100+100;
 			r1 = rand()%0xff;
 			g1 = rand()%0xff;
@@ -637,9 +641,9 @@ class GraphicPanel : public jgui::Window {
 			a1 = rand()%0x80;
 
 			g->SetColor(r1, g1, b1, a1+0x80);
-			g->FillChord(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->FillChord(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
 			g->SetColor(0x80, 0x80, 0x80, 0xff);
-			g->DrawChord(x+_insets.left+200, y+_insets.top+200, z, z, M_PI/6, -M_PI/6);
+			g->DrawChord(x+insets.left+200, y+insets.top+200, z, z, M_PI/6, -M_PI/6);
 
       Repaint();
 		}
@@ -659,11 +663,11 @@ class GraphicPanel : public jgui::Window {
 		for (int i=0; i<iterations; i++) {
 			uint32_t color = (rand()%0xf0f0f0) | 0xff000000;
 
-			x = rand()%(_size.width-w-_insets.left-_insets.right);
-			y = rand()%(_size.height-h-_insets.top-_insets.bottom);
+			x = rand()%(t.width-w-insets.left-insets.right);
+			y = rand()%(t.height-h-insets.top-insets.bottom);
 
 			g->SetColor(color);
-			g->DrawImage(off, x+_insets.left, y+_insets.top, w, h);
+			g->DrawImage(off, x+insets.left, y+insets.top, w, h);
 			
       Repaint();
 		}
@@ -689,8 +693,8 @@ class GraphicPanel : public jgui::Window {
 				color = (rand()%0xf0f0f0) | 0xff000000;
 			}
 
-			x = (_size.width-size)/2;
-			y = (_size.height-size)/2;
+			x = (t.width-size)/2;
+			y = (t.height-size)/2;
 
 			jgui::Image *colorize = off->Colorize(jgui::Color(color));
 
@@ -742,8 +746,8 @@ class GraphicPanel : public jgui::Window {
 				color = (rand()%0xf0f0f0) | 0xff000000;
 			}
 
-			x = (_size.width-size)/2;
-			y = (_size.height-size)/2;
+			x = (t.width-size)/2;
+			y = (t.height-size)/2;
 
       jgui::jsize_t
         t = rotate->GetSize();

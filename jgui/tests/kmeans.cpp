@@ -378,23 +378,29 @@ class SOM : public jgui::Window {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
+      jgui::jsize_t
+        size = GetSize();
+
 			// g->Clear();
 			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-			g->FillRectangle(0, 0, _size.width, _size.height);
+			g->FillRectangle(0, 0, size.width, size.height);
 
-			int dx = _size.width/4,
-					dy = _size.height/2,
-					ex = 3*dx,
-					ey = dy,
-					s = dx;
+			int 
+        dx = size.width/4,
+				dy = size.height/2,
+				ex = 3*dx,
+				ey = dy,
+				s = dx;
 
 			for (int i=0; i<_train_input_size; i++) {
 				// identifica a regiao do ponto
-				double x = _train_input[i][0],
-							 y = _train_input[i][1],
-							 c = _train_input[i][2];
-				uint32_t classe = (int)c,
-								 color = GetColor(classe);
+				double 
+          x = _train_input[i][0],
+					y = _train_input[i][1],
+					c = _train_input[i][2];
+				uint32_t 
+          classe = (int)c,
+					color = GetColor(classe);
 
 				g->SetRGB(color, (int)(x*s+dx), (int)(y*s+dy));
 			}
@@ -403,11 +409,13 @@ class SOM : public jgui::Window {
 				// classifica os pontos
 				for (int i=0; i<_classify_input_size; i++) {
 					// identifica a regiao do ponto
-					double x = _classify_input[i][0],
-								 y = _classify_input[i][1],
-								 c = _classify_input[i][3];
-					uint32_t classe = (int)round(c),
-									 color = GetColor(classe);
+					double 
+            x = _classify_input[i][0],
+						y = _classify_input[i][1],
+						c = _classify_input[i][3];
+					uint32_t 
+            classe = (int)round(c),
+						color = GetColor(classe);
 
 					g->SetRGB(color, (int)(x*s+ex), (int)(y*s+ey));
 				}
@@ -416,9 +424,11 @@ class SOM : public jgui::Window {
 			g->SetColor(0x00, 0x00, 0x00, 0xff);
 
 			for (int i=0; i<_neurons_size; i++) {
-				Neuron *neuron = _neurons[i];
-				uint32_t classe = (int)round(neuron->GetWeight(2)),
-								 color = GetColor(classe);
+				Neuron 
+          *neuron = _neurons[i];
+				uint32_t 
+          classe = (int)round(neuron->GetWeight(2)),
+					color = GetColor(classe);
 
 				g->SetColor(color);
 				g->FillRectangle((int)(neuron->GetWeight(0)*s+dx), (int)(neuron->GetWeight(1)*s+dy), 8, 8);

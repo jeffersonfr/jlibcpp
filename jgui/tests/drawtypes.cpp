@@ -57,22 +57,28 @@ class Main : public jgui::Window {
 		{
 			jgui::Window::Paint(g);
 
-			int items = 5;
-			int gap = 32;
-			int size = (_size.width-6*gap-_insets.top-_insets.bottom)/(items);
-			int count = 0;
+      jgui::jsize_t
+        size = GetSize();
+      jgui::jinsets_t
+        insets = GetInsets();
+			int 
+        items = 5,
+			  gap = 32,
+			  bs = (size.width-6*gap-insets.top-insets.bottom)/(items),
+			  count = 0;
 
 			for (std::map<std::string, jgui::Image *>::iterator i=_types.begin(); i!=_types.end(); i++) {
-				jgui::Image *image = i->second;
+				jgui::Image 
+          *image = i->second;
+				int 
+          x = count%items,
+				  y = count/items;
 
-				int x = count%items;
-				int y = count/items;
-
-				g->DrawImage(image, x*(size+gap)+gap, y*(size+gap)+120, size, size);
+				g->DrawImage(image, x*(bs+gap)+gap, y*(bs+gap)+120, bs, bs);
 				g->SetColor(jgui::Color::Black);
-				g->FillRectangle(x*(size+gap)+gap, y*(size+gap)+120, 36, 24);
+				g->FillRectangle(x*(bs+gap)+gap, y*(bs+gap)+120, 36, 24);
 				g->SetColor(jgui::Color::White);
-				g->DrawString(i->first, x*(size+gap)+gap, y*(size+gap)+120);
+				g->DrawString(i->first, x*(bs+gap)+gap, y*(bs+gap)+120);
 
 				count = count + 1;
 			}

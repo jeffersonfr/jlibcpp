@@ -118,7 +118,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 	friend class Container;
 	friend class Frame;
 
-	protected:
+	private:
 		/** \brief */
 		std::vector<jevent::FocusListener *> _focus_listeners;
 		/** \brief */
@@ -144,9 +144,9 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		/** \brief */
 		Component *_down;
 		/** \brief */
-		jgui::Theme *_theme;
-		/** \brief */
 		jgui::KeyMap *_keymap;
+		/** \brief */
+		jgui::Theme *_theme;
 		/** \brief */
 		std::string _name;
 		/** \brief */
@@ -501,7 +501,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		 * \brief
 		 *
 		 */
-		virtual bool GetIgnoreRepaint();
+		virtual bool IsIgnoreRepaint();
 		
 		/**
 		 * \brief

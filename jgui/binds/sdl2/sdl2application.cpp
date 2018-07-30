@@ -742,15 +742,12 @@ SDL2Window::SDL2Window(int x, int y, int width, int height):
 	_mouse_y = 0;
 	_last_keypress = 0LL;
 	_click_count = 1;
-  _location.x = x;
-  _location.y = y;
-  _size.width = width;
-  _size.height = height;
 
-	int flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
+	int 
+    flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
 	
 	// INFO:: create the main window
-	_window = SDL_CreateWindow("Main", _location.x, _location.y, _size.width, _size.height, flags);
+	_window = SDL_CreateWindow("Main", x, y, width, height, flags);
 
 	if (_window == NULL) {
 		throw jexception::RuntimeException("Cannot create a window");
@@ -764,8 +761,12 @@ SDL2Window::SDL2Window(int x, int y, int width, int height):
 
 	// SDL_SetWindowBordered(_window, SDL_FALSE);
 
-	SDL_SetWindowMinimumSize(_window, _minimum_size.width, _minimum_size.height);
-	SDL_SetWindowMaximumSize(_window, _maximum_size.width, _maximum_size.height);
+  jgui::jsize_t
+    min = GetMinimumSize(),
+    max = GetMaximumSize();
+
+	SDL_SetWindowMinimumSize(_window, min.width, min.height);
+	SDL_SetWindowMaximumSize(_window, max.width, max.height);
 	
 	SDL_HideWindow(_window);
 }

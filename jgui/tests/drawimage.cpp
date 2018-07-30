@@ -904,12 +904,15 @@ class Main : public jgui::Window {
 		Main():
 			jgui::Window(0, 0, 960, 540)
 		{
-			int gapx = 64;
-			int gapy = 64;
-			int w = 180;
-			int h = 180;
-			int dx = (_size.width-4*w-3*gapx)/2;
-			int dy = (_size.height-2*h-1*gapy)/2;
+      jgui::jsize_t
+        size = GetSize();
+			int 
+        gapx = 64,
+  			gapy = 64,
+	  		w = 180,
+		  	h = 180,
+			  dx = (size.width-4*w-3*gapx)/2,
+			  dy = (size.height-2*h-1*gapy)/2;
 
 			gapx = gapx/2;
 			gapy = gapy/3;

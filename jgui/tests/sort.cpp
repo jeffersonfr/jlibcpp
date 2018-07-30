@@ -1586,7 +1586,10 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 			}
 			*/
 			
-			double step = (double)_size.width/(double)_array_size;
+      jgui::jsize_t
+        size = GetSize();
+			double 
+        step = (double)size.width/(double)_array_size;
 
 			for (int i=0; i<_array_size; i++) {
 				_array[i] = (int)((i+1)*step);
@@ -1634,7 +1637,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 				return true;
 			}
 
-			if (_is_enabled == false) {
+			if (IsEnabled() == false) {
 				return false;
 			}
 
@@ -1662,7 +1665,10 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 		{
 			jgui::Component::Paint(g);
 
-			int hsize = _size.height/_array_size;
+      jgui::jsize_t
+        size = GetSize();
+			int 
+        hsize = size.height/_array_size;
 
 			g->SetColor(_colors[0]);
 			for (int i=0; i<_array_size; i++) {
@@ -1671,10 +1677,10 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 
 			if (_algorithm != NULL) {
 				g->SetColor(_colors[1]);
-				g->DrawRectangle(0, _algorithm->GetIndex0()*hsize, _size.width, hsize);
+				g->DrawRectangle(0, _algorithm->GetIndex0()*hsize, size.width, hsize);
 
 				g->SetColor(_colors[2]);
-				g->DrawRectangle(0, _algorithm->GetIndex1()*hsize, _size.width, hsize);
+				g->DrawRectangle(0, _algorithm->GetIndex1()*hsize, size.width, hsize);
 			}
 
 			jgui::Theme *theme = GetTheme();
@@ -1682,7 +1688,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 
 			g->SetColor(jgui::Color::White);
 			g->SetFont(font);
-			g->DrawString(_algorithm->GetName(), 0, 0, _size.width, _size.height);
+			g->DrawString(_algorithm->GetName(), 0, 0, size.width, size.height);
 		}
 
 		virtual void Update(void *v)
@@ -1701,14 +1707,16 @@ class SortFrame : public jgui::Window {
 		SortFrame():
 			jgui::Window(/*"Sort Algorithms", */0, 0, 1280, 720)
 		{
+      jgui::jsize_t
+        size = GetSize();
 			int 
         w = 128,
 				h = 128,
         gapx = 16,
         gapy = 16,
         array_size = 128,
-        dx = (_size.width-6*w-5*gapx)/2,
-        dy = (_size.height-3*h-2*gapy)/2;
+        dx = (size.width-6*w-5*gapx)/2,
+        dy = (size.height-3*h-2*gapy)/2;
 
 			_components.push_back(new SortComponent(array_size, dx+0*(w+gapx), dy+0*(h+gapy), w, h));
 			_components.push_back(new SortComponent(array_size, dx+1*(w+gapx), dy+0*(h+gapy), w, h));

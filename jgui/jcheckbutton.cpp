@@ -154,16 +154,19 @@ bool CheckButton::MousePressed(jevent::MouseEvent *event)
 		return true;
 	}
 
+  jgui::jsize_t
+    size = GetSize();
+
 	if (event->GetButton() == jevent::JMB_BUTTON1) {
 		int x1 = event->GetX(),
 				y1 = event->GetY(),
-				size = _size.height;
+				ms = size.height;
 
-		if (_size.height > _size.width) {
-			size = _size.width;
+		if (size.height > size.width) {
+			ms = size.width;
 		}
 
-		if ((x1 > 0 && x1 < (size)) && (y1 > 0 && y1 < (size))) {
+		if ((x1 > 0 && x1 < ms) && (y1 > 0 && y1 < ms)) {
 			if (_type == JCBT_CHECK) {
 				if (_checked == true) {
 					SetSelected(false);
@@ -232,47 +235,49 @@ void CheckButton::Paint(Graphics *g)
 	  fg = theme->GetIntegerParam("component.fg"),
 	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
 	  fgdisable = theme->GetIntegerParam("component.fg.disable");
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 	int
     major = 16,
     minor = 4,
-    cs = (std::min(_size.width, _size.height) - major)/2;
+    cs = (std::min(size.width, size.height) - major)/2;
 
-	if (_has_focus == true) {
+	if (HasFocus() == true) {
 		g->SetColor(fgfocus);
 	} else {
 		g->SetColor(fg);
 	}
 
 	if (_type == JCBT_CHECK) {
-		g->FillRectangle(x, y + (_size.height - cs)/2, cs, cs);
+		g->FillRectangle(x, y + (size.height - cs)/2, cs, cs);
   } else if (_type == JCBT_RADIO) {
-		g->FillCircle(x + cs/2, _size.height/2, cs);
+		g->FillCircle(x + cs/2, size.height/2, cs);
 	}
 
-	if (_checked == true) {
-		if (_has_focus == true) {
+	if (IsSelected() == true) {
+		if (HasFocus() == true) {
 			g->SetColor(fg);
 		} else {
 			g->SetColor(fgfocus);
 		}
 
 		if (_type == JCBT_CHECK) {
-		  g->FillRectangle(x + minor, y + (_size.height - cs)/2 + minor, cs - 2*minor, cs - 2*minor);
+		  g->FillRectangle(x + minor, y + (size.height - cs)/2 + minor, cs - 2*minor, cs - 2*minor);
 		} else {
-		  g->FillCircle(x + cs/2, _size.height/2, minor);
+		  g->FillCircle(x + cs/2, size.height/2, minor);
 		}
 	}
 
 	if (font != NULL) {
 		g->SetFont(font);
 
-		if (_is_enabled == true) {
-			if (_has_focus == true) {
+		if (IsEnabled() == true) {
+			if (HasFocus() == true) {
 				g->SetColor(fgfocus);
 			} else {
 				g->SetColor(fg);

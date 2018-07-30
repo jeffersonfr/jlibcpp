@@ -128,13 +128,15 @@ bool Slider::MousePressed(jevent::MouseEvent *event)
     return false;
   }
 
+  jgui::jsize_t
+    size = GetSize();
 	int x1 = event->GetX(),
 			y1 = event->GetY();
   int
     dx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		dy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		dw = _size.width - 2*dx - _stone_size,
-		dh = _size.height - 2*dy - _stone_size;
+		dw = size.width - 2*dx - _stone_size,
+		dh = size.height - 2*dy - _stone_size;
 	bool 
     catched = false;
 
@@ -142,28 +144,28 @@ bool Slider::MousePressed(jevent::MouseEvent *event)
 		catched = true;
 
 		if (_type == JSO_HORIZONTAL) {
-			if (y1 > 0 && y1 < (_size.height)) {
+			if (y1 > 0 && y1 < (size.height)) {
 				int d = (int)((_value*dw)/(GetMaximum()-GetMinimum()));
 
 				_pressed = false;
 
 				if (x1 > (dx) && x1 < (dx+d)) {
 					SetValue(_value-_maximum_tick);
-				} else if (x1 > (dx+d+_stone_size) && x1 < (_size.width)) {
+				} else if (x1 > (dx+d+_stone_size) && x1 < (size.width)) {
 					SetValue(_value+_maximum_tick);
 				} else if (x1 > (dx+d) && x1 < (dx+d+_stone_size)) {
 					_pressed = true;
 				}
 			}
 		} else if (_type == JSO_VERTICAL) {
-			if (x1 > 0 && x1 < (_size.width)) {
+			if (x1 > 0 && x1 < (size.width)) {
 				int d = (int)((_value*dh)/(GetMaximum()-GetMinimum()));
 
 				_pressed = false;
 
 				if (y1 > (dy) && y1 < (dy+d)) {
 					SetValue(_value-_maximum_tick);
-				} else if (y1 > (dy+d+_stone_size) && y1 < (_size.height)) {
+				} else if (y1 > (dy+d+_stone_size) && y1 < (size.height)) {
 					SetValue(_value+_maximum_tick);
 				}
 			}
@@ -197,13 +199,15 @@ bool Slider::MouseMoved(jevent::MouseEvent *event)
     return false;
   }
 
+  jgui::jsize_t
+    size = GetSize();
 	int x1 = event->GetX(),
 			y1 = event->GetY();
   int
     dx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		dy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		dw = _size.width - 2*dx - _stone_size,
-		dh = _size.height - 2*dy - _stone_size;
+		dw = size.width - 2*dx - _stone_size,
+		dh = size.height - 2*dy - _stone_size;
 
 	if (_pressed == true) {
 		int diff = GetMaximum()-GetMinimum();
@@ -239,32 +243,36 @@ void Slider::Paint(Graphics *g)
 
 	Component::Paint(g);
 
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
   
   if (theme == NULL) {
     return;
   }
 
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  fg = theme->GetIntegerParam("component.fg"),
 	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
 	  fgdisable = theme->GetIntegerParam("component.fg.disable"),
 	  scroll = theme->GetIntegerParam("component.scroll");
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 
 	if (_type == JSO_HORIZONTAL) {
-		int d = (int)((_value*(w-_stone_size))/(GetMaximum()-GetMinimum()));
+		int 
+      d = (int)((_value*(w - _stone_size))/(GetMaximum() - GetMinimum()));
 
-		if (d > (w-_stone_size)) {
-			d = w-_stone_size;
+		if (d > (w - _stone_size)) {
+			d = w - _stone_size;
 		}
 
-		if (_has_focus == true) {
+		if (HasFocus() == true) {
 			g->SetColor(fgfocus);
 		} else {
 			g->SetColor(scroll);
@@ -294,13 +302,14 @@ void Slider::Paint(Graphics *g)
 			g->FillPolygon((int)d+x, y, p, 5);
 		}
 	} else if (_type == JSO_VERTICAL) {
-		int d = (int)((_value*(h-_stone_size))/(GetMaximum()-GetMinimum()));
+		int 
+      d = (int)((_value*(h-_stone_size))/(GetMaximum()-GetMinimum()));
 
-		if (d > (h-_stone_size)) {
-			d = h-_stone_size;
+		if (d > (h - _stone_size)) {
+			d = h - _stone_size;
 		}
 
-		if (_has_focus == true) {
+		if (HasFocus() == true) {
 			g->SetColor(fgfocus);
 		} else {
 			g->SetColor(scroll);
@@ -311,9 +320,9 @@ void Slider::Paint(Graphics *g)
 		if (_inverted == false) {
 			jgui::jpoint_t p[] = {
 				{0, 0},
-				{(int)(_size.width*0.4), 0},
+				{(int)(size.width*0.4), 0},
 				{w, _stone_size/2},
-				{(int)(_size.width*0.4), _stone_size},
+				{(int)(size.width*0.4), _stone_size},
 				{0, _stone_size}
 			};
 
@@ -321,10 +330,10 @@ void Slider::Paint(Graphics *g)
 		} else {
 			jgui::jpoint_t p[] = {
 				{0, _stone_size/2},
-				{(int)(_size.width*0.6), 0},
+				{(int)(size.width*0.6), 0},
 				{w, 0},
 				{w, _stone_size},
-				{(int)(_size.width*0.6), _stone_size}
+				{(int)(size.width*0.6), _stone_size}
 			};
 
 			g->FillPolygon(x, (int)d+y, p, 5);

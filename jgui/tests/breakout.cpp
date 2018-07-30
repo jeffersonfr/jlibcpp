@@ -86,7 +86,7 @@ class Breakout : public jgui::Window {
 			ingame = false;
 			showtitle = true;
 
-			bricksperline = (_size.width-2*borderwidth)/(brickwidth+brickspace);
+			bricksperline = (720 - 2*borderwidth)/(brickwidth + brickspace);
 
 			showbrick = new bool[bricksperline*numlines];
 
@@ -100,9 +100,12 @@ class Breakout : public jgui::Window {
 
 		void GameInit()
 		{
-			batpos = (_size.width-batwidth)/2;
-			ballx = (_size.width-ballsize)/2;
-			bally = (_size.height-ballsize-scoreheight-2*borderwidth);
+      jgui::jsize_t
+        size = GetSize();
+
+			batpos = (size.width-batwidth)/2;
+			ballx = (size.width-ballsize)/2;
+			bally = (size.height-ballsize-scoreheight-2*borderwidth);
 			player1score = 0;
 			ballsleft = 3;
 			dxval = 2;
@@ -166,8 +169,11 @@ class Breakout : public jgui::Window {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			if (goff == NULL && _size.width > 0 && _size.height > 0) {
-				off = new jgui::BufferedImage(jgui::JPF_ARGB, _size.width, _size.height);
+      jgui::jsize_t
+        size = GetSize();
+
+			if (goff == NULL && size.width > 0 && size.height > 0) {
+				off = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
 
 				goff = off->GetGraphics();
 			}
@@ -177,7 +183,7 @@ class Breakout : public jgui::Window {
 			}
 
 			goff->SetColor(GetTheme()->GetIntegerParam("window.bg"));
-			goff->FillRectangle(0, 0, _size.width, _size.height);
+			goff->FillRectangle(0, 0, size.width, size.height);
 
 			if (ingame) {
 				PlayGame();
@@ -254,19 +260,26 @@ class Breakout : public jgui::Window {
 
 		void DrawPlayField()
 		{
+      jgui::jsize_t
+        size = GetSize();
+
 			goff->SetColor(0xff, 0xff, 0xff, 0xff);
-			goff->FillRectangle(0, 0,_size.width, borderwidth);
-			goff->FillRectangle(0, 0,borderwidth, _size.height);
-			goff->FillRectangle(_size.width-borderwidth, 0, borderwidth, _size.height);
-			goff->FillRectangle(0, _size.height-borderwidth,_size.width, borderwidth);
-			goff->FillRectangle(batpos,_size.height-2*borderwidth-scoreheight, batwidth,batheight); // bat
+			goff->FillRectangle(0, 0,size.width, borderwidth);
+			goff->FillRectangle(0, 0,borderwidth, size.height);
+			goff->FillRectangle(size.width-borderwidth, 0, borderwidth, size.height);
+			goff->FillRectangle(0, size.height-borderwidth,size.width, borderwidth);
+			goff->FillRectangle(batpos,size.height-2*borderwidth-scoreheight, batwidth,batheight); // bat
 			goff->FillRectangle(ballx, bally, ballsize, ballsize); // ball
 		}
 
 		void ShowScore()
 		{
-			jgui::Theme *theme = GetTheme();
-			jgui::Font *font = theme->GetFont("widget");
+			jgui::Theme 
+        *theme = GetTheme();
+			jgui::Font 
+        *font = theme->GetFont("widget");
+      jgui::jsize_t
+        size = GetSize();
 
 			if (font == NULL) {
 				return;
@@ -281,11 +294,14 @@ class Breakout : public jgui::Window {
 			sprintf(tmp, "Score: %d", player1score); 
 			goff->DrawString(tmp, borderwidth, borderwidth);
 			sprintf(tmp, "Balls left: %d", ballsleft); 
-			goff->DrawString(tmp, _size.width-borderwidth-font->GetStringWidth(tmp), borderwidth);
+			goff->DrawString(tmp, size.width-borderwidth-font->GetStringWidth(tmp), borderwidth);
 		}
 
 		void MoveBall()
 		{
+      jgui::jsize_t
+        size = GetSize();
+
 			ballx += balldx;
 			bally += balldy;
 
@@ -294,7 +310,7 @@ class Breakout : public jgui::Window {
 				bally = borderwidth;
 			}
 
-			if (bally >= (_size.height-ballsize-scoreheight)) {
+			if (bally >= (size.height-ballsize-scoreheight)) {
 				if (ingame) {
 					ballsleft--;
 					
@@ -309,9 +325,9 @@ class Breakout : public jgui::Window {
 				balldx = 0;
 			}
 
-			if (ballx >= (_size.width-borderwidth-ballsize)) {
+			if (ballx >= (size.width-borderwidth-ballsize)) {
 				balldx = -balldx;
-				ballx = _size.width-borderwidth-ballsize;
+				ballx = size.width-borderwidth-ballsize;
 			}
 
 			if (ballx <= borderwidth) {
@@ -331,16 +347,19 @@ class Breakout : public jgui::Window {
 
 		void CheckBat()
 		{
+      jgui::jsize_t
+        size = GetSize();
+
 			batpos += batdpos;
 
 			if (batpos < borderwidth) {
 				batpos = borderwidth;
-			} else if (batpos > (_size.width-borderwidth-batwidth)) {
-				batpos = (_size.width-borderwidth-batwidth);
+			} else if (batpos > (size.width-borderwidth-batwidth)) {
+				batpos = (size.width-borderwidth-batwidth);
 			}
 
-			if (bally >= (_size.height-scoreheight-2*borderwidth-ballsize) && bally < (_size.height-scoreheight-2*borderwidth) && (ballx+ballsize) >= batpos && ballx <= (batpos+batwidth)) {
-				bally = _size.height-scoreheight-ballsize-borderwidth*2;
+			if (bally >= (size.height-scoreheight-2*borderwidth-ballsize) && bally < (size.height-scoreheight-2*borderwidth) && (ballx+ballsize) >= batpos && ballx <= (batpos+batwidth)) {
+				bally = size.height-scoreheight-ballsize-borderwidth*2;
 				balldy = -dxval;
 				balldx = CheckBatBounce(balldx,ballx-batpos);
 			}

@@ -249,7 +249,9 @@ jsize_t TreeListView::GetPreferredSize()
     is = theme->GetIntegerParam("item.size"),
     ig = theme->GetIntegerParam("item.gap");
 
-	t.width = _size.width;
+  t = GetSize();
+
+	// t.width = t.width;
 	t.height = 2*(vg + bs) + _items.size()*(is + ig) - ig;
 
 	return t;
@@ -358,21 +360,23 @@ void TreeListView::Paint(Graphics *g)
     return;
   }
 
-	Font 
+  jgui::Font 
     *font = theme->GetFont("component.font");
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  fg = theme->GetIntegerParam("component.fg"),
 	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
 	  fgdisable = theme->GetIntegerParam("component.fg.disable");
+  jgui::jsize_t
+    size = GetSize();
   int
     hg = theme->GetIntegerParam("component.hgap"),
 		vg = theme->GetIntegerParam("component.vgap");
   int
     x = hg + theme->GetIntegerParam("component.border.size"),
 		y = vg + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x;
-		// h = _size.height - 2*y;
+		w = size.width - 2*x;
+		// h = size.height - 2*y;
   int
     is = theme->GetIntegerParam("item.size"),
     ig = theme->GetIntegerParam("item.gap");
@@ -398,7 +402,7 @@ void TreeListView::Paint(Graphics *g)
 	for (int i=0; i<(int)_items.size(); i++) {
 		int dy = y+(is + ig)*i;
 
-		if ((dy + is) < 0 || dy > _size.height) {
+		if ((dy + is) < 0 || dy > size.height) {
 			continue;
 		}
 
@@ -436,8 +440,8 @@ void TreeListView::Paint(Graphics *g)
 		if (font != NULL) {
 			g->SetFont(font);
 
-			if (_is_enabled == true) {
-				if (_has_focus == true) {
+			if (IsEnabled() == true) {
+				if (HasFocus() == true) {
 					g->SetColor(fgfocus);
 				} else {
 					g->SetColor(fg);
@@ -463,7 +467,15 @@ void TreeListView::IncrementLines(int lines)
 		return;
 	}
 
-	int old_index = _index;
+  jgui::jsize_t
+    size = GetSize();
+	jpoint_t 
+    scroll_location = GetScrollLocation();
+	int
+    scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	int 
+    old_index = _index;
 
 	_index = _index - lines;
 
@@ -475,14 +487,10 @@ void TreeListView::IncrementLines(int lines)
 		}
 	}
 
-	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-
 	if ((_item_size+_item_gap)*_index < scrolly) {
-		ScrollToVisibleArea(scrollx, (std::max)(0, (_item_size+_item_gap)*_index), _size.width, _size.height, this);
-	} else if ((scrolly+_size.height) < (_item_size+_item_gap)*(int)_index) {
-		ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*(_index+1)-_size.height+2*_item_gap, _size.width, _size.height, this);
+		ScrollToVisibleArea(scrollx, (std::max)(0, (_item_size+_item_gap)*_index), size.width, size.height, this);
+	} else if ((scrolly+size.height) < (_item_size+_item_gap)*(int)_index) {
+		ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*(_index+1)-size.height+2*_item_gap, size.width, size.height, this);
 	}
 
 	if (_index != old_index) {
@@ -498,7 +506,10 @@ void TreeListView::DecrementLines(int lines)
 		return;
 	}
 
-	int old_index = _index;
+  jgui::jsize_t
+    size = GetSize();
+	int 
+    old_index = _index;
 
 	_index = _index + lines;
 
@@ -518,10 +529,10 @@ void TreeListView::DecrementLines(int lines)
 	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
 			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
-	if ((scrolly+_size.height) < (_item_size+_item_gap)*(int)(_index+1)) {
-		ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*(_index+1)-_size.height+2*_item_gap, _size.width, _size.height, this);
+	if ((scrolly+size.height) < (_item_size+_item_gap)*(int)(_index+1)) {
+		ScrollToVisibleArea(scrollx, (_item_size+_item_gap)*(_index+1)-size.height+2*_item_gap, size.width, size.height, this);
 	} else if ((_item_size+_item_gap)*_index < scrolly) {
-		ScrollToVisibleArea(scrollx, (std::max)(0, (_item_size+_item_gap)*_index), _size.width, _size.height, this);
+		ScrollToVisibleArea(scrollx, (std::max)(0, (_item_size+_item_gap)*_index), size.width, size.height, this);
 	}
 
 	if (_index != old_index) {
@@ -550,7 +561,9 @@ jsize_t TreeListView::GetScrollDimension()
     is = theme->GetIntegerParam("item.size"),
     ig = theme->GetIntegerParam("item.gap");
 
-	t.width = _size.width;
+  t = GetSize();
+
+	// t.width = t.width;
 	t.height = _items.size()*(is + ig) + 2*(vg + bs);
 
 	return  t;

@@ -81,13 +81,14 @@ Window::Window(int x, int y, int width, int height):
 
   SetInsets(insets);
 
-  _theme = new Theme();
+  jgui::Theme 
+    *theme = new Theme();
 
-  _theme->SetFont("component.font", _font);
-  _theme->SetFont("container.font", _font);
-  _theme->SetFont("window.font", _font);
+  theme->SetFont("component.font", _font);
+  theme->SetFont("container.font", _font);
+  theme->SetFont("window.font", _font);
 
-  SetTheme(_theme);
+  SetTheme(theme);
 
   SetTitle("Main");
   SetLayout(new jgui::NullLayout());
@@ -104,9 +105,6 @@ Window::~Window()
     _exec_thread.join();
   } catch (std::system_error &e) {
   }
-
-  delete _theme;
-  _theme = NULL;
 
   delete _font;
   _font = NULL;
@@ -230,7 +228,12 @@ void Window::AddSubtitle(jgui::Image *image, std::string label)
 	t.subtitle = label;
 
 	if (_subtitles.size() == 0) {
-		_insets.bottom = _insets.bottom + SUBTITLE_SIZE + 8;
+    jgui::jinsets_t
+      insets = GetInsets();
+
+		insets.bottom = insets.bottom + SUBTITLE_SIZE + 8;
+
+    SetInsets(insets);
 	}
 
 	_subtitles.push_back(t);
@@ -244,7 +247,12 @@ void Window::RemoveAllSubtitles()
 		return;
 	}
 
-	_insets.bottom = _insets.bottom - SUBTITLE_SIZE - 8;
+  jgui::jinsets_t
+    insets = GetInsets();
+
+	insets.bottom = insets.bottom - SUBTITLE_SIZE - 8;
+
+  SetInsets(insets);
 
 	for (std::vector<struct frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
 		jgui::Image *image = (*i).image;
@@ -259,7 +267,7 @@ void Window::RemoveAllSubtitles()
 
 void Window::Repaint(Component *cmp)
 {
-	if (_is_visible == false || _is_ignore_repaint == true) {
+	if (IsVisible() == false || IsIgnoreRepaint() == true) {
 		return;
 	}
 
@@ -283,21 +291,25 @@ void Window::PaintGlassPane(Graphics *g)
 
 	jgui::Font 
     *font = theme->GetFont("window.font");
-	Color 
+  jgui::Color 
 	  fg = theme->GetIntegerParam("window.fg");
+  jgui::jsize_t
+    size = GetSize();
+  jgui::jinsets_t
+    insets = GetInsets();
 
 	g->SetFont(font);
 	g->SetColor(jgui::Color::White);
 	
 	if (_subtitles.size() > 0) {
-		int count = _insets.right;
+		int count = insets.right;
 
 		for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
 			if (font != NULL) {
 				count += font->GetStringWidth((*i).subtitle.c_str());
 
 				g->SetColor(fg);
-				g->DrawString((*i).subtitle, _size.width-count, _size.height-_insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
+				g->DrawString((*i).subtitle, size.width-count, size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
 			}
 
 			count += 8;
@@ -305,7 +317,7 @@ void Window::PaintGlassPane(Graphics *g)
 			if ((*i).image != NULL) {
 				count += SUBTITLE_SIZE;
 
-				g->DrawImage((*i).image, _size.width-count, _size.height-_insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
+				g->DrawImage((*i).image, size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
 			}
 
 			count += 20;
@@ -329,7 +341,7 @@ void Window::PaintGlassPane(Graphics *g)
 	if (_title != "") {
 		g->SetGradientStop(0.0, bg);
 		g->SetGradientStop(1.0, scroll);
-		g->FillLinearGradient(bordersize, bordersize, _size.width-2*bordersize, insets.top-2*bordersize, 0, 0, 0, insets.top-2*bordersize);
+		g->FillLinearGradient(bordersize, bordersize, size.width-2*bordersize, insets.top-2*bordersize, 0, 0, 0, insets.top-2*bordersize);
 		g->ResetGradientStop();
 
 		if (font != NULL) {
@@ -342,12 +354,12 @@ void Window::PaintGlassPane(Graphics *g)
 			std::string text = _title;
 			
 			// if (_wrap == false) {
-				text = font->TruncateString(text, "...", (_size.width-insets.left-insets.right));
+				text = font->TruncateString(text, "...", (size.width-insets.left-insets.right));
 			// }
 
 			g->SetFont(font);
 			g->SetColor(fg);
-			g->DrawString(text, insets.left+(_size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
+			g->DrawString(text, insets.left+(size.width-insets.left-insets.right-font->GetStringWidth(text))/2, y);
 		}
 	}
 
@@ -367,7 +379,7 @@ void Window::PaintGlassPane(Graphics *g)
 				count += font->GetStringWidth((*i).subtitle.c_str());
 
 				g->SetColor(fg);
-				g->DrawString((*i).subtitle, _size.width-count, _size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
+				g->DrawString((*i).subtitle, size.width-count, size.height-insets.bottom+(SUBTITLE_SIZE-font->GetSize())/2+8);
 			}
 
 			count += 8;
@@ -375,7 +387,7 @@ void Window::PaintGlassPane(Graphics *g)
 			if ((*i).image != NULL) {
 				count += SUBTITLE_SIZE;
 
-				g->DrawImage((*i).image, _size.width-count, _size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
+				g->DrawImage((*i).image, size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
 			}
 
 			count += 20;

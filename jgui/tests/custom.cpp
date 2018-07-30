@@ -44,36 +44,47 @@ class CustomContainer : public jgui::Container {
 				return;
 			}
 
-			jgui::Theme *theme = GetTheme();
-      jgui::Color scroll = theme->GetIntegerParam("component.scroll");
-			int bs = theme->GetIntegerParam("component.border.size");
-			int ss = theme->GetIntegerParam("component.scroll.size");
-
-      jgui::jsize_t scroll_dimension = GetScrollDimension();
-      jgui::jpoint_t scroll_location = GetScrollLocation();
-			int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-					scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+			jgui::Theme 
+        *theme = GetTheme();
+      jgui::Color 
+        scroll = theme->GetIntegerParam("component.scroll");
+      jgui::jsize_t 
+        scroll_dimension = GetScrollDimension();
+      jgui::jsize_t
+        size = GetSize();
+      jgui::jpoint_t 
+        scroll_location = GetScrollLocation();
+			int 
+        bs = theme->GetIntegerParam("component.border.size"),
+			  ss = theme->GetIntegerParam("component.scroll.size");
+			int 
+        scrollx = (IsScrollableX() == true)?scroll_location.x:0,
+				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
 			g->SetColor(scroll);
 
 			if (IsScrollableX() == true) {
-				double offset_ratio = (double)scrollx/(double)scroll_dimension.width,
-							 block_size_ratio = (double)_size.width/(double)scroll_dimension.width;
-				int offset = (int)(_size.width*offset_ratio),
-						block_size = (int)(_size.width*block_size_ratio);
+				double 
+          offset_ratio = (double)scrollx/(double)scroll_dimension.width,
+				  block_size_ratio = (double)size.width/(double)scroll_dimension.width;
+				int 
+          offset = (int)(size.width*offset_ratio),
+					block_size = (int)(size.width*block_size_ratio);
 
-				g->DrawRectangle(bs, _size.height-ss-bs, _size.width-2*bs, ss);
-				g->DrawImage(_image, offset, _size.height-ss-bs, block_size, ss);
+				g->DrawRectangle(bs, size.height-ss-bs, size.width-2*bs, ss);
+				g->DrawImage(_image, offset, size.height-ss-bs, block_size, ss);
 			}
 
 			if (IsScrollableY() == true) {
-				double offset_ratio = (double)scrolly/(double)scroll_dimension.height,
-							 block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
-				int offset = (int)(_size.height*offset_ratio),
-						block_size = (int)(_size.height*block_size_ratio);
+				double 
+          offset_ratio = (double)scrolly/(double)scroll_dimension.height,
+				  block_size_ratio = (double)size.height/(double)scroll_dimension.height;
+				int 
+          offset = (int)(size.height*offset_ratio),
+					block_size = (int)(size.height*block_size_ratio);
 
-				g->DrawRectangle(_size.width-ss-bs, bs, ss, _size.height);
-				g->DrawImage(_image, _size.width-ss-bs, offset, ss, block_size);
+				g->DrawRectangle(size.width-ss-bs, bs, ss, size.height);
+				g->DrawImage(_image, size.width-ss-bs, offset, ss, block_size);
 			}
 		}
 

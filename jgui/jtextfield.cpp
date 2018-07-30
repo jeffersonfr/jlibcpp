@@ -45,9 +45,14 @@ bool TextField::KeyPressed(jevent::KeyEvent *event)
 		return false;
 	}
 
-	jevent::jkeyevent_symbol_t action = event->GetSymbol();
+  jgui::KeyMap 
+    *keymap = GetKeyMap();
+  jgui::jsize_t
+    size = GetSize();
+	jevent::jkeyevent_symbol_t 
+    action = event->GetSymbol();
 
-	if (_keymap != NULL && _keymap->HasKey(action) == false) {
+	if (keymap != NULL && keymap->HasKey(action) == false) {
 		return false;
 	}
 
@@ -253,16 +258,18 @@ void TextField::Paint(Graphics *g)
 		return;
 	}
 
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  fg = theme->GetIntegerParam("component.fg"),
 	  fgfocus = theme->GetIntegerParam("component.fg.focus"),
 	  fgdisable = theme->GetIntegerParam("component.fg.disable");
+  jgui::jsize_t
+    size = GetSize();
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 	std::string 
     paint_text = _text,
 		text = paint_text,
@@ -281,8 +288,8 @@ void TextField::Paint(Graphics *g)
 		paint_text = paint_text.replace(paint_text.begin(), paint_text.end(), paint_text.size(), _echo_char);
 	}
 
-	if (_is_enabled == true) {
-		if (_has_focus == true) {
+	if (IsEnabled() == true) {
+		if (HasFocus() == true) {
 			g->SetColor(fgfocus);
 		} else {
 			g->SetColor(fg);
@@ -362,7 +369,7 @@ void TextField::Paint(Graphics *g)
 		g->DrawString(text, x+offset, y, w, h, JHA_LEFT, _valign);
 
 		if (_caret_visible == true) {
-			if (_has_focus == true && _is_editable == true) {
+			if (HasFocus() == true && IsEditable() == true) {
 				g->SetColor(_caret_color);
 			}
 

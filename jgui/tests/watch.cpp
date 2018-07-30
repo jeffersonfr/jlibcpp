@@ -69,21 +69,24 @@ class WatchTeste : public jgui::Window {
 
 			jgui::jsize_t
 				size = GetSize();
-
-			int m = std::min(size.width, size.height - _insets.top);
-
-			double th = (30*_hours + _minutes/2)*M_PI/180.0 - M_PI/2;
-			double tm = (_minutes*6 + _seconds/10)*M_PI/180.0 - M_PI/2;
-			double ts = (_seconds*6)*M_PI/180.0 - M_PI/2;
-			double xc = size.width/2;
-			double yc = (size.height - _insets.top)/2 + _insets.top;
-			double hh = 0.03*m;
-			double vh = 0.25*m;
-			double hm = 0.02*m;
-			double vm = 0.35*m;
-			double hs = 0.10*m;
-			double vs = 0.40*m;
-			char tmp[255];
+      jgui::jinsets_t
+        insets = GetInsets();
+			int 
+        m = std::min(size.width, size.height - insets.top);
+			double 
+        th = (30*_hours + _minutes/2)*M_PI/180.0 - M_PI/2,
+        tm = (_minutes*6 + _seconds/10)*M_PI/180.0 - M_PI/2,
+        ts = (_seconds*6)*M_PI/180.0 - M_PI/2,
+        xc = size.width/2,
+        yc = (size.height - insets.top)/2 + insets.top,
+        hh = 0.03*m,
+        vh = 0.25*m,
+        hm = 0.02*m,
+        vm = 0.35*m,
+        hs = 0.10*m,
+        vs = 0.40*m;
+			char 
+        tmp[255];
 
 			sprintf(tmp, "%02d:%02d:%02d", _hours, _minutes, _seconds);
 
@@ -113,7 +116,7 @@ class WatchTeste : public jgui::Window {
 
 			g->SetColor(jgui::Color::White);
 			g->SetFont(font);
-			g->DrawString(tmp, _insets.left, _insets.top);
+			g->DrawString(tmp, insets.left, insets.top);
 	
 			g->SetColor(0xd0, 0xd0, 0xd0, 0xff);
 
