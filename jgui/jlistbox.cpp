@@ -105,21 +105,22 @@ void ListBox::SetCurrentIndex(int i)
 		throw jexception::OutOfBoundsException("Index out of bounds exception");
 	}
 
-	Theme *theme = GetTheme();
+  jgui::Theme 
+    *theme = GetTheme();
+
+	_index = i;
 
   if (theme == NULL) {
     return;
   }
 
+  jgui::jpoint_t
+    slocation = GetScrollLocation();
 	int 
 		is = theme->GetIntegerParam("item.size"),
 		ig = theme->GetIntegerParam("item.gap");
 
-	_index = i;
-
-	SetScrollY(_index*(is + ig));
-
-	Repaint();
+	SetScrollLocation(slocation.x, _index*(is + ig));
 }
 
 bool ListBox::IsSelected(int i)
@@ -317,7 +318,7 @@ bool ListBox::MousePressed(jevent::MouseEvent *event)
 		return true;
 	}
 
-	return false;
+	return true;
 }
 
 bool ListBox::MouseReleased(jevent::MouseEvent *event)
@@ -344,13 +345,17 @@ bool ListBox::MouseWheel(jevent::MouseEvent *event)
 		return true;
 	}
 	
-	Theme *theme = GetTheme();
+	Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return false;
   }
 	
-	SetScrollY(GetScrollY() + theme->GetIntegerParam("item.size")*event->GetClickCount());
+  jgui::jpoint_t
+    slocation = GetScrollLocation();
+
+	SetScrollLocation(slocation.x, slocation.y + theme->GetIntegerParam("item.size")*event->GetClickCount());
 
 	Repaint();
 

@@ -30,7 +30,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class X11Window : public jgui::Window {
+class XCBWindow : public jgui::Window {
 
 	private:
 
@@ -39,13 +39,13 @@ class X11Window : public jgui::Window {
 		 * \brief
 		 *
 		 */
-		X11Window(int x, int y, int width, int height);
+		XCBWindow(int x, int y, int width, int height);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~X11Window();
+		virtual ~XCBWindow();
 
 		/**
 		 * \brief
@@ -117,7 +117,7 @@ class X11Window : public jgui::Window {
 		 * \brief
 		 *
 		 */
-		virtual void SetLocation(int x, int y);
+		virtual jgui::jregion_t GetVisibleBounds();
 		
 		/**
 		 * \brief
@@ -130,18 +130,6 @@ class X11Window : public jgui::Window {
 		 *
 		 */
 		virtual bool IsResizable();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Move(int x, int y);
 
 		/**
 		 * \brief
@@ -203,18 +191,6 @@ class X11Window : public jgui::Window {
 		 */
 		virtual jgui::Image * GetIcon();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t GetLocation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetSize();
-		
 };
 
 }

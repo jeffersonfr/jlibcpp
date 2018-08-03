@@ -33,8 +33,6 @@ UUID::UUID(juuid_type_t type)
 	} else {
 		uuid_generate(_uuid);
 	}
-
-	_date = jcommon::Date(uuid_time(_uuid, NULL));
 }
 
 UUID::UUID(std::string uuid)
@@ -42,17 +40,15 @@ UUID::UUID(std::string uuid)
 	if (uuid_parse(uuid.c_str(), _uuid) != 0) {
 		throw jexception::InvalidArgumentException("The uuid is not valid");
 	}
-	
-	_date = jcommon::Date(uuid_time(_uuid, NULL));
 }
 
 UUID::~UUID()
 {
 }
 
-jcommon::Date UUID::GetDate()
+std::time_t UUID::GetTime()
 {
-	return _date;
+	return uuid_time(_uuid, NULL);
 }
 
 jcommon::Object * UUID::Clone()
@@ -97,7 +93,7 @@ int UUID::Compare(Object *o)
 	return uuid_compare(_uuid, uuid->_uuid);
 }
 
-std::string UUID::what()
+std::string UUID::What()
 {
 	char tmp[256];
 

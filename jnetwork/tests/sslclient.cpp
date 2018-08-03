@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jnetwork/jsslsocket.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 #include "jexception/jconnectionexception.h"
 
 #include <iostream>
@@ -106,7 +106,7 @@ int main(void)
 
 		mySocket.Close();
 	//} catch (jexception::ConnectionException &e) {
-		//std::cout << "Socket Exception: " << e.what() << std::endl;
+		//std::cout << "Socket Exception: " << e.What() << std::endl;
 	//}
 	
 	delete context;

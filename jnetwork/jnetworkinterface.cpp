@@ -404,7 +404,7 @@ bool NetworkInterface::SupportsMulticast()
 	return (_flags & IFF_MULTICAST);
 }
 
-std::string NetworkInterface::what()
+std::string NetworkInterface::What()
 {	
 	std::ostringstream o;
 	std::string flags, 

@@ -1,7 +1,8 @@
 #include "libavplay.h"
 
-#include <pthread.h>
+#include <thread>
 
+#include <pthread.h>
 #include <unistd.h>
 
 const char program_name[] = "avplay";
@@ -728,7 +729,7 @@ static void * video_thread(void *arg)
         AVRational tb;
 #endif
         while (is->paused && !is->videoq.abort_request)
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds((100)));
 
         av_free_packet(&pkt);
 
@@ -1409,7 +1410,8 @@ static void * decode_thread(void *arg)
         if (is->paused && !strcmp(ic->iformat->name, "rtsp")) {
             /* wait 10 ms to avoid trying to get another packet */
             /* XXX: horrible */
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds((10)));
+
             continue;
         }
 #endif
@@ -1444,7 +1446,8 @@ static void * decode_thread(void *arg)
                 && (is->videoq   .nb_packets > MIN_FRAMES || is->video_stream < 0)
                 ))) {
             /* wait 10 ms */
-            usleep(10000);
+            std::this_thread::sleep_for(std::chrono::milliseconds((10)));
+
             continue;
         }
         if (eof) {
@@ -1463,7 +1466,9 @@ static void * decode_thread(void *arg)
                 pkt->stream_index = is->audio_stream;
                 packet_queue_put(&is->audioq, pkt);
             }
-            usleep(10000);
+
+            std::this_thread::sleep_for(std::chrono::milliseconds((10)));
+
             if (is->audioq.size + is->videoq.size == 0) {
                 if (is->loop != 0) {
                     stream_seek(is, is->start_time != AV_NOPTS_VALUE ? is->start_time : 0, 0, 0);
@@ -1483,7 +1488,9 @@ static void * decode_thread(void *arg)
 								goto fail; // break;
 						if (breaks++ > 16) // limit of breaks
 								goto fail; // break;
-            usleep(10000);
+
+            std::this_thread::sleep_for(std::chrono::milliseconds((10)));
+
             continue;
         }
 				breaks = 0;
@@ -1503,8 +1510,8 @@ static void * decode_thread(void *arg)
     }
     /* wait until the end */
     while (!is->abort_request) {
-				usleep(100000);
-		}
+      std::this_thread::sleep_for(std::chrono::milliseconds((100)));
+    }
 
     ret = 0;
  fail:
@@ -1710,7 +1717,7 @@ VideoState *avplay_open(const char *filename)
 
 		avplay_pause(is, true);
 		
-		// usleep(100000);
+    std::this_thread::sleep_for(std::chrono::milliseconds((100)));
 	}
 
 	return is;

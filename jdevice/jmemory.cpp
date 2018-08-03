@@ -41,7 +41,7 @@ void Memory::Builder()
 	}
 }
 
-std::string Memory::what()
+std::string Memory::What()
 {
 	std::ostringstream o;
 

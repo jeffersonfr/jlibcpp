@@ -17,8 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_X11APPLICATION_H
-#define J_X11APPLICATION_H
+#ifndef J_XCBAPPLICATION_H
+#define J_XCBAPPLICATION_H
 
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
@@ -33,7 +33,7 @@ namespace jgui {
  *
  * \author Jeff Ferr
  */
-class X11Application : public jgui::Application {
+class XCBApplication : public jgui::Application {
 
 	private:
 		/** \brief */
@@ -92,13 +92,13 @@ class X11Application : public jgui::Application {
 		 * \brief
 		 *
 		 */
-		X11Application();
+		XCBApplication();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual ~X11Application();
+		virtual ~XCBApplication();
 
 };
 

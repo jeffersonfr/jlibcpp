@@ -150,7 +150,7 @@ uint64_t Object::Hash()
 	return (uint64_t)((uintptr_t)this);
 }
 
-std::string Object::what()
+std::string Object::What()
 {
 	std::ostringstream o;
 

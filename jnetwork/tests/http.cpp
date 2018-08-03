@@ -21,7 +21,7 @@
 #include "jnetwork/jsocketoutputstream.h"
 #include "jnetwork/jsocket.h"
 #include "jnetwork/jurl.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 #include "jio/jinputstream.h"
 #include "jio/joutputstream.h"
 #include "jcommon/jstringtokenizer.h"
@@ -72,7 +72,7 @@ void http_stream(jnetwork::URL url)
 
 		c.Close();
 	} catch (jexception::Exception &e) {
-		std::cerr << "error: " << e.what() << std::endl;
+		std::cerr << "error: " << e.What() << std::endl;
 	}
 }
 
@@ -103,7 +103,7 @@ void http_raw(jnetwork::URL url) {
 
 		c.Close();
 	} catch (jexception::Exception &e) {
-		std::cerr << "error: " << e.what() << std::endl;
+		std::cerr << "error: " << e.What() << std::endl;
 	}
 }
 

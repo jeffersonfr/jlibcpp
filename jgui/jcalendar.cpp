@@ -31,11 +31,13 @@ Calendar::Calendar():
 
 	delta = 2;
 
+  /* TODO::
 	jcommon::Date date;
 
 	_select_day = _current_day = date.GetDayOfMonth();
 	_select_month = _current_month = date.GetMonth();
 	_select_year = _current_year = date.GetYear();
+  */
 
 	SetDay(_current_day);
 	SetMonth(_current_month);
@@ -255,9 +257,11 @@ void Calendar::BuildCalendar()
 	int first_day = -1;
 	char tmp[255];
 
+  /* TODO::
 	jcommon::Date date(1, _month+1, _year);
 
 	first_day = date.GetDayOfWeek();
+  */
 
 	switch (_month+1) {
 		case 1: mes = 31; break;
@@ -397,10 +401,12 @@ void Calendar::ItemChanged(jevent::SelectEvent *event)
     }
   }
 
+  /*
   jcommon::Date date(1, m, y);
 
   SetMonth(date.GetMonth());
   SetYear(date.GetYear());
+  */
 
 	BuildCalendar();
 }

@@ -20,6 +20,7 @@
 #include "jshared/jmemorymap.h"
 
 #include <iostream>
+#include <thread>
 
 int main(int argc, char **argv)
 {
@@ -51,7 +52,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	sleep(100);
+  std::this_thread::sleep_for(std::chrono::seconds((60)));
 
 	return 0;
 }

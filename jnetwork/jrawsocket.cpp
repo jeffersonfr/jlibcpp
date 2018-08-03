@@ -342,7 +342,7 @@ unsigned short RawSocket::Checksum(unsigned short *addr, int len)
 	return(answer);
 }
 
-std::string RawSocket::what()
+std::string RawSocket::What()
 {
 	char port[20];
 

@@ -20,6 +20,8 @@
 #include "jgui/jmarquee.h"
 #include "jlogger/jloggerlib.h"
 
+#include <thread>
+
 #include <unistd.h>
 
 namespace jgui {
@@ -209,7 +211,7 @@ void Marquee::Run()
 
 		Repaint();
 
-    usleep(_interval*1000LL);
+    std::this_thread::sleep_for(std::chrono::milliseconds((_interval)));
 	}
 }
 

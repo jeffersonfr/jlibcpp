@@ -18,7 +18,6 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jcommon/jsystem.h"
-#include "jcommon/jdate.h"
 #include "jcommon/jproperties.h"
 #include "jcommon/jxmlparser.h"
 #include "jcommon/jstringutils.h"
@@ -54,7 +53,7 @@ void testObject()
 	
 	teste::Teste t;
 
-	std::cout << t.what() << std::endl;
+	std::cout << t.What() << std::endl;
 
 	if (t.InstanceOf("jcommon::Object") == true) {
 		std::cout << "Teste is instance of Object" << std::endl;
@@ -162,17 +161,6 @@ void testOptions(int argc, char **argv)
 	std::cout << "Options:: " << o.ExistsOption("a") << ", " << o.ExistsOption("b") << ", " << o.GetArgument("a") << ", " << o.GetArgument("b") << std::endl;
 }
 
-void testDate()
-{
-	long long t = jcommon::Date::CurrentTimeMillis();
-
-	t = t/1000LL;
-
-	jcommon::Date d((time_t)t);
-
-	std::cout << "Date:: " << d.what() << std::endl;
-}
-
 void create_xml_file()
 {
 	jcommon::XmlDocument doc;
@@ -185,14 +173,6 @@ void create_xml_file()
 	doc.SaveFile("j.xml");
 }
 
-void html_parser_test()
-{
-	jcommon::HTMLParser parser;
-
-	parser.Parse("./index.html");
-	parser.Dump();
-}
-
 int main(int argc, char *argv[])
 {
 	//testObject();
@@ -202,9 +182,7 @@ int main(int argc, char *argv[])
 	//testSystem();
 	//testStringToken();
 	//testOptions(argc, argv);
-	//testDate();
 	//create_xml_file();
-	//html_parser_test();
 
 	return EXIT_SUCCESS;
 }

@@ -29,7 +29,7 @@ int main( int argc, char **argv )
 
 	// e = c + d;
 
-	std::cout << "C1:: " << c.what() << ", C2:: " << d.what() << ", SUM:: " << e.what() << std::endl;
+	std::cout << "C1:: " << c.What() << ", C2:: " << d.What() << ", SUM:: " << e.What() << std::endl;
 
 	return EXIT_SUCCESS;
 }

@@ -97,7 +97,7 @@ bool parse(char *source)
 
 		delete root;
 	} catch (jexception::ParserException &e) {
-		std::cout << e.what() << std::endl;
+		std::cout << e.What() << std::endl;
 	}
 
 	return false;

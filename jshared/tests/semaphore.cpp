@@ -83,7 +83,7 @@ int main()
 		test[i]->Start();
 	}
 
-	sleep(2);
+  std::this_thread::sleep_for(std::chrono::seconds((2)));
 
 	s.At(0).NotifyAll();
 

@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jnetwork/jnetworkinterface.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 
 #include <iostream>
 
@@ -29,12 +29,12 @@ int main(int argc, char **argv)
 	std::vector<jnetwork::NetworkInterface *> interfaces = jnetwork::NetworkInterface::GetNetworkInterfaces();
 
 	for (std::vector<jnetwork::NetworkInterface *>::iterator i=interfaces.begin(); i!=interfaces.end(); i++) {
-		std::cout << (*i)->what() << std::endl;
+		std::cout << (*i)->What() << std::endl;
 
 		std::vector<jnetwork::NetworkInterface *> subinterfaces = (*i)->GetSubInterfaces();
 		
 		for (std::vector<jnetwork::NetworkInterface *>::iterator j=subinterfaces.begin(); j!=subinterfaces.end(); j++) {
-			std::cout << (*j)->what() << std::endl;
+			std::cout << (*j)->What() << std::endl;
 		}
 	}
 

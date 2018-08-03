@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "jnetwork/jinetaddress4.h"
 #include "jnetwork/jinetaddress6.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 
 #include <iostream>
 

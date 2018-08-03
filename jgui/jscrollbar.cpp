@@ -123,12 +123,15 @@ bool ScrollBar::MousePressed(jevent::MouseEvent *event)
 		return true;
 	}
 
-	Theme *theme = GetTheme();
+  jgui::Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return false;
   }
 
+  jgui::jpoint_t
+    elocation = event->GetLocation();
   jgui::jsize_t
     size = GetSize();
   int
@@ -138,8 +141,6 @@ bool ScrollBar::MousePressed(jevent::MouseEvent *event)
 		h = size.height - 2*y;
 	int 
     arrow_size,
-		x1 = event->GetX(),
-		y1 = event->GetY(),
 		dx = x,
 		dy = y,
 		dw = size.width - 2*dx-_stone_size,
@@ -160,38 +161,38 @@ bool ScrollBar::MousePressed(jevent::MouseEvent *event)
 	catched = true;
 
 	if (_type == JSO_HORIZONTAL) {
-		if (y1 > 0 && y1 < (size.height)) {
+		if (elocation.y > 0 && elocation.y < (size.height)) {
 			int d = (int)((_value*(dw-2*arrow_size))/(GetMaximum()-GetMinimum()));
 
 			_pressed = false;
 
-			if (x1 > (dx) && x1 < (arrow_size + dx)) {
+			if (elocation.x > (dx) && elocation.x < (arrow_size + dx)) {
 				SetValue(_value - _minimum_tick);
-			} else if (x1 > (size.width - arrow_size - dx) && x1 < (size.width - dx)) {
+			} else if (elocation.x > (size.width - arrow_size - dx) && elocation.x < (size.width - dx)) {
 				SetValue(_value + _minimum_tick);
-			} else if (x1 > (arrow_size + dx) && x1 < (arrow_size + dx + d)) {
+			} else if (elocation.x > (arrow_size + dx) && elocation.x < (arrow_size + dx + d)) {
 				SetValue(_value - _maximum_tick);
-			} else if (x1 > (arrow_size + dx + d + _stone_size) && x1 < (size.width - arrow_size)) {
+			} else if (elocation.x > (arrow_size + dx + d + _stone_size) && elocation.x < (size.width - arrow_size)) {
 				SetValue(_value + _maximum_tick);
-			} else if (x1 > (arrow_size + dx + d) && x1 < (arrow_size + dx + d + _stone_size)) {
+			} else if (elocation.x > (arrow_size + dx + d) && elocation.x < (arrow_size + dx + d + _stone_size)) {
 				_pressed = true;
 			}
 		}
 	} else if (_type == JSO_VERTICAL) {
-		if (x1 > 0 && x1 < (size.width)) {
+		if (elocation.x > 0 && elocation.x < (size.width)) {
 			int d = (int)((_value*(dh-2*arrow_size))/(GetMaximum()-GetMinimum()));
 
 			_pressed = false;
 
-			if (y1 > (dy) && y1 < (arrow_size + dy)) {
+			if (elocation.y > (dy) && elocation.y < (arrow_size + dy)) {
 				SetValue(_value - _minimum_tick);
-			} else if (y1 > (size.height - arrow_size - dy) && y1 < (size.height - dy)) {
+			} else if (elocation.y > (size.height - arrow_size - dy) && elocation.y < (size.height - dy)) {
 				SetValue(_value + _minimum_tick);
-			} else if (y1 > (arrow_size + dy) && y1 < (arrow_size + dy + d)) {
+			} else if (elocation.y > (arrow_size + dy) && elocation.y < (arrow_size + dy + d)) {
 				SetValue(_value - _maximum_tick);
-			} else if (y1 > (arrow_size + dy + d + _stone_size) && y1 < (size.height - arrow_size)) {
+			} else if (elocation.y > (arrow_size + dy + d + _stone_size) && elocation.y < (size.height - arrow_size)) {
 				SetValue(_value + _maximum_tick);
-			} else if (y1 > (arrow_size + dy + d) && y1 < (arrow_size + dy + d + _stone_size)) {
+			} else if (elocation.y > (arrow_size + dy + d) && elocation.y < (arrow_size + dy + d + _stone_size)) {
 				_pressed = true;
 			}
 		}
@@ -225,6 +226,8 @@ bool ScrollBar::MouseMoved(jevent::MouseEvent *event)
     return false;
   }
 
+  jgui::jpoint_t
+    elocation = event->GetLocation();
   jgui::jsize_t
     size = GetSize();
   int
@@ -234,8 +237,6 @@ bool ScrollBar::MouseMoved(jevent::MouseEvent *event)
 		h = size.height - 2*y;
 	int 
     arrow_size,
-		x1 = event->GetX(),
-		y1 = event->GetY(),
 		dx = x,
 		dy = y,
 		dw = size.width - 2*dx - _stone_size,
@@ -252,9 +253,9 @@ bool ScrollBar::MouseMoved(jevent::MouseEvent *event)
       diff = GetMaximum()-GetMinimum();
 
 		if (_type == JSO_HORIZONTAL) {
-			SetValue(diff*(x1-_stone_size/2-arrow_size)/(dw-2*arrow_size));
+			SetValue(diff*(elocation.x - _stone_size/2 - arrow_size)/(dw - 2*arrow_size));
 		} else if (_type == JSO_VERTICAL) {
-			SetValue(diff*(y1-_stone_size/2-arrow_size)/(dh-2*arrow_size));
+			SetValue(diff*(elocation.y - _stone_size/2 - arrow_size)/(dh - 2*arrow_size));
 		}
 
 		return true;

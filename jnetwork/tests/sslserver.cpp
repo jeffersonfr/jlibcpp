@@ -19,13 +19,15 @@
  ***************************************************************************/
 #include "jnetwork/jsslserversocket.h"
 #include "jnetwork/jsslsocket.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 #include "jexception/jconnectionexception.h"
 
 #include <iostream>
 
-#include <stdio.h>
 #include <sys/types.h>
+
+#include <stdio.h>
+#include <string.h>
 #include <unistd.h>
 
 /*
@@ -94,7 +96,7 @@ int main(void)
 				std::cout << "Erro no receive" << std::endl;
 			}
 		} catch (jexception::ConnectionException &e) {
-			std::cout << "Socket exception: " << e.what() << std::endl;
+			std::cout << "Socket exception: " << e.What() << std::endl;
 		}
 	}
 	

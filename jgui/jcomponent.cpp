@@ -96,23 +96,24 @@ Component::~Component()
 void Component::ScrollToVisibleArea(int x, int y, int width, int height, Component *coordinateSpace) 
 {
 	if (IsScrollable()) {
-		jregion_t view;
-		//  jsize_t scroll_dimension = GetScrollDimension();
-		jpoint_t scroll_location = GetScrollLocation();
-		// jinsets_t insets = GetInsets();
+		jpoint_t 
+      slocation = GetScrollLocation();
+    jgui::jsize_t 
+      size = GetSize();
+		jregion_t 
+      view;
 		int 
-      scrollPosition = scroll_location.y;
-    jgui::jsize_t size = GetSize();
+      scrollPosition = slocation.y;
 
 		if (IsSmoothScrolling()) {
-			view.x = scroll_location.x;
-			view.y = scroll_location.y;
+			view.x = slocation.x;
+			view.y = slocation.y;
 			// view.y = destScrollY;
 			view.width = size.width;
 			view.height = size.height;
 		} else {
-			view.x = scroll_location.x;
-			view.y = scroll_location.y;
+			view.x = slocation.x;
+			view.y = slocation.y;
 			view.width = size.width;
 			view.height = size.height;
 		}
@@ -154,47 +155,52 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
 			}
 		}
 
+    jgui::jpoint_t
+      nslocation = slocation;
+
 		if (IsScrollableX()) {
-			if (scroll_location.x > relativeX) {
-				SetScrollX(relativeX);
+			int 
+        rightX = relativeX + width; // - s.getPadding(LEFT) - s.getPadding(RIGHT);
+
+			if (slocation.x > relativeX) {
+        nslocation.x = relativeX;
 			}
 
-			int rightX = relativeX + width; // - s.getPadding(LEFT) - s.getPadding(RIGHT);
-
-			if (scroll_location.x + size.width < rightX) {
-				SetScrollX(scroll_location.x + (rightX - (scroll_location.x + size.width)));
+			if (slocation.x + size.width < rightX) {
+				nslocation.x = slocation.x + (rightX - (slocation.x + size.width));
 			} else {
-				if (scroll_location.x > relativeX) {
-					SetScrollX(relativeX);
+				if (slocation.x > relativeX) {
+					nslocation.x = relativeX;
 				}
 			}
 		}
 
 		if (IsScrollableY()) {
-			if (scroll_location.y > relativeY) {
+			int 
+        bottomY = relativeY + height; // - s.getPadding(TOP) - s.getPadding(BOTTOM);
+
+			if (slocation.y > relativeY) {
 				scrollPosition = relativeY;
 			}
 
-			int bottomY = relativeY + height; // - s.getPadding(TOP) - s.getPadding(BOTTOM);
-
-			if (scroll_location.y + size.height < bottomY) {
-				scrollPosition = scroll_location.y + (bottomY - (scroll_location.y + size.height));
+			if (slocation.y + size.height < bottomY) {
+				scrollPosition = slocation.y + (bottomY - (slocation.y + size.height));
 			} else {
-				if (scroll_location.y > relativeY)
+				if (slocation.y > relativeY)
 					scrollPosition = relativeY;
 			}
 
 			if (IsSmoothScrolling()) {
-				// initialScrollY = scroll_location.y;
+				// initialScrollY = slocation.y;
 				// destScrollY = scrollPosition;
 				// initScrollMotion();
-				SetScrollY(scrollPosition);
+				nslocation.y = scrollPosition;
 			} else {
-				SetScrollY(scrollPosition);
+				nslocation.y = scrollPosition;
 			}
 		}
 
-		Repaint();
+    SetScrollLocation(nslocation);
 	} else {
 		// try to move parent scroll if you are not scrollable
 		Container *parent = GetParent();
@@ -376,19 +382,20 @@ bool Component::IsSmoothScrolling()
 	return _is_smooth_scroll;
 }
 
-int Component::GetScrollX()
+jgui::jpoint_t Component::GetScrollLocation()
 {
-	return _scroll_location.x;
-}
+  jgui::jpoint_t
+    location = _scroll_location;
 
-int Component::GetScrollY()
-{
-	return _scroll_location.y;
-}
+  if (IsScrollableX() == false) {
+    location.x = 0;
+  }
+  
+  if (IsScrollableY() == false) {
+    location.y = 0;
+  }
 
-jpoint_t Component::GetScrollLocation()
-{
-	return _scroll_location;
+	return location;
 }
 
 jsize_t Component::GetScrollDimension()
@@ -398,60 +405,25 @@ jsize_t Component::GetScrollDimension()
 
 jregion_t Component::GetVisibleBounds()
 {
-	jpoint_t location = GetLocation();
-	jsize_t size = GetSize();
-
-	jregion_t bounds;
-
-	bounds.x = location.x;
-	bounds.y = location.y;
-	bounds.width = size.width;
-	bounds.height = size.height;
-
-	return bounds;
+  return {
+    .x = _location.x, 
+    .y = _location.y, 
+    .width = _size.width, 
+    .height = _size.height
+  };
 }
 
-void Component::SetScrollX(int x)
+void Component::SetScrollLocation(int x, int y)
 {
-	jsize_t scroll_dimension = GetScrollDimension();
-	int diff = scroll_dimension.width -_size.width;
+	jsize_t 
+    sdimention = GetScrollDimension();
+	int 
+    diffx = sdimention.width -_size.width,
+    diffy = sdimention.height-_size.height;
 
 	_scroll_location.x = x;
 
-	if (x < 0 || diff < 0) {
-		_scroll_location.x = 0;
-	} else {
-		if (_scroll_location.x > diff) {
-			_scroll_location.x = diff;
-		}
-	}
-}
-
-void Component::SetScrollY(int y)
-{
-	jsize_t scroll_dimension = GetScrollDimension();
-	int diff = scroll_dimension.height-_size.height;
-
-	_scroll_location.y = y;
-
-	if (y < 0 || diff < 0) {
-		_scroll_location.y = 0;
-	} else {
-		if (_scroll_location.y > diff) {
-			_scroll_location.y = diff;
-		}
-	}
-}
-
-void Component::SetScrollLocation(jpoint_t t)
-{
-	jsize_t scroll_dimension = GetScrollDimension();
-	int diffx = scroll_dimension.width -_size.width;
-	int diffy = scroll_dimension.height-_size.height;
-
-	_scroll_location.x = t.x;
-
-	if (t.x < 0 || diffx < 0) {
+	if (x < 0 || diffx < 0) {
 		_scroll_location.x = 0;
 	} else {
 		if (_scroll_location.x > diffx) {
@@ -459,15 +431,22 @@ void Component::SetScrollLocation(jpoint_t t)
 		}
 	}
 
-	_scroll_location.y = t.y;
+	_scroll_location.y = y;
 
-	if (t.y < 0 || diffy < 0) {
+	if (y < 0 || diffy < 0) {
 		_scroll_location.y = 0;
 	} else {
 		if (_scroll_location.y > diffy) {
 			_scroll_location.y = diffy;
 		}
 	}
+
+  Repaint();
+}
+
+void Component::SetScrollLocation(jgui::jpoint_t t)
+{
+  SetScrollLocation(t.x, t.y);
 }
 
 int Component::GetMinorScrollIncrement()
@@ -502,24 +481,21 @@ void Component::PaintScrollbars(Graphics *g)
     return;
   }
 
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  fg = theme->GetIntegerParam("component.fg");
+  jgui::jpoint_t 
+    slocation = GetScrollLocation();
+  jgui::jsize_t
+    sdimention = GetScrollDimension();
 	int 
     bs = theme->GetIntegerParam("component.border.size"),
     ss = theme->GetIntegerParam("component.scroll.size");
-	jsize_t 
-    scroll_dimension = GetScrollDimension();
-	jpoint_t 
-    scroll_location = GetScrollLocation();
-	int 
-    scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
 
 	if (IsScrollableX() == true) {
 		double 
-      offset_ratio = (double)scrollx/(double)scroll_dimension.width,
-			block_size_ratio = (double)_size.width/(double)scroll_dimension.width;
+      offset_ratio = (double)slocation.x/(double)sdimention.width,
+			block_size_ratio = (double)_size.width/(double)sdimention.width;
 		int 
       offset = (int)(_size.width*offset_ratio),
 			block_size = (int)(_size.width*block_size_ratio);
@@ -534,8 +510,8 @@ void Component::PaintScrollbars(Graphics *g)
 	
 	if (IsScrollableY() == true) {
 		double 
-      offset_ratio = (double)scrolly/(double)scroll_dimension.height,
-			block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
+      offset_ratio = (double)slocation.y/(double)sdimention.height,
+			block_size_ratio = (double)_size.height/(double)sdimention.height;
 		int 
       offset = (int)(_size.height*offset_ratio),
 			block_size = (int)(_size.height*block_size_ratio);
@@ -1028,12 +1004,10 @@ jsize_t Component::GetPreferredSize()
 
 void Component::Move(int x, int y)
 {
-	_location.x = _location.x+x;
-	_location.y = _location.y+y;
+  jgui::jpoint_t
+    location = GetLocation();
 
-	Repaint();
-	
-	DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONMOVE));
+  SetLocation(location.x + x, location.y + y);
 }
 
 void Component::Move(jpoint_t point)
@@ -1041,18 +1015,19 @@ void Component::Move(jpoint_t point)
 	Move(point.x, point.y);
 }
 
-void Component::SetBounds(int x, int y, int w, int h)
+void Component::SetBounds(int x, int y, int width, int height)
 {
-	if (_location.x == x && _location.y == y && _size.width == w && _size.height == h) {
+	if (_location.x == x && _location.y == y && _size.width == width && _size.height == height) {
 		return;
 	}
 
 	bool moved = (_location.x != x) || (_location.y != y);
+	bool sized = (_size.width != width) || (_size.height != height);
 
 	_location.x = x;
 	_location.y = y;
-	_size.width = w;
-	_size.height = h;
+	_size.width = width;
+	_size.height = height;
 
 	if (_size.width < _minimum_size.width) {
 		_size.width = _minimum_size.width;
@@ -1070,11 +1045,15 @@ void Component::SetBounds(int x, int y, int w, int h)
 		_size.height = _maximum_size.height;
 	}
 
-	Repaint();
-
 	if (moved == true) {
 		DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONMOVE));
 	}
+	
+  if (sized == true) {
+		DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONSIZE));
+	}
+
+	Repaint();
 }
 
 void Component::SetBounds(jpoint_t point, jsize_t size)
@@ -1089,12 +1068,10 @@ void Component::SetBounds(jregion_t region)
 
 void Component::SetLocation(int x, int y)
 {
-	_location.x = x;
-	_location.y = y;
+  jgui::jsize_t
+    size = GetSize();
 
-	Repaint();
-		
-	DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONMOVE));
+  SetBounds(x, y, size.width, size.height);
 }
 
 void Component::SetLocation(jpoint_t point)
@@ -1102,32 +1079,12 @@ void Component::SetLocation(jpoint_t point)
 	SetLocation(point.x, point.y);
 }
 
-void Component::SetSize(int w, int h)
+void Component::SetSize(int width, int height)
 {
-	if (_size.width == w && _size.height == h) {
-		return;
-	}
+  jgui::jpoint_t
+    location = GetLocation();
 
-	_size.width = w;
-	_size.height = h;
-
-	if (_size.width < _minimum_size.width) {
-		_size.width = _minimum_size.width;
-	}
-
-	if (_size.height < _minimum_size.height) {
-		_size.height = _minimum_size.height;
-	}
-
-	if (_size.width > _maximum_size.width) {
-		_size.width = _maximum_size.width;
-	}
-
-	if (_size.height > _maximum_size.height) {
-		_size.height = _maximum_size.height;
-	}
-
-	Repaint();
+  SetBounds(location.x, location.y, width, height);
 }
 
 void Component::SetSize(jsize_t size)
@@ -1194,30 +1151,25 @@ bool Component::Intersects(int x1, int y1, int w1, int h1, int x2, int y2, int w
 
 jpoint_t Component::GetAbsoluteLocation()
 {
-	Container *parent = GetParent();
-	jpoint_t location;
-
-	location.x = 0;
-	location.y = 0;
+	Container 
+    *parent = GetParent();
+	jpoint_t
+    location = {.x = 0, .y = 0};
 
 	if ((void *)parent == NULL) {
 		return location;
 	}
 
-	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	jpoint_t
+    slocation = GetScrollLocation();
 
-	location.x = _location.x;
-	location.y = _location.y;
+	location = _location;
 
 	do {
-		scroll_location = parent->GetScrollLocation();
-		scrollx = (IsScrollableX() == true)?scroll_location.x:0;
-		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+		slocation = parent->GetScrollLocation();
 
-		location.x = location.x + ((parent->IsScrollableX() == true)?scrollx:0);	
-		location.y = location.y + ((parent->IsScrollableY() == true)?scrolly:0);	
+		location.x = location.x + slocation.x;	
+		location.y = location.y + slocation.y;	
 	
 		if (parent->GetParent() != NULL) {
       jgui::jpoint_t t = parent->GetLocation();
@@ -1232,12 +1184,24 @@ jpoint_t Component::GetAbsoluteLocation()
 
 jpoint_t Component::GetLocation()
 {
-	return _location;
+  jgui::jregion_t 
+    region = GetVisibleBounds();
+
+	return {
+    .x = region.x, 
+    .y = region.y
+  };
 }
 
 jsize_t Component::GetSize()
 {
-	return _size;
+  jgui::jregion_t 
+    region = GetVisibleBounds();
+
+	return {
+    .width = region.width, 
+    .height = region.height
+  };
 }
 
 void Component::RaiseToTop()
@@ -1352,18 +1316,14 @@ bool Component::MousePressed(jevent::MouseEvent *event)
 		return false;
 	}
 	
-	Theme *theme = GetTheme();
-
+  jgui::Theme 
+    *theme = GetTheme();
 	jsize_t 
-    scroll_dimension = GetScrollDimension();
+    sdimention = GetScrollDimension();
 	jpoint_t 
-    scroll_location = GetScrollLocation();
-	int 
-    scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-	int 
-    mousex = event->GetX(),
-		mousey = event->GetY();
+    slocation = GetScrollLocation();
+	jpoint_t 
+    elocation = event->GetLocation();
 	int 
     bs = 0,
     ss = 0;
@@ -1377,49 +1337,41 @@ bool Component::MousePressed(jevent::MouseEvent *event)
 		RequestFocus();
 	}
 
-	if (IsScrollableY() && mousex > (_size.width - ss - bs)) {
+	if (IsScrollableY() && elocation.x > (_size.width - ss - bs)) {
 		double 
-      offset_ratio = (double)scrolly/(double)scroll_dimension.height,
-		  block_size_ratio = (double)_size.height/(double)scroll_dimension.height;
+      offset_ratio = (double)slocation.y/(double)sdimention.height,
+		  block_size_ratio = (double)_size.height/(double)sdimention.height;
 		int 
       offset = (int)(_size.height*offset_ratio),
 			block_size = (int)(_size.height*block_size_ratio);
 
-		if (mousey > offset && mousey < (offset+block_size)) {
+		if (elocation.y > offset && elocation.y < (offset+block_size)) {
 			_component_state = 10;
-			_relative_mouse_x = mousex;
-			_relative_mouse_y = mousey;
-		} else if (mousey < offset) {
-			SetScrollY(scrolly-_scroll_major_increment);
-
-			Repaint();
-		} else if (mousey > (offset+block_size)) {
-			SetScrollY(scrolly+_scroll_major_increment);
-
-			Repaint();
+			_relative_mouse_x = elocation.x;
+			_relative_mouse_y = elocation.y;
+		} else if (elocation.y < offset) {
+			SetScrollLocation(slocation.x, slocation.y - _scroll_major_increment);
+		} else if (elocation.y > (offset + block_size)) {
+			SetScrollLocation(slocation.x, slocation.y + _scroll_major_increment);
 		}
 
 		return true;
-	} else if (IsScrollableX() && mousey > (_size.height - ss - bs)) {
+	} else if (IsScrollableX() && elocation.y > (_size.height - ss - bs)) {
 		double 
-      offset_ratio = (double)scrollx/(double)scroll_dimension.width,
-		  block_size_ratio = (double)_size.width/(double)scroll_dimension.width;
+      offset_ratio = (double)slocation.x/(double)sdimention.width,
+		  block_size_ratio = (double)_size.width/(double)sdimention.width;
 		int 
       offset = (int)(_size.width*offset_ratio),
 			block_size = (int)(_size.width*block_size_ratio);
 
-		if (mousex > offset && mousex < (offset+block_size)) {
+		if (elocation.x > offset && elocation.x < (offset + block_size)) {
 			_component_state = 11;
-			_relative_mouse_x = mousex;
-			_relative_mouse_y = mousey;
-		} else if (mousex < offset) {
-			SetScrollX(scrollx-_scroll_major_increment);
-
-			Repaint();
-		} else if (mousex > (offset+block_size)) {
-			SetScrollX(scrollx+_scroll_major_increment);
-
-			Repaint();
+			_relative_mouse_x = elocation.x;
+			_relative_mouse_y = elocation.y;
+		} else if (elocation.x < offset) {
+			SetScrollLocation(slocation.x - _scroll_major_increment, slocation.y);
+		} else if (elocation.x > (offset + block_size)) {
+      SetScrollLocation(slocation.x + _scroll_major_increment, slocation.y);
 		}
 
 		return true;
@@ -1452,32 +1404,24 @@ bool Component::MouseMoved(jevent::MouseEvent *event)
 		return false;
 	}
 	
-	int mousex = event->GetX(),
-			mousey = event->GetY();
-
+	jpoint_t 
+    slocation = GetScrollLocation(),
+    elocation = event->GetLocation();
 	jsize_t 
     size = GetSize(),
-    scroll_dimension = GetScrollDimension();
-	jpoint_t 
-    scroll_location = GetScrollLocation();
-	int 
-    scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+    sdimention = GetScrollDimension();
 
 	if (_component_state == 10) {
-		SetScrollY(scrolly + (int)((mousey - _relative_mouse_y)*((double)scroll_dimension.height/(double)size.height)));
+  printf("Mouse move:1: %d, %d, %d, %d, %d, %d, %d\n", elocation.x, elocation.y, slocation.x, slocation.y, sdimention.height, size.height, slocation.y + (int)((elocation.y - _relative_mouse_y)*((double)sdimention.height/(double)size.height)));
+		SetScrollLocation(slocation.x, slocation.y + (int)((elocation.y - _relative_mouse_y)*((double)sdimention.height/(double)size.height)));
 		
-		Repaint();
-
-		_relative_mouse_y = mousey;
+		_relative_mouse_y = elocation.y;
 
 		return true;
 	} else if (_component_state == 11) {
-		SetScrollX(scrollx + (int)((mousex - _relative_mouse_x)*((double)scroll_dimension.width/(double)size.width)));
+		SetScrollLocation(slocation.x + (int)((elocation.x - _relative_mouse_x)*((double)sdimention.width/(double)size.width)), slocation.y);
 
-		Repaint();
-
-		_relative_mouse_x = mousex;
+		_relative_mouse_x = elocation.x;
 
 		return true;
 	}
@@ -1490,9 +1434,6 @@ bool Component::MouseWheel(jevent::MouseEvent *event)
 	if (IsVisible() == false) {
 		return false;
 	}
-
-	// int mousex = event->GetX(),
-	//		mousey = event->GetY();
 
 	return false;
 }
@@ -1770,7 +1711,7 @@ bool Component::IsVisible()
 
 bool Component::IsHidden()
 {
-	if (_is_visible == false) {
+	if (IsVisible() == false) {
 		return true;
 	}
 
@@ -1921,6 +1862,8 @@ void Component::DispatchComponentEvent(jevent::ComponentEvent *event)
 			listener->OnShow(event);
 		} else if (event->GetType() == jevent::JCET_ONMOVE) {
 			listener->OnMove(event);
+		} else if (event->GetType() == jevent::JCET_ONSIZE) {
+			listener->OnSize(event);
 		} else if (event->GetType() == jevent::JCET_ONPAINT) {
 			listener->OnPaint(event);
 		} else if (event->GetType() == jevent::JCET_ONENTER) {

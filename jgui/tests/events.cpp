@@ -19,10 +19,11 @@
  ***************************************************************************/
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
-#include "jcommon/jdate.h"
 
 #include <algorithm>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #define LONG_PRESS_TIME	2000
 
@@ -182,30 +183,21 @@ class UserEventListener {
 
 };
 
-class UserEventManager : public jevent::KeyListener, public jevent::MouseListener {
+class UserWindow: public jgui::Window {
 
 	private:
 		struct event_t {
 			bool key_down;
-			long start_time;
+			uint64_t start_time;
 		};
 
 	private:
-		static UserEventManager *_instance;
-
 		std::map<jevent::jkeyevent_symbol_t, event_t *> _events;
 		std::vector<UserEventListener *> _user_listeners;
 		jgui::jpoint_t _last_mouse_location;
 		uint64_t _last_mouse_move;
 
 	private:
-		UserEventManager()
-		{
-			_last_mouse_move = 0LL;
-			_last_mouse_location.x = 0LL;
-			_last_mouse_location.y = 0LL;
-		}
-
 		void DispatchUserEvent(UserEvent *event)
 		{
 			if (event == NULL) {
@@ -249,17 +241,16 @@ class UserEventManager : public jevent::KeyListener, public jevent::MouseListene
 		}
 
 	public:
-		virtual ~UserEventManager()
+		UserWindow(int x, int y, int width, int height):
+      jgui::Window(x, y, width, height)
 		{
+			_last_mouse_move = 0LL;
+			_last_mouse_location.x = 0LL;
+			_last_mouse_location.y = 0LL;
 		}
 
-		static UserEventManager * GetInstance()
+		virtual ~UserWindow()
 		{
-			if ((void *)_instance == NULL) {
-				_instance = new UserEventManager();
-			}
-
-			return _instance;
 		}
 
 		void RegisterUserEventListener(UserEventListener *listener)
@@ -301,15 +292,15 @@ class UserEventManager : public jevent::KeyListener, public jevent::MouseListene
 				_events[event->GetSymbol()] = t;
 
 				t->key_down = true;
-				t->start_time = jcommon::Date::CurrentTimeMillis();
+				t->start_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 				DispatchUserEvent(new UserEvent(ON_KEY_DOWN_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
 			}
 
-			long current_time = jcommon::Date::CurrentTimeMillis();
+			uint64_t current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
-			if ((current_time-t->start_time) >= LONG_PRESS_TIME) {
-				t->start_time = jcommon::Date::CurrentTimeMillis();
+			if ((current_time - t->start_time) >= LONG_PRESS_TIME) {
+				t->start_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
 
 				DispatchUserEvent(new UserEvent(ON_KEY_LONGPRESS_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));
 			}
@@ -334,50 +325,60 @@ class UserEventManager : public jevent::KeyListener, public jevent::MouseListene
 
 		virtual bool MousePressed(jevent::MouseEvent *event)
 		{
+      jgui::jpoint_t
+        elocation = event->GetLocation();
+
 			if (event->GetClickCount() == 1) {
-				DispatchUserEvent(new UserEvent(ON_MOUSE_CLICK_EVENT, event->GetButton(), event->GetClickCount(), event->GetX(), event->GetY(), 0.0, 0.0));
+				DispatchUserEvent(new UserEvent(ON_MOUSE_CLICK_EVENT, event->GetButton(), event->GetClickCount(), elocation.x, elocation.y, 0.0, 0.0));
 			}
 
-			DispatchUserEvent(new UserEvent(ON_MOUSE_PRESS_EVENT, event->GetButton(), event->GetClickCount(), event->GetX(), event->GetY(), 0.0, 0.0));
+			DispatchUserEvent(new UserEvent(ON_MOUSE_PRESS_EVENT, event->GetButton(), event->GetClickCount(), elocation.x, elocation.y, 0.0, 0.0));
 
 			return true;
 		}
 
 		virtual bool MouseReleased(jevent::MouseEvent *event)
 		{
-			DispatchUserEvent(new UserEvent(ON_MOUSE_RELEASE_EVENT, event->GetButton(), event->GetClickCount(), event->GetX(), event->GetY(), 0.0, 0.0));
+      jgui::jpoint_t
+        elocation = event->GetLocation();
+
+			DispatchUserEvent(new UserEvent(ON_MOUSE_RELEASE_EVENT, event->GetButton(), event->GetClickCount(), elocation.x, elocation.y, 0.0, 0.0));
 
 			return true;
 		}
 
 		virtual bool MouseMoved(jevent::MouseEvent *event)
 		{
-			double tdiff = (double)(jcommon::Date::CurrentTimeMillis()-_last_mouse_move),
-						 mdiff = (tdiff > -10 && tdiff < 10)?10:tdiff,
-						 vx = (event->GetX()-_last_mouse_location.x)/mdiff,
-						 vy = (event->GetY()-_last_mouse_location.y)/mdiff;
+      jgui::jpoint_t
+        elocation = event->GetLocation();
+			double 
+        tdiff = (double)(std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() - _last_mouse_move),
+				mdiff = (tdiff > -10 && tdiff < 10)?10:tdiff,
+				vx = (elocation.x - _last_mouse_location.x)/mdiff,
+				vy = (elocation.y - _last_mouse_location.y)/mdiff;
 
-			DispatchUserEvent(new UserEvent(ON_MOUSE_MOVE_EVENT, event->GetButton(), event->GetClickCount(), event->GetX(), event->GetY(), vx, vy));
+			DispatchUserEvent(new UserEvent(ON_MOUSE_MOVE_EVENT, event->GetButton(), event->GetClickCount(), elocation.x, elocation.y, vx, vy));
 
-			_last_mouse_move = jcommon::Date::CurrentTimeMillis();
-			_last_mouse_location.x = event->GetX();
-			_last_mouse_location.y = event->GetY();
+			_last_mouse_move = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+			_last_mouse_location.x = elocation.x;
+			_last_mouse_location.y = elocation.y;
 
 			return true;
 		}
 
 		virtual bool MouseWheel(jevent::MouseEvent *event)
 		{
-			DispatchUserEvent(new UserEvent(ON_MOUSE_WHEEL_EVENT, event->GetButton(), event->GetClickCount(), event->GetX(), event->GetY(), 0.0, 0.0));
+      jgui::jpoint_t
+        elocation = event->GetLocation();
+
+			DispatchUserEvent(new UserEvent(ON_MOUSE_WHEEL_EVENT, event->GetButton(), event->GetClickCount(), elocation.x, elocation.y, 0.0, 0.0));
 
 			return true;
 		}
 
 };
 
-UserEventManager *UserEventManager::_instance = NULL;
-
-class Test : public jgui::Window, public UserEventListener {
+class Test : public UserWindow, public UserEventListener {
 
 	private:
 		jgui::jpoint_t _ball;
@@ -388,7 +389,7 @@ class Test : public jgui::Window, public UserEventListener {
 
 	public:
 		Test():
-			jgui::Window(0, 0, 960, 540)
+			UserWindow(0, 0, 960, 540)
 		{
 			_ball.x = 960/2;
 			_ball.y = 540/2;
@@ -396,12 +397,12 @@ class Test : public jgui::Window, public UserEventListener {
 			_color = 0;
 			_pressed = false;
 
-			UserEventManager::GetInstance()->RegisterUserEventListener(this);
+			RegisterUserEventListener(this);
 		}
 
 		virtual ~Test()
 		{
-			UserEventManager::GetInstance()->RemoveUserEventListener(this);
+			RemoveUserEventListener(this);
 		}
 
 		virtual void OnKeyDown(UserEvent *event)
@@ -432,11 +433,9 @@ class Test : public jgui::Window, public UserEventListener {
 		{
 			std::cout << "OnMousePress: "  << event->GetClickCount() << ", Button: " << event->GetButton() << std::endl;
 
-      jgui::jpoint_t
-        location = GetLocation();
 			int 
-        cx = event->GetX() - location.x,
-			  cy = event->GetY() - location.y;
+        cx = event->GetX(),
+			  cy = event->GetY();
 			int 
         x = cx-_ball.x,
 				y = cy-_ball.y;
@@ -473,12 +472,10 @@ class Test : public jgui::Window, public UserEventListener {
 
 		virtual void OnMouseMove(UserEvent *event)
 		{
-			jgui::jpoint_t
-				location = GetLocation();
 			jgui::jsize_t
 				size = GetSize();
-			int cx = event->GetX() - location.x;
-			int cy = event->GetY() - location.y;
+			int cx = event->GetX();
+			int cy = event->GetY();
 
 			std::cout << "OnMouseMove: " << cx << ", " << cy << " [" << event->GetVelocityX() << ", " << event->GetVelocityY() << "]" << std::endl;
 
@@ -531,9 +528,6 @@ int main(int argc, char **argv)
 	jgui::Application::Init(argc, argv);
 
 	Test app;
-
-	app.RegisterKeyListener(UserEventManager::GetInstance());
-	app.RegisterMouseListener(UserEventManager::GetInstance());
 
 	app.SetTitle("Events");
 	app.SetVisible(true);

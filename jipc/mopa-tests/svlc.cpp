@@ -85,7 +85,7 @@ class Callback : public jipc::RemoteCallListener {
 			
 			response->SetBooleanParam("self", r);
 
-			std::cout << method->what() << " > " << response->what() << std::endl;
+			std::cout << method->What() << " > " << response->What() << std::endl;
 
 			return response;
 		}

@@ -189,7 +189,7 @@ class Buffer : public virtual jcommon::Object {
 		 * \brief 
 		 *
 		 */
-		std::string what()
+		std::string What()
 		{
 			return _buffer.str();
 		}

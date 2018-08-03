@@ -26,7 +26,6 @@ OBJS_jcommon += \
 	   jcommonlib.o\
 	   jcalendar.o\
 	   jcharset.o\
-	   jdate.o\
 	   jdynamiclink.o\
 		 jendian.o\
 	   jjson.o\
@@ -86,6 +85,7 @@ OBJS_jevent += \
 
 OBJS_jexception += \
 		jaddressexception.o\
+		jbadcastexception.o\
 		jcompileexception.o\
 		jconnectionexception.o\
 		jconnectioninterruptedexception.o\

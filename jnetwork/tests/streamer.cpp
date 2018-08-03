@@ -19,14 +19,14 @@
  ***************************************************************************/
 #include "jnetwork/jdatagramsocket.h"
 #include "jnetwork/jconnectionpipe.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 #include "jio/jfile.h"
 #include "jio/jfileinputstream.h"
-#include "jcommon/jdate.h"
 #include "jmpeg/jmpeglib.h"
 #include "jexception/jruntimeexception.h"
 
 #include <iostream>
+#include <thread>
 
 #include <string.h>
 
@@ -158,7 +158,7 @@ class Streamer {
 									pcr_pid = pid;
 								}
 
-								reference_time = jcommon::Date::CurrentTimeMicros();
+								reference_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 							} else if (pid == pcr_pid) {
 								uint64_t ipcr = TS_GM64(ptr+2, 0, 33);
 
@@ -166,7 +166,7 @@ class Streamer {
 								ipcr = (ipcr * 300LL + pcr_extension) / 300LL;
 
 								if (ipcr >= pcr) {
-									current_time = jcommon::Date::CurrentTimeMicros();
+									current_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 									factor = (uint64_t)((ipcr-pcr)*clock2);
 
 									uint64_t diff = factor - (current_time - reference_time);
@@ -178,7 +178,7 @@ class Streamer {
 									}
 
 									if (diff > 0) {
-										usleep(diff);
+                    std::this_thread::sleep_for(std::chrono::microseconds((diff)));
 									}
 								} else {
 									reference_time = 0;
@@ -199,7 +199,7 @@ class Streamer {
 									pcr_pid = pid;
 								}
 
-								reference_time = jcommon::Date::CurrentTimeMicros();
+								reference_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 							} else if (pid == pcr_pid) {
 								uint64_t ipcr = TS_GM64(ptr+2, 0, 33);
 
@@ -207,7 +207,7 @@ class Streamer {
 								ipcr = (ipcr * 300LL + pcr_extension) / 300LL;
 
 								if (ipcr >= pcr) {
-									current_time = jcommon::Date::CurrentTimeMicros();
+									current_time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 									factor = (uint64_t)((ipcr-pcr)*clock2);
 
 									uint64_t diff = factor - (current_time - reference_time);
@@ -219,7 +219,7 @@ class Streamer {
 									}
 
 									if (diff > 0) {
-										usleep(diff);
+                    std::this_thread::sleep_for(std::chrono::microseconds((diff)));
 									}
 								} else {
 									reference_time = 0;

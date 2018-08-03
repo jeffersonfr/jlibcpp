@@ -176,7 +176,7 @@ std::string Digest::GetResult(bool hex)
 	return std::string((const char *)buffer, _digest_length);
 }
 
-std::string Digest::what()
+std::string Digest::What()
 {
 	return _method;
 }

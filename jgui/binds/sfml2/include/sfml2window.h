@@ -117,8 +117,8 @@ class SFML2Window : public jgui::Window {
 		 * \brief
 		 *
 		 */
-		virtual void SetLocation(int x, int y);
-		
+		virtual jgui::jregion_t GetVisibleBounds();
+
 		/**
 		 * \brief
 		 *
@@ -130,18 +130,6 @@ class SFML2Window : public jgui::Window {
 		 *
 		 */
 		virtual bool IsResizable();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Move(int x, int y);
 
 		/**
 		 * \brief
@@ -203,18 +191,6 @@ class SFML2Window : public jgui::Window {
 		 */
 		virtual jgui::Image * GetIcon();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jpoint_t GetLocation();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jsize_t GetSize();
-		
 };
 
 }

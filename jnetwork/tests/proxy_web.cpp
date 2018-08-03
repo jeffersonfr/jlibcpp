@@ -40,9 +40,12 @@
 #include "jnetwork/jserversocket.h"
 #include "jnetwork/jsocket.h"
 #include "jexception/jconnectionexception.h"
+#include "jexception/jsemaphoretimeoutexception.h"
 
 #include <iostream>
 #include <mutex>
+#include <thread>
+#include <condition_variable>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -100,13 +103,13 @@ int max_proxy_threads = MAX_PROXY_THREADS;
 struct th_proxy_struct {
 	struct th_proxy_struct *next_free;
   std::mutex mu;
-	jthread::Condition cond;
+  std::condition_variable cond;
 	jnetwork::Socket *sock_in;
 };
 
 // global variables
 std::mutex free_q_mu;
-jthread::Condition free_q_cond;
+std::condition_variable free_q_cond;
 struct th_proxy_struct *free_q;
 int thread_count = 0;		// protected with free_q_mu 
 
@@ -206,10 +209,11 @@ void help()
 	std::cout << "  -m max count of proxy threads allocated to serve the requests" << std::endl;
 }
 
-class Client : public jthread::Thread{
+class Client {
 
 	private:
 		struct th_proxy_struct *th_proxy;
+    std::thread _thread;
 
 	public:
 		Client(struct th_proxy_struct *th)
@@ -219,7 +223,13 @@ class Client : public jthread::Thread{
 
 		virtual ~Client()
 		{
+      _thread.join();
 		}
+
+    virtual void Start()
+    {
+      _thread = std::thread(&Client::Run, this);
+    }
 
 		virtual void Run()
 		{
@@ -237,8 +247,8 @@ class Client : public jthread::Thread{
 					ts.tv_nsec = 0;
 					
 					try {
-						th_proxy->cond.Wait((long long)ts.tv_sec*1000000LL + (long long)ts.tv_nsec/1000LL, &th_proxy->mu);
-					} catch (jthread::SemaphoreTimeoutException &e) {
+						th_proxy->cond.wait((long long)ts.tv_sec*1000000LL + (long long)ts.tv_nsec/1000LL, &th_proxy->mu);
+					} catch (jexception::SemaphoreTimeoutException &e) {
 						free_q_mu.mock();
 						th = &free_q;
 						while (*th && *th != th_proxy)
@@ -267,7 +277,7 @@ class Client : public jthread::Thread{
 				th_proxy->next_free = free_q;
 				free_q = th_proxy;
 				free_q_mu.unlock();
-				free_q_cond.Notify();
+				free_q_cond.notify_one();
 			}
 
 			run_exit:
@@ -319,7 +329,7 @@ struct th_proxy_struct *alloc_proxy_th(void)
 				}
 			}
 			if (!th_proxy) {
-				free_q_cond.Wait(&free_q_mu);
+				free_q_cond.wait(&free_q_mu);
 			}
 		}
 	} while (!th_proxy);
@@ -346,8 +356,8 @@ void server(int port)
 			th_proxy->sock_in = s;
 			th_proxy->mu.unlock();
 
-			th_proxy->cond.Notify();
-		} catch (jcommon::Exception &e) {
+			th_proxy->cond.notify_all();
+		} catch (jexception::Exception &e) {
 			perror("Broken connection");
 		}
 	}
@@ -441,7 +451,7 @@ int process_request(jnetwork::Socket *sockIn)
 		/* end of request analysis. The hostname is in "adr", and the port in "port" */
 		try {
 			sockOut = new jnetwork::Socket(adr, port);
-		} catch (jnetwork::SocketException &e) {
+		} catch (jexception::ConnectionException &e) {
 			switch (errno) {
 				case ERR_GETHOSTBYNAME:
 					goto servdnserr;
@@ -464,7 +474,7 @@ int process_request(jnetwork::Socket *sockIn)
 	} else {		/* proxy-to-proxy connection ! */
 		try {
 			sockOut = new jnetwork::Socket(NextProxyAdr, NextProxyPort);
-		} catch (jnetwork::SocketException &e) {
+		} catch (jexception::ConnectionException &e) {
 			switch (errno) {
 				case ERR_GETHOSTBYNAME:
 					goto servdnserr;

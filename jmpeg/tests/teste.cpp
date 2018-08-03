@@ -19,9 +19,9 @@
  ***************************************************************************/
 #include "jmpeg/jdemuxmanager.h"
 #include "jmpeg/jdemux.h"
-#include "jmpeg/jdemuxlistener.h"
 #include "jmpeg/jmpeglib.h"
 #include "jio/jfileinputstream.h"
+#include "jevent/jdemuxlistener.h"
 
 #include <iostream>
 #include <algorithm>
@@ -115,7 +115,7 @@ class Utils {
 		}
 };
 
-class DemuxTest : public jmpeg::DemuxListener {
+class DemuxTest : public jevent::DemuxListener {
 
 	private:
 		std::map<std::string, jmpeg::Demux *> _demuxes;
@@ -985,7 +985,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			return "...";
 		}
 
-		virtual void DataArrived(jmpeg::DemuxEvent *event)
+		virtual void DataArrived(jevent::DemuxEvent *event)
 		{
 			int pid = event->GetPID();
 			int tid = event->GetTID();
@@ -1038,7 +1038,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			printf("\n");
 		}
 
-		virtual void ProcessPAT(jmpeg::DemuxEvent *event)
+		virtual void ProcessPAT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
@@ -1080,7 +1080,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			InitDemux("nit", nit_pid, TS_NIT_TABLE_ID, TS_NIT_TIMEOUT);
 		}
 
-		virtual void ProcessCAT(jmpeg::DemuxEvent *event)
+		virtual void ProcessCAT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
@@ -1104,7 +1104,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 		}
 
-		virtual void ProcessTSDT(jmpeg::DemuxEvent *event)
+		virtual void ProcessTSDT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 			int section_length = TS_PSI_G_SECTION_LENGTH(ptr);
@@ -1128,7 +1128,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 		}
 
-		virtual void ProcessPMT(jmpeg::DemuxEvent *event)
+		virtual void ProcessPMT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 			int tid = event->GetTID();
@@ -1214,7 +1214,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			InitDemux("pcr", pcr_pid, -1, TS_PCR_TIMEOUT);
 		}
 
-		virtual void ProcessNIT(jmpeg::DemuxEvent *event)
+		virtual void ProcessNIT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 			int network_id = TS_G16(ptr+3);
@@ -1272,7 +1272,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 		}
 
-		virtual void ProcessSDT(jmpeg::DemuxEvent *event)
+		virtual void ProcessSDT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 
@@ -1317,7 +1317,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 		}
 
-		virtual void ProcessTOT(jmpeg::DemuxEvent *event)
+		virtual void ProcessTOT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 
@@ -1327,7 +1327,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			printf("TOT:: data :[0x%02x], utc:[%03x]\n", mjd, utc);
 		}
 
-		virtual void ProcessEIT(jmpeg::DemuxEvent *event)
+		virtual void ProcessEIT(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 			int tid = event->GetTID();
@@ -1411,7 +1411,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 		}
 
-		virtual void ProcessPrivate(jmpeg::DemuxEvent *event)
+		virtual void ProcessPrivate(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 
@@ -1516,7 +1516,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 		}
 
-		virtual void ProcessPCR(jmpeg::DemuxEvent *event)
+		virtual void ProcessPCR(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 
@@ -1527,7 +1527,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			printf("PCR:: base:[%lu], extension:[%lu]\n", program_clock_reference_base, program_clock_reference_extension);
 		}
 
-		virtual void ProcessDSMCCData(jmpeg::DemuxEvent *event)
+		virtual void ProcessDSMCCData(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 
@@ -1674,7 +1674,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 		}
 
-		virtual void ProcessDSMCCDescriptors(jmpeg::DemuxEvent *event)
+		virtual void ProcessDSMCCDescriptors(jevent::DemuxEvent *event)
 		{
 			const char *ptr = event->GetData();
 
@@ -1754,7 +1754,7 @@ class DemuxTest : public jmpeg::DemuxListener {
 			}
 		}
 
-		virtual void DataNotFound(jmpeg::DemuxEvent *event)
+		virtual void DataNotFound(jevent::DemuxEvent *event)
 		{
 			printf("Data Not Found:: pid:[0x%04x], tid:[0x%04x], length:[%d]\n", event->GetPID(), event->GetTID(), event->GetDataLength());
 		}

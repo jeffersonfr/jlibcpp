@@ -182,7 +182,7 @@ int inpi_compress_process(std::string filename)
 		temp->Remove();
 		temp->Close();
 	} catch (jexception::RuntimeException &e) {
-		std::cout << "INPI process failed:: " << e.what() << std::endl;
+		std::cout << "INPI process failed:: " << e.What() << std::endl;
 	}
 
 	delete file;
@@ -254,7 +254,7 @@ int inpi_extract_process(std::string filename)
 
 		file->Close();
 	} catch (jexception::RuntimeException &e) {
-		std::cout << "INPI process failed:: " << e.what() << std::endl;
+		std::cout << "INPI process failed:: " << e.What() << std::endl;
 	}
 
 	delete file;

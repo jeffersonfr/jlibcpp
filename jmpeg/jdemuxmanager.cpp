@@ -20,7 +20,6 @@
 #include "jmpeg/jdemuxmanager.h"
 #include "jmpeg/jdemux.h"
 #include "jmpeg/jmpeglib.h"
-#include "jcommon/jdate.h"
 
 #include <algorithm>
 
@@ -240,9 +239,12 @@ void DemuxManager::Run()
 		for (std::vector<Demux *>::iterator i=_demuxes.begin(); i!=_demuxes.end(); i++) {
 			Demux *demux = (*i);
 
-			std::map<Demux *, struct jdemux_status_t>::iterator j=_demux_status.find(demux);
-			uint64_t current_time = jcommon::Date::CurrentTimeMillis();
-			struct jdemux_status_t t;
+			std::map<Demux *, struct jdemux_status_t>::iterator 
+        j=_demux_status.find(demux);
+			struct jdemux_status_t 
+        t;
+      uint64_t 
+        current_time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 
 			if (j == _demux_status.end()) {
 				t.start_time = current_time;

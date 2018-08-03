@@ -20,7 +20,9 @@
 #ifndef J_UUID_H
 #define J_UUID_H
 
-#include "jcommon/jdate.h"
+#include "jcommon/jobject.h"
+
+#include <ctime>
 
 #include <uuid/uuid.h>
 
@@ -42,8 +44,6 @@ enum juuid_type_t {
 class UUID : public virtual jcommon::Object {
 
 	private:
-		/** \brief */
-		jcommon::Date _date;
 		/** \brief */
 		uuid_t _uuid;
 		
@@ -70,7 +70,7 @@ class UUID : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual jcommon::Date GetDate();
+		virtual std::time_t GetTime();
 
 		/**
 		 * \brief Clone object.
@@ -100,7 +100,7 @@ class UUID : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual std::string what();
+		virtual std::string What();
 
 };
 

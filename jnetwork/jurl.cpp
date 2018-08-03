@@ -329,7 +329,7 @@ void URL::SetPath(std::string s)
 	_path = s;
 }
 
-std::string URL::what()
+std::string URL::What()
 {
 	std::ostringstream o;
 

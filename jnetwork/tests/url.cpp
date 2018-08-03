@@ -54,7 +54,7 @@ void testObject()
 	
 	teste::Teste t;
 
-	std::cout << t.what() << std::endl;
+	std::cout << t.What() << std::endl;
 
 	if (t.InstanceOf("jcommon::Object") == true) {
 		std::cout << "Teste is instance of Object" << std::endl;
@@ -172,7 +172,7 @@ void testURL()
 
 	for (int i=0; i<12; i++) {
 		std::cout << "-------------------------------" << std::endl;
-		std::cout << "URL: [" << url[i]->what() << "]" << std::endl;
+		std::cout << "URL: [" << url[i]->What() << "]" << std::endl;
 		std::cout << "GetProtocol(): " << url[i]->GetProtocol() << std::endl;
 
 		if (url[i]->GetProtocol() == "file") {
@@ -203,13 +203,9 @@ void testOptions(int argc, char **argv)
 
 void testDate()
 {
-	long long t = jcommon::Date::CurrentTimeMillis();
+	jcommon::Date d(std::time(nullptr));
 
-	t = t/1000LL;
-
-	jcommon::Date d((time_t)t);
-
-	std::cout << "Date:: " << d.what() << std::endl;
+	std::cout << "Date:: " << d.What() << std::endl;
 }
 
 void create_xml_file()

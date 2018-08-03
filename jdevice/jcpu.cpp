@@ -147,7 +147,7 @@ std::string CPU::GetFlags()
 	return _flags;
 }
 
-std::string CPU::what()
+std::string CPU::What()
 {
 	std::ostringstream o;
 	

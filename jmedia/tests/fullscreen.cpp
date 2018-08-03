@@ -18,15 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jgui/japplication.h"
-#include "jgui/jwindow.h"
 #include "jmedia/jplayermanager.h"
-#include "jmedia/jplayerlistener.h"
 #include "jmedia/jvideosizecontrol.h"
+#include "jgui/jwindow.h"
+#include "jevent/jplayerlistener.h"
 
-#include <stdio.h>
-#include <unistd.h>
+#include <iostream>
 
-class PlayerTest : public jgui::Widget, public jmedia::PlayerListener, public jmedia::FrameGrabberListener {
+class PlayerTest : public jgui::Window, public jevent::PlayerListener, public jevent::FrameGrabberListener {
 
 	private:
 		jmedia::Player *_player;
@@ -34,8 +33,7 @@ class PlayerTest : public jgui::Widget, public jmedia::PlayerListener, public jm
 
 	public:
 		PlayerTest(std::string file):
-			jgui::Widget(),
-			jmedia::PlayerListener()
+			jgui::Window(720, 480)
 		{
 			_player = jmedia::PlayerManager::CreatePlayer(file);
 
@@ -75,36 +73,36 @@ class PlayerTest : public jgui::Widget, public jmedia::PlayerListener, public jm
 			_player->Stop();
 		}
 
-		virtual void FrameGrabbed(jmedia::FrameGrabberEvent *event)
+		virtual void FrameGrabbed(jevent::FrameGrabberEvent *event)
 		{
-			jgui::Image *image = event->GetFrame();
+			jgui::Image *image = (jgui::Image *)event->GetSource();
 			jgui::Graphics *g = image->GetGraphics();
 
 			g->SetColor(jgui::Color::Blue);
 			g->FillRectangle(8, 8, 32, 32);
 		}
 
-		virtual void MediaStarted(jmedia::PlayerEvent *event)
+		virtual void MediaStarted(jevent::PlayerEvent *event)
 		{
 			std::cout << "Media Started" << std::endl;
 		}
 
-		virtual void MediaResumed(jmedia::PlayerEvent *event)
+		virtual void MediaResumed(jevent::PlayerEvent *event)
 		{
 			std::cout << "Media Resumed" << std::endl;
 		}
 
-		virtual void MediaPaused(jmedia::PlayerEvent *event)
+		virtual void MediaPaused(jevent::PlayerEvent *event)
 		{
 			std::cout << "Media Paused" << std::endl;
 		}
 
-		virtual void MediaStopped(jmedia::PlayerEvent *event)
+		virtual void MediaStopped(jevent::PlayerEvent *event)
 		{
 			std::cout << "Media Stopped" << std::endl;
 		}
 
-		virtual void MediaFinished(jmedia::PlayerEvent *event)
+		virtual void MediaFinished(jevent::PlayerEvent *event)
 		{
 			std::cout << "Media Finished" << std::endl;
 		}

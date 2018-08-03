@@ -20,16 +20,11 @@
 #include "jmedia/jsynthesizer.h"
 #include "jexception/jruntimeexception.h"
 
+#include <thread>
+
 #include <math.h>
 
 namespace jmedia {
-
-double sawtooth_wave(double s);
-double triangle_wave(double s); 
-double square_wave(double s); 
-double sine_wave(double s);
-double noise_wave(double s) ;
-double silence_wave(double s);
 
 double sawtooth_wave(double a) 
 {
@@ -327,7 +322,8 @@ int Synthesizer::Underflow(snd_pcm_t *handle, int err)
 		return 0;
 	} else if (err == -ESTRPIPE) {
 		while ((err = snd_pcm_resume(handle)) == -EAGAIN) {
-			sleep(1);	/* wait until the suspend flag is released */
+			// wait until the suspend flag is released
+      std::this_thread::sleep_for(std::chrono::seconds((1)));
 		}
 
 		if (err < 0) {

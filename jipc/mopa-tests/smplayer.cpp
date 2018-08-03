@@ -145,7 +145,7 @@ class Callback : public jipc::RemoteCallListener, jthread::Thread {
 
 				memset(tmp, 0, 4096-1);
 
-				sleep(1);
+        std::this_thread::sleep_for(std::chrono::seconds((1));
 			}
 		}
 
@@ -181,7 +181,7 @@ class Callback : public jipc::RemoteCallListener, jthread::Thread {
 			
 			response->SetBooleanParam("self", r);
 
-			std::cout << method->what() << " > " << response->what() << std::endl;
+			std::cout << method->What() << " > " << response->What() << std::endl;
 
 			return response;
 		}
@@ -311,7 +311,7 @@ class Callback : public jipc::RemoteCallListener, jthread::Thread {
 				}
 
 				// INFO:: espera o script perceber a existencia do arquivo channel_format para abrir o mplayer
-				sleep(2);
+        std::this_thread::sleep_for(std::chrono::seconds((1));
 
 				std::ostringstream o3;
 

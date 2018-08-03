@@ -194,6 +194,8 @@ class PacMan : public jgui::Window {
 	
 	virtual ~PacMan()
 	{
+		SetTheme(NULL);
+
 		flag = false;
 	}
 
@@ -744,7 +746,8 @@ class PacMan : public jgui::Window {
 		if (finished) {
 			score+=50;
 			DrawScore();
-			usleep(2000*1000);
+        
+      std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 			
 			if (nrofghosts < maxghosts) {
 				nrofghosts++;
@@ -771,7 +774,7 @@ class PacMan : public jgui::Window {
 		do {
 			Repaint();
 
-			usleep(5000);
+      std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		} while (flag && IsHidden() == false);
 	}
 };

@@ -43,13 +43,11 @@ class Button : public Component {
 		/** \brief */
 		std::mutex _action_listener_mutex;
 		/** \brief */
-		Image *_image_icon;
+    jgui::Image *_image;
 		/** \brief */
-		Image *_image_focus_icon;
+    jgui::jhorizontal_align_t _halign;
 		/** \brief */
-		jhorizontal_align_t _halign;
-		/** \brief */
-		jvertical_align_t _valign;
+    jgui::jvertical_align_t _valign;
 		/** \brief */
 		std::string _text;
 		/** \brief */
@@ -79,6 +77,12 @@ class Button : public Component {
 		 *
 		 */
 		virtual void SetText(std::string text);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void SetImage(jgui::Image *image);
 		
 		/**
 		 * \brief

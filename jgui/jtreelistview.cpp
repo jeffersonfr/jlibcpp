@@ -103,11 +103,12 @@ void TreeListView::SetCurrentIndex(int i)
 		throw jexception::OutOfBoundsException("Index out of bounds exception");
 	}
 
+  jgui::jpoint_t
+    slocation = GetScrollLocation();
+
 	_index = i;
 
-	SetScrollY(_index*(GetItemSize()+GetItemGap()));
-
-	Repaint();
+	SetScrollLocation(slocation.x, _index*(GetItemSize()+GetItemGap()));
 }
 
 bool TreeListView::IsSelected(int i)
@@ -341,9 +342,10 @@ bool TreeListView::MouseWheel(jevent::MouseEvent *event)
 		return true;
 	}
 	
-	SetScrollY(GetScrollY()+_item_size*event->GetClickCount());
+  jgui::jpoint_t
+    slocation = GetScrollLocation();
 
-	Repaint();
+	SetScrollLocation(slocation.x, slocation.y + _item_size*event->GetClickCount());
 
 	return true;
 }

@@ -772,7 +772,7 @@ void File::Truncate(int64_t n)
 	}
 }
 
-std::string File::what()
+std::string File::What()
 {
 	return "file:" + GetAbsolutePath();
 }

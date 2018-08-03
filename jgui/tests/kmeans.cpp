@@ -205,14 +205,17 @@ class Neuron {
 class SOM : public jgui::Window {
 
 	private:
-		double **_train_input,
-					 **_classify_input;
-		int _train_input_size,
-				_classify_input_size;
-		Neuron **_neurons;
-		int _neurons_size;
-		double _learning_rate;
-
+		Neuron 
+      **_neurons;
+		double 
+      **_train_input,
+			**_classify_input;
+		double 
+      _learning_rate;
+		int 
+      _train_input_size,
+			_classify_input_size,
+      _neurons_size;
 
 	public:
 		SOM(int ninputs, int neurons):
@@ -267,7 +270,7 @@ class SOM : public jgui::Window {
 			}
 		}
 
-		void Train(double **train_input, int train_input_size)
+		void Training(double **train_input, int train_input_size)
 		{
 			_train_input = train_input;
 			_train_input_size = train_input_size;
@@ -326,9 +329,13 @@ class SOM : public jgui::Window {
 				if ((u%1000) == 0) {
 					Classify(train_input, train_input_size);
 				}
+
+        if (IsHidden() == true) {
+          break;
+        }
 			}
 
-			puts("Training complete");
+			puts("Traininging complete");
 		}
 
 		void Classify(double **train_input, int train_input_size)
@@ -368,6 +375,10 @@ class SOM : public jgui::Window {
 				if (c1 != c2) {
 					k++;
 				}
+
+        if (IsHidden() == true) {
+          break;
+        }
 			}
 
 			printf("Acerto:: Total[%d], Erro[%d], Acerto[%.2f%%], Erro[%.2f%%]\n", 
@@ -378,6 +389,10 @@ class SOM : public jgui::Window {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
+      if (_train_input == NULL) {
+        return;
+      }
+
       jgui::jsize_t
         size = GetSize();
 
@@ -442,7 +457,7 @@ class SOM : public jgui::Window {
     virtual void ShowApp()
     {
       Init(CreatePoints(POINTS), 8*POINTS);
-      Train(CreatePoints(POINTS), 8*POINTS);
+      Training(CreatePoints(POINTS), 8*POINTS);
       Classify(CreatePoints(4*POINTS), 32*POINTS);
     }
 

@@ -22,7 +22,6 @@
 #include "jgui/jfont.h"
 #include "jgui/jbufferedimage.h"
 #include "jcommon/jproperties.h"
-#include "jcommon/jdate.h"
 #include "jevent/jkeyevent.h"
 #include "jexception/jruntimeexception.h"
 #include "jexception/jillegalargumentexception.h"
@@ -46,7 +45,7 @@ static sf::RenderWindow *_window = NULL;
 /** \brief */
 static jgui::Image *_icon = NULL;
 /** \brief */
-static uint64_t _last_keypress;
+static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
 /** \brief */
 static int _mouse_x;
 /** \brief */
@@ -411,11 +410,11 @@ void SFML2Application::InternalPaint()
 	g->ReleaseClip();
 	g_window->DoLayout();
 	g_window->InvalidateAll();
-  g->SetClip(r.x, r.y, r.width, r.height);
+  g->SetClip(0, 0, r.width, r.height);
   g_window->PaintBackground(g);
   g_window->Paint(g);
   g_window->PaintGlassPane(g);
-	// g->Translate(t.x, t.y);
+	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
@@ -436,16 +435,14 @@ void SFML2Application::InternalPaint()
   }
 
 	sf::Texture texture;
-	sf::Sprite _sprite;
+	sf::Sprite sprite;
 
 	texture.create(dw, dh);
 	texture.setSmooth(g->GetAntialias() != JAM_NONE);
 
-	_sprite.setTexture(texture, true);
+	sprite.setTexture(texture, false);
   
   sf::Vector2f targetSize(dw, dh);
-
-  // _sprite.setScale(targetSize.x/_sprite.getLocalBounds().width, targetSize.y/_sprite.getLocalBounds().height);
 
 	int size = dw*dh;
 	uint8_t argb[size*4];
@@ -465,8 +462,8 @@ void SFML2Application::InternalPaint()
 	texture.update(argb);
 
 	// _window->setActive(true);
-	// _window->clear();
-	_window->draw(_sprite);
+	_window->clear();
+	_window->draw(sprite);
 	_window->display();
 	// _window->setActive(false);
 	
@@ -479,9 +476,7 @@ void SFML2Application::InternalLoop()
   bool quitting = false;
 
 	while (quitting == false && _window->isOpen() == true) {
-    // INFO:: process api events
-    // TODO:: ver isso melhor, pq o PushEvent + GrabEvent (com mutex descomentado) causa dead-lock no sistema
-    std::vector<jevent::EventObject *> &events = GrabEvents();
+    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
 
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
@@ -571,8 +566,8 @@ void SFML2Application::InternalLoop()
           event.type == sf::Event::MouseButtonReleased ||
           event.type == sf::Event::MouseWheelMoved ||
           event.type == sf::Event::MouseWheelScrolled) {
-        jevent::jmouseevent_button_t button = jevent::JMB_UNKNOWN;
-        jevent::jmouseevent_button_t buttons = jevent::JMB_UNKNOWN;
+        jevent::jmouseevent_button_t button = jevent::JMB_NONE;
+        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
         int mouse_z = 0;
 
@@ -600,13 +595,15 @@ void SFML2Application::InternalLoop()
           }
 
           if (type == jevent::JMT_PRESSED) {
-            if ((jcommon::Date::CurrentTimeMillis() - _last_keypress) < 200L) {
+            auto current = std::chrono::steady_clock::now();
+            
+            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
               _click_count = _click_count + 1;
             } else {
-              _click_count = 1;
+            	_click_count = 1;
             }
 
-            _last_keypress = jcommon::Date::CurrentTimeMillis();
+            _last_keypress = current;
 
             mouse_z = _click_count;
           }
@@ -649,6 +646,8 @@ void SFML2Application::InternalLoop()
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
+  
+  g_window->GrabEvents();
 }
 
 void SFML2Application::InternalQuit()
@@ -672,16 +671,13 @@ SFML2Window::SFML2Window(int x, int y, int width, int height):
 	_window = NULL;
 	_mouse_x = 0;
 	_mouse_y = 0;
-	_last_keypress = 0LL;
+	_last_keypress = std::chrono::steady_clock::now();
 	_click_count = 1;
-  _location.x = x;
-  _location.y = y;
-  _size.width = width;
-  _size.height = height;
 
 	int flags = (int)(sf::Style::Titlebar | sf::Style::Resize | sf::Style::Close);
 
-	_window = new sf::RenderWindow(sf::VideoMode(_size.width, _size.height), _title.c_str(), flags);
+  // TODO:: set location too
+	_window = new sf::RenderWindow(sf::VideoMode(width, height), _title.c_str(), flags);
 
 	if (_window == NULL) {
 		throw jexception::RuntimeException("Cannot create a window");
@@ -779,15 +775,26 @@ bool SFML2Window::IsVisible()
 		
 void SFML2Window::SetBounds(int x, int y, int width, int height)
 {
-	_window->setPosition(sf::Vector2i(_location.x, _location.y));
-	_window->setSize(sf::Vector2u(_size.width, _size.height));
+	_window->setPosition(sf::Vector2i(x, y));
+	_window->setSize(sf::Vector2u(width, height));
+  _window->setView(sf::View(sf::FloatRect(0, 0, width, height)));
 }
 
-void SFML2Window::SetLocation(int x, int y)
+jgui::jregion_t SFML2Window::GetVisibleBounds()
 {
-	_window->setPosition(sf::Vector2i(_location.x, _location.y));
-}
+  sf::Vector2i 
+    location = _window->getPosition();
+  sf::Vector2u 
+    size = _window->getSize();
 
+	return {
+    .x = location.x, 
+    .y = location.y, 
+    .width = size.x, 
+    .height = size.y
+  };
+}
+	
 void SFML2Window::SetResizable(bool resizable)
 {
   _resizable = resizable;
@@ -796,16 +803,6 @@ void SFML2Window::SetResizable(bool resizable)
 bool SFML2Window::IsResizable()
 {
   return _resizable;
-}
-
-void SFML2Window::SetSize(int width, int height)
-{
-	_window->setSize(sf::Vector2u(width, height));
-}
-
-void SFML2Window::Move(int x, int y)
-{
-	_window->setPosition(sf::Vector2i(x, y));
 }
 
 void SFML2Window::SetCursorLocation(int x, int y)
@@ -933,34 +930,4 @@ jgui::Image * SFML2Window::GetIcon()
   return _icon;
 }
 
-jpoint_t SFML2Window::GetLocation()
-{
-	jgui::jpoint_t t;
-
-	t.x = 0;
-	t.y = 0;
-
-  sf::Vector2i v = _window->getPosition();
-
-	t.x = v.x;
-	t.y = v.y;
-
-	return t;
-}
-		
-jsize_t SFML2Window::GetSize()
-{
-	jgui::jsize_t t;
-
-  t.width = 0;
-  t.height = 0;
-
-  sf::Vector2u v = _window->getSize();
-
-  t.width = v.x;
-  t.height = v.y;
-
-	return t;
-}
-		
 }

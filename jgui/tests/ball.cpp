@@ -25,7 +25,6 @@
 #include "jgui/jwindow.h"
 #include "jgui/jbufferedimage.h"
 #include "jmath/jmath.h"
-#include "jcommon/jdate.h"
 
 #include <iostream>
 
@@ -253,23 +252,15 @@ class BallDrop : public jgui::Window {
 
 		virtual void ShowApp() 
 		{
-			uint64_t startTime = jcommon::Date::CurrentTimeMillis();
-
 			for (std::vector<Ball *>::iterator i=_balls.begin(); i!=_balls.end(); i++) {
 				(*i)->SetImage(ball);
 			}
 
 			do {
 				UpdateBalls();
-
 				Repaint();
 
-				// Delay depending on how far we are behind.
-				startTime += delay;
-
-				if ((int64_t)(startTime-jcommon::Date::CurrentTimeMillis()) > 0) {
-					usleep((startTime-jcommon::Date::CurrentTimeMillis())*1000LL);
-				}
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			} while (IsHidden() == false);
 		}
 

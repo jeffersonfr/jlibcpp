@@ -34,7 +34,7 @@ BufferWriter::~BufferWriter()
 
 std::string BufferWriter::GetData() 
 {
-	return _buffer.what();
+	return _buffer.What();
 }
 
 void BufferWriter::WriteBoolean(bool value) 

@@ -21,6 +21,8 @@
 #include "jlogger/jfilehandler.h"
 #include "jlogger/jxmlformatter.h"
 
+#include <thread>
+
 #include <stdlib.h>
 
 int main(int argc, char *argv[])
@@ -37,7 +39,8 @@ int main(int argc, char *argv[])
 
     for (int i=0; i<100; i++) {
       g_default_logger->SendLogger(jlogger::JRT_INFO, "Logger Tested: %s:%u:%2d", __FUNCTION__, __LINE__, i);
-      sleep(1);
+        
+      std::this_thread::sleep_for(std::chrono::seconds((1)));
     }
 
     g_default_logger->Release();

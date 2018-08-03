@@ -20,6 +20,7 @@
 #include "jshared/jsharedqueue.h"
 
 #include <iostream>
+#include <thread>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -74,7 +75,9 @@ void fifo_teste()
 				std::cout << "\nno free mem left? waiting a bit..." << std::flush;
 				mypriv.counter++;
 				fifo->Setpriv(&mypriv);
-				sleep(1);
+
+        std::this_thread::sleep_for(std::chrono::seconds((1)));
+
 				if(waitpid(child,&status,WNOHANG)){
 					std::cout << "\nBUG! child already died !";
 					exit(1);
@@ -84,7 +87,9 @@ void fifo_teste()
 		
 		std::cout << "\nwaiting for child" << std::endl;
 		wait(&status);
-		sleep(1);
+
+    std::this_thread::sleep_for(std::chrono::seconds((1)));
+
 		std::cout << "parent quit" << std::endl;
 		fifo->Detach();
 		fifo->Deallocate();
@@ -103,10 +108,11 @@ void fifo_teste()
 			int pos;
 			fifo->Getpriv(&mypriv);
 			std::cout << "waitcounter: " << mypriv.counter << std::endl;
-			/* fetch block */
+			// fetch block
 			while((sz = fifo->Get(buf,sizeof(buf)))==-1){
 				std::cout << "nothing in shmem? waiting..." << std::endl;
-				sleep(1);
+
+        std::this_thread::sleep_for(std::chrono::seconds((1)));
 			};
 			// checking it;
 			sz = sz / sizeof(int);

@@ -90,24 +90,6 @@ class Application : public jcommon::Object {
 		 * \brief
 		 *
 		 */
-    static void PushEvent(jevent::EventObject *event);
-
-		/**
-		 * \brief
-		 *
-		 */
-    static std::vector<jevent::EventObject *> & GrabEvents();
-
-		/**
-		 * \brief
-		 *
-		 */
-    static void ReleaseEvents();
-
-		/**
-		 * \brief
-		 *
-		 */
 		static jsize_t GetScreenSize();
 
 		/**

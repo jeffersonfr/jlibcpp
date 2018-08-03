@@ -128,7 +128,12 @@ class BorderTest : public jgui::Window {
 			RemoveAll();
 
 			for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-				delete (*i);
+        jgui::Component *c = (*i);
+
+        c->SetTheme(NULL);
+
+				delete c;
+        c = NULL;
 			}
 		}
 

@@ -18,6 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jgui/jbutton.h"
+#include "jgui/jimage.h"
 #include "jlogger/jloggerlib.h"
 
 #include <algorithm>
@@ -33,6 +34,7 @@ Button::Button(std::string text, int x, int y, int width, int height):
 	_valign = JVA_CENTER;
 
 	_text = text;
+  _image = NULL;
 
 	SetFocusable(true);
 }
@@ -46,6 +48,7 @@ Button::Button(std::string text, jgui::Image *image, int x, int y, int width, in
 	_valign = JVA_CENTER;
 
 	_text = text;
+  _image = image;
 
 	SetFocusable(true);
 }
@@ -57,6 +60,15 @@ Button::~Button()
 void Button::SetText(std::string text)
 {
 	_text = text;
+
+  Repaint();
+}
+
+void Button::SetImage(jgui::Image *image)
+{
+  _image = image;
+
+  Repaint();
 }
 
 std::string Button::GetText()
@@ -177,6 +189,15 @@ void Button::Paint(Graphics *g)
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
 		w = size.width - 2*x,
 		h = size.height - 2*y;
+
+  if (_image != NULL) {
+    jgui::jsize_t
+      size = _image->GetSize();
+
+    x = x + size.width + 8;;
+
+    g->DrawImage(_image, 8, 8);
+  }
 
 	if (font != NULL) {
 		g->SetFont(font);

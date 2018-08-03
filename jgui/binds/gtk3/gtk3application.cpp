@@ -46,14 +46,6 @@ static std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 /** \brief */
 static jgui::Image *_icon = NULL;
 /** \brief */
-static uint64_t _last_keypress;
-/** \brief */
-static int _mouse_x;
-/** \brief */
-static int _mouse_y;
-/** \brief */
-static int _click_count;
-/** \brief */
 static Window *g_window = NULL;
 /** \brief */
 static GtkApplication *_handler = NULL;
@@ -64,15 +56,13 @@ static GtkWidget *_frame = NULL;
 /** \brief */
 static GtkWidget *_drawing_area = NULL;
 /** \brief */
-static std::string _title;
+static jgui::jregion_t _visible_bounds;
 /** \brief */
 static float _opacity = 1.0f;
 /** \brief */
 static bool _fullscreen_enabled = false;
 /** \brief */
-static bool _undecorated = false;
-/** \brief */
-static bool _resizable = true;
+static bool _visible = false;
 /** \brief */
 static bool _cursor_enabled = true;
 /** \brief */
@@ -442,11 +432,11 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 	g->ReleaseClip();
 	g_window->DoLayout();
 	g_window->InvalidateAll();
-  g->SetClip(r.x, r.y, r.width, r.height);
+  g->SetClip(0, 0, r.width, r.height);
   g_window->PaintBackground(g);
   g_window->Paint(g);
   g_window->PaintGlassPane(g);
-	// g->Translate(t.x, t.y);
+	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
@@ -456,6 +446,7 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 
   cairo_surface_flush(cairo_surface);
   cairo_set_source_surface(cr, cairo_surface, 0, 0);
+	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
   cairo_paint(cr);
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
@@ -528,7 +519,7 @@ static gboolean OnMouseMoveEvent(GtkWidget *widget, GdkEventMotion *event, gpoin
 		buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
   }
 
-  g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+  g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
 
   return TRUE;
 }
@@ -581,17 +572,21 @@ static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpoi
 		buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
   }
 
-  g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+  g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, mouse_x, mouse_y));
 
   return TRUE;
 }
 
 static void OnClose(void)
 {
+  g_window->SetVisible(false);
 }
 
 static gboolean OnConfigureEvent(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data)
 {
+  gtk_window_get_position((GtkWindow *)_window, &_visible_bounds.x, &_visible_bounds.y);
+  gtk_window_get_size((GtkWindow *)_window, &_visible_bounds.width, &_visible_bounds.height);
+
   gtk_widget_queue_draw(_drawing_area);
 
   return TRUE;
@@ -599,14 +594,9 @@ static gboolean OnConfigureEvent(GtkWidget *widget, GdkEventConfigure *event, gp
 
 static void ConfigureApplication(GtkApplication *app, gpointer user_data)
 {
-	jgui::jsize_t 
-    *size = reinterpret_cast<jgui::jsize_t *>(user_data);
-
   _window = gtk_application_window_new(app);
 
-  gtk_window_set_title(GTK_WINDOW(_window), _title.c_str());
-	// gtk_window_set_decorated(GTK_WINDOW(_window), _undecorated);
-
+  gtk_window_set_title(GTK_WINDOW(_window), "");
   // gtk_container_set_border_width(GTK_CONTAINER(_window), 2);
 
   _frame = gtk_frame_new(NULL);
@@ -616,7 +606,7 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
 
   _drawing_area = gtk_drawing_area_new();
 
-  gtk_widget_set_size_request(_drawing_area, size->width, size->height);
+  gtk_widget_set_size_request(_drawing_area, _visible_bounds.width, _visible_bounds.height);
   gtk_container_add(GTK_CONTAINER(_frame), _drawing_area);
 
 	g_signal_connect(G_OBJECT(_drawing_area),"configure-event", G_CALLBACK (OnConfigureEvent), NULL);
@@ -628,9 +618,12 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
 	g_signal_connect(G_OBJECT(_window), "button_press_event", G_CALLBACK(OnMousePressEvent), NULL);
 	g_signal_connect(G_OBJECT(_window), "button_release_event", G_CALLBACK(OnMousePressEvent), NULL);
 
-  gtk_widget_set_events(_drawing_area, gtk_widget_get_events(_drawing_area) | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
+  gtk_widget_set_events(
+      _drawing_area, gtk_widget_get_events(_drawing_area) | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
   
   gtk_widget_show_all(_window);
+  
+  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_OPENED));
 }
 
 static jgui::jsize_t _screen = {0, 0};
@@ -716,15 +709,12 @@ void GTK3Application::InternalPaint()
   gtk_widget_queue_draw(_drawing_area);
 }
 
-static std::thread _main_thread;
 static bool quitting = false;
 
 static void main_thread(GTK3Application *app)
 {
 	while (quitting == false) {
-    // INFO:: process api events
-    // TODO:: ver isso melhor, pq o PushEvent + GrabEvent (com mutex descomentado) causa dead-lock no sistema
-    std::vector<jevent::EventObject *> &events = app->GrabEvents();
+    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
 
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
@@ -749,11 +739,13 @@ static void main_thread(GTK3Application *app)
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
+  
+  g_window->GrabEvents();
 }
 
 void GTK3Application::InternalLoop()
 {
-  _main_thread = std::thread(main_thread, this);
+  std::thread _main_thread = std::thread(main_thread, this);
 
  	g_application_run(G_APPLICATION(_handler), 0, NULL);
 
@@ -764,8 +756,8 @@ void GTK3Application::InternalLoop()
 
 void GTK3Application::InternalQuit()
 {
-  // g_application_quit();
-  gtk_main_quit();
+  gtk_window_close((GtkWindow *)_window);
+  // gtk_main_quit();
 
 	InternalReleaseCursors();
 }
@@ -779,21 +771,18 @@ GTK3Window::GTK3Window(int x, int y, int width, int height):
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
-  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
-
 	_window = NULL;
-	_mouse_x = 0;
-	_mouse_y = 0;
-	_last_keypress = 0LL;
-	_click_count = 1;
-  _location.x = x;
-  _location.y = y;
-  _size.width = width;
-  _size.height = height;
+
+  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
   _handler = gtk_application_new("jlibcpp.gtk", G_APPLICATION_FLAGS_NONE);
 
-  g_signal_connect(_handler, "activate", G_CALLBACK(ConfigureApplication), &_size);
+  _visible_bounds.x = x;
+  _visible_bounds.y = y;
+  _visible_bounds.width = width;
+  _visible_bounds.height = height;
+
+  g_signal_connect(_handler, "activate", G_CALLBACK(ConfigureApplication), NULL);
 }
 
 GTK3Window::~GTK3Window()
@@ -815,6 +804,8 @@ GTK3Window::~GTK3Window()
 
 void GTK3Window::ToggleFullScreen()
 {
+  // gtk_window_unfullscreen (GtkWindow *window);
+  // gtk_window_fullscreen_on_monitor (GtkWindow *window, GdkScreen *screen, gint monitor);
 	if (_fullscreen_enabled == false) {
     _fullscreen_enabled = true;
     
@@ -845,16 +836,12 @@ void GTK3Window::SetParent(jgui::Container *c)
 
 void GTK3Window::SetTitle(std::string title)
 {
-	_title = title;
-
-	if (_window != NULL) {
-		gtk_window_set_title(GTK_WINDOW(_window), title.c_str());
-	}
+	gtk_window_set_title(GTK_WINDOW(_window), title.c_str());
 }
 
 std::string GTK3Window::GetTitle()
 {
-	return _title;
+	return gtk_window_get_title(GTK_WINDOW(_window));
 }
 
 void GTK3Window::SetOpacity(float opacity)
@@ -869,67 +856,51 @@ float GTK3Window::GetOpacity()
 
 void GTK3Window::SetUndecorated(bool undecorated)
 {
-	_undecorated = undecorated;
-	
-	gtk_window_set_decorated(GTK_WINDOW(_window), _undecorated == false);
+	gtk_window_set_decorated(GTK_WINDOW(_window), undecorated == false);
 }
 
 bool GTK3Window::IsUndecorated()
 {
-	return _undecorated;
+  return gtk_window_get_decorated(GTK_WINDOW(_window));
 }
 
 void GTK3Window::SetVisible(bool visible)
 {
-  _is_visible = visible;
+  _visible = visible;
 
-	if (_is_visible == true) {
+	if (_visible == true) {
 		DoLayout();
     Repaint();
-
-    gtk_widget_show_all(_window);
 	} else {
-		gtk_window_close((GtkWindow *)_window);
+		// gtk_window_close((GtkWindow *)_window);
   }
 }
 
 bool GTK3Window::IsVisible()
 {
-  return _is_visible;
+  return _visible;
 }
 		
 void GTK3Window::SetBounds(int x, int y, int width, int height)
 {
-	gtk_widget_set_size_request(_drawing_area, width, height);
+  gtk_window_move(GTK_WINDOW(_window), x, y);
+  gtk_window_resize(GTK_WINDOW(_window), width, height);
+	gtk_widget_set_size_request(_window, width, height);
 }
 
-void GTK3Window::SetLocation(int x, int y)
+jgui::jregion_t GTK3Window::GetVisibleBounds()
 {
-  // TODO::
+  return _visible_bounds;
 }
 
 void GTK3Window::SetResizable(bool resizable)
 {
-  _resizable = resizable;
+  gtk_window_set_resizable((GtkWindow *)_window, resizable);
 }
 
 bool GTK3Window::IsResizable()
 {
-  return _resizable;
-}
-
-void GTK3Window::SetSize(int width, int height)
-{
-	gtk_widget_set_size_request(_drawing_area, width, height);
-}
-
-void GTK3Window::Move(int x, int y)
-{
-  int
-    dx,
-    dy;
-
-  // TODO::
+  return gtk_window_get_resizable((GtkWindow *)_window);
 }
 
 void GTK3Window::SetCursorLocation(int x, int y)
@@ -1019,24 +990,7 @@ jgui::Image * GTK3Window::GetIcon()
   return _icon;
 }
 
-jpoint_t GTK3Window::GetLocation()
-{
-	jgui::jpoint_t t;
+// t.width = gtk_widget_get_allocated_width(_drawing_area);
+// t.height = gtk_widget_get_allocated_height(_drawing_area);
 
-  t.x = 0;
-  t.y = 0;
-
-	return t;
-}
-		
-jsize_t GTK3Window::GetSize()
-{
-	jgui::jsize_t t;
-
-  t.width = gtk_widget_get_allocated_width(_drawing_area);
-  t.height = gtk_widget_get_allocated_height(_drawing_area);
-
-	return t;
-}
-		
 }

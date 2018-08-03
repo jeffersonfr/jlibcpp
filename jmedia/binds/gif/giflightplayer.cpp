@@ -725,9 +725,12 @@ class PlayerComponentImpl : public jgui::Component {
 		{
 			jgui::Component::Paint(g);
 
+      jgui::jsize_t
+        size = GetSize();
+
 			_mutex.lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
+			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
 				
 			_mutex.unlock();
 		}
@@ -809,7 +812,7 @@ GIFLightPlayer::GIFLightPlayer(std::string file):
 	
 	jio::FileInputStream *stream = new jio::FileInputStream(file);
 
-	giflightplayer::AnimatedGIFData *data = new giflightplayer::AnimatedGIFData;
+	AnimatedGIFData *data = new AnimatedGIFData;
 
 	data->stream = stream;
 	data->image = NULL;
@@ -848,9 +851,9 @@ GIFLightPlayer::GIFLightPlayer(std::string file):
 
 	data->image = new uint32_t[data->Width*data->Height];
 
-	_controls.push_back(new giflightplayer::VideoSizeControlImpl(this));
+	_controls.push_back(new VideoSizeControlImpl(this));
 
-	_component = new giflightplayer::PlayerComponentImpl(this, 0, 0, data->Width, data->Height);
+	_component = new PlayerComponentImpl(this, 0, 0, data->Width, data->Height);
 	
 	_provider = data;
 }
@@ -870,14 +873,14 @@ GIFLightPlayer::~GIFLightPlayer()
 
 	_controls.clear();
 
-	giflightplayer::AnimatedGIFData *data = (giflightplayer::AnimatedGIFData *)_provider;
+	AnimatedGIFData *data = (AnimatedGIFData *)_provider;
 
 	delete data;
 }
 
 void GIFLightPlayer::Run()
 {
-	giflightplayer::AnimatedGIFData *data = (giflightplayer::AnimatedGIFData *)_provider;
+	AnimatedGIFData *data = (AnimatedGIFData *)_provider;
 
 	while (_is_playing == true) {
 		bool skip = false;
@@ -905,7 +908,7 @@ void GIFLightPlayer::Run()
 		}
 
 		if (skip == false) {
-			dynamic_cast<giflightplayer::PlayerComponentImpl *>(_component)->UpdateComponent(data->image);
+			dynamic_cast<PlayerComponentImpl *>(_component)->UpdateComponent(data->image);
 
 			try {
 				if (_decode_rate == 0) {
@@ -1004,7 +1007,7 @@ void GIFLightPlayer::Close()
 	_is_playing = false;
 	_is_closed = true;
 	
-	giflightplayer::AnimatedGIFData *data = (giflightplayer::AnimatedGIFData *)_provider;
+	AnimatedGIFData *data = (AnimatedGIFData *)_provider;
 
 	data->condition.notify_one();
 
@@ -1061,7 +1064,7 @@ void GIFLightPlayer::SetDecodeRate(double rate)
 	_decode_rate = rate;
 
 	if (_decode_rate != 0.0) {
-		giflightplayer::AnimatedGIFData *data = (giflightplayer::AnimatedGIFData *)_provider;
+		AnimatedGIFData *data = (AnimatedGIFData *)_provider;
 		
 		_is_paused = false;
 			

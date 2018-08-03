@@ -604,7 +604,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
         if (diff < ref_time) {
           diff = ref_time - diff;
 
-          usleep(diff/1000);
+          std::this_thread::sleep_for(std::chrono::microsseconds((diff/1000));
         }
       } while (IsHidden() == false);
     }

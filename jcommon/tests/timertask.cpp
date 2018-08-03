@@ -21,7 +21,7 @@
 
 #include <iostream>
 
-class TaskTest : public jcommon::TimerTask {
+class TaskTest {
 
 	private:
 
@@ -35,27 +35,20 @@ class TaskTest : public jcommon::TimerTask {
 			std::cout << "Task Destructor" << std::endl;
 		}
 
-		virtual void Run() 
+		static void Run() 
 		{
 			std::cout << "Task running ..." << std::endl;
+  
+      jcommon::TimerTask t1(1000, true, &TaskTest::Run);
 		}
 
 };
 
 int main() 
 {
-	jcommon::Timer timer;
-	TaskTest task;
-	
-	// wait 500000us to start task
-	timer.Schedule(&task, 500000LL, 1000000LL, false);
-
-	timer.Start();
+  jcommon::TimerTask t1(1000, true, &TaskTest::Run);
 
   std::this_thread::sleep_for(std::chrono::seconds(5));
 
-	timer.Stop();
-
 	return 0;
 }
-

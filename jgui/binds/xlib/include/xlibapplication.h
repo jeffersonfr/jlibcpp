@@ -17,170 +17,88 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#ifndef J_DATE_H
-#define J_DATE_H
+#ifndef J_X11APPLICATION_H
+#define J_X11APPLICATION_H
 
-#include "jcommon/jobject.h"
+#include "jgui/japplication.h"
+#include "jgui/jwindow.h"
 
-namespace jcommon {
+#include <map>
+#include <condition_variable>
+
+namespace jgui {
 
 /**
  * \brief
- * 
+ *
  * \author Jeff Ferr
  */
-class Date : public virtual jcommon::Object{
+class XlibApplication : public jgui::Application {
 
 	private:
 		/** \brief */
-		struct tm _zone;
+		struct cursor_params_t {
+			Image *cursor;
+			int hot_x;
+			int hot_y;
+		};
+
 		/** \brief */
-		time_t _time;
-		
+		std::map<jcursor_style_t, struct cursor_params_t> _cursors;
+		/** \brief */
+		std::condition_variable _init_sem;
+		/** \brief */
+		std::condition_variable _exit_sem;
+
+	private:
+		/**
+		 * \brief
+		 *
+		 */
+		void InternalInitCursors();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void InternalReleaseCursors();
+
+		/**
+		 * \brief
+		 *
+		 */
+		void InternalPaint();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InternalInit(int argc = 0, char **argv = NULL);
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InternalLoop();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void InternalQuit();
+
 	public:
 		/**
 		 * \brief
 		 *
 		 */
-		Date();
-
+		XlibApplication();
+		
 		/**
 		 * \brief
 		 *
 		 */
-		Date(time_t time_);
-
-		/**
-		 * \brief
-		 *
-		 */
-		Date(int day, int month, int year);
-
-		/**
-		 * \brief
-		 *
-		 */
-		Date(int day, int month, int year, int hours, int minutes, int seconds);
-
-		/**
-		 * \brief
-		 *
-		 */
-		Date(double julian);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual ~Date();
-
-		/**
-		 * \brief
-		 *
-		 */
-		uint32_t ToJulian();
-
-		/**
-		 * \brief
-		 *
-		 */
-		double ToGregorian();
-
-		/**
-		 * \brief
-		 *
-		 */
-		static uint64_t CurrentTimeSeconds();
-
-		/**
-		 * \brief
-		 *
-		 */
-		static uint64_t CurrentTimeMillis();
-
-		/**
-		 * \brief
-		 *
-		 */
-		static uint64_t CurrentTimeMicros();
-
-		/**
-		 * \brief
-		 *
-		 */
-		static uint64_t GetMonotonicTime();
-
-		/**
-		 * \brief Return the CPU's time spent by the thread.
-		 *
-		 */
-		static uint64_t GetThreadTime();
-
-		/**
-		 * \brief Return the CPU's time spent by the process.
-		 *
-		 */
-		static uint64_t GetProcessTime();
-
-		/**
-		 * \brief
-		 *
-		 */
-		uint64_t GetTime();
-
-		/**
-		 * \brief
-		 *
-		 */
-		int GetDayOfMonth();
-
-		/**
-		 * \brief
-		 *
-		 */
-		int GetMonth();
-
-		/**
-		 * \brief The number of years since 1900.
-		 *
-		 */
-		int GetYear();
-
-		/**
-		 * \brief
-		 *
-		 */
-		int GetSecond();
-
-		/**
-		 * \brief
-		 *
-		 */
-		int GetMinute();
-
-		/**
-		 * \brief
-		 *
-		 */
-		int GetHour();
-
-		/**
-		 * \brief
-		 *
-		 */
-		int GetDayOfWeek();
-
-		/**
-		 * \brief
-		 *
-		 */
-		int GetDayOfYear();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual std::string what();
+		virtual ~XlibApplication();
 
 };
 

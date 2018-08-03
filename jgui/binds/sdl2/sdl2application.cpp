@@ -21,7 +21,6 @@
 #include "sdl2/include/sdl2window.h"
 #include "jgui/jbufferedimage.h"
 #include "jcommon/jproperties.h"
-#include "jcommon/jdate.h"
 #include "jexception/jruntimeexception.h"
 #include "jexception/jillegalargumentexception.h"
 
@@ -48,7 +47,7 @@ static SDL_Renderer *_renderer = NULL;
 /** \brief */
 static jgui::Image *_icon = NULL;
 /** \brief */
-static uint64_t _last_keypress;
+static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
 /** \brief */
 static int _mouse_x;
 /** \brief */
@@ -449,11 +448,11 @@ void SDL2Application::InternalPaint()
 	g->ReleaseClip();
 	g_window->DoLayout();
 	g_window->InvalidateAll();
-  g->SetClip(r.x, r.y, r.width, r.height);
+  g->SetClip(0, 0, r.width, r.height);
   g_window->PaintBackground(g);
   g_window->Paint(g);
   g_window->PaintGlassPane(g);
-	// g->Translate(t.x, t.y);
+	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
@@ -474,6 +473,7 @@ void SDL2Application::InternalPaint()
   }
 
   SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, dw, dh, 32, dw*4, 0, 0, 0, 0);
+  
   SDL_Texture *texture = SDL_CreateTextureFromSurface(_renderer, surface);
 
   if (texture == NULL) {
@@ -510,19 +510,17 @@ void SDL2Application::InternalPaint()
   SDL_DestroyTexture(texture);
   SDL_FreeSurface(surface);
   SDL_RenderPresent(_renderer);
-	
+    
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
 void SDL2Application::InternalLoop()
 {
 	SDL_Event event;
-  bool quitting = false;
-
+  static bool quitting = false;
+  
 	while (quitting == false) {
-    // INFO:: process api events
-    // TODO:: ver isso melhor, pq o PushEvent + GrabEvent (com mutex descomentado) causa dead-lock no sistema
-    std::vector<jevent::EventObject *> &events = GrabEvents();
+    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
 
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
@@ -545,7 +543,6 @@ void SDL2Application::InternalLoop()
       }
     }
 
-    // INFO:: process engine events
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_WINDOWEVENT) {
         if (event.window.event == SDL_WINDOWEVENT_ENTER) {
@@ -668,13 +665,15 @@ void SDL2Application::InternalLoop()
           _click_count = event.button.clicks;
 
           if (type == jevent::JMT_PRESSED) {
-            if ((jcommon::Date::CurrentTimeMillis() - _last_keypress) < 200L) {
+            auto current = std::chrono::steady_clock::now();
+            
+            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
               _click_count = _click_count + 1;
             } else {
             	_click_count = 1;
             }
 
-            _last_keypress = jcommon::Date::CurrentTimeMillis();
+            _last_keypress = current;
 
             mouse_z = _click_count;
           }
@@ -717,6 +716,10 @@ void SDL2Application::InternalLoop()
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
+
+  quitting = true;
+  
+  g_window->GrabEvents();
 }
 
 void SDL2Application::InternalQuit()
@@ -740,7 +743,7 @@ SDL2Window::SDL2Window(int x, int y, int width, int height):
 	_window = NULL;
 	_mouse_x = 0;
 	_mouse_y = 0;
-	_last_keypress = 0LL;
+	_last_keypress = std::chrono::steady_clock::now();
 	_click_count = 1;
 
 	int 
@@ -869,11 +872,16 @@ void SDL2Window::SetBounds(int x, int y, int width, int height)
   SDL_SetWindowSize(_window, width, height);
 }
 
-void SDL2Window::SetLocation(int x, int y)
+jgui::jregion_t SDL2Window::GetVisibleBounds()
 {
-  SDL_SetWindowPosition(_window, x, y);
-}
+	jgui::jregion_t t;
 
+  SDL_GetWindowPosition(_window, &t.x, &t.y);
+  SDL_GetWindowSize(_window, &t.width, &t.height);
+
+	return t;
+}
+		
 void SDL2Window::SetResizable(bool resizable)
 {
   // SDL_SetWindowResizable(_window, resizable);
@@ -882,21 +890,6 @@ void SDL2Window::SetResizable(bool resizable)
 bool SDL2Window::IsResizable()
 {
   return (SDL_GetWindowFlags(_window) & SDL_WINDOW_RESIZABLE);
-}
-
-void SDL2Window::SetSize(int width, int height)
-{
-  SDL_SetWindowSize(_window, width, height);
-}
-
-void SDL2Window::Move(int x, int y)
-{
-  int
-    dx,
-    dy;
-
-  SDL_GetWindowPosition(_window, &dx, &dy);
-  SDL_SetWindowPosition(_window, x+dx, y+dy);
 }
 
 void SDL2Window::SetCursorLocation(int x, int y)
@@ -1001,22 +994,4 @@ jgui::Image * SDL2Window::GetIcon()
   return _icon;
 }
 
-jpoint_t SDL2Window::GetLocation()
-{
-	jgui::jpoint_t t;
-
-  SDL_GetWindowPosition(_window, &t.x, &t.y);
-
-	return t;
-}
-		
-jsize_t SDL2Window::GetSize()
-{
-	jgui::jsize_t t;
-
-  SDL_GetWindowSize(_window, &t.width, &t.height);
-
-	return t;
-}
-		
 }

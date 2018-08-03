@@ -60,7 +60,7 @@ class Response : public jcommon::ParamMapper {
 		 * \brief
 		 *
 		 */
-		virtual std::string what();
+		virtual std::string What();
 		
 };
 

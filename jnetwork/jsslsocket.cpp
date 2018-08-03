@@ -573,7 +573,7 @@ SocketOptions * SSLSocket::GetSocketOptions()
 	return new SocketOptions(_fd, JCT_TCP);
 }
 
-std::string SSLSocket::what()
+std::string SSLSocket::What()
 {
 	char *port = (char *)malloc(10);
 

@@ -583,12 +583,9 @@ class Tetris : public jgui::Window {
 			init();
 
 			while (ingame == true && IsHidden() == false) {
-				// starttime = (jcommon::Date::CurrentTimeMillis()+10LL);
-
 				Repaint();
 
-				usleep(50000);
-				// usleep(1000*((long long)jcommon::Date::CurrentTimeMillis()-(long long)starttime));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
 			}
 		}
 };

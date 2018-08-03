@@ -18,12 +18,14 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jnetwork/jsocket.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 #include "jnetwork/jurl.h"
 #include "jcommon/jstringtokenizer.h"
+#include "jexception/jexception.h"
 
 #include <sstream>
 #include <iostream>
+#include <thread>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -31,11 +33,13 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-class HTTPRequest : public jthread::Thread {
+class HTTPRequest {
 
 	private:
 		std::map<std::string, std::string> 
       _params;
+    std::thread
+      _thread;
 		std::string 
       _host,
 			_resource;
@@ -61,13 +65,13 @@ class HTTPRequest : public jthread::Thread {
 				_resource_size = 0;
 			}
 
-			Socket *c = NULL;
+      jnetwork::Socket *c = NULL;
 			
 			try {
-				c = new Socket(_host, _port, _timeout);
+				c = new jnetwork::Socket(_host, _port, _timeout);
 
 				{
-					SocketOptions *o = c->GetSocketOptions(); 
+          jnetwork::SocketOptions *o = c->GetSocketOptions(); 
 
 					o->SetSendTimeout(_timeout);
 					o->SetReceiveTimeout(_timeout);
@@ -193,7 +197,7 @@ class HTTPRequest : public jthread::Thread {
 					c->Close();
 				}
 
-				std::cerr << "error [" << strerror(errno) << "]: " << e.what() << std::endl;
+				std::cerr << "error [" << strerror(errno) << "]: " << e.What() << std::endl;
 			}
 		}
 
@@ -228,7 +232,7 @@ class HTTPRequest : public jthread::Thread {
 		}
 
 	public:
-		HTTPRequest(jcommon::URL *url)
+		HTTPRequest(jnetwork::URL *url)
 		{
 			_host = url->GetHost();
 			_port = url->GetPort();
@@ -248,7 +252,7 @@ class HTTPRequest : public jthread::Thread {
 		{
 			_timeout = timeout;
 			
-			if (IsRunning() == true) {
+			if (_cancel == false) {
 				Cancel();
 				Wait();
 			}
@@ -258,6 +262,11 @@ class HTTPRequest : public jthread::Thread {
 			Start();
 		}
 
+    void Start()
+    {
+      _thread = std::thread(&HTTPRequest::Run, this);
+    }
+
 		void Cancel()
 		{
 			_cancel = true;
@@ -265,7 +274,7 @@ class HTTPRequest : public jthread::Thread {
 
 		void Wait()
 		{
-			WaitThread();
+      _thread.join();
 		}
 
 		int GetResponseCode()
@@ -290,7 +299,7 @@ int main(int argc, char **argv)
 		resource = std::string(argv[1]);
 	}
 
-	jcommon::URL url(resource);
+	jnetwork::URL url(resource);
 
 	InitializeSocketLibrary();
 	

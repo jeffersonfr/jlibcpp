@@ -68,6 +68,12 @@ class ComponentListener : public jevent::Listener {
 		 * \brief
 		 *
 		 */
+		virtual void OnSize(ComponentEvent *event);
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void OnPaint(ComponentEvent *event);
 
 		/**

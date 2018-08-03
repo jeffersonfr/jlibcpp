@@ -122,16 +122,17 @@ bool Slider::MousePressed(jevent::MouseEvent *event)
 		return true;
 	}
 
-	Theme *theme = GetTheme();
+  jgui::Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return false;
   }
 
+  jgui::jpoint_t
+    elocation = event->GetLocation();
   jgui::jsize_t
     size = GetSize();
-	int x1 = event->GetX(),
-			y1 = event->GetY();
   int
     dx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		dy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
@@ -144,28 +145,28 @@ bool Slider::MousePressed(jevent::MouseEvent *event)
 		catched = true;
 
 		if (_type == JSO_HORIZONTAL) {
-			if (y1 > 0 && y1 < (size.height)) {
+			if (elocation.y > 0 && elocation.y < (size.height)) {
 				int d = (int)((_value*dw)/(GetMaximum()-GetMinimum()));
 
 				_pressed = false;
 
-				if (x1 > (dx) && x1 < (dx+d)) {
+				if (elocation.x > (dx) && elocation.x < (dx+d)) {
 					SetValue(_value-_maximum_tick);
-				} else if (x1 > (dx+d+_stone_size) && x1 < (size.width)) {
+				} else if (elocation.x > (dx+d+_stone_size) && elocation.x < (size.width)) {
 					SetValue(_value+_maximum_tick);
-				} else if (x1 > (dx+d) && x1 < (dx+d+_stone_size)) {
+				} else if (elocation.x > (dx+d) && elocation.x < (dx+d+_stone_size)) {
 					_pressed = true;
 				}
 			}
 		} else if (_type == JSO_VERTICAL) {
-			if (x1 > 0 && x1 < (size.width)) {
+			if (elocation.x > 0 && elocation.x < (size.width)) {
 				int d = (int)((_value*dh)/(GetMaximum()-GetMinimum()));
 
 				_pressed = false;
 
-				if (y1 > (dy) && y1 < (dy+d)) {
+				if (elocation.y > (dy) && elocation.y < (dy+d)) {
 					SetValue(_value-_maximum_tick);
-				} else if (y1 > (dy+d+_stone_size) && y1 < (size.height)) {
+				} else if (elocation.y > (dy+d+_stone_size) && elocation.y < (size.height)) {
 					SetValue(_value+_maximum_tick);
 				}
 			}
@@ -193,16 +194,17 @@ bool Slider::MouseMoved(jevent::MouseEvent *event)
 		return true;
 	}
 
-	Theme *theme = GetTheme();
+  jgui::Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return false;
   }
 
+  jgui::jpoint_t
+    elocation = event->GetLocation();
   jgui::jsize_t
     size = GetSize();
-	int x1 = event->GetX(),
-			y1 = event->GetY();
   int
     dx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		dy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
@@ -213,9 +215,9 @@ bool Slider::MouseMoved(jevent::MouseEvent *event)
 		int diff = GetMaximum()-GetMinimum();
 
 		if (_type == JSO_HORIZONTAL) {
-			SetValue(diff*(x1-_stone_size/2)/dw);
+			SetValue(diff*(elocation.x - _stone_size/2)/dw);
 		} else if (_type == JSO_VERTICAL) {
-			SetValue(diff*(y1-_stone_size/2)/dh);
+			SetValue(diff*(elocation.y - _stone_size/2)/dh);
 		}
 
 		return true;

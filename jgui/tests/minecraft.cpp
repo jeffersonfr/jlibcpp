@@ -24,7 +24,8 @@
  */
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
-#include "jcommon/jdate.h"
+
+#include <chrono>
 
 #include <math.h>
 
@@ -168,22 +169,23 @@ class Minecraft : public jgui::Window {
 
     virtual void Paint(jgui::Graphics *g)
     {
-      jgui::jsize_t size = GetSize();
-
-      uint32_t buffer[size.width*size.height];
-
-      float now = (double)(jcommon::Date::CurrentTimeMillis() % 10000LL)/10000.0f;
-
-      float xRot = sin(now * M_PI * 2) * 0.4 + M_PI / 2;
-      float yRot = cos(now * M_PI * 2) * 0.4;
-      float yCos = cos(yRot);
-      float ySin = sin(yRot);
-      float xCos = cos(xRot);
-      float xSin = sin(xRot);
-
-      float ox = 32.5 + now * 64.0;
-      float oy = 32.5;
-      float oz = 32.5;
+      float 
+        now = ((std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count() % 10000LL)/10000.0f);
+      jgui::jsize_t 
+        size = GetSize();
+      float 
+        xRot = sin(now * M_PI * 2) * 0.4 + M_PI / 2,
+        yRot = cos(now * M_PI * 2) * 0.4,
+        yCos = cos(yRot),
+        ySin = sin(yRot),
+        xCos = cos(xRot),
+        xSin = sin(xRot);
+      float 
+        ox = 32.5 + now * 64.0,
+        oy = 32.5,
+        oz = 32.5;
+      uint32_t 
+        buffer[size.width*size.height];
 
       // for each column
       for (int x = 0; x < size.width; x++) {

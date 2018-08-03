@@ -2352,7 +2352,21 @@ void Graphics::GetMatrix(double **matrix)
 
 void Graphics::Reset()
 {
-  _color = Color(0x00, 0x00, 0x00, 0x00);
+	// _translate.x = 0;
+	// _translate.y = 0;
+
+	_pen.dashes = NULL;
+	_pen.dashes_size = 0;
+	_pen.width = 1;
+	_pen.join = JLJ_MITER;
+	_pen.style = JLS_BUTT;
+
+  // ReleaseClip();
+	SetAntialias(JAM_NORMAL);
+	SetPen(_pen);
+	SetColor(0x00000000);
+	ResetGradientStop();
+	SetCompositeFlags(JCF_SRC_OVER);
 }
 
 }

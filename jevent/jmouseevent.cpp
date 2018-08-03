@@ -26,9 +26,9 @@ MouseEvent::MouseEvent(void *source, jmouseevent_type_t type, jmouseevent_button
 {
 	jcommon::Object::SetClassName("jevent::MouseEvent");
 
-	_x = x;
-	_y = y;
 	_click_count = click_count;
+	_location.x = x;
+	_location.y = y;
 	_button = button;
 	_buttons = buttons;
 	_type = type;
@@ -58,24 +58,20 @@ jmouseevent_button_t MouseEvent::GetButtons()
 	return _buttons;
 }
 
-int MouseEvent::GetX()
+jgui::jpoint_t MouseEvent::GetLocation()
 {
-	return _x;
+	return _location;
 }
 
-int MouseEvent::GetY()
+void MouseEvent::SetLocation(int x, int y)
 {
-	return _y;
+	_location.x = x;
+	_location.y = y;
 }
 
-void MouseEvent::SetX(int x)
+void MouseEvent::SetLocation(jgui::jpoint_t location)
 {
-	_x = x;
-}
-
-void MouseEvent::SetY(int y)
-{
-	_y = y;
+	_location = location;
 }
 
 }

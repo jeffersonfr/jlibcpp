@@ -28,11 +28,13 @@
 class Hough {
 
 	private:
-		uint32_t *_accu;
-		int _accu_w;
-		int _accu_h;
-		int _img_w;
-		int _img_h;
+		uint32_t 
+      *_accu;
+		int 
+      _accu_w,
+		  _accu_h,
+		  _img_w,
+		  _img_h;
 
 	public:
 		Hough():
@@ -170,6 +172,12 @@ class Test : public jgui::Window {
 			_lines_threshold = 195;
 
 			_image = new jgui::BufferedImage("images/robin.png");
+
+      jgui::jsize_t
+        size = _image->GetSize();
+
+      _hough = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
+
 		}
 
 		virtual ~Test()
@@ -180,12 +188,12 @@ class Test : public jgui::Window {
 
 		virtual void ProcessFrame()
 		{
-			jgui::jsize_t size;
+			jgui::jsize_t 
+        size;
+			uint32_t 
+        *data = NULL;
 
 			size = _image->GetSize();
-
-			// INFO:: get  pixels
-			uint32_t *data = NULL;
 
 			_image->GetGraphics()->GetRGBArray(&data, 0, 0, size.width, size.height);
 
@@ -194,13 +202,14 @@ class Test : public jgui::Window {
 	
 			for (int j=0; j<size.height-1; j++) {
 				for (int i=0; i<size.width-1; i++) {
-					int index = j*size.width+i;
-
-					uint8_t r = (data[index] >> 0x10) & 0xff;
-					uint8_t g = (data[index] >> 0x08) & 0xff;
-					uint8_t b = (data[index] >> 0x00) & 0xff;
-
-					double p = (r * 0.299) + (g * 0.587) + (b * 0.114);
+					int 
+            index = j*size.width+i;
+					uint8_t 
+            r = (data[index] >> 0x10) & 0xff,
+					  g = (data[index] >> 0x08) & 0xff,
+					  b = (data[index] >> 0x00) & 0xff;
+					double 
+            p = (r * 0.299) + (g * 0.587) + (b * 0.114);
 
 					if (p < _binary_threshold) {
 						gray[index] = 0x00;
@@ -211,8 +220,13 @@ class Test : public jgui::Window {
 			}
 
 			// INFO:: converto to edges
-			uint8_t *edges = new uint8_t[size.width*size.height];
-			int k, offset, sigma, gamma;
+			uint8_t 
+        *edges = new uint8_t[size.width*size.height];
+			int 
+        k, 
+        offset, 
+        sigma, 
+        gamma;
 
 			for (int i=1; i<size.width-1; i++) {
 				for (int j=1; j<size.height-1; j++) {
@@ -249,17 +263,17 @@ class Test : public jgui::Window {
 			}
 
 			// INFO:: convert to rgba
-			uint32_t *gray32 = new uint32_t[size.width*size.height];
-			int count = size.width*size.height;
+			uint32_t 
+        gray32[size.width*size.height];
+			int 
+        count = size.width*size.height;
 
 			for (int i=0; i<count; i++) {
 				gray32[i] = 0xff000000 | (edges[i] << 0x10) | (edges[i] << 0x08) | (edges[i] << 0x00);
 			}
 
-      _hough = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
-
-      _image->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
-      _image->GetGraphics()->SetRGBArray(gray32, 0, 0, size.width, size.height);
+      _hough->GetGraphics()->SetCompositeFlags(jgui::JCF_SRC);
+      _hough->GetGraphics()->SetRGBArray(gray32, 0, 0, size.width, size.height);
 
 			delete [] gray;
 			delete [] data;
@@ -274,23 +288,21 @@ class Test : public jgui::Window {
 
 			ProcessFrame();
 
+			std::vector<jgui::jline_t> 
+        lines = _transform.GetLines(_lines_threshold);
 			jgui::jsize_t 
 				size = _hough->GetSize();
-      jgui::jinsets_t
-        insets = GetInsets();
 
-			g->DrawImage(_image, insets.left, insets.top, size.width, size.height);
-			g->DrawImage(_hough, insets.left+size.width+16, insets.top, size.width, size.height);
-
-			std::vector<jgui::jline_t> lines = _transform.GetLines(_lines_threshold);
+			g->DrawImage(_image, 0, 0, size.width, size.height);
+			g->DrawImage(_hough, size.width, 0, size.width, size.height);
 
 			g->SetColor(jgui::Color::Red);
-			g->SetClip(insets.left, insets.top, size.width, size.height);
+			g->SetClip(0, 0, size.width, size.height);
 
 			for (std::vector<jgui::jline_t>::iterator i=lines.begin(); i!=lines.end(); i++) {
 				jgui::jline_t t = (*i);
 
-				g->DrawLine(insets.left+t.x0, insets.top+t.y0, insets.left+t.x1, insets.top+t.y1);
+				g->DrawLine(t.x0, t.y0, t.x1, t.y1);
 			}
 		}
 
@@ -300,14 +312,14 @@ class Test : public jgui::Window {
 				return true;
 			}
 
-			if (event->GetSymbol() == jevent::JKS_CURSOR_UP) {
-				_binary_threshold += 10;
-			} else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
-				_binary_threshold -= 10;
-			} else if (event->GetSymbol() == jevent::JKS_CURSOR_LEFT) {
+			if (event->GetSymbol() == jevent::JKS_CURSOR_LEFT) {
 				_lines_threshold -= 10;
+      } else if (event->GetSymbol() == jevent::JKS_CURSOR_UP) {
+				_binary_threshold += 10;
 			} else if (event->GetSymbol() == jevent::JKS_CURSOR_RIGHT) {
 				_lines_threshold += 10;
+			} else if (event->GetSymbol() == jevent::JKS_CURSOR_DOWN) {
+				_binary_threshold -= 10;
 			}
 
 			Repaint();

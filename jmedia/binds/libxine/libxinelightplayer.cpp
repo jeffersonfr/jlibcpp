@@ -27,6 +27,8 @@
 #include "jexception/jmediaexception.h"
 #include "jexception/jcontrolexception.h"
 
+#include <thread>
+
 #include <cairo.h>
 
 namespace jmedia {
@@ -150,9 +152,12 @@ class PlayerComponentImpl : public jgui::Component {
 		{
 			jgui::Component::Paint(g);
 
+      jgui::jsize_t
+        size = GetSize();
+
 			_mutex.lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
+			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
 				
 			_mutex.unlock();
 		}
@@ -714,7 +719,7 @@ void LibXineLightPlayer::SetCurrentTime(uint64_t time)
 
 		xine_set_param(_stream, XINE_PARAM_SPEED, speed);
 
-		usleep(100);
+    std::this_thread::sleep_for(std::chrono::milliseconds((100)));
 	}
 }
 
@@ -732,7 +737,7 @@ uint64_t LibXineLightPlayer::GetCurrentTime()
 				break;
 			}
 
-			usleep(1000);
+      std::this_thread::sleep_for(std::chrono::milliseconds((100)));
 		}
 
 		time = pos;

@@ -154,7 +154,7 @@ jcommon::Object * Exception::Clone()
 	return (jcommon::Object *)o;
 }
 
-std::string Exception::what()
+std::string Exception::What()
 {
 	return std::exception::what();
 }

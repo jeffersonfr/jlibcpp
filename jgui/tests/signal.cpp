@@ -167,7 +167,7 @@ class Plotter : public jgui::Window {
 
 					_signal->Plot(100+(int)(random()%50));
 
-					usleep(10000);
+          std::this_thread::sleep_for(std::chrono::milliseconds((10)));
 				} while (IsHidden() == false && _counter-- >= 0);
 
 				s.Close();

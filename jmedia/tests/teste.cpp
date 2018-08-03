@@ -20,9 +20,10 @@
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
 #include "jmedia/jplayermanager.h"
-#include "jmedia/jplayerlistener.h"
-#include "jmedia/jframegrabberlistener.h"
+#include "jevent/jplayerlistener.h"
+#include "jevent/jframegrabberlistener.h"
 
+#include <iostream>
 #include <thread> 
 
 #include <stdio.h>
@@ -72,7 +73,7 @@ class MediaStart {
 
 };
 
-class PlayerTest : public jgui::Widget, public jmedia::PlayerListener, public jmedia::FrameGrabberListener {
+class PlayerTest : public jgui::Window, public jevent::PlayerListener, public jevent::FrameGrabberListener {
 
 	private:
 		std::vector<MediaStart *> _players;
@@ -81,7 +82,7 @@ class PlayerTest : public jgui::Widget, public jmedia::PlayerListener, public jm
 
 	public:
 		PlayerTest(std::string file):
-			jgui::Widget("Player Test")
+			jgui::Window(720, 480)
 		{
 			jgui::jsize_t size = GetSize();
 
@@ -191,39 +192,54 @@ class PlayerTest : public jgui::Widget, public jmedia::PlayerListener, public jm
       _mutex.unlock();
 		}
 
-		virtual void MediaStarted(jmedia::PlayerEvent *event)
+		virtual void MediaStarted(jevent::PlayerEvent *event)
 		{
 			std::cout << "Media Started" << std::endl;
 		}
 
-		virtual void MediaResumed(jmedia::PlayerEvent *event)
+		virtual void MediaResumed(jevent::PlayerEvent *event)
 		{
 			std::cout << "Media Resumed" << std::endl;
 		}
 
-		virtual void MediaPaused(jmedia::PlayerEvent *event)
+		virtual void MediaPaused(jevent::PlayerEvent *event)
 		{
 			std::cout << "Media Paused" << std::endl;
 		}
 
-		virtual void MediaStopped(jmedia::PlayerEvent *event)
+		virtual void MediaStopped(jevent::PlayerEvent *event)
 		{
 			std::cout << "Media Stopped" << std::endl;
 		}
 
-		virtual void MediaFinished(jmedia::PlayerEvent *event)
+		virtual void MediaFinished(jevent::PlayerEvent *event)
 		{
 			std::cout << "Media Finished" << std::endl;
 		}
 
-		virtual void FrameGrabbed(jmedia::FrameGrabberEvent *event)
+		virtual void FrameGrabbed(jevent::FrameGrabberEvent *event)
 		{
-			jgui::Image *image = event->GetFrame();
+			jgui::Image *image = (jgui::Image *)event->GetSource();
 			jgui::Graphics *g = image->GetGraphics();
 
 			g->SetColor(jgui::Color::Blue);
 			g->FillRectangle(4, 4, 12, 12);
 		}
+
+		virtual void ShowApp() 
+    {
+      StartMedia();
+
+      int k = 100;
+
+      while (k-- > 0) {
+        Render();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+      }
+
+      StopMedia();
+    }
 
 };
 
@@ -242,19 +258,8 @@ int main(int argc, char **argv)
 	PlayerTest app(argv[1]);
 
 	app.SetTitle("Video Player");
-	// main->SetSize(app.GetWidth(), app.GetHeight());
 	app.SetVisible(true);
-	app.StartMedia();
-	
-	int k = 100;
-
-	while (k-- > 0) {
-		app.Render();
-
-		usleep(100000);
-	}
-
-	app.StopMedia();
+  app.Exec();
 
 	jgui::Application::Loop();
 

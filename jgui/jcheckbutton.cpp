@@ -158,15 +158,16 @@ bool CheckButton::MousePressed(jevent::MouseEvent *event)
     size = GetSize();
 
 	if (event->GetButton() == jevent::JMB_BUTTON1) {
-		int x1 = event->GetX(),
-				y1 = event->GetY(),
-				ms = size.height;
+    jgui::jpoint_t
+      elocation = event->GetLocation();
+		int
+      ms = size.height;
 
 		if (size.height > size.width) {
 			ms = size.width;
 		}
 
-		if ((x1 > 0 && x1 < ms) && (y1 > 0 && y1 < ms)) {
+		if ((elocation.x > 0 && elocation.x < ms) && (elocation.y > 0 && elocation.y < ms)) {
 			if (_type == JCBT_CHECK) {
 				if (_checked == true) {
 					SetSelected(false);
@@ -253,6 +254,8 @@ void CheckButton::Paint(Graphics *g)
 		g->SetColor(fg);
 	}
 
+  x = x + 8;
+
 	if (_type == JCBT_CHECK) {
 		g->FillRectangle(x, y + (size.height - cs)/2, cs, cs);
   } else if (_type == JCBT_RADIO) {
@@ -272,6 +275,8 @@ void CheckButton::Paint(Graphics *g)
 		  g->FillCircle(x + cs/2, size.height/2, minor);
 		}
 	}
+
+  x = x + major + 8;
 
 	if (font != NULL) {
 		g->SetFont(font);

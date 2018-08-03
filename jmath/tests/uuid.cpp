@@ -26,13 +26,13 @@ using namespace jmath;
 
 void test(std::string id, bool expect)
 {
-	std::string date;
+  std::time_t time;
 	bool result = true;
 
 	try {
 		jmath::UUID uuid(id);
 
-		date = uuid.GetDate().what();
+		time = uuid.GetTime();
 	} catch (jexception::InvalidArgumentException &e) {
 		result = false;
 	}
@@ -40,7 +40,7 @@ void test(std::string id, bool expect)
 	std::cout << "UUID::[" << id << "], expect::[" << expect << "], result::[" << result << "]" << std::endl;
 
 	if (result == true) {
-		std::cout << date << std::endl;
+		std::cout << time << std::endl;
 	}
 }
 

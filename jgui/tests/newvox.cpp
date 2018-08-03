@@ -339,15 +339,10 @@ class NewVox : public jgui::Window {
 				sa += 0.003;
 			}
 
+      Repaint();
+
 			return true;
 		}
-
-    virtual void ShowApp()
-    {
-      do {
-	      Repaint();
-      } while (IsHidden() == false);
-    }
 
 };
 
@@ -359,7 +354,6 @@ int main(int argc, char *argv[])
 
 	app.SetTitle("Newvox");
 	app.SetVisible(true);
-  app.Exec();
 	
 	jgui::Application::Loop();
 

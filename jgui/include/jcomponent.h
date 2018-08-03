@@ -405,43 +405,25 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		 * \brief
 		 *
 		 */
-		virtual int GetScrollX();
+		virtual jgui::jpoint_t GetScrollLocation();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetScrollY();
+		virtual jgui::jsize_t GetScrollDimension();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jpoint_t GetScrollLocation();
+		virtual jgui::jregion_t GetVisibleBounds();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual jsize_t GetScrollDimension();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual jregion_t GetVisibleBounds();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScrollX(int x);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetScrollY(int y);
+		virtual void SetScrollLocation(int x, int yt);
 		
 		/**
 		 * \brief

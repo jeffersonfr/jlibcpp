@@ -469,7 +469,7 @@ SocketOptions * Socket::GetSocketOptions()
 	return new SocketOptions(_fd, JCT_TCP);
 }
 
-std::string Socket::what()
+std::string Socket::What()
 {
 	char *port = (char *)malloc(10);
 

@@ -31,9 +31,12 @@ struct color_t {
 class ColorAlphaTeste : public jgui::Window {
 
 	private:
-		jgui::Image *_fg;
-		jgui::Image *_bg;
-		color_t _ref_color;
+		jgui::Image 
+      *_fg;
+		jgui::Image 
+      *_bg;
+		color_t 
+      _ref_color;
 
 	private:
 		void Color2Alpha(color_t *src, color_t *ref)
@@ -113,12 +116,12 @@ class ColorAlphaTeste : public jgui::Window {
 				return true;
 			}
 
-			jgui::Graphics 
-        *g = NULL; // TODO:: gmain->GetGraphics();
       jgui::jpoint_t
-        location = GetLocation();
-
-			jgui::Color color(g->GetRGB(event->GetX()-location.x, event->GetY()-location.y));
+        elocation = event->GetLocation();
+			jgui::Graphics 
+        *g = _fg->GetGraphics();
+			jgui::Color 
+        color(g->GetRGB(elocation.x, elocation.y));
 
 			_ref_color.a = 0xff/255.0;
 			_ref_color.r = color.GetRed()/255.0;

@@ -80,7 +80,7 @@ std::string Response::Encode()
 	return o.str();
 }
 
-std::string Response::what()
+std::string Response::What()
 {
 	std::ostringstream o;
 

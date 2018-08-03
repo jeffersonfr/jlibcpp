@@ -335,10 +335,12 @@ void TextArea::IncrementLines(int lines)
 		return;
 	}
 
-	Theme *theme = GetTheme();
-	jgui::Font *font = theme->GetFont("component.font");
-
-	int current_length = 0;
+  jgui::Theme 
+    *theme = GetTheme();
+	jgui::Font 
+    *font = theme->GetFont("component.font");
+	int 
+    current_length = 0;
 
 	_current_row = _current_row - lines;
 
@@ -354,13 +356,13 @@ void TextArea::IncrementLines(int lines)
 	_caret_position = current_length;
 
 	if (font != NULL) {
-		jpoint_t scroll_location = GetScrollLocation();
-		int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-		int fs = font->GetSize();
+		jpoint_t 
+      slocation = GetScrollLocation();
+		int 
+      fs = font->GetSize();
 
-		if (scrolly > 0) {
-			SetScrollY((std::max)(0, (fs+_rows_gap)*_current_row));
+		if (slocation.y > 0) {
+			SetScrollLocation(slocation.x, (std::max)(0, (fs+_rows_gap)*_current_row));
 		}
 	}
 
@@ -401,13 +403,13 @@ void TextArea::DecrementLines(int lines)
 	_caret_position = current_length;
 
 	if (font != NULL) {
-		jpoint_t scroll_location = GetScrollLocation();
-		int // scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-				scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-		int fs = font->GetSize();
+		jpoint_t 
+      slocation = GetScrollLocation();
+		int 
+      fs = font->GetSize();
 
-		if ((scrolly + size.height) < (font->GetSize() + _rows_gap)*GetRows()) {
-			SetScrollY((std::max)(0, (fs + _rows_gap)*_current_row));
+		if ((slocation.y + size.height) < (font->GetSize() + _rows_gap)*GetRows()) {
+			SetScrollLocation(slocation.x, (std::max)(0, (fs + _rows_gap)*_current_row));
 		}
 	}
 
@@ -455,8 +457,10 @@ void TextArea::InitRowsString()
 		return;
 	}
 
-	jcommon::StringTokenizer token(text, "\n", jcommon::JTT_STRING, false);
-	std::vector<std::string> lines;
+	jcommon::StringTokenizer 
+    token(text, "\n", jcommon::JTT_STRING, false);
+	std::vector<std::string> 
+    lines;
 
 	for (int i=0; i<token.GetSize(); i++) {
 		std::vector<std::string> words;
@@ -506,7 +510,8 @@ void TextArea::InitRowsString()
 		_lines.push_back(temp);
 	}
 
-	int length = _caret_position;
+	int 
+    length = _caret_position;
 
 	for (int i=0; i<=(int)_lines.size()-1; i++) {
 		std::string line = _lines[i];
@@ -523,7 +528,10 @@ void TextArea::InitRowsString()
 
 	_rows_string = false;
 	
-	SetScrollY((std::max)(0, (fs+_rows_gap)*_current_row));
+  jgui::jpoint_t
+    slocation = GetScrollLocation();
+
+	SetScrollLocation(slocation.x, (std::max)(0, (fs+_rows_gap)*_current_row));
 }
 
 std::vector<std::string> & TextArea::GetLines()
@@ -554,10 +562,7 @@ void TextArea::Paint(Graphics *g)
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size");
 	jpoint_t 
-    scroll_location = GetScrollLocation();
-	int 
-    scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-		scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+    slocation = GetScrollLocation();
 
 	InitRowsString();
 
@@ -571,8 +576,8 @@ void TextArea::Paint(Graphics *g)
 			current_length = _caret_position,
 			fs = font->GetSize()+_rows_gap;
 
-	x = x - scrollx;
-	y = y - scrolly;
+	x = x - slocation.x;
+	y = y - slocation.y;
 
 	// INFO:: Draw text
 	for (int i=0, k=0; i<=(int)_lines.size()-1; i++) {

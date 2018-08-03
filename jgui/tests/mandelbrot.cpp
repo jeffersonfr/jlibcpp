@@ -84,11 +84,12 @@ class Mandelbrot : public jgui::Window {
 				return true;
 			}
 
-			jevent::jmouseevent_button_t button = event->GetButton();
-			int mx = event->GetX();
-			int my = event->GetY();
+			jevent::jmouseevent_button_t 
+        button = event->GetButton();
+      jgui::jpoint_t
+        elocation = event->GetLocation();
 
-      center = std::complex<double>(center.real() + ((mx - (MAX_WIDTH/2))/zoom), (center.imag() + ((my - (MAX_HEIGHT/2))/zoom)));
+      center = std::complex<double>(center.real() + ((elocation.x - (MAX_WIDTH/2))/zoom), (center.imag() + ((elocation.y - (MAX_HEIGHT/2))/zoom)));
 
 			if (button == jevent::JMB_BUTTON1) {
 				zoom *= ZOOM_FACTOR;

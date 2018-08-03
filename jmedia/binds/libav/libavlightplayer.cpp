@@ -125,9 +125,12 @@ class PlayerComponentImpl : public jgui::Component {
 		{
 			jgui::Component::Paint(g);
 
+      jgui::jsize_t
+        size = GetSize();
+
 			_mutex.lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
+			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
 				
 			_mutex.unlock();
 		}

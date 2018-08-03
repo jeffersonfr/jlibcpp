@@ -217,7 +217,7 @@ void Network::Builder()
 		close(sock);
 }
 
-std::string Network::what()
+std::string Network::What()
 {
 	std::ostringstream o, flags;
 

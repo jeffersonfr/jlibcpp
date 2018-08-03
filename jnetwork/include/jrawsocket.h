@@ -266,7 +266,7 @@ class RawSocket : public jnetwork::Connection {
 		 * \brief
 		 *
 		 */
-		virtual std::string what();
+		virtual std::string What();
 
 };
 

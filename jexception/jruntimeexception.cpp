@@ -43,7 +43,7 @@ RuntimeException::~RuntimeException() throw()
 {
 }
 
-std::string RuntimeException::what()
+std::string RuntimeException::What()
 {
 	return std::runtime_error::what();
 }

@@ -40,7 +40,6 @@ void CheckButtonGroup::Add(CheckButton *button)
  	std::lock_guard<std::mutex> guard(_group_mutex);
 
 	if (std::find(_buttons.begin(), _buttons.end(), button) != _buttons.end()) {
-		// CHANGE:: throw an exception
 		return;
 	}
 
@@ -57,7 +56,9 @@ void CheckButtonGroup::Remove(CheckButton *button)
 		if (button == (*i)) {
 			(*i)->RemoveToggleListener(this);
 
-			i = _buttons.erase(i);
+			_buttons.erase(i);
+
+      break;
 		}
 	}
 }

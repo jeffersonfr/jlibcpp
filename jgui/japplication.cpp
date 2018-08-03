@@ -24,8 +24,10 @@
 #include "sdl2/include/sdl2application.h"
 #elif defined(SFML2_UI)
 #include "sfml2/include/sfml2application.h"
-#elif defined(X11_UI)
-#include "x11/include/x11application.h"
+#elif defined(XLIB_UI)
+#include "xlib/include/xlibapplication.h"
+#elif defined(XCB_UI)
+#include "xcb/include/xcbapplication.h"
 #elif defined(GTK3_UI)
 #include "gtk3/include/gtk3application.h"
 #elif defined(ALLEGRO5_UI)
@@ -37,7 +39,6 @@
 namespace jgui {
 
 static Application *_instance = NULL;
-static std::vector<jevent::EventObject *> _events;
 static std::mutex g_application_mutex;
 static std::mutex g_application_event_mutex;
 
@@ -75,8 +76,10 @@ void Application::Init(int argc, char **argv)
 			_instance = new SDL2Application();
 #elif defined(SFML2_UI)
 			_instance = new SFML2Application();
-#elif defined(X11_UI)
-			_instance = new X11Application();
+#elif defined(XLIB_UI)
+			_instance = new XlibApplication();
+#elif defined(XCB_UI)
+			_instance = new XCBApplication();
 #elif defined(GTK3_UI)
 			_instance = new GTK3Application();
 #elif defined(ALLEGRO5_UI)
@@ -87,7 +90,7 @@ void Application::Init(int argc, char **argv)
         _instance->InternalInit(argc, argv);
       }
 		} catch (jexception::NullPointerException &e) {
-    	throw jexception::RuntimeException("Application cannot be initialized: " + e.what());
+    	throw jexception::RuntimeException("Application cannot be initialized: " + e.What());
 		}
 	}
         
@@ -122,28 +125,7 @@ void Application::Quit()
 	_instance->InternalQuit();
 }
 
-void Application::PushEvent(jevent::EventObject *event)
-{
-  if ((void *)event == NULL) {
-    return;
-  }
-
-  std::lock_guard<std::mutex> guard(g_application_event_mutex);
-
-  _events.push_back(event);
-}
-
-std::vector<jevent::EventObject *> & Application::GrabEvents()
-{
-  // g_application_event_mutex.lock();
-
-  return _events;
-}
-
-void Application::ReleaseEvents()
-{
-  // g_application_event_mutex.unlock();
-}
+std::condition_variable _condition;
 
 jsize_t Application::GetScreenSize()
 {

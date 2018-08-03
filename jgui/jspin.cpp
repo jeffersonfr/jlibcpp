@@ -152,6 +152,8 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
     return false;
   }
 
+  jgui::jpoint_t
+    elocation = event->GetLocation();
   jgui::jsize_t
     size = GetSize();
   int
@@ -163,12 +165,10 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
     catched = false;
 
 	if (event->GetButton() == jevent::JMB_BUTTON1) {
-		catched = true;
-
 		int 
-      x1 = event->GetX(),
-			y1 = event->GetY(),
 			arrow_size;
+
+		catched = true;
 
 		if (_type == JSO_HORIZONTAL) {
 			arrow_size = h/2;
@@ -179,18 +179,18 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
 		RequestFocus();
 
 		if (_type == JSO_HORIZONTAL) {
-			if (y1 > (y) && y1 < (y+size.height)) {
-				if (x1 > (size.width-arrow_size-x) && x1 < (size.width-x)) {
+			if (elocation.y > (y) && elocation.y < (y+size.height)) {
+				if (elocation.x > (size.width-arrow_size-x) && elocation.x < (size.width-x)) {
 					NextItem();
-				} else if (x1 > (x) && x1 < (x+arrow_size)) {
+				} else if (elocation.x > (x) && elocation.x < (x+arrow_size)) {
 					PreviousItem();
 				}
 			}
 		} else if (_type == JSO_VERTICAL) {
-			if (x1 > (size.width-2*arrow_size-x) && x1 < (size.width-x)) {
-				if (y1 > (y) && y1 < (h/2)) {
+			if (elocation.x > (size.width-2*arrow_size-x) && elocation.x < (size.width-x)) {
+				if (elocation.y > (y) && elocation.y < (h/2)) {
 					PreviousItem();
-				} else if (y1 > (y+h/2) && y1 < (y+h)) {
+				} else if (elocation.y > (y+h/2) && elocation.y < (y+h)) {
 					NextItem();
 				}
 			}

@@ -120,14 +120,14 @@ class ColorChooser : public jgui::Component {
 		
 		virtual bool MouseMoved(jevent::MouseEvent *event)
 		{
+      jgui::jpoint_t
+        elocation = event->GetLocation();
+
 			if (jgui::Component::MouseMoved(event) == true) {
 				return true;
 			}
 
-			int x = event->GetX();
-			int y = event->GetY();
-
-			_theme.SetIntegerParam("component.bg", _image->GetGraphics()->GetRGB(x, y));
+			_theme.SetIntegerParam("component.bg", _image->GetGraphics()->GetRGB(elocation.x, elocation.y));
 
 			SetTheme(&_theme);
 

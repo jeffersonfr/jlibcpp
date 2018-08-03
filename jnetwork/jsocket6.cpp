@@ -485,7 +485,7 @@ SocketOptions * Socket6::GetSocketOptions()
 	return new SocketOptions(_fd, JCT_TCP);
 }
 
-std::string Socket6::what()
+std::string Socket6::What()
 {
 	char *port = (char *)malloc(10);
 

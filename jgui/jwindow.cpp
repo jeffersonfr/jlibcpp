@@ -17,6 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
+#include "jgui/jwindow.h"
 #include "jgui/japplication.h"
 #include "jgui/jnulllayout.h"
 #include "jexception/jnullpointerexception.h"
@@ -25,8 +26,10 @@
 #include "sdl2/include/sdl2window.h"
 #elif defined(SFML2_UI)
 #include "sfml2/include/sfml2window.h"
-#elif defined(X11_UI)
-#include "x11/include/x11window.h"
+#elif defined(XLIB_UI)
+#include "xlib/include/xlibwindow.h"
+#elif defined(XCB_UI)
+#include "xcb/include/xcbwindow.h"
 #elif defined(GTK3_UI)
 #include "gtk3/include/gtk3window.h"
 #elif defined(ALLEGRO5_UI)
@@ -48,6 +51,7 @@ Window::Window(Window *window):
 Window::Window(int width, int height):
 	Window(0, 0, width, height)
 {
+  SetVisible(false);
 }
 
 Window::Window(int x, int y, int width, int height):
@@ -61,8 +65,10 @@ Window::Window(int x, int y, int width, int height):
 		_instance = new SDL2Window(x, y, width, height);
 #elif defined(SFML2_UI)
 		_instance = new SFML2Window(x, y, width, height);
-#elif defined(X11_UI)
-		_instance = new X11Window(x, y, width, height);
+#elif defined(XLIB_UI)
+		_instance = new XlibWindow(x, y, width, height);
+#elif defined(XCB_UI)
+		_instance = new XCBWindow(x, y, width, height);
 #elif defined(GTK3_UI)
 		_instance = new GTK3Window(x, y, width, height);
 #elif defined(ALLEGRO5_UI)
@@ -90,6 +96,7 @@ Window::Window(int x, int y, int width, int height):
 
   SetTheme(theme);
 
+  SetVisible(false);
   SetTitle("Main");
   SetLayout(new jgui::NullLayout());
 	SetBackgroundVisible(true);
@@ -135,11 +142,6 @@ bool Window::IsVisible()
 	return _instance->IsVisible();
 }
 		
-bool Window::IsHidden()
-{
-	return !IsVisible();
-}
-		
 void Window::SetResizable(bool resizable)
 {
   _instance->SetResizable(resizable);
@@ -165,19 +167,9 @@ void Window::SetBounds(int x, int y, int width, int height)
   _instance->SetBounds(x, y, width, height);
 }
 
-void Window::SetLocation(int x, int y)
+jgui::jregion_t Window::GetVisibleBounds()
 {
-  _instance->SetLocation(x, y);
-}
-
-void Window::SetSize(int width, int height)
-{
-  _instance->SetSize(width, height);
-}
-
-void Window::Move(int x, int y)
-{
-  _instance->Move(x, y);
+  return _instance->GetVisibleBounds();
 }
 
 void Window::SetTitle(std::string title)
@@ -271,7 +263,37 @@ void Window::Repaint(Component *cmp)
 		return;
 	}
 
-  jgui::Application::PushEvent(new jevent::WindowEvent(this, jevent::JWET_PAINTED));
+  PushEvent(new jevent::WindowEvent(this, jevent::JWET_PAINTED));
+}
+
+void Window::PushEvent(jevent::EventObject *event)
+{
+  if ((void *)event == NULL) {
+    return;
+  }
+
+  std::unique_lock<std::mutex> lock(_event_mutex);
+
+  if (_window_events.size() > 1) {
+    _event_condition.wait(lock);
+  }
+
+  _window_events.push_back(event);
+}
+
+std::vector<jevent::EventObject *> Window::GrabEvents()
+{
+  std::lock_guard<std::mutex> lock(_event_mutex);
+
+  std::vector<jevent::EventObject *> events;
+
+  events = _window_events;
+
+  _window_events.clear();
+
+  _event_condition.notify_all();
+
+  return events;
 }
 
 void Window::PaintBackground(Graphics *g)
@@ -464,6 +486,10 @@ bool Window::KeyTyped(jevent::KeyEvent *event)
 
 bool Window::MousePressed(jevent::MouseEvent *event)
 {
+	if (Container::MousePressed(event) == true) {
+		return true;
+	}
+
 	std::vector<Component *> components = GetComponents();
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
@@ -477,6 +503,10 @@ bool Window::MousePressed(jevent::MouseEvent *event)
 
 bool Window::MouseReleased(jevent::MouseEvent *event)
 {
+	if (Container::MouseReleased(event) == true) {
+		return true;
+	}
+
 	std::vector<Component *> components = GetComponents();
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
@@ -490,6 +520,10 @@ bool Window::MouseReleased(jevent::MouseEvent *event)
 
 bool Window::MouseMoved(jevent::MouseEvent *event)
 {
+	if (Container::MouseMoved(event) == true) {
+		return true;
+	}
+
 	std::vector<Component *> components = GetComponents();
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
@@ -525,6 +559,10 @@ bool Window::MouseMoved(jevent::MouseEvent *event)
 
 bool Window::MouseWheel(jevent::MouseEvent *event)
 {
+	if (Container::MouseWheel(event) == true) {
+		return true;
+	}
+
 	std::vector<Component *> components = GetComponents();
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {

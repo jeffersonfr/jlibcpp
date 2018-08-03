@@ -43,6 +43,10 @@ void ComponentListener::OnMove(ComponentEvent *event)
 {
 }
 
+void ComponentListener::OnSize(ComponentEvent *event)
+{
+}
+
 void ComponentListener::OnPaint(ComponentEvent *event)
 {
 }

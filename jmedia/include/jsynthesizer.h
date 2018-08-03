@@ -26,6 +26,13 @@
 
 namespace jmedia {
 
+double sawtooth_wave(double s);
+double triangle_wave(double s); 
+double square_wave(double s); 
+double sine_wave(double s);
+double noise_wave(double s) ;
+double silence_wave(double s);
+
 class Synthesizer : public virtual jcommon::Object {
 
 	private:

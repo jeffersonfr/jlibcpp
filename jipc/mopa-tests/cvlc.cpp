@@ -50,7 +50,7 @@ bool command(jipc::Method *method)
 		return false;
 	}
 
-	std::cout << response->what() << std::endl;
+	std::cout << response->What() << std::endl;
 
 	return true;
 }
@@ -104,28 +104,43 @@ int main(int argc, char **argv)
 
 	try {
 		remote_open("/tmp/shark.avi");
-		sleep(2);
-		remote_play();
-		sleep(2);
-		remote_pause();
-		sleep(2);
-		remote_play();
-		sleep(2);
-		remote_stop();
+  
+    std::this_thread::sleep_for(std::chrono::seconds((2));
 
-		sleep(2);
+		remote_play();
+
+    std::this_thread::sleep_for(std::chrono::seconds((2));
+
+		remote_pause();
+
+    std::this_thread::sleep_for(std::chrono::seconds((2));
+
+		remote_play();
+    
+    std::this_thread::sleep_for(std::chrono::seconds((2));
+		
+    remote_stop();
+
+    std::this_thread::sleep_for(std::chrono::seconds((2));
 
 		remote_open("/tmp/shark.avi");
-		sleep(2);
+
+    std::this_thread::sleep_for(std::chrono::seconds((2));
+
 		remote_play();
-		sleep(2);
+
+    std::this_thread::sleep_for(std::chrono::seconds((2));
+
 		remote_pause();
-		sleep(2);
+
+    std::this_thread::sleep_for(std::chrono::seconds((2));
+
 		remote_play();
-		sleep(2);
+
+    std::this_thread::sleep_for(std::chrono::seconds((2));
+
 		remote_stop();
 	} catch (jipc::IPCException &e) {
-		perror("");
 		std::cout << "Connection broken" << std::endl;
 	}
 

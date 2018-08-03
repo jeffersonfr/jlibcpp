@@ -19,7 +19,7 @@
  ***************************************************************************/
 #include "jnetwork/jserversocket.h"
 #include "jnetwork/jsocket.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 #include "jexception/jexception.h"
 
 #include <iostream>

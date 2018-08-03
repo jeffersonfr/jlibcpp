@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jnetwork/jdatagramsocket.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 #include "jexception/jioexception.h"
 #include "jexception/jconnectionexception.h"
 #include "jexception/jconnectiontimeoutexception.h"
@@ -61,7 +61,7 @@ int main()
 
 		s.Close();
 	} catch (jexception::ConnectionException &e) {
-		std::cout << e.what() << std::endl;
+		std::cout << e.What() << std::endl;
 	} catch (jexception::ConnectionTimeoutException &e) {
 		std::cout << "Socket timeout" << std::endl;
 	} catch (jexception::IOException &e) {

@@ -18,16 +18,19 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jnetwork/jsslsocket.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 #include "jexception/jconnectionexception.h"
 
 #include <iostream>
 #include <string>
+#include <thread>
 
-#include <stdio.h>
-#include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
 #include <signal.h>
 
 /**
@@ -73,7 +76,9 @@ int main(void)
 			}
 
 			std::cout << "." << std::flush;
-			sleep(3);
+      
+      std::this_thread::sleep_for(std::chrono::seconds((2)));
+			
 			i++;
 		}
 

@@ -137,11 +137,11 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 	if (IsScrollable()) {
 		Component *current = GetFocusOwner();
 
-		jpoint_t scroll_location = GetScrollLocation();
+		jpoint_t slocation = GetScrollLocation();
 		jsize_t scroll_dimension = GetScrollDimension();
 		int 
-      x = scroll_location.x,
-			y = scroll_location.y,
+      x = slocation.x,
+			y = slocation.y,
 			w = _size.width,
 			h = _size.height;
 		bool 
@@ -150,7 +150,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 			scrollOutOfBounds = false;
 
 		if (symbol == jevent::JKS_CURSOR_UP) {
-				y = scroll_location.y - _scroll_major_increment;
+				y = slocation.y - _scroll_major_increment;
 				// edge = (position == 0);
 				currentLarge = (scroll_dimension.height > _size.height);
 				scrollOutOfBounds = y < 0;
@@ -158,7 +158,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 					y = 0;
 				}
 		} else if (symbol == jevent::JKS_CURSOR_DOWN) {
-				y = scroll_location.y + _scroll_major_increment;
+				y = slocation.y + _scroll_major_increment;
 				// edge = (position == f.getFocusCount() - 1);
 				currentLarge = (scroll_dimension.height > _size.height);
 				scrollOutOfBounds = y > (scroll_dimension.height - _size.height);
@@ -166,7 +166,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 					y = scroll_dimension.height - _size.height;
 				}
 		} else if (symbol == jevent::JKS_CURSOR_RIGHT) {
-				x = scroll_location.x + _scroll_major_increment;
+				x = slocation.x + _scroll_major_increment;
 				// edge = (position == f.getFocusCount() - 1);
 				currentLarge = (scroll_dimension.width > _size.width);
 				scrollOutOfBounds = x > (scroll_dimension.width - _size.width);
@@ -174,7 +174,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 					x = scroll_dimension.width - _size.width;
 				}
 		} else if (symbol == jevent::JKS_CURSOR_LEFT) {
-				x = scroll_location.x - _scroll_major_increment;
+				x = slocation.x - _scroll_major_increment;
 				// edge = (position == 0);
 				currentLarge = (scroll_dimension.width > _size.width);
 				scrollOutOfBounds = x < 0;
@@ -199,7 +199,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
       nextIntersects = Contains(next) == true && Intersects(al.x, al.y, ns.width, ns.height, al.x + x, al.y + y, w, h);
 
 		if ((nextIntersects && !currentLarge && !edge) || 
-				Rectangle::Contains(al.x + scroll_location.x, al.y + scroll_location.y, w, h, nl.x, nl.y, ns.width, ns.height)) {
+				Rectangle::Contains(al.x + slocation.x, al.y + slocation.y, w, h, nl.x, nl.y, ns.width, ns.height)) {
 			//scrollComponentToVisible(next);
 		} else {
 			if (!scrollOutOfBounds) {
@@ -231,9 +231,9 @@ jsize_t Container::GetScrollDimension()
 
 Component * Container::GetTargetComponent(Container *target, int x, int y, int *dx, int *dy)
 {
-	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	jpoint_t slocation = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?slocation.x:0,
+			scrolly = (IsScrollableY() == true)?slocation.y:0;
 
 	if ((void *)dx != NULL) {
 		*dx = x;
@@ -449,9 +449,9 @@ void Container::Paint(Graphics *g)
 
   // std::lock_guard<std::mutex> guard(_container_mutex);
 
-	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
+	jpoint_t slocation = GetScrollLocation();
+	int scrollx = (IsScrollableX() == true)?slocation.x:0,
+			scrolly = (IsScrollableY() == true)?slocation.y:0;
 	jregion_t clip = g->GetClip();
 
 	Component::Paint(g);
@@ -525,11 +525,11 @@ void Container::Paint(Graphics *g)
 
 void Container::Repaint(Component *cmp)
 {
-	Invalidate();
-
-	if (_is_ignore_repaint == true) {
+	if (IsIgnoreRepaint() == true || IsVisible() == false) {
 		return;
 	}
+
+	Invalidate();
 
 	if (_parent != NULL) {
 		_parent->Repaint((cmp == NULL)?this:cmp);
@@ -826,23 +826,23 @@ bool Container::MousePressed(jevent::MouseEvent *event)
 		return true;
 	}
 
-	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-	int mousex = event->GetX(),
-			mousey = event->GetY();
-	int dx,
-			dy;
+	jpoint_t 
+    elocation = event->GetLocation();
+  int
+    dx,
+		dy;
 
-	Component *c = GetTargetComponent(this, mousex, mousey, &dx, &dy);
+	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
 	if (c != NULL && c != this) {
-		jevent::MouseEvent e = *event;
+    jgui::jpoint_t 
+      slocation = GetScrollLocation();
+		jevent::MouseEvent 
+      event1 = *event;
 
-		e.SetX(dx+scrollx);
-		e.SetY(dy+scrolly);
+		event1.SetLocation(dx + slocation.x, dy + slocation.y);
 
-		return c->MousePressed(&e);
+		return c->MousePressed(&event1);
 	}
 
 	return false;
@@ -854,23 +854,23 @@ bool Container::MouseReleased(jevent::MouseEvent *event)
 		return true;
 	}
 
-	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-	int mousex = event->GetX(),
-			mousey = event->GetY();
-	int dx,
-			dy;
+  jgui::jpoint_t
+    elocation = event->GetLocation();
+	int 
+    dx,
+		dy;
 
-	Component *c = GetTargetComponent(this, mousex, mousey, &dx, &dy);
+	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
 	if (c != NULL && c != this) {
-		jevent::MouseEvent e = *event;
+    jgui::jpoint_t 
+      slocation = GetScrollLocation();
+		jevent::MouseEvent 
+      event1 = *event;
 
-		e.SetX(dx+scrollx);
-		e.SetY(dy+scrolly);
+		event1.SetLocation(dx + slocation.x, dy + slocation.y);
 
-		return c->MouseReleased(&e);
+		return c->MouseReleased(&event1);
 	}
 
 	return false;
@@ -882,23 +882,23 @@ bool Container::MouseMoved(jevent::MouseEvent *event)
 		return true;
 	}
 
-	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-	int mousex = event->GetX(),
-			mousey = event->GetY();
-	int dx,
-			dy;
+  jgui::jpoint_t
+    elocation = event->GetLocation();
+	int 
+	  dx,
+	  dy;
 
-	Component *c = GetTargetComponent(this, mousex, mousey, &dx, &dy);
+	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
 	if (c != NULL && c != this) {
-		jevent::MouseEvent e = *event;
+    jgui::jpoint_t 
+      slocation = GetScrollLocation();
+		jevent::MouseEvent 
+      event1 = *event;
 
-		e.SetX(dx+scrollx);
-		e.SetY(dy+scrolly);
+		event1.SetLocation(dx + slocation.x, dy + slocation.y);
 
-		return c->MouseMoved(&e);
+		return c->MouseMoved(&event1);
 	}
 
 	return false;
@@ -910,23 +910,23 @@ bool Container::MouseWheel(jevent::MouseEvent *event)
 		return true;
 	}
 
-	jpoint_t scroll_location = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?scroll_location.x:0,
-			scrolly = (IsScrollableY() == true)?scroll_location.y:0;
-	int mousex = event->GetX(),
-			mousey = event->GetY();
-	int dx,
-			dy;
+  jgui::jpoint_t
+    elocation = event->GetLocation();
+  int
+	  dx,
+		dy;
 
-	Component *c = GetTargetComponent(this, mousex, mousey, &dx, &dy);
+	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
 	if (c != NULL && c != this) {
-    jevent::MouseEvent e = *event;
+    jgui::jpoint_t 
+      slocation = GetScrollLocation();
+    jevent::MouseEvent 
+      event1 = *event;
 
-		e.SetX(dx+scrollx);
-		e.SetY(dy+scrolly);
+		event1.SetLocation(dx + slocation.x, dy + slocation.y);
 
-		return c->MouseWheel(&e);
+		return c->MouseWheel(&event1);
 	}
 
 	return false;

@@ -23,6 +23,8 @@
 #include "jexception/jnullpointerexception.h"
 #include "jexception/jinvalidargumentexception.h"
 
+#include <thread>
+
 static void NearestNeighborScale(uint32_t *src, uint32_t *dst, int w, int h, int sw, int sh) 
 {
 	int x_ratio = (int)((w << 16)/sw) + 1;
@@ -703,7 +705,7 @@ class BitMaskTeste : public jgui::Window {
 				if (diff < ref_time) {
 					diff = ref_time - diff;
 
-					usleep(diff/1000);
+          std::this_thread::sleep_for(std::chrono::microseconds(diff/1000));
 				}
 			} while (IsHidden() == false);
 		}

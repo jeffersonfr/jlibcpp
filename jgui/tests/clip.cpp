@@ -44,7 +44,7 @@ class RectangleContainer : public jgui::Container {
 			g->DrawRectangle(0, 0, size.width, size.height);
 		}
 
-		virtual std::string what()
+		virtual std::string What()
 		{
 			return "RC:: ";
 		}

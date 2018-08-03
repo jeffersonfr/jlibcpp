@@ -466,7 +466,7 @@ SocketOptions * DatagramSocket6::GetSocketOptions()
 	return new SocketOptions(_fd, JCT_UDP);
 }
 
-std::string DatagramSocket6::what()
+std::string DatagramSocket6::What()
 {
 	char port[20];
    

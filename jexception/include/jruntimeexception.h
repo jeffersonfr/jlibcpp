@@ -62,7 +62,7 @@ class RuntimeException : public jexception::Exception, public std::runtime_error
 		 * \brief
 		 *
 		 */
-		virtual std::string what();
+		virtual std::string What();
 
 };
 

@@ -17,12 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "x11/include/x11application.h"
-#include "x11/include/x11window.h"
+#include "xlib/include/xlibapplication.h"
+#include "xlib/include/xlibwindow.h"
 #include "jgui/jfont.h"
 #include "jgui/jbufferedimage.h"
 #include "jcommon/jproperties.h"
-#include "jcommon/jdate.h"
 #include "jexception/jruntimeexception.h"
 #include "jexception/jillegalargumentexception.h"
 
@@ -53,11 +52,13 @@ static ::Cursor _hidden_cursor;
 /** \brief */
 static ::XEvent _last_key_release_event;
 /** \brief */
+jgui::jregion_t _visible_bounds;
+/** \brief */
 static bool _key_repeat;
 /** \brief */
 static jgui::Image *_icon = NULL;
 /** \brief */
-static uint64_t _last_keypress;
+static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
 /** \brief */
 static int _mouse_x;
 /** \brief */
@@ -393,17 +394,17 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(KeySym symbol)
 
 static jgui::jsize_t _screen = {0, 0};
 
-X11Application::X11Application():
+XlibApplication::XlibApplication():
 	jgui::Application()
 {
-	jcommon::Object::SetClassName("jgui::X11Application");
+	jcommon::Object::SetClassName("jgui::XlibApplication");
 }
 
-X11Application::~X11Application()
+XlibApplication::~XlibApplication()
 {
 }
 
-void X11Application::InternalInitCursors()
+void XlibApplication::InternalInitCursors()
 {
 #define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
 	t.cursor = new BufferedImage(JPF_ARGB, w, h);													\
@@ -446,7 +447,7 @@ void X11Application::InternalInitCursors()
 	// SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
 }
 
-void X11Application::InternalReleaseCursors()
+void XlibApplication::InternalReleaseCursors()
 {
 	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
 		delete i->second.cursor;
@@ -455,7 +456,7 @@ void X11Application::InternalReleaseCursors()
 	_cursors.clear();
 }
 
-void X11Application::InternalInit(int argc, char **argv)
+void XlibApplication::InternalInit(int argc, char **argv)
 {
 	// Open a connection with the X server
 	_display = XOpenDisplay(NULL);
@@ -474,7 +475,7 @@ void X11Application::InternalInit(int argc, char **argv)
 	InternalInitCursors();
 }
 
-void X11Application::InternalPaint()
+void XlibApplication::InternalPaint()
 {
 	if (g_window == NULL || g_window->IsVisible() == false) {
 		return;
@@ -494,11 +495,11 @@ void X11Application::InternalPaint()
 	g->ReleaseClip();
 	g_window->DoLayout();
 	g_window->InvalidateAll();
-  g->SetClip(r.x, r.y, r.width, r.height);
+  g->SetClip(0, 0, r.width, r.height);
   g_window->PaintBackground(g);
   g_window->Paint(g);
   g_window->PaintGlassPane(g);
-	// g->Translate(t.x, t.y);
+	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
@@ -550,7 +551,7 @@ void X11Application::InternalPaint()
 	// INFO:: wait x11 process all events
 	// True:: discards all events remaing
 	// False:: not discards events remaing
-	XSync(_display, True);
+	// XSync(_display, True);
 }
 
 // Filter the events received by windows (only allow those matching a specific window)
@@ -560,7 +561,7 @@ static Bool check_x11_event(Display*, XEvent* event, XPointer userData)
 	return event->xany.window == reinterpret_cast<::Window>(userData);
 }
 
-void X11Application::InternalLoop()
+void XlibApplication::InternalLoop()
 {
 	XEvent event;
   bool quitting = false;
@@ -573,9 +574,7 @@ void X11Application::InternalLoop()
   //   - Discard both duplicated KeyPress and KeyRelease events when EnableKeyRepeat is false
   
 	while (quitting == false) {
-    // INFO:: process api events
-    // TODO:: ver isso melhor, pq o PushEvent + GrabEvent (com mutex descomentado) causa dead-lock no sistema
-    std::vector<jevent::EventObject *> &events = GrabEvents();
+    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
 
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
@@ -630,12 +629,16 @@ void X11Application::InternalLoop()
       } else if (event.type == FocusIn) {
       } else if (event.type == FocusOut) {
       } else if (event.type == ConfigureNotify) {
+        _visible_bounds.x = event.xconfigure.x;
+        _visible_bounds.y = event.xconfigure.y;
+        _visible_bounds.width = event.xconfigure.width;
+        _visible_bounds.height = event.xconfigure.height;
+
         InternalPaint();
         
         g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_RESIZED));
       } else if (event.type == ClientMessage) {
       } else if (event.type == KeyPress || event.type == KeyRelease) {
-        /*
         if (event.xkey.keycode < 256) {
           // To detect if it is a repeated key event, we check the current state of the key.
           // - If the state is "down", KeyReleased events must obviously be discarded.
@@ -656,11 +659,10 @@ void X11Application::InternalLoop()
             // KeyPress event + key repeat disabled + matching KeyRelease event = repeated event --> discard
             if ((event.type == KeyPress) && !_key_repeat &&
                 (_last_key_release_event.xkey.keycode == event.xkey.keycode) && (_last_key_release_event.xkey.time == event.xkey.time)) {
-              continue;
+              // continue;
             }
           }
         }
-        */
 
         jevent::jkeyevent_type_t type;
         jevent::jkeyevent_modifiers_t mod;
@@ -702,8 +704,8 @@ void X11Application::InternalLoop()
 
         g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
       } else if (event.type == ButtonPress || event.type == ButtonRelease || event.type == MotionNotify) {
-        jevent::jmouseevent_button_t button = jevent::JMB_UNKNOWN;
-        jevent::jmouseevent_button_t buttons = jevent::JMB_UNKNOWN;
+        jevent::jmouseevent_button_t button = jevent::JMB_NONE;
+        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
         jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
         int mouse_z = 0;
 
@@ -747,13 +749,15 @@ void X11Application::InternalLoop()
           }
 
           if (type == jevent::JMT_PRESSED) {
-            if ((jcommon::Date::CurrentTimeMillis() - _last_keypress) < 200L) {
+            auto current = std::chrono::steady_clock::now();
+            
+            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
               _click_count = _click_count + 1;
             } else {
-              _click_count = 1;
+            	_click_count = 1;
             }
 
-            _last_keypress = jcommon::Date::CurrentTimeMillis();
+            _last_keypress = current;
 
             mouse_z = _click_count;
           }
@@ -782,20 +786,23 @@ void X11Application::InternalLoop()
   XDestroyWindow(_display, _window);
   XFlush(_display);
   XSync(_display, False);
+	XCloseDisplay(_display);
 
   _window = NULL;
+
+  g_window->GrabEvents();
 }
 
-void X11Application::InternalQuit()
+void XlibApplication::InternalQuit()
 {
 	XCloseDisplay(_display);
 	InternalReleaseCursors();
 }
 
-X11Window::X11Window(int x, int y, int width, int height):
+XlibWindow::XlibWindow(int x, int y, int width, int height):
 	jgui::Window(dynamic_cast<Window *>(this))
 {
-	jcommon::Object::SetClassName("jgui::X11Window");
+	jcommon::Object::SetClassName("jgui::XlibWindow");
 
 	if (_window != NULL) {
 		throw jexception::RuntimeException("Cannot create more than one window");
@@ -806,12 +813,8 @@ X11Window::X11Window(int x, int y, int width, int height):
 	_window = NULL;
 	_mouse_x = 0;
 	_mouse_y = 0;
-	_last_keypress = 0LL;
+	_last_keypress = std::chrono::steady_clock::now();
 	_click_count = 1;
-  _location.x = x;
-  _location.y = y;
-  _size.width = width;
-  _size.height = height;
 
 	XSetWindowAttributes attr;
 
@@ -824,10 +827,10 @@ X11Window::X11Window(int x, int y, int width, int height):
 	_window = XCreateWindow(
 			_display, 
 			XRootWindow(_display, screen), 
-			_location.x, 
-			_location.y, 
-			_size.width, 
-			_size.height, 
+			x, 
+			y, 
+			width, 
+			height, 
 			0, 
 			DefaultDepth(_display, screen), 
 			InputOutput, 
@@ -898,20 +901,25 @@ X11Window::X11Window(int x, int y, int width, int height):
 	XSetWMNormalHints(_display, _window, &sizeHints); 
 	*/
 
-	XMapWindow(_display, _window);
-
 	XSelectInput(
 			_display, _window, ExposureMask | EnterNotify | LeaveNotify | KeyPress | KeyRelease | ButtonPress | ButtonRelease | MotionNotify | PointerMotionMask | StructureNotifyMask | SubstructureNotifyMask
 	);
+
+  _visible_bounds.x = x;
+  _visible_bounds.y = y;
+  _visible_bounds.width = width;
+  _visible_bounds.height = height;
+
+	XMapWindow(_display, _window);
 }
 
-X11Window::~X11Window()
+XlibWindow::~XlibWindow()
 {
   delete g_window;
   g_window = NULL;
 }
 
-void X11Window::ToggleFullScreen()
+void XlibWindow::ToggleFullScreen()
 {
     /*
        if (_need_destroy == true) {
@@ -957,7 +965,7 @@ void X11Window::ToggleFullScreen()
   Repaint();
 }
 
-void X11Window::SetParent(jgui::Container *c)
+void XlibWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
@@ -972,31 +980,33 @@ void X11Window::SetParent(jgui::Container *c)
   g_window->SetParent(NULL);
 }
 
-void X11Window::SetTitle(std::string title)
+void XlibWindow::SetTitle(std::string title)
 {
 	_title = title;
 		
   // TODO:: _window->setTitle(_title.c_str());
 }
 
-std::string X11Window::GetTitle()
+std::string XlibWindow::GetTitle()
 {
 	return _title;
 }
 
-void X11Window::SetOpacity(float opacity)
+void XlibWindow::SetOpacity(float opacity)
 {
   _opacity = opacity;
 }
 
-float X11Window::GetOpacity()
+float XlibWindow::GetOpacity()
 {
   return _opacity;
 }
 
-void X11Window::SetUndecorated(bool undecorated)
+void XlibWindow::SetUndecorated(bool undecorated)
 {
 	_undecorated = undecorated;
+  
+  // XSetWindowBorderWidth()
 
 	// Set the window's style (tell the windows manager to change our window's 
 	// decorations and functions according to the requested style)
@@ -1049,12 +1059,12 @@ void X11Window::SetUndecorated(bool undecorated)
 	}
 }
 
-bool X11Window::IsUndecorated()
+bool XlibWindow::IsUndecorated()
 {
   return _undecorated;
 }
 
-void X11Window::SetVisible(bool visible)
+void XlibWindow::SetVisible(bool visible)
 {
   _visible = visible;
 
@@ -1066,42 +1076,37 @@ void X11Window::SetVisible(bool visible)
   }
 }
 
-bool X11Window::IsVisible()
+bool XlibWindow::IsVisible()
 {
   return _visible;
 }
 		
-void X11Window::SetBounds(int x, int y, int width, int height)
+void XlibWindow::SetBounds(int x, int y, int width, int height)
 {
 	XMoveResizeWindow(_display, _window, x, y, width, height);
 }
 
-void X11Window::SetLocation(int x, int y)
+jgui::jregion_t XlibWindow::GetVisibleBounds()
 {
-	XMoveWindow(_display, _window, x, y);
+	return {
+    .x = _visible_bounds.x,
+    .y = _visible_bounds.y,
+    .width = _visible_bounds.width,
+    .height = _visible_bounds.height,
+  };
 }
 
-void X11Window::SetResizable(bool resizable)
+void XlibWindow::SetResizable(bool resizable)
 {
   _resizable = resizable;
 }
 
-bool X11Window::IsResizable()
+bool XlibWindow::IsResizable()
 {
   return _resizable;
 }
 
-void X11Window::SetSize(int width, int height)
-{
-	XResizeWindow(_display, _window, width, height);
-}
-
-void X11Window::Move(int x, int y)
-{
-	XMoveWindow(_display, _window, x, y);
-}
-
-void X11Window::SetCursorLocation(int x, int y)
+void XlibWindow::SetCursorLocation(int x, int y)
 {
 	if (x < 0) {
 		x = 0;
@@ -1124,7 +1129,7 @@ void X11Window::SetCursorLocation(int x, int y)
 	XFlush(_display);
 }
 
-jpoint_t X11Window::GetCursorLocation()
+jpoint_t XlibWindow::GetCursorLocation()
 {
 	jpoint_t t;
 
@@ -1138,7 +1143,7 @@ jpoint_t X11Window::GetCursorLocation()
 	return t;
 }
 
-void X11Window::SetCursorEnabled(bool enabled)
+void XlibWindow::SetCursorEnabled(bool enabled)
 {
   _cursor_enabled = enabled;
 
@@ -1146,17 +1151,17 @@ void X11Window::SetCursorEnabled(bool enabled)
 	// XFlush(_display);
 }
 
-bool X11Window::IsCursorEnabled()
+bool XlibWindow::IsCursorEnabled()
 {
 	return _cursor_enabled;
 }
 
-void X11Window::SetCursor(jcursor_style_t style)
+void XlibWindow::SetCursor(jcursor_style_t style)
 {
 	SetCursor(_cursors[_cursor_style].cursor, _cursors[_cursor_style].hot_x, _cursors[_cursor_style].hot_y);
 }
 
-void X11Window::SetCursor(Image *shape, int hotx, int hoty)
+void XlibWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
 	if ((void *)shape == NULL) {
 		return;
@@ -1214,43 +1219,23 @@ void X11Window::SetCursor(Image *shape, int hotx, int hoty)
 	*/
 }
 
-void X11Window::SetRotation(jwindow_rotation_t t)
+void XlibWindow::SetRotation(jwindow_rotation_t t)
 {
 }
 
-jwindow_rotation_t X11Window::GetRotation()
+jwindow_rotation_t XlibWindow::GetRotation()
 {
 	return jgui::JWR_NONE;
 }
 
-void X11Window::SetIcon(jgui::Image *image)
+void XlibWindow::SetIcon(jgui::Image *image)
 {
   _icon = image;
 }
 
-jgui::Image * X11Window::GetIcon()
+jgui::Image * XlibWindow::GetIcon()
 {
   return _icon;
 }
 
-jpoint_t X11Window::GetLocation()
-{
-	jgui::jpoint_t t;
-
-  t.x = _location.x;
-  t.y = _location.y;
-
-	return t;
-}
-		
-jsize_t X11Window::GetSize()
-{
-	jgui::jsize_t t;
-
-  t.width = _size.width;
-  t.height = _size.height;
-
-	return t;
-}
-		
 }

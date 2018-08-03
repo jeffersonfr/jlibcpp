@@ -20,6 +20,7 @@
 #include "jshared/jsharedmemory.h"
 
 #include <iostream>
+#include <thread>
 
 #include <stdlib.h>
 
@@ -47,7 +48,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	sleep(5);
+  std::this_thread::sleep_for(std::chrono::seconds((10)));
 
 	return 0;
 }

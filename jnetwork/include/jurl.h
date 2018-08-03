@@ -193,7 +193,7 @@ class URL : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual std::string what();
+		virtual std::string What();
 };
 
 }

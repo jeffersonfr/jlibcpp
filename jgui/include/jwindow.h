@@ -86,6 +86,8 @@ class Window : public jgui::Container {
 
 	private:
 		/** \brief */
+    std::vector<jevent::EventObject *> _window_events;
+		/** \brief */
 	  std::vector<jevent::KeyListener *> _key_listeners;
 		/** \brief */
 	  std::vector<jevent::MouseListener *> _mouse_listeners;
@@ -95,6 +97,10 @@ class Window : public jgui::Container {
 		std::vector<struct frame_subtitle_t> _subtitles;
 		/** \brief */
 		std::thread _exec_thread;
+		/** \brief */
+ 	  std::mutex _event_mutex;
+		/** \brief */
+ 	  std::condition_variable _event_condition;
 		/** \brief */
  	  std::mutex _key_listener_mutex;
 		/** \brief */
@@ -223,12 +229,6 @@ class Window : public jgui::Container {
 		 * \brief
 		 *
 		 */
-		virtual bool IsHidden();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetResizable(bool b);
 
 		/**
@@ -259,19 +259,7 @@ class Window : public jgui::Container {
 		 * \brief
 		 *
 		 */
-		virtual void SetLocation(int x, int y);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetSize(int width, int height);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Move(int x, int y);
+		virtual jgui::jregion_t GetVisibleBounds();
 
 		/**
 		 * \brief
@@ -350,6 +338,18 @@ class Window : public jgui::Container {
 		 *
 		 */
 		virtual jwindow_rotation_t GetRotation();
+
+		/**
+		 * \brief
+		 *
+		 */
+    virtual void PushEvent(jevent::EventObject *event);
+
+		/**
+		 * \brief
+		 *
+		 */
+    virtual std::vector<jevent::EventObject *> GrabEvents();
 
 		/**
 		 * \brief

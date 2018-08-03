@@ -269,11 +269,6 @@ class Main : public jgui::Window {
 		{
 			jgui::jsize_t
 				size = GetSize();
-      jgui::jinsets_t
-        insets = GetInsets();
-			int 
-				dx = insets.left,
-				dy = insets.top;
 			char tmp[255];
 
 			if (foffscreen == NULL) {
@@ -285,10 +280,8 @@ class Main : public jgui::Window {
 
 				jgui::Window::Paint(goff);
 
-				// TODO:: pega a fonte do theme
-        // goff->SetFont(jgui::Font::GetDefaultFont());
 				goff->SetColor(0x00, 0x00, 0x00, 0xff);
-				goff->DrawString(tmp, insets.left, size.height - 50);
+				goff->DrawString(tmp, 0, size.height - 50);
 
 				goff->SetFont(fweights);
 
@@ -296,9 +289,9 @@ class Main : public jgui::Window {
 					sprintf(tmp, "%d", board[i].value);
 
 					goff->SetColor(0x00, 0x00, 0x00, 0xff);
-					goff->FillRectangle(dx+board[i].x*(BLOCK_WIDTH+BLOCK_GAP), dy+board[i].y*(BLOCK_HEIGHT+BLOCK_GAP), BLOCK_WIDTH, BLOCK_HEIGHT);
+					goff->FillRectangle(board[i].x*(BLOCK_WIDTH+BLOCK_GAP), board[i].y*(BLOCK_HEIGHT+BLOCK_GAP), BLOCK_WIDTH, BLOCK_HEIGHT);
 					goff->SetColor(0xf0, 0xf0, 0xf0, 0xff);
-					goff->DrawString(tmp, dx+board[i].x*(BLOCK_WIDTH+BLOCK_GAP), dy+board[i].y*(BLOCK_HEIGHT+BLOCK_GAP));
+					goff->DrawString(tmp, board[i].x*(BLOCK_WIDTH+BLOCK_GAP), board[i].y*(BLOCK_HEIGHT+BLOCK_GAP));
 				}
 			}
 
@@ -308,7 +301,7 @@ class Main : public jgui::Window {
 				sprintf(tmp, "%d", board[i].value);
 
 				g->SetColor(board[i].phr, 0x00, 0x00, 0x80);
-				g->FillRectangle(dx+board[i].x*(BLOCK_WIDTH+BLOCK_GAP), dy+board[i].y*(BLOCK_HEIGHT+BLOCK_GAP), BLOCK_WIDTH, BLOCK_HEIGHT);
+				g->FillRectangle(board[i].x*(BLOCK_WIDTH+BLOCK_GAP), board[i].y*(BLOCK_HEIGHT+BLOCK_GAP), BLOCK_WIDTH, BLOCK_HEIGHT);
 			}
 
 #if DRAW_ANTS == 1
@@ -316,10 +309,10 @@ class Main : public jgui::Window {
 
 			for (int j=0; j<K_ANTS; j++) {
 				for (int i=1; i<MAX_COLS; i++) {
-					g->DrawLine(dx+try_solutions[j*MAX_COLS+i-1].x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
-						dy+try_solutions[j*MAX_COLS+i-1].y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2, 
-						dx+try_solutions[j*MAX_COLS+i].x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
-						dy+try_solutions[j*MAX_COLS+i].y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2);
+					g->DrawLine(try_solutions[j*MAX_COLS+i-1].x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
+						try_solutions[j*MAX_COLS+i-1].y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2, 
+						try_solutions[j*MAX_COLS+i].x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
+						try_solutions[j*MAX_COLS+i].y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2);
 				}
 			}
 #endif
@@ -327,10 +320,10 @@ class Main : public jgui::Window {
 			g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
 			for (int i=1; i<MAX_COLS; i++) {
-				g->DrawLine(dx+solution[i-1]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
-					dy+solution[i-1]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2, 
-					dx+solution[i]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
-					dy+solution[i]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2);
+				g->DrawLine(solution[i-1]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
+					solution[i-1]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2, 
+					solution[i]->x*(BLOCK_WIDTH+BLOCK_GAP)+BLOCK_WIDTH/2, 
+					solution[i]->y*(BLOCK_HEIGHT+BLOCK_GAP)+BLOCK_HEIGHT/2);
 			}
 		}
 #endif

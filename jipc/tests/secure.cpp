@@ -47,7 +47,7 @@ class Callback : public jipc::RemoteCallListener {
 			
 			response->SetBooleanParam("self", false);
 
-			std::cout << "Server receive [" << method->what() << "]" << std::endl;
+			std::cout << "Server receive [" << method->What() << "]" << std::endl;
 
 			if (method->GetName() == "quit") {
 				alive = false;
@@ -55,7 +55,7 @@ class Callback : public jipc::RemoteCallListener {
 				response->SetBooleanParam("self", true);
 			}
 
-			std::cout << "Server response [" << response->what() << "]" << std::endl;
+			std::cout << "Server response [" << response->What() << "]" << std::endl;
 
 			return response;
 		}
@@ -103,11 +103,11 @@ void client(std::string ip, int port, jipc::Method *method)
 	jipc::SecureIPCClient client(context, ip, port);
 	jipc::Response *response = NULL;
 
-	std::cout << "Client request [" << method->what() << "]" << std::endl;
+	std::cout << "Client request [" << method->What() << "]" << std::endl;
 
 	client.CallMethod(method, &response);
 
-	std::cout << "Server response [" << response->what() << "]" << std::endl;
+	std::cout << "Server response [" << response->What() << "]" << std::endl;
 
 	delete context;
 }

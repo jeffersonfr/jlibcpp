@@ -19,6 +19,8 @@
  ***************************************************************************/
 #include "jcommon/jsystem.h"
 
+#include <thread>
+
 #include <stdio.h>
 #include <unistd.h>
 
@@ -119,7 +121,7 @@ int main(int argc, char **argv)
 
 			jcommon::System::Beep((int)freq, DEFAULT_DELAY);
 
-			usleep(1000*DEFAULT_DELAY);
+      std::this_thread::sleep_for(std::chrono::milliseconds(DEFAULT_DELAY));
 		}
 	}
 

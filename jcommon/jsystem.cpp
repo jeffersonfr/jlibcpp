@@ -21,6 +21,7 @@
 #include "jexception/jsystemexception.h"
 
 #include <sstream>
+#include <thread>
 
 #include <sys/ioctl.h>
 #include <sys/vfs.h>
@@ -85,7 +86,8 @@ void System::Beep(int freq, int delay)
 		return;
 	}
 
-	usleep(1000*delay);
+  std::this_thread::sleep_for(std::chrono::milliseconds(delay));
+
 	ioctl(console, KIOCSOUND, 0);
 	close(console);
 	

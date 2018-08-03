@@ -67,7 +67,6 @@ ifeq ($(ENABLE_GRAPHICS),sfml2)
 	CCFLAGS 	+= \
 
 	LDFLAGS		+= \
-     `pkg-config --libs alsa` \
 		 -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio \
      -ljpeg \
 
@@ -84,21 +83,41 @@ ifeq ($(ENABLE_GRAPHICS),sfml2)
 
 endif
 
-ifeq ($(ENABLE_GRAPHICS),x11)
+ifeq ($(ENABLE_GRAPHICS),xlib)
 	CCFLAGS 	+= \
 
 	LDFLAGS		+= \
-     `pkg-config --libs x11 alsa` \
+     `pkg-config --libs x11` \
      -ljpeg \
 
 	DEFINES		+= \
-		 -DX11_UI \
+		 -DXLIB_UI \
 
 	REQUIRES	+= \
 
 	OBJS_gfx	+= \
 		 $(GENERIC_OBJS)\
-		 x11application.o\
+		 xlibapplication.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),xcb)
+	CCFLAGS 	+= \
+
+	LDFLAGS		+= \
+     `pkg-config --libs xcb` \
+     -ljpeg \
+
+	DEFINES		+= \
+		 -DXCB_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 xcbapplication.o\
 
 	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
@@ -109,7 +128,7 @@ ifeq ($(ENABLE_GRAPHICS),gtk3)
 		 `pkg-config --cflags gtk+-3.0` \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs gtk+-3.0 alsa` \
+		 `pkg-config --libs gtk+-3.0` \
 		 -ljpeg \
 
 	DEFINES		+= \
@@ -130,7 +149,7 @@ ifeq ($(ENABLE_GRAPHICS),allegro5)
 		 `pkg-config --cflags allegro-5 allegro_video-5 allegro_main-5` \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs allegro-5 allegro_video-5 allegro_main-5 alsa` \
+		 `pkg-config --libs allegro-5 allegro_video-5 allegro_main-5` \
 		 -ljpeg \
 
 	DEFINES		+= \

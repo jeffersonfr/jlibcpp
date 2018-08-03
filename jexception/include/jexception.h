@@ -118,7 +118,7 @@ class Exception : public virtual jcommon::Object, std::exception {
 		 * \brief
 		 *
 		 */
-		virtual std::string what();
+		virtual std::string What();
 };
 
 }

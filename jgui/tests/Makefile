@@ -93,9 +93,6 @@ OBJS_rotateimage = \
 OBJS_sort = \
 		sort.o\
 
-OBJS_stock = \
-		stock.o\
-
 OBJS_noise = \
 		noise.o\
 
@@ -144,10 +141,10 @@ OBJS_coloralpha = \
 OBJS_bitmask = \
 		bitmask.o\
 
-OBJS_mmx = \
-		mmx.o\
+OBJS_widgets = \
+		widgets.o\
 
-all: primitives border ball breakout raycaster_flat skull raycaster_texture clip custom calc mines ants swarm cube mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort stock noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask mmx 
+all: primitives border ball breakout raycaster_flat skull raycaster_texture clip custom calc mines ants swarm cube mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets
 	
 primitives: $(OBJS_primitives)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -230,9 +227,6 @@ rotateimage: $(OBJS_rotateimage)
 sort: $(OBJS_sort)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-stock: $(OBJS_stock)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-        
 noise: $(OBJS_noise)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
@@ -284,7 +278,7 @@ bitmask: $(OBJS_bitmask)
 room: room.o
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-mmx: mmx.o
+widgets: widgets.o
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
@@ -294,4 +288,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som stock events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask mmx 
+	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets

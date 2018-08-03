@@ -22,7 +22,6 @@
 #include "jgui/jfont.h"
 #include "jgui/jbufferedimage.h"
 #include "jcommon/jproperties.h"
-#include "jcommon/jdate.h"
 #include "jexception/jruntimeexception.h"
 #include "jexception/jillegalargumentexception.h"
 
@@ -57,7 +56,7 @@ static ALLEGRO_MOUSE_CURSOR *_cursor_bitmap;
 /** \brief */
 static jgui::Image *_icon = NULL;
 /** \brief */
-static uint64_t _last_keypress;
+static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
 /** \brief */
 static int _mouse_x;
 /** \brief */
@@ -433,11 +432,11 @@ void Allegro5Application::InternalPaint()
 	g->ReleaseClip();
 	g_window->DoLayout();
 	g_window->InvalidateAll();
-  g->SetClip(r.x, r.y, r.width, r.height);
+  g->SetClip(0, 0, r.width, r.height);
   g_window->PaintBackground(g);
   g_window->Paint(g);
   g_window->PaintGlassPane(g);
-	// g->Translate(t.x, t.y);
+	g->Translate(t.x, t.y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
@@ -480,6 +479,7 @@ void Allegro5Application::InternalPaint()
 	al_clear_to_color(al_map_rgb(0, 0, 0));
 	al_draw_bitmap(_surface, 0, 0, 0);
 	al_flip_display();
+  // al_wait_for_vsync();
 	
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
@@ -499,9 +499,7 @@ void Allegro5Application::InternalLoop()
 	al_register_event_source(queue, &_user_event);
 
 	while (quitting == false) {
-    // INFO:: process api events
-    // TODO:: ver isso melhor, pq o PushEvent + GrabEvent (com mutex descomentado) causa dead-lock no sistema
-    std::vector<jevent::EventObject *> &events = GrabEvents();
+    std::vector<jevent::EventObject *> events = g_window->GrabEvents();
 
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
@@ -628,11 +626,19 @@ void Allegro5Application::InternalLoop()
         type = jevent::JMT_MOVED;
       } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN || event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
         if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN) {
-          _mouse_buttons[event.mouse.button-1] = true;
+          if (_mouse_buttons[event.mouse.button - 1] == true) {
+            continue;
+          }
+
+          _mouse_buttons[event.mouse.button - 1] = true;
 
           type = jevent::JMT_PRESSED;
         } else if (event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP) {
-          _mouse_buttons[event.mouse.button-1] = false;
+          if (_mouse_buttons[event.mouse.button - 1] == false) {
+            continue;
+          }
+
+          _mouse_buttons[event.mouse.button - 1] = false;
 
           type = jevent::JMT_RELEASED;
         }
@@ -648,15 +654,17 @@ void Allegro5Application::InternalLoop()
         // _click_count = 1;
 
         if (type == jevent::JMT_PRESSED) {
-          if ((jcommon::Date::CurrentTimeMillis() - _last_keypress) < 200L) {
+          auto current = std::chrono::steady_clock::now();
+
+          if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
             _click_count = _click_count + 1;
           } else {
             _click_count = 1;
           }
 
-          _last_keypress = jcommon::Date::CurrentTimeMillis();
+          _last_keypress = current;
 
-          mouse_z = _click_count;
+          mouse_z = _click_count % 200;
         }
       } else if (event.type == ALLEGRO_EVENT_MOUSE_WARPED) {
         type = jevent::JMT_ROTATED;
@@ -682,6 +690,8 @@ void Allegro5Application::InternalLoop()
   }
 
   al_destroy_event_queue(queue);
+  
+  g_window->GrabEvents();
 }
 
 void Allegro5Application::InternalQuit()
@@ -703,19 +713,14 @@ Allegro5Window::Allegro5Window(int x, int y, int width, int height):
 	_surface = NULL;
 	_mouse_x = 0;
 	_mouse_y = 0;
-	_last_keypress = 0LL;
+	_last_keypress = std::chrono::steady_clock::now();
 	_click_count = 1;
-  _location.x = x;
-  _location.y = y;
-  _size.width = width;
-  _size.height = height;
 
-	al_set_new_window_position(_location.x, _location.y);
-
+	al_set_new_window_position(x, y);
 	al_set_new_display_option(ALLEGRO_UPDATE_DISPLAY_REGION, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
 	al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
 
-	_display = al_create_display(_size.width, _size.height);
+	_display = al_create_display(width, height);
 
 	if (_display == NULL) {
 		throw jexception::RuntimeException("Cannot create a window");
@@ -726,7 +731,7 @@ Allegro5Window::Allegro5Window(int x, int y, int width, int height):
 	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
 	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
 
-	_surface = al_create_bitmap(_size.width, _size.height);
+	_surface = al_create_bitmap(width, height);
 	
 	if (_surface == NULL) {
 		throw jexception::RuntimeException("Cannot get a window's surface");
@@ -776,6 +781,8 @@ void Allegro5Window::SetParent(jgui::Container *c)
 void Allegro5Window::SetTitle(std::string title)
 {
   _title = title;
+
+  al_set_window_title(_display, title.c_str());
 }
 
 std::string Allegro5Window::GetTitle()
@@ -824,15 +831,22 @@ bool Allegro5Window::IsVisible()
 		
 void Allegro5Window::SetBounds(int x, int y, int width, int height)
 {
-	al_set_window_position(_display, _location.x, _location.y);
-	al_resize_display(_display, _size.width, _size.height);
+	al_set_window_position(_display, x, y);
+	al_resize_display(_display, width, height);
 }
 
-void Allegro5Window::SetLocation(int x, int y)
+jgui::jregion_t Allegro5Window::GetVisibleBounds()
 {
-	al_set_window_position(_display, _location.x, _location.y);
-}
+	jgui::jregion_t t;
 
+  t.width = al_get_bitmap_width(_surface);
+  t.height = al_get_bitmap_height(_surface);
+
+	al_get_window_position(_display, &t.x, &t.y);
+
+	return t;
+}
+		
 void Allegro5Window::SetResizable(bool resizable)
 {
   _resizable = resizable;
@@ -841,16 +855,6 @@ void Allegro5Window::SetResizable(bool resizable)
 bool Allegro5Window::IsResizable()
 {
   return _resizable;
-}
-
-void Allegro5Window::SetSize(int width, int height)
-{
-	al_resize_display(_display, width, height);
-}
-
-void Allegro5Window::Move(int x, int y)
-{
-	al_set_window_position(_display, x, y);
 }
 
 void Allegro5Window::SetCursorLocation(int x, int y)
@@ -970,24 +974,4 @@ jgui::Image * Allegro5Window::GetIcon()
   return _icon;
 }
 
-jpoint_t Allegro5Window::GetLocation()
-{
-	jgui::jpoint_t t;
-
-  t.x = 0;
-  t.y = 0;
-
-	return t;
-}
-		
-jsize_t Allegro5Window::GetSize()
-{
-	jgui::jsize_t t;
-
-  t.width = 100;
-  t.height = 100;
-
-	return t;
-}
-		
 }

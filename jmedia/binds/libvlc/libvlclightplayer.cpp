@@ -201,9 +201,12 @@ class PlayerComponentImpl : public jgui::Component {
 		{
 			jgui::Component::Paint(g);
 
+      jgui::jsize_t
+        size = GetSize();
+
 			_mutex.lock();
 
-			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, _size.width, _size.height);
+			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
 				
 			_mutex.unlock();
 		}
@@ -612,7 +615,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 					break;
 				}
 
-				usleep(100000);
+        std::this_thread::sleep_for(std::chrono::milliseconds((100)));
 			}
 
 			libvlc_media_player_stop(_provider);

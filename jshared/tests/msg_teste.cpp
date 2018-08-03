@@ -20,6 +20,7 @@
 #include "jshared/jmessagequeue.h"
 
 #include <iostream>
+#include <thread>
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -59,7 +60,7 @@ void server()
 		
 		std::cout << "ATDT " << req.phone << " " << req.callbk << std::endl;
 
-		sleep(2);
+    std::this_thread::sleep_for(std::chrono::seconds((2)));
 	}
 
 	msqid->Release();

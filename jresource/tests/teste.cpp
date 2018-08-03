@@ -18,7 +18,7 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jresource/jresource.h"
-#include "jresource/jresourcestatusevent.h"
+#include "jevent/jresourcestatusevent.h"
 #include "jexception/jresourceexception.h"
 #include "jexception/jtimeoutexception.h"
 
@@ -61,7 +61,8 @@ class LogDevice : public jresource::Resource {
 		{
 			putchar(c);
 			fflush(stdout);
-			usleep(10000);
+
+      std::this_thread::sleep_for(std::chrono::milliseconds((100)));
 		}
 
 		virtual void Lock()
@@ -78,7 +79,7 @@ class LogDevice : public jresource::Resource {
 
 LogDevice *LogDevice::_instance = new LogDevice();
 
-class TestThread : public jresource::ResourceStatusListener {
+class TestThread : public jevent::ResourceStatusListener {
 
 	private:
     std::thread _thread;
@@ -97,19 +98,19 @@ class TestThread : public jresource::ResourceStatusListener {
       _thread.join();
 		}
 
-		virtual void Released(jresource::ResourceStatusEvent *event)
+		virtual void Released(jevent::ResourceStatusEvent *event)
 		{
 			std::cout << "Released" << std::flush << std::endl;
 		}
 
-		virtual void ReleaseForced(jresource::ResourceStatusEvent *event)
+		virtual void ReleaseForced(jevent::ResourceStatusEvent *event)
 		{
 			std::cout << "Release Forced" << std::flush << std::endl;
 
 			_released = true;
 		}
 
-		virtual bool ReleaseRequested(jresource::ResourceStatusEvent *event)
+		virtual bool ReleaseRequested(jevent::ResourceStatusEvent *event)
 		{
 			std::cout << "Release Requested" << std::flush << std::endl;
 

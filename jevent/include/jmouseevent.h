@@ -21,6 +21,7 @@
 #define J_MOUSEEVENT_H
 
 #include "jevent/jeventobject.h"
+#include "jgui/jgraphics.h"
 
 namespace jevent {
 
@@ -57,17 +58,15 @@ class MouseEvent : public jevent::EventObject {
 
 	private:
 		/** \brief */
-		int _x;
-		/** \brief */
-		int _y;
-		/** \brief */
-		int _click_count;
+    jgui::jpoint_t _location;
 		/** \brief */
 		jmouseevent_button_t _button;
 		/** \brief */
 		jmouseevent_button_t _buttons;
 		/** \brief */
 		jmouseevent_type_t _type;
+		/** \brief */
+		int _click_count;
 
 	public:
 		/**
@@ -110,26 +109,20 @@ class MouseEvent : public jevent::EventObject {
 		 * \brief
 		 *
 		 */
-		virtual int GetX();
+		virtual jgui::jpoint_t GetLocation();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual int GetY();
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetX(int x);
+		virtual void SetLocation(int x, int y);
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetY(int y);
-
+		virtual void SetLocation(jgui::jpoint_t location);
+		
 };
 
 }

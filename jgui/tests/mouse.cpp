@@ -59,15 +59,15 @@ class GraphicsTeste : public jgui::Window {
 		virtual bool MousePressed(jevent::MouseEvent *event)
 		{
       jgui::jpoint_t
-        location = GetLocation();
+        elocation = event->GetLocation();
+			std::vector<jgui::jpoint_t>::iterator 
+        i = points.begin();
+			int 
+        x = (int)((elocation.x/(int)wsize)*wsize),
+				y = (int)((elocation.y/(int)hsize)*hsize);
 
-			cx = event->GetX() - location.x;
-			cy = event->GetY() - location.y;
-
-			int x = (int)((cx/(int)wsize)*wsize),
-					y = (int)((cy/(int)hsize)*hsize);
-
-			std::vector<jgui::jpoint_t>::iterator i=points.begin();
+      cx = elocation.x;
+      cy = elocation.y;
 
 			for (; i!=points.end(); i++) {
 				if ((*i).x == x && (*i).y == y) {
@@ -99,10 +99,10 @@ class GraphicsTeste : public jgui::Window {
 		virtual bool MouseMoved(jevent::MouseEvent *event)
 		{
       jgui::jpoint_t
-        location = GetLocation();
+        elocation = event->GetLocation();
 
-			cx = event->GetX() - location.x;
-			cy = event->GetY() - location.y;
+			cx = elocation.x;
+			cy = elocation.y;
 			
 			Repaint();
 

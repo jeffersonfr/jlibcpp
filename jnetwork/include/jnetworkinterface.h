@@ -235,7 +235,7 @@ class NetworkInterface : public virtual jcommon::Object {
 		 * \brief Returns a string representation of the object.
 		 *
 		 */
-		virtual std::string what();
+		virtual std::string What();
 
 };
 

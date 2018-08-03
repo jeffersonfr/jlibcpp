@@ -52,7 +52,7 @@ class Callback : public jipc::RemoteCallListener {
 				response->SetBooleanParam("self", true);
 			}
 
-			std::cout << method->what() << std::endl;
+			std::cout << method->What() << std::endl;
 
 			return response;
 		}
@@ -84,11 +84,11 @@ void client(std::string id, jipc::Method *method)
 	jipc::LocalIPCClient client(id);
 	jipc::Response *response = NULL;
 
-	std::cout << "Client request [" << method->what() << "]" << std::endl;
+	std::cout << "Client request [" << method->What() << "]" << std::endl;
 
 	client.CallMethod(method, &response);
 
-	std::cout << "Server response [" << response->what() << "]" << std::endl;
+	std::cout << "Server response [" << response->What() << "]" << std::endl;
 }
 
 int main(int argc, char **argv)

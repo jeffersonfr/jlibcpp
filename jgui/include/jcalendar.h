@@ -24,7 +24,6 @@
 #include "jgui/jbutton.h"
 #include "jgui/jspin.h"
 #include "jgui/jlabel.h"
-#include "jcommon/jdate.h"
 #include "jevent/jselectlistener.h"
 #include "jevent/jactionlistener.h"
 

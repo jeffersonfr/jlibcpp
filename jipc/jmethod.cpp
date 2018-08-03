@@ -99,7 +99,7 @@ std::string Method::Encode()
 	return o.str();
 }
 
-std::string Method::what()
+std::string Method::What()
 {
 	std::ostringstream o;
 

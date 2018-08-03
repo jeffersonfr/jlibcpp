@@ -21,13 +21,12 @@
 #include "jnetwork/jlocalserversocket.h"
 #include "jnetwork/jlocalsocket.h"
 #include "jnetwork/jlocaldatagramsocket.h"
-#include "jnetwork/jsocketlib.h"
-#include "jcommon/jdate.h"
+#include "jnetwork/jnetworklib.h"
 #include "jexception/jexception.h"
 
 #include <sstream>
 #include <iostream>
-#include <stdexcept>
+#include <thread>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -35,9 +34,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-class ConnectionTest : public Thread {
+class ConnectionTest {
 
 	private:
+    std::thread _thread;
 		std::string _label;
 
 	public:
@@ -58,21 +58,28 @@ class ConnectionTest : public Thread {
 		{
 		}
 
+    virtual void Start()
+    {
+      _thread = std::thread(&ConnectionTest::Run, this);
+    }
+
 		virtual void Init()
 		{
 			std::cout << "Iniciando server < " << _label << " >" << std::endl;
 
 			Start();
 
-			sleep(1);
+      std::this_thread::sleep_for(std::chrono::seconds((1)));
 
 			std::cout << "Iniciando client" << std::flush;
 
-			uint64_t t1 = jcommon::Date::CurrentTimeMicros();
+      auto start = std::chrono::steady_clock::now();
 
 			InitClient();
-			
-			std::cout << " [ " << (jcommon::Date::CurrentTimeMicros()-t1) << " us ]\n" << std::endl;
+		
+      std::chrono::duration<double> diff = std::chrono::steady_clock::now() - start;
+
+			std::cout << " [ " << diff.count() << "]\n" << std::endl;
 		}
 
 		virtual void Run()

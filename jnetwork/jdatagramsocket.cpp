@@ -469,7 +469,7 @@ SocketOptions * DatagramSocket::GetSocketOptions()
 	return new SocketOptions(_fd, JCT_UDP);
 }
 
-std::string DatagramSocket::what()
+std::string DatagramSocket::What()
 {
 	char port[20];
    

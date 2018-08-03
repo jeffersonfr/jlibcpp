@@ -18,10 +18,11 @@
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
 #include "jnetwork/jdatagramsocket.h"
-#include "jnetwork/jsocketlib.h"
+#include "jnetwork/jnetworklib.h"
 #include "jio/jfileinputstream.h"
 #include "jio/jbufferedreader.h"
 #include "jcommon/jstringtokenizer.h"
+#include "jexception/jruntimeexception.h"
 
 #include <iostream>
 
@@ -108,8 +109,8 @@ int init_proxy()
 					}
 				}
 			}
-		} catch (std::runtime_error &e) {
-			std::cout << "error in init proxy" << e.what() << std::endl;
+		} catch (jexception::RuntimeException &e) {
+			std::cout << "error in init proxy" << e.What() << std::endl;
 
 			return -1;
 		}

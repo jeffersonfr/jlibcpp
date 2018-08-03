@@ -24,10 +24,9 @@
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
 #include "jgui/jbufferedimage.h"
-#include "jcommon/jdate.h"
 
 int	borderwidth = 5;
-int	batwidth = 20;
+int	batwidth = 50;
 int	ballsize = 5;
 int	batheight = 5;
 int	scoreheight = 20;
@@ -449,18 +448,10 @@ class Breakout : public jgui::Window {
 
 		virtual void ShowApp()
 		{
-			uint64_t startTime = jcommon::Date::CurrentTimeMillis();
-	
       do {
-				// TODO:: estou tendo que forcar o tamanho
 				Repaint();
 				
-				// Delay depending on how far we are behind.
-				startTime += delay;
-				
-				if ((int64_t)(startTime-jcommon::Date::CurrentTimeMillis()) > 0) {
-					usleep((startTime-jcommon::Date::CurrentTimeMillis())*1000LL);
-				}
+        std::this_thread::sleep_for(std::chrono::milliseconds((10)));
       } while (IsHidden() == false);
 		}
 

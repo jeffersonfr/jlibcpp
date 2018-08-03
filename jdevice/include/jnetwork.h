@@ -93,7 +93,7 @@ class Network : public jdevice::Device {
 		 * \brief
 		 *
 		 */
-		virtual std::string what();
+		virtual std::string What();
 		
 };
 

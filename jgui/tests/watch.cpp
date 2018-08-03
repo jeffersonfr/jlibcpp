@@ -19,15 +19,10 @@
  ***************************************************************************/
 #include "jgui/japplication.h"
 #include "jgui/jwindow.h"
-#include "jcommon/jdate.h"
 
 class WatchTeste : public jgui::Window {
 
 	private:
-		int 
-      _hours,
-  		_minutes,
-	  	_seconds;
 		bool 
 		  _filled;
 
@@ -35,12 +30,6 @@ class WatchTeste : public jgui::Window {
 		WatchTeste():
 			jgui::Window(/*"Watch Teste", */0, 0, 320, 320)
 		{
-			jcommon::Date date;
-
-			_hours = date.GetHour();
-			_minutes = date.GetMinute();
-			_seconds = date.GetSecond();
-
 			_filled = false; // true;
 		}
 
@@ -51,15 +40,9 @@ class WatchTeste : public jgui::Window {
 		virtual void ShowApp()
 		{
 			do {
-				jcommon::Date date;
-
-				_hours = date.GetHour();
-				_minutes = date.GetMinute();
-				_seconds = date.GetSecond();
-
 				Repaint();
-
-				sleep(1);
+        
+        std::this_thread::sleep_for(std::chrono::milliseconds(500));
 			} while (IsHidden() == false);
 		}
 
@@ -67,16 +50,24 @@ class WatchTeste : public jgui::Window {
 		{
 			jgui::Window::Paint(g);
 
-			jgui::jsize_t
+      std::time_t 
+        current = std::time(nullptr);
+      std::tm 
+        *gtime = std::localtime(&current);
+      jgui::jsize_t
 				size = GetSize();
       jgui::jinsets_t
         insets = GetInsets();
 			int 
         m = std::min(size.width, size.height - insets.top);
+      int
+        hours = gtime->tm_hour,
+        minutes = gtime->tm_min,
+        seconds = gtime->tm_sec;
 			double 
-        th = (30*_hours + _minutes/2)*M_PI/180.0 - M_PI/2,
-        tm = (_minutes*6 + _seconds/10)*M_PI/180.0 - M_PI/2,
-        ts = (_seconds*6)*M_PI/180.0 - M_PI/2,
+        th = (30*hours + minutes/2)*M_PI/180.0 - M_PI/2,
+        tm = (minutes*6 + seconds/10)*M_PI/180.0 - M_PI/2,
+        ts = (seconds*6)*M_PI/180.0 - M_PI/2,
         xc = size.width/2,
         yc = (size.height - insets.top)/2 + insets.top,
         hh = 0.03*m,
@@ -88,7 +79,7 @@ class WatchTeste : public jgui::Window {
 			char 
         tmp[255];
 
-			sprintf(tmp, "%02d:%02d:%02d", _hours, _minutes, _seconds);
+			sprintf(tmp, "%02d:%02d:%02d", hours, minutes, seconds);
 
 			jgui::jpen_t pen = g->GetPen();
 

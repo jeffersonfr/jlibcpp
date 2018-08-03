@@ -93,7 +93,7 @@ class Complex : public jio::Serializable {
 			}
 		}
 
-		virtual std::string what()
+		virtual std::string What()
 		{
 			std::ostringstream o;
 
@@ -145,7 +145,7 @@ int main()
 	a = (Complex *)ois->Read();
 
 	if (a != NULL) {
-		std::cout << "Complex [" << a->what() << "]" << std::endl;
+		std::cout << "Complex [" << a->What() << "]" << std::endl;
 	}
 
 	delete a;

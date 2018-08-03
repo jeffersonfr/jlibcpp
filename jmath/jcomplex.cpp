@@ -82,7 +82,7 @@ const Complex Complex::operator+(Complex &c)
 	return Complex(_real+c.GetReal(), _imaginary+c.GetImaginary());
 }
 
-std::string Complex::what()
+std::string Complex::What()
 {
 	std::ostringstream o;
 
