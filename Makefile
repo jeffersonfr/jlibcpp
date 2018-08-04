@@ -181,7 +181,7 @@ OBJS_jshared += \
 		 jsharedmutex.o\
 		 jsharedqueue.o\
 		 jsharedsemaphore.o\
-		 #jindexedbuffer.o\
+		 jindexedbuffer.o\
 
 OBJS_jnetwork += \
 		 jconnection.o\

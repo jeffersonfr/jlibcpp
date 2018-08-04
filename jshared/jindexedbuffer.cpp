@@ -22,12 +22,14 @@
 #include "jexception/joutofboundsexception.h"
 #include "jexception/jinvalidargumentexception.h"
 
-namespace jthread {
+#include <string.h>
+
+namespace jshared {
 
 IndexedBuffer::IndexedBuffer(int size, int chunk, jbuffer_type_t type_):
 	jcommon::Object()
 {
-	jcommon::Object::SetClassName("jthread::IndexedBuffer");
+	jcommon::Object::SetClassName("jshared::IndexedBuffer");
 	
 	_type = type_;
 	_buffer_size = size;
@@ -65,29 +67,31 @@ IndexedBuffer::~IndexedBuffer()
 
 void IndexedBuffer::Reset()
 {
-	AutoLock lock(&_mutex);
+  _mutex.lock();
 
 	_write_index = 0;
 	_pass_index = 0;
 	
-	// _semaphore.NotifyAll();
+	// _semaphore.notify_all();
+  
+  _mutex.unlock();
 }
 
 void IndexedBuffer::Release()
 {
-	_semaphore.Release();
+	_semaphore.notify_all();
 }
 
 void IndexedBuffer::SetChunkSize(int size)
 {
+	if (size < MIN_CHUNK_SIZE || size > MAX_CHUNK_SIZE) {
+		throw jexception::InvalidArgumentException("Range of chunk size error");
+	}
+
 	// INFO:: a sincronizacao desse metodo eh preocupacao do desenvolvedor da aplicacao
 	_write_index = 0;
 	_pass_index = 0;
 	_chunk_size = size;
-
-	if (size < MIN_CHUNK_SIZE || size > MAX_CHUNK_SIZE) {
-		throw BufferException("Range of chunk size error");
-	}
 
 	for (int i=0; i<_buffer_size; i++) {
 		delete _buffer[i].data;
@@ -99,13 +103,13 @@ void IndexedBuffer::SetChunkSize(int size)
 
 void IndexedBuffer::SetNodesSize(int size)
 {
+	if (size < 1 || size > MAX_BUFFER_SIZE) {
+		throw jexception::InvalidArgumentException("Range of buffer size error");
+	}
+
 	// INFO:: a sincronizacao desse metodo eh preocupacao do desenvolvedor da aplicacao
 	_write_index = 0;
 	_pass_index = 0;
-
-	if (_buffer_size < 1 || _buffer_size > MAX_BUFFER_SIZE) {
-		throw BufferException("Range of buffer size error");
-	}
 
 	for (int i=0; i<_buffer_size; i++) {
 		delete _buffer[i].data;
@@ -137,11 +141,13 @@ int IndexedBuffer::GetNodesSize()
 
 int IndexedBuffer::GetIndex(jbuffer_chunk_t *chunk)
 {
-	AutoLock lock(&_mutex);
+  _mutex.lock();
 
 	chunk->size = 0;
 	chunk->rindex = _write_index;
 	chunk->pindex = _pass_index;
+
+  _mutex.unlock();
 
 	return 0;
 }
@@ -152,11 +158,12 @@ int IndexedBuffer::GetAvailable(jbuffer_chunk_t *chunk)
 		return -1;
 	}
 
-	AutoLock lock(&_mutex);
-
-	int i,
+	int
+    i,
 		amount = 0;
 	
+  _mutex.lock();
+
 	if (chunk->pindex == _pass_index) {
 		if (chunk->rindex < _write_index) {
 			for (i=chunk->rindex; i<_write_index; i++) {
@@ -174,6 +181,8 @@ int IndexedBuffer::GetAvailable(jbuffer_chunk_t *chunk)
 		}
 	}
 
+  _mutex.unlock();
+
 	return amount;
 }
 
@@ -185,7 +194,7 @@ int IndexedBuffer::Read(jbuffer_chunk_t *chunk)
 	}
 	*/
 
-	AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (chunk->pindex == _pass_index) {
 		if (chunk->rindex > _write_index) {
@@ -194,7 +203,7 @@ int IndexedBuffer::Read(jbuffer_chunk_t *chunk)
 
 		while (chunk->rindex == _write_index) {
 			try {
-				_semaphore.Wait(&_mutex);
+				_semaphore.wait(lock);
 			} catch (jexception::SemaphoreException &) {
 				// WARN:: return -1; ?
 			}
@@ -242,7 +251,7 @@ int IndexedBuffer::Read(jbuffer_chunk_t *chunk, int size)
 	}
 	*/
 
-	AutoLock lock(&_mutex);
+  std::unique_lock<std::mutex> lock(_mutex);
 
 	if (chunk->pindex == _pass_index) {
 		if (chunk->rindex > _write_index) {
@@ -251,15 +260,16 @@ int IndexedBuffer::Read(jbuffer_chunk_t *chunk, int size)
 
 		while (chunk->rindex == _write_index) {
 			try {
-				_semaphore.Wait(&_mutex);
+				_semaphore.wait(lock);
 			} catch (jexception::SemaphoreException &) {
 				// WARN:: return -1; ?
 			}
 		}
 
-		struct jbuffer_chunk_t *t = &_buffer[chunk->rindex];
-
-		int diff = t->size-chunk->size;
+		struct jbuffer_chunk_t 
+      *t = &_buffer[chunk->rindex];
+		int 
+      diff = t->size-chunk->size;
 
 		if (size <= diff) {
 			memcpy(chunk->data, t->data+chunk->size, size);
@@ -288,9 +298,10 @@ int IndexedBuffer::Read(jbuffer_chunk_t *chunk, int size)
 		}
 	} else if (chunk->pindex == (_pass_index-1)) {
 		if (chunk->rindex > _write_index) {
-			struct jbuffer_chunk_t *t = &_buffer[chunk->rindex];
-
-			int diff = t->size-chunk->size;
+			struct jbuffer_chunk_t 
+        *t = &_buffer[chunk->rindex];
+			int 
+        diff = t->size-chunk->size;
 
 			if (size <= diff) {
 				memcpy(chunk->data, t->data+chunk->size, size);
@@ -339,27 +350,28 @@ int IndexedBuffer::Write(uint8_t*data, int size)
 		length = _chunk_size;
 	}
 
-	{
-		AutoLock lock(&_mutex);
-		
-		jbuffer_chunk_t *t = &_buffer[_write_index++];
-	
-		memcpy(t->data, data, length);
-		
-		t->size = length;
+  _mutex.lock();
 
-		if (_write_index >= _buffer_size) {
-			_write_index = 0;
-			_pass_index++;
-		}
+  jbuffer_chunk_t 
+    *t = &_buffer[_write_index++];
 
-		try {
-			// WARNNING:: em caso de erro modificar para Notify()
-			_semaphore.NotifyAll();
-		} catch (jexception::SemaphoreException &) {
-		}
-	}
-	
+  memcpy(t->data, data, length);
+
+  t->size = length;
+
+  if (_write_index >= _buffer_size) {
+    _write_index = 0;
+    _pass_index++;
+  }
+
+  try {
+    // WARNNING:: em caso de erro modificar para notify()
+    _semaphore.notify_all();
+  } catch (jexception::SemaphoreException &) {
+  }
+
+  _mutex.unlock();
+
 	return size;
 }
 

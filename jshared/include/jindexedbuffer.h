@@ -32,7 +32,7 @@
 #define MIN_CHUNK_SIZE	1024
 #define MAX_CHUNK_SIZE	INT_MAX
 
-namespace jthread {
+namespace jshared {
 
 /**
  * \brief
@@ -75,9 +75,9 @@ class IndexedBuffer : public virtual jcommon::Object {
 		/** \brief */
 		jbuffer_type_t _type;
 		/** \brief */
-		Mutex _mutex;
+    std::mutex _mutex;
 		/** \brief */
-		Condition _semaphore;
+    std::condition_variable _semaphore;
 		
     public:
 		/**
