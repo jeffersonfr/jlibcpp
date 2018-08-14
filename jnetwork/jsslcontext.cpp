@@ -90,7 +90,22 @@ SSLContext * SSLContext::CreateClientContext(std::string ca_file, SSL_METHOD *me
 
 RSA * SSLContext::GenerateRSAKey(int len, int exp)
 {
-	return RSA_generate_key(len, exp, NULL, NULL);
+  RSA *rsa = RSA_new();
+  BIGNUM *bne = NULL;
+
+  bne = BN_new();
+
+  if (BN_set_word(bne, exp) == 0) {
+    return NULL;
+  }
+ 
+  if (RSA_generate_key_ex(rsa, len, bne, NULL) == 0) {
+    return NULL;
+  }
+
+  BN_free(bne);
+
+  return rsa;
 }
 
 EVP_PKEY * SSLContext::GeneratePKey(RSA *rsakey)

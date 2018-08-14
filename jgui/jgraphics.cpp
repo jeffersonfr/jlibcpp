@@ -44,7 +44,7 @@ Graphics::Graphics(cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, i
 	_pixelformat = pixelformat;
 	_translate.x = 0;
 	_translate.y = 0;
-	_vertical_sync = false;
+	_is_vertical_sync_enabled = false;
 	_font = NULL;
 
 	_pen.dashes = NULL;
@@ -2367,6 +2367,16 @@ void Graphics::Reset()
 	SetColor(0x00000000);
 	ResetGradientStop();
 	SetCompositeFlags(JCF_SRC_OVER);
+}
+
+void Graphics::SetVerticalSyncEnabled(bool enabled)
+{
+  _is_vertical_sync_enabled = enabled;
+}
+
+bool Graphics::IsVerticalSyncEnabled()
+{
+  return _is_vertical_sync_enabled;
 }
 
 }

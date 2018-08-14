@@ -47,8 +47,8 @@ bool TextField::KeyPressed(jevent::KeyEvent *event)
 
   jgui::KeyMap 
     *keymap = GetKeyMap();
-  jgui::jsize_t
-    size = GetSize();
+  // jgui::jsize_t
+  //   size = GetSize();
 	jevent::jkeyevent_symbol_t 
     action = event->GetSymbol();
 

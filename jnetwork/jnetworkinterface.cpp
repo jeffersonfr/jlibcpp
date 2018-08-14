@@ -168,12 +168,14 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 {
 	std::vector<NetworkInterface *> interfaces;
 
-	struct ifaddrs *ifa = NULL,
-								 *ifEntry = NULL;
-	char addrBuffer[INET6_ADDRSTRLEN],
-			 maskBuffer[INET6_ADDRSTRLEN],
-			 broadcastBuffer[INET6_ADDRSTRLEN],
-			 p2pBuffer[INET6_ADDRSTRLEN];
+	struct ifaddrs 
+    *ifa = NULL,
+		*ifEntry = NULL;
+	char 
+    addrBuffer[INET6_ADDRSTRLEN],
+		maskBuffer[INET6_ADDRSTRLEN],
+		broadcastBuffer[INET6_ADDRSTRLEN];
+		// p2pBuffer[INET6_ADDRSTRLEN];
 
 	if (getifaddrs(&ifa) == 0) {
 		std::map<std::string, NetworkInterface *> minterfaces;
@@ -185,14 +187,16 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 				continue;
 			}
 
-			const char *addr = NULL,
-						*mask = NULL,
-						*broadcast = NULL,
-						*p2p = NULL;
-			void *addrPtr = NULL,
-					 *maskPtr = NULL,
-					 *broadcastPtr = NULL,
-					 *p2pPtr = NULL;
+			const char 
+        *addr = NULL,
+				*mask = NULL,
+				*broadcast = NULL;
+				// *p2p = NULL;
+			void 
+        *addrPtr = NULL,
+				*maskPtr = NULL,
+				*broadcastPtr = NULL;
+				// *p2pPtr = NULL;
 
 			if (ifEntry->ifa_addr->sa_family == AF_INET || ifEntry->ifa_addr->sa_family == PF_INET) {
 				addrPtr = &((struct sockaddr_in *)ifEntry->ifa_addr)->sin_addr;
@@ -203,7 +207,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 				}
 
 				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
-					p2pPtr = &((struct sockaddr_in *)ifEntry->ifa_dstaddr)->sin_addr;
+					// p2pPtr = &((struct sockaddr_in *)ifEntry->ifa_dstaddr)->sin_addr;
 				}
 			
 				addr = inet_ntop(ifEntry->ifa_addr->sa_family, addrPtr, addrBuffer, sizeof(addrBuffer));
@@ -214,7 +218,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 				}
 
 				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
-					p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
+					// p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
 				}
 			
 				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::JTT_STRING, false);
@@ -254,7 +258,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 				}
 				
 				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
-					p2pPtr = &((struct sockaddr_in6 *)ifEntry->ifa_dstaddr)->sin6_addr;
+					// p2pPtr = &((struct sockaddr_in6 *)ifEntry->ifa_dstaddr)->sin6_addr;
 				}
 				
 				addr = inet_ntop(ifEntry->ifa_addr->sa_family, addrPtr, addrBuffer, sizeof(addrBuffer));
@@ -265,7 +269,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 				}
 
 				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
-					p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
+					// p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
 				}
 				
 				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::JTT_STRING, false);
@@ -295,7 +299,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, interfaces.size(), true));
 				}
 				
-				p2p = NULL;
+				// p2p = NULL;
 			} else if (ifEntry->ifa_addr->sa_family == AF_PACKET || ifEntry->ifa_addr->sa_family == PF_PACKET) {
 				NetworkInterface *parent = new NetworkInterface(NULL, ifEntry->ifa_name, index, false);
 

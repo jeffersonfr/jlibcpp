@@ -58,17 +58,16 @@ static void NearestNeighborScale(uint32_t *src, uint32_t *dst, int w, int h, int
 		}
 	}
 
-	/*
-	for (int i=0; i<sh; i++) {
-		for (int j=0; j<sw; j++) {
-			x2 = ((j*x_ratio) >> 16) ;
-			y2 = ((i*y_ratio) >> 16) ;
-			dst[(i*sw)+j] = src[(y2*w)+x2] ;
-		}                
-	}
-	*/
+	// for (int i=0; i<sh; i++) {
+	//	for (int j=0; j<sw; j++) {
+	//		x2 = ((j*x_ratio) >> 16) ;
+	//		y2 = ((i*y_ratio) >> 16) ;
+	//		dst[(i*sw)+j] = src[(y2*w)+x2] ;
+	//	}                
+	// }
 }
 		
+/*
 static void BilinearScale(uint32_t *src, uint32_t *dst, int w, int h, int sw, int sh) 
 {
 	int a, b, c, d, x, y, index;
@@ -107,6 +106,7 @@ static void BilinearScale(uint32_t *src, uint32_t *dst, int w, int h, int sw, in
 		}
 	}
 }
+*/
 
 static void NearesNeighborRotate(uint32_t *src, int w, int h, uint32_t *dst, int dw, int dh, double radians, bool resize)
 {

@@ -56,7 +56,7 @@ ENABLE_DEBUG ?= yes
 # {sdl2, sfml2, xlib, xcb, gtk3, allegro5}
 ENABLE_GRAPHICS ?= sdl2
 # {gif, ilist, v4l2, libvlc, libav, libxine, alsa}
-ENABLE_MEDIA ?= libxine
+ENABLE_MEDIA ?= gif, ilist, v4l2, libvlc, libav, libxine, alsa
 
 # -ansi: problemas com va_copy()
 CCFLAGS		= \

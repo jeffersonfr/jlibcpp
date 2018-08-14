@@ -38,6 +38,7 @@
 
 namespace jnetwork {
 
+/*
 static int VerifyClient(int ok, X509_STORE_CTX* store) 
 {
 	if (!ok) {
@@ -56,26 +57,25 @@ static int VerifyClient(int ok, X509_STORE_CTX* store)
 
 	return ok;
 	
-	/*
-	X509 *peer_cert = X509_STORE_CTX_get_current_cert(ctx);
-	SSL *ssl = (SSL *)X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
-	char *str;
-
-	str = X509_NAME_oneline(X509_get_subject_name(peer_cert), 0, 0);
-	free(str);
-
-	str = X509_NAME_oneline(X509_get_issuer_name(peer_cert), 0, 0);
-	free(str);
-
-	X509_free(peer_cert);
-
-	if (SSL_get_verify_result(ssl) == X509_V_OK) {
-		return X509_V_OK;
-	} 
-
-	return -1;
-	*/
+	// X509 *peer_cert = X509_STORE_CTX_get_current_cert(ctx);
+	// SSL *ssl = (SSL *)X509_STORE_CTX_get_ex_data(ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
+	// char *str;
+  //
+  //	str = X509_NAME_oneline(X509_get_subject_name(peer_cert), 0, 0);
+  //	free(str);
+  //
+  //	str = X509_NAME_oneline(X509_get_issuer_name(peer_cert), 0, 0);
+  //	free(str);
+  //
+  //	X509_free(peer_cert);
+  //
+  //	if (SSL_get_verify_result(ssl) == X509_V_OK) {
+  //		return X509_V_OK;
+  //	} 
+  //
+  //	return -1;
 }
+*/
 
 SSLSocket::SSLSocket(SSLContext *ctx, InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbuf_):
 	jnetwork::Connection(JCT_TCP)

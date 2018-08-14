@@ -290,8 +290,6 @@ class Graphics : public virtual jcommon::Object {
 		/** \brief */
 		struct jpoint_t _translate;
 		/** \brief */
-		bool _vertical_sync;
-		/** \brief */
 		jantialias_mode_t _antialias;
 		/** \brief */
 		jpen_t _pen;
@@ -305,6 +303,8 @@ class Graphics : public virtual jcommon::Object {
 		jpixelformat_t _pixelformat;
 		/** \brief */
 		cairo_t *_cairo_context;
+		/** \brief */
+		bool _is_vertical_sync_enabled;
 
 	public:
 		/**
@@ -790,6 +790,18 @@ class Graphics : public virtual jcommon::Object {
 		 *
 		 */
 		virtual void Reset();
+
+		/**
+		 * \brief
+		 *
+		 */
+    virtual void SetVerticalSyncEnabled(bool enabled);
+
+		/**
+		 * \brief
+		 *
+		 */
+    virtual bool IsVerticalSyncEnabled();
 
 };
 

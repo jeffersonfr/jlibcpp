@@ -31,6 +31,7 @@
 #include "jexception/jsemaphoretimeoutexception.h"
 
 #include <algorithm>
+#include <iostream>
 
 #include <cairo.h>
 
@@ -77,14 +78,10 @@ class PlayerComponentImpl : public jgui::Component {
 
 		virtual ~PlayerComponentImpl()
 		{
-			_mutex.lock();
-
 			if (_image != NULL) {
 				delete _image;
 				_image = NULL;
 			}
-
-			_mutex.unlock();
 		}
 
 		virtual jgui::jsize_t GetPreferredSize()
@@ -94,6 +91,8 @@ class PlayerComponentImpl : public jgui::Component {
 
 		virtual void UpdateComponent(jgui::Image *frame)
 		{
+			_mutex.lock();
+
 			jgui::jsize_t isize = frame->GetSize();
 
 			if (_frame_size.width != isize.width || _frame_size.height != isize.height) {
@@ -108,20 +107,11 @@ class PlayerComponentImpl : public jgui::Component {
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(frame, jevent::JFE_GRABBED));
 
-			_mutex.unlock();
-
 			_image = frame;
 
-			Run();
+			_mutex.unlock();
 
-			_image = NULL;
-		}
-
-		virtual void Run()
-		{
-			if (IsVisible() != false) {
-				Repaint();
-			}
+			Repaint();
 		}
 
 		virtual void Paint(jgui::Graphics *g)
@@ -134,7 +124,11 @@ class PlayerComponentImpl : public jgui::Component {
 			_mutex.lock();
 
 			g->DrawImage(_image, _src.x, _src.y, _src.width, _src.height, 0, 0, size.width, size.height);
+			// g->DrawImage(_image, 0, 0, size.width, size.height);
 				
+      delete _image;
+      _image = NULL;
+
 			_mutex.unlock();
 		}
 
@@ -233,13 +227,17 @@ ImageListLightPlayer::ImageListLightPlayer(std::string directory):
 		std::string file = (*i);
 
 		if (file.size() > 3 && file[0] != '.') {
-			jio::File *tmp = jio::File::OpenFile(file);
+		  _image_list.push_back(_directory + "/" + file);
+
+      /*
+			jio::File *tmp = jio::File::OpenFile(_directory + "/" + file);
 
 			if (tmp != NULL) {
 				_image_list.push_back(_directory + "/" + file);
 			}
 
 			delete tmp;
+      */
 		}
 	}
 
@@ -252,7 +250,6 @@ ImageListLightPlayer::ImageListLightPlayer(std::string directory):
 
     return false;
   });
-
 
 	_controls.push_back(new VideoSizeControlImpl(this));
 
@@ -282,19 +279,13 @@ void ImageListLightPlayer::ResetFrames()
 
 jgui::Image * ImageListLightPlayer::GetFrame()
 {
-	for (int i=_frame_index; i<(int)_image_list.size(); i++) {
-		std::string file = _image_list[i];
+  std::string file = _image_list[_frame_index++];
 
-		_frame_index = i + 1;
+  if (_frame_index >= (int)_image_list.size()) {
+    _frame_index = 0;
+  }
 
-		if (_frame_index >= (int)_image_list.size()) {
-			_frame_index = 0;
-		}
-
-		return new jgui::BufferedImage(file);
-	}
-
-	return NULL;
+  return new jgui::BufferedImage(file);
 }
 
 void ImageListLightPlayer::Run()
@@ -319,8 +310,6 @@ void ImageListLightPlayer::Run()
 		}
 
 		dynamic_cast<PlayerComponentImpl *>(_component)->UpdateComponent(frame);
-
-    delete frame;
 
 		try {
 			if (_decode_rate == 0) {

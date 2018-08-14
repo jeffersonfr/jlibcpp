@@ -570,80 +570,84 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	media = libvlc_media_new_path(_engine, file.c_str());
 	_provider = libvlc_media_player_new_from_media(media);
 
-	libvlc_media_parse(media);
-
  	libvlc_media_track_t **tracks = NULL;
-	int count = libvlc_media_tracks_get(media, &tracks);
+	uint32_t 
+	  iw = 0,
+	  ih = 0;
+  int
+    count;
+  
+	libvlc_media_parse_with_options(
+      media, (libvlc_media_parse_flag_t)(libvlc_media_parse_local | libvlc_media_parse_network | libvlc_media_fetch_local | libvlc_media_fetch_network), 2000);
 
-	for (int i=0; i<count; i++) {
-		libvlc_media_track_t *t = tracks[i];
+  count = libvlc_media_tracks_get(media, &tracks);
 
-		if (t->i_type == libvlc_track_audio) {
-			if (_has_audio == false) {
-				_has_audio = true;
+  if (count == 0) {
+    libvlc_audio_set_mute(_provider, 1);
+    libvlc_media_player_play(_provider);
+    libvlc_media_player_pause(_provider);
 
-				_controls.push_back(new VolumeControlImpl(this));
-				_controls.push_back(new AudioConfigurationControlImpl(this));
-			}
-		} else if (t->i_type == libvlc_track_video) {
-			if (_has_video == false) {
-				_has_video = true;
-				
-				_controls.push_back(new VideoSizeControlImpl(this));
-				_controls.push_back(new VideoFormatControlImpl(this));
-			}
-		}
-	}
+    // waits 5 seconds to get video size
+    for (int i=0; i<50; i++) {
+      libvlc_video_get_size(_provider, 0, &iw, &ih);
+
+      if (iw > 0 && ih > 0) {
+        break;
+      }
+
+      usleep(100000);
+    }
+
+    libvlc_media_player_stop(_provider);
+    libvlc_audio_set_mute(_provider, 0);
+
+    if (iw <= 0 || ih <= 0) {
+      libvlc_media_player_release(_provider);
+      libvlc_release(_engine);
+
+      throw jexception::RuntimeException("Cannot retrive the size of media content");
+    }
+
+    _aspect = static_cast<float>(iw)/ih;
+
+    _controls.push_back(new VideoSizeControlImpl(this));
+    _controls.push_back(new VideoFormatControlImpl(this));
+  } else {
+    for (int i=0; i<count; i++) {
+      libvlc_media_track_t *t = tracks[i];
+
+      if (t->i_type == libvlc_track_audio) {
+        if (_has_audio == false) {
+          _has_audio = true;
+
+          _controls.push_back(new VolumeControlImpl(this));
+          _controls.push_back(new AudioConfigurationControlImpl(this));
+        }
+      } else if (t->i_type == libvlc_track_video) {
+        if (_has_video == false) {
+          _has_video = true;
+
+          _controls.push_back(new VideoSizeControlImpl(this));
+          _controls.push_back(new VideoFormatControlImpl(this));
+        }
+
+        iw = t->video->i_width;
+        ih = t->video->i_height;
+
+        _aspect = static_cast<float>(t->video->i_sar_num)/t->video->i_sar_den;
+        _frames_per_second = static_cast<float>(t->video->i_frame_rate_num)/t->video->i_frame_rate_den;
+      }
+    }
+  }
 
 	libvlc_media_tracks_release(tracks, count);
 
-	uint32_t iw = 1;
-	uint32_t ih = 1;
-
-	if (_has_video == true) {
-		if (libvlc_video_get_size(_provider, 0, &iw, &ih) != 0 || iw <= 0 || ih <= 0) {
-			// CHANGE:: fix this section (currently needed to wait the finshing of tracks loading)
-			libvlc_audio_set_mute(_provider, 1);
-			libvlc_media_player_play(_provider);
-			libvlc_media_player_pause(_provider);
-
-			// waits 5 seconds to get video size
-			for (int i=0; i<50; i++) {
-				libvlc_video_get_size(_provider, 0, &iw, &ih);
-
-				if (iw > 0 && ih > 0) {
-					break;
-				}
-
-        std::this_thread::sleep_for(std::chrono::milliseconds((100)));
-			}
-
-			libvlc_media_player_stop(_provider);
-			libvlc_audio_set_mute(_provider, 0);
-
-			if (iw <= 0 || ih <= 0) {
-				libvlc_media_player_release(_provider);
-				libvlc_release(_engine);
-
-				throw jexception::RuntimeException("Cannot retrive the size of media content");
-			}
-		}
-
-		_aspect = (double)(iw/(double)ih);
-	}
-
 	_media_time = (uint64_t)libvlc_media_get_duration(media);
-	_frames_per_second = libvlc_media_player_get_fps(_provider);
 
 	_component = new PlayerComponentImpl(this, 0, 0, iw, ih);
 
 	libvlc_video_set_format(_provider, "RV32", iw, ih, iw*4);
-	libvlc_video_set_callbacks(
-			_provider, 
-			LockMediaSurface, 
-			UnlockMediaSurface, 
-			DisplayMediaSurface, 
-			_component);
+	libvlc_video_set_callbacks(_provider, LockMediaSurface, UnlockMediaSurface, DisplayMediaSurface, _component);
 
 	_media_info.title = std::string(libvlc_media_get_meta(media, libvlc_meta_Title)?:"");
 	_media_info.author = std::string(libvlc_media_get_meta(media, libvlc_meta_Artist)?:"");

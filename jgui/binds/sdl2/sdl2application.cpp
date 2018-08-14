@@ -535,7 +535,7 @@ void SDL2Application::InternalLoop()
 
       // INFO:: discard all remaining events
       while (events.size() > 0) {
-        jevent::EventObject *event = events.back();
+        // jevent::EventObject *event = events.back();
 
         events.pop_back();
 
