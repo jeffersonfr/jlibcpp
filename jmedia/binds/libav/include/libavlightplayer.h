@@ -23,7 +23,7 @@
 #include "jmedia/jplayer.h"
 #include "jgui/jcomponent.h"
 
-struct VideoState;
+struct PlayerState;
 
 namespace jmedia {
 
@@ -33,7 +33,7 @@ class LibAVLightPlayer : public jmedia::Player {
 		/** \brief */
     std::mutex _mutex;
 		/** \brief */
-		VideoState *_provider;
+		PlayerState *_provider;
 		/** \brief */
 		std::string _file;
 		/** \brief */

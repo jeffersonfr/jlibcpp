@@ -109,7 +109,7 @@ class PlayerComponentImpl : public jgui::Component {
 				_image = NULL;
 			}
 
-			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_RGB24, sw, sh);
+			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_ARGB, sw, sh);
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
 
@@ -383,11 +383,11 @@ LibAVLightPlayer::LibAVLightPlayer(std::string file):
 	avplay_set_rendercallback(_provider, render_callback, (void *)_component);
 	avplay_set_endofmediacallback(_provider, endofmedia_callback, (void *)this);
 		
-	if (_provider->has_audio == true) {
+	if (_provider->wanted_stream[AVMEDIA_TYPE_AUDIO] != -1) {
 		_controls.push_back(new VolumeControlImpl(this));
 	}
 	
-	if (_provider->has_video == true) {
+	if (_provider->wanted_stream[AVMEDIA_TYPE_VIDEO] != -1) {
 		_controls.push_back(new VideoSizeControlImpl(this));
 		_controls.push_back(new VideoFormatControlImpl(this));
 	}
