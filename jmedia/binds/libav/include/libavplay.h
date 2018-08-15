@@ -9,18 +9,25 @@
 
 #include <string>
 
+#include "libavconfig.h"
+
 extern "C" {
-#include "libavutil/time.h"
 #include "libavresample/avresample.h"
-#include "libavutil/opt.h"
+
 #include "libavcodec/avfft.h"
+
+#include "libavutil/time.h"
+#include "libavutil/opt.h"
+#include "libavutil/imgutils.h"
+#include "libavutil/avstring.h"
+#include "libavutil/parseutils.h"
+#include "libavutil/eval.h"
+#include "libavutils.h"
 
 #if CONFIG_AVFILTER
 # include "libavfilter/buffersink.h"
 # include "libavfilter/buffersrc.h"
 #endif
-
-#include "libavutils.h"
 }
 
 #include <SDL2/SDL.h>

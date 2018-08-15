@@ -47,7 +47,7 @@ ifeq ($(findstring libav, $(ENABLE_MEDIA)), libav)
 		 -lm -lbz2 -lasound \
 
 	LDFLAGS		+= \
-		 `pkg-config --libs libavcodec libavformat libavresample libavutil libavfilter libswscale sdl2 cairo` \
+		 `pkg-config --libs libavcodec libavformat libavresample libavutil libavfilter libswscale libavdevice sdl2 cairo` \
 
 	DEFINES		+= \
 		 -DLIBAV_MEDIA \
@@ -56,7 +56,6 @@ ifeq ($(findstring libav, $(ENABLE_MEDIA)), libav)
 
 	OBJS_libav	+= \
 		 libavplay.o\
-		 libavutils.o\
 		 libavlightplayer.o\
 
 	OBJS_jmedia	+= $(addprefix binds/libav/,$(OBJS_libav))
