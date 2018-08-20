@@ -21,7 +21,10 @@ OBJS_fullscreen = \
 OBJS_synth = \
 	   synth.o\
 
-all: teste fullscreen synth
+OBJS_mixer = \
+	   mixer.o\
+
+all: teste fullscreen synth mixer
 	
 teste: $(OBJS_teste)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -32,6 +35,9 @@ fullscreen: $(OBJS_fullscreen)
 synth: $(OBJS_synth)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
+mixer: $(OBJS_mixer)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
 .cpp.o: $<  
 	@$(CC) $(CCFLAGS) -c $< ; $(ECHO) "Compiling $< ...  $(OK)" 
 
@@ -39,4 +45,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ teste fullscreen synth
+	@rm -rvf *.o *.xml *~ teste fullscreen synth mixer

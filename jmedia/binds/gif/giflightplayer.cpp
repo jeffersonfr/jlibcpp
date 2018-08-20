@@ -795,10 +795,14 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 };
 
-GIFLightPlayer::GIFLightPlayer(std::string file):
+GIFLightPlayer::GIFLightPlayer(jnetwork::URL url):
 	jmedia::Player()
 {
-	_file = file;
+  if (strcasecmp(url.GetPath().c_str() - 3, "gif") != 0) {
+		throw jexception::MediaException("This file is not a valid gif");
+  }
+
+	_file = url.GetPath();
 	_is_paused = false;
 	_is_playing = false;
 	_is_loop = false;
@@ -810,9 +814,10 @@ GIFLightPlayer::GIFLightPlayer(std::string file):
 	_decode_rate = 1.0;
 	_provider = NULL;
 	
-	jio::FileInputStream *stream = new jio::FileInputStream(file);
-
-	AnimatedGIFData *data = new AnimatedGIFData;
+	jio::FileInputStream 
+    *stream = new jio::FileInputStream(_file);
+	AnimatedGIFData 
+    *data = new AnimatedGIFData;
 
 	data->stream = stream;
 	data->image = NULL;

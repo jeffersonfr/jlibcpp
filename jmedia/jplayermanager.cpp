@@ -49,6 +49,10 @@
 #include "alsalightplayer.h"
 #endif
 
+#if defined(MIXER_MEDIA)
+#include "mixerlightplayer.h"
+#endif
+
 namespace jmedia {
 
 std::map<jplayer_hints_t, bool> PlayerManager::_hints;
@@ -73,6 +77,18 @@ Player * PlayerManager::CreatePlayer(std::string url_)
 	}
 
 	jnetwork::URL url(url_);
+
+#if defined(MIXER_MEDIA)
+	try {
+		return new MixerLightPlayer(url_);
+	} catch (jexception::Exception &e) {
+	}
+#endif
+
+  // INFO:: only the MixerLightPlayer could do the mixer
+  if (strcasecmp(url.GetProtocol().c_str(), "mixer") == 0) {
+    return NULL;
+  }
 
 #if defined(ALSA_MEDIA)
 	try {
@@ -99,7 +115,7 @@ Player * PlayerManager::CreatePlayer(std::string url_)
 
 #if defined(GIF_MEDIA)
 	try {
-		return new GIFLightPlayer(url.GetPath());
+		return new GIFLightPlayer(url_);
 	} catch (jexception::Exception &e) {
 	}
 #endif

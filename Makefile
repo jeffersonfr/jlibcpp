@@ -304,6 +304,7 @@ OBJS_jgui += \
 
 OBJS_jmedia += \
 		jaudioconfigurationcontrol.o\
+		jaudiomixercontrol.o\
 		jcolorconversion.o\
 		jcontrol.o\
 		jplayer.o\

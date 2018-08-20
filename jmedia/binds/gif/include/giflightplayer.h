@@ -22,6 +22,7 @@
 
 #include "jmedia/jplayer.h"
 #include "jgui/jcomponent.h"
+#include "jnetwork/jurl.h"
 
 #include <thread>
 
@@ -64,7 +65,7 @@ class GIFLightPlayer : public jmedia::Player {
 		 * \brief
 		 *
 		 */
-		GIFLightPlayer(std::string file);
+		GIFLightPlayer(jnetwork::URL url);
 
 		/**
 		 * \brief

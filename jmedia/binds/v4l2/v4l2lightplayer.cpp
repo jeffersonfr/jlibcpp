@@ -133,7 +133,7 @@ class PlayerComponentImpl : public jgui::Component {
 				_image = NULL;
 			}
 
-			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_RGB24, sw, sh);
+			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_ARGB, sw, sh);
 
 			_player->DispatchFrameGrabberEvent(new jevent::FrameGrabberEvent(_image, jevent::JFE_GRABBED));
 

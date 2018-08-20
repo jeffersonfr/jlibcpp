@@ -167,3 +167,24 @@ ifeq ($(findstring alsa, $(ENABLE_MEDIA)), alsa)
 
 endif
 
+ifeq ($(findstring mixer, $(ENABLE_MEDIA)), mixer)
+	CCFLAGS		+= \
+		 -Ijmedia/binds/mixer/include \
+		 -Ijgui/binds/generic/include \
+		 `pkg-config --cflags sdl2 alsa` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs sdl2 alsa` \
+
+	DEFINES		+= \
+		 -DMIXER_MEDIA \
+
+	REQUIRES	+= \
+
+	OBJS_mixer += \
+		 mixerlightplayer.o\
+
+	OBJS_jmedia	+= $(addprefix binds/mixer/,$(OBJS_mixer))
+
+endif
+

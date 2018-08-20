@@ -79,7 +79,7 @@ class PlayerTest : public jgui::Window, public jevent::PlayerListener, public je
 			jgui::Graphics *g = image->GetGraphics();
 
 			g->SetColor(jgui::Color::Blue);
-			g->FillRectangle(8, 8, 32, 32);
+			g->FillRectangle(8, 8, 64, 64);
 		}
 
 		virtual void MediaStarted(jevent::PlayerEvent *event)
