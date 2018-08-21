@@ -2412,7 +2412,6 @@ int main(int argc, char **argv)
 	GraphicsTeste app;
 
 	app.SetTitle("Skull");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

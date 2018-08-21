@@ -260,7 +260,6 @@ int main( int argc, char *argv[] )
 	GraphicsTeste app;
 
 	app.SetTitle("Cube");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

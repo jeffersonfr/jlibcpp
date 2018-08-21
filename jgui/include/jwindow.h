@@ -115,6 +115,8 @@ class Window : public jgui::Container {
     Font *_font;
     /** \brief */
     EventManager *_event_manager;
+    /** \brief */
+    Theme _theme;
 
 	public:
 		/**
@@ -213,18 +215,6 @@ class Window : public jgui::Container {
 		 */
 		virtual std::string GetTitle();
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetVisible(bool b);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsVisible();
-		
 		/**
 		 * \brief
 		 *

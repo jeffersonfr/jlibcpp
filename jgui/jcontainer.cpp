@@ -313,8 +313,6 @@ void Container::DoLayout()
 
 void Container::Pack(bool fit)
 {
-  std::lock_guard<std::mutex> guard(_container_mutex);
-
 	Component 
     *c = NULL;
 	jinsets_t 
@@ -324,6 +322,8 @@ void Container::Pack(bool fit)
     min_y = insets.top,
     max_w = 0,
     max_h = 0;
+
+  _container_mutex.lock();
 
 	if (fit == true) {
 		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
@@ -367,7 +367,9 @@ void Container::Pack(bool fit)
 		}
 	}
 
-	SetSize(max_w+insets.right, max_h+insets.bottom);
+  _container_mutex.unlock();
+
+	SetSize(max_w + insets.right, max_h + insets.bottom);
 }
 
 jsize_t Container::GetPreferredSize()
@@ -387,9 +389,9 @@ void Container::SetInsets(jinsets_t insets)
 
 void Container::InvalidateAll()
 {
-  std::lock_guard<std::mutex> guard(_container_mutex);
-
 	std::vector<std::vector<jgui::Component *> *> containers;
+
+  std::lock_guard<std::mutex> guard(_container_mutex);
 
 	containers.push_back(&_components);
 
@@ -414,9 +416,9 @@ void Container::InvalidateAll()
 
 void Container::RevalidateAll()
 {
-  std::lock_guard<std::mutex> guard(_container_mutex);
-
 	std::vector<std::vector<jgui::Component *> *> containers;
+
+  std::lock_guard<std::mutex> guard(_container_mutex);
 
 	containers.push_back(&_components);
 
@@ -552,7 +554,7 @@ void Container::Add(Component *c, int index)
 		throw jexception::RuntimeException("Adding own container");
 	}
 
-  std::lock_guard<std::mutex> guard(_container_mutex);
+  _container_mutex.lock();
 
 	if (std::find(_components.begin(), _components.end(), c) == _components.end()) {
 		_components.insert(_components.begin()+index, c);
@@ -573,6 +575,10 @@ void Container::Add(Component *c, int index)
 
 		DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 	}
+
+  _container_mutex.unlock();
+
+  DoLayout();
 }
 
 void Container::Add(Component *c)
@@ -583,8 +589,6 @@ void Container::Add(Component *c)
 void Container::Add(Component *c, GridBagConstraints *constraints)
 {
 	Add(c, GetComponentCount());
-	
-	DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 
 	if (_layout != NULL) {
 		GridBagLayout *layout = dynamic_cast<jgui::GridBagLayout *>(_layout);
@@ -593,13 +597,13 @@ void Container::Add(Component *c, GridBagConstraints *constraints)
 			layout->AddLayoutComponent(c, constraints);
 		}
 	}
+	
+	DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 }
 
 void Container::Add(jgui::Component *c, std::string id)
 {
 	Add(c, GetComponentCount());
-
-	DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 
 	if (_layout != NULL) {
 		CardLayout *layout = dynamic_cast<jgui::CardLayout *>(_layout);
@@ -608,13 +612,13 @@ void Container::Add(jgui::Component *c, std::string id)
 			layout->AddLayoutComponent(id, c);
 		}
 	}
+
+	DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 }
 
 void Container::Add(jgui::Component *c, jborderlayout_align_t align)
 {
 	Add(c, GetComponentCount());
-	
-	DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 
 	if (_layout != NULL) {
 		BorderLayout *layout = dynamic_cast<jgui::BorderLayout *>(_layout);
@@ -623,12 +627,12 @@ void Container::Add(jgui::Component *c, jborderlayout_align_t align)
 			layout->AddLayoutComponent(c, align);
 		}
 	}
+	
+	DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_ADDED));
 }
 
 void Container::Remove(jgui::Component *c)
 {
-  std::lock_guard<std::mutex> guard(_container_mutex);
-
 	if (c == NULL) {
 		return;
 	}
@@ -668,6 +672,8 @@ void Container::Remove(jgui::Component *c)
 		}
 	}
 
+  _container_mutex.lock();
+
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		if (c == (*i)) {
 			c->SetParent(NULL);
@@ -677,6 +683,10 @@ void Container::Remove(jgui::Component *c)
 			DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_REMOVED));
 		}
 	}
+  
+  _container_mutex.unlock();
+    
+  DoLayout();
 }
 
 void Container::RemoveAll()
@@ -701,21 +711,21 @@ void Container::RemoveAll()
 		}
 	}
 
-	{
-  	std::lock_guard<std::mutex> guard(_container_mutex);
+ 	_container_mutex.lock();
 
-		for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-      jgui::Component *c = (*i);
+  for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+    jgui::Component *c = (*i);
 
-      c->SetParent(NULL);
+    c->SetParent(NULL);
 
-			DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_REMOVED));
-		}
+    DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_REMOVED));
+  }
 
-		_components.clear();
-	}
+  _components.clear();
 
-	Repaint();
+ 	_container_mutex.unlock();
+
+  DoLayout();
 }
 
 bool Container::Contains(Component *cmp)
@@ -943,9 +953,9 @@ jgui::Component * Container::GetFocusOwner()
 
 void Container::RaiseComponentToTop(Component *c)
 {
- 	std::lock_guard<std::mutex> guard(_container_mutex);
-
 	bool b = false;
+
+ 	std::lock_guard<std::mutex> guard(_container_mutex);
 
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		if (c == (*i)) {
@@ -962,9 +972,9 @@ void Container::RaiseComponentToTop(Component *c)
 
 void Container::LowerComponentToBottom(Component *c)
 {
- 	std::lock_guard<std::mutex> guard(_container_mutex);
-
 	bool b = false;
+
+ 	std::lock_guard<std::mutex> guard(_container_mutex);
 
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		if (c == (*i)) {
@@ -983,24 +993,22 @@ void Container::PutComponentATop(Component *c, Component *c1)
 {
  	std::lock_guard<std::mutex> guard(_container_mutex);
 
-	std::vector<jgui::Component *>::iterator i;
-
-	i = std::find(_components.begin(), _components.end(), c1);
+	std::vector<jgui::Component *>::iterator 
+    i = std::find(_components.begin(), _components.end(), c1);
 
 	if (i == _components.end()) {
 		return;
 	}
 
-	_components.insert(i+1, c);
+	_components.insert(i + 1, c);
 }
 
 void Container::PutComponentBelow(Component *c, Component *c1)
 {
  	std::lock_guard<std::mutex> guard(_container_mutex);
 
-	std::vector<jgui::Component *>::iterator i;
-
-	i = std::find(_components.begin(), _components.end(), c1);
+	std::vector<jgui::Component *>::iterator 
+    i = std::find(_components.begin(), _components.end(), c1);
 
 	if (i == _components.end()) {
 		return;

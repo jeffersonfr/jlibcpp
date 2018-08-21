@@ -415,7 +415,6 @@ int main(int argc, char **argv)
 	Mines app(100, 100);
 
   app.SetTitle("Mines");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

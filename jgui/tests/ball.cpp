@@ -456,7 +456,6 @@ int main(int argc, char **argv)
 	BallDrop app;
 
 	app.SetTitle("Ball Drop");
-	app.SetVisible(true);
   app.Exec();
 
 	jgui::Application::Loop();

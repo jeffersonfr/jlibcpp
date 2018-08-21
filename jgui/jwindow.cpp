@@ -51,7 +51,6 @@ Window::Window(Window *window):
 Window::Window(int width, int height):
 	Window(0, 0, width, height)
 {
-  SetVisible(false);
 }
 
 Window::Window(int x, int y, int width, int height):
@@ -87,16 +86,11 @@ Window::Window(int x, int y, int width, int height):
 
   SetInsets(insets);
 
-  jgui::Theme 
-    *theme = new Theme();
+  _theme.SetFont("component.font", _font);
+  _theme.SetFont("container.font", _font);
+  _theme.SetFont("window.font", _font);
 
-  theme->SetFont("component.font", _font);
-  theme->SetFont("container.font", _font);
-  theme->SetFont("window.font", _font);
-
-  SetTheme(theme);
-
-  SetVisible(false);
+  SetTheme(&_theme);
   SetTitle("Main");
   SetLayout(new jgui::NullLayout());
 	SetBackgroundVisible(true);
@@ -105,6 +99,8 @@ Window::Window(int x, int y, int width, int height):
 
 Window::~Window()
 {
+  SetVisible(false);
+
   delete _event_manager;
   _event_manager = NULL;
 
@@ -132,16 +128,6 @@ void Window::Exec()
   _exec_thread = std::thread(&Window::ShowApp, this);
 }
 
-void Window::SetVisible(bool visible)
-{
-	_instance->SetVisible(visible);
-}
-
-bool Window::IsVisible()
-{
-	return _instance->IsVisible();
-}
-		
 void Window::SetResizable(bool resizable)
 {
   _instance->SetResizable(resizable);

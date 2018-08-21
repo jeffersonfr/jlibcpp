@@ -353,7 +353,6 @@ int main(int argc, char *argv[])
 	NewVox app;
 
 	app.SetTitle("Newvox");
-	app.SetVisible(true);
 	
 	jgui::Application::Loop();
 

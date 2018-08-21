@@ -146,7 +146,6 @@ int main(int argc, char **argv)
 	BorderTest app;
 
 	app.SetTitle("Border");
-	app.SetVisible(true);
 	
 	jgui::Application::Loop();
 

@@ -530,7 +530,6 @@ int main(int argc, char **argv)
 	Test app;
 
 	app.SetTitle("Events");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

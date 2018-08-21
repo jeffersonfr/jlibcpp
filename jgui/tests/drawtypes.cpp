@@ -93,7 +93,6 @@ int main(int argc, char **argv)
 	Main app;
 
 	app.SetTitle("Draw Types");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

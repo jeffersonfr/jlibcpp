@@ -533,13 +533,19 @@ void SDL2Application::InternalLoop()
         }
       }
 
+      events.erase(events.begin());
+
+      delete event;
+      event = NULL;
+
       // INFO:: discard all remaining events
       while (events.size() > 0) {
-        // jevent::EventObject *event = events.back();
+        jevent::EventObject *event = events.front();
 
-        events.pop_back();
+        events.erase(events.begin());
 
-        // TODO:: delete event; // problemas com fire
+        delete event;
+        event = NULL;
       }
     }
 
@@ -706,7 +712,7 @@ void SDL2Application::InternalLoop()
 
         g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
       } else if(event.type == SDL_QUIT) {
-        g_window->SetVisible(false);
+        SDL_HideWindow(_window);
 
         quitting = true;
         
@@ -719,6 +725,7 @@ void SDL2Application::InternalLoop()
 
   quitting = true;
   
+  g_window->SetVisible(false);
   g_window->GrabEvents();
 }
 
@@ -771,7 +778,8 @@ SDL2Window::SDL2Window(int x, int y, int width, int height):
 	SDL_SetWindowMinimumSize(_window, min.width, min.height);
 	SDL_SetWindowMaximumSize(_window, max.width, max.height);
 	
-	SDL_HideWindow(_window);
+  // (SDL_GetWindowFlags(_window) & SDL_WINDOW_SHOWN);
+  SDL_ShowWindow(_window);
 }
 
 SDL2Window::~SDL2Window()
@@ -849,23 +857,6 @@ bool SDL2Window::IsUndecorated()
   return (SDL_GetWindowFlags(_window) & SDL_WINDOW_BORDERLESS);
 }
 
-void SDL2Window::SetVisible(bool visible)
-{
-	if (visible == true) {
-    SDL_ShowWindow(_window);
-
-		DoLayout();
-    Repaint();
-	} else {
-    SDL_HideWindow(_window);
-  }
-}
-
-bool SDL2Window::IsVisible()
-{
-  return (SDL_GetWindowFlags(_window) & SDL_WINDOW_SHOWN);
-}
-		
 void SDL2Window::SetBounds(int x, int y, int width, int height)
 {
   SDL_SetWindowPosition(_window, x, y);

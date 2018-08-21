@@ -786,7 +786,6 @@ int main(int argc, char **argv)
 	PacMan app;
 
 	app.SetTitle("Pacman");
-	app.SetVisible(true);
 	app.Exec();
 	
   jgui::Application::Loop();

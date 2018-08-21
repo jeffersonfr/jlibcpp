@@ -157,7 +157,6 @@ int main(int argc, char **argv)
 	Mandelbrot app;
 
 	app.SetTitle("Mandelbrot");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

@@ -527,7 +527,6 @@ int main(int argc, char **argv)
 	GraphicsTeste app;
 
 	app.SetTitle("Raycast Texture");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

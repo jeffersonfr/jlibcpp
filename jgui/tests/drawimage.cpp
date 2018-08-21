@@ -948,7 +948,6 @@ int main(int argc, char **argv)
 	Main app;
 
 	app.SetTitle("Draw Image");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

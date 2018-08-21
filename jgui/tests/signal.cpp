@@ -187,7 +187,6 @@ int main(int argc, char **argv)
 	Plotter app;
 
 	app.SetTitle("Signal");
-	app.SetVisible(true);
 	app.Exec();
 	
   jgui::Application::Loop();

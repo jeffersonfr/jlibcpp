@@ -701,7 +701,6 @@ int main(int argc, char **argv)
 	Calculator app;
 
 	app.SetTitle("Calculator");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

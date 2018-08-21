@@ -335,7 +335,6 @@ int main(int argc, char **argv)
 	Test app;
 
 	app.SetTitle("Hough");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

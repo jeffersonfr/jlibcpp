@@ -792,7 +792,6 @@ int main( int argc, char *argv[] )
 	GraphicPanel app;
 
 	app.SetTitle("Stress Test");
-  app.SetVisible(true);
 	app.Exec();
 
 	jgui::Application::Loop();

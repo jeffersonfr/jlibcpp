@@ -490,7 +490,6 @@ int main(int argc, char **argv)
   Noise app;
 
 	app.SetTitle("Noise");
-	app.SetVisible(true);
 
   jgui::Application::Loop();
 

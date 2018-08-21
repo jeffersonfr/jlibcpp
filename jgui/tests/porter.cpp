@@ -161,7 +161,6 @@ int main( int argc, char *argv[] )
 	PorterTeste app;
 
 	app.SetTitle("Porter");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

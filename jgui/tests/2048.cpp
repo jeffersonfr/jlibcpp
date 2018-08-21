@@ -366,7 +366,6 @@ int main( int argc, char* argv[] )
 	Game2048 app; 
 
 	app.SetTitle("2048");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

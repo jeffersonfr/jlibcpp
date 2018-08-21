@@ -313,10 +313,7 @@ int main(int argc, char **argv)
 	SOM app;
 
 	app.SetTitle("Som");
-	app.SetVisible(true);
-
 	app.kohonenInit();
-
 	app.Exec();
 
 	jgui::Application::Loop();

@@ -70,14 +70,6 @@ static std::string _title;
 /** \brief */
 static float _opacity = 1.0f;
 /** \brief */
-static bool _visible = true;
-/** \brief */
-static bool _fullscreen_enabled = false;
-/** \brief */
-static bool _undecorated = false;
-/** \brief */
-static bool _resizable = true;
-/** \brief */
 static bool _cursor_enabled = true;
 /** \brief */
 static jcursor_style_t _cursor_style;
@@ -512,13 +504,19 @@ void Allegro5Application::InternalLoop()
         }
       }
 
+      events.erase(events.begin());
+
+      delete event;
+      event = NULL;
+
       // INFO:: discard all remaining events
       while (events.size() > 0) {
-        jevent::EventObject *event = events.back();
+        jevent::EventObject *event = events.front();
 
-        events.pop_back();
+        events.erase(events.begin());
 
-        // TODO:: delete event; // problemas com fire
+        delete event;
+        event = NULL;
       }
     }
 
@@ -691,6 +689,7 @@ void Allegro5Application::InternalLoop()
 
   al_destroy_event_queue(queue);
   
+  g_window->SetVisible(false);
   g_window->GrabEvents();
 }
 
@@ -751,15 +750,15 @@ Allegro5Window::~Allegro5Window()
 
 void Allegro5Window::ToggleFullScreen()
 {
-  // TODO::
-  /*
-	if (_is_fullscreen_enabled == false) {
-		al_set_new_display_flags(ALLEGRO_WINDOWED | ALLEGRO_RESIZABLE);
-	} else {
-		al_set_new_display_flags(ALLEGRO_FULLSCREEN_WINDOW); // | ALLEGRO_GENERATE_EXPOSE_EVENTS);
-	}
-  */
+  bool enabled = (al_get_display_flags(_display) & ALLEGRO_WINDOWED) != 0;
 
+	if (enabled == false) {
+    al_set_display_flag(_display, ALLEGRO_FULLSCREEN_WINDOW, true);
+	} else {
+    al_set_display_flag(_display, ALLEGRO_WINDOWED, true);
+	}
+
+  DoLayout();
   Repaint();
 }
 
@@ -771,8 +770,6 @@ void Allegro5Window::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  // TODO:: g_window precisa ser a window que contem ela
-  // TODO:: pegar os windows por evento ou algo assim
   g_window = parent;
 
   g_window->SetParent(NULL);
@@ -802,33 +799,14 @@ float Allegro5Window::GetOpacity()
 
 void Allegro5Window::SetUndecorated(bool undecorated)
 {
-  _undecorated = undecorated;
-		
-  // TODO:: al_set_new_display_flags(ALLEGRO_NOFRAME);
+  al_set_display_flag(_display, ALLEGRO_NOFRAME, undecorated);
 }
 
 bool Allegro5Window::IsUndecorated()
 {
-  return _undecorated;
+  return (al_get_display_flags(_display) & ALLEGRO_NOFRAME) != 0;
 }
 
-void Allegro5Window::SetVisible(bool visible)
-{
-  _visible = visible;
-
-	if (visible == true) {
-		DoLayout();
-    Repaint();
-	} else {
-    // TODO::
-  }
-}
-
-bool Allegro5Window::IsVisible()
-{
-  return _visible;
-}
-		
 void Allegro5Window::SetBounds(int x, int y, int width, int height)
 {
 	al_set_window_position(_display, x, y);
@@ -849,12 +827,12 @@ jgui::jregion_t Allegro5Window::GetVisibleBounds()
 		
 void Allegro5Window::SetResizable(bool resizable)
 {
-  _resizable = resizable;
+  al_set_display_flag(_display, ALLEGRO_RESIZABLE, resizable);
 }
 
 bool Allegro5Window::IsResizable()
 {
-  return _resizable;
+  return (al_get_display_flags(_display) & ALLEGRO_RESIZABLE) != 0;
 }
 
 void Allegro5Window::SetCursorLocation(int x, int y)

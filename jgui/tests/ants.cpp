@@ -338,7 +338,6 @@ int main(int argc, char **argv)
 	
 #if ENABLE_GUI == 1
 	app.SetTitle("Ants");
-	app.SetVisible(true);
   app.Exec();
 #endif
 

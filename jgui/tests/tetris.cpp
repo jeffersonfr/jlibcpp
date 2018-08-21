@@ -597,7 +597,6 @@ int main(int argc, char **argv)
 	Tetris app;
 
 	app.SetTitle("Tetris");
-	app.SetVisible(true);
 	app.Exec();
 
 	jgui::Application::Loop();

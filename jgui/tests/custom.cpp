@@ -125,7 +125,6 @@ int main(int argc, char **argv)
 	Main app("Custom Frame", 720, 480);
 
 	app.SetTitle("Custom");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

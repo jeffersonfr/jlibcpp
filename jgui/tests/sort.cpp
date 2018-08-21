@@ -1788,7 +1788,6 @@ int main(int argc, char **argv)
 	SortFrame app;
 
 	app.SetTitle("Sort");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

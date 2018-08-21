@@ -478,8 +478,6 @@ int main(int argc, char **argv)
 
 	Test app;
 
-	app.SetVisible(true);
-
   jgui::Application::Loop();
 
 	return 0;

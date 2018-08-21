@@ -121,7 +121,6 @@ int main(int argc, char *argv[])
   Fire app;
 
 	app.SetTitle("Bitmask");
-  app.SetVisible(true);
   app.Exec();
 
 	jgui::Application::Loop();

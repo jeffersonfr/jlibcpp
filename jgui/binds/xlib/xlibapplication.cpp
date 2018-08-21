@@ -44,9 +44,9 @@ struct cursor_params_t {
 /** \brief */
 static std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 /** \brief */
-static ::Display *_display;
+static ::Display *_display = NULL;
 /** \brief */
-static ::Window _window;
+static ::Window _window = 0;
 /** \brief */
 static ::Cursor _hidden_cursor;
 /** \brief */
@@ -71,8 +71,6 @@ static Window *g_window = NULL;
 static std::string _title;
 /** \brief */
 static float _opacity = 1.0f;
-/** \brief */
-static bool _visible = true;
 /** \brief */
 static bool _fullscreen_enabled = false;
 /** \brief */
@@ -402,6 +400,13 @@ XlibApplication::XlibApplication():
 
 XlibApplication::~XlibApplication()
 {
+  XUnmapWindow(_display, _window);
+  XDestroyWindow(_display, _window);
+  XFlush(_display);
+  XSync(_display, False);
+	XCloseDisplay(_display);
+
+  _window = 0;
 }
 
 void XlibApplication::InternalInitCursors()
@@ -587,20 +592,24 @@ void XlibApplication::InternalLoop()
         }
       }
 
+      events.erase(events.begin());
+
+      delete event;
+      event = NULL;
+
       // INFO:: discard all remaining events
       while (events.size() > 0) {
-        jevent::EventObject *event = events.back();
+        jevent::EventObject *event = events.front();
 
-        events.pop_back();
+        events.erase(events.begin());
 
-        // TODO:: delete event; // problemas com fire
+        delete event;
+        event = NULL;
       }
     }
 
     while (XCheckIfEvent(_display, &event, &check_x11_event, reinterpret_cast<XPointer>(_window))) {
       if (event.type == DestroyNotify) {
-        g_window->SetVisible(false);
-
         quitting = true;
         
         g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
@@ -782,14 +791,7 @@ void XlibApplication::InternalLoop()
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
-  XUnmapWindow(_display, _window);
-  XDestroyWindow(_display, _window);
-  XFlush(_display);
-  XSync(_display, False);
-	XCloseDisplay(_display);
-
-  _window = NULL;
-
+  g_window->SetVisible(false);
   g_window->GrabEvents();
 }
 
@@ -804,13 +806,13 @@ XlibWindow::XlibWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::XlibWindow");
 
-	if (_window != NULL) {
+	if (_window != 0) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
   _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_window = NULL;
+	_window = 0;
 	_mouse_x = 0;
 	_mouse_y = 0;
 	_last_keypress = std::chrono::steady_clock::now();
@@ -973,8 +975,6 @@ void XlibWindow::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  // TODO:: g_window precisa ser a window que contem ela
-  // TODO:: pegar os windows por evento ou algo assim
   g_window = parent;
 
   g_window->SetParent(NULL);
@@ -1064,23 +1064,6 @@ bool XlibWindow::IsUndecorated()
   return _undecorated;
 }
 
-void XlibWindow::SetVisible(bool visible)
-{
-  _visible = visible;
-
-	if (_visible == true) {
-		DoLayout();
-    Repaint();
-	} else {
-    // TODO::
-  }
-}
-
-bool XlibWindow::IsVisible()
-{
-  return _visible;
-}
-		
 void XlibWindow::SetBounds(int x, int y, int width, int height)
 {
 	XMoveResizeWindow(_display, _window, x, y, width, height);

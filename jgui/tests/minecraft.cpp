@@ -307,7 +307,6 @@ int main(int argc, char **argv)
 	Minecraft app;
 
 	app.SetTitle("Minecraft");
-  app.SetVisible(true);
 	app.Exec();
 
 	jgui::Application::Loop();

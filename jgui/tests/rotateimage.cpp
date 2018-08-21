@@ -170,7 +170,6 @@ int main(int argc, char **argv)
 	Main app;
 
 	app.SetTitle("Rotate Image");
-	app.SetVisible(true);
   app.Exec();
 
 	jgui::Application::Loop();

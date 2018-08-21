@@ -52,11 +52,9 @@ xcb_connection_t *_xconnection = NULL;
 /** \brief */
 xcb_screen_t *_xscreen = NULL;
 /** \brief */
-xcb_window_t _xwindow = NULL;
+xcb_window_t _xwindow = 0;
 /** \brief */
 xcb_gcontext_t _xcontext;
-/** \brief */
-static bool _key_repeat;
 /** \brief */
 static jgui::Image *_icon = NULL;
 /** \brief */
@@ -73,8 +71,6 @@ static Window *g_window = NULL;
 static std::string _title;
 /** \brief */
 static float _opacity = 1.0f;
-/** \brief */
-static bool _visible = true;
 /** \brief */
 static bool _fullscreen_enabled = false;
 /** \brief */
@@ -353,10 +349,6 @@ void XCBApplication::InternalReleaseCursors()
 
 void XCBApplication::InternalInit(int argc, char **argv)
 {
-  uint32_t 
-    mask,
-    values[2];
-
   _xconnection = xcb_connect(NULL,NULL);
 
   if (xcb_connection_has_error(_xconnection)) {
@@ -480,17 +472,23 @@ void XCBApplication::InternalLoop()
         }
       }
 
+      events.erase(events.begin());
+
+      delete event;
+      event = NULL;
+
       // INFO:: discard all remaining events
       while (events.size() > 0) {
-        jevent::EventObject *event = events.back();
+        jevent::EventObject *event = events.front();
 
-        events.pop_back();
+        events.erase(events.begin());
 
-        // TODO:: delete event; // problemas com fire
+        delete event;
+        event = NULL;
       }
     }
 
-    while (event = xcb_poll_for_event(_xconnection)) {
+    while ((event = xcb_poll_for_event(_xconnection))) {
     // while (e = xcb_wait_for_event(_xconnection)) {
       uint32_t id = event->response_type & ~0x80;
 
@@ -616,8 +614,6 @@ void XCBApplication::InternalLoop()
         g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
       } else if (id == XCB_CLIENT_MESSAGE) {
         if ((*(xcb_client_message_event_t*)event).data.data32[0] == (*reply2).atom) {
-          g_window->SetVisible(false);
-
           quitting = true;
 
           g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
@@ -634,6 +630,7 @@ void XCBApplication::InternalLoop()
 
   xcb_disconnect(_xconnection);
   
+  g_window->SetVisible(false);
   g_window->GrabEvents();
 }
 
@@ -650,13 +647,13 @@ XCBWindow::XCBWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::XCBWindow");
 
-	if (_xwindow != NULL) {
+	if (_xwindow != 0) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
   _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_xwindow = NULL;
+	_xwindow = 0;
 	_mouse_x = 0;
 	_mouse_y = 0;
 	_last_keypress = std::chrono::steady_clock::now();
@@ -753,8 +750,6 @@ void XCBWindow::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  // TODO:: g_window precisa ser a window que contem ela
-  // TODO:: pegar os windows por evento ou algo assim
   g_window = parent;
 
   g_window->SetParent(NULL);
@@ -791,27 +786,10 @@ bool XCBWindow::IsUndecorated()
   return _undecorated;
 }
 
-void XCBWindow::SetVisible(bool visible)
-{
-  _visible = visible;
-
-	if (_visible == true) {
-		DoLayout();
-    Repaint();
-	} else {
-    // TODO::
-  }
-}
-
-bool XCBWindow::IsVisible()
-{
-  return _visible;
-}
-		
 void XCBWindow::SetBounds(int x, int y, int width, int height)
 {
   const uint32_t 
-    values[] = {x, y, width, height};
+    values[] = {(uint32_t)x, (uint32_t)y, (uint32_t)width, (uint32_t)height};
 
   xcb_configure_window(_xconnection, _xwindow, XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, values);
 }

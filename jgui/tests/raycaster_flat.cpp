@@ -239,7 +239,6 @@ int main( int argc, char *argv[] )
 	GraphicsTeste app;
 
 	app.SetTitle("Raycast Flat");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

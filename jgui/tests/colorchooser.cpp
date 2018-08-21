@@ -171,7 +171,6 @@ int main(int argc, char **argv)
 	FrameTest app;
 
 	app.SetTitle("Color Chooser");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

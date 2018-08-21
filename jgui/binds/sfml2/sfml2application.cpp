@@ -61,8 +61,6 @@ static float _opacity = 1.0f;
 /** \brief */
 static bool _undecorated = false;
 /** \brief */
-static bool _visible = false;
-/** \brief */
 static bool _resizable = true;
 /** \brief */
 static bool _cursor_enabled = true;
@@ -489,13 +487,19 @@ void SFML2Application::InternalLoop()
         }
       }
 
+      events.erase(events.begin());
+
+      delete event;
+      event = NULL;
+
       // INFO:: discard all remaining events
       while (events.size() > 0) {
-        jevent::EventObject *event = events.back();
+        jevent::EventObject *event = events.front();
 
-        events.pop_back();
+        events.erase(events.begin());
 
-        // TODO:: delete event; // problemas com fire
+        delete event;
+        event = NULL;
       }
     }
 
@@ -636,7 +640,7 @@ void SFML2Application::InternalLoop()
         // AddEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
         g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
       } else if (event.type == sf::Event::Closed) {
-        g_window->SetVisible(false);
+        _window->close();
 
         quitting = true;
         
@@ -647,6 +651,7 @@ void SFML2Application::InternalLoop()
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
   
+  g_window->SetVisible(false);
   g_window->GrabEvents();
 }
 
@@ -654,7 +659,9 @@ void SFML2Application::InternalQuit()
 {
 	InternalReleaseCursors();
 
-	// TODO:: SFML_Quit();
+  if (_window != NULL) {
+    _window->close();
+  }
 }
 
 SFML2Window::SFML2Window(int x, int y, int width, int height):
@@ -693,6 +700,9 @@ SFML2Window::~SFML2Window()
 {
   delete g_window;
   g_window = NULL;
+
+  delete _window;
+  _window = NULL;
 }
 
 void SFML2Window::ToggleFullScreen()
@@ -756,23 +766,6 @@ bool SFML2Window::IsUndecorated()
   return _undecorated;
 }
 
-void SFML2Window::SetVisible(bool visible)
-{
-  _visible = visible;
-
-	if (_visible == true) {
-		DoLayout();
-    Repaint();
-  }
-  
-  _window->setVisible(true);
-}
-
-bool SFML2Window::IsVisible()
-{
-  return _visible;
-}
-		
 void SFML2Window::SetBounds(int x, int y, int width, int height)
 {
 	_window->setPosition(sf::Vector2i(x, y));
@@ -790,8 +783,8 @@ jgui::jregion_t SFML2Window::GetVisibleBounds()
 	return {
     .x = location.x, 
     .y = location.y, 
-    .width = size.x, 
-    .height = size.y
+    .width = (int)size.x, 
+    .height = (int)size.y
   };
 }
 	

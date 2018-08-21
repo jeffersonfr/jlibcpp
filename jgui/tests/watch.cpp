@@ -159,7 +159,6 @@ int main(int argc, char **argv)
 	WatchTeste app;
 
 	app.SetTitle("Watch");
-	app.SetVisible(true);
   app.Exec();
 
 	jgui::Application::Loop();

@@ -464,7 +464,6 @@ int main(int argc, char **argv)
 	Breakout app;
 
 	app.SetTitle("Breakout");
-	app.SetVisible(true);
 	app.Exec();
 
 	jgui::Application::Loop();

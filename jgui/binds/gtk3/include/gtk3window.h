@@ -99,18 +99,6 @@ class GTK3Window : public jgui::Window {
 		 * \brief
 		 *
 		 */
-		virtual void SetVisible(bool b);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsVisible();
-		
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void SetBounds(int x, int y, int width, int height);
 		
 		/**

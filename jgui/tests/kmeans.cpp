@@ -472,7 +472,6 @@ int main(int argc, char **argv)
   SOM app(4, 2*256);
 
   app.SetTitle("K-means");
-  app.SetVisible(true);
   app.Exec();
 
   jgui::Application::Loop();

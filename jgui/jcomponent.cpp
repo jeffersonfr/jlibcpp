@@ -88,9 +88,6 @@ Component::~Component()
 	if (_parent != NULL) {
 		_parent->Remove(this);
 	}
-
-  delete _theme;
-  _theme = NULL;
 }
 
 void Component::ScrollToVisibleArea(int x, int y, int width, int height, Component *coordinateSpace) 
@@ -246,8 +243,6 @@ Theme * Component::GetTheme()
 void Component::SetTheme(Theme *theme)
 {
 	_theme = theme;
-
-	Repaint();
 }
 
 void Component::SetKeyMap(KeyMap *keymap)
@@ -1745,7 +1740,7 @@ void Component::SetVisible(bool visible)
 	} else {
 		DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONSHOW));
 	}
-		
+	
 	Repaint();
 }
 

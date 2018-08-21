@@ -62,8 +62,6 @@ static float _opacity = 1.0f;
 /** \brief */
 static bool _fullscreen_enabled = false;
 /** \brief */
-static bool _visible = false;
-/** \brief */
 static bool _cursor_enabled = true;
 /** \brief */
 static jcursor_style_t _cursor_style;
@@ -408,8 +406,8 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 		return FALSE;
 	}
 
-	GTK3Window 
-    *handler = reinterpret_cast<GTK3Window *>(user_data);
+	// GTK3Window 
+  //   *handler = reinterpret_cast<GTK3Window *>(user_data);
   jregion_t 
     r = g_window->GetVisibleBounds();
   jgui::Image 
@@ -579,7 +577,7 @@ static gboolean OnMousePressEvent(GtkWidget *widget, GdkEventButton *event, gpoi
 
 static void OnClose(void)
 {
-  g_window->SetVisible(false);
+	// gtk_window_close((GtkWindow *)_window);
 }
 
 static gboolean OnConfigureEvent(GtkWidget *widget, GdkEventConfigure *event, gpointer user_data)
@@ -597,7 +595,7 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
   _window = gtk_application_window_new(app);
 
   gtk_window_set_title(GTK_WINDOW(_window), "");
-  // gtk_container_set_border_width(GTK_CONTAINER(_window), 2);
+  // gtk_container_set_border_width(GTK_CONTAINER(_window), 0);
 
   _frame = gtk_frame_new(NULL);
 
@@ -605,6 +603,8 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
   gtk_container_add(GTK_CONTAINER(_window), _frame);
 
   _drawing_area = gtk_drawing_area_new();
+  
+  // gtk_container_set_border_width(GTK_CONTAINER(_drawing_area), 0);
 
   gtk_widget_set_size_request(_drawing_area, _visible_bounds.width, _visible_bounds.height);
   gtk_container_add(GTK_CONTAINER(_frame), _drawing_area);
@@ -697,9 +697,14 @@ void GTK3Application::InternalInit(int argc, char **argv)
   gtk_init(&argc, &argv);
 
 	GdkScreen *screen = gdk_screen_get_default();
+  GdkDisplay *display = gdk_screen_get_display(screen);
+  GdkMonitor *monitor = gdk_display_get_primary_monitor(display);
+  GdkRectangle geometry;
 
-	_screen.width = gdk_screen_get_width(screen);
-	_screen.height = gdk_screen_get_height(screen);
+  gdk_monitor_get_geometry(monitor, &geometry);
+
+	_screen.width = geometry.width;
+	_screen.height = geometry.height;
 
 	InternalInitCursors();
 }
@@ -727,13 +732,19 @@ static void main_thread(GTK3Application *app)
         }
       }
 
+      events.erase(events.begin());
+
+      delete event;
+      event = NULL;
+
       // INFO:: discard all remaining events
       while (events.size() > 0) {
-        jevent::EventObject *event = events.back();
+        jevent::EventObject *event = events.front();
 
-        events.pop_back();
+        events.erase(events.begin());
 
-        // TODO:: delete event; // problemas com fire
+        delete event;
+        event = NULL;
       }
     }
 
@@ -752,6 +763,8 @@ void GTK3Application::InternalLoop()
   quitting = true;
 
   _main_thread.join();
+  
+  g_window->SetVisible(false);
 }
 
 void GTK3Application::InternalQuit()
@@ -827,8 +840,6 @@ void GTK3Window::SetParent(jgui::Container *c)
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
-  // TODO:: g_window precisa ser a window que contem ela
-  // TODO:: pegar os windows por evento ou algo assim
   g_window = parent;
 
   g_window->SetParent(NULL);
@@ -864,23 +875,6 @@ bool GTK3Window::IsUndecorated()
   return gtk_window_get_decorated(GTK_WINDOW(_window));
 }
 
-void GTK3Window::SetVisible(bool visible)
-{
-  _visible = visible;
-
-	if (_visible == true) {
-		DoLayout();
-    Repaint();
-	} else {
-		// gtk_window_close((GtkWindow *)_window);
-  }
-}
-
-bool GTK3Window::IsVisible()
-{
-  return _visible;
-}
-		
 void GTK3Window::SetBounds(int x, int y, int width, int height)
 {
   gtk_window_move(GTK_WINDOW(_window), x, y);

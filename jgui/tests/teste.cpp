@@ -914,7 +914,6 @@ int main(int argc, char **argv)
   Primitives app;
 
   app.SetTitle("Primitives");
-  app.SetVisible(true);
 
   jgui::Application::Loop();
 

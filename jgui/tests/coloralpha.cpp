@@ -193,7 +193,6 @@ int main(int argc, char *argv[])
 	ColorAlphaTeste app;
 
 	app.SetTitle("Coloralpha");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

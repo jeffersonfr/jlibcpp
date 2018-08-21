@@ -84,7 +84,6 @@ int main(int argc, char **argv)
 	Main app("Clip", 720, 480);
 
 	app.SetTitle("Scroll");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

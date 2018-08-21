@@ -290,7 +290,6 @@ int main(int argc, char **argv)
 	Main app;
 
 	app.SetTitle("Layouts");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

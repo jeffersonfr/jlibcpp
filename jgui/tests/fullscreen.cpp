@@ -86,7 +86,6 @@ int main( int argc, char *argv[] )
 	Fullscreen app;
 
 	app.SetTitle("Fullscreen");
-	app.SetVisible(true);
 
 	jgui::Application::Loop();
 

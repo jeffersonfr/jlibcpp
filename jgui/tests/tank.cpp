@@ -198,7 +198,6 @@ int main(int argc, char **argv)
 	Main app(50, 100);
 
 	app.SetTitle("Tank");
-	app.SetVisible(true);
 	app.Exec();
 
 	jgui::Application::Loop();
