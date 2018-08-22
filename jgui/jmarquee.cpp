@@ -34,7 +34,7 @@ Marquee::Marquee(std::string text, int x, int y, int width, int height):
 	_text = text;
 	_step = 10;
 	_position = 0;
-	_running = true;
+	_running = false;
 
 	SetInterval(100);
 	SetType(JMM_LOOP);
@@ -42,8 +42,7 @@ Marquee::Marquee(std::string text, int x, int y, int width, int height):
 
 Marquee::~Marquee()
 {
-	SetVisible(false);
-	// WaitThread();
+  Stop();
 }
 
 void Marquee::SetStep(int i)
@@ -62,11 +61,36 @@ void Marquee::SetType(jmarquee_mode_t type)
 	_position = 0;
 }
 
-void Marquee::Release()
+void Marquee::Start()
 {
+ 	std::lock_guard<std::mutex> guard(_marquee_mutex);
+
+  if (_running == true) {
+    return;
+  }
+
+	_running = true;
+
+  _thread = std::thread(&Marquee::Run, this);
+}
+
+void Marquee::Stop()
+{
+ 	std::lock_guard<std::mutex> guard(_marquee_mutex);
+
+  if (_running == false) {
+    return;
+  }
+
+  // INFO:: the first time will throw a exception because the _thread wasn't initialized
+  try {
+    _thread.join();
+  } catch (...) {
+  }
+
 	_running = false;
 
-	// WaitThread();
+  _thread.join();
 }
 
 void Marquee::SetText(std::string text)

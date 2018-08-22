@@ -65,6 +65,8 @@ size_t EventManager::GetClickDelay()
 
 void EventManager::PostEvent(jevent::EventObject *event)
 {
+  std::unique_lock<std::mutex> lock(_mutex);
+
   _events.push_back(event);
 
   _condition.notify_one();

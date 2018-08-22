@@ -43,8 +43,7 @@ Container::Container(int x, int y, int width, int height):
 	_parent = NULL;
 	_optimized_paint = false;
 
-	_scroll_dimension.width = _size.width;
-	_scroll_dimension.height = _size.height;
+	_scroll_dimension = GetSize();
 
 	_insets.left = 0;
 	_insets.right = 0;
@@ -79,11 +78,16 @@ void Container::UpdateScrollDimension()
     sg = theme->GetIntegerParam("component.scroll.gap");
   }
 
-	for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-    jgui::Component *cmp = (*i);
+  jgui::jsize_t
+    size = GetSize();
 
-    jgui::jpoint_t cl = cmp->GetLocation();
-    jgui::jsize_t cs = cmp->GetSize();
+	for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+    jgui::Component 
+      *cmp = (*i);
+    jgui::jpoint_t 
+      cl = cmp->GetLocation();
+    jgui::jsize_t 
+      cs = cmp->GetSize();
 
 		if (p1x > cl.x) {
 			p1x = cl.x;
@@ -103,30 +107,30 @@ void Container::UpdateScrollDimension()
 	}
 	
 	if (p1x < 0) {
-		if (p2x < _size.width) {
-			p2x = _size.width;
+		if (p2x < size.width) {
+			p2x = size.width;
 		}
 	}
 
 	if (p1y < 0) {
-		if (p2y < _size.height) {
-			p2y = _size.height;
+		if (p2y < size.height) {
+			p2y = size.height;
 		}
 	}
 
 	_scroll_dimension.width = p2x-p1x;
 	_scroll_dimension.height = p2y-p1y;
 
-	if ((_scroll_dimension.width > _size.width)) {
+	if ((_scroll_dimension.width > size.width)) {
 		_scroll_dimension.height = _scroll_dimension.height + ss + sg;
 
-		if ((_scroll_dimension.height > _size.height)) {
+		if ((_scroll_dimension.height > size.height)) {
 			_scroll_dimension.width = _scroll_dimension.width + ss + sg;
 		}
-	} else if ((_scroll_dimension.height > _size.height)) {
+	} else if ((_scroll_dimension.height > size.height)) {
 		_scroll_dimension.width = _scroll_dimension.width + ss + sg;
 	
-		if ((_scroll_dimension.width > _size.width)) {
+		if ((_scroll_dimension.width > size.width)) {
 			_scroll_dimension.height = _scroll_dimension.height + ss + sg;
 		}
 	}
@@ -135,15 +139,18 @@ void Container::UpdateScrollDimension()
 bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t symbol)
 {
 	if (IsScrollable()) {
-		Component *current = GetFocusOwner();
-
-		jpoint_t slocation = GetScrollLocation();
-		jsize_t scroll_dimension = GetScrollDimension();
+		Component 
+      *current = GetFocusOwner();
+		jpoint_t 
+      slocation = GetScrollLocation();
+		jsize_t 
+      size = GetSize(),
+      scroll_dimension = GetScrollDimension();
 		int 
       x = slocation.x,
 			y = slocation.y,
-			w = _size.width,
-			h = _size.height;
+			w = size.width,
+			h = size.height;
 		bool 
       edge = false,
 			currentLarge = false,
@@ -152,7 +159,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 		if (symbol == jevent::JKS_CURSOR_UP) {
 				y = slocation.y - _scroll_major_increment;
 				// edge = (position == 0);
-				currentLarge = (scroll_dimension.height > _size.height);
+				currentLarge = (scroll_dimension.height > size.height);
 				scrollOutOfBounds = y < 0;
 				if(scrollOutOfBounds){
 					y = 0;
@@ -160,23 +167,23 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 		} else if (symbol == jevent::JKS_CURSOR_DOWN) {
 				y = slocation.y + _scroll_major_increment;
 				// edge = (position == f.getFocusCount() - 1);
-				currentLarge = (scroll_dimension.height > _size.height);
-				scrollOutOfBounds = y > (scroll_dimension.height - _size.height);
+				currentLarge = (scroll_dimension.height > size.height);
+				scrollOutOfBounds = y > (scroll_dimension.height - size.height);
 				if(scrollOutOfBounds){
-					y = scroll_dimension.height - _size.height;
+					y = scroll_dimension.height - size.height;
 				}
 		} else if (symbol == jevent::JKS_CURSOR_RIGHT) {
 				x = slocation.x + _scroll_major_increment;
 				// edge = (position == f.getFocusCount() - 1);
-				currentLarge = (scroll_dimension.width > _size.width);
-				scrollOutOfBounds = x > (scroll_dimension.width - _size.width);
+				currentLarge = (scroll_dimension.width > size.width);
+				scrollOutOfBounds = x > (scroll_dimension.width - size.width);
 				if(scrollOutOfBounds){
-					x = scroll_dimension.width - _size.width;
+					x = scroll_dimension.width - size.width;
 				}
 		} else if (symbol == jevent::JKS_CURSOR_LEFT) {
 				x = slocation.x - _scroll_major_increment;
 				// edge = (position == 0);
-				currentLarge = (scroll_dimension.width > _size.width);
+				currentLarge = (scroll_dimension.width > size.width);
 				scrollOutOfBounds = x < 0;
 				if(scrollOutOfBounds){
 					x = 0;
@@ -374,7 +381,7 @@ void Container::Pack(bool fit)
 
 jsize_t Container::GetPreferredSize()
 {
-	return _size;
+	return GetSize();
 }
 
 jinsets_t Container::GetInsets()
@@ -451,9 +458,8 @@ void Container::Paint(Graphics *g)
 
   // std::lock_guard<std::mutex> guard(_container_mutex);
 
-	jpoint_t slocation = GetScrollLocation();
-	int scrollx = (IsScrollableX() == true)?slocation.x:0,
-			scrolly = (IsScrollableY() == true)?slocation.y:0;
+	jpoint_t 
+    slocation = GetScrollLocation();
 	jregion_t clip = g->GetClip();
 
 	Component::Paint(g);
@@ -469,11 +475,13 @@ void Container::Paint(Graphics *g)
 
 		if (c->IsVisible() == true && c->IsValid() == false) {
 			// TODO:: considera	r o scroll de um component
-      jgui::jpoint_t cl = c->GetLocation();
-      jgui::jsize_t cs = c->GetSize();
+      jgui::jpoint_t 
+        cl = c->GetLocation();
+      jgui::jsize_t 
+        cs = c->GetSize();
 			int 
-        cx = cl.x - scrollx,
-				cy = cl.y - scrolly,
+        cx = cl.x - slocation.x,
+				cy = cl.y - slocation.y,
 				cw = cs.width,
 				ch = cs.height;
 			bool 
@@ -679,6 +687,10 @@ void Container::Remove(jgui::Component *c)
 			c->SetParent(NULL);
 
 			i = _components.erase(i);
+
+      if (i == _components.end()) {
+        break;
+      }
 
 			DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_REMOVED));
 		}
@@ -961,6 +973,10 @@ void Container::RaiseComponentToTop(Component *c)
 		if (c == (*i)) {
 			i = _components.erase(i);
 
+      if (i == _components.end()) {
+        break;
+      }
+
 			b = true;
 		}
 	}
@@ -979,6 +995,10 @@ void Container::LowerComponentToBottom(Component *c)
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		if (c == (*i)) {
 			i = _components.erase(i);
+
+      if (i == _components.end()) {
+        break;
+      }
 
 			b = true;
 		}

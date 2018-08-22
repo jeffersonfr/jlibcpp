@@ -29,56 +29,50 @@ Animation::Animation(int x, int y, int width, int height):
 	SetClassName("jgui::Animation");
 
 	_index = 0;
-	_running = true;
+	_running = false;
 
 	SetInterval(500);
 }
 
 Animation::~Animation()
 {
-	SetVisible(false);
-	
-	// WaitThread();
+  Stop();
 }
 
-void Animation::Release()
+void Animation::Start()
 {
  	std::lock_guard<std::mutex> guard(_animation_mutex);
+
+  if (_running == true) {
+    return;
+  }
+
+	_running = true;
+
+  _thread = std::thread(&Animation::Run, this);
+}
+
+void Animation::Stop()
+{
+ 	std::lock_guard<std::mutex> guard(_animation_mutex);
+
+  if (_running == false) {
+    return;
+  }
+
+  // INFO:: the first time will throw a exception because the _thread wasn't initialized
+  try {
+    _thread.join();
+  } catch (...) {
+  }
 
 	_running = false;
-}
 
-void Animation::SetVisible(bool b)
-{
- 	std::lock_guard<std::mutex> guard(_animation_mutex);
-
-	/*
-	if (_is_visible == b) {
-		return;
-	}
-
-	_is_visible = b;
-
-	if (_is_visible == true) {
-		if (IsRunning() == false) {
-			_running = true;
-
-			// Start();
-		}
-	} else {
-		_running = false;
-
-		Release();
-		// WaitThread();
-		Repaint();
-	}
-	*/
+  _thread.join();
 }
 
 void Animation::SetInterval(int i)
 {
- 	std::lock_guard<std::mutex> guard(_animation_mutex);
-
 	_interval = i;
 }
 
@@ -93,11 +87,7 @@ void Animation::RemoveImage(jgui::Image *image)
 {
  	std::lock_guard<std::mutex> guard(_animation_mutex);
 
-  std::vector<jgui::Image *>::iterator i = std::find(_images.begin(), _images.end(), image);
-  
-  if (i != _images.end()) {
-    _images.erase(i);
-  }
+  _images.erase(std::remove(_images.begin(), _images.end(), image), _images.end());
 }
 
 void Animation::RemoveAll()
@@ -154,7 +144,7 @@ void Animation::Run()
 			_index = 0;
 		}
 
-		// jthread::Thread::MSleep(_interval);
+    std::this_thread::sleep_for(std::chrono::milliseconds(_interval));
 	}
 }
 

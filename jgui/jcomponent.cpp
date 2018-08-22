@@ -333,12 +333,18 @@ jcomponent_orientation_t Component::GetComponentOrientation()
 
 bool Component::IsScrollableX()
 {
-	return (_is_scrollable_x == true) && (GetScrollDimension().width > _size.width);
+  jgui::jsize_t
+    size = GetSize();
+
+	return (_is_scrollable_x == true) && (GetScrollDimension().width > size.width);
 }
 
 bool Component::IsScrollableY()
 {
-	return (_is_scrollable_y == true) && (GetScrollDimension().height > _size.height);
+  jgui::jsize_t
+    size = GetSize();
+
+	return (_is_scrollable_y == true) && (GetScrollDimension().height > size.height);
 }
 
 bool Component::IsScrollable()
@@ -395,7 +401,7 @@ jgui::jpoint_t Component::GetScrollLocation()
 
 jsize_t Component::GetScrollDimension()
 {
-	return _size;
+	return GetSize();
 }
 
 jregion_t Component::GetVisibleBounds()
@@ -410,11 +416,12 @@ jregion_t Component::GetVisibleBounds()
 
 void Component::SetScrollLocation(int x, int y)
 {
-	jsize_t 
+	jsize_t
+    size = GetSize(),
     sdimention = GetScrollDimension();
 	int 
-    diffx = sdimention.width -_size.width,
-    diffy = sdimention.height-_size.height;
+    diffx = sdimention.width  - size.width,
+    diffy = sdimention.height - size.height;
 
 	_scroll_location.x = x;
 
@@ -482,6 +489,7 @@ void Component::PaintScrollbars(Graphics *g)
   jgui::jpoint_t 
     slocation = GetScrollLocation();
   jgui::jsize_t
+    size = GetSize(),
     sdimention = GetScrollDimension();
 	int 
     bs = theme->GetIntegerParam("component.border.size"),
@@ -490,33 +498,33 @@ void Component::PaintScrollbars(Graphics *g)
 	if (IsScrollableX() == true) {
 		double 
       offset_ratio = (double)slocation.x/(double)sdimention.width,
-			block_size_ratio = (double)_size.width/(double)sdimention.width;
+			block_size_ratio = (double)size.width/(double)sdimention.width;
 		int 
-      offset = (int)(_size.width*offset_ratio),
-			block_size = (int)(_size.width*block_size_ratio);
+      offset = (int)(size.width*offset_ratio),
+			block_size = (int)(size.width*block_size_ratio);
 
 		g->SetColor(fg);
-		g->FillRectangle(bs, _size.height - ss - bs, _size.width - 2*bs, ss);
+		g->FillRectangle(bs, size.height - ss - bs, size.width - 2*bs, ss);
 		g->SetGradientStop(0.0, fg);
 		g->SetGradientStop(1.0, bg);
-		g->FillLinearGradient(offset, _size.height - ss- bs, block_size, ss, 0, 0, 0, ss);
+		g->FillLinearGradient(offset, size.height - ss- bs, block_size, ss, 0, 0, 0, ss);
 		g->ResetGradientStop();
 	}
 	
 	if (IsScrollableY() == true) {
 		double 
       offset_ratio = (double)slocation.y/(double)sdimention.height,
-			block_size_ratio = (double)_size.height/(double)sdimention.height;
+			block_size_ratio = (double)size.height/(double)sdimention.height;
 		int 
-      offset = (int)(_size.height*offset_ratio),
-			block_size = (int)(_size.height*block_size_ratio);
+      offset = (int)(size.height*offset_ratio),
+			block_size = (int)(size.height*block_size_ratio);
 
 		g->SetColor(fg);
-		g->FillRectangle(_size.width - ss - bs, bs, ss, _size.height);
+		g->FillRectangle(size.width - ss - bs, bs, ss, size.height);
 
 		g->SetGradientStop(0.0, fg);
 		g->SetGradientStop(1.0, bg);
-		g->FillLinearGradient(_size.width - ss - bs, offset, ss, block_size, 0, 0, ss, 0);
+		g->FillLinearGradient(size.width - ss - bs, offset, ss, block_size, 0, 0, ss, 0);
 		g->ResetGradientStop();
 	}
 
@@ -527,7 +535,7 @@ void Component::PaintScrollbars(Graphics *g)
 
 		g->SetGradientStop(0.0, bg);
 		g->SetGradientStop(1.0, fg);
-		g->FillRadialGradient(_size.width-radius2, _size.height-radius2, radius, radius, 0, 0, 0);
+		g->FillRadialGradient(size.width-radius2, size.height-radius2, radius, radius, 0, 0, 0);
 		g->ResetGradientStop();
 	}
 
@@ -539,7 +547,7 @@ void Component::PaintScrollbars(Graphics *g)
 	pen.width = -bs;
 	g->SetPen(pen);
 
-	g->DrawRectangle(0, 0, _size.width, _size.height);
+	g->DrawRectangle(0, 0, size.width, size.height);
 
 	pen.width = width;
 
@@ -552,23 +560,26 @@ void Component::PaintBackground(Graphics *g)
 		return;
 	}
 	
-	Theme *theme = GetTheme();
+  jgui::Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return;
   }
 
-	Color 
+  jgui::Color 
     bg = theme->GetIntegerParam("component.bg"),
 	  bgfocus = theme->GetIntegerParam("component.bg.focus"),
 	  bgdisable = theme->GetIntegerParam("component.bg.disable");
+  jgui::jsize_t
+    size = GetSize();
 	jcomponent_border_t 
     bordertype = (jcomponent_border_t)theme->GetIntegerParam("component.border.style");
   int
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
-		w = _size.width - 2*x,
-		h = _size.height - 2*y;
+		w = size.width - 2*x,
+		h = size.height - 2*y;
 
 	if (_is_enabled == true) {
 		if (_has_focus == true) {
@@ -591,7 +602,8 @@ void Component::PaintBackground(Graphics *g)
 
 void Component::PaintBorders(Graphics *g)
 {
-	Theme *theme = GetTheme();
+  jgui::Theme 
+    *theme = GetTheme();
 
   if (theme == NULL) {
     return;
@@ -604,18 +616,20 @@ void Component::PaintBorders(Graphics *g)
 		return;
 	}
 
-	Color
+  jgui::Color
     color,
     border = theme->GetIntegerParam("component.border"),
 	  borderfocus = theme->GetIntegerParam("component.border.focus"),
 	  borderdisable = theme->GetIntegerParam("component.border.disable");
+  jgui::jsize_t
+    size = GetSize();
 	int 
     bs = theme->GetIntegerParam("component.border.size");
 	int 
     xp = 0, 
 		yp = 0,
-		wp = _size.width,
-		hp = _size.height;
+		wp = size.width,
+		hp = size.height;
 	int 
     step = 0x20;
 
@@ -736,7 +750,7 @@ void Component::PaintBorders(Graphics *g)
 
 	if (_is_enabled == false) {
 		g->SetColor(0x00, 0x00, 0x00, 0x80);
-		g->FillRectangle(0, 0, _size.width, _size.height);
+		g->FillRectangle(0, 0, size.width, size.height);
 	}
 }
 
@@ -907,15 +921,19 @@ void Component::SetMinimumSize(jsize_t size)
 		_minimum_size.height = _maximum_size.height;
 	}
 
-	if (_size.width < _minimum_size.width || _size.height < _minimum_size.height) {
-		int w = _size.width,
-				h = _size.height;
+  jgui::jsize_t
+    size2 = GetSize();
 
-		if (_size.width < _minimum_size.width) {
+	if (size2.width < _minimum_size.width || size2.height < _minimum_size.height) {
+		int 
+      w = size2.width,
+			h = size2.height;
+
+		if (w < _minimum_size.width) {
 			w = _minimum_size.width;
 		}
 	
-		if (_size.height < _minimum_size.height) {
+		if (h < _minimum_size.height) {
 			h = _minimum_size.height;
 		}
 
@@ -944,15 +962,19 @@ void Component::SetMaximumSize(jsize_t size)
 		_maximum_size.height = _minimum_size.height;
 	}
 
-	if (_size.width > _maximum_size.width || _size.height > _maximum_size.height) {
-		int w = _size.width,
-				h = _size.height;
+  jgui::jsize_t
+    size2 = GetSize();
 
-		if (_size.width > _maximum_size.width) {
+	if (size2.width > _maximum_size.width || size2.height > _maximum_size.height) {
+		int 
+      w = _size.width,
+			h = _size.height;
+
+		if (w > _maximum_size.width) {
 			w = _maximum_size.width;
 		}
 	
-		if (_size.height > _maximum_size.height) {
+		if (h > _maximum_size.height) {
 			h = _maximum_size.height;
 		}
 
@@ -1012,7 +1034,10 @@ void Component::Move(jpoint_t point)
 
 void Component::SetBounds(int x, int y, int width, int height)
 {
-	if (_location.x == x && _location.y == y && _size.width == width && _size.height == height) {
+  jgui::jsize_t
+    size = GetSize();
+
+	if (_location.x == x && _location.y == y && size.width == width && size.height == height) {
 		return;
 	}
 
@@ -1271,7 +1296,10 @@ int Component::GetGradientLevel()
 
 bool Component::Intersect(int x, int y)
 {
-	if ((x>_location.x && x<(_location.x+_size.width)) && (y>_location.y && y<(_location.y+_size.height))) {
+  jgui::jsize_t
+    size = GetSize();
+
+	if ((x > _location.x && x < (_location.x + size.width)) && (y > _location.y && y < (_location.y + size.height))) {
 		return true;
 	}
 
@@ -1314,6 +1342,7 @@ bool Component::MousePressed(jevent::MouseEvent *event)
   jgui::Theme 
     *theme = GetTheme();
 	jsize_t 
+    size = GetSize(),
     sdimention = GetScrollDimension();
 	jpoint_t 
     slocation = GetScrollLocation();
@@ -1332,13 +1361,13 @@ bool Component::MousePressed(jevent::MouseEvent *event)
 		RequestFocus();
 	}
 
-	if (IsScrollableY() && elocation.x > (_size.width - ss - bs)) {
+	if (IsScrollableY() && elocation.x > (size.width - ss - bs)) {
 		double 
       offset_ratio = (double)slocation.y/(double)sdimention.height,
-		  block_size_ratio = (double)_size.height/(double)sdimention.height;
+		  block_size_ratio = (double)size.height/(double)sdimention.height;
 		int 
-      offset = (int)(_size.height*offset_ratio),
-			block_size = (int)(_size.height*block_size_ratio);
+      offset = (int)(size.height*offset_ratio),
+			block_size = (int)(size.height*block_size_ratio);
 
 		if (elocation.y > offset && elocation.y < (offset+block_size)) {
 			_component_state = 10;
@@ -1351,13 +1380,13 @@ bool Component::MousePressed(jevent::MouseEvent *event)
 		}
 
 		return true;
-	} else if (IsScrollableX() && elocation.y > (_size.height - ss - bs)) {
+	} else if (IsScrollableX() && elocation.y > (size.height - ss - bs)) {
 		double 
       offset_ratio = (double)slocation.x/(double)sdimention.width,
-		  block_size_ratio = (double)_size.width/(double)sdimention.width;
+		  block_size_ratio = (double)size.width/(double)sdimention.width;
 		int 
-      offset = (int)(_size.width*offset_ratio),
-			block_size = (int)(_size.width*block_size_ratio);
+      offset = (int)(size.width*offset_ratio),
+			block_size = (int)(size.width*block_size_ratio);
 
 		if (elocation.x > offset && elocation.x < (offset + block_size)) {
 			_component_state = 11;
@@ -1584,10 +1613,11 @@ void Component::FindNextComponentFocus(jregion_t rect, Component **left, Compone
 		return;
 	}
 
-	int d_left = INT_MAX,
-			d_right = INT_MAX,
-			d_up = INT_MAX,
-			d_down = INT_MAX;
+	int 
+    d_left = INT_MAX,
+		d_right = INT_MAX,
+		d_up = INT_MAX,
+		d_down = INT_MAX;
 
 	for (std::vector<Component *>::iterator i=components.begin(); i!=components.end(); i++) {
 		Component *cmp = (*i);
@@ -1596,12 +1626,15 @@ void Component::FindNextComponentFocus(jregion_t rect, Component **left, Compone
 			continue;
 		}
 
-		jsize_t cmp_size = cmp->GetSize();
-		jpoint_t cmp_location = cmp->GetAbsoluteLocation();
-		int c1x = rect.x + rect.width/2,
-				c1y = rect.y + rect.height/2,
-				c2x = cmp_location.x + cmp_size.width/2,
-				c2y = cmp_location.y + cmp_size.height/2;
+		jsize_t 
+      cmp_size = cmp->GetSize();
+		jpoint_t 
+      cmp_location = cmp->GetAbsoluteLocation();
+		int 
+      c1x = rect.x + rect.width/2,
+			c1y = rect.y + rect.height/2,
+			c2x = cmp_location.x + cmp_size.width/2,
+			c2y = cmp_location.y + cmp_size.height/2;
 
 		if (cmp_location.x < rect.x) {
 			int value = ::abs(c1y-c2y)*(rect.width+cmp_size.width) + (rect.x+rect.width-cmp_location.x-cmp_size.width);

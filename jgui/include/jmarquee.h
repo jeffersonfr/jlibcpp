@@ -22,6 +22,9 @@
 
 #include "jgui/jcomponent.h"
 
+#include <thread>
+#include <mutex>
+
 namespace jgui {
 
 /**
@@ -41,6 +44,10 @@ enum jmarquee_mode_t {
 class Marquee : public Component {
 
 	private:
+		/** \brief */
+    std::thread _thread;
+		/** \brief */
+		std::mutex _marquee_mutex;
 		/** \brief */
 		std::string _text;
 		/** \brief */
@@ -103,7 +110,13 @@ class Marquee : public Component {
 		 * \brief
 		 *
 		 */
-		virtual void Release();
+		virtual void Start();
+
+		/**
+		 * \brief
+		 *
+		 */
+		virtual void Stop();
 
 		/**
 		 * \brief

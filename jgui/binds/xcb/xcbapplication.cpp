@@ -439,6 +439,20 @@ void XCBApplication::InternalPaint()
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
+struct my_event_queue_t {
+  xcb_generic_event_t *prev = nullptr;
+  xcb_generic_event_t *current = nullptr;
+  xcb_generic_event_t *next = nullptr;
+} event_queue;
+
+void update_event_queue(){
+  std::free(event_queue.prev);
+
+  event_queue.prev = event_queue.current;
+  event_queue.current = event_queue.next;
+  event_queue.next = xcb_poll_for_queued_event(_xconnection);
+}
+
 void XCBApplication::InternalLoop()
 {
   xcb_generic_event_t *event;

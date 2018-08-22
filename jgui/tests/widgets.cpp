@@ -142,8 +142,8 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
 			_animation->AddImage(new jgui::BufferedImage("images/tux-turtle.png"));
 			_animation->AddImage(new jgui::BufferedImage("images/tux-wolverine.png"));
 			_animation->AddImage(new jgui::BufferedImage("images/tux-zombie.png"));
-
-			// TODO:: _animation->Start();
+    
+      _animation->Start();
 		}
 
     jgui::jsize_t
@@ -194,8 +194,8 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
 			_marquee = new jgui::Marquee("Marquee Test", insets.left + 196 + 16, insets.top, size.width - 2*(196 + 16) - insets.left - insets.right);
 
 			_marquee->SetType(jgui::JMM_LOOP);
-
-			// TODO:: _marquee->Start();
+    
+      // _marquee->Start();
 		}
 
 		{
@@ -209,8 +209,8 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
 			_progress->SetValue(20.0);
 			_slider->SetValue(20.0);
 			_scroll->SetValue(20.0);
-
-			// TODO:: _progress->Start();
+    
+      // TODO:: _progress->Start();
 		}
 
 		{
@@ -470,6 +470,9 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
     _mutex.unlock();
 	}
 
+  virtual void ShowApp()
+  {
+  }
 };
 
 int main(int argc, char **argv)
@@ -477,6 +480,8 @@ int main(int argc, char **argv)
 	jgui::Application::Init(argc, argv);
 
 	Test app;
+
+  app.Exec();
 
   jgui::Application::Loop();
 

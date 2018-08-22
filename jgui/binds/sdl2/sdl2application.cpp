@@ -510,7 +510,8 @@ void SDL2Application::InternalPaint()
   SDL_DestroyTexture(texture);
   SDL_FreeSurface(surface);
   SDL_RenderPresent(_renderer);
-    
+  // SDL_GL_SetSwapInterval(1);
+
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
@@ -635,7 +636,6 @@ void SDL2Application::InternalLoop()
           // e.motion.x/y
         } else if (event.type == SDL_MOUSEBUTTONDOWN) {
           // e.button.button == SDL_BUTTON_LEFT
-          // e.button.clicks
         } else if (event.type == SDL_MOUSEBUTTONUP) {
         } else if (event.type == SDL_MOUSEWHEEL) {
         }
@@ -671,16 +671,6 @@ void SDL2Application::InternalLoop()
           _click_count = event.button.clicks;
 
           if (type == jevent::JMT_PRESSED) {
-            auto current = std::chrono::steady_clock::now();
-            
-            if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
-              _click_count = _click_count + 1;
-            } else {
-            	_click_count = 1;
-            }
-
-            _last_keypress = current;
-
             mouse_z = _click_count;
           }
         } else if (event.type == SDL_MOUSEWHEEL) {
@@ -763,7 +753,8 @@ SDL2Window::SDL2Window(int x, int y, int width, int height):
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
-	_renderer = SDL_CreateRenderer(_window, 0, SDL_RENDERER_SOFTWARE); // SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
+	_renderer = SDL_CreateRenderer(_window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+	// _renderer = SDL_CreateRenderer(_window, 0, SDL_RENDERER_SOFTWARE); // SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
 
 	if (_renderer == NULL) {
 		throw jexception::RuntimeException("Cannot get a window's surface");

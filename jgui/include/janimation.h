@@ -25,6 +25,7 @@
 
 #include <mutex>
 #include <vector>
+#include <thread>
 
 namespace jgui {
 
@@ -40,6 +41,8 @@ class Animation : public Component {
 		std::vector<Image *> _images;
 		/** \brief */
 		std::mutex _animation_mutex;
+		/** \brief */
+    std::thread _thread;
 		/** \brief */
 		int _index;
 		/** \brief */
@@ -94,13 +97,13 @@ class Animation : public Component {
 		 * \brief
 		 *
 		 */
-		virtual void Release();
+		virtual void Start();
 		
 		/**
 		 * \brief
 		 *
 		 */
-		virtual void SetVisible(bool b);
+		virtual void Stop();
 		
 		/**
 		 * \brief
