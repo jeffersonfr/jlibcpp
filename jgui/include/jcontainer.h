@@ -58,8 +58,6 @@ class Container : public jgui::Component {
 		/** \brief */
 		Layout *_layout;
 		/** \brief */
-		jsize_t _scroll_dimension;
-		/** \brief */
 		jinsets_t _insets;
 		/** \brief */
 		bool _optimized_paint;
@@ -92,12 +90,6 @@ class Container : public jgui::Component {
 		 * \return true if next Component is now visible
 		 */    
 		virtual bool MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t symbol);
-
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void UpdateScrollDimension();
 
 	public:
 		/**

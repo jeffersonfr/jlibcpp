@@ -438,9 +438,6 @@ void TextArea::InitRowsString()
     x = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		// y = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size"),
 		w = size.width - 2*x;
-		// h = size.height - 2*y;
-	int 
-    fs = font->GetSize();
 
 	std::string 
     text = _text;
@@ -527,11 +524,6 @@ void TextArea::InitRowsString()
 	}
 
 	_rows_string = false;
-	
-  jgui::jpoint_t
-    slocation = GetScrollLocation();
-
-	SetScrollLocation(slocation.x, (std::max)(0, (fs+_rows_gap)*_current_row));
 }
 
 std::vector<std::string> & TextArea::GetLines()

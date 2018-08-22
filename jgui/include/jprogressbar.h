@@ -47,12 +47,6 @@ class ProgressBar : public jgui::Component {
 		int _fixe_delta;
 		/** \brief */
 		int _stone_size;
-		/** \brief */
-		bool _label_visible;
-		/** \brief */
-		bool _indeterminate;
-		/** \brief */
-		bool _running;
 
 	public:
 		/**
@@ -107,38 +101,8 @@ class ProgressBar : public jgui::Component {
 		 * \brief
 		 *
 		 */
-		virtual void SetStringPainted(bool b);
-	
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void SetIndeterminate(bool b);
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual bool IsStringPainted();
-		
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Release();
-
-		/**
-		 * \brief
-		 *
-		 */
 		virtual void Paint(Graphics *g);
 
-		/**
-		 * \brief
-		 *
-		 */
-		virtual void Run();
-		
 };
 
 }

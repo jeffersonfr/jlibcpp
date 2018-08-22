@@ -82,15 +82,12 @@ void Marquee::Stop()
     return;
   }
 
-  // INFO:: the first time will throw a exception because the _thread wasn't initialized
+	_running = false;
+
   try {
     _thread.join();
   } catch (...) {
   }
-
-	_running = false;
-
-  _thread.join();
 }
 
 void Marquee::SetText(std::string text)
@@ -181,6 +178,14 @@ void Marquee::Paint(Graphics *g)
 
 void Marquee::Run()
 {
+  do {
+    if (_running == false) {
+      return;
+    }
+    
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+  } while (GetTheme() == NULL);
+
 	Theme 
     *theme = GetTheme();
 

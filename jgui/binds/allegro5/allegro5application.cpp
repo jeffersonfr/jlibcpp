@@ -50,8 +50,6 @@ static ALLEGRO_DISPLAY *_display;
 /** \brief */
 static ALLEGRO_BITMAP *_surface;
 /** \brief */
-static ALLEGRO_EVENT_SOURCE _user_event;
-/** \brief */
 static ALLEGRO_MOUSE_CURSOR *_cursor_bitmap;
 /** \brief */
 static jgui::Image *_icon = NULL;
@@ -481,14 +479,15 @@ void Allegro5Application::InternalLoop()
 	ALLEGRO_EVENT event;
   bool quitting = false;
 
-	al_init_user_event_source(&_user_event);
-
 	ALLEGRO_EVENT_QUEUE *queue = al_create_event_queue();
+
+  if (queue == NULL) {
+    return;
+  }
 
 	al_register_event_source(queue, al_get_keyboard_event_source());
 	al_register_event_source(queue, al_get_mouse_event_source());
 	al_register_event_source(queue, al_get_display_event_source(_display));
-	al_register_event_source(queue, &_user_event);
 
 	while (quitting == false) {
     std::vector<jevent::EventObject *> events = g_window->GrabEvents();
@@ -520,13 +519,13 @@ void Allegro5Application::InternalLoop()
       }
     }
 
+		if (al_wait_for_event_timed(queue, &event, 100) == false) {
+      continue;
+    }
+    
     // al_wait_for_event(queue, &event);
-		al_wait_for_event_timed(queue, &event, 0);
-		// al_get_next_event(queue, &event);
 
 		if (event.type == ALLEGRO_EVENT_DISPLAY_CLOSE) {
-      g_window->SetVisible(false);
-
       quitting = true;
 
       g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
@@ -552,7 +551,7 @@ void Allegro5Application::InternalLoop()
       g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_RESIZED));
     } else if (event.type == ALLEGRO_EVENT_DISPLAY_EXPOSE) {
       InternalPaint();
-    } else if (event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
+    } else if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == ALLEGRO_EVENT_KEY_DOWN || event.type == ALLEGRO_EVENT_KEY_UP) {
       jevent::jkeyevent_type_t type;
       jevent::jkeyevent_modifiers_t mod;
 
@@ -596,7 +595,7 @@ void Allegro5Application::InternalLoop()
 
       type = jevent::JKT_UNKNOWN;
 
-      if (event.type == ALLEGRO_EVENT_KEY_DOWN) {
+      if (event.type == ALLEGRO_EVENT_KEY_CHAR || event.type == ALLEGRO_EVENT_KEY_DOWN) {
         type = jevent::JKT_PRESSED;
       } else if (event.type == ALLEGRO_EVENT_KEY_UP) {
         type = jevent::JKT_RELEASED;
@@ -684,7 +683,7 @@ void Allegro5Application::InternalLoop()
       g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
     }
   
-    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    // std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   al_destroy_event_queue(queue);

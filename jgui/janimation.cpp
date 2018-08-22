@@ -60,15 +60,12 @@ void Animation::Stop()
     return;
   }
 
-  // INFO:: the first time will throw a exception because the _thread wasn't initialized
+  _running = false;
+
   try {
     _thread.join();
   } catch (...) {
   }
-
-	_running = false;
-
-  _thread.join();
 }
 
 void Animation::SetInterval(int i)

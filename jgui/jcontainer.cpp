@@ -43,8 +43,6 @@ Container::Container(int x, int y, int width, int height):
 	_parent = NULL;
 	_optimized_paint = false;
 
-	_scroll_dimension = GetSize();
-
 	_insets.left = 0;
 	_insets.right = 0;
 	_insets.top = 0;
@@ -57,82 +55,6 @@ Container::~Container()
 {
 	if (_default_layout != NULL) {
 		delete _default_layout;
-	}
-}
-
-void Container::UpdateScrollDimension()
-{
-	Theme *theme = GetTheme();
-
-	int 
-    p1x = 0,
-		p2x = 0,
-    p1y = 0,
-		p2y = 0;
-  int 
-    ss = 0,
-    sg = 0;
-  
-  if (theme != NULL) {
-    ss = theme->GetIntegerParam("component.scroll.size");
-    sg = theme->GetIntegerParam("component.scroll.gap");
-  }
-
-  jgui::jsize_t
-    size = GetSize();
-
-	for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
-    jgui::Component 
-      *cmp = (*i);
-    jgui::jpoint_t 
-      cl = cmp->GetLocation();
-    jgui::jsize_t 
-      cs = cmp->GetSize();
-
-		if (p1x > cl.x) {
-			p1x = cl.x;
-		}
-
-		if (p2x < (cl.x + cs.width)) {
-			p2x = cl.x + cs.width;
-		}
-		
-		if (p1y > cl.y) {
-			p1y = cl.y;
-		}
-
-		if (p2y < (cl.y + cs.height)) {
-			p2y = cl.y + cs.height;
-		}
-	}
-	
-	if (p1x < 0) {
-		if (p2x < size.width) {
-			p2x = size.width;
-		}
-	}
-
-	if (p1y < 0) {
-		if (p2y < size.height) {
-			p2y = size.height;
-		}
-	}
-
-	_scroll_dimension.width = p2x-p1x;
-	_scroll_dimension.height = p2y-p1y;
-
-	if ((_scroll_dimension.width > size.width)) {
-		_scroll_dimension.height = _scroll_dimension.height + ss + sg;
-
-		if ((_scroll_dimension.height > size.height)) {
-			_scroll_dimension.width = _scroll_dimension.width + ss + sg;
-		}
-	} else if ((_scroll_dimension.height > size.height)) {
-		_scroll_dimension.width = _scroll_dimension.width + ss + sg;
-	
-		if ((_scroll_dimension.width > size.width)) {
-			_scroll_dimension.height = _scroll_dimension.height + ss + sg;
-		}
 	}
 }
 
@@ -233,7 +155,83 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 
 jsize_t Container::GetScrollDimension()
 {
-	return _scroll_dimension;
+  jgui::Theme 
+    *theme = GetTheme();
+	int 
+    p1x = 0,
+		p2x = 0,
+    p1y = 0,
+		p2y = 0;
+  int 
+    ss = 0,
+    sg = 0;
+  
+  if (theme != NULL) {
+    ss = theme->GetIntegerParam("component.scroll.size");
+    sg = theme->GetIntegerParam("component.scroll.gap");
+  }
+
+  jgui::jsize_t
+    size = GetSize();
+
+	for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
+    jgui::Component 
+      *cmp = (*i);
+    jgui::jpoint_t 
+      cl = cmp->GetLocation();
+    jgui::jsize_t 
+      cs = cmp->GetSize();
+
+		if (p1x > cl.x) {
+			p1x = cl.x;
+		}
+
+		if (p2x < (cl.x + cs.width)) {
+			p2x = cl.x + cs.width;
+		}
+		
+		if (p1y > cl.y) {
+			p1y = cl.y;
+		}
+
+		if (p2y < (cl.y + cs.height)) {
+			p2y = cl.y + cs.height;
+		}
+	}
+	
+	if (p1x < 0) {
+		if (p2x < size.width) {
+			p2x = size.width;
+		}
+	}
+
+	if (p1y < 0) {
+		if (p2y < size.height) {
+			p2y = size.height;
+		}
+	}
+
+  jgui::jsize_t
+    scroll_dimension;
+
+	scroll_dimension.width = p2x - p1x;
+	scroll_dimension.height = p2y - p1y;
+
+	if ((scroll_dimension.width > size.width)) {
+		scroll_dimension.height = scroll_dimension.height + ss + sg;
+
+		if ((scroll_dimension.height > size.height)) {
+			scroll_dimension.width = scroll_dimension.width + ss + sg;
+		}
+	} else if ((scroll_dimension.height > size.height)) {
+		scroll_dimension.width = scroll_dimension.width + ss + sg;
+	
+		if ((scroll_dimension.width > size.width)) {
+			scroll_dimension.height = scroll_dimension.height + ss + sg;
+		}
+	}
+
+  return scroll_dimension;
 }
 
 Component * Container::GetTargetComponent(Container *target, int x, int y, int *dx, int *dy)
@@ -314,8 +312,6 @@ void Container::DoLayout()
 		
 		SetIgnoreRepaint(false);
 	}
-		
-	UpdateScrollDimension();
 }
 
 void Container::Pack(bool fit)

@@ -195,7 +195,7 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
 
 			_marquee->SetType(jgui::JMM_LOOP);
     
-      // _marquee->Start();
+      _marquee->Start();
 		}
 
 		{
@@ -209,8 +209,6 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
 			_progress->SetValue(20.0);
 			_slider->SetValue(20.0);
 			_scroll->SetValue(20.0);
-    
-      // TODO:: _progress->Start();
 		}
 
 		{
@@ -457,13 +455,11 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
     _mutex.lock();
 
 		if (event->GetSource() == _button1) {
-			_progress->SetValue(_progress->GetValue()+10);
-			_slider->SetValue(_slider->GetValue()+10);
-
-			// TODO:: jgui::ThemeManager::GetInstance()->SetTheme(&_theme4);
+			_progress->SetValue(_progress->GetValue() + 10);
+			_slider->SetValue(_slider->GetValue() + 10);
 		} else if (event->GetSource() == _button2) {
-			_progress->SetValue(_progress->GetValue()-10);
-			_slider->SetValue(_slider->GetValue()-10);
+			_progress->SetValue(_progress->GetValue() - 10);
+			_slider->SetValue(_slider->GetValue() - 10);
 		} else if (event->GetSource() == _button3) {
 		}
     
