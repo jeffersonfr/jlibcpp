@@ -17,8 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "xlib/include/xlibapplication.h"
-#include "xlib/include/xlibwindow.h"
+#include "include/nativeapplication.h"
+#include "include/nativewindow.h"
+
 #include "jgui/jfont.h"
 #include "jgui/jbufferedimage.h"
 #include "jcommon/jproperties.h"
@@ -28,6 +29,7 @@
 #include <thread>
 
 #include <X11/Xlib.h>
+#include <X11/cursorfont.h>
 #include <X11/keysym.h>
 #include <X11/extensions/Xrandr.h>
 
@@ -42,17 +44,13 @@ struct cursor_params_t {
 };
 
 /** \brief */
-static std::map<jcursor_style_t, struct cursor_params_t> _cursors;
-/** \brief */
 static ::Display *_display = NULL;
 /** \brief */
 static ::Window _window = 0;
 /** \brief */
-static ::Cursor _hidden_cursor;
-/** \brief */
 static ::XEvent _last_key_release_event;
 /** \brief */
-jgui::jregion_t _visible_bounds;
+static jgui::jregion_t _visible_bounds;
 /** \brief */
 static bool _key_repeat;
 /** \brief */
@@ -80,7 +78,9 @@ static bool _resizable = true;
 /** \brief */
 static bool _cursor_enabled = true;
 /** \brief */
-static jcursor_style_t _cursor_style;
+static jcursor_style_t _cursor;
+/** \brief */
+static bool _visible = true;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(KeySym symbol)
 {
@@ -392,13 +392,13 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(KeySym symbol)
 
 static jgui::jsize_t _screen = {0, 0};
 
-XlibApplication::XlibApplication():
+NativeApplication::NativeApplication():
 	jgui::Application()
 {
-	jcommon::Object::SetClassName("jgui::XlibApplication");
+	jcommon::Object::SetClassName("jgui::NativeApplication");
 }
 
-XlibApplication::~XlibApplication()
+NativeApplication::~NativeApplication()
 {
   XUnmapWindow(_display, _window);
   XDestroyWindow(_display, _window);
@@ -409,59 +409,7 @@ XlibApplication::~XlibApplication()
   _window = 0;
 }
 
-void XlibApplication::InternalInitCursors()
-{
-#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
-	t.cursor = new BufferedImage(JPF_ARGB, w, h);													\
-																																				\
-	t.hot_x = hotx;																												\
-	t.hot_y = hoty;																												\
-																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
-																																				\
-	_cursors[type] = t;																										\
-
-	struct cursor_params_t t;
-	int w = 32;
-	int h = 32;
-
-	try {
-		Image *cursors = new BufferedImage(_DATA_PREFIX"/images/cursors.png");
-
-		CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
-		CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
-		CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
-		CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
-		CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
-		CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
-		CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
-		CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
-		CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
-		CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
-		CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
-		CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
-		CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
-		CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
-		CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
-		CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
-	
-		delete cursors;
-	} catch (jexception::RuntimeException &e) {
-	}
-
-	// SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
-}
-
-void XlibApplication::InternalReleaseCursors()
-{
-	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
-		delete i->second.cursor;
-	}
-
-	_cursors.clear();
-}
-
-void XlibApplication::InternalInit(int argc, char **argv)
+void NativeApplication::InternalInit(int argc, char **argv)
 {
 	// Open a connection with the X server
 	_display = XOpenDisplay(NULL);
@@ -476,11 +424,9 @@ void XlibApplication::InternalInit(int argc, char **argv)
 	_screen.height = DisplayHeight(_display, screen);
 
 	XInitThreads();
-
-	InternalInitCursors();
 }
 
-void XlibApplication::InternalPaint()
+void NativeApplication::InternalPaint()
 {
 	if (g_window == NULL || g_window->IsVisible() == false) {
 		return;
@@ -566,7 +512,7 @@ static Bool check_x11_event(Display*, XEvent* event, XPointer userData)
 	return event->xany.window == reinterpret_cast<::Window>(userData);
 }
 
-void XlibApplication::InternalLoop()
+void NativeApplication::InternalLoop()
 {
 	XEvent event;
   bool quitting = false;
@@ -795,16 +741,15 @@ void XlibApplication::InternalLoop()
   g_window->GrabEvents();
 }
 
-void XlibApplication::InternalQuit()
+void NativeApplication::InternalQuit()
 {
 	XCloseDisplay(_display);
-	InternalReleaseCursors();
 }
 
-XlibWindow::XlibWindow(int x, int y, int width, int height):
+NativeWindow::NativeWindow(int x, int y, int width, int height):
 	jgui::Window(dynamic_cast<Window *>(this))
 {
-	jcommon::Object::SetClassName("jgui::XlibWindow");
+	jcommon::Object::SetClassName("jgui::NativeWindow");
 
 	if (_window != 0) {
 		throw jexception::RuntimeException("Cannot create more than one window");
@@ -915,13 +860,13 @@ XlibWindow::XlibWindow(int x, int y, int width, int height):
 	XMapWindow(_display, _window);
 }
 
-XlibWindow::~XlibWindow()
+NativeWindow::~NativeWindow()
 {
   delete g_window;
   g_window = NULL;
 }
 
-void XlibWindow::ToggleFullScreen()
+void NativeWindow::ToggleFullScreen()
 {
     /*
        if (_need_destroy == true) {
@@ -967,7 +912,7 @@ void XlibWindow::ToggleFullScreen()
   Repaint();
 }
 
-void XlibWindow::SetParent(jgui::Container *c)
+void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
@@ -980,29 +925,29 @@ void XlibWindow::SetParent(jgui::Container *c)
   g_window->SetParent(NULL);
 }
 
-void XlibWindow::SetTitle(std::string title)
+void NativeWindow::SetTitle(std::string title)
 {
 	_title = title;
 		
   // TODO:: _window->setTitle(_title.c_str());
 }
 
-std::string XlibWindow::GetTitle()
+std::string NativeWindow::GetTitle()
 {
 	return _title;
 }
 
-void XlibWindow::SetOpacity(float opacity)
+void NativeWindow::SetOpacity(float opacity)
 {
   _opacity = opacity;
 }
 
-float XlibWindow::GetOpacity()
+float NativeWindow::GetOpacity()
 {
   return _opacity;
 }
 
-void XlibWindow::SetUndecorated(bool undecorated)
+void NativeWindow::SetUndecorated(bool undecorated)
 {
 	_undecorated = undecorated;
   
@@ -1059,17 +1004,17 @@ void XlibWindow::SetUndecorated(bool undecorated)
 	}
 }
 
-bool XlibWindow::IsUndecorated()
+bool NativeWindow::IsUndecorated()
 {
   return _undecorated;
 }
 
-void XlibWindow::SetBounds(int x, int y, int width, int height)
+void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
 	XMoveResizeWindow(_display, _window, x, y, width, height);
 }
 
-jgui::jregion_t XlibWindow::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetVisibleBounds()
 {
 	return {
     .x = _visible_bounds.x,
@@ -1079,17 +1024,17 @@ jgui::jregion_t XlibWindow::GetVisibleBounds()
   };
 }
 
-void XlibWindow::SetResizable(bool resizable)
+void NativeWindow::SetResizable(bool resizable)
 {
   _resizable = resizable;
 }
 
-bool XlibWindow::IsResizable()
+bool NativeWindow::IsResizable()
 {
   return _resizable;
 }
 
-void XlibWindow::SetCursorLocation(int x, int y)
+void NativeWindow::SetCursorLocation(int x, int y)
 {
 	if (x < 0) {
 		x = 0;
@@ -1112,7 +1057,7 @@ void XlibWindow::SetCursorLocation(int x, int y)
 	XFlush(_display);
 }
 
-jpoint_t XlibWindow::GetCursorLocation()
+jpoint_t NativeWindow::GetCursorLocation()
 {
 	jpoint_t t;
 
@@ -1126,33 +1071,98 @@ jpoint_t XlibWindow::GetCursorLocation()
 	return t;
 }
 
-void XlibWindow::SetCursorEnabled(bool enabled)
+void NativeWindow::SetVisible(bool visible)
+{
+  _visible = visible;
+
+  if (visible == true) {
+	  XMapWindow(_display, _window);
+  } else {
+	  XUnmapWindow(_display, _window);
+  }
+}
+
+bool NativeWindow::IsVisible()
+{
+  return _visible;
+}
+
+jcursor_style_t NativeWindow::GetCursor()
+{
+  return _cursor;
+}
+
+void NativeWindow::SetCursorEnabled(bool enabled)
 {
   _cursor_enabled = enabled;
 
-	// XDefineCursor(_display, _window, _is_cursor_enabled);
-	// XFlush(_display);
+  if (enabled == false) {
+    XUndefineCursor(_display, _window);
+
+    XFlush(_display);
+    XSync(_display, False);
+  } else {
+    SetCursor(_cursor);
+  }
 }
 
-bool XlibWindow::IsCursorEnabled()
+bool NativeWindow::IsCursorEnabled()
 {
 	return _cursor_enabled;
 }
 
-void XlibWindow::SetCursor(jcursor_style_t style)
+void NativeWindow::SetCursor(jcursor_style_t style)
 {
-	SetCursor(_cursors[_cursor_style].cursor, _cursors[_cursor_style].hot_x, _cursors[_cursor_style].hot_y);
+  if (_cursor_enabled == false) {
+    return;
+  }
+
+  int type = XC_arrow;
+  
+  if (style == JCS_DEFAULT) {
+    type = XC_arrow;
+  } else if (style == JCS_CROSSHAIR) {
+    type = XC_crosshair;
+  } else if (style == JCS_EAST) {
+    type = XC_sb_right_arrow;
+  } else if (style == JCS_WEST) {
+    type = XC_sb_left_arrow;
+  } else if (style == JCS_NORTH) {
+    type = XC_sb_up_arrow;
+  } else if (style == JCS_SOUTH) {
+    type = XC_sb_down_arrow;
+  } else if (style == JCS_HAND) {
+    type = XC_hand2;
+  } else if (style == JCS_MOVE) {
+    type = XC_fleur;
+  } else if (style == JCS_NS) {
+    type = XC_sb_v_double_arrow;
+  } else if (style == JCS_WE) {
+    type = XC_sb_h_double_arrow;
+  } else if (style == JCS_NW_CORNER) {
+    type = XC_left_ptr;
+  } else if (style == JCS_NE_CORNER) {
+    type = XC_right_ptr;
+  } else if (style == JCS_SW_CORNER) {
+    type = XC_bottom_left_corner;
+  } else if (style == JCS_SE_CORNER) {
+    type = XC_bottom_right_corner;
+  } else if (style == JCS_TEXT) {
+    type = XC_xterm;
+  } else if (style == JCS_WAIT) {
+    type = XC_watch;
+  }
+
+  Cursor cursor = XCreateFontCursor(_display, type);
+
+  XDefineCursor(_display, _window, cursor);
+  XSync(_display, False);
+
+  _cursor = style;
 }
 
-void XlibWindow::SetCursor(Image *shape, int hotx, int hoty)
+void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
-	if ((void *)shape == NULL) {
-		return;
-	}
-
-	// XChangeWindowAttributes() this funciontion change attributes like cursor
-	//
-	
 	/*
 	if ((void *)shape == NULL) {
 		return;
@@ -1198,25 +1208,27 @@ void XlibWindow::SetCursor(Image *shape, int hotx, int hoty)
 	XSync(_display, root_window);
 	XFreePixmap(_display, pixmap);
 
+	// XChangeWindowAttributes() this funciontion change attributes like cursor
+  
 	delete [] data;
 	*/
 }
 
-void XlibWindow::SetRotation(jwindow_rotation_t t)
+void NativeWindow::SetRotation(jwindow_rotation_t t)
 {
 }
 
-jwindow_rotation_t XlibWindow::GetRotation()
+jwindow_rotation_t NativeWindow::GetRotation()
 {
 	return jgui::JWR_NONE;
 }
 
-void XlibWindow::SetIcon(jgui::Image *image)
+void NativeWindow::SetIcon(jgui::Image *image)
 {
   _icon = image;
 }
 
-jgui::Image * XlibWindow::GetIcon()
+jgui::Image * NativeWindow::GetIcon()
 {
   return _icon;
 }

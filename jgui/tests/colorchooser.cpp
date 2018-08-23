@@ -47,6 +47,8 @@ class ColorChooser : public jgui::Component {
 					_image->GetGraphics()->SetRGB(HLS2RGB(i, 0.5, j/border2), (int)(cx - cos(M_PI * i / 180.0)*j), (int)(cy - sin(M_PI * i / 180.0)*j));
 				}
 			}
+
+      SetTheme(&_theme);
 		}
 
 		virtual ~ColorChooser()
@@ -129,7 +131,7 @@ class ColorChooser : public jgui::Component {
 
 			_theme.SetIntegerParam("component.bg", _image->GetGraphics()->GetRGB(elocation.x, elocation.y));
 
-			SetTheme(&_theme);
+      Repaint();
 
 			return true;
 		}

@@ -17,8 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "sdl2/include/sdl2application.h"
-#include "sdl2/include/sdl2window.h"
+#include "../include/nativeapplication.h"
+#include "../include/nativewindow.h"
+
 #include "jgui/jbufferedimage.h"
 #include "jcommon/jproperties.h"
 #include "jexception/jruntimeexception.h"
@@ -30,16 +31,6 @@
 
 namespace jgui {
 
-// WINDOW PARAMS
-/** \brief */
-struct cursor_params_t {
-  Image *cursor;
-  int hot_x;
-  int hot_y;
-};
-
-/** \brief */
-static std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 /** \brief */
 static SDL_Window *_window = NULL;
 /** \brief */
@@ -56,6 +47,8 @@ static int _mouse_y;
 static int _click_count;
 /** \brief */
 static Window *g_window = NULL;
+/** \brief */
+static jcursor_style_t _cursor = JCS_DEFAULT;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(SDL_Keysym symbol)
 {
@@ -346,69 +339,17 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(SDL_Keysym symbol)
 
 static jgui::jsize_t _screen = {0, 0};
 
-SDL2Application::SDL2Application():
+NativeApplication::NativeApplication():
 	jgui::Application()
 {
-	jcommon::Object::SetClassName("jgui::SDL2Application");
+	jcommon::Object::SetClassName("jgui::NativeApplication");
 }
 
-SDL2Application::~SDL2Application()
+NativeApplication::~NativeApplication()
 {
 }
 
-void SDL2Application::InternalInitCursors()
-{
-#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
-	t.cursor = new BufferedImage(JPF_ARGB, w, h);													\
-																																				\
-	t.hot_x = hotx;																												\
-	t.hot_y = hoty;																												\
-																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
-																																				\
-	_cursors[type] = t;																										\
-
-	struct cursor_params_t t;
-	int w = 32;
-	int h = 32;
-
-	try {
-		Image *cursors = new BufferedImage(_DATA_PREFIX"/images/cursors.png");
-
-		CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
-		CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
-		CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
-		CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
-		CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
-		CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
-		CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
-		CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
-		CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
-		CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
-		CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
-		CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
-		CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
-		CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
-		CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
-		CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
-	
-		delete cursors;
-	} catch (jexception::RuntimeException &e) {
-	}
-
-	// SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
-}
-
-void SDL2Application::InternalReleaseCursors()
-{
-	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
-		delete i->second.cursor;
-	}
-
-	_cursors.clear();
-}
-
-void SDL2Application::InternalInit(int argc, char **argv)
+void NativeApplication::InternalInit(int argc, char **argv)
 {
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {  
 		throw jexception::RuntimeException("Problem to init SDL2");
@@ -424,11 +365,9 @@ void SDL2Application::InternalInit(int argc, char **argv)
 
 	_screen.width = display.w;
 	_screen.height = display.h;
-
-	InternalInitCursors();
 }
 
-void SDL2Application::InternalPaint()
+void NativeApplication::InternalPaint()
 {
 	if (g_window == NULL || g_window->IsVisible() == false) {
 		return;
@@ -515,7 +454,7 @@ void SDL2Application::InternalPaint()
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
-void SDL2Application::InternalLoop()
+void NativeApplication::InternalLoop()
 {
 	SDL_Event event;
   static bool quitting = false;
@@ -692,13 +631,14 @@ void SDL2Application::InternalLoop()
           buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
         }
 
-        // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
         // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
+        /*
         if (event.type == SDL_MOUSEBUTTONDOWN) {
           SDL_SetWindowGrab(_window, SDL_TRUE);
         } else if (event.type == SDL_MOUSEBUTTONUP) {
           SDL_SetWindowGrab(_window, SDL_FALSE);
         }
+        */
 
         g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
       } else if(event.type == SDL_QUIT) {
@@ -719,17 +659,15 @@ void SDL2Application::InternalLoop()
   g_window->GrabEvents();
 }
 
-void SDL2Application::InternalQuit()
+void NativeApplication::InternalQuit()
 {
-	InternalReleaseCursors();
-
 	SDL_Quit();
 }
 
-SDL2Window::SDL2Window(int x, int y, int width, int height):
+NativeWindow::NativeWindow(int x, int y, int width, int height):
 	jgui::Window(dynamic_cast<Window *>(this))
 {
-	jcommon::Object::SetClassName("jgui::SDL2Window");
+	jcommon::Object::SetClassName("jgui::NativeWindow");
 
 	if (_window != NULL) {
 		throw jexception::RuntimeException("Cannot create more than one window");
@@ -773,13 +711,13 @@ SDL2Window::SDL2Window(int x, int y, int width, int height):
   SDL_ShowWindow(_window);
 }
 
-SDL2Window::~SDL2Window()
+NativeWindow::~NativeWindow()
 {
   delete g_window;
   g_window = NULL;
 }
 
-void SDL2Window::ToggleFullScreen()
+void NativeWindow::ToggleFullScreen()
 {
   if (SDL_GetWindowFlags(_window) & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP)) {
     SDL_SetWindowFullscreen(_window, 0);
@@ -791,7 +729,7 @@ void SDL2Window::ToggleFullScreen()
   Repaint();
 }
 
-void SDL2Window::SetParent(jgui::Container *c)
+void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
@@ -806,22 +744,22 @@ void SDL2Window::SetParent(jgui::Container *c)
   g_window->SetParent(NULL);
 }
 
-void SDL2Window::SetTitle(std::string title)
+void NativeWindow::SetTitle(std::string title)
 {
 	SDL_SetWindowTitle(_window, title.c_str());
 }
 
-std::string SDL2Window::GetTitle()
+std::string NativeWindow::GetTitle()
 {
 	return std::string(SDL_GetWindowTitle(_window));
 }
 
-void SDL2Window::SetOpacity(float opacity)
+void NativeWindow::SetOpacity(float opacity)
 {
 	// SDL_SetWindowOpacity(_window, opacity);
 }
 
-float SDL2Window::GetOpacity()
+float NativeWindow::GetOpacity()
 {
   /*
   float opacity;
@@ -834,7 +772,7 @@ float SDL2Window::GetOpacity()
 	return 1.0;
 }
 
-void SDL2Window::SetUndecorated(bool undecorated)
+void NativeWindow::SetUndecorated(bool undecorated)
 {
 	if (undecorated == true) {
 		SDL_SetWindowBordered(_window, SDL_FALSE);
@@ -843,18 +781,18 @@ void SDL2Window::SetUndecorated(bool undecorated)
 	}
 }
 
-bool SDL2Window::IsUndecorated()
+bool NativeWindow::IsUndecorated()
 {
   return (SDL_GetWindowFlags(_window) & SDL_WINDOW_BORDERLESS);
 }
 
-void SDL2Window::SetBounds(int x, int y, int width, int height)
+void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
   SDL_SetWindowPosition(_window, x, y);
   SDL_SetWindowSize(_window, width, height);
 }
 
-jgui::jregion_t SDL2Window::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetVisibleBounds()
 {
 	jgui::jregion_t t;
 
@@ -864,23 +802,23 @@ jgui::jregion_t SDL2Window::GetVisibleBounds()
 	return t;
 }
 		
-void SDL2Window::SetResizable(bool resizable)
+void NativeWindow::SetResizable(bool resizable)
 {
   // SDL_SetWindowResizable(_window, resizable);
 }
 
-bool SDL2Window::IsResizable()
+bool NativeWindow::IsResizable()
 {
   return (SDL_GetWindowFlags(_window) & SDL_WINDOW_RESIZABLE);
 }
 
-void SDL2Window::SetCursorLocation(int x, int y)
+void NativeWindow::SetCursorLocation(int x, int y)
 {
 	SDL_WarpMouseInWindow(_window, x, y);
 	// SDL_WarpMouseGlobal(x, y);
 }
 
-jpoint_t SDL2Window::GetCursorLocation()
+jpoint_t NativeWindow::GetCursorLocation()
 {
 	jpoint_t p;
 
@@ -893,22 +831,75 @@ jpoint_t SDL2Window::GetCursorLocation()
 	return p;
 }
 
-void SDL2Window::SetCursorEnabled(bool enabled)
+void NativeWindow::SetVisible(bool visible)
+{
+	if (visible == true) {
+    SDL_ShowWindow(_window);
+	} else {
+    SDL_HideWindow(_window);
+  }
+}
+
+bool NativeWindow::IsVisible()
+{
+  return (SDL_GetWindowFlags(_window) & SDL_WINDOW_SHOWN);
+}
+
+jcursor_style_t NativeWindow::GetCursor()
+{
+  return _cursor;
+}
+
+void NativeWindow::SetCursorEnabled(bool enabled)
 {
 	SDL_ShowCursor((enabled == false)?SDL_DISABLE:SDL_ENABLE);
 }
 
-bool SDL2Window::IsCursorEnabled()
+bool NativeWindow::IsCursorEnabled()
 {
 	return (bool)SDL_ShowCursor(SDL_QUERY);
 }
 
-void SDL2Window::SetCursor(jcursor_style_t style)
+void NativeWindow::SetCursor(jcursor_style_t style)
 {
-	SetCursor(_cursors[style].cursor, _cursors[style].hot_x, _cursors[style].hot_y);
+  SDL_SystemCursor type = SDL_SYSTEM_CURSOR_ARROW;
+
+  if (style == JCS_DEFAULT) {
+    type = SDL_SYSTEM_CURSOR_ARROW;
+  } else if (style == JCS_CROSSHAIR) {
+    type = SDL_SYSTEM_CURSOR_CROSSHAIR;
+  } else if (style == JCS_EAST) {
+  } else if (style == JCS_WEST) {
+  } else if (style == JCS_NORTH) {
+  } else if (style == JCS_SOUTH) {
+  } else if (style == JCS_HAND) {
+    type = SDL_SYSTEM_CURSOR_HAND;
+  } else if (style == JCS_MOVE) {
+    type = SDL_SYSTEM_CURSOR_SIZEALL;
+  } else if (style == JCS_NS) {
+    type = SDL_SYSTEM_CURSOR_SIZENS;
+  } else if (style == JCS_WE) {
+    type = SDL_SYSTEM_CURSOR_SIZEWE;
+  } else if (style == JCS_NW_CORNER) {
+  } else if (style == JCS_NE_CORNER) {
+  } else if (style == JCS_SW_CORNER) {
+  } else if (style == JCS_SE_CORNER) {
+  } else if (style == JCS_TEXT) {
+    type = SDL_SYSTEM_CURSOR_IBEAM;
+  } else if (style == JCS_WAIT) {
+    type = SDL_SYSTEM_CURSOR_WAIT;
+  }
+
+  SDL_Cursor
+    *cursor = SDL_CreateSystemCursor(type);
+
+  SDL_SetCursor(cursor);
+  // TODO:: SDL_FreeCursor(cursor);
+
+  _cursor = style;
 }
 
-void SDL2Window::SetCursor(Image *shape, int hotx, int hoty)
+void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
 	if ((void *)shape == NULL) {
 		return;
@@ -956,22 +947,22 @@ void SDL2Window::SetCursor(Image *shape, int hotx, int hoty)
 	delete [] data;
 }
 
-void SDL2Window::SetRotation(jwindow_rotation_t t)
+void NativeWindow::SetRotation(jwindow_rotation_t t)
 {
 	// TODO::
 }
 
-jwindow_rotation_t SDL2Window::GetRotation()
+jwindow_rotation_t NativeWindow::GetRotation()
 {
 	return jgui::JWR_NONE;
 }
 
-void SDL2Window::SetIcon(jgui::Image *image)
+void NativeWindow::SetIcon(jgui::Image *image)
 {
   _icon = image;
 }
 
-jgui::Image * SDL2Window::GetIcon()
+jgui::Image * NativeWindow::GetIcon()
 {
   return _icon;
 }

@@ -22,18 +22,8 @@
 #include "jgui/jnulllayout.h"
 #include "jexception/jnullpointerexception.h"
 
-#if defined(SDL2_UI)
-#include "sdl2/include/sdl2window.h"
-#elif defined(SFML2_UI)
-#include "sfml2/include/sfml2window.h"
-#elif defined(XLIB_UI)
-#include "xlib/include/xlibwindow.h"
-#elif defined(XCB_UI)
-#include "xcb/include/xcbwindow.h"
-#elif defined(GTK3_UI)
-#include "gtk3/include/gtk3window.h"
-#elif defined(ALLEGRO5_UI)
-#include "allegro5/include/allegro5window.h"
+#if defined(SDL2_UI) || defined(SFML2_UI) || defined(XLIB_UI) || defined(XCB_UI) || defined(GTK3_UI) || defined(ALLEGRO5_UI) || defined(GL_UI)
+#include "include/nativewindow.h"
 #endif
 
 #include <algorithm>
@@ -60,18 +50,8 @@ Window::Window(int x, int y, int width, int height):
 
   // TODO:: estah entrando em loop
   try {
-#if defined(SDL2_UI)
-		_instance = new SDL2Window(x, y, width, height);
-#elif defined(SFML2_UI)
-		_instance = new SFML2Window(x, y, width, height);
-#elif defined(XLIB_UI)
-		_instance = new XlibWindow(x, y, width, height);
-#elif defined(XCB_UI)
-		_instance = new XCBWindow(x, y, width, height);
-#elif defined(GTK3_UI)
-		_instance = new GTK3Window(x, y, width, height);
-#elif defined(ALLEGRO5_UI)
-		_instance = new Allegro5Window(x, y, width, height);
+#if defined(SDL2_UI) || defined(SFML2_UI) || defined(XLIB_UI) || defined(XCB_UI) || defined(GTK3_UI) || defined(ALLEGRO5_UI) || defined(GL_UI)
+		_instance = new NativeWindow(x, y, width, height);
 #endif
   
     _instance->SetParent(this);
@@ -215,8 +195,6 @@ void Window::AddSubtitle(jgui::Image *image, std::string label)
 	}
 
 	_subtitles.push_back(t);
-
-	Repaint();
 }
 
 void Window::RemoveAllSubtitles()
@@ -409,6 +387,16 @@ void Window::Paint(jgui::Graphics *g)
 	Container::Paint(g);
 }
 
+void Window::SetVisible(bool visible)
+{
+  _instance->SetVisible(visible);
+}
+
+bool Window::IsVisible()
+{
+	return _instance->IsVisible();
+}
+		
 jwindow_rotation_t Window::GetRotation()
 {
 	return _instance->GetRotation();

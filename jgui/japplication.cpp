@@ -20,18 +20,8 @@
 #include "jgui/japplication.h"
 #include "jexception/jnullpointerexception.h"
 
-#if defined(SDL2_UI)
-#include "sdl2/include/sdl2application.h"
-#elif defined(SFML2_UI)
-#include "sfml2/include/sfml2application.h"
-#elif defined(XLIB_UI)
-#include "xlib/include/xlibapplication.h"
-#elif defined(XCB_UI)
-#include "xcb/include/xcbapplication.h"
-#elif defined(GTK3_UI)
-#include "gtk3/include/gtk3application.h"
-#elif defined(ALLEGRO5_UI)
-#include "allegro5/include/allegro5application.h"
+#if defined(SDL2_UI) || defined(SFML2_UI) || defined(XLIB_UI) || defined(XCB_UI) || defined(GTK3_UI) || defined(ALLEGRO5_UI) || defined(GL_UI)
+#include "include/nativeapplication.h"
 #endif
 
 #include <mutex>
@@ -72,18 +62,8 @@ void Application::Init(int argc, char **argv)
 
 	if (_instance == NULL) {
 	  try {
-#if defined(SDL2_UI)
-			_instance = new SDL2Application();
-#elif defined(SFML2_UI)
-			_instance = new SFML2Application();
-#elif defined(XLIB_UI)
-			_instance = new XlibApplication();
-#elif defined(XCB_UI)
-			_instance = new XCBApplication();
-#elif defined(GTK3_UI)
-			_instance = new GTK3Application();
-#elif defined(ALLEGRO5_UI)
-			_instance = new Allegro5Application();
+#if defined(SDL2_UI) || defined(SFML2_UI) || defined(XLIB_UI) || defined(XCB_UI) || defined(GTK3_UI) || defined(ALLEGRO5_UI) || defined(GL_UI)
+			_instance = new NativeApplication();
 #endif
 
       if (_instance != NULL) {
@@ -124,8 +104,6 @@ void Application::Quit()
 
 	_instance->InternalQuit();
 }
-
-std::condition_variable _condition;
 
 jsize_t Application::GetScreenSize()
 {

@@ -17,8 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "sfml2/include/sfml2application.h"
-#include "sfml2/include/sfml2window.h"
+#include "include/nativeapplication.h"
+#include "include/nativewindow.h"
+
 #include "jgui/jfont.h"
 #include "jgui/jbufferedimage.h"
 #include "jcommon/jproperties.h"
@@ -27,6 +28,11 @@
 #include "jexception/jillegalargumentexception.h"
 
 #include <thread>
+
+#include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+// #include <SFML/Cursor.hpp>
+#include <X11/Xlib.h>
 
 namespace jgui {
 
@@ -38,8 +44,6 @@ struct cursor_params_t {
   int hot_y;
 };
 
-/** \brief */
-static std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 /** \brief */
 static sf::RenderWindow *_window = NULL;
 /** \brief */
@@ -66,6 +70,8 @@ static bool _resizable = true;
 static bool _cursor_enabled = true;
 /** \brief */
 static jcursor_style_t _cursor;
+/** \brief */
+static bool _visible = true;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(sf::Keyboard::Key symbol)
 {
@@ -314,69 +320,17 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(sf::Keyboard::Key s
 
 static jgui::jsize_t _screen = {0, 0};
 
-SFML2Application::SFML2Application():
+NativeApplication::NativeApplication():
 	jgui::Application()
 {
-	jcommon::Object::SetClassName("jgui::SFML2Application");
+	jcommon::Object::SetClassName("jgui::NativeApplication");
 }
 
-SFML2Application::~SFML2Application()
+NativeApplication::~NativeApplication()
 {
 }
 
-void SFML2Application::InternalInitCursors()
-{
-#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
-	t.cursor = new BufferedImage(JPF_ARGB, w, h);													\
-																																				\
-	t.hot_x = hotx;																												\
-	t.hot_y = hoty;																												\
-																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
-																																				\
-	_cursors[type] = t;																										\
-
-	struct cursor_params_t t;
-	int w = 32;
-	int h = 32;
-
-	try {
-		Image *cursors = new BufferedImage(_DATA_PREFIX"/images/cursors.png");
-
-		CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
-		CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
-		CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
-		CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
-		CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
-		CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
-		CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
-		CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
-		CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
-		CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
-		CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
-		CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
-		CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
-		CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
-		CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
-		CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
-	
-		delete cursors;
-	} catch (jexception::RuntimeException &e) {
-	}
-
-	// SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
-}
-
-void SFML2Application::InternalReleaseCursors()
-{
-	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
-		delete i->second.cursor;
-	}
-
-	_cursors.clear();
-}
-
-void SFML2Application::InternalInit(int argc, char **argv)
+void NativeApplication::InternalInit(int argc, char **argv)
 {
 	XInitThreads();
 
@@ -384,11 +338,9 @@ void SFML2Application::InternalInit(int argc, char **argv)
 
 	_screen.width = display.width;
 	_screen.height = display.height;
-
-	InternalInitCursors();
 }
 
-void SFML2Application::InternalPaint()
+void NativeApplication::InternalPaint()
 {
 	if (g_window == NULL || g_window->IsVisible() == false) {
 		return;
@@ -468,7 +420,7 @@ void SFML2Application::InternalPaint()
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
-void SFML2Application::InternalLoop()
+void NativeApplication::InternalLoop()
 {
 	sf::Event event;
   bool quitting = false;
@@ -598,13 +550,13 @@ void SFML2Application::InternalLoop()
             button = jevent::JMB_BUTTON3;
           }
 
+          _click_count = 1;
+
           if (type == jevent::JMT_PRESSED) {
             auto current = std::chrono::steady_clock::now();
             
             if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
               _click_count = _click_count + 1;
-            } else {
-            	_click_count = 1;
             }
 
             _last_keypress = current;
@@ -655,19 +607,17 @@ void SFML2Application::InternalLoop()
   g_window->GrabEvents();
 }
 
-void SFML2Application::InternalQuit()
+void NativeApplication::InternalQuit()
 {
-	InternalReleaseCursors();
-
   if (_window != NULL) {
     _window->close();
   }
 }
 
-SFML2Window::SFML2Window(int x, int y, int width, int height):
+NativeWindow::NativeWindow(int x, int y, int width, int height):
 	jgui::Window(dynamic_cast<Window *>(this))
 {
-	jcommon::Object::SetClassName("jgui::SFML2Window");
+	jcommon::Object::SetClassName("jgui::NativeWindow");
 
 	if (_window != NULL) {
 		throw jexception::RuntimeException("Cannot create more than one window");
@@ -696,8 +646,10 @@ SFML2Window::SFML2Window(int x, int y, int width, int height):
 	_window->setActive(false);
 }
 
-SFML2Window::~SFML2Window()
+NativeWindow::~NativeWindow()
 {
+  _visible = false;
+
   delete g_window;
   g_window = NULL;
 
@@ -705,7 +657,7 @@ SFML2Window::~SFML2Window()
   _window = NULL;
 }
 
-void SFML2Window::ToggleFullScreen()
+void NativeWindow::ToggleFullScreen()
 {
   /*
   if (SFML_GetWindowFlags(_window) & (SFML_WINDOW_FULLSCREEN | SFML_WINDOW_FULLSCREEN_DESKTOP)) {
@@ -719,7 +671,7 @@ void SFML2Window::ToggleFullScreen()
   Repaint();
 }
 
-void SFML2Window::SetParent(jgui::Container *c)
+void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
@@ -734,46 +686,46 @@ void SFML2Window::SetParent(jgui::Container *c)
   g_window->SetParent(NULL);
 }
 
-void SFML2Window::SetTitle(std::string title)
+void NativeWindow::SetTitle(std::string title)
 {
   _title = title;
 
 	_window->setTitle(_title.c_str());
 }
 
-std::string SFML2Window::GetTitle()
+std::string NativeWindow::GetTitle()
 {
   return _title;
 }
 
-void SFML2Window::SetOpacity(float opacity)
+void NativeWindow::SetOpacity(float opacity)
 {
   _opacity = opacity;
 }
 
-float SFML2Window::GetOpacity()
+float NativeWindow::GetOpacity()
 {
   return _opacity;
 }
 
-void SFML2Window::SetUndecorated(bool undecorated)
+void NativeWindow::SetUndecorated(bool undecorated)
 {
   _undecorated = undecorated;
 }
 
-bool SFML2Window::IsUndecorated()
+bool NativeWindow::IsUndecorated()
 {
   return _undecorated;
 }
 
-void SFML2Window::SetBounds(int x, int y, int width, int height)
+void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
 	_window->setPosition(sf::Vector2i(x, y));
 	_window->setSize(sf::Vector2u(width, height));
   _window->setView(sf::View(sf::FloatRect(0, 0, width, height)));
 }
 
-jgui::jregion_t SFML2Window::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetVisibleBounds()
 {
   sf::Vector2i 
     location = _window->getPosition();
@@ -788,17 +740,17 @@ jgui::jregion_t SFML2Window::GetVisibleBounds()
   };
 }
 	
-void SFML2Window::SetResizable(bool resizable)
+void NativeWindow::SetResizable(bool resizable)
 {
   _resizable = resizable;
 }
 
-bool SFML2Window::IsResizable()
+bool NativeWindow::IsResizable()
 {
   return _resizable;
 }
 
-void SFML2Window::SetCursorLocation(int x, int y)
+void NativeWindow::SetCursorLocation(int x, int y)
 {
 	if (x < 0) {
 		x = 0;
@@ -819,7 +771,7 @@ void SFML2Window::SetCursorLocation(int x, int y)
 	sf::Mouse::setPosition(sf::Vector2i(x, y));
 }
 
-jpoint_t SFML2Window::GetCursorLocation()
+jpoint_t NativeWindow::GetCursorLocation()
 {
 	jpoint_t p;
 
@@ -834,91 +786,120 @@ jpoint_t SFML2Window::GetCursorLocation()
 	return p;
 }
 
-void SFML2Window::SetCursorEnabled(bool enabled)
+void NativeWindow::SetVisible(bool visible)
+{
+  _visible = visible;
+
+  _window->setVisible(visible);
+}
+
+bool NativeWindow::IsVisible()
+{
+  return _visible;
+}
+
+jcursor_style_t NativeWindow::GetCursor()
+{
+  return _cursor;
+}
+
+void NativeWindow::SetCursorEnabled(bool enabled)
 {
   _cursor_enabled = enabled;
 
 	_window->setMouseCursorVisible(_cursor_enabled);
 }
 
-bool SFML2Window::IsCursorEnabled()
+bool NativeWindow::IsCursorEnabled()
 {
   return _cursor_enabled;
 }
 
-void SFML2Window::SetCursor(jcursor_style_t style)
+void NativeWindow::SetCursor(jcursor_style_t style)
 {
-	_cursor = style;
+  /*
+  sf::Cursor::Type type = sf::Cursor::Arrow;;
 
-	SetCursor(_cursors[_cursor].cursor, _cursors[_cursor].hot_x, _cursors[_cursor].hot_y);
+  if (style == JCS_DEFAULT) {
+    type = sf::Cursor::Arrow;
+  } else if (style == JCS_CROSSHAIR) {
+    type = sf::Cursor::Cross;
+  } else if (style == JCS_EAST) {
+  } else if (style == JCS_WEST) {
+  } else if (style == JCS_NORTH) {
+  } else if (style == JCS_SOUTH) {
+  } else if (style == JCS_HAND) {
+    type = sf::Cursor::Hand;
+  } else if (style == JCS_MOVE) {
+    type = sf::Cursor::Hand;
+  } else if (style == JCS_NS) {
+    type = sf::Cursor::SizeVertical;
+  } else if (style == JCS_WE) {
+    type = sf::Cursor::SizeHorizontal;
+  } else if (style == JCS_NW_CORNER) {
+  } else if (style == JCS_NE_CORNER) {
+  } else if (style == JCS_SW_CORNER) {
+  } else if (style == JCS_SE_CORNER) {
+  } else if (style == JCS_TEXT) {
+    type = sf::Cursor::Text;
+  } else if (style == JCS_WAIT) {
+    type = sf::Cursor::Wait;
+  }
+
+  sf::Cursor cursor;
+
+  if (cursor.loadFromSystem(type) == true) {
+    _window->setMouseCursor(cursor);
+  }
+  */
+	
+  _cursor = style;
 }
 
-void SFML2Window::SetCursor(Image *shape, int hotx, int hoty)
+void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
+  /*
 	if ((void *)shape == NULL) {
 		return;
 	}
 
-	/*
-	jsize_t t = shape->GetSize();
-	uint32_t *data = NULL;
+  jgui::jsize_t 
+    size = shape->GetSize();
+	uint32_t 
+    *data = NULL;
 
-	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
+	shape->GetGraphics()->GetRGBArray(&data, 0, 0, size.width, size.height);
 
 	if (data == NULL) {
 		return;
 	}
 
-	SDL_Surface *surface = NULL;
-	uint32_t rmask = 0x000000ff;
-	uint32_t gmask = 0x0000ff00;
-	uint32_t bmask = 0x00ff0000;
-	uint32_t amask = 0xff000000;
+  sf::Cursor cursor;
 
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-	rmask = 0xff000000;
-	gmask = 0x00ff0000;
-	bmask = 0x0000ff00;
-	amask = 0x000000ff;
-#endif
-
-	surface = SDL_CreateRGBSurfaceFrom(data, t.width, t.height, 32, t.width*4, rmask, gmask, bmask, amask);
-
-	if (surface == NULL) {
-		delete [] data;
-
-		return;
-	}
-
-	SDL_Cursor *cursor = SDL_CreateColorCursor(surface, hotx, hoty);
-
-	if (cursor != NULL) {
-		SDL_SetCursor(cursor);
-		// SDL_FreeCursor(cursor);
-	}
-
-	SDL_FreeSurface(surface);
+  if (cursor.loadFromPixels(data, sf::Vector2u(size.width, size.height), sf::Vector2u(hotx, hoty)) == true) {
+    _window->setMouseCursor(cursor);
+  }
 
 	delete [] data;
-	*/
+  */
 }
 
-void SFML2Window::SetRotation(jwindow_rotation_t t)
+void NativeWindow::SetRotation(jwindow_rotation_t t)
 {
 	// TODO::
 }
 
-jwindow_rotation_t SFML2Window::GetRotation()
+jwindow_rotation_t NativeWindow::GetRotation()
 {
 	return jgui::JWR_NONE;
 }
 
-void SFML2Window::SetIcon(jgui::Image *image)
+void NativeWindow::SetIcon(jgui::Image *image)
 {
   _icon = image;
 }
 
-jgui::Image * SFML2Window::GetIcon()
+jgui::Image * NativeWindow::GetIcon()
 {
   return _icon;
 }

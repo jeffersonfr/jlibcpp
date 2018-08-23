@@ -617,7 +617,7 @@ class MenuTest : public Scene {
 				} else if (GetFocusOwner() == _button2) {
 					layers->GetVideoLayer()->SetBounds(100, 100, 720, 480);
 				} else if (GetFocusOwner() == _button3) {
-					exit(0);
+          jgui::Application::Quit();
 				}
 			}
 

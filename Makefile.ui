@@ -165,3 +165,25 @@ ifeq ($(ENABLE_GRAPHICS),allegro5)
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),gl)
+	CCFLAGS 	+= \
+		 `pkg-config --cflags gl glu` \
+
+	LDFLAGS		+= \
+		 `pkg-config --libs gl glu` \
+     -lglut \
+		 -ljpeg \
+
+	DEFINES		+= \
+		 -DGL_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 glapplication.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+

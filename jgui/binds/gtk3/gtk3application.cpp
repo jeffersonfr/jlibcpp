@@ -17,8 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "gtk3/include/gtk3application.h"
-#include "gtk3/include/gtk3window.h"
+#include "include/nativeapplication.h"
+#include "include/nativewindow.h"
+
 #include "jgui/jfont.h"
 #include "jgui/jbufferedimage.h"
 #include "jcommon/jproperties.h"
@@ -33,16 +34,6 @@
 
 namespace jgui {
 
-// WINDOW PARAMS
-/** \brief */
-struct cursor_params_t {
-  Image *cursor;
-  int hot_x;
-  int hot_y;
-};
-
-/** \brief */
-static std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 /** \brief */
 static jgui::Image *_icon = NULL;
 /** \brief */
@@ -64,7 +55,7 @@ static bool _fullscreen_enabled = false;
 /** \brief */
 static bool _cursor_enabled = true;
 /** \brief */
-static jcursor_style_t _cursor_style;
+static jcursor_style_t _cursor;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(guint symbol)
 {
@@ -406,8 +397,8 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 		return FALSE;
 	}
 
-	// GTK3Window 
-  //   *handler = reinterpret_cast<GTK3Window *>(user_data);
+	// NativeWindow 
+  //   *handler = reinterpret_cast<NativeWindow *>(user_data);
   jregion_t 
     r = g_window->GetVisibleBounds();
   jgui::Image 
@@ -621,6 +612,7 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
   gtk_widget_set_events(
       _drawing_area, gtk_widget_get_events(_drawing_area) | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
   
+  gtk_widget_show_now(_window);
   gtk_widget_show_all(_window);
   
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_OPENED));
@@ -628,71 +620,19 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
 
 static jgui::jsize_t _screen = {0, 0};
 
-GTK3Application::GTK3Application():
+NativeApplication::NativeApplication():
 	jgui::Application()
 {
-	jcommon::Object::SetClassName("jgui::GTK3Application");
+	jcommon::Object::SetClassName("jgui::NativeApplication");
 }
 
-GTK3Application::~GTK3Application()
+NativeApplication::~NativeApplication()
 {
   delete g_window;
   g_window = NULL;
 }
 
-void GTK3Application::InternalInitCursors()
-{
-#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
-	t.cursor = new BufferedImage(JPF_ARGB, w, h);													\
-																																				\
-	t.hot_x = hotx;																												\
-	t.hot_y = hoty;																												\
-																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
-																																				\
-	_cursors[type] = t;																										\
-
-	struct cursor_params_t t;
-	int w = 32;
-	int h = 32;
-
-	try {
-		Image *cursors = new BufferedImage(_DATA_PREFIX"/images/cursors.png");
-
-		CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
-		CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
-		CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
-		CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
-		CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
-		CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
-		CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
-		CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
-		CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
-		CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
-		CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
-		CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
-		CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
-		CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
-		CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
-		CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
-	
-		delete cursors;
-	} catch (jexception::RuntimeException &e) {
-	}
-
-	// SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
-}
-
-void GTK3Application::InternalReleaseCursors()
-{
-	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
-		delete i->second.cursor;
-	}
-
-	_cursors.clear();
-}
-
-void GTK3Application::InternalInit(int argc, char **argv)
+void NativeApplication::InternalInit(int argc, char **argv)
 {
   gtk_init(&argc, &argv);
 
@@ -705,18 +645,16 @@ void GTK3Application::InternalInit(int argc, char **argv)
 
 	_screen.width = geometry.width;
 	_screen.height = geometry.height;
-
-	InternalInitCursors();
 }
 
-void GTK3Application::InternalPaint()
+void NativeApplication::InternalPaint()
 {
   gtk_widget_queue_draw(_drawing_area);
 }
 
 static bool quitting = false;
 
-static void main_thread(GTK3Application *app)
+static void main_thread(NativeApplication *app)
 {
 	while (quitting == false) {
     std::vector<jevent::EventObject *> events = g_window->GrabEvents();
@@ -754,7 +692,7 @@ static void main_thread(GTK3Application *app)
   g_window->GrabEvents();
 }
 
-void GTK3Application::InternalLoop()
+void NativeApplication::InternalLoop()
 {
   std::thread _main_thread = std::thread(main_thread, this);
 
@@ -767,18 +705,16 @@ void GTK3Application::InternalLoop()
   g_window->SetVisible(false);
 }
 
-void GTK3Application::InternalQuit()
+void NativeApplication::InternalQuit()
 {
   gtk_window_close((GtkWindow *)_window);
   // gtk_main_quit();
-
-	InternalReleaseCursors();
 }
 
-GTK3Window::GTK3Window(int x, int y, int width, int height):
+NativeWindow::NativeWindow(int x, int y, int width, int height):
 	jgui::Window(dynamic_cast<Window *>(this))
 {
-	jcommon::Object::SetClassName("jgui::GTK3Window");
+	jcommon::Object::SetClassName("jgui::NativeWindow");
 
 	if (_window != NULL) {
 		throw jexception::RuntimeException("Cannot create more than one window");
@@ -798,7 +734,7 @@ GTK3Window::GTK3Window(int x, int y, int width, int height):
   g_signal_connect(_handler, "activate", G_CALLBACK(ConfigureApplication), NULL);
 }
 
-GTK3Window::~GTK3Window()
+NativeWindow::~NativeWindow()
 {
   // g_signal_handler_disconnect(_window, "destroy");
   // g_signal_handler_disconnect(_drawing_area, "draw");
@@ -815,7 +751,7 @@ GTK3Window::~GTK3Window()
   g_object_unref(_handler);
 }
 
-void GTK3Window::ToggleFullScreen()
+void NativeWindow::ToggleFullScreen()
 {
   // gtk_window_unfullscreen (GtkWindow *window);
   // gtk_window_fullscreen_on_monitor (GtkWindow *window, GdkScreen *screen, gint monitor);
@@ -832,7 +768,7 @@ void GTK3Window::ToggleFullScreen()
 	Repaint();
 }
 
-void GTK3Window::SetParent(jgui::Container *c)
+void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
@@ -845,59 +781,59 @@ void GTK3Window::SetParent(jgui::Container *c)
   g_window->SetParent(NULL);
 }
 
-void GTK3Window::SetTitle(std::string title)
+void NativeWindow::SetTitle(std::string title)
 {
 	gtk_window_set_title(GTK_WINDOW(_window), title.c_str());
 }
 
-std::string GTK3Window::GetTitle()
+std::string NativeWindow::GetTitle()
 {
 	return gtk_window_get_title(GTK_WINDOW(_window));
 }
 
-void GTK3Window::SetOpacity(float opacity)
+void NativeWindow::SetOpacity(float opacity)
 {
 	_opacity = opacity;
 }
 
-float GTK3Window::GetOpacity()
+float NativeWindow::GetOpacity()
 {
   return _opacity;
 }
 
-void GTK3Window::SetUndecorated(bool undecorated)
+void NativeWindow::SetUndecorated(bool undecorated)
 {
 	gtk_window_set_decorated(GTK_WINDOW(_window), undecorated == false);
 }
 
-bool GTK3Window::IsUndecorated()
+bool NativeWindow::IsUndecorated()
 {
   return gtk_window_get_decorated(GTK_WINDOW(_window));
 }
 
-void GTK3Window::SetBounds(int x, int y, int width, int height)
+void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
   gtk_window_move(GTK_WINDOW(_window), x, y);
   gtk_window_resize(GTK_WINDOW(_window), width, height);
 	gtk_widget_set_size_request(_window, width, height);
 }
 
-jgui::jregion_t GTK3Window::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetVisibleBounds()
 {
   return _visible_bounds;
 }
 
-void GTK3Window::SetResizable(bool resizable)
+void NativeWindow::SetResizable(bool resizable)
 {
   gtk_window_set_resizable((GtkWindow *)_window, resizable);
 }
 
-bool GTK3Window::IsResizable()
+bool NativeWindow::IsResizable()
 {
   return gtk_window_get_resizable((GtkWindow *)_window);
 }
 
-void GTK3Window::SetCursorLocation(int x, int y)
+void NativeWindow::SetCursorLocation(int x, int y)
 {
 	if (x < 0) {
 		x = 0;
@@ -918,7 +854,7 @@ void GTK3Window::SetCursorLocation(int x, int y)
   // TODO::
 }
 
-jpoint_t GTK3Window::GetCursorLocation()
+jpoint_t NativeWindow::GetCursorLocation()
 {
 	jpoint_t t;
 
@@ -930,25 +866,44 @@ jpoint_t GTK3Window::GetCursorLocation()
 	return t;
 }
 
-void GTK3Window::SetCursorEnabled(bool enabled)
+void NativeWindow::SetVisible(bool visible)
+{
+  if (visible == true) {
+    gtk_widget_show(_window);
+    // gtk_widget_show_all(_window);
+  } else {
+    gtk_widget_hide(_window);
+  }
+}
+
+bool NativeWindow::IsVisible()
+{
+  return (bool)gtk_widget_is_visible(_window);
+}
+
+jcursor_style_t NativeWindow::GetCursor()
+{
+  return _cursor;
+}
+
+void NativeWindow::SetCursorEnabled(bool enabled)
 {
 	_cursor_enabled = enabled;
 }
 
-bool GTK3Window::IsCursorEnabled()
+bool NativeWindow::IsCursorEnabled()
 {
   return _cursor_enabled;
 }
 
-void GTK3Window::SetCursor(jcursor_style_t style)
+void NativeWindow::SetCursor(jcursor_style_t style)
 {
-  _cursor_style = style;
-
-	SetCursor(_cursors[_cursor_style].cursor, _cursors[_cursor_style].hot_x, _cursors[_cursor_style].hot_y);
+  _cursor = style;
 }
 
-void GTK3Window::SetCursor(Image *shape, int hotx, int hoty)
+void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
+  /*
 	if ((void *)shape == NULL) {
 		return;
 	}
@@ -962,24 +917,24 @@ void GTK3Window::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-  // TODO::
+  */
 }
 
-void GTK3Window::SetRotation(jwindow_rotation_t t)
+void NativeWindow::SetRotation(jwindow_rotation_t t)
 {
 }
 
-jwindow_rotation_t GTK3Window::GetRotation()
+jwindow_rotation_t NativeWindow::GetRotation()
 {
 	return jgui::JWR_NONE;
 }
 
-void GTK3Window::SetIcon(jgui::Image *image)
+void NativeWindow::SetIcon(jgui::Image *image)
 {
   _icon = image;
 }
 
-jgui::Image * GTK3Window::GetIcon()
+jgui::Image * NativeWindow::GetIcon()
 {
   return _icon;
 }

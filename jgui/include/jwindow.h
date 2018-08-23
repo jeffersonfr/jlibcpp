@@ -279,6 +279,18 @@ class Window : public jgui::Container {
 		 * \brief
 		 *
 		 */
+		virtual void SetVisible(bool visible);
+		
+		/**
+		 * \brief
+		 *
+		 */
+		virtual bool IsVisible();
+		
+		/**
+		 * \brief
+		 *
+		 */
 		virtual void SetCursorLocation(int x, int y);
 
 		/**

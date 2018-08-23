@@ -17,8 +17,9 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "allegro5/include/allegro5application.h"
-#include "allegro5/include/allegro5window.h"
+#include "include/nativeapplication.h"
+#include "include/nativewindow.h"
+
 #include "jgui/jfont.h"
 #include "jgui/jbufferedimage.h"
 #include "jcommon/jproperties.h"
@@ -31,26 +32,16 @@
 
 namespace jgui {
 
-// WINDOW PARAMS
-/** \brief */
-struct cursor_params_t {
-  Image *cursor;
-  int hot_x;
-  int hot_y;
-};
-
-/** \brief */
-static std::map<jcursor_style_t, struct cursor_params_t> _cursors;
 /** \brief */
 static std::map<int, int> _key_modifiers;
 /** \brief */
 static std::map<int, int> _mouse_buttons;
 /** \brief */
-static ALLEGRO_DISPLAY *_display;
+static ALLEGRO_DISPLAY *_display = NULL;
 /** \brief */
-static ALLEGRO_BITMAP *_surface;
+static ALLEGRO_BITMAP *_surface = NULL;
 /** \brief */
-static ALLEGRO_MOUSE_CURSOR *_cursor_bitmap;
+static ALLEGRO_MOUSE_CURSOR *_cursor_bitmap = NULL;
 /** \brief */
 static jgui::Image *_icon = NULL;
 /** \brief */
@@ -70,7 +61,9 @@ static float _opacity = 1.0f;
 /** \brief */
 static bool _cursor_enabled = true;
 /** \brief */
-static jcursor_style_t _cursor_style;
+static jcursor_style_t _cursor;
+/** \brief */
+static bool _visible = true;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
 {
@@ -306,69 +299,17 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool ca
 
 static jgui::jsize_t _screen = {0, 0};
 
-Allegro5Application::Allegro5Application():
+NativeApplication::NativeApplication():
 	jgui::Application()
 {
-	jcommon::Object::SetClassName("jgui::Allegro5Application");
+	jcommon::Object::SetClassName("jgui::NativeApplication");
 }
 
-Allegro5Application::~Allegro5Application()
+NativeApplication::~NativeApplication()
 {
 }
 
-void Allegro5Application::InternalInitCursors()
-{
-#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
-	t.cursor = new BufferedImage(JPF_ARGB, w, h);													\
-																																				\
-	t.hot_x = hotx;																												\
-	t.hot_y = hoty;																												\
-																																				\
-	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
-																																				\
-	_cursors[type] = t;																										\
-
-	struct cursor_params_t t;
-	int w = 32;
-	int h = 32;
-
-	try {
-		Image *cursors = new BufferedImage(_DATA_PREFIX"/images/cursors.png");
-
-		CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
-		CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
-		CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
-		CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
-		CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
-		CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
-		CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
-		CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
-		CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
-		CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
-		CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
-		CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
-		CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
-		CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
-		CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
-		CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
-	
-		delete cursors;
-	} catch (jexception::RuntimeException &e) {
-	}
-
-	// SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
-}
-
-void Allegro5Application::InternalReleaseCursors()
-{
-	for (std::map<jcursor_style_t, struct cursor_params_t>::iterator i=_cursors.begin(); i!=_cursors.end(); i++) {
-		delete i->second.cursor;
-	}
-
-	_cursors.clear();
-}
-
-void Allegro5Application::InternalInit(int argc, char **argv)
+void NativeApplication::InternalInit(int argc, char **argv)
 {
 	if (al_init() == false) {
 		throw jexception::RuntimeException("Problem to init allegro5");
@@ -398,11 +339,9 @@ void Allegro5Application::InternalInit(int argc, char **argv)
 	_key_modifiers[ALLEGRO_KEY_SCROLLLOCK] = false;
 	_key_modifiers[ALLEGRO_KEY_NUMLOCK] = false;
 	_key_modifiers[ALLEGRO_KEY_CAPSLOCK] = false;
-
-	InternalInitCursors();
 }
 
-void Allegro5Application::InternalPaint()
+void NativeApplication::InternalPaint()
 {
 	if (g_window == NULL || g_window->IsVisible() == false) {
 		return;
@@ -474,7 +413,7 @@ void Allegro5Application::InternalPaint()
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
-void Allegro5Application::InternalLoop()
+void NativeApplication::InternalLoop()
 {
 	ALLEGRO_EVENT event;
   bool quitting = false;
@@ -692,15 +631,14 @@ void Allegro5Application::InternalLoop()
   g_window->GrabEvents();
 }
 
-void Allegro5Application::InternalQuit()
+void NativeApplication::InternalQuit()
 {
-	InternalReleaseCursors();
 }
 
-Allegro5Window::Allegro5Window(int x, int y, int width, int height):
+NativeWindow::NativeWindow(int x, int y, int width, int height):
 	jgui::Window(dynamic_cast<Window *>(this))
 {
-	jcommon::Object::SetClassName("jgui::Allegro5Window");
+	jcommon::Object::SetClassName("jgui::NativeWindow");
 
 	if (_surface != NULL) {
 		throw jexception::RuntimeException("Cannot create more than one window");
@@ -714,6 +652,11 @@ Allegro5Window::Allegro5Window(int x, int y, int width, int height):
 	_last_keypress = std::chrono::steady_clock::now();
 	_click_count = 1;
 
+  // al_set_new_display_refresh_rate(60);
+	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP | ALLEGRO_NO_PREMULTIPLIED_ALPHA);
+	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
+	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
+
 	al_set_new_window_position(x, y);
 	al_set_new_display_option(ALLEGRO_UPDATE_DISPLAY_REGION, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
 	al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
@@ -724,30 +667,28 @@ Allegro5Window::Allegro5Window(int x, int y, int width, int height):
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
-	// al_set_new_display_refresh_rate(60);
-	al_set_new_bitmap_flags(ALLEGRO_MEMORY_BITMAP | ALLEGRO_NO_PREMULTIPLIED_ALPHA);
-	al_set_new_bitmap_format(ALLEGRO_PIXEL_FORMAT_ARGB_8888);
-	al_set_blender(ALLEGRO_ADD, ALLEGRO_ONE, ALLEGRO_ZERO);
-
 	_surface = al_create_bitmap(width, height);
 	
 	if (_surface == NULL) {
+	  al_destroy_display(_display);
+
 		throw jexception::RuntimeException("Cannot get a window's surface");
 	}
 }
 
-Allegro5Window::~Allegro5Window()
+NativeWindow::~NativeWindow()
 {
   al_destroy_bitmap(_surface);
+  _surface = NULL;
+
 	al_destroy_display(_display);
-	
   _display = NULL;
 
   delete g_window;
   g_window = NULL;
 }
 
-void Allegro5Window::ToggleFullScreen()
+void NativeWindow::ToggleFullScreen()
 {
   bool enabled = (al_get_display_flags(_display) & ALLEGRO_WINDOWED) != 0;
 
@@ -761,7 +702,7 @@ void Allegro5Window::ToggleFullScreen()
   Repaint();
 }
 
-void Allegro5Window::SetParent(jgui::Container *c)
+void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
@@ -774,45 +715,45 @@ void Allegro5Window::SetParent(jgui::Container *c)
   g_window->SetParent(NULL);
 }
 
-void Allegro5Window::SetTitle(std::string title)
+void NativeWindow::SetTitle(std::string title)
 {
   _title = title;
 
   al_set_window_title(_display, title.c_str());
 }
 
-std::string Allegro5Window::GetTitle()
+std::string NativeWindow::GetTitle()
 {
   return _title;
 }
 
-void Allegro5Window::SetOpacity(float opacity)
+void NativeWindow::SetOpacity(float opacity)
 {
   _opacity = opacity;
 }
 
-float Allegro5Window::GetOpacity()
+float NativeWindow::GetOpacity()
 {
   return _opacity;
 }
 
-void Allegro5Window::SetUndecorated(bool undecorated)
+void NativeWindow::SetUndecorated(bool undecorated)
 {
-  al_set_display_flag(_display, ALLEGRO_NOFRAME, undecorated);
+  al_set_display_flag(_display, ALLEGRO_FRAMELESS, undecorated);
 }
 
-bool Allegro5Window::IsUndecorated()
+bool NativeWindow::IsUndecorated()
 {
-  return (al_get_display_flags(_display) & ALLEGRO_NOFRAME) != 0;
+  return (al_get_display_flags(_display) & ALLEGRO_FRAMELESS) != 0;
 }
 
-void Allegro5Window::SetBounds(int x, int y, int width, int height)
+void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
 	al_set_window_position(_display, x, y);
 	al_resize_display(_display, width, height);
 }
 
-jgui::jregion_t Allegro5Window::GetVisibleBounds()
+jgui::jregion_t NativeWindow::GetVisibleBounds()
 {
 	jgui::jregion_t t;
 
@@ -824,17 +765,17 @@ jgui::jregion_t Allegro5Window::GetVisibleBounds()
 	return t;
 }
 		
-void Allegro5Window::SetResizable(bool resizable)
+void NativeWindow::SetResizable(bool resizable)
 {
   al_set_display_flag(_display, ALLEGRO_RESIZABLE, resizable);
 }
 
-bool Allegro5Window::IsResizable()
+bool NativeWindow::IsResizable()
 {
   return (al_get_display_flags(_display) & ALLEGRO_RESIZABLE) != 0;
 }
 
-void Allegro5Window::SetCursorLocation(int x, int y)
+void NativeWindow::SetCursorLocation(int x, int y)
 {
 	if (x < 0) {
 		x = 0;
@@ -855,7 +796,7 @@ void Allegro5Window::SetCursorLocation(int x, int y)
 	al_set_mouse_xy(_display, x, y);
 }
 
-jpoint_t Allegro5Window::GetCursorLocation()
+jpoint_t NativeWindow::GetCursorLocation()
 {
 	jpoint_t t;
 
@@ -867,7 +808,24 @@ jpoint_t Allegro5Window::GetCursorLocation()
 	return t;
 }
 
-void Allegro5Window::SetCursorEnabled(bool enabled)
+void NativeWindow::SetVisible(bool visible)
+{
+  _visible = visible;
+
+  // TODO:: delete and create the window
+}
+
+bool NativeWindow::IsVisible()
+{
+  return _visible;
+}
+
+jcursor_style_t NativeWindow::GetCursor()
+{
+  return _cursor;
+}
+
+void NativeWindow::SetCursorEnabled(bool enabled)
 {
   _cursor_enabled = enabled;
 
@@ -878,17 +836,51 @@ void Allegro5Window::SetCursorEnabled(bool enabled)
 	}
 }
 
-bool Allegro5Window::IsCursorEnabled()
+bool NativeWindow::IsCursorEnabled()
 {
 	return _cursor_enabled;
 }
 
-void Allegro5Window::SetCursor(jcursor_style_t style)
+void NativeWindow::SetCursor(jcursor_style_t style)
 {
-	SetCursor(_cursors[style].cursor, _cursors[style].hot_x, _cursors[style].hot_y);
+  ALLEGRO_SYSTEM_MOUSE_CURSOR type = ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT;
+
+  if (style == JCS_DEFAULT) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT;
+  } else if (style == JCS_CROSSHAIR) {
+  } else if (style == JCS_EAST) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_E;
+  } else if (style == JCS_WEST) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_W;
+  } else if (style == JCS_NORTH) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_N;
+  } else if (style == JCS_SOUTH) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_S;
+  } else if (style == JCS_HAND) {
+  } else if (style == JCS_MOVE) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_MOVE;
+  } else if (style == JCS_NS) {
+  } else if (style == JCS_WE) {
+  } else if (style == JCS_NW_CORNER) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_NW;
+  } else if (style == JCS_NE_CORNER) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_NE;
+  } else if (style == JCS_SW_CORNER) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_SW;
+  } else if (style == JCS_SE_CORNER) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_RESIZE_SE;
+  } else if (style == JCS_TEXT) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_EDIT;
+  } else if (style == JCS_WAIT) {
+    type = ALLEGRO_SYSTEM_MOUSE_CURSOR_BUSY;
+  }
+
+  al_set_system_mouse_cursor(_display, type);
+
+  _cursor = style;
 }
 
-void Allegro5Window::SetCursor(Image *shape, int hotx, int hoty)
+void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
 	if ((void *)shape == NULL) {
 		return;
@@ -931,22 +923,22 @@ void Allegro5Window::SetCursor(Image *shape, int hotx, int hoty)
 	al_set_mouse_cursor(_display, _cursor_bitmap);
 }
 
-void Allegro5Window::SetRotation(jwindow_rotation_t t)
+void NativeWindow::SetRotation(jwindow_rotation_t t)
 {
 	// TODO::
 }
 
-jwindow_rotation_t Allegro5Window::GetRotation()
+jwindow_rotation_t NativeWindow::GetRotation()
 {
 	return jgui::JWR_NONE;
 }
 
-void Allegro5Window::SetIcon(jgui::Image *image)
+void NativeWindow::SetIcon(jgui::Image *image)
 {
   _icon = image;
 }
 
-jgui::Image * Allegro5Window::GetIcon()
+jgui::Image * NativeWindow::GetIcon()
 {
   return _icon;
 }
