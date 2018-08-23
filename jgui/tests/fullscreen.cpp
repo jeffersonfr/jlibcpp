@@ -45,13 +45,7 @@ class Fullscreen : public jgui::Window {
 			}
 	
 			if (event->GetSymbol() == jevent::JKS_F || event->GetSymbol() == jevent::JKS_f) {
-        /*
-				if (_main->IsFullScreenEnabled() == false) {
-					_main->SetFullScreenEnabled(true);
-				} else {
-					_main->SetFullScreenEnabled(false);
-				}
-        */
+        ToggleFullScreen();
 			}
 
 			return true;

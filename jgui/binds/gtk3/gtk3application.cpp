@@ -765,7 +765,7 @@ void NativeWindow::ToggleFullScreen()
 		gtk_window_unfullscreen((GtkWindow *)_window);
 	}
 
-	Repaint();
+  gtk_widget_queue_draw(_drawing_area);
 }
 
 void NativeWindow::SetParent(jgui::Container *c)

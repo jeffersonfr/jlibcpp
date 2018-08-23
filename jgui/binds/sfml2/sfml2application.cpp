@@ -36,14 +36,6 @@
 
 namespace jgui {
 
-// WINDOW PARAMS
-/** \brief */
-struct cursor_params_t {
-  Image *cursor;
-  int hot_x;
-  int hot_y;
-};
-
 /** \brief */
 static sf::RenderWindow *_window = NULL;
 /** \brief */
@@ -72,6 +64,10 @@ static bool _cursor_enabled = true;
 static jcursor_style_t _cursor;
 /** \brief */
 static bool _visible = true;
+/** \brief */
+static bool _fullscreen = false;
+/** \brief */
+static jgui::jregion_t _previous_bounds;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(sf::Keyboard::Key symbol)
 {
@@ -659,16 +655,56 @@ NativeWindow::~NativeWindow()
 
 void NativeWindow::ToggleFullScreen()
 {
-  /*
-  if (SFML_GetWindowFlags(_window) & (SFML_WINDOW_FULLSCREEN | SFML_WINDOW_FULLSCREEN_DESKTOP)) {
-    SFML_SetWindowFullscreen(_window, 0);
-  } else {
-    SFML_SetWindowFullscreen(_window, SFML_WINDOW_FULLSCREEN_DESKTOP);
-    // SFML_SetWindowFullscreen(_window, SFML_WINDOW_FULLSCREEN);
-  }
-  */
+  uint32_t
+    flags = (int)(sf::Style::Close);
 
-  Repaint();
+  if (IsUndecorated() == false) {
+    flags = (uint32_t)(flags | sf::Style::Titlebar);
+  }
+
+  if (IsResizable() == true) {
+    flags = (uint32_t)(flags | sf::Style::Resize);
+  }
+
+  sf::RenderWindow 
+    *window = NULL;
+  sf::RenderWindow 
+    *old = _window;
+
+  if (_fullscreen == false) {
+    std::vector<sf::VideoMode> 
+      modes = sf::VideoMode::getFullscreenModes();
+
+    if (modes.size() == 0) {
+      return;
+    }
+
+    _previous_bounds = GetVisibleBounds();
+
+    window = new sf::RenderWindow(modes[0], GetTitle().c_str(), flags);
+
+    _fullscreen = true;
+  } else {
+    window = new sf::RenderWindow(sf::VideoMode(_previous_bounds.width, _previous_bounds.height), GetTitle().c_str(), flags);
+
+    window->setPosition(sf::Vector2i(_previous_bounds.x, _previous_bounds.y));
+
+    _fullscreen = false;
+  }
+
+  if (_window == NULL) {
+    return;
+  }
+
+  window->requestFocus();
+  window->setVerticalSyncEnabled(true);
+  window->setFramerateLimit(120);
+  window->setActive(false);
+
+  _window = window;
+
+  delete old;
+  old = NULL;
 }
 
 void NativeWindow::SetParent(jgui::Container *c)

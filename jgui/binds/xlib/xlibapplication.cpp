@@ -31,6 +31,7 @@
 #include <X11/Xlib.h>
 #include <X11/cursorfont.h>
 #include <X11/keysym.h>
+#include <X11/Xatom.h>
 #include <X11/extensions/Xrandr.h>
 
 namespace jgui {
@@ -70,7 +71,7 @@ static std::string _title;
 /** \brief */
 static float _opacity = 1.0f;
 /** \brief */
-static bool _fullscreen_enabled = false;
+static bool _fullscreen = false;
 /** \brief */
 static bool _undecorated = false;
 /** \brief */
@@ -81,6 +82,8 @@ static bool _cursor_enabled = true;
 static jcursor_style_t _cursor;
 /** \brief */
 static bool _visible = true;
+/** \brief */
+static jgui::jregion_t _previous_bounds;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(KeySym symbol)
 {
@@ -868,48 +871,46 @@ NativeWindow::~NativeWindow()
 
 void NativeWindow::ToggleFullScreen()
 {
+  if (_fullscreen == false) {
+    _previous_bounds = GetVisibleBounds();
+
+    Atom atoms[2] = { 
+      XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", False), None 
+    };
+
+    XMoveResizeWindow(_display, _window, 0, 0, _screen.width, _screen.height);
+    XChangeProperty(_display, _window, 
+        XInternAtom(_display, "_NET_WM_STATE", False), XA_ATOM, 32, PropModeReplace, (unsigned char*)atoms, 1);
+
     /*
-       if (_need_destroy == true) {
-       _need_destroy = false;
+    XMoveResizeWindow(_display, _window, 0, 0, _screen.width, _screen.height);
 
-       if (_is_fullscreen_enabled == true) {
-       ox = _size.width;
-       oy = _size.height;
+    XEvent xev;
 
-       _size.width = _screen.width;
-       _size.height = _screen.height;
+    Atom wm_state = XInternAtom(_display, "_NET_WM_STATE", False);
+    Atom fullscreen = XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", False);
 
-       XMoveResizeWindow(_display, _window, _location.x, _location.y, _size.width, _size.height);
+    memset(&xev, 0, sizeof(xev));
 
-       _graphics->SetNativeSurface((void *)&_window, _size.width, _size.height);
+    xev.type = ClientMessage;
+    xev.xclient.window = _window;
+    xev.xclient.message_type = wm_state;
+    xev.xclient.format = 32;
+    xev.xclient.data.l[0] = 1;
+    xev.xclient.data.l[1] = fullscreen;
+    xev.xclient.data.l[2] = 0;
 
-       XEvent xev;
+    XSendEvent(_display, XRootWindow(_display, DefaultScreen(_display)), False, SubstructureNotifyMask, &xev);
+    */
 
-       Atom wm_state = XInternAtom(_display, "_NET_WM_STATE", False);
-       Atom fullscreen = XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", False);
+    _fullscreen = true;
+  } else {
+	  XUnmapWindow(_display, _window);
+    XMoveResizeWindow(_display, _window, _previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
+	  XMapWindow(_display, _window);
 
-       memset(&xev, 0, sizeof(xev));
-
-       xev.type = ClientMessage;
-       xev.xclient.window = _window;
-       xev.xclient.message_type = wm_state;
-       xev.xclient.format = 32;
-       xev.xclient.data.l[0] = 1;
-       xev.xclient.data.l[1] = fullscreen;
-       xev.xclient.data.l[2] = 0;
-
-       XSendEvent(_display, XRootWindow(_display, DefaultScreen(_display)), False, SubstructureNotifyMask, &xev);
-       } else {
-       _size.width = ox;
-       _size.height = oy;
-
-       XMoveResizeWindow(_display, _window, _location.x, _location.y, _size.width, _size.height);
-
-       _graphics->SetNativeSurface((void *)&_window, _size.width, _size.height);
-       }
-       */
-
-  Repaint();
+    _fullscreen = false;
+  }
 }
 
 void NativeWindow::SetParent(jgui::Container *c)

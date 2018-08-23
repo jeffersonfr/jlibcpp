@@ -217,8 +217,6 @@ void Window::RemoveAllSubtitles()
 	}
 
 	_subtitles.clear();
-
-	Repaint();
 }
 
 void Window::Repaint(Component *cmp)

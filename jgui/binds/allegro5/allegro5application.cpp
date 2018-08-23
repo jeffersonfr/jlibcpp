@@ -64,6 +64,8 @@ static bool _cursor_enabled = true;
 static jcursor_style_t _cursor;
 /** \brief */
 static bool _visible = true;
+/** \brief */
+static jgui::jregion_t _previous_bounds;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
 {
@@ -690,16 +692,21 @@ NativeWindow::~NativeWindow()
 
 void NativeWindow::ToggleFullScreen()
 {
-  bool enabled = (al_get_display_flags(_display) & ALLEGRO_WINDOWED) != 0;
+  bool enabled = (al_get_display_flags(_display) & ALLEGRO_FULLSCREEN_WINDOW) != 0;
 
 	if (enabled == false) {
-    al_set_display_flag(_display, ALLEGRO_FULLSCREEN_WINDOW, true);
-	} else {
-    al_set_display_flag(_display, ALLEGRO_WINDOWED, true);
-	}
+    _previous_bounds = GetVisibleBounds();
 
-  DoLayout();
-  Repaint();
+    al_set_display_flag(_display, ALLEGRO_FULLSCREEN_WINDOW, true);
+    al_set_display_flag(_display, ALLEGRO_GENERATE_EXPOSE_EVENTS, true);
+    
+    // SetBounds(0, 0, _screen.width, _screen.height);
+	} else {
+    al_set_display_flag(_display, ALLEGRO_FULLSCREEN_WINDOW, false);
+    al_set_display_flag(_display, ALLEGRO_GENERATE_EXPOSE_EVENTS, true);
+    
+    // SetBounds(_previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
+	}
 }
 
 void NativeWindow::SetParent(jgui::Container *c)

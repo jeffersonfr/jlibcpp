@@ -33,6 +33,8 @@
 #include <xcb/xcb_aux.h>
 #include <xcb/xcb_icccm.h>
 
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
 #include <X11/cursorfont.h>
 
 #include <cairo.h>
@@ -65,7 +67,7 @@ static std::string _title;
 /** \brief */
 static float _opacity = 1.0f;
 /** \brief */
-static bool _fullscreen_enabled = false;
+static bool _fullscreen = false;
 /** \brief */
 static bool _undecorated = false;
 /** \brief */
@@ -76,6 +78,8 @@ static bool _cursor_enabled = true;
 static jcursor_style_t _cursor;
 /** \brief */
 static bool _visible = true;
+/** \brief */
+static jgui::jregion_t _previous_bounds;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(xcb_keycode_t symbol, bool capital)
 {
@@ -649,50 +653,75 @@ NativeWindow::~NativeWindow()
   g_window = NULL;
 }
 
+xcb_intern_atom_cookie_t getCookieForAtom(const char *state_name) 
+{
+  return xcb_intern_atom(_xconnection, 0, sizeof(state_name)/sizeof(char), state_name);
+}
+
+xcb_atom_t getReplyAtomFromCookie(xcb_intern_atom_cookie_t cookie) 
+{
+  xcb_generic_error_t 
+    *error;
+  xcb_intern_atom_reply_t 
+    *reply = xcb_intern_atom_reply(_xconnection, cookie, &error);
+
+  if (error) {
+    return 0;
+  }
+
+  return reply->atom;
+}
+
 void NativeWindow::ToggleFullScreen()
 {
-    /*
-       if (_need_destroy == true) {
-       _need_destroy = false;
+  if (_fullscreen == false) {
+    _previous_bounds = GetVisibleBounds();
 
-       if (_is_fullscreen_enabled == true) {
-       ox = _size.width;
-       oy = _size.height;
+    SetBounds(0, 0, _screen.width, _screen.height);
 
-       _size.width = _screen.width;
-       _size.height = _screen.height;
+    _fullscreen = true;
+  } else {
+    xcb_unmap_window(_xconnection, _xwindow);
+    SetBounds(_previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
+    xcb_map_window(_xconnection, _xwindow);
 
-       XMoveResizeWindow(_display, _window, _location.x, _location.y, _size.width, _size.height);
+    _fullscreen = false;
+  }
+  
+  xcb_flush(_xconnection);
 
-       _graphics->SetNativeSurface((void *)&_window, _size.width, _size.height);
+  /*
+  xcb_intern_atom_cookie_t wm_state_ck = getCookieForAtom("_NET_WM_STATE");
+  xcb_intern_atom_cookie_t wm_state_fs_ck = getCookieForAtom("_NET_WM_STATE_FULLSCREEN");
 
-       XEvent xev;
+#define _NET_WM_STATE_REMOVE        0    // remove/unset property
+#define _NET_WM_STATE_ADD           1    // add/set property
+#define _NET_WM_STATE_TOGGLE        2    // toggle property
 
-       Atom wm_state = XInternAtom(_display, "_NET_WM_STATE", False);
-       Atom fullscreen = XInternAtom(_display, "_NET_WM_STATE_FULLSCREEN", False);
+  xcb_atom_t atom_from_cookie = getReplyAtomFromCookie(wm_state_ck); 
 
-       memset(&xev, 0, sizeof(xev));
+  printf("::: 001\n");
+  if (atom_from_cookie == 0) {
+    return;
+  }
+  printf("::: 002\n");
 
-       xev.type = ClientMessage;
-       xev.xclient.window = _window;
-       xev.xclient.message_type = wm_state;
-       xev.xclient.format = 32;
-       xev.xclient.data.l[0] = 1;
-       xev.xclient.data.l[1] = fullscreen;
-       xev.xclient.data.l[2] = 0;
+  xcb_client_message_event_t ev;
+  // memset (&ev, 0, sizeof (ev));
+  ev.response_type = XCB_CLIENT_MESSAGE;
+  ev.type = atom_from_cookie;
+  ev.format = 32;
+  ev.window = _xwindow;
+  // ev.data.data32[0] = _fullscreen ? _NET_WM_STATE_ADD : _NET_WM_STATE_REMOVE;
+  ev.data.data32[0] = _NET_WM_STATE_TOGGLE;
+  ev.data.data32[1] = getReplyAtomFromCookie(wm_state_fs_ck);
+  ev.data.data32[2] = XCB_ATOM_NONE;
+  ev.data.data32[3] = 0;
+  ev.data.data32[4] = 0;
 
-       XSendEvent(_display, XRootWindow(_display, DefaultScreen(_display)), False, SubstructureNotifyMask, &xev);
-       } else {
-       _size.width = ox;
-       _size.height = oy;
-
-       XMoveResizeWindow(_display, _window, _location.x, _location.y, _size.width, _size.height);
-
-       _graphics->SetNativeSurface((void *)&_window, _size.width, _size.height);
-       }
-       */
-
-  Repaint();
+  xcb_send_event(
+      _xconnection, 1, _xwindow, XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT | XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY, (const char*)(&ev));
+      */
 }
 
 void NativeWindow::SetParent(jgui::Container *c)
@@ -781,6 +810,9 @@ bool NativeWindow::IsResizable()
 
 void NativeWindow::SetCursorLocation(int x, int y)
 {
+  // jgui::jsize_t
+  //  size = GetSize();
+
 	if (x < 0) {
 		x = 0;
 	}
@@ -797,8 +829,7 @@ void NativeWindow::SetCursorLocation(int x, int y)
 		y = _screen.height;
 	}
 
-	// XWarpPointer(_display, None, _window, 0, 0, 0, 0, x, y);
-	// XFlush(_display);
+	// XWarpPointer(_display, None, _xwindow, 0, 0, size.width, size.height, x, y);
 }
 
 jpoint_t NativeWindow::GetCursorLocation()

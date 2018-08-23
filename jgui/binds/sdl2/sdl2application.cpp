@@ -725,8 +725,6 @@ void NativeWindow::ToggleFullScreen()
     SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
     // SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN);
   }
-
-  Repaint();
 }
 
 void NativeWindow::SetParent(jgui::Container *c)

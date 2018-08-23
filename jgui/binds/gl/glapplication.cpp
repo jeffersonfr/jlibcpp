@@ -54,6 +54,10 @@ static Window *g_window = NULL;
 static std::string _title;
 /** \brief */
 static bool _visible = true;
+/** \brief */
+static bool _fullscreen = false;
+/** \brief */
+static jgui::jregion_t _previous_bounds;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
 {
@@ -812,6 +816,17 @@ NativeWindow::~NativeWindow()
 
 void NativeWindow::ToggleFullScreen()
 {
+  if (_fullscreen == false) {
+    _previous_bounds = GetVisibleBounds();
+
+    glutFullScreen();
+
+    _fullscreen = true;
+  } else {
+    SetBounds(_previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
+    
+    _fullscreen = false;
+  }
 }
 
 void NativeWindow::SetParent(jgui::Container *c)
