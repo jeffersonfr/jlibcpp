@@ -22,6 +22,7 @@
 
 #include "jmedia/jplayer.h"
 #include "jgui/jcomponent.h"
+#include "jnetwork/jurl.h"
 
 struct PlayerState;
 
@@ -58,7 +59,7 @@ class LibAVLightPlayer : public jmedia::Player {
 		 * \brief
 		 *
 		 */
-		LibAVLightPlayer(std::string file);
+		LibAVLightPlayer(jnetwork::URL url);
 
 		/**
 		 * \brief

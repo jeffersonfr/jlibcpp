@@ -84,6 +84,8 @@ static jcursor_style_t _cursor;
 static bool _visible = true;
 /** \brief */
 static jgui::jregion_t _previous_bounds;
+/** \brief */
+static Atom _wm_delete_message;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(KeySym symbol)
 {
@@ -793,6 +795,10 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
+  _wm_delete_message = XInternAtom(_display, "WM_DELETE_WINDOW", False);
+
+  XSetWMProtocols(_display, _window, &_wm_delete_message, 1);
+
 	// Set the window's style (tell the windows manager to change our window's 
 	// decorations and functions according to the requested style)
 	Atom WMHintsAtom = XInternAtom(_display, "_MOTIF_WM_HINTS", False);
@@ -929,8 +935,8 @@ void NativeWindow::SetParent(jgui::Container *c)
 void NativeWindow::SetTitle(std::string title)
 {
 	_title = title;
-		
-  // TODO:: _window->setTitle(_title.c_str());
+	
+   XStoreName(_display, _window, title.c_str());
 }
 
 std::string NativeWindow::GetTitle()

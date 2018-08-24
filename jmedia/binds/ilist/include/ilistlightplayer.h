@@ -22,6 +22,7 @@
 
 #include "jmedia/jplayer.h"
 #include "jgui/jcomponent.h"
+#include "jnetwork/jurl.h"
 
 #include <thread>
 #include <mutex>
@@ -70,7 +71,7 @@ class ImageListLightPlayer : public jmedia::Player {
 		 * \brief
 		 *
 		 */
-		ImageListLightPlayer(std::string directory);
+		ImageListLightPlayer(jnetwork::URL url);
 
 		/**
 		 * \brief

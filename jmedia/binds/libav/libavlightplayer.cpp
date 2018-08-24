@@ -358,10 +358,10 @@ static void endofmedia_callback(void *data)
 	player->DispatchPlayerEvent(new jevent::PlayerEvent(player, jevent::JPE_FINISHED));
 }
 
-LibAVLightPlayer::LibAVLightPlayer(std::string file):
+LibAVLightPlayer::LibAVLightPlayer(jnetwork::URL url):
 	jmedia::Player()
 {
-	_file = file;
+	_file = url.GetPath();
 	_is_paused = false;
 	_is_closed = false;
 	_has_audio = false;

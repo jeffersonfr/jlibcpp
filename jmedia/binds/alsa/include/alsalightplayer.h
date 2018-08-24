@@ -23,6 +23,7 @@
 #include "jmedia/jplayer.h"
 #include "jgui/jcomponent.h"
 #include "jio/jinputstream.h"
+#include "jnetwork/jurl.h"
 
 #include <thread>
 #include <mutex>
@@ -76,7 +77,7 @@ class AlsaLightPlayer : public jmedia::Player {
 		 * \brief
 		 *
 		 */
-		AlsaLightPlayer(std::string file);
+		AlsaLightPlayer(jnetwork::URL url);
 
 		/**
 		 * \brief

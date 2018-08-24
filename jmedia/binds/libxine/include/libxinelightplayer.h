@@ -22,6 +22,7 @@
 
 #include "jmedia/jplayer.h"
 #include "jgui/jcomponent.h"
+#include "jnetwork/jurl.h"
 
 #include <mutex>
 
@@ -75,7 +76,7 @@ class LibXineLightPlayer : public jmedia::Player {
 		 * \brief
 		 *
 		 */
-		LibXineLightPlayer(std::string file);
+		LibXineLightPlayer(jnetwork::URL url);
 
 		/**
 		 * \brief

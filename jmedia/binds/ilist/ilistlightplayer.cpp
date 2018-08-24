@@ -192,10 +192,10 @@ class VideoSizeControlImpl : public VideoSizeControl {
 
 };
 
-ImageListLightPlayer::ImageListLightPlayer(std::string directory):
+ImageListLightPlayer::ImageListLightPlayer(jnetwork::URL url):
 	jmedia::Player()
 {
-	_directory = directory;
+	_directory = url.GetPath();
 	_is_paused = false;
 	_is_playing = false;
 	_is_loop = false;

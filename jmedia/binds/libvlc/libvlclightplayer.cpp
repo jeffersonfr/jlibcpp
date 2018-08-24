@@ -545,10 +545,10 @@ class VideoFormatControlImpl : public VideoFormatControl {
 
 };
 
-LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
+LibVLCLightPlayer::LibVLCLightPlayer(jnetwork::URL url):
 	jmedia::Player()
 {
-	_file = file;
+	_file = url.GetPath();
 	_is_paused = false;
 	_is_loop = false;
 	_is_closed = false;
@@ -567,7 +567,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
 	libvlc_media_t *media;
 
 	_engine = libvlc_new(vlc_argc, vlc_argv);
-	media = libvlc_media_new_path(_engine, file.c_str());
+	media = libvlc_media_new_path(_engine, _file.c_str());
 	_provider = libvlc_media_player_new_from_media(media);
 
  	libvlc_media_track_t **tracks = NULL;
@@ -583,35 +583,41 @@ LibVLCLightPlayer::LibVLCLightPlayer(std::string file):
   count = libvlc_media_tracks_get(media, &tracks);
 
   if (count == 0) {
-    libvlc_audio_set_mute(_provider, 1);
-    libvlc_media_player_play(_provider);
-    libvlc_media_player_pause(_provider);
+    std::string ext = _file.substr(_file.size() - 3);
 
-    // waits 5 seconds to get video size
-    for (int i=0; i<50; i++) {
-      libvlc_video_get_size(_provider, 0, &iw, &ih);
+    if (strcasecmp(ext.c_str(), "mp3") != 0 && 
+        strcasecmp(ext.c_str(), "wav") != 0 && 
+        strcasecmp(ext.c_str(), "ogg") != 0) {
+      libvlc_audio_set_mute(_provider, 1);
+      libvlc_media_player_play(_provider);
+      libvlc_media_player_pause(_provider);
 
-      if (iw > 0 && ih > 0) {
-        break;
+      // waits 5 seconds to get video size
+      for (int i=0; i<50; i++) {
+        libvlc_video_get_size(_provider, 0, &iw, &ih);
+
+        if (iw > 0 && ih > 0) {
+          break;
+        }
+
+        usleep(100000);
       }
 
-      usleep(100000);
+      libvlc_media_player_stop(_provider);
+      libvlc_audio_set_mute(_provider, 0);
+
+      if (iw <= 0 || ih <= 0) {
+        libvlc_media_player_release(_provider);
+        libvlc_release(_engine);
+
+        throw jexception::RuntimeException("Cannot retrive the size of media content");
+      }
+
+      _aspect = static_cast<float>(iw)/ih;
+
+      _controls.push_back(new VideoSizeControlImpl(this));
+      _controls.push_back(new VideoFormatControlImpl(this));
     }
-
-    libvlc_media_player_stop(_provider);
-    libvlc_audio_set_mute(_provider, 0);
-
-    if (iw <= 0 || ih <= 0) {
-      libvlc_media_player_release(_provider);
-      libvlc_release(_engine);
-
-      throw jexception::RuntimeException("Cannot retrive the size of media content");
-    }
-
-    _aspect = static_cast<float>(iw)/ih;
-
-    _controls.push_back(new VideoSizeControlImpl(this));
-    _controls.push_back(new VideoFormatControlImpl(this));
   } else {
     for (int i=0; i<count; i++) {
       libvlc_media_track_t *t = tracks[i];

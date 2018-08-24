@@ -39,10 +39,12 @@ class PlayerTest : public jgui::Window, public jevent::PlayerListener, public je
 
 			jgui::Component *cmp = _player->GetVisualComponent();
 
-			cmp->SetSize(720, 480);
-			cmp->SetVisible(true);
+      if (cmp != NULL) {
+  			cmp->SetSize(720, 480);
+	  		cmp->SetVisible(true);
 
-			Add(cmp);
+		  	Add(cmp);
+      }
 
 			_fullscreen_layout = new jgui::GridLayout(1, 1);
 

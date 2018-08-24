@@ -508,10 +508,10 @@ static void events_callback(void *data, const xine_event_t *event)
   }
 }
   
-LibXineLightPlayer::LibXineLightPlayer(std::string file):
+LibXineLightPlayer::LibXineLightPlayer(jnetwork::URL url):
 	jmedia::Player()
 {
-	_file = file;
+	_file = url.GetPath();
 	_is_paused = false;
 	_is_closed = false;
 	_has_audio = false;
@@ -536,9 +536,10 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
   _xine = xine_new();
 	
 	char configfile[2048];
+
 	sprintf(configfile, "%s%s", xine_get_homedir(), "/.xine/config");
+
 	xine_config_load(_xine, configfile);
-  
 	xine_init(_xine);
  
 	_post = NULL;
@@ -604,6 +605,9 @@ LibXineLightPlayer::LibXineLightPlayer(std::string file):
 			xine_post_wire_audio_port(audio_source, _post->audio_input[0]);
 		}
 	}
+				
+	xine_set_param(_stream, XINE_PARAM_AUDIO_MUTE, 0);
+  // xine_set_param(_stream, XINE_PARAM_AUDIO_VOLUME, 100);
 }
 
 LibXineLightPlayer::~LibXineLightPlayer()

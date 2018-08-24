@@ -23,6 +23,7 @@
 #include "jmedia/binds/v4l2/include/videograbber.h"
 #include "jmedia/jplayer.h"
 #include "jgui/jcomponent.h"
+#include "jnetwork/jurl.h"
 
 #include <mutex>
 
@@ -70,7 +71,7 @@ class V4L2LightPlayer : public jmedia::Player, public jmedia::V4LFrameListener {
 		 * \brief
 		 *
 		 */
-		V4L2LightPlayer(std::string file);
+		V4L2LightPlayer(jnetwork::URL url);
 
 		/**
 		 * \brief

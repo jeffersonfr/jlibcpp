@@ -259,10 +259,10 @@ static bool load_wave_params(const char *file, uint32_t *channels_, uint32_t *bi
 	return false;
 }
 
-AlsaLightPlayer::AlsaLightPlayer(std::string file):
+AlsaLightPlayer::AlsaLightPlayer(jnetwork::URL url):
 	jmedia::Player()
 {
-	_file = file;
+	_file = url.GetPath();
 	_media_time = 0LL;
 	_decode_rate = 1.0;
 	_is_loop = false;
@@ -277,9 +277,9 @@ AlsaLightPlayer::AlsaLightPlayer(std::string file):
 	_is_closed = false;
 	_is_playing = false;
 
-	_stream = new jio::FileInputStream(file);
+	_stream = new jio::FileInputStream(_file);
 
-	if (load_wave_params(file.c_str(), &_channels, &_bit_depth, &_sample_rate) == false) {
+	if (load_wave_params(_file.c_str(), &_channels, &_bit_depth, &_sample_rate) == false) {
 		throw jexception::MediaException("Unable to open a wav file");
 	}
 

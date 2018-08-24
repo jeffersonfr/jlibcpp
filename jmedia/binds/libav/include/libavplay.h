@@ -215,6 +215,8 @@ typedef struct PlayerState {
     int framedrop;
     int infinite_buffer;
 
+    int show_audio; // if true, display audio samples
+
     int rdftspeed;
     char *vfilters;
     int autorotate;

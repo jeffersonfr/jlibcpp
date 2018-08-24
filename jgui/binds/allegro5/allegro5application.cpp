@@ -66,6 +66,8 @@ static jcursor_style_t _cursor;
 static bool _visible = true;
 /** \brief */
 static jgui::jregion_t _previous_bounds;
+/** \brief */
+static bool _refresh = false;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool capital)
 {
@@ -460,7 +462,15 @@ void NativeApplication::InternalLoop()
       }
     }
 
-		if (al_wait_for_event_timed(queue, &event, 100) == false) {
+    if (_refresh == true) {
+      InternalPaint();
+
+      _refresh = false;
+    }
+
+		if (al_wait_for_event_timed(queue, &event, 0) == false) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(1));
+      
       continue;
     }
     
@@ -623,8 +633,6 @@ void NativeApplication::InternalLoop()
 
       g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
     }
-  
-    // std::this_thread::sleep_for(std::chrono::milliseconds(1));
   }
 
   al_destroy_event_queue(queue);
@@ -662,6 +670,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	al_set_new_window_position(x, y);
 	al_set_new_display_option(ALLEGRO_UPDATE_DISPLAY_REGION, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
 	al_set_new_display_option(ALLEGRO_VSYNC, 1, ALLEGRO_SUGGEST); // ALLEGRO_REQUIRE;
+	al_set_new_display_flags(ALLEGRO_RESIZABLE);
 
 	_display = al_create_display(width, height);
 
@@ -700,13 +709,15 @@ void NativeWindow::ToggleFullScreen()
     al_set_display_flag(_display, ALLEGRO_FULLSCREEN_WINDOW, true);
     al_set_display_flag(_display, ALLEGRO_GENERATE_EXPOSE_EVENTS, true);
     
-    // SetBounds(0, 0, _screen.width, _screen.height);
+    SetBounds(0, 0, _screen.width, _screen.height);
 	} else {
     al_set_display_flag(_display, ALLEGRO_FULLSCREEN_WINDOW, false);
     al_set_display_flag(_display, ALLEGRO_GENERATE_EXPOSE_EVENTS, true);
     
-    // SetBounds(_previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
+    SetBounds(_previous_bounds.x, _previous_bounds.y, _previous_bounds.width, _previous_bounds.height);
 	}
+
+	_refresh = true;
 }
 
 void NativeWindow::SetParent(jgui::Container *c)
@@ -758,6 +769,12 @@ void NativeWindow::SetBounds(int x, int y, int width, int height)
 {
 	al_set_window_position(_display, x, y);
 	al_resize_display(_display, width, height);
+ 
+	if (_surface != NULL) { 
+		al_destroy_bitmap(_surface);
+	}
+
+	_surface = al_create_bitmap(width, height);
 }
 
 jgui::jregion_t NativeWindow::GetVisibleBounds()
@@ -768,6 +785,7 @@ jgui::jregion_t NativeWindow::GetVisibleBounds()
   t.height = al_get_bitmap_height(_surface);
 
 	al_get_window_position(_display, &t.x, &t.y);
+printf("::: %d,%d\n", t.width, t.height);
 
 	return t;
 }

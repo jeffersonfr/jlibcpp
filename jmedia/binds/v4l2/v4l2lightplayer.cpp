@@ -411,10 +411,10 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 
 };
 
-V4L2LightPlayer::V4L2LightPlayer(std::string file):
+V4L2LightPlayer::V4L2LightPlayer(jnetwork::URL url):
 	jmedia::Player()
 {
-	_file = file;
+	_file = url.GetPath();
 	_is_paused = false;
 	_is_closed = false;
 	_has_audio = false;
@@ -426,7 +426,7 @@ V4L2LightPlayer::V4L2LightPlayer(std::string file):
 	_frame_rate = 0.0;
 	_component = NULL;
 	
-  _grabber = new VideoGrabber(this, file);
+  _grabber = new VideoGrabber(this, _file);
 
 	jgui::jsize_t size;
 	

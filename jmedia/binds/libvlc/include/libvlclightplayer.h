@@ -22,6 +22,7 @@
 
 #include "jmedia/jplayer.h"
 #include "jgui/jcomponent.h"
+#include "jnetwork/jurl.h"
 
 #include <thread>
 #include <mutex>
@@ -76,7 +77,7 @@ class LibVLCLightPlayer : public jmedia::Player {
 		 * \brief
 		 *
 		 */
-		LibVLCLightPlayer(std::string file);
+		LibVLCLightPlayer(jnetwork::URL url);
 
 		/**
 		 * \brief
