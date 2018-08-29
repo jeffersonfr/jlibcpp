@@ -78,7 +78,7 @@ Graphics::Graphics(cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, i
 
 		_cairo_context = cairo_create(cairo_surface);
 
-		cairo_surface_destroy(cairo_surface);
+		// cairo_surface_destroy(cairo_surface);
 	}
 
 	SetAntialias(JAM_NORMAL);

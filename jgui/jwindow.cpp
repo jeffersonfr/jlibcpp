@@ -385,6 +385,10 @@ void Window::Paint(jgui::Graphics *g)
 	Container::Paint(g);
 }
 
+void Window::Flush()
+{
+}
+
 void Window::SetVisible(bool visible)
 {
   _instance->SetVisible(visible);

@@ -144,7 +144,22 @@ OBJS_bitmask = \
 OBJS_widgets = \
 		widgets.o\
 
-all: primitives border ball breakout raycaster_flat skull raycaster_texture clip custom calc mines ants swarm cube mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets
+OBJS_tree = \
+		tree.o\
+
+OBJS_terrain = \
+		terrain.o\
+
+OBJS_surface = \
+		surface.o\
+
+OBJS_function = \
+		function.o\
+
+OBJS_graph = \
+		graph.o\
+
+all: primitives border ball breakout raycaster_flat skull raycaster_texture clip custom calc mines ants swarm cube mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph
 	
 primitives: $(OBJS_primitives)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -275,10 +290,22 @@ coloralpha: $(OBJS_coloralpha)
 bitmask: $(OBJS_bitmask)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-room: room.o
+widgets: $(OBJS_widgets)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-widgets: widgets.o
+tree: $(OBJS_tree)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+terrain: $(OBJS_terrain)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+surface: $(OBJS_surface)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+function: $(OBJS_function)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+graph: $(OBJS_graph)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 .cpp.o: $<  
@@ -288,4 +315,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets
+	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph

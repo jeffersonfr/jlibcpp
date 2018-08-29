@@ -438,6 +438,10 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
   cairo_paint(cr);
 
+  g_window->Flush();
+
+  cairo_surface_destroy(cairo_surface);
+
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 
   return TRUE;
@@ -669,11 +673,6 @@ static void main_thread(NativeApplication *app)
           gtk_widget_queue_draw(_drawing_area);
         }
       }
-
-      events.erase(events.begin());
-
-      delete event;
-      event = NULL;
 
       // INFO:: discard all remaining events
       while (events.size() > 0) {

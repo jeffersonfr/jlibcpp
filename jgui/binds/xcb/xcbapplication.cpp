@@ -365,6 +365,8 @@ void NativeApplication::InternalPaint()
     *vt = find_visual(_xconnection, _xscreen->root_visual);
 
   if (vt == NULL) {
+    cairo_surface_destroy(cairo_surface);
+
     return;
   }
 
@@ -380,6 +382,10 @@ void NativeApplication::InternalPaint()
   cairo_paint(cr);
   xcb_flush(_xconnection);
   cairo_surface_finish(surface);
+
+  g_window->Flush();
+
+  cairo_surface_destroy(cairo_surface);
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
@@ -430,11 +436,6 @@ void NativeApplication::InternalLoop()
           InternalPaint();
         }
       }
-
-      events.erase(events.begin());
-
-      delete event;
-      event = NULL;
 
       // INFO:: discard all remaining events
       while (events.size() > 0) {

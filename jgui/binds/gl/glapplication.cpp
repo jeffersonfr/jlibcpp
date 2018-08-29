@@ -433,6 +433,8 @@ void OnDraw()
   uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
   if (data == NULL) {
+    cairo_surface_destroy(cairo_surface);
+
     return;
   }
 
@@ -454,6 +456,10 @@ void OnDraw()
   glDrawPixels(dw, dh, GL_RGB, GL_UNSIGNED_BYTE, dst);
   // glFlush();
   glutSwapBuffers();
+
+  g_window->Flush();
+
+  cairo_surface_destroy(cairo_surface);
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
@@ -678,11 +684,6 @@ void OnTimer(int value)
         glutPostRedisplay();
       }
     }
-
-    events.erase(events.begin());
-
-    delete event;
-    event = NULL;
 
     // INFO:: discard all remaining events
     while (events.size() > 0) {

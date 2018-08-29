@@ -276,6 +276,12 @@ class Window : public jgui::Container {
 		virtual void Paint(Graphics *g);
 
 		/**
+		 * \brief Called after all drawings have been synchronized.
+		 *
+		 */
+		virtual void Flush();
+
+		/**
 		 * \brief
 		 *
 		 */

@@ -386,6 +386,8 @@ void NativeApplication::InternalPaint()
   uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
   if (data == NULL) {
+    cairo_surface_destroy(cairo_surface);
+
     return;
   }
 
@@ -413,7 +415,11 @@ void NativeApplication::InternalPaint()
 	al_draw_bitmap(_surface, 0, 0, 0);
 	al_flip_display();
   // al_wait_for_vsync();
-	
+
+  g_window->Flush();
+
+  cairo_surface_destroy(cairo_surface);
+
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
@@ -445,11 +451,6 @@ void NativeApplication::InternalLoop()
           InternalPaint();
         }
       }
-
-      events.erase(events.begin());
-
-      delete event;
-      event = NULL;
 
       // INFO:: discard all remaining events
       while (events.size() > 0) {
@@ -785,7 +786,6 @@ jgui::jregion_t NativeWindow::GetVisibleBounds()
   t.height = al_get_bitmap_height(_surface);
 
 	al_get_window_position(_display, &t.x, &t.y);
-printf("::: %d,%d\n", t.width, t.height);
 
 	return t;
 }

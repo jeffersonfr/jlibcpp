@@ -408,15 +408,17 @@ void NativeApplication::InternalPaint()
   uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
   if (data == NULL) {
+    cairo_surface_destroy(cairo_surface);
+
     return;
   }
 
   SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, dw, dh, 32, dw*4, 0, 0, 0, 0);
-  
   SDL_Texture *texture = SDL_CreateTextureFromSurface(_renderer, surface);
 
   if (texture == NULL) {
     SDL_FreeSurface(surface);
+    cairo_surface_destroy(cairo_surface);
 
     return;
   }
@@ -451,6 +453,10 @@ void NativeApplication::InternalPaint()
   SDL_RenderPresent(_renderer);
   // SDL_GL_SetSwapInterval(1);
 
+  g_window->Flush();
+
+  cairo_surface_destroy(cairo_surface);
+
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
@@ -472,11 +478,6 @@ void NativeApplication::InternalLoop()
           InternalPaint();
         }
       }
-
-      events.erase(events.begin());
-
-      delete event;
-      event = NULL;
 
       // INFO:: discard all remaining events
       while (events.size() > 0) {
