@@ -24,14 +24,17 @@ OBJS_ball = \
 OBJS_breakout = \
 	   breakout.o\
 
-OBJS_raycaster_flat = \
-	   raycaster_flat.o\
-
 OBJS_skull = \
 	   skull.o\
 
-OBJS_raycaster_texture = \
-	   raycaster_texture.o\
+OBJS_raycaster1 = \
+	   raycaster1.o\
+
+OBJS_raycaster2 = \
+	   raycaster2.o\
+
+OBJS_raycaster3 = \
+	   raycaster3.o\
 
 OBJS_clip = \
 	   clip.o\
@@ -159,7 +162,7 @@ OBJS_function = \
 OBJS_graph = \
 		graph.o\
 
-all: primitives border ball breakout raycaster_flat skull raycaster_texture clip custom calc mines ants swarm cube mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph
+all: primitives border ball breakout skull raycaster1 raycaster2 raycaster3 clip custom calc mines ants swarm cube mouse watch tank pacman tetris signal layouts stress mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph
 	
 primitives: $(OBJS_primitives)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
@@ -173,13 +176,16 @@ ball: $(OBJS_ball)
 breakout: $(OBJS_breakout)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-raycaster_flat: $(OBJS_raycaster_flat)
-	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
-        
 skull: $(OBJS_skull)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
-raycaster_texture: $(OBJS_raycaster_texture)
+raycaster1: $(OBJS_raycaster1)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+raycaster2: $(OBJS_raycaster2)
+	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
+        
+raycaster3: $(OBJS_raycaster3)
 	@$(CC) $(CCFLAGS) $? -o $@ $(LDFLAGS) ; $(ECHO) "Compiling $< ...  $(OK)" 
         
 custom: $(OBJS_custom)
@@ -315,4 +321,4 @@ install:
 
 
 clean:
-	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants cube raycaster_flat raycaster_texture skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph
+	@rm -rvf *.o *.xml *~ primitives border ball breakout clip custom calc mines ants cube raycaster1 raycaster2 raycaster3 skull swarm mouse watch tank pacman tetris signal stress layouts mhp drawimage drawtypes rotateimage sort noise kmeans som events colorchooser scroll hough 2048 newvox mandelbrot porter fire minecraft fullscreen coloralpha bitmask widgets tree terrain surface function graph

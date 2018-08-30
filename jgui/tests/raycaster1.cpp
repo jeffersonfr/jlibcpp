@@ -57,12 +57,13 @@ int worldMap[mapWidth][mapHeight]=
 class GraphicsTeste : public jgui::Window {
 
 	private:
-		double posX,
-			   posY; // x and y start position
-		double dirX, 
-			   dirY; //initial direction vector
-		double planeX, 
-			   planeY; //the 2d raycaster version of camera plane
+		double 
+      posX,
+			posY, // x and y start position
+		  dirX, 
+			dirY, //initial direction vector
+		  planeX, 
+			planeY; //the 2d raycaster version of camera plane
 
 	public:
 		GraphicsTeste():
@@ -86,14 +87,13 @@ class GraphicsTeste : public jgui::Window {
 
       jgui::jsize_t
         size = GetSize();
-			int 
-        w = size.width,
-				h = size.height;
+      int
+        block_size = 20;
 
 			// screen(512, 384, 0, "Raycaster");
-			for(int x = 0; x < w; x++) {
+			for(int x = 0; x < size.width; x++) {
 				//calculate ray position and direction 
-				double cameraX = 2 * x / double(w) - 1; //x-coordinate in camera space
+				double cameraX = 2 * x / double(size.width) - 1; //x-coordinate in camera space
 				double rayPosX = posX;
 				double rayPosY = posY;
 				double rayDirX = dirX + planeX * cameraX;
@@ -109,14 +109,12 @@ class GraphicsTeste : public jgui::Window {
 				//length of ray from one x or y-side to next x or y-side
 				double deltaDistX = sqrt(1 + (rayDirY * rayDirY) / (rayDirX * rayDirX));
 				double deltaDistY = sqrt(1 + (rayDirX * rayDirX) / (rayDirY * rayDirY));
-				double perpWallDist;
 
 				//what direction to step in x or y-direction (either +1 or -1)
 				int stepX;
 				int stepY;
 
 				int hit = 0; //was there a wall hit?
-				int side; //was a NS or a EW wall hit?
 				//calculate step and initial sideDist
 				if (rayDirX < 0) {
 					stepX = -1;
@@ -138,49 +136,38 @@ class GraphicsTeste : public jgui::Window {
 					if (sideDistX < sideDistY) {
 						sideDistX += deltaDistX;
 						mapX += stepX;
-						side = 0;
 					} else {
 						sideDistY += deltaDistY;
 						mapY += stepY;
-						side = 1;
 					}
 					//Check if ray has hit a wall
 					if (worldMap[mapX][mapY] > 0) hit = 1;
 				} 
-				//Calculate distance projected on camera direction (oblique distance will give fisheye effect!)
-				if (side == 0) {
-					perpWallDist = fabs((mapX - rayPosX + (1 - stepX) / 2) / rayDirX);
-				} else {
-					perpWallDist = fabs((mapY - rayPosY + (1 - stepY) / 2) / rayDirY);
-				}
-
-				//Calculate height of line to draw on screen
-				int lineHeight = abs(int(h / perpWallDist));
-
-				//calculate lowest and highest pixel to fill in current stripe
-				int drawStart = -lineHeight / 2 + h / 2;
-				if(drawStart < 0)drawStart = 0;
-				int drawEnd = lineHeight / 2 + h / 2;
-				if(drawEnd >= h)drawEnd = h - 1;
-
-				//choose wall color
-				unsigned int color = 0xfff0f0f0;
-
-				switch(worldMap[mapX][mapY]) {
-					case 1: color = 0xfff00000; break;
-					case 2: color = 0xff00f000; break;
-					case 3: color = 0xff0000f0; break;
-					case 4: color = 0xfff0f000; break;
-				}
-
-				//give x and y sides different brightness
-				if (side == 1) {
-					color = color / 2;
-				}
-
-				g->SetColor((color>>16)&0xff, (color>>8)&0xff, (color>>0)&0xff, (color>>24)&0xff);
-				g->DrawLine(x, drawStart, x, drawEnd);
 			}
+
+      // draw map
+      g->SetColor(jgui::Color::Blue);
+
+      for (int j=0; j<mapHeight; j++) {
+        for (int i=0; i<mapWidth; i++) {
+          unsigned int color = 0xfff0f0f0;
+
+          switch(worldMap[i][j]) {
+            case 1: color = 0xfff00000; break;
+            case 2: color = 0xff00f000; break;
+            case 3: color = 0xff0000f0; break;
+            case 4: color = 0xfff0f000; break;
+          }
+
+          g->SetColor((color>>16)&0xff, (color>>8)&0xff, (color>>0)&0xff, (color>>24)&0xff);
+          g->DrawRectangle(i*block_size, j*block_size, block_size, block_size);
+        }
+      }
+
+      g->SetColor(jgui::Color::Red);
+      g->FillCircle((int)(posX * block_size), (int)(posY * block_size), block_size/2);
+      g->SetColor(jgui::Color::Yellow);
+      g->FillCircle((int)((posX + dirX) * block_size), (int)((posY + dirY) * block_size), 4);
 		}
 
 		virtual bool KeyPressed(jevent::KeyEvent *event)
