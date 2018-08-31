@@ -675,7 +675,7 @@ Color Color::Darker()
 
 	RGBtoHSB(_red, _green, _blue, &h, &s, &b);
 
-	b = b - 0.10;
+	b = b * 0.90;
 
 	HSBtoRGB(h, s, b, &r1, &g1, &b1);
 
@@ -689,7 +689,7 @@ Color Color::Brighter()
 
 	RGBtoHSB(GetRed(), GetGreen(), GetBlue(), &h, &s, &b);
 
-	b = b + 0.10;
+	b = b + 1.10;
 
 	HSBtoRGB(h, s, b, &r1, &g1, &b1);
 

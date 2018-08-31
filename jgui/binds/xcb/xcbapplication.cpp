@@ -358,6 +358,8 @@ void NativeApplication::InternalPaint()
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
   if (cairo_surface == NULL) {
+    delete buffer;
+
     return;
   }
 
@@ -365,7 +367,7 @@ void NativeApplication::InternalPaint()
     *vt = find_visual(_xconnection, _xscreen->root_visual);
 
   if (vt == NULL) {
-    cairo_surface_destroy(cairo_surface);
+    delete buffer;
 
     return;
   }
@@ -385,7 +387,7 @@ void NativeApplication::InternalPaint()
 
   g_window->Flush();
 
-  cairo_surface_destroy(cairo_surface);
+  delete buffer;
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }

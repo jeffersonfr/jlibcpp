@@ -430,6 +430,8 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
   if (cairo_surface == NULL) {
+    delete buffer;
+
     return FALSE;
   }
 
@@ -440,7 +442,7 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 
   g_window->Flush();
 
-  cairo_surface_destroy(cairo_surface);
+  delete buffer;
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 

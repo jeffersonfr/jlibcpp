@@ -31,7 +31,12 @@ all:
 
 :Dependencies
 
-	libsdl2, libsfml2, libx11, libgtk3, liballegro5, libasound2, libssl, uuid
+  libcairo2-dev libjpeg9-dev uuid-dev libssl-dev
+
+:UI Dependencies
+
+	libsdl2-dev, libsfml2-dev, libX11-dev, libgtk3-dev, liballegro5-dev,
+  libasound2-dev
 
 :Problems
 
