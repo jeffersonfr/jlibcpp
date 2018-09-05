@@ -32,24 +32,26 @@ class Fire : public jgui::Window {
     Fire():
       jgui::Window(720, 480)
     {
-      jgui::jsize_t size = GetSize();
+      jgui::jsize_t 
+        size = GetSize();
+      int 
+        r, 
+        g, 
+        b;
 
       fire = new uint32_t[size.width*size.height];
-      buffer = new uint32_t[size.width*size.height];
+      buffer = new uint32_t[size.width*size.height/2];
 
-      // make sure the fire buffer is zero in the beginning
-      for(int x = 0; x < size.width; x++) {
-        for(int y = 0; y < size.height; y++) {
-          fire[y*size.width+x] = 0;
-        }
+      for (int i = 0; i < size.width*size.height; i++) {
+        fire[i] = 0;
       }
 
       // generate the palette
-      for(int x = 0; x < 256; x++) {
-        double h = (x/8.0)/255.0;
-        double s = 255.0/255.0;
-        double l = std::min(255.0, (x * 2)/255.0);
-        int r, g, b;
+      for (int x=0; x<256; x++) {
+        double 
+          h = (x/8.0)/255.0,
+          s = 255.0/255.0,
+          l = std::min(255.0, (x * 2)/255.0);
 
         jgui::Color::HSBtoRGB(h, s, l, &r, &g, &b);
 
@@ -60,49 +62,57 @@ class Fire : public jgui::Window {
     virtual ~Fire()
     {
       delete [] fire;
+      fire = NULL;
+
       delete [] buffer;
+      buffer = NULL;
     }
 
     virtual void Paint(jgui::Graphics *g) 
     {
       jgui::jsize_t size = GetSize();
 
-      //randomize the bottom row of the fire buffer
+      // randomize the bottom row of the fire buffer
       for (int x = 0; x < size.width; x++) {
-        fire[(size.height - 1)*size.width + x] = abs(32768 + rand()) % 256;
+        fire[(size.height/2)*size.width + x] = abs(32768 + rand()) % 256;
       }
 
-      int mode = 0;
+      uint32_t 
+        *ptr = fire;
 
       //do the fire calculations for every pixel, from top to bottom
-      for(int y = 0; y < size.height-1; y++) {
-        for(int x = 0; x < size.width-1; x++) {
-          if (mode == 0) {
-            fire[y*size.width + x] = ((
-                  fire[((y+1) % size.height) * size.width + (x-1+size.width) % size.width] + 
-                  fire[((y+1) % size.height) * size.width + (x) % size.width] + 
-                  fire[((y+1) % size.height) * size.width + (x+1) % size.width] + 
-                  fire[((y+2) % size.height) * size.width + (x) % size.width]
-                  ) * 32) / 129;
-          } else if (mode == 1) {
-            fire[y*size.width + x] = ((
-                  fire[((y+1) % size.height) * size.width + (x-1+size.width) % size.width] + 
-                  fire[((y+2) % size.height) * size.width + (x) % size.width] + 
-                  fire[((y+1) % size.height) * size.width + (x+1) % size.width] + 
-                  fire[((y+3) % size.height) * size.width + (x) % size.width]
-                  ) * 64) / 257;
-          }
+      for (int y = 0; y<size.height/2; y++) {
+        int 
+          idx1 = ((y + 1) % size.height)*size.width,
+          idx2 = ((y + 2) % size.height)*size.width;
+
+        for (int x = 0; x < size.width; x++) {
+          *ptr++ = ((
+                fire[idx1 + (x - 1 + size.width) % size.width] + 
+                fire[idx1 + (x + 0) % size.width] + 
+                fire[idx1 + (x + 1) % size.width] + 
+                fire[idx2 + (x + 0) % size.width]
+                ) * 32) / 129;
         }
       }
+
+      uint32_t 
+        *ptr2 = buffer;
+
+      ptr = fire;
 
       //set the drawing buffer to the fire buffer, using the palette colors
-      for(int x = 0; x < size.width; x++) {
-        for(int y = 0; y < size.height; y++) {
-          buffer[y*size.width + x] = palette[fire[y*size.width+x]];
+      for (int y = 0; y < size.height/2; y++) {
+        for (int x = 0; x < size.width; x++) {
+          if (*ptr > 255) {
+            continue;
+          }
+          *ptr2++ = palette[*ptr++];
         }
       }
 
-      g->SetRGBArray(buffer, 0, 0, size.width, size.height);
+      g->SetCompositeFlags(jgui::JCF_SRC);
+      g->SetRGBArray(buffer, 0, size.height/2, size.width, size.height/2);
     }
 
     virtual void ShowApp()

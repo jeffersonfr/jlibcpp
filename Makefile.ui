@@ -50,6 +50,7 @@ ifeq ($(ENABLE_GRAPHICS),sdl2)
 		 -ljpeg \
 
 	DEFINES		+= \
+     -DJGUI_UI \
 		 -DSDL2_UI \
 
 	REQUIRES	+= \
@@ -71,6 +72,7 @@ ifeq ($(ENABLE_GRAPHICS),sfml2)
      -ljpeg \
 
 	DEFINES		+= \
+     -DJGUI_UI \
 		 -DSFML2_UI \
 
 	REQUIRES	+= \
@@ -91,6 +93,7 @@ ifeq ($(ENABLE_GRAPHICS),xlib)
      -ljpeg \
 
 	DEFINES		+= \
+     -DJGUI_UI \
 		 -DXLIB_UI \
 
 	REQUIRES	+= \
@@ -111,6 +114,7 @@ ifeq ($(ENABLE_GRAPHICS),xcb)
      -ljpeg \
 
 	DEFINES		+= \
+     -DJGUI_UI \
 		 -DXCB_UI \
 
 	REQUIRES	+= \
@@ -132,6 +136,7 @@ ifeq ($(ENABLE_GRAPHICS),gtk3)
 		 -ljpeg \
 
 	DEFINES		+= \
+     -DJGUI_UI \
 		 -DGTK3_UI \
 
 	REQUIRES	+= \
@@ -153,6 +158,7 @@ ifeq ($(ENABLE_GRAPHICS),allegro5)
 		 -ljpeg \
 
 	DEFINES		+= \
+     -DJGUI_UI \
 		 -DALLEGRO5_UI \
 
 	REQUIRES	+= \
@@ -175,6 +181,7 @@ ifeq ($(ENABLE_GRAPHICS),gl)
 		 -ljpeg \
 
 	DEFINES		+= \
+     -DJGUI_UI \
 		 -DGL_UI \
 
 	REQUIRES	+= \
@@ -182,6 +189,31 @@ ifeq ($(ENABLE_GRAPHICS),gl)
 	OBJS_gfx	+= \
 		 $(GENERIC_OBJS)\
 		 glapplication.o\
+
+	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),rpi)
+	CCFLAGS 	+= \
+		 -I/opt/vc/include -L/opt/vc/lib \
+
+	LDFLAGS		+= \
+     -lbcm_host \
+     -lm \
+     -lpng \
+     -lpthread \
+		 -ljpeg \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DRPI_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 $(GENERIC_OBJS)\
+		 rpiapplication.o\
 
 	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 

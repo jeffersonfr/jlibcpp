@@ -22,7 +22,7 @@
 #include "jgui/jnulllayout.h"
 #include "jexception/jnullpointerexception.h"
 
-#if defined(SDL2_UI) || defined(SFML2_UI) || defined(XLIB_UI) || defined(XCB_UI) || defined(GTK3_UI) || defined(ALLEGRO5_UI) || defined(GL_UI)
+#ifdef JGUI_UI
 #include "include/nativewindow.h"
 #endif
 
@@ -50,7 +50,7 @@ Window::Window(int x, int y, int width, int height):
 
   // TODO:: estah entrando em loop
   try {
-#if defined(SDL2_UI) || defined(SFML2_UI) || defined(XLIB_UI) || defined(XCB_UI) || defined(GTK3_UI) || defined(ALLEGRO5_UI) || defined(GL_UI)
+#ifdef JGUI_UI
 		_instance = new NativeWindow(x, y, width, height);
 #endif
   

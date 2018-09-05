@@ -53,7 +53,7 @@ OK 				= \033[30;32mOK\033[m
 
 # {no, yes}
 ENABLE_DEBUG ?= yes
-# {sdl2, sfml2, xlib, xcb, gtk3, allegro5, gl}
+# {sdl2, sfml2, xlib, xcb, gtk3, allegro5, gl, rpi}
 ENABLE_GRAPHICS ?= sdl2
 # {gif, ilist, v4l2, libvlc, libav, libxine, alsa, mixer}
 ENABLE_MEDIA ?= gif, ilist, v4l2, libvlc, libav, libxine, alsa, mixer

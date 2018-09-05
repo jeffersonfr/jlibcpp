@@ -421,6 +421,7 @@ void NativeApplication::InternalPaint()
   g_window->Flush();
 
   delete buffer;
+  buffer = NULL;
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }

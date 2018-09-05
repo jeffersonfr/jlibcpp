@@ -20,7 +20,7 @@
 #include "jgui/japplication.h"
 #include "jexception/jnullpointerexception.h"
 
-#if defined(SDL2_UI) || defined(SFML2_UI) || defined(XLIB_UI) || defined(XCB_UI) || defined(GTK3_UI) || defined(ALLEGRO5_UI) || defined(GL_UI)
+#ifdef JGUI_UI
 #include "include/nativeapplication.h"
 #endif
 
@@ -62,7 +62,7 @@ void Application::Init(int argc, char **argv)
 
 	if (_instance == NULL) {
 	  try {
-#if defined(SDL2_UI) || defined(SFML2_UI) || defined(XLIB_UI) || defined(XCB_UI) || defined(GTK3_UI) || defined(ALLEGRO5_UI) || defined(GL_UI)
+#ifdef JGUI_UI
 			_instance = new NativeApplication();
 #endif
 

@@ -395,18 +395,27 @@ void NativeApplication::InternalPaint()
   sf::Vector2f targetSize(dw, dh);
 
 	int size = dw*dh;
-	uint8_t argb[size*4];
+	// uint8_t argb[size*4];
 	uint8_t *src = data;
-	uint8_t *dst = argb;
+	// uint8_t *dst = argb;
 
 	for (int i=0; i<size; i++) {
+    uint8_t p = src[2];
+
+		// src[3] = src[3];
+		src[2] = src[0];
+		// src[1] = src[1];
+		src[0] = p;
+
+    /*
 		dst[3] = src[3];
 		dst[2] = src[0];
 		dst[1] = src[1];
 		dst[0] = src[2];
+    */
 
 		src = src + 4;
-		dst = dst + 4;
+		// dst = dst + 4;
 	}
 
 	texture.update(argb);
@@ -420,6 +429,7 @@ void NativeApplication::InternalPaint()
   g_window->Flush();
 
   delete buffer;
+  buffer = NULL;
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
