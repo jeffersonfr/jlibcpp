@@ -220,7 +220,7 @@ std::string URL::Decode(std::string s_, std::string standard_)
 						while (((i+2) < numChars) && (c == '%')) {
 							char t[2+1] = {s_[i+1], s_[i+2], '\0'};
 
-							o << (char)strtol(t, NULL, 16);
+							o << (char)strtol(t, nullptr, 16);
 							
 							i += 3;
 

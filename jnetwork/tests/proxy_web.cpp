@@ -241,8 +241,8 @@ class Client {
 			for (;;) {
 				th_proxy->mu.lock();
 
-				while (th_proxy->sock_in == NULL) {
-					gettimeofday(&tv, NULL);
+				while (th_proxy->sock_in == nullptr) {
+					gettimeofday(&tv, nullptr);
 					ts.tv_sec = tv.tv_sec + TIMEOUT_THREAD_EXIT;
 					ts.tv_nsec = 0;
 					
@@ -270,7 +270,7 @@ class Client {
 				process_request(th_proxy->sock_in);
 
 				th_proxy->mu.lock();
-				th_proxy->sock_in = NULL;
+				th_proxy->sock_in = nullptr;
 				th_proxy->mu.unlock();
 
 				free_q_mu.lock();
@@ -287,25 +287,25 @@ class Client {
 
 struct th_proxy_struct *new_proxy_th(void)
 {
-	struct th_proxy_struct *th_proxy = NULL;
+	struct th_proxy_struct *th_proxy = nullptr;
 
 	try {
 		th_proxy = new struct th_proxy_struct;
 
 		memset(th_proxy, 0, sizeof(struct th_proxy_struct));
 
-		th_proxy->next_free = NULL;
-		th_proxy->sock_in = NULL;
+		th_proxy->next_free = nullptr;
+		th_proxy->sock_in = nullptr;
 
 		Client *client = new Client(th_proxy);
 
 		client->Start();
 	} catch (std::bad_alloc &e) {
-		if ((void *)th_proxy != NULL) {
+		if ((void *)th_proxy != nullptr) {
 			delete th_proxy;
 		}
 
-		return NULL;
+		return nullptr;
 	}
 
 	return th_proxy;
@@ -389,7 +389,7 @@ int process_request(jnetwork::Socket *sockIn)
 	char data[LDATA];
 	char adr[LADR], *p;
 	int ldata, lreq, port, req_len, req_method;
-	jnetwork::Socket *sockOut = NULL;
+	jnetwork::Socket *sockOut = nullptr;
 	FILE *fsin;
 	
 	jnetwork::SocketOptions *o = sockIn->GetSocketOptions();
@@ -399,12 +399,12 @@ int process_request(jnetwork::Socket *sockIn)
 
 	delete o;
 
-	if ((fsin = fdopen(sockIn->GetHandler(), "rw")) == NULL) {
+	if ((fsin = fdopen(sockIn->GetHandler(), "rw")) == nullptr) {
 		goto serverr;
 	}
 
 	// here, we'll analyze the request and get rid of "http://adr:port". The address and port willbe duplicated and used to open the connection
-	if (fgets(data, LDATA, fsin) == NULL) {
+	if (fgets(data, LDATA, fsin) == nullptr) {
 		goto badreq;
 	}
 
@@ -431,7 +431,7 @@ int process_request(jnetwork::Socket *sockIn)
 			str++;
 		if (!strncmp(str, "http://", 7))
 			str += 7;
-		if ((p = strchr(str, '/')) != NULL) {
+		if ((p = strchr(str, '/')) != nullptr) {
 			strncpy(adr, str, (p - str));	/* copies addresse in adr */
 			adr[p - str] = 0;
 			str = p;	/* points to the rest of the request (without address) */
@@ -442,7 +442,7 @@ int process_request(jnetwork::Socket *sockIn)
 		if (adr[0] == 0)
 			goto badreq;
 		p = strchr(adr, ':');
-		if (p == NULL)	/* unspecified port. The default one will be used */
+		if (p == nullptr)	/* unspecified port. The default one will be used */
 			port = DEFAULTPORT;
 		else {		/* port is available. let's read it */
 			*(p++) = 0;	/* ends hostname */
@@ -488,7 +488,7 @@ int process_request(jnetwork::Socket *sockIn)
 		char *p;
 
 		do {
-			if (fgets(data, LDATA, fsin) == NULL) {
+			if (fgets(data, LDATA, fsin) == nullptr) {
 				break;
 			}
 			ldata = strlen(data);
@@ -513,7 +513,7 @@ int process_request(jnetwork::Socket *sockIn)
 		  * METHOD_GET, METHOD_HEAD
 		  */
 		do {
-			if (fgets(data, LDATA, fsin) == NULL) {
+			if (fgets(data, LDATA, fsin) == nullptr) {
 				break;
 			}
 			ldata = strlen(data);
@@ -585,7 +585,7 @@ int main(int argc, char **argv)
 		case 'x':	/* external proxy */
 			char *p;
 			p = strchr(optarg, ':');
-			if (p == NULL) {	/* unspecified port number. let's quit */
+			if (p == nullptr) {	/* unspecified port number. let's quit */
 				std::cout << "missing port for next proxy" << std::endl;
 				help();
 				exit(1);
@@ -607,7 +607,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	free_q = NULL;
+	free_q = nullptr;
 
 	server(listenport);
 

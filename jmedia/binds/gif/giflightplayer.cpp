@@ -650,7 +650,7 @@ class PlayerComponentImpl : public jgui::Component {
 		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			_image = NULL;
+			_image = nullptr;
 			_player = player;
 			
 			_frame_size.width = w;
@@ -673,9 +673,9 @@ class PlayerComponentImpl : public jgui::Component {
 		{
 			_mutex.lock();
 
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 
 			_mutex.unlock();
@@ -697,9 +697,9 @@ class PlayerComponentImpl : public jgui::Component {
 
 			_mutex.lock();
 
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 
 			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_ARGB, sw, sh);
@@ -812,7 +812,7 @@ GIFLightPlayer::GIFLightPlayer(jnetwork::URL url):
 	_aspect = 1.0;
 	_media_time = 0LL;
 	_decode_rate = 1.0;
-	_provider = NULL;
+	_provider = nullptr;
 	
 	jio::FileInputStream 
     *stream = new jio::FileInputStream(_file);
@@ -820,7 +820,7 @@ GIFLightPlayer::GIFLightPlayer(jnetwork::URL url):
     *data = new AnimatedGIFData;
 
 	data->stream = stream;
-	data->image = NULL;
+	data->image = nullptr;
 	data->Width = -1;
 	data->Height = -1;
 	data->BitPixel = 0;
@@ -868,7 +868,7 @@ GIFLightPlayer::~GIFLightPlayer()
 	Close();
 	
 	delete _component;
-	_component = NULL;
+	_component = nullptr;
 
 	for (std::vector<Control *>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
 		Control *control = (*i);
@@ -1022,18 +1022,18 @@ void GIFLightPlayer::Close()
 
 	_is_playing = false;
 
-	if (data->stream != NULL) {
+	if (data->stream != nullptr) {
 		data->stream->Close();
 		delete data->stream;
 	}
 
-	if (data->image != NULL) {
+	if (data->image != nullptr) {
 		delete [] data->image;
 	}
 
 	delete data;
 
-	_provider = NULL;
+	_provider = nullptr;
 
   _mutex.unlock();
 }

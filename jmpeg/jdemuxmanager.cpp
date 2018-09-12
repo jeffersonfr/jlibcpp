@@ -25,16 +25,16 @@
 
 namespace jmpeg {
 
-DemuxManager * DemuxManager::_instance = NULL;
+DemuxManager * DemuxManager::_instance = nullptr;
 
 DemuxManager::DemuxManager():
 	jcommon::Object()
 {
 	jcommon::Object::SetClassName("jmpeg::DemuxManager");
 
-	_source = NULL;
+	_source = nullptr;
 	_is_running = false;
-	_thread = NULL;
+	_thread = nullptr;
 }
 		
 DemuxManager::~DemuxManager()
@@ -43,7 +43,7 @@ DemuxManager::~DemuxManager()
 
 DemuxManager * DemuxManager::GetInstance()
 {
-	if (_instance == NULL) {
+	if (_instance == nullptr) {
 		_instance = new DemuxManager();
 	}
 
@@ -52,7 +52,7 @@ DemuxManager * DemuxManager::GetInstance()
 
 void DemuxManager::AddDemux(Demux *demux)
 {
-	if (demux == NULL) {
+	if (demux == nullptr) {
 		return;
 	}
 
@@ -67,7 +67,7 @@ void DemuxManager::AddDemux(Demux *demux)
 
 void DemuxManager::RemoveDemux(Demux *demux)
 {
-	if (demux == NULL) {
+	if (demux == nullptr) {
 		return;
 	}
 
@@ -99,7 +99,7 @@ void DemuxManager::SetInputStream(jio::InputStream *is)
 
 void DemuxManager::Start()
 {
-	if (_thread != NULL) {
+	if (_thread != nullptr) {
 		return;
 	}
 
@@ -110,13 +110,13 @@ void DemuxManager::Start()
 
 void DemuxManager::Stop()
 {
-	if (_thread != NULL) {
+	if (_thread != nullptr) {
 		_is_running = false;
 
 		_thread->join();
 
 		delete _thread;
-		_thread = NULL;
+		_thread = nullptr;
 	}
 }
 
@@ -127,7 +127,7 @@ void DemuxManager::WaitSync()
 
 void DemuxManager::Run()
 {
-	if (_source == NULL) {
+	if (_source == nullptr) {
 		return;
 	}
 
@@ -293,7 +293,7 @@ void DemuxManager::Run()
 			if (t.found == false && demux->GetTimeout() < (int)(current_time-t.start_time)) {
 				_demux_status[demux].start_time = current_time;
 
-				demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, NULL, 0, demux->GetPID(), demux->GetTID()));
+				demux->DispatchDemuxEvent(new jevent::DemuxEvent(demux, jevent::JDET_DATA_NOT_FOUND, nullptr, 0, demux->GetPID(), demux->GetTID()));
 			}
 		}
 

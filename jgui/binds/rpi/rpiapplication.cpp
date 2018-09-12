@@ -81,7 +81,7 @@ static int _mouse_y;
 /** \brief */
 static int _click_count;
 /** \brief */
-static Window *g_window = NULL;
+static Window *g_window = nullptr;
 /** \brief */
 static jcursor_style_t _cursor = JCS_DEFAULT;
 /** \brief */
@@ -101,7 +101,7 @@ bool image_init(image_t *image, VC_IMAGE_TYPE_T type, int32_t width, int32_t hei
 
     image->buffer = calloc(1, 1);
 
-    if (image->buffer == NULL) {
+    if (image->buffer == nullptr) {
 	    return false;
     }
 
@@ -113,7 +113,7 @@ void image_release(image_t *image)
     if (image->buffer) {
         free(image->buffer);
     
-	image->buffer = NULL;
+	image->buffer = nullptr;
     }
 
     image->type = VC_IMAGE_MIN;
@@ -139,7 +139,7 @@ bool key_pressed(int *character)
 
         tcsetattr(stdin_fd, TCSANOW, &term);
 
-        setbuf(stdin, NULL);
+        setbuf(stdin, nullptr);
     }
 
     int characters_buffered = 0;
@@ -151,7 +151,7 @@ bool key_pressed(int *character)
     if (characters_buffered == 1) {
         int c = fgetc(stdin);
 
-        if (character != NULL) {
+        if (character != nullptr) {
             *character = c;
         }
     } else if (characters_buffered > 1) {
@@ -215,13 +215,13 @@ bool layer_init(layer_t *bg)
     vc_dispmanx_rect_set(&dst_rect, 0, 0, bg->info.width, bg->info.height);
 
     bg->element = vc_dispmanx_element_add(
-		    bg->update, bg->display, 2000, &dst_rect, bg->resource, &src_rect, DISPMANX_PROTECTION_NONE, &alpha, NULL, DISPMANX_NO_ROTATE);
+		    bg->update, bg->display, 2000, &dst_rect, bg->resource, &src_rect, DISPMANX_PROTECTION_NONE, &alpha, nullptr, DISPMANX_NO_ROTATE);
 
     if (bg->element == 0) {
 	    return false;
     }
 
-    if (vc_dispmanx_update_submit(bg->update, NULL, NULL) != 0) {
+    if (vc_dispmanx_update_submit(bg->update, nullptr, nullptr) != 0) {
     // if (vc_dispmanx_update_submit_sync(bg->update) != 0) {
 	    return false;
     }
@@ -552,7 +552,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
 void NativeApplication::InternalPaint()
 {
-	if (g_window == NULL || g_window->IsVisible() == false) {
+	if (g_window == nullptr || g_window->IsVisible() == false) {
 		return;
 	}
 
@@ -578,7 +578,7 @@ void NativeApplication::InternalPaint()
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
-  if (cairo_surface == NULL) {
+  if (cairo_surface == nullptr) {
     delete buffer;
 
     return;
@@ -592,7 +592,7 @@ void NativeApplication::InternalPaint()
 
   uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-  if (data == NULL) {
+  if (data == nullptr) {
     delete buffer;
 
     return;
@@ -632,13 +632,14 @@ void NativeApplication::InternalPaint()
   cairo_surface_destroy(cairo_surface);
 
   delete buffer;
-  buffer = NULL;
+  buffer = nullptr;
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
 void NativeApplication::InternalLoop()
 {
+  std::map<int, bool> keymap;
 	int key = 0;
   static bool quitting = false;
   
@@ -648,7 +649,7 @@ void NativeApplication::InternalLoop()
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
 
-      if (dynamic_cast<jevent::WindowEvent *>(event) != NULL) {
+      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
         jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
 
         if (window_event->GetType() == jevent::JWET_PAINTED) {
@@ -663,13 +664,25 @@ void NativeApplication::InternalLoop()
         events.erase(events.begin());
 
         delete event;
-        event = NULL;
+        event = nullptr;
       }
     }
 
-    key_pressed(&key);
+    bool pressed = key_pressed(&key);
 
-    // printf(":: KEY:: %d\n", key);
+    /*
+    if (pressed == true) {
+      if (keymap.insert(key).second == true) {
+        keymap[key] = true;
+      } else {
+        if (keymap[key] == true) {
+        }
+      }
+    } else {
+    }
+    */
+
+    printf(":: KEY:: %d, %s\n", key, pressed);
 
     /*
     while (SDL_PollEvent(&event)) {
@@ -800,7 +813,7 @@ void NativeApplication::InternalLoop()
           mouse_z = event.motion.y;
         }
 
-        uint32_t state = SDL_GetMouseState(NULL, NULL);
+        uint32_t state = SDL_GetMouseState(nullptr, nullptr);
 
         if ((state & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0) {
           buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
@@ -849,13 +862,13 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
   /*
-	if (_window != NULL) {
+	if (_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
   _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_window = NULL;
+	_window = nullptr;
 	_mouse_x = 0;
 	_mouse_y = 0;
 	_last_keypress = std::chrono::steady_clock::now();
@@ -867,14 +880,14 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	// INFO:: create the main window
 	_window = SDL_CreateWindow("Main", x, y, width, height, flags);
 
-	if (_window == NULL) {
+	if (_window == nullptr) {
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
 	_renderer = SDL_CreateRenderer(_window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	// _renderer = SDL_CreateRenderer(_window, 0, SDL_RENDERER_SOFTWARE); // SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
 
-	if (_renderer == NULL) {
+	if (_renderer == nullptr) {
 		throw jexception::RuntimeException("Cannot get a window's surface");
 	}
 
@@ -895,7 +908,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 NativeWindow::~NativeWindow()
 {
   delete g_window;
-  g_window = NULL;
+  g_window = nullptr;
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -906,7 +919,7 @@ void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
-  if (parent == NULL) {
+  if (parent == nullptr) {
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
@@ -914,7 +927,7 @@ void NativeWindow::SetParent(jgui::Container *c)
   // TODO:: pegar os windows por evento ou algo assim
   g_window = parent;
 
-  g_window->SetParent(NULL);
+  g_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
@@ -1031,7 +1044,7 @@ void NativeWindow::SetIcon(jgui::Image *image)
 
 jgui::Image * NativeWindow::GetIcon()
 {
-	return NULL;
+	return nullptr;
 }
 
 }

@@ -93,7 +93,7 @@ class Surface : public jgui::Window {
 		virtual ~Surface()
 		{
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 		}
 
     virtual bool MouseMoved(jevent::MouseEvent *event) 

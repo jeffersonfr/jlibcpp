@@ -55,11 +55,11 @@ class PlayerComponentImpl : public jgui::Component {
 		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			_buffer = NULL;
+			_buffer = nullptr;
 
 			_buffer_index = 0;
 
-			_image = NULL;
+			_image = nullptr;
 			_player = player;
 			
 			_frame_size.width = w;
@@ -75,17 +75,17 @@ class PlayerComponentImpl : public jgui::Component {
 
 		virtual ~PlayerComponentImpl()
 		{
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 
-			if (_buffer != NULL) {
+			if (_buffer != nullptr) {
 				delete [] _buffer[0];
 				delete [] _buffer[1];
 
 				delete _buffer;
-				_buffer = NULL;
+				_buffer = nullptr;
 			}
 		}
 
@@ -100,7 +100,7 @@ class PlayerComponentImpl : public jgui::Component {
 				return;
 			}
 
-			if (_buffer == NULL) {
+			if (_buffer == nullptr) {
 				_frame_size.width = _src.width = width;
 				_frame_size.height = _src.height = height;
 
@@ -131,9 +131,9 @@ class PlayerComponentImpl : public jgui::Component {
 
 			_mutex.lock();
 
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 
 			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_RGB32, sw, sh);
@@ -200,7 +200,7 @@ class VolumeControlImpl : public VolumeControl {
 
       std::unique_lock<std::mutex> lock(_player->_mutex);
 
-			if (_player->_stream != NULL) {
+			if (_player->_stream != nullptr) {
 				level = xine_get_param(_player->_stream, XINE_PARAM_AUDIO_VOLUME);
 				
 				// int amp = xine_get_param(_player->_stream, XINE_PARAM_AUDIO_AMP_LEVEL);
@@ -215,7 +215,7 @@ class VolumeControlImpl : public VolumeControl {
 		{
       std::unique_lock<std::mutex> lock(_player->_mutex);
 
-			if (_player->_stream != NULL) {
+			if (_player->_stream != nullptr) {
 				_level = (level < 0)?0:(level > 100)?100:level;
 
 				if (_level != 0) {
@@ -257,7 +257,7 @@ class VolumeControlImpl : public VolumeControl {
 	
 			_is_muted = b;
 			
-			if (_player->_stream != NULL) {
+			if (_player->_stream != nullptr) {
 				xine_set_param(_player->_stream, XINE_PARAM_AUDIO_MUTE, (_is_muted == true)?1:0);
 			}
 		}
@@ -425,7 +425,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 		{
       std::unique_lock<std::mutex> lock(_player->_mutex);
 
-			if (_player->_stream != NULL) {
+			if (_player->_stream != nullptr) {
 				if (HasControl(id) == true) {
 					int control = -1;
 
@@ -452,7 +452,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 		{
       std::unique_lock<std::mutex> lock(_player->_mutex);
 
-			if (_player->_stream != NULL) {
+			if (_player->_stream != nullptr) {
 				if (HasControl(id) == true) {
 					int control = -1;
 
@@ -542,8 +542,8 @@ LibXineLightPlayer::LibXineLightPlayer(jnetwork::URL url):
 	xine_config_load(_xine, configfile);
 	xine_init(_xine);
  
-	_post = NULL;
-  _ao_port = xine_open_audio_driver(_xine, "auto", NULL);
+	_post = nullptr;
+  _ao_port = xine_open_audio_driver(_xine, "auto", nullptr);
   _vo_port = xine_open_video_driver(_xine , "auto", XINE_VISUAL_TYPE_RAW, &t);
   _stream = xine_stream_new(_xine, _ao_port, _vo_port);
   _event_queue = xine_event_new_queue(_stream);
@@ -597,7 +597,7 @@ LibXineLightPlayer::LibXineLightPlayer(jnetwork::URL url):
 		xine_post_out_t *audio_source;
 
 		post_list = xine_list_post_plugins_typed(_xine, XINE_POST_TYPE_AUDIO_VISUALIZATION);
-		post_plugin = xine_config_register_string(_xine, "gui.post_audio_plugin", post_list[0], "Audio visualization plugin", NULL, 0, NULL, NULL);
+		post_plugin = xine_config_register_string(_xine, "gui.post_audio_plugin", post_list[0], "Audio visualization plugin", nullptr, 0, nullptr, nullptr);
 		_post = xine_post_init(_xine, post_plugin, 0, &_ao_port, &_vo_port);
 
 		if (_post) {
@@ -615,7 +615,7 @@ LibXineLightPlayer::~LibXineLightPlayer()
 	Close();
 	
 	delete _component;
-	_component = NULL;
+	_component = nullptr;
 
 	for (std::vector<Control *>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
 		Control *control = (*i);
@@ -630,7 +630,7 @@ void LibXineLightPlayer::Play()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_is_paused == false && _stream != NULL) {
+	if (_is_paused == false && _stream != nullptr) {
 		int speed = xine_get_param(_stream, XINE_PARAM_SPEED);
 
 		xine_play(_stream, 0, 0);
@@ -672,7 +672,7 @@ void LibXineLightPlayer::Stop()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		xine_stop(_stream);
 
 		if (_has_video == true) {
@@ -693,14 +693,14 @@ void LibXineLightPlayer::Close()
 
 	_is_closed = true;
 
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		xine_close(_stream);
 		xine_event_dispose_queue(_event_queue);
 		xine_dispose(_stream);
 		xine_close_audio_driver(_xine, _ao_port);  
 		xine_close_video_driver(_xine, _vo_port);  
 		
-		if (_post != NULL) {
+		if (_post != nullptr) {
 			xine_post_dispose(_xine, _post);
 		}
 
@@ -712,7 +712,7 @@ void LibXineLightPlayer::SetCurrentTime(uint64_t time)
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		if (xine_get_stream_info(_stream, XINE_STREAM_INFO_SEEKABLE) == 0) {
 			return;
 		}
@@ -733,11 +733,11 @@ uint64_t LibXineLightPlayer::GetCurrentTime()
 
 	uint64_t time = 0LL;
 
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		int pos = 0;
 
 		for (int i=0; i<5; i++) {
-			if (xine_get_pos_length(_stream, NULL, &pos, NULL)) {
+			if (xine_get_pos_length(_stream, nullptr, &pos, nullptr)) {
 				break;
 			}
 
@@ -754,10 +754,10 @@ uint64_t LibXineLightPlayer::GetMediaTime()
 {
 	uint64_t time = 0LL;
 
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		int length = 0;
 
-		xine_get_pos_length(_stream, NULL, NULL, &length);
+		xine_get_pos_length(_stream, nullptr, nullptr, &length);
 
 		time = (uint64_t)length;
 	}
@@ -787,7 +787,7 @@ void LibXineLightPlayer::SetDecodeRate(double rate)
 		_is_paused = false;
 	}
 
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		xine_set_param(_stream, XINE_PARAM_SPEED, rate*XINE_SPEED_NORMAL+0.5);
 	}
 }
@@ -798,7 +798,7 @@ double LibXineLightPlayer::GetDecodeRate()
 
 	double rate = 1.0;
 
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		int speed;
 
 		speed = xine_get_param(_stream, XINE_PARAM_SPEED);

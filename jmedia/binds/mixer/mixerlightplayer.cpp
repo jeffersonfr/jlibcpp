@@ -56,7 +56,7 @@ class AudioImpl : public jmedia::Audio {
     {
       _buffer_index = 0;
       _buffer_size = 0;
-      _buffer = NULL;
+      _buffer = nullptr;
       _fade = 0;
       _is_loop_enabled = false;
       _volume = 1.0f;
@@ -154,14 +154,14 @@ class AudioMixerControlImpl : public AudioMixerControl {
           i = mixer->_audios.erase(i);
 
           delete audio;
-          audio = NULL;
+          audio = nullptr;
         }
       }
     }
 
     void PlayAudio(Audio *audio)
     {
-      if (audio == NULL) {
+      if (audio == nullptr) {
         return;
       }
 
@@ -259,11 +259,11 @@ class AudioMixerControlImpl : public AudioMixerControl {
 
       SDL_memset(&spec, 0, sizeof(spec));
 
-      if (SDL_LoadWAV(filename.c_str(), &spec, &(audio->_buffer), &(audio->_buffer_size)) == NULL) {
+      if (SDL_LoadWAV(filename.c_str(), &spec, &(audio->_buffer), &(audio->_buffer_size)) == nullptr) {
         delete audio;
-        audio = NULL;
+        audio = nullptr;
 
-        return NULL;
+        return nullptr;
       }
 
       audio->_fade = 0;
@@ -275,7 +275,7 @@ class AudioMixerControlImpl : public AudioMixerControl {
         spec.callback = AudioCallback;
         spec.userdata = this;
 
-        if ((_device = SDL_OpenAudioDevice(NULL, 0, &spec, NULL, SDL_AUDIO_ALLOW_ANY_CHANGE)) == 0) {
+        if ((_device = SDL_OpenAudioDevice(nullptr, 0, &spec, nullptr, SDL_AUDIO_ALLOW_ANY_CHANGE)) == 0) {
 		      throw jexception::MediaException("Unable to open the audio device");
         }
 
@@ -399,7 +399,7 @@ double MixerLightPlayer::GetDecodeRate()
 
 jgui::Component * MixerLightPlayer::GetVisualComponent()
 {
-	return NULL;
+	return nullptr;
 }
 
 }

@@ -34,8 +34,8 @@ MulticastSocket6::MulticastSocket6(std::string host_, int port_, int rbuf_, int 
 {
 	jcommon::Object::SetClassName("jnetwork::MulticastSocket6");
 	
-	_is = NULL;
-	_os = NULL;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -54,11 +54,11 @@ MulticastSocket6::~MulticastSocket6()
 	} catch (...) {
 	}
 
-	if (_is != NULL) {
+	if (_is != nullptr) {
 		delete _is;
 	}
 
-	if (_os != NULL) {
+	if (_os != nullptr) {
 		delete _os;
 	}
 }
@@ -88,7 +88,7 @@ void MulticastSocket6::ConnectSocket(InetAddress *addr_, int port_)
 	_sock_r.sin6_flowinfo = 0;
 	_sock_r.sin6_scope_id = 0;
 
-	if (addr_ == NULL) {
+	if (addr_ == nullptr) {
 		_sock_r.sin6_addr = in6addr_any;
 	} else {
 		inet_pton(AF_INET6, addr_->GetHostAddress().c_str(), &(_sock_r.sin6_addr));

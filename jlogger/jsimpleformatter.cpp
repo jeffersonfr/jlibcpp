@@ -37,19 +37,19 @@ SimpleFormatter::~SimpleFormatter()
 
 void SimpleFormatter::Transform(LogRecord *log)
 {
-	if (log == NULL) {
+	if (log == nullptr) {
 		return;
 	}
 	
 	std::string type;
 	
-	time_t curtime = time(NULL);
+	time_t curtime = time(nullptr);
 	char *loctime = asctime(localtime (&curtime));
 	
 	std::ostringstream date,
 						format;
 		
-	if (loctime != NULL) {
+	if (loctime != nullptr) {
 		loctime[strlen(loctime)-1] = '\0';
 	
 		date << " [" << (loctime + 4) << "]  ";
@@ -72,7 +72,7 @@ void SimpleFormatter::Transform(LogRecord *log)
 
 LogRecord * SimpleFormatter::Release()
 {
-	return NULL;
+	return nullptr;
 }
 
 }

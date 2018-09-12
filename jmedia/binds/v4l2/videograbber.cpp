@@ -22,12 +22,12 @@ namespace jmedia {
 
 VideoGrabber::VideoGrabber(V4LFrameListener *listener, std::string device)
 {
-	_video_control = NULL;
+	_video_control = nullptr;
 	_listener = listener;
 	_device = device;
 	_method = IO_METHOD_MMAP;
 	_handler = -1;
-	_buffers = NULL;
+	_buffers = nullptr;
 	_n_buffers = 0;
 	_xres = 0;
 	_yres = 0;
@@ -107,7 +107,7 @@ void VideoGrabber::InitSharedMemory()
 
 		_buffers[_n_buffers].length = buf.length;
 		_buffers[_n_buffers].start =
-			mmap(NULL /* start anywhere */,
+			mmap(nullptr /* start anywhere */,
 					buf.length,
 					PROT_READ | PROT_WRITE /* required */,
 					MAP_SHARED /* recommended */,
@@ -358,7 +358,7 @@ int VideoGrabber::GetFrame()
 				}
 			}
 
-			if (_listener != NULL) {
+			if (_listener != nullptr) {
 				_listener->ProcessFrame((const uint8_t *)_buffers[0].start, _xres, _yres, _pixelformat);
 				// _listener->ProcessFrame((const uint8_t *)buffers[0].start, buffers[0].length, _pixelformat);
 			}
@@ -387,7 +387,7 @@ int VideoGrabber::GetFrame()
 				ExceptionHandler("Buffer index is out of bounds");
 			}
 
-			if (_listener != NULL) {
+			if (_listener != nullptr) {
 				_listener->ProcessFrame((const uint8_t *)_buffers[buf.index].start, _xres, _yres, _pixelformat);
 				// _listener->ProcessFrame((const uint8_t *)buffers[buf.index].start, buf.bytesused, _pixelformat);
 			}
@@ -424,7 +424,7 @@ int VideoGrabber::GetFrame()
 				ExceptionHandler("Buffer index is out of bounds");
 			}
 
-			if (_listener != NULL) {
+			if (_listener != nullptr) {
 				_listener->ProcessFrame((const uint8_t *)buf.m.userptr, _xres, _yres, _pixelformat);
 				// _listener->ProcessFrame((const uint8_t *)buf.m.userptr, buf.bytesused, _pixelformat);
 			}
@@ -575,7 +575,7 @@ void VideoGrabber::Run()
 			tv.tv_sec = 2;
 			tv.tv_usec = 0;
 
-			r = select(_handler + 1, &fds, NULL, NULL, &tv);
+			r = select(_handler + 1, &fds, nullptr, nullptr, &tv);
 
 			if (-1 == r) {
 				if (EINTR == errno) {

@@ -144,7 +144,7 @@ class ColorAlphaTeste : public jgui::Window {
       jgui::jinsets_t
         insets = GetInsets();
 			uint32_t 
-        *buffer = NULL;
+        *buffer = nullptr;
 
 			_fg->GetRGBArray(&buffer, 0, 0, isize.width, isize.height);
 

@@ -86,7 +86,7 @@ void CardLayout::RemoveLayoutComponent(Component *comp)
 	for (int i = 0; i < (int)vector.size(); i++) {
 		if (vector[i].component == comp) { 
 			// if we remove current component we should show next one
-			if (comp->IsVisible() && (comp->GetParent() != NULL)) {
+			if (comp->IsVisible() && (comp->GetParent() != nullptr)) {
 				Next(comp->GetParent());
 			}
 
@@ -104,7 +104,7 @@ void CardLayout::RemoveLayoutComponent(Component *comp)
 
 void CardLayout::CheckLayout(Container *parent) 
 {
-	if (parent == NULL) {
+	if (parent == nullptr) {
 		throw jexception::NullPointerException("Parent container is null");
 	}
 
@@ -280,7 +280,7 @@ void CardLayout::DoLayout(Container *parent)
 {
 	// WARN:: sync
 	jinsets_t insets = parent->GetInsets();
-	Component *comp = NULL;
+	Component *comp = nullptr;
 	int ncomponents = parent->GetComponentCount();
 	bool currentFound = false;
 

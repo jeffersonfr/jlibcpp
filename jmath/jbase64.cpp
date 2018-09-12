@@ -73,7 +73,7 @@ char * Base64::Encode(uint8_t *src, int length)
 	int i;
 
 	if (length == 0) {
-		return NULL;	/* FIX: Or return ""? */
+		return nullptr;	/* FIX: Or return ""? */
 	}
 
 	/* Calculate required length of dst.  4 bytes of dst are needed for
@@ -99,7 +99,7 @@ char * Base64::Encode(uint8_t *src, int length)
 		if ((dstpos + 4) >= ret_length) {
 			delete dst;
 
-			return NULL;
+			return nullptr;
 		}
 
 		/* Map output to the Base64 alphabet */
@@ -123,7 +123,7 @@ char * Base64::Encode(uint8_t *src, int length)
 		if ((dstpos + 4) >= ret_length) {
 			delete dst;
 
-			return NULL;
+			return nullptr;
 		}
 
 		dst[dstpos++] = jBase64_code[(uint32_t) output[0]];
@@ -142,7 +142,7 @@ char * Base64::Encode(uint8_t *src, int length)
 	if ((dstpos) > ret_length) {
 		delete dst;
 
-		return NULL;
+		return nullptr;
 	}
 
 	dst[dstpos] = '\0';
@@ -178,13 +178,13 @@ char * Base64::Decode(uint8_t *src, int length)
 
 		switch (state) {
 			case 0:
-				if (dst != NULL) {
+				if (dst != nullptr) {
 					dst[dstidx] = (pos << 2);
 				}
 				state = 1;
 				break;
 			case 1:
-				if (dst != NULL) {
+				if (dst != nullptr) {
 					dst[dstidx] |= (pos >> 4);
 					res = ((pos & 0x0f) << 4);
 				}
@@ -192,7 +192,7 @@ char * Base64::Decode(uint8_t *src, int length)
 				state = 2;
 				break;
 			case 2:
-				if (dst != NULL) {
+				if (dst != nullptr) {
 					dst[dstidx] = res | (pos >> 2);
 					res = (pos & 0x03) << 6;
 				}
@@ -200,7 +200,7 @@ char * Base64::Decode(uint8_t *src, int length)
 				state = 3;
 				break;
 			case 3:
-				if (dst != NULL) {
+				if (dst != nullptr) {
 					dst[dstidx] = res | pos;
 				}
 				dstidx++;
@@ -219,7 +219,7 @@ char * Base64::Decode(uint8_t *src, int length)
 		switch (state) {
 			case 0:             /* Invalid = in first position */
 			case 1:             /* Invalid = in second position */
-				return NULL;
+				return nullptr;
 			case 2:             /* Valid, means one byte of info */
 				/* Skip any number of spaces. */
 				while (length-- > 0) {
@@ -229,7 +229,7 @@ char * Base64::Decode(uint8_t *src, int length)
 				/* Make sure there is another trailing = sign. */
 				if (ch != jBase64_pad) {
 					free(dst);
-					return NULL;
+					return nullptr;
 				}
 				/* FALLTHROUGH */
 			case 3:             /* Valid, means two bytes of info */
@@ -241,7 +241,7 @@ char * Base64::Decode(uint8_t *src, int length)
 					ch = *src++;
 					if (jBase64_rank[ch] != 255) {
 						free(dst);
-						return NULL;
+						return nullptr;
 					}
 				}
 				/*
@@ -250,9 +250,9 @@ char * Base64::Decode(uint8_t *src, int length)
 				 * zeros.  If we don't check them, they become a
 				 * subliminal channel.
 				 */
-				if (dst != NULL && res != 0) {
+				if (dst != nullptr && res != 0) {
 					free(dst);
-					return NULL;
+					return nullptr;
 				}
 			default:
 				break;
@@ -264,7 +264,7 @@ char * Base64::Decode(uint8_t *src, int length)
 		 */
 		if (state != 0) {
 			free(dst);
-			return NULL;
+			return nullptr;
 		}
 	}
 

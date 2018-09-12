@@ -342,16 +342,16 @@ File * File::OpenFile(std::string path, jfile_flags_t flags)
 	if (fd > 0) {
 		close(fd);
 
-		return NULL;
+		return nullptr;
 	}
 
 	fd = open(path.c_str(), o);
 
 	if (fd < 0) {
-		return NULL;
+		return nullptr;
 	}
 
-	return new File(fd, NULL, path, JFT_REGULAR);
+	return new File(fd, nullptr, path, JFT_REGULAR);
 }
 
 File * File::OpenDirectory(std::string path, jfile_flags_t flags)
@@ -360,7 +360,7 @@ File * File::OpenDirectory(std::string path, jfile_flags_t flags)
 	int fd = open(path.c_str(), O_DIRECTORY, S_IREAD | S_IWRITE); // S_IRWXU
 
 	if (fd < 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	DIR *dir = fdopendir(fd);
@@ -376,10 +376,10 @@ File * File::CreateFile(std::string path, jfile_flags_t flags, jfile_permissions
 	int fd = open(path.c_str(), o | O_CREAT | O_EXCL, mode);
 
 	if (fd < 0) {
-		return NULL;
+		return nullptr;
 	}
 
-	return new File(fd, NULL, path, JFT_REGULAR);
+	return new File(fd, nullptr, path, JFT_REGULAR);
 }
 
 File * File::CreateDirectory(std::string path, jfile_permissions_t perms)
@@ -387,13 +387,13 @@ File * File::CreateDirectory(std::string path, jfile_permissions_t perms)
 	mode_t mode = GetPermissions(perms);
 
 	if (mkdir(path.c_str(), mode) != 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	DIR *dir = opendir(path.c_str());
 
-	if (dir == NULL) {
-		return NULL;
+	if (dir == nullptr) {
+		return nullptr;
 	}
 
 	return new File(-1, dir, path, JFT_DIRECTORY);
@@ -428,10 +428,10 @@ File * File::CreateTemporaryFile(std::string path, std::string prefix, std::stri
 	free(aux);
 
 	if (fd < 0) {
-		return NULL;
+		return nullptr;
 	}
 
-	return new File(fd, NULL, tmp, JFT_REGULAR);
+	return new File(fd, nullptr, tmp, JFT_REGULAR);
 }
 
 File * File::CreateTemporaryDirectory(std::string path, std::string prefix)
@@ -444,18 +444,18 @@ File * File::CreateTemporaryDirectory(std::string path, std::string prefix)
 
 	aux = mkdtemp(aux);
 
-	if (aux == NULL) {
+	if (aux == nullptr) {
 		free(ptr);
 
-		return NULL;
+		return nullptr;
 	}
 
 	DIR *dir = opendir(aux);
 
 	path = std::string(aux);
 
-	if (dir == NULL) {
-		return NULL;
+	if (dir == nullptr) {
+		return nullptr;
 	}
 	
 	return new File(-1, dir, path, JFT_DIRECTORY);
@@ -613,11 +613,11 @@ void File::Close()
 
 	DIR *dir = (DIR *)_dir;
 
-	if (dir != NULL) {
+	if (dir != nullptr) {
 		closedir(dir);
 	}
 
-	_dir = NULL;
+	_dir = nullptr;
 
 	if (_fd > 0) {
 		close(_fd);
@@ -644,7 +644,7 @@ bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 		return false;
 	}
 
-	if (_dir == NULL) {
+	if (_dir == nullptr) {
 		return false;
 	}
 
@@ -654,7 +654,7 @@ bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 	rewinddir(dir);
 
 	if (extension == "") {
-		while ((namelist = readdir(dir)) != NULL) {
+		while ((namelist = readdir(dir)) != nullptr) {
 			if (strcmp(namelist->d_name, ".") != 0 && strcmp(namelist->d_name, "..") != 0) {
 				files->push_back(namelist->d_name);
 			}
@@ -664,7 +664,7 @@ bool File::ListFiles(std::vector<std::string> *files, std::string extension)
 	} else {
 		std::string file;
 
-		while ((namelist = readdir(dir)) != NULL) {
+		while ((namelist = readdir(dir)) != nullptr) {
 			file = namelist->d_name;
 
 			if (strcmp(namelist->d_name, ".") != 0 && strcmp(namelist->d_name, "..") != 0 && file.size() > extension.size()) {

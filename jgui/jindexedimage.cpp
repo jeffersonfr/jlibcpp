@@ -74,31 +74,31 @@ IndexedImage::IndexedImage(uint32_t *palette, int palette_size, uint32_t *argb, 
 
 IndexedImage::~IndexedImage()
 {
-	if ((void *)_palette != NULL) {
+	if ((void *)_palette != nullptr) {
 		delete [] _palette;
-		_palette = NULL;
+		_palette = nullptr;
 	}
 
-	if ((void *)_data != NULL) {
+	if ((void *)_data != nullptr) {
 		delete [] _data;
-		_data = NULL;
+		_data = nullptr;
 	}
 }
 
 IndexedImage * IndexedImage::Pack(Image *image)
 {
-	IndexedImage *packed = NULL;
+	IndexedImage *packed = nullptr;
 
-	if ((void *)image != NULL) {
-		if (image->GetGraphics() != NULL) {
+	if ((void *)image != nullptr) {
+		if (image->GetGraphics() != nullptr) {
 			jgui::jsize_t 
 				size = image->GetSize();
 			uint32_t 
-				*rgb = NULL;
+				*rgb = nullptr;
 
 			image->GetRGBArray(&rgb, 0, 0, size.width, size.height);
 
-			if ((void *)rgb != NULL) {
+			if ((void *)rgb != nullptr) {
 				packed = Pack(rgb, size.width, size.height);
 
 				delete [] rgb;
@@ -111,8 +111,8 @@ IndexedImage * IndexedImage::Pack(Image *image)
 
 IndexedImage * IndexedImage::Pack(uint32_t *rgb, int width, int height)
 {
-	if ((void *)rgb == NULL) {
-		return NULL;
+	if ((void *)rgb == nullptr) {
+		return nullptr;
 	}
 
 	uint32_t 
@@ -192,7 +192,7 @@ Image * IndexedImage::Flip(jflip_flags_t t)
 
 Image * IndexedImage::Rotate(double radians, bool resize)
 {
-	IndexedImage *image = NULL;
+	IndexedImage *image = nullptr;
 
 	jsize_t 
 		isize = GetSize();
@@ -248,7 +248,7 @@ Image * IndexedImage::Rotate(double radians, bool resize)
 Image * IndexedImage::Scale(int width, int height)
 {
 	if (width <= 0 || height <= 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	jgui::jsize_t 
@@ -282,7 +282,7 @@ Image * IndexedImage::Scale(int width, int height)
 Image * IndexedImage::Crop(int x, int y, int width, int height)
 {
 	if (width <= 0 || height <= 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	int 
@@ -303,7 +303,7 @@ Image * IndexedImage::Crop(int x, int y, int width, int height)
 
 Image * IndexedImage::Blend(double alpha)
 {
-	return NULL;
+	return nullptr;
 }
 
 Image * IndexedImage::Colorize(Color color)
@@ -359,7 +359,7 @@ void IndexedImage::GetPixels(uint8_t **pixels, int xp, int yp, int wp, int hp, i
 	uint8_t 
 		*ptr = (*pixels);
 	
-	if (ptr == NULL) {
+	if (ptr == nullptr) {
 		ptr = new uint8_t[wp*hp];
 	}
 
@@ -386,15 +386,15 @@ void IndexedImage::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 		size = GetSize();
 
 	if ((xp + wp) > size.width || (yp + hp) > size.height) {
-		(*rgb) = NULL;
+		(*rgb) = nullptr;
 
 		return;
 	}
 
 	uint32_t 
-		*buffer = NULL;
+		*buffer = nullptr;
 
-	if (*rgb == NULL) {
+	if (*rgb == nullptr) {
 		buffer = new uint32_t[wp*hp];
 	}
 
@@ -413,11 +413,11 @@ void IndexedImage::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 		
 void IndexedImage::GetPalette(uint32_t **palette, int *size)
 {
-	if (palette != NULL) {
+	if (palette != nullptr) {
 		*palette = _palette;
 	}
 
-	if (size != NULL) {
+	if (size != nullptr) {
 		*size = _palette_size;
 	}
 }

@@ -38,8 +38,8 @@ BitStream::BitStream(char *stream, int size):
 {
 	jcommon::Object::SetClassName("jcommon::BitStream");
 	
-	if (stream == NULL || size == 0) {
-		_stream = NULL;
+	if (stream == nullptr || size == 0) {
+		_stream = nullptr;
 		
 		throw jexception::InvalidArgumentException("Stream must be a valid pointer and its size greater than 0");
 	}
@@ -52,7 +52,7 @@ BitStream::BitStream(char *stream, int size):
 
 BitStream::~BitStream()
 {
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		delete [] _stream;
 	}
 }
@@ -112,10 +112,10 @@ uint8_t* BitStream::GetBitsArray(int size)
 	
 		return array;
 	} catch (std::bad_alloc &) {
-		return NULL;
+		return nullptr;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 int BitStream::Skip(int n) {

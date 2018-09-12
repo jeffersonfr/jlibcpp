@@ -42,11 +42,11 @@ void usage(char *name)
 bool command(jipc::Method *method)
 {
 	jipc::RemoteIPCClient client(_addr, _port);
-	jipc::Response *response = NULL;
+	jipc::Response *response = nullptr;
 	
 	client.CallMethod(method, &response);
 	
-	if (response == NULL || response->GetBooleanParam("self") == false) {
+	if (response == nullptr || response->GetBooleanParam("self") == false) {
 		return false;
 	}
 

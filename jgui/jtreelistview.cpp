@@ -237,7 +237,7 @@ jsize_t TreeListView::GetPreferredSize()
 
 	jsize_t t {0, 0};
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return t;
   }
 
@@ -358,7 +358,7 @@ void TreeListView::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -434,12 +434,12 @@ void TreeListView::Paint(Graphics *g)
 		if (_items[i]->GetType() == JIT_EMPTY) {
 		} else if (_items[i]->GetType() == JIT_TEXT) {
 		} else if (_items[i]->GetType() == JIT_IMAGE) {
-			if (_items[i]->GetImage() != NULL) {
+			if (_items[i]->GetImage() != nullptr) {
 				g->DrawImage(_items[i]->GetImage(), hg, y + (is + ig)*i, is, is);
 			}
 		}
 
-		if (font != NULL) {
+		if (font != nullptr) {
 			g->SetFont(font);
 
 			if (IsEnabled() == true) {
@@ -550,7 +550,7 @@ jsize_t TreeListView::GetScrollDimension()
 
 	jsize_t t {0, 0};
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return t;
   }
 

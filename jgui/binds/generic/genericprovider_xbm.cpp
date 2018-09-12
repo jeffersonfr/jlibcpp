@@ -134,7 +134,7 @@ next_int (jio::BufferedReader *stream)
 
 cairo_surface_t * create_xbm_surface_from_stream(jio::InputStream *stream) 
 {
-	uint8_t *bits = NULL;		// working variable 
+	uint8_t *bits = nullptr;		// working variable 
 	int size = 1;						// number of bytes of data 
 	char name_and_type[MAX_SIZE];	// an input line 
 	char *type;							// for parsing 
@@ -156,12 +156,12 @@ cairo_surface_t * create_xbm_surface_from_stream(jio::InputStream *stream)
 		std::string line = reader.ReadLine();
 
 		if (line.size() == MAX_SIZE-1) {
-			if (bits != NULL) {
+			if (bits != nullptr) {
 				delete [] bits;
-				bits = NULL;
+				bits = nullptr;
 			}
 
-			return NULL;
+			return nullptr;
 		}
 
 		if (sscanf (line.c_str(), "#define %s %d", name_and_type, &value) == 2) {
@@ -201,12 +201,12 @@ cairo_surface_t * create_xbm_surface_from_stream(jio::InputStream *stream)
 			continue;
     
 		if (!ww || !hh) {
-			if (bits != NULL) {
+			if (bits != nullptr) {
 				delete [] bits;
-				bits = NULL;
+				bits = nullptr;
 			}
 
-			return NULL;
+			return nullptr;
 		}
 
 		if ((ww % 16) && ((ww % 16) < 9) && version10p)
@@ -216,9 +216,9 @@ cairo_surface_t * create_xbm_surface_from_stream(jio::InputStream *stream)
 
 		bytes_per_line = (ww+7)/8 + padding;
 
-		if (bits != NULL) {
+		if (bits != nullptr) {
 			delete [] bits;
-			bits = NULL;
+			bits = nullptr;
 		}
 
 		size = bytes_per_line * hh;
@@ -251,8 +251,8 @@ cairo_surface_t * create_xbm_surface_from_stream(jio::InputStream *stream)
 		}
 	}
 
-	if (bits == NULL) {
-		return NULL;
+	if (bits == nullptr) {
+		return nullptr;
 	}
 
 	int sw = ww;
@@ -261,14 +261,14 @@ cairo_surface_t * create_xbm_surface_from_stream(jio::InputStream *stream)
 
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, sw, sh);
 
-	if (surface == NULL) {
-		return NULL;
+	if (surface == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(surface);
 
-	if (data == NULL) {
-		return NULL;
+	if (data == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *src = bits;
@@ -303,7 +303,7 @@ cairo_surface_t * create_xbm_surface_from_file(const char *file)
 {
 	jio::FileInputStream stream(file);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_xbm_surface_from_stream(&stream);
 
@@ -316,7 +316,7 @@ cairo_surface_t * create_xbm_surface_from_data(uint8_t *data, int size)
 {
 	jio::MemoryInputStream stream((const uint8_t *)data, size);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_xbm_surface_from_stream(&stream);
 

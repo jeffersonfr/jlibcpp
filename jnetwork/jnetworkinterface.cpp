@@ -112,34 +112,34 @@ NetworkInterface::~NetworkInterface()
 		_childs.erase(_childs.begin());
 
 		delete i;
-		i = NULL;
+		i = nullptr;
 	}
 }
 
 void NetworkInterface::AddNetworkMask(InetAddress *addr)
 {
-	if ((void *)addr != NULL) {
+	if ((void *)addr != nullptr) {
 		_masks.push_back(addr);
 	}
 }
 
 void NetworkInterface::AddInetAddress(InetAddress *addr)
 {
-	if ((void *)addr != NULL) {
+	if ((void *)addr != nullptr) {
 		_addresses.push_back(addr);
 	}
 }
 
 void NetworkInterface::AddBroadcastAddress(InetAddress *addr)
 {
-	if ((void *)addr != NULL) {
+	if ((void *)addr != nullptr) {
 		_broadcast_addresses.push_back(addr);
 	}
 }
 
 void NetworkInterface::AddSubInterface(NetworkInterface *i)
 {
-	if ((void *)i != NULL) {
+	if ((void *)i != nullptr) {
 		_childs.push_back(i);
 	}
 }
@@ -148,7 +148,7 @@ NetworkInterface * NetworkInterface::GetByInetAddress(InetAddress *addr)
 {
 	// TODO:: recuperar pelo ip ??
 	
-	return NULL;
+	return nullptr;
 }
 
 NetworkInterface * NetworkInterface::GetByName(std::string name)
@@ -161,7 +161,7 @@ NetworkInterface * NetworkInterface::GetByName(std::string name)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
@@ -169,8 +169,8 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 	std::vector<NetworkInterface *> interfaces;
 
 	struct ifaddrs 
-    *ifa = NULL,
-		*ifEntry = NULL;
+    *ifa = nullptr,
+		*ifEntry = nullptr;
 	char 
     addrBuffer[INET6_ADDRSTRLEN],
 		maskBuffer[INET6_ADDRSTRLEN],
@@ -182,56 +182,56 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 
 		int index = 0;
 
-		for(ifEntry=ifa; ifEntry!=NULL; ifEntry=ifEntry->ifa_next, index++) {
-			if(ifEntry->ifa_addr->sa_data == NULL) {
+		for(ifEntry=ifa; ifEntry!=nullptr; ifEntry=ifEntry->ifa_next, index++) {
+			if(ifEntry->ifa_addr->sa_data == nullptr) {
 				continue;
 			}
 
 			const char 
-        *addr = NULL,
-				*mask = NULL,
-				*broadcast = NULL;
-				// *p2p = NULL;
+        *addr = nullptr,
+				*mask = nullptr,
+				*broadcast = nullptr;
+				// *p2p = nullptr;
 			void 
-        *addrPtr = NULL,
-				*maskPtr = NULL,
-				*broadcastPtr = NULL;
-				// *p2pPtr = NULL;
+        *addrPtr = nullptr,
+				*maskPtr = nullptr,
+				*broadcastPtr = nullptr;
+				// *p2pPtr = nullptr;
 
 			if (ifEntry->ifa_addr->sa_family == AF_INET || ifEntry->ifa_addr->sa_family == PF_INET) {
 				addrPtr = &((struct sockaddr_in *)ifEntry->ifa_addr)->sin_addr;
 				maskPtr = &((struct sockaddr_in *)ifEntry->ifa_netmask)->sin_addr;
 
-				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != NULL) {
+				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
 			 		broadcastPtr = &((struct sockaddr_in *)ifEntry->ifa_broadaddr)->sin_addr;
 				}
 
-				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
+				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
 					// p2pPtr = &((struct sockaddr_in *)ifEntry->ifa_dstaddr)->sin_addr;
 				}
 			
 				addr = inet_ntop(ifEntry->ifa_addr->sa_family, addrPtr, addrBuffer, sizeof(addrBuffer));
 				mask = inet_ntop(ifEntry->ifa_addr->sa_family, maskPtr, maskBuffer, sizeof(maskBuffer));
 
-				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != NULL) {
+				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
 					broadcast = inet_ntop(ifEntry->ifa_addr->sa_family, broadcastPtr, broadcastBuffer, sizeof(broadcastBuffer));
 				}
 
-				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
+				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
 					// p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
 				}
 			
 				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::JTT_STRING, false);
 
 				std::map<std::string, NetworkInterface *>::iterator it = minterfaces.find(token.GetToken(0));
-				NetworkInterface *parent = NULL;
+				NetworkInterface *parent = nullptr;
 				
 				// TODO:: consertar... quando chegar um tipo eth0:1
 
 				if (it != minterfaces.end()) {
 					parent = it->second;
 				} else {
-					parent = new NetworkInterface(NULL, ifEntry->ifa_name, interfaces.size(), false);
+					parent = new NetworkInterface(nullptr, ifEntry->ifa_name, interfaces.size(), false);
 
 					interfaces.push_back(parent);
 					minterfaces[ifEntry->ifa_name] = parent;
@@ -241,7 +241,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 					parent->AddNetworkMask(InetAddress4::GetByName(mask));
 					parent->AddInetAddress(InetAddress4::GetByName(addr));
 
-					if (broadcast == NULL) {
+					if (broadcast == nullptr) {
 						broadcast = addr;
 					}
 
@@ -253,34 +253,34 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 				addrPtr = &((struct sockaddr_in6 *)ifEntry->ifa_addr)->sin6_addr;
 				maskPtr = &((struct sockaddr_in6 *)ifEntry->ifa_netmask)->sin6_addr;
 				
-				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != NULL) {
+				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
 					broadcastPtr = &((struct sockaddr_in6 *)ifEntry->ifa_broadaddr)->sin6_addr;
 				}
 				
-				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
+				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
 					// p2pPtr = &((struct sockaddr_in6 *)ifEntry->ifa_dstaddr)->sin6_addr;
 				}
 				
 				addr = inet_ntop(ifEntry->ifa_addr->sa_family, addrPtr, addrBuffer, sizeof(addrBuffer));
 				mask = inet_ntop(ifEntry->ifa_addr->sa_family, maskPtr, maskBuffer, sizeof(maskBuffer));
 
-				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != NULL) {
+				if (ifEntry->ifa_flags & IFF_BROADCAST && ifEntry->ifa_broadaddr != nullptr) {
 					broadcast = inet_ntop(ifEntry->ifa_addr->sa_family, broadcastPtr, broadcastBuffer, sizeof(broadcastBuffer));
 				}
 
-				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != NULL) {
+				if (ifEntry->ifa_flags & IFF_POINTOPOINT && ifEntry->ifa_broadaddr != nullptr) {
 					// p2p = inet_ntop(ifEntry->ifa_addr->sa_family, p2pPtr, p2pBuffer, sizeof(p2pBuffer));
 				}
 				
 				jcommon::StringTokenizer token(ifEntry->ifa_name, ":", jcommon::JTT_STRING, false);
 
 				std::map<std::string, NetworkInterface *>::iterator it = minterfaces.find(token.GetToken(0));
-				NetworkInterface *parent = NULL;
+				NetworkInterface *parent = nullptr;
 				
 				if (it != minterfaces.end()) {
 					parent = it->second;
 				} else {
-					parent = new NetworkInterface(NULL, ifEntry->ifa_name, interfaces.size(), false);
+					parent = new NetworkInterface(nullptr, ifEntry->ifa_name, interfaces.size(), false);
 
 					interfaces.push_back(parent);
 					minterfaces[ifEntry->ifa_name] = parent;
@@ -290,7 +290,7 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 					parent->AddNetworkMask(InetAddress6::GetByName(mask));
 					parent->AddInetAddress(InetAddress6::GetByName(addr));
 
-					if (broadcast == NULL) {
+					if (broadcast == nullptr) {
 						broadcast = addr;
 					}
 
@@ -299,9 +299,9 @@ std::vector<NetworkInterface *> NetworkInterface::GetNetworkInterfaces()
 					parent->AddSubInterface(new NetworkInterface(parent, ifEntry->ifa_name, interfaces.size(), true));
 				}
 				
-				// p2p = NULL;
+				// p2p = nullptr;
 			} else if (ifEntry->ifa_addr->sa_family == AF_PACKET || ifEntry->ifa_addr->sa_family == PF_PACKET) {
-				NetworkInterface *parent = new NetworkInterface(NULL, ifEntry->ifa_name, index, false);
+				NetworkInterface *parent = new NetworkInterface(nullptr, ifEntry->ifa_name, index, false);
 
 				interfaces.push_back(parent);
 				minterfaces[ifEntry->ifa_name] = parent;

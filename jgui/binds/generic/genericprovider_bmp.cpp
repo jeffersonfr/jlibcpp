@@ -30,7 +30,7 @@ cairo_surface_t * create_bmp_surface_from_stream(jio::InputStream *stream)
 	CBitmap bitmap;
 
 	if (bitmap.Load(stream) == false) {
-		return NULL;
+		return nullptr;
 	}
 
 	int sw = (int)bitmap.GetWidth();
@@ -39,18 +39,18 @@ cairo_surface_t * create_bmp_surface_from_stream(jio::InputStream *stream)
 
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, sw, sh);
 
-	if (surface == NULL) {
-		return NULL;
+	if (surface == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(surface);
 
-	if (data == NULL) {
-		return NULL;
+	if (data == nullptr) {
+		return nullptr;
 	}
 
 	if (bitmap.GetBits((void *)data, sz, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000, true) == false) {
-		return NULL;
+		return nullptr;
 	}
 
 	// INFO:: remove alpha channel from bmp ?
@@ -81,7 +81,7 @@ cairo_surface_t * create_bmp_surface_from_file(const char *file)
 {
 	jio::FileInputStream stream(file);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_bmp_surface_from_stream(&stream);
 
@@ -94,7 +94,7 @@ cairo_surface_t * create_bmp_surface_from_data(uint8_t *data, int size)
 {
 	jio::MemoryInputStream stream((const uint8_t *)data, size);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_bmp_surface_from_stream(&stream);
 

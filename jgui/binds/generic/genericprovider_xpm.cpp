@@ -124,7 +124,7 @@ static bool xpm_load(jio::InputStream *stream, uint8_t **image, int *width, int 
 	size_t columns_tot = 0;
 	size_t ncolors = 0;
 	size_t chars_per_pixel = 0;
-	uint32_t *data = NULL;
+	uint32_t *data = nullptr;
 
 	while (reader.IsEOF() == false) {
 		line_buffer = reader.ReadLine();
@@ -203,26 +203,26 @@ static bool xpm_load(jio::InputStream *stream, uint8_t **image, int *width, int 
 
 cairo_surface_t * create_xpm_surface_from_stream(jio::InputStream *stream) 
 {
-	uint8_t *buffer = NULL;
+	uint8_t *buffer = nullptr;
 	int sw = 0;
 	int sh = 0;
 
 	if (xpm_load(stream, &buffer, &sw, &sh) == false) {
-		return NULL;
+		return nullptr;
 	}
 
 	unsigned int sz = sw*sh;
 
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, sw, sh);
 
-	if (surface == NULL) {
-		return NULL;
+	if (surface == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(surface);
 
-	if (data == NULL) {
-		return NULL;
+	if (data == nullptr) {
+		return nullptr;
 	}
 
 	memcpy(data, buffer, sz*4);
@@ -236,7 +236,7 @@ cairo_surface_t * create_xpm_surface_from_file(const char *file)
 {
 	jio::FileInputStream stream(file);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_xpm_surface_from_stream(&stream);
 
@@ -249,7 +249,7 @@ cairo_surface_t * create_xpm_surface_from_data(uint8_t *data, int size)
 {
 	jio::MemoryInputStream stream((const uint8_t *)data, size);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_xpm_surface_from_stream(&stream);
 

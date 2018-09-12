@@ -39,7 +39,7 @@ class PlayerTest : public jgui::Window, public jevent::PlayerListener, public je
 
 			jgui::Component *cmp = _player->GetVisualComponent();
 
-      if (cmp != NULL) {
+      if (cmp != nullptr) {
   			cmp->SetSize(720, 480);
 	  		cmp->SetVisible(true);
 
@@ -59,10 +59,10 @@ class PlayerTest : public jgui::Window, public jevent::PlayerListener, public je
 			_player->Stop();
 
 			delete _player;
-			_player = NULL;
+			_player = nullptr;
 
 			delete _fullscreen_layout;
-			_fullscreen_layout = NULL;
+			_fullscreen_layout = nullptr;
 		}
 
 		virtual void StartMedia()
@@ -121,7 +121,7 @@ int main(int argc, char **argv)
 
 	jgui::Application::Init(argc, argv);
 
-	srand(time(NULL));
+	srand(time(nullptr));
 
 	PlayerTest app(argv[1]);
 

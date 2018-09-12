@@ -36,7 +36,7 @@ InetAddress::~InetAddress()
 
 bool InetAddress::IsReachable(std::string host)
 {
-	struct addrinfo *result = NULL;
+	struct addrinfo *result = nullptr;
 	struct addrinfo hints;
 
 	bzero(&hints, sizeof(hints));
@@ -46,9 +46,9 @@ bool InetAddress::IsReachable(std::string host)
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_protocol = 0;
-	hints.ai_canonname = NULL;
-	hints.ai_addr = NULL;
-	hints.ai_next = NULL;
+	hints.ai_canonname = nullptr;
+	hints.ai_addr = nullptr;
+	hints.ai_next = nullptr;
 
 	if (getaddrinfo(host.c_str(), "echo", &hints, &result) != 0) {
 		return false;

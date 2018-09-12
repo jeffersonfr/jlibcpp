@@ -77,7 +77,7 @@ jsize_t CoordinateLayout::GetMaximumLayoutSize(Container *parent)
 
 jsize_t CoordinateLayout::GetPreferredSize(Container *target) 
 {
-	if ((void *)target == NULL) {
+	if ((void *)target == nullptr) {
 		jsize_t t = {0, 0};
 
 		return t;
@@ -103,7 +103,7 @@ jsize_t CoordinateLayout::GetPreferredSize(Container *target)
 
 void CoordinateLayout::DoLayout(Container *target)
 {
-	if ((void *)target == NULL) {
+	if ((void *)target == nullptr) {
 		return;
 	}
 

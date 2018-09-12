@@ -62,10 +62,10 @@ class Fire : public jgui::Window {
     virtual ~Fire()
     {
       delete [] fire;
-      fire = NULL;
+      fire = nullptr;
 
       delete [] buffer;
-      buffer = NULL;
+      buffer = nullptr;
     }
 
     virtual void Paint(jgui::Graphics *g) 

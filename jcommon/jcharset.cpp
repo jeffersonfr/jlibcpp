@@ -318,7 +318,7 @@ char * Charset::ReadLatin1File(FILE *f, int *nbytes, int *nchars, int stop)
 	if (feof(f)) {
 		*nbytes = 0;
 		*nchars = 0;
-		return NULL;
+		return nullptr;
 	}
 
 	pos = 0;
@@ -387,7 +387,7 @@ char * Charset::ReadUTF8File(FILE *f, int *nbytes, int *nchars, int stop)
 	if (feof(f)) {
 		*nbytes = 0;
 		*nchars = 0;
-		return NULL;
+		return nullptr;
 	}
 
 	pos = 0;
@@ -531,9 +531,9 @@ char * Charset::UTF8ToLatin1(const char *utf8, int *bytes)
 	char *dest;
 
 	dest = (char *)malloc(nbytes + 1);
-	if (dest == NULL) {
+	if (dest == nullptr) {
 		*bytes = 0;
-		return NULL;
+		return nullptr;
 	}
 	dp = dest;
 
@@ -574,9 +574,9 @@ char * Charset::CorrectUTF8(const char *s, int *bytes)
 
 	total = nbytes;
 	dest = (char *)malloc(total + 1);
-	if (dest == NULL) {
+	if (dest == nullptr) {
 		*bytes = 0;
-		return NULL;
+		return nullptr;
 	}
 	dp = dest;
 

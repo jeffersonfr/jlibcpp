@@ -33,7 +33,7 @@ enum jtag_state_t {
 
 Tag::Tag(std::string name, jtag_type_t type)
 {
-	_parent = NULL;
+	_parent = nullptr;
 	_name = name;
 	_type = type;
 
@@ -149,26 +149,26 @@ std::map<std::string, std::string> & Tag::GetAttributes()
 
 HTMLParser::HTMLParser()
 {
-	_root = NULL;
+	_root = nullptr;
 }
 
 HTMLParser::~HTMLParser()
 {
-	if (_root != NULL) {
+	if (_root != nullptr) {
 		delete _root;
 	}
 }
 
 void HTMLParser::Parse(std::string file)
 {
-	jio::FileInputStream *input = NULL;
+	jio::FileInputStream *input = nullptr;
 
 	try {
 		input = new jio::FileInputStream(file);
 
 		Parse(input);
 	} catch (jexception::IOException &) {
-		if (input != NULL) {
+		if (input != nullptr) {
 			delete input;
 		}
 	}
@@ -186,7 +186,7 @@ void HTMLParser::Parse(jio::InputStream *input)
 			space_count = 0;
 	char c;
 	bool escape_flag = false;
-	Tag *root = NULL;
+	Tag *root = nullptr;
 	
 	root = new Tag("page", JTT_BODY);
 
@@ -306,7 +306,7 @@ void HTMLParser::Parse(jio::InputStream *input)
 					} else {
 						// tag = jcommon::StringUtils::ToLower(tag);
 
-						Tag *t = NULL;
+						Tag *t = nullptr;
 
 						if (tag.size() >= 1 && tag[tag.size()-1] != '/') {
 							t = new Tag(tag, JTT_BODY);
@@ -727,7 +727,7 @@ std::string HTMLParser::ConvertEscape(std::string s)
 
 void HTMLParser::InnerDump(Tag *t, std::string tab)
 {
-	if (t == NULL) {
+	if (t == nullptr) {
 		return;
 	}
 
@@ -764,7 +764,7 @@ void HTMLParser::InnerDump(Tag *t, std::string tab)
 
 void HTMLParser::Dump()
 {
-	if (_root == NULL) {
+	if (_root == nullptr) {
 		return;
 	}
 

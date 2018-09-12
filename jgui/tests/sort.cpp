@@ -52,7 +52,7 @@ class SortAlgorithm : public jcommon::Observable {
 		{
 			_name = name;
 
-			_array = NULL;
+			_array = nullptr;
 			_array_size = 0;
 
 			_is_locked = false;
@@ -1129,14 +1129,14 @@ class RadixSortAlgorithm : public SortAlgorithm{
 			Node(int a) 
 			{
 				value = a;
-				next = NULL;
-				prev = NULL;
+				next = nullptr;
+				prev = nullptr;
 			}
 
 			Node() {
 				value = 0;
-				next = NULL;
-				prev = NULL;
+				next = nullptr;
+				prev = nullptr;
 			}
 
 	};
@@ -1151,8 +1151,8 @@ class RadixSortAlgorithm : public SortAlgorithm{
 		public:
 		LinkedQueue() 
 		{
-			start = NULL;
-			end = NULL;
+			start = nullptr;
+			end = nullptr;
 			length = 0;
 		}
 
@@ -1162,7 +1162,7 @@ class RadixSortAlgorithm : public SortAlgorithm{
 
 			Node *temp = new Node(num);
 
-			if (start == NULL) {
+			if (start == nullptr) {
 				start = temp;
 				end = start;
 			} else {
@@ -1170,7 +1170,7 @@ class RadixSortAlgorithm : public SortAlgorithm{
 				end = temp;
 			}
 
-			temp = NULL;
+			temp = nullptr;
 		}
 
 		int Dequeue() 
@@ -1552,7 +1552,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 		SortComponent(int size, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			_algorithm = NULL;
+			_algorithm = nullptr;
 
 			_array = new int[size];
 			_array_size = size;
@@ -1564,7 +1564,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 
 		virtual ~SortComponent()
 		{
-			if (_algorithm != NULL) {
+			if (_algorithm != nullptr) {
 				delete _algorithm;
 			}
 		}
@@ -1573,7 +1573,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 		{
 			_algorithm = algorithm;
 
-			if (_algorithm != NULL) {
+			if (_algorithm != nullptr) {
 				_algorithm->AddObserver(this);
 			}
 		}
@@ -1608,7 +1608,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 
 		virtual void Run()
 		{
-			if (_algorithm == NULL) {
+			if (_algorithm == nullptr) {
 				return;
 			}
 			
@@ -1620,7 +1620,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 
 		virtual void Stop()
 		{
-			if (_algorithm == NULL) {
+			if (_algorithm == nullptr) {
 				return;
 			}
 			
@@ -1675,7 +1675,7 @@ class SortComponent : public jgui::Component, public jcommon::Observer {
 				g->FillRectangle(0, i*hsize, _array[i], hsize);
 			}
 
-			if (_algorithm != NULL) {
+			if (_algorithm != nullptr) {
 				g->SetColor(_colors[1]);
 				g->DrawRectangle(0, _algorithm->GetIndex0()*hsize, size.width, hsize);
 
@@ -1775,7 +1775,7 @@ class SortFrame : public jgui::Window {
 				cmp->Stop();
 
 				delete cmp;
-        cmp = NULL;
+        cmp = nullptr;
 			}
 		}
 

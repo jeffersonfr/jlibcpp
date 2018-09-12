@@ -30,7 +30,7 @@ BufferedReader::BufferedReader(InputStream *stream_)
 {
 	jcommon::Object::SetClassName("jio::BufferedReader");
 
-	if (stream_ == NULL) {
+	if (stream_ == nullptr) {
 		throw jexception::IOException("InputStream null pointer exception");
 	}
 
@@ -45,7 +45,7 @@ BufferedReader::BufferedReader(InputStream *stream_)
 
 BufferedReader::~BufferedReader()
 {
-	if ((void *)_buffer != NULL) {
+	if ((void *)_buffer != nullptr) {
 		delete [] _buffer;
 	}
 }
@@ -179,7 +179,7 @@ std::string BufferedReader::ReadLine(std::string delim)
 			int tmp = n + LINE_SIZE;
 			new_ptr = (char *)realloc(lineptr, tmp);
 
-			if (new_ptr == NULL) {
+			if (new_ptr == nullptr) {
 				delete [] lineptr;
 
 				return "";

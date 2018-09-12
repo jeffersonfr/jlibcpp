@@ -52,7 +52,7 @@ bool TextField::KeyPressed(jevent::KeyEvent *event)
 	jevent::jkeyevent_symbol_t 
     action = event->GetSymbol();
 
-	if (keymap != NULL && keymap->HasKey(action) == false) {
+	if (keymap != nullptr && keymap->HasKey(action) == false) {
 		return false;
 	}
 
@@ -247,14 +247,14 @@ void TextField::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
 	Font 
     *font = theme->GetFont("component.font");
 	
-  if (font == NULL) {
+  if (font == nullptr) {
 		return;
 	}
 
@@ -300,7 +300,7 @@ void TextField::Paint(Graphics *g)
 
 	current_text_size = 0;
 
-	if (font != NULL) {
+	if (font != nullptr) {
 		g->SetFont(font);
 
 		if (_caret_visible == true) {

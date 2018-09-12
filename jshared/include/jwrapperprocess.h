@@ -152,7 +152,7 @@ class WrapperProcess : public virtual jcommon::Object {
 			/**
 			 * \brief Constructor.
 			 *
-			 * \param args_ Contem um array de parametros, com o ultimo parametro igual a NULL
+			 * \param args_ Contem um array de parametros, com o ultimo parametro igual a nullptr
 			 *
 			 */
 			WrapperProcess(std::string prog_, char **args_);

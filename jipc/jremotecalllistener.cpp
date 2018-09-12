@@ -32,7 +32,7 @@ RemoteCallListener::~RemoteCallListener()
 
 Response * RemoteCallListener::ProcessCall(Method *method)
 {
-	return NULL;
+	return nullptr;
 }
 
 }

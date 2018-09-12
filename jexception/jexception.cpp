@@ -59,7 +59,7 @@ Exception::Exception(Exception *exception, std::string reason):
 {
 	jcommon::Object::SetClassName("jexception::Exception");
 	
-	if (exception == NULL) {
+	if (exception == nullptr) {
 		return;
 	}
 
@@ -75,7 +75,7 @@ Exception::Exception(jexception::Exception *exception, const char *fmt, ...):
 {
 	jcommon::Object::SetClassName("jexception::Exception");
 	
-	if (exception == NULL) {
+	if (exception == nullptr) {
 		return;
 	}
 
@@ -121,7 +121,7 @@ const std::vector<Exception *> & Exception::GetStackTrace()
 
 void Exception::SetStackTrace(const std::vector<Exception *> *stack)
 {
-	if (stack == NULL) {
+	if (stack == nullptr) {
 		return;
 	}
 

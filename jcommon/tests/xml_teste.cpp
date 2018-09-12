@@ -532,7 +532,7 @@ int main()
 			{
 				while ( fgets( verifyBuf, 256, verify ) )
 				{
-					if (fgets( savedBuf, 256, saved ) == NULL) 
+					if (fgets( savedBuf, 256, saved ) == nullptr) 
 					{
 						break;
 					}
@@ -873,7 +873,7 @@ int main()
 		assert( textfile );
 		if ( textfile ) {
 			char buf[ 1024 ];
-			if (fgets( buf, 1024, textfile ) != NULL) {
+			if (fgets( buf, 1024, textfile ) != nullptr) {
 				XmlTest( "Entity transformation: write. ",
 						 "<psg context=\'Line 5 has &quot;quotation marks&quot; and &apos;apostrophe marks&apos;."
 						 " It also has &lt;, &gt;, and &amp;, as well as a fake copyright \xC2\xA9.' />",

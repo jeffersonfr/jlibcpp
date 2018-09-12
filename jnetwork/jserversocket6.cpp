@@ -34,7 +34,7 @@ ServerSocket6::ServerSocket6(int port_, int backlog_, InetAddress *addr_):
 {
 	jcommon::Object::SetClassName("jnetwork::ServerSocket6");
 	
-	_local = NULL;
+	_local = nullptr;
 	_is_closed = true;
 
 	CreateSocket();
@@ -61,7 +61,7 @@ ServerSocket6::~ServerSocket6()
 	} catch (...) {
 	}
 
-	if (_local != NULL) {
+	if (_local != nullptr) {
 		delete _local;
 	}
 }
@@ -87,7 +87,7 @@ void ServerSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin6_flowinfo = 0;
 	_lsock.sin6_scope_id = 0;
 
-	if (local_addr_ == NULL) {
+	if (local_addr_ == nullptr) {
 		_local = dynamic_cast<InetAddress6 *>(InetAddress6::GetLocalHost());
 
 		_lsock.sin6_addr = in6addr_any;

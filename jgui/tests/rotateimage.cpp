@@ -112,10 +112,10 @@ class Main : public jgui::Window {
 				}
 			}
 
-			static jgui::Image *off = NULL;
-			static jgui::Image *offsub = NULL;
+			static jgui::Image *off = nullptr;
+			static jgui::Image *offsub = nullptr;
 			
-			if (off == NULL) {
+			if (off == nullptr) {
 				jgui::Image *image = new jgui::BufferedImage("images/square.png");
 
 				off = image->Scale(iw, ih);

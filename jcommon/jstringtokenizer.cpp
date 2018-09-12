@@ -35,18 +35,6 @@ StringTokenizer::~StringTokenizer()
 
 void StringTokenizer::BuildTokens(std::string string_, std::string token_, jtoken_type_t flag_, bool return_tokens_)
 {
-	/*
-	char *s = (char *)string_.c_str(),
-		 *t = (char *)token_.c_str(),
-		 *token = strtok(s, t);
-	
-	while (token != NULL) {
-		_tokens.push_back(token);
-		
-		token = strtok(NULL, t);
-	}
-	*/
-
 	if (flag_ == JTT_CHAR) {
 		std::string::size_type idx = 0; 
 		
@@ -75,21 +63,6 @@ void StringTokenizer::BuildTokens(std::string string_, std::string token_, jtoke
 		}
 	} else if (flag_ == JTT_STRING) {
 		std::string::size_type pos = string_.find(token_);
-
-		/*
-		// CHANGE:: remove pos != 0, caso entre em loop
-		if (pos != 0 && pos != std::string::npos) {
-			_tokens.push_back(string_.substr(0, pos));
-			
-			if (return_tokens_ == true) {
-				_tokens.push_back(token_);
-			}
-			
-			BuildTokens(string_.substr(pos+token_.size(), string_.length()), token_, flag_, return_tokens_);
-		} else {
-			_tokens.push_back(string_);
-		}
-		*/
 
 		if (pos != std::string::npos) {
 			_tokens.push_back(string_.substr(0, pos));

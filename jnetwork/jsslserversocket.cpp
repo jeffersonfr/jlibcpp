@@ -34,7 +34,7 @@ SSLServerSocket::SSLServerSocket(SSLContext *ctx, int port_, int backlog_, InetA
 {
 	jcommon::Object::SetClassName("jnetwork::SSLServerSocket");
 
-	_local = NULL;
+	_local = nullptr;
 	_is_closed = true;
 	_ctx = ctx;
 
@@ -87,7 +87,7 @@ void SSLServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
     
 	_lsock.sin_family = AF_INET;
 	
-	if (local_addr_ == NULL) {
+	if (local_addr_ == nullptr) {
 		_local = InetAddress4::GetLocalHost();
 
 		_lsock.sin_addr.s_addr = htonl(INADDR_ANY);

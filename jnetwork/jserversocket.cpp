@@ -34,7 +34,7 @@ ServerSocket::ServerSocket(int port_, int backlog_, InetAddress *addr_):
 {
 	jcommon::Object::SetClassName("jnetwork::ServerSocket");
 	
-  _local = NULL;
+  _local = nullptr;
 	_is_closed = true;
 
 	CreateSocket();
@@ -60,7 +60,7 @@ ServerSocket::~ServerSocket()
 	} catch (...) {
 	}
 
-	if (_local != NULL) {
+	if (_local != nullptr) {
 		delete _local;
 	}
 }
@@ -84,7 +84,7 @@ void ServerSocket::BindSocket(InetAddress *local_addr_, int local_port_)
     
 	_lsock.sin_family = AF_INET;
 
-	if (local_addr_ == NULL) {
+	if (local_addr_ == nullptr) {
 		_local = InetAddress4::GetLocalHost();
 
 		_lsock.sin_addr.s_addr = htonl(INADDR_ANY);

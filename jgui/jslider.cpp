@@ -125,7 +125,7 @@ bool Slider::MousePressed(jevent::MouseEvent *event)
   jgui::Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return false;
   }
 
@@ -197,7 +197,7 @@ bool Slider::MouseMoved(jevent::MouseEvent *event)
   jgui::Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return false;
   }
 
@@ -248,7 +248,7 @@ void Slider::Paint(Graphics *g)
 	Theme 
     *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 

@@ -361,7 +361,7 @@ int main( int argc, char* argv[] )
 {
 	jgui::Application::Init(argc, argv);
 
-	srand(static_cast<int>(time(NULL)));
+	srand(static_cast<int>(time(nullptr)));
 
 	Game2048 app; 
 

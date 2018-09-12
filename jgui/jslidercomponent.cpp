@@ -144,7 +144,7 @@ void SliderComponent::SetMajorTickSpacing(int i)
 
 void SliderComponent::RegisterAdjustmentListener(jevent::AdjustmentListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -157,7 +157,7 @@ void SliderComponent::RegisterAdjustmentListener(jevent::AdjustmentListener *lis
 
 void SliderComponent::RemoveAdjustmentListener(jevent::AdjustmentListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -168,7 +168,7 @@ void SliderComponent::RemoveAdjustmentListener(jevent::AdjustmentListener *liste
 
 void SliderComponent::DispatchAdjustmentEvent(jevent::AdjustmentEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

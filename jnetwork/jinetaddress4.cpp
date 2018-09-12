@@ -43,7 +43,7 @@ InetAddress * InetAddress4::GetByName(std::string host_)
 {
 	struct hostent *h = gethostbyname(host_.c_str());
     
-	if (h == NULL) {
+	if (h == nullptr) {
 		throw jexception::UnknownHostException("Host \"" + host_ + "\" not found");
   }
    
@@ -58,7 +58,7 @@ std::vector<InetAddress *> InetAddress4::GetAllByName(std::string host_)
 {
 	std::vector<InetAddress *> vip;
 
-	struct hostent *aux = NULL;
+	struct hostent *aux = nullptr;
 	in_addr ip;
 
 	if (inet_aton(host_.c_str(), &ip) == 0) {
@@ -67,15 +67,15 @@ std::vector<InetAddress *> InetAddress4::GetAllByName(std::string host_)
 		aux = gethostbyaddr(&ip, sizeof(ip), PF_INET);
 	}
 
-	if (aux == NULL) {
+	if (aux == nullptr) {
 		throw jexception::UnknownHostException("Host \"" + host_ + "\" not found");
 	} else {
 		struct hostent *aux2;
 
-		for(int i=0; aux->h_addr_list[i] != NULL; ++i) {
+		for(int i=0; aux->h_addr_list[i] != nullptr; ++i) {
 			aux2 = gethostbyaddr(aux->h_addr_list[i], sizeof(aux->h_addr_list[i]),PF_INET);
 			
-			if ((void *)aux2 != NULL) {
+			if ((void *)aux2 != nullptr) {
 				vip.push_back(new InetAddress4(aux2->h_name, *(in_addr *)aux2->h_addr_list[0]));
 			}
 		}

@@ -33,7 +33,7 @@ struct priv {
    int counter;
 };
 
-jshared::SharedQueue *fifo = NULL;
+jshared::SharedQueue *fifo = nullptr;
 
 void fifo_teste() 
 {
@@ -51,7 +51,7 @@ void fifo_teste()
 		mypriv.counter = 0;
 		fifo->Setpriv(&mypriv);
 		
-		srand(time(NULL));
+		srand(time(nullptr));
 		for(i=0;i<NTESTS;i++){
 			int pos;
 			int sz;

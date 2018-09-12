@@ -117,8 +117,8 @@ class PacMan : public jgui::Window {
 	PacMan():
 		jgui::Window(720, 720)
 	{
-		goff = NULL;
-		ii = NULL;
+		goff = nullptr;
+		ii = nullptr;
 	
 		d = {0, 0, 0, 0};
 
@@ -153,16 +153,16 @@ class PacMan : public jgui::Window {
 		pacsleft = 0;
 		score = 0;
 		deathcounter = 0;
-		dx = NULL;
-		dy = NULL;
-		ghostx = NULL;
-		ghosty = NULL;
-		ghostdx = NULL;
-		ghostdy = NULL;
-		ghostspeed = NULL;
+		dx = nullptr;
+		dy = nullptr;
+		ghostx = nullptr;
+		ghosty = nullptr;
+		ghostdx = nullptr;
+		ghostdy = nullptr;
+		ghostspeed = nullptr;
 
-		ghost_bmp = NULL;
-		pacman_bmp = NULL;
+		ghost_bmp = nullptr;
+		pacman_bmp = nullptr;
 
 		pacmanx = 0;
 		pacmany = 0;
@@ -182,7 +182,7 @@ class PacMan : public jgui::Window {
 		maxspeed = 0;
 		currentspeed = 0;
 		
-		screendata = NULL;
+		screendata = nullptr;
 	
 		flag = true;
 
@@ -194,7 +194,7 @@ class PacMan : public jgui::Window {
 	
 	virtual ~PacMan()
 	{
-		SetTheme(NULL);
+		SetTheme(nullptr);
 
 		flag = false;
 	}
@@ -362,13 +362,13 @@ class PacMan : public jgui::Window {
 
 		std::string s;
 
-		if (goff == NULL && d.width > 0 && d.height > 0) {
+		if (goff == nullptr && d.width > 0 && d.height > 0) {
 			ii = new jgui::BufferedImage(jgui::JPF_ARGB, d.width, d.height);
 
 			goff = ii->GetGraphics();
 		}
 
-		if (goff == NULL || ii == NULL) {
+		if (goff == nullptr || ii == nullptr) {
 			return;
 		}
 
@@ -478,7 +478,7 @@ class PacMan : public jgui::Window {
 			pos,
 			count;
 
-		if (ghostx == NULL || ghosty == NULL) {
+		if (ghostx == nullptr || ghosty == nullptr) {
 			return;
 		}
 

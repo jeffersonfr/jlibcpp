@@ -217,8 +217,8 @@ class Callback : public jipc::RemoteCallListener {
 
 			o << " printf \"get_time\n\" | nc -U " << RESOURCE_FILE << " | grep '^[\\d]*'";
 
-			if ((fp = popen(o.str().c_str(), "r")) != NULL) {
-				if (fgets(tmp, 12, fp) == NULL) {
+			if ((fp = popen(o.str().c_str(), "r")) != nullptr) {
+				if (fgets(tmp, 12, fp) == nullptr) {
 					pclose(fp);
 
 					return false;
@@ -229,7 +229,7 @@ class Callback : public jipc::RemoteCallListener {
 
 			char *index = strstr(tmp, "\n");
 
-			if (index != NULL) {
+			if (index != nullptr) {
 				*index = '\0';
 			}
 
@@ -261,8 +261,8 @@ class Callback : public jipc::RemoteCallListener {
 
 			o << "printf \"is_playing\n\" | nc -U " << RESOURCE_FILE << " | grep '^[01]'";
 
-			if ((fp = popen(o.str().c_str(), "r")) != NULL) {
-				if (fgets(tmp, 2, fp) == NULL) {
+			if ((fp = popen(o.str().c_str(), "r")) != nullptr) {
+				if (fgets(tmp, 2, fp) == nullptr) {
 					pclose(fp);
 
 					return false;

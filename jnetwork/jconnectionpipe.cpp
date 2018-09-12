@@ -191,12 +191,12 @@ void ConnectionPipe::Close()
 
 jio::InputStream * ConnectionPipe::GetInputStream()
 {
-	return NULL;
+	return nullptr;
 }
 
 jio::OutputStream * ConnectionPipe::GetOutputStream()
 {
-	return NULL;
+	return nullptr;
 }
 
 int64_t ConnectionPipe::GetSentBytes()

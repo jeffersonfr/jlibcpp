@@ -129,7 +129,7 @@ class PlayerComponentImpl : public jgui::Component {
 
 			_buffer_index = 0;
 
-			_image = NULL;
+			_image = nullptr;
 			_player = player;
 			
 			_frame_size.width = w;
@@ -150,17 +150,17 @@ class PlayerComponentImpl : public jgui::Component {
 
 		virtual ~PlayerComponentImpl()
 		{
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 
-			if (_buffer != NULL) {
+			if (_buffer != nullptr) {
 				delete [] _buffer[0];
 				delete [] _buffer[1];
 
 				delete _buffer;
-				_buffer = NULL;
+				_buffer = nullptr;
 			}
 		}
 
@@ -180,9 +180,9 @@ class PlayerComponentImpl : public jgui::Component {
 
 			_mutex.lock();
 
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 
 			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_ARGB, sw, sh);
@@ -226,7 +226,7 @@ static void * LockMediaSurface(void *data, void **p_pixels)
 
 	cmp->_buffer_index = (cmp->_buffer_index + 1)%2;
 
-	return NULL; 
+	return nullptr; 
 }
 
 static void UnlockMediaSurface(void *data, void *id, void *const *p_pixels)
@@ -338,7 +338,7 @@ class VolumeControlImpl : public VolumeControl {
 		{
 			int level = 0;
 
-			if (_player->_provider != NULL) {
+			if (_player->_provider != nullptr) {
 				level = libvlc_audio_get_volume(_player->_provider);
 			}
 
@@ -360,7 +360,7 @@ class VolumeControlImpl : public VolumeControl {
 				_is_muted = false;
 			}
 
-			if (_player->_provider != NULL) {
+			if (_player->_provider != nullptr) {
 				libvlc_audio_set_mute(_player->_provider, (_is_muted == true)?1:0);
 				libvlc_audio_set_volume(_player->_provider, _level);
 			}
@@ -375,7 +375,7 @@ class VolumeControlImpl : public VolumeControl {
 		{
 			_is_muted = b;
 			
-			if (_player->_provider != NULL) {
+			if (_player->_provider != nullptr) {
 				libvlc_audio_set_mute(_player->_provider, (_is_muted == true)?1:0);
 			}
 		}
@@ -401,7 +401,7 @@ class AudioConfigurationControlImpl : public AudioConfigurationControl {
 
 		virtual void SetAudioDelay(int64_t delay)
 		{
-			if (_player->_provider != NULL) {
+			if (_player->_provider != nullptr) {
 				 libvlc_audio_set_delay(_player->_provider, delay);
 			}
 		}
@@ -410,7 +410,7 @@ class AudioConfigurationControlImpl : public AudioConfigurationControl {
 		{
 			int64_t delay = 0LL;
 
-			if (_player->_provider != NULL) {
+			if (_player->_provider != nullptr) {
 				 delay = libvlc_audio_get_delay(_player->_provider);
 			}
 
@@ -570,7 +570,7 @@ LibVLCLightPlayer::LibVLCLightPlayer(jnetwork::URL url):
 	media = libvlc_media_new_path(_engine, _file.c_str());
 	_provider = libvlc_media_player_new_from_media(media);
 
- 	libvlc_media_track_t **tracks = NULL;
+ 	libvlc_media_track_t **tracks = nullptr;
 	uint32_t 
 	  iw = 0,
 	  ih = 0;
@@ -703,7 +703,7 @@ LibVLCLightPlayer::~LibVLCLightPlayer()
 	Close();
 	
 	delete _component;
-	_component = NULL;
+	_component = nullptr;
 
 	for (std::vector<Control *>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
 		Control *control = (*i);
@@ -728,14 +728,14 @@ void LibVLCLightPlayer::Run()
 
 void LibVLCLightPlayer::Play()
 {
-	if (_is_paused == false && _provider != NULL) {
+	if (_is_paused == false && _provider != nullptr) {
 		libvlc_media_player_play(_provider);
 	}
 }
 
 void LibVLCLightPlayer::Pause()
 {
-	if (_is_paused == false && _provider != NULL) {
+	if (_is_paused == false && _provider != nullptr) {
 		_is_paused = true;
 
 		if (libvlc_media_player_can_pause(_provider) == true) {
@@ -748,7 +748,7 @@ void LibVLCLightPlayer::Pause()
 
 void LibVLCLightPlayer::Resume()
 {
-	if (_is_paused == true && _provider != NULL) {
+	if (_is_paused == true && _provider != nullptr) {
 		_is_paused = false;
 
 		libvlc_media_player_set_pause(_provider, 0);
@@ -759,7 +759,7 @@ void LibVLCLightPlayer::Resume()
 
 void LibVLCLightPlayer::Stop()
 {
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		libvlc_media_player_stop(_provider);
 
 		if (_has_video == true) {
@@ -778,22 +778,22 @@ void LibVLCLightPlayer::Close()
 
 	_is_closed = true;
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		// INFO:: cause crashes when release and create players
 		// _events->Release(_events);
-		// _events = NULL;
+		// _events = nullptr;
 
 		libvlc_media_player_release(_provider);
-		_provider = NULL;
+		_provider = nullptr;
 
 		libvlc_release(_engine);
-		_engine = NULL;
+		_engine = nullptr;
 	}
 }
 
 void LibVLCLightPlayer::SetCurrentTime(uint64_t time)
 {
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		if (libvlc_media_player_is_seekable(_provider) == true) {
 			libvlc_media_player_set_time(_provider, (libvlc_time_t)time);
 		}
@@ -804,7 +804,7 @@ uint64_t LibVLCLightPlayer::GetCurrentTime()
 {
 	uint64_t time = 0LL;
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		time = (uint64_t)libvlc_media_player_get_time(_provider);
 	}
 
@@ -834,7 +834,7 @@ void LibVLCLightPlayer::SetDecodeRate(double rate)
 		_is_paused = false;
 	}
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		libvlc_media_player_set_rate(_provider, (float)rate);
 	}
 }
@@ -843,7 +843,7 @@ double LibVLCLightPlayer::GetDecodeRate()
 {
 	double rate = 1.0;
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		rate = (double)libvlc_media_player_get_rate(_provider);
 	}
 

@@ -30,7 +30,7 @@ SharedMutex::SharedMutex(jsharedmutex_flags_t flags_):
 	jcommon::Object::SetClassName("jshared::SharedMutex");
 	
 	_flags = flags_;
-	_shmp = NULL;
+	_shmp = nullptr;
 	_size = 0LL;
 }
 
@@ -43,8 +43,8 @@ SharedMutex::SharedMutex(void *data_, int64_t size_):
 	_shmp = (char *)data_;
 	_size = size_;
 
-	if ((void *)data_ == NULL) {
-		throw jexception::MemoryException("Data parameter was NULL");
+	if ((void *)data_ == nullptr) {
+		throw jexception::MemoryException("Data parameter was nullptr");
 	}
 	
 	if (_size <= 0LL) {
@@ -59,7 +59,7 @@ SharedMutex::~SharedMutex()
 
 void SharedMutex::Lock()
 {
-	if ((void *)_shmp == NULL) {
+	if ((void *)_shmp == nullptr) {
 		throw jexception::MemoryException("Null pointer exception");
 	}
 	
@@ -70,7 +70,7 @@ void SharedMutex::Lock()
 
 void SharedMutex::Unlock()
 {
-	if ((void *)_shmp == NULL) {
+	if ((void *)_shmp == nullptr) {
 		throw jexception::MemoryException("Null pointer exception");
 	}
 	
@@ -81,7 +81,7 @@ void SharedMutex::Unlock()
 
 void SharedMutex::LockAll()
 {
-	if ((void *)_shmp != NULL) {
+	if ((void *)_shmp != nullptr) {
 		throw jexception::MemoryException("Null pointer exception");
 	}
 	
@@ -102,7 +102,7 @@ void SharedMutex::LockAll()
 
 void SharedMutex::UnlockAll()
 {
-	if ((void *)_shmp == NULL) {
+	if ((void *)_shmp == nullptr) {
 		throw jexception::MemoryException("Null pointer exception");
 	}
 	

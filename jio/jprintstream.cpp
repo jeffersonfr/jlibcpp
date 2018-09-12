@@ -26,7 +26,7 @@ PrintStream::PrintStream(OutputStream *stream)
 {
 	jcommon::Object::SetClassName("jio::PrintStream");
 
-	if ((void *)stream == NULL) {
+	if (stream == nullptr) {
 		throw jexception::NullPointerException("PrintStream cannot process null stream");
 	}
 

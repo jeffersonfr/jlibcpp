@@ -33,8 +33,8 @@ GridBagLayout::GridBagLayout():
 	defaultConstraints = new GridBagConstraints();
 
 	rightToLeft = false;
-	layoutInfo = NULL;
-	componentAdjusting = NULL;
+	layoutInfo = nullptr;
+	componentAdjusting = nullptr;
 	columnWidthsSize = 0;
 	rowHeightsSize = 0;
 	columnWeightsSize = 0;
@@ -44,11 +44,11 @@ GridBagLayout::GridBagLayout():
 
 GridBagLayout::~GridBagLayout()
 {
-	if (layoutInfo != NULL) {
+	if (layoutInfo != nullptr) {
 		delete layoutInfo;
 	}
 
-	if (componentAdjusting != NULL) {
+	if (componentAdjusting != nullptr) {
 		delete componentAdjusting;
 	}
 }
@@ -126,7 +126,7 @@ void GridBagLayout::RemoveConstraints(Component *comp)
 jpoint_t GridBagLayout::GetLayoutOrigin () 
 {
 	jpoint_t origin = {0, 0};
-	if (layoutInfo != NULL) {
+	if (layoutInfo != nullptr) {
 		origin.x = layoutInfo->startx;
 		origin.y = layoutInfo->starty;
 	}
@@ -353,9 +353,9 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 
 	curRow = curCol = -1;
 
-	int *maxAscent = NULL,
-			*maxDescent = NULL;
-	short *baselineType = NULL;
+	int *maxAscent = nullptr,
+			*maxDescent = nullptr;
+	short *baselineType = nullptr;
 
 	if (hasBaseline) {
 		r->maxAscent = maxAscent = new int[layoutHeight];
@@ -502,19 +502,19 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 		}
 	}
 
-	if (r->weightX != NULL) {
+	if (r->weightX != nullptr) {
 		delete r->weightX;
 	}
 
-	if (r->weightY != NULL) {
+	if (r->weightY != nullptr) {
 		delete r->weightY;
 	}
 
-	if (r->minWidth != NULL) {
+	if (r->minWidth != nullptr) {
 		delete r->minWidth;
 	}
 
-	if (r->minHeight != NULL) {
+	if (r->minHeight != nullptr) {
 		delete r->minHeight;
 	}
 

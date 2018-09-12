@@ -927,7 +927,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(Component *cmp = NULL);
+		virtual void Repaint(Component *cmp = nullptr);
 
 		/**
 		 * \brief

@@ -138,7 +138,7 @@ class Request {
 			versao = '1';
 			metodo = JHM_ERROR;
 			arquivo[0] = 0;
-			body = NULL;
+			body = nullptr;
 		}
 
 		virtual ~Request() 
@@ -383,7 +383,7 @@ class HTTP : public virtual jcommon::Object {
 		 * 
 		 * \param header É o cabeçalho a ser procurado.
 		 * 
-		 * \return O valor do cabeçalho encontrado, ou NULL caso não exista.
+		 * \return O valor do cabeçalho encontrado, ou nullptr caso não exista.
 		 *
 		 */
 		char * GetHeader(const char * header);
@@ -393,7 +393,7 @@ class HTTP : public virtual jcommon::Object {
 		 * 
 		 * \param header É o query a ser procurado.
 		 * 
-		 * \return O valor do query encontrado, ou NULL caso não exista.
+		 * \return O valor do query encontrado, ou nullptr caso não exista.
 		 *
 		 */
 		char * GetQuery(const char * query);

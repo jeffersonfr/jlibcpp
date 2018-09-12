@@ -335,7 +335,7 @@ jhorizontal_align_t TextComponent::GetHorizontalAlign()
 
 void TextComponent::RegisterTextListener(jevent::TextListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -348,7 +348,7 @@ void TextComponent::RegisterTextListener(jevent::TextListener *listener)
 
 void TextComponent::RemoveTextListener(jevent::TextListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -359,7 +359,7 @@ void TextComponent::RemoveTextListener(jevent::TextListener *listener)
 
 void TextComponent::DispatchTextEvent(jevent::TextEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

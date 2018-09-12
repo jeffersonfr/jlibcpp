@@ -62,7 +62,7 @@ void Display::SetText(std::string text)
 
 void Display::Paint(jgui::Graphics *g)
 {
-	if ((void *)g == NULL) {
+	if ((void *)g == nullptr) {
 		return;
 	}
 
@@ -75,7 +75,7 @@ void Display::Paint(jgui::Graphics *g)
 
 	g->SetColor(0xf0, 0xf0, 0xf0, 0xff);
 
-	if (font != NULL) {
+	if (font != nullptr) {
 		g->SetFont(font);
 	}
 
@@ -182,12 +182,12 @@ Calculator::~Calculator()
   RemoveAll();
 
 	delete _display;
-	_display = NULL;
+	_display = nullptr;
   
   _container->RemoveAll();
 
   delete _container;
-  _container = NULL;
+  _container = nullptr;
 
 	while (_buttons.size() > 0) {
 		jgui::Button *b = _buttons.back();
@@ -207,13 +207,13 @@ void Calculator::Process(std::string type)
 	if (type == ".") {
 		if (_state == 2 || _state == 5) {
 			if (_number0.size() < 9) {
-				if (strchr(_number0.c_str(), '.') == NULL) {
+				if (strchr(_number0.c_str(), '.') == nullptr) {
 					_number0 += ".";
 				}
 			}
 		} else if (_state == 4) {
 			if (_number1.size() < 9) {
-				if (strchr(_number1.c_str(), '.') == NULL) {
+				if (strchr(_number1.c_str(), '.') == nullptr) {
 					_number1 += ".";
 				}
 			}
@@ -325,8 +325,8 @@ void Calculator::Process(std::string type)
 			// INFO:: tirar zeros a direitaa
 			std::string zeros = tmp;
 
-			if (strchr(tmp, '.') != NULL) {
-				while (zeros.size() > 1 && (i1 = strrchr(zeros.c_str(), '0')) != NULL) {
+			if (strchr(tmp, '.') != nullptr) {
+				while (zeros.size() > 1 && (i1 = strrchr(zeros.c_str(), '0')) != nullptr) {
 					int d1 = (int)(i1-zeros.c_str());
 
 					if (d1 == (int)(zeros.size()-1)) {
@@ -383,8 +383,8 @@ void Calculator::Process(std::string type)
 			// INFO:: tirar zeros a direitaa
 			std::string zeros = tmp;
 
-			if (strchr(tmp, '.') != NULL) {
-				while (zeros.size() > 1 && (i1 = strrchr(zeros.c_str(), '0')) != NULL) {
+			if (strchr(tmp, '.') != nullptr) {
+				while (zeros.size() > 1 && (i1 = strrchr(zeros.c_str(), '0')) != nullptr) {
 					int d1 = (int)(i1-zeros.c_str());
 
 					if (d1 == (int)(zeros.size()-1)) {
@@ -441,8 +441,8 @@ void Calculator::Process(std::string type)
 			// INFO:: tirar zeros a direitaa
 			std::string zeros = tmp;
 
-			if (strchr(tmp, '.') != NULL) {
-				while (zeros.size() > 1 && (i1 = strrchr(zeros.c_str(), '0')) != NULL) {
+			if (strchr(tmp, '.') != nullptr) {
+				while (zeros.size() > 1 && (i1 = strrchr(zeros.c_str(), '0')) != nullptr) {
 					int d1 = (int)(i1-zeros.c_str());
 
 					if (d1 == (int)(zeros.size()-1)) {
@@ -551,7 +551,7 @@ bool Calculator::KeyPressed(jevent::KeyEvent *event)
 		if (strlen(tmp) > 9) {
 			i1 = strchr(tmp, '.');
 
-			if (i1 != NULL) {
+			if (i1 != nullptr) {
 				int d1 = (int)(i1-tmp);
 
 				if (d1 < 9) {
@@ -590,7 +590,7 @@ bool Calculator::KeyPressed(jevent::KeyEvent *event)
 		if (strlen(tmp) > 9) {
 			char *i1 = strchr(tmp, '.');
 
-			if (i1 != NULL) {
+			if (i1 != nullptr) {
 				int d1 = (int)(i1-tmp);
 
 				if (d1 < 9) {
@@ -631,7 +631,7 @@ void Calculator::ActionPerformed(jevent::ActionEvent *event)
 		if (strlen(tmp) > 9) {
 			i1 = strchr(tmp, '.');
 
-			if (i1 != NULL) {
+			if (i1 != nullptr) {
 				int d1 = (int)(i1-tmp);
 
 				if (d1 < 9) {
@@ -670,7 +670,7 @@ void Calculator::ActionPerformed(jevent::ActionEvent *event)
 		if (strlen(tmp) > 9) {
 			char *i1 = strchr(tmp, '.');
 
-			if (i1 != NULL) {
+			if (i1 != nullptr) {
 				int d1 = (int)(i1-tmp);
 
 				if (d1 < 9) {

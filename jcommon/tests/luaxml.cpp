@@ -157,7 +157,7 @@ std::string xmlmap(std::string id)
 	
 	psg = doc.RootElement();
 
-	if (psg == NULL) {
+	if (psg == nullptr) {
 		return "";
 	}
 
@@ -166,7 +166,7 @@ std::string xmlmap(std::string id)
 	while (i < tags.size()) {
 		struct luaxml_t t = tags[i];
 
-		if (psg == NULL) {
+		if (psg == nullptr) {
 			return "";
 		}
 
@@ -181,7 +181,7 @@ std::string xmlmap(std::string id)
 
 				psg = psg->NextSiblingElement();
 
-				if (psg == NULL) {
+				if (psg == nullptr) {
 					return "";
 				}
 			}
@@ -201,7 +201,7 @@ std::string xmlmap(std::string id)
 			}
 		} else if (t.field == 1) {
 			if (t.id != "") {
-				if (psg->Attribute(t.id.c_str()) != NULL) {
+				if (psg->Attribute(t.id.c_str()) != nullptr) {
 					return psg->Attribute(t.id.c_str());
 				} else {
 					return "";
@@ -212,7 +212,7 @@ std::string xmlmap(std::string id)
 				for (j=0; j<t.index; j++) {
 					attr = attr->Next();
 
-					if (attr == NULL) {
+					if (attr == nullptr) {
 						return "";
 					}
 				}

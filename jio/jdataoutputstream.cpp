@@ -27,7 +27,7 @@ DataOutputStream::DataOutputStream(OutputStream *os):
 {
     jcommon::Object::SetClassName("jio::DataOutputStream");
 	
-	if ((void *)os == NULL) {
+	if ((void *)os == nullptr) {
 		throw jexception::IOException("Null pointer exception");
 	}
 
@@ -45,7 +45,7 @@ bool DataOutputStream::IsEmpty()
 
 int64_t DataOutputStream::Available()
 {
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		return _stream->Available();
 	}
 
@@ -119,7 +119,7 @@ void DataOutputStream::Seek(int64_t index)
 
 int64_t DataOutputStream::Flush()
 {
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		std::string data = GetData();
 
 		Write(data.c_str(), data.size());
@@ -132,14 +132,14 @@ int64_t DataOutputStream::Flush()
 
 void DataOutputStream::Close()
 {
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		_stream->Close();
 	}
 }
 
 int64_t DataOutputStream::GetSentBytes()
 {
-	if (_stream != NULL) {
+	if (_stream != nullptr) {
 		_stream->GetSentBytes();
 	}
 

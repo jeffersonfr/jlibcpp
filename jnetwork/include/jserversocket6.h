@@ -71,7 +71,7 @@ class ServerSocket6 : public virtual jcommon::Object {
 		 * \brief Constructor.
 		 *
 		 */
-		ServerSocket6(int port, int backlog = 5, InetAddress * = NULL);
+		ServerSocket6(int port, int backlog = 5, InetAddress * = nullptr);
 
 		/**
 		 * \brief Destructor virtual.

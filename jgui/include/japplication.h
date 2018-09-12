@@ -47,7 +47,7 @@ class Application : public jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual void InternalInit(int argc = 0, char **argv = NULL);
+		virtual void InternalInit(int argc = 0, char **argv = nullptr);
 
 		/**
 		 * \brief
@@ -72,7 +72,7 @@ class Application : public jcommon::Object {
 		 * \brief
 		 *
 		 */
-		static void Init(int argc = 0, char **argv = NULL);
+		static void Init(int argc = 0, char **argv = nullptr);
 
 		/**
 		 * \brief

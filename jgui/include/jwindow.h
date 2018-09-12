@@ -255,7 +255,7 @@ class Window : public jgui::Container {
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(Component *cmp = NULL);
+		virtual void Repaint(Component *cmp = nullptr);
 		
 		/**
 		 * \brief

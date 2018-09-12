@@ -32,11 +32,11 @@
 namespace jgui {
 
 /** \brief */
-static SDL_Window *_window = NULL;
+static SDL_Window *_window = nullptr;
 /** \brief */
-static SDL_Renderer *_renderer = NULL;
+static SDL_Renderer *_renderer = nullptr;
 /** \brief */
-static jgui::Image *_icon = NULL;
+static jgui::Image *_icon = nullptr;
 /** \brief */
 static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
 /** \brief */
@@ -46,7 +46,7 @@ static int _mouse_y;
 /** \brief */
 static int _click_count;
 /** \brief */
-static Window *g_window = NULL;
+static Window *g_window = nullptr;
 /** \brief */
 static jcursor_style_t _cursor = JCS_DEFAULT;
 
@@ -369,7 +369,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
 void NativeApplication::InternalPaint()
 {
-	if (g_window == NULL || g_window->IsVisible() == false) {
+	if (g_window == nullptr || g_window->IsVisible() == false) {
 		return;
 	}
 
@@ -395,7 +395,7 @@ void NativeApplication::InternalPaint()
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
-  if (cairo_surface == NULL) {
+  if (cairo_surface == nullptr) {
     delete buffer;
 
     return;
@@ -409,7 +409,7 @@ void NativeApplication::InternalPaint()
 
   uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-  if (data == NULL) {
+  if (data == nullptr) {
     delete buffer;
 
     return;
@@ -418,7 +418,7 @@ void NativeApplication::InternalPaint()
   SDL_Surface *surface = SDL_CreateRGBSurfaceFrom(data, dw, dh, 32, dw*4, 0, 0, 0, 0);
   SDL_Texture *texture = SDL_CreateTextureFromSurface(_renderer, surface);
 
-  if (texture == NULL) {
+  if (texture == nullptr) {
     SDL_FreeSurface(surface);
 
     delete buffer;
@@ -433,7 +433,7 @@ void NativeApplication::InternalPaint()
   dst.w = dw;
   dst.h = dh;
 
-  SDL_RenderCopy(_renderer, texture, NULL, &dst);
+  SDL_RenderCopy(_renderer, texture, nullptr, &dst);
 
   /* INFO:: dirty region
    SDL_Rect src, dst;
@@ -461,7 +461,7 @@ void NativeApplication::InternalPaint()
   cairo_surface_destroy(cairo_surface);
 
   delete buffer;
-  buffer = NULL;
+  buffer = nullptr;
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
@@ -477,7 +477,7 @@ void NativeApplication::InternalLoop()
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
 
-      if (dynamic_cast<jevent::WindowEvent *>(event) != NULL) {
+      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
         jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
 
         if (window_event->GetType() == jevent::JWET_PAINTED) {
@@ -492,7 +492,7 @@ void NativeApplication::InternalLoop()
         events.erase(events.begin());
 
         delete event;
-        event = NULL;
+        event = nullptr;
       }
     }
 
@@ -624,7 +624,7 @@ void NativeApplication::InternalLoop()
           mouse_z = event.motion.y;
         }
 
-        uint32_t state = SDL_GetMouseState(NULL, NULL);
+        uint32_t state = SDL_GetMouseState(nullptr, nullptr);
 
         if ((state & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0) {
           buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
@@ -676,13 +676,13 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (_window != NULL) {
+	if (_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
   _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_window = NULL;
+	_window = nullptr;
 	_mouse_x = 0;
 	_mouse_y = 0;
 	_last_keypress = std::chrono::steady_clock::now();
@@ -694,14 +694,14 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	// INFO:: create the main window
 	_window = SDL_CreateWindow("Main", x, y, width, height, flags);
 
-	if (_window == NULL) {
+	if (_window == nullptr) {
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
 	_renderer = SDL_CreateRenderer(_window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	// _renderer = SDL_CreateRenderer(_window, 0, SDL_RENDERER_SOFTWARE); // SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
 
-	if (_renderer == NULL) {
+	if (_renderer == nullptr) {
 		throw jexception::RuntimeException("Cannot get a window's surface");
 	}
 
@@ -721,7 +721,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 NativeWindow::~NativeWindow()
 {
   delete g_window;
-  g_window = NULL;
+  g_window = nullptr;
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -738,7 +738,7 @@ void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
-  if (parent == NULL) {
+  if (parent == nullptr) {
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
@@ -746,7 +746,7 @@ void NativeWindow::SetParent(jgui::Container *c)
   // TODO:: pegar os windows por evento ou algo assim
   g_window = parent;
 
-  g_window->SetParent(NULL);
+  g_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
@@ -906,20 +906,20 @@ void NativeWindow::SetCursor(jcursor_style_t style)
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
-	if ((void *)shape == NULL) {
+	if ((void *)shape == nullptr) {
 		return;
 	}
 
 	jsize_t t = shape->GetSize();
-	uint32_t *data = NULL;
+	uint32_t *data = nullptr;
 
 	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		return;
 	}
 
-	SDL_Surface *surface = NULL;
+	SDL_Surface *surface = nullptr;
 	uint32_t rmask = 0x000000ff;
 	uint32_t gmask = 0x0000ff00;
 	uint32_t bmask = 0x00ff0000;
@@ -934,7 +934,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 
 	surface = SDL_CreateRGBSurfaceFrom(data, t.width, t.height, 32, t.width*4, rmask, gmask, bmask, amask);
 
-	if (surface == NULL) {
+	if (surface == nullptr) {
 		delete [] data;
 
 		return;
@@ -942,7 +942,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 
 	SDL_Cursor *cursor = SDL_CreateColorCursor(surface, hotx, hoty);
 
-	if (cursor != NULL) {
+	if (cursor != nullptr) {
 		SDL_SetCursor(cursor);
 		// SDL_FreeCursor(cursor);
 	}

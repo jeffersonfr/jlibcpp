@@ -268,7 +268,7 @@ int main(int argc, char* argv[])
 {
 	jgui::Application::Init(argc, argv);
 
-	srand(time(NULL));
+	srand(time(nullptr));
 
 	Tree app;
 

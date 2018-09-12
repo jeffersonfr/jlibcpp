@@ -225,7 +225,7 @@ void CheckButton::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -278,7 +278,7 @@ void CheckButton::Paint(Graphics *g)
 
   x = x + major + 8;
 
-	if (font != NULL) {
+	if (font != nullptr) {
 		g->SetFont(font);
 
 		if (IsEnabled() == true) {
@@ -303,7 +303,7 @@ void CheckButton::Paint(Graphics *g)
 
 void CheckButton::RegisterToggleListener(jevent::ToggleListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -316,7 +316,7 @@ void CheckButton::RegisterToggleListener(jevent::ToggleListener *listener)
 
 void CheckButton::RemoveToggleListener(jevent::ToggleListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -327,7 +327,7 @@ void CheckButton::RemoveToggleListener(jevent::ToggleListener *listener)
 
 void CheckButton::DispatchToggleEvent(jevent::ToggleEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

@@ -80,7 +80,7 @@ Synthesizer::Synthesizer(std::string device_name, int channels, int sample_rate)
 	int err;
 
 	_device_name = device_name; // "default", "plughw:0,0";
-	_output = NULL;
+	_output = nullptr;
 	_function = square_wave;
 	_format = SND_PCM_FORMAT_S16;
 	_sample_rate = sample_rate;
@@ -408,7 +408,7 @@ void Synthesizer::Play(int channel, double frequency, double duration)
 
 	samples = (short int *)malloc((_period_size*_channels*snd_pcm_format_width(_format))/8);
 
-	if (samples == NULL) {
+	if (samples == nullptr) {
 		return;
 	}
 

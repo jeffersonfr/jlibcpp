@@ -36,8 +36,8 @@ LocalSocket::LocalSocket(std::string file, int timeout_, int rbuf_, int wbuf_):
 
 	_file = file;
 
-	_is = NULL;
-	_os = NULL;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -57,14 +57,14 @@ LocalSocket::~LocalSocket()
 	} catch (...) {
 	}
 
-	if (_is != NULL) {
+	if (_is != nullptr) {
 		delete _is;
-		_is = NULL;
+		_is = nullptr;
 	}
 
-	if (_os != NULL) {
+	if (_os != nullptr) {
 		delete _os;
-		_os = NULL;
+		_os = nullptr;
 	}
 }
 

@@ -23,7 +23,7 @@
 
 namespace jlogger {
 
-LoggerManager *LoggerManager::_manager = NULL;
+LoggerManager *LoggerManager::_manager = nullptr;
 
 LoggerManager::LoggerManager():
 	jcommon::Object()
@@ -37,7 +37,7 @@ LoggerManager::~LoggerManager()
 
 LoggerManager * LoggerManager::GetInstance()
 {
-	if (_manager == NULL) {
+	if (_manager == nullptr) {
 		_manager = new LoggerManager();
 	}
 
@@ -52,17 +52,17 @@ Logger * LoggerManager::CreateLogger(LoggerHandler *handler_, Formatter *format_
 	h = handler_;
 	f = format_;
     
-	if (h == NULL) {
+	if (h == nullptr) {
 		h = new ConsoleHandler();
 	}
    
-	if (f == NULL) {
+	if (f == nullptr) {
 		f = new SimpleFormatter();
 	}
    
 	Logger *l = new Logger(h, f);
    
-	if (group_ != NULL) {
+	if (group_ != nullptr) {
 		group_->AddLogger(l);
 	}
 	

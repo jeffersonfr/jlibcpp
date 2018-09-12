@@ -77,7 +77,7 @@ int64_t ProcessOutputStream::Write(const char *data, int64_t size)
 		waittime.tv_sec = 1L;	// TODO:: usuario especifica ou use pool
 		waittime.tv_usec = 0L;
 
-		if (select(_fd+1, NULL, &writefs, NULL, &waittime) < 0) {
+		if (select(_fd+1, nullptr, &writefs, nullptr, &waittime) < 0) {
 			return -1LL;
 		}
 

@@ -45,9 +45,9 @@ Graphics::Graphics(cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, i
 	_translate.x = 0;
 	_translate.y = 0;
 	_is_vertical_sync_enabled = false;
-	_font = NULL;
+	_font = nullptr;
 
-	_pen.dashes = NULL;
+	_pen.dashes = nullptr;
 	_pen.dashes_size = 0;
 	_pen.width = 1;
 	_pen.join = JLJ_MITER;
@@ -58,10 +58,10 @@ Graphics::Graphics(cairo_t *cairo_context, jpixelformat_t pixelformat, int wp, i
 	_clip.width = wp;
 	_clip.height = hp;
 
-	if (cairo_context != NULL) {
+	if (cairo_context != nullptr) {
 		_cairo_context = cairo_context;
 	} else {
-		cairo_surface_t *cairo_surface = NULL;
+		cairo_surface_t *cairo_surface = nullptr;
 		cairo_format_t format = CAIRO_FORMAT_INVALID;
 
 		if (_pixelformat == JPF_ARGB) {
@@ -102,7 +102,7 @@ std::string Graphics::Dump(std::string dir, std::string prefix)
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		throw jexception::NullPointerException("The surface is null");
 	}
 
@@ -116,7 +116,7 @@ std::string Graphics::Dump(std::string dir, std::string prefix)
 
 	jio::File *temp = jio::File::CreateTemporaryFile(dir, prefix, ".png");
 
-	if (temp == NULL) {
+	if (temp == nullptr) {
 		throw jexception::IOException("Cannot create the temporary image file");
 	}
 
@@ -322,17 +322,17 @@ void Graphics::SetColor(int red, int green, int blue, int alpha)
 
 bool Graphics::HasFont()
 {
-	return (_font != NULL);
+	return (_font != nullptr);
 }
 
 void Graphics::SetFont(Font *font)
 {
 	_font = font;
 	
-	if (_font != NULL) {
+	if (_font != nullptr) {
 		_font->ApplyContext(_cairo_context);
 	} else {
-		cairo_set_font_face(_cairo_context, NULL);
+		cairo_set_font_face(_cairo_context, nullptr);
 	}
 }
 
@@ -1224,7 +1224,7 @@ jregion_t Graphics::GetGlyphExtends(int symbol)
 
 void Graphics::DrawString(std::string text, int xp, int yp)
 {
-	if (_font == NULL) {
+	if (_font == nullptr) {
 		return;
 	}
 
@@ -1235,7 +1235,7 @@ void Graphics::DrawString(std::string text, int xp, int yp)
 
 	const char *utf8 = text.c_str();
 	int utf8_len = text.size();
-	cairo_glyph_t *glyphs = NULL;
+	cairo_glyph_t *glyphs = nullptr;
 	int glyphs_len = 0;
 	cairo_status_t status;
 
@@ -1246,7 +1246,7 @@ void Graphics::DrawString(std::string text, int xp, int yp)
 	}
 
 	status = cairo_scaled_font_text_to_glyphs(
-			font->GetScaledFont(), x, y+_font->GetAscender(), utf8, utf8_len, &glyphs, &glyphs_len, NULL, NULL, NULL);
+			font->GetScaledFont(), x, y+_font->GetAscender(), utf8, utf8_len, &glyphs, &glyphs_len, nullptr, nullptr, nullptr);
 
 	if (status == CAIRO_STATUS_SUCCESS) {
 		cairo_show_glyphs(_cairo_context, glyphs, glyphs_len);
@@ -1262,7 +1262,7 @@ void Graphics::DrawString(std::string text, int xp, int yp)
 
 void Graphics::DrawGlyph(int symbol, int xp, int yp)
 {
-	if (_font == NULL) {
+	if (_font == nullptr) {
 		return;
 	}
 
@@ -1291,7 +1291,7 @@ jpoint_t Graphics::Translate()
 
 void Graphics::DrawString(std::string text, int xp, int yp, int wp, int hp, jhorizontal_align_t halign, jvertical_align_t valign, bool clipped)
 {
-	if (_font == NULL) {
+	if (_font == nullptr) {
 		return;
 	}
 
@@ -1435,7 +1435,7 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		return pixel;
 	}
 
@@ -1452,7 +1452,7 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		return pixel;
 	}
 
@@ -1463,13 +1463,13 @@ uint32_t Graphics::GetRGB(int xp, int yp, uint32_t pixel)
 
 void Graphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
-	if (rgb == NULL) {
+	if (rgb == nullptr) {
 		throw jexception::NullPointerException("Pixel array is null");
 	}
 
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		return;
 	}
 
@@ -1486,13 +1486,13 @@ void Graphics::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		return;
 	}
 
 	uint32_t *ptr = (*rgb);
 
-	if (ptr == NULL) {
+	if (ptr == nullptr) {
 		ptr = new uint32_t[hp*wp];
 	}
 
@@ -1565,13 +1565,13 @@ void Graphics::SetRGB(uint32_t rgb, int xp, int yp)
 
 void Graphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp) 
 {
-	if (rgb == NULL) {
+	if (rgb == nullptr) {
 		throw jexception::NullPointerException("Pixel array is null");
 	}
 
 	cairo_surface_t *cairo_surface = cairo_get_target(_cairo_context);
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		return;
 	}
 
@@ -1589,7 +1589,7 @@ void Graphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 	int stride = cairo_image_surface_get_stride(cairo_surface);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		return;
 	}
 
@@ -1925,17 +1925,17 @@ void Graphics::SetRGBArray(uint32_t *rgb, int xp, int yp, int wp, int hp)
 
 bool Graphics::DrawImage(Image *img, int xp, int yp)
 {
-	if ((void *)img == NULL) {
+	if ((void *)img == nullptr) {
 		return false;
 	}
 
   Graphics *g = img->GetGraphics();
   jsize_t size = img->GetSize();
 
-	if (g != NULL) {
+	if (g != nullptr) {
 		cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
-		if (cairo_surface == NULL) {
+		if (cairo_surface == nullptr) {
 			return false;
 		}
 
@@ -1952,11 +1952,11 @@ bool Graphics::DrawImage(Image *img, int xp, int yp)
 
 		SetClip(clip.x, clip.y, clip.width, clip.height);
 	} else {
-		uint32_t *rgb = NULL;
+		uint32_t *rgb = nullptr;
 
 		img->GetRGBArray(&rgb, 0, 0, size.width, size.height);
 	
-		if (rgb != NULL) {
+		if (rgb != nullptr) {
 			SetRGBArray(rgb, xp, yp, size.width, size.height);
 
 			delete [] rgb;
@@ -1970,7 +1970,7 @@ bool Graphics::DrawImage(Image *img, int xp, int yp)
 
 bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 {
-	if ((void *)img == NULL) {
+	if ((void *)img == nullptr) {
 		return false;
 	}
 
@@ -1984,16 +1984,16 @@ bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 
 	jgui::Image *scl = img->Scale(wp, hp);
 
-	if (scl == NULL) {
+	if (scl == nullptr) {
 		return false;
 	}
 
 	Graphics *g = scl->GetGraphics();
 
-	if (g != NULL) {
+	if (g != nullptr) {
 		cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
-		if (cairo_surface == NULL) {
+		if (cairo_surface == nullptr) {
 			return false;
 		}
 
@@ -2010,11 +2010,11 @@ bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 
 		SetClip(clip.x, clip.y, clip.width, clip.height);
 	} else {
-		uint32_t *rgb = NULL;
+		uint32_t *rgb = nullptr;
 
 		scl->GetRGBArray(&rgb, 0, 0, wp, hp);
 	
-		if (rgb != NULL) {
+		if (rgb != nullptr) {
 			SetRGBArray(rgb, xp, yp, wp, hp);
 
 			delete [] rgb;
@@ -2030,7 +2030,7 @@ bool Graphics::DrawImage(Image *img, int xp, int yp, int wp, int hp)
 
 bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp)
 {
-	if ((void *)img == NULL) {
+	if ((void *)img == nullptr) {
 		return false;
 	}
 
@@ -2039,7 +2039,7 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 
 bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp, int yp, int wp, int hp)
 {
-	if ((void *)img == NULL) {
+	if ((void *)img == nullptr) {
 		return false;
 	}
 
@@ -2053,13 +2053,13 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 
 	jgui::Image *aux = img->Crop(sxp, syp, swp, shp);
 
-	if (aux == NULL) {
+	if (aux == nullptr) {
 		return false;
 	}
 
 	jgui::Image *scl = aux->Scale(wp, hp);
 
-	if (scl == NULL) {
+	if (scl == nullptr) {
 		return false;
 	}
 
@@ -2067,10 +2067,10 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 
 	Graphics *g = scl->GetGraphics();
 
-	if (g != NULL) {
+	if (g != nullptr) {
 		cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
-		if (cairo_surface == NULL) {
+		if (cairo_surface == nullptr) {
 			return false;
 		}
 
@@ -2087,11 +2087,11 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 
 		SetClip(clip.x, clip.y, clip.width, clip.height);
 	} else {
-		uint32_t *rgb = NULL;
+		uint32_t *rgb = nullptr;
 
 		scl->GetRGBArray(&rgb, 0, 0, wp, hp);
 	
-		if (rgb != NULL) {
+		if (rgb != nullptr) {
 			SetRGBArray(rgb, xp, yp, wp, hp);
 
 			delete [] rgb;
@@ -2105,13 +2105,13 @@ bool Graphics::DrawImage(Image *img, int sxp, int syp, int swp, int shp, int xp,
 
 void Graphics::SetPattern(Image *image)
 {
-	if (image == NULL) {
+	if (image == nullptr) {
 		return;
 	}
 
 	cairo_surface_t *cairo_surface = cairo_get_target(image->GetGraphics()->GetCairoContext());
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		return;
 	}
 
@@ -2259,7 +2259,7 @@ void Graphics::TextTo(std::string text, int xp, int yp)
 {
 	Font *font = dynamic_cast<Font *>(GetFont());
 
-	if (font == NULL) {
+	if (font == nullptr) {
 		return;
 	}
 
@@ -2270,7 +2270,7 @@ void Graphics::TextTo(std::string text, int xp, int yp)
 
 	const char *utf8 = text.c_str();
 	int utf8_len = text.size();
-	cairo_glyph_t *glyphs = NULL;
+	cairo_glyph_t *glyphs = nullptr;
 	int glyphs_len = 0;
 	cairo_status_t status;
 
@@ -2281,7 +2281,7 @@ void Graphics::TextTo(std::string text, int xp, int yp)
 	}
 
 	status = cairo_scaled_font_text_to_glyphs(
-			font->GetScaledFont(), x, y+font->GetAscender(), utf8, utf8_len, &glyphs, &glyphs_len, NULL, NULL, NULL);
+			font->GetScaledFont(), x, y+font->GetAscender(), utf8, utf8_len, &glyphs, &glyphs_len, nullptr, nullptr, nullptr);
 
 	if (status == CAIRO_STATUS_SUCCESS) {
 		cairo_glyph_path(_cairo_context, glyphs, glyphs_len);
@@ -2320,7 +2320,7 @@ void Graphics::SetSource(Image *image)
 {
 	Graphics *g = dynamic_cast<Graphics *>(image->GetGraphics());
 
-	if (g == NULL) {
+	if (g == nullptr) {
 		return;
 	}
 
@@ -2333,7 +2333,7 @@ void Graphics::SetMask(Image *image)
 {
 	Graphics *g = dynamic_cast<Graphics *>(image->GetGraphics());
 
-	if (g == NULL) {
+	if (g == nullptr) {
 		return;
 	}
 
@@ -2355,7 +2355,7 @@ void Graphics::Reset()
 	// _translate.x = 0;
 	// _translate.y = 0;
 
-	_pen.dashes = NULL;
+	_pen.dashes = nullptr;
 	_pen.dashes_size = 0;
 	_pen.width = 1;
 	_pen.join = JLJ_MITER;

@@ -360,14 +360,14 @@ class GridBagLayoutInfo {
 			this->height = height;
 			this->startx = 0;
 			this->starty = 0;	
-			this->minWidth = NULL;
-			this->minHeight = NULL;	
-			this->maxAscent = NULL;	
-			this->maxDescent = NULL;
-			this->weightX = NULL;
-			this->weightY = NULL;
+			this->minWidth = nullptr;
+			this->minHeight = nullptr;	
+			this->maxAscent = nullptr;	
+			this->maxDescent = nullptr;
+			this->weightX = nullptr;
+			this->weightY = nullptr;
 			this->hasBaseline = false;
-			this->baselineType = NULL;
+			this->baselineType = nullptr;
 			this->minWidthSize = 0;
 			this->minHeightSize = 0;
 			this->maxAscentSize = 0;
@@ -379,31 +379,31 @@ class GridBagLayoutInfo {
 
 		virtual ~GridBagLayoutInfo() 
 		{
-			if (minWidth != NULL) {
+			if (minWidth != nullptr) {
 				delete minWidth;
 			}
 
-			if (minHeight != NULL) {
+			if (minHeight != nullptr) {
 				delete minHeight;
 			}
 
-			if (maxAscent != NULL) {
+			if (maxAscent != nullptr) {
 				delete maxAscent;
 			}
 
-			if (maxDescent != NULL) {
+			if (maxDescent != nullptr) {
 				delete maxDescent;
 			}
 
-			if (weightX != NULL) {
+			if (weightX != nullptr) {
 				delete weightX;
 			}
 
-			if (weightY != NULL) {
+			if (weightY != nullptr) {
 				delete weightY;
 			}
 
-			if (baselineType != NULL) {
+			if (baselineType != nullptr) {
 				delete baselineType;
 			}
 		}

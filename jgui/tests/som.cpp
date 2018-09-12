@@ -285,7 +285,7 @@ class SOM : public jgui::Window {
 			g->SetColor(bkC);
 			g->FillRectangle(0, 0, size.width, size.height);
 
-			if ((offscreen == NULL) || ((imagewidth != w) || (imageheight != h))) {
+			if ((offscreen == nullptr) || ((imagewidth != w) || (imageheight != h))) {
 				offscreen = new jgui::BufferedImage(jgui::JPF_ARGB, w, h);
 				imagewidth = w;
 				imageheight = h;
@@ -308,7 +308,7 @@ int main(int argc, char **argv)
 {
 	jgui::Application::Init(argc, argv);
 
-	srand(time(NULL));
+	srand(time(nullptr));
 
 	SOM app;
 

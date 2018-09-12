@@ -81,7 +81,7 @@ class Main : public jgui::Window {
 #endif
 		{
 #if ENABLE_GUI == 1
-			foffscreen = NULL;
+			foffscreen = nullptr;
 
       fweights = new jgui::Font("default", jgui::JFA_NORMAL, 8);
 #endif
@@ -92,7 +92,7 @@ class Main : public jgui::Window {
 			
 			std::cout << "random seed:: " << r << std::endl;
 
-			srand(time(NULL));
+			srand(time(nullptr));
 
 			max_value = 0;
 			min_value = 9999;
@@ -271,7 +271,7 @@ class Main : public jgui::Window {
 				size = GetSize();
 			char tmp[255];
 
-			if (foffscreen == NULL) {
+			if (foffscreen == nullptr) {
 				foffscreen = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
 			
 				jgui::Graphics *goff = foffscreen->GetGraphics();
@@ -334,7 +334,7 @@ int main(int argc, char **argv)
 {
 	jgui::Application::Init(argc, argv);
 
-	Main app(time(NULL));
+	Main app(time(nullptr));
 	
 #if ENABLE_GUI == 1
 	app.SetTitle("Ants");

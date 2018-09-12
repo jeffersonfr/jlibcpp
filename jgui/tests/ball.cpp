@@ -62,7 +62,7 @@ class Ball {
 	public:
 		Ball(double tx, double ty) 
 		{
-			_image = NULL;
+			_image = nullptr;
 
 			r = 0;
 			x = tx;
@@ -156,7 +156,7 @@ class Ball {
 
 		void Draw(jgui::Graphics *g) 
 		{
-			if (_image != NULL)
+			if (_image != nullptr)
 				g->DrawImage(_image, (int)x-w/2, (int)y-h/2);
 		}
 
@@ -270,7 +270,7 @@ class BallDrop : public jgui::Window {
         size = GetSize();
 
 			// Create the background image if necessary
-			if ((backImage == NULL) || (size.width != backDimension.width) || (size.height != backDimension.height) ) {
+			if ((backImage == nullptr) || (size.width != backDimension.width) || (size.height != backDimension.height) ) {
 				jgui::Graphics *backGraphics;
 
 				backDimension = size;
@@ -288,7 +288,7 @@ class BallDrop : public jgui::Window {
 				UpdateRack(backImage->GetGraphics());
 			}
 
-			if ( (offImage == NULL) || (size.width != offDimension.width) || (size.height != offDimension.height) ) {
+			if ( (offImage == nullptr) || (size.width != offDimension.width) || (size.height != offDimension.height) ) {
 				offDimension = size;
 				offImage = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
 			}

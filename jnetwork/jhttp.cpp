@@ -169,7 +169,7 @@ int HTTPlexer::GetToken()
 char * HTTPlexer::GetToken(int &len) 
 {
 	if(cur <= pos) {
-		return NULL;
+		return nullptr;
 	}
 
 	len = cur-pos;
@@ -328,9 +328,9 @@ bool HTTP::Fim()
 	
 	end = strstr(buffer,"\r\n\r\n");
 	
-	if(end == NULL) {
+	if(end == nullptr) {
 		end = strstr(buffer,"\n\n");
-		if(end == NULL) {
+		if(end == nullptr) {
 			return false;
 		}
 	}
@@ -554,11 +554,11 @@ bool HTTP::Parsear()
 
 std::string HTTP::GetMIME() 
 {
-	char * ext = NULL;
+	char * ext = nullptr;
 
 	ext = rindex(r.arquivo,'.');
 
-	if(ext == NULL) 
+	if(ext == nullptr) 
 		return "application/octet-stream";
 	ext++;
 	if(!strcasecmp(ext,"avi")) {
@@ -647,7 +647,7 @@ char * HTTP::GetHeader(const char * header)
 			return r.cabecalho[i]->valor;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 char * HTTP::GetQuery(const char * query) 
@@ -657,7 +657,7 @@ char * HTTP::GetQuery(const char * query)
 			return r.query[i].valor;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void HTTP::Clear() 
@@ -667,7 +667,7 @@ void HTTP::Clear()
 	r.codigo = 0;
 	r.metodo = JHM_ERROR;
 	r.arquivo[0] = 0;
-	r.body = NULL;
+	r.body = nullptr;
 	r.versao = '1';
 
 	memset(buffer, 0, buflen);

@@ -43,8 +43,8 @@ InetAddress6::~InetAddress6()
 
 InetAddress * InetAddress6::GetByName(std::string host_)
 {
-	struct addrinfo *result = NULL;
-	struct addrinfo *ptr = NULL;
+	struct addrinfo *result = nullptr;
+	struct addrinfo *ptr = nullptr;
 	struct addrinfo hints;
 
 	// Setup the hints address info structure which is passed to the getaddrinfo() function
@@ -55,9 +55,9 @@ InetAddress * InetAddress6::GetByName(std::string host_)
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_protocol = 0;
-	hints.ai_canonname = NULL;
-	hints.ai_addr = NULL;
-	hints.ai_next = NULL;
+	hints.ai_canonname = nullptr;
+	hints.ai_addr = nullptr;
+	hints.ai_next = nullptr;
 
 	// Call getaddrinfo(). If the call succeeds, the result variable will hold a linked list 
 	// of addrinfo structures containing response information
@@ -66,7 +66,7 @@ InetAddress * InetAddress6::GetByName(std::string host_)
 	}
 
 	// Retrieve each address and print out the hex bytes
-	for (ptr=result; ptr!=NULL; ptr=ptr->ai_next) {
+	for (ptr=result; ptr!=nullptr; ptr=ptr->ai_next) {
 		switch (ptr->ai_family) {
 			case AF_INET6: {
 				struct sockaddr_in6 *sockaddr_ipv6 = (struct sockaddr_in6 *)ptr->ai_addr;
@@ -84,8 +84,8 @@ std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_)
 {
 	std::vector<InetAddress *> vip;
 
-	struct addrinfo *result = NULL;
-	struct addrinfo *ptr = NULL;
+	struct addrinfo *result = nullptr;
+	struct addrinfo *ptr = nullptr;
 	struct addrinfo hints;
 
 	// Setup the hints address info structure which is passed to the getaddrinfo() function
@@ -96,9 +96,9 @@ std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_)
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_protocol = 0;
-	hints.ai_canonname = NULL;
-	hints.ai_addr = NULL;
-	hints.ai_next = NULL;
+	hints.ai_canonname = nullptr;
+	hints.ai_addr = nullptr;
+	hints.ai_next = nullptr;
 
 	// Call getaddrinfo(). If the call succeeds, the result variable will hold a linked list 
 	// of addrinfo structures containing response information
@@ -107,7 +107,7 @@ std::vector<InetAddress *> InetAddress6::GetAllByName(std::string host_)
 	}
 
 	// Retrieve each address and print out the hex bytes
-	for (ptr=result; ptr!=NULL; ptr=ptr->ai_next) {
+	for (ptr=result; ptr!=nullptr; ptr=ptr->ai_next) {
 		switch (ptr->ai_family) {
 			case AF_INET: {
 				struct sockaddr_in *sockaddr_ipv4 = (struct sockaddr_in *) ptr->ai_addr;

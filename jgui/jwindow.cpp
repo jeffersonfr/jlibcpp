@@ -82,7 +82,7 @@ Window::~Window()
   SetVisible(false);
 
   delete _event_manager;
-  _event_manager = NULL;
+  _event_manager = nullptr;
 
   try {
     _exec_thread.join();
@@ -90,7 +90,7 @@ Window::~Window()
   }
 
   delete _font;
-  _font = NULL;
+  _font = nullptr;
 }
 
 EventManager * Window::GetEventManager()
@@ -230,7 +230,7 @@ void Window::Repaint(Component *cmp)
 
 void Window::PushEvent(jevent::EventObject *event)
 {
-  if ((void *)event == NULL) {
+  if ((void *)event == nullptr) {
     return;
   }
 
@@ -269,7 +269,7 @@ void Window::PaintGlassPane(Graphics *g)
 
 	Theme *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -289,7 +289,7 @@ void Window::PaintGlassPane(Graphics *g)
 		int count = insets.right;
 
 		for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
-			if (font != NULL) {
+			if (font != nullptr) {
 				count += font->GetStringWidth((*i).subtitle.c_str());
 
 				g->SetColor(fg);
@@ -298,7 +298,7 @@ void Window::PaintGlassPane(Graphics *g)
 
 			count += 8;
 
-			if ((*i).image != NULL) {
+			if ((*i).image != nullptr) {
 				count += SUBTITLE_SIZE;
 
 				g->DrawImage((*i).image, size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
@@ -328,7 +328,7 @@ void Window::PaintGlassPane(Graphics *g)
 		g->FillLinearGradient(bordersize, bordersize, size.width-2*bordersize, insets.top-2*bordersize, 0, 0, 0, insets.top-2*bordersize);
 		g->ResetGradientStop();
 
-		if (font != NULL) {
+		if (font != nullptr) {
 			int y = (insets.top-font->GetSize())/2;
 
 			if (y < 0) {
@@ -347,7 +347,7 @@ void Window::PaintGlassPane(Graphics *g)
 		}
 	}
 
-	if (_icon_image != NULL) {
+	if (_icon_image != nullptr) {
 		int h = (insets.top-20);
 
 		if (h > 0) {
@@ -359,7 +359,7 @@ void Window::PaintGlassPane(Graphics *g)
 		int count = insets.right;
 
 		for (std::vector<frame_subtitle_t>::iterator i=_subtitles.begin(); i!=_subtitles.end(); i++) {
-			if (font != NULL) {
+			if (font != nullptr) {
 				count += font->GetStringWidth((*i).subtitle.c_str());
 
 				g->SetColor(fg);
@@ -368,7 +368,7 @@ void Window::PaintGlassPane(Graphics *g)
 
 			count += 8;
 
-			if ((*i).image != NULL) {
+			if ((*i).image != nullptr) {
 				count += SUBTITLE_SIZE;
 
 				g->DrawImage((*i).image, size.width-count, size.height-insets.bottom+8, SUBTITLE_SIZE, SUBTITLE_SIZE);
@@ -644,7 +644,7 @@ std::vector<jevent::MouseListener *> & Window::GetMouseListeners()
 
 void Window::RegisterWindowListener(jevent::WindowListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -657,7 +657,7 @@ void Window::RegisterWindowListener(jevent::WindowListener *listener)
 
 void Window::RemoveWindowListener(jevent::WindowListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -668,7 +668,7 @@ void Window::RemoveWindowListener(jevent::WindowListener *listener)
 
 void Window::DispatchWindowEvent(jevent::WindowEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

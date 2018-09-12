@@ -48,7 +48,7 @@ SSLSocketOutputStream::SSLSocketOutputStream(Connection *connection_, void *ssl,
 	try {
 		_buffer = new char[(uint32_t)_buffer_length];
 	} catch (std::bad_alloc &e) {
-		_buffer = NULL;
+		_buffer = nullptr;
 
 		_buffer_length = 0;
 		_current_index = 0;
@@ -57,7 +57,7 @@ SSLSocketOutputStream::SSLSocketOutputStream(Connection *connection_, void *ssl,
 
 SSLSocketOutputStream::~SSLSocketOutputStream()
 {
-	if (_buffer != NULL) {
+	if (_buffer != nullptr) {
 		delete [] _buffer;
 	}
 }

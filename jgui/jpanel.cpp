@@ -85,7 +85,7 @@ void Panel::PaintGlassPane(Graphics *g)
 {
 	Theme *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -108,7 +108,7 @@ void Panel::PaintGlassPane(Graphics *g)
 		g->FillLinearGradient(bs, bs, size.width - 2*bs, insets.top - 2*bs, 0, 0, 0, insets.top - 2*bs);
 		g->ResetGradientStop();
 
-		if (font != NULL) {
+		if (font != nullptr) {
 			int y = (insets.top-font->GetSize())/2;
 
 			if (y < 0) {

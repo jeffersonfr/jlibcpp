@@ -23,14 +23,14 @@ extern "C" {
 
 #include <assert.h>
 
-static AVDictionary *format_opts = NULL;
-static AVDictionary *codec_opts = NULL;
+static AVDictionary *format_opts = nullptr;
+static AVDictionary *codec_opts = nullptr;
 static int avplay_initialized = 0;
 
 int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec)
 {
     if (*spec <= '9' && *spec >= '0') /* opt:index */
-        return strtol(spec, NULL, 0) == st->index;
+        return strtol(spec, nullptr, 0) == st->index;
     else if (*spec == 'v' || *spec == 'a' || *spec == 's' || *spec == 'd' ||
              *spec == 't') { /* opt:[vasdt] */
         enum AVMediaType type;
@@ -46,7 +46,7 @@ int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec)
         if (type != st->codecpar->codec_type)
             return 0;
         if (*spec++ == ':') { /* possibly followed by :index */
-            int i, index = strtol(spec, NULL, 0);
+            int i, index = strtol(spec, nullptr, 0);
             for (i = 0; i < (int)s->nb_streams; i++)
                 if (s->streams[i]->codecpar->codec_type == type && index-- == 0)
                    return i == st->index;
@@ -63,7 +63,7 @@ int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec)
                 continue;
 
             if (*endptr++ == ':') {
-                int stream_idx = strtol(endptr, NULL, 0);
+                int stream_idx = strtol(endptr, nullptr, 0);
                 return stream_idx >= 0 &&
                     stream_idx < (int)s->programs[i]->nb_stream_indexes &&
                     st->index == (int)s->programs[i]->stream_index[stream_idx];
@@ -92,7 +92,7 @@ int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec)
         if (!key)
             return AVERROR(ENOMEM);
 
-        tag = av_dict_get(st->metadata, key, NULL, 0);
+        tag = av_dict_get(st->metadata, key, nullptr, 0);
         if (tag) {
             if (!val || !strcmp(tag->value, val + 1))
                 ret = 1;
@@ -135,8 +135,8 @@ int check_stream_specifier(AVFormatContext *s, AVStream *st, const char *spec)
 AVDictionary *filter_codec_opts(AVDictionary *opts, enum AVCodecID codec_id,
                                 AVFormatContext *s, AVStream *st, AVCodec *codec)
 {
-    AVDictionary    *ret = NULL;
-    AVDictionaryEntry *t = NULL;
+    AVDictionary    *ret = nullptr;
+    AVDictionaryEntry *t = nullptr;
     int            flags = s->oformat ? AV_OPT_FLAG_ENCODING_PARAM
                                       : AV_OPT_FLAG_DECODING_PARAM;
     char          prefix = 0;
@@ -171,16 +171,16 @@ AVDictionary *filter_codec_opts(AVDictionary *opts, enum AVCodecID codec_id,
             switch (check_stream_specifier(s, st, p + 1)) {
             case  1: *p = 0; break;
             case  0:         continue;
-            default:         return NULL;
+            default:         return nullptr;
             }
 
-        if (av_opt_find(&cc, t->key, NULL, flags, AV_OPT_SEARCH_FAKE_OBJ) ||
+        if (av_opt_find(&cc, t->key, nullptr, flags, AV_OPT_SEARCH_FAKE_OBJ) ||
             (codec && codec->priv_class &&
-             av_opt_find(&codec->priv_class, t->key, NULL, flags,
+             av_opt_find(&codec->priv_class, t->key, nullptr, flags,
                          AV_OPT_SEARCH_FAKE_OBJ)))
             av_dict_set(&ret, t->key, t->value, 0);
         else if (t->key[0] == prefix &&
-                 av_opt_find(&cc, t->key + 1, NULL, flags,
+                 av_opt_find(&cc, t->key + 1, nullptr, flags,
                              AV_OPT_SEARCH_FAKE_OBJ))
             av_dict_set(&ret, t->key + 1, t->value, 0);
 
@@ -197,16 +197,16 @@ AVDictionary **setup_find_stream_info_opts(AVFormatContext *s,
     AVDictionary **opts;
 
     if (!s->nb_streams)
-        return NULL;
+        return nullptr;
     opts = (AVDictionary**)av_mallocz(s->nb_streams * sizeof(*opts));
     if (!opts) {
-        av_log(NULL, AV_LOG_ERROR,
+        av_log(nullptr, AV_LOG_ERROR,
                "Could not alloc memory for stream options.\n");
-        return NULL;
+        return nullptr;
     }
     for (i = 0; i < (int)s->nb_streams; i++)
         opts[i] = filter_codec_opts(codec_opts, s->streams[i]->codecpar->codec_id,
-                                    s, s->streams[i], NULL);
+                                    s, s->streams[i], nullptr);
     return opts;
 }
 
@@ -246,7 +246,7 @@ static int packet_queue_put(PacketQueue *q, AVPacket *pkt)
     if (!pkt1)
         return -1;
     pkt1->pkt = *pkt;
-    pkt1->next = NULL;
+    pkt1->next = nullptr;
 
     pthread_mutex_lock(&q->mutex);
 
@@ -268,8 +268,8 @@ static int packet_queue_put(PacketQueue *q, AVPacket *pkt)
 static void packet_queue_init(PlayerState *is, PacketQueue *q)
 {
     memset(q, 0, sizeof(PacketQueue));
-    pthread_mutex_init(&q->mutex, NULL);
-    pthread_cond_init(&q->cond, NULL);
+    pthread_mutex_init(&q->mutex, nullptr);
+    pthread_cond_init(&q->cond, nullptr);
     packet_queue_put(q, &is->flush_pkt);
 }
 
@@ -278,13 +278,13 @@ static void packet_queue_flush(PacketQueue *q)
     AVPacketList *pkt, *pkt1;
 
     pthread_mutex_lock(&q->mutex);
-    for (pkt = q->first_pkt; pkt != NULL; pkt = pkt1) {
+    for (pkt = q->first_pkt; pkt != nullptr; pkt = pkt1) {
         pkt1 = pkt->next;
         av_packet_unref(&pkt->pkt);
         av_freep(&pkt);
     }
-    q->last_pkt = NULL;
-    q->first_pkt = NULL;
+    q->last_pkt = nullptr;
+    q->first_pkt = nullptr;
     q->nb_packets = 0;
     q->size = 0;
     pthread_mutex_unlock(&q->mutex);
@@ -326,7 +326,7 @@ static int packet_queue_get(PacketQueue *q, AVPacket *pkt, int block)
         if (pkt1) {
             q->first_pkt = pkt1->next;
             if (!q->first_pkt)
-                q->last_pkt = NULL;
+                q->last_pkt = nullptr;
             q->nb_packets--;
             q->size -= pkt1->pkt.size + sizeof(*pkt1);
             *pkt = pkt1->pkt;
@@ -357,7 +357,7 @@ static void video_image_display(PlayerState *is)
         is->height = vp->height;
         is->no_background = 0;
     
-				if (is->render_callback != NULL) {
+				if (is->render_callback != nullptr) {
 					is->render_callback(is->render_callback_data, vp->bmp[vp->bmp_index], vp->width, vp->height);
 				}
     }
@@ -453,7 +453,7 @@ static void * refresh_thread(void *opaque)
       av_usleep(is->audio_st ? is->rdftspeed * 1000 : 5000); 
 			// av_usleep(5000); 
     }
-    return NULL;
+    return nullptr;
 }
 
 // get the current audio clock value 
@@ -567,7 +567,7 @@ static double compute_target_time(double frame_current_pts, PlayerState *is)
     }
     is->frame_timer += delay;
 
-    av_log(NULL, AV_LOG_TRACE, "video: delay=%0.3f pts=%0.3f A-V=%f\n", delay, frame_current_pts, -diff);
+    av_log(nullptr, AV_LOG_TRACE, "video: delay=%0.3f pts=%0.3f A-V=%f\n", delay, frame_current_pts, -diff);
 
     return is->frame_timer;
 }
@@ -578,19 +578,19 @@ static void player_close(PlayerState *is)
     int i;
     // XXX: use a special url_shutdown call to abort parse cleanly
     is->abort_request = 1;
-    pthread_join(is->parse_tid, NULL);
-    pthread_join(is->refresh_tid, NULL);
+    pthread_join(is->parse_tid, nullptr);
+    pthread_join(is->refresh_tid, nullptr);
 
     // free all pictures 
     for (i = 0; i < VIDEO_PICTURE_QUEUE_SIZE; i++) {
         vp = &is->pictq[i];
         if (vp->bmp[0]) {
             delete [] vp->bmp[0];
-            vp->bmp[0] = NULL;
+            vp->bmp[0] = nullptr;
         }
         if (vp->bmp[1]) {
             delete [] vp->bmp[1];
-            vp->bmp[1] = NULL;
+            vp->bmp[1] = nullptr;
         }
     }
     pthread_mutex_destroy(&is->video_filter_mutex);
@@ -611,12 +611,12 @@ static bool alloc_picture(void *opaque)
 
     if (vp->bmp[0]) {
         delete [] vp->bmp[0];
-        vp->bmp[0] = NULL;
+        vp->bmp[0] = nullptr;
     }
 
     if (vp->bmp[1]) {
         delete [] vp->bmp[1];
-        vp->bmp[1] = NULL;
+        vp->bmp[1] = nullptr;
     }
 
     vp->width   = is->out_video_filter->inputs[0]->w;
@@ -697,9 +697,9 @@ static int queue_picture(PlayerState *is, AVFrame *src_frame, double pts, int64_
         AVPixelFormat fmt = AV_PIX_FMT_RGB32;
 
         struct SwsContext *ctx = 
-          sws_getContext(vp->width, vp->height, (AVPixelFormat)src_frame->format, vp->width, vp->height, fmt, SWS_BICUBIC, NULL, NULL, NULL);
+          sws_getContext(vp->width, vp->height, (AVPixelFormat)src_frame->format, vp->width, vp->height, fmt, SWS_BICUBIC, nullptr, nullptr, nullptr);
 
-        if (ctx != NULL) {
+        if (ctx != nullptr) {
           sws_scale(ctx, src_frame->data, src_frame->linesize, 0, vp->height, data, linesize);
         }
 
@@ -813,7 +813,7 @@ static int configure_video_filters(AVFilterGraph *graph, PlayerState *is, const 
     char sws_flags_str[128];
     char buffersrc_args[256];
     int ret;
-    AVFilterContext *filt_src = NULL, *filt_out = NULL, *last_filter;
+    AVFilterContext *filt_src = nullptr, *filt_out = nullptr, *last_filter;
     AVCodecContext *codec = is->video_dec;
 
     snprintf(sws_flags_str, sizeof(sws_flags_str), "flags=%d", SWS_BICUBIC);
@@ -827,12 +827,12 @@ static int configure_video_filters(AVFilterGraph *graph, PlayerState *is, const 
 
     if ((ret = avfilter_graph_create_filter(&filt_src,
                                             avfilter_get_by_name("buffer"),
-                                            "src", buffersrc_args, NULL,
+                                            "src", buffersrc_args, nullptr,
                                             graph)) < 0)
         return ret;
     if ((ret = avfilter_graph_create_filter(&filt_out,
                                             avfilter_get_by_name("buffersink"),
-                                            "out", NULL, NULL, graph)) < 0)
+                                            "out", nullptr, nullptr, graph)) < 0)
         return ret;
 
     last_filter = filt_out;
@@ -843,7 +843,7 @@ static int configure_video_filters(AVFilterGraph *graph, PlayerState *is, const 
                                                                              \
     ret = avfilter_graph_create_filter(&filt_ctx,                            \
                                        avfilter_get_by_name(name),           \
-                                       "avplay_" name, arg, NULL, graph);    \
+                                       "avplay_" name, arg, nullptr, graph);    \
     if (ret < 0)                                                             \
         return ret;                                                          \
                                                                              \
@@ -858,12 +858,12 @@ static int configure_video_filters(AVFilterGraph *graph, PlayerState *is, const 
 
     if (is->autorotate) {
         uint8_t* displaymatrix = av_stream_get_side_data(is->video_st,
-                                                         AV_PKT_DATA_DISPLAYMATRIX, NULL);
+                                                         AV_PKT_DATA_DISPLAYMATRIX, nullptr);
         if (displaymatrix) {
             double rot = av_display_rotation_get((int32_t*) displaymatrix);
             if (rot < -135 || rot > 135) {
-                INSERT_FILT("vflip", NULL);
-                INSERT_FILT("hflip", NULL);
+                INSERT_FILT("vflip", nullptr);
+                INSERT_FILT("hflip", nullptr);
             } else if (rot < -45) {
                 INSERT_FILT("transpose", "dir=clock");
             } else if (rot > 45) {
@@ -879,21 +879,21 @@ static int configure_video_filters(AVFilterGraph *graph, PlayerState *is, const 
         outputs->name    = av_strdup("in");
         outputs->filter_ctx = filt_src;
         outputs->pad_idx = 0;
-        outputs->next    = NULL;
+        outputs->next    = nullptr;
 
         inputs->name    = av_strdup("out");
         inputs->filter_ctx = last_filter;
         inputs->pad_idx = 0;
-        inputs->next    = NULL;
+        inputs->next    = nullptr;
 
-        if ((ret = avfilter_graph_parse(graph, vfilters, inputs, outputs, NULL)) < 0)
+        if ((ret = avfilter_graph_parse(graph, vfilters, inputs, outputs, nullptr)) < 0)
             return ret;
     } else {
         if ((ret = avfilter_link(filt_src, 0, last_filter, 0)) < 0)
             return ret;
     }
 
-    if ((ret = avfilter_graph_config(graph, NULL)) < 0)
+    if ((ret = avfilter_graph_config(graph, nullptr)) < 0)
         return ret;
 
     is->in_video_filter  = filt_src;
@@ -912,12 +912,12 @@ static void * video_thread(void *arg)
     int ret;
 
     AVFilterGraph *graph = avfilter_graph_alloc();
-    AVFilterContext *filt_out = NULL, *filt_in = NULL;
+    AVFilterContext *filt_out = nullptr, *filt_in = nullptr;
     int last_w = is->video_dec->width;
     int last_h = is->video_dec->height;
     if (!graph) {
         av_frame_free(&frame);
-        return NULL;
+        return nullptr;
     }
 
     if ((ret = configure_video_filters(graph, is, is->vfilters)) < 0)
@@ -927,7 +927,7 @@ static void * video_thread(void *arg)
 
     if (!frame) {
         avfilter_graph_free(&graph);
-        return NULL;
+        return nullptr;
     }
 
     for (;;) {
@@ -946,7 +946,7 @@ static void * video_thread(void *arg)
 
         if (   last_w != is->video_dec->width
             || last_h != is->video_dec->height) {
-            av_log(NULL, AV_LOG_TRACE, "Changing size %dx%d -> %dx%d\n", last_w, last_h,
+            av_log(nullptr, AV_LOG_TRACE, "Changing size %dx%d -> %dx%d\n", last_w, last_h,
                     is->video_dec->width, is->video_dec->height);
             avfilter_graph_free(&graph);
             graph = avfilter_graph_alloc();
@@ -975,7 +975,7 @@ static void * video_thread(void *arg)
             if (av_cmp_q(tb, is->video_st->time_base)) {
                 av_unused int64_t pts1 = pts_int;
                 pts_int = av_rescale_q(pts_int, tb, is->video_st->time_base);
-                av_log(NULL, AV_LOG_TRACE, "video_thread(): "
+                av_log(nullptr, AV_LOG_TRACE, "video_thread(): "
                         "tb:%d/%d pts:%" PRId64" -> tb:%d/%d pts:%" PRId64"\n",
                         tb.num, tb.den, pts1,
                         is->video_st->time_base.num, is->video_st->time_base.den, pts_int);
@@ -993,13 +993,13 @@ static void * video_thread(void *arg)
     }
  the_end:
     pthread_mutex_lock(&is->video_filter_mutex);
-    is->out_video_filter = NULL;
+    is->out_video_filter = nullptr;
     pthread_mutex_unlock(&is->video_filter_mutex);
     av_freep(&is->vfilters);
     avfilter_graph_free(&graph);
     av_packet_unref(&pkt);
     av_frame_free(&frame);
-    return NULL;
+    return nullptr;
 }
 
 /* return the new audio buffer size (samples can be added or deleted
@@ -1062,7 +1062,7 @@ static int synchronize_audio(PlayerState *is, short *samples,
                         samples_size = wanted_size;
                     }
                 }
-                av_log(NULL, AV_LOG_TRACE, "diff=%f adiff=%f sample_diff=%d apts=%0.3f vpts=%0.3f %f\n",
+                av_log(nullptr, AV_LOG_TRACE, "diff=%f adiff=%f sample_diff=%d apts=%0.3f vpts=%0.3f %f\n",
                         diff, avg_diff, samples_size - samples_size1,
                         is->audio_clock, is->video_clock, is->audio_diff_threshold);
             }
@@ -1117,7 +1117,7 @@ static int audio_decode_frame(PlayerState *is, double *pts_ptr)
                     flush_complete = 1;
                 continue;
             }
-            data_size = av_samples_get_buffer_size(NULL, dec->channels,
+            data_size = av_samples_get_buffer_size(nullptr, dec->channels,
                                                    is->frame->nb_samples,
                                                    (AVSampleFormat)is->frame->format, 1);
 
@@ -1275,20 +1275,20 @@ static AVCodec *find_codec_or_die(const char *name, enum AVMediaType type)
     if (!codec && (desc = avcodec_descriptor_get_by_name(name))) {
         codec = avcodec_find_decoder(desc->id);
         if (codec)
-            av_log(NULL, AV_LOG_VERBOSE, "Matched decoder '%s' for codec '%s'.\n",
+            av_log(nullptr, AV_LOG_VERBOSE, "Matched decoder '%s' for codec '%s'.\n",
                    codec->name, desc->name);
     }
 
     if (!codec) {
-        av_log(NULL, AV_LOG_FATAL, "Unknown decoder '%s'\n", name);
+        av_log(nullptr, AV_LOG_FATAL, "Unknown decoder '%s'\n", name);
 
-        return NULL;
+        return nullptr;
     }
 
     if (codec->type != type) {
-        av_log(NULL, AV_LOG_FATAL, "Invalid decoder type '%s'\n", name);
+        av_log(nullptr, AV_LOG_FATAL, "Invalid decoder type '%s'\n", name);
 
-        return NULL;
+        return nullptr;
     }
 
     return codec;
@@ -1296,7 +1296,7 @@ static AVCodec *find_codec_or_die(const char *name, enum AVMediaType type)
 
 static AVCodec *choose_decoder(PlayerState *is, AVFormatContext *ic, AVStream *st)
 {
-    char *codec_name = NULL;
+    char *codec_name = nullptr;
     int i, ret;
 
     for (i = 0; i < is->nb_codec_names; i++) {
@@ -1304,7 +1304,7 @@ static AVCodec *choose_decoder(PlayerState *is, AVFormatContext *ic, AVStream *s
         if ((ret = check_stream_specifier(ic, st, spec)) > 0)
             codec_name = (char*)is->codec_names[i].u.str;
         else if (ret < 0) {
-          return NULL;
+          return nullptr;
         }
     }
 
@@ -1324,13 +1324,13 @@ static int stream_component_open(PlayerState *is, int stream_index)
     AVCodec *codec;
     SDL_AudioSpec wanted_spec, spec;
     AVDictionary *opts;
-    AVDictionaryEntry *t = NULL;
+    AVDictionaryEntry *t = nullptr;
     int ret = 0;
 
     if (stream_index < 0 || stream_index >= (int)ic->nb_streams)
         return -1;
 
-    avctx = avcodec_alloc_context3(NULL);
+    avctx = avcodec_alloc_context3(nullptr);
     if (!avctx)
         return AVERROR(ENOMEM);
 
@@ -1340,7 +1340,7 @@ static int stream_component_open(PlayerState *is, int stream_index)
         return ret;
     }
 
-    opts = filter_codec_opts(codec_opts, avctx->codec_id, ic, ic->streams[stream_index], NULL);
+    opts = filter_codec_opts(codec_opts, avctx->codec_id, ic, ic->streams[stream_index], nullptr);
 
     codec = choose_decoder(is, ic, ic->streams[stream_index]);
     avctx->workaround_bugs   = is->workaround_bugs;
@@ -1353,7 +1353,7 @@ static int stream_component_open(PlayerState *is, int stream_index)
     if (is->fast)
         avctx->flags2 |= AV_CODEC_FLAG2_FAST;
 
-    if (!av_dict_get(opts, "threads", NULL, 0))
+    if (!av_dict_get(opts, "threads", nullptr, 0))
         av_dict_set(&opts, "threads", "auto", 0);
     if (avctx->codec_type == AVMEDIA_TYPE_VIDEO)
         av_dict_set(&opts, "refcounted_frames", "1", 0);
@@ -1361,8 +1361,8 @@ static int stream_component_open(PlayerState *is, int stream_index)
         (ret = avcodec_open2(avctx, codec, &opts)) < 0) {
         goto fail;
     }
-    if ((t = av_dict_get(opts, "", NULL, AV_DICT_IGNORE_SUFFIX))) {
-        av_log(NULL, AV_LOG_ERROR, "Option %s not found.\n", t->key);
+    if ((t = av_dict_get(opts, "", nullptr, AV_DICT_IGNORE_SUFFIX))) {
+        av_log(nullptr, AV_LOG_ERROR, "Option %s not found.\n", t->key);
         ret =  AVERROR_OPTION_NOT_FOUND;
         goto fail;
     }
@@ -1453,7 +1453,7 @@ static int stream_component_open(PlayerState *is, int stream_index)
         is->video_dec = avctx;
 
         packet_queue_init(is, &is->videoq);
-        pthread_create(&is->video_tid, NULL, video_thread, is);
+        pthread_create(&is->video_tid, nullptr, video_thread, is);
         break;
     default:
         break;
@@ -1485,13 +1485,13 @@ static void stream_component_close(PlayerState *is, int stream_index)
         if (is->avr)
             avresample_free(&is->avr);
         av_freep(&is->audio_buf1);
-        is->audio_buf = NULL;
+        is->audio_buf = nullptr;
         av_frame_free(&is->frame);
 
         if (is->rdft) {
             av_rdft_end(is->rdft);
             av_freep(&is->rdft_data);
-            is->rdft = NULL;
+            is->rdft = nullptr;
             is->rdft_bits = 0;
         }
         break;
@@ -1504,7 +1504,7 @@ static void stream_component_close(PlayerState *is, int stream_index)
         pthread_cond_signal(&is->pictq_cond);
         pthread_mutex_unlock(&is->pictq_mutex);
 
-        pthread_join(is->video_tid, NULL);
+        pthread_join(is->video_tid, nullptr);
 
         packet_queue_end(&is->videoq);
         break;
@@ -1516,12 +1516,12 @@ static void stream_component_close(PlayerState *is, int stream_index)
     switch (par->codec_type) {
     case AVMEDIA_TYPE_AUDIO:
         avcodec_free_context(&is->audio_dec);
-        is->audio_st = NULL;
+        is->audio_st = nullptr;
         is->audio_stream = -1;
         break;
     case AVMEDIA_TYPE_VIDEO:
         avcodec_free_context(&is->video_dec);
-        is->video_st = NULL;
+        is->video_st = nullptr;
         is->video_stream = -1;
         break;
     default:
@@ -1541,7 +1541,7 @@ static int decode_interrupt_cb(void *ctx)
 static void stream_close(PlayerState *is)
 {
     /* disable interrupting */
-    global_video_state = NULL;
+    global_video_state = nullptr;
 
     /* close each stream */
     if (is->audio_stream >= 0)
@@ -1555,7 +1555,7 @@ static void stream_close(PlayerState *is)
 
 static int stream_setup(PlayerState *is)
 {
-    AVFormatContext *ic = NULL;
+    AVFormatContext *ic = nullptr;
     int err, i, ret;
     int st_index[AVMEDIA_TYPE_NB];
     AVDictionaryEntry *t;
@@ -1570,7 +1570,7 @@ static int stream_setup(PlayerState *is)
 
     ic = avformat_alloc_context();
     if (!ic) {
-        av_log(NULL, AV_LOG_FATAL, "Could not allocate context.\n");
+        av_log(nullptr, AV_LOG_FATAL, "Could not allocate context.\n");
         ret = AVERROR(ENOMEM);
         goto fail;
     }
@@ -1583,8 +1583,8 @@ static int stream_setup(PlayerState *is)
         goto fail;
     }
 
-    if ((t = av_dict_get(format_opts, "", NULL, AV_DICT_IGNORE_SUFFIX))) {
-        av_log(NULL, AV_LOG_ERROR, "Option %s not found.\n", t->key);
+    if ((t = av_dict_get(format_opts, "", nullptr, AV_DICT_IGNORE_SUFFIX))) {
+        av_log(nullptr, AV_LOG_ERROR, "Option %s not found.\n", t->key);
         ret = AVERROR_OPTION_NOT_FOUND;
         goto fail;
     }
@@ -1640,9 +1640,9 @@ static int stream_setup(PlayerState *is)
 
     st_index[AVMEDIA_TYPE_VIDEO] =
             av_find_best_stream(ic, AVMEDIA_TYPE_VIDEO,
-                                is->wanted_stream[AVMEDIA_TYPE_VIDEO], -1, NULL, 0);
+                                is->wanted_stream[AVMEDIA_TYPE_VIDEO], -1, nullptr, 0);
     st_index[AVMEDIA_TYPE_AUDIO] =
-            av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, is->wanted_stream[AVMEDIA_TYPE_AUDIO], st_index[AVMEDIA_TYPE_VIDEO], NULL, 0);
+            av_find_best_stream(ic, AVMEDIA_TYPE_AUDIO, is->wanted_stream[AVMEDIA_TYPE_AUDIO], st_index[AVMEDIA_TYPE_VIDEO], nullptr, 0);
 
     // open the streams 
     if (st_index[AVMEDIA_TYPE_AUDIO] >= 0) {
@@ -1739,7 +1739,7 @@ static void * decode_thread(void *arg)
         if (eof) {
             if (is->video_stream >= 0) {
                 av_init_packet(pkt);
-                pkt->data = NULL;
+                pkt->data = nullptr;
                 pkt->size = 0;
                 pkt->stream_index = is->video_stream;
                 packet_queue_put(&is->videoq, pkt);
@@ -1747,7 +1747,7 @@ static void * decode_thread(void *arg)
             if (is->audio_stream >= 0 &&
                 (is->audio_dec->codec->capabilities & AV_CODEC_CAP_DELAY)) {
                 av_init_packet(pkt);
-                pkt->data = NULL;
+                pkt->data = nullptr;
                 pkt->size = 0;
                 pkt->stream_index = is->audio_stream;
                 packet_queue_put(&is->audioq, pkt);
@@ -1796,11 +1796,11 @@ static void * decode_thread(void *arg)
 fail:
     stream_close(is);
 
-		if (is->endofmedia_callback != NULL) {
+		if (is->endofmedia_callback != nullptr) {
 			is->endofmedia_callback(is->endofmedia_callback_data);
 		}
 
-    return NULL;
+    return nullptr;
 }
 
 static int stream_open(PlayerState *is,
@@ -1817,20 +1817,20 @@ static int stream_open(PlayerState *is,
         return ret;
     }
 
-    pthread_mutex_init(&is->video_filter_mutex, NULL);
+    pthread_mutex_init(&is->video_filter_mutex, nullptr);
 
     /* start video display */
-    pthread_mutex_init(&is->pictq_mutex, NULL);
-    pthread_cond_init(&is->pictq_cond, NULL);
+    pthread_mutex_init(&is->pictq_mutex, nullptr);
+    pthread_cond_init(&is->pictq_cond, nullptr);
 
-    pthread_mutex_init(&is->subpq_mutex, NULL);
-    pthread_cond_init(&is->subpq_cond, NULL);
+    pthread_mutex_init(&is->subpq_mutex, nullptr);
+    pthread_cond_init(&is->subpq_cond, nullptr);
 
     is->av_sync_type = AV_SYNC_AUDIO_MASTER;
-    pthread_create(&is->refresh_tid, NULL, refresh_thread, is);
+    pthread_create(&is->refresh_tid, nullptr, refresh_thread, is);
     if (!is->refresh_tid)
         return -1;
-    pthread_create(&is->parse_tid, NULL, decode_thread, is);
+    pthread_create(&is->parse_tid, nullptr, decode_thread, is);
     if (!is->parse_tid)
         return -1;
     return 0;
@@ -1875,18 +1875,18 @@ PlayerState *avplay_open(const char *filename)
   av_init_packet(&is->flush_pkt);
   is->flush_pkt.data = (uint8_t *)&is->flush_pkt;
 
-  if (stream_open(is, filename, NULL) < 0) {
+  if (stream_open(is, filename, nullptr) < 0) {
     stream_close(is);
 
-    return NULL;
+    return nullptr;
   }
 
   avplay_pause(is, 1);
 
-  is->render_callback = NULL;
-  is->render_callback_data = NULL;
-  is->endofmedia_callback = NULL;
-  is->endofmedia_callback_data = NULL;
+  is->render_callback = nullptr;
+  is->render_callback_data = nullptr;
+  is->endofmedia_callback = nullptr;
+  is->endofmedia_callback_data = nullptr;
 
   is->loop = 0;
 
@@ -1912,7 +1912,7 @@ PlayerState *avplay_open(const char *filename)
   is->infinite_buffer = 0;
 
   is->rdftspeed = 20;
-  is->vfilters = NULL;
+  is->vfilters = nullptr;
   is->autorotate = 1;
 
   is->frames_per_second = 0.0;
@@ -1998,7 +1998,7 @@ bool avplay_isloop(PlayerState *is)
 
 void avplay_mute(PlayerState *is, bool state)
 {
-	if (is == NULL) {
+	if (is == nullptr) {
 		return;
 	}
 
@@ -2081,19 +2081,19 @@ void avplay_setcurrentmediatime(PlayerState *is, int64_t time)
 
 const char * avplay_getmetadata(PlayerState *is, const char *id)
 {
-	return NULL;
+	return nullptr;
 }
 
 /*
 int main(int argc, char **argv)
 {
-  PlayerState *is = NULL;
+  PlayerState *is = nullptr;
 
   avplay_init();
 
   is = avplay_open(argv[1]);
 
-  if (is == NULL) {
+  if (is == nullptr) {
     return -1;
   }
 

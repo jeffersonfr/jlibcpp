@@ -148,7 +148,7 @@ bool Spin::MousePressed(jevent::MouseEvent *event)
 	Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return false;
   }
 
@@ -284,7 +284,7 @@ void Spin::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -331,7 +331,7 @@ void Spin::Paint(Graphics *g)
 		}
 
 		if (_items.size() > 0) {
-			if (font != NULL) {
+			if (font != nullptr) {
 				g->SetFont(font);
 
 				if (IsEnabled() == true) {
@@ -375,7 +375,7 @@ void Spin::Paint(Graphics *g)
 		g->FillTriangle(size.width-2*arrow_size-x, y+arrow_size+8, size.width-x, y+arrow_size+8, size.width-arrow_size-x, y+h);
 
 		if (_items.size() > 0) {
-			if (font != NULL) {
+			if (font != nullptr) {
 				g->SetFont(font);
 
 				if (IsEnabled() == true) {

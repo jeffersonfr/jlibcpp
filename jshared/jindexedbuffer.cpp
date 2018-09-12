@@ -35,7 +35,7 @@ IndexedBuffer::IndexedBuffer(int size, int chunk, jbuffer_type_t type_):
 	_buffer_size = size;
 	_write_index = 0;
 	_pass_index = 0;
-	_buffer = NULL;
+	_buffer = nullptr;
 	_chunk_size = chunk;
 
 	if (_buffer_size < 1 || _buffer_size > MAX_BUFFER_SIZE) {
@@ -58,7 +58,7 @@ IndexedBuffer::IndexedBuffer(int size, int chunk, jbuffer_type_t type_):
 
 IndexedBuffer::~IndexedBuffer()
 {
-	if (_buffer != NULL) {
+	if (_buffer != nullptr) {
 		for (int i=0; i<_buffer_size; i++) {
 			delete [] _buffer[i].data;
 		}
@@ -336,7 +336,7 @@ int IndexedBuffer::Read(jbuffer_chunk_t *chunk, int size)
 
 int IndexedBuffer::Write(uint8_t*data, int size)
 {
-	if ((void *)data == NULL) {
+	if ((void *)data == nullptr) {
 		return -1;
 	}
 

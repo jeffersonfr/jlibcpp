@@ -380,7 +380,7 @@ static int p_init(PNMData *data)
 			} break;
 
 			case PHDR_WIDTH: {
-				data->width = strtol( buf, NULL, 10 );
+				data->width = strtol( buf, nullptr, 10 );
 
 				if (data->width < 1) {
 					return -1;
@@ -394,7 +394,7 @@ static int p_init(PNMData *data)
 			} break;
 
 			case PHDR_HEIGHT: {
-				data->height = strtol( buf, NULL, 10 );
+				data->height = strtol( buf, nullptr, 10 );
 
 				if (data->height < 1) {
 					return -1;
@@ -408,7 +408,7 @@ static int p_init(PNMData *data)
 			} break;
 
 			case PHDR_COLORS: {
-				data->colors = strtoul( buf, NULL, 10 );
+				data->colors = strtoul( buf, nullptr, 10 );
 
 				if (data->colors < 1) {
 					return -1;
@@ -430,47 +430,47 @@ static int p_init(PNMData *data)
 
 cairo_surface_t * create_ppm_surface_from_stream(jio::InputStream *stream)
 {
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 	
 	PNMData pnm;
 	
 	pnm.width = -1;
 	pnm.height = -1;
 	pnm.colors = 0;
-	pnm.getrow = NULL;
-	pnm.rowbuf = NULL;
+	pnm.getrow = nullptr;
+	pnm.rowbuf = nullptr;
 	pnm.bufp = 0;
 	pnm.chunksize = 0;
 	pnm.stream = stream;
 
 	if (p_init(&pnm) < 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (pnm.width < 0 || pnm.height < 0 || pnm.width > 16387 || pnm.height > 16387) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (pnm.format == PFMT_PBM) {
 		// A1
-		return NULL;
+		return nullptr;
 	} else if (pnm.format == PFMT_PGM) {
 		// A8
-		return NULL;
+		return nullptr;
 	} else {
 		// RGB32
 	}
 
 	surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, pnm.width, pnm.height);
 
-	if (surface == NULL) {
-		return NULL;
+	if (surface == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(surface);
 
-	if (data == NULL) {
-		return NULL;
+	if (data == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t row[pnm.width*4];
@@ -515,7 +515,7 @@ cairo_surface_t * create_ppm_surface_from_file(const char *file)
 {
 	jio::FileInputStream stream(file);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_ppm_surface_from_stream(&stream);
 
@@ -528,7 +528,7 @@ cairo_surface_t * create_ppm_surface_from_data(uint8_t *data, int size)
 {
 	jio::MemoryInputStream stream((const uint8_t *)data, size);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_ppm_surface_from_stream(&stream);
 

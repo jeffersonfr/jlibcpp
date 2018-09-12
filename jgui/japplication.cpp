@@ -28,7 +28,7 @@
 
 namespace jgui {
 
-static Application *_instance = NULL;
+static Application *_instance = nullptr;
 static std::mutex g_application_mutex;
 static std::mutex g_application_event_mutex;
 
@@ -41,7 +41,7 @@ Application::Application():
 Application::~Application()
 {
   delete _instance;
-  _instance = NULL;
+  _instance = nullptr;
 }
 
 void Application::InternalInit(int argc, char **argv)
@@ -60,13 +60,13 @@ void Application::Init(int argc, char **argv)
 {
   std::lock_guard<std::mutex> guard(g_application_mutex);
 
-	if (_instance == NULL) {
+	if (_instance == nullptr) {
 	  try {
 #ifdef JGUI_UI
 			_instance = new NativeApplication();
 #endif
 
-      if (_instance != NULL) {
+      if (_instance != nullptr) {
         _instance->InternalInit(argc, argv);
       }
 		} catch (jexception::NullPointerException &e) {
@@ -74,7 +74,7 @@ void Application::Init(int argc, char **argv)
 		}
 	}
         
-  if (_instance == NULL) {
+  if (_instance == nullptr) {
     throw jexception::NullPointerException("No graphic engine avaiable !");
   }
 }
@@ -83,7 +83,7 @@ void Application::Loop()
 {
   g_application_mutex.lock();
 
-	if (_instance == NULL) {
+	if (_instance == nullptr) {
     throw jexception::RuntimeException("Application was not initialized");
 	}
 
@@ -96,7 +96,7 @@ void Application::Quit()
 {
   g_application_mutex.lock();
 
-	if (_instance == NULL) {
+	if (_instance == nullptr) {
     throw jexception::RuntimeException("Application was not initialized");
 	}
 
@@ -109,7 +109,7 @@ jsize_t Application::GetScreenSize()
 {
   g_application_mutex.lock();
 
-	if (_instance == NULL) {
+	if (_instance == nullptr) {
     throw jexception::RuntimeException("Application was not initialized");
 	}
 
@@ -122,7 +122,7 @@ void Application::SetVerticalSyncEnabled(bool enabled)
 {
   g_application_mutex.lock();
 
-	if (_instance == NULL) {
+	if (_instance == nullptr) {
     throw jexception::RuntimeException("Application was not initialized");
 	}
 
@@ -135,7 +135,7 @@ bool Application::IsVerticalSyncEnabled()
 {
   g_application_mutex.lock();
 
-	if (_instance == NULL) {
+	if (_instance == nullptr) {
     throw jexception::RuntimeException("Application was not initialized");
 	}
 

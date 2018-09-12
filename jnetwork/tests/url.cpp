@@ -75,7 +75,7 @@ void testTrim()
 void testLink()
 {
 	jcommon::DynamicLink link;
-	double (*cosine)(double) = NULL;
+	double (*cosine)(double) = nullptr;
 
 	link.Load(LIBM_SO, jcommon::JLF_LAZY);
 

@@ -37,14 +37,14 @@ CPU::~CPU()
 
 void CPU::Builder() 
 {
-	jio::FileInputStream *file = NULL;
-	jio::BufferedReader *reader = NULL;
+	jio::FileInputStream *file = nullptr;
+	jio::BufferedReader *reader = nullptr;
 
 	try {
 		file = new jio::FileInputStream("/proc/cpuinfo");
 		reader = new jio::BufferedReader(file);
 	} catch (...) {
-		if (file != NULL) {
+		if (file != nullptr) {
 			delete file;
 		}
 

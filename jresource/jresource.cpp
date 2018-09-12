@@ -29,7 +29,7 @@ namespace jresource {
 
 Resource::Resource()
 {
-	_listener = NULL;
+	_listener = nullptr;
 	_is_available = true;
 }
 
@@ -46,7 +46,7 @@ bool Resource::IsAvailable()
 
 void Resource::Reserve(jevent::ResourceStatusListener *listener, bool force, int64_t timeout)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		throw jexception::IllegalArgumentException("Resource listener cannot be null");
 	}
 
@@ -143,7 +143,7 @@ void Resource::Release()
 
 void Resource::RegisterResourceTypeListener(jevent::ResourceTypeListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -154,7 +154,7 @@ void Resource::RegisterResourceTypeListener(jevent::ResourceTypeListener *listen
 
 void Resource::RemoveResourceTypeListener(jevent::ResourceTypeListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -163,7 +163,7 @@ void Resource::RemoveResourceTypeListener(jevent::ResourceTypeListener *listener
 
 void Resource::DispatchResourceTypeEvent(jevent::ResourceTypeEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 
@@ -191,7 +191,7 @@ void Resource::DispatchResourceTypeEvent(jevent::ResourceTypeEvent *event)
 }
 void Resource::RegisterResourceStatusListener(jevent::ResourceStatusListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -202,7 +202,7 @@ void Resource::RegisterResourceStatusListener(jevent::ResourceStatusListener *li
 
 void Resource::RemoveResourceStatusListener(jevent::ResourceStatusListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -211,7 +211,7 @@ void Resource::RemoveResourceStatusListener(jevent::ResourceStatusListener *list
 
 void Resource::DispatchResourceStatusEvent(jevent::ResourceStatusEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

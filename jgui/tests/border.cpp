@@ -130,10 +130,10 @@ class BorderTest : public jgui::Window {
 			for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
         jgui::Component *c = (*i);
 
-        c->SetTheme(NULL);
+        c->SetTheme(nullptr);
 
 				delete c;
-        c = NULL;
+        c = nullptr;
 			}
 		}
 

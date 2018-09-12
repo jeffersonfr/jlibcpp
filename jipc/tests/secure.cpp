@@ -101,7 +101,7 @@ void client(std::string ip, int port, jipc::Method *method)
 {
 	jnetwork::SSLContext *context = jnetwork::SSLContext::CreateClientContext("certs/cert.pem");
 	jipc::SecureIPCClient client(context, ip, port);
-	jipc::Response *response = NULL;
+	jipc::Response *response = nullptr;
 
 	std::cout << "Client request [" << method->What() << "]" << std::endl;
 

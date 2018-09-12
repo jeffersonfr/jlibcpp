@@ -87,7 +87,7 @@ Player * PlayerManager::CreatePlayer(std::string url_)
 
   // INFO:: only the MixerLightPlayer could do the mixer
   if (strcasecmp(url.GetProtocol().c_str(), "mixer") == 0) {
-    return NULL;
+    return nullptr;
   }
 
 #if defined(ALSA_MEDIA)
@@ -141,7 +141,7 @@ Player * PlayerManager::CreatePlayer(std::string url_)
 	}
 #endif
 
-	return NULL;
+	return nullptr;
 }
 		
 void PlayerManager::SetHint(jplayer_hints_t hint, bool value)

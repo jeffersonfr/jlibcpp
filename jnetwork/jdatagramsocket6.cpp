@@ -39,9 +39,9 @@ DatagramSocket6::DatagramSocket6(std::string host_, int port_, bool stream_, int
 	jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
 	
 	_stream = stream_;
-	_address = NULL;
-	_is = NULL;
-	_os = NULL;
+	_address = nullptr;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_timeout = timeout_;
 	
@@ -60,9 +60,9 @@ DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf
 {
 	jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
 
-	_address = NULL;
-	_is = NULL;
-	_os = NULL;
+	_address = nullptr;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_stream = stream_;
 	_timeout = timeout_;
@@ -72,7 +72,7 @@ DatagramSocket6::DatagramSocket6(int port_, bool stream_, int timeout_, int rbuf
 	_address = InetAddress6::GetByName("127.0.0.1");
 
 	CreateSocket();
-	BindSocket(NULL, port_);
+	BindSocket(nullptr, port_);
 	InitStream(rbuf_, wbuf_);
 }
 
@@ -82,8 +82,8 @@ DatagramSocket6::DatagramSocket6(InetAddress *addr_, int port_, bool stream_, in
 	jcommon::Object::SetClassName("jnetwork::DatagramSocket6");
 
 	_address = addr_;
-	_is = NULL;
-	_os = NULL;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_stream = stream_;
 	_timeout = timeout_;
@@ -102,15 +102,15 @@ DatagramSocket6::~DatagramSocket6()
 	} catch (...) {
 	}
 
-	if ((void *)_address != NULL) {
+	if ((void *)_address != nullptr) {
 		delete _address;
 	}
 
-	if ((void *)_is != NULL) {
+	if ((void *)_is != nullptr) {
 		delete _is;
 	}
 
-	if ((void *)_os != NULL) {
+	if ((void *)_os != nullptr) {
 		delete _os;
 	}
 }
@@ -135,7 +135,7 @@ void DatagramSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin6_family = AF_INET6;
 	_lsock.sin6_flowinfo = 0;
 	
-	if (local_addr_ == NULL) {
+	if (local_addr_ == nullptr) {
 		_lsock.sin6_addr = in6addr_any;
 	} else {
 		_local = dynamic_cast<InetAddress6 *>(local_addr_);
@@ -171,7 +171,7 @@ void DatagramSocket6::ConnectSocket(InetAddress *addr_, int port_)
 	_lsock.sin6_scope_id = 0;
 	_lsock.sin6_port = htons(port_);
 	
-	if(_address == NULL) {
+	if(_address == nullptr) {
 		_lsock.sin6_addr = in6addr_any;
 	} else {
 		inet_pton(AF_INET6, _address->GetHostAddress().c_str(), &(_lsock.sin6_addr));
@@ -183,7 +183,7 @@ void DatagramSocket6::ConnectSocket(InetAddress *addr_, int port_)
 		if (_timeout > 0) {
 			long arg;
 
-			if( (arg = fcntl(_fd, F_GETFL, NULL)) < 0) { 
+			if( (arg = fcntl(_fd, F_GETFL, nullptr)) < 0) { 
 				throw jexception::ConnectionException("Cannont set non blocking socket");
 			}
 
@@ -208,7 +208,7 @@ void DatagramSocket6::ConnectSocket(InetAddress *addr_, int port_)
 						FD_ZERO(&wset); 
 						FD_SET(_fd, &wset); 
 
-						r = select(_fd+1, NULL, &wset, NULL, &tv); 
+						r = select(_fd+1, nullptr, &wset, nullptr, &tv); 
 
 						if (r < 0 && errno != EINTR) { 
 							throw jexception::ConnectionException("Connection error");

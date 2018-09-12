@@ -29,11 +29,11 @@ FileHandler::FileHandler(std::string filename_):
 
 	_file = jio::File::OpenFile(filename_, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE | jio::JFF_APPEND));
 
-	if (_file == NULL) {
+	if (_file == nullptr) {
 		_file = jio::File::CreateFile(filename_, (jio::jfile_flags_t)(jio::JFF_WRITE_ONLY | jio::JFF_LARGEFILE));
 	}
 		
-	if (_file == NULL) {
+	if (_file == nullptr) {
 		throw jexception::LoggerException("Unable to create the log file");
 	}
 }

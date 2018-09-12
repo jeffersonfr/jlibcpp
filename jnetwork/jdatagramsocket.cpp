@@ -37,9 +37,9 @@ DatagramSocket::DatagramSocket(std::string host_, int port_, bool stream_, int t
 	jcommon::Object::SetClassName("jnetwork::DatagramSocket");
 	
 	_stream = stream_;
-	_address = NULL;
-	_is = NULL;
-	_os = NULL;
+	_address = nullptr;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_timeout = timeout_;
 
@@ -58,9 +58,9 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 {
 	jcommon::Object::SetClassName("jnetwork::DatagramSocket");
 
-	_address = NULL;
-	_is = NULL;
-	_os = NULL;
+	_address = nullptr;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_stream = stream_;
 	_timeout = timeout_;
@@ -68,7 +68,7 @@ DatagramSocket::DatagramSocket(int port_, bool stream_, int timeout_, int rbuf_,
 	_address = InetAddress4::GetByName("127.0.0.1");
 
 	CreateSocket();
-	BindSocket(NULL, port_);
+	BindSocket(nullptr, port_);
 	InitStream(rbuf_, wbuf_);
 
 	_sent_bytes = 0;
@@ -81,8 +81,8 @@ DatagramSocket::DatagramSocket(InetAddress *addr_, int port_, bool stream_, int 
 	jcommon::Object::SetClassName("jnetwork::DatagramSocket");
 
 	_address = addr_;
-	_is = NULL;
-	_os = NULL;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_stream = stream_;
 	_timeout = timeout_;
@@ -101,15 +101,15 @@ DatagramSocket::~DatagramSocket()
 	} catch (...) {
 	}
 
-	if ((void *)_address != NULL) {
+	if ((void *)_address != nullptr) {
 		delete _address;
 	}
 
-	if ((void *)_is != NULL) {
+	if ((void *)_is != nullptr) {
 		delete _is;
 	}
 
-	if ((void *)_os != NULL) {
+	if ((void *)_os != nullptr) {
 		delete _os;
 	}
 }
@@ -133,7 +133,7 @@ void DatagramSocket::BindSocket(InetAddress *local_addr_, int local_port_)
    
 	_lsock.sin_family = AF_INET;
    
-	if (local_addr_ == NULL) {
+	if (local_addr_ == nullptr) {
 		_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
 		_local = dynamic_cast<InetAddress4 *>(local_addr_);
@@ -165,7 +165,7 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 	
 	_server_sock.sin_family = AF_INET;
 	
-	if(_address == NULL) {
+	if(_address == nullptr) {
 		_server_sock.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
 		_server_sock.sin_addr.s_addr = ::inet_addr(_address->GetHostAddress().c_str());
@@ -180,7 +180,7 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 		if (_timeout > 0) {
 			long arg;
 
-			if( (arg = fcntl(_fd, F_GETFL, NULL)) < 0) { 
+			if( (arg = fcntl(_fd, F_GETFL, nullptr)) < 0) { 
 				throw jexception::ConnectionException("Cannont set non blocking socket");
 			}
 
@@ -205,7 +205,7 @@ void DatagramSocket::ConnectSocket(InetAddress *addr_, int port_)
 						FD_ZERO(&wset); 
 						FD_SET(_fd, &wset); 
 
-						r = select(_fd+1, NULL, &wset, NULL, &tv); 
+						r = select(_fd+1, nullptr, &wset, nullptr, &tv); 
 
 						if (r < 0 && errno != EINTR) { 
 							throw jexception::ConnectionException("Connection error");

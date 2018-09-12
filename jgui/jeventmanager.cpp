@@ -90,7 +90,7 @@ void EventManager::ProcessEvents()
       break;
     }
 
-    jevent::EventObject *unknown = NULL;
+    jevent::EventObject *unknown = nullptr;
 
 	  _mutex.lock();
 
@@ -100,11 +100,11 @@ void EventManager::ProcessEvents()
 
     _mutex.unlock();
 	
-    if (dynamic_cast<jevent::KeyEvent *>(unknown) != NULL) {
+    if (dynamic_cast<jevent::KeyEvent *>(unknown) != nullptr) {
       jevent::KeyEvent *event = dynamic_cast<jevent::KeyEvent *>(unknown);
       jevent::KeyListener *listener = dynamic_cast<jevent::KeyListener *>(_window);
 
-      if (listener != NULL) {
+      if (listener != nullptr) {
         if (event->GetType() == jevent::JKT_PRESSED) {
           listener->KeyPressed(event);
         } else if (event->GetType() == jevent::JKT_RELEASED) {
@@ -113,11 +113,11 @@ void EventManager::ProcessEvents()
           listener->KeyTyped(event);
         }
       }
-    } else if (dynamic_cast<jevent::MouseEvent *>(unknown) != NULL) {
+    } else if (dynamic_cast<jevent::MouseEvent *>(unknown) != nullptr) {
       jevent::MouseEvent *event = dynamic_cast<jevent::MouseEvent *>(unknown);
       jevent::MouseListener *listener = dynamic_cast<jevent::MouseListener *>(_window);
 
-      if (listener != NULL) {
+      if (listener != nullptr) {
         if (event->GetType() == jevent::JMT_PRESSED) {
           listener->MousePressed(event);
         } else if (event->GetType() == jevent::JMT_RELEASED) {

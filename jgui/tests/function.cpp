@@ -100,7 +100,7 @@ class Function : public jgui::Window {
 		virtual ~Function()
 		{
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 		}
 
 		virtual void ShowApp() 

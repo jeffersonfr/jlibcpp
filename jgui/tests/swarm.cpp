@@ -54,7 +54,7 @@ class Main : public jgui::Window {
       jgui::jsize_t
         size = GetSize();
 
-			srand(time(NULL));
+			srand(time(nullptr));
 
 			_active = true;
 

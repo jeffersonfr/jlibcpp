@@ -81,7 +81,7 @@ int64_t ProcessInputStream::Read(char *data, int64_t size)
 		t.tv_sec = 1LL;
 		t.tv_usec = 0LL;
 
-		if (select(_fd+1, &readfs, NULL, NULL, &t) < 0) {
+		if (select(_fd+1, &readfs, nullptr, nullptr, &t) < 0) {
 			return -1LL;
 		}
 

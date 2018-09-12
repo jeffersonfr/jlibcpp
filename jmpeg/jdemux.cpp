@@ -149,7 +149,7 @@ bool Demux::Append(const char *data, int data_length)
 
 void Demux::RegisterDemuxListener(jevent::DemuxListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -160,7 +160,7 @@ void Demux::RegisterDemuxListener(jevent::DemuxListener *listener)
 
 void Demux::RemoveDemuxListener(jevent::DemuxListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -169,7 +169,7 @@ void Demux::RemoveDemuxListener(jevent::DemuxListener *listener)
 
 void Demux::DispatchDemuxEvent(jevent::DemuxEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

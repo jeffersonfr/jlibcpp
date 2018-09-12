@@ -37,7 +37,7 @@ int main()
 
 		std::cout << "File Reference: [" << args[i] << "]" << std::endl;
 
-		if (file != NULL) {
+		if (file != nullptr) {
 			std::cout << "GetPath: [" << file->GetPath() << "]" << std::endl;
 			std::cout << "GetName: [" << file->GetName() << "]" << std::endl;
 			std::cout << "Process: [" << jio::File::GetFixedPath(file->GetPath()) << "]" << std::endl;

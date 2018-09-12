@@ -163,14 +163,14 @@ int removeWhiteSpace(jio::File *file, jio::File *temp, std::string filename)
 
 int inpi_compress_process(std::string filename)
 {
-  jio::File *file = NULL;
-  jio::File *temp = NULL;
+  jio::File *file = nullptr;
+  jio::File *temp = nullptr;
 
 	try {
 		file = jio::File::OpenFile(filename);
 		temp = jio::File::CreateTemporaryFile("/tmp", "jeff");
 
-		if ((void *)temp == NULL) {
+		if ((void *)temp == nullptr) {
 			std::cout << "Cannot create temporary file !" << std::endl;
 		}
 
@@ -193,8 +193,8 @@ int inpi_compress_process(std::string filename)
 
 int inpi_extract_process(std::string filename)
 {
-  jio::File *file = NULL;
-  jio::File *temp = NULL;
+  jio::File *file = nullptr;
+  jio::File *temp = nullptr;
 
 	try {
 		char filename[256];
@@ -246,7 +246,7 @@ int inpi_extract_process(std::string filename)
 				temp->Close();
 
 				delete temp;
-				temp = NULL;
+				temp = nullptr;
 
 				while ((r = file->Read((char *)&c, 1)) != EOF && r != 0 && c != '\n');
 			}	

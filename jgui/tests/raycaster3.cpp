@@ -142,7 +142,7 @@ int loadImage(std::vector<uint32_t>& out, unsigned long& w, unsigned long& h, co
 {
 	jgui::Image *image = new jgui::BufferedImage(filename);
 
-	if (image == NULL) {
+	if (image == nullptr) {
 		return 1;
 	}
 

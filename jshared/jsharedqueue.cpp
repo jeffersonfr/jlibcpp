@@ -60,7 +60,7 @@ SharedQueue::SharedQueue(key_t key_, int npages_, int struct_size_):
 	_shm = (struct jshmhandle_t *)malloc(sizeof(struct jshmhandle_t));
 	
 	_shm->sid = semid;
-	_shm->mem = NULL;
+	_shm->mem = nullptr;
 	_shm->privsz = struct_size_;
 	_shm->sz = npages_*getpagesize();
 	
@@ -89,7 +89,7 @@ SharedQueue::~SharedQueue()
 {
 	Close();
 
-	if ((void *)_shm != NULL) {
+	if ((void *)_shm != nullptr) {
 		delete _shm;
 	}
 }
@@ -295,7 +295,7 @@ void SharedQueue::Detach()
 		}
 	}
 
-	_shm->mem = NULL;
+	_shm->mem = nullptr;
 }
 
 void SharedQueue::Setpriv(void *priv)
@@ -314,7 +314,7 @@ void SharedQueue::Getpriv(void *priv)
 
 int SharedQueue::Get(void *data,int sz)
 {
-	if ((void *)data == NULL) {
+	if ((void *)data == nullptr) {
 		throw jexception::MemoryException("Null pointer in data parameter");
 	}
 	
@@ -363,7 +363,7 @@ int SharedQueue::Get(void *data,int sz)
 
 int SharedQueue::Put(void *data, int sz)
 {
-	if ((void *)data == NULL) {
+	if ((void *)data == nullptr) {
 		throw jexception::MemoryException("Null pointer in data parameter");
 	}
 	
@@ -389,13 +389,13 @@ int SharedQueue::Put(void *data, int sz)
 
 bool SharedQueue::IsEmpty()
 {
- 	if ((void *)_shm == NULL) {
+ 	if ((void *)_shm == nullptr) {
 		throw jexception::MemoryException("Parameter shm is null");
 	}
 	
 	struct jshmprefix_t *p = (struct jshmprefix_t *)_shm->mem;
 	
-	if (p == NULL) {
+	if (p == nullptr) {
 		return true;
 	}
 	

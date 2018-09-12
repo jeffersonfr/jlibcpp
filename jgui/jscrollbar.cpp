@@ -126,7 +126,7 @@ bool ScrollBar::MousePressed(jevent::MouseEvent *event)
   jgui::Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return false;
   }
 
@@ -222,7 +222,7 @@ bool ScrollBar::MouseMoved(jevent::MouseEvent *event)
 	Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return false;
   }
 
@@ -285,7 +285,7 @@ void ScrollBar::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 

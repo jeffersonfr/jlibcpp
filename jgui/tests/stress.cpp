@@ -32,7 +32,7 @@ class GraphicPanel : public jgui::Window {
 		GraphicPanel():
 			jgui::Window(0, 0, 1600, 900)
 	{
-		srand(time(NULL));
+		srand(time(nullptr));
 
     _buffer = new jgui::BufferedImage(jgui::JPF_ARGB, 1920, 1080);
 	}
@@ -121,7 +121,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -145,7 +145,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -205,7 +205,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -281,7 +281,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -309,7 +309,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -338,7 +338,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -363,7 +363,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -389,7 +389,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -414,7 +414,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -440,7 +440,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -465,7 +465,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -491,7 +491,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -517,7 +517,7 @@ class GraphicPanel : public jgui::Window {
 		
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -544,7 +544,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -570,7 +570,7 @@ class GraphicPanel : public jgui::Window {
 		
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -597,7 +597,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -623,7 +623,7 @@ class GraphicPanel : public jgui::Window {
 		
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -650,7 +650,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -674,7 +674,7 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -711,14 +711,14 @@ class GraphicPanel : public jgui::Window {
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
 
     if (IsHidden() == true) {
       delete _buffer;
-      _buffer = NULL;
+      _buffer = nullptr;
 
       return;
     }
@@ -775,7 +775,7 @@ class GraphicPanel : public jgui::Window {
 
 		delete pimage;
 
-		g->SetFont(NULL);
+		g->SetFont(nullptr);
 
 		delete off;
 		delete font;

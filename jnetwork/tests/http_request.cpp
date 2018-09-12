@@ -59,13 +59,13 @@ class HTTPRequest {
 			std::string buffer = "GET " + _resource + " HTTP/1.0\r\nHost: " + _host + "\r\n\r\n";
 			int length;
 
-			if (_resource_data != NULL) {
+			if (_resource_data != nullptr) {
 				delete [] _resource_data;
-				_resource_data = NULL;
+				_resource_data = nullptr;
 				_resource_size = 0;
 			}
 
-      jnetwork::Socket *c = NULL;
+      jnetwork::Socket *c = nullptr;
 			
 			try {
 				c = new jnetwork::Socket(_host, _port, _timeout);
@@ -83,7 +83,7 @@ class HTTPRequest {
 
 				if (_cancel == true) {
 					delete [] _resource_data;
-					_resource_data = NULL;
+					_resource_data = nullptr;
 					_resource_size = 0;
 
 					return;
@@ -94,7 +94,7 @@ class HTTPRequest {
 
 				if (_cancel == true) {
 					delete [] _resource_data;
-					_resource_data = NULL;
+					_resource_data = nullptr;
 					_resource_size = 0;
 
 					return;
@@ -105,7 +105,7 @@ class HTTPRequest {
 
 				if (_cancel == true) {
 					delete [] _resource_data;
-					_resource_data = NULL;
+					_resource_data = nullptr;
 					_resource_size = 0;
 
 					return;
@@ -149,7 +149,7 @@ class HTTPRequest {
 				l = 0;
 
 				delete [] _resource_data;
-				_resource_data = NULL;
+				_resource_data = nullptr;
 				_resource_size = 0;
 
 				if (_cancel == true) {
@@ -181,19 +181,19 @@ class HTTPRequest {
 				
 				if (_cancel == true || l != max_length) {
 					 delete [] _resource_data;
-					_resource_data = NULL;
+					_resource_data = nullptr;
 					_resource_size = 0;
 				}
 
 				c->Close();
 			} catch (jexception::Exception &e) {
-				if (_resource_data != NULL) {
+				if (_resource_data != nullptr) {
 					delete [] _resource_data;
-					_resource_data = NULL;
+					_resource_data = nullptr;
 					_resource_size = 0;
 				}
 
-				if (c != NULL) {
+				if (c != nullptr) {
 					c->Close();
 				}
 
@@ -240,7 +240,7 @@ class HTTPRequest {
 			_timeout = -1;
 			_code = -1;
 			_resource_size = 0;
-			_resource_data = NULL;
+			_resource_data = nullptr;
 			_cancel = false;
 		}
 
@@ -308,12 +308,12 @@ int main(int argc, char **argv)
 	request.Connect();
 	request.Wait();
 
-	char *data = NULL;
+	char *data = nullptr;
 	int size;
 
 	request.GetData(&data, &size);
 
-	// if (data != NULL && r.GetResponseCode() == 200) {
+	// if (data != nullptr && r.GetResponseCode() == 200) {
 		int fd;
 
 		fd = open(url.GetFile().c_str(), (int)(O_CREAT | O_RDWR), 0644);

@@ -42,16 +42,16 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, int timeo
 	jcommon::Object::SetClassName("jnetwork::SSLSocket6");
 	
 	_server_side = false;
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
 	_ctx = ctx;
-	_ssl = NULL;
+	_ssl = nullptr;
 
 	CreateSocket();
 	ConnectSocket(addr_, port_);
@@ -66,9 +66,9 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, InetAddre
 	jcommon::Object::SetClassName("jnetwork::SSLSocket6");
 
 	_server_side = false;
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -77,7 +77,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, InetAddress *addr_, int port_, InetAddre
 	_is_closed = false;
 
 	_ctx = ctx;
-	_ssl = NULL;
+	_ssl = nullptr;
 
 	CreateSocket();
 	BindSocket(local_addr_, local_port_);
@@ -91,9 +91,9 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, int timeou
 	jcommon::Object::SetClassName("jnetwork::SSLSocket6");
 
 	_server_side = false;
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -102,7 +102,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, int timeou
 	InetAddress *address = InetAddress6::GetByName(host_);
 
 	_ctx = ctx;
-	_ssl = NULL;
+	_ssl = nullptr;
 
 	CreateSocket();
 	ConnectSocket(address, port_);
@@ -117,9 +117,9 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, InetAddres
 	jcommon::Object::SetClassName("jnetwork::SSLSocket6");
 
 	_server_side = false;
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -127,7 +127,7 @@ SSLSocket6::SSLSocket6(SSLContext *ctx, std::string host_, int port_, InetAddres
 	_is_closed = false;
 
 	_ctx = ctx;
-	_ssl = NULL;
+	_ssl = nullptr;
 
 	CreateSocket();
 	BindSocket(local_addr_, local_port_);
@@ -142,19 +142,19 @@ SSLSocket6::~SSLSocket6()
 	} catch (...) {
 	}
 
-	if (_is != NULL) {
+	if (_is != nullptr) {
 		delete _is;
-		_is = NULL;
+		_is = nullptr;
 	}
 
-	if (_os != NULL) {
+	if (_os != nullptr) {
 		delete _os;
-		_os = NULL;
+		_os = nullptr;
 	}
 
-	if (_address != NULL) {
+	if (_address != nullptr) {
 		delete _address;
-		_address = NULL;
+		_address = nullptr;
 	}
 }
 
@@ -204,7 +204,7 @@ void SSLSocket6::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin6_flowinfo = 0;
 	_lsock.sin6_scope_id = 0;
 
-	if (local_addr_ == NULL) {
+	if (local_addr_ == nullptr) {
 		_lsock.sin6_addr = in6addr_any;
 	} else {
 		inet_pton(AF_INET6, local_addr_->GetHostAddress().c_str(), &(_lsock.sin6_addr));
@@ -236,7 +236,7 @@ void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 	if (_timeout > 0) {
 		long arg;
 
-		if( (arg = fcntl(_fd, F_GETFL, NULL)) < 0) { 
+		if( (arg = fcntl(_fd, F_GETFL, nullptr)) < 0) { 
 			throw jexception::ConnectionException("Cannont set non blocking socket");
 		}
 
@@ -261,7 +261,7 @@ void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 					FD_ZERO(&wset); 
 					FD_SET(_fd, &wset); 
 
-					r = select(_fd+1, NULL, &wset, NULL, &tv); 
+					r = select(_fd+1, nullptr, &wset, nullptr, &tv); 
 
 					if (r < 0 && errno != EINTR) { 
 						throw jexception::ConnectionException("Connection error");
@@ -297,14 +297,14 @@ void SSLSocket6::ConnectSocket(InetAddress *addr_, int port_)
 	_ssl = SSL_new(_ctx->GetSSLContext());
 
 	/*
-	if(_ssl == NULL ) {
+	if(_ssl == nullptr ) {
 		_ssl = SSL_new(_ctx->GetSSLContext());
 	} else {
 		SSL_clear(_ssl);  //reuse old
 	}
 	*/
 
-	if (_ssl == NULL) {
+	if (_ssl == nullptr) {
 		throw jexception::ConnectionException("Secure connection error");
 	}
 
@@ -431,7 +431,7 @@ int SSLSocket6::Receive(char *data_, int size_, bool block_)
 		throw jexception::ConnectionException("Connection closed exception");
 	}
 
-	if (_ssl == NULL) {
+	if (_ssl == nullptr) {
 		return -1;
 	}
 
@@ -489,7 +489,7 @@ void SSLSocket6::Close()
 			SSL_free(_ssl);
 		}
 
-		_ssl = NULL;
+		_ssl = nullptr;
 	}
 
 	if (close(_fd) < 0) {
@@ -550,7 +550,7 @@ std::string SSLSocket6::What()
 
 bool SSLSocket6::GetPeerCertPEM(std::string *pem)
 {
-	if (pem == NULL) {
+	if (pem == nullptr) {
 		throw jexception::ConnectionException("Null pointer exception in get GetCertPEM");
 	}
 
@@ -592,7 +592,7 @@ X509 * SSLSocket6::GetPeerCert()
 
 bool SSLSocket6::GetPeerCertInfo(peer_cert_info_t *info)
 {
-	if (_ssl == NULL || info == NULL) {
+	if (_ssl == nullptr || info == nullptr) {
 		// structures not allocated");
 		return false;
 	}

@@ -37,7 +37,7 @@ typedef struct {
 
 static char *cmdopt_s = 0;
 static int cmdopt_p = 20;
-static MessageQueue *msqid = NULL;
+static MessageQueue *msqid = nullptr;
 
 void usage() 
 {

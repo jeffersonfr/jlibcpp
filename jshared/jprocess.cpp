@@ -45,9 +45,9 @@ Process::Process():
 	jcommon::Object::SetClassName("jshared::Process");
 	
 	// _process = process;
-	_input = NULL;
-	_output = NULL;
-	_error = NULL;
+	_input = nullptr;
+	_output = nullptr;
+	_error = nullptr;
 	_type = JPT_PARENT;
 
 	_pid = getpid();
@@ -59,9 +59,9 @@ Process::Process(std::string process):
 	jcommon::Object::SetClassName("jshared::Process");
 	
 	_process = process;
-	_input = NULL;
-	_output = NULL;
-	_error = NULL;
+	_input = nullptr;
+	_output = nullptr;
+	_error = nullptr;
 	_type = JPT_PARENT;
 
 	_pid = getpid();
@@ -292,7 +292,7 @@ void Process::Start()
 			argv[i] = (char *)strdup(tokens.GetToken(i).c_str());
 		}
 
-		argv[length] = NULL;
+		argv[length] = nullptr;
 
 		ForkChild(argv[0], argv);
 		
@@ -321,22 +321,22 @@ void Process::Release()
 		kill(_pid, SIGKILL);
 	}
 
-	if ((void *)_input != NULL) {
+	if ((void *)_input != nullptr) {
 		_input->Close();
 		delete _input;
-		_input = NULL;
+		_input = nullptr;
 	}
 
-	if ((void *)_output != NULL) {
+	if ((void *)_output != nullptr) {
 		_output->Close();
 		delete _output;
-		_output = NULL;
+		_output = nullptr;
 	}
 
-	if ((void *)_error != NULL) {
+	if ((void *)_error != nullptr) {
 		_error->Close();
 		delete _error;
-		_error = NULL;
+		_error = nullptr;
 	}
 
 	_pid = -1;

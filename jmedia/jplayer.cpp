@@ -113,7 +113,7 @@ std::vector<Control *> & Player::GetControls()
 
 jgui::Component * Player::GetVisualComponent()
 {
-	return NULL;
+	return nullptr;
 }
 
 Control * Player::GetControl(std::string id)
@@ -126,12 +126,12 @@ Control * Player::GetControl(std::string id)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void Player::RegisterPlayerListener(jevent::PlayerListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -142,7 +142,7 @@ void Player::RegisterPlayerListener(jevent::PlayerListener *listener)
 
 void Player::RemovePlayerListener(jevent::PlayerListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -156,7 +156,7 @@ std::vector<jevent::PlayerListener *> & Player::GetPlayerListeners()
 
 void Player::DispatchPlayerEvent(jevent::PlayerEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 
@@ -190,7 +190,7 @@ void Player::DispatchPlayerEvent(jevent::PlayerEvent *event)
 
 void Player::RegisterFrameGrabberListener(jevent::FrameGrabberListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -201,7 +201,7 @@ void Player::RegisterFrameGrabberListener(jevent::FrameGrabberListener *listener
 
 void Player::RemoveFrameGrabberListener(jevent::FrameGrabberListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -215,7 +215,7 @@ std::vector<jevent::FrameGrabberListener *> & Player::GetFrameGrabberListeners()
 
 void Player::DispatchFrameGrabberEvent(jevent::FrameGrabberEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

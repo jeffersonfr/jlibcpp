@@ -83,16 +83,16 @@ SSLSocket::SSLSocket(SSLContext *ctx, InetAddress *addr_, int port_, int timeout
 	jcommon::Object::SetClassName("jnetwork::SSLSocket");
 	
 	_server_side = false;
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
 	_timeout = timeout_;
 
 	_ctx = ctx;
-	_ssl = NULL;
+	_ssl = nullptr;
 
 	CreateSocket();
 	ConnectSocket(addr_, port_);
@@ -107,9 +107,9 @@ SSLSocket::SSLSocket(SSLContext *ctx, InetAddress *addr_, int port_, InetAddress
 	jcommon::Object::SetClassName("jnetwork::SSLSocket");
 
 	_server_side = false;
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -118,7 +118,7 @@ SSLSocket::SSLSocket(SSLContext *ctx, InetAddress *addr_, int port_, InetAddress
 	_is_closed = false;
 
 	_ctx = ctx;
-	_ssl = NULL;
+	_ssl = nullptr;
 
 	CreateSocket();
 	BindSocket(local_addr_, local_port_);
@@ -132,9 +132,9 @@ SSLSocket::SSLSocket(SSLContext *ctx, std::string host_, int port_, int timeout_
 	jcommon::Object::SetClassName("jnetwork::SSLSocket");
 
 	_server_side = false;
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -143,7 +143,7 @@ SSLSocket::SSLSocket(SSLContext *ctx, std::string host_, int port_, int timeout_
 	InetAddress *address = InetAddress4::GetByName(host_);
 
 	_ctx = ctx;
-	_ssl = NULL;
+	_ssl = nullptr;
 
 	CreateSocket();
 	ConnectSocket(address, port_);
@@ -158,9 +158,9 @@ SSLSocket::SSLSocket(SSLContext *ctx, std::string host_, int port_, InetAddress 
 	jcommon::Object::SetClassName("jnetwork::SSLSocket");
 
 	_server_side = false;
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -168,7 +168,7 @@ SSLSocket::SSLSocket(SSLContext *ctx, std::string host_, int port_, InetAddress 
 	_is_closed = false;
 
 	_ctx = ctx;
-	_ssl = NULL;
+	_ssl = nullptr;
 
 	CreateSocket();
 	BindSocket(local_addr_, local_port_);
@@ -183,19 +183,19 @@ SSLSocket::~SSLSocket()
 	} catch (...) {
 	}
 
-	if (_is != NULL) {
+	if (_is != nullptr) {
 		delete _is;
-		_is = NULL;
+		_is = nullptr;
 	}
 
-	if (_os != NULL) {
+	if (_os != nullptr) {
 		delete _os;
-		_os = NULL;
+		_os = nullptr;
 	}
 
-	if (_address != NULL) {
+	if (_address != nullptr) {
 		delete _address;
-		_address = NULL;
+		_address = nullptr;
 	}
 }
 
@@ -239,7 +239,7 @@ void SSLSocket::BindSocket(InetAddress *local_addr_, int local_port_)
 
 	_lsock.sin_family = AF_INET;
 
-	if (local_addr_ == NULL) {
+	if (local_addr_ == nullptr) {
 		_lsock.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
 		_local = dynamic_cast<InetAddress4 *>(local_addr_);
@@ -270,7 +270,7 @@ void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 	if (_timeout > 0) {
 		long arg;
 
-		if( (arg = fcntl(_fd, F_GETFL, NULL)) < 0) { 
+		if( (arg = fcntl(_fd, F_GETFL, nullptr)) < 0) { 
 			throw jexception::ConnectionException("Cannont set non blocking socket");
 		}
 
@@ -295,7 +295,7 @@ void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 					FD_ZERO(&wset); 
 					FD_SET(_fd, &wset); 
 
-					r = select(_fd+1, NULL, &wset, NULL, &tv); 
+					r = select(_fd+1, nullptr, &wset, nullptr, &tv); 
 
 					if (r < 0 && errno != EINTR) { 
 						throw jexception::ConnectionException("Connection error");
@@ -331,14 +331,14 @@ void SSLSocket::ConnectSocket(InetAddress *addr_, int port_)
 	_ssl = SSL_new(_ctx->GetSSLContext());
 
 	/*
-	if(_ssl == NULL ) {
+	if(_ssl == nullptr ) {
 		_ssl = SSL_new(_ctx->GetSSLContext());
 	} else {
 		SSL_clear(_ssl);  //reuse old
 	}
 	*/
 
-	if (_ssl == NULL) {
+	if (_ssl == nullptr) {
 		throw jexception::ConnectionException("Secure connection error");
 	}
 
@@ -465,7 +465,7 @@ int SSLSocket::Receive(char *data_, int size_, bool block_)
 		throw jexception::ConnectionException("Connection closed exception");
 	}
 
-	if (_ssl == NULL) {
+	if (_ssl == nullptr) {
 		return -1;
 	}
 
@@ -523,7 +523,7 @@ void SSLSocket::Close()
 			SSL_free(_ssl);
 		}
 
-		_ssl = NULL;
+		_ssl = nullptr;
 	}
 
 	if (close(_fd) < 0) {
@@ -584,7 +584,7 @@ std::string SSLSocket::What()
 
 bool SSLSocket::GetPeerCertPEM(std::string *pem)
 {
-	if (pem == NULL) {
+	if (pem == nullptr) {
 		throw jexception::ConnectionException("Null pointer exception in get GetCertPEM");
 	}
 
@@ -628,9 +628,9 @@ bool SSLSocket::VerifyCertificate()
 {
 	X509 *x509 = GetPeerCert();
 
-	if (x509 != NULL) {
+	if (x509 != nullptr) {
 		// SSL_CTX_set_verify(_ctx, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, VerifyClient);
-		SSL_CTX_set_verify(_ctx->GetSSLContext(), SSL_VERIFY_PEER, NULL);
+		SSL_CTX_set_verify(_ctx->GetSSLContext(), SSL_VERIFY_PEER, nullptr);
 
 		if (SSL_get_verify_result(_ssl) == X509_V_OK) {
 			return true;
@@ -644,7 +644,7 @@ bool SSLSocket::VerifyCertificate()
 
 bool SSLSocket::GetPeerCertInfo(peer_cert_info_t *info)
 {
-	if (_ssl == NULL || info == NULL) {
+	if (_ssl == nullptr || info == nullptr) {
 		// structures not allocated");
 		return false;
 	}

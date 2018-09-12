@@ -108,7 +108,7 @@ void Marquee::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -127,7 +127,7 @@ void Marquee::Paint(Graphics *g)
 		w = size.width - 2*x,
 		h = size.height - 2*y;
 
-	if (font != NULL) {
+	if (font != nullptr) {
 		g->SetFont(font);
 
 		if (IsEnabled() == true) {
@@ -184,19 +184,19 @@ void Marquee::Run()
     }
     
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-  } while (GetTheme() == NULL);
+  } while (GetTheme() == nullptr);
 
 	Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
 	jgui::Font 
     *font = theme->GetFont("component.font");
 	
-  if (font == NULL) {
+  if (font == nullptr) {
 		return;
 	}
 

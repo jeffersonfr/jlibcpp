@@ -114,7 +114,7 @@ bool Object::InstanceOf(std::string parent)
 
 bool Object::InstanceOf(Object *o)
 {
-	if ((void *)o == NULL) {
+	if ((void *)o == nullptr) {
     return false;
 	}
 
@@ -123,7 +123,7 @@ bool Object::InstanceOf(Object *o)
 
 bool Object::Equals(Object *o)
 {
-	if ((void *)o == NULL) {
+	if ((void *)o == nullptr) {
 		return false;
 	}
 

@@ -34,12 +34,12 @@ typedef struct {
 
 cairo_surface_t * create_png_surface_from_file(const char *file)
 {
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 	
 	surface = cairo_image_surface_create_from_png(file);
 	
-	if (surface == NULL) {
-		return NULL;
+	if (surface == nullptr) {
+		return nullptr;
 	}
 
 	cairo_format_t format = cairo_image_surface_get_format(surface);
@@ -49,7 +49,7 @@ cairo_surface_t * create_png_surface_from_file(const char *file)
 	if (format == CAIRO_FORMAT_INVALID || sw <= 0 || sh <= 0) {
 		cairo_surface_destroy(surface);
 
-		return NULL;
+		return nullptr;
 	}
 
 	return surface;
@@ -77,8 +77,8 @@ cairo_surface_t * create_png_surface_from_data(uint8_t *data, int size)
 	
 	surface = cairo_image_surface_create_from_png_stream(cairocks_read_png, &closure);
 
-	if (surface == NULL) {
-		return NULL;
+	if (surface == nullptr) {
+		return nullptr;
 	}
 
 	cairo_format_t format = cairo_image_surface_get_format(surface);
@@ -88,7 +88,7 @@ cairo_surface_t * create_png_surface_from_data(uint8_t *data, int size)
 	if (format == CAIRO_FORMAT_INVALID || sw <= 0 || sh <= 0) {
 		cairo_surface_destroy(surface);
 
-		return NULL;
+		return nullptr;
 	}
 
 	return surface;
@@ -109,8 +109,8 @@ static cairo_status_t cairocks_read_png(void *closure, uint8_t *data, uint32_t l
 
 cairo_surface_t * cairocks_surface_from_png_data(jio::InputStream *stream) 
 {
-	if (stream == NULL) {
-		return NULL;
+	if (stream == nullptr) {
+		return nullptr;
 	}
 
 	return cairo_image_surface_create_from_png_stream(cairocks_read_png, stream);

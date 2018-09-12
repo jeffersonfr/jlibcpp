@@ -174,7 +174,7 @@ public:
 	/* Load specified Bitmap and stores it as RGBA in an internal buffer */
 	
 	bool Load(jio::InputStream *stream) {
-		if (stream == NULL) {
+		if (stream == nullptr) {
 			return false;
 		}
 		
@@ -473,7 +473,7 @@ public:
 			}
 
 			if (Result) {
-				if (GetBits(NULL, bh.SizeImage, RedMask, GreenMask, BlueMask, AlphaMask)) {
+				if (GetBits(nullptr, bh.SizeImage, RedMask, GreenMask, BlueMask, AlphaMask)) {
 					uint8_t* Bitmap = new uint8_t[bh.SizeImage];
 					if (GetBits(Bitmap, bh.SizeImage, RedMask, GreenMask, BlueMask, AlphaMask)) {
 						file.write((char*) &bfh, sizeof(BITMAP_FILEHEADER));

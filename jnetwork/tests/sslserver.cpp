@@ -59,7 +59,7 @@ int main(void)
 	context->SetDHFile("certs/dh1024.pem");
 
   jnetwork::SSLServerSocket server(context, 5555);
-  jnetwork::SSLSocket *socket = NULL;
+  jnetwork::SSLSocket *socket = nullptr;
 	
 	while(true) {
 		try {
@@ -87,7 +87,7 @@ int main(void)
 				socket->Close();
 
 				delete socket;
-				socket = NULL;
+				socket = nullptr;
 
 				if (strncmp(msg, "quit", 4) == 0) {
 					break;

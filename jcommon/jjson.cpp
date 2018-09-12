@@ -54,14 +54,14 @@ JSONValue::JSONValue():
 	jcommon::Object::SetClassName("jcommon::JSONValue");
 
 	_type = JSON_NULL;
-	_name = NULL;
-	_parent = NULL;
+	_name = nullptr;
+	_parent = nullptr;
 
-	_next_sibling = NULL;
-	_first_child = NULL;
-	_last_child = NULL;
+	_next_sibling = nullptr;
+	_first_child = nullptr;
+	_last_child = nullptr;
 	
-	_string_value = NULL;
+	_string_value = nullptr;
 	_int_value = 0;
 	_double_value = 0.0;
 }
@@ -70,7 +70,7 @@ JSONValue::~JSONValue()
 {
 	std::vector<JSONValue *> values;
 
-	for (JSONValue *value=_first_child; value!=NULL;) {
+	for (JSONValue *value = _first_child; value != nullptr;) {
 		JSONValue *next = value->_next_sibling;
 
 		delete value;
@@ -78,11 +78,11 @@ JSONValue::~JSONValue()
 		value = next;
 	}
 
-	if (_name != NULL) {
+	if (_name != nullptr) {
 		delete [] _name;
 	}
 
-	if (_string_value != NULL) {
+	if (_string_value != nullptr) {
 		delete [] _string_value;
 	}
 }
@@ -282,7 +282,7 @@ JSONValue * JSON::Parse(const char *source)
 	int lines = 0;
 	char *dup = strdup(source);
 	char *it = dup;
-	char *name = NULL;
+	char *name = nullptr;
 
 	while (*it) {
 		// skip white space
@@ -299,9 +299,9 @@ JSONValue * JSON::Parse(const char *source)
 				JSONValue *object = new JSONValue();
 
 				// name
-				object->_name = NULL;
+				object->_name = nullptr;
 
-				if (name != NULL) {
+				if (name != nullptr) {
 					object->_name = strdup(name);
 				}
 
@@ -436,9 +436,9 @@ JSONValue * JSON::Parse(const char *source)
 					// new string value
 					JSONValue *object = new JSONValue();
 
-					object->_name = NULL;
+					object->_name = nullptr;
 
-					if (name != NULL) {
+					if (name != nullptr) {
 						object->_name = strdup(name);
 					}
 
@@ -446,9 +446,9 @@ JSONValue * JSON::Parse(const char *source)
 
 					object->_type = JSON_STRING;
 						
-					object->_string_value = NULL;
+					object->_string_value = nullptr;
 
-					if (first != NULL) {
+					if (first != nullptr) {
 						object->_string_value = strdup(first);
 					}
 
@@ -465,9 +465,9 @@ JSONValue * JSON::Parse(const char *source)
 				// new null/bool value
 				JSONValue *object = new JSONValue();
 
-				object->_name = NULL;
+				object->_name = nullptr;
 
-				if (name != NULL) {
+				if (name != nullptr) {
 					object->_name = strdup(name);
 				}
 
@@ -513,9 +513,9 @@ JSONValue * JSON::Parse(const char *source)
 				// new number value
 				JSONValue *object = new JSONValue();
 
-				object->_name = NULL;
+				object->_name = nullptr;
 
-				if (name != NULL) {
+				if (name != nullptr) {
 					object->_name = strdup(name);
 				}
 
@@ -572,18 +572,18 @@ JSONValue * JSON::Parse(const char *source)
 
 
 
-	if (source == NULL) {
-		return NULL;
+	if (source == nullptr) {
+		return nullptr;
 	}
 
-	JSONValue *root = NULL;
-	JSONValue *top = NULL;
+	JSONValue *root = nullptr;
+	JSONValue *top = nullptr;
 
 	int escaped_newlines = 0;
 	int lines = 0;
 	char *dup = strdup(source);
 	char *it = dup;
-	char *name = NULL;
+	char *name = nullptr;
 
 	while (*it) {
 		if ((*it) == '\n') {
@@ -597,13 +597,13 @@ JSONValue * JSON::Parse(const char *source)
 					JSONValue *object = new JSONValue();
 
 					// name
-					object->_name = NULL;
+					object->_name = nullptr;
 
-					if (name != NULL) {
+					if (name != nullptr) {
 						object->_name = strdup(name);
 					}
 					
-					name = NULL;
+					name = nullptr;
 
 					// type
 					object->_type = (*it == '{')?JSON_OBJECT:JSON_ARRAY;
@@ -726,18 +726,18 @@ JSONValue * JSON::Parse(const char *source)
 						// new string value
 						JSONValue *object = new JSONValue();
 
-						object->_name = NULL;
+						object->_name = nullptr;
 
-						if (name != NULL) {
+						if (name != nullptr) {
 							object->_name = strdup(name);
 						}
 
-						name = NULL;
+						name = nullptr;
 
 						object->_type = JSON_STRING;
-						object->_string_value = NULL;
+						object->_string_value = nullptr;
 
-						if (first != NULL) {
+						if (first != nullptr) {
 							object->_string_value = strdup(first);
 						}
 
@@ -753,13 +753,13 @@ JSONValue * JSON::Parse(const char *source)
 					// new null/bool value
 					JSONValue *object = new JSONValue();
 
-					object->_name = NULL;
+					object->_name = nullptr;
 
-					if (name != NULL) {
+					if (name != nullptr) {
 						object->_name = strdup(name);
 					}
 
-					name = NULL;
+					name = nullptr;
 
 					if (strncasecmp(it, "null", 4) == 0) {
 						// null
@@ -800,13 +800,13 @@ JSONValue * JSON::Parse(const char *source)
 					// new number value
 					JSONValue *object = new JSONValue();
 
-					object->_name = NULL;
+					object->_name = nullptr;
 
-					if (name != NULL) {
+					if (name != nullptr) {
 						object->_name = strdup(name);
 					}
 
-					name = NULL;
+					name = nullptr;
 
 					object->_type = JSON_INT;
 

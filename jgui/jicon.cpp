@@ -80,7 +80,7 @@ void Icon::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -97,7 +97,7 @@ void Icon::Paint(Graphics *g)
 		w = size.width - 2*x,
 		h = size.height - 2*y;
 
-	if (_image != NULL) {
+	if (_image != nullptr) {
 		g->DrawImage(_image, x, y, w, h);
 	} else {
     g->SetColor(Color::Black);

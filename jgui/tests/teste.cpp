@@ -460,7 +460,7 @@ class Primitives : public jgui::Window {
       g->SetPen(pen);
       g->DrawLine(10+0*(120+10)+10, 6*(120+10)+80, 10+10*(120+10)-20, 6*(120+10)+80);
 
-      pen.dashes = NULL;
+      pen.dashes = nullptr;
       pen.dashes_size = 0;
       g->SetPen(pen);
 
@@ -553,7 +553,7 @@ class Primitives : public jgui::Window {
 
       g->Translate(-320, 0);
 
-      g->SetFont(NULL);
+      g->SetFont(nullptr);
 
       delete f1;
       delete f2;

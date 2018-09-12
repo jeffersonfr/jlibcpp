@@ -105,13 +105,13 @@ class SSLContext : public virtual jcommon::Object {
 		 * \brief 
 		 *
 		 */
-		static SSLContext * CreateServerContext(SSL_METHOD *method = NULL);
+		static SSLContext * CreateServerContext(SSL_METHOD *method = nullptr);
 
 		/**
 		 * \brief 
 		 *
 		 */
-		static SSLContext * CreateClientContext(std::string ca_file, SSL_METHOD *method = NULL);
+		static SSLContext * CreateClientContext(std::string ca_file, SSL_METHOD *method = nullptr);
 
 		/**
 		 * \brief 

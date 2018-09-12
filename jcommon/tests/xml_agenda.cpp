@@ -55,7 +55,7 @@ class AgendaDB{
 
 			// parser servern node
 			root = doc.RootElement()->FirstChildElement("notes");
-			if (root != NULL) {
+			if (root != nullptr) {
 				if (strcmp(root->Value(), "notes") == 0) {
 					std::string event;
 					int dia = -1,
@@ -65,19 +65,19 @@ class AgendaDB{
 					psg = root->FirstChildElement("event");
 
 					do {
-						if (psg == NULL || strcmp(psg->Value(), "event") != 0) {
+						if (psg == nullptr || strcmp(psg->Value(), "event") != 0) {
 							break;
 						}
 
-						if (psg->Attribute("day") != NULL) {
+						if (psg->Attribute("day") != nullptr) {
 							dia = atoi(psg->Attribute("day"));
 						}
 
-						if (psg->Attribute("month") != NULL) {
+						if (psg->Attribute("month") != nullptr) {
 							mes = atoi(psg->Attribute("month"));
 						}
 
-						if (psg->Attribute("year") != NULL) {
+						if (psg->Attribute("year") != nullptr) {
 							ano = atoi(psg->Attribute("year"));
 						}
 
@@ -93,7 +93,7 @@ class AgendaDB{
 
 							events.push_back(t);
 						}
-					} while ((psg = psg->NextSiblingElement("event")) != NULL);
+					} while ((psg = psg->NextSiblingElement("event")) != nullptr);
 				}
 			}
 
@@ -113,7 +113,7 @@ class AgendaDB{
 		struct agenda_t * Get(int i)
 		{
 			if (i < 0 || i >= GetSize()) {
-				return NULL;
+				return nullptr;
 			}
 
 			return events[i];

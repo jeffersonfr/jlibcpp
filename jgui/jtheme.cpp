@@ -53,7 +53,7 @@ Theme::Theme():
   SetIntegerParam("component.hgap", 0);
 	SetIntegerParam("component.vgap", 0);
 
-	_fonts["component.font"] = NULL;
+	_fonts["component.font"] = nullptr;
 
 	// INFO:: container
 	SetIntegerParam("container.bg", GetIntegerParam("component.bg"));
@@ -80,7 +80,7 @@ Theme::Theme():
   SetIntegerParam("container.hgap", 0);
 	SetIntegerParam("container.vgap", 0);
 
-	_fonts["container.font"] = NULL;
+	_fonts["container.font"] = nullptr;
 
 	// INFO:: window
 	SetIntegerParam("window.bg", GetIntegerParam("component.bg"));
@@ -107,7 +107,7 @@ Theme::Theme():
   SetIntegerParam("window.hgap", 0);
 	SetIntegerParam("window.vgap", 0);
 
-	_fonts["window.font"] = NULL;
+	_fonts["window.font"] = nullptr;
 
 	// INFO:: item
 	SetIntegerParam("item.bg", 0xff000000);

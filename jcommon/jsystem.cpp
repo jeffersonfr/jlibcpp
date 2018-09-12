@@ -100,7 +100,7 @@ std::string System::GetCurrentUserName()
 
     pw = getpwuid(0);
 
-	if (pw != NULL) {
+	if (pw != nullptr) {
 		// WARNNING:: free pointer
 	    return pw->pw_name;
 	}
@@ -139,7 +139,7 @@ std::string System::GetHomeDirectory()
 
 	pw = getpwuid(0);
 
-	if (pw != NULL) {
+	if (pw != nullptr) {
 		return pw->pw_dir;
 	}
 
@@ -150,7 +150,7 @@ std::string System::GetCurrentDirectory()
 {
 	char path[65536];
 	
-	if (getcwd(path, 65536) == NULL) {
+	if (getcwd(path, 65536) == nullptr) {
 		throw jexception::RuntimeException(strerror(errno));
 	}
 
@@ -163,7 +163,7 @@ std::string System::GetEnviromentVariable(std::string key_, std::string default_
 	
 	char *var = getenv(key_.c_str());
 
-	if (var == NULL) {
+	if (var == nullptr) {
 		return default_;
 	}
 	
@@ -255,7 +255,7 @@ int System::KbHit(void)
 	FD_SET(0, &read_handles);
 	
 	timeout.tv_sec = timeout.tv_usec = 0;
-	status = select(0 + 1, &read_handles, NULL, NULL, &timeout);
+	status = select(0 + 1, &read_handles, nullptr, nullptr, &timeout);
 	
 	if(status < 0) {
 		throw jexception::RuntimeException("select() failed in kbhit()");

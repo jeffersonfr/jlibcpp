@@ -717,15 +717,15 @@ static int remove_unused_colors(ICOImage* image);
 static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 	ICODir icondir;
 	ICOImageHeader bmp_header;
-	ICOImage* images = NULL;
+	ICOImage* images = nullptr;
 	int rv = 1;
 	int i=0, j=0;
 
-	if (stream == NULL) {
+	if (stream == nullptr) {
 		ico_error_code = icoFileOpenError;
 		return -1;
 	}
-	if (images_ptr == NULL) {
+	if (images_ptr == nullptr) {
 		ico_error_code = icoNoMemory;
 		return -1;
 	}
@@ -740,10 +740,10 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 	}
 
 	/* Read Icon Directory Entries */
-	icondir.image_entries = NULL;
+	icondir.image_entries = nullptr;
 	icondir.image_entries = (ICODirEntry *) malloc(icondir.image_count *
 							sizeof(ICODirEntry));
-	if (icondir.image_entries == NULL) {
+	if (icondir.image_entries == nullptr) {
 		ico_error_code = icoNoMemory;
 		return -1;
 	}
@@ -758,7 +758,7 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 
 	/* Create ICOImages Memory */
 	images = (ICOImage *) malloc(icondir.image_count * sizeof(ICOImage));
-	if (images == NULL) {
+	if (images == nullptr) {
 		ico_error_code = icoNoMemory;
 		goto error;
 	}
@@ -795,10 +795,10 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 		if (images[i].num_colors == 0) {
 			images[i].num_colors = 256;
 		}
-		images[i].colors = NULL;
+		images[i].colors = nullptr;
 		images[i].colors = (ICORGBColor *) malloc(images[i].num_colors *
 							sizeof(ICORGBColor));
-		if (images[i].colors == NULL) {
+		if (images[i].colors == nullptr) {
 			ico_error_code = icoNoMemory;
 			goto error;
 		}
@@ -812,8 +812,8 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 		}
 
 		/* Get Image and Mask Data */
-		images[i].data = NULL;
-		images[i].mask = NULL;
+		images[i].data = nullptr;
+		images[i].mask = nullptr;
 		images[i].data = (uint8_t *) malloc((8/bmp_header.bits_per_pixel)*
 						 images[i].width * 
 						 images[i].height * 
@@ -822,7 +822,7 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 						 images[i].width * 
 						 images[i].height * 
 						 sizeof(uint8_t));
-		if ((images[i].data == NULL) || (images[i].mask == NULL)) {
+		if ((images[i].data == nullptr) || (images[i].mask == nullptr)) {
 			ico_error_code = icoNoMemory;
 			goto error;
 		}
@@ -848,21 +848,21 @@ static int read_ICO_file(jio::InputStream *stream, ICOImage** images_ptr) {
 	return icondir.image_count;
 
 error:
-	if (icondir.image_entries != NULL) free(icondir.image_entries);
-	if (images != NULL) {
+	if (icondir.image_entries != nullptr) free(icondir.image_entries);
+	if (images != nullptr) {
 		for (i=0; i<(int)bmp_header.colors_used; i++) {
-			if (images[i].colors != NULL) {
+			if (images[i].colors != nullptr) {
 				free(images[i].colors);
 			}
-			if (images[i].data != NULL) {
+			if (images[i].data != nullptr) {
 				free(images[i].data);
 			}
-			if (images[i].mask != NULL) {
+			if (images[i].mask != nullptr) {
 				free(images[i].mask);
 			}
 		}
 		free(images);
-		images = NULL;
+		images = nullptr;
 	}
 	return -1;
 }
@@ -1205,7 +1205,7 @@ static int remove_unused_colors(ICOImage* image) {
 	int i = 0;
 	int j = 0;
 	int num_used_colors = 0;
-	ICORGBColor* used_colors = NULL;
+	ICORGBColor* used_colors = nullptr;
 
 	/* flag used colors in original color map */
 	for (i=0; i<(int)(image->width*image->height); i++) {
@@ -1217,7 +1217,7 @@ static int remove_unused_colors(ICOImage* image) {
 
 	/* make space for used colors array */
 	used_colors = (ICORGBColor *) malloc(num_used_colors * sizeof(ICORGBColor));
-	if (used_colors == NULL) {
+	if (used_colors == nullptr) {
 		return 0;
 	}
 
@@ -1245,7 +1245,7 @@ cairo_surface_t * create_ico_surface_from_stream(jio::InputStream *stream)
 	if (read_ICO_file(stream, &image) == 0) {
 		delete image;
 
-		return NULL;
+		return nullptr;
 	}
 
 	int sw = image->width;
@@ -1254,14 +1254,14 @@ cairo_surface_t * create_ico_surface_from_stream(jio::InputStream *stream)
 
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, sw, sh);
 
-	if (surface == NULL) {
-		return NULL;
+	if (surface == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(surface);
 
-	if (data == NULL) {
-		return NULL;
+	if (data == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *ptr = (uint8_t *)data;
@@ -1288,7 +1288,7 @@ cairo_surface_t * create_ico_surface_from_file(const char *file)
 {
 	jio::FileInputStream stream(file);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_ico_surface_from_stream(&stream);
 
@@ -1301,7 +1301,7 @@ cairo_surface_t * create_ico_surface_from_data(uint8_t *data, int size)
 {
 	jio::MemoryInputStream stream((const uint8_t *)data, size);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_ico_surface_from_stream(&stream);
 

@@ -44,12 +44,12 @@ BitInputStream::BitInputStream(std::string filename):
 		file = jio::File::OpenFile(filename);
 		stream = new FileInputStream(file);
 	} catch (...) {
-		if (file != NULL) {
+		if (file != nullptr) {
 			delete file;
 		}
 
-		file = NULL;
-		stream = NULL;
+		file = nullptr;
+		stream = nullptr;
 
 		throw jexception::IOException("Cannot open file in BitInputStream");
 	}
@@ -60,7 +60,7 @@ BitInputStream::BitInputStream(InputStream *is):
 {
 	jcommon::Object::SetClassName("jio::BitInputStream");
 
-	if ((void *)is == NULL) {
+	if ((void *)is == nullptr) {
 		throw jexception::IOException("Null pointer exception");
 	}
 
@@ -69,16 +69,16 @@ BitInputStream::BitInputStream(InputStream *is):
 	show = false;
 	currentMask = 0;
 	currentByte = 0;
-	file = NULL;
+	file = nullptr;
 }
 
 BitInputStream::~BitInputStream()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		delete stream;
 	}
 
-	if (file != NULL) {
+	if (file != nullptr) {
 		delete file;
 	}
 }

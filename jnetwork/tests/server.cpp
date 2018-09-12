@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 
 		client = server.Accept();
 	
-		if (client != NULL) {
+		if (client != nullptr) {
 			int r;
 			
 			do {

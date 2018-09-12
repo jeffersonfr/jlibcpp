@@ -61,15 +61,15 @@ class BackgroundLayer : public ScreenLayer {
 		BackgroundLayer():
 			ScreenLayer()
 		{
-			_image = NULL;
+			_image = nullptr;
 			_color = jgui::Color(0x00, 0x00, 0x00, 0xff);
 		}
 
 		virtual ~BackgroundLayer()
 		{
-      if (_image != NULL) {
+      if (_image != nullptr) {
         delete _image;
-        _image = NULL;
+        _image = nullptr;
       }
 		}
 
@@ -82,9 +82,9 @@ class BackgroundLayer : public ScreenLayer {
 
 		void SetImage(std::string image)
 		{
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 
 			_image = new jgui::BufferedImage(image);
@@ -114,12 +114,12 @@ class VideoLayer : public ScreenLayer {
 		VideoLayer():
 			ScreenLayer()
 		{
-			_player = NULL;
+			_player = nullptr;
 		}
 
 		virtual ~VideoLayer()
 		{
-			if (_player != NULL) {
+			if (_player != nullptr) {
 				jgui::Component *cmp = _player->GetVisualComponent();
 
 			  _player->Stop();
@@ -127,13 +127,13 @@ class VideoLayer : public ScreenLayer {
 				Remove(cmp);
 			
         delete _player;
-			  _player = NULL;
+			  _player = nullptr;
 			}
 		}
 
 		void SetFile(std::string file)
 		{
-			if (_player != NULL) {
+			if (_player != nullptr) {
 				jgui::Component *cmp = _player->GetVisualComponent();
 
 			  _player->Stop();
@@ -141,7 +141,7 @@ class VideoLayer : public ScreenLayer {
 				Remove(cmp);
 			
         delete _player;
-			  _player = NULL;
+			  _player = nullptr;
 			}
 
 			_player = jmedia::PlayerManager::CreatePlayer(file);
@@ -186,10 +186,10 @@ class GraphicLayer : public ScreenLayer {
 		virtual ~GraphicLayer()
 		{
 			delete _user_container;
-			_user_container = NULL;
+			_user_container = nullptr;
 
 			delete _system_container;
-			_system_container = NULL;
+			_system_container = nullptr;
 		}
 
 		jgui::Container * GetUserContainer()
@@ -317,7 +317,7 @@ class LayersManager : public jgui::Window {
 			return dynamic_cast<GraphicLayer *>(_graphic_layer);
 		}
 
-		virtual void Repaint(jgui::Component *c = NULL)
+		virtual void Repaint(jgui::Component *c = nullptr)
 		{
 			_condition.notify_one();
 		}
@@ -510,16 +510,16 @@ class MenuTest : public Scene {
 			RemoveAll();
 
 			delete _label;
-      _label = NULL;
+      _label = nullptr;
 
 			delete _button1;
-      _button1 = NULL;
+      _button1 = nullptr;
 
 			delete _button2;
-      _button2 = NULL;
+      _button2 = nullptr;
 
 			delete _button3;
-      _button3 = NULL;
+      _button3 = nullptr;
 		}
 
 		virtual bool Animate()
@@ -580,7 +580,7 @@ class MenuTest : public Scene {
         printf("F1");
         Start();
 
-				if (GetFocusOwner() != NULL) {
+				if (GetFocusOwner() != nullptr) {
 					GetFocusOwner()->ReleaseFocus();
 				}
 

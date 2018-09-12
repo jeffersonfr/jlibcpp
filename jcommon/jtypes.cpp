@@ -81,7 +81,7 @@ int Types::StringToInteger(std::string s, int radix)
 		throw jexception::OutOfBoundsException("Bounds of radix exception");
 	}
 	
-	return (int)strtol(s.c_str(), NULL, radix);
+	return (int)strtol(s.c_str(), nullptr, radix);
 }
 
 std::string Types::IntegerToString(int i, int radix)
@@ -101,7 +101,7 @@ int64_t Types::StringToLong(std::string s, int radix)
 		throw jexception::OutOfBoundsException("Bounds of radix exception");
 	}
 	
-	return (int64_t)strtoll(s.c_str(), NULL, radix);
+	return (int64_t)strtoll(s.c_str(), nullptr, radix);
 }
 
 std::string Types::LongToString(int64_t i, int radix)
@@ -117,7 +117,7 @@ std::string Types::LongToString(int64_t i, int radix)
 
 float Types::StringToFloat(std::string s)
 {
-	return strtof(s.c_str(), NULL);
+	return strtof(s.c_str(), nullptr);
 }
 
 std::string Types::FloatToString(float i, int radix)
@@ -141,7 +141,7 @@ std::string Types::FloatToString(float i, int radix)
 
 double Types::StringToDouble(std::string s)
 {
-	return strtod(s.c_str(), NULL);
+	return strtod(s.c_str(), nullptr);
 }
 
 std::string Types::DoubleToString(double i, int radix)

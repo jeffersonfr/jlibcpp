@@ -88,12 +88,12 @@ class Callback : public jipc::RemoteCallListener, jthread::Thread {
 				// INFO:: processing ANS_'s parameters
 				char *iptr = strstr(tmp, "V:");
 
-				if (iptr != NULL) {
+				if (iptr != nullptr) {
 					iptr = iptr+2;
 
 					char *fptr = strstr(iptr, "A-V");
 
-					if (fptr != NULL) {
+					if (fptr != nullptr) {
 						*fptr = 0;
 
 						key = "ANS_TIME_POSITION";
@@ -102,10 +102,10 @@ class Callback : public jipc::RemoteCallListener, jthread::Thread {
 				} else {
 					iptr = strstr(tmp, "ANS");
 
-					if (iptr != NULL) {
+					if (iptr != nullptr) {
 						char *fptr = strstr(iptr+1, " ");
 
-						if (fptr == NULL) {
+						if (fptr == nullptr) {
 							continue;
 						}
 
@@ -115,14 +115,14 @@ class Callback : public jipc::RemoteCallListener, jthread::Thread {
 
 						iptr = strstr(fptr+1, "=");
 
-						if (iptr == NULL) {
+						if (iptr == nullptr) {
 							continue;
 						}
 
 						iptr = iptr+1;
 						fptr = strstr(iptr+1, "\n");
 
-						if (fptr == NULL) {
+						if (fptr == nullptr) {
 							continue;
 						}
 
@@ -214,8 +214,8 @@ class Callback : public jipc::RemoteCallListener, jthread::Thread {
 
 						o << "youtube-dl -g " << _path;
 
-						if ((fp = popen(o.str().c_str(), "r")) != NULL) {
-							if (fgets(tmp, 1024, fp) == NULL) {
+						if ((fp = popen(o.str().c_str(), "r")) != nullptr) {
+							if (fgets(tmp, 1024, fp) == nullptr) {
 								pclose(fp);
 
 								std::cout << "Cannot retrive youtube's url from youtube-dl." << std::endl;
@@ -226,7 +226,7 @@ class Callback : public jipc::RemoteCallListener, jthread::Thread {
 						
 								char *index = strstr(tmp, "\n");
 
-								if (index != NULL) {
+								if (index != nullptr) {
 									*index = '\0';
 								}
 		
@@ -267,8 +267,8 @@ class Callback : public jipc::RemoteCallListener, jthread::Thread {
 
 				o << "./channel-count.sh \"" << _path << "\"";
 
-				if ((fp = popen(o.str().c_str(), "r")) != NULL) {
-					if (fgets(tmp, 1024, fp) == NULL) {
+				if ((fp = popen(o.str().c_str(), "r")) != nullptr) {
+					if (fgets(tmp, 1024, fp) == nullptr) {
 						pclose(fp);
 
 						std::cout << "Cannot retrive the number of channels." << std::endl;
@@ -277,7 +277,7 @@ class Callback : public jipc::RemoteCallListener, jthread::Thread {
 
 						char *index = strstr(tmp, "\n");
 
-						if (index != NULL) {
+						if (index != nullptr) {
 							*index = '\0';
 						}
 

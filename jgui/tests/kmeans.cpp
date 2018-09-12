@@ -221,7 +221,7 @@ class SOM : public jgui::Window {
 		SOM(int ninputs, int neurons):
 			jgui::Window(3*240, 3*128)
 		{
-			_classify_input = NULL;
+			_classify_input = nullptr;
 			_classify_input_size = 0;
 
 			_learning_rate = 0.1;
@@ -389,7 +389,7 @@ class SOM : public jgui::Window {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-      if (_train_input == NULL) {
+      if (_train_input == nullptr) {
         return;
       }
 
@@ -420,7 +420,7 @@ class SOM : public jgui::Window {
 				g->SetRGB(color, (int)(x*s+dx), (int)(y*s+dy));
 			}
 			
-			if (_classify_input != NULL) {
+			if (_classify_input != nullptr) {
 				// classifica os pontos
 				for (int i=0; i<_classify_input_size; i++) {
 					// identifica a regiao do ponto
@@ -467,7 +467,7 @@ int main(int argc, char **argv)
 {
   jgui::Application::Init(argc, argv);
 
-  srand(time(NULL));
+  srand(time(nullptr));
 
   SOM app(4, 2*256);
 

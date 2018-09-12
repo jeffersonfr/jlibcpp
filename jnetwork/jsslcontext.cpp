@@ -37,13 +37,13 @@ SSLContext::SSLContext(SSL_METHOD *method)
 {
 	jcommon::Object::SetClassName("jnetwork::SSLContext");
 
-	if (method != NULL) {
+	if (method != nullptr) {
 		_ctx = SSL_CTX_new(method);
 	} else {
 		_ctx = SSL_CTX_new(SSLv23_server_method());
 	}
 
-	if (_ctx == NULL) {
+	if (_ctx == nullptr) {
 		throw jexception::ConnectionException("Cannot create ssl context");
 	}
 
@@ -55,13 +55,13 @@ SSLContext::SSLContext(std::string ca_file, SSL_METHOD *method)
 {
 	jcommon::Object::SetClassName("jnetwork::SSLContext");
 		
-	if (method != NULL) {
+	if (method != nullptr) {
 		_ctx = SSL_CTX_new(method);
 	} else {
 		_ctx = SSL_CTX_new(SSLv23_client_method());
 	}
 
-	if (_ctx == NULL) {
+	if (_ctx == nullptr) {
 		throw jexception::ConnectionException("Cannot create ssl context");
 	}
 
@@ -91,16 +91,16 @@ SSLContext * SSLContext::CreateClientContext(std::string ca_file, SSL_METHOD *me
 RSA * SSLContext::GenerateRSAKey(int len, int exp)
 {
   RSA *rsa = RSA_new();
-  BIGNUM *bne = NULL;
+  BIGNUM *bne = nullptr;
 
   bne = BN_new();
 
   if (BN_set_word(bne, exp) == 0) {
-    return NULL;
+    return nullptr;
   }
  
-  if (RSA_generate_key_ex(rsa, len, bne, NULL) == 0) {
-    return NULL;
+  if (RSA_generate_key_ex(rsa, len, bne, nullptr) == 0) {
+    return nullptr;
   }
 
   BN_free(bne);
@@ -110,16 +110,16 @@ RSA * SSLContext::GenerateRSAKey(int len, int exp)
 
 EVP_PKEY * SSLContext::GeneratePKey(RSA *rsakey)
 {
-	EVP_PKEY *pkey = NULL;
+	EVP_PKEY *pkey = nullptr;
 
 	if (!(pkey = EVP_PKEY_new())) {
-		return NULL;
+		return nullptr;
 	}
 	
 	if (!EVP_PKEY_assign_RSA(pkey, rsakey)) {
 		EVP_PKEY_free(pkey);
 
-		return NULL;
+		return nullptr;
 	}
 	
 	return pkey;
@@ -130,33 +130,33 @@ X509 * SSLContext::BuildCertificate(std::string name, std::string organization, 
 	// Create an X509_NAME structure to hold the distinguished name 
 	X509_NAME *n = X509_NAME_new();
 	if (!n) {
-		return NULL;
+		return nullptr;
 	}
 	
 	// Add fields
 	if (!X509_NAME_add_entry_by_NID(n, NID_commonName, MBSTRING_ASC, (uint8_t *)name.c_str(), -1, -1, 0)) {
 		X509_NAME_free(n);
 
-		return NULL;
+		return nullptr;
 	}
 
 	if (!X509_NAME_add_entry_by_NID(n, NID_organizationName, MBSTRING_ASC, (uint8_t *)organization.c_str(), -1, -1, 0)) {
 		X509_NAME_free(n);
 
-		return NULL;
+		return nullptr;
 	}
 
 	if (!X509_NAME_add_entry_by_NID(n, NID_countryName, MBSTRING_ASC, (uint8_t *)country.c_str(), -1, -1, 0)) {
 		X509_NAME_free(n);
 
-		return NULL;
+		return nullptr;
 	}
 	
 	X509 *c = X509_new();
 	if (!c) {
 		X509_NAME_free(n);
 
-		return NULL;
+		return nullptr;
 	}
 
 	// Set subject and issuer names to the X509_NAME we made 
@@ -172,7 +172,7 @@ X509 * SSLContext::BuildCertificate(std::string name, std::string organization, 
 	if (!s) {
 		X509_free(c);
 
-		return NULL;
+		return nullptr;
 	}
 	
 	X509_gmtime_adj(s, -60*60*24);
@@ -193,7 +193,7 @@ X509 * SSLContext::BuildCertificate(std::string name, std::string organization, 
 
 bool SSLContext::SetCertificate(std::string cert_file, std::string pkey_file)
 {
-	return SetCertificate(cert_file, pkey_file, NULL, NULL);
+	return SetCertificate(cert_file, pkey_file, nullptr, nullptr);
 }
 
 bool SSLContext::SetCertificate(std::string cert_file, std::string pkey_file, std::string password)
@@ -232,7 +232,7 @@ bool SSLContext::SetCertificate(std::string cert_file, std::string pkey_file, in
 
 bool SSLContext::VerifyRootAuthorityFile(std::string file)
 {
-	if (!SSL_CTX_load_verify_locations(_ctx, file.c_str(), NULL)) {
+	if (!SSL_CTX_load_verify_locations(_ctx, file.c_str(), nullptr)) {
 		return false;
 	}
 
@@ -241,7 +241,7 @@ bool SSLContext::VerifyRootAuthorityFile(std::string file)
 
 bool SSLContext::VerifyRootAuthorityLocation(std::string location)
 {
-	if (!SSL_CTX_load_verify_locations(_ctx, NULL, location.c_str())) {
+	if (!SSL_CTX_load_verify_locations(_ctx, nullptr, location.c_str())) {
 		return false;
 	}
 
@@ -266,7 +266,7 @@ void SSLContext::SetDHFile(std::string file)
 	fd = fopen(file.c_str(), "r");
 
 	if (fd) {
-		dh = PEM_read_DHparams(fd, NULL, NULL, NULL);
+		dh = PEM_read_DHparams(fd, nullptr, nullptr, nullptr);
 
 		fclose(fd);
 		

@@ -48,12 +48,12 @@ SecureIPCServer::~SecureIPCServer()
 
 void SecureIPCServer::WaitCall(RemoteCallListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
-	jnetwork::SSLSocket *client = NULL;
-	Response *response = NULL;
+	jnetwork::SSLSocket *client = nullptr;
+	Response *response = nullptr;
 
 	try {
 		client = (jnetwork::SSLSocket *)_server->Accept();
@@ -86,7 +86,7 @@ void SecureIPCServer::WaitCall(RemoteCallListener *listener)
 
 		response = listener->ProcessCall(&method);
 
-		if (response != NULL) {
+		if (response != nullptr) {
 			std::string encoded = response->Encode();
 
 			const char *buffer = encoded.c_str();
@@ -117,22 +117,22 @@ void SecureIPCServer::WaitCall(RemoteCallListener *listener)
 			delete client;
 		}
 	} catch (jexception::ConnectionTimeoutException &e) {
-		if (response != NULL) {
+		if (response != nullptr) {
 			delete response;
 		}
 
-		if (client != NULL) {
+		if (client != nullptr) {
 			client->Close();
 			delete client;
 		}
 
 		throw jexception::TimeoutException(&e, "Connection timeout exception");
 	} catch (jexception::Exception &e) {
-		if (response != NULL) {
+		if (response != nullptr) {
 			delete response;
 		}
 
-		if (client != NULL) {
+		if (client != nullptr) {
 			client->Close();
 			delete client;
 		}

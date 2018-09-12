@@ -40,7 +40,7 @@ SocketInputStream::SocketInputStream(Connection *connection_, int64_t size_):
 	try {
 		_buffer = new char[(int)_buffer_length];
 	} catch (std::bad_alloc &) {
-		_buffer = NULL;
+		_buffer = nullptr;
 
 		_buffer_length = 0LL;
 		_current_index = 0LL;
@@ -64,7 +64,7 @@ SocketInputStream::SocketInputStream(Connection *connection_, struct sockaddr *a
 	try {
 		_buffer = new char[(int)_buffer_length];
 	} catch (std::bad_alloc &) {
-		_buffer = NULL;
+		_buffer = nullptr;
 
 		_buffer_length = 0LL;
 		_current_index = 0LL;
@@ -73,7 +73,7 @@ SocketInputStream::SocketInputStream(Connection *connection_, struct sockaddr *a
 
 SocketInputStream::~SocketInputStream()
 {
-	if (_buffer != NULL) {
+	if (_buffer != nullptr) {
 		delete [] _buffer;
 	}
 }

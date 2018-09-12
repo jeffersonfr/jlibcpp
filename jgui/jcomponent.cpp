@@ -31,7 +31,7 @@ Component::Component(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::Component");
 
-	_theme = NULL;
+	_theme = nullptr;
 
 	_preferred_size.width = DEFAULT_COMPONENT_WIDTH;
 	_preferred_size.height = DEFAULT_COMPONENT_HEIGHT;
@@ -50,12 +50,12 @@ Component::Component(int x, int y, int width, int height):
 	_has_focus = false;
 	_is_ignore_repaint = false;
 	
-	_keymap = NULL;
-	_parent = NULL;
-	_left = NULL;
-	_right = NULL;
-	_up = NULL;
-	_down = NULL;
+	_keymap = nullptr;
+	_parent = nullptr;
+	_left = nullptr;
+	_right = nullptr;
+	_up = nullptr;
+	_down = nullptr;
 	_gradient_level = 0x40;
 	_alignment_x = JCA_CENTER;
 	_alignment_y = JCA_CENTER;
@@ -85,7 +85,7 @@ Component::Component(int x, int y, int width, int height):
 
 Component::~Component()
 {
-	if (_parent != NULL) {
+	if (_parent != nullptr) {
 		_parent->Remove(this);
 	}
 }
@@ -119,9 +119,9 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
 		int relativeY = y;
 		
 		// component needs to be in absolute coordinates ...
-		Container *parent = NULL;
+		Container *parent = nullptr;
 
-		if (coordinateSpace != NULL) {
+		if (coordinateSpace != nullptr) {
 			parent = coordinateSpace->GetParent();
 		}
 
@@ -132,7 +132,7 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
 		} else {
 			while (parent != this) {
 				// mostly a special case for list
-				if (parent == NULL) {
+				if (parent == nullptr) {
 					relativeX = x;
 					relativeY = y;
 
@@ -202,7 +202,7 @@ void Component::ScrollToVisibleArea(int x, int y, int width, int height, Compone
 		// try to move parent scroll if you are not scrollable
 		Container *parent = GetParent();
 
-		if (parent != NULL) {
+		if (parent != nullptr) {
 			parent->ScrollToVisibleArea(
 					GetAbsoluteLocation().x-parent->GetAbsoluteLocation().x+x, GetAbsoluteLocation().y-parent->GetAbsoluteLocation().y+y, width, height, parent);
 		}
@@ -221,23 +221,23 @@ std::string Component::GetName()
 
 Theme * Component::GetTheme()
 {
-  if (_theme != NULL) {
+  if (_theme != nullptr) {
     return _theme;
   }
 
 	Container *cmp = GetParent();
 
-  while (cmp != NULL) {
+  while (cmp != nullptr) {
     Theme *theme = cmp->GetTheme();
 
-    if (theme != NULL) {
+    if (theme != nullptr) {
       return theme;
     }
 
     cmp = cmp->GetParent();
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void Component::SetTheme(Theme *theme)
@@ -269,7 +269,7 @@ bool Component::IsOpaque()
 {
 	Theme *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return true;
   }
 
@@ -479,7 +479,7 @@ void Component::PaintScrollbars(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -563,7 +563,7 @@ void Component::PaintBackground(Graphics *g)
   jgui::Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -605,7 +605,7 @@ void Component::PaintBorders(Graphics *g)
   jgui::Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -765,15 +765,15 @@ Container * Component::GetParent()
 
 Container * Component::GetTopLevelAncestor()
 {
-	for (Component *cmp = this; cmp != NULL; cmp = cmp->GetParent()) {
+	for (Component *cmp = this; cmp != nullptr; cmp = cmp->GetParent()) {
 		Container *container = dynamic_cast<jgui::Window *>(cmp);
 		
-		if (container != NULL) {
+		if (container != nullptr) {
 			return container;
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool Component::IsEnabled()
@@ -893,7 +893,7 @@ void Component::Repaint(Component *cmp)
 		return;
 	}
 
-	if (_parent != NULL) {
+	if (_parent != nullptr) {
 		_parent->Repaint(this);
 	}
 
@@ -1176,7 +1176,7 @@ jpoint_t Component::GetAbsoluteLocation()
 	jpoint_t
     location = {.x = 0, .y = 0};
 
-	if ((void *)parent == NULL) {
+	if ((void *)parent == nullptr) {
 		return location;
 	}
 
@@ -1191,13 +1191,13 @@ jpoint_t Component::GetAbsoluteLocation()
 		location.x = location.x + slocation.x;	
 		location.y = location.y + slocation.y;	
 	
-		if (parent->GetParent() != NULL) {
+		if (parent->GetParent() != nullptr) {
       jgui::jpoint_t t = parent->GetLocation();
 
 			location.x = location.x + t.x;
 			location.y = location.y + t.y;
 		}
-	} while ((parent = parent->GetParent()) != NULL);
+	} while ((parent = parent->GetParent()) != nullptr);
 
 	return location;
 }
@@ -1228,7 +1228,7 @@ void Component::RaiseToTop()
 {
 	// frame repaint is needed
 
-	if (_parent == NULL) {
+	if (_parent == nullptr) {
 		return;
 	}
 
@@ -1239,7 +1239,7 @@ void Component::LowerToBottom()
 {
 	// frame repaint is needed
 
-	if (_parent == NULL) {
+	if (_parent == nullptr) {
 		return;
 	}
 
@@ -1250,11 +1250,11 @@ void Component::PutAtop(Component *c)
 {
 	// frame repaint is needed
 
-	if (_parent == NULL) {
+	if (_parent == nullptr) {
 		return;
 	}
 
-	if ((void *)c == NULL) {
+	if ((void *)c == nullptr) {
 		return;
 	}
 
@@ -1265,11 +1265,11 @@ void Component::PutBelow(Component *c)
 {
 	// frame repaint is needed
 
-	if (_parent == NULL) {
+	if (_parent == nullptr) {
 		return;
 	}
 
-	if ((void *)c == NULL) {
+	if ((void *)c == nullptr) {
 		return;
 	}
 
@@ -1352,7 +1352,7 @@ bool Component::MousePressed(jevent::MouseEvent *event)
     bs = 0,
     ss = 0;
   
-  if (theme != NULL) {
+  if (theme != nullptr) {
     bs = theme->GetIntegerParam("component.border.size");
     ss = theme->GetIntegerParam("component.scroll.size");
   }
@@ -1464,7 +1464,7 @@ bool Component::MouseWheel(jevent::MouseEvent *event)
 
 void Component::GetInternalComponents(Container *parent, std::vector<Component *> *components)
 {
-	if ((void *)parent == NULL) {
+	if ((void *)parent == nullptr) {
 		return;
 	}
 
@@ -1473,7 +1473,7 @@ void Component::GetInternalComponents(Container *parent, std::vector<Component *
 	for (std::vector<Component *>::iterator i=v.begin(); i!=v.end(); i++) {
 		Container *container = dynamic_cast<jgui::Container *>(*i);
 
-		if (container != NULL) {
+		if (container != nullptr) {
 			GetInternalComponents(container, components);
 		}
 
@@ -1507,13 +1507,13 @@ bool Component::ProcessNavigation(jevent::KeyEvent *event)
 
 	Component *next = this;
 
-	if (action == jevent::JKS_CURSOR_LEFT && GetNextFocusLeft() != NULL) {
+	if (action == jevent::JKS_CURSOR_LEFT && GetNextFocusLeft() != nullptr) {
 		next = GetNextFocusLeft();
-	} else if (action == jevent::JKS_CURSOR_RIGHT && GetNextFocusRight() != NULL) {
+	} else if (action == jevent::JKS_CURSOR_RIGHT && GetNextFocusRight() != nullptr) {
 		next = GetNextFocusRight();
-	} else if (action == jevent::JKS_CURSOR_UP && GetNextFocusUp() != NULL) {
+	} else if (action == jevent::JKS_CURSOR_UP && GetNextFocusUp() != nullptr) {
 		next = GetNextFocusUp();
-	} else if (action == jevent::JKS_CURSOR_DOWN && GetNextFocusDown() != NULL) {
+	} else if (action == jevent::JKS_CURSOR_DOWN && GetNextFocusDown() != nullptr) {
 		next = GetNextFocusDown();
 	} else {
 		Component 
@@ -1594,7 +1594,7 @@ bool Component::ProcessNavigation(jevent::KeyEvent *event)
 		}
 	}
 
-	if (next != NULL) {
+	if (next != nullptr) {
 		next->RequestFocus();
 	
 		return true;
@@ -1677,7 +1677,7 @@ void Component::FindNextComponentFocus(jregion_t rect, Component **left, Compone
 void Component::RequestFocus()
 {
 	if (_has_focus == false) {
-		if (_parent != NULL) {
+		if (_parent != nullptr) {
 			_has_focus = true;
 
 			_parent->RequestComponentFocus(this);
@@ -1688,7 +1688,7 @@ void Component::RequestFocus()
 void Component::ReleaseFocus()
 {
 	if (_has_focus == true) {
-		if (_parent != NULL) {
+		if (_parent != nullptr) {
 			_has_focus = false;
 
 			_parent->ReleaseComponentFocus(this);
@@ -1725,7 +1725,7 @@ Container * Component::GetFocusCycleRootAncestor()
 {
 	Container *cmp = GetParent();
 	
-	while (cmp != NULL && cmp->GetParent() != NULL && cmp->IsFocusCycleRoot() == false) {
+	while (cmp != nullptr && cmp->GetParent() != nullptr && cmp->IsFocusCycleRoot() == false) {
 		cmp = cmp->GetParent();
 	}
 
@@ -1745,7 +1745,7 @@ bool Component::IsHidden()
 
 	Container *cmp = GetParent();
 	
-	while (cmp != NULL) {
+	while (cmp != nullptr) {
 		if (cmp->IsVisible() == false) {
 			return true;
 		}
@@ -1779,7 +1779,7 @@ void Component::SetVisible(bool visible)
 
 void Component::RegisterFocusListener(jevent::FocusListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -1792,7 +1792,7 @@ void Component::RegisterFocusListener(jevent::FocusListener *listener)
 
 void Component::RemoveFocusListener(jevent::FocusListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -1803,7 +1803,7 @@ void Component::RemoveFocusListener(jevent::FocusListener *listener)
 
 void Component::DispatchFocusEvent(jevent::FocusEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 
@@ -1845,7 +1845,7 @@ std::vector<jevent::FocusListener *> & Component::GetFocusListeners()
 
 void Component::RegisterComponentListener(jevent::ComponentListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -1858,7 +1858,7 @@ void Component::RegisterComponentListener(jevent::ComponentListener *listener)
 
 void Component::RemoveComponentListener(jevent::ComponentListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -1869,7 +1869,7 @@ void Component::RemoveComponentListener(jevent::ComponentListener *listener)
 
 void Component::DispatchComponentEvent(jevent::ComponentEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 
@@ -1916,7 +1916,7 @@ jcommon::ParamMapper * Component::GetParams()
 
 void Component::RegisterDataListener(jevent::DataListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -1929,7 +1929,7 @@ void Component::RegisterDataListener(jevent::DataListener *listener)
 
 void Component::RemoveDataListener(jevent::DataListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -1940,7 +1940,7 @@ void Component::RemoveDataListener(jevent::DataListener *listener)
 
 void Component::DispatchDataEvent(jevent::DataEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

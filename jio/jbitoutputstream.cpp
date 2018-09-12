@@ -29,7 +29,7 @@ BitOutputStream::BitOutputStream(std::string filename):
 {
 	jcommon::Object::SetClassName("jio::BitOutputStream");
 
-	stream = NULL;
+	stream = nullptr;
 	haveByte = false;
 	show = false;
 	bitCount = 0;
@@ -38,7 +38,7 @@ BitOutputStream::BitOutputStream(std::string filename):
 	try {
 		stream = new FileOutputStream(filename);
 	} catch (...) {
-		stream = NULL;
+		stream = nullptr;
 
 		throw jexception::IOException("Cannot open file in BitInputStream");
 	}
@@ -49,7 +49,7 @@ BitOutputStream::BitOutputStream(OutputStream *os):
 {
 	jcommon::Object::SetClassName("jio::BitOutputStream");
 
-	if ((void *)os == NULL) {
+	if ((void *)os == nullptr) {
 		throw jexception::IOException("Null pointer exception");
 	}
 
@@ -62,7 +62,7 @@ BitOutputStream::BitOutputStream(OutputStream *os):
 
 BitOutputStream::~BitOutputStream()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		delete stream;
 	}
 }

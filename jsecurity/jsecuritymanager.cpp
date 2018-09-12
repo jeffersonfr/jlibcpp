@@ -35,7 +35,7 @@ SecurityManager * SecurityManager::GetInstance()
 {
 	// TODO::
 
-	return NULL;
+	return nullptr;
 }
 
 void SecurityManager::GetAllUsers()
@@ -44,7 +44,7 @@ void SecurityManager::GetAllUsers()
 
 User * SecurityManager::GetUser(std::string id)
 {
-	return NULL;
+	return nullptr;
 }
 
 void SecurityManager::GetAllGroups()
@@ -61,7 +61,7 @@ void SecurityManager::GetGoupsFromUser(std::string id)
 
 AccessControl * SecurityManager::GetDefaultAccessControl()
 {
-	return NULL;
+	return nullptr;
 }
 
 void SecurityManager::Update(User id)

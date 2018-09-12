@@ -41,7 +41,7 @@ NamedSemaphore::NamedSemaphore(std::string name):
 		throw jexception::SemaphoreException("Cannot open the semaphore resource file");
 	}
 
-	_handler = (struct jnamedsemaphore_t *) mmap(NULL, sizeof(struct jnamedsemaphore_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	_handler = (struct jnamedsemaphore_t *) mmap(nullptr, sizeof(struct jnamedsemaphore_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
 	close (fd);
 }
@@ -70,7 +70,7 @@ NamedSemaphore::NamedSemaphore(std::string name, int access):
 	pthread_condattr_init(&psharedc);
 	pthread_condattr_setpshared(&psharedc, PTHREAD_PROCESS_SHARED);
 
-	_handler = (struct jnamedsemaphore_t *)mmap(NULL, sizeof(struct jnamedsemaphore_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	_handler = (struct jnamedsemaphore_t *)mmap(nullptr, sizeof(struct jnamedsemaphore_t), PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
 	close (fd);
 

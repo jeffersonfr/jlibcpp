@@ -52,7 +52,7 @@ class NativeApplication : public jgui::Application {
 		 * \brief
 		 *
 		 */
-		virtual void InternalInit(int argc = 0, char **argv = NULL);
+		virtual void InternalInit(int argc = 0, char **argv = nullptr);
 
 		/**
 		 * \brief

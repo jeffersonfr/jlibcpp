@@ -194,7 +194,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 			_dlx = 0.2;
 			_hand = 0;
 			_dhd = 1;
-			_sound_effect = NULL;
+			_sound_effect = nullptr;
 			_sound_effect_x = -1;
 			_sound_effect_y = -1;
 			_sound_effect_available = true;
@@ -209,7 +209,7 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 
 			_player = jmedia::PlayerManager::CreatePlayer("sounds/ambience2.mp3");
 
-			if (_player != NULL) {
+			if (_player != nullptr) {
 				_player->SetLoop(true);
 				_player->Play();
 			}
@@ -224,12 +224,12 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 
 		virtual ~Ray()
 		{
-			if (_sound_effect != NULL) {
+			if (_sound_effect != nullptr) {
 				_sound_effect->Stop();
 				delete _sound_effect;
 			}
 
-			if (_player != NULL) {
+			if (_player != nullptr) {
 				_player->Stop();
 				delete _player;
 			}
@@ -317,16 +317,16 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 			}
 
 			if (sound != "" && _sound_effect_available == true) {
-				if (_sound_effect != NULL) {
+				if (_sound_effect != nullptr) {
 					delete _sound_effect;
-					_sound_effect = NULL;
+					_sound_effect = nullptr;
 				}
 
 				sound = "sounds/" + sound + ".mp3";
 
 				_sound_effect = jmedia::PlayerManager::CreatePlayer(sound);
 
-				if (_sound_effect != NULL) {
+				if (_sound_effect != nullptr) {
 					_sound_effect_available = false;
 					_sound_effect_x = _px;
 					_sound_effect_y = _py;
@@ -339,20 +339,20 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 
 		virtual void UpdateVolume(int x, int y)
 		{
-			if (_sound_effect == NULL || _sound_effect_x < 0 || _sound_effect_y < 0) {
+			if (_sound_effect == nullptr || _sound_effect_x < 0 || _sound_effect_y < 0) {
 				return;
 			}
 
 			jmedia::VolumeControl *control = (jmedia::VolumeControl *)_sound_effect->GetControl("audio.volume");
 
-			if (control != NULL) {
+			if (control != nullptr) {
 				control->SetLevel(100);
 			}
 
 			/*
 			jmedia::VolumeControl *control = (jmedia::VolumeControl *)_sound_effect->GetControl("audio.volume");
 
-			if (control != NULL) {
+			if (control != nullptr) {
 				int dx = (_sound_effect_x - x);
 				int dy = (_sound_effect_y - y);
 				int distance = dx*dx/100 + dy*dy/100 + 1;
@@ -530,19 +530,19 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 			PaintCandle(g);
 			PaintMap(g);
 
-			if (_splash != NULL) {
+			if (_splash != nullptr) {
 				_splash_index = _splash_index + 1;
 
 				if (_splash_index > 60) {
 					delete _splash;
-					_splash = NULL;
+					_splash = nullptr;
 				} else if (_splash_index > 30) {
 					jgui::Image *blend = _splash->Blend(0.80);
 
 					g->DrawImage(_splash, 0, 0, size.width, size.height);
 
 					delete _splash;
-					_splash = NULL;
+					_splash = nullptr;
 
 					_splash = blend;
 				} else if (_splash_index > 0) {
@@ -550,17 +550,17 @@ class Ray : public jgui::Window, public jevent::PlayerListener {
 				}
 			}
 
-			static uint32_t *dst = NULL;
+			static uint32_t *dst = nullptr;
 			
 			// CHANGE:: pixel scaler
 			jgui::Graphics 
         *g2 = _scene2x->GetGraphics();
 			uint32_t 
-        *src = NULL;
+        *src = nullptr;
 
 			g->GetRGBArray(&src, 0, 0, size.width, size.height);
 
-			if (dst == NULL) {
+			if (dst == nullptr) {
 				g2->GetRGBArray(&dst, 0, 0, 2*size.width, 2*size.height);
 			}
 

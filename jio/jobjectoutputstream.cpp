@@ -28,7 +28,7 @@ ObjectOutputStream::ObjectOutputStream(OutputStream *os):
 {
 	jcommon::Object::SetClassName("jio::ObjectOutputStream");
 	
-	if ((void *)os == NULL) {
+	if ((void *)os == nullptr) {
 		throw jexception::IOException("Null pointer exception");
 	}
 
@@ -46,7 +46,7 @@ bool ObjectOutputStream::IsEmpty()
 
 int64_t ObjectOutputStream::Available()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		return stream->Available();
 	}
 
@@ -55,7 +55,7 @@ int64_t ObjectOutputStream::Available()
 
 int64_t ObjectOutputStream::Write(jcommon::Object *object)
 {
-	if (object == NULL || stream == NULL) {
+	if (object == nullptr || stream == nullptr) {
 		return -1;
 	}
 
@@ -78,7 +78,7 @@ int64_t ObjectOutputStream::Write(jcommon::Object *object)
 
 int64_t ObjectOutputStream::Flush()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		return stream->Flush();
 	}
 
@@ -87,14 +87,14 @@ int64_t ObjectOutputStream::Flush()
 
 void ObjectOutputStream::Close()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		stream->Close();
 	}
 }
 
 int64_t ObjectOutputStream::GetSentBytes()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		return stream->GetSentBytes();
 	}
 

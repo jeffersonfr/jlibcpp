@@ -50,7 +50,7 @@ class PlayerComponentImpl : public jgui::Component {
 		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			_image = NULL;
+			_image = nullptr;
 			_player = player;
 			
 			_frame_size.width = w;
@@ -71,9 +71,9 @@ class PlayerComponentImpl : public jgui::Component {
 
 		virtual ~PlayerComponentImpl()
 		{
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 		}
 
@@ -104,9 +104,9 @@ class PlayerComponentImpl : public jgui::Component {
 
 			_mutex.lock();
 
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 
 			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_ARGB, sw, sh);
@@ -172,7 +172,7 @@ class VolumeControlImpl : public VolumeControl {
 			int level = 0;
 
 			/*
-			if (_player->_provider != NULL) {
+			if (_player->_provider != nullptr) {
 				level = libvlc_audio_get_volume(_player->_provider);
 			}
 			*/
@@ -191,7 +191,7 @@ class VolumeControlImpl : public VolumeControl {
 			}
 
 			/*
-			if (_player->_provider != NULL) {
+			if (_player->_provider != nullptr) {
 				libvlc_audio_set_mute(_player->_provider, (_is_muted == true)?1:0);
 				libvlc_audio_set_volume(_player->_provider, _level);
 			}
@@ -209,7 +209,7 @@ class VolumeControlImpl : public VolumeControl {
 	
 			_is_muted = b;
 			
-			if (_player->_provider != NULL) {
+			if (_player->_provider != nullptr) {
 				avplay_mute(_player->_provider, _is_muted);
 			}
 		}
@@ -374,7 +374,7 @@ LibAVLightPlayer::LibAVLightPlayer(jnetwork::URL url):
 
 	_provider = avplay_open(_file.c_str());
 
-	if (_provider == NULL) {
+	if (_provider == nullptr) {
 		throw jexception::MediaException("Cannot recognize the media file");
 	}
 
@@ -398,7 +398,7 @@ LibAVLightPlayer::~LibAVLightPlayer()
 	Close();
 	
 	delete _component;
-	_component = NULL;
+	_component = nullptr;
 
 	for (std::vector<Control *>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
 		Control *control = (*i);
@@ -413,7 +413,7 @@ void LibAVLightPlayer::Play()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_is_paused == false && _provider != NULL) {
+	if (_is_paused == false && _provider != nullptr) {
 		avplay_play(_provider);
 		
 		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_STARTED));
@@ -424,7 +424,7 @@ void LibAVLightPlayer::Pause()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_is_paused == false && _provider != NULL) {
+	if (_is_paused == false && _provider != nullptr) {
 		_is_paused = true;
 		
 		avplay_pause(_provider, true);
@@ -437,7 +437,7 @@ void LibAVLightPlayer::Resume()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_is_paused == true && _provider != NULL) {
+	if (_is_paused == true && _provider != nullptr) {
 		_is_paused = false;
 		
 		avplay_pause(_provider, false);
@@ -450,7 +450,7 @@ void LibAVLightPlayer::Stop()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		avplay_stop(_provider);
 
 		if (_has_video == true) {
@@ -471,10 +471,10 @@ void LibAVLightPlayer::Close()
 
 	_is_closed = true;
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		avplay_close(_provider);
 
-		_provider = NULL;
+		_provider = nullptr;
 	}
 }
 
@@ -482,7 +482,7 @@ void LibAVLightPlayer::SetCurrentTime(uint64_t time)
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		avplay_setcurrentmediatime(_provider, time);
 	}
 }
@@ -493,7 +493,7 @@ uint64_t LibAVLightPlayer::GetCurrentTime()
 
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		time = (uint64_t)avplay_getcurrentmediatime(_provider);
 	}
 
@@ -504,7 +504,7 @@ uint64_t LibAVLightPlayer::GetMediaTime()
 {
 	uint64_t time = 0LL;
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		time = (uint64_t)avplay_getmediatime(_provider);
 	}
 
@@ -515,14 +515,14 @@ void LibAVLightPlayer::SetLoop(bool b)
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		avplay_setloop(_provider, b);
 	}
 }
 
 bool LibAVLightPlayer::IsLoop()
 {
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		return avplay_isloop(_provider);
 	}
 
@@ -539,7 +539,7 @@ void LibAVLightPlayer::SetDecodeRate(double rate)
 		_is_paused = false;
 	}
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		// libvlc_media_player_set_rate(_provider, (float)rate);
 	}
 }
@@ -550,7 +550,7 @@ double LibAVLightPlayer::GetDecodeRate()
 
 	double rate = 1.0;
 
-	if (_provider != NULL) {
+	if (_provider != nullptr) {
 		// rate = (double)libvlc_media_player_get_rate(_provider);
 	}
 

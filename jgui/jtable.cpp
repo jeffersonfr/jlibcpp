@@ -120,7 +120,7 @@ Table::Table(int x, int y, int width, int height):
 	
 	std::vector<Cell *> *cols = new std::vector<Cell *>();
 
-	cols->push_back(NULL);
+	cols->push_back(nullptr);
 
 	_cells.push_back(cols);
 
@@ -194,7 +194,7 @@ void Table::InsertColumn(std::string text, int index)
 	for (std::vector<std::vector<Cell *> *>::iterator i=_cells.begin(); i!=_cells.end(); i++) {
 		std::vector<Cell *> *v = (std::vector<Cell *> *)(*i);
 
-		if (v != NULL) {
+		if (v != nullptr) {
 			v->insert(v->begin()+index, new Cell(this));
 		}
 	}
@@ -213,7 +213,7 @@ void Table::InsertRow(std::string text, int index)
 	std::vector<Cell *> *columns = new std::vector<Cell *>();
 
 	for (int i=0; i<_columns; i++) {
-		columns->push_back(NULL);
+		columns->push_back(nullptr);
 	}
 
 	_cells.insert(_cells.begin()+index, columns);
@@ -233,12 +233,12 @@ void Table::RemoveColumn(int index)
 	for (std::vector<std::vector<Cell *> *>::iterator i=_cells.begin(); i!=_cells.end(); i++) {
 		std::vector<Cell *> *v = (std::vector<Cell *> *)(*i);
 
-		if (v != NULL) {
+		if (v != nullptr) {
 			Cell *c = (*v)[index];
 
 			v->erase(v->begin()+index);
 
-			if (c != NULL) {
+			if (c != nullptr) {
 				delete c;
 			}
 		}
@@ -263,7 +263,7 @@ void Table::RemoveRow(int index)
 	for (std::vector<Cell *>::iterator i=row->begin(); i!=row->end(); i++) {
 		Cell *c = (Cell *)(*i);
 
-		if (c != NULL) {
+		if (c != nullptr) {
 			delete c;
 		}
 	}
@@ -283,7 +283,7 @@ void Table::SetHeaderValue(std::string text, int index)
 
 	Cell *c = _header[index];
 
-	if (c != NULL) {
+	if (c != nullptr) {
 		c->SetValue(text);
 	}
 
@@ -298,7 +298,7 @@ std::string Table::GetHeaderValue(int index)
 
 	Cell *c = _header[index];
 
-	if (c != NULL) {
+	if (c != nullptr) {
 		return c->GetValue();
 	}
 
@@ -351,11 +351,11 @@ void Table::SetCurrentCell(int row, int column)
 Cell * Table::GetCell(int row, int column)
 {
 	if (row < 0 || row >= _rows) {
-		return NULL;
+		return nullptr;
 	}
 
 	if (column < 0 || column >= _columns) {
-		return NULL;
+		return nullptr;
 	}
 
 	std::vector<Cell *> *v = _cells[row];
@@ -377,7 +377,7 @@ void Table::SetCell(Cell *cell, int row, int column)
 
 	Cell *c = (*v)[column];
 
-	if (c != NULL) {
+	if (c != nullptr) {
 		delete c;
 	}
 

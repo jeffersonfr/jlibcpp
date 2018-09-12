@@ -35,9 +35,9 @@ Socket6::Socket6(InetAddress *addr_, int port_, int timeout_, int rbuf_, int wbu
 {
 	jcommon::Object::SetClassName("jnetwork::Socket");
 	
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -55,9 +55,9 @@ Socket6::Socket6(InetAddress *addr_, int port_, InetAddress *local_addr_, int lo
 {
 	jcommon::Object::SetClassName("jnetwork::Socket");
 
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -76,9 +76,9 @@ Socket6::Socket6(std::string host_, int port_, int timeout_, int rbuf_, int wbuf
 {
 	jcommon::Object::SetClassName("jnetwork::Socket");
 
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -98,9 +98,9 @@ Socket6::Socket6(std::string host_, int port_, InetAddress *local_addr_, int loc
 {
 	jcommon::Object::SetClassName("jnetwork::Socket");
 
-	_is = NULL;
-	_os = NULL;
-	_address = NULL;
+	_is = nullptr;
+	_os = nullptr;
+	_address = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -123,19 +123,19 @@ Socket6::~Socket6()
 	} catch (...) {
 	}
 
-	if (_is != NULL) {
+	if (_is != nullptr) {
 		delete _is;
-		_is = NULL;
+		_is = nullptr;
 	}
 
-	if (_os != NULL) {
+	if (_os != nullptr) {
 		delete _os;
-		_os = NULL;
+		_os = nullptr;
 	}
 
-	if (_address != NULL) {
+	if (_address != nullptr) {
 		delete _address;
-		_address = NULL;
+		_address = nullptr;
 	}
 }
 
@@ -181,7 +181,7 @@ void Socket6::BindSocket(InetAddress *local_addr_, int local_port_)
 	_lsock.sin6_flowinfo = 0;
 	_lsock.sin6_scope_id = 0;
 
-	if (local_addr_ == NULL) {
+	if (local_addr_ == nullptr) {
 		_lsock.sin6_addr = in6addr_any;
 	} else {
 		inet_pton(AF_INET6, local_addr_->GetHostAddress().c_str(), &(_lsock.sin6_addr));
@@ -213,7 +213,7 @@ void Socket6::ConnectSocket(InetAddress *addr_, int port_)
 	if (_timeout > 0) {
 		long arg;
 
-		if( (arg = fcntl(_fd, F_GETFL, NULL)) < 0) { 
+		if( (arg = fcntl(_fd, F_GETFL, nullptr)) < 0) { 
 			throw jexception::ConnectionException("Cannont set non blocking socket");
 		}
 
@@ -238,7 +238,7 @@ void Socket6::ConnectSocket(InetAddress *addr_, int port_)
 					FD_ZERO(&wset); 
 					FD_SET(_fd, &wset); 
 
-					r = select(_fd+1, NULL, &wset, NULL, &tv); 
+					r = select(_fd+1, nullptr, &wset, nullptr, &tv); 
 
 					if (r < 0 && errno != EINTR) { 
 						throw jexception::ConnectionException("Connection error");

@@ -32,15 +32,15 @@ BorderLayout::BorderLayout(int hgap, int vgap):
 	_hgap = hgap;
 	_vgap = vgap;
 	
-	north = NULL;
-	west = NULL;
-	east = NULL;
-	south = NULL;
-	center = NULL;
-	firstLine = NULL;
-	lastLine = NULL;
-	firstItem = NULL;
-	lastItem = NULL;
+	north = nullptr;
+	west = nullptr;
+	east = nullptr;
+	south = nullptr;
+	center = nullptr;
+	firstLine = nullptr;
+	lastLine = nullptr;
+	firstItem = nullptr;
+	lastItem = nullptr;
 }
 
 BorderLayout::~BorderLayout()
@@ -70,35 +70,35 @@ void BorderLayout::SetVgap(int vgap)
 jsize_t BorderLayout::GetMinimumLayoutSize(Container *parent)
 {
 	// WARN:: sync parent
-	Component *cmp = NULL;
+	Component *cmp = nullptr;
 	jsize_t t = {0, 0};
 	bool ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
       
-	if ((cmp = GetChild(JBLA_EAST, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_EAST, ltr)) != nullptr) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width += d.width + _hgap;
 	    t.height = (std::max)(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBLA_WEST, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_WEST, ltr)) != nullptr) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width += d.width + _hgap;
 	    t.height = (std::max)(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBLA_CENTER, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_CENTER, ltr)) != nullptr) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width += d.width;
 	    t.height = (std::max)(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBLA_NORTH, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_NORTH, ltr)) != nullptr) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width = (std::max)(d.width, t.width);
 	    t.height += d.height + _vgap;
 	}
 	
-	if ((cmp = GetChild(JBLA_SOUTH, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_SOUTH, ltr)) != nullptr) {
 	    jsize_t d = cmp->GetMinimumSize();
 	    t.width = (std::max)(d.width, t.width);
 	    t.height += d.height + _vgap;
@@ -122,35 +122,35 @@ jsize_t BorderLayout::GetMaximumLayoutSize(Container *parent)
 jsize_t BorderLayout::GetPreferredLayoutSize(Container *parent)
 {
 	// WARN:: sync parent
-	Component *cmp = NULL;
+	Component *cmp = nullptr;
 	jsize_t t = {0, 0};
 	bool ltr = (parent->GetComponentOrientation() == JCO_LEFT_TO_RIGHT);
       
-	if ((cmp = GetChild(JBLA_EAST, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_EAST, ltr)) != nullptr) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width += d.width + _hgap;
 	    t.height = (std::max)(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBLA_WEST, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_WEST, ltr)) != nullptr) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width += d.width + _hgap;
 	    t.height = (std::max)(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBLA_CENTER, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_CENTER, ltr)) != nullptr) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width += d.width;
 	    t.height = (std::max)(d.height, t.height);
 	}
 	
-	if ((cmp = GetChild(JBLA_NORTH, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_NORTH, ltr)) != nullptr) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width = (std::max)(d.width, t.width);
 	    t.height += d.height + _vgap;
 	}
 	
-	if ((cmp = GetChild(JBLA_SOUTH, ltr)) != NULL) {
+	if ((cmp = GetChild(JBLA_SOUTH, ltr)) != nullptr) {
 	    jsize_t d = cmp->GetPreferredSize();
 	    t.width = (std::max)(d.width, t.width);
 	    t.height += d.height + _vgap;
@@ -168,7 +168,7 @@ void BorderLayout::DoLayout(Container *target)
 {
 	// WARN:: sync with jframe
 	Component 
-    *c = NULL;
+    *c = nullptr;
 	jinsets_t 
     insets = target->GetInsets();
 	jsize_t 
@@ -181,7 +181,7 @@ void BorderLayout::DoLayout(Container *target)
 	bool 
     ltr = (target->GetComponentOrientation() == JCO_LEFT_TO_RIGHT || target->GetComponentOrientation() == JCO_RIGHT_TO_LEFT);
 
-	if ((c = GetChild(JBLA_NORTH, ltr)) != NULL) {
+	if ((c = GetChild(JBLA_NORTH, ltr)) != nullptr) {
 		c->SetSize(right - left, c->GetSize().height);
 
 		psize = c->GetPreferredSize();
@@ -190,7 +190,7 @@ void BorderLayout::DoLayout(Container *target)
 		top += psize.height + _vgap;
 	}
 
-	if ((c = GetChild(JBLA_SOUTH, ltr)) != NULL) {
+	if ((c = GetChild(JBLA_SOUTH, ltr)) != nullptr) {
 		c->SetSize(right - left, c->GetSize().height);
 
 		psize = c->GetPreferredSize();
@@ -199,7 +199,7 @@ void BorderLayout::DoLayout(Container *target)
 		bottom -= psize.height + _vgap;
 	}
 
-	if ((c = GetChild(JBLA_EAST, ltr)) != NULL) {
+	if ((c = GetChild(JBLA_EAST, ltr)) != nullptr) {
 		c->SetSize(c->GetSize().width, bottom - top);
 
 		psize = c->GetPreferredSize();
@@ -208,7 +208,7 @@ void BorderLayout::DoLayout(Container *target)
 		right -= psize.width + _hgap;
 	}
 
-	if ((c = GetChild(JBLA_WEST, ltr)) != NULL) {
+	if ((c = GetChild(JBLA_WEST, ltr)) != nullptr) {
 		c->SetSize(c->GetSize().width, bottom - top);
 
 		psize = c->GetPreferredSize();
@@ -217,7 +217,7 @@ void BorderLayout::DoLayout(Container *target)
 		left += psize.width + _hgap;
 	}
 
-	if ((c = GetChild(JBLA_CENTER, ltr)) != NULL) {
+	if ((c = GetChild(JBLA_CENTER, ltr)) != nullptr) {
 		c->SetBounds(left, top, right - left, bottom - top);
 	}
 }
@@ -250,40 +250,40 @@ void BorderLayout::RemoveLayoutComponent(Component *c)
 {
 	// WARN:: sync with jframe
 	if (c == center) {
-		center = NULL;
+		center = nullptr;
 	} else if (c == north) {
-		north = NULL;
+		north = nullptr;
 	} else if (c == south) {
-		south = NULL;
+		south = nullptr;
 	} else if (c == east) {
-		east = NULL;
+		east = nullptr;
 	} else if (c == west) {
-		west = NULL;
+		west = nullptr;
 	}
 
 	if (c == firstLine) {
-		firstLine = NULL;
+		firstLine = nullptr;
 	} else if (c == lastLine) {
-		lastLine = NULL;
+		lastLine = nullptr;
 	} else if (c == firstItem) {
-		firstItem = NULL;
+		firstItem = nullptr;
 	} else if (c == lastItem) {
-		lastItem = NULL;
+		lastItem = nullptr;
 	}
 }
 
 void BorderLayout::RemoveLayoutComponents() 
 {
 	// WARN:: sync with jframe
-	center = NULL;
-	north = NULL;
-	south = NULL;
-	east = NULL;
-	west = NULL;
-	firstLine = NULL;
-	lastLine = NULL;
-	firstItem = NULL;
-	lastItem = NULL;
+	center = nullptr;
+	north = nullptr;
+	south = nullptr;
+	east = nullptr;
+	west = nullptr;
+	firstLine = nullptr;
+	lastLine = nullptr;
+	firstItem = nullptr;
+	lastItem = nullptr;
 }
 
 Component * BorderLayout::GetLayoutComponent(jborderlayout_align_t align) 
@@ -308,28 +308,28 @@ Component * BorderLayout::GetLayoutComponent(jborderlayout_align_t align)
 		return lastItem;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 Component * BorderLayout::GetLayoutComponent(Container *target, jborderlayout_align_t align) 
 {
-	Component *result = NULL;
+	Component *result = nullptr;
 	bool ltr = (target->GetComponentOrientation() == JCO_LEFT_TO_RIGHT || target->GetComponentOrientation() == JCO_RIGHT_TO_LEFT);
 
 	if (align == JBLA_NORTH) {
-		result = (firstLine != NULL) ? firstLine : north;
+		result = (firstLine != nullptr) ? firstLine : north;
 	} else if (align == JBLA_SOUTH) {
-		result = (lastLine != NULL) ? lastLine : south;
+		result = (lastLine != nullptr) ? lastLine : south;
 	} else if (align == JBLA_WEST) {
 		result = ltr ? firstItem : lastItem;
 		
-		if (result == NULL) {
+		if (result == nullptr) {
 			result = west;
 		}
 	} else if (align == JBLA_EAST) {
 		result = ltr ? lastItem : firstItem;
 		
-		if (result == NULL) {
+		if (result == nullptr) {
 			result = east;
 		}
 	} else if (align == JBLA_CENTER) {
@@ -341,7 +341,7 @@ Component * BorderLayout::GetLayoutComponent(Container *target, jborderlayout_al
 
 jborderlayout_align_t BorderLayout::GetConstraints(Component *c) 
 {
-	if (c == NULL){
+	if (c == nullptr){
 		return JBLA_UNKNOWN;
 	}
 
@@ -370,28 +370,28 @@ jborderlayout_align_t BorderLayout::GetConstraints(Component *c)
 
 Component * BorderLayout::GetChild(jborderlayout_align_t key, bool ltr) 
 {
-	Component *result = NULL;
+	Component *result = nullptr;
 
 	if (key == JBLA_NORTH) {
-		result = (firstLine != NULL) ? firstLine : north;
+		result = (firstLine != nullptr) ? firstLine : north;
 	} else if (key == JBLA_SOUTH) {
-		result = (lastLine != NULL) ? lastLine : south;
+		result = (lastLine != nullptr) ? lastLine : south;
 	} else if (key == JBLA_WEST) {
 		result = ltr ? firstItem : lastItem;
-		if (result == NULL) {
+		if (result == nullptr) {
 			result = west;
 		}
 	} else if (key == JBLA_EAST) {
 		result = ltr ? lastItem : firstItem;
-		if (result == NULL) {
+		if (result == nullptr) {
 			result = east;
 		}
 	} else if (key == JBLA_CENTER) {
 		result = center;
 	}
 
-	if (result != NULL && !result->IsVisible()) {
-		result = NULL;
+	if (result != nullptr && !result->IsVisible()) {
+		result = nullptr;
 	}
 
 	return result;

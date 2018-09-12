@@ -159,7 +159,7 @@ BufferedImage::BufferedImage(jpixelformat_t pixelformat, int width, int height):
 	_size.width = width;
 	_size.height = height;
 
-	_graphics = new Graphics(NULL, pixelformat, width, height);
+	_graphics = new Graphics(nullptr, pixelformat, width, height);
 }
 
 BufferedImage::BufferedImage(cairo_t *cairo_context, jpixelformat_t pixelformat, int width, int height):
@@ -185,43 +185,43 @@ BufferedImage::BufferedImage(std::string file):
 
 	cairo_surface_t *cairo_surface = create_png_surface_from_file(file.c_str());
 	
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_jpg_surface_from_file(file.c_str());
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_bmp_surface_from_file(file.c_str());
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_ppm_surface_from_file(file.c_str());
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_gif_surface_from_file(file.c_str());
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_ico_surface_from_file(file.c_str());
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_pcx_surface_from_file(file.c_str());
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_tga_surface_from_file(file.c_str());
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_xbm_surface_from_file(file.c_str());
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_xpm_surface_from_file(file.c_str());
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		throw jexception::RuntimeException("Cannot open this image type");
 	}
 
@@ -256,7 +256,7 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
 	_size.width = -1;
 	_size.height = -1;
 
-	if ((void *)stream == NULL) {
+	if ((void *)stream == nullptr) {
 		throw jexception::NullPointerException("Cannot request data from a invalid stream");
 	}
 
@@ -281,43 +281,43 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
 	
 	cairo_surface_t *cairo_surface = create_png_surface_from_data(buffer, count);
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_jpg_surface_from_data(buffer, count);
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_bmp_surface_from_data(buffer, count);
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_ppm_surface_from_data(buffer, count);
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_gif_surface_from_data(buffer, count);
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_ico_surface_from_data(buffer, count);
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_pcx_surface_from_data(buffer, count);
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_tga_surface_from_data(buffer, count);
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_xbm_surface_from_data(buffer, count);
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_xpm_surface_from_data(buffer, count);
 	}
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		throw jexception::RuntimeException("Cannot open this image type");
 	}
 
@@ -345,9 +345,9 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
 
 BufferedImage::~BufferedImage()
 {
-	if (_graphics != NULL) {
+	if (_graphics != nullptr) {
 		delete _graphics;
-		_graphics = NULL;
+		_graphics = nullptr;
 	}
 }
 
@@ -360,11 +360,11 @@ Image * BufferedImage::Flip(jflip_flags_t mode)
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
 
-	if (cairo_surface == NULL) {
-		return NULL;
+	if (cairo_surface == nullptr) {
+		return nullptr;
 	}
 
-	Image *image = new BufferedImage(NULL, _pixelformat, _size.width, _size.height);
+	Image *image = new BufferedImage(nullptr, _pixelformat, _size.width, _size.height);
 
 	cairo_t *cairo_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
 
@@ -394,8 +394,8 @@ Image * BufferedImage::Rotate(double radians, bool resize)
 	cairo_t *src_context = dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext();
 	cairo_surface_t *src_surface = cairo_get_target(src_context);
 
-	if (src_surface == NULL) {
-		return NULL;
+	if (src_surface == nullptr) {
+		return nullptr;
 	}
 
 	cairo_surface_flush(src_surface);
@@ -413,7 +413,7 @@ Image * BufferedImage::Rotate(double radians, bool resize)
 		iw = (abs(_size.width*cosTheta) + abs(_size.height*sinTheta))/precision;
 		ih = (abs(_size.width*sinTheta) + abs(_size.height*cosTheta))/precision;
 		
-		Image *image = new BufferedImage(NULL, _pixelformat, iw, ih);
+		Image *image = new BufferedImage(nullptr, _pixelformat, iw, ih);
 
 		if (GetGraphics()->GetAntialias() == JAM_NONE) {
 			uint32_t *src = new uint32_t[_size.width*_size.height];
@@ -440,7 +440,7 @@ Image * BufferedImage::Rotate(double radians, bool resize)
 		return image;
 	}
 
-	Image *image = new BufferedImage(NULL, _pixelformat, iw, ih);
+	Image *image = new BufferedImage(nullptr, _pixelformat, iw, ih);
 	
 	if (GetGraphics()->GetAntialias() == JAM_NONE) {
 		uint32_t *src = new uint32_t[_size.width*_size.height];
@@ -471,11 +471,11 @@ Image * BufferedImage::Scale(int width, int height)
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
 
-	if (cairo_surface == NULL) {
-		return NULL;
+	if (cairo_surface == nullptr) {
+		return nullptr;
 	}
 
-	Image *image = new BufferedImage(NULL, _pixelformat, width, height);
+	Image *image = new BufferedImage(nullptr, _pixelformat, width, height);
 	
 	if (GetGraphics()->GetAntialias() == JAM_NONE) {
 		uint32_t *src = new uint32_t[_size.width*_size.height];
@@ -506,11 +506,11 @@ Image * BufferedImage::Crop(int x, int y, int width, int height)
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
 
-	if (cairo_surface == NULL) {
-		return NULL;
+	if (cairo_surface == nullptr) {
+		return nullptr;
 	}
 
-	Image *image = new BufferedImage(NULL, _pixelformat, width, height);
+	Image *image = new BufferedImage(nullptr, _pixelformat, width, height);
 	cairo_t *cairo_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
 
 	cairo_surface_flush(cairo_surface);
@@ -524,8 +524,8 @@ Image * BufferedImage::Blend(double alpha)
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
 
-	if (cairo_surface == NULL) {
-		return NULL;
+	if (cairo_surface == nullptr) {
+		return nullptr;
 	}
 
 	if (alpha < 0.0) {
@@ -536,7 +536,7 @@ Image * BufferedImage::Blend(double alpha)
 		alpha = 1.0;
 	}
 
-	Image *image = new BufferedImage(NULL, _pixelformat, _size.width, _size.height);
+	Image *image = new BufferedImage(nullptr, _pixelformat, _size.width, _size.height);
 	cairo_t *cairo_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
 
 	cairo_surface_flush(cairo_surface);
@@ -552,18 +552,18 @@ Image * BufferedImage::Colorize(Color color)
 
 	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext());
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		delete image;
 
-		return NULL;
+		return nullptr;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		delete image;
 
-		return NULL;
+		return nullptr;
 	}
 
 	int stride = cairo_image_surface_get_stride(cairo_surface);
@@ -653,13 +653,13 @@ void BufferedImage::SetPixels(uint8_t *buffer, int xp, int yp, int wp, int hp, i
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		return;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		return;
 	}
 
@@ -688,13 +688,13 @@ void BufferedImage::GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, 
 {
 	cairo_surface_t *cairo_surface = cairo_get_target(dynamic_cast<Graphics *>(GetGraphics())->GetCairoContext());
 
-	if (cairo_surface == NULL) {
+	if (cairo_surface == nullptr) {
 		return;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		return;
 	}
 
@@ -718,18 +718,18 @@ void BufferedImage::GetPixels(uint8_t **buffer, int xp, int yp, int wp, int hp, 
 
 void BufferedImage::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 {
-	if (_graphics != NULL) {
+	if (_graphics != nullptr) {
 		_graphics->GetRGBArray(rgb, xp, yp, wp, hp);
 
 		return;
 	}
 
-	(*rgb) = NULL;
+	(*rgb) = nullptr;
 }
 		
 jcommon::Object * BufferedImage::Clone()
 {
-	Image *clone = new BufferedImage(NULL, _pixelformat, _size.width, _size.height);
+	Image *clone = new BufferedImage(nullptr, _pixelformat, _size.width, _size.height);
 
 	Graphics *g = clone->GetGraphics();
 	jcomposite_flags_t flags = g->GetCompositeFlags();
@@ -738,7 +738,7 @@ jcommon::Object * BufferedImage::Clone()
 
 	if (g->DrawImage(this, 0, 0) == false) {
 		delete clone;
-		clone = NULL;
+		clone = nullptr;
 	}
 
 	g->SetCompositeFlags(flags);

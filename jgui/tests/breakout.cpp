@@ -69,8 +69,8 @@ class Breakout : public jgui::Window {
 		Breakout():
 			jgui::Window(/*"BreakOut", */0, 0, 720, 480)
 		{
-			off = NULL;
-			goff = NULL;
+			off = nullptr;
+			goff = nullptr;
 
 			player1score = 0;
 			ballx = 0;
@@ -171,13 +171,13 @@ class Breakout : public jgui::Window {
       jgui::jsize_t
         size = GetSize();
 
-			if (goff == NULL && size.width > 0 && size.height > 0) {
+			if (goff == nullptr && size.width > 0 && size.height > 0) {
 				off = new jgui::BufferedImage(jgui::JPF_ARGB, size.width, size.height);
 
 				goff = off->GetGraphics();
 			}
 
-			if (goff == NULL || off == NULL) {
+			if (goff == nullptr || off == nullptr) {
 				return;
 			}
 
@@ -225,7 +225,7 @@ class Breakout : public jgui::Window {
 			jgui::Font *font = theme->GetFont("widget");
 			jgui::jsize_t size = GetSize();
 
-			if (font != NULL) {
+			if (font != nullptr) {
 				goff->DrawString("Pressione SPACE para iniciar", (size.width - font->GetStringWidth("Pressione SPACE para iniciar"))/2, size.height/2);
 			}
 		}
@@ -280,7 +280,7 @@ class Breakout : public jgui::Window {
       jgui::jsize_t
         size = GetSize();
 
-			if (font == NULL) {
+			if (font == nullptr) {
 				return;
 			}
 

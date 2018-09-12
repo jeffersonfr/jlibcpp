@@ -75,7 +75,7 @@ class Observable : public virtual jcommon::Object{
 		* \brief
 		*
 		*/
-		void NotifyObservers(void *v = NULL);
+		void NotifyObservers(void *v = nullptr);
 
 		/**
 		* \brief

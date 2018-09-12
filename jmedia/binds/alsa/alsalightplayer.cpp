@@ -61,27 +61,27 @@ class VolumeControlImpl : public VolumeControl {
 			snd_mixer_selem_id_set_name(_sid, ALSA_PLAYER_MIXER_NAME);
 
 			if ((snd_mixer_open(&_mixer, 0)) < 0) {
-				_mixer = NULL;
+				_mixer = nullptr;
 				return;
 			}
 
 			if ((snd_mixer_attach(_mixer, ALSA_PLAYER_DEVICE_NAME)) < 0) {
 				snd_mixer_close(_mixer);
-				_mixer = NULL;
+				_mixer = nullptr;
 
 				return;
 			}
 
-			if ((snd_mixer_selem_register(_mixer, NULL, NULL)) < 0) {
+			if ((snd_mixer_selem_register(_mixer, nullptr, nullptr)) < 0) {
 				snd_mixer_close(_mixer);
-				_mixer = NULL;
+				_mixer = nullptr;
 
 				return;
 			}
 
 			if (snd_mixer_load(_mixer) < 0) {
 				snd_mixer_close(_mixer);
-				_mixer = NULL;
+				_mixer = nullptr;
 			
 				return;
 			}
@@ -90,7 +90,7 @@ class VolumeControlImpl : public VolumeControl {
 			
 			if (!_elem) {
 				snd_mixer_close(_mixer);
-				_mixer = NULL;
+				_mixer = nullptr;
 
 				return;
 			}
@@ -109,7 +109,7 @@ class VolumeControlImpl : public VolumeControl {
 			
       std::unique_lock<std::mutex> lock(_player->_mutex);
 
-			if (_mixer != NULL) {
+			if (_mixer != nullptr) {
 				long minv, maxv;
 
 				snd_mixer_selem_get_playback_volume_range(_elem, &minv, &maxv);
@@ -130,7 +130,7 @@ class VolumeControlImpl : public VolumeControl {
 
 			_level = (level < 0)?0:(level > 100)?100:level;
 
-			if (_mixer != NULL) {
+			if (_mixer != nullptr) {
 				long minv, maxv;
 
 				snd_mixer_selem_get_playback_volume_range(_elem, &minv, &maxv);
@@ -266,10 +266,10 @@ AlsaLightPlayer::AlsaLightPlayer(jnetwork::URL url):
 	_media_time = 0LL;
 	_decode_rate = 1.0;
 	_is_loop = false;
-	_stream = NULL;
-	_pcm_handle = NULL;
-	_params = NULL;
-	_buffer = NULL;
+	_stream = nullptr;
+	_pcm_handle = nullptr;
+	_params = nullptr;
+	_buffer = nullptr;
 	_buffer_length = 0;
 	_sample_rate = 0;
 	_bit_depth = 0;
@@ -331,10 +331,10 @@ AlsaLightPlayer::~AlsaLightPlayer()
 	Close();
 	
 	delete _stream;
-	_stream = NULL;
+	_stream = nullptr;
 
 	delete _component;
-	_component = NULL;
+	_component = nullptr;
 
 	for (std::vector<Control *>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
 		Control *control = (*i);
@@ -349,7 +349,7 @@ void AlsaLightPlayer::Play()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_pcm_handle != NULL && _is_playing == false) {
+	if (_pcm_handle != nullptr && _is_playing == false) {
     _thread = std::thread(&AlsaLightPlayer::Run, this);
 		
 		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_STARTED));
@@ -360,7 +360,7 @@ void AlsaLightPlayer::Pause()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_pcm_handle != NULL && snd_pcm_state(_pcm_handle) == SND_PCM_STATE_RUNNING) {
+	if (_pcm_handle != nullptr && snd_pcm_state(_pcm_handle) == SND_PCM_STATE_RUNNING) {
 		snd_pcm_pause(_pcm_handle, 1);
 	
 		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_PAUSED));
@@ -371,7 +371,7 @@ void AlsaLightPlayer::Resume()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_pcm_handle != NULL && snd_pcm_state(_pcm_handle) == SND_PCM_STATE_PAUSED) {
+	if (_pcm_handle != nullptr && snd_pcm_state(_pcm_handle) == SND_PCM_STATE_PAUSED) {
 		snd_pcm_pause(_pcm_handle, 0);
 	
 		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_RESUMED));
@@ -382,7 +382,7 @@ void AlsaLightPlayer::Stop()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_pcm_handle != NULL) {
+	if (_pcm_handle != nullptr) {
 		snd_pcm_state_t state = snd_pcm_state(_pcm_handle);
 		
 		if (
@@ -420,7 +420,7 @@ void AlsaLightPlayer::Close()
 
 	_is_closed = true;
 
-	if (_pcm_handle != NULL) {
+	if (_pcm_handle != nullptr) {
 		snd_pcm_close(_pcm_handle);
 	}
 }

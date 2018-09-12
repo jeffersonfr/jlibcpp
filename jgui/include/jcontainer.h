@@ -73,7 +73,7 @@ class Container : public jgui::Component {
 		 * \brief
 		 *
 		 */
-		virtual Component * GetTargetComponent(Container *target, int x, int y, int *dx = NULL, int *dy = NULL);
+		virtual Component * GetTargetComponent(Container *target, int x, int y, int *dx = nullptr, int *dy = nullptr);
 
 		/**
 		 * \brief
@@ -252,7 +252,7 @@ class Container : public jgui::Component {
 		 * \brief
 		 *
 		 */
-		virtual void Repaint(Component *cmp = NULL);
+		virtual void Repaint(Component *cmp = nullptr);
 		
 		/**
 		 * \brief

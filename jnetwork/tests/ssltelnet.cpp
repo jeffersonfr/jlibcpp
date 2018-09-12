@@ -124,7 +124,7 @@ int main(void)
 			// INFO:: repetir esse codigo em caso de excecao
 			if(interrupted == true ){
 				kill(pid, SIGKILL); // Kill send process
-				wait(NULL);         // Wait for send process to die
+				wait(nullptr);         // Wait for send process to die
 
 				if (interrupted == true ){
 					std::cout << "\nConnection to " << host << " was closed" << std::endl;

@@ -2269,7 +2269,7 @@ class GraphicsTeste : public jgui::Window {
 			while(count--)
 				MultiplyVector(untransPoints++, transPoints++);
 
-			first->next = NULL;
+			first->next = nullptr;
 
 			count = SKULL_TRIANGLES;
 			while(count--) {
@@ -2301,7 +2301,7 @@ class GraphicsTeste : public jgui::Window {
 				/* Not the smartest sorting algorithm */
 				if(NumUsed)
 				{
-					prev = NULL;
+					prev = nullptr;
 					pntr = first;
 					while(pntr)
 					{
@@ -2311,7 +2311,7 @@ class GraphicsTeste : public jgui::Window {
 								pntr = pntr->next;
 							} else {
 								pntr->next = current;
-								current->next = NULL;
+								current->next = nullptr;
 								break;
 							}
 						} else {

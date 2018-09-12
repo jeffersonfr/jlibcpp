@@ -90,7 +90,7 @@ CheckButton * CheckButtonGroup::GetSelected()
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 }

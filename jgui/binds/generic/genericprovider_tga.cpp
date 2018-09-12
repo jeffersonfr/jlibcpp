@@ -50,7 +50,7 @@ class TGAImg {
 			short ColMapStart,ColMapLen;
 			short x1,y1,x2,y2;
 
-			if (pData==NULL) {
+			if (pData==nullptr) {
 				return TGA_IMG_ERR_NO_FILE;
 			}
 
@@ -124,7 +124,7 @@ class TGAImg {
 
 			pImage=new uint8_t[lImageSize];
 
-			if (pImage==NULL) {
+			if (pImage==nullptr) {
 				return TGA_IMG_ERR_MEM_FAIL;
 			}
 
@@ -162,13 +162,13 @@ class TGAImg {
 			pCur=&pData[iOffset];
 
 			// Allocate space for the image data
-			if (pImage!=NULL) {
+			if (pImage!=nullptr) {
 				delete [] pImage;
 			}
 
 			pImage=new uint8_t[lImageSize];
 
-			if (pImage==NULL) {
+			if (pImage==nullptr) {
 				return TGA_IMG_ERR_MEM_FAIL;
 			}
 
@@ -205,13 +205,13 @@ class TGAImg {
 			// Delete old palette if present
 			if(pPalette) {
 				delete [] pPalette;
-				pPalette=NULL;
+				pPalette=nullptr;
 			}
 
 			// Create space for new palette
 			pPalette=new uint8_t[768];
 
-			if(pPalette==NULL) {
+			if(pPalette==nullptr) {
 				return TGA_IMG_ERR_MEM_FAIL;
 			}
 
@@ -276,7 +276,7 @@ class TGAImg {
 	public:
 		TGAImg()
 		{ 
-			pImage=pPalette=pData=NULL;
+			pImage=pPalette=pData=nullptr;
 			iWidth=iHeight=iBPP=bEnc=0;
 			lImageSize=0;
 		}
@@ -285,17 +285,17 @@ class TGAImg {
 		{
 			if(pImage) {
 				delete [] pImage;
-				pImage=NULL;
+				pImage=nullptr;
 			}
 
 			if(pPalette) {
 				delete [] pPalette;
-				pPalette=NULL;
+				pPalette=nullptr;
 			}
 
 			if(pData) {
 				delete [] pData;
-				pData=NULL;
+				pData=nullptr;
 			}
 		}
 
@@ -308,12 +308,12 @@ class TGAImg {
 			// Clear out any existing image and palette
 			if (pImage) {
 				delete [] pImage;
-				pImage=NULL;
+				pImage=nullptr;
 			}
 
 			if (pPalette) {
 				delete [] pPalette;
-				pPalette=NULL;
+				pPalette=nullptr;
 			}
 
 			// Get file size
@@ -327,7 +327,7 @@ class TGAImg {
 
 			pData=new uint8_t[ulSize];
 
-			if (pData==NULL) {
+			if (pData==nullptr) {
 				return TGA_IMG_ERR_MEM_FAIL;
 			}
 
@@ -461,7 +461,7 @@ class TGAImg {
 
 			// Release file memory
 			delete [] pData;
-			pData=NULL;
+			pData=nullptr;
 
 			return TGA_IMG_OK;
 		}
@@ -500,7 +500,7 @@ cairo_surface_t * create_tga_surface_from_stream(jio::InputStream *stream)
 	TGAImg tga;
 
 	if (tga.Load(stream) != TGA_IMG_OK) {
-		return NULL;
+		return nullptr;
 	}
 
 	int sw = tga.GetWidth();
@@ -509,14 +509,14 @@ cairo_surface_t * create_tga_surface_from_stream(jio::InputStream *stream)
 
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, sw, sh);
 
-	if (surface == NULL) {
-		return NULL;
+	if (surface == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(surface);
 
-	if (data == NULL) {
-		return NULL;
+	if (data == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *ptr = (uint8_t *)data;
@@ -569,7 +569,7 @@ cairo_surface_t * create_tga_surface_from_file(const char *file)
 {
 	jio::FileInputStream stream(file);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_tga_surface_from_stream(&stream);
 
@@ -582,7 +582,7 @@ cairo_surface_t * create_tga_surface_from_data(uint8_t *data, int size)
 {
 	jio::MemoryInputStream stream((const uint8_t *)data, size);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_tga_surface_from_stream(&stream);
 

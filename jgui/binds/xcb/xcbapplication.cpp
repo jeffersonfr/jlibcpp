@@ -43,15 +43,15 @@
 namespace jgui {
 
 /** \brief */
-static xcb_connection_t *_xconnection = NULL;
+static xcb_connection_t *_xconnection = nullptr;
 /** \brief */
-static xcb_screen_t *_xscreen = NULL;
+static xcb_screen_t *_xscreen = nullptr;
 /** \brief */
 static xcb_window_t _xwindow = 0;
 /** \brief */
 static xcb_gcontext_t _xcontext;
 /** \brief */
-static jgui::Image *_icon = NULL;
+static jgui::Image *_icon = nullptr;
 /** \brief */
 static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
 /** \brief */
@@ -61,7 +61,7 @@ static int _mouse_y;
 /** \brief */
 static int _click_count;
 /** \brief */
-static Window *g_window = NULL;
+static Window *g_window = nullptr;
 /** \brief */
 static std::string _title;
 /** \brief */
@@ -296,7 +296,7 @@ NativeApplication::~NativeApplication()
 
 void NativeApplication::InternalInit(int argc, char **argv)
 {
-  _xconnection = xcb_connect(NULL,NULL);
+  _xconnection = xcb_connect(nullptr,nullptr);
 
   if (xcb_connection_has_error(_xconnection)) {
 		throw jexception::RuntimeException("Unable to open display");
@@ -326,12 +326,12 @@ static xcb_visualtype_t * find_visual(xcb_connection_t *c, xcb_visualid_t visual
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void NativeApplication::InternalPaint()
 {
-	if (g_window == NULL || g_window->IsVisible() == false) {
+	if (g_window == nullptr || g_window->IsVisible() == false) {
 		return;
 	}
 
@@ -357,7 +357,7 @@ void NativeApplication::InternalPaint()
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
-  if (cairo_surface == NULL) {
+  if (cairo_surface == nullptr) {
     delete buffer;
 
     return;
@@ -366,7 +366,7 @@ void NativeApplication::InternalPaint()
   xcb_visualtype_t 
     *vt = find_visual(_xconnection, _xscreen->root_visual);
 
-  if (vt == NULL) {
+  if (vt == nullptr) {
     delete buffer;
 
     return;
@@ -388,7 +388,7 @@ void NativeApplication::InternalPaint()
   g_window->Flush();
 
   delete buffer;
-  buffer = NULL;
+  buffer = nullptr;
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
@@ -432,7 +432,7 @@ void NativeApplication::InternalLoop()
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
 
-      if (dynamic_cast<jevent::WindowEvent *>(event) != NULL) {
+      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
         jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
 
         if (window_event->GetType() == jevent::JWET_PAINTED) {
@@ -447,7 +447,7 @@ void NativeApplication::InternalLoop()
         events.erase(events.begin());
 
         delete event;
-        event = NULL;
+        event = nullptr;
       }
     }
 
@@ -654,7 +654,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 NativeWindow::~NativeWindow()
 {
   delete g_window;
-  g_window = NULL;
+  g_window = nullptr;
 }
 
 xcb_intern_atom_cookie_t getCookieForAtom(const char *state_name) 
@@ -732,13 +732,13 @@ void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
-  if (parent == NULL) {
+  if (parent == nullptr) {
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
   g_window = parent;
 
-  g_window->SetParent(NULL);
+  g_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
@@ -788,9 +788,9 @@ jgui::jregion_t NativeWindow::GetVisibleBounds()
   xcb_get_geometry_cookie_t 
     cookie = xcb_get_geometry(_xconnection, _xwindow);
   xcb_get_geometry_reply_t 
-    *reply = NULL;
+    *reply = nullptr;
 
-  if ((reply = xcb_get_geometry_reply(_xconnection, cookie, NULL))) {
+  if ((reply = xcb_get_geometry_reply(_xconnection, cookie, nullptr))) {
     t.x = reply->x;
     t.y = reply->y;
     t.width = reply->width;
@@ -939,7 +939,7 @@ void NativeWindow::SetCursor(jcursor_style_t style)
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
-	if ((void *)shape == NULL) {
+	if ((void *)shape == nullptr) {
 		return;
 	}
 
@@ -947,17 +947,17 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 	//
 	
 	/*
-	if ((void *)shape == NULL) {
+	if ((void *)shape == nullptr) {
 		return;
 	}
 
-	uint32_t *data = NULL;
+	uint32_t *data = nullptr;
 
 	jsize_t t = shape->GetSize();
 	
 	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		return;
 	}
 
@@ -968,12 +968,12 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 	XImage *image = XCreateImage(_display, visual, depth, ZPixmap, 0, (char *)data, t.width, t.height, 32, 0);
 	::Window root_window = XRootWindow(_display, screen);
 
-	if (image == NULL) {
+	if (image == nullptr) {
 		return;
 	}
 
 	Pixmap pixmap = XCreatePixmap(_display, RootWindow(_display, screen), t.width, t.height, depth);
-	GC gc = XCreateGC(_display, pixmap, 0, NULL);
+	GC gc = XCreateGC(_display, pixmap, 0, nullptr);
 	
 	XPutImage(_display, pixmap, gc, image, 0, 0, 0, 0, t.width, t.height);
 

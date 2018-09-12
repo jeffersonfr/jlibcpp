@@ -35,7 +35,7 @@ Item::Item():
 	_valign = JVA_CENTER;
 
 	_is_enabled = true;
-	_prefetch = NULL;
+	_prefetch = nullptr;
 	_is_checked = false;
 	_is_visible = true;
 	_type = JIT_EMPTY;
@@ -50,7 +50,7 @@ Item::Item(std::string value):
 	_valign = JVA_CENTER;
 
 	_is_enabled = true;
-	_prefetch = NULL;
+	_prefetch = nullptr;
 	_value = value;
 	_is_checked = false;
 	_is_visible = true;
@@ -66,7 +66,7 @@ Item::Item(std::string value, jgui::Image *image):
 	_valign = JVA_CENTER;
 
 	_is_enabled = true;
-	_prefetch = NULL;
+	_prefetch = nullptr;
 	_image = image;
 	_value = value;
 	_is_checked = false;
@@ -83,7 +83,7 @@ Item::Item(std::string value, bool checked):
 	_valign = JVA_CENTER;
 
 	_is_enabled = true;
-	_prefetch = NULL;
+	_prefetch = nullptr;
 	_value = value;
 	_is_checked = checked;
 	_is_visible = true;
@@ -92,9 +92,9 @@ Item::Item(std::string value, bool checked):
 
 Item::~Item()
 {
-	if (_prefetch != NULL) {
+	if (_prefetch != nullptr) {
 		delete _prefetch;
-		_prefetch = NULL;
+		_prefetch = nullptr;
 	}
 }
 
@@ -102,7 +102,7 @@ jcommon::Object * Item::Clone()
 {
 	Item *item = new Item(*this);
 
-	if (_prefetch != NULL) {
+	if (_prefetch != nullptr) {
 		item->_prefetch = dynamic_cast<Image *>(item->_prefetch->Clone());
 	}
 
@@ -436,7 +436,7 @@ void ItemComponent::AddItem(Item *item)
 
 void ItemComponent::AddItem(Item *item, int index)
 {
-	if (item == NULL) {
+	if (item == nullptr) {
 		return;
 	}
 
@@ -460,7 +460,7 @@ void ItemComponent::AddItems(std::vector<Item *> &items)
 
 void ItemComponent::RemoveItem(Item *item)
 {
-	if (item == NULL) {
+	if (item == nullptr) {
 		return;
 	}
 
@@ -490,7 +490,7 @@ void ItemComponent::RemoveItems()
 Item * ItemComponent::GetItem(int index)
 {
 	if (index < 0 || index >= (int)_items.size()) {
-		return NULL;
+		return nullptr;
 	}
 
 	return *(_items.begin()+index);
@@ -504,7 +504,7 @@ std::vector<Item *> & ItemComponent::GetItems()
 Item * ItemComponent::GetCurrentItem()
 {
 	if (_items.size() == 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	return *(_items.begin()+_index);
@@ -517,7 +517,7 @@ int ItemComponent::GetCurrentIndex()
 
 void ItemComponent::RegisterSelectListener(jevent::SelectListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -530,7 +530,7 @@ void ItemComponent::RegisterSelectListener(jevent::SelectListener *listener)
 
 void ItemComponent::RemoveSelectListener(jevent::SelectListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -541,7 +541,7 @@ void ItemComponent::RemoveSelectListener(jevent::SelectListener *listener)
 
 void ItemComponent::DispatchSelectEvent(jevent::SelectEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

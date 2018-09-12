@@ -42,7 +42,7 @@ void Options::SetOptions(std::string options)
 		return;
 	}
 
-	if ((void *)_argv == NULL) {
+	if ((void *)_argv == nullptr) {
 		return;
 	}
 
@@ -52,7 +52,7 @@ void Options::SetOptions(std::string options)
 
 	while ((opt = getopt(_argc, _argv, options.c_str())) != EOF) {
 		if (opt != '?' && opt != ':') {
-			if ((void *)optarg != NULL) {
+			if ((void *)optarg != nullptr) {
 		 		_tags[opt] = optarg;
 			} else {
 		 		_tags[opt] = "";

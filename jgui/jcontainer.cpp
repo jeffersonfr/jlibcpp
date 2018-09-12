@@ -36,11 +36,11 @@ Container::Container(int x, int y, int width, int height):
 	_layout = _default_layout;
 
 	_is_focus_cycle_root = false;
-	_focus = NULL;
+	_focus = nullptr;
 	_orientation = JCO_LEFT_TO_RIGHT;
 	_is_enabled = true;
 	_is_visible = true;
-	_parent = NULL;
+	_parent = nullptr;
 	_optimized_paint = false;
 
 	_insets.left = 0;
@@ -53,7 +53,7 @@ Container::Container(int x, int y, int width, int height):
 
 Container::~Container()
 {
-	if (_default_layout != NULL) {
+	if (_default_layout != nullptr) {
 		delete _default_layout;
 	}
 }
@@ -113,7 +113,7 @@ bool Container::MoveScrollTowards(Component *next, jevent::jkeyevent_symbol_t sy
 		}
 		
 		//if the Form doesn't contain a focusable Component simply move the viewport by pixels
-		if (next == NULL || next == this){
+		if (next == nullptr || next == this){
 			ScrollToVisibleArea(x, y, w, h, this);
 
 			return false;
@@ -166,7 +166,7 @@ jsize_t Container::GetScrollDimension()
     ss = 0,
     sg = 0;
   
-  if (theme != NULL) {
+  if (theme != nullptr) {
     ss = theme->GetIntegerParam("component.scroll.size");
     sg = theme->GetIntegerParam("component.scroll.gap");
   }
@@ -240,11 +240,11 @@ Component * Container::GetTargetComponent(Container *target, int x, int y, int *
 	int scrollx = (IsScrollableX() == true)?slocation.x:0,
 			scrolly = (IsScrollableY() == true)?slocation.y:0;
 
-	if ((void *)dx != NULL) {
+	if ((void *)dx != nullptr) {
 		*dx = x;
 	}
 
-	if ((void *)dy != NULL) {
+	if ((void *)dy != nullptr) {
 		*dy = y;
 	}
 
@@ -255,11 +255,11 @@ Component * Container::GetTargetComponent(Container *target, int x, int y, int *
 			if (c->Intersect(x+scrollx, y+scrolly) == true) {
         jgui::jpoint_t cl = c->GetLocation();
 
-				if ((void *)dx != NULL) {
+				if ((void *)dx != nullptr) {
 					*dx = x - cl.x;
 				}
 
-				if ((void *)dy != NULL) {
+				if ((void *)dy != nullptr) {
 					*dy = y - cl.y;
 				}
 
@@ -278,7 +278,7 @@ void Container::SetOptimizedPaint(bool b)
 
 void Container::SetLayout(jgui::Layout *layout)
 {
-	if (layout == NULL) {
+	if (layout == nullptr) {
 		return;
 	}
 
@@ -297,7 +297,7 @@ jgui::Layout * Container::GetLayout()
 
 void Container::DoLayout()
 {
-	if (_layout != NULL) {
+	if (_layout != nullptr) {
 		SetIgnoreRepaint(true);
 
 		_layout->DoLayout(this);
@@ -305,7 +305,7 @@ void Container::DoLayout()
 		for (std::vector<Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 			Container *container = dynamic_cast<jgui::Container *>(*i);
 			
-			if (container != NULL) {
+			if (container != nullptr) {
 				container->DoLayout();
 			}
 		}
@@ -317,7 +317,7 @@ void Container::DoLayout()
 void Container::Pack(bool fit)
 {
 	Component 
-    *c = NULL;
+    *c = nullptr;
 	jinsets_t 
     insets = GetInsets();
 	int 
@@ -408,7 +408,7 @@ void Container::InvalidateAll()
 
 			Container *container = dynamic_cast<jgui::Container *>(component);
 
-			if (container != NULL) {
+			if (container != nullptr) {
 				containers.push_back(&(container->GetComponents()));
 			}
 		}
@@ -435,7 +435,7 @@ void Container::RevalidateAll()
 
 			Container *container = dynamic_cast<jgui::Container *>(component);
 		
-			if (container != NULL) {
+			if (container != nullptr) {
 				containers.push_back(&(container->GetComponents()));
 			}
 		}
@@ -481,7 +481,7 @@ void Container::Paint(Graphics *g)
 				cw = cs.width,
 				ch = cs.height;
 			bool 
-        flag = (dynamic_cast<jgui::Container *>(c) != NULL);
+        flag = (dynamic_cast<jgui::Container *>(c) != nullptr);
 
 			if (cw > 0 && ch > 0) {
 				g->Translate(cx, cy);
@@ -537,8 +537,8 @@ void Container::Repaint(Component *cmp)
 
 	Invalidate();
 
-	if (_parent != NULL) {
-		_parent->Repaint((cmp == NULL)?this:cmp);
+	if (_parent != nullptr) {
+		_parent->Repaint((cmp == nullptr)?this:cmp);
 	}
 
 	Component::DispatchComponentEvent(new jevent::ComponentEvent(this, jevent::JCET_ONPAINT));
@@ -550,7 +550,7 @@ void Container::Add(Component *c, int index)
 		throw jexception::OutOfBoundsException("Index out of range");
 	}
 
-	if (c == NULL) {
+	if (c == nullptr) {
 		throw jexception::NullPointerException("The component must be valid");
 	}
 
@@ -565,12 +565,12 @@ void Container::Add(Component *c, int index)
 
 		Container *container = dynamic_cast<jgui::Container *>(c);
 		
-		if (container != NULL) {
+		if (container != nullptr) {
 			jgui::Component *focus = container->GetFocusOwner();
 
 			c->SetParent(this);
 
-			if ((void *)focus != NULL) {
+			if ((void *)focus != nullptr) {
 				RequestComponentFocus(focus);
 			}
 		} else {
@@ -594,10 +594,10 @@ void Container::Add(Component *c, GridBagConstraints *constraints)
 {
 	Add(c, GetComponentCount());
 
-	if (_layout != NULL) {
+	if (_layout != nullptr) {
 		GridBagLayout *layout = dynamic_cast<jgui::GridBagLayout *>(_layout);
 
-		if (layout != NULL) {
+		if (layout != nullptr) {
 			layout->AddLayoutComponent(c, constraints);
 		}
 	}
@@ -609,10 +609,10 @@ void Container::Add(jgui::Component *c, std::string id)
 {
 	Add(c, GetComponentCount());
 
-	if (_layout != NULL) {
+	if (_layout != nullptr) {
 		CardLayout *layout = dynamic_cast<jgui::CardLayout *>(_layout);
 
-		if (layout != NULL) {
+		if (layout != nullptr) {
 			layout->AddLayoutComponent(id, c);
 		}
 	}
@@ -624,10 +624,10 @@ void Container::Add(jgui::Component *c, jborderlayout_align_t align)
 {
 	Add(c, GetComponentCount());
 
-	if (_layout != NULL) {
+	if (_layout != nullptr) {
 		BorderLayout *layout = dynamic_cast<jgui::BorderLayout *>(_layout);
 
-		if (layout != NULL) {
+		if (layout != nullptr) {
 			layout->AddLayoutComponent(c, align);
 		}
 	}
@@ -637,27 +637,27 @@ void Container::Add(jgui::Component *c, jborderlayout_align_t align)
 
 void Container::Remove(jgui::Component *c)
 {
-	if (c == NULL) {
+	if (c == nullptr) {
 		return;
 	}
 
 	// INFO:: se o componente em foco pertencer ao container remover o foco
 	jgui::Container *container = dynamic_cast<jgui::Container *>(c);
 
-	if (container != NULL) {
+	if (container != nullptr) {
 		jgui::Component *focus = GetFocusOwner();
 
-		if ((void *)focus != NULL) {
+		if ((void *)focus != nullptr) {
 			Container *parent = focus->GetParent();
 
-			while ((void *)parent != NULL) {
+			while ((void *)parent != nullptr) {
 				if (parent == container) {
 					focus->ReleaseFocus();
 
 					break;
 				}
 
-				if (parent->GetParent() == NULL) {
+				if (parent->GetParent() == nullptr) {
 					break;
 				}
 
@@ -668,10 +668,10 @@ void Container::Remove(jgui::Component *c)
 		c->ReleaseFocus();
 	}
 
-	if (_layout != NULL) {
+	if (_layout != nullptr) {
 		jgui::BorderLayout *layout = dynamic_cast<jgui::BorderLayout *>(_layout);
 		
-		if (layout != NULL) {
+		if (layout != nullptr) {
 			layout->RemoveLayoutComponent(c);
 		}
 	}
@@ -680,7 +680,7 @@ void Container::Remove(jgui::Component *c)
 
 	for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
 		if (c == (*i)) {
-			c->SetParent(NULL);
+			c->SetParent(nullptr);
 
 			i = _components.erase(i);
 
@@ -701,17 +701,17 @@ void Container::RemoveAll()
 {
 	jgui::Component *focus = GetFocusOwner();
 
-	if ((void *)focus != NULL) {
+	if ((void *)focus != nullptr) {
 		Container *parent = focus->GetParent();
 
-		while ((void *)parent != NULL) {
+		while ((void *)parent != nullptr) {
 			if (parent == this) {
 				focus->ReleaseFocus();
 
 				break;
 			}
 
-			if (parent->GetParent() == NULL) {
+			if (parent->GetParent() == nullptr) {
 				break;
 			}
 
@@ -724,7 +724,7 @@ void Container::RemoveAll()
   for (std::vector<jgui::Component *>::iterator i=_components.begin(); i!=_components.end(); i++) {
     jgui::Component *c = (*i);
 
-    c->SetParent(NULL);
+    c->SetParent(nullptr);
 
     DispatchContainerEvent(new jevent::ContainerEvent(c, jevent::JCET_COMPONENT_REMOVED));
   }
@@ -765,21 +765,21 @@ std::vector<Component *> & Container::GetComponents()
 
 Component * Container::GetComponentAt(int x, int y)
 {
-	return GetTargetComponent(this, x, y, NULL, NULL);
+	return GetTargetComponent(this, x, y, nullptr, nullptr);
 }
 
 void Container::RequestComponentFocus(jgui::Component *c)
 {
-	if (c == NULL || c->IsFocusable() == false) {
+	if (c == nullptr || c->IsFocusable() == false) {
 		return;
 	}
 
-	if (_parent != NULL) {
+	if (_parent != nullptr) {
 		_parent->RequestComponentFocus(c);
 	} else {
 		SetIgnoreRepaint(true);
 
-		if (_focus != NULL && _focus != c) {
+		if (_focus != nullptr && _focus != c) {
 			_focus->ReleaseFocus();
 		}
 
@@ -798,22 +798,22 @@ void Container::RequestComponentFocus(jgui::Component *c)
 
 void Container::ReleaseComponentFocus(jgui::Component *c)
 {
-	if (c == NULL) {
+	if (c == nullptr) {
 		return;
 	}
 
-	if (_parent != NULL) {
-		_focus = NULL;
+	if (_parent != nullptr) {
+		_focus = nullptr;
 
 		_parent->ReleaseComponentFocus(c);
 	} else {
-		if (_focus != NULL && _focus == c) {
+		if (_focus != nullptr && _focus == c) {
 			_focus->Repaint();
 
 			dynamic_cast<Component *>(_focus)->DispatchFocusEvent(new jevent::FocusEvent(_focus, jevent::JFET_LOST));
 		}
 
-		_focus = NULL;
+		_focus = nullptr;
 	}
 }
 
@@ -825,7 +825,7 @@ bool Container::KeyPressed(jevent::KeyEvent *event)
 
 	Component *current = GetFocusOwner();
 
-	if (current != NULL && current != this) {
+	if (current != nullptr && current != this) {
 		if (current->KeyPressed(event) == true) {
 			return true;
 		}
@@ -852,7 +852,7 @@ bool Container::MousePressed(jevent::MouseEvent *event)
 
 	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
-	if (c != NULL && c != this) {
+	if (c != nullptr && c != this) {
     jgui::jpoint_t 
       slocation = GetScrollLocation();
 		jevent::MouseEvent 
@@ -880,7 +880,7 @@ bool Container::MouseReleased(jevent::MouseEvent *event)
 
 	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
-	if (c != NULL && c != this) {
+	if (c != nullptr && c != this) {
     jgui::jpoint_t 
       slocation = GetScrollLocation();
 		jevent::MouseEvent 
@@ -908,7 +908,7 @@ bool Container::MouseMoved(jevent::MouseEvent *event)
 
 	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
-	if (c != NULL && c != this) {
+	if (c != nullptr && c != this) {
     jgui::jpoint_t 
       slocation = GetScrollLocation();
 		jevent::MouseEvent 
@@ -936,7 +936,7 @@ bool Container::MouseWheel(jevent::MouseEvent *event)
 
 	Component *c = GetTargetComponent(this, elocation.x, elocation.y, &dx, &dy);
 
-	if (c != NULL && c != this) {
+	if (c != nullptr && c != this) {
     jgui::jpoint_t 
       slocation = GetScrollLocation();
     jevent::MouseEvent 
@@ -952,7 +952,7 @@ bool Container::MouseWheel(jevent::MouseEvent *event)
 
 jgui::Component * Container::GetFocusOwner()
 {
-	if (_parent != NULL) {
+	if (_parent != nullptr) {
 		return _parent->GetFocusOwner();
 	}
 
@@ -1035,7 +1035,7 @@ void Container::PutComponentBelow(Component *c, Component *c1)
 
 void Container::RegisterContainerListener(jevent::ContainerListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -1048,7 +1048,7 @@ void Container::RegisterContainerListener(jevent::ContainerListener *listener)
 
 void Container::RemoveContainerListener(jevent::ContainerListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -1059,7 +1059,7 @@ void Container::RemoveContainerListener(jevent::ContainerListener *listener)
 
 void Container::DispatchContainerEvent(jevent::ContainerEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

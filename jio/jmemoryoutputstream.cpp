@@ -29,7 +29,7 @@ MemoryOutputStream::MemoryOutputStream(const char *data, int64_t size):
 {
 	jcommon::Object::SetClassName("jio::MemoryOutputStream");
 	
-	if ((void *)data == NULL) {
+	if ((void *)data == nullptr) {
 		throw jexception::RuntimeException("Null pointer exception");
 	}
 

@@ -36,8 +36,8 @@ LocalDatagramSocket::LocalDatagramSocket(std::string server, int timeout_, int r
 	jcommon::Object::SetClassName("jnetwork::DatagramSocket");
 	
 	_server_file = server;
-	_is = NULL;
-	_os = NULL;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_timeout = timeout_;
 
@@ -56,8 +56,8 @@ LocalDatagramSocket::LocalDatagramSocket(std::string client, std::string server,
 	
 	_server_file = server;
 	_client_file = client;
-	_is = NULL;
-	_os = NULL;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_timeout = timeout_;
 
@@ -76,11 +76,11 @@ LocalDatagramSocket::~LocalDatagramSocket()
 	} catch (...) {
 	}
 
-	if ((void *)_is != NULL) {
+	if ((void *)_is != nullptr) {
 		delete _is;
 	}
 
-	if ((void *)_os != NULL) {
+	if ((void *)_os != nullptr) {
 		delete _os;
 	}
 }

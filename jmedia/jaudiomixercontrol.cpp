@@ -62,7 +62,7 @@ AudioMixerControl::~AudioMixerControl()
 
 Audio * AudioMixerControl::CreateAudio(std::string filename)
 {
-  return NULL;
+  return nullptr;
 }
 
 void AudioMixerControl::StartSound(Audio *audio)

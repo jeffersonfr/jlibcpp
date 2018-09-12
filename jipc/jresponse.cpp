@@ -53,7 +53,7 @@ void Response::Initialize(uint8_t *buffer, int size)
 		if (param.GetSize() > 1) {
 			char *value = base64.Decode((uint8_t *)param.GetToken(1).c_str(), param.GetToken(1).size());
 
-			if (value == NULL) {
+			if (value == nullptr) {
 				value = (char *)"";
 			}
 
@@ -70,7 +70,7 @@ std::string Response::Encode()
 	for (std::map<std::string, std::string>::iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
 		char *value = base64.Encode((uint8_t *)i->second.c_str(), i->second.size());
 
-		if (value == NULL) {
+		if (value == nullptr) {
 			value = (char *)"";
 		}
 

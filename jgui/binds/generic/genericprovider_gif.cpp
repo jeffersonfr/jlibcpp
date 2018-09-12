@@ -428,7 +428,7 @@ static uint32_t * ReadImage(GIFData *data, int width, int height, uint8_t cmap[3
 
 	// CHANGE:: avoid invalid images 
 	if (width > 16384 || height > 16384) {
-		return NULL;
+		return nullptr;
 	}
 
 	// Initialize the decompression routines
@@ -444,7 +444,7 @@ static uint32_t * ReadImage(GIFData *data, int width, int height, uint8_t cmap[3
 	if (ignore) {
 		while (LWZReadByte(data, false, c) >= 0);
 
-		return NULL;
+		return nullptr;
 	}
 
 	// FIXME: 
@@ -529,13 +529,13 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 	if (data->stream->Read((char *)buf, 6) <= 0) {
 		JDEBUG(JINFO, "error reading magic number" );
 
-		return NULL;
+		return nullptr;
 	}
 
 	if (strncmp( (char *)buf, "GIF", 3 ) != 0) {
 		JDEBUG(JINFO, "not a GIF file" );
 
-		return NULL;
+		return nullptr;
 	}
 
 	memcpy(version, (char *)buf + 3, 4);
@@ -543,13 +543,13 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 	if ((strcmp(version, "87a") != 0) && (strcmp(version, "89a") != 0)) {
 		JDEBUG(JINFO, "bad version number, not '87a' or '89a'" );
 
-		return NULL;
+		return nullptr;
 	}
 
 	if (data->stream->Read((char *)buf, 7) <= 0) {
 		JDEBUG(JINFO, "failed to read screen descriptor" );
 
-		return NULL;
+		return nullptr;
 	}
 
 	data->Width = LM_to_uint( buf[0], buf[1] );
@@ -564,7 +564,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		if (ReadColorMap(data->stream, data->BitPixel, data->ColorMap )) {
 			JDEBUG(JINFO, "error reading global colormap" );
 
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -582,7 +582,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		if (data->stream->Read((char *)&c, 1) <= 0) {
 			JDEBUG(JINFO, "EOF / read error on image data" );
 
-			return NULL;
+			return nullptr;
 		}
 
 		// GIF terminator
@@ -591,7 +591,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 				JDEBUG(JINFO, "only %d image%s found in file", imageCount, imageCount>1?"s":"" );
 			}
 
-			return NULL;
+			return nullptr;
 		}
 
 		// Extension
@@ -617,7 +617,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		if (data->stream->Read((char *)buf, 9) <= 0) {
 			JDEBUG(JINFO, "couldn't read left/top/width/height");
 
-			return NULL;
+			return nullptr;
 		}
 
 		*width  = LM_to_uint( buf[4], buf[5] );
@@ -625,7 +625,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		*transparency = (data->transparent != -1);
 
 		if (headeronly && !(*transparency && key_rgb)) {
-			return NULL;
+			return nullptr;
 		}
 
 		useGlobalColormap = ! BitSet( buf[8], LOCALCOLORMAP );
@@ -640,7 +640,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 			if (ReadColorMap(data->stream, bitPixel, localColorMap) != true) {
 				JDEBUG(JINFO, "error reading local colormap" );
 
-				return NULL;
+				return nullptr;
 			}
 
 			if (*transparency && (key_rgb || !headeronly)) {
@@ -653,7 +653,7 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 		}
 
 		if (headeronly) {
-			return NULL;
+			return nullptr;
 		}
 
 		if (alpha) {
@@ -667,14 +667,14 @@ static uint32_t * ReadGIF(GIFData *data, int imageNumber, int *width, int *heigh
 
 cairo_surface_t * create_gif_surface_from_stream(jio::InputStream *stream) 
 {
-	if (stream == NULL) {
-		return NULL;
+	if (stream == nullptr) {
+		return nullptr;
 	}
 
 	GIFData t;
 
 	t.stream = stream;
-	t.image = NULL;
+	t.image = nullptr;
 	t.image_width = -1;
 	t.image_height = -1;
 	t.image_transparency = false;
@@ -707,22 +707,22 @@ cairo_surface_t * create_gif_surface_from_stream(jio::InputStream *stream)
 
 	t.image = ReadGIF(&t, 1, &t.image_width, &t.image_height, &t.image_transparency, &t.image_colorkey, true, false);
 
-	if (t.image == NULL || (t.image_height == 0) || (t.image_width  == 0)) {
-		return NULL;
+	if (t.image == nullptr || (t.image_height == 0) || (t.image_width  == 0)) {
+		return nullptr;
 	}
 
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, t.image_width, t.image_height);
 
-	if (surface == NULL) {
-		return NULL;
+	if (surface == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(surface);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		delete [] t.image;
 
-		return NULL;
+		return nullptr;
 	}
 
 	memcpy(data, t.image, t.image_width*t.image_height*4);
@@ -747,7 +747,7 @@ cairo_surface_t * create_gif_surface_from_file(const char *file)
 {
 	jio::FileInputStream stream(file);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_gif_surface_from_stream(&stream);
 
@@ -760,7 +760,7 @@ cairo_surface_t * create_gif_surface_from_data(uint8_t *data, int size)
 {
 	jio::MemoryInputStream stream((const uint8_t *)data, size);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_gif_surface_from_stream(&stream);
 

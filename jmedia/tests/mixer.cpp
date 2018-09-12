@@ -29,7 +29,7 @@ int main(int argc, char **argv)
 {
   jmedia::Player *player = jmedia::PlayerManager::CreatePlayer("mixer://");
 
-  if (player == NULL) {
+  if (player == nullptr) {
     std::cout << "Audio mixer is not avaiable !" << std::endl;
 
     return -1;
@@ -37,7 +37,7 @@ int main(int argc, char **argv)
 
   jmedia::AudioMixerControl *control = dynamic_cast<jmedia::AudioMixerControl *>(player->GetControl("audio.mixer"));
 
-  if (control == NULL) {
+  if (control == nullptr) {
     std::cout << "Audio mixer control is not avaiable !" << std::endl;
 
     return -1;

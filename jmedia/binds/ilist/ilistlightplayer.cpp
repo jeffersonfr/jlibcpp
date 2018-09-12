@@ -57,7 +57,7 @@ class PlayerComponentImpl : public jgui::Component {
 		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			_image = NULL;
+			_image = nullptr;
 			_player = player;
 			
 			_frame_size.width = w;
@@ -78,9 +78,9 @@ class PlayerComponentImpl : public jgui::Component {
 
 		virtual ~PlayerComponentImpl()
 		{
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 		}
 
@@ -127,7 +127,7 @@ class PlayerComponentImpl : public jgui::Component {
 			// g->DrawImage(_image, 0, 0, size.width, size.height);
 				
       delete _image;
-      _image = NULL;
+      _image = nullptr;
 
 			_mutex.unlock();
 		}
@@ -209,7 +209,7 @@ ImageListLightPlayer::ImageListLightPlayer(jnetwork::URL url):
 	
 	jio::File *file = jio::File::OpenDirectory(_directory);
 
-	if (file == NULL) {
+	if (file == nullptr) {
 		throw jexception::RuntimeException("Unable to open the media directory");
 	}
 
@@ -232,7 +232,7 @@ ImageListLightPlayer::ImageListLightPlayer(jnetwork::URL url):
       /*
 			jio::File *tmp = jio::File::OpenFile(_directory + "/" + file);
 
-			if (tmp != NULL) {
+			if (tmp != nullptr) {
 				_image_list.push_back(_directory + "/" + file);
 			}
 
@@ -261,7 +261,7 @@ ImageListLightPlayer::~ImageListLightPlayer()
 	Close();
 	
 	delete _component;
-	_component = NULL;
+	_component = nullptr;
 
 	for (std::vector<Control *>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
 		Control *control = (*i);
@@ -297,7 +297,7 @@ void ImageListLightPlayer::Run()
 
 		frame = GetFrame();
 
-		if (frame == NULL) { 
+		if (frame == nullptr) { 
 			ResetFrames();
 
 			if (_is_loop == false) {

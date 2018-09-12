@@ -65,7 +65,7 @@ class PorterTeste : public jgui::Window {
 			if (_is_drawimage == true) {
 				ig->DrawImage(_img2, 2*RECT_SIZE/2, 2*RECT_SIZE/2);
 			} else {
-				uint32_t *buffer = NULL;
+				uint32_t *buffer = nullptr;
 				jgui::jsize_t size = _img2->GetSize();
 
 				_img2->GetGraphics()->GetRGBArray(&buffer, 0, 0, size.width, size.height);

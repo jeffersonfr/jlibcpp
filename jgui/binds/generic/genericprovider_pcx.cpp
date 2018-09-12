@@ -46,7 +46,7 @@ class PCXImageLoader {
 	 {
 		 unsigned short x1,x2,y1,y2;
 
-		 if(pData==NULL)
+		 if(pData==nullptr)
 			 return PCX_IMG_ERR_NO_FILE;
 
 		 if(pData[0]!=0xA) // PCX ID Byte, should be 0xA
@@ -98,16 +98,16 @@ class PCXImageLoader {
 		 iImageLineLen =iWidth*iPlanes;
 		 pLine=new unsigned char[iBufferLineLen];
 
-		 if(pLine==NULL)
+		 if(pLine==nullptr)
 			 return PCX_IMG_ERR_MEM_FAIL;
 
 		 // Allocate space for the image data
-		 if(pImage!=NULL)
+		 if(pImage!=nullptr)
 			 delete [] pImage;
 
 		 pImage=new unsigned char[(iImageLineLen * iHeight)+1];
 
-		 if(pImage==NULL)
+		 if(pImage==nullptr)
 			 return PCX_IMG_ERR_MEM_FAIL;
 
 		 // Decode each scanline
@@ -152,17 +152,17 @@ class PCXImageLoader {
 		 // Load a 256 color palette
 		 if(pPalette) {
 			 delete [] pPalette;
-			 pPalette=NULL;
+			 pPalette=nullptr;
 		 }
 
-		 if(iPlanes==3) { // NULL Palette for RGB images
+		 if(iPlanes==3) { // nullptr Palette for RGB images
 			 return PCX_IMG_OK;
 		 }
 
 		 // Create space for palette
 		 pPalette=new unsigned char[768];
 
-		 if(pPalette==NULL) {
+		 if(pPalette==nullptr) {
 			 return PCX_IMG_ERR_MEM_FAIL;
 		 }
 
@@ -180,7 +180,7 @@ class PCXImageLoader {
 	public:
 	 PCXImageLoader()
 	 { 
-		 pImage=pPalette=pData=NULL;
+		 pImage=pPalette=pData=nullptr;
 		 iWidth=iHeight=iBPP=iPlanes=iBPL=bEnc=0;
 	 }
 
@@ -188,17 +188,17 @@ class PCXImageLoader {
 	 {
 		 if(pImage) {
 			 delete [] pImage;
-			 pImage=NULL;
+			 pImage=nullptr;
 		 }
 
 		 if(pPalette) {
 			 delete [] pPalette;
-			 pPalette=NULL;
+			 pPalette=nullptr;
 		 }
 
 		 if(pData) {
 			 delete [] pData;
-			 pData=NULL;
+			 pData=nullptr;
 		 }
 	 }
 
@@ -212,12 +212,12 @@ class PCXImageLoader {
 		 // Clear out any existing image and palette
 		 if(pImage) {
 			 delete [] pImage;
-			 pImage=NULL;
+			 pImage=nullptr;
 		 }
 
 		 if(pPalette) {
 			 delete [] pPalette;
-			 pPalette=NULL;
+			 pPalette=nullptr;
 		 }
 
 		 ulSize = stream->GetSize();
@@ -230,7 +230,7 @@ class PCXImageLoader {
 
 		 pData=new unsigned char[ulSize];
 
-		 if(pData==NULL) {
+		 if(pData==nullptr) {
 			 return PCX_IMG_ERR_MEM_FAIL;
 		 }
 
@@ -268,7 +268,7 @@ class PCXImageLoader {
 
 		 // Free the file data
 		 delete [] pData;
-		 pData=NULL;
+		 pData=nullptr;
 
 		 // Update the BPP value to reflect the image format
 		 iBPP*=iPlanes;
@@ -305,28 +305,28 @@ class PCXImageLoader {
  
 cairo_surface_t * create_pcx_surface_from_stream(jio::InputStream *stream) 
 {
-	if (stream == NULL) {
-		return NULL;
+	if (stream == nullptr) {
+		return nullptr;
 	}
 
 	PCXImageLoader loader;
 	
 	loader.Load(stream);
 
-	if (loader.GetImage() == NULL || (loader.GetWidth() == 0) || (loader.GetHeight() == 0)) {
-		return NULL;
+	if (loader.GetImage() == nullptr || (loader.GetWidth() == 0) || (loader.GetHeight() == 0)) {
+		return nullptr;
 	}
 
 	cairo_surface_t *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, loader.GetWidth(), loader.GetHeight());
 
-	if (surface == NULL) {
-		return NULL;
+	if (surface == nullptr) {
+		return nullptr;
 	}
 
 	uint8_t *data = cairo_image_surface_get_data(surface);
 
-	if (data == NULL) {
-		return NULL;
+	if (data == nullptr) {
+		return nullptr;
 	}
 
 	int size = loader.GetWidth()*loader.GetHeight();
@@ -359,7 +359,7 @@ cairo_surface_t * create_pcx_surface_from_file(const char *file)
 {
 	jio::FileInputStream stream(file);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_pcx_surface_from_stream(&stream);
 
@@ -372,7 +372,7 @@ cairo_surface_t * create_pcx_surface_from_data(uint8_t *data, int size)
 {
 	jio::MemoryInputStream stream((const uint8_t *)data, size);
 
-	cairo_surface_t *surface = NULL;
+	cairo_surface_t *surface = nullptr;
 
 	surface = create_pcx_surface_from_stream(&stream);
 

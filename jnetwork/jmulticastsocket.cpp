@@ -34,8 +34,8 @@ MulticastSocket::MulticastSocket(std::string host_, int port_, int rbuf_, int wb
 {
 	jcommon::Object::SetClassName("jnetwork::MulticastSocket");
 	
-	_is = NULL;
-	_os = NULL;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_sent_bytes = 0;
 	_receive_bytes = 0;
@@ -54,11 +54,11 @@ MulticastSocket::~MulticastSocket()
 	} catch (...) {
 	}
 
-	if (_is != NULL) {
+	if (_is != nullptr) {
 		delete _is;
 	}
 
-	if (_os != NULL) {
+	if (_os != nullptr) {
 		delete _os;
 	}
 }
@@ -96,7 +96,7 @@ void MulticastSocket::ConnectSocket(InetAddress *local_addr_, int port_)
 #ifdef SOLARIS
 	_sock_r.sin_addr.s_addr = htonl(INADDR_ANY);
 #else
-	if (local_addr_ == NULL) {
+	if (local_addr_ == nullptr) {
 		_sock_r.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
 		_sock_r.sin_addr.s_addr = inet_addr(local_addr_->GetHostAddress().c_str());

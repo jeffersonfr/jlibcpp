@@ -29,7 +29,7 @@ MemoryInputStream::MemoryInputStream(const uint8_t *data, int64_t size):
 {
 	jcommon::Object::SetClassName("jio::MemoryInputStream");
 
-	if ((void *)data == NULL) {
+	if ((void *)data == nullptr) {
 		throw jexception::RuntimeException("Null pointer exception");
 	}
 
@@ -73,7 +73,7 @@ int64_t MemoryInputStream::Read()
 
 int64_t MemoryInputStream::Read(char *data, int64_t size)
 {
-	if ((void *)data == NULL) {
+	if ((void *)data == nullptr) {
 		return -1LL;
 	}
 

@@ -87,7 +87,7 @@ void BufferWriter::WriteString(std::string value)
 
 void BufferWriter::WriteRaw(const char *data, int64_t size) 
 {
-	if (data == NULL || size <= 0) {
+	if (data == nullptr || size <= 0) {
 		WriteInteger(0);
 
 		return;

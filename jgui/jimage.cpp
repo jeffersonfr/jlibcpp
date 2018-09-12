@@ -37,7 +37,7 @@ Image::~Image()
 
 Graphics * Image::GetGraphics()
 {
-	return NULL;
+	return nullptr;
 }
 
 jpixelformat_t Image::GetPixelFormat()
@@ -52,32 +52,32 @@ jsize_t Image::GetSize()
 
 Image * Image::Flip(jflip_flags_t mode)
 {
-  return NULL;
+  return nullptr;
 }
 
 Image * Image::Rotate(double radians, bool resize)
 {
-  return NULL;
+  return nullptr;
 }
 
 Image * Image::Scale(int width, int height)
 {
-  return NULL;
+  return nullptr;
 }
 
 Image * Image::Crop(int x, int y, int width, int height)
 {
-  return NULL;
+  return nullptr;
 }
 
 Image * Image::Blend(double alpha)
 {
-  return NULL;
+  return nullptr;
 }
 
 Image * Image::Colorize(Color color)
 {
-  return NULL;
+  return nullptr;
 }
 
 void Image::SetPixels(uint8_t *buffer, int xp, int yp, int wp, int hp, int stride)
@@ -94,7 +94,7 @@ void Image::GetRGBArray(uint32_t **rgb, int xp, int yp, int wp, int hp)
 		
 jcommon::Object * Image::Clone()
 {
-  return NULL;
+  return nullptr;
 }
 
 }

@@ -28,7 +28,7 @@ DataInputStream::DataInputStream(InputStream *is):
 {
 	jcommon::Object::SetClassName("jio::DataInputStream");
 		
-	if ((void *)is == NULL) {
+	if ((void *)is == nullptr) {
 		throw jexception::IOException("Null pointer exception");
 	}
 

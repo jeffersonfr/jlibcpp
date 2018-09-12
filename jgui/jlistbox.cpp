@@ -110,7 +110,7 @@ void ListBox::SetCurrentIndex(int i)
 
 	_index = i;
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -227,7 +227,7 @@ jsize_t ListBox::GetPreferredSize()
 	Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return jgui::jsize_t {0, 0};
   }
 
@@ -258,7 +258,7 @@ bool ListBox::KeyPressed(jevent::KeyEvent *event)
 	Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return false;
   }
 	
@@ -348,7 +348,7 @@ bool ListBox::MouseWheel(jevent::MouseEvent *event)
 	Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return false;
   }
 	
@@ -370,7 +370,7 @@ void ListBox::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 	
@@ -472,12 +472,12 @@ void ListBox::Paint(Graphics *g)
 		if (_items[i]->GetType() == JIT_EMPTY) {
 		} else if (_items[i]->GetType() == JIT_TEXT) {
 		} else if (_items[i]->GetType() == JIT_IMAGE) {
-			if (_items[i]->GetImage() != NULL) {
+			if (_items[i]->GetImage() != nullptr) {
 				g->DrawImage(_items[i]->GetImage(), hg, y+(is + ig)*i, is, is);
 			}
 		}
 
-		if (font != NULL) {
+		if (font != nullptr) {
 			g->SetFont(font);
 
 			if (IsEnabled() == true) {
@@ -510,7 +510,7 @@ void ListBox::IncrementLines(int lines)
 	Theme 
     *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 	
@@ -559,7 +559,7 @@ void ListBox::DecrementLines(int lines)
 	Theme 
     *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 	
@@ -607,7 +607,7 @@ jsize_t ListBox::GetScrollDimension()
 {
 	Theme *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return jgui::jsize_t {0, 0};
   }
 

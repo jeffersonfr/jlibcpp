@@ -30,7 +30,7 @@
 
 #include <string.h>
 
-uint8_t NULL_PACKET [188] = {
+uint8_t nullptr_PACKET [188] = {
 	0x47, 0x1F, 0xff, 0x1F, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
@@ -62,7 +62,7 @@ class Streamer {
 		{
 			_file = jio::File::OpenFile(filename);
 
-			if (_file == NULL) {
+			if (_file == nullptr) {
 				throw jexception::RuntimeException("File not found");
 			}
 
@@ -74,18 +74,18 @@ class Streamer {
 
 		virtual ~Streamer()
 		{
-			if (_file != NULL) {
+			if (_file != nullptr) {
 				_file->Close();
 
 				delete _file;
-				_file = NULL;
+				_file = nullptr;
 			}
 
-			if (_socket != NULL) {
+			if (_socket != nullptr) {
 				_socket->Close();
 
 				delete _socket;
-				_socket = NULL;
+				_socket = nullptr;
 			}
 		}
 
@@ -238,13 +238,13 @@ class Streamer {
 				counter = (counter + 1) % 7;
 
 				if (counter == 0) {
-					pipe.Send((char *)NULL_PACKET, _packet_size);
+					pipe.Send((char *)nullptr_PACKET, _packet_size);
 				}
 			}
 
-			if (data != NULL) {
+			if (data != nullptr) {
 				delete data;
-				data = NULL;
+				data = nullptr;
 			}
 		}
 };

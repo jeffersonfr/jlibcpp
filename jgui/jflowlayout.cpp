@@ -285,8 +285,8 @@ void FlowLayout::DoLayout(Container *target)
 		rowh = 0, 
 		start = 0;
 	int 
-		*ascent = NULL,
-		*descent = NULL;
+		*ascent = nullptr,
+		*descent = nullptr;
 	bool 
 		ltr = (target->GetComponentOrientation() == JCO_LEFT_TO_RIGHT),
 		useBaseline = GetAlignOnBaseline();
@@ -334,11 +334,11 @@ void FlowLayout::DoLayout(Container *target)
 
 	MoveComponents(target, insets.left + _hgap, y, maxwidth - x, rowh, start, nmembers, ltr, useBaseline, ascent, descent);
 
-	if (ascent != NULL) {
+	if (ascent != nullptr) {
 		delete ascent;
 	}
 
-	if (descent != NULL) {
+	if (descent != nullptr) {
 		delete descent;
 	}
 }

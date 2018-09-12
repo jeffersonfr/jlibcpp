@@ -316,7 +316,7 @@ void SharedSemaphore::Wait(int *array, int array_size)
 	int sz = _nsem;
 	bool param = false;
 
-	if (array != NULL && array_size > 0) {
+	if (array != nullptr && array_size > 0) {
 		sz = array_size;
 		param = true;
 	}
@@ -362,7 +362,7 @@ void SharedSemaphore::Wait(int *array, int array_size, int time_)
 	int sz = _nsem;
 	bool param = false;
 
-	if (array != NULL && array_size > 0) {
+	if (array != nullptr && array_size > 0) {
 		sz = array_size;
 		param = true;
 	}
@@ -415,7 +415,7 @@ void SharedSemaphore::Notify(int *array, int array_size, int n)
 	int sz = _nsem;
 	bool param = false;
 
-	if (array != NULL && array_size > 0) {
+	if (array != nullptr && array_size > 0) {
 		sz = array_size;
 		param = true;
 	}

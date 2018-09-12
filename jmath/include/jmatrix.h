@@ -141,7 +141,7 @@ template<class T> class Vector : public virtual jcommon::Object {
 		{
 			jcommon::Object::SetClassName("jmath::Vector");
 
-			_v = NULL;
+			_v = nullptr;
 			_vlo = 0;
 			_vhi = 0;
 			_nelem = 0;
@@ -156,7 +156,7 @@ template<class T> class Vector : public virtual jcommon::Object {
 		{
 			jcommon::Object::SetClassName("jmath::Vector");
 
-			_v = NULL;
+			_v = nullptr;
 			_vlo = 0;
 			_vhi = 0;
 			_nelem = 0;
@@ -237,7 +237,7 @@ template<class T> class Vector : public virtual jcommon::Object {
 		void SetSize(int vhi) 
 		{
 			if (vhi < 1) {
-				throw jexception::InvalidArgumentException("Size of vector cannot be NULL");
+				throw jexception::InvalidArgumentException("Size of vector cannot be nullptr");
 			}
 
 			delete [] (_v+this->_vlo);
@@ -1419,8 +1419,8 @@ template<class T> class Matrix : public virtual jcommon::Object {
 		{
 			jcommon::Object::SetClassName("jmath::Matrix");
 
-			_v = NULL;
-			_m = NULL;
+			_v = nullptr;
+			_m = nullptr;
 			_clo = 0;
 			_chi = 0;
 			_rlo = 0;
@@ -1438,8 +1438,8 @@ template<class T> class Matrix : public virtual jcommon::Object {
 		{
 			jcommon::Object::SetClassName("jmath::Matrix");
 
-			_v = NULL;
-			_m = NULL;
+			_v = nullptr;
+			_m = nullptr;
 			_clo = 0;
 			_chi = 0;
 			_rlo = 0;
@@ -1727,7 +1727,7 @@ template<class T> class Matrix : public virtual jcommon::Object {
 		 */
 		Matrix<T> &operator=(T *m) 
 		{
-			if (this->_m == NULL) 
+			if (this->_m == nullptr) 
 				throw jexception::NullPointerException("Matrix::operator=(T *m):  Attempt to assign by value to a C array, when no dimensions have been allocated for the Matrix");
 			
 			for (int i=0; i<_nelem; i++) 
@@ -1742,7 +1742,7 @@ template<class T> class Matrix : public virtual jcommon::Object {
 		 */
 		Matrix<T> &operator=(T **m) 
 		{
-			if (this->_m == NULL) 
+			if (this->_m == nullptr) 
 				throw jexception::NullPointerException("Matrix::operator=(T **m):  Attempt to assign by value to a C array, when no dimensions have been allocated for the Matrix");
 
 			for (int i=0; i<_nelem; i++) 

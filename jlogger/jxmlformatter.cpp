@@ -36,7 +36,7 @@ XMLFormatter::~XMLFormatter()
 
 void XMLFormatter::Transform(LogRecord *log)
 {
-	if (log == NULL) {
+	if (log == nullptr) {
 		return;
 	}
 	
@@ -78,7 +78,7 @@ void XMLFormatter::Transform(LogRecord *log)
 
 LogRecord * XMLFormatter::Release()
 {
-	return NULL; // new LogRecord(INFO_LOGGER, "</" + _name + ">\n");
+	return nullptr; // new LogRecord(INFO_LOGGER, "</" + _name + ">\n");
 }
 
 }

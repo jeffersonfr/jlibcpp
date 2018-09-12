@@ -48,7 +48,7 @@ void TabbedPane::RemoveTab(int index)
 
 jgui::Component * TabbedPane::GetTabComponentAt(int index)
 {
-	return NULL;
+	return nullptr;
 }
 
 void TabbedPane::SetTabTitle(int index, std::string title)

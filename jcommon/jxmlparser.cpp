@@ -380,67 +380,67 @@ XmlDocument* XmlNode::GetDocument()
 
 bool XmlNode::HasChildren() const
 {
-	return _firstChild != NULL;
+	return _firstChild != nullptr;
 }
 
 const XmlDocument * XmlNode::ToDocument() const
 {
-	return NULL;
+	return nullptr;
 }
 
 const XmlElement * XmlNode::ToElement() const 
 {
-	return NULL;
+	return nullptr;
 }
 
 const XmlComment * XmlNode::ToComment() const 
 {
-	return NULL;
+	return nullptr;
 }
 
 const XmlUnknown * XmlNode::ToUnknown() const
 {
-	return NULL; 
+	return nullptr; 
 }
 
 const XmlText * XmlNode::ToText() const 
 {
-	return NULL; 
+	return nullptr; 
 }
 
 const XmlDeclaration * XmlNode::ToDeclaration() const
 {
-	return NULL;
+	return nullptr;
 }
 
 XmlDocument * XmlNode::ToDocument()    
 {
-	return NULL; 
+	return nullptr; 
 }
 
 XmlElement * XmlNode::ToElement()	
 { 
-	return NULL; 
+	return nullptr; 
 }
 
 XmlComment * XmlNode::ToComment() 
 { 
-	return NULL;
+	return nullptr;
 }
 
 XmlUnknown * XmlNode::ToUnknown()	   
 {
-	return NULL;
+	return nullptr;
 }
 
 XmlText * XmlNode::ToText()       
 {
-	return NULL;
+	return nullptr;
 }
 
 XmlDeclaration * XmlNode::ToDeclaration() 
 {
-	return NULL;
+	return nullptr;
 }
 
 XmlAttribute::XmlAttribute() : XmlBase()
@@ -1801,7 +1801,7 @@ XmlNode * XmlNode::Identify( const char* p, XmlEncoding encoding )
 			returnNode = new XmlUnknown();
 		}
 	} catch (std::bad_alloc &) {
-		returnNode = NULL;
+		returnNode = nullptr;
 	}
 
 	if ( returnNode ) {
@@ -3265,7 +3265,7 @@ XmlNode* XmlElement::Clone() const
 	} catch (std::bad_alloc &) {
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 std::string XmlElement::GetText() const
@@ -3411,7 +3411,7 @@ bool XmlDocument::LoadFile( FILE* file, XmlEncoding encoding )
 	}
 	*/
 
-	char *buf = NULL;
+	char *buf = nullptr;
 	
 	try {
 		buf = new char[ length+1 ];
@@ -3540,7 +3540,7 @@ XmlNode * XmlDocument::Clone() const
 	} catch (std::bad_alloc &) {
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -3735,7 +3735,7 @@ XmlNode* XmlComment::Clone() const
 	} catch (std::bad_alloc &) {
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -3790,7 +3790,7 @@ XmlNode* XmlText::Clone() const
 	} catch (std::bad_alloc &) {
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -3903,7 +3903,7 @@ XmlNode* XmlDeclaration::Clone() const
 	} catch (std::bad_alloc &) {
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -3923,13 +3923,13 @@ void XmlUnknown::CopyTo( XmlUnknown* target ) const
 }
 
 
-bool XmlUnknown::Accept( XmlVisitor* visitor ) const
+bool XmlUnknown::Accept(XmlVisitor *visitor) const
 {
 	return visitor->Visit( *this );
 }
 
 
-XmlNode* XmlUnknown::Clone() const
+XmlNode * XmlUnknown::Clone() const
 {
 	try {
 		XmlUnknown* clone = new XmlUnknown();
@@ -3940,7 +3940,7 @@ XmlNode* XmlUnknown::Clone() const
 	} catch (std::bad_alloc &) {
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -3958,7 +3958,7 @@ XmlAttributeSet::~XmlAttributeSet()
 }
 
 
-void XmlAttributeSet::Add( XmlAttribute* addMe )
+void XmlAttributeSet::Add(XmlAttribute *addMe)
 {
 	assert( !Find( std::string( addMe->Name() ) ) );	// Shouldn't be multiply adding to the set.
 

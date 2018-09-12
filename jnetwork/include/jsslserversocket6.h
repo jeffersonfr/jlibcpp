@@ -74,7 +74,7 @@ class SSLServerSocket6 : public virtual jcommon::Object {
 		 * \brief Constructor.
 		 *
 		 */
-		SSLServerSocket6(SSLContext *ctx, int port, int backlog = 5, InetAddress * = NULL);
+		SSLServerSocket6(SSLContext *ctx, int port, int backlog = 5, InetAddress * = nullptr);
 
 		/**
 		 * \brief Destructor virtual.

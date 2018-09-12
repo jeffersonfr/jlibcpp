@@ -35,7 +35,7 @@ void populate_sources(const char *filter, std::vector<std::vector<char> > &sourc
 		sprintf(filename, filter, i);
 		FILE *fp = fopen(filename, "rb");
 
-		if (fp == NULL) {
+		if (fp == nullptr) {
 			break;
 		}
 
@@ -56,7 +56,7 @@ void print(jcommon::JSONValue *value, int ident = 0)
 {
 	IDENT(ident);
 
-	if (value->GetName() != NULL) {
+	if (value->GetName() != nullptr) {
 		printf("\"%s\" = ", value->GetName());
 	}
 

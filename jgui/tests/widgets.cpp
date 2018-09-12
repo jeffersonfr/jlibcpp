@@ -166,7 +166,7 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
       jgui::jregion_t
         region = _button3->GetVisibleBounds();
 
-			_toggle = new jgui::Button("Toggle Button", NULL, insets.left, region.y + region.height + 8, 196, DEFAULT_COMPONENT_HEIGHT);
+			_toggle = new jgui::Button("Toggle Button", nullptr, insets.left, region.y + region.height + 8, 196, DEFAULT_COMPONENT_HEIGHT);
 		}
 
 		{
@@ -366,9 +366,9 @@ class Test : public jgui::Window, public jevent::ActionListener, public jevent::
 	{
     RemoveAll();
 
-		_button1->SetTheme(NULL);
-		_button2->SetTheme(NULL);
-		_button3->SetTheme(NULL);
+		_button1->SetTheme(nullptr);
+		_button2->SetTheme(nullptr);
+		_button3->SetTheme(nullptr);
 
 		_group->Remove(_radio1);
 		_group->Remove(_radio2);

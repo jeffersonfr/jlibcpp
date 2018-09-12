@@ -299,7 +299,7 @@ class Quantization {
 
 			for (int i=0; i<_netsize; i++) {
 				int *p = _colormap[i];
-				int *q = NULL;
+				int *q = nullptr;
 				int smallpos = i;
 				int smallval = p[1];
 
@@ -522,15 +522,15 @@ class Quantization {
 			}
 
 			_netsize = colors + 1;
-			_network = NULL;
-			_bias = NULL;
-			_freq = NULL;
+			_network = nullptr;
+			_bias = nullptr;
+			_freq = nullptr;
 			_gamma = 1024.0;
 			_beta = 1.0/1024.0;
 			_betagamma = _beta * _gamma;
-			_pixels = NULL;
-			_colormap = NULL;
-			_netindex = NULL;
+			_pixels = nullptr;
+			_colormap = nullptr;
+			_netindex = nullptr;
 			_ncycles	=	100;
 			_specials = 3;
 			_bgColour = _specials - 1;
@@ -632,7 +632,7 @@ class Picture : public jgui::Component {
 		Picture(int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			_image = NULL;
+			_image = nullptr;
 		}
 
 		virtual ~Picture()
@@ -652,7 +652,7 @@ class Picture : public jgui::Component {
 			int 
         height = font->GetSize();
 
-			if (font != NULL) {
+			if (font != nullptr) {
 
 				g->SetColor(jgui::Color::White);
 				g->SetFont(font);
@@ -787,7 +787,7 @@ class RGBImageTest : public Picture {
 			jgui::jsize_t
 				size = image->GetSize();
 			uint32_t 
-				*rgb = NULL;
+				*rgb = nullptr;
 
 			image->GetRGBArray(&rgb, 0, 0, size.width, size.height);
 
@@ -854,7 +854,7 @@ class IndexedImageTest : public Picture {
 			int 
 				length = size.width*size.height;
 			uint32_t 
-				*rgb = NULL,
+				*rgb = nullptr,
 				*pixels = new uint32_t[length];
 
 			image->GetRGBArray(&rgb, 0, 0, size.width, size.height);
@@ -886,7 +886,7 @@ class Test : public Picture {
 		Test(int x, int y, int w, int h):
 			Picture(x, y, w, h)
 		{
-			_image = NULL;
+			_image = nullptr;
 			_title = "Image";
 		}
 

@@ -56,8 +56,8 @@ class PlayerComponentImpl : public jgui::Component {
 		PlayerComponentImpl(Player *player, int x, int y, int w, int h):
 			jgui::Component(x, y, w, h)
 		{
-			_buffer = NULL;
-			_image = NULL;
+			_buffer = nullptr;
+			_image = nullptr;
 			_player = player;
 			
 			_frame_size.width = w;
@@ -73,14 +73,14 @@ class PlayerComponentImpl : public jgui::Component {
 
 		virtual ~PlayerComponentImpl()
 		{
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 
-			if (_buffer != NULL) {
+			if (_buffer != nullptr) {
 				delete [] _buffer;
-				_buffer = NULL;
+				_buffer = nullptr;
 			}
 		}
 
@@ -95,7 +95,7 @@ class PlayerComponentImpl : public jgui::Component {
 			_frame_size.height = _src.height = -1;
 
 			delete [] _buffer;
-			_buffer = NULL;
+			_buffer = nullptr;
 		}
 
 		virtual void UpdateComponent(const uint8_t *buffer, int width, int height, jgui::jpixelformat_t format)
@@ -104,7 +104,7 @@ class PlayerComponentImpl : public jgui::Component {
 				return;
 			}
 
-			if (_buffer == NULL) {
+			if (_buffer == nullptr) {
 				_frame_size.width = _src.width = width;
 				_frame_size.height = _src.height = height;
 
@@ -128,9 +128,9 @@ class PlayerComponentImpl : public jgui::Component {
 
 			_mutex.lock();
 
-			if (_image != NULL) {
+			if (_image != nullptr) {
 				delete _image;
-				_image = NULL;
+				_image = nullptr;
 			}
 
 			_image = new jgui::BufferedImage(cairo_context, jgui::JPF_ARGB, sw, sh);
@@ -313,7 +313,7 @@ class VideoFormatControlImpl : public VideoFormatControl {
 		{
       std::unique_lock<std::mutex> lock(_player->_mutex);
 
-			if (_player->_grabber != NULL) {
+			if (_player->_grabber != nullptr) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
 
 				return control->GetFramesPerSecond();
@@ -350,7 +350,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 		{
 			_player = player;
 
-			if (_player->_grabber != NULL) {
+			if (_player->_grabber != nullptr) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
 				std::vector<jmedia::jvideo_control_t> controls = control->GetControls();
 
@@ -368,7 +368,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 		{
       std::unique_lock<std::mutex> lock(_player->_mutex);
 
-			if (_player->_grabber != NULL) {
+			if (_player->_grabber != nullptr) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
 
 				if (control->HasControl(id) == true) {
@@ -383,7 +383,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 		{
       std::unique_lock<std::mutex> lock(_player->_mutex);
 
-			if (_player->_grabber != NULL) {
+			if (_player->_grabber != nullptr) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
 
 				if (control->HasControl(id) == true) {
@@ -400,7 +400,7 @@ class VideoDeviceControlImpl : public VideoDeviceControl {
 		{
       std::unique_lock<std::mutex> lock(_player->_mutex);
 
-			if (_player->_grabber != NULL) {
+			if (_player->_grabber != nullptr) {
 				VideoControl *control = _player->_grabber->GetVideoControl();
 
 				if (control->HasControl(id) == true) {
@@ -424,7 +424,7 @@ V4L2LightPlayer::V4L2LightPlayer(jnetwork::URL url):
 	_is_loop = false;
 	_decode_rate = 1.0;
 	_frame_rate = 0.0;
-	_component = NULL;
+	_component = nullptr;
 	
   _grabber = new VideoGrabber(this, _file);
 
@@ -449,7 +449,7 @@ V4L2LightPlayer::~V4L2LightPlayer()
 	Close();
 	
 	delete _component;
-	_component = NULL;
+	_component = nullptr;
 
 	for (std::vector<Control *>::iterator i=_controls.begin(); i!=_controls.end(); i++) {
 		Control *control = (*i);
@@ -469,7 +469,7 @@ void V4L2LightPlayer::Play()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_is_paused == false && _grabber != NULL) {
+	if (_is_paused == false && _grabber != nullptr) {
 		_grabber->Start();
 		
 		DispatchPlayerEvent(new jevent::PlayerEvent(this, jevent::JPE_STARTED));
@@ -480,7 +480,7 @@ void V4L2LightPlayer::Pause()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_is_paused == false && _grabber != NULL) {
+	if (_is_paused == false && _grabber != nullptr) {
 		_is_paused = true;
 		
 		_grabber->Pause();
@@ -493,7 +493,7 @@ void V4L2LightPlayer::Resume()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_is_paused == true && _grabber != NULL) {
+	if (_is_paused == true && _grabber != nullptr) {
 		_is_paused = false;
 		
 		_grabber->Resume();
@@ -506,7 +506,7 @@ void V4L2LightPlayer::Stop()
 {
   std::unique_lock<std::mutex> lock(_mutex);
 
-	if (_grabber != NULL) {
+	if (_grabber != nullptr) {
 		_grabber->Stop();
 
 		if (_has_video == true) {
@@ -527,9 +527,9 @@ void V4L2LightPlayer::Close()
 
 	_is_closed = true;
 
-	if (_grabber != NULL) {
+	if (_grabber != nullptr) {
 		delete _grabber;
-		_grabber = NULL;
+		_grabber = nullptr;
 	}
 }
 

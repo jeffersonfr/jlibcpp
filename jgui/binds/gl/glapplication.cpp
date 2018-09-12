@@ -39,7 +39,7 @@ namespace jgui {
 /** \brief */
 static int _window = 0;
 /** \brief */
-static jgui::Image *_icon = NULL;
+static jgui::Image *_icon = nullptr;
 /** \brief */
 static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
 /** \brief */
@@ -49,7 +49,7 @@ static int _mouse_y;
 /** \brief */
 static int _click_count;
 /** \brief */
-static Window *g_window = NULL;
+static Window *g_window = nullptr;
 /** \brief */
 static std::string _title;
 /** \brief */
@@ -394,7 +394,7 @@ void NativeApplication::InternalQuit()
 
 void OnDraw()
 {
-	if (g_window == NULL || g_window->IsVisible() == false) {
+	if (g_window == nullptr || g_window->IsVisible() == false) {
 		return;
 	}
 
@@ -420,7 +420,7 @@ void OnDraw()
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
-  if (cairo_surface == NULL) {
+  if (cairo_surface == nullptr) {
     delete buffer;
 
     return;
@@ -434,7 +434,7 @@ void OnDraw()
 
   uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-  if (data == NULL) {
+  if (data == nullptr) {
     delete buffer;
 
     return;
@@ -462,7 +462,7 @@ void OnDraw()
   g_window->Flush();
 
   delete buffer;
-  buffer = NULL;
+  buffer = nullptr;
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
@@ -680,7 +680,7 @@ void OnTimer(int value)
   if (events.size() > 0) {
     jevent::EventObject *event = events.front();
 
-    if (dynamic_cast<jevent::WindowEvent *>(event) != NULL) {
+    if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
       jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
 
       if (window_event->GetType() == jevent::JWET_PAINTED) {
@@ -695,7 +695,7 @@ void OnTimer(int value)
       events.erase(events.begin());
 
       delete event;
-      event = NULL;
+      event = nullptr;
     }
   }
 
@@ -785,7 +785,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   glutInitWindowSize(width, height);
   glutInitWindowPosition(x, y);
   
-  _window = glutCreateWindow(NULL);
+  _window = glutCreateWindow(nullptr);
 
   if (_window == 0) {
 		throw jexception::RuntimeException("Cannot create a window");
@@ -807,7 +807,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   glutTimerFunc(100, OnTimer, 1);
   glutVisibilityFunc(OnVisibility);
   glutEntryFunc(OnEntry);
-  glutIdleFunc(NULL);
+  glutIdleFunc(nullptr);
 
   g_window = this;
 }
@@ -815,7 +815,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 NativeWindow::~NativeWindow()
 {
   delete g_window;
-  g_window = NULL;
+  g_window = nullptr;
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -837,13 +837,13 @@ void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
-  if (parent == NULL) {
+  if (parent == nullptr) {
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
   g_window = parent;
 
-  g_window->SetParent(NULL);
+  g_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
@@ -1035,20 +1035,20 @@ void NativeWindow::SetCursor(jcursor_style_t style)
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
   /*
-	if ((void *)shape == NULL) {
+	if ((void *)shape == nullptr) {
 		return;
 	}
 
 	jsize_t t = shape->GetSize();
-	uint32_t *data = NULL;
+	uint32_t *data = nullptr;
 
 	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		return;
 	}
 
-	SDL_Surface *surface = NULL;
+	SDL_Surface *surface = nullptr;
 	uint32_t rmask = 0x000000ff;
 	uint32_t gmask = 0x0000ff00;
 	uint32_t bmask = 0x00ff0000;
@@ -1063,7 +1063,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 
 	surface = SDL_CreateRGBSurfaceFrom(data, t.width, t.height, 32, t.width*4, rmask, gmask, bmask, amask);
 
-	if (surface == NULL) {
+	if (surface == nullptr) {
 		delete [] data;
 
 		return;
@@ -1071,7 +1071,7 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 
 	SDL_Cursor *cursor = SDL_CreateColorCursor(surface, hotx, hoty);
 
-	if (cursor != NULL) {
+	if (cursor != nullptr) {
 		SDL_SetCursor(cursor);
 		// SDL_FreeCursor(cursor);
 	}

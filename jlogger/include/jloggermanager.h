@@ -64,7 +64,7 @@ class LoggerManager : public virtual jcommon::Object{
 		 * \brief
 		 * 
 		 */
-		virtual Logger * CreateLogger(LoggerHandler *handler_ = NULL, Formatter *format_ = NULL, Logger *group_ = NULL);
+		virtual Logger * CreateLogger(LoggerHandler *handler_ = nullptr, Formatter *format_ = nullptr, Logger *group_ = nullptr);
 
 		/**
 		 * \brief

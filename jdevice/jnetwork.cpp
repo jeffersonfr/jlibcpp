@@ -48,7 +48,7 @@ void Network::Builder()
 	}
 	
 	for (int i=1; ; i++) {
-		info = NULL;
+		info = nullptr;
 		req.ifr_ifindex = i;
 		
 		if (ioctl(sock, SIOCGIFNAME, &req) < 0) {
@@ -156,8 +156,8 @@ void Network::Builder()
 			info->flags = (unsigned int)req.ifr_flags;
 		}
 		
-		jio::FileInputStream *file = NULL;
-		jio::BufferedReader *reader = NULL;
+		jio::FileInputStream *file = nullptr;
+		jio::BufferedReader *reader = nullptr;
 			
 		try {
 			std::string line;
@@ -201,7 +201,7 @@ void Network::Builder()
 			file->Close();
 			// WARNNING:: reader->Close();
 		} catch (...) {
-			if (file != NULL) {
+			if (file != nullptr) {
 				file->Close();
 				delete file;
 			}

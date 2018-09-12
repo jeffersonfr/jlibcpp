@@ -284,7 +284,7 @@ class Noise : public jgui::Window {
       jgui::Window(1280, 720),
       net(6, 1)
     {
-      srand(time(NULL));
+      srand(time(nullptr));
 
       for (int i=0; i<10000; i++) {
         noise[i] = (NOISE*((double)rand()/((double)(RAND_MAX))))-NOISE/2.0;

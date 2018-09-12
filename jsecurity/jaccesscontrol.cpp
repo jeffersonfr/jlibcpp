@@ -33,17 +33,17 @@ AccessControl::~AccessControl()
 
 User * AccessControl::GetUser()
 {
-	return NULL;
+	return nullptr;
 }
 
 Group * AccessControl::GetGroup()
 {
-	return NULL;
+	return nullptr;
 }
 
 User * AccessControl::GetOther()
 {
-	return NULL;
+	return nullptr;
 }
 
 void AccessControl::SetUser(User *id)

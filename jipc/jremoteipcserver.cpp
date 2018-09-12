@@ -46,12 +46,12 @@ RemoteIPCServer::~RemoteIPCServer()
 
 void RemoteIPCServer::WaitCall(RemoteCallListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
-	jnetwork::Socket *client = NULL;
-	Response *response = NULL;
+	jnetwork::Socket *client = nullptr;
+	Response *response = nullptr;
 
 	try {
 		client = _server->Accept();
@@ -84,7 +84,7 @@ void RemoteIPCServer::WaitCall(RemoteCallListener *listener)
 
 		response = listener->ProcessCall(&method);
 
-		if (response != NULL) {
+		if (response != nullptr) {
 			std::string encoded = response->Encode();
 
 			const char *buffer = encoded.c_str();
@@ -115,22 +115,22 @@ void RemoteIPCServer::WaitCall(RemoteCallListener *listener)
 			delete client;
 		}
 	} catch (jexception::ConnectionTimeoutException &e) {
-		if (response != NULL) {
+		if (response != nullptr) {
 			delete response;
 		}
 
-		if (client != NULL) {
+		if (client != nullptr) {
 			client->Close();
 			delete client;
 		}
 
 		throw jexception::TimeoutException(&e, "Connection timeout exception");
 	} catch (jexception::Exception &e) {
-		if (response != NULL) {
+		if (response != nullptr) {
 			delete response;
 		}
 
-		if (client != NULL) {
+		if (client != nullptr) {
 			client->Close();
 			delete client;
 		}

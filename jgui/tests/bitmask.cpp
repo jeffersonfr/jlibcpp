@@ -105,7 +105,7 @@ class BitMask : public jcommon::Object {
 	public:
 		BitMask(uint32_t *data, int width, int height)
 		{
-			if (data == NULL) {
+			if (data == nullptr) {
 				throw jexception::NullPointerException("Image data must be valid");
 			}
 
@@ -124,17 +124,17 @@ class BitMask : public jcommon::Object {
 
 		BitMask(jgui::Image *image)
 		{
-			if (image == NULL) {
+			if (image == nullptr) {
 				throw jexception::NullPointerException("Image must be valid");
 			}
 
-			_data = NULL;
+			_data = nullptr;
 			_size = image->GetSize();
 			_transparent_color = 0x00000000;
 
 			image->GetRGBArray(&_data, 0, 0, _size.width, _size.height);
 			
-			if (_data == NULL) {
+			if (_data == nullptr) {
 				throw jexception::NullPointerException("Image data must be valid");
 			}
 			
@@ -149,17 +149,17 @@ class BitMask : public jcommon::Object {
 		{
 			jgui::Image *image = new jgui::BufferedImage(file);
 
-			if (image == NULL) {
+			if (image == nullptr) {
 				throw jexception::NullPointerException("Image must be valid");
 			}
 
-			_data = NULL;
+			_data = nullptr;
 			_size = image->GetSize();
 			_transparent_color = 0x00000000;
 
 			image->GetRGBArray(&_data, 0, 0, _size.width, _size.height);
 			
-			if (_data == NULL) {
+			if (_data == nullptr) {
 				throw jexception::NullPointerException("Image data must be valid");
 			}
 
@@ -174,7 +174,7 @@ class BitMask : public jcommon::Object {
 
 		virtual ~BitMask()
 		{
-			if (_data != NULL) {
+			if (_data != nullptr) {
 				delete [] _data;
 			}
 		}
@@ -337,7 +337,7 @@ class BitMask : public jcommon::Object {
 
 		virtual void BlitAnd(BitMask *bm, int x, int y, int sx, int sy, int sw, int sh)
 		{
-			if (bm == NULL) {
+			if (bm == nullptr) {
 				return;
 			}
 				
@@ -375,7 +375,7 @@ class BitMask : public jcommon::Object {
 
 		virtual void BlitOr(BitMask *bm, int x, int y, int sx, int sy, int sw, int sh)
 		{
-			if (bm == NULL) {
+			if (bm == nullptr) {
 				return;
 			}
 				
@@ -413,7 +413,7 @@ class BitMask : public jcommon::Object {
 
 		virtual void BlitXor(BitMask *bm, int x, int y, int sx, int sy, int sw, int sh)
 		{
-			if (bm == NULL) {
+			if (bm == nullptr) {
 				return;
 			}
 				
@@ -466,7 +466,7 @@ class BitMask : public jcommon::Object {
 
 		virtual void BlitTile(BitMask *bm, int x, int y, int w, int h, int sx, int sy, int sw, int sh)
 		{
-			if (bm == NULL) {
+			if (bm == nullptr) {
 				return;
 			}
 				

@@ -35,17 +35,17 @@
 namespace jgui {
 
 /** \brief */
-static jgui::Image *_icon = NULL;
+static jgui::Image *_icon = nullptr;
 /** \brief */
-static Window *g_window = NULL;
+static Window *g_window = nullptr;
 /** \brief */
-static GtkApplication *_handler = NULL;
+static GtkApplication *_handler = nullptr;
 /** \brief */
-static GtkWidget *_window = NULL;
+static GtkWidget *_window = nullptr;
 /** \brief */
-static GtkWidget *_frame = NULL;
+static GtkWidget *_frame = nullptr;
 /** \brief */
-static GtkWidget *_drawing_area = NULL;
+static GtkWidget *_drawing_area = nullptr;
 /** \brief */
 static jgui::jregion_t _visible_bounds;
 /** \brief */
@@ -393,7 +393,7 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(guint symbol)
 
 static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 {
-	if (g_window == NULL || g_window->IsVisible() == false) {
+	if (g_window == nullptr || g_window->IsVisible() == false) {
 		return FALSE;
 	}
 
@@ -429,7 +429,7 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
-  if (cairo_surface == NULL) {
+  if (cairo_surface == nullptr) {
     delete buffer;
 
     return FALSE;
@@ -443,7 +443,7 @@ static gboolean OnDraw(GtkWidget *widget, cairo_t *cr, gpointer user_data)
   g_window->Flush();
 
   delete buffer;
-  buffer = NULL;
+  buffer = nullptr;
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 
@@ -595,7 +595,7 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
   gtk_window_set_title(GTK_WINDOW(_window), "");
   // gtk_container_set_border_width(GTK_CONTAINER(_window), 0);
 
-  _frame = gtk_frame_new(NULL);
+  _frame = gtk_frame_new(nullptr);
 
   // gtk_frame_set_shadow_type(GTK_FRAME(_frame), GTK_SHADOW_IN);
   gtk_container_add(GTK_CONTAINER(_window), _frame);
@@ -607,14 +607,14 @@ static void ConfigureApplication(GtkApplication *app, gpointer user_data)
   gtk_widget_set_size_request(_drawing_area, _visible_bounds.width, _visible_bounds.height);
   gtk_container_add(GTK_CONTAINER(_frame), _drawing_area);
 
-	g_signal_connect(G_OBJECT(_drawing_area),"configure-event", G_CALLBACK (OnConfigureEvent), NULL);
-  g_signal_connect(_window, "destroy", G_CALLBACK(OnClose), NULL);
-  g_signal_connect(_drawing_area, "draw", G_CALLBACK(OnDraw), NULL);
-	g_signal_connect(G_OBJECT(_window), "key_press_event", G_CALLBACK(OnKeyPressEvent), NULL);
-	g_signal_connect(G_OBJECT(_window), "key_release_event", G_CALLBACK(OnKeyPressEvent), NULL);
-	g_signal_connect(G_OBJECT(_window), "motion_notify_event", G_CALLBACK(OnMouseMoveEvent), NULL);
-	g_signal_connect(G_OBJECT(_window), "button_press_event", G_CALLBACK(OnMousePressEvent), NULL);
-	g_signal_connect(G_OBJECT(_window), "button_release_event", G_CALLBACK(OnMousePressEvent), NULL);
+	g_signal_connect(G_OBJECT(_drawing_area),"configure-event", G_CALLBACK (OnConfigureEvent), nullptr);
+  g_signal_connect(_window, "destroy", G_CALLBACK(OnClose), nullptr);
+  g_signal_connect(_drawing_area, "draw", G_CALLBACK(OnDraw), nullptr);
+	g_signal_connect(G_OBJECT(_window), "key_press_event", G_CALLBACK(OnKeyPressEvent), nullptr);
+	g_signal_connect(G_OBJECT(_window), "key_release_event", G_CALLBACK(OnKeyPressEvent), nullptr);
+	g_signal_connect(G_OBJECT(_window), "motion_notify_event", G_CALLBACK(OnMouseMoveEvent), nullptr);
+	g_signal_connect(G_OBJECT(_window), "button_press_event", G_CALLBACK(OnMousePressEvent), nullptr);
+	g_signal_connect(G_OBJECT(_window), "button_release_event", G_CALLBACK(OnMousePressEvent), nullptr);
 
   gtk_widget_set_events(
       _drawing_area, gtk_widget_get_events(_drawing_area) | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK | GDK_POINTER_MOTION_MASK);
@@ -636,7 +636,7 @@ NativeApplication::NativeApplication():
 NativeApplication::~NativeApplication()
 {
   delete g_window;
-  g_window = NULL;
+  g_window = nullptr;
 }
 
 void NativeApplication::InternalInit(int argc, char **argv)
@@ -669,7 +669,7 @@ static void main_thread(NativeApplication *app)
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
 
-      if (dynamic_cast<jevent::WindowEvent *>(event) != NULL) {
+      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
         jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
 
         if (window_event->GetType() == jevent::JWET_PAINTED) {
@@ -684,7 +684,7 @@ static void main_thread(NativeApplication *app)
         events.erase(events.begin());
 
         delete event;
-        event = NULL;
+        event = nullptr;
       }
     }
 
@@ -698,7 +698,7 @@ void NativeApplication::InternalLoop()
 {
   std::thread _main_thread = std::thread(main_thread, this);
 
- 	g_application_run(G_APPLICATION(_handler), 0, NULL);
+ 	g_application_run(G_APPLICATION(_handler), 0, nullptr);
 
   quitting = true;
 
@@ -718,11 +718,11 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (_window != NULL) {
+	if (_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
-	_window = NULL;
+	_window = nullptr;
 
   _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
@@ -733,7 +733,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   _visible_bounds.width = width;
   _visible_bounds.height = height;
 
-  g_signal_connect(_handler, "activate", G_CALLBACK(ConfigureApplication), NULL);
+  g_signal_connect(_handler, "activate", G_CALLBACK(ConfigureApplication), nullptr);
 }
 
 NativeWindow::~NativeWindow()
@@ -774,13 +774,13 @@ void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
-  if (parent == NULL) {
+  if (parent == nullptr) {
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
   g_window = parent;
 
-  g_window->SetParent(NULL);
+  g_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
@@ -906,16 +906,16 @@ void NativeWindow::SetCursor(jcursor_style_t style)
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
   /*
-	if ((void *)shape == NULL) {
+	if ((void *)shape == nullptr) {
 		return;
 	}
 
 	jsize_t t = shape->GetSize();
-	uint32_t *data = NULL;
+	uint32_t *data = nullptr;
 
 	shape->GetGraphics()->GetRGBArray(&data, 0, 0, t.width, t.height);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		return;
 	}
 

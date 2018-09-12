@@ -129,39 +129,39 @@ Calendar::~Calendar()
 		delete b;
 	}
 
-	if (_syear != NULL) {
+	if (_syear != nullptr) {
 		delete _syear;
 	}
 
-	if (_smonth != NULL) {
+	if (_smonth != nullptr) {
 		delete _smonth;
 	}
 
-	if (_ldom != NULL) {
+	if (_ldom != nullptr) {
 		delete _ldom;
 	}
 
-	if (_lseg != NULL) {
+	if (_lseg != nullptr) {
 		delete _lseg;
 	}
 
-	if (_lter != NULL) {
+	if (_lter != nullptr) {
 		delete _lter;
 	}
 
-	if (_lqua != NULL) {
+	if (_lqua != nullptr) {
 		delete _lqua;
 	}
 
-	if (_lqui != NULL) {
+	if (_lqui != nullptr) {
 		delete _lqui;
 	}
 
-	if (_lsex != NULL) {
+	if (_lsex != nullptr) {
 		delete _lsex;
 	}
 	
-	if (_lsab != NULL) {
+	if (_lsab != nullptr) {
 		delete _lsab;
 	}
 }
@@ -252,7 +252,7 @@ void Calendar::RemoveAll()
 
 void Calendar::BuildCalendar()
 {
-	Button *button = NULL;
+	Button *button = nullptr;
 	int mes = -1;
 	int first_day = -1;
 	char tmp[255];
@@ -338,7 +338,7 @@ void Calendar::BuildCalendar()
 		Add(button);
 	}
 
-	if (GetFocusOwner() == NULL) {
+	if (GetFocusOwner() == nullptr) {
 		_buttons[_day]->RequestFocus();
 	}
 

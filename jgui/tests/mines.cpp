@@ -80,7 +80,7 @@ class Mines : public jgui::Window {
 Mines::Mines(int x, int y):
 	jgui::Window(720, 480)
 {
-	srand((int)time(NULL));
+	srand((int)time(nullptr));
 
 	isize = 36;
 	max_rows = 10;

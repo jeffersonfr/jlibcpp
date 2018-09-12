@@ -191,7 +191,7 @@ class Test : public jgui::Window {
 			jgui::jsize_t 
         size;
 			uint32_t 
-        *data = NULL;
+        *data = nullptr;
 
 			size = _image->GetSize();
 

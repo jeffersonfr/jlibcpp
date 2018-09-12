@@ -44,7 +44,7 @@ int main(void)
 
 		/*
 		// Check server certificates agains our known trusted certificate
-		if (mySocket.UseVerification("certs/cert.pem", NULL) == true) {
+		if (mySocket.UseVerification("certs/cert.pem", nullptr) == true) {
 			std::cout << "Certificado Verificado com Sucesso !" << std::endl;
 		} else {
 			std::cout << "Certificado Invalido !" << std::endl;

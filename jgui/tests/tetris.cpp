@@ -151,10 +151,10 @@ class Tetris : public jgui::Window {
 			smallfont = new jgui::Font("default", jgui::JFA_NORMAL, 20);
 			largefont = new jgui::Font("default", jgui::JFA_NORMAL, 28);
 
-			goff = NULL;
-			ii = NULL;
-			largefont = NULL;
-			smallfont = NULL;
+			goff = nullptr;
+			ii = nullptr;
+			largefont = nullptr;
+			smallfont = nullptr;
 			textcolor1 = 0xff6080ff;
 			textcolor2 = 0xffffa040;
 			barcolor = 0xff80ff40;
@@ -310,13 +310,13 @@ class Tetris : public jgui::Window {
 
 		virtual void Paint(jgui::Graphics *g)
 		{
-			if (goff == NULL && d.width>0 && d.height>0) {
+			if (goff == nullptr && d.width>0 && d.height>0) {
 				ii = new jgui::BufferedImage(jgui::JPF_ARGB, d.width, d.height);
 
 				goff = ii->GetGraphics();
 			}
 
-			if (goff==NULL || ii==NULL) {
+			if (goff==nullptr || ii==nullptr) {
 				return;
 			}
 

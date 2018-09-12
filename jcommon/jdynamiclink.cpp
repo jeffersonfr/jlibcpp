@@ -50,7 +50,7 @@ void DynamicLink::Load(std::string lib, jlink_flags_t mode)
 
 	_handle = dlopen(lib.c_str(), m);
 
-	if (_handle == NULL) {
+	if (_handle == nullptr) {
 		throw jexception::RuntimeException(dlerror());
 	}
 	

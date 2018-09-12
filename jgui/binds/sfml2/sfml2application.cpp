@@ -37,9 +37,9 @@
 namespace jgui {
 
 /** \brief */
-static sf::RenderWindow *_window = NULL;
+static sf::RenderWindow *_window = nullptr;
 /** \brief */
-static jgui::Image *_icon = NULL;
+static jgui::Image *_icon = nullptr;
 /** \brief */
 static std::chrono::time_point<std::chrono::steady_clock> _last_keypress;
 /** \brief */
@@ -49,7 +49,7 @@ static int _mouse_y;
 /** \brief */
 static int _click_count;
 /** \brief */
-static Window *g_window = NULL;
+static Window *g_window = nullptr;
 /** \brief */
 static std::string _title;
 /** \brief */
@@ -338,7 +338,7 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
 void NativeApplication::InternalPaint()
 {
-	if (g_window == NULL || g_window->IsVisible() == false) {
+	if (g_window == nullptr || g_window->IsVisible() == false) {
 		return;
 	}
 
@@ -364,7 +364,7 @@ void NativeApplication::InternalPaint()
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
-  if (cairo_surface == NULL) {
+  if (cairo_surface == nullptr) {
     delete buffer;
 
     return;
@@ -378,7 +378,7 @@ void NativeApplication::InternalPaint()
 
   uint8_t *data = cairo_image_surface_get_data(cairo_surface);
 
-  if (data == NULL) {
+  if (data == nullptr) {
     delete buffer;
 
     return;
@@ -429,7 +429,7 @@ void NativeApplication::InternalPaint()
   g_window->Flush();
 
   delete buffer;
-  buffer = NULL;
+  buffer = nullptr;
 
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
@@ -445,7 +445,7 @@ void NativeApplication::InternalLoop()
     if (events.size() > 0) {
       jevent::EventObject *event = events.front();
 
-      if (dynamic_cast<jevent::WindowEvent *>(event) != NULL) {
+      if (dynamic_cast<jevent::WindowEvent *>(event) != nullptr) {
         jevent::WindowEvent *window_event = dynamic_cast<jevent::WindowEvent *>(event);
 
         if (window_event->GetType() == jevent::JWET_PAINTED) {
@@ -460,7 +460,7 @@ void NativeApplication::InternalLoop()
         events.erase(events.begin());
 
         delete event;
-        event = NULL;
+        event = nullptr;
       }
     }
 
@@ -598,7 +598,7 @@ void NativeApplication::InternalLoop()
           buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
         }
 
-        // AddEvent(new MouseEvent(NULL, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+        // AddEvent(new MouseEvent(nullptr, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
         g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
       } else if (event.type == sf::Event::Closed) {
         _window->close();
@@ -618,7 +618,7 @@ void NativeApplication::InternalLoop()
 
 void NativeApplication::InternalQuit()
 {
-  if (_window != NULL) {
+  if (_window != nullptr) {
     _window->close();
   }
 }
@@ -628,13 +628,13 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 {
 	jcommon::Object::SetClassName("jgui::NativeWindow");
 
-	if (_window != NULL) {
+	if (_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
 
   _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
 
-	_window = NULL;
+	_window = nullptr;
 	_mouse_x = 0;
 	_mouse_y = 0;
 	_last_keypress = std::chrono::steady_clock::now();
@@ -645,7 +645,7 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   // TODO:: set location too
 	_window = new sf::RenderWindow(sf::VideoMode(width, height), _title.c_str(), flags);
 
-	if (_window == NULL) {
+	if (_window == nullptr) {
 		throw jexception::RuntimeException("Cannot create a window");
 	}
 
@@ -660,10 +660,10 @@ NativeWindow::~NativeWindow()
   _visible = false;
 
   delete g_window;
-  g_window = NULL;
+  g_window = nullptr;
 
   delete _window;
-  _window = NULL;
+  _window = nullptr;
 }
 
 void NativeWindow::ToggleFullScreen()
@@ -680,7 +680,7 @@ void NativeWindow::ToggleFullScreen()
   }
 
   sf::RenderWindow 
-    *window = NULL;
+    *window = nullptr;
   sf::RenderWindow 
     *old = _window;
 
@@ -705,7 +705,7 @@ void NativeWindow::ToggleFullScreen()
     _fullscreen = false;
   }
 
-  if (_window == NULL) {
+  if (_window == nullptr) {
     return;
   }
 
@@ -717,14 +717,14 @@ void NativeWindow::ToggleFullScreen()
   _window = window;
 
   delete old;
-  old = NULL;
+  old = nullptr;
 }
 
 void NativeWindow::SetParent(jgui::Container *c)
 {
   jgui::Window *parent = dynamic_cast<jgui::Window *>(c);
 
-  if (parent == NULL) {
+  if (parent == nullptr) {
     throw jexception::IllegalArgumentException("Used only by native engine");
   }
 
@@ -732,7 +732,7 @@ void NativeWindow::SetParent(jgui::Container *c)
   // TODO:: pegar os windows por evento ou algo assim
   g_window = parent;
 
-  g_window->SetParent(NULL);
+  g_window->SetParent(nullptr);
 }
 
 void NativeWindow::SetTitle(std::string title)
@@ -908,18 +908,18 @@ void NativeWindow::SetCursor(jcursor_style_t style)
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
   /*
-	if ((void *)shape == NULL) {
+	if ((void *)shape == nullptr) {
 		return;
 	}
 
   jgui::jsize_t 
     size = shape->GetSize();
 	uint32_t 
-    *data = NULL;
+    *data = nullptr;
 
 	shape->GetGraphics()->GetRGBArray(&data, 0, 0, size.width, size.height);
 
-	if (data == NULL) {
+	if (data == nullptr) {
 		return;
 	}
 

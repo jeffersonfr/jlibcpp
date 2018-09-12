@@ -102,7 +102,7 @@ jsize_t Label::GetPreferredSize()
 
 	jsize_t t {0, 0};
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return t;
   }
 
@@ -114,7 +114,7 @@ jsize_t Label::GetPreferredSize()
     gx = theme->GetIntegerParam("component.hgap") + theme->GetIntegerParam("component.border.size"),
 		gy = theme->GetIntegerParam("component.vgap") + theme->GetIntegerParam("component.border.size");
 
-	if (font != NULL) {
+	if (font != nullptr) {
 		int 
       wp = size.width - 2*gx,
 			hp = font->GetSize();
@@ -139,7 +139,7 @@ void Label::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -158,7 +158,7 @@ void Label::Paint(Graphics *g)
 		w = size.width - 2*x,
 		h = size.height - 2*y;
 
-	if (font != NULL) {
+	if (font != nullptr) {
 		g->SetFont(font);
 
 		if (IsEnabled() == true) {

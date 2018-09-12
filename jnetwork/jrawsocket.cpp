@@ -39,9 +39,9 @@ RawSocket::RawSocket(std::string device_, bool promisc_, int timeout_, int rbuf_
 	
 	_device = device_;
 	_promisc = promisc_;
-	_address = NULL;
-	_is = NULL;
-	_os = NULL;
+	_address = nullptr;
+	_is = nullptr;
+	_os = nullptr;
 	_is_closed = true;
 	_timeout = timeout_;
 

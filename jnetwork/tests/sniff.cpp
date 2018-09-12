@@ -139,14 +139,14 @@ void LoggaTCP(void)
 
 void LoggaConnessioneTCP( struct tcphdr  * th, unsigned long S, unsigned long D)
 {
-	struct servent *P = NULL; //porta --> servizio
+	struct servent *P = nullptr; //porta --> servizio
 	
 	set_col(RED,BLK);
 	std::cout << "TCP  ";
 	nocol();
 	set_col(YEL,BLK);
 	std::cout << "connection from " << Indirizzo(S) << " on (" << ntohs(th->dest) << ")";
-	if ((P!=NULL)) {
+	if ((P!=nullptr)) {
 		std::cout << " <" << P->s_name << ">";
 	}
 	nocol();

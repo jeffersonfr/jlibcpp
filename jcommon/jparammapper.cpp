@@ -164,7 +164,7 @@ void ParamMapper::SetDecimalParam(std::string key, double value)
 
 void ParamMapper::SetArrayParam(std::string key, uint8_t *value, uint64_t value_size)
 {
-	if (value == NULL || value_size == 0) {
+	if (value == nullptr || value_size == 0) {
 		return;
 	}
 
@@ -237,7 +237,7 @@ bool ParamMapper::Equals(Object *o)
 {
 	ParamMapper *mapper = dynamic_cast<ParamMapper *>(o);
 
-	if (mapper == NULL) {
+	if (mapper == nullptr) {
 		return false;
 	}
 
@@ -258,7 +258,7 @@ void ParamMapper::Copy(Object *o)
 {
 	ParamMapper *mapper = dynamic_cast<ParamMapper *>(o);
 
-	if (mapper == NULL) {
+	if (mapper == nullptr) {
 		return;
 	}
 

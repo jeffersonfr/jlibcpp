@@ -100,7 +100,7 @@ void SharedMemory::Detach()
 
 void SharedMemory::Deallocate()
 {
-	int r = shmctl(_id, IPC_RMID, NULL);
+	int r = shmctl(_id, IPC_RMID, nullptr);
 
 	if (r < 0) {
 		if (errno == EACCES) {
@@ -113,7 +113,7 @@ void SharedMemory::Deallocate()
 
 int SharedMemory::Get(char *data_, int size_)
 {
-	if ((void *)data_ == NULL) {
+	if ((void *)data_ == nullptr) {
 		throw jexception::MemoryException("Null pointer in data parameter");
 	}
 	
@@ -128,7 +128,7 @@ int SharedMemory::Get(char *data_, int size_)
 
 int SharedMemory::Put(const char *data_, int size_)
 {
-	if ((void *)data_ == NULL) {
+	if ((void *)data_ == nullptr) {
 		throw jexception::MemoryException("Null pointer in data parameter");
 	}
 	

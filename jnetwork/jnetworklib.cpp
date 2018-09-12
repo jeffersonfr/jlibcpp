@@ -33,7 +33,7 @@
 
 void InitializeSocketLibrary()
 {
-	srand(time(NULL));
+	srand(time(nullptr));
 
 	int tmp;
 
@@ -60,8 +60,8 @@ std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::st
 {
 	std::vector<struct jaddress_info_t> address_info;
 
-	struct addrinfo *result = NULL;
-	struct addrinfo *ptr = NULL;
+	struct addrinfo *result = nullptr;
+	struct addrinfo *ptr = nullptr;
 	struct addrinfo hints;
 
 	// Setup the hints address info structure which is passed to the getaddrinfo() function
@@ -72,9 +72,9 @@ std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::st
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 	hints.ai_protocol = 0;
-	hints.ai_canonname = NULL;
-	hints.ai_addr = NULL;
-	hints.ai_next = NULL;
+	hints.ai_canonname = nullptr;
+	hints.ai_addr = nullptr;
+	hints.ai_next = nullptr;
 
 	// Call getaddrinfo(). If the call succeeds, the result variable will hold a linked list 
 	// of addrinfo structures containing response information
@@ -83,7 +83,7 @@ std::vector<struct jaddress_info_t> RequestAddressInfo(std::string host, std::st
 	}
 
 	// Retrieve each address and print out the hex bytes
-	for (ptr=result; ptr!=NULL; ptr=ptr->ai_next) {
+	for (ptr=result; ptr!=nullptr; ptr=ptr->ai_next) {
 		jaddress_info_t info;
 
 		switch (ptr->ai_family) {

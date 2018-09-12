@@ -30,7 +30,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-  jshared::MemoryMap *m = NULL;
+  jshared::MemoryMap *m = nullptr;
 
 	std::string key;
 

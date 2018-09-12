@@ -48,7 +48,7 @@ UUID::~UUID()
 
 std::time_t UUID::GetTime()
 {
-	return uuid_time(_uuid, NULL);
+	return uuid_time(_uuid, nullptr);
 }
 
 jcommon::Object * UUID::Clone()
@@ -64,7 +64,7 @@ bool UUID::Equals(Object *o)
 {
 	UUID *uuid = dynamic_cast<UUID *>(o);
 
-	if (uuid == NULL) {
+	if (uuid == nullptr) {
 		return false;
 	}
 
@@ -75,7 +75,7 @@ void UUID::Copy(Object *o)
 {
 	UUID *uuid = dynamic_cast<UUID *>(o);
 
-	if (uuid == NULL) {
+	if (uuid == nullptr) {
 		throw jexception::InvalidArgumentException("The parameter is not a uuid object");
 	}
 
@@ -86,7 +86,7 @@ int UUID::Compare(Object *o)
 {
 	UUID *uuid = dynamic_cast<UUID *>(o);
 
-	if (uuid == NULL) {
+	if (uuid == nullptr) {
 		throw jexception::InvalidArgumentException("The parameter is not a uuid object");
 	}
 

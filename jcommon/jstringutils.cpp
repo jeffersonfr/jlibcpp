@@ -43,14 +43,14 @@ std::string StringUtils::Format(const char *format, ...)
 	std::string str;
 	va_list ap, cp;
 	int format_length;
-	char *dst = NULL;
+	char *dst = nullptr;
 
 	va_start(ap, format);
 	va_copy(cp, ap);
 
-	format_length = vsnprintf(NULL, 0, format, cp);
+	format_length = vsnprintf(nullptr, 0, format, cp);
 
-	if ((dst = (char *)malloc((format_length + 1) * sizeof(char))) != NULL) {
+	if ((dst = (char *)malloc((format_length + 1) * sizeof(char))) != nullptr) {
 		vsprintf(dst, format, ap);
 		
 		str = std::string(dst);

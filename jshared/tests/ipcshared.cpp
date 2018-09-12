@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-  jshared::SharedMemory *m = NULL;
+  jshared::SharedMemory *m = nullptr;
 
 	int key = atoi(argv[1]);
 

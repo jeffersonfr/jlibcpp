@@ -48,19 +48,19 @@ SocketHandler::~SocketHandler()
 	_thread->join();
 
 	delete _thread;
-	_thread = NULL;
+	_thread = nullptr;
 }
 
 void SocketHandler::WriteRecord(LogRecord *record_)
 {
 	std::string type;
 	
-	time_t curtime = time(NULL);
+	time_t curtime = time(nullptr);
 	char *loctime = asctime(localtime (&curtime));
 	
 	std::ostringstream log, date;
 		
-	if (loctime != NULL) {
+	if (loctime != nullptr) {
 		loctime[strlen(loctime)-1] = '\0';
 	
 		date << " [" << (loctime + 4) << "]  ";

@@ -41,7 +41,7 @@ int InternalCreateFont(std::string name, cairo_font_face_t **font)
 	FT_Face ft_face;
 
 	if (FT_New_Face(_ft_library, name.c_str(), 0, &ft_face) != 0) {
-		(*font) = NULL;
+		(*font) = nullptr;
 
 		return -1;
 	}
@@ -65,15 +65,15 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size):
 
 	jio::File *file = jio::File::OpenFile(name);
 
-	_font = NULL;
+	_font = nullptr;
 	_is_builtin = false;
 
-	if (file == NULL) {
+	if (file == nullptr) {
 		_is_builtin = true;
 	} else {
 		InternalCreateFont(name, &_font);
 	
-		if (_font == NULL) {
+		if (_font == nullptr) {
 			throw jexception::NullPointerException("Cannot load a native font");
 		}
 	}
@@ -154,7 +154,7 @@ Font::Font(std::string name, jfont_attributes_t attributes, int size):
 
 Font::~Font()
 {
-	if (_font != NULL) {
+	if (_font != nullptr) {
 		cairo_scaled_font_destroy(_scaled_font);
 		cairo_font_face_destroy(_font);
 		cairo_font_options_destroy(_options);

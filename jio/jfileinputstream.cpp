@@ -30,7 +30,7 @@ FileInputStream::FileInputStream(std::string filename_):
 
 	_file = jio::File::OpenFile(filename_);
 
-	if (_file == NULL) {
+	if (_file == nullptr) {
 		throw jexception::IOException("Unable to open file");
 	}
 	
@@ -44,7 +44,7 @@ FileInputStream::FileInputStream(File *file_):
 
 	_file = file_;
 
-	if (_file == NULL) {
+	if (_file == nullptr) {
 		throw jexception::NullPointerException("File must be a valid pointer");
 	}
 
@@ -53,7 +53,7 @@ FileInputStream::FileInputStream(File *file_):
 
 FileInputStream::~FileInputStream()
 {
-	if (_flag == 0 && (void *)_file != NULL) {
+	if (_flag == 0 && (void *)_file != nullptr) {
 		// _file->Close();
 		delete _file;
 	}
@@ -96,7 +96,7 @@ int64_t FileInputStream::Read()
 
 int64_t FileInputStream::Read(char *data, int64_t size)
 {
-	if ((void *)data == NULL) {
+	if ((void *)data == nullptr) {
 		return -1LL;
 	}
 

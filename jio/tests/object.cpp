@@ -75,7 +75,7 @@ class Complex : public jio::Serializable {
 				jcommon::JSONValue *root = jcommon::JSON::Parse(object.c_str()),
 					*psd = root->GetFirstChild();
 
-				while (psd != NULL) {
+				while (psd != nullptr) {
 					if (strcasecmp(psd->GetName(), "real") == 0) {
 						real = psd->GetInteger();
 					}
@@ -125,7 +125,7 @@ class ObjectInputStreamImpl : public jio::ObjectInputStream {
 				return new Complex();
 			}
 
-			return NULL;
+			return nullptr;
 		}
 };
 
@@ -144,7 +144,7 @@ int main()
 
 	a = (Complex *)ois->Read();
 
-	if (a != NULL) {
+	if (a != nullptr) {
 		std::cout << "Complex [" << a->What() << "]" << std::endl;
 	}
 

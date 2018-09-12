@@ -128,7 +128,7 @@ bool TextArea::KeyPressed(jevent::KeyEvent *event)
 	bool 
     catched = false;
 
-	if (keymap != NULL && keymap->HasKey(action) == false) {
+	if (keymap != nullptr && keymap->HasKey(action) == false) {
 		return false;
 	}
 
@@ -280,7 +280,7 @@ bool TextArea::KeyPressed(jevent::KeyEvent *event)
 	}
 
   /* TODO::
-	if (font != NULL) {
+	if (font != nullptr) {
 		int w = font->GetStringWidth(GetText().substr(0, _caret_position));
 
 		if ((w-_size.width) > 0) {
@@ -355,7 +355,7 @@ void TextArea::IncrementLines(int lines)
 
 	_caret_position = current_length;
 
-	if (font != NULL) {
+	if (font != nullptr) {
 		jpoint_t 
       slocation = GetScrollLocation();
 		int 
@@ -378,7 +378,7 @@ void TextArea::DecrementLines(int lines)
 	Theme 
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -402,7 +402,7 @@ void TextArea::DecrementLines(int lines)
 
 	_caret_position = current_length;
 
-	if (font != NULL) {
+	if (font != nullptr) {
 		jpoint_t 
       slocation = GetScrollLocation();
 		int 
@@ -421,14 +421,14 @@ void TextArea::InitRowsString()
 	Theme
     *theme = GetTheme();
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
 	jgui::Font 
     *font = theme->GetFont("component.font");
 
-	if (font == NULL) {
+	if (font == nullptr) {
 		return;
 	}
 
@@ -539,7 +539,7 @@ void TextArea::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -558,7 +558,7 @@ void TextArea::Paint(Graphics *g)
 
 	InitRowsString();
 
-	if (font == NULL) {
+	if (font == nullptr) {
 		return;
 	}
 
@@ -577,7 +577,7 @@ void TextArea::Paint(Graphics *g)
 
 		char *c = (char *)strchr(s.c_str(), '\n');
 
-		if (c != NULL) {
+		if (c != nullptr) {
 			c[0] = ' ';
 		}
 
@@ -674,7 +674,7 @@ jsize_t TextArea::GetScrollDimension()
 	
   jsize_t t {0, 0};
 
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return t;
   }
 
@@ -686,7 +686,7 @@ jsize_t TextArea::GetScrollDimension()
 
   t = GetSize();
 
-	if (font == NULL) {
+	if (font == nullptr) {
     return t;
 	}
 

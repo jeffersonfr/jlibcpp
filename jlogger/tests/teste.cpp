@@ -27,11 +27,11 @@
 
 int main(int argc, char *argv[])
 {
-	jlogger::Logger *g_default_logger = NULL;
+	jlogger::Logger *g_default_logger = nullptr;
 
   try {
-    // g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger(NULL, NULL);
-    // g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger(NULL, new jlogger::XMLFormatter());
+    // g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger(nullptr, nullptr);
+    // g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger(nullptr, new jlogger::XMLFormatter());
     g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger((jlogger::LoggerHandler *)(new jlogger::FileHandler("teste.log")), new jlogger::XMLFormatter());
     // g_default_logger = jlogger::LoggerManager::GetInstance()->CreateLogger((jlogger::Handler *)(new jlogger::SocketHandler(1234)), new jlogger::XMLFormatter());
 
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
   } catch (...) {
   }
 
-  if (g_default_logger != NULL) {
+  if (g_default_logger != nullptr) {
     delete g_default_logger;
   }
 

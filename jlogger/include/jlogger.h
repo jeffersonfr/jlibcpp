@@ -53,7 +53,7 @@ class Logger : public virtual jcommon::Object {
 		 * \brief
 		 * 
 		 */
-		Logger(LoggerHandler *handler_ = NULL, Formatter *format_ = NULL);
+		Logger(LoggerHandler *handler_ = nullptr, Formatter *format_ = nullptr);
 
 		/**
 		 * \brief

@@ -70,7 +70,7 @@ void MessageQueue::Send(const void *msg_, int size_, long type_)
 		throw jexception::MessageException("Message queue is released");
 	}
 
-	if (msg_ == NULL) {
+	if (msg_ == nullptr) {
 		throw jexception::MessageException("Null pointer exception");
 	}
 
@@ -107,7 +107,7 @@ void MessageQueue::Receive(void *msg_, int size_, long type_, int flag_)
 		 throw jexception::MessageException("Message queue is released");
     }
 
-	if (msg_ == NULL) {
+	if (msg_ == nullptr) {
 		 throw jexception::MessageException("Null pointer exception");
 	}
 	

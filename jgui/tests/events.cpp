@@ -200,7 +200,7 @@ class UserWindow: public jgui::Window {
 	private:
 		void DispatchUserEvent(UserEvent *event)
 		{
-			if (event == NULL) {
+			if (event == nullptr) {
 				return;
 			}
 
@@ -255,7 +255,7 @@ class UserWindow: public jgui::Window {
 
 		void RegisterUserEventListener(UserEventListener *listener)
 		{
-			if (listener == NULL) {
+			if (listener == nullptr) {
 				return;
 			}
 
@@ -266,7 +266,7 @@ class UserWindow: public jgui::Window {
 
 		void RemoveUserEventListener(UserEventListener *listener)
 		{
-			if (listener == NULL) {
+			if (listener == nullptr) {
 				return;
 			}
 
@@ -281,7 +281,7 @@ class UserWindow: public jgui::Window {
 		{
 			struct event_t *t = _events[event->GetSymbol()];
 
-			if ((void *)t == NULL) {
+			if ((void *)t == nullptr) {
 				t = new struct event_t;
 
 				t->key_down = false;
@@ -314,7 +314,7 @@ class UserWindow: public jgui::Window {
 		{
 			struct event_t *t = _events[event->GetSymbol()];
 
-			if ((void *)t != NULL) {
+			if (t != nullptr) {
 				t->key_down = false;
 
 				DispatchUserEvent(new UserEvent(ON_KEY_UP_EVENT, event->GetModifiers(), event->GetKeyCode(), event->GetSymbol()));

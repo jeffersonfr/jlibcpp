@@ -30,7 +30,7 @@ ObjectInputStream::ObjectInputStream(InputStream *is):
 {
 	jcommon::Object::SetClassName("jio::ObjectInputStream");
 	
-	if ((void *)is == NULL) {
+	if ((void *)is == nullptr) {
 		throw jexception::IOException("Null pointer exception");
 	}
 
@@ -48,7 +48,7 @@ bool ObjectInputStream::IsEmpty()
 
 int64_t ObjectInputStream::Available()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		return stream->Available();
 	}
 
@@ -57,7 +57,7 @@ int64_t ObjectInputStream::Available()
 
 int64_t ObjectInputStream::GetSize()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		return stream->GetSize();
 	}
 
@@ -73,22 +73,22 @@ jcommon::Object * ObjectInputStream::Read()
 {
 	// TODO::
 	// - read all bytes from file (currently is limited in 65536)
-	if (stream == NULL) {
-		return NULL;
+	if (stream == nullptr) {
+		return nullptr;
 	}
 
-	jcommon::Object *object = NULL;
+	jcommon::Object *object = nullptr;
 	std::string description;
 	char *ptr,
 		 tmp[65536];
 
 	if (stream->Read(tmp, 65536) <= 0) {
-		return NULL;
+		return nullptr;
 	}
 
 	ptr = strchr(tmp+2, '\"');
 
-	if (ptr != NULL) {
+	if (ptr != nullptr) {
 		*ptr = '\0';
 		*(ptr+strlen(ptr+1)) = '\0';
 
@@ -99,12 +99,12 @@ jcommon::Object * ObjectInputStream::Read()
 	
 	object = CreateObject((tmp+2));
 
-	if (object != NULL) {
+	if (object != nullptr) {
 		if (object->InstanceOf("jio::Serializable") == true) {
 			dynamic_cast<jio::Serializable *>(object)->AssemblyObject(description);
 		} else {
 			delete object;
-			object = NULL;
+			object = nullptr;
 		}
 	}
 
@@ -113,28 +113,28 @@ jcommon::Object * ObjectInputStream::Read()
 
 void ObjectInputStream::Skip(int64_t skip)
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		stream->Skip(skip);
 	}
 }
 
 void ObjectInputStream::Reset()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		stream->Reset();
 	}
 }
 
 void ObjectInputStream::Close()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		stream->Close();
 	}
 }
 
 int64_t ObjectInputStream::GetReadedBytes()
 {
-	if (stream != NULL) {
+	if (stream != nullptr) {
 		return stream->GetReadedBytes();
 	}
 
@@ -143,7 +143,7 @@ int64_t ObjectInputStream::GetReadedBytes()
 
 jcommon::Object * ObjectInputStream::CreateObject(std::string id)
 {
-	return NULL;
+	return nullptr;
 }
 
 }

@@ -132,7 +132,8 @@ char * BufferReader::ReadRaw(int64_t *size)
 
 	if (sz <= 0) {
 		(*size) = 0;
-		return NULL;
+
+		return nullptr;
 	}
 
 	char *data = new char[sz];

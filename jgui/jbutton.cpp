@@ -34,7 +34,7 @@ Button::Button(std::string text, int x, int y, int width, int height):
 	_valign = JVA_CENTER;
 
 	_text = text;
-  _image = NULL;
+  _image = nullptr;
 
 	SetFocusable(true);
 }
@@ -171,7 +171,7 @@ void Button::Paint(Graphics *g)
 
 	Theme *theme = GetTheme();
   
-  if (theme == NULL) {
+  if (theme == nullptr) {
     return;
   }
 
@@ -190,7 +190,7 @@ void Button::Paint(Graphics *g)
 		w = size.width - 2*x,
 		h = size.height - 2*y;
 
-  if (_image != NULL) {
+  if (_image != nullptr) {
     jgui::jsize_t
       size = _image->GetSize();
 
@@ -199,7 +199,7 @@ void Button::Paint(Graphics *g)
     g->DrawImage(_image, 8, 8);
   }
 
-	if (font != NULL) {
+	if (font != nullptr) {
 		g->SetFont(font);
 
 		if (IsEnabled() == true) {
@@ -220,7 +220,7 @@ void Button::Paint(Graphics *g)
 
 void Button::RegisterActionListener(jevent::ActionListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -233,7 +233,7 @@ void Button::RegisterActionListener(jevent::ActionListener *listener)
 
 void Button::RemoveActionListener(jevent::ActionListener *listener)
 {
-	if (listener == NULL) {
+	if (listener == nullptr) {
 		return;
 	}
 
@@ -244,7 +244,7 @@ void Button::RemoveActionListener(jevent::ActionListener *listener)
 
 void Button::DispatchActionEvent(jevent::ActionEvent *event)
 {
-	if (event == NULL) {
+	if (event == nullptr) {
 		return;
 	}
 

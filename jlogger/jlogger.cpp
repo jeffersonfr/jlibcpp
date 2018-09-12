@@ -35,11 +35,11 @@ Logger::Logger(LoggerHandler *handler_, Formatter *format_):
 
 Logger::~Logger()
 {
-	if (_handler != NULL) {
+	if (_handler != nullptr) {
 		delete _handler;
 	}
 
-	if (_format != NULL) {
+	if (_format != nullptr) {
 		delete _format;
 	}
 }
@@ -55,12 +55,12 @@ void Logger::SendLogger(jrecord_type_t type_, std::string record_)
 		return;
 	}
 
-	LogRecord *record = NULL;
+	LogRecord *record = nullptr;
     
 	try {
 		record = new LogRecord(type_, record_);
 
-		if (_format != NULL) {
+		if (_format != nullptr) {
 			_format->Transform(record);
 		}
 		
@@ -68,7 +68,7 @@ void Logger::SendLogger(jrecord_type_t type_, std::string record_)
 
 		delete record;
 	} catch (std::bad_alloc &) {
-		if (record != NULL) {
+		if (record != nullptr) {
 			delete record;
 		}
 	}
@@ -87,12 +87,12 @@ void Logger::SendLogger(jrecord_type_t type_, const char *fmt, ...)
 	vsnprintf(tmp, 4096, fmt, va); tmp[4096-1] = 0;
 	va_end(va);
 
-	LogRecord *record = NULL;
+	LogRecord *record = nullptr;
         
 	try {
 		record = new LogRecord(type_, tmp);
 
-		if (_format != NULL) {
+		if (_format != nullptr) {
 			_format->Transform(record);
 		}
 		
@@ -100,7 +100,7 @@ void Logger::SendLogger(jrecord_type_t type_, const char *fmt, ...)
 
 		delete record;
 	} catch (std::bad_alloc &) {
-		if (record != NULL) {
+		if (record != nullptr) {
 			delete record;
 		}
 	}
@@ -113,7 +113,7 @@ void Logger::SendLogger(LogRecord *record_)
 	}
 
 	try {
-		if (_format != NULL) {
+		if (_format != nullptr) {
 			_format->Transform(record_);
 		}
 		
@@ -129,8 +129,8 @@ void Logger::SetOutput(int mask_)
 
 void Logger::SetHandler(LoggerHandler *handler_)
 {
-	if (handler_ != NULL) {
-		if (_handler != NULL) {
+	if (handler_ != nullptr) {
+		if (_handler != nullptr) {
 			delete _handler;
 		}
         
@@ -140,8 +140,8 @@ void Logger::SetHandler(LoggerHandler *handler_)
 
 void Logger::SetFormatter(Formatter *format_)
 {
-	if (format_ != NULL) {
-		if (_format != NULL) {
+	if (format_ != nullptr) {
+		if (_format != nullptr) {
 			delete _format;
 		}
 		
@@ -151,20 +151,20 @@ void Logger::SetFormatter(Formatter *format_)
 
 void Logger::Release()
 {
-	LogRecord *record = NULL;
+	LogRecord *record = nullptr;
         
 	try {
-		if (_format != NULL) {
+		if (_format != nullptr) {
 			record = _format->Release();
 		}
 	
-		if (record != NULL) {	
+		if (record != nullptr) {	
 			_handler->WriteRecord(record);
 
 			delete record;
 		}
 	} catch (std::bad_alloc &) {
-		if (record != NULL) {
+		if (record != nullptr) {
 			delete record;
 		}
 	}

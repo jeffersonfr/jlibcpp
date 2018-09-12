@@ -43,11 +43,11 @@ FileOutputStream::FileOutputStream(std::string filename_):
 	try {
 		_file = jio::File::OpenFile(filename_, (jio::jfile_flags_t)(JFF_READ_WRITE | JFF_LARGEFILE));
 
-		if (_file == NULL) {
+		if (_file == nullptr) {
 			_file = jio::File::CreateFile(filename_, (jio::jfile_flags_t)(JFF_READ_WRITE | JFF_LARGEFILE));
 		}
 	} catch (...) {
-		_file = NULL;
+		_file = nullptr;
 
 		throw jexception::IOException("Open file failed");
 	}
@@ -60,7 +60,7 @@ FileOutputStream::FileOutputStream(File *file_):
 
 	_file = file_;
 
-	if (_file == NULL) {
+	if (_file == nullptr) {
 		throw jexception::NullPointerException("File pointer is null");
 	}
 
@@ -78,11 +78,11 @@ FileOutputStream::FileOutputStream(File *file_):
 
 FileOutputStream::~FileOutputStream()
 {
-	if ((void *)_file != NULL) {
+	if ((void *)_file != nullptr) {
 		// delete _file;
 	}
 
-	if ((void *)_buffer != NULL) {
+	if ((void *)_buffer != nullptr) {
 		delete [] _buffer;
 	}
 }

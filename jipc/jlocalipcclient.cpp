@@ -40,7 +40,7 @@ LocalIPCClient::~LocalIPCClient()
 
 void LocalIPCClient::CallMethod(Method *method, Response **response)
 {
-	if (method == NULL) {
+	if (method == nullptr) {
 		throw jexception::NullPointerException("Method cannot be null");
 	}
 
@@ -92,7 +92,7 @@ void LocalIPCClient::CallMethod(Method *method, Response **response)
 
 		Response *local = (*response);
 
-		if (local == NULL) {
+		if (local == nullptr) {
 			local = new Response();
 		}
 

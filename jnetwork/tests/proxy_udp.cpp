@@ -28,8 +28,8 @@
 
 #define BUFFER_SIZE	4096
 
-jio::FileInputStream *file = NULL;
-jio::BufferedReader *reader = NULL;
+jio::FileInputStream *file = nullptr;
+jio::BufferedReader *reader = nullptr;
 std::vector<jnetwork::Connection *> hosts;
 int receive_port = 0;
 
@@ -45,15 +45,15 @@ int init_args(int argc, char **argv)
 
 		receive_port = atoi(argv[1]);
 	} catch (...) {
-		if (file != NULL) {
+		if (file != nullptr) {
 			file->Close();
 			delete file;
-			file = NULL;
+			file = nullptr;
 		}
 		
-		if (reader != NULL) {
+		if (reader != nullptr) {
 			delete reader;
-			reader = NULL;
+			reader = nullptr;
 		}
 
 		return -1;
