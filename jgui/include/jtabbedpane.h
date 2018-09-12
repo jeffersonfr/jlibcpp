@@ -130,7 +130,7 @@ class TabbedPane : public jgui::Container {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::SelectListener *> & GetTabsListeners();
+		virtual const std::vector<jevent::SelectListener *> & GetTabsListeners();
 
 };
 

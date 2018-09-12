@@ -65,7 +65,7 @@ class Object{
 		 * \brief
 		 *
 		 */
-		virtual std::vector<std::string> & GetParents();
+		virtual const std::vector<std::string> & GetParents();
 
 		/**
 		 * \brief

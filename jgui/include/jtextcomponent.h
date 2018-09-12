@@ -309,7 +309,7 @@ class TextComponent : public jgui::Component {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::TextListener *> & GetTextListeners();
+		virtual const std::vector<jevent::TextListener *> & GetTextListeners();
 
 };
 

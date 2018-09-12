@@ -118,7 +118,7 @@ class Tag{
 		 * \brief
 		 *
 		 */
-		virtual std::map<std::string, std::string> & GetAttributes();
+		virtual const std::map<std::string, std::string> & GetAttributes();
 
 };
 

@@ -72,7 +72,7 @@ void EventManager::PostEvent(jevent::EventObject *event)
   _condition.notify_one();
 }
 
-std::vector<jevent::EventObject *> & EventManager::GetEvents()
+const std::vector<jevent::EventObject *> & EventManager::GetEvents()
 {
   return _events;
 }

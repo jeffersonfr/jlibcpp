@@ -931,11 +931,11 @@ class Main : public jgui::Window {
 		virtual ~Main()
 		{
 			while (GetComponents().size() > 0) {
-				Picture *pic = (Picture *)(*GetComponents().begin());
+        jgui::Component *c = *GetComponents().begin();
 
-				GetComponents().erase(GetComponents().begin());
+				Remove(c);
 
-				delete pic;
+				delete c;
 			}
 		}
 

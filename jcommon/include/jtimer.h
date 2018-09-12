@@ -50,11 +50,11 @@ class TimerTask : public virtual jcommon::Object {
     {
     }
 
-    template <class callable, class... arguments> TimerTask(int after, bool async, callable&& f, arguments&&... args) 
+    template <class callable, class ...arguments> TimerTask(int after, bool async, callable &&f, arguments &&...args) 
     {
       std::function<typename std::result_of<callable(arguments...)>::type()> task(std::bind(std::forward<callable>(f), std::forward<arguments>(args)...));
 
-      if (async) {
+      if (async == true) {
         std::thread([after, task]() {
             std::this_thread::sleep_for(std::chrono::milliseconds(after));
             task();

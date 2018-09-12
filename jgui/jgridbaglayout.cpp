@@ -143,22 +143,27 @@ void GridBagLayout::RemoveLayoutComponent(Component *comp)
 	RemoveConstraints(comp);
 }
 
-int64_t * GridBagLayout::PreInitMaximumArraySizes(Container *parent)
+jgui::jpoint_t GridBagLayout::PreInitMaximumArraySizes(Container *parent)
 {
-	std::vector<Component *> &components = parent->GetComponents();
-
-	Component *comp;
-	GridBagConstraints *constraints;
-	int64_t *returnArray = new int64_t[2];
-	int curX, 
-			curY;
-	int curWidth, 
-			curHeight;
-	int preMaximumArrayXIndex = 0,
-			preMaximumArrayYIndex = 0;
+	const std::vector<Component *> 
+    &components = parent->GetComponents();
+	Component 
+    *comp = nullptr;
+	GridBagConstraints 
+    *constraints = nullptr;
+  jgui::jpoint_t
+    returnPoint;
+	int 
+    curX, 
+		curY,
+	  curWidth,
+	  curHeight,
+	  preMaximumArrayXIndex = 0,
+		preMaximumArrayYIndex = 0;
 
 	for (int compId = 0 ; compId < (int)components.size() ; compId++) {
 		comp = components[compId];
+
 		if (!comp->IsVisible()) {
 			continue;
 		}
@@ -177,35 +182,36 @@ int64_t * GridBagLayout::PreInitMaximumArraySizes(Container *parent)
 		if (curX < 0){
 			curX = ++preMaximumArrayYIndex;
 		}
-		if (curY < 0){
+		
+    if (curY < 0){
 			curY = ++preMaximumArrayXIndex;
 		}
-		// gridwidth|gridheight may be equal to RELATIVE (-1) or REMAINDER (0)
+		
+    // gridwidth|gridheight may be equal to RELATIVE (-1) or REMAINDER (0)
 		// in any case using 1 instead of 0 or -1 should be sufficient to for
 		// correct maximumArraySizes calculation
 		if (curWidth <= 0){
 			curWidth = 1;
 		}
-		if (curHeight <= 0){
+		
+    if (curHeight <= 0){
 			curHeight = 1;
 		}
 
 		preMaximumArrayXIndex = jmath::Math<int>::Max(curY + curHeight, preMaximumArrayXIndex);
 		preMaximumArrayYIndex = jmath::Math<int>::Max(curX + curWidth, preMaximumArrayYIndex);
-	} //for (components) loop
-	// Must specify index++ to allocate well-working arrays.
-	/* fix for 4623196.
-	 * now return int64_t array instead of jpoint_t
-	 */
-	returnArray[0] = preMaximumArrayXIndex;
-	returnArray[1] = preMaximumArrayYIndex;
+	} 
+	
+  // Must specify index++ to allocate well-working arrays.
+	returnPoint.x = preMaximumArrayXIndex;
+	returnPoint.y = preMaximumArrayYIndex;
 
-	return returnArray;
+	return returnPoint;
 } 
 
 GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag) 
 {
-	std::vector<Component *> &components = parent->GetComponents();
+	const std::vector<Component *> &components = parent->GetComponents();
 
 	// WARN:: sync parent
 	GridBagLayoutInfo *r;
@@ -219,25 +225,32 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 	// be calculated in the following code is curX+curX.
 	// EmpericMultier equals 2 because of this.
 
-	double weight_diff, weight;
-	int layoutWidth, 
-			layoutHeight;
-	int compindex, 
-			i, 
-			k, 
-			px, 
-			py, 
-			pixels_diff, 
-			nextSize;
-	int anchor;
-	int curX = 0,	// constraints->gridx
-			curY = 0; // constraints->gridy
-	int curWidth = 1,		// constraints->gridwidth
-			curHeight = 1;	// constraints->gridheight
-	int curRow, 
-			curCol;
-	int maximumArrayXIndex = 0,
-			maximumArrayYIndex = 0;
+	double 
+    weight_diff, 
+    weight;
+	int 
+    layoutWidth, 
+		layoutHeight,
+	  compindex, 
+		i, 
+		k, 
+		px, 
+		py, 
+		pixels_diff, 
+		nextSize,
+	  anchor;
+	int 
+    curX = 0,	// constraints->gridx
+		curY = 0; // constraints->gridy
+	int 
+    curWidth = 1,		// constraints->gridwidth
+		curHeight = 1;	// constraints->gridheight
+	int 
+    curRow, 
+		curCol;
+	int 
+    maximumArrayXIndex = 0,
+		maximumArrayYIndex = 0;
 
 	/*
 	 * Pass #1
@@ -248,7 +261,8 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 
 	layoutWidth = layoutHeight = 0; 
 	curRow = curCol = -1;
-	int64_t *arraySizes = PreInitMaximumArraySizes(parent);
+
+  jgui::jpoint_t arraySizes = PreInitMaximumArraySizes(parent);
 
 	/* fix for 4623196.
 	 * If user try to create a very big grid we can
@@ -257,10 +271,8 @@ GridBagLayoutInfo * GridBagLayout::GetLayoutInfo(Container *parent, int sizeflag
 	 * We need to detect this situation and try to create a
 	 * grid with INT_MAX size instead.
 	 */
-	maximumArrayXIndex = (EMPIRIC_MULTIPLIER * arraySizes[0] > INT_MAX )? INT_MAX : EMPIRIC_MULTIPLIER*(int)arraySizes[0];
-	maximumArrayYIndex = (EMPIRIC_MULTIPLIER * arraySizes[1] > INT_MAX )? INT_MAX : EMPIRIC_MULTIPLIER*(int)arraySizes[1];
-
-	delete arraySizes;
+	maximumArrayXIndex = (EMPIRIC_MULTIPLIER * arraySizes.x > INT_MAX )? INT_MAX : EMPIRIC_MULTIPLIER*(int)arraySizes.x;
+	maximumArrayYIndex = (EMPIRIC_MULTIPLIER * arraySizes.y > INT_MAX )? INT_MAX : EMPIRIC_MULTIPLIER*(int)arraySizes.y;
 
 	bool hasBaseline = false;
 	for (compindex = 0 ; compindex < (int)components.size() ; compindex++) {
@@ -1126,7 +1138,7 @@ jsize_t GridBagLayout::GetMinSize(Container *parent, GridBagLayoutInfo *info)
 
 void GridBagLayout::ArrangeGrid(Container *parent) 
 {
-	std::vector<Component *> &components = parent->GetComponents();
+	const std::vector<Component *> &components = parent->GetComponents();
 
 	Component *comp;
 	GridBagConstraints *constraints;

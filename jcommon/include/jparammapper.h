@@ -53,7 +53,7 @@ class ParamMapper : public virtual jcommon::Object{
 		 * \brief
 		 *
 		 */
-		virtual std::map<std::string, std::string> & GetParameters();
+		virtual const std::map<std::string, std::string> & GetParameters();
 
 		/**
 		 * \brief 

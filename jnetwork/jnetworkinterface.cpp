@@ -323,22 +323,22 @@ std::string NetworkInterface::GetDisplayName()
 	return _name;
 }
 
-std::vector<uint8_t> NetworkInterface::GetHardwareAddress()
+const std::vector<uint8_t> & NetworkInterface::GetHardwareAddress()
 {
 	return _hwaddress;
 }
 
-std::vector<InetAddress *> NetworkInterface::GetNetworkMasks()
+const std::vector<InetAddress *> & NetworkInterface::GetNetworkMasks()
 {
 	return _masks;
 }
 
-std::vector<InetAddress *> NetworkInterface::GetInetAddresses()
+const std::vector<InetAddress *> & NetworkInterface::GetInetAddresses()
 {
 	return _addresses;
 }
 
-std::vector<InetAddress *> NetworkInterface::GetBroadcastAddresses()
+const std::vector<InetAddress *> & NetworkInterface::GetBroadcastAddresses()
 {
 	return _broadcast_addresses;
 }
@@ -378,7 +378,7 @@ NetworkInterface * NetworkInterface::GetParent()
 	return _parent;
 }
 
-std::vector<NetworkInterface *> NetworkInterface::GetSubInterfaces()
+const std::vector<NetworkInterface *> & NetworkInterface::GetSubInterfaces()
 {
 	return _childs;
 }

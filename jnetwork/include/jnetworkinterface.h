@@ -132,25 +132,25 @@ class NetworkInterface : public virtual jcommon::Object {
 		 * \brief Returns the hardware address (usually MAC) of the interface if it has one and if it can be accessed given the current privileges.
 		 *
 		 */
-		virtual std::vector<uint8_t> GetHardwareAddress();
+		virtual const std::vector<uint8_t> & GetHardwareAddress();
 
 		/**
 		 * \brief 
 		 *
 		 */
-		virtual std::vector<InetAddress *> GetNetworkMasks();
+		virtual const std::vector<InetAddress *> & GetNetworkMasks();
 
 		/**
 		 * \brief Convenience method to return an Enumeration with all or a subset of the InetAddresses bound to this network interface.
 		 *
 		 */
-		virtual std::vector<InetAddress *> GetInetAddresses();
+		virtual const std::vector<InetAddress *> & GetInetAddresses();
 
 		/**
 		 * \brief Get a List of all or a subset of the  <address, broadcast> of this network interface.
 		 *
 		 */
-		virtual std::vector<InetAddress *> GetBroadcastAddresses();
+		virtual const std::vector<InetAddress *> & GetBroadcastAddresses();
 
 		/**
 		 * \brief Returns the Maximum Transmission Unit (MTU) of this interface.
@@ -199,7 +199,7 @@ class NetworkInterface : public virtual jcommon::Object {
 		 * \brief Get an Enumeration with all the subinterfaces (also known as virtual interfaces) attached to this network interface.
 		 *
 		 */
-		virtual std::vector<NetworkInterface *> GetSubInterfaces();
+		virtual const std::vector<NetworkInterface *> & GetSubInterfaces();
 
 		/**
 		 * \brief Returns whether a network interface is a loopback interface.

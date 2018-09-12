@@ -113,7 +113,7 @@ jcommon::Object * Item::Clone()
 	return (jcommon::Object *)item;
 }
 
-std::vector<Item *> & Item::GetChilds()
+const std::vector<Item *> & Item::GetChilds()
 {
 	return _childs;
 }
@@ -496,7 +496,7 @@ Item * ItemComponent::GetItem(int index)
 	return *(_items.begin()+index);
 }
 
-std::vector<Item *> & ItemComponent::GetItems()
+const std::vector<Item *> & ItemComponent::GetItems()
 {
 	return _items;
 }
@@ -564,7 +564,7 @@ void ItemComponent::DispatchSelectEvent(jevent::SelectEvent *event)
 	delete event;
 }
 
-std::vector<jevent::SelectListener *> & ItemComponent::GetSelectListeners()
+const std::vector<jevent::SelectListener *> & ItemComponent::GetSelectListeners()
 {
 	return _select_listeners;
 }

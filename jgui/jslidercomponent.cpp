@@ -187,7 +187,7 @@ void SliderComponent::DispatchAdjustmentEvent(jevent::AdjustmentEvent *event)
 	delete event;
 }
 
-std::vector<jevent::AdjustmentListener *> & SliderComponent::GetAdjustmentListeners()
+const std::vector<jevent::AdjustmentListener *> & SliderComponent::GetAdjustmentListeners()
 {
 	return _adjustment_listeners;
 }

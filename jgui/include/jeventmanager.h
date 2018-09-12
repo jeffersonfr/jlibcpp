@@ -113,7 +113,7 @@ class EventManager : public jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::EventObject *> & GetEvents();
+		virtual const std::vector<jevent::EventObject *> & GetEvents();
 
 };
 

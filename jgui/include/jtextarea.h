@@ -104,7 +104,7 @@ class TextArea : public jgui::TextComponent {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<std::string> & GetLines();
+		virtual const std::vector<std::string> & GetLines();
 
 		/**
 		 * \brief

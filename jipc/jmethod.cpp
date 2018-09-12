@@ -86,7 +86,7 @@ std::string Method::Encode()
 
 	o << _name << ";";
 
-	for (std::map<std::string, std::string>::iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
+	for (std::map<std::string, std::string>::const_iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
 		char *value = base64.Encode((uint8_t *)i->second.c_str(), i->second.size());
 
 		if (value == nullptr) {
@@ -105,7 +105,7 @@ std::string Method::What()
 
 	o << _name << ";";
 
-	for (std::map<std::string, std::string>::iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
+	for (std::map<std::string, std::string>::const_iterator i=GetParameters().begin(); i!=GetParameters().end(); i++) {
 		o << i->first << ":" << i->second << ";";
 	}
 

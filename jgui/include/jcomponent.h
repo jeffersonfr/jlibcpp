@@ -951,7 +951,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::FocusListener *> & GetFocusListeners();
+		virtual const std::vector<jevent::FocusListener *> & GetFocusListeners();
 
 		/**
 		 * \brief
@@ -975,7 +975,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::ComponentListener *> & GetComponentListeners();
+		virtual const std::vector<jevent::ComponentListener *> & GetComponentListeners();
 
 		/**
 		 * \brief
@@ -1005,7 +1005,7 @@ class Component : public jevent::KeyListener, public jevent::MouseListener {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::DataListener *> & GetDataListeners();
+		virtual const std::vector<jevent::DataListener *> & GetDataListeners();
 
 };
 

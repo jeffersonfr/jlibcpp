@@ -263,7 +263,7 @@ void Button::DispatchActionEvent(jevent::ActionEvent *event)
 	delete event;
 }
 
-std::vector<jevent::ActionListener *> & Button::GetActionListeners()
+const std::vector<jevent::ActionListener *> & Button::GetActionListeners()
 {
 	return _action_listeners;
 }

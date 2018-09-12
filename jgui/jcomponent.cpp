@@ -1838,7 +1838,7 @@ void Component::DispatchFocusEvent(jevent::FocusEvent *event)
 	delete event;
 }
 
-std::vector<jevent::FocusListener *> & Component::GetFocusListeners()
+const std::vector<jevent::FocusListener *> & Component::GetFocusListeners()
 {
 	return _focus_listeners;
 }
@@ -1904,7 +1904,7 @@ void Component::DispatchComponentEvent(jevent::ComponentEvent *event)
 	delete event;
 }
 
-std::vector<jevent::ComponentListener *> & Component::GetComponentListeners()
+const std::vector<jevent::ComponentListener *> & Component::GetComponentListeners()
 {
 	return _component_listeners;
 }
@@ -1959,7 +1959,7 @@ void Component::DispatchDataEvent(jevent::DataEvent *event)
 	}
 }
 
-std::vector<jevent::DataListener *> & Component::GetDataListeners()
+const std::vector<jevent::DataListener *> & Component::GetDataListeners()
 {
 	return _data_listeners;
 }

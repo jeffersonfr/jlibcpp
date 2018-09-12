@@ -248,7 +248,7 @@ Component * Container::GetTargetComponent(Container *target, int x, int y, int *
 		*dy = y;
 	}
 
-	for (std::vector<jgui::Component *>::reverse_iterator i=target->GetComponents().rbegin(); i!=target->GetComponents().rend(); i++) {
+	for (std::vector<jgui::Component *>::const_reverse_iterator i=target->GetComponents().rbegin(); i!=target->GetComponents().rend(); i++) {
 		Component *c = (*i);
 	
 		if (c->IsVisible() == true) {
@@ -392,16 +392,16 @@ void Container::SetInsets(jinsets_t insets)
 
 void Container::InvalidateAll()
 {
-	std::vector<std::vector<jgui::Component *> *> containers;
+	std::vector<std::vector<jgui::Component *>> containers;
 
   std::lock_guard<std::mutex> guard(_container_mutex);
 
-	containers.push_back(&_components);
+	containers.push_back(_components);
 
 	do {
-		std::vector<jgui::Component *> *c = (*containers.begin());
+		const std::vector<jgui::Component *> &c = containers.front();
 
-		for (std::vector<jgui::Component *>::iterator i=c->begin(); i!=c->end(); i++) {
+		for (std::vector<jgui::Component *>::const_iterator i=c.begin(); i!=c.end(); i++) {
 			jgui::Component *component = (*i);
 
 			component->Invalidate();
@@ -409,7 +409,7 @@ void Container::InvalidateAll()
 			Container *container = dynamic_cast<jgui::Container *>(component);
 
 			if (container != nullptr) {
-				containers.push_back(&(container->GetComponents()));
+				containers.push_back(container->GetComponents());
 			}
 		}
 
@@ -419,16 +419,16 @@ void Container::InvalidateAll()
 
 void Container::RevalidateAll()
 {
-	std::vector<std::vector<jgui::Component *> *> containers;
+	std::vector<std::vector<jgui::Component *>> containers;
 
   std::lock_guard<std::mutex> guard(_container_mutex);
 
-	containers.push_back(&_components);
+	containers.push_back(_components);
 
 	do {
-		std::vector<jgui::Component *> *c = (*containers.begin());
+		const std::vector<jgui::Component *> &c = containers.front();
 
-		for (std::vector<jgui::Component *>::iterator i=c->begin(); i!=c->end(); i++) {
+		for (std::vector<jgui::Component *>::const_iterator i=c.begin(); i!=c.end(); i++) {
 			jgui::Component *component = (*i);
 
 			component->Revalidate();
@@ -436,7 +436,7 @@ void Container::RevalidateAll()
 			Container *container = dynamic_cast<jgui::Container *>(component);
 		
 			if (container != nullptr) {
-				containers.push_back(&(container->GetComponents()));
+				containers.push_back(container->GetComponents());
 			}
 		}
 
@@ -758,7 +758,7 @@ int Container::GetComponentCount()
 	return _components.size();
 }
 
-std::vector<Component *> & Container::GetComponents()
+const std::vector<Component *> & Container::GetComponents()
 {
 	return _components;
 }
@@ -1084,7 +1084,7 @@ void Container::DispatchContainerEvent(jevent::ContainerEvent *event)
 	delete event;
 }
 
-std::vector<jevent::ContainerListener *> & Container::GetContainerListeners()
+const std::vector<jevent::ContainerListener *> & Container::GetContainerListeners()
 {
 	return _container_listeners;
 }

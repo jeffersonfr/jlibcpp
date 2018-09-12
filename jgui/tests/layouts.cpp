@@ -253,11 +253,11 @@ class Main : public jgui::Window, public jevent::ActionListener {
 				ccontainer->RemoveAll();
 				bcontainer->RemoveAll();
 
-				for (std::vector<Component *>::iterator iccomponent=ccontainer->GetComponents().begin(); iccomponent!=ccontainer->GetComponents().end(); iccomponent++) {
+				for (std::vector<Component *>::const_iterator iccomponent=ccontainer->GetComponents().begin(); iccomponent!=ccontainer->GetComponents().end(); iccomponent++) {
 					delete (*iccomponent);
 				}
 
-				for (std::vector<Component *>::iterator ibcomponent=bcontainer->GetComponents().begin(); ibcomponent!=bcontainer->GetComponents().end(); ibcomponent++) {
+				for (std::vector<Component *>::const_iterator ibcomponent=bcontainer->GetComponents().begin(); ibcomponent!=bcontainer->GetComponents().end(); ibcomponent++) {
 					delete (*ibcomponent);
 				}
 

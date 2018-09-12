@@ -202,7 +202,7 @@ class CheckButton : public Component {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::ToggleListener *> & GetToggleListeners();
+		virtual const std::vector<jevent::ToggleListener *> & GetToggleListeners();
 
 };
 

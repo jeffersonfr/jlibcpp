@@ -31,7 +31,7 @@ VideoDeviceControl::~VideoDeviceControl()
 {
 }
 
-std::vector<jvideo_control_t> & VideoDeviceControl::GetControls()
+const std::vector<jvideo_control_t> & VideoDeviceControl::GetControls()
 {
 	return _controls;
 }

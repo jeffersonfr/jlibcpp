@@ -198,7 +198,7 @@ class Container : public jgui::Component {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<Component *> & GetComponents();
+		virtual const std::vector<Component *> & GetComponents();
 
 		/**
 		 * \brief
@@ -342,7 +342,7 @@ class Container : public jgui::Component {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::ContainerListener *> & GetContainerListeners();
+		virtual const std::vector<jevent::ContainerListener *> & GetContainerListeners();
 
 };
 

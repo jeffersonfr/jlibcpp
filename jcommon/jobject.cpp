@@ -51,7 +51,7 @@ void Object::AddParent(std::string parent)
 	}
 }
 
-std::vector<std::string> & Object::GetParents()
+const std::vector<std::string> & Object::GetParents()
 {
 	return _parents;
 }

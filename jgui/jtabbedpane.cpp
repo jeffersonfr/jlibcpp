@@ -86,7 +86,7 @@ void TabbedPane::DispatchTabsEvent(jevent::SelectEvent *event)
 {
 }
 
-std::vector<jevent::SelectListener *> & TabbedPane::GetTabsListeners()
+const std::vector<jevent::SelectListener *> & TabbedPane::GetTabsListeners()
 {
 	return _select_listeners;
 }

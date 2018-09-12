@@ -37,7 +37,7 @@ ParamMapper::~ParamMapper()
 {
 }
 
-std::map<std::string, std::string> & ParamMapper::GetParameters()
+const std::map<std::string, std::string> & ParamMapper::GetParameters()
 {
 	return _params;
 }

@@ -104,7 +104,7 @@ class Item : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<Item *> & GetChilds();
+		virtual const std::vector<Item *> & GetChilds();
 
 		/**
 		 * \brief
@@ -511,7 +511,7 @@ class ItemComponent : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<Item *> & GetItems();
+		virtual const std::vector<Item *> & GetItems();
 	
 		/**
 		 * \brief
@@ -547,7 +547,7 @@ class ItemComponent : public virtual jcommon::Object {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::SelectListener *> & GetSelectListeners();
+		virtual const std::vector<jevent::SelectListener *> & GetSelectListeners();
 
 };
 

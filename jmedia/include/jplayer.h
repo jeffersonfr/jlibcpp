@@ -157,7 +157,7 @@ class Player : public virtual jcommon::Object {
 		 *
 		 * \return controls
 		 */
-		virtual std::vector<Control *> & GetControls();
+		virtual const std::vector<Control *> & GetControls();
 
 		/**
 		 * \brief Return a specific control related with the type.
@@ -192,7 +192,7 @@ class Player : public virtual jcommon::Object {
 		 *
 		 * \param listener
 		 */
-		virtual std::vector<jevent::PlayerListener *> & GetPlayerListeners();
+		virtual const std::vector<jevent::PlayerListener *> & GetPlayerListeners();
 
 		/*
 		 * \brief
@@ -219,7 +219,7 @@ class Player : public virtual jcommon::Object {
 		 *
 		 * \param listener
 		 */
-		virtual std::vector<jevent::FrameGrabberListener *> & GetFrameGrabberListeners();
+		virtual const std::vector<jevent::FrameGrabberListener *> & GetFrameGrabberListeners();
 
 		/*
 		 * \brief

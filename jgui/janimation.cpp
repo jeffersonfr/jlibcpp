@@ -94,7 +94,7 @@ void Animation::RemoveAll()
 	_images.clear();
 }
 
-std::vector<jgui::Image *> & Animation::GetImages()
+const std::vector<jgui::Image *> & Animation::GetImages()
 {
   return _images;
 }

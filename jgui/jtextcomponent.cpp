@@ -378,7 +378,7 @@ void TextComponent::DispatchTextEvent(jevent::TextEvent *event)
 	delete event;
 }
 
-std::vector<jevent::TextListener *> & TextComponent::GetTextListeners()
+const std::vector<jevent::TextListener *> & TextComponent::GetTextListeners()
 {
 	return _text_listeners;
 }

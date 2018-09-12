@@ -346,7 +346,7 @@ void CheckButton::DispatchToggleEvent(jevent::ToggleEvent *event)
 	delete event;
 }
 
-std::vector<jevent::ToggleListener *> & CheckButton::GetToggleListeners()
+const std::vector<jevent::ToggleListener *> & CheckButton::GetToggleListeners()
 {
 	return _check_listeners;
 }

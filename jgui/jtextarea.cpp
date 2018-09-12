@@ -526,7 +526,7 @@ void TextArea::InitRowsString()
 	_rows_string = false;
 }
 
-std::vector<std::string> & TextArea::GetLines()
+const std::vector<std::string> & TextArea::GetLines()
 {
 	return _lines;
 }

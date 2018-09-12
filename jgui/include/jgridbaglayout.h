@@ -499,7 +499,7 @@ class GridBagLayout : public Layout {
 		 * \brief
 		 *
 		 */
-		virtual int64_t * PreInitMaximumArraySizes(Container *parent);
+		virtual jgui::jpoint_t PreInitMaximumArraySizes(Container *parent);
 		
 		/**
 		 * \brief

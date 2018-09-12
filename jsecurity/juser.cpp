@@ -61,7 +61,7 @@ void User::RemoveGroup(Group *group)
 	}
 }
 
-std::vector<Group *> & User::GetGroups()
+const std::vector<Group *> & User::GetGroups()
 {
 	return _groups;
 }

@@ -73,7 +73,7 @@ class VideoDeviceControl : public Control {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jvideo_control_t> & GetControls();
+		virtual const std::vector<jvideo_control_t> & GetControls();
 		
 		/**
 		 * \brief

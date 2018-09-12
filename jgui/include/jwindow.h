@@ -417,7 +417,7 @@ class Window : public jgui::Container {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::KeyListener *> & GetKeyListeners();
+		virtual const std::vector<jevent::KeyListener *> & GetKeyListeners();
 		
 		/**
 		 * \brief
@@ -435,7 +435,7 @@ class Window : public jgui::Container {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::MouseListener *> & GetMouseListeners();
+		virtual const std::vector<jevent::MouseListener *> & GetMouseListeners();
 
 		/**
 		 * \brief
@@ -459,7 +459,7 @@ class Window : public jgui::Container {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::WindowListener *> & GetWindowListeners();
+		virtual const std::vector<jevent::WindowListener *> & GetWindowListeners();
 
 };
 

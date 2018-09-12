@@ -606,7 +606,7 @@ void Window::RemoveKeyListener(jevent::KeyListener *listener)
 	}
 }
 
-std::vector<jevent::KeyListener *> & Window::GetKeyListeners()
+const std::vector<jevent::KeyListener *> & Window::GetKeyListeners()
 {
 	return _key_listeners;
 }
@@ -637,7 +637,7 @@ void Window::RemoveMouseListener(jevent::MouseListener *listener)
 	}
 }
 
-std::vector<jevent::MouseListener *> & Window::GetMouseListeners()
+const std::vector<jevent::MouseListener *> & Window::GetMouseListeners()
 {
 	return _mouse_listeners;
 }
@@ -705,7 +705,7 @@ void Window::DispatchWindowEvent(jevent::WindowEvent *event)
 	delete event;
 }
 
-std::vector<jevent::WindowListener *> & Window::GetWindowListeners()
+const std::vector<jevent::WindowListener *> & Window::GetWindowListeners()
 {
 	return _window_listeners;
 }

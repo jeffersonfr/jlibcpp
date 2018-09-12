@@ -91,7 +91,7 @@ class Animation : public Component {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jgui::Image *> & GetImages();
+		virtual const std::vector<jgui::Image *> & GetImages();
 		
 		/**
 		 * \brief

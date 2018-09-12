@@ -74,7 +74,7 @@ class User : public virtual jcommon::Object {
 		 * \brief
 		 * 
 		 */
-		virtual std::vector<Group *> & GetGroups();
+		virtual const std::vector<Group *> & GetGroups();
 
 		/**
 		 * \brief

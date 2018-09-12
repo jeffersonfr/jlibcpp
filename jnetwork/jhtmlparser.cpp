@@ -142,7 +142,7 @@ std::string Tag::GetAttribute(std::string key)
 	return _attributes[key];
 }
 
-std::map<std::string, std::string> & Tag::GetAttributes() 
+const std::map<std::string, std::string> & Tag::GetAttributes() 
 {
 	return _attributes;
 }

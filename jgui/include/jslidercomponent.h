@@ -172,7 +172,7 @@ class SliderComponent : public jgui::Component {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::AdjustmentListener *> & GetAdjustmentListeners();
+		virtual const std::vector<jevent::AdjustmentListener *> & GetAdjustmentListeners();
 };
 
 }

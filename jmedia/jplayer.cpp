@@ -106,7 +106,7 @@ void Player::SetDecodeRate(double rate)
 {
 }
 
-std::vector<Control *> & Player::GetControls()
+const std::vector<Control *> & Player::GetControls()
 {
 	return _controls;
 }
@@ -149,7 +149,7 @@ void Player::RemovePlayerListener(jevent::PlayerListener *listener)
   _player_listeners.erase(std::remove(_player_listeners.begin(), _player_listeners.end(), listener), _player_listeners.end());
 }
 
-std::vector<jevent::PlayerListener *> & Player::GetPlayerListeners()
+const std::vector<jevent::PlayerListener *> & Player::GetPlayerListeners()
 {
 	return _player_listeners;
 }
@@ -208,7 +208,7 @@ void Player::RemoveFrameGrabberListener(jevent::FrameGrabberListener *listener)
   _frame_listeners.erase(std::remove(_frame_listeners.begin(), _frame_listeners.end(), listener), _frame_listeners.end());
 }
 
-std::vector<jevent::FrameGrabberListener *> & Player::GetFrameGrabberListeners()
+const std::vector<jevent::FrameGrabberListener *> & Player::GetFrameGrabberListeners()
 {
 	return _frame_listeners;
 }
@@ -238,6 +238,5 @@ void Player::DispatchFrameGrabberEvent(jevent::FrameGrabberEvent *event)
 
 	delete event;
 }
-
 
 }

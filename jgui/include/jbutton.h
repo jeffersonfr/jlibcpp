@@ -172,7 +172,7 @@ class Button : public Component {
 		 * \brief
 		 *
 		 */
-		virtual std::vector<jevent::ActionListener *> & GetActionListeners();
+		virtual const std::vector<jevent::ActionListener *> & GetActionListeners();
 
 };
 
