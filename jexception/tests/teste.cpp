@@ -53,7 +53,7 @@ void i()
 	try {
 		h();
 	} catch (jexception::Exception &e) {
-		throw jexception::NullPointerException(&e, "i() null pointer");
+		throw jexception::NullPointerException(&e, "i() null pointer:: %p", h);
 	}
 }
 
