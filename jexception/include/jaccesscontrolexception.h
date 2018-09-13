@@ -50,6 +50,26 @@ class AccessControlException : public jexception::SecurityException {
 		 * \brief Construtor.
 		 *
 		 */
+    template <typename... T> AccessControlException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::AccessControlException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> AccessControlException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::AccessControlException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
 		AccessControlException(jexception::Exception *exception, std::string reason);
 
 		/**

@@ -53,6 +53,26 @@ class NullPointerException : public jexception::RuntimeException {
 		NullPointerException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> NullPointerException(const std::string &fmt, T ...vs):
+      RuntimeException(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::NullPointerException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> NullPointerException(Exception *exception, const std::string &fmt, T ...vs):
+      RuntimeException(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::NullPointerException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

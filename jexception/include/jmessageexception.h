@@ -53,6 +53,26 @@ class MessageException : public jexception::RuntimeException {
 		MessageException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> MessageException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::MessageException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> MessageException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::MessageException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

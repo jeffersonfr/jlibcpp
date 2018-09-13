@@ -31,32 +31,52 @@ namespace jexception {
  */
 class ConnectionInterruptedException : public jexception::InterruptedException {
 
-    private:
+  private:
 
-    public:
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			ConnectionInterruptedException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    ConnectionInterruptedException();
 
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			ConnectionInterruptedException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ConnectionInterruptedException(std::string reason);
 
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			ConnectionInterruptedException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    ConnectionInterruptedException(jexception::Exception *exception, std::string reason);
 
-			/**
-			 * \brief Destrutor virtual.
-			 *
-			 */
-			virtual ~ConnectionInterruptedException() throw();
+    /**
+     * \brief Construtor.
+     *
+     */
+    template <typename... T> ConnectionInterruptedException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::ConnectionInterruptedException");
+    }
+
+    /**
+     * \brief Construtor.
+     *
+     */
+    template <typename... T> ConnectionInterruptedException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::ConnectionInterruptedException");
+    }
+
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~ConnectionInterruptedException() throw();
 
 };
 

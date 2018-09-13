@@ -53,6 +53,26 @@ class NotOwnerException : public jexception::RuntimeException {
 		NotOwnerException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> NotOwnerException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::NotOwnerException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> NotOwnerException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::NotOwnerException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

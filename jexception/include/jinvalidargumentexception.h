@@ -53,6 +53,26 @@ class InvalidArgumentException : public jexception::RuntimeException {
 		InvalidArgumentException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> InvalidArgumentException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::InvalidArgumentException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> InvalidArgumentException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::InvalidArgumentException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

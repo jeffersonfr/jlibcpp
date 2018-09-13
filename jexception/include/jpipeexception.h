@@ -53,6 +53,26 @@ class PipeException : public jexception::RuntimeException {
 		PipeException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> PipeException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::PipeException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> PipeException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::PipeException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

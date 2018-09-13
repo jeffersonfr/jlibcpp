@@ -53,6 +53,26 @@ class IllegalArgumentException : public jexception::RuntimeException {
 		IllegalArgumentException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> IllegalArgumentException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::IllegalArgumentException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> IllegalArgumentException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::IllegalArgumentException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

@@ -33,7 +33,7 @@ namespace jcommon {
  * 
  * \author Jeff Ferr
  */
-class StringUtils : public virtual jcommon::Object{
+class StringUtils : public virtual jcommon::Object {
 
 	private:
 		/**
@@ -50,12 +50,19 @@ class StringUtils : public virtual jcommon::Object{
 		 */
 		virtual ~StringUtils();
 		
-		/**
-		 * \brief 
-		 *
-		 */
-		static std::string Format(const char *format, ...);
-		
+    template <typename... T> static std::string Format(const std::string &fmt, T ...vs)
+    {
+      char 
+        ptr;
+      size_t 
+        len = std::snprintf(&ptr, 0, fmt.c_str(), vs...) + 1;
+      char 
+        buf[len];
+
+      std::snprintf(buf, len, fmt.c_str(), vs...);
+
+      return buf;
+    }
 		/**
 		 * \brief 
 		 *
@@ -91,7 +98,7 @@ class StringUtils : public virtual jcommon::Object{
 		 * \brief 
 		 *
 		 */
-		static std::string ReplaceString(std::string s, std::string old, std::string brand);
+		static std::string ReplaceString(std::string str, std::string old, std::string brand);
 };
 
 }

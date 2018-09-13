@@ -31,32 +31,52 @@ namespace jexception {
  */
 class IOInterruptedException : public jexception::InterruptedException {
 
-    private:
+  private:
 
-    public:
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			IOInterruptedException();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    IOInterruptedException();
 
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			IOInterruptedException(std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    IOInterruptedException(std::string reason);
 
-			/**
-			 * \brief Construtor.
-			 *
-			 */
-			IOInterruptedException(jexception::Exception *exception, std::string reason);
+    /**
+     * \brief Construtor.
+     *
+     */
+    IOInterruptedException(jexception::Exception *exception, std::string reason);
 
-			/**
-			 * \brief Destrutor virtual.
-			 *
-			 */
-			virtual ~IOInterruptedException() throw();
+    /**
+     * \brief Construtor.
+     *
+     */
+    template <typename... T> IOInterruptedException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::IOInterruptedException");
+    }
+
+    /**
+     * \brief Construtor.
+     *
+     */
+    template <typename... T> IOInterruptedException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::IOInterruptedException");
+    }
+
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~IOInterruptedException() throw();
 
 };
 

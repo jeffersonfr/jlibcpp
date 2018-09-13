@@ -53,6 +53,26 @@ class ConnectionTimeoutException : public jexception::TimeoutException {
 		ConnectionTimeoutException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> ConnectionTimeoutException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::ConnectionTimeoutException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> ConnectionTimeoutException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::ConnectionTimeoutException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

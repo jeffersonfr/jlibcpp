@@ -53,6 +53,26 @@ class SemaphoreTimeoutException : public jexception::TimeoutException {
 		SemaphoreTimeoutException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> SemaphoreTimeoutException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::SemaphoreTimeoutException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> SemaphoreTimeoutException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::SemaphoreTimeoutException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

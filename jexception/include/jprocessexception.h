@@ -53,6 +53,26 @@ class ProcessException : public jexception::RuntimeException {
 		ProcessException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> ProcessException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::ProcessException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> ProcessException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::ProcessException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

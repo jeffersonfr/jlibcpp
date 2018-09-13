@@ -53,6 +53,26 @@ class RuntimeException : public jexception::Exception, public std::runtime_error
 		RuntimeException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> RuntimeException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...), std::runtime_error(_reason)
+    {
+      jcommon::Object::SetClassName("jexception::RuntimeException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> RuntimeException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...), std::runtime_error(_reason)
+    {
+      jcommon::Object::SetClassName("jexception::RuntimeException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

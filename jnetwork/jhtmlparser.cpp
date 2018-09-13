@@ -734,7 +734,7 @@ void HTMLParser::InnerDump(Tag *t, std::string tab)
 	if (t->GetType() == JTT_BODY) {
 		std::string attr;
 
-		for (std::map<std::string, std::string>::iterator i=t->GetAttributes().begin(); i!=t->GetAttributes().end(); i++) {
+		for (std::map<std::string, std::string>::const_iterator i=t->GetAttributes().begin(); i!=t->GetAttributes().end(); i++) {
 			attr = attr + " " + i->first + "=\"" + i->second + "\"";
 		}
 

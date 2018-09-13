@@ -53,6 +53,26 @@ class IllegalStateException : public jexception::RuntimeException {
 		IllegalStateException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> IllegalStateException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::IllegalStateException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> IllegalStateException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::IllegalStateException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

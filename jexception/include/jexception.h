@@ -20,7 +20,7 @@
 #ifndef J_EXCEPTION_H
 #define J_EXCEPTION_H
 
-#include "jcommon/jobject.h"
+#include "jcommon/jstringutils.h"
 
 #include <exception>
 #include <stdexcept>
@@ -38,6 +38,8 @@ class Exception : public virtual jcommon::Object, std::exception {
 	private:
 		/** \brief */
 		std::vector<Exception *> _exceptions;
+	
+  protected:
 		/** \brief */
 		std::string _reason;
 
@@ -58,19 +60,32 @@ class Exception : public virtual jcommon::Object, std::exception {
 		 * \brief Construtor.
 		 *
 		 */
-		Exception(const char *fmt, ...);
-		
-		/**
-		 * \brief Construtor.
-		 *
-		 */
 		Exception(Exception *exception, std::string reason);
 
 		/**
 		 * \brief Construtor.
 		 *
 		 */
-		Exception(jexception::Exception *exception, const char *fmt, ...);
+    template <typename... T> Exception(const std::string &fmt, T ...vs)
+    {
+      jcommon::Object::SetClassName("jexception::Exception");
+
+      _reason = jcommon::StringUtils::Format(fmt, vs...);
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> Exception(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      if (exception != nullptr) {
+        SetStackTrace(&exception->GetStackTrace());
+
+        _exceptions.push_back(dynamic_cast<Exception *>(exception->Clone()));
+      }
+    }
 		
 		/**
 		 * \brief Destrutor virtual.

@@ -53,6 +53,26 @@ class LoggerException : public jexception::RuntimeException {
 		LoggerException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> LoggerException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::LoggerException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> LoggerException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::LoggerException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

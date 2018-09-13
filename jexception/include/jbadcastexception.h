@@ -53,6 +53,26 @@ class BadCastException : public jexception::RuntimeException, std::bad_cast {
 		BadCastException(Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> BadCastException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::BadCastException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> BadCastException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::BadCastException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

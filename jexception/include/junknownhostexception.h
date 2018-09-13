@@ -53,6 +53,26 @@ class UnknownHostException : public jexception::RuntimeException {
 		UnknownHostException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> UnknownHostException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::UnknownHostException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> UnknownHostException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::UnknownHostException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

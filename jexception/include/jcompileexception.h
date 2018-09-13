@@ -31,32 +31,52 @@ namespace jexception {
  */
 class CompileException : public jexception::RuntimeException {
 
-    private:
+  private:
 
-    public:
-        /**
-        * \brief Construtor.
-        *
-        */
-        CompileException();
-        
-        /**
-        * \brief Construtor.
-        *
-        */
-        CompileException(std::string reason);
-        
-        /**
-        * \brief Construtor.
-        *
-        */
-        CompileException(Exception *exception, std::string reason);
-        
-        /**
-        * \brief Destrutor virtual.
-        *
-        */
-        virtual ~CompileException() throw();
+  public:
+    /**
+     * \brief Construtor.
+     *
+     */
+    CompileException();
+
+    /**
+     * \brief Construtor.
+     *
+     */
+    CompileException(std::string reason);
+
+    /**
+     * \brief Construtor.
+     *
+     */
+    CompileException(Exception *exception, std::string reason);
+
+    /**
+     * \brief Construtor.
+     *
+     */
+    template <typename... T> CompileException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::CompileException");
+    }
+
+    /**
+     * \brief Construtor.
+     *
+     */
+    template <typename... T> CompileException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::CompileException");
+    }
+
+    /**
+     * \brief Destrutor virtual.
+     *
+     */
+    virtual ~CompileException() throw();
 
 };
 

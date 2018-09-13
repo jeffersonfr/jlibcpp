@@ -39,21 +39,6 @@ Exception::Exception(std::string reason_):
 	_reason = reason_;
 }
 
-Exception::Exception(const char *fmt, ...):
-    jcommon::Object(), std::exception()
-{
-	jcommon::Object::SetClassName("jexception::Exception");
-	
-	char tmp[4096];
-	va_list ap;
-
-	va_start(ap, fmt);
-	vsprintf(tmp, fmt, ap);
-	va_end(ap);
-
-	_reason = tmp;
-}
-
 Exception::Exception(Exception *exception, std::string reason):
     jcommon::Object(), std::exception()
 {
@@ -64,29 +49,6 @@ Exception::Exception(Exception *exception, std::string reason):
 	}
 
 	_reason = reason;
-
-	SetStackTrace(&exception->GetStackTrace());
-
-	_exceptions.push_back(dynamic_cast<Exception *>(exception->Clone()));
-}
-
-Exception::Exception(jexception::Exception *exception, const char *fmt, ...):
-    jcommon::Object(), std::exception()
-{
-	jcommon::Object::SetClassName("jexception::Exception");
-	
-	if (exception == nullptr) {
-		return;
-	}
-
-	char tmp[4096];
-	va_list ap;
-
-	va_start(ap, fmt);
-	vsprintf(tmp, fmt, ap);
-	va_end(ap);
-
-	_reason = tmp;
 
 	SetStackTrace(&exception->GetStackTrace());
 

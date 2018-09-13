@@ -53,6 +53,26 @@ class SecurityException : public jexception::RuntimeException {
 		SecurityException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> SecurityException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::SecurityException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> SecurityException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::SecurityException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

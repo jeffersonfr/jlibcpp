@@ -53,6 +53,26 @@ class OutOfMemoryException : public jexception::RuntimeException {
 		OutOfMemoryException(Exception *exception, std::string);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> OutOfMemoryException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::OutOfMemoryException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> OutOfMemoryException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::OutOfMemoryException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

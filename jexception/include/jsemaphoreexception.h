@@ -53,6 +53,26 @@ class SemaphoreException : public jexception::RuntimeException {
 		SemaphoreException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> SemaphoreException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::SemaphoreException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> SemaphoreException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::SemaphoreException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

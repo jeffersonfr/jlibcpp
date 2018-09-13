@@ -53,6 +53,26 @@ class AddressException : public jexception::RuntimeException {
 		AddressException(Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> AddressException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::AddressException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> AddressException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::AddressException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

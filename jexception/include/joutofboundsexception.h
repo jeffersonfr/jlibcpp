@@ -53,6 +53,26 @@ class OutOfBoundsException : public jexception::RuntimeException {
 		OutOfBoundsException(Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> OutOfBoundsException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::OutOfBoundsException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> OutOfBoundsException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::OutOfBoundsException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

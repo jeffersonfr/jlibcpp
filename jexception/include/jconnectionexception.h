@@ -51,7 +51,27 @@ class ConnectionException : public jexception::RuntimeException {
 		 *
 		 */
 		ConnectionException(jexception::Exception *exception, std::string reason);
-
+ 
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> ConnectionException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::ConnectionException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> ConnectionException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::ConnectionException");
+    }
+		
 		/**
 		 * \brief Destrutor virtual.
 		 *

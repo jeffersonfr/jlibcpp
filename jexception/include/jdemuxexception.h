@@ -53,6 +53,26 @@ class DemuxException : public jexception::RuntimeException {
 		DemuxException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> DemuxException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::DemuxException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> DemuxException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::DemuxException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */

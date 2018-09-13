@@ -53,6 +53,26 @@ class TimeoutException : public jexception::RuntimeException {
 		TimeoutException(jexception::Exception *exception, std::string reason);
 
 		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> TimeoutException(const std::string &fmt, T ...vs):
+      Exception(fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::TimeoutException");
+    }
+		
+		/**
+		 * \brief Construtor.
+		 *
+		 */
+    template <typename... T> TimeoutException(Exception *exception, const std::string &fmt, T ...vs):
+      Exception(exception, fmt, vs...)
+    {
+      jcommon::Object::SetClassName("jexception::TimeoutException");
+    }
+		
+		/**
 		 * \brief Destrutor virtual.
 		 *
 		 */
