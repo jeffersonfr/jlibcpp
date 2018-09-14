@@ -22,6 +22,8 @@
 
 #include "jexception/jruntimeexception.h"
 
+#include <typeinfo>
+
 namespace jexception {
 
 /**

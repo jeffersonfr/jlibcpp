@@ -47,7 +47,7 @@ PREFIX		= /usr
 
 TARGET		= $(BUILD)$(PREFIX)
 
-ECHO			= echo -e
+ECHO			= echo
 
 OK 				= \033[30;32mOK\033[m
 

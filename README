@@ -29,14 +29,20 @@ all:
 
 ## Makefile -- with pkgconfig -- end ##
 
-:Dependencies
+: Dependencies
 
-  libcairo2-dev libjpeg9-dev uuid-dev libssl-dev
+:GERAL
 
-:UI Dependencies
+  uuid-dev libssl-dev 
+
+:GUI
+
+  libcairo2-dev libjpeg9-dev libheif-dev libwebp-dev
+
+:MEDIA
 
 	libsdl2-dev, libsfml2-dev, libX11-dev, libgtk3-dev, liballegro5-dev,
-  libasound2-dev
+  libasound2-dev libx11-xcb-dev
 
 :Problems
 

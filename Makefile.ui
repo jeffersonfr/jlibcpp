@@ -17,27 +17,35 @@
 #   Free Software Foundation, Inc.,                                       *
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
-GENERIC_OBJS = \
-		 ../generic/genericprovider_bmp.o\
-		 ../generic/genericprovider_gif.o\
-		 ../generic/genericprovider_ico.o\
-		 ../generic/genericprovider_jpg.o\
-		 ../generic/genericprovider_pcx.o\
-		 ../generic/genericprovider_png.o\
-		 ../generic/genericprovider_ppm.o\
-		 ../generic/genericprovider_tga.o\
-		 ../generic/genericprovider_xbm.o\
-		 ../generic/genericprovider_xpm.o\
-
 CCFLAGS 	+= \
      -Ijgui/binds \
 	   `pkg-config --cflags cairo` \
+	   `pkg-config --cflags libheif` \
+	   `pkg-config --cflags libwebp` \
 
 LDFLAGS		+= \
-	   `pkg-config --libs cairo` \
+    `pkg-config --libs cairo` \
+    `pkg-config --libs libheif` \
+    `pkg-config --libs libwebp` \
+    -ljpeg \
 
 REQUIRES	+= \
 		 cairo \
+
+OBJS_jgui	+= \
+     binds/generic/genericprovider_bmp.o \
+		 binds/generic/genericprovider_gif.o \
+		 binds/generic/genericprovider_ico.o \
+		 binds/generic/genericprovider_jpg.o \
+		 binds/generic/genericprovider_pcx.o \
+		 binds/generic/genericprovider_png.o \
+		 binds/generic/genericprovider_ppm.o \
+		 binds/generic/genericprovider_tga.o \
+		 binds/generic/genericprovider_xbm.o \
+		 binds/generic/genericprovider_xpm.o \
+		 binds/generic/genericprovider_heif.o \
+		 binds/generic/genericprovider_webp.o \
+		 #binds/generic/genericprovider_flif.o \
 
 # choose the graphic engine
 
@@ -57,10 +65,10 @@ ifeq ($(ENABLE_GRAPHICS),sdl2)
 		 sdl2 \
 
 	OBJS_gfx	+= \
-		 $(GENERIC_OBJS)\
 		 sdl2application.o\
 
-	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
@@ -78,10 +86,10 @@ ifeq ($(ENABLE_GRAPHICS),sfml2)
 	REQUIRES	+= \
 
 	OBJS_gfx	+= \
-		 $(GENERIC_OBJS)\
 		 sfml2application.o\
 
-	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
@@ -99,10 +107,10 @@ ifeq ($(ENABLE_GRAPHICS),xlib)
 	REQUIRES	+= \
 
 	OBJS_gfx	+= \
-		 $(GENERIC_OBJS)\
 		 xlibapplication.o\
 
-	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
@@ -120,10 +128,10 @@ ifeq ($(ENABLE_GRAPHICS),xcb)
 	REQUIRES	+= \
 
 	OBJS_gfx	+= \
-		 $(GENERIC_OBJS)\
 		 xcbapplication.o\
 
-	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
@@ -142,10 +150,10 @@ ifeq ($(ENABLE_GRAPHICS),gtk3)
 	REQUIRES	+= \
 
 	OBJS_gfx	+= \
-		 $(GENERIC_OBJS)\
 		 gtk3application.o\
 
-	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
@@ -164,10 +172,10 @@ ifeq ($(ENABLE_GRAPHICS),allegro5)
 	REQUIRES	+= \
 
 	OBJS_gfx	+= \
-		 $(GENERIC_OBJS)\
 		 allegro5application.o\
 
-	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
@@ -187,10 +195,10 @@ ifeq ($(ENABLE_GRAPHICS),gl)
 	REQUIRES	+= \
 
 	OBJS_gfx	+= \
-		 $(GENERIC_OBJS)\
 		 glapplication.o\
 
-	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
 
@@ -212,10 +220,9 @@ ifeq ($(ENABLE_GRAPHICS),rpi)
 	REQUIRES	+= \
 
 	OBJS_gfx	+= \
-		 $(GENERIC_OBJS)\
 		 rpiapplication.o\
 
-	OBJS_jgui	= $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
-
