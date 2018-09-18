@@ -35,7 +35,10 @@
 #include "generic/include/genericprovider_xpm.h"
 #include "generic/include/genericprovider_heif.h"
 #include "generic/include/genericprovider_webp.h"
-// #include "generic/include/genericprovider_flif.h"
+#include "generic/include/genericprovider_jp2000.h"
+#include "generic/include/genericprovider_svg.h"
+#include "generic/include/genericprovider_tif.h"
+#include "generic/include/genericprovider_flif.h"
 
 #include <string.h>
 
@@ -193,6 +196,18 @@ BufferedImage::BufferedImage(std::string file):
 	}
 
 	if (cairo_surface == nullptr) {
+		cairo_surface = create_svg_surface_from_file(file.c_str());
+	}
+
+	if (cairo_surface == nullptr) {
+		cairo_surface = create_tif_surface_from_file(file.c_str());
+	}
+
+	if (cairo_surface == nullptr) {
+		cairo_surface = create_jp2000_surface_from_file(file.c_str());
+	}
+
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_bmp_surface_from_file(file.c_str());
 	}
 
@@ -205,7 +220,7 @@ BufferedImage::BufferedImage(std::string file):
 	}
 
 	if (cairo_surface == nullptr) {
-		// cairo_surface = create_flif_surface_from_file(file.c_str());
+		cairo_surface = create_flif_surface_from_file(file.c_str());
 	}
 
 	if (cairo_surface == nullptr) {
@@ -301,6 +316,18 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
 	}
 
 	if (cairo_surface == nullptr) {
+		cairo_surface = create_svg_surface_from_data(buffer, count);
+	}
+
+	if (cairo_surface == nullptr) {
+		cairo_surface = create_tif_surface_from_data(buffer, count);
+	}
+
+	if (cairo_surface == nullptr) {
+		cairo_surface = create_jp2000_surface_from_data(buffer, count);
+	}
+
+	if (cairo_surface == nullptr) {
 		cairo_surface = create_bmp_surface_from_data(buffer, count);
 	}
 
@@ -313,7 +340,7 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
 	}
 
 	if (cairo_surface == nullptr) {
-		// cairo_surface = create_flif_surface_from_data(buffer, count);
+		cairo_surface = create_flif_surface_from_data(buffer, count);
 	}
 
 	if (cairo_surface == nullptr) {

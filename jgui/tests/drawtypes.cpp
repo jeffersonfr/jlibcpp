@@ -39,7 +39,8 @@ class Main : public jgui::Window {
 			_types["PPM"] = new jgui::BufferedImage("images/image.ppm");
 			_types["TGA"] = new jgui::BufferedImage("images/image.tga");
 			_types["XBM"] = new jgui::BufferedImage("images/image.xbm");
-			_types["XPM"] = new jgui::BufferedImage("images/image.xpm");
+			_types["XPM"] = new jgui::BufferedImage("images/image.tif");
+			// _types["XPM"] = new jgui::BufferedImage("images/image.xpm");
 		}
 
 		virtual ~Main()
