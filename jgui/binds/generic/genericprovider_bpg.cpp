@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "generic/include/genericprovider_svg.h"
+#include "generic/include/genericprovider_bpg.h"
 
 #include <jio/jfile.h>
 
@@ -25,11 +25,13 @@
 #include <string.h>
 #include <stdio.h>
 
-#include <librsvg-2.0/librsvg/rsvg.h>
+extern "C" {
+#include <libbpg.h>
+}
 
 namespace jgui {
 
-cairo_surface_t * create_svg_surface_from_file(const char *filename)
+cairo_surface_t * create_bpg_surface_from_file(const char *filename)
 {
   jio::File *file = jio::File::OpenFile(filename, (jio::jfile_flags_t)(jio::JFF_READ_ONLY | jio::JFF_LARGEFILE));
 
@@ -47,52 +49,80 @@ cairo_surface_t * create_svg_surface_from_file(const char *filename)
     count = count + length;
   }
 
-  cairo_surface_t *surface = create_svg_surface_from_data(buffer, count);
+  cairo_surface_t *surface = create_bpg_surface_from_data(buffer, count);
 
   delete [] buffer;
 
   return surface;
 }
 
-cairo_surface_t * create_svg_surface_from_data(uint8_t *data, int size) 
+cairo_surface_t * create_bpg_surface_from_data(uint8_t *data, int size) 
 {
-  if (memcmp(data, "<?xml", 5) != 0) {
+  BPGDecoderContext 
+    *img = bpg_decoder_open();
+
+  if (img == nullptr) {
     return nullptr;
   }
 
-  // rsvg_init();
+  if (bpg_decoder_decode(img, data, size) < 0) {
+    bpg_decoder_close(img);
 
-  RsvgHandle 
-    *svg = rsvg_handle_new_from_data(data, size, NULL);
-    // *svg = svg_new_from_file (file, &err);
-  RsvgDimensionData 
-    dimensions;
+    return nullptr;
+  }
 
-  rsvg_handle_get_dimensions(svg, &dimensions);
+  BPGImageInfo 
+    info;
+  int 
+    sw, 
+    sh;
 
-  int
-    sw = dimensions.width,
-    sh = dimensions.height;
-  float
-    scale = 72.0f; // pick_best_scape(sw, sh, dw, dh);
+  bpg_decoder_get_info(img, &info);
 
-  sw = ((float)sw * scale);
-  sh = ((float)sh * scale);
+  sw = info.width;
+  sh = info.height;
 
   cairo_surface_t 
     *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, sw, sh);
 
-  if (surface == nullptr) {
+	if (surface == nullptr) {
+    bpg_decoder_close(img);
+
     return nullptr;
+	}
+
+	uint8_t 
+    *dst = cairo_image_surface_get_data(surface);
+
+	if (dst == nullptr) {
+    bpg_decoder_close(img);
+
+		return nullptr;
+	}
+
+  bpg_decoder_start(img, BPG_OUTPUT_FORMAT_RGBA32);
+
+  uint8_t 
+    *line = dst;
+
+  for (int y=0; y<sh; y++) {
+    bpg_decoder_get_line(img, line);
+
+    line = line + 4*sw;
   }
 
-  cairo_t *cr = cairo_create(surface);
+	for (int i=0; i<sw*sh; i++) {
+    uint8_t p = dst[2];
 
-  cairo_scale(cr, scale, scale);
-  rsvg_handle_render_cairo(svg, cr);
+		dst[2] = dst[0];
+		dst[0] = p;
 
-  cairo_surface_mark_dirty(surface);
-  cairo_destroy(cr);
+		dst = dst + 4;
+	}
+
+	cairo_surface_mark_dirty(surface);
+
+  bpg_decoder_close(img);
 
   return surface;
 }

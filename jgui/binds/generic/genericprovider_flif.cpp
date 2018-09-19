@@ -23,13 +23,13 @@
 
 #include <fstream>
 
-#include <flif.h>
+// #include <flif.h>
 
 namespace jgui {
 
 cairo_surface_t * create_flif_surface_from_file(const char *filename) 
 {
-  jio::File *file = jio::File::OpenFile(file, (jio::jfile_flags_t)(jio::JFF_READ_ONLY | jio::JFF_LARGEFILE));
+  jio::File *file = jio::File::OpenFile(filename, (jio::jfile_flags_t)(jio::JFF_READ_ONLY | jio::JFF_LARGEFILE));
 
   if (file == nullptr) {
     return nullptr;
@@ -41,7 +41,7 @@ cairo_surface_t * create_flif_surface_from_file(const char *filename)
     length,
     count = 0;
 
-  while ((length = file->Read(buffer + count, 4098)) > 0) {
+  while ((length = file->Read((char *)buffer + count, 4098)) > 0) {
     count = count + length;
   }
 

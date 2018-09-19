@@ -39,8 +39,12 @@ class Main : public jgui::Window {
 			_types["PPM"] = new jgui::BufferedImage("images/image.ppm");
 			_types["TGA"] = new jgui::BufferedImage("images/image.tga");
 			_types["XBM"] = new jgui::BufferedImage("images/image.xbm");
-			_types["XPM"] = new jgui::BufferedImage("images/image.tif");
-			// _types["XPM"] = new jgui::BufferedImage("images/image.xpm");
+			_types["XPM"] = new jgui::BufferedImage("images/image.xpm");
+      _types["SVG"] = new jgui::BufferedImage("images/image.svg");
+      _types["JP2"] = new jgui::BufferedImage("images/image.jp2");
+      _types["HEIC"] = new jgui::BufferedImage("images/image.heic");
+      _types["BPG"] = new jgui::BufferedImage("images/image.bpg");
+      _types["TIF"] = new jgui::BufferedImage("images/image.tif");
 		}
 
 		virtual ~Main()
@@ -75,11 +79,11 @@ class Main : public jgui::Window {
           x = count%items,
 				  y = count/items;
 
-				g->DrawImage(image, x*(bs+gap)+gap, y*(bs+gap)+120, bs, bs);
+				g->DrawImage(image, x*(bs+gap)+gap, y*(bs+gap)+16, bs, bs);
 				g->SetColor(jgui::Color::Black);
-				g->FillRectangle(x*(bs+gap)+gap, y*(bs+gap)+120, 36, 24);
+				g->FillRectangle(x*(bs+gap)+gap, y*(bs+gap)+16, 36, 24);
 				g->SetColor(jgui::Color::White);
-				g->DrawString(i->first, x*(bs+gap)+gap, y*(bs+gap)+120);
+				g->DrawString(i->first, x*(bs+gap)+gap, y*(bs+gap)+16);
 
 				count = count + 1;
 			}

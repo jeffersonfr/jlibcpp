@@ -22,12 +22,17 @@ CCFLAGS 	+= \
 	   `pkg-config --cflags cairo` \
 	   `pkg-config --cflags libheif` \
 	   `pkg-config --cflags libwebp` \
+     `pkg-config --cflags librsvg-2.0` \
 
 LDFLAGS		+= \
-    `pkg-config --libs cairo` \
-    `pkg-config --libs libheif` \
-    `pkg-config --libs libwebp` \
-    -ljpeg \
+     `pkg-config --libs cairo` \
+     `pkg-config --libs libheif` \
+     `pkg-config --libs libwebp` \
+     `pkg-config --libs librsvg-2.0` \
+     -ljasper \
+     -ltiffxx \
+     -ljpeg \
+     /usr/local/lib/libbpg.a \
 
 REQUIRES	+= \
 		 cairo \
@@ -45,7 +50,11 @@ OBJS_jgui	+= \
 		 binds/generic/genericprovider_xpm.o \
 		 binds/generic/genericprovider_heif.o \
 		 binds/generic/genericprovider_webp.o \
-		 #binds/generic/genericprovider_flif.o \
+		 binds/generic/genericprovider_jp2000.o \
+		 binds/generic/genericprovider_svg.o \
+		 binds/generic/genericprovider_tif.o \
+		 binds/generic/genericprovider_bpg.o \
+		 binds/generic/genericprovider_flif.o \
 
 # choose the graphic engine
 
