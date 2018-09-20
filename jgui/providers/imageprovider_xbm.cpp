@@ -43,7 +43,8 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#include "generic/include/genericprovider_xbm.h"
+#include "providers/include/imageprovider_xbm.h"
+
 #include "jio/jfileinputstream.h"
 #include "jio/jmemoryinputstream.h"
 #include "jio/jbufferedreader.h"

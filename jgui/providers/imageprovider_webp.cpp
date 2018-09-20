@@ -17,21 +17,17 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "generic/include/genericprovider_tif.h"
+#include "providers/include/imageprovider_webp.h"
 
-#include <jio/jfile.h>
+#include "jio/jfile.h"
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#include <fstream>
 
-#include <tiffio.h>
-#include <tiffio.hxx>
-#include <sstream>
+#include <webp/decode.h>
 
 namespace jgui {
 
-cairo_surface_t * create_tif_surface_from_file(const char *filename)
+cairo_surface_t * create_webp_surface_from_file(const char *filename) 
 {
   jio::File *file = jio::File::OpenFile(filename, (jio::jfile_flags_t)(jio::JFF_READ_ONLY | jio::JFF_LARGEFILE));
 
@@ -49,44 +45,40 @@ cairo_surface_t * create_tif_surface_from_file(const char *filename)
     count = count + length;
   }
 
-  cairo_surface_t *surface = create_tif_surface_from_data(buffer, count);
+  cairo_surface_t *surface = create_webp_surface_from_data(buffer, count);
 
   delete [] buffer;
 
   return surface;
 }
 
-cairo_surface_t * create_tif_surface_from_data(uint8_t *data, int size) 
+cairo_surface_t * create_webp_surface_from_data(uint8_t *data, int size)
 {
-  uint16_t tiff_magic = (data[0] | (data[1] << 8));
-
-  if ((tiff_magic != TIFF_BIGENDIAN) && (tiff_magic != TIFF_LITTLEENDIAN) && (MDI_LITTLEENDIAN != tiff_magic)) {
-    return nullptr;
-  }
-
-  std::string str((char *)data, size);
-  std::istringstream in(str);
-
-  TIFF 
-    *tif = TIFFStreamOpen("MemTIFF", &in);
-  
-  if (!tif) {
-    return nullptr;
-  }
-
-  int 
+  int
     sw,
     sh;
 
-  TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &sw);
-  TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &sh);
+  if (WebPGetInfo(data, size, &sw, &sh) == false) {
+    return nullptr;
+  }
+
+  if (sw <= 0 || sh <= 0) {
+    return nullptr;
+  }
+
+  uint8_t 
+    *src = WebPDecodeRGBA(data, size, &sw, &sh);
+
+  if (src == nullptr) {
+    return nullptr;
+  }
 
   cairo_surface_t 
     *surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, sw, sh);
 
-  if (surface == nullptr) {
-    return nullptr;
-  }
+	if (surface == nullptr) {
+		return nullptr;
+	}
 
 	uint8_t 
     *dst = cairo_image_surface_get_data(surface);
@@ -95,23 +87,24 @@ cairo_surface_t * create_tif_surface_from_data(uint8_t *data, int size)
 		return nullptr;
 	}
 
-  TIFFReadRGBAImageOriented(tif, sw, sh, (uint32 *)(dst), ORIENTATION_TOPLEFT, 0);
+  int 
+    length = sw*sh;
 
-	for (int i=0; i<sw*sh; i++) {
-    uint8_t p = dst[2];
+  for (int i=0; i<length; i++) {
+    dst[0] = src[2];
+    dst[1] = src[1];
+    dst[2] = src[0];
+    dst[3] = src[3];
 
-		dst[2] = dst[0];
-		dst[0] = p;
+    dst = dst + 4;
+    src = src + 4;
+  }
 
-		dst = dst + 4;
-	}
+	cairo_surface_mark_dirty(surface);
 
-  cairo_surface_mark_dirty(surface);
-
-  TIFFClose(tif);
+  // WebPFree(src);
 
   return surface;
 }
 
 }
-

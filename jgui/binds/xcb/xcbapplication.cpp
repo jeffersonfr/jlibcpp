@@ -17,11 +17,11 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "include/nativeapplication.h"
-#include "include/nativewindow.h"
+#include "binds/include/nativeapplication.h"
+#include "binds/include/nativewindow.h"
 
-#include "jgui/jfont.h"
 #include "jgui/jbufferedimage.h"
+#include "jgui/jfont.h"
 #include "jcommon/jproperties.h"
 #include "jexception/jruntimeexception.h"
 #include "jexception/jillegalargumentexception.h"

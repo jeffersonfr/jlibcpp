@@ -34,6 +34,8 @@
 #include <X11/Xatom.h>
 #include <X11/extensions/Xrandr.h>
 
+#include <vdpau/vdpau_x11.h>
+
 namespace jgui {
 
 // WINDOW PARAMS
@@ -43,6 +45,27 @@ struct cursor_params_t {
   int hot_x;
   int hot_y;
 };
+
+VdpDevice vdp_device;
+VdpPresentationQueueTarget vdp_target;
+VdpPresentationQueue vdp_queue;
+VdpOutputSurface vdp_surface;
+VdpGetProcAddress *vdp_proc_address;
+
+VdpPresentationQueueTargetCreateX11 *PresentationQueueTargetCreate = NULL;
+VdpGetErrorString *GetErrorString = NULL;
+VdpDeviceDestroy *DeviceDestroy = NULL;
+VdpGetInformationString *GetInformationString = NULL;
+VdpPresentationQueueTargetDestroy *PresentationQueueTargetDestroy = NULL;
+VdpOutputSurfaceCreate *OutputSurfaceCreate = NULL;
+VdpOutputSurfaceDestroy *OutputSurfaceDestroy = NULL;
+VdpOutputSurfacePutBitsNative *OutputSurfacePutBitsNative = NULL;
+VdpOutputSurfaceRenderOutputSurface *OutputSurfaceRenderOutputSurface = NULL;
+VdpPresentationQueueCreate *PresentationQueueCreate = NULL;
+VdpPresentationQueueDestroy *PresentationQueueDestroy = NULL;
+VdpPresentationQueueDisplay *PresentationQueueDisplay = NULL;
+VdpPresentationQueueGetTime *PresentationQueueGetTime = NULL;
+VdpPresentationQueueBlockUntilSurfaceIdle *PresentationQueueBlockUntilSurfaceIdle = NULL;
 
 /** \brief */
 static ::Display *_display = nullptr;
@@ -405,6 +428,10 @@ NativeApplication::NativeApplication():
 
 NativeApplication::~NativeApplication()
 {
+  PresentationQueueDestroy(vdp_queue);
+  PresentationQueueTargetDestroy(vdp_target);
+  DeviceDestroy(vdp_device);
+
   XUnmapWindow(_display, _window);
   XDestroyWindow(_display, _window);
   XFlush(_display);
@@ -479,42 +506,21 @@ void NativeApplication::InternalPaint()
     return;
   }
 
-	int 
-    screen = DefaultScreen(_display);
-	::Visual 
-    *visual = DefaultVisual(_display, screen);
-	uint32_t 
-    depth = DefaultDepth(_display, screen);
+  uint32_t pitches[] = {
+    dw*4,
+    dw*4,
+    dw*4,
+    dw*4
+  };
+  VdpTime
+    vdp_time = 0;
 
-	XImage *image = XCreateImage(_display, visual, depth, ZPixmap, 0, (char *)data, dw, dh, 32, 0);
+  // TODO::
+  PresentationQueueBlockUntilSurfaceIdle(vdp_queue, vdp_surface, &vdp_time);
+  OutputSurfacePutBitsNative(vdp_surface, (void const *const *)data, pitches, nullptr);
+  PresentationQueueGetTime(vdp_queue, &vdp_time);
+  PresentationQueueDisplay(vdp_queue, vdp_surface, 0, 0, vdp_time);
 
-	if (image == nullptr) {
-    delete buffer;
-
-		return;
-	}
-
-	Pixmap 
-    pixmap = XCreatePixmap(_display, XRootWindow(_display, screen), dw, dh, depth);
-	GC 
-    gc = XCreateGC(_display, pixmap, 0, nullptr);
-	
-	// XClearWindow(*(::Window *)_surface);
-	
-	// draw image to pixmap
-	XPutImage(_display, pixmap, gc, image, 0, 0, 0, 0, dw, dh);
-	XCopyArea(_display, pixmap, _window, gc, 0, 0, dw, dh, 0, 0);
-
-	// XDestroyImage(image);
-	XFreePixmap(_display, pixmap);
-
-	// XFlush(_display);
-
-	// INFO:: wait x11 process all events
-	// True:: discards all events remaing
-	// False:: not discards events remaing
-	// XSync(_display, True);
-    
   g_window->Flush();
 
   delete buffer;
@@ -781,6 +787,8 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	attr.event_mask = 0;
 	attr.override_redirect = False;
 
+  XLockDisplay(_display);
+
 	int 
     screen = DefaultScreen(_display);
 
@@ -875,6 +883,56 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
   _visible_bounds.height = height;
 
   XMapRaised(_display, _window);
+
+  VdpStatus 
+    status = vdp_device_create_x11(_display, DefaultScreen(_display), &vdp_device, &vdp_proc_address);
+  
+  if (status) {
+    XUnlockDisplay(_display);
+    
+		throw jexception::RuntimeException("Unable to create a vdpau device");
+  }
+
+#define CHECK_STATUS(x) \
+  if (x) { \
+    XUnlockDisplay(_display); \
+		throw jexception::RuntimeException("Unable to load the current vdpau function"); \
+  } \
+
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_TARGET_CREATE_X11, (void **)&PresentationQueueTargetCreate));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_GET_ERROR_STRING, (void **)&GetErrorString));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_GET_INFORMATION_STRING, (void **)&GetInformationString));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_DEVICE_DESTROY, (void **)&DeviceDestroy));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_TARGET_DESTROY, (void **)&PresentationQueueTargetDestroy));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_CREATE, (void **)&OutputSurfaceCreate));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_DESTROY, (void **)&OutputSurfaceDestroy));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_PUT_BITS_NATIVE, (void **)&OutputSurfacePutBitsNative));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_OUTPUT_SURFACE_RENDER_OUTPUT_SURFACE, (void **)&OutputSurfaceRenderOutputSurface));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_CREATE, (void **)&PresentationQueueCreate));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_CREATE, (void **)&PresentationQueueDestroy));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_DISPLAY, (void **)&PresentationQueueDisplay));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_GET_TIME, (void **)&PresentationQueueGetTime));
+  CHECK_STATUS(vdp_proc_address(vdp_device, VDP_FUNC_ID_PRESENTATION_QUEUE_BLOCK_UNTIL_SURFACE_IDLE, (void **)&PresentationQueueBlockUntilSurfaceIdle));
+  
+  status = PresentationQueueTargetCreate(vdp_device,_window, &vdp_target);
+  status = PresentationQueueCreate(vdp_device, vdp_target, &vdp_queue);
+
+  if (status) {
+    XUnlockDisplay(_display);
+    
+		throw jexception::RuntimeException("Unable to create a presentation queue");
+  }
+
+  status = OutputSurfaceCreate(vdp_device, VDP_RGBA_FORMAT_B8G8R8A8, width, height, &vdp_surface);
+
+  if (status) {
+    XUnlockDisplay(_display);
+
+		throw jexception::RuntimeException("Unable to create an output surface");
+  }
+
+  XUnlockDisplay(_display);
+
 	XMapWindow(_display, _window);
 }
 

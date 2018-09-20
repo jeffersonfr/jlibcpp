@@ -18,7 +18,7 @@
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
 CCFLAGS 	+= \
-     -Ijgui/binds \
+     -Ijgui \
 	   `pkg-config --cflags cairo` \
 	   `pkg-config --cflags libheif` \
 	   `pkg-config --cflags libwebp` \
@@ -38,23 +38,23 @@ REQUIRES	+= \
 		 cairo \
 
 OBJS_jgui	+= \
-     binds/generic/genericprovider_bmp.o \
-		 binds/generic/genericprovider_gif.o \
-		 binds/generic/genericprovider_ico.o \
-		 binds/generic/genericprovider_jpg.o \
-		 binds/generic/genericprovider_pcx.o \
-		 binds/generic/genericprovider_png.o \
-		 binds/generic/genericprovider_ppm.o \
-		 binds/generic/genericprovider_tga.o \
-		 binds/generic/genericprovider_xbm.o \
-		 binds/generic/genericprovider_xpm.o \
-		 binds/generic/genericprovider_heif.o \
-		 binds/generic/genericprovider_webp.o \
-		 binds/generic/genericprovider_jp2000.o \
-		 binds/generic/genericprovider_svg.o \
-		 binds/generic/genericprovider_tif.o \
-		 binds/generic/genericprovider_bpg.o \
-		 binds/generic/genericprovider_flif.o \
+     providers/imageprovider_bmp.o \
+		 providers/imageprovider_gif.o \
+		 providers/imageprovider_ico.o \
+		 providers/imageprovider_jpg.o \
+		 providers/imageprovider_pcx.o \
+		 providers/imageprovider_png.o \
+		 providers/imageprovider_ppm.o \
+		 providers/imageprovider_tga.o \
+		 providers/imageprovider_xbm.o \
+		 providers/imageprovider_xpm.o \
+		 providers/imageprovider_heif.o \
+		 providers/imageprovider_webp.o \
+		 providers/imageprovider_jp2000.o \
+		 providers/imageprovider_svg.o \
+		 providers/imageprovider_tif.o \
+		 providers/imageprovider_bpg.o \
+		 providers/imageprovider_flif.o \
 
 # choose the graphic engine
 
@@ -235,3 +235,26 @@ ifeq ($(ENABLE_GRAPHICS),rpi)
      $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
 
 endif
+
+ifeq ($(ENABLE_GRAPHICS),vdpau)
+	CCFLAGS 	+= \
+
+	LDFLAGS		+= \
+     `pkg-config --libs x11` \
+     `pkg-config --libs vdpau` \
+     -ljpeg \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DVDPAU_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 vdpauapplication.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+

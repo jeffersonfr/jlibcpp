@@ -17,7 +17,8 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "generic/include/genericprovider_tga.h"
+#include "providers/include/imageprovider_tga.h"
+
 #include "jgui/jgraphics.h"
 #include "jio/jfileinputstream.h"
 #include "jio/jmemoryinputstream.h"

@@ -49,7 +49,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */ 
-#include "generic/include/genericprovider_xpm.h"
+#include "providers/include/imageprovider_xpm.h"
+
 #include "jio/jfileinputstream.h"
 #include "jio/jmemoryinputstream.h"
 #include "jio/jbufferedreader.h"

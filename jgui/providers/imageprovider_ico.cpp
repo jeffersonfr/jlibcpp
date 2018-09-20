@@ -28,7 +28,8 @@ Notes: Much of the structure information comes from
 	that book are noted with "GFF".
        A "DIB" is a "Device Independent Bitmap".
 ****/
-#include "generic/include/genericprovider_ico.h"
+#include "providers/include/imageprovider_ico.h"
+
 #include "jio/jfileinputstream.h"
 #include "jio/jmemoryinputstream.h"
 #include "jlogger/jloggerlib.h"

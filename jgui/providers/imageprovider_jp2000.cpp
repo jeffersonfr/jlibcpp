@@ -17,7 +17,7 @@
  *   Free Software Foundation, Inc.,                                       *
  *   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
  ***************************************************************************/
-#include "generic/include/genericprovider_jp2000.h"
+#include "providers/include/imageprovider_jp2000.h"
 
 #include <jio/jfile.h>
 
@@ -43,14 +43,14 @@ static void init_jasper()
     fmtops.decode = jp2_decode;
     fmtops.encode = jp2_encode;
     fmtops.validate = jp2_validate;
-    jas_image_addfmt(fmtid, "jp2", "jp2", (const char *)"JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)", &fmtops);
+    jas_image_addfmt(fmtid, (char *)"jp2", (char *)"jp2", (char *)"JPEG-2000 JP2 File Format Syntax (ISO/IEC 15444-1)", &fmtops);
 
     ++fmtid;
 
     fmtops.decode = jpc_decode;
     fmtops.encode = jpc_encode;
     fmtops.validate = jpc_validate;
-    jas_image_addfmt(fmtid, "jpc", "jpc", (const char *)"JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)", &fmtops);
+    jas_image_addfmt(fmtid, (char *)"jpc", (char *)"jpc", (char *)"JPEG-2000 Code Stream Syntax (ISO/IEC 15444-1)", &fmtops);
 
     ++fmtid;
   }
