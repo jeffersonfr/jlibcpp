@@ -50,6 +50,7 @@ VdpDevice vdp_device;
 VdpPresentationQueueTarget vdp_target;
 VdpPresentationQueue vdp_queue;
 VdpOutputSurface vdp_surface;
+VdpTime vdp_time = 0;
 VdpGetProcAddress *vdp_proc_address;
 
 VdpPresentationQueueTargetCreateX11 *PresentationQueueTargetCreate = NULL;
@@ -506,20 +507,31 @@ void NativeApplication::InternalPaint()
     return;
   }
 
-  uint32_t pitches[] = {
-    dw*4,
-    dw*4,
-    dw*4,
-    dw*4
+  const void *src[1] = {
+    data
   };
-  VdpTime
-    vdp_time = 0;
+  uint32_t pitches[1] = {
+    (uint32_t)dw*4
+  };
+  VdpTime 
+    this_time = 0;
+  uint32_t
+    period = 30000000;
 
-  // TODO::
   PresentationQueueBlockUntilSurfaceIdle(vdp_queue, vdp_surface, &vdp_time);
-  OutputSurfacePutBitsNative(vdp_surface, (void const *const *)data, pitches, nullptr);
-  PresentationQueueGetTime(vdp_queue, &vdp_time);
-  PresentationQueueDisplay(vdp_queue, vdp_surface, 0, 0, vdp_time);
+  OutputSurfacePutBitsNative(vdp_surface, (void const *const *)src, pitches, nullptr);
+
+  if (!vdp_time) {
+    PresentationQueueGetTime(vdp_queue, &vdp_time);
+    
+    vdp_time += 30000000;
+  } else {
+    vdp_time += period;
+  }
+
+  this_time = vdp_time;
+
+  PresentationQueueDisplay(vdp_queue, vdp_surface, 0, 0, this_time);
 
   g_window->Flush();
 

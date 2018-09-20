@@ -21,7 +21,7 @@
 #include "jexception/jnullpointerexception.h"
 
 #ifdef JGUI_UI
-#include "include/nativeapplication.h"
+#include "binds/include/nativeapplication.h"
 #endif
 
 #include <mutex>

@@ -23,7 +23,7 @@
 #include "jexception/jnullpointerexception.h"
 
 #ifdef JGUI_UI
-#include "include/nativewindow.h"
+#include "binds/include/nativewindow.h"
 #endif
 
 #include <algorithm>
