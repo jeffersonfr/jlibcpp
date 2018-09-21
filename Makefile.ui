@@ -258,3 +258,24 @@ ifeq ($(ENABLE_GRAPHICS),vdpau)
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),vnc)
+	CCFLAGS 	+= \
+
+	LDFLAGS		+= \
+     `pkg-config --libs libvncserver` \
+     -ljpeg \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DVNC_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 vncapplication.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
