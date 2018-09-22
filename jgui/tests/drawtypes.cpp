@@ -26,25 +26,35 @@ class Main : public jgui::Window {
 	private:
 		std::map<std::string, jgui::Image *> _types;
 
+  protected:
+    virtual void LoadImage(std::string format)
+    {
+      try {
+			  _types[format] = new jgui::BufferedImage("images/image." + format);
+      } catch (...) {
+			  _types[format] = nullptr;
+      }
+    }
+
 	public:
 		Main():
-			jgui::Window(/*"Image Types", */0, 0, 1280, 720)
+			jgui::Window(0, 0, 1280, 720)
 		{
-			_types["BMP"] = new jgui::BufferedImage("images/image.bmp");
-			_types["GIF"] = new jgui::BufferedImage("images/image.gif");
-			_types["ICO"] = new jgui::BufferedImage("images/image.ico");
-			_types["JPG"] = new jgui::BufferedImage("images/image.jpg");
-			_types["PCX"] = new jgui::BufferedImage("images/image.pcx");
-			_types["PNG"] = new jgui::BufferedImage("images/image.png");
-			_types["PPM"] = new jgui::BufferedImage("images/image.ppm");
-			_types["TGA"] = new jgui::BufferedImage("images/image.tga");
-			_types["XBM"] = new jgui::BufferedImage("images/image.xbm");
-			_types["XPM"] = new jgui::BufferedImage("images/image.xpm");
-      _types["SVG"] = new jgui::BufferedImage("images/image.svg");
-      _types["JP2"] = new jgui::BufferedImage("images/image.jp2");
-      _types["HEIC"] = new jgui::BufferedImage("images/image.heic");
-      _types["BPG"] = new jgui::BufferedImage("images/image.bpg");
-      _types["TIF"] = new jgui::BufferedImage("images/image.tif");
+      LoadImage("bmp");
+      LoadImage("gif");
+      LoadImage("ico");
+      LoadImage("jpg");
+      LoadImage("pcx");
+      LoadImage("png");
+      LoadImage("pnm");
+      LoadImage("tga");
+      LoadImage("xbm");
+      LoadImage("xpm");
+      LoadImage("svg");
+      LoadImage("jp2");
+      LoadImage("heic");
+      LoadImage("bpg");
+      LoadImage("tif");
 		}
 
 		virtual ~Main()

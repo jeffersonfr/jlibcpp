@@ -1,0 +1,250 @@
+#**************************************************************************
+#   Copyright (C) 2005 by Jeff Ferr                                       *
+#   root@sat                                                              *
+#                                                                         *
+#   This program is free software; you can redistribute it and/or modify  *
+#   it under the terms of the GNU General Public License as published by  *
+#   the Free Software Foundation; either version 2 of the License, or     *
+#   (at your option) any later version.                                   *
+#                                                                         *
+#   This program is distributed in the hope that it will be useful,       *
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+#   GNU General Public License for more details.                          *
+#                                                                         *
+#   You should have received a copy of the GNU General Public License     *
+#   along with this program; if not, write to the                         *
+#   Free Software Foundation, Inc.,                                       *
+#   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+#**************************************************************************
+ifeq ($(findstring bmp, $(ENABLE_IMAGE)), bmp)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DBMP_IMAGE \
+
+	OBJS_jgui	+= \
+     providers/imageprovider_bmp.o \
+
+endif
+
+ifeq ($(findstring gif, $(ENABLE_IMAGE)), gif)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DGIF_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_gif.o \
+
+endif
+
+ifeq ($(findstring ico, $(ENABLE_IMAGE)), ico)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DICO_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_ico.o \
+
+endif
+
+ifeq ($(findstring jpg, $(ENABLE_IMAGE)), jpg)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+     -ljpeg \
+
+	DEFINES		+= \
+		 -DJPG_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_jpg.o \
+
+endif
+
+ifeq ($(findstring pcx, $(ENABLE_IMAGE)), pcx)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DPCX_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_pcx.o \
+
+endif
+
+ifeq ($(findstring png, $(ENABLE_IMAGE)), png)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DPNG_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_png.o \
+
+endif
+
+ifeq ($(findstring ppm, $(ENABLE_IMAGE)), ppm)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DPPM_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_ppm.o \
+
+endif
+
+ifeq ($(findstring tga, $(ENABLE_IMAGE)), tga)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DTGA_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_tga.o \
+
+endif
+
+ifeq ($(findstring xbm, $(ENABLE_IMAGE)), xbm)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DXBM_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_xbm.o \
+
+endif
+
+ifeq ($(findstring xpm, $(ENABLE_IMAGE)), xpm)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DXPM_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_xpm.o \
+
+endif
+
+ifeq ($(findstring heif, $(ENABLE_IMAGE)), heif)
+	CCFLAGS		+= \
+	   `pkg-config --cflags libheif` \
+
+	LDFLAGS		+= \
+     `pkg-config --libs libheif` \
+
+	DEFINES		+= \
+		 -DHEIF_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_heif.o \
+
+endif
+
+ifeq ($(findstring webp, $(ENABLE_IMAGE)), webp)
+	CCFLAGS		+= \
+	   `pkg-config --cflags libwebp` \
+
+	LDFLAGS		+= \
+     `pkg-config --libs libwebp` \
+
+	DEFINES		+= \
+		 -DWEBP_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_webp.o \
+
+endif
+
+ifeq ($(findstring jp2000, $(ENABLE_IMAGE)), jp2000)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+     -ljasper \
+
+	DEFINES		+= \
+		 -DJP2000_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_jp2000.o \
+
+endif
+
+ifeq ($(findstring svg, $(ENABLE_IMAGE)), svg)
+	CCFLAGS		+= \
+     `pkg-config --cflags librsvg-2.0` \
+
+	LDFLAGS		+= \
+     `pkg-config --libs librsvg-2.0` \
+
+	DEFINES		+= \
+		 -DSVG_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_svg.o \
+
+endif
+
+ifeq ($(findstring tif, $(ENABLE_IMAGE)), tif)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+     -ltiffxx \
+
+	DEFINES		+= \
+		 -DTIF_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_tif.o \
+
+endif
+
+ifeq ($(findstring bpg, $(ENABLE_IMAGE)), bpg)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+     /usr/local/lib/libbpg.a \
+
+	DEFINES		+= \
+		 -DBPG_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_bpg.o \
+
+endif
+
+ifeq ($(findstring flif, $(ENABLE_IMAGE)), flif)
+	CCFLAGS		+= \
+
+	LDFLAGS		+= \
+
+	DEFINES		+= \
+		 -DFLIF_IMAGE \
+
+	OBJS_jgui	+= \
+		 providers/imageprovider_flif.o \
+
+endif
+

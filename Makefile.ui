@@ -20,41 +20,13 @@
 CCFLAGS 	+= \
      -Ijgui \
 	   `pkg-config --cflags cairo` \
-	   `pkg-config --cflags libheif` \
-	   `pkg-config --cflags libwebp` \
-     `pkg-config --cflags librsvg-2.0` \
 
 LDFLAGS		+= \
      `pkg-config --libs cairo` \
-     `pkg-config --libs libheif` \
-     `pkg-config --libs libwebp` \
-     `pkg-config --libs librsvg-2.0` \
-     -ljasper \
-     -ltiffxx \
      -ljpeg \
-     /usr/local/lib/libbpg.a \
 
 REQUIRES	+= \
 		 cairo \
-
-OBJS_jgui	+= \
-     providers/imageprovider_bmp.o \
-		 providers/imageprovider_gif.o \
-		 providers/imageprovider_ico.o \
-		 providers/imageprovider_jpg.o \
-		 providers/imageprovider_pcx.o \
-		 providers/imageprovider_png.o \
-		 providers/imageprovider_ppm.o \
-		 providers/imageprovider_tga.o \
-		 providers/imageprovider_xbm.o \
-		 providers/imageprovider_xpm.o \
-		 providers/imageprovider_heif.o \
-		 providers/imageprovider_webp.o \
-		 providers/imageprovider_jp2000.o \
-		 providers/imageprovider_svg.o \
-		 providers/imageprovider_tif.o \
-		 providers/imageprovider_bpg.o \
-		 providers/imageprovider_flif.o \
 
 # choose the graphic engine
 
@@ -273,6 +245,28 @@ ifeq ($(ENABLE_GRAPHICS),vnc)
 
 	OBJS_gfx	+= \
 		 vncapplication.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),directfb)
+	CCFLAGS 	+= \
+     `pkg-config --cflags directfb` \
+
+	LDFLAGS		+= \
+     `pkg-config --libs directfb` \
+     -ljpeg \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DDIRECTFB_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 directfbapplication.o\
 
   OBJS_jgui	+= \
      $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))

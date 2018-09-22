@@ -19,6 +19,7 @@
 #**************************************************************************
 include Makefile.defs
 include Makefile.ui
+include Makefile.image
 include Makefile.media
 
 OBJS_jcommon += \

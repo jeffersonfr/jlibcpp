@@ -23,23 +23,73 @@
 #include "jexception/jnullpointerexception.h"
 #include "jexception/jnullpointerexception.h"
 
+#ifdef BMP_IMAGE
 #include "providers/include/imageprovider_bmp.h"
+#endif
+
+#ifdef GIF_IMAGE
 #include "providers/include/imageprovider_gif.h"
+#endif
+
+#ifdef ICO_IMAGE
 #include "providers/include/imageprovider_ico.h"
+#endif
+
+#ifdef JPG_IMAGE
 #include "providers/include/imageprovider_jpg.h"
+#endif
+
+#ifdef PCX_IMAGE
 #include "providers/include/imageprovider_pcx.h"
+#endif
+
+#ifdef PNG_IMAGE
 #include "providers/include/imageprovider_png.h"
+#endif
+
+#ifdef PPM_IMAGE
 #include "providers/include/imageprovider_ppm.h"
+#endif
+
+#ifdef TGA_IMAGE
 #include "providers/include/imageprovider_tga.h"
+#endif
+
+#ifdef XBM_IMAGE
 #include "providers/include/imageprovider_xbm.h"
+#endif
+
+#ifdef XPM_IMAGE
 #include "providers/include/imageprovider_xpm.h"
+#endif
+
+#ifdef HEIF_IMAGE
 #include "providers/include/imageprovider_heif.h"
+#endif
+
+#ifdef WEBP_IMAGE
 #include "providers/include/imageprovider_webp.h"
+#endif
+
+#ifdef JP2000_IMAGE
 #include "providers/include/imageprovider_jp2000.h"
+#endif
+
+#ifdef SVG_IMAGE
 #include "providers/include/imageprovider_svg.h"
+#endif
+
+#ifdef TIF_IMAGE
 #include "providers/include/imageprovider_tif.h"
+#endif
+
+#ifdef BPG_IMAGE
 #include "providers/include/imageprovider_bpg.h"
+#endif
+
+#ifdef FLIF_IMAGE
 #include "providers/include/imageprovider_flif.h"
+#endif
 
 #include <string.h>
 
@@ -193,67 +243,99 @@ BufferedImage::BufferedImage(std::string file):
 	cairo_surface_t *cairo_surface = create_png_surface_from_file(file.c_str());
 	
 	if (cairo_surface == nullptr) {
+#ifdef JPG_IMAGE
 		cairo_surface = create_jpg_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef BPG_IMAGE
 		cairo_surface = create_bpg_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef SVG_IMAGE
 		cairo_surface = create_svg_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef TIF_IMAGE
 		cairo_surface = create_tif_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef JP2000_IMAGE
 		cairo_surface = create_jp2000_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef BMP_IMAGE
 		cairo_surface = create_bmp_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef PPM_IMAGE
 		cairo_surface = create_ppm_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef HEIC_IMAGE
 		cairo_surface = create_heif_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef FLIF_IMAGE
 		cairo_surface = create_flif_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef WEBP_IMAGE
 		cairo_surface = create_webp_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef GIF_IMAGE
 		cairo_surface = create_gif_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef ICO_IMAGE
 		cairo_surface = create_ico_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef PCX_IMAGE
 		cairo_surface = create_pcx_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef TGA_IMAGE
 		cairo_surface = create_tga_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef XBM_IMAGE
 		cairo_surface = create_xbm_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef XPM_IMAGE
 		cairo_surface = create_xpm_surface_from_file(file.c_str());
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
@@ -317,67 +399,99 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
 	cairo_surface_t *cairo_surface = create_png_surface_from_data(buffer, count);
 
 	if (cairo_surface == nullptr) {
+#ifdef JPG_IMAGE
 		cairo_surface = create_jpg_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef BPG_IMAGE
 		cairo_surface = create_bpg_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef SVG_IMAGE
 		cairo_surface = create_svg_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef TIF_IMAGE
 		cairo_surface = create_tif_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef JP2000_IMAGE
 		cairo_surface = create_jp2000_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef BMP_IMAGE
 		cairo_surface = create_bmp_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef PPM_IMAGE
 		cairo_surface = create_ppm_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef HEIF_IMAGE
 		cairo_surface = create_heif_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef FLIF_IMAGE
 		cairo_surface = create_flif_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef WEBP_IMAGE
 		cairo_surface = create_webp_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef GIF_IMAGE
 		cairo_surface = create_gif_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef ICO_IMAGE
 		cairo_surface = create_ico_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef PCX_IMAGE
 		cairo_surface = create_pcx_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef TGA_IMAGE
 		cairo_surface = create_tga_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef XBM_IMAGE
 		cairo_surface = create_xbm_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {
+#ifdef XPM_IMAGE
 		cairo_surface = create_xpm_surface_from_data(buffer, count);
+#endif
 	}
 
 	if (cairo_surface == nullptr) {

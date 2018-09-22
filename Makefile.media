@@ -17,7 +17,7 @@
 #   Free Software Foundation, Inc.,                                       *
 #   59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
 #**************************************************************************
-ifeq ($(findstring libvlc, $(ENABLE_MEDIA)), libvlc)
+ifeq ($(findstring libvlc, $(ENABLE_VIDEO)), libvlc)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/libvlc/include \
 		 -Ijgui/binds/generic/include \
@@ -38,7 +38,7 @@ ifeq ($(findstring libvlc, $(ENABLE_MEDIA)), libvlc)
 
 endif
 
-ifeq ($(findstring libav, $(ENABLE_MEDIA)), libav)
+ifeq ($(findstring libav, $(ENABLE_VIDEO)), libav)
 	CCFLAGS		+= \
 		 -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -DPIC -DZLIB_CONST -O3 \
 		 -Ijmedia/binds/libav/include \
@@ -62,7 +62,7 @@ ifeq ($(findstring libav, $(ENABLE_MEDIA)), libav)
 
 endif
 
-ifeq ($(findstring libxine, $(ENABLE_MEDIA)), libxine)
+ifeq ($(findstring libxine, $(ENABLE_VIDEO)), libxine)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/libxine/include \
 		 -Ijgui/binds/generic/include \
@@ -83,7 +83,7 @@ ifeq ($(findstring libxine, $(ENABLE_MEDIA)), libxine)
 
 endif
 
-ifeq ($(findstring v4l2, $(ENABLE_MEDIA)), v4l2)
+ifeq ($(findstring v4l2, $(ENABLE_VIDEO)), v4l2)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/v4l2/include \
 		 -Ijgui/binds/generic/include \
@@ -104,7 +104,7 @@ ifeq ($(findstring v4l2, $(ENABLE_MEDIA)), v4l2)
 
 endif
 
-ifeq ($(findstring gif, $(ENABLE_MEDIA)), gif)
+ifeq ($(findstring gif, $(ENABLE_VIDEO)), gif)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/gif/include \
 		 -Ijgui/binds/generic/include \
@@ -125,7 +125,7 @@ ifeq ($(findstring gif, $(ENABLE_MEDIA)), gif)
 
 endif
 
-ifeq ($(findstring ilist, $(ENABLE_MEDIA)), ilist)
+ifeq ($(findstring ilist, $(ENABLE_VIDEO)), ilist)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/ilist/include \
 		 -Ijgui/binds/generic/include \
@@ -146,7 +146,7 @@ ifeq ($(findstring ilist, $(ENABLE_MEDIA)), ilist)
 
 endif
 
-ifeq ($(findstring alsa, $(ENABLE_MEDIA)), alsa)
+ifeq ($(findstring alsa, $(ENABLE_VIDEO)), alsa)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/alsa/include \
 		 -Ijgui/binds/generic/include \
@@ -167,7 +167,7 @@ ifeq ($(findstring alsa, $(ENABLE_MEDIA)), alsa)
 
 endif
 
-ifeq ($(findstring mixer, $(ENABLE_MEDIA)), mixer)
+ifeq ($(findstring mixer, $(ENABLE_VIDEO)), mixer)
 	CCFLAGS		+= \
 		 -Ijmedia/binds/mixer/include \
 		 -Ijgui/binds/generic/include \
