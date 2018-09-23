@@ -80,50 +80,6 @@ static cairo_surface_t * cairocks_surface_from_jpeg_private(struct jpeg_decompre
 	return surface;
 }
 
-cairo_surface_t * create_jpg_surface_from_file(const char *file) 
-{
-	struct jpeg_decompress_struct cinfo;
-	struct my_error_mgr jerr;
-	cairo_surface_t *surface;
-	FILE *infile;
-
-	if ((infile = fopen(file, "rb")) == nullptr) {
-		return nullptr;
-	}
-
-	cinfo.err = jpeg_std_error(&jerr.pub);
-	jerr.pub.error_exit = my_error_exit;
-
-	if (setjmp(jerr.setjmp_buffer)) {
-		jpeg_destroy_decompress(&cinfo);
-
-		return nullptr;
-	}
-
-	jpeg_create_decompress(&cinfo);
-	jpeg_stdio_src(&cinfo, infile);
-
-	surface = cairocks_surface_from_jpeg_private(&cinfo);
-
-	fclose(infile);
-
-	if (surface == nullptr) {
-		return nullptr;
-	}
-
-	cairo_format_t format = cairo_image_surface_get_format(surface);
-	int sw = cairo_image_surface_get_width(surface);
-	int sh = cairo_image_surface_get_height(surface);
-
-	if (format == CAIRO_FORMAT_INVALID || sw <= 0 || sh <= 0) {
-		cairo_surface_destroy(surface);
-
-		return nullptr;
-	}
-
-	return surface;
-}
-
 cairo_surface_t * create_jpg_surface_from_data(uint8_t *data, int size)
 {
 	cairo_surface_t *surface;

@@ -436,9 +436,6 @@ void NativeApplication::InternalInit(int argc, char **argv)
 	CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
 	
 	delete cursors;
-
-	// TODO::
-  // SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
 }
 
 void NativeApplication::InternalPaint()
@@ -523,7 +520,6 @@ void NativeApplication::InternalLoop()
   
   _window->CreateEventBuffer(_window, &event_buffer);
 
-  // TODO:: create the event buffer from window and delete at end
 	if (event_buffer == nullptr) {
 		return;
 	}
@@ -765,6 +761,8 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	_surface->Flip(_surface, NULL, (DFBSurfaceFlipFlags)(DSFLIP_NONE));
 #endif
 	_surface->Clear(_surface, 0x00, 0x00, 0x00, 0x00);
+  
+  SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
 }
 
 NativeWindow::~NativeWindow()
@@ -789,6 +787,7 @@ NativeWindow::~NativeWindow()
 
 void NativeWindow::ToggleFullScreen()
 {
+  // TODO::
 }
 
 void NativeWindow::SetParent(jgui::Container *c)
@@ -911,7 +910,9 @@ jcursor_style_t NativeWindow::GetCursor()
 
 void NativeWindow::SetCursorEnabled(bool enabled)
 {
-	_layer->EnableCursor(_layer, (enabled == false)?0:1);
+  _is_cursor_enabled = (enabled == false)?false:true;
+
+	_layer->EnableCursor(_layer, _is_cursor_enabled);
 }
 
 bool NativeWindow::IsCursorEnabled()
@@ -921,7 +922,7 @@ bool NativeWindow::IsCursorEnabled()
 
 void NativeWindow::SetCursor(jcursor_style_t style)
 {
-	// _cursor = t;
+	_cursor = style;
 
 	SetCursor(_cursors[style].cursor, _cursors[style].hot_x, _cursors[style].hot_y);
 }

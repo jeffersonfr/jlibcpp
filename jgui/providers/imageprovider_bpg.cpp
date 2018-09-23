@@ -31,31 +31,6 @@ extern "C" {
 
 namespace jgui {
 
-cairo_surface_t * create_bpg_surface_from_file(const char *filename)
-{
-  jio::File *file = jio::File::OpenFile(filename, (jio::jfile_flags_t)(jio::JFF_READ_ONLY | jio::JFF_LARGEFILE));
-
-  if (file == nullptr) {
-    return nullptr;
-  }
-
-  uint8_t 
-    *buffer = new uint8_t[file->GetSize()];
-  int 
-    length,
-    count = 0;
-
-  while ((length = file->Read((char *)buffer + count, 4098)) > 0) {
-    count = count + length;
-  }
-
-  cairo_surface_t *surface = create_bpg_surface_from_data(buffer, count);
-
-  delete [] buffer;
-
-  return surface;
-}
-
 cairo_surface_t * create_bpg_surface_from_data(uint8_t *data, int size) 
 {
   BPGDecoderContext 

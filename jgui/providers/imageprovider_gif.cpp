@@ -744,19 +744,6 @@ cairo_surface_t * create_gif_surface_from_stream(jio::InputStream *stream)
 	return surface;
 }
 
-cairo_surface_t * create_gif_surface_from_file(const char *file) 
-{
-	jio::FileInputStream stream(file);
-
-	cairo_surface_t *surface = nullptr;
-
-	surface = create_gif_surface_from_stream(&stream);
-
-	stream.Close();
-
-	return surface;
-}
-
 cairo_surface_t * create_gif_surface_from_data(uint8_t *data, int size)
 {
 	jio::MemoryInputStream stream((const uint8_t *)data, size);

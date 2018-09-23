@@ -26,7 +26,6 @@
 
 namespace jgui{
 
-cairo_surface_t * create_xpm_surface_from_file(const char *file);
 cairo_surface_t * create_xpm_surface_from_data(uint8_t *data, int size);
 
 }

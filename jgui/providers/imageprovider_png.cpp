@@ -32,29 +32,6 @@ typedef struct {
 	uint8_t *data;
 } cairocks_read_png_closure_t;
 
-cairo_surface_t * create_png_surface_from_file(const char *file)
-{
-	cairo_surface_t *surface = nullptr;
-	
-	surface = cairo_image_surface_create_from_png(file);
-	
-	if (surface == nullptr) {
-		return nullptr;
-	}
-
-	cairo_format_t format = cairo_image_surface_get_format(surface);
-	int sw = cairo_image_surface_get_width(surface);
-	int sh = cairo_image_surface_get_height(surface);
-
-	if (format == CAIRO_FORMAT_INVALID || sw <= 0 || sh <= 0) {
-		cairo_surface_destroy(surface);
-
-		return nullptr;
-	}
-
-	return surface;
-}
-
 static cairo_status_t cairocks_read_png(void *closure, uint8_t *data, uint32_t length) 
 {
 	cairocks_read_png_closure_t *c = (cairocks_read_png_closure_t *)(closure);

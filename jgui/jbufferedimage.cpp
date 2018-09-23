@@ -20,8 +20,11 @@
 #include "jgui/jbufferedimage.h"
 #include "jgui/jhslcolorspace.h"
 #include "jio/jmemoryinputstream.h"
+#include "jio/jfileinputstream.h"
 #include "jexception/jnullpointerexception.h"
 #include "jexception/jnullpointerexception.h"
+
+#include <memory>
 
 #ifdef BMP_IMAGE
 #include "providers/include/imageprovider_bmp.h"
@@ -236,132 +239,9 @@ BufferedImage::BufferedImage(cairo_t *cairo_context, jpixelformat_t pixelformat,
 }
 
 BufferedImage::BufferedImage(std::string file):
-	jgui::Image(JPF_UNKNOWN, -1, -1)
+	jgui::BufferedImage(std::make_shared<jio::FileInputStream>(file).get())
 {
 	jcommon::Object::SetClassName("jgui::BufferedImage");
-
-	cairo_surface_t *cairo_surface = create_png_surface_from_file(file.c_str());
-	
-	if (cairo_surface == nullptr) {
-#ifdef JPG_IMAGE
-		cairo_surface = create_jpg_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef BPG_IMAGE
-		cairo_surface = create_bpg_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef SVG_IMAGE
-		cairo_surface = create_svg_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef TIF_IMAGE
-		cairo_surface = create_tif_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef JP2000_IMAGE
-		cairo_surface = create_jp2000_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef BMP_IMAGE
-		cairo_surface = create_bmp_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef PPM_IMAGE
-		cairo_surface = create_ppm_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef HEIC_IMAGE
-		cairo_surface = create_heif_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef FLIF_IMAGE
-		cairo_surface = create_flif_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef WEBP_IMAGE
-		cairo_surface = create_webp_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef GIF_IMAGE
-		cairo_surface = create_gif_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef ICO_IMAGE
-		cairo_surface = create_ico_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef PCX_IMAGE
-		cairo_surface = create_pcx_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef TGA_IMAGE
-		cairo_surface = create_tga_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef XBM_IMAGE
-		cairo_surface = create_xbm_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-#ifdef XPM_IMAGE
-		cairo_surface = create_xpm_surface_from_file(file.c_str());
-#endif
-	}
-
-	if (cairo_surface == nullptr) {
-		throw jexception::RuntimeException("Cannot open this image type");
-	}
-
-	_pixelformat = JPF_UNKNOWN;
-
-	cairo_format_t format = cairo_image_surface_get_format(cairo_surface);
-
-	if (format == CAIRO_FORMAT_ARGB32) {
-		_pixelformat = JPF_ARGB;
-	} else if (format == CAIRO_FORMAT_RGB24) {
-		_pixelformat = JPF_RGB24;
-	} else if (format == CAIRO_FORMAT_RGB16_565) {
-		_pixelformat = JPF_RGB16;
-	}
-
-	_size.width = cairo_image_surface_get_width(cairo_surface);
-	_size.height = cairo_image_surface_get_height(cairo_surface);
-
-	cairo_t *cairo_context = cairo_create(cairo_surface);
-	
-	cairo_surface_destroy(cairo_surface);
-
-	_graphics = new Graphics(cairo_context, _pixelformat, _size.width, _size.height);
 }
 
 BufferedImage::BufferedImage(jio::InputStream *stream):
