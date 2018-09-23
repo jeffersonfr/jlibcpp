@@ -26,7 +26,7 @@
 
 namespace jgui{
 
-cairo_surface_t * create_svg_surface_from_data(uint8_t *data, int size);
+cairo_surface_t * create_svg_surface_from_data(uint8_t *data, int size, int width, int height);
 
 }
 

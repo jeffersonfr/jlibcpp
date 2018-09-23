@@ -29,7 +29,14 @@
 
 namespace jgui {
 
-cairo_surface_t * create_svg_surface_from_data(uint8_t *data, int size) 
+void svg_data_destroy(void *data)
+{
+  std::string *ptr = (std::string *)data;
+
+  delete ptr;
+}
+
+cairo_surface_t * create_svg_surface_from_data(uint8_t *data, int size, int width, int height) 
 {
   if (memcmp(data, "<?xml", 5) != 0) {
     return nullptr;
@@ -38,7 +45,7 @@ cairo_surface_t * create_svg_surface_from_data(uint8_t *data, int size)
   // rsvg_init();
 
   RsvgHandle 
-    *svg = rsvg_handle_new_from_data(data, size, NULL);
+    *svg = rsvg_handle_new_from_data(data, size, nullptr);
     // *svg = svg_new_from_file (file, &err);
   RsvgDimensionData 
     dimensions;
@@ -50,6 +57,10 @@ cairo_surface_t * create_svg_surface_from_data(uint8_t *data, int size)
     sh = dimensions.height;
   float
     scale = 72.0f; // pick_best_scape(sw, sh, dw, dh);
+
+  if (width > 0 && height > 0) {
+    scale = (float)width/(float)sw;
+  }
 
   sw = ((float)sw * scale);
   sh = ((float)sh * scale);
@@ -68,6 +79,8 @@ cairo_surface_t * create_svg_surface_from_data(uint8_t *data, int size)
 
   cairo_surface_mark_dirty(surface);
   cairo_destroy(cr);
+
+  cairo_surface_set_user_data(surface, nullptr, new std::string((char *)data, size), svg_data_destroy);
 
   return surface;
 }

@@ -292,7 +292,7 @@ BufferedImage::BufferedImage(jio::InputStream *stream):
 
 	if (cairo_surface == nullptr) {
 #ifdef SVG_IMAGE
-		cairo_surface = create_svg_surface_from_data(buffer, count);
+		cairo_surface = create_svg_surface_from_data(buffer, count, -1, -1);
 #endif
 	}
 
@@ -534,6 +534,20 @@ Image * BufferedImage::Scale(int width, int height)
 
 	Image *image = new BufferedImage(nullptr, _pixelformat, width, height);
 	
+  // INFO:: scale svg format
+  std::string *data = (std::string *)cairo_surface_get_user_data(cairo_surface, nullptr);
+
+  if (data != nullptr) {
+    cairo_t *cairo_context = dynamic_cast<Graphics *>(image->GetGraphics())->GetCairoContext();
+
+    cairo_surface = create_svg_surface_from_data((uint8_t *)data->c_str(), data->size(), width, height);
+		
+		cairo_set_source_surface(cairo_context, cairo_surface, 0, 0);
+		cairo_paint(cairo_context);
+
+    return image;
+  }
+
 	if (GetGraphics()->GetAntialias() == JAM_NONE) {
 		uint32_t *src = new uint32_t[_size.width*_size.height];
 		uint32_t *dst = new uint32_t[width*height];
