@@ -33,7 +33,11 @@
 #include <stdint.h>
 #include <string.h>
 #include <termio.h>
+#include <fcntl.h>
 
+#include <linux/input.h>
+#include <linux/fb.h>
+#include <sys/mman.h>
 #include <sys/time.h>
 
 extern "C" {
@@ -70,6 +74,15 @@ struct layer_t {
     int32_t layer;
 };
 
+struct cursor_params_t {
+  jgui::Image *cursor;
+  int hot_x;
+  int hot_y;
+};
+
+/** \brief */
+std::map<jcursor_style_t, struct cursor_params_t> _cursors;
+
 /** \brief */
 layer_t layer;
 /** \brief */
@@ -85,9 +98,9 @@ static Window *g_window = nullptr;
 /** \brief */
 static jcursor_style_t _cursor = JCS_DEFAULT;
 /** \brief */
-static struct termios original;
+static bool _is_cursor_enabled = true;
 /** \brief */
-static int stdin_fd = -1;
+static struct cursor_params_t _current_cursor;
 
 bool image_init(image_t *image, VC_IMAGE_TYPE_T type, int32_t width, int32_t height)
 {
@@ -123,53 +136,6 @@ void image_release(image_t *image)
     image->alignedHeight = 0;
     image->bitsPerPixel = 0;
     image->size = 0;
-}
-
-bool key_pressed(int *character)
-{
-    if (stdin_fd == -1) {
-        struct termios term;
-
-        stdin_fd = fileno(stdin);
-
-        tcgetattr(stdin_fd, &original);
-        memcpy(&term, &original, sizeof(term));
-
-        term.c_lflag &= ~(ICANON|ECHO);
-
-        tcsetattr(stdin_fd, TCSANOW, &term);
-
-        setbuf(stdin, nullptr);
-    }
-
-    int characters_buffered = 0;
-
-    ioctl(stdin_fd, FIONREAD, &characters_buffered);
-
-    bool pressed = (characters_buffered != 0);
-
-    if (characters_buffered == 1) {
-        int c = fgetc(stdin);
-
-        if (character != nullptr) {
-            *character = c;
-        }
-    } else if (characters_buffered > 1) {
-        while (characters_buffered) {
-            fgetc(stdin);
-
-            --characters_buffered;
-        }
-    }
-
-    return pressed;
-}
-
-void key_release(void)
-{
-    if (stdin_fd != -1) {
-        tcsetattr(stdin_fd, TCSANOW, &original);
-    }
 }
 
 bool layer_init(layer_t *bg)
@@ -241,233 +207,140 @@ void layer_release(layer_t *bg)
     vc_dispmanx_display_close(bg->display);
 }
 
-static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
+static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool shift)
 {
-  /*
-	switch (symbol.sym) {
-		case SDLK_RETURN:
+	switch (symbol) {
+		case 0x1c:
 			return jevent::JKS_ENTER; // jevent::JKS_RETURN;
-		case SDLK_BACKSPACE:
+		case 0x0e:
 			return jevent::JKS_BACKSPACE;
-		case SDLK_TAB:
+		case 0x0f:
 			return jevent::JKS_TAB;
 		// case SDLK_CANCEL:
 		//	return jevent::JKS_CANCEL;
-		case SDLK_ESCAPE:
+		case 0x01:
 			return jevent::JKS_ESCAPE;
-		case SDLK_SPACE:
+		case 0x39:
 			return jevent::JKS_SPACE;
-		case SDLK_EXCLAIM:
-			return jevent::JKS_EXCLAMATION_MARK;
-		case SDLK_QUOTEDBL:
-			return jevent::JKS_QUOTATION;
-		case SDLK_HASH:
-			return jevent::JKS_NUMBER_SIGN;
-		case SDLK_DOLLAR:
-			return jevent::JKS_DOLLAR_SIGN;
-		// case SDLK_PERCENT_SIGN:
-		//	return jevent::JKS_PERCENT_SIGN;
-		case SDLK_AMPERSAND:   
-			return jevent::JKS_AMPERSAND;
-		case SDLK_QUOTE:
-			return jevent::JKS_APOSTROPHE;
-		case SDLK_LEFTPAREN:
-			return jevent::JKS_PARENTHESIS_LEFT;
-		case SDLK_RIGHTPAREN:
-			return jevent::JKS_PARENTHESIS_RIGHT;
-		case SDLK_ASTERISK:
-			return jevent::JKS_STAR;
-		case SDLK_PLUS:
-			return jevent::JKS_PLUS_SIGN;
-		case SDLK_COMMA:   
-			return jevent::JKS_COMMA;
-		case SDLK_MINUS:
-			return jevent::JKS_MINUS_SIGN;
-		case SDLK_PERIOD:  
-			return jevent::JKS_PERIOD;
-		case SDLK_SLASH:
-			return jevent::JKS_SLASH;
-		case SDLK_0:     
-			return jevent::JKS_0;
-		case SDLK_1:
-			return jevent::JKS_1;
-		case SDLK_2:
-			return jevent::JKS_2;
-		case SDLK_3:
-			return jevent::JKS_3;
-		case SDLK_4:
-			return jevent::JKS_4;
-		case SDLK_5:
-			return jevent::JKS_5;
-		case SDLK_6:
-			return jevent::JKS_6;
-		case SDLK_7:
-			return jevent::JKS_7;
-		case SDLK_8:
-			return jevent::JKS_8;
-		case SDLK_9:
-			return jevent::JKS_9;
-		case SDLK_COLON:
-			return jevent::JKS_COLON;
-		case SDLK_SEMICOLON:
-			return jevent::JKS_SEMICOLON;
-		case SDLK_LESS:
-			return jevent::JKS_LESS_THAN_SIGN;
-		case SDLK_EQUALS: 
-			return jevent::JKS_EQUALS_SIGN;
-		case SDLK_GREATER:
-			return jevent::JKS_GREATER_THAN_SIGN;
-		case SDLK_QUESTION:   
-			return jevent::JKS_QUESTION_MARK;
-		case SDLK_AT:
-			return jevent::JKS_AT;
-		case SDLK_CAPITAL_A:
-			return jevent::JKS_A;
-		case SDLK_CAPITAL_B:
-			return jevent::JKS_B;
-		case SDLK_CAPITAL_C:
-			return jevent::JKS_C;
-		case SDLK_CAPITAL_D:
-			return jevent::JKS_D;
-		case SDLK_CAPITAL_E:
-			return jevent::JKS_E;
-		case SDLK_CAPITAL_F:
-			return jevent::JKS_F;
-		case SDLK_CAPITAL_G:
-			return jevent::JKS_G;
-		case SDLK_CAPITAL_H:
-			return jevent::JKS_H;
-		case SDLK_CAPITAL_I:
-			return jevent::JKS_I;
-		case SDLK_CAPITAL_J:
-			return jevent::JKS_J;
-		case SDLK_CAPITAL_K:
-			return jevent::JKS_K;
-		case SDLK_CAPITAL_L:
-			return jevent::JKS_L;
-		case SDLK_CAPITAL_M:
-			return jevent::JKS_M;
-		case SDLK_CAPITAL_N:
-			return jevent::JKS_N;
-		case SDLK_CAPITAL_O:
-			return jevent::JKS_O;
-		case SDLK_CAPITAL_P:
-			return jevent::JKS_P;
-		case SDLK_CAPITAL_Q:
-			return jevent::JKS_Q;
-		case SDLK_CAPITAL_R:
-			return jevent::JKS_R;
-		case SDLK_CAPITAL_S:
-			return jevent::JKS_S;
-		case SDLK_CAPITAL_T:
-			return jevent::JKS_T;
-		case SDLK_CAPITAL_U:
-			return jevent::JKS_U;
-		case SDLK_CAPITAL_V:
-			return jevent::JKS_V;
-		case SDLK_CAPITAL_W:
-			return jevent::JKS_W;
-		case SDLK_CAPITAL_X:
-			return jevent::JKS_X;
-		case SDLK_CAPITAL_Y:
-			return jevent::JKS_Y;
-		case SDLK_CAPITAL_Z:
-			return jevent::JKS_Z;
-		case SDLK_LEFTBRACKET:
-			return jevent::JKS_SQUARE_BRACKET_LEFT;
-		case SDLK_BACKSLASH:   
-			return jevent::JKS_BACKSLASH;
-		case SDLK_RIGHTBRACKET:
-			return jevent::JKS_SQUARE_BRACKET_RIGHT;
-		case SDLK_CARET:
-			return jevent::JKS_CIRCUMFLEX_ACCENT;
-		case SDLK_UNDERSCORE:    
-			return jevent::JKS_UNDERSCORE;
-		case SDLK_BACKQUOTE:
-			return jevent::JKS_GRAVE_ACCENT;
-		case SDLK_a:       
-			return jevent::JKS_a;
-		case SDLK_b:
-			return jevent::JKS_b;
-		case SDLK_c:
-			return jevent::JKS_c;
-		case SDLK_d:
-			return jevent::JKS_d;
-		case SDLK_e:
-			return jevent::JKS_e;
-		case SDLK_f:
-			return jevent::JKS_f;
-		case SDLK_g:
-			return jevent::JKS_g;
-		case SDLK_h:
-			return jevent::JKS_h;
-		case SDLK_i:
-			return jevent::JKS_i;
-		case SDLK_j:
-			return jevent::JKS_j;
-		case SDLK_k:
-			return jevent::JKS_k;
-		case SDLK_l:
-			return jevent::JKS_l;
-		case SDLK_m:
-			return jevent::JKS_m;
-		case SDLK_n:
-			return jevent::JKS_n;
-		case SDLK_o:
-			return jevent::JKS_o;
-		case SDLK_p:
-			return jevent::JKS_p;
-		case SDLK_q:
-			return jevent::JKS_q;
-		case SDLK_r:
-			return jevent::JKS_r;
-		case SDLK_s:
-			return jevent::JKS_s;
-		case SDLK_t:
-			return jevent::JKS_t;
-		case SDLK_u:
-			return jevent::JKS_u;
-		case SDLK_v:
-			return jevent::JKS_v;
-		case SDLK_w:
-			return jevent::JKS_w;
-		case SDLK_x:
-			return jevent::JKS_x;
-		case SDLK_y:
-			return jevent::JKS_y;
-		case SDLK_z:
-			return jevent::JKS_z;
-		// case SDLK_CURLY_BRACKET_LEFT:
-		//	return jevent::JKS_CURLY_BRACKET_LEFT;
-		// case SDLK_VERTICAL_BAR:  
-		//	return jevent::JKS_VERTICAL_BAR;
-		// case SDLK_CURLY_BRACKET_RIGHT:
-		//	return jevent::JKS_CURLY_BRACKET_RIGHT;
-		// case SDLK_TILDE:  
-		//	return jevent::JKS_TILDE;
-		case SDLK_DELETE:
+		case 0x29:
+			return (shift == false)?jevent::JKS_APOSTROPHE:jevent::JKS_QUOTATION;
+		case 0x33:
+			return (shift == false)?jevent::JKS_COMMA:jevent::JKS_LESS_THAN_SIGN;
+		case 0x0c:
+			return (shift == false)?jevent::JKS_MINUS_SIGN:jevent::JKS_UNDERSCORE;
+		case 0x34:  
+			return (shift == false)?jevent::JKS_PERIOD:jevent::JKS_GREATER_THAN_SIGN;
+		case 0x59:
+			return (shift == false)?jevent::JKS_SLASH:jevent::JKS_QUESTION_MARK;
+		case 0x0b:     
+			return (shift == false)?jevent::JKS_0:jevent::JKS_PARENTHESIS_RIGHT;
+		case 0x02:
+			return (shift == false)?jevent::JKS_1:jevent::JKS_EXCLAMATION_MARK;
+		case 0x03:
+			return (shift == false)?jevent::JKS_2:jevent::JKS_AT;
+		case 0x04:
+			return (shift == false)?jevent::JKS_3:jevent::JKS_NUMBER_SIGN;
+		case 0x05:
+			return (shift == false)?jevent::JKS_4:jevent::JKS_DOLLAR_SIGN;
+		case 0x06:
+			return (shift == false)?jevent::JKS_5:jevent::JKS_PERCENT_SIGN;
+		case 0x07:
+			return (shift == false)?jevent::JKS_6:jevent::JKS_CIRCUMFLEX_ACCENT;
+		case 0x08:
+			return (shift == false)?jevent::JKS_7:jevent::JKS_AMPERSAND;
+		case 0x09:
+			return (shift == false)?jevent::JKS_8:jevent::JKS_STAR;
+		case 0x0a:
+			return (shift == false)?jevent::JKS_9:jevent::JKS_PARENTHESIS_LEFT;
+		case 0x35:
+			return (shift == false)?jevent::JKS_SEMICOLON:jevent::JKS_COLON;
+		case 0x0d: 
+			return (shift == false)?jevent::JKS_EQUALS_SIGN:jevent::JKS_PLUS_SIGN;
+		case 0x1b:
+			return (shift == false)?jevent::JKS_SQUARE_BRACKET_LEFT:jevent::JKS_CURLY_BRACKET_LEFT;
+		case 0x56:   
+			return (shift == false)?jevent::JKS_BACKSLASH:jevent::JKS_VERTICAL_BAR;
+		case 0x2b:
+			return (shift == false)?jevent::JKS_SQUARE_BRACKET_RIGHT:jevent::JKS_CURLY_BRACKET_RIGHT;
+		case 0x1e:       
+			return (shift == false)?jevent::JKS_a:jevent::JKS_A;
+		case 0x30:
+			return (shift == false)?jevent::JKS_b:jevent::JKS_B;
+		case 0x2e:
+			return (shift == false)?jevent::JKS_c:jevent::JKS_C;
+		case 0x20:
+			return (shift == false)?jevent::JKS_d:jevent::JKS_D;
+		case 0x12:
+			return (shift == false)?jevent::JKS_e:jevent::JKS_E;
+		case 0x21:
+			return (shift == false)?jevent::JKS_f:jevent::JKS_F;
+		case 0x22:
+			return (shift == false)?jevent::JKS_g:jevent::JKS_G;
+		case 0x23:
+			return (shift == false)?jevent::JKS_h:jevent::JKS_H;
+		case 0x17:
+			return (shift == false)?jevent::JKS_i:jevent::JKS_I;
+		case 0x24:
+			return (shift == false)?jevent::JKS_j:jevent::JKS_J;
+		case 0x25:
+			return (shift == false)?jevent::JKS_k:jevent::JKS_K;
+		case 0x26:
+			return (shift == false)?jevent::JKS_l:jevent::JKS_L;
+		case 0x32:
+			return (shift == false)?jevent::JKS_m:jevent::JKS_M;
+		case 0x31:
+			return (shift == false)?jevent::JKS_n:jevent::JKS_N;
+		case 0x18:
+			return (shift == false)?jevent::JKS_o:jevent::JKS_O;
+		case 0x19:
+			return (shift == false)?jevent::JKS_p:jevent::JKS_P;
+		case 0x10:
+			return (shift == false)?jevent::JKS_q:jevent::JKS_Q;
+		case 0x13:
+			return (shift == false)?jevent::JKS_r:jevent::JKS_R;
+		case 0x1f:
+			return (shift == false)?jevent::JKS_s:jevent::JKS_S;
+		case 0x14:
+			return (shift == false)?jevent::JKS_t:jevent::JKS_T;
+		case 0x16:
+			return (shift == false)?jevent::JKS_u:jevent::JKS_U;
+		case 0x2f:
+			return (shift == false)?jevent::JKS_v:jevent::JKS_V;
+		case 0x11:
+			return (shift == false)?jevent::JKS_w:jevent::JKS_W;
+		case 0x2d:
+			return (shift == false)?jevent::JKS_x:jevent::JKS_X;
+		case 0x15:
+			return (shift == false)?jevent::JKS_y:jevent::JKS_Y;
+		case 0x2c:
+			return (shift == false)?jevent::JKS_z:jevent::JKS_Z;
+		// case SDLK_BACKQUOTE:
+		//	return jevent::JKS_GRAVE_ACCENT;
+		case 0x28:  
+			return (shift == false)?jevent::JKS_TILDE:jevent::JKS_CIRCUMFLEX_ACCENT;
+		case 0x6f:
 			return jevent::JKS_DELETE;
-		case SDLK_LEFT:
+		case 0x69:
 			return jevent::JKS_CURSOR_LEFT;
-		case SDLK_RIGHT:
+		case 0x6a:
 			return jevent::JKS_CURSOR_RIGHT;
-		case SDLK_UP:  
+		case 0x67:  
 			return jevent::JKS_CURSOR_UP;
-		case SDLK_DOWN:
+		case 0x6c:
 			return jevent::JKS_CURSOR_DOWN;
-		case SDLK_INSERT:  
+		case 0x6e:  
 			return jevent::JKS_INSERT;
-		case SDLK_HOME:     
+		case 0x66:     
 			return jevent::JKS_HOME;
-		case SDLK_END:
+		case 0x6b:
 			return jevent::JKS_END;
-		case SDLK_PAGEUP:
+		case 0x68:
 			return jevent::JKS_PAGE_UP;
-		case SDLK_PAGEDOWN:
+		case 0x6d:
 			return jevent::JKS_PAGE_DOWN;
-		// case SDLK_PRINT:   
-		//	return jevent::JKS_PRINT;
-		case SDLK_PAUSE:
+		case 0x63:   
+			return jevent::JKS_PRINT;
+		case 0x77:
 			return jevent::JKS_PAUSE;
 		// case SDLK_RED:
 		//	return jevent::JKS_RED;
@@ -477,53 +350,50 @@ static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol)
 		//	return jevent::JKS_YELLOW;
 		// case SDLK_BLUE:
 		//	return jevent::JKS_BLUE;
-		case SDLK_F1:
+		case 0x3b:
 			return jevent::JKS_F1;
-		case SDLK_F2:
+		case 0x3c:
 			return jevent::JKS_F2;
-		case SDLK_F3:
+		case 0x3d:
 			return jevent::JKS_F3;
-		case SDLK_F4:
+		case 0x3e:
 			return jevent::JKS_F4;
-		case SDLK_F5:
+		case 0x3f:
 			return jevent::JKS_F5;
-		case SDLK_F6:     
+		case 0x40:
 			return jevent::JKS_F6;
-		case SDLK_F7:    
+		case 0x41:    
 			return jevent::JKS_F7;
-		case SDLK_F8:   
+		case 0x42:
 			return jevent::JKS_F8;
-		case SDLK_F9:  
+		case 0x43:  
 			return jevent::JKS_F9;
-		case SDLK_F10: 
+		case 0x44: 
 			return jevent::JKS_F10;
-		case SDLK_F11:
+		case 0x57:
 			return jevent::JKS_F11;
-		case SDLK_F12:
+		case 0x58:
 			return jevent::JKS_F12;
-		case SDLK_LSHIFT:
-		case SDLK_RSHIFT:
+		case 0x2a: // left
+		case 0x36: // right
 			return jevent::JKS_SHIFT;
-		case SDLK_LCTRL:
-		case SDLK_RCTRL:
+		case 0x1d: // left
+		case 0x61: // right
 			return jevent::JKS_CONTROL;
-		case SDLK_LALT:
-		case SDLK_RALT:
+		case 0x38: // left
 			return jevent::JKS_ALT;
-		// case SDLK_ALTGR:
-		//	return jevent::JKS_ALTGR;
+		case 0x64: 
+		  return jevent::JKS_ALTGR;
 		// case SDLK_LMETA:
 		// case SDLK_RMETA:
 		//	return jevent::JKS_META;
-		// case SDLK_LSUPER:
-		// case SDLK_RSUPER:
-		//	return jevent::JKS_SUPER;
+		case 0x7d:
+			return jevent::JKS_SUPER;
 		// case SDLK_HYPER:
 		//	return jevent::JKS_HYPER;
 		default: 
 			break;
 	}
-			*/
 
 	return jevent::JKS_UNKNOWN;
 }
@@ -548,6 +418,41 @@ void NativeApplication::InternalInit(int argc, char **argv)
 
 	_screen.width = layer.info.width;
 	_screen.height = layer.info.height;
+
+#define CURSOR_INIT(type, ix, iy, hotx, hoty) 													\
+	t.cursor = new jgui::BufferedImage(JPF_ARGB, w, h);												\
+																																				\
+	t.hot_x = hotx;																												\
+	t.hot_y = hoty;																												\
+																																				\
+	t.cursor->GetGraphics()->DrawImage(cursors, ix*w, iy*h, w, h, 0, 0);	\
+																																				\
+	_cursors[type] = t;																										\
+
+	struct cursor_params_t t;
+	int w = 30,
+			h = 30;
+
+	Image *cursors = new jgui::BufferedImage(_DATA_PREFIX"/images/cursors.png");
+
+	CURSOR_INIT(JCS_DEFAULT, 0, 0, 8, 8);
+	CURSOR_INIT(JCS_CROSSHAIR, 4, 3, 15, 15);
+	CURSOR_INIT(JCS_EAST, 4, 4, 22, 15);
+	CURSOR_INIT(JCS_WEST, 5, 4, 9, 15);
+	CURSOR_INIT(JCS_NORTH, 6, 4, 15, 8);
+	CURSOR_INIT(JCS_SOUTH, 7, 4, 15, 22);
+	CURSOR_INIT(JCS_HAND, 1, 0, 15, 15);
+	CURSOR_INIT(JCS_MOVE, 8, 4, 15, 15);
+	CURSOR_INIT(JCS_NS, 2, 4, 15, 15);
+	CURSOR_INIT(JCS_WE, 3, 4, 15, 15);
+	CURSOR_INIT(JCS_NW_CORNER, 8, 1, 10, 10);
+	CURSOR_INIT(JCS_NE_CORNER, 9, 1, 20, 10);
+	CURSOR_INIT(JCS_SW_CORNER, 6, 1, 10, 20);
+	CURSOR_INIT(JCS_SE_CORNER, 7, 1, 20, 20);
+	CURSOR_INIT(JCS_TEXT, 7, 0, 15, 15);
+	CURSOR_INIT(JCS_WAIT, 8, 0, 15, 15);
+	
+	delete cursors;
 }
 
 void NativeApplication::InternalPaint()
@@ -575,6 +480,7 @@ void NativeApplication::InternalPaint()
   g_window->Paint(g);
   g_window->PaintGlassPane(g);
 	g->Translate(t.x, t.y);
+  g->DrawImage(_current_cursor.cursor, _mouse_x, _mouse_y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
@@ -639,10 +545,30 @@ void NativeApplication::InternalPaint()
 
 void NativeApplication::InternalLoop()
 {
-  std::map<int, bool> keymap;
-	int key = 0;
+  struct input_event ev;
+  bool shift = false;
+  int mouse_x = 0, mouse_y = 0;
+  uint32_t last_mouse_state = 0x00;
   static bool quitting = false;
-  
+
+  int 
+    fdk = open("/dev/input/by-path/platform-3f980000.usb-usb-0:1.4:1.0-event-kbd", O_RDONLY);
+
+  if (fdk == -1) {
+    printf("Cannot open the key device\n");
+  }
+
+  fcntl(fdk, F_SETFL, O_NONBLOCK);
+
+  int 
+    fdm = open("/dev/input/mice", O_RDONLY);
+
+  if(fdm == -1) {   
+    printf("Cannot open the mouse device\n");
+  }   
+
+  fcntl(fdm, F_SETFL, O_NONBLOCK);
+
 	while (quitting == false) {
     std::vector<jevent::EventObject *> events = g_window->GrabEvents();
 
@@ -666,67 +592,23 @@ void NativeApplication::InternalLoop()
         delete event;
         event = nullptr;
       }
-    }
+    } else if (_is_cursor_enabled == true) {
+      if (mouse_x != _mouse_x or mouse_y != _mouse_y) {
+        mouse_x = _mouse_x;
+        mouse_y = _mouse_y;
 
-    bool pressed = key_pressed(&key);
-
-    /*
-    if (pressed == true) {
-      if (keymap.insert(key).second == true) {
-        keymap[key] = true;
-      } else {
-        if (keymap[key] == true) {
-        }
+        InternalPaint();
       }
-    } else {
     }
-    */
 
-    printf(":: KEY:: %d, %s\n", key, pressed);
-
-    /*
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_WINDOWEVENT) {
-        if (event.window.event == SDL_WINDOWEVENT_ENTER) {
-          // SDL_CaptureMouse(true);
-          // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-          // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
-          // SetCursor(GetCursor());
-
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_ENTERED));
-        } else if (event.window.event == SDL_WINDOWEVENT_LEAVE) {
-          // SDL_CaptureMouse(false);
-          // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);
-          // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-
-          // SetCursor(JCS_DEFAULT);
-
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_LEAVED));
-        } else if (event.window.event == SDL_WINDOWEVENT_SHOWN) {
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_OPENED));
-        } else if (event.window.event == SDL_WINDOWEVENT_HIDDEN) {
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
-        } else if (event.window.event == SDL_WINDOWEVENT_EXPOSED) {
-          InternalPaint();
-        } else if (event.window.event == SDL_WINDOWEVENT_MOVED) {
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_MOVED));
-        } else if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-          InternalPaint();
-        
-          g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_RESIZED));
-        } else if (event.window.event == SDL_WINDOWEVENT_MINIMIZED) {
-        } else if (event.window.event == SDL_WINDOWEVENT_MAXIMIZED) {
-        } else if (event.window.event == SDL_WINDOWEVENT_RESTORED) {
-        } else if (event.window.event == SDL_WINDOWEVENT_FOCUS_GAINED) {
-        } else if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
-        }
-      } else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+    if (read(fdk, &ev, sizeof ev) == sizeof(ev)) {
+      if (ev.type == EV_KEY) {
         jevent::jkeyevent_type_t type;
         jevent::jkeyevent_modifiers_t mod;
 
         mod = (jevent::jkeyevent_modifiers_t)(0);
 
+        /*
         if ((event.key.keysym.mod & KMOD_LSHIFT) != 0) {
           mod = (jevent::jkeyevent_modifiers_t)(mod | jevent::JKM_SHIFT);
         } else if ((event.key.keysym.mod & KMOD_RSHIFT) != 0) {
@@ -750,102 +632,125 @@ void NativeApplication::InternalLoop()
         // } else if ((event.key.keysym.mod & ) != 0) {
         //	mod = (jevent::jkeyevent_modifiers_t)(mod | JKM_HYPER);
         }
+        */
 
         type = jevent::JKT_UNKNOWN;
 
-        if (event.key.state == SDL_PRESSED) {
+        if (ev.value == 1 or ev.value == 2) {
           type = jevent::JKT_PRESSED;
 
           // TODO:: grab pointer events
-        } else if (event.key.state == SDL_RELEASED) {
+        } else if (ev.value == 0) {
           type = jevent::JKT_RELEASED;
 
           // TODO:: ungrab pointer events
         }
 
-        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(event.key.keysym);
+        if (ev.code == 0x2a or ev.code == 0x36) { // LSHIFT, RSHIFT
+          shift = (bool)ev.value;
+        }
+
+        jevent::jkeyevent_symbol_t symbol = TranslateToNativeKeySymbol(ev.code, shift);
 
         g_window->GetEventManager()->PostEvent(new jevent::KeyEvent(g_window, type, mod, jevent::KeyEvent::GetCodeFromSymbol(symbol), symbol));
-      } else if (event.type == SDL_MOUSEMOTION || event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP || event.type == SDL_MOUSEWHEEL) {
-        if (event.type == SDL_MOUSEMOTION) {
-          // e.motion.x/y
-        } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-          // e.button.button == SDL_BUTTON_LEFT
-        } else if (event.type == SDL_MOUSEBUTTONUP) {
-        } else if (event.type == SDL_MOUSEWHEEL) {
-        }
 
-        int mouse_z = 0;
-        jevent::jmouseevent_button_t button = jevent::JMB_NONE;
-        jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
-        jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
-
-        _mouse_x = event.motion.x;
-        _mouse_y = event.motion.y;
-
-        _mouse_x = CLAMP(_mouse_x, 0, _screen.width-1);
-        _mouse_y = CLAMP(_mouse_y, 0, _screen.height-1);
-
-        if (event.type == SDL_MOUSEMOTION) {
-          type = jevent::JMT_MOVED;
-        } else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
-          if (event.type == SDL_MOUSEBUTTONDOWN) {
-            type = jevent::JMT_PRESSED;
-          } else if (event.type == SDL_MOUSEBUTTONUP) {
-            type = jevent::JMT_RELEASED;
-          }
-
-          if (event.button.button == SDL_BUTTON_LEFT) {
-            button = jevent::JMB_BUTTON1;
-          } else if (event.button.button == SDL_BUTTON_MIDDLE) {
-            button = jevent::JMB_BUTTON2;
-          } else if (event.button.button == SDL_BUTTON_RIGHT) {
-            button = jevent::JMB_BUTTON3;
-          }
-
-          _click_count = event.button.clicks;
-
-          if (type == jevent::JMT_PRESSED) {
-            mouse_z = _click_count;
-          }
-        } else if (event.type == SDL_MOUSEWHEEL) {
-          type = jevent::JMT_ROTATED;
-          mouse_z = event.motion.y;
-        }
-
-        uint32_t state = SDL_GetMouseState(nullptr, nullptr);
-
-        if ((state & SDL_BUTTON(SDL_BUTTON_LEFT)) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
-        }
-
-        if ((state & SDL_BUTTON(SDL_BUTTON_MIDDLE)) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
-        }
-
-        if ((state & SDL_BUTTON(SDL_BUTTON_RIGHT)) != 0) {
-          buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
-        }
-
-        // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
-        
-        g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
-      } else if(event.type == SDL_QUIT) {
-        SDL_HideWindow(_window);
-
-        quitting = true;
-        
-        g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
+        // continue;
       }
     }
-    */
+
+    signed char data[3];
+
+    if (read(fdm, data, sizeof(data)) == sizeof(data)) {
+      int 
+        buttonMask = data[0];
+      int 
+        x = _mouse_x + data[1],
+        y = _mouse_y - data[2];
+     
+      x = (x < 0)?0:(x > SW)?SW:x;
+      y = (y < 0)?0:(y > SH)?SH:y;
+
+      jevent::jmouseevent_button_t button = jevent::JMB_NONE;
+      jevent::jmouseevent_button_t buttons = jevent::JMB_NONE;
+      jevent::jmouseevent_type_t type = jevent::JMT_UNKNOWN;
+      int mouse_z = 0;
+
+      type = jevent::JMT_PRESSED;
+
+      if (_mouse_x != x || _mouse_y != y) {
+        type = jevent::JMT_MOVED;
+      }
+
+      _mouse_x = CLAMP(x, 0, _screen.width - 1);
+      _mouse_y = CLAMP(y, 0, _screen.height - 1);
+
+      if ((buttonMask & 0x01) == 0 && (last_mouse_state & 0x01)) {
+        type = jevent::JMT_RELEASED;
+      } else if ((buttonMask & 0x02) == 0 && (last_mouse_state & 0x02)) {
+        type = jevent::JMT_RELEASED;
+      } else if ((buttonMask & 0x04) == 0 && (last_mouse_state & 0x04)) {
+        type = jevent::JMT_RELEASED;
+      } 
+
+      if ((buttonMask & 0x01) != (last_mouse_state & 0x01)) {
+        button = jevent::JMB_BUTTON1;
+      } else if ((buttonMask & 0x02) != (last_mouse_state & 0x02)) {
+        button = jevent::JMB_BUTTON3;
+      } else if ((buttonMask & 0x04) != (last_mouse_state & 0x04)) {
+        button = jevent::JMB_BUTTON2;
+      }
+
+      last_mouse_state = buttonMask;
+
+      _click_count = 1;
+
+      if (type == jevent::JMT_PRESSED) {
+        auto current = std::chrono::steady_clock::now();
+
+        if ((std::chrono::duration_cast<std::chrono::milliseconds>(current - _last_keypress).count()) < 200L) {
+          _click_count = _click_count + 1;
+        }
+
+        _last_keypress = current;
+
+        mouse_z = _click_count;
+      }
+
+      /*
+      if ((buttonMask & 0x08) || (buttonMask & 0x10)) {
+        type = jevent::JMT_ROTATED;
+        mouse_z = 1;
+      }
+      */
+
+      if (buttonMask & 0x01) {
+        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON1);
+      }
+
+      if (buttonMask & 0x02) {
+        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON3);
+      }
+
+      if (buttonMask & 0x04) {
+        buttons = (jevent::jmouseevent_button_t)(button | jevent::JMB_BUTTON2);
+      }
+
+      // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
+
+      g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x + _current_cursor.hot_x, _mouse_y + _current_cursor.hot_y));
+
+      continue;
+    }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(10));
   }
 
+  g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_CLOSED));
+
   quitting = true;
   
-  key_release();
+  close(fdk);
+  close(fdm);
 
   g_window->SetVisible(false);
   g_window->GrabEvents();
@@ -865,44 +770,9 @@ NativeWindow::NativeWindow(int x, int y, int width, int height):
 	if (_window != nullptr) {
 		throw jexception::RuntimeException("Cannot create more than one window");
   }
-
-  _icon = new BufferedImage(_DATA_PREFIX"/images/small-gnu.png");
-
-	_window = nullptr;
-	_mouse_x = 0;
-	_mouse_y = 0;
-	_last_keypress = std::chrono::steady_clock::now();
-	_click_count = 1;
-
-	int 
-    flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE;
-	
-	// INFO:: create the main window
-	_window = SDL_CreateWindow("Main", x, y, width, height, flags);
-
-	if (_window == nullptr) {
-		throw jexception::RuntimeException("Cannot create a window");
-	}
-
-	_renderer = SDL_CreateRenderer(_window, 0, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	// _renderer = SDL_CreateRenderer(_window, 0, SDL_RENDERER_SOFTWARE); // SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC
-
-	if (_renderer == nullptr) {
-		throw jexception::RuntimeException("Cannot get a window's surface");
-	}
-
-	// SDL_SetWindowBordered(_window, SDL_FALSE);
-
-  jgui::jsize_t
-    min = GetMinimumSize(),
-    max = GetMaximumSize();
-
-	SDL_SetWindowMinimumSize(_window, min.width, min.height);
-	SDL_SetWindowMaximumSize(_window, max.width, max.height);
-	
-  // (SDL_GetWindowFlags(_window) & SDL_WINDOW_SHOWN);
-  SDL_ShowWindow(_window);
   */
+  
+  SetCursor(_cursors[JCS_DEFAULT].cursor, _cursors[JCS_DEFAULT].hot_x, _cursors[JCS_DEFAULT].hot_y);
 }
 
 NativeWindow::~NativeWindow()
@@ -984,14 +854,16 @@ bool NativeWindow::IsResizable()
 
 void NativeWindow::SetCursorLocation(int x, int y)
 {
+  _mouse_x = (x < 0)?0:(x > _screen.width)?_screen.width:x;
+  _mouse_y = (y < 0)?0:(y > _screen.height)?_screen.height:y;
 }
 
 jpoint_t NativeWindow::GetCursorLocation()
 {
 	jpoint_t p;
 
-	p.x = 0;
-	p.y = 0;
+	p.x = _mouse_x;
+	p.y = _mouse_y;
 
 	return p;
 }
@@ -1013,20 +885,36 @@ jcursor_style_t NativeWindow::GetCursor()
 
 void NativeWindow::SetCursorEnabled(bool enabled)
 {
+  _is_cursor_enabled = (enabled == false)?false:true;
 }
 
 bool NativeWindow::IsCursorEnabled()
 {
-	return true;
+	return _is_cursor_enabled;
 }
 
 void NativeWindow::SetCursor(jcursor_style_t style)
 {
   _cursor = style;
+	
+  SetCursor(_cursors[style].cursor, _cursors[style].hot_x, _cursors[style].hot_y);
 }
 
 void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 {
+	if ((void *)shape == nullptr) {
+		return;
+	}
+
+  if (_current_cursor.cursor != nullptr) {
+    delete _current_cursor.cursor;
+    _current_cursor.cursor = nullptr;
+  }
+
+  _current_cursor.cursor = dynamic_cast<jgui::Image *>(shape->Clone());
+
+  _current_cursor.hot_x = hotx;
+  _current_cursor.hot_y = hoty;
 }
 
 void NativeWindow::SetRotation(jwindow_rotation_t t)

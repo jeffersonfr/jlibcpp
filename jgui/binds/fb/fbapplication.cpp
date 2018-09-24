@@ -68,7 +68,7 @@ static jcursor_style_t _cursor = JCS_DEFAULT;
 /** \brief */
 static bool _is_cursor_enabled = true;
 /** \brief */
-static jgui::Image *_current_cursor;
+static struct cursor_params_t _current_cursor;
 
 static jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(int symbol, bool shift)
 {
@@ -355,7 +355,7 @@ void NativeApplication::InternalPaint()
   g_window->Paint(g);
   g_window->PaintGlassPane(g);
 	g->Translate(t.x, t.y);
-  g->DrawImage(_current_cursor, _mouse_x, _mouse_y);
+  g->DrawImage(_current_cursor.cursor, _mouse_x, _mouse_y);
 
   cairo_surface_t *cairo_surface = cairo_get_target(g->GetCairoContext());
 
@@ -410,13 +410,12 @@ void NativeApplication::InternalPaint()
   g_window->DispatchWindowEvent(new jevent::WindowEvent(g_window, jevent::JWET_PAINTED));
 }
 
-uint32_t last_mouse_state = 0x00;
-
 void NativeApplication::InternalLoop()
 {
   struct input_event ev;
   bool shift = false;
   int mouse_x = 0, mouse_y = 0;
+  uint32_t last_mouse_state = 0x00;
   static bool quitting = false;
 
   int 
@@ -526,7 +525,7 @@ void NativeApplication::InternalLoop()
       }
     }
 
-    char data[3];
+    signed char data[3];
 
     if (read(fdm, data, sizeof(data)) == sizeof(data)) {
       int 
@@ -605,7 +604,7 @@ void NativeApplication::InternalLoop()
 
       // SDL_GrabMode SDL_WM_GrabInput(SDL_GrabMode mode); // <SDL_GRAB_ON, SDL_GRAB_OFF>
 
-      g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x, _mouse_y));
+      g_window->GetEventManager()->PostEvent(new jevent::MouseEvent(g_window, type, button, buttons, mouse_z, _mouse_x + _current_cursor.hot_x, _mouse_y + _current_cursor.hot_y));
 
       continue;
     }
@@ -787,12 +786,15 @@ void NativeWindow::SetCursor(Image *shape, int hotx, int hoty)
 		return;
 	}
 
-  if (_current_cursor != nullptr) {
-    delete _current_cursor;
-    _current_cursor = nullptr;
+  if (_current_cursor.cursor != nullptr) {
+    delete _current_cursor.cursor;
+    _current_cursor.cursor = nullptr;
   }
 
-  _current_cursor = dynamic_cast<jgui::Image *>(shape->Clone());
+  _current_cursor.cursor = dynamic_cast<jgui::Image *>(shape->Clone());
+
+  _current_cursor.hot_x = hotx;
+  _current_cursor.hot_y = hoty;
 }
 
 void NativeWindow::SetRotation(jwindow_rotation_t t)
