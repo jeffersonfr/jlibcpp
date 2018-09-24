@@ -54,11 +54,11 @@ OK 				= \033[30;32mOK\033[m
 # {no, yes}
 ENABLE_DEBUG ?= yes
 
-# {allegro5, directfb, gl, gtk3, rpi, sdl2, sfml2, vdpau, vnc, xcb, xlib}
-ENABLE_GRAPHICS ?= sdl2
+# {allegro5, gl, gtk3, rpi, sdl2, sfml2, vdpau, vnc, xcb, xlib, directfb, fb}
+ENABLE_GRAPHICS ?= fb
 
 # {bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, flif}
-ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, webp, svg, tif, flif
+ENABLE_IMAGE ?= bmp, gif, ico, jpg, pcx, png, ppm, tga, xbm, xpm, heif, webp, jp2000, svg, tif, bpg, flif
 
 # {gif, ilist, v4l2, libvlc, libav, libxine, alsa, mixer}
 ENABLE_VIDEO ?= gif, ilist, v4l2, libvlc, libav, libxine, alsa, mixer

@@ -273,3 +273,48 @@ ifeq ($(ENABLE_GRAPHICS),directfb)
 
 endif
 
+ifeq ($(ENABLE_GRAPHICS),fb)
+	CCFLAGS 	+= \
+
+	LDFLAGS		+= \
+     -ljpeg \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DFB_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 fbapplication.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+
+ifeq ($(ENABLE_GRAPHICS),egl)
+	CCFLAGS 	+= \
+
+	LDFLAGS		+= \
+     `pkg-config --libs xcb` \
+     `pkg-config --libs x11-xcb` \
+     `pkg-config --libs egl` \
+     `pkg-config --libs glesv2` \
+     -lGLU -lGL\
+     -ljpeg \
+
+	DEFINES		+= \
+     -DJGUI_UI \
+		 -DEGL_UI \
+
+	REQUIRES	+= \
+
+	OBJS_gfx	+= \
+		 eglapplication.o\
+
+  OBJS_jgui	+= \
+     $(addprefix binds/$(ENABLE_GRAPHICS)/,$(OBJS_gfx))
+
+endif
+

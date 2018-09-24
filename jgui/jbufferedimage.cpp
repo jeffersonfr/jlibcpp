@@ -534,7 +534,7 @@ Image * BufferedImage::Scale(int width, int height)
 
 	Image *image = new BufferedImage(nullptr, _pixelformat, width, height);
 	
-  // INFO:: scale svg format
+#ifdef SVG_IMAGE
   std::string *data = (std::string *)cairo_surface_get_user_data(cairo_surface, nullptr);
 
   if (data != nullptr) {
@@ -547,6 +547,7 @@ Image * BufferedImage::Scale(int width, int height)
 
     return image;
   }
+#endif
 
 	if (GetGraphics()->GetAntialias() == JAM_NONE) {
 		uint32_t *src = new uint32_t[_size.width*_size.height];
