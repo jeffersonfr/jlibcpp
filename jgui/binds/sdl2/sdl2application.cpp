@@ -433,6 +433,7 @@ void NativeApplication::InternalPaint()
   dst.w = dw;
   dst.h = dh;
 
+  // SDL_RenderClear(_renderer);
   SDL_RenderCopy(_renderer, texture, nullptr, &dst);
 
   /* INFO:: dirty region
@@ -451,10 +452,10 @@ void NativeApplication::InternalPaint()
    SDL_RenderCopy(_renderer, texture, &src, &dst);
    */
 
+  SDL_RenderPresent(_renderer);
+
   SDL_DestroyTexture(texture);
   SDL_FreeSurface(surface);
-  SDL_RenderPresent(_renderer);
-  // SDL_GL_SetSwapInterval(1);
 
   g_window->Flush();
 
@@ -668,6 +669,9 @@ void NativeApplication::InternalLoop()
 
 void NativeApplication::InternalQuit()
 {
+  SDL_DestroyRenderer(_renderer);
+  SDL_DestroyWindow(_window);
+
 	SDL_Quit();
 }
 
@@ -809,7 +813,7 @@ jgui::jregion_t NativeWindow::GetVisibleBounds()
 		
 void NativeWindow::SetResizable(bool resizable)
 {
-  // SDL_SetWindowResizable(_window, resizable);
+  SDL_SetWindowResizable(_window, (SDL_bool)resizable);
 }
 
 bool NativeWindow::IsResizable()
