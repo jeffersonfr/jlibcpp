@@ -392,16 +392,16 @@ void Container::SetInsets(jinsets_t insets)
 
 void Container::InvalidateAll()
 {
-	std::vector<std::vector<jgui::Component *>> containers;
+ 	std::vector<std::vector<jgui::Component *> *> containers;
 
   std::lock_guard<std::mutex> guard(_container_mutex);
 
-	containers.push_back(_components);
+	containers.push_back(&_components);
 
 	do {
-		const std::vector<jgui::Component *> &c = containers.front();
+		std::vector<jgui::Component *> *c = (*containers.begin());
 
-		for (std::vector<jgui::Component *>::const_iterator i=c.begin(); i!=c.end(); i++) {
+		for (std::vector<jgui::Component *>::iterator i=c->begin(); i!=c->end(); i++) {
 			jgui::Component *component = (*i);
 
 			component->Invalidate();
@@ -409,7 +409,7 @@ void Container::InvalidateAll()
 			Container *container = dynamic_cast<jgui::Container *>(component);
 
 			if (container != nullptr) {
-				containers.push_back(container->GetComponents());
+				containers.push_back(const_cast<std::vector<jgui::Component *> *>(&container->GetComponents()));
 			}
 		}
 
@@ -419,16 +419,16 @@ void Container::InvalidateAll()
 
 void Container::RevalidateAll()
 {
-	std::vector<std::vector<jgui::Component *>> containers;
+	std::vector<std::vector<jgui::Component *> *> containers;
 
   std::lock_guard<std::mutex> guard(_container_mutex);
 
-	containers.push_back(_components);
+	containers.push_back(&_components);
 
 	do {
-		const std::vector<jgui::Component *> &c = containers.front();
+		std::vector<jgui::Component *> *c = (*containers.begin());
 
-		for (std::vector<jgui::Component *>::const_iterator i=c.begin(); i!=c.end(); i++) {
+		for (std::vector<jgui::Component *>::iterator i=c->begin(); i!=c->end(); i++) {
 			jgui::Component *component = (*i);
 
 			component->Revalidate();
@@ -436,7 +436,7 @@ void Container::RevalidateAll()
 			Container *container = dynamic_cast<jgui::Container *>(component);
 		
 			if (container != nullptr) {
-				containers.push_back(container->GetComponents());
+				containers.push_back(const_cast<std::vector<jgui::Component *> *>(&container->GetComponents()));
 			}
 		}
 

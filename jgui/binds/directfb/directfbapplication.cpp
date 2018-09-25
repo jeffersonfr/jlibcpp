@@ -62,6 +62,8 @@ static int _click_count;
 static Window *g_window = nullptr;
 /** \brief */
 static jcursor_style_t _cursor = JCS_DEFAULT;
+/** \brief */
+static bool _is_cursor_enabled = true;
 
 jevent::jkeyevent_symbol_t TranslateToNativeKeySymbol(DFBInputDeviceKeySymbol symbol)
 {
@@ -552,6 +554,8 @@ void NativeApplication::InternalLoop()
     event_buffer->WaitForEventWithTimeout(event_buffer, 0, 100);
 
     while (event_buffer->GetEvent(event_buffer, DFB_EVENT(&event)) == DFB_OK) {
+      event_buffer->Reset(event_buffer);
+
       if (event.type == DWET_ENTER) {
         // SDL_CaptureMouse(true);
         // void SDL_SetWindowGrab(SDL_Window* window, SDL_bool grabbed);

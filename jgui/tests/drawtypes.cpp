@@ -46,7 +46,7 @@ class Main : public jgui::Window {
       LoadImage("jpg");
       LoadImage("pcx");
       LoadImage("png");
-      LoadImage("pnm");
+      LoadImage("ppm");
       LoadImage("tga");
       LoadImage("xbm");
       LoadImage("xpm");
